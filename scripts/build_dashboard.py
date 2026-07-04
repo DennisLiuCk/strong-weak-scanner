@@ -18,6 +18,7 @@ TEMPLATE = os.path.join(ROOT, "scripts", "dashboard_template.html")
 OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages 乾淨網址
 
 GROUP_ORDER = ["passive", "power", "packtest"]
+GROUP_NM = {"passive": "被動元件", "power": "功率元件", "packtest": "封測"}
 TIER_ORDER = ["真強", "蓄勢·外資佈局", "強但過熱", "潛在/中性", "真弱", "真弱·陷阱"]
 TIER_VT = {"真強": 2, "蓄勢·外資佈局": 2, "強但過熱": 1, "潛在/中性": 0, "真弱": -2, "真弱·陷阱": -2}
 TIER_COL = {"真強": "var(--strong)", "蓄勢·外資佈局": "var(--neutral)", "強但過熱": "var(--warn-line)",
@@ -114,6 +115,20 @@ def verdict(sc):
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"])
 
 
+def group_state(r):
+    """族群層狀態:med_dip(修正日中位淨買)為主訊號(實測「最高者領漲」命中 68%,基準 33%)。"""
+    b, dist, dip, rel = r["breadth_f"], r["med_dist60"], r["med_dip"], r["rel20"]
+    if b is None or dist is None:
+        return "資料不足", "var(--neutral)", "族群指標樣本不足"
+    if dip is not None and dip > 0 and dist <= -0.05:
+        return "蓄勢·被佈局", "var(--warn-line)", "修正日有人接、價未回高——佈局特徵"
+    if rel is not None and rel > 0 and dist > -0.05:
+        return "發動·領漲", "var(--strong)", "動能領先全體、價近波段高"
+    if (dip is not None and dip < 0) and b <= 0.4:
+        return "籌碼退潮", "var(--weak)", "修正日遭調節、佈局廣度低"
+    return "中性觀察", "var(--neutral)", "族群訊號分歧"
+
+
 def main():
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
@@ -124,7 +139,25 @@ def main():
     rows = con.execute("""SELECT u.stock_id, u.name, u.grp, sc.*, m.*
         FROM daily_scores sc JOIN universe u USING(stock_id) JOIN daily_metrics m USING(date, stock_id)
         WHERE sc.date=?""", (last,)).fetchall()
+    grows = con.execute("SELECT * FROM group_metrics WHERE date=?", (last,)).fetchall()
+    mk = con.execute("SELECT * FROM market_daily WHERE date=?", (last,)).fetchone()
     con.close()
+
+    groups = []
+    for g in GROUP_ORDER:
+        r = next((x for x in grows if x["grp"] == g), None)
+        if not r:
+            continue
+        st, col, note = group_state(r)
+        groups.append({"nm": GROUP_NM.get(g, g), "state": st, "col": col, "note": note, "stats": [
+            ["修正日中位淨買", f"{r['med_dip']:+.2f}%股本" if r["med_dip"] is not None else "-"],
+            ["外資佈局廣度", f"{r['breadth_f']*100:.0f}%" if r["breadth_f"] is not None else "-"],
+            ["20日動能 vs 全體", pct(r["rel20"], True) if r["rel20"] is not None else "-"],
+            ["中位距60日高", pct(r["med_dist60"]) if r["med_dist60"] is not None else "-"],
+            ["投信5日合計", f"{r['trust_pct']:+.2f}%股本" if r["trust_pct"] is not None else "-"],
+        ]})
+    mchip = (f"市場 <b>{'⚠ 修正' if mk['regime'] else '多頭/中性'}</b>(TAIEX 距20日高 {mk['dd20']*100:+.1f}%)"
+             if (mk and mk["dd20"] is not None) else "市場 <b>-</b>")
 
     data, tiers_map = [], {}
     for r in rows:
@@ -153,6 +186,8 @@ def main():
     html = open(TEMPLATE, encoding="utf-8").read()
     html = html.replace("__DATA_JSON__", json.dumps(data, ensure_ascii=False))
     html = html.replace("__TIERS_JSON__", json.dumps(tiers, ensure_ascii=False))
+    html = html.replace("__GROUPS_JSON__", json.dumps(groups, ensure_ascii=False))
+    html = html.replace("__MARKET_CHIP__", mchip)
     html = html.replace("__DATE__", date_str)
     open(OUT, "w", encoding="utf-8").write(html)
     print(f"已重生 {OUT} — 資料日 {date_str},{len(data)} 檔,{len(tiers)} 個 tier")

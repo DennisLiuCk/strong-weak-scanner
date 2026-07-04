@@ -172,12 +172,11 @@
     <div>
       <div class="brandrule"></div>
       <h1>被動 × 功率 × 封測 · 汰弱留強五元素儀表板</h1>
-      <p class="sub">台股 2026 年 6 月修正下,三大半導體族群共 30 檔的強弱掃描。價是表象,量定真假,外資/投信是法人方向,融資券是散戶籌碼與未來賣壓——五者交叉才看得出誰真強、誰是出貨陷阱、誰是外資默默佈局的蓄勢股。</p>
+      <p class="sub">台股三大半導體族群共 30 檔的汰弱留強掃描(v2 族群內排名制)。個股層比「相對強弱 + 修正日抗跌」選強汰弱;族群層看「佈局廣度 + 逆勢買超」找出正在被默默佈局的族群——兩層各司其職,tier 需連兩日確認。</p>
       <div class="meta">
-        <span class="chip">修正① <b>6/3→6/11 −7%</b></span>
-        <span class="chip">修正② <b>6/22→6/26 −6.6%</b></span>
+        <span class="chip">市場 <b>多頭/中性</b>(TAIEX 距20日高 -1.7%)</span>
         <span class="chip">範圍 <b>3 族群 · 30 檔</b></span>
-        <span class="chip">資料至 <b>2026/7/3</b>(原始股價)</span>
+        <span class="chip">資料至 <b>2026/7/3</b>(還原股價)</span>
         <span class="chip">來源 <b>FinMind</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
       </div>
@@ -200,16 +199,19 @@
       </div>
     </div>
     <div>
-      <h3>五元素(欄位)</h3>
+      <h3>五元素(欄位;v2 族群內排名制)</h3>
       <div class="elrow">
-        <span class="el"><span class="n">①&nbsp;價</span><span class="r">距波段高 / 反彈 — 表象</span></span>
-        <span class="el"><span class="n">②&nbsp;量</span><span class="r">周轉率 / 量能 — 價格真假</span></span>
-        <span class="el"><span class="n">③&nbsp;外資</span><span class="r">持股比例變化 — 國際法人</span></span>
-        <span class="el"><span class="n">④&nbsp;投信</span><span class="r">買賣超 / 認養 — 本土法人</span></span>
-        <span class="el"><span class="n">⑤&nbsp;融資券</span><span class="r">散戶水位 / 券資比 — 未來賣壓</span></span>
+        <span class="el"><span class="n">①&nbsp;價</span><span class="r">族群內相對強弱 + 修正日抗跌</span></span>
+        <span class="el"><span class="n">②&nbsp;量</span><span class="r">量比(自身60日基期)— 過熱旗標</span></span>
+        <span class="el"><span class="n">③&nbsp;外資</span><span class="r">持股pp變化 + 逆勢買超 — 族群層為主</span></span>
+        <span class="el"><span class="n">④&nbsp;投信</span><span class="r">近5日佔股本 — 本土法人 / 作帳</span></span>
+        <span class="el"><span class="n">⑤&nbsp;融資券</span><span class="r">價×融資交互 + 散戶水位 — 未來賣壓</span></span>
       </div>
     </div>
   </div>
+
+  <h2 class="sec">族群雷達 · 哪個族群正在被佈局</h2>
+  <div class="tiers" id="groups"></div>
 
   <h2 class="sec">結論 · 汰弱留強</h2>
   <div class="tiers" id="tiers"></div>
@@ -222,8 +224,8 @@
   <footer>
     <div class="caveat" id="caveat"><b>唯一未補齊:</b>「主力是哪個分點」需券商分點進出(<span class="mono">TaiwanStockTradingDailyReport</span>,Sponsor 等級,目前端點逾時未開通)。小型股外資持股單日有保管行重分類雜訊,本表看淨趨勢並與買賣超交叉驗證。</div>
     <div class="fn" style="margin-top:14px">
-      <div><b>指標定義</b> · 距波段高 = 7/3收盤相對區間最高收盤;周轉率 = 當日成交量 ÷ 發行股數;外資持股Δ = 6/15→7/3持股比例變化(pp);散戶水位 = 融資餘額 ÷ 發行股數;券資比 = 融券餘額 ÷ 融資餘額。</div>
-      <div><b>方法</b> · 強弱為五元素綜合研判,非單一報酬率。原始未還原股價,短線比較用途;長期報酬應改用還原股價。本頁為量化籌碼判讀,非投資建議。</div>
+      <div><b>指標定義</b> · 相對強弱 rs20 = 20日報酬 − 族群中位;抗跌 = 族群下跌日的平均相對表現(20日);逆勢買超 = 族群下跌日外資淨買 20 日累計 ÷ 股本;佈局廣度 = 族群內外資 20 日增持檔數比例;量比 = 當日周轉率 ÷ 自身 60 日中位;散戶水位 = 融資餘額 ÷ 發行股數。</div>
+      <div><b>方法</b> · v2 族群內排名制:各元素取族群內分位數(−2..+2)加權合成,綜合分 3 日平滑、tier 連 2 日確認。價格類指標用還原股價(除權息/分割已本地調整)。個股層選強弱、族群層找佈局。本頁為量化籌碼判讀,非投資建議。</div>
     </div>
   </footer>
 </div>
@@ -234,8 +236,8 @@
 (function(){
   "use strict";
   var EL = [
-    {k:"①價", role:"表象"},
-    {k:"②量", role:"價格真假"},
+    {k:"①價", role:"族群相對"},
+    {k:"②量", role:"量比/過熱"},
     {k:"③外資", role:"國際法人"},
     {k:"④投信", role:"本土法人"},
     {k:"⑤融資券", role:"散戶籌碼"}
@@ -378,6 +380,30 @@
     if(row.g!==curG){ matrix.appendChild(groupHead(row.g)); curG=row.g; }
     matrix.appendChild(stockRow(row));
   });
+
+  // ---------- group radar ----------
+  var GROUPS = [{"nm": "被動元件", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-1.07%股本"], ["外資佈局廣度", "20%"], ["20日動能 vs 全體", "+27.6%"], ["中位距60日高", "-6.1%"], ["投信5日合計", "+3.17%股本"]]}, {"nm": "功率元件", "state": "發動·領漲", "col": "var(--strong)", "note": "動能領先全體、價近波段高", "stats": [["修正日中位淨買", "-0.19%股本"], ["外資佈局廣度", "60%"], ["20日動能 vs 全體", "+5.4%"], ["中位距60日高", "-2.9%"], ["投信5日合計", "-0.71%股本"]]}, {"nm": "封測", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.43%股本"], ["外資佈局廣度", "70%"], ["20日動能 vs 全體", "-13.4%"], ["中位距60日高", "-6.0%"], ["投信5日合計", "-2.44%股本"]]}];
+  (function(){
+    var host = document.getElementById("groups");
+    if(!host) return;
+    GROUPS.forEach(function(g){
+      var el = document.createElement("div");
+      el.className = "tier";
+      el.style.setProperty("--tc", g.col);
+      var tt = document.createElement("div"); tt.className = "tt"; tt.textContent = g.nm; el.appendChild(tt);
+      var st = document.createElement("div"); st.className = "td";
+      st.style.color = g.col; st.style.fontWeight = "700"; st.textContent = g.state; el.appendChild(st);
+      var nt = document.createElement("div"); nt.className = "td"; nt.textContent = g.note; el.appendChild(nt);
+      var picks = document.createElement("div"); picks.className = "picks";
+      g.stats.forEach(function(s){
+        var p = document.createElement("div"); p.className = "pick";
+        var lab = document.createElement("span"); lab.className = "code"; lab.style.flex = "1"; lab.textContent = s[0];
+        var val = document.createElement("span"); val.className = "nm mono"; val.textContent = s[1];
+        p.appendChild(lab); p.appendChild(val); picks.appendChild(p);
+      });
+      el.appendChild(picks); host.appendChild(el);
+    });
+  })();
 
   // ---------- tiers summary ----------
   var TIERS = [{"t": "真強", "d": "價強且籌碼扎實", "col": "var(--strong)", "ids": ["3711", "6257"]}, {"t": "蓄勢·外資佈局", "d": "外資/投信吃貨,價未發動", "col": "var(--neutral)", "ids": ["2478"]}, {"t": "強但過熱", "d": "價強但散戶滿載,別追高", "col": "var(--warn-line)", "ids": ["5328", "8261", "6573", "2375"]}, {"t": "潛在/中性", "d": "訊號分歧,觀察", "col": "var(--neutral)", "ids": ["3026", "2369", "2481", "3264", "8150", "2449", "2441", "2492", "6173", "3317", "6435", "5299", "6239", "2472", "5425", "3675", "2327"]}, {"t": "真弱", "d": "價籌俱弱", "col": "var(--weak)", "ids": ["6284", "3236", "8255", "2329", "6147"]}, {"t": "真弱·陷阱", "d": "外資出、散戶接", "col": "var(--weak)", "ids": ["6415"]}];

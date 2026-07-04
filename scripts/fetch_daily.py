@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS dividend_result(date TEXT, stock_id TEXT, before_pric
   reference_price REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS split_event(date TEXT, stock_id TEXT, before_price REAL,
   after_price REAL, PRIMARY KEY(date,stock_id));
+CREATE TABLE IF NOT EXISTS market(date TEXT PRIMARY KEY, taiex REAL);
 CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS fetch_log(ts TEXT, start TEXT, "end" TEXT, rows INTEGER);
 """
@@ -145,6 +146,16 @@ def fetch_splits(con, ids, token, start, end, sleep):
             for d in data if d.get("stock_id") in keep and d.get("before_price") and d.get("after_price")]
     if rows:
         con.executemany("INSERT OR REPLACE INTO split_event VALUES(?,?,?,?)", rows)
+        con.commit()
+    time.sleep(sleep)
+    return len(rows)
+
+def fetch_index(con, token, start, end, sleep):
+    """加權報酬指數(TAIEX,含息)→ market(upsert)。大盤 regime 旗標的原料。"""
+    data = api_get("TaiwanStockTotalReturnIndex", "TAIEX", start, end, token)
+    rows = [(d["date"], d.get("price")) for d in data if d.get("price")]
+    if rows:
+        con.executemany("INSERT OR REPLACE INTO market VALUES(?,?)", rows)
         con.commit()
     time.sleep(sleep)
     return len(rows)
@@ -299,6 +310,57 @@ def build_metrics(con):
         con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(" + ",".join("?" * 26) + ")", out)
     con.commit()
 
+def build_group_market(con):
+    """族群層聚合 + 大盤 regime(整表重建,冪等)。
+    Phase 1 實證:籌碼(外資pp/逆勢買超)是「族群層」訊號、族群內無選股力 →
+    佈局廣度與中位籌碼在此聚合,回答「哪個族群正在被佈局」;個股層交給 score.py 排名。"""
+    # 大盤:TAIEX 距 20 日高 → regime(1=修正:dd ≤ -3%)
+    con.execute("DROP TABLE IF EXISTS market_daily")
+    con.execute("CREATE TABLE market_daily(date TEXT PRIMARY KEY, taiex REAL, dd20 REAL, regime INT)")
+    rows = con.execute("SELECT date, taiex FROM market ORDER BY date").fetchall()
+    closes = [r[1] for r in rows]
+    mk = []
+    for k, (d, c) in enumerate(rows):
+        win = [x for x in closes[max(0, k-19):k+1] if x]
+        dd = (c / max(win) - 1) if (c and win) else None
+        mk.append((d, c, dd, 1 if (dd is not None and dd <= -0.03) else 0))
+    con.executemany("INSERT INTO market_daily VALUES(?,?,?,?)", mk)
+    # 族群層:佈局廣度 + 中位價位階/動能 + 中位籌碼
+    con.execute("DROP TABLE IF EXISTS group_metrics")
+    con.execute("""CREATE TABLE group_metrics(
+        date TEXT, grp TEXT,
+        breadth_f REAL,                                 -- 佈局廣度:fpct_chg20>0 檔數比例
+        med_dist60 REAL, med_ret20 REAL, rel20 REAL,    -- 中位距60日高 / 20日動能 / 相對全體
+        med_fpct20 REAL, med_dip REAL, trust_pct REAL,  -- 中位外資pp / 中位逆勢買超 / 投信5日合計佔股本%
+        PRIMARY KEY(date, grp))""")
+    agg, uni_ret = {}, {}
+    for d, grp, f20, dist60, ret20, dip, tpct in con.execute(
+            """SELECT m.date, u.grp, m.fpct_chg20, m.dist_hi60, m.ret20, m.dipbuy20, m.trust5_pct
+               FROM daily_metrics m JOIN universe u USING(stock_id)"""):
+        a = agg.setdefault((d, grp), {"f20": [], "dist": [], "ret": [], "dip": [], "t": []})
+        if f20 is not None:
+            a["f20"].append(f20)
+        if dist60 is not None:
+            a["dist"].append(dist60)
+        if ret20 is not None:
+            a["ret"].append(ret20)
+            uni_ret.setdefault(d, []).append(ret20)
+        if dip is not None:
+            a["dip"].append(dip)
+        if tpct is not None:
+            a["t"].append(tpct)
+    def med(v):
+        return statistics.median(v) if v else None
+    out = []
+    for (d, grp), a in agg.items():
+        breadth = (sum(1 for x in a["f20"] if x > 0) / len(a["f20"])) if a["f20"] else None
+        m20, u20 = med(a["ret"]), med(uni_ret.get(d))
+        rel20 = (m20 - u20) if (m20 is not None and u20 is not None) else None
+        out.append((d, grp, breadth, med(a["dist"]), m20, rel20,
+                    med(a["f20"]), med(a["dip"]), (sum(a["t"]) if a["t"] else None)))
+    con.executemany("INSERT OR REPLACE INTO group_metrics VALUES(?,?,?,?,?,?,?,?,?)", out)
+    con.commit()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", help="YYYY-MM-DD;省略則抓最近 --days 天")
@@ -313,9 +375,10 @@ def main():
         con.executescript(SCHEMA)
         load_universe(con)
         con.commit()
-        print("只重算 price_adj + daily_metrics(不抓取)…")
+        print("只重算 price_adj + daily_metrics + 族群/大盤層(不抓取)…")
         build_price_adj(con)
         build_metrics(con)
+        build_group_market(con)
         n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
         con.close()
         print(f"完成 — daily_metrics {n} rows")
@@ -350,10 +413,12 @@ def main():
     print(f"除權息/分割事件 {adj_start} .. {today} …")
     nd = fetch_dividends(con, ids, token, adj_start, today, args.sleep)
     ns = fetch_splits(con, ids, token, adj_start, today, args.sleep)
+    ni = fetch_index(con, token, adj_start, today, args.sleep)
     build_price_adj(con)
-    print(f"dividend_result upsert {nd};split_event upsert {ns};price_adj 已重算")
-    print("重算 daily_metrics …")
+    print(f"dividend_result upsert {nd};split_event upsert {ns};TAIEX {ni};price_adj 已重算")
+    print("重算 daily_metrics + 族群/大盤層 …")
     build_metrics(con)
+    build_group_market(con)
     n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
     con.close()
     print(f"完成 — 原始 {total} rows 落地,daily_metrics {n} rows → {DB}")
