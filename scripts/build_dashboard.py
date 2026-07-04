@@ -60,17 +60,23 @@ def build_cells(sc, m):
               f"修正日抗跌 {pct(m['down_rs20'], True)}(抗{sc['s_resil']:+d});"
               f"前一日 {pct(m['ret1'], True)}(還原價)")
     cells.append([sc["s_price"], val, detail, R_PRICE[sc["s_price"]]])
-    # ② 量
+    # ② 量(v2:量比 = 當日周轉率 / 自身60日中位;周轉率移入 tooltip)
     t = m["turnover_pct"]
+    vr = m["vol_ratio60"]
     if t is not None and t >= 20:
         rv, warn = "周轉率過高、當沖過熱", 1
+    elif vr is not None and vr >= 5:
+        rv, warn = "量比爆增、過熱", 1
     elif sc["s_vol"] == 1:
         rv, warn = "量能健康活絡", 0
-    elif t is not None and t < 1:
+    elif sc["s_vol"] == -1:
         rv, warn = "量縮、人氣不足", 0
     else:
         rv, warn = "量能中等", 0
-    c = [sc["s_vol"], pctp(t), f"周轉率 {pctp(t)}(當日量/發行股數)", rv]
+    val = f"{vr:.1f}×" if vr is not None else "-"
+    detail = (f"量比 {vr:.1f}×(相對自身60日中位);周轉率 {pctp(t)}" if vr is not None
+              else f"周轉率 {pctp(t)}(量比樣本不足)")
+    c = [sc["s_vol"], val, detail, rv]
     if warn:
         c.append(1)
     cells.append(c)
@@ -164,7 +170,7 @@ def main():
             ["外資佈局廣度", f"{r['breadth_f']*100:.0f}%" if r["breadth_f"] is not None else "-"],
             ["20日動能 vs 全體", pct(r["rel20"], True) if r["rel20"] is not None else "-"],
             ["中位距60日高", pct(r["med_dist60"]) if r["med_dist60"] is not None else "-"],
-            ["投信5日中位", f"{r['med_trust']:+.2f}%股本" if r["med_trust"] is not None else "-"],
+            ["投信買超廣度", f"{r['breadth_t']*100:.0f}%" if r["breadth_t"] is not None else "-"],
         ]})
     lag = f",指數至 {int(mk['date'][5:7])}/{int(mk['date'][8:10])}" if (mk and mk["date"] != last) else ""
     mchip = (f"市場 <b>{'⚠ 修正' if mk['regime'] else '多頭/中性'}</b>(報酬指數距20日高 {mk['dd20']*100:+.1f}%{lag})"

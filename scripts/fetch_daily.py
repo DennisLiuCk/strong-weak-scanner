@@ -361,7 +361,7 @@ def build_group_market(con):
         date TEXT, grp TEXT,
         breadth_f REAL,                        -- 佈局廣度:fpct_chg20>0 檔數比例
         med_dist60 REAL, rel20 REAL,           -- 中位距60日高 / 20日動能相對全體
-        med_dip REAL, med_trust REAL,          -- 中位逆勢買超 / 中位投信5日佔股本
+        med_dip REAL, breadth_t REAL,          -- 中位逆勢買超 / 投信買超廣度(5日淨買>0 檔數比例)
         state TEXT, note TEXT,                 -- 族群狀態(規則見 _gstate)
         PRIMARY KEY(date, grp))""")
     agg, uni_ret = {}, {}
@@ -385,12 +385,13 @@ def build_group_market(con):
     out = []
     for (d, grp), a in agg.items():
         breadth = (sum(1 for x in a["f20"] if x > 0) / len(a["f20"])) if len(a["f20"]) >= GRP_MIN_N else None
+        breadth_t = (sum(1 for x in a["t"] if x > 0) / len(a["t"])) if len(a["t"]) >= GRP_MIN_N else None
         m20 = med(a["ret"])
         u20 = statistics.median(uni_ret[d]) if uni_ret.get(d) else None
         rel20 = (m20 - u20) if (m20 is not None and u20 is not None) else None
-        dist, dip, tr = med(a["dist"]), med(a["dip"]), med(a["t"])
+        dist, dip = med(a["dist"]), med(a["dip"])
         state, note = _gstate(breadth, dist, dip, rel20)
-        out.append((d, grp, breadth, dist, rel20, dip, tr, state, note))
+        out.append((d, grp, breadth, dist, rel20, dip, breadth_t, state, note))
     con.executemany("INSERT OR REPLACE INTO group_metrics VALUES(?,?,?,?,?,?,?,?,?)", out)
     con.commit()
 
