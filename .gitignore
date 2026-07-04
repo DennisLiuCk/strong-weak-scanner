@@ -1,0 +1,25 @@
+# ── 機密:絕不進版控 ──────────────────────────────
+# .mcp.json 含 FINMIND_TOKEN;雲端改用 secret 注入
+.mcp.json
+.env
+*.token
+secrets/
+
+# ── Claude Code 本機設定 ──
+.claude/
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.uv/
+
+# ── OS / 編輯器 ──
+Thumbs.db
+.DS_Store
+*.swp
+*~
+
+# 注意:data/findmind.db 是刻意版控的 —— 方案 A 靠它跨天累積狀態。
+# 若日後嫌二進位 db 讓 repo 變大,可改成只 commit CSV 匯出。
