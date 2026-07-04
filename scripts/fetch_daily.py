@@ -13,8 +13,9 @@ FinMind 五元素每日抓取 → SQLite 落地。
 Token 讀取順序:環境變數 FINMIND_TOKEN → 專案根目錄 .mcp.json。
 抓完會自動重算 daily_metrics(五元素衍生指標表)。
 價格類指標(ret1/距高)用還原股價 price_adj。FinMind 的 TaiwanStockPriceAdj 免費層不可用
-(需 Sponsor),所以改抓 TaiwanStockDividendResult(免費)的除權息前收盤/參考價,
-本地以倒推法重算還原價(除息日前的歷史價 × reference/before,最新區段==原始價)。
+(需 Sponsor),所以改抓 TaiwanStockDividendResult + TaiwanStockSplitPrice(皆免費),
+本地以倒推法重算還原價(事件日前的歷史價 × 係數連乘,最新區段==原始價)。
+減資參考價 dataset 需付費、未涵蓋——由「無事件大跳空」偵測示警兜底。
 price_adj 每次整表重建、冪等;原始 price 表維持 append-only 不動。
 """
 import argparse, csv, json, os, sqlite3, sys, time
@@ -41,6 +42,8 @@ CREATE TABLE IF NOT EXISTS holding(date TEXT, stock_id TEXT, foreign_pct REAL, s
   PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS dividend_result(date TEXT, stock_id TEXT, before_price REAL,
   reference_price REAL, PRIMARY KEY(date,stock_id));
+CREATE TABLE IF NOT EXISTS split_event(date TEXT, stock_id TEXT, before_price REAL,
+  after_price REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS fetch_log(ts TEXT, start TEXT, "end" TEXT, rows INTEGER);
 """
@@ -53,8 +56,10 @@ def get_token():
         return json.load(f)["mcpServers"]["finmind"]["env"]["FINMIND_TOKEN"]
 
 def api_get(dataset, data_id, start, end, token, retries=3):
-    q = urllib.parse.urlencode({"dataset": dataset, "data_id": data_id,
-                                "start_date": start, "end_date": end})
+    p = {"dataset": dataset, "start_date": start, "end_date": end}
+    if data_id:
+        p["data_id"] = data_id          # 部分 dataset(如 TaiwanStockSplitPrice)全市場一次回傳
+    q = urllib.parse.urlencode(p)
     url = API + "?" + q
     for i in range(retries):
         try:
@@ -73,6 +78,7 @@ def load_universe(con):
     with open(UNIVERSE, encoding="utf-8") as f:
         for r in csv.DictReader(f):
             rows.append((r["stock_id"].strip(), r["name"].strip(), r["group"].strip()))
+    con.execute("DELETE FROM universe")   # 從 csv 整表重建:移除的股票不再殭屍重算
     con.executemany("INSERT OR REPLACE INTO universe VALUES(?,?,?)", rows)
     return [r[0] for r in rows]
 
@@ -116,7 +122,8 @@ UPSERT = {"TaiwanStockPrice": up_price, "TaiwanStockInstitutionalInvestorsBuySel
           "TaiwanStockMarginPurchaseShortSale": up_margin, "TaiwanStockShareholding": up_holding}
 
 def fetch_dividends(con, ids, token, start, end, sleep):
-    """除權息結果 → dividend_result(upsert)。事件稀疏,整段視窗抓也便宜。"""
+    """除權息結果 → dividend_result(upsert)。事件稀疏,整段視窗抓也便宜(payload 極小,
+    抓全視窗才能保證「price 涵蓋範圍內的事件都在庫」,回補舊價也不會留缺口)。"""
     n = 0
     for sid in ids:
         data = api_get("TaiwanStockDividendResult", sid, start, end, token)
@@ -129,25 +136,67 @@ def fetch_dividends(con, ids, token, start, end, sleep):
         time.sleep(sleep)
     return n
 
+def fetch_splits(con, ids, token, start, end, sleep):
+    """股票分割/反分割參考價 → split_event(upsert)。此 dataset 免 data_id、全市場一次回傳,
+    只留 universe 內的股票。"""
+    data = api_get("TaiwanStockSplitPrice", None, start, end, token)
+    keep = set(ids)
+    rows = [(d["date"], d["stock_id"], d.get("before_price"), d.get("after_price"))
+            for d in data if d.get("stock_id") in keep and d.get("before_price") and d.get("after_price")]
+    if rows:
+        con.executemany("INSERT OR REPLACE INTO split_event VALUES(?,?,?,?)", rows)
+        con.commit()
+    time.sleep(sleep)
+    return len(rows)
+
 def build_price_adj(con):
-    """由 price × 除權息係數重算還原價(倒推法:除息日「之前」的價 × reference/before 連乘)。
-    整表重建、冪等;無除權息事件時 price_adj == price。註:減資/分割參考價另有 dataset,未涵蓋。"""
+    """由 price × 事件係數重算還原價(倒推法:事件日「之前」的價 × 係數連乘,最新區段==原始價)。
+    事件來源:dividend_result(date=除息「交易日」、before_price=前一交易日收盤——已對 10 筆實際
+    事件逐一驗證;係數 reference/before 必然 <=1)+ split_event(分割/反分割,係數 after/before
+    可 >1)。減資參考價 dataset 需付費、未涵蓋 → 靠下方「無事件大跳空」偵測示警。
+    整表重建、冪等;無事件時 price_adj == price。異常事件一律 stderr 示警、不靜默。"""
     con.execute("DELETE FROM price_adj")
-    for (sid,) in con.execute("SELECT stock_id FROM universe"):
-        evs = [(d, rp / bp) for d, bp, rp in con.execute(
-                   "SELECT date, before_price, reference_price FROM dividend_result "
-                   "WHERE stock_id=?", (sid,)).fetchall()
-               if bp and rp and 0 < rp / bp <= 1.5]
-        out = []
-        for d, c in con.execute("SELECT date, close FROM price WHERE stock_id=? ORDER BY date", (sid,)):
+    for (sid,) in con.execute("SELECT stock_id FROM universe").fetchall():
+        evs = []   # (事件日, 係數, 事件前收盤)
+        for d, bp, rp in con.execute("SELECT date, before_price, reference_price FROM dividend_result "
+                                     "WHERE stock_id=?", (sid,)).fetchall():
+            f = (rp / bp) if (bp and rp) else None
+            if f is None or not (0 < f <= 1.02):
+                print(f"  ! {sid} {d} 除權息係數異常 ({bp}->{rp}),略過該事件", file=sys.stderr)
+                continue
+            evs.append((d, f, bp))
+        for d, bp, ap in con.execute("SELECT date, before_price, after_price FROM split_event "
+                                     "WHERE stock_id=?", (sid,)).fetchall():
+            f = (ap / bp) if (bp and ap) else None
+            if f is None or not (0.05 <= f <= 20):
+                print(f"  ! {sid} {d} 分割係數異常 ({bp}->{ap}),略過該事件", file=sys.stderr)
+                continue
+            evs.append((d, f, bp))
+        rows = con.execute("SELECT date, close FROM price WHERE stock_id=? ORDER BY date", (sid,)).fetchall()
+        for ed, _f, bp in evs:   # 對帳:事件 before_price 應==前一交易日收盤,不符=日期語義漂移
+            prev = next((c for d2, c in reversed(rows) if d2 < ed and c is not None), None)
+            if prev and bp and abs(prev - bp) / bp > 0.01:
+                print(f"  ! {sid} {ed} before_price {bp} != 前日收盤 {prev},請查事件日期語義", file=sys.stderr)
+        ev_dates = {e[0] for e in evs}
+        out, prev_c = [], None
+        for d, c in rows:
             if c is None:
                 continue
+            if prev_c and abs(c / prev_c - 1) > 0.15 and d not in ev_dates:   # 台股漲跌幅 ±10%
+                print(f"  ! {sid} {d} 原始價跳空 {c/prev_c-1:+.0%} 且無已知事件——疑似減資/缺事件,"
+                      f"還原價未修正", file=sys.stderr)
+            prev_c = c
             f = 1.0
-            for ed, ef in evs:
+            for ed, ef, _bp in evs:
                 if ed > d:
                     f *= ef
             out.append((d, sid, round(c * f, 4)))
         con.executemany("INSERT OR REPLACE INTO price_adj VALUES(?,?,?)", out)
+    miss = con.execute("""SELECT COUNT(*) FROM price p JOIN universe u USING(stock_id)
+                          LEFT JOIN price_adj a ON a.date=p.date AND a.stock_id=p.stock_id
+                          WHERE p.close IS NOT NULL AND a.close IS NULL""").fetchone()[0]
+    if miss:
+        print(f"  ! price_adj 缺 {miss} 列(metrics 將以原始價替代——不應發生,請檢查)", file=sys.stderr)
     con.commit()
 
 def build_metrics(con):
@@ -179,15 +228,13 @@ def build_metrics(con):
         mbal = [r[4] for r in rows]
         trust = [r[6] or 0 for r in rows]
         fnet = [r[7] or 0 for r in rows]
-        sh = [r[8] for r in rows]      # 股本逐日 forward-fill;最前段缺值用第一筆已知回填
-        prev = None
+        sh = [r[8] for r in rows]   # 股本逐日 forward-fill,0/None 都視為缺值;
+        prev = next((x for x in sh if x), None)   # 種子=第一筆已知 → 最前段以其回填(輕微前視,僅及 holding 起點前)
         for k in range(len(sh)):
-            if sh[k] is None:
-                sh[k] = prev
-            else:
+            if sh[k]:
                 prev = sh[k]
-        first = next((x for x in sh if x is not None), None)
-        sh = [x if x is not None else first for x in sh]
+            else:
+                sh[k] = prev
         out = []
         for k, r in enumerate(rows):
             d, close, vol, fp, mb, sb = r[0], r[1], r[2], r[3], r[4], r[5]
@@ -195,9 +242,9 @@ def build_metrics(con):
             ret1 = (ca / adj[k-1] - 1) if (k > 0 and adj[k-1] and ca) else None
             win20 = [c for c in adj[max(0, k-19):k+1] if c is not None]
             win60 = [c for c in adj[max(0, k-59):k+1] if c is not None]
-            hi20 = max(win20) if win20 else None
-            hi60 = max(win60) if win60 else None
-            turnover = (vol / shares * 100) if (vol and shares) else None
+            hi20 = max(win20) if len(win20) >= 10 else None    # 冷啟動保護:視窗樣本不足時
+            hi60 = max(win60) if len(win60) >= 30 else None    # 不給「距高」,避免上市/新增股假新高
+            turnover = (vol / shares * 100) if (vol is not None and shares) else None  # vol=0 → 0%(量縮),非缺值
             fchg5 = (fp - fpct[k-5]) if (k >= 5 and fp is not None and fpct[k-5] is not None) else None
             fchg20 = (fp - fpct[k-20]) if (k >= 20 and fp is not None and fpct[k-20] is not None) else None
             t5 = sum(trust[max(0, k-4):k+1])
@@ -205,9 +252,9 @@ def build_metrics(con):
             trust5_pct = (t5 / shares * 100) if shares else None  # 佔股本 %
             foreign5 = round(sum(fnet[max(0, k-4):k+1]) / 1000)   # 張
             mutil = (mb * 1000 / shares * 100) if (mb and shares) else None
-            mchg5 = (mb / mbal[k-5] - 1) if (k >= 5 and mbal[k-5]) else None
-            mchg10 = (mb / mbal[k-10] - 1) if (k >= 10 and mbal[k-10]) else None
-            mchg20 = (mb / mbal[k-20] - 1) if (k >= 20 and mbal[k-20]) else None
+            mchg5 = (mb / mbal[k-5] - 1) if (mb is not None and k >= 5 and mbal[k-5]) else None
+            mchg10 = (mb / mbal[k-10] - 1) if (mb is not None and k >= 10 and mbal[k-10]) else None
+            mchg20 = (mb / mbal[k-20] - 1) if (mb is not None and k >= 20 and mbal[k-20]) else None
             smr = (sb / mb * 100) if (sb is not None and mb) else None
             out.append((d, sid, close, ca, ret1, turnover,
                         (ca/hi20 - 1) if (hi20 and ca) else None, (ca/hi60 - 1) if (hi60 and ca) else None,
@@ -260,11 +307,14 @@ def main():
         print(f"[{i:>2}/{len(ids)}] {sid} · {got} rows")
     con.execute('INSERT INTO fetch_log VALUES(datetime("now"),?,?,?)', (start, end, total))
     con.commit()
+    # 事件視窗:price 的完整涵蓋範圍 .. 今天(與 --end 無關:回補舊價時才不會留事件缺口)
     adj_start = con.execute("SELECT MIN(date) FROM price").fetchone()[0] or start
-    print(f"除權息結果 {adj_start} .. {end} …")
-    nd = fetch_dividends(con, ids, token, adj_start, end, args.sleep)
+    today = date.today().isoformat()
+    print(f"除權息/分割事件 {adj_start} .. {today} …")
+    nd = fetch_dividends(con, ids, token, adj_start, today, args.sleep)
+    ns = fetch_splits(con, ids, token, adj_start, today, args.sleep)
     build_price_adj(con)
-    print(f"dividend_result upsert {nd} rows;price_adj 已重算")
+    print(f"dividend_result upsert {nd};split_event upsert {ns};price_adj 已重算")
     print("重算 daily_metrics …")
     build_metrics(con)
     n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
