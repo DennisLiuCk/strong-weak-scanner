@@ -1,0 +1,39 @@
+name: weekly-validate
+
+on:
+  schedule:
+    # 台灣週六 09:00 = UTC 01:00(週五收盤資料已於週五晚間入庫)
+    - cron: "0 1 * * 6"
+  workflow_dispatch: {}   # 允許手動觸發(每週檢視時)
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-validate
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 產生週度驗證報告(reports/validate_<資料迄日>.md)
+        run: python scripts/validate.py
+
+      - name: commit 報告(有變動才提交)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/
+          if git diff --staged --quiet; then
+            echo "無新報告,略過 commit"
+          else
+            git commit -m "report: 週度驗證 $(date -u +%Y-%m-%d) [skip ci]"
+            git push
+          fi

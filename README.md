@@ -26,11 +26,14 @@
 每日(雲端 routine) → fetch_daily.py:4 datasets × 30 檔 + 除權息/分割事件 + TAIEX
                       → SQLite → 還原價 → 五元素 → 族群層聚合(group_metrics/market_daily)
                       → score.py(族群內排名 + tier)→ build_dashboard.py(index.html)
-每週(Claude 半自動) → 前瞻報酬 by tier / element IC(分 regime)/ 假設命中 → 調策略
+每週(六 09:00 自動)  → validate.py → reports/validate_*.md(元素 IC 分 regime/IS/OOS、
+                      tier 超額與轉移事件、v1/v2 對照、族群層命中率)
+                      → Claude 檢視報告 → 調策略(一次最多 1~2 個旋鈕)
 ```
 
 **兩層訊號分工**(Phase 2):個股層 = 族群內排名選強汰弱;族群層 = 佈局廣度 +
-修正日中位逆勢買超(實測「最高者領漲」命中 68%,基準 33%)找被佈局的族群;
+修正日中位逆勢買超(「最高者領漲」命中率顯著高於 33% 隨機基準,最新數字見
+`reports/validate_*.md`)找被佈局的族群;
 大盤層 = TAIEX 距 20 日高 regime 旗標(修正期抗跌/投信因子 IC 顯著升高:
 +0.096→+0.253 / +0.028→+0.117,現行權重已偏向修正期有效因子,故不做權重切換)。
 
