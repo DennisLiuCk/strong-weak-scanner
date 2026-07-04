@@ -78,12 +78,8 @@ def score_foreign(m):
     return _ladder(m["fpct_chg20"], TH_FOREIGN)
 
 
-def score_trust(m, shares):
-    t = m["trust5"]
-    if t is None or not shares:
-        return 0
-    norm = t * 1000.0 / shares * 100.0   # 近5日投信淨額佔股本 %
-    return _ladder(norm, TH_TRUST)
+def score_trust(m):
+    return _ladder(m["trust5_pct"], TH_TRUST)   # 近5日投信淨額佔股本 %(metrics 已用當日股本算好)
 
 
 def score_vol(m):
@@ -104,7 +100,7 @@ def score_vol(m):
 
 
 def score_margin(m):
-    """回傳 (分數, 水位過滿旗標)。方向用 20 日融資變化(較穩),不足 20 日退回 5 日。"""
+    """回傳 (分數, 水位過滿旗標)。方向用 10 日融資變化(貼近手工的~2週視窗),不足 10 日退回 5 日。"""
     chg = m["margin_chg10"] if m["margin_chg10"] is not None else m["margin_chg5"]
     base = _ladder_low(chg, TH_MARGIN_CHG)
     u = m["margin_util_pct"]
@@ -139,15 +135,6 @@ def classify(s):
     return comp, tier, warn
 
 
-def latest_shares(con):
-    d = {}
-    for sid, sh in con.execute(
-            "SELECT stock_id, shares_issued FROM holding WHERE shares_issued IS NOT NULL "
-            "GROUP BY stock_id HAVING date = MAX(date)"):
-        d[sid] = sh
-    return d
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", help="只算單日;省略=重算全部歷史")
@@ -158,7 +145,6 @@ def main():
     con.execute("""CREATE TABLE IF NOT EXISTS daily_scores(
         date TEXT, stock_id TEXT, s_price INT, s_vol INT, s_foreign INT, s_trust INT, s_margin INT,
         composite REAL, tier TEXT, warn INT, PRIMARY KEY(date, stock_id))""")
-    shares = latest_shares(con)
 
     where = "WHERE date = ?" if args.date else ""
     params = (args.date,) if args.date else ()
@@ -169,7 +155,7 @@ def main():
         sp = score_price(m)
         sv, vwarn = score_vol(m)
         sf = score_foreign(m)
-        st = score_trust(m, shares.get(m["stock_id"]))
+        st = score_trust(m)
         sm, mwarn = score_margin(m)
         s = {"price": sp, "vol": sv, "foreign": sf, "trust": st, "margin": sm,
              "vol_warn": vwarn, "margin_warn": mwarn}

@@ -28,7 +28,8 @@
 config/universe.csv      30 檔清單(id, name, group)
 scripts/fetch_daily.py   零依賴 ETL(stdlib urllib + sqlite3);抓取 + 重算五元素
 data/findmind.db         SQLite(方案 A 靠它 commit 跨天累積狀態)
-  ├ price / inst / margin / holding   FinMind 原始四表(可重算)
+  ├ price / inst / margin / holding   FinMind 原始四表(append-only,可重算)
+  ├ dividend_result / price_adj       除權息結果(FinMind 免費)→ 本地自算還原股價(每次重建)
   └ daily_metrics                     五元素衍生指標
 ```
 
@@ -47,7 +48,7 @@ Token 讀取順序:環境變數 `FINMIND_TOKEN` → 本機 `.mcp.json`(已被 `.
 
 ## 資料註記
 
-- 原始(未還原)股價,適合短線比較;長期報酬應改用還原股價。
+- 價格類指標(ret1 / 距 20/60 日高)用**還原股價**(`price_adj`),除權息不會造成假跌;原始 `price` 表保留未還原價供顯示。周轉率 / 散戶水位 / 投信佔股本用**當日**發行股數(非最新股本回填,避免前視)。
 - 券商分點(真主力)需 FinMind **Sponsor** 等級,目前未開通。
 - 回測要用「當日可得」資料避免 lookahead(外資持股有申報遞延);本表只 append、不覆寫。
 - 本專案為量化籌碼研究,**非投資建議**。

@@ -12,6 +12,10 @@ FinMind 五元素每日抓取 → SQLite 落地。
 
 Token 讀取順序:環境變數 FINMIND_TOKEN → 專案根目錄 .mcp.json。
 抓完會自動重算 daily_metrics(五元素衍生指標表)。
+價格類指標(ret1/距高)用還原股價 price_adj。FinMind 的 TaiwanStockPriceAdj 免費層不可用
+(需 Sponsor),所以改抓 TaiwanStockDividendResult(免費)的除權息前收盤/參考價,
+本地以倒推法重算還原價(除息日前的歷史價 × reference/before,最新區段==原始價)。
+price_adj 每次整表重建、冪等;原始 price 表維持 append-only 不動。
 """
 import argparse, csv, json, os, sqlite3, sys, time
 import urllib.parse, urllib.request
@@ -35,6 +39,9 @@ CREATE TABLE IF NOT EXISTS margin(date TEXT, stock_id TEXT, margin_bal INTEGER, 
   PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS holding(date TEXT, stock_id TEXT, foreign_pct REAL, shares_issued INTEGER,
   PRIMARY KEY(date,stock_id));
+CREATE TABLE IF NOT EXISTS dividend_result(date TEXT, stock_id TEXT, before_price REAL,
+  reference_price REAL, PRIMARY KEY(date,stock_id));
+CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS fetch_log(ts TEXT, start TEXT, "end" TEXT, rows INTEGER);
 """
 
@@ -108,58 +115,104 @@ def up_holding(con, data):
 UPSERT = {"TaiwanStockPrice": up_price, "TaiwanStockInstitutionalInvestorsBuySell": up_inst,
           "TaiwanStockMarginPurchaseShortSale": up_margin, "TaiwanStockShareholding": up_holding}
 
+def fetch_dividends(con, ids, token, start, end, sleep):
+    """除權息結果 → dividend_result(upsert)。事件稀疏,整段視窗抓也便宜。"""
+    n = 0
+    for sid in ids:
+        data = api_get("TaiwanStockDividendResult", sid, start, end, token)
+        rows = [(d["date"], d["stock_id"], d.get("before_price"), d.get("reference_price"))
+                for d in data if d.get("before_price") and d.get("reference_price")]
+        if rows:
+            con.executemany("INSERT OR REPLACE INTO dividend_result VALUES(?,?,?,?)", rows)
+            n += len(rows)
+        con.commit()
+        time.sleep(sleep)
+    return n
+
+def build_price_adj(con):
+    """由 price × 除權息係數重算還原價(倒推法:除息日「之前」的價 × reference/before 連乘)。
+    整表重建、冪等;無除權息事件時 price_adj == price。註:減資/分割參考價另有 dataset,未涵蓋。"""
+    con.execute("DELETE FROM price_adj")
+    for (sid,) in con.execute("SELECT stock_id FROM universe"):
+        evs = [(d, rp / bp) for d, bp, rp in con.execute(
+                   "SELECT date, before_price, reference_price FROM dividend_result "
+                   "WHERE stock_id=?", (sid,)).fetchall()
+               if bp and rp and 0 < rp / bp <= 1.5]
+        out = []
+        for d, c in con.execute("SELECT date, close FROM price WHERE stock_id=? ORDER BY date", (sid,)):
+            if c is None:
+                continue
+            f = 1.0
+            for ed, ef in evs:
+                if ed > d:
+                    f *= ef
+            out.append((d, sid, round(c * f, 4)))
+        con.executemany("INSERT OR REPLACE INTO price_adj VALUES(?,?,?)", out)
+    con.commit()
+
 def build_metrics(con):
-    """由原始表重算五元素衍生指標(純 Python 滾動,穩健)。整表重建,可重複執行。"""
+    """由原始表重算五元素衍生指標(純 Python 滾動,穩健)。整表重建,可重複執行。
+    價格類(ret1/距高)用還原價;股本取「當日」值(forward-fill),避免用最新股本回填歷史造成前視。"""
     con.execute("DROP TABLE IF EXISTS daily_metrics")
     con.execute("""CREATE TABLE daily_metrics(
-        date TEXT, stock_id TEXT, close REAL, ret1 REAL,
-        turnover_pct REAL,            -- ②量:周轉率 = 量/發行股數
-        dist_hi20 REAL, dist_hi60 REAL, -- ①價:距 20/60 日高
+        date TEXT, stock_id TEXT, close REAL, close_adj REAL, ret1 REAL,
+        turnover_pct REAL,            -- ②量:周轉率 = 量/當日發行股數
+        dist_hi20 REAL, dist_hi60 REAL, -- ①價:距 20/60 日高(還原價)
         foreign_pct REAL, fpct_chg5 REAL, fpct_chg20 REAL,  -- ③外資:持股% 與變化(pp)
-        trust5 INTEGER, foreign5 INTEGER,                   -- ④投信/外資:近5日淨額(張)
+        trust5 INTEGER, trust5_pct REAL, foreign5 INTEGER,  -- ④投信/外資:近5日淨額(張;投信另存佔股本%)
         margin_bal INTEGER, margin_util_pct REAL,
         margin_chg5 REAL, margin_chg10 REAL, margin_chg20 REAL,  -- ⑤散戶:水位 + 5/10/20 日融資變化
         short_margin_ratio REAL,                            -- ⑤券資比(%)
         PRIMARY KEY(date, stock_id))""")
     ids = [r[0] for r in con.execute("SELECT stock_id FROM universe")]
     for sid in ids:
-        si = con.execute("SELECT shares_issued FROM holding WHERE stock_id=? AND shares_issued IS NOT NULL "
-                         "ORDER BY date DESC LIMIT 1", (sid,)).fetchone()
-        shares = si[0] if si else None
         rows = con.execute("""SELECT p.date, p.close, p.volume, h.foreign_pct, m.margin_bal, m.short_bal,
-                                     i.trust_net, i.foreign_net
+                                     i.trust_net, i.foreign_net, h.shares_issued, pa.close
                               FROM price p
                               LEFT JOIN holding h ON h.date=p.date AND h.stock_id=p.stock_id
                               LEFT JOIN margin  m ON m.date=p.date AND m.stock_id=p.stock_id
                               LEFT JOIN inst    i ON i.date=p.date AND i.stock_id=p.stock_id
+                              LEFT JOIN price_adj pa ON pa.date=p.date AND pa.stock_id=p.stock_id
                               WHERE p.stock_id=? ORDER BY p.date""", (sid,)).fetchall()
-        closes = [r[1] for r in rows]
+        adj = [(r[9] if r[9] is not None else r[1]) for r in rows]  # 還原價;缺值退回原始價
         fpct = [r[3] for r in rows]
         mbal = [r[4] for r in rows]
         trust = [r[6] or 0 for r in rows]
         fnet = [r[7] or 0 for r in rows]
+        sh = [r[8] for r in rows]      # 股本逐日 forward-fill;最前段缺值用第一筆已知回填
+        prev = None
+        for k in range(len(sh)):
+            if sh[k] is None:
+                sh[k] = prev
+            else:
+                prev = sh[k]
+        first = next((x for x in sh if x is not None), None)
+        sh = [x if x is not None else first for x in sh]
         out = []
         for k, r in enumerate(rows):
-            d, close, vol, fp, mb, sb, _tn, _fn = r
-            ret1 = (close / closes[k-1] - 1) if k > 0 and closes[k-1] else None
-            win20 = [c for c in closes[max(0, k-19):k+1] if c is not None]
-            win60 = [c for c in closes[max(0, k-59):k+1] if c is not None]
+            d, close, vol, fp, mb, sb = r[0], r[1], r[2], r[3], r[4], r[5]
+            shares, ca = sh[k], adj[k]
+            ret1 = (ca / adj[k-1] - 1) if (k > 0 and adj[k-1] and ca) else None
+            win20 = [c for c in adj[max(0, k-19):k+1] if c is not None]
+            win60 = [c for c in adj[max(0, k-59):k+1] if c is not None]
             hi20 = max(win20) if win20 else None
             hi60 = max(win60) if win60 else None
             turnover = (vol / shares * 100) if (vol and shares) else None
             fchg5 = (fp - fpct[k-5]) if (k >= 5 and fp is not None and fpct[k-5] is not None) else None
             fchg20 = (fp - fpct[k-20]) if (k >= 20 and fp is not None and fpct[k-20] is not None) else None
-            trust5 = round(sum(trust[max(0, k-4):k+1]) / 1000)   # 張
-            foreign5 = round(sum(fnet[max(0, k-4):k+1]) / 1000)  # 張
+            t5 = sum(trust[max(0, k-4):k+1])
+            trust5 = round(t5 / 1000)                             # 張
+            trust5_pct = (t5 / shares * 100) if shares else None  # 佔股本 %
+            foreign5 = round(sum(fnet[max(0, k-4):k+1]) / 1000)   # 張
             mutil = (mb * 1000 / shares * 100) if (mb and shares) else None
             mchg5 = (mb / mbal[k-5] - 1) if (k >= 5 and mbal[k-5]) else None
             mchg10 = (mb / mbal[k-10] - 1) if (k >= 10 and mbal[k-10]) else None
             mchg20 = (mb / mbal[k-20] - 1) if (k >= 20 and mbal[k-20]) else None
             smr = (sb / mb * 100) if (sb is not None and mb) else None
-            out.append((d, sid, close, ret1, turnover,
-                        (close/hi20 - 1) if hi20 else None, (close/hi60 - 1) if hi60 else None,
-                        fp, fchg5, fchg20, trust5, foreign5, mb, mutil, mchg5, mchg10, mchg20, smr))
-        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
+            out.append((d, sid, close, ca, ret1, turnover,
+                        (ca/hi20 - 1) if (hi20 and ca) else None, (ca/hi60 - 1) if (hi60 and ca) else None,
+                        fp, fchg5, fchg20, trust5, trust5_pct, foreign5, mb, mutil, mchg5, mchg10, mchg20, smr))
+        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
     con.commit()
 
 def main():
@@ -176,7 +229,8 @@ def main():
         con.executescript(SCHEMA)
         load_universe(con)
         con.commit()
-        print("只重算 daily_metrics(不抓取)…")
+        print("只重算 price_adj + daily_metrics(不抓取)…")
+        build_price_adj(con)
         build_metrics(con)
         n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
         con.close()
@@ -206,6 +260,11 @@ def main():
         print(f"[{i:>2}/{len(ids)}] {sid} · {got} rows")
     con.execute('INSERT INTO fetch_log VALUES(datetime("now"),?,?,?)', (start, end, total))
     con.commit()
+    adj_start = con.execute("SELECT MIN(date) FROM price").fetchone()[0] or start
+    print(f"除權息結果 {adj_start} .. {end} …")
+    nd = fetch_dividends(con, ids, token, adj_start, end, args.sleep)
+    build_price_adj(con)
+    print(f"dividend_result upsert {nd} rows;price_adj 已重算")
     print("重算 daily_metrics …")
     build_metrics(con)
     n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
