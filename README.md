@@ -27,8 +27,10 @@
                       → score.py(族群內排名 + tier)→ build_dashboard.py(index.html)
 每週(六 09:00 自動)  → validate.py → reports/validate_*.md(元素 IC 分 regime/IS/OOS、
                       tier 超額與轉移事件、新舊制對照、族群層命中率)
-                      → Claude 檢視報告 → 調策略(一次最多 1~2 個旋鈕)
+                      → 依 WEEKLY_REVIEW.md 檢視報告 → 調策略(一次最多 1~2 個旋鈕)
 ```
+
+週檢視的標準程序與行動判準:**[WEEKLY_REVIEW.md](WEEKLY_REVIEW.md)**。
 
 **兩層訊號分工**:個股層 = 族群內排名選強汰弱;族群層 = 佈局廣度 + 修正日中位
 逆勢買超,找出正在被佈局的族群;大盤層 = 報酬指數距 20 日高的修正 regime 旗標。
