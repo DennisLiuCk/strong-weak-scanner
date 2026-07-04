@@ -179,7 +179,7 @@ def main():
         if not r:
             continue
         note = r["note"] + ("(★ 修正日買超 3 族群最高)" if g == best_dip else "")
-        groups.append({"nm": GROUP_NM.get(g, g), "state": r["state"],
+        groups.append({"g": g, "nm": GROUP_NM.get(g, g), "state": r["state"],
                        "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note, "stats": [
             ["修正日中位淨買", f"{r['med_dip']:+.2f}%股本" if r["med_dip"] is not None else "-"],
             ["外資佈局廣度", f"{r['breadth_f']*100:.0f}%" if r["breadth_f"] is not None else "-"],

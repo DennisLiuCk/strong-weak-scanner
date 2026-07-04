@@ -68,6 +68,20 @@
   .toggle:hover{color:var(--ink);border-color:var(--muted)}
   .toggle:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
 
+  /* ---- group filter ---- */
+  .gfilter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:22px 0 2px}
+  .gfilter .lb{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;margin-right:2px}
+  .gf{cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink-2);background:var(--surface);
+    border:1px solid var(--hairline);border-radius:100px;padding:6px 14px;display:inline-flex;
+    align-items:center;gap:7px;transition:background .12s ease,color .12s ease,border-color .12s ease}
+  .gf:hover{border-color:var(--muted);color:var(--ink)}
+  .gf:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+  .gf .ct{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;
+    font-family:"Cascadia Mono",Consolas,ui-monospace,monospace}
+  .gf[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:700}
+  .gf[aria-selected="true"] .ct{color:var(--surface);opacity:.65}
+
   /* ---- legend ---- */
   .legend{margin:22px 0 10px;background:var(--surface);border:1px solid var(--hairline);
     border-radius:14px;padding:14px 16px;display:grid;gap:14px;
@@ -184,7 +198,7 @@
       <p class="sub">台股三大半導體族群共 30 檔的汰弱留強掃描。個股層以族群內排名比「相對強弱 + 修正日抗跌」選強汰弱;族群層看「佈局廣度 + 逆勢買超」找出正在被默默佈局的族群——兩層各司其職,tier 需連兩日確認。</p>
       <div class="meta">
         <span class="chip">__MARKET_CHIP__</span>
-        <span class="chip">範圍 <b>3 族群 · 30 檔</b></span>
+        <span class="chip" id="scopeChip">範圍 <b>3 族群 · 30 檔</b></span>
         <span class="chip">資料至 <b>__DATE__</b>(還原股價)</span>
         <span class="chip">來源 <b>FinMind</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
@@ -194,6 +208,8 @@
       <span id="themeIcon">◐</span><span id="themeTxt">主題</span>
     </button>
   </header>
+
+  <div class="gfilter" id="gfilter" role="tablist" aria-label="檢視族群"></div>
 
   <div class="legend">
     <div>
@@ -370,13 +386,13 @@
     return r;
   }
   function groupHead(g){
-    var d=document.createElement("div"); d.className="grp";
+    var d=document.createElement("div"); d.className="grp"; d.dataset.g=g;
     var n=document.createElement("span"); n.textContent=GRP[g].nm; d.appendChild(n);
     var t=document.createElement("span"); t.className="tag"; t.textContent=GRP[g].tag; d.appendChild(t);
     return d;
   }
   function stockRow(row){
-    var r=document.createElement("div"); r.className="row";
+    var r=document.createElement("div"); r.className="row"; r.dataset.g=row.g;
     var rl=document.createElement("div"); rl.className="rl";
     var nm=document.createElement("span"); nm.className="nm"; nm.textContent=row.nm; rl.appendChild(nm);
     var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; rl.appendChild(code);
@@ -442,6 +458,7 @@
     GROUPS.forEach(function(g){
       var el = document.createElement("div");
       el.className = "tier";
+      if(g.g) el.dataset.g = g.g;
       el.style.setProperty("--tc", g.col);
       var tt = document.createElement("div"); tt.className = "tt"; tt.textContent = g.nm; el.appendChild(tt);
       var st = document.createElement("div"); st.className = "td";
@@ -469,7 +486,7 @@
     var picks=document.createElement("div"); picks.className="picks";
     T.ids.forEach(function(id){
       var d=byId[id];
-      var p=document.createElement("div"); p.className="pick";
+      var p=document.createElement("div"); p.className="pick"; p.dataset.g=d.g;
       var dot=document.createElement("span"); dot.className="dot"; dot.style.setProperty("--pc",scColor(d.vt));
       if(d.warn) dot.style.background="var(--warn-line)";
       p.appendChild(dot);
@@ -484,6 +501,81 @@
     });
     el.appendChild(picks); tiers.appendChild(el);
   });
+
+  // ---------- group filter ----------
+  (function(){
+    var bar = document.getElementById("gfilter");
+    if(!bar) return;
+    var order = ["passive","power","packtest"];
+    var counts = {}; DATA.forEach(function(d){ counts[d.g] = (counts[d.g]||0) + 1; });
+    var present = order.filter(function(g){ return counts[g]; });
+    if(present.length < 2){ bar.style.display = "none"; return; }   // 單一族群不需篩選
+    var total = DATA.length;
+    var scope = document.getElementById("scopeChip");
+    var groupsHost = document.getElementById("groups");
+    function nmOf(g){ return (GRP[g] && GRP[g].nm) || g; }
+
+    function setScope(g){
+      if(!scope) return;
+      scope.textContent = "範圍 ";
+      var b = document.createElement("b");
+      b.textContent = g === "all" ? (present.length + " 族群 · " + total + " 檔")
+                                  : (nmOf(g) + " · " + counts[g] + " 檔");
+      scope.appendChild(b);
+    }
+    function mkBtn(g, label, n){
+      var b = document.createElement("button"); b.className = "gf"; b.type = "button";
+      b.setAttribute("role","tab"); b.dataset.g = g; b.setAttribute("aria-selected","false");
+      var t = document.createElement("span"); t.textContent = label; b.appendChild(t);
+      var c = document.createElement("span"); c.className = "ct"; c.textContent = n; b.appendChild(c);
+      b.addEventListener("click", function(){ setGroup(g); });
+      return b;
+    }
+    var lb = document.createElement("span"); lb.className = "lb"; lb.textContent = "檢視族群"; bar.appendChild(lb);
+    bar.appendChild(mkBtn("all","全部",total));
+    present.forEach(function(g){ bar.appendChild(mkBtn(g, nmOf(g), counts[g])); });
+
+    function setGroup(g, skipStore){
+      if(g !== "all" && !counts[g]) g = "all";
+      var all = g === "all";
+      Array.prototype.forEach.call(bar.querySelectorAll(".gf"), function(b){
+        b.setAttribute("aria-selected", b.dataset.g === g ? "true" : "false");
+      });
+      // 五元素明細:族群標題 + 個股列
+      Array.prototype.forEach.call(matrix.querySelectorAll("[data-g]"), function(n){
+        n.style.display = (all || n.dataset.g === g) ? "" : "none";
+      });
+      // 族群雷達:只留選中族群的卡片
+      if(groupsHost){
+        Array.prototype.forEach.call(groupsHost.querySelectorAll("[data-g]"), function(n){
+          n.style.display = (all || n.dataset.g === g) ? "" : "none";
+        });
+        groupsHost.style.gridTemplateColumns = all ? "" : "minmax(0,300px)";
+      }
+      // 結論:過濾每張 tier 卡的 picks,整卡無標的則隱藏
+      Array.prototype.forEach.call(tiers.children, function(card){
+        var picks = card.querySelectorAll(".pick"), shown = 0;
+        Array.prototype.forEach.call(picks, function(p){
+          var show = all || p.dataset.g === g; p.style.display = show ? "" : "none"; if(show) shown++;
+        });
+        card.style.display = (picks.length && shown === 0) ? "none" : "";
+      });
+      setScope(g);
+      hideTip();
+      if(!skipStore){
+        try{ localStorage.setItem("sc_group", g); }catch(e){}
+        try{ history.replaceState(null, "", all ? location.pathname + location.search : "#g=" + g); }catch(e){}
+      }
+    }
+
+    function fromHash(){ var m = (location.hash || "").match(/g=([a-z]+)/); return (m && counts[m[1]]) ? m[1] : null; }
+    // 初始選取:URL hash > localStorage > 全部
+    var init = fromHash();
+    if(!init){ try{ var s = localStorage.getItem("sc_group"); if(s === "all" || counts[s]) init = s; }catch(e){} }
+    setGroup(init || "all", true);
+    // 分享連結貼進同分頁 / 瀏覽器前進後退 → 即時套用(hash 為權威,不再回寫)
+    window.addEventListener("hashchange", function(){ setGroup(fromHash() || "all", true); });
+  })();
 
   // ---------- theme toggle ----------
   var root=document.documentElement, btn=document.getElementById("themeBtn"),
