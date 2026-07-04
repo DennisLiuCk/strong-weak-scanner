@@ -98,6 +98,9 @@ def main():
     gm = defaultdict(dict)
     for r in con.execute("SELECT * FROM group_metrics"):
         gm[r["date"]][r["grp"]] = r
+    met = defaultdict(dict)
+    for r in con.execute("SELECT date, stock_id, dist_hi60, down_rs20 FROM daily_metrics"):
+        met[r["date"]][r["stock_id"]] = r
 
     def fwd(d, sid):
         i = didx.get(d)
@@ -184,6 +187,29 @@ def main():
                     trans[(prev, r["tier"])].append(f - gv)
             prev = r["tier"]
 
+    # ── ③ 蓄勢濾網 cohort:籌碼吃貨+價未動,按修正日抗跌分組 ──
+    # 濾網存在理由:抗跌<0 組 10 日仍落後族群(v1 無濾網時蓄勢事件 −0.92%)。
+    # 若 OOS 顯示該組不再落後(20 日視窗本就會收斂)→ 考慮放寬 STEALTH 的抗跌條件。
+    OFF_HIGH = -0.03   # 同 score.py STEALTH_OFF_HIGH
+    cohort = defaultdict(lambda: defaultdict(list))   # 分組 -> bucket -> [excess]
+    for d in dates:
+        if d not in v2:
+            continue
+        bs = bucket(d)
+        for sid, sc in v2[d].items():
+            m = met[d].get(sid)
+            if m is None or not (sc["s_foreign"] >= 2 or sc["s_dip"] >= 2):
+                continue
+            if not (m["dist_hi60"] is not None and m["dist_hi60"] <= OFF_HIGH):
+                continue
+            f, gv = fwd(d, sid), grp_med_fwd(d, uni.get(sid))
+            if f is None or gv is None:
+                continue
+            key = ("抗跌≥0(放行)" if m["down_rs20"] >= 0 else "領跌<0(擋下)") \
+                if m["down_rs20"] is not None else "抗跌缺值"
+            for b in bs:
+                cohort[key][b].append(f - gv)
+
     # ── ④ 族群層 ──────────────────────────────────────────────
     dip_hit = defaultdict(list)   # bucket -> [1/0]
     state_x = defaultdict(list)   # state -> [group excess vs universe]
@@ -254,6 +280,20 @@ def main():
         if len(v) >= 5:
             w(f"| {a} → {b} | {len(v)} | {mean(v)*100:+.2f}% |")
     w("")
+    w("## ③ 蓄勢濾網 cohort(籌碼吃貨+價未動,按修正日抗跌分組)")
+    w("")
+    w("| 分組 | n·全期 | 超額·全期 | 勝率 | n·OOS | 超額·OOS |")
+    w("|---|---|---|---|---|---|")
+    for k in ("抗跌≥0(放行)", "領跌<0(擋下)", "抗跌缺值"):
+        a, o = cohort[k].get("全期", []), cohort[k].get("OOS", [])
+        if not a:
+            continue
+        hit = f"{100*sum(1 for x in a if x > 0)/len(a):.0f}%"
+        w(f"| {k} | {len(a)} | {mean(a)*100:+.2f}% | {hit} | {len(o)} | "
+          + (f"{mean(o)*100:+.2f}%" if o else "–") + " |")
+    w("")
+    w("> 放寬濾網的條件:OOS 累積 ≥15 筆且「領跌<0」組超額不再顯著落後「抗跌≥0」組。")
+    w("")
     w("## ④ 族群層")
     w("")
     hit_all, hit_oos = dip_hit.get("全期", []), dip_hit.get("OOS", [])
@@ -287,6 +327,9 @@ def main():
         print(f"v1 composite 族群內 IC:全期 {fmt_ic(mean(wg['v1_composite'].get('全期')))}")
     if hit_all:
         print(f"med_dip 領漲命中:全期 {100*statistics.mean(hit_all):.0f}%(基準33%)")
+    ca, cb = cohort["抗跌≥0(放行)"].get("全期", []), cohort["領跌<0(擋下)"].get("全期", [])
+    if ca and cb:
+        print(f"蓄勢濾網 cohort:放行 {mean(ca)*100:+.2f}%(n={len(ca)}) vs 擋下 {mean(cb)*100:+.2f}%(n={len(cb)})")
     con.close()
 
 

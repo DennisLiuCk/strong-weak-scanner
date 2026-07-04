@@ -143,6 +143,7 @@ def main():
         date TEXT, stock_id TEXT,
         s_price INT, s_resil INT, s_vol INT, s_foreign INT, s_trust INT, s_dip INT, s_margin INT,
         composite REAL, composite_s REAL, tier_raw TEXT, tier TEXT, warn INT,
+        pending TEXT,   -- 蓄勢候補:籌碼條件已符、尚差哪些蓄勢條件(顯示用,不影響 tier)
         PRIMARY KEY(date, stock_id))""")
 
     rows = con.execute("""SELECT m.*, u.grp FROM daily_metrics m
@@ -205,9 +206,22 @@ def main():
                     tier = prev_tier[sid]
                 prev_raw[sid], prev_tier[sid] = tier_raw, tier
                 warn = 1 if (trap or overheat) else 0
+                # 蓄勢候補:籌碼吃貨但還沒到蓄勢 —— 標出差哪幾項(cohort 實證:差「抗跌」者
+                # 10日仍落後族群,但20日多會補上 → 是「等時機」名單,不是弱股)
+                pending = None
+                if (s["foreign"] >= 2 or s["dip"] >= 2) and tier_raw == "潛在/中性":
+                    miss = []
+                    if not (m["dist_hi60"] is not None and m["dist_hi60"] <= STEALTH_OFF_HIGH):
+                        miss.append("價未動")
+                    if not (m["down_rs20"] is not None and m["down_rs20"] >= 0):
+                        miss.append("抗跌")
+                    if comp_s < STEALTH_MIN:
+                        miss.append("綜合分")
+                    if miss:
+                        pending = "蓄勢候補·差:" + "、".join(miss)
                 out.append((d, sid, s["price"], s["resil"], s["vol"], s["foreign"], s["trust"],
-                            s["dip"], s["margin"], comp, comp_s, tier_raw, tier, warn))
-    con.executemany("INSERT OR REPLACE INTO daily_scores VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
+                            s["dip"], s["margin"], comp, comp_s, tier_raw, tier, warn, pending))
+    con.executemany("INSERT OR REPLACE INTO daily_scores VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
     con.commit()
 
     # ── 印最新日的 tier 排行 ──
@@ -245,9 +259,10 @@ def main():
         for r in rs:
             flag = " ⚠" if r["warn"] else ""
             pend = "" if r["tier_raw"] == r["tier"] else f" →{r['tier_raw']}?"
+            cand = f" ◇{r['pending']}" if r["pending"] else ""
             elem = (f"價{r['s_price']:+d} 抗{r['s_resil']:+d} 量{r['s_vol']:+d} 外{r['s_foreign']:+d} "
                     f"投{r['s_trust']:+d} 逆{r['s_dip']:+d} 融{r['s_margin']:+d}")
-            print(f"   {r['stock_id']} {r['name']:<5} [{r['grp']:<8}] 綜{r['composite_s']:>5.1f}  {elem}{flag}{pend}")
+            print(f"   {r['stock_id']} {r['name']:<5} [{r['grp']:<8}] 綜{r['composite_s']:>5.1f}  {elem}{flag}{pend}{cand}")
         print()
     con.close()
 

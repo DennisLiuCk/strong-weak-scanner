@@ -104,6 +104,11 @@ def verdict(sc):
             ("margin", sc["s_margin"])]
     labels = [SALIENT[k] for k in keys if k in SALIENT]
     vsub = " · ".join(labels[:2]) if labels else f"綜合 {comp:+.1f}"
+    chip = sc["s_foreign"] >= 2 or sc["s_dip"] >= 2
+    if sc["pending"] and tier == "潛在/中性":       # 蓄勢候補(score.py 資料層算好)
+        vsub = "◇ " + sc["pending"]
+    elif chip and sc["s_resil"] <= -2:              # 衝突組合改方向性敘述,避免讀成自相矛盾
+        vsub = "吃貨中·等抗跌轉正"
     drivers = []
     for name, ref in [("價", "s_price"), ("抗跌", "s_resil"), ("外資", "s_foreign"),
                       ("逆勢", "s_dip"), ("投信", "s_trust"), ("融資", "s_margin")]:
@@ -114,6 +119,10 @@ def verdict(sc):
     vr = f"綜合 {comp:+.1f}(3日平滑;族群內排名制:價{sc['s_price']:+d} 抗{sc['s_resil']:+d} " \
          f"量{sc['s_vol']:+d} 外{sc['s_foreign']:+d} 投{sc['s_trust']:+d} 逆{sc['s_dip']:+d} " \
          f"融{sc['s_margin']:+d})。" + ("；".join(drivers) if drivers else "訊號分歧")
+    if sc["pending"] and tier == "潛在/中性":
+        vr += f"。◇ {sc['pending']}——籌碼條件已符,補齊即升蓄勢"
+    elif chip and sc["s_resil"] <= -2:
+        vr += "。籌碼在買但修正日領跌——歷史上此組合 10 日仍落後族群、20 日多會補上,等抗跌轉正再確認"
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"])
 
 
