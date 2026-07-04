@@ -15,7 +15,7 @@ except Exception:
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 TEMPLATE = os.path.join(ROOT, "scripts", "dashboard_template.html")
-OUT = os.path.join(ROOT, "dashboard.html")
+OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages 乾淨網址
 
 GROUP_ORDER = ["passive", "power", "packtest"]
 TIER_ORDER = ["真強", "蓄勢·外資佈局", "強但過熱", "潛在/中性", "真弱", "真弱·陷阱"]

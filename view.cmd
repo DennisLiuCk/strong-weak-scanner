@@ -4,4 +4,4 @@ cd /d "%~dp0"
 echo 抓取雲端最新資料中...
 git pull --quiet
 if errorlevel 1 echo (git pull 失敗,仍以本機現有版本開啟)
-start "" "dashboard.html"
+start "" "index.html"
