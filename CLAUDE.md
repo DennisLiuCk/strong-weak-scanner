@@ -1,0 +1,43 @@
+# strong-weak-scanner(台股汰弱留強掃描)
+
+台股半導體族群(被動/功率/封測,約 39 檔)的兩層訊號系統:**個股層**族群內排名
+選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions(台灣 18:00)
+抓資料 → 評分 → 儀表板;SQLite db 與報告都 commit 在 repo 裡。
+儀表板:https://dennisliuck.github.io/strong-weak-scanner/
+
+## 每個 session 開始前
+
+- **先 `git pull`**——`data/findmind.db` 由 Actions 每日更新,不 pull 就是在看舊資料。
+- Python 一律 `uv run --no-project --python 3.12 python ...`(系統 python 是 MS Store stub,不能用)。
+- 中文 stdout 在 console 會亂碼(cp950),寫檔 UTF-8 正常;必要時輸出到檔案再讀。
+
+## 依任務選 runbook
+
+| 情境 | 文件 / 工具 |
+|---|---|
+| 盤後確認執行狀況、討論今日資料 | `DAILY_CHECK.md`;核心工具 `scripts/daily_brief.py`(唯讀) |
+| 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
+| 季度 universe 調整 | README「Universe 治理」+ `scripts/screen.py` |
+
+## 鐵律
+
+- **勿憑 in-sample 或單日/單週數據調策略**——一律走 `WEEKLY_REVIEW.md` 的 OOS 行動門檻;
+  每次最多動 1~2 個旋鈕。
+- 改了權重或 tier 條件,**必須同步把 `scripts/validate.py` 的 `IS_CUTOFF` 改成當天**
+  (否則舊 OOS 會被新規則重複當證據)。
+- 零第三方依賴(純 stdlib);策略旋鈕集中在 `score.py` CONFIG(個股層)與
+  `fetch_daily.py` 頂部(族群/大盤層),不散落他處。
+- 版本沿革與實證依據記 `CHANGELOG.md`;README 與網站只描述現行系統,不放版本敘事。
+- commit 訊息用中文;策略變更需附依據數字(哪份報告、哪個指標)。
+
+## 架構速覽
+
+```
+fetch_daily.py   抓取(FinMind)→ 還原價(除權息/分割自算)→ 五元素 → 族群層聚合
+score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
+build_dashboard.py → index.html(GitHub Pages)     validate.py → reports/ 週報
+config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
+```
+
+資料表:原始 price/inst/margin/holding(append-only)+ 衍生 price_adj/daily_metrics/
+daily_scores/group_metrics/market_daily(每次重建)。舊制凍結:daily_scores_v1。

@@ -30,7 +30,8 @@
                       → 依 WEEKLY_REVIEW.md 檢視報告 → 調策略(一次最多 1~2 個旋鈕)
 ```
 
-週檢視的標準程序與行動判準:**[WEEKLY_REVIEW.md](WEEKLY_REVIEW.md)**。
+週檢視的標準程序與行動判準:**[WEEKLY_REVIEW.md](WEEKLY_REVIEW.md)**;
+盤後日常檢視(確認 Actions、今日簡報、討論):**[DAILY_CHECK.md](DAILY_CHECK.md)**。
 
 **兩層訊號分工**:個股層 = 族群內排名選強汰弱;族群層 = 佈局廣度 + 修正日中位
 逆勢買超,找出正在被佈局的族群;大盤層 = 報酬指數距 20 日高的修正 regime 旗標。
