@@ -27,9 +27,15 @@ TIER_DESC = {"真強": "價強且籌碼扎實", "蓄勢·外資佈局": "外資/
              "真弱": "價籌俱弱", "真弱·陷阱": "外資出、散戶接"}
 
 def pct(x, signed=False):
+    """給『分數/比率』欄位(dist_hi、ret1、margin_chg):× 100 轉百分比。"""
     if x is None:
         return "-"
     return f"{x*100:+.1f}%" if signed else f"{x*100:.1f}%"
+
+
+def pctp(x):
+    """給『本身已是百分比』的欄位(turnover_pct / margin_util_pct):不再 × 100。"""
+    return "-" if x is None else f"{x:.1f}%"
 
 # 每個元素:score → 理由文字
 R_PRICE = {2: "在波段高檔/創新高", 1: "接近波段高檔", 0: "距高中等、區間整理", -1: "明顯拉回", -2: "深跌、族群落後"}
@@ -58,7 +64,7 @@ def build_cells(sc, m):
         rv, warn = "量縮、人氣不足", 0
     else:
         rv, warn = "量能中等", 0
-    c = [sc["s_vol"], pct(t) if t is not None else "-", f"周轉率 {pct(t)}(當日量/發行股數)", rv]
+    c = [sc["s_vol"], pctp(t), f"周轉率 {pctp(t)}(當日量/發行股數)", rv]
     if warn:
         c.append(1)
     cells.append(c)
@@ -72,8 +78,8 @@ def build_cells(sc, m):
     cells.append([sc["s_trust"], f"{t5:+,}張", f"投信近5日淨額 {t5:+,}張", R_TRUST[sc["s_trust"]]])
     # ⑤ 融資券
     u = m["margin_util_pct"]
-    detail = f"散戶水位 {pct(u)};10日融資 {pct(m['margin_chg10'], True)};券資比 {(m['short_margin_ratio'] or 0):.1f}%"
-    c = [sc["s_margin"], pct(u) if u is not None else "-", detail, R_MARGIN[sc["s_margin"]]]
+    detail = f"散戶水位 {pctp(u)};10日融資 {pct(m['margin_chg10'], True)};券資比 {(m['short_margin_ratio'] or 0):.1f}%"
+    c = [sc["s_margin"], pctp(u), detail, R_MARGIN[sc["s_margin"]]]
     if u is not None and u >= 9:
         c.append(1)
     cells.append(c)
