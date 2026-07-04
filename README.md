@@ -59,6 +59,18 @@ uv run --no-project python scripts/fetch_daily.py --start 2026-03-01 --end 2026-
 Token 讀取順序:環境變數 `FINMIND_TOKEN` → 本機 `.mcp.json`(已被 `.gitignore` 排除)。
 雲端 routine 用 secret 注入 `FINMIND_TOKEN`。
 
+## Universe 治理
+
+- **規則**:R1 業務歸屬(主營收 >50% 屬族群業務,人工覆核)/ R2 市值遲滯
+  (≥50 億納入、現有成員 <30 億才剔除,防反覆進出)/ R3 近 20 日中位成交值
+  ≥3,000 萬 / R4 上市 ≥60 交易日。族群定義在 `config/groups.csv`(名稱/tag/排序),
+  成員在 `config/universe.csv`(代號/名稱/族群/主業)。
+- **節奏**:每季跑 `scripts/screen.py`(現有成員體檢 + `config/candidates.csv`
+  候選提名),覆核後改 universe.csv → `fetch_daily.py --start <窗首>` 回補 →
+  變更記入 CHANGELOG。
+- **注意**:universe 變更後全歷史按新名單重算(族群中位、排名都會變),
+  變更的審計軌跡以 CHANGELOG 為準。
+
 ## 資料註記
 
 - 價格類指標(ret1 / 距 20/60 日高)用**還原股價**(`price_adj`),除權息不會造成假跌;原始 `price` 表保留未還原價供顯示。周轉率 / 散戶水位 / 投信佔股本用**當日**發行股數(非最新股本回填,避免前視)。

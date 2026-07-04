@@ -9,6 +9,8 @@ stock_id,name,group,biz
 6173,信昌電,passive,MLCC(華新系)
 5328,華容,passive,鋁質電解電容
 6284,佳邦,passive,電感、天線
+2428,興勤,passive,保護元件、熱敏電阻
+6449,鈺邦,passive,固態電容
 2481,強茂,power,二極體、MOSFET
 5425,台半,power,二極體、車用功率
 8261,富鼎,power,MOSFET
@@ -17,8 +19,12 @@ stock_id,name,group,biz
 6415,矽力-KY,power,電源管理IC
 5299,杰力,power,MOSFET、電源IC
 3317,尼克森,power,低壓MOSFET
-6573,虹揚-KY,power,橋式整流二極體
 8255,朋程,power,車用整流二極體
+3707,漢磊,power,功率/SiC磊晶代工
+3016,嘉晶,power,磊晶片(漢磊集團)
+6525,捷敏-KY,power,功率半導體封測
+6138,茂達,power,電源管理IC
+8081,致新,power,電源管理IC
 3711,日月光投控,packtest,封測龍頭(OSAT)
 2449,京元電子,packtest,IC測試(AI晶片)
 6239,力成,packtest,記憶體封測
@@ -29,3 +35,6 @@ stock_id,name,group,biz
 2441,超豐,packtest,消費IC封測(力成系)
 2369,菱生,packtest,IC封測
 2329,華泰,packtest,封測+EMS
+6271,同欣電,packtest,陶瓷基板、CIS封裝
+8131,福懋科,packtest,記憶體封測(力成系)
+6451,訊芯-KY,packtest,SiP模組封測
