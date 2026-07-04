@@ -29,6 +29,9 @@ jobs:
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
         run: python scripts/fetch_daily.py
 
+      - name: 計算五元素分數與 tier
+        run: python scripts/score.py
+
       - name: commit 回 repo(有變動才提交)
         run: |
           git config user.name "github-actions[bot]"

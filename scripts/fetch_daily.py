@@ -117,7 +117,8 @@ def build_metrics(con):
         dist_hi20 REAL, dist_hi60 REAL, -- ①價:距 20/60 日高
         foreign_pct REAL, fpct_chg5 REAL, fpct_chg20 REAL,  -- ③外資:持股% 與變化(pp)
         trust5 INTEGER, foreign5 INTEGER,                   -- ④投信/外資:近5日淨額(張)
-        margin_bal INTEGER, margin_util_pct REAL, margin_chg5 REAL,  -- ⑤散戶:水位/變化
+        margin_bal INTEGER, margin_util_pct REAL,
+        margin_chg5 REAL, margin_chg10 REAL, margin_chg20 REAL,  -- ⑤散戶:水位 + 5/10/20 日融資變化
         short_margin_ratio REAL,                            -- ⑤券資比(%)
         PRIMARY KEY(date, stock_id))""")
     ids = [r[0] for r in con.execute("SELECT stock_id FROM universe")]
@@ -152,11 +153,13 @@ def build_metrics(con):
             foreign5 = round(sum(fnet[max(0, k-4):k+1]) / 1000)  # 張
             mutil = (mb * 1000 / shares * 100) if (mb and shares) else None
             mchg5 = (mb / mbal[k-5] - 1) if (k >= 5 and mbal[k-5]) else None
+            mchg10 = (mb / mbal[k-10] - 1) if (k >= 10 and mbal[k-10]) else None
+            mchg20 = (mb / mbal[k-20] - 1) if (k >= 20 and mbal[k-20]) else None
             smr = (sb / mb * 100) if (sb is not None and mb) else None
             out.append((d, sid, close, ret1, turnover,
                         (close/hi20 - 1) if hi20 else None, (close/hi60 - 1) if hi60 else None,
-                        fp, fchg5, fchg20, trust5, foreign5, mb, mutil, mchg5, smr))
-        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
+                        fp, fchg5, fchg20, trust5, foreign5, mb, mutil, mchg5, mchg10, mchg20, smr))
+        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
     con.commit()
 
 def main():
@@ -165,7 +168,21 @@ def main():
     ap.add_argument("--end", help="YYYY-MM-DD;預設今天")
     ap.add_argument("--days", type=int, default=15)
     ap.add_argument("--sleep", type=float, default=0.25, help="每次 API 間隔秒數(避免限流)")
+    ap.add_argument("--metrics-only", action="store_true", help="不抓取,只用現有原始表重算 daily_metrics")
     args = ap.parse_args()
+
+    if args.metrics_only:
+        con = sqlite3.connect(DB)
+        con.executescript(SCHEMA)
+        load_universe(con)
+        con.commit()
+        print("只重算 daily_metrics(不抓取)…")
+        build_metrics(con)
+        n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
+        con.close()
+        print(f"完成 — daily_metrics {n} rows")
+        return
+
     end = args.end or date.today().isoformat()
     start = args.start or (date.today() - timedelta(days=args.days)).isoformat()
 
