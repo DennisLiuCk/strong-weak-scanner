@@ -1,0 +1,423 @@
+<title>被動 × 功率 × 封測 · 汰弱留強五元素儀表板</title>
+<style>
+  :root{
+    --page:#f0eee8; --surface:#fbfaf8; --surface-2:#f3f1ea; --cell:#f6f4ee;
+    --ink:#17150f; --ink-2:#5c574c; --muted:#8f897b;
+    --hairline:rgba(20,18,12,0.12); --hairline-2:rgba(20,18,12,0.06);
+    --strong:#c1121f; --strong-tint:rgba(193,18,31,0.09); --strong-tint-2:rgba(193,18,31,0.18);
+    --weak:#0b7a37; --weak-tint:rgba(11,122,55,0.09); --weak-tint-2:rgba(11,122,55,0.17);
+    --neutral:#7a756a; --neutral-tint:rgba(122,117,106,0.07);
+    --warn:#9c6a06; --warn-line:#d69e2e; --warn-bg:rgba(214,158,46,0.16);
+    --shadow:0 1px 2px rgba(20,18,12,.05),0 8px 24px rgba(20,18,12,.08);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --page:#0e0e0a; --surface:#17160f; --surface-2:#201f16; --cell:#1d1c14;
+      --ink:#f5f3ea; --ink-2:#b8b3a3; --muted:#8b8577;
+      --hairline:rgba(255,255,255,0.13); --hairline-2:rgba(255,255,255,0.05);
+      --strong:#ee4b4f; --strong-tint:rgba(238,75,79,0.15); --strong-tint-2:rgba(238,75,79,0.26);
+      --weak:#23a657; --weak-tint:rgba(35,166,87,0.16); --weak-tint-2:rgba(35,166,87,0.28);
+      --neutral:#9a9488; --neutral-tint:rgba(154,148,136,0.09);
+      --warn:#e0a83a; --warn-line:#e0a83a; --warn-bg:rgba(224,168,58,0.16);
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="light"]{
+    --page:#f0eee8; --surface:#fbfaf8; --surface-2:#f3f1ea; --cell:#f6f4ee;
+    --ink:#17150f; --ink-2:#5c574c; --muted:#8f897b;
+    --hairline:rgba(20,18,12,0.12); --hairline-2:rgba(20,18,12,0.06);
+    --strong:#c1121f; --strong-tint:rgba(193,18,31,0.09); --strong-tint-2:rgba(193,18,31,0.18);
+    --weak:#0b7a37; --weak-tint:rgba(11,122,55,0.09); --weak-tint-2:rgba(11,122,55,0.17);
+    --neutral:#7a756a; --neutral-tint:rgba(122,117,106,0.07);
+    --warn:#9c6a06; --warn-line:#d69e2e; --warn-bg:rgba(214,158,46,0.16);
+    --shadow:0 1px 2px rgba(20,18,12,.05),0 8px 24px rgba(20,18,12,.08);
+  }
+  :root[data-theme="dark"]{
+    --page:#0e0e0a; --surface:#17160f; --surface-2:#201f16; --cell:#1d1c14;
+    --ink:#f5f3ea; --ink-2:#b8b3a3; --muted:#8b8577;
+    --hairline:rgba(255,255,255,0.13); --hairline-2:rgba(255,255,255,0.05);
+    --strong:#ff6560; --strong-tint:rgba(255,101,96,0.13); --strong-tint-2:rgba(255,101,96,0.24);
+    --weak:#3fca6f; --weak-tint:rgba(63,202,111,0.12); --weak-tint-2:rgba(63,202,111,0.22);
+    --neutral:#9a9488; --neutral-tint:rgba(154,148,136,0.09);
+    --warn:#e0a83a; --warn-line:#e0a83a; --warn-bg:rgba(224,168,58,0.16);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--page); color:var(--ink);
+    font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC","Hiragino Sans GB",sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:"Cascadia Mono",Consolas,ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 22px 64px}
+
+  /* ---- header ---- */
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}
+  .brandrule{width:34px;height:3px;background:var(--strong);border-radius:2px;margin-bottom:14px}
+  h1{font-size:clamp(21px,2.6vw,27px);line-height:1.2;margin:0 0 8px;letter-spacing:.2px;text-wrap:balance;font-weight:800}
+  .sub{color:var(--ink-2);font-size:14px;margin:0;max-width:60ch}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:14px}
+  .chip{font-size:11.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--hairline);
+    border-radius:100px;padding:3px 10px;white-space:nowrap}
+  .chip b{color:var(--ink);font-weight:700}
+  .toggle{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+    background:var(--surface);border:1px solid var(--hairline);color:var(--ink-2);
+    border-radius:100px;padding:7px 13px;font-size:12.5px;font-family:inherit}
+  .toggle:hover{color:var(--ink);border-color:var(--muted)}
+  .toggle:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+
+  /* ---- legend ---- */
+  .legend{margin:22px 0 10px;background:var(--surface);border:1px solid var(--hairline);
+    border-radius:14px;padding:14px 16px;display:grid;gap:14px;
+    grid-template-columns:1.15fr 1fr;box-shadow:var(--shadow)}
+  @media (max-width:720px){.legend{grid-template-columns:1fr}}
+  .legend h3{margin:0 0 9px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .scale{display:flex;flex-wrap:wrap;gap:6px}
+  .sk{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);
+    border:1px solid var(--hairline);border-radius:8px;padding:4px 9px 4px 7px}
+  .sk .g{font-size:12px;font-weight:800;width:20px;text-align:center}
+  .elrow{display:flex;flex-direction:column;gap:5px}
+  .el{display:flex;gap:9px;align-items:baseline;font-size:12.5px}
+  .el .n{font-weight:700;color:var(--ink);white-space:nowrap}
+  .el .r{color:var(--muted);font-size:11.5px}
+
+  /* ---- verdict summary tiers ---- */
+  h2.sec{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;margin:30px 0 12px;display:flex;align-items:center;gap:10px}
+  h2.sec::after{content:"";flex:1;height:1px;background:var(--hairline)}
+  .tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (max-width:760px){.tiers{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:440px){.tiers{grid-template-columns:1fr}}
+  .tier{background:var(--surface);border:1px solid var(--hairline);border-radius:14px;padding:14px;
+    border-top:3px solid var(--tc,var(--neutral));box-shadow:var(--shadow)}
+  .tier .tt{font-weight:800;font-size:14px;margin-bottom:2px}
+  .tier .td{font-size:11.5px;color:var(--muted);margin-bottom:11px}
+  .tier .picks{display:flex;flex-direction:column;gap:7px}
+  .pick{display:flex;align-items:center;gap:8px;font-size:13px}
+  .pick .code{font-size:11px;color:var(--muted)}
+  .pick .nm{font-weight:700}
+  .dot{width:9px;height:9px;border-radius:3px;flex:0 0 auto;background:var(--pc,var(--neutral))}
+
+  /* ---- matrix ---- */
+  .scroller{overflow-x:auto;border:1px solid var(--hairline);border-radius:16px;background:var(--surface);
+    box-shadow:var(--shadow)}
+  .matrix{min-width:880px}
+  .grp{padding:11px 16px 5px;font-weight:800;font-size:13.5px;display:flex;align-items:center;gap:9px}
+  .grp .tag{font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--hairline);
+    border-radius:100px;padding:1px 9px}
+  .row{display:grid;
+    grid-template-columns:minmax(146px,1.3fr) repeat(5,minmax(84px,1fr)) minmax(118px,1.15fr);
+    align-items:stretch;border-top:1px solid var(--hairline-2)}
+  .row.head{border-top:none;position:sticky;top:0;background:var(--surface-2);z-index:2}
+  .row.head .hc{padding:9px 10px;font-size:11.5px;color:var(--muted)}
+  .row.head .hc .t{font-weight:800;color:var(--ink);font-size:12.5px;display:block}
+  .row.head .rl{padding-left:16px}
+  .rl{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:9px 10px 9px 16px;min-width:0}
+  .rl .nm{font-weight:800;font-size:14px;letter-spacing:.2px}
+  .rl .code{font-size:11px;color:var(--muted)}
+  .cell{position:relative;margin:5px;border-radius:9px;padding:8px 6px 7px;cursor:default;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    background:var(--cell);border:1px solid transparent;transition:transform .08s ease, box-shadow .08s ease;
+    min-height:52px}
+  .cell:hover,.cell:focus-visible{transform:translateY(-1px);box-shadow:var(--shadow);z-index:1;outline:none;
+    border-color:var(--hairline)}
+  .cell:focus-visible{border-color:var(--strong)}
+  .cell .g{font-size:12.5px;font-weight:800;line-height:1}
+  .cell .v{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.2px}
+  .cell.s2{background:var(--strong-tint-2)} .cell.s1{background:var(--strong-tint)}
+  .cell.s0{background:var(--neutral-tint)}
+  .cell.sm1{background:var(--weak-tint)} .cell.sm2{background:var(--weak-tint-2)}
+  .cell.s2 .g,.cell.s1 .g{color:var(--strong)}
+  .cell.s0 .g{color:var(--neutral)}
+  .cell.sm1 .g,.cell.sm2 .g{color:var(--weak)}
+  .cell.warn{box-shadow:inset 0 0 0 1.5px var(--warn-line)}
+  .cell .flag{position:absolute;top:3px;right:4px;font-size:10px;color:var(--warn);line-height:1}
+  .vc{display:flex;align-items:center;padding:5px 12px 5px 6px}
+  .verdict{width:100%;border-radius:9px;padding:8px 10px;background:var(--vt,var(--neutral-tint));
+    border:1px solid var(--hairline);cursor:default;transition:transform .08s ease,box-shadow .08s ease}
+  .verdict:hover,.verdict:focus-visible{transform:translateY(-1px);box-shadow:var(--shadow);outline:none}
+  .verdict:focus-visible{border-color:var(--vl,var(--neutral))}
+  .verdict .vv{font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;color:var(--vl,var(--ink))}
+  .verdict .vs{font-size:10.5px;color:var(--muted);margin-top:1px}
+
+  /* ---- tooltip ---- */
+  #tip{position:fixed;z-index:50;max-width:290px;background:var(--surface);color:var(--ink);
+    border:1px solid var(--hairline);border-radius:12px;box-shadow:var(--shadow);
+    padding:12px 13px;font-size:12.5px;pointer-events:none;opacity:0;transform:translateY(3px);
+    transition:opacity .12s ease,transform .12s ease}
+  #tip.on{opacity:1;transform:translateY(0)}
+  #tip .th{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+  #tip .th .el{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  #tip .th .sc{margin-left:auto;font-size:11px;font-weight:800;padding:1px 8px;border-radius:100px}
+  #tip .who{font-weight:800;font-size:14px;margin-bottom:6px}
+  #tip .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
+    font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
+    border-radius:8px;padding:7px 9px;margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
+  #tip .why{color:var(--ink-2);line-height:1.5}
+  #tip .why b{color:var(--ink)}
+
+  footer{margin-top:26px;color:var(--muted);font-size:11.5px;line-height:1.7}
+  footer b{color:var(--ink-2)}
+  footer .fn{border-top:1px solid var(--hairline);padding-top:14px;display:grid;gap:4px}
+  .caveat{margin-top:12px;background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:10px;
+    padding:10px 12px;color:var(--ink-2);font-size:12px}
+  .caveat b{color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brandrule"></div>
+      <h1>被動 × 功率 × 封測 · 汰弱留強五元素儀表板</h1>
+      <p class="sub">台股 2026 年 6 月修正下,三大半導體族群共 30 檔的強弱掃描。價是表象,量定真假,外資/投信是法人方向,融資券是散戶籌碼與未來賣壓——五者交叉才看得出誰真強、誰是出貨陷阱、誰是外資默默佈局的蓄勢股。</p>
+      <div class="meta">
+        <span class="chip">修正① <b>6/3→6/11 −7%</b></span>
+        <span class="chip">修正② <b>6/22→6/26 −6.6%</b></span>
+        <span class="chip">範圍 <b>3 族群 · 30 檔</b></span>
+        <span class="chip">資料至 <b>__DATE__</b>(原始股價)</span>
+        <span class="chip">來源 <b>FinMind</b></span>
+        <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
+      </div>
+    </div>
+    <button class="toggle" id="themeBtn" aria-label="切換深淺色">
+      <span id="themeIcon">◐</span><span id="themeTxt">主題</span>
+    </button>
+  </header>
+
+  <div class="legend">
+    <div>
+      <h3>強弱刻度(每格另有符號與數字,不靠顏色單獨判讀)</h3>
+      <div class="scale">
+        <span class="sk"><span class="g" style="color:var(--strong)">▲▲</span>強</span>
+        <span class="sk"><span class="g" style="color:var(--strong)">▲</span>偏強</span>
+        <span class="sk"><span class="g" style="color:var(--neutral)">—</span>中性</span>
+        <span class="sk"><span class="g" style="color:var(--weak)">▼</span>偏弱</span>
+        <span class="sk"><span class="g" style="color:var(--weak)">▼▼</span>弱</span>
+        <span class="sk"><span class="g" style="color:var(--warn)">⚠</span>過熱/背離/陷阱</span>
+      </div>
+    </div>
+    <div>
+      <h3>五元素(欄位)</h3>
+      <div class="elrow">
+        <span class="el"><span class="n">①&nbsp;價</span><span class="r">距波段高 / 反彈 — 表象</span></span>
+        <span class="el"><span class="n">②&nbsp;量</span><span class="r">周轉率 / 量能 — 價格真假</span></span>
+        <span class="el"><span class="n">③&nbsp;外資</span><span class="r">持股比例變化 — 國際法人</span></span>
+        <span class="el"><span class="n">④&nbsp;投信</span><span class="r">買賣超 / 認養 — 本土法人</span></span>
+        <span class="el"><span class="n">⑤&nbsp;融資券</span><span class="r">散戶水位 / 券資比 — 未來賣壓</span></span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec">結論 · 汰弱留強</h2>
+  <div class="tiers" id="tiers"></div>
+
+  <h2 class="sec">五元素明細 · hover 或點選看數據與理由</h2>
+  <div class="scroller">
+    <div class="matrix" id="matrix"></div>
+  </div>
+
+  <footer>
+    <div class="caveat" id="caveat"><b>唯一未補齊:</b>「主力是哪個分點」需券商分點進出(<span class="mono">TaiwanStockTradingDailyReport</span>,Sponsor 等級,目前端點逾時未開通)。小型股外資持股單日有保管行重分類雜訊,本表看淨趨勢並與買賣超交叉驗證。</div>
+    <div class="fn" style="margin-top:14px">
+      <div><b>指標定義</b> · 距波段高 = 7/3收盤相對區間最高收盤;周轉率 = 當日成交量 ÷ 發行股數;外資持股Δ = 6/15→7/3持股比例變化(pp);散戶水位 = 融資餘額 ÷ 發行股數;券資比 = 融券餘額 ÷ 融資餘額。</div>
+      <div><b>方法</b> · 強弱為五元素綜合研判,非單一報酬率。原始未還原股價,短線比較用途;長期報酬應改用還原股價。本頁為量化籌碼判讀,非投資建議。</div>
+    </div>
+  </footer>
+</div>
+
+<div id="tip" role="tooltip" aria-hidden="true"></div>
+
+<script>
+(function(){
+  "use strict";
+  var EL = [
+    {k:"①價", role:"表象"},
+    {k:"②量", role:"價格真假"},
+    {k:"③外資", role:"國際法人"},
+    {k:"④投信", role:"本土法人"},
+    {k:"⑤融資券", role:"散戶籌碼"}
+  ];
+  // score -> glyph + class + label
+  function sinfo(s){
+    if(s>=2)  return {g:"▲▲",c:"s2", l:"強"};
+    if(s===1) return {g:"▲", c:"s1", l:"偏強"};
+    if(s===0) return {g:"—", c:"s0", l:"中性"};
+    if(s===-1)return {g:"▼", c:"sm1",l:"偏弱"};
+    return {g:"▼▼",c:"sm2",l:"弱"};
+  }
+  function scColor(s){
+    if(s>0) return "var(--strong)"; if(s<0) return "var(--weak)"; return "var(--neutral)";
+  }
+  // c = cell: [score, valueText, detail, reason, warn?]
+  var DATA = __DATA_JSON__;
+
+  var GRP = {passive:{nm:"被動元件", tag:"MLCC / 電容 / 電阻 / 電感"}, power:{nm:"功率元件", tag:"MOSFET / 二極體 / 功率IC"}, packtest:{nm:"封測", tag:"OSAT / 先進封裝 / AI測試"}};
+
+  // ---------- tooltip ----------
+  var tip = document.getElementById("tip");
+  function setText(node, t){ node.textContent = t == null ? "" : String(t); }
+  function showTip(html, x, y){
+    // build safely
+    tip.innerHTML = "";
+    var head = document.createElement("div"); head.className="th";
+    var el = document.createElement("span"); el.className="el"; setText(el, html.el); head.appendChild(el);
+    var sc = document.createElement("span"); sc.className="sc";
+    setText(sc, html.scLabel);
+    sc.style.color = html.scColor; sc.style.background = html.scBg;
+    head.appendChild(sc);
+    tip.appendChild(head);
+    var who = document.createElement("div"); who.className="who"; setText(who, html.who); tip.appendChild(who);
+    if(html.data){ var d=document.createElement("div"); d.className="data"; setText(d, html.data); tip.appendChild(d); }
+    var why=document.createElement("div"); why.className="why"; setText(why, html.why); tip.appendChild(why);
+    tip.classList.add("on"); tip.setAttribute("aria-hidden","false");
+    positionTip(x,y);
+  }
+  function positionTip(x,y){
+    var pad=14, w=tip.offsetWidth, h=tip.offsetHeight;
+    var left=x+16, top=y+16;
+    if(left+w+pad>window.innerWidth) left=x-w-16;
+    if(left<pad) left=pad;
+    if(top+h+pad>window.innerHeight) top=y-h-16;
+    if(top<pad) top=pad;
+    tip.style.left=left+"px"; tip.style.top=top+"px";
+  }
+  function hideTip(){ tip.classList.remove("on"); tip.setAttribute("aria-hidden","true"); }
+
+  function tintBg(s){ // background for score chip in tooltip
+    if(s>0) return "var(--strong-tint-2)"; if(s<0) return "var(--weak-tint-2)"; return "var(--neutral-tint)";
+  }
+
+  function attachTip(node, payload){
+    var lastX=0,lastY=0;
+    node.addEventListener("mouseenter", function(e){ lastX=e.clientX;lastY=e.clientY; showTip(payload(), lastX,lastY); });
+    node.addEventListener("mousemove", function(e){ lastX=e.clientX;lastY=e.clientY; if(tip.classList.contains("on")) positionTip(lastX,lastY); });
+    node.addEventListener("mouseleave", hideTip);
+    node.addEventListener("focus", function(){ var r=node.getBoundingClientRect(); showTip(payload(), r.left+r.width/2, r.top); });
+    node.addEventListener("blur", hideTip);
+    node.addEventListener("click", function(e){ // touch / tap
+      if(tip.classList.contains("on")) { hideTip(); }
+      else { showTip(payload(), e.clientX||node.getBoundingClientRect().left, e.clientY||node.getBoundingClientRect().top); }
+    });
+  }
+
+  // ---------- render matrix ----------
+  var matrix = document.getElementById("matrix");
+  function headRow(){
+    var r=document.createElement("div"); r.className="row head";
+    var rl=document.createElement("div"); rl.className="hc rl";
+    var t=document.createElement("span"); t.className="t"; t.textContent="個股"; rl.appendChild(t);
+    var s=document.createElement("span"); s.textContent="族群 / 綜評"; rl.appendChild(s);
+    r.appendChild(rl);
+    EL.forEach(function(e){
+      var c=document.createElement("div"); c.className="hc";
+      var t=document.createElement("span"); t.className="t"; t.textContent=e.k; c.appendChild(t);
+      var s=document.createElement("span"); s.textContent=e.role; c.appendChild(s);
+      r.appendChild(c);
+    });
+    var v=document.createElement("div"); v.className="hc";
+    var vt=document.createElement("span"); vt.className="t"; vt.textContent="綜合評級"; v.appendChild(vt);
+    var vs=document.createElement("span"); vs.textContent="五元素研判"; v.appendChild(vs);
+    r.appendChild(v);
+    return r;
+  }
+  function groupHead(g){
+    var d=document.createElement("div"); d.className="grp";
+    var n=document.createElement("span"); n.textContent=GRP[g].nm; d.appendChild(n);
+    var t=document.createElement("span"); t.className="tag"; t.textContent=GRP[g].tag; d.appendChild(t);
+    return d;
+  }
+  function stockRow(row){
+    var r=document.createElement("div"); r.className="row";
+    var rl=document.createElement("div"); rl.className="rl";
+    var nm=document.createElement("span"); nm.className="nm"; nm.textContent=row.nm; rl.appendChild(nm);
+    var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; rl.appendChild(code);
+    r.appendChild(rl);
+
+    row.cells.forEach(function(c,i){
+      var s=c[0], val=c[1], detail=c[2], reason=c[3], warn=c[4];
+      var info=sinfo(s);
+      var cell=document.createElement("div"); cell.className="cell "+info.c+(warn?" warn":"");
+      cell.tabIndex=0; cell.setAttribute("role","button");
+      cell.setAttribute("aria-label", row.nm+" "+EL[i].k+" "+info.l+" "+val);
+      if(warn){ var fl=document.createElement("span"); fl.className="flag"; fl.textContent="⚠"; cell.appendChild(fl); }
+      var g=document.createElement("span"); g.className="g"; g.textContent=info.g; cell.appendChild(g);
+      var v=document.createElement("span"); v.className="v mono"; v.textContent=val; cell.appendChild(v);
+      attachTip(cell, (function(row,i,s,detail,reason,info){ return function(){
+        return { el: EL[i].k+" · "+EL[i].role, who: row.nm+"("+row.id+")",
+          data: detail, why: reason,
+          scLabel: info.l+(row.cells[i][4]?" ⚠":""), scColor: scColor(s), scBg: tintBg(s) };
+      };})(row,i,s,detail,reason,info));
+      r.appendChild(cell);
+    });
+
+    // verdict
+    var vc=document.createElement("div"); vc.className="vc";
+    var vd=document.createElement("div"); vd.className="verdict"; vd.tabIndex=0; vd.setAttribute("role","button");
+    vd.style.setProperty("--vt", tintBg(row.vt));
+    vd.style.setProperty("--vl", scColor(row.vt));
+    vd.setAttribute("aria-label", row.nm+" 綜評 "+row.vlabel);
+    var vv=document.createElement("div"); vv.className="vv";
+    if(row.warn){ var w=document.createElement("span"); w.textContent="⚠"; w.style.color="var(--warn)"; vv.appendChild(w); }
+    var vtx=document.createElement("span"); vtx.textContent=row.vlabel; vv.appendChild(vtx);
+    vd.appendChild(vv);
+    var vs=document.createElement("div"); vs.className="vs"; vs.textContent=row.vsub; vd.appendChild(vs);
+    attachTip(vd, (function(row){ return function(){
+      return { el:"綜合評級 · 五元素研判", who: row.nm+"("+row.id+")", data:"", why: row.vr,
+        scLabel: row.vlabel+(row.warn?" ⚠":""), scColor: scColor(row.vt), scBg: tintBg(row.vt) };
+    };})(row));
+    vc.appendChild(vd); r.appendChild(vc);
+    return r;
+  }
+
+  matrix.appendChild(headRow());
+  var curG=null;
+  DATA.forEach(function(row){
+    if(row.g!==curG){ matrix.appendChild(groupHead(row.g)); curG=row.g; }
+    matrix.appendChild(stockRow(row));
+  });
+
+  // ---------- tiers summary ----------
+  var TIERS = __TIERS_JSON__;
+    var byId={}; DATA.forEach(function(d){byId[d.id]=d;});
+  var tiers=document.getElementById("tiers");
+  TIERS.forEach(function(T){
+    var el=document.createElement("div"); el.className="tier"; el.style.setProperty("--tc",T.col);
+    var tt=document.createElement("div"); tt.className="tt"; tt.textContent=T.t; el.appendChild(tt);
+    var td=document.createElement("div"); td.className="td"; td.textContent=T.d; el.appendChild(td);
+    var picks=document.createElement("div"); picks.className="picks";
+    T.ids.forEach(function(id){
+      var d=byId[id];
+      var p=document.createElement("div"); p.className="pick";
+      var dot=document.createElement("span"); dot.className="dot"; dot.style.setProperty("--pc",scColor(d.vt));
+      if(d.warn) dot.style.background="var(--warn-line)";
+      p.appendChild(dot);
+      var nm=document.createElement("span"); nm.className="nm"; nm.textContent=d.nm; p.appendChild(nm);
+      var code=document.createElement("span"); code.className="code mono"; code.textContent=id; p.appendChild(code);
+      picks.appendChild(p);
+    });
+    el.appendChild(picks); tiers.appendChild(el);
+  });
+
+  // ---------- theme toggle ----------
+  var root=document.documentElement, btn=document.getElementById("themeBtn"),
+      icon=document.getElementById("themeIcon"), txt=document.getElementById("themeTxt");
+  function sysDark(){ return window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches; }
+  function apply(mode){
+    if(mode==="auto"){ root.removeAttribute("data-theme"); icon.textContent="◐"; txt.textContent="自動"; }
+    else { root.setAttribute("data-theme",mode); icon.textContent = mode==="dark"?"●":"○"; txt.textContent = mode==="dark"?"深色":"淺色"; }
+  }
+  var cur="auto";
+  try{ var saved=localStorage.getItem("sc_theme"); if(saved) cur=saved; }catch(e){}
+  apply(cur);
+  btn.addEventListener("click", function(){
+    cur = cur==="auto" ? (sysDark()?"light":"dark") : (cur==="dark"?"light":"dark");
+    apply(cur); try{ localStorage.setItem("sc_theme",cur); }catch(e){}
+  });
+
+  window.addEventListener("scroll", hideTip, {passive:true});
+  window.addEventListener("resize", hideTip);
+})();
+</script>
