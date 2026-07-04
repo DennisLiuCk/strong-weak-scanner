@@ -1,17 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-score.py — 五元素數值 → 分數(−2..+2)+ 綜合 + tier,寫入 daily_scores。
-零第三方依賴。預設用「當前規則」重算全部歷史(調規則後要重跑才會一致)。
+score.py — v2 族群內橫斷面排名評分 + tier,寫入 daily_scores。
+零第三方依賴。每次用「當前規則」重算全部歷史(調規則後重跑即一致)。
+舊絕對門檻制(v1)最後結果凍結於 daily_scores_v1(2026-07-05),供 validate 對照。
 
-用法:
-  uv run --no-project python scripts/score.py            # 重算全部並印最新日 tier
-  uv run --no-project python scripts/score.py --date 2026-07-03
+v2 核心改變(依 2026-07-05 方法論 review 實證):
+  * 排名制:各元素在「族群內」按分位數給 −2..+2 —— 解決絕對門檻的個股結構偏誤
+    (日月光永遠拿不到外資+2、小型股躺著滿分)。
+  * ⑤融資改「價×融資」交互;②量改「相對自身 60 日中位」量比。
+  * 蓄勢加質量濾網:修正日抗跌(down_rs20)不得輸族群 —— 排除華泰式假佈局。
+  * 遲滯:composite 取 3 日平滑;tier 需連 2 日同 raw 才轉層(v1 日均 7.2/30 檔換層)。
 
-★ 策略優化就是調下面 CONFIG 的門檻與權重;改完重跑即可,validate.py 會告訴你哪個元素最準。
+v2.1 權重再校準(族群內 IC 診斷,2026-07-05):
+  * 族群內選股靠「價格相對」:rs20 相對強弱(族群內 IC +0.155)、down_rs20 抗跌(+0.119)
+    → s_price 改排名 rs20、新元素 s_resil 排名 down_rs20,兩者權重最高。
+  * 籌碼(fpct_chg20 −0.007、dipbuy20 −0.096)在「族群內」沒有選股力 —— 它們是
+    「族群層」訊號(v1 混池 IC +0.07 全來自跨族群選對族群)。故 s_foreign 降權、
+    s_dip 權重 0(只用於蓄勢 tier 條件與儀表板顯示);族群層籌碼聚合屬 Phase 2。
+  * 此為 in-sample 校準 + 因子先驗(橫斷面動能/低下行 beta 是最強健的已知因子);
+    正式評判交給 validate.py 的 out-of-sample 累積。
+
+★ 策略優化調下面 CONFIG;validate.py(Phase 3)會告訴你哪個元素/權重最準。
 """
-import argparse, os, sqlite3, sys
-from collections import defaultdict
+import argparse, os, sqlite3, statistics, sys
+from collections import defaultdict, deque
 
 try:                       # 讓輸出在任何 console(含 Windows cp950)都不會因中文/⚠ 崩潰
     sys.stdout.reconfigure(encoding="utf-8")
@@ -24,156 +37,184 @@ DB = os.path.join(ROOT, "data", "findmind.db")
 # ══════════════════════════════════════════════════════════════════
 # CONFIG ── 策略旋鈕(調這裡)
 # ══════════════════════════════════════════════════════════════════
-# 各元素門檻:list 由高到低,x >= 門檻 就給該分數;都不符合給 default。
-TH_PRICE   = [(-0.03, 2), (-0.08, 1), (-0.15, 0), (-0.25, -1)]   # ①價:距60日高(近高=強)
-TH_FOREIGN = [(3.0, 2), (1.0, 1), (-1.0, 0), (-3.0, -1)]          # ③外資:20日持股變化(pp)
-TH_TRUST   = [(0.5, 2), (0.1, 1), (-0.1, 0), (-0.5, -1)]          # ④投信:近5日淨額(佔股本%)
-DEFAULT_LOW = -2
+# 族群內百分位 → 分數(0=最弱,1=最強);低於最後一檔門檻給 -2
+RANK_MAP = [(0.8, 2), (0.6, 1), (0.4, 0), (0.2, -1)]
 
-# ②量:周轉率(雙面刃)—— 極高=過熱churn、太低=量縮無人氣、中間健康
-VOL_OVERHEAT = 20.0   # 周轉率 >= 此值 → 過熱旗標
-VOL_HEALTHY  = (3.0, 12.0)   # 此區間 → +1;>上界=0;1~下界=0;<1=-1
+# 雜訊死區:|原始值| 低於此,不論排名一律 0 分(全族群無訊號時,排名只會放大雜訊)
+DZ_FOREIGN = 0.3     # fpct_chg20(pp)
+DZ_TRUST   = 0.03    # trust5_pct(佔股本 %)
+DZ_DIP     = 0.03    # dipbuy20(佔股本 %)
 
-# ⑤融資券:以「融資10日變化」定方向(貼近我們手工的~2週視窗;不足10日退回5日),「散戶水位」加罰
-# 備註:daily_metrics 另存了 margin_chg5/20,validate.py 可比較哪個窗預測力最好再改這裡。
-TH_MARGIN_CHG = [(-0.08, 2), (-0.03, 1), (0.06, 0), (0.15, -1)]  # 融資大減=洗清(強)/暴增=追高(弱)
-MARGIN_UTIL_HOT = 9.0   # 散戶水位 >= 此值 → 封頂 -1 並示警
-MARGIN_UTIL_MID = 6.0   # >= 此值 → 分數封頂 +1
+# ②量:量比(相對自身 60 日中位)
+VOLR_ACTIVE   = (1.2, 3.0)   # 健康活絡 → +1
+VOLR_DRY      = 0.5          # 低於 → -1(無人氣)
+VOL_OVERHEAT  = 20.0         # 周轉率絕對過熱旗標(%)
+VOLR_OVERHEAT = 5.0          # 量比過熱旗標
 
-# 綜合權重(籌碼權重刻意高於價量)
-WEIGHTS = {"price": 1.0, "vol": 0.6, "foreign": 1.6, "trust": 1.2, "margin": 1.3}
+# ⑤融資:價(ret20)×融資(margin_chg10)交互
+MARGIN_DOWN_BIG = -0.05      # 融資 10 日大減
+MARGIN_UP_MID   = 0.06       # 融資 10 日明顯增
+MARGIN_UP_BIG   = 0.20       # 融資 10 日暴增
+MARGIN_UTIL_HOT = 9.0        # 散戶水位(%)≥ → 封頂 -1 並示警
+MARGIN_UTIL_MID = 6.0        # ≥ → 封頂 +1
 
-# tier 分界
-STRONG_CUT = 4.0     # composite >= → 真強
-WEAK_CUT   = -3.0    # composite <= → 真弱
-STEALTH_MIN = 2.0    # 蓄勢需綜合仍為正(籌碼真的強、只是價未動)
+# 綜合權重(v2.1:族群內選股以價格相對因子為主,籌碼降權/歸零 —— 見檔頭說明)
+WEIGHTS = {"price": 1.4, "resil": 1.0, "vol": 0.3, "foreign": 0.5, "trust": 0.8,
+           "dip": 0.0, "margin": 0.4}
+
+# 蓄勢 tier 的「價未動」定義:距 60 日高至少落後此幅度
+STEALTH_OFF_HIGH = -0.03
+
+SMOOTH_N    = 3      # composite 平滑天數
+STRONG_MIN  = 2.5    # 真強:族群 comp_s 前 2 名 且 comp_s ≥ 此值(避免「爛族群裡的最好」)
+WEAK_ABS    = -3.5   # 真弱絕對線(或族群倒數 2 名且 comp_s < 0)
+STEALTH_MIN = 1.5    # 蓄勢最低 comp_s
 # ══════════════════════════════════════════════════════════════════
 
 
-def _ladder(x, table):
-    """越高越好:table 由高到低,x >= 門檻 給該分。"""
-    if x is None:
-        return 0
-    for thr, sc in table:
-        if x >= thr:
-            return sc
-    return DEFAULT_LOW
-
-
-def _ladder_low(x, table):
-    """越低越好(⑤融資:融資減=強):table 由低到高,x <= 門檻 給該分。"""
-    if x is None:
-        return 0
-    for thr, sc in table:
-        if x <= thr:
-            return sc
-    return DEFAULT_LOW
-
-
-def score_price(m):
-    return _ladder(m["dist_hi60"], TH_PRICE)
-
-
-def score_foreign(m):
-    return _ladder(m["fpct_chg20"], TH_FOREIGN)
-
-
-def score_trust(m):
-    return _ladder(m["trust5_pct"], TH_TRUST)   # 近5日投信淨額佔股本 %(metrics 已用當日股本算好)
+def rank_scores(vals, deadzone=None):
+    """族群內橫斷面:原始值 list → −2..+2 分數 list(五分位)。
+    None 不參與排名、給 0;參與檔數 <4 全給 0;死區內強制 0。"""
+    out = [0] * len(vals)
+    idx = [i for i, v in enumerate(vals) if v is not None]
+    m = len(idx)
+    if m < 4:
+        return out
+    order = sorted(idx, key=lambda i: vals[i])
+    for pos, i in enumerate(order):
+        pct = pos / (m - 1)
+        s = -2
+        for thr, sc in RANK_MAP:
+            if pct >= thr:
+                s = sc
+                break
+        out[i] = s
+    if deadzone is not None:
+        for i in idx:
+            if abs(vals[i]) < deadzone:
+                out[i] = 0
+    return out
 
 
 def score_vol(m):
-    """回傳 (分數, 過熱旗標)。"""
-    t = m["turnover_pct"]
-    if t is None:
-        return 0, False
-    if t >= VOL_OVERHEAT:
-        return -1, True                 # 爆量churn/過熱
-    lo, hi = VOL_HEALTHY
-    if t >= hi:
-        return 0, False
-    if t >= lo:
-        return 1, False                 # 健康活量
-    if t >= 1.0:
-        return 0, False
-    return -1, False                    # 量縮無人問津
+    """量比制。回傳 (分數, 過熱旗標)。"""
+    vr, t = m["vol_ratio60"], m["turnover_pct"]
+    warn = (t is not None and t >= VOL_OVERHEAT) or (vr is not None and vr >= VOLR_OVERHEAT)
+    if vr is None:
+        return 0, warn
+    if VOLR_ACTIVE[0] <= vr <= VOLR_ACTIVE[1]:
+        return 1, warn
+    if vr < VOLR_DRY:
+        return -1, warn
+    return 0, warn
 
 
 def score_margin(m):
-    """回傳 (分數, 水位過滿旗標)。方向用 10 日融資變化(貼近手工的~2週視窗),不足 10 日退回 5 日。"""
+    """價(ret20)×融資(chg10,不足退 chg5)交互 + 散戶水位封頂。回傳 (分數, 水位旗標)。"""
     chg = m["margin_chg10"] if m["margin_chg10"] is not None else m["margin_chg5"]
-    base = _ladder_low(chg, TH_MARGIN_CHG)
+    r20 = m["ret20"]
+    down = r20 is not None and r20 < 0
+    if chg is None:
+        base = 0
+    elif chg <= MARGIN_DOWN_BIG:
+        base = 2 if down else 1          # 價跌融資減=洗盤(最佳);價漲融資減=健康換手
+    elif chg >= MARGIN_UP_BIG:
+        base = -2                        # 融資暴增:無論價格方向都是散戶湧入
+    elif chg >= MARGIN_UP_MID:
+        base = -2 if down else -1        # 價跌融資增=散戶接刀(最凶);價漲融資增=追高
+    else:
+        base = 0
     u = m["margin_util_pct"]
     warn = False
     if u is not None and u >= MARGIN_UTIL_HOT:
-        base = min(base, -1)            # 散戶槓桿滿載 = 未來賣壓
+        base = min(base, -1)
         warn = True
-    elif u is not None and u >= MARGIN_UTIL_MID and base > 1:
-        base = 1
+    elif u is not None and u >= MARGIN_UTIL_MID:
+        base = min(base, 1)
     return base, warn
 
 
-def classify(s):
-    comp = round(sum(WEIGHTS[k] * s[k] for k in WEIGHTS), 2)
-    overheat = s["vol_warn"] or s["margin_warn"] or s["margin"] <= -2
-    trap = s["foreign"] <= -1 and s["margin"] <= -1          # 外資出 + 散戶接 = 陷阱
-    stealth = s["foreign"] >= 2 and s["price"] <= 1          # 籌碼強、價未動 = 蓄勢
-
-    if trap:
-        tier = "真弱·陷阱"
-    elif s["price"] >= 1 and overheat:
-        tier = "強但過熱"
-    elif stealth and comp >= STEALTH_MIN:
-        tier = "蓄勢·外資佈局"
-    elif comp >= STRONG_CUT and s["price"] >= 1 and (s["foreign"] >= 1 or s["trust"] >= 1):
-        tier = "真強"                                        # 真強:價在高檔 + 至少一種法人挺(不能只靠融資)
-    elif comp <= WEAK_CUT:
-        tier = "真弱"
-    else:
-        tier = "潛在/中性"
-    warn = 1 if (trap or overheat) else 0
-    return comp, tier, warn
-
-
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--date", help="只算單日;省略=重算全部歷史")
-    args = ap.parse_args()
-
+    argparse.ArgumentParser(description="v2 排名制評分(永遠重算全歷史)").parse_args()
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
-    con.execute("""CREATE TABLE IF NOT EXISTS daily_scores(
-        date TEXT, stock_id TEXT, s_price INT, s_vol INT, s_foreign INT, s_trust INT, s_margin INT,
-        composite REAL, tier TEXT, warn INT, PRIMARY KEY(date, stock_id))""")
+    con.execute("DROP TABLE IF EXISTS daily_scores")
+    con.execute("""CREATE TABLE daily_scores(
+        date TEXT, stock_id TEXT,
+        s_price INT, s_resil INT, s_vol INT, s_foreign INT, s_trust INT, s_dip INT, s_margin INT,
+        composite REAL, composite_s REAL, tier_raw TEXT, tier TEXT, warn INT,
+        PRIMARY KEY(date, stock_id))""")
 
-    where = "WHERE date = ?" if args.date else ""
-    params = (args.date,) if args.date else ()
-    rows = con.execute(f"SELECT * FROM daily_metrics {where}", params).fetchall()
+    rows = con.execute("""SELECT m.*, u.grp FROM daily_metrics m
+                          JOIN universe u USING(stock_id) ORDER BY m.date""").fetchall()
+    by_date = defaultdict(lambda: defaultdict(list))   # date -> grp -> [row]
+    for r in rows:
+        by_date[r["date"]][r["grp"]].append(r)
 
+    comp_hist = defaultdict(lambda: deque(maxlen=SMOOTH_N))   # 平滑用
+    prev_raw, prev_tier = {}, {}                              # 遲滯用
     out = []
-    for m in rows:
-        sp = score_price(m)
-        sv, vwarn = score_vol(m)
-        sf = score_foreign(m)
-        st = score_trust(m)
-        sm, mwarn = score_margin(m)
-        s = {"price": sp, "vol": sv, "foreign": sf, "trust": st, "margin": sm,
-             "vol_warn": vwarn, "margin_warn": mwarn}
-        comp, tier, warn = classify(s)
-        out.append((m["date"], m["stock_id"], sp, sv, sf, st, sm, comp, tier, warn))
-
-    con.executemany("""INSERT OR REPLACE INTO daily_scores
-        (date,stock_id,s_price,s_vol,s_foreign,s_trust,s_margin,composite,tier,warn)
-        VALUES(?,?,?,?,?,?,?,?,?,?)""", out)
+    for d in sorted(by_date):
+        for grp, ms in by_date[d].items():
+            s_price = rank_scores([m["rs20"] for m in ms])          # 20日相對強弱(族群內最強因子)
+            s_resil = rank_scores([m["down_rs20"] for m in ms])     # 修正日抗跌
+            s_foreign = rank_scores([m["fpct_chg20"] for m in ms], DZ_FOREIGN)
+            s_trust = rank_scores([m["trust5_pct"] for m in ms], DZ_TRUST)
+            s_dip = rank_scores([m["dipbuy20"] for m in ms], DZ_DIP)
+            scored = []
+            for i, m in enumerate(ms):
+                sv, vwarn = score_vol(m)
+                sm, mwarn = score_margin(m)
+                s = {"price": s_price[i], "resil": s_resil[i], "vol": sv, "foreign": s_foreign[i],
+                     "trust": s_trust[i], "dip": s_dip[i], "margin": sm}
+                comp = round(sum(WEIGHTS[k] * s[k] for k in WEIGHTS), 2)
+                comp_hist[m["stock_id"]].append(comp)
+                comp_s = round(sum(comp_hist[m["stock_id"]]) / len(comp_hist[m["stock_id"]]), 2)
+                scored.append((m, s, vwarn, mwarn, comp, comp_s))
+            # 族群內以平滑綜合分排名(1=最強)
+            grank = {id(t): rk + 1 for rk, t in
+                     enumerate(sorted(scored, key=lambda t: -t[5]))}
+            n = len(scored)
+            for t in scored:
+                m, s, vwarn, mwarn, comp, comp_s = t
+                sid = m["stock_id"]
+                overheat = vwarn or mwarn
+                trap = (s["foreign"] <= -1 and s["margin"] <= -1
+                        and m["rs20"] is not None and m["rs20"] < 0)
+                stealth = ((s["foreign"] >= 2 or s["dip"] >= 2)
+                           and m["dist_hi60"] is not None and m["dist_hi60"] <= STEALTH_OFF_HIGH
+                           and m["down_rs20"] is not None and m["down_rs20"] >= 0
+                           and comp_s >= STEALTH_MIN)          # 籌碼吃貨+價未動+修正日不輸族群
+                if trap:
+                    tier_raw = "真弱·陷阱"
+                elif s["price"] >= 1 and overheat:
+                    tier_raw = "強但過熱"
+                elif stealth:
+                    tier_raw = "蓄勢·外資佈局"
+                elif (grank[id(t)] <= 2 and comp_s >= STRONG_MIN and s["price"] >= 1
+                      and (s["foreign"] >= 1 or s["trust"] >= 1 or s["dip"] >= 1)):
+                    tier_raw = "真強"
+                elif comp_s <= WEAK_ABS or (grank[id(t)] >= n - 1 and comp_s < 0):
+                    tier_raw = "真弱"
+                else:
+                    tier_raw = "潛在/中性"
+                # 遲滯:連 2 日同 raw tier 才轉層,否則沿用昨日已確認 tier
+                if prev_tier.get(sid) is None or prev_raw.get(sid) == tier_raw:
+                    tier = tier_raw
+                else:
+                    tier = prev_tier[sid]
+                prev_raw[sid], prev_tier[sid] = tier_raw, tier
+                warn = 1 if (trap or overheat) else 0
+                out.append((d, sid, s["price"], s["resil"], s["vol"], s["foreign"], s["trust"],
+                            s["dip"], s["margin"], comp, comp_s, tier_raw, tier, warn))
+    con.executemany("INSERT OR REPLACE INTO daily_scores VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
     con.commit()
 
     # ── 印最新日的 tier 排行 ──
     last = con.execute("SELECT MAX(date) FROM daily_scores").fetchone()[0]
-    print(f"daily_scores 已更新 {len(out)} 列。最新日 {last} 的 tier:\n")
-    q = """SELECT sc.stock_id,u.name,u.grp,sc.composite,sc.tier,sc.warn,
-                  sc.s_price,sc.s_vol,sc.s_foreign,sc.s_trust,sc.s_margin
-           FROM daily_scores sc JOIN universe u USING(stock_id)
-           WHERE sc.date=? ORDER BY sc.composite DESC"""
+    print(f"daily_scores(v2 排名制)已更新 {len(out)} 列。最新日 {last} 的 tier:\n")
+    q = """SELECT sc.*, u.name, u.grp FROM daily_scores sc JOIN universe u USING(stock_id)
+           WHERE sc.date=? ORDER BY sc.composite_s DESC"""
     ORDER = ["真強", "蓄勢·外資佈局", "強但過熱", "潛在/中性", "真弱", "真弱·陷阱"]
     by_tier = defaultdict(list)
     for r in con.execute(q, (last,)):
@@ -185,8 +226,10 @@ def main():
         print(f"■ {tier}  ({len(rs)})")
         for r in rs:
             flag = " ⚠" if r["warn"] else ""
-            elem = f"價{r['s_price']:+d} 量{r['s_vol']:+d} 外{r['s_foreign']:+d} 投{r['s_trust']:+d} 融{r['s_margin']:+d}"
-            print(f"   {r['stock_id']} {r['name']:<5} [{r['grp']:<8}] 綜{r['composite']:>5.1f}  {elem}{flag}")
+            pend = "" if r["tier_raw"] == r["tier"] else f" →{r['tier_raw']}?"
+            elem = (f"價{r['s_price']:+d} 抗{r['s_resil']:+d} 量{r['s_vol']:+d} 外{r['s_foreign']:+d} "
+                    f"投{r['s_trust']:+d} 逆{r['s_dip']:+d} 融{r['s_margin']:+d}")
+            print(f"   {r['stock_id']} {r['name']:<5} [{r['grp']:<8}] 綜{r['composite_s']:>5.1f}  {elem}{flag}{pend}")
         print()
     con.close()
 

@@ -18,7 +18,7 @@ Token 讀取順序:環境變數 FINMIND_TOKEN → 專案根目錄 .mcp.json。
 減資參考價 dataset 需付費、未涵蓋——由「無事件大跳空」偵測示警兜底。
 price_adj 每次整表重建、冪等;原始 price 表維持 append-only 不動。
 """
-import argparse, csv, json, os, sqlite3, sys, time
+import argparse, csv, json, os, sqlite3, statistics, sys, time
 import urllib.parse, urllib.request
 from datetime import date, timedelta
 
@@ -201,20 +201,25 @@ def build_price_adj(con):
 
 def build_metrics(con):
     """由原始表重算五元素衍生指標(純 Python 滾動,穩健)。整表重建,可重複執行。
-    價格類(ret1/距高)用還原價;股本取「當日」值(forward-fill),避免用最新股本回填歷史造成前視。"""
+    價格類(ret1/ret20/距高)用還原價;股本取「當日」值(forward-fill)。
+    兩段式:先算每檔基礎序列 → 族群逐日中位數 → 再合成「族群相對」指標:
+    rs20(20日相對強弱)、down_rs20(族群下跌日抗跌)、dipbuy20(逆勢買超)。"""
     con.execute("DROP TABLE IF EXISTS daily_metrics")
     con.execute("""CREATE TABLE daily_metrics(
-        date TEXT, stock_id TEXT, close REAL, close_adj REAL, ret1 REAL,
-        turnover_pct REAL,            -- ②量:周轉率 = 量/當日發行股數
-        dist_hi20 REAL, dist_hi60 REAL, -- ①價:距 20/60 日高(還原價)
-        foreign_pct REAL, fpct_chg5 REAL, fpct_chg20 REAL,  -- ③外資:持股% 與變化(pp)
-        trust5 INTEGER, trust5_pct REAL, foreign5 INTEGER,  -- ④投信/外資:近5日淨額(張;投信另存佔股本%)
+        date TEXT, stock_id TEXT, close REAL, close_adj REAL, ret1 REAL, ret20 REAL,
+        turnover_pct REAL, vol_ratio60 REAL,   -- ②量:周轉率 + 量比(相對自身60日中位)
+        dist_hi20 REAL, dist_hi60 REAL,        -- ①價:距 20/60 日高(還原價)
+        rs20 REAL, down_rs20 REAL,             -- ①價(相對):20日報酬-族群中位;族群下跌日平均相對表現
+        foreign_pct REAL, fpct_chg5 REAL, fpct_chg20 REAL,   -- ③外資:持股% 與變化(pp)
+        dipbuy20 REAL, dipbuy20_t REAL,        -- ③④逆勢買超:族群下跌日外資/投信淨買20日累計佔股本%
+        trust5 INTEGER, trust5_pct REAL, foreign5 INTEGER,   -- ④投信/外資:近5日淨額(張;投信另存佔股本%)
         margin_bal INTEGER, margin_util_pct REAL,
         margin_chg5 REAL, margin_chg10 REAL, margin_chg20 REAL,  -- ⑤散戶:水位 + 5/10/20 日融資變化
-        short_margin_ratio REAL,                            -- ⑤券資比(%)
+        short_margin_ratio REAL,               -- ⑤券資比(%)
         PRIMARY KEY(date, stock_id))""")
-    ids = [r[0] for r in con.execute("SELECT stock_id FROM universe")]
-    for sid in ids:
+    # ── 第一趟:每檔基礎序列 ──
+    S = {}
+    for sid, grp in con.execute("SELECT stock_id, grp FROM universe").fetchall():
         rows = con.execute("""SELECT p.date, p.close, p.volume, h.foreign_pct, m.margin_bal, m.short_bal,
                                      i.trust_net, i.foreign_net, h.shares_issued, pa.close
                               FROM price p
@@ -223,28 +228,59 @@ def build_metrics(con):
                               LEFT JOIN inst    i ON i.date=p.date AND i.stock_id=p.stock_id
                               LEFT JOIN price_adj pa ON pa.date=p.date AND pa.stock_id=p.stock_id
                               WHERE p.stock_id=? ORDER BY p.date""", (sid,)).fetchall()
+        n = len(rows)
         adj = [(r[9] if r[9] is not None else r[1]) for r in rows]  # 還原價;缺值退回原始價
-        fpct = [r[3] for r in rows]
-        mbal = [r[4] for r in rows]
-        trust = [r[6] or 0 for r in rows]
-        fnet = [r[7] or 0 for r in rows]
-        sh = [r[8] for r in rows]   # 股本逐日 forward-fill,0/None 都視為缺值;
+        sh = [r[8] for r in rows]   # 股本逐日 forward-fill,0/None 都視為缺值
         prev = next((x for x in sh if x), None)   # 種子=第一筆已知 → 最前段以其回填(輕微前視,僅及 holding 起點前)
-        for k in range(len(sh)):
+        for k in range(n):
             if sh[k]:
                 prev = sh[k]
             else:
                 sh[k] = prev
+        turn = [(rows[k][2] / sh[k] * 100) if (rows[k][2] is not None and sh[k]) else None for k in range(n)]
+        ret1s = [(adj[k] / adj[k-1] - 1) if (k > 0 and adj[k-1] and adj[k]) else None for k in range(n)]
+        ret20s = [(adj[k] / adj[k-20] - 1) if (k >= 20 and adj[k-20] and adj[k]) else None for k in range(n)]
+        S[sid] = dict(grp=grp, rows=rows, adj=adj, sh=sh, turn=turn, ret1=ret1s, ret20=ret20s)
+    # ── 族群逐日中位數(等權,供相對指標)──
+    g1, g20 = {}, {}
+    for sid, st in S.items():
+        for k, r in enumerate(st["rows"]):
+            key = (r[0], st["grp"])
+            if st["ret1"][k] is not None:
+                g1.setdefault(key, []).append(st["ret1"][k])
+            if st["ret20"][k] is not None:
+                g20.setdefault(key, []).append(st["ret20"][k])
+    gmed1 = {k: statistics.median(v) for k, v in g1.items()}
+    gmed20 = {k: statistics.median(v) for k, v in g20.items()}
+    # ── 第二趟:合成 ──
+    for sid, st in S.items():
+        rows, adj, sh, turn = st["rows"], st["adj"], st["sh"], st["turn"]
+        ret1s, ret20s, grp = st["ret1"], st["ret20"], st["grp"]
+        fpct = [r[3] for r in rows]
+        mbal = [r[4] for r in rows]
+        trust = [r[6] or 0 for r in rows]
+        fnet = [r[7] or 0 for r in rows]
+        gd = [gmed1.get((r[0], grp)) for r in rows]   # 族群當日中位報酬
         out = []
         for k, r in enumerate(rows):
             d, close, vol, fp, mb, sb = r[0], r[1], r[2], r[3], r[4], r[5]
             shares, ca = sh[k], adj[k]
-            ret1 = (ca / adj[k-1] - 1) if (k > 0 and adj[k-1] and ca) else None
+            ret1, ret20 = ret1s[k], ret20s[k]
             win20 = [c for c in adj[max(0, k-19):k+1] if c is not None]
             win60 = [c for c in adj[max(0, k-59):k+1] if c is not None]
             hi20 = max(win20) if len(win20) >= 10 else None    # 冷啟動保護:視窗樣本不足時
             hi60 = max(win60) if len(win60) >= 30 else None    # 不給「距高」,避免上市/新增股假新高
-            turnover = (vol / shares * 100) if (vol is not None and shares) else None  # vol=0 → 0%(量縮),非缺值
+            turnover = turn[k]
+            volwin = [t for t in turn[max(0, k-59):k+1] if t is not None]
+            vmed = statistics.median(volwin) if len(volwin) >= 20 else None
+            vratio = (turnover / vmed) if (turnover is not None and vmed) else None
+            gm20 = gmed20.get((d, grp))
+            rs20 = (ret20 - gm20) if (ret20 is not None and gm20 is not None) else None
+            downs = [j for j in range(max(0, k-19), k+1) if gd[j] is not None and gd[j] < 0]
+            rels = [ret1s[j] - gd[j] for j in downs if ret1s[j] is not None]
+            down_rs20 = (sum(rels) / len(rels)) if len(rels) >= 3 else None   # 至少3個下跌日才有意義
+            dipbuy20 = (sum(fnet[j] for j in downs) / shares * 100) if (shares and downs) else None
+            dipbuy20_t = (sum(trust[j] for j in downs) / shares * 100) if (shares and downs) else None
             fchg5 = (fp - fpct[k-5]) if (k >= 5 and fp is not None and fpct[k-5] is not None) else None
             fchg20 = (fp - fpct[k-20]) if (k >= 20 and fp is not None and fpct[k-20] is not None) else None
             t5 = sum(trust[max(0, k-4):k+1])
@@ -256,10 +292,11 @@ def build_metrics(con):
             mchg10 = (mb / mbal[k-10] - 1) if (mb is not None and k >= 10 and mbal[k-10]) else None
             mchg20 = (mb / mbal[k-20] - 1) if (mb is not None and k >= 20 and mbal[k-20]) else None
             smr = (sb / mb * 100) if (sb is not None and mb) else None
-            out.append((d, sid, close, ca, ret1, turnover,
+            out.append((d, sid, close, ca, ret1, ret20, turnover, vratio,
                         (ca/hi20 - 1) if (hi20 and ca) else None, (ca/hi60 - 1) if (hi60 and ca) else None,
-                        fp, fchg5, fchg20, trust5, trust5_pct, foreign5, mb, mutil, mchg5, mchg10, mchg20, smr))
-        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
+                        rs20, down_rs20, fp, fchg5, fchg20, dipbuy20, dipbuy20_t,
+                        trust5, trust5_pct, foreign5, mb, mutil, mchg5, mchg10, mchg20, smr))
+        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(" + ",".join("?" * 26) + ")", out)
     con.commit()
 
 def main():

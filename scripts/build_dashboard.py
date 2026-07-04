@@ -38,21 +38,26 @@ def pctp(x):
     return "-" if x is None else f"{x:.1f}%"
 
 # 每個元素:score → 理由文字
-R_PRICE = {2: "在波段高檔/創新高", 1: "接近波段高檔", 0: "距高中等、區間整理", -1: "明顯拉回", -2: "深跌、族群落後"}
+R_PRICE = {2: "族群內領漲", 1: "強於族群", 0: "與族群同步", -1: "弱於族群", -2: "族群內落後"}
+R_RESIL = {2: "修正日明顯抗跌", -2: "修正日領跌"}
 R_FOREIGN = {2: "外資強力吃貨", 1: "外資淨買", 0: "外資中性", -1: "外資調節", -2: "外資倒貨/大幅撤出"}
 R_TRUST = {2: "投信強力認養", 1: "投信淨買", 0: "投信中性/未參與", -1: "投信調節", -2: "投信大幅賣超"}
 R_MARGIN = {2: "散戶大幅洗清", 1: "融資減、籌碼漸乾淨", 0: "融資平穩", -1: "融資增、散戶追高", -2: "散戶槓桿滿載、賣壓重"}
+R_DIP = {2: "修正日外資逆勢吃貨", -2: "修正日外資逆勢倒貨"}
 # 精簡標籤(給 vsub 用)
-SALIENT = {("price", 2): "價高檔", ("price", -2): "價落後", ("foreign", 2): "外資吃貨", ("foreign", -2): "外資倒貨",
-           ("trust", 2): "投信認養", ("trust", -2): "投信賣超", ("margin", 2): "散戶洗清", ("margin", -2): "散戶滿載"}
+SALIENT = {("price", 2): "族群領漲", ("price", -2): "族群落後", ("foreign", 2): "外資吃貨", ("foreign", -2): "外資倒貨",
+           ("trust", 2): "投信認養", ("trust", -2): "投信賣超", ("margin", 2): "散戶洗清", ("margin", -2): "散戶滿載",
+           ("dip", 2): "修正日吃貨", ("dip", -2): "修正日遭倒", ("resil", 2): "修正抗跌", ("resil", -2): "修正領跌"}
 
 
 def build_cells(sc, m):
     cells = []
-    # ① 價
-    d60 = m["dist_hi60"]
-    val = "新高" if (d60 is not None and d60 >= -0.005) else pct(d60)
-    detail = f"距60日高 {pct(d60)};距20日高 {pct(m['dist_hi20'])};前一日 {pct(m['ret1'], True)}"
+    # ① 價(v2:族群內相對強弱;距高做輔助資訊)
+    rs = m["rs20"]
+    val = pct(rs, True) if rs is not None else "-"
+    detail = (f"20日相對族群 {pct(rs, True)};距60日高 {pct(m['dist_hi60'])};"
+              f"修正日抗跌 {pct(m['down_rs20'], True)}(抗{sc['s_resil']:+d});"
+              f"前一日 {pct(m['ret1'], True)}(還原價)")
     cells.append([sc["s_price"], val, detail, R_PRICE[sc["s_price"]]])
     # ② 量
     t = m["turnover_pct"]
@@ -72,6 +77,8 @@ def build_cells(sc, m):
     fc = m["fpct_chg20"]
     val = f"{fc:+.1f}pp" if fc is not None else "-"
     detail = f"外資持股 {m['foreign_pct']:.1f}%;20日變化 {fc:+.2f}pp" if fc is not None else "外資持股資料不足"
+    if m["dipbuy20"] is not None:
+        detail += f";修正日淨買 {m['dipbuy20']:+.2f}%股本(逆{sc['s_dip']:+d})"
     cells.append([sc["s_foreign"], val, detail, R_FOREIGN[sc["s_foreign"]]])
     # ④ 投信
     t5 = m["trust5"] or 0
@@ -88,18 +95,22 @@ def build_cells(sc, m):
 
 def verdict(sc):
     tier = sc["tier"]
-    comp = sc["composite"]
-    keys = [("price", sc["s_price"]), ("vol", sc["s_vol"]), ("foreign", sc["s_foreign"]),
-            ("trust", sc["s_trust"]), ("margin", sc["s_margin"])]
+    comp = sc["composite_s"]
+    keys = [("price", sc["s_price"]), ("resil", sc["s_resil"]), ("vol", sc["s_vol"]),
+            ("foreign", sc["s_foreign"]), ("trust", sc["s_trust"]), ("dip", sc["s_dip"]),
+            ("margin", sc["s_margin"])]
     labels = [SALIENT[k] for k in keys if k in SALIENT]
     vsub = " · ".join(labels[:2]) if labels else f"綜合 {comp:+.1f}"
     drivers = []
-    for name, ref in [("外資", "s_foreign"), ("投信", "s_trust"), ("融資", "s_margin"), ("價", "s_price")]:
+    for name, ref in [("價", "s_price"), ("抗跌", "s_resil"), ("外資", "s_foreign"),
+                      ("逆勢", "s_dip"), ("投信", "s_trust"), ("融資", "s_margin")]:
         s = sc[ref]
         if abs(s) >= 2:
-            drivers.append({"外資": R_FOREIGN, "投信": R_TRUST, "融資": R_MARGIN, "價": R_PRICE}[name][s])
-    vr = f"綜合 {comp:+.1f}(價{sc['s_price']:+d} 量{sc['s_vol']:+d} 外{sc['s_foreign']:+d} " \
-         f"投{sc['s_trust']:+d} 融{sc['s_margin']:+d})。" + ("；".join(drivers) if drivers else "訊號分歧")
+            drivers.append({"外資": R_FOREIGN, "逆勢": R_DIP, "投信": R_TRUST,
+                            "融資": R_MARGIN, "價": R_PRICE, "抗跌": R_RESIL}[name][s])
+    vr = f"綜合 {comp:+.1f}(3日平滑;族群內排名制:價{sc['s_price']:+d} 抗{sc['s_resil']:+d} " \
+         f"量{sc['s_vol']:+d} 外{sc['s_foreign']:+d} 投{sc['s_trust']:+d} 逆{sc['s_dip']:+d} " \
+         f"融{sc['s_margin']:+d})。" + ("；".join(drivers) if drivers else "訊號分歧")
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"])
 
 
@@ -122,9 +133,9 @@ def main():
                "vlabel": tier, "vsub": vsub, "vr": vr, "cells": build_cells(r, r)}
         if warn:
             obj["warn"] = True
-        obj["_comp"] = r["composite"]
+        obj["_comp"] = r["composite_s"]
         data.append(obj)
-        tiers_map.setdefault(tier, []).append((r["composite"], r["stock_id"]))
+        tiers_map.setdefault(tier, []).append((r["composite_s"], r["stock_id"]))
 
     # 排序:族群順序,族群內綜合分數由高到低
     data.sort(key=lambda o: (GROUP_ORDER.index(o["g"]), -o["_comp"]))
