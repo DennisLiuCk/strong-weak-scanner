@@ -1,0 +1,42 @@
+name: daily-fetch
+
+on:
+  schedule:
+    # 台灣 18:00 = UTC 10:00,週一~五(台股交易日)。
+    # 遇台股假日抓不到新資料時,commit 步驟會自動略過。
+    - cron: "0 10 * * 1-5"
+  workflow_dispatch: {}   # 允許手動觸發(測試用)
+
+permissions:
+  contents: write          # 允許把更新後的 db commit 回 repo
+
+concurrency:
+  group: daily-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 抓取五元素並重算 daily_metrics
+        env:
+          FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+        run: python scripts/fetch_daily.py
+
+      - name: commit 回 repo(有變動才提交)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "無新資料,略過 commit"
+          else
+            git commit -m "data: $(date -u +%Y-%m-%d) 五元素更新 [skip ci]"
+            git push
+          fi
