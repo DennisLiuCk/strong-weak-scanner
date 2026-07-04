@@ -428,6 +428,10 @@
       p.appendChild(dot);
       var nm=document.createElement("span"); nm.className="nm"; nm.textContent=d.nm; p.appendChild(nm);
       var code=document.createElement("span"); code.className="code mono"; code.textContent=id; p.appendChild(code);
+      if(T.sub && T.sub[id]){   // 蓄勢候補:標示差哪些條件
+        var sb=document.createElement("span"); sb.className="code"; sb.style.marginLeft="auto";
+        sb.style.textAlign="right"; sb.textContent=T.sub[id]; p.appendChild(sb);
+      }
       picks.appendChild(p);
     });
     el.appendChild(picks); tiers.appendChild(el);

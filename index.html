@@ -412,7 +412,7 @@
   })();
 
   // ---------- tiers summary ----------
-  var TIERS = [{"t": "真強", "d": "價強且籌碼扎實", "col": "var(--strong)", "ids": ["3711", "6257"]}, {"t": "蓄勢·外資佈局", "d": "外資/投信吃貨,價未發動", "col": "var(--neutral)", "ids": ["2478"]}, {"t": "強但過熱", "d": "價強但散戶滿載,別追高", "col": "var(--warn-line)", "ids": ["5328", "8261", "6573", "2375"]}, {"t": "潛在/中性", "d": "訊號分歧,觀察", "col": "var(--neutral)", "ids": ["3026", "2369", "2481", "3264", "8150", "2449", "2441", "2492", "6173", "3317", "6435", "5299", "6239", "2472", "5425", "3675", "2327"]}, {"t": "真弱", "d": "價籌俱弱", "col": "var(--weak)", "ids": ["6284", "3236", "8255", "2329", "6147"]}, {"t": "真弱·陷阱", "d": "外資出、散戶接", "col": "var(--weak)", "ids": ["6415"]}];
+  var TIERS = [{"t": "真強", "d": "價強且籌碼扎實", "col": "var(--strong)", "ids": ["3711", "6257"]}, {"t": "蓄勢·外資佈局", "d": "外資/投信吃貨,價未發動", "col": "var(--neutral)", "ids": ["2478"]}, {"t": "◇ 蓄勢候補", "d": "籌碼已吃貨(屬潛在/中性),補齊缺項即升蓄勢", "col": "var(--neutral)", "ids": ["2449", "6239", "3675", "5425"], "sub": {"2449": "差:綜合分", "6239": "差:綜合分", "3675": "差:綜合分", "5425": "差:價未動、抗跌、綜合分"}}, {"t": "強但過熱", "d": "價強但散戶滿載,別追高", "col": "var(--warn-line)", "ids": ["5328", "8261", "6573", "2375"]}, {"t": "潛在/中性", "d": "訊號分歧,觀察", "col": "var(--neutral)", "ids": ["3026", "2369", "2481", "3264", "8150", "2441", "2492", "6173", "3317", "6435", "5299", "2472", "2327"]}, {"t": "真弱", "d": "價籌俱弱", "col": "var(--weak)", "ids": ["6284", "3236", "8255", "2329", "6147"]}, {"t": "真弱·陷阱", "d": "外資出、散戶接", "col": "var(--weak)", "ids": ["6415"]}];
     var byId={}; DATA.forEach(function(d){byId[d.id]=d;});
   var tiers=document.getElementById("tiers");
   TIERS.forEach(function(T){
@@ -428,6 +428,10 @@
       p.appendChild(dot);
       var nm=document.createElement("span"); nm.className="nm"; nm.textContent=d.nm; p.appendChild(nm);
       var code=document.createElement("span"); code.className="code mono"; code.textContent=id; p.appendChild(code);
+      if(T.sub && T.sub[id]){   // 蓄勢候補:標示差哪些條件
+        var sb=document.createElement("span"); sb.className="code"; sb.style.marginLeft="auto";
+        sb.style.textAlign="right"; sb.textContent=T.sub[id]; p.appendChild(sb);
+      }
       picks.appendChild(p);
     });
     el.appendChild(picks); tiers.appendChild(el);

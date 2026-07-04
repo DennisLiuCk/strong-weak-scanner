@@ -192,11 +192,22 @@ def main():
     for o in data:
         del o["_comp"]
 
+    # ◇ 蓄勢候補獨立卡片:從中性池抽出、插在蓄勢旁(缺項少者排前)
+    cands = sorted(((r["pending"].count("、"), -r["composite_s"], r["stock_id"], r["pending"])
+                    for r in rows if r["pending"] and r["tier"] == "潛在/中性"))
+    cand_ids = [c[2] for c in cands]
+    cand_sub = {c[2]: c[3].replace("蓄勢候補·", "") for c in cands}
+
     tiers = []
     for t in TIER_ORDER:
         if t in tiers_map:
             ids = [sid for _, sid in sorted(tiers_map[t], reverse=True)]
+            if t == "潛在/中性":
+                ids = [i for i in ids if i not in cand_ids]
             tiers.append({"t": t, "d": TIER_DESC.get(t, ""), "col": TIER_COL.get(t, "var(--neutral)"), "ids": ids})
+        if t == "蓄勢·外資佈局" and cand_ids:
+            tiers.append({"t": "◇ 蓄勢候補", "d": "籌碼已吃貨(屬潛在/中性),補齊缺項即升蓄勢",
+                          "col": "var(--neutral)", "ids": cand_ids, "sub": cand_sub})
 
     y, mo, d = last.split("-")
     date_str = f"{y}/{int(mo)}/{int(d)}"
