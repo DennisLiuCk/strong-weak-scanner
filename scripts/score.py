@@ -239,7 +239,7 @@ def main():
             lag = "" if mk["date"] == last else f"(指數至 {mk['date']})"
             print(f"市場:報酬指數(含息){mk['taiex']:,.0f},距20日高 {mk['dd20']*100:+.1f}%{lag} → "
                   f"{'⚠ 修正 regime(抗跌/投信因子最有效的環境)' if mk['regime'] else '多頭/中性 regime'}")
-        print("族群雷達(修正日中位淨買=選族群主訊號):")
+        print("族群雷達(修正日中位淨買=候選主訊號,OOS 驗證中):")
         for g in con.execute("SELECT * FROM group_metrics WHERE date=? ORDER BY grp", (last,)):
             print(f"   {g['grp']:<9} {g['state']:<7} 修正日淨買{fnum(g['med_dip'], '{:+.2f}%')} "
                   f"廣度{fnum(g['breadth_f'], '{:.0%}')} 動能vs全體{fnum(g['rel20'], '{:+.1%}')} "

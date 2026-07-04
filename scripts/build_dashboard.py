@@ -136,7 +136,7 @@ def verdict(sc):
     if sc["pending"] and tier == "潛在/中性":
         vr += f"。◇ {sc['pending']}——籌碼條件已符,補齊即升蓄勢"
     elif chip and sc["s_resil"] <= -2:
-        vr += "。籌碼在買但修正日領跌——歷史上此組合 10 日仍落後族群、20 日多會補上,等抗跌轉正再確認"
+        vr += "。籌碼在買但修正日領跌——此組合歷史表現分歧(見週報濾網 cohort),等抗跌轉正再確認"
     # 元素 × 權重分解(權重來自 score.py CONFIG,單一事實來源)
     vrows = [["綜合分(3日平滑)", f"{comp:+.1f}"],
              ["①相對強弱", f"{sc['s_price']:+d} × {WEIGHTS['price']}"],

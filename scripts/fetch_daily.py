@@ -338,7 +338,7 @@ def build_metrics(con):
 
 def _gstate(breadth, dist, dip, rel):
     """族群狀態分類。策略規則放資料層(而非儀表板),validate.py 之後直接讀 state 欄。
-    med_dip(修正日中位淨買)為選族群主訊號;門檻見頂部 GS_* 旋鈕。"""
+    med_dip(修正日中位淨買)為選族群「候選」主訊號(OOS 驗證中,見週報④);門檻見 GS_* 旋鈕。"""
     if breadth is None or dist is None:
         return "資料不足", "族群指標樣本不足"
     if dip is not None and dip > 0 and dist <= GS_OFF_HIGH:
