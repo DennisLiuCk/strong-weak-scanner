@@ -104,8 +104,12 @@ def main():
     for r in con.execute("SELECT * FROM group_metrics"):
         gm[r["date"]][r["grp"]] = r
     met = defaultdict(dict)
-    for r in con.execute("SELECT date, stock_id, dist_hi60, down_rs20 FROM daily_metrics"):
+    for r in con.execute("SELECT date, stock_id, dist_hi60, down_rs20, rs20, ret1, close FROM daily_metrics"):
         met[r["date"]][r["stock_id"]] = r
+    sh_latest = {}
+    for r in con.execute("SELECT stock_id, shares_issued FROM holding "
+                         "WHERE shares_issued IS NOT NULL ORDER BY date"):
+        sh_latest[r["stock_id"]] = r["shares_issued"]   # 升冪覆寫 → 留最新
 
     def fwd(d, sid):
         i = didx.get(d)
@@ -240,6 +244,61 @@ def main():
                 if g in gm[d]:
                     state_x[gm[d][g]["state"]].append(gf[g] - uv)
 
+    # ── ⑤ 市值公平性監測 ────────────────────────────────────────
+    # (a) 影子因子:風險調整 rs20/σ20 vs 原始 rs20——「同一把尺」的兩種定義,
+    #     若 OOS 持續分歧(尤其小型股行情期)才考慮換尺,現行評分不動。
+    sigma, hist = {}, defaultdict(list)
+    for d in dates:
+        for sid, m in met[d].items():
+            if m["ret1"] is not None:
+                h = hist[sid]
+                h.append(m["ret1"])
+                if len(h) >= 20:
+                    sigma[(d, sid)] = statistics.pstdev(h[-20:])
+    ic_sz = defaultdict(lambda: defaultdict(list))
+    for d in dates:
+        if d not in met:
+            continue
+        bs = bucket(d)
+        for g in GRPS:
+            sids = [s for s in met[d] if uni.get(s) == g]
+            f = [fwd(d, s) for s in sids]
+            raw = [met[d][s]["rs20"] for s in sids]
+            adj = [(met[d][s]["rs20"] / sigma[(d, s)])
+                   if (met[d][s]["rs20"] is not None and sigma.get((d, s))) else None
+                   for s in sids]
+            for key, vals in (("rs20(原始)", raw), ("rs20/σ20(風險調整)", adj)):
+                ic = spearman(vals, f)
+                if ic is not None:
+                    for b in bs:
+                        ic_sz[key][b].append(ic)
+    # (b) tier 佔用 by 族群內市值三分位(期末市值;監測同尺是否發展出持續傾斜)
+    lastd = dates[-1]
+    cap = {}
+    for sid in uni:
+        m = met.get(lastd, {}).get(sid)
+        if m and m["close"] and sh_latest.get(sid):
+            cap[sid] = m["close"] * sh_latest[sid]
+    terc = {}
+    for g in GRPS:
+        sids = sorted([s for s in uni if uni[s] == g and s in cap], key=lambda s: cap[s])
+        k = len(sids) // 3
+        for i, s in enumerate(sids):
+            terc[s] = "小" if i < k else ("大" if i >= len(sids) - k else "中")
+    tsz = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+    tszN = defaultdict(lambda: defaultdict(int))
+    for d in dates:
+        if d not in v2:
+            continue
+        bs = bucket(d)
+        for sid, r in v2[d].items():
+            tc = terc.get(sid)
+            if not tc:
+                continue
+            for b in bs:
+                tsz[b][r["tier"]][tc] += 1
+                tszN[b][tc] += 1
+
     # ── 輸出 ──────────────────────────────────────────────────
     last = dates[-1]
     n_oos = sum(1 for d in dates if d > IS_CUTOFF)
@@ -313,6 +372,32 @@ def main():
     for s, v in sorted(state_x.items(), key=lambda kv: -mean(kv[1])):
         w(f"| {s} | {len(v)} | {mean(v)*100:+.2f}% |")
     w("")
+    w("## ⑤ 市值公平性監測(同尺檢核)")
+    w("")
+    w("### 影子因子:原始 rs20 vs 風險調整 rs20/σ20(族群內 IC)")
+    w("")
+    w("| 因子 | 全期 | OOS | 修正 |")
+    w("|---|---|---|---|")
+    for key in ("rs20(原始)", "rs20/σ20(風險調整)"):
+        cells = [fmt_ic(mean(ic_sz[key].get(b)), len(ic_sz[key].get(b, [])))
+                 for b in ("全期", "OOS", "修正")]
+        w(f"| {key} | " + " | ".join(cells) + " |")
+    w("")
+    w("> 換尺條件:風險調整版在 OOS **持續**優於原始版(尤其小型股行情期)才改評分;現行不動。")
+    w("")
+    w("### tier 佔用率 by 族群內市值三分位")
+    w("")
+    w("| tier | 小·全期 | 中·全期 | 大·全期 | 小·OOS | 大·OOS |")
+    w("|---|---|---|---|---|---|")
+    def _occ(b, t_, tc):
+        n = tszN[b].get(tc, 0)
+        return f"{100*tsz[b][t_][tc]/n:.1f}%" if n else "–"
+    for t_ in ("真強", "蓄勢·外資佈局", "真弱", "真弱·陷阱"):
+        w(f"| {t_} | {_occ('全期', t_, '小')} | {_occ('全期', t_, '中')} | {_occ('全期', t_, '大')} | "
+          f"{_occ('OOS', t_, '小')} | {_occ('OOS', t_, '大')} |")
+    w("")
+    w("> 真強的大/小佔用差若「持續」單邊擴大、且與當期領漲結構不符 → 檢查評分尺的市值傾斜。")
+    w("")
     w("## 判讀警語")
     w("")
     w(f"- {IS_CUTOFF} 前屬 in-sample(權重該窗校準,數字必然偏好看);評判看 OOS 欄。")
@@ -336,6 +421,12 @@ def main():
     ca, cb = cohort["抗跌≥0(放行)"].get("全期", []), cohort["領跌<0(擋下)"].get("全期", [])
     if ca and cb:
         print(f"蓄勢濾網 cohort:放行 {mean(ca)*100:+.2f}%(n={len(ca)}) vs 擋下 {mean(cb)*100:+.2f}%(n={len(cb)})")
+    print(f"影子因子:rs20 {fmt_ic(mean(ic_sz['rs20(原始)'].get('全期')))} vs "
+          f"rs20/σ20 {fmt_ic(mean(ic_sz['rs20/σ20(風險調整)'].get('全期')))}")
+    n_all = tszN["全期"]
+    if n_all.get("小") and n_all.get("大"):
+        print(f"真強佔用(小/大):{100*tsz['全期']['真強']['小']/n_all['小']:.1f}% / "
+              f"{100*tsz['全期']['真強']['大']/n_all['大']:.1f}%")
     con.close()
 
 
