@@ -57,7 +57,7 @@ SALIENT = {("price", 2): "族群領漲", ("price", -2): "族群落後", ("foreig
 def build_cells(sc, m):
     """每格:[分數, 格值, 數據rows(標籤/數值對), 判讀, 過熱旗標?]——rows 供 tooltip 表格化顯示。"""
     cells = []
-    # ① 價(v2:族群內相對強弱;距高做輔助資訊)
+    # ① 價(族群內相對強弱;距高做輔助資訊)
     rs = m["rs20"]
     rows = [["20日報酬 − 族群中位", pct(rs, True)],
             ["距60日高(還原價)", pct(m["dist_hi60"])],
