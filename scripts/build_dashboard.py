@@ -12,6 +12,9 @@ try:
 except Exception:
     pass
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from score import WEIGHTS   # 權重單一事實來源(score.py CONFIG),tooltip 顯示用
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 TEMPLATE = os.path.join(ROOT, "scripts", "dashboard_template.html")
@@ -52,15 +55,16 @@ SALIENT = {("price", 2): "族群領漲", ("price", -2): "族群落後", ("foreig
 
 
 def build_cells(sc, m):
+    """每格:[分數, 格值, 數據rows(標籤/數值對), 判讀, 過熱旗標?]——rows 供 tooltip 表格化顯示。"""
     cells = []
     # ① 價(v2:族群內相對強弱;距高做輔助資訊)
     rs = m["rs20"]
-    val = pct(rs, True) if rs is not None else "-"
-    detail = (f"20日相對族群 {pct(rs, True)};距60日高 {pct(m['dist_hi60'])};"
-              f"修正日抗跌 {pct(m['down_rs20'], True)}(抗{sc['s_resil']:+d});"
-              f"前一日 {pct(m['ret1'], True)}(還原價)")
-    cells.append([sc["s_price"], val, detail, R_PRICE[sc["s_price"]]])
-    # ② 量(v2:量比 = 當日周轉率 / 自身60日中位;周轉率移入 tooltip)
+    rows = [["20日報酬 − 族群中位", pct(rs, True)],
+            ["距60日高(還原價)", pct(m["dist_hi60"])],
+            ["修正日抗跌(20日)", f"{pct(m['down_rs20'], True)}(抗{sc['s_resil']:+d})"],
+            ["前一日漲跌", pct(m["ret1"], True)]]
+    cells.append([sc["s_price"], pct(rs, True) if rs is not None else "-", rows, R_PRICE[sc["s_price"]]])
+    # ② 量(量比 = 當日周轉率 / 自身60日中位)
     t = m["turnover_pct"]
     vr = m["vol_ratio60"]
     if t is not None and t >= 20:
@@ -73,29 +77,33 @@ def build_cells(sc, m):
         rv, warn = "量縮、人氣不足", 0
     else:
         rv, warn = "量能中等", 0
-    val = f"{vr:.1f}×" if vr is not None else "-"
-    detail = (f"量比 {vr:.1f}×(相對自身60日中位);周轉率 {pctp(t)}" if vr is not None
-              else f"周轉率 {pctp(t)}(量比樣本不足)")
-    c = [sc["s_vol"], val, detail, rv]
+    rows = [["量比(vs 自身60日中位)", f"{vr:.1f}×" if vr is not None else "樣本不足"],
+            ["當日周轉率", pctp(t)]]
+    c = [sc["s_vol"], f"{vr:.1f}×" if vr is not None else "-", rows, rv]
     if warn:
         c.append(1)
     cells.append(c)
     # ③ 外資
     fc = m["fpct_chg20"]
-    val = f"{fc:+.1f}pp" if fc is not None else "-"
-    detail = f"外資持股 {m['foreign_pct']:.1f}%;20日變化 {fc:+.2f}pp" if fc is not None else "外資持股資料不足"
-    if m["dipbuy20"] is not None:
-        detail += f";修正日淨買 {m['dipbuy20']:+.2f}%股本(逆{sc['s_dip']:+d})"
-    cells.append([sc["s_foreign"], val, detail, R_FOREIGN[sc["s_foreign"]]])
+    rows = [["外資持股", f"{m['foreign_pct']:.1f}%" if m["foreign_pct"] is not None else "-"],
+            ["20日持股變化", f"{fc:+.2f}pp" if fc is not None else "-"],
+            ["修正日淨買(20日)", f"{m['dipbuy20']:+.2f}%股本(逆{sc['s_dip']:+d})"
+             if m["dipbuy20"] is not None else "-"]]
+    cells.append([sc["s_foreign"], f"{fc:+.1f}pp" if fc is not None else "-", rows,
+                  R_FOREIGN[sc["s_foreign"]]])
     # ④ 投信
     t5 = m["trust5"] or 0
     tp = m["trust5_pct"]
-    tdetail = f"投信近5日淨額 {t5:+,}張" + (f"(佔股本 {tp:+.2f}%)" if tp is not None else "")
-    cells.append([sc["s_trust"], f"{t5:+,}張", tdetail, R_TRUST[sc["s_trust"]]])
+    rows = [["近5日淨買賣", f"{t5:+,}張"],
+            ["佔股本", f"{tp:+.3f}%" if tp is not None else "-"]]
+    cells.append([sc["s_trust"], f"{t5:+,}張", rows, R_TRUST[sc["s_trust"]]])
     # ⑤ 融資券
     u = m["margin_util_pct"]
-    detail = f"散戶水位 {pctp(u)};10日融資 {pct(m['margin_chg10'], True)};券資比 {(m['short_margin_ratio'] or 0):.1f}%"
-    c = [sc["s_margin"], pctp(u), detail, R_MARGIN[sc["s_margin"]]]
+    rows = [["散戶水位(融資/股本)", pctp(u)],
+            ["10日融資變化", pct(m["margin_chg10"], True)],
+            ["20日還原價報酬", pct(m["ret20"], True)],
+            ["券資比", f"{(m['short_margin_ratio'] or 0):.1f}%"]]
+    c = [sc["s_margin"], pctp(u), rows, R_MARGIN[sc["s_margin"]]]
     if u is not None and u >= 9:
         c.append(1)
     cells.append(c)
@@ -122,14 +130,21 @@ def verdict(sc):
         if abs(s) >= 2:
             drivers.append({"外資": R_FOREIGN, "逆勢": R_DIP, "投信": R_TRUST,
                             "融資": R_MARGIN, "價": R_PRICE, "抗跌": R_RESIL}[name][s])
-    vr = f"綜合 {comp:+.1f}(3日平滑;族群內排名制:價{sc['s_price']:+d} 抗{sc['s_resil']:+d} " \
-         f"量{sc['s_vol']:+d} 外{sc['s_foreign']:+d} 投{sc['s_trust']:+d} 逆{sc['s_dip']:+d} " \
-         f"融{sc['s_margin']:+d})。" + ("；".join(drivers) if drivers else "訊號分歧")
+    vr = "；".join(drivers) if drivers else "訊號分歧,持續觀察"
     if sc["pending"] and tier == "潛在/中性":
         vr += f"。◇ {sc['pending']}——籌碼條件已符,補齊即升蓄勢"
     elif chip and sc["s_resil"] <= -2:
         vr += "。籌碼在買但修正日領跌——歷史上此組合 10 日仍落後族群、20 日多會補上,等抗跌轉正再確認"
-    return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"])
+    # 元素 × 權重分解(權重來自 score.py CONFIG,單一事實來源)
+    vrows = [["綜合分(3日平滑)", f"{comp:+.1f}"],
+             ["①相對強弱", f"{sc['s_price']:+d} × {WEIGHTS['price']}"],
+             ["①抗跌", f"{sc['s_resil']:+d} × {WEIGHTS['resil']}"],
+             ["④投信", f"{sc['s_trust']:+d} × {WEIGHTS['trust']}"],
+             ["③外資", f"{sc['s_foreign']:+d} × {WEIGHTS['foreign']}"],
+             ["⑤融資券", f"{sc['s_margin']:+d} × {WEIGHTS['margin']}"],
+             ["②量", f"{sc['s_vol']:+d} × {WEIGHTS['vol']}"],
+             ["③′逆勢買超", f"{sc['s_dip']:+d} × {WEIGHTS['dip']}(供tier)"]]
+    return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"]), vrows
 
 
 # 族群狀態→顏色(狀態本身由 fetch_daily._gstate 在資料層算好,存 group_metrics.state)
@@ -144,7 +159,7 @@ def main():
     if not last:
         print("daily_scores 沒有資料,請先跑 score.py")
         return
-    rows = con.execute("""SELECT u.stock_id, u.name, u.grp, sc.*, m.*
+    rows = con.execute("""SELECT u.stock_id, u.name, u.grp, u.biz, sc.*, m.*
         FROM daily_scores sc JOIN universe u USING(stock_id) JOIN daily_metrics m USING(date, stock_id)
         WHERE sc.date=?""", (last,)).fetchall()
     try:   # 舊 db 尚無族群/大盤表 → 雷達留空(跑一次 fetch_daily 即補齊)
@@ -178,9 +193,10 @@ def main():
 
     data, tiers_map = [], {}
     for r in rows:
-        vt, tier, vsub, vr, warn = verdict(r)
-        obj = {"g": r["grp"], "id": r["stock_id"], "nm": r["name"], "vt": vt,
-               "vlabel": tier, "vsub": vsub, "vr": vr, "cells": build_cells(r, r)}
+        vt, tier, vsub, vr, warn, vrows = verdict(r)
+        obj = {"g": r["grp"], "id": r["stock_id"], "nm": r["name"], "biz": r["biz"] or "",
+               "vt": vt, "vlabel": tier, "vsub": vsub, "vr": vr, "vrows": vrows,
+               "cells": build_cells(r, r)}
         if warn:
             obj["warn"] = True
         obj["_comp"] = r["composite_s"]

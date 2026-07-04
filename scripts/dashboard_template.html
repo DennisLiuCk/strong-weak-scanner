@@ -143,20 +143,29 @@
   .verdict .vs{font-size:10.5px;color:var(--muted);margin-top:1px}
 
   /* ---- tooltip ---- */
-  #tip{position:fixed;z-index:50;max-width:290px;background:var(--surface);color:var(--ink);
+  #tip{position:fixed;z-index:50;max-width:330px;background:var(--surface);color:var(--ink);
     border:1px solid var(--hairline);border-radius:12px;box-shadow:var(--shadow);
     padding:12px 13px;font-size:12.5px;pointer-events:none;opacity:0;transform:translateY(3px);
     transition:opacity .12s ease,transform .12s ease}
   #tip.on{opacity:1;transform:translateY(0)}
   #tip .th{display:flex;align-items:center;gap:7px;margin-bottom:7px}
   #tip .th .el{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
-  #tip .th .sc{margin-left:auto;font-size:11px;font-weight:800;padding:1px 8px;border-radius:100px}
-  #tip .who{font-weight:800;font-size:14px;margin-bottom:6px}
+  #tip .th .sc{margin-left:auto;font-size:11px;font-weight:800;padding:1px 8px;border-radius:100px;white-space:nowrap}
+  #tip .who{font-weight:800;font-size:14px}
+  #tip .biz{font-size:11px;color:var(--muted);margin:1px 0 7px}
+  #tip .rows{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;background:var(--surface-2);
+    border:1px solid var(--hairline-2);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+  #tip .rows .k{color:var(--ink-2);font-size:11.5px;white-space:nowrap}
+  #tip .rows .rv{text-align:right;font-size:12px;font-weight:600;
+    font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
   #tip .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:8px;padding:7px 9px;margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
   #tip .why{color:var(--ink-2);line-height:1.5}
   #tip .why b{color:var(--ink)}
+  #tip .how{margin-top:8px;padding-top:8px;border-top:1px dashed var(--hairline);
+    color:var(--muted);font-size:11px;line-height:1.6}
+  #tip .how b{color:var(--ink-2)}
 
   footer{margin-top:26px;color:var(--muted);font-size:11.5px;line-height:1.7}
   footer b{color:var(--ink-2)}
@@ -236,12 +245,27 @@
 (function(){
   "use strict";
   var EL = [
-    {k:"①價", role:"族群相對"},
-    {k:"②量", role:"量比/過熱"},
-    {k:"③外資", role:"國際法人"},
-    {k:"④投信", role:"本土法人"},
-    {k:"⑤融資券", role:"散戶籌碼"}
+    {k:"①價", role:"族群相對",
+     how:"rs20 = 20日還原價報酬 − 族群中位,在族群10檔內排名給分:前20% +2、後20% −2。「修正日抗跌」= 近20日族群下跌日的平均相對表現(獨立元素,權重1.0),也是升「蓄勢」的質量濾網。"},
+    {k:"②量", role:"量比/過熱",
+     how:"量比 = 當日周轉率 ÷ 自身60日中位(避免大型股永遠低周轉的偏誤):1.2~3.0 健康 +1、<0.5 量縮 −1。量比≥5 或周轉率≥20% 觸發過熱旗標 ⚠(不影響分數,進 tier 判斷)。"},
+    {k:"③外資", role:"國際法人",
+     how:"20日持股pp變化在族群內排名(±0.3pp 視為雜訊給0)。本系統實證:外資是「選族群」訊號,在族群內選股力弱 → 權重僅0.5。「修正日淨買」= 族群下跌日外資淨買20日累計/股本,供蓄勢判定與族群雷達。"},
+    {k:"④投信", role:"本土法人",
+     how:"近5日投信淨買佔股本% 在族群內排名(±0.03% 視為雜訊給0)。實證:修正期投信因子的預測力顯著升高(IC +0.03→+0.12)。"},
+    {k:"⑤融資券", role:"散戶籌碼",
+     how:"看「價 × 融資」的交互而非融資單獨方向:價跌融資減=洗盤 +2、價漲融資增=散戶追高 −1、價跌融資增=散戶接刀 −2。散戶水位(融資/股本)≥9% 分數封頂 −1 並示警 ⚠。"}
   ];
+  var TIER_HOW = {
+    "真強":"升級條件:族群綜合分前2名、綜合≥2.5、價≥+1、且至少一項法人買超(外資/投信/逆勢 ≥+1)。歷史10日超額 +5.4%。",
+    "蓄勢·外資佈局":"條件:外資或逆勢買超 +2、距60日高 ≤−3%(價未動)、修正日抗跌 ≥0、綜合 ≥1.5。歷史10日超額 +8.5%;升「真強」當日起 +8.4%。",
+    "強但過熱":"條件:價 ≥+1 且出現過熱旗標(周轉率≥20% / 量比≥5 / 散戶水位≥9%)。主升段中曾為反指標——視為風險提示,非賣出訊號。",
+    "潛在/中性":"未觸發任何 tier 規則,族群內排名居中,持續觀察。◇蓄勢候補會標出「差哪些條件」。",
+    "真弱":"條件:族群綜合分倒數2名且<0,或綜合 ≤−3.5。歷史10日超額 −2.5%、勝率38% → 汰弱優先。",
+    "真弱·陷阱":"條件:外資 ≤−1、融資 ≤−1、相對強弱 <0 —— 外資出、散戶接的出貨形態。",
+    "資料不足":"樣本不足,不給判定。"
+  };
+  var COMP_HOW = "綜合分 = Σ(元素分數 × 權重),取3日平滑抗抖動;tier 需連2日同向才轉層。權重由86日實證校準:族群內選股靠價格相對因子(相對強弱/抗跌),籌碼是族群層訊號故降權。";
   // score -> glyph + class + label
   function sinfo(s){
     if(s>=2)  return {g:"▲▲",c:"s2", l:"強"};
@@ -272,8 +296,28 @@
     head.appendChild(sc);
     tip.appendChild(head);
     var who = document.createElement("div"); who.className="who"; setText(who, html.who); tip.appendChild(who);
-    if(html.data){ var d=document.createElement("div"); d.className="data"; setText(d, html.data); tip.appendChild(d); }
-    var why=document.createElement("div"); why.className="why"; setText(why, html.why); tip.appendChild(why);
+    var bz = document.createElement("div"); bz.className="biz";
+    setText(bz, html.biz || ""); tip.appendChild(bz);
+    if(html.rows && html.rows.length){          // 數據表格(標籤/數值對)
+      var tb=document.createElement("div"); tb.className="rows";
+      html.rows.forEach(function(rw){
+        var k=document.createElement("span"); k.className="k"; setText(k, rw[0]); tb.appendChild(k);
+        var v=document.createElement("span"); v.className="rv"; setText(v, rw[1]); tb.appendChild(v);
+      });
+      tip.appendChild(tb);
+    } else if(html.data){
+      var d=document.createElement("div"); d.className="data"; setText(d, html.data); tip.appendChild(d);
+    }
+    var why=document.createElement("div"); why.className="why";
+    var wb=document.createElement("b"); setText(wb, "判讀:"); why.appendChild(wb);
+    why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
+    tip.appendChild(why);
+    if(html.how){                                // 評分依據(教學:分數與門檻怎麼來)
+      var hw=document.createElement("div"); hw.className="how";
+      var hb=document.createElement("b"); setText(hb, "評分依據:"); hw.appendChild(hb);
+      hw.appendChild(document.createTextNode(String(html.how)));
+      tip.appendChild(hw);
+    }
     tip.classList.add("on"); tip.setAttribute("aria-hidden","false");
     positionTip(x,y);
   }
@@ -336,10 +380,11 @@
     var rl=document.createElement("div"); rl.className="rl";
     var nm=document.createElement("span"); nm.className="nm"; nm.textContent=row.nm; rl.appendChild(nm);
     var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; rl.appendChild(code);
+    if(row.biz){ var bz=document.createElement("span"); bz.className="code"; bz.textContent=row.biz; rl.appendChild(bz); }
     r.appendChild(rl);
 
     row.cells.forEach(function(c,i){
-      var s=c[0], val=c[1], detail=c[2], reason=c[3], warn=c[4];
+      var s=c[0], val=c[1], rows=c[2], reason=c[3], warn=c[4];
       var info=sinfo(s);
       var cell=document.createElement("div"); cell.className="cell "+info.c+(warn?" warn":"");
       cell.tabIndex=0; cell.setAttribute("role","button");
@@ -347,11 +392,11 @@
       if(warn){ var fl=document.createElement("span"); fl.className="flag"; fl.textContent="⚠"; cell.appendChild(fl); }
       var g=document.createElement("span"); g.className="g"; g.textContent=info.g; cell.appendChild(g);
       var v=document.createElement("span"); v.className="v mono"; v.textContent=val; cell.appendChild(v);
-      attachTip(cell, (function(row,i,s,detail,reason,info){ return function(){
-        return { el: EL[i].k+" · "+EL[i].role, who: row.nm+"("+row.id+")",
-          data: detail, why: reason,
+      attachTip(cell, (function(row,i,s,rows,reason,info){ return function(){
+        return { el: EL[i].k+" · "+EL[i].role, who: row.nm+"("+row.id+")", biz: row.biz,
+          rows: rows, why: reason, how: EL[i].how,
           scLabel: info.l+(row.cells[i][4]?" ⚠":""), scColor: scColor(s), scBg: tintBg(s) };
-      };})(row,i,s,detail,reason,info));
+      };})(row,i,s,rows,reason,info));
       r.appendChild(cell);
     });
 
@@ -367,7 +412,9 @@
     vd.appendChild(vv);
     var vs=document.createElement("div"); vs.className="vs"; vs.textContent=row.vsub; vd.appendChild(vs);
     attachTip(vd, (function(row){ return function(){
-      return { el:"綜合評級 · 五元素研判", who: row.nm+"("+row.id+")", data:"", why: row.vr,
+      return { el:"綜合評級 · 五元素研判", who: row.nm+"("+row.id+")", biz: row.biz,
+        rows: row.vrows, why: row.vr,
+        how: (TIER_HOW[row.vlabel]||"") + " " + COMP_HOW,
         scLabel: row.vlabel+(row.warn?" ⚠":""), scColor: scColor(row.vt), scBg: tintBg(row.vt) };
     };})(row));
     vc.appendChild(vd); r.appendChild(vc);
