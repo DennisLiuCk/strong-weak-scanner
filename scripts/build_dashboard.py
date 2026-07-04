@@ -83,7 +83,9 @@ def build_cells(sc, m):
     cells.append([sc["s_foreign"], val, detail, R_FOREIGN[sc["s_foreign"]]])
     # ④ 投信
     t5 = m["trust5"] or 0
-    cells.append([sc["s_trust"], f"{t5:+,}張", f"投信近5日淨額 {t5:+,}張", R_TRUST[sc["s_trust"]]])
+    tp = m["trust5_pct"]
+    tdetail = f"投信近5日淨額 {t5:+,}張" + (f"(佔股本 {tp:+.2f}%)" if tp is not None else "")
+    cells.append([sc["s_trust"], f"{t5:+,}張", tdetail, R_TRUST[sc["s_trust"]]])
     # ⑤ 融資券
     u = m["margin_util_pct"]
     detail = f"散戶水位 {pctp(u)};10日融資 {pct(m['margin_chg10'], True)};券資比 {(m['short_margin_ratio'] or 0):.1f}%"
@@ -115,18 +117,9 @@ def verdict(sc):
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"])
 
 
-def group_state(r):
-    """族群層狀態:med_dip(修正日中位淨買)為主訊號(實測「最高者領漲」命中 68%,基準 33%)。"""
-    b, dist, dip, rel = r["breadth_f"], r["med_dist60"], r["med_dip"], r["rel20"]
-    if b is None or dist is None:
-        return "資料不足", "var(--neutral)", "族群指標樣本不足"
-    if dip is not None and dip > 0 and dist <= -0.05:
-        return "蓄勢·被佈局", "var(--warn-line)", "修正日有人接、價未回高——佈局特徵"
-    if rel is not None and rel > 0 and dist > -0.05:
-        return "發動·領漲", "var(--strong)", "動能領先全體、價近波段高"
-    if (dip is not None and dip < 0) and b <= 0.4:
-        return "籌碼退潮", "var(--weak)", "修正日遭調節、佈局廣度低"
-    return "中性觀察", "var(--neutral)", "族群訊號分歧"
+# 族群狀態→顏色(狀態本身由 fetch_daily._gstate 在資料層算好,存 group_metrics.state)
+STATE_COL = {"蓄勢·被佈局": "var(--warn-line)", "發動·領漲": "var(--strong)",
+             "籌碼退潮": "var(--weak)"}
 
 
 def main():
@@ -139,24 +132,33 @@ def main():
     rows = con.execute("""SELECT u.stock_id, u.name, u.grp, sc.*, m.*
         FROM daily_scores sc JOIN universe u USING(stock_id) JOIN daily_metrics m USING(date, stock_id)
         WHERE sc.date=?""", (last,)).fetchall()
-    grows = con.execute("SELECT * FROM group_metrics WHERE date=?", (last,)).fetchall()
-    mk = con.execute("SELECT * FROM market_daily WHERE date=?", (last,)).fetchone()
+    try:   # 舊 db 尚無族群/大盤表 → 雷達留空(跑一次 fetch_daily 即補齊)
+        grows = con.execute("SELECT * FROM group_metrics WHERE date=?", (last,)).fetchall()
+        # 指數資料可能落後個股一日 → 取 ≤last 的最近一筆(顯示時標註日期)
+        mk = con.execute("""SELECT * FROM market_daily WHERE date<=? AND dd20 IS NOT NULL
+                            ORDER BY date DESC LIMIT 1""", (last,)).fetchone()
+    except sqlite3.OperationalError:
+        grows, mk = [], None
     con.close()
 
+    dips = [(x["med_dip"], x["grp"]) for x in grows if x["med_dip"] is not None]
+    best_dip = max(dips)[1] if dips else None      # 修正日買超最高的族群(選族群主訊號)
     groups = []
     for g in GROUP_ORDER:
         r = next((x for x in grows if x["grp"] == g), None)
         if not r:
             continue
-        st, col, note = group_state(r)
-        groups.append({"nm": GROUP_NM.get(g, g), "state": st, "col": col, "note": note, "stats": [
+        note = r["note"] + ("(★ 修正日買超 3 族群最高)" if g == best_dip else "")
+        groups.append({"nm": GROUP_NM.get(g, g), "state": r["state"],
+                       "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note, "stats": [
             ["修正日中位淨買", f"{r['med_dip']:+.2f}%股本" if r["med_dip"] is not None else "-"],
             ["外資佈局廣度", f"{r['breadth_f']*100:.0f}%" if r["breadth_f"] is not None else "-"],
             ["20日動能 vs 全體", pct(r["rel20"], True) if r["rel20"] is not None else "-"],
             ["中位距60日高", pct(r["med_dist60"]) if r["med_dist60"] is not None else "-"],
-            ["投信5日合計", f"{r['trust_pct']:+.2f}%股本" if r["trust_pct"] is not None else "-"],
+            ["投信5日中位", f"{r['med_trust']:+.2f}%股本" if r["med_trust"] is not None else "-"],
         ]})
-    mchip = (f"市場 <b>{'⚠ 修正' if mk['regime'] else '多頭/中性'}</b>(TAIEX 距20日高 {mk['dd20']*100:+.1f}%)"
+    lag = f",指數至 {int(mk['date'][5:7])}/{int(mk['date'][8:10])}" if (mk and mk["date"] != last) else ""
+    mchip = (f"市場 <b>{'⚠ 修正' if mk['regime'] else '多頭/中性'}</b>(報酬指數距20日高 {mk['dd20']*100:+.1f}%{lag})"
              if (mk and mk["dd20"] is not None) else "市場 <b>-</b>")
 
     data, tiers_map = [], {}

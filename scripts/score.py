@@ -213,20 +213,24 @@ def main():
     # ── 印最新日的 tier 排行 ──
     last = con.execute("SELECT MAX(date) FROM daily_scores").fetchone()[0]
     print(f"daily_scores(v2 排名制)已更新 {len(out)} 列。最新日 {last}:\n")
-    try:   # 市場 regime + 族群雷達(fetch_daily 的 build_group_market 產物)
-        mk = con.execute("SELECT * FROM market_daily WHERE date=?", (last,)).fetchone()
-        if mk and mk["dd20"] is not None:
-            print(f"市場:TAIEX {mk['taiex']:,.0f},距20日高 {mk['dd20']*100:+.1f}% → "
+    def fnum(v, fmt):
+        return fmt.format(v) if v is not None else "-"
+    have = {r[0] for r in con.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('market_daily','group_metrics')")}
+    if {"market_daily", "group_metrics"} <= have:   # 舊 db 無族群/大盤表 → 略過(跑一次 fetch_daily 即補齊)
+        # 指數資料可能落後個股一日 → 取 ≤last 的最近一筆
+        mk = con.execute("""SELECT * FROM market_daily WHERE date<=? AND dd20 IS NOT NULL
+                            ORDER BY date DESC LIMIT 1""", (last,)).fetchone()
+        if mk:
+            lag = "" if mk["date"] == last else f"(指數至 {mk['date']})"
+            print(f"市場:報酬指數(含息){mk['taiex']:,.0f},距20日高 {mk['dd20']*100:+.1f}%{lag} → "
                   f"{'⚠ 修正 regime(抗跌/投信因子最有效的環境)' if mk['regime'] else '多頭/中性 regime'}")
-        print("族群雷達(修正日中位淨買=主訊號):")
+        print("族群雷達(修正日中位淨買=選族群主訊號):")
         for g in con.execute("SELECT * FROM group_metrics WHERE date=? ORDER BY grp", (last,)):
-            def f(v, fmt):
-                return fmt.format(v) if v is not None else "-"
-            print(f"   {g['grp']:<9} 修正日淨買{f(g['med_dip'], '{:+.2f}%')} 廣度{f(g['breadth_f'], '{:.0%}')} "
-                  f"動能vs全體{f(g['rel20'], '{:+.1%}')} 距60日高{f(g['med_dist60'], '{:+.1%}')}")
+            print(f"   {g['grp']:<9} {g['state']:<7} 修正日淨買{fnum(g['med_dip'], '{:+.2f}%')} "
+                  f"廣度{fnum(g['breadth_f'], '{:.0%}')} 動能vs全體{fnum(g['rel20'], '{:+.1%}')} "
+                  f"距60日高{fnum(g['med_dist60'], '{:+.1%}')}")
         print()
-    except sqlite3.OperationalError:
-        pass   # 舊 db 無族群/大盤表:略過(跑一次 fetch_daily 即補齊)
     q = """SELECT sc.*, u.name, u.grp FROM daily_scores sc JOIN universe u USING(stock_id)
            WHERE sc.date=? ORDER BY sc.composite_s DESC"""
     ORDER = ["真強", "蓄勢·外資佈局", "強但過熱", "潛在/中性", "真弱", "真弱·陷阱"]

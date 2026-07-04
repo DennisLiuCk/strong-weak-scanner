@@ -30,6 +30,13 @@ API = "https://api.finmindtrade.com/api/v4/data"
 DATASETS = ["TaiwanStockPrice", "TaiwanStockInstitutionalInvestorsBuySell",
             "TaiwanStockMarginPurchaseShortSale", "TaiwanStockShareholding"]
 
+# ── 族群/大盤層策略旋鈕(個股層旋鈕在 score.py CONFIG)──
+REGIME_DD      = -0.03   # 報酬指數距20日高 ≤ 此值 → 修正 regime
+DD_MIN_OBS     = 10      # dd20 最少樣本數(冷啟動保護,同 dist_hi 慣例)
+GRP_MIN_N      = 6       # 族群聚合最少有效檔數(避免 1 檔代表全族群)
+GS_OFF_HIGH    = -0.05   # 族群狀態:「價未回高」門檻(中位距60日高)
+GS_BREADTH_LOW = 0.4     # 族群狀態:「佈局廣度低」門檻
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS universe(stock_id TEXT PRIMARY KEY, name TEXT, grp TEXT);
 CREATE TABLE IF NOT EXISTS price(date TEXT, stock_id TEXT, open REAL, high REAL, low REAL,
@@ -153,10 +160,13 @@ def fetch_splits(con, ids, token, start, end, sleep):
 def fetch_index(con, token, start, end, sleep):
     """加權報酬指數(TAIEX,含息)→ market(upsert)。大盤 regime 旗標的原料。"""
     data = api_get("TaiwanStockTotalReturnIndex", "TAIEX", start, end, token)
-    rows = [(d["date"], d.get("price")) for d in data if d.get("price")]
+    rows = [(d["date"], d.get("price")) for d in data
+            if d.get("stock_id") == "TAIEX" and d.get("price")]   # 防呆:只收 TAIEX 序列
     if rows:
         con.executemany("INSERT OR REPLACE INTO market VALUES(?,?)", rows)
         con.commit()
+    else:
+        print("  ! TAIEX 指數抓取為空——市場 regime 將沿用舊資料", file=sys.stderr)
     time.sleep(sleep)
     return len(rows)
 
@@ -310,11 +320,28 @@ def build_metrics(con):
         con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(" + ",".join("?" * 26) + ")", out)
     con.commit()
 
+def _gstate(breadth, dist, dip, rel):
+    """族群狀態分類。策略規則放資料層(而非儀表板),validate.py 之後直接讀 state 欄。
+    med_dip(修正日中位淨買)為選族群主訊號;門檻見頂部 GS_* 旋鈕。"""
+    if breadth is None or dist is None:
+        return "資料不足", "族群指標樣本不足"
+    if dip is not None and dip > 0 and dist <= GS_OFF_HIGH:
+        return "蓄勢·被佈局", "修正日有人接、價未回高——佈局特徵"
+    if rel is not None and rel > 0 and dist > GS_OFF_HIGH:
+        note = "動能領先全體、價近波段高"
+        if dip is not None and dip > 0:
+            note += ";修正日仍獲買超"
+        return "發動·領漲", note
+    if dip is not None and dip < 0 and breadth <= GS_BREADTH_LOW:
+        return "籌碼退潮", "修正日遭調節、佈局廣度低"
+    return "中性觀察", "族群訊號分歧"
+
 def build_group_market(con):
     """族群層聚合 + 大盤 regime(整表重建,冪等)。
     Phase 1 實證:籌碼(外資pp/逆勢買超)是「族群層」訊號、族群內無選股力 →
-    佈局廣度與中位籌碼在此聚合,回答「哪個族群正在被佈局」;個股層交給 score.py 排名。"""
-    # 大盤:TAIEX 距 20 日高 → regime(1=修正:dd ≤ -3%)
+    佈局廣度與中位籌碼在此聚合,回答「哪個族群正在被佈局」;個股層交給 score.py 排名。
+    註:regime 刻意用「報酬指數(含息)」——除息季價格指數會機械性下跌,含息指數
+    只反映經濟性修正,與個股層用還原價是同一個邏輯。"""
     con.execute("DROP TABLE IF EXISTS market_daily")
     con.execute("CREATE TABLE market_daily(date TEXT PRIMARY KEY, taiex REAL, dd20 REAL, regime INT)")
     rows = con.execute("SELECT date, taiex FROM market ORDER BY date").fetchall()
@@ -322,16 +349,20 @@ def build_group_market(con):
     mk = []
     for k, (d, c) in enumerate(rows):
         win = [x for x in closes[max(0, k-19):k+1] if x]
-        dd = (c / max(win) - 1) if (c and win) else None
-        mk.append((d, c, dd, 1 if (dd is not None and dd <= -0.03) else 0))
+        dd = (c / max(win) - 1) if (c and len(win) >= DD_MIN_OBS) else None   # 冷啟動保護
+        mk.append((d, c, dd, None if dd is None else (1 if dd <= REGIME_DD else 0)))
     con.executemany("INSERT INTO market_daily VALUES(?,?,?,?)", mk)
-    # 族群層:佈局廣度 + 中位價位階/動能 + 中位籌碼
+    pmax = con.execute("SELECT MAX(date) FROM price").fetchone()[0]
+    mmax = rows[-1][0] if rows else None
+    if pmax and (mmax is None or mmax < pmax):
+        print(f"  ! TAIEX 指數最新日 {mmax} 落後個股資料 {pmax}——市場 regime 沿用較舊值", file=sys.stderr)
     con.execute("DROP TABLE IF EXISTS group_metrics")
     con.execute("""CREATE TABLE group_metrics(
         date TEXT, grp TEXT,
-        breadth_f REAL,                                 -- 佈局廣度:fpct_chg20>0 檔數比例
-        med_dist60 REAL, med_ret20 REAL, rel20 REAL,    -- 中位距60日高 / 20日動能 / 相對全體
-        med_fpct20 REAL, med_dip REAL, trust_pct REAL,  -- 中位外資pp / 中位逆勢買超 / 投信5日合計佔股本%
+        breadth_f REAL,                        -- 佈局廣度:fpct_chg20>0 檔數比例
+        med_dist60 REAL, rel20 REAL,           -- 中位距60日高 / 20日動能相對全體
+        med_dip REAL, med_trust REAL,          -- 中位逆勢買超 / 中位投信5日佔股本
+        state TEXT, note TEXT,                 -- 族群狀態(規則見 _gstate)
         PRIMARY KEY(date, grp))""")
     agg, uni_ret = {}, {}
     for d, grp, f20, dist60, ret20, dip, tpct in con.execute(
@@ -350,14 +381,16 @@ def build_group_market(con):
         if tpct is not None:
             a["t"].append(tpct)
     def med(v):
-        return statistics.median(v) if v else None
+        return statistics.median(v) if (v and len(v) >= GRP_MIN_N) else None   # 樣本不足不給值
     out = []
     for (d, grp), a in agg.items():
-        breadth = (sum(1 for x in a["f20"] if x > 0) / len(a["f20"])) if a["f20"] else None
-        m20, u20 = med(a["ret"]), med(uni_ret.get(d))
+        breadth = (sum(1 for x in a["f20"] if x > 0) / len(a["f20"])) if len(a["f20"]) >= GRP_MIN_N else None
+        m20 = med(a["ret"])
+        u20 = statistics.median(uni_ret[d]) if uni_ret.get(d) else None
         rel20 = (m20 - u20) if (m20 is not None and u20 is not None) else None
-        out.append((d, grp, breadth, med(a["dist"]), m20, rel20,
-                    med(a["f20"]), med(a["dip"]), (sum(a["t"]) if a["t"] else None)))
+        dist, dip, tr = med(a["dist"]), med(a["dip"]), med(a["t"])
+        state, note = _gstate(breadth, dist, dip, rel20)
+        out.append((d, grp, breadth, dist, rel20, dip, tr, state, note))
     con.executemany("INSERT OR REPLACE INTO group_metrics VALUES(?,?,?,?,?,?,?,?,?)", out)
     con.commit()
 

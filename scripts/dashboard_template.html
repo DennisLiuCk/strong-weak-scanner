@@ -386,6 +386,12 @@
   (function(){
     var host = document.getElementById("groups");
     if(!host) return;
+    if(!GROUPS.length){          // 無族群資料(舊 db):整段隱藏,不留空標題
+      var h = host.previousElementSibling;
+      if(h) h.style.display = "none";
+      host.style.display = "none";
+      return;
+    }
     GROUPS.forEach(function(g){
       var el = document.createElement("div");
       el.className = "tier";
