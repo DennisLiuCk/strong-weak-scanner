@@ -43,6 +43,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "無新資料,略過 commit"
           else
-            git commit -m "data: $(date -u +%Y-%m-%d) 五元素更新 [skip ci]"
+            git commit -m "data: $(date -u +%Y-%m-%d) 五元素更新"
             git push
           fi
