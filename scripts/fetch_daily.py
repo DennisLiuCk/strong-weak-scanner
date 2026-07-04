@@ -25,6 +25,7 @@ from datetime import date, timedelta
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 UNIVERSE = os.path.join(ROOT, "config", "universe.csv")
+GROUPS_CSV = os.path.join(ROOT, "config", "groups.csv")
 API = "https://api.finmindtrade.com/api/v4/data"
 
 DATASETS = ["TaiwanStockPrice", "TaiwanStockInstitutionalInvestorsBuySell",
@@ -90,6 +91,19 @@ def load_universe(con):
     con.execute("DROP TABLE IF EXISTS universe")   # 從 csv 整表重建(含 schema 演進、移除股不殭屍)
     con.execute("CREATE TABLE universe(stock_id TEXT PRIMARY KEY, name TEXT, grp TEXT, biz TEXT)")
     con.executemany("INSERT INTO universe VALUES(?,?,?,?)", rows)
+    # 族群定義(名稱/標籤/排序)一併配置化:加族群 = groups.csv + universe.csv 各加一行
+    grows = []
+    with open(GROUPS_CSV, encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            grows.append((r["group"].strip(), r["name"].strip(),
+                          (r.get("tag") or "").strip(), int(r.get("ord") or 0)))
+    con.execute("DROP TABLE IF EXISTS groups")
+    con.execute("CREATE TABLE groups(grp TEXT PRIMARY KEY, name TEXT, tag TEXT, ord INT)")
+    con.executemany("INSERT INTO groups VALUES(?,?,?,?)", grows)
+    missing = [g for (g,) in con.execute(
+        "SELECT DISTINCT grp FROM universe WHERE grp NOT IN (SELECT grp FROM groups)")]
+    if missing:
+        print(f"  ! universe 含未定義族群 {missing}——請補 config/groups.csv", file=sys.stderr)
     return [r[0] for r in rows]
 
 def up_price(con, data):

@@ -31,7 +31,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 REPORTS = os.path.join(ROOT, "reports")
 IS_CUTOFF = "2026-07-05"      # v2.1 權重校準日:此日(含)之前 = in-sample
-GRPS = ("passive", "power", "packtest")
 ELEMENTS = ["s_price", "s_resil", "s_vol", "s_foreign", "s_trust", "s_dip", "s_margin",
             "composite", "composite_s"]
 
@@ -81,6 +80,12 @@ def main():
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
     uni = {r["stock_id"]: r["grp"] for r in con.execute("SELECT stock_id, grp FROM universe")}
+    try:   # 族群清單配置化(groups 表);舊 db 退回 universe 去重
+        GRPS = tuple(r[0] for r in con.execute("SELECT grp FROM groups ORDER BY ord"))
+    except sqlite3.OperationalError:
+        GRPS = ()
+    if not GRPS:
+        GRPS = tuple(sorted(set(uni.values())))
     dates = [r[0] for r in con.execute("SELECT DISTINCT date FROM daily_metrics ORDER BY date")]
     didx = {d: i for i, d in enumerate(dates)}
     cadj = {(r["date"], r["stock_id"]): r["close_adj"]
@@ -222,11 +227,11 @@ def main():
             v = grp_med_fwd(d, g)
             if v is not None:
                 gf[g] = v
-        if len(gf) == 3:
+        if len(gf) == len(GRPS):
             uv = statistics.median(gf.values())
             dips = {g: gm[d][g]["med_dip"] for g in GRPS
                     if g in gm[d] and gm[d][g]["med_dip"] is not None}
-            if len(dips) == 3:
+            if len(dips) == len(GRPS):
                 leader = max(dips, key=dips.get)
                 hit = 1 if gf[leader] == max(gf.values()) else 0
                 for b in bs:
@@ -297,8 +302,9 @@ def main():
     w("## ④ 族群層")
     w("")
     hit_all, hit_oos = dip_hit.get("全期", []), dip_hit.get("OOS", [])
+    base = round(100 / len(GRPS)) if GRPS else 0
     w(f"- **med_dip 最高者領漲**命中率:全期 "
-      + (f"{100*statistics.mean(hit_all):.0f}%(n={len(hit_all)},基準 33%)" if hit_all else "–")
+      + (f"{100*statistics.mean(hit_all):.0f}%(n={len(hit_all)},基準 {base}%)" if hit_all else "–")
       + ";OOS " + (f"{100*statistics.mean(hit_oos):.0f}%(n={len(hit_oos)})" if hit_oos else "–"))
     w("- 各 state 的族群前瞻超額(vs 全體中位):")
     w("")
@@ -326,7 +332,7 @@ def main():
     if v1:
         print(f"v1 composite 族群內 IC:全期 {fmt_ic(mean(wg['v1_composite'].get('全期')))}")
     if hit_all:
-        print(f"med_dip 領漲命中:全期 {100*statistics.mean(hit_all):.0f}%(基準33%)")
+        print(f"med_dip 領漲命中:全期 {100*statistics.mean(hit_all):.0f}%(基準{base}%)")
     ca, cb = cohort["抗跌≥0(放行)"].get("全期", []), cohort["領跌<0(擋下)"].get("全期", [])
     if ca and cb:
         print(f"蓄勢濾網 cohort:放行 {mean(ca)*100:+.2f}%(n={len(ca)}) vs 擋下 {mean(cb)*100:+.2f}%(n={len(cb)})")

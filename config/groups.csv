@@ -1,0 +1,4 @@
+group,name,tag,ord
+passive,被動元件,MLCC / 電容 / 電阻 / 電感,1
+power,功率元件,MOSFET / 二極體 / 功率IC,2
+packtest,封測,OSAT / 先進封裝 / AI測試,3

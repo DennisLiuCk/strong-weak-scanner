@@ -20,8 +20,10 @@ DB = os.path.join(ROOT, "data", "findmind.db")
 TEMPLATE = os.path.join(ROOT, "scripts", "dashboard_template.html")
 OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages 乾淨網址
 
+# 族群定義以 config/groups.csv → db `groups` 表為準;此處僅為舊 db 的退路預設
 GROUP_ORDER = ["passive", "power", "packtest"]
 GROUP_NM = {"passive": "被動元件", "power": "功率元件", "packtest": "封測"}
+GROUP_TAG = {}
 TIER_ORDER = ["真強", "蓄勢·外資佈局", "強但過熱", "潛在/中性", "真弱", "真弱·陷阱"]
 TIER_VT = {"真強": 2, "蓄勢·外資佈局": 2, "強但過熱": 1, "潛在/中性": 0, "真弱": -2, "真弱·陷阱": -2}
 TIER_COL = {"真強": "var(--strong)", "蓄勢·外資佈局": "var(--neutral)", "強但過熱": "var(--warn-line)",
@@ -162,6 +164,14 @@ def main():
     rows = con.execute("""SELECT u.stock_id, u.name, u.grp, u.biz, sc.*, m.*
         FROM daily_scores sc JOIN universe u USING(stock_id) JOIN daily_metrics m USING(date, stock_id)
         WHERE sc.date=?""", (last,)).fetchall()
+    try:   # 族群定義配置化:讀 groups 表(舊 db 缺表時退回檔頭預設)
+        gmeta = con.execute("SELECT grp, name, tag FROM groups ORDER BY ord").fetchall()
+        if gmeta:
+            GROUP_ORDER[:] = [g["grp"] for g in gmeta]
+            GROUP_NM.update({g["grp"]: g["name"] for g in gmeta})
+            GROUP_TAG.update({g["grp"]: g["tag"] for g in gmeta})
+    except sqlite3.OperationalError:
+        pass
     try:   # 舊 db 尚無族群/大盤表 → 雷達留空(跑一次 fetch_daily 即補齊)
         grows = con.execute("SELECT * FROM group_metrics WHERE date=?", (last,)).fetchall()
         # 指數資料可能落後個股一日 → 取 ≤last 的最近一筆(顯示時標註日期)
@@ -178,7 +188,7 @@ def main():
         r = next((x for x in grows if x["grp"] == g), None)
         if not r:
             continue
-        note = r["note"] + ("(★ 修正日買超 3 族群最高)" if g == best_dip else "")
+        note = r["note"] + (f"(★ 修正日買超 {len(GROUP_ORDER)} 族群最高)" if g == best_dip else "")
         groups.append({"g": g, "nm": GROUP_NM.get(g, g), "state": r["state"],
                        "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note, "stats": [
             ["修正日中位淨買", f"{r['med_dip']:+.2f}%股本" if r["med_dip"] is not None else "-"],
@@ -227,10 +237,16 @@ def main():
 
     y, mo, d = last.split("-")
     date_str = f"{y}/{int(mo)}/{int(d)}"
+    gtitle = " × ".join(GROUP_NM.get(g, g) for g in GROUP_ORDER) + " · 汰弱留強五元素儀表板"
+    grpmeta = {g: {"nm": GROUP_NM.get(g, g), "tag": GROUP_TAG.get(g, "")} for g in GROUP_ORDER}
     html = open(TEMPLATE, encoding="utf-8").read()
     html = html.replace("__DATA_JSON__", json.dumps(data, ensure_ascii=False))
     html = html.replace("__TIERS_JSON__", json.dumps(tiers, ensure_ascii=False))
     html = html.replace("__GROUPS_JSON__", json.dumps(groups, ensure_ascii=False))
+    html = html.replace("__GRPMETA_JSON__", json.dumps(grpmeta, ensure_ascii=False))
+    html = html.replace("__GORDER_JSON__", json.dumps(GROUP_ORDER))
+    html = html.replace("__GTITLE__", gtitle)
+    html = html.replace("__SCOPE__", f"{len(GROUP_ORDER)} 族群 · {len(data)} 檔")
     html = html.replace("__MARKET_CHIP__", mchip)
     html = html.replace("__DATE__", date_str)
     open(OUT, "w", encoding="utf-8").write(html)

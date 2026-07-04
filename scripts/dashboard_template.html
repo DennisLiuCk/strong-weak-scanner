@@ -1,4 +1,4 @@
-<title>被動 × 功率 × 封測 · 汰弱留強五元素儀表板</title>
+<title>__GTITLE__</title>
 <style>
   :root{
     --page:#f0eee8; --surface:#fbfaf8; --surface-2:#f3f1ea; --cell:#f6f4ee;
@@ -194,11 +194,11 @@
   <header>
     <div>
       <div class="brandrule"></div>
-      <h1>被動 × 功率 × 封測 · 汰弱留強五元素儀表板</h1>
+      <h1>__GTITLE__</h1>
       <p class="sub">台股三大半導體族群共 30 檔的汰弱留強掃描。個股層以族群內排名比「相對強弱 + 修正日抗跌」選強汰弱;族群層看「佈局廣度 + 逆勢買超」找出正在被默默佈局的族群——兩層各司其職,tier 需連兩日確認。</p>
       <div class="meta">
         <span class="chip">__MARKET_CHIP__</span>
-        <span class="chip" id="scopeChip">範圍 <b>3 族群 · 30 檔</b></span>
+        <span class="chip" id="scopeChip">範圍 <b>__SCOPE__</b></span>
         <span class="chip">資料至 <b>__DATE__</b>(還原股價)</span>
         <span class="chip">來源 <b>FinMind</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
@@ -296,7 +296,7 @@
   // c = cell: [score, valueText, detail, reason, warn?]
   var DATA = __DATA_JSON__;
 
-  var GRP = {passive:{nm:"被動元件", tag:"MLCC / 電容 / 電阻 / 電感"}, power:{nm:"功率元件", tag:"MOSFET / 二極體 / 功率IC"}, packtest:{nm:"封測", tag:"OSAT / 先進封裝 / AI測試"}};
+  var GRP = __GRPMETA_JSON__;   // 族群名稱/標籤來自 config/groups.csv(build_dashboard 注入)
 
   // ---------- tooltip ----------
   var tip = document.getElementById("tip");
@@ -506,7 +506,7 @@
   (function(){
     var bar = document.getElementById("gfilter");
     if(!bar) return;
-    var order = ["passive","power","packtest"];
+    var order = __GORDER_JSON__;   // 族群排序來自 config/groups.csv
     var counts = {}; DATA.forEach(function(d){ counts[d.g] = (counts[d.g]||0) + 1; });
     var present = order.filter(function(g){ return counts[g]; });
     if(present.length < 2){ bar.style.display = "none"; return; }   // 單一族群不需篩選
