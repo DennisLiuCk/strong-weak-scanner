@@ -15,6 +15,8 @@ except Exception:
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from score import WEIGHTS   # 權重單一事實來源(score.py CONFIG),tooltip 顯示用
+# 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
+from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -175,6 +177,44 @@ def verdict(sc):
 STATE_COL = {"蓄勢·被佈局": "var(--warn-line)", "發動·領漲": "var(--strong)",
              "籌碼退潮": "var(--weak)"}
 
+# 族群卡 tooltip 教學文字(門檻值 import 自 fetch_daily,改旋鈕自動同步)
+GROUP_HOW = (
+    f"族群狀態每日由聚合指標判定(規則在資料層,非儀表板):蓄勢·被佈局=修正日中位淨買>0 且 "
+    f"中位距60日高≤{GS_OFF_HIGH*100:+.0f}%(下跌時有人接貨、價還沒回到高點——佈局特徵);"
+    f"發動·領漲=20日動能贏全體 且 價近波段高;籌碼退潮=修正日遭調節 且 佈局廣度≤"
+    f"{GS_BREADTH_LOW*100:.0f}%;其餘=中性觀察。「修正日中位淨買」=族群下跌日外資淨買20日累計"
+    f"佔股本%的族群中位數——選族群的主訊號(樣本外驗證中,見週報);「外資佈局廣度」=20日外資"
+    f"增持的成員比例;「20日動能 vs 全體」=族群中位20日報酬 − 全部掃描個股中位。"
+    f"↗/↘/→ = 與 5 個交易日前相比的方向。")
+GROUP_SRC = "個股五元素於族群層聚合(等權中位數/廣度);原始資料 FinMind"
+
+
+def _streak(series):
+    """最新狀態往回連續了幾個交易日、自哪天起。series 依日期升冪。"""
+    if not series:
+        return None, None
+    cur, n = series[-1]["state"], 0
+    for x in reversed(series):
+        if x["state"] != cur:
+            break
+        n += 1
+    d = series[-n]["date"]
+    return n, f"{int(d[5:7])}/{int(d[8:10])}"
+
+
+def _arrow(series, key, eps):
+    """與 5 個交易日前相比的方向箭頭;樣本不足或缺值回空字串。"""
+    if len(series) < 6:
+        return ""
+    cur, prev = series[-1][key], series[-6][key]
+    if cur is None or prev is None:
+        return ""
+    if cur - prev >= eps:
+        return " ↗"
+    if prev - cur >= eps:
+        return " ↘"
+    return " →"
+
 
 def main():
     con = sqlite3.connect(DB)
@@ -203,8 +243,14 @@ def main():
         mkrows = con.execute("""SELECT taiex FROM market_daily WHERE taiex IS NOT NULL
                                 AND date<=? ORDER BY date""", (last,)).fetchall()
         mkt20 = (mkrows[-1]["taiex"] / mkrows[-21]["taiex"] - 1) if len(mkrows) >= 21 else None
+        # 族群歷史:狀態連續天數(「首先轉強」要看得出先後)+ 5 日方向箭頭
+        ghist = con.execute("""SELECT date, grp, state, med_dip, rel20 FROM group_metrics
+                               WHERE date<=? ORDER BY date""", (last,)).fetchall()
     except sqlite3.OperationalError:
-        grows, mk, mkt20 = [], None, None
+        grows, mk, mkt20, ghist = [], None, None, []
+    gseries = {}
+    for x in ghist:
+        gseries.setdefault(x["grp"], []).append(x)
     con.close()
 
     dips = [(x["med_dip"], x["grp"]) for x in grows if x["med_dip"] is not None]
@@ -215,17 +261,41 @@ def main():
         if not r:
             continue
         note = r["note"] + (f"(★ 修正日買超 {len(GROUP_ORDER)} 族群最高)" if g == best_dip else "")
-        groups.append({"g": g, "nm": GROUP_NM.get(g, g), "state": r["state"],
-                       "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note, "stats": [
-            ["修正日中位淨買", f"{r['med_dip']:+.2f}%股本" if r["med_dip"] is not None else "-"],
+        ser = gseries.get(g, [])
+        n, since = _streak(ser)
+        a_dip = _arrow(ser, "med_dip", 0.01)     # %股本,顯示 2 位小數 → 死區 0.01
+        a_rel = _arrow(ser, "rel20", 0.005)      # 比率,顯示 0.1% 一位 → 死區 0.5pp
+        gobj = {"g": g, "nm": GROUP_NM.get(g, g), "state": r["state"],
+                "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note, "stats": [
+            ["修正日中位淨買", f"{r['med_dip']:+.2f}%股本{a_dip}" if r["med_dip"] is not None else "-"],
             ["外資佈局廣度", f"{r['breadth_f']*100:.0f}%" if r["breadth_f"] is not None else "-"],
-            ["20日動能 vs 全體", pct(r["rel20"], True) if r["rel20"] is not None else "-"],
+            ["20日動能 vs 全體", f"{pct(r['rel20'], True)}{a_rel}" if r["rel20"] is not None else "-"],
             ["中位距60日高", pct(r["med_dist60"]) if r["med_dist60"] is not None else "-"],
             ["投信買超廣度", f"{r['breadth_t']*100:.0f}%" if r["breadth_t"] is not None else "-"],
-        ]})
+        ]}
+        if n:
+            gobj["dur"] = f"第 {n} 個交易日(自 {since})"
+        groups.append(gobj)
     lag = f",指數至 {int(mk['date'][5:7])}/{int(mk['date'][8:10])}" if (mk and mk["date"] != last) else ""
     mchip = (f"市場 <b>{'⚠ 修正' if mk['regime'] else '多頭/中性'}</b>(報酬指數距20日高 {mk['dd20']*100:+.1f}%{lag})"
              if (mk and mk["dd20"] is not None) else "市場 <b>-</b>")
+    mtip = None
+    if mk and mk["dd20"] is not None:
+        regime = bool(mk["regime"])
+        mtip = {
+            "el": "市場環境", "scLabel": "⚠ 修正" if regime else "多頭/中性",
+            "scColor": "var(--warn-line)" if regime else "var(--neutral)",
+            "scBg": "var(--neutral-tint)", "who": "加權報酬指數(含息)",
+            "rows": [["指數日期", mk["date"]],
+                     ["距20日高", f"{mk['dd20']*100:+.1f}%"],
+                     ["修正門檻", f"≤ {REGIME_DD*100:.0f}%"],
+                     ["20日報酬", pct(mkt20, True)]],
+            "why": ("報酬指數距 20 日高回落超過門檻,判定為修正 regime——此時「修正日抗跌」"
+                    "「修正日買超」等訊號鑑別度最高,適合觀察哪個族群先止穩轉強。" if regime else
+                    "距 20 日高回落未達門檻,市場處於多頭/中性,個股訊號以族群內相對強弱為主。"),
+            "how": (f"距20日高 ≤ {REGIME_DD*100:.0f}% → 修正 regime。刻意用「含息」報酬指數而非"
+                    "價格指數——除息季價格指數會機械性下跌,含息指數才反映真實市場強弱。"),
+            "src": "FinMind 加權報酬指數(TAIEX 含息)"}
 
     data, tiers_map = [], {}
     for r in rows:
@@ -277,6 +347,9 @@ def main():
     html = html.replace("__TITLE_TAIL_JSON__", json.dumps(TITLE_TAIL, ensure_ascii=False))
     html = html.replace("__SCOPE__", f"{len(GROUP_ORDER)} 族群 · {len(data)} 檔")
     html = html.replace("__MARKET_CHIP__", mchip)
+    html = html.replace("__MKT_TIP_JSON__", json.dumps(mtip, ensure_ascii=False))
+    html = html.replace("__GROUP_HOW_JSON__", json.dumps({"how": GROUP_HOW, "src": GROUP_SRC},
+                                                         ensure_ascii=False))
     html = html.replace("__DATE_ISO__", last)
     html = html.replace("__DATE__", date_str)
     # 快照日期清單(含本次):注入頁內當 fallback,另寫 manifest 供已凍結的舊頁抓最新清單

@@ -294,7 +294,7 @@
       <h1>台股半導體族群 · 汰弱留強掃描</h1>
       <p class="sub">每個交易日收盤後,把同族群的個股放上同一把尺互相比較:價格誰相對強、下跌時誰撐得住、法人在買誰、散戶擠在哪——比出強弱、依規則分層。每個分數都可以點開,看到原始數據、判讀理由、計算規則與資料來源;完整方法見<a href="#method">頁尾「方法與資料」</a>。</p>
       <div class="meta">
-        <span class="chip">市場 <b>多頭/中性</b>(報酬指數距20日高 -1.7%)</span>
+        <span class="chip" id="mktChip">市場 <b>多頭/中性</b>(報酬指數距20日高 -1.7%)</span>
         <span class="chip" id="scopeChip">範圍 <b>6 族群 · 69 檔</b></span>
         <span class="chip">資料至 <select id="dateSel" aria-label="切換報告日期"><option value="2026-07-03">2026/7/3</option></select>(還原股價)</span>
         <span class="chip">來源 <b>FinMind</b></span>
@@ -681,7 +681,8 @@
   });
 
   // ---------- group radar ----------
-  var GROUPS = [{"g": "passive", "nm": "被動元件", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-0.71%股本"], ["外資佈局廣度", "25%"], ["20日動能 vs 全體", "+36.1%"], ["中位距60日高", "-6.1%"], ["投信買超廣度", "25%"]]}, {"g": "power", "nm": "功率元件", "state": "發動·領漲", "col": "var(--strong)", "note": "動能領先全體、價近波段高", "stats": [["修正日中位淨買", "-0.41%股本"], ["外資佈局廣度", "50%"], ["20日動能 vs 全體", "+15.1%"], ["中位距60日高", "-3.7%"], ["投信買超廣度", "21%"]]}, {"g": "packtest", "nm": "封測", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.81%股本"], ["外資佈局廣度", "54%"], ["20日動能 vs 全體", "-2.5%"], ["中位距60日高", "-5.4%"], ["投信買超廣度", "54%"]]}, {"g": "memory", "nm": "記憶體", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-2.03%股本"], ["外資佈局廣度", "17%"], ["20日動能 vs 全體", "-16.8%"], ["中位距60日高", "-18.5%"], ["投信買超廣度", "33%"]]}, {"g": "ipdesign", "nm": "矽智財", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.53%股本"], ["外資佈局廣度", "67%"], ["20日動能 vs 全體", "-11.6%"], ["中位距60日高", "-13.5%"], ["投信買超廣度", "56%"]]}, {"g": "semiequip", "nm": "半導體設備", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧(★ 修正日買超 6 族群最高)", "stats": [["修正日中位淨買", "-0.24%股本"], ["外資佈局廣度", "44%"], ["20日動能 vs 全體", "-6.1%"], ["中位距60日高", "-11.8%"], ["投信買超廣度", "22%"]]}];
+  var GROUPS = [{"g": "passive", "nm": "被動元件", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-0.71%股本 ↘"], ["外資佈局廣度", "25%"], ["20日動能 vs 全體", "+36.1% ↗"], ["中位距60日高", "-6.1%"], ["投信買超廣度", "25%"]], "dur": "第 2 個交易日(自 7/2)"}, {"g": "power", "nm": "功率元件", "state": "發動·領漲", "col": "var(--strong)", "note": "動能領先全體、價近波段高", "stats": [["修正日中位淨買", "-0.41%股本 ↗"], ["外資佈局廣度", "50%"], ["20日動能 vs 全體", "+15.1% ↗"], ["中位距60日高", "-3.7%"], ["投信買超廣度", "21%"]], "dur": "第 2 個交易日(自 7/2)"}, {"g": "packtest", "nm": "封測", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.81%股本 ↘"], ["外資佈局廣度", "54%"], ["20日動能 vs 全體", "-2.5% ↘"], ["中位距60日高", "-5.4%"], ["投信買超廣度", "54%"]], "dur": "第 7 個交易日(自 6/25)"}, {"g": "memory", "nm": "記憶體", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-2.03%股本 ↗"], ["外資佈局廣度", "17%"], ["20日動能 vs 全體", "-16.8% ↘"], ["中位距60日高", "-18.5%"], ["投信買超廣度", "33%"]], "dur": "第 4 個交易日(自 6/30)"}, {"g": "ipdesign", "nm": "矽智財", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.53%股本 ↗"], ["外資佈局廣度", "67%"], ["20日動能 vs 全體", "-11.6% ↘"], ["中位距60日高", "-13.5%"], ["投信買超廣度", "56%"]], "dur": "第 5 個交易日(自 6/29)"}, {"g": "semiequip", "nm": "半導體設備", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧(★ 修正日買超 6 族群最高)", "stats": [["修正日中位淨買", "-0.24%股本 ↗"], ["外資佈局廣度", "44%"], ["20日動能 vs 全體", "-6.1% →"], ["中位距60日高", "-11.8%"], ["投信買超廣度", "22%"]], "dur": "第 5 個交易日(自 6/29)"}];
+  var GROUP_HOW = {"how": "族群狀態每日由聚合指標判定(規則在資料層,非儀表板):蓄勢·被佈局=修正日中位淨買>0 且 中位距60日高≤-5%(下跌時有人接貨、價還沒回到高點——佈局特徵);發動·領漲=20日動能贏全體 且 價近波段高;籌碼退潮=修正日遭調節 且 佈局廣度≤40%;其餘=中性觀察。「修正日中位淨買」=族群下跌日外資淨買20日累計佔股本%的族群中位數——選族群的主訊號(樣本外驗證中,見週報);「外資佈局廣度」=20日外資增持的成員比例;「20日動能 vs 全體」=族群中位20日報酬 − 全部掃描個股中位。↗/↘/→ = 與 5 個交易日前相比的方向。", "src": "個股五元素於族群層聚合(等權中位數/廣度);原始資料 FinMind"};   // 狀態判定規則+資料來源(門檻值由 build 注入,單一事實來源)
   (function(){
     var host = document.getElementById("groups");
     if(!host) return;
@@ -699,6 +700,10 @@
       var tt = document.createElement("div"); tt.className = "tt"; tt.textContent = g.nm; el.appendChild(tt);
       var st = document.createElement("div"); st.className = "td";
       st.style.color = g.col; st.style.fontWeight = "700"; st.textContent = g.state; el.appendChild(st);
+      if(g.dur){                 // 狀態持續天數:分辨「剛轉」與「已持續數週」——看先後的關鍵
+        var du = document.createElement("div"); du.className = "td";
+        du.style.opacity = ".72"; du.textContent = "狀態持續 " + g.dur; el.appendChild(du);
+      }
       var nt = document.createElement("div"); nt.className = "td"; nt.textContent = g.note; el.appendChild(nt);
       var picks = document.createElement("div"); picks.className = "picks";
       g.stats.forEach(function(s){
@@ -708,7 +713,23 @@
         p.appendChild(lab); p.appendChild(val); picks.appendChild(p);
       });
       el.appendChild(picks); host.appendChild(el);
+      el.tabIndex = 0; el.style.cursor = "help";   // 與五元素格同一套詳情:狀態怎麼判、欄位是什麼
+      attachTip(el, function(){
+        return {el: "族群雷達", scLabel: g.state, scColor: g.col, scBg: "var(--neutral-tint)",
+                who: g.nm, biz: (GRP[g.g] && GRP[g.g].tag) || "",
+                rows: g.stats.concat(g.dur ? [["狀態持續", g.dur]] : []),
+                why: g.note, how: GROUP_HOW.how, src: GROUP_HOW.src};
+      });
     });
+  })();
+
+  // ---------- market chip(頁首市場環境籤條的詳情)----------
+  var MKT_TIP = {"el": "市場環境", "scLabel": "多頭/中性", "scColor": "var(--neutral)", "scBg": "var(--neutral-tint)", "who": "加權報酬指數(含息)", "rows": [["指數日期", "2026-07-03"], ["距20日高", "-1.7%"], ["修正門檻", "≤ -3%"], ["20日報酬", "+3.0%"]], "why": "距 20 日高回落未達門檻,市場處於多頭/中性,個股訊號以族群內相對強弱為主。", "how": "距20日高 ≤ -3% → 修正 regime。刻意用「含息」報酬指數而非價格指數——除息季價格指數會機械性下跌,含息指數才反映真實市場強弱。", "src": "FinMind 加權報酬指數(TAIEX 含息)"};
+  (function(){
+    var chip = document.getElementById("mktChip");
+    if(!chip || !MKT_TIP) return;
+    chip.tabIndex = 0; chip.style.cursor = "help";
+    attachTip(chip, function(){ return MKT_TIP; });
   })();
 
   // ---------- tiers summary ----------

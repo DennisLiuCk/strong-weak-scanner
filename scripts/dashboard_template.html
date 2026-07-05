@@ -294,7 +294,7 @@
       <h1>__H1__</h1>
       <p class="sub">每個交易日收盤後,把同族群的個股放上同一把尺互相比較:價格誰相對強、下跌時誰撐得住、法人在買誰、散戶擠在哪——比出強弱、依規則分層。每個分數都可以點開,看到原始數據、判讀理由、計算規則與資料來源;完整方法見<a href="#method">頁尾「方法與資料」</a>。</p>
       <div class="meta">
-        <span class="chip">__MARKET_CHIP__</span>
+        <span class="chip" id="mktChip">__MARKET_CHIP__</span>
         <span class="chip" id="scopeChip">範圍 <b>__SCOPE__</b></span>
         <span class="chip">資料至 <select id="dateSel" aria-label="切換報告日期"><option value="__DATE_ISO__">__DATE__</option></select>(還原股價)</span>
         <span class="chip">來源 <b>FinMind</b></span>
@@ -682,6 +682,7 @@
 
   // ---------- group radar ----------
   var GROUPS = __GROUPS_JSON__;
+  var GROUP_HOW = __GROUP_HOW_JSON__;   // 狀態判定規則+資料來源(門檻值由 build 注入,單一事實來源)
   (function(){
     var host = document.getElementById("groups");
     if(!host) return;
@@ -699,6 +700,10 @@
       var tt = document.createElement("div"); tt.className = "tt"; tt.textContent = g.nm; el.appendChild(tt);
       var st = document.createElement("div"); st.className = "td";
       st.style.color = g.col; st.style.fontWeight = "700"; st.textContent = g.state; el.appendChild(st);
+      if(g.dur){                 // 狀態持續天數:分辨「剛轉」與「已持續數週」——看先後的關鍵
+        var du = document.createElement("div"); du.className = "td";
+        du.style.opacity = ".72"; du.textContent = "狀態持續 " + g.dur; el.appendChild(du);
+      }
       var nt = document.createElement("div"); nt.className = "td"; nt.textContent = g.note; el.appendChild(nt);
       var picks = document.createElement("div"); picks.className = "picks";
       g.stats.forEach(function(s){
@@ -708,7 +713,23 @@
         p.appendChild(lab); p.appendChild(val); picks.appendChild(p);
       });
       el.appendChild(picks); host.appendChild(el);
+      el.tabIndex = 0; el.style.cursor = "help";   // 與五元素格同一套詳情:狀態怎麼判、欄位是什麼
+      attachTip(el, function(){
+        return {el: "族群雷達", scLabel: g.state, scColor: g.col, scBg: "var(--neutral-tint)",
+                who: g.nm, biz: (GRP[g.g] && GRP[g.g].tag) || "",
+                rows: g.stats.concat(g.dur ? [["狀態持續", g.dur]] : []),
+                why: g.note, how: GROUP_HOW.how, src: GROUP_HOW.src};
+      });
     });
+  })();
+
+  // ---------- market chip(頁首市場環境籤條的詳情)----------
+  var MKT_TIP = __MKT_TIP_JSON__;
+  (function(){
+    var chip = document.getElementById("mktChip");
+    if(!chip || !MKT_TIP) return;
+    chip.tabIndex = 0; chip.style.cursor = "help";
+    attachTip(chip, function(){ return MKT_TIP; });
   })();
 
   // ---------- tiers summary ----------
