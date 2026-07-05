@@ -83,5 +83,4 @@ Token 讀取順序:環境變數 `FINMIND_TOKEN` → 本機 `.mcp.json`(已被 `.
 
 ## 視覺化儀表板
 
-30 檔 × 五元素互動熱力圖(hover 看數據與理由):
-<https://claude.ai/code/artifact/5c32b02f-fbf0-4195-91dd-6257b62d0432>
+<https://dennisliuck.github.io/strong-weak-scanner>

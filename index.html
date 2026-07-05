@@ -223,9 +223,6 @@
   footer{margin-top:26px;color:var(--muted);font-size:11.5px;line-height:1.7}
   footer b{color:var(--ink-2)}
   footer .fn{border-top:1px solid var(--hairline);padding-top:14px;display:grid;gap:4px}
-  .caveat{margin-top:12px;background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:10px;
-    padding:10px 12px;color:var(--ink-2);font-size:12px}
-  .caveat b{color:var(--ink)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -280,14 +277,13 @@
   <h2 class="sec">結論 · 汰弱留強</h2>
   <div class="tiers" id="tiers"></div>
 
-  <h2 class="sec">五元素明細 · 點任一格看數據與理由(桌機可 hover)</h2>
+  <h2 class="sec">五元素明細 · 點任一格看數據與理由</h2>
   <div class="scroller">
     <div class="matrix" id="matrix"></div>
   </div>
 
   <footer>
-    <div class="caveat" id="caveat"><b>唯一未補齊:</b>「主力是哪個分點」需券商分點進出(<span class="mono">TaiwanStockTradingDailyReport</span>,Sponsor 等級,目前端點逾時未開通)。小型股外資持股單日有保管行重分類雜訊,本表看淨趨勢並與買賣超交叉驗證。</div>
-    <div class="fn" style="margin-top:14px">
+    <div class="fn">
       <div><b>指標定義</b> · 相對強弱 rs20 = 20日報酬 − 族群中位;抗跌 = 族群下跌日的平均相對表現(20日);逆勢買超 = 族群下跌日外資淨買 20 日累計 ÷ 股本;佈局廣度 = 族群內外資 20 日增持檔數比例;量比 = 當日周轉率 ÷ 自身 60 日中位;散戶水位 = 融資餘額 ÷ 發行股數。</div>
       <div><b>方法</b> · 族群內排名制:各元素取族群內分位數(−2..+2)加權合成,綜合分 3 日平滑、tier 連 2 日確認。價格類指標用還原股價(除權息/分割已本地調整)。個股層選強弱、族群層找佈局。本頁為量化籌碼判讀,非投資建議。</div>
     </div>
