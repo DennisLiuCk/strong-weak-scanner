@@ -89,8 +89,8 @@
   .gf:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
   .gf .ct{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;
     font-family:"Cascadia Mono",Consolas,ui-monospace,monospace}
-  .gf[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:700}
-  .gf[aria-selected="true"] .ct{color:var(--surface);opacity:.65}
+  .gf[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:700}
+  .gf[aria-pressed="true"] .ct{color:var(--surface);opacity:.65}
 
   /* ---- legend ---- */
   .legend{margin:22px 0 10px;background:var(--surface);border:1px solid var(--hairline);
@@ -314,7 +314,7 @@
 
   <div id="histNote" role="note" hidden></div>
 
-  <div class="gfilter" id="gfilter" role="tablist" aria-label="檢視族群"></div>
+  <div class="gfilter" id="gfilter" role="group" aria-label="檢視族群"></div>
 
   <div class="legend">
     <div>
@@ -795,7 +795,7 @@
     });
   })();
 
-  // ---------- group filter ----------
+  // ---------- group filter(可複選:全部 = 無篩選;點個別族群鍵可疊加/移除) ----------
   (function(){
     var bar = document.getElementById("gfilter");
     if(!bar) return;
@@ -808,78 +808,131 @@
     var groupsHost = document.getElementById("groups");
     function nmOf(g){ return (GRP[g] && GRP[g].nm) || g; }
 
-    // 動態標題:分頁 <title> 與頁面 <h1> 隨選中族群改變(全部→注入預設;單族群→「族群名 · 尾綴」),
-    // 讓分享的 #g=xxx 連結分頁即點題。尾綴由 build 注入,與 PAGE_TITLE / H1_TITLE 同源。
+    // 篩選狀態:mode "all" = 不篩選(預設);"some" = 只顯示 sel 內的族群。
+    // 互動:第一次點某族群鍵 → 從「全部」切成只顯示該族群(與舊版單選行為相同);
+    // 之後再點其他族群鍵 → 疊加/移除;點掉最後一個或點「全部」→ 回到不篩選。
+    var mode = "all", sel = new Set();
+    function visible(g){ return mode === "all" || sel.has(g); }
+    function selectedList(){ return order.filter(function(g){ return sel.has(g); }); }
+
+    // 動態標題:分頁 <title> 與頁面 <h1> 隨選中族群改變(全部→注入預設;選 1~3 個→列名稱;
+    // 更多→「N 個族群」),讓分享的 #g=xxx 連結分頁即點題。尾綴由 build 注入,與 PAGE_TITLE / H1_TITLE 同源。
     var h1El = document.querySelector("h1");
     var TAIL = __TITLE_TAIL_JSON__;
     var BASE_TITLE = document.title;                      // <title> 預設(全部族群)
     var BASE_H1 = h1El ? h1El.textContent : BASE_TITLE;   // <h1> 預設(全部族群)
-    function setTitle(g){
-      document.title = g === "all" ? BASE_TITLE : nmOf(g) + " · " + TAIL;
-      if(h1El) h1El.textContent = g === "all" ? BASE_H1 : nmOf(g) + " · " + TAIL;
+    function labelOf(list, sep){
+      return list.length <= 3 ? list.map(nmOf).join(sep) : list.length + " 個族群";
+    }
+    function setTitle(){
+      if(mode === "all"){
+        document.title = BASE_TITLE;
+        if(h1El) h1El.textContent = BASE_H1;
+        return;
+      }
+      var label = labelOf(selectedList(), "、") + " · " + TAIL;
+      document.title = label;
+      if(h1El) h1El.textContent = label;
     }
 
-    function setScope(g){
+    function setScope(){
       if(!scope) return;
       scope.textContent = "範圍 ";
       var b = document.createElement("b");
-      b.textContent = g === "all" ? (present.length + " 族群 · " + total + " 檔")
-                                  : (nmOf(g) + " · " + counts[g] + " 檔");
+      if(mode === "all"){
+        b.textContent = present.length + " 族群 · " + total + " 檔";
+      } else {
+        var list = selectedList();
+        var n = list.reduce(function(a, g){ return a + counts[g]; }, 0);
+        b.textContent = labelOf(list, "/") + " · " + n + " 檔";
+      }
       scope.appendChild(b);
     }
     function mkBtn(g, label, n){
       var b = document.createElement("button"); b.className = "gf"; b.type = "button";
-      b.setAttribute("role","tab"); b.dataset.g = g; b.setAttribute("aria-selected","false");
+      b.dataset.g = g; b.setAttribute("aria-pressed","false");
       var t = document.createElement("span"); t.textContent = label; b.appendChild(t);
       var c = document.createElement("span"); c.className = "ct"; c.textContent = n; b.appendChild(c);
-      b.addEventListener("click", function(){ setGroup(g); });
+      b.addEventListener("click", function(){ g === "all" ? selectAll() : toggleGroup(g); });
       return b;
     }
-    var lb = document.createElement("span"); lb.className = "lb"; lb.textContent = "檢視族群"; bar.appendChild(lb);
+    var lb = document.createElement("span"); lb.className = "lb"; lb.textContent = "檢視族群(可複選)"; bar.appendChild(lb);
     bar.appendChild(mkBtn("all","全部",total));
     present.forEach(function(g){ bar.appendChild(mkBtn(g, nmOf(g), counts[g])); });
 
-    function setGroup(g, skipStore){
-      if(g !== "all" && !counts[g]) g = "all";
-      var all = g === "all";
+    function apply(skipStore){
       Array.prototype.forEach.call(bar.querySelectorAll(".gf"), function(b){
-        b.setAttribute("aria-selected", b.dataset.g === g ? "true" : "false");
+        var g = b.dataset.g;
+        var on = g === "all" ? mode === "all" : (mode === "some" && sel.has(g));
+        b.setAttribute("aria-pressed", on ? "true" : "false");
       });
       // 五元素明細:族群標題 + 個股列
       Array.prototype.forEach.call(matrix.querySelectorAll("[data-g]"), function(n){
-        n.style.display = (all || n.dataset.g === g) ? "" : "none";
+        n.style.display = visible(n.dataset.g) ? "" : "none";
       });
       // 族群雷達:只留選中族群的卡片
       if(groupsHost){
         Array.prototype.forEach.call(groupsHost.querySelectorAll("[data-g]"), function(n){
-          n.style.display = (all || n.dataset.g === g) ? "" : "none";
+          n.style.display = visible(n.dataset.g) ? "" : "none";
         });
-        groupsHost.style.gridTemplateColumns = all ? "" : "minmax(0,300px)";
+        groupsHost.style.gridTemplateColumns = mode === "all" ? "" : "minmax(0,300px)";
       }
       // 結論:過濾每張 tier 卡的 picks,整卡無標的則隱藏
       Array.prototype.forEach.call(tiers.children, function(card){
         var picks = card.querySelectorAll(".pick"), shown = 0;
         Array.prototype.forEach.call(picks, function(p){
-          var show = all || p.dataset.g === g; p.style.display = show ? "" : "none"; if(show) shown++;
+          var show = visible(p.dataset.g); p.style.display = show ? "" : "none"; if(show) shown++;
         });
         card.style.display = (picks.length && shown === 0) ? "none" : "";
       });
-      setScope(g);
-      setTitle(g);
+      setScope();
+      setTitle();
       hideTip();
       if(!skipStore){
-        try{ localStorage.setItem("sc_group", g); }catch(e){}
-        try{ history.replaceState(null, "", all ? location.pathname + location.search : "#g=" + g); }catch(e){}
+        var v = mode === "all" ? "all" : selectedList().join(",");
+        try{ localStorage.setItem("sc_group", v); }catch(e){}
+        try{ history.replaceState(null, "", mode === "all" ? location.pathname + location.search : "#g=" + v); }catch(e){}
       }
     }
 
-    function fromHash(){ var m = (location.hash || "").match(/g=([a-z]+)/); return (m && counts[m[1]]) ? m[1] : null; }
+    function selectAll(){ mode = "all"; sel = new Set(); apply(); }
+    function toggleGroup(g){
+      if(!counts[g]) return;
+      if(mode === "all"){
+        mode = "some"; sel = new Set([g]);
+      } else if(sel.has(g)){
+        sel.delete(g);
+        if(sel.size === 0){ mode = "all"; sel = new Set(); }
+      } else {
+        sel.add(g);
+        if(sel.size === present.length){ mode = "all"; sel = new Set(); }   // 全選=等同不篩選
+      }
+      apply();
+    }
+
+    // #g=passive,memory,material 這種逗號分隔清單;無效族群自動濾掉
+    function fromHash(){
+      var m = (location.hash || "").match(/g=([a-z,]+)/);
+      if(!m) return null;
+      var list = m[1].split(",").filter(function(g){ return counts[g]; });
+      return list.length ? list : null;
+    }
+    function applyList(list){
+      if(!list || !list.length || list.length === present.length){ mode = "all"; sel = new Set(); }
+      else { mode = "some"; sel = new Set(list); }
+    }
     // 初始選取:URL hash > localStorage > 全部
-    var init = fromHash();
-    if(!init){ try{ var s = localStorage.getItem("sc_group"); if(s === "all" || counts[s]) init = s; }catch(e){} }
-    setGroup(init || "all", true);
+    var initList = fromHash();
+    if(!initList){
+      try{
+        var s = localStorage.getItem("sc_group");
+        if(s && s !== "all"){ initList = s.split(",").filter(function(g){ return counts[g]; }); }
+      }catch(e){}
+    }
+    applyList(initList);
+    apply(true);
     // 分享連結貼進同分頁 / 瀏覽器前進後退 → 即時套用(hash 為權威,不再回寫)
-    window.addEventListener("hashchange", function(){ setGroup(fromHash() || "all", true); });
+    window.addEventListener("hashchange", function(){ applyList(fromHash()); apply(true); });
   })();
 
   // ---------- theme toggle ----------
