@@ -875,7 +875,8 @@
         Array.prototype.forEach.call(groupsHost.querySelectorAll("[data-g]"), function(n){
           n.style.display = visible(n.dataset.g) ? "" : "none";
         });
-        groupsHost.style.gridTemplateColumns = mode === "all" ? "" : "minmax(0,300px)";
+        // 篩選時卡片改窄版(不拉滿整排);選多個族群要並排,故用 auto-fill 而非單一固定欄
+        groupsHost.style.gridTemplateColumns = mode === "all" ? "" : "repeat(auto-fill,minmax(300px,1fr))";
       }
       // 結論:過濾每張 tier 卡的 picks,整卡無標的則隱藏
       Array.prototype.forEach.call(tiers.children, function(card){
