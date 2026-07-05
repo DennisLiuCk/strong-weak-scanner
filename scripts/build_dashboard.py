@@ -72,12 +72,18 @@ SALIENT = {("price", 2): "族群領漲", ("price", -2): "族群落後", ("foreig
            ("dip", 2): "修正日吃貨", ("dip", -2): "修正日遭倒", ("resil", 2): "修正抗跌", ("resil", -2): "修正領跌"}
 
 
-def build_cells(sc, m):
-    """每格:[分數, 格值, 數據rows(標籤/數值對), 判讀, 過熱旗標?]——rows 供 tooltip 表格化顯示。"""
+def build_cells(sc, m, mkt20=None):
+    """每格:[分數, 格值, 數據rows(標籤/數值對), 判讀, 過熱旗標?]——rows 供 tooltip 表格化顯示。
+    mkt20 = 大盤(報酬指數)20日報酬,全 universe 共用,僅供①價 tooltip 當基準線。"""
     cells = []
     # ① 價(族群內相對強弱;距高做輔助資訊)
+    # 族群中位由定義還原(rs20 = ret20 − 族群中位),不必回 db 重算
     rs = m["rs20"]
+    gmed = (m["ret20"] - rs) if (m["ret20"] is not None and rs is not None) else None
     rows = [["20日報酬 − 族群中位", pct(rs, True)],
+            ["└ 個股20日還原報酬", pct(m["ret20"], True)],
+            ["└ 族群中位20日報酬", pct(gmed, True)],
+            ["大盤20日(報酬指數,參考)", pct(mkt20, True)],
             ["距60日高(還原價)", pct(m["dist_hi60"])],
             ["修正日抗跌(20日)", f"{pct(m['down_rs20'], True)}(抗{sc['s_resil']:+d})"],
             ["前一日漲跌", pct(m["ret1"], True)]]
@@ -193,8 +199,12 @@ def main():
         # 指數資料可能落後個股一日 → 取 ≤last 的最近一筆(顯示時標註日期)
         mk = con.execute("""SELECT * FROM market_daily WHERE date<=? AND dd20 IS NOT NULL
                             ORDER BY date DESC LIMIT 1""", (last,)).fetchone()
+        # 大盤 20 日報酬(含息報酬指數):①價 tooltip 的基準線,與個股 ret20 同窗口
+        mkrows = con.execute("""SELECT taiex FROM market_daily WHERE taiex IS NOT NULL
+                                AND date<=? ORDER BY date""", (last,)).fetchall()
+        mkt20 = (mkrows[-1]["taiex"] / mkrows[-21]["taiex"] - 1) if len(mkrows) >= 21 else None
     except sqlite3.OperationalError:
-        grows, mk = [], None
+        grows, mk, mkt20 = [], None, None
     con.close()
 
     dips = [(x["med_dip"], x["grp"]) for x in grows if x["med_dip"] is not None]
@@ -222,7 +232,7 @@ def main():
         vt, tier, vsub, vr, warn, vrows = verdict(r)
         obj = {"g": r["grp"], "id": r["stock_id"], "nm": r["name"], "biz": r["biz"] or "",
                "vt": vt, "vlabel": tier, "vsub": vsub, "vr": vr, "vrows": vrows,
-               "cells": build_cells(r, r)}
+               "cells": build_cells(r, r, mkt20)}
         if warn:
             obj["warn"] = True
         obj["_comp"] = r["composite_s"]
