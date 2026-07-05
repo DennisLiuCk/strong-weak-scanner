@@ -5,3 +5,6 @@ packtest,封測,OSAT / 先進封裝 / AI測試,3
 memory,記憶體,DRAM / Flash / 模組 / 控制IC,4
 ipdesign,矽智財,ASIC設計服務 / IP / 高速介面IC,5
 semiequip,半導體設備,先進封裝 / 測試介面 / 濕製程,6
+material,半導體材料,矽晶圓 / 電子化學品 / 耗材,7
+thermal,散熱,液冷 / 3D VC / 風扇,8
+pcb,PCB/CCL,AI伺服器板 / CCL / 載板,9

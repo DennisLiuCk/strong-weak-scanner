@@ -31,7 +31,7 @@ ARCHIVE = os.path.join(ROOT, "archive")
 # 刻意不列舉族群、不寫死元素數——加族群或改元素都不必動這裡。PAGE_TITLE(<title>,分頁/SEO/
 # 書籤)與 H1_TITLE(<h1>,頁面大標)是兩個獨立旋鈕,預設同字串,要各自演化改對應那行即可。
 TITLE_TAIL = "汰弱留強掃描"          # 品牌尾綴;各族群動態標題共用
-ALL_SCOPE  = "台股半導體族群"         # 「全部族群」時的範圍詞
+ALL_SCOPE  = "台股半導體與 AI 供應鏈"  # 「全部族群」時的範圍詞(2026-07-06 起含散熱/PCB,超出純半導體)
 PAGE_TITLE = ALL_SCOPE + " · " + TITLE_TAIL   # <title> 預設(全部族群)
 H1_TITLE   = ALL_SCOPE + " · " + TITLE_TAIL   # <h1> 預設(全部族群)
 
