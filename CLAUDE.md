@@ -17,7 +17,7 @@
 |---|---|
 | 盤後確認執行狀況、討論今日資料 | `DAILY_CHECK.md`;核心工具 `scripts/daily_brief.py`(唯讀) |
 | 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
-| 季度 universe 調整 | README「Universe 治理」+ `scripts/screen.py` |
+| 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
 
 ## 鐵律
 
@@ -38,6 +38,7 @@ fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token)→ tdcc_h
 fetch_daily.py   抓取(FinMind)→ 還原價(除權息/分割自算)→ 五元素+觀察欄 → 族群層聚合
 score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
+                 ⚠ 本地重跑會覆寫當日資料日的已凍結快照——commit 前 git checkout -- archive/
 validate.py      → reports/ 週報(§⑥=觀察因子 IC)
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
 ```

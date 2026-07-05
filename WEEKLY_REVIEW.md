@@ -2,7 +2,9 @@
 
 > 報告本身每週六 09:00 已由 Actions 自動產生並 commit(`reports/validate_<資料迄日>.md`)。
 > 本文件是「讀報告 → 判斷 → 行動」的標準程序。**判斷依據一律用報告的 OOS 欄**,
-> IS(2026-07-05 前)數字只做背景參考。
+> IS(2026-07-05 前)數字只做背景參考(且含記憶體族群回補的挑族群 look-ahead——
+> 記憶體加入日恰為 IS_CUTOFF,只看 OOS 即自動排除;之後新增族群若晚於 IS_CUTOFF,
+> 該族群數字要從**它自己的加入日**起算,見 README「Universe 治理·新增族群」)。
 
 ## 0. 前置檢查
 
@@ -29,7 +31,9 @@
 
 - **每次最多動 1~2 個旋鈕**;不同層(權重 vs tier 條件)不同週動。
 - 動旋鈕 = 改 `score.py` CONFIG(個股層)或 `fetch_daily.py` 頂部旋鈕(族群/大盤層)
-  → 本地重跑 `score.py` + `build_dashboard.py` 確認 → commit(訊息附依據數字)→ 記 `CHANGELOG.md`。
+  → 本地重跑 `score.py` + `build_dashboard.py` 確認(⚠ 會用新規則覆寫當日資料日的
+  archive 凍結快照,commit 前 `git checkout -- archive/` 還原)→ commit(訊息附
+  依據數字)→ 記 `CHANGELOG.md`。
 - **改了權重或 tier 條件後,必須把 `validate.py` 的 `IS_CUTOFF` 改成當天**——
   否則之前的 OOS 對新規則而言其實是 in-sample,會被重複當證據。
 - 絕不做:憑單週數據調整;用 IS 欄數字當調整依據;同週改權重又改 tier 定義。
