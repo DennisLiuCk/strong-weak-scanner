@@ -14,7 +14,9 @@ except Exception:
     pass
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from score import WEIGHTS   # 權重單一事實來源(score.py CONFIG),tooltip 顯示用
+# 個股層門檻單一事實來源(score.py CONFIG):權重 + 各元素 hint 引用的門檻,調旋鈕文字自動同步
+from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
+                   MARGIN_UTIL_HOT, MARGIN_UTIL_MID, DZ_FOREIGN, DZ_TRUST, STEALTH_OFF_HIGH)
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
 from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
 
@@ -82,12 +84,26 @@ def build_cells(sc, m, mkt20=None):
     # 族群中位由定義還原(rs20 = ret20 − 族群中位),不必回 db 重算
     rs = m["rs20"]
     gmed = (m["ret20"] - rs) if (m["ret20"] is not None and rs is not None) else None
-    rows = [["20日報酬 − 族群中位", pct(rs, True)],
+    rs_dyn = ("" if rs is None else
+              (";目前=贏過至少一半同業" if rs > 0 else ";目前=輸給一半以上同業" if rs < 0 else ""))
+    dist = m["dist_hi60"]
+    dist_dyn = ("" if dist is None else
+                (f";目前≤{STEALTH_OFF_HIGH*100:.0f}%=「價未動」(蓄勢條件之一)"
+                 if dist <= STEALTH_OFF_HIGH else ";目前=接近波段高"))
+    dr = m["down_rs20"]
+    dr_dyn = ("" if dr is None else
+              (";目前=修正日相對撐得住" if dr > 0 else ";目前=修正日跌得比同業重" if dr < 0 else ""))
+    rows = [["20日報酬 − 族群中位", pct(rs, True),
+             f"過去一個月跑贏同業多少——下面兩列相減;①價的分數就是此值的族群內排名{rs_dyn}"],
             ["└ 個股20日還原報酬", pct(m["ret20"], True)],
             ["└ 族群中位20日報酬", pct(gmed, True)],
-            ["大盤20日(報酬指數,參考)", pct(mkt20, True)],
-            ["距60日高(還原價)", pct(m["dist_hi60"])],
-            ["修正日抗跌(20日)", f"{pct(m['down_rs20'], True)}(抗{sc['s_resil']:+d})"],
+            ["大盤20日(報酬指數,參考)", pct(mkt20, True),
+             "全市場同窗口基準,不計分。個股與族群中位都贏大盤=強族群裡的強;只贏族群中位卻輸大盤=弱勢族群裡的相對強"],
+            ["距60日高(還原價)", pct(dist),
+             f"現價距近60日高點回落多少,0%=創新高附近{dist_dyn}"],
+            ["修正日抗跌(20日)", f"{pct(dr, True)}(抗{sc['s_resil']:+d})",
+             "族群下跌日平均比同業多漲(少跌)多少——大家一起跌時撐得住的才是真強"
+             f"(獨立元素「抗」,權重{WEIGHTS['resil']},也是升蓄勢的品質門檻){dr_dyn}"],
             ["前一日漲跌", pct(m["ret1"], True)]]
     cells.append([sc["s_price"], pct(rs, True) if rs is not None else "-", rows, R_PRICE[sc["s_price"]]])
     # ② 量(量比 = 當日周轉率 / 自身60日中位)
@@ -103,32 +119,63 @@ def build_cells(sc, m, mkt20=None):
         rv, warn = "量縮、人氣不足", 0
     else:
         rv, warn = "量能中等", 0
-    rows = [["量比(vs 自身60日中位)", f"{vr:.1f}×" if vr is not None else "樣本不足"],
-            ["當日周轉率", pctp(t)]]
+    vr_dyn = ("" if vr is None else
+              (f";目前≥{VOLR_OVERHEAT:.0f}×=爆量過熱⚠" if vr >= VOLR_OVERHEAT else
+               ";目前=健康活絡" if VOLR_ACTIVE[0] <= vr <= VOLR_ACTIVE[1] else
+               f";目前<{VOLR_DRY}×=量縮無人氣" if vr < VOLR_DRY else ""))
+    rows = [["量比(vs 自身60日中位)", f"{vr:.1f}×" if vr is not None else "樣本不足",
+             "當日周轉率÷自己過去60日的常態(中位)——跟自己比,大型股不吃虧;"
+             f"{VOLR_ACTIVE[0]}~{VOLR_ACTIVE[1]}×=健康活絡{vr_dyn}"],
+            ["當日周轉率", pctp(t),
+             f"成交股數佔發行股數%;≥{VOL_OVERHEAT:.0f}%=當沖過熱⚠(壓評級但不改分數)"]]
     c = [sc["s_vol"], f"{vr:.1f}×" if vr is not None else "-", rows, rv]
     if warn:
         c.append(1)
     cells.append(c)
     # ③ 外資
     fc = m["fpct_chg20"]
-    rows = [["外資持股", f"{m['foreign_pct']:.1f}%" if m["foreign_pct"] is not None else "-"],
-            ["20日持股變化", f"{fc:+.2f}pp" if fc is not None else "-"],
-            ["修正日淨買(20日)", f"{m['dipbuy20']:+.2f}%股本(逆{sc['s_dip']:+d})"
-             if m["dipbuy20"] is not None else "-"]]
+    fc_dyn = ("" if fc is None else
+              (";目前=增持中" if fc > 0 else ";目前=減持中" if fc < 0 else ""))
+    dp = m["dipbuy20"]
+    dp_dyn = ("" if dp is None else
+              (";目前=下跌有人接(佈局特徵)" if dp > 0 else ";目前=下跌日被倒貨" if dp < 0 else ""))
+    rows = [["外資持股", f"{m['foreign_pct']:.1f}%" if m["foreign_pct"] is not None else "-",
+             "外資目前持有比例(水位);看下列「變化」比看水位重要"],
+            ["20日持股變化", f"{fc:+.2f}pp" if fc is not None else "-",
+             f"近一個月外資增減持了多少百分點——③外資的分數即此值的族群內排名"
+             f"(全族群都<±{DZ_FOREIGN}pp 視為無訊號給0){fc_dyn}"],
+            ["修正日淨買(20日)", f"{dp:+.2f}%股本(逆{sc['s_dip']:+d})" if dp is not None else "-",
+             "族群下跌日外資買賣的20日累計佔股本%——回檔時有沒有人默默接貨"
+             f"(「逆」為其排名,只用於蓄勢評級、不計分){dp_dyn}"]]
     cells.append([sc["s_foreign"], f"{fc:+.1f}pp" if fc is not None else "-", rows,
                   R_FOREIGN[sc["s_foreign"]]])
     # ④ 投信
     t5 = m["trust5"] or 0
     tp = m["trust5_pct"]
-    rows = [["近5日淨買賣", f"{t5:+,}張"],
-            ["佔股本", f"{tp:+.3f}%" if tp is not None else "-"]]
+    rows = [["近5日淨買賣", f"{t5:+,}張",
+             "投信=本土基金,買進後通常持續認養、不太當沖——正=認養中、負=調節中"],
+            ["佔股本", f"{tp:+.3f}%" if tp is not None else "-",
+             f"上值換算佔股本%——④投信的分數即此值的族群內排名(消除股本大小差;"
+             f"全族群都<±{DZ_TRUST}% 視為無訊號給0)"]]
     cells.append([sc["s_trust"], f"{t5:+,}張", rows, R_TRUST[sc["s_trust"]]])
     # ⑤ 融資券
     u = m["margin_util_pct"]
-    rows = [["散戶水位(融資/股本)", pctp(u)],
-            ["10日融資變化", pct(m["margin_chg10"], True)],
-            ["20日還原價報酬", pct(m["ret20"], True)],
-            ["券資比", f"{(m['short_margin_ratio'] or 0):.1f}%"]]
+    u_dyn = ("" if u is None else
+             (f";目前≥{MARGIN_UTIL_HOT:.0f}%=滿載⚠(分數封頂−1)" if u >= MARGIN_UTIL_HOT else
+              f";目前≥{MARGIN_UTIL_MID:.0f}%=偏高(分數封頂+1)" if u >= MARGIN_UTIL_MID else
+              ";目前=水位健康"))
+    mc = m["margin_chg10"]
+    mc_dyn = ("" if mc is None else
+              (";目前=散戶加碼中" if mc > 0 else ";目前=散戶退場中" if mc < 0 else ""))
+    rows = [["散戶水位(融資/股本)", pctp(u),
+             f"融資餘額佔股本%——散戶槓桿有多擁擠,越高賣壓越重{u_dyn}"],
+            ["10日融資變化", pct(mc, True),
+             f"散戶在追價還是退場;與下列價格方向交互給分:價漲+融資大減=洗清(好)、"
+             f"價跌+融資暴增=接刀(壞){mc_dyn}"],
+            ["20日還原價報酬", pct(m["ret20"], True),
+             "供上列交互判定的價格方向(與①價的原料同值)"],
+            ["券資比", f"{(m['short_margin_ratio'] or 0):.1f}%",
+             "融券餘額÷融資餘額;高=空方對作或軋空題材。參考欄位,未計分"]]
     c = [sc["s_margin"], pctp(u), rows, R_MARGIN[sc["s_margin"]]]
     if u is not None and u >= 9:
         c.append(1)
