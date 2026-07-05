@@ -36,6 +36,12 @@ jobs:
         with:
           python-version: "3.12"
 
+      # 必須排在 fetch_daily 之前:build_metrics(fetch_daily 內)讀 tdcc_holding 算觀察欄,
+      # 排後面會讓新快照晚一天才進 daily_metrics。TDCC opendata 只給最新一週(週六更新)、
+      # 失敗自動 exit 0 不擋管線;週一~五每天重抓同一快照 = 冪等 + 5 次保險。
+      - name: 抓取 TDCC 股權分散週快照(免 token)
+        run: python scripts/fetch_tdcc.py
+
       - name: 抓取五元素並重算 daily_metrics
         env:
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}

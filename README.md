@@ -35,7 +35,9 @@
 每交易日 22:00(台北,GitHub Actions:.github/workflows/daily-fetch.yml;
 排程時點依 FinMind 各 dataset 更新時間而定——最晚的持股/融資券 21:00 更新,
 對照表見 workflow 註解)
-  fetch_daily.py   FinMind 4 資料集 × 全 universe + 除權息/分割事件 + 報酬指數
+  fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token;僅供最新一週)
+                   → tdcc_holding(append-only;失敗自動略過不擋管線)
+  fetch_daily.py   FinMind 5 資料集 × 全 universe + 除權息/分割事件 + 報酬指數
                    → SQLite 原始表(append-only)
                    → price_adj 還原價(本地重算)
                    → daily_metrics 五元素衍生指標
@@ -59,6 +61,8 @@
 | inst | 外資/投信/自營淨買賣(股) | TaiwanStockInstitutionalInvestorsBuySell |
 | margin | 融資/融券餘額 | TaiwanStockMarginPurchaseShortSale |
 | holding | 外資持股比率、發行股數 | TaiwanStockShareholding |
+| sbl | 借券賣出餘額(股) | TaiwanDailyShortSaleBalances |
+| tdcc_holding | 集保股權分散(週頻,17 級距,universe+候選) | TDCC opendata(**非 FinMind**;僅供最新一週) |
 | dividend_result / split_event | 除權息、分割事件 | TaiwanStockDividendResult / TaiwanStockSplitPrice |
 | market | 加權報酬指數(含息) | TaiwanStockTotalReturnIndex |
 
@@ -67,7 +71,7 @@
 | 表 | 內容 |
 |---|---|
 | price_adj | 還原收盤價:除權息/分割以倒推法本地重算(事件日前歷史價 × 係數連乘,最新區段=原始價);減資 dataset 需付費未涵蓋,以「無事件 >15% 跳空」偵測示警兜底 |
-| daily_metrics | 五元素原始指標:ret1/ret20、dist_hi20/60、rs20、down_rs20、turnover_pct、vol_ratio60、foreign_pct、fpct_chg5/20、dipbuy20、trust5(_pct)、margin_bal/chg、margin_util_pct、券資比等 |
+| daily_metrics | 五元素原始指標:ret1/ret20、dist_hi20/60、rs20、down_rs20、turnover_pct、vol_ratio60、foreign_pct、fpct_chg5/20、dipbuy20、trust5(_pct)、margin_bal/chg、margin_util_pct、券資比等;**觀察欄(未計分)**:tdcc_big400/1000_pct·chg、tdcc_people_chg、sbl_pct/chg(TDCC pct 分母為集保庫存,非發行股本) |
 | daily_scores | 各元素分數、composite / composite_s(3 日平滑)、tier_raw / tier、warn、pending(蓄勢候補差哪些條件) |
 | group_metrics | 族群聚合:breadth_f、med_dist60、rel20、med_dip、breadth_t、state/note |
 | market_daily | dd20(報酬指數距 20 日高)、regime 旗標 |
@@ -77,7 +81,8 @@
 
 **防前視(lookahead)設計**:周轉率/散戶水位/投信佔股本用**當日**發行股數
 (forward-fill,不用最新股本回填歷史);dist/dd 視窗有最少樣本保護(新股冷啟動
-不會假新高);外資持股有申報遞延,回測一律只用「當日可得」資料。
+不會假新高);外資持股有申報遞延,回測一律只用「當日可得」資料;TDCC 週快照
+(週五結算、週六才公布)以 T−3 日曆日生效——當週快照最早次週一才進指標。
 
 ## 個股層評分(`scripts/score.py`,策略旋鈕集中在 CONFIG)
 
@@ -120,7 +125,8 @@
 
 - **週報**(每週六自動,`validate.py` → `reports/`):元素 IC(族群內/混池 ×
   IS/OOS × 修正/多頭 regime)、tier 前瞻超額與轉移事件、新舊制對照、蓄勢濾網
-  cohort、族群層命中率、市值公平性監測(同尺檢核)。
+  cohort、族群層命中率、市值公平性監測(同尺檢核)、觀察因子 IC(TDCC 大戶/
+  借券,未計分,等 OOS 裁決歸宿)。
 - **鐵律**:不憑 in-sample 或單日/單週數據調策略;一律走
   [WEEKLY_REVIEW.md](WEEKLY_REVIEW.md) 的 OOS 行動門檻,每次最多動 1~2 個旋鈕;
   改權重或 tier 條件,必須同步把 `validate.py` 的 `IS_CUTOFF` 改成當天。
@@ -151,5 +157,7 @@ Token 讀取順序:環境變數 `FINMIND_TOKEN` → 本機 `.mcp.json`(已被 `.
 ## 侷限與註記
 
 - 券商分點(真主力)需 FinMind Sponsor 等級,未開通——看得到法人別、看不到分點。
+- TDCC 股權分散 opendata 僅提供最新一週、歷史不可回補——自 2026-07-03 起累積,
+  缺週即永久洞(每日管線重抓同週快照 = 5 次保險);FinMind 的歷史版 dataset 需付費。
 - 小型股外資持股單日數字含保管行重分類雜訊:看 20 日趨勢並與買賣超交叉驗證。
 - 本專案為量化籌碼研究,**非投資建議**。

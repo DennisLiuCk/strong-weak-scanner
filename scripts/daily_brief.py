@@ -89,10 +89,17 @@ def main():
 
     # ── 6. 資料品質快檢 ──
     issues = []
-    for tbl in ("price", "inst", "margin", "holding"):
+    for tbl in ("price", "inst", "margin", "holding", "sbl"):
         n = con.execute(f"SELECT COUNT(*) FROM {tbl} WHERE date=?", (last,)).fetchone()[0]
         if n < len(uni):
             issues.append(f"{tbl} 最新日僅 {n}/{len(uni)} 列")
+    # TDCC 週快照鮮度:正常最大 age = 10 天(週一 22:00 前);>10 = 漏抓一週(不可回補,永久洞)
+    if con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='tdcc_holding'").fetchone():
+        td_last = con.execute("SELECT MAX(date) FROM tdcc_holding").fetchone()[0]
+        if td_last and (today - datetime.date.fromisoformat(td_last)).days > 10:
+            issues.append(f"tdcc_holding 最新快照 {td_last},疑漏抓一週(TDCC 不可回補)")
+    else:
+        issues.append("tdcc_holding 表不存在——fetch_tdcc 尚未跑過")
     miss_adj = con.execute("""SELECT COUNT(*) FROM price p JOIN universe u USING(stock_id)
                               LEFT JOIN price_adj a ON a.date=p.date AND a.stock_id=p.stock_id
                               WHERE p.date=? AND p.close IS NOT NULL AND a.close IS NULL""",

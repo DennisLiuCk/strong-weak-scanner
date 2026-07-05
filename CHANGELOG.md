@@ -2,6 +2,32 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## Phase 4a:觀察層資料源——TDCC 大戶 + 借券賣出餘額 — 2026-07-05
+
+**策略規則零變動**(不進評分/tier/儀表板;IS_CUTOFF 不動),純資料層 + 驗證層:
+
+- **TDCC 股權分散**(週頻):新增 `scripts/fetch_tdcc.py` 直抓 opendata(免 token)
+  → 新表 `tdcc_holding`(universe ∪ candidates,17 級距,append-only)。可行性實測
+  (2026-07-05):FinMind `TaiwanStockHoldingSharesPer` 免費層被 400 擋(需 Backer);
+  opendata 對 39 檔 universe **全覆蓋**(含 KY 股)但**僅供最新一週、不可回補**——
+  自 2026-07-03 起累積,每缺一週=永久洞,故排在每日管線最前(同週冪等重抓=5 次保險,
+  失敗 exit 0 不擋 FinMind 抓取)。
+- **借券賣出餘額**(日頻,免費層實測可用):`fetch_daily.py` DATASETS 第 5 個
+  dataset `TaiwanDailyShortSaleBalances` → 新表 `sbl`;歷史已回補 2026-03-01 起。
+  ⚠ `sbl_bal` 單位是**股**(`margin_bal` 才是張)。
+- **daily_metrics 新增 10 個觀察欄**:`tdcc_date`、`tdcc_big400_pct/chg`(級距 12~15)、
+  `tdcc_big1000_pct/chg`(級距 15)、`tdcc_people_chg`(級距 17 人數週變化)、
+  `sbl_pct/chg5/chg10/chg20`。防前視:TDCC 快照以 **T−3 日曆日生效**(週五結算、
+  週六公布 → 次週一才進指標,旋鈕 `TDCC_LAG_DAYS`);pct 分母為集保庫存(非發行股本)。
+- **validate.py 新增 §⑥ 觀察因子**:四因子族群內 IC(TDCC 另出「快照生效日取樣版」——
+  週頻 forward-fill 使日頻 IC 的 n 虛胖 ~5 倍,8 週歸宿裁決以取樣版為準)+ 與
+  fpct_chg20 共線性(族群內/混池,|ρ|≥0.7 = 疑為 s_foreign 慢版)。
+  裁決條件記 `WEEKLY_REVIEW.md` §4-8:方向穩定且不共線 → 優先升格族群層訊號/
+  蓄勢條件(Phase 1 結論:籌碼在族群內無選股力),不進族群內排名。
+- 工具面:`fetch_daily.py --datasets` 過濾(單 dataset 回補,跳過事件段);
+  `daily_brief.py` 品質快檢加 sbl 覆蓋 + TDCC 鮮度(>10 天=漏抓警告)。
+- 範圍決策:當沖(TaiwanStockDayTrading)延後;分點(需 Sponsor)與自營商不做。
+
 ## 歷史報告快照(archive)— 2026-07-05
 
 網站可回看任一日報告。策略規則零變動,純呈現層:

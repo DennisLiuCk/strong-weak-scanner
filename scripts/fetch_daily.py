@@ -9,6 +9,8 @@ FinMind 五元素每日抓取 → SQLite 落地。
   uv run --no-project python scripts/fetch_daily.py
   # 回補歷史(建立滾動視窗需要的基期)
   uv run --no-project python scripts/fetch_daily.py --start 2026-03-01 --end 2026-07-03
+  # 只回補單一 dataset(新表補歷史用;跳過事件段、仍重算 metrics)
+  uv run --no-project python scripts/fetch_daily.py --datasets TaiwanDailyShortSaleBalances --start 2026-03-01
 
 Token 讀取順序:環境變數 FINMIND_TOKEN → 專案根目錄 .mcp.json。
 抓完會自動重算 daily_metrics(五元素衍生指標表)。
@@ -18,7 +20,7 @@ Token 讀取順序:環境變數 FINMIND_TOKEN → 專案根目錄 .mcp.json。
 減資參考價 dataset 需付費、未涵蓋——由「無事件大跳空」偵測示警兜底。
 price_adj 每次整表重建、冪等;原始 price 表維持 append-only 不動。
 """
-import argparse, csv, json, os, sqlite3, statistics, sys, time
+import argparse, bisect, csv, json, os, sqlite3, statistics, sys, time
 import urllib.parse, urllib.request
 from datetime import date, timedelta
 
@@ -29,7 +31,8 @@ GROUPS_CSV = os.path.join(ROOT, "config", "groups.csv")
 API = "https://api.finmindtrade.com/api/v4/data"
 
 DATASETS = ["TaiwanStockPrice", "TaiwanStockInstitutionalInvestorsBuySell",
-            "TaiwanStockMarginPurchaseShortSale", "TaiwanStockShareholding"]
+            "TaiwanStockMarginPurchaseShortSale", "TaiwanStockShareholding",
+            "TaiwanDailyShortSaleBalances"]
 
 # ── 族群/大盤層策略旋鈕(個股層旋鈕在 score.py CONFIG)──
 REGIME_DD      = -0.03   # 報酬指數距20日高 ≤ 此值 → 修正 regime
@@ -37,6 +40,7 @@ DD_MIN_OBS     = 10      # dd20 最少樣本數(冷啟動保護,同 dist_hi 慣�
 GRP_MIN_N      = 6       # 族群聚合最少有效檔數(避免 1 檔代表全族群)
 GS_OFF_HIGH    = -0.05   # 族群狀態:「價未回高」門檻(中位距60日高)
 GS_BREADTH_LOW = 0.4     # 族群狀態:「佈局廣度低」門檻
+TDCC_LAG_DAYS  = 3       # 資料層假設:TDCC 週快照(週五結算、週六公布)自次週一生效(T−3 日曆日)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS universe(stock_id TEXT PRIMARY KEY, name TEXT, grp TEXT, biz TEXT);
@@ -47,6 +51,8 @@ CREATE TABLE IF NOT EXISTS inst(date TEXT, stock_id TEXT, foreign_net INTEGER, t
 CREATE TABLE IF NOT EXISTS margin(date TEXT, stock_id TEXT, margin_bal INTEGER, short_bal INTEGER,
   PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS holding(date TEXT, stock_id TEXT, foreign_pct REAL, shares_issued INTEGER,
+  PRIMARY KEY(date,stock_id));
+CREATE TABLE IF NOT EXISTS sbl(date TEXT, stock_id TEXT, sbl_bal INTEGER,
   PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS dividend_result(date TEXT, stock_id TEXT, before_price REAL,
   reference_price REAL, PRIMARY KEY(date,stock_id));
@@ -142,8 +148,15 @@ def up_holding(con, data):
     con.executemany("INSERT OR REPLACE INTO holding VALUES(?,?,?,?)", rows)
     return len(rows)
 
+def up_sbl(con, data):
+    # 借券賣出餘額(觀察層)。⚠ 單位是「股」、不是張——margin_bal 才是張,算比例時勿照抄 ×1000
+    rows = [(d["date"], d["stock_id"], d.get("SBLShortSalesCurrentDayBalance")) for d in data]
+    con.executemany("INSERT OR REPLACE INTO sbl VALUES(?,?,?)", rows)
+    return len(rows)
+
 UPSERT = {"TaiwanStockPrice": up_price, "TaiwanStockInstitutionalInvestorsBuySell": up_inst,
-          "TaiwanStockMarginPurchaseShortSale": up_margin, "TaiwanStockShareholding": up_holding}
+          "TaiwanStockMarginPurchaseShortSale": up_margin, "TaiwanStockShareholding": up_holding,
+          "TaiwanDailyShortSaleBalances": up_sbl}
 
 def fetch_dividends(con, ids, token, start, end, sleep):
     """除權息結果 → dividend_result(upsert)。事件稀疏,整段視窗抓也便宜(payload 極小,
@@ -253,17 +266,37 @@ def build_metrics(con):
         margin_bal INTEGER, margin_util_pct REAL,
         margin_chg5 REAL, margin_chg10 REAL, margin_chg20 REAL,  -- ⑤散戶:水位 + 5/10/20 日融資變化
         short_margin_ratio REAL,               -- ⑤券資比(%)
+        tdcc_date TEXT, tdcc_big400_pct REAL, tdcc_big400_chg REAL,   -- 觀察:TDCC 大戶>400張(生效快照日/集保庫存%水位/對前週 pp)
+        tdcc_big1000_pct REAL, tdcc_big1000_chg REAL,                 -- 觀察:>1000張
+        tdcc_people_chg REAL,                                         -- 觀察:總股東人數週變化(比率;負=籌碼集中)
+        sbl_pct REAL, sbl_chg5 REAL, sbl_chg10 REAL, sbl_chg20 REAL,  -- 觀察:借券賣出餘額佔股本% + 5/10/20日變化(pp)
         PRIMARY KEY(date, stock_id))""")
+    # ── TDCC 週快照預載(觀察層;表可能不存在=fetch_tdcc 尚未跑過,全欄留 None)──
+    tdcc = {}
+    if con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='tdcc_holding'").fetchone():
+        acc = {}
+        for d, sid, lv, people, pct in con.execute(
+                "SELECT date, stock_id, level, people, pct FROM tdcc_holding ORDER BY date"):
+            w = acc.setdefault(sid, {}).setdefault(d, [0.0, 0.0, None])   # [big400, big1000, people]
+            if 12 <= lv <= 15:
+                w[0] += pct or 0.0
+            if lv == 15:
+                w[1] = pct or 0.0
+            if lv == 17:
+                w[2] = people   # 合計列人數=總股東數(含差異調整,誤差可忽略)
+        for sid, byd in acc.items():
+            tdcc[sid] = sorted((d, v[0], v[1], v[2]) for d, v in byd.items())
     # ── 第一趟:每檔基礎序列 ──
     S = {}
     for sid, grp in con.execute("SELECT stock_id, grp FROM universe").fetchall():
         rows = con.execute("""SELECT p.date, p.close, p.volume, h.foreign_pct, m.margin_bal, m.short_bal,
-                                     i.trust_net, i.foreign_net, h.shares_issued, pa.close
+                                     i.trust_net, i.foreign_net, h.shares_issued, pa.close, s.sbl_bal
                               FROM price p
                               LEFT JOIN holding h ON h.date=p.date AND h.stock_id=p.stock_id
                               LEFT JOIN margin  m ON m.date=p.date AND m.stock_id=p.stock_id
                               LEFT JOIN inst    i ON i.date=p.date AND i.stock_id=p.stock_id
                               LEFT JOIN price_adj pa ON pa.date=p.date AND pa.stock_id=p.stock_id
+                              LEFT JOIN sbl     s ON s.date=p.date AND s.stock_id=p.stock_id
                               WHERE p.stock_id=? ORDER BY p.date""", (sid,)).fetchall()
         n = len(rows)
         adj = [(r[9] if r[9] is not None else r[1]) for r in rows]  # 還原價;缺值退回原始價
@@ -298,6 +331,11 @@ def build_metrics(con):
         trust = [r[6] or 0 for r in rows]
         fnet = [r[7] or 0 for r in rows]
         gd = [gmed1.get((r[0], grp)) for r in rows]   # 族群當日中位報酬
+        # 觀察層序列:借券賣出餘額佔股本%(sbl_bal 單位=股,直接除股本;margin_bal 才是張)
+        sblp = [(rows[k][10] / sh[k] * 100) if (rows[k][10] is not None and sh[k]) else None
+                for k in range(len(rows))]
+        snaps = tdcc.get(sid, [])
+        snap_dates = [x[0] for x in snaps]
         out = []
         for k, r in enumerate(rows):
             d, close, vol, fp, mb, sb = r[0], r[1], r[2], r[3], r[4], r[5]
@@ -329,11 +367,27 @@ def build_metrics(con):
             mchg10 = (mb / mbal[k-10] - 1) if (mb is not None and k >= 10 and mbal[k-10]) else None
             mchg20 = (mb / mbal[k-20] - 1) if (mb is not None and k >= 20 and mbal[k-20]) else None
             smr = (sb / mb * 100) if (sb is not None and mb) else None
+            # 觀察層:TDCC 週快照以 T−TDCC_LAG_DAYS(日曆日)生效——週五結算、週六才公布,防前視
+            td = b4 = b4c = b10 = b10c = ppc = None
+            if snaps:
+                cut = (date.fromisoformat(d) - timedelta(days=TDCC_LAG_DAYS)).isoformat()
+                j = bisect.bisect_right(snap_dates, cut) - 1
+                if j >= 0:
+                    td, b4, b10, pp = snaps[j]
+                    if j >= 1:
+                        b4c = b4 - snaps[j-1][1]
+                        b10c = b10 - snaps[j-1][2]
+                        ppc = (pp / snaps[j-1][3] - 1) if (pp and snaps[j-1][3]) else None
+            sblv = sblp[k]
+            sblc5 = (sblv - sblp[k-5]) if (sblv is not None and k >= 5 and sblp[k-5] is not None) else None
+            sblc10 = (sblv - sblp[k-10]) if (sblv is not None and k >= 10 and sblp[k-10] is not None) else None
+            sblc20 = (sblv - sblp[k-20]) if (sblv is not None and k >= 20 and sblp[k-20] is not None) else None
             out.append((d, sid, close, ca, ret1, ret20, turnover, vratio,
                         (ca/hi20 - 1) if (hi20 and ca) else None, (ca/hi60 - 1) if (hi60 and ca) else None,
                         rs20, down_rs20, fp, fchg5, fchg20, dipbuy20, dipbuy20_t,
-                        trust5, trust5_pct, foreign5, mb, mutil, mchg5, mchg10, mchg20, smr))
-        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(" + ",".join("?" * 26) + ")", out)
+                        trust5, trust5_pct, foreign5, mb, mutil, mchg5, mchg10, mchg20, smr,
+                        td, b4, b4c, b10, b10c, ppc, sblv, sblc5, sblc10, sblc20))
+        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(" + ",".join("?" * 36) + ")", out)
     con.commit()
 
 def _gstate(breadth, dist, dip, rel):
@@ -418,6 +472,7 @@ def main():
     ap.add_argument("--days", type=int, default=15)
     ap.add_argument("--sleep", type=float, default=0.25, help="每次 API 間隔秒數(避免限流)")
     ap.add_argument("--metrics-only", action="store_true", help="不抓取,只用現有原始表重算 daily_metrics")
+    ap.add_argument("--datasets", help="逗號分隔,只抓指定 dataset(回補新表用);過濾時跳過除權息/分割/指數事件段")
     args = ap.parse_args()
 
     if args.metrics_only:
@@ -436,6 +491,10 @@ def main():
 
     end = args.end or date.today().isoformat()
     start = args.start or (date.today() - timedelta(days=args.days)).isoformat()
+    ds_list = [s.strip() for s in args.datasets.split(",") if s.strip()] if args.datasets else DATASETS
+    bad = [s for s in ds_list if s not in UPSERT]
+    if bad:
+        sys.exit(f"未知 dataset:{bad}(可用:{sorted(UPSERT)})")
 
     token = get_token()
     os.makedirs(os.path.dirname(DB), exist_ok=True)
@@ -443,11 +502,11 @@ def main():
     con.executescript(SCHEMA)
     ids = load_universe(con)
     con.commit()
-    print(f"抓取 {start} .. {end} · {len(ids)} 檔 · 4 datasets")
+    print(f"抓取 {start} .. {end} · {len(ids)} 檔 · {len(ds_list)} datasets")
     total = 0
     for i, sid in enumerate(ids, 1):
         got = 0
-        for ds in DATASETS:
+        for ds in ds_list:
             data = api_get(ds, sid, start, end, token)
             if data:
                 got += UPSERT[ds](con, data)
@@ -458,14 +517,17 @@ def main():
     con.execute('INSERT INTO fetch_log VALUES(datetime("now"),?,?,?)', (start, end, total))
     con.commit()
     # 事件視窗:price 的完整涵蓋範圍 .. 今天(與 --end 無關:回補舊價時才不會留事件缺口)
-    adj_start = con.execute("SELECT MIN(date) FROM price").fetchone()[0] or start
-    today = date.today().isoformat()
-    print(f"除權息/分割事件 {adj_start} .. {today} …")
-    nd = fetch_dividends(con, ids, token, adj_start, today, args.sleep)
-    ns = fetch_splits(con, ids, token, adj_start, today, args.sleep)
-    ni = fetch_index(con, token, adj_start, today, args.sleep)
+    if args.datasets:
+        print("(--datasets 過濾:跳過除權息/分割/指數事件抓取,仍重算 price_adj 與 metrics)")
+    else:
+        adj_start = con.execute("SELECT MIN(date) FROM price").fetchone()[0] or start
+        today = date.today().isoformat()
+        print(f"除權息/分割事件 {adj_start} .. {today} …")
+        nd = fetch_dividends(con, ids, token, adj_start, today, args.sleep)
+        ns = fetch_splits(con, ids, token, adj_start, today, args.sleep)
+        ni = fetch_index(con, token, adj_start, today, args.sleep)
+        print(f"dividend_result upsert {nd};split_event upsert {ns};TAIEX {ni}")
     build_price_adj(con)
-    print(f"dividend_result upsert {nd};split_event upsert {ns};TAIEX {ni};price_adj 已重算")
     print("重算 daily_metrics + 族群/大盤層 …")
     build_metrics(con)
     build_group_market(con)
