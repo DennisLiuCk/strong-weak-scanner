@@ -38,3 +38,15 @@ stock_id,name,group,biz
 6271,同欣電,packtest,陶瓷基板、CIS封裝
 8131,福懋科,packtest,記憶體封測(力成系)
 6451,訊芯-KY,packtest,SiP模組封測
+2408,南亞科,memory,DRAM(IDM)
+2344,華邦電,memory,DRAM、NOR Flash
+2337,旺宏,memory,NOR Flash、ROM
+8299,群聯,memory,NAND控制IC、模組
+3006,晶豪科,memory,利基型DRAM、SRAM設計
+5351,鈺創,memory,利基型DRAM設計
+6531,愛普*,memory,3D堆疊、高頻寬記憶體IC
+3260,威剛,memory,記憶體模組
+2451,創見,memory,記憶體模組
+4967,十銓,memory,記憶體模組(電競)
+8271,宇瞻,memory,記憶體模組
+5289,宜鼎,memory,工控記憶體模組
