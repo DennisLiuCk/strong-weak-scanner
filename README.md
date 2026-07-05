@@ -4,7 +4,8 @@
 的量化籌碼掃描系統:每個交易日自動抓取價量與籌碼資料,在**族群內**互相排名比強弱,
 產出評級與儀表板,並每週以樣本外資料驗證規則是否仍然有效。
 
-- **儀表板**:<https://dennisliuck.github.io/strong-weak-scanner/>(GitHub Pages,每日更新)
+- **儀表板**:<https://dennisliuck.github.io/strong-weak-scanner/>(GitHub Pages,每日更新;
+  頁首「資料至」日期選單可回看任一日的歷史報告快照)
 - **零第三方依賴**:純 Python 標準庫 + SQLite;資料庫與報告 commit 在 repo,全程可稽核
 - 本檔說明**現行系統**的設計與實作;版本沿革與各決策的實證依據見 [CHANGELOG.md](CHANGELOG.md)
 
@@ -39,6 +40,9 @@
                    → group_metrics / market_daily 族群層聚合 + 大盤 regime
   score.py         族群內排名評分 → composite → tier(daily_scores)
   build_dashboard.py → index.html(GitHub Pages)
+                     → archive/<資料日>.html + manifest.json(as-seen 歷史快照:
+                       凍結當日產出原樣,供日期選單回看;不事後從 db 重繪,
+                       因衍生表每日全量重建,重繪會被現行規則污染)
 每週六 09:00(weekly-validate.yml)
   validate.py      → reports/validate_*.md(元素 IC、tier 超額報酬、IS/OOS 對照)
 ```

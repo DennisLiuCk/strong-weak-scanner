@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 build_dashboard.py — 從 SQLite(daily_scores + daily_metrics)自動重生儀表板 HTML。
-吃 scripts/dashboard_template.html(CSS/JS 外殼),只注入資料 → dashboard.html。
+吃 scripts/dashboard_template.html(CSS/JS 外殼),只注入資料 → index.html,
+並把同一份頁面凍結成 archive/<資料日>.html(as-seen 歷史快照,供日期選單回看)。
 零第三方依賴。用法:  uv run --no-project python scripts/build_dashboard.py
 """
-import json, os, sqlite3, sys
+import json, os, re, sqlite3, sys
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -19,6 +20,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 TEMPLATE = os.path.join(ROOT, "scripts", "dashboard_template.html")
 OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages 乾淨網址
+# 歷史快照:每日 build 原樣存檔,回看的是「當天使用者看到的報告」而非以現行規則重算
+# (daily_scores 等衍生表每日全量重建,事後從 db 重繪會是 restated history,不可稽核)。
+ARCHIVE = os.path.join(ROOT, "archive")
 
 # 標題設定。TITLE_TAIL 是品牌尾綴、ALL_SCOPE 是「全部族群」時的範圍詞;篩選到單一族群時,
 # 前端會把標題換成「族群名 · TITLE_TAIL」(見 dashboard_template.html 的 group filter JS)。
@@ -259,9 +263,18 @@ def main():
     html = html.replace("__TITLE_TAIL_JSON__", json.dumps(TITLE_TAIL, ensure_ascii=False))
     html = html.replace("__SCOPE__", f"{len(GROUP_ORDER)} 族群 · {len(data)} 檔")
     html = html.replace("__MARKET_CHIP__", mchip)
+    html = html.replace("__DATE_ISO__", last)
     html = html.replace("__DATE__", date_str)
+    # 快照日期清單(含本次):注入頁內當 fallback,另寫 manifest 供已凍結的舊頁抓最新清單
+    os.makedirs(ARCHIVE, exist_ok=True)
+    dates = sorted({f[:10] for f in os.listdir(ARCHIVE)
+                    if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.html", f)} | {last})
+    html = html.replace("__DATES_JSON__", json.dumps(dates))
     open(OUT, "w", encoding="utf-8").write(html)
-    print(f"已重生 {OUT} — 資料日 {date_str},{len(data)} 檔,{len(tiers)} 個 tier")
+    open(os.path.join(ARCHIVE, f"{last}.html"), "w", encoding="utf-8").write(html)
+    open(os.path.join(ARCHIVE, "manifest.json"), "w", encoding="utf-8").write(json.dumps(dates))
+    print(f"已重生 {OUT} — 資料日 {date_str},{len(data)} 檔,{len(tiers)} 個 tier;"
+          f"快照 archive/{last}.html,manifest 共 {len(dates)} 日")
 
 
 if __name__ == "__main__":

@@ -35,7 +35,8 @@
 ```
 fetch_daily.py   抓取(FinMind)→ 還原價(除權息/分割自算)→ 五元素 → 族群層聚合
 score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
-build_dashboard.py → index.html(GitHub Pages)     validate.py → reports/ 週報
+build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
+validate.py      → reports/ 週報
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
 ```
 

@@ -66,6 +66,12 @@
   .chip{font-size:11.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--hairline);
     border-radius:100px;padding:3px 10px;white-space:nowrap}
   .chip b{color:var(--ink);font-weight:700}
+  #dateSel{font-family:inherit;font-size:inherit;font-weight:700;color:var(--ink);
+    background:transparent;border:none;padding:0;cursor:pointer}
+  #dateSel:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+  #histNote{margin:14px 0 0;padding:9px 14px;font-size:13px;color:var(--ink);
+    background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:8px}
+  #histNote a{color:var(--ink);font-weight:700;text-underline-offset:2px}
   .toggle{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;cursor:pointer;
     background:var(--surface);border:1px solid var(--hairline);color:var(--ink-2);
     border-radius:100px;padding:7px 13px;font-size:12.5px;font-family:inherit}
@@ -287,7 +293,7 @@
       <div class="meta">
         <span class="chip">__MARKET_CHIP__</span>
         <span class="chip" id="scopeChip">範圍 <b>__SCOPE__</b></span>
-        <span class="chip">資料至 <b>__DATE__</b>(還原股價)</span>
+        <span class="chip">資料至 <select id="dateSel" aria-label="切換報告日期"><option value="__DATE_ISO__">__DATE__</option></select>(還原股價)</span>
         <span class="chip">來源 <b>FinMind</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
       </div>
@@ -296,6 +302,8 @@
       <span id="themeIcon">◐</span><span id="themeTxt">主題</span>
     </button>
   </header>
+
+  <div id="histNote" role="note" hidden></div>
 
   <div class="gfilter" id="gfilter" role="tablist" aria-label="檢視族群"></div>
 
@@ -853,6 +861,49 @@
     cur = cur==="auto" ? (sysDark()?"light":"dark") : (cur==="dark"?"light":"dark");
     apply(cur); try{ localStorage.setItem("sc_theme",cur); }catch(e){}
   });
+
+  // ---------- 歷史報告切換 ----------
+  // 每日 build 把當日頁面原樣凍結成 archive/<date>.html;切日期=換頁,不重繪資料——
+  // 歷史頁是當天產出的 as-seen 快照,非以現行規則事後重算(稽核語義)。
+  (function(){
+    var sel = document.getElementById("dateSel"), note = document.getElementById("histNote");
+    if(!sel) return;
+    var PAGE_DATE = "__DATE_ISO__";
+    var inArchive = /\/archive\/[^\/]*$/.test(location.pathname);
+    var base = inArchive ? "" : "archive/";
+    function fmt(iso){ var p = iso.split("-"); return p[0] + "/" + (+p[1]) + "/" + (+p[2]); }
+    function render(dates){
+      dates = dates.slice().sort().reverse();   // 最新在前
+      sel.innerHTML = "";
+      for(var i = 0; i < dates.length; i++){
+        var o = document.createElement("option");
+        o.value = dates[i];
+        o.textContent = fmt(dates[i]) + (i === 0 ? "(最新)" : "");
+        if(dates[i] === PAGE_DATE) o.selected = true;
+        sel.appendChild(o);
+      }
+      if(inArchive && note){
+        note.hidden = false;
+        note.innerHTML = (dates[0] > PAGE_DATE)
+          ? "這是 <b>" + fmt(PAGE_DATE) + "</b> 的歷史報告快照(最新資料日 " + fmt(dates[0]) + ")。<a href=\"../index.html\">回到最新報告 →</a>"
+          : "這是 <b>" + fmt(PAGE_DATE) + "</b> 的報告快照。<a href=\"../index.html\">回到首頁 →</a>";
+      }
+    }
+    render(__DATES_JSON__);
+    // 快照頁內嵌的日期清單在 build 當下凍結;上線後改抓 manifest 補上之後新增的日期
+    if(location.protocol !== "file:"){
+      fetch(base + "manifest.json").then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){ if(d && d.length) render(d); })
+        .catch(function(){});
+    }
+    sel.addEventListener("change", function(){
+      var d = sel.value;
+      if(d === PAGE_DATE) return;
+      var latest = sel.options.length ? sel.options[0].value : d;   // 最新一律回 index(權威最新頁)
+      location.href = (d === latest) ? (inArchive ? "../index.html" : "index.html")
+                                     : base + d + ".html";
+    });
+  })();
 
   window.addEventListener("scroll", hideTip, {passive:true});
   window.addEventListener("resize", hideTip);
