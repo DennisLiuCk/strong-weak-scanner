@@ -177,16 +177,20 @@ def verdict(sc):
 STATE_COL = {"蓄勢·被佈局": "var(--warn-line)", "發動·領漲": "var(--strong)",
              "籌碼退潮": "var(--weak)"}
 
-# 族群卡 tooltip 教學文字(門檻值 import 自 fetch_daily,改旋鈕自動同步)
+# 族群卡 tooltip 教學文字(門檻值 import 自 fetch_daily,改旋鈕自動同步)。
+# 各指標的定義寫在每列數據自己的 hint(見 groups 組裝),這裡只留狀態判定規則。
 GROUP_HOW = (
-    f"族群狀態每日由聚合指標判定(規則在資料層,非儀表板):蓄勢·被佈局=修正日中位淨買>0 且 "
-    f"中位距60日高≤{GS_OFF_HIGH*100:+.0f}%(下跌時有人接貨、價還沒回到高點——佈局特徵);"
+    f"族群狀態每日由上列指標判定(規則在資料層,非儀表板):蓄勢·被佈局=修正日中位淨買>0 且 "
+    f"中位距60日高≤{GS_OFF_HIGH*100:+.0f}%(下跌有人接、價未回高——佈局特徵);"
     f"發動·領漲=20日動能贏全體 且 價近波段高;籌碼退潮=修正日遭調節 且 佈局廣度≤"
-    f"{GS_BREADTH_LOW*100:.0f}%;其餘=中性觀察。「修正日中位淨買」=族群下跌日外資淨買20日累計"
-    f"佔股本%的族群中位數——選族群的主訊號(樣本外驗證中,見週報);「外資佈局廣度」=20日外資"
-    f"增持的成員比例;「20日動能 vs 全體」=族群中位20日報酬 − 全部掃描個股中位。"
-    f"↗/↘/→ = 與 5 個交易日前相比的方向。")
+    f"{GS_BREADTH_LOW*100:.0f}%;其餘=中性觀察。修正日中位淨買為選族群主訊號(樣本外驗證中,"
+    f"見週報)。↗/↘/→ = 與 5 個交易日前相比的方向。")
 GROUP_SRC = "個股五元素於族群層聚合(等權中位數/廣度);原始資料 FinMind"
+
+
+def _dir_txt(arrow):
+    """箭頭 → 白話(hint 用);無箭頭回空字串。"""
+    return {" ↗": ",且比5日前改善", " ↘": ",且比5日前惡化", " →": ",與5日前持平"}.get(arrow, "")
 
 
 def _streak(series):
@@ -251,6 +255,12 @@ def main():
     gseries = {}
     for x in ghist:
         gseries.setdefault(x["grp"], []).append(x)
+    # 廣度的分子/分母(與 fetch_daily 口徑一致:分母=當日有值的成員數)——tooltip 顯示 x/N 檔
+    bcnt = {r["grp"]: r for r in con.execute("""SELECT u.grp,
+            SUM(CASE WHEN m.fpct_chg20>0 THEN 1 ELSE 0 END) f_pos, COUNT(m.fpct_chg20) f_n,
+            SUM(CASE WHEN m.trust5_pct>0 THEN 1 ELSE 0 END) t_pos, COUNT(m.trust5_pct) t_n
+            FROM daily_metrics m JOIN universe u USING(stock_id)
+            WHERE m.date=? GROUP BY u.grp""", (last,))}
     con.close()
 
     dips = [(x["med_dip"], x["grp"]) for x in grows if x["med_dip"] is not None]
@@ -265,13 +275,44 @@ def main():
         n, since = _streak(ser)
         a_dip = _arrow(ser, "med_dip", 0.01)     # %股本,顯示 2 位小數 → 死區 0.01
         a_rel = _arrow(ser, "rel20", 0.005)      # 比率,顯示 0.1% 一位 → 死區 0.5pp
+        bc = bcnt.get(g)
+        # stats 每列 = [標籤, 數值, 白話解讀];卡片只畫前兩欄,tooltip 三欄全顯示。
+        # 解讀句由「當下數值」生成(方向、對照門檻),不是通用定義——這是看得懂的關鍵。
+        dip = r["med_dip"]
+        dip_dyn = ("" if dip is None else
+                   (";目前=修正時有人承接(佈局特徵)" if dip > 0 else
+                    ";目前=下跌日被調節(資金撤出)" if dip < 0 else ";目前≈中性"))
+        rel = r["rel20"]
+        rel_dyn = ("" if rel is None else
+                   (";目前=跑贏其他族群" if rel > 0 else ";目前=落後其他族群" if rel < 0 else ""))
+        dist = r["med_dist60"]
+        dist_dyn = ("" if dist is None else
+                    (f";目前≤{GS_OFF_HIGH*100:.0f}%=「價未回高」(蓄勢的前提)" if dist <= GS_OFF_HIGH
+                     else ";目前接近波段高"))
+        bf = r["breadth_f"]
+        bf_dyn = ("" if bf is None else
+                  (f";目前≤{GS_BREADTH_LOW*100:.0f}%=廣度低(個案而非族群現象)" if bf <= GS_BREADTH_LOW
+                   else ";過半成員被增持=族群現象" if bf > 0.5 else ""))
         gobj = {"g": g, "nm": GROUP_NM.get(g, g), "state": r["state"],
                 "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note, "stats": [
-            ["修正日中位淨買", f"{r['med_dip']:+.2f}%股本{a_dip}" if r["med_dip"] is not None else "-"],
-            ["外資佈局廣度", f"{r['breadth_f']*100:.0f}%" if r["breadth_f"] is not None else "-"],
-            ["20日動能 vs 全體", f"{pct(r['rel20'], True)}{a_rel}" if r["rel20"] is not None else "-"],
-            ["中位距60日高", pct(r["med_dist60"]) if r["med_dist60"] is not None else "-"],
-            ["投信買超廣度", f"{r['breadth_t']*100:.0f}%" if r["breadth_t"] is not None else "-"],
+            ["修正日中位淨買",
+             f"{dip:+.2f}%股本{a_dip}" if dip is not None else "-",
+             "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。"
+             f"正=回檔有人接、負=跟著倒貨{dip_dyn}{_dir_txt(a_dip)}"],
+            ["外資佈局廣度",
+             f"{bf*100:.0f}%({bc['f_pos']}/{bc['f_n']}檔)" if (bf is not None and bc) else "-",
+             f"買盤是普遍還是個案?近20日外資持股增加的成員比例{bf_dyn}"],
+            ["20日動能 vs 全體",
+             f"{pct(rel, True)}{a_rel}" if rel is not None else "-",
+             "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比"
+             f"(個股卡的①價是族群內比){rel_dyn}{_dir_txt(a_rel)}"],
+            ["中位距60日高",
+             pct(dist) if dist is not None else "-",
+             f"成員距自己60日高點的中位數,衡量族群整體回檔深度{dist_dyn}"],
+            ["投信買超廣度",
+             f"{r['breadth_t']*100:.0f}%({bc['t_pos']}/{bc['t_n']}檔)"
+             if (r["breadth_t"] is not None and bc) else "-",
+             "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"],
         ]}
         if n:
             gobj["dur"] = f"第 {n} 個交易日(自 {since})"
@@ -287,9 +328,12 @@ def main():
             "scColor": "var(--warn-line)" if regime else "var(--neutral)",
             "scBg": "var(--neutral-tint)", "who": "加權報酬指數(含息)",
             "rows": [["指數日期", mk["date"]],
-                     ["距20日高", f"{mk['dd20']*100:+.1f}%"],
-                     ["修正門檻", f"≤ {REGIME_DD*100:.0f}%"],
-                     ["20日報酬", pct(mkt20, True)]],
+                     ["距20日高", f"{mk['dd20']*100:+.1f}%",
+                      "含息指數距近20個交易日最高點回落多少;回檔深度的量尺"],
+                     ["修正門檻", f"≤ {REGIME_DD*100:.0f}%",
+                      "回落超過此值即判為修正 regime,頁首籤條會轉「⚠ 修正」"],
+                     ["20日報酬", pct(mkt20, True),
+                      "全市場近一個月的基準線;個股①價 tooltip 的「大盤20日」同此值"]],
             "why": ("報酬指數距 20 日高回落超過門檻,判定為修正 regime——此時「修正日抗跌」"
                     "「修正日買超」等訊號鑑別度最高,適合觀察哪個族群先止穩轉強。" if regime else
                     "距 20 日高回落未達門檻,市場處於多頭/中性,個股訊號以族群內相對強弱為主。"),

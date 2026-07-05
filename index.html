@@ -185,10 +185,13 @@
   #tip .rows .k{color:var(--ink-2);font-size:11.5px;white-space:nowrap}
   #tip .rows .rv{text-align:right;font-size:12px;font-weight:600;
     font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  #tip .rows .rh{grid-column:1/-1;color:var(--muted);font-size:10.5px;line-height:1.5;
+    margin:-2px 0 3px;padding-bottom:4px;border-bottom:1px dashed var(--hairline-2)}
+  #tip .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
   #tip .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:8px;padding:7px 9px;margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
-  #tip .why{color:var(--ink-2);line-height:1.5}
+  #tip .why{color:var(--ink-2);line-height:1.5;margin-bottom:8px}
   #tip .why b{color:var(--ink)}
   #tip .how{margin-top:8px;padding-top:8px;border-top:1px dashed var(--hairline);
     color:var(--muted);font-size:11px;line-height:1.6}
@@ -226,10 +229,13 @@
   #sheetBody .rows .k{color:var(--ink-2);font-size:12.5px;white-space:nowrap}
   #sheetBody .rows .rv{text-align:right;font-size:13px;font-weight:600;
     font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  #sheetBody .rows .rh{grid-column:1/-1;color:var(--muted);font-size:11.5px;line-height:1.55;
+    margin:-3px 0 4px;padding-bottom:6px;border-bottom:1px dashed var(--hairline-2)}
+  #sheetBody .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
   #sheetBody .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12.5px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:10px;padding:10px 12px;margin-bottom:11px;line-height:1.55;white-space:pre-wrap}
-  #sheetBody .why{color:var(--ink-2);line-height:1.6;font-size:13.5px}
+  #sheetBody .why{color:var(--ink-2);line-height:1.6;font-size:13.5px;margin-bottom:10px}
   #sheetBody .why b{color:var(--ink)}
   #sheetBody .how{margin-top:11px;padding-top:11px;border-top:1px dashed var(--hairline);
     color:var(--muted);font-size:12px;line-height:1.65}
@@ -500,20 +506,23 @@
     var who = document.createElement("div"); who.className="who"; setText(who, html.who); box.appendChild(who);
     var bz = document.createElement("div"); bz.className="biz";
     setText(bz, html.biz || ""); box.appendChild(bz);
-    if(html.rows && html.rows.length){          // 數據表格(標籤/數值對)
+    var why=document.createElement("div"); why.className="why";   // 結論先行,數據表是佐證
+    var wb=document.createElement("b"); setText(wb, "判讀:"); why.appendChild(wb);
+    why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
+    box.appendChild(why);
+    if(html.rows && html.rows.length){          // 數據表格:[標籤, 數值, 白話解讀?]
       var tb=document.createElement("div"); tb.className="rows";
       html.rows.forEach(function(rw){
         var k=document.createElement("span"); k.className="k"; setText(k, rw[0]); tb.appendChild(k);
         var v=document.createElement("span"); v.className="rv"; setText(v, rw[1]); tb.appendChild(v);
+        if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
+          var h=document.createElement("span"); h.className="rh"; setText(h, rw[2]); tb.appendChild(h);
+        }
       });
       box.appendChild(tb);
     } else if(html.data){
       var d=document.createElement("div"); d.className="data"; setText(d, html.data); box.appendChild(d);
     }
-    var why=document.createElement("div"); why.className="why";
-    var wb=document.createElement("b"); setText(wb, "判讀:"); why.appendChild(wb);
-    why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
-    box.appendChild(why);
     if(html.how){                                // 評分依據(教學:分數與門檻怎麼來)
       var hw=document.createElement("div"); hw.className="how";
       var hb=document.createElement("b"); setText(hb, "評分依據:"); hw.appendChild(hb);
@@ -681,8 +690,8 @@
   });
 
   // ---------- group radar ----------
-  var GROUPS = [{"g": "passive", "nm": "被動元件", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-0.71%股本 ↘"], ["外資佈局廣度", "25%"], ["20日動能 vs 全體", "+38.4% ↗"], ["中位距60日高", "-6.1%"], ["投信買超廣度", "25%"]], "dur": "第 2 個交易日(自 7/2)"}, {"g": "power", "nm": "功率元件", "state": "發動·領漲", "col": "var(--strong)", "note": "動能領先全體、價近波段高", "stats": [["修正日中位淨買", "-0.41%股本 ↗"], ["外資佈局廣度", "50%"], ["20日動能 vs 全體", "+17.4% ↗"], ["中位距60日高", "-3.7%"], ["投信買超廣度", "21%"]], "dur": "第 2 個交易日(自 7/2)"}, {"g": "packtest", "nm": "封測", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.81%股本 ↘"], ["外資佈局廣度", "54%"], ["20日動能 vs 全體", "-0.2% →"], ["中位距60日高", "-5.4%"], ["投信買超廣度", "54%"]], "dur": "第 7 個交易日(自 6/25)"}, {"g": "memory", "nm": "記憶體", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-2.03%股本 ↗"], ["外資佈局廣度", "17%"], ["20日動能 vs 全體", "-14.5% ↘"], ["中位距60日高", "-18.5%"], ["投信買超廣度", "33%"]], "dur": "第 4 個交易日(自 6/30)"}, {"g": "ipdesign", "nm": "矽智財", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.53%股本 ↗"], ["外資佈局廣度", "67%"], ["20日動能 vs 全體", "-9.3% →"], ["中位距60日高", "-13.5%"], ["投信買超廣度", "56%"]], "dur": "第 5 個交易日(自 6/29)"}, {"g": "semiequip", "nm": "半導體設備", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.24%股本 ↗"], ["外資佈局廣度", "44%"], ["20日動能 vs 全體", "-3.9% ↗"], ["中位距60日高", "-11.8%"], ["投信買超廣度", "22%"]], "dur": "第 5 個交易日(自 6/29)"}, {"g": "material", "nm": "半導體材料", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.17%股本 ↗"], ["外資佈局廣度", "50%"], ["20日動能 vs 全體", "-0.0% ↗"], ["中位距60日高", "-6.1%"], ["投信買超廣度", "80%"]], "dur": "第 1 個交易日(自 7/3)"}, {"g": "thermal", "nm": "散熱", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.80%股本 ↗"], ["外資佈局廣度", "57%"], ["20日動能 vs 全體", "-12.8% ↘"], ["中位距60日高", "-15.8%"], ["投信買超廣度", "57%"]], "dur": "第 23 個交易日(自 6/2)"}, {"g": "pcb", "nm": "PCB/CCL", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧(★ 修正日買超 9 族群最高)", "stats": [["修正日中位淨買", "-0.02%股本 ↗"], ["外資佈局廣度", "58%"], ["20日動能 vs 全體", "-1.2% ↘"], ["中位距60日高", "-10.0%"], ["投信買超廣度", "58%"]], "dur": "第 22 個交易日(自 6/3)"}];
-  var GROUP_HOW = {"how": "族群狀態每日由聚合指標判定(規則在資料層,非儀表板):蓄勢·被佈局=修正日中位淨買>0 且 中位距60日高≤-5%(下跌時有人接貨、價還沒回到高點——佈局特徵);發動·領漲=20日動能贏全體 且 價近波段高;籌碼退潮=修正日遭調節 且 佈局廣度≤40%;其餘=中性觀察。「修正日中位淨買」=族群下跌日外資淨買20日累計佔股本%的族群中位數——選族群的主訊號(樣本外驗證中,見週報);「外資佈局廣度」=20日外資增持的成員比例;「20日動能 vs 全體」=族群中位20日報酬 − 全部掃描個股中位。↗/↘/→ = 與 5 個交易日前相比的方向。", "src": "個股五元素於族群層聚合(等權中位數/廣度);原始資料 FinMind"};   // 狀態判定規則+資料來源(門檻值由 build 注入,單一事實來源)
+  var GROUPS = [{"g": "passive", "nm": "被動元件", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-0.71%股本 ↘", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前惡化"], ["外資佈局廣度", "25%(3/12檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例;目前≤40%=廣度低(個案而非族群現象)"], ["20日動能 vs 全體", "+38.4% ↗", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=跑贏其他族群,且比5日前改善"], ["中位距60日高", "-6.1%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前≤-5%=「價未回高」(蓄勢的前提)"], ["投信買超廣度", "25%(3/12檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 2 個交易日(自 7/2)"}, {"g": "power", "nm": "功率元件", "state": "發動·領漲", "col": "var(--strong)", "note": "動能領先全體、價近波段高", "stats": [["修正日中位淨買", "-0.41%股本 ↗", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前改善"], ["外資佈局廣度", "50%(7/14檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例"], ["20日動能 vs 全體", "+17.4% ↗", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=跑贏其他族群,且比5日前改善"], ["中位距60日高", "-3.7%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前接近波段高"], ["投信買超廣度", "21%(3/14檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 2 個交易日(自 7/2)"}, {"g": "packtest", "nm": "封測", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.81%股本 ↘", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前惡化"], ["外資佈局廣度", "54%(7/13檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例;過半成員被增持=族群現象"], ["20日動能 vs 全體", "-0.2% →", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=落後其他族群,與5日前持平"], ["中位距60日高", "-5.4%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前≤-5%=「價未回高」(蓄勢的前提)"], ["投信買超廣度", "54%(7/13檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 7 個交易日(自 6/25)"}, {"g": "memory", "nm": "記憶體", "state": "籌碼退潮", "col": "var(--weak)", "note": "修正日遭調節、佈局廣度低", "stats": [["修正日中位淨買", "-2.03%股本 ↗", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前改善"], ["外資佈局廣度", "17%(2/12檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例;目前≤40%=廣度低(個案而非族群現象)"], ["20日動能 vs 全體", "-14.5% ↘", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=落後其他族群,且比5日前惡化"], ["中位距60日高", "-18.5%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前≤-5%=「價未回高」(蓄勢的前提)"], ["投信買超廣度", "33%(4/12檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 4 個交易日(自 6/30)"}, {"g": "ipdesign", "nm": "矽智財", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.53%股本 ↗", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前改善"], ["外資佈局廣度", "67%(6/9檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例;過半成員被增持=族群現象"], ["20日動能 vs 全體", "-9.3% →", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=落後其他族群,與5日前持平"], ["中位距60日高", "-13.5%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前≤-5%=「價未回高」(蓄勢的前提)"], ["投信買超廣度", "56%(5/9檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 5 個交易日(自 6/29)"}, {"g": "semiequip", "nm": "半導體設備", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.24%股本 ↗", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前改善"], ["外資佈局廣度", "44%(4/9檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例"], ["20日動能 vs 全體", "-3.9% ↗", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=落後其他族群,且比5日前改善"], ["中位距60日高", "-11.8%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前≤-5%=「價未回高」(蓄勢的前提)"], ["投信買超廣度", "22%(2/9檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 5 個交易日(自 6/29)"}, {"g": "material", "nm": "半導體材料", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.17%股本 ↗", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前改善"], ["外資佈局廣度", "50%(5/10檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例"], ["20日動能 vs 全體", "-0.0% ↗", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=落後其他族群,且比5日前改善"], ["中位距60日高", "-6.1%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前≤-5%=「價未回高」(蓄勢的前提)"], ["投信買超廣度", "80%(8/10檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 1 個交易日(自 7/3)"}, {"g": "thermal", "nm": "散熱", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧", "stats": [["修正日中位淨買", "-0.80%股本 ↗", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前改善"], ["外資佈局廣度", "57%(4/7檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例;過半成員被增持=族群現象"], ["20日動能 vs 全體", "-12.8% ↘", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=落後其他族群,且比5日前惡化"], ["中位距60日高", "-15.8%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前≤-5%=「價未回高」(蓄勢的前提)"], ["投信買超廣度", "57%(4/7檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 23 個交易日(自 6/2)"}, {"g": "pcb", "nm": "PCB/CCL", "state": "中性觀察", "col": "var(--neutral)", "note": "族群訊號分歧(★ 修正日買超 9 族群最高)", "stats": [["修正日中位淨買", "-0.02%股本 ↗", "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。正=回檔有人接、負=跟著倒貨;目前=下跌日被調節(資金撤出),且比5日前改善"], ["外資佈局廣度", "58%(7/12檔)", "買盤是普遍還是個案?近20日外資持股增加的成員比例;過半成員被增持=族群現象"], ["20日動能 vs 全體", "-1.2% ↘", "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比(個股卡的①價是族群內比);目前=落後其他族群,且比5日前惡化"], ["中位距60日高", "-10.0%", "成員距自己60日高點的中位數,衡量族群整體回檔深度;目前≤-5%=「價未回高」(蓄勢的前提)"], ["投信買超廣度", "58%(7/12檔)", "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"]], "dur": "第 22 個交易日(自 6/3)"}];
+  var GROUP_HOW = {"how": "族群狀態每日由上列指標判定(規則在資料層,非儀表板):蓄勢·被佈局=修正日中位淨買>0 且 中位距60日高≤-5%(下跌有人接、價未回高——佈局特徵);發動·領漲=20日動能贏全體 且 價近波段高;籌碼退潮=修正日遭調節 且 佈局廣度≤40%;其餘=中性觀察。修正日中位淨買為選族群主訊號(樣本外驗證中,見週報)。↗/↘/→ = 與 5 個交易日前相比的方向。", "src": "個股五元素於族群層聚合(等權中位數/廣度);原始資料 FinMind"};   // 狀態判定規則+資料來源(門檻值由 build 注入,單一事實來源)
   (function(){
     var host = document.getElementById("groups");
     if(!host) return;
@@ -717,14 +726,15 @@
       attachTip(el, function(){
         return {el: "族群雷達", scLabel: g.state, scColor: g.col, scBg: "var(--neutral-tint)",
                 who: g.nm, biz: (GRP[g.g] && GRP[g.g].tag) || "",
-                rows: g.stats.concat(g.dur ? [["狀態持續", g.dur]] : []),
+                rows: g.stats.concat(g.dur ? [["狀態持續", g.dur,
+                  "連續判為同一狀態的交易日數——剛轉=新訊號、持續多日=趨勢確立"]] : []),
                 why: g.note, how: GROUP_HOW.how, src: GROUP_HOW.src};
       });
     });
   })();
 
   // ---------- market chip(頁首市場環境籤條的詳情)----------
-  var MKT_TIP = {"el": "市場環境", "scLabel": "多頭/中性", "scColor": "var(--neutral)", "scBg": "var(--neutral-tint)", "who": "加權報酬指數(含息)", "rows": [["指數日期", "2026-07-03"], ["距20日高", "-1.7%"], ["修正門檻", "≤ -3%"], ["20日報酬", "+3.0%"]], "why": "距 20 日高回落未達門檻,市場處於多頭/中性,個股訊號以族群內相對強弱為主。", "how": "距20日高 ≤ -3% → 修正 regime。刻意用「含息」報酬指數而非價格指數——除息季價格指數會機械性下跌,含息指數才反映真實市場強弱。", "src": "FinMind 加權報酬指數(TAIEX 含息)"};
+  var MKT_TIP = {"el": "市場環境", "scLabel": "多頭/中性", "scColor": "var(--neutral)", "scBg": "var(--neutral-tint)", "who": "加權報酬指數(含息)", "rows": [["指數日期", "2026-07-03"], ["距20日高", "-1.7%", "含息指數距近20個交易日最高點回落多少;回檔深度的量尺"], ["修正門檻", "≤ -3%", "回落超過此值即判為修正 regime,頁首籤條會轉「⚠ 修正」"], ["20日報酬", "+3.0%", "全市場近一個月的基準線;個股①價 tooltip 的「大盤20日」同此值"]], "why": "距 20 日高回落未達門檻,市場處於多頭/中性,個股訊號以族群內相對強弱為主。", "how": "距20日高 ≤ -3% → 修正 regime。刻意用「含息」報酬指數而非價格指數——除息季價格指數會機械性下跌,含息指數才反映真實市場強弱。", "src": "FinMind 加權報酬指數(TAIEX 含息)"};
   (function(){
     var chip = document.getElementById("mktChip");
     if(!chip || !MKT_TIP) return;

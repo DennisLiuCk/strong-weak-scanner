@@ -185,10 +185,13 @@
   #tip .rows .k{color:var(--ink-2);font-size:11.5px;white-space:nowrap}
   #tip .rows .rv{text-align:right;font-size:12px;font-weight:600;
     font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  #tip .rows .rh{grid-column:1/-1;color:var(--muted);font-size:10.5px;line-height:1.5;
+    margin:-2px 0 3px;padding-bottom:4px;border-bottom:1px dashed var(--hairline-2)}
+  #tip .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
   #tip .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:8px;padding:7px 9px;margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
-  #tip .why{color:var(--ink-2);line-height:1.5}
+  #tip .why{color:var(--ink-2);line-height:1.5;margin-bottom:8px}
   #tip .why b{color:var(--ink)}
   #tip .how{margin-top:8px;padding-top:8px;border-top:1px dashed var(--hairline);
     color:var(--muted);font-size:11px;line-height:1.6}
@@ -226,10 +229,13 @@
   #sheetBody .rows .k{color:var(--ink-2);font-size:12.5px;white-space:nowrap}
   #sheetBody .rows .rv{text-align:right;font-size:13px;font-weight:600;
     font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  #sheetBody .rows .rh{grid-column:1/-1;color:var(--muted);font-size:11.5px;line-height:1.55;
+    margin:-3px 0 4px;padding-bottom:6px;border-bottom:1px dashed var(--hairline-2)}
+  #sheetBody .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
   #sheetBody .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12.5px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:10px;padding:10px 12px;margin-bottom:11px;line-height:1.55;white-space:pre-wrap}
-  #sheetBody .why{color:var(--ink-2);line-height:1.6;font-size:13.5px}
+  #sheetBody .why{color:var(--ink-2);line-height:1.6;font-size:13.5px;margin-bottom:10px}
   #sheetBody .why b{color:var(--ink)}
   #sheetBody .how{margin-top:11px;padding-top:11px;border-top:1px dashed var(--hairline);
     color:var(--muted);font-size:12px;line-height:1.65}
@@ -500,20 +506,23 @@
     var who = document.createElement("div"); who.className="who"; setText(who, html.who); box.appendChild(who);
     var bz = document.createElement("div"); bz.className="biz";
     setText(bz, html.biz || ""); box.appendChild(bz);
-    if(html.rows && html.rows.length){          // 數據表格(標籤/數值對)
+    var why=document.createElement("div"); why.className="why";   // 結論先行,數據表是佐證
+    var wb=document.createElement("b"); setText(wb, "判讀:"); why.appendChild(wb);
+    why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
+    box.appendChild(why);
+    if(html.rows && html.rows.length){          // 數據表格:[標籤, 數值, 白話解讀?]
       var tb=document.createElement("div"); tb.className="rows";
       html.rows.forEach(function(rw){
         var k=document.createElement("span"); k.className="k"; setText(k, rw[0]); tb.appendChild(k);
         var v=document.createElement("span"); v.className="rv"; setText(v, rw[1]); tb.appendChild(v);
+        if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
+          var h=document.createElement("span"); h.className="rh"; setText(h, rw[2]); tb.appendChild(h);
+        }
       });
       box.appendChild(tb);
     } else if(html.data){
       var d=document.createElement("div"); d.className="data"; setText(d, html.data); box.appendChild(d);
     }
-    var why=document.createElement("div"); why.className="why";
-    var wb=document.createElement("b"); setText(wb, "判讀:"); why.appendChild(wb);
-    why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
-    box.appendChild(why);
     if(html.how){                                // 評分依據(教學:分數與門檻怎麼來)
       var hw=document.createElement("div"); hw.className="how";
       var hb=document.createElement("b"); setText(hb, "評分依據:"); hw.appendChild(hb);
@@ -717,7 +726,8 @@
       attachTip(el, function(){
         return {el: "族群雷達", scLabel: g.state, scColor: g.col, scBg: "var(--neutral-tint)",
                 who: g.nm, biz: (GRP[g.g] && GRP[g.g].tag) || "",
-                rows: g.stats.concat(g.dur ? [["狀態持續", g.dur]] : []),
+                rows: g.stats.concat(g.dur ? [["狀態持續", g.dur,
+                  "連續判為同一狀態的交易日數——剛轉=新訊號、持續多日=趨勢確立"]] : []),
                 why: g.note, how: GROUP_HOW.how, src: GROUP_HOW.src};
       });
     });
