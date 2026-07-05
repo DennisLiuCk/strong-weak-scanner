@@ -2,9 +2,21 @@ name: daily-fetch
 
 on:
   schedule:
-    # 台灣 18:00 = UTC 10:00,週一~五(台股交易日)。
+    # 台灣 22:00 = UTC 14:00,週一~五(台股交易日)。
     # 遇台股假日抓不到新資料時,commit 步驟會自動略過。
-    - cron: "0 10 * * 1-5"
+    #
+    # 為什麼是 22:00 —— FinMind 各 dataset 每日更新時間(官方文件,台北時間;
+    # 「實際更新時間以 API 資料為主」,可能漂移):
+    #   16:50  TaiwanStockTotalReturnIndex(大盤 regime)
+    #   17:30  TaiwanStockPrice(①價②量)
+    #   20:00  TaiwanStockInstitutionalInvestorsBuySell(③④法人買賣超)
+    #   21:00  TaiwanStockShareholding(③外資持股)
+    #   21:00  TaiwanStockMarginPurchaseShortSale(⑤融資券)
+    # 若早於 21:00 執行,當日籌碼缺值會被靜默當 0/舊值計分,隔日回補後
+    # 整表重建無痕改寫 → 決策時點與回測(validate.py)看到的資料不一致。
+    # 舊排程 18:00 只有價量是當日的,③④⑤ 全缺(2026-07-05 對抗性驗證)。
+    # GitHub cron 高峰期可能延遲 15~60 分——此設計下「晚」是安全方向。
+    - cron: "0 14 * * 1-5"
   workflow_dispatch: {}   # 允許手動觸發(測試用)
 
 permissions:

@@ -1,7 +1,7 @@
 # strong-weak-scanner(台股汰弱留強掃描)
 
 台股半導體族群(被動/功率/封測,約 39 檔)的兩層訊號系統:**個股層**族群內排名
-選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions(台灣 18:00)
+選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions(台灣 22:00)
 抓資料 → 評分 → 儀表板;SQLite db 與報告都 commit 在 repo 裡。
 儀表板:https://dennisliuck.github.io/strong-weak-scanner/
 

@@ -32,7 +32,9 @@
 ## 資料管線
 
 ```
-每交易日 18:00(台北,GitHub Actions:.github/workflows/daily-fetch.yml)
+每交易日 22:00(台北,GitHub Actions:.github/workflows/daily-fetch.yml;
+排程時點依 FinMind 各 dataset 更新時間而定——最晚的持股/融資券 21:00 更新,
+對照表見 workflow 註解)
   fetch_daily.py   FinMind 4 資料集 × 全 universe + 除權息/分割事件 + 報酬指數
                    → SQLite 原始表(append-only)
                    → price_adj 還原價(本地重算)
