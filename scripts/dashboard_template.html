@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>__GTITLE__</title>
 <style>
   :root{
@@ -58,6 +60,8 @@
   .brandrule{width:34px;height:3px;background:var(--strong);border-radius:2px;margin-bottom:14px}
   h1{font-size:clamp(21px,2.6vw,27px);line-height:1.2;margin:0 0 8px;letter-spacing:.2px;text-wrap:balance;font-weight:800}
   .sub{color:var(--ink-2);font-size:14px;margin:0;max-width:60ch}
+  .sub a{color:inherit;text-decoration-color:var(--muted);text-underline-offset:2px}
+  .sub a:hover{color:var(--ink)}
   .meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:14px}
   .chip{font-size:11.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--hairline);
     border-radius:100px;padding:3px 10px;white-space:nowrap}
@@ -180,6 +184,8 @@
   #tip .how{margin-top:8px;padding-top:8px;border-top:1px dashed var(--hairline);
     color:var(--muted);font-size:11px;line-height:1.6}
   #tip .how b{color:var(--ink-2)}
+  #tip .src{margin-top:6px;color:var(--muted);font-size:10.5px;line-height:1.5}
+  #tip .src b{color:var(--ink-2)}
 
   /* ---- bottom sheet(觸控裝置的詳情;桌機不會顯示) ---- */
   #sheetWrap{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
@@ -219,10 +225,56 @@
   #sheetBody .how{margin-top:11px;padding-top:11px;border-top:1px dashed var(--hairline);
     color:var(--muted);font-size:12px;line-height:1.65}
   #sheetBody .how b{color:var(--ink-2)}
+  #sheetBody .src{margin-top:8px;color:var(--muted);font-size:11.5px;line-height:1.55}
+  #sheetBody .src b{color:var(--ink-2)}
+
+  /* ---- 新手導讀 ---- */
+  details.guide{margin:14px 0 0;background:var(--surface);border:1px solid var(--hairline);
+    border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  details.guide summary{cursor:pointer;padding:12px 16px;font-size:13px;font-weight:700;color:var(--ink-2);
+    list-style:none;display:flex;align-items:center;gap:9px}
+  details.guide summary::-webkit-details-marker{display:none}
+  details.guide summary::before{content:"▸";color:var(--muted);transition:transform .15s ease}
+  details.guide[open] summary::before{transform:rotate(90deg)}
+  details.guide summary:hover{color:var(--ink)}
+  details.guide .gbody{padding:2px 18px 16px;font-size:13px;color:var(--ink-2);line-height:1.8}
+  details.guide .gbody b{color:var(--ink)}
+  details.guide .gbody ol{margin:8px 0;padding-left:22px}
+  details.guide .gbody li{margin:4px 0}
+
+  /* ---- 方法與資料 ---- */
+  .method{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:760px){.method{grid-template-columns:1fr}}
+  .mcard{background:var(--surface);border:1px solid var(--hairline);border-radius:14px;
+    padding:15px 17px;box-shadow:var(--shadow);font-size:12.5px;color:var(--ink-2);line-height:1.75}
+  .mcard.wide{grid-column:1/-1}
+  .mcard h3{margin:0 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);font-weight:700}
+  .mcard b{color:var(--ink)}
+  .mcard p{margin:8px 0 0}
+  .mcard ol{margin:0;padding-left:20px}
+  .mcard ol li{margin:0 0 8px}
+  .mcard a{color:var(--ink);text-decoration-color:var(--muted);text-underline-offset:2px}
+  .mcard a:hover{text-decoration-color:var(--ink)}
+  .dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0}
+  .dl dt{font-weight:700;color:var(--ink);white-space:nowrap;font-size:12px}
+  .dl dd{margin:0}
+  .dl .f{display:block;font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;
+    font-size:11px;color:var(--muted);margin-bottom:1px}
+  .wchips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 8px}
+  .wchip{border:1px solid var(--hairline);border-radius:8px;padding:3px 9px;font-size:12px;
+    color:var(--ink-2);background:var(--surface-2)}
+  .wchip b{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-weight:700}
+  .srcline{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:8px 0 0}
+  .srcline dt{font-weight:700;color:var(--ink);font-size:12px;white-space:nowrap}
+  .srcline dd{margin:0;font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-size:11px;
+    color:var(--muted);overflow-wrap:anywhere}
 
   footer{margin-top:26px;color:var(--muted);font-size:11.5px;line-height:1.7}
   footer b{color:var(--ink-2)}
   footer .fn{border-top:1px solid var(--hairline);padding-top:14px;display:grid;gap:4px}
+  footer a{color:var(--ink-2);text-decoration-color:var(--muted);text-underline-offset:2px}
+  footer a:hover{color:var(--ink)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -231,7 +283,7 @@
     <div>
       <div class="brandrule"></div>
       <h1>__GTITLE__</h1>
-      <p class="sub">台股三大半導體族群的汰弱留強掃描。個股層以族群內排名比「相對強弱 + 修正日抗跌」選強汰弱;族群層看「佈局廣度 + 逆勢買超」找出正在被默默佈局的族群——兩層各司其職,tier 需連兩日確認。</p>
+      <p class="sub">每個交易日收盤後,把同族群的個股放上同一把尺互相比較:價格誰相對強、下跌時誰撐得住、法人在買誰、散戶擠在哪——比出強弱、依規則分層。每個分數都可以點開,看到原始數據、判讀理由、計算規則與資料來源;完整方法見<a href="#method">頁尾「方法與資料」</a>。</p>
       <div class="meta">
         <span class="chip">__MARKET_CHIP__</span>
         <span class="chip" id="scopeChip">範圍 <b>__SCOPE__</b></span>
@@ -260,16 +312,29 @@
       </div>
     </div>
     <div>
-      <h3>五元素(欄位;族群內排名制)</h3>
+      <h3>五元素(每欄回答一個問題;分數=族群內相對排名)</h3>
       <div class="elrow">
-        <span class="el"><span class="n">①&nbsp;價</span><span class="r">族群內相對強弱 + 修正日抗跌</span></span>
-        <span class="el"><span class="n">②&nbsp;量</span><span class="r">量比(自身60日基期)— 過熱旗標</span></span>
-        <span class="el"><span class="n">③&nbsp;外資</span><span class="r">持股pp變化 + 逆勢買超 — 族群層為主</span></span>
-        <span class="el"><span class="n">④&nbsp;投信</span><span class="r">近5日佔股本 — 本土法人 / 作帳</span></span>
-        <span class="el"><span class="n">⑤&nbsp;融資券</span><span class="r">價×融資交互 + 散戶水位 — 未來賣壓</span></span>
+        <span class="el"><span class="n">①&nbsp;價</span><span class="r">誰比同業強?下跌時誰撐得住?</span></span>
+        <span class="el"><span class="n">②&nbsp;量</span><span class="r">交投活絡還是過熱?(跟自己的常態比)</span></span>
+        <span class="el"><span class="n">③&nbsp;外資</span><span class="r">國際資金在買誰?(選族群訊號為主)</span></span>
+        <span class="el"><span class="n">④&nbsp;投信</span><span class="r">本土法人近 5 日在買誰?</span></span>
+        <span class="el"><span class="n">⑤&nbsp;融資券</span><span class="r">散戶擠在哪?未來停損賣壓多重?</span></span>
       </div>
     </div>
   </div>
+
+  <details class="guide">
+    <summary>第一次看這個儀表板?60 秒導讀</summary>
+    <div class="gbody">
+      <b>這是什麼</b>:台股三個半導體族群的每日「體檢表」。它不預測明天的漲跌,而是回答一個問題——<b>同族群裡,誰相對強、誰相對弱?</b>資金若要留在這個族群,該留誰、先汰誰。
+      <ol>
+        <li><b>先看環境</b>:頁首籤條顯示市場處於多頭還是修正;「族群雷達」顯示哪個族群整體被法人佈局、哪個在退潮。</li>
+        <li><b>再看結論</b>:「汰弱留強」把所有個股按公開規則分層——真強、蓄勢(法人在買但價還沒動)、強但過熱、中性、真弱、陷阱(法人出、散戶接)。</li>
+        <li><b>想知道為什麼</b>:到「五元素明細」點任何一格,會列出原始數據、判讀、評分規則與資料來源——<b>每個結論都能往下追到數字</b>,可以自己驗算,也歡迎質疑。</li>
+      </ol>
+      兩個關鍵觀念:<b>① 分數是族群內的相對排名</b>——「+2」代表這一項在族群裡排前 20%,不代表它會漲;弱族群裡的第一名仍可能下跌。<b>② 評級是規則分層,不是預測</b>——規則全文在頁尾「評級規則」,是否真的有效,由每週自動產出的驗證報告持續檢驗(頁尾「怎麼檢驗」)。顏色依台股慣例:紅=強、綠=弱。
+    </div>
+  </details>
 
   <h2 class="sec">族群雷達 · 哪個族群正在被佈局</h2>
   <div class="tiers" id="groups"></div>
@@ -282,10 +347,72 @@
     <div class="matrix" id="matrix"></div>
   </div>
 
+  <h2 class="sec" id="method">方法與資料 · 分數怎麼來、怎麼驗證</h2>
+  <div class="method">
+    <div class="mcard wide">
+      <h3>評分流程(每個交易日收盤後自動執行)</h3>
+      <ol>
+        <li><b>算指標</b> — 對每一檔,用「還原股價」與法人/融資資料計算原始指標(定義見下方辭典)。還原股價已把除權息與股票分割造成的價格跳空調整掉,漲跌只反映真實損益,除息日不會被誤判成大跌。</li>
+        <li><b>族群內排名</b> — 相對強弱、抗跌、外資、投信、逆勢買超五項只跟「同族群」比:族群內前 20% 得 +2、20~40% 得 +1、中段 0、60~80% 得 −1、最後 20% 得 −2。若整個族群的原始值都貼近零(無訊號),一律給 0——排名制只在有訊號時放大差異,不把雜訊排成名次。量與融資券不排名,用固定規則直接給分(規則見各格「評分依據」)。</li>
+        <li><b>加權合成</b> — 綜合分 = Σ(元素分 × 權重),再取 3 日平均消除單日跳動;理論範圍約 ±8.5。</li>
+        <li><b>分層確認</b> — 依「評級規則」分層,且需連續 2 個交易日判到同一層才正式轉層,避免評級每天翻面。</li>
+      </ol>
+      <div class="wchips" id="wchips"></div>
+      <p>權重反映本系統的核心實證:<b>族群內分強弱靠價格相對因子(相對強弱、抗跌);外資、投信等籌碼指標的價值在「選族群」</b>——所以籌碼在個股層降權,聚合到族群層做成「族群雷達」。權重屬樣本內校準,每週以樣本外資料重新檢驗,見下方「怎麼檢驗」。</p>
+    </div>
+    <div class="mcard">
+      <h3>指標辭典 · 個股層</h3>
+      <dl class="dl">
+        <dt>相對強弱</dt><dd><span class="f">近20日報酬 − 族群中位數</span>過去一個月跑贏同業多少;&gt;0 表示贏過至少一半同業。</dd>
+        <dt>修正日抗跌</dt><dd><span class="f">族群下跌日的平均相對表現(近20日)</span>大家一起跌的日子,它平均多漲(少跌)多少。</dd>
+        <dt>量比</dt><dd><span class="f">當日周轉率 ÷ 自身60日中位</span>1 = 自己的正常量;跟自己比,不跨股比。</dd>
+        <dt>周轉率</dt><dd><span class="f">成交股數 ÷ 發行股數</span>當日換手的股本比例。</dd>
+        <dt>外資持股變化</dt><dd><span class="f">外資持股比率的20日變化(pp)</span>pp = 百分點,如 40% → 41% 記 +1pp。</dd>
+        <dt>逆勢買超</dt><dd><span class="f">族群下跌日外資淨買20日累計 ÷ 股本</span>下跌時有沒有人默默接貨——佈局的典型痕跡。</dd>
+        <dt>投信佔股本</dt><dd><span class="f">近5日投信淨買賣 ÷ 發行股數</span>換算成股本比例,大小型股才可比。</dd>
+        <dt>散戶水位</dt><dd><span class="f">融資餘額 ÷ 發行股數</span>愈高代表散戶槓桿愈滿,回檔時停損賣壓愈重。</dd>
+        <dt>距60日高</dt><dd><span class="f">還原價距近60日最高點的百分比</span>衡量「價格發動了沒」;蓄勢評級要求 ≤ −3%。</dd>
+      </dl>
+    </div>
+    <div class="mcard">
+      <h3>指標辭典 · 族群與大盤層</h3>
+      <dl class="dl">
+        <dt>佈局廣度</dt><dd><span class="f">族群內外資20日增持的檔數比例</span>佈局是「面」不是單點:一半以上成員被增持,才像族群行情。</dd>
+        <dt>修正日中位淨買</dt><dd><span class="f">族群內各檔逆勢買超的中位數</span>「哪個族群正被佈局」的候選主訊號(樣本外驗證中,見週報)。</dd>
+        <dt>投信買超廣度</dt><dd><span class="f">族群內投信5日淨買 &gt;0 的檔數比例</span>本土法人參與的廣度。</dd>
+        <dt>20日動能 vs 全體</dt><dd><span class="f">族群中位20日報酬 − 全體中位</span>族群整體跑贏還是跑輸大部隊。</dd>
+        <dt>修正 regime</dt><dd><span class="f">加權報酬指數(含息)距20日高 ≤ −3%</span>頁首籤條「修正」的定義。用含息指數,除息旺季不會被機械性拉低而誤報修正。</dd>
+      </dl>
+      <p>族群層統計需至少 6 檔有效樣本才給值,避免 1、2 檔代表整個族群。</p>
+    </div>
+    <div class="mcard">
+      <h3>評級規則(與點開任一評級看到的一致)</h3>
+      <dl class="dl" id="tierRules"></dl>
+      <p>判定優先序:陷阱 → 強但過熱 → 蓄勢 → 真強 → 真弱 → 中性;先排除風險形態,再認定強勢。</p>
+    </div>
+    <div class="mcard">
+      <h3>資料來源與更新</h3>
+      全部數據取自 <a href="https://finmindtrade.com/" rel="noopener">FinMind 開放資料</a>,每交易日約 18:00(台北)由 GitHub Actions 自動抓取、評分並重建本頁;點開任一格,底部都標示該格數據的來源。
+      <dl class="srcline">
+        <dt>股價 / 成交量</dt><dd>TaiwanStockPrice</dd>
+        <dt>三大法人買賣超</dt><dd>TaiwanStockInstitutionalInvestorsBuySell</dd>
+        <dt>融資融券</dt><dd>TaiwanStockMarginPurchaseShortSale</dd>
+        <dt>外資持股 / 股本</dt><dd>TaiwanStockShareholding</dd>
+        <dt>除權息 / 分割</dt><dd>TaiwanStockDividendResult · TaiwanStockSplitPrice(還原價本地重算)</dd>
+        <dt>大盤指數</dt><dd>TaiwanStockTotalReturnIndex(加權報酬指數,含息)</dd>
+      </dl>
+    </div>
+    <div class="mcard wide">
+      <h3>怎麼檢驗(或質疑)這個系統</h3>
+      <p><b>可追溯</b> — 每一格都能點開看原始數據與計算規則,分數可自行驗算;原始資料庫(SQLite)、全部程式碼與每日評分結果公開於 <a href="https://github.com/DennisLiuCk/strong-weak-scanner" rel="noopener">GitHub</a>,原始資料表只增不改,歷史判定無法事後改寫。</p>
+      <p><b>持續驗證</b> — 每週六自動產出驗證報告(repo 的 <a href="https://github.com/DennisLiuCk/strong-weak-scanner/tree/main/reports" rel="noopener">reports/</a>):各元素在「規則定案日之後」新資料上的預測力、各評級的後續超額報酬。規則調整走固定行動門檻,不憑單日或樣本內數據拍板;歷次調整與依據記錄在 <a href="https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/CHANGELOG.md" rel="noopener">CHANGELOG</a>。</p>
+      <p><b>已知侷限</b> — 券商分點資料未開通,「主力是誰」只能看到法人別、看不到分點;小型股的外資持股單日數字含保管行重分類雜訊(本表看 20 日趨勢並與買賣超交叉驗證);涵蓋範圍僅頁首所列族群與檔數,結論不外推整體市場。</p>
+    </div>
+  </div>
+
   <footer>
     <div class="fn">
-      <div><b>指標定義</b> · 相對強弱 rs20 = 20日報酬 − 族群中位;抗跌 = 族群下跌日的平均相對表現(20日);逆勢買超 = 族群下跌日外資淨買 20 日累計 ÷ 股本;佈局廣度 = 族群內外資 20 日增持檔數比例;量比 = 當日周轉率 ÷ 自身 60 日中位;散戶水位 = 融資餘額 ÷ 發行股數。</div>
-      <div><b>方法</b> · 族群內排名制:各元素取族群內分位數(−2..+2)加權合成,綜合分 3 日平滑、tier 連 2 日確認。價格類指標用還原股價(除權息/分割已本地調整)。個股層選強弱、族群層找佈局。本頁為量化籌碼判讀,非投資建議。</div>
+      <div><b>strong-weak-scanner</b> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner" rel="noopener">原始碼與資料</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/tree/main/reports" rel="noopener">驗證週報</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/CHANGELOG.md" rel="noopener">設計沿革</a> · 資料源 <a href="https://finmindtrade.com/" rel="noopener">FinMind</a>。本頁為量化籌碼研究,非投資建議;資料或有缺漏與延遲,以交易所公告為準。</div>
     </div>
   </footer>
 </div>
@@ -306,26 +433,31 @@
   "use strict";
   var EL = [
     {k:"①價", role:"族群相對",
-     how:"rs20 = 20日還原價報酬 − 族群中位,在族群10檔內排名給分:前20% +2、後20% −2。「修正日抗跌」= 近20日族群下跌日的平均相對表現(獨立元素,權重1.0),也是升「蓄勢」的質量濾網。"},
+     how:"「相對強弱」= 近20日還原價報酬 − 族群中位數(白話:過去一個月跑贏同業多少),在族群內排名給分:前20% +2、後20% −2。「修正日抗跌」是獨立元素(權重1.0):只統計族群整體下跌的日子,它平均比族群多漲(少跌)多少——大家一起跌時撐得住的,才是真強;這也是升「蓄勢」評級的品質門檻。",
+     src:"FinMind 台股日收盤(TaiwanStockPrice);除權息/分割還原價由本系統以事件資料重算"},
     {k:"②量", role:"量比/過熱",
-     how:"量比 = 當日周轉率 ÷ 自身60日中位(避免大型股永遠低周轉的偏誤):1.2~3.0 健康 +1、<0.5 量縮 −1。量比≥5 或周轉率≥20% 觸發過熱旗標 ⚠(不影響分數,進 tier 判斷)。"},
+     how:"量比 = 當日周轉率 ÷ 自己過去60日的中位數——跟自己的常態比,大型股不會因天生低周轉吃虧。1.2~3.0 視為健康活絡 +1;<0.5 量縮無人氣 −1。量比≥5 或周轉率≥20% 觸發過熱旗標 ⚠(不改分數,但會把評級壓到「強但過熱」)。",
+     src:"FinMind 成交量(TaiwanStockPrice)÷ 當日發行股數(TaiwanStockShareholding)"},
     {k:"③外資", role:"國際法人",
-     how:"20日持股pp變化在族群內排名(±0.3pp 視為雜訊給0)。本系統實證:外資是「選族群」訊號,在族群內選股力弱 → 權重僅0.5。「修正日淨買」= 族群下跌日外資淨買20日累計/股本,供蓄勢判定與族群雷達。"},
+     how:"外資持股比率的20日變化(單位:百分點 pp),在族群內排名;若整個族群變化都小於 ±0.3pp,視為無訊號、一律 0 分。本系統實證:外資動向適合「選族群」,在族群內分不出個股強弱,故權重僅 0.5。「修正日淨買」= 族群下跌日外資淨買的20日累計 ÷ 股本(下跌時有沒有人默默接貨),用於蓄勢判定與族群雷達。",
+     src:"FinMind 外資持股(TaiwanStockShareholding)+ 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
     {k:"④投信", role:"本土法人",
-     how:"近5日投信淨買佔股本% 在族群內排名(±0.03% 視為雜訊給0)。實證:修正期投信因子的預測力顯著升高(IC +0.03→+0.12)。"},
+     how:"近5日投信淨買賣 ÷ 發行股數,在族群內排名;整個族群都在 ±0.03% 內時視為雜訊、一律 0 分。投信部位小、動作集中,對中小型股邊際影響大;歷史上在市場修正期參考價值較高(最新檢驗以週報為準)。",
+     src:"FinMind 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
     {k:"⑤融資券", role:"散戶籌碼",
-     how:"看「價 × 融資」的交互而非融資單獨方向:價跌融資減=洗盤 +2、價漲融資增=散戶追高 −1、價跌融資增=散戶接刀 −2。散戶水位(融資/股本)≥9% 分數封頂 −1 並示警 ⚠。"}
+     how:"看「價格 × 融資」的組合,而非融資單獨方向:價跌+融資減=籌碼洗清 +2(最佳)、價漲+融資增=散戶追高 −1、價跌+融資增=散戶接刀 −2(最差)。散戶水位(融資餘額÷股本)≥9% 時分數封頂 −1 並示警 ⚠——水位愈高,回檔時的停損賣壓愈重。",
+     src:"FinMind 融資融券(TaiwanStockMarginPurchaseShortSale)"}
   ];
   var TIER_HOW = {
     "真強":"升級條件:族群綜合分前2名、綜合≥2.5、價≥+1、且至少一項法人買超(外資/投信/逆勢 ≥+1)。",
     "蓄勢·外資佈局":"條件:外資或逆勢買超 +2、距60日高 ≤−3%(價未動)、修正日抗跌 ≥0、綜合 ≥1.5。",
     "強但過熱":"條件:價 ≥+1 且出現過熱旗標(周轉率≥20% / 量比≥5 / 散戶水位≥9%)。主升段中曾為反指標——視為風險提示,非賣出訊號。",
     "潛在/中性":"未觸發任何 tier 規則,族群內排名居中,持續觀察。◇蓄勢候補會標出「差哪些條件」。",
-    "真弱":"條件:族群綜合分倒數2名且<0,或綜合過低 → 汰弱優先名單。",
+    "真弱":"條件:族群綜合分倒數2名且<0,或綜合 ≤−3.5 → 汰弱優先名單。",
     "真弱·陷阱":"條件:外資 ≤−1、融資 ≤−1、相對強弱 <0 —— 外資出、散戶接的出貨形態。",
     "資料不足":"樣本不足,不給判定。"
   };
-  var COMP_HOW = "綜合分 = Σ(元素分數 × 權重),取3日平滑抗抖動;tier 需連2日同向才轉層。權重由實證校準:族群內選股靠價格相對因子(相對強弱/抗跌),籌碼是族群層訊號故降權。各 tier 的滾動歷史表現隨樣本更新,以 reports/ 最新週報為準,不在此寫死。";
+  var COMP_HOW = "綜合分 = Σ(元素分數 × 權重),取3日平均消除單日跳動;評級需連2個交易日判到同層才正式轉層。權重由實證校準:族群內分強弱靠價格相對因子(相對強弱/抗跌),外資/投信是「選族群」訊號故降權——依據與最新樣本外檢驗見 GitHub 週報(reports/)。各評級的歷史表現隨樣本更新,以最新週報為準,不在此寫死。";
   // score -> glyph + class + label
   function sinfo(s){
     if(s>=2)  return {g:"▲▲",c:"s2", l:"強"};
@@ -376,6 +508,12 @@
       var hb=document.createElement("b"); setText(hb, "評分依據:"); hw.appendChild(hb);
       hw.appendChild(document.createTextNode(String(html.how)));
       box.appendChild(hw);
+    }
+    if(html.src){                                // 資料來源(每格都能追到源頭)
+      var sr=document.createElement("div"); sr.className="src";
+      var sb=document.createElement("b"); setText(sb, "資料來源:"); sr.appendChild(sb);
+      sr.appendChild(document.createTextNode(String(html.src)));
+      box.appendChild(sr);
     }
   }
   function showTip(html, x, y){
@@ -496,7 +634,7 @@
       var v=document.createElement("span"); v.className="v mono"; v.textContent=val; cell.appendChild(v);
       attachTip(cell, (function(row,i,s,rows,reason,info){ return function(){
         return { el: EL[i].k+" · "+EL[i].role, who: row.nm+"("+row.id+")", biz: row.biz,
-          rows: rows, why: reason, how: EL[i].how,
+          rows: rows, why: reason, how: EL[i].how, src: EL[i].src,
           scLabel: info.l+(row.cells[i][4]?" ⚠":""), scColor: scColor(s), scBg: tintBg(s) };
       };})(row,i,s,rows,reason,info));
       r.appendChild(cell);
@@ -517,6 +655,7 @@
       return { el:"綜合評級 · 五元素研判", who: row.nm+"("+row.id+")", biz: row.biz,
         rows: row.vrows, why: row.vr,
         how: (TIER_HOW[row.vlabel]||"") + " " + COMP_HOW,
+        src: "由本列五格元素分數加權合成;各元素的原始資料來源見左側各格",
         scLabel: row.vlabel+(row.warn?" ⚠":""), scColor: scColor(row.vt), scBg: tintBg(row.vt) };
     };})(row));
     vc.appendChild(vd); r.appendChild(vc);
@@ -587,6 +726,30 @@
     });
     el.appendChild(picks); tiers.appendChild(el);
   });
+
+  // ---------- 方法區:權重 chips + 評級規則(單一事實來源:WEIGHTS 注入自 score.py、規則共用 TIER_HOW) ----------
+  var WEIGHTS = __WEIGHTS_JSON__;
+  (function(){
+    var host = document.getElementById("wchips");
+    if(!host || !WEIGHTS) return;
+    [["price","①相對強弱"],["resil","①抗跌"],["trust","④投信"],["foreign","③外資"],
+     ["margin","⑤融資券"],["vol","②量"],["dip","③′逆勢買超"]].forEach(function(p){
+      var c = document.createElement("span"); c.className = "wchip";
+      c.appendChild(document.createTextNode(p[1] + " "));
+      var b = document.createElement("b"); b.textContent = "×" + WEIGHTS[p[0]]; c.appendChild(b);
+      if(p[0] === "dip") c.appendChild(document.createTextNode("(僅評級條件)"));
+      host.appendChild(c);
+    });
+  })();
+  (function(){
+    var host = document.getElementById("tierRules");
+    if(!host) return;
+    ["真強","蓄勢·外資佈局","強但過熱","潛在/中性","真弱","真弱·陷阱"].forEach(function(t){
+      var dt = document.createElement("dt"); dt.textContent = t;
+      var dd = document.createElement("dd"); dd.textContent = TIER_HOW[t] || "";
+      host.appendChild(dt); host.appendChild(dd);
+    });
+  })();
 
   // ---------- group filter ----------
   (function(){

@@ -245,6 +245,7 @@ def main():
     html = html.replace("__GROUPS_JSON__", json.dumps(groups, ensure_ascii=False))
     html = html.replace("__GRPMETA_JSON__", json.dumps(grpmeta, ensure_ascii=False))
     html = html.replace("__GORDER_JSON__", json.dumps(GROUP_ORDER))
+    html = html.replace("__WEIGHTS_JSON__", json.dumps(WEIGHTS))
     html = html.replace("__GTITLE__", gtitle)
     html = html.replace("__SCOPE__", f"{len(GROUP_ORDER)} 族群 · {len(data)} 檔")
     html = html.replace("__MARKET_CHIP__", mchip)
