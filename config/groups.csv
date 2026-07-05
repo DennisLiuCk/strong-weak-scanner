@@ -3,3 +3,5 @@ passive,被動元件,MLCC / 電容 / 電阻 / 電感,1
 power,功率元件,MOSFET / 二極體 / 功率IC,2
 packtest,封測,OSAT / 先進封裝 / AI測試,3
 memory,記憶體,DRAM / Flash / 模組 / 控制IC,4
+ipdesign,矽智財,ASIC設計服務 / IP / 高速介面IC,5
+semiequip,半導體設備,先進封裝 / 測試介面 / 濕製程,6

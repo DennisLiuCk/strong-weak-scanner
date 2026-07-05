@@ -1,6 +1,6 @@
 # strong-weak-scanner · 台股汰弱留強掃描
 
-台股半導體四族群(**被動元件 / 功率元件 / 封測 / 記憶體**,名單見 `config/universe.csv`,現 51 檔)
+台股半導體六族群(**被動元件 / 功率元件 / 封測 / 記憶體 / 矽智財 / 半導體設備**,名單見 `config/universe.csv`,現 69 檔)
 的量化籌碼掃描系統:每個交易日自動抓取價量與籌碼資料,在**族群內**互相排名比強弱,
 產出評級與儀表板,並每週以樣本外資料驗證規則是否仍然有效。
 
@@ -154,14 +154,18 @@ uv run --no-project python scripts/build_dashboard.py # 重生 index.html
 # TDCC 週快照(Actions 每日自動抓;週六 opendata 更新後手動跑可提早入庫)
 uv run --no-project python scripts/fetch_tdcc.py
 
-# 回補歷史 / 盤後唯讀簡報 / 週度驗證
+# 回補歷史 / 定向補缺(只抓指定股票,省 API 額度)/ 盤後唯讀簡報 / 週度驗證
 uv run --no-project python scripts/fetch_daily.py --start 2026-03-01
+uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-01
 uv run --no-project python scripts/daily_brief.py
 uv run --no-project python scripts/validate.py
 ```
 
-Token 讀取順序:環境變數 `FINMIND_TOKEN` → 本機 `.mcp.json`(已被 `.gitignore`
-排除);雲端由 Actions secret 注入。Runbook:盤後檢視
+Token 讀取順序:環境變數 `FINMIND_TOKEN`(+選配 `FINMIND_TOKEN2`)→ 本機
+`.mcp.json` 同名欄位(已被 `.gitignore` 排除);雲端由 Actions secret 注入。
+多組 token 組成時額輪替池——免費層 600 req/hr,遇 402 自動換下一組
+(`fetch_daily.api_get`,screen.py 共用);同日多輪「screen+全量回補」單組
+token 必爆額度,參考量:回補一輪 ≈ 5 datasets × 檔數 + 事件段。Runbook:盤後檢視
 [DAILY_CHECK.md](DAILY_CHECK.md)、週六策略檢視 [WEEKLY_REVIEW.md](WEEKLY_REVIEW.md)。
 
 ## 侷限與註記

@@ -11,6 +11,8 @@ FinMind 五元素每日抓取 → SQLite 落地。
   uv run --no-project python scripts/fetch_daily.py --start 2026-03-01 --end 2026-07-03
   # 只回補單一 dataset(新表補歷史用;跳過事件段、仍重算 metrics)
   uv run --no-project python scripts/fetch_daily.py --datasets TaiwanDailyShortSaleBalances --start 2026-03-01
+  # 定向補缺:只抓指定股票(省 API 額度;可與 --datasets 疊加)
+  uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-02
 
 Token 讀取順序:環境變數 FINMIND_TOKEN → 專案根目錄 .mcp.json。
 抓完會自動重算 daily_metrics(五元素衍生指標表)。
@@ -63,14 +65,29 @@ CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMA
 CREATE TABLE IF NOT EXISTS fetch_log(ts TEXT, start TEXT, "end" TEXT, rows INTEGER);
 """
 
+_TOKENS = []   # get_tokens() 快取
+_TOK_I = 0     # 402 輪替黏性指標:換到新 token 後,行程內後續呼叫直接沿用
+
+def get_tokens():
+    """可用 token 清單:環境變數 FINMIND_TOKEN/FINMIND_TOKEN2 → .mcp.json 同名欄位。
+    多組 token = 時額(600/hr)輪替池;402 時 api_get 自動換下一組。"""
+    global _TOKENS
+    if _TOKENS:
+        return _TOKENS
+    ts = [os.environ[k] for k in ("FINMIND_TOKEN", "FINMIND_TOKEN2") if os.environ.get(k)]
+    if not ts:
+        with open(os.path.join(ROOT, ".mcp.json"), encoding="utf-8") as f:
+            env = json.load(f)["mcpServers"]["finmind"]["env"]
+        ts = [env[k] for k in ("FINMIND_TOKEN", "FINMIND_TOKEN2") if env.get(k)]
+    _TOKENS = ts
+    return ts
+
 def get_token():
-    t = os.environ.get("FINMIND_TOKEN")
-    if t:
-        return t
-    with open(os.path.join(ROOT, ".mcp.json"), encoding="utf-8") as f:
-        return json.load(f)["mcpServers"]["finmind"]["env"]["FINMIND_TOKEN"]
+    return get_tokens()[0]
 
 def api_get(dataset, data_id, start, end, token, retries=3):
+    global _TOK_I
+    tokens = get_tokens() or [token]
     p = {"dataset": dataset, "start_date": start, "end_date": end}
     if data_id:
         p["data_id"] = data_id          # 部分 dataset(如 TaiwanStockSplitPrice)全市場一次回傳
@@ -78,10 +95,15 @@ def api_get(dataset, data_id, start, end, token, retries=3):
     url = API + "?" + q
     for i in range(retries):
         try:
-            req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token})
+            req = urllib.request.Request(url, headers={
+                "Authorization": "Bearer " + tokens[_TOK_I % len(tokens)]})
             with urllib.request.urlopen(req, timeout=60) as resp:
                 return json.load(resp).get("data", [])
         except Exception as e:
+            if getattr(e, "code", None) == 402 and len(tokens) > 1 and i < retries - 1:
+                _TOK_I += 1              # 額度用盡 → 輪替下一組立即重試(不退避)
+                print(f"  ! 402 額度用盡,輪替 token → #{_TOK_I % len(tokens) + 1}", file=sys.stderr)
+                continue
             if i == retries - 1:
                 print(f"  ! {dataset} {data_id} 失敗: {e}", file=sys.stderr)
                 return []
@@ -473,6 +495,7 @@ def main():
     ap.add_argument("--sleep", type=float, default=0.25, help="每次 API 間隔秒數(避免限流)")
     ap.add_argument("--metrics-only", action="store_true", help="不抓取,只用現有原始表重算 daily_metrics")
     ap.add_argument("--datasets", help="逗號分隔,只抓指定 dataset(回補新表用);過濾時跳過除權息/分割/指數事件段")
+    ap.add_argument("--stocks", help="逗號分隔,只抓指定股票(定向補缺用,省 API 額度);事件段同步過濾,指數照抓")
     args = ap.parse_args()
 
     if args.metrics_only:
@@ -502,6 +525,12 @@ def main():
     con.executescript(SCHEMA)
     ids = load_universe(con)
     con.commit()
+    if args.stocks:
+        want = {s.strip() for s in args.stocks.split(",") if s.strip()}
+        missing = want - set(ids)
+        if missing:
+            sys.exit(f"--stocks 含 universe 外代號:{sorted(missing)}")
+        ids = [s for s in ids if s in want]
     print(f"抓取 {start} .. {end} · {len(ids)} 檔 · {len(ds_list)} datasets")
     total = 0
     for i, sid in enumerate(ids, 1):

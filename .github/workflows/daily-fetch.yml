@@ -45,6 +45,7 @@ jobs:
       - name: 抓取五元素並重算 daily_metrics
         env:
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+          FINMIND_TOKEN2: ${{ secrets.FINMIND_TOKEN2 }}   # 選配:402 額度輪替備援(secret 未設=自動略過)
         run: python scripts/fetch_daily.py
 
       - name: 計算五元素分數與 tier
