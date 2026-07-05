@@ -20,6 +20,15 @@ DB = os.path.join(ROOT, "data", "findmind.db")
 TEMPLATE = os.path.join(ROOT, "scripts", "dashboard_template.html")
 OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages 乾淨網址
 
+# 標題設定。TITLE_TAIL 是品牌尾綴、ALL_SCOPE 是「全部族群」時的範圍詞;篩選到單一族群時,
+# 前端會把標題換成「族群名 · TITLE_TAIL」(見 dashboard_template.html 的 group filter JS)。
+# 刻意不列舉族群、不寫死元素數——加族群或改元素都不必動這裡。PAGE_TITLE(<title>,分頁/SEO/
+# 書籤)與 H1_TITLE(<h1>,頁面大標)是兩個獨立旋鈕,預設同字串,要各自演化改對應那行即可。
+TITLE_TAIL = "汰弱留強掃描"          # 品牌尾綴;各族群動態標題共用
+ALL_SCOPE  = "台股半導體族群"         # 「全部族群」時的範圍詞
+PAGE_TITLE = ALL_SCOPE + " · " + TITLE_TAIL   # <title> 預設(全部族群)
+H1_TITLE   = ALL_SCOPE + " · " + TITLE_TAIL   # <h1> 預設(全部族群)
+
 # 族群定義以 config/groups.csv → db `groups` 表為準;此處僅為舊 db 的退路預設
 GROUP_ORDER = ["passive", "power", "packtest"]
 GROUP_NM = {"passive": "被動元件", "power": "功率元件", "packtest": "封測"}
@@ -237,7 +246,6 @@ def main():
 
     y, mo, d = last.split("-")
     date_str = f"{y}/{int(mo)}/{int(d)}"
-    gtitle = " × ".join(GROUP_NM.get(g, g) for g in GROUP_ORDER) + " · 汰弱留強五元素儀表板"
     grpmeta = {g: {"nm": GROUP_NM.get(g, g), "tag": GROUP_TAG.get(g, "")} for g in GROUP_ORDER}
     html = open(TEMPLATE, encoding="utf-8").read()
     html = html.replace("__DATA_JSON__", json.dumps(data, ensure_ascii=False))
@@ -246,7 +254,9 @@ def main():
     html = html.replace("__GRPMETA_JSON__", json.dumps(grpmeta, ensure_ascii=False))
     html = html.replace("__GORDER_JSON__", json.dumps(GROUP_ORDER))
     html = html.replace("__WEIGHTS_JSON__", json.dumps(WEIGHTS))
-    html = html.replace("__GTITLE__", gtitle)
+    html = html.replace("__PAGE_TITLE__", PAGE_TITLE)
+    html = html.replace("__H1__", H1_TITLE)
+    html = html.replace("__TITLE_TAIL_JSON__", json.dumps(TITLE_TAIL, ensure_ascii=False))
     html = html.replace("__SCOPE__", f"{len(GROUP_ORDER)} 族群 · {len(data)} 檔")
     html = html.replace("__MARKET_CHIP__", mchip)
     html = html.replace("__DATE__", date_str)

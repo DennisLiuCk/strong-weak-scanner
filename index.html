@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>被動元件 × 功率元件 × 封測 · 汰弱留強五元素儀表板</title>
+<title>台股半導體族群 · 汰弱留強掃描</title>
 <style>
   :root{
     --page:#f0eee8; --surface:#fbfaf8; --surface-2:#f3f1ea; --cell:#f6f4ee;
@@ -282,7 +282,7 @@
   <header>
     <div>
       <div class="brandrule"></div>
-      <h1>被動元件 × 功率元件 × 封測 · 汰弱留強五元素儀表板</h1>
+      <h1>台股半導體族群 · 汰弱留強掃描</h1>
       <p class="sub">每個交易日收盤後,把同族群的個股放上同一把尺互相比較:價格誰相對強、下跌時誰撐得住、法人在買誰、散戶擠在哪——比出強弱、依規則分層。每個分數都可以點開,看到原始數據、判讀理由、計算規則與資料來源;完整方法見<a href="#method">頁尾「方法與資料」</a>。</p>
       <div class="meta">
         <span class="chip">市場 <b>多頭/中性</b>(報酬指數距20日高 -1.7%)</span>
@@ -764,6 +764,17 @@
     var groupsHost = document.getElementById("groups");
     function nmOf(g){ return (GRP[g] && GRP[g].nm) || g; }
 
+    // 動態標題:分頁 <title> 與頁面 <h1> 隨選中族群改變(全部→注入預設;單族群→「族群名 · 尾綴」),
+    // 讓分享的 #g=xxx 連結分頁即點題。尾綴由 build 注入,與 PAGE_TITLE / H1_TITLE 同源。
+    var h1El = document.querySelector("h1");
+    var TAIL = "汰弱留強掃描";
+    var BASE_TITLE = document.title;                      // <title> 預設(全部族群)
+    var BASE_H1 = h1El ? h1El.textContent : BASE_TITLE;   // <h1> 預設(全部族群)
+    function setTitle(g){
+      document.title = g === "all" ? BASE_TITLE : nmOf(g) + " · " + TAIL;
+      if(h1El) h1El.textContent = g === "all" ? BASE_H1 : nmOf(g) + " · " + TAIL;
+    }
+
     function setScope(g){
       if(!scope) return;
       scope.textContent = "範圍 ";
@@ -810,6 +821,7 @@
         card.style.display = (picks.length && shown === 0) ? "none" : "";
       });
       setScope(g);
+      setTitle(g);
       hideTip();
       if(!skipStore){
         try{ localStorage.setItem("sc_group", g); }catch(e){}
