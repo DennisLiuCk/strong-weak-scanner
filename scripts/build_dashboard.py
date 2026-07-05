@@ -37,6 +37,9 @@ H1_TITLE   = ALL_SCOPE + " · " + TITLE_TAIL   # <h1> 預設(全部族群)
 GROUP_ORDER = ["passive", "power", "packtest"]
 GROUP_NM = {"passive": "被動元件", "power": "功率元件", "packtest": "封測"}
 GROUP_TAG = {}
+# 結論卡的族群標籤用短名(2~3 字,省空間);未列的族群自動退回全名。加族群時想更短就在這補一筆。
+GROUP_SHORT = {"passive": "被動", "power": "功率", "packtest": "封測",
+               "memory": "記憶體", "ipdesign": "矽智財", "semiequip": "設備"}
 TIER_ORDER = ["真強", "蓄勢·外資佈局", "強但過熱", "潛在/中性", "真弱", "真弱·陷阱"]
 TIER_VT = {"真強": 2, "蓄勢·外資佈局": 2, "強但過熱": 1, "潛在/中性": 0, "真弱": -2, "真弱·陷阱": -2}
 TIER_COL = {"真強": "var(--strong)", "蓄勢·外資佈局": "var(--neutral)", "強但過熱": "var(--warn-line)",
@@ -250,7 +253,8 @@ def main():
 
     y, mo, d = last.split("-")
     date_str = f"{y}/{int(mo)}/{int(d)}"
-    grpmeta = {g: {"nm": GROUP_NM.get(g, g), "tag": GROUP_TAG.get(g, "")} for g in GROUP_ORDER}
+    grpmeta = {g: {"nm": GROUP_NM.get(g, g), "tag": GROUP_TAG.get(g, ""),
+                   "short": GROUP_SHORT.get(g, GROUP_NM.get(g, g))} for g in GROUP_ORDER}
     html = open(TEMPLATE, encoding="utf-8").read()
     html = html.replace("__DATA_JSON__", json.dumps(data, ensure_ascii=False))
     html = html.replace("__TIERS_JSON__", json.dumps(tiers, ensure_ascii=False))

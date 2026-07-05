@@ -123,6 +123,9 @@
   .pick .code{font-size:11px;color:var(--muted)}
   .pick .nm{font-weight:700}
   .dot{width:9px;height:9px;border-radius:3px;flex:0 0 auto;background:var(--pc,var(--neutral))}
+  /* 結論卡族群標籤:同族群名對齊成一欄(min-width),色盲友善的純文字小標,不佔訊號色 */
+  .pick .gt{font-size:10px;font-weight:600;color:var(--muted);border:1px solid var(--hairline);
+    border-radius:6px;padding:0 6px;flex:0 0 auto;min-width:34px;text-align:center;box-sizing:border-box}
 
   /* ---- matrix ---- */
   .scroller{overflow-x:auto;border:1px solid var(--hairline);border-radius:16px;background:var(--surface);
@@ -723,6 +726,8 @@
       var dot=document.createElement("span"); dot.className="dot"; dot.style.setProperty("--pc",scColor(d.vt));
       if(d.warn) dot.style.background="var(--warn-line)";
       p.appendChild(dot);
+      var gt=document.createElement("span"); gt.className="gt";   // 族群短標(混族群的結論卡才分得出來)
+      gt.textContent=(GRP[d.g] && (GRP[d.g].short || GRP[d.g].nm)) || d.g; p.appendChild(gt);
       var nm=document.createElement("span"); nm.className="nm"; nm.textContent=d.nm; p.appendChild(nm);
       var code=document.createElement("span"); code.className="code mono"; code.textContent=id; p.appendChild(code);
       if(T.sub && T.sub[id]){   // 蓄勢候補:標示差哪些條件
