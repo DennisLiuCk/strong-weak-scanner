@@ -11,6 +11,7 @@
     --neutral:#7a756a; --neutral-tint:rgba(122,117,106,0.07);
     --warn:#9c6a06; --warn-line:#d69e2e; --warn-bg:rgba(214,158,46,0.16);
     --shadow:0 1px 2px rgba(20,18,12,.05),0 8px 24px rgba(20,18,12,.08);
+    color-scheme:light;
   }
   @media (prefers-color-scheme:dark){
     :root{
@@ -22,6 +23,7 @@
       --neutral:#9a9488; --neutral-tint:rgba(154,148,136,0.09);
       --warn:#e0a83a; --warn-line:#e0a83a; --warn-bg:rgba(224,168,58,0.16);
       --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
+      color-scheme:dark;
     }
   }
   :root[data-theme="light"]{
@@ -33,6 +35,7 @@
     --neutral:#7a756a; --neutral-tint:rgba(122,117,106,0.07);
     --warn:#9c6a06; --warn-line:#d69e2e; --warn-bg:rgba(214,158,46,0.16);
     --shadow:0 1px 2px rgba(20,18,12,.05),0 8px 24px rgba(20,18,12,.08);
+    color-scheme:light;
   }
   :root[data-theme="dark"]{
     --page:#0e0e0a; --surface:#17160f; --surface-2:#201f16; --cell:#1d1c14;
@@ -43,6 +46,7 @@
     --neutral:#9a9488; --neutral-tint:rgba(154,148,136,0.09);
     --warn:#e0a83a; --warn-line:#e0a83a; --warn-bg:rgba(224,168,58,0.16);
     --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
+    color-scheme:dark;
   }
 
   *{box-sizing:border-box}
@@ -66,9 +70,15 @@
   .chip{font-size:11.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--hairline);
     border-radius:100px;padding:3px 10px;white-space:nowrap}
   .chip b{color:var(--ink);font-weight:700}
+  .date-wrap{position:relative;display:inline-block}
+  .date-wrap::after{content:"";position:absolute;right:1px;top:45%;width:6px;height:6px;
+    border-right:1.5px solid var(--ink-2);border-bottom:1.5px solid var(--ink-2);
+    transform:translateY(-55%) rotate(45deg);pointer-events:none}
   #dateSel{font-family:inherit;font-size:inherit;font-weight:700;color:var(--ink);
-    background:transparent;border:none;padding:0;cursor:pointer}
-  #dateSel:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+    background:transparent;border:none;padding:0 13px 0 0;margin:0;cursor:pointer;
+    appearance:none;-webkit-appearance:none;-moz-appearance:none}
+  #dateSel:focus-visible{outline:2px solid var(--strong);outline-offset:2px;border-radius:4px}
+  #dateSel option{background:var(--surface);color:var(--ink)}
   #histNote{margin:14px 0 0;padding:9px 14px;font-size:13px;color:var(--ink);
     background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:8px}
   #histNote a{color:var(--ink);font-weight:700;text-underline-offset:2px}
@@ -302,7 +312,7 @@
       <div class="meta">
         <span class="chip" id="mktChip">__MARKET_CHIP__</span>
         <span class="chip" id="scopeChip">範圍 <b>__SCOPE__</b></span>
-        <span class="chip">資料至 <select id="dateSel" aria-label="切換報告日期"><option value="__DATE_ISO__">__DATE__</option></select>(還原股價)</span>
+        <span class="chip">資料至 <span class="date-wrap"><select id="dateSel" aria-label="切換報告日期"><option value="__DATE_ISO__">__DATE__</option></select></span>(還原股價)</span>
         <span class="chip">來源 <b>FinMind</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
       </div>
