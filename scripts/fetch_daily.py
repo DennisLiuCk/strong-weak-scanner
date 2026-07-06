@@ -251,11 +251,7 @@ def backfill_holding_from_exchange(con, target_date):
     ymd = target_date.replace("-", "")
     found = {}
     try:
-        req = urllib.request.Request(
-            f"{TWSE_QFIIS_URL}?date={ymd}&selectType=ALLBUT0999&response=json",
-            headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            d = json.load(resp)
+        d = _get_json(f"{TWSE_QFIIS_URL}?date={ymd}&selectType=ALLBUT0999&response=json")
         if d.get("stat") == "OK" and d.get("date") == ymd:
             for row in d["data"]:
                 sid = row[0]
@@ -266,9 +262,7 @@ def backfill_holding_from_exchange(con, target_date):
     still_missing = missing - found.keys()
     if still_missing:
         try:
-            req = urllib.request.Request(TPEX_QFII_URL, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                rows = json.load(resp)
+            rows = _get_json(TPEX_QFII_URL)
             roc = _roc_date(target_date)
             if rows and rows[0].get("Date") == roc:
                 for row in rows:
@@ -302,7 +296,9 @@ TPEX_WARNING_URL = "https://www.tpex.org.tw/openapi/v1/tpex_trading_warning_info
 def _get_json(url):
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.load(resp)
+        data = json.load(resp)
+    time.sleep(0.5)   # 禮貌間隔:TWSE/TPEx 官方未公布限流數字,保守起見別連續打
+    return data
 
 def fetch_risk_flags(con, target_date):
     """抓當天 TWSE/TPEx 處置+注意名單,篩出 universe 內的檔位存進 risk_flags(整表重建,
