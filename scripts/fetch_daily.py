@@ -79,8 +79,11 @@ def get_tokens():
         with open(os.path.join(ROOT, ".mcp.json"), encoding="utf-8") as f:
             env = json.load(f)["mcpServers"]["finmind"]["env"]
         ts = [env[k] for k in ("FINMIND_TOKEN", "FINMIND_TOKEN2") if env.get(k)]
-    _TOKENS = ts
-    return ts
+    # GitHub secret 貼上時可能夾帶 BOM(例如來源檔案存成「UTF-8 with BOM」)——
+    # 混進 Authorization header 會讓 latin-1 編碼直接炸掉,且 api_get 逐檔 catch 例外,
+    # 會變成「全部靜默失敗、job 卻顯示成功」(2026-07-06 事故:GH Actions 兩次 run 皆 0 rows)。
+    _TOKENS = [t.strip().lstrip("﻿") for t in ts]
+    return _TOKENS
 
 def get_token():
     return get_tokens()[0]
