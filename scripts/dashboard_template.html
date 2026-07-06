@@ -154,6 +154,10 @@
   .rl{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:9px 10px 9px 16px;min-width:0}
   .rl .nm{font-weight:800;font-size:14px;letter-spacing:.2px}
   .rl .code{font-size:11px;color:var(--muted)}
+  .riskbadge{display:inline-block;width:fit-content;margin-top:2px;font-size:10px;font-weight:700;
+    color:var(--strong);border:1px solid var(--strong);border-radius:100px;padding:1px 7px;
+    cursor:default;letter-spacing:.5px}
+  .riskbadge.sm{margin-top:0;padding:0 5px;flex:0 0 auto}
   .cell{position:relative;margin:5px;border-radius:9px;padding:8px 6px 7px;cursor:default;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
     background:var(--cell);border:1px solid transparent;transition:transform .08s ease, box-shadow .08s ease;
@@ -651,6 +655,19 @@
     var nm=document.createElement("span"); nm.className="nm"; nm.textContent=row.nm; rl.appendChild(nm);
     var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; rl.appendChild(code);
     if(row.biz){ var bz=document.createElement("span"); bz.className="code"; bz.textContent=row.biz; rl.appendChild(bz); }
+    if(row.risk && row.risk.length){
+      var rk=document.createElement("span"); rk.className="riskbadge";
+      rk.textContent = row.risk.some(function(x){ return x.kind==="處置"; }) ? "處置" : "注意";
+      rl.appendChild(rk);
+      attachTip(rk, (function(row){ return function(){
+        return { el:"處置/注意股票 · 觀察層(不計分)", who: row.nm+"("+row.id+")", biz: row.biz,
+          rows: row.risk.map(function(x){ return [x.kind, x.period||"", x.reason||""]; }),
+          why: "交易所對異常價量的官方認證(法定門檻觸發),五元素分數看不到這塊——僅供風險提醒,不影響左側評分與綜合評級。",
+          how: "當天名單即代表當下正被列管,不代表基本面或籌碼變差,常與短線炒作/當沖過熱相關。",
+          src: "TWSE announcement/punish、announcement/notice;TPEx tpex_disposal_information、tpex_trading_warning_information",
+          scLabel: "⚠ 列管中", scColor: "var(--strong)", scBg: "var(--strong-tint)" };
+      };})(row));
+    }
     r.appendChild(rl);
 
     row.cells.forEach(function(c,i){
@@ -771,6 +788,19 @@
       gt.textContent=(GRP[d.g] && (GRP[d.g].short || GRP[d.g].nm)) || d.g; p.appendChild(gt);
       var nm=document.createElement("span"); nm.className="nm"; nm.textContent=d.nm; p.appendChild(nm);
       var code=document.createElement("span"); code.className="code mono"; code.textContent=id; p.appendChild(code);
+      if(d.risk && d.risk.length){
+        var rk=document.createElement("span"); rk.className="riskbadge sm";
+        rk.textContent = d.risk.some(function(x){ return x.kind==="處置"; }) ? "處置" : "注意";
+        p.appendChild(rk);
+        attachTip(rk, (function(d){ return function(){
+          return { el:"處置/注意股票 · 觀察層(不計分)", who: d.nm+"("+id+")", biz: d.biz,
+            rows: d.risk.map(function(x){ return [x.kind, x.period||"", x.reason||""]; }),
+            why: "交易所對異常價量的官方認證(法定門檻觸發),五元素分數看不到這塊——僅供風險提醒,不影響左側評分與綜合評級。",
+            how: "當天名單即代表當下正被列管,不代表基本面或籌碼變差,常與短線炒作/當沖過熱相關。",
+            src: "TWSE announcement/punish、announcement/notice;TPEx tpex_disposal_information、tpex_trading_warning_information",
+            scLabel: "⚠ 列管中", scColor: "var(--strong)", scBg: "var(--strong-tint)" };
+        };})(d));
+      }
       if(T.sub && T.sub[id]){   // 蓄勢候補:標示差哪些條件
         nm.style.whiteSpace="nowrap";
         var sb=document.createElement("span"); sb.className="code"; sb.style.marginLeft="auto";

@@ -308,6 +308,15 @@ def main():
             SUM(CASE WHEN m.trust5_pct>0 THEN 1 ELSE 0 END) t_pos, COUNT(m.trust5_pct) t_n
             FROM daily_metrics m JOIN universe u USING(stock_id)
             WHERE m.date=? GROUP BY u.grp""", (last,))}
+    # 處置/注意股票(觀察層、不計分):交易所官方認證的異常價量列管,五元素分數看不到——
+    # 只顯示當天名單,不判斷起訖(risk_flags 由 fetch_daily 每日整表重建)
+    risk = {}
+    try:
+        for r in con.execute("SELECT stock_id, kind, reason, period FROM risk_flags WHERE date=?", (last,)):
+            risk.setdefault(r["stock_id"], []).append(
+                {"kind": r["kind"], "reason": r["reason"], "period": r["period"]})
+    except sqlite3.OperationalError:
+        pass
     con.close()
 
     dips = [(x["med_dip"], x["grp"]) for x in grows if x["med_dip"] is not None]
@@ -396,6 +405,8 @@ def main():
                "cells": build_cells(r, r, mkt20)}
         if warn:
             obj["warn"] = True
+        if r["stock_id"] in risk:
+            obj["risk"] = risk[r["stock_id"]]
         obj["_comp"] = r["composite_s"]
         data.append(obj)
         tiers_map.setdefault(tier, []).append((r["composite_s"], r["stock_id"]))

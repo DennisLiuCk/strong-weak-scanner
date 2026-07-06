@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS holding(date TEXT, stock_id TEXT, foreign_pct REAL, s
   PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS sbl(date TEXT, stock_id TEXT, sbl_bal INTEGER,
   PRIMARY KEY(date,stock_id));
+CREATE TABLE IF NOT EXISTS risk_flags(date TEXT, stock_id TEXT, kind TEXT, reason TEXT, period TEXT,
+  PRIMARY KEY(date,stock_id,kind));
 CREATE TABLE IF NOT EXISTS dividend_result(date TEXT, stock_id TEXT, before_price REAL,
   reference_price REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS split_event(date TEXT, stock_id TEXT, before_price REAL,
@@ -287,6 +289,68 @@ def backfill_holding_from_exchange(con, target_date):
         print(f"  ! 外資持股仍缺 {len(still)} 檔(TWSE/TPEx 當天也沒有):{','.join(sorted(still))}",
               file=sys.stderr)
     return len(found)
+
+# 處置/注意股票(觀察層、不計分):交易所對異常價量的官方認證,五元素分數看不到這塊
+# ——2026-07-07 驗證發現「真強」評級個股同時被列注意股票(90日漲幅163%)的實例。
+# TWSE(上市)+TPEx(上櫃)各自的處置/注意端點,免token,合計涵蓋全市場;當天名單
+# 即代表當下正被列管,不必自行判斷起訖。任一端點失敗印警告後跳過,不擋主管線。
+TWSE_PUNISH_URL = "https://openapi.twse.com.tw/v1/announcement/punish"
+TWSE_NOTICE_URL = "https://openapi.twse.com.tw/v1/announcement/notice"
+TPEX_DISPOSAL_URL = "https://www.tpex.org.tw/openapi/v1/tpex_disposal_information"
+TPEX_WARNING_URL = "https://www.tpex.org.tw/openapi/v1/tpex_trading_warning_information"
+
+def _get_json(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return json.load(resp)
+
+def fetch_risk_flags(con, target_date):
+    """抓當天 TWSE/TPEx 處置+注意名單,篩出 universe 內的檔位存進 risk_flags(整表重建,
+    冪等)。同一檔同一天可能有多筆理由(TPEx 注意常見),合併成一筆用「;」串接。"""
+    uni = {r[0] for r in con.execute("SELECT stock_id FROM universe")}
+    picked = {}   # (stock_id, kind) -> {"reasons": [...], "period": str|None}
+
+    def add(sid, kind, reason, period=None):
+        if sid not in uni:
+            return
+        e = picked.setdefault((sid, kind), {"reasons": [], "period": period})
+        if reason and reason not in e["reasons"]:
+            e["reasons"].append(reason)
+        if period and not e["period"]:
+            e["period"] = period
+
+    try:
+        for r in _get_json(TWSE_PUNISH_URL):
+            add(r.get("Code"), "處置", r.get("ReasonsOfDisposition"), r.get("DispositionPeriod"))
+    except Exception as e:
+        print(f"  ! TWSE 處置股票抓取失敗:{e}", file=sys.stderr)
+    try:
+        for r in _get_json(TWSE_NOTICE_URL):
+            if r.get("Code"):   # 當天無注意股票時回傳單筆全空值 placeholder row
+                add(r["Code"], "注意", r.get("TradingInfoForAttention"))
+    except Exception as e:
+        print(f"  ! TWSE 注意股票抓取失敗:{e}", file=sys.stderr)
+    try:
+        for r in _get_json(TPEX_DISPOSAL_URL):
+            add(r.get("SecuritiesCompanyCode"), "處置", r.get("DispositionReasons"), r.get("DispositionPeriod"))
+    except Exception as e:
+        print(f"  ! TPEx 處置股票抓取失敗:{e}", file=sys.stderr)
+    try:
+        for r in _get_json(TPEX_WARNING_URL):
+            if r.get("SecuritiesCompanyCode"):
+                add(r["SecuritiesCompanyCode"], "注意", r.get("TradingInformation"))
+    except Exception as e:
+        print(f"  ! TPEx 注意股票抓取失敗:{e}", file=sys.stderr)
+
+    con.execute("DELETE FROM risk_flags WHERE date=?", (target_date,))
+    rows = [(target_date, sid, kind, "；".join(e["reasons"]), e["period"])
+            for (sid, kind), e in picked.items()]
+    if rows:
+        con.executemany("INSERT OR REPLACE INTO risk_flags VALUES(?,?,?,?,?)", rows)
+    con.commit()
+    if rows:
+        print(f"  處置/注意股票(觀察層):{len(picked)} 檔次,{','.join(sorted({s for s, _ in picked}))}")
+    return len(rows)
 
 def build_price_adj(con):
     """由 price × 事件係數重算還原價(倒推法:事件日「之前」的價 × 係數連乘,最新區段==原始價)。
@@ -627,6 +691,7 @@ def main():
         n_bf = backfill_holding_from_exchange(con, end)
         if n_bf:
             print(f"外資持股 TWSE/TPEx 備援:補上 {n_bf} 檔")
+    fetch_risk_flags(con, end)
     build_price_adj(con)
     print("重算 daily_metrics + 族群/大盤層 …")
     build_metrics(con)
