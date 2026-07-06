@@ -37,6 +37,7 @@
 fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token)→ tdcc_holding
                  ⚠ 僅供最新一週、缺週=永久洞;失敗 exit 0 不擋管線(Actions 綠≠成功)
 fetch_daily.py   抓取(FinMind)→ 還原價(除權息/分割自算)→ 五元素+觀察欄 → 族群層聚合
+                 ⚠ 內含 TWSE/TPEx 直抓備援(免token):外資持股缺值回補、處置/注意股票旗標
 score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
                  ⚠ 本地重跑會覆寫當日資料日的已凍結快照——commit 前 git checkout -- archive/
@@ -44,7 +45,10 @@ validate.py      → reports/ 週報(§⑥=觀察因子 IC)
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
 ```
 
-資料表:原始 price/inst/margin/holding/sbl(借券餘額,單位=股)+ tdcc_holding(週頻)
-(append-only)+ 衍生 price_adj/daily_metrics/daily_scores/group_metrics/market_daily
-(每次重建)。舊制凍結:daily_scores_v1。**觀察層(TDCC 大戶/借券)未計分**,
-歸宿等 OOS 裁決(WEEKLY_REVIEW §4-8,約 2026-08-29 後)。
+資料表:原始 price/inst/margin/holding/sbl(借券餘額,單位=股)+ tdcc_holding(週頻)+
+risk_flags(TWSE/TPEx 處置/注意公告)(皆 append-only)+ 衍生
+price_adj/daily_metrics/daily_scores/group_metrics/market_daily(每次重建)。
+舊制凍結:daily_scores_v1。**觀察層(TDCC 大戶/借券)未計分**,歸宿等 OOS 裁決
+(WEEKLY_REVIEW §4-8,約 2026-08-29 後)。**risk_flags(處置/注意)屬另一類**——
+交易所官方認證的異常價量列管,設計上就是永久顯示用警示(儀表板紅框 badge),
+不進 OOS 排程、不會變成計分項。
