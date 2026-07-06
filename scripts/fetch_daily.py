@@ -224,6 +224,70 @@ def fetch_index(con, token, start, end, sleep):
     time.sleep(sleep)
     return len(rows)
 
+# FinMind TaiwanStockShareholding 對個別股票偶有發布延遲(2026-07-06 事故:19 檔當天缺值,
+# 隔天仍缺,但 TWSE/TPEx 官方當天就有——見 reports/data_gap_2026-07-06.md)。
+# 兩者皆免token、免登入,合計涵蓋全市場(上市+上櫃),與 fetch_tdcc.py 同一原則:
+# 直接打交易所官方 opendata,失敗不擋主管線。
+TWSE_QFIIS_URL = "https://www.twse.com.tw/rwd/zh/fund/MI_QFIIS"
+TPEX_QFII_URL = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_qfii"
+
+def _roc_date(iso_date):
+    """2026-07-06 → 民國 1150706(TPEx Date 欄位格式)。"""
+    y, m, d = iso_date.split("-")
+    return f"{int(y) - 1911}{m}{d}"
+
+def backfill_holding_from_exchange(con, target_date):
+    """FinMind holding(外資持股)在 target_date 缺值時的備援:直接查 TWSE(上市)/
+    TPEx(上櫃)當天官方數字回補,只補缺、不覆寫既有資料。任一來源格式跑掉或連不上,
+    印警告後跳過,不擋主管線(建置/評分沿用既有的 None→中性0 兜底)。"""
+    missing = {r[0] for r in con.execute(
+        """SELECT u.stock_id FROM universe u
+           LEFT JOIN holding h ON h.stock_id = u.stock_id AND h.date = ?
+           WHERE h.stock_id IS NULL""", (target_date,))}
+    if not missing:
+        return 0
+    ymd = target_date.replace("-", "")
+    found = {}
+    try:
+        req = urllib.request.Request(
+            f"{TWSE_QFIIS_URL}?date={ymd}&selectType=ALLBUT0999&response=json",
+            headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            d = json.load(resp)
+        if d.get("stat") == "OK" and d.get("date") == ymd:
+            for row in d["data"]:
+                sid = row[0]
+                if sid in missing:
+                    found[sid] = (float(row[7]), int(str(row[3]).replace(",", "")))
+    except Exception as e:
+        print(f"  ! TWSE MI_QFIIS 備援失敗:{e}", file=sys.stderr)
+    still_missing = missing - found.keys()
+    if still_missing:
+        try:
+            req = urllib.request.Request(TPEX_QFII_URL, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                rows = json.load(resp)
+            roc = _roc_date(target_date)
+            if rows and rows[0].get("Date") == roc:
+                for row in rows:
+                    sid = row.get("SecuritiesCompanyCode")
+                    if sid in still_missing:
+                        pct = float(row["PercentageOfSharesOC/FMIHeld"].rstrip("%"))
+                        shares = int(row["NumberOfSharesIssued"])
+                        found[sid] = (pct, shares)
+        except Exception as e:
+            print(f"  ! TPEx qfii 備援失敗:{e}", file=sys.stderr)
+    for sid, (pct, shares) in found.items():
+        con.execute("INSERT OR REPLACE INTO holding VALUES(?,?,?,?)", (target_date, sid, pct, shares))
+    con.commit()
+    if found:
+        print(f"  外資持股備援(TWSE/TPEx)補上 {len(found)}/{len(missing)} 檔:{','.join(sorted(found))}")
+    still = missing - found.keys()
+    if still:
+        print(f"  ! 外資持股仍缺 {len(still)} 檔(TWSE/TPEx 當天也沒有):{','.join(sorted(still))}",
+              file=sys.stderr)
+    return len(found)
+
 def build_price_adj(con):
     """由 price × 事件係數重算還原價(倒推法:事件日「之前」的價 × 係數連乘,最新區段==原始價)。
     事件來源:dividend_result(date=除息「交易日」、before_price=前一交易日收盤——已對 10 筆實際
@@ -559,6 +623,10 @@ def main():
         ns = fetch_splits(con, ids, token, adj_start, today, args.sleep)
         ni = fetch_index(con, token, adj_start, today, args.sleep)
         print(f"dividend_result upsert {nd};split_event upsert {ns};TAIEX {ni}")
+    if "TaiwanStockShareholding" in ds_list:
+        n_bf = backfill_holding_from_exchange(con, end)
+        if n_bf:
+            print(f"外資持股 TWSE/TPEx 備援:補上 {n_bf} 檔")
     build_price_adj(con)
     print("重算 daily_metrics + 族群/大盤層 …")
     build_metrics(con)
