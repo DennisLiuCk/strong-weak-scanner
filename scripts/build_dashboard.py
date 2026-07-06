@@ -216,7 +216,7 @@ def verdict(sc):
              ["③外資", f"{sc['s_foreign']:+d} × {WEIGHTS['foreign']}"],
              ["⑤融資券", f"{sc['s_margin']:+d} × {WEIGHTS['margin']}"],
              ["②量", f"{sc['s_vol']:+d} × {WEIGHTS['vol']}"],
-             ["③′逆勢買超", f"{sc['s_dip']:+d} × {WEIGHTS['dip']}(供tier)"]]
+             ["③逆勢買超", f"{sc['s_dip']:+d} × {WEIGHTS['dip']}(供tier)"]]
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"]), vrows
 
 

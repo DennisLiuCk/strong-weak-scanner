@@ -787,7 +787,7 @@
     var host = document.getElementById("wchips");
     if(!host || !WEIGHTS) return;
     [["price","①相對強弱"],["resil","①抗跌"],["trust","④投信"],["foreign","③外資"],
-     ["margin","⑤融資券"],["vol","②量"],["dip","③′逆勢買超"]].forEach(function(p){
+     ["margin","⑤融資券"],["vol","②量"],["dip","③逆勢買超"]].forEach(function(p){
       var c = document.createElement("span"); c.className = "wchip";
       c.appendChild(document.createTextNode(p[1] + " "));
       var b = document.createElement("b"); b.textContent = "×" + WEIGHTS[p[0]]; c.appendChild(b);
