@@ -819,14 +819,21 @@
       });
       el.appendChild(picks);
       if(g.chip){                // 籌碼健康度彙總(觀察層):族群內幾檔健康/中性/待觀察,一眼看整體體質
+        var CHIP_DOT = {health:"var(--health)", neutral:"var(--neutral)", warn:"var(--warn-line)"};
         var cp = document.createElement("div"); cp.className = "pick";
         var clab = document.createElement("span"); clab.className = "code"; clab.style.flex = "1";
         clab.textContent = "籌碼健康(" + (g.chip.dots.length) + "檔)";
         var cval = document.createElement("span"); cval.className = "nm mono";
-        cval.textContent = g.chip.health + "健康 · " + g.chip.neutral + "中性 · " + g.chip.warn + "待觀察";
+        // 標籤縮成單字(健/中/待)——色彩已經跟下方圓點對應,文字只需要當作色塊的輔助辨識,
+        // 不必重複寫全名,避免把左側「籌碼健康(N檔)」擠成兩行
+        [["health", g.chip.health, "健"], ["neutral", g.chip.neutral, "中"], ["warn", g.chip.warn, "待"]]
+          .forEach(function(seg, i){
+            var sp = document.createElement("span"); sp.style.color = CHIP_DOT[seg[0]];
+            sp.textContent = seg[1] + seg[2]; cval.appendChild(sp);
+            if(i < 2) cval.appendChild(document.createTextNode("·"));
+          });
         cp.appendChild(clab); cp.appendChild(cval); picks.appendChild(cp);
         var strip = document.createElement("div"); strip.className = "dotstrip";
-        var CHIP_DOT = {health:"var(--health)", neutral:"var(--neutral)", warn:"var(--warn-line)"};
         g.chip.dots.forEach(function(cls){
           var dt = document.createElement("span"); dt.style.background = CHIP_DOT[cls]; strip.appendChild(dt);
         });
