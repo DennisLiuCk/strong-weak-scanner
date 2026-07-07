@@ -2,10 +2,10 @@ name: daily-fetch
 
 on:
   schedule:
-    # 台灣 22:00 = UTC 14:00,週一~五(台股交易日)。
+    # 台灣 21:40 = UTC 13:40,週一~五(台股交易日),落在收盤後 21-22 點窗口。
     # 遇台股假日抓不到新資料時,commit 步驟會自動略過。
     #
-    # 為什麼是 22:00 —— FinMind 各 dataset 每日更新時間(官方文件,台北時間;
+    # 為什麼是 21:40 —— FinMind 各 dataset 每日更新時間(官方文件,台北時間;
     # 「實際更新時間以 API 資料為主」,可能漂移):
     #   16:50  TaiwanStockTotalReturnIndex(大盤 regime)
     #   17:30  TaiwanStockPrice(①價②量)
@@ -13,10 +13,12 @@ on:
     #   21:00  TaiwanStockShareholding(③外資持股)
     #   21:00  TaiwanStockMarginPurchaseShortSale(⑤融資券)
     # 若早於 21:00 執行,當日籌碼缺值會被靜默當 0/舊值計分,隔日回補後
-    # 整表重建無痕改寫 → 決策時點與回測(validate.py)看到的資料不一致。
+    # 整表重建無痕改寫 → 決策時點與回測(validate.py)看到的資料不一致;
+    # 21:40 在 21:00 之後留 40 分鐘緩衝,同時避開整點(:00)尖峰。
     # 舊排程 18:00 只有價量是當日的,③④⑤ 全缺(2026-07-05 對抗性驗證)。
-    # GitHub cron 高峰期可能延遲 15~60 分——此設計下「晚」是安全方向。
-    - cron: "0 14 * * 1-5"
+    # GitHub cron 高峰期可能大幅延遲(2026-07-06 觀察到整點 :00 排程實際延遲
+    # 2 小時 51 分才觸發,見官方文件建議避開整點)——此設計下「晚」是安全方向。
+    - cron: "40 13 * * 1-5"
   workflow_dispatch: {}   # 允許手動觸發(測試用)
 
 permissions:
@@ -61,7 +63,23 @@ jobs:
           git add data/ index.html archive/
           if git diff --staged --quiet; then
             echo "無新資料,略過 commit"
-          else
-            git commit -m "data: $(date -u +%Y-%m-%d) 五元素更新"
-            git push
+            exit 0
           fi
+          git commit -m "data: $(date -u +%Y-%m-%d) 五元素更新"
+          # main 上若同時有其他 push(手動 session、另一次跑),直接 push 會被拒。
+          # fetch + rebase 後重試;若 rebase 真的衝突(同一批資料已落地),放棄本次 commit。
+          for i in 1 2 3 4 5; do
+            if git push; then
+              exit 0
+            fi
+            echo "push 被拒(第 $i 次)——fetch + rebase 後重試"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "::warning::rebase 衝突(資料可能已被別的 push 落地),放棄本次 commit"
+              git rebase --abort
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::push 重試 5 次仍失敗,本次資料未落地"
+          exit 1
