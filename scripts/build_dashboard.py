@@ -16,7 +16,8 @@ except Exception:
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # 個股層門檻單一事實來源(score.py CONFIG):權重 + 各元素 hint 引用的門檻,調旋鈕文字自動同步
 from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
-                   MARGIN_UTIL_HOT, MARGIN_UTIL_MID, DZ_FOREIGN, DZ_TRUST, STEALTH_OFF_HIGH)
+                   MARGIN_UTIL_HOT, MARGIN_UTIL_MID, MARGIN_DOWN_BIG, MARGIN_UP_BIG,
+                   DZ_FOREIGN, DZ_TRUST, STEALTH_OFF_HIGH, _chip_signal)
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
 from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
 
@@ -228,6 +229,40 @@ def verdict(sc):
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"]), vrows
 
 
+# 籌碼健康度(觀察層、純描述性,獨立於①價②量與 tier)——net_score/label/族群排名已由
+# score.py 的 chip_health 表算好;這裡只重算「每個信號」的顯示明細(門檻沿用 score.py 匯入的
+# 同一份常數,跟①②③④⑤ element cells 的 hint 現算是同一套慣例,不重複造輪子)。
+CHIP_LABELS = ["外資20日變化", "投信近5日佔股本", "融資水位", "融資10日變化",
+               "大戶(400張+)佔比週變化", "股東人數週變化", "借券賣出餘額10日變化"]
+
+
+def build_chip_rows(m, risky):
+    """回傳 (rows, n_health, n_warn)——rows 給 tooltip 表格,n_health/n_warn 給判讀句(不含官方否決項)。"""
+    fc, tp, u, mc = m["fpct_chg20"], m["trust5_pct"], m["margin_util_pct"], m["margin_chg10"]
+    tb, tpl, sb = m["tdcc_big400_chg"], m["tdcc_people_chg"], m["sbl_chg10"]
+    sigs = [
+        _chip_signal(fc, lambda v: v > DZ_FOREIGN, lambda v: v < -DZ_FOREIGN),
+        _chip_signal(tp, lambda v: v > DZ_TRUST, lambda v: v < -DZ_TRUST),
+        _chip_signal(u, lambda v: v < MARGIN_UTIL_MID, lambda v: v >= MARGIN_UTIL_HOT),
+        _chip_signal(mc, lambda v: v <= MARGIN_DOWN_BIG, lambda v: v >= MARGIN_UP_BIG),
+        _chip_signal(tb, lambda v: v > 0, lambda v: v < 0),
+        _chip_signal(tpl, lambda v: v < 0, lambda v: v > 0),
+        _chip_signal(sb, lambda v: v < 0, lambda v: v > 0),
+    ]
+    vals = [f"{fc:+.2f}pp" if fc is not None else "-",
+            f"{tp:+.3f}%" if tp is not None else "-",
+            pctp(u),
+            pct(mc, True) if mc is not None else "-",
+            f"{tb:+.2f}pp" if tb is not None else "-",
+            pct(tpl, True) if tpl is not None else "-",
+            f"{sb:+.2f}pp" if sb is not None else "-"]
+    rows = [[lb, v, None, s, None, ""] for lb, v, s in zip(CHIP_LABELS, vals, sigs)]
+    rows.append(["官方處置/注意", "有列管" if risky else "無", None, (-1 if risky else 0), None, ""])
+    n_health = sum(1 for s in sigs if s > 0)
+    n_warn = sum(1 for s in sigs if s < 0)
+    return rows, n_health, n_warn
+
+
 # 族群狀態→顏色(狀態本身由 fetch_daily._gstate 在資料層算好,存 group_metrics.state)
 STATE_COL = {"蓄勢·被佈局": "var(--warn-line)", "發動·領漲": "var(--strong)",
              "籌碼退潮": "var(--weak)"}
@@ -325,7 +360,26 @@ def main():
                 {"kind": r["kind"], "reason": r["reason"], "period": r["period"]})
     except sqlite3.OperationalError:
         pass
+    # 籌碼健康度(觀察層、獨立新表,舊 db 未跑過新版 score.py 時沒有此表 → 全部從缺,不擋主管線)
+    chip = {}
+    try:
+        for r in con.execute(
+                "SELECT stock_id, net_score, label, grp_rank, grp_n FROM chip_health WHERE date=?", (last,)):
+            chip[r["stock_id"]] = {"label": r["label"], "rank": r["grp_rank"], "n": r["grp_n"]}
+    except sqlite3.OperationalError:
+        pass
     con.close()
+
+    CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
+    chip_by_grp = {}
+    for r in rows:
+        c = chip.get(r["stock_id"])
+        if not c:
+            continue
+        cc = chip_by_grp.setdefault(r["grp"], {"health": 0, "neutral": 0, "warn": 0, "dots": []})
+        cls = CHIP_CLS[c["label"]]
+        cc[cls] += 1
+        cc["dots"].append(cls)
 
     dips = [(x["med_dip"], x["grp"]) for x in grows if x["med_dip"] is not None]
     best_dip = max(dips)[1] if dips else None      # 修正日買超最高的族群(選族群主訊號)
@@ -380,6 +434,8 @@ def main():
         ]}
         if n:
             gobj["dur"] = f"第 {n} 個交易日(自 {since})"
+        if g in chip_by_grp:
+            gobj["chip"] = chip_by_grp[g]
         groups.append(gobj)
     lag = f",指數至 {int(mk['date'][5:7])}/{int(mk['date'][8:10])}" if (mk and mk["date"] != last) else ""
     mchip = (f"市場 <b>{'⚠ 修正' if mk['regime'] else '多頭/中性'}</b>(報酬指數距20日高 {mk['dd20']*100:+.1f}%{lag})"
@@ -413,8 +469,17 @@ def main():
                "cells": build_cells(r, r, mkt20)}
         if warn:
             obj["warn"] = True
-        if r["stock_id"] in risk:
+        risky = r["stock_id"] in risk
+        if risky:
             obj["risk"] = risk[r["stock_id"]]
+        c = chip.get(r["stock_id"])
+        if c:
+            chip_rows, n_health, n_warn = build_chip_rows(r, risky)
+            why = f"{n_health} 項健康信號、{n_warn} 項警示"
+            if risky:
+                why += "；當天列處置/注意,官方警示一票否決"
+            obj["chip"] = {"cls": CHIP_CLS[c["label"]], "label": c["label"], "rank": c["rank"],
+                           "n": c["n"], "rows": chip_rows, "why": why}
         obj["_comp"] = r["composite_s"]
         data.append(obj)
         tiers_map.setdefault(tier, []).append((r["composite_s"], r["stock_id"]))

@@ -109,6 +109,33 @@ def score_vol(m):
     return 0, warn
 
 
+def _chip_signal(v, healthy, warn):
+    """單一籌碼健康度信號:健康+1、警示−1、中性(含缺值)0。"""
+    if v is None:
+        return 0
+    if healthy(v):
+        return 1
+    if warn(v):
+        return -1
+    return 0
+
+
+def chip_signals(m):
+    """籌碼健康度的 7 個獨立信號(不含①價②量,跟 tier 選股完全獨立的一把尺)。
+    只用既有的雜訊死區/水位門檻(DZ_FOREIGN/DZ_TRUST/MARGIN_*)——已經過實證校準的門檻,
+    直接沿用;TDCC 大戶/股東人數/借券三項是觀察層新欄位,尚無實證門檻,先用純方向
+    (>0/<0)判斷,之後有樣本再校準。回傳 7 個 ±1/0 的 list,順序固定供 build_dashboard 對照。"""
+    return [
+        _chip_signal(m["fpct_chg20"], lambda v: v > DZ_FOREIGN, lambda v: v < -DZ_FOREIGN),
+        _chip_signal(m["trust5_pct"], lambda v: v > DZ_TRUST, lambda v: v < -DZ_TRUST),
+        _chip_signal(m["margin_util_pct"], lambda v: v < MARGIN_UTIL_MID, lambda v: v >= MARGIN_UTIL_HOT),
+        _chip_signal(m["margin_chg10"], lambda v: v <= MARGIN_DOWN_BIG, lambda v: v >= MARGIN_UP_BIG),
+        _chip_signal(m["tdcc_big400_chg"], lambda v: v > 0, lambda v: v < 0),
+        _chip_signal(m["tdcc_people_chg"], lambda v: v < 0, lambda v: v > 0),
+        _chip_signal(m["sbl_chg10"], lambda v: v < 0, lambda v: v > 0),
+    ]
+
+
 def score_margin(m):
     """價(ret20)×融資(chg10,不足退 chg5)交互 + 散戶水位封頂。回傳 (分數, 水位旗標)。"""
     chg = m["margin_chg10"] if m["margin_chg10"] is not None else m["margin_chg5"]
@@ -132,6 +159,41 @@ def score_margin(m):
     elif u is not None and u >= MARGIN_UTIL_MID:
         base = min(base, 1)
     return base, warn
+
+
+def build_chip_health(con):
+    """籌碼健康度(觀察層、純描述性診斷)——獨立新表,不碰 daily_scores 的 composite_s/tier,
+    不受 IS_CUTOFF OOS 鐵律管轄(不是選股訊號,是「現在籌碼乾不乾淨」的現況判讀)。
+    只看③外資④投信⑤融資券 + TDCC 大戶/股東人數(週頻)+ 借券賣出餘額,不含①價②量——
+    跟 tier(強弱)完全獨立的兩把尺。淨分=7個信號加總,官方處置/注意不計入淨分、
+    但一票否決直接鎖定「待觀察」。族群內依淨分排名。"""
+    con.execute("DROP TABLE IF EXISTS chip_health")
+    con.execute("""CREATE TABLE chip_health(
+        date TEXT, stock_id TEXT, net_score INT, label TEXT,
+        grp_rank INT, grp_n INT, PRIMARY KEY(date, stock_id))""")
+    risky = {(d, sid) for d, sid in con.execute("SELECT date, stock_id FROM risk_flags")}
+    rows = con.execute("""SELECT m.*, u.grp FROM daily_metrics m
+                          JOIN universe u USING(stock_id) ORDER BY m.date""").fetchall()
+    by_grp = defaultdict(list)
+    for m in rows:
+        net = sum(chip_signals(m))
+        flagged = (m["date"], m["stock_id"]) in risky
+        if flagged or net <= -2:
+            label = "待觀察"
+        elif net >= 2:
+            label = "健康"
+        else:
+            label = "中性"
+        item = {"date": m["date"], "stock_id": m["stock_id"], "net": net, "label": label}
+        by_grp[(m["date"], m["grp"])].append(item)
+    out = []
+    for items in by_grp.values():
+        items.sort(key=lambda x: -x["net"])
+        n = len(items)
+        for rk, it in enumerate(items, 1):
+            out.append((it["date"], it["stock_id"], it["net"], it["label"], rk, n))
+    con.executemany("INSERT OR REPLACE INTO chip_health VALUES(?,?,?,?,?,?)", out)
+    con.commit()
 
 
 def main():
@@ -223,12 +285,18 @@ def main():
                             s["dip"], s["margin"], comp, comp_s, tier_raw, tier, warn, pending))
     con.executemany("INSERT OR REPLACE INTO daily_scores VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
     con.commit()
+    build_chip_health(con)
 
     # ── 印最新日的 tier 排行 ──
     last = con.execute("SELECT MAX(date) FROM daily_scores").fetchone()[0]
     print(f"daily_scores(v2 排名制)已更新 {len(out)} 列。最新日 {last}:\n")
     def fnum(v, fmt):
         return fmt.format(v) if v is not None else "-"
+    ch_counts = defaultdict(int)
+    for (label,) in con.execute("SELECT label FROM chip_health WHERE date=?", (last,)):
+        ch_counts[label] += 1
+    print(f"籌碼健康度(觀察層,不影響tier):健康 {ch_counts['健康']}、中性 {ch_counts['中性']}、"
+          f"待觀察 {ch_counts['待觀察']}\n")
     have = {r[0] for r in con.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('market_daily','group_metrics')")}
     if {"market_daily", "group_metrics"} <= have:   # 舊 db 無族群/大盤表 → 略過(跑一次 fetch_daily 即補齊)
