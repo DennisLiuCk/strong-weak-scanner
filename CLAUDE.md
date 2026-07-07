@@ -2,7 +2,7 @@
 
 台股半導體與 AI 供應鏈族群(被動/功率/封測/記憶體/矽智財/設備/材料/散熱/PCB,
 約 98 檔)的兩層訊號系統:**個股層**族群內排名
-選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions(台灣 22:00)
+選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions(台灣 21:40)
 抓資料 → 評分 → 儀表板;SQLite db 與報告都 commit 在 repo 裡。
 儀表板:https://dennisliuck.github.io/strong-weak-scanner/
 
@@ -11,6 +11,10 @@
 - **先 `git pull`**——`data/findmind.db` 由 Actions 每日更新,不 pull 就是在看舊資料。
 - Python 一律 `uv run --no-project --python 3.12 python ...`(系統 python 是 MS Store stub,不能用)。
 - 中文 stdout 在 console 會亂碼(cp950),寫檔 UTF-8 正常;必要時輸出到檔案再讀。
+- **判斷「現在台灣時間」直接下 `date`(不要加 `TZ=Asia/Taipei` 前綴)**——這台機器系統
+  本地時區就是 Asia/Taipei,但 git-bash 沒裝 tzdata,`TZ=Asia/Taipei date` 會轉換失敗、
+  靜默印出系統原始值並貼錯時區標籤(曾把 23:32 台灣時間誤判成 15:31,少算 8 小時,
+  差點在收盤資料還沒發布時就手動 trigger 排程)。要 UTC 時間才用 `date -u`。
 
 ## 依任務選 runbook
 
