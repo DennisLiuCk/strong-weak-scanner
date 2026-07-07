@@ -202,6 +202,9 @@
   #tip .rows .rh{grid-column:1/-1;color:var(--muted);font-size:10.5px;line-height:1.5;
     margin:-2px 0 3px;padding-bottom:4px;border-bottom:1px dashed var(--hairline-2)}
   #tip .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+  #tip .rows .wt{font-weight:500;color:var(--muted);font-size:10.5px}
+  #tip .rows .total{font-size:13px;font-weight:800}
+  #tip .rows .muted{opacity:.55}
   #tip .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:8px;padding:7px 9px;margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
@@ -210,6 +213,8 @@
   #tip .how{margin-top:8px;padding-top:8px;border-top:1px dashed var(--hairline);
     color:var(--muted);font-size:11px;line-height:1.6}
   #tip .how b{color:var(--ink-2)}
+  #tip .how .jump{display:block;margin-top:5px;font-weight:700;color:var(--ink);
+    text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:2px}
   #tip .src{margin-top:6px;color:var(--muted);font-size:10.5px;line-height:1.5}
   #tip .src b{color:var(--ink-2)}
 
@@ -246,6 +251,9 @@
   #sheetBody .rows .rh{grid-column:1/-1;color:var(--muted);font-size:11.5px;line-height:1.55;
     margin:-3px 0 4px;padding-bottom:6px;border-bottom:1px dashed var(--hairline-2)}
   #sheetBody .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+  #sheetBody .rows .wt{font-weight:500;color:var(--muted);font-size:11.5px}
+  #sheetBody .rows .total{font-size:14px;font-weight:800}
+  #sheetBody .rows .muted{opacity:.55}
   #sheetBody .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12.5px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:10px;padding:10px 12px;margin-bottom:11px;line-height:1.55;white-space:pre-wrap}
@@ -254,6 +262,8 @@
   #sheetBody .how{margin-top:11px;padding-top:11px;border-top:1px dashed var(--hairline);
     color:var(--muted);font-size:12px;line-height:1.65}
   #sheetBody .how b{color:var(--ink-2)}
+  #sheetBody .how .jump{display:block;margin-top:7px;font-weight:700;color:var(--ink);
+    text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:2px}
   #sheetBody .src{margin-top:8px;color:var(--muted);font-size:11.5px;line-height:1.55}
   #sheetBody .src b{color:var(--ink-2)}
 
@@ -488,7 +498,6 @@
     "真弱·陷阱":"條件:外資 ≤−1、融資 ≤−1、相對強弱 <0 —— 外資出、散戶接的出貨形態。",
     "資料不足":"樣本不足,不給判定。"
   };
-  var COMP_HOW = "綜合分 = Σ(元素分數 × 權重),取3日平均消除單日跳動;評級需連2個交易日判到同層才正式轉層。權重由實證校準:族群內分強弱靠價格相對因子(相對強弱/抗跌),外資/投信是「選族群」訊號故降權——依據與最新樣本外檢驗見 GitHub 週報(reports/)。各評級的歷史表現隨樣本更新,以最新週報為準,不在此寫死。";
   // score -> glyph + class + label
   function sinfo(s){
     if(s>=2)  return {g:"▲▲",c:"s2", l:"強"};
@@ -524,11 +533,16 @@
     var wb=document.createElement("b"); setText(wb, "判讀:"); why.appendChild(wb);
     why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
     box.appendChild(why);
-    if(html.rows && html.rows.length){          // 數據表格:[標籤, 數值, 白話解讀?]
+    if(html.rows && html.rows.length){          // 數據表格:[標籤, 數值, 白話解讀?, 分數(供上色)?, 權重文字?, flag?]
       var tb=document.createElement("div"); tb.className="rows";
       html.rows.forEach(function(rw){
-        var k=document.createElement("span"); k.className="k"; setText(k, rw[0]); tb.appendChild(k);
-        var v=document.createElement("span"); v.className="rv"; setText(v, rw[1]); tb.appendChild(v);
+        var flag = rw[5] || "";
+        var k=document.createElement("span"); k.className="k"+(flag?" "+flag:""); setText(k, rw[0]); tb.appendChild(k);
+        var v=document.createElement("span"); v.className="rv"+(flag?" "+flag:"");
+        setText(v, rw[1]);
+        if(rw[3] != null) v.style.color = scColor(rw[3]);        // 沿用左側格子同一套 scColor,不新增色彩語彙
+        if(rw[4]){ var wt=document.createElement("span"); wt.className="wt"; setText(wt, " "+rw[4]); v.appendChild(wt); }
+        tb.appendChild(v);
         if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
           var h=document.createElement("span"); h.className="rh"; setText(h, rw[2]); tb.appendChild(h);
         }
@@ -541,6 +555,10 @@
       var hw=document.createElement("div"); hw.className="how";
       var hb=document.createElement("b"); setText(hb, "評分依據:"); hw.appendChild(hb);
       hw.appendChild(document.createTextNode(String(html.how)));
+      if(html.howLink){                          // 通用方法論不逐格重複寫,指到頁尾單一事實來源
+        var jl=document.createElement("a"); jl.className="jump"; jl.href="#method";
+        setText(jl, "→ "+html.howLink); hw.appendChild(jl);
+      }
       box.appendChild(hw);
     }
     if(html.src){                                // 資料來源(每格都能追到源頭)
@@ -701,7 +719,8 @@
     attachTip(vd, (function(row){ return function(){
       return { el:"綜合評級 · 五元素研判", who: row.nm+"("+row.id+")", biz: row.biz,
         rows: row.vrows, why: row.vr,
-        how: (TIER_HOW[row.vlabel]||"") + " " + COMP_HOW,
+        how: TIER_HOW[row.vlabel]||"",           // 只留「這檔為什麼是這個tier」;通用公式/權重不再逐格重複
+        howLink: "完整公式與權重依據見頁尾「方法與資料」",
         src: "由本列五格元素分數加權合成;各元素的原始資料來源見左側各格",
         scLabel: row.vlabel+(row.warn?" ⚠":""), scColor: scColor(row.vt), scBg: tintBg(row.vt) };
     };})(row));
