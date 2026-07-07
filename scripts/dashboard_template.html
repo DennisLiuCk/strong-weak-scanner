@@ -551,13 +551,16 @@
     } else if(html.data){
       var d=document.createElement("div"); d.className="data"; setText(d, html.data); box.appendChild(d);
     }
-    if(html.how){                                // 評分依據(教學:分數與門檻怎麼來)
+    if(html.how || html.howLink){                // 評分依據(教學:分數與門檻怎麼來)——how 缺值時仍要顯示 howLink
       var hw=document.createElement("div"); hw.className="how";
-      var hb=document.createElement("b"); setText(hb, "評分依據:"); hw.appendChild(hb);
-      hw.appendChild(document.createTextNode(String(html.how)));
+      if(html.how){
+        var hb=document.createElement("b"); setText(hb, "評分依據:"); hw.appendChild(hb);
+        hw.appendChild(document.createTextNode(String(html.how)));
+      }
       if(html.howLink){                          // 通用方法論不逐格重複寫,指到頁尾單一事實來源
         var jl=document.createElement("a"); jl.className="jump"; jl.href="#method";
         setText(jl, "→ "+html.howLink); hw.appendChild(jl);
+        jl.addEventListener("click", function(){ closeSheet(); }); // 只會在底部 sheet 出現;先關 sheet 才看得到跳轉目標
       }
       box.appendChild(hw);
     }
@@ -569,6 +572,10 @@
     }
   }
   function showTip(html, x, y){
+    // #tip 是 pointer-events:none 的浮動框(hover 顯示、游標一離開就消失),裡面放不了可點連結;
+    // howLink 只在點按開啟的底部 sheet(openSheet)有效,桌機版把它拿掉,改用純文字。payload() 每次
+    // 呼叫都回傳全新物件,直接改這份不影響其他地方。
+    html.howLink = null;
     renderDetail(tip, html);
     tip.classList.add("on"); tip.setAttribute("aria-hidden","false");
     positionTip(x,y);
