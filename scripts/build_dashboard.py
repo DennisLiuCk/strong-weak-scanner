@@ -210,15 +210,21 @@ def verdict(sc):
         vr += "。籌碼在買但修正日領跌——此組合歷史表現分歧(見週報濾網 cohort),等抗跌轉正再確認"
     # 元素 × 權重分解:依左側①②③④⑤自然順序(不依權重大小排,避免循環數字跳來跳去)。
     # 每列 = [標籤, 顯示值, hint(此表不用), 分數(供JS用scColor上色), 權重文字(muted顯示), flag]
-    # flag: "total"=加大加粗、"muted"=整列調淡(逆勢買超權重0,只供tier判定不計入加總)
+    # flag: "total"=加大加粗、"muted"=整列調淡(權重0=只供tier判定、不計入加總——由 WEIGHTS 動態判斷,
+    # 不寫死是哪個元素,權重一旦調整就自動跟著變)
+    def vrow(label, key, wkey):
+        v = sc[key]
+        tier_only = WEIGHTS[wkey] == 0
+        wt = f"× {WEIGHTS[wkey]}" + ("  · 供tier" if tier_only else "")
+        return [label, f"{v:+d}", None, v, wt, "muted" if tier_only else ""]
     vrows = [["綜合分(3日平滑)", f"{comp:+.1f}", None, round(comp, 1), None, "total"],
-             ["①相對強弱", f"{sc['s_price']:+d}", None, sc["s_price"], f"× {WEIGHTS['price']}", ""],
-             ["①抗跌", f"{sc['s_resil']:+d}", None, sc["s_resil"], f"× {WEIGHTS['resil']}", ""],
-             ["②量", f"{sc['s_vol']:+d}", None, sc["s_vol"], f"× {WEIGHTS['vol']}", ""],
-             ["③外資", f"{sc['s_foreign']:+d}", None, sc["s_foreign"], f"× {WEIGHTS['foreign']}", ""],
-             ["③逆勢買超", f"{sc['s_dip']:+d}", None, sc["s_dip"], f"× {WEIGHTS['dip']} · 供tier", "muted"],
-             ["④投信", f"{sc['s_trust']:+d}", None, sc["s_trust"], f"× {WEIGHTS['trust']}", ""],
-             ["⑤融資券", f"{sc['s_margin']:+d}", None, sc["s_margin"], f"× {WEIGHTS['margin']}", ""]]
+             vrow("①相對強弱", "s_price", "price"),
+             vrow("①抗跌", "s_resil", "resil"),
+             vrow("②量", "s_vol", "vol"),
+             vrow("③外資", "s_foreign", "foreign"),
+             vrow("③逆勢買超", "s_dip", "dip"),
+             vrow("④投信", "s_trust", "trust"),
+             vrow("⑤融資券", "s_margin", "margin")]
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"]), vrows
 
 

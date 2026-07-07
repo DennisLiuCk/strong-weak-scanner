@@ -204,7 +204,7 @@
   #tip .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
   #tip .rows .wt{font-weight:500;color:var(--muted);font-size:10.5px}
   #tip .rows .total{font-size:13px;font-weight:800}
-  #tip .rows .muted{opacity:.55}
+  #tip .rows .muted{color:var(--ink-2)}
   #tip .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:8px;padding:7px 9px;margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
@@ -253,7 +253,7 @@
   #sheetBody .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
   #sheetBody .rows .wt{font-weight:500;color:var(--muted);font-size:11.5px}
   #sheetBody .rows .total{font-size:14px;font-weight:800}
-  #sheetBody .rows .muted{opacity:.55}
+  #sheetBody .rows .muted{color:var(--ink-2)}
   #sheetBody .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12.5px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:10px;padding:10px 12px;margin-bottom:11px;line-height:1.55;white-space:pre-wrap}
@@ -540,7 +540,9 @@
         var k=document.createElement("span"); k.className="k"+(flag?" "+flag:""); setText(k, rw[0]); tb.appendChild(k);
         var v=document.createElement("span"); v.className="rv"+(flag?" "+flag:"");
         setText(v, rw[1]);
-        if(rw[3] != null) v.style.color = scColor(rw[3]);        // 沿用左側格子同一套 scColor,不新增色彩語彙
+        if(rw[3] && flag !== "muted") v.style.color = scColor(rw[3]); // 沿用左側格子同一套 scColor,不新增色彩語彙;
+                                                                   // 0分(中性)不上色維持 --ink 對比度;muted 列改走
+                                                                   // CSS 的 --ink-2(見樣式),不疊加方向色以免和淡化衝突
         if(rw[4]){ var wt=document.createElement("span"); wt.className="wt"; setText(wt, " "+rw[4]); v.appendChild(wt); }
         tb.appendChild(v);
         if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
@@ -847,7 +849,7 @@
       var c = document.createElement("span"); c.className = "wchip";
       c.appendChild(document.createTextNode(p[1] + " "));
       var b = document.createElement("b"); b.textContent = "×" + WEIGHTS[p[0]]; c.appendChild(b);
-      if(p[0] === "dip") c.appendChild(document.createTextNode("(僅評級條件)"));
+      if(WEIGHTS[p[0]] === 0) c.appendChild(document.createTextNode("(僅評級條件)"));
       host.appendChild(c);
     });
   })();
