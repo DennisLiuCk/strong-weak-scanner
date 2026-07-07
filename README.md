@@ -33,7 +33,7 @@
 ## 資料管線
 
 ```
-每交易日 22:00(台北,GitHub Actions:.github/workflows/daily-fetch.yml;
+每交易日 21:40(台北,GitHub Actions:.github/workflows/daily-fetch.yml;
 排程時點依 FinMind 各 dataset 更新時間而定——最晚的持股/融資券 21:00 更新,
 對照表見 workflow 註解)
   fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token;僅供最新一週)

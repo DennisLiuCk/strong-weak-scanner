@@ -1,7 +1,7 @@
 # 每日檢視 Runbook(盤後 agent session / 人工)
 
-> 每日資料由 GitHub Actions 台灣 22:00 自動抓取、評分、更新儀表板並 commit
->(排在 22:00 是因 FinMind 持股/融資券 21:00 才更新;對照表見 daily-fetch.yml 註解)。
+> 每日資料由 GitHub Actions 台灣 21:40 自動抓取、評分、更新儀表板並 commit
+>(排在 21:40 是因 FinMind 持股/融資券 21:00 才更新,留緩衝並避開整點;對照表見 daily-fetch.yml 註解)。
 > 本文件是盤後想「確認執行狀況 + 討論今日資料」時的標準開場。
 > 策略調整**不在每日做**——那走 `WEEKLY_REVIEW.md` 的門檻;每日只做確認、討論、資料修復。
 
