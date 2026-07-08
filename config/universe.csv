@@ -22,7 +22,7 @@ stock_id,name,group,biz
 8255,朋程,power,車用整流二極體
 3707,漢磊,power,功率/SiC磊晶代工
 3016,嘉晶,power,磊晶片(漢磊集團)
-6525,捷敏-KY,power,功率半導體封測
+6525,捷敏-KY,packtest,功率半導體封測(OSAT)
 6138,茂達,power,電源管理IC
 8081,致新,power,電源管理IC
 3711,日月光投控,packtest,封測龍頭(OSAT)
