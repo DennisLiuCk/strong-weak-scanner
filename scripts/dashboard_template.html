@@ -172,6 +172,12 @@
   .hdot.health{background:var(--health)}
   .hdot.neutral{background:var(--neutral)}
   .hdot.warn{background:var(--warn-line)}
+  .fundbadge{display:inline-block;width:fit-content;margin-top:2px;font-family:inherit;
+    font-size:10px;font-weight:700;border:1px solid currentColor;border-radius:100px;
+    padding:1px 7px;cursor:pointer;background:none;letter-spacing:.2px}
+  .fundbadge.up{color:var(--strong)}
+  .fundbadge.down{color:var(--weak)}
+  .fundbadge.flat{color:var(--muted)}
   .cell{position:relative;margin:5px;border-radius:9px;padding:8px 6px 7px;cursor:default;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
     background:var(--cell);border:1px solid transparent;transition:transform .08s ease, box-shadow .08s ease;
@@ -733,6 +739,24 @@
           src: "外資/投信/融資券:FinMind;大戶集中度/股東人數:TDCC集保股權分散週快照;" +
                "借券賣出餘額:FinMind;處置/注意:TWSE/TPEx",
           scLabel: row.chip.label+" · 族群內"+row.chip.rank+"/"+row.chip.n, scColor: pill[0], scBg: pill[1] };
+      };})(row));
+    }
+    if(row.fund){
+      var fb=document.createElement("button"); fb.type="button"; fb.tabIndex=0;
+      fb.className="fundbadge "+row.fund.cls;
+      fb.textContent = row.fund.label;
+      fb.setAttribute("aria-label", "基本面參考:"+row.fund.label);
+      badges.appendChild(fb);
+      var FUND_COL = {up:["var(--strong)","var(--strong-tint)"], down:["var(--weak)","var(--weak-tint)"],
+                       flat:["var(--neutral)","var(--neutral-tint)"]};
+      attachTip(fb, (function(row){ return function(){
+        var col = FUND_COL[row.fund.cls];
+        return { el:"基本面參考 · 觀察層(不計分)", who: row.nm+"("+row.id+")", biz: row.biz,
+          rows: row.fund.rows, why: row.fund.why,
+          how: "月營收/季報由 fetch_financials.py 獨立排程抓取(月/季頻,非每日)——跟左側①~⑤" +
+               "五元素評分完全獨立、不進 daily_metrics/daily_scores,純參考,不影響 composite 分數與 tier。",
+          src: "FinMind TaiwanStockMonthRevenue / TaiwanStockFinancialStatements",
+          scLabel: row.fund.label, scColor: col[0], scBg: col[1] };
       };})(row));
     }
     if(badges.children.length) rl.appendChild(badges);
