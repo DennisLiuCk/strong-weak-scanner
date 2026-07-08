@@ -7,7 +7,7 @@ stock_id,name,group,biz
 2472,立隆電,passive,鋁質電解電容
 2478,大毅,passive,晶片電阻、保護元件
 6173,信昌電,passive,MLCC(華新系)
-5328,華容,passive,鋁質電解電容
+5328,華容,passive,塑膠薄膜/金屬化膜電容器
 6284,佳邦,passive,電感、天線
 2428,興勤,passive,保護元件、熱敏電阻
 6449,鈺邦,passive,固態電容
@@ -36,7 +36,7 @@ stock_id,name,group,biz
 2369,菱生,packtest,IC封測
 2329,華泰,packtest,封測+EMS
 6271,同欣電,packtest,陶瓷基板、CIS封裝
-8131,福懋科,packtest,記憶體封測(力成系)
+8131,福懋科,packtest,記憶體封測(南亞科/台塑系)
 6451,訊芯-KY,packtest,SiP模組封測
 2408,南亞科,memory,DRAM(IDM)
 2344,華邦電,memory,DRAM、NOR Flash

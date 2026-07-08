@@ -178,9 +178,9 @@
   .fundbadge.up{color:var(--strong)}
   .fundbadge.down{color:var(--weak)}
   .fundbadge.flat{color:var(--muted)}
-  .notebadge{display:inline-block;width:fit-content;margin-top:2px;font-family:inherit;
-    font-size:10px;font-weight:700;border:1px solid currentColor;border-radius:100px;
-    padding:1px 7px;cursor:pointer;background:none;letter-spacing:.2px;text-decoration:none}
+  .notebadge{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;
+    margin-top:2px;font-size:11px;line-height:1;border:1px solid currentColor;border-radius:100px;
+    padding:0;cursor:pointer;background:none;flex:0 0 auto}
   .notebadge.fresh{color:var(--muted)}
   .notebadge.draft{color:var(--muted);border-style:dashed}
   .notebadge.due{color:var(--warn-line)}
@@ -856,7 +856,7 @@
     if(row.note){                // 質化研究筆記(年報MD&A/法說會重點,人工維護,觀察層)
       var nb=document.createElement("button"); nb.type="button"; nb.tabIndex=0;
       nb.className="notebadge "+row.note.cls;
-      nb.textContent = "📝 "+row.note.label;
+      nb.textContent = "📝";                     // 儀表板上只留 icon,狀態文字留到點開的完整筆記面板再顯示
       nb.setAttribute("aria-label", "質化研究筆記:"+row.note.label+"(最後更新 "+row.note.updated+"),點擊展開完整筆記");
       badges.appendChild(nb);
       var NOTE_COL = {fresh:["var(--muted)","var(--neutral-tint)"], draft:["var(--muted)","var(--neutral-tint)"],
