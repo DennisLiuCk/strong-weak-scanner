@@ -23,6 +23,7 @@
 | 盤後確認執行狀況、討論今日資料 | `DAILY_CHECK.md`;核心工具 `scripts/daily_brief.py`(唯讀) |
 | 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
+| 個股質化筆記建立/維護、biz 對齊複核 | README「質化研究筆記」+ `scripts/qual_notes.py` |
 
 ## 鐵律
 
