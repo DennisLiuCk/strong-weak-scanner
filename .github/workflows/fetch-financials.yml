@@ -1,0 +1,69 @@
+name: fetch-financials
+
+on:
+  schedule:
+    # 月營收:每月 12 日 UTC 02:00(= 台灣 10:00)——公司約月初 10 日內公布上月數字,留 2 天緩衝。
+    - cron: "0 2 12 * *"
+    # 季報四表(順帶重抓月營收,冪等):申報截止後幾天抓一次。
+    # Q1(3/31結算)截止 5/15 → 5/17 抓;Q2(6/30)截止 8/14 → 8/17 抓;
+    # Q3(9/30)截止 11/14 → 11/17 抓;Q4/年報(12/31)截止次年 3/31 → 4/3 抓。
+    - cron: "0 2 17 5 *"
+    - cron: "0 2 17 8 *"
+    - cron: "0 2 17 11 *"
+    - cron: "0 2 3 4 *"
+  workflow_dispatch: {}   # 允許手動觸發(測試/補缺用,固定抓全部四個 dataset)
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-financials
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 月營收排程(12日)只抓月營收,省額度;其餘排程(季報截止後)+手動觸發抓全部四個。
+      - name: 抓取財報
+        env:
+          FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+          FINMIND_TOKEN2: ${{ secrets.FINMIND_TOKEN2 }}
+        run: |
+          if [ "${{ github.event.schedule }}" = "0 2 12 * *" ]; then
+            python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue
+          else
+            python scripts/fetch_financials.py
+          fi
+
+      - name: commit 回 repo(有變動才提交)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "無新資料,略過 commit"
+            exit 0
+          fi
+          git commit -m "data: $(date -u +%Y-%m-%d) 財報更新"
+          for i in 1 2 3 4 5; do
+            if git push; then
+              exit 0
+            fi
+            echo "push 被拒(第 $i 次)——fetch + rebase 後重試"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "::warning::rebase 衝突(資料可能已被別的 push 落地),放棄本次 commit"
+              git rebase --abort
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::push 重試 5 次仍失敗,本次資料未落地"
+          exit 1

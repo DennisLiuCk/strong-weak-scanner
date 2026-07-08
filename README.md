@@ -50,6 +50,11 @@
                        因衍生表每日全量重建,重繪會被現行規則污染)
 每週六 09:00(weekly-validate.yml)
   validate.py      → reports/validate_*.md(元素 IC、tier 超額報酬、IS/OOS 對照)
+每月 12 日 / 每季申報截止後(fetch-financials.yml)
+  fetch_financials.py 財報四表(FinMind:月營收+損益表+資產負債表+現金流量表)
+                   → month_revenue/financials/balance_sheet/cash_flow(append-only)
+                   ⚠ 基本面資料,不進 daily_metrics/daily_scores;供 Universe 治理
+                     (R1 業務歸屬)等質化查證用——同 tdcc_holding 屬另一類資料
 ```
 
 ## 資料結構(`data/findmind.db`)
@@ -66,6 +71,10 @@
 | tdcc_holding | 集保股權分散(週頻,17 級距,universe+候選) | TDCC opendata(**非 FinMind**;僅供最新一週) |
 | dividend_result / split_event | 除權息、分割事件 | TaiwanStockDividendResult / TaiwanStockSplitPrice |
 | market | 加權報酬指數(含息) | TaiwanStockTotalReturnIndex |
+| month_revenue | 個股月營收 | TaiwanStockMonthRevenue |
+| financials | 損益表(含EPS,type/value 窄表) | TaiwanStockFinancialStatements |
+| balance_sheet | 資產負債表(type/value 窄表) | TaiwanStockBalanceSheet |
+| cash_flow | 現金流量表(type/value 窄表) | TaiwanStockCashFlowsStatement |
 
 **衍生層(每次全量重建、冪等——調規則後重跑即一致)**
 
@@ -159,6 +168,10 @@ uv run --no-project python scripts/build_dashboard.py # 重生 index.html
 
 # TDCC 週快照(Actions 每日自動抓;週六 opendata 更新後手動跑可提早入庫)
 uv run --no-project python scripts/fetch_tdcc.py
+
+# 財報四表(Actions 月/季自動跑;獨立於每日管線,見 fetch-financials.yml)
+uv run --no-project python scripts/fetch_financials.py                     # 全部四個 dataset
+uv run --no-project python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue
 
 # 回補歷史 / 定向補缺(只抓指定股票,省 API 額度)/ 盤後唯讀簡報 / 週度驗證
 uv run --no-project python scripts/fetch_daily.py --start 2026-03-01
