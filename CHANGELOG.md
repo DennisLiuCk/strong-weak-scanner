@@ -2,6 +2,27 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 新增個股質化研究筆記系統 — 2026-07-09
+
+**策略規則零變動**(不進 daily_metrics/daily_scores,不影響權重/tier,IS_CUTOFF 不動)。
+年報 MD&A、法說會重點這類質化揭露原本完全缺乏收錄管道,新增：
+
+- `notes/qualitative/<股號>_<名稱>.md`:人工撰寫(非自動抓取),固定結構
+  (業務概況/客戶產品結構/財務亮點/成長動能/風險重點/法說會頻率/資料來源/下次更新
+  建議時機),`<!-- meta -->` 註解區塊放 `stock_id`/`template_version`/`last_updated`/
+  `next_review`(GitHub 渲染時隱形,不干擾正文閱讀)。首批範例:6525 捷敏-KY
+  (中小型股,法說會約年 1~2 場)、8299 群聯(權值股,法說會嚴格季頻)——刻意選一大
+  一小對照更新頻率差異。
+- `scripts/qual_notes.py`:唯讀狀態追蹤 + 骨架建立(`--missing`/`--stale`/
+  `--outdated`/`--new`),對照 `config/universe.csv` 全量名單。**已有筆記的股票
+  不會被要求重寫**,除非模板版本升級(`TEMPLATE_VERSION` +1)或人工判斷需要——
+  避免「重新整理」變成隱性的重複勞動。
+- 儀表板個股列新增「📝 筆記」badge(`build_dashboard.py` 讀 meta 狀態,`next_review`
+  逾期上色提醒);點擊直接在頁內展開完整筆記全文——標題/段落/清單/表格都有排版
+  (`qual_notes.py` 把每個 `##` 章節解析成結構化 blocks,前端無 innerHTML 組 DOM,
+  借用既有底部詳情面板,桌機/手機同一套互動,不做 hover 預覽,底部另附 GitHub 原始檔
+  連結)。無筆記股票不顯示 badge,不影響既有版面。
+
 ## Universe 覆核調整:6525 捷敏-KY 改歸 packtest — 2026-07-09
 
 **策略規則零變動**(IS_CUTOFF 不動,同 2026-07-05/06 三次族群異動先例——universe

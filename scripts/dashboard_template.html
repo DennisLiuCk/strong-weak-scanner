@@ -178,6 +178,12 @@
   .fundbadge.up{color:var(--strong)}
   .fundbadge.down{color:var(--weak)}
   .fundbadge.flat{color:var(--muted)}
+  .notebadge{display:inline-block;width:fit-content;margin-top:2px;font-family:inherit;
+    font-size:10px;font-weight:700;border:1px solid currentColor;border-radius:100px;
+    padding:1px 7px;cursor:pointer;background:none;letter-spacing:.2px;text-decoration:none}
+  .notebadge.fresh{color:var(--muted)}
+  .notebadge.draft{color:var(--muted);border-style:dashed}
+  .notebadge.due{color:var(--warn-line)}
   .cell{position:relative;margin:5px;border-radius:9px;padding:8px 6px 7px;cursor:default;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
     background:var(--cell);border:1px solid transparent;transition:transform .08s ease, box-shadow .08s ease;
@@ -277,6 +283,29 @@
   #sheetBody .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12.5px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:10px;padding:10px 12px;margin-bottom:11px;line-height:1.55;white-space:pre-wrap}
+  /* 質化筆記全文(renderNoteDetail 專用,同樣掛在 #sheetBody 底下) */
+  #sheetBody .nb-h{font-size:13.5px;font-weight:800;color:var(--ink);margin:18px 0 8px}
+  #sheetBody .nb-h:first-of-type{margin-top:2px}
+  #sheetBody .nb-p{font-size:13.5px;line-height:1.75;color:var(--ink-2);margin:0 0 10px}
+  #sheetBody .nb-p b{color:var(--ink);font-weight:700}
+  #sheetBody .nb-ul{margin:0 0 10px;padding-left:20px}
+  #sheetBody .nb-ul li{font-size:13.5px;line-height:1.75;color:var(--ink-2);margin-bottom:5px}
+  #sheetBody .nb-ul li b{color:var(--ink);font-weight:700}
+  #sheetBody .nb-table{width:100%;border-collapse:collapse;margin:2px 0 12px;font-size:12.5px}
+  #sheetBody .nb-table th,#sheetBody .nb-table td{border:1px solid var(--hairline-2);padding:6px 9px;text-align:left;
+    vertical-align:top}
+  #sheetBody .nb-table th{background:var(--surface-2);color:var(--ink-2);font-weight:700;white-space:nowrap}
+  #sheetBody .nb-table td{color:var(--ink-2)}
+  #sheetBody .nlink{color:var(--health);text-decoration:underline;text-underline-offset:2px}
+  #sheetBody .nb-meta{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 14px;padding:10px 13px;
+    background:var(--surface-2);border:1px solid var(--hairline-2);border-radius:10px}
+  #sheetBody .nb-meta div{font-size:11.5px;color:var(--muted)}
+  #sheetBody .nb-meta b{display:block;color:var(--ink);font-size:12.5px;font-weight:700;margin-top:1px}
+  #sheetBody .nb-flag{font-size:11.5px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-line);
+    border-radius:8px;padding:6px 10px;margin:0 0 12px}
+  #sheetBody .nb-src{display:block;margin-top:16px;padding-top:13px;border-top:1px dashed var(--hairline);
+    font-size:12.5px;font-weight:700;color:var(--ink);text-decoration:none}
+  #sheetBody .nb-src:hover{color:var(--health)}
   #sheetBody .why{color:var(--ink-2);line-height:1.6;font-size:13.5px;margin-bottom:10px}
   #sheetBody .why b{color:var(--ink)}
   #sheetBody .how{margin-top:11px;padding-top:11px;border-top:1px dashed var(--hairline);
@@ -646,12 +675,77 @@
   var sheetWrap = document.getElementById("sheetWrap"),
       sheetEl   = document.getElementById("sheet"),
       sheetBody = document.getElementById("sheetBody");
-  function openSheet(html){
+  function openSheet(html, renderFn){
     if(!sheetWrap) return;
-    renderDetail(sheetBody, html);
+    (renderFn || renderDetail)(sheetBody, html);
     sheetEl.scrollTop = 0; sheetEl.style.transform = "";
     sheetWrap.classList.add("on"); sheetWrap.setAttribute("aria-hidden","false");
     document.body.style.overflow = "hidden";
+  }
+
+  // ---------- 質化筆記全文(點「筆記」badge 展開,借用同一個底部 sheet 殼) ----------
+  function renderRuns(container, runs){       // runs:[{s,b?,a?}] → 粗體/連結/純文字節點
+    (runs||[]).forEach(function(r){
+      if(r.a){
+        var a=document.createElement("a"); a.className="nlink"; a.href=r.a; a.target="_blank"; a.rel="noopener";
+        setText(a, r.s); container.appendChild(a);
+      } else if(r.b){
+        var b=document.createElement("b"); setText(b, r.s); container.appendChild(b);
+      } else {
+        container.appendChild(document.createTextNode(r.s));
+      }
+    });
+  }
+  function renderNoteBlocks(container, blocks){
+    (blocks||[]).forEach(function(bl){
+      if(bl.t==="p"){
+        var p=document.createElement("p"); p.className="nb-p"; renderRuns(p, bl.runs); container.appendChild(p);
+      } else if(bl.t==="ul"){
+        var ul=document.createElement("ul"); ul.className="nb-ul";
+        bl.items.forEach(function(it){ var li=document.createElement("li"); renderRuns(li, it); ul.appendChild(li); });
+        container.appendChild(ul);
+      } else if(bl.t==="table"){
+        var tb=document.createElement("table"); tb.className="nb-table";
+        var thead=document.createElement("thead"), htr=document.createElement("tr");
+        bl.head.forEach(function(c){ var th=document.createElement("th"); renderRuns(th, c); htr.appendChild(th); });
+        thead.appendChild(htr); tb.appendChild(thead);
+        var tbody=document.createElement("tbody");
+        bl.rows.forEach(function(row){
+          var tr=document.createElement("tr");
+          row.forEach(function(c){ var td=document.createElement("td"); renderRuns(td, c); tr.appendChild(td); });
+          tbody.appendChild(tr);
+        });
+        tb.appendChild(tbody); container.appendChild(tb);
+      }
+    });
+  }
+  function renderNoteDetail(box, note){        // note = notePayload() 的回傳物件
+    box.innerHTML = "";
+    var head=document.createElement("div"); head.className="th";
+    var el=document.createElement("span"); el.className="el"; setText(el, "質化研究筆記 · 觀察層(不計分)"); head.appendChild(el);
+    var sc=document.createElement("span"); sc.className="sc"; setText(sc, note.label);
+    sc.style.color=note.color[0]; sc.style.background=note.color[1]; head.appendChild(sc);
+    box.appendChild(head);
+    var who=document.createElement("div"); who.className="who"; setText(who, note.who); box.appendChild(who);
+    var bz=document.createElement("div"); bz.className="biz"; setText(bz, note.biz||""); box.appendChild(bz);
+    var meta=document.createElement("div"); meta.className="nb-meta";
+    [["最後更新", note.updated], ["下次建議更新", note.next]].forEach(function(kv){
+      var d=document.createElement("div");
+      d.appendChild(document.createTextNode(kv[0]));
+      var b=document.createElement("b"); setText(b, kv[1]); d.appendChild(b);
+      meta.appendChild(d);
+    });
+    box.appendChild(meta);
+    if(note.tmplOld){
+      var fl=document.createElement("div"); fl.className="nb-flag";
+      setText(fl, "筆記模板已改版,這篇還沒依新版重寫——內容仍可參考。"); box.appendChild(fl);
+    }
+    (note.sections||[]).forEach(function(sec){
+      var h=document.createElement("h4"); h.className="nb-h"; setText(h, sec.h); box.appendChild(h);
+      renderNoteBlocks(box, sec.blocks);
+    });
+    var link=document.createElement("a"); link.className="nb-src"; link.href=note.url; link.target="_blank"; link.rel="noopener";
+    setText(link, "在 GitHub 開啟原始檔 ↗"); box.appendChild(link);
   }
   function closeSheet(){
     if(!sheetWrap || !sheetWrap.classList.contains("on")) return;
@@ -757,6 +851,22 @@
                "五元素評分完全獨立、不進 daily_metrics/daily_scores,純參考,不影響 composite 分數與 tier。",
           src: "FinMind TaiwanStockMonthRevenue / TaiwanStockFinancialStatements",
           scLabel: row.fund.label, scColor: col[0], scBg: col[1] };
+      };})(row));
+    }
+    if(row.note){                // 質化研究筆記(年報MD&A/法說會重點,人工維護,觀察層)
+      var nb=document.createElement("button"); nb.type="button"; nb.tabIndex=0;
+      nb.className="notebadge "+row.note.cls;
+      nb.textContent = "📝 "+row.note.label;
+      nb.setAttribute("aria-label", "質化研究筆記:"+row.note.label+"(最後更新 "+row.note.updated+"),點擊展開完整筆記");
+      badges.appendChild(nb);
+      var NOTE_COL = {fresh:["var(--muted)","var(--neutral-tint)"], draft:["var(--muted)","var(--neutral-tint)"],
+                      due:["var(--warn-line)","var(--warn-bg)"]};
+      // 不做 hover 預覽——質化筆記是長文,點開就直接看完整排版內容(借用底部 sheet 殼,
+      // 桌機/觸控都走同一條路),比瞄一眼縮寫摘要更符合「閱讀筆記」的體驗。
+      nb.addEventListener("click", (function(row){ return function(){
+        openSheet({ who: row.nm+"("+row.id+")", biz: row.biz, label: row.note.label,
+          color: NOTE_COL[row.note.cls], updated: row.note.updated, next: row.note.next,
+          tmplOld: row.note.tmplOld, sections: row.note.sections, url: row.note.url }, renderNoteDetail);
       };})(row));
     }
     if(badges.children.length) rl.appendChild(badges);

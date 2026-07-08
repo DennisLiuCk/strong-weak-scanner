@@ -49,6 +49,8 @@ build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db
                  ⚠ 本地重跑會覆寫當日資料日的已凍結快照——commit 前 git checkout -- archive/
 validate.py      → reports/ 週報(§⑥=觀察因子 IC)
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
+qual_notes.py    notes/qualitative/*.md(年報MD&A/法說會重點,人工撰寫)狀態追蹤+骨架建立
+                 ⚠ 唯讀盤點工具,不抓資料;已有筆記的股票不會被要求重寫,除非模板版本升級
 ```
 
 資料表:原始 price/inst/margin/holding/sbl(借券餘額,單位=股)+ tdcc_holding(週頻)+
@@ -61,3 +63,6 @@ price_adj/daily_metrics/daily_scores/group_metrics/market_daily(每次重建)。
 (2026-07-09 起,`fetch_financials.py` 獨立填入)也是另一類**——FinMind 官方財報,
 月/季頻、不進 daily_metrics/daily_scores,供 Universe 治理(R1 業務歸屬)等質化查證用;
 financials/balance_sheet/cash_flow 是 FinMind 原生 type/value 窄表(EAV),非寬表。
+**`notes/qualitative/*.md`(2026-07-09 起)也是另一類**——年報 MD&A、法說會重點,人工
+撰寫(非 FinMind、零自動抓取),供理解個股業務/商業模式用;`build_dashboard.py` 讀 meta
+區塊把「最後更新/建議複核」狀態顯示成儀表板個股列的筆記 badge,點擊連到 GitHub 全文。

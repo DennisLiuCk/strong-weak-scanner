@@ -149,7 +149,9 @@
   抓 biz 欄與族群歸類疑似不符的既有成員,供人工覆核、不自動改分類 /
   R2 市值遲滯(≥50 億納入、現有成員 <30 億才剔除,防反覆進出)/ R3 近 20 日
   中位成交值 ≥3,000 萬 / R4 上市 ≥60 交易日。變更後全歷史按新名單重算
-  (族群中位與排名都會變),審計軌跡以 CHANGELOG 為準。
+  (族群中位與排名都會變),審計軌跡以 CHANGELOG 為準。R1 商業模式判斷的質化佐證
+  (年報 MD&A、法說會重點)人工整理在 `notes/qualitative/*.md`,狀態由
+  `scripts/qual_notes.py` 追蹤,見下方「質化研究筆記」。
 - **新增族群**(2026-07-05 記憶體為範例,細節見 CHANGELOG):全管線配置驅動,
   `groups.csv` + `universe.csv` 各加行即生效、零改碼;一檔只屬一個族群(跨域者
   依籌碼行為歸屬,如記憶體封測歸封測);族群設計下限約 6 檔有效樣本(低於
@@ -186,6 +188,32 @@ Token 讀取順序:環境變數 `FINMIND_TOKEN`(+選配 `FINMIND_TOKEN2`)→ 本
 (`fetch_daily.api_get`,screen.py 共用);同日多輪「screen+全量回補」單組
 token 必爆額度,參考量:回補一輪 ≈ 5 datasets × 檔數 + 事件段。Runbook:盤後檢視
 [DAILY_CHECK.md](DAILY_CHECK.md)、週六策略檢視 [WEEKLY_REVIEW.md](WEEKLY_REVIEW.md)。
+
+## 質化研究筆記(`notes/qualitative/`)
+
+年報 MD&A、法說會重點這類質化揭露,量化管線(FinMind)沒有涵蓋,人工整理成
+`notes/qualitative/<股號>_<名稱>.md`,補業務概況/商業模式/成長動能/風險重點,
+供 Universe 治理(R1 業務歸屬判斷,見上)與個股研究參考——**非自動抓取**,內容
+仍需人工讀年報/法說會簡報後撰寫(MOPS 法人說明會一覽表:
+<https://mops.twse.com.tw/mops/web/t100sb02_1>,輸入股號查歷年場次)。
+
+```bash
+uv run --no-project python scripts/qual_notes.py             # 全體 universe 筆記狀態總覽
+uv run --no-project python scripts/qual_notes.py --missing    # 只列尚無筆記(全量建立/新增類股用)
+uv run --no-project python scripts/qual_notes.py --stale      # 只列已逾建議複核日的筆記
+uv run --no-project python scripts/qual_notes.py --outdated   # 只列模板版本落後、需依新模板重寫的筆記
+uv run --no-project python scripts/qual_notes.py --new 6525   # 從 _template.md 建立骨架(帶入 universe.csv 的 name/group/biz)
+```
+
+**已有筆記的股票不會被要求重寫**——狀態機只看檔案是否存在與 meta 區塊的
+`next_review` 日期,「建議複核」只是提醒,不強制;要重寫只有兩種情況:人工判斷
+內容過時,或改了 `_template.md` 結構後把 `qual_notes.py` 的 `TEMPLATE_VERSION`
++1(`--outdated` 會列出所有版本落後的筆記)。法說會頻率因公司而異(權值股常季頻,
+中小型股常年 1~2 場),各筆記自己的「下次更新建議時機」依實際頻率訂,不是統一排程。
+
+儀表板個股列會顯示「📝 筆記」badge(依 next_review 逾期與否上色);點擊直接在頁內
+展開完整筆記(標題/段落/清單/表格都有排版,借用既有底部詳情面板,桌機/手機同一套),
+底部另附「在 GitHub 開啟原始檔」連結。無筆記的股票不顯示 badge。
 
 ## 侷限與註記
 

@@ -21,6 +21,8 @@ from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
                    DZ_FOREIGN, DZ_TRUST, STEALTH_OFF_HIGH, _chip_signal)
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
 from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
+# 個股質化筆記(年報MD&A/法說會重點,人工維護)狀態——單一事實來源在 qual_notes.py
+from qual_notes import load_notes, note_status, TEMPLATE_VERSION as NOTE_TEMPLATE_VERSION
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -29,6 +31,12 @@ OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages
 # 歷史快照:每日 build 原樣存檔,回看的是「當天使用者看到的報告」而非以現行規則重算
 # (daily_scores 等衍生表每日全量重建,事後從 db 重繪會是 restated history,不可稽核)。
 ARCHIVE = os.path.join(ROOT, "archive")
+NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
+# 筆記全文放 repo 裡,儀表板不 embed 全文(質化筆記是長文,不適合塞進 tooltip)——
+# badge 點開直接連到 GitHub 的 render 版本,讀 repo remote 免寫死也行,但這裡固定
+# 域名比較簡單(僅供內部 GitHub Pages 使用,repo 搬家機率低)
+NOTE_REPO_BLOB = "https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/"
+NOTE_LABEL = {"fresh": "筆記", "draft": "筆記草稿", "due": "筆記·待複核"}
 
 # 標題設定。TITLE_TAIL 是品牌尾綴、ALL_SCOPE 是「全部族群」時的範圍詞;篩選到單一族群時,
 # 前端會把標題換成「族群名 · TITLE_TAIL」(見 dashboard_template.html 的 group filter JS)。
@@ -439,6 +447,9 @@ def main():
     except sqlite3.OperationalError:
         fund_map = {}
     con.close()
+    # 質化筆記(觀察層、人工維護,見 notes/qualitative/):資料夾不存在或無筆記時 load_notes
+    # 回傳空 dict,同 fund_map 的「從缺不擋主管線」慣例
+    notes_map = load_notes(NOTES_DIR)
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
     chip_by_grp = {}
@@ -553,6 +564,17 @@ def main():
         f = fund_map.get(r["stock_id"])
         if f:
             obj["fund"] = f
+        n = notes_map.get(r["stock_id"])
+        if n:
+            # asof 用資料日(last)而非 wall-clock today——archive 快照才可重現(同一資料日重建,
+            # 「建議複核」判定不會因為隔幾天重跑而改變)
+            st = note_status(n, last)
+            obj["note"] = {
+                "cls": st, "label": NOTE_LABEL[st],
+                "updated": n["last_updated"] or "-", "next": n["next_review"] or "-",
+                "summary": n["summary"], "tmplOld": n["template_version"] < NOTE_TEMPLATE_VERSION,
+                "url": NOTE_REPO_BLOB + n["relpath"], "sections": n["sections"],
+            }
         obj["_comp"] = r["composite_s"]
         data.append(obj)
         tiers_map.setdefault(tier, []).append((r["composite_s"], r["stock_id"]))
