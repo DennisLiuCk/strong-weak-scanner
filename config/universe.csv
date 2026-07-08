@@ -1,14 +1,14 @@
 stock_id,name,group,biz
-2327,國巨,passive,MLCC、晶片電阻
+2327,國巨,passive,MLCC、晶片電阻、鉭質電容、磁性元件(多元被動元件龍頭)
 2492,華新科,passive,MLCC、晶片電阻
-3026,禾伸堂,passive,高壓MLCC、通路
-2375,凱美,passive,電容器(國巨系)
+3026,禾伸堂,passive,通路代理(營收大宗)、高壓MLCC(自製核心)
+2375,凱美,passive,電阻、鋁質電解電容、風扇馬達(國巨系)
 3236,千如,passive,電感、線圈
 2472,立隆電,passive,鋁質電解電容
 2478,大毅,passive,晶片電阻、保護元件
 6173,信昌電,passive,MLCC(華新系)
 5328,華容,passive,塑膠薄膜/金屬化膜電容器
-6284,佳邦,passive,電感、天線
+6284,佳邦,passive,天線、電感(保護元件)
 2428,興勤,passive,保護元件、熱敏電阻
 6449,鈺邦,passive,固態電容
 2481,強茂,power,二極體、MOSFET
@@ -23,31 +23,31 @@ stock_id,name,group,biz
 3707,漢磊,power,功率/SiC磊晶代工
 3016,嘉晶,power,磊晶片(漢磊集團)
 6525,捷敏-KY,packtest,功率半導體封測(OSAT)
-6138,茂達,power,電源管理IC
+6138,茂達,power,電源管理IC、風扇驅動IC
 8081,致新,power,電源管理IC
-3711,日月光投控,packtest,封測龍頭(OSAT)
+3711,日月光投控,packtest,封測龍頭(OSAT)+EMS(環旭電子)
 2449,京元電子,packtest,IC測試(AI晶片)
-6239,力成,packtest,記憶體封測
+6239,力成,packtest,記憶體封測(擴大邏輯IC/先進封裝FOPLP)
 6147,頎邦,packtest,驅動IC封測(COF)
 8150,南茂,packtest,驅動IC/記憶體封測
-6257,矽格,packtest,IC測試(射頻/網通)
-3264,欣銓,packtest,IC測試(車用/工控)
+6257,矽格,packtest,IC測試(射頻/網通、拓展AI/矽光子)
+3264,欣銓,packtest,IC測試(車用/工控、拓展AI ASIC)
 2441,超豐,packtest,消費IC封測(力成系)
 2369,菱生,packtest,IC封測
 2329,華泰,packtest,封測+EMS
-6271,同欣電,packtest,陶瓷基板、CIS封裝
+6271,同欣電,packtest,陶瓷基板(自製自銷)、CIS封裝代工
 8131,福懋科,packtest,記憶體封測(南亞科/台塑系)
-6451,訊芯-KY,packtest,SiP模組封測
+6451,訊芯-KY,packtest,光收發模組/SiP封測(鴻海系)
 2408,南亞科,memory,DRAM(IDM)
-2344,華邦電,memory,DRAM、NOR Flash
-2337,旺宏,memory,NOR Flash、ROM
+2344,華邦電,memory,DRAM、NOR/NAND Flash
+2337,旺宏,memory,NOR Flash、NAND Flash、ROM
 8299,群聯,memory,NAND控制IC、模組
 3006,晶豪科,memory,利基型DRAM、SRAM設計
-5351,鈺創,memory,利基型DRAM設計
-6531,愛普*,memory,3D堆疊、高頻寬記憶體IC
+5351,鈺創,memory,利基型/工控/車用DRAM設計
+6531,愛普*,memory,低功耗IoT RAM(PSRAM)、矽電容IPD
 3260,威剛,memory,記憶體模組
 2451,創見,memory,記憶體模組
-4967,十銓,memory,記憶體模組(電競)
+4967,十銓,memory,記憶體模組(電競/B2B轉型中)
 8271,宇瞻,memory,記憶體模組
 5289,宜鼎,memory,工控記憶體模組
 3661,世芯-KY,ipdesign,ASIC設計服務(先進製程)
@@ -58,12 +58,12 @@ stock_id,name,group,biz
 6533,晶心科,ipdesign,CPU矽智財
 5269,祥碩,ipdesign,高速介面IC(USB/PCIe)
 5274,信驊,ipdesign,BMC伺服器管理IC
-4966,譜瑞-KY,ipdesign,高速介面IC(Retimer)
+4966,譜瑞-KY,ipdesign,高速介面IC(Retimer/Redriver)+顯示驅動IC(TCON)
 3131,弘塑,semiequip,濕製程/先進封裝設備
-3583,辛耘,semiequip,濕製程設備、再生晶圓
+3583,辛耘,semiequip,設備代理、濕製程設備、再生晶圓
 6187,萬潤,semiequip,先進封裝設備(點膠/檢測)
-6640,均華,semiequip,先進封裝設備(固晶)
-3680,家登,semiequip,EUV光罩傳送盒
+6640,均華,semiequip,先進封裝設備(固晶/分類機)
+3680,家登,semiequip,光罩/晶圓載具(EUV Pod/FOUP)
 3413,京鼎,semiequip,半導體設備代工(AMAT)
 6223,旺矽,semiequip,探針卡、測試介面
 6515,穎崴,semiequip,測試介面座
@@ -71,8 +71,8 @@ stock_id,name,group,biz
 6488,環球晶,material,矽晶圓
 3532,台勝科,material,矽晶圓
 6182,合晶,material,矽晶圓
-1560,中砂,material,鑽石碟、研磨耗材
-1785,光洋科,material,貴金屬靶材
+1560,中砂,material,鑽石碟、再生晶圓、研磨耗材
+1785,光洋科,material,貴金屬回收精煉/濺鍍靶材(儲存+半導體)
 1773,勝一,material,電子級溶劑
 4755,三福化,material,電子化學品
 5234,達興材料,material,電子材料(顯示/半導體)
@@ -80,20 +80,20 @@ stock_id,name,group,biz
 4770,上品,material,氟素樹脂製程元件
 3017,奇鋐,thermal,散熱模組、3D VC、液冷
 3324,雙鴻,thermal,散熱模組、水冷板
-2421,建準,thermal,散熱風扇
-3653,健策,thermal,均熱片、導線架
-3483,力致,thermal,散熱模組
-3338,泰碩,thermal,散熱模組
-8996,高力,thermal,熱交換器、液冷板
+2421,建準,thermal,散熱風扇、水冷板
+3653,健策,thermal,均熱片、水冷板(主力)、導線架(次要)
+3483,力致,thermal,散熱模組、液冷(水冷板/CDU/浸沒式冷卻)
+3338,泰碩,thermal,散熱模組、水冷/CDU
+8996,高力,thermal,熱交換器、液冷板、氫燃料電池組件
 2383,台光電,pcb,CCL(高速材料)
 6274,台燿,pcb,CCL
 6213,聯茂,pcb,CCL
 8358,金居,pcb,銅箔(CCL上游)
-1815,富喬,pcb,玻纖布(CCL上游)
+1815,富喬,pcb,玻纖紗/布(CCL上游)
 2368,金像電,pcb,AI伺服器板
 3044,健鼎,pcb,多層板
 8155,博智,pcb,伺服器板
-5439,高技,pcb,高階板
+5439,高技,pcb,高階厚銅板(轉型AI伺服器)
 3037,欣興,pcb,ABF載板
 8046,南電,pcb,ABF載板
 3189,景碩,pcb,IC載板
