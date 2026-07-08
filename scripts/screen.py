@@ -38,7 +38,32 @@ CAP_IN   = 50e8    # 市值 ≥ 50 億 → 可納入
 CAP_OUT  = 30e8    # 現有成員 < 30 億 → 建議剔除(30~50 億 = 緩衝帶,維持現狀)
 LIQ_MIN  = 3e7     # 近 20 日中位成交值 ≥ 3,000 萬
 MIN_DAYS = 60      # 上市至少 60 個交易日
+
+# R1 業務歸屬關鍵字複檢(零 API,純字串比對):抓「服務型業務被歸到產品型族群」
+# 的疏漏(2026-07-09 6525 捷敏-KY 案例——biz 寫「封測」卻歸 power)。命中僅供
+# 人工覆核,不自動改 universe.csv。
+BIZ_OSAT_KW     = ("封測", "OSAT", "IC測試")   # 封測/測試代工型業務 → 理應歸 packtest
+BIZ_CONTRACT_KW = ("代工",)                     # 廣義代工 → packtest 或 semiequip 皆合理
+BIZ_CHANNEL_KW  = ("通路",)                     # 純通路商需確認非主業(R1 前例:至上/崇越/華立)
 # ──────────────────────────────────────────────────────────
+
+
+def check_biz_grp(con):
+    """R1 業務歸屬關鍵字一致性檢查:biz 含服務型/代工型關鍵字但族群歸類疑似不符時
+    列出,供人工覆核(不自動改分類)。回傳 [(icon, stock_id, name, grp, biz, why), ...]。"""
+    flags = []
+    for r in con.execute("SELECT stock_id, name, grp, biz FROM universe ORDER BY stock_id"):
+        biz = r["biz"] or ""
+        if any(k in biz for k in BIZ_OSAT_KW) and r["grp"] != "packtest":
+            flags.append(("🔴", r["stock_id"], r["name"], r["grp"], biz,
+                          "biz 含封測/OSAT/IC測試關鍵字,但族群非 packtest"))
+        elif any(k in biz for k in BIZ_CONTRACT_KW) and r["grp"] not in ("packtest", "semiequip"):
+            flags.append(("🟡", r["stock_id"], r["name"], r["grp"], biz,
+                          "biz 含代工關鍵字,但族群非 packtest/semiequip"))
+        elif any(k in biz for k in BIZ_CHANNEL_KW):
+            flags.append(("🟡", r["stock_id"], r["name"], r["grp"], biz,
+                          "biz 含通路關鍵字,確認主業非純通路(同前例:至上/崇越/華立)"))
+    return flags
 
 
 def verdict_new(cap, liq, days):
@@ -98,6 +123,21 @@ def main():
             actions.append(f"{vd} {sid} {r['name']}:{';'.join(why)}")
         L.append(f"| {sid} | {r['name']} | {r['grp']} | {cap/1e8:,.0f} | "
                  f"{liq/1e6:,.0f}M | {vd}{('(' + ';'.join(why) + ')') if why else ''} |")
+
+    # ── A2. 業務歸屬關鍵字複檢(R1,零 API)──
+    L.append("")
+    L.append("## A2. 業務歸屬關鍵字一致性檢查(R1 免API複檢)")
+    L.append("")
+    biz_flags = check_biz_grp(con)
+    if biz_flags:
+        L.append("| | 代號 | 名稱 | 現族群 | biz | 提醒 |")
+        L.append("|---|---|---|---|---|---|")
+        for icon, sid, nm, grp, biz, why in biz_flags:
+            L.append(f"| {icon} | {sid} | {nm} | {grp} | {biz} | {why} |")
+            if icon == "🔴":
+                actions.append(f"🔴 {sid} {nm}:{why}——建議覆核族群歸屬")
+    else:
+        L.append("(無關鍵字疑義)")
 
     # ── B. 候選體檢(FinMind)──
     L.append("")
