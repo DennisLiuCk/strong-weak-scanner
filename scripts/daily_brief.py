@@ -100,6 +100,26 @@ def main():
             issues.append(f"tdcc_holding 最新快照 {td_last},疑漏抓一週(TDCC 不可回補)")
     else:
         issues.append("tdcc_holding 表不存在——fetch_tdcc 尚未跑過")
+    # risk_flags 抓取健康度:TWSE/TPEx 四端點任一失敗只印 stderr、exit 0 不擋管線(綠燈看不出來),
+    # 且當天名單整表重建、不保留前一天資料——用「前一有資料日 vs 今日」比對偵測「處置/注意」
+    # 從非零掉到零(2026-07-09 實測:TWSE+TPEx 處置雙雙失敗,3 檔仍在官方列管期內的股票當天
+    # 從名單消失,品質快檢原本測不出來)。
+    if con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='risk_flags'").fetchone():
+        rf_dates = [r[0] for r in con.execute("SELECT DISTINCT date FROM risk_flags ORDER BY date")]
+        if last not in rf_dates:
+            issues.append(f"risk_flags 無 {last} 資料——TWSE/TPEx 處置+注意四端點疑似全數抓取失敗")
+        else:
+            idx = rf_dates.index(last)
+            if idx > 0:
+                prev_d = rf_dates[idx - 1]
+                for kind in ("處置", "注意"):
+                    n_today = con.execute("SELECT COUNT(*) FROM risk_flags WHERE date=? AND kind=?",
+                                          (last, kind)).fetchone()[0]
+                    n_prev = con.execute("SELECT COUNT(*) FROM risk_flags WHERE date=? AND kind=?",
+                                         (prev_d, kind)).fetchone()[0]
+                    if n_prev > 0 and n_today == 0:
+                        issues.append(f"risk_flags「{kind}」從 {prev_d} 的 {n_prev} 筆掉到 {last} 的 0 筆,"
+                                      f"疑似 TWSE/TPEx 端點抓取失敗——chip_health 一票否決可能漏判")
     miss_adj = con.execute("""SELECT COUNT(*) FROM price p JOIN universe u USING(stock_id)
                               LEFT JOIN price_adj a ON a.date=p.date AND a.stock_id=p.stock_id
                               WHERE p.date=? AND p.close IS NOT NULL AND a.close IS NULL""",

@@ -91,6 +91,17 @@
     border-radius:100px;padding:7px 13px;font-size:12.5px;font-family:inherit}
   .toggle:hover{color:var(--ink);border-color:var(--muted)}
   .toggle:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+  .toggle[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:700}
+
+  /* ---- matrix toolbar(搜尋/排序) ---- */
+  .mtoolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 8px}
+  .msearch{font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);
+    border:1px solid var(--hairline);border-radius:100px;padding:7px 14px;min-width:200px;
+    outline:none;transition:border-color .12s ease}
+  .msearch::placeholder{color:var(--muted)}
+  .msearch:focus{border-color:var(--strong)}
+  .mcount{font-size:12px;color:var(--muted)}
+  .search-hide{display:none !important}
 
   /* ---- group filter ---- */
   .gfilter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:22px 0 2px}
@@ -411,6 +422,17 @@
         <span class="el"><span class="n">⑤&nbsp;融資券</span><span class="r">散戶擠在哪?未來停損賣壓多重?</span></span>
       </div>
     </div>
+    <div style="grid-column:1 / -1">
+      <h3>個股標記(觀察層,不影響左側①~⑤評分與 tier;點列表格內同款圖示看明細)</h3>
+      <div class="scale">
+        <span class="sk"><span class="riskbadge sm">處置</span>／<span class="riskbadge sm">注意</span>交易所官方列管(TWSE/TPEx 異常價量認證)</span>
+        <span class="sk"><span class="hdot health" style="display:inline-block"></span>籌碼健康度:健康</span>
+        <span class="sk"><span class="hdot neutral" style="display:inline-block"></span>籌碼健康度:中性</span>
+        <span class="sk"><span class="hdot warn" style="display:inline-block"></span>籌碼健康度:待觀察(含官方處置/注意一票否決)</span>
+        <span class="sk"><span class="fundbadge up">▲18%</span>基本面參考:月營收年增(▲上升 ▼下降 →持平)</span>
+        <span class="sk"><span class="notebadge fresh">📝</span>質化研究筆記(灰=已更新、橘框=建議複核已逾期)</span>
+      </div>
+    </div>
   </div>
 
   <details class="guide">
@@ -433,6 +455,11 @@
   <div class="tiers" id="tiers"></div>
 
   <h2 class="sec">五元素明細 · 點任一格看數據與理由</h2>
+  <div class="mtoolbar">
+    <input type="search" id="matrixSearch" class="msearch" placeholder="搜尋股號或名稱…" aria-label="搜尋股號或名稱">
+    <button type="button" class="toggle" id="matrixSortBtn" aria-pressed="false">↓ 族群內綜合分由高到低</button>
+    <span id="matrixSearchCount" class="mcount" aria-live="polite"></span>
+  </div>
   <div class="scroller">
     <div class="matrix" id="matrix"></div>
   </div>
@@ -918,6 +945,58 @@
     if(row.g!==curG){ matrix.appendChild(groupHead(row.g)); curG=row.g; }
     matrix.appendChild(stockRow(row));
   });
+
+  // ---------- 五元素明細:搜尋(股號/名稱)+ 族群內排序切換 ----------
+  // 兩者都用 CSS class 疊加隱藏(search-hide),不動群組篩選既有的 inline style.display,
+  // 兩套篩選互不覆寫、天然 AND 組合(任一條件要隱藏就隱藏)。
+  (function(){
+    var input = document.getElementById("matrixSearch");
+    var countEl = document.getElementById("matrixSearchCount");
+    if(!input) return;
+    var rows = Array.prototype.slice.call(matrix.querySelectorAll(".row[data-g]"));
+    var heads = Array.prototype.slice.call(matrix.querySelectorAll(".grp[data-g]"));
+    function norm(s){ return (s||"").toLowerCase(); }
+    function apply(){
+      var q = norm(input.value.trim());
+      var shownTotal = 0, byGroup = {};
+      rows.forEach(function(r){
+        var nmEl = r.querySelector(".nm"), codeEl = r.querySelector(".code.mono");
+        var match = !q || norm(nmEl && nmEl.textContent).indexOf(q) !== -1
+                        || norm(codeEl && codeEl.textContent).indexOf(q) !== -1;
+        r.classList.toggle("search-hide", !match);
+        if(match){ shownTotal++; byGroup[r.dataset.g] = true; }
+      });
+      heads.forEach(function(h){ h.classList.toggle("search-hide", !byGroup[h.dataset.g]); });
+      countEl.textContent = q ? (shownTotal + " 檔符合") : "";
+    }
+    input.addEventListener("input", apply);
+  })();
+
+  (function(){
+    var btn = document.getElementById("matrixSortBtn");
+    if(!btn) return;
+    // 進場時 DATA 已是「族群順序→族群內綜合分高到低」(build_dashboard.py 排序),原地存一份
+    // 供切回;切到「由低到高」時只在各族群區塊內反轉列順序,不動族群分區與族群篩選的 data-g。
+    var headEl = matrix.querySelector(".row.head");
+    var blocks = []; var cur = null;
+    Array.prototype.forEach.call(matrix.children, function(el){
+      if(el.classList.contains("grp")){ cur = {head: el, rows: []}; blocks.push(cur); }
+      else if(cur && el.classList.contains("row")){ cur.rows.push(el); }
+    });
+    var ascending = false;
+    btn.addEventListener("click", function(){
+      ascending = !ascending;
+      btn.setAttribute("aria-pressed", ascending ? "true" : "false");
+      btn.textContent = ascending ? "↑ 族群內綜合分由低到高" : "↓ 族群內綜合分由高到低";
+      var frag = document.createDocumentFragment();
+      if(headEl) frag.appendChild(headEl);
+      blocks.forEach(function(b){
+        frag.appendChild(b.head);
+        (ascending ? b.rows.slice().reverse() : b.rows).forEach(function(r){ frag.appendChild(r); });
+      });
+      matrix.appendChild(frag);
+    });
+  })();
 
   // ---------- group radar ----------
   var GROUPS = __GROUPS_JSON__;
