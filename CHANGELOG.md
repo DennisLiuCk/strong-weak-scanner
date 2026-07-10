@@ -2,6 +2,36 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 質化研究品質系統 v2＋已確認錯誤優先修正 — 2026-07-11
+
+**策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與
+`validate.py` 的 `IS_CUTOFF` 皆未動）。本次只處理 `notes/qualitative/` 的研究正確性、
+一手證據、獨立複核與對外狀態語意；不以這批質化修正作為調整量化策略的 OOS 證據。
+
+- 優先修正交叉查證已確認的錯誤：大毅 2025 前三季／Q3 營收小數位放大十倍、立隆電
+  2026 Q1 營收、富鼎 2025 前三季營收、德微 2026 年 1 月營收與 YoY、昇陽半導體把
+  2026 Q1 成果誤寫成 Q2、訊芯-KY 把越南北江省光州誤寫為廣州、愛普星號與上市市場
+  說明、朋程法說場次、世芯-KY 否認專案遞延，以及華容無研究必要且無來源的股價敘事。
+  每個存續更正主張都補公司／交易所直接 `[S#]`；華容為純刪除。
+- 改寫者以兩組分工完成修正，另一位未參與改寫的 reviewer 逐篇打開原始 PDF／公司頁，
+  重新核對數字、期間、單位、引用映射與推論邊界，10/10 通過。這十篇只標
+  `partially_verified` 與 `confirmed_corrections_only`（華容為
+  `confirmed_correction_deletion_only`），明確不代表全文查核。
+- `qual_notes.py` 將時效（fresh/due）與查核品質（AI 草稿／部分核驗／全文獨立核驗／
+  來源衝突）拆成兩軸。舊筆記不再因 `last_updated` 新就看似已驗證；本次盤點結果為
+  98 篇中 10 篇局部修正已核驗、88 篇 AI 草稿、0 篇全文獨立核驗。
+- template v2 新增產業結構、獲利模式、財務品質、護城河、KPI、風險、治理與證據索引；
+  固定來源格式為 `一手/二手/衍生｜文件｜定位｜直接 URL`。全文獨立核驗採 claim-block
+  Boolean gate：每個實質段落、bullet 與表格資料列都必須在同一 block 引用一手來源。
+- 簽核契約要求 `drafted_by != reviewed_by`、reviewer 日期／範圍及內容 SHA-256；任何正文
+  或 meta 後續變動都會使 hash 失效並保守降回 AI 草稿。新增 `--lint`、`--quality`、
+  `--needs-review`、`--invalid`、`--hash`，並攔截未定義／重複來源、假日期、重複 stock ID、
+  reviewer 自審、二手-only 與表格列漏引等錯誤。另設 `qualitative-quality` workflow 專門
+  gate 質化檔與 parser 變更，不阻斷每日市場資料 ingestion；dashboard 對無效狀態保守降級。
+- 儀表板改顯示查核狀態、reviewer、核驗範圍、資料截至日、claim／一手證據覆蓋；逾期只
+  加外圈警示，不改寫既有查核程度。另修正舊 parser 會丟掉第一個 `##` 前 Universe 警語、
+  多行摘要被截斷與 Windows 檔名含 `*` 無法建立骨架等問題。
+
 ## 儀表板解釋層重構:原始方向、相對排名與確認狀態分離 — 2026-07-10
 
 **策略規則零變動**(`score.py` 權重、排名、平滑、tier 條件，`fetch_daily.py` 族群/市場

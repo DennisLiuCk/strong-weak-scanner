@@ -21,8 +21,9 @@ from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
                    DZ_FOREIGN, DZ_TRUST, STEALTH_OFF_HIGH, _chip_signal)
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
 from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
-# 個股質化筆記(年報MD&A/法說會重點,人工維護)狀態——單一事實來源在 qual_notes.py
-from qual_notes import load_notes, note_status, TEMPLATE_VERSION as NOTE_TEMPLATE_VERSION
+# 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
+from qual_notes import (load_notes, note_status, note_review_status,
+                        TEMPLATE_VERSION as NOTE_TEMPLATE_VERSION)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -36,7 +37,12 @@ NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 # badge 點開直接連到 GitHub 的 render 版本,讀 repo remote 免寫死也行,但這裡固定
 # 域名比較簡單(僅供內部 GitHub Pages 使用,repo 搬家機率低)
 NOTE_REPO_BLOB = "https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/"
-NOTE_LABEL = {"fresh": "筆記", "draft": "筆記草稿", "due": "筆記·待複核"}
+NOTE_LABEL = {
+    "ai_draft": "AI 草稿・未獨立查核",
+    "partially_verified": "部分核驗",
+    "independently_verified": "已獨立核對來源",
+    "conflicted": "來源衝突・待釐清",
+}
 
 # 標題設定。TITLE_TAIL 是品牌尾綴、ALL_SCOPE 是「全部族群」時的範圍詞;篩選到單一族群時,
 # 前端會把標題換成「族群名 · TITLE_TAIL」(見 dashboard_template.html 的 group filter JS)。
@@ -696,7 +702,7 @@ def main():
     except sqlite3.OperationalError:
         fund_map = {}
     con.close()
-    # 質化筆記(觀察層、人工維護,見 notes/qualitative/):資料夾不存在或無筆記時 load_notes
+    # 質化筆記(觀察層、AI 協作＋獨立 reviewer,見 notes/qualitative/):無筆記時 load_notes
     # 回傳空 dict,同 fund_map 的「從缺不擋主管線」慣例
     notes_map = load_notes(NOTES_DIR)
 
@@ -841,9 +847,31 @@ def main():
             # asof 用資料日(last)而非 wall-clock today——archive 快照才可重現(同一資料日重建,
             # 「建議複核」判定不會因為隔幾天重跑而改變)
             st = note_status(n, last)
+            verification = note_review_status(n)
+            label = NOTE_LABEL[verification]
+            if n.get("quality_invalid"):
+                label += "・品質契約未通過"
+            if st == "due":
+                label += "・待更新"
+            elif st == "draft":
+                label += "・未填更新日"
+            elif st == "unscheduled":
+                label += "・未排複核日"
             obj["note"] = {
-                "cls": st, "label": NOTE_LABEL[st],
+                "cls": verification, "label": label,
+                "freshness": st, "due": st == "due",
                 "updated": n["last_updated"] or "-", "next": n["next_review"] or "-",
+                "contentAsOf": n.get("content_as_of") or "-",
+                "latestPeriod": n.get("latest_financial_period") or "-",
+                "reviewedAt": n.get("reviewed_at") or "-",
+                "reviewedBy": n.get("reviewed_by") or "-",
+                "reviewScope": n.get("review_scope") or "-",
+                "qualityInvalid": n.get("quality_invalid", False),
+                "qualityErrors": n.get("quality_errors", []),
+                "claimCount": n.get("claim_count", 0),
+                "citedClaims": n.get("cited_claim_count", 0),
+                "primaryClaims": n.get("primary_cited_claim_count", 0),
+                "primarySources": n.get("primary_source_count", 0),
                 "summary": n["summary"], "tmplOld": n["template_version"] < NOTE_TEMPLATE_VERSION,
                 "url": NOTE_REPO_BLOB + n["relpath"], "sections": n["sections"],
             }

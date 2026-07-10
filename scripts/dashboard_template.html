@@ -256,9 +256,16 @@
   .notebadge{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
     margin-top:2px;font-size:14px;line-height:1;border:1px solid currentColor;border-radius:100px;
     padding:0;cursor:pointer;background:none;flex:0 0 auto}
-  .notebadge.fresh{color:var(--muted)}
-  .notebadge.draft{color:var(--muted);border-style:dashed}
-  .notebadge.due{color:var(--warn-line)}
+  .notebadge.ai_draft{color:var(--muted);border-style:dashed}
+  .notebadge.partially_verified{color:var(--warn-line);background:var(--warn-bg)}
+  .notebadge.independently_verified{color:var(--health);background:var(--health-tint)}
+  .notebadge.conflicted{color:var(--warn);background:var(--warn-bg);border-width:2px}
+  .notebadge.due{box-shadow:0 0 0 2px var(--warn-bg),0 0 0 3px var(--warn-line)}
+  .note-toggle.ai_draft{color:var(--muted);border-style:dashed}
+  .note-toggle.partially_verified{color:var(--warn);border-color:var(--warn-line);background:var(--warn-bg)}
+  .note-toggle.independently_verified{color:var(--health);border-color:var(--health);background:var(--health-tint)}
+  .note-toggle.conflicted{color:var(--warn);border-color:var(--warn-line);background:var(--warn-bg);border-width:2px}
+  .note-toggle.due{box-shadow:0 0 0 2px var(--warn-bg),0 0 0 3px var(--warn-line)}
   .cell{position:relative;width:calc(100% - 10px);margin:5px;border-radius:9px;padding:8px 7px;cursor:pointer;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
     background:var(--cell);border:1px solid transparent;transition:transform .08s ease, box-shadow .08s ease;
@@ -380,6 +387,7 @@
   #sheetBody .nb-ul{margin:0 0 10px;padding-left:20px}
   #sheetBody .nb-ul li{font-size:13.5px;line-height:1.75;color:var(--ink-2);margin-bottom:5px}
   #sheetBody .nb-ul li b{color:var(--ink);font-weight:700}
+  #sheetBody .nb-subh{font-size:13px;font-weight:800;color:var(--ink);margin:13px 0 6px}
   #sheetBody .nb-table{width:100%;border-collapse:collapse;margin:2px 0 12px;font-size:12.5px}
   #sheetBody .nb-table th,#sheetBody .nb-table td{border:1px solid var(--hairline-2);padding:6px 9px;text-align:left;
     vertical-align:top}
@@ -392,6 +400,12 @@
   #sheetBody .nb-meta b{display:block;color:var(--ink);font-size:12.5px;font-weight:700;margin-top:1px}
   #sheetBody .nb-flag{font-size:11.5px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-line);
     border-radius:8px;padding:6px 10px;margin:0 0 12px}
+  #sheetBody .nb-quality{font-size:12.5px;line-height:1.65;color:var(--ink-2);background:var(--surface-2);
+    border:1px solid var(--hairline);border-left:4px solid var(--neutral);border-radius:9px;padding:9px 11px;margin:0 0 12px}
+  #sheetBody .nb-quality.partially_verified{border-left-color:var(--warn-line)}
+  #sheetBody .nb-quality.independently_verified{border-left-color:var(--health);background:var(--health-tint)}
+  #sheetBody .nb-quality.conflicted,#sheetBody .nb-quality.invalid{border-left-color:var(--warn-line);background:var(--warn-bg)}
+  #sheetBody .nb-quality b{color:var(--ink)}
   #sheetBody .nb-summary{margin:4px 0 14px;padding:13px 14px;border-left:4px solid var(--health);border-radius:10px;
     background:var(--health-tint);color:var(--ink-2);font-size:13.5px;line-height:1.7}
   #sheetBody .nb-summary b{display:block;margin-bottom:3px;color:var(--ink)}
@@ -529,7 +543,7 @@
         <span class="chip" id="mktChip">__MARKET_CHIP__</span>
         <span class="chip" id="scopeChip">範圍 <b>__SCOPE__</b></span>
         <span class="chip">資料至 <span class="date-wrap"><select id="dateSel" aria-label="切換報告日期"><option value="__DATE_ISO__">__DATE__</option></select></span>(還原股價)</span>
-        <span class="chip" title="市場數據: FinMind、TDCC、TWSE/TPEx；公司研究筆記:人工整理">來源 <b>多來源</b></span>
+        <span class="chip" title="市場數據: FinMind、TDCC、TWSE/TPEx；公司研究筆記:AI 協作整理並逐篇標示獨立複核狀態">來源 <b>多來源</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
       </div>
     </div>
@@ -591,7 +605,10 @@
         <span class="sk"><span class="hdot neutral" style="display:inline-block"></span>籌碼現況診斷:中性</span>
         <span class="sk"><span class="hdot warn" style="display:inline-block"></span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
         <span class="sk"><span class="fundbadge up">營收YoY +18%</span>基本面參考:只描述最新月營收較去年同月的變化，不直接判定營運強弱</span>
-        <span class="sk"><span class="notebadge fresh">📝</span>質化研究筆記(灰=已更新、橘框=建議複核已逾期)</span>
+        <span class="sk"><span class="notebadge ai_draft">📝</span>AI 草稿・未獨立查核</span>
+        <span class="sk"><span class="notebadge partially_verified">📝</span>僅明列範圍完成獨立核驗</span>
+        <span class="sk"><span class="notebadge independently_verified">📝</span>全部重要主張已核對一手來源</span>
+        <span class="sk"><span class="notebadge conflicted">📝</span>來源衝突待釐清；外圈橘框另代表資料待更新</span>
       </div>
     </div>
     </div>
@@ -679,7 +696,7 @@
     </div>
     <div class="mcard">
       <h3>資料來源與更新</h3>
-      市場與財報資料主要來自 <a href="https://finmindtrade.com/" rel="noopener">FinMind 開放資料</a>；股權分散使用 TDCC，處置／注意名單使用 TWSE／TPEx 官方公告，質化研究筆記則由人工整理公開資訊。每日管線可由 GitHub Actions 排程或本地手動啟動，會補齊缺漏後評分並重建本頁；點開任一項，底部會標示該項來源。
+      市場與財報資料主要來自 <a href="https://finmindtrade.com/" rel="noopener">FinMind 開放資料</a>；股權分散使用 TDCC，處置／注意名單使用 TWSE／TPEx 官方公告。質化研究筆記由 AI 協作整理公開資訊，逐篇顯示一手證據覆蓋、獨立 reviewer 與核驗範圍；未簽核者一律標為 AI 草稿。每日管線可由 GitHub Actions 排程或本地手動啟動，會補齊缺漏後評分並重建本頁；點開任一項，底部會標示該項來源。
       <dl class="srcline">
         <dt>股價 / 成交量</dt><dd>TaiwanStockPrice</dd>
         <dt>三大法人買賣超</dt><dd>TaiwanStockInstitutionalInvestorsBuySell</dd>
@@ -701,7 +718,7 @@
 
   <footer>
     <div class="fn">
-      <div><b>strong-weak-scanner</b> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner" rel="noopener">原始碼與資料</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/tree/main/reports" rel="noopener">驗證週報</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/CHANGELOG.md" rel="noopener">設計沿革</a> · 資料源 FinMind、TDCC、TWSE／TPEx 與人工研究筆記。本頁為量化籌碼研究,非投資建議;資料或有缺漏與延遲,以交易所公告為準。</div>
+      <div><b>strong-weak-scanner</b> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner" rel="noopener">原始碼與資料</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/tree/main/reports" rel="noopener">驗證週報</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/CHANGELOG.md" rel="noopener">設計沿革</a> · 資料源 FinMind、TDCC、TWSE／TPEx 與具查核狀態的 AI 協作研究筆記。本頁為量化籌碼研究,非投資建議;資料或有缺漏與延遲,以交易所公告為準。</div>
     </div>
   </footer>
 </div>
@@ -992,10 +1009,12 @@
     (blocks||[]).forEach(function(bl){
       if(bl.t==="p"){
         var p=document.createElement("p"); p.className="nb-p"; renderRuns(p, bl.runs); container.appendChild(p);
-      } else if(bl.t==="ul"){
-        var ul=document.createElement("ul"); ul.className="nb-ul";
-        bl.items.forEach(function(it){ var li=document.createElement("li"); renderRuns(li, it); ul.appendChild(li); });
-        container.appendChild(ul);
+      } else if(bl.t==="ul"||bl.t==="ol"){
+        var list=document.createElement(bl.t); list.className="nb-ul";
+        bl.items.forEach(function(it){ var li=document.createElement("li"); renderRuns(li, it); list.appendChild(li); });
+        container.appendChild(list);
+      } else if(bl.t==="h3"){
+        var sub=document.createElement("h4"); sub.className="nb-subh"; renderRuns(sub,bl.runs); container.appendChild(sub);
       } else if(bl.t==="table"){
         var tb=document.createElement("table"); tb.className="nb-table";
         var thead=document.createElement("thead"), htr=document.createElement("tr");
@@ -1011,7 +1030,25 @@
       }
     });
   }
-  function renderNoteDetail(box, note){        // note = notePayload() 的回傳物件
+  function notePalette(cls){
+    return {
+      ai_draft:["var(--muted)","var(--neutral-tint)"],
+      partially_verified:["var(--warn)","var(--warn-bg)"],
+      independently_verified:["var(--health)","var(--health-tint)"],
+      conflicted:["var(--warn)","var(--warn-bg)"]
+    }[cls]||["var(--muted)","var(--neutral-tint)"];
+  }
+  function notePayload(row){
+    var n=row.note;
+    return {who:row.nm+"("+row.id+")",biz:row.biz,label:n.label,color:notePalette(n.cls),
+      cls:n.cls,freshness:n.freshness,due:n.due,updated:n.updated,next:n.next,
+      contentAsOf:n.contentAsOf,latestPeriod:n.latestPeriod,reviewedAt:n.reviewedAt,
+      reviewedBy:n.reviewedBy,reviewScope:n.reviewScope,qualityInvalid:n.qualityInvalid,
+      qualityErrors:n.qualityErrors||[],claimCount:n.claimCount||0,citedClaims:n.citedClaims||0,
+      primaryClaims:n.primaryClaims||0,primarySources:n.primarySources||0,
+      tmplOld:n.tmplOld,summary:n.summary,sections:n.sections,url:n.url};
+  }
+  function renderNoteDetail(box, note){
     box.innerHTML = "";
     var head=document.createElement("div"); head.className="th";
     var el=document.createElement("span"); el.className="el"; setText(el, "質化研究筆記 · 觀察層(不計分)"); head.appendChild(el);
@@ -1021,16 +1058,45 @@
     var who=document.createElement("div"); who.className="who"; setText(who, note.who); box.appendChild(who);
     var bz=document.createElement("div"); bz.className="biz"; setText(bz, note.biz||""); box.appendChild(bz);
     var meta=document.createElement("div"); meta.className="nb-meta";
-    [["最後更新", note.updated], ["下次建議更新", note.next]].forEach(function(kv){
+    var metaRows=[["最後內容編修", note.updated], ["資料截至", note.contentAsOf],
+      ["最新財報期間", note.latestPeriod], ["下次建議更新", note.next],
+      ["獨立 reviewer", note.reviewedBy], ["查核日期", note.reviewedAt],
+      ["查核範圍", note.reviewScope],
+      ["證據覆蓋", note.citedClaims+"/"+note.claimCount+" claim blocks；其中一手 "+note.primaryClaims+"/"+note.claimCount]];
+    metaRows.forEach(function(kv){
       var d=document.createElement("div");
       d.appendChild(document.createTextNode(kv[0]));
-      var b=document.createElement("b"); setText(b, kv[1]); d.appendChild(b);
+      var b=document.createElement("b"); setText(b, kv[1]||"-"); d.appendChild(b);
       meta.appendChild(d);
     });
     box.appendChild(meta);
+    var quality=document.createElement("div"); quality.className="nb-quality "+note.cls+(note.qualityInvalid?" invalid":"");
+    var qualityTitle=document.createElement("b");
+    if(note.qualityInvalid){
+      setText(qualityTitle,note.cls==="conflicted"?
+        "品質契約未通過：仍保留來源衝突警示。 ":"品質契約未通過：已保守降級為 AI 草稿。 ");
+      quality.appendChild(qualityTitle);
+      quality.appendChild(document.createTextNode((note.qualityErrors||[]).join("；")||"請執行 qual_notes.py --lint 查看原因。"));
+    } else if(note.cls==="independently_verified"){
+      setText(qualityTitle,"完整獨立核驗。 "); quality.appendChild(qualityTitle);
+      quality.appendChild(document.createTextNode("每個實質 claim block 都有一手來源，且 reviewer 已簽核目前內容雜湊。"));
+    } else if(note.cls==="partially_verified"){
+      setText(qualityTitle,"僅部分核驗。 "); quality.appendChild(qualityTitle);
+      quality.appendChild(document.createTextNode("只有「"+(note.reviewScope||"未標示")+"」已由獨立 reviewer 核對；其餘內容仍視為 AI 草稿。"));
+    } else if(note.cls==="conflicted"){
+      setText(qualityTitle,"來源衝突。 "); quality.appendChild(qualityTitle);
+      quality.appendChild(document.createTextNode("可信來源口徑尚未一致，請先讀未決衝突與證據索引，不應自行選擇有利版本。"));
+    } else {
+      setText(qualityTitle,"AI 草稿・未獨立查核。 "); quality.appendChild(qualityTitle);
+      quality.appendChild(document.createTextNode("最後更新日只代表編修日期，不代表主張正確或來源已被 reviewer 核對。"));
+    }
+    box.appendChild(quality);
+    var caveat=document.createElement("div"); caveat.className="nb-quality";
+    setText(caveat,"查核只代表筆記與所列來源在查核範圍內一致，不保證管理層預測實現，也不把公司說法自動視為客觀真相。");
+    box.appendChild(caveat);
     if(note.tmplOld){
       var fl=document.createElement("div"); fl.className="nb-flag";
-      setText(fl, "筆記模板已改版,這篇還沒依新版重寫——內容仍可參考。"); box.appendChild(fl);
+      setText(fl, "筆記仍是舊模板；除明列的部分核驗範圍外，不可視為完成全文品質查核。"); box.appendChild(fl);
     }
     if(note.summary){
       var sum=document.createElement("div"); sum.className="nb-summary";
@@ -1190,20 +1256,16 @@
           scLabel: row.fund.label, scColor: col[0], scBg: col[1] };
       };})(row));
     }
-    if(row.note){                // 質化研究筆記(年報MD&A/法說會重點,人工維護,觀察層)
+    if(row.note){                // 質化研究筆記：查核品質與 freshness 分開呈現
       var nb=document.createElement("button"); nb.type="button"; nb.tabIndex=0;
-      nb.className="notebadge "+row.note.cls;
+      nb.className="notebadge "+row.note.cls+(row.note.due?" due":"");
       nb.textContent = "📝";                     // 儀表板上只留 icon,狀態文字留到點開的完整筆記面板再顯示
-      nb.setAttribute("aria-label", "質化研究筆記:"+row.note.label+"(最後更新 "+row.note.updated+"),點擊展開完整筆記");
+      nb.setAttribute("aria-label", "質化研究筆記:"+row.note.label+"；獨立 reviewer "+row.note.reviewedBy+"；最後更新 "+row.note.updated+"，點擊展開完整筆記");
       badges.appendChild(nb);
-      var NOTE_COL = {fresh:["var(--muted)","var(--neutral-tint)"], draft:["var(--muted)","var(--neutral-tint)"],
-                      due:["var(--warn-line)","var(--warn-bg)"]};
       // 不做 hover 預覽——質化筆記是長文,點開就直接看完整排版內容(借用底部 sheet 殼,
       // 桌機/觸控都走同一條路),比瞄一眼縮寫摘要更符合「閱讀筆記」的體驗。
       nb.addEventListener("click", (function(row){ return function(){
-        openSheet({ who: row.nm+"("+row.id+")", biz: row.biz, label: row.note.label,
-          color: NOTE_COL[row.note.cls], updated: row.note.updated, next: row.note.next,
-          tmplOld: row.note.tmplOld, summary: row.note.summary, sections: row.note.sections, url: row.note.url }, renderNoteDetail, nb);
+        openSheet(notePayload(row), renderNoteDetail, nb);
       };})(row));
     }
     if(badges.children.length) rl.appendChild(badges);
@@ -1303,14 +1365,13 @@
       host.appendChild(fund);
     }
     if(row.note){
-      var note=document.createElement("button"); note.type="button"; note.className="toggle"; note.textContent="📝 研究筆記";
-      var ncol={fresh:["var(--muted)","var(--neutral-tint)"],draft:["var(--muted)","var(--neutral-tint)"],
-                due:["var(--warn-line)","var(--warn-bg)"]}[row.note.cls]||["var(--muted)","var(--neutral-tint)"];
-      note.addEventListener("click",(function(row,ncol,note){return function(){
-        openSheet({who:row.nm+"("+row.id+")",biz:row.biz,label:row.note.label,color:ncol,updated:row.note.updated,
-          next:row.note.next,tmplOld:row.note.tmplOld,summary:row.note.summary,sections:row.note.sections,url:row.note.url},
-          renderNoteDetail,note);
-      };})(row,ncol,note));
+      var note=document.createElement("button"); note.type="button";
+      note.className="toggle note-toggle "+row.note.cls+(row.note.due?" due":"");
+      note.textContent="📝 "+row.note.label;
+      note.setAttribute("aria-label","研究筆記："+row.note.label+"；獨立 reviewer "+row.note.reviewedBy);
+      note.addEventListener("click",(function(row,note){return function(){
+        openSheet(notePayload(row),renderNoteDetail,note);
+      };})(row,note));
       host.appendChild(note);
     }
     if(!host.children.length){ var none=document.createElement("span"); none.className="mcount"; none.textContent="目前沒有額外觀察標記"; host.appendChild(none); }

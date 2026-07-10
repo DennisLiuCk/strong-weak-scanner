@@ -1,0 +1,43 @@
+name: qualitative-quality
+
+on:
+  push:
+    paths:
+      - "notes/qualitative/**"
+      - "config/universe.csv"
+      - "scripts/qual_notes.py"
+      - "scripts/build_dashboard.py"
+      - "scripts/dashboard_template.html"
+      - "tests/test_qual_notes_quality.py"
+      - "tests/test_dashboard_ux_contract.py"
+      - ".github/workflows/qualitative-quality.yml"
+  pull_request:
+    paths:
+      - "notes/qualitative/**"
+      - "config/universe.csv"
+      - "scripts/qual_notes.py"
+      - "scripts/build_dashboard.py"
+      - "scripts/dashboard_template.html"
+      - "tests/test_qual_notes_quality.py"
+      - "tests/test_dashboard_ux_contract.py"
+      - ".github/workflows/qualitative-quality.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 稽核質化研究品質契約
+        run: python scripts/qual_notes.py --lint
+
+      - name: 執行質化品質與 dashboard 契約測試
+        run: python -m unittest tests.test_qual_notes_quality tests.test_dashboard_ux_contract

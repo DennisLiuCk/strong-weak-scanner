@@ -147,6 +147,26 @@ class DashboardUxContractTest(unittest.TestCase):
         ):
             self.assertIn(guardrail, public_copy)
 
+    def test_note_badges_expose_verification_separately_from_freshness(self):
+        for status in ("ai_draft", "partially_verified", "independently_verified", "conflicted"):
+            self.assertIn(status, self.template)
+            self.assertIn(status, self.builder)
+        for field in ("reviewedBy", "reviewedAt", "reviewScope", "qualityInvalid",
+                      "claimCount", "citedClaims", "primaryClaims", "contentAsOf"):
+            self.assertIn(field, self.template)
+            self.assertIn(field, self.builder)
+        self.assertIn('row.note.cls+(row.note.due?" due":"")', self.template)
+        self.assertIn("最後更新日只代表編修日期", self.template)
+        self.assertIn("其餘內容仍視為 AI 草稿", self.template)
+        self.assertIn("不把公司說法自動視為客觀真相", self.template)
+        self.assertIn("仍保留來源衝突警示", self.template)
+        self.assertIn('note.className="toggle note-toggle "+row.note.cls+(row.note.due?" due":"")',
+                      self.template)
+        self.assertIn('note.textContent="📝 "+row.note.label', self.template)
+        self.assertIn('bl.t==="ul"||bl.t==="ol"', self.template)
+        self.assertIn('bl.t==="h3"', self.template)
+        self.assertNotIn("質化研究筆記則由人工整理公開資訊", self.template)
+
 
 if __name__ == "__main__":
     unittest.main()
