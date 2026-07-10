@@ -426,9 +426,9 @@
       <h3>個股標記(觀察層,不影響左側①~⑤評分與 tier;點列表格內同款圖示看明細)</h3>
       <div class="scale">
         <span class="sk"><span class="riskbadge sm">處置</span>／<span class="riskbadge sm">注意</span>交易所官方列管(TWSE/TPEx 異常價量認證)</span>
-        <span class="sk"><span class="hdot health" style="display:inline-block"></span>籌碼健康度:健康</span>
-        <span class="sk"><span class="hdot neutral" style="display:inline-block"></span>籌碼健康度:中性</span>
-        <span class="sk"><span class="hdot warn" style="display:inline-block"></span>籌碼健康度:待觀察(含官方處置/注意一票否決)</span>
+        <span class="sk"><span class="hdot health" style="display:inline-block"></span>籌碼現況診斷:健康</span>
+        <span class="sk"><span class="hdot neutral" style="display:inline-block"></span>籌碼現況診斷:中性</span>
+        <span class="sk"><span class="hdot warn" style="display:inline-block"></span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
         <span class="sk"><span class="fundbadge up">▲18%</span>基本面參考:月營收年增(▲上升 ▼下降 →持平)</span>
         <span class="sk"><span class="notebadge fresh">📝</span>質化研究筆記(灰=已更新、橘框=建議複核已逾期)</span>
       </div>
@@ -846,20 +846,22 @@
     if(row.chip){
       var hd=document.createElement("button"); hd.type="button"; hd.tabIndex=0;
       hd.className="hdot "+row.chip.cls;
-      hd.setAttribute("aria-label", "籌碼健康度:"+row.chip.label+",族群內第"+row.chip.rank+"/"+row.chip.n+"名");
+      hd.setAttribute("aria-label", "籌碼現況診斷:"+row.chip.label+",非選股排名");
       badges.appendChild(hd);
       var CHIP_PILL = {health:["var(--health)","var(--health-tint)"], neutral:["var(--neutral)","var(--neutral-tint)"],
                         warn:["var(--warn)","var(--warn-bg)"]};
       attachTip(hd, (function(row){ return function(){
         var pill = CHIP_PILL[row.chip.cls];
-        return { el:"籌碼健康度 · 觀察層(不計分)", who: row.nm+"("+row.id+")", biz: row.biz,
+        return { el:"籌碼現況診斷 · 非排名/不計分", who: row.nm+"("+row.id+")", biz: row.biz,
           rows: row.chip.rows, why: row.chip.why, chipColors: true,
           how: "只看外資/投信/融資券/大戶集中度/股東人數/借券賣出餘額,不含①價②量——跟左側 tier " +
                "是完全獨立的兩把尺。健康−警示≥2 且無官方警示→健康;≤−2 或有官方處置/注意→待觀察" +
-               "(官方警示不計入信號數,一票否決);其餘中性。純描述性,不影響 composite 分數與 tier。",
+               "(官方警示不計入信號數,一票否決);其餘中性。表中的正負號只表示原始數值方向," +
+               "不等於好壞——例如融資、股東人數或借券下降會顯示負值,但依本欄規則可判為健康。" +
+               "純描述性,不是選股排名,不影響 composite 分數與 tier。",
           src: "外資/投信/融資券:FinMind;大戶集中度/股東人數:TDCC集保股權分散週快照;" +
                "借券賣出餘額:FinMind;處置/注意:TWSE/TPEx",
-          scLabel: row.chip.label+" · 族群內"+row.chip.rank+"/"+row.chip.n, scColor: pill[0], scBg: pill[1] };
+          scLabel: row.chip.label+" · 現況診斷", scColor: pill[0], scBg: pill[1] };
       };})(row));
     }
     if(row.fund){

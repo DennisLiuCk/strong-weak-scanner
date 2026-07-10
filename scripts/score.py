@@ -166,7 +166,8 @@ def build_chip_health(con):
     不受 IS_CUTOFF OOS 鐵律管轄(不是選股訊號,是「現在籌碼乾不乾淨」的現況判讀)。
     只看③外資④投信⑤融資券 + TDCC 大戶/股東人數(週頻)+ 借券賣出餘額,不含①價②量——
     跟 tier(強弱)完全獨立的兩把尺。淨分=7個信號加總,官方處置/注意不計入淨分、
-    但一票否決直接鎖定「待觀察」。族群內依淨分排名。"""
+    但一票否決直接鎖定「待觀察」。grp_rank 僅保留給歷史稽核/schema 相容；儀表板
+    不顯示名次,避免被誤讀為有選股效力的排名。"""
     con.execute("DROP TABLE IF EXISTS chip_health")
     con.execute("""CREATE TABLE chip_health(
         date TEXT, stock_id TEXT, net_score INT, label TEXT,

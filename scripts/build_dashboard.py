@@ -238,11 +238,44 @@ def verdict(sc):
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"]), vrows
 
 
-# 籌碼健康度(觀察層、純描述性,獨立於①價②量與 tier)——net_score/label/族群排名已由
+# 籌碼健康度(觀察層、純描述性,獨立於①價②量與 tier)——net_score/label 已由
 # score.py 的 chip_health 表算好;這裡只重算「每個信號」的顯示明細(門檻沿用 score.py 匯入的
 # 同一份常數,跟①②③④⑤ element cells 的 hint 現算是同一套慣例,不重複造輪子)。
-CHIP_LABELS = ["外資20日變化", "投信近5日佔股本", "融資水位", "融資10日變化",
-               "大戶(400張+)佔比週變化", "股東人數週變化", "借券賣出餘額10日變化"]
+CHIP_LABELS = ["外資20日變化(↑增持)", "投信近5日佔股本(↑買超)",
+               "融資水位(低水位較健康)", "融資10日變化(↓去槓桿)",
+               "大戶400張+週變化(↑集中·觀察)", "股東人數週變化(↓集中·觀察)",
+               "借券餘額10日變化(↓減壓·觀察)"]
+
+
+def _raw_direction(v, up, down, flat):
+    if v is None:
+        return "資料不足"
+    if v > 0:
+        return up
+    if v < 0:
+        return down
+    return flat
+
+
+def _chip_reading(direction, signal, observational=False):
+    verdict = "健康訊號" if signal > 0 else "警示" if signal < 0 else "中性"
+    note = "；方向仍待 OOS 驗證" if observational else "；依既有校準門檻"
+    if direction == "資料不足":
+        return "資料不足 → 中性(不計健康/警示)" + ("；方向仍待 OOS 驗證" if observational else "")
+    return f"{direction} → 本欄判讀為{verdict}{note}"
+
+
+def _chip_pp(v):
+    """觀察欄保留微小正負方向；避免 ±0.004pp 被兩位小數顯示成 ±0.00pp。"""
+    if v is None:
+        return "-"
+    if v == 0:
+        return "0.00pp"
+    if abs(v) < 0.00005:
+        return ("+" if v > 0 else "-") + "<0.0001pp"
+    if abs(v) < 0.005:
+        return f"{v:+.4f}pp"
+    return f"{v:+.2f}pp"
 
 
 def build_chip_rows(m, risky):
@@ -262,11 +295,25 @@ def build_chip_rows(m, risky):
             f"{tp:+.3f}%" if tp is not None else "-",
             pctp(u),
             pct(mc, True) if mc is not None else "-",
-            f"{tb:+.2f}pp" if tb is not None else "-",
+            _chip_pp(tb),
             pct(tpl, True) if tpl is not None else "-",
-            f"{sb:+.2f}pp" if sb is not None else "-"]
-    rows = [[lb, v, None, s, None, ""] for lb, v, s in zip(CHIP_LABELS, vals, sigs)]
-    rows.append(["官方處置/注意", "有列管" if risky else "無", None, (-1 if risky else 0), None, ""])
+            _chip_pp(sb)]
+    directions = [
+        _raw_direction(fc, "外資增持", "外資減持", "外資持股持平"),
+        _raw_direction(tp, "投信買超", "投信賣超", "投信持平"),
+        ("資料不足" if u is None else
+         "融資低水位" if sigs[2] > 0 else "融資高水位" if sigs[2] < 0 else "融資中等水位"),
+        _raw_direction(mc, "融資增加(槓桿升高)", "融資下降(去槓桿)", "融資持平"),
+        _raw_direction(tb, "大戶集中度上升", "大戶集中度下降", "大戶集中度持平"),
+        _raw_direction(tpl, "股東人數增加(籌碼分散)", "股東人數下降(籌碼集中)", "股東人數持平"),
+        _raw_direction(sb, "借券賣出餘額增加(壓力升高)", "借券賣出餘額下降(壓力減輕)",
+                       "借券賣出餘額持平"),
+    ]
+    rows = [[lb, v, _chip_reading(direction, s, i >= 4), s, None, ""]
+            for i, (lb, v, direction, s) in enumerate(zip(CHIP_LABELS, vals, directions, sigs))]
+    rows.append(["官方處置/注意", "有列管" if risky else "無",
+                 "交易所列管 → 一票否決為待觀察" if risky else "當天無交易所列管",
+                 (-1 if risky else 0), None, ""])
     n_health = sum(1 for s in sigs if s > 0)
     n_warn = sum(1 for s in sigs if s < 0)
     return rows, n_health, n_warn
@@ -437,8 +484,8 @@ def main():
     chip = {}
     try:
         for r in con.execute(
-                "SELECT stock_id, net_score, label, grp_rank, grp_n FROM chip_health WHERE date=?", (last,)):
-            chip[r["stock_id"]] = {"label": r["label"], "rank": r["grp_rank"], "n": r["grp_n"]}
+                "SELECT stock_id, label FROM chip_health WHERE date=?", (last,)):
+            chip[r["stock_id"]] = {"label": r["label"]}
     except sqlite3.OperationalError:
         pass
     # 基本面參考(觀察層、獨立新表,fetch_financials.py 尚未跑過的 db 沒有這些表 → 從缺,不擋主管線)
@@ -556,11 +603,11 @@ def main():
         c = chip.get(r["stock_id"])
         if c:
             chip_rows, n_health, n_warn = build_chip_rows(r, risky)
-            why = f"{n_health} 項健康信號、{n_warn} 項警示"
+            why = f"{n_health} 項健康信號、{n_warn} 項警示；原始正負號不直接代表好壞"
             if risky:
                 why += "；當天列處置/注意,官方警示一票否決"
-            obj["chip"] = {"cls": CHIP_CLS[c["label"]], "label": c["label"], "rank": c["rank"],
-                           "n": c["n"], "rows": chip_rows, "why": why}
+            obj["chip"] = {"cls": CHIP_CLS[c["label"]], "label": c["label"],
+                           "rows": chip_rows, "why": why}
         f = fund_map.get(r["stock_id"])
         if f:
             obj["fund"] = f
