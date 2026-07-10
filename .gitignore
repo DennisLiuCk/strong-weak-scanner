@@ -5,8 +5,9 @@
 *.token
 secrets/
 
-# ── Claude Code 本機設定 ──
+# ── Claude / Codex 本機設定 ──
 .claude/
+.codex/
 
 # ── Python ──
 __pycache__/
