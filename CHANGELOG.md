@@ -2,6 +2,37 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## OOS 改採 append-only as-seen 原始訊號快照 — 2026-07-10
+
+**策略規則零變動**(權重/tier/族群狀態條件皆未動,`IS_CUTOFF` 不動),修正驗證資料的
+point-in-time 完整性。對抗性 review 發現:HTML archive 雖是 as-seen,但
+`daily_scores`/`daily_metrics` 每日仍以最新資料、universe 與分組重算全歷史,
+`validate.py` 原本直接讀重算表,使 cutoff 後數字不是真正 OOS。實測凍結頁 vs 現行 db:
+2026-07-06 有 21/98 檔 composite、1 檔 tier 被事後改寫;07-07 有 19/98 檔 composite
+被改寫(主要來自 19 檔外資持股缺值補回 + 6525 捷敏-KY 換組)。
+
+- 新增 `scripts/snapshot_signals.py`:每日正式管線在 `score.py` 後把最新資料日 append-only
+  凍結到 `oos_snapshot_runs/oos_signal_snapshots/oos_group_snapshots/
+  oos_market_snapshots`。保存當時分組、34 個 daily_metrics 原始欄、13 個評分欄、
+  chip health、risk flags、族群雷達、大盤 regime,以及 git SHA 與 score/metrics/
+  universe/groups SHA-256。98 檔或族群表不完整時拒絕凍結、主管線失敗。
+- 正式性與觸發來源解耦:`source` 只記 GitHub Actions / local provenance，另以
+  `is_official` 決定 OOS 資格。本地 `scripts/run_daily.py` 與 Actions 都能發布正式快照；
+  `validate.py` 固定採資料日最早正式版，後續修正版只供稽核。相同內容跨來源去重。
+- `fetch_daily.py` 改為預設智慧補缺:一檔價格探針發現新交易日後，逐一比較 SQLite 的
+  股票×dataset 日期，完整者零請求、只抓缺口；事件資料另記 coverage，中斷後可接續。
+  提早執行而部分 dataset 延遲時，已到資料先落地、晚點重跑只補剩餘缺口；`--force`
+  保留給來源修正。休市且既有資料完整時只需一次新交易日探針，不再重打全 universe。
+- 正式快照新增五張原始表完整性門檻；資料未齊時拒絕發布，避免提早本地 run 污染 OOS。
+  `archive/<資料日>.html` 也改為首次建立後不覆寫。
+- 快照最早資料日鎖為 2026-07-10;實測該日颱風休市、五張原始表皆停在 07-09 時會
+  正常略過,不把上線前 restated 07-09 誤建為第一份 OOS。完全相同的休市日重跑也以
+  content hash 去重,不製造假 revision。
+- `validate.py`:OOS bucket 只接受正式快照;cutoff 後沒有機器快照的舊日期標為 restated、
+  不計 OOS。報告分列快照累積日數與前瞻已成熟日數;tier 轉移、族群 state 也新增 OOS 欄。
+- 不從既有 HTML 反向拼湊缺欄位的假快照;正式 OOS 從本功能上線後第一個成功每日 run
+  重新累積。原 07-06~07-09 數字仍保留在全期/背景欄,但不再作策略調整證據。
+
 ## 對抗性審查:chip_health / risk_flags(觀察層,不涉 OOS)— 2026-07-10
 
 **策略規則零變動**(IS_CUTOFF 不動)。針對本週新增的兩個觀察層功能做「try to break it」

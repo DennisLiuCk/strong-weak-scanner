@@ -35,6 +35,13 @@ API = "https://api.finmindtrade.com/api/v4/data"
 DATASETS = ["TaiwanStockPrice", "TaiwanStockInstitutionalInvestorsBuySell",
             "TaiwanStockMarginPurchaseShortSale", "TaiwanStockShareholding",
             "TaiwanDailyShortSaleBalances"]
+DATASET_TABLE = {
+    "TaiwanStockPrice": "price",
+    "TaiwanStockInstitutionalInvestorsBuySell": "inst",
+    "TaiwanStockMarginPurchaseShortSale": "margin",
+    "TaiwanStockShareholding": "holding",
+    "TaiwanDailyShortSaleBalances": "sbl",
+}
 
 # ── 族群/大盤層策略旋鈕(個股層旋鈕在 score.py CONFIG)──
 REGIME_DD      = -0.03   # 報酬指數距20日高 ≤ 此值 → 修正 regime
@@ -65,6 +72,8 @@ CREATE TABLE IF NOT EXISTS split_event(date TEXT, stock_id TEXT, before_price RE
 CREATE TABLE IF NOT EXISTS market(date TEXT PRIMARY KEY, taiex REAL);
 CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS fetch_log(ts TEXT, start TEXT, "end" TEXT, rows INTEGER);
+CREATE TABLE IF NOT EXISTS fetch_coverage(dataset TEXT, data_id TEXT, covered_through TEXT,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(dataset,data_id));
 """
 
 _TOKENS = []   # get_tokens() 快取
@@ -90,7 +99,7 @@ def get_tokens():
 def get_token():
     return get_tokens()[0]
 
-def api_get(dataset, data_id, start, end, token, retries=3):
+def api_get(dataset, data_id, start, end, token, retries=3, return_status=False):
     global _TOK_I
     tokens = get_tokens() or [token]
     p = {"dataset": dataset, "start_date": start, "end_date": end}
@@ -103,7 +112,8 @@ def api_get(dataset, data_id, start, end, token, retries=3):
             req = urllib.request.Request(url, headers={
                 "Authorization": "Bearer " + tokens[_TOK_I % len(tokens)]})
             with urllib.request.urlopen(req, timeout=60) as resp:
-                return json.load(resp).get("data", [])
+                data = json.load(resp).get("data", [])
+                return (data, True) if return_status else data
         except Exception as e:
             if getattr(e, "code", None) == 402 and len(tokens) > 1 and i < retries - 1:
                 _TOK_I += 1              # 額度用盡 → 輪替下一組立即重試(不退避)
@@ -111,9 +121,9 @@ def api_get(dataset, data_id, start, end, token, retries=3):
                 continue
             if i == retries - 1:
                 print(f"  ! {dataset} {data_id} 失敗: {e}", file=sys.stderr)
-                return []
+                return ([], False) if return_status else []
             time.sleep(2 * (i + 1))  # 遇限流退避重試
-    return []
+    return ([], False) if return_status else []
 
 def load_universe(con):
     rows = []
@@ -185,36 +195,204 @@ UPSERT = {"TaiwanStockPrice": up_price, "TaiwanStockInstitutionalInvestorsBuySel
           "TaiwanStockMarginPurchaseShortSale": up_margin, "TaiwanStockShareholding": up_holding,
           "TaiwanDailyShortSaleBalances": up_sbl}
 
-def fetch_dividends(con, ids, token, start, end, sleep):
-    """除權息結果 → dividend_result(upsert)。事件稀疏,整段視窗抓也便宜(payload 極小,
-    抓全視窗才能保證「price 涵蓋範圍內的事件都在庫」,回補舊價也不會留缺口)。"""
-    n = 0
+
+def _dates_in_table(con, table, stock_id, start, end):
+    return {r[0] for r in con.execute(
+        f"SELECT date FROM {table} WHERE stock_id=? AND date BETWEEN ? AND ?",
+        (stock_id, start, end))}
+
+
+def _trading_dates(con, start, end):
+    # price 與大盤任一方曾落地都視為交易日；可抓出「全 universe price 同日整批漏掉」
+    # 的歷史洞。兩者都沒有的尾端，仍由單一股票探針發現。
+    return {r[0] for r in con.execute(
+        """SELECT date FROM price WHERE date BETWEEN ? AND ?
+           UNION SELECT date FROM market WHERE date BETWEEN ? AND ?""",
+        (start, end, start, end))}
+
+
+def _next_date(iso_date):
+    return (date.fromisoformat(iso_date) + timedelta(days=1)).isoformat()
+
+
+def _probe_stock(con, ids):
+    """新交易日探針。優先 2330；否則取庫內最新且歷史最完整的一檔。"""
+    if "2330" in ids:
+        return "2330"
+    if not ids:
+        return None
+    marks = ",".join("?" for _ in ids)
+    row = con.execute(
+        f"""SELECT stock_id,MAX(date) last,COUNT(*) n FROM price
+            WHERE stock_id IN ({marks}) GROUP BY stock_id
+            ORDER BY last DESC,n DESC,stock_id LIMIT 1""", ids).fetchone()
+    return row[0] if row else ids[0]
+
+
+def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
+                      force=False, fetcher=api_get):
+    """只抓 SQLite 尚缺的股票×dataset 日期；回傳 rows 與請求統計。
+
+    交易日以 price∪market 為準。若請求尾端超過已知最新交易日，只用一檔探針查一次；
+    探針發現新日期後，其餘股票與 dataset 才依缺口展開抓取。
+    """
+    known_before = _trading_dates(con, start, end)
+    expected = set(known_before)
+    requests = probe_requests = skipped = rows = 0
+    probe_data = []
+    probe_sid = _probe_stock(con, ids)
+    probe_start = None
+
+    if not force and probe_sid:
+        if not expected:
+            probe_start = start
+        else:
+            lo, hi = min(expected), max(expected)
+            if start < lo:
+                probe_start = start
+            elif hi < end:
+                probe_start = _next_date(hi)
+        if probe_start and probe_start <= end:
+            probe_data = fetcher("TaiwanStockPrice", probe_sid, probe_start, end, token)
+            requests += 1
+            probe_requests += 1
+            expected.update(d["date"] for d in probe_data if d.get("date"))
+            if "TaiwanStockPrice" in ds_list and probe_data:
+                rows += up_price(con, probe_data)
+                con.commit()
+            if sleep:
+                time.sleep(sleep)
+
+    price_dates_written = {d["date"] for d in probe_data if d.get("date")}
+    for i, sid in enumerate(ids, 1):
+        got = calls = 0
+        for ds in ds_list:
+            table = DATASET_TABLE[ds]
+            if force:
+                req_start, req_end = start, end
+            else:
+                have = _dates_in_table(con, table, sid, start, end)
+                missing = expected - have
+                if not missing:
+                    skipped += 1
+                    continue
+                req_start, req_end = min(missing), max(missing)
+            data = fetcher(ds, sid, req_start, req_end, token)
+            requests += 1
+            calls += 1
+            if data:
+                n = UPSERT[ds](con, data)
+                got += n
+                rows += n
+                if ds == "TaiwanStockPrice":
+                    price_dates_written.update(d["date"] for d in data if d.get("date"))
+            if sleep:
+                time.sleep(sleep)
+        con.commit()
+        if calls:
+            print(f"[{i:>2}/{len(ids)}] {sid} · {got} rows · {calls} requests")
+
+    expected.update(_trading_dates(con, start, end))
+    return {
+        "rows": rows,
+        "requests": requests,
+        "probe_requests": probe_requests,
+        "skipped_pairs": skipped,
+        "known_dates": known_before,
+        "expected_dates": expected,
+        "new_dates": expected - known_before,
+        "price_dates_written": price_dates_written,
+        "probe_stock": probe_sid,
+        "probe_start": probe_start,
+    }
+
+
+def _coverage_get(con, dataset, data_id):
+    row = con.execute(
+        "SELECT covered_through FROM fetch_coverage WHERE dataset=? AND data_id=?",
+        (dataset, data_id)).fetchone()
+    return row[0] if row else None
+
+
+def _coverage_set(con, dataset, data_id, covered_through):
+    con.execute(
+        """INSERT INTO fetch_coverage(dataset,data_id,covered_through,updated_at)
+           VALUES(?,?,?,CURRENT_TIMESTAMP)
+           ON CONFLICT(dataset,data_id) DO UPDATE SET
+             covered_through=excluded.covered_through,updated_at=CURRENT_TIMESTAMP""",
+        (dataset, data_id, covered_through))
+
+
+def initialize_fetch_coverage(con, ids, baseline):
+    """舊版每日流程曾逐檔重抓完整事件視窗；首次升級時把已知最新日設為基線。
+
+    只在整張 coverage 表為空時 seed。之後新增 universe 成員沒有 coverage，會自然從
+    該股票最早 price 日補抓事件，不會錯把新成員視為已檢查。
+    """
+    if not baseline or con.execute("SELECT 1 FROM fetch_coverage LIMIT 1").fetchone():
+        return
+    con.executemany(
+        "INSERT INTO fetch_coverage(dataset,data_id,covered_through) VALUES(?,?,?)",
+        [("TaiwanStockDividendResult", sid, baseline) for sid in ids])
+    con.execute("INSERT INTO fetch_coverage VALUES(?,?,?,CURRENT_TIMESTAMP)",
+                ("TaiwanStockSplitPrice", "*", baseline))
+    # risk_flags 舊表的 0 rows 無法區分「當天無列管」與「四端點曾失敗」；不 seed，
+    # 升級後第一次 daily 必須重新確認四端點成功，之後才可依 coverage 跳過。
+    con.commit()
+
+def fetch_dividends(con, ids, token, start, end, sleep, force=False):
+    """除權息結果 → dividend_result；coverage 讓無事件日也不必重複請求。"""
+    n = requests = 0
     for sid in ids:
-        data = api_get("TaiwanStockDividendResult", sid, start, end, token)
+        covered = None if force else _coverage_get(con, "TaiwanStockDividendResult", sid)
+        req_start = start if not covered else max(start, _next_date(covered))
+        if req_start > end:
+            continue
+        data, ok = api_get("TaiwanStockDividendResult", sid, req_start, end, token,
+                           return_status=True)
+        requests += 1
         rows = [(d["date"], d["stock_id"], d.get("before_price"), d.get("reference_price"))
                 for d in data if d.get("before_price") and d.get("reference_price")]
         if rows:
             con.executemany("INSERT OR REPLACE INTO dividend_result VALUES(?,?,?,?)", rows)
             n += len(rows)
+        if ok:
+            _coverage_set(con, "TaiwanStockDividendResult", sid, end)
         con.commit()
-        time.sleep(sleep)
-    return n
+        if sleep:
+            time.sleep(sleep)
+    return n, requests
 
-def fetch_splits(con, ids, token, start, end, sleep):
+def fetch_splits(con, ids, token, start, end, sleep, force=False):
     """股票分割/反分割參考價 → split_event(upsert)。此 dataset 免 data_id、全市場一次回傳,
     只留 universe 內的股票。"""
-    data = api_get("TaiwanStockSplitPrice", None, start, end, token)
+    covered = None if force else _coverage_get(con, "TaiwanStockSplitPrice", "*")
+    req_start = start if not covered else max(start, _next_date(covered))
+    if req_start > end:
+        return 0, 0
+    data, ok = api_get("TaiwanStockSplitPrice", None, req_start, end, token,
+                       return_status=True)
     keep = set(ids)
     rows = [(d["date"], d["stock_id"], d.get("before_price"), d.get("after_price"))
             for d in data if d.get("stock_id") in keep and d.get("before_price") and d.get("after_price")]
     if rows:
         con.executemany("INSERT OR REPLACE INTO split_event VALUES(?,?,?,?)", rows)
-        con.commit()
-    time.sleep(sleep)
-    return len(rows)
+    if ok:
+        _coverage_set(con, "TaiwanStockSplitPrice", "*", end)
+    con.commit()
+    if sleep:
+        time.sleep(sleep)
+    return len(rows), 1
 
-def fetch_index(con, token, start, end, sleep):
+def fetch_index(con, token, start, end, sleep, expected_dates=None, force=False):
     """加權報酬指數(TAIEX,含息)→ market(upsert)。大盤 regime 旗標的原料。"""
+    if not force and expected_dates:
+        have = {r[0] for r in con.execute(
+            "SELECT date FROM market WHERE date BETWEEN ? AND ?", (start, end))}
+        missing = set(expected_dates) - have
+        if not missing:
+            return 0, 0
+        start, end = min(missing), max(missing)
     data = api_get("TaiwanStockTotalReturnIndex", "TAIEX", start, end, token)
     rows = [(d["date"], d.get("price")) for d in data
             if d.get("stock_id") == "TAIEX" and d.get("price")]   # 防呆:只收 TAIEX 序列
@@ -223,8 +401,9 @@ def fetch_index(con, token, start, end, sleep):
         con.commit()
     else:
         print("  ! TAIEX 指數抓取為空——市場 regime 將沿用舊資料", file=sys.stderr)
-    time.sleep(sleep)
-    return len(rows)
+    if sleep:
+        time.sleep(sleep)
+    return len(rows), 1
 
 # FinMind TaiwanStockShareholding 對個別股票偶有發布延遲(2026-07-06 事故:19 檔當天缺值,
 # 隔天仍缺,但 TWSE/TPEx 官方當天就有——見 reports/data_gap_2026-07-06.md)。
@@ -305,6 +484,7 @@ def fetch_risk_flags(con, target_date):
     冪等)。同一檔同一天可能有多筆理由(TPEx 注意常見),合併成一筆用「;」串接。"""
     uni = {r[0] for r in con.execute("SELECT stock_id FROM universe")}
     picked = {}   # (stock_id, kind) -> {"reasons": [...], "period": str|None}
+    successful_sources = 0
 
     def add(sid, kind, reason, period=None):
         if sid not in uni:
@@ -318,23 +498,27 @@ def fetch_risk_flags(con, target_date):
     try:
         for r in _get_json(TWSE_PUNISH_URL):
             add(r.get("Code"), "處置", r.get("ReasonsOfDisposition"), r.get("DispositionPeriod"))
+        successful_sources += 1
     except Exception as e:
         print(f"  ! TWSE 處置股票抓取失敗:{e}", file=sys.stderr)
     try:
         for r in _get_json(TWSE_NOTICE_URL):
             if r.get("Code"):   # 當天無注意股票時回傳單筆全空值 placeholder row
                 add(r["Code"], "注意", r.get("TradingInfoForAttention"))
+        successful_sources += 1
     except Exception as e:
         print(f"  ! TWSE 注意股票抓取失敗:{e}", file=sys.stderr)
     try:
         for r in _get_json(TPEX_DISPOSAL_URL):
             add(r.get("SecuritiesCompanyCode"), "處置", r.get("DispositionReasons"), r.get("DispositionPeriod"))
+        successful_sources += 1
     except Exception as e:
         print(f"  ! TPEx 處置股票抓取失敗:{e}", file=sys.stderr)
     try:
         for r in _get_json(TPEX_WARNING_URL):
             if r.get("SecuritiesCompanyCode"):
                 add(r["SecuritiesCompanyCode"], "注意", r.get("TradingInformation"))
+        successful_sources += 1
     except Exception as e:
         print(f"  ! TPEx 注意股票抓取失敗:{e}", file=sys.stderr)
 
@@ -346,7 +530,7 @@ def fetch_risk_flags(con, target_date):
     con.commit()
     if rows:
         print(f"  處置/注意股票(觀察層):{len(picked)} 檔次,{','.join(sorted({s for s, _ in picked}))}")
-    return len(rows)
+    return len(rows), successful_sources == 4
 
 def build_price_adj(con):
     """由 price × 事件係數重算還原價(倒推法:事件日「之前」的價 × 係數連乘,最新區段==原始價)。
@@ -623,6 +807,8 @@ def main():
     ap.add_argument("--metrics-only", action="store_true", help="不抓取,只用現有原始表重算 daily_metrics")
     ap.add_argument("--datasets", help="逗號分隔,只抓指定 dataset(回補新表用);過濾時跳過除權息/分割/指數事件段")
     ap.add_argument("--stocks", help="逗號分隔,只抓指定股票(定向補缺用,省 API 額度);事件段同步過濾,指數照抓")
+    ap.add_argument("--force", action="store_true",
+                    help="忽略缺口規劃,強制重抓指定日期範圍(來源修正/人工稽核才用)")
     args = ap.parse_args()
 
     if args.metrics_only:
@@ -652,46 +838,66 @@ def main():
     con.executescript(SCHEMA)
     ids = load_universe(con)
     con.commit()
+    baseline = con.execute("SELECT MAX(date) FROM price").fetchone()[0]
+    initialize_fetch_coverage(con, ids, baseline)
     if args.stocks:
         want = {s.strip() for s in args.stocks.split(",") if s.strip()}
         missing = want - set(ids)
         if missing:
             sys.exit(f"--stocks 含 universe 外代號:{sorted(missing)}")
         ids = [s for s in ids if s in want]
-    print(f"抓取 {start} .. {end} · {len(ids)} 檔 · {len(ds_list)} datasets")
-    total = 0
-    for i, sid in enumerate(ids, 1):
-        got = 0
-        for ds in ds_list:
-            data = api_get(ds, sid, start, end, token)
-            if data:
-                got += UPSERT[ds](con, data)
-            time.sleep(args.sleep)
-        total += got
+    mode = "強制重抓" if args.force else "智慧補缺"
+    print(f"{mode} {start} .. {end} · {len(ids)} 檔 · {len(ds_list)} datasets")
+    stats = fetch_missing_raw(
+        con, ids, ds_list, start, end, token, args.sleep, force=args.force)
+    total = stats["rows"]
+    main_requests = stats["requests"] - stats["probe_requests"]
+    print(f"原始資料規劃:API {stats['requests']} 次(新交易日探針 {stats['probe_requests']}),"
+          f"跳過已完整 pair {stats['skipped_pairs']} 個")
+    if total or main_requests:
+        con.execute('INSERT INTO fetch_log VALUES(datetime("now"),?,?,?)', (start, end, total))
         con.commit()
-        print(f"[{i:>2}/{len(ids)}] {sid} · {got} rows")
-    con.execute('INSERT INTO fetch_log VALUES(datetime("now"),?,?,?)', (start, end, total))
-    con.commit()
-    # 事件視窗:price 的完整涵蓋範圍 .. 今天(與 --end 無關:回補舊價時才不會留事件缺口)
+
+    data_changed = total > 0
+    expected_dates = stats["expected_dates"]
+    target_date = max(expected_dates) if expected_dates else None
+    # 事件 coverage 能區分「已查但當天沒有事件」與「尚未查」；新交易日只補新增區間，
+    # 中斷後重跑也會從未完成的 coverage 接續，不會再掃完整歷史。
     if args.datasets:
         print("(--datasets 過濾:跳過除權息/分割/指數事件抓取,仍重算 price_adj 與 metrics)")
-    else:
+    elif target_date:
         adj_start = con.execute("SELECT MIN(date) FROM price").fetchone()[0] or start
-        today = date.today().isoformat()
-        print(f"除權息/分割事件 {adj_start} .. {today} …")
-        nd = fetch_dividends(con, ids, token, adj_start, today, args.sleep)
-        ns = fetch_splits(con, ids, token, adj_start, today, args.sleep)
-        ni = fetch_index(con, token, adj_start, today, args.sleep)
-        print(f"dividend_result upsert {nd};split_event upsert {ns};TAIEX {ni}")
-    if "TaiwanStockShareholding" in ds_list:
-        n_bf = backfill_holding_from_exchange(con, end)
+        print(f"除權息/分割/指數補缺 {adj_start} .. {target_date} …")
+        nd, rd = fetch_dividends(con, ids, token, adj_start, target_date, args.sleep, args.force)
+        ns, rs = fetch_splits(con, ids, token, adj_start, target_date, args.sleep, args.force)
+        ni, ri = fetch_index(con, token, adj_start, target_date, args.sleep,
+                             expected_dates=expected_dates, force=args.force)
+        data_changed = data_changed or bool(nd or ns or ni)
+        print(f"事件 API {rd + rs + ri} 次:dividend_result upsert {nd};"
+              f"split_event upsert {ns};TAIEX {ni}")
+    if target_date and "TaiwanStockShareholding" in ds_list:
+        n_bf = backfill_holding_from_exchange(con, target_date)
         if n_bf:
             print(f"外資持股 TWSE/TPEx 備援:補上 {n_bf} 檔")
-    fetch_risk_flags(con, end)
-    build_price_adj(con)
-    print("重算 daily_metrics + 族群/大盤層 …")
-    build_metrics(con)
-    build_group_market(con)
+            data_changed = True
+    if target_date and not args.datasets:
+        risk_through = None if args.force else _coverage_get(con, "risk_flags", "*")
+        if not risk_through or risk_through < target_date:
+            _, risk_ok = fetch_risk_flags(con, target_date)
+            if risk_ok:
+                _coverage_set(con, "risk_flags", "*", target_date)
+                con.commit()
+
+    metric_last = con.execute("SELECT MAX(date) FROM daily_metrics").fetchone()[0] if con.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='daily_metrics'").fetchone() else None
+    price_last = con.execute("SELECT MAX(date) FROM price").fetchone()[0]
+    if data_changed or metric_last != price_last:
+        build_price_adj(con)
+        print("重算 daily_metrics + 族群/大盤層 …")
+        build_metrics(con)
+        build_group_market(con)
+    else:
+        print("原始/事件資料無變更且 metrics 已同步,略過衍生表重建")
     n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
     con.close()
     print(f"完成 — 原始 {total} rows 落地,daily_metrics {n} rows → {DB}")

@@ -5,9 +5,10 @@ daily_brief.py — 盤後日常簡報(唯讀,不寫 db)。給「當日檢視/討
 資料鮮度 → 市場/族群雷達 → tier 變動(誰升誰降)→ 蓄勢候補變動 → 綜合分大變動 → 資料品質快檢。
 
 用法:  git pull 之後  uv run --no-project python scripts/daily_brief.py
-注意:  db 由 GitHub Actions 每日更新並 commit——不先 git pull 就是在看舊資料。
+注意:  db 通常由 GitHub Actions 更新，也可由本地 runner 正式發布；不先 git pull 可能是在看舊資料。
 """
 import datetime, os, sqlite3, sys
+from snapshot_signals import MIN_DATA_DATE as OOS_SNAPSHOT_START
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -93,6 +94,27 @@ def main():
         n = con.execute(f"SELECT COUNT(*) FROM {tbl} WHERE date=?", (last,)).fetchone()[0]
         if n < len(uni):
             issues.append(f"{tbl} 最新日僅 {n}/{len(uni)} 列")
+    # 正式 OOS 只認 append-only 正式快照(可由 Actions 或本地 runner 發布)。表不存在/
+    # 最新日未凍結都代表本日訊號
+    # 日後只能當 restated history,不可進 OOS；快照步驟設計為 hard fail,此處再做事後守門。
+    if last >= OOS_SNAPSHOT_START:
+        have_oos = con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='oos_snapshot_runs'").fetchone()
+        if not have_oos:
+            issues.append("OOS as-seen 快照表尚不存在——最新資料日不得計入 OOS")
+        else:
+            run_cols = {r[1] for r in con.execute("PRAGMA table_info(oos_snapshot_runs)")}
+            official_where = "is_official=1" if "is_official" in run_cols else "source='github-actions'"
+            run = con.execute(f"""SELECT snapshot_id FROM oos_snapshot_runs
+                                  WHERE data_date=? AND {official_where}
+                                  ORDER BY captured_at, snapshot_id LIMIT 1""", (last,)).fetchone()
+            if not run:
+                issues.append(f"OOS as-seen 快照缺 {last}——該日不得計入 OOS")
+            else:
+                n_snap = con.execute(
+                    "SELECT COUNT(*) FROM oos_signal_snapshots WHERE snapshot_id=?", (run[0],)).fetchone()[0]
+                if n_snap != len(uni):
+                    issues.append(f"OOS as-seen 快照 {last} 僅 {n_snap}/{len(uni)} 檔")
     # TDCC 週快照鮮度:正常最大 age = 10 天(週一 21:40 前);>10 = 漏抓一週(不可回補,永久洞)
     if con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='tdcc_holding'").fetchone():
         td_last = con.execute("SELECT MAX(date) FROM tdcc_holding").fetchone()[0]

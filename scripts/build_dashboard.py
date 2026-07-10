@@ -628,10 +628,14 @@ def main():
                     if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.html", f)} | {last})
     html = html.replace("__DATES_JSON__", json.dumps(dates))
     open(OUT, "w", encoding="utf-8").write(html)
-    open(os.path.join(ARCHIVE, f"{last}.html"), "w", encoding="utf-8").write(html)
+    archive_path = os.path.join(ARCHIVE, f"{last}.html")
+    archive_created = not os.path.exists(archive_path)
+    if archive_created:
+        open(archive_path, "w", encoding="utf-8").write(html)
     open(os.path.join(ARCHIVE, "manifest.json"), "w", encoding="utf-8").write(json.dumps(dates))
     print(f"已重生 {OUT} — 資料日 {date_str},{len(data)} 檔,{len(tiers)} 個 tier;"
-          f"快照 archive/{last}.html,manifest 共 {len(dates)} 日")
+          f"{'建立' if archive_created else '保留既有'}快照 archive/{last}.html,"
+          f"manifest 共 {len(dates)} 日")
 
 
 if __name__ == "__main__":

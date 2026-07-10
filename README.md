@@ -33,20 +33,23 @@
 ## 資料管線
 
 ```
-每交易日 21:40(台北,GitHub Actions:.github/workflows/daily-fetch.yml;
+每交易日盤後(預設由 GitHub Actions 21:40 台北執行,也可隨時從本地 run_daily.py 觸發；
 排程時點依 FinMind 各 dataset 更新時間而定——最晚的持股/融資券 21:00 更新,
-對照表見 workflow 註解)
+對照表見 workflow 註解。提早執行若資料未齊,只保存已抓缺口、不發布正式快照)
   fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token;僅供最新一週)
                    → tdcc_holding(append-only;失敗自動略過不擋管線)
-  fetch_daily.py   FinMind 5 資料集 × 全 universe + 除權息/分割事件 + 報酬指數
+  fetch_daily.py   先探測新交易日,再只補 FinMind 5 資料集的股票×日期缺口
+                   + 依 coverage 補除權息/分割事件 + 報酬指數
                    → SQLite 原始表(append-only)
                    → price_adj 還原價(本地重算)
                    → daily_metrics 五元素衍生指標
                    → group_metrics / market_daily 族群層聚合 + 大盤 regime
   score.py         族群內排名評分 → composite → tier(daily_scores)
+  snapshot_signals.py → 凍結本次實際發布的 OOS as-seen 原始指標+評分
+                        (append-only;同日重跑保留各版,驗證採最早正式發布版)
   build_dashboard.py → index.html(GitHub Pages)
                      → archive/<資料日>.html + manifest.json(as-seen 歷史快照:
-                       凍結當日產出原樣,供日期選單回看;不事後從 db 重繪,
+                       首次建立後不覆寫,供日期選單回看;不事後從 db 重繪,
                        因衍生表每日全量重建,重繪會被現行規則污染)
 每週六 09:00(weekly-validate.yml)
   validate.py      → reports/validate_*.md(元素 IC、tier 超額報酬、IS/OOS 對照)
@@ -88,6 +91,24 @@
 | universe / groups | 每次由 `config/universe.csv`、`config/groups.csv` 重建 |
 
 凍結表 `daily_scores_v1`:舊絕對門檻制(v1)最後結果,供 validate 新舊對照。
+
+**OOS as-seen 凍結層(append-only、不可重算覆寫)**
+
+| 表 | 內容 |
+|---|---|
+| oos_snapshot_runs | 每次快照的 run id、資料日、UTC 擷取時間、觸發來源(source)、正式發布旗標(is_official)、git SHA、score/metrics/universe/groups SHA-256、資料品質計數 |
+| oos_signal_snapshots | 當時分組、`daily_metrics` 全部原始欄、`daily_scores` 全部評分欄、chip health、官方風險旗標 |
+| oos_group_snapshots | 當時九族群定義、聚合指標與 state |
+| oos_market_snapshots | 當時大盤資料日、dd20 與 regime |
+
+`daily_scores` 等衍生表仍可用最新規則重算全歷史,供研究「現行模型放回過去」的
+restated history；正式 OOS 則只讀上述每日快照。同資料日若修復資料後重跑,新版本會
+另存而非覆蓋,驗證固定採**最早正式發布的快照**——觸發來源可以是 GitHub Actions 或
+本地 runner；`source` 只供追溯,不決定 OOS 資格。正式發布前會要求五張原始表、評分與
+族群表都涵蓋完整 universe。這才是使用者當天第一次實際看到、可能據以決策的訊號。
+舊日期只有 HTML archive、沒有完整機器快照者
+不事後拼湊,一律標為 restated、不得計入 OOS。快照最早資料日鎖為 2026-07-10；遇休市
+或資料源尚未產生新交易日、最新資料仍早於此日，就正常略過，不把 7/9 回算值偽裝成新 OOS。
 
 **防前視(lookahead)設計**:周轉率/散戶水位/投信佔股本用**當日**發行股數
 (forward-fill,不用最新股本回填歷史);dist/dd 視窗有最少樣本保護(新股冷啟動
@@ -137,6 +158,9 @@
   IS/OOS × 修正/多頭 regime)、tier 前瞻超額與轉移事件、新舊制對照、蓄勢濾網
   cohort、族群層命中率、市值公平性監測(同尺檢核)、觀察因子 IC(TDCC 大戶/
   借券,未計分,等 OOS 裁決歸宿)。
+- **OOS 口徑**:`validate.py` 只把 `snapshot_signals.py` 留下的正式 as-seen 快照列入
+  OOS,並同時顯示「快照累積日數」與「前瞻報酬已成熟日數」;cutoff 後但由最新規則
+  回算的日期只供背景,不進任何 OOS 行動門檻。
 - **鐵律**:不憑 in-sample 或單日/單週數據調策略;一律走
   [WEEKLY_REVIEW.md](WEEKLY_REVIEW.md) 的 OOS 行動門檻,每次最多動 1~2 個旋鈕;
   改權重或 tier 條件,必須同步把 `validate.py` 的 `IS_CUTOFF` 改成當天。
@@ -156,16 +180,20 @@
   `groups.csv` + `universe.csv` 各加行即生效、零改碼;一檔只屬一個族群(跨域者
   依籌碼行為歸屬,如記憶體封測歸封測);族群設計下限約 6 檔有效樣本(低於
   `GRP_MIN_N` 族群層聚合不給值,子鏈拆太細會算不出來);候選一樣走 R1~R4 +
-  `screen.py`。回補至現有基期後全歷史即有分數,但**新族群的 OOS 從加入日起算**
-  ——「事後挑族群」的回補歷史含 look-ahead,不得當策略證據;TDCC 週快照自
+  `screen.py`。回補至現有基期後全歷史即有分數,但**新族群的 OOS 從加入日後第一份
+  正式 as-seen 快照起算**——「事後挑族群」的回補歷史含 look-ahead,不得當策略證據;TDCC 週快照自
   加入日起累積,之前為永久洞。
 
 ## 用法
 
 ```bash
-# 每日三步(Actions 自動跑;本機手動也可)
-uv run --no-project python scripts/fetch_daily.py     # 增量抓取(預設補最近 15 天)
+# 本地每日正式管線(與 Actions 同序；可重跑、預設發布正式 OOS,但不 commit/push)
+uv run --no-project --python 3.12 python scripts/run_daily.py
+
+# 拆開執行；直接呼叫 snapshot 時本地預設只是 preview,正式發布需 --publish
+uv run --no-project python scripts/fetch_daily.py     # 智慧補缺(預設最近 15 天)
 uv run --no-project python scripts/score.py           # 重算全歷史評分
+uv run --no-project python scripts/snapshot_signals.py --source local --publish
 uv run --no-project python scripts/build_dashboard.py # 重生 index.html
 
 # TDCC 週快照(Actions 每日自動抓;週六 opendata 更新後手動跑可提早入庫)
@@ -178,6 +206,7 @@ uv run --no-project python scripts/fetch_financials.py --datasets TaiwanStockMon
 # 回補歷史 / 定向補缺(只抓指定股票,省 API 額度)/ 盤後唯讀簡報 / 週度驗證
 uv run --no-project python scripts/fetch_daily.py --start 2026-03-01
 uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-01
+uv run --no-project python scripts/fetch_daily.py --force --start 2026-07-01 # 明確要求來源修正重抓
 uv run --no-project python scripts/daily_brief.py
 uv run --no-project python scripts/validate.py
 ```
@@ -186,7 +215,8 @@ Token 讀取順序:環境變數 `FINMIND_TOKEN`(+選配 `FINMIND_TOKEN2`)→ 本
 `.mcp.json` 同名欄位(已被 `.gitignore` 排除);雲端由 Actions secret 注入。
 多組 token 組成時額輪替池——免費層 600 req/hr,遇 402 自動換下一組
 (`fetch_daily.api_get`,screen.py 共用);同日多輪「screen+全量回補」單組
-token 必爆額度,參考量:回補一輪 ≈ 5 datasets × 檔數 + 事件段。Runbook:盤後檢視
+token 必爆額度。正常 daily 會跳過完整 pair；休市日通常只需 1 次價格探針，資料源延遲時
+稍後重跑只補仍缺的 dataset。Runbook:盤後檢視
 [DAILY_CHECK.md](DAILY_CHECK.md)、週六策略檢視 [WEEKLY_REVIEW.md](WEEKLY_REVIEW.md)。
 
 ## 質化研究筆記(`notes/qualitative/`)

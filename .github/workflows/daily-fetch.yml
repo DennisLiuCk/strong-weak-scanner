@@ -53,6 +53,11 @@ jobs:
       - name: 計算五元素分數與 tier
         run: python scripts/score.py
 
+      # daily_scores 會因資料回補、universe/分組與策略調整而重算全歷史；在重生並發布
+      # 儀表板前，把本次 run 實際可見的原始指標+分數 append-only 凍結，供 OOS 驗證。
+      - name: 凍結 OOS as-seen 訊號快照
+        run: python scripts/snapshot_signals.py --publish
+
       - name: 重生儀表板 HTML
         run: python scripts/build_dashboard.py
 

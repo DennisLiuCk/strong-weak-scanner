@@ -47,7 +47,7 @@ fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現
                  → month_revenue/financials/balance_sheet/cash_flow;獨立月/季排程,不掛每日管線
 score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
-                 ⚠ 本地重跑會覆寫當日資料日的已凍結快照——commit 前 git checkout -- archive/
+                 archive 同資料日首次建立後不覆寫;本地重跑只更新 index.html
 validate.py      → reports/ 週報(§⑥=觀察因子 IC)
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
 qual_notes.py    notes/qualitative/*.md(年報MD&A/法說會重點,人工撰寫)狀態追蹤+骨架建立
