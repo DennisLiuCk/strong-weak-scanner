@@ -1,10 +1,14 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="台股半導體與 AI 供應鏈族群強弱儀表板">
 <title>__PAGE_TITLE__</title>
 <style>
   :root{
     --page:#f0eee8; --surface:#fbfaf8; --surface-2:#f3f1ea; --cell:#f6f4ee;
-    --ink:#17150f; --ink-2:#5c574c; --muted:#8f897b;
+    --ink:#17150f; --ink-2:#514c42; --muted:#6f695d;
     --hairline:rgba(20,18,12,0.12); --hairline-2:rgba(20,18,12,0.06);
     --strong:#c1121f; --strong-tint:rgba(193,18,31,0.09); --strong-tint-2:rgba(193,18,31,0.18);
     --weak:#0b7a37; --weak-tint:rgba(11,122,55,0.09); --weak-tint-2:rgba(11,122,55,0.17);
@@ -17,7 +21,7 @@
   @media (prefers-color-scheme:dark){
     :root{
       --page:#0e0e0a; --surface:#17160f; --surface-2:#201f16; --cell:#1d1c14;
-      --ink:#f5f3ea; --ink-2:#b8b3a3; --muted:#8b8577;
+      --ink:#f5f3ea; --ink-2:#c7c1b0; --muted:#aaa392;
       --hairline:rgba(255,255,255,0.13); --hairline-2:rgba(255,255,255,0.05);
       --strong:#ee4b4f; --strong-tint:rgba(238,75,79,0.15); --strong-tint-2:rgba(238,75,79,0.26);
       --weak:#23a657; --weak-tint:rgba(35,166,87,0.16); --weak-tint-2:rgba(35,166,87,0.28);
@@ -30,7 +34,7 @@
   }
   :root[data-theme="light"]{
     --page:#f0eee8; --surface:#fbfaf8; --surface-2:#f3f1ea; --cell:#f6f4ee;
-    --ink:#17150f; --ink-2:#5c574c; --muted:#8f897b;
+    --ink:#17150f; --ink-2:#514c42; --muted:#6f695d;
     --hairline:rgba(20,18,12,0.12); --hairline-2:rgba(20,18,12,0.06);
     --strong:#c1121f; --strong-tint:rgba(193,18,31,0.09); --strong-tint-2:rgba(193,18,31,0.18);
     --weak:#0b7a37; --weak-tint:rgba(11,122,55,0.09); --weak-tint-2:rgba(11,122,55,0.17);
@@ -42,7 +46,7 @@
   }
   :root[data-theme="dark"]{
     --page:#0e0e0a; --surface:#17160f; --surface-2:#201f16; --cell:#1d1c14;
-    --ink:#f5f3ea; --ink-2:#b8b3a3; --muted:#8b8577;
+    --ink:#f5f3ea; --ink-2:#c7c1b0; --muted:#aaa392;
     --hairline:rgba(255,255,255,0.13); --hairline-2:rgba(255,255,255,0.05);
     --strong:#ff6560; --strong-tint:rgba(255,101,96,0.13); --strong-tint-2:rgba(255,101,96,0.24);
     --weak:#3fca6f; --weak-tint:rgba(63,202,111,0.12); --weak-tint-2:rgba(63,202,111,0.22);
@@ -54,12 +58,19 @@
   }
 
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:12px}
   html,body{margin:0}
   body{
     background:var(--page); color:var(--ink);
     font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC","Hiragino Sans GB",sans-serif;
     line-height:1.55; -webkit-font-smoothing:antialiased;
   }
+  button,input,select{font:inherit}
+  button{color:inherit}
+  :focus-visible{outline:3px solid var(--health);outline-offset:3px}
+  .skip-link{position:fixed;z-index:100;top:8px;left:8px;padding:10px 14px;border-radius:8px;
+    color:var(--surface);background:var(--ink);transform:translateY(-150%)}
+  .skip-link:focus{transform:translateY(0)}
   .mono{font-family:"Cascadia Mono",Consolas,ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 22px 64px}
 
@@ -93,6 +104,45 @@
   .toggle:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
   .toggle[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:700}
 
+  /* ---- page navigation + first-screen overview ---- */
+  .anchor-nav{display:flex;gap:8px;overflow-x:auto;margin:18px 0 0;padding:2px 1px 5px;
+    scrollbar-width:thin}
+  .anchor-nav a{display:inline-flex;align-items:center;min-height:38px;padding:6px 13px;border:1px solid var(--hairline);
+    border-radius:999px;background:var(--surface);color:var(--ink-2);font-size:13px;font-weight:700;
+    text-decoration:none;white-space:nowrap}
+  .anchor-nav a:hover{border-color:var(--muted);color:var(--ink)}
+  .overview{margin:16px 0 8px;padding:18px 20px;border:1px solid var(--hairline);border-left:5px solid var(--health);
+    border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+  .overview[data-tone="warn"]{border-left-color:var(--warn-line)}
+  .overview[data-tone="neutral"]{border-left-color:var(--neutral)}
+  .overview-kicker{margin:0 0 4px;color:var(--health);font-size:12px;letter-spacing:.12em;font-weight:800}
+  .overview h2{margin:0;font-size:clamp(18px,2.5vw,23px);line-height:1.35;text-wrap:balance}
+  .overview-summary{max-width:76ch;margin:8px 0 0;color:var(--ink-2);font-size:14px}
+  .overview-points{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin:14px 0 0}
+  .overview-point{padding:10px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--hairline-2);
+    color:var(--ink-2);font-size:13px}
+  .overview-point b{display:block;margin-bottom:2px;color:var(--ink);font-size:12px}
+  .overview-note{margin:11px 0 0;color:var(--muted);font-size:12.5px}
+  .group-map-shell{margin:0 0 14px;padding:14px 16px 12px;border:1px solid var(--hairline);border-radius:14px;
+    background:var(--surface);box-shadow:var(--shadow)}
+  .group-map-shell figcaption{display:flex;align-items:baseline;gap:8px 14px;flex-wrap:wrap;margin-bottom:8px}
+  .group-map-shell figcaption b{font-size:14px}
+  .group-map-shell figcaption span{color:var(--muted);font-size:12.5px}
+  #groupMap{display:block;width:100%;height:auto;max-height:470px;overflow:visible}
+  #groupMap .q-label{fill:var(--muted);font-size:12px;font-weight:700}
+  #groupMap .axis-label{fill:var(--ink-2);font-size:12px;font-weight:800}
+  #groupMap .group-label{paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round;
+    font-size:14px;font-weight:800}
+  #groupMap .trail{stroke:var(--muted);stroke-width:1.5;opacity:.72;fill:none;vector-effect:non-scaling-stroke}
+  #groupMap .endpoint{stroke:var(--surface);stroke-width:2;vector-effect:non-scaling-stroke}
+  #groupMap .map-group:focus{outline:none}
+  #groupMap .map-group:focus .endpoint{stroke:var(--ink);stroke-width:4}
+  @media (max-width:520px){
+    .group-map-shell{padding:12px 8px 8px}
+    #groupMap{min-height:390px}
+    #groupMap .group-label{font-size:15px}
+  }
+
   /* ---- matrix toolbar(搜尋/排序) ---- */
   .mtoolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 8px}
   .msearch{font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);
@@ -118,11 +168,16 @@
   .gf[aria-pressed="true"] .ct{color:var(--surface);opacity:.65}
 
   /* ---- legend ---- */
-  .legend{margin:22px 0 10px;background:var(--surface);border:1px solid var(--hairline);
-    border-radius:14px;padding:14px 16px;display:grid;gap:14px;
-    grid-template-columns:1.15fr 1fr;box-shadow:var(--shadow)}
-  @media (max-width:720px){.legend{grid-template-columns:1fr}}
-  .legend h3{margin:0 0 9px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  details.legend{margin:12px 0 10px;background:var(--surface);border:1px solid var(--hairline);
+    border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  details.legend>summary{display:flex;align-items:center;gap:9px;min-height:44px;padding:10px 16px;cursor:pointer;
+    color:var(--ink-2);font-size:13px;font-weight:800;list-style:none}
+  details.legend>summary::-webkit-details-marker{display:none}
+  details.legend>summary::before{content:"▸";color:var(--muted);transition:transform .15s ease}
+  details.legend[open]>summary::before{transform:rotate(90deg)}
+  .legend-grid{display:grid;gap:14px;grid-template-columns:1.15fr 1fr;padding:4px 16px 16px}
+  @media (max-width:720px){.legend-grid{grid-template-columns:1fr}}
+  .legend h3{margin:0 0 9px;font-size:12px;letter-spacing:.1em;color:var(--muted);font-weight:700}
   .scale{display:flex;flex-wrap:wrap;gap:6px}
   .sk{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);
     border:1px solid var(--hairline);border-radius:8px;padding:4px 9px 4px 7px}
@@ -142,14 +197,23 @@
   .tier{background:var(--surface);border:1px solid var(--hairline);border-radius:14px;padding:14px;
     border-top:3px solid var(--tc,var(--neutral));box-shadow:var(--shadow)}
   .tier .tt{font-weight:800;font-size:14px;margin-bottom:2px}
-  .tier .td{font-size:11.5px;color:var(--muted);margin-bottom:11px}
+  .tier .td{font-size:12px;color:var(--muted);margin-bottom:11px}
   .tier .picks{display:flex;flex-direction:column;gap:7px}
+  .tier:not(.expanded) .pick.tier-extra{display:none!important}
+  .tier-expand{width:100%;min-height:40px;margin-top:10px;border:1px solid var(--hairline);border-radius:9px;
+    background:var(--surface-2);color:var(--ink-2);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .tier-expand:hover,.tier-expand:focus-visible{border-color:var(--ink);outline:none}
   .pick{display:flex;align-items:center;gap:8px;font-size:13px}
-  .pick .code{font-size:11px;color:var(--muted)}
+  .pick .code{font-size:12px;color:var(--muted)}
   .pick .nm{font-weight:700}
   .dot{width:9px;height:9px;border-radius:3px;flex:0 0 auto;background:var(--pc,var(--neutral))}
   .dotstrip{display:flex;gap:5px;flex-wrap:wrap;margin-top:1px}
   .dotstrip span{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .chipbar{display:flex;width:100%;height:12px;overflow:hidden;border-radius:999px;background:var(--surface-2);
+    border:1px solid var(--hairline);margin-top:3px}
+  .chipbar span{display:block;min-width:0;height:100%}
+  .stat{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:2px 10px}
+  .stat .change{grid-column:1/-1;color:var(--muted);font-size:12px;line-height:1.45}
   /* 結論卡族群標籤:同族群名對齊成一欄(min-width),色盲友善的純文字小標,不佔訊號色 */
   .pick .gt{font-size:10px;font-weight:600;color:var(--muted);border:1px solid var(--hairline);
     border-radius:6px;padding:0 6px;flex:0 0 auto;min-width:34px;text-align:center;box-sizing:border-box}
@@ -157,12 +221,12 @@
   /* ---- matrix ---- */
   .scroller{overflow-x:auto;border:1px solid var(--hairline);border-radius:16px;background:var(--surface);
     box-shadow:var(--shadow)}
-  .matrix{min-width:880px}
+  .matrix{min-width:1060px}
   .grp{padding:11px 16px 5px;font-weight:800;font-size:13.5px;display:flex;align-items:center;gap:9px}
   .grp .tag{font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--hairline);
     border-radius:100px;padding:1px 9px}
   .row{display:grid;
-    grid-template-columns:minmax(146px,1.3fr) repeat(5,minmax(84px,1fr)) minmax(118px,1.15fr);
+    grid-template-columns:minmax(150px,1.2fr) repeat(5,minmax(130px,1fr)) minmax(150px,1.15fr);
     align-items:stretch;border-top:1px solid var(--hairline-2)}
   .row.head{border-top:none;position:sticky;top:0;background:var(--surface-2);z-index:2}
   .row.head .hc{padding:9px 10px;font-size:11.5px;color:var(--muted)}
@@ -171,39 +235,40 @@
   .rl{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:9px 10px 9px 16px;min-width:0}
   .rl .nm{font-weight:800;font-size:14px;letter-spacing:.2px}
   .rl .code{font-size:11px;color:var(--muted)}
-  .riskbadge{display:inline-block;width:fit-content;margin-top:2px;font-size:10px;font-weight:700;
-    color:var(--strong);border:1px solid var(--strong);border-radius:100px;padding:1px 7px;
-    cursor:default;letter-spacing:.5px}
+  .riskbadge{display:inline-flex;align-items:center;justify-content:center;width:fit-content;min-height:28px;margin-top:2px;
+    font-size:11.5px;font-weight:700;color:var(--strong);border:1px solid var(--strong);border-radius:100px;
+    padding:3px 9px;cursor:pointer;letter-spacing:.3px;background:transparent}
   .riskbadge.sm{margin-top:0;padding:0 5px;flex:0 0 auto}
   .badges{display:flex;align-items:center;gap:6px;margin-top:3px}
-  .hdot{width:11px;height:11px;border-radius:50%;border:none;padding:0;cursor:pointer;flex:0 0 auto;
+  .hdot{width:28px;height:28px;border-radius:50%;border:8px solid var(--surface);padding:0;cursor:pointer;flex:0 0 auto;
     box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--hairline);transition:transform .1s ease}
   .hdot:hover,.hdot:focus-visible{transform:scale(1.3)}
   .hdot:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
   .hdot.health{background:var(--health)}
   .hdot.neutral{background:var(--neutral)}
   .hdot.warn{background:var(--warn-line)}
-  .fundbadge{display:inline-block;width:fit-content;margin-top:2px;font-family:inherit;
-    font-size:10px;font-weight:700;border:1px solid currentColor;border-radius:100px;
-    padding:1px 7px;cursor:pointer;background:none;letter-spacing:.2px}
+  .fundbadge{display:inline-flex;align-items:center;width:fit-content;min-height:28px;margin-top:2px;font-family:inherit;
+    font-size:11.5px;font-weight:700;border:1px solid currentColor;border-radius:100px;
+    padding:3px 9px;cursor:pointer;background:none;letter-spacing:.1px}
   .fundbadge.up{color:var(--strong)}
   .fundbadge.down{color:var(--weak)}
   .fundbadge.flat{color:var(--muted)}
-  .notebadge{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;
-    margin-top:2px;font-size:11px;line-height:1;border:1px solid currentColor;border-radius:100px;
+  .notebadge{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+    margin-top:2px;font-size:14px;line-height:1;border:1px solid currentColor;border-radius:100px;
     padding:0;cursor:pointer;background:none;flex:0 0 auto}
   .notebadge.fresh{color:var(--muted)}
   .notebadge.draft{color:var(--muted);border-style:dashed}
   .notebadge.due{color:var(--warn-line)}
-  .cell{position:relative;margin:5px;border-radius:9px;padding:8px 6px 7px;cursor:default;
+  .cell{position:relative;width:calc(100% - 10px);margin:5px;border-radius:9px;padding:8px 7px;cursor:pointer;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
     background:var(--cell);border:1px solid transparent;transition:transform .08s ease, box-shadow .08s ease;
-    min-height:52px}
+    min-height:86px;font-family:inherit;color:var(--ink)}
   .cell:hover,.cell:focus-visible{transform:translateY(-1px);box-shadow:var(--shadow);z-index:1;outline:none;
     border-color:var(--hairline)}
   .cell:focus-visible{border-color:var(--strong)}
   .cell .g{font-size:12.5px;font-weight:800;line-height:1}
-  .cell .v{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.2px}
+  .cell .v{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:.1px;text-align:center}
+  .cell .basis{font-size:11.5px;line-height:1.35;color:var(--muted);text-align:center}
   .cell.s2{background:var(--strong-tint-2)} .cell.s1{background:var(--strong-tint)}
   .cell.s0{background:var(--neutral-tint)}
   .cell.sm1{background:var(--weak-tint)} .cell.sm2{background:var(--weak-tint-2)}
@@ -213,12 +278,15 @@
   .cell.warn{box-shadow:inset 0 0 0 1.5px var(--warn-line)}
   .cell .flag{position:absolute;top:3px;right:4px;font-size:10px;color:var(--warn);line-height:1}
   .vc{display:flex;align-items:center;padding:5px 12px 5px 6px}
-  .verdict{width:100%;border-radius:9px;padding:8px 10px;background:var(--vt,var(--neutral-tint));
-    border:1px solid var(--hairline);cursor:default;transition:transform .08s ease,box-shadow .08s ease}
+  .verdict{width:100%;min-height:78px;border-radius:9px;padding:8px 10px;background:var(--vt,var(--neutral-tint));
+    border:1px solid var(--hairline);cursor:pointer;transition:transform .08s ease,box-shadow .08s ease;
+    font-family:inherit;text-align:left;color:var(--ink)}
   .verdict:hover,.verdict:focus-visible{transform:translateY(-1px);box-shadow:var(--shadow);outline:none}
   .verdict:focus-visible{border-color:var(--vl,var(--neutral))}
   .verdict .vv{font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;color:var(--vl,var(--ink))}
-  .verdict .vs{font-size:10.5px;color:var(--muted);margin-top:1px}
+  .verdict .kicker{font-size:11.5px;color:var(--muted);font-weight:700}
+  .verdict .vs{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .verdict .pending{margin-top:4px;color:var(--warn);font-size:11.5px;font-weight:700;line-height:1.35}
 
   /* ---- tooltip ---- */
   #tip{position:fixed;z-index:50;max-width:330px;background:var(--surface);color:var(--ink);
@@ -254,6 +322,9 @@
     text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:2px}
   #tip .src{margin-top:6px;color:var(--muted);font-size:10.5px;line-height:1.5}
   #tip .src b{color:var(--ink-2)}
+  #tip .preview-why{margin-top:7px;color:var(--ink-2);font-size:12.5px;line-height:1.5}
+  #tip .preview-hint{margin-top:8px;padding-top:7px;border-top:1px dashed var(--hairline);color:var(--muted);
+    font-size:11.5px;font-weight:700}
 
   /* ---- bottom sheet(觸控裝置的詳情;桌機不會顯示) ---- */
   #sheetWrap{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
@@ -270,10 +341,17 @@
     transform:translateY(100%);transition:transform .28s cubic-bezier(.32,.72,0,1)}
   #sheetWrap.on #sheet{transform:translateY(0)}
   #sheetGrab{width:38px;height:4px;border-radius:100px;background:var(--hairline);margin:6px auto 8px}
-  #sheetClose{position:absolute;top:12px;right:13px;width:30px;height:30px;display:flex;
+  #sheetClose{position:absolute;z-index:2;top:12px;right:13px;width:44px;height:44px;display:flex;
     align-items:center;justify-content:center;background:var(--surface-2);border:1px solid var(--hairline);
     border-radius:100px;color:var(--ink-2);font-size:14px;line-height:1;cursor:pointer;font-family:inherit}
   #sheetClose:hover{color:var(--ink)}
+  @media (min-width:760px){
+    #sheetWrap{align-items:flex-end;justify-content:stretch}
+    #sheet{width:min(620px,100%);max-width:none;height:100%;max-height:100vh;margin:0;border:0;border-left:1px solid var(--hairline);
+      border-radius:18px 0 0 18px;padding:12px 24px 28px;transform:translateX(100%)}
+    #sheetWrap.on #sheet{transform:translateX(0)}
+    #sheetGrab{display:none}
+  }
   /* sheet 內容沿用 tooltip 版型,行動裝置上放大以利閱讀 */
   #sheetBody .th{display:flex;align-items:center;gap:7px;margin:0 36px 9px 0}
   #sheetBody .th .el{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
@@ -314,6 +392,29 @@
   #sheetBody .nb-meta b{display:block;color:var(--ink);font-size:12.5px;font-weight:700;margin-top:1px}
   #sheetBody .nb-flag{font-size:11.5px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-line);
     border-radius:8px;padding:6px 10px;margin:0 0 12px}
+  #sheetBody .nb-summary{margin:4px 0 14px;padding:13px 14px;border-left:4px solid var(--health);border-radius:10px;
+    background:var(--health-tint);color:var(--ink-2);font-size:13.5px;line-height:1.7}
+  #sheetBody .nb-summary b{display:block;margin-bottom:3px;color:var(--ink)}
+  #sheetBody .glossary{margin:0 0 13px;border:1px solid var(--hairline);border-radius:10px;background:var(--surface-2)}
+  #sheetBody .glossary>summary{min-height:44px;padding:9px 12px;cursor:pointer;list-style:none;color:var(--ink);
+    font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px}
+  #sheetBody .glossary>summary::-webkit-details-marker{display:none}
+  #sheetBody .glossary>summary::before{content:"?";display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+    border-radius:50%;background:var(--health-tint);color:var(--health);font-weight:900}
+  #sheetBody .glossary dl{margin:0;padding:0 12px 11px}
+  #sheetBody .glossary dt{margin:8px 0 2px;color:var(--ink);font-size:12.5px;font-weight:900}
+  #sheetBody .glossary dd{margin:0;color:var(--ink-2);font-size:12.5px;line-height:1.65}
+  #sheetBody .glossary dd b{color:var(--ink);font-weight:700}
+  #sheetBody .nb-toc{display:flex;gap:7px;overflow-x:auto;margin:0 0 12px;padding:1px 0 5px}
+  #sheetBody .nb-toc a{flex:0 0 auto;min-height:36px;padding:6px 10px;border:1px solid var(--hairline);border-radius:999px;
+    color:var(--ink-2);font-size:12px;font-weight:700;text-decoration:none;background:var(--surface-2)}
+  #sheetBody .nb-section{margin:0 0 8px;border:1px solid var(--hairline);border-radius:10px;background:var(--surface)}
+  #sheetBody .nb-section>summary{min-height:44px;padding:10px 13px;cursor:pointer;list-style:none;font-size:13.5px;
+    font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+  #sheetBody .nb-section>summary::-webkit-details-marker{display:none}
+  #sheetBody .nb-section>summary::before{content:"▸";color:var(--muted);transition:transform .15s ease}
+  #sheetBody .nb-section[open]>summary::before{transform:rotate(90deg)}
+  #sheetBody .nb-section-body{padding:0 13px 10px}
   #sheetBody .nb-src{display:block;margin-top:16px;padding-top:13px;border-top:1px dashed var(--hairline);
     font-size:12.5px;font-weight:700;color:var(--ink);text-decoration:none}
   #sheetBody .nb-src:hover{color:var(--health)}
@@ -340,6 +441,43 @@
   details.guide .gbody b{color:var(--ink)}
   details.guide .gbody ol{margin:8px 0;padding-left:22px}
   details.guide .gbody li{margin:4px 0}
+
+  /* ---- mobile stock cards: no horizontal matrix dependency ---- */
+  .mobile-stocks{display:none}
+  .mobile-card{margin:0 0 10px;background:var(--surface);border:1px solid var(--hairline);border-radius:13px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .mobile-card>summary{min-height:64px;padding:11px 13px;cursor:pointer;list-style:none;display:grid;
+    grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center}
+  .mobile-card>summary::-webkit-details-marker{display:none}
+  .mobile-title{min-width:0;font-size:15px;font-weight:800}
+  .mobile-meta{display:block;color:var(--muted);font-size:12px;font-weight:600}
+  .mobile-tier{text-align:right;color:var(--tc,var(--neutral));font-size:12.5px;font-weight:800}
+  .mobile-tier small{display:block;color:var(--muted);font-size:11.5px;font-weight:600}
+  .mobile-body{padding:0 10px 11px;border-top:1px solid var(--hairline-2)}
+  .mobile-badges{display:flex;align-items:center;gap:8px;min-height:50px;padding:7px 2px;border-bottom:1px dashed var(--hairline)}
+  .mobile-metrics{display:grid;gap:7px;margin-top:9px}
+  .mmetric{width:100%;min-height:58px;padding:9px 10px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+    gap:2px 10px;align-items:center;border:1px solid var(--hairline);border-radius:10px;background:var(--cell);
+    color:var(--ink);text-align:left;cursor:pointer}
+  .mmetric .mlabel{font-weight:800;font-size:12.5px}
+  .mmetric .mraw{font-size:12.5px;font-weight:700}
+  .mmetric .mbasis{grid-column:2/-1;color:var(--muted);font-size:11.5px;line-height:1.35}
+  .mmetric .mscore{grid-row:1/span 2;grid-column:3;color:var(--mc,var(--neutral));font-size:12px;font-weight:900;text-align:right}
+  .mobile-verdict{margin-top:9px}
+
+  @media (max-width:720px){
+    .wrap{padding:18px 14px 48px}
+    .scroller{display:none}
+    .mobile-stocks{display:block}
+    .anchor-nav a,.toggle,.gf,.msearch{min-height:44px}
+    .msearch{width:100%;min-width:0}
+    .mtoolbar{align-items:stretch}
+    .mtoolbar .toggle{flex:1 1 auto;justify-content:center}
+    .riskbadge,.fundbadge,.notebadge,.hdot{min-height:44px;height:44px}
+    .riskbadge,.fundbadge{padding-inline:12px}
+    .notebadge,.hdot{width:44px}
+    .overview{padding:15px 16px}
+  }
 
   /* ---- 方法與資料 ---- */
   .method{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -376,18 +514,22 @@
   footer a:hover{color:var(--ink)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主要內容</a>
 
 <div class="wrap">
   <header>
     <div>
       <div class="brandrule"></div>
       <h1>__H1__</h1>
-      <p class="sub">每個交易日收盤後,把同族群的個股放上同一把尺互相比較:價格誰相對強、下跌時誰撐得住、法人在買誰、散戶擠在哪——比出強弱、依規則分層。每個分數都可以點開,看到原始數據、判讀理由、計算規則與資料來源;完整方法見<a href="#method">頁尾「方法與資料」</a>。</p>
+      <p class="sub">每個交易日收盤後,把同族群個股放上同一把尺:比較價格與抗跌表現、法人原始買賣及其同業位置、融資槓桿條件，再依公開規則分層。每個分數都可以點開,看到原始數據、判讀理由、計算規則與資料來源;完整方法見<a href="#method">頁尾「方法與資料」</a>。</p>
       <div class="meta">
         <span class="chip" id="mktChip">__MARKET_CHIP__</span>
         <span class="chip" id="scopeChip">範圍 <b>__SCOPE__</b></span>
         <span class="chip">資料至 <span class="date-wrap"><select id="dateSel" aria-label="切換報告日期"><option value="__DATE_ISO__">__DATE__</option></select></span>(還原股價)</span>
-        <span class="chip">來源 <b>FinMind</b></span>
+        <span class="chip" title="市場數據: FinMind、TDCC、TWSE/TPEx；公司研究筆記:人工整理">來源 <b>多來源</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
       </div>
     </div>
@@ -398,9 +540,28 @@
 
   <div id="histNote" role="note" hidden></div>
 
+  <nav class="anchor-nav" aria-label="本頁快速導覽">
+    <a href="#overview">今日重點</a>
+    <a href="#groups-section">族群概況</a>
+    <a href="#tiers-section">個股分層</a>
+    <a href="#stocks-section">個股明細</a>
+    <a href="#method">計算與資料</a>
+  </nav>
+
+  <main id="main">
+  <section class="overview" id="overview" aria-labelledby="overviewTitle">
+    <p class="overview-kicker">今日先看這裡</p>
+    <h2 id="overviewTitle">正在整理今日重點…</h2>
+    <p class="overview-summary" id="overviewSummary"></p>
+    <div class="overview-points" id="overviewPoints"></div>
+    <p class="overview-note" id="overviewNote" hidden></p>
+  </section>
+
   <div class="gfilter" id="gfilter" role="group" aria-label="檢視族群"></div>
 
-  <div class="legend">
+  <details class="legend">
+    <summary>如何閱讀：顏色、分數與五個觀察面向</summary>
+    <div class="legend-grid">
     <div>
       <h3>強弱刻度(每格另有符號與數字,不靠顏色單獨判讀)</h3>
       <div class="scale">
@@ -413,7 +574,7 @@
       </div>
     </div>
     <div>
-      <h3>五元素(每欄回答一個問題;分數=族群內相對排名)</h3>
+      <h3>五個觀察面向（共 7 個計算指標）</h3>
       <div class="elrow">
         <span class="el"><span class="n">①&nbsp;價</span><span class="r">誰比同業強?下跌時誰撐得住?</span></span>
         <span class="el"><span class="n">②&nbsp;量</span><span class="r">交投活絡還是過熱?(跟自己的常態比)</span></span>
@@ -423,38 +584,46 @@
       </div>
     </div>
     <div style="grid-column:1 / -1">
-      <h3>個股標記(觀察層,不影響左側①~⑤評分與 tier;點列表格內同款圖示看明細)</h3>
+      <h3>個股標記(觀察資訊,不影響左側①~⑤評分與已確認分層;點列表格內同款圖示看明細)</h3>
       <div class="scale">
         <span class="sk"><span class="riskbadge sm">處置</span>／<span class="riskbadge sm">注意</span>交易所官方列管(TWSE/TPEx 異常價量認證)</span>
         <span class="sk"><span class="hdot health" style="display:inline-block"></span>籌碼現況診斷:健康</span>
         <span class="sk"><span class="hdot neutral" style="display:inline-block"></span>籌碼現況診斷:中性</span>
         <span class="sk"><span class="hdot warn" style="display:inline-block"></span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
-        <span class="sk"><span class="fundbadge up">▲18%</span>基本面參考:月營收年增(▲上升 ▼下降 →持平)</span>
+        <span class="sk"><span class="fundbadge up">營收YoY +18%</span>基本面參考:只描述最新月營收較去年同月的變化，不直接判定營運強弱</span>
         <span class="sk"><span class="notebadge fresh">📝</span>質化研究筆記(灰=已更新、橘框=建議複核已逾期)</span>
       </div>
     </div>
-  </div>
+    </div>
+  </details>
 
   <details class="guide">
     <summary>第一次看這個儀表板?60 秒導讀</summary>
     <div class="gbody">
-      <b>這是什麼</b>:台股半導體與 AI 供應鏈各族群的每日「體檢表」。它不預測明天的漲跌,而是回答一個問題——<b>同族群裡,誰相對強、誰相對弱?</b>資金若要留在這個族群,該留誰、先汰誰。
+      <b>這是什麼</b>:台股半導體與 AI 供應鏈各族群的每日「體檢表」。它不預測明天的漲跌,而是回答一個問題——<b>同族群裡,誰相對強、誰相對弱?</b>這是研究上的相對位置，不等同買進、賣出或持有指示。
       <ol>
-        <li><b>先看環境</b>:頁首籤條顯示市場處於多頭還是修正;「族群雷達」顯示哪個族群整體被法人佈局、哪個在退潮。</li>
-        <li><b>再看結論</b>:「汰弱留強」把所有個股按公開規則分層——真強、蓄勢(法人在買但價還沒動)、強但過熱、中性、真弱、陷阱(法人出、散戶接)。</li>
-        <li><b>想知道為什麼</b>:到「五元素明細」點任何一格,會列出原始數據、判讀、評分規則與資料來源——<b>每個結論都能往下追到數字</b>,可以自己驗算,也歡迎質疑。</li>
+        <li><b>先看環境</b>:頁首籤條顯示市場處於多頭還是修正;「族群概況」把價格與法人籌碼分成兩條軸，不先假設它一定是買超或賣超。</li>
+        <li><b>再看結論</b>:「個股分層」依分數組合分為相對強勢、相對蓄勢、相對強勢但過熱、中性、相對弱勢與槓桿風險。這些名稱描述同族群位置與門檻組合，不宣稱法人一定買進或賣出。</li>
+        <li><b>想知道為什麼</b>:到「五個觀察面向」點任何一格,會列出原始方向、同族群位置或固定門檻、評分規則與資料來源——<b>每個結論都能往下追到數字</b>,可以自己驗算,也歡迎質疑。</li>
       </ol>
-      兩個關鍵觀念:<b>① 分數是族群內的相對排名</b>——「+2」代表這一項在族群裡排前 20%,不代表它會漲;弱族群裡的第一名仍可能下跌。<b>② 評級是規則分層,不是預測</b>——規則全文在頁尾「評級規則」,是否真的有效,由每週自動產出的驗證報告持續檢驗(頁尾「怎麼檢驗」)。顏色依台股慣例:紅=強、綠=弱。
+      兩個關鍵觀念:<b>① 多數分數是族群內的相對排名</b>——價格、抗跌、外資、投信與修正日買賣的「+2」代表位於族群前 20%,不代表原始值為正或股價會漲;量與融資則依固定門檻評分，不參加排名。<b>② 評級是規則分層,不是預測</b>——規則全文在頁尾「評級規則」,是否真的有效,由每週自動產出的驗證報告持續檢驗(頁尾「怎麼檢驗」)。顏色依台股慣例:紅=強、綠=弱。
     </div>
   </details>
 
-  <h2 class="sec">族群雷達 · 哪個族群正在被佈局</h2>
+  <h2 class="sec" id="groups-section">族群概況 · 價格與籌碼現在在哪裡</h2>
+  <figure class="group-map-shell" id="groupMapShell">
+    <figcaption><b>族群價籌四象限</b><span>灰線從 5 個交易日前指向現在；終點文字是目前位置。右上代表價格相對跑贏且修正日淨買，左下代表跑輸且淨賣；仍須搭配下方數值閱讀。</span></figcaption>
+    <svg id="groupMap" viewBox="0 0 520 430" role="img" aria-labelledby="groupMapTitle groupMapDesc">
+      <title id="groupMapTitle">族群價格動能與修正日外資買賣四象限</title>
+      <desc id="groupMapDesc">橫軸是族群二十日動能相對全體，越右代表跑贏；縱軸是修正日外資買賣中位數，越上代表淨買。灰線顯示五個交易日的移動方向。</desc>
+    </svg>
+  </figure>
   <div class="tiers" id="groups"></div>
 
-  <h2 class="sec">結論 · 汰弱留強</h2>
+  <h2 class="sec" id="tiers-section">個股分層 · 已確認的相對強弱</h2>
   <div class="tiers" id="tiers"></div>
 
-  <h2 class="sec">五元素明細 · 點任一格看數據與理由</h2>
+  <h2 class="sec" id="stocks-section">五個觀察面向（共 7 指標） · 點按看完整計算</h2>
   <div class="mtoolbar">
     <input type="search" id="matrixSearch" class="msearch" placeholder="搜尋股號或名稱…" aria-label="搜尋股號或名稱">
     <button type="button" class="toggle" id="matrixSortBtn" aria-pressed="false">↓ 族群內綜合分由高到低</button>
@@ -463,19 +632,20 @@
   <div class="scroller">
     <div class="matrix" id="matrix"></div>
   </div>
+  <div class="mobile-stocks" id="mobileStocks" aria-label="個股觀察面向清單"></div>
 
   <h2 class="sec" id="method">方法與資料 · 分數怎麼來、怎麼驗證</h2>
   <div class="method">
     <div class="mcard wide">
       <h3>評分流程(每個交易日收盤後自動執行)</h3>
       <ol>
-        <li><b>算指標</b> — 對每一檔,用「還原股價」與法人/融資資料計算原始指標(定義見下方辭典)。還原股價已把除權息與股票分割造成的價格跳空調整掉,漲跌只反映真實損益,除息日不會被誤判成大跌。</li>
-        <li><b>族群內排名</b> — 相對強弱、抗跌、外資、投信、逆勢買超五項只跟「同族群」比:族群內前 20% 得 +2、20~40% 得 +1、中段 0、60~80% 得 −1、最後 20% 得 −2。若整個族群的原始值都貼近零(無訊號),一律給 0——排名制只在有訊號時放大差異,不把雜訊排成名次。量與融資券不排名,用固定規則直接給分(規則見各格「評分依據」)。</li>
+        <li><b>算指標</b> — 對每一檔,用「還原股價」與法人/融資資料計算原始指標(定義見下方辭典)。還原股價用來調整除權息與股票分割造成的機械性跳空，避免把除息誤判為大跌；它是可比較的研究序列，不等於任何投資人的實際含息報酬。</li>
+        <li><b>族群內排名</b> — 相對強弱、抗跌、外資、投信、修正日買賣五項只跟「同族群」比:族群內前 20% 得 +2、20~40% 得 +1、中段 0、60~80% 得 −1、最後 20% 得 −2。外資與投信會逐檔檢查原始值：若該檔變化小於死區門檻，就歸 0 分，不把微小雜訊硬排成訊號。量與融資券不排名,用固定規則直接給分(規則見各格「評分依據」)。</li>
         <li><b>加權合成</b> — 綜合分 = Σ(元素分 × 權重),再取 3 日平均消除單日跳動;理論範圍約 ±8.5。</li>
         <li><b>分層確認</b> — 依「評級規則」分層,且需連續 2 個交易日判到同一層才正式轉層,避免評級每天翻面。</li>
       </ol>
       <div class="wchips" id="wchips"></div>
-      <p>權重反映本系統的核心實證:<b>族群內分強弱靠價格相對因子(相對強弱、抗跌);外資、投信等籌碼指標的價值在「選族群」</b>——所以籌碼在個股層降權,聚合到族群層做成「族群雷達」。權重屬樣本內校準,每週以樣本外資料重新檢驗,見下方「怎麼檢驗」。</p>
+      <p>五個觀察面向實際使用 7 個計算指標：價格含「相對強弱、抗跌」，外資含「持股變化、修正日買賣」。權重反映本系統的核心實證:<b>族群內分強弱靠價格相對因子;外資、投信等籌碼指標的價值主要在比較族群</b>。權重屬樣本內校準,每週以規則定案後的新資料（樣本外）重新檢驗,見下方「怎麼檢驗」。</p>
     </div>
     <div class="mcard">
       <h3>指標辭典 · 個股層</h3>
@@ -485,7 +655,7 @@
         <dt>量比</dt><dd><span class="f">當日周轉率 ÷ 自身60日中位</span>1 = 自己的正常量;跟自己比,不跨股比。</dd>
         <dt>周轉率</dt><dd><span class="f">成交股數 ÷ 發行股數</span>當日換手的股本比例。</dd>
         <dt>外資持股變化</dt><dd><span class="f">外資持股比率的20日變化(pp)</span>pp = 百分點,如 40% → 41% 記 +1pp。</dd>
-        <dt>逆勢買超</dt><dd><span class="f">族群下跌日外資淨買20日累計 ÷ 股本</span>下跌時有沒有人默默接貨——佈局的典型痕跡。</dd>
+        <dt>修正日外資買賣</dt><dd><span class="f">族群下跌日外資淨買賣20日累計 ÷ 股本</span>觀察族群下跌時外資整體是淨買或淨賣；正值才代表承接。</dd>
         <dt>投信佔股本</dt><dd><span class="f">近5日投信淨買賣 ÷ 發行股數</span>換算成股本比例,大小型股才可比。</dd>
         <dt>散戶水位</dt><dd><span class="f">融資餘額 ÷ 發行股數</span>愈高代表散戶槓桿愈滿,回檔時停損賣壓愈重。</dd>
         <dt>距60日高</dt><dd><span class="f">還原價距近60日最高點的百分比</span>衡量「價格發動了沒」;蓄勢評級要求 ≤ −3%。</dd>
@@ -495,10 +665,10 @@
       <h3>指標辭典 · 族群與大盤層</h3>
       <dl class="dl">
         <dt>佈局廣度</dt><dd><span class="f">族群內外資20日增持的檔數比例</span>佈局是「面」不是單點:一半以上成員被增持,才像族群行情。</dd>
-        <dt>修正日中位淨買</dt><dd><span class="f">族群內各檔逆勢買超的中位數</span>「哪個族群正被佈局」的候選主訊號(樣本外驗證中,見週報)。</dd>
+        <dt>修正日中位買賣</dt><dd><span class="f">族群內各檔修正日外資買賣率的中位數</span>正值才是淨買，負值仍是淨賣；可比較哪個族群調節較少或承接較多(樣本外驗證中,見週報)。</dd>
         <dt>投信買超廣度</dt><dd><span class="f">族群內投信5日淨買 &gt;0 的檔數比例</span>本土法人參與的廣度。</dd>
         <dt>20日動能 vs 全體</dt><dd><span class="f">族群中位20日報酬 − 全體中位</span>族群整體跑贏還是跑輸大部隊。</dd>
-        <dt>修正 regime</dt><dd><span class="f">加權報酬指數(含息)距20日高 ≤ −3%</span>頁首籤條「修正」的定義。用含息指數,除息旺季不會被機械性拉低而誤報修正。</dd>
+        <dt>修正市場情境</dt><dd><span class="f">加權報酬指數(含息)距20日高 ≤ −3%</span>頁首籤條「修正」的定義。用含息指數,降低除息旺季機械性下跌造成的誤判。</dd>
       </dl>
       <p>族群層統計需至少 6 檔有效樣本才給值,避免 1、2 檔代表整個族群。</p>
     </div>
@@ -509,7 +679,7 @@
     </div>
     <div class="mcard">
       <h3>資料來源與更新</h3>
-      全部數據取自 <a href="https://finmindtrade.com/" rel="noopener">FinMind 開放資料</a>,每交易日約 21:40(台北)由 GitHub Actions 自動抓取、評分並重建本頁;點開任一格,底部都標示該格數據的來源。
+      市場與財報資料主要來自 <a href="https://finmindtrade.com/" rel="noopener">FinMind 開放資料</a>；股權分散使用 TDCC，處置／注意名單使用 TWSE／TPEx 官方公告，質化研究筆記則由人工整理公開資訊。每日管線可由 GitHub Actions 排程或本地手動啟動，會補齊缺漏後評分並重建本頁；點開任一項，底部會標示該項來源。
       <dl class="srcline">
         <dt>股價 / 成交量</dt><dd>TaiwanStockPrice</dd>
         <dt>三大法人買賣超</dt><dd>TaiwanStockInstitutionalInvestorsBuySell</dd>
@@ -527,9 +697,11 @@
     </div>
   </div>
 
+  </main>
+
   <footer>
     <div class="fn">
-      <div><b>strong-weak-scanner</b> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner" rel="noopener">原始碼與資料</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/tree/main/reports" rel="noopener">驗證週報</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/CHANGELOG.md" rel="noopener">設計沿革</a> · 資料源 <a href="https://finmindtrade.com/" rel="noopener">FinMind</a>。本頁為量化籌碼研究,非投資建議;資料或有缺漏與延遲,以交易所公告為準。</div>
+      <div><b>strong-weak-scanner</b> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner" rel="noopener">原始碼與資料</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/tree/main/reports" rel="noopener">驗證週報</a> · <a href="https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/CHANGELOG.md" rel="noopener">設計沿革</a> · 資料源 FinMind、TDCC、TWSE／TPEx 與人工研究筆記。本頁為量化籌碼研究,非投資建議;資料或有缺漏與延遲,以交易所公告為準。</div>
     </div>
   </footer>
 </div>
@@ -550,28 +722,28 @@
   "use strict";
   var EL = [
     {k:"①價", role:"族群相對",
-     how:"「相對強弱」= 近20日還原價報酬 − 族群中位數(白話:過去一個月跑贏同業多少),在族群內排名給分:前20% +2、後20% −2。上表的 └ 兩列就是相減前的原料;「大盤20日」是含息報酬指數同窗口報酬,純參考基準(不參與計分)——個股與族群中位都贏大盤=族群整體被佈局,只贏族群中位卻輸大盤=弱勢族群裡的相對強。「修正日抗跌」是獨立元素(權重1.0):只統計族群整體下跌的日子,它平均比族群多漲(少跌)多少——大家一起跌時撐得住的,才是真強;這也是升「蓄勢」評級的品質門檻。",
+     how:"「相對強弱」= 近20日還原價報酬 − 族群中位數(白話:過去一個月跑贏同業多少),在族群內排名給分:前20% +2、後20% −2。上表的 └ 兩列就是相減前的原料;「大盤20日」是含息報酬指數同窗口報酬,純參考基準(不參與計分)——個股與族群中位都贏大盤，表示個股與族群價格都相對靠前；只贏族群中位卻輸大盤，則是弱勢族群裡的相對強。「修正日抗跌」是獨立指標(權重1.0):只統計族群整體下跌的日子,它平均比族群多漲(少跌)多少。",
      src:"FinMind 台股日收盤(TaiwanStockPrice);除權息/分割還原價由本系統以事件資料重算"},
     {k:"②量", role:"量比/過熱",
      how:"量比 = 當日周轉率 ÷ 自己過去60日的中位數——跟自己的常態比,大型股不會因天生低周轉吃虧。1.2~3.0 視為健康活絡 +1;<0.5 量縮無人氣 −1。量比≥5 或周轉率≥20% 觸發過熱旗標 ⚠(不改分數,但會把評級壓到「強但過熱」)。",
      src:"FinMind 成交量(TaiwanStockPrice)÷ 當日發行股數(TaiwanStockShareholding)"},
     {k:"③外資", role:"國際法人",
-     how:"外資持股比率的20日變化(單位:百分點 pp),在族群內排名;若整個族群變化都小於 ±0.3pp,視為無訊號、一律 0 分。本系統實證:外資動向適合「選族群」,在族群內分不出個股強弱,故權重僅 0.5。「修正日淨買」= 族群下跌日外資淨買的20日累計 ÷ 股本(下跌時有沒有人默默接貨),用於蓄勢判定與族群雷達。",
+     how:"外資持股比率的20日變化(單位:百分點 pp),在族群內排名;每檔原始變化若小於 ±0.3pp,視為雜訊並歸 0 分。排名分數只說明同業位置，原始值仍可能為負。本系統實證:外資動向較適合比較族群,在族群內分個股的權重僅 0.5。「修正日買賣」= 族群下跌日外資淨買賣的20日累計 ÷ 股本,用於蓄勢條件與族群概況。",
      src:"FinMind 外資持股(TaiwanStockShareholding)+ 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
     {k:"④投信", role:"本土法人",
-     how:"近5日投信淨買賣 ÷ 發行股數,在族群內排名;整個族群都在 ±0.03% 內時視為雜訊、一律 0 分。投信部位小、動作集中,對中小型股邊際影響大;歷史上在市場修正期參考價值較高(最新檢驗以週報為準)。",
+     how:"近5日投信淨買賣 ÷ 發行股數,在族群內排名;每檔原始變化若小於 ±0.03%,視為雜訊並歸 0 分。排名分數只說明同業位置，請同時閱讀原始值是淨買或淨賣。投信部位小、動作集中,歷史上在市場修正期參考價值較高(最新檢驗以週報為準)。",
      src:"FinMind 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
     {k:"⑤融資券", role:"散戶籌碼",
-     how:"看「價格 × 融資」的組合,而非融資單獨方向:價跌+融資減=籌碼洗清 +2(最佳)、價漲+融資增=散戶追高 −1、價跌+融資增=散戶接刀 −2(最差)。散戶水位(融資餘額÷股本)≥9% 時分數封頂 −1 並示警 ⚠——水位愈高,回檔時的停損賣壓愈重。",
+     how:"融資採固定門檻，看「價格方向 × 融資變化」組合:價跌且融資下降代表槓桿同步降低，給 +2；價漲且融資增加給 −1；價跌且融資明顯增加代表槓桿風險升高，給 −2。融資水位(餘額÷股本)≥9% 時分數封頂 −1 並示警 ⚠。",
      src:"FinMind 融資融券(TaiwanStockMarginPurchaseShortSale)"}
   ];
   var TIER_HOW = {
-    "真強":"升級條件:族群綜合分前2名、綜合≥2.5、價≥+1、且至少一項法人買超(外資/投信/逆勢 ≥+1)。",
-    "蓄勢·外資佈局":"條件:外資或逆勢買超 +2、距60日高 ≤−3%(價未動)、修正日抗跌 ≥0、綜合 ≥1.5。",
+    "真強":"升級條件:族群綜合分前2名、綜合≥2.5、價格相對分≥+1、且外資／投信／修正日買賣至少一項的相對分≥+1。相對分靠前不保證原始值為正。",
+    "蓄勢·外資佈局":"條件:外資或修正日買賣的族群相對分為 +2、距60日高 ≤−3%、修正日抗跌分 ≥0、綜合 ≥1.5；原始法人值請另看同一格。",
     "強但過熱":"條件:價 ≥+1 且出現過熱旗標(周轉率≥20% / 量比≥5 / 散戶水位≥9%)。主升段中曾為反指標——視為風險提示,非賣出訊號。",
-    "潛在/中性":"未觸發任何 tier 規則,族群內排名居中,持續觀察。◇蓄勢候補會標出「差哪些條件」。",
-    "真弱":"條件:族群綜合分倒數2名且<0,或綜合 ≤−3.5 → 汰弱優先名單。",
-    "真弱·陷阱":"條件:外資 ≤−1、融資 ≤−1、相對強弱 <0 —— 外資出、散戶接的出貨形態。",
+    "潛在/中性":"目前的分數組合未符合其他分層規則,持續觀察。◇蓄勢候補會標出「差哪些條件」。",
+    "真弱":"條件:族群綜合分倒數2名且<0,或綜合 ≤−3.5；表示目前落在相對弱勢層，不等同賣出指示。",
+    "真弱·陷阱":"條件:外資族群相對分 ≤−1、融資固定門檻分 ≤−1、相對強弱原始值 <0。這描述分數組合，不宣稱原始外資值一定為賣超。",
     "資料不足":"樣本不足,不給判定。"
   };
   // score -> glyph + class + label
@@ -590,14 +762,83 @@
   function chipColor(s){
     if(s>0) return "var(--health)"; if(s<0) return "var(--warn)"; return "var(--neutral)";
   }
-  // c = cell: [score, valueText, detail, reason, warn?]
+  // c = cell: [score,valueText,rows,relativeReading,warn,currentRawDirection,scoreBasis]
   var DATA = __DATA_JSON__;
 
   var GRP = __GRPMETA_JSON__;   // 族群名稱/標籤來自 config/groups.csv(build_dashboard 注入)
+  var OVERVIEW = __OVERVIEW_JSON__;
+  // 族群篩選使用 #g=... 保存可分享狀態；快速導覽若直接改 hash 會把篩選清掉。
+  // 改成就地捲動，同時也避免動態卡片插入後，首次以錨點開頁落在錯誤位置。
+  Array.prototype.forEach.call(document.querySelectorAll(".anchor-nav a[href^='#']"),function(a){
+    a.addEventListener("click",function(e){
+      var target=document.querySelector(a.getAttribute("href"));
+      if(!target)return;e.preventDefault();
+      target.scrollIntoView({behavior:"smooth",block:"start"});
+      target.setAttribute("tabindex","-1");target.focus({preventScroll:true});
+    });
+  });
+
+  (function(){
+    var title=document.getElementById("overviewTitle"), summary=document.getElementById("overviewSummary"),
+        points=document.getElementById("overviewPoints"), note=document.getElementById("overviewNote");
+    if(!title) return;
+    var o=OVERVIEW;
+    if(typeof o==="string") o={headline:o};
+    if(Array.isArray(o)) o={points:o};
+    o=o||{};
+    var overviewEl=document.getElementById("overview");if(overviewEl&&o.tone)overviewEl.dataset.tone=o.tone;
+    setText(title,o.headline||"先確認族群方向，再看個股的相對位置");
+    setText(summary,o.summary||"分數回答的是「和同族群相比位在哪裡」，不是明日漲跌預測。往下可同時查看原始方向、評分依據與已確認分層。");
+    (o.points||[]).forEach(function(p){
+      var card=document.createElement("div"); card.className="overview-point";
+      if(typeof p==="string") setText(card,p);
+      else {
+        if(p.label){var b=document.createElement("b");setText(b,p.label);card.appendChild(b);}
+        card.appendChild(document.createTextNode(p.text||p.value||""));
+      }
+      points.appendChild(card);
+    });
+    if(o.note){setText(note,o.note);note.hidden=false;}
+  })();
 
   // ---------- tooltip ----------
-  var tip = document.getElementById("tip");
+  var tip = document.getElementById("tip"), suppressFocusTip=false;
   function setText(node, t){ node.textContent = t == null ? "" : String(t); }
+  function revenueLabel(label){label=label==null?"":String(label);return label.indexOf("營收")===0?label:"營收 "+label;}
+  var GLOSSARY = {
+    "NRE":["一次性研發工程費，客戶為客製晶片設計階段支付的費用。","認列時點會使單月營收波動，不能直接當成量產需求。"],
+    "Tape-out":["晶片設計定稿並交由晶圓廠製作光罩、準備投片。","代表專案跨過重要里程碑，但仍不等於已量產或開始穩定獲利。"],
+    "ASIC":["為特定工作量身打造的客製晶片，和通用處理器不同。","專案生命週期、客戶集中度與量產時程會直接影響營收。"],
+    "CoWoS":["台積電的先進封裝平台，常用來整合 AI 運算晶片與高頻寬記憶體。","產能是否充足可能成為 AI 晶片出貨的瓶頸。"],
+    "CSP":["雲端服務供應商，例如提供大型資料中心與雲端運算的公司。","其資本支出常是伺服器、網通與 AI 供應鏈需求的重要來源。"],
+    "ODM":["原廠委託設計製造商，替品牌客戶設計並生產產品。","客戶組合、議價能力與訂單集中度會影響成長與毛利。"],
+    "CCL":["銅箔基板，是印刷電路板的核心上游材料。","原料價格、規格升級與產品組合會影響 PCB 供應鏈成本與毛利。"],
+    "YoY":["年增率：和去年同一期間相比，較能降低季節性的干擾。","仍可能受去年基期過高或過低影響，正負不等於營運必然轉強或轉弱。"],
+    "MoM":["月增率：和上一個月相比，反映很短期的變化。","工作天數、季節性與認列時點都可能造成跳動，需和 YoY 一起看。"],
+    "EPS":["每股盈餘：公司稅後獲利除以加權平均流通股數。","能比較每股賺多少，但可能受一次性損益或股本變化影響。"],
+    "毛利率":["營收扣除直接銷貨成本後的毛利，占營收的比例。","可觀察售價、成本與產品組合，但不等於最終淨利或現金流。"]
+  };
+  function appendGlossary(container, source){
+    var blob=""; try{blob=JSON.stringify(source)||"";}catch(e){return;}
+    var terms=Object.keys(GLOSSARY).filter(function(term){
+      if(/^[A-Za-z-]+$/.test(term)){
+        var safe=term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+        return new RegExp("(^|[^A-Za-z])"+safe+"(?=$|[^A-Za-z])","i").test(blob);
+      }
+      return blob.indexOf(term)!==-1;
+    });
+    if(!terms.length)return;
+    var box=document.createElement("details"); box.className="glossary";
+    var sm=document.createElement("summary"); setText(sm,"本文術語白話解釋（"+terms.length+"）"); box.appendChild(sm);
+    var dl=document.createElement("dl");
+    terms.forEach(function(term){
+      var dt=document.createElement("dt");setText(dt,term);dl.appendChild(dt);
+      var dd=document.createElement("dd");dd.appendChild(document.createTextNode(GLOSSARY[term][0]+" "));
+      var b=document.createElement("b");setText(b,"為何重要：");dd.appendChild(b);
+      dd.appendChild(document.createTextNode(GLOSSARY[term][1]));dl.appendChild(dd);
+    });
+    box.appendChild(dl);container.appendChild(box);
+  }
   function renderDetail(box, html){   // 建立詳情內容 → tooltip 與 bottom sheet 共用
     box.innerHTML = "";
     var head = document.createElement("div"); head.className="th";
@@ -635,6 +876,7 @@
     } else if(html.data){
       var d=document.createElement("div"); d.className="data"; setText(d, html.data); box.appendChild(d);
     }
+    appendGlossary(box,html);
     if(html.how || html.howLink){                // 評分依據(教學:分數與門檻怎麼來)——how 缺值時仍要顯示 howLink
       var hw=document.createElement("div"); hw.className="how";
       if(html.how){
@@ -644,7 +886,7 @@
       if(html.howLink){                          // 通用方法論不逐格重複寫,指到頁尾單一事實來源
         var jl=document.createElement("a"); jl.className="jump"; jl.href="#method";
         setText(jl, "→ "+html.howLink); hw.appendChild(jl);
-        jl.addEventListener("click", function(){ closeSheet(); }); // 只會在底部 sheet 出現;先關 sheet 才看得到跳轉目標
+        jl.addEventListener("click", function(){ closeSheet(false); }); // 跳到方法區時不把焦點拉回原觸發按鈕
       }
       box.appendChild(hw);
     }
@@ -654,15 +896,6 @@
       sr.appendChild(document.createTextNode(String(html.src)));
       box.appendChild(sr);
     }
-  }
-  function showTip(html, x, y){
-    // #tip 是 pointer-events:none 的浮動框(hover 顯示、游標一離開就消失),裡面放不了可點連結;
-    // howLink 只在點按開啟的底部 sheet(openSheet)有效,桌機版把它拿掉,改用純文字。payload() 每次
-    // 呼叫都回傳全新物件,直接改這份不影響其他地方。
-    html.howLink = null;
-    renderDetail(tip, html);
-    tip.classList.add("on"); tip.setAttribute("aria-hidden","false");
-    positionTip(x,y);
   }
   function positionTip(x,y){
     var pad=14, w=tip.offsetWidth, h=tip.offsetHeight;
@@ -679,21 +912,47 @@
     if(s>0) return "var(--strong-tint-2)"; if(s<0) return "var(--weak-tint-2)"; return "var(--neutral-tint)";
   }
 
+  function renderPreview(box, html){
+    box.innerHTML = "";
+    var head=document.createElement("div"); head.className="th";
+    var el=document.createElement("span"); el.className="el"; setText(el, html.el); head.appendChild(el);
+    var sc=document.createElement("span"); sc.className="sc"; setText(sc, html.scLabel);
+    sc.style.color=html.scColor; sc.style.background=html.scBg; head.appendChild(sc); box.appendChild(head);
+    var who=document.createElement("div"); who.className="who"; setText(who, html.who); box.appendChild(who);
+    var brief=document.createElement("div"); brief.className="preview-why";
+    var raw="";
+    if(html.rows && html.rows.length) raw=html.rows[0][0]+"："+html.rows[0][1]+"。";
+    var why=html.why == null ? "" : String(html.why);
+    if(why.length>105) why=why.slice(0,105)+"…";
+    setText(brief, raw+why); box.appendChild(brief);
+    var hint=document.createElement("div"); hint.className="preview-hint";
+    setText(hint,"點按開啟完整數據、算法與來源"); box.appendChild(hint);
+  }
+  function showTip(html, x, y){
+    renderPreview(tip, html);
+    tip.classList.add("on"); tip.setAttribute("aria-hidden","false");
+    positionTip(x,y);
+  }
+
   function attachTip(node, payload){
-    if(TOUCH){   // 觸控/無 hover 裝置:點一下開底部 sheet,不做浮動 tooltip
-      node.addEventListener("click", function(){ openSheet(payload()); });
+    node.setAttribute("aria-haspopup","dialog");
+    if(node.tagName!=="BUTTON" && node.tagName!=="A"){
+      node.tabIndex=0; node.setAttribute("role","button");
+      node.addEventListener("keydown",function(e){
+        if(e.key==="Enter" || e.key===" "){ e.preventDefault(); hideTip(); openSheet(payload(),null,node); }
+      });
+    }
+    if(TOUCH){
+      node.addEventListener("click", function(){ hideTip(); openSheet(payload(),null,node); });
       return;
     }
     var lastX=0,lastY=0;
     node.addEventListener("mouseenter", function(e){ lastX=e.clientX;lastY=e.clientY; showTip(payload(), lastX,lastY); });
     node.addEventListener("mousemove", function(e){ lastX=e.clientX;lastY=e.clientY; if(tip.classList.contains("on")) positionTip(lastX,lastY); });
     node.addEventListener("mouseleave", hideTip);
-    node.addEventListener("focus", function(){ var r=node.getBoundingClientRect(); showTip(payload(), r.left+r.width/2, r.top); });
+    node.addEventListener("focus", function(){ if(suppressFocusTip)return;var r=node.getBoundingClientRect(); showTip(payload(), r.left+r.width/2, r.top); });
     node.addEventListener("blur", hideTip);
-    node.addEventListener("click", function(e){ // 桌機 trackpad 點按也可切換
-      if(tip.classList.contains("on")) { hideTip(); }
-      else { showTip(payload(), e.clientX||node.getBoundingClientRect().left, e.clientY||node.getBoundingClientRect().top); }
-    });
+    node.addEventListener("click", function(){ hideTip(); openSheet(payload(),null,node); });
   }
 
   // ---------- bottom sheet(觸控裝置的詳情呈現) ----------
@@ -701,13 +960,19 @@
   var TOUCH = !!(window.matchMedia && window.matchMedia("(hover: none)").matches) || /[?&]touch=1\b/.test(location.search);
   var sheetWrap = document.getElementById("sheetWrap"),
       sheetEl   = document.getElementById("sheet"),
-      sheetBody = document.getElementById("sheetBody");
-  function openSheet(html, renderFn){
+      sheetBody = document.getElementById("sheetBody"),
+      sheetClose = document.getElementById("sheetClose"),
+      lastSheetFocus = null;
+  function openSheet(html, renderFn, trigger){
     if(!sheetWrap) return;
+    hideTip();
+    lastSheetFocus = trigger || document.activeElement;
     (renderFn || renderDetail)(sheetBody, html);
+    sheetEl.setAttribute("aria-label", (html.who||"詳情")+" — "+(html.el||html.label||"完整說明"));
     sheetEl.scrollTop = 0; sheetEl.style.transform = "";
     sheetWrap.classList.add("on"); sheetWrap.setAttribute("aria-hidden","false");
     document.body.style.overflow = "hidden";
+    window.requestAnimationFrame(function(){ if(sheetClose) sheetClose.focus(); });
   }
 
   // ---------- 質化筆記全文(點「筆記」badge 展開,借用同一個底部 sheet 殼) ----------
@@ -767,22 +1032,64 @@
       var fl=document.createElement("div"); fl.className="nb-flag";
       setText(fl, "筆記模板已改版,這篇還沒依新版重寫——內容仍可參考。"); box.appendChild(fl);
     }
-    (note.sections||[]).forEach(function(sec){
-      var h=document.createElement("h4"); h.className="nb-h"; setText(h, sec.h); box.appendChild(h);
-      renderNoteBlocks(box, sec.blocks);
+    if(note.summary){
+      var sum=document.createElement("div"); sum.className="nb-summary";
+      var stb=document.createElement("b"); setText(stb,"30 秒看懂這家公司"); sum.appendChild(stb);
+      if(typeof note.summary==="string") sum.appendChild(document.createTextNode(note.summary));
+      else if(Array.isArray(note.summary)){
+        if(note.summary.length && typeof note.summary[0]==="object" && "s" in note.summary[0]) renderRuns(sum,note.summary);
+        else sum.appendChild(document.createTextNode(note.summary.join("；")));
+      } else setText(sum, note.summary.text||note.summary.summary||"");
+      box.appendChild(sum);
+    }
+    appendGlossary(box,note);
+    var sections=note.sections||[];
+    if(sections.length){
+      var toc=document.createElement("nav"); toc.className="nb-toc"; toc.setAttribute("aria-label","筆記章節");
+      sections.forEach(function(sec,i){
+        var a=document.createElement("a"); a.href="#note-section-"+i; setText(a,sec.h||("第 "+(i+1)+" 節"));
+        a.addEventListener("click",function(e){
+          e.preventDefault(); var target=document.getElementById("note-section-"+i);
+          if(target){ target.open=true; target.scrollIntoView({behavior:"smooth",block:"start"}); }
+        });
+        toc.appendChild(a);
+      });
+      box.appendChild(toc);
+    }
+    sections.forEach(function(sec,i){
+      var part=document.createElement("details"); part.className="nb-section"; part.id="note-section-"+i;
+      if(i===0) part.open=true;
+      var h=document.createElement("summary"); setText(h, sec.h); part.appendChild(h);
+      var body=document.createElement("div"); body.className="nb-section-body"; renderNoteBlocks(body,sec.blocks); part.appendChild(body);
+      box.appendChild(part);
     });
     var link=document.createElement("a"); link.className="nb-src"; link.href=note.url; link.target="_blank"; link.rel="noopener";
     setText(link, "在 GitHub 開啟原始檔 ↗"); box.appendChild(link);
   }
-  function closeSheet(){
+  function closeSheet(restoreFocus){
     if(!sheetWrap || !sheetWrap.classList.contains("on")) return;
     sheetWrap.classList.remove("on"); sheetWrap.setAttribute("aria-hidden","true");
     sheetEl.style.transform = ""; document.body.style.overflow = "";
+    if(restoreFocus!==false && lastSheetFocus && typeof lastSheetFocus.focus==="function"){
+      var target=lastSheetFocus; window.setTimeout(function(){suppressFocusTip=true;target.focus({preventScroll:true});suppressFocusTip=false;},0);
+    }
+    lastSheetFocus=null;
   }
   if(sheetWrap){
     document.getElementById("sheetBackdrop").addEventListener("click", closeSheet);
     document.getElementById("sheetClose").addEventListener("click", closeSheet);
-    document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeSheet(); });
+    document.addEventListener("keydown", function(e){
+      if(!sheetWrap.classList.contains("on")) return;
+      if(e.key==="Escape"){ closeSheet(); return; }
+      if(e.key==="Tab"){
+        var focusable=Array.prototype.slice.call(sheetEl.querySelectorAll(
+          "button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex='-1'])"));
+        if(!focusable.length){ e.preventDefault(); return; }
+        var first=focusable[0], last=focusable[focusable.length-1];
+        if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+        else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+      }
+    });
     var sy=0, dy=0, drag=false;                          // 由頂端下滑關閉
     sheetEl.addEventListener("touchstart", function(e){
       if(sheetEl.scrollTop>0){ drag=false; return; } drag=true; sy=e.touches[0].clientY; dy=0;
@@ -812,8 +1119,8 @@
       r.appendChild(c);
     });
     var v=document.createElement("div"); v.className="hc";
-    var vt=document.createElement("span"); vt.className="t"; vt.textContent="綜合評級"; v.appendChild(vt);
-    var vs=document.createElement("span"); vs.textContent="五元素研判"; v.appendChild(vs);
+    var vt=document.createElement("span"); vt.className="t"; vt.textContent="已確認分層"; v.appendChild(vt);
+    var vs=document.createElement("span"); vs.textContent="三日平均 / 兩日確認"; v.appendChild(vs);
     r.appendChild(v);
     return r;
   }
@@ -831,8 +1138,9 @@
     if(row.biz){ var bz=document.createElement("span"); bz.className="code"; bz.textContent=row.biz; rl.appendChild(bz); }
     var badges=document.createElement("div"); badges.className="badges";
     if(row.risk && row.risk.length){
-      var rk=document.createElement("span"); rk.className="riskbadge";
+      var rk=document.createElement("button"); rk.type="button"; rk.className="riskbadge";
       rk.textContent = row.risk.some(function(x){ return x.kind==="處置"; }) ? "處置" : "注意";
+      rk.setAttribute("aria-label",rk.textContent+"股票，點擊查看交易所列管理由");
       badges.appendChild(rk);
       attachTip(rk, (function(row){ return function(){
         return { el:"處置/注意股票 · 觀察層(不計分)", who: row.nm+"("+row.id+")", biz: row.biz,
@@ -854,11 +1162,11 @@
         var pill = CHIP_PILL[row.chip.cls];
         return { el:"籌碼現況診斷 · 非排名/不計分", who: row.nm+"("+row.id+")", biz: row.biz,
           rows: row.chip.rows, why: row.chip.why, chipColors: true,
-          how: "只看外資/投信/融資券/大戶集中度/股東人數/借券賣出餘額,不含①價②量——跟左側 tier " +
+          how: "只看外資/投信/融資券/大戶集中度/股東人數/借券賣出餘額,不含①價②量——跟左側已確認分層 " +
                "是完全獨立的兩把尺。健康−警示≥2 且無官方警示→健康;≤−2 或有官方處置/注意→待觀察" +
                "(官方警示不計入信號數,一票否決);其餘中性。表中的正負號只表示原始數值方向," +
                "不等於好壞——例如融資、股東人數或借券下降會顯示負值,但依本欄規則可判為健康。" +
-               "純描述性,不是選股排名,不影響 composite 分數與 tier。",
+               "純描述性,不是選股排名,不影響綜合分數與已確認分層。",
           src: "外資/投信/融資券:FinMind;大戶集中度/股東人數:TDCC集保股權分散週快照;" +
                "借券賣出餘額:FinMind;處置/注意:TWSE/TPEx",
           scLabel: row.chip.label+" · 現況診斷", scColor: pill[0], scBg: pill[1] };
@@ -867,8 +1175,8 @@
     if(row.fund){
       var fb=document.createElement("button"); fb.type="button"; fb.tabIndex=0;
       fb.className="fundbadge "+row.fund.cls;
-      fb.textContent = row.fund.label;
-      fb.setAttribute("aria-label", "基本面參考:"+row.fund.label);
+      fb.textContent = revenueLabel(row.fund.label);
+      fb.setAttribute("aria-label", "月營收基本面參考:"+row.fund.label);
       badges.appendChild(fb);
       var FUND_COL = {up:["var(--strong)","var(--strong-tint)"], down:["var(--weak)","var(--weak-tint)"],
                        flat:["var(--neutral)","var(--neutral-tint)"]};
@@ -876,8 +1184,8 @@
         var col = FUND_COL[row.fund.cls];
         return { el:"基本面參考 · 觀察層(不計分)", who: row.nm+"("+row.id+")", biz: row.biz,
           rows: row.fund.rows, why: row.fund.why,
-          how: "月營收/季報由 fetch_financials.py 獨立排程抓取(月/季頻,非每日)——跟左側①~⑤" +
-               "五元素評分完全獨立、不進 daily_metrics/daily_scores,純參考,不影響 composite 分數與 tier。",
+          how: "月營收/季報由獨立排程抓取(月/季頻,非每日)——跟左側五個觀察面向" +
+               "完全獨立,純參考,不影響每日綜合分數與已確認分層。",
           src: "FinMind TaiwanStockMonthRevenue / TaiwanStockFinancialStatements",
           scLabel: row.fund.label, scColor: col[0], scBg: col[1] };
       };})(row));
@@ -895,7 +1203,7 @@
       nb.addEventListener("click", (function(row){ return function(){
         openSheet({ who: row.nm+"("+row.id+")", biz: row.biz, label: row.note.label,
           color: NOTE_COL[row.note.cls], updated: row.note.updated, next: row.note.next,
-          tmplOld: row.note.tmplOld, sections: row.note.sections, url: row.note.url }, renderNoteDetail);
+          tmplOld: row.note.tmplOld, summary: row.note.summary, sections: row.note.sections, url: row.note.url }, renderNoteDetail, nb);
       };})(row));
     }
     if(badges.children.length) rl.appendChild(badges);
@@ -903,13 +1211,15 @@
 
     row.cells.forEach(function(c,i){
       var s=c[0], val=c[1], rows=c[2], reason=c[3], warn=c[4];
+      var rawDirection=c[5]||val;
+      var scoreBasis=c[6]||((i===1||i===4)?"固定門檻判定":"族群相對位置："+sinfo(s).l);
       var info=sinfo(s);
-      var cell=document.createElement("div"); cell.className="cell "+info.c+(warn?" warn":"");
-      cell.tabIndex=0; cell.setAttribute("role","button");
-      cell.setAttribute("aria-label", row.nm+" "+EL[i].k+" "+info.l+" "+val);
+      var cell=document.createElement("button"); cell.type="button"; cell.className="cell "+info.c+(warn?" warn":"");
+      cell.setAttribute("aria-label", row.nm+" "+EL[i].k+"，原始狀態 "+rawDirection+"，評分依據 "+scoreBasis+"，得分 "+s);
       if(warn){ var fl=document.createElement("span"); fl.className="flag"; fl.textContent="⚠"; cell.appendChild(fl); }
-      var g=document.createElement("span"); g.className="g"; g.textContent=info.g; cell.appendChild(g);
-      var v=document.createElement("span"); v.className="v mono"; v.textContent=val; cell.appendChild(v);
+      var g=document.createElement("span"); g.className="g"; g.textContent=info.g+" "+(s>0?"+":"")+s; cell.appendChild(g);
+      var v=document.createElement("span"); v.className="v"; v.textContent=rawDirection; cell.appendChild(v);
+      var basis=document.createElement("span"); basis.className="basis"; basis.textContent=scoreBasis; cell.appendChild(basis);
       attachTip(cell, (function(row,i,s,rows,reason,info){ return function(){
         return { el: EL[i].k+" · "+EL[i].role, who: row.nm+"("+row.id+")", biz: row.biz,
           rows: rows, why: reason, how: EL[i].how, src: EL[i].src,
@@ -920,25 +1230,135 @@
 
     // verdict
     var vc=document.createElement("div"); vc.className="vc";
-    var vd=document.createElement("div"); vd.className="verdict"; vd.tabIndex=0; vd.setAttribute("role","button");
+    var vd=document.createElement("button"); vd.type="button"; vd.className="verdict";
+    var confirmedLabel=row.tier_label||row.vdisplay||row.vlabel||"資料不足";
+    var rawLabel=row.tier_raw_label||row.vrawdisplay||confirmedLabel;
+    var waiting=typeof row.tier_waiting==="boolean"?row.tier_waiting:!!row.vchanging;
+    var confirmedKey=row.tier_confirmed||row.vkey||row.tier||confirmedLabel;
     vd.style.setProperty("--vt", tintBg(row.vt));
     vd.style.setProperty("--vl", scColor(row.vt));
-    vd.setAttribute("aria-label", row.nm+" 綜評 "+row.vlabel);
+    vd.setAttribute("aria-label", row.nm+" 已確認分層 "+confirmedLabel+(waiting?"，今日初判 "+rawLabel+"，等待第二日確認":""));
+    var kick=document.createElement("div"); kick.className="kicker"; kick.textContent="已確認分層"; vd.appendChild(kick);
     var vv=document.createElement("div"); vv.className="vv";
     if(row.warn){ var w=document.createElement("span"); w.textContent="⚠"; w.style.color="var(--warn)"; vv.appendChild(w); }
-    var vtx=document.createElement("span"); vtx.textContent=row.vlabel; vv.appendChild(vtx);
+    var vtx=document.createElement("span"); vtx.textContent=confirmedLabel; vv.appendChild(vtx);
     vd.appendChild(vv);
     var vs=document.createElement("div"); vs.className="vs"; vs.textContent=row.vsub; vd.appendChild(vs);
+    if(waiting){
+      var pending=document.createElement("div"); pending.className="pending";
+      pending.textContent="今日初判 1/2："+rawLabel+"（尚未轉層）"; vd.appendChild(pending);
+    }
     attachTip(vd, (function(row){ return function(){
-      return { el:"綜合評級 · 五元素研判", who: row.nm+"("+row.id+")", biz: row.biz,
+      var confirmedLabel=row.tier_label||row.vdisplay||row.vlabel||"資料不足";
+      var rawLabel=row.tier_raw_label||row.vrawdisplay||confirmedLabel;
+      var waiting=typeof row.tier_waiting==="boolean"?row.tier_waiting:!!row.vchanging;
+      var confirmedKey=row.tier_confirmed||row.vkey||row.tier||confirmedLabel;
+      return { el:"已確認分層 · 五個觀察面向", who: row.nm+"("+row.id+")", biz: row.biz,
         rows: row.vrows, why: row.vr,
-        how: TIER_HOW[row.vlabel]||"",           // 只留「這檔為什麼是這個tier」;通用公式/權重不再逐格重複
+        how: (waiting?"今日初判為「"+rawLabel+"」，目前是第 1/2 日，連續兩日相同才會正式轉層。":"")+
+             (TIER_HOW[confirmedKey]||TIER_HOW[confirmedLabel]||""),
         howLink: "完整公式與權重依據見頁尾「方法與資料」",
         src: "由本列五格元素分數加權合成;各元素的原始資料來源見左側各格",
-        scLabel: row.vlabel+(row.warn?" ⚠":""), scColor: scColor(row.vt), scBg: tintBg(row.vt) };
+        scLabel: confirmedLabel+(row.warn?" ⚠":""), scColor: scColor(row.vt), scBg: tintBg(row.vt) };
     };})(row));
     vc.appendChild(vd); r.appendChild(vc);
     return r;
+  }
+
+  var mobileStocks=document.getElementById("mobileStocks"), mobileGroupOrder=[], mobileRowsByGroup={};
+  function mobileBadges(row){
+    var host=document.createElement("div"); host.className="mobile-badges";
+    if(row.risk && row.risk.length){
+      var risk=document.createElement("button"); risk.type="button"; risk.className="riskbadge";
+      risk.textContent=row.risk.some(function(x){return x.kind==="處置";})?"處置":"注意";
+      attachTip(risk,(function(row){return function(){return {
+        el:"處置/注意股票 · 觀察資訊（不計分）",who:row.nm+"("+row.id+")",biz:row.biz,
+        rows:row.risk.map(function(x){return [x.kind,x.period||"",x.reason||""];}),
+        why:"交易所依異常價量門檻列管，僅供風險提醒，不影響五個觀察面向與已確認分層。",
+        how:"列管不等於基本面變差，常見於短線交易過熱。",src:"TWSE / TPEx 官方公告",
+        scLabel:"⚠ 列管中",scColor:"var(--strong)",scBg:"var(--strong-tint)"};};})(row));
+      host.appendChild(risk);
+    }
+    if(row.chip){
+      var chip=document.createElement("button"); chip.type="button"; chip.className="toggle";
+      chip.textContent="籌碼："+row.chip.label;
+      var pill={health:["var(--health)","var(--health-tint)"],neutral:["var(--neutral)","var(--neutral-tint)"],
+                warn:["var(--warn)","var(--warn-bg)"]}[row.chip.cls]||["var(--neutral)","var(--neutral-tint)"];
+      attachTip(chip,(function(row,pill){return function(){return {
+        el:"籌碼現況診斷 · 非排名／不計分",who:row.nm+"("+row.id+")",biz:row.biz,rows:row.chip.rows,
+        why:row.chip.why,chipColors:true,how:"原始正負號只表示數值方向，不直接等於好壞；例如融資下降是負值，但代表去槓桿。",
+        src:"FinMind、TDCC、TWSE／TPEx",scLabel:row.chip.label+" · 現況診斷",scColor:pill[0],scBg:pill[1]};};})(row,pill));
+      host.appendChild(chip);
+    }
+    if(row.fund){
+      var fund=document.createElement("button"); fund.type="button"; fund.className="fundbadge "+row.fund.cls;
+      fund.textContent=revenueLabel(row.fund.label);
+      var fcol={up:["var(--strong)","var(--strong-tint)"],down:["var(--weak)","var(--weak-tint)"],
+                flat:["var(--neutral)","var(--neutral-tint)"]}[row.fund.cls]||["var(--neutral)","var(--neutral-tint)"];
+      attachTip(fund,(function(row,fcol){return function(){return {
+        el:"月營收與財報參考 · 觀察資訊（不計分）",who:row.nm+"("+row.id+")",biz:row.biz,rows:row.fund.rows,
+        why:row.fund.why,how:"月營收與季報更新頻率不同，只做基本面脈絡參考，不影響每日分數。",
+        src:"FinMind TaiwanStockMonthRevenue / TaiwanStockFinancialStatements",scLabel:revenueLabel(row.fund.label),
+        scColor:fcol[0],scBg:fcol[1]};};})(row,fcol));
+      host.appendChild(fund);
+    }
+    if(row.note){
+      var note=document.createElement("button"); note.type="button"; note.className="toggle"; note.textContent="📝 研究筆記";
+      var ncol={fresh:["var(--muted)","var(--neutral-tint)"],draft:["var(--muted)","var(--neutral-tint)"],
+                due:["var(--warn-line)","var(--warn-bg)"]}[row.note.cls]||["var(--muted)","var(--neutral-tint)"];
+      note.addEventListener("click",(function(row,ncol,note){return function(){
+        openSheet({who:row.nm+"("+row.id+")",biz:row.biz,label:row.note.label,color:ncol,updated:row.note.updated,
+          next:row.note.next,tmplOld:row.note.tmplOld,summary:row.note.summary,sections:row.note.sections,url:row.note.url},
+          renderNoteDetail,note);
+      };})(row,ncol,note));
+      host.appendChild(note);
+    }
+    if(!host.children.length){ var none=document.createElement("span"); none.className="mcount"; none.textContent="目前沒有額外觀察標記"; host.appendChild(none); }
+    return host;
+  }
+  function mobileStockCard(row){
+    var card=document.createElement("details"); card.className="mobile-card"; card.dataset.g=row.g; card.dataset.id=row.id;
+    var confirmedLabel=row.tier_label||row.vdisplay||row.vlabel||"資料不足";
+    var rawLabel=row.tier_raw_label||row.vrawdisplay||confirmedLabel;
+    var waiting=typeof row.tier_waiting==="boolean"?row.tier_waiting:!!row.vchanging;
+    var summary=document.createElement("summary");
+    var title=document.createElement("span"); title.className="mobile-title"; title.textContent=row.nm;
+    var meta=document.createElement("span"); meta.className="mobile-meta mono";
+    meta.textContent=row.id+" · "+((GRP[row.g]&&GRP[row.g].nm)||row.g); title.appendChild(meta); summary.appendChild(title);
+    var tier=document.createElement("span"); tier.className="mobile-tier"; tier.style.setProperty("--tc",scColor(row.vt));
+    tier.appendChild(document.createTextNode(confirmedLabel));
+    var small=document.createElement("small"); small.textContent=waiting?("今日初判 1/2："+rawLabel):"已確認分層"; tier.appendChild(small);
+    summary.appendChild(tier); card.appendChild(summary);
+    var body=document.createElement("div"); body.className="mobile-body"; body.appendChild(mobileBadges(row));
+    var metrics=document.createElement("div"); metrics.className="mobile-metrics";
+    row.cells.forEach(function(c,i){
+      var info=sinfo(c[0]), raw=c[5]||c[1], basis=c[6]||((i===1||i===4)?"固定門檻判定":"族群相對位置："+info.l);
+      var btn=document.createElement("button"); btn.type="button"; btn.className="mmetric "+info.c;
+      btn.style.setProperty("--mc",scColor(c[0]));
+      var label=document.createElement("span"); label.className="mlabel"; label.textContent=EL[i].k; btn.appendChild(label);
+      var rv=document.createElement("span"); rv.className="mraw"; rv.textContent=raw; btn.appendChild(rv);
+      var score=document.createElement("span"); score.className="mscore"; score.textContent=info.g+" "+(c[0]>0?"+":"")+c[0]; btn.appendChild(score);
+      var bs=document.createElement("span"); bs.className="mbasis"; bs.textContent=basis; btn.appendChild(bs);
+      btn.setAttribute("aria-label",row.nm+" "+EL[i].k+"，原始狀態 "+raw+"，"+basis+"，得分 "+c[0]);
+      attachTip(btn,(function(row,i,c,info){return function(){return {
+        el:EL[i].k+" · "+EL[i].role,who:row.nm+"("+row.id+")",biz:row.biz,rows:c[2],why:c[3],how:EL[i].how,src:EL[i].src,
+        scLabel:info.l+(c[4]?" ⚠":""),scColor:scColor(c[0]),scBg:tintBg(c[0])};};})(row,i,c,info));
+      metrics.appendChild(btn);
+    });
+    body.appendChild(metrics);
+    var vd=document.createElement("button"); vd.type="button"; vd.className="verdict mobile-verdict";
+    vd.style.setProperty("--vt",tintBg(row.vt)); vd.style.setProperty("--vl",scColor(row.vt));
+    var kicker=document.createElement("div"); kicker.className="kicker"; kicker.textContent="已確認分層"; vd.appendChild(kicker);
+    var vv=document.createElement("div"); vv.className="vv"; vv.textContent=confirmedLabel; vd.appendChild(vv);
+    var sub=document.createElement("div"); sub.className="vs"; sub.textContent=row.vsub||"點按查看今日分數、三日平均與確認規則"; vd.appendChild(sub);
+    if(waiting){var pend=document.createElement("div");pend.className="pending";pend.textContent="今日初判 1/2："+rawLabel+"（尚未轉層）";vd.appendChild(pend);}
+    attachTip(vd,(function(row,confirmedLabel,rawLabel,waiting){return function(){
+      var key=row.tier_confirmed||row.vkey||row.tier||confirmedLabel; return {el:"已確認分層 · 五個觀察面向",who:row.nm+"("+row.id+")",
+        biz:row.biz,rows:row.vrows,why:row.vr,how:(waiting?"今日初判為「"+rawLabel+"」，目前第 1/2 日。":"")+
+        (TIER_HOW[key]||TIER_HOW[confirmedLabel]||""),howLink:"完整公式與權重依據見頁尾「方法與資料」",
+        src:"由各指標分數加權，取近三日平均，再以連續兩日確認分層",scLabel:confirmedLabel,
+        scColor:scColor(row.vt),scBg:tintBg(row.vt)};};})(row,confirmedLabel,rawLabel,waiting));
+    body.appendChild(vd); card.appendChild(body); return card;
   }
 
   matrix.appendChild(headRow());
@@ -946,6 +1366,10 @@
   DATA.forEach(function(row){
     if(row.g!==curG){ matrix.appendChild(groupHead(row.g)); curG=row.g; }
     matrix.appendChild(stockRow(row));
+    if(mobileStocks){
+      if(!mobileRowsByGroup[row.g]){mobileRowsByGroup[row.g]=[];mobileGroupOrder.push(row.g);}
+      var card=mobileStockCard(row); mobileRowsByGroup[row.g].push(card); mobileStocks.appendChild(card);
+    }
   });
 
   // ---------- 五元素明細:搜尋(股號/名稱)+ 族群內排序切換 ----------
@@ -957,6 +1381,7 @@
     if(!input) return;
     var rows = Array.prototype.slice.call(matrix.querySelectorAll(".row[data-g]"));
     var heads = Array.prototype.slice.call(matrix.querySelectorAll(".grp[data-g]"));
+    var mobileCards = mobileStocks ? Array.prototype.slice.call(mobileStocks.querySelectorAll(".mobile-card[data-g]")) : [];
     function norm(s){ return (s||"").toLowerCase(); }
     function apply(){
       var q = norm(input.value.trim());
@@ -967,6 +1392,11 @@
                         || norm(codeEl && codeEl.textContent).indexOf(q) !== -1;
         r.classList.toggle("search-hide", !match);
         if(match){ shownTotal++; byGroup[r.dataset.g] = true; }
+      });
+      mobileCards.forEach(function(card){
+        var id=card.dataset.id||"", nm=card.querySelector(".mobile-title");
+        var match=!q || norm(id).indexOf(q)!==-1 || norm(nm&&nm.firstChild&&nm.firstChild.nodeValue).indexOf(q)!==-1;
+        card.classList.toggle("search-hide",!match);
       });
       heads.forEach(function(h){ h.classList.toggle("search-hide", !byGroup[h.dataset.g]); });
       countEl.textContent = q ? (shownTotal + " 檔符合") : "";
@@ -997,12 +1427,114 @@
         (ascending ? b.rows.slice().reverse() : b.rows).forEach(function(r){ frag.appendChild(r); });
       });
       matrix.appendChild(frag);
+      if(mobileStocks){
+        var mobileFrag=document.createDocumentFragment();
+        mobileGroupOrder.forEach(function(g){
+          (ascending?mobileRowsByGroup[g].slice().reverse():mobileRowsByGroup[g]).forEach(function(card){mobileFrag.appendChild(card);});
+        });
+        mobileStocks.appendChild(mobileFrag);
+      }
     });
   })();
 
   // ---------- group radar ----------
   var GROUPS = __GROUPS_JSON__;
   var GROUP_HOW = __GROUP_HOW_JSON__;   // 狀態判定規則+資料來源(門檻值由 build 注入,單一事實來源)
+  (function(){
+    var svg=document.getElementById("groupMap"), shell=document.getElementById("groupMapShell");
+    if(!svg) return;
+    var items=GROUPS.filter(function(g){
+      return g.axis && isFinite(Number(g.axis.price)) && isFinite(Number(g.axis.dip));
+    });
+    if(!items.length){if(shell)shell.hidden=true;return;}
+    var NS="http://www.w3.org/2000/svg";
+    function node(tag,attrs,textValue){
+      var n=document.createElementNS(NS,tag);
+      Object.keys(attrs||{}).forEach(function(k){n.setAttribute(k,attrs[k]);});
+      if(textValue!=null)n.textContent=textValue; return n;
+    }
+    function add(tag,attrs,textValue,parent){var n=node(tag,attrs,textValue);(parent||svg).appendChild(n);return n;}
+    function n(v,fallback){v=Number(v);return isFinite(v)?v:fallback;}
+    function signed(z,digits){return (z>0?"+":"")+z.toFixed(digits)+"%";}
+    function pricePct(v){return signed(n(v,0)*100,1);}
+    function dipPct(v){var z=n(v,0);return signed(z,Math.abs(z)<0.1?2:1);}
+    var xs=[],ys=[];
+    items.forEach(function(g){xs.push(Math.abs(n(g.axis.price,0)),Math.abs(n(g.axis.price5,n(g.axis.price,0))));
+      ys.push(Math.abs(n(g.axis.dip,0)),Math.abs(n(g.axis.dip5,n(g.axis.dip,0))));});
+    var xmax=Math.max.apply(null,xs.concat([.0001]))*1.18, ymax=Math.max.apply(null,ys.concat([.0001]))*1.18;
+    var L=62,R=470,T=48,B=382,CX=(L+R)/2,CY=(T+B)/2;
+    function sx(v){return CX+n(v,0)/xmax*(R-L)/2;}
+    function sy(v){return CY-n(v,0)/ymax*(B-T)/2;}
+    svg.innerHTML="";
+    add("title",{id:"groupMapTitle"},"族群價格動能與修正日外資買賣四象限");
+    add("desc",{id:"groupMapDesc"},"橫軸越右代表二十日動能跑贏全體，縱軸越上代表修正日外資買賣中位數。每一條灰線從五個交易日前指向現在。下方卡片提供相同資訊的文字版本。");
+    add("rect",{x:CX,y:T,width:R-CX,height:CY-T,fill:"var(--health-tint)",opacity:".45"});
+    add("rect",{x:L,y:T,width:CX-L,height:CY-T,fill:"var(--neutral-tint)"});
+    add("rect",{x:CX,y:CY,width:R-CX,height:B-CY,fill:"var(--warn-bg)",opacity:".35"});
+    add("rect",{x:L,y:CY,width:CX-L,height:B-CY,fill:"var(--weak-tint)",opacity:".35"});
+    add("line",{x1:L,y1:CY,x2:R,y2:CY,stroke:"var(--hairline)","stroke-width":"2"});
+    add("line",{x1:CX,y1:T,x2:CX,y2:B,stroke:"var(--hairline)","stroke-width":"2"});
+    add("text",{x:R,y:B+30,"text-anchor":"end",class:"axis-label"},"20日動能跑贏全體 →");
+    add("text",{x:L,y:B+30,"text-anchor":"start",class:"axis-label"},"← 20日動能跑輸全體");
+    add("text",{x:CX,y:T-18,"text-anchor":"middle",class:"axis-label"},"修正日淨買 ↑");
+    add("text",{x:CX,y:B+14,"text-anchor":"middle",class:"axis-label"},"淨賣 ↓");
+    add("text",{x:R-8,y:T+17,"text-anchor":"end",class:"q-label"},"價格強＋籌碼正向");
+    add("text",{x:L+8,y:T+17,class:"q-label"},"價格弱＋籌碼先行");
+    add("text",{x:R-8,y:B-10,"text-anchor":"end",class:"q-label"},"價格強＋籌碼退潮");
+    add("text",{x:L+8,y:B-10,class:"q-label"},"價籌皆弱");
+    var mapLabels=[], mapPoints=items.map(function(g){
+      return {g:g,x:sx(g.axis.price),y:sy(g.axis.dip),x0:sx(n(g.axis.price5,g.axis.price)),y0:sy(n(g.axis.dip5,g.axis.dip))};
+    });
+    mapPoints.forEach(function(p){
+      var g=p.g,x=p.x,y=p.y,x0=p.x0,y0=p.y0;
+      var group=add("g",{class:"map-group",tabindex:"0","data-g":g.g,role:"img",
+        "aria-label":g.nm+"：20日動能相對全體 "+pricePct(g.axis.price)+"，修正日外資買賣中位數 "+dipPct(g.axis.dip)+"股本；灰線起點是五個交易日前"});
+      add("title",{},g.nm+"，目前價格軸 "+pricePct(g.axis.price)+"，籌碼軸 "+dipPct(g.axis.dip)+"股本",group);
+      add("line",{x1:x0,y1:y0,x2:x,y2:y,class:"trail"},null,group);
+      add("circle",{cx:x0,cy:y0,r:"2.5",fill:"var(--muted)",opacity:".7"},null,group);
+      add("circle",{cx:x,cy:y,r:"6",fill:g.col||"var(--health)",class:"endpoint"},null,group);
+      var label=(GRP[g.g]&&(GRP[g.g].short||GRP[g.g].nm))||g.nm;
+      var textNode=add("text",{x:x,y:y-14,"text-anchor":"middle",fill:g.col||"var(--ink)",class:"group-label"},label,group);
+      mapLabels.push({text:textNode,x:x,y:y,label:label});
+    });
+    // 族群位置可能集中在零線附近。用實際 SVG 文字框逐一挑選周邊候選位置，
+    // 避開已放置的標籤和其他終點；資料每日改變時也不需手工指定 offset。
+    function overlapArea(a,b){
+      var w=Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x));
+      var h=Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y));
+      return w*h;
+    }
+    var placed=[];
+    mapLabels.sort(function(a,b){return a.y-b.y||a.x-b.x;}).forEach(function(item){
+      var side=item.x<CX?-1:1, sideAnchor=side>0?"start":"end", otherAnchor=side>0?"end":"start";
+      var candidates=[
+        {dx:side*12,dy:-13,a:sideAnchor},{dx:side*12,dy:18,a:sideAnchor},
+        {dx:-side*12,dy:-13,a:otherAnchor},{dx:-side*12,dy:18,a:otherAnchor},
+        {dx:0,dy:-24,a:"middle"},{dx:0,dy:31,a:"middle"},
+        {dx:side*28,dy:-28,a:sideAnchor},{dx:side*28,dy:34,a:sideAnchor}
+      ];
+      var best=null,bestScore=Infinity;
+      candidates.forEach(function(c){
+        item.text.setAttribute("x",item.x+c.dx);
+        item.text.setAttribute("y",Math.max(T+31,Math.min(B-25,item.y+c.dy)));
+        item.text.setAttribute("text-anchor",c.a);
+        var bb=item.text.getBBox(), padded={x:bb.x-4,y:bb.y-3,width:bb.width+8,height:bb.height+6};
+        var boundary=Math.max(0,L-padded.x)+Math.max(0,padded.x+padded.width-R)+
+                     Math.max(0,T+23-padded.y)+Math.max(0,padded.y+padded.height-(B-18));
+        var labelOverlap=placed.reduce(function(sum,b){return sum+overlapArea(padded,b);},0);
+        var pointOverlap=mapLabels.reduce(function(sum,p){
+          if(p===item)return sum;
+          return sum+overlapArea(padded,{x:p.x-9,y:p.y-9,width:18,height:18});
+        },0);
+        var score=boundary*1000+labelOverlap*100+pointOverlap*20+Math.abs(c.dx)+Math.abs(c.dy)*.25;
+        if(score<bestScore){bestScore=score;best={c:c,y:Number(item.text.getAttribute("y")),box:padded};}
+      });
+      item.text.setAttribute("x",item.x+best.c.dx);
+      item.text.setAttribute("y",best.y);
+      item.text.setAttribute("text-anchor",best.c.a);
+      placed.push(best.box);
+    });
+  })();
   (function(){
     var host = document.getElementById("groups");
     if(!host) return;
@@ -1027,17 +1559,20 @@
       var nt = document.createElement("div"); nt.className = "td"; nt.textContent = g.note; el.appendChild(nt);
       var picks = document.createElement("div"); picks.className = "picks";
       g.stats.forEach(function(s){
-        var p = document.createElement("div"); p.className = "pick";
+        var p = document.createElement("div"); p.className = "pick stat";
         var lab = document.createElement("span"); lab.className = "code"; lab.style.flex = "1"; lab.textContent = s[0];
         var val = document.createElement("span"); val.className = "nm mono"; val.textContent = s[1];
-        p.appendChild(lab); p.appendChild(val); picks.appendChild(p);
+        p.appendChild(lab); p.appendChild(val);
+        if(s[3]){var change=document.createElement("span");change.className="change";change.textContent=s[3];p.appendChild(change);}
+        picks.appendChild(p);
       });
       el.appendChild(picks);
       if(g.chip){                // 籌碼健康度彙總(觀察層):族群內幾檔健康/中性/待觀察,一眼看整體體質
         var CHIP_DOT = {health:"var(--health)", neutral:"var(--neutral)", warn:"var(--warn-line)"};
         var cp = document.createElement("div"); cp.className = "pick";
         var clab = document.createElement("span"); clab.className = "code"; clab.style.flex = "1";
-        clab.textContent = "籌碼健康(" + (g.chip.dots.length) + "檔)";
+        var chipN=(Number(g.chip.health)||0)+(Number(g.chip.neutral)||0)+(Number(g.chip.warn)||0);
+        clab.textContent = "籌碼現況(" + chipN + "檔)";
         var cval = document.createElement("span"); cval.className = "nm mono";
         // 標籤縮成單字(健/中/待)——色彩已經跟下方圓點對應,文字只需要當作色塊的輔助辨識,
         // 不必重複寫全名,避免把左側「籌碼健康(N檔)」擠成兩行
@@ -1048,18 +1583,20 @@
             if(i < 2) cval.appendChild(document.createTextNode("·"));
           });
         cp.appendChild(clab); cp.appendChild(cval); picks.appendChild(cp);
-        var strip = document.createElement("div"); strip.className = "dotstrip";
-        g.chip.dots.forEach(function(cls){
-          var dt = document.createElement("span"); dt.style.background = CHIP_DOT[cls]; strip.appendChild(dt);
+        var strip = document.createElement("div"); strip.className = "chipbar"; strip.setAttribute("role","img");
+        strip.setAttribute("aria-label","籌碼現況：健康 "+g.chip.health+" 檔，中性 "+g.chip.neutral+" 檔，待觀察 "+g.chip.warn+" 檔");
+        [["health",g.chip.health],["neutral",g.chip.neutral],["warn",g.chip.warn]].forEach(function(seg){
+          if(!seg[1])return;var part=document.createElement("span");part.style.background=CHIP_DOT[seg[0]];
+          part.style.flex=String(seg[1])+" 0 0";part.title=seg[1]+" 檔";strip.appendChild(part);
         });
         picks.appendChild(strip);
       }
       host.appendChild(el);
       el.tabIndex = 0; el.style.cursor = "help";   // 與五元素格同一套詳情:狀態怎麼判、欄位是什麼
       attachTip(el, function(){
-        return {el: "族群雷達", scLabel: g.state, scColor: g.col, scBg: "var(--neutral-tint)",
+        return {el: "族群價格與籌碼概況", scLabel: g.state, scColor: g.col, scBg: "var(--neutral-tint)",
                 who: g.nm, biz: (GRP[g.g] && GRP[g.g].tag) || "",
-                rows: g.stats.concat(g.dur ? [["狀態持續", g.dur,
+                rows: g.stats.map(function(s){return [s[0],s[1],[s[2],s[3]].filter(Boolean).join("；")];}).concat(g.dur ? [["狀態持續", g.dur,
                   "連續判為同一狀態的交易日數——剛轉=新訊號、持續多日=趨勢確立"]] : []),
                 why: g.note, how: GROUP_HOW.how, src: GROUP_HOW.src};
       });
@@ -1077,7 +1614,20 @@
 
   // ---------- tiers summary ----------
   var TIERS = __TIERS_JSON__;
-    var byId={}; DATA.forEach(function(d){byId[d.id]=d;});
+  var TIER_PREVIEW=6;
+  function refreshTierPreview(card){
+    var picks=Array.prototype.slice.call(card.querySelectorAll(".pick"));
+    var available=picks.filter(function(p){return p.style.display!=="none";});
+    available.forEach(function(p,i){p.classList.toggle("tier-extra",i>=TIER_PREVIEW);});
+    var btn=card.querySelector(".tier-expand");
+    if(!btn)return;
+    if(available.length<=TIER_PREVIEW){btn.style.display="none";card.classList.remove("expanded");return;}
+    btn.style.display="";
+    var expanded=card.classList.contains("expanded");
+    btn.setAttribute("aria-expanded",expanded?"true":"false");
+    btn.textContent=expanded?"收合為前 "+TIER_PREVIEW+" 檔":"顯示全部 "+available.length+" 檔";
+  }
+  var byId={}; DATA.forEach(function(d){byId[d.id]=d;});
   var tiers=document.getElementById("tiers");
   TIERS.forEach(function(T){
     var el=document.createElement("div"); el.className="tier"; el.style.setProperty("--tc",T.col);
@@ -1095,8 +1645,9 @@
       var nm=document.createElement("span"); nm.className="nm"; nm.textContent=d.nm; p.appendChild(nm);
       var code=document.createElement("span"); code.className="code mono"; code.textContent=id; p.appendChild(code);
       if(d.risk && d.risk.length){
-        var rk=document.createElement("span"); rk.className="riskbadge sm";
+        var rk=document.createElement("button"); rk.type="button"; rk.className="riskbadge sm";
         rk.textContent = d.risk.some(function(x){ return x.kind==="處置"; }) ? "處置" : "注意";
+        rk.setAttribute("aria-label",d.nm+" "+rk.textContent+"股票，點擊查看列管理由");
         p.appendChild(rk);
         attachTip(rk, (function(d){ return function(){
           return { el:"處置/注意股票 · 觀察層(不計分)", who: d.nm+"("+id+")", biz: d.biz,
@@ -1114,7 +1665,13 @@
       }
       picks.appendChild(p);
     });
-    el.appendChild(picks); tiers.appendChild(el);
+    el.appendChild(picks);
+    if(T.ids.length>TIER_PREVIEW){
+      var more=document.createElement("button");more.type="button";more.className="tier-expand";
+      more.addEventListener("click",function(){el.classList.toggle("expanded");refreshTierPreview(el);});
+      el.appendChild(more);
+    }
+    tiers.appendChild(el);refreshTierPreview(el);
   });
 
   // ---------- 方法區:權重 chips + 評級規則(單一事實來源:WEIGHTS 注入自 score.py、規則共用 TIER_HOW) ----------
@@ -1123,7 +1680,7 @@
     var host = document.getElementById("wchips");
     if(!host || !WEIGHTS) return;
     [["price","①相對強弱"],["resil","①抗跌"],["trust","④投信"],["foreign","③外資"],
-     ["margin","⑤融資券"],["vol","②量"],["dip","③逆勢買超"]].forEach(function(p){
+     ["margin","⑤融資券"],["vol","②量"],["dip","③修正日買賣"]].forEach(function(p){
       var c = document.createElement("span"); c.className = "wchip";
       c.appendChild(document.createTextNode(p[1] + " "));
       var b = document.createElement("b"); b.textContent = "×" + WEIGHTS[p[0]]; c.appendChild(b);
@@ -1216,6 +1773,11 @@
       Array.prototype.forEach.call(matrix.querySelectorAll("[data-g]"), function(n){
         n.style.display = visible(n.dataset.g) ? "" : "none";
       });
+      if(mobileStocks){
+        Array.prototype.forEach.call(mobileStocks.querySelectorAll("[data-g]"),function(n){
+          n.style.display=visible(n.dataset.g)?"":"none";
+        });
+      }
       // 族群雷達:只留選中族群的卡片
       if(groupsHost){
         Array.prototype.forEach.call(groupsHost.querySelectorAll("[data-g]"), function(n){
@@ -1224,12 +1786,20 @@
         // 篩選時卡片改窄版(不拉滿整排);選多個族群要並排,故用 auto-fill 而非單一固定欄
         groupsHost.style.gridTemplateColumns = mode === "all" ? "" : "repeat(auto-fill,minmax(300px,1fr))";
       }
+      var groupMap=document.getElementById("groupMap");
+      if(groupMap){
+        Array.prototype.forEach.call(groupMap.querySelectorAll("[data-g]"),function(n){
+          n.style.display=visible(n.dataset.g)?"":"none";
+        });
+      }
       // 結論:過濾每張 tier 卡的 picks,整卡無標的則隱藏
       Array.prototype.forEach.call(tiers.children, function(card){
         var picks = card.querySelectorAll(".pick"), shown = 0;
         Array.prototype.forEach.call(picks, function(p){
           var show = visible(p.dataset.g); p.style.display = show ? "" : "none"; if(show) shown++;
         });
+        card.classList.remove("expanded");
+        refreshTierPreview(card);
         card.style.display = (picks.length && shown === 0) ? "none" : "";
       });
       setScope();
@@ -1345,3 +1915,5 @@
   window.addEventListener("resize", hideTip);
 })();
 </script>
+</body>
+</html>

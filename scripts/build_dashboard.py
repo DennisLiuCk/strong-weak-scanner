@@ -58,9 +58,24 @@ TIER_ORDER = ["真強", "蓄勢·外資佈局", "強但過熱", "潛在/中性",
 TIER_VT = {"真強": 2, "蓄勢·外資佈局": 2, "強但過熱": 1, "潛在/中性": 0, "真弱": -2, "真弱·陷阱": -2}
 TIER_COL = {"真強": "var(--strong)", "蓄勢·外資佈局": "var(--neutral)", "強但過熱": "var(--warn-line)",
             "潛在/中性": "var(--neutral)", "真弱": "var(--weak)", "真弱·陷阱": "var(--weak)"}
-TIER_DESC = {"真強": "價強且籌碼扎實", "蓄勢·外資佈局": "外資/投信吃貨,價未發動",
-             "強但過熱": "價強但散戶滿載,別追高", "潛在/中性": "訊號分歧,觀察",
-             "真弱": "價籌俱弱", "真弱·陷阱": "外資出、散戶接"}
+# DB tier key 是策略與 OOS 稽核契約,不可因 UI 改名而變動；畫面另用安全標籤，避免把
+# 「族群內相對位置」誤讀成絕對買賣或保證強弱。
+TIER_UI_LABEL = {
+    "真強": "相對強勢",
+    "蓄勢·外資佈局": "相對蓄勢",
+    "強但過熱": "相對強勢·過熱",
+    "潛在/中性": "中性觀察",
+    "真弱": "相對弱勢",
+    "真弱·陷阱": "相對弱勢·槓桿風險",
+}
+TIER_DESC = {
+    "真強": "價格與籌碼指標多位於族群相對前段",
+    "蓄勢·外資佈局": "籌碼指標相對位置靠前,價格尚未發動",
+    "強但過熱": "價格相對靠前,但出現量能或融資過熱警示",
+    "潛在/中性": "各指標相對位置分歧,持續觀察",
+    "真弱": "價格與綜合指標位於族群相對後段",
+    "真弱·陷阱": "外資相對位置靠後,且融資條件偏弱",
+}
 
 def pct(x, signed=False):
     """給『分數/比率』欄位(dist_hi、ret1、margin_chg):× 100 轉百分比。"""
@@ -74,20 +89,56 @@ def pctp(x):
     return "-" if x is None else f"{x:.1f}%"
 
 # 每個元素:score → 理由文字
-R_PRICE = {2: "族群內領漲", 1: "強於族群", 0: "與族群同步", -1: "弱於族群", -2: "族群內落後"}
-R_RESIL = {2: "修正日明顯抗跌", -2: "修正日領跌"}
-R_FOREIGN = {2: "外資強力吃貨", 1: "外資淨買", 0: "外資中性", -1: "外資調節", -2: "外資倒貨/大幅撤出"}
-R_TRUST = {2: "投信強力認養", 1: "投信淨買", 0: "投信中性/未參與", -1: "投信調節", -2: "投信大幅賣超"}
-R_MARGIN = {2: "散戶大幅洗清", 1: "融資減、籌碼漸乾淨", 0: "融資平穩", -1: "融資增、散戶追高", -2: "散戶槓桿滿載、賣壓重"}
-R_DIP = {2: "修正日外資逆勢吃貨", -2: "修正日外資逆勢倒貨"}
+R_PRICE = {2: "20日相對報酬位於族群前20%", 1: "20日相對報酬位於族群前20–40%",
+           0: "20日相對報酬位於族群中段", -1: "20日相對報酬位於族群後20–40%",
+           -2: "20日相對報酬位於族群後20%"}
+R_RESIL = {2: "修正日抗跌程度位於族群前20%", -2: "修正日抗跌程度位於族群後20%"}
+R_FOREIGN = {2: "外資變化位於族群前20%", 1: "外資變化位於族群前20–40%",
+             0: "外資變化位於族群中段或雜訊區", -1: "外資變化位於族群後20–40%",
+             -2: "外資變化位於族群後20%"}
+R_TRUST = {2: "投信變化位於族群前20%", 1: "投信變化位於族群前20–40%",
+           0: "投信變化位於族群中段或雜訊區", -1: "投信變化位於族群後20–40%",
+           -2: "投信變化位於族群後20%"}
+R_MARGIN = {2: "融資條件落在健康區", 1: "融資條件偏健康",
+            0: "融資變化未觸發門檻", -1: "融資條件偏擁擠",
+            -2: "融資增加幅度觸及高風險門檻"}
+R_DIP = {2: "修正日買賣位於族群前20%", -2: "修正日買賣位於族群後20%"}
 # 精簡標籤(給 vsub 用)
-SALIENT = {("price", 2): "族群領漲", ("price", -2): "族群落後", ("foreign", 2): "外資吃貨", ("foreign", -2): "外資倒貨",
-           ("trust", 2): "投信認養", ("trust", -2): "投信賣超", ("margin", 2): "散戶洗清", ("margin", -2): "散戶滿載",
-           ("dip", 2): "修正日吃貨", ("dip", -2): "修正日遭倒", ("resil", 2): "修正抗跌", ("resil", -2): "修正領跌"}
+SALIENT = {("price", 2): "價格相對前段", ("price", -2): "價格相對後段",
+           ("foreign", 2): "外資變化相對前段", ("foreign", -2): "外資變化相對後段",
+           ("trust", 2): "投信變化相對前段", ("trust", -2): "投信變化相對後段",
+           ("margin", 2): "融資條件偏健康", ("margin", -2): "融資槓桿風險偏高",
+           ("dip", 2): "修正日買賣相對前段", ("dip", -2): "修正日買賣相對後段",
+           ("resil", 2): "修正抗跌相對前段", ("resil", -2): "修正抗跌相對後段"}
+
+
+def _relative_bucket(score):
+    """排名分數的白話區間；0 也可能由死區強制歸零，故不可只寫「中間40%」。"""
+    return {2: "族群前20%", 1: "族群前20–40%", 0: "族群中段或雜訊區",
+            -1: "族群後20–40%", -2: "族群後20%"}.get(score, "族群相對位置未知")
+
+
+def _cell(score, value, rows, reading, current, basis, warn=False):
+    """固定 cell payload: [score,value,rows,reading,warn,current,basis]。
+
+    current 是未經排名的當下方向；basis 才說明分數來自排名桶或固定門檻。兩者刻意分開，
+    例如外資仍減持也可能因同業減持更多而落在族群前20%。
+    """
+    return [score, value, rows, reading, int(bool(warn)), current, basis]
+
+
+def _value(row, key, default=None):
+    """sqlite3.Row 與測試 dict 共用的安全取值。"""
+    try:
+        return row[key]
+    except (KeyError, IndexError, TypeError):
+        return default
 
 
 def build_cells(sc, m, mkt20=None):
-    """每格:[分數, 格值, 數據rows(標籤/數值對), 判讀, 過熱旗標?]——rows 供 tooltip 表格化顯示。
+    """每格:[分數,格值,rows,相對判讀,過熱旗標,原始方向,計分依據]。
+
+    原始方向與相對判讀不得合併：排名分數只表示「跟同族群相比」，不保證原始值為正。
     mkt20 = 大盤(報酬指數)20日報酬,全 universe 共用,僅供①價 tooltip 當基準線。"""
     cells = []
     # ① 價(族群內相對強弱;距高做輔助資訊)
@@ -115,7 +166,13 @@ def build_cells(sc, m, mkt20=None):
              "族群下跌日平均比同業多漲(少跌)多少——大家一起跌時撐得住的才是真強"
              f"(獨立元素「抗」,權重{WEIGHTS['resil']},也是升蓄勢的品質門檻){dr_dyn}"],
             ["前一日漲跌", pct(m["ret1"], True)]]
-    cells.append([sc["s_price"], pct(rs, True) if rs is not None else "-", rows, R_PRICE[sc["s_price"]]])
+    price_current = ("相對報酬資料不足" if rs is None else
+                     f"20日相對報酬 {pct(rs, True)}，目前跑贏族群中位" if rs > 0 else
+                     f"20日相對報酬 {pct(rs, True)}，目前跑輸族群中位" if rs < 0 else
+                     "20日相對報酬 0.0%，目前與族群中位持平")
+    cells.append(_cell(
+        sc["s_price"], pct(rs, True) if rs is not None else "-", rows, R_PRICE[sc["s_price"]],
+        price_current, f"{_relative_bucket(sc['s_price'])}（族群內排名）"))
     # ② 量(量比 = 當日周轉率 / 自身60日中位)
     t = m["turnover_pct"]
     vr = m["vol_ratio60"]
@@ -138,62 +195,103 @@ def build_cells(sc, m, mkt20=None):
              f"{VOLR_ACTIVE[0]}~{VOLR_ACTIVE[1]}×=健康活絡{vr_dyn}"],
             ["當日周轉率", pctp(t),
              f"成交股數佔發行股數%;≥{VOL_OVERHEAT:.0f}%=當沖過熱⚠(壓評級但不改分數)"]]
-    c = [sc["s_vol"], f"{vr:.1f}×" if vr is not None else "-", rows, rv]
-    if warn:
-        c.append(1)
-    cells.append(c)
+    vol_current = ("量比資料不足" if vr is None else
+                   f"量比 {vr:.1f}×，高於自身60日常態" if vr > 1 else
+                   f"量比 {vr:.1f}×，低於自身60日常態" if vr < 1 else
+                   "量比 1.0×，與自身60日常態相當")
+    cells.append(_cell(
+        sc["s_vol"], f"{vr:.1f}×" if vr is not None else "-", rows, rv, vol_current,
+        "固定門檻（與自身60日常態比）",
+        warn))
     # ③ 外資
     fc = m["fpct_chg20"]
     fc_dyn = ("" if fc is None else
               (";目前=增持中" if fc > 0 else ";目前=減持中" if fc < 0 else ""))
     dp = m["dipbuy20"]
     dp_dyn = ("" if dp is None else
-              (";目前=下跌有人接(佈局特徵)" if dp > 0 else ";目前=下跌日被倒貨" if dp < 0 else ""))
+              (";目前=下跌日為外資淨買" if dp > 0 else ";目前=下跌日為外資淨賣" if dp < 0 else ""))
     rows = [["外資持股", f"{m['foreign_pct']:.1f}%" if m["foreign_pct"] is not None else "-",
              "外資目前持有比例(水位);看下列「變化」比看水位重要"],
             ["20日持股變化", f"{fc:+.2f}pp" if fc is not None else "-",
              f"近一個月外資增減持了多少百分點——③外資的分數即此值的族群內排名"
-             f"(全族群都<±{DZ_FOREIGN}pp 視為無訊號給0){fc_dyn}"],
-            ["修正日淨買(20日)", f"{dp:+.2f}%股本(逆{sc['s_dip']:+d})" if dp is not None else "-",
-             "族群下跌日外資買賣的20日累計佔股本%——回檔時有沒有人默默接貨"
-             f"(「逆」為其排名,只用於蓄勢評級、不計分){dp_dyn}"]]
-    cells.append([sc["s_foreign"], f"{fc:+.1f}pp" if fc is not None else "-", rows,
-                  R_FOREIGN[sc["s_foreign"]]])
+             f"(此檔 |變化| < {DZ_FOREIGN}pp 時視為雜訊並歸0分){fc_dyn}"],
+            ["修正日買賣(20日)", f"{dp:+.2f}%股本(相對{sc['s_dip']:+d})" if dp is not None else "-",
+             "族群下跌日外資買賣的20日累計佔股本%——正值是淨買,負值是淨賣"
+             f"(括號分數為族群內排名,只用於蓄勢評級、不計分){dp_dyn}"]]
+    foreign_current = ("外資持股變化資料不足" if fc is None else
+                       f"外資仍增持 {fc:+.2f}pp" if fc > 0 else
+                       f"外資仍減持 {fc:+.2f}pp" if fc < 0 else
+                       "外資持股持平 0.00pp")
+    cells.append(_cell(
+        sc["s_foreign"], f"{fc:+.1f}pp" if fc is not None else "-", rows,
+        R_FOREIGN[sc["s_foreign"]], foreign_current,
+        f"{_relative_bucket(sc['s_foreign'])}（族群內排名）"))
     # ④ 投信
     t5 = m["trust5"] or 0
     tp = m["trust5_pct"]
     rows = [["近5日淨買賣", f"{t5:+,}張",
-             "投信=本土基金,買進後通常持續認養、不太當沖——正=認養中、負=調節中"],
+             "投信=本土基金；正值代表這5日累計淨買,負值代表累計淨賣"],
             ["佔股本", f"{tp:+.3f}%" if tp is not None else "-",
              f"上值換算佔股本%——④投信的分數即此值的族群內排名(消除股本大小差;"
-             f"全族群都<±{DZ_TRUST}% 視為無訊號給0)"]]
-    cells.append([sc["s_trust"], f"{t5:+,}張", rows, R_TRUST[sc["s_trust"]]])
+             f"此檔 |佔股本變化| < {DZ_TRUST}% 時視為雜訊並歸0分)"]]
+    if tp is not None:
+        trust_current = (f"投信仍淨買 {t5:+,}張（{tp:+.3f}%股本）" if tp > 0 else
+                         f"投信仍淨賣 {t5:+,}張（{tp:+.3f}%股本）" if tp < 0 else
+                         f"投信買賣持平 {t5:+,}張（0.000%股本）")
+    else:
+        trust_current = "投信買賣資料不足"
+    cells.append(_cell(
+        sc["s_trust"], f"{t5:+,}張", rows, R_TRUST[sc["s_trust"]], trust_current,
+        f"{_relative_bucket(sc['s_trust'])}（族群內排名）"))
     # ⑤ 融資券
     u = m["margin_util_pct"]
     u_dyn = ("" if u is None else
-             (f";目前≥{MARGIN_UTIL_HOT:.0f}%=滿載⚠(分數封頂−1)" if u >= MARGIN_UTIL_HOT else
-              f";目前≥{MARGIN_UTIL_MID:.0f}%=偏高(分數封頂+1)" if u >= MARGIN_UTIL_MID else
-              ";目前=水位健康"))
-    mc = m["margin_chg10"]
+             (f";目前≥{MARGIN_UTIL_HOT:.0f}%=觸發過熱門檻⚠(分數封頂−1)" if u >= MARGIN_UTIL_HOT else
+              f";目前≥{MARGIN_UTIL_MID:.0f}%=觸發中段水位門檻(分數封頂+1)" if u >= MARGIN_UTIL_MID else
+              ";目前低於中段水位門檻"))
+    mc10 = _value(m, "margin_chg10")
+    mc5 = _value(m, "margin_chg5")
+    mc = mc10 if mc10 is not None else mc5
+    mc_window = 10 if mc10 is not None else 5 if mc5 is not None else None
     mc_dyn = ("" if mc is None else
-              (";目前=散戶加碼中" if mc > 0 else ";目前=散戶退場中" if mc < 0 else ""))
-    rows = [["散戶水位(融資/股本)", pctp(u),
-             f"融資餘額佔股本%——散戶槓桿有多擁擠,越高賣壓越重{u_dyn}"],
-            ["10日融資變化", pct(mc, True),
-             f"散戶在追價還是退場;與下列價格方向交互給分:價漲+融資大減=洗清(好)、"
-             f"價跌+融資暴增=接刀(壞){mc_dyn}"],
+              (";目前=融資餘額增加" if mc > 0 else ";目前=融資餘額下降" if mc < 0 else ""))
+    rows = [["融資水位(融資/股本)", pctp(u),
+             f"融資餘額佔股本%,用來觀察市場槓桿擁擠程度{u_dyn}"],
+            [f"{mc_window}日融資變化" if mc_window else "融資變化", pct(mc, True),
+             f"融資餘額增加或下降的幅度；與下列價格方向交互給分:價跌且融資下降代表槓桿同步降低,"
+             f"價跌且融資明顯增加代表槓桿風險升高；10日缺值時採5日備援{mc_dyn}"],
             ["20日還原價報酬", pct(m["ret20"], True),
              "供上列交互判定的價格方向(與①價的原料同值)"],
             ["券資比", f"{(m['short_margin_ratio'] or 0):.1f}%",
              "融券餘額÷融資餘額;高=空方對作或軋空題材。參考欄位,未計分"]]
-    c = [sc["s_margin"], pctp(u), rows, R_MARGIN[sc["s_margin"]]]
-    if u is not None and u >= 9:
-        c.append(1)
-    cells.append(c)
+    fallback = "（5日備援）" if mc_window == 5 else ""
+    margin_current = ("融資變化資料不足" if mc is None else
+                      f"融資{mc_window}日仍增加 {pct(mc, True)}{fallback}" if mc > 0 else
+                      f"融資{mc_window}日仍下降 {pct(mc, True)}{fallback}" if mc < 0 else
+                      f"融資{mc_window}日持平 0.0%{fallback}")
+    if u is not None:
+        margin_current += f"；目前水位 {u:.1f}%"
+    cells.append(_cell(
+        sc["s_margin"], pctp(u), rows, R_MARGIN[sc["s_margin"]], margin_current,
+        f"固定門檻（價格×融資，{mc_window or '-'}日；水位封頂）",
+        u is not None and u >= 9))
     return cells
 
 
-def verdict(sc):
+def tier_ui_payload(sc):
+    """保留策略 key，另提供不把相對排名說成絕對強弱的 UI label。"""
+    confirmed = sc["tier"]
+    raw = sc["tier_raw"]
+    return {
+        "tier_raw": raw,
+        "tier_confirmed": confirmed,
+        "tier_waiting": raw != confirmed,
+        "tier_label": TIER_UI_LABEL.get(confirmed, confirmed),
+        "tier_raw_label": TIER_UI_LABEL.get(raw, raw),
+    }
+
+
+def verdict(sc, comp_history=None):
     tier = sc["tier"]
     comp = sc["composite_s"]
     keys = [("price", sc["s_price"]), ("resil", sc["s_resil"]), ("vol", sc["s_vol"]),
@@ -205,7 +303,7 @@ def verdict(sc):
     if sc["pending"] and tier == "潛在/中性":       # 蓄勢候補(score.py 資料層算好)
         vsub = "◇ " + sc["pending"]
     elif chip and sc["s_resil"] <= -2:              # 衝突組合改方向性敘述,避免讀成自相矛盾
-        vsub = "吃貨中·等抗跌轉正"
+        vsub = "籌碼相對靠前·等抗跌轉正"
     drivers = []
     for name, ref in [("價", "s_price"), ("抗跌", "s_resil"), ("外資", "s_foreign"),
                       ("逆勢", "s_dip"), ("投信", "s_trust"), ("融資", "s_margin")]:
@@ -215,26 +313,52 @@ def verdict(sc):
                             "融資": R_MARGIN, "價": R_PRICE, "抗跌": R_RESIL}[name][s])
     vr = "；".join(drivers) if drivers else "訊號分歧,持續觀察"
     if sc["pending"] and tier == "潛在/中性":
-        vr += f"。◇ {sc['pending']}——籌碼條件已符,補齊即升蓄勢"
+        vr += (f"。◇ {sc['pending']}——籌碼相對位置條件已符；補齊後先成為今日初判,"
+               "連2日相同初判才更新已確認層")
     elif chip and sc["s_resil"] <= -2:
-        vr += "。籌碼在買但修正日領跌——此組合歷史表現分歧(見週報濾網 cohort),等抗跌轉正再確認"
+        vr += ("。籌碼指標在族群相對靠前,但修正日價格位於相對後段——原始值未必是買超；"
+               "此類歷史樣本表現分歧,詳見週報的同條件比較,等抗跌轉正再確認")
     # 元素 × 權重分解:依左側①②③④⑤自然順序(不依權重大小排,避免循環數字跳來跳去)。
     # 每列 = [標籤, 顯示值, hint(此表不用), 分數(供JS用scColor上色), 權重文字(muted顯示), flag]
     # flag: "total"=加大加粗、"muted"=整列調淡(權重0=只供tier判定、不計入加總——由 WEIGHTS 動態判斷,
     # 不寫死是哪個元素,權重一旦調整就自動跟著變)
     def vrow(label, key, wkey):
         v = sc[key]
-        tier_only = WEIGHTS[wkey] == 0
-        wt = f"× {WEIGHTS[wkey]}" + ("  · 供tier" if tier_only else "")
+        weight = WEIGHTS[wkey]
+        tier_only = weight == 0
+        contribution = v * weight
+        wt = f"× {weight:g} = {contribution:+.1f}" + ("  · 只供分層條件" if tier_only else "")
         return [label, f"{v:+d}", None, v, wt, "muted" if tier_only else ""]
-    vrows = [["綜合分(3日平滑)", f"{comp:+.1f}", None, round(comp, 1), None, "total"],
+    today = sc["composite"]
+    vrows = [["今日分(未平滑)", f"{today:+.1f}", "下列各項元素分 × 權重的貢獻加總",
+              round(today, 1), None, "total"],
              vrow("①相對強弱", "s_price", "price"),
              vrow("①抗跌", "s_resil", "resil"),
              vrow("②量", "s_vol", "vol"),
              vrow("③外資", "s_foreign", "foreign"),
-             vrow("③逆勢買超", "s_dip", "dip"),
+             vrow("③修正日相對位置", "s_dip", "dip"),
              vrow("④投信", "s_trust", "trust"),
              vrow("⑤融資券", "s_margin", "margin")]
+    history = list(comp_history or [])[-3:]
+    if history:
+        parts, values = [], []
+        for h in history:
+            date, value = _value(h, "date"), _value(h, "composite")
+            if value is None:
+                continue
+            values.append(value)
+            date_label = f"{int(date[5:7])}/{int(date[8:10])}" if date else "-"
+            parts.append(f"{date_label} {value:+.1f}")
+        if values:
+            equation = " + ".join(f"({v:+.1f})" for v in values)
+            vrows.append(["近3個交易日", " → ".join(parts),
+                          "每天依元素分與權重加總出的未平滑分", None, None, ""])
+            vrows.append(["3日平均(評級用)", f"{comp:+.1f}",
+                          f"({equation}) ÷ {len(values)} = {comp:+.1f}", round(comp, 1), None, "total"])
+    else:
+        vrows.append(["3日平均(評級用)", f"{comp:+.1f}",
+                      "每日未平滑分歷史未提供；此值取自資料庫既有的三日平滑結果",
+                      round(comp, 1), None, "total"])
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"]), vrows
 
 
@@ -259,9 +383,9 @@ def _raw_direction(v, up, down, flat):
 
 def _chip_reading(direction, signal, observational=False):
     verdict = "健康訊號" if signal > 0 else "警示" if signal < 0 else "中性"
-    note = "；方向仍待 OOS 驗證" if observational else "；依既有校準門檻"
+    note = "；方向尚未用規則定案後的新資料驗證" if observational else "；依既有校準門檻"
     if direction == "資料不足":
-        return "資料不足 → 中性(不計健康/警示)" + ("；方向仍待 OOS 驗證" if observational else "")
+        return "資料不足 → 中性(不計健康/警示)" + ("；方向尚未用規則定案後的新資料驗證" if observational else "")
     return f"{direction} → 本欄判讀為{verdict}{note}"
 
 
@@ -373,12 +497,17 @@ def build_fund_map(con):
             rows.append(["近4季毛利率趨勢", trend, f"{fdates[0]} ~ {fdates[-1]},舊到新"])
         if latest_eps is not None:
             rows.append(["最新季EPS", f"{latest_eps:.2f} 元", f"季別:{fdates[-1]}"])
-        label = (f"{'▲' if cls == 'up' else '▼' if cls == 'down' else '→'}{yoy*100:+.0f}%"
-                 if yoy is not None else (f"月增{mom*100:+.0f}%" if mom is not None else "基本面"))
-        why = ("月營收年增 ≥ 10%,營運動能向上" if cls == "up" else
-               "月營收年增 ≤ −10%,營運動能轉弱" if cls == "down" else
-               "月營收年增介於 ±10% 內,動能持平" if yoy is not None else
-               "月營收年增樣本不足(上市未滿13個月或資料尚未回補齊)")
+        label = f"營收YoY {yoy*100:+.0f}%" if yoy is not None else "營收YoY 資料不足"
+        if yoy is not None:
+            direction = "增加" if yoy > 0 else "減少" if yoy < 0 else "持平"
+            why = (f"最新單月營收較去年同月{direction} {abs(yoy)*100:.1f}%。這只是已公告營收的"
+                   "同比描述；營收不等於獲利,也不能單獨代表需求或整體營運變強/變弱。基期、"
+                   "收入認列時點、工作天數、售價、併購與產品組合都可能影響單月數字,"
+                   "需搭配公司筆記與季報判讀。")
+        else:
+            why = ("月營收年增樣本不足(上市未滿13個月或資料尚未回補齊)。營收不等於獲利或"
+                   "整體營運強弱；即使有月增資料,仍可能受基期、收入認列時點、工作天數、售價、"
+                   "併購與產品組合影響。")
         out[sid] = {"cls": cls, "label": label, "rows": rows, "why": why}
     return out
 
@@ -390,17 +519,12 @@ STATE_COL = {"蓄勢·被佈局": "var(--warn-line)", "發動·領漲": "var(--s
 # 族群卡 tooltip 教學文字(門檻值 import 自 fetch_daily,改旋鈕自動同步)。
 # 各指標的定義寫在每列數據自己的 hint(見 groups 組裝),這裡只留狀態判定規則。
 GROUP_HOW = (
-    f"族群狀態每日由上列指標判定(規則在資料層,非儀表板):蓄勢·被佈局=修正日中位淨買>0 且 "
-    f"中位距60日高≤{GS_OFF_HIGH*100:+.0f}%(下跌有人接、價未回高——佈局特徵);"
+    f"族群狀態每日由上列指標判定(規則在資料層,非儀表板):蓄勢·被佈局=修正日中位買賣>0 且 "
+    f"中位距60日高≤{GS_OFF_HIGH*100:+.0f}%(修正日外資為淨買,且價格尚未回高);"
     f"發動·領漲=20日動能贏全體 且 價近波段高;籌碼退潮=修正日遭調節 且 佈局廣度≤"
-    f"{GS_BREADTH_LOW*100:.0f}%;其餘=中性觀察。修正日中位淨買為選族群主訊號(樣本外驗證中,"
-    f"見週報)。↗/↘/→ = 與 5 個交易日前相比的方向。")
+    f"{GS_BREADTH_LOW*100:.0f}%;其餘=中性觀察。修正日中位買賣為選族群主訊號(樣本外驗證中,"
+    f"見週報)。卡片把『目前原始值』與『較5日前的變化』分欄顯示；改善不代表已轉為正值。")
 GROUP_SRC = "個股五元素於族群層聚合(等權中位數/廣度);原始資料 FinMind"
-
-
-def _dir_txt(arrow):
-    """箭頭 → 白話(hint 用);無箭頭回空字串。"""
-    return {" ↗": ",且比5日前改善", " ↘": ",且比5日前惡化", " →": ",與5日前持平"}.get(arrow, "")
 
 
 def _streak(series):
@@ -416,18 +540,89 @@ def _streak(series):
     return n, f"{int(d[5:7])}/{int(d[8:10])}"
 
 
-def _arrow(series, key, eps):
-    """與 5 個交易日前相比的方向箭頭;樣本不足或缺值回空字串。"""
+def _five_day_delta(series, key, eps, scale=1.0, digits=2):
+    """回傳獨立的 5 日比較文字；較高一律稱改善，並保留 delta 正負號。"""
     if len(series) < 6:
-        return ""
+        return "5日比較資料不足"
     cur, prev = series[-1][key], series[-6][key]
     if cur is None or prev is None:
-        return ""
-    if cur - prev >= eps:
-        return " ↗"
-    if prev - cur >= eps:
-        return " ↘"
-    return " →"
+        return "5日比較資料不足"
+    delta = cur - prev
+    direction = "改善" if delta >= eps else "惡化" if delta <= -eps else "持平"
+    return f"較5日前{direction} {delta*scale:+.{digits}f}pp"
+
+
+def _five_day_value(series, key):
+    """圖像化座標的五日前 raw 值；樣本或欄位不足時明確回傳 null。"""
+    if len(series) < 6:
+        return None
+    return series[-6][key]
+
+
+def _current_dip(v):
+    if v is None:
+        return "-"
+    if v > 0:
+        return f"淨買 {v:+.2f}%股本"
+    if v < 0:
+        return f"淨賣 {v:+.2f}%股本"
+    return "買賣持平 0.00%股本"
+
+
+def _current_relative(v):
+    if v is None:
+        return "-"
+    if v > 0:
+        return f"跑贏 {v*100:+.1f}%"
+    if v < 0:
+        return f"跑輸 {v*100:+.1f}%"
+    return "與全體持平 0.0%"
+
+
+def build_overview(grows):
+    """首頁白話結論；明確區分『相對最好』與『原始值已轉正』。"""
+    if not grows:
+        return {"headline": "族群資料不足", "summary": "目前無法判讀族群強弱。",
+                "points": [], "note": "請先確認 group_metrics 已更新。"}
+    deployed = [r for r in grows if r["state"] == "蓄勢·被佈局"]
+    dips = [r for r in grows if r["med_dip"] is not None]
+    rels = [r for r in grows if r["rel20"] is not None]
+    best_dip = max(dips, key=lambda r: r["med_dip"]) if dips else None
+    best_rel = max(rels, key=lambda r: r["rel20"]) if rels else None
+
+    if deployed:
+        names = "、".join(GROUP_NM.get(r["grp"], r["grp"]) for r in deployed)
+        headline = f"{names}目前符合「被佈局」條件"
+        summary = "此狀態要求修正日中位買賣為正,並同時符合價格尚未回高的條件。"
+        tone = "strong"
+    elif best_dip and all(r["med_dip"] <= 0 for r in dips):
+        nm = GROUP_NM.get(best_dip["grp"], best_dip["grp"])
+        headline = "目前沒有族群符合「被佈局」條件"
+        summary = (f"{len(dips)}/{len(grows)} 族群的修正日中位皆為淨賣；{nm}的調節相對最少,"
+                   f"但仍淨賣 {abs(best_dip['med_dip']):.2f}%股本；"
+                   "相對最好不等於已出現買超。")
+        tone = "warn"
+    else:
+        headline = "目前沒有族群符合「被佈局」條件"
+        if best_dip:
+            nm = GROUP_NM.get(best_dip["grp"], best_dip["grp"])
+            summary = (f"{nm}修正日淨買相對最高（{best_dip['med_dip']:+.2f}%股本）,"
+                       "但尚未同時符合完整狀態條件。")
+        else:
+            summary = "修正日籌碼資料不足,暫不做族群佈局判讀。"
+        tone = "neutral"
+
+    points = []
+    if best_dip:
+        nm = GROUP_NM.get(best_dip["grp"], best_dip["grp"])
+        points.append({"label": "籌碼相對位置", "text": f"{nm}：{_current_dip(best_dip['med_dip'])}",
+                       "tone": "strong" if best_dip["med_dip"] > 0 else "warn"})
+    if best_rel:
+        nm = GROUP_NM.get(best_rel["grp"], best_rel["grp"])
+        points.append({"label": "價格相對位置", "text": f"{nm}：{_current_relative(best_rel['rel20'])}",
+                       "tone": "strong" if best_rel["rel20"] > 0 else "warn"})
+    return {"headline": headline, "summary": summary, "points": points, "tone": tone,
+            "note": "族群比較是相對結果；請同時閱讀目前原始值與5日變化。"}
 
 
 def main():
@@ -440,6 +635,12 @@ def main():
     rows = con.execute("""SELECT u.stock_id, u.name, u.grp, u.biz, sc.*, m.*
         FROM daily_scores sc JOIN universe u USING(stock_id) JOIN daily_metrics m USING(date, stock_id)
         WHERE sc.date=?""", (last,)).fetchall()
+    # 使用每日未平滑 composite 讓使用者能驗算 composite_s；每檔只留最近3個交易日、舊到新。
+    score_hist = defaultdict(list)
+    for h in con.execute("""SELECT date, stock_id, composite FROM daily_scores
+                            WHERE date<=? ORDER BY stock_id, date DESC""", (last,)):
+        if len(score_hist[h["stock_id"]]) < 3:
+            score_hist[h["stock_id"]].insert(0, h)
     try:   # 族群定義配置化:讀 groups 表(舊 db 缺表時退回檔頭預設)
         gmeta = con.execute("SELECT grp, name, tag FROM groups ORDER BY ord").fetchall()
         if gmeta:
@@ -457,8 +658,9 @@ def main():
         mkrows = con.execute("""SELECT taiex FROM market_daily WHERE taiex IS NOT NULL
                                 AND date<=? ORDER BY date""", (last,)).fetchall()
         mkt20 = (mkrows[-1]["taiex"] / mkrows[-21]["taiex"] - 1) if len(mkrows) >= 21 else None
-        # 族群歷史:狀態連續天數(「首先轉強」要看得出先後)+ 5 日方向箭頭
-        ghist = con.execute("""SELECT date, grp, state, med_dip, rel20 FROM group_metrics
+        # 族群歷史:狀態連續天數 + 各欄獨立的 5 日變化說明
+        ghist = con.execute("""SELECT date, grp, state, med_dip, breadth_f, rel20,
+                                      med_dist60, breadth_t FROM group_metrics
                                WHERE date<=? ORDER BY date""", (last,)).fetchall()
     except sqlite3.OperationalError:
         grows, mk, mkt20, ghist = [], None, None, []
@@ -509,25 +711,31 @@ def main():
         cc[cls] += 1
         cc["dots"].append(cls)
 
-    dips = [(x["med_dip"], x["grp"]) for x in grows if x["med_dip"] is not None]
-    best_dip = max(dips)[1] if dips else None      # 修正日買超最高的族群(選族群主訊號)
+    dip_rows = [x for x in grows if x["med_dip"] is not None]
+    best_dip_row = max(dip_rows, key=lambda x: x["med_dip"]) if dip_rows else None
+    best_dip = best_dip_row["grp"] if best_dip_row else None
     groups = []
     for g in GROUP_ORDER:
         r = next((x for x in grows if x["grp"] == g), None)
         if not r:
             continue
-        note = r["note"] + (f"(★ 修正日買超 {len(GROUP_ORDER)} 族群最高)" if g == best_dip else "")
+        note = r["note"] or ""
+        if g == best_dip:
+            if r["med_dip"] > 0:
+                note += f"(★ 修正日淨買為 {len(GROUP_ORDER)} 族群最高)"
+            elif r["med_dip"] < 0:
+                note += f"(★ 修正日調節為 {len(GROUP_ORDER)} 族群相對最少,但仍是淨賣)"
+            else:
+                note += f"(★ 修正日買賣為 {len(GROUP_ORDER)} 族群相對最高,目前持平)"
         ser = gseries.get(g, [])
         n, since = _streak(ser)
-        a_dip = _arrow(ser, "med_dip", 0.01)     # %股本,顯示 2 位小數 → 死區 0.01
-        a_rel = _arrow(ser, "rel20", 0.005)      # 比率,顯示 0.1% 一位 → 死區 0.5pp
         bc = bcnt.get(g)
-        # stats 每列 = [標籤, 數值, 白話解讀];卡片只畫前兩欄,tooltip 三欄全顯示。
+        # stats 每列 = [標籤, 當下原始值, 白話解讀, 5日變化]；不可把方向箭頭黏在原始值後面。
         # 解讀句由「當下數值」生成(方向、對照門檻),不是通用定義——這是看得懂的關鍵。
         dip = r["med_dip"]
         dip_dyn = ("" if dip is None else
-                   (";目前=修正時有人承接(佈局特徵)" if dip > 0 else
-                    ";目前=下跌日被調節(資金撤出)" if dip < 0 else ";目前≈中性"))
+                   (";目前=族群修正日外資淨買" if dip > 0 else
+                    ";目前=族群修正日外資淨賣" if dip < 0 else ";目前買賣持平"))
         rel = r["rel20"]
         rel_dyn = ("" if rel is None else
                    (";目前=跑贏其他族群" if rel > 0 else ";目前=落後其他族群" if rel < 0 else ""))
@@ -539,32 +747,46 @@ def main():
         bf_dyn = ("" if bf is None else
                   (f";目前≤{GS_BREADTH_LOW*100:.0f}%=廣度低(個案而非族群現象)" if bf <= GS_BREADTH_LOW
                    else ";過半成員被增持=族群現象" if bf > 0.5 else ""))
+        dist_value = ("-" if dist is None else
+                      f"低於60日高 {abs(dist)*100:.1f}%" if dist < 0 else
+                      "位於60日高 0.0%" if dist == 0 else
+                      f"高於參考高點 {dist*100:+.1f}%")
         gobj = {"g": g, "nm": GROUP_NM.get(g, g), "state": r["state"],
-                "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note, "stats": [
-            ["修正日中位淨買",
-             f"{dip:+.2f}%股本{a_dip}" if dip is not None else "-",
-             "下跌時有人接貨嗎?族群下跌日外資買賣的20日累計佔股本%(取成員中位)。"
-             f"正=回檔有人接、負=跟著倒貨{dip_dyn}{_dir_txt(a_dip)}"],
-            ["外資佈局廣度",
-             f"{bf*100:.0f}%({bc['f_pos']}/{bc['f_n']}檔)" if (bf is not None and bc) else "-",
-             f"買盤是普遍還是個案?近20日外資持股增加的成員比例{bf_dyn}"],
+                "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note,
+                "axis": {"price": rel, "dip": dip,
+                         "price5": _five_day_value(ser, "rel20"),
+                         "dip5": _five_day_value(ser, "med_dip")},
+                "stats": [
+            ["修正日外資買賣中位",
+             _current_dip(dip),
+             "族群下跌日外資買賣的20日累計佔股本%(取成員中位)。"
+             f"正=淨買、負=淨賣{dip_dyn}",
+             _five_day_delta(ser, "med_dip", 0.01, 1, 2)],
+            ["外資增持廣度",
+             f"{bf*100:.0f}%成員增持({bc['f_pos']}/{bc['f_n']}檔)" if (bf is not None and bc) else "-",
+             f"近20日外資持股增加的成員比例；用來分辨普遍現象或少數個案{bf_dyn}",
+             _five_day_delta(ser, "breadth_f", 0.01, 100, 0)],
             ["20日動能 vs 全體",
-             f"{pct(rel, True)}{a_rel}" if rel is not None else "-",
+             _current_relative(rel),
              "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比"
-             f"(個股卡的①價是族群內比){rel_dyn}{_dir_txt(a_rel)}"],
+             f"(個股卡的①價是族群內比){rel_dyn}",
+             _five_day_delta(ser, "rel20", 0.005, 100, 1)],
             ["中位距60日高",
-             pct(dist) if dist is not None else "-",
-             f"成員距自己60日高點的中位數,衡量族群整體回檔深度{dist_dyn}"],
+             dist_value,
+             f"成員距自己60日高點的中位數,衡量族群整體回檔深度{dist_dyn}",
+             _five_day_delta(ser, "med_dist60", 0.001, 100, 1)],
             ["投信買超廣度",
-             f"{r['breadth_t']*100:.0f}%({bc['t_pos']}/{bc['t_n']}檔)"
+             f"{r['breadth_t']*100:.0f}%成員淨買({bc['t_pos']}/{bc['t_n']}檔)"
              if (r["breadth_t"] is not None and bc) else "-",
-             "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度"],
+             "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度",
+             _five_day_delta(ser, "breadth_t", 0.01, 100, 0)],
         ]}
         if n:
             gobj["dur"] = f"第 {n} 個交易日(自 {since})"
         if g in chip_by_grp:
             gobj["chip"] = chip_by_grp[g]
         groups.append(gobj)
+    overview = build_overview(grows)
     lag = f",指數至 {int(mk['date'][5:7])}/{int(mk['date'][8:10])}" if (mk and mk["date"] != last) else ""
     mchip = (f"市場 <b>{'⚠ 修正' if mk['regime'] else '多頭/中性'}</b>(報酬指數距20日高 {mk['dd20']*100:+.1f}%{lag})"
              if (mk and mk["dd20"] is not None) else "市場 <b>-</b>")
@@ -579,22 +801,25 @@ def main():
                      ["距20日高", f"{mk['dd20']*100:+.1f}%",
                       "含息指數距近20個交易日最高點回落多少;回檔深度的量尺"],
                      ["修正門檻", f"≤ {REGIME_DD*100:.0f}%",
-                      "回落超過此值即判為修正 regime,頁首籤條會轉「⚠ 修正」"],
+                      "回落超過此值即判為修正市場情境,頁首籤條會轉「⚠ 修正」"],
                      ["20日報酬", pct(mkt20, True),
                       "全市場近一個月的基準線;個股①價 tooltip 的「大盤20日」同此值"]],
-            "why": ("報酬指數距 20 日高回落超過門檻,判定為修正 regime——此時「修正日抗跌」"
-                    "「修正日買超」等訊號鑑別度最高,適合觀察哪個族群先止穩轉強。" if regime else
+            "why": ("報酬指數距 20 日高回落超過門檻,判定為修正市場情境——此時「修正日抗跌」"
+                    "「修正日外資買賣」等訊號較有辨識力,適合觀察哪個族群先止穩轉強。" if regime else
                     "距 20 日高回落未達門檻,市場處於多頭/中性,個股訊號以族群內相對強弱為主。"),
-            "how": (f"距20日高 ≤ {REGIME_DD*100:.0f}% → 修正 regime。刻意用「含息」報酬指數而非"
-                    "價格指數——除息季價格指數會機械性下跌,含息指數才反映真實市場強弱。"),
+            "how": (f"距20日高 ≤ {REGIME_DD*100:.0f}% → 修正市場情境。使用「含息」報酬指數而非"
+                    "價格指數,避免除息季的機械性下跌扭曲市場比較。"),
             "src": "FinMind 加權報酬指數(TAIEX 含息)"}
 
     data, tiers_map = [], {}
     for r in rows:
-        vt, tier, vsub, vr, warn, vrows = verdict(r)
+        tier_meta = tier_ui_payload(r)
+        vt, tier, vsub, vr, warn, vrows = verdict(r, score_hist.get(r["stock_id"]))
         obj = {"g": r["grp"], "id": r["stock_id"], "nm": r["name"], "biz": r["biz"] or "",
-               "vt": vt, "vlabel": tier, "vsub": vsub, "vr": vr, "vrows": vrows,
+               "vt": vt, "vlabel": tier_meta["tier_label"], "vkey": tier,
+               "vsub": vsub, "vr": vr, "vrows": vrows,
                "cells": build_cells(r, r, mkt20)}
+        obj.update(tier_meta)
         if warn:
             obj["warn"] = True
         risky = r["stock_id"] in risk
@@ -643,9 +868,11 @@ def main():
             ids = [sid for _, sid in sorted(tiers_map[t], reverse=True)]
             if t == "潛在/中性":
                 ids = [i for i in ids if i not in cand_ids]
-            tiers.append({"t": t, "d": TIER_DESC.get(t, ""), "col": TIER_COL.get(t, "var(--neutral)"), "ids": ids})
+            tiers.append({"key": t, "t": TIER_UI_LABEL.get(t, t), "d": TIER_DESC.get(t, ""),
+                          "col": TIER_COL.get(t, "var(--neutral)"), "ids": ids})
         if t == "蓄勢·外資佈局" and cand_ids:
-            tiers.append({"t": "◇ 蓄勢候補", "d": "籌碼已吃貨(屬潛在/中性),補齊缺項即升蓄勢",
+            tiers.append({"key": "蓄勢候補", "t": "◇ 相對蓄勢候補",
+                          "d": "籌碼相對位置靠前；補齊後先成為今日初判,連2日才更新已確認層",
                           "col": "var(--neutral)", "ids": cand_ids, "sub": cand_sub})
 
     y, mo, d = last.split("-")
@@ -656,6 +883,7 @@ def main():
     html = html.replace("__DATA_JSON__", json.dumps(data, ensure_ascii=False))
     html = html.replace("__TIERS_JSON__", json.dumps(tiers, ensure_ascii=False))
     html = html.replace("__GROUPS_JSON__", json.dumps(groups, ensure_ascii=False))
+    html = html.replace("__OVERVIEW_JSON__", json.dumps(overview, ensure_ascii=False))
     html = html.replace("__GRPMETA_JSON__", json.dumps(grpmeta, ensure_ascii=False))
     html = html.replace("__GORDER_JSON__", json.dumps(GROUP_ORDER))
     html = html.replace("__WEIGHTS_JSON__", json.dumps(WEIGHTS))

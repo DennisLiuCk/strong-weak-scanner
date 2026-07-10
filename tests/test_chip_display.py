@@ -29,7 +29,7 @@ class ChipDisplayTest(unittest.TestCase):
         people = by_label["股東人數週變化(↓集中·觀察)"]
         self.assertTrue(people[1].startswith("-"))
         self.assertIn("股東人數下降(籌碼集中) → 本欄判讀為健康訊號", people[2])
-        self.assertIn("方向仍待 OOS 驗證", people[2])
+        self.assertIn("方向尚未用規則定案後的新資料驗證", people[2])
 
         sbl = by_label["借券餘額10日變化(↓減壓·觀察)"]
         self.assertTrue(sbl[1].startswith("-"))
