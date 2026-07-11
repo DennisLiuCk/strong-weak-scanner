@@ -2,6 +2,31 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 質化研究 focused_v1：縮短逐篇驗證工時 — 2026-07-11
+
+**策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與
+`validate.py` 的 `IS_CUTOFF` 皆未動）。60/98 篇完成全文獨立核驗後，實務瓶頸已從寫作
+轉為整本 PDF 渲染、來源無限追逐，以及 reviewer 重複下載同一文件；本次只收斂研究流程，
+不把質化內容作為量化策略的 OOS 證據。
+
+- 新建或重新完整研究的筆記改用向後相容的 `research_profile: focused_v1`；既有未標
+  profile 的 v2 筆記不回溯失效。每家公司只保留 3–5 份核心一手文件，正文以約 25–35 個
+  真正重要 claim block 為目標；年報、年度財報、最新季報與最新法說 role 必須齊全，
+  股東會僅必要時加入。文件與 role 是簽核硬門檻，主張數是防止失焦的 warning。
+- 新增 `qual_evidence.py`：drafter 把本機 PDF 建成內容定址的 SHA-256 evidence pack，
+  payload mode 標成唯讀並以完整 SHA／精確目錄驗證竄改，只提交小型 manifest；這是
+  流程封存而非不可繞過的 ACL。PDF／PNG 留在 `tmp/`，渲染圖放在 pack 外，計畫固定
+  只有正文實際引用頁及前後各一頁，不再全本轉圖，也不改動 SHA payload。
+- evidence manifest 固定記錄 10 分鐘來源搜尋止損與「未驗證主張已刪除」attestation。
+  找不到穩定一手來源就停止追逐、從正文刪除主張；只有兩份一手來源互相矛盾才可標示
+  `conflicted`。
+- reviewer 必須與 drafter 不同，使用同一 SHA pack 離線驗證文件、獨立重算數字／期間／
+  單位並判讀推論邊界，不重新下載；固定 `review_method`、pack SHA 與全文內容 SHA 共同
+  鎖住簽核版本。lint 另核對 note、核心來源清單與 tracked manifest 的股票、日期、URL、
+  文件 ID 及 pack SHA。
+- 改為每完成一篇 `independently_verified`，只提交該 note 與對應 manifest 並立即做一個
+  中文 commit，不再等待三篇成批。獨立品質 workflow 已納入 evidence pack 測試。
+
 ## 質化研究品質系統 v2＋已確認錯誤優先修正 — 2026-07-11
 
 **策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與

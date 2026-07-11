@@ -228,6 +228,66 @@ token 必爆額度。正常 daily 會跳過完整 pair；休市日通常只需 1
 法說摘要只能用來發現線索；主張應回到公司 IR、年報／財報原檔、MOPS 直接公告或
 TWSE／TPEx 文件。FinMind 財報窄表用來交叉檢查量化口徑,不取代原始文件。
 
+### `focused_v1`（只套用新研究）
+
+新建筆記或重新展開一輪完整研究時,在既有 template v2 上加入以下 meta；這是附加的
+研究流程 profile,**不是 template v3**。既有未標 `research_profile` 的 v2 筆記繼續依原
+品質契約有效,不批次改寫、不因 focused 規範回溯降級；待下一次實質重做時才加入。
+
+```yaml
+research_profile: focused_v1
+core_source_ids: S1,S2,S3
+evidence_pack_manifest: notes/qualitative/evidence/<股號>/<content_as_of>_<sha前16>.json
+evidence_pack_sha256: <64 位十六進位 SHA-256>
+review_method: offline_evidence_pack_independent_recalculation
+```
+
+focused 研究的範圍刻意收斂：
+
+1. 只選 **3~5 份不重複的核心一手文件**：通常是最新年報、年度查核財報、最新季度
+   核閱財報、最新法說；只有治理／股利等主張確有需要時才加入官方股東會文件。
+   `core_source_ids` 必須與 evidence manifest 及正文證據索引一致。
+2. 全文以 **約 25~35 個真正重要 claim block** 為目標。`qual_notes.py` 既有定義是一個
+   實質段落、一個 bullet 或一列表格資料各算一個；超出區間應警告並要求聚焦,但不可
+   為湊數拆句,也不可因此刪掉理解公司不可或缺的少數主張。
+3. PDF 只渲染正文實際引用頁及前後各一頁（頁首／頁尾自動截斷）,不渲染整本。
+4. 找不到穩定一手來源時,每份缺失文件最多查找 **10 分鐘**。逾時即停止追逐,
+   從正文刪除相關未驗證主張；manifest 固定記錄 `source_search_timeout_minutes: 10`
+   與 `unverified_claims_removed: true`。這不是來源衝突,不得改標 `conflicted`,也不得
+   用新聞或搜尋摘要補洞。
+
+evidence pack 使用內容定址且不可覆寫。`qual_evidence.py` 本身不下載文件；drafter 先把
+3~5 份核心 PDF 放在本機,再對每份文件重複傳入
+`--source/--url/--pages/--page-count/--role`。四個必備 role 是 `annual_report`、
+`annual_financials`、`latest_quarterly_report`、`latest_investor_conference`；只有同一份年報
+PDF 已包含查核財報時,前兩個 role 才能合併在同一個 S#,股東會文件則使用選填的
+`shareholder_meeting`。`build` 與 reviewer 的 `verify` 都會用 Poppler `pdfinfo` 解析原檔並
+核對實際頁數；若不在 PATH,以 `--pdfinfo <路徑>` 指定。以下 S1~S3 的路徑、URL、引用
+實體頁與總頁數都必須換成實際值。
+
+```bash
+uv run --no-project --python 3.12 python scripts/qual_evidence.py build --stock-id 6525 --content-as-of 2026-07-11 --source S1=tmp/S1.pdf --url S1=https://example.com/S1.pdf --pages S1=4-6,12 --page-count S1=80 --role S1=annual_report,annual_financials --source S2=tmp/S2.pdf --url S2=https://example.com/S2.pdf --pages S2=5,18-19 --page-count S2=64 --role S2=latest_quarterly_report --source S3=tmp/S3.pdf --url S3=https://example.com/S3.pdf --pages S3=3,20 --page-count S3=40 --role S3=latest_investor_conference
+uv run --no-project --python 3.12 python scripts/qual_evidence.py render-plan "$PACK_DIR"
+uv run --no-project --python 3.12 python scripts/qual_evidence.py render "$PACK_DIR" --pdftoppm "$PDFTOPPM"
+uv run --no-project --python 3.12 python scripts/qual_evidence.py verify "$PACK_DIR" --renders
+```
+
+`build` 的 JSON stdout 會回傳 `pack_dir`、可提交的 `manifest` 路徑與 `pack_sha256`；把後
+兩者填回 meta。PDF／PNG 留在已忽略的 `tmp/qualitative_evidence/`,只有自動產生於
+`notes/qualitative/evidence/` 的小型 manifest 進版控。`build` 會把 SHA payload 檔案標成
+唯讀,`verify` 重算完整 64 位址、PDF 頁數與精確目錄內容；這是可偵測竄改的唯讀封存,
+不是阻止檔案擁有者自行改 ACL／chmod 的安全邊界。`render` 只在 pack 外建立衍生 PNG,
+不會改動 evidence payload。不同於 drafter 的
+reviewer 使用**同一個 pack**執行 `verify --renders`,離線重算
+文件與 pack SHA,並獨立重算數字、期間、單位及判斷推論邊界,不得重新下載另一份文件。
+簽核時必須把 `review_method` 填成 `offline_evidence_pack_independent_recalculation`；這個
+固定值連同 pack SHA 會被正文 hash 鎖住,明確 attested reviewer 採用同 pack 離線重算流程。
+
+每完成一篇 `independently_verified`,先執行 `qual_notes.py --hash <股號>`、把輸出填入
+`reviewed_content_sha256`,再執行 `--lint <股號>`；通過後只 stage 該 note 與其 manifest
+並立即做一個中文 commit,不可等三篇或多篇完成後才一起提交。這個單篇 commit 邊界不需
+寫入 meta,避免 commit SHA 與內容 hash 形成循環依賴。
+
 品質狀態與資料時效是兩條獨立軸：
 
 - `ai_draft`：預設；即使剛更新或已有引用,也不代表經 reviewer 查核。
@@ -262,8 +322,9 @@ uv run --no-project --python 3.12 python scripts/qual_notes.py --new 6525       
 uv run --no-project --python 3.12 python scripts/qual_notes.py --hash 6525             # reviewer 核完後產生內容雜湊
 ```
 
-研究流程是：先建立／更新 AI 草稿 → 用直接一手文件逐 claim 補 `[S#]` → 由未參與撰稿的
-reviewer 回查文件、數字、期間、單位與推論邊界 → 填簽核 meta → 產生 hash → `--lint`。
+研究流程是：先建立／更新 AI 草稿 → focused_v1 drafter 建立 evidence pack 並逐 claim 補
+`[S#]` → 未參與撰稿的 reviewer 用同一 pack 離線驗 SHA、文件、數字、期間、單位與推論
+邊界 → 填簽核 meta → 產生 hash → `--lint` → 該 note 與 manifest 立即獨立 commit。
 質化檔案或 parser 變更時，獨立的 `qualitative-quality` GitHub workflow 會執行 lint 與
 dashboard 契約測試；它不阻斷每日市場資料抓取。品質無效的宣告狀態會在 dashboard 保守
 降級（已知來源衝突則維持衝突警示），避免人工研究層故障使核心量化資料整批過期。

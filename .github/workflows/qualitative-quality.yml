@@ -6,9 +6,11 @@ on:
       - "notes/qualitative/**"
       - "config/universe.csv"
       - "scripts/qual_notes.py"
+      - "scripts/qual_evidence.py"
       - "scripts/build_dashboard.py"
       - "scripts/dashboard_template.html"
       - "tests/test_qual_notes_quality.py"
+      - "tests/test_qual_evidence.py"
       - "tests/test_dashboard_ux_contract.py"
       - ".github/workflows/qualitative-quality.yml"
   pull_request:
@@ -16,9 +18,11 @@ on:
       - "notes/qualitative/**"
       - "config/universe.csv"
       - "scripts/qual_notes.py"
+      - "scripts/qual_evidence.py"
       - "scripts/build_dashboard.py"
       - "scripts/dashboard_template.html"
       - "tests/test_qual_notes_quality.py"
+      - "tests/test_qual_evidence.py"
       - "tests/test_dashboard_ux_contract.py"
       - ".github/workflows/qualitative-quality.yml"
   workflow_dispatch: {}
@@ -40,4 +44,4 @@ jobs:
         run: python scripts/qual_notes.py --lint
 
       - name: 執行質化品質與 dashboard 契約測試
-        run: python -m unittest tests.test_qual_notes_quality tests.test_dashboard_ux_contract
+        run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_dashboard_ux_contract

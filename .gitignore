@@ -16,6 +16,9 @@ __pycache__/
 venv/
 .uv/
 
+# focused_v1 質化研究的本機 evidence pack；只提交 notes/qualitative/evidence/ manifest
+tmp/qualitative_evidence/
+
 # ── OS / 編輯器 ──
 Thumbs.db
 .DS_Store

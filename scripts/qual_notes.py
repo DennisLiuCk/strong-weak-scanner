@@ -16,11 +16,17 @@ import argparse
 import csv
 import glob
 import hashlib
+import json
 import os
 import re
 import sys
 from datetime import date, datetime, timedelta, timezone
 from urllib.parse import parse_qs, urlparse
+
+try:
+    import qual_evidence
+except ModuleNotFoundError:  # 支援以 scripts.qual_notes 匯入。
+    from scripts import qual_evidence
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -32,8 +38,12 @@ NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 TEMPLATE_MD = os.path.join(NOTES_DIR, "_template.md")
 UNIVERSE_CSV = os.path.join(ROOT, "config", "universe.csv")
 
-# 改了 _template.md 的研究結構或品質契約就必須遞增。
+# 核心章節或既有契約有 breaking change 才遞增；opt-in profile 可維持同版向後相容。
 TEMPLATE_VERSION = 2
+FOCUSED_RESEARCH_PROFILE = qual_evidence.RESEARCH_PROFILE
+FOCUSED_MIN_CLAIMS = 25
+FOCUSED_MAX_CLAIMS = 35
+FOCUSED_REVIEW_METHOD = "offline_evidence_pack_independent_recalculation"
 VERIFICATION_STATUSES = (
     "ai_draft",
     "partially_verified",
@@ -526,6 +536,126 @@ def _effective_verification(declared, errors):
     return declared
 
 
+def _focused_manifest_path(relative_path):
+    """把 tracked manifest 路徑限制在固定目錄，避免絕對路徑與 traversal。"""
+    value = (relative_path or "").strip()
+    if (not value or "\\" in value or os.path.isabs(value)
+            or not value.endswith(".json")):
+        return None
+    normalized = os.path.normpath(value).replace("\\", "/")
+    if normalized != value or not normalized.startswith("notes/qualitative/evidence/"):
+        return None
+    root = os.path.realpath(ROOT)
+    evidence_root = os.path.realpath(os.path.join(root, "notes", "qualitative", "evidence"))
+    unresolved = os.path.abspath(os.path.join(root, *normalized.split("/")))
+    if os.path.islink(unresolved):
+        return None
+    candidate = os.path.realpath(unresolved)
+    try:
+        if os.path.normcase(os.path.commonpath([evidence_root, candidate])) != os.path.normcase(evidence_root):
+            return None
+    except ValueError:
+        return None
+    return candidate
+
+
+def _focused_contract(meta, sid, sources, body_refs, claim_count, declared):
+    """驗證 focused_v1；未標 profile 的既有 v2 筆記維持原契約。"""
+    errors, warnings = [], []
+    profile = meta.get("research_profile", "").strip()
+    if profile and profile != FOCUSED_RESEARCH_PROFILE:
+        errors.append(f"未知 research_profile：{profile}")
+        return errors, warnings
+    if profile != FOCUSED_RESEARCH_PROFILE:
+        return errors, warnings
+
+    # 「約 25–35」是研究密度目標，不因自然段落切法讓已核驗內容失效。
+    if claim_count and not FOCUSED_MIN_CLAIMS <= claim_count <= FOCUSED_MAX_CLAIMS:
+        warnings.append(
+            f"focused_v1 目前有 {claim_count} 個 claim block；目標約 "
+            f"{FOCUSED_MIN_CLAIMS}–{FOCUSED_MAX_CLAIMS} 個真正重要主張"
+        )
+
+    # 草稿允許逐步填寫；完整門檻在宣告獨立核驗時一次收緊。
+    if declared != "independently_verified":
+        return errors, warnings
+
+    if meta.get("review_method", "").strip() != FOCUSED_REVIEW_METHOD:
+        errors.append(
+            "focused_v1 的 review_method 必須是 " + FOCUSED_REVIEW_METHOD
+        )
+
+    raw_ids = meta.get("core_source_ids", "")
+    core_ids = [value.strip() for value in raw_ids.split(",") if value.strip()]
+    if (len(core_ids) != len(set(core_ids))
+            or any(not qual_evidence.SOURCE_ID_RE.fullmatch(value) for value in core_ids)):
+        errors.append("focused_v1 的 core_source_ids 必須是無重複的 S# 清單")
+    if not qual_evidence.MIN_CORE_SOURCES <= len(core_ids) <= qual_evidence.MAX_CORE_SOURCES:
+        errors.append("focused_v1 必須列出 3–5 份核心文件")
+
+    core_set = set(core_ids)
+    if core_set != set(sources):
+        errors.append("focused_v1 的固定格式來源必須與 core_source_ids 完全一致")
+    non_primary = sorted(
+        source_id for source_id in core_set
+        if sources.get(source_id, {}).get("type") != "一手"
+    )
+    if non_primary:
+        errors.append("focused_v1 核心文件必須全為一手來源：" + ", ".join(non_primary))
+    unused_core = sorted(core_set - set(body_refs))
+    if unused_core:
+        errors.append("focused_v1 核心文件未被正文引用：" + ", ".join(unused_core))
+
+    signed_pack_sha = meta.get("evidence_pack_sha256", "").strip()
+    if not qual_evidence.SHA256_RE.fullmatch(signed_pack_sha):
+        errors.append("focused_v1 缺少合法 evidence_pack_sha256")
+
+    relative_manifest = meta.get("evidence_pack_manifest", "").strip()
+    if not relative_manifest.startswith(f"notes/qualitative/evidence/{sid}/"):
+        errors.append("focused_v1 的 evidence manifest 必須位於該 stock_id 子目錄")
+    manifest_path = _focused_manifest_path(relative_manifest)
+    if manifest_path is None:
+        errors.append("focused_v1 的 evidence_pack_manifest 必須位於 notes/qualitative/evidence/ 下")
+        return errors, warnings
+    if not os.path.isfile(manifest_path) or os.path.islink(manifest_path):
+        errors.append(f"focused_v1 找不到可提交的 evidence manifest：{relative_manifest}")
+        return errors, warnings
+
+    try:
+        with open(manifest_path, encoding="utf-8") as handle:
+            manifest = json.load(handle)
+        if not isinstance(manifest, dict):
+            raise ValueError("manifest 根節點必須是 JSON object")
+        manifest_errors = qual_evidence.validate_manifest(manifest)
+    except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        errors.append(f"focused_v1 evidence manifest 無法解析：{exc}")
+        return errors, warnings
+    errors.extend(f"evidence manifest：{issue}" for issue in manifest_errors)
+
+    if manifest.get("pack_sha256") != signed_pack_sha:
+        errors.append("evidence_pack_sha256 與 manifest 不一致")
+    if manifest.get("stock_id") != sid:
+        errors.append("evidence manifest stock_id 與筆記不一致")
+    if manifest.get("content_as_of") != meta.get("content_as_of"):
+        errors.append("evidence manifest content_as_of 與筆記不一致")
+
+    documents = manifest.get("documents", [])
+    if not isinstance(documents, list):
+        documents = []
+    manifest_ids = {
+        document.get("id") for document in documents if isinstance(document, dict)
+    }
+    if manifest_ids != core_set:
+        errors.append("evidence manifest 文件 ID 與 core_source_ids 不一致")
+    for document in documents:
+        if not isinstance(document, dict):
+            continue
+        source_id = document.get("id")
+        if source_id in sources and document.get("url") != sources[source_id]["url"]:
+            errors.append(f"{source_id} 的筆記 URL 與 evidence manifest 不一致")
+    return errors, warnings
+
+
 def _analyse_note(path, text):
     meta, errors = _parse_meta_details(text)
     warnings = []
@@ -696,6 +826,12 @@ def _analyse_note(path, text):
         if len(primary_conflict_refs) < 2:
             errors.append("未決衝突的雙方主張都必須實際指向一手來源")
 
+    focused_errors, focused_warnings = _focused_contract(
+        meta, sid, sources, body_refs, len(units), declared
+    )
+    errors.extend(focused_errors)
+    warnings.extend(focused_warnings)
+
     effective = _effective_verification(declared, errors)
     claim_count = len(units)
     return {
@@ -714,6 +850,11 @@ def _analyse_note(path, text):
         "reviewed_by": reviewed_by or None,
         "reviewed_at": reviewed_at or None,
         "review_scope": review_scope or None,
+        "review_method": meta.get("review_method") or None,
+        "research_profile": meta.get("research_profile") or None,
+        "core_source_ids": meta.get("core_source_ids") or None,
+        "evidence_pack_manifest": meta.get("evidence_pack_manifest") or None,
+        "evidence_pack_sha256": meta.get("evidence_pack_sha256") or None,
         "conflict_summary": meta.get("conflict_summary") or None,
         "reviewed_content_sha256": signed_digest or None,
         "summary": _extract_summary(text),

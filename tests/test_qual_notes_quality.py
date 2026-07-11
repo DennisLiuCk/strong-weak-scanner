@@ -1,5 +1,6 @@
 import contextlib
 import io
+import json
 import os
 import re
 import sys
@@ -13,6 +14,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 import qual_notes  # noqa: E402
+import qual_evidence  # noqa: E402
 
 
 PRIMARY = (
@@ -26,6 +28,18 @@ SECONDARY = (
 PRIMARY_2 = (
     "- [S2] **一手**｜交易所重大訊息（2026-05-16）｜說明第 5 項｜"
     "https://example.com/announcement"
+)
+FOCUSED_ANNUAL = (
+    "- [S1] **一手**｜公司 2025 年報暨年度查核財報（2026-03-31）｜p.45 產品組合｜"
+    "https://example.com/2025-annual-report.pdf"
+)
+FOCUSED_QUARTERLY = (
+    "- [S2] **一手**｜公司 2026 Q1 財務報告（2026-05-15）｜p.12 營業收入｜"
+    "https://example.com/2026q1.pdf"
+)
+FOCUSED_IR = (
+    "- [S3] **一手**｜公司 2026 Q1 法說簡報（2026-05-20）｜p.8 營運展望｜"
+    "https://example.com/2026q1-ir.pdf"
 )
 
 
@@ -119,6 +133,77 @@ def analyse(text, filename="1234_測試.md"):
     return qual_notes._analyse_note(os.path.join(ROOT, filename), text)
 
 
+def focused_manifest():
+    urls = {
+        "S1": "https://example.com/2025-annual-report.pdf",
+        "S2": "https://example.com/2026q1.pdf",
+        "S3": "https://example.com/2026q1-ir.pdf",
+    }
+    documents = []
+    for index, source_id in enumerate(("S1", "S2", "S3"), 1):
+        documents.append({
+            "id": source_id,
+            "roles": (
+                ["annual_report", "annual_financials"] if source_id == "S1"
+                else ["latest_quarterly_report"] if source_id == "S2"
+                else ["latest_investor_conference"]
+            ),
+            "url": urls[source_id],
+            "file": f"documents/{source_id}.pdf",
+            "sha256": str(index) * 64,
+            "size_bytes": 100 + index,
+            "page_count": 20,
+            "cited_pages": [10],
+            "rendered_pages": [9, 10, 11],
+        })
+    manifest = {
+        "schema": qual_evidence.SCHEMA,
+        "schema_version": qual_evidence.SCHEMA_VERSION,
+        "research_profile": qual_evidence.RESEARCH_PROFILE,
+        "stock_id": "1234",
+        "content_as_of": "2026-07-11",
+        "source_search_timeout_minutes": qual_evidence.SOURCE_SEARCH_TIMEOUT_MINUTES,
+        "unverified_claims_removed": True,
+        "documents": documents,
+    }
+    manifest["pack_sha256"] = qual_evidence.manifest_digest(manifest)
+    return manifest
+
+
+def focused_note(pack_sha):
+    text = independent_note()
+    text = text.replace(
+        "template_version: 2",
+        "template_version: 2\n"
+        "research_profile: focused_v1\n"
+        "core_source_ids: S1,S2,S3\n"
+        "evidence_pack_manifest: notes/qualitative/evidence/1234/test-pack.json\n"
+        f"evidence_pack_sha256: {pack_sha}\n"
+        "review_method: offline_evidence_pack_independent_recalculation",
+    )
+    text = text.replace(PRIMARY, "{{FOCUSED_SOURCES}}")
+    text = text.replace("[S1]", "[S1][S2][S3]")
+    text = text.replace(
+        "{{FOCUSED_SOURCES}}",
+        "\n".join((FOCUSED_ANNUAL, FOCUSED_QUARTERLY, FOCUSED_IR)),
+    )
+    return resign(text)
+
+
+def analyse_focused(text, manifest=None):
+    with tempfile.TemporaryDirectory() as directory:
+        manifest_path = os.path.join(
+            directory, "notes", "qualitative", "evidence", "1234", "test-pack.json"
+        )
+        os.makedirs(os.path.dirname(manifest_path), exist_ok=True)
+        if manifest is not None:
+            with open(manifest_path, "w", encoding="utf-8", newline="\n") as handle:
+                json.dump(manifest, handle, ensure_ascii=False, sort_keys=True)
+        note_path = os.path.join(directory, "1234_測試.md")
+        with mock.patch.object(qual_notes, "ROOT", directory):
+            return qual_notes._analyse_note(note_path, text)
+
+
 class QualitativeNoteQualityTests(unittest.TestCase):
     def test_legacy_v1_never_auto_upgrades_from_date_or_citations(self):
         text = f"""# 1234 測試
@@ -144,6 +229,85 @@ next_review: 2026-10-01
         self.assertEqual(11, note["cited_claim_count"])
         self.assertEqual(11, note["primary_cited_claim_count"])
         self.assertEqual([], note["quality_errors"])
+
+    def test_focused_profile_binds_note_to_tracked_evidence_manifest(self):
+        manifest = focused_manifest()
+        note = analyse_focused(focused_note(manifest["pack_sha256"]), manifest)
+        self.assertEqual("independently_verified", note["verification"])
+        self.assertEqual([], note["quality_errors"])
+        self.assertTrue(any("目標約 25–35" in item for item in note["quality_warnings"]))
+        self.assertEqual("focused_v1", note["research_profile"])
+        self.assertEqual(manifest["pack_sha256"], note["evidence_pack_sha256"])
+
+    def test_focused_claim_target_is_warning_not_false_quality_failure(self):
+        manifest = focused_manifest()
+        extra_claims = "\n".join(
+            f"- 額外的重要觀察 {index}。[S1]" for index in range(1, 15)
+        )
+        text = focused_note(manifest["pack_sha256"]).replace(
+            "- 毛利率為 30%。[S1]",
+            "- 毛利率為 30%。[S1]\n" + extra_claims,
+        )
+        note = analyse_focused(resign(text), manifest)
+        self.assertEqual(25, note["claim_count"])
+        self.assertEqual("independently_verified", note["verification"])
+        self.assertFalse(any("目標約 25–35" in item for item in note["quality_warnings"]))
+
+        too_many = "\n".join(
+            f"- 次要觀察 {index}。[S1]" for index in range(1, 26)
+        )
+        text = focused_note(manifest["pack_sha256"]).replace(
+            "- 毛利率為 30%。[S1][S2][S3]",
+            "- 毛利率為 30%。[S1][S2][S3]\n" + too_many,
+        )
+        note = analyse_focused(resign(text), manifest)
+        self.assertEqual(36, note["claim_count"])
+        self.assertEqual("independently_verified", note["verification"])
+        self.assertTrue(any("目標約 25–35" in item for item in note["quality_warnings"]))
+
+    def test_focused_profile_rejects_missing_or_mismatched_pack(self):
+        manifest = focused_manifest()
+        wrong_sha = "f" * 64
+        note = analyse_focused(focused_note(wrong_sha), manifest)
+        self.assertEqual("ai_draft", note["verification"])
+        self.assertTrue(any("evidence_pack_sha256 與 manifest 不一致" in error
+                            for error in note["quality_errors"]))
+
+        missing = analyse_focused(focused_note(manifest["pack_sha256"]), None)
+        self.assertEqual("ai_draft", missing["verification"])
+        self.assertTrue(any("找不到可提交的 evidence manifest" in error
+                            for error in missing["quality_errors"]))
+
+        no_recalculation = focused_note(manifest["pack_sha256"]).replace(
+            "review_method: offline_evidence_pack_independent_recalculation",
+            "review_method:",
+        )
+        note = analyse_focused(resign(no_recalculation), manifest)
+        self.assertEqual("ai_draft", note["verification"])
+        self.assertTrue(any("review_method" in error for error in note["quality_errors"]))
+
+    def test_focused_profile_rejects_source_set_and_url_drift(self):
+        manifest = focused_manifest()
+        missing_core = focused_note(manifest["pack_sha256"]).replace(
+            "core_source_ids: S1,S2,S3", "core_source_ids: S1,S2"
+        )
+        note = analyse_focused(resign(missing_core), manifest)
+        self.assertEqual("ai_draft", note["verification"])
+        self.assertTrue(any("3–5 份核心文件" in error for error in note["quality_errors"]))
+
+        drifted = focused_note(manifest["pack_sha256"]).replace(
+            "https://example.com/2026q1-ir.pdf",
+            "https://example.com/changed-2026q1-ir.pdf",
+        )
+        note = analyse_focused(resign(drifted), manifest)
+        self.assertEqual("ai_draft", note["verification"])
+        self.assertTrue(any("S3 的筆記 URL" in error for error in note["quality_errors"]))
+
+    def test_legacy_v2_is_not_retroactively_forced_into_focused_limits(self):
+        note = analyse(independent_note())
+        self.assertEqual("independently_verified", note["verification"])
+        self.assertEqual([], note["quality_errors"])
+        self.assertFalse(any("25–35" in item for item in note["quality_warnings"]))
 
     def test_table_caption_citation_does_not_cover_uncited_row(self):
         note = analyse(independent_note(table_citation=""))

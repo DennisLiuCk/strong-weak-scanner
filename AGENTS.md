@@ -23,7 +23,7 @@
 | 盤後確認執行狀況、討論今日資料 | `DAILY_CHECK.md`;核心工具 `scripts/daily_brief.py`(唯讀) |
 | 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
-| 個股質化筆記建立/維護、biz 對齊複核 | README「質化研究筆記」+ `scripts/qual_notes.py` |
+| 個股質化筆記建立/維護、biz 對齊複核 | README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` |
 
 ## 鐵律
 
@@ -35,6 +35,20 @@
   `fetch_daily.py` 頂部(族群/大盤層),不散落他處。
 - 版本沿革與實證依據記 `CHANGELOG.md`;README 與網站只描述現行系統,不放版本敘事。
 - commit 訊息用中文;策略變更需附依據數字(哪份報告、哪個指標)。
+- **新建或重新展開完整研究的質化筆記一律使用 `research_profile: focused_v1`**;
+  既有未標 profile 的 v2 筆記沿用原品質契約,不因 focused 規範回溯失效。
+- focused 研究只選 3~5 份核心一手文件:年報、年度財報、最新季報、最新法說四種 role
+  必備(年報含查核財報時可共用一份 PDF),股東會僅必要時選填;正文約 25~35 個真正重要
+  claim block;
+  找不到穩定來源時每份文件最多查找 10 分鐘,逾時就在 evidence manifest 記錄
+  `source_search_timeout_minutes: 10` 與 `unverified_claims_removed: true`,並從正文刪除
+  該主張,不可繼續追逐或以二手資料補洞。
+- PDF 只渲染實際引用頁及前後各一頁。drafter 建立含完整 SHA、payload mode 唯讀且
+  可離線偵測竄改的 evidence pack 後(不是不可繞過的 ACL 安全邊界),
+  reviewer 必須使用同一 pack 離線重算檔案 SHA、數字、期間、單位與推論邊界,不得重下載。
+  focused 簽核的 `review_method` 固定填 `offline_evidence_pack_independent_recalculation`。
+- 每完成一篇 `independently_verified` 就只把該 note 與對應 evidence manifest 做成一個
+  獨立 commit;不可累積三篇或多篇後一起提交。PDF/PNG pack 留在 `tmp/`,不得進版控。
 
 ## 架構速覽
 
@@ -52,6 +66,8 @@ validate.py      → reports/ 週報(§⑥=觀察因子 IC)
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
 qual_notes.py    notes/qualitative/*.md(年報MD&A/法說會重點,人工撰寫)狀態追蹤+骨架建立
                  ⚠ 唯讀盤點工具,不抓資料;已有筆記的股票不會被要求重寫,除非模板版本升級
+qual_evidence.py focused_v1 evidence pack 建立/渲染規劃/離線驗證;可提交 manifest
+                 → notes/qualitative/evidence/,PDF/PNG → tmp/qualitative_evidence/(不進版控)
 ```
 
 資料表:原始 price/inst/margin/holding/sbl(借券餘額,單位=股)+ tdcc_holding(週頻)+

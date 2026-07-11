@@ -3,14 +3,19 @@
 <!-- meta
 stock_id: {{STOCK_ID}}
 template_version: {{TEMPLATE_VERSION}}
+research_profile: focused_v1
 verification_status: ai_draft
 drafted_by: ai
 last_updated:
 content_as_of:
 latest_financial_period:
 next_review:
+core_source_ids:
+evidence_pack_manifest:
+evidence_pack_sha256:
 reviewed_by:
 reviewed_at:
+review_method:
 review_scope:
 reviewed_content_sha256:
 conflict_summary:
@@ -29,6 +34,19 @@ conflict_summary:
    review_scope 設為 all_material_claims，且所有 claim block 都有一手來源。
 4. reviewer 完成複核後執行 `qual_notes.py --hash {{STOCK_ID}}`，將結果填入
    reviewed_content_sha256；正文再被修改就會自動失去簽核資格。
+5. focused_v1 只使用 3–5 份核心一手文件，全文以約 25–35 個真正重要 claim block
+   為目標；manifest 必須涵蓋年報、年度財報、最新季報與最新法說 role，股東會僅在
+   必要時加入。這是聚焦警示，不鼓勵為湊數拆句或保留不重要主張。
+6. PDF 只渲染正文實際引用頁及前後各一頁，不渲染全本。drafter 建立完整 SHA、payload
+   mode 唯讀且可偵測竄改的 evidence pack；reviewer 使用同一 pack 離線執行 verify、
+   重算數字並獨立判讀，不重下載。這是流程封存，不是不可繞過的 ACL 安全邊界。
+   focused_v1 簽核時 review_method 固定填 offline_evidence_pack_independent_recalculation。
+7. 每份缺失核心文件只找 10 分鐘；manifest 固定記 `source_search_timeout_minutes: 10`
+   與 `unverified_claims_removed: true`，正文必須刪除未驗證主張。來源衝突才使用
+   conflicted，找不到來源不等於來源衝突。
+8. 每完成一篇獨立簽核，該 note 與其 evidence manifest 必須單獨 commit，不累積多篇。
+9. 既有未標 research_profile 的 v2 筆記仍依原契約有效；focused_v1 只套用新建或
+   重新展開完整研究的筆記。
 -->
 
 ## 30 秒摘要
@@ -74,7 +92,7 @@ conflict_summary:
 ## 證據索引與資料來源（擷取日期：{{TODAY}}）
 
 <!-- 固定格式：- [S1] **一手**｜文件名稱與發布／資料日期｜頁碼、表格或章節｜直接 HTTPS URL -->
-（待填：刪除此行後，依上方固定格式加入正文實際引用的來源；不要保留範例網址。）
+（待填：刪除此行後，只列 core_source_ids 指定的 3–5 份正文實際引用核心文件；不要保留範例網址。）
 
 ## 下次更新與事件觸發
 
