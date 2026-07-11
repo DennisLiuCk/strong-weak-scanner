@@ -29,13 +29,17 @@
 
 ### 2. 取得核心來源：只把搜尋當入口
 
-- [ ] 優先依序查公司 IR、MOPS／TWSE／TPEx；搜尋引擎、新聞與法說摘要只能協助定位，
-  不可成為正文證據。
+- [ ] 依 [一手文件取得指南](QUALITATIVE_SOURCE_ACQUISITION.md) 的公司 IR → MOPS／TWSE／TPEx
+  順序與失敗備援取件；搜尋引擎、新聞與法說摘要只能協助定位，不可成為正文證據。
 - [ ] 核心 role 必須涵蓋 `annual_report`、`annual_financials`、
   `latest_quarterly_report`、`latest_investor_conference`。年報若確實內含查核財報，可由同一
   PDF 同時承擔前兩個 role；股東會只在治理／股利主張必要時加入。
-- [ ] 每份文件記錄直接 HTTPS URL、發布／資料日期、財務期間、PDF 實體總頁數。正文的頁碼
-  一律指 PDF 實體頁，不使用文件印刷頁碼。
+- [ ] 每份文件記錄可重現的官方 HTTPS locator、發布／資料日期、財務期間、精確檔名與 PDF
+  實體總頁數。優先記永久 PDF 直鏈；MOPS 若以 POST 產生短效 `/pdf/` 位址，改記帶完整參數的
+  官方文件清單 URL 與結果列檔名，不把首頁、泛用搜尋頁或短效位址當來源。正文頁碼一律指
+  PDF 實體頁，不使用文件印刷頁碼。
+- [ ] 下載後確認檔案開頭為 `%PDF-`，人工核對 PDF 內的公司與期間，並由 `pdfinfo` 成功解析
+  頁數；HTTP 200、`.pdf` 副檔名或 `Content-Type` 都不能單獨視為合格 PDF。
 - [ ] 每份缺失文件最多找 10 分鐘；逾時即停止，manifest 保留
   `source_search_timeout_minutes: 10` 與 `unverified_claims_removed: true`，並刪除無法驗證的
   主張，不用二手來源補洞。10 分鐘規則不會豁免四個必備 role；若必備文件確實不存在，

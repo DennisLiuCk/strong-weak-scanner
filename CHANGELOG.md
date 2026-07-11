@@ -2,6 +2,22 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 質化研究一手文件取得與官方備援 — 2026-07-12
+
+**策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與
+`validate.py` 的 `IS_CUTOFF` 皆未動）。本次只補齊 focused 質化研究的取件操作，避免 agent
+因公司 IR 改版、MOPS 動態下載或舊書籤失效而無限追逐來源。
+
+- 新增公司 IR → MOPS／TWSE → TPEx 的角色別取件表，並以 TWSE／TPEx 公司基本資料 OpenAPI
+  定位官方公司網站；搜尋引擎與二手資料仍只能用於發現入口。
+- 實測並記錄 `doc.twse.com.tw/server-java/t57sb01` 的財報／年報查詢參數。`step=1` 回傳的是
+  文件清單，點擊後才產生短效 PDF，因此 evidence 優先記永久附件直鏈；動態文件則記完整
+  官方清單 URL，加上精確檔名、期間及上傳日，不把首頁或短效 `/pdf/` 位址當來源。
+- 補上 MOPS 法說附件、TPEx 法說附件與單筆重大訊息的常見 URL 形態，以及 popup、HTML
+  偽 PDF、JavaScript／session、文件更正與舊路由失效時的官方備援。
+- 收件新增 `%PDF-`、`pdfinfo`、公司／期間、頁數與 SHA 驗收；10 分鐘搜尋止損、缺必備 role
+  維持 `ai_draft`、reviewer 不重新下載與來源替換必須建立新 pack SHA 等品質門檻均未放寬。
+
 ## 個股自身技術面觀察：MA／RSI／價量關係 — 2026-07-11
 
 **策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與
