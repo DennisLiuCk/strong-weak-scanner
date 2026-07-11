@@ -1,0 +1,177 @@
+{
+  "content_as_of": "2026-07-11",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        76,
+        77,
+        78,
+        81
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 97,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "8f3dfb0c22c235c569b979ce505a9c99b928e42276f8045a289bacfb85b4fa03",
+      "size_bytes": 1741779,
+      "url": "https://www.tai.com.tw/files/uploads/Download/Investors/Shareholders/2026%E5%B9%B4%E8%82%A1%E6%9C%83%E8%B3%87%E6%96%99/2026-%E5%B9%B4%E5%A0%B1.pdf"
+    },
+    {
+      "cited_pages": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        50,
+        53,
+        57,
+        71,
+        73
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 82,
+      "rendered_pages": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        56,
+        57,
+        58,
+        70,
+        71,
+        72,
+        73,
+        74
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "53166c87a12928ccc3b04797d98228adaad36506f7e3df2ad1fef38f5fa8fd01",
+      "size_bytes": 6088814,
+      "url": "https://www.tai.com.tw/files/uploads/Download/Investors/Financial%20Release/Fiancial/2025Q4-CH.pdf"
+    },
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        19,
+        20,
+        40,
+        42,
+        44,
+        46,
+        52
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 67,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        18,
+        19,
+        20,
+        21,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        51,
+        52,
+        53
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "6b15b7d57153c82a52faca1b19c15b98edde3c29075631fc5ac098036a44ffd8",
+      "size_bytes": 1488426,
+      "url": "https://www.tai.com.tw/files/uploads/Download/Investors/Financial%20Release/Fiancial/2026Q1-CH.pdf"
+    },
+    {
+      "cited_pages": [
+        9,
+        11,
+        12,
+        13
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 17,
+      "rendered_pages": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "e4b995338202a285972eae121d99915d9431d49d3203e2689ef01a4697f696d7",
+      "size_bytes": 1909958,
+      "url": "https://www.tai.com.tw/files/uploads/Download/Investors/Financial%20Release/Conference/%E6%9C%80%E6%96%B0%E6%B3%95%E8%AA%AA-CH_2025.pdf"
+    }
+  ],
+  "pack_sha256": "a4495427b74242ced265d80bffaf1a9e277c2ac84850a0196d7a28fc259f8d8a",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2478",
+  "unverified_claims_removed": true
+}
