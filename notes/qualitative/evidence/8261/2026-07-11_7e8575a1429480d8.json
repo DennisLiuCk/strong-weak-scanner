@@ -1,0 +1,188 @@
+{
+  "content_as_of": "2026-07-11",
+  "documents": [
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 13,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "3323e5e0932cde7a2ed39974f8995e550ce4e579b67498a109e7c0e3b5360fd7",
+      "size_bytes": 449215,
+      "url": "https://www.a-power.com.tw/assets/upload/files/2026/04/24/43497b6c91798d86ff1b3f98.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        13,
+        14,
+        15
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 46,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "bf754769f610ae70abb7d5de2b70dc3c88aae8af4db552175848d455bee5b49a",
+      "size_bytes": 1366923,
+      "url": "https://www.a-power.com.tw/assets/upload/files/2026/05/04/52eb0c414e371a99070a1cd9.pdf"
+    },
+    {
+      "cited_pages": [
+        9,
+        13,
+        67,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        88,
+        89,
+        90,
+        91
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 94,
+      "rendered_pages": [
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "ea875d1e52464b9287b02ccd28457fe0b048116d935d1911b8734b531d474ab2",
+      "size_bytes": 5169027,
+      "url": "https://www.a-power.com.tw/assets/upload/files/2026/06/23/1e0b86bdd9cb72fb678b0d45.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        50,
+        51,
+        52,
+        53,
+        54
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 60,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "c387ae1737d1e38eb550f6c2a4f9eaa684c34355f6e1162e615aa84b85e50953",
+      "size_bytes": 1480758,
+      "url": "https://www.a-power.com.tw/assets/upload/files/2026/03/08/37b83c346cc0d2ae88e52ff9.pdf"
+    }
+  ],
+  "pack_sha256": "7e8575a1429480d8b4fb1908c75c8b5a9c4aee607c90d32ebb6106cf490bfe80",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "8261",
+  "unverified_claims_removed": true
+}
