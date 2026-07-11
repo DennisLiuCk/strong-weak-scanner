@@ -63,10 +63,10 @@ class LeadingHypothesesTest(unittest.TestCase):
                                  today="2026-07-12")
         self.assertTrue(any("可證偽條件" in error for error in info["quality_errors"]))
 
-    def test_initial_pilot_has_ten_valid_reports_and_twenty_hypotheses(self):
+    def test_two_pilot_batches_have_twenty_valid_reports_and_forty_hypotheses(self):
         reports = lh.load_reports()
-        self.assertEqual(len(reports), 10)
-        self.assertEqual(sum(report["hypothesis_count"] for report in reports.values()), 20)
+        self.assertEqual(len(reports), 20)
+        self.assertEqual(sum(report["hypothesis_count"] for report in reports.values()), 40)
         self.assertFalse([report["quality_errors"] for report in reports.values()
                           if report["quality_invalid"]])
 
