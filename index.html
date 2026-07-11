@@ -253,29 +253,31 @@
   .rl{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:9px 10px 9px 16px;min-width:0}
   .rl .nm{font-weight:800;font-size:14px;letter-spacing:.2px}
   .rl .code{font-size:11px;color:var(--muted)}
-  /* 官方列管是最高層級警示:實心紅,與「營收YoY」等描邊資訊 pill 拉開視覺位階 */
-  .riskbadge{display:inline-flex;align-items:center;justify-content:center;width:fit-content;min-height:28px;margin-top:2px;
-    font-size:11.5px;font-weight:700;color:var(--surface);border:1px solid var(--strong);border-radius:100px;
-    padding:3px 9px;cursor:pointer;letter-spacing:.3px;background:var(--strong);white-space:nowrap}
-  .riskbadge.sm{margin-top:0;padding:0 5px;flex:0 0 auto}
-  .badges{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;margin-top:3px}
-  /* 籌碼診斷與其他標記同款 pill(舊版圓點外觀近似 radio button,易誤讀為可勾選);
-     文字帶狀態字(健/中/待),遵守「不靠顏色單獨判讀」 */
-  .hdot{display:inline-flex;align-items:center;width:fit-content;min-height:28px;font-family:inherit;
-    font-size:11.5px;font-weight:700;border:1px solid currentColor;border-radius:100px;
-    padding:3px 9px;cursor:pointer;flex:0 0 auto;letter-spacing:.1px;white-space:nowrap}
+  /* 股名列:官方處置/注意直接貼在名稱旁——嚴重度=位置,第一眼就看到 */
+  .nmline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .riskbadge{display:inline-flex;align-items:center;min-height:18px;
+    font-size:10px;font-weight:800;color:var(--surface);border:1px solid var(--strong);border-radius:5px;
+    padding:0 7px;cursor:pointer;letter-spacing:.5px;background:var(--strong);white-space:nowrap}
+  .riskbadge.sm{padding:0 5px;flex:0 0 auto}
+  /* 觀察標記單行資訊列(方案D):籌碼=小膠囊、YoY=帶色數字、筆記=小圖徽——
+     常態一行收工,去框後紅色注意力保留給官方警示 */
+  .badges{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:5px}
+  .hdot{display:inline-flex;align-items:center;min-height:20px;font-family:inherit;
+    font-size:10.5px;font-weight:700;border:1px solid currentColor;border-radius:100px;
+    padding:0 8px;cursor:pointer;flex:0 0 auto;letter-spacing:.1px;white-space:nowrap}
   .hdot:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   .hdot.health{color:var(--health);background:var(--health-tint)}
   .hdot.neutral{color:var(--ink-2);background:var(--neutral-tint)}
   .hdot.warn{color:var(--warn);background:var(--warn-bg)}
-  .fundbadge{display:inline-flex;align-items:center;width:fit-content;min-height:28px;margin-top:2px;font-family:inherit;
-    font-size:11.5px;font-weight:700;border:1px solid currentColor;border-radius:100px;
-    padding:3px 9px;cursor:pointer;background:none;letter-spacing:.1px;white-space:nowrap}
+  .fundbadge{display:inline-flex;align-items:center;font-family:inherit;font-variant-numeric:tabular-nums;
+    font-size:11.5px;font-weight:700;border:none;border-radius:6px;
+    padding:0;cursor:pointer;background:none;letter-spacing:.1px;white-space:nowrap}
+  .fundbadge:hover,.fundbadge:focus-visible{text-decoration:underline;text-underline-offset:3px}
   .fundbadge.up{color:var(--strong)}
   .fundbadge.down{color:var(--weak)}
   .fundbadge.flat{color:var(--muted)}
-  .notebadge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
-    margin-top:2px;font-size:13px;line-height:1;border:1px solid currentColor;border-radius:100px;
+  .notebadge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+    font-size:12px;line-height:1;border:1px solid currentColor;border-radius:100px;
     padding:0;cursor:pointer;background:none;flex:0 0 auto}
   .notebadge.ai_draft{color:var(--muted);border-style:dashed}
   .notebadge.partially_verified{color:var(--warn-line);background:var(--warn-bg)}
@@ -511,6 +513,11 @@
     .mtoolbar .toggle{flex:1 1 auto;justify-content:center}
     .riskbadge,.fundbadge,.notebadge,.hdot{min-height:44px;height:44px}
     .riskbadge,.fundbadge,.hdot{padding-inline:12px}
+    /* 行動版卡片要大點按目標:恢復膠囊外觀與字級 */
+    .riskbadge{border-radius:100px;font-size:11.5px}
+    .fundbadge{border:1px solid currentColor;border-radius:100px}
+    .fundbadge:hover{text-decoration:none}
+    .hdot{font-size:11.5px}
     .notebadge{width:44px}
     .overview{padding:15px 16px}
   }
@@ -622,11 +629,11 @@
     <div style="grid-column:1 / -1">
       <h3>個股標記(觀察資訊,不影響左側①~⑤評分與已確認分層;點列表格內同款圖示看明細)</h3>
       <div class="scale">
-        <span class="sk"><span class="riskbadge sm">處置</span>／<span class="riskbadge sm">注意</span>交易所官方列管(TWSE/TPEx 異常價量認證)</span>
-        <span class="sk"><span class="hdot health">籌碼 健</span>籌碼現況診斷:健康</span>
-        <span class="sk"><span class="hdot neutral">籌碼 中</span>籌碼現況診斷:中性</span>
-        <span class="sk"><span class="hdot warn">籌碼 待</span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
-        <span class="sk"><span class="fundbadge up">營收YoY +18%</span>基本面參考:只描述最新月營收較去年同月的變化，不直接判定營運強弱</span>
+        <span class="sk"><span class="riskbadge sm">處置</span>／<span class="riskbadge sm">注意</span>交易所官方列管(TWSE/TPEx 異常價量認證),直接標在股名旁</span>
+        <span class="sk"><span class="hdot health">籌碼健</span>籌碼現況診斷:健康</span>
+        <span class="sk"><span class="hdot neutral">籌碼中</span>籌碼現況診斷:中性</span>
+        <span class="sk"><span class="hdot warn">籌碼待</span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
+        <span class="sk"><span class="fundbadge up">YoY +18%</span>基本面參考(YoY=最新月營收較去年同月):只描述變化方向,不直接判定營運強弱</span>
         <span class="sk"><span class="notebadge ai_draft">📝</span>AI 草稿・未獨立查核</span>
         <span class="sk"><span class="notebadge partially_verified">📝</span>僅明列範圍完成獨立核驗</span>
         <span class="sk"><span class="notebadge independently_verified">📝</span>全部重要主張已核對一手來源</span>
@@ -1228,15 +1235,15 @@
   function stockRow(row){
     var r=document.createElement("div"); r.className="row"; r.dataset.g=row.g;
     var rl=document.createElement("div"); rl.className="rl";
-    var nm=document.createElement("span"); nm.className="nm"; nm.textContent=row.nm; rl.appendChild(nm);
-    var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; rl.appendChild(code);
-    if(row.biz){ var bz=document.createElement("span"); bz.className="code"; bz.textContent=row.biz; rl.appendChild(bz); }
+    // 股名列:名稱 + 官方警示(處置/注意)同列——警示不與觀察標記混排,層級最高所以位置最前
+    var nmline=document.createElement("div"); nmline.className="nmline";
+    var nm=document.createElement("span"); nm.className="nm"; nm.textContent=row.nm; nmline.appendChild(nm);
     var badges=document.createElement("div"); badges.className="badges";
     if(row.risk && row.risk.length){
       var rk=document.createElement("button"); rk.type="button"; rk.className="riskbadge";
       rk.textContent = row.risk.some(function(x){ return x.kind==="處置"; }) ? "處置" : "注意";
       rk.setAttribute("aria-label",rk.textContent+"股票，點擊查看交易所列管理由");
-      badges.appendChild(rk);
+      nmline.appendChild(rk);
       attachTip(rk, (function(row){ return function(){
         return { el:"處置/注意股票 · 觀察層(不計分)", who: row.nm+"("+row.id+")", biz: row.biz,
           rows: row.risk.map(function(x){ return [x.kind, x.period||"", x.reason||""]; }),
@@ -1246,10 +1253,13 @@
           scLabel: "⚠ 列管中", scColor: "var(--strong)", scBg: "var(--strong-tint)" };
       };})(row));
     }
+    rl.appendChild(nmline);
+    var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; rl.appendChild(code);
+    if(row.biz){ var bz=document.createElement("span"); bz.className="code"; bz.textContent=row.biz; rl.appendChild(bz); }
     if(row.chip){
       var hd=document.createElement("button"); hd.type="button"; hd.tabIndex=0;
       hd.className="hdot "+row.chip.cls;
-      hd.textContent={health:"籌碼 健",neutral:"籌碼 中",warn:"籌碼 待"}[row.chip.cls]||"籌碼";
+      hd.textContent={health:"籌碼健",neutral:"籌碼中",warn:"籌碼待"}[row.chip.cls]||"籌碼";
       hd.setAttribute("aria-label", "籌碼現況診斷:"+row.chip.label+",非選股排名");
       badges.appendChild(hd);
       var CHIP_PILL = {health:["var(--health)","var(--health-tint)"], neutral:["var(--neutral)","var(--neutral-tint)"],
@@ -1271,7 +1281,8 @@
     if(row.fund){
       var fb=document.createElement("button"); fb.type="button"; fb.tabIndex=0;
       fb.className="fundbadge "+row.fund.cls;
-      fb.textContent = revenueLabel(row.fund.label);
+      // 桌機縮寫成帶色數字(YoY 全稱與定義在點開的詳情與圖例),把紅色注意力留給官方警示
+      fb.textContent = row.fund.label.replace(/^營收YoY/,"YoY");
       fb.setAttribute("aria-label", "月營收基本面參考:"+row.fund.label);
       badges.appendChild(fb);
       var FUND_COL = {up:["var(--strong)","var(--strong-tint)"], down:["var(--weak)","var(--weak-tint)"],
