@@ -582,6 +582,52 @@ def build_price_adj(con):
         print(f"  ! price_adj 缺 {miss} 列(metrics 將以原始價替代——不應發生,請檢查)", file=sys.stderr)
     con.commit()
 
+def _window_mean(values, k, window):
+    """含當日的完整交易日視窗平均；樣本不足或中間缺值時不產生指標。"""
+    if k + 1 < window:
+        return None
+    sample = values[k-window+1:k+1]
+    if any(v is None for v in sample):
+        return None
+    return sum(sample) / window
+
+
+def _wilder_rsi(values, period=14):
+    """Wilder RSI；首值使用 period 個漲跌的簡單平均，之後採 Wilder 平滑。"""
+    out = [None] * len(values)
+    gains, losses = [], []
+    avg_gain = avg_loss = None
+
+    def value(gain, loss):
+        if loss == 0:
+            return 50.0 if gain == 0 else 100.0
+        return 100.0 - 100.0 / (1.0 + gain / loss)
+
+    for k in range(1, len(values)):
+        prev, cur = values[k-1], values[k]
+        if prev is None or cur is None:
+            gains, losses = [], []
+            avg_gain = avg_loss = None
+            continue
+        delta = cur - prev
+        gain, loss = max(delta, 0.0), max(-delta, 0.0)
+        if avg_gain is None:
+            gains.append(gain)
+            losses.append(loss)
+            if len(gains) < period:
+                continue
+            if len(gains) > period:
+                gains.pop(0)
+                losses.pop(0)
+            avg_gain = sum(gains) / period
+            avg_loss = sum(losses) / period
+        else:
+            avg_gain = (avg_gain * (period - 1) + gain) / period
+            avg_loss = (avg_loss * (period - 1) + loss) / period
+        out[k] = value(avg_gain, avg_loss)
+    return out
+
+
 def build_metrics(con):
     """由原始表重算五元素衍生指標(純 Python 滾動,穩健)。整表重建,可重複執行。
     價格類(ret1/ret20/距高)用還原價;股本取「當日」值(forward-fill)。
@@ -589,7 +635,10 @@ def build_metrics(con):
     rs20(20日相對強弱)、down_rs20(族群下跌日抗跌)、dipbuy20(逆勢買超)。"""
     con.execute("DROP TABLE IF EXISTS daily_metrics")
     con.execute("""CREATE TABLE daily_metrics(
-        date TEXT, stock_id TEXT, close REAL, close_adj REAL, ret1 REAL, ret20 REAL,
+        date TEXT, stock_id TEXT, close REAL, close_adj REAL,
+        ma5 REAL, ma20 REAL, ma60 REAL, rsi14 REAL,
+        volume INTEGER, vol_ma5 REAL, vol_ma20 REAL, vol_ma60 REAL, vol_ratio20 REAL,
+        ret1 REAL, ret20 REAL,
         turnover_pct REAL, vol_ratio60 REAL,   -- ②量:周轉率 + 量比(相對自身60日中位)
         dist_hi20 REAL, dist_hi60 REAL,        -- ①價:距 20/60 日高(還原價)
         rs20 REAL, down_rs20 REAL,             -- ①價(相對):20日報酬-族群中位;族群下跌日平均相對表現
@@ -641,9 +690,22 @@ def build_metrics(con):
             else:
                 sh[k] = prev
         turn = [(rows[k][2] / sh[k] * 100) if (rows[k][2] is not None and sh[k]) else None for k in range(n)]
+        volumes = [r[2] for r in rows]
+        ma5s = [_window_mean(adj, k, 5) for k in range(n)]
+        ma20s = [_window_mean(adj, k, 20) for k in range(n)]
+        ma60s = [_window_mean(adj, k, 60) for k in range(n)]
+        rsi14s = _wilder_rsi(adj, 14)
+        vol_ma5s = [_window_mean(volumes, k, 5) for k in range(n)]
+        vol_ma20s = [_window_mean(volumes, k, 20) for k in range(n)]
+        vol_ma60s = [_window_mean(volumes, k, 60) for k in range(n)]
+        vol_ratio20s = [(volumes[k] / vol_ma20s[k]) if (volumes[k] is not None and vol_ma20s[k]) else None
+                        for k in range(n)]
         ret1s = [(adj[k] / adj[k-1] - 1) if (k > 0 and adj[k-1] and adj[k]) else None for k in range(n)]
         ret20s = [(adj[k] / adj[k-20] - 1) if (k >= 20 and adj[k-20] and adj[k]) else None for k in range(n)]
-        S[sid] = dict(grp=grp, rows=rows, adj=adj, sh=sh, turn=turn, ret1=ret1s, ret20=ret20s)
+        S[sid] = dict(grp=grp, rows=rows, adj=adj, sh=sh, turn=turn,
+                      ma5=ma5s, ma20=ma20s, ma60=ma60s, rsi14=rsi14s,
+                      vol_ma5=vol_ma5s, vol_ma20=vol_ma20s, vol_ma60=vol_ma60s,
+                      vol_ratio20=vol_ratio20s, ret1=ret1s, ret20=ret20s)
     # ── 族群逐日中位數(等權,供相對指標)──
     g1, g20 = {}, {}
     for sid, st in S.items():
@@ -715,12 +777,15 @@ def build_metrics(con):
             sblc5 = (sblv - sblp[k-5]) if (sblv is not None and k >= 5 and sblp[k-5] is not None) else None
             sblc10 = (sblv - sblp[k-10]) if (sblv is not None and k >= 10 and sblp[k-10] is not None) else None
             sblc20 = (sblv - sblp[k-20]) if (sblv is not None and k >= 20 and sblp[k-20] is not None) else None
-            out.append((d, sid, close, ca, ret1, ret20, turnover, vratio,
+            out.append((d, sid, close, ca,
+                        st["ma5"][k], st["ma20"][k], st["ma60"][k], st["rsi14"][k],
+                        vol, st["vol_ma5"][k], st["vol_ma20"][k], st["vol_ma60"][k],
+                        st["vol_ratio20"][k], ret1, ret20, turnover, vratio,
                         (ca/hi20 - 1) if (hi20 and ca) else None, (ca/hi60 - 1) if (hi60 and ca) else None,
                         rs20, down_rs20, fp, fchg5, fchg20, dipbuy20, dipbuy20_t,
                         trust5, trust5_pct, foreign5, mb, mutil, mchg5, mchg10, mchg20, smr,
                         td, b4, b4c, b10, b10c, ppc, sblv, sblc5, sblc10, sblc20))
-        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(" + ",".join("?" * 36) + ")", out)
+        con.executemany("INSERT OR REPLACE INTO daily_metrics VALUES(" + ",".join("?" * 45) + ")", out)
     con.commit()
 
 def _gstate(breadth, dist, dip, rel):

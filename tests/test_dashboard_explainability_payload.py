@@ -34,7 +34,63 @@ def metric_row(**overrides):
     return row
 
 
+def technical_history():
+    rows = []
+    for i in range(6):
+        rows.append({
+            "date": f"2026-07-{4+i:02d}", "close_adj": 100+i,
+            "ma5": 99+i, "ma20": 96+i*.5, "ma60": 90+i*.2,
+            "rsi14": 50+i*2, "volume": 900_000+i*20_000,
+            "vol_ma20": 1_000_000, "vol_ratio20": (900_000+i*20_000)/1_000_000,
+            "ret1": 0.01,
+        })
+    return rows
+
+
 class DashboardExplainabilityPayloadTest(unittest.TestCase):
+    def test_technical_view_combines_self_relative_trend_momentum_and_volume(self):
+        history = technical_history()
+        current = dict(history[-1], ma5=106, ma20=102, ma60=94, rsi14=72,
+                       volume=1_300_000, vol_ratio20=1.3)
+        view = bd.build_technical_view(current, history[:-1] + [current])
+        self.assertEqual((view["cls"], view["label"]), ("up", "多頭排列"))
+        self.assertEqual(view["rows"][1][1], "MA5 > MA20 > MA60")
+        self.assertIn("上漲力道明顯較強", view["rows"][2][1])
+        self.assertIn("價漲量增", view["rows"][4][1])
+        self.assertIn("不等於即將反轉", view["why"])
+        self.assertEqual(
+            [(x["label"], x["cls"]) for x in view["series"]],
+            [("現價", "price"), ("MA5", "ma5"), ("MA20", "ma20"), ("MA60", "ma60")],
+        )
+        self.assertEqual(view["series"][1]["value"], "106")
+
+    def test_rsi_copy_explains_the_50_line_in_plain_language(self):
+        history = technical_history()
+        current = dict(history[-1], rsi14=55)
+        view = bd.build_technical_view(current, history[:-1] + [current])
+        self.assertIn("上漲力道較強", view["rows"][2][1])
+        self.assertIn("平均上漲力道大於平均下跌力道", view["rows"][2][2])
+        self.assertIn("50是兩者的分界", view["rows"][2][2])
+        self.assertNotIn("動能相對占優", view["why"])
+
+    def test_technical_view_exposes_price_distance_and_transition(self):
+        history = technical_history()
+        previous = dict(history[-2], close_adj=99, ma5=99, ma20=100, ma60=95)
+        current = dict(history[-1], close_adj=103, ma5=101, ma20=100, ma60=96,
+                       rsi14=55, volume=700_000, vol_ma20=1_000_000, vol_ratio20=.7)
+        view = bd.build_technical_view(current, history[:-2] + [previous, current])
+        self.assertIn("現價相對MA5", view["rows"][0][2])
+        self.assertIn("現價上穿MA20", view["rows"][5][1])
+        self.assertEqual(view["rows"][4][1], "價漲量縮")
+
+    def test_no_crossing_copy_names_two_separate_comparisons(self):
+        history = technical_history()
+        view = bd.build_technical_view(history[-1], history)
+        self.assertEqual(view["rows"][5][0], "短線轉折（較前一交易日）")
+        self.assertEqual(view["rows"][5][1], "無穿越事件")
+        self.assertIn("現價沒有跨越MA20", view["rows"][5][2])
+        self.assertIn("MA5也沒有跨越MA20", view["rows"][5][2])
+        self.assertNotIn("現價/MA20", view["rows"][5][2])
     def test_rank_wording_never_claims_an_absolute_trade_direction(self):
         texts = (list(bd.R_PRICE.values()) + list(bd.R_RESIL.values())
                  + list(bd.R_FOREIGN.values()) + list(bd.R_TRUST.values())

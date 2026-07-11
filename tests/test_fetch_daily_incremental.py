@@ -104,6 +104,21 @@ class IncrementalFetchTest(unittest.TestCase):
         self.assertEqual(fd._coverage_get(
             self.con, "TaiwanStockSplitPrice", "*"), "2026-07-09")
 
+    def test_technical_windows_require_full_samples(self):
+        values = list(range(1, 61))
+        self.assertIsNone(fd._window_mean(values, 3, 5))
+        self.assertEqual(fd._window_mean(values, 4, 5), 3)
+        self.assertEqual(fd._window_mean(values, 59, 60), 30.5)
+        values[58] = None
+        self.assertIsNone(fd._window_mean(values, 59, 60))
+
+    def test_wilder_rsi_handles_trending_and_flat_prices(self):
+        rising = fd._wilder_rsi(list(range(1, 17)), 14)
+        flat = fd._wilder_rsi([10] * 16, 14)
+        self.assertIsNone(rising[13])
+        self.assertEqual(rising[14], 100.0)
+        self.assertEqual(flat[14], 50.0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -141,6 +141,150 @@ def _value(row, key, default=None):
         return default
 
 
+def _fmt_price(x):
+    if x is None:
+        return "-"
+    return f"{x:,.2f}".rstrip("0").rstrip(".")
+
+
+def _fmt_volume(x):
+    return "-" if x is None else f"{int(round(x)):,} 股"
+
+
+def _ratio(a, b):
+    return (a / b - 1) if (a is not None and b) else None
+
+
+def build_technical_view(m, history=None):
+    """個股相對自身歷史的技術面觀察，不做族群排名、不影響分數或 tier。"""
+    close = _value(m, "close_adj")
+    ma5, ma20, ma60 = (_value(m, "ma5"), _value(m, "ma20"), _value(m, "ma60"))
+    rsi = _value(m, "rsi14")
+    volume, vma20, vr20 = (_value(m, "volume"), _value(m, "vol_ma20"),
+                           _value(m, "vol_ratio20"))
+    if any(v is None for v in (close, ma5, ma20, ma60, rsi)):
+        return None
+
+    series = list(history or [])
+    current_date = _value(m, "date")
+    if not series or (current_date and _value(series[-1], "date") != current_date):
+        series.append(m)
+    if current_date:
+        series = [x for x in series if (_value(x, "date") or "") <= current_date]
+    series.sort(key=lambda x: _value(x, "date", ""))
+    prev = series[-2] if len(series) >= 2 else None
+    five = series[-6] if len(series) >= 6 else None
+
+    d5, d20, d60 = _ratio(close, ma5), _ratio(close, ma20), _ratio(close, ma60)
+    bull = ma5 > ma20 > ma60
+    bear = ma5 < ma20 < ma60
+    if bull:
+        cls, label, structure = "up", "多頭排列", "MA5 > MA20 > MA60"
+        structure_note = "短、中、長期均線依序向上排列；描述趨勢結構，不保證後續上漲"
+    elif bear:
+        cls, label, structure = "down", "空頭排列", "MA5 < MA20 < MA60"
+        structure_note = "短、中、長期均線依序向下排列；描述趨勢結構，不代表已無反彈可能"
+    elif close > ma20 and rsi >= 50:
+        cls, label, structure = "up", "趨勢偏多", "均線交錯，現價在 MA20 上"
+        structure_note = "尚非完整多頭排列，但價格站上中期均線且 RSI 位於 50 上方"
+    elif close < ma20 and rsi < 50:
+        cls, label, structure = "down", "趨勢偏弱", "均線交錯，現價在 MA20 下"
+        structure_note = "尚非完整空頭排列，但價格低於中期均線且 RSI 位於 50 下方"
+    else:
+        cls, label, structure = "flat", "結構分歧", "均線、現價與動能方向未一致"
+        structure_note = "不同週期訊號互相矛盾，單看一項指標容易誤判"
+
+    if rsi >= 70:
+        rsi_state = "上漲力道明顯較強"
+        rsi_note = ("過去14個交易日的平均上漲力道明顯大於平均下跌力道；RSI≥70屬高檔區，"
+                    "代表追價風險提高，但強趨勢中也可能維持高檔，不等於即將反轉")
+    elif rsi <= 30:
+        rsi_state = "下跌力道明顯較強"
+        rsi_note = ("過去14個交易日的平均下跌力道明顯大於平均上漲力道；RSI≤30屬低檔區，"
+                    "可能出現反彈，但不等於已經止跌")
+    elif rsi >= 50:
+        rsi_state = "上漲力道較強"
+        rsi_note = ("過去14個交易日的平均上漲力道大於平均下跌力道；50是兩者的分界，"
+                    "只描述近期力道，不代表股價一定續漲")
+    else:
+        rsi_state = "下跌力道較強"
+        rsi_note = ("過去14個交易日的平均下跌力道大於平均上漲力道；50是兩者的分界，"
+                    "只描述近期力道，不代表股價一定續跌")
+    rsi5 = _value(five, "rsi14") if five else None
+    rsi_delta = (rsi - rsi5) if rsi5 is not None else None
+    rsi_display = f"{rsi:.1f} · {rsi_state}"
+    if rsi_delta is not None:
+        rsi_display += f"（較5日前 {rsi_delta:+.1f}）"
+
+    ret1 = _value(m, "ret1")
+    vol_state = ("量增" if vr20 is not None and vr20 >= 1.2 else
+                 "量縮" if vr20 is not None and vr20 <= 0.8 else "量近平均")
+    price_state = "價漲" if ret1 is not None and ret1 > 0 else "價跌" if ret1 is not None and ret1 < 0 else "價平"
+    pv = price_state + vol_state
+    pv_notes = {
+        "價漲量增": "上漲伴隨高於20日均量的成交參與，價量方向互相確認",
+        "價漲量縮": "價格上漲，但成交參與低於20日均量，延續力仍需後續量能確認",
+        "價跌量增": "下跌伴隨高於20日均量的成交參與，短線賣壓較明顯",
+        "價跌量縮": "價格下跌但成交參與有限，屬縮量整理或賣壓暫未擴大",
+        "價平量增": "價格變化不大但成交活躍，可能處於換手，方向尚未表態",
+        "價平量縮": "價格與成交都收斂，市場暫時觀望",
+    }
+    pv_note = pv_notes.get(pv, f"成交量約為20日均量的 {vr20:.2f}×，尚未出現明顯量增或量縮" if vr20 is not None else "量能樣本不足")
+
+    events = []
+    if prev:
+        pc, pm20 = _value(prev, "close_adj"), _value(prev, "ma20")
+        pm5 = _value(prev, "ma5")
+        if None not in (pc, pm20):
+            if pc <= pm20 and close > ma20:
+                events.append("現價上穿MA20")
+            elif pc >= pm20 and close < ma20:
+                events.append("現價跌破MA20")
+        if None not in (pm5, pm20):
+            if pm5 <= pm20 and ma5 > ma20:
+                events.append("MA5上穿MA20")
+            elif pm5 >= pm20 and ma5 < ma20:
+                events.append("MA5跌破MA20")
+    if events:
+        event_text = "、".join(events)
+        event_note = "與前一交易日比較，發生上述跨越事件"
+    elif prev:
+        event_text = "無穿越事件"
+        event_note = "與前一交易日比較：現價沒有跨越MA20，MA5也沒有跨越MA20"
+    else:
+        event_text = "穿越資料不足"
+        event_note = "至少需要目前與前一個交易日的均線資料，才能判斷是否發生跨越"
+
+    ma5_delta = _ratio(ma5, _value(five, "ma5")) if five else None
+    ma20_delta = _ratio(ma20, _value(five, "ma20")) if five else None
+    slope_text = (f"MA5較5日前 {pct(ma5_delta, True)}；MA20 {pct(ma20_delta, True)}"
+                  if ma5_delta is not None and ma20_delta is not None else "均線5日變化樣本不足")
+    extension = ("現價高於MA20逾10%，短線偏離較大" if d20 is not None and d20 >= 0.10 else
+                 "現價低於MA20逾10%，短線偏離較大" if d20 is not None and d20 <= -0.10 else
+                 "現價仍在MA20上下10%的常態觀察帶內")
+
+    rows = [
+        ["現價 / MA5 / MA20 / MA60",
+         " / ".join(_fmt_price(x) for x in (close, ma5, ma20, ma60)),
+         f"現價相對MA5 {pct(d5, True)}、MA20 {pct(d20, True)}、MA60 {pct(d60, True)}；{extension}"],
+        ["均線結構", structure, structure_note],
+        ["RSI14", rsi_display, rsi_note + "；括號是RSI較5個交易日前的增減，不是股價報酬率"],
+        ["成交量 / 20日均量",
+         f"{_fmt_volume(volume)} / {_fmt_volume(vma20)}" + (f"（{vr20:.2f}×）" if vr20 is not None else ""),
+         "VOL以股數計；vol_ratio20=當日成交量÷20日平均成交量，≥1.2×視為量增、≤0.8×視為量縮"],
+        ["今日價量關係", pv, pv_note],
+        ["短線轉折（較前一交易日）", event_text, event_note + "；" + slope_text],
+    ]
+    why = f"{structure_note}；{rsi_note}；{pv_note}。"
+    return {"cls": cls, "label": label, "rows": rows, "why": why,
+            "series": [
+                {"label": "現價", "value": _fmt_price(close), "cls": "price"},
+                {"label": "MA5", "value": _fmt_price(ma5), "cls": "ma5"},
+                {"label": "MA20", "value": _fmt_price(ma20), "cls": "ma20"},
+                {"label": "MA60", "value": _fmt_price(ma60), "cls": "ma60"},
+            ]}
+
+
 def build_cells(sc, m, mkt20=None):
     """每格:[分數,格值,rows,相對判讀,過熱旗標,原始方向,計分依據]。
 
@@ -650,6 +794,14 @@ def main():
                             WHERE date<=? ORDER BY stock_id, date DESC""", (last,)):
         if len(score_hist[h["stock_id"]]) < 3:
             score_hist[h["stock_id"]].insert(0, h)
+    # 個股技術面只需今日、昨日與5個交易日前；舊到新保存，供穿越與變化解讀。
+    tech_hist = defaultdict(list)
+    for h in con.execute("""SELECT date, stock_id, close_adj, ma5, ma20, ma60, rsi14,
+                                    volume, vol_ma20, vol_ratio20, ret1
+                             FROM daily_metrics WHERE date<=?
+                             ORDER BY stock_id, date DESC""", (last,)):
+        if len(tech_hist[h["stock_id"]]) < 6:
+            tech_hist[h["stock_id"]].insert(0, h)
     try:   # 族群定義配置化:讀 groups 表(舊 db 缺表時退回檔頭預設)
         gmeta = con.execute("SELECT grp, name, tag FROM groups ORDER BY ord").fetchall()
         if gmeta:
@@ -829,6 +981,9 @@ def main():
                "vsub": vsub, "vr": vr, "vrows": vrows,
                "cells": build_cells(r, r, mkt20)}
         obj.update(tier_meta)
+        tech = build_technical_view(r, tech_hist.get(r["stock_id"]))
+        if tech:
+            obj["tech"] = tech
         if warn:
             obj["warn"] = True
         risky = r["stock_id"] in risk

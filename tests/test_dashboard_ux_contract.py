@@ -71,6 +71,26 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertEqual(self.template.count("appendGlossary(box,"), 2)
         self.assertIn("本文術語白話解釋", self.template)
 
+    def test_technical_guide_explains_meaning_and_reading_order(self):
+        for marker in (
+            'id="technical-guide"', "MA／RSI／VOL 的意義與盤讀順序",
+            "比較近14日平均上漲力道與平均下跌力道", "50是兩種力道的分界",
+            "建議盤讀順序", "常見組合怎麼讀", "均線向上＋RSI下降",
+            "什麼叫「穿越」", "前一交易日現價在MA20下方或相等",
+            'howHref:"#technical-guide"', 'jl.href=html.howHref||"#method"',
+        ):
+            self.assertIn(marker, self.template)
+
+    def test_ma_series_use_distinct_non_semantic_colors_with_text_labels(self):
+        for marker in (
+            "--ma5:#b84e00", "--ma20:#0b66b2", "--ma60:#6f4ba8",
+            "MA5 橘色 · 短線", "MA20 藍色 · 中期", "MA60 紫色 · 較長期",
+            "顏色只區分週期，不代表強弱", "function appendMaText(node,t)",
+            "function appendTechSeriesRow(labelNode,valueNode,series)",
+            "techSeries:row.tech.series",
+        ):
+            self.assertIn(marker, self.template)
+
     def test_first_desktop_click_opens_persistent_drawer(self):
         touch_click_to_drawer = (
             'node.addEventListener("click", function(){ hideTip(); '

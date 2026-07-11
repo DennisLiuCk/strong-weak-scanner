@@ -15,6 +15,7 @@
     --neutral:#7a756a; --neutral-tint:rgba(122,117,106,0.07);
     --warn:#9c6a06; --warn-line:#d69e2e; --warn-bg:rgba(214,158,46,0.16);
     --health:#0f6e8c; --health-tint:rgba(15,110,140,0.10);
+    --ma5:#b84e00; --ma20:#0b66b2; --ma60:#6f4ba8;
     --shadow:0 1px 2px rgba(20,18,12,.05),0 8px 24px rgba(20,18,12,.08);
     color-scheme:light;
   }
@@ -28,6 +29,7 @@
       --neutral:#9a9488; --neutral-tint:rgba(154,148,136,0.09);
       --warn:#e0a83a; --warn-line:#e0a83a; --warn-bg:rgba(224,168,58,0.16);
       --health:#5cc2e8; --health-tint:rgba(92,194,232,0.16);
+      --ma5:#ff9d4d; --ma20:#62b5ff; --ma60:#c4a7ff;
       --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
       color-scheme:dark;
     }
@@ -41,6 +43,7 @@
     --neutral:#7a756a; --neutral-tint:rgba(122,117,106,0.07);
     --warn:#9c6a06; --warn-line:#d69e2e; --warn-bg:rgba(214,158,46,0.16);
     --health:#0f6e8c; --health-tint:rgba(15,110,140,0.10);
+    --ma5:#b84e00; --ma20:#0b66b2; --ma60:#6f4ba8;
     --shadow:0 1px 2px rgba(20,18,12,.05),0 8px 24px rgba(20,18,12,.08);
     color-scheme:light;
   }
@@ -53,6 +56,7 @@
     --neutral:#9a9488; --neutral-tint:rgba(154,148,136,0.09);
     --warn:#e0a83a; --warn-line:#e0a83a; --warn-bg:rgba(224,168,58,0.16);
     --health:#5cc2e8; --health-tint:rgba(92,194,232,0.16);
+    --ma5:#ff9d4d; --ma20:#62b5ff; --ma60:#c4a7ff;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
     color-scheme:dark;
   }
@@ -72,6 +76,9 @@
     color:var(--surface);background:var(--ink);transform:translateY(-150%)}
   .skip-link:focus{transform:translateY(0)}
   .mono{font-family:"Cascadia Mono",Consolas,ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
+  .series{font-weight:800}
+  .series.ma5{color:var(--ma5)} .series.ma20{color:var(--ma20)} .series.ma60{color:var(--ma60)}
+  .series.price{color:var(--ink)} .series-sep{color:var(--muted);font-weight:400}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 22px 64px}
   /* 大螢幕給密集矩陣多一點呼吸空間;筆電以下維持原版心 */
   @media (min-width:1440px){.wrap{max-width:1230px}}
@@ -269,6 +276,12 @@
   .hdot.health{color:var(--health);background:var(--health-tint)}
   .hdot.neutral{color:var(--ink-2);background:var(--neutral-tint)}
   .hdot.warn{color:var(--warn);background:var(--warn-bg)}
+  .techbadge{display:inline-flex;align-items:center;min-height:20px;font-family:inherit;
+    font-size:10.5px;font-weight:700;border:1px solid currentColor;border-radius:100px;
+    padding:0 8px;cursor:pointer;background:transparent;white-space:nowrap}
+  .techbadge.up{color:var(--strong);background:var(--strong-tint)}
+  .techbadge.flat{color:var(--ink-2);background:var(--neutral-tint)}
+  .techbadge.down{color:var(--weak);background:var(--weak-tint)}
   .fundbadge{display:inline-flex;align-items:center;font-family:inherit;font-variant-numeric:tabular-nums;
     font-size:11.5px;font-weight:700;border:none;border-radius:6px;
     padding:0;cursor:pointer;background:none;letter-spacing:.1px;white-space:nowrap}
@@ -511,8 +524,8 @@
     .msearch{width:100%;min-width:0}
     .mtoolbar{align-items:stretch}
     .mtoolbar .toggle{flex:1 1 auto;justify-content:center}
-    .riskbadge,.fundbadge,.notebadge,.hdot{min-height:44px;height:44px}
-    .riskbadge,.fundbadge,.hdot{padding-inline:12px}
+    .riskbadge,.fundbadge,.notebadge,.hdot,.techbadge{min-height:44px;height:44px}
+    .riskbadge,.fundbadge,.hdot,.techbadge{padding-inline:12px}
     /* 行動版卡片要大點按目標:恢復膠囊外觀與字級 */
     .riskbadge{border-radius:100px;font-size:11.5px}
     .fundbadge{border:1px solid currentColor;border-radius:100px}
@@ -534,6 +547,13 @@
   .mcard p{margin:8px 0 0}
   .mcard ol{margin:0;padding-left:20px}
   .mcard ol li{margin:0 0 8px}
+  .tech-guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 28px}
+  .tech-guide-grid h4{margin:0 0 8px;color:var(--ink);font-size:13px}
+  .tech-guide-grid .dl+.dl{margin-top:12px}
+  .ma-legend{display:flex;flex-wrap:wrap;gap:7px 14px;margin:10px 0 14px;padding:8px 11px;
+    border:1px solid var(--hairline);border-radius:9px;background:var(--surface-2)}
+  .ma-legend span{font-size:12px}
+  @media (max-width:760px){.tech-guide-grid{grid-template-columns:1fr}}
   .mcard a{color:var(--ink);text-decoration-color:var(--muted);text-underline-offset:2px}
   .mcard a:hover{text-decoration-color:var(--ink)}
   .dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0}
@@ -630,6 +650,7 @@
       <h3>個股標記(觀察資訊,不影響左側①~⑤評分與已確認分層;點列表格內同款圖示看明細)</h3>
       <div class="scale">
         <span class="sk"><span class="riskbadge sm">處置</span>／<span class="riskbadge sm">注意</span>交易所官方列管(TWSE/TPEx 異常價量認證),直接標在股名旁</span>
+        <span class="sk"><span class="techbadge up">技術·多頭排列</span>個股相對自身歷史的均線、RSI與價量解讀；不做族群排名</span>
         <span class="sk"><span class="hdot health">籌碼健</span>籌碼現況診斷:健康</span>
         <span class="sk"><span class="hdot neutral">籌碼中</span>籌碼現況診斷:中性</span>
         <span class="sk"><span class="hdot warn">籌碼待</span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
@@ -706,6 +727,56 @@
         <dt>散戶水位</dt><dd><span class="f">融資餘額 ÷ 發行股數</span>愈高代表散戶槓桿愈滿,回檔時停損賣壓愈重。</dd>
         <dt>距60日高</dt><dd><span class="f">還原價距近60日最高點的百分比</span>衡量「價格發動了沒」;蓄勢評級要求 ≤ −3%。</dd>
       </dl>
+    </div>
+    <div class="mcard wide" id="technical-guide">
+      <h3>MA／RSI／VOL 的意義與盤讀順序</h3>
+      <p>這組指標回答的是「這檔股票相對自己近期歷史處在哪裡」，不是跟同產業比，也不是預測明日漲跌。先看趨勢，再看力道，最後看成交參與度；不要用單一數字直接下結論。</p>
+      <div class="ma-legend" aria-label="均線顏色圖例">
+        <span class="series ma5">MA5 橘色 · 短線</span>
+        <span class="series ma20">MA20 藍色 · 中期</span>
+        <span class="series ma60">MA60 紫色 · 較長期</span>
+        <span>現價維持主文字色；顏色只區分週期，不代表強弱。</span>
+      </div>
+      <div class="tech-guide-grid">
+        <div>
+          <h4>每個指標代表什麼</h4>
+          <dl class="dl">
+            <dt><span class="series ma5">MA5</span></dt><dd><span class="f">近5個交易日還原收盤價平均</span>約一週的短線平均價格；反應最快，也最容易被單日波動影響。</dd>
+            <dt><span class="series ma20">MA20</span></dt><dd><span class="f">近20個交易日還原收盤價平均</span>約一個月的中期平均價格，是判讀現價強弱與偏離程度的主要基準。</dd>
+            <dt><span class="series ma60">MA60</span></dt><dd><span class="f">近60個交易日還原收盤價平均</span>約一季的較長期平均價格；變化較慢，用來確認大方向。</dd>
+            <dt>RSI14</dt><dd><span class="f">比較近14日平均上漲力道與平均下跌力道，範圍0–100</span>50是兩種力道的分界；高於50代表上漲力道較強，低於50代表下跌力道較強。70／30是高低檔提醒，不是自動賣出／買進訊號。</dd>
+            <dt>VOL</dt><dd><span class="f">當日成交股數</span>表示當天有多少交易參與；量大本身沒有多空方向，必須和價格漲跌一起看。</dd>
+            <dt>20日均量</dt><dd><span class="f">近20日成交量平均</span>提供個股自己的常態基準，避免只因大型股絕對成交量較大就誤判。</dd>
+            <dt>vol_ratio20</dt><dd><span class="f">當日成交量 ÷ 20日均量</span>≥1.2×視為量增，≤0.8×視為量縮；介於兩者代表成交參與接近近期常態。</dd>
+          </dl>
+        </div>
+        <div>
+          <h4>建議盤讀順序</h4>
+          <ol>
+            <li><b>先看均線結構：</b>MA5 &gt; MA20 &gt; MA60 表示短中長期平均價格依序墊高；反向排列則依序降低。均線交錯代表週期方向尚未一致。</li>
+            <li><b>再看現價位置：</b>現價在 MA20／MA60 上方，代表高於中長期平均價格；低於則相反。偏離 MA20 超過約 ±10% 時，短線離平均成本較遠，波動風險通常較高。</li>
+            <li><b>用 RSI 看力道：</b>RSI 是否在 50 上下，以及較5日前上升或下降，可辨認力道正在增強或降溫。RSI 高不等於馬上跌，低也不等於馬上漲。</li>
+            <li><b>最後用成交量確認：</b>價格方向若伴隨量增，代表更多成交參與；量縮則代表參與度不足。量能只能確認參與程度，不能單獨決定方向。</li>
+            <li><b>優先留意轉折而非單日數字：</b>「現價跨越 MA20」是現價從 MA20 下方移到上方，或從上方移到下方；「MA5 跨越 MA20」是短期均線從中期均線的一側移到另一側。這些都以今日和前一交易日比較，仍需後續交易日確認。</li>
+          </ol>
+          <h4>常見組合怎麼讀</h4>
+          <dl class="dl">
+            <dt>均線向上＋RSI&gt;50＋價漲量增</dt><dd>趨勢、近期力道與成交參與方向一致。</dd>
+            <dt>均線向上＋RSI下降</dt><dd>中期結構仍向上，但短期上漲力道正在降溫，兩個時間尺度並不矛盾。</dd>
+            <dt>價漲量縮</dt><dd>價格上升，但參與度低於20日常態；延續性需要後續成交量確認。</dd>
+            <dt>價跌量增＋RSI&lt;50</dt><dd>下跌伴隨較高成交參與，且近期下跌力道較強。</dd>
+            <dt>均線交錯＋RSI近50</dt><dd>價格與力道都沒有明確一致方向，較像整理或轉換階段。</dd>
+          </dl>
+          <h4>什麼叫「穿越」</h4>
+          <dl class="dl">
+            <dt>現價上穿MA20</dt><dd>前一交易日現價在MA20下方或相等，今日移到MA20上方。</dd>
+            <dt>現價跌破MA20</dt><dd>前一交易日現價在MA20上方或相等，今日移到MA20下方。</dd>
+            <dt>MA5上穿MA20</dt><dd>前一交易日MA5在MA20下方或相等，今日MA5移到MA20上方。</dd>
+            <dt>MA5跌破MA20</dt><dd>前一交易日MA5在MA20上方或相等，今日MA5移到MA20下方。</dd>
+          </dl>
+        </div>
+      </div>
+      <p><b>核心原則：</b>均線看方向與位置、RSI看漲跌力道、VOL看參與程度。三者一致時敘述較完整；互相衝突時，應明確保留分歧，而不是硬湊成單一偏多或偏空結論。</p>
     </div>
     <div class="mcard">
       <h3>指標辭典 · 族群與大盤層</h3>
@@ -854,6 +925,22 @@
   // ---------- tooltip ----------
   var tip = document.getElementById("tip"), suppressFocusTip=false;
   function setText(node, t){ node.textContent = t == null ? "" : String(t); }
+  function appendMaText(node,t){
+    String(t==null?"":t).split(/(MA5|MA20|MA60)/).forEach(function(part){
+      if(!part)return;
+      var key={MA5:"ma5",MA20:"ma20",MA60:"ma60"}[part];
+      if(key){var s=document.createElement("span");s.className="series "+key;setText(s,part);node.appendChild(s);}
+      else node.appendChild(document.createTextNode(part));
+    });
+  }
+  function appendTechSeriesRow(labelNode,valueNode,series){
+    series.forEach(function(item,i){
+      if(i){var ls=document.createElement("span");ls.className="series-sep";setText(ls," / ");labelNode.appendChild(ls);
+            var vs=document.createElement("span");vs.className="series-sep";setText(vs," / ");valueNode.appendChild(vs);}
+      var l=document.createElement("span");l.className="series "+item.cls;setText(l,item.label);labelNode.appendChild(l);
+      var v=document.createElement("span");v.className="series "+item.cls;setText(v,item.value);valueNode.appendChild(v);
+    });
+  }
   function revenueLabel(label){label=label==null?"":String(label);return label.indexOf("營收")===0?label:"營收 "+label;}
   var GLOSSARY = {
     "NRE":["一次性研發工程費，客戶為客製晶片設計階段支付的費用。","認列時點會使單月營收波動，不能直接當成量產需求。"],
@@ -910,16 +997,20 @@
       var colorOf = html.chipColors ? chipColor : scColor;   // 籌碼健康度 tooltip 走獨立色階(見 chipColor)
       html.rows.forEach(function(rw){
         var flag = rw[5] || "";
-        var k=document.createElement("span"); k.className="k"+(flag?" "+flag:""); setText(k, rw[0]); tb.appendChild(k);
+        var k=document.createElement("span"); k.className="k"+(flag?" "+flag:"");
         var v=document.createElement("span"); v.className="rv"+(flag?" "+flag:"");
-        setText(v, rw[1]);
+        if(html.techSeries && rw[0]==="現價 / MA5 / MA20 / MA60") appendTechSeriesRow(k,v,html.techSeries);
+        else {if(html.techSeries)appendMaText(k,rw[0]);else setText(k,rw[0]);
+              if(html.techSeries)appendMaText(v,rw[1]);else setText(v,rw[1]);}
+        tb.appendChild(k);
         if(rw[3] && flag !== "muted") v.style.color = colorOf(rw[3]); // 沿用同一套上色機制,不新增色彩語彙;
                                                                    // 0分(中性)不上色維持 --ink 對比度;muted 列改走
                                                                    // CSS 的 --ink-2(見樣式),不疊加方向色以免和淡化衝突
         if(rw[4]){ var wt=document.createElement("span"); wt.className="wt"; setText(wt, " "+rw[4]); v.appendChild(wt); }
         tb.appendChild(v);
         if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
-          var h=document.createElement("span"); h.className="rh"; setText(h, rw[2]); tb.appendChild(h);
+          var h=document.createElement("span"); h.className="rh";
+          if(html.techSeries)appendMaText(h,rw[2]);else setText(h,rw[2]);tb.appendChild(h);
         }
       });
       box.appendChild(tb);
@@ -930,11 +1021,11 @@
     if(html.how || html.howLink){                // 評分依據(教學:分數與門檻怎麼來)——how 缺值時仍要顯示 howLink
       var hw=document.createElement("div"); hw.className="how";
       if(html.how){
-        var hb=document.createElement("b"); setText(hb, "評分依據:"); hw.appendChild(hb);
+        var hb=document.createElement("b"); setText(hb, (html.howLabel||"評分依據")+":"); hw.appendChild(hb);
         hw.appendChild(document.createTextNode(String(html.how)));
       }
       if(html.howLink){                          // 通用方法論不逐格重複寫,指到頁尾單一事實來源
-        var jl=document.createElement("a"); jl.className="jump"; jl.href="#method";
+        var jl=document.createElement("a"); jl.className="jump"; jl.href=html.howHref||"#method";
         setText(jl, "→ "+html.howLink); hw.appendChild(jl);
         jl.addEventListener("click", function(){ closeSheet(false); }); // 跳到方法區時不把焦點拉回原觸發按鈕
       }
@@ -1256,6 +1347,23 @@
     rl.appendChild(nmline);
     var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; rl.appendChild(code);
     if(row.biz){ var bz=document.createElement("span"); bz.className="code"; bz.textContent=row.biz; rl.appendChild(bz); }
+    if(row.tech){
+      var tb=document.createElement("button"); tb.type="button"; tb.tabIndex=0;
+      tb.className="techbadge "+row.tech.cls; tb.textContent="技術·"+row.tech.label;
+      tb.setAttribute("aria-label","個股技術面觀察:"+row.tech.label+",相對自身歷史,不計分");
+      badges.appendChild(tb);
+      var TECH_COL={up:["var(--strong)","var(--strong-tint)"],down:["var(--weak)","var(--weak-tint)"],
+                    flat:["var(--neutral)","var(--neutral-tint)"]};
+      attachTip(tb,(function(row){return function(){var col=TECH_COL[row.tech.cls]||TECH_COL.flat;return {
+        el:"個股技術面 · 相對自身歷史（不排名／不計分）",who:row.nm+"("+row.id+")",biz:row.biz,
+        rows:row.tech.rows,why:row.tech.why,
+        techSeries:row.tech.series,
+        howLabel:"判讀方式",
+        how:"MA與RSI使用還原收盤價；價量關係使用當日漲跌與20日平均成交量。這些規則描述目前的趨勢、動能與參與度，不預測下一日漲跌，也不影響綜合分數與已確認分層。",
+        howLink:"前往頁尾查看MA／RSI／VOL完整盤讀指南",howHref:"#technical-guide",
+        src:"FinMind TaiwanStockPrice；本地以除權息／分割事件還原價格後計算",
+        scLabel:row.tech.label,scColor:col[0],scBg:col[1]};};})(row));
+    }
     if(row.chip){
       var hd=document.createElement("button"); hd.type="button"; hd.tabIndex=0;
       hd.className="hdot "+row.chip.cls;
@@ -1381,6 +1489,22 @@
         how:"列管不等於基本面變差，常見於短線交易過熱。",src:"TWSE / TPEx 官方公告",
         scLabel:"⚠ 列管中",scColor:"var(--strong)",scBg:"var(--strong-tint)"};};})(row));
       host.appendChild(risk);
+    }
+    if(row.tech){
+      var tech=document.createElement("button"); tech.type="button"; tech.className="techbadge "+row.tech.cls;
+      tech.textContent="技術："+row.tech.label;
+      var tcol={up:["var(--strong)","var(--strong-tint)"],down:["var(--weak)","var(--weak-tint)"],
+                flat:["var(--neutral)","var(--neutral-tint)"]}[row.tech.cls]||["var(--neutral)","var(--neutral-tint)"];
+      attachTip(tech,(function(row,tcol){return function(){return {
+        el:"個股技術面 · 相對自身歷史（不排名／不計分）",who:row.nm+"("+row.id+")",biz:row.biz,
+        rows:row.tech.rows,why:row.tech.why,
+        techSeries:row.tech.series,
+        howLabel:"判讀方式",
+        how:"MA與RSI使用還原收盤價；價量關係使用當日漲跌與20日平均成交量。只描述目前狀態，不預測下一日漲跌。",
+        howLink:"前往頁尾查看MA／RSI／VOL完整盤讀指南",howHref:"#technical-guide",
+        src:"FinMind TaiwanStockPrice；本地還原價計算",scLabel:row.tech.label,
+        scColor:tcol[0],scBg:tcol[1]};};})(row,tcol));
+      host.appendChild(tech);
     }
     if(row.chip){
       var chip=document.createElement("button"); chip.type="button"; chip.className="toggle";

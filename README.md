@@ -84,12 +84,17 @@
 | 表 | 內容 |
 |---|---|
 | price_adj | 還原收盤價:除權息/分割以倒推法本地重算(事件日前歷史價 × 係數連乘,最新區段=原始價);減資 dataset 需付費未涵蓋,以「無事件 >15% 跳空」偵測示警兜底 |
-| daily_metrics | 五元素原始指標:ret1/ret20、dist_hi20/60、rs20、down_rs20、turnover_pct、vol_ratio60、foreign_pct、fpct_chg5/20、dipbuy20、trust5(_pct)、margin_bal/chg、margin_util_pct、券資比等;**觀察欄(未計分)**:tdcc_big400/1000_pct·chg、tdcc_people_chg、sbl_pct/chg(TDCC pct 分母為集保庫存,非發行股本) |
+| daily_metrics | 五元素原始指標:ret1/ret20、dist_hi20/60、rs20、down_rs20、turnover_pct、vol_ratio60、foreign_pct、fpct_chg5/20、dipbuy20、trust5(_pct)、margin_bal/chg、margin_util_pct、券資比等;**個股自身技術觀察(未計分)**:ma5/20/60、rsi14(Wilder)、volume、vol_ma5/20/60、vol_ratio20(當日量÷20日均量);**其他觀察欄(未計分)**:tdcc_big400/1000_pct·chg、tdcc_people_chg、sbl_pct/chg(TDCC pct 分母為集保庫存,非發行股本) |
 | daily_scores | 各元素分數、composite / composite_s(3 日平滑)、tier_raw / tier、warn、pending(蓄勢候補差哪些條件) |
 | chip_health | 個股籌碼現況診斷(健康/中性/待觀察),不計 composite/tier、不是選股排名；儀表板逐列把原始方向翻成健康/中性/警示,TDCC/借券另標「方向待 OOS 驗證」 |
 | group_metrics | 族群聚合:breadth_f、med_dist60、rel20、med_dip、breadth_t、state/note |
 | market_daily | dd20(報酬指數距 20 日高)、regime 旗標 |
 | universe / groups | 每次由 `config/universe.csv`、`config/groups.csv` 重建 |
+
+儀表板的「個股技術面」使用還原收盤價與成交量，從五個互補角度描述個股相對自身歷史：
+短中長均線結構、現價偏離均線、RSI 動能及 5 日變化、價格與 20 日均量的確認關係、
+現價/MA20 與 MA5/MA20 的最近一日穿越。這些都是觀察資訊，不做族群排名、不預測下一日
+漲跌，也不進 `composite`、`tier` 或 `chip_health`。
 
 凍結表 `daily_scores_v1`:舊絕對門檻制(v1)最後結果,供 validate 新舊對照。
 

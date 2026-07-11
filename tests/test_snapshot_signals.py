@@ -79,10 +79,13 @@ class SnapshotSignalsTest(unittest.TestCase):
         sid, date_, created = self.capture("run-1", "2026-07-10T14:00:00+00:00")
         self.assertEqual((sid, date_, created), ("run-1", self.date, True))
         first = self.con.execute(
-            "SELECT tier, composite_s, risk_flags_json FROM oos_signal_snapshots "
+            "SELECT tier, composite_s, ma5, rsi14, volume, vol_ratio20, risk_flags_json "
+            "FROM oos_signal_snapshots "
             "WHERE snapshot_id='run-1' AND stock_id='1001'").fetchone()
         self.assertEqual(first["tier"], "真強")
         self.assertEqual(first["composite_s"], 3.0)
+        self.assertEqual((first["ma5"], first["rsi14"], first["volume"], first["vol_ratio20"]),
+                         (1.0, 1.0, 1, 1.0))
         self.assertIn("注意", first["risk_flags_json"])
 
         self.con.execute("UPDATE daily_scores SET tier='真弱', composite_s=-4 WHERE stock_id='1001'")

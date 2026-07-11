@@ -31,7 +31,9 @@ DB = os.path.join(ROOT, "data", "findmind.db")
 MIN_DATA_DATE = "2026-07-10"
 
 METRIC_COLS = (
-    "close", "close_adj", "ret1", "ret20", "turnover_pct", "vol_ratio60",
+    "close", "close_adj", "ma5", "ma20", "ma60", "rsi14", "volume",
+    "vol_ma5", "vol_ma20", "vol_ma60", "vol_ratio20",
+    "ret1", "ret20", "turnover_pct", "vol_ratio60",
     "dist_hi20", "dist_hi60", "rs20", "down_rs20", "foreign_pct", "fpct_chg5",
     "fpct_chg20", "dipbuy20", "dipbuy20_t", "trust5", "trust5_pct", "foreign5",
     "margin_bal", "margin_util_pct", "margin_chg5", "margin_chg10", "margin_chg20",
@@ -66,7 +68,10 @@ CREATE TABLE IF NOT EXISTS oos_signal_snapshots(
   date TEXT NOT NULL,
   stock_id TEXT NOT NULL,
   grp TEXT NOT NULL,
-  close REAL, close_adj REAL, ret1 REAL, ret20 REAL,
+  close REAL, close_adj REAL,
+  ma5 REAL, ma20 REAL, ma60 REAL, rsi14 REAL,
+  volume INTEGER, vol_ma5 REAL, vol_ma20 REAL, vol_ma60 REAL, vol_ratio20 REAL,
+  ret1 REAL, ret20 REAL,
   turnover_pct REAL, vol_ratio60 REAL, dist_hi20 REAL, dist_hi60 REAL,
   rs20 REAL, down_rs20 REAL,
   foreign_pct REAL, fpct_chg5 REAL, fpct_chg20 REAL,
@@ -150,6 +155,14 @@ def ensure_schema(con):
         con.execute("ALTER TABLE oos_snapshot_runs ADD COLUMN is_official INTEGER NOT NULL DEFAULT 0")
         # 舊版只有 GitHub Actions 被視為正式；migration 保留既有語意。
         con.execute("UPDATE oos_snapshot_runs SET is_official=1 WHERE source='github-actions'")
+    # daily_metrics 新增的觀察欄也必須進 as-seen 快照。舊快照保留 NULL，不能回填
+    # 現行規則重算值冒充當時可見資料。
+    signal_cols = {r[1] for r in con.execute("PRAGMA table_info(oos_signal_snapshots)")}
+    signal_types = {"volume": "INTEGER"}
+    for name in METRIC_COLS:
+        if name not in signal_cols:
+            con.execute(
+                f"ALTER TABLE oos_signal_snapshots ADD COLUMN {name} {signal_types.get(name, 'REAL')}")
     con.execute("""CREATE INDEX IF NOT EXISTS idx_oos_runs_official ON oos_snapshot_runs(
                    data_date, is_official, captured_at, snapshot_id)""")
     con.commit()
