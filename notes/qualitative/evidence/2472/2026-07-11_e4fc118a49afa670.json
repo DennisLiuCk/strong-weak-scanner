@@ -1,0 +1,174 @@
+{
+  "content_as_of": "2026-07-11",
+  "documents": [
+    {
+      "cited_pages": [
+        2,
+        3,
+        4,
+        5,
+        8,
+        11,
+        13,
+        14,
+        15,
+        24
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 25,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        23,
+        24,
+        25
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "a9eb9e17a68649a0e7824cc10edfa0ef762526a15852f55f1db16eb98308f2a2",
+      "size_bytes": 2910251,
+      "url": "https://mopsov.twse.com.tw/nas/STR/247220260508M001.pdf"
+    },
+    {
+      "cited_pages": [
+        7,
+        9,
+        14,
+        15,
+        17,
+        24,
+        32,
+        50,
+        51
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 58,
+      "rendered_pages": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        23,
+        24,
+        25,
+        31,
+        32,
+        33,
+        49,
+        50,
+        51,
+        52
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "abfc1c9a6ff54e34abf0cf52310cca9436e229ce3b993d94d331c7a4a6e7b1f1",
+      "size_bytes": 873298,
+      "url": "https://www.lelon.com.tw/upload/inves31/177881171516.pdf"
+    },
+    {
+      "cited_pages": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 87,
+      "rendered_pages": [
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "1d326f373bf53acbaacaa586a3e39cb9db811e00678d4c0de33c89164c848f0a",
+      "size_bytes": 4248601,
+      "url": "https://www.lelon.com.tw/upload/inves32/178056495090.pdf"
+    },
+    {
+      "cited_pages": [
+        10,
+        12,
+        64,
+        65,
+        66
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 87,
+      "rendered_pages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        63,
+        64,
+        65,
+        66,
+        67
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "55be90eca2ad181f790e06c64440f3a4dad0db9f3ee66176d7fb61c52472ee0b",
+      "size_bytes": 1993479,
+      "url": "https://www.lelon.com.tw/upload/inves31/177390816745.pdf"
+    }
+  ],
+  "pack_sha256": "e4fc118a49afa670cac4baecaa1742083784736d572b35bea66c16fe6cc12198",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2472",
+  "unverified_claims_removed": true
+}
