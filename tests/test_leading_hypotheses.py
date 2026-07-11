@@ -1,7 +1,9 @@
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 import sys
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -62,6 +64,11 @@ class LeadingHypothesesTest(unittest.TestCase):
         info = lh.analyse_report("1234_測試.md", text, notes=self.notes,
                                  today="2026-07-12")
         self.assertTrue(any("可證偽條件" in error for error in info["quality_errors"]))
+
+    def test_default_today_uses_taiwan_research_date(self):
+        with mock.patch.object(lh, "_today", return_value=date(2026, 7, 12)):
+            info = lh.analyse_report("1234_測試.md", report_text(), notes=self.notes)
+        self.assertFalse(info["quality_invalid"], info["quality_errors"])
 
     def test_two_pilot_batches_have_twenty_valid_reports_and_forty_hypotheses(self):
         reports = lh.load_reports()

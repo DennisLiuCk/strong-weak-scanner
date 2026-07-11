@@ -8,7 +8,7 @@ import os
 import re
 import sys
 
-from qual_notes import _extract_sections, _parse_meta_details, load_notes, note_review_status
+from qual_notes import _extract_sections, _parse_meta_details, _today, load_notes, note_review_status
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPORTS_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
@@ -56,7 +56,7 @@ def _hypotheses(text):
 def analyse_report(path, text, notes=None, today=None):
     meta, errors = _parse_meta_details(text)
     warnings = []
-    today = today or dt.date.today().isoformat()
+    today = today or _today().isoformat()
     sid_from_name = os.path.basename(path).split("_", 1)[0]
     sid = meta.get("stock_id") or sid_from_name
     if not re.fullmatch(r"\d{4}", sid or ""):
