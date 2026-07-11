@@ -20,6 +20,7 @@ import os
 import re
 import sys
 from datetime import date, datetime, timedelta, timezone
+from urllib.parse import parse_qs, urlparse
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -90,6 +91,39 @@ _V2_REQUIRED_SECTIONS = (
     "證據索引與資料來源",
     "下次更新與事件觸發",
 )
+
+
+def _is_exact_mops_announcement_url(url):
+    """辨識可唯一回到單筆重大訊息的 MOPS URL，而非泛用查詢入口。"""
+    parsed = urlparse(url)
+    if (parsed.hostname or "").lower() not in {
+        "mops.twse.com.tw",
+        "mopsov.twse.com.tw",
+    }:
+        return False
+    if parsed.path.rstrip("/").lower() not in {
+        "/mops/web/ajax_t05st01",
+        "/mops/web/t05st01",
+    }:
+        return False
+
+    query = parse_qs(parsed.query)
+    if query.get("step") != ["2"]:
+        return False
+    required = {
+        "TYPEK": r"[A-Za-z]+",
+        "co_id": r"\d{4,6}",
+        "spoke_date": r"\d{8}",
+        "spoke_time": r"\d{1,6}",
+        "seq_no": r"\d+",
+    }
+    return all(
+        len(query.get(key, [])) == 1
+        and re.fullmatch(pattern, query[key][0] or "") is not None
+        for key, pattern in required.items()
+    )
+
+
 _TAIPEI_TZ = timezone(timedelta(hours=8))
 
 
@@ -335,7 +369,10 @@ def _parse_sources(text):
                 "locator": locator.strip(),
                 "url": url,
                 "line": line_no,
-                "generic": bool(_GENERIC_SOURCE_RE.search(url)),
+                "generic": (
+                    bool(_GENERIC_SOURCE_RE.search(url))
+                    and not _is_exact_mops_announcement_url(url)
+                ),
             }
             if source_type == "一手":
                 if not url.startswith("https://"):

@@ -282,6 +282,25 @@ next_review: 2026-10-01
         self.assertEqual("ai_draft", note["verification"])
         self.assertTrue(any("不可使用 MOPS 查詢入口" in error for error in note["quality_errors"]))
 
+        exact_url = (
+            "https://mopsov.twse.com.tw/mops/web/ajax_t05st01?"
+            "TYPEK=otc&firstin=true&step=2&year=115&month=all&e_month=all&"
+            "co_id=3324&spoke_date=20260530&spoke_time=2944&seq_no=1"
+        )
+        exact = resign(independent_note().replace(
+            "https://example.com/2026q1.pdf", exact_url
+        ))
+        note = analyse(exact)
+        self.assertEqual("independently_verified", note["verification"])
+        self.assertFalse(any("MOPS 查詢入口" in error for error in note["quality_errors"]))
+
+        incomplete = resign(independent_note().replace(
+            "https://example.com/2026q1.pdf", exact_url.replace("&seq_no=1", "")
+        ))
+        note = analyse(incomplete)
+        self.assertEqual("ai_draft", note["verification"])
+        self.assertTrue(any("不可使用 MOPS 查詢入口" in error for error in note["quality_errors"]))
+
         source_elsewhere = independent_note().replace(PRIMARY, "")
         source_elsewhere = source_elsewhere.replace(
             "產業競爭者共有三家。[S1]", f"產業競爭者共有三家。[S1]\n\n{PRIMARY}"
