@@ -260,8 +260,13 @@
   .rl{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:9px 10px 9px 16px;min-width:0}
   .rl .nm{font-weight:800;font-size:14px;letter-spacing:.2px}
   .rl .code{font-size:11px;color:var(--muted)}
-  /* 股名列:官方處置/注意直接貼在名稱旁——嚴重度=位置,第一眼就看到 */
+  /* 股名列:官方處置/注意直接貼在名稱旁——嚴重度=位置,第一眼就看到;
+     筆記圖徽靠右端(公司層級的研究資料歸識別區,不與判讀標記混排) */
   .nmline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .nmline .notebadge{margin-left:auto}
+  /* 代號列:YoY 帶色數字靠右,利用代號右側的死空間,零額外高度 */
+  .codeline{display:flex;align-items:baseline;gap:8px;min-width:0}
+  .codeline .fundbadge{margin-left:auto}
   .riskbadge{display:inline-flex;align-items:center;min-height:18px;
     font-size:10px;font-weight:800;color:var(--surface);border:1px solid var(--strong);border-radius:5px;
     padding:0 7px;cursor:pointer;letter-spacing:.5px;background:var(--strong);white-space:nowrap}
@@ -1345,7 +1350,10 @@
       };})(row));
     }
     rl.appendChild(nmline);
-    var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; rl.appendChild(code);
+    // 代號列右半是死空間:營收YoY(帶色數字)靠右放這裡,數字跟數字同行、零額外高度
+    var codeline=document.createElement("div"); codeline.className="codeline";
+    var code=document.createElement("span"); code.className="code mono"; code.textContent=row.id; codeline.appendChild(code);
+    rl.appendChild(codeline);
     if(row.biz){ var bz=document.createElement("span"); bz.className="code"; bz.textContent=row.biz; rl.appendChild(bz); }
     if(row.tech){
       var tb=document.createElement("button"); tb.type="button"; tb.tabIndex=0;
@@ -1392,7 +1400,7 @@
       // 桌機縮寫成帶色數字(YoY 全稱與定義在點開的詳情與圖例),把紅色注意力留給官方警示
       fb.textContent = row.fund.label.replace(/^營收YoY/,"YoY");
       fb.setAttribute("aria-label", "月營收基本面參考:"+row.fund.label);
-      badges.appendChild(fb);
+      codeline.appendChild(fb);
       var FUND_COL = {up:["var(--strong)","var(--strong-tint)"], down:["var(--weak)","var(--weak-tint)"],
                        flat:["var(--neutral)","var(--neutral-tint)"]};
       attachTip(fb, (function(row){ return function(){
@@ -1410,7 +1418,7 @@
       nb.className="notebadge "+row.note.cls+(row.note.due?" due":"");
       nb.textContent = "📝";                     // 儀表板上只留 icon,狀態文字留到點開的完整筆記面板再顯示
       nb.setAttribute("aria-label", "質化研究筆記:"+row.note.label+"；獨立 reviewer "+row.note.reviewedBy+"；最後更新 "+row.note.updated+"，點擊展開完整筆記");
-      badges.appendChild(nb);
+      nmline.appendChild(nb);   // 筆記是「這家公司」層級的資料 → 放識別列右端,不與判讀標記混排
       // 不做 hover 預覽——質化筆記是長文,點開就直接看完整排版內容(借用底部 sheet 殼,
       // 桌機/觸控都走同一條路),比瞄一眼縮寫摘要更符合「閱讀筆記」的體驗。
       nb.addEventListener("click", (function(row){ return function(){
