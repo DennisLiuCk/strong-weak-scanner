@@ -176,9 +176,11 @@ def build_cells(sc, m, mkt20=None):
                      f"20日相對報酬 {pct(rs, True)}，目前跑贏族群中位" if rs > 0 else
                      f"20日相對報酬 {pct(rs, True)}，目前跑輸族群中位" if rs < 0 else
                      "20日相對報酬 0.0%，目前與族群中位持平")
+    # basis 只留會隨個股變動的排名桶;「分數=族群內排名」的常數語意放明細表欄位表頭
+    # (dashboard_template 的 EL.sub),不跟著 98 檔逐格重複
     cells.append(_cell(
         sc["s_price"], pct(rs, True) if rs is not None else "-", rows, R_PRICE[sc["s_price"]],
-        price_current, f"{_relative_bucket(sc['s_price'])}（族群內排名）"))
+        price_current, _relative_bucket(sc["s_price"])))
     # ② 量(量比 = 當日周轉率 / 自身60日中位)
     t = m["turnover_pct"]
     vr = m["vol_ratio60"]
@@ -205,9 +207,10 @@ def build_cells(sc, m, mkt20=None):
                    f"量比 {vr:.1f}×，高於自身60日常態" if vr > 1 else
                    f"量比 {vr:.1f}×，低於自身60日常態" if vr < 1 else
                    "量比 1.0×，與自身60日常態相當")
+    # 固定門檻欄的門檻說明是常數(在欄位表頭與 tooltip),格內改放會變動的判讀語
     cells.append(_cell(
         sc["s_vol"], f"{vr:.1f}×" if vr is not None else "-", rows, rv, vol_current,
-        "固定門檻（與自身60日常態比）",
+        rv,
         warn))
     # ③ 外資
     fc = m["fpct_chg20"]
@@ -231,7 +234,7 @@ def build_cells(sc, m, mkt20=None):
     cells.append(_cell(
         sc["s_foreign"], f"{fc:+.1f}pp" if fc is not None else "-", rows,
         R_FOREIGN[sc["s_foreign"]], foreign_current,
-        f"{_relative_bucket(sc['s_foreign'])}（族群內排名）"))
+        _relative_bucket(sc["s_foreign"])))
     # ④ 投信
     t5 = m["trust5"] or 0
     tp = m["trust5_pct"]
@@ -248,7 +251,7 @@ def build_cells(sc, m, mkt20=None):
         trust_current = "投信買賣資料不足"
     cells.append(_cell(
         sc["s_trust"], f"{t5:+,}張", rows, R_TRUST[sc["s_trust"]], trust_current,
-        f"{_relative_bucket(sc['s_trust'])}（族群內排名）"))
+        _relative_bucket(sc["s_trust"])))
     # ⑤ 融資券
     u = m["margin_util_pct"]
     u_dyn = ("" if u is None else
@@ -279,7 +282,7 @@ def build_cells(sc, m, mkt20=None):
         margin_current += f"；目前水位 {u:.1f}%"
     cells.append(_cell(
         sc["s_margin"], pctp(u), rows, R_MARGIN[sc["s_margin"]], margin_current,
-        f"固定門檻（價格×融資，{mc_window or '-'}日；水位封頂）",
+        R_MARGIN[sc["s_margin"]],
         u is not None and u >= 9))
     return cells
 

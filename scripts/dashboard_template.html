@@ -73,6 +73,8 @@
   .skip-link:focus{transform:translateY(0)}
   .mono{font-family:"Cascadia Mono",Consolas,ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
   .wrap{max-width:1120px;margin:0 auto;padding:28px 22px 64px}
+  /* 大螢幕給密集矩陣多一點呼吸空間;筆電以下維持原版心 */
+  @media (min-width:1440px){.wrap{max-width:1230px}}
 
   /* ---- header ---- */
   header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}
@@ -213,7 +215,17 @@
     border:1px solid var(--hairline);margin-top:3px}
   .chipbar span{display:block;min-width:0;height:100%}
   .stat{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:2px 10px}
-  .stat .change{grid-column:1/-1;color:var(--muted);font-size:12px;line-height:1.45}
+  /* 5日變化靠右貼齊上方數值(同欄=同一件事);惡化/改善用獨立於紅強綠弱的告警/健康色 */
+  .stat .change{grid-column:1/-1;color:var(--muted);font-size:11.5px;line-height:1.45;text-align:right}
+  .stat .change.worse{color:var(--warn)}
+  .stat .change.better{color:var(--health)}
+  /* 族群卡:統計列用細線分組取代等距浮排,每列(數值+變化)讀成一個單位 */
+  #groups .picks{gap:0}
+  #groups .pick{padding:6px 0}
+  #groups .pick + .pick{border-top:1px solid var(--hairline-2)}
+  /* 族群卡表頭:狀態/持續天數收緊成一組,與下方註記留呼吸 */
+  .tier .gstate{margin-bottom:1px}
+  .tier .gdur{font-size:11.5px;margin-bottom:9px}
   /* 結論卡族群標籤:同族群名對齊成一欄(min-width),色盲友善的純文字小標,不佔訊號色 */
   .pick .gt{font-size:10px;font-weight:600;color:var(--muted);border:1px solid var(--hairline);
     border-radius:6px;padding:0 6px;flex:0 0 auto;min-width:34px;text-align:center;box-sizing:border-box}
@@ -221,6 +233,9 @@
   /* ---- matrix ---- */
   .scroller{overflow-x:auto;border:1px solid var(--hairline);border-radius:16px;background:var(--surface);
     box-shadow:var(--shadow)}
+  /* 寬螢幕時矩陣放得下:改 clip(非捲動容器),讓表頭 sticky 相對視窗生效——
+     overflow:auto 會把 sticky 困在容器內,深捲 14000px 後看不到欄位表頭 */
+  @media (min-width:1105px){.scroller{overflow-x:clip}}
   .matrix{min-width:1060px}
   .grp{padding:11px 16px 5px;font-weight:800;font-size:13.5px;display:flex;align-items:center;gap:9px}
   .grp .tag{font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--hairline);
@@ -228,33 +243,39 @@
   .row{display:grid;
     grid-template-columns:minmax(150px,1.2fr) repeat(5,minmax(130px,1fr)) minmax(150px,1.15fr);
     align-items:stretch;border-top:1px solid var(--hairline-2)}
-  .row.head{border-top:none;position:sticky;top:0;background:var(--surface-2);z-index:2}
+  /* 離屏個股列跳過 layout/paint(98 檔約 14000px 長表),降低首屏與捲動成本;高度先估後記憶 */
+  .row[data-g]{content-visibility:auto;contain-intrinsic-size:auto 118px}
+  .row.head{border-top:none;position:sticky;top:0;background:var(--surface-2);z-index:2;
+    border-bottom:1px solid var(--hairline)}
   .row.head .hc{padding:9px 10px;font-size:11.5px;color:var(--muted)}
   .row.head .hc .t{font-weight:800;color:var(--ink);font-size:12.5px;display:block}
   .row.head .rl{padding-left:16px}
   .rl{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:9px 10px 9px 16px;min-width:0}
   .rl .nm{font-weight:800;font-size:14px;letter-spacing:.2px}
   .rl .code{font-size:11px;color:var(--muted)}
+  /* 官方列管是最高層級警示:實心紅,與「營收YoY」等描邊資訊 pill 拉開視覺位階 */
   .riskbadge{display:inline-flex;align-items:center;justify-content:center;width:fit-content;min-height:28px;margin-top:2px;
-    font-size:11.5px;font-weight:700;color:var(--strong);border:1px solid var(--strong);border-radius:100px;
-    padding:3px 9px;cursor:pointer;letter-spacing:.3px;background:transparent}
+    font-size:11.5px;font-weight:700;color:var(--surface);border:1px solid var(--strong);border-radius:100px;
+    padding:3px 9px;cursor:pointer;letter-spacing:.3px;background:var(--strong);white-space:nowrap}
   .riskbadge.sm{margin-top:0;padding:0 5px;flex:0 0 auto}
-  .badges{display:flex;align-items:center;gap:6px;margin-top:3px}
-  .hdot{width:28px;height:28px;border-radius:50%;border:8px solid var(--surface);padding:0;cursor:pointer;flex:0 0 auto;
-    box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--hairline);transition:transform .1s ease}
-  .hdot:hover,.hdot:focus-visible{transform:scale(1.3)}
-  .hdot:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-  .hdot.health{background:var(--health)}
-  .hdot.neutral{background:var(--neutral)}
-  .hdot.warn{background:var(--warn-line)}
+  .badges{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;margin-top:3px}
+  /* 籌碼診斷與其他標記同款 pill(舊版圓點外觀近似 radio button,易誤讀為可勾選);
+     文字帶狀態字(健/中/待),遵守「不靠顏色單獨判讀」 */
+  .hdot{display:inline-flex;align-items:center;width:fit-content;min-height:28px;font-family:inherit;
+    font-size:11.5px;font-weight:700;border:1px solid currentColor;border-radius:100px;
+    padding:3px 9px;cursor:pointer;flex:0 0 auto;letter-spacing:.1px;white-space:nowrap}
+  .hdot:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .hdot.health{color:var(--health);background:var(--health-tint)}
+  .hdot.neutral{color:var(--ink-2);background:var(--neutral-tint)}
+  .hdot.warn{color:var(--warn);background:var(--warn-bg)}
   .fundbadge{display:inline-flex;align-items:center;width:fit-content;min-height:28px;margin-top:2px;font-family:inherit;
     font-size:11.5px;font-weight:700;border:1px solid currentColor;border-radius:100px;
-    padding:3px 9px;cursor:pointer;background:none;letter-spacing:.1px}
+    padding:3px 9px;cursor:pointer;background:none;letter-spacing:.1px;white-space:nowrap}
   .fundbadge.up{color:var(--strong)}
   .fundbadge.down{color:var(--weak)}
   .fundbadge.flat{color:var(--muted)}
-  .notebadge{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
-    margin-top:2px;font-size:14px;line-height:1;border:1px solid currentColor;border-radius:100px;
+  .notebadge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+    margin-top:2px;font-size:13px;line-height:1;border:1px solid currentColor;border-radius:100px;
     padding:0;cursor:pointer;background:none;flex:0 0 auto}
   .notebadge.ai_draft{color:var(--muted);border-style:dashed}
   .notebadge.partially_verified{color:var(--warn-line);background:var(--warn-bg)}
@@ -276,6 +297,7 @@
   .cell .g{font-size:12.5px;font-weight:800;line-height:1}
   .cell .v{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:.1px;text-align:center}
   .cell .basis{font-size:11.5px;line-height:1.35;color:var(--muted);text-align:center}
+  .cell .v,.cell .basis{text-wrap:balance}
   .cell.s2{background:var(--strong-tint-2)} .cell.s1{background:var(--strong-tint)}
   .cell.s0{background:var(--neutral-tint)}
   .cell.sm1{background:var(--weak-tint)} .cell.sm2{background:var(--weak-tint-2)}
@@ -488,8 +510,8 @@
     .mtoolbar{align-items:stretch}
     .mtoolbar .toggle{flex:1 1 auto;justify-content:center}
     .riskbadge,.fundbadge,.notebadge,.hdot{min-height:44px;height:44px}
-    .riskbadge,.fundbadge{padding-inline:12px}
-    .notebadge,.hdot{width:44px}
+    .riskbadge,.fundbadge,.hdot{padding-inline:12px}
+    .notebadge{width:44px}
     .overview{padding:15px 16px}
   }
 
@@ -559,7 +581,7 @@
     <a href="#groups-section">族群概況</a>
     <a href="#tiers-section">個股分層</a>
     <a href="#stocks-section">個股明細</a>
-    <a href="#method">計算與資料</a>
+    <a href="#method">方法與資料</a>
   </nav>
 
   <main id="main">
@@ -601,9 +623,9 @@
       <h3>個股標記(觀察資訊,不影響左側①~⑤評分與已確認分層;點列表格內同款圖示看明細)</h3>
       <div class="scale">
         <span class="sk"><span class="riskbadge sm">處置</span>／<span class="riskbadge sm">注意</span>交易所官方列管(TWSE/TPEx 異常價量認證)</span>
-        <span class="sk"><span class="hdot health" style="display:inline-block"></span>籌碼現況診斷:健康</span>
-        <span class="sk"><span class="hdot neutral" style="display:inline-block"></span>籌碼現況診斷:中性</span>
-        <span class="sk"><span class="hdot warn" style="display:inline-block"></span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
+        <span class="sk"><span class="hdot health">籌碼 健</span>籌碼現況診斷:健康</span>
+        <span class="sk"><span class="hdot neutral">籌碼 中</span>籌碼現況診斷:中性</span>
+        <span class="sk"><span class="hdot warn">籌碼 待</span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
         <span class="sk"><span class="fundbadge up">營收YoY +18%</span>基本面參考:只描述最新月營收較去年同月的變化，不直接判定營運強弱</span>
         <span class="sk"><span class="notebadge ai_draft">📝</span>AI 草稿・未獨立查核</span>
         <span class="sk"><span class="notebadge partially_verified">📝</span>僅明列範圍完成獨立核驗</span>
@@ -640,7 +662,7 @@
   <h2 class="sec" id="tiers-section">個股分層 · 已確認的相對強弱</h2>
   <div class="tiers" id="tiers"></div>
 
-  <h2 class="sec" id="stocks-section">五個觀察面向（共 7 指標） · 點按看完整計算</h2>
+  <h2 class="sec" id="stocks-section">個股明細 · 五個觀察面向（共 7 指標），每格點按看完整計算</h2>
   <div class="mtoolbar">
     <input type="search" id="matrixSearch" class="msearch" placeholder="搜尋股號或名稱…" aria-label="搜尋股號或名稱">
     <button type="button" class="toggle" id="matrixSortBtn" aria-pressed="false">↓ 族群內綜合分由高到低</button>
@@ -737,20 +759,22 @@
 <script>
 (function(){
   "use strict";
+  // sub = 明細表欄位表頭的第二行:把「這欄分數怎麼來」的常數語意放這裡,
+  // 個股格內只留會變動的資訊(排名桶/判讀),避免同一句話跟著 98 檔重複。
   var EL = [
-    {k:"①價", role:"族群相對",
+    {k:"①價", role:"族群相對", sub:"族群內排名 · 含抗跌",
      how:"「相對強弱」= 近20日還原價報酬 − 族群中位數(白話:過去一個月跑贏同業多少),在族群內排名給分:前20% +2、後20% −2。上表的 └ 兩列就是相減前的原料;「大盤20日」是含息報酬指數同窗口報酬,純參考基準(不參與計分)——個股與族群中位都贏大盤，表示個股與族群價格都相對靠前；只贏族群中位卻輸大盤，則是弱勢族群裡的相對強。「修正日抗跌」是獨立指標(權重1.0):只統計族群整體下跌的日子,它平均比族群多漲(少跌)多少。",
      src:"FinMind 台股日收盤(TaiwanStockPrice);除權息/分割還原價由本系統以事件資料重算"},
-    {k:"②量", role:"量比/過熱",
+    {k:"②量", role:"量比/過熱", sub:"固定門檻 · 比自身常態",
      how:"量比 = 當日周轉率 ÷ 自己過去60日的中位數——跟自己的常態比,大型股不會因天生低周轉吃虧。1.2~3.0 視為健康活絡 +1;<0.5 量縮無人氣 −1。量比≥5 或周轉率≥20% 觸發過熱旗標 ⚠(不改分數,但會把評級壓到「強但過熱」)。",
      src:"FinMind 成交量(TaiwanStockPrice)÷ 當日發行股數(TaiwanStockShareholding)"},
-    {k:"③外資", role:"國際法人",
+    {k:"③外資", role:"國際法人", sub:"族群內排名 · 國際法人",
      how:"外資持股比率的20日變化(單位:百分點 pp),在族群內排名;每檔原始變化若小於 ±0.3pp,視為雜訊並歸 0 分。排名分數只說明同業位置，原始值仍可能為負。本系統實證:外資動向較適合比較族群,在族群內分個股的權重僅 0.5。「修正日買賣」= 族群下跌日外資淨買賣的20日累計 ÷ 股本,用於蓄勢條件與族群概況。",
      src:"FinMind 外資持股(TaiwanStockShareholding)+ 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
-    {k:"④投信", role:"本土法人",
+    {k:"④投信", role:"本土法人", sub:"族群內排名 · 本土法人",
      how:"近5日投信淨買賣 ÷ 發行股數,在族群內排名;每檔原始變化若小於 ±0.03%,視為雜訊並歸 0 分。排名分數只說明同業位置，請同時閱讀原始值是淨買或淨賣。投信部位小、動作集中,歷史上在市場修正期參考價值較高(最新檢驗以週報為準)。",
      src:"FinMind 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
-    {k:"⑤融資券", role:"散戶籌碼",
+    {k:"⑤融資券", role:"散戶籌碼", sub:"固定門檻 · 價×融資",
      how:"融資採固定門檻，看「價格方向 × 融資變化」組合:價跌且融資下降代表槓桿同步降低，給 +2；價漲且融資增加給 −1；價跌且融資明顯增加代表槓桿風險升高，給 −2。融資水位(餘額÷股本)≥9% 時分數封頂 −1 並示警 ⚠。",
      src:"FinMind 融資融券(TaiwanStockMarginPurchaseShortSale)"}
   ];
@@ -790,7 +814,9 @@
     a.addEventListener("click",function(e){
       var target=document.querySelector(a.getAttribute("href"));
       if(!target)return;e.preventDefault();
-      target.scrollIntoView({behavior:"smooth",block:"start"});
+      // 遠距離(數千px)平滑捲動又慢又暈,改瞬移;鄰近區塊維持平滑
+      var dist=Math.abs(target.getBoundingClientRect().top);
+      target.scrollIntoView({behavior:dist>2500?"auto":"smooth",block:"start"});
       target.setAttribute("tabindex","-1");target.focus({preventScroll:true});
     });
   });
@@ -963,13 +989,16 @@
       node.addEventListener("click", function(){ hideTip(); openSheet(payload(),null,node); });
       return;
     }
-    var lastX=0,lastY=0;
-    node.addEventListener("mouseenter", function(e){ lastX=e.clientX;lastY=e.clientY; showTip(payload(), lastX,lastY); });
+    var lastX=0,lastY=0,hoverTimer=null;
+    function cancelHover(){ if(hoverTimer){ clearTimeout(hoverTimer); hoverTimer=null; } hideTip(); }
+    // 小延遲:滑鼠掃過整排格子時不連環閃預覽,停留才顯示
+    node.addEventListener("mouseenter", function(e){ lastX=e.clientX;lastY=e.clientY;
+      hoverTimer=setTimeout(function(){ hoverTimer=null; showTip(payload(), lastX,lastY); },120); });
     node.addEventListener("mousemove", function(e){ lastX=e.clientX;lastY=e.clientY; if(tip.classList.contains("on")) positionTip(lastX,lastY); });
-    node.addEventListener("mouseleave", hideTip);
+    node.addEventListener("mouseleave", cancelHover);
     node.addEventListener("focus", function(){ if(suppressFocusTip)return;var r=node.getBoundingClientRect(); showTip(payload(), r.left+r.width/2, r.top); });
-    node.addEventListener("blur", hideTip);
-    node.addEventListener("click", function(){ hideTip(); openSheet(payload(),null,node); });
+    node.addEventListener("blur", cancelHover);
+    node.addEventListener("click", function(){ cancelHover(); openSheet(payload(),null,node); });
   }
 
   // ---------- bottom sheet(觸控裝置的詳情呈現) ----------
@@ -1181,7 +1210,7 @@
     EL.forEach(function(e){
       var c=document.createElement("div"); c.className="hc";
       var t=document.createElement("span"); t.className="t"; t.textContent=e.k; c.appendChild(t);
-      var s=document.createElement("span"); s.textContent=e.role; c.appendChild(s);
+      var s=document.createElement("span"); s.textContent=e.sub||e.role; c.appendChild(s);
       r.appendChild(c);
     });
     var v=document.createElement("div"); v.className="hc";
@@ -1220,6 +1249,7 @@
     if(row.chip){
       var hd=document.createElement("button"); hd.type="button"; hd.tabIndex=0;
       hd.className="hdot "+row.chip.cls;
+      hd.textContent={health:"籌碼 健",neutral:"籌碼 中",warn:"籌碼 待"}[row.chip.cls]||"籌碼";
       hd.setAttribute("aria-label", "籌碼現況診斷:"+row.chip.label+",非選股排名");
       badges.appendChild(hd);
       var CHIP_PILL = {health:["var(--health)","var(--health-tint)"], neutral:["var(--neutral)","var(--neutral-tint)"],
@@ -1277,7 +1307,7 @@
       var scoreBasis=c[6]||((i===1||i===4)?"固定門檻判定":"族群相對位置："+sinfo(s).l);
       var info=sinfo(s);
       var cell=document.createElement("button"); cell.type="button"; cell.className="cell "+info.c+(warn?" warn":"");
-      cell.setAttribute("aria-label", row.nm+" "+EL[i].k+"，原始狀態 "+rawDirection+"，評分依據 "+scoreBasis+"，得分 "+s);
+      cell.setAttribute("aria-label", row.nm+" "+EL[i].k+"，原始狀態 "+rawDirection+"，判讀 "+scoreBasis+"，得分 "+s);
       if(warn){ var fl=document.createElement("span"); fl.className="flag"; fl.textContent="⚠"; cell.appendChild(fl); }
       var g=document.createElement("span"); g.className="g"; g.textContent=info.g+" "+(s>0?"+":"")+s; cell.appendChild(g);
       var v=document.createElement("span"); v.className="v"; v.textContent=rawDirection; cell.appendChild(v);
@@ -1300,7 +1330,7 @@
     vd.style.setProperty("--vt", tintBg(row.vt));
     vd.style.setProperty("--vl", scColor(row.vt));
     vd.setAttribute("aria-label", row.nm+" 已確認分層 "+confirmedLabel+(waiting?"，今日初判 "+rawLabel+"，等待第二日確認":""));
-    var kick=document.createElement("div"); kick.className="kicker"; kick.textContent="已確認分層"; vd.appendChild(kick);
+    // 桌機欄位表頭已寫「已確認分層」且現在恆常可見(sticky),每列不再重複 kicker
     var vv=document.createElement("div"); vv.className="vv";
     if(row.warn){ var w=document.createElement("span"); w.textContent="⚠"; w.style.color="var(--warn)"; vv.appendChild(w); }
     var vtx=document.createElement("span"); vtx.textContent=confirmedLabel; vv.appendChild(vtx);
@@ -1611,10 +1641,10 @@
       if(g.g) el.dataset.g = g.g;
       el.style.setProperty("--tc", g.col);
       var tt = document.createElement("div"); tt.className = "tt"; tt.textContent = g.nm; el.appendChild(tt);
-      var st = document.createElement("div"); st.className = "td";
+      var st = document.createElement("div"); st.className = "td gstate";
       st.style.color = g.col; st.style.fontWeight = "700"; st.textContent = g.state; el.appendChild(st);
       if(g.dur){                 // 狀態持續天數:分辨「剛轉」與「已持續數週」——看先後的關鍵
-        var du = document.createElement("div"); du.className = "td";
+        var du = document.createElement("div"); du.className = "td gdur";
         du.style.opacity = ".72"; du.textContent = "狀態持續 " + g.dur; el.appendChild(du);
       }
       var nt = document.createElement("div"); nt.className = "td"; nt.textContent = g.note; el.appendChild(nt);
@@ -1624,7 +1654,12 @@
         var lab = document.createElement("span"); lab.className = "code"; lab.style.flex = "1"; lab.textContent = s[0];
         var val = document.createElement("span"); val.className = "nm mono"; val.textContent = s[1];
         p.appendChild(lab); p.appendChild(val);
-        if(s[3]){var change=document.createElement("span");change.className="change";change.textContent=s[3];p.appendChild(change);}
+        if(s[3]){
+          var change=document.createElement("span");change.className="change";change.textContent=s[3];
+          if(s[3].indexOf("惡化")!==-1)change.classList.add("worse");
+          else if(s[3].indexOf("改善")!==-1)change.classList.add("better");
+          p.appendChild(change);
+        }
         picks.appendChild(p);
       });
       el.appendChild(picks);
