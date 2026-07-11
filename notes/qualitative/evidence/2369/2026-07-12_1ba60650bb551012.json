@@ -1,0 +1,193 @@
+{
+  "content_as_of": "2026-07-12",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        50,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        68,
+        69,
+        70
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 75,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        67,
+        68,
+        69,
+        70,
+        71
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "1cc1f0d0c4ce4e0885bd901e70215f68031fa957aa79332a8f2a5b2825987b8a",
+      "size_bytes": 2234476,
+      "url": "https://www.lingsen.com.tw/webc/html/investor/pdf/Annual/114年股東會年報.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        25,
+        29,
+        30,
+        31,
+        32,
+        60,
+        61
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 64,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        59,
+        60,
+        61,
+        62
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "9382448a46c6b39e422f2d0a7dd35582806898cb5ecc7595a6414f7ab1abb71f",
+      "size_bytes": 1637780,
+      "url": "https://www.lingsen.com.tw/webc/html/investor/pdf/Annual/114/114Q4合併財報.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        18,
+        19,
+        20,
+        28,
+        29,
+        30
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 42,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        17,
+        18,
+        19,
+        20,
+        21,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "6b66031a6e99c7f8826098ecda3dde182960097baced38d0fda89d3b03210045",
+      "size_bytes": 1458055,
+      "url": "https://www.lingsen.com.tw/webc/html/investor/pdf/Annual/115/115Q1合併財報.pdf"
+    },
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 12,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "a7a8815cae0fd635790b187977890a2978176b4e359e32fed44a27d54194dd52",
+      "size_bytes": 1283193,
+      "url": "https://www.lingsen.com.tw/webc/html/investor/pdf/Annual/114/2025-12-03.pdf"
+    }
+  ],
+  "pack_sha256": "1ba60650bb5510123ddb1c732fb42692b29648727d682e634d06684d038a638d",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2369",
+  "unverified_claims_removed": true
+}
