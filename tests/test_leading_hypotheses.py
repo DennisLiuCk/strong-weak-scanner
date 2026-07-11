@@ -70,10 +70,10 @@ class LeadingHypothesesTest(unittest.TestCase):
             info = lh.analyse_report("1234_測試.md", report_text(), notes=self.notes)
         self.assertFalse(info["quality_invalid"], info["quality_errors"])
 
-    def test_five_batches_have_fifty_valid_reports_and_one_hundred_hypotheses(self):
+    def test_six_batches_have_sixty_valid_reports_and_one_hundred_twenty_hypotheses(self):
         reports = lh.load_reports()
-        self.assertEqual(len(reports), 50)
-        self.assertEqual(sum(report["hypothesis_count"] for report in reports.values()), 100)
+        self.assertEqual(len(reports), 60)
+        self.assertEqual(sum(report["hypothesis_count"] for report in reports.values()), 120)
         self.assertFalse([report["quality_errors"] for report in reports.values()
                           if report["quality_invalid"]])
 
