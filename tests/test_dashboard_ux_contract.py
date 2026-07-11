@@ -192,6 +192,18 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn('bl.t==="h3"', self.template)
         self.assertNotIn("質化研究筆記則由人工整理公開資訊", self.template)
 
+    def test_research_drawer_tabs_formal_note_and_leading_hypotheses(self):
+        for marker in (
+            "function researchPayload(row)", "function renderResearchDetail(box, research)",
+            "function renderHypothesisDetail(box, hypothesis)", 'setText(noteTab,"正式筆記")',
+            'setText(hypTab,"領先假說 "+research.hypothesis.count+" 則")',
+            "可證偽", "多篇轉載同一消息鏈不視為獨立確認", "has-hypothesis",
+        ):
+            self.assertIn(marker, self.template)
+        for marker in ("load_hypothesis_reports", 'obj["hypothesis"]',
+                       '"statusCounts"', '"sections"'):
+            self.assertIn(marker, self.builder)
+
 
 if __name__ == "__main__":
     unittest.main()

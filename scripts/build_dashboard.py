@@ -24,6 +24,7 @@ from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
 from qual_notes import (load_notes, note_status, note_review_status,
                         TEMPLATE_VERSION as NOTE_TEMPLATE_VERSION)
+from leading_hypotheses import load_reports as load_hypothesis_reports
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -33,6 +34,7 @@ OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages
 # (daily_scores 等衍生表每日全量重建,事後從 db 重繪會是 restated history,不可稽核)。
 ARCHIVE = os.path.join(ROOT, "archive")
 NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
+HYPOTHESES_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
 # 筆記全文放 repo 裡,儀表板不 embed 全文(質化筆記是長文,不適合塞進 tooltip)——
 # badge 點開直接連到 GitHub 的 render 版本,讀 repo remote 免寫死也行,但這裡固定
 # 域名比較簡單(僅供內部 GitHub Pages 使用,repo 搬家機率低)
@@ -907,6 +909,8 @@ def main():
     # 質化筆記(觀察層、AI 協作＋獨立 reviewer,見 notes/qualitative/):無筆記時 load_notes
     # 回傳空 dict,同 fund_map 的「從缺不擋主管線」慣例
     notes_map = load_notes(NOTES_DIR)
+    # 領先假說是獨立觀察層；lint 會要求其錨定有效 independently_verified 正式筆記。
+    hypotheses_map = load_hypothesis_reports(HYPOTHESES_DIR, notes=notes_map)
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
     chip_by_grp = {}
@@ -1079,6 +1083,26 @@ def main():
                 "primarySources": n.get("primary_source_count", 0),
                 "summary": n["summary"], "tmplOld": n["template_version"] < NOTE_TEMPLATE_VERSION,
                 "url": NOTE_REPO_BLOB + n["relpath"], "sections": n["sections"],
+            }
+        hypothesis = hypotheses_map.get(r["stock_id"])
+        if hypothesis:
+            status_counts = defaultdict(int)
+            for item in hypothesis.get("hypotheses", []):
+                raw = item.get("fields", {}).get("目前狀態", "")
+                match = re.search(r"`([a-z_]+)`", raw)
+                status_counts[match.group(1) if match else "unknown"] += 1
+            count = hypothesis.get("hypothesis_count", 0)
+            obj["hypothesis"] = {
+                "label": f"領先假說 {count} 則",
+                "count": count,
+                "updated": hypothesis.get("last_updated") or "-",
+                "contentAsOf": hypothesis.get("content_as_of") or "-",
+                "next": hypothesis.get("next_review") or "-",
+                "qualityInvalid": hypothesis.get("quality_invalid", False),
+                "qualityErrors": hypothesis.get("quality_errors", []),
+                "statusCounts": dict(status_counts),
+                "sections": hypothesis.get("sections", []),
+                "url": NOTE_REPO_BLOB + hypothesis["relpath"],
             }
         obj["_comp"] = r["composite_s"]
         data.append(obj)
