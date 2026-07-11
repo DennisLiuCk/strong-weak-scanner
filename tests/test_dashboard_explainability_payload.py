@@ -67,12 +67,13 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
         self.assertNotIn("調節", foreign[3])
         self.assertNotIn("減持", foreign[3])
 
-    def test_warn_slot_does_not_shift_explainability_fields(self):
+    def test_warn_slot_keeps_current_direction_and_dynamic_reading_aligned(self):
         cells = bd.build_cells(score_row(), metric_row(vol_ratio60=6.0))
         volume = cells[1]
         self.assertEqual(volume[4], 1)
         self.assertIn("量比 6.0×", volume[5])
-        self.assertIn("固定門檻", volume[6])
+        # 固定門檻定義已集中在欄位表頭；格內 basis 只保留這檔當下的動態判讀。
+        self.assertEqual("量比爆增、過熱", volume[6])
 
     def test_margin_display_uses_the_same_five_day_fallback_as_scoring(self):
         cells = bd.build_cells(

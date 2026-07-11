@@ -72,12 +72,17 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("本文術語白話解釋", self.template)
 
     def test_first_desktop_click_opens_persistent_drawer(self):
-        click_to_drawer = (
+        touch_click_to_drawer = (
             'node.addEventListener("click", function(){ hideTip(); '
             'openSheet(payload(),null,node); });'
         )
-        # TOUCH 與 hover-capable desktop 各有一條；桌機不得先用 click 關掉 tooltip。
-        self.assertGreaterEqual(self.template.count(click_to_drawer), 2)
+        desktop_click_to_drawer = (
+            'node.addEventListener("click", function(){ cancelHover(); '
+            'openSheet(payload(),null,node); });'
+        )
+        # TOUCH 先關 tooltip；hover-capable desktop 同時取消延遲 timer，再開持續 drawer。
+        self.assertIn(touch_click_to_drawer, self.template)
+        self.assertIn(desktop_click_to_drawer, self.template)
         self.assertNotIn('if(tip.classList.contains("on")) { hideTip(); }', self.template)
         self.assertNotIn('else { showTip(payload()', self.template)
         self.assertIn('node.setAttribute("aria-haspopup","dialog")', self.template)
