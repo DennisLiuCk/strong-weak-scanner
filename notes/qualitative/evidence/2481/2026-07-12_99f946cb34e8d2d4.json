@@ -1,0 +1,183 @@
+{
+  "content_as_of": "2026-07-12",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        93,
+        98,
+        99,
+        100,
+        103,
+        105,
+        117,
+        118,
+        119,
+        120,
+        121
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 125,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        92,
+        93,
+        94,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "224d5b97808054af909dc550846fd9210771ad55f4e91996fa3755b89d066384",
+      "size_bytes": 2266518,
+      "url": "https://www.panjit.com.tw/upload/2026_06_2412/20260624130021mtmtvctwS1.pdf"
+    },
+    {
+      "cited_pages": [
+        43,
+        63,
+        74,
+        81,
+        91,
+        92,
+        93,
+        94
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 104,
+      "rendered_pages": [
+        42,
+        43,
+        44,
+        62,
+        63,
+        64,
+        73,
+        74,
+        75,
+        80,
+        81,
+        82,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "cebf60875a12dece9b97f2f647bf7452ece868aa83cd72642dbc3895c85a60ca",
+      "size_bytes": 5246318,
+      "url": "https://www.panjit.com.tw/upload/2026_03_1712/20260317161104aa6pybD8d1.pdf"
+    },
+    {
+      "cited_pages": [
+        39,
+        56,
+        63,
+        80,
+        81,
+        82,
+        83
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 93,
+      "rendered_pages": [
+        38,
+        39,
+        40,
+        55,
+        56,
+        57,
+        62,
+        63,
+        64,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "4512766cdc790b273622f4d378a94eb88de0f47cdacca59a6d7b42a78370cb74",
+      "size_bytes": 1719251,
+      "url": "https://www.panjit.com.tw/upload/2026_05_1512/20260515164025xg1joi6qU1.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 15,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "a0750cd4cbe5898953ce07c1f3750b33e512e277a7dca97495264214e8a9e55e",
+      "size_bytes": 1878102,
+      "url": "https://www.panjit.com.tw/upload/2026_06_0312/20260603105658nu8i2tkZq1.pdf"
+    }
+  ],
+  "pack_sha256": "99f946cb34e8d2d479c5db172d71349f7c5ef87cfea7bf7c86e9af4fe70b3f15",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2481",
+  "unverified_claims_removed": true
+}
