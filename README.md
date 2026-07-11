@@ -233,6 +233,10 @@ token 必爆額度。正常 daily 會跳過完整 pair；休市日通常只需 1
 法說摘要只能用來發現線索；主張應回到公司 IR、年報／財報原檔、MOPS 直接公告或
 TWSE／TPEx 文件。FinMind 財報窄表用來交叉檢查量化口徑,不取代原始文件。
 
+新 session 逐篇執行時先依 [QUALITATIVE_RESEARCH_RUNBOOK.md](QUALITATIVE_RESEARCH_RUNBOOK.md)
+的 checklist 完成來源取得、claim-page 對照、drafter／reviewer 交接、退回重建與單篇提交；
+本節保留完整品質契約與工具參數說明。
+
 ### `focused_v1`（只套用新研究）
 
 新建筆記或重新展開一輪完整研究時,在既有 template v2 上加入以下 meta；這是附加的
