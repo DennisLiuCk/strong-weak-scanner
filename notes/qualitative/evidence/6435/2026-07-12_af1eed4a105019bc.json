@@ -1,0 +1,167 @@
+{
+  "content_as_of": "2026-07-12",
+  "documents": [
+    {
+      "cited_pages": [
+        76,
+        87,
+        88,
+        89,
+        90,
+        91,
+        99,
+        100,
+        101,
+        102,
+        103
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 110,
+      "rendered_pages": [
+        75,
+        76,
+        77,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "ca511cb51f0c0ac12b56892bc64d606b7e526ead03bce671e9939921f5910152",
+      "size_bytes": 2523384,
+      "url": "https://www.sinopowersemi.com/investors/information-download/0/472__1/"
+    },
+    {
+      "cited_pages": [
+        21,
+        22,
+        23,
+        26,
+        30,
+        33,
+        34,
+        35,
+        46,
+        49
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 55,
+      "rendered_pages": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "b5db1939865974f85e7fbf3e56fc0c3966f063983a7b6515e902e3d1da0b99da",
+      "size_bytes": 2502783,
+      "url": "https://www.sinopowersemi.com/investors/finance-download/3/finance-report-2025/data_file_q4/"
+    },
+    {
+      "cited_pages": [
+        13,
+        14,
+        17,
+        20,
+        22,
+        23,
+        24,
+        29,
+        30
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 34,
+      "rendered_pages": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        28,
+        29,
+        30,
+        31
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "b49ca49b2a9a3ed7e67937fd40f41882ae0294a2b9ac58fb9adcfa2547755207",
+      "size_bytes": 1564791,
+      "url": "https://www.sinopowersemi.com/investors/finance-download/0/finance-report-2026/data_file_q1/"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        6
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 8,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "1aa3b4669947f623895d794a9c2bd568f5b4a3ee86ad632a3f4816e20df4c9df",
+      "size_bytes": 1398030,
+      "url": "https://www.sinopowersemi.com/investors/information-download/0/559/"
+    }
+  ],
+  "pack_sha256": "af1eed4a105019bcab9931746e0f11be56ff231081200fa27cb287605dc91bed",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "6435",
+  "unverified_claims_removed": true
+}
