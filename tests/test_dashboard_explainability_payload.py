@@ -79,9 +79,29 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
         current = dict(history[-1], close_adj=103, ma5=101, ma20=100, ma60=96,
                        rsi14=55, volume=700_000, vol_ma20=1_000_000, vol_ratio20=.7)
         view = bd.build_technical_view(current, history[:-2] + [previous, current])
-        self.assertIn("現價相對MA5", view["rows"][0][2])
+        self.assertEqual(view["rows"][0][0], "價格與均線")
+        self.assertIn("現價 103／MA5 101／MA20 100／MA60 96", view["rows"][0][1])
+        self.assertIn("比MA5高2.0%", view["rows"][0][2])
         self.assertIn("現價上穿MA20", view["rows"][5][1])
         self.assertEqual(view["rows"][4][1], "價漲量縮")
+
+    def test_mixed_ma_structure_lists_actual_order_and_all_price_positions(self):
+        history = technical_history()
+        current = dict(history[-1], close_adj=448.5, ma5=473.78, ma20=502.01,
+                       ma60=477.93, rsi14=45, volume=1_160_000,
+                       vol_ma20=1_000_000, vol_ratio20=1.16, ret1=-0.01)
+        view = bd.build_technical_view(current, history[:-1] + [current])
+        self.assertEqual((view["cls"], view["label"]), ("down", "趨勢偏弱"))
+        self.assertEqual(view["rows"][1][1], "由高到低：MA20 > MA60 > MA5")
+        self.assertIn("尚未形成標準空頭排列（MA5 < MA20 < MA60）", view["rows"][1][2])
+        self.assertIn("現價低於MA5、MA20、MA60", view["rows"][1][2])
+        self.assertNotIn("RSI", view["rows"][1][2])
+        self.assertIn("平均下跌力道大於平均上漲力道", view["why"])
+        self.assertIn("現價 448.5／MA5 473.78／MA20 502.01／MA60 477.93",
+                      view["rows"][0][1])
+        self.assertIn("比MA5低5.3%、比MA20低10.7%、比MA60低6.2%", view["rows"][0][2])
+        self.assertIn("與MA20的差距超過10%", view["rows"][0][2])
+        self.assertNotIn("短線偏離", view["rows"][0][2])
 
     def test_no_crossing_copy_names_two_separate_comparisons(self):
         history = technical_history()

@@ -155,6 +155,35 @@ def _ratio(a, b):
     return (a / b - 1) if (a is not None and b) else None
 
 
+def _ma_price_position(close, ma_values):
+    """白話列出現價相對三條均線的位置；不只拿 MA20 代表全部週期。"""
+    above = [label for label, value in ma_values if close > value]
+    below = [label for label, value in ma_values if close < value]
+    equal = [label for label, value in ma_values if close == value]
+    if len(above) == len(ma_values):
+        return "現價高於MA5、MA20、MA60"
+    if len(below) == len(ma_values):
+        return "現價低於MA5、MA20、MA60"
+    parts = []
+    if above:
+        parts.append("現價高於" + "、".join(above))
+    if below:
+        parts.append("低於" + "、".join(below))
+    if equal:
+        parts.append("約等於" + "、".join(equal))
+    return "；".join(parts)
+
+
+def _ma_distance_phrase(label, distance):
+    if distance is None:
+        return f"{label}距離資料不足"
+    if distance > 0:
+        return f"比{label}高{abs(distance)*100:.1f}%"
+    if distance < 0:
+        return f"比{label}低{abs(distance)*100:.1f}%"
+    return f"約等於{label}"
+
+
 def build_technical_view(m, history=None):
     """個股相對自身歷史的技術面觀察，不做族群排名、不影響分數或 tier。"""
     close = _value(m, "close_adj")
@@ -176,23 +205,36 @@ def build_technical_view(m, history=None):
     five = series[-6] if len(series) >= 6 else None
 
     d5, d20, d60 = _ratio(close, ma5), _ratio(close, ma20), _ratio(close, ma60)
+    ma_values = [("MA5", ma5), ("MA20", ma20), ("MA60", ma60)]
+    price_position = _ma_price_position(close, ma_values)
     bull = ma5 > ma20 > ma60
     bear = ma5 < ma20 < ma60
     if bull:
         cls, label, structure = "up", "多頭排列", "MA5 > MA20 > MA60"
-        structure_note = "短、中、長期均線依序向上排列；描述趨勢結構，不保證後續上漲"
+        structure_note = ("短、中、長期均線依序向上排列；" + price_position +
+                          "。排列描述均線關係，不保證後續上漲")
     elif bear:
         cls, label, structure = "down", "空頭排列", "MA5 < MA20 < MA60"
-        structure_note = "短、中、長期均線依序向下排列；描述趨勢結構，不代表已無反彈可能"
+        structure_note = ("短、中、長期均線依序向下排列；" + price_position +
+                          "。排列描述均線關係，不代表已無反彈可能")
     elif close > ma20 and rsi >= 50:
-        cls, label, structure = "up", "趨勢偏多", "均線交錯，現價在 MA20 上"
-        structure_note = "尚非完整多頭排列，但價格站上中期均線且 RSI 位於 50 上方"
+        ordered = sorted(ma_values, key=lambda x: x[1], reverse=True)
+        cls, label = "up", "趨勢偏多"
+        structure = "由高到低：" + " > ".join(x[0] for x in ordered)
+        structure_note = ("均線尚未形成標準多頭排列（MA5 > MA20 > MA60）；" +
+                          price_position + "，價格位置偏強")
     elif close < ma20 and rsi < 50:
-        cls, label, structure = "down", "趨勢偏弱", "均線交錯，現價在 MA20 下"
-        structure_note = "尚非完整空頭排列，但價格低於中期均線且 RSI 位於 50 下方"
+        ordered = sorted(ma_values, key=lambda x: x[1], reverse=True)
+        cls, label = "down", "趨勢偏弱"
+        structure = "由高到低：" + " > ".join(x[0] for x in ordered)
+        structure_note = ("均線尚未形成標準空頭排列（MA5 < MA20 < MA60）；" +
+                          price_position + "，價格位置偏弱")
     else:
-        cls, label, structure = "flat", "結構分歧", "均線、現價與動能方向未一致"
-        structure_note = "不同週期訊號互相矛盾，單看一項指標容易誤判"
+        ordered = sorted(ma_values, key=lambda x: x[1], reverse=True)
+        cls, label = "flat", "結構分歧"
+        structure = "由高到低：" + " > ".join(x[0] for x in ordered)
+        structure_note = ("均線與現價尚未形成一致方向；" + price_position +
+                          "。不同週期訊號互相矛盾，單看一項指標容易誤判")
 
     if rsi >= 70:
         rsi_state = "上漲力道明顯較強"
@@ -259,14 +301,19 @@ def build_technical_view(m, history=None):
     ma20_delta = _ratio(ma20, _value(five, "ma20")) if five else None
     slope_text = (f"MA5較5日前 {pct(ma5_delta, True)}；MA20 {pct(ma20_delta, True)}"
                   if ma5_delta is not None and ma20_delta is not None else "均線5日變化樣本不足")
-    extension = ("現價高於MA20逾10%，短線偏離較大" if d20 is not None and d20 >= 0.10 else
-                 "現價低於MA20逾10%，短線偏離較大" if d20 is not None and d20 <= -0.10 else
-                 "現價仍在MA20上下10%的常態觀察帶內")
+    distances = "、".join((_ma_distance_phrase("MA5", d5),
+                            _ma_distance_phrase("MA20", d20),
+                            _ma_distance_phrase("MA60", d60)))
+    extension = ("其中與MA20的差距超過10%，代表現價和近20日平均價格距離較大；"
+                 "不代表一定反彈或續跌" if d20 is not None and abs(d20) >= 0.10 else
+                 f"與MA20的差距為{abs(d20)*100:.1f}%，仍在±10%觀察帶內"
+                 if d20 is not None else "MA20距離資料不足")
 
     rows = [
-        ["現價 / MA5 / MA20 / MA60",
-         " / ".join(_fmt_price(x) for x in (close, ma5, ma20, ma60)),
-         f"現價相對MA5 {pct(d5, True)}、MA20 {pct(d20, True)}、MA60 {pct(d60, True)}；{extension}"],
+        ["價格與均線",
+         "／".join((f"現價 {_fmt_price(close)}", f"MA5 {_fmt_price(ma5)}",
+                   f"MA20 {_fmt_price(ma20)}", f"MA60 {_fmt_price(ma60)}")),
+         f"{price_position}：{distances}。{extension}"],
         ["均線結構", structure, structure_note],
         ["RSI14", rsi_display, rsi_note + "；括號是RSI較5個交易日前的增減，不是股價報酬率"],
         ["成交量 / 20日均量",

@@ -753,7 +753,7 @@
         <div>
           <h4>建議盤讀順序</h4>
           <ol>
-            <li><b>先看均線結構：</b>MA5 &gt; MA20 &gt; MA60 表示短中長期平均價格依序墊高；反向排列則依序降低。均線交錯代表週期方向尚未一致。</li>
+            <li><b>先看均線結構：</b>MA5 &gt; MA20 &gt; MA60 表示短中長期平均價格依序墊高；反向排列則依序降低。未符合兩種標準排列時，畫面會直接列出三條均線由高到低的實際順序，不再只寫「均線交錯」。</li>
             <li><b>再看現價位置：</b>現價在 MA20／MA60 上方，代表高於中長期平均價格；低於則相反。偏離 MA20 超過約 ±10% 時，短線離平均成本較遠，波動風險通常較高。</li>
             <li><b>用 RSI 看力道：</b>RSI 是否在 50 上下，以及較5日前上升或下降，可辨認力道正在增強或降溫。RSI 高不等於馬上跌，低也不等於馬上漲。</li>
             <li><b>最後用成交量確認：</b>價格方向若伴隨量增，代表更多成交參與；量縮則代表參與度不足。量能只能確認參與程度，不能單獨決定方向。</li>
@@ -934,11 +934,11 @@
     });
   }
   function appendTechSeriesRow(labelNode,valueNode,series){
+    setText(labelNode,"價格與均線");
     series.forEach(function(item,i){
-      if(i){var ls=document.createElement("span");ls.className="series-sep";setText(ls," / ");labelNode.appendChild(ls);
-            var vs=document.createElement("span");vs.className="series-sep";setText(vs," / ");valueNode.appendChild(vs);}
-      var l=document.createElement("span");l.className="series "+item.cls;setText(l,item.label);labelNode.appendChild(l);
-      var v=document.createElement("span");v.className="series "+item.cls;setText(v,item.value);valueNode.appendChild(v);
+      if(i){var vs=document.createElement("span");vs.className="series-sep";setText(vs," ／ ");valueNode.appendChild(vs);}
+      var pair=document.createElement("span");pair.className="series "+item.cls;
+      setText(pair,item.label+" "+item.value);valueNode.appendChild(pair);
     });
   }
   function revenueLabel(label){label=label==null?"":String(label);return label.indexOf("營收")===0?label:"營收 "+label;}
@@ -999,7 +999,7 @@
         var flag = rw[5] || "";
         var k=document.createElement("span"); k.className="k"+(flag?" "+flag:"");
         var v=document.createElement("span"); v.className="rv"+(flag?" "+flag:"");
-        if(html.techSeries && rw[0]==="現價 / MA5 / MA20 / MA60") appendTechSeriesRow(k,v,html.techSeries);
+        if(html.techSeries && rw[0]==="價格與均線") appendTechSeriesRow(k,v,html.techSeries);
         else {if(html.techSeries)appendMaText(k,rw[0]);else setText(k,rw[0]);
               if(html.techSeries)appendMaText(v,rw[1]);else setText(v,rw[1]);}
         tb.appendChild(k);
