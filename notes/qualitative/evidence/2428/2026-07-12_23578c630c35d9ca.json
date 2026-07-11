@@ -1,0 +1,161 @@
+{
+  "content_as_of": "2026-07-12",
+  "documents": [
+    {
+      "cited_pages": [
+        67,
+        68,
+        69,
+        70,
+        72,
+        74,
+        76
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 98,
+      "rendered_pages": [
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "e520596a233ca58ddbf185c6892718e25ed4eda64e09dc6d7747c918877a76b6",
+      "size_bytes": 4879372,
+      "url": "https://www.thinking.com.tw/upload/investor/files/%E8%88%88%E5%8B%A4_114%E5%B9%B4%E5%B9%B4%E5%A0%B1_%E5%85%AC%E5%91%8A%E8%B3%87%E6%96%99(%E4%B8%AD%E6%96%87).pdf"
+    },
+    {
+      "cited_pages": [
+        8,
+        9,
+        13,
+        34,
+        35,
+        46,
+        54,
+        68,
+        69
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 78,
+      "rendered_pages": [
+        7,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        33,
+        34,
+        35,
+        36,
+        45,
+        46,
+        47,
+        53,
+        54,
+        55,
+        67,
+        68,
+        69,
+        70
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "961130d92f2a2490bb5147488676e02a04fd17c8debc2da35d71450b9d667f40",
+      "size_bytes": 1434971,
+      "url": "https://www.thinking.com.tw/upload/investor/files/2025Q4%E8%88%88%E5%8B%A4%E9%9B%BB%E5%AD%90%E8%B2%A1%E5%A0%B1_%E4%B8%AD%E6%96%87%E5%90%88%E4%BD%B5.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        9,
+        17,
+        18,
+        19,
+        33,
+        38,
+        47
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 56,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10,
+        16,
+        17,
+        18,
+        19,
+        20,
+        32,
+        33,
+        34,
+        37,
+        38,
+        39,
+        46,
+        47,
+        48
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "0d5fdce1db198233de3b65caa8f5eac6dbaf8b5ca136f943c293c488cc735c9b",
+      "size_bytes": 1209113,
+      "url": "https://www.thinking.com.tw/upload/investor/files/2026Q1%E8%88%88%E5%8B%A4%E9%9B%BB%E5%AD%90%E8%B2%A1%E5%A0%B1_%E4%B8%AD%E6%96%87%E5%90%88%E4%BD%B5.pdf"
+    },
+    {
+      "cited_pages": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 6,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "fbc4b9adb063fc232e228d7b9773049721927bcb1947926bb6b0e1d7cdab4604",
+      "size_bytes": 460215,
+      "url": "https://www.thinking.com.tw/upload/investor/files/%E6%B3%95%E8%AA%AA%E6%9C%83Q%26A-202605.pdf"
+    }
+  ],
+  "pack_sha256": "23578c630c35d9ca00fa7c19b96de85e97d035b031b5e2d5dd9a113840fe8eb6",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2428",
+  "unverified_claims_removed": true
+}
