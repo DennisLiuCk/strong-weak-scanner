@@ -716,7 +716,9 @@ def build_fund_map(con):
 
 
 # 族群狀態→顏色(狀態本身由 fetch_daily._gstate 在資料層算好,存 group_metrics.state)
-STATE_COL = {"蓄勢·被佈局": "var(--warn-line)", "發動·領漲": "var(--strong)",
+# 蓄勢用 --warn 而非 --warn-line:此色會當「狀態文字」的前景色,warn-line(#d69e2e)在
+# 淺色 surface 上對比僅約 2.2:1,warn 是同語彙的可讀文字版
+STATE_COL = {"蓄勢·被佈局": "var(--warn)", "發動·領漲": "var(--strong)",
              "籌碼退潮": "var(--weak)"}
 
 # 族群卡 tooltip 教學文字(門檻值 import 自 fetch_daily,改旋鈕自動同步)。
