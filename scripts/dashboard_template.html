@@ -242,6 +242,11 @@
   #groups .picks{gap:0}
   #groups .pick{padding:6px 0}
   #groups .pick + .pick{border-top:1px solid var(--hairline-2)}
+  /* 帶圖形的統計列:第三欄放 30 日迷你趨勢/廣度量尺,跨數值與變化兩行置中 */
+  #groups .stat.has-gfx{grid-template-columns:minmax(0,1fr) auto 92px}
+  #groups .stat.has-gfx .change{grid-column:1/3}
+  #groups .stat.has-gfx>svg{grid-column:3;grid-row:1/span 2;align-self:center;
+    width:92px;height:26px}
   /* 族群卡表頭:狀態/持續天數收緊成一組,與下方註記留呼吸 */
   .tier .gstate{margin-bottom:1px}
   .tier .gdur{font-size:11.5px;margin-bottom:9px}
@@ -2101,6 +2106,18 @@
           else if(s[3].indexOf("改善")!==-1)change.classList.add("better");
           p.appendChild(change);
         }
+        // 第5欄圖形規格:30日迷你趨勢(「5日變化」有了形狀——連續下坡或單日跳水立判)
+        // 或廣度量尺(過半刻度=族群現象門檻)
+        var sp=s[4], gfx=null;
+        if(sp && sp.spark && g.trend && (g.trend[sp.spark]||[]).length>1){
+          var series=g.trend[sp.spark], lastV=series[series.length-1];
+          gfx=gSpark(series,{baseline:0,w:92,h:26,
+            accent:lastV>0?"var(--strong)":lastV<0?"var(--weak)":"var(--neutral)"});
+        } else if(sp && sp.meter){
+          gfx=gMeter(sp.meter[0],sp.meter[1],[{at:sp.meter[2]}],
+            sp.meter[0]>=sp.meter[2]?"health":"neutral");
+        }
+        if(gfx){ p.classList.add("has-gfx"); p.appendChild(gfx); }
         picks.appendChild(p);
       });
       el.appendChild(picks);

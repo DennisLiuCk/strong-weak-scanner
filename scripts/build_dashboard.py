@@ -980,35 +980,48 @@ def main():
                       f"低於60日高 {abs(dist)*100:.1f}%" if dist < 0 else
                       "位於60日高 0.0%" if dist == 0 else
                       f"高於參考高點 {dist*100:+.1f}%")
+        # stats 第5欄=圖形規格(前端渲染):{"spark":trend鍵}=30日迷你趨勢線、
+        # {"meter":[值,滿格,門檻]}=廣度量尺;None=純文字列。文字欄完全不動。
+        bt = r["breadth_t"]
         gobj = {"g": g, "nm": GROUP_NM.get(g, g), "state": r["state"],
                 "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note,
                 "axis": {"price": rel, "dip": dip,
                          "price5": _five_day_value(ser, "rel20"),
                          "dip5": _five_day_value(ser, "med_dip")},
+                # 30個交易日的走勢原料(缺值日剔除,迷你圖只看形狀)
+                "trend": {"dip": [round(x["med_dip"], 3) for x in ser[-30:]
+                                  if x["med_dip"] is not None],
+                          "rel": [round(x["rel20"] * 100, 2) for x in ser[-30:]
+                                  if x["rel20"] is not None]},
                 "stats": [
             ["修正日外資買賣中位",
              _current_dip(dip),
              "族群下跌日外資買賣的20日累計佔股本%(取成員中位)。"
              f"正=淨買、負=淨賣{dip_dyn}",
-             _five_day_delta(ser, "med_dip", 0.01, 1, 2)],
+             _five_day_delta(ser, "med_dip", 0.01, 1, 2),
+             {"spark": "dip"}],
             ["外資增持廣度",
              f"{bf*100:.0f}%成員增持({bc['f_pos']}/{bc['f_n']}檔)" if (bf is not None and bc) else "-",
              f"近20日外資持股增加的成員比例；用來分辨普遍現象或少數個案{bf_dyn}",
-             _five_day_delta(ser, "breadth_f", 0.01, 100, 0)],
+             _five_day_delta(ser, "breadth_f", 0.01, 100, 0),
+             {"meter": [round(bf, 3), 1, 0.5]} if bf is not None else None],
             ["20日動能 vs 全體",
              _current_relative(rel),
              "族群中位20日報酬 − 全部掃描標的中位——族群跟其他族群比"
              f"(個股卡的①價是族群內比){rel_dyn}",
-             _five_day_delta(ser, "rel20", 0.005, 100, 1)],
+             _five_day_delta(ser, "rel20", 0.005, 100, 1),
+             {"spark": "rel"}],
             ["中位距60日高",
              dist_value,
              f"成員距自己60日高點的中位數,衡量族群整體回檔深度{dist_dyn}",
-             _five_day_delta(ser, "med_dist60", 0.001, 100, 1)],
+             _five_day_delta(ser, "med_dist60", 0.001, 100, 1),
+             None],
             ["投信買超廣度",
-             f"{r['breadth_t']*100:.0f}%成員淨買({bc['t_pos']}/{bc['t_n']}檔)"
-             if (r["breadth_t"] is not None and bc) else "-",
+             f"{bt*100:.0f}%成員淨買({bc['t_pos']}/{bc['t_n']}檔)"
+             if (bt is not None and bc) else "-",
              "近5日投信(本土基金)買超的成員比例,與外資廣度對照看參與度",
-             _five_day_delta(ser, "breadth_t", 0.01, 100, 0)],
+             _five_day_delta(ser, "breadth_t", 0.01, 100, 0),
+             {"meter": [round(bt, 3), 1, 0.5]} if bt is not None else None],
         ]}
         if n:
             gobj["dur"] = f"第 {n} 個交易日(自 {since})"
