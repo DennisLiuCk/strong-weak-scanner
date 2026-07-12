@@ -226,6 +226,10 @@
   .stat .change{grid-column:1/-1;color:var(--muted);font-size:11.5px;line-height:1.45;text-align:right}
   .stat .change.worse{color:var(--warn)}
   .stat .change.better{color:var(--health)}
+  /* 族群卡改 auto-fit:9 個族群在 4 欄 grid 會產生獨佔一列的孤兒卡(3/4 空白帶),
+     auto-fit minmax(340px,1fr) 在 1120~1230 版心自然收成 3×3;族群數變動也不必改這裡。
+     (篩選族群時 JS 會用 inline style 蓋掉,維持既有窄卡行為) */
+  #groups{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
   /* 族群卡:統計列用細線分組取代等距浮排,每列(數值+變化)讀成一個單位 */
   #groups .picks{gap:0}
   #groups .pick{padding:6px 0}
@@ -542,6 +546,13 @@
       background:var(--page);border-bottom:1px solid var(--hairline-2)}
     .scroller{display:none}
     .mobile-stocks{display:block}
+    /* 族群卡直排 9 張 ≈4,000px,手機改橫向滑動+snap:高度收成一張卡,85% 寬留下一張
+       卡的邊緣提示可滑。!important 是為了壓過族群篩選 JS 寫入的 inline
+       grid-template-columns(僅此處需要) */
+    #groups{grid-template-columns:none !important;grid-auto-flow:column;grid-auto-columns:85%;
+      overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;
+      margin-left:-14px;margin-right:-14px;padding:2px 14px 8px;scroll-padding-left:14px}
+    #groups .tier{scroll-snap-align:start}
     .anchor-nav a,.toggle,.gf,.msearch{min-height:44px}
     .msearch{width:100%;min-width:0}
     .mtoolbar{align-items:stretch}
