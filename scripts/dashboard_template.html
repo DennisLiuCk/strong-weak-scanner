@@ -405,10 +405,12 @@
   #tip .rows .wt{font-weight:500;color:var(--muted);font-size:10.5px}
   #tip .rows .total{font-size:13px;font-weight:800}
   #tip .rows .muted{color:var(--ink-2)}
-  /* 權重分解的貢獻條:全寬一列,緊貼在該元素的數字下方,長度可跨列比較 */
+  /* 權重分解的貢獻條:全寬一列,緊貼在該元素的數字下方;svg 以 preserveAspectRatio:none
+     真正撐滿列寬(等比縮放會 letterbox 成中央小色塊),左負右正與左右文字自然對齊 */
   #tip .rows .gbar,#sheetBody .rows .gbar{grid-column:1/-1;margin:-1px 0 3px}
-  #tip .rows .gbar svg,#sheetBody .rows .gbar svg{display:block;width:100%;height:10px}
-  #tip .rows .gbar.rp svg,#sheetBody .rows .gbar.rp svg{height:26px}  /* 區間定位含門檻刻度字 */
+  #tip .rows .gbar svg,#sheetBody .rows .gbar svg{display:block;width:100%;height:12px}
+  /* 區間定位有圓點/刻度字不能拉伸:定尺寸靠左,與標籤欄對齊 */
+  #tip .rows .gbar.rp svg,#sheetBody .rows .gbar.rp svg{width:auto;max-width:100%;height:26px}
   /* 技術面強調式小圖(詳情面板):還原價主色線+MA20灰線;RSI/量比走門檻量尺 */
   .techchart{margin:2px 0 10px}
   .techchart .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:var(--ink-2);margin:0 0 4px}
@@ -1006,14 +1008,19 @@
         fill:"var(--muted)"});tx.textContent=t.l;s.appendChild(tx);}
     });
     return s;}
-  // 正負貢獻條:中央基線,在基線哪一側=方向,長度=大小(同尺度可跨列比較)
+  // 正負貢獻條:中央基線,在基線哪一側=方向,長度=大小(同尺度可跨列比較)。
+  // 這支要「撐滿容器寬」使用(preserveAspectRatio:none 非等比拉伸),否則在寬面板
+  // 會被等比縮放置中成一小塊(letterbox);因此全部用 rect、不用圓與描邊,
+  // 拉伸下不變形。座標以 100 為滿寬的百分比思考。
   function gDivergeBar(value,max){
-    var W=150,H=12,s=svgRoot(W,H,"gd"),cx=W/2;
-    s.appendChild(svgNode("line",{x1:cx,y1:1,x2:cx,y2:H-1,stroke:"var(--hairline)","stroke-width":1.5}));
-    if(value){var w=Math.max(3,Math.min(Math.abs(value)/max,1)*(W/2-4));
-      s.appendChild(svgNode("rect",{x:value>0?cx:cx-w,y:2,width:w,height:H-4,rx:3,
+    var W=100,H=12,cx=W/2;
+    var s=svgNode("svg",{viewBox:"0 0 "+W+" "+H,"aria-hidden":"true",
+      preserveAspectRatio:"none","class":"gd"});
+    s.appendChild(svgNode("rect",{x:cx-0.3,y:1,width:0.6,height:H-2,fill:"var(--hairline)"}));
+    if(value){var w=Math.max(1.2,Math.min(Math.abs(value)/max,1)*(cx-2));
+      s.appendChild(svgNode("rect",{x:value>0?cx:cx-w,y:2.5,width:w,height:H-5,
         fill:value>0?"var(--strong)":"var(--weak)"}));}
-    else s.appendChild(svgNode("circle",{cx:cx,cy:H/2,r:2.5,fill:"var(--neutral)"}));
+    else s.appendChild(svgNode("rect",{x:cx-0.9,y:H/2-2,width:1.8,height:4,fill:"var(--neutral)"}));
     return s;}
   // 綜評條:實條=3日平均(評級用),殘影點=近3日未平滑分——看得出動能在增強或衰退
   function gCompositeBar(avg,daily,max){
@@ -1065,9 +1072,10 @@
     s.appendChild(svgNode("circle",{cx:X(vals.length-1),cy:Y(vals[vals.length-1]),r:4,
       fill:opt.accent||"var(--strong)",stroke:"var(--surface)","stroke-width":2}));
     return s;}
-  // 區間定位:右端=區間頂(如60日高=0%),點=現值位置,refAt=門檻刻度
-  function gRangePos(value,min,max,refAt,refLabel){
-    var W=150,H=22,P=6,s=svgRoot(W,H,"gr"),y=H/2-2;
+  // 區間定位:右端=區間頂(如60日高=0%),點=現值位置,refAt=門檻刻度。
+  // 有圓點與刻度字,不能非等比拉伸 → 用 w 指定實際寬度、容器內靠左定尺寸呈現
+  function gRangePos(value,min,max,refAt,refLabel,w){
+    var W=w||150,H=22,P=6,s=svgRoot(W,H,"gr"),y=H/2-2;
     function X(v){return P+(v-min)/(max-min)*(W-2*P);}
     s.appendChild(svgNode("line",{x1:P,y1:y,x2:W-P,y2:y,stroke:"var(--track)","stroke-width":4,
       "stroke-linecap":"round"}));
@@ -1287,7 +1295,7 @@
           var spec=rw[6];
           var gb=document.createElement("span"); gb.className="gbar"+(spec&&spec.rp?" rp":"");
           if(typeof spec==="number") gb.appendChild(gDivergeBar(spec, CMAX));
-          else if(spec.rp) gb.appendChild(gRangePos(spec.rp[0],spec.rp[1],spec.rp[2],spec.rp[3],spec.rp[4]||null));
+          else if(spec.rp) gb.appendChild(gRangePos(spec.rp[0],spec.rp[1],spec.rp[2],spec.rp[3],spec.rp[4]||null,320));
           if(gb.children.length) tb.appendChild(gb);
         }
         if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
