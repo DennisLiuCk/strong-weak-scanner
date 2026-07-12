@@ -148,6 +148,10 @@
     font-size:14px;font-weight:800}
   #groupMap .trail{stroke:var(--muted);stroke-width:1.5;opacity:.72;fill:none;vector-effect:non-scaling-stroke}
   #groupMap .endpoint{stroke:var(--surface);stroke-width:2;vector-effect:non-scaling-stroke}
+  #groupMap .map-group{cursor:pointer;transition:opacity .15s ease}
+  #groupMap .map-group:hover .endpoint{stroke:var(--ink);stroke-width:3}
+  /* 篩選時未選族群改調淡不隱藏:地圖是篩選控制器,看得到才能切換/取消 */
+  #groupMap .map-group.mapdim{opacity:.22}
   #groupMap .map-group:focus{outline:none}
   #groupMap .map-group:focus .endpoint{stroke:var(--ink);stroke-width:4}
   @media (max-width:520px){
@@ -726,7 +730,7 @@
 
   <h2 class="sec" id="groups-section">族群概況 · 價格與籌碼現在在哪裡</h2>
   <figure class="group-map-shell" id="groupMapShell">
-    <figcaption><b>族群價籌四象限</b><span>灰線從 5 個交易日前指向現在；終點文字是目前位置。右上代表價格相對跑贏且修正日淨買，左下代表跑輸且淨賣；仍須搭配下方數值閱讀。</span></figcaption>
+    <figcaption><b>族群價籌四象限</b><span>灰線從 5 個交易日前指向現在；終點文字是目前位置。右上代表價格相對跑贏且修正日淨買，左下代表跑輸且淨賣；仍須搭配下方數值閱讀。<b>點族群圓點=只看該族群</b>，再點一次取消。</span></figcaption>
     <svg id="groupMap" viewBox="0 0 520 430" role="img" aria-labelledby="groupMapTitle groupMapDesc">
       <title id="groupMapTitle">族群價格動能與修正日外資買賣四象限</title>
       <desc id="groupMapDesc">橫軸是族群二十日動能相對全體，越右代表跑贏；縱軸是修正日外資買賣中位數，越上代表淨買。灰線顯示五個交易日的移動方向。</desc>
@@ -1030,6 +1034,9 @@
   // 權重供方法區 chips 與綜合分尺度共用;CMAX=|權重|×2 加總=綜合分理論滿分(±)
   var WEIGHTS = __WEIGHTS_JSON__;
   var CMAX=(function(){var t=0;for(var k in WEIGHTS)t+=Math.abs(WEIGHTS[k])*2;return t||8.8;})();
+  // 族群篩選控制 hook:四象限圖的點選會呼叫(gfilter IIFE 初始化時填入;晚綁,
+  // 單一族群的 db 不建篩選列時保持 null → 地圖點選自然無作用)
+  var GFILTER=null;
 
   var GRP = __GRPMETA_JSON__;   // 族群名稱/標籤來自 config/groups.csv(build_dashboard 注入)
   var OVERVIEW = __OVERVIEW_JSON__;
@@ -1961,8 +1968,21 @@
     });
     mapPoints.forEach(function(p){
       var g=p.g,x=p.x,y=p.y,x0=p.x0,y0=p.y0;
-      var group=add("g",{class:"map-group",tabindex:"0","data-g":g.g,role:"img",
-        "aria-label":g.nm+"：20日動能相對全體 "+pricePct(g.axis.price)+"，修正日外資買賣中位數 "+dipPct(g.axis.dip)+"股本；灰線起點是五個交易日前"});
+      var group=add("g",{class:"map-group",tabindex:"0","data-g":g.g,role:"button","aria-pressed":"false",
+        "aria-label":g.nm+"：20日動能相對全體 "+pricePct(g.axis.price)+"，修正日外資買賣中位數 "+dipPct(g.axis.dip)+"股本；灰線起點是五個交易日前。點選只看此族群,再點取消"});
+      // 點圓點=套用/取消族群篩選(走 gfilter 既有機制);新選上時把該族群卡帶進視野
+      function toggleFromMap(){
+        if(!GFILTER) return;
+        var nowOn=GFILTER.toggle(g.g);
+        if(nowOn){
+          var card=document.querySelector("#groups .tier[data-g='"+g.g+"']");
+          if(card) card.scrollIntoView({behavior:"smooth",block:"nearest"});
+        }
+      }
+      group.addEventListener("click",toggleFromMap);
+      group.addEventListener("keydown",function(e){
+        if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleFromMap();}
+      });
       add("title",{},g.nm+"，目前價格軸 "+pricePct(g.axis.price)+"，籌碼軸 "+dipPct(g.axis.dip)+"股本",group);
       add("line",{x1:x0,y1:y0,x2:x,y2:y,class:"trail"},null,group);
       add("circle",{cx:x0,cy:y0,r:"2.5",fill:"var(--muted)",opacity:".7"},null,group);
@@ -2266,8 +2286,12 @@
       }
       var groupMap=document.getElementById("groupMap");
       if(groupMap){
+        // 地圖點是篩選控制器:未選族群調淡不隱藏(隱藏會讓人無法切換/取消),
+        // aria-pressed 同步目前篩選狀態
         Array.prototype.forEach.call(groupMap.querySelectorAll("[data-g]"),function(n){
-          n.style.display=visible(n.dataset.g)?"":"none";
+          var g=n.dataset.g;
+          n.classList.toggle("mapdim", mode!=="all" && !visible(g));
+          n.setAttribute("aria-pressed", String(mode==="some" && sel.has(g)));
         });
       }
       // 結論:過濾每張 tier 卡的 picks,整卡無標的則隱藏
@@ -2292,7 +2316,7 @@
 
     function selectAll(){ mode = "all"; sel = new Set(); apply(); }
     function toggleGroup(g){
-      if(!counts[g]) return;
+      if(!counts[g]) return false;
       if(mode === "all"){
         mode = "some"; sel = new Set([g]);
       } else if(sel.has(g)){
@@ -2303,7 +2327,9 @@
         if(sel.size === present.length){ mode = "all"; sel = new Set(); }   // 全選=等同不篩選
       }
       apply();
+      return mode === "some" && sel.has(g);   // 供四象限點選判斷「剛選上」→ 捲到族群卡
     }
+    GFILTER = {toggle: toggleGroup, all: selectAll};   // 四象限圖點選走同一機制
 
     // #g=passive,memory,material 這種逗號分隔清單;無效族群自動濾掉
     function fromHash(){
