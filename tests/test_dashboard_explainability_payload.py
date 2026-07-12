@@ -127,9 +127,10 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
         self.assertTrue(all(len(cell) == 7 for cell in cells))
         foreign, trust = cells[2], cells[3]
         self.assertEqual(foreign[3], "外資變化位於族群前20%")
-        self.assertIn("外資仍減持 -0.80pp", foreign[5])
+        # 動詞已帶方向 → 數值用絕對值(「減持 -0.80pp」是雙重否定);rows 內量值仍帶號
+        self.assertIn("外資仍減持 0.80pp", foreign[5])
         self.assertIn("族群前20%", foreign[6])
-        self.assertIn("投信仍淨賣 -100張", trust[5])
+        self.assertIn("投信仍淨賣 100張", trust[5])
         self.assertIn("族群前20%", trust[6])
         self.assertNotIn("吃貨", foreign[3])
         self.assertNotIn("認養", trust[3])
@@ -138,7 +139,7 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
         cells = bd.build_cells(
             score_row(s_foreign=-1), metric_row(fpct_chg20=0.68))
         foreign = cells[2]
-        self.assertIn("外資仍增持 +0.68pp", foreign[5])
+        self.assertIn("外資仍增持 0.68pp", foreign[5])
         self.assertIn("族群後20–40%", foreign[6])
         self.assertNotIn("調節", foreign[3])
         self.assertNotIn("減持", foreign[3])
@@ -156,7 +157,7 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
             score_row(s_margin=2), metric_row(margin_chg10=None, margin_chg5=-0.10))
         margin = cells[4]
         self.assertEqual(margin[2][1][0], "5日融資變化")
-        self.assertIn("融資5日仍下降 -10.0%（5日備援）", margin[5])
+        self.assertIn("融資5日仍下降 10.0%（5日備援）", margin[5])
 
     def test_tier_keys_labels_confirmation_and_math_are_all_exposed(self):
         sc = score_row()
@@ -200,7 +201,7 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
             bd._five_day_delta(series, "med_dip", 0.01, 1, 2),
             "較5日前改善 +0.15pp",
         )
-        self.assertEqual(bd._current_dip(-0.41), "淨賣 -0.41%股本")
+        self.assertEqual(bd._current_dip(-0.41), "淨賣 0.41%股本")  # 動詞帶方向 → 絕對值
         self.assertEqual(bd._five_day_value(series, "rel20"), -0.02)
         self.assertIsNone(bd._five_day_value(series[:5], "rel20"))
 

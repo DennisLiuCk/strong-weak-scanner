@@ -154,6 +154,11 @@ def _fmt_volume(x):
     return "-" if x is None else f"{int(round(x)):,} 股"
 
 
+def _fmt_lots(v):
+    """張數帶正負號;0 不帶(避免顯示成「+0張」)。"""
+    return f"{v:+,}張" if v else "0張"
+
+
 def _ratio(a, b):
     return (a / b - 1) if (a is not None and b) else None
 
@@ -421,9 +426,11 @@ def build_cells(sc, m, mkt20=None):
             ["修正日買賣(20日)", f"{dp:+.2f}%股本(相對{sc['s_dip']:+d})" if dp is not None else "-",
              "族群下跌日外資買賣的20日累計佔股本%——正值是淨買,負值是淨賣"
              f"(括號分數為族群內排名,只用於蓄勢評級、不計分){dp_dyn}"]]
+    # 「目前方向」句的慣例:動詞已帶方向(增持/減持、淨買/淨賣…)時數值用絕對值,
+    # 避免「減持 -4.03pp」雙重否定;數據表 rows 是量值欄位,維持帶正負號。
     foreign_current = ("外資持股變化資料不足" if fc is None else
-                       f"外資仍增持 {fc:+.2f}pp" if fc > 0 else
-                       f"外資仍減持 {fc:+.2f}pp" if fc < 0 else
+                       f"外資仍增持 {fc:.2f}pp" if fc > 0 else
+                       f"外資仍減持 {abs(fc):.2f}pp" if fc < 0 else
                        "外資持股持平 0.00pp")
     cells.append(_cell(
         sc["s_foreign"], f"{fc:+.1f}pp" if fc is not None else "-", rows,
@@ -432,19 +439,19 @@ def build_cells(sc, m, mkt20=None):
     # ④ 投信
     t5 = m["trust5"] or 0
     tp = m["trust5_pct"]
-    rows = [["近5日淨買賣", f"{t5:+,}張",
+    rows = [["近5日淨買賣", _fmt_lots(t5),
              "投信=本土基金；正值代表這5日累計淨買,負值代表累計淨賣"],
             ["佔股本", f"{tp:+.3f}%" if tp is not None else "-",
              f"上值換算佔股本%——④投信的分數即此值的族群內排名(消除股本大小差;"
              f"此檔 |佔股本變化| < {DZ_TRUST}% 時視為雜訊並歸0分)"]]
     if tp is not None:
-        trust_current = (f"投信仍淨買 {t5:+,}張（{tp:+.3f}%股本）" if tp > 0 else
-                         f"投信仍淨賣 {t5:+,}張（{tp:+.3f}%股本）" if tp < 0 else
-                         f"投信買賣持平 {t5:+,}張（0.000%股本）")
+        trust_current = (f"投信仍淨買 {abs(t5):,}張（{tp:.3f}%股本）" if tp > 0 else
+                         f"投信仍淨賣 {abs(t5):,}張（{abs(tp):.3f}%股本）" if tp < 0 else
+                         "投信買賣持平 0張（0.000%股本）")
     else:
         trust_current = "投信買賣資料不足"
     cells.append(_cell(
-        sc["s_trust"], f"{t5:+,}張", rows, R_TRUST[sc["s_trust"]], trust_current,
+        sc["s_trust"], _fmt_lots(t5), rows, R_TRUST[sc["s_trust"]], trust_current,
         _relative_bucket(sc["s_trust"])))
     # ⑤ 融資券
     u = m["margin_util_pct"]
@@ -469,8 +476,8 @@ def build_cells(sc, m, mkt20=None):
              "融券餘額÷融資餘額;高=空方對作或軋空題材。參考欄位,未計分"]]
     fallback = "（5日備援）" if mc_window == 5 else ""
     margin_current = ("融資變化資料不足" if mc is None else
-                      f"融資{mc_window}日仍增加 {pct(mc, True)}{fallback}" if mc > 0 else
-                      f"融資{mc_window}日仍下降 {pct(mc, True)}{fallback}" if mc < 0 else
+                      f"融資{mc_window}日仍增加 {pct(mc)}{fallback}" if mc > 0 else
+                      f"融資{mc_window}日仍下降 {pct(abs(mc))}{fallback}" if mc < 0 else
                       f"融資{mc_window}日持平 0.0%{fallback}")
     if u is not None:
         margin_current += f"；目前水位 {u:.1f}%"
@@ -765,12 +772,14 @@ def _five_day_value(series, key):
 
 
 def _current_dip(v):
+    """動詞已帶方向 → 數值用絕對值(「淨賣 -0.27%」是雙重否定,且與 build_overview
+    摘要句的「仍淨賣 0.27%股本」寫法不一致)。"""
     if v is None:
         return "-"
     if v > 0:
-        return f"淨買 {v:+.2f}%股本"
+        return f"淨買 {v:.2f}%股本"
     if v < 0:
-        return f"淨賣 {v:+.2f}%股本"
+        return f"淨賣 {abs(v):.2f}%股本"
     return "買賣持平 0.00%股本"
 
 
@@ -778,9 +787,9 @@ def _current_relative(v):
     if v is None:
         return "-"
     if v > 0:
-        return f"跑贏 {v*100:+.1f}%"
+        return f"跑贏 {v*100:.1f}%"
     if v < 0:
-        return f"跑輸 {v*100:+.1f}%"
+        return f"跑輸 {abs(v)*100:.1f}%"
     return "與全體持平 0.0%"
 
 
