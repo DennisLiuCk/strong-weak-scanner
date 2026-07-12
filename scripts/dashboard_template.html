@@ -391,6 +391,18 @@
   /* 權重分解的貢獻條:全寬一列,緊貼在該元素的數字下方,長度可跨列比較 */
   #tip .rows .gbar,#sheetBody .rows .gbar{grid-column:1/-1;margin:-1px 0 3px}
   #tip .rows .gbar svg,#sheetBody .rows .gbar svg{display:block;width:100%;height:10px}
+  /* 技術面強調式小圖(詳情面板):還原價主色線+MA20灰線;RSI/量比走門檻量尺 */
+  .techchart{margin:2px 0 10px}
+  .techchart .legend{display:flex;gap:14px;font-size:11px;color:var(--ink-2);margin:0 0 4px}
+  .techchart .legend .key{display:inline-flex;align-items:center;gap:5px}
+  .techchart .legend .sw{width:14px;height:2px;border-radius:2px;background:var(--ink)}
+  .techchart .legend .sw.ctx{background:var(--neutral);opacity:.5}
+  .techchart>svg{display:block;width:100%;height:auto;background:var(--surface-2);
+    border:1px solid var(--hairline-2);border-radius:8px}
+  .techchart .mrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin-top:8px}
+  .techchart .mrow .k{font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+  .techchart .mrow .n{font-size:12px;font-weight:700}
+  .techchart .mrow svg{display:block;width:100%;height:20px}
   #tip .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:8px;padding:7px 9px;margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
@@ -1176,6 +1188,35 @@
     var wb=document.createElement("b"); setText(wb, "判讀:"); why.appendChild(wb);
     why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
     box.appendChild(why);
+    if(html.techChart && html.techChart.px && html.techChart.px.length>1){
+      // 20日還原價+MA20 強調式小圖:兩序列必附圖例;RSI/量比另以量尺顯示位置與門檻
+      var tc=document.createElement("div"); tc.className="techchart";
+      var lg=document.createElement("div"); lg.className="legend";
+      [["還原價 20日",""],["MA20","ctx"]].forEach(function(k){
+        var key=document.createElement("span"); key.className="key";
+        var sw=document.createElement("span"); sw.className="sw"+(k[1]?" "+k[1]:"");
+        key.appendChild(sw); key.appendChild(document.createTextNode(k[0])); lg.appendChild(key);
+      });
+      tc.appendChild(lg);
+      tc.appendChild(gSpark(html.techChart.px,{context:html.techChart.ma,w:300,h:80,
+        accent:html.scColor||"var(--strong)"}));
+      function mrow(label,svg,num){
+        var r=document.createElement("div"); r.className="mrow";
+        var k=document.createElement("span"); k.className="k"; setText(k,label); r.appendChild(k);
+        r.appendChild(svg);
+        var n=document.createElement("span"); n.className="n mono"; setText(n,num); r.appendChild(n);
+        tc.appendChild(r);
+      }
+      if(html.techRsi!=null){
+        mrow("RSI14", gMeter(html.techRsi,100,[{at:30,l:"30"},{at:50,l:"50"},{at:70,l:"70"}],
+          (html.techRsi>=70||html.techRsi<=30)?"warn":"neutral"), html.techRsi);
+      }
+      if(html.techVr!=null){
+        mrow("量比(vs 20日均量)", gMeter(html.techVr,3,[{at:0.8,l:"0.8"},{at:1.2,l:"1.2"}],
+          "neutral"), html.techVr+"×");
+      }
+      box.appendChild(tc);
+    }
     if(html.rows && html.rows.length){          // 數據表格:[標籤, 數值, 白話解讀?, 分數(供上色)?, 權重文字?, flag?]
       var tb=document.createElement("div"); tb.className="rows";
       var colorOf = html.chipColors ? chipColor : scColor;   // 籌碼健康度 tooltip 走獨立色階(見 chipColor)
@@ -1634,6 +1675,7 @@
         el:"個股技術面 · 相對自身歷史（不排名／不計分）",who:row.nm+"("+row.id+")",biz:row.biz,
         rows:row.tech.rows,why:row.tech.why,
         techSeries:row.tech.series,
+        techChart:row.tech.chart,techRsi:row.tech.rsi,techVr:row.tech.vr20,
         howLabel:"判讀方式",
         how:"MA與RSI使用還原收盤價；價量關係使用當日漲跌與20日平均成交量。這些規則描述目前的趨勢、動能與參與度，不預測下一日漲跌，也不影響綜合分數與已確認分層。",
         howLink:"前往頁尾查看MA／RSI／VOL完整盤讀指南",howHref:"#technical-guide",
@@ -1789,6 +1831,7 @@
         el:"個股技術面 · 相對自身歷史（不排名／不計分）",who:row.nm+"("+row.id+")",biz:row.biz,
         rows:row.tech.rows,why:row.tech.why,
         techSeries:row.tech.series,
+        techChart:row.tech.chart,techRsi:row.tech.rsi,techVr:row.tech.vr20,
         howLabel:"判讀方式",
         how:"MA與RSI使用還原收盤價；價量關係使用當日漲跌與20日平均成交量。只描述目前狀態，不預測下一日漲跌。",
         howLink:"前往頁尾查看MA／RSI／VOL完整盤讀指南",howHref:"#technical-guide",

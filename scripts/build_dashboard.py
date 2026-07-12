@@ -319,6 +319,15 @@ def build_technical_view(m, history=None):
                  f"與MA20的差距為{abs(d20)*100:.1f}%，仍在±10%觀察帶內"
                  if d20 is not None else "MA20距離資料不足")
 
+    # 20日還原價+MA20 強調式小圖原料:主色=價、灰=MA20。刻意不畫三色均線——
+    # MA20藍/MA60紫在綠色弱視下 ΔE 僅 6.2(驗證器實測不合格),圖走「一主一情境」,
+    # MA5/MA60 資訊留在文字列。缺值日剔除、成對對齊,不足2點不出圖。
+    chart_rows = [x for x in series[-20:]
+                  if _value(x, "close_adj") is not None and _value(x, "ma20") is not None]
+    chart = ({"px": [round(_value(x, "close_adj"), 2) for x in chart_rows],
+              "ma": [round(_value(x, "ma20"), 2) for x in chart_rows]}
+             if len(chart_rows) >= 2 else None)
+
     rows = [
         ["價格與均線",
          "／".join((f"現價 {_fmt_price(close)}", f"MA5 {_fmt_price(ma5)}",
@@ -334,6 +343,8 @@ def build_technical_view(m, history=None):
     ]
     why = f"{structure_note}；{rsi_note}；{pv_note}。"
     return {"cls": cls, "label": label, "rows": rows, "why": why,
+            "chart": chart, "rsi": round(rsi, 1),
+            "vr20": round(vr20, 2) if vr20 is not None else None,
             "series": [
                 {"label": "現價", "value": _fmt_price(close), "cls": "price"},
                 {"label": "MA5", "value": _fmt_price(ma5), "cls": "ma5"},
@@ -860,13 +871,14 @@ def main():
                             WHERE date<=? ORDER BY stock_id, date DESC""", (last,)):
         if len(score_hist[h["stock_id"]]) < 3:
             score_hist[h["stock_id"]].insert(0, h)
-    # 個股技術面只需今日、昨日與5個交易日前；舊到新保存，供穿越與變化解讀。
+    # 個股技術面:穿越/變化解讀需今日、昨日與5個交易日前;強調式小圖需20日
+    # 還原價+MA20 → 每檔保留最近20個交易日,舊到新。
     tech_hist = defaultdict(list)
     for h in con.execute("""SELECT date, stock_id, close_adj, ma5, ma20, ma60, rsi14,
                                     volume, vol_ma20, vol_ratio20, ret1
                              FROM daily_metrics WHERE date<=?
                              ORDER BY stock_id, date DESC""", (last,)):
-        if len(tech_hist[h["stock_id"]]) < 6:
+        if len(tech_hist[h["stock_id"]]) < 20:
             tech_hist[h["stock_id"]].insert(0, h)
     try:   # 族群定義配置化:讀 groups 表(舊 db 缺表時退回檔頭預設)
         gmeta = con.execute("SELECT grp, name, tag FROM groups ORDER BY ord").fetchall()
