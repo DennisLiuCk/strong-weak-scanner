@@ -15,15 +15,37 @@ REPORTS_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
 NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 REPORT_VERSION = 1
 REPORT_STATUSES = {"active_monitoring", "closed"}
-HYPOTHESIS_STATUSES = {
-    "management_quoted",
-    "consistent_unconfirmed",
-    "plausible_lead",
-    "attribution_error",
-    "unsupported_specificity",
-    "contradicted",
-    "resolved",
+HYPOTHESIS_STATUS_INFO = {
+    "management_quoted": {
+        "label": "管理層說法・待驗證", "stage": "持續觀察", "order": 10, "terminal": False,
+        "description": "具名管理層談話或媒體轉述，尚未由正式文件或實績完成核對。",
+    },
+    "consistent_unconfirmed": {
+        "label": "方向相符・細節待證", "stage": "持續觀察", "order": 20, "terminal": False,
+        "description": "方向與正式資料一致，但客戶、數量、占比或時程仍未證實。",
+    },
+    "plausible_lead": {
+        "label": "合理線索・證據不足", "stage": "持續觀察", "order": 30, "terminal": False,
+        "description": "產業邏輯合理且可驗證，目前仍缺少足夠的公司層級證據。",
+    },
+    "attribution_error": {
+        "label": "歸因錯置", "stage": "證據警示", "order": 40, "terminal": False,
+        "description": "把產業、客戶或供應鏈數字錯誤歸因為這家公司本身。",
+    },
+    "unsupported_specificity": {
+        "label": "精確細節無法核實", "stage": "證據警示", "order": 50, "terminal": False,
+        "description": "客戶名、台數、單價、占比或時程過度精確，但原始依據不可追溯。",
+    },
+    "contradicted": {
+        "label": "已驗證不成立", "stage": "驗證終態", "order": 70, "terminal": True,
+        "description": "較強、較新的正式證據已否定這則主張。",
+    },
+    "resolved": {
+        "label": "已驗證成立", "stage": "驗證終態", "order": 60, "terminal": True,
+        "description": "後續正式證據或可重算實績已證實這則主張。",
+    },
 }
+HYPOTHESIS_STATUSES = set(HYPOTHESIS_STATUS_INFO)
 REQUIRED_FIELDS = (
     "市場主張", "首次捕捉", "來源層級", "目前狀態", "正式資料基準",
     "可證偽條件", "下次驗證", "研究判讀", "來源",
@@ -104,6 +126,11 @@ def analyse_report(path, text, notes=None, today=None):
         status = status_match.group(1) if status_match else fields.get("目前狀態", "").split()[0].strip("`。")
         if status and status not in HYPOTHESIS_STATUSES:
             errors.append(f"{hypothesis['id']} 非法目前狀態：{status}")
+        elif status and HYPOTHESIS_STATUS_INFO[status]["label"] not in fields.get("目前狀態", ""):
+            errors.append(
+                f"{hypothesis['id']} 目前狀態須顯示中文名稱："
+                f"{HYPOTHESIS_STATUS_INFO[status]['label']}"
+            )
         captured = fields.get("首次捕捉", "")[:10]
         if captured and not _valid_date(captured):
             errors.append(f"{hypothesis['id']} 首次捕捉必須以 YYYY-MM-DD 開頭")

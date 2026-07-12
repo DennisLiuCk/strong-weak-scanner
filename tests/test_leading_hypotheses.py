@@ -29,7 +29,7 @@ formal_note_content_sha256: {digest}
 - **市場主張：** 某產品可能在下季量產。
 - **首次捕捉：** 2026-07-01。
 - **來源層級：** 具名媒體轉述。
-- **目前狀態：** `plausible_lead`。
+- **目前狀態：** 合理線索・證據不足（`plausible_lead`）。
 - **正式資料基準：** 正式筆記只確認研發。
 - **可證偽條件：** 下季仍未量產。
 - **下次驗證：** 下一季財報。
@@ -51,7 +51,16 @@ class LeadingHypothesesTest(unittest.TestCase):
         self.assertFalse(info["quality_invalid"], info["quality_errors"])
         self.assertEqual(info["hypothesis_count"], 1)
         self.assertEqual(info["hypotheses"][0]["fields"]["目前狀態"],
-                         "`plausible_lead`。")
+                         "合理線索・證據不足（`plausible_lead`）。")
+
+    def test_status_catalog_has_reader_labels_and_terminal_states(self):
+        self.assertEqual(lh.HYPOTHESIS_STATUS_INFO["management_quoted"]["label"],
+                         "管理層說法・待驗證")
+        self.assertEqual(lh.HYPOTHESIS_STATUS_INFO["attribution_error"]["stage"],
+                         "證據警示")
+        self.assertFalse(lh.HYPOTHESIS_STATUS_INFO["plausible_lead"]["terminal"])
+        self.assertTrue(lh.HYPOTHESIS_STATUS_INFO["resolved"]["terminal"])
+        self.assertTrue(lh.HYPOTHESIS_STATUS_INFO["contradicted"]["terminal"])
 
     def test_formal_note_change_invalidates_anchor(self):
         info = lh.analyse_report("1234_測試.md", report_text("b" * 64),

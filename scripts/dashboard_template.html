@@ -1305,10 +1305,26 @@
     quality.appendChild(document.createTextNode(hypothesis.qualityInvalid?
       ((hypothesis.qualityErrors||[]).join("；")||"請執行 leading_hypotheses.py --lint。"):
       "這只證明來源、時間戳、正式基準與可證偽欄位完整，不代表市場主張為真。")); box.appendChild(quality);
-    var counts=hypothesis.statusCounts||{}, parts=[];
-    Object.keys(counts).sort().forEach(function(key){parts.push(key+" "+counts[key]);});
+    var counts=hypothesis.statusCounts||{}, info=hypothesis.statusInfo||{}, parts=[];
+    Object.keys(counts).sort(function(a,b){return ((info[a]||{}).order||999)-((info[b]||{}).order||999);}).forEach(function(key){
+      var meta=info[key]||{}; parts.push((meta.label||key)+" "+counts[key]);
+    });
     var state=document.createElement("div"); state.className="hypothesis-status";
     setText(state,"狀態分布："+(parts.join(" · ")||"-")+"。多篇轉載同一消息鏈不視為獨立確認。"); box.appendChild(state);
+    var machine=document.createElement("details"); machine.className="nb-section hypothesis-machine";
+    var machineTitle=document.createElement("summary"); setText(machineTitle,"這些狀態如何變化？"); machine.appendChild(machineTitle);
+    var machineBody=document.createElement("div"); machineBody.className="nb-section-body";
+    var flow=document.createElement("p");
+    setText(flow,"初次捕捉 → 持續觀察或證據警示 → 取得較強證據 → 已驗證成立／已驗證不成立。非終態可隨新證據互相重分類；終態仍保留原始主張與時間戳。");
+    machineBody.appendChild(flow);
+    ["持續觀察","證據警示","驗證終態"].forEach(function(stage){
+      var title=document.createElement("b"); setText(title,stage); machineBody.appendChild(title);
+      var list=document.createElement("ul");
+      Object.keys(info).forEach(function(key){var meta=info[key]||{}; if(meta.stage!==stage)return;
+        var li=document.createElement("li"); setText(li,(meta.label||key)+"："+(meta.description||"")); list.appendChild(li);
+      }); machineBody.appendChild(list);
+    });
+    machine.appendChild(machineBody); box.appendChild(machine);
     (hypothesis.sections||[]).forEach(function(sec,i){
       var part=document.createElement("details"); part.className="nb-section"; part.id="hyp-section-"+i;
       if(/^H1[｜|]/.test(sec.h)||((hypothesis.sections||[]).length===1&&i===0)) part.open=true;

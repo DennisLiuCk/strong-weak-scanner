@@ -24,7 +24,8 @@ from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
 from qual_notes import (load_notes, note_status, note_review_status,
                         TEMPLATE_VERSION as NOTE_TEMPLATE_VERSION)
-from leading_hypotheses import load_reports as load_hypothesis_reports
+from leading_hypotheses import (HYPOTHESIS_STATUS_INFO,
+                                load_reports as load_hypothesis_reports)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -1101,6 +1102,7 @@ def main():
                 "qualityInvalid": hypothesis.get("quality_invalid", False),
                 "qualityErrors": hypothesis.get("quality_errors", []),
                 "statusCounts": dict(status_counts),
+                "statusInfo": HYPOTHESIS_STATUS_INFO,
                 "sections": hypothesis.get("sections", []),
                 "url": NOTE_REPO_BLOB + hypothesis["relpath"],
             }

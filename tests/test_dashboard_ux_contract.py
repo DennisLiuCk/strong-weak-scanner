@@ -204,6 +204,15 @@ class DashboardUxContractTest(unittest.TestCase):
                        '"statusCounts"', '"sections"'):
             self.assertIn(marker, self.builder)
 
+    def test_hypothesis_statuses_are_reader_facing_and_explain_the_state_machine(self):
+        for marker in (
+            "這些狀態如何變化？", "初次捕捉 → 持續觀察或證據警示",
+            "已驗證成立／已驗證不成立", "meta.label||key",
+        ):
+            self.assertIn(marker, self.template)
+        self.assertIn('"statusInfo"', self.builder)
+        self.assertNotIn('parts.push(key+" "+counts[key])', self.template)
+
 
 if __name__ == "__main__":
     unittest.main()
