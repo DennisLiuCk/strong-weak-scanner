@@ -394,14 +394,18 @@
   #tip .th .sc{margin-left:auto;font-size:11px;font-weight:800;padding:1px 8px;border-radius:100px;white-space:nowrap}
   #tip .who{font-weight:800;font-size:14px}
   #tip .biz{font-size:11px;color:var(--muted);margin:1px 0 7px}
-  #tip .rows{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;background:var(--surface-2);
-    border:1px solid var(--hairline-2);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+  /* 項目分隔=方案A(2026-07-12 對照頁選定):每項一個 .item wrapper,項目間極淡實線,
+     總計列(today/3日平均)前後用深一級的線框出元素區;分隔由項目線承擔,
+     說明小字(.rh)不再各自畫虛線底線 */
+  #tip .rows{background:var(--surface-2);
+    border:1px solid var(--hairline-2);border-radius:8px;padding:2px 10px;margin-bottom:8px}
+  #tip .rows .item{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding:6px 0}
+  #tip .rows .item + .item{border-top:1px solid var(--hairline-2)}
+  #tip .rows .item.total + .item,#tip .rows .item + .item.total{border-top-color:var(--hairline)}
   #tip .rows .k{color:var(--ink-2);font-size:11.5px;white-space:nowrap}
   #tip .rows .rv{text-align:right;font-size:12px;font-weight:600;
     font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
-  #tip .rows .rh{grid-column:1/-1;color:var(--muted);font-size:10.5px;line-height:1.5;
-    margin:-2px 0 3px;padding-bottom:4px;border-bottom:1px dashed var(--hairline-2)}
-  #tip .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+  #tip .rows .rh{grid-column:1/-1;color:var(--muted);font-size:10.5px;line-height:1.5;margin:0}
   #tip .rows .wt{font-weight:500;color:var(--muted);font-size:10.5px}
   #tip .rows .total{font-size:13px;font-weight:800}
   #tip .rows .muted{color:var(--ink-2)}
@@ -470,14 +474,15 @@
   #sheetBody .th .sc{margin-left:auto;font-size:11.5px;font-weight:800;padding:2px 9px;border-radius:100px;white-space:nowrap}
   #sheetBody .who{font-weight:800;font-size:16px}
   #sheetBody .biz{font-size:12px;color:var(--muted);margin:1px 0 10px}
-  #sheetBody .rows{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;background:var(--surface-2);
-    border:1px solid var(--hairline-2);border-radius:10px;padding:12px 13px;margin-bottom:11px}
+  #sheetBody .rows{background:var(--surface-2);
+    border:1px solid var(--hairline-2);border-radius:10px;padding:4px 13px;margin-bottom:11px}
+  #sheetBody .rows .item{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;padding:8px 0}
+  #sheetBody .rows .item + .item{border-top:1px solid var(--hairline-2)}
+  #sheetBody .rows .item.total + .item,#sheetBody .rows .item + .item.total{border-top-color:var(--hairline)}
   #sheetBody .rows .k{color:var(--ink-2);font-size:12.5px;white-space:nowrap}
   #sheetBody .rows .rv{text-align:right;font-size:13px;font-weight:600;
     font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
-  #sheetBody .rows .rh{grid-column:1/-1;color:var(--muted);font-size:11.5px;line-height:1.55;
-    margin:-3px 0 4px;padding-bottom:6px;border-bottom:1px dashed var(--hairline-2)}
-  #sheetBody .rows .rh:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+  #sheetBody .rows .rh{grid-column:1/-1;color:var(--muted);font-size:11.5px;line-height:1.55;margin:0}
   #sheetBody .rows .wt{font-weight:500;color:var(--muted);font-size:11.5px}
   #sheetBody .rows .total{font-size:14px;font-weight:800}
   #sheetBody .rows .muted{color:var(--ink-2)}
@@ -1280,28 +1285,32 @@
       var colorOf = html.chipColors ? chipColor : scColor;   // 籌碼健康度 tooltip 走獨立色階(見 chipColor)
       html.rows.forEach(function(rw){
         var flag = rw[5] || "";
+        // 每個項目自成 wrapper:項目之間才畫得出分隔線(方案A),
+        // 「標籤+數值+貢獻條+說明」讀成一個單位
+        var it=document.createElement("div"); it.className="item"+(flag?" "+flag:"");
         var k=document.createElement("span"); k.className="k"+(flag?" "+flag:"");
         var v=document.createElement("span"); v.className="rv"+(flag?" "+flag:"");
         if(html.techSeries && rw[0]==="價格與均線") appendTechSeriesRow(k,v,html.techSeries);
         else {if(html.techSeries)appendMaText(k,rw[0]);else setText(k,rw[0]);
               if(html.techSeries)appendMaText(v,rw[1]);else setText(v,rw[1]);}
-        tb.appendChild(k);
+        it.appendChild(k);
         if(rw[3] && flag !== "muted") v.style.color = colorOf(rw[3]); // 沿用同一套上色機制,不新增色彩語彙;
                                                                    // 0分(中性)不上色維持 --ink 對比度;muted 列改走
                                                                    // CSS 的 --ink-2(見樣式),不疊加方向色以免和淡化衝突
         if(rw[4]){ var wt=document.createElement("span"); wt.className="wt"; setText(wt, " "+rw[4]); v.appendChild(wt); }
-        tb.appendChild(v);
+        it.appendChild(v);
         if(rw.length>6 && rw[6]!=null){         // 第7欄圖形:數值=貢獻條(±CMAX 同尺度);{rp:[...]}=區間定位
           var spec=rw[6];
           var gb=document.createElement("span"); gb.className="gbar"+(spec&&spec.rp?" rp":"");
           if(typeof spec==="number") gb.appendChild(gDivergeBar(spec, CMAX));
           else if(spec.rp) gb.appendChild(gRangePos(spec.rp[0],spec.rp[1],spec.rp[2],spec.rp[3],spec.rp[4]||null,320));
-          if(gb.children.length) tb.appendChild(gb);
+          if(gb.children.length) it.appendChild(gb);
         }
         if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
           var h=document.createElement("span"); h.className="rh";
-          if(html.techSeries)appendMaText(h,rw[2]);else setText(h,rw[2]);tb.appendChild(h);
+          if(html.techSeries)appendMaText(h,rw[2]);else setText(h,rw[2]);it.appendChild(h);
         }
+        tb.appendChild(it);
       });
       box.appendChild(tb);
     } else if(html.data){

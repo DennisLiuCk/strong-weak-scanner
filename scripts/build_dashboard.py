@@ -561,8 +561,12 @@ def verdict(sc, comp_history=None):
         weight = WEIGHTS[wkey]
         tier_only = weight == 0
         contribution = v * weight
-        wt = f"× {weight:g} = {contribution:+.1f}" + ("  · 只供分層條件" if tier_only else "")
-        return [label, f"{v:+d}", None, v, wt, "muted" if tier_only else "",
+        # 「只供分層條件」放 hint(項目第二行)而非黏在算式後——長字串會把該列算式
+        # 推離右緣,破壞跨列的數字對齊
+        wt = f"× {weight:g} = {contribution:+.1f}"
+        return [label, f"{v:+d}",
+                "權重 0:不計入加總,只作為分層判定條件" if tier_only else None,
+                v, wt, "muted" if tier_only else "",
                 None if tier_only else round(contribution, 2)]
     today = sc["composite"]
     vrows = [["今日分(未平滑)", f"{today:+.1f}", "下列各項元素分 × 權重的貢獻加總",
