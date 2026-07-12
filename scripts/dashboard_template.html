@@ -1217,6 +1217,18 @@
       }
       box.appendChild(tc);
     }
+    if(html.fundSpark && html.fundSpark.length>1){
+      // 近13個月營收柱形:單一序列免圖例,標題即說明;最新月柱=徽章同色。
+      // 首柱≈最新月的去年同月——基期效應(去年低基期撐高YoY)看柱形立判
+      var fsBox=document.createElement("div"); fsBox.className="techchart";
+      var fsCap=document.createElement("div"); fsCap.className="legend";
+      var fsT=document.createElement("span");
+      setText(fsT,"近"+html.fundSpark.length+"個月單月營收(億元,舊→新;末柱=最新月)");
+      fsCap.appendChild(fsT); fsBox.appendChild(fsCap);
+      fsBox.appendChild(gSpark(html.fundSpark,{type:"bar",w:300,h:60,
+        accent:html.scColor||"var(--neutral)"}));
+      box.appendChild(fsBox);
+    }
     if(html.rows && html.rows.length){          // 數據表格:[標籤, 數值, 白話解讀?, 分數(供上色)?, 權重文字?, flag?]
       var tb=document.createElement("div"); tb.className="rows";
       var colorOf = html.chipColors ? chipColor : scColor;   // 籌碼健康度 tooltip 走獨立色階(見 chipColor)
@@ -1716,7 +1728,7 @@
       attachTip(fb, (function(row){ return function(){
         var col = FUND_COL[row.fund.cls];
         return { el:"基本面參考 · 觀察層(不計分)", who: row.nm+"("+row.id+")", biz: row.biz,
-          rows: row.fund.rows, why: row.fund.why,
+          rows: row.fund.rows, why: row.fund.why, fundSpark: row.fund.spark,
           how: "月營收/季報由獨立排程抓取(月/季頻,非每日)——跟左側五個觀察面向" +
                "完全獨立,純參考,不影響每日綜合分數與已確認分層。",
           src: "FinMind TaiwanStockMonthRevenue / TaiwanStockFinancialStatements",
@@ -1857,7 +1869,8 @@
                 flat:["var(--neutral)","var(--neutral-tint)"]}[row.fund.cls]||["var(--neutral)","var(--neutral-tint)"];
       attachTip(fund,(function(row,fcol){return function(){return {
         el:"月營收與財報參考 · 觀察資訊（不計分）",who:row.nm+"("+row.id+")",biz:row.biz,rows:row.fund.rows,
-        why:row.fund.why,how:"月營收與季報更新頻率不同，只做基本面脈絡參考，不影響每日分數。",
+        why:row.fund.why,fundSpark:row.fund.spark,
+        how:"月營收與季報更新頻率不同，只做基本面脈絡參考，不影響每日分數。",
         src:"FinMind TaiwanStockMonthRevenue / TaiwanStockFinancialStatements",scLabel:revenueLabel(row.fund.label),
         scColor:fcol[0],scBg:fcol[1]};};})(row,fcol));
       host.appendChild(fund);

@@ -723,6 +723,10 @@ def build_fund_map(con):
             rows.append(["近4季毛利率趨勢", trend, f"{fdates[0]} ~ {fdates[-1]},舊到新"])
         if latest_eps is not None:
             rows.append(["最新季EPS", f"{latest_eps:.2f} 元", f"季別:{fdates[-1]}"])
+        # 近13個月營收柱形原料(舊到新,億元):第1柱≈最新月的去年同月,基期效應
+        # (去年同月特別低造成的高YoY)看柱形一眼識破——與 why 文案的警告同源
+        spark = [round(x["revenue"] / 1e8, 2) for x in mrs[:13]
+                 if x["revenue"] is not None][::-1]
         label = f"營收YoY {yoy*100:+.0f}%" if yoy is not None else "營收YoY 資料不足"
         if yoy is not None:
             direction = "增加" if yoy > 0 else "減少" if yoy < 0 else "持平"
@@ -734,7 +738,8 @@ def build_fund_map(con):
             why = ("月營收年增樣本不足(上市未滿13個月或資料尚未回補齊)。營收不等於獲利或"
                    "整體營運強弱；即使有月增資料,仍可能受基期、收入認列時點、工作天數、售價、"
                    "併購與產品組合影響。")
-        out[sid] = {"cls": cls, "label": label, "rows": rows, "why": why}
+        out[sid] = {"cls": cls, "label": label, "rows": rows, "why": why,
+                    "spark": spark if len(spark) >= 2 else None}
     return out
 
 
