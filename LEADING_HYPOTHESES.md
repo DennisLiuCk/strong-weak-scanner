@@ -3,6 +3,9 @@
 `notes/leading_hypotheses/` 保存市場流傳、尚未被正式一手文件完整覆蓋，但具體、可追溯且
 可被後續事件驗證的主張。它是觀察層，不是正式質化筆記、事實認證、投資建議或評分因子。
 
+第一階段的凍結樣本、可下結論、限制與第二階段決策見
+[領先假說第一階段回顧](LEADING_HYPOTHESES_PHASE1_REVIEW.md)。
+
 ## 收錄邊界
 
 - 只為已有有效 `independently_verified` 正式筆記的股票建立報告。
