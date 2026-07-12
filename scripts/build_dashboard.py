@@ -379,7 +379,11 @@ def build_cells(sc, m, mkt20=None):
             ["大盤20日(報酬指數,參考)", pct(mkt20, True),
              "全市場同窗口基準,不計分。個股與族群中位都贏大盤=強族群裡的強;只贏族群中位卻輸大盤=弱勢族群裡的相對強"],
             ["距60日高(還原價)", pct(dist),
-             f"現價距近60日高點回落多少,0%=創新高附近{dist_dyn}"],
+             f"現價距近60日高點回落多少,0%=創新高附近{dist_dyn}", None, None, "",
+             # 區間定位:右端=60日高(0%),刻度=蓄勢「價未動」門檻
+             {"rp": [round(dist * 100, 1), min(-30.0, round(dist * 100, 1)), 0,
+                     STEALTH_OFF_HIGH * 100, f"{STEALTH_OFF_HIGH*100:.0f}%蓄勢門檻"]}
+             if dist is not None else None],
             ["修正日抗跌(20日)", f"{pct(dr, True)}(抗{sc['s_resil']:+d})",
              "族群下跌日平均比同業多漲(少跌)多少——大家一起跌時撐得住的才是真強"
              f"(獨立元素「抗」,權重{WEIGHTS['resil']},也是升蓄勢的品質門檻){dr_dyn}"],
@@ -1032,7 +1036,8 @@ def main():
              dist_value,
              f"成員距自己60日高點的中位數,衡量族群整體回檔深度{dist_dyn}",
              _five_day_delta(ser, "med_dist60", 0.001, 100, 1),
-             None],
+             {"rp": [round(dist * 100, 1), min(-30.0, round(dist * 100, 1)), 0,
+                     GS_OFF_HIGH * 100]} if dist is not None else None],
             ["投信買超廣度",
              f"{bt*100:.0f}%成員淨買({bc['t_pos']}/{bc['t_n']}檔)"
              if (bt is not None and bc) else "-",

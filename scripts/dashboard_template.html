@@ -391,6 +391,7 @@
   /* 權重分解的貢獻條:全寬一列,緊貼在該元素的數字下方,長度可跨列比較 */
   #tip .rows .gbar,#sheetBody .rows .gbar{grid-column:1/-1;margin:-1px 0 3px}
   #tip .rows .gbar svg,#sheetBody .rows .gbar svg{display:block;width:100%;height:10px}
+  #tip .rows .gbar.rp svg,#sheetBody .rows .gbar.rp svg{height:26px}  /* 區間定位含門檻刻度字 */
   /* 技術面強調式小圖(詳情面板):還原價主色線+MA20灰線;RSI/量比走門檻量尺 */
   .techchart{margin:2px 0 10px}
   .techchart .legend{display:flex;gap:14px;font-size:11px;color:var(--ink-2);margin:0 0 4px}
@@ -1245,9 +1246,12 @@
                                                                    // CSS 的 --ink-2(見樣式),不疊加方向色以免和淡化衝突
         if(rw[4]){ var wt=document.createElement("span"); wt.className="wt"; setText(wt, " "+rw[4]); v.appendChild(wt); }
         tb.appendChild(v);
-        if(rw.length>6 && rw[6]!=null){         // 貢獻條:與綜合分同尺度(±CMAX),誰扛分數一眼可比
-          var gb=document.createElement("span"); gb.className="gbar";
-          gb.appendChild(gDivergeBar(rw[6], CMAX)); tb.appendChild(gb);
+        if(rw.length>6 && rw[6]!=null){         // 第7欄圖形:數值=貢獻條(±CMAX 同尺度);{rp:[...]}=區間定位
+          var spec=rw[6];
+          var gb=document.createElement("span"); gb.className="gbar"+(spec&&spec.rp?" rp":"");
+          if(typeof spec==="number") gb.appendChild(gDivergeBar(spec, CMAX));
+          else if(spec.rp) gb.appendChild(gRangePos(spec.rp[0],spec.rp[1],spec.rp[2],spec.rp[3],spec.rp[4]||null));
+          if(gb.children.length) tb.appendChild(gb);
         }
         if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
           var h=document.createElement("span"); h.className="rh";
@@ -2172,6 +2176,9 @@
         } else if(sp && sp.meter){
           gfx=gMeter(sp.meter[0],sp.meter[1],[{at:sp.meter[2]}],
             sp.meter[0]>=sp.meter[2]?"health":"neutral");
+        } else if(sp && sp.rp){
+          // 區間定位:右端=60日高;卡片欄寬放不下可讀刻度字,門檻語意在 hint 文字
+          gfx=gRangePos(sp.rp[0],sp.rp[1],sp.rp[2],sp.rp[3],null);
         }
         if(gfx){ p.classList.add("has-gfx"); p.appendChild(gfx); }
         picks.appendChild(p);
