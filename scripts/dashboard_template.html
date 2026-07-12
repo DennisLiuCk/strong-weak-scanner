@@ -535,6 +535,11 @@
 
   @media (max-width:720px){
     .wrap{padding:18px 14px 48px}
+    /* 手機頁高約 21,000px:導覽列 sticky 置頂,長捲後仍能跳區塊(桌機不 sticky,
+       避免與矩陣欄位表頭的 sticky top:0 疊在同一條線上) */
+    html{scroll-padding-top:74px}
+    .anchor-nav{position:sticky;top:0;z-index:20;margin:14px -14px 0;padding:8px 14px;
+      background:var(--page);border-bottom:1px solid var(--hairline-2)}
     .scroller{display:none}
     .mobile-stocks{display:block}
     .anchor-nav a,.toggle,.gf,.msearch{min-height:44px}
