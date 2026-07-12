@@ -263,7 +263,7 @@
     grid-template-columns:minmax(150px,1.2fr) repeat(5,minmax(130px,1fr)) minmax(150px,1.15fr);
     align-items:stretch;border-top:1px solid var(--hairline-2)}
   /* 離屏個股列跳過 layout/paint(98 檔約 14000px 長表),降低首屏與捲動成本;高度先估後記憶 */
-  .row[data-g]{content-visibility:auto;contain-intrinsic-size:auto 118px}
+  .row[data-g]{content-visibility:auto;contain-intrinsic-size:auto 144px}
   .row.head{border-top:none;position:sticky;top:0;background:var(--surface-2);z-index:2;
     border-bottom:1px solid var(--hairline)}
   .row.head .hc{padding:9px 10px;font-size:11.5px;color:var(--muted)}
@@ -322,17 +322,23 @@
   .note-toggle.independently_verified{color:var(--health);border-color:var(--health);background:var(--health-tint)}
   .note-toggle.conflicted{color:var(--warn);border-color:var(--warn-line);background:var(--warn-bg);border-width:2px}
   .note-toggle.due{box-shadow:0 0 0 2px var(--warn-bg),0 0 0 3px var(--warn-line)}
-  .cell{position:relative;width:calc(100% - 10px);margin:5px;border-radius:9px;padding:8px 7px;cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  /* stat-tile 版型:小標+分數列 / 數值大字 / 機制圖形+判讀。數字先到、句子下沉詳情 */
+  .cell{position:relative;width:calc(100% - 10px);margin:5px;border-radius:9px;padding:8px 9px 7px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:3px;
     background:var(--cell);border:1px solid transparent;transition:transform .08s ease, box-shadow .08s ease;
-    min-height:86px;font-family:inherit;color:var(--ink)}
+    min-height:86px;font-family:inherit;color:var(--ink);text-align:left}
   .cell:hover,.cell:focus-visible{transform:translateY(-1px);box-shadow:var(--shadow);z-index:1;outline:none;
     border-color:var(--hairline)}
   .cell:focus-visible{border-color:var(--strong)}
-  .cell .g{font-size:12.5px;font-weight:800;line-height:1}
-  .cell .v{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:.1px;text-align:center}
-  .cell .basis{font-size:11.5px;line-height:1.35;color:var(--ink-2);text-align:center}
-  .cell .v,.cell .basis{text-wrap:balance}
+  .cell .tl{display:flex;align-items:baseline;gap:5px;min-width:0}
+  .cell .tl .lb2{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-size:10px;font-weight:700;color:var(--ink-2);letter-spacing:.2px}
+  .cell .g{flex:0 0 auto;font-size:11px;font-weight:800;line-height:1}
+  .cell .v{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:.1px;line-height:1.15}
+  .cell .basis{display:flex;align-items:center;gap:6px;margin-top:auto;
+    font-size:10.5px;line-height:1.25;color:var(--ink-2)}
+  .cell .basis svg{flex:0 0 auto;width:52px;height:11px}
+  .cell .basis .bt{min-width:0}
   .cell.s2{background:var(--strong-tint-2)} .cell.s1{background:var(--strong-tint)}
   .cell.s0{background:var(--neutral-tint)}
   .cell.sm1{background:var(--weak-tint)} .cell.sm2{background:var(--weak-tint-2)}
@@ -340,7 +346,7 @@
   .cell.s0 .g{color:var(--neutral)}
   .cell.sm1 .g,.cell.sm2 .g{color:var(--weak)}
   .cell.warn{box-shadow:inset 0 0 0 1.5px var(--warn-line)}
-  .cell .flag{position:absolute;top:3px;right:4px;font-size:10px;color:var(--warn);line-height:1}
+  .cell .flag{flex:0 0 auto;font-size:10px;color:var(--warn);line-height:1}
   .vc{display:flex;align-items:center;padding:5px 12px 5px 6px}
   .verdict{width:100%;min-height:78px;border-radius:9px;padding:8px 10px;background:var(--vt,var(--neutral-tint));
     border:1px solid var(--hairline);cursor:pointer;transition:transform .08s ease,box-shadow .08s ease;
@@ -547,7 +553,9 @@
     color:var(--ink);text-align:left;cursor:pointer}
   .mmetric .mlabel{font-weight:800;font-size:12.5px}
   .mmetric .mraw{font-size:12.5px;font-weight:700}
-  .mmetric .mbasis{grid-column:2/-1;color:var(--ink-2);font-size:11.5px;line-height:1.35}
+  .mmetric .mbasis{grid-column:2/-1;color:var(--ink-2);font-size:11.5px;line-height:1.35;
+    display:flex;align-items:center;gap:6px}
+  .mmetric .mbasis svg{flex:0 0 auto;width:52px;height:11px}
   .mmetric .mscore{grid-row:1/span 2;grid-column:3;color:var(--mc,var(--neutral));font-size:12px;font-weight:900;text-align:right}
   .mobile-verdict{margin-top:9px}
 
@@ -890,20 +898,21 @@
   "use strict";
   // sub = 明細表欄位表頭的第二行:把「這欄分數怎麼來」的常數語意放這裡,
   // 個股格內只留會變動的資訊(排名桶/判讀),避免同一句話跟著 98 檔重複。
+  // vlabel = 格內小標(格值是什麼指標);欄位表頭已寫元素名,這裡只標「數字的身分」
   var EL = [
-    {k:"①價", role:"族群相對", sub:"族群內排名 · 含抗跌",
+    {k:"①價", role:"族群相對", sub:"族群內排名 · 含抗跌", vlabel:"20日相對報酬",
      how:"「相對強弱」= 近20日還原價報酬 − 族群中位數(白話:過去一個月跑贏同業多少),在族群內排名給分:前20% +2、後20% −2。上表的 └ 兩列就是相減前的原料;「大盤20日」是含息報酬指數同窗口報酬,純參考基準(不參與計分)——個股與族群中位都贏大盤，表示個股與族群價格都相對靠前；只贏族群中位卻輸大盤，則是弱勢族群裡的相對強。「修正日抗跌」是獨立指標(權重1.0):只統計族群整體下跌的日子,它平均比族群多漲(少跌)多少。",
      src:"FinMind 台股日收盤(TaiwanStockPrice);除權息/分割還原價由本系統以事件資料重算"},
-    {k:"②量", role:"量比/過熱", sub:"固定門檻 · 比自身常態",
+    {k:"②量", role:"量比/過熱", sub:"固定門檻 · 比自身常態", vlabel:"量比",
      how:"量比 = 當日周轉率 ÷ 自己過去60日的中位數——跟自己的常態比,大型股不會因天生低周轉吃虧。1.2~3.0 視為健康活絡 +1;<0.5 量縮無人氣 −1。量比≥5 或周轉率≥20% 觸發過熱旗標 ⚠(不改分數,但會把評級壓到「強但過熱」)。",
      src:"FinMind 成交量(TaiwanStockPrice)÷ 當日發行股數(TaiwanStockShareholding)"},
-    {k:"③外資", role:"國際法人", sub:"族群內排名 · 國際法人",
+    {k:"③外資", role:"國際法人", sub:"族群內排名 · 國際法人", vlabel:"20日持股變化",
      how:"外資持股比率的20日變化(單位:百分點 pp),在族群內排名;每檔原始變化若小於 ±0.3pp,視為雜訊並歸 0 分。排名分數只說明同業位置，原始值仍可能為負。本系統實證:外資動向較適合比較族群,在族群內分個股的權重僅 0.5。「修正日買賣」= 族群下跌日外資淨買賣的20日累計 ÷ 股本,用於蓄勢條件與族群概況。",
      src:"FinMind 外資持股(TaiwanStockShareholding)+ 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
-    {k:"④投信", role:"本土法人", sub:"族群內排名 · 本土法人",
+    {k:"④投信", role:"本土法人", sub:"族群內排名 · 本土法人", vlabel:"近5日淨買賣",
      how:"近5日投信淨買賣 ÷ 發行股數,在族群內排名;每檔原始變化若小於 ±0.03%,視為雜訊並歸 0 分。排名分數只說明同業位置，請同時閱讀原始值是淨買或淨賣。投信部位小、動作集中,歷史上在市場修正期參考價值較高(最新檢驗以週報為準)。",
      src:"FinMind 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
-    {k:"⑤融資券", role:"散戶籌碼", sub:"固定門檻 · 價×融資",
+    {k:"⑤融資券", role:"散戶籌碼", sub:"固定門檻 · 價×融資", vlabel:"融資水位",
      how:"融資採固定門檻，看「價格方向 × 融資變化」組合:價跌且融資下降代表槓桿同步降低，給 +2；價漲且融資增加給 −1；價跌且融資明顯增加代表槓桿風險升高，給 −2。融資水位(餘額÷股本)≥9% 時分數封頂 −1 並示警 ⚠。",
      src:"FinMind 融資融券(TaiwanStockMarginPurchaseShortSale)"}
   ];
@@ -1037,6 +1046,22 @@
   // 族群篩選控制 hook:四象限圖的點選會呼叫(gfilter IIFE 初始化時填入;晚綁,
   // 單一族群的 db 不建篩選列時保持 null → 地圖點選自然無作用)
   var GFILTER=null;
+  // 量尺門檻(build 注入自 score.py,單一事實來源)
+  var THRESH = __THRESH_JSON__;
+  // 門檻制欄位的格內量尺:i=1 量比、i=4 融資水位;格太小放不下可讀的刻度字,
+  // 只畫刻度線與區間色,數字語意由同格文字與詳情面板承載
+  function cellMeter(i, num){
+    if(num==null || !THRESH) return null;
+    if(i===1){
+      var zone=num>=THRESH.volr_overheat?"warn":
+               (num>=THRESH.volr_active[0]&&num<=THRESH.volr_active[1])?"health":"neutral";
+      return gMeter(num, THRESH.volr_overheat*1.2,
+        [{at:THRESH.volr_active[0]},{at:THRESH.volr_active[1]},{at:THRESH.volr_overheat}], zone);
+    }
+    var zone2=num>=THRESH.margin_hot?"warn":num>=THRESH.margin_mid?"warn":"health";
+    return gMeter(num, THRESH.margin_hot*1.33,
+      [{at:THRESH.margin_mid},{at:THRESH.margin_hot}], zone2);
+  }
 
   var GRP = __GRPMETA_JSON__;   // 族群名稱/標籤來自 config/groups.csv(build_dashboard 注入)
   var OVERVIEW = __OVERVIEW_JSON__;
@@ -1674,10 +1699,19 @@
       var info=sinfo(s);
       var cell=document.createElement("button"); cell.type="button"; cell.className="cell "+info.c+(warn?" warn":"");
       cell.setAttribute("aria-label", row.nm+" "+EL[i].k+"，原始狀態 "+rawDirection+"，判讀 "+scoreBasis+"，得分 "+s);
-      if(warn){ var fl=document.createElement("span"); fl.className="flag"; fl.textContent="⚠"; cell.appendChild(fl); }
-      var g=document.createElement("span"); g.className="g"; g.textContent=info.g+" "+(s>0?"+":"")+s; cell.appendChild(g);
-      var v=document.createElement("span"); v.className="v"; v.textContent=rawDirection; cell.appendChild(v);
-      var basis=document.createElement("span"); basis.className="basis"; basis.textContent=scoreBasis; cell.appendChild(basis);
+      // stat-tile 版型:小標(數字的身分)+分數 glyph 一列、數值大字、機制圖形+判讀一列。
+      // 完整方向句(rawDirection)保留在上行 aria-label 與點開的詳情,掃讀層只留數字。
+      var tl=document.createElement("span"); tl.className="tl";
+      var lb2=document.createElement("span"); lb2.className="lb2"; lb2.textContent=EL[i].vlabel||EL[i].k; tl.appendChild(lb2);
+      if(warn){ var fl=document.createElement("span"); fl.className="flag"; fl.textContent="⚠"; tl.appendChild(fl); }
+      var g=document.createElement("span"); g.className="g"; g.textContent=info.g+" "+(s>0?"+":"")+s; tl.appendChild(g);
+      cell.appendChild(tl);
+      var v=document.createElement("span"); v.className="v mono"; v.textContent=val; cell.appendChild(v);
+      var basis=document.createElement("span"); basis.className="basis";
+      var gfx=(i===1||i===4)?cellMeter(i, row.cells[i][7]):gQuintile(s);   // 元件跟著計分機制走
+      if(gfx) basis.appendChild(gfx);
+      var bt=document.createElement("span"); bt.className="bt"; bt.textContent=scoreBasis; basis.appendChild(bt);
+      cell.appendChild(basis);
       attachTip(cell, (function(row,i,s,rows,reason,info){ return function(){
         return { el: EL[i].k+" · "+EL[i].role, who: row.nm+"("+row.id+")", biz: row.biz,
           rows: rows, why: reason, how: EL[i].how, src: EL[i].src,
@@ -1815,7 +1849,11 @@
       var label=document.createElement("span"); label.className="mlabel"; label.textContent=EL[i].k; btn.appendChild(label);
       var rv=document.createElement("span"); rv.className="mraw"; rv.textContent=raw; btn.appendChild(rv);
       var score=document.createElement("span"); score.className="mscore"; score.textContent=info.g+" "+(c[0]>0?"+":"")+c[0]; btn.appendChild(score);
-      var bs=document.createElement("span"); bs.className="mbasis"; bs.textContent=basis; btn.appendChild(bs);
+      var bs=document.createElement("span"); bs.className="mbasis";
+      var mgfx=(i===1||i===4)?cellMeter(i, c[7]):gQuintile(c[0]);   // 與桌機格同一套機制圖形
+      if(mgfx) bs.appendChild(mgfx);
+      var bst=document.createElement("span"); bst.textContent=basis; bs.appendChild(bst);
+      btn.appendChild(bs);
       btn.setAttribute("aria-label",row.nm+" "+EL[i].k+"，原始狀態 "+raw+"，"+basis+"，得分 "+c[0]);
       attachTip(btn,(function(row,i,c,info){return function(){return {
         el:EL[i].k+" · "+EL[i].role,who:row.nm+"("+row.id+")",biz:row.biz,rows:c[2],why:c[3],how:EL[i].how,src:EL[i].src,

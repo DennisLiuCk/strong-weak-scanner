@@ -124,7 +124,11 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
         sc = score_row(s_foreign=2, s_trust=2)
         cells = bd.build_cells(sc, metric_row())
 
-        self.assertTrue(all(len(cell) == 7 for cell in cells))
+        # 第8欄=門檻制欄位(②量比/⑤融資水位)的量尺原始值;排名制欄位為 None
+        self.assertTrue(all(len(cell) == 8 for cell in cells))
+        self.assertIsNone(cells[0][7])
+        self.assertEqual(cells[1][7], 1.0)   # vol_ratio60
+        self.assertEqual(cells[4][7], 3.0)   # margin_util_pct
         foreign, trust = cells[2], cells[3]
         self.assertEqual(foreign[3], "外資變化位於族群前20%")
         # 動詞已帶方向 → 數值用絕對值(「減持 -0.80pp」是雙重否定);rows 內量值仍帶號

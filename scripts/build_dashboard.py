@@ -127,13 +127,15 @@ def _relative_bucket(score):
             -1: "族群後20–40%", -2: "族群後20%"}.get(score, "族群相對位置未知")
 
 
-def _cell(score, value, rows, reading, current, basis, warn=False):
-    """固定 cell payload: [score,value,rows,reading,warn,current,basis]。
+def _cell(score, value, rows, reading, current, basis, warn=False, gfx=None):
+    """固定 cell payload: [score,value,rows,reading,warn,current,basis,gfx]。
 
     current 是未經排名的當下方向；basis 才說明分數來自排名桶或固定門檻。兩者刻意分開，
     例如外資仍減持也可能因同業減持更多而落在族群前20%。
+    gfx 是門檻制欄位(②量比/⑤融資水位)畫量尺用的原始數值;排名制欄位為 None
+    (五分位條只需要分數本身)。
     """
-    return [score, value, rows, reading, int(bool(warn)), current, basis]
+    return [score, value, rows, reading, int(bool(warn)), current, basis, gfx]
 
 
 def _value(row, key, default=None):
@@ -410,7 +412,7 @@ def build_cells(sc, m, mkt20=None):
     cells.append(_cell(
         sc["s_vol"], f"{vr:.1f}×" if vr is not None else "-", rows, rv, vol_current,
         rv,
-        warn))
+        warn, round(vr, 2) if vr is not None else None))
     # ③ 外資
     fc = m["fpct_chg20"]
     fc_dyn = ("" if fc is None else
@@ -484,7 +486,7 @@ def build_cells(sc, m, mkt20=None):
     cells.append(_cell(
         sc["s_margin"], pctp(u), rows, R_MARGIN[sc["s_margin"]], margin_current,
         R_MARGIN[sc["s_margin"]],
-        u is not None and u >= 9))
+        u is not None and u >= 9, round(u, 2) if u is not None else None))
     return cells
 
 
@@ -1185,6 +1187,10 @@ def main():
     html = html.replace("__GRPMETA_JSON__", json.dumps(grpmeta, ensure_ascii=False))
     html = html.replace("__GORDER_JSON__", json.dumps(GROUP_ORDER))
     html = html.replace("__WEIGHTS_JSON__", json.dumps(WEIGHTS))
+    # 量尺門檻(②量比/⑤融資水位)——單一事實來源 score.py,調旋鈕量尺刻度自動同步
+    html = html.replace("__THRESH_JSON__", json.dumps({
+        "volr_active": list(VOLR_ACTIVE), "volr_dry": VOLR_DRY, "volr_overheat": VOLR_OVERHEAT,
+        "margin_mid": MARGIN_UTIL_MID, "margin_hot": MARGIN_UTIL_HOT}))
     html = html.replace("__PAGE_TITLE__", PAGE_TITLE)
     html = html.replace("__H1__", H1_TITLE)
     html = html.replace("__TITLE_TAIL_JSON__", json.dumps(TITLE_TAIL, ensure_ascii=False))
