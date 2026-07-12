@@ -2244,6 +2244,22 @@
           ? "這是 <b>" + fmt(PAGE_DATE) + "</b> 的歷史報告快照(最新資料日 " + fmt(dates[0]) + ")。<a href=\"../index.html\">回到最新報告 →</a>"
           : "這是 <b>" + fmt(PAGE_DATE) + "</b> 的報告快照。<a href=\"../index.html\">回到首頁 →</a>";
       }
+      // 最新頁的陳舊警示:日期選單標「(最新)」只代表本頁裡最新,不代表管線今天有跑。
+      // 資料日距瀏覽日 ≥4 個日曆日(一般週末+單日假期最多 3 天,不誤報)或 manifest
+      // 顯示已有更新報告(本頁是舊快取)時,借用同一條 histNote 提示。
+      if(!inArchive && note){
+        var days = Math.floor((Date.now() - new Date(PAGE_DATE + "T00:00:00").getTime()) / 864e5);
+        if(dates[0] > PAGE_DATE){
+          note.hidden = false;
+          note.innerHTML = "本頁還是 <b>" + fmt(PAGE_DATE) + "</b> 的報告,最新資料日已是 " +
+            fmt(dates[0]) + "。<a href=\"index.html\">重新載入最新報告 →</a>";
+        } else if(days >= 4){
+          note.hidden = false;
+          note.innerHTML = "最新資料日 <b>" + fmt(PAGE_DATE) + "</b> 距今已 " + days +
+            " 天——可能是連續假期,也可能是資料管線未更新;非假期請檢查 " +
+            "<a href=\"https://github.com/DennisLiuCk/strong-weak-scanner/actions\" rel=\"noopener\">Actions 執行紀錄</a>。";
+        }
+      }
     }
     render(__DATES_JSON__);
     // 快照頁內嵌的日期清單在 build 當下凍結;上線後改抓 manifest 補上之後新增的日期
