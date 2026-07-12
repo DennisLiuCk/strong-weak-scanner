@@ -411,10 +411,9 @@
   #tip .rows .gbar.rp svg,#sheetBody .rows .gbar.rp svg{height:26px}  /* 區間定位含門檻刻度字 */
   /* 技術面強調式小圖(詳情面板):還原價主色線+MA20灰線;RSI/量比走門檻量尺 */
   .techchart{margin:2px 0 10px}
-  .techchart .legend{display:flex;gap:14px;font-size:11px;color:var(--ink-2);margin:0 0 4px}
+  .techchart .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:var(--ink-2);margin:0 0 4px}
   .techchart .legend .key{display:inline-flex;align-items:center;gap:5px}
-  .techchart .legend .sw{width:14px;height:2px;border-radius:2px;background:var(--ink)}
-  .techchart .legend .sw.ctx{background:var(--neutral);opacity:.5}
+  .techchart .legend .key svg{flex:0 0 auto;width:22px;height:6px}
   .techchart>svg{display:block;width:100%;height:auto;background:var(--surface-2);
     border:1px solid var(--hairline-2);border-radius:8px}
   .techchart .mrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin-top:8px}
@@ -1031,11 +1030,14 @@
     s.appendChild(svgNode("circle",{cx:cx+(avg>0?w:avg<0?-w:0),cy:y+h/2,r:4.5,fill:col,
       stroke:"var(--surface)","stroke-width":2}));
     return s;}
-  // 迷你趨勢:線(預設)或柱(type:"bar");終點=主色點帶 surface 環;context=灰色情境序列
+  // 迷你趨勢:線(預設)或柱(type:"bar");終點=主色點帶 surface 環。
+  // 情境序列:opt.context=單條灰線(相容舊介面),或 opt.contexts=[{v,stroke,dash,
+  // width,opacity}] 多條——dash 提供「線型」第二編碼,近色系(如MA藍/紫)不單靠顏色分。
   function gSpark(vals,opt){
     opt=opt||{};var W=opt.w||150,H=opt.h||30,P=4,s=svgRoot(W,H,"gs");
+    var ctxs=opt.contexts||(opt.context?[{v:opt.context,stroke:"var(--neutral)",opacity:.45,width:2}]:[]);
     var pool=vals.slice();if(opt.baseline!=null)pool.push(opt.baseline);
-    if(opt.context)pool=pool.concat(opt.context);
+    ctxs.forEach(function(c){pool=pool.concat(c.v);});
     var min=Math.min.apply(null,pool),max=Math.max.apply(null,pool);
     if(max===min){max+=1;min-=1;}
     function X(i,n){return P+i/((n||vals.length)-1)*(W-2*P);}
@@ -1049,11 +1051,14 @@
       return s;}
     if(opt.baseline!=null){var by=Y(opt.baseline);
       s.appendChild(svgNode("line",{x1:P,y1:by,x2:W-P,y2:by,stroke:"var(--hairline)","stroke-width":1}));}
-    if(opt.context){
-      s.appendChild(svgNode("path",{d:opt.context.map(function(v,i){
-        return (i?"L":"M")+X(i,opt.context.length)+" "+Y(v);}).join(""),
-        fill:"none",stroke:"var(--neutral)","stroke-width":2,"stroke-linecap":"round",
-        "stroke-linejoin":"round",opacity:.45}));}
+    ctxs.forEach(function(c){
+      var attrs={d:c.v.map(function(v,i){return (i?"L":"M")+X(i,c.v.length)+" "+Y(v);}).join(""),
+        fill:"none",stroke:c.stroke||"var(--neutral)","stroke-width":c.width||1.6,
+        "stroke-linecap":"round","stroke-linejoin":"round"};
+      if(c.dash)attrs["stroke-dasharray"]=c.dash;
+      if(c.opacity!=null)attrs.opacity=c.opacity;
+      s.appendChild(svgNode("path",attrs));
+    });
     s.appendChild(svgNode("path",{d:vals.map(function(v,i){return (i?"L":"M")+X(i)+" "+Y(v);}).join(""),
       fill:"none",stroke:opt.stroke||"var(--ink)","stroke-width":2,"stroke-linecap":"round",
       "stroke-linejoin":"round"}));
@@ -1210,16 +1215,28 @@
     why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
     box.appendChild(why);
     if(html.techChart && html.techChart.px && html.techChart.px.length>1){
-      // 20日還原價+MA20 強調式小圖:兩序列必附圖例;RSI/量比另以量尺顯示位置與門檻
+      // 20日還原價+三條均線:均線用全站 MA 識別色(與文字列同源),另以線型雙編碼
+      // (MA5短虛/MA20實/MA60長虛)——藍/紫色弱下近色,不單靠顏色分;圖例鍵同線型。
+      // 繪製順序長週期在下、價在最上;MA5/MA60 整窗缺值時 build 不嵌,圖例跟著少鍵。
       var tc=document.createElement("div"); tc.className="techchart";
+      var maSeries=[
+        html.techChart.ma60?{v:html.techChart.ma60,stroke:"var(--ma60)",dash:"7 4",label:"MA60"}:null,
+        html.techChart.ma  ?{v:html.techChart.ma,  stroke:"var(--ma20)",label:"MA20"}:null,
+        html.techChart.ma5 ?{v:html.techChart.ma5, stroke:"var(--ma5)", dash:"3 3",label:"MA5"}:null
+      ].filter(Boolean);
       var lg=document.createElement("div"); lg.className="legend";
-      [["還原價 20日",""],["MA20","ctx"]].forEach(function(k){
+      function legendKey(label,stroke,dash,width){
         var key=document.createElement("span"); key.className="key";
-        var sw=document.createElement("span"); sw.className="sw"+(k[1]?" "+k[1]:"");
-        key.appendChild(sw); key.appendChild(document.createTextNode(k[0])); lg.appendChild(key);
-      });
+        var sw=svgRoot(22,6);
+        var la={x1:1,y1:3,x2:21,y2:3,stroke:stroke,"stroke-width":width||1.8,"stroke-linecap":"round"};
+        if(dash)la["stroke-dasharray"]=dash;
+        sw.appendChild(svgNode("line",la));
+        key.appendChild(sw); key.appendChild(document.createTextNode(label)); lg.appendChild(key);
+      }
+      legendKey("還原價 20日","var(--ink)",null,2.5);
+      maSeries.slice().reverse().forEach(function(c){legendKey(c.label,c.stroke,c.dash);});  // MA5→MA20→MA60 由短到長
       tc.appendChild(lg);
-      tc.appendChild(gSpark(html.techChart.px,{context:html.techChart.ma,w:300,h:80,
+      tc.appendChild(gSpark(html.techChart.px,{contexts:maSeries,w:300,h:84,
         accent:html.scColor||"var(--strong)"}));
       function mrow(label,svg,num){
         var r=document.createElement("div"); r.className="mrow";

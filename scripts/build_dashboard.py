@@ -319,14 +319,20 @@ def build_technical_view(m, history=None):
                  f"與MA20的差距為{abs(d20)*100:.1f}%，仍在±10%觀察帶內"
                  if d20 is not None else "MA20距離資料不足")
 
-    # 20日還原價+MA20 強調式小圖原料:主色=價、灰=MA20。刻意不畫三色均線——
-    # MA20藍/MA60紫在綠色弱視下 ΔE 僅 6.2(驗證器實測不合格),圖走「一主一情境」,
-    # MA5/MA60 資訊留在文字列。缺值日剔除、成對對齊,不足2點不出圖。
+    # 20日還原價+三條均線小圖原料。均線用全站既有 MA 識別色(橘/藍/紫,與文字列
+    # 同源);MA20藍/MA60紫在綠色弱視下 ΔE 僅 6.2,故前端另以「線型」雙編碼
+    # (MA5短虛線/MA20實線/MA60長虛線)+圖例,不單靠顏色分。缺值日剔除、與價
+    # 成對對齊;MA5/MA60 需整窗有值才收(新上市前段可能缺),不足即略去該線。
     chart_rows = [x for x in series[-20:]
                   if _value(x, "close_adj") is not None and _value(x, "ma20") is not None]
-    chart = ({"px": [round(_value(x, "close_adj"), 2) for x in chart_rows],
-              "ma": [round(_value(x, "ma20"), 2) for x in chart_rows]}
-             if len(chart_rows) >= 2 else None)
+    chart = None
+    if len(chart_rows) >= 2:
+        chart = {"px": [round(_value(x, "close_adj"), 2) for x in chart_rows],
+                 "ma": [round(_value(x, "ma20"), 2) for x in chart_rows]}
+        for key in ("ma5", "ma60"):
+            vals = [_value(x, key) for x in chart_rows]
+            if all(v is not None for v in vals):
+                chart[key] = [round(v, 2) for v in vals]
 
     rows = [
         ["價格與均線",
