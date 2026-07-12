@@ -529,7 +529,8 @@ def verdict(sc, comp_history=None):
         vr += ("。籌碼指標在族群相對靠前,但修正日價格位於相對後段——原始值未必是買超；"
                "此類歷史樣本表現分歧,詳見週報的同條件比較,等抗跌轉正再確認")
     # 元素 × 權重分解:依左側①②③④⑤自然順序(不依權重大小排,避免循環數字跳來跳去)。
-    # 每列 = [標籤, 顯示值, hint(此表不用), 分數(供JS用scColor上色), 權重文字(muted顯示), flag]
+    # 每列 = [標籤, 顯示值, hint(此表不用), 分數(供JS用scColor上色), 權重文字(muted顯示), flag,
+    #         貢獻數值(供JS畫等尺度貢獻條;None=不畫)]
     # flag: "total"=加大加粗、"muted"=整列調淡(權重0=只供tier判定、不計入加總——由 WEIGHTS 動態判斷,
     # 不寫死是哪個元素,權重一旦調整就自動跟著變)
     def vrow(label, key, wkey):
@@ -538,10 +539,11 @@ def verdict(sc, comp_history=None):
         tier_only = weight == 0
         contribution = v * weight
         wt = f"× {weight:g} = {contribution:+.1f}" + ("  · 只供分層條件" if tier_only else "")
-        return [label, f"{v:+d}", None, v, wt, "muted" if tier_only else ""]
+        return [label, f"{v:+d}", None, v, wt, "muted" if tier_only else "",
+                None if tier_only else round(contribution, 2)]
     today = sc["composite"]
     vrows = [["今日分(未平滑)", f"{today:+.1f}", "下列各項元素分 × 權重的貢獻加總",
-              round(today, 1), None, "total"],
+              round(today, 1), None, "total", round(today, 2)],
              vrow("①相對強弱", "s_price", "price"),
              vrow("①抗跌", "s_resil", "resil"),
              vrow("②量", "s_vol", "vol"),
@@ -562,13 +564,14 @@ def verdict(sc, comp_history=None):
         if values:
             equation = " + ".join(f"({v:+.1f})" for v in values)
             vrows.append(["近3個交易日", " → ".join(parts),
-                          "每天依元素分與權重加總出的未平滑分", None, None, ""])
+                          "每天依元素分與權重加總出的未平滑分", None, None, "", None])
             vrows.append(["3日平均(評級用)", f"{comp:+.1f}",
-                          f"({equation}) ÷ {len(values)} = {comp:+.1f}", round(comp, 1), None, "total"])
+                          f"({equation}) ÷ {len(values)} = {comp:+.1f}", round(comp, 1), None, "total",
+                          round(comp, 2)])
     else:
         vrows.append(["3日平均(評級用)", f"{comp:+.1f}",
                       "每日未平滑分歷史未提供；此值取自資料庫既有的三日平滑結果",
-                      round(comp, 1), None, "total"])
+                      round(comp, 1), None, "total", round(comp, 2)])
     return TIER_VT.get(tier, 0), tier, vsub, vr, int(sc["warn"]), vrows
 
 
@@ -1038,10 +1041,15 @@ def main():
     data, tiers_map = [], {}
     for r in rows:
         tier_meta = tier_ui_payload(r)
-        vt, tier, vsub, vr, warn, vrows = verdict(r, score_hist.get(r["stock_id"]))
+        hist = score_hist.get(r["stock_id"]) or []
+        vt, tier, vsub, vr, warn, vrows = verdict(r, hist)
         obj = {"g": r["grp"], "id": r["stock_id"], "nm": r["name"], "biz": r["biz"] or "",
                "vt": vt, "vlabel": tier_meta["tier_label"], "vkey": tier,
                "vsub": vsub, "vr": vr, "vrows": vrows,
+               # 綜評條原料:3日平滑分(實條)+近3日未平滑分(殘影點),與 vrows 文字同源
+               "comp": round(r["composite_s"], 2) if r["composite_s"] is not None else None,
+               "comp3": [round(h["composite"], 2) for h in hist[-3:]
+                         if h["composite"] is not None],
                "cells": build_cells(r, r, mkt20)}
         obj.update(tier_meta)
         tech = build_technical_view(r, tech_hist.get(r["stock_id"]))
@@ -1099,10 +1107,25 @@ def main():
         hypothesis = hypotheses_map.get(r["stock_id"])
         if hypothesis:
             status_counts = defaultdict(int)
+            capture_mode_counts = defaultdict(int)
+            lifecycle_counts = defaultdict(int)
+            due_count = 0
+            independent_chains = 0
             for item in hypothesis.get("hypotheses", []):
                 raw = item.get("fields", {}).get("目前狀態", "")
                 match = re.search(r"`([a-z_]+)`", raw)
                 status_counts[match.group(1) if match else "unknown"] += 1
+                hmeta = item.get("meta", {})
+                capture_mode_counts[hmeta.get("capture_mode") or "unknown"] += 1
+                lifecycle_counts[hmeta.get("lifecycle") or "unknown"] += 1
+                try:
+                    independent_chains += int(hmeta.get("independent_chain_count") or 0)
+                except ValueError:
+                    pass
+                if (hmeta.get("lifecycle") == "open"
+                        and re.fullmatch(r"\d{4}-\d{2}-\d{2}", hmeta.get("review_due", ""))
+                        and hmeta["review_due"] <= last):
+                    due_count += 1
             count = hypothesis.get("hypothesis_count", 0)
             obj["hypothesis"] = {
                 "label": f"領先假說 {count} 則",
@@ -1114,6 +1137,11 @@ def main():
                 "qualityErrors": hypothesis.get("quality_errors", []),
                 "statusCounts": dict(status_counts),
                 "statusInfo": HYPOTHESIS_STATUS_INFO,
+                "captureModeCounts": dict(capture_mode_counts),
+                "lifecycleCounts": dict(lifecycle_counts),
+                "dueCount": due_count,
+                "independentChains": independent_chains,
+                "schemaVersion": hypothesis.get("report_version", 0),
                 "sections": hypothesis.get("sections", []),
                 "url": NOTE_REPO_BLOB + hypothesis["relpath"],
             }

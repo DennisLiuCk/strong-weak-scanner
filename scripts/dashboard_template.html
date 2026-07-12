@@ -15,6 +15,7 @@
     --neutral:#7a756a; --neutral-tint:rgba(122,117,106,0.07);
     --warn:#8a5d05; --warn-line:#d69e2e; --warn-bg:rgba(214,158,46,0.16);
     --health:#0f6e8c; --health-tint:rgba(15,110,140,0.10);
+    --track:rgba(122,117,106,0.18);
     --ma5:#b84e00; --ma20:#0b66b2; --ma60:#6f4ba8;
     --shadow:0 1px 2px rgba(20,18,12,.05),0 8px 24px rgba(20,18,12,.08);
     color-scheme:light;
@@ -29,6 +30,7 @@
       --neutral:#9a9488; --neutral-tint:rgba(154,148,136,0.09);
       --warn:#e0a83a; --warn-line:#e0a83a; --warn-bg:rgba(224,168,58,0.16);
       --health:#5cc2e8; --health-tint:rgba(92,194,232,0.16);
+      --track:rgba(154,148,136,0.25);
       --ma5:#ff9d4d; --ma20:#62b5ff; --ma60:#c4a7ff;
       --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
       color-scheme:dark;
@@ -43,6 +45,7 @@
     --neutral:#7a756a; --neutral-tint:rgba(122,117,106,0.07);
     --warn:#8a5d05; --warn-line:#d69e2e; --warn-bg:rgba(214,158,46,0.16);
     --health:#0f6e8c; --health-tint:rgba(15,110,140,0.10);
+    --track:rgba(122,117,106,0.18);
     --ma5:#b84e00; --ma20:#0b66b2; --ma60:#6f4ba8;
     --shadow:0 1px 2px rgba(20,18,12,.05),0 8px 24px rgba(20,18,12,.08);
     color-scheme:light;
@@ -56,6 +59,7 @@
     --neutral:#9a9488; --neutral-tint:rgba(154,148,136,0.09);
     --warn:#e0a83a; --warn-line:#e0a83a; --warn-bg:rgba(224,168,58,0.16);
     --health:#5cc2e8; --health-tint:rgba(92,194,232,0.16);
+    --track:rgba(154,148,136,0.25);
     --ma5:#ff9d4d; --ma20:#62b5ff; --ma60:#c4a7ff;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
     color-scheme:dark;
@@ -343,6 +347,9 @@
   .verdict .kicker{font-size:11.5px;color:var(--muted);font-weight:700}
   .verdict .vs{font-size:11.5px;color:var(--ink-2);margin-top:2px}
   .verdict .pending{margin-top:4px;color:var(--warn);font-size:11.5px;font-weight:700;line-height:1.35}
+  /* 綜評分數條(±理論滿分,中央=0):實條=3日平均、殘影點=近3日未平滑分 */
+  .verdict .cbar{margin-top:6px}
+  .verdict .cbar svg{display:block;width:100%;height:16px}
 
   /* ---- tooltip ---- */
   #tip{position:fixed;z-index:50;max-width:330px;background:var(--surface);color:var(--ink);
@@ -366,6 +373,9 @@
   #tip .rows .wt{font-weight:500;color:var(--muted);font-size:10.5px}
   #tip .rows .total{font-size:13px;font-weight:800}
   #tip .rows .muted{color:var(--ink-2)}
+  /* 權重分解的貢獻條:全寬一列,緊貼在該元素的數字下方,長度可跨列比較 */
+  #tip .rows .gbar,#sheetBody .rows .gbar{grid-column:1/-1;margin:-1px 0 3px}
+  #tip .rows .gbar svg,#sheetBody .rows .gbar svg{display:block;width:100%;height:10px}
   #tip .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:8px;padding:7px 9px;margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
@@ -918,8 +928,108 @@
   function chipColor(s){
     if(s>0) return "var(--health)"; if(s<0) return "var(--warn)"; return "var(--neutral)";
   }
+
+  // ---------- SVG 元件庫(零依賴;顏色走 CSS 變數自動支援深淺色) ----------
+  // 慣例:位置/形狀承載方向與名次,顏色只重申(紅=強、綠=弱維持台股語彙但不單靠色);
+  // 圖形一律 aria-hidden,語意由同格既有文字與 aria-label 承載,不重複發聲。
+  var SVGNS="http://www.w3.org/2000/svg";
+  function svgNode(tag,attrs){var n=document.createElementNS(SVGNS,tag);
+    for(var k in attrs)n.setAttribute(k,attrs[k]);return n;}
+  function svgRoot(w,h,cls){var s=svgNode("svg",{viewBox:"0 0 "+w+" "+h,"aria-hidden":"true"});
+    if(cls)s.setAttribute("class",cls);return s;}
+  // 五分位條(排名制欄位):亮起的「位置」=族群名次(左=前20%),顏色只重申方向
+  function gQuintile(score){
+    var W=110,H=12,s=svgRoot(W,H,"gq"),seg=(W-8)/5,idx={2:0,1:1,0:2,"-1":3,"-2":4}[String(score)];
+    var col=score>0?"var(--strong)":score<0?"var(--weak)":"var(--neutral)";
+    for(var i=0;i<5;i++)s.appendChild(svgNode("rect",{x:i*(seg+2),y:2,width:seg,height:8,rx:3,
+      fill:i===idx?col:"var(--track)",opacity:i===idx?1:.55}));
+    return s;}
+  // 門檻量尺(固定門檻欄位):刻度=計分門檻,軌道用同語彙淺一級
+  function gMeter(value,max,ticks,zone){
+    var W=150,H=20,s=svgRoot(W,H,"gm"),y=6,h=8,w=W-4;
+    s.appendChild(svgNode("rect",{x:2,y:y,width:w,height:h,rx:4,fill:"var(--track)"}));
+    var ratio=Math.max(0,Math.min(1,value/max));
+    s.appendChild(svgNode("rect",{x:2,y:y,width:Math.max(6,ratio*w),height:h,rx:4,
+      fill:"var(--"+(zone||"health")+")"}));
+    (ticks||[]).forEach(function(t){
+      var x=2+t.at/max*w;
+      s.appendChild(svgNode("line",{x1:x,y1:y-3,x2:x,y2:y+h+3,stroke:"var(--muted)","stroke-width":1}));
+      if(t.l){var tx=svgNode("text",{x:x,y:H-.5,"text-anchor":"middle","font-size":6.5,
+        fill:"var(--muted)"});tx.textContent=t.l;s.appendChild(tx);}
+    });
+    return s;}
+  // 正負貢獻條:中央基線,在基線哪一側=方向,長度=大小(同尺度可跨列比較)
+  function gDivergeBar(value,max){
+    var W=150,H=12,s=svgRoot(W,H,"gd"),cx=W/2;
+    s.appendChild(svgNode("line",{x1:cx,y1:1,x2:cx,y2:H-1,stroke:"var(--hairline)","stroke-width":1.5}));
+    if(value){var w=Math.max(3,Math.min(Math.abs(value)/max,1)*(W/2-4));
+      s.appendChild(svgNode("rect",{x:value>0?cx:cx-w,y:2,width:w,height:H-4,rx:3,
+        fill:value>0?"var(--strong)":"var(--weak)"}));}
+    else s.appendChild(svgNode("circle",{cx:cx,cy:H/2,r:2.5,fill:"var(--neutral)"}));
+    return s;}
+  // 綜評條:實條=3日平均(評級用),殘影點=近3日未平滑分——看得出動能在增強或衰退
+  function gCompositeBar(avg,daily,max){
+    var W=300,H=20,s=svgRoot(W,H,"gc"),cx=W/2,y=5,h=10;
+    s.appendChild(svgNode("line",{x1:cx,y1:1,x2:cx,y2:H-1,stroke:"var(--hairline)","stroke-width":1.5}));
+    var col=avg>0?"var(--strong)":avg<0?"var(--weak)":"var(--neutral)";
+    var w=Math.min(Math.abs(avg)/max,1)*(W/2-6);
+    if(avg)s.appendChild(svgNode("rect",{x:avg>0?cx:cx-w,y:y,width:Math.max(3,w),height:h,rx:3,
+      fill:col,opacity:.85}));
+    (daily||[]).forEach(function(d){
+      s.appendChild(svgNode("circle",{cx:cx+Math.max(-1,Math.min(1,d/max))*(W/2-6),cy:y+h/2,r:3,
+        fill:d>0?"var(--strong)":d<0?"var(--weak)":"var(--neutral)",opacity:.4,
+        stroke:"var(--surface)","stroke-width":1.5}));});
+    s.appendChild(svgNode("circle",{cx:cx+(avg>0?w:avg<0?-w:0),cy:y+h/2,r:4.5,fill:col,
+      stroke:"var(--surface)","stroke-width":2}));
+    return s;}
+  // 迷你趨勢:線(預設)或柱(type:"bar");終點=主色點帶 surface 環;context=灰色情境序列
+  function gSpark(vals,opt){
+    opt=opt||{};var W=opt.w||150,H=opt.h||30,P=4,s=svgRoot(W,H,"gs");
+    var pool=vals.slice();if(opt.baseline!=null)pool.push(opt.baseline);
+    if(opt.context)pool=pool.concat(opt.context);
+    var min=Math.min.apply(null,pool),max=Math.max.apply(null,pool);
+    if(max===min){max+=1;min-=1;}
+    function X(i,n){return P+i/((n||vals.length)-1)*(W-2*P);}
+    function Y(v){return H-P-(v-min)/(max-min)*(H-2*P);}
+    if(opt.type==="bar"){
+      var bw=Math.max(2,Math.min(8,(W-2*P)/vals.length-2)),y0=opt.baseline!=null?Y(opt.baseline):H-P;
+      vals.forEach(function(v,i){var yv=Y(v);
+        s.appendChild(svgNode("rect",{x:X(i)-bw/2,y:Math.min(yv,y0),width:bw,
+          height:Math.max(2,Math.abs(y0-yv)),rx:2,
+          fill:i===vals.length-1?(opt.accent||"var(--strong)"):"var(--track)"}));});
+      return s;}
+    if(opt.baseline!=null){var by=Y(opt.baseline);
+      s.appendChild(svgNode("line",{x1:P,y1:by,x2:W-P,y2:by,stroke:"var(--hairline)","stroke-width":1}));}
+    if(opt.context){
+      s.appendChild(svgNode("path",{d:opt.context.map(function(v,i){
+        return (i?"L":"M")+X(i,opt.context.length)+" "+Y(v);}).join(""),
+        fill:"none",stroke:"var(--neutral)","stroke-width":2,"stroke-linecap":"round",
+        "stroke-linejoin":"round",opacity:.45}));}
+    s.appendChild(svgNode("path",{d:vals.map(function(v,i){return (i?"L":"M")+X(i)+" "+Y(v);}).join(""),
+      fill:"none",stroke:opt.stroke||"var(--ink)","stroke-width":2,"stroke-linecap":"round",
+      "stroke-linejoin":"round"}));
+    s.appendChild(svgNode("circle",{cx:X(vals.length-1),cy:Y(vals[vals.length-1]),r:4,
+      fill:opt.accent||"var(--strong)",stroke:"var(--surface)","stroke-width":2}));
+    return s;}
+  // 區間定位:右端=區間頂(如60日高=0%),點=現值位置,refAt=門檻刻度
+  function gRangePos(value,min,max,refAt,refLabel){
+    var W=150,H=22,P=6,s=svgRoot(W,H,"gr"),y=H/2-2;
+    function X(v){return P+(v-min)/(max-min)*(W-2*P);}
+    s.appendChild(svgNode("line",{x1:P,y1:y,x2:W-P,y2:y,stroke:"var(--track)","stroke-width":4,
+      "stroke-linecap":"round"}));
+    s.appendChild(svgNode("line",{x1:X(refAt),y1:y-6,x2:X(refAt),y2:y+6,stroke:"var(--warn-line)",
+      "stroke-width":1.5}));
+    if(refLabel){var t=svgNode("text",{x:X(refAt),y:H-1,"text-anchor":"middle","font-size":6.5,
+      fill:"var(--muted)"});t.textContent=refLabel;s.appendChild(t);}
+    s.appendChild(svgNode("line",{x1:W-P,y1:y-6,x2:W-P,y2:y+6,stroke:"var(--muted)","stroke-width":1.5}));
+    s.appendChild(svgNode("circle",{cx:X(Math.max(min,Math.min(max,value))),cy:y,r:4.5,
+      fill:value>=refAt?"var(--warn)":"var(--health)",stroke:"var(--surface)","stroke-width":2}));
+    return s;}
   // c = cell: [score,valueText,rows,relativeReading,warn,currentRawDirection,scoreBasis]
   var DATA = __DATA_JSON__;
+  // 權重供方法區 chips 與綜合分尺度共用;CMAX=|權重|×2 加總=綜合分理論滿分(±)
+  var WEIGHTS = __WEIGHTS_JSON__;
+  var CMAX=(function(){var t=0;for(var k in WEIGHTS)t+=Math.abs(WEIGHTS[k])*2;return t||8.8;})();
 
   var GRP = __GRPMETA_JSON__;   // 族群名稱/標籤來自 config/groups.csv(build_dashboard 注入)
   var OVERVIEW = __OVERVIEW_JSON__;
@@ -1045,6 +1155,10 @@
                                                                    // CSS 的 --ink-2(見樣式),不疊加方向色以免和淡化衝突
         if(rw[4]){ var wt=document.createElement("span"); wt.className="wt"; setText(wt, " "+rw[4]); v.appendChild(wt); }
         tb.appendChild(v);
+        if(rw.length>6 && rw[6]!=null){         // 貢獻條:與綜合分同尺度(±CMAX),誰扛分數一眼可比
+          var gb=document.createElement("span"); gb.className="gbar";
+          gb.appendChild(gDivergeBar(rw[6], CMAX)); tb.appendChild(gb);
+        }
         if(rw[2]){                              // 這個數字怎麼讀:跨兩欄的小字,緊貼在數值下方
           var h=document.createElement("span"); h.className="rh";
           if(html.techSeries)appendMaText(h,rw[2]);else setText(h,rw[2]);tb.appendChild(h);
@@ -1331,11 +1445,18 @@
     });
     var state=document.createElement("div"); state.className="hypothesis-status";
     setText(state,"狀態分布："+(parts.join(" · ")||"-")+"。多篇轉載同一消息鏈不視為獨立確認。"); box.appendChild(state);
+    var modes=hypothesis.captureModeCounts||{}, lifecycle=hypothesis.lifecycleCounts||{};
+    var audit=document.createElement("div"); audit.className="hypothesis-status";
+    setText(audit,"樣本性質：前瞻捕捉 "+(modes.prospective||0)+" · 回溯基線 "+(modes.retrospective||0)+
+      "；生命週期：追蹤中 "+(lifecycle.open||0)+" · 已成立 "+(lifecycle.confirmed||0)+
+      " · 已否定 "+(lifecycle.refuted||0)+" · 到期未決 "+(lifecycle.expired_unresolved||0)+
+      "；獨立消息鏈 "+(hypothesis.independentChains||0)+"。"+
+      ((hypothesis.dueCount||0)>0?("本頁資料日已有 "+hypothesis.dueCount+" 則到期待複核。"):"")); box.appendChild(audit);
     var machine=document.createElement("details"); machine.className="nb-section hypothesis-machine";
     var machineTitle=document.createElement("summary"); setText(machineTitle,"這些狀態如何變化？"); machine.appendChild(machineTitle);
     var machineBody=document.createElement("div"); machineBody.className="nb-section-body";
     var flow=document.createElement("p");
-    setText(flow,"初次捕捉 → 持續觀察或證據警示 → 取得較強證據 → 已驗證成立／已驗證不成立。非終態可隨新證據互相重分類；終態仍保留原始主張與時間戳。");
+    setText(flow,"初次捕捉 → 持續觀察或證據警示 → 取得較強證據 → 已驗證成立／已驗證不成立／到期仍無法判定。閱讀狀態由生命週期、證據強度與警示組合而成；每次轉移保留日期、理由與證據。");
     machineBody.appendChild(flow);
     ["持續觀察","證據警示","驗證終態"].forEach(function(stage){
       var title=document.createElement("b"); setText(title,stage); machineBody.appendChild(title);
@@ -1574,6 +1695,10 @@
     var vtx=document.createElement("span"); vtx.textContent=confirmedLabel; vv.appendChild(vtx);
     vd.appendChild(vv);
     var vs=document.createElement("div"); vs.className="vs"; vs.textContent=row.vsub; vd.appendChild(vs);
+    if(typeof row.comp==="number"){   // 綜合分條:一眼看出強弱程度與近3日動能方向
+      var cb=document.createElement("div"); cb.className="cbar";
+      cb.appendChild(gCompositeBar(row.comp,row.comp3||[],CMAX)); vd.appendChild(cb);
+    }
     if(waiting){
       var pending=document.createElement("div"); pending.className="pending";
       pending.textContent="今日初判 1/2："+rawLabel+"（尚未轉層）"; vd.appendChild(pending);
@@ -1696,6 +1821,10 @@
     var kicker=document.createElement("div"); kicker.className="kicker"; kicker.textContent="已確認分層"; vd.appendChild(kicker);
     var vv=document.createElement("div"); vv.className="vv"; vv.textContent=confirmedLabel; vd.appendChild(vv);
     var sub=document.createElement("div"); sub.className="vs"; sub.textContent=row.vsub||"點按查看今日分數、三日平均與確認規則"; vd.appendChild(sub);
+    if(typeof row.comp==="number"){
+      var cbm=document.createElement("div"); cbm.className="cbar";
+      cbm.appendChild(gCompositeBar(row.comp,row.comp3||[],CMAX)); vd.appendChild(cbm);
+    }
     if(waiting){var pend=document.createElement("div");pend.className="pending";pend.textContent="今日初判 1/2："+rawLabel+"（尚未轉層）";vd.appendChild(pend);}
     attachTip(vd,(function(row,confirmedLabel,rawLabel,waiting){return function(){
       var key=row.tier_confirmed||row.vkey||row.tier||confirmedLabel; return {el:"已確認分層 · 五個觀察面向",who:row.nm+"("+row.id+")",
@@ -2024,8 +2153,7 @@
     tiers.appendChild(el);refreshTierPreview(el);
   });
 
-  // ---------- 方法區:權重 chips + 評級規則(單一事實來源:WEIGHTS 注入自 score.py、規則共用 TIER_HOW) ----------
-  var WEIGHTS = __WEIGHTS_JSON__;
+  // ---------- 方法區:權重 chips + 評級規則(單一事實來源:WEIGHTS 注入自 score.py,宣告已提前到 DATA 旁;規則共用 TIER_HOW) ----------
   (function(){
     var host = document.getElementById("wchips");
     if(!host || !WEIGHTS) return;
