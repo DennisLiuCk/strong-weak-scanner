@@ -546,6 +546,10 @@
     .msearch{width:100%;min-width:0}
     .mtoolbar{align-items:stretch}
     .mtoolbar .toggle{flex:1 1 auto;justify-content:center}
+    /* header 兩個「可點」的籤條(市場環境=開詳情、資料至=切日期)升成 44px 點按目標;
+       其餘純顯示 chip 維持小型。dateSel 16px 防 iOS 聚焦自動放大頁面 */
+    #mktChip,.chip-date{min-height:44px;display:inline-flex;align-items:center;font-size:12.5px}
+    .chip-date #dateSel{min-height:44px;font-size:16px}
     .riskbadge,.fundbadge,.notebadge,.hdot,.techbadge{min-height:44px;height:44px}
     .riskbadge,.fundbadge,.hdot,.techbadge{padding-inline:12px}
     /* 行動版卡片要大點按目標:恢復膠囊外觀與字級 */
@@ -613,7 +617,7 @@
       <div class="meta">
         <span class="chip" id="mktChip">__MARKET_CHIP__</span>
         <span class="chip" id="scopeChip">範圍 <b>__SCOPE__</b></span>
-        <span class="chip">資料至 <span class="date-wrap"><select id="dateSel" aria-label="切換報告日期"><option value="__DATE_ISO__">__DATE__</option></select></span>(還原股價)</span>
+        <span class="chip chip-date">資料至 <span class="date-wrap"><select id="dateSel" aria-label="切換報告日期"><option value="__DATE_ISO__">__DATE__</option></select></span>(還原股價)</span>
         <span class="chip" title="市場數據: FinMind、TDCC、TWSE/TPEx；正式筆記標示獨立複核；領先假說保存可追溯、可證偽的市場主張">來源 <b>多來源</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
       </div>
