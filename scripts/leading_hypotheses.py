@@ -15,6 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPORTS_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
 NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 REPORT_VERSION = 2
+RETROSPECTIVE_BASELINE_CUTOFF = "2026-07-12"
 REPORT_STATUSES = {"active_monitoring", "closed"}
 CAPTURE_MODES = {"retrospective", "prospective"}
 LIFECYCLES = {"open", "confirmed", "refuted", "expired_unresolved"}
@@ -235,6 +236,12 @@ def analyse_report(path, text, notes=None, today=None):
             errors.append(f"{hypothesis['id']} 驗證期限須與 review_due 一致")
         if hmeta.get("capture_mode") not in CAPTURE_MODES:
             errors.append(f"{hypothesis['id']} 非法 capture_mode：{hmeta.get('capture_mode') or '-'}")
+        if (hmeta.get("capture_mode") == "retrospective" and _valid_date(captured)
+                and captured > RETROSPECTIVE_BASELINE_CUTOFF):
+            errors.append(
+                f"{hypothesis['id']} 回溯基線已於 {RETROSPECTIVE_BASELINE_CUTOFF} 封存；"
+                "之後新增內容必須使用 prospective"
+            )
         lifecycle = hmeta.get("lifecycle")
         if lifecycle not in LIFECYCLES:
             errors.append(f"{hypothesis['id']} 非法 lifecycle：{lifecycle or '-'}")

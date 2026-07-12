@@ -186,6 +186,17 @@ review_due: 2026-08-31
         metrics = lh.prospective_metrics({"1234": retrospective}, "2026-08-31")
         self.assertEqual(metrics["cohort"], 0)
 
+    def test_new_content_after_baseline_cannot_be_retrospective(self):
+        text = report_text().replace("capture_mode: prospective", "capture_mode: retrospective")
+        text = text.replace("research_captured_at: 2026-07-12", "research_captured_at: 2026-07-13")
+        text = text.replace("source_accessed_at: 2026-07-12", "source_accessed_at: 2026-07-13")
+        text = text.replace("date: 2026-07-12", "date: 2026-07-13")
+        text = text.replace("（前瞻捕捉）", "（回溯建檔）")
+        text = text.replace("- **研究收錄：** 2026-07-12", "- **研究收錄：** 2026-07-13")
+        info = lh.analyse_report("1234_測試.md", text, notes=self.notes, today="2026-07-13")
+        self.assertTrue(any("之後新增內容必須使用 prospective" in error
+                            for error in info["quality_errors"]))
+
     def test_default_today_uses_taiwan_research_date(self):
         with mock.patch.object(lh, "_today", return_value=date(2026, 7, 12)):
             info = lh.analyse_report("1234_測試.md", report_text(), notes=self.notes)
@@ -193,15 +204,15 @@ review_due: 2026-08-31
 
     def test_all_verified_notes_have_valid_reports_and_hypotheses(self):
         reports = lh.load_reports()
-        self.assertEqual(len(reports), 78)
-        self.assertEqual(sum(report["hypothesis_count"] for report in reports.values()), 156)
+        self.assertEqual(len(reports), 98)
+        self.assertEqual(sum(report["hypothesis_count"] for report in reports.values()), 196)
         self.assertFalse([report["quality_errors"] for report in reports.values()
                           if report["quality_invalid"]])
         hypotheses = [item for report in reports.values() for item in report["hypotheses"]]
         self.assertTrue(all(report["report_version"] == 2 for report in reports.values()))
         self.assertEqual({item["meta"]["capture_mode"] for item in hypotheses}, {"retrospective"})
         self.assertEqual(sum(int(item["meta"]["independent_chain_count"])
-                             for item in hypotheses), 156)
+                             for item in hypotheses), 196)
         self.assertTrue(all(item["transitions"] for item in hypotheses))
 
 
