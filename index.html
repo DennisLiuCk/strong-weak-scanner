@@ -107,6 +107,12 @@
     appearance:none;-webkit-appearance:none;-moz-appearance:none}
   #dateSel:focus-visible{outline:2px solid var(--strong);outline-offset:2px;border-radius:4px}
   #dateSel option{background:var(--surface);color:var(--ink)}
+  /* 日期 ‹ › 步進:回看連續幾天不必每次開下拉 */
+  .dstep{border:none;background:none;color:var(--ink-2);font:inherit;font-weight:800;
+    cursor:pointer;padding:0 5px;border-radius:6px;line-height:1}
+  .dstep:hover:not(:disabled){color:var(--ink)}
+  .dstep:disabled{opacity:.3;cursor:default}
+  .dstep:focus-visible{outline:2px solid var(--strong);outline-offset:1px}
   #histNote{margin:14px 0 0;padding:9px 14px;font-size:13px;color:var(--ink);
     background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:8px}
   #histNote a{color:var(--ink);font-weight:700;text-underline-offset:2px}
@@ -223,6 +229,12 @@
   .pick{display:flex;align-items:center;gap:8px;font-size:13px}
   .pick .code{font-size:12px;color:var(--muted)}
   .pick .nm{font-weight:700}
+  /* 分層卡個股名=按鈕(開綜評詳情):底線示意可點,不佔新的訊號色 */
+  .pickbtn{background:none;border:none;padding:0;font:inherit;font-weight:700;color:var(--ink);
+    cursor:pointer;text-decoration:underline;text-decoration-color:var(--hairline);
+    text-underline-offset:3px}
+  .pickbtn:hover{text-decoration-color:var(--ink)}
+  .pickbtn:focus-visible{outline:2px solid var(--strong);outline-offset:2px;border-radius:4px}
   .dot{width:9px;height:9px;border-radius:3px;flex:0 0 auto;background:var(--pc,var(--neutral))}
   .dotstrip{display:flex;gap:5px;flex-wrap:wrap;margin-top:1px}
   .dotstrip span{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
@@ -274,6 +286,11 @@
   .row.head .hc{padding:9px 10px;font-size:11.5px;color:var(--muted)}
   .row.head .hc .t{font-weight:800;color:var(--ink);font-size:12.5px;display:block}
   .row.head .rl{padding-left:16px}
+  /* 可點排序表頭:hover 顯示可互動,箭頭=目前排序鍵與方向 */
+  .row.head .hc.hsort{cursor:pointer}
+  .row.head .hc.hsort:hover .t{color:var(--strong)}
+  .row.head .hc.hsort:focus-visible{outline:2px solid var(--strong);outline-offset:-2px;border-radius:6px}
+  .row.head .hc .arrow{color:var(--strong);font-weight:800}
   .rl{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:9px 10px 9px 16px;min-width:0}
   .rl .nm{font-weight:800;font-size:14px;letter-spacing:.2px}
   .rl .code{font-size:11px;color:var(--muted)}
@@ -601,6 +618,7 @@
        其餘純顯示 chip 維持小型。dateSel 16px 防 iOS 聚焦自動放大頁面 */
     #mktChip,.chip-date{min-height:44px;display:inline-flex;align-items:center;font-size:12.5px}
     .chip-date #dateSel{min-height:44px;font-size:16px}
+    .chip-date .dstep{min-width:40px;min-height:44px}
     .riskbadge,.fundbadge,.notebadge,.hdot,.techbadge{min-height:44px;height:44px}
     .riskbadge,.fundbadge,.hdot,.techbadge{padding-inline:12px}
     /* 行動版卡片要大點按目標:恢復膠囊外觀與字級 */
@@ -668,7 +686,7 @@
       <div class="meta">
         <span class="chip" id="mktChip">市場 <b>⚠ 修正</b>(報酬指數距20日高 -4.6%)</span>
         <span class="chip" id="scopeChip">範圍 <b>9 族群 · 98 檔</b></span>
-        <span class="chip chip-date">資料至 <span class="date-wrap"><select id="dateSel" aria-label="切換報告日期"><option value="2026-07-09">2026/7/9</option></select></span>(還原股價)</span>
+        <span class="chip chip-date">資料至 <button type="button" id="datePrev" class="dstep" aria-label="前一個資料日">‹</button><span class="date-wrap"><select id="dateSel" aria-label="切換報告日期"><option value="2026-07-09">2026/7/9</option></select></span><button type="button" id="dateNext" class="dstep" aria-label="後一個資料日">›</button>(還原股價)</span>
         <span class="chip" title="市場數據: FinMind、TDCC、TWSE/TPEx；正式筆記標示獨立複核；領先假說保存可追溯、可證偽的市場主張">來源 <b>多來源</b></span>
         <span class="chip">慣例 <b style="color:var(--strong)">紅=強</b> <b style="color:var(--weak)">綠=弱</b></span>
       </div>
@@ -1064,6 +1082,8 @@
   // 族群篩選控制 hook:四象限圖的點選會呼叫(gfilter IIFE 初始化時填入;晚綁,
   // 單一族群的 db 不建篩選列時保持 null → 地圖點選自然無作用)
   var GFILTER=null;
+  // 排序控制 hook:欄位表頭點選會呼叫(排序 IIFE 初始化時填入,同晚綁模式)
+  var MSORT=null;
   // 量尺門檻(build 注入自 score.py,單一事實來源)
   var THRESH = {"volr_active": [1.2, 3.0], "volr_dry": 0.5, "volr_overheat": 5.0, "margin_mid": 6.0, "margin_hot": 9.0};
   // 門檻制欄位的格內量尺:i=1 量比、i=4 融資水位;格太小放不下可讀的刻度字,
@@ -1635,15 +1655,29 @@
     var t=document.createElement("span"); t.className="t"; t.textContent="個股"; rl.appendChild(t);
     var s=document.createElement("span"); s.textContent="族群 / 綜評"; rl.appendChild(s);
     r.appendChild(rl);
-    EL.forEach(function(e){
+    // 表頭可點排序:key=元素索引(0..4)或 "comp"(綜評);箭頭與 aria-sort 由排序引擎回填
+    function sortable(c, key, name){
+      c.classList.add("hsort"); c.tabIndex=0; c.setAttribute("role","button");
+      c.setAttribute("aria-label","依"+name+"排序(族群內);再點切換升降冪");
+      var arrow=document.createElement("span"); arrow.className="arrow"; arrow.dataset.sortkey=String(key);
+      c.querySelector(".t").appendChild(arrow);
+      function go(){ if(MSORT) MSORT.by(key); }
+      c.addEventListener("click", go);
+      c.addEventListener("keydown", function(e){
+        if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(); }
+      });
+    }
+    EL.forEach(function(e,i){
       var c=document.createElement("div"); c.className="hc";
       var t=document.createElement("span"); t.className="t"; t.textContent=e.k; c.appendChild(t);
       var s=document.createElement("span"); s.textContent=e.sub||e.role; c.appendChild(s);
+      sortable(c, i, e.k);
       r.appendChild(c);
     });
     var v=document.createElement("div"); v.className="hc";
     var vt=document.createElement("span"); vt.className="t"; vt.textContent="已確認分層"; v.appendChild(vt);
     var vs=document.createElement("span"); vs.textContent="三日平均 / 兩日確認"; v.appendChild(vs);
+    sortable(v, "comp", "綜合分");
     r.appendChild(v);
     return r;
   }
@@ -1991,34 +2025,64 @@
   (function(){
     var btn = document.getElementById("matrixSortBtn");
     if(!btn) return;
-    // 進場時 DATA 已是「族群順序→族群內綜合分高到低」(build_dashboard.py 排序),原地存一份
-    // 供切回;切到「由低到高」時只在各族群區塊內反轉列順序,不動族群分區與族群篩選的 data-g。
+    // 排序引擎:key="comp"(綜合分,預設高→低)或元素索引 0..4(表頭點選)。
+    // 只在各族群區塊內重排,不動族群分區與族群篩選的 data-g;分數相同維持原順
+    // (Array.sort 穩定,原順=綜合分高→低)。
     var headEl = matrix.querySelector(".row.head");
     var blocks = []; var cur = null;
     Array.prototype.forEach.call(matrix.children, function(el){
       if(el.classList.contains("grp")){ cur = {head: el, rows: []}; blocks.push(cur); }
       else if(cur && el.classList.contains("row")){ cur.rows.push(el); }
     });
-    var ascending = false;
-    btn.addEventListener("click", function(){
-      ascending = !ascending;
-      btn.setAttribute("aria-pressed", ascending ? "true" : "false");
-      btn.textContent = ascending ? "↑ 族群內綜合分由低到高" : "↓ 族群內綜合分由高到低";
+    var scoreById={};
+    DATA.forEach(function(dd){
+      scoreById[dd.id]={cells:dd.cells.map(function(c){return c[0];}),
+                        comp:typeof dd.comp==="number"?dd.comp:0};
+    });
+    var key="comp", asc=false;
+    function val(el){
+      var s=scoreById[el.dataset.id];
+      if(!s) return 0;
+      return key==="comp" ? s.comp : (s.cells[key]||0);
+    }
+    function cmp(a,b){ var d=val(a)-val(b); return asc ? d : -d; }
+    function updateUi(){
+      btn.setAttribute("aria-pressed", (key==="comp"&&asc) ? "true" : "false");
+      btn.textContent = key!=="comp" ? "↓ 族群內綜合分由高到低"
+        : (asc ? "↑ 族群內綜合分由低到高" : "↓ 族群內綜合分由高到低");
+      Array.prototype.forEach.call(matrix.querySelectorAll(".row.head .arrow"), function(a){
+        var mine=a.dataset.sortkey===String(key);
+        a.textContent = mine ? (asc?" ↑":" ↓") : "";
+        var hc=a.closest(".hc");
+        if(hc) hc.setAttribute("aria-sort", mine ? (asc?"ascending":"descending") : "none");
+      });
+    }
+    function rebuild(){
       var frag = document.createDocumentFragment();
       if(headEl) frag.appendChild(headEl);
       blocks.forEach(function(b){
         frag.appendChild(b.head);
-        (ascending ? b.rows.slice().reverse() : b.rows).forEach(function(r){ frag.appendChild(r); });
+        b.rows.slice().sort(cmp).forEach(function(r){ frag.appendChild(r); });
       });
       matrix.appendChild(frag);
       if(mobileStocks){
         var mobileFrag=document.createDocumentFragment();
         mobileGroupOrder.forEach(function(g){
-          (ascending?mobileRowsByGroup[g].slice().reverse():mobileRowsByGroup[g]).forEach(function(card){mobileFrag.appendChild(card);});
+          mobileRowsByGroup[g].slice().sort(cmp).forEach(function(card){mobileFrag.appendChild(card);});
         });
         mobileStocks.appendChild(mobileFrag);
       }
+      updateUi();
+    }
+    btn.addEventListener("click", function(){
+      if(key==="comp"){ asc=!asc; } else { key="comp"; asc=false; }
+      rebuild();
     });
+    MSORT={by:function(k){
+      if(key===k){ asc=!asc; } else { key=k; asc=false; }
+      rebuild();
+    }};
+    updateUi();
   })();
 
   // ---------- group radar ----------
@@ -2246,6 +2310,20 @@
   }
   var byId={}; DATA.forEach(function(d){byId[d.id]=d;});
   var tiers=document.getElementById("tiers");
+  // 分層卡個股點名字 → 直接開該股綜評詳情(資料已在 DATA,零額外請求)
+  function pickVerdictPayload(row){
+    var confirmedLabel=row.tier_label||row.vlabel||"資料不足";
+    var rawLabel=row.tier_raw_label||confirmedLabel;
+    var waiting=typeof row.tier_waiting==="boolean"?row.tier_waiting:false;
+    var confirmedKey=row.tier_confirmed||row.vkey||confirmedLabel;
+    return { el:"已確認分層 · 五個觀察面向", who: row.nm+"("+row.id+")", biz: row.biz,
+      rows: row.vrows, why: row.vr,
+      how:(waiting?"今日初判為「"+rawLabel+"」，目前是第 1/2 日，連續兩日相同才會正式轉層。":"")+
+          (TIER_HOW[confirmedKey]||TIER_HOW[confirmedLabel]||""),
+      howLink:"完整公式與權重依據見頁尾「方法與資料」",
+      src:"由五個觀察面向的元素分數加權合成;各元素的原始資料來源見個股明細",
+      scLabel: confirmedLabel+(row.warn?" ⚠":""), scColor: scColor(row.vt), scBg: tintBg(row.vt) };
+  }
   TIERS.forEach(function(T){
     var el=document.createElement("div"); el.className="tier"; el.style.setProperty("--tc",T.col);
     var tt=document.createElement("div"); tt.className="tt"; tt.textContent=T.t; el.appendChild(tt);
@@ -2259,7 +2337,10 @@
       p.appendChild(dot);
       var gt=document.createElement("span"); gt.className="gt";   // 族群短標(混族群的結論卡才分得出來)
       gt.textContent=(GRP[d.g] && (GRP[d.g].short || GRP[d.g].nm)) || d.g; p.appendChild(gt);
-      var nm=document.createElement("span"); nm.className="nm"; nm.textContent=d.nm; p.appendChild(nm);
+      var nm=document.createElement("button"); nm.type="button"; nm.className="nm pickbtn"; nm.textContent=d.nm;
+      nm.setAttribute("aria-label", d.nm+"("+id+") 開啟綜評詳情");
+      nm.addEventListener("click", function(){ hideTip(); openSheet(pickVerdictPayload(d), null, nm); });
+      p.appendChild(nm);
       var code=document.createElement("span"); code.className="code mono"; code.textContent=id; p.appendChild(code);
       if(d.risk && d.risk.length){
         var rk=document.createElement("button"); rk.type="button"; rk.className="riskbadge sm";
@@ -2499,9 +2580,24 @@
     var PAGE_DATE = "2026-07-09";
     var inArchive = /\/archive\/[^\/]*$/.test(location.pathname);
     var base = inArchive ? "" : "archive/";
+    var curDates = [];   // 最新在前;供 ‹ › 步進鍵用
     function fmt(iso){ var p = iso.split("-"); return p[0] + "/" + (+p[1]) + "/" + (+p[2]); }
+    function goto(d){
+      if(d === PAGE_DATE) return;
+      var latest = curDates.length ? curDates[0] : d;   // 最新一律回 index(權威最新頁)
+      location.href = (d === latest) ? (inArchive ? "../index.html" : "index.html")
+                                     : base + d + ".html";
+    }
+    var prevBtn = document.getElementById("datePrev"), nextBtn = document.getElementById("dateNext");
+    function updateSteppers(){
+      if(!prevBtn || !nextBtn) return;
+      var i = curDates.indexOf(sel.value);
+      prevBtn.disabled = !(i >= 0 && i < curDates.length - 1);   // ‹=較舊一日
+      nextBtn.disabled = !(i > 0);                               // ›=較新一日
+    }
     function render(dates){
       dates = dates.slice().sort().reverse();   // 最新在前
+      curDates = dates;
       sel.innerHTML = "";
       for(var i = 0; i < dates.length; i++){
         var o = document.createElement("option");
@@ -2532,6 +2628,7 @@
             "<a href=\"https://github.com/DennisLiuCk/strong-weak-scanner/actions\" rel=\"noopener\">Actions 執行紀錄</a>。";
         }
       }
+      updateSteppers();
     }
     render(["2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09"]);
     // 快照頁內嵌的日期清單在 build 當下凍結;上線後改抓 manifest 補上之後新增的日期
@@ -2540,14 +2637,28 @@
         .then(function(d){ if(d && d.length) render(d); })
         .catch(function(){});
     }
-    sel.addEventListener("change", function(){
-      var d = sel.value;
-      if(d === PAGE_DATE) return;
-      var latest = sel.options.length ? sel.options[0].value : d;   // 最新一律回 index(權威最新頁)
-      location.href = (d === latest) ? (inArchive ? "../index.html" : "index.html")
-                                     : base + d + ".html";
-    });
+    sel.addEventListener("change", function(){ goto(sel.value); });
+    if(prevBtn && nextBtn){
+      prevBtn.addEventListener("click", function(){
+        var i = curDates.indexOf(sel.value);
+        if(i >= 0 && i < curDates.length - 1) goto(curDates[i + 1]);
+      });
+      nextBtn.addEventListener("click", function(){
+        var i = curDates.indexOf(sel.value);
+        if(i > 0) goto(curDates[i - 1]);
+      });
+    }
   })();
+
+  // ---------- 鍵盤捷徑:「/」聚焦搜尋(GitHub 慣例;輸入框內不攔截) ----------
+  document.addEventListener("keydown", function(e){
+    if(e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target, tag = (t && t.tagName || "").toLowerCase();
+    if(tag === "input" || tag === "select" || tag === "textarea" || (t && t.isContentEditable)) return;
+    var s = document.getElementById("matrixSearch");
+    if(!s || !s.offsetParent) return;   // 搜尋框不可見(例外狀態)就不搶按鍵
+    e.preventDefault(); s.focus(); s.select();
+  });
 
   window.addEventListener("scroll", hideTip, {passive:true});
   window.addEventListener("resize", hideTip);
