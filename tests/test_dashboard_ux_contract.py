@@ -213,6 +213,18 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn('"statusInfo"', self.builder)
         self.assertNotIn('parts.push(key+" "+counts[key])', self.template)
 
+    def test_hypothesis_v2_audit_dimensions_are_visible(self):
+        for marker in (
+            "樣本性質：前瞻捕捉", "回溯基線", "到期未決", "獨立消息鏈",
+            "閱讀狀態由生命週期、證據強度與警示組合而成",
+        ):
+            self.assertIn(marker, self.template)
+        for marker in (
+            '"captureModeCounts"', '"lifecycleCounts"', '"dueCount"',
+            '"independentChains"', '"schemaVersion"',
+        ):
+            self.assertIn(marker, self.builder)
+
 
 if __name__ == "__main__":
     unittest.main()
