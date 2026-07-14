@@ -884,11 +884,15 @@ def main():
     rows = con.execute("""SELECT u.stock_id, u.name, u.grp, u.biz, sc.*, m.*
         FROM daily_scores sc JOIN universe u USING(stock_id) JOIN daily_metrics m USING(date, stock_id)
         WHERE sc.date=?""", (last,)).fetchall()
-    # 使用每日未平滑 composite 讓使用者能驗算 composite_s；每檔只留最近3個交易日、舊到新。
+    # 使用每日未平滑 composite 讓使用者能驗算 composite_s；同一份近5日歷史也供
+    # 「五日變層軌跡」使用。verdict() 仍只取最後3筆驗算 composite_s。
+    tier_dates = [r[0] for r in con.execute(
+        "SELECT DISTINCT date FROM daily_scores WHERE date<=? ORDER BY date DESC LIMIT 5",
+        (last,))][::-1]
     score_hist = defaultdict(list)
-    for h in con.execute("""SELECT date, stock_id, composite FROM daily_scores
+    for h in con.execute("""SELECT date, stock_id, composite, tier, tier_raw FROM daily_scores
                             WHERE date<=? ORDER BY stock_id, date DESC""", (last,)):
-        if len(score_hist[h["stock_id"]]) < 3:
+        if len(score_hist[h["stock_id"]]) < 5:
             score_hist[h["stock_id"]].insert(0, h)
     # 個股技術面:穿越/變化解讀需今日、昨日與5個交易日前;強調式小圖需20日
     # 還原價+MA20 → 每檔保留最近20個交易日,舊到新。
@@ -1019,6 +1023,20 @@ def main():
                 "axis": {"price": rel, "dip": dip,
                          "price5": _five_day_value(ser, "rel20"),
                          "dip5": _five_day_value(ser, "med_dip")},
+                # 族群熱圖使用原始數值與五日前數值；所有欄位皆是「越高越靠前」，
+                # 前端可用同一套跨族群名次色階，不把不同單位硬塞進同一數值尺度。
+                "heat": {
+                    "dip": [round(dip, 4) if dip is not None else None,
+                            _five_day_value(ser, "med_dip")],
+                    "breadth_f": [round(bf, 4) if bf is not None else None,
+                                  _five_day_value(ser, "breadth_f")],
+                    "rel20": [round(rel, 5) if rel is not None else None,
+                              _five_day_value(ser, "rel20")],
+                    "dist60": [round(dist, 5) if dist is not None else None,
+                               _five_day_value(ser, "med_dist60")],
+                    "breadth_t": [round(bt, 4) if bt is not None else None,
+                                  _five_day_value(ser, "breadth_t")],
+                },
                 # 30個交易日的走勢原料(缺值日剔除,迷你圖只看形狀)
                 "trend": {"dip": [round(x["med_dip"], 3) for x in ser[-30:]
                                   if x["med_dip"] is not None],
@@ -1093,6 +1111,24 @@ def main():
         obj = {"g": r["grp"], "id": r["stock_id"], "nm": r["name"], "biz": r["biz"] or "",
                "vt": vt, "vlabel": tier_meta["tier_label"], "vkey": tier,
                "vsub": vsub, "vr": vr, "vrows": vrows,
+               # 詳情面板的七因子發散條：條長固定看元素分(-2~+2)，權重與貢獻另列，
+               # 避免高權重把「族群相對位置」的原始分數尺度扭曲。
+               "factors": [
+                   {"k": "price", "label": "①相對強弱", "score": r["s_price"],
+                    "weight": WEIGHTS["price"]},
+                   {"k": "resil", "label": "①抗跌", "score": r["s_resil"],
+                    "weight": WEIGHTS["resil"]},
+                   {"k": "vol", "label": "②量", "score": r["s_vol"],
+                    "weight": WEIGHTS["vol"]},
+                   {"k": "foreign", "label": "③外資", "score": r["s_foreign"],
+                    "weight": WEIGHTS["foreign"]},
+                   {"k": "dip", "label": "③修正日買賣", "score": r["s_dip"],
+                    "weight": WEIGHTS["dip"]},
+                   {"k": "trust", "label": "④投信", "score": r["s_trust"],
+                    "weight": WEIGHTS["trust"]},
+                   {"k": "margin", "label": "⑤融資券", "score": r["s_margin"],
+                    "weight": WEIGHTS["margin"]},
+               ],
                # 綜評條原料:3日平滑分(實條)+近3日未平滑分(殘影點),與 vrows 文字同源
                "comp": round(r["composite_s"], 2) if r["composite_s"] is not None else None,
                "comp3": [round(h["composite"], 2) for h in hist[-3:]
@@ -1201,6 +1237,30 @@ def main():
     for o in data:
         del o["_comp"]
 
+    # 近5個交易日只列「已確認分層曾改變」的個股；未變層檔數由前端依族群篩選即時計算。
+    # states 保留策略 key，顯示名稱與顏色由 tiers 單一對照表提供。
+    tier_flow_stocks = []
+    for o in data:
+        by_date = {h["date"]: h["tier"] for h in score_hist.get(o["id"], [])}
+        states = [by_date.get(d) for d in tier_dates]
+        observed = [s for s in states if s is not None]
+        if len(observed) < 2 or len(set(observed)) < 2:
+            continue
+        last_change = max((i for i in range(1, len(states))
+                           if states[i] is not None and states[i - 1] is not None
+                           and states[i] != states[i - 1]), default=0)
+        tier_flow_stocks.append({"id": o["id"], "nm": o["nm"], "g": o["g"],
+                                 "states": states, "lastChange": last_change})
+    tier_pos = {t: i for i, t in enumerate(TIER_ORDER)}
+    tier_flow_stocks.sort(key=lambda o: (-o["lastChange"], GROUP_ORDER.index(o["g"]),
+                                         tier_pos.get(o["states"][-1], 99), o["id"]))
+    tier_flow = {
+        "dates": tier_dates,
+        "tiers": [{"key": t, "label": TIER_UI_LABEL.get(t, t),
+                   "col": TIER_COL.get(t, "var(--neutral)")} for t in TIER_ORDER],
+        "stocks": tier_flow_stocks,
+    }
+
     # ◇ 蓄勢候補獨立卡片:從中性池抽出、插在蓄勢旁(缺項少者排前)
     cands = sorted(((r["pending"].count("、"), -r["composite_s"], r["stock_id"], r["pending"])
                     for r in rows if r["pending"] and r["tier"] == "潛在/中性"))
@@ -1228,6 +1288,7 @@ def main():
     html = html.replace("__DATA_JSON__", json.dumps(data, ensure_ascii=False))
     html = html.replace("__TIERS_JSON__", json.dumps(tiers, ensure_ascii=False))
     html = html.replace("__GROUPS_JSON__", json.dumps(groups, ensure_ascii=False))
+    html = html.replace("__TIER_FLOW_JSON__", json.dumps(tier_flow, ensure_ascii=False))
     html = html.replace("__OVERVIEW_JSON__", json.dumps(overview, ensure_ascii=False))
     html = html.replace("__GRPMETA_JSON__", json.dumps(grpmeta, ensure_ascii=False))
     html = html.replace("__GORDER_JSON__", json.dumps(GROUP_ORDER))

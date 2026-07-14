@@ -46,6 +46,31 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("仍淨賣", overview["summary"])
         self.assertIn("相對最好不等於已出現買超", overview["summary"])
 
+    def test_group_heatmap_and_five_day_tier_flow_share_group_filter(self):
+        for marker in (
+            'id="groupHeatShell"', 'id="groupHeat"', "function rankOf(g,key)",
+            'id="tierFlowShell"', 'id="tierFlow"', "var TIER_FLOW = __TIER_FLOW_JSON__;",
+            'groupHeat.querySelectorAll("tbody tr[data-g]")',
+            'tierFlowHost.querySelectorAll(".flow-row[data-g]")',
+        ):
+            self.assertIn(marker, self.template)
+        self.assertNotIn('textContent="39 檔', self.template)
+        for marker in ('"heat": {', '"states": states', '"lastChange": last_change',
+                       'html.replace("__TIER_FLOW_JSON__"'):
+            self.assertIn(marker, self.builder)
+        self.assertIn("LIMIT 5", self.builder)
+
+    def test_stock_verdict_drawer_has_seven_factor_diverging_profile(self):
+        for marker in (
+            "function renderFactorProfile(box, factors)", "七因子分數輪廓",
+            "gDivergeBar(score,2)", "if(html.factors && html.factors.length)",
+            "條長表示元素分的相對位置", "factors:row.factors",
+        ):
+            self.assertIn(marker, self.template)
+        self.assertEqual(self.template.count("factors:row.factors"), 3)
+        for label in ("①相對強弱", "①抗跌", "②量", "③外資", "③修正日買賣", "④投信", "⑤融資券"):
+            self.assertIn(f'"label": "{label}"', self.builder)
+
     def test_mobile_cards_replace_the_wide_matrix_and_share_filters_search(self):
         required = (
             'class="mobile-stocks" id="mobileStocks"',

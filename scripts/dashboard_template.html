@@ -166,6 +166,73 @@
     #groupMap .group-label{font-size:15px}
   }
 
+  /* ---- 族群熱圖矩陣：同欄跨族群名次著色，數字仍保留原始單位 ---- */
+  .group-heat-shell{margin:0 0 14px;padding:14px 16px 12px;border:1px solid var(--hairline);
+    border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+  .group-heat-shell figcaption,.tier-flow-shell figcaption{display:flex;align-items:baseline;
+    gap:7px 14px;flex-wrap:wrap;margin-bottom:10px}
+  .group-heat-shell figcaption b,.tier-flow-shell figcaption b{font-size:14px}
+  .group-heat-shell figcaption span,.tier-flow-shell figcaption span{color:var(--muted);font-size:12.5px}
+  .group-heat-table{width:100%;table-layout:fixed;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  .group-heat-table th{padding:7px 6px;color:var(--muted);font-size:11.5px;font-weight:700;
+    line-height:1.35;text-align:center;border-bottom:1px solid var(--hairline)}
+  .group-heat-table th:first-child{width:132px;text-align:left}
+  .group-heat-table td{padding:6px;text-align:center;border-top:1px solid var(--hairline-2)}
+  .group-heat-table tbody tr:first-child td{border-top:none}
+  .group-heat-table tbody tr{transition:opacity .15s ease}
+  .group-heat-table tbody tr.heatdim{opacity:.24}
+  .heat-group{width:100%;min-height:34px;padding:4px 7px;border:0;border-radius:7px;background:transparent;
+    color:var(--ink);font-size:12.5px;font-weight:800;text-align:left;cursor:pointer}
+  .heat-group:hover{background:var(--surface-2)}
+  .heat-cell{display:flex;align-items:center;justify-content:center;gap:5px;min-height:34px;
+    padding:4px 5px;border-radius:7px;color:var(--ink);font-size:12px;font-weight:800;white-space:nowrap}
+  .heat-cell.rank-p2{background:var(--strong-tint-2)}
+  .heat-cell.rank-p1{background:var(--strong-tint)}
+  .heat-cell.rank-mid{background:var(--neutral-tint)}
+  .heat-cell.rank-n1{background:var(--weak-tint)}
+  .heat-cell.rank-n2{background:var(--weak-tint-2)}
+  .heat-delta{font-size:10.5px;font-weight:900}
+  .heat-delta.better{color:var(--health)} .heat-delta.worse{color:var(--warn)}
+  .heat-delta.flat{color:var(--muted)}
+  .heat-short{display:none}
+
+  /* ---- 五日變層軌跡：所有列共用日期軸與分層高度，可直接上下比較 ---- */
+  .tier-flow-shell{margin:0 0 14px;padding:14px 16px 12px;border:1px solid var(--hairline);
+    border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+  .flow-tier-key{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;margin:0 0 8px;
+    color:var(--muted);font-size:11.5px}
+  .flow-tier-key span{display:inline-flex;align-items:center;gap:5px}
+  .flow-tier-key i{width:8px;height:8px;border-radius:50%;background:var(--fc,var(--neutral));flex:0 0 auto}
+  .flow-axis{display:flex;align-items:center;gap:12px;padding:2px 4px 7px;color:var(--muted);font-size:11px}
+  .flow-axis>span:first-child{flex:0 0 auto;white-space:nowrap}
+  .flow-axis>span:last-child{display:none}
+  .flow-dates{display:grid;grid-template-columns:repeat(5,1fr);width:min(420px,75%);text-align:center}
+  .flow-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--hairline)}
+  .flow-row{display:grid;grid-template-columns:minmax(64px,88px) minmax(0,1fr);gap:4px;align-items:center;
+    width:100%;min-height:50px;padding:3px 5px;border:0;border-right:1px solid var(--hairline-2);
+    border-bottom:1px solid var(--hairline-2);border-radius:0;background:transparent;color:var(--ink);
+    text-align:left;cursor:pointer}
+  .flow-row:hover{background:var(--surface-2)}
+  .flow-stock{min-width:0;line-height:1.3}
+  .flow-stock b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px}
+  .flow-stock span{display:block;color:var(--muted);font-size:10.5px}
+  .flow-row svg{display:block;width:100%;height:42px;overflow:visible}
+  .flow-now{display:none}
+  @media (max-width:860px){.flow-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:620px){
+    .group-heat-shell,.tier-flow-shell{padding:12px 8px 9px}
+    .group-heat-table th:first-child{width:76px}
+    .group-heat-table th,.group-heat-table td{padding:5px 2px}
+    .heat-group{padding:3px 4px;font-size:11.5px}
+    .heat-cell{gap:2px;padding:3px 1px;font-size:11px}
+    .heat-full{display:none}.heat-short{display:inline}
+    .heat-delta{font-size:9.5px}
+    .flow-axis{padding-left:2px;padding-right:2px;gap:6px}
+    .flow-dates{width:auto;flex:1 1 auto}
+    .flow-row{grid-template-columns:minmax(54px,66px) minmax(0,1fr);padding:3px;min-height:50px}
+    .flow-stock b{font-size:11.5px}
+  }
+
   /* ---- matrix toolbar(搜尋/排序) ---- */
   .mtoolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 8px}
   .msearch{font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);
@@ -489,6 +556,28 @@
   #sheetBody .data{font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums;
     font-size:12.5px;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline-2);
     border-radius:10px;padding:10px 12px;margin-bottom:11px;line-height:1.55;white-space:pre-wrap}
+  /* 個股綜評詳情：七因子同尺度發散條。條長只表元素分，右側另列權重與加權貢獻。 */
+  #sheetBody .factor-profile{margin:13px 0 14px;padding:12px 0;border-top:1px solid var(--hairline);
+    border-bottom:1px solid var(--hairline)}
+  #sheetBody .factor-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    margin:0 0 6px;font-size:13px;font-weight:800}
+  #sheetBody .factor-title span{color:var(--muted);font-size:10.5px;font-weight:500;text-align:right}
+  #sheetBody .factor-scale,#sheetBody .factor-row{display:grid;
+    grid-template-columns:minmax(88px,116px) minmax(120px,1fr) minmax(86px,104px);gap:8px;align-items:center}
+  #sheetBody .factor-scale{margin-bottom:2px;color:var(--muted);font-size:10px}
+  #sheetBody .factor-scale .ticks{display:flex;justify-content:space-between}
+  #sheetBody .factor-row{min-height:29px}
+  #sheetBody .factor-label{font-size:11.5px;font-weight:700;white-space:nowrap}
+  #sheetBody .factor-bar{height:14px}
+  #sheetBody .factor-bar .gd{display:block;width:100%;height:14px}
+  #sheetBody .factor-value{text-align:right;color:var(--ink-2);font-size:10.5px;white-space:nowrap;
+    font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  #sheetBody .factor-note{margin:7px 0 0;color:var(--muted);font-size:10.5px;line-height:1.5}
+  @media (max-width:420px){
+    #sheetBody .factor-scale,#sheetBody .factor-row{grid-template-columns:76px minmax(90px,1fr) 80px;gap:5px}
+    #sheetBody .factor-label{font-size:10.5px}
+    #sheetBody .factor-value{font-size:9.5px}
+  }
   /* 質化筆記全文(renderNoteDetail 專用,同樣掛在 #sheetBody 底下) */
   #sheetBody .nb-h{font-size:13.5px;font-weight:800;color:var(--ink);margin:18px 0 8px}
   #sheetBody .nb-h:first-of-type{margin-top:2px}
@@ -786,9 +875,29 @@
       <desc id="groupMapDesc">橫軸是族群二十日動能相對全體，越右代表跑贏；縱軸是修正日外資買賣中位數，越上代表淨買。灰線顯示五個交易日的移動方向。</desc>
     </svg>
   </figure>
+  <figure class="group-heat-shell" id="groupHeatShell">
+    <figcaption><b>族群熱圖矩陣</b><span>每欄各自比較所有族群：紅底=相對前段、綠底=相對後段；數字保留原始值，▲／▼／→ 表示較 5 個交易日前改善／惡化／持平。<b>點族群名稱=只看該族群</b>。</span></figcaption>
+    <table class="group-heat-table" id="groupHeat" aria-label="族群五項價格與籌碼指標熱圖矩陣">
+      <thead><tr>
+        <th scope="col">族群</th>
+        <th scope="col"><span class="heat-full">修正日外資</span><span class="heat-short">修正外資</span></th>
+        <th scope="col"><span class="heat-full">外資增持廣度</span><span class="heat-short">外資廣度</span></th>
+        <th scope="col"><span class="heat-full">20日相對動能</span><span class="heat-short">相對動能</span></th>
+        <th scope="col"><span class="heat-full">距60日高</span><span class="heat-short">距高</span></th>
+        <th scope="col"><span class="heat-full">投信買超廣度</span><span class="heat-short">投信廣度</span></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </figure>
   <div class="tiers" id="groups"></div>
 
   <h2 class="sec" id="tiers-section">個股分層 · 已確認的相對強弱</h2>
+  <figure class="tier-flow-shell" id="tierFlowShell">
+    <figcaption><b>五日變層軌跡</b><span id="tierFlowCount">載入近 5 個交易日分層…</span><span>只列已確認分層曾改變的個股；每列共用日期與上下分層尺度，點按可看七因子詳情。</span></figcaption>
+    <div class="flow-tier-key" id="tierFlowKey" aria-label="分層由上到下的圖例"></div>
+    <div class="flow-axis" aria-hidden="true"><span>日期</span><span class="flow-dates" id="tierFlowDates"></span><span>目前分層</span></div>
+    <div class="flow-list" id="tierFlow"></div>
+  </figure>
   <div class="tiers" id="tiers"></div>
 
   <h2 class="sec" id="stocks-section">個股明細 · 五個觀察面向（共 7 指標），每格點按看完整計算</h2>
@@ -1094,6 +1203,7 @@
     return s;}
   // c = cell: [score,valueText,rows,relativeReading,warn,currentRawDirection,scoreBasis]
   var DATA = __DATA_JSON__;
+  var TIER_FLOW = __TIER_FLOW_JSON__;
   // 權重供方法區 chips 與綜合分尺度共用;CMAX=|權重|×2 加總=綜合分理論滿分(±)
   var WEIGHTS = __WEIGHTS_JSON__;
   var CMAX=(function(){var t=0;for(var k in WEIGHTS)t+=Math.abs(WEIGHTS[k])*2;return t||8.8;})();
@@ -1211,6 +1321,36 @@
     });
     box.appendChild(dl);container.appendChild(box);
   }
+  function renderFactorProfile(box, factors){
+    if(!factors || !factors.length) return;
+    var profile=document.createElement("section"); profile.className="factor-profile";
+    profile.setAttribute("role","group");
+    profile.setAttribute("aria-label","七因子分數發散圖，中央是零分，右側為正分，左側為負分");
+    var title=document.createElement("h3"); title.className="factor-title";
+    title.appendChild(document.createTextNode("七因子分數輪廓"));
+    var sub=document.createElement("span"); sub.textContent="同尺度 −2～+2"; title.appendChild(sub);
+    profile.appendChild(title);
+    var scale=document.createElement("div"); scale.className="factor-scale";
+    scale.appendChild(document.createElement("span"));
+    var ticks=document.createElement("span"); ticks.className="ticks";
+    ["−2","0","+2"].forEach(function(v){var s=document.createElement("span");s.textContent=v;ticks.appendChild(s);});
+    scale.appendChild(ticks);
+    var calc=document.createElement("span");calc.textContent="分 × 權重 = 貢獻";scale.appendChild(calc);
+    profile.appendChild(scale);
+    factors.forEach(function(f){
+      var score=Number(f.score), weight=Number(f.weight), contribution=score*weight;
+      var row=document.createElement("div"); row.className="factor-row";
+      var label=document.createElement("span"); label.className="factor-label"; label.textContent=f.label; row.appendChild(label);
+      var bar=document.createElement("span"); bar.className="factor-bar"; bar.appendChild(gDivergeBar(score,2)); row.appendChild(bar);
+      var value=document.createElement("span"); value.className="factor-value"; value.style.color=scColor(score);
+      value.textContent=(score>0?"+":"")+score+" ×"+weight.toFixed(weight%1?1:0)+" = "+
+        (contribution>0?"+":"")+contribution.toFixed(1);
+      row.appendChild(value); profile.appendChild(row);
+    });
+    var note=document.createElement("p"); note.className="factor-note";
+    note.textContent="條長表示元素分的相對位置，不代表原始值一定為正；右紅=正分、左綠=負分，權重 0 的因子只參與分層條件。";
+    profile.appendChild(note); box.appendChild(profile);
+  }
   function renderDetail(box, html){   // 建立詳情內容 → tooltip 與 bottom sheet 共用
     box.innerHTML = "";
     var head = document.createElement("div"); head.className="th";
@@ -1227,6 +1367,7 @@
     var wb=document.createElement("b"); setText(wb, "判讀:"); why.appendChild(wb);
     why.appendChild(document.createTextNode(html.why == null ? "" : String(html.why)));
     box.appendChild(why);
+    if(html.factors && html.factors.length) renderFactorProfile(box,html.factors);
     if(html.techChart && html.techChart.px && html.techChart.px.length>1){
       // 20日還原價+三條均線:均線用全站 MA 識別色(與文字列同源),另以線型雙編碼
       // (MA5短虛/MA20實/MA60長虛)——藍/紫色弱下近色,不單靠顏色分;圖例鍵同線型。
@@ -1881,7 +2022,7 @@
       var waiting=typeof row.tier_waiting==="boolean"?row.tier_waiting:!!row.vchanging;
       var confirmedKey=row.tier_confirmed||row.vkey||row.tier||confirmedLabel;
       return { el:"已確認分層 · 五個觀察面向", who: row.nm+"("+row.id+")", biz: row.biz,
-        rows: row.vrows, why: row.vr,
+        rows: row.vrows, factors:row.factors, why: row.vr,
         how: (waiting?"今日初判為「"+rawLabel+"」，目前是第 1/2 日，連續兩日相同才會正式轉層。":"")+
              (TIER_HOW[confirmedKey]||TIER_HOW[confirmedLabel]||""),
         howLink: "完整公式與權重依據見頁尾「方法與資料」",
@@ -2006,7 +2147,7 @@
     if(waiting){var pend=document.createElement("div");pend.className="pending";pend.textContent="今日初判 1/2："+rawLabel+"（尚未轉層）";vd.appendChild(pend);}
     attachTip(vd,(function(row,confirmedLabel,rawLabel,waiting){return function(){
       var key=row.tier_confirmed||row.vkey||row.tier||confirmedLabel; return {el:"已確認分層 · 五個觀察面向",who:row.nm+"("+row.id+")",
-        biz:row.biz,rows:row.vrows,why:row.vr,how:(waiting?"今日初判為「"+rawLabel+"」，目前第 1/2 日。":"")+
+        biz:row.biz,rows:row.vrows,factors:row.factors,why:row.vr,how:(waiting?"今日初判為「"+rawLabel+"」，目前第 1/2 日。":"")+
         (TIER_HOW[key]||TIER_HOW[confirmedLabel]||""),howLink:"完整公式與權重依據見頁尾「方法與資料」",
         src:"由各指標分數加權，取近三日平均，再以連續兩日確認分層",scLabel:confirmedLabel,
         scColor:scColor(row.vt),scBg:tintBg(row.vt)};};})(row,confirmedLabel,rawLabel,waiting));
@@ -2122,6 +2263,64 @@
   // ---------- group radar ----------
   var GROUPS = __GROUPS_JSON__;
   var GROUP_HOW = __GROUP_HOW_JSON__;   // 狀態判定規則+資料來源(門檻值由 build 注入,單一事實來源)
+  (function(){
+    var table=document.getElementById("groupHeat"), shell=document.getElementById("groupHeatShell");
+    if(!table) return;
+    var body=table.querySelector("tbody");
+    var items=GROUPS.filter(function(g){return g.heat;});
+    if(!items.length){if(shell)shell.hidden=true;return;}
+    var cols=[
+      {key:"dip",label:"修正日外資買賣中位",eps:.01,fmt:function(v){return signed(v,2);}},
+      {key:"breadth_f",label:"外資增持廣度",eps:.01,fmt:function(v){return Math.round(v*100)+"%";}},
+      {key:"rel20",label:"20日相對動能",eps:.005,fmt:function(v){return signed(v*100,1);}},
+      {key:"dist60",label:"距60日高",eps:.001,fmt:function(v){return signed(v*100,1);}},
+      {key:"breadth_t",label:"投信買超廣度",eps:.01,fmt:function(v){return Math.round(v*100)+"%";}}
+    ];
+    function signed(v,d){return (v>0?"+":"")+Number(v).toFixed(d)+"%";}
+    function valueOf(g,key){var pair=g.heat&&g.heat[key];return pair&&pair[0]!=null?Number(pair[0]):null;}
+    function rankOf(g,key){
+      var v=valueOf(g,key), vals=items.map(function(x){return valueOf(x,key);})
+        .filter(function(x){return x!=null&&isFinite(x);});
+      if(v==null||!vals.length)return null;
+      var lower=vals.filter(function(x){return x<v;}).length;
+      var same=vals.filter(function(x){return x===v;}).length;
+      var pct=vals.length===1?0.5:(lower+(same-1)/2)/(vals.length-1);
+      var place=1+vals.filter(function(x){return x>v;}).length;
+      return {pct:pct,place:place,total:vals.length};
+    }
+    function rankClass(p){return p>=.8?"rank-p2":p>=.6?"rank-p1":p>=.4?"rank-mid":p>=.2?"rank-n1":"rank-n2";}
+    items.forEach(function(g){
+      var tr=document.createElement("tr");tr.dataset.g=g.g;
+      var first=document.createElement("td");
+      var btn=document.createElement("button");btn.type="button";btn.className="heat-group";btn.textContent=g.nm;
+      btn.setAttribute("aria-pressed","false");
+      btn.setAttribute("aria-label",g.nm+"，點按只看此族群，再點一次取消");
+      btn.addEventListener("click",function(){
+        if(!GFILTER)return;var on=GFILTER.toggle(g.g);
+        if(on){var card=document.querySelector("#groups .tier[data-g='"+g.g+"']");if(card)card.scrollIntoView({behavior:"smooth",block:"nearest"});}
+      });
+      first.appendChild(btn);tr.appendChild(first);
+      cols.forEach(function(c){
+        var pair=g.heat[c.key]||[], cur=pair[0], prev=pair[1], td=document.createElement("td");
+        if(cur==null||!isFinite(Number(cur))){td.textContent="—";td.setAttribute("aria-label",g.nm+" "+c.label+"資料不足");tr.appendChild(td);return;}
+        cur=Number(cur);var rank=rankOf(g,c.key), cell=document.createElement("span");
+        cell.className="heat-cell "+rankClass(rank.pct);cell.setAttribute("aria-hidden","true");
+        var value=document.createElement("span");value.textContent=c.fmt(cur);cell.appendChild(value);
+        var delta=document.createElement("span");delta.className="heat-delta";
+        var deltaLabel="5日比較資料不足";
+        if(prev==null||!isFinite(Number(prev))){delta.textContent="·";delta.classList.add("flat");}
+        else {var diff=cur-Number(prev);
+          if(diff>=c.eps){delta.textContent="▲";delta.classList.add("better");deltaLabel="較5個交易日前改善";}
+          else if(diff<=-c.eps){delta.textContent="▼";delta.classList.add("worse");deltaLabel="較5個交易日前惡化";}
+          else {delta.textContent="→";delta.classList.add("flat");deltaLabel="較5個交易日前持平";}
+        }
+        cell.appendChild(delta);td.appendChild(cell);
+        td.setAttribute("aria-label",g.nm+"，"+c.label+" "+c.fmt(cur)+"，"+rank.total+"族群中第"+rank.place+"，"+deltaLabel);
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  })();
   (function(){
     var svg=document.getElementById("groupMap"), shell=document.getElementById("groupMapShell");
     if(!svg) return;
@@ -2318,6 +2517,64 @@
     });
   })();
 
+  // ---------- 五日變層軌跡：只列已確認分層曾改變的個股 ----------
+  (function(){
+    var shell=document.getElementById("tierFlowShell"), host=document.getElementById("tierFlow"),
+        keyHost=document.getElementById("tierFlowKey"), dateHost=document.getElementById("tierFlowDates"),
+        count=document.getElementById("tierFlowCount");
+    if(!shell||!host||!TIER_FLOW||!TIER_FLOW.dates||TIER_FLOW.dates.length<2){if(shell)shell.hidden=true;return;}
+    var meta={}, rows={};
+    TIER_FLOW.tiers.forEach(function(t){
+      meta[t.key]=t;
+      var item=document.createElement("span"), dot=document.createElement("i");
+      dot.style.setProperty("--fc",t.col);item.appendChild(dot);item.appendChild(document.createTextNode(t.label));keyHost.appendChild(item);
+    });
+    DATA.forEach(function(d){rows[d.id]=d;});
+    TIER_FLOW.dates.forEach(function(d){
+      var s=document.createElement("span");s.textContent=Number(d.slice(5,7))+"/"+Number(d.slice(8,10));dateHost.appendChild(s);
+    });
+    var stocks=TIER_FLOW.stocks||[];
+    if(count)count.textContent=stocks.length+" 檔曾變層 · "+Math.max(0,DATA.length-stocks.length)+" 檔維持原層";
+    if(!stocks.length){host.hidden=true;return;}
+    function yOf(key){var i=TIER_FLOW.tiers.findIndex(function(t){return t.key===key;});
+      return i<0?22:4+i/(Math.max(1,TIER_FLOW.tiers.length-1))*36;}
+    function shortTier(key){return {"真強":"強","蓄勢·外資佈局":"蓄","強但過熱":"熱",
+      "潛在/中性":"中","真弱":"弱","真弱·陷阱":"槓"}[key]||"—";}
+    stocks.forEach(function(s){
+      var row=rows[s.id];if(!row)return;
+      var btn=document.createElement("button");btn.type="button";btn.className="flow-row";btn.dataset.g=s.g;
+      btn.setAttribute("aria-haspopup","dialog");
+      var stock=document.createElement("span");stock.className="flow-stock";
+      var nm=document.createElement("b");nm.textContent=s.nm;stock.appendChild(nm);
+      var code=document.createElement("span");
+      var observed=s.states.filter(function(state){return state!=null;});
+      code.textContent=s.id+" · "+shortTier(observed[0])+"→"+shortTier(observed[observed.length-1]);
+      stock.appendChild(code);btn.appendChild(stock);
+      var svg=svgNode("svg",{viewBox:"0 0 100 44",preserveAspectRatio:"none","aria-hidden":"true"});
+      var points=[];
+      s.states.forEach(function(state,i){
+        var x=3+i/(s.states.length-1)*94;
+        svg.appendChild(svgNode("line",{x1:x,y1:2,x2:x,y2:42,stroke:"var(--hairline-2)",
+          "stroke-width":1,"vector-effect":"non-scaling-stroke"}));
+        if(state!=null)points.push({x:x,y:yOf(state),state:state,i:i});
+      });
+      if(points.length>1)svg.appendChild(svgNode("path",{d:points.map(function(p,i){return (i?"L":"M")+p.x+" "+p.y;}).join(" "),
+        fill:"none",stroke:"var(--ink-2)","stroke-width":1.6,"stroke-linecap":"round","stroke-linejoin":"round",
+        "vector-effect":"non-scaling-stroke"}));
+      points.forEach(function(p,i){
+        var latest=i===points.length-1;
+        svg.appendChild(svgNode("line",{x1:p.x,y1:p.y,x2:p.x,y2:p.y+.01,stroke:(meta[p.state]||{}).col||"var(--neutral)",
+          "stroke-width":latest?8:5.5,"stroke-linecap":"round","vector-effect":"non-scaling-stroke"}));
+      });
+      btn.appendChild(svg);
+      var spoken=s.states.map(function(state,i){return Number(TIER_FLOW.dates[i].slice(5,7))+"/"+
+        Number(TIER_FLOW.dates[i].slice(8,10))+" "+(state&&meta[state]?meta[state].label:"資料不足");}).join("，");
+      btn.setAttribute("aria-label",s.nm+"("+s.id+") 五日分層軌跡："+spoken+"。點按查看七因子詳情");
+      btn.addEventListener("click",function(){openSheet(pickVerdictPayload(row),null,btn);});
+      host.appendChild(btn);
+    });
+  })();
+
   // ---------- market chip(頁首市場環境籤條的詳情)----------
   var MKT_TIP = __MKT_TIP_JSON__;
   (function(){
@@ -2351,7 +2608,7 @@
     var waiting=typeof row.tier_waiting==="boolean"?row.tier_waiting:false;
     var confirmedKey=row.tier_confirmed||row.vkey||confirmedLabel;
     return { el:"已確認分層 · 五個觀察面向", who: row.nm+"("+row.id+")", biz: row.biz,
-      rows: row.vrows, why: row.vr,
+      rows: row.vrows, factors:row.factors, why: row.vr,
       how:(waiting?"今日初判為「"+rawLabel+"」，目前是第 1/2 日，連續兩日相同才會正式轉層。":"")+
           (TIER_HOW[confirmedKey]||TIER_HOW[confirmedLabel]||""),
       howLink:"完整公式與權重依據見頁尾「方法與資料」",
@@ -2440,6 +2697,9 @@
     var total = DATA.length;
     var scope = document.getElementById("scopeChip");
     var groupsHost = document.getElementById("groups");
+    var groupHeat = document.getElementById("groupHeat");
+    var tierFlowHost = document.getElementById("tierFlow");
+    var tierFlowCount = document.getElementById("tierFlowCount");
     function nmOf(g){ return (GRP[g] && GRP[g].nm) || g; }
 
     // 篩選狀態:mode "all" = 不篩選(預設);"some" = 只顯示 sel 內的族群。
@@ -2526,6 +2786,25 @@
           n.classList.toggle("mapdim", mode!=="all" && !visible(g));
           n.setAttribute("aria-pressed", String(mode==="some" && sel.has(g)));
         });
+      }
+      // 熱圖同樣是篩選入口：保留全部族群供比較與切換，未選列只調淡。
+      if(groupHeat){
+        Array.prototype.forEach.call(groupHeat.querySelectorAll("tbody tr[data-g]"),function(n){
+          var g=n.dataset.g, on=mode==="some"&&sel.has(g);
+          n.classList.toggle("heatdim",mode!=="all"&&!visible(g));
+          var b=n.querySelector(".heat-group");if(b)b.setAttribute("aria-pressed",String(on));
+        });
+      }
+      // 五日軌跡跟著族群篩選，只算目前範圍內「曾變層／維持原層」檔數。
+      if(tierFlowHost){
+        var changed=0;
+        Array.prototype.forEach.call(tierFlowHost.querySelectorAll(".flow-row[data-g]"),function(n){
+          var show=visible(n.dataset.g);n.style.display=show?"":"none";if(show)changed++;
+        });
+        if(tierFlowCount){
+          var scopedTotal=DATA.reduce(function(n,d){return n+(visible(d.g)?1:0);},0);
+          tierFlowCount.textContent=changed+" 檔曾變層 · "+Math.max(0,scopedTotal-changed)+" 檔維持原層";
+        }
       }
       // 結論:過濾每張 tier 卡的 picks,整卡無標的則隱藏
       Array.prototype.forEach.call(tiers.children, function(card){
