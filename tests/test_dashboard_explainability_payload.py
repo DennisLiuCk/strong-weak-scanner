@@ -63,6 +63,8 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
             [("現價", "price"), ("MA5", "ma5"), ("MA20", "ma20"), ("MA60", "ma60")],
         )
         self.assertEqual(view["series"][1]["value"], "106")
+        self.assertEqual(view["chart"]["dates"], [row["date"] for row in history])
+        self.assertEqual(len(view["chart"]["dates"]), len(view["chart"]["px"]))
 
     def test_rsi_copy_explains_the_50_line_in_plain_language(self):
         history = technical_history()
@@ -225,6 +227,8 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
         con.close()
 
         self.assertEqual(fund["label"], "營收YoY -33%")
+        self.assertEqual(fund["sparkDates"], ["2025/05", "2026/04", "2026/05"])
+        self.assertEqual(len(fund["sparkDates"]), len(fund["spark"]))
         for phrase in ("營收不等於獲利", "需求", "基期", "收入認列時點", "工作天數"):
             self.assertIn(phrase, fund["why"])
         self.assertNotIn("營運動能轉弱", fund["why"])

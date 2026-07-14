@@ -509,6 +509,42 @@
   #tip .preview-hint{margin-top:8px;padding-top:7px;border-top:1px dashed var(--hairline);color:var(--muted);
     font-size:11.5px;font-weight:700}
 
+  /* 圖表節點詳情：桌機跟著節點浮動；觸控裝置固定在底部，避免手指遮住內容。 */
+  #chartTip{position:fixed;z-index:90;width:min(330px,calc(100vw - 28px));max-width:330px;
+    background:var(--surface);color:var(--ink);border:1px solid var(--hairline);border-radius:12px;
+    box-shadow:var(--shadow);padding:11px 12px;pointer-events:none;opacity:0;
+    transform:translateY(3px);transition:opacity .1s ease,transform .1s ease}
+  #chartTip.on{opacity:1;transform:translateY(0)}
+  #chartTip .chart-tip-title{font-size:10.5px;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  #chartTip .chart-tip-date{font-size:14px;font-weight:800;margin:2px 0 7px}
+  #chartTip .chart-tip-values{background:var(--surface-2);border:1px solid var(--hairline-2);
+    border-radius:8px;padding:3px 9px}
+  #chartTip .chart-tip-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;
+    align-items:center;padding:5px 0;font-size:11.5px}
+  #chartTip .chart-tip-row + .chart-tip-row{border-top:1px solid var(--hairline-2)}
+  #chartTip .chart-tip-label{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
+  #chartTip .chart-tip-dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:var(--neutral)}
+  #chartTip .chart-tip-value{font-size:12px;font-weight:800;text-align:right;
+    font-family:"Cascadia Mono",Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  #chartTip .chart-tip-meaning,#chartTip .chart-tip-source{font-size:10.5px;line-height:1.5;color:var(--muted)}
+  #chartTip .chart-tip-meaning{margin-top:7px;color:var(--ink-2)}
+  #chartTip .chart-tip-source{margin-top:4px;padding-top:4px;border-top:1px dashed var(--hairline-2)}
+  #chartTip .chart-tip-source b{color:var(--ink-2)}
+  .chart-interaction-hint{margin-left:auto;color:var(--muted);font-size:10.5px;font-weight:600}
+  .chart-guide{opacity:0;pointer-events:none;transition:opacity .08s ease}
+  .chart-guide.on{opacity:.8}
+  .chart-hit{cursor:crosshair;pointer-events:all}
+  svg.chart-focus:focus-visible{outline:2px solid var(--health);outline-offset:2px}
+  @media (hover:none),(pointer:coarse){
+    #chartTip{left:14px!important;right:14px;top:auto!important;bottom:calc(14px + env(safe-area-inset-bottom,0px));
+      width:auto;max-width:none;transform:translateY(8px)}
+    #chartTip.on{transform:translateY(0)}
+  }
+  /* ?touch=1 與混合輸入平板不一定會命中上方 media query；JS 同步的 class 作為同規格後援。 */
+  #chartTip.touch{left:14px!important;right:14px;top:auto!important;
+    bottom:calc(14px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;transform:translateY(8px)}
+  #chartTip.touch.on{transform:translateY(0)}
+
   /* ---- bottom sheet(觸控裝置的詳情;桌機不會顯示) ---- */
   #sheetWrap{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;
     justify-content:flex-end;visibility:hidden;pointer-events:none}
@@ -869,7 +905,7 @@
 
   <h2 class="sec" id="groups-section">族群概況 · 價格與籌碼現在在哪裡</h2>
   <figure class="group-map-shell" id="groupMapShell">
-    <figcaption><b>族群價籌四象限</b><span>灰線從 5 個交易日前指向現在；終點文字是目前位置。右上代表價格相對跑贏且修正日淨買，左下代表跑輸且淨賣；仍須搭配下方數值閱讀。<b>點族群圓點=只看該族群</b>，再點一次取消。</span></figcaption>
+    <figcaption><b>族群價籌四象限</b><span>灰線從 5 個交易日前指向現在；終點文字是目前位置。右上代表價格相對跑贏且修正日淨買，左下代表跑輸且淨賣。<b>滑過／點節點看日期、雙軸數值與來源；點族群名稱=只看該族群</b>，再點一次取消。</span></figcaption>
     <svg id="groupMap" viewBox="0 0 520 430" role="img" aria-labelledby="groupMapTitle groupMapDesc">
       <title id="groupMapTitle">族群價格動能與修正日外資買賣四象限</title>
       <desc id="groupMapDesc">橫軸是族群二十日動能相對全體，越右代表跑贏；縱軸是修正日外資買賣中位數，越上代表淨買。灰線顯示五個交易日的移動方向。</desc>
@@ -893,7 +929,7 @@
 
   <h2 class="sec" id="tiers-section">個股分層 · 已確認的相對強弱</h2>
   <figure class="tier-flow-shell" id="tierFlowShell">
-    <figcaption><b>五日變層軌跡</b><span id="tierFlowCount">載入近 5 個交易日分層…</span><span>只列已確認分層曾改變的個股；每列共用日期與上下分層尺度，點按可看七因子詳情。</span></figcaption>
+    <figcaption><b>五日變層軌跡</b><span id="tierFlowCount">載入近 5 個交易日分層…</span><span>只列已確認分層曾改變的個股；滑過／點節點看當日分層與來源，點列的其他位置看七因子詳情。</span></figcaption>
     <div class="flow-tier-key" id="tierFlowKey" aria-label="分層由上到下的圖例"></div>
     <div class="flow-axis" aria-hidden="true"><span>日期</span><span class="flow-dates" id="tierFlowDates"></span><span>目前分層</span></div>
     <div class="flow-list" id="tierFlow"></div>
@@ -1034,6 +1070,7 @@
 </div>
 
 <div id="tip" role="tooltip" aria-hidden="true"></div>
+<div id="chartTip" role="status" aria-live="polite" aria-hidden="true"></div>
 
 <div id="sheetWrap" aria-hidden="true">
   <div id="sheetBackdrop"></div>
@@ -1137,19 +1174,41 @@
     else s.appendChild(svgNode("rect",{x:cx-0.9,y:H/2-2,width:1.8,height:4,fill:"var(--neutral)"}));
     return s;}
   // 綜評條:實條=3日平均(評級用),殘影點=近3日未平滑分——看得出動能在增強或衰退
-  function gCompositeBar(avg,daily,max){
-    var W=300,H=20,s=svgRoot(W,H,"gc"),cx=W/2,y=5,h=10;
+  function gCompositeBar(avg,daily,max,opt){
+    opt=opt||{};
+    var W=300,H=20,s=svgRoot(W,H,"gc"),cx=W/2,y=5,h=10,dates=opt.dates||[];
     s.appendChild(svgNode("line",{x1:cx,y1:1,x2:cx,y2:H-1,stroke:"var(--hairline)","stroke-width":1.5}));
     var col=avg>0?"var(--strong)":avg<0?"var(--weak)":"var(--neutral)";
     var w=Math.min(Math.abs(avg)/max,1)*(W/2-6);
     if(avg)s.appendChild(svgNode("rect",{x:avg>0?cx:cx-w,y:y,width:Math.max(3,w),height:h,rx:3,
       fill:col,opacity:.85}));
-    (daily||[]).forEach(function(d){
-      s.appendChild(svgNode("circle",{cx:cx+Math.max(-1,Math.min(1,d/max))*(W/2-6),cy:y+h/2,r:3,
+    var dailyHits=[];
+    (daily||[]).forEach(function(d,i){
+      var x=cx+Math.max(-1,Math.min(1,d/max))*(W/2-6);
+      s.appendChild(svgNode("circle",{cx:x,cy:y+h/2,r:3,
         fill:d>0?"var(--strong)":d<0?"var(--weak)":"var(--neutral)",opacity:.4,
-        stroke:"var(--surface)","stroke-width":1.5}));});
-    s.appendChild(svgNode("circle",{cx:cx+(avg>0?w:avg<0?-w:0),cy:y+h/2,r:4.5,fill:col,
+        stroke:"var(--surface)","stroke-width":1.5,"pointer-events":"none"}));
+      dailyHits.push({x:x,value:d,date:dates[i]});
+    });
+    var avgX=cx+(avg>0?w:avg<0?-w:0);
+    s.appendChild(svgNode("circle",{cx:avgX,cy:y+h/2,r:4.5,fill:col,
+      "pointer-events":"none",
       stroke:"var(--surface)","stroke-width":2}));
+    dailyHits.forEach(function(item){
+      var hit=svgNode("circle",{cx:item.x,cy:y+h/2,r:6.5,fill:"transparent"});s.appendChild(hit);
+      bindChartNode(hit,{title:opt.title||"近三日綜合分",date:item.date,
+        values:[{label:"當日未平滑綜合分",value:chartNumber(item.value,2,true),
+          color:item.value>0?"var(--strong)":item.value<0?"var(--weak)":"var(--neutral)"}],
+        meaning:"七個元素分乘上各自權重後加總的當日值；分數正負描述目前相對位置，不預測下一日漲跌。",
+        source:opt.source||"daily_scores：七因子元素分 × 權重"});
+    });
+    var avgValues=[{label:"近 3 日平均（評級用）",value:chartNumber(avg,2,true),color:col}];
+    dailyHits.forEach(function(item,i){avgValues.push({label:chartDateLabel(item.date)||("第 "+(i+1)+" 日"),
+      value:chartNumber(item.value,2,true),color:item.value>0?"var(--strong)":item.value<0?"var(--weak)":"var(--neutral)"});});
+    var avgHit=svgNode("circle",{cx:avgX,cy:y+h/2,r:7.5,fill:"transparent"});s.appendChild(avgHit);
+    bindChartNode(avgHit,{title:opt.title||"綜合分與三日平滑",date:dates.length?dates[dates.length-1]:null,
+      values:avgValues,meaning:"實條與大圓點是近 3 日平均；淡色小點是各日未平滑分，用來辨認近期增強或衰退。",
+      source:opt.source||"daily_scores：七因子元素分 × 權重；近 3 日平均供分層"});
     return s;}
   // 迷你趨勢:線(預設)或柱(type:"bar");終點=主色點帶 surface 環。
   // 情境序列:opt.context=單條灰線(相容舊介面),或 opt.contexts=[{v,stroke,dash,
@@ -1157,19 +1216,46 @@
   function gSpark(vals,opt){
     opt=opt||{};var W=opt.w||150,H=opt.h||30,P=4,s=svgRoot(W,H,"gs");
     var ctxs=opt.contexts||(opt.context?[{v:opt.context,stroke:"var(--neutral)",opacity:.45,width:2}]:[]);
+    var interactive=(opt.interactive||[]).filter(function(series){return series&&series.v&&series.v.length;});
+    var dates=opt.dates||(interactive[0]&&interactive[0].dates)||[];
     var pool=vals.slice();if(opt.baseline!=null)pool.push(opt.baseline);
     ctxs.forEach(function(c){pool=pool.concat(c.v);});
     var min=Math.min.apply(null,pool),max=Math.max.apply(null,pool);
     if(max===min){max+=1;min-=1;}
     function X(i,n){return P+i/((n||vals.length)-1)*(W-2*P);}
     function Y(v){return H-P-(v-min)/(max-min)*(H-2*P);}
+    function payloadAt(i){
+      var values=[];
+      interactive.forEach(function(series){
+        var v=series.v[i];if(v==null||!isFinite(Number(v)))return;
+        values.push({label:series.label||"數值",value:series.format?series.format(Number(v)):chartNumber(v,2,false),
+          color:series.color||series.stroke||"var(--neutral)"});
+      });
+      return {title:opt.tooltipTitle||"圖表節點",date:dates[i],values:values,
+        meaning:opt.meaning||"圖上每個節點對應同一期間的原始數值。",source:opt.source||""};
+    }
+    function addInteractions(){
+      if(!interactive.length)return;
+      var guide=svgNode("line",{x1:P,y1:P,x2:P,y2:H-P,stroke:"var(--ink-2)","stroke-width":1,
+        "stroke-dasharray":"2 2","vector-effect":"non-scaling-stroke",class:"chart-guide"});
+      s.appendChild(guide);
+      var entries=[];
+      vals.forEach(function(_,i){
+        var x=X(i),left=i?((X(i-1)+x)/2):P,right=i<vals.length-1?((x+X(i+1))/2):(W-P);
+        var hit=svgNode("rect",{x:left,y:0,width:Math.max(2,right-left),height:H,fill:"transparent"});
+        s.appendChild(hit);
+        var payload=payloadAt(i),guideRef={node:guide,x:x};bindChartNode(hit,payload,guideRef);
+        entries.push({mark:hit,payload:payload,guide:guideRef});
+      });
+      if(opt.keyboard)registerChartKeyboard(s,entries,opt.ariaLabel||opt.tooltipTitle||"趨勢圖");
+    }
     if(opt.type==="bar"){
       var bw=Math.max(2,Math.min(8,(W-2*P)/vals.length-2)),y0=opt.baseline!=null?Y(opt.baseline):H-P;
       vals.forEach(function(v,i){var yv=Y(v);
         s.appendChild(svgNode("rect",{x:X(i)-bw/2,y:Math.min(yv,y0),width:bw,
           height:Math.max(2,Math.abs(y0-yv)),rx:2,
           fill:i===vals.length-1?(opt.accent||"var(--strong)"):"var(--track)"}));});
-      return s;}
+      addInteractions();return s;}
     if(opt.baseline!=null){var by=Y(opt.baseline);
       s.appendChild(svgNode("line",{x1:P,y1:by,x2:W-P,y2:by,stroke:"var(--hairline)","stroke-width":1}));}
     ctxs.forEach(function(c){
@@ -1183,8 +1269,15 @@
     s.appendChild(svgNode("path",{d:vals.map(function(v,i){return (i?"L":"M")+X(i)+" "+Y(v);}).join(""),
       fill:"none",stroke:opt.stroke||"var(--ink)","stroke-width":2,"stroke-linecap":"round",
       "stroke-linejoin":"round"}));
+    if(opt.showNodes){
+      interactive.forEach(function(series){series.v.forEach(function(v,i){
+        s.appendChild(svgNode("circle",{cx:X(i,series.v.length),cy:Y(v),r:1.8,
+          fill:series.color||series.stroke||"var(--neutral)",opacity:.62,"pointer-events":"none"}));
+      });});
+    }
     s.appendChild(svgNode("circle",{cx:X(vals.length-1),cy:Y(vals[vals.length-1]),r:4,
       fill:opt.accent||"var(--strong)",stroke:"var(--surface)","stroke-width":2}));
+    addInteractions();
     return s;}
   // 區間定位:右端=區間頂(如60日高=0%),點=現值位置,refAt=門檻刻度。
   // 有圓點與刻度字,不能非等比拉伸 → 用 w 指定實際寬度、容器內靠左定尺寸呈現
@@ -1268,8 +1361,105 @@
   })();
 
   // ---------- tooltip ----------
-  var tip = document.getElementById("tip"), suppressFocusTip=false;
+  // hover:none 裝置改用 bottom sheet／點按節點；網址加 ?touch=1 可在桌機強制預覽。
+  var TOUCH = !!(window.matchMedia && window.matchMedia("(hover: none)").matches) ||
+              /[?&]touch=1\b/.test(location.search);
+  var tip = document.getElementById("tip"), chartTip=document.getElementById("chartTip"),
+      suppressFocusTip=false, chartTipPinned=false, activeChartGuide=null;
+  if(chartTip&&TOUCH)chartTip.classList.add("touch");
   function setText(node, t){ node.textContent = t == null ? "" : String(t); }
+  function chartHint(){return TOUCH?"點按圖中日期／柱體看數值":"滑過節點；鍵盤可用左右方向鍵";}
+  function chartDateLabel(value){
+    var s=value==null?"":String(value);
+    return /^\d{4}-\d{2}-\d{2}$/.test(s)?s.replace(/-/g,"/"):s;
+  }
+  function chartNumber(value,digits,signed){
+    var n=Number(value);if(!isFinite(n))return "-";
+    var text=n.toLocaleString("zh-TW",{minimumFractionDigits:digits,maximumFractionDigits:digits});
+    return signed&&n>0?"+"+text:text;
+  }
+  function clearChartGuide(){
+    if(activeChartGuide&&activeChartGuide.node)activeChartGuide.node.classList.remove("on");
+    activeChartGuide=null;
+  }
+  function activateChartGuide(guide){
+    clearChartGuide();if(!guide||!guide.node)return;
+    if(guide.x!=null){guide.node.setAttribute("x1",guide.x);guide.node.setAttribute("x2",guide.x);}
+    guide.node.classList.add("on");activeChartGuide=guide;
+  }
+  function renderChartTip(payload){
+    chartTip.innerHTML="";
+    var title=document.createElement("div");title.className="chart-tip-title";
+    setText(title,payload.title||"圖表節點");chartTip.appendChild(title);
+    var date=document.createElement("div");date.className="chart-tip-date";
+    setText(date,chartDateLabel(payload.date)||"目前");chartTip.appendChild(date);
+    var values=document.createElement("div");values.className="chart-tip-values";
+    (payload.values||[]).forEach(function(item){
+      var row=document.createElement("div");row.className="chart-tip-row";
+      var label=document.createElement("span");label.className="chart-tip-label";
+      if(item.color){var dot=document.createElement("i");dot.className="chart-tip-dot";
+        dot.style.background=item.color;label.appendChild(dot);}
+      label.appendChild(document.createTextNode(item.label||"數值"));row.appendChild(label);
+      var value=document.createElement("span");value.className="chart-tip-value";
+      setText(value,item.value);row.appendChild(value);values.appendChild(row);
+    });
+    chartTip.appendChild(values);
+    if(payload.meaning){var meaning=document.createElement("div");meaning.className="chart-tip-meaning";
+      var mb=document.createElement("b");setText(mb,"代表：");meaning.appendChild(mb);
+      meaning.appendChild(document.createTextNode(String(payload.meaning)));chartTip.appendChild(meaning);}
+    if(payload.source){var source=document.createElement("div");source.className="chart-tip-source";
+      var sb=document.createElement("b");setText(sb,"資料來源：");source.appendChild(sb);
+      source.appendChild(document.createTextNode(String(payload.source)));chartTip.appendChild(source);}
+  }
+  function positionChartTip(mark){
+    if(TOUCH||!mark)return;
+    var r=mark.getBoundingClientRect(),pad=14,w=chartTip.offsetWidth,h=chartTip.offsetHeight;
+    var x=r.left+r.width/2,left=x+14,top=r.top;
+    if(left+w+pad>window.innerWidth)left=x-w-14;
+    if(left<pad)left=pad;
+    if(top+h+pad>window.innerHeight)top=Math.max(pad,r.bottom-h);
+    if(top<pad)top=pad;
+    chartTip.style.left=left+"px";chartTip.style.top=top+"px";
+  }
+  function showChartTip(mark,payload,pinned,guide){
+    hideTip();activateChartGuide(guide);renderChartTip(payload);
+    chartTipPinned=!!pinned;chartTip.classList.add("on");chartTip.setAttribute("aria-hidden","false");
+    positionChartTip(mark);
+  }
+  function hideChartTip(force){
+    if(chartTipPinned&&!force)return;
+    chartTipPinned=false;clearChartGuide();chartTip.classList.remove("on");
+    chartTip.setAttribute("aria-hidden","true");
+  }
+  function bindChartNode(mark,payload,guide){
+    mark.classList.add("chart-hit");mark.setAttribute("data-chart-node","true");
+    mark.addEventListener("mouseenter",function(){if(!TOUCH)showChartTip(mark,payload,false,guide);});
+    mark.addEventListener("mouseleave",function(){if(!TOUCH)hideChartTip(false);});
+    mark.addEventListener("click",function(e){
+      if(!TOUCH)return;e.preventDefault();e.stopPropagation();showChartTip(mark,payload,true,guide);
+    });
+  }
+  function registerChartKeyboard(svg,entries,label){
+    if(!entries.length)return;
+    var index=entries.length-1;
+    svg.classList.add("chart-focus");svg.setAttribute("aria-hidden","false");svg.setAttribute("role","img");
+    svg.setAttribute("tabindex","0");svg.setAttribute("aria-label",label+"；按左右方向鍵逐期查看數值");
+    function show(){var e=entries[index];showChartTip(e.mark,e.payload,false,e.guide);}
+    svg.addEventListener("focus",show);
+    svg.addEventListener("blur",function(){hideChartTip(true);});
+    svg.addEventListener("keydown",function(e){
+      if(e.key==="ArrowLeft"||e.key==="ArrowRight"||e.key==="Home"||e.key==="End"){
+        e.preventDefault();
+        if(e.key==="Home")index=0;else if(e.key==="End")index=entries.length-1;
+        else index=Math.max(0,Math.min(entries.length-1,index+(e.key==="ArrowLeft"?-1:1)));
+        show();
+      } else if(e.key==="Escape")hideChartTip(true);
+    });
+  }
+  document.addEventListener("click",function(e){
+    if(chartTipPinned&&!(e.target.closest&&e.target.closest("[data-chart-node]")))hideChartTip(true);
+  });
+  document.addEventListener("scroll",function(){hideChartTip(true);},true);
   function appendMaText(node,t){
     String(t==null?"":t).split(/(MA5|MA20|MA60)/).forEach(function(part){
       if(!part)return;
@@ -1389,9 +1579,19 @@
       }
       legendKey("還原價 20日","var(--ink)",null,2.5);
       maSeries.slice().reverse().forEach(function(c){legendKey(c.label,c.stroke,c.dash);});  // MA5→MA20→MA60 由短到長
+      var techHint=document.createElement("span");techHint.className="chart-interaction-hint";
+      setText(techHint,chartHint());lg.appendChild(techHint);
       tc.appendChild(lg);
+      var techInteractive=[{v:html.techChart.px,label:"還原收盤價",color:"var(--ink)",
+        format:function(v){return chartNumber(v,2,false)+" 元";}}].concat(
+        maSeries.slice().reverse().map(function(c){return {v:c.v,label:c.label,color:c.stroke,
+          format:function(v){return chartNumber(v,2,false)+" 元";}};}));
       tc.appendChild(gSpark(html.techChart.px,{contexts:maSeries,w:300,h:84,
-        accent:html.scColor||"var(--strong)"}));
+        accent:html.scColor||"var(--strong)",dates:html.techChart.dates||[],interactive:techInteractive,
+        showNodes:true,keyboard:true,ariaLabel:(html.who||"")+" 20 日還原價與移動平均線",
+        tooltipTitle:(html.who||"")+" · 股價與均線",
+        meaning:"還原收盤價是調整除權息與分割後的研究比較序列；MA5／20／60 是近 5／20／60 個交易日還原收盤價平均，不等於當時實際成交價或含息報酬。",
+        source:html.src||"FinMind TaiwanStockPrice；本地依除權息／分割事件還原後計算"}));
       function mrow(label,svg,num){
         var r=document.createElement("div"); r.className="mrow";
         var k=document.createElement("span"); k.className="k"; setText(k,label); r.appendChild(k);
@@ -1416,9 +1616,16 @@
       var fsCap=document.createElement("div"); fsCap.className="legend";
       var fsT=document.createElement("span");
       setText(fsT,"近"+html.fundSpark.length+"個月單月營收(億元,舊→新;末柱=最新月)");
-      fsCap.appendChild(fsT); fsBox.appendChild(fsCap);
+      fsCap.appendChild(fsT);
+      var fundHint=document.createElement("span");fundHint.className="chart-interaction-hint";
+      setText(fundHint,chartHint());fsCap.appendChild(fundHint);fsBox.appendChild(fsCap);
       fsBox.appendChild(gSpark(html.fundSpark,{type:"bar",w:300,h:60,
-        accent:html.scColor||"var(--neutral)"}));
+        accent:html.scColor||"var(--neutral)",dates:html.fundSparkDates||[],keyboard:true,
+        ariaLabel:(html.who||"")+" 近月營收",tooltipTitle:(html.who||"")+" · 單月營收",
+        interactive:[{v:html.fundSpark,label:"單月營收",color:html.scColor||"var(--neutral)",
+          format:function(v){return chartNumber(v,2,false)+" 億元";}}],
+        meaning:"公司公告的單月營收；營收不等於獲利，基期、收入認列時點、工作天數、售價、併購與產品組合都可能影響單月數字。",
+        source:"FinMind TaiwanStockMonthRevenue"}));
       box.appendChild(fsBox);
     }
     if(html.rows && html.rows.length){          // 數據表格:[標籤, 數值, 白話解讀?, 分數(供上色)?, 權重文字?, flag?]
@@ -1510,6 +1717,7 @@
     setText(hint,"點按開啟完整數據、算法與來源"); box.appendChild(hint);
   }
   function showTip(html, x, y){
+    if(chartTip.classList.contains("on"))return;
     renderPreview(tip, html);
     tip.classList.add("on"); tip.setAttribute("aria-hidden","false");
     positionTip(x,y);
@@ -1540,8 +1748,6 @@
   }
 
   // ---------- bottom sheet(觸控裝置的詳情呈現) ----------
-  // hover:none 裝置改用底部 sheet;桌機維持浮動 tooltip。網址加 ?touch=1 可在桌機強制預覽手機模式。
-  var TOUCH = !!(window.matchMedia && window.matchMedia("(hover: none)").matches) || /[?&]touch=1\b/.test(location.search);
   var sheetWrap = document.getElementById("sheetWrap"),
       sheetEl   = document.getElementById("sheet"),
       sheetBody = document.getElementById("sheetBody"),
@@ -1549,7 +1755,7 @@
       lastSheetFocus = null;
   function openSheet(html, renderFn, trigger){
     if(!sheetWrap) return;
-    hideTip();
+    hideTip();hideChartTip(true);
     lastSheetFocus = trigger || document.activeElement;
     (renderFn || renderDetail)(sheetBody, html);
     sheetEl.setAttribute("aria-label", (html.who||"詳情")+" — "+(html.el||html.label||"完整說明"));
@@ -1786,6 +1992,7 @@
   }
   function closeSheet(restoreFocus){
     if(!sheetWrap || !sheetWrap.classList.contains("on")) return;
+    hideChartTip(true);
     sheetWrap.classList.remove("on"); sheetWrap.setAttribute("aria-hidden","true");
     sheetEl.style.transform = ""; document.body.style.overflow = "";
     if(restoreFocus!==false && lastSheetFocus && typeof lastSheetFocus.focus==="function"){
@@ -1942,6 +2149,7 @@
         var col = FUND_COL[row.fund.cls];
         return { el:"基本面參考 · 觀察層(不計分)", who: row.nm+"("+row.id+")", biz: row.biz,
           rows: row.fund.rows, why: row.fund.why, fundSpark: row.fund.spark,
+          fundSparkDates: row.fund.sparkDates,
           how: "月營收/季報由獨立排程抓取(月/季頻,非每日)——跟左側五個觀察面向" +
                "完全獨立,純參考,不影響每日綜合分數與已確認分層。",
           src: "FinMind TaiwanStockMonthRevenue / TaiwanStockFinancialStatements",
@@ -2010,7 +2218,9 @@
     var vs=document.createElement("div"); vs.className="vs"; vs.textContent=row.vsub; vd.appendChild(vs);
     if(typeof row.comp==="number"){   // 綜合分條:一眼看出強弱程度與近3日動能方向
       var cb=document.createElement("div"); cb.className="cbar";
-      cb.appendChild(gCompositeBar(row.comp,row.comp3||[],CMAX)); vd.appendChild(cb);
+      cb.appendChild(gCompositeBar(row.comp,row.comp3||[],CMAX,{dates:row.comp3Dates||[],
+        title:row.nm+"("+row.id+") · 綜合分",
+        source:"daily_scores：七因子元素分 × 權重；近 3 日平均供分層"})); vd.appendChild(cb);
     }
     if(waiting){
       var pending=document.createElement("div"); pending.className="pending";
@@ -2082,7 +2292,7 @@
                 flat:["var(--neutral)","var(--neutral-tint)"]}[row.fund.cls]||["var(--neutral)","var(--neutral-tint)"];
       attachTip(fund,(function(row,fcol){return function(){return {
         el:"月營收與財報參考 · 觀察資訊（不計分）",who:row.nm+"("+row.id+")",biz:row.biz,rows:row.fund.rows,
-        why:row.fund.why,fundSpark:row.fund.spark,
+        why:row.fund.why,fundSpark:row.fund.spark,fundSparkDates:row.fund.sparkDates,
         how:"月營收與季報更新頻率不同，只做基本面脈絡參考，不影響每日分數。",
         src:"FinMind TaiwanStockMonthRevenue / TaiwanStockFinancialStatements",scLabel:revenueLabel(row.fund.label),
         scColor:fcol[0],scBg:fcol[1]};};})(row,fcol));
@@ -2142,7 +2352,9 @@
     var sub=document.createElement("div"); sub.className="vs"; sub.textContent=row.vsub||"點按查看今日分數、三日平均與確認規則"; vd.appendChild(sub);
     if(typeof row.comp==="number"){
       var cbm=document.createElement("div"); cbm.className="cbar";
-      cbm.appendChild(gCompositeBar(row.comp,row.comp3||[],CMAX)); vd.appendChild(cbm);
+      cbm.appendChild(gCompositeBar(row.comp,row.comp3||[],CMAX,{dates:row.comp3Dates||[],
+        title:row.nm+"("+row.id+") · 綜合分",
+        source:"daily_scores：七因子元素分 × 權重；近 3 日平均供分層"})); vd.appendChild(cbm);
     }
     if(waiting){var pend=document.createElement("div");pend.className="pending";pend.textContent="今日初判 1/2："+rawLabel+"（尚未轉層）";vd.appendChild(pend);}
     attachTip(vd,(function(row,confirmedLabel,rawLabel,waiting){return function(){
@@ -2370,7 +2582,7 @@
       var g=p.g,x=p.x,y=p.y,x0=p.x0,y0=p.y0;
       var group=add("g",{class:"map-group",tabindex:"0","data-g":g.g,role:"button","aria-pressed":"false",
         "aria-label":g.nm+"：20日動能相對全體 "+pricePct(g.axis.price)+"，修正日外資買賣中位數 "+dipPct(g.axis.dip)+"股本；灰線起點是五個交易日前。點選只看此族群,再點取消"});
-      // 點圓點=套用/取消族群篩選(走 gfilter 既有機制);新選上時把該族群卡帶進視野
+      // 點名稱/群組=套用篩選；觸控裝置直接點節點時先讀數值，不誤觸篩選。
       function toggleFromMap(){
         if(!GFILTER) return;
         var nowOn=GFILTER.toggle(g.g);
@@ -2385,8 +2597,22 @@
       });
       add("title",{},g.nm+"，目前價格軸 "+pricePct(g.axis.price)+"，籌碼軸 "+dipPct(g.axis.dip)+"股本",group);
       add("line",{x1:x0,y1:y0,x2:x,y2:y,class:"trail"},null,group);
-      add("circle",{cx:x0,cy:y0,r:"2.5",fill:"var(--muted)",opacity:".7"},null,group);
-      add("circle",{cx:x,cy:y,r:"6",fill:g.col||"var(--health)",class:"endpoint"},null,group);
+      add("circle",{cx:x0,cy:y0,r:"2.5",fill:"var(--muted)",opacity:".7","pointer-events":"none"},null,group);
+      add("circle",{cx:x,cy:y,r:"6",fill:g.col||"var(--health)",class:"endpoint","pointer-events":"none"},null,group);
+      if(g.axis.price5!=null&&g.axis.dip5!=null){
+        var startHit=add("circle",{cx:x0,cy:y0,r:"8",fill:"transparent"},null,group);
+        bindChartNode(startHit,{title:g.nm+" · 五日前位置",date:g.axis.date5,
+          values:[{label:"20 日動能 vs 全體",value:pricePct(g.axis.price5),color:"var(--ink-2)"},
+                  {label:"修正日外資買賣中位",value:dipPct(g.axis.dip5)+" 股本",color:"var(--muted)"}],
+          meaning:"四象限灰線的起點；橫軸是族群中位 20 日報酬減全體中位，縱軸是成員修正日外資買賣 20 日累計的中位數。",
+          source:GROUP_HOW.src});
+      }
+      var endHit=add("circle",{cx:x,cy:y,r:"10",fill:"transparent"},null,group);
+      bindChartNode(endHit,{title:g.nm+" · 目前位置",date:g.axis.date,
+        values:[{label:"20 日動能 vs 全體",value:pricePct(g.axis.price),color:g.col||"var(--ink)"},
+                {label:"修正日外資買賣中位",value:dipPct(g.axis.dip)+" 股本",color:g.col||"var(--ink)"}],
+        meaning:"四象限目前終點；位置只描述族群的相對價格動能與修正日外資買賣，不代表買進或賣出指示。",
+        source:GROUP_HOW.src});
       var label=(GRP[g.g]&&(GRP[g.g].short||GRP[g.g].nm))||g.nm;
       var textNode=add("text",{x:x,y:y-14,"text-anchor":"middle",fill:g.col||"var(--ink)",class:"group-label"},label,group);
       mapLabels.push({text:textNode,x:x,y:y,label:label});
@@ -2467,9 +2693,18 @@
         // 或廣度量尺(過半刻度=族群現象門檻)
         var sp=s[4], gfx=null;
         if(sp && sp.spark && g.trend && (g.trend[sp.spark]||[]).length>1){
-          var series=g.trend[sp.spark], lastV=series[series.length-1];
+          var series=g.trend[sp.spark], lastV=series[series.length-1],
+              sparkCol=lastV>0?"var(--strong)":lastV<0?"var(--weak)":"var(--neutral)",
+              sparkIsDip=sp.spark==="dip";
           gfx=gSpark(series,{baseline:0,w:92,h:26,
-            accent:lastV>0?"var(--strong)":lastV<0?"var(--weak)":"var(--neutral)"});
+            accent:sparkCol,dates:g.trend[sp.spark+"Dates"]||[],tooltipTitle:g.nm+" · "+s[0],
+            interactive:[{v:series,label:s[0],color:sparkCol,format:sparkIsDip?
+              function(v){return chartNumber(v,Math.abs(v)<.1?2:1,true)+"% 股本";}:
+              function(v){return chartNumber(v,2,true)+"%";}}],
+            meaning:sparkIsDip?
+              "族群下跌日中，成員外資買賣的 20 日累計占股本%，再取族群中位；正=淨買、負=淨賣。":
+              "族群成員 20 日報酬中位數減全部掃描標的 20 日報酬中位數；正=跑贏、負=跑輸。",
+            source:GROUP_HOW.src});
         } else if(sp && sp.meter){
           gfx=gMeter(sp.meter[0],sp.meter[1],[{at:sp.meter[2]}],
             sp.meter[0]>=sp.meter[2]?"health":"neutral");
@@ -2564,7 +2799,15 @@
       points.forEach(function(p,i){
         var latest=i===points.length-1;
         svg.appendChild(svgNode("line",{x1:p.x,y1:p.y,x2:p.x,y2:p.y+.01,stroke:(meta[p.state]||{}).col||"var(--neutral)",
-          "stroke-width":latest?8:5.5,"stroke-linecap":"round","vector-effect":"non-scaling-stroke"}));
+          "stroke-width":latest?8:5.5,"stroke-linecap":"round","vector-effect":"non-scaling-stroke",
+          "pointer-events":"none"}));
+        var hit=svgNode("line",{x1:p.x,y1:p.y,x2:p.x,y2:p.y+.01,stroke:"transparent",
+          "stroke-width":16,"stroke-linecap":"round","vector-effect":"non-scaling-stroke"});svg.appendChild(hit);
+        var tierMeta=meta[p.state]||{};
+        bindChartNode(hit,{title:row.nm+"("+row.id+") · 五日變層軌跡",date:TIER_FLOW.dates[p.i],
+          values:[{label:"已確認分層",value:tierMeta.label||p.state,color:tierMeta.col||"var(--neutral)"}],
+          meaning:"這是當日收盤資料算出的已確認分層；今日初判需連續 2 個交易日相同才會正式轉層。",
+          source:"daily_scores：七因子加權、近 3 日平均、連續 2 日確認"});
       });
       btn.appendChild(svg);
       var spoken=s.states.map(function(state,i){return Number(TIER_FLOW.dates[i].slice(5,7))+"/"+

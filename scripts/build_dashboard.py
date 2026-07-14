@@ -327,7 +327,8 @@ def build_technical_view(m, history=None):
                   if _value(x, "close_adj") is not None and _value(x, "ma20") is not None]
     chart = None
     if len(chart_rows) >= 2:
-        chart = {"px": [round(_value(x, "close_adj"), 2) for x in chart_rows],
+        chart = {"dates": [_value(x, "date") for x in chart_rows],
+                 "px": [round(_value(x, "close_adj"), 2) for x in chart_rows],
                  "ma": [round(_value(x, "ma20"), 2) for x in chart_rows]}
         for key in ("ma5", "ma60"):
             vals = [_value(x, key) for x in chart_rows]
@@ -739,8 +740,9 @@ def build_fund_map(con):
             rows.append(["最新季EPS", f"{latest_eps:.2f} 元", f"季別:{fdates[-1]}"])
         # 近13個月營收柱形原料(舊到新,億元):第1柱≈最新月的去年同月,基期效應
         # (去年同月特別低造成的高YoY)看柱形一眼識破——與 why 文案的警告同源
-        spark = [round(x["revenue"] / 1e8, 2) for x in mrs[:13]
-                 if x["revenue"] is not None][::-1]
+        spark_rows = [x for x in mrs[:13] if x["revenue"] is not None][::-1]
+        spark = [round(x["revenue"] / 1e8, 2) for x in spark_rows]
+        spark_dates = [f"{x['revenue_year']}/{x['revenue_month']:02d}" for x in spark_rows]
         label = f"營收YoY {yoy*100:+.0f}%" if yoy is not None else "營收YoY 資料不足"
         if yoy is not None:
             direction = "增加" if yoy > 0 else "減少" if yoy < 0 else "持平"
@@ -753,7 +755,8 @@ def build_fund_map(con):
                    "整體營運強弱；即使有月增資料,仍可能受基期、收入認列時點、工作天數、售價、"
                    "併購與產品組合影響。")
         out[sid] = {"cls": cls, "label": label, "rows": rows, "why": why,
-                    "spark": spark if len(spark) >= 2 else None}
+                    "spark": spark if len(spark) >= 2 else None,
+                    "sparkDates": spark_dates if len(spark) >= 2 else None}
     return out
 
 
@@ -1022,7 +1025,9 @@ def main():
                 "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note,
                 "axis": {"price": rel, "dip": dip,
                          "price5": _five_day_value(ser, "rel20"),
-                         "dip5": _five_day_value(ser, "med_dip")},
+                         "dip5": _five_day_value(ser, "med_dip"),
+                         "date": ser[-1]["date"] if ser else None,
+                         "date5": ser[-6]["date"] if len(ser) >= 6 else None},
                 # 族群熱圖使用原始數值與五日前數值；所有欄位皆是「越高越靠前」，
                 # 前端可用同一套跨族群名次色階，不把不同單位硬塞進同一數值尺度。
                 "heat": {
@@ -1040,8 +1045,12 @@ def main():
                 # 30個交易日的走勢原料(缺值日剔除,迷你圖只看形狀)
                 "trend": {"dip": [round(x["med_dip"], 3) for x in ser[-30:]
                                   if x["med_dip"] is not None],
+                          "dipDates": [x["date"] for x in ser[-30:]
+                                       if x["med_dip"] is not None],
                           "rel": [round(x["rel20"] * 100, 2) for x in ser[-30:]
-                                  if x["rel20"] is not None]},
+                                  if x["rel20"] is not None],
+                          "relDates": [x["date"] for x in ser[-30:]
+                                       if x["rel20"] is not None]},
                 "stats": [
             ["修正日外資買賣中位",
              _current_dip(dip),
@@ -1107,6 +1116,7 @@ def main():
     for r in rows:
         tier_meta = tier_ui_payload(r)
         hist = score_hist.get(r["stock_id"]) or []
+        comp_hist = [h for h in hist[-3:] if h["composite"] is not None]
         vt, tier, vsub, vr, warn, vrows = verdict(r, hist)
         obj = {"g": r["grp"], "id": r["stock_id"], "nm": r["name"], "biz": r["biz"] or "",
                "vt": vt, "vlabel": tier_meta["tier_label"], "vkey": tier,
@@ -1131,8 +1141,8 @@ def main():
                ],
                # 綜評條原料:3日平滑分(實條)+近3日未平滑分(殘影點),與 vrows 文字同源
                "comp": round(r["composite_s"], 2) if r["composite_s"] is not None else None,
-               "comp3": [round(h["composite"], 2) for h in hist[-3:]
-                         if h["composite"] is not None],
+               "comp3": [round(h["composite"], 2) for h in comp_hist],
+               "comp3Dates": [h["date"] for h in comp_hist],
                "cells": build_cells(r, r, mkt20)}
         obj.update(tier_meta)
         tech = build_technical_view(r, tech_hist.get(r["stock_id"]))

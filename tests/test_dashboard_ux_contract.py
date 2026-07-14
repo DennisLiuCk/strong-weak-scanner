@@ -116,6 +116,36 @@ class DashboardUxContractTest(unittest.TestCase):
         ):
             self.assertIn(marker, self.template)
 
+    def test_chart_nodes_expose_dates_values_meanings_and_sources_across_input_modes(self):
+        for marker in (
+            'id="chartTip" role="status" aria-live="polite"',
+            "function bindChartNode(mark,payload,guide)",
+            'mark.addEventListener("mouseenter"',
+            'mark.addEventListener("click"',
+            "function registerChartKeyboard(svg,entries,label)",
+            'e.key==="ArrowLeft"||e.key==="ArrowRight"',
+            "滑過節點；鍵盤可用左右方向鍵",
+            "點按圖中日期／柱體看數值",
+            "chart-tip-source",
+            "FinMind TaiwanStockMonthRevenue",
+            "daily_scores：七因子元素分 × 權重",
+            "bindChartNode(startHit",
+            "bindChartNode(endHit",
+            "五日變層軌跡",
+        ):
+            self.assertIn(marker, self.template)
+        for marker in (
+            '"dates": [_value(x, "date") for x in chart_rows]',
+            '"sparkDates": spark_dates',
+            '"dipDates": [x["date"]',
+            '"relDates": [x["date"]',
+            '"date5": ser[-6]["date"]',
+            '"comp3Dates": [h["date"] for h in comp_hist]',
+        ):
+            self.assertIn(marker, self.builder)
+        self.assertEqual(self.template.count("fundSparkDates:"), 2)
+        self.assertEqual(self.template.count("gCompositeBar(row.comp"), 2)
+
     def test_first_desktop_click_opens_persistent_drawer(self):
         touch_click_to_drawer = (
             'node.addEventListener("click", function(){ hideTip(); '
