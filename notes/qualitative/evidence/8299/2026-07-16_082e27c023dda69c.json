@@ -1,0 +1,168 @@
+{
+  "content_as_of": "2026-07-16",
+  "documents": [
+    {
+      "cited_pages": [
+        72,
+        73,
+        77,
+        78,
+        79,
+        81,
+        83,
+        86,
+        87
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 107,
+      "rendered_pages": [
+        71,
+        72,
+        73,
+        74,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "57f8a21d0b031abc24023867573175e9ad898c56be6a27ab88e613f032430061",
+      "size_bytes": 5463968,
+      "url": "https://www.phison.com/wp-content/uploads/2026/06/%E7%BE%A4%E8%81%AF%E9%9B%BB%E5%AD%90%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8-114%E5%B9%B4%E5%BA%A6%E5%B9%B4%E5%A0%B1.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 75,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "92d49ffafefc65119e1464f85b75f267dc66e35028c3a95ed4e4d9d8ffb4625d",
+      "size_bytes": 1882204,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=8299&year=114&seamon=4&mtype=A"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        17,
+        18,
+        21,
+        22,
+        23,
+        24,
+        25,
+        28,
+        29,
+        30
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 55,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "aadb7d2872ad4d6b94704132e066cb103ab92c35bd30803b097d281887f79187",
+      "size_bytes": 1187133,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=8299&year=115&seamon=1&mtype=A"
+    },
+    {
+      "cited_pages": [
+        5,
+        10,
+        11,
+        12,
+        17,
+        21,
+        23,
+        24
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 24,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "57dd46b4764d9e9a3efad9585cae430e630241fcbb9bf0ca82d504758c02f41d",
+      "size_bytes": 2220596,
+      "url": "https://www.phison.com/wp-content/uploads/2026/06/1Q26_Phison-Earnings-Call_CN_Official_uploaded-version.pdf"
+    }
+  ],
+  "pack_sha256": "082e27c023dda69c588827839f85dadc1d0bcfd7b9bacfa827b19ce926654ea7",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "8299",
+  "unverified_claims_removed": true
+}
