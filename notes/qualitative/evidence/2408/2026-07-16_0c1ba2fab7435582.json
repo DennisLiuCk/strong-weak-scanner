@@ -1,0 +1,176 @@
+{
+  "content_as_of": "2026-07-16",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        148,
+        149,
+        150,
+        159,
+        172,
+        173,
+        174,
+        175,
+        176
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 191,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        147,
+        148,
+        149,
+        150,
+        151,
+        158,
+        159,
+        160,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "1f7e21a44d1e063e2ae3af8397bdc0204c79bdc7b3af343b8b6e433f7cd815b1",
+      "size_bytes": 5695323,
+      "url": "https://www.nanya.com/en/Activity?Action=Get_IRannualreport_FileName&Id=25"
+    },
+    {
+      "cited_pages": [
+        4,
+        8,
+        9
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 72,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "96e9892a91d988eae3365e2fc39d123994b8356d989e913192056ee3a553cd69",
+      "size_bytes": 502085,
+      "url": "https://www.nanya.com/en/Activity?Action=Get_IRFinancialReport_FileName&Id=127"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        7,
+        14,
+        17,
+        27,
+        36,
+        42
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 46,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        26,
+        27,
+        28,
+        35,
+        36,
+        37,
+        41,
+        42,
+        43
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "d074667e7499003f40268133aa167c8eea5f8f363cbd927cd306f542b5318b6d",
+      "size_bytes": 297266,
+      "url": "https://www.nanya.com/en/Activity?Action=Get_IRFinancialReport_FileName&Id=129"
+    },
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        9,
+        12,
+        14,
+        16,
+        17,
+        19
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 19,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "fd8506e7f276adb8f66c4d92bdb3e025c2e2db37846c2786ae0d3d55ad064c94",
+      "size_bytes": 668137,
+      "url": "https://www.nanya.com/en/Activity?Action=IR_investorcalendar_FileName&Id=4295&column=Presentation"
+    }
+  ],
+  "pack_sha256": "0c1ba2fab7435582780de022e54a5f73d8d5539dd3c1e616c9788dd9ae4a62d4",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2408",
+  "unverified_claims_removed": true
+}
