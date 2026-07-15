@@ -205,14 +205,16 @@ review_due: 2026-08-31
     def test_all_verified_notes_have_valid_reports_and_hypotheses(self):
         reports = lh.load_reports()
         self.assertEqual(len(reports), 98)
-        self.assertEqual(sum(report["hypothesis_count"] for report in reports.values()), 196)
+        self.assertEqual(sum(report["hypothesis_count"] for report in reports.values()), 199)
         self.assertFalse([report["quality_errors"] for report in reports.values()
                           if report["quality_invalid"]])
         hypotheses = [item for report in reports.values() for item in report["hypotheses"]]
         self.assertTrue(all(report["report_version"] == 2 for report in reports.values()))
-        self.assertEqual({item["meta"]["capture_mode"] for item in hypotheses}, {"retrospective"})
+        modes = [item["meta"]["capture_mode"] for item in hypotheses]
+        self.assertEqual(modes.count("retrospective"), 196)
+        self.assertEqual(modes.count("prospective"), 3)
         self.assertEqual(sum(int(item["meta"]["independent_chain_count"])
-                             for item in hypotheses), 196)
+                             for item in hypotheses), 199)
         self.assertTrue(all(item["transitions"] for item in hypotheses))
 
 
