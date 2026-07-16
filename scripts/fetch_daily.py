@@ -43,6 +43,10 @@ DATASET_TABLE = {
     "TaiwanDailyShortSaleBalances": "sbl",
 }
 
+# ── 觀察層參考個股(上游錨定,如台積電):收盤/外資持股進 ref_* 隔離表,
+#    絕不進 universe/daily_metrics/daily_scores/tier;僅供儀表板台積電專區顯示 ──
+REF_IDS = ["2330"]
+
 # ── 族群/大盤層策略旋鈕(個股層旋鈕在 score.py CONFIG)──
 REGIME_DD      = -0.03   # 報酬指數距20日高 ≤ 此值 → 修正 regime
 DD_MIN_OBS     = 10      # dd20 最少樣本數(冷啟動保護,同 dist_hi 慣例)
@@ -70,6 +74,8 @@ CREATE TABLE IF NOT EXISTS dividend_result(date TEXT, stock_id TEXT, before_pric
 CREATE TABLE IF NOT EXISTS split_event(date TEXT, stock_id TEXT, before_price REAL,
   after_price REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS market(date TEXT PRIMARY KEY, taiex REAL);
+CREATE TABLE IF NOT EXISTS ref_price(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
+CREATE TABLE IF NOT EXISTS ref_holding(date TEXT, stock_id TEXT, foreign_pct REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS fetch_log(ts TEXT, start TEXT, "end" TEXT, rows INTEGER);
 CREATE TABLE IF NOT EXISTS fetch_coverage(dataset TEXT, data_id TEXT, covered_through TEXT,
@@ -404,6 +410,36 @@ def fetch_index(con, token, start, end, sleep, expected_dates=None, force=False)
     if sleep:
         time.sleep(sleep)
     return len(rows), 1
+
+def fetch_ref_series(con, token, start, end, sleep, expected_dates=None, force=False):
+    """觀察層參考個股(REF_IDS)收盤/外資持股 → ref_price/ref_holding(upsert)。
+    隔離表:不進 universe/daily_metrics/daily_scores,只供儀表板專區顯示;
+    缺口守門同 fetch_index。Shareholding 約 21:00 發布,排程時段常缺當日,隔日自補。"""
+    total = requests = 0
+    for sid in REF_IDS:
+        for dataset, table, field in (
+                ("TaiwanStockPrice", "ref_price", "close"),
+                ("TaiwanStockShareholding", "ref_holding", "ForeignInvestmentSharesRatio")):
+            s, e = start, end
+            if not force and expected_dates:
+                have = {r[0] for r in con.execute(
+                    f"SELECT date FROM {table} WHERE stock_id=? AND date BETWEEN ? AND ?",
+                    (sid, s, e))}
+                missing = set(expected_dates) - have
+                if not missing:
+                    continue
+                s, e = min(missing), max(missing)
+            data = api_get(dataset, sid, s, e, token)
+            requests += 1
+            rows = [(d["date"], d["stock_id"], d.get(field)) for d in data
+                    if d.get("stock_id") == sid and d.get(field) is not None]
+            if rows:
+                con.executemany(f"INSERT OR REPLACE INTO {table} VALUES(?,?,?)", rows)
+                con.commit()
+            total += len(rows)
+            if sleep:
+                time.sleep(sleep)
+    return total, requests
 
 # FinMind TaiwanStockShareholding 對個別股票偶有發布延遲(2026-07-06 事故:19 檔當天缺值,
 # 隔天仍缺,但 TWSE/TPEx 官方當天就有——見 reports/data_gap_2026-07-06.md)。
@@ -929,7 +965,7 @@ def main():
     # 事件 coverage 能區分「已查但當天沒有事件」與「尚未查」；新交易日只補新增區間，
     # 中斷後重跑也會從未完成的 coverage 接續，不會再掃完整歷史。
     if args.datasets:
-        print("(--datasets 過濾:跳過除權息/分割/指數事件抓取,仍重算 price_adj 與 metrics)")
+        print("(--datasets 過濾:跳過除權息/分割/指數/參考個股事件抓取,仍重算 price_adj 與 metrics)")
     elif target_date:
         adj_start = con.execute("SELECT MIN(date) FROM price").fetchone()[0] or start
         print(f"除權息/分割/指數補缺 {adj_start} .. {target_date} …")
@@ -937,9 +973,12 @@ def main():
         ns, rs = fetch_splits(con, ids, token, adj_start, target_date, args.sleep, args.force)
         ni, ri = fetch_index(con, token, adj_start, target_date, args.sleep,
                              expected_dates=expected_dates, force=args.force)
+        nr, rr = fetch_ref_series(con, token, adj_start, target_date, args.sleep,
+                                  expected_dates=expected_dates, force=args.force)
+        # ref_* 是觀察層隔離表、不餵任何衍生表 → 刻意不併入 data_changed(避免無謂 metrics 重建)
         data_changed = data_changed or bool(nd or ns or ni)
-        print(f"事件 API {rd + rs + ri} 次:dividend_result upsert {nd};"
-              f"split_event upsert {ns};TAIEX {ni}")
+        print(f"事件 API {rd + rs + ri + rr} 次:dividend_result upsert {nd};"
+              f"split_event upsert {ns};TAIEX {ni};參考個股 {nr}")
     if target_date and "TaiwanStockShareholding" in ds_list:
         n_bf = backfill_holding_from_exchange(con, target_date)
         if n_bf:
