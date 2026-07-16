@@ -18,7 +18,7 @@
      (fetch_tdcc 失敗是 exit 0,綠燈看不出來;唯一硬警報是簡報品質快檢的
      「tdcc_holding 最新快照 >10 天」——TDCC 缺週不可回補,週內看到警告當天就要補跑;
      另確認最新資料日的 `oos_signal_snapshots` 檔數與 `config/universe.csv` 一致
-     (目前 111 檔),否則該日不得計入 OOS)。
+     (目前 121 檔),否則該日不得計入 OOS)。
 3. **今日簡報**:`uv run --no-project --python 3.12 python scripts/daily_brief.py`
    (唯讀)——資料鮮度、市場 regime、族群雷達、tier 升降、蓄勢候補進出、
    綜合分大變動、資料品質快檢。這就是討論議程。

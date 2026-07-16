@@ -9,3 +9,4 @@ material,半導體材料,矽晶圓 / 電子化學品 / 耗材,7
 thermal,散熱,液冷 / 3D VC / 風扇,8
 pcb,PCB/CCL,AI伺服器板 / CCL / 載板,9
 powersupply,電源供應,AI伺服器電源 / BBU / 工業電源,10
+serverodm,伺服器組裝/機構,AI伺服器 ODM / 機殼 / 導軌,11

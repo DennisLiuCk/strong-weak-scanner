@@ -346,7 +346,7 @@
   .row{display:grid;
     grid-template-columns:minmax(150px,1.2fr) repeat(5,minmax(130px,1fr)) minmax(150px,1.15fr);
     align-items:stretch;border-top:1px solid var(--hairline-2)}
-  /* 離屏個股列跳過 layout/paint(111 檔長表),降低首屏與捲動成本;高度先估後記憶 */
+  /* 離屏個股列跳過 layout/paint(Universe 長表),降低首屏與捲動成本;高度先估後記憶 */
   .row[data-g]{content-visibility:auto;contain-intrinsic-size:auto 144px}
   .row.head{border-top:none;position:sticky;top:0;background:var(--surface-2);z-index:2;
     border-bottom:1px solid var(--hairline)}
@@ -1131,7 +1131,7 @@
 (function(){
   "use strict";
   // sub = 明細表欄位表頭的第二行:把「這欄分數怎麼來」的常數語意放這裡,
-  // 個股格內只留會變動的資訊(排名桶/判讀),避免同一句話跟著 111 檔重複。
+  // 個股格內只留會變動的資訊(排名桶/判讀),避免同一句話跟著 Universe 長表重複。
   // vlabel = 格內小標(格值是什麼指標);欄位表頭已寫元素名,這裡只標「數字的身分」
   var EL = [
     {k:"①價", role:"族群相對", sub:"族群內排名 · 含抗跌", vlabel:"20日相對報酬",

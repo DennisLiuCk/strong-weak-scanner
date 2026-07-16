@@ -401,7 +401,7 @@ def build_cells(sc, m, mkt20=None):
                      f"20日相對報酬 {pct(rs, True)}，目前跑輸族群中位" if rs < 0 else
                      "20日相對報酬 0.0%，目前與族群中位持平")
     # basis 只留會隨個股變動的排名桶;「分數=族群內排名」的常數語意放明細表欄位表頭
-    # (dashboard_template 的 EL.sub),不跟著 111 檔逐格重複
+    # (dashboard_template 的 EL.sub),不跟著 Universe 長表逐格重複
     cells.append(_cell(
         sc["s_price"], pct(rs, True) if rs is not None else "-", rows, R_PRICE[sc["s_price"]],
         price_current, _relative_bucket(sc["s_price"])))
