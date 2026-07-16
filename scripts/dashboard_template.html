@@ -801,6 +801,36 @@
   footer .fn{border-top:1px solid var(--hairline);padding-top:14px;display:grid;gap:4px}
   footer a{color:var(--ink-2);text-decoration-color:var(--muted);text-underline-offset:2px}
   footer a:hover{color:var(--ink)}
+
+  /* ---- 台積電專區(觀察層) ---- */
+  .tsmc{margin:14px 0 8px;padding:16px 18px;border:1px solid var(--hairline);border-left:5px solid var(--neutral);
+    border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+  .tsmc-kicker{margin:0 0 4px;color:var(--muted);font-size:12px;letter-spacing:.12em;font-weight:800}
+  .tsmc h2{margin:0;font-size:clamp(16px,2.2vw,20px);line-height:1.35}
+  .tsmc-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin:12px 0 0}
+  .tcell{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 12px;border-radius:10px;
+    background:var(--surface-2);border:1px solid var(--hairline-2);text-align:left;font:inherit;color:inherit}
+  .tcell .code{font-size:11.5px;color:var(--muted)}
+  .tcell .nm{font-size:16px;font-weight:700}
+  .tcell .tsub{font-size:11.5px;color:var(--ink-2)}
+  button.tcell{cursor:pointer}
+  button.tcell:hover,button.tcell:focus-visible{border-color:var(--muted)}
+  .tsmc-deep{margin:12px 0 0;font-size:13px;color:var(--ink-2)}
+  .tsmc-deep>summary{cursor:pointer;font-weight:700;color:var(--ink)}
+  .tsmc-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin:10px 0 0}
+  .tsmc-kpi .tcell .nm{font-size:13px;font-weight:600;line-height:1.5}
+  .tsmc-guid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:7px;margin:12px 0 0}
+  .tsmc-guid .grow{display:flex;gap:8px;align-items:baseline;padding:7px 10px;border-radius:9px;
+    background:var(--surface-2);border:1px solid var(--hairline-2)}
+  .tsmc-guid .gname{flex:0 0 4.5em;font-weight:700}
+  .tsmc-guid .gdir{flex:0 0 auto;font-weight:700}
+  .tsmc-guid .gtext{color:var(--ink-2);font-size:12.5px}
+  .tsmc-links{margin:12px 0 0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:12.5px}
+  .tsmc-links .evbtn{font:inherit;font-weight:700;color:var(--health);background:none;
+    border:1px solid var(--hairline);border-radius:100px;padding:6px 14px;cursor:pointer}
+  .tsmc-links .evbtn:hover,.tsmc-links .evbtn:focus-visible{border-color:var(--health)}
+  .tsmc-note{margin:12px 0 0;font-size:11.5px;color:var(--muted)}
+  .tchip{border-left:3px solid currentColor;padding-left:8px;font-size:12px;font-weight:700;cursor:help}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -831,6 +861,7 @@
 
   <nav class="anchor-nav" aria-label="本頁快速導覽">
     <a href="#overview">今日重點</a>
+    <a href="#tsmc-section">台積電</a>
     <a href="#groups-section">族群概況</a>
     <a href="#tiers-section">個股分層</a>
     <a href="#stocks-section">個股明細</a>
@@ -844,6 +875,19 @@
     <p class="overview-summary" id="overviewSummary"></p>
     <div class="overview-points" id="overviewPoints"></div>
     <p class="overview-note" id="overviewNote" hidden></p>
+  </section>
+
+  <section class="tsmc" id="tsmc-section" aria-labelledby="tsmcTitle" hidden>
+    <p class="tsmc-kicker">上游錨點</p>
+    <h2 id="tsmcTitle">台積電專區 · 產業方向指引(觀察層,不計分)</h2>
+    <div class="tsmc-strip" id="tsmcStrip"></div>
+    <details class="tsmc-deep" id="tsmcDeep">
+      <summary>法說 KPI 與九族群指引對照</summary>
+      <div class="tsmc-kpi" id="tsmcKpi"></div>
+      <div class="tsmc-guid" id="tsmcGuidance"></div>
+      <p class="tsmc-links" id="tsmcLinks"></p>
+    </details>
+    <p class="tsmc-note">台積電(2330)不在掃描範圍內、不參與任何排名與評分;本區是上游產業脈絡:量化數據每日自動更新,方向指引由每季法說會後的事件錨點人工彙整,點各格可看原始數據、依據與資料來源。</p>
   </section>
 
   <div class="gfilter" id="gfilter" role="group" aria-label="檢視族群"></div>
@@ -1032,6 +1076,7 @@
         <dt>投信買超廣度</dt><dd><span class="f">族群內投信5日淨買 &gt;0 的檔數比例</span>本土法人參與的廣度。</dd>
         <dt>20日動能 vs 全體</dt><dd><span class="f">族群中位20日報酬 − 全體中位</span>族群整體跑贏還是跑輸大部隊。</dd>
         <dt>修正市場情境</dt><dd><span class="f">加權報酬指數(含息)距20日高 ≤ −3%</span>頁首籤條「修正」的定義。用含息指數,降低除息旺季機械性下跌造成的誤判。</dd>
+        <dt>台積電指引</dt><dd><span class="f">每季法說會 → 九族群方向標記(↑ ↓ → ↕ ·)</span>台積電是掃描族群共同的上游;法說內容對各族群的方向性由人工整理進事件錨點,非數值訊號、不進任何評分。點族群卡的指引 chip 或「台積電專區」可看依據與法說全文。</dd>
       </dl>
       <p>族群層統計需至少 6 檔有效樣本才給值,避免 1、2 檔代表整個族群。</p>
     </div>
@@ -1050,6 +1095,7 @@
         <dt>外資持股 / 股本</dt><dd>TaiwanStockShareholding</dd>
         <dt>除權息 / 分割</dt><dd>TaiwanStockDividendResult · TaiwanStockSplitPrice(還原價本地重算)</dd>
         <dt>大盤指數</dt><dd>TaiwanStockTotalReturnIndex(加權報酬指數,含息)</dd>
+        <dt>台積電專區</dt><dd>TaiwanStockPrice · TaiwanStockShareholding · TaiwanStockMonthRevenue(2330,觀察層隔離表)+ notes/events 事件錨點(季頻人工彙整)</dd>
       </dl>
     </div>
     <div class="mcard wide">
@@ -1916,6 +1962,37 @@
     var link=document.createElement("a"); link.className="nb-src"; link.href=note.url; link.target="_blank"; link.rel="noopener";
     setText(link, "在 GitHub 開啟原始檔 ↗"); box.appendChild(link);
   }
+  // ---------- 台積電事件錨點全文(借同一個底部 sheet 殼;結構仿 renderNoteDetail 的精簡版) ----------
+  function renderEventDetail(box, ev){
+    box.innerHTML = "";
+    var head=document.createElement("div"); head.className="th";
+    var el=document.createElement("span"); el.className="el"; setText(el, "台積電事件錨點 · 觀察層(不計分)"); head.appendChild(el);
+    var sc=document.createElement("span"); sc.className="sc"; setText(sc, ev.vlabel);
+    var pal=notePalette(ev.vcls); sc.style.color=pal[0]; sc.style.background=pal[1];
+    head.appendChild(sc); box.appendChild(head);
+    var who=document.createElement("div"); who.className="who"; setText(who, ev.title); box.appendChild(who);
+    var meta=document.createElement("div"); meta.className="nb-meta";
+    [["事件日期", ev.date],["季度", ev.quarter],["資料截至", ev.contentAsOf],
+     ["下次建議更新", ev.nextReview]].forEach(function(kv){
+      var d=document.createElement("div");
+      d.appendChild(document.createTextNode(kv[0]));
+      var b=document.createElement("b"); setText(b, kv[1]||"-"); d.appendChild(b);
+      meta.appendChild(d);
+    });
+    box.appendChild(meta);
+    var caveat=document.createElement("div"); caveat.className="nb-quality";
+    setText(caveat,"事件錨點是法說會與官方文件的人工彙整;查核狀態僅代表內容與所列來源一致,不保證公司預測實現,方向指引也不參與任何評分。");
+    box.appendChild(caveat);
+    (ev.sections||[]).forEach(function(sec,i){
+      var part=document.createElement("details"); part.className="nb-section"; part.id="event-section-"+i;
+      if(i===0) part.open=true;
+      var h=document.createElement("summary"); setText(h, sec.h); part.appendChild(h);
+      var body=document.createElement("div"); body.className="nb-section-body"; renderNoteBlocks(body,sec.blocks); part.appendChild(body);
+      box.appendChild(part);
+    });
+    var link=document.createElement("a"); link.className="nb-src"; link.href=ev.url; link.target="_blank"; link.rel="noopener";
+    setText(link, "在 GitHub 開啟原始檔 ↗"); box.appendChild(link);
+  }
   function renderHypothesisDetail(box, hypothesis){
     box.innerHTML="";
     var head=document.createElement("div"); head.className="th hypothesis-head";
@@ -2677,6 +2754,16 @@
         du.style.opacity = ".72"; du.textContent = "狀態持續 " + g.dur; el.appendChild(du);
       }
       var nt = document.createElement("div"); nt.className = "td"; nt.textContent = g.note; el.appendChild(nt);
+      if(g.tsmc){                // 台積電指引 chip(觀察層):上游法說對本族群的方向性,詳情見 tip
+        var tk = document.createElement("div"); tk.className = "td tchip";
+        tk.style.color = g.tsmc.col;
+        tk.textContent = "台積電指引 " + g.tsmc.mark + " " + g.tsmc.label;
+        // 卡片本身也綁 attachTip:先擋冒泡,點 chip 才不會誤開族群詳情(同元素其他監聽不受影響)
+        tk.addEventListener("click", function(e){ e.stopPropagation(); });
+        tk.addEventListener("keydown", function(e){ e.stopPropagation(); });
+        attachTip(tk, function(){ return g.tsmc.tip; });
+        el.appendChild(tk);
+      }
       var picks = document.createElement("div"); picks.className = "picks";
       g.stats.forEach(function(s){
         var p = document.createElement("div"); p.className = "pick stat";
@@ -2750,6 +2837,118 @@
                 why: g.note, how: GROUP_HOW.how, src: GROUP_HOW.src};
       });
     });
+  })();
+
+  // ---------- 台積電專區(觀察層):上游錨定股的量化摘要+法說指引 ----------
+  var TSMC = __TSMC_JSON__;
+  (function(){
+    var sec=document.getElementById("tsmc-section");
+    if(!sec) return;
+    if(!TSMC){                   // ref 未回補且無事件錨點:整段與導覽連結一起隱藏(同族群雷達空資料慣例)
+      var navLink=document.querySelector('.anchor-nav a[href="#tsmc-section"]');
+      if(navLink) navLink.style.display="none";
+      return;
+    }
+    sec.hidden=false;
+    var strip=document.getElementById("tsmcStrip");
+    var DIRCOL={up:"var(--strong)",down:"var(--weak)",flat:"var(--neutral)"};
+    function cell(asButton){
+      var c=document.createElement(asButton?"button":"div"); c.className="tcell";
+      if(asButton) c.type="button";
+      strip.appendChild(c); return c;
+    }
+    function fill(c,label,value,sub){
+      var l=document.createElement("span"); l.className="code"; setText(l,label); c.appendChild(l);
+      var v=document.createElement("span"); v.className="nm mono"; setText(v,value); c.appendChild(v);
+      if(sub){ var s=document.createElement("span"); s.className="tsub"; setText(s,sub); c.appendChild(s); }
+    }
+    if(TSMC.quote){
+      var qc=cell(false);
+      fill(qc,"收盤(未還原)",TSMC.quote.close+" 元","20日 "+TSMC.quote.chg20+" · 至 "+TSMC.quote.asof);
+      if((TSMC.quote.spark||[]).length>1)
+        qc.appendChild(gSpark(TSMC.quote.spark,{w:120,h:24,accent:DIRCOL[TSMC.quote.dir]||"var(--neutral)",
+          dates:TSMC.quote.sparkDates||[]}));
+      qc.tabIndex=0; qc.style.cursor="help";
+      attachTip(qc,function(){ return {el:"台積電 · 收盤價(觀察層)",
+        scLabel:"20日 "+TSMC.quote.chg20,scColor:DIRCOL[TSMC.quote.dir]||"var(--neutral)",scBg:"var(--neutral-tint)",
+        who:"台積電(2330)",
+        rows:[["收盤",TSMC.quote.close+" 元","資料日 "+TSMC.quote.asof],
+              ["20日變化",TSMC.quote.chg20,"近20個交易日收盤價變化"],
+              ["還原註記","未還原價","季配息會造成約 0.3% 的機械跳空;此格只看方向與幅度級距"]],
+        why:"台積電是本頁掃描族群共同的上游錨定股;此為原始收盤價走勢,僅供產業脈絡參考,不參與任何評分或排名。",
+        how:"每日與掃描標的同管線自 FinMind 抓取,存 ref_price 隔離表,不進 universe。",
+        howLabel:"資料方式",
+        src:"FinMind TaiwanStockPrice(2330,未還原)"}; });
+    }
+    if(TSMC.foreign){
+      var fc=cell(false);
+      fill(fc,"外資持股",TSMC.foreign.pct,"20日 "+TSMC.foreign.chg20pp+" · 至 "+TSMC.foreign.asof);
+      fc.tabIndex=0; fc.style.cursor="help";
+      attachTip(fc,function(){ return {el:"台積電 · 外資持股(觀察層)",
+        scLabel:"20日 "+TSMC.foreign.chg20pp,scColor:DIRCOL[TSMC.foreign.dir]||"var(--neutral)",scBg:"var(--neutral-tint)",
+        who:"台積電(2330)",
+        rows:[["外資持股比例",TSMC.foreign.pct,"資料日 "+TSMC.foreign.asof],
+              ["20日變化",TSMC.foreign.chg20pp,"百分點(pp)"],
+              ["雜訊註記","含保管行帳戶","單日數字含保管行重分類雜訊;看20日趨勢,不看絕對水位"]],
+        why:"外資對上游錨定股的增減持,是整個供應鏈籌碼面的背景資訊;僅供參考,不參與任何評分。",
+        how:"每日與掃描標的同管線自 FinMind 抓取,存 ref_holding 隔離表,不進 universe。",
+        howLabel:"資料方式",
+        src:"FinMind TaiwanStockShareholding(2330)"}; });
+    }
+    if(TSMC.rev){
+      var FUND_COL2={up:["var(--strong)","var(--strong-tint)"],down:["var(--weak)","var(--weak-tint)"],
+                     flat:["var(--neutral)","var(--neutral-tint)"]};
+      var rc=cell(false);
+      fill(rc,"月營收",TSMC.rev.label,(TSMC.rev.rows&&TSMC.rev.rows[0])?TSMC.rev.rows[0][1]:"");
+      rc.tabIndex=0; rc.style.cursor="help";
+      attachTip(rc,function(){ var col=FUND_COL2[TSMC.rev.cls]||FUND_COL2.flat;
+        return {el:"台積電 · 月營收(觀察層)",who:"台積電(2330)",
+          rows:TSMC.rev.rows,why:TSMC.rev.why,
+          fundSpark:TSMC.rev.spark,fundSparkDates:TSMC.rev.sparkDates,
+          how:"與掃描標的同一套基本面排程(月/季頻,非每日);純參考,不影響任何分數。",
+          howLabel:"資料方式",
+          src:"FinMind TaiwanStockMonthRevenue / 財報(2330)",
+          scLabel:TSMC.rev.label,scColor:col[0],scBg:col[1]}; });
+    }
+    var ev=TSMC.event;
+    if(ev){
+      var evSheet=function(){ return {el:"事件錨點",who:"台積電(2330)",title:ev.title,quarter:ev.quarter,
+        date:ev.date,vcls:ev.vcls,vlabel:ev.vlabel,contentAsOf:ev.contentAsOf,nextReview:ev.nextReview,
+        sections:ev.sections,url:ev.url}; };
+      var ec=cell(true);
+      fill(ec,"最新事件",ev.quarter+" 法說會",ev.vlabel+" · "+ev.date);
+      ec.setAttribute("aria-label","台積電事件錨點:"+ev.quarter+" 法說會,"+ev.vlabel+";點擊展開全文");
+      ec.addEventListener("click",function(){ openSheet(evSheet(), renderEventDetail, ec); });
+      var kpiHost=document.getElementById("tsmcKpi");
+      ev.kpi.forEach(function(kv){
+        var c=document.createElement("div"); c.className="tcell";
+        var l=document.createElement("span"); l.className="code"; setText(l,kv[0]); c.appendChild(l);
+        var v=document.createElement("span"); v.className="nm"; setText(v,kv[1]); c.appendChild(v);
+        kpiHost.appendChild(c);
+      });
+      var gHost=document.getElementById("tsmcGuidance");
+      ev.guidance.forEach(function(gi){
+        var rowEl=document.createElement("div"); rowEl.className="grow";
+        var nm=document.createElement("span"); nm.className="gname"; setText(nm,gi.nm); rowEl.appendChild(nm);
+        var dd=document.createElement("span"); dd.className="gdir"; dd.style.color=gi.col;
+        setText(dd,gi.mark+" "+gi.label); rowEl.appendChild(dd);
+        var tx=document.createElement("span"); tx.className="gtext"; setText(tx,gi.text); rowEl.appendChild(tx);
+        gHost.appendChild(rowEl);
+      });
+      var links=document.getElementById("tsmcLinks");
+      var rb=document.createElement("button"); rb.type="button"; rb.className="evbtn";
+      setText(rb,"讀法說全文(事件錨點)");
+      rb.addEventListener("click",function(){ openSheet(evSheet(), renderEventDetail, rb); });
+      links.appendChild(rb);
+      var gh=document.createElement("a"); gh.href=ev.url; gh.target="_blank"; gh.rel="noopener";
+      setText(gh,"在 GitHub 開啟原始檔 ↗"); links.appendChild(gh);
+      (ev.history||[]).forEach(function(h){
+        var ha=document.createElement("a"); ha.href=h.url; ha.target="_blank"; ha.rel="noopener";
+        setText(ha,"歷史錨點:"+h.date); links.appendChild(ha);
+      });
+    } else {
+      var deep=document.getElementById("tsmcDeep"); if(deep) deep.hidden=true;
+    }
   })();
 
   // ---------- 五日變層軌跡：只列已確認分層曾改變的個股 ----------

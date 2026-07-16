@@ -29,7 +29,8 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertTrue(html.endswith("</html>"))
 
     def test_first_screen_overview_has_navigation_and_injected_payload(self):
-        for anchor in ("overview", "groups-section", "tiers-section", "stocks-section", "method"):
+        for anchor in ("overview", "tsmc-section", "groups-section",
+                       "tiers-section", "stocks-section", "method"):
             self.assertIn(f'href="#{anchor}"', self.template)
         self.assertIn('id="overview" aria-labelledby="overviewTitle"', self.template)
         self.assertIn('id="overviewSummary"', self.template)
@@ -143,7 +144,8 @@ class DashboardUxContractTest(unittest.TestCase):
             '"comp3Dates": [h["date"] for h in comp_hist]',
         ):
             self.assertIn(marker, self.builder)
-        self.assertEqual(self.template.count("fundSparkDates:"), 2)
+        # 2 個個股 fund badge 消費者 + 1 個台積電專區月營收格——每個傳 fundSpark 者都必須帶日期
+        self.assertEqual(self.template.count("fundSparkDates:"), 3)
         self.assertEqual(self.template.count("gCompositeBar(row.comp"), 2)
 
     def test_first_desktop_click_opens_persistent_drawer(self):
@@ -198,6 +200,25 @@ class DashboardUxContractTest(unittest.TestCase):
             (-0.03, 10, 6, -0.05, 0.4, 3),
         )
         self.assertEqual(validate.IS_CUTOFF, "2026-07-05")
+
+    def test_tsmc_section_is_observation_layer_only(self):
+        # 模板:專區 anchor section、payload 注入、事件全文 renderer、族群卡指引 chip
+        self.assertIn('id="tsmc-section"', self.template)
+        self.assertIn("var TSMC = __TSMC_JSON__;", self.template)
+        self.assertIn("function renderEventDetail", self.template)
+        self.assertIn("g.tsmc", self.template)
+        self.assertIn("觀察層,不計分", self.template)
+        # builder:payload 注入與事件錨點 loader
+        self.assertIn('html.replace("__TSMC_JSON__"', self.builder)
+        self.assertIn("load_events", self.builder)
+        self.assertIn("ref_price", self.builder)
+        # 鐵律守護:2330 只能是觀察層參考個股——不在 universe、score.py 不讀 ref 表
+        self.assertEqual(fd.REF_IDS, ["2330"])
+        universe_csv = (ROOT / "config" / "universe.csv").read_text(encoding="utf-8")
+        self.assertFalse(any(line.startswith("2330,") for line in universe_csv.splitlines()))
+        score_src = (SCRIPTS / "score.py").read_text(encoding="utf-8")
+        self.assertNotIn("ref_price", score_src)
+        self.assertNotIn("ref_holding", score_src)
 
     def test_public_copy_avoids_absolute_or_actionable_rank_claims(self):
         public_copy = self.builder + "\n" + self.template
