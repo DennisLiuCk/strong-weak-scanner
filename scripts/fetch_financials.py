@@ -25,7 +25,7 @@ import argparse, csv, os, sqlite3, sys, time
 from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fetch_daily import api_get, get_token   # 重用抓取層(retry/限流退避一致)
+from fetch_daily import api_get, get_token, REF_IDS   # 重用抓取層(retry/限流退避一致)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -99,6 +99,7 @@ def main():
         sys.exit(f"未知 dataset:{bad}(可用:{sorted(UPSERT)})")
 
     ids = read_universe_ids()
+    ids += [s for s in REF_IDS if s not in ids]   # 觀察層參考個股(2330):月營收/財報供台積電專區
     if args.stocks:
         want = {s.strip() for s in args.stocks.split(",") if s.strip()}
         missing = want - set(ids)
