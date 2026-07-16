@@ -346,7 +346,7 @@
   .row{display:grid;
     grid-template-columns:minmax(150px,1.2fr) repeat(5,minmax(130px,1fr)) minmax(150px,1.15fr);
     align-items:stretch;border-top:1px solid var(--hairline-2)}
-  /* 離屏個股列跳過 layout/paint(98 檔約 14000px 長表),降低首屏與捲動成本;高度先估後記憶 */
+  /* 離屏個股列跳過 layout/paint(111 檔長表),降低首屏與捲動成本;高度先估後記憶 */
   .row[data-g]{content-visibility:auto;contain-intrinsic-size:auto 144px}
   .row.head{border-top:none;position:sticky;top:0;background:var(--surface-2);z-index:2;
     border-bottom:1px solid var(--hairline)}
@@ -882,7 +882,7 @@
     <h2 id="tsmcTitle">台積電專區 · 產業方向指引(觀察層,不計分)</h2>
     <div class="tsmc-strip" id="tsmcStrip"></div>
     <details class="tsmc-deep" id="tsmcDeep">
-      <summary>法說 KPI 與九族群指引對照</summary>
+      <summary>法說 KPI 與族群指引對照</summary>
       <div class="tsmc-kpi" id="tsmcKpi"></div>
       <div class="tsmc-guid" id="tsmcGuidance"></div>
       <p class="tsmc-links" id="tsmcLinks"></p>
@@ -1076,7 +1076,7 @@
         <dt>投信買超廣度</dt><dd><span class="f">族群內投信5日淨買 &gt;0 的檔數比例</span>本土法人參與的廣度。</dd>
         <dt>20日動能 vs 全體</dt><dd><span class="f">族群中位20日報酬 − 全體中位</span>族群整體跑贏還是跑輸大部隊。</dd>
         <dt>修正市場情境</dt><dd><span class="f">加權報酬指數(含息)距20日高 ≤ −3%</span>頁首籤條「修正」的定義。用含息指數,降低除息旺季機械性下跌造成的誤判。</dd>
-        <dt>台積電指引</dt><dd><span class="f">每季法說會 → 九族群方向標記(↑ ↓ → ↕ ·)</span>台積電是掃描族群共同的上游;法說內容對各族群的方向性由人工整理進事件錨點,非數值訊號、不進任何評分。點族群卡的指引 chip 或「台積電專區」可看依據與法說全文。</dd>
+        <dt>台積電指引</dt><dd><span class="f">每季法說會 → 各族群方向標記(↑ ↓ → ↕ ·)</span>台積電是掃描族群共同的上游;法說內容對各族群的方向性由人工整理進事件錨點,非數值訊號、不進任何評分。點族群卡的指引 chip 或「台積電專區」可看依據與法說全文。</dd>
       </dl>
       <p>族群層統計需至少 6 檔有效樣本才給值,避免 1、2 檔代表整個族群。</p>
     </div>
@@ -1131,7 +1131,7 @@
 (function(){
   "use strict";
   // sub = 明細表欄位表頭的第二行:把「這欄分數怎麼來」的常數語意放這裡,
-  // 個股格內只留會變動的資訊(排名桶/判讀),避免同一句話跟著 98 檔重複。
+  // 個股格內只留會變動的資訊(排名桶/判讀),避免同一句話跟著 111 檔重複。
   // vlabel = 格內小標(格值是什麼指標);欄位表頭已寫元素名,這裡只標「數字的身分」
   var EL = [
     {k:"①價", role:"族群相對", sub:"族群內排名 · 含抗跌", vlabel:"20日相對報酬",

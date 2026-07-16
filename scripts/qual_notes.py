@@ -41,7 +41,7 @@ UNIVERSE_CSV = os.path.join(ROOT, "config", "universe.csv")
 # ── 事件錨點(notes/events/)──────────────────────────────────────────
 # 跨個股市場事件彙整(如台積電法說會),供儀表板台積電專區與個股筆記複核引用。
 # 同用 <!-- meta --> 契約但無 stock_id:以 subject+event_date 識別;
-# guidance_<族群鍵>: <dir>|<一句話> 編碼對九族群的方向性指引,九鍵必須全齊
+# guidance_<族群鍵>: <dir>|<一句話> 編碼對正式族群的方向性指引,所有族群鍵必須全齊
 # (未提及請寫 none|未提及——「法說沒提」本身就是資訊)。
 EVENTS_DIR = os.path.join(ROOT, "notes", "events")
 GROUPS_CSV = os.path.join(ROOT, "config", "groups.csv")

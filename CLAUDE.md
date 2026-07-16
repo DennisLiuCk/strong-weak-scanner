@@ -1,7 +1,7 @@
 # strong-weak-scanner(台股汰弱留強掃描)
 
-台股半導體與 AI 供應鏈族群(被動/功率/封測/記憶體/矽智財/設備/材料/散熱/PCB,
-約 98 檔)的兩層訊號系統:**個股層**族群內排名
+台股半導體與 AI 供應鏈族群(被動/功率/封測/記憶體/矽智財/設備/材料/散熱/PCB/電源,
+約 111 檔)的兩層訊號系統:**個股層**族群內排名
 選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions(台灣 21:40)
 抓資料 → 評分 → 儀表板;SQLite db 與報告都 commit 在 repo 裡。
 儀表板:https://dennisliuck.github.io/strong-weak-scanner/
@@ -74,6 +74,6 @@ financials/balance_sheet/cash_flow 是 FinMind 原生 type/value 窄表(EAV),非
 **ref_price/ref_holding 與 `notes/events/*.md`(2026-07-17 起)也是另一類**——台積電專區
 (觀察層)的原料:前者是每日 FinMind 2330 收盤/外資持股隔離表(範圍旋鈕 =
 `fetch_daily.py` 的 REF_IDS,不進任何衍生表、不併入 data_changed);後者是跨個股市場
-事件錨點(法說會彙整,人工撰寫 + machine-readable meta,guidance 九鍵編碼對九族群的
+事件錨點(法說會彙整,人工撰寫 + machine-readable meta,guidance 鍵逐一對應正式族群的
 方向指引),`qual_notes.load_events()` 讀取、`build_dashboard.py` 顯示成主頁台積電專區
 與族群卡指引 chip;每季法說後人工更新,`qual_notes.py --lint` 稽核格式(CI 同步跑)。

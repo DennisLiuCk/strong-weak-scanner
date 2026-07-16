@@ -68,6 +68,9 @@ stock_id,name,group,biz
 6223,旺矽,semiequip,探針卡、測試介面
 6515,穎崴,semiequip,測試介面座
 6510,精測,semiequip,探針卡
+3587,閎康,semiequip,材料/失效分析實驗室
+3289,宜特,semiequip,材料/驗證測試實驗室
+6830,汎銓,semiequip,材料分析實驗室
 6488,環球晶,material,矽晶圓
 3532,台勝科,material,矽晶圓
 6182,合晶,material,矽晶圓
@@ -97,3 +100,13 @@ stock_id,name,group,biz
 3037,欣興,pcb,ABF載板
 8046,南電,pcb,ABF載板
 3189,景碩,pcb,IC載板
+2308,台達電,powersupply,AI伺服器電源/資料中心基礎設施(含液冷)
+2301,光寶科,powersupply,AI伺服器電源/BBU/電能管理
+6412,群電,powersupply,電源供應器(伺服器/消費電子)
+6282,康舒,powersupply,電源供應器(企業/電信/消費)
+3078,僑威,powersupply,電源供應器(OEM/ODM;桌機為主)
+3015,全漢,powersupply,電源供應器(工業/雲端/邊緣運算)
+3211,順達,powersupply,電池模組/BBU
+6781,AES-KY,powersupply,鋰電池模組/資料中心BBU
+2457,飛宏,powersupply,電源供應器/充電設備
+8109,博大,powersupply,工業電源/DC-DC

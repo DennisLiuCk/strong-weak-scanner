@@ -2,6 +2,36 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## Universe 第一批擴充：電源供應 + 檢測實驗室 — 2026-07-17
+
+**策略規則零變動**(`score.py` 權重/tier、`fetch_daily.py` 族群/市場條件與
+`validate.py` 的 `IS_CUTOFF` 皆未動)。依
+`reports/universe_gap_proposal_2026-07-17.md` 的分批治理提案與
+`reports/screen_2026-07-17.md` 的 R2/R3/R4 體檢，完成第一批 Universe 擴充；
+R1 逐檔一手文件覆核與推論界線記於
+`reports/biz_audit_powersupply_2026-07-17.md`：
+
+- **10 群 111 檔**：新增 `powersupply` 電源供應族群 10 檔（台達電、光寶科、
+  群電、康舒、僑威、全漢、順達、AES-KY、飛宏、博大），並把閎康、宜特、汎銓
+  三家材料／失效分析與驗證測試服務商併入 `semiequip`；Universe 由 9 群 98 檔
+  增為 10 群 111 檔。新巨(2420)因 2025 PSU 僅 46.88%、2026Q1 46.02%，未過
+  R1 主營收 >50% 門檻，留在 `candidates.csv` 並記錄理由。
+- **R1 邊界**：台達電以複合 Power Electronics／Infrastructure 的人工判定歸
+  `powersupply`，不重複放入 `thermal`；飛宏最新 PSU 68.3% 推翻「車充為主」
+  疑慮，但資料中心仍僅切入敘述；博大電源占 98.34%，卻沒有 AI／資料中心直接
+  營收證據。AI 曝險品質與 R1 主業門檻分開記錄，沒有暗增新策略條件。
+- **資料與額度**：13 檔定向回補 2026-03-01 起資料，實際均自首個交易日
+  2026-03-02 起有 94 筆價格資料；日資料 65 個 dataset 請求 + 13 個事件請求，
+  財報四表另 52 次請求，未做全量重抓。沿用交接的日常粗估基準，本批固定新增
+  13 檔 × 5 個核心個股 datasets = 65 次，使約 593 增至 658（約 650）；事件
+  coverage 依缺口發生，連同指數與交易所備援另計，仍由雙 token 輪替。
+- **質化與事件契約**：13 檔同步建立 `focused_v1`／`ai_draft` 質化筆記，避免
+  `universe.csv` 先行造成 quality CI 失敗；台積電 2026Q2 事件錨點同步補齊
+  `guidance_powersupply`，維持 guidance 鍵與 10 個正式族群一一對齊。
+- **重算與 OOS 邊界**：`daily_metrics`／`daily_scores` 依 111 檔新名單全歷史重算；
+  回補結果含事後選樣，不當成策略證據。`powersupply` 的 OOS 自加入後第一份正式
+  as-seen 快照起算，至少累積 8 週才具裁決力。
+
 ## 台積電專區(觀察層)上線 — 2026-07-17
 
 **策略規則零變動**(`score.py` 權重/tier、`fetch_daily.py` 族群/市場條件與
