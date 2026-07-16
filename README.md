@@ -388,6 +388,42 @@ uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --metrics
 複核結果整理成 `reports/biz_audit_<日期>.md`(範例見 2026-07-09 那份,含逐檔判定表與
 依據引用),比照 `screen.py` 報告的存放慣例;修正/擱置項目一併記入 CHANGELOG。
 
+## 事件錨點與台積電專區(`notes/events/`)
+
+台積電(2330)是本 universe 共同的上游:capex 決定設備/材料訂單、先進封裝產能決定
+封測外溢與 AI 伺服器節奏、HPC 平台占比是 AI 需求的第一手證據。`notes/events/*.md`
+保存跨個股的市場事件錨點(目前=每季台積電法說會彙整),儀表板據此顯示
+「台積電專區」與族群卡上的「台積電指引」chip。**全程觀察層:2330 不在 universe、
+不參與任何排名/評分,指引是編輯彙整的方向標記,不是預測。**
+
+### 檔案契約(`qual_notes.py --lint` 稽核,CI 同步跑)
+
+檔名 `<事件日>_<標題>.md`,與個股筆記同用 `<!-- meta -->` 區塊(唯一、key: value 逐行):
+
+| 欄位 | 必填 | 說明 |
+|---|---|---|
+| `subject` | ✅ | 事件主體,小寫代號(目前儀表板僅顯示 `tsmc`;其他值 lint 警告) |
+| `event_date` / `fiscal_quarter` | ✅ | 事件日(YYYY-MM-DD)/ 季度(`2026Q2`);同 (subject, event_date) 重複=error |
+| `content_as_of` / `next_review` | ✅ | 資料時點 / 下次建議更新(=下季法說估日);逾期在儀表板標「待更新」 |
+| `verification_status` | ✅ | 沿用質化筆記四態(`ai_draft`/`partially_verified`/…) |
+| `guidance_<族群鍵>` | ✅×9 | `<dir>\|<一句話>`,dir ∈ `up/flat/down/mixed/none`;**九鍵必須全齊**——「法說沒提」也是資訊,未提及寫 `none\|未提及` |
+| `kpi_capex` `kpi_fy_growth` `kpi_gm` `kpi_hpc_share` | 建議 | 顯示字串(缺=專區顯示「—」,lint 警告) |
+
+prose 章節完全自由(§數字/§質化訊號/§族群映射…),經 `_extract_sections` 拆節後
+在儀表板 sheet 全文呈現,並連到 GitHub 原始檔。同 subject 多檔時取 `event_date`
+最大者為當前事件,其餘列入歷史清單。
+
+### 資料流與維護節奏
+
+- **量化(自動)**:每日管線另抓 2330 收盤/外資持股 → `ref_price`/`ref_holding`
+  隔離表(+2 req/日;不進任何衍生表);月營收/財報四表隨 `fetch_financials`
+  月/季排程(+1 req/月、+4 req/季),`fund_map["2330"]` 供專區月營收格。
+- **質化(每季人工/AI 協作)**:法說會後 T+1 內更新事件錨點(guidance/kpi/prose),
+  跑 `uv run --no-project --python 3.12 python scripts/qual_notes.py --lint` 確認格式,
+  `next_review` 設下季法說估日。
+- 指引未來若要驗證「方向 vs 族群後續報酬」,依策略治理慣例走 `validate.py`
+  另立觀察因子與 OOS 檢驗,不直接進評分。
+
 ## 侷限與註記
 
 - 券商分點(真主力)需 FinMind Sponsor 等級,未開通——看得到法人別、看不到分點。

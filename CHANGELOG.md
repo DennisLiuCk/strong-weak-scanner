@@ -2,6 +2,41 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 台積電專區(觀察層)上線 — 2026-07-17
+
+**策略規則零變動**(`score.py` 權重/tier、`fetch_daily.py` 族群/市場條件與
+`validate.py` 的 `IS_CUTOFF` 皆未動)。台積電(2330)是全 universe 的上游錨定股
+(capex 決定設備/材料訂單、先進封裝產能決定封測外溢、HPC 占比是 AI 需求證據),
+本次把「上游方向性指引」補上儀表板,全程觀察層、不進任何評分:
+
+- **資料流三條**:① 每日 `fetch_ref_series()`(仿 fetch_index 前例)抓 2330 收盤/
+  外資持股 → `ref_price`/`ref_holding` 隔離表,**+2 req/日(591→593,單 token 上限
+  600/hr,雙 token 輪替後盾)**;回補 2026-03-02 起 94 交易日(2 req)。
+  ② `fetch_financials` ids 併入 `REF_IDS`,2330 月營收/財報四表 +1 req/月、+4 req/季;
+  `build_fund_map` 不過濾 universe → `fund_map["2330"]` 零下游改動自動可用
+  (實測「營收YoY +68%」)。③ `notes/events/*.md` 事件錨點 machine-readable meta
+  (必填 6 鍵 + guidance 九鍵全齊 + kpi 四鍵),`qual_notes.py` 新增 `load_events()`
+  並把事件稽核併入 `--lint`(破壞 guidance 一行實測 exit 1)。
+- **儀表板**:`#tsmc-section`(anchor-nav 5→6)= 摘要 4 格(收盤/外資持股/月營收/
+  最新事件,逐格 attachTip 標 FinMind 來源與未還原、保管行雜訊註記)+ 折疊深度區
+  (法說 KPI 四格 + 九族群指引對照)+ 事件全文 sheet(新 `renderEventDetail`,
+  借質化筆記 nb-* 樣式)+ GitHub 原始檔連結;九張族群卡各加「台積電指引」chip
+  (click/keydown stopPropagation 防冒泡——實測 chip 點擊開指引詳情、非族群詳情)。
+  從缺分級降級:移除 notes/events 實測 build exit 0、事件格與九卡 chip 消失;
+  ref 未回補時對應格不出現。
+- **鐵律驗證**:2330 不進 universe/daily_metrics/daily_scores(三查=0);
+  `daily_scores` 不變量(9,212 筆、抽樣 composite)改動前後一致;ref 抓取刻意
+  **不併入 data_changed**(不觸發無謂 metrics 重建);archive as-seen 快照未被覆寫
+  (本地重跑實測「保留既有快照」)。
+- **測試**:unittest 三模組 65→70(事件契約 4 條 + 專區契約 1 條——含 `REF_IDS`
+  凍結、universe.csv 無 2330、score.py 原始碼不讀 ref 表的守護斷言;
+  fundSparkDates 消費者 2→3);Chrome 實測同步 JS 斷言全過(6 錨點/4 格/9 指引/
+  9 chip/事件 sheet 8 章節/深淺主題),console 零錯誤。
+- **維護節奏**:每季法說會後更新事件錨點(guidance/kpi/prose)並跑
+  `qual_notes.py --lint`;`next_review` 設下季法說估日(本季=2026-10-15)。
+  指引若未來要驗證「方向 vs 族群後續報酬」,走 validate.py 另立觀察因子,
+  不直接進評分。
+
 ## 圖表節點可追溯讀值：桌機 hover／鍵盤、手機點按 — 2026-07-14
 
 **策略規則零變動**（`score.py` 權重/tier、`fetch_daily.py` 族群/市場條件與
