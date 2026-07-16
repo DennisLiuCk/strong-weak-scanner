@@ -816,5 +816,63 @@ last_updated: 2026-07-11
         self.assertIsNone(rows[0]["verification"])
 
 
+class EventAnchorTests(unittest.TestCase):
+    """notes/events/ 事件錨點契約(load_events / _lint_events)。"""
+
+    @staticmethod
+    def _event_text(drop=None, replace=None):
+        meta = {
+            "subject": "tsmc",
+            "event_date": "2026-07-16",
+            "fiscal_quarter": "2026Q2",
+            "content_as_of": "2026-07-16",
+            "next_review": "2099-12-31",
+            "verification_status": "partially_verified",
+        }
+        for group_key in qual_notes._load_group_keys():
+            meta[f"guidance_{group_key}"] = "none|未提及"
+        for kpi_key in qual_notes.EVENT_KPI_KEYS:
+            meta[kpi_key] = "測試值"
+        if replace:
+            meta.update(replace)
+        for key in drop or ():
+            meta.pop(key, None)
+        lines = "\n".join(f"{key}: {value}" for key, value in meta.items())
+        return f"# 測試事件\n\n<!-- meta\n{lines}\n-->\n\n## 摘要\n\n內容一句。\n"
+
+    def _load(self, text, name="2026-07-16_test-event.md"):
+        with tempfile.TemporaryDirectory() as tmp:
+            with open(os.path.join(tmp, name), "w", encoding="utf-8") as handle:
+                handle.write(text)
+            return qual_notes.load_events(events_dir=tmp)
+
+    def test_minimal_valid_event_passes_and_becomes_latest(self):
+        result = self._load(self._event_text())
+        self.assertEqual([], result["errors"])
+        latest = result["latest"]
+        self.assertIsNotNone(latest)
+        self.assertEqual("2026Q2", latest["fiscal_quarter"])
+        self.assertEqual(set(qual_notes._load_group_keys()), set(latest["guidance"]))
+        self.assertEqual(set(qual_notes.EVENT_KPI_KEYS), set(latest["kpi"]))
+        self.assertEqual("partially_verified", latest["verification"])
+        self.assertEqual("fresh", qual_notes.note_status(latest, "2026-07-16"))
+
+    def test_missing_guidance_group_key_is_error(self):
+        group_key = qual_notes._load_group_keys()[0]
+        result = self._load(self._event_text(drop=[f"guidance_{group_key}"]))
+        self.assertTrue(any("guidance 族群鍵不全" in error for error in result["errors"]))
+
+    def test_guidance_direction_out_of_domain_is_error(self):
+        group_key = qual_notes._load_group_keys()[0]
+        result = self._load(self._event_text(replace={f"guidance_{group_key}": "sideways|亂寫"}))
+        self.assertTrue(any("方向不在值域" in error for error in result["errors"]))
+
+    def test_repo_event_anchors_pass_contract(self):
+        result = qual_notes.load_events()
+        self.assertEqual([], result["errors"])
+        self.assertIsNotNone(result["latest"])
+        self.assertEqual("tsmc", result["latest"]["subject"])
+
+
 if __name__ == "__main__":
     unittest.main()

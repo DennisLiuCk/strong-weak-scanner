@@ -5,6 +5,8 @@ on:
     paths:
       - "notes/qualitative/**"
       - "notes/leading_hypotheses/**"
+      - "notes/events/**"
+      - "config/groups.csv"
       - "LEADING_HYPOTHESES.md"
       - "LEADING_HYPOTHESES_PHASE1_REVIEW.md"
       - "LEADING_HYPOTHESES_PHASE2_RUNBOOK.md"
@@ -23,6 +25,8 @@ on:
     paths:
       - "notes/qualitative/**"
       - "notes/leading_hypotheses/**"
+      - "notes/events/**"
+      - "config/groups.csv"
       - "LEADING_HYPOTHESES.md"
       - "LEADING_HYPOTHESES_PHASE1_REVIEW.md"
       - "LEADING_HYPOTHESES_PHASE2_RUNBOOK.md"

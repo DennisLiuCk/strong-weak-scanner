@@ -38,6 +38,25 @@ NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 TEMPLATE_MD = os.path.join(NOTES_DIR, "_template.md")
 UNIVERSE_CSV = os.path.join(ROOT, "config", "universe.csv")
 
+# ── 事件錨點(notes/events/)──────────────────────────────────────────
+# 跨個股市場事件彙整(如台積電法說會),供儀表板台積電專區與個股筆記複核引用。
+# 同用 <!-- meta --> 契約但無 stock_id:以 subject+event_date 識別;
+# guidance_<族群鍵>: <dir>|<一句話> 編碼對九族群的方向性指引,九鍵必須全齊
+# (未提及請寫 none|未提及——「法說沒提」本身就是資訊)。
+EVENTS_DIR = os.path.join(ROOT, "notes", "events")
+GROUPS_CSV = os.path.join(ROOT, "config", "groups.csv")
+EVENT_GUIDANCE_DIRS = ("up", "flat", "down", "mixed", "none")
+EVENT_KPI_KEYS = {
+    "kpi_capex": "資本支出(FY)",
+    "kpi_fy_growth": "全年營收展望",
+    "kpi_gm": "毛利率",
+    "kpi_hpc_share": "HPC 占比",
+}
+EVENT_REQUIRED_KEYS = ("subject", "event_date", "fiscal_quarter", "content_as_of",
+                       "next_review", "verification_status")
+_EVENT_SUBJECT_RE = re.compile(r"^[a-z0-9_]+$")
+_EVENT_QUARTER_RE = re.compile(r"^\d{4}Q[1-4]$")
+
 # 核心章節或既有契約有 breaking change 才遞增；opt-in profile 可維持同版向後相容。
 TEMPLATE_VERSION = 2
 FOCUSED_RESEARCH_PROFILE = qual_evidence.RESEARCH_PROFILE
@@ -930,6 +949,130 @@ def _load_universe():
         return [row for row in csv.DictReader(handle) if row.get("stock_id")]
 
 
+def _load_group_keys():
+    with open(GROUPS_CSV, encoding="utf-8") as handle:
+        return [row["group"] for row in csv.DictReader(handle) if row.get("group")]
+
+
+def _analyse_event(path, text, group_keys):
+    meta, errors = _parse_meta_details(text)
+    warnings = []
+    title_match = re.search(r"^#\s+(.+?)\s*$", _META_RE.sub("", text), re.M)
+    title = (title_match.group(1).strip() if title_match
+             else os.path.splitext(os.path.basename(path))[0])
+    for key in EVENT_REQUIRED_KEYS:
+        if not meta.get(key):
+            errors.append(f"meta 缺少必填欄位:{key}")
+    subject = meta.get("subject", "")
+    if subject and not _EVENT_SUBJECT_RE.match(subject):
+        errors.append(f"subject 格式不合(^[a-z0-9_]+$):{subject}")
+    elif subject and subject != "tsmc":
+        warnings.append(f"subject={subject}:v1 儀表板僅顯示 tsmc,此事件不會上專區")
+    quarter = meta.get("fiscal_quarter", "")
+    if quarter and not _EVENT_QUARTER_RE.match(quarter):
+        errors.append(f"fiscal_quarter 格式不合(YYYYQn):{quarter}")
+    for key in ("event_date", "content_as_of", "next_review"):
+        value = meta.get(key)
+        if value and not _valid_date(value):
+            errors.append(f"{key} 不是合法日期:{value}")
+    declared = meta.get("verification_status", "")
+    verification = declared if declared in VERIFICATION_STATUSES else "ai_draft"
+    if declared and declared not in VERIFICATION_STATUSES:
+        errors.append(f"verification_status 不在值域 {VERIFICATION_STATUSES}:{declared}")
+    guidance = {}
+    for key, value in meta.items():
+        if not key.startswith("guidance_"):
+            continue
+        gkey = key[len("guidance_"):]
+        if gkey not in group_keys:
+            errors.append(f"guidance 鍵不在 config/groups.csv 族群:{gkey}")
+            continue
+        direction, _, gtext = value.partition("|")
+        direction, gtext = direction.strip(), gtext.strip()
+        if direction not in EVENT_GUIDANCE_DIRS:
+            errors.append(f"guidance_{gkey} 方向不在值域 {EVENT_GUIDANCE_DIRS}:{direction}")
+            continue
+        if not gtext:
+            errors.append(f"guidance_{gkey} 缺少一句話說明(格式:<dir>|<說明>)")
+            continue
+        if len(gtext) > 80:
+            warnings.append(f"guidance_{gkey} 說明超過 80 字,儀表板顯示會截斷")
+        guidance[gkey] = {"dir": direction, "text": gtext}
+    missing_groups = [g for g in group_keys if g not in guidance]
+    if missing_groups:
+        errors.append(
+            f"guidance 族群鍵不全,缺:{','.join(missing_groups)}(未提及請寫 none|未提及)")
+    kpi = {key: meta[key] for key in EVENT_KPI_KEYS if meta.get(key)}
+    missing_kpi = [key for key in EVENT_KPI_KEYS if key not in kpi]
+    if missing_kpi:
+        warnings.append(f"kpi 欄位缺:{','.join(missing_kpi)}(專區將顯示「—」)")
+    if _valid_date(meta.get("next_review", "")) and meta["next_review"] <= _today().isoformat():
+        warnings.append(f"next_review 已到期:{meta['next_review']}")
+    return {
+        "path": path,
+        "relpath": os.path.relpath(path, ROOT).replace("\\", "/"),
+        "title": title,
+        "subject": subject,
+        "fiscal_quarter": quarter,
+        "event_date": meta.get("event_date"),
+        "content_as_of": meta.get("content_as_of"),
+        "last_updated": meta.get("content_as_of"),   # note_status() 讀的別名欄
+        "next_review": meta.get("next_review"),
+        "verification": verification,
+        "kpi": kpi,
+        "guidance": guidance,
+        "sections": _extract_sections(text),
+        "quality_errors": errors,
+        "quality_warnings": warnings,
+    }
+
+
+def load_events(events_dir=EVENTS_DIR, subject="tsmc"):
+    """載入事件錨點。同 subject 取 event_date 最大者為 latest(平手取檔名字典序大),
+    其餘依日期新→舊進 history;目錄不存在或無合法檔案 → latest=None,不擋主管線。"""
+    infos = []
+    if os.path.isdir(events_dir):
+        group_keys = _load_group_keys()
+        for path in sorted(glob.glob(os.path.join(events_dir, "*.md"))):
+            if os.path.basename(path).startswith("_"):
+                continue
+            with open(path, encoding="utf-8") as handle:
+                text = handle.read()
+            infos.append(_analyse_event(path, text, group_keys))
+    seen = {}
+    for info in infos:
+        key = (info["subject"], info["event_date"])
+        if all(key) and key in seen:
+            info["quality_errors"].append(
+                f"同 (subject, event_date) 重複:{os.path.basename(seen[key]['path'])}、"
+                f"{os.path.basename(info['path'])}")
+        elif all(key):
+            seen[key] = info
+    errors = [f"{info['relpath']}: {issue}"
+              for info in infos for issue in info["quality_errors"]]
+    pool = [i for i in infos
+            if i["subject"] == subject and _valid_date(i["event_date"] or "")]
+    pool.sort(key=lambda i: (i["event_date"], os.path.basename(i["path"])))
+    latest = pool[-1] if pool else None
+    history = list(reversed(pool[:-1])) if len(pool) > 1 else []
+    return {"latest": latest, "history": history, "errors": errors, "all": infos}
+
+
+def _lint_events():
+    result = load_events()
+    error_count = warning_count = 0
+    for info in result["all"]:
+        tag = os.path.basename(info["path"])
+        for issue in info["quality_errors"]:
+            print(f"ERROR\t{tag}\t{issue}")
+            error_count += 1
+        for issue in info["quality_warnings"]:
+            print(f"WARN\t{tag}\t{issue}")
+            warning_count += 1
+    print(f"事件錨點:{len(result['all'])} 篇,{error_count} errors,{warning_count} warnings")
+    return 1 if error_count else 0
+
+
 def _status_rows(asof):
     notes = load_notes()
     rows = []
@@ -1040,7 +1183,10 @@ def main():
 
     notes = load_notes()
     if args.lint:
-        return _lint(notes, None if args.lint == "ALL" else args.lint)
+        rc = _lint(notes, None if args.lint == "ALL" else args.lint)
+        if args.lint == "ALL":
+            rc = max(rc, _lint_events())
+        return rc
     if args.hash_stock:
         note = notes.get(args.hash_stock)
         if not note:
