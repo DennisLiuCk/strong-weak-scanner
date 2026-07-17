@@ -2,6 +2,28 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 質化複核機器輔助 triage 與領先假說多空觀點 — 2026-07-18
+
+**量化策略規則零變動**;本次只優化人工研究層的複核效率與領先假說資料豐富度,
+依據與實測見 `reports/review_optimization_2026-07-18.md`:
+
+- 新增 `scripts/qual_review.py`(唯讀):沿用 `_claim_units` 解析 claim 數字,
+  pdftotext 抽同 pack cited/rendered 頁文字做數值比對(單位限定倍率換算、絕對值、
+  兩數加減推導),產出六段 triage(HARD/未命中/推導/高風險詞/無文字層/命中明細)。
+  實測 3693、6669 兩篇已簽核筆記:76–96 個數字機器定位 67–78%、0 HARD、單篇
+  10–20 秒;「僅鄰頁命中」可自動抓 6451 型 cited 缺頁。純函式測試 23 條。
+- `QUALITATIVE_RESEARCH_RUNBOOK.md`:drafter 交接前先跑 triage(shift-left),
+  reviewer 由全量逐張目視改為「④⑤+抽查,發現錯誤回全量」;不可放行條件新增
+  「HARD 未解決」,並明文 triage 是搜尋輔助、不得取代人工重算與推論邊界判讀。
+- 領先假說報告層新增「多空觀點(小作文)」契約(`narrative_meta` v1):看多/看空
+  各 100–800 字、須引用現有 H#、結尾自陳「最脆弱處」,加 1–3 條「勝負手」;
+  lint 於 narrative 存在時強制檢查,196 則回溯基線不回溯補寫,2026-07-18 起前瞻
+  捕捉未附時 warning。示範:3693 營邦。新增 lint 測試 8 條。
+- `leading_hypotheses.py --context <股號>`:自家 db 產「量化背景」快照(月營收
+  YoY、價格動能、族群排名、外資/借券/融資、TDCC 大戶、處置注意、台積電法說族群
+  指引);警語「不得作為生命週期轉移證據」被 lint 鎖住。PHASE2 runbook 新增
+  七面向來源 checklist 與「db 異常=捕捉觸發器、非證據」原則。
+
 ## 五張原始表全面改用 TWSE／TPEx 官方批次 — 2026-07-18
 
 **策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與

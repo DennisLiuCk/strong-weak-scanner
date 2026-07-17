@@ -23,7 +23,8 @@
 | 盤後確認執行狀況、討論今日資料 | `DAILY_CHECK.md`;核心工具 `scripts/daily_brief.py`(唯讀) |
 | 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
-| 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` |
+| 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` + `scripts/qual_review.py`(複核 triage) |
+| 領先假說收錄/複核/多空小作文 | `LEADING_HYPOTHESES.md` + `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` + `scripts/leading_hypotheses.py`(`--context` 產量化背景) |
 
 ## 鐵律
 
@@ -72,6 +73,8 @@ qual_notes.py    notes/qualitative/*.md(年報MD&A/法說會重點,人工撰寫)
                  ⚠ 唯讀盤點工具,不抓資料;已有筆記的股票不會被要求重寫,除非模板版本升級
 qual_evidence.py focused_v1 evidence pack 建立/渲染規劃/離線驗證;可提交 manifest
                  → notes/qualitative/evidence/,PDF/PNG → tmp/qualitative_evidence/(不進版控)
+qual_review.py   focused_v1 機器輔助複核 triage(唯讀):claim 數字對 cited 頁全覆蓋比對
+                 → tmp/qualitative_review/;HARD=缺頁/缺檔,未解決不得簽核;非簽核依據
 ```
 
 資料表:原始 price/inst/margin/holding/sbl(借券餘額,單位=股)+ tdcc_holding(週頻)+
