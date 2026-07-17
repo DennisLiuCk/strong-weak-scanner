@@ -1,0 +1,164 @@
+{
+  "content_as_of": "2026-07-18",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        5,
+        6,
+        75,
+        77,
+        80,
+        81,
+        82,
+        85,
+        99,
+        104
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 109,
+      "rendered_pages": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        98,
+        99,
+        100,
+        103,
+        104,
+        105
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "38747b2ac8172d155857eb4e619b78a3c43eac4f36ed65fde4f2d1b6b48decd2",
+      "size_bytes": 2513019,
+      "url": "https://www.inventec.com/Upload/202605/investor_2026051911135103.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        4,
+        5,
+        8,
+        9,
+        11,
+        12,
+        86
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 87,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        85,
+        86,
+        87
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "0ec3d3aa9917a6c2921b272368bbc78627e65592d93f8a3dfec9a346638027dd",
+      "size_bytes": 1345687,
+      "url": "https://www.inventec.com/Upload/202603/investor_2026031110324103.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 61,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "fcc56f27b68f48df9504f0d5f7be5c640a13b854c7f1888256317cb204fa06ad",
+      "size_bytes": 1318125,
+      "url": "https://www.inventec.com/Upload/202605/investor_2026051214425403.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        3,
+        4,
+        5,
+        7,
+        9
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 13,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "2466fa9414fc02c372a31c9fe5ef6ab3bb99b430c7d20f8b76380b04c2ca7e48",
+      "size_bytes": 325371,
+      "url": "https://www.inventec.com/Upload/202605/investor_2026051216121203.pdf"
+    }
+  ],
+  "pack_sha256": "0a8da28d1643b268bb584614e28eee865d6d1cc21ba966673197361bb32e69c3",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2356",
+  "unverified_claims_removed": true
+}
