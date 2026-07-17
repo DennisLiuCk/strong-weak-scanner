@@ -1,0 +1,180 @@
+{
+  "content_as_of": "2026-07-17",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        84,
+        86,
+        87,
+        88,
+        89,
+        94,
+        95,
+        96,
+        97,
+        98,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 116,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "f4b3bd04a1d6378f7b2e137481642f9e3a9484f57e77c189693562aa39fb43f9",
+      "size_bytes": 5702719,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=2382&year=115&seamon=&mtype=F"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        63,
+        74,
+        91
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 93,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        62,
+        63,
+        64,
+        73,
+        74,
+        75,
+        90,
+        91,
+        92
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "f377f72ceda7290eeefae3de82d382f84cf304486c691d2da5237b2ba35235cd",
+      "size_bytes": 1970160,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=2382&year=114&seamon=4&mtype=A"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        40,
+        66
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 66,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        39,
+        40,
+        41,
+        65,
+        66
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "aa0604c0e3c9ecf834e3269b9766642c96fe15667f1b4a315bae1bfc92bafbc8",
+      "size_bytes": 1350444,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=2382&year=115&seamon=1&mtype=A"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 6,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "5cdeafffe3136d9d4491fd5321560a39c6ee44a6237d7ba8cd6ebf37f3e39e40",
+      "size_bytes": 683794,
+      "url": "https://mopsov.twse.com.tw/nas/STR/238220260514M001.pdf"
+    }
+  ],
+  "pack_sha256": "caed1c04e8e16e09d339a759e179c6bc09a30ed80f102782ff02b992f9c476b1",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2382",
+  "unverified_claims_removed": true
+}
