@@ -1,0 +1,163 @@
+{
+  "content_as_of": "2026-07-18",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        7,
+        64,
+        67,
+        68,
+        70,
+        71,
+        83
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 93,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        82,
+        83,
+        84
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "107990d9b79a5ee07c4b3e3eaeb1aaabc246b0258b942817aa2f219a0b562bec",
+      "size_bytes": 1787247,
+      "url": "https://www.cwt.com.tw/uploads/images/7-1shareholder/7-1-2shareholders-meeting/2026/5_R1505001063%E5%83%91%E5%A8%81%E7%A7%91%E6%8A%80%E5%B9%B4%E5%A0%B1%28%E4%B8%8A%29-FINAL-0604%E4%B8%8A%E5%82%B3.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        8,
+        9,
+        10,
+        12,
+        13,
+        29,
+        54,
+        55
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 64,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        28,
+        29,
+        30,
+        53,
+        54,
+        55,
+        56
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "03e39c5e3caac0a2674502e0c3c4334ceb854d50951ba2767e0b95bb4c7123dc",
+      "size_bytes": 1511625,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3078&year=114&seamon=4&mtype=A"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        17,
+        23
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 46,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        16,
+        17,
+        18,
+        22,
+        23,
+        24
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "51eb373c667224e9caa8876e926f257720e33781676188281c63f0b03aff5b99",
+      "size_bytes": 1405561,
+      "url": "https://www.cwt.com.tw/uploads/images/finance/2026/%E5%83%91%E5%A8%81115Q1%E5%90%88%E4%BD%B5%E8%B2%A1%E5%8B%99%E5%A0%B1%E5%91%8A.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        5,
+        6,
+        13
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 16,
+      "rendered_pages": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        12,
+        13,
+        14
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "9623632e57bcedc82a4c0012009ce26515ee0ee35a0167e01445b7122be93d9b",
+      "size_bytes": 1325122,
+      "url": "https://mopsov.twse.com.tw/nas/STR/307820251009M001.pdf"
+    }
+  ],
+  "pack_sha256": "98f3a8603c9767f58bd553df2810240688cd8d05fcf4e1da5144c49f7d9f7620",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3078",
+  "unverified_claims_removed": true
+}
