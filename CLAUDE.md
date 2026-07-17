@@ -2,8 +2,8 @@
 
 台股半導體與 AI 供應鏈族群(被動/功率/封測/記憶體/矽智財/設備/材料/散熱/PCB/電源/
 伺服器組裝機構,約 121 檔)的兩層訊號系統:**個股層**族群內排名
-選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions(台灣 21:40)
-抓資料 → 評分 → 儀表板;SQLite db 與報告都 commit 在 repo 裡。
+選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions 台灣 20:17
+先抓價格/法人 checkpoint，23:40 補完 → 評分 → 儀表板；SQLite db 與報告都 commit 在 repo 裡。
 儀表板:https://dennisliuck.github.io/strong-weak-scanner/
 
 ## 每個 session 開始前
@@ -42,10 +42,11 @@
 ```
 fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token)→ tdcc_holding
                  ⚠ 僅供最新一週、缺週=永久洞;失敗 exit 0 不擋管線(Actions 綠≠成功)
-fetch_daily.py   TWSE/TPEx 全市場批次價格 + FinMind 其餘四張原始表
+fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件/指數/參考個股
                  → 還原價(除權息/分割自算)→ 五元素+觀察欄 → 族群層聚合
-                 ⚠ 價格每待補日期兩次免 token 官方請求；日誌批次 0 次=缺口已完整、非失敗
-                 ⚠ 另含 TWSE/TPEx 直抓備援(免token):外資持股缺值回補、處置/注意股票旗標
+                 ⚠ 每張待補表每交易日各呼叫 TWSE/TPEx 一次；五表完整新日共 10 次免 token
+                 ⚠ 20:17 只落地價格/法人 checkpoint；23:40 final pass 補三表、刷新 holding
+                 ⚠ 另直抓 TWSE/TPEx 處置/注意股票旗標；日誌批次 0 次=缺口已完整、非失敗
                  日誌/API 次數/斷點續跑判讀見 README「Daily Fetch 日誌判讀與續跑語意」
                  另抓觀察層參考個股 REF_IDS(2330)收盤/外資持股 → ref_price/ref_holding 隔離表
 fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現金流量表)
@@ -62,7 +63,8 @@ qual_notes.py    notes/qualitative/*.md(年報MD&A/法說會重點,人工撰寫)
 ```
 
 資料表:原始 price/inst/margin/holding/sbl(借券餘額,單位=股)+ tdcc_holding(週頻)+
-risk_flags(TWSE/TPEx 處置/注意公告)(皆 append-only)+ 衍生
+risk_flags(TWSE/TPEx 處置/注意公告)(依主鍵冪等 upsert；holding 當日初版只在 23:40
+final pass 刷新一次)+ 衍生
 price_adj/daily_metrics/daily_scores/group_metrics/market_daily(每次重建)。
 舊制凍結:daily_scores_v1。**觀察層(TDCC 大戶/借券)未計分**,歸宿等 OOS 裁決
 (WEEKLY_REVIEW §4-8,約 2026-08-29 後)。**risk_flags(處置/注意)屬另一類**——

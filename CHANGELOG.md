@@ -2,6 +2,28 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 五張原始表全面改用 TWSE／TPEx 官方批次 — 2026-07-18
+
+**策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與
+`validate.py` 的 `IS_CUTOFF` 皆未動）。本次只替換資料取得方式與發布時序：
+
+- `inst` 改用 TWSE `T86`／TPEx `dailyTrade`；`margin` 改用 TWSE `MI_MARGN`／
+  TPEx `margin/balance`；`holding` 改用 TWSE `MI_QFIIS`／TPEx `insti/qfii`；`sbl`
+  改用 TWSE `TWT93U`／TPEx `margin/sbl`。既有 FinMind dataset 名稱保留為 CLI selector，
+  歷史回補指令不必改名。
+- 正常新增交易日的四張表由 `121×4=484` 次 FinMind 個股請求改成 8 次免 token 官方
+  全市場請求；連同已遷移的價格，五張原始表共 10 次。FinMind 正常日理論量由 609
+  降至 125（除權息 121＋分割 1＋TAIEX 1＋參考個股 2），單一免費 token 即有餘裕。
+- Action 拆成台灣 20:17 早場與 23:40 正式補完：早場只抓價格／三大法人並 commit
+  raw checkpoint，不重算衍生表；晚場在 TWSE 23:30 借券資料產製後補齊所有表、重試
+  早場缺口，再評分／凍結 OOS／發布。手動 workflow 預設走 `complete`。
+- 每張表逐交易所 commit；任一來源失敗或 universe 覆蓋不足會保存成功市場後標紅，
+  下次依缺口續跑。`holding` 的 TPEx 日內有 18:00／22:00 兩版；23:40 `final_pass`
+  會刷新最新日一次並於所有指定表成功後才寫 final coverage，避免初版卡住終版。
+- 2026-07-17 最終資料唯讀對帳：`inst` 3 欄、`margin` 2 欄、`holding` 2 欄、`sbl`
+  1 欄均為 121/121 覆蓋，對既有 DB 共 968 個欄位差異為 0。新增八端點解析、錯日期拒絕、
+  單一市場失敗 checkpoint、缺口批次與 holding final-pass 冪等測試。
+
 ## 日價格改用 TWSE／TPEx 官方全市場批次 — 2026-07-18
 
 **策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與

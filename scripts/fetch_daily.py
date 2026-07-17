@@ -9,14 +9,17 @@
   uv run --no-project python scripts/fetch_daily.py
   # 回補歷史(建立滾動視窗需要的基期)
   uv run --no-project python scripts/fetch_daily.py --start 2026-03-01 --end 2026-07-03
-  # 只回補單一 dataset(新表補歷史用;跳過事件段、仍重算 metrics)
+  # 只回補單一 dataset(名稱保留 FinMind 相容性,實際由交易所批次取得)
   uv run --no-project python scripts/fetch_daily.py --datasets TaiwanDailyShortSaleBalances --start 2026-03-01
+  # 20:17 早場 checkpoint:只抓價格/法人,不重算衍生表
+  uv run --no-project python scripts/fetch_daily.py --datasets TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell --raw-only
   # 定向補缺:只抓指定股票(省 API 額度;可與 --datasets 疊加)
   uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-02
 
 Token 讀取順序:環境變數 FINMIND_TOKEN/FINMIND_TOKEN2/FINMIND_TOKEN3
 → 專案根目錄 .mcp.json。
-日 OHLCV 改由 TWSE/TPEx 官方全市場日報各抓一次；其餘四張個股原始表仍走 FinMind。
+五張原始表皆由 TWSE/TPEx 官方全市場日報各抓一次；FinMind 僅留除權息、分割、
+加權報酬指數與參考個股等事件／觀察序列。
 抓完會自動重算 daily_metrics(五元素衍生指標表)。
 價格類指標(ret1/距高)用還原股價 price_adj。FinMind 的 TaiwanStockPriceAdj 免費層不可用
 (需 Sponsor),所以改抓 TaiwanStockDividendResult + TaiwanStockSplitPrice(皆免費),
@@ -36,6 +39,14 @@ API = "https://api.finmindtrade.com/api/v4/data"
 TWSE_PRICE_URL = "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX"
 TPEX_PRICE_URL = "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes"
 PRICE_SOURCES = ("TWSE", "TPEx")
+TWSE_INST_URL = "https://www.twse.com.tw/rwd/zh/fund/T86"
+TPEX_INST_URL = "https://www.tpex.org.tw/www/zh-tw/insti/dailyTrade"
+TWSE_MARGIN_URL = "https://www.twse.com.tw/exchangeReport/MI_MARGN"
+TPEX_MARGIN_URL = "https://www.tpex.org.tw/www/zh-tw/margin/balance"
+TWSE_HOLDING_URL = "https://www.twse.com.tw/rwd/zh/fund/MI_QFIIS"
+TPEX_HOLDING_URL = "https://www.tpex.org.tw/www/zh-tw/insti/qfii"
+TWSE_SBL_URL = "https://www.twse.com.tw/exchangeReport/TWT93U"
+TPEX_SBL_URL = "https://www.tpex.org.tw/www/zh-tw/margin/sbl"
 
 DATASETS = ["TaiwanStockPrice", "TaiwanStockInstitutionalInvestorsBuySell",
             "TaiwanStockMarginPurchaseShortSale", "TaiwanStockShareholding",
@@ -47,6 +58,7 @@ DATASET_TABLE = {
     "TaiwanStockShareholding": "holding",
     "TaiwanDailyShortSaleBalances": "sbl",
 }
+EXCHANGE_RAW_DATASETS = tuple(DATASETS[1:])
 
 # ── 觀察層參考個股(上游錨定,如台積電):收盤/外資持股進 ref_* 隔離表,
 #    絕不進 universe/daily_metrics/daily_scores/tier;僅供儀表板台積電專區顯示 ──
@@ -100,6 +112,10 @@ class TokenPoolExhausted(RuntimeError):
 
 class ExchangePriceFetchError(RuntimeError):
     """TWSE/TPEx 官方價格批次失敗或最新交易日不完整。"""
+
+
+class ExchangeRawFetchError(RuntimeError):
+    """TWSE/TPEx 官方原始表批次失敗或交易日不完整。"""
 
 
 def get_tokens():
@@ -277,6 +293,280 @@ def fetch_exchange_price_source(source, day, wanted_ids=None, retries=3):
             time.sleep(2 * (attempt + 1))
 
 
+def _market_percent(value):
+    """交易所百分比欄正規化；資料缺值保留 None。"""
+    if value is None:
+        return None
+    text = str(value).strip().replace(",", "").rstrip("%")
+    if not text or not any(ch.isdigit() for ch in text):
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
+def _validate_exchange_day(payload, day, source, report):
+    """驗證官方回應確實是要求的資料日；無資料(休市/尚未發布)回傳 False。"""
+    stat = str(payload.get("stat") or "")
+    if "沒有符合條件的資料" in stat or "查無資料" in stat:
+        return False
+    expected = day.replace("-", "")
+    ok = stat == "OK" if source == "TWSE" else stat.lower() == "ok"
+    if not ok or payload.get("date") != expected:
+        raise ValueError(
+            f"{source} {report} 回應異常:stat={stat},date={payload.get('date')}")
+    return True
+
+
+def _net_record(day, sid, name, value):
+    """把官方淨額轉回 up_inst 可共用的 buy/sell 形狀。"""
+    net = _market_number(value, integer=True) or 0
+    return {
+        "date": day, "stock_id": sid, "name": name,
+        "buy": max(net, 0), "sell": max(-net, 0),
+    }
+
+
+def parse_twse_inst(payload, day, wanted_ids=None):
+    if not _validate_exchange_day(payload, day, "TWSE", "T86"):
+        return [], False
+    fields = payload.get("fields", [])
+    required = {"證券代號", "外陸資買賣超股數(不含外資自營商)",
+                "投信買賣超股數", "自營商買賣超股數"}
+    if not required.issubset(fields):
+        raise ValueError("TWSE T86 找不到三大法人欄位")
+    pos = {name: i for i, name in enumerate(fields)}
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    out, raw_rows = [], payload.get("data", [])
+    for raw in raw_rows:
+        sid = str(raw[pos["證券代號"]]).strip()
+        if wanted is not None and sid not in wanted:
+            continue
+        out.extend((
+            _net_record(day, sid, "Foreign_Investor",
+                        raw[pos["外陸資買賣超股數(不含外資自營商)"]]),
+            _net_record(day, sid, "Investment_Trust", raw[pos["投信買賣超股數"]]),
+            _net_record(day, sid, "Dealer_self", raw[pos["自營商買賣超股數"]]),
+        ))
+    return out, bool(raw_rows)
+
+
+def parse_tpex_inst(payload, day, wanted_ids=None):
+    if not _validate_exchange_day(payload, day, "TPEx", "dailyTrade"):
+        return [], False
+    tables = [t for t in payload.get("tables", [])
+              if len(t.get("fields", [])) >= 24 and t["fields"][:2] == ["代號", "名稱"]]
+    if not tables:
+        raise ValueError("TPEx dailyTrade 找不到三大法人欄位")
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    out, market_rows = [], 0
+    for table in tables:
+        market_rows += len(table.get("data", []))
+        for raw in table.get("data", []):
+            if len(raw) < 24:
+                raise ValueError("TPEx dailyTrade 資料欄數不足")
+            sid = str(raw[0]).strip()
+            if wanted is not None and sid not in wanted:
+                continue
+            # 4=外資及陸資(不含外資自營商)淨額；13=投信；22=自營商合計。
+            out.extend((
+                _net_record(day, sid, "Foreign_Investor", raw[4]),
+                _net_record(day, sid, "Investment_Trust", raw[13]),
+                _net_record(day, sid, "Dealer_self", raw[22]),
+            ))
+    return out, market_rows > 0
+
+
+def parse_twse_margin(payload, day, wanted_ids=None):
+    if not _validate_exchange_day(payload, day, "TWSE", "MI_MARGN"):
+        return [], False
+    tables = [t for t in payload.get("tables", [])
+              if len(t.get("fields", [])) >= 13 and t["fields"][0] == "代號"
+              and t["fields"][6] == "今日餘額" and t["fields"][12] == "今日餘額"]
+    if not tables:
+        raise ValueError("TWSE MI_MARGN 找不到個股融資融券欄位")
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    out, market_rows = [], 0
+    for table in tables:
+        market_rows += len(table.get("data", []))
+        for raw in table.get("data", []):
+            sid = str(raw[0]).strip()
+            if wanted is not None and sid not in wanted:
+                continue
+            out.append({
+                "date": day, "stock_id": sid,
+                "MarginPurchaseTodayBalance": _market_number(raw[6], integer=True),
+                "ShortSaleTodayBalance": _market_number(raw[12], integer=True),
+            })
+    return out, market_rows > 0
+
+
+def parse_tpex_margin(payload, day, wanted_ids=None):
+    if not _validate_exchange_day(payload, day, "TPEx", "margin/balance"):
+        return [], False
+    required = {"代號", "資餘額", "券餘額"}
+    tables = [t for t in payload.get("tables", []) if required.issubset(t.get("fields", []))]
+    if not tables:
+        raise ValueError("TPEx margin/balance 找不到個股融資融券欄位")
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    out, market_rows = [], 0
+    for table in tables:
+        pos = {name: i for i, name in enumerate(table["fields"])}
+        market_rows += len(table.get("data", []))
+        for raw in table.get("data", []):
+            sid = str(raw[pos["代號"]]).strip()
+            if wanted is not None and sid not in wanted:
+                continue
+            out.append({
+                "date": day, "stock_id": sid,
+                "MarginPurchaseTodayBalance": _market_number(raw[pos["資餘額"]], integer=True),
+                "ShortSaleTodayBalance": _market_number(raw[pos["券餘額"]], integer=True),
+            })
+    return out, market_rows > 0
+
+
+def parse_twse_holding(payload, day, wanted_ids=None):
+    if not _validate_exchange_day(payload, day, "TWSE", "MI_QFIIS"):
+        return [], False
+    fields = payload.get("fields", [])
+    required = {"證券代號", "發行股數", "全體外資及陸資持股比率"}
+    if not required.issubset(fields):
+        raise ValueError("TWSE MI_QFIIS 找不到外資持股欄位")
+    pos = {name: i for i, name in enumerate(fields)}
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    out, raw_rows = [], payload.get("data", [])
+    for raw in raw_rows:
+        sid = str(raw[pos["證券代號"]]).strip()
+        if wanted is not None and sid not in wanted:
+            continue
+        out.append({
+            "date": day, "stock_id": sid,
+            "ForeignInvestmentSharesRatio": _market_percent(raw[pos["全體外資及陸資持股比率"]]),
+            "NumberOfSharesIssued": _market_number(raw[pos["發行股數"]], integer=True),
+        })
+    return out, bool(raw_rows)
+
+
+def parse_tpex_holding(payload, day, wanted_ids=None):
+    if not _validate_exchange_day(payload, day, "TPEx", "insti/qfii"):
+        return [], False
+    required = {"代號", "發行股數(A)", "僑外資及陸資持股比率(E=C/A)"}
+    tables = [t for t in payload.get("tables", []) if required.issubset(t.get("fields", []))]
+    if not tables:
+        raise ValueError("TPEx insti/qfii 找不到外資持股欄位")
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    out, market_rows = [], 0
+    for table in tables:
+        pos = {name: i for i, name in enumerate(table["fields"])}
+        market_rows += len(table.get("data", []))
+        for raw in table.get("data", []):
+            sid = str(raw[pos["代號"]]).strip()
+            if wanted is not None and sid not in wanted:
+                continue
+            out.append({
+                "date": day, "stock_id": sid,
+                "ForeignInvestmentSharesRatio": _market_percent(
+                    raw[pos["僑外資及陸資持股比率(E=C/A)"]]),
+                "NumberOfSharesIssued": _market_number(raw[pos["發行股數(A)"]], integer=True),
+            })
+    return out, market_rows > 0
+
+
+def _parse_sbl(payload, day, source, report):
+    if not _validate_exchange_day(payload, day, source, report):
+        return [], False
+    if source == "TWSE":
+        fields, raw_rows = payload.get("fields", []), payload.get("data", [])
+        tables = [{"fields": fields, "data": raw_rows}]
+    else:
+        tables = payload.get("tables", [])
+    tables = [t for t in tables if len(t.get("fields", [])) >= 13
+              and t["fields"][0] in {"代號", "股票代號"}
+              and "當日餘額" in t["fields"][12]]
+    if not tables:
+        raise ValueError(f"{source} {report} 找不到借券賣出餘額欄位")
+    out, market_rows = [], 0
+    for table in tables:
+        market_rows += len(table.get("data", []))
+        for raw in table.get("data", []):
+            out.append((str(raw[0]).strip(), raw[12]))
+    return out, market_rows > 0
+
+
+def parse_twse_sbl(payload, day, wanted_ids=None):
+    pairs, available = _parse_sbl(payload, day, "TWSE", "TWT93U")
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    return [{"date": day, "stock_id": sid,
+             "SBLShortSalesCurrentDayBalance": _market_number(value, integer=True)}
+            for sid, value in pairs if wanted is None or sid in wanted], available
+
+
+def parse_tpex_sbl(payload, day, wanted_ids=None):
+    pairs, available = _parse_sbl(payload, day, "TPEx", "margin/sbl")
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    return [{"date": day, "stock_id": sid,
+             "SBLShortSalesCurrentDayBalance": _market_number(value, integer=True)}
+            for sid, value in pairs if wanted is None or sid in wanted], available
+
+
+EXCHANGE_RAW_PARSERS = {
+    ("TaiwanStockInstitutionalInvestorsBuySell", "TWSE"): parse_twse_inst,
+    ("TaiwanStockInstitutionalInvestorsBuySell", "TPEx"): parse_tpex_inst,
+    ("TaiwanStockMarginPurchaseShortSale", "TWSE"): parse_twse_margin,
+    ("TaiwanStockMarginPurchaseShortSale", "TPEx"): parse_tpex_margin,
+    ("TaiwanStockShareholding", "TWSE"): parse_twse_holding,
+    ("TaiwanStockShareholding", "TPEx"): parse_tpex_holding,
+    ("TaiwanDailyShortSaleBalances", "TWSE"): parse_twse_sbl,
+    ("TaiwanDailyShortSaleBalances", "TPEx"): parse_tpex_sbl,
+}
+
+
+def _exchange_raw_url(dataset, source, day):
+    ymd, slash = day.replace("-", ""), day.replace("-", "/")
+    if (dataset, source) == ("TaiwanStockInstitutionalInvestorsBuySell", "TWSE"):
+        return f"{TWSE_INST_URL}?" + urllib.parse.urlencode(
+            {"date": ymd, "selectType": "ALL", "response": "json"})
+    if (dataset, source) == ("TaiwanStockInstitutionalInvestorsBuySell", "TPEx"):
+        return f"{TPEX_INST_URL}?" + urllib.parse.urlencode(
+            {"type": "Daily", "cate": "EW", "date": slash, "response": "json"})
+    if (dataset, source) == ("TaiwanStockMarginPurchaseShortSale", "TWSE"):
+        return f"{TWSE_MARGIN_URL}?" + urllib.parse.urlencode(
+            {"date": ymd, "selectType": "ALL", "response": "json"})
+    if (dataset, source) == ("TaiwanStockMarginPurchaseShortSale", "TPEx"):
+        return f"{TPEX_MARGIN_URL}?" + urllib.parse.urlencode(
+            {"date": slash, "response": "json"})
+    if (dataset, source) == ("TaiwanStockShareholding", "TWSE"):
+        return f"{TWSE_HOLDING_URL}?" + urllib.parse.urlencode(
+            {"date": ymd, "selectType": "ALLBUT0999", "response": "json"})
+    if (dataset, source) == ("TaiwanStockShareholding", "TPEx"):
+        return f"{TPEX_HOLDING_URL}?" + urllib.parse.urlencode(
+            {"date": slash, "response": "json"})
+    if (dataset, source) == ("TaiwanDailyShortSaleBalances", "TWSE"):
+        return f"{TWSE_SBL_URL}?" + urllib.parse.urlencode(
+            {"date": ymd, "response": "json"})
+    if (dataset, source) == ("TaiwanDailyShortSaleBalances", "TPEx"):
+        return f"{TPEX_SBL_URL}?" + urllib.parse.urlencode(
+            {"date": slash, "response": "json"})
+    raise ValueError(f"未知官方原始表:{dataset}/{source}")
+
+
+def fetch_exchange_raw_source(dataset, source, day, wanted_ids=None, retries=3):
+    """抓單一交易所的一張單日原始表；失敗重試後交由 Action checkpoint。"""
+    parser = EXCHANGE_RAW_PARSERS.get((dataset, source))
+    if parser is None:
+        raise ValueError(f"未知官方原始表:{dataset}/{source}")
+    for attempt in range(retries):
+        try:
+            payload = _request_json(_exchange_raw_url(dataset, source, day))
+            return parser(payload, day, wanted_ids)
+        except Exception as exc:
+            if attempt == retries - 1:
+                raise ExchangeRawFetchError(
+                    f"{source} {day} {dataset} 官方批次失敗:{exc}") from exc
+            time.sleep(2 * (attempt + 1))
+
+
 def load_universe(con):
     rows = []
     with open(UNIVERSE, encoding="utf-8") as f:
@@ -348,12 +638,6 @@ UPSERT = {"TaiwanStockPrice": up_price, "TaiwanStockInstitutionalInvestorsBuySel
           "TaiwanDailyShortSaleBalances": up_sbl}
 
 
-def _dates_in_table(con, table, stock_id, start, end):
-    return {r[0] for r in con.execute(
-        f"SELECT date FROM {table} WHERE stock_id=? AND date BETWEEN ? AND ?",
-        (stock_id, start, end))}
-
-
 def _trading_dates(con, start, end):
     # price 與大盤任一方曾落地都視為交易日；可抓出「全 universe price 同日整批漏掉」
     # 的歷史洞。兩者都沒有的尾端，仍由 TWSE/TPEx 每日全市場批次探針發現。
@@ -376,17 +660,27 @@ def _calendar_dates(start, end):
     return out
 
 
-def _missing_price_dates(con, ids, dates):
-    """找出指定股票集合未全數落地的交易日；批次價格按日補，不再逐檔請求。"""
+def _missing_dataset_dates(con, table, ids, dates):
+    """找出指定股票集合在某原始表未全數落地的交易日。"""
     dates = set(dates)
     if not ids or not dates:
         return set()
     marks = ",".join("?" for _ in ids)
     counts = dict(con.execute(
-        f"""SELECT date,COUNT(*) FROM price
+        f"""SELECT date,COUNT(*) FROM {table}
             WHERE stock_id IN ({marks}) AND date BETWEEN ? AND ? GROUP BY date""",
         (*ids, min(dates), max(dates))).fetchall())
     return {day for day in dates if counts.get(day, 0) != len(ids)}
+
+
+def _missing_dataset_ids(con, table, ids, day):
+    return {sid for sid in ids if not con.execute(
+        f"SELECT 1 FROM {table} WHERE date=? AND stock_id=?", (day, sid)).fetchone()}
+
+
+def _missing_price_dates(con, ids, dates):
+    """價格表相容 wrapper；批次價格按日補，不再逐檔請求。"""
+    return _missing_dataset_dates(con, "price", ids, dates)
 
 
 def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None):
@@ -440,18 +734,74 @@ def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None):
     }
 
 
+def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, fetcher=None):
+    """單一原始表的 TWSE+TPEx 單日全市場批次，逐來源 checkpoint。
+
+    一般補缺只寫入當日尚缺股票；`overwrite_dates` 用於明確的最終版刷新。任一來源失敗
+    仍保留另一來源已 commit 的 rows，但拒絕把不完整資料日交給評分／發布。
+    """
+    if dataset not in EXCHANGE_RAW_DATASETS:
+        raise ValueError(f"非官方批次原始表:{dataset}")
+    fetcher = fetcher or fetch_exchange_raw_source
+    wanted = set(ids)
+    overwrite_dates = set(overwrite_dates or ())
+    table = DATASET_TABLE[dataset]
+    total_rows = requests = 0
+    found_dates, written_dates = set(), set()
+    for day in sorted(set(dates)):
+        day_wanted = wanted if day in overwrite_dates else _missing_dataset_ids(
+            con, table, wanted, day)
+        if not day_wanted:
+            continue
+        availability, errors = {}, []
+        for source in PRICE_SOURCES:
+            requests += 1
+            try:
+                batch, has_market_data = fetcher(dataset, source, day, day_wanted)
+            except Exception as exc:
+                errors.append(f"{source}:{exc}")
+                continue
+            availability[source] = has_market_data
+            if batch:
+                total_rows += UPSERT[dataset](con, batch)
+                con.commit()  # source-by-source checkpoint；下一來源失敗時仍可保存。
+                written_dates.add(day)
+        if errors:
+            raise ExchangeRawFetchError(
+                f"{day} {dataset} 官方批次未完成({'; '.join(errors)})")
+        flags = [availability.get(source, False) for source in PRICE_SOURCES]
+        if not all(flags):
+            missing_sources = [source for source in PRICE_SOURCES
+                               if not availability.get(source, False)]
+            raise ExchangeRawFetchError(
+                f"{day} 已是交易日但 {','.join(missing_sources)} {dataset} 回傳空白")
+        missing_ids = _missing_dataset_ids(con, table, wanted, day)
+        if missing_ids:
+            raise ExchangeRawFetchError(
+                f"拒絕完成不完整資料日 {day}:{table}="
+                f"{len(wanted) - len(missing_ids)}/{len(wanted)};缺 {','.join(sorted(missing_ids))}")
+        found_dates.add(day)
+    return {
+        "rows": total_rows,
+        "requests": requests,
+        "found_dates": found_dates,
+        "written_dates": written_dates,
+    }
+
+
 def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
-                      force=False, fetcher=api_get, price_fetcher=None):
-    """價格走交易所按日批次，其餘 FinMind dataset 只抓 SQLite 尚缺的股票×日期。
+                      force=False, fetcher=None, price_fetcher=None, final_pass=False):
+    """五張原始表皆走交易所按日批次，只補 SQLite 尚缺的 dataset×日期。
 
     交易日以 price∪market 為準。未知尾端逐日用 TWSE+TPEx 批次探測；找到新交易日後，
-    其餘四張 FinMind 表才按股票×dataset 缺口展開。
+    其餘四張表才各以 TWSE+TPEx 全市場報表補齊。`final_pass` 會把最新 holding 重新抓取
+    一次，避免 18:00 初版阻止 22:00 最終版覆寫；完成日另記 coverage，重跑保持冪等。
     """
     known_before = _trading_dates(con, start, end)
     expected = set(known_before)
-    finmind_requests = exchange_requests = probe_requests = skipped = rows = 0
+    exchange_requests = probe_requests = skipped = rows = 0
     want_price = "TaiwanStockPrice" in ds_list
-    finmind_ds = [ds for ds in ds_list if ds != "TaiwanStockPrice"]
+    exchange_ds = [ds for ds in ds_list if ds != "TaiwanStockPrice"]
     probe_start = None
     probe_dates = set()
 
@@ -483,31 +833,34 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
         expected.update(price_stats["found_dates"])
         price_dates_written.update(price_stats["written_dates"])
 
-    for i, sid in enumerate(ids, 1):
-        got = calls = 0
-        for ds in finmind_ds:
-            table = DATASET_TABLE[ds]
-            if force:
-                req_start, req_end = start, end
-            else:
-                have = _dates_in_table(con, table, sid, start, end)
-                missing = expected - have
-                if not missing:
-                    skipped += 1
-                    continue
-                req_start, req_end = min(missing), max(missing)
-            data = fetcher(ds, sid, req_start, req_end, token)
-            finmind_requests += 1
-            calls += 1
-            if data:
-                n = UPSERT[ds](con, data)
-                got += n
-                rows += n
-            if sleep:
-                time.sleep(sleep)
+    final_holding_day = None
+    for ds in exchange_ds:
+        table = DATASET_TABLE[ds]
+        fetch_dates = set(expected) if force else _missing_dataset_dates(
+            con, table, ids, expected)
+        overwrite_dates = set(expected) if force else set()
+        if final_pass and ds == "TaiwanStockShareholding" and expected:
+            latest = max(expected)
+            final_covered = _coverage_get(con, "exchange_final", ds)
+            if not final_covered or final_covered < latest:
+                fetch_dates.add(latest)
+                overwrite_dates.add(latest)
+                final_holding_day = latest
+        if not fetch_dates:
+            skipped += 1
+            continue
+        raw_stats = fetch_exchange_raw_dataset(
+            con, ids, ds, fetch_dates, overwrite_dates=overwrite_dates, fetcher=fetcher)
+        rows += raw_stats["rows"]
+        exchange_requests += raw_stats["requests"]
+        print(f"{table}: {raw_stats['rows']} rows · {raw_stats['requests']} 官方 requests"
+              f" · {len(fetch_dates)} dates")
+
+    # 延至所有指定原始表都成功後才標示 holding 最終版；若後續 margin/sbl 失敗，
+    # 23:40 重跑仍會再次刷新 holding，不會讓早場版本被誤認為完成。
+    if final_holding_day:
+        _coverage_set(con, "exchange_final", "TaiwanStockShareholding", final_holding_day)
         con.commit()
-        if calls:
-            print(f"[{i:>2}/{len(ids)}] {sid} · {got} rows · {calls} requests")
 
     expected.update(_trading_dates(con, start, end))
     if want_price and expected and ids:
@@ -520,11 +873,12 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
                 f"拒絕完成價格不完整資料日 {latest}:price={have}/{len(ids)}")
     return {
         "rows": rows,
-        "requests": finmind_requests + exchange_requests,
-        "finmind_requests": finmind_requests,
+        "requests": exchange_requests,
+        "finmind_requests": 0,
         "exchange_requests": exchange_requests,
         "probe_requests": probe_requests,
-        "skipped_pairs": skipped,
+        "skipped_batches": skipped,
+        "skipped_pairs": skipped,  # 舊日誌／外部呼叫相容 alias
         "known_dates": known_before,
         "expected_dates": expected,
         "new_dates": expected - known_before,
@@ -660,64 +1014,6 @@ def fetch_ref_series(con, token, start, end, sleep, expected_dates=None, force=F
             if sleep:
                 time.sleep(sleep)
     return total, requests
-
-# FinMind TaiwanStockShareholding 對個別股票偶有發布延遲(2026-07-06 事故:19 檔當天缺值,
-# 隔天仍缺,但 TWSE/TPEx 官方當天就有——見 reports/data_gap_2026-07-06.md)。
-# 兩者皆免token、免登入,合計涵蓋全市場(上市+上櫃),與 fetch_tdcc.py 同一原則:
-# 直接打交易所官方 opendata,失敗不擋主管線。
-TWSE_QFIIS_URL = "https://www.twse.com.tw/rwd/zh/fund/MI_QFIIS"
-TPEX_QFII_URL = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_qfii"
-
-def _roc_date(iso_date):
-    """2026-07-06 → 民國 1150706(TPEx Date 欄位格式)。"""
-    y, m, d = iso_date.split("-")
-    return f"{int(y) - 1911}{m}{d}"
-
-def backfill_holding_from_exchange(con, target_date):
-    """FinMind holding(外資持股)在 target_date 缺值時的備援:直接查 TWSE(上市)/
-    TPEx(上櫃)當天官方數字回補,只補缺、不覆寫既有資料。任一來源格式跑掉或連不上,
-    印警告後跳過,不擋主管線(建置/評分沿用既有的 None→中性0 兜底)。"""
-    missing = {r[0] for r in con.execute(
-        """SELECT u.stock_id FROM universe u
-           LEFT JOIN holding h ON h.stock_id = u.stock_id AND h.date = ?
-           WHERE h.stock_id IS NULL""", (target_date,))}
-    if not missing:
-        return 0
-    ymd = target_date.replace("-", "")
-    found = {}
-    try:
-        d = _get_json(f"{TWSE_QFIIS_URL}?date={ymd}&selectType=ALLBUT0999&response=json")
-        if d.get("stat") == "OK" and d.get("date") == ymd:
-            for row in d["data"]:
-                sid = row[0]
-                if sid in missing:
-                    found[sid] = (float(row[7]), int(str(row[3]).replace(",", "")))
-    except Exception as e:
-        print(f"  ! TWSE MI_QFIIS 備援失敗:{e}", file=sys.stderr)
-    still_missing = missing - found.keys()
-    if still_missing:
-        try:
-            rows = _get_json(TPEX_QFII_URL)
-            roc = _roc_date(target_date)
-            if rows and rows[0].get("Date") == roc:
-                for row in rows:
-                    sid = row.get("SecuritiesCompanyCode")
-                    if sid in still_missing:
-                        pct = float(row["PercentageOfSharesOC/FMIHeld"].rstrip("%"))
-                        shares = int(row["NumberOfSharesIssued"])
-                        found[sid] = (pct, shares)
-        except Exception as e:
-            print(f"  ! TPEx qfii 備援失敗:{e}", file=sys.stderr)
-    for sid, (pct, shares) in found.items():
-        con.execute("INSERT OR REPLACE INTO holding VALUES(?,?,?,?)", (target_date, sid, pct, shares))
-    con.commit()
-    if found:
-        print(f"  外資持股備援(TWSE/TPEx)補上 {len(found)}/{len(missing)} 檔:{','.join(sorted(found))}")
-    still = missing - found.keys()
-    if still:
-        print(f"  ! 外資持股仍缺 {len(still)} 檔(TWSE/TPEx 當天也沒有):{','.join(sorted(still))}",
-              file=sys.stderr)
-    return len(found)
 
 # 處置/注意股票(觀察層、不計分):交易所對異常價量的官方認證,五元素分數看不到這塊
 # ——2026-07-07 驗證發現「真強」評級個股同時被列注意股票(90日漲幅163%)的實例。
@@ -1122,8 +1418,12 @@ def main():
     ap.add_argument("--days", type=int, default=15)
     ap.add_argument("--sleep", type=float, default=0.25, help="每次 API 間隔秒數(避免限流)")
     ap.add_argument("--metrics-only", action="store_true", help="不抓取,只用現有原始表重算 daily_metrics")
-    ap.add_argument("--datasets", help="逗號分隔,只抓指定 dataset(回補新表用);過濾時跳過除權息/分割/指數事件段")
+    ap.add_argument("--datasets", help="逗號分隔,只抓指定官方原始表(沿用 FinMind dataset 名稱);過濾時跳過事件段")
     ap.add_argument("--stocks", help="逗號分隔,只抓指定股票(定向補缺用,省 API 額度);事件段同步過濾,指數照抓")
+    ap.add_argument("--raw-only", action="store_true",
+                    help="只落地原始表 checkpoint,不抓事件、不重算 metrics(20:17 早場用)")
+    ap.add_argument("--final-pass", action="store_true",
+                    help="正式晚場:最新 holding 強制刷新一次並記 final coverage(應於 22:00 後使用)")
     ap.add_argument("--force", action="store_true",
                     help="忽略缺口規劃,強制重抓指定日期範圍(來源修正/人工稽核才用)")
     args = ap.parse_args()
@@ -1149,7 +1449,8 @@ def main():
     if bad:
         sys.exit(f"未知 dataset:{bad}(可用:{sorted(UPSERT)})")
 
-    token = get_token()
+    # 指定原始表或 raw-only 全程不碰 FinMind；正式晚場才需要 token 補事件／指數／參考序列。
+    token = None if (args.datasets or args.raw_only) else get_token()
     os.makedirs(os.path.dirname(DB), exist_ok=True)
     con = sqlite3.connect(DB)
     con.executescript(SCHEMA)
@@ -1166,19 +1467,26 @@ def main():
     mode = "強制重抓" if args.force else "智慧補缺"
     print(f"{mode} {start} .. {end} · {len(ids)} 檔 · {len(ds_list)} datasets")
     stats = fetch_missing_raw(
-        con, ids, ds_list, start, end, token, args.sleep, force=args.force)
+        con, ids, ds_list, start, end, token, args.sleep, force=args.force,
+        final_pass=args.final_pass)
     total = stats["rows"]
     print(f"原始資料規劃:FinMind {stats['finmind_requests']} 次;"
-          f"TWSE/TPEx 價格批次 {stats['exchange_requests']} 次"
+          f"TWSE/TPEx 官方批次 {stats['exchange_requests']} 次"
           f"(新交易日探針 {stats['probe_requests']}),"
-          f"跳過已完整 FinMind pair {stats['skipped_pairs']} 個")
-    if total or stats["finmind_requests"]:
+          f"跳過已完整 dataset-day {stats['skipped_batches']} 組")
+    if total:
         con.execute('INSERT INTO fetch_log VALUES(datetime("now"),?,?,?)', (start, end, total))
         con.commit()
 
     data_changed = total > 0
     expected_dates = stats["expected_dates"]
     target_date = max(expected_dates) if expected_dates else None
+    if args.raw_only:
+        n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0] if con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='daily_metrics'").fetchone() else 0
+        con.close()
+        print(f"raw-only 完成 — 原始 {total} rows checkpoint,daily_metrics 未重算({n} rows)")
+        return
     # 事件 coverage 能區分「已查但當天沒有事件」與「尚未查」；新交易日只補新增區間，
     # 中斷後重跑也會從未完成的 coverage 接續，不會再掃完整歷史。
     if args.datasets:
@@ -1196,11 +1504,6 @@ def main():
         data_changed = data_changed or bool(nd or ns or ni)
         print(f"事件 API {rd + rs + ri + rr} 次:dividend_result upsert {nd};"
               f"split_event upsert {ns};TAIEX {ni};參考個股 {nr}")
-    if target_date and "TaiwanStockShareholding" in ds_list:
-        n_bf = backfill_holding_from_exchange(con, target_date)
-        if n_bf:
-            print(f"外資持股 TWSE/TPEx 備援:補上 {n_bf} 檔")
-            data_changed = True
     if target_date and not args.datasets:
         risk_through = None if args.force else _coverage_get(con, "risk_flags", "*")
         if not risk_through or risk_through < target_date:

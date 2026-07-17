@@ -2,25 +2,22 @@ name: daily-fetch
 
 on:
   schedule:
-    # 台灣 20:17 = UTC 12:17,週一~五(台股交易日),落在收盤後窗口。
-    # 遇台股假日抓不到新資料時,commit 步驟會自動略過。
-    #
-    # 為什麼是 20:17 —— 各來源每日更新時間(台北時間；FinMind 官方文件註明
-    # 「實際更新時間以 API 資料為主」,可能漂移):
-    #   收盤後 TWSE/TPEx 官方全市場價格批次(①價②量;不耗 FinMind 額度)
-    #   16:50  TaiwanStockTotalReturnIndex(大盤 regime)
-    #   20:00  TaiwanStockInstitutionalInvestorsBuySell(③④法人買賣超)
-    #   21:00  TaiwanStockShareholding(③外資持股)
-    #   21:00  TaiwanStockMarginPurchaseShortSale(⑤融資券)
-    # 若早於 21:00 執行,當日籌碼缺值會被靜默當 0/舊值計分,隔日回補後
-    # 整表重建無痕改寫 → 決策時點與回測(validate.py)看到的資料不一致;
-    # 20:17 避開整點(:00)尖峰,但早於 21:00 的籌碼資料更新時間,當日籌碼可能缺值。
-    # 舊排程 18:00 只有價量是當日的,③④⑤ 全缺(2026-07-05 對抗性驗證)。
-    # GitHub cron 高峰期可能大幅延遲(2026-07-06 觀察到整點 :00 排程實際延遲
-    # 2 小時 51 分才觸發,見官方文件建議避開整點)——若發生延遲,反而可能更接近完整資料,
-    # 但不能取代 21:00 之後的緩衝。
+    # 早場 台灣 20:17 = UTC 12:17：官方價格 + 三大法人(20:00 含鉅額版)。
+    # 只 commit 原始 checkpoint，不重算／發布，避免持股、融資券、借券尚未終版時污染 OOS。
     - cron: "17 12 * * 1-5"
-  workflow_dispatch: {}   # 允許手動觸發(測試用)
+    # 晚場 台灣 23:40 = UTC 15:40：TWSE 借券餘額約 23:30 產製後補完其餘三表，
+    # 同時重試任何早場缺口；五表完整才評分、凍結 OOS、發布儀表板。
+    - cron: "40 15 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "complete=正式補完並發布；early=只抓價格/法人 checkpoint"
+        required: true
+        default: complete
+        type: choice
+        options:
+          - complete
+          - early
 
 permissions:
   contents: write          # 允許把更新後的 db commit 回 repo
@@ -39,20 +36,45 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 決定早場或正式補完模式
+        id: mode
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          REQUESTED_MODE: ${{ inputs.mode }}
+        run: |
+          mode=complete
+          if [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "17 12 * * 1-5" ]; then
+            mode=early
+          elif [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$REQUESTED_MODE" ]; then
+            mode="$REQUESTED_MODE"
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "本次模式: $mode"
+
       # 必須排在 fetch_daily 之前:build_metrics(fetch_daily 內)讀 tdcc_holding 算觀察欄,
       # 排後面會讓新快照晚一天才進 daily_metrics。TDCC opendata 只給最新一週(週六更新)、
       # 失敗自動 exit 0 不擋管線;週一~五每天重抓同一快照 = 冪等 + 5 次保險。
       - name: 抓取 TDCC 股權分散週快照(免 token)
+        if: steps.mode.outputs.mode == 'complete'
         run: python scripts/fetch_tdcc.py
 
-      - name: 抓取五元素並重算 daily_metrics
+      - name: 抓取本階段原始資料
         id: fetch_daily
         continue-on-error: true
         env:
+          FETCH_MODE: ${{ steps.mode.outputs.mode }}
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
           FINMIND_TOKEN2: ${{ secrets.FINMIND_TOKEN2 }}   # 選配:402 額度輪替備援(secret 未設=自動略過)
           FINMIND_TOKEN3: ${{ secrets.FINMIND_TOKEN3 }}   # 選配:第三組獨立額度
-        run: python scripts/fetch_daily.py
+        run: |
+          if [ "$FETCH_MODE" = "early" ]; then
+            python scripts/fetch_daily.py \
+              --datasets TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell \
+              --raw-only
+          else
+            python scripts/fetch_daily.py --final-pass
+          fi
 
       # runner 是一次性的；fetch_daily 雖逐檔 commit SQLite，若不 push 回 repo，失敗前
       # 的進度仍會隨 runner 消失。只保存 data/，不更新分數快照或網站；下次 run 會由
@@ -91,26 +113,37 @@ jobs:
           exit 1
 
       - name: 計算五元素分數與 tier
+        if: steps.mode.outputs.mode == 'complete'
         run: python scripts/score.py
 
       # daily_scores 會因資料回補、universe/分組與策略調整而重算全歷史；在重生並發布
       # 儀表板前，把本次 run 實際可見的原始指標+分數 append-only 凍結，供 OOS 驗證。
       - name: 凍結 OOS as-seen 訊號快照
+        if: steps.mode.outputs.mode == 'complete'
         run: python scripts/snapshot_signals.py --publish
 
       - name: 重生儀表板 HTML
+        if: steps.mode.outputs.mode == 'complete'
         run: python scripts/build_dashboard.py
 
       - name: commit 回 repo(有變動才提交)
+        env:
+          FETCH_MODE: ${{ steps.mode.outputs.mode }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/ index.html archive/
+          if [ "$FETCH_MODE" = "early" ]; then
+            git add data/
+            message="data: $(date -u +%Y-%m-%d) 早場官方資料 checkpoint"
+          else
+            git add data/ index.html archive/
+            message="data: $(date -u +%Y-%m-%d) 五元素更新"
+          fi
           if git diff --staged --quiet; then
             echo "無新資料,略過 commit"
             exit 0
           fi
-          git commit -m "data: $(date -u +%Y-%m-%d) 五元素更新"
+          git commit -m "$message"
           # main 上若同時有其他 push(手動 session、另一次跑),直接 push 會被拒。
           # fetch + rebase 後重試;若 rebase 真的衝突(同一批資料已落地),放棄本次 commit。
           for i in 1 2 3 4 5; do

@@ -1087,12 +1087,13 @@
     </div>
     <div class="mcard">
       <h3>資料來源與更新</h3>
-      市場與財報資料主要來自 <a href="https://finmindtrade.com/" rel="noopener">FinMind 開放資料</a>；股權分散使用 TDCC，處置／注意名單使用 TWSE／TPEx 官方公告。質化研究筆記由 AI 協作整理公開資訊，逐篇顯示一手證據覆蓋、獨立 reviewer 與核驗範圍；領先假說另保存市場流傳主張的時間戳、來源、正式基準與可證偽條件，不代表已獲證實。每日管線可由 GitHub Actions 排程或本地手動啟動，會補齊缺漏後評分並重建本頁；點開任一項，底部會標示該項來源。
+      每日五張市場原始表來自 TWSE／TPEx 公開報表；除權息、分割、含息大盤、參考個股與財報資料使用 <a href="https://finmindtrade.com/" rel="noopener">FinMind 開放資料</a>，股權分散使用 TDCC，處置／注意名單使用交易所官方公告。質化研究筆記由 AI 協作整理公開資訊，逐篇顯示一手證據覆蓋、獨立 reviewer 與核驗範圍；領先假說另保存市場流傳主張的時間戳、來源、正式基準與可證偽條件，不代表已獲證實。每日管線可由 GitHub Actions 排程或本地手動啟動，會補齊缺漏後評分並重建本頁；點開任一項，底部會標示該項來源。
       <dl class="srcline">
-        <dt>股價 / 成交量</dt><dd>TaiwanStockPrice</dd>
-        <dt>三大法人買賣超</dt><dd>TaiwanStockInstitutionalInvestorsBuySell</dd>
-        <dt>融資融券</dt><dd>TaiwanStockMarginPurchaseShortSale</dd>
-        <dt>外資持股 / 股本</dt><dd>TaiwanStockShareholding</dd>
+        <dt>股價 / 成交量</dt><dd>TWSE MI_INDEX · TPEx dailyQuotes</dd>
+        <dt>三大法人買賣超</dt><dd>TWSE T86 · TPEx dailyTrade</dd>
+        <dt>融資融券</dt><dd>TWSE MI_MARGN · TPEx margin/balance</dd>
+        <dt>外資持股 / 股本</dt><dd>TWSE MI_QFIIS · TPEx insti/qfii</dd>
+        <dt>借券賣出餘額</dt><dd>TWSE TWT93U · TPEx margin/sbl</dd>
         <dt>除權息 / 分割</dt><dd>TaiwanStockDividendResult · TaiwanStockSplitPrice(還原價本地重算)</dd>
         <dt>大盤指數</dt><dd>TaiwanStockTotalReturnIndex(加權報酬指數,含息)</dd>
         <dt>台積電專區</dt><dd>TaiwanStockPrice · TaiwanStockShareholding · TaiwanStockMonthRevenue(2330,觀察層隔離表)+ notes/events 事件錨點(季頻人工彙整)</dd>
@@ -1136,19 +1137,19 @@
   var EL = [
     {k:"①價", role:"族群相對", sub:"族群內排名 · 含抗跌", vlabel:"20日相對報酬",
      how:"「相對強弱」= 近20日還原價報酬 − 族群中位數(白話:過去一個月跑贏同業多少),在族群內排名給分:前20% +2、後20% −2。上表的 └ 兩列就是相減前的原料;「大盤20日」是含息報酬指數同窗口報酬,純參考基準(不參與計分)——個股與族群中位都贏大盤，表示個股與族群價格都相對靠前；只贏族群中位卻輸大盤，則是弱勢族群裡的相對強。「修正日抗跌」是獨立指標(權重1.0):只統計族群整體下跌的日子,它平均比族群多漲(少跌)多少。",
-     src:"FinMind 台股日收盤(TaiwanStockPrice);除權息/分割還原價由本系統以事件資料重算"},
+     src:"TWSE MI_INDEX／TPEx dailyQuotes 官方日收盤;除權息/分割事件由 FinMind 提供並由本系統重算還原價"},
     {k:"②量", role:"量比/過熱", sub:"固定門檻 · 比自身常態", vlabel:"量比",
      how:"量比 = 當日周轉率 ÷ 自己過去60日的中位數——跟自己的常態比,大型股不會因天生低周轉吃虧。1.2~3.0 視為健康活絡 +1;<0.5 量縮無人氣 −1。量比≥5 或周轉率≥20% 觸發過熱旗標 ⚠(不改分數,但會把評級壓到「強但過熱」)。",
-     src:"FinMind 成交量(TaiwanStockPrice)÷ 當日發行股數(TaiwanStockShareholding)"},
+     src:"TWSE／TPEx 官方成交量 ÷ 官方外資持股表的當日發行股數"},
     {k:"③外資", role:"國際法人", sub:"族群內排名 · 國際法人", vlabel:"20日持股變化",
      how:"外資持股比率的20日變化(單位:百分點 pp),在族群內排名;每檔原始變化若小於 ±0.3pp,視為雜訊並歸 0 分。排名分數只說明同業位置，原始值仍可能為負。本系統實證:外資動向較適合比較族群,在族群內分個股的權重僅 0.5。「修正日買賣」= 族群下跌日外資淨買賣的20日累計 ÷ 股本,用於蓄勢條件與族群概況。",
-     src:"FinMind 外資持股(TaiwanStockShareholding)+ 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
+     src:"TWSE MI_QFIIS／TPEx insti/qfii 外資持股 + TWSE T86／TPEx dailyTrade 三大法人"},
     {k:"④投信", role:"本土法人", sub:"族群內排名 · 本土法人", vlabel:"近5日淨買賣",
      how:"近5日投信淨買賣 ÷ 發行股數,在族群內排名;每檔原始變化若小於 ±0.03%,視為雜訊並歸 0 分。排名分數只說明同業位置，請同時閱讀原始值是淨買或淨賣。投信部位小、動作集中,歷史上在市場修正期參考價值較高(最新檢驗以週報為準)。",
-     src:"FinMind 三大法人買賣超(TaiwanStockInstitutionalInvestorsBuySell)"},
+     src:"TWSE T86／TPEx dailyTrade 三大法人買賣超"},
     {k:"⑤融資券", role:"散戶籌碼", sub:"固定門檻 · 價×融資", vlabel:"融資水位",
      how:"融資採固定門檻，看「價格方向 × 融資變化」組合:價跌且融資下降代表槓桿同步降低，給 +2；價漲且融資增加給 −1；價跌且融資明顯增加代表槓桿風險升高，給 −2。融資水位(餘額÷股本)≥9% 時分數封頂 −1 並示警 ⚠。",
-     src:"FinMind 融資融券(TaiwanStockMarginPurchaseShortSale)"}
+     src:"TWSE MI_MARGN／TPEx margin/balance 融資融券"}
   ];
   var TIER_HOW = {
     "真強":"升級條件:族群綜合分前2名、綜合≥2.5、價格相對分≥+1、且外資／投信／修正日買賣至少一項的相對分≥+1。相對分靠前不保證原始值為正。",
@@ -1637,7 +1638,7 @@
         showNodes:true,keyboard:true,ariaLabel:(html.who||"")+" 20 日還原價與移動平均線",
         tooltipTitle:(html.who||"")+" · 股價與均線",
         meaning:"還原收盤價是調整除權息與分割後的研究比較序列；MA5／20／60 是近 5／20／60 個交易日還原收盤價平均，不等於當時實際成交價或含息報酬。",
-        source:html.src||"FinMind TaiwanStockPrice；本地依除權息／分割事件還原後計算"}));
+        source:html.src||"TWSE MI_INDEX／TPEx dailyQuotes；本地依除權息／分割事件還原後計算"}));
       function mrow(label,svg,num){
         var r=document.createElement("div"); r.className="mrow";
         var k=document.createElement("span"); k.className="k"; setText(k,label); r.appendChild(k);
@@ -2188,7 +2189,7 @@
         howLabel:"判讀方式",
         how:"MA與RSI使用還原收盤價；價量關係使用當日漲跌與20日平均成交量。這些規則描述目前的趨勢、動能與參與度，不預測下一日漲跌，也不影響綜合分數與已確認分層。",
         howLink:"前往頁尾查看MA／RSI／VOL完整盤讀指南",howHref:"#technical-guide",
-        src:"FinMind TaiwanStockPrice；本地以除權息／分割事件還原價格後計算",
+        src:"TWSE MI_INDEX／TPEx dailyQuotes；本地以除權息／分割事件還原價格後計算",
         scLabel:row.tech.label,scColor:col[0],scBg:col[1]};};})(row));
     }
     if(row.chip){
@@ -2347,7 +2348,7 @@
         howLabel:"判讀方式",
         how:"MA與RSI使用還原收盤價；價量關係使用當日漲跌與20日平均成交量。只描述目前狀態，不預測下一日漲跌。",
         howLink:"前往頁尾查看MA／RSI／VOL完整盤讀指南",howHref:"#technical-guide",
-        src:"FinMind TaiwanStockPrice；本地還原價計算",scLabel:row.tech.label,
+        src:"TWSE MI_INDEX／TPEx dailyQuotes；本地還原價計算",scLabel:row.tech.label,
         scColor:tcol[0],scBg:tcol[1]};};})(row,tcol));
       host.appendChild(tech);
     }

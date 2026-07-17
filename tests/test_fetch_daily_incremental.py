@@ -208,6 +208,125 @@ class OfficialPriceBatchTest(unittest.TestCase):
         self.assertEqual([call[0] for call in calls], ["TWSE", "TPEx"])
 
 
+class OfficialRawBatchTest(unittest.TestCase):
+    @staticmethod
+    def _nets(rows):
+        return {row["name"]: row["buy"] - row["sell"] for row in rows}
+
+    def test_institutional_parsers_map_exact_net_columns(self):
+        twse_fields = [
+            "證券代號", "外陸資買賣超股數(不含外資自營商)",
+            "投信買賣超股數", "自營商買賣超股數",
+        ]
+        twse = {"stat": "OK", "date": "20260717", "fields": twse_fields,
+                "data": [["2330", "1,200", "-300", "45"]]}
+        rows, available = fd.parse_twse_inst(twse, "2026-07-17", {"2330"})
+        self.assertTrue(available)
+        self.assertEqual(self._nets(rows), {
+            "Foreign_Investor": 1200, "Investment_Trust": -300, "Dealer_self": 45})
+
+        tpex_fields = ["代號", "名稱"] + ["欄"] * 21 + ["三大法人買賣超股數合計"]
+        raw = ["2454", "聯發科"] + ["0"] * 22
+        raw[4], raw[13], raw[22] = "-900", "700", "-50"
+        tpex = {"stat": "ok", "date": "20260717",
+                "tables": [{"fields": tpex_fields, "data": [raw]}]}
+        rows, available = fd.parse_tpex_inst(tpex, "2026-07-17", {"2454"})
+        self.assertTrue(available)
+        self.assertEqual(self._nets(rows), {
+            "Foreign_Investor": -900, "Investment_Trust": 700, "Dealer_self": -50})
+
+    def test_margin_parsers_map_current_balances(self):
+        twse_fields = ["代號", "名稱", "買進", "賣出", "現金償還", "前日餘額",
+                       "今日餘額", "次一營業日限額", "買進", "賣出", "現券償還",
+                       "前日餘額", "今日餘額", "次一營業日限額", "資券互抵", "註記"]
+        twse_raw = ["2330", "台積電"] + ["0"] * 14
+        twse_raw[6], twse_raw[12] = "12,345", "678"
+        twse = {"stat": "OK", "date": "20260717",
+                "tables": [{"fields": twse_fields, "data": [twse_raw]}]}
+        rows, available = fd.parse_twse_margin(twse, "2026-07-17", {"2330"})
+        self.assertTrue(available)
+        self.assertEqual((rows[0]["MarginPurchaseTodayBalance"],
+                          rows[0]["ShortSaleTodayBalance"]), (12345, 678))
+
+        tpex = {"stat": "ok", "date": "20260717", "tables": [{
+            "fields": ["代號", "資餘額", "券餘額"],
+            "data": [["2454", "9,876", "54"]],
+        }]}
+        rows, available = fd.parse_tpex_margin(tpex, "2026-07-17", {"2454"})
+        self.assertTrue(available)
+        self.assertEqual((rows[0]["MarginPurchaseTodayBalance"],
+                          rows[0]["ShortSaleTodayBalance"]), (9876, 54))
+
+    def test_holding_parsers_map_percentage_and_issued_shares(self):
+        twse = {"stat": "OK", "date": "20260717",
+                "fields": ["證券代號", "發行股數", "全體外資及陸資持股比率"],
+                "data": [["2330", "25,933,804,458", "72.54"]]}
+        rows, available = fd.parse_twse_holding(twse, "2026-07-17", {"2330"})
+        self.assertTrue(available)
+        self.assertEqual((rows[0]["ForeignInvestmentSharesRatio"],
+                          rows[0]["NumberOfSharesIssued"]), (72.54, 25933804458))
+
+        tpex = {"stat": "ok", "date": "20260717", "tables": [{
+            "fields": ["代號", "發行股數(A)", "僑外資及陸資持股比率(E=C/A)"],
+            "data": [["2454", "1,591,673,608", "58.12%"]],
+        }]}
+        rows, available = fd.parse_tpex_holding(tpex, "2026-07-17", {"2454"})
+        self.assertTrue(available)
+        self.assertEqual((rows[0]["ForeignInvestmentSharesRatio"],
+                          rows[0]["NumberOfSharesIssued"]), (58.12, 1591673608))
+
+    def test_sbl_parsers_use_borrowed_short_sale_current_balance(self):
+        fields = ["代號", "名稱"] + ["欄"] * 10 + ["當日餘額"]
+        raw = ["2330", "台積電"] + ["0"] * 10 + ["8,765,432"]
+        twse = {"stat": "OK", "date": "20260717", "fields": fields, "data": [raw]}
+        rows, available = fd.parse_twse_sbl(twse, "2026-07-17", {"2330"})
+        self.assertTrue(available)
+        self.assertEqual(rows[0]["SBLShortSalesCurrentDayBalance"], 8765432)
+
+        tpex_fields = ["股票代號", "股票名稱"] + ["欄"] * 10 + ["當日餘額"]
+        tpex_raw = ["2454", "聯發科"] + ["0"] * 10 + ["123,456"]
+        tpex = {"stat": "ok", "date": "20260717",
+                "tables": [{"fields": tpex_fields, "data": [tpex_raw]}]}
+        rows, available = fd.parse_tpex_sbl(tpex, "2026-07-17", {"2454"})
+        self.assertTrue(available)
+        self.assertEqual(rows[0]["SBLShortSalesCurrentDayBalance"], 123456)
+
+    def test_wrong_response_date_is_rejected(self):
+        payload = {"stat": "OK", "date": "20260716", "fields": [], "data": []}
+        with self.assertRaises(ValueError):
+            fd.parse_twse_inst(payload, "2026-07-17", {"2330"})
+
+    def test_successful_market_is_committed_before_other_raw_market_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "raw-checkpoint.db"
+            con = sqlite3.connect(db)
+            con.executescript(fd.SCHEMA)
+
+            def partial_fetch(dataset, source, day, wanted_ids):
+                if source == "TPEx":
+                    raise OSError("temporary TPEx failure")
+                return [
+                    {"date": day, "stock_id": "2330", "name": "Foreign_Investor",
+                     "buy": 10, "sell": 2},
+                ], True
+
+            try:
+                with self.assertRaises(fd.ExchangeRawFetchError):
+                    fd.fetch_exchange_raw_dataset(
+                        con, ["2330", "2454"],
+                        "TaiwanStockInstitutionalInvestorsBuySell", {"2026-07-17"},
+                        fetcher=partial_fetch)
+                observer = sqlite3.connect(db)
+                try:
+                    self.assertEqual(observer.execute(
+                        "SELECT stock_id,foreign_net FROM inst WHERE date='2026-07-17'"
+                    ).fetchall(), [("2330", 8)])
+                finally:
+                    observer.close()
+            finally:
+                con.close()
+
+
 class IncrementalFetchTest(unittest.TestCase):
     def setUp(self):
         self.con = sqlite3.connect(":memory:")
@@ -228,26 +347,23 @@ class IncrementalFetchTest(unittest.TestCase):
     def tearDown(self):
         self.con.close()
 
-    def fake_fetch(self, dataset, sid, start, end, token):
-        self.calls.append((dataset, sid, start, end))
-        if end != "2026-07-10":
-            return []
-        if dataset == "TaiwanStockPrice":
-            return [{"date": "2026-07-10", "stock_id": sid, "open": 2, "max": 3,
-                     "min": 2, "close": 3, "Trading_Volume": 100,
-                     "Trading_money": 300}]
+    def fake_fetch(self, dataset, source, day, wanted_ids):
+        self.calls.append((dataset, source, day, set(wanted_ids)))
+        sid = "2330" if source == "TWSE" else "2454"
+        if sid not in wanted_ids:
+            return [], True
         if dataset == "TaiwanStockInstitutionalInvestorsBuySell":
-            return [{"date": "2026-07-10", "stock_id": sid, "name": "Foreign_Investor",
-                     "buy": 10, "sell": 2}]
+            return [{"date": day, "stock_id": sid, "name": "Foreign_Investor",
+                     "buy": 10, "sell": 2}], True
         if dataset == "TaiwanStockMarginPurchaseShortSale":
-            return [{"date": "2026-07-10", "stock_id": sid,
-                     "MarginPurchaseTodayBalance": 10, "ShortSaleTodayBalance": 1}]
+            return [{"date": day, "stock_id": sid,
+                     "MarginPurchaseTodayBalance": 10, "ShortSaleTodayBalance": 1}], True
         if dataset == "TaiwanStockShareholding":
-            return [{"date": "2026-07-10", "stock_id": sid,
-                     "ForeignInvestmentSharesRatio": 20, "NumberOfSharesIssued": 1000}]
+            return [{"date": day, "stock_id": sid,
+                     "ForeignInvestmentSharesRatio": 20, "NumberOfSharesIssued": 1000}], True
         if dataset == "TaiwanDailyShortSaleBalances":
-            return [{"date": "2026-07-10", "stock_id": sid,
-                     "SBLShortSalesCurrentDayBalance": 10}]
+            return [{"date": day, "stock_id": sid,
+                     "SBLShortSalesCurrentDayBalance": 10}], True
         raise AssertionError(dataset)
 
     def fake_price_fetch(self, source, day, wanted_ids):
@@ -263,9 +379,9 @@ class IncrementalFetchTest(unittest.TestCase):
         return rows, True
 
     def test_holiday_repeat_uses_one_daily_batch_per_market(self):
-        def empty_fetch(dataset, sid, start, end, token):
-            self.calls.append((dataset, sid, start, end))
-            return []
+        def empty_fetch(dataset, source, day, wanted_ids):
+            self.calls.append((dataset, source, day, set(wanted_ids)))
+            return [], False
 
         def empty_price(source, day, wanted_ids):
             self.price_calls.append((source, day, set(wanted_ids)))
@@ -278,19 +394,19 @@ class IncrementalFetchTest(unittest.TestCase):
         self.assertEqual(stats["finmind_requests"], 0)
         self.assertEqual(stats["exchange_requests"], 2)
         self.assertEqual(stats["probe_requests"], 2)
-        self.assertEqual(stats["skipped_pairs"], 8)
+        self.assertEqual(stats["skipped_batches"], 4)
         self.assertEqual(stats["rows"], 0)
 
     def test_new_trading_day_expands_only_missing_pairs(self):
         stats = fd.fetch_missing_raw(
             self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-10", "token",
             sleep=0, fetcher=self.fake_fetch, price_fetcher=self.fake_price_fetch)
-        # 價格 TWSE/TPEx 各 1 次 + 其餘四張 FinMind 表 2 檔 × 4。
+        # 價格 + 其餘四張原始表，各自 TWSE/TPEx 各 1 次。
         self.assertEqual(stats["requests"], 10)
-        self.assertEqual(stats["finmind_requests"], 8)
-        self.assertEqual(stats["exchange_requests"], 2)
+        self.assertEqual(stats["finmind_requests"], 0)
+        self.assertEqual(stats["exchange_requests"], 10)
         self.assertEqual(stats["probe_requests"], 2)
-        self.assertEqual(stats["skipped_pairs"], 0)
+        self.assertEqual(stats["skipped_batches"], 0)
         self.assertEqual(stats["new_dates"], {"2026-07-10"})
         for table in fd.DATASET_TABLE.values():
             n = self.con.execute(f"SELECT COUNT(*) FROM {table} WHERE date='2026-07-10'").fetchone()[0]
@@ -315,14 +431,48 @@ class IncrementalFetchTest(unittest.TestCase):
         stats = fd.fetch_missing_raw(
             self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-09", "token",
             sleep=0, fetcher=self.fake_fetch, price_fetcher=self.fake_price_fetch)
-        self.assertEqual(stats["requests"], 1)
+        self.assertEqual(stats["requests"], 2)
         self.assertEqual(stats["probe_requests"], 0)
-        self.assertEqual(stats["skipped_pairs"], 7)
+        self.assertEqual(stats["skipped_batches"], 3)
         self.assertEqual(self.price_calls, [])
         self.assertEqual(self.calls, [
-            ("TaiwanStockShareholding", "2454", "2026-07-09", "2026-07-09")])
+            ("TaiwanStockShareholding", "TWSE", "2026-07-09", {"2454"}),
+            ("TaiwanStockShareholding", "TPEx", "2026-07-09", {"2454"}),
+        ])
 
-    def test_incomplete_price_batch_checkpoints_and_stops_before_finmind(self):
+    def test_final_pass_refreshes_latest_holding_once(self):
+        calls = []
+
+        def final_holding(dataset, source, day, wanted_ids):
+            calls.append((dataset, source, day, set(wanted_ids)))
+            sid = "2330" if source == "TWSE" else "2454"
+            pct = 30 if source == "TWSE" else 40
+            return ([{"date": day, "stock_id": sid,
+                      "ForeignInvestmentSharesRatio": pct,
+                      "NumberOfSharesIssued": 2000}], True)
+
+        stats = fd.fetch_missing_raw(
+            self.con, self.ids, ["TaiwanStockShareholding"],
+            "2026-07-09", "2026-07-09", None, sleep=0,
+            fetcher=final_holding, final_pass=True)
+
+        self.assertEqual(stats["requests"], 2)
+        self.assertEqual(self.con.execute(
+            "SELECT stock_id,foreign_pct,shares_issued FROM holding "
+            "WHERE date='2026-07-09' ORDER BY stock_id").fetchall(),
+            [("2330", 30.0, 2000), ("2454", 40.0, 2000)])
+        self.assertEqual(fd._coverage_get(
+            self.con, "exchange_final", "TaiwanStockShareholding"), "2026-07-09")
+
+        calls.clear()
+        repeat = fd.fetch_missing_raw(
+            self.con, self.ids, ["TaiwanStockShareholding"],
+            "2026-07-09", "2026-07-09", None, sleep=0,
+            fetcher=final_holding, final_pass=True)
+        self.assertEqual(repeat["requests"], 0)
+        self.assertEqual(calls, [])
+
+    def test_incomplete_price_batch_checkpoints_and_stops_before_other_raw_tables(self):
         def incomplete_price(source, day, wanted_ids):
             if source == "TWSE":
                 return [{
@@ -399,7 +549,7 @@ class WorkflowCheckpointTest(unittest.TestCase):
         workflow = (ROOT / ".github" / "workflows" / "daily-fetch.yml").read_text(
             encoding="utf-8")
 
-        fetch_at = workflow.index("- name: 抓取五元素並重算 daily_metrics")
+        fetch_at = workflow.index("- name: 抓取本階段原始資料")
         checkpoint_at = workflow.index("- name: 保存未完成抓取進度")
         stop_at = workflow.index("- name: 抓取未完成，停止後續發布")
         score_at = workflow.index("- name: 計算五元素分數與 tier")
@@ -418,6 +568,37 @@ class WorkflowCheckpointTest(unittest.TestCase):
         self.assertNotIn("index.html", checkpoint_block)
         self.assertIn("steps.fetch_daily.outcome == 'failure'", stop_block)
         self.assertIn("exit 1", stop_block)
+        self.assertIn('cron: "17 12 * * 1-5"', workflow)
+        self.assertIn('cron: "40 15 * * 1-5"', workflow)
+        self.assertIn("--raw-only", fetch_block)
+        self.assertIn("--final-pass", fetch_block)
+        self.assertIn("steps.mode.outputs.mode == 'complete'", workflow[score_at:])
+
+
+class RawOnlyModeTest(unittest.TestCase):
+    def test_raw_only_needs_no_token_and_skips_derived_rebuild(self):
+        stats = {
+            "rows": 0, "finmind_requests": 0, "exchange_requests": 0,
+            "probe_requests": 0, "skipped_batches": 2, "expected_dates": set(),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "raw-only.db")
+            argv = [
+                "fetch_daily.py", "--start", "2026-07-18", "--end", "2026-07-18",
+                "--datasets",
+                "TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell",
+                "--raw-only",
+            ]
+            with mock.patch.object(fd, "DB", db), \
+                    mock.patch.object(sys, "argv", argv), \
+                    mock.patch.object(fd, "load_universe", return_value=[]), \
+                    mock.patch.object(fd, "fetch_missing_raw", return_value=stats), \
+                    mock.patch.object(fd, "get_token") as get_token, \
+                    mock.patch.object(fd, "build_metrics") as build_metrics:
+                fd.main()
+
+            get_token.assert_not_called()
+            build_metrics.assert_not_called()
 
 
 if __name__ == "__main__":

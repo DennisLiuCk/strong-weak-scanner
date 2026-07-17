@@ -37,7 +37,8 @@ def main():
     if not args.skip_tdcc:
         run("fetch_tdcc.py")
 
-    fetch_args = []
+    # 正式本地管線等同 23:40 completion pass；holding 需覆核 22:00 最終版。
+    fetch_args = ["--final-pass"]
     for name in ("start", "end", "days", "sleep", "datasets", "stocks"):
         value = getattr(args, name)
         if value is not None:
