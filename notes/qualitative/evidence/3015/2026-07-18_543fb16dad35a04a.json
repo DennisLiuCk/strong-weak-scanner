@@ -1,0 +1,167 @@
+{
+  "content_as_of": "2026-07-18",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        97,
+        98,
+        99,
+        100,
+        101,
+        104,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 120,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "0f4dcd8e03f2632f7c28b7c69be4a056e657a23ea4c6de423ed60b80a0abca4b",
+      "size_bytes": 2765213,
+      "url": "https://www.fsp-group.com/download/260624-6A3B741FBED23.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        7,
+        8,
+        9,
+        10
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 71,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "2857a35cb7575f64ab2c4e13722c27d5aaa966b97c78127b465785ae7a7b07f0",
+      "size_bytes": 1734755,
+      "url": "https://www.fsp-group.com/download/260309-69AE26560CF88.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 52,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "95faf60eaac9b46d79e9259a40de2f50781cfd1075535bb925cf1c7ffd2fc025",
+      "size_bytes": 1200742,
+      "url": "https://www.fsp-group.com/download/260709-6A4F31A59E43C.pdf"
+    },
+    {
+      "cited_pages": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 15,
+      "rendered_pages": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "2152e5f0a7d12a104b1f24522f9fa0011d84f68fbf5225cdb39b1066392f0827",
+      "size_bytes": 1343245,
+      "url": "https://www.fsp-group.com/download/260624-6A3B6C8828EE5.pdf"
+    }
+  ],
+  "pack_sha256": "543fb16dad35a04a2e9e5eab62c17e175d0a790127615fb5dadb7e898c48ce7d",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3015",
+  "unverified_claims_removed": true
+}
