@@ -1,0 +1,178 @@
+{
+  "content_as_of": "2026-07-18",
+  "documents": [
+    {
+      "cited_pages": [
+        4,
+        5,
+        87,
+        88,
+        89,
+        90,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 112,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "e840c9a8c88f236dd69320c084384cc84d0e6fdb5bc38401ca518f3308766e16",
+      "size_bytes": 4817785,
+      "url": "https://www.wistron.com/file/9ecdf53a-9c8a-4df8-aeed-7568724eb956/2025_WistronAnnualReport_EN.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        78,
+        102,
+        103
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 129,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        77,
+        78,
+        79,
+        101,
+        102,
+        103,
+        104
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "e3f420183c96712555bc80d63e9c68bc1b542fdabf79ea41706edcac95da8318",
+      "size_bytes": 812607,
+      "url": "https://www.wistron.com/file/d48aae47-ccb7-4abb-9838-f9750d2a9417/274415_114Q4_%E5%90%88%E4%BD%B5_%E5%AE%8C%E7%A8%BF%E8%8B%B1%E6%96%87%E8%B2%A1%E5%A0%B1_IMSv2.pdf.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        40
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 91,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        39,
+        40,
+        41
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "9c38f42025ad176189289ba7e7e3825c9be99d796bcdece9cbdf9a343da4a608",
+      "size_bytes": 712927,
+      "url": "https://www.wistron.com/file/ac6f7c4d-5d18-4106-be48-7f184febce1b/274415_115Q1_%E5%90%88%E4%BD%B5_%E5%AE%8C%E7%A8%BF%E8%8B%B1%E6%96%87%E8%B2%A1%E5%A0%B1_IMSv1.pdf.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 17,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "d1d8ab86c459b557f98c0f36ddabd456b46679bac124c0355eb4da03a5e62b59",
+      "size_bytes": 1318401,
+      "url": "https://www.wistron.com/file/3704fa4b-357a-41a6-8478-c1dfd46c4029/Wistron%20Presentation_Roadshow%202026Q1_Web.pdf.pdf"
+    }
+  ],
+  "pack_sha256": "ce9405fd6a0702b4799eb43f57afb26f4ca1a36e0d8363b3187e04f25a894dd5",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3231",
+  "unverified_claims_removed": true
+}
