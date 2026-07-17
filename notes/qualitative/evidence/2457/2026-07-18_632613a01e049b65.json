@@ -1,0 +1,167 @@
+{
+  "content_as_of": "2026-07-18",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        105,
+        107,
+        108,
+        117,
+        118,
+        119,
+        120,
+        121,
+        138,
+        150,
+        153
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 171,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        137,
+        138,
+        139,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "c0a7633e21e6e8fc842d20020664fcc0684a140c6b467269a029f0a88999a0b9",
+      "size_bytes": 7720523,
+      "url": "https://www.phihongtech.com/wp-content/uploads/2026/06/114%E5%B9%B4%E5%A0%B1-_2026.05.18_FINAL%E4%B8%8A%E5%82%B3%E7%89%88.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 78,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "06953a16cc777fcf8561d8824fa2cff01a723d1c2a778f96051368866e73523d",
+      "size_bytes": 1637703,
+      "url": "https://www.phihongtech.com/wp-content/uploads/2026/03/2025Q4_%E9%A3%9B%E5%AE%8F%E5%90%88%E4%BD%B5%E8%B2%A1%E5%A0%B1_%E4%B8%AD%E6%96%87%E4%B8%8A%E5%82%B3%E7%89%88.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        45,
+        46
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 56,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        44,
+        45,
+        46,
+        47
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "5028e842253ced9b604f6d8db3e8101d0738763870e326259352331a9d2a2a80",
+      "size_bytes": 1501008,
+      "url": "https://www.phihongtech.com/wp-content/uploads/2026/05/2026Q1_%E9%A3%9B%E5%AE%8F%E5%90%88%E4%BD%B5%E8%B2%A1%E5%A0%B1_%E4%B8%AD%E6%96%87%E4%B8%8A%E5%82%B3%E7%89%88.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        7
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 10,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "5410ca8bb66edc523530329f1bb6f5bc7aef8243127127eeaed7ee73e0591756",
+      "size_bytes": 481522,
+      "url": "https://www.phihongtech.com/wp-content/uploads/2026/06/2026%E5%B9%B4Q1%E6%B3%95%E8%AA%AA%E6%9C%83%E5%A0%B1%E5%91%8A_20260609_%E4%B8%AD%E6%96%87.pdf"
+    }
+  ],
+  "pack_sha256": "632613a01e049b65a85695478ddb9bd1bc83012f955896dcba6da3fb29c6a13c",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "2457",
+  "unverified_claims_removed": true
+}
