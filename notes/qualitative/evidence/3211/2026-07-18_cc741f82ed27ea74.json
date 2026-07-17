@@ -1,0 +1,162 @@
+{
+  "content_as_of": "2026-07-18",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        79,
+        81,
+        82
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 87,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "f4db59fdfacfa41e0b03780ef72562b889bfd47d8ce6fa20a7d07a5301033412",
+      "size_bytes": 2588280,
+      "url": "https://m3.hocom.tw/Uploads/userfiles/files/i5egzpitiqarvb6.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        9,
+        10,
+        12,
+        13,
+        64,
+        65
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 70,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        63,
+        64,
+        65,
+        66
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "62ae9ddc61012a3e30396948530ddd2db82f110de3b73af061fec4a35f542d33",
+      "size_bytes": 1522330,
+      "url": "https://m3.hocom.tw/Uploads/userfiles/files/kvp0mtf6b34jaj6.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        8,
+        9
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 51,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "b81f12dbc409ca1c77c5b98f56144ff3976afdb9122cadb558abb99353e05aad",
+      "size_bytes": 1394253,
+      "url": "https://m3.hocom.tw/Uploads/userfiles/files/1000165_p6if468w8bzsi7h.pdf"
+    },
+    {
+      "cited_pages": [
+        8,
+        9,
+        11
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 12,
+      "rendered_pages": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "a4a1854da776eb6ef733c54ceb519c23d1fb74df509f9ef9a27d979f6171978a",
+      "size_bytes": 1337196,
+      "url": "https://mopsov.twse.com.tw/nas/STR/321120260304M001.pdf"
+    }
+  ],
+  "pack_sha256": "cc741f82ed27ea748646130fc66cd37f216d3aa06fc86893f63a6bbf11ab3632",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3211",
+  "unverified_claims_removed": true
+}
