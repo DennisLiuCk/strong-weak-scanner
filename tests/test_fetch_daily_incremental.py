@@ -2,6 +2,7 @@ import io
 import os
 import sqlite3
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from urllib.error import HTTPError
@@ -191,6 +192,63 @@ class IncrementalFetchTest(unittest.TestCase):
         self.assertIsNone(rising[13])
         self.assertEqual(rising[14], 100.0)
         self.assertEqual(flat[14], 50.0)
+
+    def test_dividend_progress_is_committed_before_pool_exhaustion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "checkpoint.db"
+            con = sqlite3.connect(db)
+            con.executescript(fd.SCHEMA)
+
+            def fake_api(dataset, sid, start, end, token, return_status=False):
+                if sid == "2330":
+                    return [], True
+                raise fd.TokenPoolExhausted("all tokens disabled")
+
+            try:
+                with mock.patch.object(fd, "api_get", side_effect=fake_api):
+                    with self.assertRaises(fd.TokenPoolExhausted):
+                        fd.fetch_dividends(
+                            con, ["2330", "2454"], "token",
+                            "2026-07-10", "2026-07-10", sleep=0)
+
+                # 用另一條連線驗證第一檔的 coverage 已真正 commit 到檔案，不只留在 transaction。
+                observer = sqlite3.connect(db)
+                try:
+                    self.assertEqual(
+                        fd._coverage_get(observer, "TaiwanStockDividendResult", "2330"),
+                        "2026-07-10")
+                    self.assertIsNone(
+                        fd._coverage_get(observer, "TaiwanStockDividendResult", "2454"))
+                finally:
+                    observer.close()
+            finally:
+                con.close()
+
+
+class WorkflowCheckpointTest(unittest.TestCase):
+    def test_failed_fetch_checkpoints_data_before_blocking_publish(self):
+        workflow = (ROOT / ".github" / "workflows" / "daily-fetch.yml").read_text(
+            encoding="utf-8")
+
+        fetch_at = workflow.index("- name: 抓取五元素並重算 daily_metrics")
+        checkpoint_at = workflow.index("- name: 保存未完成抓取進度")
+        stop_at = workflow.index("- name: 抓取未完成，停止後續發布")
+        score_at = workflow.index("- name: 計算五元素分數與 tier")
+        self.assertLess(fetch_at, checkpoint_at)
+        self.assertLess(checkpoint_at, stop_at)
+        self.assertLess(stop_at, score_at)
+
+        fetch_block = workflow[fetch_at:checkpoint_at]
+        checkpoint_block = workflow[checkpoint_at:stop_at]
+        stop_block = workflow[stop_at:score_at]
+        self.assertIn("id: fetch_daily", fetch_block)
+        self.assertIn("continue-on-error: true", fetch_block)
+        self.assertIn("steps.fetch_daily.outcome == 'failure'", checkpoint_block)
+        self.assertIn("git add data/", checkpoint_block)
+        self.assertIn("每日抓取進度（未完成）", checkpoint_block)
+        self.assertNotIn("index.html", checkpoint_block)
+        self.assertIn("steps.fetch_daily.outcome == 'failure'", stop_block)
+        self.assertIn("exit 1", stop_block)
 
 
 if __name__ == "__main__":

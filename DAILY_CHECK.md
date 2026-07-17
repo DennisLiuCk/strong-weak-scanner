@@ -12,7 +12,10 @@
 2. **Actions 狀態**:`gh run list --workflow daily-fetch.yml -L 1`
    - 紅 → `gh run view <run-id> --log-failed`。常見:FinMind 限流(retry 已內建,
      偶發整批失敗隔日自癒)、Pages 部署偶發 `Deployment failed`(GitHub 端暫時性,
-     重跑即可)。修復管線問題 → 本地驗證 → commit + push,隔天生效。
+     重跑即可)。FinMind 抓取中途失敗時，Action 會先把已落地的 `data/` 以
+     `每日抓取進度（未完成）` commit 回 repo，再刻意標紅；不會發布未完成的分數、
+     OOS 快照或儀表板。重新執行會依 SQLite 缺口與事件 coverage 從未完成處接續，
+     可多次補完。修復管線問題 → 本地驗證 → commit + push,隔天生效。
    - 即使綠的,也掃一眼 log 裡的 stderr 警告(`!` 開頭):TAIEX 抓空、price_adj 缺列、
      無事件大跳空(疑減資)、before_price 對帳不符、**TDCC 下載/解析失敗**
      (fetch_tdcc 失敗是 exit 0,綠燈看不出來;唯一硬警報是簡報品質快檢的

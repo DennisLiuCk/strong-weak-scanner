@@ -46,11 +46,49 @@ jobs:
         run: python scripts/fetch_tdcc.py
 
       - name: 抓取五元素並重算 daily_metrics
+        id: fetch_daily
+        continue-on-error: true
         env:
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
           FINMIND_TOKEN2: ${{ secrets.FINMIND_TOKEN2 }}   # 選配:402 額度輪替備援(secret 未設=自動略過)
           FINMIND_TOKEN3: ${{ secrets.FINMIND_TOKEN3 }}   # 選配:第三組獨立額度
         run: python scripts/fetch_daily.py
+
+      # runner 是一次性的；fetch_daily 雖逐檔 commit SQLite，若不 push 回 repo，失敗前
+      # 的進度仍會隨 runner 消失。只保存 data/，不更新分數快照或網站；下次 run 會由
+      # SQLite 缺口與事件 coverage 接續。任務最後仍標紅，避免把未完成資料當正式發布。
+      - name: 保存未完成抓取進度
+        if: always() && steps.fetch_daily.outcome == 'failure'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "抓取失敗前沒有新增進度"
+            exit 0
+          fi
+          git commit -m "data: $(date -u +%Y-%m-%d) 每日抓取進度（未完成）"
+          for i in 1 2 3 4 5; do
+            if git push; then
+              exit 0
+            fi
+            echo "進度 push 被拒(第 $i 次)——fetch + rebase 後重試"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "::warning::rebase 衝突，未完成進度未能落地"
+              git rebase --abort
+              exit 1
+            fi
+            sleep 5
+          done
+          echo "::error::push 重試 5 次仍失敗，未完成進度未能落地"
+          exit 1
+
+      - name: 抓取未完成，停止後續發布
+        if: always() && steps.fetch_daily.outcome == 'failure'
+        run: |
+          echo "::error::每日抓取未完成；已嘗試保存部分進度，停止評分、OOS 快照與儀表板發布"
+          exit 1
 
       - name: 計算五元素分數與 tier
         run: python scripts/score.py
