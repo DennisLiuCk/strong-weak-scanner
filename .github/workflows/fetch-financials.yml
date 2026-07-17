@@ -35,6 +35,7 @@ jobs:
         env:
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
           FINMIND_TOKEN2: ${{ secrets.FINMIND_TOKEN2 }}
+          FINMIND_TOKEN3: ${{ secrets.FINMIND_TOKEN3 }}
         run: |
           if [ "${{ github.event.schedule }}" = "0 2 12 * *" ]; then
             python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue

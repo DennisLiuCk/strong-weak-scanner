@@ -49,6 +49,7 @@ jobs:
         env:
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
           FINMIND_TOKEN2: ${{ secrets.FINMIND_TOKEN2 }}   # 選配:402 額度輪替備援(secret 未設=自動略過)
+          FINMIND_TOKEN3: ${{ secrets.FINMIND_TOKEN3 }}   # 選配:第三組獨立額度
         run: python scripts/fetch_daily.py
 
       - name: 計算五元素分數與 tier

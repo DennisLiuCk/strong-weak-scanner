@@ -1,12 +1,85 @@
+import io
+import os
 import sqlite3
 import sys
 import unittest
 from pathlib import Path
+from urllib.error import HTTPError
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import fetch_daily as fd
+
+
+class TokenPoolTest(unittest.TestCase):
+    def setUp(self):
+        self.old_tokens = fd._TOKENS
+        self.old_token_i = fd._TOK_I
+        self.old_disabled = fd._TOK_DISABLED
+        fd._TOKENS = []
+        fd._TOK_I = 0
+        fd._TOK_DISABLED = set()
+
+    def tearDown(self):
+        fd._TOKENS = self.old_tokens
+        fd._TOK_I = self.old_token_i
+        fd._TOK_DISABLED = self.old_disabled
+
+    def test_loads_three_distinct_tokens_and_deduplicates(self):
+        env = {
+            "FINMIND_TOKEN": " token-1 ",
+            "FINMIND_TOKEN2": "\ufefftoken-2",
+            "FINMIND_TOKEN3": "token-1",
+        }
+        with mock.patch.dict(os.environ, env, clear=True):
+            self.assertEqual(fd.get_tokens(), ["token-1", "token-2"])
+
+    def test_402_rotation_reaches_third_token(self):
+        seen = []
+
+        def fake_urlopen(req, timeout):
+            seen.append(req.get_header("Authorization"))
+            if len(seen) < 3:
+                raise HTTPError(req.full_url, 402, "Payment Required", None, None)
+            return io.BytesIO(b'{"data":[{"value":3}]}')
+
+        env = {
+            "FINMIND_TOKEN": "token-1",
+            "FINMIND_TOKEN2": "token-2",
+            "FINMIND_TOKEN3": "token-3",
+        }
+        with mock.patch.dict(os.environ, env, clear=True), \
+                mock.patch("fetch_daily.urllib.request.urlopen", side_effect=fake_urlopen):
+            data = fd.api_get("dataset", "2330", "2026-07-17", "2026-07-17", "unused")
+            again = fd.api_get("dataset", "2330", "2026-07-17", "2026-07-17", "unused")
+
+        self.assertEqual(data, [{"value": 3}])
+        self.assertEqual(again, [{"value": 3}])
+        self.assertEqual(seen, ["Bearer token-1", "Bearer token-2",
+                                "Bearer token-3", "Bearer token-3"])
+        self.assertEqual(fd._TOK_DISABLED, {0, 1})
+
+    def test_all_failed_tokens_stop_immediately_without_reuse(self):
+        seen = []
+
+        def always_402(req, timeout):
+            seen.append(req.get_header("Authorization"))
+            raise HTTPError(req.full_url, 402, "Payment Required", None, None)
+
+        env = {
+            "FINMIND_TOKEN": "token-1",
+            "FINMIND_TOKEN2": "token-2",
+            "FINMIND_TOKEN3": "token-3",
+        }
+        with mock.patch.dict(os.environ, env, clear=True), \
+                mock.patch("fetch_daily.urllib.request.urlopen", side_effect=always_402):
+            with self.assertRaises(fd.TokenPoolExhausted):
+                fd.api_get("dataset", "2330", "2026-07-17", "2026-07-17", "unused")
+
+        self.assertEqual(seen, ["Bearer token-1", "Bearer token-2", "Bearer token-3"])
+        self.assertEqual(fd._TOK_DISABLED, {0, 1, 2})
 
 
 class IncrementalFetchTest(unittest.TestCase):

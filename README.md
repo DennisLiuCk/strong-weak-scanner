@@ -219,9 +219,11 @@ uv run --no-project python scripts/daily_brief.py
 uv run --no-project python scripts/validate.py
 ```
 
-Token 讀取順序:環境變數 `FINMIND_TOKEN`(+選配 `FINMIND_TOKEN2`)→ 本機
+Token 讀取順序:環境變數 `FINMIND_TOKEN`(+選配 `FINMIND_TOKEN2`、
+`FINMIND_TOKEN3`)→ 本機
 `.mcp.json` 同名欄位(已被 `.gitignore` 排除);雲端由 Actions secret 注入。
-多組 token 組成時額輪替池——免費層 600 req/hr,遇 402 自動換下一組
+多組 token 組成時額輪替池——免費層 600 req/hr,遇 401/402/403 會把該 token
+在本次 process 熔斷並換下一組,全部熔斷就立即失敗停止
 (`fetch_daily.api_get`,screen.py 共用);同日多輪「screen+全量回補」單組
 token 必爆額度。正常 daily 會跳過完整 pair；休市日通常只需 1 次價格探針，資料源延遲時
 稍後重跑只補仍缺的 dataset。Runbook:盤後檢視

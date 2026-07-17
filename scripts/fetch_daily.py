@@ -14,7 +14,8 @@ FinMind 五元素每日抓取 → SQLite 落地。
   # 定向補缺:只抓指定股票(省 API 額度;可與 --datasets 疊加)
   uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-02
 
-Token 讀取順序:環境變數 FINMIND_TOKEN → 專案根目錄 .mcp.json。
+Token 讀取順序:環境變數 FINMIND_TOKEN/FINMIND_TOKEN2/FINMIND_TOKEN3
+→ 專案根目錄 .mcp.json。
 抓完會自動重算 daily_metrics(五元素衍生指標表)。
 價格類指標(ret1/距高)用還原股價 price_adj。FinMind 的 TaiwanStockPriceAdj 免費層不可用
 (需 Sponsor),所以改抓 TaiwanStockDividendResult + TaiwanStockSplitPrice(皆免費),
@@ -83,27 +84,47 @@ CREATE TABLE IF NOT EXISTS fetch_coverage(dataset TEXT, data_id TEXT, covered_th
 """
 
 _TOKENS = []   # get_tokens() 快取
-_TOK_I = 0     # 402 輪替黏性指標:換到新 token 後,行程內後續呼叫直接沿用
+_TOK_I = 0     # 輪替黏性指標:換到新 token 後,行程內後續呼叫直接沿用
+_TOK_DISABLED = set()  # 本次 process 已熔斷的 token index;不再回頭使用
+TOKEN_ENV_KEYS = ("FINMIND_TOKEN", "FINMIND_TOKEN2", "FINMIND_TOKEN3")
+TOKEN_FATAL_HTTP_CODES = {401, 402, 403}
+
+
+class TokenPoolExhausted(RuntimeError):
+    """所有 FinMind token 都已在本次 process 熔斷。"""
 
 def get_tokens():
-    """可用 token 清單:環境變數 FINMIND_TOKEN/FINMIND_TOKEN2 → .mcp.json 同名欄位。
-    多組 token = 時額(600/hr)輪替池;402 時 api_get 自動換下一組。"""
+    """可用 token 清單:環境變數 FINMIND_TOKEN{,2,3} → .mcp.json 同名欄位。
+    多組 token = 時額(600/hr)輪替池;401/402/403 時熔斷該把並換下一組。"""
     global _TOKENS
     if _TOKENS:
         return _TOKENS
-    ts = [os.environ[k] for k in ("FINMIND_TOKEN", "FINMIND_TOKEN2") if os.environ.get(k)]
+    ts = [os.environ[k] for k in TOKEN_ENV_KEYS if os.environ.get(k)]
     if not ts:
         with open(os.path.join(ROOT, ".mcp.json"), encoding="utf-8") as f:
             env = json.load(f)["mcpServers"]["finmind"]["env"]
-        ts = [env[k] for k in ("FINMIND_TOKEN", "FINMIND_TOKEN2") if env.get(k)]
+        ts = [env[k] for k in TOKEN_ENV_KEYS if env.get(k)]
     # GitHub secret 貼上時可能夾帶 BOM(例如來源檔案存成「UTF-8 with BOM」)——
     # 混進 Authorization header 會讓 latin-1 編碼直接炸掉,且 api_get 逐檔 catch 例外,
     # 會變成「全部靜默失敗、job 卻顯示成功」(2026-07-06 事故:GH Actions 兩次 run 皆 0 rows)。
-    _TOKENS = [t.strip().lstrip("﻿") for t in ts]
+    # 同一支 token 若誤填到多個 secret,輪替沒有意義且會重複消耗 retry。
+    _TOKENS = list(dict.fromkeys(t.strip().lstrip("﻿") for t in ts if t.strip().lstrip("﻿")))
     return _TOKENS
 
 def get_token():
     return get_tokens()[0]
+
+
+def _active_token_index(tokens):
+    """從目前位置找下一把未熔斷 token；找不到就立即停止主管線。"""
+    global _TOK_I
+    for offset in range(len(tokens)):
+        idx = (_TOK_I + offset) % len(tokens)
+        if idx not in _TOK_DISABLED:
+            _TOK_I = idx
+            return idx
+    raise TokenPoolExhausted("所有 FinMind token 均已失敗,停止本次 action")
+
 
 def api_get(dataset, data_id, start, end, token, retries=3, return_status=False):
     global _TOK_I
@@ -114,16 +135,22 @@ def api_get(dataset, data_id, start, end, token, retries=3, return_status=False)
     q = urllib.parse.urlencode(p)
     url = API + "?" + q
     for i in range(retries):
+        token_i = _active_token_index(tokens)
         try:
             req = urllib.request.Request(url, headers={
-                "Authorization": "Bearer " + tokens[_TOK_I % len(tokens)]})
+                "Authorization": "Bearer " + tokens[token_i]})
             with urllib.request.urlopen(req, timeout=60) as resp:
                 data = json.load(resp).get("data", [])
                 return (data, True) if return_status else data
         except Exception as e:
-            if getattr(e, "code", None) == 402 and len(tokens) > 1 and i < retries - 1:
-                _TOK_I += 1              # 額度用盡 → 輪替下一組立即重試(不退避)
-                print(f"  ! 402 額度用盡,輪替 token → #{_TOK_I % len(tokens) + 1}", file=sys.stderr)
+            code = getattr(e, "code", None)
+            if code in TOKEN_FATAL_HTTP_CODES:
+                _TOK_DISABLED.add(token_i)
+                print(f"  ! HTTP {code}:token #{token_i + 1} 本次 action 停用", file=sys.stderr)
+                if len(_TOK_DISABLED) >= len(tokens):
+                    raise TokenPoolExhausted(
+                        f"所有 {len(tokens)} 把 FinMind token 均已失敗,停止本次 action") from e
+                _TOK_I = (token_i + 1) % len(tokens)
                 continue
             if i == retries - 1:
                 print(f"  ! {dataset} {data_id} 失敗: {e}", file=sys.stderr)
