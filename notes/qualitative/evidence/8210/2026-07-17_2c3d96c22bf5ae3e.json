@@ -1,0 +1,156 @@
+{
+  "content_as_of": "2026-07-17",
+  "documents": [
+    {
+      "cited_pages": [
+        6,
+        7,
+        8,
+        107,
+        109,
+        110,
+        111,
+        126,
+        129,
+        130
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 140,
+      "rendered_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "011a01d3a487979f981ed77ce60f9b246a2d5e629374fefe0d24bd9737e945d3",
+      "size_bytes": 4983059,
+      "url": "https://chenbro-newwebserver-hk.s3.ap-east-1.amazonaws.com/upload/files/2026/4/114-----------------CN-.pdf"
+    },
+    {
+      "cited_pages": [
+        5,
+        7,
+        11,
+        12,
+        13,
+        15,
+        16,
+        28,
+        49
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 82,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        27,
+        28,
+        29,
+        48,
+        49,
+        50
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "56ae3c658faf21728e1eb0db3dee5d656b225627c687204affec725882219d54",
+      "size_bytes": 2869714,
+      "url": "https://chenbro-newwebserver-hk.s3.ap-east-1.amazonaws.com/upload/files/2026/2/25134b97-7dd4-4095-9de6-aa8dcff60d97.pdf"
+    },
+    {
+      "cited_pages": [
+        6,
+        8,
+        9,
+        11,
+        12,
+        17
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 67,
+      "rendered_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "02a6b9a3c70922f97552e737a5c569938c407e59f429c36c21ba7dd742934a6d",
+      "size_bytes": 1205546,
+      "url": "https://chenbro-newwebserver-hk.s3.ap-east-1.amazonaws.com/upload/files/2026/4/9068fe16-5d12-4ba5-82fd-197129662306.pdf"
+    },
+    {
+      "cited_pages": [
+        2,
+        4,
+        5
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 9,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "a661d29b98112a50e7b2d19034f500bfd811cb645d94f1e96a7200b57f80a781",
+      "size_bytes": 742183,
+      "url": "https://mopsov.twse.com.tw/nas/STR/821020260508M001.pdf"
+    }
+  ],
+  "pack_sha256": "2c3d96c22bf5ae3e77ab2b436db0ce413350fbf0eb7195dcf107a24dfd3a6c98",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "8210",
+  "unverified_claims_removed": true
+}
