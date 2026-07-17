@@ -1,0 +1,164 @@
+{
+  "content_as_of": "2026-07-17",
+  "documents": [
+    {
+      "cited_pages": [
+        7,
+        8,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 105,
+      "rendered_pages": [
+        6,
+        7,
+        8,
+        9,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "9c3f300a9eb6588d48f3a840e2b872507abf63cc588883f6eed3f6236c345003",
+      "size_bytes": 2345601,
+      "url": "https://www.uneec.com/Content/Upload/Financial%20Information/%E8%82%A1%E6%9D%B1%E6%9C%83%E8%B3%87%E8%A8%8A/114%E5%B9%B4%E6%99%9F%E9%8A%98%E9%9B%BB%E5%AD%90%E5%B9%B4%E5%A0%B1%28%E4%B8%8A%29.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        40,
+        41
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 57,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        39,
+        40,
+        41,
+        42
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "dcf47af5148121c3d2646509b294eff8416428518be495b8cabde2260f47580e",
+      "size_bytes": 1588760,
+      "url": "https://www.uneec.com/Content/Upload/Financial%20Information/%E8%B2%A1%E5%A0%B1/%E6%99%9F%E9%8A%98114Q4_%E5%90%88%E4%BD%B5_%E5%AE%8C%E7%A8%BF%E8%B2%A1%E5%A0%B1-%E9%9B%BB%E5%AD%90%E6%9B%B8.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 37,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "c5eb900a1f2ee41a3d9d63763e5fcb2bcdd5d955cc7fdb1281185741cc14610f",
+      "size_bytes": 1061875,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3013&filename=202601_3013_AI1.pdf"
+    },
+    {
+      "cited_pages": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 36,
+      "rendered_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "d8b1e8274409a8695721a1df7b709cb53dbb96e39f745569aa2a49b901301cd1",
+      "size_bytes": 6562191,
+      "url": "https://mopsov.twse.com.tw/nas/STR/301320251113M001.pdf"
+    }
+  ],
+  "pack_sha256": "141988ac5f73570f121c08386c9e7b4befaa70295749f14888f44fba510bf48e",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3013",
+  "unverified_claims_removed": true
+}
