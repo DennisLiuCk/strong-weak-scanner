@@ -83,6 +83,131 @@ class TokenPoolTest(unittest.TestCase):
         self.assertEqual(fd._TOK_DISABLED, {0, 1, 2})
 
 
+class OfficialPriceBatchTest(unittest.TestCase):
+    def test_parse_twse_filters_universe_and_normalizes_numbers(self):
+        payload = {
+            "stat": "OK",
+            "date": "20260717",
+            "tables": [{
+                "fields": [
+                    "證券代號", "證券名稱", "成交股數", "成交筆數", "成交金額",
+                    "開盤價", "最高價", "最低價", "收盤價",
+                ],
+                "data": [
+                    ["2330", "台積電", "12,345", "100", "12,345,000",
+                     "1,000.00", "1,020.00", "995.00", "1,010.00"],
+                    ["1101", "台泥", "200", "10", "8,000",
+                     "40.00", "41.00", "39.50", "40.50"],
+                ],
+            }],
+        }
+
+        rows, has_market_data = fd.parse_twse_price(
+            payload, "2026-07-17", {"2330"})
+
+        self.assertTrue(has_market_data)
+        self.assertEqual(rows, [{
+            "date": "2026-07-17",
+            "stock_id": "2330",
+            "open": 1000.0,
+            "max": 1020.0,
+            "min": 995.0,
+            "close": 1010.0,
+            "Trading_Volume": 12345,
+            "Trading_money": 12345000.0,
+        }])
+
+    def test_parse_twse_no_data_is_a_holiday_not_an_error(self):
+        rows, has_market_data = fd.parse_twse_price(
+            {"stat": "很抱歉，沒有符合條件的資料!", "date": ""},
+            "2026-07-18", {"2330"})
+        self.assertEqual(rows, [])
+        self.assertFalse(has_market_data)
+
+    def test_parse_tpex_empty_daily_tables_are_a_holiday(self):
+        payload = {
+            "stat": "ok",
+            "date": "20260718",
+            "tables": [{
+                "fields": [
+                    "代號", "收盤", "開盤", "最高", "最低", "成交股數", "成交金額(元)",
+                ],
+                "data": [],
+            }],
+        }
+        rows, has_market_data = fd.parse_tpex_price(
+            payload, "2026-07-18", {"2454"})
+        self.assertEqual(rows, [])
+        self.assertFalse(has_market_data)
+
+    def test_parse_tpex_reads_all_matching_tables_and_handles_no_trade(self):
+        fields = [
+            "代號", "名稱", "收盤", "漲跌", "開盤", "最高", "最低", "均價",
+            "成交股數", "成交金額(元)",
+        ]
+        payload = {
+            "stat": "ok",
+            "date": "20260717",
+            "tables": [
+                {"fields": fields, "data": [
+                    ["2454", "聯發科", "1,310.00", "+10", "1,300.00",
+                     "1,320.00", "1,295.00", "1,308.00", "9,876", "12,345,678"],
+                ]},
+                {"fields": fields, "data": [
+                    ["9999", "測試", "--", "--", "--", "--", "--", "--", "0", "0"],
+                ]},
+            ],
+        }
+
+        rows, has_market_data = fd.parse_tpex_price(
+            payload, "2026-07-17", {"2454", "9999"})
+
+        self.assertTrue(has_market_data)
+        self.assertEqual(rows[0]["stock_id"], "2454")
+        self.assertEqual(rows[0]["close"], 1310.0)
+        self.assertEqual(rows[0]["Trading_Volume"], 9876)
+        self.assertEqual(rows[0]["Trading_money"], 12345678.0)
+        self.assertEqual(rows[1]["stock_id"], "9999")
+        self.assertIsNone(rows[1]["open"])
+        self.assertIsNone(rows[1]["close"])
+        self.assertEqual(rows[1]["Trading_Volume"], 0)
+
+    def test_successful_market_is_committed_before_other_market_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "price-checkpoint.db"
+            con = sqlite3.connect(db)
+            con.executescript(fd.SCHEMA)
+            calls = []
+
+            def partial_fetch(source, day, wanted_ids):
+                calls.append((source, day, set(wanted_ids)))
+                if source == "TPEx":
+                    raise OSError("temporary TPEx failure")
+                return [{
+                    "date": day, "stock_id": "2330", "open": 1000,
+                    "max": 1020, "min": 995, "close": 1010,
+                    "Trading_Volume": 12345, "Trading_money": 12345000,
+                }], True
+
+            try:
+                with self.assertRaises(fd.ExchangePriceFetchError):
+                    fd.fetch_exchange_prices(
+                        con, ["2330", "2454"], {"2026-07-17"},
+                        fetcher=partial_fetch)
+
+                observer = sqlite3.connect(db)
+                try:
+                    self.assertEqual(observer.execute(
+                        "SELECT stock_id,close FROM price WHERE date='2026-07-17'"
+                    ).fetchall(), [("2330", 1010.0)])
+                finally:
+                    observer.close()
+            finally:
+                con.close()
+
+        self.assertEqual([call[0] for call in calls], ["TWSE", "TPEx"])
+
+
 class IncrementalFetchTest(unittest.TestCase):
     def setUp(self):
         self.con = sqlite3.connect(":memory:")
@@ -98,6 +223,7 @@ class IncrementalFetchTest(unittest.TestCase):
                 self.con.execute("INSERT INTO sbl VALUES(?,?,?)", (day, sid, 10))
         self.con.commit()
         self.calls = []
+        self.price_calls = []
 
     def tearDown(self):
         self.con.close()
@@ -124,27 +250,47 @@ class IncrementalFetchTest(unittest.TestCase):
                      "SBLShortSalesCurrentDayBalance": 10}]
         raise AssertionError(dataset)
 
-    def test_holiday_repeat_uses_only_one_probe(self):
+    def fake_price_fetch(self, source, day, wanted_ids):
+        self.price_calls.append((source, day, set(wanted_ids)))
+        if day != "2026-07-10":
+            return [], False
+        sid = "2330" if source == "TWSE" else "2454"
+        rows = [{
+            "date": day, "stock_id": sid, "open": 2, "max": 3,
+            "min": 2, "close": 3, "Trading_Volume": 100,
+            "Trading_money": 300,
+        }] if sid in wanted_ids else []
+        return rows, True
+
+    def test_holiday_repeat_uses_one_daily_batch_per_market(self):
         def empty_fetch(dataset, sid, start, end, token):
             self.calls.append((dataset, sid, start, end))
             return []
 
+        def empty_price(source, day, wanted_ids):
+            self.price_calls.append((source, day, set(wanted_ids)))
+            return [], False
+
         stats = fd.fetch_missing_raw(
             self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-10", "token",
-            sleep=0, fetcher=empty_fetch)
-        self.assertEqual(stats["requests"], 1)
-        self.assertEqual(stats["probe_requests"], 1)
-        self.assertEqual(stats["skipped_pairs"], 10)
+            sleep=0, fetcher=empty_fetch, price_fetcher=empty_price)
+        self.assertEqual(stats["requests"], 2)
+        self.assertEqual(stats["finmind_requests"], 0)
+        self.assertEqual(stats["exchange_requests"], 2)
+        self.assertEqual(stats["probe_requests"], 2)
+        self.assertEqual(stats["skipped_pairs"], 8)
         self.assertEqual(stats["rows"], 0)
 
     def test_new_trading_day_expands_only_missing_pairs(self):
         stats = fd.fetch_missing_raw(
             self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-10", "token",
-            sleep=0, fetcher=self.fake_fetch)
-        # 1 次價格探針 + 其餘 9 個缺口；探針結果直接落地，不再抓 2330 price。
+            sleep=0, fetcher=self.fake_fetch, price_fetcher=self.fake_price_fetch)
+        # 價格 TWSE/TPEx 各 1 次 + 其餘四張 FinMind 表 2 檔 × 4。
         self.assertEqual(stats["requests"], 10)
-        self.assertEqual(stats["probe_requests"], 1)
-        self.assertEqual(stats["skipped_pairs"], 1)
+        self.assertEqual(stats["finmind_requests"], 8)
+        self.assertEqual(stats["exchange_requests"], 2)
+        self.assertEqual(stats["probe_requests"], 2)
+        self.assertEqual(stats["skipped_pairs"], 0)
         self.assertEqual(stats["new_dates"], {"2026-07-10"})
         for table in fd.DATASET_TABLE.values():
             n = self.con.execute(f"SELECT COUNT(*) FROM {table} WHERE date='2026-07-10'").fetchone()[0]
@@ -155,9 +301,11 @@ class IncrementalFetchTest(unittest.TestCase):
         self.con.commit()
         stats = fd.fetch_missing_raw(
             self.con, self.ids, ["TaiwanStockPrice"], "2026-07-08", "2026-07-10", "token",
-            sleep=0, fetcher=self.fake_fetch)
+            sleep=0, fetcher=self.fake_fetch, price_fetcher=self.fake_price_fetch)
         self.assertEqual(stats["probe_requests"], 0)
         self.assertEqual(stats["requests"], 2)
+        self.assertEqual(stats["finmind_requests"], 0)
+        self.assertEqual(stats["exchange_requests"], 2)
         self.assertEqual(self.con.execute(
             "SELECT COUNT(*) FROM price WHERE date='2026-07-10'").fetchone()[0], 2)
 
@@ -166,11 +314,32 @@ class IncrementalFetchTest(unittest.TestCase):
         self.con.commit()
         stats = fd.fetch_missing_raw(
             self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-09", "token",
-            sleep=0, fetcher=self.fake_fetch)
+            sleep=0, fetcher=self.fake_fetch, price_fetcher=self.fake_price_fetch)
         self.assertEqual(stats["requests"], 1)
         self.assertEqual(stats["probe_requests"], 0)
+        self.assertEqual(stats["skipped_pairs"], 7)
+        self.assertEqual(self.price_calls, [])
         self.assertEqual(self.calls, [
             ("TaiwanStockShareholding", "2454", "2026-07-09", "2026-07-09")])
+
+    def test_incomplete_price_batch_checkpoints_and_stops_before_finmind(self):
+        def incomplete_price(source, day, wanted_ids):
+            if source == "TWSE":
+                return [{
+                    "date": day, "stock_id": "2330", "open": 2, "max": 3,
+                    "min": 2, "close": 3, "Trading_Volume": 100,
+                    "Trading_money": 300,
+                }], True
+            return [], True
+
+        with self.assertRaises(fd.ExchangePriceFetchError):
+            fd.fetch_missing_raw(
+                self.con, self.ids, fd.DATASETS,
+                "2026-07-08", "2026-07-10", "token", sleep=0,
+                fetcher=self.fake_fetch, price_fetcher=incomplete_price)
+        self.assertEqual(self.con.execute(
+            "SELECT COUNT(*) FROM price WHERE date='2026-07-10'").fetchone()[0], 1)
+        self.assertEqual(self.calls, [])
 
     def test_coverage_migration_does_not_trust_legacy_empty_risk_flags(self):
         fd.initialize_fetch_coverage(self.con, self.ids, "2026-07-09")

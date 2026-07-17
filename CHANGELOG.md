@@ -2,6 +2,25 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 日價格改用 TWSE／TPEx 官方全市場批次 — 2026-07-18
+
+**策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與
+`validate.py` 的 `IS_CUTOFF` 皆未動）。本次只替換五張原始表中 `price` 的取得方式：
+
+- 上市日 OHLCV 改抓 TWSE `MI_INDEX`、上櫃改抓 TPEx `dailyQuotes`；每個待補日期各
+  1 次全市場批次，再只保留 universe 股票。其餘 `inst`／`margin`／`holding`／`sbl`
+  仍依 FinMind 個股缺口抓取，既有 `TaiwanStockPrice` CLI selector 保留相容性。
+- 正常新增交易日由 121 次 FinMind 個股價格請求降成 2 次免 token 官方請求；FinMind
+  邏輯請求由約 730 降至 609（四張原始表 484＋除權息 121＋分割 1＋TAIEX 1＋
+  參考個股 2）。單一免費 token 的 600 次時額仍差 9 次，現階段仍需第二把 token；
+  下一個可獨立遷移的主要項目是 121 次除權息事件查詢。
+- TWSE、TPEx 分來源 commit；若其中一邊失敗，先保存另一邊成功資料供 Action checkpoint，
+  但任務仍標紅。任一待補交易日未達 universe 全覆蓋時會拒絕完成，不會進入評分／發布；
+  重跑依 SQLite 缺口接續。
+- 2026-07-17 真實資料唯讀對帳：TWSE 77 檔＋TPEx 44 檔＝121/121，對既有 FinMind
+  `price` 的 open／high／low／close／volume／amount 共 726 個欄位差異為 0；解析、
+  休市、完整性與單一市場失敗 checkpoint 測試均通過。
+
 ## Universe 第二批擴充：伺服器組裝／機構 — 2026-07-17
 
 **策略規則零變動**（`score.py` 權重/tier、`fetch_daily.py` 族群/市場條件與

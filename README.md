@@ -39,7 +39,8 @@
 對照表見 workflow 註解。提早執行若資料未齊,只保存已抓缺口、不發布正式快照)
   fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token;僅供最新一週)
                    → tdcc_holding(append-only;失敗自動略過不擋管線)
-  fetch_daily.py   先探測新交易日,再只補 FinMind 5 資料集的股票×日期缺口
+  fetch_daily.py   TWSE/TPEx 官方全市場批次補日價格；FinMind 只補其餘 4 張
+                   原始表的股票×日期缺口
                    + 依 coverage 補除權息/分割事件 + 報酬指數
                    → SQLite 原始表(append-only)
                    → price_adj 還原價(本地重算)
@@ -65,9 +66,9 @@
 
 **原始層(append-only、只增不覆寫——歷史判定不可事後改寫)**
 
-| 表 | 內容 | 來源 dataset |
+| 表 | 內容 | 來源 |
 |---|---|---|
-| price | 日 OHLCV | TaiwanStockPrice |
+| price | 日 OHLCV | TWSE `MI_INDEX` / TPEx `dailyQuotes`(**非 FinMind**;每日期各 1 次全市場批次) |
 | inst | 外資/投信/自營淨買賣(股) | TaiwanStockInstitutionalInvestorsBuySell |
 | margin | 融資/融券餘額 | TaiwanStockMarginPurchaseShortSale |
 | holding | 外資持股比率、發行股數 | TaiwanStockShareholding |
@@ -225,8 +226,11 @@ Token 讀取順序:環境變數 `FINMIND_TOKEN`(+選配 `FINMIND_TOKEN2`、
 多組 token 組成時額輪替池——免費層 600 req/hr,遇 401/402/403 會把該 token
 在本次 process 熔斷並換下一組,全部熔斷就立即失敗停止
 (`fetch_daily.api_get`,screen.py 共用);同日多輪「screen+全量回補」單組
-token 必爆額度。正常 daily 會跳過完整 pair；休市日通常只需 1 次價格探針，資料源延遲時
-稍後重跑只補仍缺的 dataset。Runbook:盤後檢視
+token 必爆額度。正常新增交易日的 universe 價格已由 121 次 FinMind 個股請求降為
+TWSE／TPEx 各 1 次官方批次；FinMind 邏輯請求約 609 次（其餘四張原始表
+`121×4=484`、除權息 121、分割 1、TAIEX 1、參考個股 2），所以單一 600 額度仍差
+9 次、會用到第二把 token。正常 daily 會跳過完整 pair；休市日通常只需兩個官方價格
+探針，資料源延遲時稍後重跑只補仍缺的 dataset。Runbook:盤後檢視
 [DAILY_CHECK.md](DAILY_CHECK.md)、週六策略檢視 [WEEKLY_REVIEW.md](WEEKLY_REVIEW.md)。
 
 ## 質化研究筆記(`notes/qualitative/`)
@@ -418,7 +422,7 @@ prose 章節完全自由(§數字/§質化訊號/§族群映射…),經 `_extrac
 
 ### 資料流與維護節奏
 
-- **量化(自動)**:每日管線另抓 2330 收盤/外資持股 → `ref_price`/`ref_holding`
+- **量化(自動)**:每日管線另以 FinMind 抓 2330 收盤/外資持股 → `ref_price`/`ref_holding`
   隔離表(+2 req/日;不進任何衍生表);月營收/財報四表隨 `fetch_financials`
   月/季排程(+1 req/月、+4 req/季),`fund_map["2330"]` 供專區月營收格。
 - **質化(每季人工/AI 協作)**:法說會後 T+1 內更新事件錨點(guidance/kpi/prose),

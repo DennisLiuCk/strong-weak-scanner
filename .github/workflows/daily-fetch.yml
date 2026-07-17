@@ -5,10 +5,10 @@ on:
     # 台灣 20:17 = UTC 12:17,週一~五(台股交易日),落在收盤後窗口。
     # 遇台股假日抓不到新資料時,commit 步驟會自動略過。
     #
-    # 為什麼是 20:17 —— FinMind 各 dataset 每日更新時間(官方文件,台北時間;
+    # 為什麼是 20:17 —— 各來源每日更新時間(台北時間；FinMind 官方文件註明
     # 「實際更新時間以 API 資料為主」,可能漂移):
+    #   收盤後 TWSE/TPEx 官方全市場價格批次(①價②量;不耗 FinMind 額度)
     #   16:50  TaiwanStockTotalReturnIndex(大盤 regime)
-    #   17:30  TaiwanStockPrice(①價②量)
     #   20:00  TaiwanStockInstitutionalInvestorsBuySell(③④法人買賣超)
     #   21:00  TaiwanStockShareholding(③外資持股)
     #   21:00  TaiwanStockMarginPurchaseShortSale(⑤融資券)

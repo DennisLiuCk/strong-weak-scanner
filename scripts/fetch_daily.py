@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FinMind 五元素每日抓取 → SQLite 落地。
+台股五元素每日抓取 → SQLite 落地。
 零第三方依賴(只用 Python 標準庫),方便本機排程或雲端 routine 搬運。
 
 用法:
@@ -16,6 +16,7 @@ FinMind 五元素每日抓取 → SQLite 落地。
 
 Token 讀取順序:環境變數 FINMIND_TOKEN/FINMIND_TOKEN2/FINMIND_TOKEN3
 → 專案根目錄 .mcp.json。
+日 OHLCV 改由 TWSE/TPEx 官方全市場日報各抓一次；其餘四張個股原始表仍走 FinMind。
 抓完會自動重算 daily_metrics(五元素衍生指標表)。
 價格類指標(ret1/距高)用還原股價 price_adj。FinMind 的 TaiwanStockPriceAdj 免費層不可用
 (需 Sponsor),所以改抓 TaiwanStockDividendResult + TaiwanStockSplitPrice(皆免費),
@@ -32,6 +33,9 @@ DB = os.path.join(ROOT, "data", "findmind.db")
 UNIVERSE = os.path.join(ROOT, "config", "universe.csv")
 GROUPS_CSV = os.path.join(ROOT, "config", "groups.csv")
 API = "https://api.finmindtrade.com/api/v4/data"
+TWSE_PRICE_URL = "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX"
+TPEX_PRICE_URL = "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes"
+PRICE_SOURCES = ("TWSE", "TPEx")
 
 DATASETS = ["TaiwanStockPrice", "TaiwanStockInstitutionalInvestorsBuySell",
             "TaiwanStockMarginPurchaseShortSale", "TaiwanStockShareholding",
@@ -92,6 +96,11 @@ TOKEN_FATAL_HTTP_CODES = {401, 402, 403}
 
 class TokenPoolExhausted(RuntimeError):
     """所有 FinMind token 都已在本次 process 熔斷。"""
+
+
+class ExchangePriceFetchError(RuntimeError):
+    """TWSE/TPEx 官方價格批次失敗或最新交易日不完整。"""
+
 
 def get_tokens():
     """可用 token 清單:環境變數 FINMIND_TOKEN{,2,3} → .mcp.json 同名欄位。
@@ -157,6 +166,116 @@ def api_get(dataset, data_id, start, end, token, retries=3, return_status=False)
                 return ([], False) if return_status else []
             time.sleep(2 * (i + 1))  # 遇限流退避重試
     return ([], False) if return_status else []
+
+
+def _request_json(url, form=None):
+    """交易所公開 JSON；form=None 用 GET，否則以 x-www-form-urlencoded POST。"""
+    body = urllib.parse.urlencode(form).encode() if form is not None else None
+    req = urllib.request.Request(
+        url, data=body, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=45) as resp:
+        data = json.load(resp)
+    time.sleep(0.5)  # 官方未公布限流數字；市場批次每日僅各一請求，保留禮貌間隔。
+    return data
+
+
+def _market_number(value, integer=False):
+    """交易所數字欄正規化；`--`/空字串代表當日無成交，保留為 None。"""
+    if value is None:
+        return None
+    text = str(value).strip().replace(",", "")
+    if not text or not any(ch.isdigit() for ch in text):
+        return None
+    try:
+        number = float(text)
+        return int(number) if integer else number
+    except ValueError:
+        return None
+
+
+def _price_row(day, sid, open_, high, low, close, volume, amount):
+    """轉成既有 up_price() 接受的 FinMind-compatible 欄位名稱。"""
+    return {
+        "date": day,
+        "stock_id": str(sid).strip(),
+        "open": _market_number(open_),
+        "max": _market_number(high),
+        "min": _market_number(low),
+        "close": _market_number(close),
+        "Trading_Volume": _market_number(volume, integer=True),
+        "Trading_money": _market_number(amount),
+    }
+
+
+def parse_twse_price(payload, day, wanted_ids=None):
+    """解析 TWSE MI_INDEX 的「每日收盤行情(全部)」；回傳(rows,市場是否有資料)。"""
+    stat = str(payload.get("stat") or "")
+    if "沒有符合條件的資料" in stat:
+        return [], False
+    ymd = day.replace("-", "")
+    if stat != "OK" or payload.get("date") != ymd:
+        raise ValueError(f"TWSE MI_INDEX 回應異常:stat={stat},date={payload.get('date')}")
+    required = {"證券代號", "成交股數", "成交金額", "開盤價", "最高價", "最低價", "收盤價"}
+    tables = [t for t in payload.get("tables", []) if required.issubset(t.get("fields", []))]
+    if not tables:
+        raise ValueError("TWSE MI_INDEX 找不到每日收盤行情欄位")
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    rows, market_rows = [], 0
+    for table in tables:
+        pos = {name: i for i, name in enumerate(table["fields"])}
+        market_rows += len(table.get("data", []))
+        for raw in table.get("data", []):
+            sid = str(raw[pos["證券代號"]]).strip()
+            if wanted is not None and sid not in wanted:
+                continue
+            rows.append(_price_row(
+                day, sid, raw[pos["開盤價"]], raw[pos["最高價"]], raw[pos["最低價"]],
+                raw[pos["收盤價"]], raw[pos["成交股數"]], raw[pos["成交金額"]]))
+    return rows, market_rows > 0
+
+
+def parse_tpex_price(payload, day, wanted_ids=None):
+    """解析 TPEx dailyQuotes；兩張同 schema 表都納入，避免管理股票等分表漏列。"""
+    ymd = day.replace("-", "")
+    if str(payload.get("stat") or "").lower() != "ok" or payload.get("date") != ymd:
+        raise ValueError(f"TPEx dailyQuotes 回應異常:stat={payload.get('stat')},date={payload.get('date')}")
+    required = {"代號", "收盤", "開盤", "最高", "最低", "成交股數", "成交金額(元)"}
+    tables = [t for t in payload.get("tables", []) if required.issubset(t.get("fields", []))]
+    if not tables:
+        raise ValueError("TPEx dailyQuotes 找不到每日收盤行情欄位")
+    wanted = set(wanted_ids) if wanted_ids is not None else None
+    rows, market_rows = [], 0
+    for table in tables:
+        pos = {name: i for i, name in enumerate(table["fields"])}
+        market_rows += len(table.get("data", []))
+        for raw in table.get("data", []):
+            sid = str(raw[pos["代號"]]).strip()
+            if wanted is not None and sid not in wanted:
+                continue
+            rows.append(_price_row(
+                day, sid, raw[pos["開盤"]], raw[pos["最高"]], raw[pos["最低"]],
+                raw[pos["收盤"]], raw[pos["成交股數"]], raw[pos["成交金額(元)"]]))
+    return rows, market_rows > 0
+
+
+def fetch_exchange_price_source(source, day, wanted_ids=None, retries=3):
+    """抓單一交易所單日全市場價格；失敗重試後拋錯，交給 Action 保存 checkpoint。"""
+    for attempt in range(retries):
+        try:
+            if source == "TWSE":
+                url = (f"{TWSE_PRICE_URL}?date={day.replace('-', '')}"
+                       "&type=ALLBUT0999&response=json")
+                return parse_twse_price(_request_json(url), day, wanted_ids)
+            if source == "TPEx":
+                return parse_tpex_price(_request_json(
+                    TPEX_PRICE_URL,
+                    {"date": day.replace("-", "/"), "response": "json"}), day, wanted_ids)
+            raise ValueError(f"未知價格來源:{source}")
+        except Exception as exc:
+            if attempt == retries - 1:
+                raise ExchangePriceFetchError(f"{source} {day} 官方價格批次失敗:{exc}") from exc
+            time.sleep(2 * (attempt + 1))
+
 
 def load_universe(con):
     rows = []
@@ -237,7 +356,7 @@ def _dates_in_table(con, table, stock_id, start, end):
 
 def _trading_dates(con, start, end):
     # price 與大盤任一方曾落地都視為交易日；可抓出「全 universe price 同日整批漏掉」
-    # 的歷史洞。兩者都沒有的尾端，仍由單一股票探針發現。
+    # 的歷史洞。兩者都沒有的尾端，仍由 TWSE/TPEx 每日全市場批次探針發現。
     return {r[0] for r in con.execute(
         """SELECT date FROM price WHERE date BETWEEN ? AND ?
            UNION SELECT date FROM market WHERE date BETWEEN ? AND ?""",
@@ -248,35 +367,95 @@ def _next_date(iso_date):
     return (date.fromisoformat(iso_date) + timedelta(days=1)).isoformat()
 
 
-def _probe_stock(con, ids):
-    """新交易日探針。優先 2330；否則取庫內最新且歷史最完整的一檔。"""
-    if "2330" in ids:
-        return "2330"
-    if not ids:
-        return None
+def _calendar_dates(start, end):
+    current, last = date.fromisoformat(start), date.fromisoformat(end)
+    out = []
+    while current <= last:
+        out.append(current.isoformat())
+        current += timedelta(days=1)
+    return out
+
+
+def _missing_price_dates(con, ids, dates):
+    """找出指定股票集合未全數落地的交易日；批次價格按日補，不再逐檔請求。"""
+    dates = set(dates)
+    if not ids or not dates:
+        return set()
     marks = ",".join("?" for _ in ids)
-    row = con.execute(
-        f"""SELECT stock_id,MAX(date) last,COUNT(*) n FROM price
-            WHERE stock_id IN ({marks}) GROUP BY stock_id
-            ORDER BY last DESC,n DESC,stock_id LIMIT 1""", ids).fetchone()
-    return row[0] if row else ids[0]
+    counts = dict(con.execute(
+        f"""SELECT date,COUNT(*) FROM price
+            WHERE stock_id IN ({marks}) AND date BETWEEN ? AND ? GROUP BY date""",
+        (*ids, min(dates), max(dates))).fetchall())
+    return {day for day in dates if counts.get(day, 0) != len(ids)}
+
+
+def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None):
+    """TWSE+TPEx 各日全市場批次。
+
+    任一來源失敗時仍先 commit 另一來源已取得的 rows，讓 GitHub Action checkpoint
+    可以保存；但隨後拋錯阻止未完成資料進入評分/發布。兩邊都空代表休市或尚未發布。
+    """
+    fetcher = fetcher or fetch_exchange_price_source
+    wanted = set(ids)
+    total_rows = requests = 0
+    found_dates, written_dates = set(), set()
+    for day in sorted(set(dates)):
+        availability, errors = {}, []
+        for source in PRICE_SOURCES:
+            requests += 1
+            try:
+                batch, has_market_data = fetcher(source, day, wanted)
+            except Exception as exc:
+                errors.append(f"{source}:{exc}")
+                continue
+            availability[source] = has_market_data
+            if write and batch:
+                total_rows += up_price(con, batch)
+                con.commit()  # source-by-source checkpoint；下一來源失敗時仍可保存。
+                written_dates.add(day)
+        if errors:
+            raise ExchangePriceFetchError(
+                f"{day} 官方價格批次未完成({'; '.join(errors)})")
+        flags = [availability.get(source, False) for source in PRICE_SOURCES]
+        if any(flags) and not all(flags):
+            missing_sources = [source for source in PRICE_SOURCES
+                               if not availability.get(source, False)]
+            raise ExchangePriceFetchError(
+                f"{day} 已是交易日但 {','.join(missing_sources)} 價格回傳空白")
+        if all(flags):
+            found_dates.add(day)
+            if write:
+                missing_ids = {sid for sid in wanted if not con.execute(
+                    "SELECT 1 FROM price WHERE date=? AND stock_id=?", (day, sid)).fetchone()}
+                if missing_ids:
+                    raise ExchangePriceFetchError(
+                        f"拒絕完成價格不完整資料日 {day}:"
+                        f"price={len(wanted) - len(missing_ids)}/{len(wanted)};"
+                        f"缺 {','.join(sorted(missing_ids))}")
+    return {
+        "rows": total_rows,
+        "requests": requests,
+        "found_dates": found_dates,
+        "written_dates": written_dates,
+    }
 
 
 def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
-                      force=False, fetcher=api_get):
-    """只抓 SQLite 尚缺的股票×dataset 日期；回傳 rows 與請求統計。
+                      force=False, fetcher=api_get, price_fetcher=None):
+    """價格走交易所按日批次，其餘 FinMind dataset 只抓 SQLite 尚缺的股票×日期。
 
-    交易日以 price∪market 為準。若請求尾端超過已知最新交易日，只用一檔探針查一次；
-    探針發現新日期後，其餘股票與 dataset 才依缺口展開抓取。
+    交易日以 price∪market 為準。未知尾端逐日用 TWSE+TPEx 批次探測；找到新交易日後，
+    其餘四張 FinMind 表才按股票×dataset 缺口展開。
     """
     known_before = _trading_dates(con, start, end)
     expected = set(known_before)
-    requests = probe_requests = skipped = rows = 0
-    probe_data = []
-    probe_sid = _probe_stock(con, ids)
+    finmind_requests = exchange_requests = probe_requests = skipped = rows = 0
+    want_price = "TaiwanStockPrice" in ds_list
+    finmind_ds = [ds for ds in ds_list if ds != "TaiwanStockPrice"]
     probe_start = None
+    probe_dates = set()
 
-    if not force and probe_sid:
+    if not force:
         if not expected:
             probe_start = start
         else:
@@ -286,20 +465,27 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
             elif hi < end:
                 probe_start = _next_date(hi)
         if probe_start and probe_start <= end:
-            probe_data = fetcher("TaiwanStockPrice", probe_sid, probe_start, end, token)
-            requests += 1
-            probe_requests += 1
-            expected.update(d["date"] for d in probe_data if d.get("date"))
-            if "TaiwanStockPrice" in ds_list and probe_data:
-                rows += up_price(con, probe_data)
-                con.commit()
-            if sleep:
-                time.sleep(sleep)
+            probe_dates = set(_calendar_dates(probe_start, end)) - expected
 
-    price_dates_written = {d["date"] for d in probe_data if d.get("date")}
+    if want_price:
+        price_gap_dates = (set(_calendar_dates(start, end)) if force
+                           else _missing_price_dates(con, ids, expected))
+    else:
+        price_gap_dates = set()
+    price_fetch_dates = probe_dates | price_gap_dates
+    price_dates_written = set()
+    if price_fetch_dates:
+        price_stats = fetch_exchange_prices(
+            con, ids, price_fetch_dates, write=want_price, fetcher=price_fetcher)
+        rows += price_stats["rows"]
+        exchange_requests += price_stats["requests"]
+        probe_requests += len(PRICE_SOURCES) * len(probe_dates & price_fetch_dates)
+        expected.update(price_stats["found_dates"])
+        price_dates_written.update(price_stats["written_dates"])
+
     for i, sid in enumerate(ids, 1):
         got = calls = 0
-        for ds in ds_list:
+        for ds in finmind_ds:
             table = DATASET_TABLE[ds]
             if force:
                 req_start, req_end = start, end
@@ -311,14 +497,12 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
                     continue
                 req_start, req_end = min(missing), max(missing)
             data = fetcher(ds, sid, req_start, req_end, token)
-            requests += 1
+            finmind_requests += 1
             calls += 1
             if data:
                 n = UPSERT[ds](con, data)
                 got += n
                 rows += n
-                if ds == "TaiwanStockPrice":
-                    price_dates_written.update(d["date"] for d in data if d.get("date"))
             if sleep:
                 time.sleep(sleep)
         con.commit()
@@ -326,16 +510,25 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
             print(f"[{i:>2}/{len(ids)}] {sid} · {got} rows · {calls} requests")
 
     expected.update(_trading_dates(con, start, end))
+    if want_price and expected and ids:
+        latest = max(expected)
+        missing_latest = _missing_price_dates(con, ids, {latest})
+        if missing_latest:
+            have = len(ids) - sum(1 for sid in ids if not con.execute(
+                "SELECT 1 FROM price WHERE date=? AND stock_id=?", (latest, sid)).fetchone())
+            raise ExchangePriceFetchError(
+                f"拒絕完成價格不完整資料日 {latest}:price={have}/{len(ids)}")
     return {
         "rows": rows,
-        "requests": requests,
+        "requests": finmind_requests + exchange_requests,
+        "finmind_requests": finmind_requests,
+        "exchange_requests": exchange_requests,
         "probe_requests": probe_requests,
         "skipped_pairs": skipped,
         "known_dates": known_before,
         "expected_dates": expected,
         "new_dates": expected - known_before,
         "price_dates_written": price_dates_written,
-        "probe_stock": probe_sid,
         "probe_start": probe_start,
     }
 
@@ -536,11 +729,7 @@ TPEX_DISPOSAL_URL = "https://www.tpex.org.tw/openapi/v1/tpex_disposal_informatio
 TPEX_WARNING_URL = "https://www.tpex.org.tw/openapi/v1/tpex_trading_warning_information"
 
 def _get_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        data = json.load(resp)
-    time.sleep(0.5)   # 禮貌間隔:TWSE/TPEx 官方未公布限流數字,保守起見別連續打
-    return data
+    return _request_json(url)
 
 def fetch_risk_flags(con, target_date):
     """抓當天 TWSE/TPEx 處置+注意名單,篩出 universe 內的檔位存進 risk_flags(整表重建,
@@ -979,10 +1168,11 @@ def main():
     stats = fetch_missing_raw(
         con, ids, ds_list, start, end, token, args.sleep, force=args.force)
     total = stats["rows"]
-    main_requests = stats["requests"] - stats["probe_requests"]
-    print(f"原始資料規劃:API {stats['requests']} 次(新交易日探針 {stats['probe_requests']}),"
-          f"跳過已完整 pair {stats['skipped_pairs']} 個")
-    if total or main_requests:
+    print(f"原始資料規劃:FinMind {stats['finmind_requests']} 次;"
+          f"TWSE/TPEx 價格批次 {stats['exchange_requests']} 次"
+          f"(新交易日探針 {stats['probe_requests']}),"
+          f"跳過已完整 FinMind pair {stats['skipped_pairs']} 個")
+    if total or stats["finmind_requests"]:
         con.execute('INSERT INTO fetch_log VALUES(datetime("now"),?,?,?)', (start, end, total))
         con.commit()
 
