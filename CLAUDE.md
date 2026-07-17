@@ -42,8 +42,11 @@
 ```
 fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token)→ tdcc_holding
                  ⚠ 僅供最新一週、缺週=永久洞;失敗 exit 0 不擋管線(Actions 綠≠成功)
-fetch_daily.py   抓取(FinMind)→ 還原價(除權息/分割自算)→ 五元素+觀察欄 → 族群層聚合
-                 ⚠ 內含 TWSE/TPEx 直抓備援(免token):外資持股缺值回補、處置/注意股票旗標
+fetch_daily.py   TWSE/TPEx 全市場批次價格 + FinMind 其餘四張原始表
+                 → 還原價(除權息/分割自算)→ 五元素+觀察欄 → 族群層聚合
+                 ⚠ 價格每待補日期兩次免 token 官方請求；日誌批次 0 次=缺口已完整、非失敗
+                 ⚠ 另含 TWSE/TPEx 直抓備援(免token):外資持股缺值回補、處置/注意股票旗標
+                 日誌/API 次數/斷點續跑判讀見 README「Daily Fetch 日誌判讀與續跑語意」
                  另抓觀察層參考個股 REF_IDS(2330)收盤/外資持股 → ref_price/ref_holding 隔離表
 fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現金流量表)
                  → month_revenue/financials/balance_sheet/cash_flow;獨立月/季排程,不掛每日管線
