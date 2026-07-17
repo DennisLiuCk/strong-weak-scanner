@@ -80,6 +80,18 @@ URL_RE = re.compile(r"https://[^\s)>]+")
 HYP_META_RE = re.compile(r"<!--\s*hypothesis_meta\s*(.*?)-->", re.S | re.I)
 TRANSITION_RE = re.compile(r"<!--\s*transition\s*(.*?)-->", re.S | re.I)
 
+# ── 多空觀點(小作文)──────────────────────────────────────────────
+# 報告層選配章節:看多/看空各一篇小作文 + 勝負手,與逐則 H# 分開;
+# narrative_meta 存在才啟用契約檢查,196 則回溯基線不回溯補寫。
+NARRATIVE_VERSION = 1
+# 此日後新捕捉的前瞻假說,報告缺多空觀點時 lint 以 warning 提示(不擋提交)。
+NARRATIVE_ENCOURAGED_FROM = "2026-07-18"
+NARRATIVE_META_RE = re.compile(r"<!--\s*narrative_meta\s*(.*?)-->", re.S | re.I)
+NARRATIVE_SECTIONS = ("看多小作文", "看空小作文", "勝負手")
+QUANT_SECTION_RE = re.compile(r"^##\s+量化背景", re.M)
+# 觀察層警語必須原句保留,防止量化快照被當成生命週期轉移證據。
+QUANT_CAUTION = "不得作為生命週期轉移證據"
+
 
 def _parse_comment_fields(body):
     out = {}
@@ -139,6 +151,68 @@ def _expected_lifecycle(status):
 def _valid_https_url(url):
     parsed = urlparse(url.rstrip("。；,、"))
     return parsed.scheme == "https" and bool(parsed.hostname) and "." in parsed.hostname
+
+
+def _h3_section(text, title):
+    match = re.search(rf"^###\s+{re.escape(title)}\s*$(.*?)(?=^###\s|^##\s|\Z)",
+                      text, re.S | re.M)
+    return match.group(1).strip() if match else None
+
+
+def _analyse_narrative(text, hypothesis_ids, today):
+    """多空觀點契約:narrative_meta 存在才啟用;回傳 (narrative|None, errors, warnings)。"""
+    match = NARRATIVE_META_RE.search(text)
+    if not match:
+        return None, [], []
+    errors, warnings = [], []
+    meta = _parse_comment_fields(match.group(1))
+    if meta.get("narrative_version") != str(NARRATIVE_VERSION):
+        errors.append(f"narrative_version 必須是 {NARRATIVE_VERSION}")
+    for field in ("narrative_updated", "quant_context_as_of"):
+        value = meta.get(field, "")
+        if not _valid_date(value):
+            errors.append(f"narrative_meta {field} 必須是 YYYY-MM-DD")
+        elif value > today:
+            errors.append(f"narrative_meta {field} 不可晚於今天 {today}")
+    sections = {}
+    for title in NARRATIVE_SECTIONS:
+        body = _h3_section(text, title)
+        if body is None or not body.strip():
+            errors.append(f"多空觀點缺少非空的「### {title}」")
+            continue
+        sections[title] = body
+    hyp_set = set(hypothesis_ids)
+    for title in ("看多小作文", "看空小作文"):
+        body = sections.get(title)
+        if body is None:
+            continue
+        cited = set(re.findall(r"\bH\d+\b", body))
+        if not cited & hyp_set:
+            errors.append(f"「{title}」必須至少引用一則現有 H# 假說")
+        plain_len = len(re.sub(r"\s", "", body))
+        if not 100 <= plain_len <= 800:
+            warnings.append(f"「{title}」長度 {plain_len} 字,建議 100–800 字的聚焦敘事")
+        if "最脆弱" not in body:
+            errors.append(f"「{title}」結尾必須自陳「最脆弱處」——沒有反身檢查的小作文只是行銷文")
+    decisive = sections.get("勝負手")
+    if decisive is not None:
+        bullets = [line for line in decisive.splitlines() if line.strip().startswith("-")]
+        if not 1 <= len(bullets) <= 3:
+            errors.append("「勝負手」須為 1–3 條可觀測資料點/事件的 bullet")
+    if not QUANT_SECTION_RE.search(text):
+        errors.append("多空觀點需搭配「## 量化背景」章節(可用 --context 產生)")
+    else:
+        as_of = meta.get("quant_context_as_of", "")
+        if _valid_date(as_of) and as_of not in text.split("## 量化背景", 1)[1][:200]:
+            errors.append("量化背景章節標題附近須標明 quant_context_as_of 的截至日期")
+        if QUANT_CAUTION not in text:
+            errors.append(f"量化背景必須保留警語「{QUANT_CAUTION}」")
+    narrative = {
+        "version": meta.get("narrative_version"),
+        "updated": meta.get("narrative_updated"),
+        "quant_as_of": meta.get("quant_context_as_of"),
+    }
+    return narrative, errors, warnings
 
 
 def analyse_report(path, text, notes=None, today=None):
@@ -339,6 +413,19 @@ def analyse_report(path, text, notes=None, today=None):
         if status == "attribution_error" and "歸因" not in fields.get("研究判讀", ""):
             warnings.append(f"{hypothesis['id']} 為 attribution_error，研究判讀宜明示歸因問題")
 
+    narrative, narrative_errors, narrative_warnings = _analyse_narrative(text, ids, today)
+    errors.extend(narrative_errors)
+    warnings.extend(narrative_warnings)
+    if narrative is None:
+        has_new_prospective = any(
+            item["meta"].get("capture_mode") == "prospective"
+            and _valid_date(item["meta"].get("research_captured_at", ""))
+            and item["meta"]["research_captured_at"] >= NARRATIVE_ENCOURAGED_FROM
+            for item in hypotheses)
+        if has_new_prospective:
+            warnings.append(
+                f"{NARRATIVE_ENCOURAGED_FROM} 起的前瞻捕捉宜補「多空觀點(小作文)」章節")
+
     if open_review_dates and meta.get("next_review") != min(open_review_dates):
         errors.append("report next_review 必須等於所有追蹤中假說最早的 review_due")
     if hypotheses:
@@ -360,6 +447,7 @@ def analyse_report(path, text, notes=None, today=None):
         "formal_note_content_sha256": meta.get("formal_note_content_sha256"),
         "hypotheses": hypotheses,
         "hypothesis_count": len(hypotheses),
+        "narrative": narrative,
         "sections": _extract_sections(text),
         "quality_invalid": bool(errors),
         "quality_errors": errors,
@@ -586,6 +674,117 @@ def prospective_metrics(reports, as_of):
             "lead_days": lead_days, "median_lead_days": median_lead}
 
 
+def _fmt(value, digits=2, suffix=""):
+    if value is None:
+        return "-"
+    return f"{value:,.{digits}f}{suffix}"
+
+
+def quant_context(stock_id, db_path=None):
+    """從自家 SQLite 產出「量化背景」章節草稿(唯讀;觀察層,不當轉移證據)。
+
+    資料面向:月營收路徑、價格/相對強弱、族群內排名、外資持股、借券、融資、
+    TDCC 大戶、處置/注意旗標、台積電法說對所屬族群的方向指引。作者貼上後可裁剪,
+    但警語與截至日期必須保留(lint 檢查)。"""
+    import sqlite3
+
+    db_path = db_path or os.path.join(ROOT, "data", "findmind.db")
+    con = sqlite3.connect(db_path)
+    con.row_factory = sqlite3.Row
+    uni = con.execute("SELECT name, grp FROM universe WHERE stock_id=?", (stock_id,)).fetchone()
+    if not uni:
+        raise SystemExit(f"universe 沒有 {stock_id}")
+    metric = con.execute(
+        "SELECT * FROM daily_metrics WHERE stock_id=? ORDER BY date DESC LIMIT 1",
+        (stock_id,)).fetchone()
+    if not metric:
+        raise SystemExit(f"daily_metrics 沒有 {stock_id}")
+    as_of = metric["date"]
+    closes = [row["close"] for row in con.execute(
+        "SELECT close FROM daily_metrics WHERE stock_id=? AND date<=? ORDER BY date DESC LIMIT 61",
+        (stock_id, as_of))]
+    ret60 = (closes[0] / closes[60] - 1) * 100 if len(closes) == 61 and closes[60] else None
+
+    score = con.execute(
+        "SELECT composite_s, tier FROM daily_scores WHERE stock_id=? AND date=?",
+        (stock_id, as_of)).fetchone()
+    peers = con.execute(
+        "SELECT s.stock_id, s.composite_s FROM daily_scores s JOIN universe u "
+        "ON u.stock_id = s.stock_id WHERE s.date=? AND u.grp=? "
+        "ORDER BY s.composite_s DESC", (as_of, uni["grp"])).fetchall()
+    rank = next((idx for idx, row in enumerate(peers, 1) if row["stock_id"] == stock_id), None)
+
+    revenue_rows = con.execute(
+        "SELECT revenue, revenue_month, revenue_year FROM month_revenue WHERE stock_id=? "
+        "ORDER BY date DESC LIMIT 4", (stock_id,)).fetchall()
+    revenue_lines = []
+    for row in revenue_rows:
+        prior = con.execute(
+            "SELECT revenue FROM month_revenue WHERE stock_id=? AND revenue_year=? "
+            "AND revenue_month=?", (stock_id, row["revenue_year"] - 1,
+                                    row["revenue_month"])).fetchone()
+        yoy = ((row["revenue"] / prior["revenue"] - 1) * 100) if prior and prior["revenue"] else None
+        revenue_lines.append(
+            f"{row['revenue_year']}/{row['revenue_month']:02d} "
+            f"{row['revenue'] / 1e8:.2f} 億元"
+            + (f"(YoY {yoy:+.1f}%)" if yoy is not None else "(YoY -)"))
+
+    flags = con.execute(
+        "SELECT date, kind, reason FROM risk_flags WHERE stock_id=? AND date>=date(?, '-30 day') "
+        "ORDER BY date DESC", (stock_id, as_of)).fetchall()
+
+    guidance_line = None
+    try:
+        from qual_notes import load_events
+        latest_event = load_events().get("latest")
+        if latest_event:
+            item = (latest_event.get("guidance") or {}).get(uni["grp"])
+            if item:
+                guidance_line = (f"台積電 {latest_event.get('fiscal_quarter', '?')} 法說對 "
+                                 f"{uni['grp']} 指引:{item['dir']}|{item['text']}"
+                                 f"(notes/events,{latest_event.get('event_date', '-')})")
+    except Exception:
+        pass
+
+    tdcc_line = "-"
+    if metric["tdcc_big400_pct"] is not None:
+        chg = metric["tdcc_big400_chg"]
+        tdcc_line = (f"{metric['tdcc_big400_pct']:.2f}%"
+                     + (f"(週變化 {chg:+.2f}pp)" if chg is not None else "")
+                     + f",快照日 {metric['tdcc_date'] or '-'}")
+    lines = [
+        f"## 量化背景（截至 {as_of}）",
+        "",
+        f"- **月營收路徑：** {'、'.join(revenue_lines) or '-'}。[DB]",
+        f"- **價格動能：** 收盤 {_fmt(metric['close'])} 元;20 日 "
+        f"{_fmt(metric['ret20'], 1, '%') if metric['ret20'] is not None else '-'}、60 日 "
+        f"{_fmt(ret60, 1, '%')};族群相對強弱 rs20 {_fmt(metric['rs20'], 3)}。[DB]",
+        f"- **族群內位置：** {uni['grp']} 綜合分排名 "
+        f"{rank or '-'}/{len(peers)},tier {score['tier'] if score else '-'}"
+        f"(平滑綜合分 {_fmt(score['composite_s'] if score else None, 2)})。[DB]",
+        f"- **外資持股：** {_fmt(metric['foreign_pct'], 2, '%')};20 日變化 "
+        f"{_fmt(metric['fpct_chg20'], 2, 'pp')}。[DB]",
+        f"- **借券餘額：** 流通比 {_fmt(metric['sbl_pct'], 2, '%')};20 日變化 "
+        f"{_fmt(metric['sbl_chg20'], 2, 'pp')}。[DB]",
+        f"- **融資：** 使用率 {_fmt(metric['margin_util_pct'], 2, '%')};20 日增減 "
+        f"{_fmt(metric['margin_chg20'], 2, 'pp')}。[DB]",
+        f"- **TDCC 大戶(>400 張)：** {tdcc_line}。[DB]",
+        f"- **處置/注意(近 30 日)：** "
+        + ("、".join(f"{row['date']} {row['kind']}({row['reason']})" for row in flags)
+           if flags else "無")
+        + "。[DB]",
+    ]
+    if guidance_line:
+        lines.append(f"- **產業鏈訊號：** {guidance_line}")
+    lines += [
+        "",
+        "> [DB] = data/findmind.db(month_revenue/daily_metrics/daily_scores/risk_flags),"
+        f"由 `leading_hypotheses.py --context {stock_id}` 產生。觀察層數據僅供敘事語境與"
+        "捕捉觸發,不得作為生命週期轉移證據。",
+    ]
+    return "\n".join(lines)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="領先假說報告品質檢查")
     mode = parser.add_mutually_exclusive_group()
@@ -594,9 +793,23 @@ def main(argv=None):
     mode.add_argument("--summary", action="store_true", help="輸出第二階段資料分布摘要")
     mode.add_argument("--metrics", action="store_true", help="只對前瞻樣本輸出 30/60/90 日成效")
     mode.add_argument("--migrate-v2", action="store_true", help="將 v1 報告機械遷移至 v2")
+    mode.add_argument("--context", action="store_true",
+                      help="從自家 db 產出指定股票的「量化背景」章節草稿(寫入 tmp/)")
     parser.add_argument("--as-of", help="--due／--metrics 的截止日，預設今天（YYYY-MM-DD）")
     parser.add_argument("stock_id", nargs="?")
     args = parser.parse_args(argv)
+    if args.context:
+        if not args.stock_id:
+            print("--context 需要 stock_id", file=sys.stderr)
+            return 2
+        block = quant_context(args.stock_id)
+        out_dir = os.path.join(ROOT, "tmp")
+        os.makedirs(out_dir, exist_ok=True)
+        out_path = os.path.join(out_dir, f"lh_context_{args.stock_id}.md")
+        with open(out_path, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(block + "\n")
+        print(f"context: {os.path.relpath(out_path, ROOT)}")
+        return 0
     if args.migrate_v2:
         changed = migrate_reports_v2()
         for path in changed:
@@ -633,7 +846,8 @@ def main(argv=None):
                                     (lifecycles, "lifecycle"), (sources, "source_type")):
                     value = hmeta.get(key) or "missing"
                     target[value] = target.get(value, 0) + 1
-        print(f"reports={len(reports)} hypotheses={total}")
+        narrative_count = sum(1 for report in reports.values() if report.get("narrative"))
+        print(f"reports={len(reports)} hypotheses={total} narrative={narrative_count}")
         print("capture_mode " + " ".join(f"{key}={value}" for key, value in sorted(capture_modes.items())))
         print("lifecycle " + " ".join(f"{key}={value}" for key, value in sorted(lifecycles.items())))
         print("source_type " + " ".join(f"{key}={value}" for key, value in sorted(sources.items())))

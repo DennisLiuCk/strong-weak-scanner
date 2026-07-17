@@ -12,6 +12,35 @@ formal_note_content_sha256: <正式筆記 reviewed_content_sha256>
 
 > 本報告記錄可追溯、可證偽的市場領先假說，不代表主張已獲證實，也不影響量化分數。
 
+## 多空觀點（小作文）
+
+<!-- narrative_meta
+narrative_version: 1
+narrative_updated: YYYY-MM-DD
+quant_context_as_of: YYYY-MM-DD
+-->
+
+> 看多與看空是兩篇刻意對立的研究敘事,各自只能使用 H#、正式筆記與量化背景已有的
+> 材料;誰對誰錯由「勝負手」列出的可觀測資料裁決,不由文筆裁決。
+
+### 看多小作文
+
+(100–800 字;至少引用一則 H#;結尾一句「最脆弱處:…」)
+
+### 看空小作文
+
+(100–800 字;至少引用一則 H#;結尾一句「最脆弱處:…」)
+
+### 勝負手
+
+- (1–3 條:什麼即將可觀測的資料/事件會裁決多空,對應 H# 的可證偽條件與 review_due)
+
+## 量化背景（截至 YYYY-MM-DD）
+
+- (貼上 `leading_hypotheses.py --context <股號>` 的輸出,可裁剪)
+
+> [DB] = data/findmind.db。觀察層數據僅供敘事語境與捕捉觸發,不得作為生命週期轉移證據。
+
 ## H1｜假說標題
 
 <!-- hypothesis_meta

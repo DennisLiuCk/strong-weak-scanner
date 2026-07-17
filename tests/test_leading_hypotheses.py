@@ -218,5 +218,98 @@ review_due: 2026-08-31
         self.assertTrue(all(item["transitions"] for item in hypotheses))
 
 
+NARRATIVE_BLOCK = """## 多空觀點（小作文）
+
+<!-- narrative_meta
+narrative_version: 1
+narrative_updated: 2026-07-18
+quant_context_as_of: 2026-07-17
+-->
+
+### 看多小作文
+
+看多敘事引用 H1:月營收動能回升、產能已投入且產業指引順風,若下半年維持六月水位即可跨過門檻,
+且股價已大幅回落、悲觀多半在價內,風險報酬對做多有利。最脆弱處:單月脈衝可能不可持續。
+
+### 看空小作文
+
+看空敘事同樣引用 H1:上半年仍年減、獲利與現金流品質惡化,管理層從未定義成長指標,
+籌碼面借券上升、族群內排名居後,達標也可能是有量無質。最脆弱處:連續三個月放量會拆掉脈衝論。
+
+### 勝負手
+
+- 每月 MOPS 月營收對全年門檻的差額與剩餘月均。
+
+## 量化背景（截至 2026-07-17）
+
+- **月營收路徑：** 測試資料。[DB]
+
+> 觀察層數據僅供敘事語境與捕捉觸發,不得作為生命週期轉移證據。
+
+"""
+
+
+def narrative_report_text(block=NARRATIVE_BLOCK, digest="a" * 64):
+    return report_text(digest).replace("## H1｜", block + "## H1｜")
+
+
+class NarrativeContractTest(unittest.TestCase):
+    def setUp(self):
+        self.notes = {"1234": {
+            "verification": "independently_verified",
+            "reviewed_content_sha256": "a" * 64,
+        }}
+
+    def _analyse(self, text, today="2026-07-18"):
+        return lh.analyse_report("1234_測試.md", text, notes=self.notes, today=today)
+
+    def test_valid_narrative_passes_and_is_exposed(self):
+        info = self._analyse(narrative_report_text())
+        self.assertFalse(info["quality_invalid"], info["quality_errors"])
+        self.assertEqual(info["narrative"]["updated"], "2026-07-18")
+        self.assertEqual(info["narrative"]["quant_as_of"], "2026-07-17")
+
+    def test_reports_without_narrative_stay_valid(self):
+        info = self._analyse(report_text(), today="2026-07-12")
+        self.assertFalse(info["quality_invalid"], info["quality_errors"])
+        self.assertIsNone(info["narrative"])
+
+    def test_missing_bear_essay_fails(self):
+        text = narrative_report_text().replace("### 看空小作文", "### 其他段落")
+        info = self._analyse(text)
+        self.assertTrue(any("看空小作文" in error for error in info["quality_errors"]))
+
+    def test_essay_must_cite_existing_hypothesis(self):
+        text = narrative_report_text().replace("看多敘事引用 H1", "看多敘事沒有引用假說")
+        info = self._analyse(text)
+        self.assertTrue(any("至少引用一則現有 H#" in error for error in info["quality_errors"]))
+
+    def test_essay_must_admit_weakest_point(self):
+        text = narrative_report_text().replace("最脆弱處:單月脈衝可能不可持續。", "")
+        info = self._analyse(text)
+        self.assertTrue(any("最脆弱處" in error for error in info["quality_errors"]))
+
+    def test_quant_caution_phrase_is_required(self):
+        text = narrative_report_text().replace("不得作為生命週期轉移證據", "僅供參考")
+        info = self._analyse(text)
+        self.assertTrue(any("警語" in error for error in info["quality_errors"]))
+
+    def test_missing_quant_section_fails(self):
+        text = narrative_report_text().replace("## 量化背景（截至 2026-07-17）", "## 其他背景")
+        info = self._analyse(text)
+        self.assertTrue(any("量化背景" in error for error in info["quality_errors"]))
+
+    def test_new_prospective_without_narrative_gets_warning(self):
+        text = report_text().replace("2026-07-12", "2026-07-18").replace(
+            "source_published_at: 2026-07-18", "source_published_at: 2026-07-01")
+        text = text.replace("- **消息日期：** 2026-07-18。", "- **消息日期：** 2026-07-01。")
+        text = text.replace("evidence_published_at: 2026-07-18",
+                            "evidence_published_at: 2026-07-01")
+        info = self._analyse(text)
+        self.assertFalse(info["quality_invalid"], info["quality_errors"])
+        self.assertTrue(any("宜補「多空觀點" in warning
+                            for warning in info["quality_warnings"]))
+
+
 if __name__ == "__main__":
     unittest.main()

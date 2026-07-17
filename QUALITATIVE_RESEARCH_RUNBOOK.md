@@ -84,6 +84,13 @@ uv run --no-project --python 3.12 python scripts/qual_evidence.py verify "<PACK_
 - [ ] drafter 寫作時讀完所有實際 `cited_pages`，並按每份文件抽查 render 的首／中／尾、
   跨頁表格與複雜頁面，確認非空白、未裁切／旋轉、無亂碼且表頭、單位、註腳可讀；完整的
   `rendered_pages` 逐張目視留給獨立 reviewer，避免兩人重複做同一輪全量檢查。
+- [ ] 交接前執行機器輔助 triage，HARD 項(數字只在鄰頁命中、render 缺檔、引用不存在的
+  S#)必須先解決——在 drafter 端修好比進 review 後退回重建便宜一輪:
+
+```powershell
+uv run --no-project --python 3.12 python scripts/qual_review.py <股號>
+```
+
 - [ ] 完成 drafter 自查後停止改 note／manifest，回報 pack 路徑、SHA、claim 數與 render 數；
   在共用工作樹若用 `git hash-object -w -- <note> <manifest>` 建立短期復原點，必須立即記錄
   回傳的兩個 blob SHA；無 ref 的 dangling blob 可能被 Git 清理，不可當成長期備份，也不可
@@ -92,10 +99,23 @@ uv run --no-project --python 3.12 python scripts/qual_evidence.py verify "<PACK_
 ### 5. Reviewer 獨立查核與唯一寫入權
 
 - [ ] reviewer 接手後，drafter 不再改檔；reviewer 不重下載，也不使用另一版本 PDF。
-- [ ] 先對同一 pack 執行 `verify --renders`，再逐張目視全部 renders；獨立重算每個重要數字，
-  不沿用 drafter 的算式結論。
-- [ ] 逐 claim 核對期間、單位、正負號、合併／歸母口徑、來源時效措辭及「事實→推論」是否
-  越界；確認正文只說一手文件實際支持的程度。
+- [ ] 先對同一 pack 執行 `verify --renders`，再執行 `qual_review.py <股號>` 產生 triage
+  報告(唯讀,同 pack 離線比對,不改變 `review_method` 的意義——它只是
+  offline_evidence_pack_independent_recalculation 裡「找數字」的搜尋輔助)。
+- [ ] 依 triage 報告分配注意力,取代舊制的無差別全量逐張目視:
+  - **① HARD**:任一項存在即停止簽核,依下一節退回重建。
+  - **② 未命中**:逐項人工重算或回原 render 目視;比率類重算分子/分母與期間。
+  - **③ 推導命中**:逐項核對兩個運算元的頁碼、期間與口徑後才放行,機器提示的
+    運算元組合可能是巧合,不可照單全收。
+  - **④ 高風險詞 claim** 與 **⑤ 無文字層頁面**:一律逐字目視原 render,機器比對
+    對它們無效或不足採信。
+  - **⑥ cited 命中**:就附上的前後文核期間、單位、正負號、合併/歸母口徑;
+    context 不足以判斷時回原 render。機器命中只代表「數字在被引用頁找得到」,
+    不是驗證通過。
+- [ ] renders 抽查每份文件首/中/尾與跨頁表格各至少一頁,確認未裁切/旋轉/亂碼;
+  triage 或抽查發現任何一個實質錯誤,回到全量逐張目視,不得繼續抽樣。
+- [ ] 逐 claim 核對來源時效措辭及「事實→推論」是否越界;確認正文只說一手文件實際
+  支持的程度。這一步無法自動化,是 reviewer 時間應該花的地方。
 - [ ] 小額差異若不改變四捨五入數字與研究結論，可保留雙方數字於 `conflict_summary` 並完成
   簽核；若可信來源對重要結論實質衝突，狀態改為 `conflicted`，不可自行挑有利版本。
 - [ ] 找不到證據不是來源衝突：刪除 claim，或依下一節退回重建 pack。
@@ -157,5 +177,8 @@ uv run --no-project --python 3.12 python -m unittest discover -s tests
 ## 不可放行條件
 
 - reviewer 與 drafter 相同、pack SHA／PDF SHA 不符、render 不可讀、重要運算元頁未引用、
-  重大來源衝突未保留、正文仍有二手／無來源主張、hash 或 lint 不通過，任一項成立都不得
-  標為 `independently_verified` 或 commit。
+  `qual_review.py` triage 仍有未解決的 HARD 項、重大來源衝突未保留、正文仍有二手／
+  無來源主張、hash 或 lint 不通過，任一項成立都不得標為 `independently_verified` 或 commit。
+- 機器 triage 是搜尋輔助,不是驗證來源:不得以「triage 全命中」取代 ②③④⑤ 的人工
+  重算與目視,也不得因工具無法執行(缺 pdftotext 等)而略過;工具不可用時退回
+  舊制全量逐張目視。
