@@ -2,6 +2,22 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 原始表可續跑欄位回補與唯讀稽核 — 2026-07-19
+
+**策略規則與資料值零變動**。把 P0 正式 DB 回補時驗證過的一次性流程收斂為可重複工具：
+
+- `fetch_daily.py --backfill-expanded-fields` 只掃 `price∪market` 已知交易日，並以
+  `RAW_COLUMN_MIGRATIONS` 任一欄為 `NULL` 判定 dataset-day／股票缺口；逐來源 checkpoint、
+  自動 raw-only、不耗 FinMind token，中斷後重跑只補剩餘缺口。它與 `--force` 互斥且要求
+  明確 `--start`；來源已修正、連既有非空值也須覆寫時才使用 `--force`。
+- 新增唯讀 `scripts/audit_raw_data.py`：以 current universe × `price∪market` 交易日 spine
+  驗證五表 grid、core／expanded 非空、SQLite integrity、法人買賣淨額與借券餘額公式；
+  `market_index` 與 off-spine legacy row 明確列為非阻斷 warning，退出碼為 0/1/2。
+- 新增 `RAW_DATA_BACKFILL.md`，固定 audit → 欄位回補 → 零請求重跑 → audit → metrics／score／
+  首頁／tests 的 restatement 順序，並禁止覆寫 as-seen OOS snapshot／archive。正式 DB 實測
+  121 檔 × 95 日五表各 11,495/11,495、六項公式零 mismatch、TWSE 95/95、TPEx 當月
+  12/12；既有 off-spine `inst` 74 筆只警告、不灌入完整度。
+
 ## P0 官方原始欄位擴充與 market_index — 2026-07-19
 
 **策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與

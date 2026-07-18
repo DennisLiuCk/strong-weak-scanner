@@ -44,6 +44,7 @@
                    → price_adj 還原價(本地重算)
                    → daily_metrics 五元素衍生指標
                    → group_metrics / market_daily 族群層聚合 + 大盤 regime
+  audit_raw_data.py → 唯讀驗證五表 grid/必備欄/公式/SQLite integrity 與指數覆蓋
   score.py         族群內排名評分 → composite → tier(daily_scores)
   snapshot_signals.py → 凍結本次實際發布的 OOS as-seen 原始指標+評分
                         (append-only;同日重跑保留各版,驗證採最早正式發布版)
@@ -83,9 +84,12 @@
 
 上述五表擴充欄與 `market_index` 目前都是**原始／觀察層**：不進 `daily_metrics`、
 `daily_scores`、tier 或 regime，也不取代既有 FinMind `market`。舊 SQLite 會在首次執行時
-原地 `ALTER TABLE`；既有歷史列的新欄先保持 `NULL`，五表需回補歷史時明確使用
-`--force --start ... --end ...`。`market_index` 自上線起前瞻累積；TPEx
+原地 `ALTER TABLE`；既有歷史列的新欄先保持 `NULL`，應使用可中斷續跑的
+`--backfill-expanded-fields --start ... --end ...`，不要用 `--force` 重打已完成日期。
+`market_index` 自上線起前瞻累積；TPEx
 `tpex_reward_index` 公開端點一次提供當月資料，日常依最新交易日缺口冪等補入。
+完整稽核、請求量估算與 restatement 重建順序見
+[RAW_DATA_BACKFILL.md](RAW_DATA_BACKFILL.md)。
 
 **衍生層(每次全量重建、冪等——調規則後重跑即一致)**
 
@@ -222,6 +226,8 @@ uv run --no-project python scripts/fetch_financials.py --datasets TaiwanStockMon
 # 回補歷史 / 定向補缺(只抓指定股票,省 API 額度)/ 盤後唯讀簡報 / 週度驗證
 uv run --no-project python scripts/fetch_daily.py --start 2026-03-01
 uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-01
+uv run --no-project --python 3.12 python scripts/fetch_daily.py --backfill-expanded-fields --start 2026-03-02
+uv run --no-project --python 3.12 python scripts/audit_raw_data.py # 正式 DB 唯讀完整度/公式稽核
 uv run --no-project python scripts/fetch_daily.py --force --start 2026-07-01 # 明確要求來源修正重抓
 uv run --no-project python scripts/daily_brief.py
 uv run --no-project python scripts/validate.py
@@ -253,6 +259,9 @@ Runbook:盤後檢視
   `market_index` 是非阻斷觀察層，失敗會明確警告並留待下次補缺，不阻止五表評分／發布。
 - `P=0` 表示 SQLite 指定表已完整而被智慧補缺跳過，不代表端點失敗；只有真正發出請求
   的新資料日才能驗收該來源路徑。
+- schema 新增欄位後用 `--backfill-expanded-fields`：它不探測未知日曆日，只把既有交易日中
+  缺列或 `RAW_COLUMN_MIGRATIONS` 任一欄為 `NULL` 的 pair 視為缺口，自動 raw-only 且
+  逐來源 checkpoint；中斷後重跑同一命令即可。`--force` 僅供來源修正，不是欄位 migration。
 - TWSE／TPEx 任一來源失敗或 universe 覆蓋不完整時，成功來源會先 commit 進 SQLite，
   隨後整個 fetch step 失敗；Action 只 commit `data/` checkpoint 並刻意標紅，不執行
   score、OOS snapshot、dashboard。重跑會依缺口接續，不會丟掉失敗前成果。

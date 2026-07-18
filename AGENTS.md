@@ -21,6 +21,7 @@
 | 情境 | 文件 / 工具 |
 |---|---|
 | 盤後確認執行狀況、討論今日資料 | `DAILY_CHECK.md`;核心工具 `scripts/daily_brief.py`(唯讀) |
+| 原始表 schema 新欄回補、正式 DB 全期稽核 | `RAW_DATA_BACKFILL.md` + `scripts/audit_raw_data.py`(唯讀) + `fetch_daily.py --backfill-expanded-fields` |
 | 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
 | 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` + `scripts/qual_review.py`(複核 triage) |
@@ -65,10 +66,14 @@ fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件
                  ⚠ 每張待補表每交易日各呼叫 TWSE/TPEx 一次；五表完整新日共 10 次免 token
                  ⚠ market_index:TWSE 報酬指數沿用價格 MI_INDEX；TPEx 當月報酬指數 +1 req
                    屬非阻斷觀察層，不取代 FinMind market、不進 regime/評分/發布門檻
+                 ⚠ schema 新欄歷史回補用 --backfill-expanded-fields：只掃既有交易日與 NULL
+                   欄位、自動 raw-only、可續跑；來源修正版才用 --force
                  ⚠ 20:17 只落地價格/法人 checkpoint；23:40 final pass 補三表、刷新 holding
                  ⚠ 另直抓 TWSE/TPEx 處置/注意股票旗標；日誌批次 0 次=缺口已完整、非失敗
                  日誌/API 次數/斷點續跑判讀見 README「Daily Fetch 日誌判讀與續跑語意」
                  另抓觀察層參考個股 REF_IDS(2330)收盤/外資持股 → ref_price/ref_holding 隔離表
+audit_raw_data.py 唯讀稽核 current universe×price∪market 交易日的五表 grid、core/expanded
+                 NULL、法人/借券公式、SQLite integrity 與 market_index 覆蓋；exit 0/1/2
 fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現金流量表)
                  → month_revenue/financials/balance_sheet/cash_flow;獨立月/季排程,不掛每日管線
                  範圍 = universe + REF_IDS(2330,供台積電專區)

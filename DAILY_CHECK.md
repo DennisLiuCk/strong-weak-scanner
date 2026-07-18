@@ -38,6 +38,14 @@
    commit + push。**發現策略問題**:記下來,累積到週六按 WEEKLY_REVIEW.md
    的 OOS 門檻判斷——單日數據永遠不是調旋鈕的理由。
 
+## 歷史欄位回補不是每日補跑
+
+若問題是 schema 新增欄位後舊列仍為 `NULL`，不要用 `run_daily.py` 或 `--force` 反覆重打。
+先執行唯讀 `scripts/audit_raw_data.py`，再用 `fetch_daily.py
+--backfill-expanded-fields --start <基期> --end <資料日>`；中斷後重跑同一命令會依欄位缺口
+接續。audit PASS 後才重建 metrics／score／首頁，且不得重發既有 OOS snapshot 或 archive。
+完整指令、退出碼、請求量與分段方式見 [RAW_DATA_BACKFILL.md](RAW_DATA_BACKFILL.md)。
+
 ## 環境備忘
 
 - Python 一律 `uv run --no-project --python 3.12 python ...`(系統 python 是 Store stub)。
@@ -45,3 +53,5 @@
 - 手動重跑每日管線:Actions 頁 `daily-fetch` → Run workflow,或本地跑
   `scripts/run_daily.py` 後 review、commit + push。兩者建立的正式快照地位相同；source
   只記錄 provenance。需無條件重抓來源修正版時才加 `--force`。
+- 正式 DB 全期稽核：
+  `uv run --no-project --python 3.12 python scripts/audit_raw_data.py`（SQLite 唯讀）。

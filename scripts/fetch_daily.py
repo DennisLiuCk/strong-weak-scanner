@@ -11,6 +11,8 @@
   uv run --no-project python scripts/fetch_daily.py --start 2026-03-01 --end 2026-07-03
   # 只回補單一 dataset(名稱保留 FinMind 相容性,實際由交易所批次取得)
   uv run --no-project python scripts/fetch_daily.py --datasets TaiwanDailyShortSaleBalances --start 2026-03-01
+  # schema 新增欄位回補：只掃既有交易日與 NULL 欄位，可中斷續跑，且只落 raw checkpoint
+  uv run --no-project python scripts/fetch_daily.py --backfill-expanded-fields --start 2026-03-02 --end 2026-07-17
   # 20:17 早場 checkpoint:只抓價格/法人,不重算衍生表
   uv run --no-project python scripts/fetch_daily.py --datasets TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell --raw-only
   # 定向補缺:只抓指定股票(省 API 額度;可與 --datasets 疊加)
@@ -140,6 +142,25 @@ RAW_COLUMN_MIGRATIONS = {
         ("sbl_return", "INTEGER"), ("sbl_adjustment", "INTEGER"),
         ("sbl_next_limit", "INTEGER"),
     ),
+}
+
+# 原始表完整度契約：core 是策略既有欄位；expanded 由 schema migration 唯一來源自動衍生。
+# audit_raw_data.py 會同時檢查兩者；--backfill-expanded-fields 只以 expanded 欄位的 NULL
+# 當作缺口，避免一般智慧補缺因「整列已存在」而跳過舊 DB 新增欄位。
+RAW_CORE_COLUMNS = {
+    "price": ("open", "high", "low", "close", "volume", "amount"),
+    "inst": ("foreign_net", "trust_net", "dealer_net"),
+    "margin": ("margin_bal", "short_bal"),
+    "holding": ("foreign_pct", "shares_issued"),
+    "sbl": ("sbl_bal",),
+}
+RAW_EXPANDED_COLUMNS = {
+    table: tuple(name for name, _ in columns)
+    for table, columns in RAW_COLUMN_MIGRATIONS.items()
+}
+RAW_AUDIT_COLUMNS = {
+    table: RAW_CORE_COLUMNS[table] + RAW_EXPANDED_COLUMNS[table]
+    for table in RAW_CORE_COLUMNS
 }
 
 
@@ -1023,22 +1044,37 @@ def _calendar_dates(start, end):
     return out
 
 
-def _missing_dataset_dates(con, table, ids, dates):
-    """找出指定股票集合在某原始表未全數落地的交易日。"""
+def _nonnull_sql(required_columns):
+    """內部固定欄名的非 NULL 條件；呼叫端只能傳 RAW_*_COLUMNS 契約。"""
+    return "".join(f' AND "{column}" IS NOT NULL' for column in required_columns or ())
+
+
+def _missing_dataset_dates(con, table, ids, dates, required_columns=()):
+    """找出指定股票集合缺列，或指定必備欄仍為 NULL 的交易日。"""
     dates = set(dates)
     if not ids or not dates:
         return set()
     marks = ",".join("?" for _ in ids)
+    nonnull = _nonnull_sql(required_columns)
     counts = dict(con.execute(
         f"""SELECT date,COUNT(*) FROM {table}
-            WHERE stock_id IN ({marks}) AND date BETWEEN ? AND ? GROUP BY date""",
+            WHERE stock_id IN ({marks}) AND date BETWEEN ? AND ?{nonnull} GROUP BY date""",
         (*ids, min(dates), max(dates))).fetchall())
     return {day for day in dates if counts.get(day, 0) != len(ids)}
 
 
-def _missing_dataset_ids(con, table, ids, day):
-    return {sid for sid in ids if not con.execute(
-        f"SELECT 1 FROM {table} WHERE date=? AND stock_id=?", (day, sid)).fetchone()}
+def _missing_dataset_ids(con, table, ids, day, required_columns=()):
+    """同日精準到股票的缺列／缺欄集合，供欄位回補中斷後續跑。"""
+    wanted = set(ids)
+    if not wanted:
+        return set()
+    marks = ",".join("?" for _ in wanted)
+    nonnull = _nonnull_sql(required_columns)
+    complete = {row[0] for row in con.execute(
+        f"""SELECT stock_id FROM {table}
+            WHERE date=? AND stock_id IN ({marks}){nonnull}""",
+        (day, *sorted(wanted))).fetchall()}
+    return wanted - complete
 
 
 def _missing_price_dates(con, ids, dates):
@@ -1046,7 +1082,7 @@ def _missing_price_dates(con, ids, dates):
     return _missing_dataset_dates(con, "price", ids, dates)
 
 
-def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None):
+def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None, required_columns=()):
     """TWSE+TPEx 各日全市場批次。
 
     任一來源失敗時仍先 commit 另一來源已取得的 rows，讓 GitHub Action checkpoint
@@ -1087,11 +1123,11 @@ def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None):
         if all(flags):
             found_dates.add(day)
             if write:
-                missing_ids = {sid for sid in wanted if not con.execute(
-                    "SELECT 1 FROM price WHERE date=? AND stock_id=?", (day, sid)).fetchone()}
+                missing_ids = _missing_dataset_ids(
+                    con, "price", wanted, day, required_columns=required_columns)
                 if missing_ids:
                     raise ExchangePriceFetchError(
-                        f"拒絕完成價格不完整資料日 {day}:"
+                        f"拒絕完成價格不完整資料日／欄位 {day}:"
                         f"price={len(wanted) - len(missing_ids)}/{len(wanted)};"
                         f"缺 {','.join(sorted(missing_ids))}")
     return {
@@ -1103,7 +1139,8 @@ def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None):
     }
 
 
-def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, fetcher=None):
+def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, fetcher=None,
+                               required_columns=()):
     """單一原始表的 TWSE+TPEx 單日全市場批次，逐來源 checkpoint。
 
     一般補缺只寫入當日尚缺股票；`overwrite_dates` 用於明確的最終版刷新。任一來源失敗
@@ -1119,7 +1156,7 @@ def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, f
     found_dates, written_dates = set(), set()
     for day in sorted(set(dates)):
         day_wanted = wanted if day in overwrite_dates else _missing_dataset_ids(
-            con, table, wanted, day)
+            con, table, wanted, day, required_columns=required_columns)
         if not day_wanted:
             continue
         availability, errors = {}, []
@@ -1144,10 +1181,11 @@ def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, f
                                if not availability.get(source, False)]
             raise ExchangeRawFetchError(
                 f"{day} 已是交易日但 {','.join(missing_sources)} {dataset} 回傳空白")
-        missing_ids = _missing_dataset_ids(con, table, wanted, day)
+        missing_ids = _missing_dataset_ids(
+            con, table, wanted, day, required_columns=required_columns)
         if missing_ids:
             raise ExchangeRawFetchError(
-                f"拒絕完成不完整資料日 {day}:{table}="
+                f"拒絕完成不完整資料日／欄位 {day}:{table}="
                 f"{len(wanted) - len(missing_ids)}/{len(wanted)};缺 {','.join(sorted(missing_ids))}")
         found_dates.add(day)
     return {
@@ -1159,13 +1197,20 @@ def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, f
 
 
 def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
-                      force=False, fetcher=None, price_fetcher=None, final_pass=False):
+                      force=False, fetcher=None, price_fetcher=None, final_pass=False,
+                      backfill_expanded_fields=False):
     """五張原始表皆走交易所按日批次，只補 SQLite 尚缺的 dataset×日期。
 
     交易日以 price∪market 為準。未知尾端逐日用 TWSE+TPEx 批次探測；找到新交易日後，
     其餘四張表才各以 TWSE+TPEx 全市場報表補齊。`final_pass` 會把最新 holding 重新抓取
     一次，避免 18:00 初版阻止 22:00 最終版覆寫；完成日另記 coverage，重跑保持冪等。
+    `backfill_expanded_fields` 只掃既有交易日，把 RAW_COLUMN_MIGRATIONS 中任一 NULL 視為
+    缺口；每個來源完成即 commit，同一命令中斷後可只續補剩餘股票／日期。
     """
+    if force and backfill_expanded_fields:
+        raise ValueError("force 與 backfill_expanded_fields 不可同時使用")
+    if final_pass and backfill_expanded_fields:
+        raise ValueError("final_pass 與 backfill_expanded_fields 不可同時使用")
     known_before = _trading_dates(con, start, end)
     expected = set(known_before)
     exchange_requests = probe_requests = skipped = rows = market_index_rows = 0
@@ -1174,7 +1219,7 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
     probe_start = None
     probe_dates = set()
 
-    if not force:
+    if not force and not backfill_expanded_fields:
         if not expected:
             probe_start = start
         else:
@@ -1187,15 +1232,23 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
             probe_dates = set(_calendar_dates(probe_start, end)) - expected
 
     if want_price:
-        price_gap_dates = (set(_calendar_dates(start, end)) if force
-                           else _missing_price_dates(con, ids, expected))
+        if force:
+            price_gap_dates = set(_calendar_dates(start, end))
+        elif backfill_expanded_fields:
+            price_gap_dates = _missing_dataset_dates(
+                con, "price", ids, expected,
+                required_columns=RAW_EXPANDED_COLUMNS["price"])
+        else:
+            price_gap_dates = _missing_price_dates(con, ids, expected)
     else:
         price_gap_dates = set()
     price_fetch_dates = probe_dates | price_gap_dates
     price_dates_written = set()
     if price_fetch_dates:
         price_stats = fetch_exchange_prices(
-            con, ids, price_fetch_dates, write=want_price, fetcher=price_fetcher)
+            con, ids, price_fetch_dates, write=want_price, fetcher=price_fetcher,
+            required_columns=(RAW_EXPANDED_COLUMNS["price"]
+                              if backfill_expanded_fields else ()))
         rows += price_stats["rows"]
         market_index_rows += price_stats["market_index_rows"]
         exchange_requests += price_stats["requests"]
@@ -1206,8 +1259,13 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
     final_holding_day = None
     for ds in exchange_ds:
         table = DATASET_TABLE[ds]
-        fetch_dates = set(expected) if force else _missing_dataset_dates(
-            con, table, ids, expected)
+        required_columns = (RAW_EXPANDED_COLUMNS[table]
+                            if backfill_expanded_fields else ())
+        if force:
+            fetch_dates = set(expected)
+        else:
+            fetch_dates = _missing_dataset_dates(
+                con, table, ids, expected, required_columns=required_columns)
         overwrite_dates = set(expected) if force else set()
         if final_pass and ds == "TaiwanStockShareholding" and expected:
             latest = max(expected)
@@ -1220,7 +1278,8 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
             skipped += 1
             continue
         raw_stats = fetch_exchange_raw_dataset(
-            con, ids, ds, fetch_dates, overwrite_dates=overwrite_dates, fetcher=fetcher)
+            con, ids, ds, fetch_dates, overwrite_dates=overwrite_dates, fetcher=fetcher,
+            required_columns=required_columns)
         rows += raw_stats["rows"]
         exchange_requests += raw_stats["requests"]
         print(f"{table}: {raw_stats['rows']} rows · {raw_stats['requests']} 官方 requests"
@@ -1235,7 +1294,10 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
     expected.update(_trading_dates(con, start, end))
     if want_price and expected and ids:
         latest = max(expected)
-        missing_latest = _missing_price_dates(con, ids, {latest})
+        missing_latest = _missing_dataset_dates(
+            con, "price", ids, {latest},
+            required_columns=(RAW_EXPANDED_COLUMNS["price"]
+                              if backfill_expanded_fields else ()))
         if missing_latest:
             have = len(ids) - sum(1 for sid in ids if not con.execute(
                 "SELECT 1 FROM price WHERE date=? AND stock_id=?", (latest, sid)).fetchone())
@@ -1255,6 +1317,7 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
         "new_dates": expected - known_before,
         "price_dates_written": price_dates_written,
         "probe_start": probe_start,
+        "backfill_expanded_fields": backfill_expanded_fields,
     }
 
 
@@ -1795,9 +1858,18 @@ def main():
                     help="只落地原始表 checkpoint,不抓事件、不重算 metrics(20:17 早場用)")
     ap.add_argument("--final-pass", action="store_true",
                     help="正式晚場:最新 holding 強制刷新一次並記 final coverage(應於 22:00 後使用)")
-    ap.add_argument("--force", action="store_true",
-                    help="忽略缺口規劃,強制重抓指定日期範圍(來源修正/人工稽核才用)")
+    fetch_mode = ap.add_mutually_exclusive_group()
+    fetch_mode.add_argument("--force", action="store_true",
+                            help="忽略缺口規劃,強制重抓指定日期範圍(來源修正/人工稽核才用)")
+    fetch_mode.add_argument(
+        "--backfill-expanded-fields", action="store_true",
+        help="只在既有交易日補 RAW_COLUMN_MIGRATIONS 的 NULL 欄位;可續跑且自動 raw-only")
     args = ap.parse_args()
+
+    if args.backfill_expanded_fields and not args.start:
+        ap.error("--backfill-expanded-fields 必須明確指定 --start，避免意外回打過大範圍")
+    if args.backfill_expanded_fields and args.final_pass:
+        ap.error("--backfill-expanded-fields 不可與 --final-pass 同時使用")
 
     if args.metrics_only:
         con = sqlite3.connect(DB)
@@ -1820,8 +1892,9 @@ def main():
     if bad:
         sys.exit(f"未知 dataset:{bad}(可用:{sorted(UPSERT)})")
 
-    # 指定原始表或 raw-only 全程不碰 FinMind；正式晚場才需要 token 補事件／指數／參考序列。
-    token = None if (args.datasets or args.raw_only) else get_token()
+    # 指定原始表、raw-only、欄位回補全程不碰 FinMind；正式晚場才需 token 補事件／觀察序列。
+    effective_raw_only = args.raw_only or args.backfill_expanded_fields
+    token = None if (args.datasets or effective_raw_only) else get_token()
     os.makedirs(os.path.dirname(DB), exist_ok=True)
     con = sqlite3.connect(DB)
     ensure_schema(con)
@@ -1835,11 +1908,13 @@ def main():
         if missing:
             sys.exit(f"--stocks 含 universe 外代號:{sorted(missing)}")
         ids = [s for s in ids if s in want]
-    mode = "強制重抓" if args.force else "智慧補缺"
+    mode = ("強制重抓" if args.force else
+            "新增欄位可續跑回補" if args.backfill_expanded_fields else "智慧補缺")
     print(f"{mode} {start} .. {end} · {len(ids)} 檔 · {len(ds_list)} datasets")
     stats = fetch_missing_raw(
         con, ids, ds_list, start, end, token, args.sleep, force=args.force,
-        final_pass=args.final_pass)
+        final_pass=args.final_pass,
+        backfill_expanded_fields=args.backfill_expanded_fields)
     total = stats["rows"]
     market_index_rows = stats.get("market_index_rows", 0)
     index_stats = {"rows": 0, "requests": 0, "errors": []}
@@ -1863,11 +1938,12 @@ def main():
     data_changed = total > 0
     expected_dates = stats["expected_dates"]
     target_date = max(expected_dates) if expected_dates else None
-    if args.raw_only:
+    if effective_raw_only:
         n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0] if con.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' AND name='daily_metrics'").fetchone() else 0
         con.close()
-        print(f"raw-only 完成 — 原始 {total} rows + market_index {market_index_rows} rows "
+        label = "欄位回補" if args.backfill_expanded_fields else "raw-only"
+        print(f"{label} 完成 — 原始 {total} rows + market_index {market_index_rows} rows "
               f"checkpoint,daily_metrics 未重算({n} rows)")
         return
     # 事件 coverage 能區分「已查但當天沒有事件」與「尚未查」；新交易日只補新增區間，

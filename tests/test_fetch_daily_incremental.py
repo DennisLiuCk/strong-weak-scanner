@@ -656,6 +656,114 @@ class IncrementalFetchTest(unittest.TestCase):
         }] if sid in wanted_ids else []
         return rows, True
 
+    def expanded_price_fetch(self, source, day, wanted_ids):
+        self.price_calls.append((source, day, set(wanted_ids)))
+        sid = "2330" if source == "TWSE" else "2454"
+        rows = [{
+            "date": day, "stock_id": sid, "open": 2, "max": 3,
+            "min": 2, "close": 3, "Trading_Volume": 100,
+            "Trading_money": 300, "Trading_turnover": 9,
+        }] if sid in wanted_ids else []
+        return rows, True
+
+    def expanded_raw_fetch(self, dataset, source, day, wanted_ids):
+        self.calls.append((dataset, source, day, set(wanted_ids)))
+        sid = "2330" if source == "TWSE" else "2454"
+        if sid not in wanted_ids:
+            return [], True
+        if dataset == "TaiwanStockInstitutionalInvestorsBuySell":
+            return [{"date": day, "stock_id": sid, "name": "Foreign_Investor",
+                     "buy": 10, "sell": 2, "net": 8}], True
+        if dataset == "TaiwanStockMarginPurchaseShortSale":
+            return [{
+                "date": day, "stock_id": sid,
+                "MarginPurchaseTodayBalance": 10, "ShortSaleTodayBalance": 1,
+                "MarginPurchaseBuy": 3, "MarginPurchaseSell": 2,
+                "MarginPurchaseCashRepayment": 1, "MarginPurchaseLimit": 100,
+                "ShortSaleSell": 2, "ShortSaleBuyback": 1,
+                "ShortSaleStockRepayment": 0, "ShortSaleLimit": 50,
+                "MarginShortOffset": 0,
+            }], True
+        if dataset == "TaiwanStockShareholding":
+            return [{
+                "date": day, "stock_id": sid,
+                "ForeignInvestmentSharesRatio": 20,
+                "NumberOfSharesIssued": 1000,
+                "ForeignInvestmentShares": 200,
+                "ForeignInvestmentAvailableShares": 600,
+                "ForeignInvestmentAvailableRatio": 60,
+                "ForeignInvestmentLimitRatio": 80,
+            }], True
+        if dataset == "TaiwanDailyShortSaleBalances":
+            return [{
+                "date": day, "stock_id": sid,
+                "SBLShortSalesCurrentDayBalance": 10,
+                "SBLShortSalesPreviousDayBalance": 8,
+                "SBLShortSalesCurrentDaySell": 3,
+                "SBLShortSalesCurrentDayReturn": 1,
+                "SBLShortSalesCurrentDayAdjustment": 0,
+                "SBLShortSalesNextDayLimit": 50,
+            }], True
+        raise AssertionError(dataset)
+
+    def test_expanded_field_backfill_uses_known_dates_and_becomes_zero_request(self):
+        stats = fd.fetch_missing_raw(
+            self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-10", None,
+            sleep=0, fetcher=self.expanded_raw_fetch,
+            price_fetcher=self.expanded_price_fetch,
+            backfill_expanded_fields=True)
+
+        # 只掃 DB 已知的 07-08/07-09，不探測尚未知的 07-10：5 表 × 2 日 × 2 市場。
+        self.assertEqual(stats["requests"], 20)
+        self.assertEqual(stats["probe_requests"], 0)
+        self.assertEqual({call[1] for call in self.price_calls},
+                         {"2026-07-08", "2026-07-09"})
+        for table, columns in fd.RAW_EXPANDED_COLUMNS.items():
+            null_sql = " OR ".join(f'"{column}" IS NULL' for column in columns)
+            self.assertEqual(self.con.execute(
+                f"SELECT COUNT(*) FROM {table} WHERE {null_sql}").fetchone()[0], 0, table)
+
+        self.calls.clear()
+        self.price_calls.clear()
+        repeat = fd.fetch_missing_raw(
+            self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-10", None,
+            sleep=0, fetcher=self.expanded_raw_fetch,
+            price_fetcher=self.expanded_price_fetch,
+            backfill_expanded_fields=True)
+        self.assertEqual(repeat["requests"], 0)
+        self.assertEqual(self.calls, [])
+        self.assertEqual(self.price_calls, [])
+
+    def test_expanded_field_backfill_resumes_after_source_checkpoint(self):
+        def fail_tpex(dataset, source, day, wanted_ids):
+            if source == "TPEx":
+                raise OSError("temporary TPEx failure")
+            return self.expanded_raw_fetch(dataset, source, day, wanted_ids)
+
+        with self.assertRaises(fd.ExchangeRawFetchError):
+            fd.fetch_missing_raw(
+                self.con, self.ids, ["TaiwanStockMarginPurchaseShortSale"],
+                "2026-07-08", "2026-07-08", None, sleep=0,
+                fetcher=fail_tpex, backfill_expanded_fields=True)
+
+        self.assertIsNotNone(self.con.execute(
+            "SELECT margin_buy FROM margin WHERE date='2026-07-08' AND stock_id='2330'"
+        ).fetchone()[0])
+        self.assertIsNone(self.con.execute(
+            "SELECT margin_buy FROM margin WHERE date='2026-07-08' AND stock_id='2454'"
+        ).fetchone()[0])
+
+        self.calls.clear()
+        resumed = fd.fetch_missing_raw(
+            self.con, self.ids, ["TaiwanStockMarginPurchaseShortSale"],
+            "2026-07-08", "2026-07-08", None, sleep=0,
+            fetcher=self.expanded_raw_fetch, backfill_expanded_fields=True)
+        self.assertEqual(resumed["requests"], 2)
+        self.assertTrue(all(call[3] == {"2454"} for call in self.calls))
+        self.assertEqual(self.con.execute(
+            "SELECT COUNT(*) FROM margin WHERE date='2026-07-08' AND margin_buy IS NULL"
+        ).fetchone()[0], 0)
+
     def test_holiday_repeat_uses_one_daily_batch_per_market(self):
         def empty_fetch(dataset, source, day, wanted_ids):
             self.calls.append((dataset, source, day, set(wanted_ids)))
@@ -877,6 +985,35 @@ class RawOnlyModeTest(unittest.TestCase):
 
             get_token.assert_not_called()
             build_metrics.assert_not_called()
+
+    def test_expanded_field_backfill_is_automatically_raw_only(self):
+        stats = {
+            "rows": 0, "finmind_requests": 0, "exchange_requests": 0,
+            "probe_requests": 0, "skipped_batches": 5, "expected_dates": set(),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "expanded-backfill.db")
+            argv = [
+                "fetch_daily.py", "--backfill-expanded-fields",
+                "--start", "2026-03-02", "--end", "2026-07-17",
+            ]
+            with mock.patch.object(fd, "DB", db), \
+                    mock.patch.object(sys, "argv", argv), \
+                    mock.patch.object(fd, "load_universe", return_value=[]), \
+                    mock.patch.object(fd, "fetch_missing_raw", return_value=stats) as fetch_raw, \
+                    mock.patch.object(fd, "get_token") as get_token, \
+                    mock.patch.object(fd, "build_metrics") as build_metrics:
+                fd.main()
+
+            get_token.assert_not_called()
+            build_metrics.assert_not_called()
+            self.assertTrue(fetch_raw.call_args.kwargs["backfill_expanded_fields"])
+
+    def test_expanded_field_backfill_requires_explicit_start(self):
+        with mock.patch.object(sys, "argv", ["fetch_daily.py", "--backfill-expanded-fields"]):
+            with self.assertRaises(SystemExit) as raised:
+                fd.main()
+        self.assertEqual(raised.exception.code, 2)
 
 
 if __name__ == "__main__":
