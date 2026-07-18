@@ -2,6 +2,27 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 官方資料數據解剖觀察層 — 2026-07-19
+
+**策略規則零變動**：沒有修改 `score.py`、tier、regime 或 `IS_CUTOFF`，只把新增官方欄位
+轉成可閱讀、可驗算的觀察指標。
+
+- 新增 `scripts/observation_metrics.py`，全量重建 `observation_metrics` 11,495 筆與
+  `group_observation_metrics` 1,045 筆。個股層涵蓋法人方向強度、總活動占成交量、
+  自營自行／避險、融資券流量與官方限額、外資法令上限、借券三分解，以及依上市／上櫃
+  扣除 TWSE／TPEx 官方報酬指數的 1／5／20 日超額報酬；族群層用中位數、廣度與樣本數，
+  避免股本大小主導原始加總。
+- `security_market` 保存官方價格批次辨識出的 77 檔 TWSE、44 檔 TPEx 歸屬；儀表板新增
+  個股與族群「數據解剖」抽屜，逐列顯示實際分子、分母、公式與初學者說明，所有入口均
+  標示「不計分」。
+- 在原先 29 個擴充欄之外，另保存 `margin_prev_bal`、`short_prev_bal` 兩個官方前日餘額。
+  餘額變動改用同一份日報的前日／今日餘額，而不是資料庫上一日舊值；95 日、11,495 筆
+  回補後，融資、融券、借券三條餘額恆等式皆為 0 mismatch。
+- 官方指數涵蓋為 TWSE 95 日、TPEx 12 日，因此最新日 TWSE 77 檔可算 1／5／20 日超額，
+  TPEx 44 檔可算 1／5 日、20 日暫顯示「資料不足」；不以 TWSE 指數冒充上櫃基準。
+- 新增觀察公式、雙市場短歷史、群組樣本門檻、儀表板數字／教學文案與兩欄 migration／
+  parser／upsert 測試；資料稽核同步加入融資、融券餘額公式。
+
 ## 原始表可續跑欄位回補與唯讀稽核 — 2026-07-19
 
 **策略規則與資料值零變動**。把 P0 正式 DB 回補時驗證過的一次性流程收斂為可重複工具：
@@ -15,7 +36,7 @@
   `market_index` 與 off-spine legacy row 明確列為非阻斷 warning，退出碼為 0/1/2。
 - 新增 `RAW_DATA_BACKFILL.md`，固定 audit → 欄位回補 → 零請求重跑 → audit → metrics／score／
   首頁／tests 的 restatement 順序，並禁止覆寫 as-seen OOS snapshot／archive。正式 DB 實測
-  121 檔 × 95 日五表各 11,495/11,495、六項公式零 mismatch、TWSE 95/95、TPEx 當月
+  121 檔 × 95 日五表各 11,495/11,495、八項公式零 mismatch、TWSE 95/95、TPEx 當月
   12/12；既有 off-spine `inst` 74 筆只警告、不灌入完整度。
 
 ## P0 官方原始欄位擴充與 market_index — 2026-07-19

@@ -247,6 +247,16 @@ def audit_connection(con, stock_ids, start=None, end=None):
     _check_formula(report, raw_maps, "inst.dealer_net", "inst",
                    ("dealer_net", "dealer_self_net", "dealer_hedge_net"),
                    lambda total, self_net, hedge_net: total == self_net + hedge_net)
+    _check_formula(report, raw_maps, "margin.balance", "margin",
+                   ("margin_bal", "margin_prev_bal", "margin_buy", "margin_sell",
+                    "margin_cash_repay"),
+                   lambda bal, prev, buy, sell, cash_repay:
+                   bal == prev + buy - sell - cash_repay)
+    _check_formula(report, raw_maps, "short.balance", "margin",
+                   ("short_bal", "short_prev_bal", "short_sell", "short_buyback",
+                    "short_stock_repay"),
+                   lambda bal, prev, sell, buyback, stock_repay:
+                   bal == prev + sell - buyback - stock_repay)
     _check_formula(report, raw_maps, "sbl.balance", "sbl",
                    ("sbl_bal", "sbl_prev_bal", "sbl_sell", "sbl_return",
                     "sbl_adjustment"),

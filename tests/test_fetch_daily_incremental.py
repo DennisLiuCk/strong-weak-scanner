@@ -407,6 +407,8 @@ class OfficialRawBatchTest(unittest.TestCase):
         self.assertTrue(available)
         self.assertEqual((rows[0]["MarginPurchaseTodayBalance"],
                           rows[0]["ShortSaleTodayBalance"]), (12345, 678))
+        self.assertEqual((rows[0]["MarginPurchasePreviousDayBalance"],
+                          rows[0]["ShortSalePreviousDayBalance"]), (12330, 676))
         self.assertEqual(
             [rows[0][key] for key in ("MarginPurchaseBuy", "MarginPurchaseSell",
                                       "MarginPurchaseCashRepayment", "MarginPurchaseLimit",
@@ -431,6 +433,8 @@ class OfficialRawBatchTest(unittest.TestCase):
         self.assertTrue(available)
         self.assertEqual((rows[0]["MarginPurchaseTodayBalance"],
                           rows[0]["ShortSaleTodayBalance"]), (9876, 54))
+        self.assertEqual((rows[0]["MarginPurchasePreviousDayBalance"],
+                          rows[0]["ShortSalePreviousDayBalance"]), (9850, 50))
         self.assertEqual((rows[0]["MarginPurchaseBuy"], rows[0]["ShortSaleSell"],
                           rows[0]["ShortSaleBuyback"], rows[0]["MarginShortOffset"]),
                          (40, 8, 3, 2))
@@ -521,7 +525,9 @@ class OfficialRawBatchTest(unittest.TestCase):
         ])
         fd.up_margin(con, [{
             "date": day, "stock_id": sid, "MarginPurchaseTodayBalance": 1000,
-            "ShortSaleTodayBalance": 50, "MarginPurchaseBuy": 30,
+            "MarginPurchasePreviousDayBalance": 992,
+            "ShortSaleTodayBalance": 50, "ShortSalePreviousDayBalance": 46,
+            "MarginPurchaseBuy": 30,
             "MarginPurchaseSell": 20, "MarginPurchaseCashRepayment": 2,
             "MarginPurchaseLimit": 5000, "ShortSaleSell": 8,
             "ShortSaleBuyback": 3, "ShortSaleStockRepayment": 1,
@@ -549,8 +555,9 @@ class OfficialRawBatchTest(unittest.TestCase):
         ).fetchone(), (100, 20, 80, 30, 10, 20, 8, 3, 5, 7, 9, -2, 3))
         self.assertEqual(con.execute(
             "SELECT margin_buy,margin_sell,margin_cash_repay,margin_limit,short_sell,"
-            "short_buyback,short_stock_repay,short_limit,offset_volume FROM margin"
-        ).fetchone(), (30, 20, 2, 5000, 8, 3, 1, 1000, 4))
+            "short_buyback,short_stock_repay,short_limit,offset_volume,margin_prev_bal,"
+            "short_prev_bal FROM margin"
+        ).fetchone(), (30, 20, 2, 5000, 8, 3, 1, 1000, 4, 992, 46))
         self.assertEqual(con.execute(
             "SELECT foreign_shares,foreign_available_shares,foreign_available_pct,"
             "foreign_limit_pct FROM holding"
@@ -677,7 +684,10 @@ class IncrementalFetchTest(unittest.TestCase):
         if dataset == "TaiwanStockMarginPurchaseShortSale":
             return [{
                 "date": day, "stock_id": sid,
-                "MarginPurchaseTodayBalance": 10, "ShortSaleTodayBalance": 1,
+                "MarginPurchasePreviousDayBalance": 10,
+                "MarginPurchaseTodayBalance": 10,
+                "ShortSalePreviousDayBalance": 0,
+                "ShortSaleTodayBalance": 1,
                 "MarginPurchaseBuy": 3, "MarginPurchaseSell": 2,
                 "MarginPurchaseCashRepayment": 1, "MarginPurchaseLimit": 100,
                 "ShortSaleSell": 2, "ShortSaleBuyback": 1,

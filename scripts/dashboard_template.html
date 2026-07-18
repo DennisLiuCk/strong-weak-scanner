@@ -388,6 +388,10 @@
   .techbadge.up{color:var(--strong);background:var(--strong-tint)}
   .techbadge.flat{color:var(--ink-2);background:var(--neutral-tint)}
   .techbadge.down{color:var(--weak);background:var(--weak-tint)}
+  .flowbadge{display:inline-flex;align-items:center;min-height:20px;font-family:inherit;
+    font-size:10.5px;font-weight:700;border:1px dashed var(--muted);border-radius:100px;
+    padding:0 8px;cursor:pointer;color:var(--ink-2);background:var(--neutral-tint);white-space:nowrap}
+  .flowbadge:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   .fundbadge{display:inline-flex;align-items:center;font-family:inherit;font-variant-numeric:tabular-nums;
     font-size:11.5px;font-weight:700;border:none;border-radius:6px;
     padding:0;cursor:pointer;background:none;letter-spacing:.1px;white-space:nowrap}
@@ -750,8 +754,8 @@
     #mktChip,.chip-date{min-height:44px;display:inline-flex;align-items:center;font-size:12.5px}
     .chip-date #dateSel{min-height:44px;font-size:16px}
     .chip-date .dstep{min-width:40px;min-height:44px}
-    .riskbadge,.fundbadge,.notebadge,.hdot,.techbadge{min-height:44px;height:44px}
-    .riskbadge,.fundbadge,.hdot,.techbadge{padding-inline:12px}
+    .riskbadge,.fundbadge,.notebadge,.hdot,.techbadge,.flowbadge{min-height:44px;height:44px}
+    .riskbadge,.fundbadge,.hdot,.techbadge,.flowbadge{padding-inline:12px}
     /* 行動版卡片要大點按目標:恢復膠囊外觀與字級 */
     .riskbadge{border-radius:100px;font-size:11.5px}
     .fundbadge{border:1px solid currentColor;border-radius:100px}
@@ -865,6 +869,7 @@
     <a href="#groups-section">族群概況</a>
     <a href="#tiers-section">個股分層</a>
     <a href="#stocks-section">個股明細</a>
+    <a href="#flow-guide">數據解剖</a>
     <a href="#method">方法與資料</a>
   </nav>
 
@@ -921,6 +926,7 @@
       <div class="scale">
         <span class="sk"><span class="riskbadge sm">處置</span>／<span class="riskbadge sm">注意</span>交易所官方列管(TWSE/TPEx 異常價量認證),直接標在股名旁</span>
         <span class="sk"><span class="techbadge up">技術·多頭排列</span>個股相對自身歷史的均線、RSI與價量解讀；不做族群排名</span>
+        <span class="sk"><span class="flowbadge">數據解剖</span>法人買賣、信用／借券流量、限額與官方指數超額報酬；純觀察、不計分</span>
         <span class="sk"><span class="hdot health">籌碼健</span>籌碼現況診斷:健康</span>
         <span class="sk"><span class="hdot neutral">籌碼中</span>籌碼現況診斷:中性</span>
         <span class="sk"><span class="hdot warn">籌碼待</span>籌碼現況診斷:待觀察(含官方處置/注意一票否決)</span>
@@ -1068,6 +1074,32 @@
       </div>
       <p><b>核心原則：</b>均線看方向與位置、RSI看漲跌力道、VOL看參與程度。三者一致時敘述較完整；互相衝突時，應明確保留分歧，而不是硬湊成單一偏多或偏空結論。</p>
     </div>
+    <div class="mcard wide" id="flow-guide">
+      <h3>交易／部位觀察指南 · 新增官方資料怎麼讀</h3>
+      <p>這組數字回答「今天的成交與部位是怎麼形成」，不回答「明天一定漲或跌」。點個股的「數據解剖」或族群卡同名標記，可以看到當日實際數字、公式與有效樣本。</p>
+      <div class="tech-guide-grid">
+        <div>
+          <h4>先看交易與法人</h4>
+          <dl class="dl">
+            <dt>平均每筆成交</dt><dd><span class="f">成交量／成交筆數；成交金額／成交筆數</span>把量增拆成「筆數變多」或「平均單筆變大」。成交筆數不是投資人帳戶數，不能據此認定散戶或法人增加。</dd>
+            <dt>法人方向強度</dt><dd><span class="f">(買進−賣出)／(買進＋賣出)，範圍−100%～+100%</span>+100%代表只有買進，−100%代表只有賣出，0%代表買賣相等。同樣淨買超，低方向強度可能只是雙向交易都很大。</dd>
+            <dt>法人總活動占比</dt><dd><span class="f">四類法人買進＋賣出／(2×成交量)</span>市場每筆成交同時有買賣兩側，因此分母要乘2。高占比只說法人參與多，方向仍要回頭看方向強度。</dd>
+            <dt>自營自行／避險</dt><dd><span class="f">自行買賣與避險分開列示</span>自行較接近方向性庫存；避險可能來自權證、ETF或套利。避險淨賣不能直接解讀為自營商看空。</dd>
+          </dl>
+        </div>
+        <div>
+          <h4>再看部位、限額與市場基準</h4>
+          <dl class="dl">
+            <dt>融資餘額來源</dt><dd><span class="f">今日餘額−同一份官方日報的前日餘額＝資買−資賣−現償</span>分辨融資下降是賣出部位，還是用現金償還；融券則是券賣−券買−券償。採用日報內的前日餘額，可納入交易所對基期的調整。</dd>
+            <dt>官方信用限額</dt><dd><span class="f">融資／融券餘額÷交易所公告限額</span>描述信用額度使用程度；不同於既有「散戶水位」的融資餘額÷發行股數。</dd>
+            <dt>外資法令空間</dt><dd><span class="f">外資持股÷法令容許股數；另列尚可投資股數</span>接近100%表示法規空間較少，不代表外資必然繼續買進或賣出。</dd>
+            <dt>借券賣出拆解</dt><dd><span class="f">新增賣出−還券＋調整＝餘額變動</span>若變化主要來自「調整」，不應直接當成空方新部位；今天的新增賣出應對照昨天公告的次日限額。</dd>
+            <dt>官方指數超額報酬</dt><dd><span class="f">個股還原報酬−同市場官方含息指數報酬</span>上市股扣TWSE、上櫃股扣TPEx；正值表示跑贏市場。族群先逐檔扣除各自基準，再取中位，避免上市／上櫃混合造成偏差。</dd>
+          </dl>
+        </div>
+      </div>
+      <p><b>建議順序：</b>方向強度回答「買賣哪一側較多」→ 活動占比回答「法人參與多少」→ 流量恆等式回答「餘額為何改變」→ 限額回答「空間還有多少」→ 超額報酬回答「扣除市場後是否仍跑贏」。缺值顯示「-」，代表資料或所需歷史不足，不代表0。</p>
+    </div>
     <div class="mcard">
       <h3>指標辭典 · 族群與大盤層</h3>
       <dl class="dl">
@@ -1089,11 +1121,12 @@
       <h3>資料來源與更新</h3>
       每日五張市場原始表來自 TWSE／TPEx 公開報表；除權息、分割、含息大盤、參考個股與財報資料使用 <a href="https://finmindtrade.com/" rel="noopener">FinMind 開放資料</a>，股權分散使用 TDCC，處置／注意名單使用交易所官方公告。質化研究筆記由 AI 協作整理公開資訊，逐篇顯示一手證據覆蓋、獨立 reviewer 與核驗範圍；領先假說另保存市場流傳主張的時間戳、來源、正式基準與可證偽條件，不代表已獲證實。每日管線可由 GitHub Actions 排程或本地手動啟動，會補齊缺漏後評分並重建本頁；點開任一項，底部會標示該項來源。
       <dl class="srcline">
-        <dt>股價 / 成交量</dt><dd>TWSE MI_INDEX · TPEx dailyQuotes</dd>
-        <dt>三大法人買賣超</dt><dd>TWSE T86 · TPEx dailyTrade</dd>
-        <dt>融資融券</dt><dd>TWSE MI_MARGN · TPEx margin/balance</dd>
-        <dt>外資持股 / 股本</dt><dd>TWSE MI_QFIIS · TPEx insti/qfii</dd>
-        <dt>借券賣出餘額</dt><dd>TWSE TWT93U · TPEx margin/sbl</dd>
+        <dt>股價 / 成交量 / 成交筆數</dt><dd>TWSE MI_INDEX · TPEx dailyQuotes</dd>
+        <dt>法人買進 / 賣出 / 淨額</dt><dd>TWSE T86 · TPEx dailyTrade（含自營自行／避險）</dd>
+        <dt>融資融券流量 / 餘額 / 限額</dt><dd>TWSE MI_MARGN · TPEx margin/balance</dd>
+        <dt>外資持股 / 尚可投資 / 法令上限</dt><dd>TWSE MI_QFIIS · TPEx insti/qfii</dd>
+        <dt>借券新增 / 還券 / 調整 / 餘額</dt><dd>TWSE TWT93U · TPEx margin/sbl</dd>
+        <dt>官方含息報酬指數</dt><dd>TWSE MI_INDEX 全部報酬指數 · TPEx tpex_reward_index</dd>
         <dt>除權息 / 分割</dt><dd>TaiwanStockDividendResult · TaiwanStockSplitPrice(還原價本地重算)</dd>
         <dt>大盤指數</dt><dd>TaiwanStockTotalReturnIndex(加權報酬指數,含息)</dd>
         <dt>台積電專區</dt><dd>TaiwanStockPrice · TaiwanStockShareholding · TaiwanStockMonthRevenue(2330,觀察層隔離表)+ notes/events 事件錨點(季頻人工彙整)</dd>
@@ -2192,6 +2225,13 @@
         src:"TWSE MI_INDEX／TPEx dailyQuotes；本地以除權息／分割事件還原價格後計算",
         scLabel:row.tech.label,scColor:col[0],scBg:col[1]};};})(row));
     }
+    if(row.flow){
+      var flow=document.createElement("button"); flow.type="button"; flow.tabIndex=0;
+      flow.className="flowbadge"; flow.textContent="數據解剖";
+      flow.setAttribute("aria-label","新增官方資料數據解剖，觀察層不計分");
+      badges.appendChild(flow);
+      attachTip(flow,(function(row){return function(){return row.flow;};})(row));
+    }
     if(row.chip){
       var hd=document.createElement("button"); hd.type="button"; hd.tabIndex=0;
       hd.className="hdot "+row.chip.cls;
@@ -2351,6 +2391,13 @@
         src:"TWSE MI_INDEX／TPEx dailyQuotes；本地還原價計算",scLabel:row.tech.label,
         scColor:tcol[0],scBg:tcol[1]};};})(row,tcol));
       host.appendChild(tech);
+    }
+    if(row.flow){
+      var flow=document.createElement("button"); flow.type="button"; flow.className="flowbadge";
+      flow.textContent="數據解剖";
+      flow.setAttribute("aria-label","新增官方資料數據解剖，觀察層不計分");
+      attachTip(flow,(function(row){return function(){return row.flow;};})(row));
+      host.appendChild(flow);
     }
     if(row.chip){
       var chip=document.createElement("button"); chip.type="button"; chip.className="toggle";
@@ -2764,6 +2811,14 @@
         tk.addEventListener("keydown", function(e){ e.stopPropagation(); });
         attachTip(tk, function(){ return g.tsmc.tip; });
         el.appendChild(tk);
+      }
+      if(g.flow){                // expanded raw fields 的族群中位／廣度解剖，不改既有族群狀態
+        var fk=document.createElement("div"); fk.className="td tchip"; fk.tabIndex=0;
+        fk.style.color="var(--ink-2)"; fk.textContent="新增資料 · 數據解剖（不計分）";
+        fk.addEventListener("click",function(e){e.stopPropagation();});
+        fk.addEventListener("keydown",function(e){e.stopPropagation();});
+        attachTip(fk,function(){return g.flow;});
+        el.appendChild(fk);
       }
       var picks = document.createElement("div"); picks.className = "picks";
       g.stats.forEach(function(s){

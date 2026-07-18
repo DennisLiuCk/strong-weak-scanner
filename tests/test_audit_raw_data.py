@@ -56,7 +56,9 @@ class RawDataAuditTest(unittest.TestCase):
         ])
         fd.up_margin(self.con, [{
             "date": day, "stock_id": sid, "MarginPurchaseTodayBalance": 1000,
-            "ShortSaleTodayBalance": 50, "MarginPurchaseBuy": 30,
+            "MarginPurchasePreviousDayBalance": 992,
+            "ShortSaleTodayBalance": 50, "ShortSalePreviousDayBalance": 46,
+            "MarginPurchaseBuy": 30,
             "MarginPurchaseSell": 20, "MarginPurchaseCashRepayment": 2,
             "MarginPurchaseLimit": 5000, "ShortSaleSell": 8,
             "ShortSaleBuyback": 3, "ShortSaleStockRepayment": 1,
@@ -106,10 +108,15 @@ class RawDataAuditTest(unittest.TestCase):
             "UPDATE inst SET foreign_net=999 WHERE date='2026-07-08' AND stock_id='2330'")
         self.con.execute(
             "UPDATE sbl SET sbl_bal=999 WHERE date='2026-07-10' AND stock_id='2454'")
+        self.con.execute(
+            "UPDATE margin SET margin_prev_bal=0,short_prev_bal=0 "
+            "WHERE date='2026-07-10' AND stock_id='2330'")
         report = audit.audit_connection(self.con, self.ids)
 
         self.assertFalse(report["ok"])
         self.assertEqual(report["invariants"]["inst.foreign_net"]["mismatches"], 1)
+        self.assertEqual(report["invariants"]["margin.balance"]["mismatches"], 1)
+        self.assertEqual(report["invariants"]["short.balance"]["mismatches"], 1)
         self.assertEqual(report["invariants"]["sbl.balance"]["mismatches"], 1)
 
     def test_off_spine_rows_warn_but_do_not_fake_completeness(self):

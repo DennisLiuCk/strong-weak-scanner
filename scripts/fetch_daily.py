@@ -33,6 +33,8 @@ import argparse, bisect, csv, json, os, sqlite3, statistics, sys, time
 import urllib.parse, urllib.request
 from datetime import date, timedelta
 
+from observation_metrics import build_observation_metrics
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 UNIVERSE = os.path.join(ROOT, "config", "universe.csv")
@@ -87,7 +89,7 @@ CREATE TABLE IF NOT EXISTS inst(date TEXT, stock_id TEXT, foreign_net INTEGER, t
 CREATE TABLE IF NOT EXISTS margin(date TEXT, stock_id TEXT, margin_bal INTEGER, short_bal INTEGER,
   margin_buy INTEGER, margin_sell INTEGER, margin_cash_repay INTEGER, margin_limit INTEGER,
   short_sell INTEGER, short_buyback INTEGER, short_stock_repay INTEGER, short_limit INTEGER,
-  offset_volume INTEGER,
+  offset_volume INTEGER, margin_prev_bal INTEGER, short_prev_bal INTEGER,
   PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS holding(date TEXT, stock_id TEXT, foreign_pct REAL, shares_issued INTEGER,
   foreign_shares INTEGER, foreign_available_shares INTEGER, foreign_available_pct REAL,
@@ -107,6 +109,8 @@ CREATE TABLE IF NOT EXISTS market(date TEXT PRIMARY KEY, taiex REAL);
 CREATE TABLE IF NOT EXISTS market_index(date TEXT, market TEXT, index_key TEXT, index_name TEXT,
   index_type TEXT, close REAL, PRIMARY KEY(date,market,index_key));
 CREATE INDEX IF NOT EXISTS idx_market_index_date_type ON market_index(date,index_type);
+CREATE TABLE IF NOT EXISTS security_market(stock_id TEXT PRIMARY KEY, market TEXT,
+  observed_date TEXT);
 CREATE TABLE IF NOT EXISTS ref_price(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS ref_holding(date TEXT, stock_id TEXT, foreign_pct REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
@@ -132,6 +136,7 @@ RAW_COLUMN_MIGRATIONS = {
         ("short_sell", "INTEGER"), ("short_buyback", "INTEGER"),
         ("short_stock_repay", "INTEGER"), ("short_limit", "INTEGER"),
         ("offset_volume", "INTEGER"),
+        ("margin_prev_bal", "INTEGER"), ("short_prev_bal", "INTEGER"),
     ),
     "holding": (
         ("foreign_shares", "INTEGER"), ("foreign_available_shares", "INTEGER"),
@@ -578,7 +583,9 @@ def parse_twse_margin(payload, day, wanted_ids=None):
                 continue
             out.append({
                 "date": day, "stock_id": sid,
+                "MarginPurchasePreviousDayBalance": _market_number(raw[5], integer=True),
                 "MarginPurchaseTodayBalance": _market_number(raw[6], integer=True),
+                "ShortSalePreviousDayBalance": _market_number(raw[11], integer=True),
                 "ShortSaleTodayBalance": _market_number(raw[12], integer=True),
                 "MarginPurchaseBuy": _market_number(raw[2], integer=True),
                 "MarginPurchaseSell": _market_number(raw[3], integer=True),
@@ -597,8 +604,9 @@ def parse_twse_margin(payload, day, wanted_ids=None):
 def parse_tpex_margin(payload, day, wanted_ids=None):
     if not _validate_exchange_day(payload, day, "TPEx", "margin/balance"):
         return [], False
-    required = {"代號", "資買", "資賣", "現償", "資餘額", "資限額",
-                "券賣", "券買", "券償", "券餘額", "券限額", "資券相抵(張)"}
+    required = {"代號", "前資餘額(張)", "資買", "資賣", "現償", "資餘額", "資限額",
+                "前券餘額(張)", "券賣", "券買", "券償", "券餘額", "券限額",
+                "資券相抵(張)"}
     tables = [t for t in payload.get("tables", []) if required.issubset(t.get("fields", []))]
     if not tables:
         raise ValueError("TPEx margin/balance 找不到個股融資融券欄位")
@@ -613,7 +621,11 @@ def parse_tpex_margin(payload, day, wanted_ids=None):
                 continue
             out.append({
                 "date": day, "stock_id": sid,
+                "MarginPurchasePreviousDayBalance": _market_number(
+                    raw[pos["前資餘額(張)"]], integer=True),
                 "MarginPurchaseTodayBalance": _market_number(raw[pos["資餘額"]], integer=True),
+                "ShortSalePreviousDayBalance": _market_number(
+                    raw[pos["前券餘額(張)"]], integer=True),
                 "ShortSaleTodayBalance": _market_number(raw[pos["券餘額"]], integer=True),
                 "MarginPurchaseBuy": _market_number(raw[pos["資買"]], integer=True),
                 "MarginPurchaseSell": _market_number(raw[pos["資賣"]], integer=True),
@@ -829,6 +841,22 @@ def up_price(con, data):
            VALUES(?,?,?,?,?,?,?,?,?)""", rows)
     return len(rows)
 
+
+def up_security_market(con, market, data):
+    """保存價格批次已確認的上市／上櫃別，供官方指數基準配對。
+
+    交易所別不是評分因子；只用來讓上市股扣 TWSE、上櫃股扣 TPEx 含息指數。
+    """
+    rows = [(d["stock_id"], market, d["date"]) for d in data]
+    con.executemany(
+        """INSERT INTO security_market(stock_id,market,observed_date) VALUES(?,?,?)
+           ON CONFLICT(stock_id) DO UPDATE SET
+             market=excluded.market,
+             observed_date=CASE WHEN excluded.observed_date>=security_market.observed_date
+                                THEN excluded.observed_date ELSE security_market.observed_date END""",
+        rows)
+    return len(rows)
+
 def up_inst(con, data):
     # 把官方分項匯總成每檔一列；舊的三個 net 欄口徑保持不變。
     agg = {}
@@ -888,12 +916,15 @@ def up_margin(con, data):
              d.get("MarginPurchaseSell"), d.get("MarginPurchaseCashRepayment"),
              d.get("MarginPurchaseLimit"), d.get("ShortSaleSell"),
              d.get("ShortSaleBuyback"), d.get("ShortSaleStockRepayment"),
-             d.get("ShortSaleLimit"), d.get("MarginShortOffset")) for d in data]
+             d.get("ShortSaleLimit"), d.get("MarginShortOffset"),
+             d.get("MarginPurchasePreviousDayBalance"),
+             d.get("ShortSalePreviousDayBalance")) for d in data]
     con.executemany(
         """INSERT OR REPLACE INTO margin
            (date,stock_id,margin_bal,short_bal,margin_buy,margin_sell,margin_cash_repay,
-            margin_limit,short_sell,short_buyback,short_stock_repay,short_limit,offset_volume)
-           VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""", rows)
+            margin_limit,short_sell,short_buyback,short_stock_repay,short_limit,offset_volume,
+            margin_prev_bal,short_prev_bal)
+           VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", rows)
     return len(rows)
 
 def up_holding(con, data):
@@ -1107,6 +1138,7 @@ def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None, required_co
             if write and (batch or index_batch):
                 if batch:
                     total_rows += up_price(con, batch)
+                    up_security_market(con, source, batch)
                     written_dates.add(day)
                 if index_batch:
                     market_index_rows += up_market_index(con, index_batch)
@@ -1876,13 +1908,16 @@ def main():
         ensure_schema(con)
         load_universe(con)
         con.commit()
-        print("只重算 price_adj + daily_metrics + 族群/大盤層(不抓取)…")
+        print("只重算 price_adj + daily_metrics + 觀察指標 + 族群/大盤層(不抓取)…")
         build_price_adj(con)
         build_metrics(con)
+        obs = build_observation_metrics(
+            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
         build_group_market(con)
         n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
         con.close()
-        print(f"完成 — daily_metrics {n} rows")
+        print(f"完成 — daily_metrics {n} rows;觀察層 {obs['stock_rows']} stock rows / "
+              f"{obs['group_rows']} group rows")
         return
 
     end = args.end or date.today().isoformat()
@@ -1973,14 +2008,23 @@ def main():
 
     metric_last = con.execute("SELECT MAX(date) FROM daily_metrics").fetchone()[0] if con.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='daily_metrics'").fetchone() else None
+    observation_last = con.execute(
+        "SELECT MAX(date) FROM observation_metrics").fetchone()[0] if con.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='observation_metrics'").fetchone() else None
     price_last = con.execute("SELECT MAX(date) FROM price").fetchone()[0]
     if data_changed or metric_last != price_last:
         build_price_adj(con)
-        print("重算 daily_metrics + 族群/大盤層 …")
+        print("重算 daily_metrics + 觀察指標 + 族群/大盤層 …")
         build_metrics(con)
+        build_observation_metrics(
+            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
         build_group_market(con)
+    elif market_index_rows or observation_last != price_last:
+        print("官方指數／觀察層有更新，重算 observation_metrics …")
+        build_observation_metrics(
+            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
     else:
-        print("原始/事件資料無變更且 metrics 已同步,略過衍生表重建")
+        print("原始/事件資料無變更且 metrics/observation 已同步,略過衍生表重建")
     n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
     con.close()
     print(f"完成 — 原始 {total} rows 落地,daily_metrics {n} rows → {DB}")

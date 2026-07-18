@@ -166,6 +166,277 @@ def _ratio(a, b):
     return (a / b - 1) if (a is not None and b) else None
 
 
+def _fmt_obs_pct(value, signed=False, digits=1):
+    if value is None:
+        return "-"
+    sign = "+" if signed and value > 0 else ""
+    return f"{sign}{value:.{digits}f}%"
+
+
+def _fmt_obs_return(value):
+    """Return difference stored as decimal -> percentage-point display."""
+    if value is None:
+        return "-"
+    return f"{value * 100:+.1f}pp" if value else "0.0pp"
+
+
+def _fmt_obs_lots(value, signed=True):
+    if value is None:
+        return "-"
+    sign = "+" if signed and value > 0 else ""
+    return f"{sign}{value:,.0f}張"
+
+
+def _fmt_obs_share_lots(value, signed=True):
+    """Institutional share count -> lots, retaining odd-lot precision."""
+    if value is None:
+        return "-"
+    lots = value / 1000
+    sign = "+" if signed and lots > 0 else ""
+    return f"{sign}{lots:,.1f}張"
+
+
+def _fmt_obs_shares(value, signed=True):
+    if value is None:
+        return "-"
+    sign = "+" if signed and value > 0 else ""
+    if abs(value) >= 10_000:
+        return f"{sign}{value / 10_000:,.1f}萬股"
+    return f"{sign}{value:,.0f}股"
+
+
+def _fmt_obs_money(value):
+    if value is None:
+        return "-"
+    if abs(value) >= 10_000:
+        return f"{value / 10_000:,.1f}萬元"
+    return f"{value:,.0f}元"
+
+
+def _fmt_obs_breadth(value):
+    return "-" if value is None else f"{value * 100:.0f}%"
+
+
+def _obs_direction(name, value):
+    if value is None:
+        return f"{name}當日無買賣或資料不足"
+    if value > 0:
+        return f"{name}買方股數較多({_fmt_obs_pct(value, True)})"
+    if value < 0:
+        return f"{name}賣方股數較多({_fmt_obs_pct(value, True)})"
+    return f"{name}買賣股數相等(0.0%)"
+
+
+def build_observation_view(row):
+    """個股 expanded raw fields 的數字解剖；純描述、不打分。"""
+    foreign_strength = _value(row, "foreign_imbalance_pct")
+    trust_strength = _value(row, "trust_imbalance_pct")
+    dealer_self_strength = _value(row, "dealer_self_imbalance_pct")
+    dealer_hedge_strength = _value(row, "dealer_hedge_imbalance_pct")
+    inst_gross = _value(row, "inst_gross")
+    participation = _value(row, "inst_participation_pct")
+
+    avg_shares = _value(row, "avg_shares_per_trade")
+    avg_value = _value(row, "avg_value_per_trade")
+    trades = _value(row, "raw_trades")
+    trade_value = (f"{int(trades):,}筆｜平均{avg_shares:,.0f}股／筆｜"
+                   f"{_fmt_obs_money(avg_value)}／筆") if (
+                       trades is not None and avg_shares is not None) else "資料不足"
+
+    direction_value = (
+        f"外資 {_fmt_obs_pct(foreign_strength, True)}"
+        f"（買{_fmt_obs_share_lots(_value(row, 'raw_foreign_buy'), False)}／"
+        f"賣{_fmt_obs_share_lots(_value(row, 'raw_foreign_sell'), False)}）｜"
+        f"投信 {_fmt_obs_pct(trust_strength, True)}"
+        f"（買{_fmt_obs_share_lots(_value(row, 'raw_trust_buy'), False)}／"
+        f"賣{_fmt_obs_share_lots(_value(row, 'raw_trust_sell'), False)}）")
+    direction_hint = (
+        "方向強度=(買進−賣出)÷(買進＋賣出)。+100%=只有買進，−100%=只有賣出，"
+        "0%=買賣一樣多；它回答單向程度，不是報酬預測。")
+
+    activity_value = (f"四類法人合計 {_fmt_obs_share_lots(inst_gross, False)}｜"
+                      f"占雙邊成交 {_fmt_obs_pct(participation)}")
+    activity_hint = (
+        "合計外資、投信、自營自行與避險的買進＋賣出；分母用2×成交量，因一筆成交同時有"
+        "買方與賣方。數值高代表法人參與多，不代表一定淨買。")
+
+    dealer_value = (f"自行 {_fmt_obs_share_lots(_value(row, 'raw_dealer_self_net'))}"
+                    f" ({_fmt_obs_pct(dealer_self_strength, True)})｜避險 "
+                    f"{_fmt_obs_share_lots(_value(row, 'raw_dealer_hedge_net'))}"
+                    f" ({_fmt_obs_pct(dealer_hedge_strength, True)})")
+    dealer_hint = (
+        "自行買賣較接近自營商方向性庫存；避險常與權證、ETF或套利部位有關。"
+        "兩者必須拆開，避險淨賣不能直接翻成自營商看空。")
+
+    margin_flow = _value(row, "margin_net_flow")
+    margin_change = _value(row, "margin_balance_change")
+    margin_residual = _value(row, "margin_flow_residual")
+    margin_value = (f"淨流量 {_fmt_obs_lots(margin_flow)}｜餘額實變 "
+                    f"{_fmt_obs_lots(margin_change)}")
+    margin_hint = (
+        f"同一份官方日報：今日餘額 {_fmt_obs_lots(_value(row, 'raw_margin_bal'), False)} − "
+        f"前日餘額 {_fmt_obs_lots(_value(row, 'raw_margin_prev_bal'), False)} = "
+        f"餘額實變 {_fmt_obs_lots(margin_change)}。另一邊用流量驗算：資買 "
+        f"{_fmt_obs_lots(_value(row, 'raw_margin_buy'), False)} − 資賣 "
+        f"{_fmt_obs_lots(_value(row, 'raw_margin_sell'), False)} − 現償 "
+        f"{_fmt_obs_lots(_value(row, 'raw_margin_cash_repay'), False)} = "
+        f"{_fmt_obs_lots(margin_flow)}；兩式差額 {_fmt_obs_lots(margin_residual)}。"
+        f"現償是用現金還掉融資；當日資券互抵 "
+        f"{_fmt_obs_lots(_value(row, 'raw_offset_volume'), False)}。")
+
+    short_flow = _value(row, "short_net_flow")
+    short_change = _value(row, "short_balance_change")
+    short_residual = _value(row, "short_flow_residual")
+    short_value = (f"淨流量 {_fmt_obs_lots(short_flow)}｜餘額實變 "
+                   f"{_fmt_obs_lots(short_change)}")
+    short_hint = (
+        f"同一份官方日報：今日餘額 {_fmt_obs_lots(_value(row, 'raw_short_bal'), False)} − "
+        f"前日餘額 {_fmt_obs_lots(_value(row, 'raw_short_prev_bal'), False)} = "
+        f"餘額實變 {_fmt_obs_lots(short_change)}。另一邊用流量驗算：券賣 "
+        f"{_fmt_obs_lots(_value(row, 'raw_short_sell'), False)} − 券買 "
+        f"{_fmt_obs_lots(_value(row, 'raw_short_buyback'), False)} − 券償 "
+        f"{_fmt_obs_lots(_value(row, 'raw_short_stock_repay'), False)} = "
+        f"{_fmt_obs_lots(short_flow)}；兩式差額 {_fmt_obs_lots(short_residual)}。"
+        "券買是買回，券償是拿股票償還。")
+
+    limit_value = (f"融資 {_fmt_obs_pct(_value(row, 'margin_limit_util_pct'))}｜"
+                   f"融券 {_fmt_obs_pct(_value(row, 'short_limit_util_pct'))}")
+    limit_hint = (
+        "使用率=當日餘額÷交易所公告限額。這是官方信用額度使用程度；不同於既有"
+        "「散戶水位」的融資餘額÷發行股數，兩個分母不能混用。")
+
+    foreign_used = _value(row, "foreign_limit_used_pct")
+    foreign_available = _value(row, "raw_foreign_available_shares")
+    foreign_available_pct = _value(row, "raw_foreign_available_pct")
+    foreign_value = (f"法令上限已用 {_fmt_obs_pct(foreign_used)}｜尚可投資 "
+                     f"{_fmt_obs_shares(foreign_available, False)}"
+                     f" ({_fmt_obs_pct(foreign_available_pct)}股本)")
+    foreign_hint = (
+        f"法令上限 {_fmt_obs_pct(_value(row, 'raw_foreign_limit_pct'))} 是外資最多可持有的"
+        "股本比例；「已用」以實際外資持股除以法令容許股數。尚可投資空間低，只表示"
+        "接近規範上限，不保證後續買賣方向。")
+
+    sbl_flow = _value(row, "sbl_net_flow")
+    sbl_change = _value(row, "sbl_balance_change")
+    sbl_residual = _value(row, "sbl_flow_residual")
+    sbl_value = (f"淨變動 {_fmt_obs_shares(sbl_flow)}｜餘額實變 "
+                 f"{_fmt_obs_shares(sbl_change)}")
+    sbl_hint = (
+        f"新增賣出 {_fmt_obs_shares(_value(row, 'raw_sbl_sell'), False)} − 還券 "
+        f"{_fmt_obs_shares(_value(row, 'raw_sbl_return'), False)} ＋ 調整 "
+        f"{_fmt_obs_shares(_value(row, 'raw_sbl_adjustment'))} = "
+        f"{_fmt_obs_shares(sbl_flow)}；公式差額 {_fmt_obs_shares(sbl_residual)}。"
+        "調整若占主要部分，就不宜把餘額變化解讀成新空方部位。")
+    sbl_limit_value = (f"今日新增使用昨日限額 "
+                       f"{_fmt_obs_pct(_value(row, 'sbl_sell_limit_pct'))}｜"
+                       f"次日公告限額 {_fmt_obs_shares(_value(row, 'raw_sbl_next_limit'), False)}")
+    sbl_limit_hint = (
+        "今天的借券賣出量應除以昨天公告的「次日限額」；今天欄位中的限額是明天才適用，"
+        "不能拿當日餘額直接相除。")
+
+    benchmark = _value(row, "benchmark_name") or "基準尚未配對"
+    excess_value = (f"1日 {_fmt_obs_return(_value(row, 'excess_ret1'))}｜"
+                    f"5日 {_fmt_obs_return(_value(row, 'excess_ret5'))}｜"
+                    f"20日 {_fmt_obs_return(_value(row, 'excess_ret20'))}")
+    excess_hint = (
+        f"個股還原報酬−{benchmark}同期間報酬；正值=跑贏市場、負值=落後市場。"
+        "上櫃報酬指數目前歷史較短，20日顯示「-」代表基準樣本不足，不是0%。")
+
+    rows = [
+        ["成交如何形成", trade_value,
+         "成交量可拆成交易筆數×平均每筆股數；筆數多不等於投資人帳戶數變多。"],
+        ["法人方向強度", direction_value, direction_hint],
+        ["法人總活動量", activity_value, activity_hint],
+        ["自營自行／避險", dealer_value, dealer_hint],
+        ["融資餘額來源", margin_value, margin_hint],
+        ["融券餘額來源", short_value, short_hint],
+        ["官方信用限額", limit_value, limit_hint],
+        ["外資法令上限", foreign_value, foreign_hint],
+        ["借券新增／還券／調整", sbl_value, sbl_hint],
+        ["借券賣出限額", sbl_limit_value, sbl_limit_hint],
+        ["官方指數超額報酬", excess_value, excess_hint],
+    ]
+
+    summary_parts = [_obs_direction("外資", foreign_strength), _obs_direction("投信", trust_strength)]
+    if participation is not None:
+        summary_parts.append(f"追蹤法人占雙邊成交{participation:.1f}%")
+    excess5 = _value(row, "excess_ret5")
+    if excess5 is not None:
+        summary_parts.append(f"近5日相對{benchmark}{'跑贏' if excess5 > 0 else '落後' if excess5 < 0 else '持平'}"
+                             f"{abs(excess5) * 100:.1f}pp")
+    why = "；".join(summary_parts) + "。以上回答交易與部位如何形成，不評定好壞，也不改分數。"
+    return {
+        "el": "新增官方資料 · 個股數據解剖", "scLabel": "觀察層 · 不計分",
+        "scColor": "var(--ink-2)", "scBg": "var(--neutral-tint)",
+        "rows": rows, "why": why,
+        "howLabel": "建議閱讀順序",
+        "how": ("先看法人方向強度與活動量，再核對融資／融券／借券餘額是由哪些流量形成，"
+                "最後看限額與官方指數超額報酬。任何單日數字都只描述當下，不直接預測後續漲跌。"),
+        "howLink": "前往頁尾查看交易／部位觀察指南", "howHref": "#flow-guide",
+        "src": ("TWSE MI_INDEX、T86、MI_MARGN、MI_QFIIS、TWT93U；TPEx dailyQuotes、"
+                "dailyTrade、margin/balance、insti/qfii、margin/sbl、tpex_reward_index"),
+    }
+
+
+def build_group_observation_view(row, name, tag=""):
+    """族群版採成員中位與廣度，避免大型股用絕對張數支配結論。"""
+    n = _value(row, "n", 0)
+    foreign_breadth = _value(row, "foreign_buy_breadth")
+    trust_breadth = _value(row, "trust_buy_breadth")
+    rows = [
+        ["法人方向中位",
+         f"外資 {_fmt_obs_pct(_value(row, 'med_foreign_imbalance_pct'), True)}｜"
+         f"投信 {_fmt_obs_pct(_value(row, 'med_trust_imbalance_pct'), True)}",
+         f"買方較多的成員：外資 {_fmt_obs_breadth(foreign_breadth)}、投信 "
+         f"{_fmt_obs_breadth(trust_breadth)}。中位數代表一半成員高於、一半低於，不讓單一大型股主導。"],
+        ["法人參與中位",
+         _fmt_obs_pct(_value(row, "med_inst_participation_pct")),
+         "每檔先以四類法人買賣總量÷2×成交量，再取族群中位；高只代表參與多，不代表淨買。"],
+        ["自營商淨額／成交量中位",
+         f"自行 {_fmt_obs_pct(_value(row, 'med_dealer_self_net_volume_pct'), True, 2)}｜"
+         f"避險 {_fmt_obs_pct(_value(row, 'med_dealer_hedge_net_volume_pct'), True, 2)}",
+         "每檔先除以自己的成交量再取中位，讓大小型股可比；避險方向不等同自營商看多或看空。"],
+        ["融資／融券淨流量中位",
+         f"融資 {_fmt_obs_pct(_value(row, 'med_margin_net_flow_shares_pct'), True, 3)}股本｜"
+         f"融券 {_fmt_obs_pct(_value(row, 'med_short_net_flow_shares_pct'), True, 3)}股本",
+         "每檔的資買−資賣−現償、券賣−券買−券償，先除股本再取中位。"],
+        ["官方限額使用中位",
+         f"融資 {_fmt_obs_pct(_value(row, 'med_margin_limit_util_pct'))}｜"
+         f"融券 {_fmt_obs_pct(_value(row, 'med_short_limit_util_pct'))}",
+         "使用率是餘額÷交易所限額；只描述信用空間，不設本系統的新門檻。"],
+        ["外資法令上限使用中位",
+         _fmt_obs_pct(_value(row, "med_foreign_limit_used_pct")),
+         "每檔外資實際持股÷法令容許持股，再取族群中位；接近100%代表法規空間較少。"],
+        ["借券流量中位",
+         f"新增 {_fmt_obs_pct(_value(row, 'med_sbl_sell_shares_pct'), True, 3)}｜"
+         f"還券 {_fmt_obs_pct(_value(row, 'med_sbl_return_shares_pct'), True, 3)}｜"
+         f"調整 {_fmt_obs_pct(_value(row, 'med_sbl_adjustment_shares_pct'), True, 3)}｜"
+         f"淨額 {_fmt_obs_pct(_value(row, 'med_sbl_net_flow_shares_pct'), True, 3)}股本",
+         "每檔先換算占股本比例再取中位，避免絕對股數把大型股放大。"],
+        ["成員官方指數超額中位",
+         f"1日 {_fmt_obs_return(_value(row, 'med_excess_ret1'))}｜"
+         f"5日 {_fmt_obs_return(_value(row, 'med_excess_ret5'))}｜"
+         f"20日 {_fmt_obs_return(_value(row, 'med_excess_ret20'))}",
+         f"各成員依上市／上櫃扣除自己的官方含息指數，再取中位。有效樣本："
+         f"1日 {_value(row, 'n_excess1', 0)}/{n}、5日 {_value(row, 'n_excess5', 0)}/{n}、"
+         f"20日 {_value(row, 'n_excess20', 0)}/{n}；跑贏基準廣度分別為 "
+         f"{_fmt_obs_breadth(_value(row, 'excess_breadth1'))}／"
+         f"{_fmt_obs_breadth(_value(row, 'excess_breadth5'))}／"
+         f"{_fmt_obs_breadth(_value(row, 'excess_breadth20'))}。"],
+    ]
+    return {
+        "el": "新增官方資料 · 族群數據解剖", "who": name, "biz": tag,
+        "scLabel": "觀察層 · 不計分", "scColor": "var(--ink-2)",
+        "scBg": "var(--neutral-tint)", "rows": rows,
+        "why": f"以{n}檔成員的中位數與廣度回答「這是普遍現象，還是少數個案」；不改族群狀態。",
+        "howLabel": "聚合方式",
+        "how": ("流量先按個股成交量或股本標準化，再取族群中位；超額報酬先逐檔扣除"
+                "上市／上櫃官方含息指數。有效樣本少於6檔就留白。"),
+        "howLink": "前往頁尾查看交易／部位觀察指南", "howHref": "#flow-guide",
+        "src": "observation_metrics（TWSE／TPEx 官方五表與官方報酬指數衍生）",
+    }
+
+
 def _ma_price_position(close, ma_values):
     """白話列出現價相對三條均線的位置；不只拿 MA20 代表全部週期。"""
     above = [label for label, value in ma_values if close > value]
@@ -1038,6 +1309,44 @@ def main():
             chip[r["stock_id"]] = {"label": r["label"]}
     except sqlite3.OperationalError:
         pass
+    # 新增官方欄位的觀察解剖：獨立衍生表，不進 daily_metrics/daily_scores。
+    observation_map, group_observation_map = {}, {}
+    try:
+        for r in con.execute("""SELECT o.*,
+                p.trades AS raw_trades,p.volume AS raw_volume,p.amount AS raw_amount,
+                i.foreign_buy AS raw_foreign_buy,i.foreign_sell AS raw_foreign_sell,
+                i.trust_buy AS raw_trust_buy,i.trust_sell AS raw_trust_sell,
+                i.dealer_self_net AS raw_dealer_self_net,
+                i.dealer_hedge_net AS raw_dealer_hedge_net,
+                m.margin_bal AS raw_margin_bal,m.margin_buy AS raw_margin_buy,
+                m.margin_sell AS raw_margin_sell,
+                m.margin_cash_repay AS raw_margin_cash_repay,m.margin_limit AS raw_margin_limit,
+                m.margin_prev_bal AS raw_margin_prev_bal,
+                m.short_bal AS raw_short_bal,m.short_sell AS raw_short_sell,
+                m.short_buyback AS raw_short_buyback,
+                m.short_stock_repay AS raw_short_stock_repay,m.short_limit AS raw_short_limit,
+                m.short_prev_bal AS raw_short_prev_bal,
+                m.offset_volume AS raw_offset_volume,
+                h.foreign_shares AS raw_foreign_shares,
+                h.foreign_available_shares AS raw_foreign_available_shares,
+                h.foreign_available_pct AS raw_foreign_available_pct,
+                h.foreign_limit_pct AS raw_foreign_limit_pct,
+                s.sbl_sell AS raw_sbl_sell,s.sbl_return AS raw_sbl_return,
+                s.sbl_adjustment AS raw_sbl_adjustment,s.sbl_next_limit AS raw_sbl_next_limit
+            FROM observation_metrics o
+            LEFT JOIN price p USING(date,stock_id)
+            LEFT JOIN inst i USING(date,stock_id)
+            LEFT JOIN margin m USING(date,stock_id)
+            LEFT JOIN holding h USING(date,stock_id)
+            LEFT JOIN sbl s USING(date,stock_id)
+            WHERE o.date=?""", (last,)):
+            observation_map[r["stock_id"]] = r
+        for r in con.execute(
+                "SELECT * FROM group_observation_metrics WHERE date=?", (last,)):
+            group_observation_map[r["grp"]] = r
+    except sqlite3.OperationalError:
+        # 舊 DB 尚未跑過 metrics-only 時從缺，不阻止既有儀表板發布。
+        observation_map, group_observation_map = {}, {}
     # 基本面參考(觀察層、獨立新表,fetch_financials.py 尚未跑過的 db 沒有這些表 → 從缺,不擋主管線)
     try:
         fund_map = build_fund_map(con)
@@ -1176,6 +1485,9 @@ def main():
             gobj["dur"] = f"第 {n} 個交易日(自 {since})"
         if g in chip_by_grp:
             gobj["chip"] = chip_by_grp[g]
+        if g in group_observation_map:
+            gobj["flow"] = build_group_observation_view(
+                group_observation_map[g], GROUP_NM.get(g, g), GROUP_TAG.get(g, ""))
         if g in tsmc_by_grp:
             gi = tsmc_by_grp[g]
             ev_meta = tsmc["event"]
@@ -1258,6 +1570,11 @@ def main():
         tech = build_technical_view(r, tech_hist.get(r["stock_id"]))
         if tech:
             obj["tech"] = tech
+        observation = observation_map.get(r["stock_id"])
+        if observation:
+            obj["flow"] = build_observation_view(observation)
+            obj["flow"].update({"who": r["name"] + "(" + r["stock_id"] + ")",
+                                "biz": r["biz"] or ""})
         if warn:
             obj["warn"] = True
         risky = r["stock_id"] in risk

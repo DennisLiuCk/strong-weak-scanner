@@ -43,6 +43,7 @@
                    → SQLite 原始表(append-only)
                    → price_adj 還原價(本地重算)
                    → daily_metrics 五元素衍生指標
+                   → observation_metrics / group_observation_metrics 官方資料解剖(不計分)
                    → group_metrics / market_daily 族群層聚合 + 大盤 regime
   audit_raw_data.py → 唯讀驗證五表 grid/必備欄/公式/SQLite integrity 與指數覆蓋
   score.py         族群內排名評分 → composite → tier(daily_scores)
@@ -70,7 +71,7 @@
 |---|---|---|
 | price | 日 OHLCV、成交金額、成交筆數(`trades`) | TWSE `MI_INDEX` / TPEx `dailyQuotes`(**非 FinMind**;每日期各 1 次全市場批次) |
 | inst | 外資／投信買進、賣出、淨額；自營商自行／避險分項與合計(股) | TWSE `T86` / TPEx `dailyTrade` |
-| margin | 融資買／賣／現償／餘額／限額、融券賣／買回／現券償還／餘額／限額、資券互抵(張) | TWSE `MI_MARGN` / TPEx `margin/balance` |
+| margin | 融資買／賣／現償／前日餘額／今日餘額／限額、融券賣／買回／現券償還／前日餘額／今日餘額／限額、資券互抵(張) | TWSE `MI_MARGN` / TPEx `margin/balance` |
 | holding | 外資持有／尚可投資股數與比率、法令上限比率、發行股數 | TWSE `MI_QFIIS` / TPEx `insti/qfii` |
 | sbl | 借券賣出前餘額／賣出／還券／調整／當日餘額／次日限額(股) | TWSE `TWT93U` / TPEx `margin/sbl` |
 | tdcc_holding | 集保股權分散(週頻,17 級距,universe+候選) | TDCC opendata(**非 FinMind**;僅供最新一週) |
@@ -82,8 +83,9 @@
 | balance_sheet | 資產負債表(type/value 窄表) | TaiwanStockBalanceSheet |
 | cash_flow | 現金流量表(type/value 窄表) | TaiwanStockCashFlowsStatement |
 
-上述五表擴充欄與 `market_index` 目前都是**原始／觀察層**：不進 `daily_metrics`、
-`daily_scores`、tier 或 regime，也不取代既有 FinMind `market`。舊 SQLite 會在首次執行時
+上述五表擴充欄與 `market_index` 目前都是**原始／觀察層**：只供下列
+`observation_metrics`，不進計分用 `daily_metrics`、`daily_scores`、tier 或 regime，
+也不取代既有 FinMind `market`。舊 SQLite 會在首次執行時
 原地 `ALTER TABLE`；既有歷史列的新欄先保持 `NULL`，應使用可中斷續跑的
 `--backfill-expanded-fields --start ... --end ...`，不要用 `--force` 重打已完成日期。
 `market_index` 自上線起前瞻累積；TPEx
@@ -97,6 +99,8 @@
 |---|---|
 | price_adj | 還原收盤價:除權息/分割以倒推法本地重算(事件日前歷史價 × 係數連乘,最新區段=原始價);減資 dataset 需付費未涵蓋,以「無事件 >15% 跳空」偵測示警兜底 |
 | daily_metrics | 五元素原始指標:ret1/ret20、dist_hi20/60、rs20、down_rs20、turnover_pct、vol_ratio60、foreign_pct、fpct_chg5/20、dipbuy20、trust5(_pct)、margin_bal/chg、margin_util_pct、券資比等;**個股自身技術觀察(未計分)**:ma5/20/60、rsi14(Wilder)、volume、vol_ma5/20/60、vol_ratio20(當日量÷20日均量);**其他觀察欄(未計分)**:tdcc_big400/1000_pct·chg、tdcc_people_chg、sbl_pct/chg(TDCC pct 分母為集保庫存,非發行股本) |
+| observation_metrics | 個股官方資料解剖(全數不計分)：成交筆數／每筆均量與均額、外資／投信／自營自行／避險方向強度、法人總活動占成交量、融資券餘額流量分解與官方限額使用率、外資法令上限使用率、借券賣出／還券／調整、相對所屬市場官方報酬指數的 1／5／20 日超額報酬 |
+| group_observation_metrics | 族群觀察：以上比例的成員中位數、買超／跑贏指數家數廣度及有效樣本數；不把不同股本公司的原始股數直接相加 |
 | daily_scores | 各元素分數、composite / composite_s(3 日平滑)、tier_raw / tier、warn、pending(蓄勢候補差哪些條件) |
 | chip_health | 個股籌碼現況診斷(健康/中性/待觀察),不計 composite/tier、不是選股排名；儀表板逐列把原始方向翻成健康/中性/警示,TDCC/借券另標「方向待 OOS 驗證」 |
 | group_metrics | 族群聚合:breadth_f、med_dist60、rel20、med_dip、breadth_t、state/note |
@@ -107,6 +111,12 @@
 短中長均線結構、現價偏離均線、RSI 動能及 5 日變化、價格與 20 日均量的確認關係、
 現價/MA20 與 MA5/MA20 的最近一日穿越。這些都是觀察資訊，不做族群排名、不預測下一日
 漲跌，也不進 `composite`、`tier` 或 `chip_health`。
+
+儀表板個股列與族群卡的「數據解剖」會直接列出分子、分母與公式。法人方向強度採
+`(買進−賣出)÷(買進+賣出)`；法人總活動占比採四分項買賣總額
+`÷(2×市場成交量)`，因每一股成交同時有買賣兩側；融資券餘額變動使用**同一份官方日報**
+的前日餘額驗算當日流量，避免交易所調整基期時誤判。族群一律使用成員比例的中位數與
+廣度，官方超額報酬則依個股上市／上櫃身分分別扣除 TWSE／TPEx 報酬指數。
 
 凍結表 `daily_scores_v1`:舊絕對門檻制(v1)最後結果,供 validate 新舊對照。
 

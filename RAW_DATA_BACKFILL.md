@@ -53,7 +53,7 @@ uv run --no-project --python 3.12 python scripts/audit_raw_data.py --json
 ```
 
 audit 的硬性條件是 current universe × `price ∪ market` 交易日的五表完整 grid、core／
-expanded 必備欄非空、SQLite integrity，以及法人與借券公式一致。`market_index` 維持
+expanded 必備欄非空、SQLite integrity，以及法人、融資、融券與借券公式一致。`market_index` 維持
 非阻斷觀察層，因此缺口列為 warning；TPEx 公開端點只驗最新月份可再取得的交易日。
 不在交易日 spine 的 legacy row 也只列 warning：它不會灌大完整度，且未經來源查證不要刪除。
 
