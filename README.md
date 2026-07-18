@@ -67,18 +67,25 @@
 
 | 表 | 內容 | 來源 |
 |---|---|---|
-| price | 日 OHLCV | TWSE `MI_INDEX` / TPEx `dailyQuotes`(**非 FinMind**;每日期各 1 次全市場批次) |
-| inst | 外資/投信/自營淨買賣(股) | TWSE `T86` / TPEx `dailyTrade` |
-| margin | 融資/融券餘額 | TWSE `MI_MARGN` / TPEx `margin/balance` |
-| holding | 外資持股比率、發行股數 | TWSE `MI_QFIIS` / TPEx `insti/qfii` |
-| sbl | 借券賣出餘額(股) | TWSE `TWT93U` / TPEx `margin/sbl` |
+| price | 日 OHLCV、成交金額、成交筆數(`trades`) | TWSE `MI_INDEX` / TPEx `dailyQuotes`(**非 FinMind**;每日期各 1 次全市場批次) |
+| inst | 外資／投信買進、賣出、淨額；自營商自行／避險分項與合計(股) | TWSE `T86` / TPEx `dailyTrade` |
+| margin | 融資買／賣／現償／餘額／限額、融券賣／買回／現券償還／餘額／限額、資券互抵(張) | TWSE `MI_MARGN` / TPEx `margin/balance` |
+| holding | 外資持有／尚可投資股數與比率、法令上限比率、發行股數 | TWSE `MI_QFIIS` / TPEx `insti/qfii` |
+| sbl | 借券賣出前餘額／賣出／還券／調整／當日餘額／次日限額(股) | TWSE `TWT93U` / TPEx `margin/sbl` |
 | tdcc_holding | 集保股權分散(週頻,17 級距,universe+候選) | TDCC opendata(**非 FinMind**;僅供最新一週) |
 | dividend_result / split_event | 除權息、分割事件 | TaiwanStockDividendResult / TaiwanStockSplitPrice |
 | market | 加權報酬指數(含息) | TaiwanStockTotalReturnIndex |
+| market_index | 交易所官方報酬指數(`market/index_key/index_type/close`)；TWSE 全部報酬指數＋TPEx 櫃買報酬指數 | TWSE `MI_INDEX`(與價格共用回應) / TPEx `tpex_reward_index` OpenAPI |
 | month_revenue | 個股月營收 | TaiwanStockMonthRevenue |
 | financials | 損益表(含EPS,type/value 窄表) | TaiwanStockFinancialStatements |
 | balance_sheet | 資產負債表(type/value 窄表) | TaiwanStockBalanceSheet |
 | cash_flow | 現金流量表(type/value 窄表) | TaiwanStockCashFlowsStatement |
+
+上述五表擴充欄與 `market_index` 目前都是**原始／觀察層**：不進 `daily_metrics`、
+`daily_scores`、tier 或 regime，也不取代既有 FinMind `market`。舊 SQLite 會在首次執行時
+原地 `ALTER TABLE`；既有歷史列的新欄先保持 `NULL`，五表需回補歷史時明確使用
+`--force --start ... --end ...`。`market_index` 自上線起前瞻累積；TPEx
+`tpex_reward_index` 公開端點一次提供當月資料，日常依最新交易日缺口冪等補入。
 
 **衍生層(每次全量重建、冪等——調規則後重跑即一致)**
 
@@ -227,7 +234,8 @@ Token 讀取順序:環境變數 `FINMIND_TOKEN`(+選配 `FINMIND_TOKEN2`、
 在本次 process 熔斷並換下一組,全部熔斷就立即失敗停止
 (`fetch_daily.api_get`,screen.py 共用);同日多輪「screen+全量回補」單組
 token 必爆額度。五張每日原始表已全部改成 TWSE／TPEx 每表各 1 次批次；正常新交易日
-共 10 次免 token 官方請求。FinMind 邏輯請求只剩約 125 次（除權息 121、分割 1、
+共 10 次免 token 官方請求，另有 TPEx `market_index` 1 次；TWSE 報酬指數與價格共用
+`MI_INDEX`，不增加請求。FinMind 邏輯請求只剩約 125 次（除權息 121、分割 1、
 TAIEX 1、參考個股 2），單一免費 token 已有充足餘裕。正常 daily 會跳過完整
 dataset-day；休市日早場通常只需兩個官方價格探針，資料源延遲時稍後重跑只補仍缺資料。
 Runbook:盤後檢視
@@ -240,6 +248,9 @@ Runbook:盤後檢視
   `inst` 2 = 4，晚場若早場完整則只需 `margin`／`holding`／`sbl` 共 6。早場失敗時
   晚場會連價格／法人一起補，最多仍是 10。除權息、分割、TAIEX、參考個股另列為
   `事件 API E 次`，這才消耗 FinMind 額度，理論值 `N+4=125`（N=121）。
+- `market_index:upsert I rows · 額外官方 requests M` 另計：正常新交易日 `M=1`（TPEx），
+  TWSE 由價格回應順手落地；舊 DB 首次升級且最新日尚無 TWSE 指數時最多再補 1 次。
+  `market_index` 是非阻斷觀察層，失敗會明確警告並留待下次補缺，不阻止五表評分／發布。
 - `P=0` 表示 SQLite 指定表已完整而被智慧補缺跳過，不代表端點失敗；只有真正發出請求
   的新資料日才能驗收該來源路徑。
 - TWSE／TPEx 任一來源失敗或 universe 覆蓋不完整時，成功來源會先 commit 進 SQLite，

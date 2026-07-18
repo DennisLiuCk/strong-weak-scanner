@@ -83,6 +83,38 @@ class TokenPoolTest(unittest.TestCase):
         self.assertEqual(fd._TOK_DISABLED, {0, 1, 2})
 
 
+class SchemaMigrationTest(unittest.TestCase):
+    def test_legacy_raw_tables_are_upgraded_in_place_idempotently(self):
+        con = sqlite3.connect(":memory:")
+        con.executescript("""
+            CREATE TABLE price(date TEXT, stock_id TEXT, open REAL, high REAL, low REAL,
+              close REAL, volume INTEGER, amount REAL, PRIMARY KEY(date,stock_id));
+            CREATE TABLE inst(date TEXT, stock_id TEXT, foreign_net INTEGER, trust_net INTEGER,
+              dealer_net INTEGER, PRIMARY KEY(date,stock_id));
+            CREATE TABLE margin(date TEXT, stock_id TEXT, margin_bal INTEGER, short_bal INTEGER,
+              PRIMARY KEY(date,stock_id));
+            CREATE TABLE holding(date TEXT, stock_id TEXT, foreign_pct REAL, shares_issued INTEGER,
+              PRIMARY KEY(date,stock_id));
+            CREATE TABLE sbl(date TEXT, stock_id TEXT, sbl_bal INTEGER,
+              PRIMARY KEY(date,stock_id));
+            INSERT INTO price VALUES('2026-07-17','2330',1,2,1,2,100,200);
+        """)
+
+        fd.ensure_schema(con)
+        fd.ensure_schema(con)
+
+        for table, columns in fd.RAW_COLUMN_MIGRATIONS.items():
+            actual = {row[1] for row in con.execute(f"PRAGMA table_info({table})")}
+            self.assertTrue({name for name, _ in columns}.issubset(actual), table)
+        self.assertEqual(con.execute(
+            "SELECT close,volume,amount,trades FROM price WHERE stock_id='2330'"
+        ).fetchone(), (2.0, 100, 200.0, None))
+        self.assertIsNotNone(con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='market_index'"
+        ).fetchone())
+        con.close()
+
+
 class OfficialPriceBatchTest(unittest.TestCase):
     def test_parse_twse_filters_universe_and_normalizes_numbers(self):
         payload = {
@@ -115,6 +147,7 @@ class OfficialPriceBatchTest(unittest.TestCase):
             "close": 1010.0,
             "Trading_Volume": 12345,
             "Trading_money": 12345000.0,
+            "Trading_turnover": 100,
         }])
 
     def test_parse_twse_no_data_is_a_holiday_not_an_error(self):
@@ -131,6 +164,7 @@ class OfficialPriceBatchTest(unittest.TestCase):
             "tables": [{
                 "fields": [
                     "代號", "收盤", "開盤", "最高", "最低", "成交股數", "成交金額(元)",
+                    "成交筆數",
                 ],
                 "data": [],
             }],
@@ -143,7 +177,7 @@ class OfficialPriceBatchTest(unittest.TestCase):
     def test_parse_tpex_reads_all_matching_tables_and_handles_no_trade(self):
         fields = [
             "代號", "名稱", "收盤", "漲跌", "開盤", "最高", "最低", "均價",
-            "成交股數", "成交金額(元)",
+            "成交股數", "成交金額(元)", "成交筆數",
         ]
         payload = {
             "stat": "ok",
@@ -151,10 +185,10 @@ class OfficialPriceBatchTest(unittest.TestCase):
             "tables": [
                 {"fields": fields, "data": [
                     ["2454", "聯發科", "1,310.00", "+10", "1,300.00",
-                     "1,320.00", "1,295.00", "1,308.00", "9,876", "12,345,678"],
+                     "1,320.00", "1,295.00", "1,308.00", "9,876", "12,345,678", "321"],
                 ]},
                 {"fields": fields, "data": [
-                    ["9999", "測試", "--", "--", "--", "--", "--", "--", "0", "0"],
+                    ["9999", "測試", "--", "--", "--", "--", "--", "--", "0", "0", "0"],
                 ]},
             ],
         }
@@ -167,10 +201,54 @@ class OfficialPriceBatchTest(unittest.TestCase):
         self.assertEqual(rows[0]["close"], 1310.0)
         self.assertEqual(rows[0]["Trading_Volume"], 9876)
         self.assertEqual(rows[0]["Trading_money"], 12345678.0)
+        self.assertEqual(rows[0]["Trading_turnover"], 321)
         self.assertEqual(rows[1]["stock_id"], "9999")
         self.assertIsNone(rows[1]["open"])
         self.assertIsNone(rows[1]["close"])
         self.assertEqual(rows[1]["Trading_Volume"], 0)
+
+    def test_market_index_parsers_keep_total_return_series(self):
+        twse = {
+            "stat": "OK", "date": "20260717", "tables": [
+                {"fields": ["指數", "收盤指數"],
+                 "data": [["發行量加權股價指數", "42,671.27"]]},
+                {"fields": ["報酬指數", "收盤指數"],
+                 "data": [[fd.TWSE_TOTAL_RETURN_KEY, "98,228.75"],
+                          ["半導體類報酬指數", "12,345.67"]]},
+            ],
+        }
+        rows = fd.parse_twse_market_indices(twse, "2026-07-17")
+        self.assertEqual([(row["index_key"], row["close"]) for row in rows], [
+            (fd.TWSE_TOTAL_RETURN_KEY, 98228.75), ("半導體類報酬指數", 12345.67)])
+        self.assertTrue(all(row["index_type"] == "total_return" for row in rows))
+
+        rows = fd.parse_tpex_market_indices([
+            {"Date": "1150716", "TPExIndex": "390.00",
+             "TPExTotalReturnIndex": "710.25"},
+            {"Date": "1150717", "TPExIndex": "378.44",
+             "TPExTotalReturnIndex": "699.92"},
+        ])
+        self.assertEqual([(row["date"], row["index_key"], row["close"]) for row in rows], [
+            ("2026-07-16", fd.TPEX_TOTAL_RETURN_KEY, 710.25),
+            ("2026-07-17", fd.TPEX_TOTAL_RETURN_KEY, 699.92),
+        ])
+
+    def test_missing_twse_index_subtable_does_not_block_price(self):
+        payload = {
+            "stat": "OK", "date": "20260717", "tables": [{
+                "fields": ["證券代號", "成交股數", "成交筆數", "成交金額", "開盤價",
+                           "最高價", "最低價", "收盤價"],
+                "data": [["2330", "100", "9", "200", "1", "2", "1", "2"]],
+            }],
+        }
+        with mock.patch.object(fd, "_request_json", return_value=payload), \
+                mock.patch("sys.stderr", new_callable=io.StringIO) as stderr:
+            rows, available, indices = fd.fetch_exchange_price_source(
+                "TWSE", "2026-07-17", {"2330"}, retries=1)
+        self.assertTrue(available)
+        self.assertEqual(rows[0]["close"], 2.0)
+        self.assertEqual(indices, [])
+        self.assertIn("market_index 順手解析失敗", stderr.getvalue())
 
     def test_successful_market_is_committed_before_other_market_failure(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -187,7 +265,12 @@ class OfficialPriceBatchTest(unittest.TestCase):
                     "date": day, "stock_id": "2330", "open": 1000,
                     "max": 1020, "min": 995, "close": 1010,
                     "Trading_Volume": 12345, "Trading_money": 12345000,
-                }], True
+                }], True, [{
+                    "date": day, "market": "TWSE",
+                    "index_key": fd.TWSE_TOTAL_RETURN_KEY,
+                    "index_name": fd.TWSE_TOTAL_RETURN_KEY,
+                    "index_type": "total_return", "close": 98228.75,
+                }]
 
             try:
                 with self.assertRaises(fd.ExchangePriceFetchError):
@@ -200,6 +283,9 @@ class OfficialPriceBatchTest(unittest.TestCase):
                     self.assertEqual(observer.execute(
                         "SELECT stock_id,close FROM price WHERE date='2026-07-17'"
                     ).fetchall(), [("2330", 1010.0)])
+                    self.assertEqual(observer.execute(
+                        "SELECT index_key,close FROM market_index WHERE date='2026-07-17'"
+                    ).fetchall(), [(fd.TWSE_TOTAL_RETURN_KEY, 98228.75)])
                 finally:
                     observer.close()
             finally:
@@ -207,89 +293,272 @@ class OfficialPriceBatchTest(unittest.TestCase):
 
         self.assertEqual([call[0] for call in calls], ["TWSE", "TPEx"])
 
+    def test_market_index_backfill_is_latest_only_and_idempotent(self):
+        con = sqlite3.connect(":memory:")
+        con.executescript(fd.SCHEMA)
+        calls = []
+
+        def twse_fetch(day):
+            calls.append(("TWSE", day))
+            return [{
+                "date": day, "market": "TWSE", "index_key": fd.TWSE_TOTAL_RETURN_KEY,
+                "index_name": fd.TWSE_TOTAL_RETURN_KEY, "index_type": "total_return",
+                "close": 98228.75,
+            }]
+
+        def tpex_fetch():
+            calls.append(("TPEx", None))
+            return [{
+                "date": day, "market": "TPEx", "index_key": fd.TPEX_TOTAL_RETURN_KEY,
+                "index_name": fd.TPEX_TOTAL_RETURN_KEY, "index_type": "total_return",
+                "close": close,
+            } for day, close in (("2026-07-16", 710.25), ("2026-07-17", 699.92))]
+
+        stats = fd.fetch_missing_market_indices(
+            con, {"2026-07-16", "2026-07-17"},
+            twse_fetcher=twse_fetch, tpex_fetcher=tpex_fetch)
+        self.assertEqual(stats, {"rows": 3, "requests": 2, "errors": []})
+        self.assertEqual(calls, [("TWSE", "2026-07-17"), ("TPEx", None)])
+        self.assertEqual(con.execute("SELECT COUNT(*) FROM market_index").fetchone()[0], 3)
+
+        calls.clear()
+        repeat = fd.fetch_missing_market_indices(
+            con, {"2026-07-16", "2026-07-17"},
+            twse_fetcher=twse_fetch, tpex_fetcher=tpex_fetch)
+        self.assertEqual(repeat, {"rows": 0, "requests": 0, "errors": []})
+        self.assertEqual(calls, [])
+        con.close()
+
+    def test_market_index_source_failures_are_reported_but_not_raised(self):
+        con = sqlite3.connect(":memory:")
+        con.executescript(fd.SCHEMA)
+
+        def fail_twse(day):
+            raise OSError(f"TWSE unavailable {day}")
+
+        def fail_tpex():
+            raise OSError("TPEx unavailable")
+
+        stats = fd.fetch_missing_market_indices(
+            con, {"2026-07-17"}, twse_fetcher=fail_twse, tpex_fetcher=fail_tpex)
+        self.assertEqual(stats["rows"], 0)
+        self.assertEqual(stats["requests"], 2)
+        self.assertEqual(len(stats["errors"]), 2)
+        self.assertIn("TWSE 2026-07-17", stats["errors"][0])
+        self.assertIn("TPEx 2026-07-17", stats["errors"][1])
+        con.close()
+
 
 class OfficialRawBatchTest(unittest.TestCase):
     @staticmethod
     def _nets(rows):
-        return {row["name"]: row["buy"] - row["sell"] for row in rows}
+        return {row["name"]: row.get("net", row["buy"] - row["sell"]) for row in rows}
 
     def test_institutional_parsers_map_exact_net_columns(self):
         twse_fields = [
-            "證券代號", "外陸資買賣超股數(不含外資自營商)",
-            "投信買賣超股數", "自營商買賣超股數",
+            "證券代號",
+            "外陸資買進股數(不含外資自營商)",
+            "外陸資賣出股數(不含外資自營商)",
+            "外陸資買賣超股數(不含外資自營商)",
+            "投信買進股數", "投信賣出股數", "投信買賣超股數",
+            "自營商買賣超股數",
+            "自營商買進股數(自行買賣)", "自營商賣出股數(自行買賣)",
+            "自營商買賣超股數(自行買賣)",
+            "自營商買進股數(避險)", "自營商賣出股數(避險)",
+            "自營商買賣超股數(避險)",
         ]
         twse = {"stat": "OK", "date": "20260717", "fields": twse_fields,
-                "data": [["2330", "1,200", "-300", "45"]]}
+                "data": [["2330", "2,000", "800", "1,200", "100", "400", "-300",
+                          "45", "100", "80", "20", "50", "25", "25"]]}
         rows, available = fd.parse_twse_inst(twse, "2026-07-17", {"2330"})
         self.assertTrue(available)
         self.assertEqual(self._nets(rows), {
-            "Foreign_Investor": 1200, "Investment_Trust": -300, "Dealer_self": 45})
+            "Foreign_Investor": 1200, "Investment_Trust": -300,
+            "Dealer_self": 20, "Dealer_Hedging": 25, "Dealer_Total": 45})
+        self.assertEqual((rows[0]["buy"], rows[0]["sell"], rows[0]["net"]),
+                         (2000, 800, 1200))
 
-        tpex_fields = ["代號", "名稱"] + ["欄"] * 21 + ["三大法人買賣超股數合計"]
+        triplet = ["買進股數", "賣出股數", "買賣超股數"]
+        tpex_fields = ["代號", "名稱"] + triplet * 7 + ["三大法人買賣超股數合計"]
         raw = ["2454", "聯發科"] + ["0"] * 22
-        raw[4], raw[13], raw[22] = "-900", "700", "-50"
+        raw[2:5] = ["100", "1,000", "-900"]
+        raw[11:14] = ["900", "200", "700"]
+        raw[14:17] = ["30", "40", "-10"]
+        raw[17:20] = ["20", "60", "-40"]
+        raw[20:23] = ["50", "100", "-50"]
         tpex = {"stat": "ok", "date": "20260717",
                 "tables": [{"fields": tpex_fields, "data": [raw]}]}
         rows, available = fd.parse_tpex_inst(tpex, "2026-07-17", {"2454"})
         self.assertTrue(available)
         self.assertEqual(self._nets(rows), {
-            "Foreign_Investor": -900, "Investment_Trust": 700, "Dealer_self": -50})
+            "Foreign_Investor": -900, "Investment_Trust": 700,
+            "Dealer_self": -10, "Dealer_Hedging": -40, "Dealer_Total": -50})
 
     def test_margin_parsers_map_current_balances(self):
         twse_fields = ["代號", "名稱", "買進", "賣出", "現金償還", "前日餘額",
                        "今日餘額", "次一營業日限額", "買進", "賣出", "現券償還",
                        "前日餘額", "今日餘額", "次一營業日限額", "資券互抵", "註記"]
         twse_raw = ["2330", "台積電"] + ["0"] * 14
-        twse_raw[6], twse_raw[12] = "12,345", "678"
+        twse_raw[2:8] = ["100", "80", "5", "12,330", "12,345", "20,000"]
+        twse_raw[8:15] = ["7", "9", "1", "676", "678", "5,000", "4"]
         twse = {"stat": "OK", "date": "20260717",
                 "tables": [{"fields": twse_fields, "data": [twse_raw]}]}
         rows, available = fd.parse_twse_margin(twse, "2026-07-17", {"2330"})
         self.assertTrue(available)
         self.assertEqual((rows[0]["MarginPurchaseTodayBalance"],
                           rows[0]["ShortSaleTodayBalance"]), (12345, 678))
+        self.assertEqual(
+            [rows[0][key] for key in ("MarginPurchaseBuy", "MarginPurchaseSell",
+                                      "MarginPurchaseCashRepayment", "MarginPurchaseLimit",
+                                      "ShortSaleSell", "ShortSaleBuyback",
+                                      "ShortSaleStockRepayment", "ShortSaleLimit",
+                                      "MarginShortOffset")],
+            [100, 80, 5, 20000, 9, 7, 1, 5000, 4])
 
+        tpex_fields = [
+            "代號", "名稱", "前資餘額(張)", "資買", "資賣", "現償", "資餘額",
+            "資屬證金", "資使用率(%)", "資限額", "前券餘額(張)", "券賣", "券買",
+            "券償", "券餘額", "券屬證金", "券使用率(%)", "券限額",
+            "資券相抵(張)", "備註",
+        ]
+        tpex_raw = ["2454", "聯發科", "9,850", "40", "10", "4", "9,876", "0",
+                    "1.2", "20,000", "50", "8", "3", "1", "54", "0", "0.1",
+                    "5,000", "2", ""]
         tpex = {"stat": "ok", "date": "20260717", "tables": [{
-            "fields": ["代號", "資餘額", "券餘額"],
-            "data": [["2454", "9,876", "54"]],
+            "fields": tpex_fields, "data": [tpex_raw],
         }]}
         rows, available = fd.parse_tpex_margin(tpex, "2026-07-17", {"2454"})
         self.assertTrue(available)
         self.assertEqual((rows[0]["MarginPurchaseTodayBalance"],
                           rows[0]["ShortSaleTodayBalance"]), (9876, 54))
+        self.assertEqual((rows[0]["MarginPurchaseBuy"], rows[0]["ShortSaleSell"],
+                          rows[0]["ShortSaleBuyback"], rows[0]["MarginShortOffset"]),
+                         (40, 8, 3, 2))
 
     def test_holding_parsers_map_percentage_and_issued_shares(self):
-        twse = {"stat": "OK", "date": "20260717",
-                "fields": ["證券代號", "發行股數", "全體外資及陸資持股比率"],
-                "data": [["2330", "25,933,804,458", "72.54"]]}
+        twse_fields = ["證券代號", "發行股數", "外資及陸資尚可投資股數",
+                       "全體外資及陸資持有股數", "外資及陸資尚可投資比率",
+                       "全體外資及陸資持股比率", "外資及陸資共用法令投資上限比率"]
+        twse = {"stat": "OK", "date": "20260717", "fields": twse_fields,
+                "data": [["2330", "25,933,804,458", "1,944,000,000",
+                          "18,815,000,000", "7.49", "72.54", "80.00"]]}
         rows, available = fd.parse_twse_holding(twse, "2026-07-17", {"2330"})
         self.assertTrue(available)
         self.assertEqual((rows[0]["ForeignInvestmentSharesRatio"],
                           rows[0]["NumberOfSharesIssued"]), (72.54, 25933804458))
+        self.assertEqual((rows[0]["ForeignInvestmentShares"],
+                          rows[0]["ForeignInvestmentAvailableShares"],
+                          rows[0]["ForeignInvestmentAvailableRatio"],
+                          rows[0]["ForeignInvestmentLimitRatio"]),
+                         (18815000000, 1944000000, 7.49, 80.0))
 
+        tpex_fields = ["代號", "發行股數(A)", "僑外資及陸資尚可投資股數B=A*F-C",
+                       "僑外資及陸資持有股數(C)", "僑外資及陸資尚可投資比率(D=B/A)",
+                       "僑外資及陸資持股比率(E=C/A)", "法令投資上限比率(F)"]
         tpex = {"stat": "ok", "date": "20260717", "tables": [{
-            "fields": ["代號", "發行股數(A)", "僑外資及陸資持股比率(E=C/A)"],
-            "data": [["2454", "1,591,673,608", "58.12%"]],
+            "fields": tpex_fields,
+            "data": [["2454", "1,591,673,608", "348,000,000", "925,000,000",
+                      "21.86%", "58.12%", "80.00%"]],
         }]}
         rows, available = fd.parse_tpex_holding(tpex, "2026-07-17", {"2454"})
         self.assertTrue(available)
         self.assertEqual((rows[0]["ForeignInvestmentSharesRatio"],
                           rows[0]["NumberOfSharesIssued"]), (58.12, 1591673608))
+        self.assertEqual((rows[0]["ForeignInvestmentShares"],
+                          rows[0]["ForeignInvestmentAvailableShares"],
+                          rows[0]["ForeignInvestmentAvailableRatio"],
+                          rows[0]["ForeignInvestmentLimitRatio"]),
+                         (925000000, 348000000, 21.86, 80.0))
 
     def test_sbl_parsers_use_borrowed_short_sale_current_balance(self):
-        fields = ["代號", "名稱"] + ["欄"] * 10 + ["當日餘額"]
-        raw = ["2330", "台積電"] + ["0"] * 10 + ["8,765,432"]
+        fields = ["代號", "名稱", "前日餘額", "賣出", "買進", "現券", "今日餘額",
+                  "次一營業日限額", "前日餘額", "當日賣出", "當日還券", "當日調整",
+                  "當日餘額", "次一營業日可限額", "備註"]
+        raw = ["2330", "台積電", "0", "0", "0", "0", "0", "0", "8,700,000",
+               "100,000", "30,000", "-4,568", "8,765,432", "12,000,000", ""]
         twse = {"stat": "OK", "date": "20260717", "fields": fields, "data": [raw]}
         rows, available = fd.parse_twse_sbl(twse, "2026-07-17", {"2330"})
         self.assertTrue(available)
         self.assertEqual(rows[0]["SBLShortSalesCurrentDayBalance"], 8765432)
+        self.assertEqual((rows[0]["SBLShortSalesPreviousDayBalance"],
+                          rows[0]["SBLShortSalesCurrentDaySell"],
+                          rows[0]["SBLShortSalesCurrentDayReturn"],
+                          rows[0]["SBLShortSalesCurrentDayAdjustment"],
+                          rows[0]["SBLShortSalesNextDayLimit"]),
+                         (8700000, 100000, 30000, -4568, 12000000))
 
-        tpex_fields = ["股票代號", "股票名稱"] + ["欄"] * 10 + ["當日餘額"]
-        tpex_raw = ["2454", "聯發科"] + ["0"] * 10 + ["123,456"]
+        tpex_fields = ["股票代號", "股票名稱", "前日餘額", "賣出", "買進", "現券",
+                       "當日餘額", "限額", "前日餘額", "當日賣出", "當日還券",
+                       "當日調整數額", "當日餘額", "次一營業日可借券賣出限額", "備註"]
+        tpex_raw = ["2454", "聯發科", "0", "0", "0", "0", "0", "0", "120,000",
+                    "10,000", "5,000", "-1,544", "123,456", "500,000", ""]
         tpex = {"stat": "ok", "date": "20260717",
                 "tables": [{"fields": tpex_fields, "data": [tpex_raw]}]}
         rows, available = fd.parse_tpex_sbl(tpex, "2026-07-17", {"2454"})
         self.assertTrue(available)
         self.assertEqual(rows[0]["SBLShortSalesCurrentDayBalance"], 123456)
+
+    def test_upserts_persist_all_expanded_raw_columns(self):
+        con = sqlite3.connect(":memory:")
+        con.executescript(fd.SCHEMA)
+        day, sid = "2026-07-17", "2330"
+        fd.up_price(con, [{
+            "date": day, "stock_id": sid, "open": 1, "max": 2, "min": 1,
+            "close": 2, "Trading_Volume": 100, "Trading_money": 200,
+            "Trading_turnover": 9,
+        }])
+        fd.up_inst(con, [
+            {"date": day, "stock_id": sid, "name": "Foreign_Investor",
+             "buy": 100, "sell": 20, "net": 80},
+            {"date": day, "stock_id": sid, "name": "Investment_Trust",
+             "buy": 30, "sell": 10, "net": 20},
+            {"date": day, "stock_id": sid, "name": "Dealer_self",
+             "buy": 8, "sell": 3, "net": 5},
+            {"date": day, "stock_id": sid, "name": "Dealer_Hedging",
+             "buy": 7, "sell": 9, "net": -2},
+            {"date": day, "stock_id": sid, "name": "Dealer_Total",
+             "buy": 15, "sell": 12, "net": 3},
+        ])
+        fd.up_margin(con, [{
+            "date": day, "stock_id": sid, "MarginPurchaseTodayBalance": 1000,
+            "ShortSaleTodayBalance": 50, "MarginPurchaseBuy": 30,
+            "MarginPurchaseSell": 20, "MarginPurchaseCashRepayment": 2,
+            "MarginPurchaseLimit": 5000, "ShortSaleSell": 8,
+            "ShortSaleBuyback": 3, "ShortSaleStockRepayment": 1,
+            "ShortSaleLimit": 1000, "MarginShortOffset": 4,
+        }])
+        fd.up_holding(con, [{
+            "date": day, "stock_id": sid, "ForeignInvestmentSharesRatio": 72.5,
+            "NumberOfSharesIssued": 10000, "ForeignInvestmentShares": 7250,
+            "ForeignInvestmentAvailableShares": 750,
+            "ForeignInvestmentAvailableRatio": 7.5, "ForeignInvestmentLimitRatio": 80,
+        }])
+        fd.up_sbl(con, [{
+            "date": day, "stock_id": sid, "SBLShortSalesCurrentDayBalance": 120,
+            "SBLShortSalesPreviousDayBalance": 100, "SBLShortSalesCurrentDaySell": 30,
+            "SBLShortSalesCurrentDayReturn": 8, "SBLShortSalesCurrentDayAdjustment": -2,
+            "SBLShortSalesNextDayLimit": 500,
+        }])
+
+        self.assertEqual(con.execute(
+            "SELECT trades FROM price WHERE date=? AND stock_id=?", (day, sid)).fetchone(), (9,))
+        self.assertEqual(con.execute(
+            "SELECT foreign_buy,foreign_sell,foreign_net,trust_buy,trust_sell,trust_net,"
+            "dealer_self_buy,dealer_self_sell,dealer_self_net,dealer_hedge_buy,"
+            "dealer_hedge_sell,dealer_hedge_net,dealer_net FROM inst"
+        ).fetchone(), (100, 20, 80, 30, 10, 20, 8, 3, 5, 7, 9, -2, 3))
+        self.assertEqual(con.execute(
+            "SELECT margin_buy,margin_sell,margin_cash_repay,margin_limit,short_sell,"
+            "short_buyback,short_stock_repay,short_limit,offset_volume FROM margin"
+        ).fetchone(), (30, 20, 2, 5000, 8, 3, 1, 1000, 4))
+        self.assertEqual(con.execute(
+            "SELECT foreign_shares,foreign_available_shares,foreign_available_pct,"
+            "foreign_limit_pct FROM holding"
+        ).fetchone(), (7250, 750, 7.5, 80.0))
+        self.assertEqual(con.execute(
+            "SELECT sbl_prev_bal,sbl_sell,sbl_return,sbl_adjustment,sbl_next_limit FROM sbl"
+        ).fetchone(), (100, 30, 8, -2, 500))
+        con.close()
 
     def test_wrong_response_date_is_rejected(self):
         payload = {"stat": "OK", "date": "20260716", "fields": [], "data": []}
@@ -334,12 +603,21 @@ class IncrementalFetchTest(unittest.TestCase):
         self.ids = ["2330", "2454"]
         for day in ("2026-07-08", "2026-07-09"):
             for sid in self.ids:
-                self.con.execute("INSERT INTO price VALUES(?,?,?,?,?,?,?,?)",
+                self.con.execute(
+                    "INSERT INTO price(date,stock_id,open,high,low,close,volume,amount) "
+                    "VALUES(?,?,?,?,?,?,?,?)",
                                  (day, sid, 1, 2, 1, 2, 100, 200))
-                self.con.execute("INSERT INTO inst VALUES(?,?,?,?,?)", (day, sid, 1, 2, 3))
-                self.con.execute("INSERT INTO margin VALUES(?,?,?,?)", (day, sid, 10, 1))
-                self.con.execute("INSERT INTO holding VALUES(?,?,?,?)", (day, sid, 20, 1000))
-                self.con.execute("INSERT INTO sbl VALUES(?,?,?)", (day, sid, 10))
+                self.con.execute(
+                    "INSERT INTO inst(date,stock_id,foreign_net,trust_net,dealer_net) "
+                    "VALUES(?,?,?,?,?)", (day, sid, 1, 2, 3))
+                self.con.execute(
+                    "INSERT INTO margin(date,stock_id,margin_bal,short_bal) VALUES(?,?,?,?)",
+                    (day, sid, 10, 1))
+                self.con.execute(
+                    "INSERT INTO holding(date,stock_id,foreign_pct,shares_issued) VALUES(?,?,?,?)",
+                    (day, sid, 20, 1000))
+                self.con.execute(
+                    "INSERT INTO sbl(date,stock_id,sbl_bal) VALUES(?,?,?)", (day, sid, 10))
         self.con.commit()
         self.calls = []
         self.price_calls = []

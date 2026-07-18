@@ -2,6 +2,25 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## P0 官方原始欄位擴充與 market_index — 2026-07-19
+
+**策略規則零變動**（`score.py` 權重／tier、`fetch_daily.py` 族群／市場條件與
+`validate.py` 的 `IS_CUTOFF` 皆未動）。新增資料先留在原始／觀察層：
+
+- 五張既有表保留同一主鍵並擴充官方回應原本已提供、先前丟棄的欄位：`price.trades`；
+  `inst` 外資／投信買賣與自營自行／避險分項；`margin` 融資券流量、現金／現券償還、
+  限額與資券互抵；`holding` 外資持有／尚可投資股數、比率及法令上限；`sbl` 前餘額、
+  賣出、還券、調整與次日限額。五表呼叫數仍是完整新日 10 次。
+- 新增 `market_index(date,market,index_key,index_name,index_type,close)`：TWSE 同一份
+  `MI_INDEX` 順手保留全部報酬指數（零額外請求）；TPEx `tpex_reward_index` 每日最多
+  1 次並按最新日缺口冪等補入當月櫃買報酬指數。此表非阻斷、不取代 FinMind `market`，
+  暫不餵 `market_daily`／regime／分數／tier。
+- `ensure_schema()` 以 `PRAGMA table_info`＋`ALTER TABLE ADD COLUMN` 原地升級 repo 既有
+  SQLite，保留舊列與舊值；所有 raw upsert 改用明確欄名，避免新舊 DB 欄位順序造成錯寫。
+- 2026-07-17 官方端點記憶體 DB 驗收：五表均 121/121，29 個新增欄位逐欄皆 121/121
+  非空；`market_index` 為 TWSE 129 條＋TPEx 1 條。migration、雙市場欄位位置、upsert、
+  checkpoint 與 market_index 補缺／冪等均有單元測試。
+
 ## 質化複核機器輔助 triage 與領先假說多空觀點 — 2026-07-18
 
 **量化策略規則零變動**;本次只優化人工研究層的複核效率與領先假說資料豐富度,

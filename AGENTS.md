@@ -63,6 +63,8 @@ fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token)→ tdcc_h
 fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件/指數/參考個股
                  → 還原價(除權息/分割自算)→ 五元素+觀察欄 → 族群層聚合
                  ⚠ 每張待補表每交易日各呼叫 TWSE/TPEx 一次；五表完整新日共 10 次免 token
+                 ⚠ market_index:TWSE 報酬指數沿用價格 MI_INDEX；TPEx 當月報酬指數 +1 req
+                   屬非阻斷觀察層，不取代 FinMind market、不進 regime/評分/發布門檻
                  ⚠ 20:17 只落地價格/法人 checkpoint；23:40 final pass 補三表、刷新 holding
                  ⚠ 另直抓 TWSE/TPEx 處置/注意股票旗標；日誌批次 0 次=缺口已完整、非失敗
                  日誌/API 次數/斷點續跑判讀見 README「Daily Fetch 日誌判讀與續跑語意」
@@ -84,7 +86,9 @@ qual_review.py   focused_v1 機器輔助複核 triage(唯讀):claim 數字對 ci
                  → tmp/qualitative_review/;HARD=缺頁/缺檔,未解決不得簽核;非簽核依據
 ```
 
-資料表:原始 price/inst/margin/holding/sbl(借券餘額,單位=股)+ tdcc_holding(週頻)+
+資料表:原始 price(含成交筆數)/inst(買賣分項)/margin(流量與限額)/holding(持股股數、
+可投資餘額與上限)/sbl(借券流量、調整、餘額與限額；單位=股)+ market_index(交易所
+官方報酬指數,觀察層)+ tdcc_holding(週頻)+
 risk_flags(TWSE/TPEx 處置/注意公告)(依主鍵冪等 upsert；holding 當日初版只在 23:40
 final pass 刷新一次)+ 衍生
 price_adj/daily_metrics/daily_scores/group_metrics/market_daily(每次重建)。
