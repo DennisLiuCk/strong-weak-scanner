@@ -25,6 +25,7 @@
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
 | 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` + `scripts/qual_review.py`(複核 triage) |
 | 領先假說收錄/複核/多空小作文 | `LEADING_HYPOTHESES.md` + `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` + `scripts/leading_hypotheses.py`(`--context` 產量化背景) |
+| 每季台積電法說會後,更新事件錨點與專區指引 | README「事件錨點與台積電專區」+ `scripts/qual_notes.py --lint` |
 
 ## 鐵律
 
@@ -50,6 +51,9 @@
   focused 簽核的 `review_method` 固定填 `offline_evidence_pack_independent_recalculation`。
 - 每完成一篇 `independently_verified` 就只把該 note 與對應 evidence manifest 做成一個
   獨立 commit;不可累積三篇或多篇後一起提交。PDF/PNG pack 留在 `tmp/`,不得進版控。
+- **`CLAUDE.md` 與 `AGENTS.md` 內容必須完全相同**——改任一檔就同步另一檔,改完
+  `diff CLAUDE.md AGENTS.md` 確認為空(兩檔曾被不同 session 各自更新而分岔,
+  導致後續 agent 讀到的入口文件缺關鍵規範)。
 
 ## 架構速覽
 
@@ -62,11 +66,14 @@ fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件
                  ⚠ 20:17 只落地價格/法人 checkpoint；23:40 final pass 補三表、刷新 holding
                  ⚠ 另直抓 TWSE/TPEx 處置/注意股票旗標；日誌批次 0 次=缺口已完整、非失敗
                  日誌/API 次數/斷點續跑判讀見 README「Daily Fetch 日誌判讀與續跑語意」
+                 另抓觀察層參考個股 REF_IDS(2330)收盤/外資持股 → ref_price/ref_holding 隔離表
 fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現金流量表)
                  → month_revenue/financials/balance_sheet/cash_flow;獨立月/季排程,不掛每日管線
+                 範圍 = universe + REF_IDS(2330,供台積電專區)
 score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
                  archive 同資料日首次建立後不覆寫;本地重跑只更新 index.html
+                 含台積電專區(觀察層):ref 表+fund_map[2330]+事件錨點 → __TSMC_JSON__
 validate.py      → reports/ 週報(§⑥=觀察因子 IC)
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
 qual_notes.py    notes/qualitative/*.md(年報MD&A/法說會重點,人工撰寫)狀態追蹤+骨架建立
@@ -91,3 +98,9 @@ financials/balance_sheet/cash_flow 是 FinMind 原生 type/value 窄表(EAV),非
 **`notes/qualitative/*.md`(2026-07-09 起)也是另一類**——年報 MD&A、法說會重點,人工
 撰寫(非 FinMind、零自動抓取),供理解個股業務/商業模式用;`build_dashboard.py` 讀 meta
 區塊把「最後更新/建議複核」狀態顯示成儀表板個股列的筆記 badge,點擊連到 GitHub 全文。
+**ref_price/ref_holding 與 `notes/events/*.md`(2026-07-17 起)也是另一類**——台積電專區
+(觀察層)的原料:前者是每日 FinMind 2330 收盤/外資持股隔離表(範圍旋鈕 =
+`fetch_daily.py` 的 REF_IDS,不進任何衍生表、不併入 data_changed);後者是跨個股市場
+事件錨點(法說會彙整,人工撰寫 + machine-readable meta,guidance 鍵逐一對應正式族群的
+方向指引),`qual_notes.load_events()` 讀取、`build_dashboard.py` 顯示成主頁台積電專區
+與族群卡指引 chip;每季法說後人工更新,`qual_notes.py --lint` 稽核格式(CI 同步跑)。

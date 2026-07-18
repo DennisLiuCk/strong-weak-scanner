@@ -16,14 +16,15 @@ __pycache__/
 venv/
 .uv/
 
-# focused_v1 質化研究的本機 evidence pack；只提交 notes/qualitative/evidence/ manifest
-tmp/qualitative_evidence/
+# 本機工作區(evidence pack、複核 triage、臨時輸出);只提交 notes/qualitative/evidence/ manifest
+tmp/
 
 # ── OS / 編輯器 ──
 Thumbs.db
 .DS_Store
 *.swp
 *~
+.idea/
 
 # 注意:data/findmind.db 是刻意版控的 —— 方案 A 靠它跨天累積狀態。
 # 若日後嫌二進位 db 讓 repo 變大,可改成只 commit CSV 匯出。
