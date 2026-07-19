@@ -9,8 +9,8 @@
 - 術語 glossary(appendGlossary)
 - MA/RSI/VOL 教學區(technical-guide)
 - 圖表節點 tooltip 與鍵盤左右鍵導覽(bindChartNode/registerChartKeyboard)
-- 觀察層 flow badge(交易/部位觀察指南;payload 仍每日產出,見
-  test_observation_dashboard.py)
+(官方資料數據解剖已於 2026-07-19 以 flowSection+#flow-guide 回補,契約見
+ test_observation_dashboard.py)
 """
 import sys
 import unittest
@@ -46,7 +46,7 @@ class DashboardUxContractTest(unittest.TestCase):
 
     def test_quicknav_reaches_every_section(self):
         self.assertIn('aria-label="快速導覽"', self.template)
-        for anchor in ("ov", "tsmc", "grp", "tier", "stocks"):
+        for anchor in ("ov", "tsmc", "grp", "tier", "stocks", "flow-guide"):
             self.assertIn(f'href="#{anchor}"', self.template)
             self.assertIn(f'<section id="{anchor}"', self.template)
         # 個股詳情只由點列開抽屜,不再有底部常駐展示區(設計稿 demo 殘留,已移除)

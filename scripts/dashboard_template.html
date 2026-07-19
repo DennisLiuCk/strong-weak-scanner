@@ -121,6 +121,12 @@ svg{display:block;overflow:visible}
 .stepgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
 .hscroll{overflow-x:auto}
 .hscroll>*{min-width:640px}
+.gguide{display:grid;grid-template-columns:1fr 1fr;gap:10px 30px}
+@media (max-width:900px){.gguide{grid-template-columns:1fr}}
+.dl{margin:0}
+.dl dt{font-size:12.5px;font-weight:700;margin-top:12px}
+.dl dd{margin:2px 0 0;font-size:12px;color:var(--ink2);line-height:1.65}
+.dl .f{display:block;font-family:'IBM Plex Mono',Consolas,ui-monospace,monospace;font-size:11px;color:var(--teal);margin-bottom:2px}
 @media (max-width:1240px){.wrap{padding:32px 22px 90px}}
 @media (max-width:1000px){.fgrid{grid-template-columns:1fr 1fr}.dgrid{grid-template-columns:1fr}}
 @media (max-width:900px){.srow{grid-template-columns:34px minmax(150px,1fr) minmax(200px,1fr)}.srow>*:nth-child(4){grid-column:2/-1}}
@@ -152,7 +158,7 @@ svg{display:block;overflow:visible}
     <h1>__H1__</h1>
     <p class="sub">每個交易日收盤後，把同族群個股放上同一把尺：比較價格與抗跌、法人原始買賣及其同業位置、融資槓桿，再依公開規則分層。每個分數都可點開，看原始數據與判讀；資料來源見頁尾。</p>
     <nav class="quicknav" aria-label="快速導覽">
-      <a href="#ov">今日重點</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a>
+      <a href="#ov">今日重點</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
     </nav>
   </header>
 
@@ -163,6 +169,36 @@ svg{display:block;overflow:visible}
     <section id="grp" class="blk"></section>
     <section id="tier" class="blk"></section>
     <section id="stocks" class="blk"></section>
+
+    <section id="flow-guide" class="blk">
+      <p class="kicker">觀察層 · 不計分</p>
+      <h2 class="sec">交易／部位觀察指南 · 官方資料怎麼讀</h2>
+      <p class="lead">這組數字回答「今天的成交與部位是怎麼形成」，不回答「明天一定漲或跌」。點開個股或族群明細裡的「數據解剖」，可看到當日實際數字、公式與有效樣本。</p>
+      <div class="card" style="padding:24px 26px">
+        <div class="gguide">
+          <div>
+            <h3 class="sub3">先看交易與法人</h3>
+            <dl class="dl">
+              <dt>平均每筆成交</dt><dd><span class="f">成交量／成交筆數；成交金額／成交筆數</span>把量增拆成「筆數變多」或「平均單筆變大」。成交筆數不是投資人帳戶數，不能據此認定散戶或法人增加。</dd>
+              <dt>法人方向強度</dt><dd><span class="f">(買進−賣出)／(買進＋賣出)，範圍−100%～+100%</span>+100%代表只有買進，−100%代表只有賣出，0%代表買賣相等。同樣淨買超，低方向強度可能只是雙向交易都很大。</dd>
+              <dt>法人總活動占比</dt><dd><span class="f">四類法人買進＋賣出／(2×成交量)</span>市場每筆成交同時有買賣兩側，因此分母要乘2。高占比只說法人參與多，方向仍要回頭看方向強度。</dd>
+              <dt>自營自行／避險</dt><dd><span class="f">自行買賣與避險分開列示</span>自行較接近方向性庫存；避險可能來自權證、ETF或套利。避險淨賣不能直接解讀為自營商看空。</dd>
+            </dl>
+          </div>
+          <div>
+            <h3 class="sub3">再看部位、限額與市場基準</h3>
+            <dl class="dl">
+              <dt>融資餘額來源</dt><dd><span class="f">今日餘額−同一份官方日報的前日餘額＝資買−資賣−現償</span>分辨融資下降是賣出部位，還是用現金償還；融券則是券賣−券買−券償。採用日報內的前日餘額，可納入交易所對基期的調整。</dd>
+              <dt>官方信用限額</dt><dd><span class="f">融資／融券餘額÷交易所公告限額</span>描述信用額度使用程度；不同於既有「散戶水位」的融資餘額÷發行股數。</dd>
+              <dt>外資法令空間</dt><dd><span class="f">外資持股÷法令容許股數；另列尚可投資股數</span>接近100%表示法規空間較少，不代表外資必然繼續買進或賣出。</dd>
+              <dt>借券賣出拆解</dt><dd><span class="f">新增賣出−還券＋調整＝餘額變動</span>若變化主要來自「調整」，不應直接當成空方新部位；今天的新增賣出應對照昨天公告的次日限額。</dd>
+              <dt>官方指數超額報酬</dt><dd><span class="f">個股還原報酬−同市場官方含息指數報酬</span>上市股扣TWSE、上櫃股扣TPEx；正值表示跑贏市場。族群先逐檔扣除各自基準，再取中位，避免上市／上櫃混合造成偏差。</dd>
+            </dl>
+          </div>
+        </div>
+        <p style="margin:18px 0 0;font-size:12px;color:var(--ink2);line-height:1.7"><b>建議順序：</b>方向強度回答「買賣哪一側較多」→ 活動占比回答「法人參與多少」→ 流量恆等式回答「餘額為何改變」→ 限額回答「空間還有多少」→ 超額報酬回答「扣除市場後是否仍跑贏」。缺值顯示「-」，代表資料或所需歷史不足，不代表0。</p>
+      </div>
+    </section>
   </main>
 
   <footer style="margin:86px 0 0;border-top:1px solid var(--line);padding-top:18px">
@@ -549,6 +585,8 @@ function openGroupSheet(g){
       h('span',{text:g.dur}),h('span',{style:'color:var(--teal)',text:'籌碼健 '+g.chip.health}),h('span',{text:'中性 '+g.chip.neutral}),h('span',{style:'color:var(--amber)',text:'待觀察 '+g.chip.warn})),
     h('div',{style:'margin:14px 0 2px'},h('div',{style:'font-size:11px;color:var(--muted);margin-bottom:4px',text:'20日動能 vs 全體 · 近 30 個交易日（高＝跑贏）'}),spark(g.trend.rel,300,42,'var(--ink)',0)),
     h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'族群五項指標'}),statList];
+  const gfs=flowSection(g.flow);
+  if(gfs)body.push(h('div',{style:'margin-top:10px;border-top:1px solid var(--line)'},gfs));
   sheetEl.replaceChildren(...body); showSheet();
 }
 
@@ -629,6 +667,24 @@ function narrativeBlock(nar){
   w.appendChild(h('div',{style:'height:1px;background:var(--line);margin:18px 0'}));
   return w;
 }
+function flowSection(f){ if(!f||!f.rows||!f.rows.length)return null;
+  const list=h('div',{});
+  f.rows.forEach(r=>list.appendChild(h('div',{style:'padding:10px 0;border-top:1px solid var(--line2)'},
+    h('div',{style:'display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap'},
+      h('span',{style:'font-size:12.5px;font-weight:700;flex:0 0 auto',text:r[0]}),
+      h('span',{class:'mono',style:'font-size:12px;color:var(--ink);text-align:right',text:r[1]})),
+    h('div',{style:'font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:3px',text:r[2]}))));
+  const body=h('div',{style:'padding:0 0 12px'});
+  if(f.why)body.appendChild(h('p',{style:'margin:0 0 4px;font-size:12px;color:var(--ink2);line-height:1.65',text:f.why}));
+  body.appendChild(list);
+  if(f.how)body.appendChild(h('p',{style:'margin:10px 0 0;font-size:11.5px;color:var(--ink2);line-height:1.6'},h('b',{text:(f.howLabel||'怎麼讀')+'：'}),f.how));
+  if(f.src)body.appendChild(h('p',{class:'mono',style:'margin:8px 0 0;font-size:10px;color:var(--muted);line-height:1.5',text:'來源：'+f.src}));
+  body.appendChild(h('a',{href:f.howHref||'#flow-guide',onclick:closeSheet,style:'display:inline-block;margin-top:8px;font-size:12px;font-weight:700',text:(f.howLink||'交易／部位觀察指南')+' →'}));
+  return h('details',{class:'nbsec'},
+    h('summary',{style:'cursor:pointer;font-size:13.5px;font-weight:800;color:var(--ink);padding:11px 0'},
+      '數據解剖 · 交易與部位怎麼形成 ',
+      h('span',{class:'chip',style:'color:var(--muted);background:var(--neubg)',text:f.scLabel||'觀察層 · 不計分'})),
+    body); }
 function noteVerifyMeta(n){ const col=n.cls==='independently_verified'?'var(--teal)':n.cls==='conflicted'?'var(--amber)':'var(--muted)';
   return {label:(n.cls==='independently_verified'?'✓ ':'')+n.label, col,
     scope:n.reviewScope==='all_material_claims'?'全部重要主張':(n.reviewScope&&n.reviewScope!=='-'?n.reviewScope:'—')}; }
@@ -712,6 +768,8 @@ function buildDetail(){
           h('div',{style:'margin:4px 0 12px'},meter(d.tech.rsi/100,130,12,(d.tech.rsi>=70||d.tech.rsi<=30)?'var(--amber)':'var(--teal)')),
           h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:8px'},h('span',{style:'font-size:12px;color:var(--ink2)',text:'量比（vs 20日均量）'}),h('span',{class:'mono',style:'font-size:12.5px;font-weight:600',text:d.tech.vr20+'×'})),
           h('div',{style:'margin-top:4px'},meter(Math.min(d.tech.vr20/3,1),130,12,'var(--muted)'))))));
+  const fs=flowSection(d.flow);
+  if(fs)card.appendChild(h('div',{style:'margin-top:24px;border-top:1px solid var(--line)'},fs));
   if(d.note)card.appendChild(researchTabs(d));
   return card;
 }

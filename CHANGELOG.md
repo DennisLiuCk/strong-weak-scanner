@@ -32,8 +32,12 @@
   卡片頂部僅保留一句話結論(結論先行 → 依據攤開的分層)。
 - `tests/test_dashboard_ux_contract.py` 對齊新模板全面改寫(builder 側、策略凍結、
   公開文案、2330 觀察層鐵律斷言原樣保留);全套 193 tests 綠。**明示放棄待議**:
-  術語 glossary、MA/RSI 教學區、圖表節點 tooltip/鍵盤導覽、觀察層 flow badge UI
-  (payload 仍每日產出,`#flow-guide` howHref 為 inert 資料欄)。
+  術語 glossary、MA/RSI 教學區、圖表節點 tooltip/鍵盤導覽。
+- 官方資料數據解剖(183a8f1 引入)以新設計回補:`flowSection` 把個股/族群 flow
+  payload(rows 標籤/數值/公式白話 + why/how/來源)渲染成抽屜內可折疊段,個股在
+  詳情卡研究面板前、族群在五項指標後,均標「觀察層 · 不計分」;頁尾前恢復
+  `#flow-guide` 交易/部位觀察指南(9 條公式原文自舊版移植),快速導覽同步加錨點。
+  test_observation_dashboard.py 恢復模板 marker 契約。
 
 ## 官方資料數據解剖觀察層 — 2026-07-19
 

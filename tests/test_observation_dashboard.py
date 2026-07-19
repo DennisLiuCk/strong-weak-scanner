@@ -109,11 +109,18 @@ class ObservationDashboardTest(unittest.TestCase):
         self.assertIn("20日 5/9", text)
         self.assertIn("有效樣本少於6檔就留白", payload["how"])
 
-    def test_observation_payload_builders_stay_wired(self):
-        # 2026-07-19 redesign 後,flow badge UI(交易/部位觀察指南)尚未移植——
-        # payload 仍每日產出並注入 DATA/GROUPS,待回補 UI 時恢復模板 marker 斷言
-        # (原斷言見 git 歷史 183a8f1 之前版本)。
+    def test_template_exposes_observation_anatomy_and_guide(self):
+        # 2026-07-19 redesign 版:數據解剖以可折疊段呈現在個股詳情卡與族群抽屜,
+        # 指南區 #flow-guide 移到主頁尾段;payload 契約(rows/why/how/src)不變。
+        template = (SCRIPTS / "dashboard_template.html").read_text(encoding="utf-8")
         builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
+        for marker in (
+            'id="flow-guide"', "交易／部位觀察指南", "法人方向強度",
+            "法人總活動占比", "官方指數超額報酬",
+            "function flowSection(f)", "flowSection(d.flow)", "flowSection(g.flow)",
+            "數據解剖 · 交易與部位怎麼形成",
+        ):
+            self.assertIn(marker, template)
         self.assertIn("build_observation_view(observation)", builder)
         self.assertIn("build_group_observation_view", builder)
         self.assertIn('obj["flow"]', builder)
