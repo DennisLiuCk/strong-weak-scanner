@@ -1113,8 +1113,6 @@ function buildDetail(){
       h('div',{},
         h('section',{style:'margin-bottom:26px'},h('h3',{class:'sub3',text:'為什麼是這個分數 · 七因子拆解'}),
           h('p',{style:'margin:0 0 14px;font-size:12px;color:var(--muted)',html:'條長＝元素分相對位置（<b style="color:var(--strong)">右紅為正</b>／<b style="color:var(--weak)">左綠為負</b>）；權重 0 只作為分層條件。<b style="color:var(--ink)">點任一列</b>看該維原始數字、門檻與判讀。'}),fac),
-        t&&h('section',{style:'margin-bottom:26px'},price,
-          h('p',{style:'margin:8px 0 0;font-size:11.5px;color:var(--muted);line-height:1.6',text:d.tech.why})),
         (d.fund&&d.fund.spark&&d.fund.spark.length)&&h('section',{},h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px'},h('h3',{class:'sub3',text:'單月營收 · 近 13 個月'}),h('span',{style:`font-size:12.5px;font-weight:700;color:${yoyCol}`,text:'YoY '+yoy})),
           h('div',{style:'background:var(--inset);border:1px solid var(--line2);border-radius:12px;padding:12px 12px 8px'},bars(d.fund.spark,520,80,yoyCol),
             h('div',{class:'mono',style:'display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:4px'},h('span',{text:d.fund.sparkDates[0]}),h('span',{text:d.fund.sparkDates[d.fund.sparkDates.length-1]+'（最新 '+latest+'）'}))))),
@@ -1126,7 +1124,9 @@ function buildDetail(){
           h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:8px'},h('span',{style:'font-size:12px;color:var(--ink2)',text:'RSI14'}),h('span',{class:'mono',style:'font-size:12.5px;font-weight:600',text:d.tech.rsi})),
           h('div',{style:'margin:4px 0 12px'},meter(d.tech.rsi/100,130,12,(d.tech.rsi>=70||d.tech.rsi<=30)?'var(--amber)':'var(--teal)')),
           h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:8px'},h('span',{style:'font-size:12px;color:var(--ink2)',text:'量比（vs 20日均量）'}),h('span',{class:'mono',style:'font-size:12.5px;font-weight:600',text:d.tech.vr20+'×'})),
-          h('div',{style:'margin-top:4px'},meter(Math.min(d.tech.vr20/3,1),130,12,'var(--muted)'))))));
+          h('div',{style:'margin-top:4px'},meter(Math.min(d.tech.vr20/3,1),130,12,'var(--muted)'))))),
+    t&&h('section',{style:'margin-top:8px'},price,
+      h('p',{style:'margin:8px 0 0;font-size:11.5px;color:var(--muted);line-height:1.6',text:d.tech.why})));
   const fs=flowSection(d.flow);
   if(fs)card.appendChild(h('div',{style:'margin-top:24px;border-top:1px solid var(--line)'},fs));
   if(d.note)card.appendChild(researchTabs(d));

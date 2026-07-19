@@ -150,7 +150,8 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("const COMP_MAX=2*Object.values(WEIGHTS)", self.template)
         self.assertNotIn("8.8", self.template)
         # 趨勢標籤與營收 YoY 的顏色跟著資料方向走,不得沿用設計稿 demo 股的寫死色
-        self.assertIn("d.tech.cls==='up'?'var(--strong)'", self.template)
+        # (趨勢標籤自 1f 起在 priceChart() 內渲染,tech 為其參數)
+        self.assertIn("tech.cls==='up'?'var(--strong)'", self.template)
         self.assertIn("String(yoy).trim().startsWith('-')?'var(--weak)'", self.template)
         for label in ("①相對強弱", "①抗跌", "②量", "③外資", "③修正日買賣",
                       "④投信", "⑤融資券"):
@@ -194,9 +195,11 @@ class DashboardUxContractTest(unittest.TestCase):
         for marker in ("--ma5:#b26a12", "--ma20:#0b66b2", "--ma60:#6f4ba8",   # light
                        "--ma5:#ff9d4d", "--ma20:#62b5ff", "--ma60:#c4a7ff"):  # dark
             self.assertIn(marker, self.template)
-        # 圖例帶文字標籤與數值,不只靠顏色
-        self.assertIn("h('span',{text:s.label+' '}),h('b',{class:'mono',text:s.value})",
+        # 圖例帶文字標籤與數值,不只靠顏色(1f 起圖例=priceChart 的指標 chip:
+        # 色塊+文字標籤+最新值,勾選狀態另以 ✓ 雙編碼)
+        self.assertIn("h('span',{class:'mono',style:'font-size:10.5px;color:var(--muted)'}, val)",
                       self.template)
+        self.assertIn("onx?'✓':''", self.template)
 
     # ---------- 策略凍結(原樣保留) ----------
 
