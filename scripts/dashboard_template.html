@@ -374,7 +374,7 @@ function buildGroup(){
     {k:'dip',label:'修正日外資',hint:'下跌日淨買/賣',fmt:v=>(v>=0?'淨買 ':'淨賣 ')+Math.abs(v).toFixed(2)+'%'},
     {k:'breadth_f',label:'外資廣度',hint:'多少檔被增持',fmt:v=>Math.round(v*100)+'%'},
     {k:'rel20',label:'20日動能',hint:'贏/輸全市場',fmt:v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1)+'%'},
-    {k:'dist60',label:'距60日高',hint:'離高點多遠',fmt:v=>v.toFixed(0)+'%'},
+    {k:'dist60',label:'距60日高',hint:'離高點多遠',fmt:v=>(v*100).toFixed(1)+'%'},
     {k:'breadth_t',label:'投信廣度',hint:'多少檔被買超',fmt:v=>Math.round(v*100)+'%'}];
   const sorted={}; metrics.forEach(m=>sorted[m.k]=G.map(g=>g.heat[m.k][0]).sort((a,b)=>b-a));
   const rankClass=(v,arr)=>{const q=arr.indexOf(v)/(arr.length-1); return q<=0.18?'var(--strongbg2)':q<=0.38?'var(--strongbg)':q<=0.62?'var(--neubg)':q<=0.82?'var(--weakbg)':'var(--weakbg2)';};

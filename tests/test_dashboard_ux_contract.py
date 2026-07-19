@@ -102,6 +102,9 @@ class DashboardUxContractTest(unittest.TestCase):
         # 族群數動態帶入,不得寫死
         self.assertIn("${G.length} 族群", self.template)
         self.assertNotIn("11 族群", self.template)
+        # dist60 是小數(−0.36=−36%),顯示必須 ×100——設計稿 demo 資料曾假設已是百分比
+        self.assertIn("{k:'dist60',label:'距60日高',hint:'離高點多遠',fmt:v=>(v*100).toFixed(1)+'%'}",
+                      self.template)
         for marker in ('"heat": {', '"states": states', '"lastChange": last_change',
                        'html.replace("__TIER_FLOW_JSON__"'):
             self.assertIn(marker, self.builder)
