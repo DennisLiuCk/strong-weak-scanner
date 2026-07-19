@@ -51,7 +51,13 @@ class DashboardUxContractTest(unittest.TestCase):
             self.assertIn(f'<section id="{anchor}"', self.template)
         # 個股詳情只由點列開抽屜,不再有底部常駐展示區(設計稿 demo 殘留,已移除)
         self.assertNotIn('<section id="detail"', self.template)
-        self.assertNotIn("畫面 5", self.template)
+        # 提案文件的螢幕編號/選項徽章不得出現在正式版面
+        for artifact in ("畫面 1", "畫面 2", "畫面 3", "畫面 4", "畫面 5",
+                         "optHead(", "badgeid", "最白話"):
+            self.assertNotIn(artifact, self.template)
+        # header kicker 用動態範圍詞,不與 __H1__ 重複同文
+        self.assertIn('<p class="kicker" style="color:var(--strong)">__SCOPE__</p>',
+                      self.template)
 
     # ---------- 資料契約:placeholder 注入與 adapter ----------
 
@@ -59,7 +65,8 @@ class DashboardUxContractTest(unittest.TestCase):
         pairs = ("__DATA_JSON__", "__GROUPS_JSON__", "__TIERS_JSON__",
                  "__TIER_FLOW_JSON__", "__OVERVIEW_JSON__", "__GRPMETA_JSON__",
                  "__WEIGHTS_JSON__", "__THRESH_JSON__", "__TSMC_JSON__",
-                 "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__")
+                 "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__",
+                 "__SCOPE__")
         for ph in pairs:
             self.assertIn(ph, self.template)
             self.assertIn(f'"{ph}"', self.builder)
@@ -92,6 +99,9 @@ class DashboardUxContractTest(unittest.TestCase):
         # 熱圖五欄對應 builder 的族群 heat payload
         for key in ("'dip'", "'breadth_f'", "'rel20'", "'dist60'", "'breadth_t'"):
             self.assertIn(key, self.template)
+        # 族群數動態帶入,不得寫死
+        self.assertIn("${G.length} 族群", self.template)
+        self.assertNotIn("11 族群", self.template)
         for marker in ('"heat": {', '"states": states', '"lastChange": last_change',
                        'html.replace("__TIER_FLOW_JSON__"'):
             self.assertIn(marker, self.builder)
@@ -129,6 +139,12 @@ class DashboardUxContractTest(unittest.TestCase):
                        "(d.tech||{}).chart", "d.note&&h(",
                        "if(d.note)card.appendChild(researchTabs(d));"):
             self.assertIn(marker, self.template)
+        # 綜合分尺度由注入的 WEIGHTS 導出,不得寫死(改權重時長條刻度須自動跟上)
+        self.assertIn("const COMP_MAX=2*Object.values(WEIGHTS)", self.template)
+        self.assertNotIn("8.8", self.template)
+        # 趨勢標籤與營收 YoY 的顏色跟著資料方向走,不得沿用設計稿 demo 股的寫死色
+        self.assertIn("d.tech.cls==='up'?'var(--strong)'", self.template)
+        self.assertIn("String(yoy).trim().startsWith('-')?'var(--weak)'", self.template)
         for label in ("①相對強弱", "①抗跌", "②量", "③外資", "③修正日買賣",
                       "④投信", "⑤融資券"):
             self.assertIn(f'"label": "{label}"', self.builder)
@@ -215,6 +231,10 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("TSMC=__TSMC_JSON__", self.template)
         self.assertIn("上游錨點 · 觀察層（不計分）", self.template)
         self.assertIn("不在掃描範圍、不參與任何排名與評分", self.template)
+        # 期別與查核狀態 chip 一律吃事件錨點資料,不得寫死
+        self.assertIn("'台積電官方 IR · '+T.quarter", self.template)
+        self.assertNotIn("2026 Q2", self.template)
+        self.assertIn("scMap[T.status]", self.template)
         self.assertIn('html.replace("__TSMC_JSON__"', self.builder)
         self.assertIn("load_events", self.builder)
         self.assertIn("ref_price", self.builder)
@@ -255,6 +275,8 @@ class DashboardUxContractTest(unittest.TestCase):
             "營收不等於獲利",
         ):
             self.assertIn(guardrail, public_copy)
+        # 頁尾必須有資料來源說明(header sub 的承諾要有對應落點)
+        self.assertIn("資料來源：TWSE／TPEx 官方每日批次與公告", self.template)
 
     # ---------- 筆記查核狀態:動態呈現,不得寫死「已核驗」 ----------
 
