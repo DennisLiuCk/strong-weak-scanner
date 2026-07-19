@@ -730,16 +730,90 @@ function researchTabs(d){
   const sel=n=>{ noteTab.setAttribute('aria-selected',n); hypTab.setAttribute('aria-selected',!n); notePanel.classList.toggle('hide',!n); hypPanel.classList.toggle('hide',n); };
   noteTab.addEventListener('click',()=>sel(true)); hypTab.addEventListener('click',()=>sel(false)); sel(true);
   return wrap; }
+/* ---- F1/F3：七因子 → cell 明細（rows / 判讀 / 原始方向 / 依據 / 量尺）---- */
+// 7 因子對映到 build_cells 的 5 格：①價與抗跌共用 cell0；③外資與修正日買賣共用 cell2
+const FAC2CELL = {price:0, resil:0, vol:1, foreign:2, dip:2, trust:3, margin:4};
+
+function _chip2(t, col, bg){
+  return h('span',{style:`font-size:10.5px;font-weight:700;color:${col};background:${bg};`
+    +'border-radius:100px;padding:3px 10px'}, t);
+}
+function _rpBar(rp){                       // rp=[val, lo, hi, mark, label?]，值多為 %（已×100）
+  const [val, lo, hi, mark, label] = rp;
+  const span=(hi-lo)||1, at=x=>Math.max(0,Math.min(100,(x-lo)/span*100)).toFixed(1);
+  const f=n=>(Math.round(n*10)/10)+'%';
+  return h('div',{style:'margin:7px 0 3px'},
+    h('div',{style:'position:relative;height:8px;background:var(--track);border-radius:4px'},
+      h('div',{style:`position:absolute;left:${at(mark)}%;top:-3px;bottom:-3px;width:2px;background:var(--amber)`}),
+      h('div',{style:`position:absolute;left:${at(val)}%;top:-3px;width:9px;height:14px;`
+        +'transform:translateX(-50%);border-radius:3px;background:var(--strong);border:2px solid var(--card)'})),
+    h('div',{class:'mono',style:'display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:4px'},
+      h('span',{text:f(lo)}), h('span',{style:'color:var(--amber)',text:label||f(mark)}), h('span',{text:f(hi)})));
+}
+function _gfxBar(cell, ci){                // ②量比(ci=1) / ⑤融資水位(ci=4) 的門檻量尺
+  const v = cell[7]; if(v==null) return null;
+  const draw=(lo,hi,marks,fmt,cap)=>{
+    const span=(hi-lo)||1, at=x=>Math.max(0,Math.min(100,(x-lo)/span*100)).toFixed(1);
+    const bar=h('div',{style:'position:relative;height:8px;background:var(--track);border-radius:4px'},
+      h('div',{style:`position:absolute;left:0;top:0;bottom:0;width:${at(v)}%;background:var(--teal);opacity:.55;border-radius:4px`}));
+    marks.forEach(m=>bar.appendChild(h('div',{style:`position:absolute;left:${at(m[0])}%;top:-3px;bottom:-3px;width:2px;background:${m[2]}`})));
+    const lb=h('div',{class:'mono',style:'display:flex;justify-content:space-between;gap:6px;font-size:9.5px;color:var(--muted);margin-top:4px'},
+      h('span',{text:fmt(lo)}));
+    marks.forEach(m=>lb.appendChild(h('span',{style:`color:${m[2]}`,text:m[1]+' '+fmt(m[0])})));
+    lb.appendChild(h('span',{text:fmt(hi)}));
+    return h('div',{style:'margin:9px 0 2px'},
+      h('div',{style:'font-size:10.5px;color:var(--muted);margin-bottom:4px',text:cap+'（目前 '+fmt(v)+'）'}), bar, lb);
+  };
+  if(ci===1) return draw(0, Math.max(THRESH.volr_overheat*1.15, v*1.1),
+    [[THRESH.volr_active[0],'健康','var(--teal)'],[THRESH.volr_overheat,'爆量','var(--strong)']],
+    x=>x.toFixed(1)+'×', '量比 vs 門檻');
+  if(ci===4) return draw(0, Math.max(THRESH.margin_hot*1.4, v*1.15),
+    [[THRESH.margin_mid,'中段','var(--amber)'],[THRESH.margin_hot,'過熱','var(--strong)']],
+    x=>x.toFixed(1)+'%', '融資水位 vs 門檻');
+  return null;
+}
+function cellDetail(cell, ci){
+  if(!cell) return h('div',{});
+  const rows=cell[2]||[], reading=cell[3], current=cell[5], basis=cell[6], sc=cell[0];
+  const box=h('div',{style:'background:var(--inset);border-radius:11px;padding:13px 15px'});
+  rows.forEach(r=>{
+    const last=r[r.length-1];
+    const rp=(last && typeof last==='object' && last.rp) ? last.rp : null;
+    box.appendChild(h('div',{style:'padding:5px 0'},
+      h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:12px'},
+        h('span',{style:'font-size:12px;color:var(--ink2);line-height:1.45',text:r[0]}),
+        h('span',{class:'mono',style:'font-size:12px;color:var(--ink);text-align:right;white-space:nowrap',text:r[1]==null?'':r[1]})),
+      r[2]?h('div',{style:'font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:1px',text:r[2]}):null,
+      rp?_rpBar(rp):null));
+  });
+  const g=_gfxBar(cell, ci); if(g) box.appendChild(g);
+  const chips=h('div',{style:'display:flex;flex-wrap:wrap;gap:6px;margin-top:10px'});
+  if(reading) chips.appendChild(_chip2(reading, 'var(--ink2)', 'var(--neubg)'));
+  if(current) chips.appendChild(_chip2('目前：'+current,
+    sc>0?'var(--strong)':sc<0?'var(--weak)':'var(--ink2)',
+    sc>0?'var(--strongbg)':sc<0?'var(--weakbg)':'var(--neubg)'));
+  if(basis) chips.appendChild(_chip2('依據：'+basis, 'var(--teal)', 'var(--tealbg)'));
+  box.appendChild(chips);
+  return box;
+}
 function buildDetail(){
   if(!D.detail)return null;
   const d=D.detail,ts=tierStyle(d.tier_confirmed||d.tier),cs=d.cells.map(c=>c[0]);
   const fac=h('div',{});
-  d.factors.forEach(f=>{const dim=f.weight===0,col=dim?'var(--muted)':(f.score>0?'var(--strong)':f.score<0?'var(--weak)':'var(--muted)');
+  d.factors.forEach((f,i)=>{const dim=f.weight===0,col=dim?'var(--muted)':(f.score>0?'var(--strong)':f.score<0?'var(--weak)':'var(--muted)');
     const contrib=dim?'僅供分層':((f.score*f.weight>0?'+':'')+(f.score*f.weight).toFixed(1));
-    fac.appendChild(h('div',{style:'display:grid;grid-template-columns:minmax(104px,124px) 1fr 96px;gap:12px;align-items:center;padding:7px 0;border-top:1px solid var(--line2)'},
+    const ci=FAC2CELL[f.k], panel=h('div',{class:'hide',style:'margin:2px 0 6px'}, cellDetail(d.cells[ci], ci));
+    const caret=h('span',{class:'mono',style:'font-size:11px;color:var(--teal);font-weight:700',text:'▸'});
+    const flip=()=>{const hidden=panel.classList.toggle('hide');caret.textContent=hidden?'▸':'▾';};
+    fac.appendChild(h('div',{class:'clickrow',role:'button',tabindex:'0',
+      style:'display:grid;grid-template-columns:minmax(104px,124px) 1fr 96px 14px;gap:10px;align-items:center;padding:7px 4px;border-top:1px solid var(--line2);cursor:pointer;border-radius:8px',
+      onclick:flip, onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip();}}},
       h('div',{style:'min-width:0'},h('span',{style:`font-size:12.5px;font-weight:700;color:${col}`,text:f.label}),h('span',{style:'font-size:10px;color:var(--muted);margin-left:5px',text:dim?'不計分':'×'+f.weight})),
       h('div',{},diverg(f.score,2,130,12)),
-      h('div',{class:'mono',style:`text-align:right;font-size:12px;color:${col}`,html:`<b>${(f.score>0?'+':'')+f.score}</b> <span style="color:var(--muted);font-size:10.5px">→ ${contrib}</span>`})));
+      h('div',{class:'mono',style:`text-align:right;font-size:12px;color:${col}`,html:`<b>${(f.score>0?'+':'')+f.score}</b> <span style="color:var(--muted);font-size:10.5px">→ ${contrib}</span>`}),
+      caret));
+    fac.appendChild(panel);
+    if(i===0)flip();   // 預設展開第一列（①相對強弱），讓使用者看見可展開的形態
   });
   const techCol=d.tech?(d.tech.cls==='up'?'var(--strong)':d.tech.cls==='down'?'var(--weak)':'var(--muted)'):'var(--muted)';
   const t=(d.tech||{}).chart, price=t?lineChart([{v:t.px,color:'var(--ink)',width:2.4},{v:t.ma5,color:'var(--ma5)',width:1.5,dash:'3 3'},{v:t.ma,color:'var(--ma20)',width:1.7},{v:t.ma60,color:'var(--ma60)',width:1.5,dash:'6 4'}],520,150):null;
@@ -773,7 +847,7 @@ function buildDetail(){
     h('div',{class:'dgrid'},
       h('div',{},
         h('section',{style:'margin-bottom:26px'},h('h3',{class:'sub3',text:'為什麼是這個分數 · 七因子拆解'}),
-          h('p',{style:'margin:0 0 14px;font-size:12px;color:var(--muted)',html:'條長＝元素分相對位置（<b style="color:var(--strong)">右紅為正</b>／<b style="color:var(--weak)">左綠為負</b>）；權重 0 只作為分層條件。'}),fac),
+          h('p',{style:'margin:0 0 14px;font-size:12px;color:var(--muted)',html:'條長＝元素分相對位置（<b style="color:var(--strong)">右紅為正</b>／<b style="color:var(--weak)">左綠為負</b>）；權重 0 只作為分層條件。<b style="color:var(--ink)">點任一列</b>看該維原始數字、門檻與判讀。'}),fac),
         t&&h('section',{style:'margin-bottom:26px'},h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px'},h('h3',{class:'sub3',text:'股價與均線 · 近 20 日'}),h('span',{style:`font-size:12px;font-weight:700;color:${techCol}`,text:d.tech.label})),
           legend,h('div',{style:'background:var(--inset);border:1px solid var(--line2);border-radius:12px;padding:12px'},price),
           h('p',{style:'margin:8px 0 0;font-size:11.5px;color:var(--muted);line-height:1.6',text:d.tech.why})),
