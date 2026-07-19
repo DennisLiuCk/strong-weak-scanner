@@ -46,9 +46,12 @@ class DashboardUxContractTest(unittest.TestCase):
 
     def test_quicknav_reaches_every_section(self):
         self.assertIn('aria-label="快速導覽"', self.template)
-        for anchor in ("ov", "tsmc", "grp", "tier", "stocks", "detail"):
+        for anchor in ("ov", "tsmc", "grp", "tier", "stocks"):
             self.assertIn(f'href="#{anchor}"', self.template)
             self.assertIn(f'<section id="{anchor}"', self.template)
+        # 個股詳情只由點列開抽屜,不再有底部常駐展示區(設計稿 demo 殘留,已移除)
+        self.assertNotIn('<section id="detail"', self.template)
+        self.assertNotIn("畫面 5", self.template)
 
     # ---------- 資料契約:placeholder 注入與 adapter ----------
 
@@ -145,8 +148,7 @@ class DashboardUxContractTest(unittest.TestCase):
     def test_mobile_layout_collapses_grids_and_meets_touch_targets(self):
         for marker in ("@media (max-width:720px)", "min-height:44px",
                        ".srow{grid-template-columns:1fr", ".shead{display:none}",
-                       ".bhead{display:none}", ".hscroll{overflow-x:auto}",
-                       "#sheet .dgrid{grid-template-columns:1fr}"):
+                       ".bhead{display:none}", ".hscroll{overflow-x:auto}"):
             self.assertIn(marker, self.template)
         # 桌機鎖寬已移除,窄視口不得水平溢位
         self.assertNotIn("min-width:1180px", self.template)
@@ -160,6 +162,8 @@ class DashboardUxContractTest(unittest.TestCase):
                        "if(e.key==='Escape')closeSheet();",
                        "role:'dialog'", "'aria-modal':'true'"):
             self.assertIn(marker, self.template)
+        # 桌機抽屜要夠寬,個股詳情卡才能維持兩欄可讀排版
+        self.assertIn("width:min(880px,100%)", self.template)
 
     # ---------- MA 色彩(區分週期,非強弱語意) ----------
 
