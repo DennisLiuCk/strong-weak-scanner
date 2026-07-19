@@ -394,12 +394,30 @@ function buildOverview(){
 function buildTSMC(){
   const T=D.tsmc; if(!T)return [];
   const dirMap={up:{s:'↑',col:'var(--strong)',bg:'var(--strongbg)',l:'看增'},mixed:{s:'↕',col:'var(--amber)',bg:'var(--amberbg)',l:'分歧'},down:{s:'↓',col:'var(--weak)',bg:'var(--weakbg)',l:'看減'},flat:{s:'→',col:'var(--muted)',bg:'var(--neubg)',l:'持平'},none:{s:'·',col:'var(--muted)',bg:'var(--neubg)',l:'未提及'}};
+
+  // KPI（常駐）
   const kpi=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:4px'});
   (T.kpis||[]).forEach(k=>kpi.appendChild(h('div',{style:'background:var(--inset);border-radius:12px;padding:12px 14px'},
     h('div',{style:'font-size:11px;font-weight:800;color:var(--muted)',text:k.k}),
     h('div',{class:'mono',style:'font-size:17px;font-weight:600;color:var(--ink);margin:3px 0 1px',text:k.v}),
     k.note?h('div',{style:'font-size:11px;color:var(--ink2)',text:k.note}):null)));
-  // 各族群方向指引
+
+  // 分頁 A：法說會重點（sections）
+  const _splitP=b=>{ if(b.t!=='p'||!(b.runs||[]).length) return [b];
+    const groups=[[]];
+    b.runs.forEach((r,i)=>{ const nx=b.runs[i+1];
+      if(r.b && nx && typeof nx.s==='string' && /^[:：]/.test(nx.s) && groups[groups.length-1].length) groups.push([]);
+      groups[groups.length-1].push(r); });
+    return groups.map(g=>({t:'p',runs:g})); };
+  const secWrap=h('div',{});
+  const secs=T.sections||[];
+  if(secs.length)secs.forEach((s,i)=>secWrap.appendChild(nbSection({h:s.h,blocks:(s.blocks||[]).flatMap(_splitP)},i<2)));
+  else secWrap.appendChild(h('p',{style:'font-size:12.5px;color:var(--muted)',text:'本季法說會全文整理尚未載入；見下方官方 IR 連結。'}));
+  const notesPanel=h('div',{},
+    h('p',{style:'margin:0 0 10px;font-size:11.5px;color:var(--muted)',text:'台積電法說會原文彙整（營運、需求、資本支出、各平台展望）。'}),
+    secWrap);
+
+  // 分頁 B：各族群方向指引（guidance）
   const gl=h('div',{style:'display:flex;flex-direction:column;gap:8px'});
   (T.guidance||[]).forEach(gd=>{ const dm=dirMap[gd.dir]||dirMap.none, gobj=D.groups.find(x=>x.g===gd.g);
     const a={class:'grow',style:'background:var(--card);border:1px solid var(--line);border-left:4px solid '+dm.col+';border-radius:12px;padding:12px 16px'};
@@ -410,43 +428,38 @@ function buildTSMC(){
         h('b',{style:'font-size:14px',text:grp(gd.g).nm}),
         h('span',{class:'chip',style:`margin-left:auto;color:${dm.col};background:${dm.bg}`,text:dm.l})),
       h('div',{style:'font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:5px',text:gd.text}))); });
-  // 法說會重點整理（sections，與方向指引同等）
-  // 來源 blockquote 的「**標籤**:內容」多行被 parser 併成單一段落——依粗體標籤邊界拆回多段好讀
-  const _splitP=b=>{ if(b.t!=='p'||!(b.runs||[]).length) return [b];
-    const groups=[[]];
-    b.runs.forEach((r,i)=>{ const nx=b.runs[i+1];
-      if(r.b && nx && typeof nx.s==='string' && /^[:：]/.test(nx.s) && groups[groups.length-1].length) groups.push([]);
-      groups[groups.length-1].push(r); });
-    return groups.map(g=>({t:'p',runs:g})); };
-  const secWrap=h('div',{});
-  const secs=T.sections||[];
-  if(secs.length)secs.forEach((s,i)=>secWrap.appendChild(nbSection({h:s.h,blocks:(s.blocks||[]).flatMap(_splitP)},i<3)));
-  else secWrap.appendChild(h('p',{style:'font-size:12.5px;color:var(--muted)',text:'本季法說會全文整理尚未載入；見下方官方 IR 連結。'}));
-  // 往期法說
+  const groupsPanel=h('div',{class:'hide'},
+    h('p',{style:'margin:0 0 10px;font-size:11.5px;color:var(--muted)',text:'↑看增 ↕分歧 ↓看減 ·未提及；點族群看目前狀態。'}),
+    gl);
+
+  // 分頁列（沿用 .rtab / .hide）
+  const nGuide=(T.guidance||[]).length;
+  const tabbar=h('div',{style:'display:inline-flex;gap:4px;padding:4px;background:var(--inset);border-radius:12px;margin:20px 0 16px'});
+  const notesTab=h('button',{class:'rtab',text:'法說會重點'});
+  const groupsTab=h('button',{class:'rtab',text:'各族群方向 · '+nGuide});
+  tabbar.append(notesTab,groupsTab);
+  const sel=n=>{ notesTab.setAttribute('aria-selected',n); groupsTab.setAttribute('aria-selected',!n); notesPanel.classList.toggle('hide',!n); groupsPanel.classList.toggle('hide',n); };
+  notesTab.addEventListener('click',()=>sel(true)); groupsTab.addEventListener('click',()=>sel(false)); sel(true);
+
+  // 往期法說 + 查核狀態 + 頁尾（與原版相同）
   const hist=h('div',{style:'display:flex;flex-wrap:wrap;gap:8px;align-items:center'});
   (T.history||[]).forEach(hh=>hist.appendChild(h('a',{href:hh.url,style:'font-size:12px;font-weight:600;color:var(--teal);background:var(--inset);border-radius:100px;padding:5px 12px',text:hh.title+(hh.date?' · '+hh.date:'')})));
-  // 查核狀態
   const scMap={independently_verified:{col:'var(--teal)',bg:'var(--tealbg)'},partially_verified:{col:'var(--amber)',bg:'var(--amberbg)'},conflicted:{col:'var(--strong)',bg:'var(--strongbg)'}};
   const scc=scMap[T.status]||{col:'var(--muted)',bg:'var(--neubg)'}, sc={t:T.statusLabel||T.status||'',col:scc.col,bg:scc.bg};
+
   return [
     h('p',{class:'kicker',text:'上游錨點 · 觀察層（不計分）'}),
     h('h2',{class:'sec',text:'台積電專區 · 法說會脈絡與族群方向'}),
-    h('p',{class:'lead',html:'台積電（2330）<b style="color:var(--ink)">不在掃描範圍、不參與任何排名與評分</b>。以下為每季法說後人工彙整的<b style="color:var(--ink)">法說會重點</b>與其對各族群的<b style="color:var(--ink)">方向指引</b>——兩者同等重要：前者是原文脈絡，後者是對應到本站族群的方向。'}),
+    h('p',{class:'lead',html:'台積電（2330）<b style="color:var(--ink)">不在掃描範圍、不參與任何排名與評分</b>。以下為每季法說後人工彙整的<b style="color:var(--ink)">法說會重點</b>與其對各族群的<b style="color:var(--ink)">方向指引</b>——用分頁切換，一次專心看一塊。'}),
     h('div',{class:'card',style:'padding:24px 26px'},
       h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px'},
         h('b',{style:'font-size:18px;font-weight:800',text:(T.title||('台積電 '+T.quarter))}),
         h('span',{class:'mono',style:'font-size:12px;color:var(--muted)',text:T.eventDate}),
         h('span',{class:'chip',style:`color:${sc.col};background:${sc.bg}`,text:sc.t})),
       kpi,
-      h('div',{class:'dgrid',style:'margin-top:24px'},
-        h('div',{},
-          h('h3',{style:'margin:0 0 4px;font-size:15px;font-weight:800',text:'法說會重點整理'}),
-          h('p',{style:'margin:0 0 10px;font-size:11.5px;color:var(--muted)',text:'台積電法說會原文彙整（營運、需求、資本支出、各平台展望）。'}),
-          secWrap),
-        h('div',{},
-          h('h3',{style:'margin:0 0 4px;font-size:15px;font-weight:800',text:'各族群方向指引'}),
-          h('p',{style:'margin:0 0 10px;font-size:11.5px;color:var(--muted)',text:'↑看增 ↕分歧 ↓看減 ·未提及；點族群看目前狀態。'}),
-          gl)),
+      tabbar,
+      notesPanel,
+      groupsPanel,
       hist.children.length?h('div',{style:'margin-top:18px;border-top:1px solid var(--line2);padding-top:14px'},h('div',{style:'font-size:12px;font-weight:800;margin-bottom:8px',text:'往期法說'}),hist):null,
       h('div',{style:'display:flex;flex-wrap:wrap;gap:14px;font-size:11.5px;color:var(--muted);margin-top:14px'},
         T.contentAsOf?h('span',{text:'資料截至 '+T.contentAsOf}):null,
@@ -783,6 +796,39 @@ function narrativeBlock(nar){
   return w;
 }
 function flowSection(f){ if(!f||!f.rows||!f.rows.length)return null;
+  const _clean=s=>String(s==null?'':s).replace(/,/g,'').replace(/−/g,'-').replace(/＋/g,'+');
+  const _firstPct=s=>{const m=_clean(s).match(/([+-]?\d+(?:\.\d+)?)\s*%/);return m?parseFloat(m[1]):null;};
+  const _pps=s=>[..._clean(s).matchAll(/([+-]?\d+(?:\.\d+)?)\s*pp/g)].map(m=>parseFloat(m[1]));
+  const _row=re=>(f.rows||[]).find(r=>re.test(r[0]));
+
+  // 一眼看懂：三張訊號卡（有解析到數字才顯示）
+  const cards=[];
+  const rDir=_row(/方向強度|方向中位/); if(rDir){ const v=_firstPct(rDir[1]);
+    if(v!=null)cards.push(h('div',{style:'background:'+(v>=0?'var(--strongbg)':'var(--weakbg)')+';border-radius:12px;padding:12px 14px'},
+      h('div',{style:'font-size:10.5px;font-weight:800;color:var(--muted)',text:'法人方向強度'}),
+      h('div',{class:'mono',style:'font-size:20px;font-weight:600;margin:2px 0 7px;color:'+(v>=0?'var(--strong)':'var(--weak)'),text:(v>=0?'+':'')+v+'%'}),
+      diverg(v,100,150,16),
+      h('div',{style:'font-size:10px;color:var(--ink2);line-height:1.4;margin-top:5px',text:rDir[1]}))); }
+  const rAct=_row(/總活動|參與中位/); if(rAct){ const p=_firstPct(rAct[1]);
+    if(p!=null)cards.push(h('div',{style:'background:var(--tealbg);border-radius:12px;padding:12px 14px'},
+      h('div',{style:'font-size:10.5px;font-weight:800;color:var(--muted)',text:'法人參與度'}),
+      h('div',{class:'mono',style:'font-size:20px;font-weight:600;margin:2px 0 7px;color:var(--teal)',text:p+'%'}),
+      meter(p/100,150,14,'var(--teal)'),
+      h('div',{style:'font-size:10px;color:var(--ink2);line-height:1.4;margin-top:5px',text:'占雙邊成交（'+p+'%）'}))); }
+  const rExc=_row(/超額報酬|超額中位/); if(rExc){ const arr=_pps(rExc[1]);
+    if(arr.length){ const last=arr[arr.length-1],mxA=Math.max(...arr.map(Math.abs),1),lbs=['1日','5日','20日'];
+      cards.push(h('div',{style:'background:'+(last>=0?'var(--strongbg)':'var(--weakbg)')+';border-radius:12px;padding:12px 14px'},
+        h('div',{style:'font-size:10.5px;font-weight:800;color:var(--muted)',text:'官方指數超額報酬'}),
+        h('div',{class:'mono',style:'font-size:20px;font-weight:600;margin:2px 0 7px;color:'+(last>=0?'var(--strong)':'var(--weak)'),text:(last>=0?'+':'')+last+'pp'}),
+        h('div',{style:'display:flex;flex-direction:column;gap:5px'},
+          ...arr.map((v,i)=>h('div',{style:'display:grid;grid-template-columns:28px 1fr 46px;gap:6px;align-items:center'},
+            h('span',{style:'font-size:10px;color:var(--muted)',text:lbs[i]||('#'+(i+1))}),
+            diverg(v,mxA,90,12),
+            h('span',{class:'mono',style:'font-size:10px;text-align:right;color:'+(v>=0?'var(--strong)':'var(--weak)'),text:(v>=0?'+':'')+v+'pp'})))),
+        h('div',{style:'font-size:10px;color:var(--ink2);margin-top:5px',text:'正＝跑贏市場'}))); } }
+  const hero=cards.length?h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:2px 0 12px'},...cards):null;
+
+  // 完整明細（沿用原本 rows / why / how / src / link，收合）
   const list=h('div',{});
   f.rows.forEach(r=>list.appendChild(h('div',{style:'padding:10px 0;border-top:1px solid var(--line2)'},
     h('div',{style:'display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap'},
@@ -795,23 +841,17 @@ function flowSection(f){ if(!f||!f.rows||!f.rows.length)return null;
   if(f.how)body.appendChild(h('p',{style:'margin:10px 0 0;font-size:11.5px;color:var(--ink2);line-height:1.6'},h('b',{text:(f.howLabel||'怎麼讀')+'：'}),f.how));
   if(f.src)body.appendChild(h('p',{class:'mono',style:'margin:8px 0 0;font-size:10px;color:var(--muted);line-height:1.5',text:'來源：'+f.src}));
   body.appendChild(h('a',{href:f.howHref||'#flow-guide',onclick:closeSheet,style:'display:inline-block;margin-top:8px;font-size:12px;font-weight:700',text:(f.howLink||'交易／部位觀察指南')+' →'}));
-  // 上浮高價值列（個股與族群的 label 都涵蓋；找不到就略過）
-  const PEEK=['法人方向強度','法人總活動量','官方指數超額報酬',
-              '法人方向中位','法人參與中位','成員官方指數超額中位'];
-  const peek=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:2px 0 10px'});
-  PEEK.forEach(lb=>{const r=(f.rows||[]).find(x=>x[0]===lb);if(!r)return;
-    peek.appendChild(h('div',{style:'background:var(--inset);border-radius:10px;padding:9px 12px'},
-      h('div',{style:'font-size:10.5px;font-weight:700;color:var(--muted)',text:r[0]}),
-      h('div',{class:'mono',style:'font-size:12px;color:var(--ink);margin-top:2px;line-height:1.4',text:r[1]})));});
-  const det=h('details',{class:'nbsec',open:''},
+  const det=h('details',{class:'nbsec'},
     h('summary',{style:'cursor:pointer;font-size:13.5px;font-weight:800;color:var(--ink);padding:11px 0'},
-      '數據解剖 · 全部 '+((f.rows||[]).length)+' 列 ',
+      '數據解剖 · 全部 '+((f.rows||[]).length)+' 列（含公式與判讀） ',
       h('span',{class:'chip',style:'color:var(--muted);background:var(--neubg)',text:f.scLabel||'觀察層 · 不計分'})),
     body);
+
   const wrap=h('div',{});
-  if(peek.children.length) wrap.appendChild(peek);
+  if(hero){ wrap.appendChild(h('div',{style:'font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.05em;margin:2px 0 8px'},'一眼看懂')); wrap.appendChild(hero); }
   wrap.appendChild(det);
-  return wrap; }
+  return wrap;
+}
 function noteVerifyMeta(n){ const col=n.cls==='independently_verified'?'var(--teal)':n.cls==='conflicted'?'var(--amber)':'var(--muted)';
   return {label:(n.cls==='independently_verified'?'✓ ':'')+n.label, col,
     scope:n.reviewScope==='all_material_claims'?'全部重要主張':(n.reviewScope&&n.reviewScope!=='-'?n.reviewScope:'—')}; }
