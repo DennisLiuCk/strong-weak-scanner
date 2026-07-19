@@ -218,7 +218,7 @@ const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLO
 function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,tier:s.tier_confirmed,
   tierLabel:s.tier_label,waiting:s.tier_waiting,
   f:(s.factors||[]).map(function(f){return [f.label,f.score,f.weight];}),
-  cs:(s.cells||[]).map(function(c){return c[0];}), cv:(s.cells||[]).map(function(c){return c[1];}), cr:(s.cells||[]).map(function(c){return c[3];}),
+  cs:(s.cells||[]).map(function(c){return c[0];}), cv:(s.cells||[]).map(function(c){return c[1];}), cr:(s.cells||[]).map(function(c){return c[3];}), cd:(s.cells||[]).map(function(c){return c[5]||'';}),
   tech:[s.tech?s.tech.cls:'flat', s.tech?s.tech.label:'—'],
   chip:[s.chip?s.chip.cls:'neutral', s.chip?s.chip.label:'中性'],
   fund:s.fund?[s.fund.cls,(s.fund.rows.find(function(r){return /年增/.test(r[0]);})||[])[1]||s.fund.label]:null,
@@ -229,7 +229,7 @@ function _adaptTSMC(T){ if(!T||!T.event)return null; const e=T.event;
     guidance:(e.guidance||[]).map(function(g){return {g:g.g,dir:g.dir,text:g.text};})}; }
 const D={ groups:GROUPS, grpMeta:GRP, overview:OVERVIEW, tierFlow:TIER_FLOW, date:DATE_STR,
   stocks:DATA.map(_slim),
-  allStocks:DATA.map(function(s){return {id:s.id,nm:s.nm,g:s.g,comp:s.comp,tier:s.tier_confirmed,tl:s.tier_label,w:s.tier_waiting};}),
+  allStocks:DATA.map(function(s){return {id:s.id,nm:s.nm,g:s.g,comp:s.comp,tier:s.tier_confirmed,tl:s.tier_label,w:s.tier_waiting,cs:(s.cells||[]).map(function(c){return c[0];})};}),
   byId:Object.fromEntries(DATA.map(function(s){return [s.id,s];})),
   tsmc:_adaptTSMC(TSMC) };
 const COMP_MAX=2*Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
@@ -448,18 +448,18 @@ function buildGroup(){
   return [
     h('p',{class:'kicker',text:'族群層'}),
     h('h2',{class:'sec',text:'族群比較 · 最近誰在領漲、誰有人接'}),
-    h('p',{class:'lead',html:'回答「資金正在佈局哪個族群」。橫軸＝族群整體<b style="color:var(--ink)">跑贏/跑輸</b>全市場，縱軸＝下跌時外資<b style="color:var(--ink)">淨買/淨賣</b>。'}),
+    h('p',{class:'lead',html:'回答「資金正在佈局哪個族群」。橫軸＝族群整體<b style="color:var(--ink)">跑贏/跑輸</b>全市場，縱軸＝下跌時外資<b style="color:var(--ink)">淨買/淨賣</b>。同一組族群、三種互補視角：<b style="color:var(--ink)">① 四象限</b>定位、<b style="color:var(--ink)">② 熱圖</b>看多維名次、<b style="color:var(--ink)">③ 排行榜</b>逐欄排序。'}),
     h('div',{style:'display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start'},
       h('div',{style:'flex:1 1 540px;min-width:min(520px,100%)'},
         h('div',{class:'opthd'},h('b',{text:'四象限地圖與熱圖'}),h('span',{text:'看全貌與 5 日位移'})),
         h('figure',{class:'card',style:'margin:0 0 18px;padding:22px'},
-          h('figcaption',{style:'display:flex;justify-content:space-between;margin-bottom:6px'},h('b',{style:'font-size:15px',text:'族群價籌四象限'}),h('span',{style:'font-size:12px;color:var(--muted)',text:'灰線＝近 5 日移動方向 · 點圓點看族群明細'})),
+          h('figcaption',{style:'display:flex;justify-content:space-between;margin-bottom:6px'},h('b',{style:'font-size:15px',text:'① 定位 · 族群價籌四象限'}),h('span',{style:'font-size:12px;color:var(--muted)',text:'灰線＝近 5 日移動方向 · 點圓點看族群明細'})),
           quadEl(G)),
         h('figure',{class:'card',style:'margin:0;padding:22px'},
-          h('figcaption',{style:'margin-bottom:14px',html:`<b style="font-size:15px">族群熱圖</b> <span style="font-size:12px;color:var(--muted);margin-left:8px">每欄各自比較 ${G.length} 族群：<b style="color:var(--strong)">紅＝前段</b>、<b style="color:var(--weak)">綠＝後段</b>；▲▼＝較 5 日前</span>`}),
+          h('figcaption',{style:'margin-bottom:14px',html:`<b style="font-size:15px">② 多維名次 · 族群熱圖</b> <span style="font-size:12px;color:var(--muted);margin-left:8px">每欄各自比較 ${G.length} 族群：<b style="color:var(--strong)">紅＝前段</b>、<b style="color:var(--weak)">綠＝後段</b>；▲▼＝較 5 日前</span>`}),
           h('div',{class:'hscroll'},heatGrid))),
       h('div',{style:'flex:1 1 540px;min-width:min(520px,100%)'},
-        h('div',{class:'opthd'},h('b',{text:'族群排行榜'}),h('span',{text:'點任一列看族群明細'})),
+        h('div',{class:'opthd'},h('b',{text:'③ 可排序 · 族群排行榜'}),h('span',{text:'點任一列看族群明細'})),
         board))
   ];
 }
@@ -484,8 +484,13 @@ function stockChips(s){ const c=[];
 function chipRow(chips){ const w=h('div',{style:'display:flex;flex-wrap:wrap;gap:5px'});
   chips.forEach(ch=>w.appendChild(h('span',{style:`font-size:10px;font-weight:700;color:${ch.col};background:${ch.bg};border:${ch.bd}px solid ${ch.col};border-radius:100px;padding:2px 8px;white-space:nowrap`,text:ch.t}))); return w; }
 function stripEl(s,short5){ const strip=h('div',{class:'strip'});
-  s.cs.forEach((sc,idx)=>{const si=sinfo(sc); strip.appendChild(h('div',{class:'tile '+si.cls},
-    h('div',{class:'lb',text:short5[idx]}),h('div',{class:'gl',style:'color:'+si.col,text:si.g}),h('div',{class:'vv mono',text:s.cv[idx]})));});
+  s.cs.forEach((sc,idx)=>{const si=sinfo(sc); const raw=(s.cd&&s.cd[idx])||'';
+    strip.appendChild(h('div',{class:'tile '+si.cls, title:raw,
+        style:raw?'cursor:help':''},
+      h('div',{class:'lb',text:short5[idx]}),
+      h('div',{class:'gl',style:'color:'+si.col,text:si.g}),
+      h('div',{class:'vv mono',text:s.cv[idx]}),
+      raw?h('div',{style:'font-size:8px;color:var(--muted);margin-top:1px;line-height:1',text:'ⓘ'}):null));});
   return strip; }
 
 function buildStocks1c(){
@@ -590,6 +595,13 @@ function openGroupSheet(g){
   sheetEl.replaceChildren(...body); showSheet();
 }
 
+// 分層 pill 用：5 個元素分 → 極簡色條（紅＝相對強、綠＝相對弱，高度／濃度＝強度）
+function microStrip(cs){ const lb=['價','量','外資','投信','融資'];
+  const w=h('span',{style:'display:inline-flex;gap:2px;align-items:center;margin:0 3px'});
+  (cs||[]).forEach(function(sc,i){const si=sinfo(sc),a=Math.abs(sc);
+    w.appendChild(h('span',{title:lb[i]+' '+(sc>0?'+':'')+sc,
+      style:'width:4px;border-radius:1px;height:'+(a>=2?11:a===1?8:5)+'px;background:'+si.col+';opacity:'+(a>=2?1:a===1?0.65:0.3)}));});
+  return w; }
 function buildTier(){
   const order=[['真強','相對強勢','價格與籌碼多在族群前段'],['蓄勢·外資佈局','相對蓄勢','籌碼靠前、價格尚未發動'],
     ['__cand','蓄勢候補','籌碼已符，等抗跌／綜合分補齊'],['強但過熱','相對強勢·過熱','價格靠前但量能或融資過熱'],
@@ -607,6 +619,7 @@ function buildTier(){
       onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
       style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid var(--line2);border-radius:100px;padding:4px 11px;cursor:pointer'},
       h('b',{style:'font-weight:700',text:s.nm}),h('span',{class:'mono',style:'font-size:10px;color:var(--muted)',text:grp(s.g).short}),
+      s.cs&&s.cs.length?microStrip(s.cs):null,
       h('span',{class:'mono',style:`font-size:11px;font-weight:600;color:${cc}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)})); }
   const bands=h('div',{style:'display:flex;flex-direction:column;gap:11px'});
   function renderBands(){ bands.replaceChildren(...order.map(([k,t,d])=>{
@@ -701,11 +714,23 @@ function flowSection(f){ if(!f||!f.rows||!f.rows.length)return null;
   if(f.how)body.appendChild(h('p',{style:'margin:10px 0 0;font-size:11.5px;color:var(--ink2);line-height:1.6'},h('b',{text:(f.howLabel||'怎麼讀')+'：'}),f.how));
   if(f.src)body.appendChild(h('p',{class:'mono',style:'margin:8px 0 0;font-size:10px;color:var(--muted);line-height:1.5',text:'來源：'+f.src}));
   body.appendChild(h('a',{href:f.howHref||'#flow-guide',onclick:closeSheet,style:'display:inline-block;margin-top:8px;font-size:12px;font-weight:700',text:(f.howLink||'交易／部位觀察指南')+' →'}));
-  return h('details',{class:'nbsec'},
+  // 上浮高價值列（個股與族群的 label 都涵蓋；找不到就略過）
+  const PEEK=['法人方向強度','法人總活動量','官方指數超額報酬',
+              '法人方向中位','法人參與中位','成員官方指數超額中位'];
+  const peek=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:2px 0 10px'});
+  PEEK.forEach(lb=>{const r=(f.rows||[]).find(x=>x[0]===lb);if(!r)return;
+    peek.appendChild(h('div',{style:'background:var(--inset);border-radius:10px;padding:9px 12px'},
+      h('div',{style:'font-size:10.5px;font-weight:700;color:var(--muted)',text:r[0]}),
+      h('div',{class:'mono',style:'font-size:12px;color:var(--ink);margin-top:2px;line-height:1.4',text:r[1]})));});
+  const det=h('details',{class:'nbsec',open:''},
     h('summary',{style:'cursor:pointer;font-size:13.5px;font-weight:800;color:var(--ink);padding:11px 0'},
-      '數據解剖 · 交易與部位怎麼形成 ',
+      '數據解剖 · 全部 '+((f.rows||[]).length)+' 列 ',
       h('span',{class:'chip',style:'color:var(--muted);background:var(--neubg)',text:f.scLabel||'觀察層 · 不計分'})),
-    body); }
+    body);
+  const wrap=h('div',{});
+  if(peek.children.length) wrap.appendChild(peek);
+  wrap.appendChild(det);
+  return wrap; }
 function noteVerifyMeta(n){ const col=n.cls==='independently_verified'?'var(--teal)':n.cls==='conflicted'?'var(--amber)':'var(--muted)';
   return {label:(n.cls==='independently_verified'?'✓ ':'')+n.label, col,
     scope:n.reviewScope==='all_material_claims'?'全部重要主張':(n.reviewScope&&n.reviewScope!=='-'?n.reviewScope:'—')}; }
