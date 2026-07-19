@@ -635,7 +635,7 @@ function openStockDetail(id){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail
     style:'padding:6px 12px;font-size:12px'+(o?'':';visibility:hidden'),
     onclick:o?()=>openStockDetail(o.id):null, text:label+(o?' '+o.nm:'')});
   const jump=h('div',{style:'display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px'});
-  const nav=h('div',{style:'display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:2px 40px 0 0'},
+  const nav=h('div',{style:'display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:2px 60px 0 0'},
     navBtn(prev,'‹ 上一檔'),
     h('span',{class:'mono',style:'font-size:11.5px;color:var(--muted)',text:(idx+1)+' / '+sibs.length+' · '+grp(s.g).nm}),
     navBtn(next,'下一檔 ›'));
