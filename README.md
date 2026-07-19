@@ -1,499 +1,315 @@
 # strong-weak-scanner · 台股汰弱留強掃描
 
-台股半導體與 AI 供應鏈十一族群(**被動元件 / 功率元件 / 封測 / 記憶體 / 矽智財 /
-半導體設備 / 半導體材料 / 散熱 / PCB·CCL / 電源供應 / 伺服器組裝·機構**,
-名單見 `config/universe.csv`,現 121 檔)
-的量化籌碼掃描系統:每個交易日自動抓取價量與籌碼資料,在**族群內**互相排名比強弱,
-產出評級與儀表板,並每週以樣本外資料驗證規則是否仍然有效。
+針對台股半導體與 AI 供應鏈的相對強弱研究系統。現行 universe 由
+[`config/universe.csv`](config/universe.csv) 定義，共 121 檔、11 個族群：被動元件、
+功率元件、封測、記憶體、矽智財、半導體設備、半導體材料、散熱、PCB/CCL、電源供應、
+伺服器組裝/機構。
 
-- **儀表板**:<https://dennisliuck.github.io/strong-weak-scanner/>(GitHub Pages,每日更新;
-  頁首「資料至」日期選單可回看任一日的歷史報告快照)
-- **零第三方依賴**:純 Python 標準庫 + SQLite;資料庫與報告 commit 在 repo,全程可稽核
-- 本檔說明**現行系統**的設計與實作;版本沿革與各決策的實證依據見 [CHANGELOG.md](CHANGELOG.md)
+- **儀表板**：<https://dennisliuck.github.io/strong-weak-scanner/>
+- **設定來源**：[`config/groups.csv`](config/groups.csv)、
+  [`config/universe.csv`](config/universe.csv)、[`config/candidates.csv`](config/candidates.csv)
+- **版本沿革與實證依據**：[`CHANGELOG.md`](CHANGELOG.md)
 
-## 設計理念:兩層訊號,各司其職
+核心每日管線只使用 Python 3.12 標準庫與 SQLite。原始資料、正式 OOS 快照、儀表板歷史頁
+與驗證報告都保留在 repo，讓每次發布可以追溯。質化證據包的 PDF 驗證與轉圖另需 Poppler。
 
-系統的核心實證(推導過程與數字見 CHANGELOG v2.1):
+## 方法論
 
-> **族群內分強弱,靠價格相對因子;籌碼因子的價值在「選族群」。**
-> 外資/投信買賣超在「族群內」幾乎沒有選股力——它們回答的是「資金在佈局哪個族群」,
-> 不是「族群裡哪一檔最強」。
+> **先用籌碼聚合判斷資金正在佈局哪個族群，再用價格相對因子在族群內選強汰弱。**
 
-因此架構拆成兩層,加一個大盤旗標:
+這個拆分是系統最重要的邊界：外資或投信在整個市場的流向，適合回答「哪個族群受關注」；
+同一族群內誰較強，主要交給相對強弱與修正日抗跌。排名結果只代表同業相對位置，不能反推
+原始值一定為正，也不代表未來股價方向。
 
-| 層 | 回答的問題 | 主要訊號 | 產出 |
+| 層級 | 回答的問題 | 現行訊號 | 輸出 |
 |---|---|---|---|
-| 個股層 | 族群內誰強誰弱 | 相對強弱、修正日抗跌(價格相對因子) | 五元素分數 → 綜合分 → tier |
-| 族群層 | 哪個族群正被佈局 | 佈局廣度、修正日中位逆勢買超(籌碼聚合) | 族群狀態(儀表板「族群雷達」) |
-| 大盤層 | 多頭還是修正 | 報酬指數距 20 日高 | regime 旗標(修正期價值/抗跌因子更有效) |
+| 個股層 | 同族群裡誰強、誰弱 | 七因子分數、3 日平滑、分層確認 | composite 與 tier |
+| 族群層 | 哪個供應鏈正在被佈局或領漲 | 外資廣度、修正日中位買賣、相對動能、距高 | 族群狀態，不改個股分數 |
+| 大盤層 | 目前是否進入修正環境 | 含息報酬指數距 20 日高 | regime，不改個股分數 |
+| 觀察與研究層 | 數字如何形成、公司在做什麼、市場在傳什麼 | 官方資料解剖、技術/基本面、TDCC、借券、研究筆記、領先假說、台積電事件 | 閱讀背景，不計分 |
 
-**為什麼是排名制、不是絕對門檻**:絕對門檻有個股結構偏誤——外資持股本來就高的
-大型股永遠拿不到「外資增持 +2」,小型股股本小、稍有買超就滿分。族群內分位數排名
-讓每檔跟「處境相同的同業」比,天生控制了產業與規模效應。
+### 個股層：族群內七因子
 
-## 資料管線
+[`scripts/score.py`](scripts/score.py) 的 CONFIG 是個股策略唯一旋鈕來源。價格、抗跌、外資、
+投信與修正日買賣先在同族群內排五分位，得到 −2～+2 分；有效樣本少於 4 檔時不排名。
+外資、投信、修正日買賣另有雜訊死區，避免全族群都接近零時仍被硬分高低。
 
-```
-每交易日盤後(GitHub Actions 台北 20:17 先抓價格/法人 checkpoint，23:40 補完並發布；
-也可在官方資料齊全後從本地 run_daily.py 觸發。早場只保存原始缺口，不重算或發布)
-  fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token;僅供最新一週)
-                   → tdcc_holding(append-only;失敗自動略過不擋管線)
-  fetch_daily.py   TWSE/TPEx 官方全市場批次補五張原始表的 dataset×日期缺口
-                   + FinMind 依 coverage 補除權息/分割事件 + 報酬指數/參考個股
-                   → SQLite 原始表(append-only)
-                   → price_adj 還原價(本地重算)
-                   → daily_metrics 五元素衍生指標
-                   → observation_metrics / group_observation_metrics 官方資料解剖(不計分)
-                   → group_metrics / market_daily 族群層聚合 + 大盤 regime
-  audit_raw_data.py → 唯讀驗證五表 grid/必備欄/公式/SQLite integrity 與指數覆蓋
-  score.py         族群內排名評分 → composite → tier(daily_scores)
-  snapshot_signals.py → 凍結本次實際發布的 OOS as-seen 原始指標+評分
-                        (append-only;同日重跑保留各版,驗證採最早正式發布版)
-  build_dashboard.py → index.html(GitHub Pages)
-                     → archive/<資料日>.html + manifest.json(as-seen 歷史快照:
-                       首次建立後不覆寫,供日期選單回看;不事後從 db 重繪,
-                       因衍生表每日全量重建,重繪會被現行規則污染)
-每週六 09:00(weekly-validate.yml)
-  validate.py      → reports/validate_*.md(元素 IC、tier 超額報酬、IS/OOS 對照)
-每月 12 日 / 每季申報截止後(fetch-financials.yml)
-  fetch_financials.py 財報四表(FinMind:月營收+損益表+資產負債表+現金流量表)
-                   → month_revenue/financials/balance_sheet/cash_flow(append-only)
-                   ⚠ 基本面資料,不進 daily_metrics/daily_scores;供 Universe 治理
-                     (R1 業務歸屬)等質化查證用——同 tdcc_holding 屬另一類資料
-```
+| 因子 | 原始量與規則 | 權重 |
+|---|---|---:|
+| 價格相對強弱 | `rs20`＝20 日還原報酬－同族群中位報酬；族群內排名 | 1.4 |
+| 修正日抗跌 | 近 20 日族群下跌日，相對同業的平均表現；至少 3 個有效日後排名 | 1.0 |
+| 投信 | 近 5 日投信淨買占股本；族群內排名，±0.03% 內歸零 | 0.8 |
+| 外資 | 20 日外資持股率變化；族群內排名，±0.3pp 內歸零 | 0.5 |
+| 融資券 | 價格方向 × 10 日融資變化；融資減碼加分、暴增或下跌接刀扣分，並受 6%/9% 融資水位封頂 | 0.4 |
+| 量能 | 當日周轉率 ÷ 自身 60 日中位；1.2～3.0 倍為 +1、低於 0.5 倍為 −1 | 0.3 |
+| 修正日買賣 | 族群下跌日的外資淨買占股本；族群內排名，±0.03% 內歸零 | 0.0 |
 
-## 資料結構(`data/findmind.db`)
+修正日買賣目前不進 composite，但仍參與「相對蓄勢」條件與族群層聚合。每日 composite
+以近 3 個交易日平均形成 `composite_s`；既有股票的 raw tier 需連續 2 日相同才正式轉層，
+降低單日跳動。
 
-**原始層(依日期/股票鍵冪等 upsert；holding 當日初版只可在正式晚場刷新一次；
-正式 OOS 判定另由 append-only snapshot 凍結，不從後來重建結果回填)**
+分層按下表由上到下判定。括號內是資料庫使用的策略 key；儀表板使用較保守的讀者標籤。
 
-| 表 | 內容 | 來源 |
+| 儀表板分層 | 現行條件 |
+|---|---|
+| 相對弱勢·槓桿風險（`真弱·陷阱`） | 外資分 ≤−1、融資分 ≤−1，且 `rs20 < 0` |
+| 相對強勢·過熱（`強但過熱`） | 價格分 ≥+1，且周轉率 ≥20%、量比 ≥5 倍或融資水位 ≥9% |
+| 相對蓄勢（`蓄勢·外資佈局`） | 外資或修正日買賣分 ≥+2、距 60 日高 ≤−3%、抗跌不輸同業，且 `composite_s ≥ 1.5` |
+| 相對強勢（`真強`） | 族群內前 2 名、`composite_s ≥ 2.5`、價格分 ≥+1，且至少一項法人分 ≥+1 |
+| 相對弱勢（`真弱`） | `composite_s ≤ −3.5`，或族群倒數 2 名且分數 <0 |
+| 中性觀察（`潛在/中性`） | 以上皆非；籌碼已達蓄勢前提者另列尚缺條件 |
+
+### 族群層與大盤
+
+[`scripts/fetch_daily.py`](scripts/fetch_daily.py) 以至少 6 檔有效樣本聚合族群指標：
+
+- `breadth_f`：20 日外資持股率增加的成員比例。
+- `med_dip`：成員在族群下跌日的外資淨買占股本中位數；目前是候選主訊號，仍在 OOS 驗證。
+- `rel20`：族群 20 日中位報酬相對全 universe 中位數。
+- `med_dist60`：族群成員距 60 日高的中位數。
+- `breadth_t`：近 5 日投信買超的成員比例。
+
+族群狀態同樣按優先序判定：
+
+| 狀態 | 條件 |
+|---|---|
+| 蓄勢·被佈局 | `med_dip > 0` 且 `med_dist60 ≤ −5%` |
+| 發動·領漲 | `rel20 > 0` 且 `med_dist60 > −5%` |
+| 籌碼退潮 | `med_dip < 0` 且 `breadth_f ≤ 40%` |
+| 中性觀察 / 資料不足 | 其他情況 / 樣本不足 |
+
+大盤使用含息報酬指數；距 20 日高 ≤−3% 時標為修正 regime。含息口徑可避免除息季的
+機械性下跌被誤判為市場修正，與個股使用還原價的原則一致。
+
+### 明確不計分的內容
+
+- `chip_health` 是七個籌碼方向的描述性診斷，不是族群內排名；其中 TDCC 大戶、股東人數、
+  借券三項仍待 OOS 累積後裁決。交易所處置/注意旗標會直接標成待觀察，但不改 composite。
+- MA5/20/60、RSI14、價量關係與穿越事件只描述個股相對自身歷史。
+- 官方資料「數據解剖」展示成交筆數、法人買賣兩側、融資券流量、外資限額、借券拆分與
+  相對所屬市場報酬指數；個股與族群版本都不計分。
+- 月營收、財報、質化筆記、領先假說與台積電專區都是研究背景，不直接餵入 tier。
+
+## 資料、重算與發布邊界
+
+### 資料來源
+
+| 類別 | 來源與用途 |
+|---|---|
+| 每日五張原始表 | TWSE/TPEx 全市場批次：價格、法人、融資券、外資持股、借券；另抓處置/注意公告 |
+| 還原與市場序列 | FinMind：除權息/分割事件、TAIEX 含息報酬指數；交易所官方 `market_index` 只供觀察，不取代 regime |
+| 週/月/季資料 | TDCC 股權分散週快照；FinMind 月營收、損益表、資產負債表、現金流量表 |
+| 研究資料 | 公司 IR、MOPS、TWSE/TPEx 文件與人工維護的質化筆記、領先假說、事件錨點 |
+
+每日價格因子使用本地倒推的 `price_adj`。除權息與分割有事件資料可重算；減資參考價未涵蓋，
+以「無事件大幅跳空」警告兜底。TDCC 只提供最新一週，週五快照到次週一才生效，避免前視。
+
+### SQLite 分層
+
+| 層 | 主要內容 | 更新語意 |
 |---|---|---|
-| price | 日 OHLCV、成交金額、成交筆數(`trades`) | TWSE `MI_INDEX` / TPEx `dailyQuotes`(**非 FinMind**;每日期各 1 次全市場批次) |
-| inst | 外資／投信買進、賣出、淨額；自營商自行／避險分項與合計(股) | TWSE `T86` / TPEx `dailyTrade` |
-| margin | 融資買／賣／現償／前日餘額／今日餘額／限額、融券賣／買回／現券償還／前日餘額／今日餘額／限額、資券互抵(張) | TWSE `MI_MARGN` / TPEx `margin/balance` |
-| holding | 外資持有／尚可投資股數與比率、法令上限比率、發行股數 | TWSE `MI_QFIIS` / TPEx `insti/qfii` |
-| sbl | 借券賣出前餘額／賣出／還券／調整／當日餘額／次日限額(股) | TWSE `TWT93U` / TPEx `margin/sbl` |
-| tdcc_holding | 集保股權分散(週頻,17 級距,universe+候選) | TDCC opendata(**非 FinMind**;僅供最新一週) |
-| dividend_result / split_event | 除權息、分割事件 | TaiwanStockDividendResult / TaiwanStockSplitPrice |
-| market | 加權報酬指數(含息) | TaiwanStockTotalReturnIndex |
-| market_index | 交易所官方報酬指數(`market/index_key/index_type/close`)；TWSE 全部報酬指數＋TPEx 櫃買報酬指數 | TWSE `MI_INDEX`(與價格共用回應) / TPEx `tpex_reward_index` OpenAPI |
-| month_revenue | 個股月營收 | TaiwanStockMonthRevenue |
-| financials | 損益表(含EPS,type/value 窄表) | TaiwanStockFinancialStatements |
-| balance_sheet | 資產負債表(type/value 窄表) | TaiwanStockBalanceSheet |
-| cash_flow | 現金流量表(type/value 窄表) | TaiwanStockCashFlowsStatement |
+| 原始層 | `price`、`inst`、`margin`、`holding`、`sbl`、`risk_flags`、`market`、`market_index`、`tdcc_holding`、財報與 `ref_*` | 依主鍵冪等補缺；成功來源可先 checkpoint |
+| 衍生層 | `price_adj`、`daily_metrics`、`observation_metrics`、`daily_scores`、`chip_health`、`group_metrics`、`market_daily` | 依目前規則全量重建，屬 restated history |
+| OOS as-seen 層 | `oos_snapshot_runs`、`oos_signal_snapshots`、`oos_group_snapshots`、`oos_market_snapshots` | append-only，不覆寫舊發布 |
+| 發布層 | `index.html`、`archive/<資料日>.html`、`reports/` | 首頁可重建；同日 archive 首次建立後不覆寫 |
 
-上述五表擴充欄與 `market_index` 目前都是**原始／觀察層**：只供下列
-`observation_metrics`，不進計分用 `daily_metrics`、`daily_scores`、tier 或 regime，
-也不取代既有 FinMind `market`。舊 SQLite 會在首次執行時
-原地 `ALTER TABLE`；既有歷史列的新欄先保持 `NULL`，應使用可中斷續跑的
-`--backfill-expanded-fields --start ... --end ...`，不要用 `--force` 重打已完成日期。
-`market_index` 自上線起前瞻累積；TPEx
-`tpex_reward_index` 公開端點一次提供當月資料，日常依最新交易日缺口冪等補入。
-完整稽核、請求量估算與 restatement 重建順序見
-[RAW_DATA_BACKFILL.md](RAW_DATA_BACKFILL.md)。
+衍生表回答「把現行規則套回歷史會得到什麼」；正式 OOS 回答「當天第一次發布時，使用者
+實際看到了什麼」。同一資料日若修復後重跑會新增快照，驗證固定採最早正式發布版；只有 HTML
+舊頁、沒有機器快照的日期，不得事後拼成 OOS。
 
-**衍生層(每次全量重建、冪等——調規則後重跑即一致)**
+### 自動化流程
 
-| 表 | 內容 |
-|---|---|
-| price_adj | 還原收盤價:除權息/分割以倒推法本地重算(事件日前歷史價 × 係數連乘,最新區段=原始價);減資 dataset 需付費未涵蓋,以「無事件 >15% 跳空」偵測示警兜底 |
-| daily_metrics | 五元素原始指標:ret1/ret20、dist_hi20/60、rs20、down_rs20、turnover_pct、vol_ratio60、foreign_pct、fpct_chg5/20、dipbuy20、trust5(_pct)、margin_bal/chg、margin_util_pct、券資比等;**個股自身技術觀察(未計分)**:ma5/20/60、rsi14(Wilder)、volume、vol_ma5/20/60、vol_ratio20(當日量÷20日均量);**其他觀察欄(未計分)**:tdcc_big400/1000_pct·chg、tdcc_people_chg、sbl_pct/chg(TDCC pct 分母為集保庫存,非發行股本) |
-| observation_metrics | 個股官方資料解剖(全數不計分)：成交筆數／每筆均量與均額、外資／投信／自營自行／避險方向強度、法人總活動占成交量、融資券餘額流量分解與官方限額使用率、外資法令上限使用率、借券賣出／還券／調整、相對所屬市場官方報酬指數的 1／5／20 日超額報酬 |
-| group_observation_metrics | 族群觀察：以上比例的成員中位數、買超／跑贏指數家數廣度及有效樣本數；不把不同股本公司的原始股數直接相加 |
-| daily_scores | 各元素分數、composite / composite_s(3 日平滑)、tier_raw / tier、warn、pending(蓄勢候補差哪些條件) |
-| chip_health | 個股籌碼現況診斷(健康/中性/待觀察),不計 composite/tier、不是選股排名；儀表板逐列把原始方向翻成健康/中性/警示,TDCC/借券另標「方向待 OOS 驗證」 |
-| group_metrics | 族群聚合:breadth_f、med_dist60、rel20、med_dip、breadth_t、state/note |
-| market_daily | dd20(報酬指數距 20 日高)、regime 旗標 |
-| universe / groups | 每次由 `config/universe.csv`、`config/groups.csv` 重建 |
+所有時間皆為台灣時間：
 
-儀表板的「個股技術面」使用還原收盤價與成交量，從五個互補角度描述個股相對自身歷史：
-短中長均線結構、現價偏離均線、RSI 動能及 5 日變化、價格與 20 日均量的確認關係、
-現價/MA20 與 MA5/MA20 的最近一日穿越。這些都是觀察資訊，不做族群排名、不預測下一日
-漲跌，也不進 `composite`、`tier` 或 `chip_health`。
+```text
+平日 20:17  價格 + 法人 raw checkpoint（不重算、不發布）
+       ↓
+平日 23:40  TDCC → 五表補完/holding 終版 → 衍生指標 → score
+             → 正式 OOS snapshot → index + immutable archive → commit
 
-儀表板個股列與族群卡的「數據解剖」會直接列出分子、分母與公式。法人方向強度採
-`(買進−賣出)÷(買進+賣出)`；法人總活動占比採四分項買賣總額
-`÷(2×市場成交量)`，因每一股成交同時有買賣兩側；融資券餘額變動使用**同一份官方日報**
-的前日餘額驗算當日流量，避免交易所調整基期時誤判。族群一律使用成員比例的中位數與
-廣度，官方超額報酬則依個股上市／上櫃身分分別扣除 TWSE／TPEx 報酬指數。
+週六 09:00  validate.py → reports/validate_<資料日>.md
+每月/每季   fetch_financials.py → 月營收與財報四表（不進評分）
+```
 
-凍結表 `daily_scores_v1`:舊絕對門檻制(v1)最後結果,供 validate 新舊對照。
+正式晚場要求五張原始表、universe、評分與族群資料完整後才發布。任一交易所來源失敗時，
+已成功部分會先寫入 SQLite 並保存 checkpoint，但工作流保持失敗，停止 score、OOS 快照與網站更新。
 
-**OOS as-seen 凍結層(append-only、不可重算覆寫)**
+## 儀表板怎麼看
 
-| 表 | 內容 |
-|---|---|
-| oos_snapshot_runs | 每次快照的 run id、資料日、UTC 擷取時間、觸發來源(source)、正式發布旗標(is_official)、git SHA、score/metrics/universe/groups SHA-256、資料品質計數 |
-| oos_signal_snapshots | 當時分組、`daily_metrics` 全部原始欄、`daily_scores` 全部評分欄、chip health、官方風險旗標 |
-| oos_group_snapshots | 當時族群定義、聚合指標與 state |
-| oos_market_snapshots | 當時大盤資料日、dd20 與 regime |
+建議依頁面順序閱讀：
 
-`daily_scores` 等衍生表仍可用最新規則重算全歷史,供研究「現行模型放回過去」的
-restated history；正式 OOS 則只讀上述每日快照。同資料日若修復資料後重跑,新版本會
-另存而非覆蓋,驗證固定採**最早正式發布的快照**——觸發來源可以是 GitHub Actions 或
-本地 runner；`source` 只供追溯,不決定 OOS 資格。正式發布前會要求五張原始表、評分與
-族群表都涵蓋完整 universe。這才是使用者當天第一次實際看到、可能據以決策的訊號。
-舊日期只有 HTML archive、沒有完整機器快照者
-不事後拼湊,一律標為 restated、不得計入 OOS。快照最早資料日鎖為 2026-07-10；遇休市
-或資料源尚未產生新交易日、最新資料仍早於此日，就正常略過，不把 7/9 回算值偽裝成新 OOS。
+1. **今日重點**：先確認「資料至」日期、陳舊警示與大盤 regime，不把最新頁誤認為最新資料。
+2. **台積電專區**：閱讀上游價格、外資持股、月營收與法說指引；這一區全為觀察層。
+3. **族群比較**：四象限看價籌位置與 5 日位移，熱圖比較各欄名次，排行榜逐欄排序；三個視圖
+   使用同一批資料並聯動高亮。相對最好不等於原始值已轉正。
+4. **個股分層**：可按族群篩選、展開所有成員，並查看近 5 日已確認分層的變化。
+5. **族群內個股**：搜尋或單維排序；七因子列可展開原始值、門檻量尺、權重與加權貢獻。
+6. **個股抽屜**：同一處查看分數驗算、技術/基本面、籌碼健康度、官方數據解剖，以及分頁保存的
+   正式筆記與領先假說。後四者都不會偷偷改變分數。
 
-**防前視(lookahead)設計**:周轉率/散戶水位/投信佔股本用**當日**發行股數
-(forward-fill,不用最新股本回填歷史);dist/dd 視窗有最少樣本保護(新股冷啟動
-不會假新高);外資持股有申報遞延,回測一律只用「當日可得」資料;TDCC 週快照
-(週五結算、週六才公布)以 T−3 日曆日生效——當週快照最早次週一才進指標。
+歷史日期選單讀的是當日首次建立的 archive，不會拿今天的規則或研究內容回填舊畫面。
 
-## 個股層評分(`scripts/score.py`,策略旋鈕集中在 CONFIG)
+## OOS 驗證與策略治理
 
-1. **排名制**:相對強弱(rs20)、抗跌(down_rs20)、外資(fpct_chg20)、投信
-   (trust5_pct)、逆勢買超(dipbuy20)五項在族群內取分位數:前 20% → +2、
-   20~40% → +1、中段 → 0、60~80% → −1、後 20% → −2;有效樣本 <4 檔全給 0。
-2. **雜訊死區**:外資 ±0.3pp、投信 ±0.03%、逆勢 ±0.03% 內強制 0 分——
-   全族群無訊號時,排名只會放大雜訊。
-3. **規則式元素(不排名)**:
-   - ②量:量比 = 當日周轉率 ÷ 自身 60 日中位;1.2~3.0 → +1、<0.5 → −1;
-     量比 ≥5 或周轉率 ≥20% → 過熱旗標 ⚠(不改分數,進 tier 判斷)。
-   - ⑤融資券:價(ret20)× 融資(margin_chg10)交互——價跌融資減=洗盤 +2
-     (價漲融資減=健康換手 +1)、融資 10 日暴增 ≥20% = −2、價跌融資增=接刀 −2
-     (價漲融資增=追高 −1);散戶水位 ≥9% 分數封頂 −1 並示警、≥6% 封頂 +1。
-4. **加權合成**:權重 price 1.4 / resil 1.0 / trust 0.8 / foreign 0.5 /
-   margin 0.4 / vol 0.3 / dip 0(僅供 tier 條件)。composite 取 3 日平均為
-   composite_s,理論範圍約 ±8.5。
-5. **tier**(判定優先序由上而下;raw tier 需連 2 日相同才正式轉層):
+[`scripts/validate.py`](scripts/validate.py) 預設以 10 個交易日後、相對族群中位報酬驗證：
 
-| tier | 條件 |
-|---|---|
-| 真弱·陷阱 | 外資 ≤−1 且 融資 ≤−1 且 rs20 <0(外資出、散戶接) |
-| 強但過熱 | 價 ≥+1 且 過熱旗標 |
-| 蓄勢·外資佈局 | (外資 ≥+2 或 逆勢 ≥+2)且 距 60 日高 ≤−3%(價未動)且 抗跌 ≥0(質量濾網)且 composite_s ≥1.5 |
-| 真強 | 族群 composite_s 前 2 名 且 ≥2.5 且 價 ≥+1 且 任一法人(外資/投信/逆勢)≥+1 |
-| 真弱 | composite_s ≤−3.5,或族群倒數 2 名且 <0 |
-| 潛在/中性 | 以上皆非;籌碼已符蓄勢但差其他條件者標「◇蓄勢候補」(pending 欄標明差哪些) |
+- 七因子與 composite 的族群內 IC。
+- 各 tier 與 tier 轉移的前瞻超額報酬。
+- 蓄勢條件鏈、族群狀態與 `med_dip` 命中率。
+- 市值公平性，以及 TDCC/借券等未計分觀察因子。
 
-## 族群層與大盤(`scripts/fetch_daily.py`,旋鈕在檔頭)
+策略判斷只認正式 as-seen 快照的 OOS 欄。完整門檻見
+[`WEEKLY_REVIEW.md`](WEEKLY_REVIEW.md)：不因單日、單週或 in-sample 結果調參；每次最多改
+1～2 個旋鈕。若更動權重或 tier 條件，必須同時把 `validate.py` 的 `IS_CUTOFF` 更新為當天，
+並在 `CHANGELOG.md` 記錄報告、指標與決策依據。
 
-- `group_metrics`:佈局廣度(fpct_chg20>0 檔數比例)、中位距 60 日高、rel20
-  (族群中位 20 日報酬 − 全體中位)、med_dip(修正日中位逆勢買超——選族群
-  **候選**主訊號,OOS 驗證中)、投信買超廣度;聚合需 ≥6 檔有效樣本才給值。
-- 族群狀態(`_gstate`):修正日有人接 + 價未回高 → 蓄勢·被佈局;動能領先 +
-  價近波段高 → 發動·領漲;修正日遭調節 + 廣度低 → 籌碼退潮;其餘中性觀察。
-- 大盤 regime:報酬指數距 20 日高 ≤−3% → 修正。**刻意用含息指數**——除息季
-  價格指數會機械性下跌,含息指數只反映經濟性修正(與個股層用還原價同一邏輯)。
+## 本地使用與維運
 
-## 驗證與策略治理
+所有 session 先 `git pull`，Python 一律透過 `uv` 使用 3.12。正式晚場還需要
+`FINMIND_TOKEN`；可選配 `FINMIND_TOKEN2`、`FINMIND_TOKEN3`，或放在已忽略的 `.mcp.json`。
 
-- **週報**(每週六自動,`validate.py` → `reports/`):元素 IC(族群內/混池 ×
-  IS/OOS × 修正/多頭 regime)、tier 前瞻超額與轉移事件、新舊制對照、蓄勢濾網
-  cohort、族群層命中率、市值公平性監測(同尺檢核)、觀察因子 IC(TDCC 大戶/
-  借券,未計分,等 OOS 裁決歸宿)。
-- **OOS 口徑**:`validate.py` 只把 `snapshot_signals.py` 留下的正式 as-seen 快照列入
-  OOS,並同時顯示「快照累積日數」與「前瞻報酬已成熟日數」;cutoff 後但由最新規則
-  回算的日期只供背景,不進任何 OOS 行動門檻。
-- **鐵律**:不憑 in-sample 或單日/單週數據調策略;一律走
-  [WEEKLY_REVIEW.md](WEEKLY_REVIEW.md) 的 OOS 行動門檻,每次最多動 1~2 個旋鈕;
-  改權重或 tier 條件,必須同步把 `validate.py` 的 `IS_CUTOFF` 改成當天。
-- **Universe 治理**(季度,工具 `scripts/screen.py` + `config/candidates.csv`):
-  R1 業務歸屬(主營收 >50% 屬族群業務,人工覆核)——**先判斷商業模式**:營收主要
-  來自賣自己的產品、還是收加工/服務費?後者(封測代工/測試代工/通路代理/工程
-  服務等)優先看 packtest/semiequip 這類「服務型」族群,不依終端應用分到
-  power/memory 等「產品型」族群(2026-07-09 6525 捷敏-KY 曾誤判為例,見
-  CHANGELOG);`screen.py` 另跑一次零 API 的業務歸屬關鍵字複檢(`check_biz_grp`),
-  抓 biz 欄與族群歸類疑似不符的既有成員,供人工覆核、不自動改分類 /
-  R2 市值遲滯(≥50 億納入、現有成員 <30 億才剔除,防反覆進出)/ R3 近 20 日
-  中位成交值 ≥3,000 萬 / R4 上市 ≥60 交易日。變更後全歷史按新名單重算
-  (族群中位與排名都會變),審計軌跡以 CHANGELOG 為準。R1 商業模式判斷的質化佐證
-  (年報 MD&A、法說會重點)以 AI 協作整理在 `notes/qualitative/*.md`,並由獨立
-  reviewer 依一手證據簽核；狀態與品質契約由 `scripts/qual_notes.py` 追蹤,見下方
-  「質化研究筆記」。
-- **新增族群**(2026-07-05 記憶體為範例,細節見 CHANGELOG):全管線配置驅動,
-  `groups.csv` + `universe.csv` 各加行即生效、零改碼;一檔只屬一個族群(跨域者
-  依籌碼行為歸屬,如記憶體封測歸封測);族群設計下限約 6 檔有效樣本(低於
-  `GRP_MIN_N` 族群層聚合不給值,子鏈拆太細會算不出來);候選一樣走 R1~R4 +
-  `screen.py`。回補至現有基期後全歷史即有分數,但**新族群的 OOS 從加入日後第一份
-  正式 as-seen 快照起算**——「事後挑族群」的回補歷史含 look-ahead,不得當策略證據;TDCC 週快照自
-  加入日起累積,之前為永久洞。
+```powershell
+# 只讀：盤後資料鮮度、族群、分層變化與品質摘要
+git pull
+uv run --no-project --python 3.12 python scripts/daily_brief.py
 
-## 用法
-
-```bash
-# 本地每日正式管線(與 Actions 同序；可重跑、預設發布正式 OOS,但不 commit/push)
+# 23:40 後人工補跑完整正式管線；會發布本地 OOS snapshot，但不 commit/push
 uv run --no-project --python 3.12 python scripts/run_daily.py
 
-# 拆開執行；直接呼叫 snapshot 時本地預設只是 preview,正式發布需 --publish
-uv run --no-project python scripts/fetch_daily.py --final-pass # 23:40 後正式補完(預設最近 15 天)
-uv run --no-project python scripts/fetch_daily.py --datasets TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell --raw-only # 20:17 早場
-uv run --no-project python scripts/score.py           # 重算全歷史評分
-uv run --no-project python scripts/snapshot_signals.py --source local --publish
-uv run --no-project python scripts/build_dashboard.py # 重生 index.html
-
-# TDCC 週快照(Actions 每日自動抓;週六 opendata 更新後手動跑可提早入庫)
-uv run --no-project python scripts/fetch_tdcc.py
-
-# 財報四表(Actions 月/季自動跑;獨立於每日管線,見 fetch-financials.yml)
-uv run --no-project python scripts/fetch_financials.py                     # 全部四個 dataset
-uv run --no-project python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue
-
-# 回補歷史 / 定向補缺(只抓指定股票,省 API 額度)/ 盤後唯讀簡報 / 週度驗證
-uv run --no-project python scripts/fetch_daily.py --start 2026-03-01
-uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-01
-uv run --no-project --python 3.12 python scripts/fetch_daily.py --backfill-expanded-fields --start 2026-03-02
-uv run --no-project --python 3.12 python scripts/audit_raw_data.py # 正式 DB 唯讀完整度/公式稽核
-uv run --no-project python scripts/fetch_daily.py --force --start 2026-07-01 # 明確要求來源修正重抓
-uv run --no-project python scripts/daily_brief.py
-uv run --no-project python scripts/validate.py
+# 週度驗證、正式 DB 唯讀稽核、完整測試
+uv run --no-project --python 3.12 python scripts/validate.py
+uv run --no-project --python 3.12 python scripts/audit_raw_data.py
+uv run --no-project --python 3.12 python -m unittest discover -s tests
 ```
 
-Token 讀取順序:環境變數 `FINMIND_TOKEN`(+選配 `FINMIND_TOKEN2`、
-`FINMIND_TOKEN3`)→ 本機
-`.mcp.json` 同名欄位(已被 `.gitignore` 排除);雲端由 Actions secret 注入。
-多組 token 組成時額輪替池——免費層 600 req/hr,遇 401/402/403 會把該 token
-在本次 process 熔斷並換下一組,全部熔斷就立即失敗停止
-(`fetch_daily.api_get`,screen.py 共用);同日多輪「screen+全量回補」單組
-token 必爆額度。五張每日原始表已全部改成 TWSE／TPEx 每表各 1 次批次；正常新交易日
-共 10 次免 token 官方請求，另有 TPEx `market_index` 1 次；TWSE 報酬指數與價格共用
-`MI_INDEX`，不增加請求。FinMind 邏輯請求只剩約 125 次（除權息 121、分割 1、
-TAIEX 1、參考個股 2），單一免費 token 已有充足餘裕。正常 daily 會跳過完整
-dataset-day；休市日早場通常只需兩個官方價格探針，資料源延遲時稍後重跑只補仍缺資料。
-Runbook:盤後檢視
-[DAILY_CHECK.md](DAILY_CHECK.md)、週六策略檢視 [WEEKLY_REVIEW.md](WEEKLY_REVIEW.md)。
+`run_daily.py` 可安全重跑，只補缺口；上游未齊時會拒絕正式發布。它不會替你 review、commit
+或 push。
 
 ### Daily Fetch 日誌判讀與續跑語意
 
-- `原始資料規劃:FinMind 0 次;TWSE/TPEx 官方批次 P 次` 中，`P` 是五表實際發出的
-  交易所請求。完整新交易日由每表兩個市場組成，理論值 10；正常早場是價格 2 +
-  `inst` 2 = 4，晚場若早場完整則只需 `margin`／`holding`／`sbl` 共 6。早場失敗時
-  晚場會連價格／法人一起補，最多仍是 10。除權息、分割、TAIEX、參考個股另列為
-  `事件 API E 次`，這才消耗 FinMind 額度，理論值 `N+4=125`（N=121）。
-- `market_index:upsert I rows · 額外官方 requests M` 另計：正常新交易日 `M=1`（TPEx），
-  TWSE 由價格回應順手落地；舊 DB 首次升級且最新日尚無 TWSE 指數時最多再補 1 次。
-  `market_index` 是非阻斷觀察層，失敗會明確警告並留待下次補缺，不阻止五表評分／發布。
-- `P=0` 表示 SQLite 指定表已完整而被智慧補缺跳過，不代表端點失敗；只有真正發出請求
-  的新資料日才能驗收該來源路徑。
-- schema 新增欄位後用 `--backfill-expanded-fields`：它不探測未知日曆日，只把既有交易日中
-  缺列或 `RAW_COLUMN_MIGRATIONS` 任一欄為 `NULL` 的 pair 視為缺口，自動 raw-only 且
-  逐來源 checkpoint；中斷後重跑同一命令即可。`--force` 僅供來源修正，不是欄位 migration。
-- TWSE／TPEx 任一來源失敗或 universe 覆蓋不完整時，成功來源會先 commit 進 SQLite，
-  隨後整個 fetch step 失敗；Action 只 commit `data/` checkpoint 並刻意標紅，不執行
-  score、OOS snapshot、dashboard。重跑會依缺口接續，不會丟掉失敗前成果。
-- 交易日的官方表若任一市場回空、或 universe 未達全覆蓋，會直接失敗；不把空回應補 0。
-  `holding` 的 18:00 初版不設 final coverage，23:40 completion pass 會再抓一次 22:00
-  最終版；final coverage 成功後，同日重跑保持冪等。
-- 綠燈驗收不只看 workflow conclusion：日誌應有正式 OOS 快照、資料 commit/push；拉回
-  最新 commit 後執行 `uv run --no-project --python 3.12 python scripts/daily_brief.py`，確認
-  最新資料日覆蓋等於 universe 且「資料品質:無異常」。網站發布另以首頁與當日 archive
-  HTTP 200 確認。
+- 日誌的「官方批次 `P` 次」只計五張表的 TWSE/TPEx 呼叫。完整新交易日通常為 10 次；
+  早場為 4 次，早場已完成時晚場通常再補 6 次。
+- `P=0` 代表指定缺口已完整而跳過，不是資料源失敗。FinMind 事件呼叫與 `market_index`
+  額外官方請求會分開列示；後者是非阻斷觀察層。
+- 一個市場成功、另一個失敗時，成功資料先落地；下次依 SQLite 缺口接續。空回應或 universe
+  覆蓋不足不會被補成 0。
+- `holding` 日內初版不視為正式終版；23:40 的 `--final-pass` 會刷新一次，完成後同日重跑維持冪等。
+- schema 新增欄位的歷史 `NULL` 使用 `--backfill-expanded-fields`；只有交易所公告來源修正版、
+  既有非空值也必須覆寫時才用 `--force`。
+
+完整退出碼、請求量與 restatement 順序見
+[`RAW_DATA_BACKFILL.md`](RAW_DATA_BACKFILL.md)。每日異常排查見
+[`DAILY_CHECK.md`](DAILY_CHECK.md)。
+
+## Universe 治理
+
+Universe 每季檢視一次；[`scripts/screen.py`](scripts/screen.py) 產生現有成員體檢與候選報告，
+但不自動改名單或族群。
+
+| 規則 | 現行標準 |
+|---|---|
+| R1 業務歸屬 | 主營收 >50% 屬該族群；優先判斷公司賣自有產品，或收代工/測試/通路/工程服務費，由一手文件人工覆核 |
+| R2 規模遲滯 | 候選市值 ≥50 億才可納入；既有成員跌破 30 億才建議剔除，30～50 億留在緩衝帶 |
+| R3 流動性 | 候選近 20 日中位成交值 ≥3,000 萬；既有成員未達時列觀察，不自動剔除 |
+| R4 冷啟動 | 候選至少有 60 個交易日 |
+
+一檔股票只屬一個族群，跨域公司依主要商業模式與籌碼可比性歸類。`screen.py` 的業務關鍵字
+檢查只負責提示疑點，不可取代 R1 人工判斷。季度檢視也應以正式質化筆記重新核對
+`universe.csv` 的 `biz` 與 group：純文字過時可修 metadata；族群歸類疑義必須回到治理流程，
+不得自動搬移。
+
+### 新增族群
+
+族群由 `groups.csv` 與 `universe.csv` 配置驅動，但仍須同時完成下列工作：
+
+1. 維持至少 6 檔有效樣本，避免中位數與排名被少數個股主導。
+2. 回補新成員原始資料，重建衍生表，並補齊質化筆記與事件錨點的 `guidance_<group>`。
+3. 檢查儀表板、lint、測試與資料完整度，將治理依據記入 `CHANGELOG.md`。
+4. 將回補歷史明確視為 restated；新成員/新族群的 OOS 只能從加入後第一份正式快照起算。
+
+TDCC 只提供最新一週，新成員加入前的週資料無法補回。Universe 變更也會改變族群中位數與
+所有成員排名，因此回補後的漂亮歷史不能當成策略證據。
 
 ## 質化研究筆記(`notes/qualitative/`)
 
-年報 MD&A、財報、法說會與重大訊息這類質化揭露由 AI 協作整理成
-`notes/qualitative/<股號>_<名稱>.md`,供 Universe 治理與個股研究參考。搜尋引擎、新聞、
-法說摘要只能用來發現線索；主張應回到公司 IR、年報／財報原檔、MOPS 直接公告或
-TWSE／TPEx 文件。FinMind 財報窄表用來交叉檢查量化口徑,不取代原始文件。
+正式筆記用於 R1 業務歸屬與公司研究，不進量化分數。搜尋結果、新聞與法說摘要只能協助定位；
+主張必須回到公司 IR、年報/財報、MOPS 或交易所文件。
 
-新 session 逐篇執行時先依 [QUALITATIVE_RESEARCH_RUNBOOK.md](QUALITATIVE_RESEARCH_RUNBOOK.md)
-的 checklist 完成來源取得、claim-page 對照、drafter／reviewer 交接、退回重建與單篇提交；
-公司 IR、MOPS、TWSE／TPEx 的常見查詢 URL 與失敗備援另見
-[QUALITATIVE_SOURCE_ACQUISITION.md](QUALITATIVE_SOURCE_ACQUISITION.md)。本節保留完整品質契約與
-工具參數說明。
+新建或重新展開完整研究一律使用 `research_profile: focused_v1`；既有未標 profile 的 v2
+筆記仍依原契約有效，等下次實質重做才遷移。focused 流程的核心要求是：
 
-### `focused_v1`（只套用新研究）
+- 使用 3～5 份核心一手文件，涵蓋年報、年度財報、最新季報與最新法說；年報含查核財報時
+  可由同一 PDF 承擔兩個 role。
+- 正文聚焦約 25～35 個重要 claim block，每個實質段落、bullet 或表格列以 `[S#]` 對到實際頁。
+- 每份缺失文件最多尋找 10 分鐘；找不到就記錄 timeout、刪除未驗證主張，不用二手來源補洞。
+- Drafter 建立內容定址 evidence pack；reviewer 使用同一 pack 離線重算 SHA、數字、期間、
+  單位與推論邊界，不重新下載另一份文件。
+- `qual_review.py` 只做唯讀 triage；HARD 項未清除不能簽核，機器命中也不等於人工驗證通過。
+- 完成 `independently_verified` 後，只提交該 note 與對應 manifest，立即做成一個獨立中文 commit；
+  PDF/PNG 留在 `tmp/`。
 
-新建筆記或重新展開一輪完整研究時,在既有 template v2 上加入以下 meta；這是附加的
-研究流程 profile,**不是 template v3**。既有未標 `research_profile` 的 v2 筆記繼續依原
-品質契約有效,不批次改寫、不因 focused 規範回溯降級；待下一次實質重做時才加入。
+筆記品質狀態分為 `ai_draft`、`partially_verified`、`independently_verified`、`conflicted`；
+內容時效與查核品質是兩條獨立軸，儀表板會分開顯示。
 
-```yaml
-research_profile: focused_v1
-core_source_ids: S1,S2,S3
-evidence_pack_manifest: notes/qualitative/evidence/<股號>/<content_as_of>_<sha前16>.json
-evidence_pack_sha256: <64 位十六進位 SHA-256>
-review_method: offline_evidence_pack_independent_recalculation
+```powershell
+uv run --no-project --python 3.12 python scripts/qual_notes.py --needs-review
+uv run --no-project --python 3.12 python scripts/qual_notes.py --lint
+uv run --no-project --python 3.12 python scripts/qual_review.py <股號>
 ```
 
-focused 研究的範圍刻意收斂：
+逐篇查核與 evidence pack 命令見
+[`QUALITATIVE_RESEARCH_RUNBOOK.md`](QUALITATIVE_RESEARCH_RUNBOOK.md)；官方文件取得順序與備援見
+[`QUALITATIVE_SOURCE_ACQUISITION.md`](QUALITATIVE_SOURCE_ACQUISITION.md)。
 
-1. 只選 **3~5 份不重複的核心一手文件**：通常是最新年報、年度查核財報、最新季度
-   核閱財報、最新法說；只有治理／股利等主張確有需要時才加入官方股東會文件。
-   `core_source_ids` 必須與 evidence manifest 及正文證據索引一致。
-2. 全文以 **約 25~35 個真正重要 claim block** 為目標。`qual_notes.py` 既有定義是一個
-   實質段落、一個 bullet 或一列表格資料各算一個；超出區間應警告並要求聚焦,但不可
-   為湊數拆句,也不可因此刪掉理解公司不可或缺的少數主張。
-3. PDF 只渲染正文實際引用頁及前後各一頁（頁首／頁尾自動截斷）,不渲染整本。
-4. 找不到穩定一手來源時,每份缺失文件最多查找 **10 分鐘**。逾時即停止追逐,
-   從正文刪除相關未驗證主張；manifest 固定記錄 `source_search_timeout_minutes: 10`
-   與 `unverified_claims_removed: true`。這不是來源衝突,不得改標 `conflicted`,也不得
-   用新聞或搜尋摘要補洞。
+## 領先假說（市場小作文）
 
-evidence pack 使用內容定址且不可覆寫。`qual_evidence.py` 本身不下載文件；drafter 先把
-3~5 份核心 PDF 放在本機,再對每份文件重複傳入
-`--source/--url/--pages/--page-count/--role`。四個必備 role 是 `annual_report`、
-`annual_financials`、`latest_quarterly_report`、`latest_investor_conference`；只有同一份年報
-PDF 已包含查核財報時,前兩個 role 才能合併在同一個 S#,股東會文件則使用選填的
-`shareholder_meeting`。`build` 與 reviewer 的 `verify` 都會用 Poppler `pdfinfo` 解析原檔並
-核對實際頁數；若不在 PATH,以 `--pdfinfo <路徑>` 指定。以下 S1~S3 的路徑、URL、引用
-實體頁與總頁數都必須換成實際值。
+[`notes/leading_hypotheses/`](notes/leading_hypotheses/) 保存市場流傳、可追溯且可證偽，
+但尚未被正式一手文件完整覆蓋的主張。它不是事實認證，也不進分數。
 
-```bash
-uv run --no-project --python 3.12 python scripts/qual_evidence.py build --stock-id 6525 --content-as-of 2026-07-11 --source S1=tmp/S1.pdf --url S1=https://example.com/S1.pdf --pages S1=4-6,12 --page-count S1=80 --role S1=annual_report,annual_financials --source S2=tmp/S2.pdf --url S2=https://example.com/S2.pdf --pages S2=5,18-19 --page-count S2=64 --role S2=latest_quarterly_report --source S3=tmp/S3.pdf --url S3=https://example.com/S3.pdf --pages S3=3,20 --page-count S3=40 --role S3=latest_investor_conference
-uv run --no-project --python 3.12 python scripts/qual_evidence.py render-plan "$PACK_DIR"
-uv run --no-project --python 3.12 python scripts/qual_evidence.py render "$PACK_DIR" --pdftoppm "$PDFTOPPM"
-uv run --no-project --python 3.12 python scripts/qual_evidence.py verify "$PACK_DIR" --renders
-```
-
-`build` 的 JSON stdout 會回傳 `pack_dir`、可提交的 `manifest` 路徑與 `pack_sha256`；把後
-兩者填回 meta。PDF／PNG 留在已忽略的 `tmp/qualitative_evidence/`,只有自動產生於
-`notes/qualitative/evidence/` 的小型 manifest 進版控。`build` 會把 SHA payload 檔案標成
-唯讀,`verify` 重算完整 64 位址、PDF 頁數與精確目錄內容；這是可偵測竄改的唯讀封存,
-不是阻止檔案擁有者自行改 ACL／chmod 的安全邊界。`render` 只在 pack 外建立衍生 PNG,
-不會改動 evidence payload。不同於 drafter 的
-reviewer 使用**同一個 pack**執行 `verify --renders`,離線重算
-文件與 pack SHA,並獨立重算數字、期間、單位及判斷推論邊界,不得重新下載另一份文件。
-簽核時必須把 `review_method` 填成 `offline_evidence_pack_independent_recalculation`；這個
-固定值連同 pack SHA 會被正文 hash 鎖住,明確 attested reviewer 採用同 pack 離線重算流程。
-
-每完成一篇 `independently_verified`,先執行 `qual_notes.py --hash <股號>`、把輸出填入
-`reviewed_content_sha256`,再執行 `--lint <股號>`；通過後只 stage 該 note 與其 manifest
-並立即做一個中文 commit,不可等三篇或多篇完成後才一起提交。這個單篇 commit 邊界不需
-寫入 meta,避免 commit SHA 與內容 hash 形成循環依賴。
-
-品質狀態與資料時效是兩條獨立軸：
-
-- `ai_draft`：預設；即使剛更新或已有引用,也不代表經 reviewer 查核。
-- `partially_verified`：只有 `review_scope` 明列的更正／章節完成獨立核驗,其餘仍是草稿。
-- `independently_verified`：template v2 的每個實質段落、bullet 與表格資料列皆有一手
-  `[S#]`，且由不同於撰稿者的 reviewer 完成全文簽核。
-- `conflicted`：兩個可信來源口徑不一致,保留雙方證據與未決問題,不可自行挑有利版本。
-
-正文的重要主張在同一 claim block 後標 `[S1]`;證據索引固定使用：
-
-```markdown
-- [S1] **一手**｜文件名稱與發布／資料日期｜頁碼、表格或章節｜https://直接文件網址
-```
-
-`last_updated` 只是內容編修日。部分／完整核驗另須填 `drafted_by`、`reviewed_by`、
-`reviewed_at`、`review_scope` 與 `reviewed_content_sha256`;撰稿者與 reviewer 不得相同。
-雜湊鎖住 reviewer 實際看過的版本,簽核後再改正文會由 lint 自動降回 AI 草稿。
-這是可稽核的流程 attestation,不是密碼學身分簽章：字串本身仍可被編輯。正式多人維護時
-應再用 GitHub branch protection／指定 reviewer 的 PR approval 鎖住身分與核准權限。
-
-```bash
-uv run --no-project --python 3.12 python scripts/qual_notes.py                         # 時效＋查核品質總覽
-uv run --no-project --python 3.12 python scripts/qual_notes.py --lint                  # 全庫品質契約；error 時 exit 1
-uv run --no-project --python 3.12 python scripts/qual_notes.py --lint 6525             # 只稽核一篇
-uv run --no-project --python 3.12 python scripts/qual_notes.py --needs-review          # 全文尚未獨立核驗／過期／無效
-uv run --no-project --python 3.12 python scripts/qual_notes.py --quality ai_draft      # 依有效品質狀態篩選
-uv run --no-project --python 3.12 python scripts/qual_notes.py --missing               # universe 尚無筆記
-uv run --no-project --python 3.12 python scripts/qual_notes.py --stale                 # 到達／超過 next_review
-uv run --no-project --python 3.12 python scripts/qual_notes.py --invalid               # 品質契約有 error
-uv run --no-project --python 3.12 python scripts/qual_notes.py --outdated              # 舊模板遷移佇列
-uv run --no-project --python 3.12 python scripts/qual_notes.py --new 6525              # 建立 v2 骨架
-uv run --no-project --python 3.12 python scripts/qual_notes.py --hash 6525             # reviewer 核完後產生內容雜湊
-uv run --no-project --python 3.12 python scripts/qual_review.py 6525                   # 機器輔助複核 triage(唯讀)
-```
-
-研究流程是：先建立／更新 AI 草稿 → focused_v1 drafter 建立 evidence pack 並逐 claim 補
-`[S#]`、交接前跑 `qual_review.py` triage 清 HARD → 未參與撰稿的 reviewer 用同一 pack
-離線驗 SHA,再依 triage 報告分配注意力(機器全覆蓋定位數字與前後文;未命中/推導/
-高風險詞/無文字層由人重算與目視),獨立判讀期間、單位與推論邊界 → 填簽核 meta →
-產生 hash → `--lint` → 該 note 與 manifest 立即獨立 commit。`qual_review.py` 是唯讀
-搜尋輔助,不改變 `review_method` 的離線同 pack 重算語意,機器命中不等於驗證通過。
-質化檔案或 parser 變更時，獨立的 `qualitative-quality` GitHub workflow 會執行 lint 與
-dashboard 契約測試；它不阻斷每日市場資料抓取。品質無效的宣告狀態會在 dashboard 保守
-降級（已知來源衝突則維持衝突警示），避免人工研究層故障使核心量化資料整批過期。
-完整核驗只能使用 v2 與 `review_scope: all_material_claims`;舊 v1 可留作遷移佇列,已確認的
-局部修正可明確標成 partial,但不會因局部修正冒充全文已驗證。純刪除錯誤敘事且沒有存續
-claim 時使用 `confirmed_correction_deletion_only`。法說頻率因公司而異,`next_review` 依各公司
-實際頻率設定；財報、法說、重大訊息、KPI 偏離或來源衝突也可提前觸發更新。
-
-儀表板 badge 主色表示有效查核狀態,外圈才表示 `next_review` 已逾期；詳情會顯示 reviewer、
-核驗範圍、資料截至日與 claim／一手證據覆蓋。無筆記的股票不顯示 badge。查核只代表筆記
-在明列範圍內與所列來源一致,不保證管理層預測實現,也不把公司說法自動視為客觀真相。
-
-### 領先假說（市場小作文）
-
-`notes/leading_hypotheses/*.md` 與正式筆記分層保存可追溯、可證偽的市場主張。只允許為有效
-`independently_verified` 正式筆記建立報告，且每份報告以 `formal_note_content_sha256`
-錨定當時比較的正式版本；正式筆記更新後，假說報告必須重新對照才能通過 lint。詳細收錄
-邊界、狀態與更新規則見 [LEADING_HYPOTHESES.md](LEADING_HYPOTHESES.md)；第一階段的凍結
-樣本、限制與第二階段決策見
-[LEADING_HYPOTHESES_PHASE1_REVIEW.md](LEADING_HYPOTHESES_PHASE1_REVIEW.md)。
-第二階段的前瞻收錄、消息鏈判定、複核與終態操作見
-[LEADING_HYPOTHESES_PHASE2_RUNBOOK.md](LEADING_HYPOTHESES_PHASE2_RUNBOOK.md)。
-
-領先假說不是事實認證，也不進入個股分數。儀表板在同一個公司研究入口以「正式筆記／
-領先假說」Tab 並列，讓讀者直接比較正式揭露與市場快訊、匿名法人或社群推論。每則固定
-保留消息日期、研究實際收錄日、前瞻／回溯標記、來源與獨立消息鏈、生命週期、證據警示、
-狀態歷程、正式資料基準、可證偽條件與單則驗證期限；來源重複轉載不視為獨立確認。
-報告層另可附「多空觀點(小作文)」——看多/看空兩篇對立敘事(各須引用現有 H# 並自陳
-「最脆弱處」)加 1–3 條「勝負手」裁決點,搭配 `--context` 從自家 db 產生的「量化背景」
-快照(月營收/籌碼/族群排名/台積電法說族群指引);觀察層數據僅供敘事語境,不得作為
-生命週期轉移證據,lint 鎖住此警語。
-2026-07-12 封存基線的既有 98 檔正式筆記均有領先假說報告，共 199 則假說，其中
-196 則為回溯基線、3 則為其後實際捕捉的前瞻樣本；其後新增的 Universe 成員須先完成
-正式筆記獨立核驗才建立領先假說，新增內容一律以前瞻捕捉建檔，不再用舊消息補成回溯績效。
+- 只為有效 `independently_verified` 正式筆記建立，並以內容 SHA 錨定當時比較的正式版本。
+- 每則保留消息發布日、實際研究收錄日、前瞻/回溯、獨立消息鏈、證據警示、生命週期、
+  可證偽條件與期限；轉載同一原始事件不算多條獨立證據。
+- 狀態只能由正式文件、可重算實績或事前里程碑轉移；股價與觀察層數據只可當捕捉觸發器。
+- 看多/看空敘事必須各引用現有 H#、說明最脆弱處，並用 1～3 條「勝負手」交給未來資料裁決。
 
 ```powershell
 uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --lint
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --summary
 uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --due
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --metrics
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --context 6525  # 量化背景快照 → tmp/
+uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --context <股號>
 ```
 
-**biz/群組對齊複核**(不定期,建議跟季度 Universe 治理一起做,或補完一批新筆記後執行):
-筆記內容通常比 `universe.csv` 的 biz 欄豐富得多,值得回頭核對兩者是否還對得上——拿每檔
-筆記的「業務概況」「客戶/產品結構」章節,對照現有 biz 描述與 group 歸類是否仍準確,
-判斷框架同上面「Universe 治理」的 R1 商業模式準則。結果分兩類:
-- **biz 文字疑慮**(描述跟不上筆記揭露的最新營收結構,不影響族群歸屬,如舊描述漏列
-  已躍居主力的新產品線):可直接修正 `universe.csv` 的 biz 欄,並用
-  `fetch_daily.load_universe(con)` 同步 db 的 `universe` 表(純 metadata 更新,
-  不必重跑整條抓取管線,也不影響 price/score)。
-- **族群歸類疑慮**(商業模式與現有族群定位有張力,例如實際收代工/服務費卻歸在
-  產品型族群,但現行族群未必有對應的服務型分類可放):記錄下來留給人工 Universe
-  治理判斷,**不自動改分類**。
-複核結果整理成 `reports/biz_audit_<日期>.md`(範例見 2026-07-09 那份,含逐檔判定表與
-依據引用),比照 `screen.py` 報告的存放慣例;修正/擱置項目一併記入 CHANGELOG。
+完整收錄邊界與操作見 [`LEADING_HYPOTHESES.md`](LEADING_HYPOTHESES.md) 與
+[`LEADING_HYPOTHESES_PHASE2_RUNBOOK.md`](LEADING_HYPOTHESES_PHASE2_RUNBOOK.md)。
 
-## 事件錨點與台積電專區(`notes/events/`)
+## 事件錨點與台積電專區
 
-台積電(2330)是本 universe 共同的上游:capex 決定設備/材料訂單、先進封裝產能決定
-封測外溢與 AI 伺服器節奏、HPC 平台占比是 AI 需求的第一手證據。`notes/events/*.md`
-保存跨個股的市場事件錨點(目前=每季台積電法說會彙整),儀表板據此顯示
-「台積電專區」與族群卡上的「台積電指引」chip。**全程觀察層:2330 不在 universe、
-不參與任何排名/評分,指引是編輯彙整的方向標記,不是預測。**
+台積電 2330 是觀察層參考股，不在 universe，也不參與 `daily_metrics`、`daily_scores` 或任何
+排名。每日收盤/外資持股寫入隔離的 `ref_price`、`ref_holding`；月營收與財報由獨立排程更新。
 
-### 檔案契約(`qual_notes.py --lint` 稽核,CI 同步跑)
+[`notes/events/`](notes/events/) 保存每季法說會等跨個股事件。每份事件必須為所有正式族群提供
+`guidance_<group>`，即使未提及也明確寫 `none`；儀表板用它產生台積電專區與族群卡指引 chip。
+這些方向是編輯彙整，不是預測。每季法說後更新事件日期、KPI、guidance、`next_review`，並執行：
 
-檔名 `<事件日>_<標題>.md`,與個股筆記同用 `<!-- meta -->` 區塊(唯一、key: value 逐行):
+```powershell
+uv run --no-project --python 3.12 python scripts/qual_notes.py --lint
+```
 
-| 欄位 | 必填 | 說明 |
-|---|---|---|
-| `subject` | ✅ | 事件主體,小寫代號(目前儀表板僅顯示 `tsmc`;其他值 lint 警告) |
-| `event_date` / `fiscal_quarter` | ✅ | 事件日(YYYY-MM-DD)/ 季度(`2026Q2`);同 (subject, event_date) 重複=error |
-| `content_as_of` / `next_review` | ✅ | 資料時點 / 下次建議更新(=下季法說估日);逾期在儀表板標「待更新」 |
-| `verification_status` | ✅ | 沿用質化筆記四態(`ai_draft`/`partially_verified`/…) |
-| `guidance_<族群鍵>` | ✅×族群數 | `<dir>\|<一句話>`,dir ∈ `up/flat/down/mixed/none`;**全部正式族群鍵必須全齊**——「法說沒提」也是資訊,未提及寫 `none\|未提及` |
-| `kpi_capex` `kpi_fy_growth` `kpi_gm` `kpi_hpc_share` | 建議 | 顯示字串(缺=專區顯示「—」,lint 警告) |
+## 專案入口
 
-prose 章節完全自由(§數字/§質化訊號/§族群映射…),經 `_extract_sections` 拆節後
-在儀表板 sheet 全文呈現,並連到 GitHub 原始檔。同 subject 多檔時取 `event_date`
-最大者為當前事件,其餘列入歷史清單。
+| 需求 | 入口 |
+|---|---|
+| 盤後確認與今日討論 | [`DAILY_CHECK.md`](DAILY_CHECK.md)、`scripts/daily_brief.py` |
+| 原始欄位回補/正式 DB 稽核 | [`RAW_DATA_BACKFILL.md`](RAW_DATA_BACKFILL.md)、`scripts/audit_raw_data.py` |
+| 週六策略檢視 | [`WEEKLY_REVIEW.md`](WEEKLY_REVIEW.md)、`scripts/validate.py` |
+| Universe 與候選 | 本頁「Universe 治理」、`scripts/screen.py`、`config/` |
+| 質化筆記 | [`QUALITATIVE_RESEARCH_RUNBOOK.md`](QUALITATIVE_RESEARCH_RUNBOOK.md)、`scripts/qual_notes.py`、`scripts/qual_evidence.py`、`scripts/qual_review.py` |
+| 領先假說 | [`LEADING_HYPOTHESES.md`](LEADING_HYPOTHESES.md)、[`LEADING_HYPOTHESES_PHASE2_RUNBOOK.md`](LEADING_HYPOTHESES_PHASE2_RUNBOOK.md) |
+| 策略與資料變更歷史 | [`CHANGELOG.md`](CHANGELOG.md) |
 
-### 資料流與維護節奏
+## 已知限制
 
-- **量化(自動)**:每日管線另以 FinMind 抓 2330 收盤/外資持股 → `ref_price`/`ref_holding`
-  隔離表(+2 req/日;不進任何衍生表);月營收/財報四表隨 `fetch_financials`
-  月/季排程(+1 req/月、+4 req/季),`fund_map["2330"]` 供專區月營收格。
-- **質化(每季人工/AI 協作)**:法說會後 T+1 內更新事件錨點(guidance/kpi/prose),
-  跑 `uv run --no-project --python 3.12 python scripts/qual_notes.py --lint` 確認格式,
-  `next_review` 設下季法說估日。
-- 指引未來若要驗證「方向 vs 族群後續報酬」,依策略治理慣例走 `validate.py`
-  另立觀察因子與 OOS 檢驗,不直接進評分。
-
-## 侷限與註記
-
-- 券商分點(真主力)需 FinMind Sponsor 等級,未開通——看得到法人別、看不到分點。
-- TDCC 股權分散 opendata 僅提供最新一週、歷史不可回補——自 2026-07-03 起累積,
-  缺週即永久洞(每日管線重抓同週快照 = 5 次保險);FinMind 的歷史版 dataset 需付費。
-- 小型股外資持股單日數字含保管行重分類雜訊:看 20 日趨勢並與買賣超交叉驗證。
-- 本專案為量化籌碼研究,**非投資建議**。
+- 券商分點資料未涵蓋；系統能看法人別，不能辨識實際分點主力。
+- TDCC opendata 只有最新一週，漏抓無法事後補回；外資持股也可能受保管行重分類影響。
+- 減資參考價未納入還原事件；無事件大幅跳空只能警告，仍需人工查核。
+- 歷史最前段若尚無當日股本，衍生指標會以第一筆可得股本作種子；研究長窗時應注意這個邊界。
+- 排名、tier、族群狀態、研究筆記與領先假說都不是報酬保證。本專案為研究工具，**非投資建議**。
