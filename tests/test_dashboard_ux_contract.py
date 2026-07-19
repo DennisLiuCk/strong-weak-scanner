@@ -1,3 +1,17 @@
+# -*- coding: utf-8 -*-
+"""儀表板 UX 契約(2026-07-19 redesign 版)。
+
+模板於 2026-07-19 換成 claude.ai/design 專案的純 JS/SVG 重寫版
+(adapter 層吃同一組 __*_JSON__ placeholder,build_dashboard.py 零改動)。
+本檔對齊新模板重寫;builder 側、策略凍結、公開文案與 2330 鐵律斷言原樣保留。
+
+明示放棄、待日後裁決是否回補的舊功能(原斷言見 git 歷史 183a8f1 之前版本):
+- 術語 glossary(appendGlossary)
+- MA/RSI/VOL 教學區(technical-guide)
+- 圖表節點 tooltip 與鍵盤左右鍵導覽(bindChartNode/registerChartKeyboard)
+- 觀察層 flow badge(交易/部位觀察指南;payload 仍每日產出,見
+  test_observation_dashboard.py)
+"""
 import sys
 import unittest
 from pathlib import Path
@@ -19,6 +33,8 @@ class DashboardUxContractTest(unittest.TestCase):
         cls.template = (SCRIPTS / "dashboard_template.html").read_text(encoding="utf-8")
         cls.builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
 
+    # ---------- 文件骨架與導覽 ----------
+
     def test_template_is_a_complete_traditional_chinese_document(self):
         html = self.template.strip()
         self.assertTrue(html.lower().startswith("<!doctype html>"))
@@ -28,16 +44,33 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn('<main id="main">', html)
         self.assertTrue(html.endswith("</html>"))
 
-    def test_first_screen_overview_has_navigation_and_injected_payload(self):
-        for anchor in ("overview", "tsmc-section", "groups-section",
-                       "tiers-section", "stocks-section", "method"):
+    def test_quicknav_reaches_every_section(self):
+        self.assertIn('aria-label="快速導覽"', self.template)
+        for anchor in ("ov", "tsmc", "grp", "tier", "stocks", "detail"):
             self.assertIn(f'href="#{anchor}"', self.template)
-        self.assertIn('id="overview" aria-labelledby="overviewTitle"', self.template)
-        self.assertIn('id="overviewSummary"', self.template)
-        self.assertIn('id="overviewPoints"', self.template)
-        self.assertIn("var OVERVIEW = __OVERVIEW_JSON__;", self.template)
-        self.assertIn('html.replace("__OVERVIEW_JSON__"', self.builder)
+            self.assertIn(f'<section id="{anchor}"', self.template)
 
+    # ---------- 資料契約:placeholder 注入與 adapter ----------
+
+    def test_placeholders_are_injected_and_adapted(self):
+        pairs = ("__DATA_JSON__", "__GROUPS_JSON__", "__TIERS_JSON__",
+                 "__TIER_FLOW_JSON__", "__OVERVIEW_JSON__", "__GRPMETA_JSON__",
+                 "__WEIGHTS_JSON__", "__THRESH_JSON__", "__TSMC_JSON__",
+                 "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__")
+        for ph in pairs:
+            self.assertIn(ph, self.template)
+            self.assertIn(f'"{ph}"', self.builder)
+        # adapter 把完整 DATA 轉成 render 層的 slim 形狀;點列時用 byId 取完整物件
+        self.assertIn("function _slim(s)", self.template)
+        self.assertIn("_adaptTSMC", self.template)
+        self.assertIn("D.byId", self.template)
+        self.assertIn("tier:s.tier_confirmed", self.template)
+        self.assertIn("tierLabel:s.tier_label", self.template)
+        self.assertIn("waiting:s.tier_waiting", self.template)
+
+    def test_first_screen_overview_headline_from_builder(self):
+        self.assertIn("function buildOverview()", self.template)
+        self.assertIn("今日分層概況", self.template)
         overview = bd.build_overview([
             {"grp": "passive", "state": "中性觀察", "med_dip": -0.27, "rel20": 0.01},
             {"grp": "power", "state": "中性觀察", "med_dip": -0.80, "rel20": -0.02},
@@ -47,94 +80,56 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("仍淨賣", overview["summary"])
         self.assertIn("相對最好不等於已出現買超", overview["summary"])
 
-    def test_group_heatmap_and_five_day_tier_flow_share_group_filter(self):
-        for marker in (
-            'id="groupHeatShell"', 'id="groupHeat"', "function rankOf(g,key)",
-            'id="tierFlowShell"', 'id="tierFlow"', "var TIER_FLOW = __TIER_FLOW_JSON__;",
-            'groupHeat.querySelectorAll("tbody tr[data-g]")',
-            'tierFlowHost.querySelectorAll(".flow-row[data-g]")',
-        ):
+    # ---------- 族群層:四象限 + 熱圖 + 排行榜 ----------
+
+    def test_group_section_has_quadrant_heatmap_and_leaderboard(self):
+        for marker in ("function buildGroup()", "quadEl", "族群價籌四象限", "族群熱圖",
+                       "rankClass", "openGroupSheet", 'class:\'hscroll\''):
             self.assertIn(marker, self.template)
-        self.assertNotIn('textContent="39 檔', self.template)
+        # 熱圖五欄對應 builder 的族群 heat payload
+        for key in ("'dip'", "'breadth_f'", "'rel20'", "'dist60'", "'breadth_t'"):
+            self.assertIn(key, self.template)
         for marker in ('"heat": {', '"states": states', '"lastChange": last_change',
                        'html.replace("__TIER_FLOW_JSON__"'):
             self.assertIn(marker, self.builder)
         self.assertIn("LIMIT 5", self.builder)
 
-    def test_stock_verdict_drawer_has_seven_factor_diverging_profile(self):
-        for marker in (
-            "function renderFactorProfile(box, factors)", "七因子分數輪廓",
-            "gDivergeBar(score,2)", "if(html.factors && html.factors.length)",
-            "條長表示元素分的相對位置", "factors:row.factors",
-        ):
+    def test_tier_bands_and_five_day_flow(self):
+        for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",
+                       "D.tierFlow", "蓄勢候補", "不是買賣指示"):
             self.assertIn(marker, self.template)
-        self.assertEqual(self.template.count("factors:row.factors"), 3)
-        for label in ("①相對強弱", "①抗跌", "②量", "③外資", "③修正日買賣", "④投信", "⑤融資券"):
+        # 檔數不得寫死——用 D.allStocks.length 動態帶入
+        self.assertIn("${D.allStocks.length}", self.template)
+        self.assertNotIn("把全 121 檔", self.template)
+
+    # ---------- 個股層:族群選單 + 搜尋排序 + 點列開詳情 ----------
+
+    def test_stock_list_has_group_selector_search_sort_and_detail_click(self):
+        for marker in ("function buildStocks1c()", "'aria-label':'選擇族群'",
+                       "openStockDetail(s.id)", "class:'msearch'", "class:'sortbtn'",
+                       "plainVerdict"):
+            self.assertIn(marker, self.template)
+        # 不得寫死示範族群
+        self.assertNotIn("s.g==='passive'", self.template)
+        self.assertNotIn("示範族群", self.template)
+
+    def test_clickable_rows_support_keyboard(self):
+        self.assertIn("role:'button'", self.template)
+        self.assertIn("tabindex:'0'", self.template)
+        self.assertIn("e.key==='Enter'||e.key===' '", self.template)
+        self.assertIn(".clickrow:focus-visible", self.template)
+
+    # ---------- 個股詳情:七因子 + null 防護 ----------
+
+    def test_stock_detail_has_seven_factor_profile_with_null_guards(self):
+        for marker in ("function buildDetail()", "七因子拆解", "diverg(f.score,2",
+                       "(d.tech||{}).chart", "d.note&&h(",
+                       "if(d.note)card.appendChild(researchTabs(d));"):
+            self.assertIn(marker, self.template)
+        for label in ("①相對強弱", "①抗跌", "②量", "③外資", "③修正日買賣",
+                      "④投信", "⑤融資券"):
             self.assertIn(f'"label": "{label}"', self.builder)
-
-    def test_mobile_cards_replace_the_wide_matrix_and_share_filters_search(self):
-        required = (
-            'class="mobile-stocks" id="mobileStocks"',
-            "function mobileStockCard(row)",
-            "var mobileCards = mobileStocks ?",
-            'mobileStocks.querySelectorAll("[data-g]")',
-            "mobileCards.forEach(function(card)",
-            "@media (max-width:720px)",
-            ".scroller{display:none}",
-            ".mobile-stocks{display:block}",
-            "min-height:44px",
-        )
-        for marker in required:
-            self.assertIn(marker, self.template)
-        self.assertIn("target.scrollIntoView", self.template)
-        self.assertIn("快速導覽若直接改 hash 會把篩選清掉", self.template)
-
-    def test_glossary_is_available_in_metric_and_note_drawers(self):
-        for term in ("NRE", "Tape-out", "ASIC", "CoWoS", "CSP", "ODM", "CCL",
-                     "YoY", "MoM", "EPS", "毛利率"):
-            self.assertIn(f'"{term}":[', self.template)
-        self.assertIn("function appendGlossary(container, source)", self.template)
-        self.assertEqual(self.template.count("appendGlossary(box,"), 2)
-        self.assertIn("本文術語白話解釋", self.template)
-
-    def test_technical_guide_explains_meaning_and_reading_order(self):
-        for marker in (
-            'id="technical-guide"', "MA／RSI／VOL 的意義與盤讀順序",
-            "比較近14日平均上漲力道與平均下跌力道", "50是兩種力道的分界",
-            "建議盤讀順序", "常見組合怎麼讀", "均線向上＋RSI下降",
-            "什麼叫「穿越」", "前一交易日現價在MA20下方或相等",
-            'howHref:"#technical-guide"', 'jl.href=html.howHref||"#method"',
-        ):
-            self.assertIn(marker, self.template)
-
-    def test_ma_series_use_distinct_non_semantic_colors_with_text_labels(self):
-        for marker in (
-            "--ma5:#b84e00", "--ma20:#0b66b2", "--ma60:#6f4ba8",
-            "MA5 橘色 · 短線", "MA20 藍色 · 中期", "MA60 紫色 · 較長期",
-            "顏色只區分週期，不代表強弱", "function appendMaText(node,t)",
-            "function appendTechSeriesRow(labelNode,valueNode,series)",
-            "techSeries:row.tech.series",
-        ):
-            self.assertIn(marker, self.template)
-
-    def test_chart_nodes_expose_dates_values_meanings_and_sources_across_input_modes(self):
-        for marker in (
-            'id="chartTip" role="status" aria-live="polite"',
-            "function bindChartNode(mark,payload,guide)",
-            'mark.addEventListener("mouseenter"',
-            'mark.addEventListener("click"',
-            "function registerChartKeyboard(svg,entries,label)",
-            'e.key==="ArrowLeft"||e.key==="ArrowRight"',
-            "滑過節點；鍵盤可用左右方向鍵",
-            "點按圖中日期／柱體看數值",
-            "chart-tip-source",
-            "FinMind TaiwanStockMonthRevenue",
-            "daily_scores：七因子元素分 × 權重",
-            "bindChartNode(startHit",
-            "bindChartNode(endHit",
-            "五日變層軌跡",
-        ):
-            self.assertIn(marker, self.template)
+        # builder 圖表資料必附日期(archive 快照可稽核)
         for marker in (
             '"dates": [_value(x, "date") for x in chart_rows]',
             '"sparkDates": spark_dates',
@@ -144,31 +139,39 @@ class DashboardUxContractTest(unittest.TestCase):
             '"comp3Dates": [h["date"] for h in comp_hist]',
         ):
             self.assertIn(marker, self.builder)
-        # 2 個個股 fund badge 消費者 + 1 個台積電專區月營收格——每個傳 fundSpark 者都必須帶日期
-        self.assertEqual(self.template.count("fundSparkDates:"), 3)
-        self.assertEqual(self.template.count("gCompositeBar(row.comp"), 2)
 
-    def test_first_desktop_click_opens_persistent_drawer(self):
-        touch_click_to_drawer = (
-            'node.addEventListener("click", function(){ hideTip(); '
-            'openSheet(payload(),null,node); });'
-        )
-        desktop_click_to_drawer = (
-            'node.addEventListener("click", function(){ cancelHover(); '
-            'openSheet(payload(),null,node); });'
-        )
-        # TOUCH 先關 tooltip；hover-capable desktop 同時取消延遲 timer，再開持續 drawer。
-        self.assertIn(touch_click_to_drawer, self.template)
-        self.assertIn(desktop_click_to_drawer, self.template)
-        self.assertNotIn('if(tip.classList.contains("on")) { hideTip(); }', self.template)
-        self.assertNotIn('else { showTip(payload()', self.template)
-        self.assertIn('node.setAttribute("aria-haspopup","dialog")', self.template)
-        self.assertIn('function openSheet(html, renderFn, trigger)', self.template)
-        self.assertIn("lastSheetFocus = trigger || document.activeElement", self.template)
-        self.assertIn("window.requestAnimationFrame(function(){ if(sheetClose) sheetClose.focus(); })",
+    # ---------- 行動版與觸控 ----------
+
+    def test_mobile_layout_collapses_grids_and_meets_touch_targets(self):
+        for marker in ("@media (max-width:720px)", "min-height:44px",
+                       ".srow{grid-template-columns:1fr", ".shead{display:none}",
+                       ".bhead{display:none}", ".hscroll{overflow-x:auto}",
+                       "#sheet .dgrid{grid-template-columns:1fr}"):
+            self.assertIn(marker, self.template)
+        # 桌機鎖寬已移除,窄視口不得水平溢位
+        self.assertNotIn("min-width:1180px", self.template)
+
+    # ---------- 抽屜:focus 管理 ----------
+
+    def test_sheet_manages_focus_and_escape(self):
+        for marker in ("lastSheetFocus=document.activeElement",
+                       "if(c) c.focus()",
+                       "lastSheetFocus.focus()",
+                       "if(e.key==='Escape')closeSheet();",
+                       "role:'dialog'", "'aria-modal':'true'"):
+            self.assertIn(marker, self.template)
+
+    # ---------- MA 色彩(區分週期,非強弱語意) ----------
+
+    def test_ma_series_have_distinct_colors_in_both_themes(self):
+        for marker in ("--ma5:#b26a12", "--ma20:#0b66b2", "--ma60:#6f4ba8",   # light
+                       "--ma5:#ff9d4d", "--ma20:#62b5ff", "--ma60:#c4a7ff"):  # dark
+            self.assertIn(marker, self.template)
+        # 圖例帶文字標籤與數值,不只靠顏色
+        self.assertIn("h('span',{text:s.label+' '}),h('b',{class:'mono',text:s.value})",
                       self.template)
-        self.assertIn('if(e.key==="Escape"){ closeSheet(); return; }', self.template)
-        self.assertIn("lastSheetFocus.focus", self.template)
+
+    # ---------- 策略凍結(原樣保留) ----------
 
     def test_strategy_constants_and_oos_cutoff_are_frozen(self):
         self.assertEqual(score.RANK_MAP, [(0.8, 2), (0.6, 1), (0.4, 0), (0.2, -1)])
@@ -201,14 +204,13 @@ class DashboardUxContractTest(unittest.TestCase):
         )
         self.assertEqual(validate.IS_CUTOFF, "2026-07-05")
 
+    # ---------- 台積電專區:觀察層鐵律(原樣保留 + 新模板 marker) ----------
+
     def test_tsmc_section_is_observation_layer_only(self):
-        # 模板:專區 anchor section、payload 注入、事件全文 renderer、族群卡指引 chip
-        self.assertIn('id="tsmc-section"', self.template)
-        self.assertIn("var TSMC = __TSMC_JSON__;", self.template)
-        self.assertIn("function renderEventDetail", self.template)
-        self.assertIn("g.tsmc", self.template)
-        self.assertIn("觀察層,不計分", self.template)
-        # builder:payload 注入與事件錨點 loader
+        self.assertIn('id="tsmc"', self.template)
+        self.assertIn("TSMC=__TSMC_JSON__", self.template)
+        self.assertIn("上游錨點 · 觀察層（不計分）", self.template)
+        self.assertIn("不在掃描範圍、不參與任何排名與評分", self.template)
         self.assertIn('html.replace("__TSMC_JSON__"', self.builder)
         self.assertIn("load_events", self.builder)
         self.assertIn("ref_price", self.builder)
@@ -219,6 +221,8 @@ class DashboardUxContractTest(unittest.TestCase):
         score_src = (SCRIPTS / "score.py").read_text(encoding="utf-8")
         self.assertNotIn("ref_price", score_src)
         self.assertNotIn("ref_holding", score_src)
+
+    # ---------- 公開文案鐵律(原樣保留) ----------
 
     def test_public_copy_avoids_absolute_or_actionable_rank_claims(self):
         public_copy = self.builder + "\n" + self.template
@@ -248,57 +252,36 @@ class DashboardUxContractTest(unittest.TestCase):
         ):
             self.assertIn(guardrail, public_copy)
 
-    def test_note_badges_expose_verification_separately_from_freshness(self):
-        for status in ("ai_draft", "partially_verified", "independently_verified", "conflicted"):
-            self.assertIn(status, self.template)
+    # ---------- 筆記查核狀態:動態呈現,不得寫死「已核驗」 ----------
+
+    def test_note_verification_status_is_dynamic_never_hardcoded(self):
+        for status in ("ai_draft", "partially_verified", "independently_verified",
+                       "conflicted"):
             self.assertIn(status, self.builder)
         for field in ("reviewedBy", "reviewedAt", "reviewScope", "qualityInvalid",
                       "claimCount", "citedClaims", "primaryClaims", "contentAsOf"):
-            self.assertIn(field, self.template)
             self.assertIn(field, self.builder)
-        self.assertIn('row.note.cls+(row.note.due?" due":"")', self.template)
-        self.assertIn("最後更新日只代表編修日期", self.template)
-        self.assertIn("其餘內容仍視為 AI 草稿", self.template)
-        self.assertIn("不把公司說法自動視為客觀真相", self.template)
-        self.assertIn("仍保留來源衝突警示", self.template)
-        self.assertIn('note.className="toggle note-toggle "+row.note.cls+(row.note.due?" due":"")',
-                      self.template)
-        self.assertIn('note.textContent="📝 "+row.note.label', self.template)
-        self.assertIn('bl.t==="ul"||bl.t==="ol"', self.template)
-        self.assertIn('bl.t==="h3"', self.template)
-        self.assertNotIn("質化研究筆記則由人工整理公開資訊", self.template)
+        # 模板必須吃真實 note.label/cls/reviewScope,勿退回設計稿寫死的「✓ 已獨立核驗」
+        self.assertIn("noteVerifyMeta", self.template)
+        self.assertIn("d.note.label", self.template)
+        self.assertNotIn("metaBox('查核狀態','✓ 已獨立核驗'", self.template)
+        self.assertNotIn(">全部重要主張</b>'", self.template)
+        # 已核章 chip 只給 independently_verified
+        self.assertIn("s.note[0]==='independently_verified'", self.template)
+        self.assertIn("✓已核筆記", self.template)
 
-    def test_research_drawer_tabs_formal_note_and_leading_hypotheses(self):
-        for marker in (
-            "function researchPayload(row)", "function renderResearchDetail(box, research)",
-            "function renderHypothesisDetail(box, hypothesis)", 'setText(noteTab,"正式筆記")',
-            'setText(hypTab,"領先假說 "+research.hypothesis.count+" 則")',
-            "可證偽", "多篇轉載同一消息鏈不視為獨立確認", "has-hypothesis",
-        ):
+    # ---------- 研究面板:正式筆記與領先假說分層 ----------
+
+    def test_research_tabs_split_formal_note_and_hypotheses(self):
+        for marker in ("function researchTabs(d)", "正式筆記", "領先假說",
+                       "可證偽", "不代表已證實", "narrativeBlock",
+                       "勝負手 · 可觀測裁決點",
+                       "不得作為生命週期轉移證據"):
             self.assertIn(marker, self.template)
         for marker in ("load_hypothesis_reports", 'obj["hypothesis"]',
-                       '"statusCounts"', '"sections"'):
-            self.assertIn(marker, self.builder)
-
-    def test_hypothesis_statuses_are_reader_facing_and_explain_the_state_machine(self):
-        for marker in (
-            "這些狀態如何變化？", "初次捕捉 → 持續觀察或證據警示",
-            "已驗證成立／已驗證不成立", "meta.label||key",
-        ):
-            self.assertIn(marker, self.template)
-        self.assertIn('"statusInfo"', self.builder)
-        self.assertNotIn('parts.push(key+" "+counts[key])', self.template)
-
-    def test_hypothesis_v2_audit_dimensions_are_visible(self):
-        for marker in (
-            "樣本性質：前瞻捕捉", "回溯基線", "到期未決", "獨立消息鏈",
-            "閱讀狀態由生命週期、證據強度與警示組合而成",
-        ):
-            self.assertIn(marker, self.template)
-        for marker in (
-            '"captureModeCounts"', '"lifecycleCounts"', '"dueCount"',
-            '"independentChains"', '"schemaVersion"',
-        ):
+                       '"statusCounts"', '"sections"', '"statusInfo"',
+                       '"captureModeCounts"', '"lifecycleCounts"', '"dueCount"',
+                       '"independentChains"', '"schemaVersion"'):
             self.assertIn(marker, self.builder)
 
 

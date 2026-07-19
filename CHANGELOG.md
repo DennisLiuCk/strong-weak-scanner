@@ -2,6 +2,27 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 儀表板視覺重構(claude.ai/design 移植) — 2026-07-19
+
+**策略規則、資料 payload 與 `IS_CUTOFF` 零變動**;`build_dashboard.py` 注入層不變,
+只換 `scripts/dashboard_template.html`(claude.ai/design 專案 fa6ce597 的純 JS/SVG 重寫版,
+模板內建 adapter 吃同一組 `__*_JSON__` placeholder)。
+
+- 新版面:結論先行首屏、族群價籌四象限+熱圖+排行榜、分層帶+近5日變層軌跡、
+  族群內個股分數卡(族群選單/搜尋/排序)、點列開個股完整研究抽屜(七因子拆解、
+  均線/營收圖、籌碼健康度、研究筆記與領先假說分頁)。
+- 落地修正設計稿缺陷:族群 tag 取自 grpMeta(原 `g.tag` 會顯示 undefined)、個股列表
+  族群選單取代寫死示範族群、`buildDetail` 對 tech/chip/fund/note 加 null 防護、
+  筆記查核狀態改吃真實 `note.label/cls/reviewScope`(原寫死「✓ 已獨立核驗」,對當日
+  3 檔 ai_draft 是不實宣稱)。
+- 補回舊版 UX 契約的守護語與無障礙:4 句公開文案 guardrail、籌碼健康度「純描述性,
+  不是選股排名」、≤720px 卡片化+44px 觸控目標+熱圖橫向捲動、快速導覽+`main#main`、
+  抽屜 focus 管理(開啟聚焦關閉鈕、Esc/關閉後還原焦點)。
+- `tests/test_dashboard_ux_contract.py` 對齊新模板全面改寫(builder 側、策略凍結、
+  公開文案、2330 觀察層鐵律斷言原樣保留);全套 193 tests 綠。**明示放棄待議**:
+  術語 glossary、MA/RSI 教學區、圖表節點 tooltip/鍵盤導覽、觀察層 flow badge UI
+  (payload 仍每日產出,`#flow-guide` howHref 為 inert 資料欄)。
+
 ## 官方資料數據解剖觀察層 — 2026-07-19
 
 **策略規則零變動**：沒有修改 `score.py`、tier、regime 或 `IS_CUTOFF`，只把新增官方欄位
