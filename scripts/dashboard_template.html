@@ -411,9 +411,16 @@ function buildTSMC(){
         h('span',{class:'chip',style:`margin-left:auto;color:${dm.col};background:${dm.bg}`,text:dm.l})),
       h('div',{style:'font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:5px',text:gd.text}))); });
   // 法說會重點整理（sections，與方向指引同等）
+  // 來源 blockquote 的「**標籤**:內容」多行被 parser 併成單一段落——依粗體標籤邊界拆回多段好讀
+  const _splitP=b=>{ if(b.t!=='p'||!(b.runs||[]).length) return [b];
+    const groups=[[]];
+    b.runs.forEach((r,i)=>{ const nx=b.runs[i+1];
+      if(r.b && nx && typeof nx.s==='string' && /^[:：]/.test(nx.s) && groups[groups.length-1].length) groups.push([]);
+      groups[groups.length-1].push(r); });
+    return groups.map(g=>({t:'p',runs:g})); };
   const secWrap=h('div',{});
   const secs=T.sections||[];
-  if(secs.length)secs.forEach((s,i)=>secWrap.appendChild(nbSection(s,i<3)));
+  if(secs.length)secs.forEach((s,i)=>secWrap.appendChild(nbSection({h:s.h,blocks:(s.blocks||[]).flatMap(_splitP)},i<3)));
   else secWrap.appendChild(h('p',{style:'font-size:12.5px;color:var(--muted)',text:'本季法說會全文整理尚未載入；見下方官方 IR 連結。'}));
   // 往期法說
   const hist=h('div',{style:'display:flex;flex-wrap:wrap;gap:8px;align-items:center'});
@@ -469,7 +476,7 @@ function buildGroup(){
   metrics.forEach(m=>heatGrid.appendChild(h('div',{style:'font-size:10.5px;color:var(--muted);font-weight:700;text-align:center;line-height:1.3;align-self:end;padding-bottom:6px',html:m.label+'<br><span style="font-weight:500;opacity:.8">'+m.hint+'</span>'})));
   heatSorted.forEach(g=>{ const row=h('div',{class:'clickrow',role:'button',tabindex:'0',onclick:()=>openGroupSheet(g),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}},style:'grid-column:1/-1;display:grid;grid-template-columns:104px repeat(5,1fr);gap:4px;align-items:stretch;border-top:1px solid var(--line2);padding-top:4px'});
     row.addEventListener('mouseenter',()=>GHL.enter(g.g)); row.addEventListener('mouseleave',()=>GHL.leave(g.g));
-    GHL.add(g.g, ()=>{row.style.boxShadow='inset 3px 0 0 0 var(--ink2)';row.style.borderRadius='8px';}, ()=>{row.style.boxShadow='';row.style.borderRadius='';});
+    GHL.add(g.g, ()=>{row.style.background='var(--inset)';row.style.borderRadius='8px';}, ()=>{row.style.background='';row.style.borderRadius='';});
     row.appendChild(h('div',{style:'font-size:12.5px;font-weight:700;align-self:center;padding-right:6px',text:grp(g.g).short}));
     metrics.forEach(m=>{const cur=g.heat[m.k][0],d=cur-g.heat[m.k][1];
       row.appendChild(h('div',{style:`min-height:40px;border-radius:8px;background:${rankClass(cur,sorted[m.k])};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 3px`},
@@ -736,8 +743,10 @@ function buildTier(){
 
 function nbRuns(runs){ return (runs||[]).map(r=>{ if(r.a)return h('a',{href:r.a,text:r.s}); if(r.b)return h('b',{style:'color:var(--ink)',text:r.s}); return document.createTextNode(r.s==null?'':r.s); }); }
 function nbBlock(b){
+  if(b.t==='h3')return h('div',{style:'font-size:13px;font-weight:800;color:var(--ink);margin:10px 0 5px'},...nbRuns(b.runs||[]));
   if(b.t==='p')return h('p',{style:'margin:0 0 10px;font-size:13px;line-height:1.75;color:var(--ink2)'},...nbRuns(b.runs));
   if(b.t==='ul'){ const ul=h('ul',{style:'margin:0 0 10px;padding-left:20px'}); (b.items||[]).forEach(it=>ul.appendChild(h('li',{style:'font-size:13px;line-height:1.7;color:var(--ink2);margin-bottom:5px'},...nbRuns(it)))); return ul; }
+  if(b.t==='ol'){ const ol=h('ol',{style:'margin:0 0 10px;padding-left:22px'}); (b.items||[]).forEach(it=>ol.appendChild(h('li',{style:'font-size:13px;line-height:1.7;color:var(--ink2);margin-bottom:5px'},...nbRuns(it)))); return ol; }
   if(b.t==='table'){ const t=h('table',{style:'width:100%;border-collapse:collapse;margin:2px 0 12px;font-size:12px'}),thead=h('thead',{}),trh=h('tr',{});
     (b.head||[]).forEach(c=>trh.appendChild(h('th',{style:'border:1px solid var(--line2);padding:6px 9px;text-align:left;background:var(--inset);color:var(--ink2);font-weight:700;white-space:nowrap'},...nbRuns(c)))); thead.appendChild(trh); t.appendChild(thead);
     const tb=h('tbody',{}); (b.rows||[]).forEach(row=>{ const tr=h('tr',{}); row.forEach(c=>tr.appendChild(h('td',{style:'border:1px solid var(--line2);padding:6px 9px;color:var(--ink2);vertical-align:top'},...nbRuns(c)))); tb.appendChild(tr); }); t.appendChild(tb); return t; }
