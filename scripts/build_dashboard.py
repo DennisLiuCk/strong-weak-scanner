@@ -32,6 +32,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 TEMPLATE = os.path.join(ROOT, "scripts", "dashboard_template.html")
 OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages 乾淨網址
+CHART_DAYS = 120   # 互動股價圖每檔保留交易日數(1f;vol=股數、含外資/投信,前端 slice 切 20/60/120)
 # 歷史快照:每日 build 原樣存檔,回看的是「當天使用者看到的報告」而非以現行規則重算
 # (daily_scores 等衍生表每日全量重建,事後從 db 重繪會是 restated history,不可稽核)。
 ARCHIVE = os.path.join(ROOT, "archive")
@@ -591,21 +592,28 @@ def build_technical_view(m, history=None):
                  f"與MA20的差距為{abs(d20)*100:.1f}%，仍在±10%觀察帶內"
                  if d20 is not None else "MA20距離資料不足")
 
-    # 20日還原價+三條均線小圖原料。均線用全站既有 MA 識別色(橘/藍/紫,與文字列
-    # 同源);MA20藍/MA60紫在綠色弱視下 ΔE 僅 6.2,故前端另以「線型」雙編碼
-    # (MA5短虛線/MA20實線/MA60長虛線)+圖例,不單靠顏色分。缺值日剔除、與價
-    # 成對對齊;MA5/MA60 需整窗有值才收(新上市前段可能缺),不足即略去該線。
-    chart_rows = [x for x in series[-20:]
-                  if _value(x, "close_adj") is not None and _value(x, "ma20") is not None]
+    # CHART_DAYS 日互動股價圖原料(還原價+三均線+RSI14+量;外資/投信於掛 tech 處
+    # 併入)。均線用全站既有 MA 識別色(橘/藍/紫,與文字列同源);MA20藍/MA60紫在
+    # 綠色弱視下 ΔE 僅 6.2,故前端另以「線型」雙編碼(MA5短虛線/MA20實線/MA60
+    # 長虛線)+圖例,不單靠顏色分。
+    chart_rows = [x for x in series[-CHART_DAYS:]
+                  if _value(x, "close_adj") is not None]     # 只要求有收盤價
     chart = None
     if len(chart_rows) >= 2:
-        chart = {"dates": [_value(x, "date") for x in chart_rows],
-                 "px": [round(_value(x, "close_adj"), 2) for x in chart_rows],
-                 "ma": [round(_value(x, "ma20"), 2) for x in chart_rows]}
-        for key in ("ma5", "ma60"):
-            vals = [_value(x, key) for x in chart_rows]
-            if all(v is not None for v in vals):
-                chart[key] = [round(v, 2) for v in vals]
+        # 缺值填 null 佔位(不略過該日),各序列與 dates 一一對應;前端遇 null 斷線
+        def _col(key, nd=2):
+            return [(round(_value(x, key), nd) if _value(x, key) is not None else None)
+                    for x in chart_rows]
+        chart = {
+            "dates": [_value(x, "date") for x in chart_rows],
+            "px": _col("close_adj"),
+            "ma5": _col("ma5"),
+            "ma": _col("ma20"),          # 沿用舊名 ma = MA20,向後相容
+            "ma60": _col("ma60"),
+            "rsi": _col("rsi14", 1),
+            "vol": [(int(_value(x, "volume")) if _value(x, "volume") is not None else None)
+                    for x in chart_rows],
+        }
 
     rows = [
         ["價格與均線",
@@ -1251,15 +1259,23 @@ def main():
                             WHERE date<=? ORDER BY stock_id, date DESC""", (last,)):
         if len(score_hist[h["stock_id"]]) < 5:
             score_hist[h["stock_id"]].insert(0, h)
-    # 個股技術面:穿越/變化解讀需今日、昨日與5個交易日前;強調式小圖需20日
-    # 還原價+MA20 → 每檔保留最近20個交易日,舊到新。
+    # 個股技術面:穿越/變化解讀需今日、昨日與5個交易日前;互動股價圖需 CHART_DAYS 日
+    # 還原價+均線+RSI+量 → 每檔保留最近 CHART_DAYS 個交易日,舊到新。
     tech_hist = defaultdict(list)
     for h in con.execute("""SELECT date, stock_id, close_adj, ma5, ma20, ma60, rsi14,
                                     volume, vol_ma20, vol_ratio20, ret1
                              FROM daily_metrics WHERE date<=?
                              ORDER BY stock_id, date DESC""", (last,)):
-        if len(tech_hist[h["stock_id"]]) < 20:
+        if len(tech_hist[h["stock_id"]]) < CHART_DAYS:
             tech_hist[h["stock_id"]].insert(0, h)
+    # 外資/投信每日淨買賣(股→張),供互動股價圖兩條副圖;窗口與 tech_hist 對齊即可
+    inst_hist = defaultdict(dict)
+    for r in con.execute("""SELECT date, stock_id, foreign_buy, foreign_sell,
+                                   trust_buy, trust_sell
+                            FROM inst WHERE date<=? ORDER BY date""", (last,)):
+        fn = (r["foreign_buy"] or 0) - (r["foreign_sell"] or 0)
+        tn = (r["trust_buy"] or 0) - (r["trust_sell"] or 0)
+        inst_hist[r["stock_id"]][r["date"]] = (round(fn / 1000), round(tn / 1000))
     try:   # 族群定義配置化:讀 groups 表(舊 db 缺表時退回檔頭預設)
         gmeta = con.execute("SELECT grp, name, tag FROM groups ORDER BY ord").fetchall()
         if gmeta:
@@ -1569,6 +1585,11 @@ def main():
         obj.update(tier_meta)
         tech = build_technical_view(r, tech_hist.get(r["stock_id"]))
         if tech:
+            if tech.get("chart"):
+                ih = inst_hist.get(r["stock_id"], {})
+                ch = tech["chart"]
+                ch["foreign"] = [ih.get(d, (None, None))[0] for d in ch["dates"]]
+                ch["trust"] = [ih.get(d, (None, None))[1] for d in ch["dates"]]
             obj["tech"] = tech
         observation = observation_map.get(r["stock_id"])
         if observation:
