@@ -594,37 +594,58 @@ function buildTier(){
   const order=[['真強','相對強勢','價格與籌碼多在族群前段'],['蓄勢·外資佈局','相對蓄勢','籌碼靠前、價格尚未發動'],
     ['__cand','蓄勢候補','籌碼已符，等抗跌／綜合分補齊'],['強但過熱','相對強勢·過熱','價格靠前但量能或融資過熱'],
     ['潛在/中性','中性觀察','各指標相對位置分歧'],['真弱','相對弱勢','價格與綜合分在族群後段'],['真弱·陷阱','相對弱勢·槓桿風險','外資靠後且融資偏弱']];
-  const bands=h('div',{style:'display:flex;flex-direction:column;gap:11px'});
-  order.forEach(([k,t,d])=>{ let mem;
+  let curG='';                 // ''=全部族群;選定族群時各層顯示全部成員
+  const expanded={};           // 全部族群模式下,各層「＋N 檔」點擊展開
+  function memFor(k){ let mem;
     if(k==='__cand')mem=D.allStocks.filter(s=>s.tier==='潛在/中性'&&s.w);
     else if(k==='潛在/中性')mem=D.allStocks.filter(s=>s.tier==='潛在/中性'&&!s.w);
     else mem=D.allStocks.filter(s=>s.tier===k);
-    mem.sort((a,b)=>b.comp-a.comp);
-    const col=tierColorKey(k==='__cand'?'蓄勢·外資佈局':k),cw=h('div',{style:'display:flex;flex-wrap:wrap;gap:7px'});
-    mem.slice(0,8).forEach(s=>{const cc=s.comp>=0?'var(--strong)':'var(--weak)';
-      cw.appendChild(h('span',{style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid var(--line2);border-radius:100px;padding:4px 11px'},
-        h('b',{style:'font-weight:700',text:s.nm}),h('span',{class:'mono',style:'font-size:10px;color:var(--muted)',text:grp(s.g).short}),
-        h('span',{class:'mono',style:`font-size:11px;font-weight:600;color:${cc}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)})));});
-    if(mem.length>8)cw.appendChild(h('span',{style:'display:inline-flex;align-items:center;font-size:12px;color:var(--muted);padding:4px 6px',text:'＋'+(mem.length-8)+' 檔'}));
-    bands.appendChild(h('div',{class:'tband',style:`background:var(--card);border:1px solid var(--line);border-left:5px solid ${col};border-radius:14px;padding:16px 22px`},
+    if(curG)mem=mem.filter(s=>s.g===curG);
+    return mem.sort((a,b)=>b.comp-a.comp); }
+  function stockPill(s){ const cc=s.comp>=0?'var(--strong)':'var(--weak)';
+    return h('span',{class:'clickrow',role:'button',tabindex:'0',
+      onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
+      style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid var(--line2);border-radius:100px;padding:4px 11px;cursor:pointer'},
+      h('b',{style:'font-weight:700',text:s.nm}),h('span',{class:'mono',style:'font-size:10px;color:var(--muted)',text:grp(s.g).short}),
+      h('span',{class:'mono',style:`font-size:11px;font-weight:600;color:${cc}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)})); }
+  const bands=h('div',{style:'display:flex;flex-direction:column;gap:11px'});
+  function renderBands(){ bands.replaceChildren(...order.map(([k,t,d])=>{
+    const mem=memFor(k),col=tierColorKey(k==='__cand'?'蓄勢·外資佈局':k),cw=h('div',{style:'display:flex;flex-wrap:wrap;gap:7px'});
+    const showAll=!!curG||expanded[k];
+    (showAll?mem:mem.slice(0,8)).forEach(s=>cw.appendChild(stockPill(s)));
+    if(!showAll&&mem.length>8)cw.appendChild(h('button',{class:'sortbtn',style:'padding:4px 12px;font-size:12px',
+      onclick:()=>{expanded[k]=true;renderBands();},text:'＋'+(mem.length-8)+' 檔 展開'}));
+    if(curG&&!mem.length)cw.appendChild(h('span',{style:'font-size:12px;color:var(--muted);padding:4px 0',text:'此族群目前無成員'}));
+    return h('div',{class:'tband',style:`background:var(--card);border:1px solid var(--line);border-left:5px solid ${col};border-radius:14px;padding:16px 22px`},
       h('div',{},h('div',{style:'display:flex;align-items:baseline;gap:9px'},h('b',{style:`font-size:16px;font-weight:800;color:${col}`,text:t}),h('span',{class:'mono',style:`font-size:14px;font-weight:600;color:${col}`,text:mem.length})),
-        h('div',{style:'font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5',text:d})),cw));
-  });
-  const tf=D.tierFlow,changed=tf.stocks.filter(s=>new Set(s.states).size>1);
-  const fg=h('div',{class:'fgrid'});
-  changed.slice().sort((a,b)=>b.lastChange-a.lastChange).slice(0,15).forEach(s=>{const from=s.states[0],to=s.states[s.states.length-1],up=tierRank(to)>tierRank(from);
-    fg.appendChild(h('div',{style:'display:grid;grid-template-columns:1fr 104px 74px;gap:10px;align-items:center;padding:9px 2px;border-top:1px solid var(--line2)'},
-      h('div',{style:'min-width:0'},h('b',{style:'font-size:13.5px;font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap',text:s.nm}),
-        h('span',{class:'mono',style:'font-size:10px;color:var(--muted)',text:s.id+' · '+grp(s.g).short})),
-      h('div',{},flowSpark(s.states)),
-      h('div',{style:'text-align:right;font-size:11.5px;white-space:nowrap'},h('span',{style:'color:var(--muted)',text:tierShort(from)}),
-        h('span',{style:`color:${up?'var(--teal)':'var(--amber)'};font-weight:700`,text:up?' ▲ ':(tierRank(to)<tierRank(from)?' ▼ ':' → ')}),
-        h('span',{style:`font-weight:700;color:${tierColorKey(to)}`,text:tierShort(to)}))));});
+        h('div',{style:'font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5',text:d})),cw); })); }
+  renderBands();
+  const tf=D.tierFlow,fg=h('div',{class:'fgrid'});
+  const flowNote=h('span',{style:'font-size:12.5px;color:var(--muted)'});
+  function renderFlow(){ let changed=tf.stocks.filter(s=>new Set(s.states).size>1);
+    if(curG)changed=changed.filter(s=>s.g===curG);
+    const sorted=changed.slice().sort((a,b)=>b.lastChange-a.lastChange),show=curG?sorted:sorted.slice(0,15);
+    fg.replaceChildren(...show.map(s=>{const from=s.states[0],to=s.states[s.states.length-1],up=tierRank(to)>tierRank(from);
+      return h('div',{class:'clickrow',role:'button',tabindex:'0',
+        onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
+        style:'display:grid;grid-template-columns:1fr 104px 74px;gap:10px;align-items:center;padding:9px 2px;border-top:1px solid var(--line2)'},
+        h('div',{style:'min-width:0'},h('b',{style:'font-size:13.5px;font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap',text:s.nm}),
+          h('span',{class:'mono',style:'font-size:10px;color:var(--muted)',text:s.id+' · '+grp(s.g).short})),
+        h('div',{},flowSpark(s.states)),
+        h('div',{style:'text-align:right;font-size:11.5px;white-space:nowrap'},h('span',{style:'color:var(--muted)',text:tierShort(from)}),
+          h('span',{style:`color:${up?'var(--teal)':'var(--amber)'};font-weight:700`,text:up?' ▲ ':(tierRank(to)<tierRank(from)?' ▼ ':' → ')}),
+          h('span',{style:`font-weight:700;color:${tierColorKey(to)}`,text:tierShort(to)}))); }));
+    flowNote.textContent=(curG?`只列分層有變動者（${grp(curG).nm} ${changed.length} 檔，全列）`:`只列分層有變動者（${changed.length} 檔，取近期變動最大 15 檔）`)+' · 線越高＝分層越強 · 點列看明細'; }
+  renderFlow();
+  const gsel=h('select',{class:'sortbtn','aria-label':'分層篩選族群',onchange:e=>{curG=e.target.value;renderBands();renderFlow();}});
+  gsel.appendChild(h('option',{value:'',text:'全部族群'}));
+  D.groups.forEach(g=>gsel.appendChild(h('option',{value:g.g,text:grp(g.g).nm})));
   return [h('p',{class:'kicker',text:'族群層'}),h('h2',{class:'sec',text:'個股分層 · 已確認的相對強弱'}),
-    h('p',{class:'lead',html:`把全 ${D.allStocks.length} 檔依分數組合分成幾層（<b style="color:var(--strong)">強</b> → <b style="color:var(--weak)">弱</b>）。分層名稱描述相對位置，<b style="color:var(--ink)">不是買賣指示</b>。`}),
+    h('p',{class:'lead',html:`把全 ${D.allStocks.length} 檔依分數組合分成幾層（<b style="color:var(--strong)">強</b> → <b style="color:var(--weak)">弱</b>）。分層名稱描述相對位置，<b style="color:var(--ink)">不是買賣指示</b>。選族群可看該族群全部成員；<b style="color:var(--ink)">點任一檔</b>看完整明細。`}),
+    h('div',{class:'toolbar'},gsel),
     bands,
     h('div',{style:'margin-top:34px'},h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px'},h('h3',{style:'margin:0;font-size:17px;font-weight:800',text:'近 5 日變層軌跡'}),
-      h('span',{style:'font-size:12.5px;color:var(--muted)',text:`只列分層有變動者（${changed.length} 檔，取近期變動最大 15 檔）· 線越高＝分層越強`})),
+      flowNote),
       h('div',{class:'card',style:'padding:8px 24px 16px'},fg))];
 }
 

@@ -114,6 +114,10 @@ class DashboardUxContractTest(unittest.TestCase):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",
                        "D.tierFlow", "蓄勢候補", "不是買賣指示"):
             self.assertIn(marker, self.template)
+        # 分層區可依族群篩選(選定=全列)、全部模式「＋N 檔」可展開、chip/變層列點開明細
+        for marker in ("'aria-label':'分層篩選族群'", "檔 展開",
+                       "onclick:()=>{expanded[k]=true;renderBands();}"):
+            self.assertIn(marker, self.template)
         # 檔數不得寫死——用 D.allStocks.length 動態帶入
         self.assertIn("${D.allStocks.length}", self.template)
         self.assertNotIn("把全 121 檔", self.template)
