@@ -677,8 +677,6 @@ function buildDetail(){
     chipList.appendChild(h('div',{style:'display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line2)'},
       h('span',{style:'font-size:12px;color:var(--ink2);min-width:0',text:r[0]}),h('span',{class:'mono',style:'font-size:11.5px;color:var(--ink);white-space:nowrap',text:r[1]}),
       h('span',{style:`font-size:10.5px;font-weight:700;color:${col};min-width:30px;text-align:right`,text:tag})));});
-  let sec30=[]; ((d.note&&d.note.sections)||[]).forEach(s=>{ if(/30\s*秒摘要/.test(s.h))(s.blocks||[]).forEach(b=>{ if(b.t==='ul')b.items.forEach(it=>sec30.push(it.map(r=>r.s).join(''))); }); });
-  const sec30w=h('div',{}); sec30.slice(0,4).forEach(b=>sec30w.appendChild(h('div',{style:'display:flex;gap:8px;font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:7px'},h('span',{style:'color:var(--teal);flex:0 0 auto',text:'▪'}),h('span',{text:b}))));
   const riskW=h('div',{style:'display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px'});
   riskW.appendChild(h('span',{style:'font-size:15px;color:var(--ink);font-weight:500',text:plainVerdict(cs)}));
   (d.risk||[]).forEach(r=>riskW.appendChild(h('span',{style:'font-size:11px;font-weight:800;color:#fff;background:var(--strong);border-radius:6px;padding:2px 9px',text:'官方'+r.kind})));
@@ -713,16 +711,7 @@ function buildDetail(){
           h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:8px'},h('span',{style:'font-size:12px;color:var(--ink2)',text:'RSI14'}),h('span',{class:'mono',style:'font-size:12.5px;font-weight:600',text:d.tech.rsi})),
           h('div',{style:'margin:4px 0 12px'},meter(d.tech.rsi/100,130,12,(d.tech.rsi>=70||d.tech.rsi<=30)?'var(--amber)':'var(--teal)')),
           h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:8px'},h('span',{style:'font-size:12px;color:var(--ink2)',text:'量比（vs 20日均量）'}),h('span',{class:'mono',style:'font-size:12.5px;font-weight:600',text:d.tech.vr20+'×'})),
-          h('div',{style:'margin-top:4px'},meter(Math.min(d.tech.vr20/3,1),130,12,'var(--muted)'))),
-        d.note&&h('section',{style:'border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px'},
-          h('div',{style:'display:flex;align-items:center;gap:8px;margin-bottom:10px'},h('span',{style:'font-size:13px',text:d.note.cls==='independently_verified'?'✓':'📝'}),h('h3',{style:'margin:0;font-size:14px;font-weight:800',text:'研究筆記品質 · '+d.note.label})),
-          h('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:11.5px;color:var(--muted);margin-bottom:12px'},
-            h('div',{html:`核驗範圍<br><b style="color:var(--ink);font-size:12.5px">${noteVerifyMeta(d.note).scope}</b>`}),h('div',{html:`一手來源<br><b style="color:var(--ink);font-size:12.5px">${d.note.primarySources} 份</b>`}),
-            h('div',{html:`主張覆蓋<br><b style="color:var(--ink);font-size:12.5px">${d.note.claimCount} 條</b>`}),h('div',{html:`資料截至<br><b style="color:var(--ink);font-size:12.5px">${d.note.latestPeriod}</b>`})),
-          sec30w,h('a',{href:d.note.url,style:'display:inline-block;margin-top:6px;font-size:12px;font-weight:700',text:'看完整研究筆記與一手來源 →'})),
-        h('section',{style:'border:1px solid var(--hypoline);background:var(--hypobg);border-radius:14px;padding:14px 18px'},
-          h('div',{style:'display:flex;align-items:center;gap:8px'},h('span',{style:'width:8px;height:8px;border-radius:50%;background:var(--hypodot);flex:0 0 auto'}),h('b',{style:'font-size:13px;color:var(--hypoink)',text:d.hypothesis?d.hypothesis.label:''})),
-          h('p',{style:'margin:7px 0 0;font-size:11.5px;color:var(--hypotext);line-height:1.6',text:'市場流傳、可證偽的主張（如 AI 電容題材），與正式筆記分開保存，不影響量化分數。'})))));
+          h('div',{style:'margin-top:4px'},meter(Math.min(d.tech.vr20/3,1),130,12,'var(--muted)'))))));
   if(d.note)card.appendChild(researchTabs(d));
   return card;
 }

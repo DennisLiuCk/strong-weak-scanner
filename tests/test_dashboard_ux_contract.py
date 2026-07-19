@@ -304,6 +304,9 @@ class DashboardUxContractTest(unittest.TestCase):
                        "勝負手 · 可觀測裁決點",
                        "不得作為生命週期轉移證據"):
             self.assertIn(marker, self.template)
+        # 筆記/假說內容單一歸屬研究面板——右欄不得再放品質框或假說 teaser 複述
+        self.assertNotIn("研究筆記品質", self.template)
+        self.assertNotIn("sec30", self.template)
         for marker in ("load_hypothesis_reports", 'obj["hypothesis"]',
                        '"statusCounts"', '"sections"', '"statusInfo"',
                        '"captureModeCounts"', '"lifecycleCounts"', '"dueCount"',

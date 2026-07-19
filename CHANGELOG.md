@@ -27,6 +27,9 @@
   13 檔 YoY 負值誤標強色)、台積電 IR 期別吃 `T.quarter`、查核狀態 chip 色對映
   vcls、熱圖族群數 `G.length`、綜合分尺度 ±8.8 改由 2×ΣWEIGHTS 導出;新增頁尾
   資料來源說明(header 承諾的落點)。UX 契約測試同步鎖住以上各點。
+- 個股詳情卡去重:右欄「研究筆記品質」框(meta 四格+30 秒摘要 bullet)與「領先假說」
+  teaser 皆為下方個股研究面板的複述,整組移除;筆記/假說內容單一歸屬研究面板,
+  卡片頂部僅保留一句話結論(結論先行 → 依據攤開的分層)。
 - `tests/test_dashboard_ux_contract.py` 對齊新模板全面改寫(builder 側、策略凍結、
   公開文案、2330 觀察層鐵律斷言原樣保留);全套 193 tests 綠。**明示放棄待議**:
   術語 glossary、MA/RSI 教學區、圖表節點 tooltip/鍵盤導覽、觀察層 flow badge UI
