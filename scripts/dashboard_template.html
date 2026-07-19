@@ -224,9 +224,11 @@ function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,tier:s.ti
   fund:s.fund?[s.fund.cls,(s.fund.rows.find(function(r){return /年增/.test(r[0]);})||[])[1]||s.fund.label]:null,
   note:s.note?[s.note.cls,s.note.summary]:null, risk:(s.risk||[]).map(function(r){return r.kind;})}; }
 function _adaptTSMC(T){ if(!T||!T.event)return null; const e=T.event;
-  return {quarter:e.quarter||'', eventDate:e.date||'', status:e.vcls||'', statusLabel:e.vlabel||'', url:e.url,
+  return {title:e.title||'', quarter:e.quarter||'', eventDate:e.date||'', status:e.vcls||'', statusLabel:e.vlabel||'', url:e.url,
+    contentAsOf:e.contentAsOf||'', nextReview:e.nextReview||'',
     kpis:(e.kpi||[]).map(function(kv){return {k:kv[0],v:kv[1],note:''};}),
-    guidance:(e.guidance||[]).map(function(g){return {g:g.g,dir:g.dir,text:g.text};})}; }
+    guidance:(e.guidance||[]).map(function(g){return {g:g.g,dir:g.dir,text:g.text};}),
+    sections:e.sections||[], history:e.history||[]}; }
 const D={ groups:GROUPS, grpMeta:GRP, overview:OVERVIEW, tierFlow:TIER_FLOW, date:DATE_STR,
   stocks:DATA.map(_slim),
   allStocks:DATA.map(function(s){return {id:s.id,nm:s.nm,g:s.g,comp:s.comp,tier:s.tier_confirmed,tl:s.tier_label,w:s.tier_waiting,cs:(s.cells||[]).map(function(c){return c[0];})};}),
@@ -330,19 +332,27 @@ function quadEl(G){ const W=470,H=380,m={l:52,r:22,t:26,b:44},xs=[],ys=[];
   k.push(ql(m.l+4,H-m.b-6,'退潮 · 沒人接','start')); k.push(ql(W-m.r-4,H-m.b-6,'領漲但調節','end'));
   const xt=sv('text',{x:(m.l+W-m.r)/2,y:H-8,'text-anchor':'middle','font-size':11,'font-weight':700,fill:'var(--ink2)'});xt.textContent='← 跑輸        20日動能        跑贏 →';k.push(xt);
   const cy2=(m.t+H-m.b)/2,yt=sv('text',{x:14,y:cy2,'text-anchor':'middle','font-size':11,'font-weight':700,fill:'var(--ink2)',transform:`rotate(-90 14 ${cy2})`});yt.textContent='← 淨賣   修正日外資   淨買 →';k.push(yt);
+  // 每族群獨立 <g>：預設只顯示圓點與標籤，軌跡隱藏；focus 時才顯示該族群軌跡並淡化其他
+  const layer=[];
+  const setFocus=gid=>layer.forEach(o=>{const on=(gid==null||o.g===gid);
+    o.gEl.setAttribute('opacity', gid==null?1:(on?1:0.14));
+    o.trail.setAttribute('opacity', (gid!=null&&on)?0.85:0);
+    o.end.setAttribute('opacity', (gid!=null&&on)?0.75:0);
+    o.dot.setAttribute('r', (gid!=null&&on)?8:6);
+    o.t.setAttribute('font-size', (gid!=null&&on)?13:11);});
   G.forEach(g=>{const cx=X(g.axis.price*100),cyy=Y(g.axis.dip),sx=X(g.axis.price5*100),sy=Y(g.axis.dip5),col=stateStyle(g.state).col;
-    k.push(sv('line',{x1:sx,y1:sy,x2:cx,y2:cyy,stroke:'var(--muted)','stroke-width':1.4,opacity:.5}));
-    k.push(sv('circle',{cx:sx,cy:sy,r:2.4,fill:'var(--muted)',opacity:.5}));
-    const hit=sv('circle',{cx,cy:cyy,r:13,fill:'transparent'}); hit.style.cursor='pointer'; hit.addEventListener('click',()=>openGroupSheet(g)); k.push(hit);
-    const dot=sv('circle',{cx,cy:cyy,r:6,fill:col,stroke:'var(--card)','stroke-width':2}); dot.style.cursor='pointer'; dot.addEventListener('click',()=>openGroupSheet(g)); k.push(dot);
-    // F8：hover 讀出當前與 5 日前數值
+    const trail=sv('line',{x1:sx,y1:sy,x2:cx,y2:cyy,stroke:col,'stroke-width':1.8,'stroke-linecap':'round',opacity:0});
+    const end=sv('circle',{cx:sx,cy:sy,r:2.6,fill:'var(--muted)',opacity:0});
+    const hit=sv('circle',{cx,cy:cyy,r:13,fill:'transparent'});
+    const dot=sv('circle',{cx,cy:cyy,r:6,fill:col,stroke:'var(--card)','stroke-width':2}); dot.style.cursor='pointer';
     const _p5=g.axis.price5!=null?(g.axis.price5*100).toFixed(1)+'%':'—', _d5=g.axis.dip5!=null?g.axis.dip5.toFixed(2):'—';
-    dot.appendChild(sv('title',{},document.createTextNode(
-      grp(g.g).nm+'｜動能 '+(g.axis.price*100).toFixed(1)+'%（5日前 '+_p5+'）｜修正日外資 '+g.axis.dip.toFixed(2)+'（5日前 '+_d5+'）')));
-    // F10：與熱圖／排行榜聯動高亮
-    GHL.add(g.g, ()=>{dot.setAttribute('r',9);dot.setAttribute('stroke-width',3);}, ()=>{dot.setAttribute('r',6);dot.setAttribute('stroke-width',2);});
-    [hit,dot].forEach(e=>{e.addEventListener('mouseenter',()=>GHL.enter(g.g));e.addEventListener('mouseleave',()=>GHL.leave(g.g));});
-    const t=sv('text',{x:cx+9,y:cyy+4,'font-size':11,'font-weight':800,fill:'var(--ink)','paint-order':'stroke',stroke:'var(--card)','stroke-width':3,'stroke-linejoin':'round'});t.textContent=grp(g.g).short;t.style.cursor='pointer';t.addEventListener('click',()=>openGroupSheet(g));k.push(t);});
+    dot.appendChild(sv('title',{},document.createTextNode(grp(g.g).nm+'｜動能 '+(g.axis.price*100).toFixed(1)+'%（5日前 '+_p5+'）｜修正日外資 '+g.axis.dip.toFixed(2)+'（5日前 '+_d5+'）')));
+    const t=sv('text',{x:cx+9,y:cyy+4,'font-size':11,'font-weight':800,fill:'var(--ink)','paint-order':'stroke',stroke:'var(--card)','stroke-width':3,'stroke-linejoin':'round'});t.textContent=grp(g.g).short;t.style.cursor='pointer';
+    const gEl=sv('g',{}); [trail,end,hit,dot,t].forEach(x=>gEl.appendChild(x)); gEl.style.cursor='pointer'; gEl.style.transition='opacity .15s ease';
+    gEl.addEventListener('click',()=>openGroupSheet(g));
+    gEl.addEventListener('mouseenter',()=>GHL.enter(g.g)); gEl.addEventListener('mouseleave',()=>GHL.leave(g.g));
+    GHL.add(g.g,()=>setFocus(g.g),()=>setFocus(null));
+    layer.push({g:g.g,gEl,trail,end,dot,t}); k.push(gEl);});
   return svg(W,H,k,'height:auto;max-height:400px'); }
 
 /* ---------- 段落建構 ---------- */
@@ -384,35 +394,57 @@ function buildOverview(){
 function buildTSMC(){
   const T=D.tsmc; if(!T)return [];
   const dirMap={up:{s:'↑',col:'var(--strong)',bg:'var(--strongbg)',l:'看增'},mixed:{s:'↕',col:'var(--amber)',bg:'var(--amberbg)',l:'分歧'},down:{s:'↓',col:'var(--weak)',bg:'var(--weakbg)',l:'看減'},flat:{s:'→',col:'var(--muted)',bg:'var(--neubg)',l:'持平'},none:{s:'·',col:'var(--muted)',bg:'var(--neubg)',l:'未提及'}};
-  const kpi=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:4px'});
-  T.kpis.forEach(k=>kpi.appendChild(h('div',{style:'background:var(--inset);border-radius:12px;padding:13px 15px'},
+  const kpi=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:4px'});
+  (T.kpis||[]).forEach(k=>kpi.appendChild(h('div',{style:'background:var(--inset);border-radius:12px;padding:12px 14px'},
     h('div',{style:'font-size:11px;font-weight:800;color:var(--muted)',text:k.k}),
     h('div',{class:'mono',style:'font-size:17px;font-weight:600;color:var(--ink);margin:3px 0 1px',text:k.v}),
-    h('div',{style:'font-size:11px;color:var(--ink2)',text:k.note}))));
+    k.note?h('div',{style:'font-size:11px;color:var(--ink2)',text:k.note}):null)));
+  // 各族群方向指引
   const gl=h('div',{style:'display:flex;flex-direction:column;gap:8px'});
-  T.guidance.forEach(gd=>{ const dm=dirMap[gd.dir]||dirMap.none, gobj=D.groups.find(x=>x.g===gd.g);
+  (T.guidance||[]).forEach(gd=>{ const dm=dirMap[gd.dir]||dirMap.none, gobj=D.groups.find(x=>x.g===gd.g);
     const a={class:'grow',style:'background:var(--card);border:1px solid var(--line);border-left:4px solid '+dm.col+';border-radius:12px;padding:12px 16px'};
     if(gobj){a.class='clickrow grow';a.role='button';a.tabindex='0';a.onclick=()=>openGroupSheet(gobj);a.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(gobj);}};}
     gl.appendChild(h('div',a,
       h('div',{style:'display:flex;align-items:center;gap:8px'},
         h('span',{class:'mono',style:`font-size:16px;font-weight:600;color:${dm.col}`,text:dm.s}),
-        h('b',{style:'font-size:14px',text:grp(gd.g).nm})),
-      h('div',{style:'font-size:12.5px;color:var(--ink2);line-height:1.5',text:gd.text}))); });
+        h('b',{style:'font-size:14px',text:grp(gd.g).nm}),
+        h('span',{class:'chip',style:`margin-left:auto;color:${dm.col};background:${dm.bg}`,text:dm.l})),
+      h('div',{style:'font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:5px',text:gd.text}))); });
+  // 法說會重點整理（sections，與方向指引同等）
+  const secWrap=h('div',{});
+  const secs=T.sections||[];
+  if(secs.length)secs.forEach((s,i)=>secWrap.appendChild(nbSection(s,i<3)));
+  else secWrap.appendChild(h('p',{style:'font-size:12.5px;color:var(--muted)',text:'本季法說會全文整理尚未載入；見下方官方 IR 連結。'}));
+  // 往期法說
+  const hist=h('div',{style:'display:flex;flex-wrap:wrap;gap:8px;align-items:center'});
+  (T.history||[]).forEach(hh=>hist.appendChild(h('a',{href:hh.url,style:'font-size:12px;font-weight:600;color:var(--teal);background:var(--inset);border-radius:100px;padding:5px 12px',text:hh.title+(hh.date?' · '+hh.date:'')})));
+  // 查核狀態
   const scMap={independently_verified:{col:'var(--teal)',bg:'var(--tealbg)'},partially_verified:{col:'var(--amber)',bg:'var(--amberbg)'},conflicted:{col:'var(--strong)',bg:'var(--strongbg)'}};
-  const scc=scMap[T.status]||{col:'var(--muted)',bg:'var(--neubg)'};
-  const sc={t:T.statusLabel||T.status||'',col:scc.col,bg:scc.bg};
+  const scc=scMap[T.status]||{col:'var(--muted)',bg:'var(--neubg)'}, sc={t:T.statusLabel||T.status||'',col:scc.col,bg:scc.bg};
   return [
     h('p',{class:'kicker',text:'上游錨點 · 觀察層（不計分）'}),
-    h('h2',{class:'sec',text:'台積電專區 · 產業方向指引'}),
-    h('p',{class:'lead',html:'台積電（2330）<b style="color:var(--ink)">不在掃描範圍、不參與任何排名與評分</b>。方向指引由每季法說後的事件錨點人工彙整，只作上游脈絡；點族群列可看該族群目前狀態。'}),
+    h('h2',{class:'sec',text:'台積電專區 · 法說會脈絡與族群方向'}),
+    h('p',{class:'lead',html:'台積電（2330）<b style="color:var(--ink)">不在掃描範圍、不參與任何排名與評分</b>。以下為每季法說後人工彙整的<b style="color:var(--ink)">法說會重點</b>與其對各族群的<b style="color:var(--ink)">方向指引</b>——兩者同等重要：前者是原文脈絡，後者是對應到本站族群的方向。'}),
     h('div',{class:'card',style:'padding:24px 26px'},
-      h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px'},
-        h('b',{style:'font-size:18px;font-weight:800',text:'台積電 '+T.quarter}),
+      h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px'},
+        h('b',{style:'font-size:18px;font-weight:800',text:(T.title||('台積電 '+T.quarter))}),
         h('span',{class:'mono',style:'font-size:12px;color:var(--muted)',text:T.eventDate}),
         h('span',{class:'chip',style:`color:${sc.col};background:${sc.bg}`,text:sc.t})),
       kpi,
-      h('h3',{style:'margin:22px 0 8px;font-size:14px;font-weight:800',text:'各族群方向指引（↑看增 ↕分歧 ·未提及）'}),gl,
-      h('a',{href:T.url,style:'display:inline-block;margin-top:16px;font-size:12px;font-weight:700',text:'台積電官方 IR · '+T.quarter+' →'}))
+      h('div',{class:'dgrid',style:'margin-top:24px'},
+        h('div',{},
+          h('h3',{style:'margin:0 0 4px;font-size:15px;font-weight:800',text:'法說會重點整理'}),
+          h('p',{style:'margin:0 0 10px;font-size:11.5px;color:var(--muted)',text:'台積電法說會原文彙整（營運、需求、資本支出、各平台展望）。'}),
+          secWrap),
+        h('div',{},
+          h('h3',{style:'margin:0 0 4px;font-size:15px;font-weight:800',text:'各族群方向指引'}),
+          h('p',{style:'margin:0 0 10px;font-size:11.5px;color:var(--muted)',text:'↑看增 ↕分歧 ↓看減 ·未提及；點族群看目前狀態。'}),
+          gl)),
+      hist.children.length?h('div',{style:'margin-top:18px;border-top:1px solid var(--line2);padding-top:14px'},h('div',{style:'font-size:12px;font-weight:800;margin-bottom:8px',text:'往期法說'}),hist):null,
+      h('div',{style:'display:flex;flex-wrap:wrap;gap:14px;font-size:11.5px;color:var(--muted);margin-top:14px'},
+        T.contentAsOf?h('span',{text:'資料截至 '+T.contentAsOf}):null,
+        T.nextReview?h('span',{text:'下次複核 '+T.nextReview}):null),
+      h('a',{href:T.url,style:'display:inline-block;margin-top:12px;font-size:12px;font-weight:700',text:'台積電官方 IR · '+T.quarter+' →'}))
   ];
 }
 // F10：族群跨視圖高亮。各 view 用 GHL.add 登錄自己的「亮起/還原」，hover 時互相觸發。
@@ -437,7 +469,7 @@ function buildGroup(){
   metrics.forEach(m=>heatGrid.appendChild(h('div',{style:'font-size:10.5px;color:var(--muted);font-weight:700;text-align:center;line-height:1.3;align-self:end;padding-bottom:6px',html:m.label+'<br><span style="font-weight:500;opacity:.8">'+m.hint+'</span>'})));
   heatSorted.forEach(g=>{ const row=h('div',{class:'clickrow',role:'button',tabindex:'0',onclick:()=>openGroupSheet(g),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}},style:'grid-column:1/-1;display:grid;grid-template-columns:104px repeat(5,1fr);gap:4px;align-items:stretch;border-top:1px solid var(--line2);padding-top:4px'});
     row.addEventListener('mouseenter',()=>GHL.enter(g.g)); row.addEventListener('mouseleave',()=>GHL.leave(g.g));
-    GHL.add(g.g, ()=>row.style.boxShadow='inset 0 0 0 2px var(--teal)', ()=>row.style.boxShadow='');
+    GHL.add(g.g, ()=>{row.style.boxShadow='inset 3px 0 0 0 var(--ink2)';row.style.borderRadius='8px';}, ()=>{row.style.boxShadow='';row.style.borderRadius='';});
     row.appendChild(h('div',{style:'font-size:12.5px;font-weight:700;align-self:center;padding-right:6px',text:grp(g.g).short}));
     metrics.forEach(m=>{const cur=g.heat[m.k][0],d=cur-g.heat[m.k][1];
       row.appendChild(h('div',{style:`min-height:40px;border-radius:8px;background:${rankClass(cur,sorted[m.k])};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 3px`},
@@ -472,7 +504,7 @@ function buildGroup(){
       h('div',{style:'flex:1 1 540px;min-width:min(520px,100%)'},
         h('div',{class:'opthd'},h('b',{text:'四象限地圖與熱圖'}),h('span',{text:'看全貌與 5 日位移'})),
         h('figure',{class:'card',style:'margin:0 0 18px;padding:22px'},
-          h('figcaption',{style:'display:flex;justify-content:space-between;margin-bottom:6px'},h('b',{style:'font-size:15px',text:'① 定位 · 族群價籌四象限'}),h('span',{style:'font-size:12px;color:var(--muted)',text:'灰線＝近 5 日移動方向 · 點圓點看族群明細'})),
+          h('figcaption',{style:'display:flex;justify-content:space-between;margin-bottom:6px'},h('b',{style:'font-size:15px',text:'① 定位 · 族群價籌四象限'}),h('span',{style:'font-size:12px;color:var(--muted)',text:'hover 圓點：單獨顯示該族群的 5 日移動 · 點圓點看明細'})),
           quadEl(G)),
         h('figure',{class:'card',style:'margin:0;padding:22px'},
           h('figcaption',{style:'margin-bottom:14px',html:`<b style="font-size:15px">② 多維名次 · 族群熱圖</b> <span style="font-size:12px;color:var(--muted);margin-left:8px">每欄各自比較 ${G.length} 族群：<b style="color:var(--strong)">紅＝前段</b>、<b style="color:var(--weak)">綠＝後段</b>；▲▼＝較 5 日前</span>`}),
