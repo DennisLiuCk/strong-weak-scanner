@@ -1,7 +1,7 @@
 # 每日檢視 Runbook(盤後 agent session / 人工)
 
-> 每日資料由 GitHub Actions 台灣 20:17 先保存價格/法人原始 checkpoint，23:40 等
-> TWSE 借券最終版產製後補完、評分、更新儀表板並 commit。Actions 延遲或要人工補跑時，
+> 每日資料由 GitHub Actions 台灣 18:00 先保存價格/法人原始 checkpoint，19:00
+> 嘗試補完、評分、更新儀表板並 commit；上游未齊時會拒絕正式發布。Actions 延遲或要人工補跑時，
 > 應在官方資料齊全後執行同一條 `scripts/run_daily.py` 正式管線。
 > 本文件是盤後想「確認執行狀況 + 討論今日資料」時的標準開場。
 > 策略調整**不在每日做**——那走 `WEEKLY_REVIEW.md` 的門檻;每日只做確認、討論、資料修復。

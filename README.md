@@ -122,16 +122,17 @@
 所有時間皆為台灣時間：
 
 ```text
-平日 20:17  價格 + 法人 raw checkpoint（不重算、不發布）
+平日 18:00  價格 + 法人 raw checkpoint（不重算、不發布）
        ↓
-平日 23:40  TDCC → 五表補完/holding 終版 → 衍生指標 → score
+平日 19:00  TDCC → 嘗試五表補完 → 衍生指標 → score
              → 正式 OOS snapshot → index + immutable archive → commit
 
 週六 09:00  validate.py → reports/validate_<資料日>.md
 每月/每季   fetch_financials.py → 月營收與財報四表（不進評分）
 ```
 
-正式晚場要求五張原始表、universe、評分與族群資料完整後才發布。任一交易所來源失敗時，
+正式晚場要求五張原始表、universe、評分與族群資料完整後才發布。19:00 時上游若尚未齊備，
+完整性門檻會拒絕發布。任一交易所來源失敗時，
 已成功部分會先寫入 SQLite 並保存 checkpoint，但工作流保持失敗，停止 score、OOS 快照與網站更新。
 
 ## 儀表板怎麼看
@@ -193,7 +194,8 @@ uv run --no-project --python 3.12 python -m unittest discover -s tests
   額外官方請求會分開列示；後者是非阻斷觀察層。
 - 一個市場成功、另一個失敗時，成功資料先落地；下次依 SQLite 缺口接續。空回應或 universe
   覆蓋不足不會被補成 0。
-- `holding` 日內初版不視為正式終版；23:40 的 `--final-pass` 會刷新一次，完成後同日重跑維持冪等。
+- `holding` 日內初版不視為正式終版；19:00 排程會以 `--final-pass` 刷新一次，
+  上游資料未齊時不發布，同日重跑維持冪等。
 - schema 新增欄位的歷史 `NULL` 使用 `--backfill-expanded-fields`；只有交易所公告來源修正版、
   既有非空值也必須覆寫時才用 `--force`。
 

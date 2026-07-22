@@ -2,12 +2,12 @@ name: daily-fetch
 
 on:
   schedule:
-    # 早場 台灣 20:17 = UTC 12:17：官方價格 + 三大法人(20:00 含鉅額版)。
+    # 早場 台灣 18:00 = UTC 10:00：價格 + 三大法人 checkpoint。
     # 只 commit 原始 checkpoint，不重算／發布，避免持股、融資券、借券尚未終版時污染 OOS。
-    - cron: "17 12 * * 1-5"
-    # 晚場 台灣 23:40 = UTC 15:40：TWSE 借券餘額約 23:30 產製後補完其餘三表，
-    # 同時重試任何早場缺口；五表完整才評分、凍結 OOS、發布儀表板。
-    - cron: "40 15 * * 1-5"
+    - cron: "0 10 * * 1-5"
+    # 晚場 台灣 19:00 = UTC 11:00：嘗試補完其餘三表並重試早場缺口；
+    # 五表完整才評分、凍結 OOS、發布儀表板，上游未齊時會停止發布。
+    - cron: "0 11 * * 1-5"
   workflow_dispatch:
     inputs:
       mode:
@@ -44,7 +44,7 @@ jobs:
           REQUESTED_MODE: ${{ inputs.mode }}
         run: |
           mode=complete
-          if [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "17 12 * * 1-5" ]; then
+          if [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "0 10 * * 1-5" ]; then
             mode=early
           elif [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$REQUESTED_MODE" ]; then
             mode="$REQUESTED_MODE"

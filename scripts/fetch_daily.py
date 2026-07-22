@@ -13,7 +13,7 @@
   uv run --no-project python scripts/fetch_daily.py --datasets TaiwanDailyShortSaleBalances --start 2026-03-01
   # schema 新增欄位回補：只掃既有交易日與 NULL 欄位，可中斷續跑，且只落 raw checkpoint
   uv run --no-project python scripts/fetch_daily.py --backfill-expanded-fields --start 2026-03-02 --end 2026-07-17
-  # 20:17 早場 checkpoint:只抓價格/法人,不重算衍生表
+  # 18:00 早場 checkpoint:只抓價格/法人,不重算衍生表
   uv run --no-project python scripts/fetch_daily.py --datasets TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell --raw-only
   # 定向補缺:只抓指定股票(省 API 額度;可與 --datasets 疊加)
   uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-02
@@ -1318,7 +1318,7 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
               f" · {len(fetch_dates)} dates")
 
     # 延至所有指定原始表都成功後才標示 holding 最終版；若後續 margin/sbl 失敗，
-    # 23:40 重跑仍會再次刷新 holding，不會讓早場版本被誤認為完成。
+    # 19:00 重跑仍會再次刷新 holding，不會讓早場版本被誤認為完成。
     if final_holding_day:
         _coverage_set(con, "exchange_final", "TaiwanStockShareholding", final_holding_day)
         con.commit()
@@ -1887,9 +1887,9 @@ def main():
     ap.add_argument("--datasets", help="逗號分隔,只抓指定官方原始表(沿用 FinMind dataset 名稱);過濾時跳過事件段")
     ap.add_argument("--stocks", help="逗號分隔,只抓指定股票(定向補缺用,省 API 額度);事件段同步過濾,指數照抓")
     ap.add_argument("--raw-only", action="store_true",
-                    help="只落地原始表 checkpoint,不抓事件、不重算 metrics(20:17 早場用)")
+                    help="只落地原始表 checkpoint,不抓事件、不重算 metrics(18:00 早場用)")
     ap.add_argument("--final-pass", action="store_true",
-                    help="正式晚場:最新 holding 強制刷新一次並記 final coverage(應於 22:00 後使用)")
+                    help="完整場:最新 holding 強制刷新一次，指定原始表完整才記 final coverage")
     fetch_mode = ap.add_mutually_exclusive_group()
     fetch_mode.add_argument("--force", action="store_true",
                             help="忽略缺口規劃,強制重抓指定日期範圍(來源修正/人工稽核才用)")

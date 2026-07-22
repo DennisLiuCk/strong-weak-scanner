@@ -115,7 +115,7 @@ def main():
                     "SELECT COUNT(*) FROM oos_signal_snapshots WHERE snapshot_id=?", (run[0],)).fetchone()[0]
                 if n_snap != len(uni):
                     issues.append(f"OOS as-seen 快照 {last} 僅 {n_snap}/{len(uni)} 檔")
-    # TDCC 週快照鮮度:正常最大 age = 10 天(週一 23:40 前);>10 = 漏抓一週(不可回補,永久洞)
+    # TDCC 週快照鮮度:正常最大 age = 10 天(週一 19:00 完整場前);>10 = 漏抓一週(不可回補,永久洞)
     if con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='tdcc_holding'").fetchone():
         td_last = con.execute("SELECT MAX(date) FROM tdcc_holding").fetchone()[0]
         if td_last and (today - datetime.date.fromisoformat(td_last)).days > 10:

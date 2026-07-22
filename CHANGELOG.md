@@ -2,6 +2,12 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## Daily Fetch 排程提早 — 2026-07-22
+
+- 因 GitHub Actions 實際啟動延遲，平日早場由台灣 20:17 提早為 18:00，完整場由
+  23:40 提早為 19:00（GitHub cron 分別為 UTC 10:00、11:00）。資料完整性門檻不變；
+  19:00 時上游資料未齊仍會停止 score、OOS 快照與儀表板發布。
+
 ## 儀表板視覺重構(claude.ai/design 移植) — 2026-07-19
 
 **策略規則、資料 payload 與 `IS_CUTOFF` 零變動**;`build_dashboard.py` 注入層不變,
