@@ -4,6 +4,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError
 from unittest import mock
@@ -956,6 +957,7 @@ class WorkflowCheckpointTest(unittest.TestCase):
         fetch_block = workflow[fetch_at:checkpoint_at]
         checkpoint_block = workflow[checkpoint_at:stop_at]
         stop_block = workflow[stop_at:score_at]
+        publish_block = workflow[workflow.index("- name: commit 回 repo(有變動才提交)"):]
         self.assertIn("id: fetch_daily", fetch_block)
         self.assertIn("continue-on-error: true", fetch_block)
         self.assertIn("steps.fetch_daily.outcome == 'failure'", checkpoint_block)
@@ -964,12 +966,65 @@ class WorkflowCheckpointTest(unittest.TestCase):
         self.assertNotIn("index.html", checkpoint_block)
         self.assertIn("steps.fetch_daily.outcome == 'failure'", stop_block)
         self.assertIn("exit 1", stop_block)
-        self.assertIn('cron: "0 10 * * 1-5"', workflow)
-        self.assertIn('cron: "0 11 * * 1-5"', workflow)
-        self.assertIn('[ "$SCHEDULE" = "0 10 * * 1-5" ]', workflow)
+        self.assertIn('cron: "7 10 * * 1-5"', workflow)
+        self.assertIn('cron: "7 11 * * 1-5"', workflow)
+        self.assertIn('cron: "47 15 * * 1-5"', workflow)
+        self.assertIn('[ "$SCHEDULE" = "7 10 * * 1-5" ]', workflow)
+        self.assertIn('[ "$SCHEDULE" = "7 11 * * 1-5" ]', workflow)
+        self.assertIn('$(date -u +%H%M)', workflow)
         self.assertIn("--raw-only", fetch_block)
         self.assertIn("--final-pass", fetch_block)
         self.assertIn("steps.mode.outputs.mode == 'complete'", workflow[score_at:])
+        self.assertIn("git merge-base --is-ancestor", publish_block)
+        self.assertIn("id: commit_push", workflow)
+        self.assertIn("pages: read", workflow)
+        self.assertIn("steps.commit_push.outputs.commit_sha", workflow)
+        self.assertIn("pages/builds/latest", workflow)
+        self.assertIn('page_commit" = "$COMMIT_SHA', workflow)
+        conflict_at = publish_block.index("::error::rebase 衝突")
+        self.assertIn("exit 1", publish_block[conflict_at:])
+
+    def test_all_main_writers_serialize_and_checkout_fresh_main(self):
+        workflows = ROOT / ".github" / "workflows"
+        for name in ("daily-fetch.yml", "fetch-financials.yml", "weekly-validate.yml"):
+            text = (workflows / name).read_text(encoding="utf-8")
+            with self.subTest(workflow=name):
+                self.assertIn("group: repo-main-writer", text)
+                self.assertIn("queue: max", text)
+                self.assertIn("uses: actions/checkout@v6", text)
+                self.assertIn("ref: main", text)
+                self.assertIn("fetch-depth: 0", text)
+                self.assertIn("uses: actions/setup-python@v6", text)
+
+        financial = (workflows / "fetch-financials.yml").read_text(encoding="utf-8")
+        conflict_at = financial.index("::error::rebase 衝突")
+        self.assertIn("exit 1", financial[conflict_at:])
+
+        quality = (workflows / "qualitative-quality.yml").read_text(encoding="utf-8")
+        self.assertIn("uses: actions/checkout@v6", quality)
+        self.assertIn("uses: actions/setup-python@v6", quality)
+
+
+class FinalPassReadinessTest(unittest.TestCase):
+    def test_today_requires_taipei_2340_cutoff(self):
+        before = datetime(2026, 7, 22, 15, 39, tzinfo=timezone.utc)
+        ready = datetime(2026, 7, 22, 15, 40, tzinfo=timezone.utc)
+        self.assertFalse(fd.final_pass_ready("2026-07-22", before))
+        self.assertTrue(fd.final_pass_ready("2026-07-22", ready))
+
+    def test_historical_backfill_is_allowed_but_future_date_is_not(self):
+        now = datetime(2026, 7, 22, 15, 40, tzinfo=timezone.utc)
+        self.assertTrue(fd.final_pass_ready("2026-07-21", now))
+        self.assertFalse(fd.final_pass_ready("2026-07-23", now))
+
+    def test_cli_rejects_same_day_final_pass_before_cutoff(self):
+        before = datetime(2026, 7, 22, 15, 39, tzinfo=timezone.utc)
+        argv = ["fetch_daily.py", "--final-pass", "--end", "2026-07-22"]
+        with mock.patch.object(sys, "argv", argv), \
+                mock.patch.object(fd, "taipei_now", return_value=before):
+            with self.assertRaises(SystemExit) as raised:
+                fd.main()
+        self.assertIn("拒絕過早 final-pass", str(raised.exception))
 
 
 class RawOnlyModeTest(unittest.TestCase):

@@ -2,6 +2,24 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## Actions 寫入可靠性與終版門檻 — 2026-07-22
+
+**策略規則、權重、tier 與 `IS_CUTOFF` 零變動**；本次只修正自動化可靠性。
+
+- 事故證據:`daily-fetch` run `29924075052` 已建立完整場 commit `2f4bddd`，但早場
+  `5ac4fdc` 先推上 `main`，導致 SQLite rebase 衝突；workflow 卻 `exit 0`，呈現綠燈但
+  資料、archive 與 Pages 都未落地。補跑 run `29924837966` 後才以 `78bacc2` 正式發布。
+- `daily-fetch`、`fetch-financials`、`weekly-validate` 統一使用 `repo-main-writer`
+  + `queue: max`，並在實際執行時 checkout 最新 `main`；push 後再驗證遠端包含本次
+  commit。rebase 衝突改為 exit 1，不再假成功；完整場另輪詢 Pages latest build，
+  只有同一 commit 狀態為 `built` 才通過部署驗證。
+- 避開 GitHub 整點高負載：台灣 18:07 早場、19:07 第二次提前觸發；19:07 實際
+  啟動若仍早於 23:40，只做 checkpoint。新增 23:47 終版安全網。
+- `fetch_daily.py --final-pass` 對當日資料新增台北 23:40 硬門檻；原始表滿檔仍不足以
+  證明 18:00/22:00 日內版本已是終版。明確回補過去日期不受此時間門檻限制。
+- 官方 Actions 升級為 `actions/checkout@v6`、`actions/setup-python@v6`，清除 Node 20
+  deprecation 警告；新增排程、共用鎖、fresh checkout、衝突失敗與終版門檻回歸測試。
+
 ## Daily Fetch 排程提早 — 2026-07-22
 
 - 因 GitHub Actions 實際啟動延遲，平日早場由台灣 20:17 提早為 18:00，完整場由

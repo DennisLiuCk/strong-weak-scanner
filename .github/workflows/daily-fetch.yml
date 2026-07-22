@@ -2,16 +2,18 @@ name: daily-fetch
 
 on:
   schedule:
-    # 早場 台灣 18:00 = UTC 10:00：價格 + 三大法人 checkpoint。
+    # 早場 台灣 18:07 = UTC 10:07：價格 + 三大法人 checkpoint。
     # 只 commit 原始 checkpoint，不重算／發布，避免持股、融資券、借券尚未終版時污染 OOS。
-    - cron: "0 10 * * 1-5"
-    # 晚場 台灣 19:00 = UTC 11:00：嘗試補完其餘三表並重試早場缺口；
-    # 五表完整才評分、凍結 OOS、發布儀表板，上游未齊時會停止發布。
-    - cron: "0 11 * * 1-5"
+    - cron: "7 10 * * 1-5"
+    # 第二次提前觸發 台灣 19:07 = UTC 11:07：實際啟動若尚未到 23:40，
+    # 只重試早場 checkpoint；若 GitHub 延遲至終版門檻後，直接走 complete。
+    - cron: "7 11 * * 1-5"
+    # 台灣 23:47 = UTC 15:47：終版安全網，五表完整才評分、凍結 OOS 與發布。
+    - cron: "47 15 * * 1-5"
   workflow_dispatch:
     inputs:
       mode:
-        description: "complete=正式補完並發布；early=只抓價格/法人 checkpoint"
+        description: "complete=23:40 後正式補完並發布；early=只抓價格/法人 checkpoint"
         required: true
         default: complete
         type: choice
@@ -21,18 +23,23 @@ on:
 
 permissions:
   contents: write          # 允許把更新後的 db commit 回 repo
+  pages: read              # 驗證 legacy Pages build 已部署本次 commit
 
 concurrency:
-  group: daily-fetch
+  group: repo-main-writer
   cancel-in-progress: false
+  queue: max
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -44,8 +51,13 @@ jobs:
           REQUESTED_MODE: ${{ inputs.mode }}
         run: |
           mode=complete
-          if [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "0 10 * * 1-5" ]; then
+          if [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "7 10 * * 1-5" ]; then
             mode=early
+          elif [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "7 11 * * 1-5" ]; then
+            # 19:07 只是提前排隊；實際啟動跨過 UTC 15:40(台灣 23:40)才允許正式發布。
+            if [ "$(date -u +%H%M)" -lt 1540 ]; then
+              mode=early
+            fi
           elif [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$REQUESTED_MODE" ]; then
             mode="$REQUESTED_MODE"
           fi
@@ -91,7 +103,13 @@ jobs:
           fi
           git commit -m "data: $(date -u +%Y-%m-%d) 每日抓取進度（未完成）"
           for i in 1 2 3 4 5; do
+            commit_sha=$(git rev-parse HEAD)
             if git push; then
+              git fetch origin main
+              if ! git merge-base --is-ancestor "$commit_sha" origin/main; then
+                echo "::error::push 回報成功，但遠端 main 不包含 $commit_sha"
+                exit 1
+              fi
               exit 0
             fi
             echo "進度 push 被拒(第 $i 次)——fetch + rebase 後重試"
@@ -127,6 +145,7 @@ jobs:
         run: python scripts/build_dashboard.py
 
       - name: commit 回 repo(有變動才提交)
+        id: commit_push
         env:
           FETCH_MODE: ${{ steps.mode.outputs.mode }}
         run: |
@@ -141,23 +160,61 @@ jobs:
           fi
           if git diff --staged --quiet; then
             echo "無新資料,略過 commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "$message"
-          # main 上若同時有其他 push(手動 session、另一次跑),直接 push 會被拒。
-          # fetch + rebase 後重試;若 rebase 真的衝突(同一批資料已落地),放棄本次 commit。
+          # main 上若同時有其他 push(手動 session等),直接 push 會被拒。
+          # fetch + rebase 後重試；SQLite 無法自動合併時必須標紅，不得假成功。
           for i in 1 2 3 4 5; do
+            commit_sha=$(git rev-parse HEAD)
             if git push; then
+              git fetch origin main
+              if ! git merge-base --is-ancestor "$commit_sha" origin/main; then
+                echo "::error::push 回報成功，但遠端 main 不包含 $commit_sha"
+                exit 1
+              fi
+              echo "### Daily Fetch 已落地" >> "$GITHUB_STEP_SUMMARY"
+              echo "- commit: \`$commit_sha\`" >> "$GITHUB_STEP_SUMMARY"
+              echo "- Pages: https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/" >> "$GITHUB_STEP_SUMMARY"
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              echo "commit_sha=$commit_sha" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             echo "push 被拒(第 $i 次)——fetch + rebase 後重試"
             git fetch origin main
             if ! git rebase origin/main; then
-              echo "::warning::rebase 衝突(資料可能已被別的 push 落地),放棄本次 commit"
+              echo "::error::rebase 衝突，本次 commit 未能落地"
               git rebase --abort
-              exit 0
+              exit 1
             fi
             sleep 5
           done
           echo "::error::push 重試 5 次仍失敗,本次資料未落地"
+          exit 1
+
+      - name: 確認 GitHub Pages 部署本次 commit
+        if: steps.mode.outputs.mode == 'complete' && steps.commit_push.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT_SHA: ${{ steps.commit_push.outputs.commit_sha }}
+        run: |
+          for i in $(seq 1 60); do
+            payload=$(gh api "repos/$GITHUB_REPOSITORY/pages/builds/latest" 2>/dev/null || true)
+            page_commit=$(jq -r '.commit // ""' <<< "$payload")
+            page_status=$(jq -r '.status // ""' <<< "$payload")
+            if [ "$page_commit" = "$COMMIT_SHA" ]; then
+              if [ "$page_status" = "built" ]; then
+                echo "Pages 已部署 $COMMIT_SHA"
+                echo "- Pages deployment: built" >> "$GITHUB_STEP_SUMMARY"
+                exit 0
+              fi
+              if [ "$page_status" = "errored" ]; then
+                echo "::error::Pages 部署失敗:$COMMIT_SHA"
+                exit 1
+              fi
+            fi
+            sleep 5
+          done
+          echo "::error::5 分鐘內未確認 Pages 部署本次 commit:$COMMIT_SHA"
           exit 1

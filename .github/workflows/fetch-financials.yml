@@ -17,16 +17,20 @@ permissions:
   contents: write
 
 concurrency:
-  group: fetch-financials
+  group: repo-main-writer
   cancel-in-progress: false
+  queue: max
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -54,15 +58,21 @@ jobs:
           fi
           git commit -m "data: $(date -u +%Y-%m-%d) 財報更新"
           for i in 1 2 3 4 5; do
+            commit_sha=$(git rev-parse HEAD)
             if git push; then
+              git fetch origin main
+              if ! git merge-base --is-ancestor "$commit_sha" origin/main; then
+                echo "::error::push 回報成功，但遠端 main 不包含 $commit_sha"
+                exit 1
+              fi
               exit 0
             fi
             echo "push 被拒(第 $i 次)——fetch + rebase 後重試"
             git fetch origin main
             if ! git rebase origin/main; then
-              echo "::warning::rebase 衝突(資料可能已被別的 push 落地),放棄本次 commit"
+              echo "::error::rebase 衝突，本次財報 commit 未能落地"
               git rebase --abort
-              exit 0
+              exit 1
             fi
             sleep 5
           done
