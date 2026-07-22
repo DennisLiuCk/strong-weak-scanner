@@ -118,7 +118,7 @@ class ObservationDashboardTest(unittest.TestCase):
             'id="flow-guide"', "交易／部位觀察指南", "法人方向強度",
             "法人總活動占比", "官方指數超額報酬",
             "function flowSection(f)", "flowSection(d.flow)", "flowSection(g.flow)",
-            "數據解剖 · 交易與部位怎麼形成",
+            "數據解剖 · 全部 ", "列（含公式與判讀）",
         ):
             self.assertIn(marker, template)
         self.assertIn("build_observation_view(observation)", builder)
