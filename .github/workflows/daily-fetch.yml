@@ -8,6 +8,9 @@ on:
     # 第二次提前觸發 台灣 19:07 = UTC 11:07：實際啟動若尚未到 23:40，
     # 只重試早場 checkpoint；若 GitHub 延遲至終版門檻後，直接走 complete。
     - cron: "7 11 * * 1-5"
+    # 台灣 21:47 = UTC 13:47：提前排隊吸收 Actions 延遲；實際啟動若尚未到
+    # 23:40 仍只做 checkpoint，跨過終版門檻才走 complete。
+    - cron: "47 13 * * 1-5"
     # 台灣 23:47 = UTC 15:47：終版安全網，五表完整才評分、凍結 OOS 與發布。
     - cron: "47 15 * * 1-5"
   workflow_dispatch:
@@ -55,6 +58,11 @@ jobs:
             mode=early
           elif [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "7 11 * * 1-5" ]; then
             # 19:07 只是提前排隊；實際啟動跨過 UTC 15:40(台灣 23:40)才允許正式發布。
+            if [ "$(date -u +%H%M)" -lt 1540 ]; then
+              mode=early
+            fi
+          elif [ "$EVENT_NAME" = "schedule" ] && [ "$SCHEDULE" = "47 13 * * 1-5" ]; then
+            # 21:47 提前排隊；實際啟動跨過 UTC 15:40(台灣 23:40)才允許正式發布。
             if [ "$(date -u +%H%M)" -lt 1540 ]; then
               mode=early
             fi

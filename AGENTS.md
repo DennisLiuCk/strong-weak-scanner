@@ -3,7 +3,7 @@
 台股半導體與 AI 供應鏈族群(被動/功率/封測/記憶體/矽智財/設備/材料/散熱/PCB/電源/
 伺服器組裝機構,約 121 檔)的兩層訊號系統:**個股層**族群內排名
 選強汰弱、**族群層**籌碼聚合找被佈局的族群。每日 GitHub Actions 台灣 18:07
-先抓價格/法人 checkpoint，19:07 重試，23:47 終版補完 → 評分 → 儀表板；SQLite db 與報告都 commit 在 repo 裡。
+先抓價格/法人 checkpoint，19:07 重試，21:47 提前排隊，23:47 終版安全網 → 評分 → 儀表板；SQLite db 與報告都 commit 在 repo 裡。
 儀表板:https://dennisliuck.github.io/strong-weak-scanner/
 
 ## 每個 session 開始前
@@ -71,7 +71,8 @@ fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件
                    屬非阻斷觀察層，不取代 FinMind market、不進 regime/評分/發布門檻
                  ⚠ schema 新欄歷史回補用 --backfill-expanded-fields：只掃既有交易日與 NULL
                    欄位、自動 raw-only、可續跑；來源修正版才用 --force
-                 ⚠ 18:07/19:07 只落地價格/法人 checkpoint；23:47 final pass 補三表、刷新 holding
+                 ⚠ 18:07/19:07/21:47 在 23:40 前只落地價格/法人 checkpoint；
+                   23:47 final pass 補三表、刷新 holding
                  ⚠ 當日 final pass 有台北 23:40 硬門檻；提前觸發不得凍結 OOS 或發布
                  ⚠ 另直抓 TWSE/TPEx 處置/注意股票旗標；日誌批次 0 次=缺口已完整、非失敗
                  日誌/API 次數/斷點續跑判讀見 README「Daily Fetch 日誌判讀與續跑語意」

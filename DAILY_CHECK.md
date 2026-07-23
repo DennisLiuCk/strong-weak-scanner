@@ -1,7 +1,7 @@
 # 每日檢視 Runbook(盤後 agent session / 人工)
 
-> 每日資料由 GitHub Actions 台灣 18:07 先保存價格/法人原始 checkpoint，19:07
-> 再排一次以吸收 Actions 延遲；23:47 終版安全網才補完、評分、更新儀表板並 commit。
+> 每日資料由 GitHub Actions 台灣 18:07 先保存價格/法人原始 checkpoint，19:07 重試，
+> 21:47 再提前排隊吸收 Actions 延遲；23:47 終版安全網才補完、評分、更新儀表板並 commit。
 > 當日 `final-pass` 在台北 23:40 前會被拒絕。Actions 延遲或要人工補跑時，
 > 應在官方資料齊全後執行同一條 `scripts/run_daily.py` 正式管線。
 > 本文件是盤後想「確認執行狀況 + 討論今日資料」時的標準開場。
@@ -10,8 +10,8 @@
 ## 步驟
 
 1. **`git pull`**(最重要的一步:db 在 git 裡,不 pull 就是在看舊資料)。
-2. **Actions 狀態**:`gh run list --workflow daily-fetch.yml -L 3`。正常每個交易日有兩筆
-   提前 checkpoint 與一筆 `complete` 終版補完；手動 Run workflow 預設是 `complete`，
+2. **Actions 狀態**:`gh run list --workflow daily-fetch.yml -L 4`。正常每個交易日有三筆
+   提前排隊/checkpoint 與一筆 `complete` 終版安全網；手動 Run workflow 預設是 `complete`，
    23:40 前觸發會因終版門檻標紅。
    - 紅 → `gh run view <run-id> --log-failed`。常見:FinMind 限流(retry 已內建,
      偶發整批失敗隔日自癒)、Pages 部署偶發 `Deployment failed`(GitHub 端暫時性,

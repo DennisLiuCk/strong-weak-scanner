@@ -124,6 +124,7 @@
 ```text
 平日 18:07  價格 + 法人 raw checkpoint（不重算、不發布）
 平日 19:07  再次 checkpoint；若 Actions 延遲到 23:40 後才啟動，直接正式補完
+平日 21:47  提前排隊；23:40 前啟動仍只做 checkpoint，延遲跨過門檻則正式補完
        ↓
 平日 23:47  TDCC → 五表終版補完 → 衍生指標 → score
              → 正式 OOS snapshot → index + immutable archive → commit
