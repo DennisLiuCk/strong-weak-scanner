@@ -4,6 +4,7 @@
 > 21:47 再提前排隊吸收 Actions 延遲；23:47 終版安全網才補完、評分、更新儀表板並 commit。
 > 當日 `final-pass` 在台北 23:40 前會被拒絕。Actions 延遲或要人工補跑時，
 > 應在官方資料齊全後執行同一條 `scripts/run_daily.py` 正式管線。
+> 晚間 Actions 以 UTC 日期鎖定原交易日；延遲跨過台北午夜仍應補前一個交易日。
 > 本文件是盤後想「確認執行狀況 + 討論今日資料」時的標準開場。
 > 策略調整**不在每日做**——那走 `WEEKLY_REVIEW.md` 的門檻;每日只做確認、討論、資料修復。
 
@@ -13,6 +14,8 @@
 2. **Actions 狀態**:`gh run list --workflow daily-fetch.yml -L 4`。正常每個交易日有三筆
    提前排隊/checkpoint 與一筆 `complete` 終版安全網；手動 Run workflow 預設是 `complete`，
    23:40 前觸發會因終版門檻標紅。
+   若跨午夜 run 的 log 顯示「資料目標日」不是原排程交易日，視為排程邏輯故障，
+   不得把隔日空資料當作正常完成。
    - 紅 → `gh run view <run-id> --log-failed`。常見:FinMind 限流(retry 已內建,
      偶發整批失敗隔日自癒)、Pages 部署偶發 `Deployment failed`(GitHub 端暫時性,
      重跑即可)，以及 TWSE／TPEx 任一官方原始表端點暫時失敗。每日抓取中途失敗時，

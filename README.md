@@ -136,6 +136,8 @@
 正式晚場同時要求台北 23:40 終版時間門檻，以及五張原始表、universe、評分與
 族群資料完整，兩者都通過才發布。任一交易所來源失敗時，
 已成功部分會先寫入 SQLite 並保存 checkpoint，但工作流保持失敗，停止 score、OOS 快照與網站更新。
+晚間 workflow 以 runner 的 UTC 日期鎖定資料目標日；因此排程即使延遲跨過台北午夜，
+仍會補原交易日，不會誤把隔日當成當日 final pass。
 所有會寫回 `main` 的工作流共用同一 FIFO concurrency group，並在實際開始時 checkout
 最新 `main`；push/rebase 衝突一律標紅，不得以成功結束。完整場 push 後還會等待
 Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會標紅。

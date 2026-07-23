@@ -2,6 +2,19 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 修正終版排程跨午夜目標日 — 2026-07-24
+
+**策略規則、權重、tier、23:40 終版門檻與 `IS_CUTOFF` 零變動**；本次只修正
+workflow 延遲跨日的資料日期判定。
+
+- 事故證據：7/23 的 23:47 安全網 run `30027825142` 延遲到台灣 7/24 01:04 啟動，
+  `fetch_daily.py` 預設把目標日設為 7/24，遂被「7/24 尚未到 23:40」拒絕；7/23
+  僅留下價格／法人 checkpoint，評分、OOS 與網站停在 7/22。
+- workflow 現在以 runner 的 UTC 日期顯式傳入 `--end`。台灣 18:07～23:47 的 cron
+  在 UTC 均屬同一交易日，即使 runner 延遲跨過台北午夜，仍會補原交易日。
+- 新增 workflow 契約測試，固定要求 complete 路徑使用
+  `fetch_daily.py --final-pass --end "$TARGET_DATE"`。
+
 ## Daily Fetch 新增 21:47 提前排隊 — 2026-07-23
 
 **策略規則、權重、tier、終版資料門檻與 `IS_CUTOFF` 零變動**；本次只增加排程提前量。

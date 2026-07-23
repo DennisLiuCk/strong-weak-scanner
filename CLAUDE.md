@@ -74,6 +74,7 @@ fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件
                  ⚠ 18:07/19:07/21:47 在 23:40 前只落地價格/法人 checkpoint；
                    23:47 final pass 補三表、刷新 holding
                  ⚠ 當日 final pass 有台北 23:40 硬門檻；提前觸發不得凍結 OOS 或發布
+                 ⚠ Actions 以 UTC 日期鎖定原交易日；延遲跨過台北午夜仍補原交易日
                  ⚠ 另直抓 TWSE/TPEx 處置/注意股票旗標；日誌批次 0 次=缺口已完整、非失敗
                  日誌/API 次數/斷點續跑判讀見 README「Daily Fetch 日誌判讀與續跑語意」
                  另抓觀察層參考個股 REF_IDS(2330)收盤/外資持股 → ref_price/ref_holding 隔離表
