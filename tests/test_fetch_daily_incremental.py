@@ -396,6 +396,10 @@ class OfficialRawBatchTest(unittest.TestCase):
             "Dealer_self": -10, "Dealer_Hedging": -40, "Dealer_Total": -50})
 
     def test_margin_parsers_map_current_balances(self):
+        self.assertIn(
+            "/rwd/zh/marginTrading/MI_MARGN",
+            fd._exchange_raw_url(
+                "TaiwanStockMarginPurchaseShortSale", "TWSE", "2026-07-17"))
         twse_fields = ["代號", "名稱", "買進", "賣出", "現金償還", "前日餘額",
                        "今日餘額", "次一營業日限額", "買進", "賣出", "現券償還",
                        "前日餘額", "今日餘額", "次一營業日限額", "資券互抵", "註記"]

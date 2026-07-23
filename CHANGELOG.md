@@ -14,6 +14,8 @@ workflow 延遲跨日的資料日期判定。
   在 UTC 均屬同一交易日，即使 runner 延遲跨過台北午夜，仍會補原交易日。
 - 新增 workflow 契約測試，固定要求 complete 路徑使用
   `fetch_daily.py --final-pass --end "$TARGET_DATE"`。
+- 首次補跑已正確鎖定 7/23，但 TWSE 舊版 `exchangeReport/MI_MARGN` 回傳 HTTP 307；
+  融資融券來源改用交易所現行 `rwd/zh/marginTrading/MI_MARGN` 路徑，並新增 URL 契約測試。
 
 ## Daily Fetch 新增 21:47 提前排隊 — 2026-07-23
 
