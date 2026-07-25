@@ -1,0 +1,52 @@
+name: tests
+
+# 為什麼要獨立一條:原本只有 qualitative-quality.yml 會跑 unittest,而它只列了 5 個模組
+# ——206 個測試裡有 111 個從未在 CI 執行過(含 signal_structure 的數學契約、screen CLI
+# 契約、原始表稽核、快照凍結、抓取續跑)。這裡改跑完整 discover,不再逐一列舉,
+# 新增測試檔自動納入。
+#
+# 路徑刻意排除 data/、index.html、archive/、reports/:每個交易日有 3~4 個資料 commit,
+# 那些 commit 不會改動程式,不需要重跑測試。
+#
+# 與 qualitative-quality.yml 的關係:那條**刻意**保留自己的 5 模組 unittest 與兩個 lint,
+# 由 test_qual_notes_quality.test_quality_ci_is_independent_from_daily_market_pipeline
+# 釘住——質化 gate 必須獨立於每日市場管線、且釘在自己的 workflow。兩邊在 notes/ 或
+# qual_* 變更時會重複跑那 5 個模組(約 20 秒),那是刻意接受的代價,不要為了去重而鬆綁
+# 該契約。
+
+on:
+  push:
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "config/**"
+      - "notes/**"
+      - "CLAUDE.md"
+      - "AGENTS.md"
+      - ".github/workflows/tests.yml"
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "config/**"
+      - "notes/**"
+      - "CLAUDE.md"
+      - "AGENTS.md"
+      - ".github/workflows/tests.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: 執行完整測試套件(零第三方依賴,純 stdlib)
+        run: python -m unittest discover -s tests -v
