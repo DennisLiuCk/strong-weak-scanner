@@ -15,7 +15,7 @@ screen.py — universe 季度體檢 + 候選提名。中立規則篩選,人只�
   候選(config/candidates.csv)→ FinMind:TaiwanStockInfo(1 call,全市場名稱/產業)
   + 每檔近 150 日價量、近 10 日股本(2 calls/檔)
 
-用法:  uv run --no-project python scripts/screen.py
+用法:  python scripts/screen.py
 節奏:  每季跑一次;變更 universe.csv 後跑回補,並記入 CHANGELOG.md
 """
 import csv, datetime, os, sqlite3, statistics, sys

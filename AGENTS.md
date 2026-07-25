@@ -9,7 +9,10 @@
 ## 每個 session 開始前
 
 - **先 `git pull`**——`data/findmind.db` 由 Actions 每日更新,不 pull 就是在看舊資料。
-- Python 一律 `uv run --no-project --python 3.12 python ...`(系統 python 是 MS Store stub,不能用)。
+- Python 一律 `python ...`(python.org 3.12 user 安裝,PSF 簽章,user PATH 排在 MS Store
+  stub 之前)。**不要改用 uv 自帶的 Python**——python-build-standalone 未簽章,
+  Smart App Control 會擋 `_socket.pyd`;症狀是唯讀腳本(daily_brief/validate/audit)正常、
+  `fetch_*.py` 一 import urllib 就死,很容易誤判成程式碼問題。
 - 中文 stdout 在 console 會亂碼(cp950),寫檔 UTF-8 正常;必要時輸出到檔案再讀。
 - **判斷「現在台灣時間」直接下 `date`(不要加 `TZ=Asia/Taipei` 前綴)**——這台機器系統
   本地時區就是 Asia/Taipei,但 git-bash 沒裝 tzdata,`TZ=Asia/Taipei date` 會轉換失敗、

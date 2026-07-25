@@ -6,17 +6,17 @@
 
 用法:
   # 增量(預設抓最近 15 天,補當日缺口)
-  uv run --no-project python scripts/fetch_daily.py
+  python scripts/fetch_daily.py
   # 回補歷史(建立滾動視窗需要的基期)
-  uv run --no-project python scripts/fetch_daily.py --start 2026-03-01 --end 2026-07-03
+  python scripts/fetch_daily.py --start 2026-03-01 --end 2026-07-03
   # 只回補單一 dataset(名稱保留 FinMind 相容性,實際由交易所批次取得)
-  uv run --no-project python scripts/fetch_daily.py --datasets TaiwanDailyShortSaleBalances --start 2026-03-01
+  python scripts/fetch_daily.py --datasets TaiwanDailyShortSaleBalances --start 2026-03-01
   # schema 新增欄位回補：只掃既有交易日與 NULL 欄位，可中斷續跑，且只落 raw checkpoint
-  uv run --no-project python scripts/fetch_daily.py --backfill-expanded-fields --start 2026-03-02 --end 2026-07-17
+  python scripts/fetch_daily.py --backfill-expanded-fields --start 2026-03-02 --end 2026-07-17
   # 18:07 / 19:07 提前 checkpoint:只抓價格/法人,不重算衍生表
-  uv run --no-project python scripts/fetch_daily.py --datasets TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell --raw-only
+  python scripts/fetch_daily.py --datasets TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell --raw-only
   # 定向補缺:只抓指定股票(省 API 額度;可與 --datasets 疊加)
-  uv run --no-project python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-02
+  python scripts/fetch_daily.py --stocks 6510,6515 --start 2026-03-02
 
 Token 讀取順序:環境變數 FINMIND_TOKEN/FINMIND_TOKEN2/FINMIND_TOKEN3
 → 專案根目錄 .mcp.json。

@@ -57,8 +57,8 @@
 例行檢查使用：
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --due
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --due --as-of 2026-08-31
+python scripts/leading_hypotheses.py --due
+python scripts/leading_hypotheses.py --due --as-of 2026-08-31
 ```
 
 除了到期佇列，下列事件可提前複核：正式筆記更新造成 SHA 失配、公司發布財報或法說附件、
@@ -106,11 +106,11 @@ uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --due --a
 ## 六、提交前檢查
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --lint
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --summary
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --metrics
-uv run --no-project --python 3.12 python scripts/build_dashboard.py
-uv run --no-project --python 3.12 python -m unittest discover -s tests
+python scripts/leading_hypotheses.py --lint
+python scripts/leading_hypotheses.py --summary
+python scripts/leading_hypotheses.py --metrics
+python scripts/build_dashboard.py
+python -m unittest discover -s tests
 git diff --check
 ```
 

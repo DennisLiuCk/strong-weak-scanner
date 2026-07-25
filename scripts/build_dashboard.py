@@ -4,7 +4,7 @@
 build_dashboard.py — 從 SQLite(daily_scores + daily_metrics)自動重生儀表板 HTML。
 吃 scripts/dashboard_template.html(CSS/JS 外殼),只注入資料 → index.html,
 並把同一份頁面凍結成 archive/<資料日>.html(as-seen 歷史快照,供日期選單回看)。
-零第三方依賴。用法:  uv run --no-project python scripts/build_dashboard.py
+零第三方依賴。用法:  python scripts/build_dashboard.py
 """
 import json, os, re, sqlite3, sys
 from collections import defaultdict

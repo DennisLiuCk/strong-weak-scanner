@@ -173,21 +173,21 @@ Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會
 
 ## 本地使用與維運
 
-所有 session 先 `git pull`，Python 一律透過 `uv` 使用 3.12。正式晚場還需要
+所有 session 先 `git pull`，Python 使用 3.12（python.org 安裝，PSF 簽章）。正式晚場還需要
 `FINMIND_TOKEN`；可選配 `FINMIND_TOKEN2`、`FINMIND_TOKEN3`，或放在已忽略的 `.mcp.json`。
 
 ```powershell
 # 只讀：盤後資料鮮度、族群、分層變化與品質摘要
 git pull
-uv run --no-project --python 3.12 python scripts/daily_brief.py
+python scripts/daily_brief.py
 
 # 23:40 後人工補跑完整正式管線；會發布本地 OOS snapshot，但不 commit/push
-uv run --no-project --python 3.12 python scripts/run_daily.py
+python scripts/run_daily.py
 
 # 週度驗證、正式 DB 唯讀稽核、完整測試
-uv run --no-project --python 3.12 python scripts/validate.py
-uv run --no-project --python 3.12 python scripts/audit_raw_data.py
-uv run --no-project --python 3.12 python -m unittest discover -s tests
+python scripts/validate.py
+python scripts/audit_raw_data.py
+python -m unittest discover -s tests
 ```
 
 `run_daily.py` 可安全重跑，只補缺口；上游未齊時會拒絕正式發布。它不會替你 review、commit
@@ -261,9 +261,9 @@ TDCC 只提供最新一週，新成員加入前的週資料無法補回。Univer
 內容時效與查核品質是兩條獨立軸，儀表板會分開顯示。
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/qual_notes.py --needs-review
-uv run --no-project --python 3.12 python scripts/qual_notes.py --lint
-uv run --no-project --python 3.12 python scripts/qual_review.py <股號>
+python scripts/qual_notes.py --needs-review
+python scripts/qual_notes.py --lint
+python scripts/qual_review.py <股號>
 ```
 
 逐篇查核與 evidence pack 命令見
@@ -282,9 +282,9 @@ uv run --no-project --python 3.12 python scripts/qual_review.py <股號>
 - 看多/看空敘事必須各引用現有 H#、說明最脆弱處，並用 1～3 條「勝負手」交給未來資料裁決。
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --lint
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --due
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --context <股號>
+python scripts/leading_hypotheses.py --lint
+python scripts/leading_hypotheses.py --due
+python scripts/leading_hypotheses.py --context <股號>
 ```
 
 完整收錄邊界與操作見 [`LEADING_HYPOTHESES.md`](LEADING_HYPOTHESES.md) 與
@@ -300,7 +300,7 @@ uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --context
 這些方向是編輯彙整，不是預測。每季法說後更新事件日期、KPI、guidance、`next_review`，並執行：
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/qual_notes.py --lint
+python scripts/qual_notes.py --lint
 ```
 
 ## 專案入口

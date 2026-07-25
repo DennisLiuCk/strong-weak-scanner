@@ -35,10 +35,10 @@ PowerShell 可直接用專案規定的 Python 查詢；一邊找不到就換另�
 
 ```powershell
 $env:STOCK_ID = "6451"
-uv run --no-project --python 3.12 python -c "import json,os,urllib.request; sid=os.environ['STOCK_ID']; rows=json.load(urllib.request.urlopen('https://openapi.twse.com.tw/v1/opendata/t187ap03_L')); print(next(r['網址'] for r in rows if r['公司代號']==sid))"
+python -c "import json,os,urllib.request; sid=os.environ['STOCK_ID']; rows=json.load(urllib.request.urlopen('https://openapi.twse.com.tw/v1/opendata/t187ap03_L')); print(next(r['網址'] for r in rows if r['公司代號']==sid))"
 
 $env:STOCK_ID = "3675"
-uv run --no-project --python 3.12 python -c "import json,os,urllib.request; sid=os.environ['STOCK_ID']; rows=json.load(urllib.request.urlopen('https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O')); print(next(r['WebAddress'] for r in rows if r['SecuritiesCompanyCode']==sid))"
+python -c "import json,os,urllib.request; sid=os.environ['STOCK_ID']; rows=json.load(urllib.request.urlopen('https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O')); print(next(r['WebAddress'] for r in rows if r['SecuritiesCompanyCode']==sid))"
 ```
 
 API 可能回傳 `http://` 或沒有 scheme 的舊官網值；用瀏覽器進站並確認公司名稱、憑證與

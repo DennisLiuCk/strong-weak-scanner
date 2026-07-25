@@ -19,8 +19,8 @@ validate.py — 週度驗證報告。讀 db 不寫 db,輸出 reports/validate_<�
   * 前瞻視窗重疊 → 顯著性高估;30 檔小樣本 → 每次檢視最多調 1~2 個旋鈕。
 
 用法:
-  uv run --no-project python scripts/validate.py           # 預設 10 日前瞻
-  uv run --no-project python scripts/validate.py --fwd 5
+  python scripts/validate.py           # 預設 10 日前瞻
+  python scripts/validate.py --fwd 5
 """
 import argparse, json, os, sqlite3, statistics, sys
 from collections import defaultdict

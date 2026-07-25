@@ -120,12 +120,12 @@ stateDiagram-v2
 建立或更新後執行：
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --lint
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --summary
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --due
-uv run --no-project --python 3.12 python scripts/leading_hypotheses.py --metrics
-uv run --no-project --python 3.12 python scripts/build_dashboard.py
-uv run --no-project --python 3.12 python -m unittest discover -s tests
+python scripts/leading_hypotheses.py --lint
+python scripts/leading_hypotheses.py --summary
+python scripts/leading_hypotheses.py --due
+python scripts/leading_hypotheses.py --metrics
+python scripts/build_dashboard.py
+python -m unittest discover -s tests
 ```
 
 `--due --as-of YYYY-MM-DD` 可重建任一日期的假說層複核佇列。更新時不得用股價漲跌判定真偽；

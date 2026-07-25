@@ -31,14 +31,14 @@
      「tdcc_holding 最新快照 >10 天」——TDCC 缺週不可回補,週內看到警告當天就要補跑;
      另確認最新資料日的 `oos_signal_snapshots` 檔數與 `config/universe.csv` 一致
      (目前 121 檔),否則該日不得計入 OOS)。
-3. **今日簡報**:`uv run --no-project --python 3.12 python scripts/daily_brief.py`
+3. **今日簡報**:`python scripts/daily_brief.py`
    (唯讀)——資料鮮度、市場 regime、族群雷達、tier 升降、蓄勢候補進出、
    綜合分大變動、資料品質快檢。這就是討論議程。
 4. **深入討論**:儀表板 https://dennisliuck.github.io/strong-weak-scanner/ hover 看
    個股評分來源;要查數字直接讀 `data/findmind.db`(daily_scores / daily_metrics /
    group_metrics,唯讀查詢)。
 5. **發現資料問題 / Actions 延遲**:23:40 後執行
-   `uv run --no-project --python 3.12 python scripts/run_daily.py`。它會只補 SQLite 缺口,
+   `python scripts/run_daily.py`。它會只補 SQLite 缺口,
    原始資料未齊時拒絕正式發布；資料齊全才建立本地正式快照與儀表板,之後自行 review、
    commit + push。**發現策略問題**:記下來,累積到週六按 WEEKLY_REVIEW.md
    的 OOS 門檻判斷——單日數據永遠不是調旋鈕的理由。
@@ -53,10 +53,11 @@
 
 ## 環境備忘
 
-- Python 一律 `uv run --no-project --python 3.12 python ...`(系統 python 是 Store stub)。
+- Python 一律 `python ...`(python.org 3.12,PSF 簽章;勿改用 uv 自帶的未簽章 Python,
+  Smart App Control 會擋 `_socket.pyd`,`fetch_*.py` 起不來)。
 - 中文在 console 可能亂碼,檔案輸出 UTF-8 正常。
 - 手動重跑每日管線:Actions 頁 `daily-fetch` → Run workflow,或本地跑
   `scripts/run_daily.py` 後 review、commit + push。兩者建立的正式快照地位相同；source
   只記錄 provenance。需無條件重抓來源修正版時才加 `--force`。
 - 正式 DB 全期稽核：
-  `uv run --no-project --python 3.12 python scripts/audit_raw_data.py`（SQLite 唯讀）。
+  `python scripts/audit_raw_data.py`（SQLite 唯讀）。

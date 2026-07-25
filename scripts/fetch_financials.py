@@ -17,9 +17,9 @@ PRIMARY KEY(date, stock_id, type)。
 (R1 業務歸屬)等質化查證用——同 tdcc_holding/sbl 屬「觀察層」,見 CLAUDE.md。
 
 用法:
-  uv run --no-project python scripts/fetch_financials.py                       # 全部四個 dataset
-  uv run --no-project python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue
-  uv run --no-project python scripts/fetch_financials.py --stocks 6525,8131 --start 2023-01-01
+  python scripts/fetch_financials.py                       # 全部四個 dataset
+  python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue
+  python scripts/fetch_financials.py --stocks 6525,8131 --start 2023-01-01
 """
 import argparse, csv, os, sqlite3, sys, time
 from datetime import date, timedelta

@@ -19,10 +19,10 @@
 
 - [ ] 執行 `git pull --ff-only` 與 `git status --short`；不得覆蓋、清理或順手提交別人的變更。
 - [ ] 讀 `AGENTS.md` 本任務規則；既有筆記才先執行
-  `uv run --no-project --python 3.12 python scripts/qual_notes.py --lint <股號>`。尚無筆記時此命令會
+  `python scripts/qual_notes.py --lint <股號>`。尚無筆記時此命令會
   因找不到檔案而 exit 1，應直接走下一步建立骨架，不把它誤判成既有內容品質失敗。
 - [ ] 新建時用
-  `uv run --no-project --python 3.12 python scripts/qual_notes.py --new <股號>`；重做既有筆記
+  `python scripts/qual_notes.py --new <股號>`；重做既有筆記
   不使用會清空內容的 `--force`，應保留正確歷史內容，並把 meta 改為
   `research_profile: focused_v1`、`verification_status: ai_draft`，reviewer 欄位先留空。
 - [ ] drafter 與 reviewer 使用不同身分；開始就指定交接人，避免最後由撰稿者自簽。
@@ -73,10 +73,10 @@ if (-not $PDFINFO) { throw '找不到原生 Poppler pdfinfo.exe' }
 $PDFTOPPM = Join-Path (Split-Path $PDFINFO) 'pdftoppm.exe'
 if (-not (Test-Path -LiteralPath $PDFTOPPM)) { throw '找不到同目錄 pdftoppm.exe' }
 
-uv run --no-project --python 3.12 python scripts/qual_evidence.py build --stock-id <股號> --content-as-of <YYYY-MM-DD> --source "S1=<PDF>" --url "S1=<直接URL>" --pages "S1=<實體頁>" --page-count "S1=<總頁數>" --role "S1=<role>" [...其餘 S#...] --pdfinfo "$PDFINFO"
-uv run --no-project --python 3.12 python scripts/qual_evidence.py render-plan "<PACK_DIR>" --pdfinfo "$PDFINFO"
-uv run --no-project --python 3.12 python scripts/qual_evidence.py render "<PACK_DIR>" --pdftoppm "$PDFTOPPM" --pdfinfo "$PDFINFO"
-uv run --no-project --python 3.12 python scripts/qual_evidence.py verify "<PACK_DIR>" --renders --pdfinfo "$PDFINFO"
+python scripts/qual_evidence.py build --stock-id <股號> --content-as-of <YYYY-MM-DD> --source "S1=<PDF>" --url "S1=<直接URL>" --pages "S1=<實體頁>" --page-count "S1=<總頁數>" --role "S1=<role>" [...其餘 S#...] --pdfinfo "$PDFINFO"
+python scripts/qual_evidence.py render-plan "<PACK_DIR>" --pdfinfo "$PDFINFO"
+python scripts/qual_evidence.py render "<PACK_DIR>" --pdftoppm "$PDFTOPPM" --pdfinfo "$PDFINFO"
+python scripts/qual_evidence.py verify "<PACK_DIR>" --renders --pdfinfo "$PDFINFO"
 ```
 
 - [ ] 把 `build` 回傳的 manifest 路徑、完整 pack SHA 與 S# 填回 note meta；證據索引列出的
@@ -88,7 +88,7 @@ uv run --no-project --python 3.12 python scripts/qual_evidence.py verify "<PACK_
   S#)必須先解決——在 drafter 端修好比進 review 後退回重建便宜一輪:
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/qual_review.py <股號>
+python scripts/qual_review.py <股號>
 ```
 
 - [ ] 完成 drafter 自查後停止改 note／manifest，回報 pack 路徑、SHA、claim 數與 render 數；
@@ -160,12 +160,12 @@ conflict_summary: <無衝突可留空；有小幅口徑差異則保留雙方>
   把第一個命令輸出的 hash 填回 meta 後，再重跑 hash 確認一致：
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/qual_notes.py --hash <股號>
+python scripts/qual_notes.py --hash <股號>
 # 將上列輸出填入 reviewed_content_sha256，再確認重算結果相同
-uv run --no-project --python 3.12 python scripts/qual_notes.py --hash <股號>
-uv run --no-project --python 3.12 python scripts/qual_notes.py --lint <股號>
-uv run --no-project --python 3.12 python scripts/qual_evidence.py verify "<PACK_DIR>" --renders --pdfinfo "$PDFINFO"
-uv run --no-project --python 3.12 python -m unittest discover -s tests
+python scripts/qual_notes.py --hash <股號>
+python scripts/qual_notes.py --lint <股號>
+python scripts/qual_evidence.py verify "<PACK_DIR>" --renders --pdfinfo "$PDFINFO"
+python -m unittest discover -s tests
 ```
 
 - [ ] 只 stage `notes/qualitative/<股號>_<名稱>.md` 與 meta 指向的**當前** manifest；用

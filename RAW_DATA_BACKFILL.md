@@ -22,20 +22,20 @@
 
 ```powershell
 git pull
-uv run --no-project --python 3.12 python scripts/audit_raw_data.py
+python scripts/audit_raw_data.py
 ```
 
 一次補五表：
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/fetch_daily.py `
+python scripts/fetch_daily.py `
   --backfill-expanded-fields --start 2026-03-02 --end 2026-07-17
 ```
 
 長區間可按 dataset 分段；名稱沿用既有 FinMind selector，但資料仍來自 TWSE／TPEx：
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/fetch_daily.py `
+python scripts/fetch_daily.py `
   --backfill-expanded-fields --datasets TaiwanStockMarginPurchaseShortSale `
   --start 2026-03-02 --end 2026-07-17
 ```
@@ -47,9 +47,9 @@ uv run --no-project --python 3.12 python scripts/fetch_daily.py `
 回補後再次稽核；需要機器可讀輸出時加 `--json`：
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/audit_raw_data.py `
+python scripts/audit_raw_data.py `
   --start 2026-03-02 --end 2026-07-17
-uv run --no-project --python 3.12 python scripts/audit_raw_data.py --json
+python scripts/audit_raw_data.py --json
 ```
 
 audit 的硬性條件是 current universe × `price ∪ market` 交易日的五表完整 grid、core／
@@ -62,11 +62,11 @@ expanded 必備欄非空、SQLite integrity，以及法人、融資、融券與�
 只有 audit PASS 後才依序重建：
 
 ```powershell
-uv run --no-project --python 3.12 python scripts/fetch_daily.py --metrics-only
-uv run --no-project --python 3.12 python scripts/score.py
-uv run --no-project --python 3.12 python scripts/build_dashboard.py
-uv run --no-project --python 3.12 python -m unittest discover -s tests
-uv run --no-project --python 3.12 python scripts/daily_brief.py
+python scripts/fetch_daily.py --metrics-only
+python scripts/score.py
+python scripts/build_dashboard.py
+python -m unittest discover -s tests
+python scripts/daily_brief.py
 ```
 
 歷史 restatement 不得執行 `snapshot_signals.py --publish`，也不得覆寫既有

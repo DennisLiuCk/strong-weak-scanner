@@ -4,7 +4,7 @@
 daily_brief.py — 盤後日常簡報(唯讀,不寫 db)。給「當日檢視/討論」的 session 一份現成議程:
 資料鮮度 → 市場/族群雷達 → tier 變動(誰升誰降)→ 蓄勢候補變動 → 綜合分大變動 → 資料品質快檢。
 
-用法:  git pull 之後  uv run --no-project python scripts/daily_brief.py
+用法:  git pull 之後  python scripts/daily_brief.py
 注意:  db 通常由 GitHub Actions 更新，也可由本地 runner 正式發布；不先 git pull 可能是在看舊資料。
 """
 import datetime, os, sqlite3, sys
