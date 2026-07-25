@@ -65,6 +65,7 @@ class DashboardUxContractTest(unittest.TestCase):
         pairs = ("__DATA_JSON__", "__GROUPS_JSON__", "__TIERS_JSON__",
                  "__TIER_FLOW_JSON__", "__OVERVIEW_JSON__", "__GRPMETA_JSON__",
                  "__WEIGHTS_JSON__", "__THRESH_JSON__", "__TSMC_JSON__",
+                 "__STRATEGY_JSON__",
                  "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__",
                  "__SCOPE__")
         for ph in pairs:
@@ -77,6 +78,49 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("tier:s.tier_confirmed", self.template)
         self.assertIn("tierLabel:s.tier_label", self.template)
         self.assertIn("waiting:s.tier_waiting", self.template)
+
+    def test_strategy_status_card_shows_evidence_state_not_judgement(self):
+        """首屏「策略狀態」卡:只放證據狀態與結構事實,不得放對個別因子的判斷。
+
+        儀表板原本只傳達「透明可追溯」,沒有傳達「這套規則有多可信」——分層看起來很確定,
+        但預測力還在累積樣本外證據。這張卡補上那一軸;同時它不可以變成把 in-sample 的
+        IC 結論公開宣告的地方。
+        """
+        self.assertIn("function buildStrategyStatus()", self.template)
+        self.assertIn("buildStrategyStatus()", self.template)
+        self.assertIn("id:'strategy-status'", self.template)
+        # 四項事實都要在
+        for key in ("權重校準窗", "樣本外驗證", "訊號集中度", "分層穩定度"):
+            self.assertIn(key, self.template, f"策略狀態卡缺「{key}」")
+        # 校準窗與成熟門檻不得寫死:IS_CUTOFF 由 validate 取、前瞻窗由 signal_structure 取
+        self.assertIn("from validate import IS_CUTOFF", self.builder)
+        self.assertNotIn(validate.IS_CUTOFF, self.template,
+                         "IS_CUTOFF 不可寫死在模板——改權重時會忘記同步")
+        self.assertIn("sig.EVAL_HORIZON_DAYS", self.builder)
+        # 績效數字(超額/勝率/IC)不可複製到儀表板,只能連向週報,避免與 validate 各算一份
+        for banned in ("勝率", "rank-IC", "超額報酬率"):
+            self.assertNotIn(banned, self._strategy_card_source(),
+                             f"策略狀態卡不得複製績效數字「{banned}」,應連向週報")
+        self.assertIn("report_url", self.builder)
+        # 守護語:必須明說這些是事實而非判斷,且分層不是買賣指示
+        card = self._strategy_card_source()
+        self.assertIn("不是對個別因子有效性的判斷", card)
+        self.assertIn("不是買賣指示", card)
+        self.assertIn("觀察名單", card)
+
+    def _strategy_card_source(self):
+        """取出模板裡 buildStrategyStatus 的函式本體,避免斷言誤中頁面其他區塊。"""
+        start = self.template.index("function buildStrategyStatus()")
+        end = self.template.index("\nfunction ", start + 10)
+        return self.template[start:end]
+
+    def test_tier_section_warns_that_layers_turn_over(self):
+        """個股分層區必須提醒名單會頻繁變動(中位停留 4~5 日),並連到策略狀態。"""
+        self.assertIn("各層停留天數不長", self.template)
+        self.assertIn("STRATEGY.dwell", self.template)
+        self.assertIn("#strategy-status", self.template)
+        # 首屏概況標題要標明是相對分層,不可讓「11 強勢」讀成絕對強弱
+        self.assertIn("今日分層概況（相對分層）", self.template)
 
     def test_first_screen_overview_headline_from_builder(self):
         self.assertIn("function buildOverview()", self.template)

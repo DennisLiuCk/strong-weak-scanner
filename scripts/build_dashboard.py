@@ -21,6 +21,7 @@ from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
                    DZ_FOREIGN, DZ_TRUST, STEALTH_OFF_HIGH, _chip_signal)
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
 from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
+import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡報、週報 §⑦⑧ 同一組函式)
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
 from qual_notes import (load_notes, note_status, note_review_status,
                         load_events, EVENT_KPI_KEYS,
@@ -1239,6 +1240,77 @@ def build_overview(grows):
             "note": "族群比較是相對結果；請同時閱讀目前原始值與5日變化。"}
 
 
+# ── 策略狀態(證據強度)────────────────────────────────────────────────
+# 儀表板原本只傳達「透明可追溯」(每個分數都能點開追到原始數字),沒有傳達「這套規則
+# 有多可信」。這裡補上證據強度那一軸。
+#
+# **只放事實,不放判斷**——這是刻意的界線:
+#   可以放:IS 校準窗、OOS 快照/成熟日數(證據狀態的事實)、
+#           ρ 與有效因子數、停留天數與名單換手(結構與描述統計,不需前瞻報酬)
+#   不可以放:個別因子「可不可靠」的結論。那些 IC 數字絕大部分來自 IS 窗,
+#           拿 in-sample 證據在使用者看得到的地方下判斷,正是鐵律禁止的事。
+# tier 的績效數字(超額/勝率/IC)一律不複製到這裡,只連向週報——避免與 validate.py
+# 的 §② 各算一份而漂移。
+def build_strategy_status(con, last):
+    """回傳首屏「策略狀態」卡片的資料;任何一段算不出來就給 None,前端略過該行。
+
+    自己查完整交易日列表——main() 的 tier_dates 只有近 5 日,拿它算成熟度與停留期會錯。
+    """
+    dates = [r[0] for r in con.execute(
+        "SELECT DISTINCT date FROM daily_scores WHERE date<=? ORDER BY date", (last,))]
+    try:
+        from validate import IS_CUTOFF          # 單一真相來源(改權重必須同步改它)
+    except Exception:
+        IS_CUTOFF = None
+    st = {"is_start": dates[0] if dates else None, "is_cutoff": IS_CUTOFF,
+          "fwd": sig.EVAL_HORIZON_DAYS, "report_url": None}
+
+    # OOS:as-seen 快照日數,以及其中前瞻窗已走完(可判讀)的日數
+    try:
+        snap = [r[0] for r in con.execute(
+            """SELECT DISTINCT data_date FROM oos_snapshot_runs
+               WHERE is_official=1 ORDER BY data_date""")]
+        didx = {d: i for i, d in enumerate(dates)}
+        oos = [d for d in snap if IS_CUTOFF and d > IS_CUTOFF and d in didx]
+        st["oos_days"] = len(oos)
+        st["oos_mature"] = sum(1 for d in oos if didx[d] + st["fwd"] < len(dates))
+    except sqlite3.OperationalError:
+        st["oos_days"] = st["oos_mature"] = None
+
+    # 結構:訊號集中度(當日橫斷面)
+    try:
+        s = sig.summarize(sig.group_rows(con, last))
+        if s:
+            st["lead"] = s["lead"]
+            st["lead_rho"] = s["lead_rho"]
+            st["eff"] = s["eff_factors"]
+            st["n_scored"] = len(s["churn"])
+    except Exception:
+        pass
+
+    # 結構:分層穩定度(以真強 = 畫面的「相對強勢」為代表)
+    try:
+        ch = sig.churn_summary(sig.tier_sequences(con), dates)
+        if ch:
+            st["dwell"] = ch["dwell"].get("真強")
+            tv = ch["turnover"].get("真強") or {}
+            st["turn_days"] = tv.get("full_turn_days")
+            st["round_trip"] = ch["round_trip"][2]
+            st["round_trip_window"] = sig.ROUND_TRIP_WINDOW
+    except Exception:
+        pass
+
+    # 週報連結:報告以資料迄日命名,取實際存在的最新一份
+    try:
+        rep = sorted(f for f in os.listdir(os.path.join(ROOT, "reports"))
+                     if f.startswith("validate_") and f.endswith(".md"))
+        if rep:
+            st["report_url"] = NOTE_REPO_BLOB + "reports/" + rep[-1]
+    except OSError:
+        pass
+    return st
+
+
 def main():
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
@@ -1372,6 +1444,8 @@ def main():
     # 任一塊從缺不擋主管線(load_events 目錄不存在回 latest=None,同 fund_map 慣例)
     events = load_events()
     tsmc = build_tsmc_payload(con, fund_map, events, last)
+    # 策略狀態(證據強度)——必須在 con.close() 之前算
+    strategy = build_strategy_status(con, last)
     con.close()
     # 質化筆記(觀察層、AI 協作＋獨立 reviewer,見 notes/qualitative/):無筆記時 load_notes
     # 回傳空 dict,同 fund_map 的「從缺不擋主管線」慣例
@@ -1751,6 +1825,7 @@ def main():
     html = html.replace("__GRPMETA_JSON__", json.dumps(grpmeta, ensure_ascii=False))
     html = html.replace("__GORDER_JSON__", json.dumps(GROUP_ORDER))
     html = html.replace("__WEIGHTS_JSON__", json.dumps(WEIGHTS))
+    html = html.replace("__STRATEGY_JSON__", json.dumps(strategy, ensure_ascii=False))
     # 量尺門檻(②量比/⑤融資水位)——單一事實來源 score.py,調旋鈕量尺刻度自動同步
     html = html.replace("__THRESH_JSON__", json.dumps({
         "volr_active": list(VOLR_ACTIVE), "volr_dry": VOLR_DRY, "volr_overheat": VOLR_OVERHEAT,

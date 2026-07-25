@@ -214,7 +214,7 @@ svg{display:block;overflow:visible}
    ============================================================ */
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
-      TSMC=__TSMC_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
+      TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,tier:s.tier_confirmed,
   tierLabel:s.tier_label,waiting:s.tier_waiting,
   f:(s.factors||[]).map(function(f){return [f.label,f.score,f.weight];}),
@@ -491,7 +491,7 @@ function buildOverview(){
     h('div',{style:'font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.04em',text:p.label}),
     h('div',{style:`font-size:16px;font-weight:800;margin-top:4px;color:${toneCol(p.tone)}`,text:p.value||p.text}))));
   cards.appendChild(h('div',{style:'background:var(--inset);border-radius:13px;padding:15px 17px'},
-    h('div',{style:'font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.04em',text:`今日分層概況 · 全 ${D.allStocks.length} 檔`}),
+    h('div',{style:'font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.04em',text:`今日分層概況（相對分層）· 全 ${D.allStocks.length} 檔`}),
     h('div',{style:'display:flex;gap:16px;align-items:baseline;margin-top:6px'},
       h('span',{style:'font-size:13px;color:var(--ink2)',html:`<b class="mono cstrong" style="font-size:19px">${strong}</b> 強勢`}),
       h('span',{style:'font-size:13px;color:var(--ink2)',html:`<b class="mono cteal" style="font-size:19px">${accum}</b> 蓄勢`}),
@@ -512,7 +512,48 @@ function buildOverview(){
       h('p',{style:'margin:0;max-width:72ch;font-size:15px;color:var(--ink2);line-height:1.7',text:o.summary}),
       cards,
       h('p',{style:'margin:18px 0 0;font-size:12.5px;color:var(--muted)',text:o.note})),
+    buildStrategyStatus(),
     stepGrid];
+}
+
+/* 策略狀態(證據強度)——只放事實,不放判斷。
+   分層結果看起來很確定,但這套規則的預測力還在累積樣本外證據;把那個狀態寫在同一屏,
+   才能用儀表板 review 策略而不是只 review 個股。
+   結構指標(ρ/有效因子數/停留/換手)不需前瞻報酬,是當日確定性事實;
+   績效數字(超額/勝率/IC)一律不複製到這裡,只連向週報,避免與 validate.py 各算一份。 */
+function buildStrategyStatus(){
+  const S=STRATEGY; if(!S) return h('div');
+  const pct=v=>v==null?null:(v*100).toFixed(0)+'%';
+  const rows=[];
+  if(S.is_start&&S.is_cutoff) rows.push(['權重校準窗',
+    `${S.is_start} ~ ${S.is_cutoff}`,'此窗內的數字必然好看——權重是看著它調出來的']);
+  if(S.oos_days!=null) rows.push(['樣本外驗證',
+    `快照 ${S.oos_days} 日,前瞻 ${S.fwd} 日已成熟 ${S.oos_mature} 日`,
+    S.oos_mature>=10?'已達可判讀門檻,見週報 ①②'
+      :'尚未達可判讀門檻(需 10 日)——分層的預測力目前無獨立驗證']);
+  if(S.lead_rho!=null&&S.eff!=null) rows.push(['訊號集中度',
+    `綜合分排名 ≈ ${S.lead==='price'?'相對強弱':'s_'+S.lead}排名（ρ ${S.lead_rho>=0?'+':''}${S.lead_rho.toFixed(2)}）；有效因子數 ${S.eff.toFixed(1)} / ${S.n_scored}`,
+    `七因子中實際主導排名的僅一項;其餘在加權和裡貢獻有限`]);
+  if(S.dwell!=null&&S.turn_days!=null) rows.push(['分層穩定度',
+    `相對強勢中位停留 ${S.dwell.toFixed(0)} 個交易日;名單 ${S.turn_days.toFixed(1)} 個交易日全量換一輪`,
+    `${S.round_trip!=null?'變層有 '+pct(S.round_trip)+' 在 '+S.round_trip_window+' 日內反覆;':''}停留短於 ${S.fwd} 日的量測窗,分層宜當觀察名單而非進出訊號`]);
+  if(!rows.length) return h('div');
+  const box=h('div',{class:'card',id:'strategy-status',style:'padding:22px 26px;margin-top:22px;border-left:3px solid var(--amber)'});
+  const head=h('div',{style:'display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:4px'},
+    h('b',{style:'font-size:15px',text:'策略狀態 · 證據強度'}));
+  if(S.report_url) head.appendChild(h('a',{href:S.report_url,target:'_blank',rel:'noopener',
+    style:'font-size:12px;font-weight:700;color:var(--teal)',text:'完整週度驗證報告 →'}));
+  box.appendChild(head);
+  box.appendChild(h('p',{style:'margin:0 0 14px;font-size:12.5px;color:var(--ink2);line-height:1.6',
+    text:'下列全部是「證據狀態」與「結構」的事實,不是對個別因子有效性的判斷。分層本身描述相對位置,不是買賣指示。'}));
+  const dl=h('div',{style:'display:grid;gap:11px'});
+  rows.forEach(r=>dl.appendChild(h('div',{style:'display:grid;grid-template-columns:minmax(84px,104px) 1fr;gap:14px;align-items:start'},
+    h('div',{style:'font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.03em;padding-top:2px',text:r[0]}),
+    h('div',{},
+      h('div',{style:'font-size:13.5px;font-weight:700;color:var(--ink)',text:r[1]}),
+      h('div',{style:'margin-top:2px;font-size:12px;color:var(--muted);line-height:1.55',text:r[2]})))));
+  box.appendChild(dl);
+  return box;
 }
 
 function buildTSMC(){
@@ -870,7 +911,8 @@ function buildTier(){
   gsel.appendChild(h('option',{value:'',text:'全部族群'}));
   D.groups.forEach(g=>gsel.appendChild(h('option',{value:g.g,text:grp(g.g).nm})));
   return [h('p',{class:'kicker',text:'族群層'}),h('h2',{class:'sec',text:'個股分層 · 已確認的相對強弱'}),
-    h('p',{class:'lead',html:`把全 ${D.allStocks.length} 檔依分數組合分成幾層（<b style="color:var(--strong)">強</b> → <b style="color:var(--weak)">弱</b>）。分層名稱描述相對位置，<b style="color:var(--ink)">不是買賣指示</b>。選族群可看該族群全部成員；<b style="color:var(--ink)">點任一檔</b>看完整明細。`}),
+    h('p',{class:'lead',html:`把全 ${D.allStocks.length} 檔依分數組合分成幾層（<b style="color:var(--strong)">強</b> → <b style="color:var(--weak)">弱</b>）。分層名稱描述相對位置，<b style="color:var(--ink)">不是買賣指示</b>。選族群可看該族群全部成員；<b style="color:var(--ink)">點任一檔</b>看完整明細。`
+      +(STRATEGY&&STRATEGY.dwell!=null?`各層停留天數不長（相對強勢中位 <b style="color:var(--ink)">${STRATEGY.dwell.toFixed(0)} 個交易日</b>），名單本身會頻繁變動；穩定度與證據狀態見上方<a href="#strategy-status" style="color:var(--teal);font-weight:700">策略狀態</a>。`:'')}),
     h('div',{class:'toolbar'},gsel),
     bands,
     h('div',{style:'margin-top:34px'},h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px'},h('h3',{style:'margin:0;font-size:17px;font-weight:800',text:'近 5 日變層軌跡'}),
