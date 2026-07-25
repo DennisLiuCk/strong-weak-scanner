@@ -25,6 +25,9 @@ validate.py — 週度驗證報告。讀 db 不寫 db,輸出 reports/validate_<�
 import argparse, json, os, sqlite3, statistics, sys
 from collections import defaultdict
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import signal_structure as sig   # §⑦:元素邊際貢獻與結構指標(共用 score.WEIGHTS)
+
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -562,6 +565,74 @@ def main():
             w(f"  - {el}:族群內 {fmt_ic(mi, len(ocol_in[el]))};混池 {fmt_ic(mp, len(ocol_pool[el]))}")
         w("")
         w("> TDCC 週頻 forward-fill 使日頻 IC 的 n 虛胖約 5 倍(同一快照重複取樣)——8 週後的歸宿裁決以「快照取樣版」為準。")
+    w("")
+    # ── ⑦ 元素邊際貢獻與訊號集中度(WEEKLY_REVIEW §4-7 單柱風險)────────
+    # §① 給的是「每個元素單獨有多準」,回答不了「它在 composite 裡有沒有加值」。
+    # 一個元素可以單獨 IC 為正,卻因為與其他元素近乎獨立又無訊號,在加權和裡稀釋掉
+    # 唯一的訊號。這節用「移除後重算」量測邊際貢獻,並附不需前瞻報酬的結構指標。
+    w("## ⑦ 元素邊際貢獻與訊號集中度(§4-7 單柱風險)")
+    w("")
+    w("移除某元素後重算 composite 的 IC —— 「該元素在加權和裡有沒有加值」,"
+      "與 §① 的「單獨有多準」是不同問題。同一組格對照,故可直接相減。")
+    w("")
+    lo_shares = sig.variance_shares([[v2[d][s] for s in v2[d] if grp_of(d, s) == g]
+                                     for d in dates if d in v2 for g in grps_on(d)]) or {}
+
+    def comp_ic(weights, bucket_name):
+        acc = []
+        for d in dates:
+            if d not in v2 or bucket_name not in bucket(d):
+                continue
+            for g in grps_on(d):
+                sids = [s for s in v2[d] if grp_of(d, s) == g and fwd(d, s) is not None]
+                ic = spearman([sig.composite_of(v2[d][s], weights) for s in sids],
+                              [fwd(d, s) for s in sids])
+                if ic is not None:
+                    acc.append(ic)
+        return (mean(acc), len(acc))
+
+    base = {b: comp_ic(sig.WEIGHTS, b) for b in ("全期", "OOS")}
+    w("| 移除的元素 | 權重 | 變異貢獻·全期 | IC·全期 | Δ | IC·OOS | Δ |")
+    w("|---|---|---|---|---|---|---|")
+    w(f"| (現行 {len([k for k, v in sig.WEIGHTS.items() if v])} 個計分元素) | – | – | "
+      f"{fmt_ic(base['全期'][0], base['全期'][1])} | — | "
+      f"{fmt_ic(base['OOS'][0], base['OOS'][1])} | — |")
+    for el, wt in sorted(sig.WEIGHTS.items(), key=lambda kv: -kv[1]):
+        if not wt:
+            continue
+        dropped = {k: (0.0 if k == el else v) for k, v in sig.WEIGHTS.items()}
+        cells = []
+        for b in ("全期", "OOS"):
+            v, n = comp_ic(dropped, b)
+            cells.append(fmt_ic(v, n))
+            cells.append(f"{v - base[b][0]:+.3f}" if (v is not None and base[b][0] is not None) else "–")
+        share = lo_shares.get(el)
+        w(f"| s_{el} | {wt:.1f} | " + (f"{share:.0%}" if share is not None else "–")
+          + " | " + " | ".join(cells) + " |")
+    w("")
+    w("> Δ 為正 = 移除該元素後 composite 變準,即它在加權和裡是淨負貢獻。"
+      "全期欄大部分落在 IS 窗,只能當假說;動權重一律等 OOS 欄達 §① 的連 N 週門檻。")
+    w("")
+    lead = max(lo_shares, key=lambda k: lo_shares[k]) if lo_shares else None
+    if lead:
+        w(f"### 結構指標(不需前瞻報酬 → 每日可由 `daily_brief.py` 監控)")
+        w("")
+        eff = sig.effective_factors(lo_shares)
+        for label, only_snap in (("全期", False), ("OOS(as-seen 快照日)", True)):
+            gs = [[v2[d][s] for s in v2[d] if grp_of(d, s) == g]
+                  for d in dates if d in v2 and (not only_snap or d in snap_dates)
+                  for g in grps_on(d)]
+            r = sig.rank_rho(gs, lead)
+            sh = sig.variance_shares(gs)
+            e = sig.effective_factors(sh) if sh else None
+            n_scored = len([k for k, v in sig.WEIGHTS.items() if v])
+            w(f"- {label}:composite 排名 vs s_{lead} 排名 ρ 中位 "
+              + (f"**{r:+.3f}**" if r is not None else "–")
+              + ";有效因子數 " + (f"**{e:.2f}** / {n_scored}" if e is not None else "–"))
+        w("")
+        w(f"> 有效因子數 = 變異貢獻的倒 Herfindahl(1 = 完全單柱)。"
+          f"警戒線 ρ>{sig.RHO_ALERT}、有效因子數<{sig.EFF_ALERT};"
+          "越線只代表脆弱,不構成調旋鈕的理由。")
     w("")
     w("## 判讀警語")
     w("")

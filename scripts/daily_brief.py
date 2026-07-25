@@ -8,6 +8,9 @@ daily_brief.py — 盤後日常簡報(唯讀,不寫 db)。給「當日檢視/討
 注意:  db 通常由 GitHub Actions 更新，也可由本地 runner 正式發布；不先 git pull 可能是在看舊資料。
 """
 import datetime, os, sqlite3, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import signal_structure as sig
 from snapshot_signals import MIN_DATA_DATE as OOS_SNAPSHOT_START
 
 try:
@@ -88,7 +91,26 @@ def main():
     for d, s in delta:
         print(f"   {s} {uni[s][0]:<5} {pre[s]['composite_s']:+.1f} → {cur[s]['composite_s']:+.1f}({d:+.1f})")
 
-    # ── 6. 資料品質快檢 ──
+    # ── 6. 訊號集中度(結構指標)──
+    # 不需前瞻報酬 → 當日即可讀、無取樣誤差,和 §①② 的 IC/超額(必須等前瞻成熟、單日
+    # 讀數是純雜訊)不同類。監控對象是 WEEKLY_REVIEW §4-7 的 rs20 單柱風險。
+    st = sig.summarize(sig.group_rows(con, last))
+    if st:
+        shares = sorted(st["shares"].items(), key=lambda kv: -kv[1])
+        print(f"\n■ 訊號集中度(結構,不需前瞻報酬):")
+        rho = st["lead_rho"]
+        print(f"   composite 排名 vs s_{st['lead']} 排名 ρ 中位 "
+              + (f"{rho:+.2f}" if rho is not None else "-")
+              + f";有效因子數 {st['eff_factors']:.1f} / {len(st['churn'])}")
+        print("   變異貢獻:" + " / ".join(f"{k} {v:.0%}" for k, v in shares))
+        churn = sorted((v, k) for k, v in st["churn"].items())
+        print("   移除單一元素 → 族群前 2 名(真強閘門)易主席次:"
+              + "、".join(f"{k} {v}" for v, k in reversed(churn)))
+        if st["alert"]:
+            print(f"   ⚠ 單柱警戒:{'、'.join(st['alert'])}"
+                  "——僅為監看提示,調旋鈕一律走 WEEKLY_REVIEW 的 OOS 門檻")
+
+    # ── 7. 資料品質快檢 ──
     issues = []
     for tbl in ("price", "inst", "margin", "holding", "sbl"):
         n = con.execute(f"SELECT COUNT(*) FROM {tbl} WHERE date=?", (last,)).fetchone()[0]
