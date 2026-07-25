@@ -15,10 +15,12 @@ screen.py — universe 季度體檢 + 候選提名。中立規則篩選,人只�
   候選(config/candidates.csv)→ FinMind:TaiwanStockInfo(1 call,全市場名稱/產業)
   + 每檔近 150 日價量、近 10 日股本(2 calls/檔)
 
-用法:  python scripts/screen.py
+用法:  python scripts/screen.py                  # 完整體檢(A+A2 本地 + B 候選,需 token)
+       python scripts/screen.py --no-candidates  # 只跑 A+A2,零 API call、不需 token
+       python scripts/screen.py --dry-run        # 印出報告但不寫 reports/
 節奏:  每季跑一次;變更 universe.csv 後跑回補,並記入 CHANGELOG.md
 """
-import csv, datetime, os, sqlite3, statistics, sys
+import argparse, csv, datetime, os, sqlite3, statistics, sys
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -91,8 +93,18 @@ def verdict_member(cap, liq):
 
 
 def main():
+    ap = argparse.ArgumentParser(
+        description="universe 季度體檢 + 候選提名(唯讀 db;不自動改 universe.csv)")
+    ap.add_argument("--no-candidates", action="store_true",
+                    help="跳過 §B 候選體檢:零 API call、不需 FINMIND_TOKEN")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="只印報告到 stdout,不寫 reports/screen_<今日>.md")
+    ap.add_argument("--db", default=DB, help="SQLite 路徑(測試/診斷用;預設 production db)")
+    ap.add_argument("--reports", default=REPORTS, help="報告輸出目錄")
+    args = ap.parse_args()
+
     today = datetime.date.today().isoformat()
-    con = sqlite3.connect(DB)
+    con = sqlite3.connect(args.db)
     con.row_factory = sqlite3.Row
     L, w = [], None
     L.append(f"# Universe 體檢與候選提名 · {today}")
@@ -143,12 +155,22 @@ def main():
     L.append("")
     L.append("## B. 候選提名(config/candidates.csv)")
     L.append("")
-    cands = list(csv.DictReader(open(CANDIDATES, encoding="utf-8")))
-    token = get_token()
-    info = {d["stock_id"]: d for d in api_get("TaiwanStockInfo", None, "", "", token)}
-    start = (datetime.date.today() - datetime.timedelta(days=220)).isoformat()
-    L.append("| 代號 | 名稱 | 擬歸類 | 產業別 | 市值(億) | 20日中位成交值 | 結論 |")
-    L.append("|---|---|---|---|---|---|---|")
+    if args.no_candidates:
+        # 明寫「已跳過」而非留空——留空會被誤讀成「候選全部不合格」。
+        L.append("⚠ 本次以 `--no-candidates` 執行,**未查驗候選**(零 API call)。"
+                 "季度治理決策前須補跑完整版。")
+        cands = []
+    else:
+        cands = list(csv.DictReader(open(CANDIDATES, encoding="utf-8")))
+    info, start = {}, None
+    if cands:
+        token = get_token()
+        info = {d["stock_id"]: d for d in api_get("TaiwanStockInfo", None, "", "", token)}
+        start = (datetime.date.today() - datetime.timedelta(days=220)).isoformat()
+        L.append("| 代號 | 名稱 | 擬歸類 | 產業別 | 市值(億) | 20日中位成交值 | 結論 |")
+        L.append("|---|---|---|---|---|---|---|")
+    elif not args.no_candidates:
+        L.append("(config/candidates.csv 無候選)")
     for c in cands:
         sid = c["stock_id"].strip()
         meta = info.get(sid)
@@ -180,11 +202,15 @@ def main():
     for a in (actions or ["(無)"]):
         L.append(f"- {a}")
 
-    os.makedirs(REPORTS, exist_ok=True)
-    path = os.path.join(REPORTS, f"screen_{today}.md")
-    with open(path, "w", encoding="utf-8") as fh:
-        fh.write("\n".join(L) + "\n")
-    print(f"報告已寫入 {path}\n")
+    if args.dry_run:
+        print("\n".join(L))
+        print("\n(--dry-run:未寫入 reports/)\n")
+    else:
+        os.makedirs(args.reports, exist_ok=True)
+        path = os.path.join(args.reports, f"screen_{today}.md")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(L) + "\n")
+        print(f"報告已寫入 {path}\n")
     for a in (actions or ["全部 ✅ 續留,無建議動作"]):
         print(" ", a)
     con.close()

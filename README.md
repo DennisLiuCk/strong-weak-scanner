@@ -213,7 +213,9 @@ python -m unittest discover -s tests
 ## Universe 治理
 
 Universe 每季檢視一次；[`scripts/screen.py`](scripts/screen.py) 產生現有成員體檢與候選報告，
-但不自動改名單或族群。
+但不自動改名單或族群。候選體檢會呼叫 FinMind（1 + 2×候選數 次），只想看既有成員時用
+`--no-candidates`（零 API call、不需 token），探索性執行用 `--dry-run` 避免在 `reports/`
+留下看似正式的季度報告。
 
 | 規則 | 現行標準 |
 |---|---|
