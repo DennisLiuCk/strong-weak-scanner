@@ -68,6 +68,61 @@ class SignalStructureTest(unittest.TestCase):
         self.assertEqual(sig._get({"s_price": 2}, "s_trust"), 0)
         con.close()
 
+    # ── tier 持續性(§⑧)──────────────────────────────────────
+    def test_dwell_excludes_censored_tail(self):
+        """尾段只看到一半,計入會低估停留天數 → 預設排除。"""
+        dates = ["d1", "d2", "d3", "d4", "d5"]
+        seqs = {"A": [("d1", "真強"), ("d2", "真強"), ("d3", "真弱"),
+                      ("d4", "真弱"), ("d5", "真弱")]}
+        runs = sig.dwell_runs(seqs, dates)
+        self.assertEqual(runs, {"真強": [2]}, "真弱 是尾段(截尾),應被排除")
+        self.assertEqual(sig.dwell_runs(seqs, dates, include_censored=True),
+                         {"真強": [2], "真弱": [3]})
+
+    def test_date_gap_breaks_a_run(self):
+        """日期不連續(例:成員中途才加入)不可被當成同一段連續停留。"""
+        dates = ["d1", "d2", "d3", "d4"]
+        seqs = {"A": [("d1", "真強"), ("d4", "真強")]}   # 缺 d2/d3
+        self.assertEqual(sig.dwell_runs(seqs, dates, include_censored=True),
+                         {"真強": [1, 1]}, "跨斷點必須切成兩段")
+
+    def test_round_trip_only_counts_return_within_window(self):
+        dates = [f"d{i}" for i in range(1, 9)]
+        # A:d2 變 真弱,d3 就變回 真強 → 視窗內反覆
+        # B:d2 變 真弱,直到 d8 才變回 → 超出 5 日視窗,不算反覆
+        seqs = {
+            "A": [("d1", "真強"), ("d2", "真弱"), ("d3", "真強"), ("d4", "真強"),
+                  ("d5", "真強"), ("d6", "真強"), ("d7", "真強"), ("d8", "真強")],
+            "B": [("d1", "真強"), ("d2", "真弱"), ("d3", "真弱"), ("d4", "真弱"),
+                  ("d5", "真弱"), ("d6", "真弱"), ("d7", "真弱"), ("d8", "真強")],
+        }
+        back, total, rate = sig.round_trip_rate(seqs, dates, within=5)
+        self.assertEqual(total, 4, "A 兩次(d2、d3)、B 兩次(d2、d8);變動一律計入分母")
+        self.assertEqual(back, 1, "只有 A 的 d2→真弱 在 5 日內變回;"
+                                  "B 到 d8 才回頭(d2+6),已超出視窗")
+        self.assertAlmostEqual(rate, 0.25)
+
+    def test_membership_turnover_arithmetic(self):
+        """名單固定不變 → 每日新進 0、全量換手需時 None(不可除以零)。"""
+        dates = ["d1", "d2", "d3"]
+        seqs = {s: [(d, "真強") for d in dates] for s in ("A", "B")}
+        tv = sig.membership_turnover(seqs, dates, "真強")
+        self.assertEqual(tv["avg_n"], 2)
+        self.assertEqual(tv["avg_in"], 0)
+        self.assertIsNone(tv["full_turn_days"])
+        self.assertIsNone(tv["turns_per_year"])
+
+    def test_dwell_vs_horizon_flags_only_short_tradable_tiers(self):
+        dates = [f"d{i}" for i in range(1, 21)]
+        # 真強 每 2 日換一次(短);潛在/中性 不在 TRADABLE_TIERS,不該被列
+        seq = []
+        for i, d in enumerate(dates):
+            seq.append((d, "真強" if (i // 2) % 2 == 0 else "潛在/中性"))
+        short = sig.dwell_vs_horizon({"A": seq}, dates, horizon=10)
+        self.assertEqual([t for t, _ in short], ["真強"])
+        self.assertEqual(sig.dwell_vs_horizon({"A": seq}, dates, horizon=1), [],
+                         "量測窗短於停留時不該告警")
+
     def test_weights_come_from_score_config(self):
         """權重必須取自 score.WEIGHTS,不得在 signal_structure 另立一份。"""
         import score

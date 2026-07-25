@@ -634,6 +634,41 @@ def main():
           f"警戒線 ρ>{sig.RHO_ALERT}、有效因子數<{sig.EFF_ALERT};"
           "越線只代表脆弱,不構成調旋鈕的理由。")
     w("")
+    # ── ⑧ tier 持續性(結構指標第二組)────────────────────────────
+    # §② 量的是「tier 對不對」,量不到「tier 撐多久」。若可交易 tier 的中位停留短於
+    # 前瞻窗,照訊號進出就抓不到 §② 那個超額——量測窗與可用訊號長度不一致。
+    w("## ⑧ tier 持續性與名單換手(結構指標,不需前瞻報酬)")
+    w("")
+    w("「每日幾檔變層」分不出震盪與單向遷移,故量停留天數、震盪率、名單換手。"
+      f"基礎為 daily_scores(最新規則重算歷史)——as-seen 快照目前僅 {n_oos} 日,"
+      "不足以測停留;累積足夠後應改以 as-seen 為準。")
+    w("")
+    ch = sig.churn_summary(sig.tier_sequences(con), dates, horizon=F)
+    if not ch:
+        w("- 資料不足。")
+    else:
+        w("| tier | 完整區段數 | 中位停留 | 名單平均檔數 | 全量換手需時 | 年化換手 |")
+        w("|---|---|---|---|---|---|")
+        for t in sorted(ch["dwell"], key=lambda k: -ch["dwell_n"].get(k, 0)):
+            tv = ch["turnover"].get(t)
+            cells = (f"{tv['avg_n']:.1f} | {tv['full_turn_days']:.1f} 交易日 | "
+                     f"{tv['turns_per_year']:.0f} 次/年"
+                     if tv and tv["full_turn_days"] else "– | – | –")
+            w(f"| {t} | {ch['dwell_n'][t]} | {ch['dwell'][t]:.0f} 日 | {cells} |")
+        w("")
+        back, total, rate = ch["round_trip"]
+        w(f"- **震盪率**:{total} 次變動中,{sig.ROUND_TRIP_WINDOW} 個交易日內又變回原 tier 的有 "
+          + (f"**{back} 次({rate:.0%})**" if rate is not None else "–")
+          + ";其餘為單向遷移。")
+        if ch["short_vs_horizon"]:
+            names = "、".join(f"{t} {m:.0f} 日" for t, m in ch["short_vs_horizon"])
+            w(f"- ⚠ **停留短於量測窗**:{names},皆 < 前瞻 {F} 日。"
+              "照 tier 進出的實際持有期比 §② 的量測視窗短,兩者不是同一件事"
+              "(見 WEEKLY_REVIEW §4-10)。")
+        w("")
+        w("> 中位停留排除右截尾的尾段(只看到一半的區段當成完整會低估);"
+          "排除本身也略偏短,兩種偏誤同向,故此值宜視為停留天數的下限。")
+    w("")
     w("## 判讀警語")
     w("")
     w(f"- {IS_CUTOFF} 前屬 in-sample;cutoff 後若沒有正式快照也只是 restated history。"

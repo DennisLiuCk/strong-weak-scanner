@@ -162,6 +162,137 @@ def _alert(shares, lead, lead_rho):
     return hits
 
 
+# ── tier 持續性(結構指標第二組:訊號活多久,而非訊號多集中)──────────────
+#
+# 「每日幾檔變層」是錯的指標——數量分不出「來回震盪(純摩擦成本)」與「單向遷移(真訊號)」。
+# 這裡量三件事:停留天數、震盪率、名單換手。三者同樣不需前瞻報酬,故可每日讀。
+#
+# 最關鍵的產出是 dwell_vs_horizon():若可交易 tier 的中位停留 < 超額被量測的前瞻窗,
+# 則「照 tier 進出」抓不到報告 §② 宣稱的那個優勢——量測窗與可用訊號長度不一致。
+EVAL_HORIZON_DAYS = 10    # 對齊 validate.py --fwd 預設;呼叫端可覆寫為實際使用的 F
+TRADABLE_TIERS = ("真強", "蓄勢·外資佈局", "強但過熱", "真弱")
+ROUND_TRIP_WINDOW = 5     # 幾個交易日內變回原 tier 才算「震盪」
+
+
+def tier_sequences(con, *, since=None):
+    """stock_id -> [(date, tier), ...](升冪)。用 daily_scores(最新規則重算歷史)。"""
+    sql = "SELECT date, stock_id, tier FROM daily_scores"
+    args = ()
+    if since:
+        sql += " WHERE date>=?"
+        args = (since,)
+    seqs = {}
+    for r in con.execute(sql + " ORDER BY stock_id, date", args):
+        seqs.setdefault(r["stock_id"], []).append((r["date"], r["tier"]))
+    return seqs
+
+
+def _runs_of(seq, all_dates):
+    """把一檔的 (date, tier) 序列切成區段;日期不連續視為斷點。
+
+    回傳 [(tier, 長度, 是否右截尾)];最後一段必然截尾(我們還沒看到它結束)。
+    """
+    idx = {d: i for i, d in enumerate(all_dates)}
+    out, cur, n = [], None, 0
+    prev_i = None
+    for d, t in seq:
+        i = idx.get(d)
+        if i is None:
+            continue
+        broken = prev_i is not None and i != prev_i + 1
+        if cur is None or t != cur or broken:
+            if cur is not None:
+                out.append((cur, n, False))
+            cur, n = t, 1
+        else:
+            n += 1
+        prev_i = i
+    if cur is not None:
+        out.append((cur, n, True))     # 尾段截尾
+    return out
+
+
+def dwell_runs(seqs, all_dates, *, include_censored=False):
+    """tier -> [完整區段長度]。預設排除右截尾的尾段:把只看到一半的區段當成完整的
+    會低估停留天數。排除本身也略偏低(被排除的多是長區段),兩種偏誤都往短的方向。"""
+    acc = {}
+    for seq in seqs.values():
+        for t, n, censored in _runs_of(seq, all_dates):
+            if censored and not include_censored:
+                continue
+            acc.setdefault(t, []).append(n)
+    return acc
+
+
+def round_trip_rate(seqs, all_dates, within=ROUND_TRIP_WINDOW):
+    """變動後 `within` 個交易日內又變回原 tier 的比例。回傳 (次數, 總變動數, 比例)。"""
+    idx = {d: i for i, d in enumerate(all_dates)}
+    back = total = 0
+    for seq in seqs.values():
+        s = [(idx[d], t) for d, t in seq if d in idx]
+        s.sort()
+        for k in range(1, len(s)):
+            if s[k][0] != s[k - 1][0] + 1 or s[k][1] == s[k - 1][1]:
+                continue
+            total += 1
+            prev = s[k - 1][1]
+            if any(s[j][1] == prev for j in range(k + 1, len(s))
+                   if s[j][0] <= s[k][0] + within):
+                back += 1
+    return back, total, (back / total if total else None)
+
+
+def membership_turnover(seqs, all_dates, tier):
+    """名單進出:平均檔數、每日新進/退出、全量換手需時(交易日)、年化換手次數。"""
+    by_date = {d: set() for d in all_dates}
+    for sid, seq in seqs.items():
+        for d, t in seq:
+            if t == tier and d in by_date:
+                by_date[d].add(sid)
+    ins, outs, sizes = [], [], []
+    for i in range(1, len(all_dates)):
+        a, b = by_date[all_dates[i - 1]], by_date[all_dates[i]]
+        ins.append(len(b - a))
+        outs.append(len(a - b))
+        sizes.append(len(b))
+    if not sizes or not statistics.mean(sizes):
+        return None
+    avg_n, avg_in = statistics.mean(sizes), statistics.mean(ins)
+    days = (avg_n / avg_in) if avg_in else None
+    return {"avg_n": avg_n, "avg_in": avg_in, "avg_out": statistics.mean(outs),
+            "full_turn_days": days, "turns_per_year": (250 / days) if days else None}
+
+
+def dwell_vs_horizon(seqs, all_dates, *, horizon=EVAL_HORIZON_DAYS,
+                     tiers=TRADABLE_TIERS):
+    """列出中位停留 < 前瞻量測窗的可交易 tier —— 照訊號進出抓不到被量測的優勢。"""
+    runs = dwell_runs(seqs, all_dates)
+    short = []
+    for t in tiers:
+        v = runs.get(t)
+        if v:
+            med = statistics.median(v)
+            if med < horizon:
+                short.append((t, med))
+    return short
+
+
+def churn_summary(seqs, all_dates, *, horizon=EVAL_HORIZON_DAYS):
+    """一次算齊 tier 持續性要的全部數字。"""
+    runs = dwell_runs(seqs, all_dates)
+    if not runs:
+        return None
+    back, total, rate = round_trip_rate(seqs, all_dates)
+    return {
+        "dwell": {t: statistics.median(v) for t, v in runs.items()},
+        "dwell_n": {t: len(v) for t, v in runs.items()},
+        "round_trip": (back, total, rate),
+        "turnover": {t: membership_turnover(seqs, all_dates, t) for t in TRADABLE_TIERS},
+        "short_vs_horizon": dwell_vs_horizon(seqs, all_dates, horizon=horizon),
+        "horizon": horizon,
+    }
+
+
 def group_rows(con, date, *, snapshot_id=None):
     """把某資料日的評分列依族群分組。snapshot_id 給定時讀 as-seen 快照(自帶當日族群)。"""
     if snapshot_id:

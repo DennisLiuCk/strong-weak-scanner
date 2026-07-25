@@ -110,7 +110,27 @@ def main():
             print(f"   ⚠ 單柱警戒:{'、'.join(st['alert'])}"
                   "——僅為監看提示,調旋鈕一律走 WEEKLY_REVIEW 的 OOS 門檻")
 
-    # ── 7. 資料品質快檢 ──
+    # ── 7. tier 持續性(結構指標第二組)──
+    # 「每日幾檔變層」分不出震盪與遷移,所以量停留天數/震盪率/名單換手。
+    # 用最新規則重算歷史(daily_scores);as-seen 快照目前只有 10 日,不足以測停留。
+    seqs = sig.tier_sequences(con)
+    ch = sig.churn_summary(seqs, dates)
+    if ch:
+        print("\n■ tier 持續性(結構,重算歷史;不需前瞻報酬):")
+        dw = ", ".join(f"{t} {ch['dwell'][t]:.0f}日" for t in sig.TRADABLE_TIERS
+                       if t in ch["dwell"])
+        back, total, rate = ch["round_trip"]
+        print(f"   中位停留 {dw};{sig.ROUND_TRIP_WINDOW} 日內反覆 "
+              + (f"{rate:.0%}({back}/{total} 次變動)" if rate is not None else "-"))
+        tv = [f"{t} {v['full_turn_days']:.1f}日全換({v['turns_per_year']:.0f}次/年)"
+              for t, v in ch["turnover"].items() if v and v["full_turn_days"]]
+        print("   名單換手 " + "、".join(tv[:2]))
+        if ch["short_vs_horizon"]:
+            names = "、".join(f"{t} {m:.0f}日" for t, m in ch["short_vs_horizon"])
+            print(f"   ⚠ 停留短於量測窗:{names} < 前瞻 {ch['horizon']} 日"
+                  "——照 tier 進出抓不到報告 §② 量到的超額(見 WEEKLY_REVIEW §4-10)")
+
+    # ── 8. 資料品質快檢 ──
     issues = []
     for tbl in ("price", "inst", "margin", "holding", "sbl"):
         n = con.execute(f"SELECT COUNT(*) FROM {tbl} WHERE date=?", (last,)).fetchone()[0]
