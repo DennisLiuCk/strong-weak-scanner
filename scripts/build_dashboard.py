@@ -1300,12 +1300,20 @@ def build_strategy_status(con, last):
     except Exception:
         pass
 
-    # 週報連結:報告以資料迄日命名,取實際存在的最新一份
+    # 週報連結:報告以資料迄日命名,取實際存在的最新一份。
+    # §② 的錨點用「實際掃出的行號」而非標題 anchor——GitHub 對中文標題產生的 anchor
+    # 難以預測且會隨標點變動;行號每次 build 重新掃,報告改版也自動跟上。
     try:
-        rep = sorted(f for f in os.listdir(os.path.join(ROOT, "reports"))
+        rdir = os.path.join(ROOT, "reports")
+        rep = sorted(f for f in os.listdir(rdir)
                      if f.startswith("validate_") and f.endswith(".md"))
         if rep:
             st["report_url"] = NOTE_REPO_BLOB + "reports/" + rep[-1]
+            with open(os.path.join(rdir, rep[-1]), encoding="utf-8") as fh:
+                for i, line in enumerate(fh, 1):
+                    if line.startswith("## ②"):
+                        st["report_tier_url"] = f"{st['report_url']}#L{i}"
+                        break
     except OSError:
         pass
     return st

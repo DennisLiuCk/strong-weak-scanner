@@ -97,11 +97,17 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertNotIn(validate.IS_CUTOFF, self.template,
                          "IS_CUTOFF 不可寫死在模板——改權重時會忘記同步")
         self.assertIn("sig.EVAL_HORIZON_DAYS", self.builder)
-        # 績效數字(超額/勝率/IC)不可複製到儀表板,只能連向週報,避免與 validate 各算一份
-        for banned in ("勝率", "rank-IC", "超額報酬率"):
-            self.assertNotIn(banned, self._strategy_card_source(),
-                             f"策略狀態卡不得複製績效數字「{banned}」,應連向週報")
+        # 績效數字不可複製到儀表板,只能連向週報(避免與 validate.py §② 各算一份而漂移)。
+        # 卡片可以「提到」超額/勝率並指路,但 builder 必須連算不出來:禁止在此碰前瞻報酬。
+        src = self._builder_strategy_source()
+        for banned in ("close_adj", "spearman", "daily_metrics"):
+            self.assertNotIn(banned, src,
+                             f"build_strategy_status 不得計算績效({banned})——只放證據狀態與結構")
         self.assertIn("report_url", self.builder)
+        self.assertIn("report_tier_url", self.builder)
+        # §② 的錨點必須是掃出來的行號,不可寫死(報告每週重生,行號會變)
+        self.assertIn('startswith("## ②")', src)
+        self.assertNotIn("#L", self.template.split("function buildStrategyStatus()")[0][-4000:])
         # 守護語:必須明說這些是事實而非判斷,且分層不是買賣指示
         card = self._strategy_card_source()
         self.assertIn("不是對個別因子有效性的判斷", card)
@@ -113,6 +119,12 @@ class DashboardUxContractTest(unittest.TestCase):
         start = self.template.index("function buildStrategyStatus()")
         end = self.template.index("\nfunction ", start + 10)
         return self.template[start:end]
+
+    def _builder_strategy_source(self):
+        """取出 build_dashboard.build_strategy_status 的函式本體。"""
+        start = self.builder.index("def build_strategy_status(")
+        end = self.builder.index("\ndef ", start + 10)
+        return self.builder[start:end]
 
     def test_tier_section_warns_that_layers_turn_over(self):
         """個股分層區必須提醒名單會頻繁變動(中位停留 4~5 日),並連到策略狀態。"""

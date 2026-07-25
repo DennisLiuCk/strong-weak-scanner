@@ -537,6 +537,13 @@ function buildStrategyStatus(){
   if(S.dwell!=null&&S.turn_days!=null) rows.push(['分層穩定度',
     `相對強勢中位停留 ${S.dwell.toFixed(0)} 個交易日;名單 ${S.turn_days.toFixed(1)} 個交易日全量換一輪`,
     `${S.round_trip!=null?'變層有 '+pct(S.round_trip)+' 在 '+S.round_trip_window+' 日內反覆;':''}停留短於 ${S.fwd} 日的量測窗,分層宜當觀察名單而非進出訊號`]);
+  // 各層的前瞻表現只在週報,不複製到這裡:數字需要「全期/OOS/重疊窗」等限定條件才不誤導,
+  // 卡片沒有空間寫清楚。這一列只負責指路 + 說明現在能不能判讀。
+  if(S.report_tier_url) rows.push(['分層實證表現',
+    '各層前瞻超額與勝率',
+    S.oos_mature>=10 ? 'OOS 欄已可判讀,依 WEEKLY_REVIEW 的連 N 週門檻判斷'
+      : `所有 tier 的 OOS 欄目前為空(成熟 ${S.oos_mature==null?'—':S.oos_mature} 日);全期欄以校準窗為主、前瞻窗重疊會高估顯著性——OOS 欄有值前不下結論`,
+    S.report_tier_url, '週報 ② →']);
   if(!rows.length) return h('div');
   const box=h('div',{class:'card',id:'strategy-status',style:'padding:22px 26px;margin-top:22px;border-left:3px solid var(--amber)'});
   const head=h('div',{style:'display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:4px'},
@@ -547,11 +554,15 @@ function buildStrategyStatus(){
   box.appendChild(h('p',{style:'margin:0 0 14px;font-size:12.5px;color:var(--ink2);line-height:1.6',
     text:'下列全部是「證據狀態」與「結構」的事實,不是對個別因子有效性的判斷。分層本身描述相對位置,不是買賣指示。'}));
   const dl=h('div',{style:'display:grid;gap:11px'});
-  rows.forEach(r=>dl.appendChild(h('div',{style:'display:grid;grid-template-columns:minmax(84px,104px) 1fr;gap:14px;align-items:start'},
-    h('div',{style:'font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.03em;padding-top:2px',text:r[0]}),
-    h('div',{},
-      h('div',{style:'font-size:13.5px;font-weight:700;color:var(--ink)',text:r[1]}),
-      h('div',{style:'margin-top:2px;font-size:12px;color:var(--muted);line-height:1.55',text:r[2]})))));
+  rows.forEach(r=>{
+    const val=h('div',{style:'font-size:13.5px;font-weight:700;color:var(--ink)',text:r[1]});
+    if(r[3]) val.appendChild(h('a',{href:r[3],target:'_blank',rel:'noopener',
+      style:'margin-left:8px;font-size:12px;font-weight:700;color:var(--teal);white-space:nowrap',text:r[4]||'詳見 →'}));
+    dl.appendChild(h('div',{style:'display:grid;grid-template-columns:minmax(84px,104px) 1fr;gap:14px;align-items:start'},
+      h('div',{style:'font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.03em;padding-top:2px',text:r[0]}),
+      h('div',{}, val,
+        h('div',{style:'margin-top:2px;font-size:12px;color:var(--muted);line-height:1.55',text:r[2]}))));
+  });
   box.appendChild(dl);
   return box;
 }
