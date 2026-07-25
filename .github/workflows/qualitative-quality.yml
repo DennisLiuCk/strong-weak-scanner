@@ -20,6 +20,9 @@ on:
       - "tests/test_qual_evidence.py"
       - "tests/test_leading_hypotheses.py"
       - "tests/test_dashboard_ux_contract.py"
+      - "tests/test_entry_docs_sync.py"
+      - "CLAUDE.md"
+      - "AGENTS.md"
       - ".github/workflows/qualitative-quality.yml"
   pull_request:
     paths:
@@ -40,6 +43,9 @@ on:
       - "tests/test_qual_evidence.py"
       - "tests/test_leading_hypotheses.py"
       - "tests/test_dashboard_ux_contract.py"
+      - "tests/test_entry_docs_sync.py"
+      - "CLAUDE.md"
+      - "AGENTS.md"
       - ".github/workflows/qualitative-quality.yml"
   workflow_dispatch: {}
 
@@ -62,5 +68,5 @@ jobs:
       - name: 稽核領先假說格式與正式筆記錨定
         run: python scripts/leading_hypotheses.py --lint
 
-      - name: 執行質化品質與 dashboard 契約測試
-        run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_leading_hypotheses tests.test_dashboard_ux_contract
+      - name: 執行質化品質、dashboard 與入口文件契約測試
+        run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_leading_hypotheses tests.test_dashboard_ux_contract tests.test_entry_docs_sync
