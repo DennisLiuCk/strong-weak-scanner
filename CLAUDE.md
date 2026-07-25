@@ -104,7 +104,8 @@ risk_flags(TWSE/TPEx 處置/注意公告)(依主鍵冪等 upsert；holding 當�
 final pass 刷新一次)+ 衍生
 price_adj/daily_metrics/daily_scores/group_metrics/market_daily(每次重建)。
 舊制凍結:daily_scores_v1。**觀察層(TDCC 大戶/借券)未計分**,歸宿等 OOS 裁決
-(WEEKLY_REVIEW §4-8,約 2026-08-29 後)。**risk_flags(處置/注意)屬另一類**——
+(WEEKLY_REVIEW §4-8「正式 as-seen 快照 ≥8 週」;快照自 2026-07-13 起算 →
+約 2026-09-12 後,不是 TDCC 起始日 07-03 + 8 週)。**risk_flags(處置/注意)屬另一類**——
 交易所官方認證的異常價量列管,設計上就是永久顯示用警示(儀表板紅框 badge),
 不進 OOS 排程、不會變成計分項。**month_revenue/financials/balance_sheet/cash_flow
 (2026-07-09 起,`fetch_financials.py` 獨立填入)也是另一類**——FinMind 官方財報,
