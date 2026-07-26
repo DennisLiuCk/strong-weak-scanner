@@ -6,7 +6,7 @@ build_dashboard.py — 從 SQLite(daily_scores + daily_metrics)自動重生儀�
 並把同一份頁面凍結成 archive/<資料日>.html(as-seen 歷史快照,供日期選單回看)。
 零第三方依賴。用法:  python scripts/build_dashboard.py
 """
-import json, os, re, sqlite3, sys
+import json, os, re, sqlite3, statistics, sys
 from collections import defaultdict
 
 try:
@@ -22,6 +22,7 @@ from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
 from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
 import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡報、週報 §⑦⑧ 同一組函式)
+import hypotheses as hyp         # 兩視角分歧的籌碼定義 = H1 檢定的同一個定義
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
 from qual_notes import (load_notes, note_status, note_review_status,
                         load_events, EVENT_KPI_KEYS,
@@ -1319,6 +1320,64 @@ def build_strategy_status(con, last):
     return st
 
 
+# ── 兩視角分歧(價格 vs 籌碼)────────────────────────────────────────────
+# 為什麼值得單獨一段:價格與籌碼是兩個近乎正交的視角(族群內排名相關 ρ≈0.27),分歧本身
+# 就是可讀的市場狀態——動能強而籌碼弱 = 漲了但沒人接;反之 = 有人在買但價格還沒動。
+#
+# **這是描述,不是訊號。** 它有沒有預測力正由事先登錄的假設 H1 檢定中(週報 §⑪),
+# 目前尚無結論;籌碼分數刻意直接用 hypotheses.CHIP_WEIGHTS,讓畫面顯示的與 H1 檢定的
+# 是同一個東西。
+#
+# 單日 ρ 不可裸讀:實測全期 80 日中位 +0.25、標準差 0.15,所以一律附歷史百分位與近 5 日
+# ——2026-07-24 的 −0.13 落在第 4 百分位、且近 5 日連續為負,那才是有意義的敘述。
+def _names(con):
+    return {r["stock_id"]: r["name"] for r in con.execute(
+        "SELECT stock_id, name FROM universe")}
+
+
+def build_divergence(con, last, names, group_names):
+    """回傳兩視角分歧的 payload;任何一段算不出來就給 None,前端略過。"""
+    try:
+        today = sig.divergence_summary(sig.group_rows(con, last), hyp.CHIP_WEIGHTS)
+        if not today:
+            return None
+        dates = [r[0] for r in con.execute(
+            "SELECT DISTINCT date FROM daily_scores WHERE date<=? ORDER BY date", (last,))]
+        hist = {}
+        for d in dates:
+            s = sig.divergence_summary(sig.group_rows(con, d), hyp.CHIP_WEIGHTS)
+            if s and s["rho_median"] is not None:
+                hist[d] = s["rho_median"]
+        vals = sorted(hist.values())
+        cur = hist.get(last)
+        pct = (sum(1 for x in vals if x <= cur) / len(vals) * 100) if (vals and cur is not None) else None
+
+        def deco(x):
+            return {"id": x["stock_id"], "nm": names.get(x["stock_id"], x["stock_id"]),
+                    "g": group_names.get(x["grp"], x["grp"]),
+                    "mom": x["mom_pct"], "chip": x["chip_pct"], "gap": x["gap"]}
+
+        first_month = dates[0][:7] if dates else None
+        fm = [v for d, v in hist.items() if d[:7] == first_month]
+        return {
+            "rho": cur, "rho_pct": pct, "rho_median_all": statistics.median(vals) if vals else None,
+            "n_days": len(vals),
+            "recent": [{"d": d, "v": round(hist[d], 3)} for d in dates[-5:] if d in hist],
+            "first_month": first_month,
+            "first_month_median": statistics.median(fm) if fm else None,
+            "threshold": sig.DIVERGE_NOTABLE,
+            "price_ahead": [deco(x) for x in today["price_ahead"][:8]],
+            "chips_ahead": [deco(x) for x in today["chips_ahead"][:8]],
+            "n_price_ahead": len(today["price_ahead"]),
+            "n_chips_ahead": len(today["chips_ahead"]),
+        }
+    except sqlite3.Error:
+        # 只吞資料層問題(舊 db 缺表/缺欄)。程式錯誤必須炸出來——
+        # 原本寫 `except Exception` 把 `statistics` 未 import 的 NameError 吃掉了,
+        # 結果整段靜默消失、build 還印「已重生」看起來成功。
+        return None
+
+
 def main():
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
@@ -1452,8 +1511,9 @@ def main():
     # 任一塊從缺不擋主管線(load_events 目錄不存在回 latest=None,同 fund_map 慣例)
     events = load_events()
     tsmc = build_tsmc_payload(con, fund_map, events, last)
-    # 策略狀態(證據強度)——必須在 con.close() 之前算
+    # 策略狀態(證據強度)與兩視角分歧——都必須在 con.close() 之前算
     strategy = build_strategy_status(con, last)
+    diverge = build_divergence(con, last, _names(con), GROUP_NM)
     con.close()
     # 質化筆記(觀察層、AI 協作＋獨立 reviewer,見 notes/qualitative/):無筆記時 load_notes
     # 回傳空 dict,同 fund_map 的「從缺不擋主管線」慣例
@@ -1834,6 +1894,7 @@ def main():
     html = html.replace("__GORDER_JSON__", json.dumps(GROUP_ORDER))
     html = html.replace("__WEIGHTS_JSON__", json.dumps(WEIGHTS))
     html = html.replace("__STRATEGY_JSON__", json.dumps(strategy, ensure_ascii=False))
+    html = html.replace("__DIVERGE_JSON__", json.dumps(diverge, ensure_ascii=False))
     # 量尺門檻(②量比/⑤融資水位)——單一事實來源 score.py,調旋鈕量尺刻度自動同步
     html = html.replace("__THRESH_JSON__", json.dumps({
         "volr_active": list(VOLR_ACTIVE), "volr_dry": VOLR_DRY, "volr_overheat": VOLR_OVERHEAT,

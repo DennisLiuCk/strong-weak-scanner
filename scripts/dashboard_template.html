@@ -158,7 +158,7 @@ svg{display:block;overflow:visible}
     <h1>__H1__</h1>
     <p class="sub">每個交易日收盤後，把同族群個股放上同一把尺：比較價格與抗跌、法人原始買賣及其同業位置、融資槓桿，再依公開規則分層。每個分數都可點開，看原始數據與判讀；資料來源見頁尾。</p>
     <nav class="quicknav" aria-label="快速導覽">
-      <a href="#ov">今日重點</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
+      <a href="#ov">今日重點</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
     </nav>
   </header>
 
@@ -167,6 +167,7 @@ svg{display:block;overflow:visible}
     <section id="ov" class="blk" style="margin-top:56px"></section>
     <section id="tsmc" class="blk"></section>
     <section id="grp" class="blk"></section>
+    <section id="diverge" class="blk"></section>
     <section id="tier" class="blk"></section>
     <section id="stocks" class="blk"></section>
 
@@ -214,7 +215,7 @@ svg{display:block;overflow:visible}
    ============================================================ */
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
-      TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
+      TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,tier:s.tier_confirmed,
   tierLabel:s.tier_label,waiting:s.tier_waiting,
   f:(s.factors||[]).map(function(f){return [f.label,f.score,f.weight];}),
@@ -565,6 +566,63 @@ function buildStrategyStatus(){
   });
   box.appendChild(dl);
   return box;
+}
+
+/* 兩視角分歧(價格 vs 籌碼)。
+   價格與籌碼是兩個近乎正交的視角,分歧本身就是可讀的市場狀態:
+   動能強而籌碼弱 = 漲了但沒人接;籌碼強而動能弱 = 有人在買但價格還沒動。
+   **這是描述,不是買賣訊號**——它有沒有預測力正由事先登錄的假設 H1 檢定中(週報 §⑪),
+   目前尚無結論。單日 ρ 一律附歷史百分位與近 5 日,裸讀單一數字沒有意義。 */
+function buildDiverge(){
+  const D2=DIVERGE; if(!D2) return [];
+  const pct=v=>v==null?'—':(v>=0?'+':'')+v.toFixed(2);
+  const card=(title, hint, list, dirLabel, col)=>{
+    const box=h('div',{class:'card',style:'padding:20px 22px'},
+      h('div',{style:'display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between'},
+        h('b',{style:'font-size:15px',text:title}),
+        h('span',{class:'chip',style:`color:${col};background:var(--inset)`,text:dirLabel})),
+      h('p',{style:'margin:6px 0 12px;font-size:12.5px;color:var(--ink2);line-height:1.6',text:hint}));
+    if(!list.length){ box.appendChild(h('p',{style:'margin:0;font-size:13px;color:var(--muted)',
+      text:`今日沒有落差達 ${D2.threshold} 個百分位點的個股。`})); return box; }
+    const tb=h('div',{style:'display:grid;gap:7px'});
+    list.forEach(x=>tb.appendChild(h('div',{style:'display:grid;grid-template-columns:1fr auto;gap:10px;align-items:baseline;font-size:13px'},
+      h('div',{}, h('b',{text:x.nm}), h('span',{class:'mono',style:'margin-left:6px;font-size:11.5px;color:var(--muted)',text:x.id}),
+        h('span',{style:'margin-left:8px;font-size:11.5px;color:var(--muted)',text:x.g})),
+      h('div',{class:'mono',style:'font-size:12px;color:var(--ink2);white-space:nowrap'},
+        h('span',{text:`動能 ${x.mom.toFixed(0)}`}),
+        h('span',{style:'color:var(--muted)',text:' / '}),
+        h('span',{text:`籌碼 ${x.chip.toFixed(0)}`}),
+        h('span',{style:`margin-left:8px;font-weight:800;color:${col}`,text:(x.gap>=0?'+':'')+x.gap.toFixed(0)})))));
+    box.appendChild(tb);
+    return box;
+  };
+  const grid=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:18px'});
+  grid.appendChild(card(`漲了但沒人接（${D2.n_price_ahead} 檔）`,
+    '族群內價格位置明顯領先籌碼位置。可能是籌碼還沒跟上,也可能是漲勢缺乏法人支撐——本頁不判斷是哪一種。',
+    D2.price_ahead, '價格領先', 'var(--amber)'));
+  grid.appendChild(card(`有人在買但價格還沒動（${D2.n_chips_ahead} 檔）`,
+    '族群內籌碼位置明顯領先價格位置。這是「蓄勢」那一層想捕捉的形狀,但這裡不套用任何分層條件,只呈現落差。',
+    D2.chips_ahead, '籌碼領先', 'var(--teal)'));
+  const rho=h('div',{class:'card',style:'padding:20px 22px;margin-top:16px;border-left:3px solid var(--teal)'},
+    h('b',{style:'font-size:15px',text:'兩視角的一致程度'}),
+    h('p',{style:'margin:6px 0 10px;font-size:13px;color:var(--ink)',
+      html:`今日族群內排名相關 <b class="mono">ρ ${pct(D2.rho)}</b>`
+        +(D2.rho_pct!=null?`,落在全期 ${D2.n_days} 個交易日的第 <b>${D2.rho_pct.toFixed(0)}</b> 百分位`:'')
+        +(D2.rho_median_all!=null?`(全期中位 ${pct(D2.rho_median_all)}`:'')
+        +(D2.first_month_median!=null?`、${D2.first_month} 為 ${pct(D2.first_month_median)})`:')')}),
+    h('div',{class:'mono',style:'font-size:12px;color:var(--ink2)',
+      text:'近 5 日:'+(D2.recent||[]).map(r=>`${r.d.slice(5)} ${pct(r.v)}`).join('　')}),
+    h('p',{style:'margin:10px 0 0;font-size:12px;color:var(--muted);line-height:1.6',
+      text:'ρ 越低代表兩個視角越不同意。單日數字不可裸讀——全期標準差約 0.15,'
+        +'所以要看它落在什麼百分位、以及近幾日是否連續同向。ρ 下降本身不指示漲跌方向。'}));
+  return [h('p',{class:'kicker',text:'兩個視角'}),
+    h('h2',{class:'sec',text:'兩視角分歧 · 價格與籌碼說的是否一致'}),
+    h('p',{class:'lead',html:'同一檔股票在族群內有兩個位置:<b>價格位置</b>(相對強弱)與'
+      +'<b>籌碼位置</b>(法人買賣的相對位置)。兩者近乎獨立,所以<b style="color:var(--ink)">'
+      +'落差本身就是可讀的狀態</b>。百分位用平均秩計算,與資料順序無關。'
+      +'<br><b style="color:var(--ink)">這是描述,不是買賣訊號</b>——落差有沒有預測力,'
+      +'正由事先登錄的假設 H1 檢定中(見週報 ⑪),目前尚無結論。'}),
+    grid, rho];
 }
 
 function buildTSMC(){
@@ -1202,6 +1260,7 @@ document.getElementById('ov').append(...buildOverview());
 document.getElementById('tsmc').append(...buildTSMC());
 document.getElementById('grp').append(...buildGroup());
 document.getElementById('tier').append(...buildTier());
+document.getElementById('diverge').append(...buildDiverge());
 document.getElementById('stocks').append(...buildStocks1c());
 </script>
 </body>

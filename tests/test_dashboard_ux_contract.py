@@ -46,7 +46,7 @@ class DashboardUxContractTest(unittest.TestCase):
 
     def test_quicknav_reaches_every_section(self):
         self.assertIn('aria-label="快速導覽"', self.template)
-        for anchor in ("ov", "tsmc", "grp", "tier", "stocks", "flow-guide"):
+        for anchor in ("ov", "tsmc", "grp", "diverge", "tier", "stocks", "flow-guide"):
             self.assertIn(f'href="#{anchor}"', self.template)
             self.assertIn(f'<section id="{anchor}"', self.template)
         # 個股詳情只由點列開抽屜,不再有底部常駐展示區(設計稿 demo 殘留,已移除)
@@ -65,7 +65,7 @@ class DashboardUxContractTest(unittest.TestCase):
         pairs = ("__DATA_JSON__", "__GROUPS_JSON__", "__TIERS_JSON__",
                  "__TIER_FLOW_JSON__", "__OVERVIEW_JSON__", "__GRPMETA_JSON__",
                  "__WEIGHTS_JSON__", "__THRESH_JSON__", "__TSMC_JSON__",
-                 "__STRATEGY_JSON__",
+                 "__STRATEGY_JSON__", "__DIVERGE_JSON__",
                  "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__",
                  "__SCOPE__")
         for ph in pairs:
@@ -133,6 +133,35 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("#strategy-status", self.template)
         # 首屏概況標題要標明是相對分層,不可讓「11 強勢」讀成絕對強弱
         self.assertIn("今日分層概況（相對分層）", self.template)
+
+    def test_divergence_section_is_描述_not_signal(self):
+        """兩視角分歧是**描述**,不是買賣訊號。它有沒有預測力正由 H1 檢定中(§⑪),
+        所以畫面必須(a)明說不是訊號、(b)指向 H1、(c)不裸讀單日 ρ、
+        (d)用平均秩而非排序切片——後者在整數分數上會平手,結果隨資料順序而變。"""
+        self.assertIn("function buildDiverge()", self.template)
+        sec = self._diverge_source()
+        self.assertIn("不是買賣訊號", sec)
+        self.assertIn("H1", sec)
+        self.assertIn("平均秩", sec, "必須說明百分位用平均秩(與資料順序無關)")
+        # 單日 ρ 必須附歷史脈絡
+        for ctx in ("百分位", "近 5 日", "標準差"):
+            self.assertIn(ctx, sec, f"單日 ρ 必須附「{ctx}」等脈絡,不可裸讀")
+        # 籌碼定義必須就是 H1 檢定的那一個,不可另立一份
+        b = self.builder
+        self.assertIn("hyp.CHIP_WEIGHTS", b,
+                      "畫面顯示的籌碼分數必須與 H1 檢定的定義相同")
+        # 靜默失敗防護:資料層以外的錯誤不得被吞掉
+        self.assertIn("except sqlite3.Error:", b)
+        i = b.index("def build_divergence(")
+        body = b[i:b.index("\ndef ", i + 10)]
+        self.assertNotIn("except Exception:", body,
+                         "build_divergence 不得用 bare except 吞掉程式錯誤")
+
+    def _diverge_source(self):
+        start = self.template.index("function buildDiverge()")
+        # 往前含註解區塊,往後到下一個函式
+        head = self.template.rindex("/*", 0, start)
+        return self.template[head:self.template.index("\nfunction ", start + 10)]
 
     def test_first_screen_overview_headline_from_builder(self):
         self.assertIn("function buildOverview()", self.template)

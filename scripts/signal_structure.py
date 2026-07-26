@@ -293,6 +293,70 @@ def churn_summary(seqs, all_dates, *, horizon=EVAL_HORIZON_DAYS):
     }
 
 
+# ── 兩個視角的分歧(結構指標第三組)────────────────────────────────────
+#
+# 「價格」與「籌碼」是兩個近乎正交的視角(實測族群內排名相關 ρ≈0.27~0.52),而分歧本身
+# 就是資訊:動能強而籌碼弱 = 漲了但沒人接;籌碼強而動能弱 = 有人在買但價格還沒動。
+# 實測 ρ(動能,籌碼) 在 2026 年 1 月是 0.66,到 7 月修正時降到全期最低 0.37
+# ——**市場轉折時兩個視角分歧最大**。
+#
+# 這組同樣不需要前瞻報酬 → 可每日讀。但**它是描述,不是訊號**:它有沒有預測力,
+# 正由事先登錄的假設 H1 檢定中(見 hypotheses.py 與週報 §⑪),目前尚無結論。
+#
+# 百分位一律用**平均秩**:s_* 是 −2..+2 的整數,用排序切片會大量平手,結果隨餵入順序
+# 而變(2026-07-26 的實測:93% 的格在邊界平手,換順序讓統計量從 t=1.4 掉到 t=0.2)。
+# 平均秩給平手相同的秩,與任何順序無關。
+DIVERGE_NOTABLE = 40.0     # |分歧| ≥ 此值(百分位點)才列為值得一看
+
+
+def lens_pct(values):
+    """把一組分數轉成族群內百分位(0~100),平手取平均秩 → 與餵入順序無關。"""
+    n = len(values)
+    if n < 2:
+        return [50.0] * n
+    return [(r - 1) / (n - 1) * 100 for r in rankdata(list(values))]
+
+
+def divergence(rows, chip_weights, momentum_col="s_price"):
+    """回傳 (每檔的分歧明細, 該組的視角相關 ρ)。
+
+    分歧 = 動能百分位 − 籌碼百分位(百分位點)。正 = 漲了但沒人接;負 = 有人接但沒漲。
+    """
+    if len(rows) < 2:
+        return [], None
+    mom = [_get(r, momentum_col) for r in rows]
+    chip = [sum(w * _get(r, k) for k, w in chip_weights.items()) for r in rows]
+    mp, cp = lens_pct(mom), lens_pct(chip)
+    out = [{"stock_id": r["stock_id"], "mom_pct": round(mp[i], 1),
+            "chip_pct": round(cp[i], 1), "gap": round(mp[i] - cp[i], 1),
+            "mom_score": _get(r, momentum_col), "chip_score": round(chip[i], 2)}
+           for i, r in enumerate(rows)]
+    return out, spearman(mom, chip)
+
+
+def divergence_summary(groups, chip_weights, momentum_col="s_price"):
+    """跨族群彙總:每檔明細 + 各族群 ρ 的中位(= 當日兩視角的一致程度)。"""
+    detail, rhos = [], []
+    for rows in groups:
+        d, rho = divergence(rows, chip_weights, momentum_col)
+        for x in d:
+            x["grp"] = rows[0]["grp"] if "grp" in rows[0].keys() else None
+        detail.extend(d)
+        if rho is not None:
+            rhos.append(rho)
+    if not detail:
+        return None
+    return {
+        "detail": detail,
+        "rho_median": statistics.median(rhos) if rhos else None,
+        "n_groups": len(rhos),
+        "price_ahead": sorted((x for x in detail if x["gap"] >= DIVERGE_NOTABLE),
+                              key=lambda x: -x["gap"]),
+        "chips_ahead": sorted((x for x in detail if x["gap"] <= -DIVERGE_NOTABLE),
+                              key=lambda x: x["gap"]),
+    }
+
+
 def group_rows(con, date, *, snapshot_id=None):
     """把某資料日的評分列依族群分組。snapshot_id 給定時讀 as-seen 快照(自帶當日族群)。"""
     if snapshot_id:
