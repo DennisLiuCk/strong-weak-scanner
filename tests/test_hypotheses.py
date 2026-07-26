@@ -8,6 +8,7 @@
 分不出高下的名次,不如驗一個方向、門檻、放棄條件都事先寫死的假設。
 """
 import datetime
+import inspect
 import re
 import sys
 import unittest
@@ -65,8 +66,9 @@ class HypothesisRegistryTest(unittest.TestCase):
     def test_status_honours_declared_direction(self):
         """宣告方向為正時,強烈的反向結果必須判成「依宣告放棄」,不能改口說也算成功。"""
         h = dict(hyp.REGISTRY[0])
-        ok = {"t": 2.5, "se": 0.1, "mean": 0.25, "eff_obs": 12.0, "se_blocked": False}
-        bad = {"t": -2.5, "se": 0.1, "mean": -0.25, "eff_obs": 12.0, "se_blocked": False}
+        # 門檻隨 eff_obs 分級(eff=40 → 2.4),故用 t=±3.0 才確定過門檻
+        ok = {"t": 3.0, "se": 0.1, "mean": 0.3, "eff_obs": 40.0, "se_blocked": False}
+        bad = {"t": -3.0, "se": 0.1, "mean": -0.3, "eff_obs": 40.0, "se_blocked": False}
         self.assertIn("達成", hyp.status(h, ok))
         self.assertIn("放棄", hyp.status(h, bad))
         h["direction"] = "negative"
@@ -86,6 +88,24 @@ class HypothesisRegistryTest(unittest.TestCase):
         src = (ROOT / "scripts" / "hypotheses.py").read_text(encoding="utf-8")
         self.assertNotIn("from score import", src)
         self.assertNotIn("import score", src)
+
+    def test_operational_definition_has_no_order_dependence(self):
+        """2026-07-26 審查發現:原本用「s_price 排名切前 1/3」,但 93% 的 (日,族群) 格
+        在邊界有平手,穩定排序 → 選中誰取決於 db 列序,結果不可重現(t 由 1.4 掉到 0.2)。
+        改用分數門檻後成員集合由分數唯一決定。這裡釘住「不得再出現排名切片」。"""
+        src = inspect.getsource(hyp.eval_momentum_chip_agreement)
+        self.assertIn("MOMENTUM_MIN_SCORE", src, "動能領先者要用分數門檻界定")
+        self.assertNotIn("sorted(", src, "不得用排序切片——整數分數會平手,結果依列序而變")
+        self.assertNotIn("// 3", src)
+
+    def test_spec_sha_covers_the_code_that_actually_enforces_the_verdict(self):
+        """主要判準是「NW t 是否過門檻」,所以 stats_ci 的實作與門檻表、以及 status()
+        本身都會改變判定,必須一起入湊——否則改門檻表就能無聲換掉舊登錄的判準。"""
+        src = inspect.getsource(hyp.spec_digest)
+        for must in ("sci.nw_se", "sci.summarize", "sci.t_threshold",
+                     "MIN_EFF_OBS", "T_THRESHOLD", "status", "prior_is",
+                     "MOMENTUM_MIN_SCORE", "CHIP_WEIGHTS"):
+            self.assertIn(must, src, f"spec_digest 必須覆蓋 {must}")
 
     def test_report_section_exists_and_is_wired(self):
         v = (ROOT / "scripts" / "validate.py").read_text(encoding="utf-8")

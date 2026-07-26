@@ -45,16 +45,28 @@ def chip_score(row):
     return sum(w * _get(row, k) for k, w in CHIP_WEIGHTS.items())
 
 
+MOMENTUM_MIN_SCORE = 1   # s_price ≥ 1 = 該族群內 rs20 的前 40%(由 score.py RANK_MAP 定義)
+
+
 def eval_momentum_chip_agreement(ctx, hold_days):
     """H1 的操作定義。**此函式原始碼進 spec_sha,改動即視為新假設。**
 
     對每個 (交易日, 族群):
-      1. 取該族群內 `s_price`(動能)排名前 1/3 的成員(至少 2 檔,族群至少 6 檔有報酬)
-      2. 以這個子集合的 `chip_score` 中位數切成「籌碼同意」與「籌碼反對」兩組
+      1. 「動能領先者」= 該族群內 `s_price` >= MOMENTUM_MIN_SCORE 的成員
+      2. 以這個子集合的 `chip_score` 中位數切成「籌碼同意」(> 中位)與「反對」(<= 中位)
       3. 兩組各算「相對族群中位的前瞻報酬」平均,相減
       4. 同一天各族群的差取平均 → 每日一個數
+
+    **為什麼用分數門檻而不是「排名前 1/3」**(2026-07-26 審查發現):s_price 是 −2..+2 的
+    整數,排名切 1/3 時 **93.0%(910/979)的 (日,族群) 格在邊界上有平手**,而 `sorted`
+    是穩定排序 → 選中誰取決於 dict 插入順序(= db 列序),完全在 spec_sha 之外。實測把
+    同一份資料改用 stock_id 降冪餵入,主要判準從 +0.985%(t=+1.4)變成 +0.121%(t=+0.2)。
+    改用「分數 >= 門檻」後,成員集合由分數唯一決定,與任何排序或列序無關。
+    註:s_price 的分位定義來自 score.py 的 RANK_MAP;若 RANK_MAP 改動,本假設的操作定義
+    即改變,必須重新登錄(RANK_MAP 屬策略旋鈕,改它本來就要重設 IS_CUTOFF)。
+
     報酬用**隔日開盤進出**(訊號 18:07 才產出,close(d) 買不到),不扣成本
-    ——兩組都要付同一筆來回成本,差值裡大致相消。
+    ——兩組都是「買進」子集、各付同一筆來回成本,差值裡相消。
 
     回傳 {date: 當日差(%)}。
     """
@@ -74,12 +86,10 @@ def eval_momentum_chip_agreement(ctx, hold_days):
             if len(rr) < 6:
                 continue
             gmed = statistics.median(rr.values())
-            ranked = sorted(rr, key=lambda s: -_get(rows[s], "s_price"))
-            top = ranked[:max(2, len(ranked) // 3)]
+            top = [s for s in rr if _get(rows[s], "s_price") >= MOMENTUM_MIN_SCORE]
             if len(top) < 2:
                 continue
-            chips = [chip_score(rows[s]) for s in top]
-            cut = statistics.median(chips)
+            cut = statistics.median(chip_score(rows[s]) for s in top)
             agree = [s for s in top if chip_score(rows[s]) > cut]
             against = [s for s in top if chip_score(rows[s]) <= cut]
             if not agree or not against:
@@ -105,33 +115,51 @@ REGISTRY = [
         "hold_days": 10,
         "direction": "positive",          # 事先宣告:預期籌碼同意組較好
         "min_eff_obs": 10.0,              # 有效獨立觀測門檻(= 100 個成熟 OOS 交易日)
-        "success": "OOS 主要判準 t ≥ +2 且有效獨立觀測 ≥ 10",
-        "abandon": "OOS 主要判準 t ≤ −2 且有效獨立觀測 ≥ 10(反向成立),"
-                   "或有效獨立觀測 ≥ 30 仍 |t| < 2(無訊號)",
+        "success": "OOS 主要判準 t 達 stats_ci.t_threshold(eff_obs) 所定門檻(正向)且有效獨立觀測 ≥ 10;該門檻由 MC 校準隨樣本量分級(eff≥12 時為 3.0、eff≥30 時為 2.4),固定 1.96 的實際誤判率是 10~24%",
+        "abandon": "OOS 主要判準達同一門檻但方向相反(反向成立),"
+                   "或有效獨立觀測 ≥ 30 仍未達門檻(無訊號)",
         "prior_is": {
             "note": "登錄時的 in-sample/restated 值,僅記錄本假設的出身,"
                     "**登錄後不得再當證據引用**",
             "source": "構想來自 2026-07-26 對抗性審查(Fable agent)的草稿檢定"
-                      "(+1.94% ±1.19%, t=+1.6);本登錄把操作定義收緊——改用隔日開盤"
-                      "(可成交)、籌碼分數明確排除 s_vol、切點取動能前 1/3 子集合的中位"
-                      "——故數值不同但結論相同(與 0 無法分辨)",
-            "value_pct": 0.985, "se_pct": 0.706, "t": 1.4,
-            "measured_on": "2026-07-26 / data/findmind.db 2026-03-02~07-24 / 89 交易日 / "
-                           "有效獨立觀測 8.9",
+                      "(+1.94% ±1.19%, t=+1.6)。本登錄把操作定義收緊三處:改用隔日開盤"
+                      "(可成交)、籌碼分數明確排除 s_vol、動能領先者改用「s_price >= 1」"
+                      "分數門檻(原本的排名切 1/3 有 93% 的格在邊界平手,結果會隨 db 列序"
+                      "改變 → 不可重現)。故數值不同但結論相同(與 0 無法分辨)",
+            "value_pct": 0.910, "se_pct": 0.782, "t": 1.2,
+            "measured_on": "2026-07-26 / data/findmind.db 2026-03-02~07-24 / 69 交易日 / "
+                           "有效獨立觀測 6.9;已驗證與餵入順序無關(升冪/降冪差 <1e-12)",
         },
-        "spec_sha": "4ffd50d0301e0c49",   # 由 spec_digest() 產生;改規格或評估函式就會不符
+        "spec_sha": "562d0d24199e7561",   # 由 spec_digest() 產生;改規格或評估函式就會不符
     },
 ]
 
 
 def spec_digest(h):
-    """規格 + 評估函式原始碼的雜湊。任一邊改動 → 不符 → 視為新假設。"""
+    """規格 + 操作定義 + **實際執法程式**的雜湊。任一邊改動 → 不符 → 視為新假設。
+
+    2026-07-26 審查指出的缺口已補上:主要判準是「NW t 是否過門檻」,所以
+    `stats_ci`(nw_se / summarize / MIN_EFF_OBS / t 門檻表)與 `status()` 本身都會改變判定,
+    必須一起入湊——否則有人改了門檻表,舊登錄的判準就被無聲換掉了。
+    `prior_is` 也入湊,免得「不得再引用」的出身數字被事後改寫。
+    """
     core = {k: h[k] for k in ("id", "name", "registered", "evaluator", "hold_days",
                               "direction", "min_eff_obs", "success", "abandon")}
-    src = inspect.getsource(EVALUATORS[h["evaluator"]])
-    blob = json.dumps(core, ensure_ascii=False, sort_keys=True) + "\n" + src
-    blob += "\n" + json.dumps(CHIP_WEIGHTS, sort_keys=True)
-    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
+    core["prior_is"] = h["prior_is"]
+    parts = [
+        json.dumps(core, ensure_ascii=False, sort_keys=True),
+        inspect.getsource(EVALUATORS[h["evaluator"]]),
+        json.dumps(CHIP_WEIGHTS, sort_keys=True),
+        f"MOMENTUM_MIN_SCORE={MOMENTUM_MIN_SCORE}",
+        inspect.getsource(chip_score), inspect.getsource(_get),
+        inspect.getsource(status),
+        # 執法用的統計實作:改 SE 演算法或門檻表都會改變判定
+        inspect.getsource(sci.nw_se), inspect.getsource(sci.summarize),
+        inspect.getsource(sci.t_threshold),
+        f"MIN_EFF_OBS={sci.MIN_EFF_OBS}",
+        json.dumps([list(x) for x in sci.T_THRESHOLD]) + f"/{sci.T_THRESHOLD_LARGE}",
+    ]
+    return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()[:16]
 
 
 def evaluate(h, ctx, date_filter=None):
@@ -144,17 +172,21 @@ def evaluate(h, ctx, date_filter=None):
 
 
 def status(h, s):
-    """依**事先宣告**的條件判定,不臨場解釋。"""
+    """依**事先宣告**的條件判定,不臨場解釋。
+
+    門檻取 `stats_ci.t_threshold(eff_obs)`(MC 校準,隨有效獨立觀測分級)——
+    固定 1.96 在這種樣本量下的實際誤判率是 10~24%,不是 5%。
+    """
     if not s:
         return "尚無資料"
     if s.get("se_blocked") or s["eff_obs"] < h["min_eff_obs"]:
         return f"累積中(需有效獨立觀測 ≥ {h['min_eff_obs']:.0f},現 {s['eff_obs']:.1f})"
-    t = s["t"]
+    t, thr = s["t"], sci.t_threshold(s["eff_obs"])
     want = 1 if h["direction"] == "positive" else -1
-    if t is not None and t * want >= 1.96:
-        return "**達成宣告的成功條件**"
-    if t is not None and t * want <= -1.96:
-        return "**反向成立 → 依宣告放棄**"
+    if t is not None and t * want >= thr:
+        return f"**達成宣告的成功條件**(門檻 {thr:.1f})"
+    if t is not None and t * want <= -thr:
+        return f"**反向成立 → 依宣告放棄**(門檻 {thr:.1f})"
     if s["eff_obs"] >= 30:
         return "**無訊號 → 依宣告放棄**"
-    return "累積中(尚未達判定門檻)"
+    return f"累積中(尚未達判定門檻 {thr:.1f})"

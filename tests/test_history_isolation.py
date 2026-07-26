@@ -20,8 +20,12 @@ import fetch_daily as fd
 
 
 def run(script, *args):
+    # errors="replace":子行程的中文訊息在 Windows 預設是 cp950,用 utf-8 硬解會讓
+    # subprocess 的讀取執行緒炸掉、r.stderr 變成 None(CLAUDE.md 警告的 cp950 雷)。
+    # CI 是 ubuntu 所以永遠綠,這個洞只在本機出現 → 必須容錯解碼。
     return subprocess.run([sys.executable, str(SCRIPTS / script), *args],
-                          cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+                          cwd=ROOT, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace")
 
 
 class HistoryIsolationTest(unittest.TestCase):

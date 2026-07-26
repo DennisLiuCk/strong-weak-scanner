@@ -1933,7 +1933,10 @@ def main():
         ap.error("--backfill-expanded-fields 不可與 --final-pass 同時使用")
     # 正式 db 只放 2026-03-02(策略起算日)之後的資料。要往前延伸必須改用 --db,
     # 否則會把回補歷史混進正在累積證據的正式庫。
-    if args.start and args.start < HISTORY_FLOOR and os.path.abspath(args.db) == os.path.abspath(DB):
+    # normcase:Windows 檔名不分大小寫,單純比 abspath 時 --db data/FINDMIND.DB 會繞過護欄
+    same_db = (os.path.normcase(os.path.abspath(args.db))
+               == os.path.normcase(os.path.abspath(DB)))
+    if args.start and args.start < HISTORY_FLOOR and same_db:
         ap.error(f"--start {args.start} 早於 {HISTORY_FLOOR}(正式 db 的起算日)。"
                  f"歷史延伸請加 --db 指向另一個檔案,例如 --db data/history.db")
 

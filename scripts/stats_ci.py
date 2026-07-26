@@ -116,14 +116,44 @@ def fmt(s, digits=3):
     return f"{s['mean']:+.{digits}f} ±{s['se']:.{digits}f} (t={s['t']:+.1f})"
 
 
-def verdict(s, t_strong=1.96):
-    """一句話判讀。刻意不說「有效/無效」,只說證據夠不夠分辨。"""
+# ── t 門檻必須隨有效獨立觀測分級 ────────────────────────────────────────
+# 1.96 是「大樣本、獨立」下的 5% 臨界值,在這裡完全不適用。用 repo 自己的 nw_se 跑
+# Monte Carlo(null 為真、4000 reps、AR(1) φ=0.63 貼合實測日 IC 自相關 +0.63):
+#
+#   有效獨立觀測   null 下 |t| 的 q95   用 1.96 的實際誤判率
+#        3.0             4.02                 24.3%
+#        5.0             3.15                 17.9%
+#        8.9             2.62                 13.0%
+#       15.0             2.46                 11.4%
+#       30.0             2.36                 10.1%
+#
+# 也就是說,原本用 1.96 判「可分辨於 0」時,誤判率是 10~24% 而不是 5%。
+# 下表取上述 q95 並向上取整,故各級都偏保守。改用純 MA(F) null(自相關更強)門檻會更高,
+# 真實序列介於兩者之間 → 取較寬鬆的 AR 版當門檻已是下限。
+T_THRESHOLD = ((6.0, 4.0), (12.0, 3.0), (30.0, 2.5))   # (eff_obs 上界, 門檻)
+T_THRESHOLD_LARGE = 2.4
+
+
+def t_threshold(eff_obs):
+    """依有效獨立觀測回傳該用的 |t| 門檻(MC 校準,見上表)。"""
+    for upper, thr in T_THRESHOLD:
+        if eff_obs < upper:
+            return thr
+    return T_THRESHOLD_LARGE
+
+
+def verdict(s, t_strong=None):
+    """一句話判讀。刻意不說「有效/無效」,只說證據夠不夠分辨。
+
+    門檻預設隨 `eff_obs` 分級;傳 t_strong 可覆寫(僅供測試/診斷)。
+    """
     if not s:
         return "樣本不足"
     if s.get("se_blocked"):
         return f"**獨立觀測 <{MIN_EFF_OBS:.0f},不判讀**"
     if s.get("t") is None:
         return "樣本不足"
-    if abs(s["t"]) >= t_strong:
-        return "可分辨於 0"
-    return "**與 0 無法分辨**"
+    thr = t_strong if t_strong is not None else t_threshold(s.get("eff_obs") or 0.0)
+    if abs(s["t"]) >= thr:
+        return f"可分辨於 0(門檻 {thr:.1f})"
+    return f"**與 0 無法分辨**(門檻 {thr:.1f})"

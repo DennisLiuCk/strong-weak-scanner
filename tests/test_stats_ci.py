@@ -79,14 +79,33 @@ class StatsCiTest(unittest.TestCase):
         self.assertAlmostEqual(s["t"], s["mean"] / s["se"])
 
     def test_verdict_wording_never_claims_effectiveness(self):
-        """判讀只說「能不能分辨」,不得說「有效/無效」——t<2 不代表為 0。"""
-        strong = {"t": 3.0, "se": 0.01, "mean": 0.03}
-        weak = {"t": 1.0, "se": 0.01, "mean": 0.01}
+        """判讀只說「能不能分辨」,不得說「有效/無效」——未過門檻不代表為 0。"""
+        strong = {"t": 5.0, "se": 0.01, "mean": 0.05, "eff_obs": 40.0}
+        weak = {"t": 1.0, "se": 0.01, "mean": 0.01, "eff_obs": 40.0}
         self.assertIn("可分辨", sci.verdict(strong))
         self.assertIn("無法分辨", sci.verdict(weak))
         for v in (sci.verdict(strong), sci.verdict(weak), sci.verdict(None)):
             self.assertNotIn("有效", v)
             self.assertNotIn("無效", v)
+
+    def test_t_threshold_is_graded_by_effective_observations(self):
+        """1.96 是「大樣本、獨立」的臨界值,在重疊窗小樣本下實際誤判率 10~24%。
+        門檻必須隨有效獨立觀測分級,且永遠嚴於 1.96。"""
+        self.assertGreater(sci.t_threshold(3.0), sci.t_threshold(8.0))
+        self.assertGreater(sci.t_threshold(8.0), sci.t_threshold(20.0))
+        self.assertGreaterEqual(sci.t_threshold(20.0), sci.t_threshold(100.0))
+        for eff in (3.0, 5.0, 10.0, 20.0, 50.0, 1e6):
+            self.assertGreater(sci.t_threshold(eff), 1.96,
+                               f"eff={eff} 的門檻不得寬鬆於 1.96")
+
+    def test_borderline_t_is_not_declared_distinguishable_at_small_samples(self):
+        """實例:composite_s 修正桶 t=+2.3、eff=3.0。用 1.96 會判「可分辨」,
+        但 MC 顯示該樣本量下 null 的 |t| q95 約 4.0 → 必須判成無法分辨。"""
+        s = {"t": 2.3, "se": 0.022, "mean": 0.053, "eff_obs": 3.0}
+        self.assertIn("無法分辨", sci.verdict(s))
+        # 同一個 t 值在大樣本下仍不夠(最寬鬆的門檻是 2.4);要 2.6 才過
+        self.assertIn("無法分辨", sci.verdict({**s, "eff_obs": 200.0}))
+        self.assertIn("可分辨", sci.verdict({**s, "t": 2.6, "eff_obs": 200.0}))
 
     def test_few_overlapping_days_must_not_produce_a_t_value(self):
         """實測過的危險失效模式:5 個成熟日配前瞻 5 日(lag=4),5 個高度重疊的日 IC
