@@ -94,7 +94,10 @@ score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ 
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
                  archive 同資料日首次建立後不覆寫;本地重跑只更新 index.html
                  含台積電專區(觀察層):ref 表+fund_map[2330]+事件錨點 → __TSMC_JSON__
-validate.py      → reports/ 週報(§⑥=觀察因子 IC)
+validate.py      → reports/ 週報(§⑥=觀察因子 IC、§⑦=元素邊際貢獻、§⑧=tier 持續性、
+                 §⑨=判讀強度)。**§⑨ 是讀其他節的前置**:格數不是獨立樣本,前瞻窗重疊
+                 使日 IC 自相關 ≈ +0.6,配 Newey-West 後 composite_s 全期 t=+0.7 與 0
+                 無法分辨;10 個成熟日 ≈ 1 個獨立觀測。點估計 t<2 時不得當調旋鈕依據
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
 qual_notes.py    notes/qualitative/*.md(年報MD&A/法說會重點,人工撰寫)狀態追蹤+骨架建立
                  ⚠ 唯讀盤點工具,不抓資料;已有筆記的股票不會被要求重寫,除非模板版本升級

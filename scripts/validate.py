@@ -27,6 +27,7 @@ from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import signal_structure as sig   # §⑦:元素邊際貢獻與結構指標(共用 score.WEIGHTS)
+import stats_ci as sci           # §⑨:NW 標準誤 / 有效獨立觀測 / episode 計數
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -197,6 +198,10 @@ def main():
     # ── ① 元素 IC ──────────────────────────────────────────────
     wg = defaultdict(lambda: defaultdict(list))    # factor -> bucket -> [ic per date×group]
     pool = defaultdict(lambda: defaultdict(list))  # factor -> bucket -> [ic per date]
+    # §⑨ 判讀強度用:同一份 IC 但**保留日期**。格數(date×group)不是獨立樣本——
+    # 前瞻窗重疊使日 IC 自相關(實測 lag-1 ≈ +0.7),必須先收斂成「每日一個數」
+    # 才能算 Newey-West 標準誤。
+    wg_by_date = defaultdict(lambda: defaultdict(dict))   # factor -> bucket -> {date: [ic]}
     for d in dates:
         if d not in v2:
             continue
@@ -223,6 +228,7 @@ def main():
                 if ic is not None:
                     for b in bs:
                         wg[el][b].append(ic)
+                        wg_by_date[el][b].setdefault(d, []).append(ic)
             if d in v1:
                 ic = spearman([v1[d][s]["composite"] for s in sids if s in v1[d]],
                               [fwd(d, s) for s in sids if s in v1[d]])
@@ -450,6 +456,8 @@ def main():
     w("")
     w("## ① 元素 rank-IC(族群內 = 汰弱留強的正確量尺)")
     w("")
+    w("> 下表只有點估計與格數。**格數不是獨立樣本**——證據強度(標準誤、有效獨立觀測、連續區段)見 §⑨,t<2 時大小順序沒有意義。")
+    w("")
     w("| 因子 | 族群內·全期 | 族群內·OOS | 族群內·修正 | 族群內·多頭 | 混池·全期 |")
     w("|---|---|---|---|---|---|")
     order = ["composite_s", "composite", "v1_composite", "s_price", "s_resil", "s_trust",
@@ -668,6 +676,41 @@ def main():
         w("")
         w("> 中位停留排除右截尾的尾段(只看到一半的區段當成完整會低估);"
           "排除本身也略偏短,兩種偏誤同向,故此值宜視為停留天數的下限。")
+    w("")
+    # ── ⑨ 判讀強度 ────────────────────────────────────────────────
+    # 2026-07-26 對抗性審查的結論:在此之前報告只有點估計與 n=格數,沒有任何誤差量。
+    # 補算後三個候選策略的全期 IC(+0.021/+0.034/+0.040)t 值全部 <2——先前那些
+    # 「哪個比較好」的比較,比的是三個統計上等於零的數字。
+    w("## ⑨ 判讀強度(標準誤 / 獨立觀測 / episode)")
+    w("")
+    w(f"格數(date×group)**不是**獨立樣本:前瞻 {F} 日的窗互相重疊,日 IC 高度自相關。"
+      f"下表先把同一天各族群的 IC 收斂成「每日一個數」,再用 Newey-West"
+      f"(lag={sci.overlap_lag(F)})估標準誤。")
+    w("")
+    w("| 因子 | 桶 | 日均 IC ±NW SE (t) | 交易日 | 有效獨立觀測 | 連續區段 | 判讀 |")
+    w("|---|---|---|---|---|---|---|")
+    for el in ("composite_s", "s_price", "s_resil", "s_foreign", "s_dip", "s_trust", "s_margin"):
+        for b in ("全期", "OOS", "修正", "多頭"):
+            by_d = wg_by_date[el].get(b) or {}
+            if not by_d:
+                continue
+            ds = sorted(by_d)
+            s = sci.summarize([mean(by_d[d]) for d in ds], F, ds, dates)
+            if not s:
+                continue
+            w(f"| {el} | {b} | {sci.fmt(s)} | {s['n_days']} | **{s['eff_obs']:.1f}** | "
+              f"{s['episodes']} | {sci.verdict(s)} |")
+    ac = sci.autocorr1([mean(v) for _, v in sorted((wg_by_date['composite_s'].get('全期') or {}).items())])
+    if ac is not None:
+        w("")
+        w(f"- 日 IC 序列 lag-1 自相關 = **{ac:+.2f}**——這就是不能用一般標準誤的原因。")
+    w(f"- 有效獨立觀測 = 交易日數 ÷ {F}。{n_oos_mature} 個成熟 OOS 日 ≈ "
+      f"**{sci.effective_obs(n_oos_mature, F):.1f} 個獨立觀測**。")
+    w("- 連續區段 = 該桶的交易日切成幾段連續期間。修正桶若只來自少數幾段大跌,"
+      "「修正期有效」講的是那幾個事件,不是規律。")
+    w("")
+    w("> **規矩**:沒有標準誤與區段數的數字,不得作為調旋鈕的依據——"
+      "點估計的大小順序在 t<2 時沒有意義。§①②③ 的點估計請一律回到本節查證據強度。")
     w("")
     w("## 判讀警語")
     w("")
