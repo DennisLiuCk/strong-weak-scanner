@@ -89,15 +89,25 @@ class AbsoluteReturnContractTest(unittest.TestCase):
 
     # ---------- 顯示格式 ----------
 
-    def test_small_negative_return_never_renders_as_zero_percent(self):
-        """−0.4% 印成「-0%」會把在跌讀成持平;|r|<1 必須保留一位小數。"""
-        self.assertIn("Math.abs(r).toFixed(Math.abs(r)<1?1:0)", self.template)
-        self.assertNotIn("r.toFixed(0)+'%'", self.template)
+    def test_all_percent_rendering_goes_through_the_single_formatter(self):
+        """小數位、U+2212 負號、−0 中性這三件事的**行為**由
+        test_dashboard_js_behaviour 用 node 實際跑過;這裡只釘「沒有人繞過它」——
+        行內各寫各的正是三個格式 bug 的來源。"""
+        for spot in ("text:fmtPct(r)",                       # 分層帶個股列
+                     "text:fmtPct(a.med,1)",                 # 族群排行榜絕對列
+                     "text:fmtPct(s.r20,1)",                 # 族群內個股表格列
+                     "text:'20日 '+fmtPct(r)"):              # 時間尺度卡
+            self.assertIn(spot, self.template, f"{spot} 沒有走 fmtPct")
+        self.assertNotIn("(r>=0?'+':'−')", self.template)
+        self.assertNotIn("(a.med>=0?'+':'−')", self.template)
 
-    def test_negative_sign_is_unicode_minus_everywhere(self):
-        """族群列與個股列的負號要一致(U+2212),不混用 toFixed 產生的 ASCII hyphen。"""
-        for frag in ("(r>=0?'+':'−')", "(a.med>=0?'+':'−')"):
-            self.assertIn(frag, self.template)
+    def test_absolute_return_appears_on_every_per_stock_surface(self):
+        """三個逐檔瀏覽介面都要有絕對報酬。原本只加在分層帶的 pill 上,
+        族群內個股表格(主要瀏覽介面)仍只有相對綜合分,同一個數字在兩個畫面
+        說不同的故事。"""
+        self.assertIn("r20:s.ret20", self.template, "_slim 投影要帶 r20 給族群內個股表格")
+        self.assertIn("r20:s.ret20,tier:s.tier_confirmed", self.template)
+        self.assertIn('"r20": x["raw"]["swing"]', self.builder, "時間尺度卡要帶絕對報酬")
 
     def test_caveat_is_computed_from_live_data_never_hardcoded(self):
         """警語數字寫死會在行情反轉後變成假話;且 0 檔時整句必須消失。"""

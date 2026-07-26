@@ -217,7 +217,7 @@ svg{display:block;overflow:visible}
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
       TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
-function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,tier:s.tier_confirmed,
+function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,
   tierLabel:s.tier_label,waiting:s.tier_waiting,
   f:(s.factors||[]).map(function(f){return [f.label,f.score,f.weight];}),
   cs:(s.cells||[]).map(function(c){return c[0];}), cv:(s.cells||[]).map(function(c){return c[1];}), cr:(s.cells||[]).map(function(c){return c[3];}), cd:(s.cells||[]).map(function(c){return c[5]||'';}),
@@ -629,16 +629,24 @@ function buildDiverge(){
 /* 時間尺度視角:整套訊號只有 20 日一個週期,這裡把同一檔放到短(5日)/波段(20日)/
    趨勢(20日vs60日)三個尺度上各排一次名。三欄都是族群內平均秩百分位,所以可比。
    同樣是描述、不計分、不進 tier、不作前瞻報酬主張。 */
-const LENS_HI=60, LENS_LO=40;   // 靠前/靠後的門檻(百分位點)
+/* 標籤只能描述**名次形狀**,不能講價格事件。原本寫成「波段轉強」「短線剛回檔」
+   「反彈」,那是在敘述漲跌與方向,但這三欄是族群內橫斷面排名,不含漲跌資訊——
+   2026-07-24 實測:14 檔被標「波段轉強」的裡面有 10 檔 20 日絕對報酬是負的
+   (立隆電 −34.9%、佳邦 −21.9%、興勤 −21.8%),而興勤在上一區才剛被標紅 ↓
+   「相對靠前但絕對在跌」;8 檔「短線反彈」裡有 3 檔收盤根本仍低於 ma5,
+   根本沒有反彈,只是在一群更低於 ma5 的同業裡排前面。這正是絕對報酬那一版
+   要修掉的毛病,卻在兩區之後又犯一次。現在標籤一律講「名次」,漲跌交給旁邊的
+   絕對報酬欄自己說;顏色也不再暗示好壞(名次形狀沒有好壞)。 */
+const LENS_HI=60, LENS_LO=40;   // 名次靠前/靠後的門檻(百分位點)
 function lensShape(s,w,t){
   const hi=v=>v>=LENS_HI, lo=v=>v<LENS_LO;
-  if(hi(s)&&hi(w)&&hi(t)) return ['三個週期都靠前','var(--strong)'];
-  if(lo(s)&&lo(w)&&lo(t)) return ['三個週期都靠後','var(--weak)'];
-  if(lo(s)&&hi(w)&&hi(t)) return ['中長期靠前，短線剛回檔','var(--amber)'];
-  if(hi(s)&&lo(w)&&lo(t)) return ['短線反彈，中長期仍在後段','var(--amber)'];
-  if(hi(w)&&lo(t))        return ['波段轉強，長期趨勢還沒跟上','var(--teal)'];
-  if(hi(t)&&lo(w))        return ['長期趨勢仍靠前，波段已轉弱','var(--amber)'];
-  return ['週期之間看法分歧','var(--muted)'];
+  if(hi(s)&&hi(w)&&hi(t)) return '三個週期名次都靠前';
+  if(lo(s)&&lo(w)&&lo(t)) return '三個週期名次都靠後';
+  if(lo(s)&&hi(w)&&hi(t)) return '中長期名次靠前、短期靠後';
+  if(hi(s)&&lo(w)&&lo(t)) return '短期名次靠前、中長期靠後';
+  if(hi(w)&&lo(t))        return '波段名次靠前、趨勢靠後';
+  if(hi(t)&&lo(w))        return '趨勢名次靠前、波段靠後';
+  return '三個週期名次分歧';
 }
 function lensBar(label,v,raw){
   const col=v>=LENS_HI?'var(--strong)':(v<LENS_LO?'var(--weak)':'var(--muted)');
@@ -665,7 +673,9 @@ function buildLenses(){
     const rows=L.all.filter(x=>!g||x.g===g);
     const shown=showAll?rows:rows.slice(0,12);
     shown.forEach(x=>{
-      const [txt,col]=lensShape(x.s,x.w,x.t);
+      const txt=lensShape(x.s,x.w,x.t);
+      // 名次形狀旁邊一定要有絕對報酬,否則「名次靠前」還是會被讀成「在漲」
+      const r=x.r20, rc=r==null?'var(--muted)':(r>0?'var(--strong)':(r<0?'var(--weak)':'var(--muted)'));
       listBox.appendChild(h('div',{class:'card clickrow',role:'button',tabindex:'0',
         style:'padding:13px 15px;cursor:pointer',
         onclick:()=>openStockDetail(x.id),
@@ -675,7 +685,11 @@ function buildLenses(){
           h('span',{class:'mono',style:'font-size:10.5px;color:var(--muted)',text:x.id}),
           h('span',{style:'font-size:10.5px;color:var(--muted)',text:x.g}),
           x.tier?h('span',{class:'chip',style:'font-size:10px',text:x.tier}):null),
-        h('div',{style:`font-size:11px;color:${col};font-weight:700;margin-bottom:7px`,text:txt}),
+        h('div',{style:'display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:7px'},
+          h('span',{style:'font-size:11px;color:var(--ink2);font-weight:700',text:txt}),
+          r==null?null:h('span',{class:'mono',style:`font-size:11px;font-weight:700;color:${rc}`,
+            title:'20 日絕對報酬（名次是族群內排名，與漲跌是兩件事）',
+            text:'20日 '+fmtPct(r)})),
         h('div',{style:'display:grid;gap:4px'},
           lensBar('短',x.s,x.raw.short),lensBar('波',x.w,x.raw.swing),lensBar('趨',x.t,x.raw.trend))));
     });
@@ -693,14 +707,16 @@ function buildLenses(){
         +`短期↔趨勢 <b class="mono">${rho('short-trend')}</b> / ${rhoToday('short-trend')}、`
         +`短期↔波段 <b class="mono">${rho('short-swing')}</b> / ${rhoToday('short-swing')}、`
         +`波段↔趨勢 <b class="mono">${rho('swing-trend')}</b> / ${rhoToday('swing-trend')}。`
-        +`三者都遠低於 0.8 的冗餘門檻，其中短期與趨勢幾乎獨立。`
+        +`三者都低於 0.8 的冗餘門檻。`
         +`今日三欄極差中位 <b>${L.spread_median.toFixed(0)}</b> 個百分位點，`
         +`<b>${L.n_notable}</b> 檔達 ${L.threshold} 點以上。`}),
     h('p',{style:'margin:8px 0 0;font-size:12px;color:var(--muted);line-height:1.6',
       text:`中位取自 ${L.first_date} 起的 ${L.n_days} 個交易日——趨勢欄需要 60 個交易日暖身，`
-        +`所以這個視角比其他區年輕，且窗口幾乎落在同一段回檔裡；在別的行情下 ρ 未必相同。`
-        +`單日 ρ 很吵（同一組視角當日可以差到 0.3 以上），所以並列全期中位；`
-        +`這裡只把 ρ 當「會不會重複」的篩子，不當假設檢定，故不附標準誤。`}));
+        +`所以這個視角比其他區年輕。這段窗口不是單一走勢：大盤先漲 8.2% 到 6/22 的期間高，`
+        +`再回 7.9%；但 41 天仍然很短，在別的行情下 ρ 未必相同。`
+        +`單日 ρ 很吵（短↔趨當日 −0.29 vs 全期中位 +0.04），所以並列全期中位。`
+        +`ρ 低不等於兩個視角獨立——波段與趨勢共用同一段 20 日價格，機械相關的底線`
+        +`本頁尚未拆解；這裡只把 ρ 當「會不會重複」的篩子，不當假設檢定，故不附標準誤。`}));
   return [h('p',{class:'kicker',text:'三個時間尺度'}),
     h('h2',{class:'sec',text:'時間尺度 · 同一檔在短、波段、長期的位置'}),
     h('p',{class:'lead',html:'評分只看一個週期（20 日），但「這檔強不強」在不同週期可以是相反的答案。'
@@ -860,6 +876,16 @@ function deltaTxt(txt){ if(!txt)return{t:'',c:'var(--muted)'}; const m=txt.match
 /* 分數靠前的三個 tier(其餘是中性/弱層,相對後段本來就不會被誤讀成在漲)。 */
 const UPPER_TIERS={'真強':1,'蓄勢·外資佈局':1,'強但過熱':1};
 
+/* 百分比的單一格式化入口。三件事必須一致,所以不各寫各的:
+   ① 負號用 U+2212,不是 toFixed 產生的 ASCII hyphen;
+   ② |v|<1 保留一位小數 —— 否則 −0.4% 印成「-0%」,把在跌讀成持平;
+   ③ **0 與 −0 都不給正負號、不上漲跌色**。JS 裡 -0<0 是 false 而 -0>=0 是 true,
+      用 `v>=0?'+':'−'` 會把後端 round(−0.04,1) 得到的 −0.0 印成綠色的「+0.0%」。 */
+function fmtPct(v,dp){ if(v==null) return '—';
+  const d=dp!=null?dp:(Math.abs(v)<1?1:0);
+  return (v>0?'+':(v<0?'−':''))+Math.abs(v).toFixed(d)+'%'; }
+function pctCol(v){ return v==null||v===0?'var(--muted)':(v>0?'var(--strong)':'var(--weak)'); }
+
 /* 相對強勢層裡有多少檔 20 日絕對報酬其實是負的——由當日資料現算,不寫死。
    數字為 0 時整句不出現,避免在多頭時留下沒有指涉對象的警語。 */
 function absCaveat(){ const up=D.allStocks.filter(s=>UPPER_TIERS[s.tier]&&s.r20!=null);
@@ -873,11 +899,10 @@ function absCaveat(){ const up=D.allStocks.filter(s=>UPPER_TIERS[s.tier]&&s.r20!
 /* 「動能 vs 全體」是族群間的**相對**名次:全市場一起跌時,跌得最少的族群照樣排第一。
    絕對列補上該族群 20 日中位報酬與上漲家數,讓「領漲」與「抗跌」分得開。 */
 function absLine(a){ if(!a) return null;
-  const c=a.med>=0?'var(--strong)':'var(--weak)';
   return h('div',{style:'margin-top:4px;font-size:10px;color:var(--muted);white-space:nowrap',
     title:`族群 ${a.n} 檔的 20 日還原報酬中位數,以及其中 ${a.pos} 檔為正`},
     h('span',{text:'絕對 '}),
-    h('span',{class:'mono',style:`color:${c};font-weight:700`,text:(a.med>=0?'+':'−')+Math.abs(a.med).toFixed(1)+'%'}),
+    h('span',{class:'mono',style:`color:${pctCol(a.med)};font-weight:700`,text:fmtPct(a.med,1)}),
     h('span',{text:` · ${a.pos}/${a.n} 檔漲`})); }
 
 function metricCell(v,valTxt,col,d,max){ return h('div',{},
@@ -931,7 +956,14 @@ function buildStocks1c(){
       stripEl(s,short5),
       h('div',{},chipRow(stockChips(s)),
         h('div',{style:'display:flex;align-items:center;gap:8px;margin-top:9px'},h('span',{style:'font-size:10px;color:var(--muted);white-space:nowrap',text:'綜合'}),
-          h('div',{style:'flex:1'},diverg(s.comp,COMP_MAX,160,13)),h('span',{class:'mono',style:`font-size:12.5px;font-weight:600;color:${compCol}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)})))); }
+          h('div',{style:'flex:1'},diverg(s.comp,COMP_MAX,160,13)),h('span',{class:'mono',style:`font-size:12.5px;font-weight:600;color:${compCol}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)})),
+        /* 這張表是逐檔瀏覽的主要介面,綜合分只有族群內相對意義——絕對報酬要跟分層帶
+           一樣並列在這裡,否則同一個數字在兩個畫面說不同的故事。 */
+        s.r20==null?null:h('div',{style:'display:flex;align-items:center;gap:8px;margin-top:4px'},
+          h('span',{style:'font-size:10px;color:var(--muted);white-space:nowrap',text:'20日'}),
+          h('div',{style:'flex:1'}),
+          h('span',{class:'mono',style:`font-size:11.5px;font-weight:600;color:${pctCol(s.r20)}`,
+            title:'20 日絕對報酬（綜合分是族群內相對排名，與漲跌是兩件事）',text:fmtPct(s.r20,1)})))); }
   function apply(){ const all=D.stocks.filter(s=>s.g===curG);
     const f=all.filter(s=>{const t=(s.nm+' '+s.id).toLowerCase();return !q||t.includes(q);}).sort((a,b)=>{const av=sortKey==='comp'?a.comp:(a.cs[+sortKey]||0),bv=sortKey==='comp'?b.comp:(b.cs[+sortKey]||0),d=sortDesc?bv-av:av-bv;return d||(b.comp-a.comp);});
     rows.replaceChildren(...f.map((s,i)=>row(s,i))); count.textContent=grp(curG).nm+' '+f.length+' / '+all.length+' 檔'; }
@@ -1051,14 +1083,15 @@ function buildTier(){
     if(curG)mem=mem.filter(s=>s.g===curG);
     return mem.sort((a,b)=>b.comp-a.comp); }
   /* 整套分數都是**族群內相對**,所以「相對強勢」可能與「絕對在跌」並存
-     ——2026-07-24 實測 11 檔相對強勢裡有 7 檔 20 日絕對報酬為負,最深 −21.8%。
+     ——2026-07-24 實測:真強 11 檔裡 7 檔 20 日絕對報酬為負(最深 −21.8%);
+     擴到三個上層 tier(真強/蓄勢·外資佈局/強但過熱)是 23 檔裡 15 檔為負,最深 −38.2%。
      只顯示綜合分會讓人把「相對強」讀成「在漲」,故每一列並列 20 日絕對報酬;
      相對靠前的層若絕對為負,額外標記。 */
   function stockPill(s){ const cc=s.comp>=0?'var(--strong)':'var(--weak)';
-    const r=s.r20, rc=r==null?'var(--muted)':(r>=0?'var(--strong)':'var(--weak)');
+    const r=s.r20, rc=pctCol(r);
     const mismatch=r!=null&&r<0&&UPPER_TIERS[s.tier];
     return h('span',{class:'clickrow',role:'button',tabindex:'0',
-      title:r==null?'':`20 日絕對報酬 ${(r>=0?'+':'')+r.toFixed(1)}%`
+      title:r==null?'':`20 日絕對報酬 ${fmtPct(r,1)}`
         +(mismatch?'(族群內相對靠前,但絕對報酬為負)':''),
       onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
       style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid '
@@ -1066,10 +1099,8 @@ function buildTier(){
       h('b',{style:'font-weight:700',text:s.nm}),h('span',{class:'mono',style:'font-size:10px;color:var(--muted)',text:grp(s.g).short}),
       s.cs&&s.cs.length?microStrip(s.cs):null,
       h('span',{class:'mono',style:`font-size:11px;font-weight:600;color:${cc}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)}),
-      /* 小數位動態:|r|<1 用一位,否則整數——否則 −0.4% 會印成「-0%」,把在跌讀成持平。
-         負號用 U+2212 與族群列一致,不用 toFixed 產生的 ASCII hyphen。 */
       r==null?null:h('span',{class:'mono',style:`font-size:10.5px;color:${rc};opacity:.9`,
-        text:(r>=0?'+':'−')+Math.abs(r).toFixed(Math.abs(r)<1?1:0)+'%'}),
+        text:fmtPct(r)}),
       mismatch?h('span',{style:'font-size:10px;color:var(--weak);font-weight:800',text:'↓'}):null); }
   const bands=h('div',{style:'display:flex;flex-direction:column;gap:11px'});
   function renderBands(){ bands.replaceChildren(...order.map(([k,t,d])=>{

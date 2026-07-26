@@ -1389,6 +1389,10 @@ def build_lenses(con, last, names, group_names):
             return None
         # 冗餘判定不能只看一天:單日 ρ 很吵(2026-07-24 的 short-trend 是 −0.29,
         # 全期卻接近 0)。逐日算再取中位,並同時給出今日值,與分歧區同一套呈現。
+        # ⚠ 這裡的歷史 ρ 用**今日的** universe 族群歸屬回推過去(group_metric_rows
+        # join 的是 universe 現況),不是 as-seen。季度 universe 調整會讓已顯示過的
+        # 全期中位悄悄改變。這個數字只用來判斷「三欄會不會重複」,不進 OOS、
+        # 不當證據;真要當證據就得改讀 oos_signal_snapshots(欄位是齊的)。
         # 起算日 = 三個視角都排得出來的第一天(ma60 要 60 個交易日暖身),
         # 讓前端能誠實說出「這個視角只有 N 天資料」而不是看起來與其他區同齡。
         days = [r[0] for r in con.execute(
@@ -1408,11 +1412,13 @@ def build_lenses(con, last, names, group_names):
             "SELECT stock_id, tier FROM daily_scores WHERE date=?", (last,))}
 
         def deco(x):
+            # r20 = 20 日絕對報酬。名次形狀旁一定要有它:族群內名次不含漲跌資訊,
+            # 只給名次會讓「名次靠前」再一次被讀成「在漲」。
             return {"id": x["stock_id"], "nm": names.get(x["stock_id"], x["stock_id"]),
                     "g": group_names.get(x["grp"], x["grp"]),
                     "tier": tiers.get(x["stock_id"]),
                     "s": x["pct"]["short"], "w": x["pct"]["swing"], "t": x["pct"]["trend"],
-                    "raw": x["raw"], "sp": x["spread"]}
+                    "r20": x["raw"]["swing"], "raw": x["raw"], "sp": x["spread"]}
 
         return {
             "rho": {k: (round(v, 2) if v is not None else None) for k, v in s["rho"].items()},
@@ -1990,6 +1996,13 @@ def main():
     print(f"已重生 {OUT} — 資料日 {date_str},{len(data)} 檔,{len(tiers)} 個 tier;"
           f"{'建立' if archive_created else '保留既有'}快照 archive/{last}.html,"
           f"manifest 共 {len(dates)} 日")
+    # 可選區段算不出來時前端只會少一整塊、導覽還留著死連結,而 build 照印「已重生」。
+    # CI 的 tests.yml 刻意不吃 index.html/data 的路徑(每日 3~4 個資料 commit),
+    # 所以產出物契約測試不會在每日管線上跑 → 這行是每日唯一會出聲的地方,務必留著。
+    dead = [n for n, v in (("策略狀態", strategy), ("兩視角分歧", diverge),
+                           ("時間尺度", lenses)) if not v]
+    if dead:
+        print(f"⚠ 下列區段沒有 payload,頁面會少掉整塊(導覽連結仍在):{'、'.join(dead)}")
 
 
 if __name__ == "__main__":

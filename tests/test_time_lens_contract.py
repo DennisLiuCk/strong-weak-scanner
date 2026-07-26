@@ -65,12 +65,37 @@ class TimeLensContractTest(unittest.TestCase):
             self.assertAlmostEqual(x["pct"]["trend"], 50.0, places=9)
 
     def test_stock_missing_any_lens_is_dropped_not_partially_ranked(self):
-        """暖身不足只排得出兩欄時,極差會與三欄的不可比 —— 整檔略過。"""
-        rows = [{"stock_id": f"S{i}", "close_adj": 10.0 + i, "ma5": 10.0, "ma20": 10.0,
-                 "ma60": 10.0, "ret20": 0.01 * i, "grp": "g"} for i in range(4)]
-        rows[0]["ma60"] = None
-        out = sig.time_lenses(rows)
-        self.assertEqual({x["stock_id"] for x in out}, {"S1", "S2", "S3"})
+        """暖身不足只排得出兩欄時,極差會與三欄的不可比 —— 整檔略過。
+
+        **每個欄位都要測**。原本只測了 ma60(分母,靠 `not b` 擋掉),而
+        `signal_structure._get` 把 None 當 0(那是 s_* 分數「無訊號=中性」的語意),
+        所以 ret20=None 會變成捏造的 0%(在下跌盤裡排進族群前段)、
+        close_adj=None 會算出 −100% 的短期視角,兩者都被留下來排名,
+        而那句 `if a is None` 永遠不成立、是死碼。2026-07-26 複核抓到。"""
+        def base():
+            return [{"stock_id": f"S{i}", "close_adj": 10.0 + i, "ma5": 10.0, "ma20": 10.0,
+                     "ma60": 10.0, "ret20": 0.01 * i, "grp": "g"} for i in range(4)]
+
+        for col in ("ma60", "ma5", "ma20", "close_adj", "ret20"):
+            rows = base()
+            rows[0][col] = None
+            out = sig.time_lenses(rows)
+            self.assertEqual({x["stock_id"] for x in out}, {"S1", "S2", "S3"},
+                             f"{col} 缺值時 S0 沒有被丟掉")
+        # 欄位整個不存在(舊 db / 換來源)也要當缺值,不可拋例外或捏造 0
+        rows = [{k: v for k, v in r.items() if k != "ret20"} for r in base()]
+        self.assertEqual(sig.time_lenses(rows), [])
+
+    def test_missing_value_is_not_coerced_to_zero(self):
+        """_raw 與 _get 的分工:分數用 _get(None→0 是「無訊號=中性」),
+        均線與報酬一律走 _raw(None→None)。這條直接把兩者的差異釘住。"""
+        self.assertEqual(sig._get({"x": None}, "x"), 0)
+        self.assertIsNone(sig._raw({"x": None}, "x"))
+        self.assertIsNone(sig._raw({}, "x"))
+        self.assertEqual(sig._raw({"x": 1.5}, "x"), 1.5)
+        src = (SCRIPTS / "signal_structure.py").read_text(encoding="utf-8")
+        m = re.search(r"def _lens_raw\(.*?\n(?=\n\ndef )", src, re.S)
+        self.assertNotIn("_get(", m.group(0), "_lens_raw 不可用 _get,它會把缺值變 0")
 
     def test_zero_denominator_does_not_raise(self):
         rows = [{"stock_id": "A", "close_adj": 10.0, "ma5": 0.0, "ma20": 1.0, "ma60": 1.0,
@@ -118,9 +143,28 @@ class TimeLensContractTest(unittest.TestCase):
         # 只剝開頭的 docstring(它本來就會提到「不支援 snapshot_id」);
         # 不能無差別剝所有三引號字串,SQL 也是三引號寫的。
         code = re.sub(r'^(def [^\n]*\n\s*)""".*?"""', r"\1", gm.group(0), flags=re.S)
-        self.assertNotIn("snapshot_id", code,
-                         "快照表沒有均線欄,不可假裝支援 as-seen 快照")
+        self.assertNotIn("snapshot_id", code, "時間尺度只讀 daily_metrics")
         self.assertIn("daily_metrics", code)
+
+    def test_snapshot_unsupported_reason_is_stated_truthfully(self):
+        """原本三個地方都寫「快照表沒有均線欄」——實查 oos_signal_snapshots 有 65 欄,
+        ma5/ma20/ma60/ret20/close_adj 全在且 1118/1118 列都有值。不支援是設計選擇,
+        不是資料限制;理由寫錯會讓後人以為這條路走不通。"""
+        src = (SCRIPTS / "signal_structure.py").read_text(encoding="utf-8")
+        gm = re.search(r"def group_metric_rows\(.*?\n(?=\n\ndef |\Z)", src, re.S).group(0)
+        self.assertNotIn("快照表也沒有這些欄", gm)      # 原本的錯誤說法,已刪
+        self.assertIn("理由不是快照表缺欄", gm)
+        self.assertIn("1118/1118", gm, "要留下實查數字,否則後人無從判斷誰對")
+        db = ROOT / "data" / "findmind.db"
+        if not db.exists():
+            self.skipTest("db 不在")
+        sys.path.insert(0, str(SCRIPTS))
+        import db_ro
+        con = db_ro.connect(str(db))
+        cols = {c[1] for c in con.execute("PRAGMA table_info(oos_signal_snapshots)")}
+        have = {"ma5", "ma20", "ma60", "ret20", "close_adj"} & cols
+        self.assertEqual(have, {"ma5", "ma20", "ma60", "ret20", "close_adj"},
+                         "快照表真的缺欄了 —— 那就把 docstring 的理由改回資料限制")
 
     # ---------- 產出物 ----------
 
