@@ -28,6 +28,7 @@ from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import signal_structure as sig   # §⑦:元素邊際貢獻與結構指標(共用 score.WEIGHTS)
 import stats_ci as sci           # §⑨:NW 標準誤 / 有效獨立觀測 / episode 計數
+import hypotheses as hyp         # §⑪:事先登錄、規格雜湊凍結的可證偽假設
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -855,6 +856,50 @@ def main():
       f"(§⑧ 顯示真強中位停留 4~5 日,進出各延一天後約 3 日)。持有期越長,"
       f"固定成本被攤薄、點估計越好——但有效獨立觀測同時變少,長持有反而更難判讀。"
       f"**沒有一格達到 |t|>2 之前,不可宣稱這套訊號在扣成本後仍有效。**")
+    w("")
+    # ── ⑪ 事先登錄的假設 ──────────────────────────────────────────
+    # 「多分析師比勝率」在統計上做不到:依實測變異外推,分辨兩個正交策略真差 ΔIC=0.02
+    # 需約 2.3 年。所以登錄的主角不是策略名單,而是**明確、可證偽、有放棄條件的假設**。
+    # 規格與評估函式一起雜湊(spec_sha),改任一邊即視為新假設、時鐘重新起算。
+    w("## ⑪ 事先登錄的假設(OOS 時鐘自登錄日起算)")
+    w("")
+    hctx = {
+        "dates": dates, "scores": {d: v2[d] for d in v2}, "groups": GRPS,
+        "grp_of": grp_of, "shift": shift, "oret": oret,
+    }
+    for h in hyp.REGISTRY:
+        digest = hyp.spec_digest(h)
+        drift = "" if digest == h["spec_sha"] else f" ⚠ **規格已被改動**(現 `{digest}`)"
+        w(f"### {h['id']} {h['name']}(登錄 {h['registered']},`spec_sha` `{h['spec_sha']}`){drift}")
+        w("")
+        w(f"- **白話**:{h['plain']}")
+        w(f"- **事先宣告的方向**:{'正' if h['direction'] == 'positive' else '負'}"
+          f";持有 {h['hold_days']} 日;主要判準 = 日聚合差的 Newey-West t 值")
+        w(f"- **成功條件**:{h['success']}")
+        w(f"- **放棄條件**:{h['abandon']}")
+        pr = h["prior_is"]
+        w(f"- **登錄時的 in-sample 值**:{pr['value_pct']:+.3f}% ±{pr['se_pct']:.3f}% "
+          f"(t={pr['t']:+.1f})——{pr['note']}")
+        w("")
+        w("| 樣本 | 日聚合差 ±NW SE (t) | 交易日 | 有效獨立觀測 | 依宣告條件的狀態 |")
+        w("|---|---|---|---|---|")
+        for label, flt in (("OOS(as-seen 快照日,登錄後)",
+                            {d for d in snap_dates if d >= h["registered"]}),
+                           ("全期(含 in-sample,僅供背景)", None)):
+            s = hyp.evaluate(h, hctx, flt)
+            if not s:
+                w(f"| {label} | – | 0 | 0.0 | 尚無資料 |")
+                continue
+            st = hyp.status(h, s) if flt is not None else "(背景值,不判定)"
+            w(f"| {label} | {sci.fmt(s)} | {s['n_days']} | **{s['eff_obs']:.1f}** | {st} |")
+        w("")
+    w("> **為什麼登錄假設而不是登錄策略名單**:依實測變異外推,要分辨兩個正交策略的真實"
+      "IC 差 0.02 需約 **2.3 年**;能快速分勝負的配對(ρ≈0.86)恰好是冗餘的。"
+      "與其比一組分不出高下的名次,不如驗一個方向、門檻、放棄條件都事先寫死的假設。")
+    w("")
+    w("> **紀律**:`spec_sha` 覆蓋規格欄位與評估函式原始碼。要修操作定義就登錄新假設、"
+      "OOS 時鐘重新起算——不可原地改規格再引用舊資料。登錄時的 in-sample 值只記錄出身,"
+      "**登錄後不得當證據引用**。")
     w("")
     w("## 判讀警語")
     w("")
