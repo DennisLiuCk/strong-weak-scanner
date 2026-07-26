@@ -162,14 +162,17 @@ jobs:
       # 所以「產出物」契約測試不會在每日管線跑。少了這一步,build_lenses 之類的
       # 區段一旦因 schema/資料變動落到 except sqlite3.Error 就回 None,頁面會少掉
       # 整塊、導覽留下死連結,而 Actions 全綠、Pages 照常部署——沒有人會發現。
-      # 這兩個檔只讀已產生的 index.html,純 stdlib,約 2 秒。
+      # 只讀已產生的 index.html,純 stdlib,約 2 秒。
+      #
+      # ⚠ 這一步**只能放結構斷言**,不可放資料不變式。它排在 commit step 之前,
+      # 失敗會擋掉整個每日資料 commit——比它要防的「頁面少一塊」嚴重得多。
+      # 實際差點踩到的例子:`test_built_dashboard_has_full_absolute_coverage`
+      # 要求每一檔都有 ret20,而 ret20 需要**正好 20 個交易日**才有值,
+      # 季度 universe 新增一檔就會讓每日 commit 連續失敗約一個月。
+      # 那類斷言留在 tests.yml(程式碼推送時跑,壞了看得見也擋不住資料)。
       - name: 驗證產出的儀表板沒有整塊消失
         if: steps.mode.outputs.mode == 'complete'
-        run: |
-          python -m unittest -v \
-            tests.test_absolute_return_contract.AbsoluteReturnContractTest.test_built_dashboard_has_full_absolute_coverage \
-            tests.test_time_lens_contract.TimeLensContractTest.test_built_lens_section_is_present_and_consistent \
-            tests.test_dashboard_sections_present.DashboardSectionsPresentTest
+        run: python -m unittest -v tests.test_dashboard_sections_present.DashboardSectionsPresentTest
 
       - name: commit 回 repo(有變動才提交)
         id: commit_push
