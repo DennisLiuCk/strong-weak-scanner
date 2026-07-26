@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import signal_structure as sig   # §⑦:元素邊際貢獻與結構指標(共用 score.WEIGHTS)
 import stats_ci as sci           # §⑨:NW 標準誤 / 有效獨立觀測 / episode 計數
 import hypotheses as hyp         # §⑪:事先登錄、規格雜湊凍結的可證偽假設
+import db_ro                     # 唯讀開啟(強制 docstring 宣稱的「不寫 db」)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -95,8 +96,9 @@ def main():
     args = ap.parse_args()
     F = args.fwd
 
-    con = sqlite3.connect(args.db)
-    con.row_factory = sqlite3.Row
+    # docstring 寫「讀 db 不寫 db」——用 db_ro 讓那句話被強制,而不只是意圖
+    # (2026-07-26 檢討:當天宣稱「全程唯讀」但 15 支腳本有 11 支沒真的唯讀開啟)
+    con = db_ro.connect(args.db)
     uni = {r["stock_id"]: r["grp"] for r in con.execute("SELECT stock_id, grp FROM universe")}
     try:   # 族群清單配置化(groups 表);舊 db 退回 universe 去重
         GRPS = tuple(r[0] for r in con.execute("SELECT grp FROM groups ORDER BY ord"))

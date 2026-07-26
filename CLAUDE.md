@@ -26,6 +26,7 @@
 | 盤後確認執行狀況、討論今日資料 | `DAILY_CHECK.md`;核心工具 `scripts/daily_brief.py`(唯讀) |
 | 原始表 schema 新欄回補、正式 DB 全期稽核 | `RAW_DATA_BACKFILL.md` + `scripts/audit_raw_data.py`(唯讀) + `fetch_daily.py --backfill-expanded-fields` |
 | 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
+| **算任何新的統計量、或要對使用者宣稱一個結果** | `ANALYSIS_DISCIPLINE.md`(起飛前檢查表 + 宣稱時要附什麼 + 唯讀怎麼強制) |
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
 | 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` + `scripts/qual_review.py`(複核 triage) |
 | 領先假說收錄/複核/多空小作文 | `LEADING_HYPOTHESES.md` + `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` + `scripts/leading_hypotheses.py`(`--context` 產量化背景) |
@@ -37,6 +38,11 @@
   每次最多動 1~2 個旋鈕。
 - 改了權重或 tier 條件,**必須同步把 `scripts/validate.py` 的 `IS_CUTOFF` 改成當天**
   (否則舊 OOS 會被新規則重複當證據)。
+- **數字必附誤差與樣本規模**(`±SE (t=…)`、有效獨立觀測、連續區段);只寫點估計等於
+  沒有依據。宣稱測試/腳本結果要附執行環境——同一份測試在 `PYTHONUTF8=1` 下綠、
+  預設 cp950 下紅過,而 CI 是 ubuntu 永遠綠。詳見 `ANALYSIS_DISCIPLINE.md`。
+- **只斷言量過的性質**:唯讀一律 `db_ro.connect()`(mode=ro + query_only),
+  不要說「全程唯讀」卻用 `sqlite3.connect`。臨時分析腳本同樣適用。
 - 零第三方依賴(純 stdlib);策略旋鈕集中在 `score.py` CONFIG(個股層)與
   `fetch_daily.py` 頂部(族群/大盤層),不散落他處。
 - 版本沿革與實證依據記 `CHANGELOG.md`;README 與網站只描述現行系統,不放版本敘事。
@@ -94,6 +100,9 @@ score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ 
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
                  archive 同資料日首次建立後不覆寫;本地重跑只更新 index.html
                  含台積電專區(觀察層):ref 表+fund_map[2330]+事件錨點 → __TSMC_JSON__
+db_ro.py         唯讀開啟 SQLite 的唯一入口(mode=ro + PRAGMA query_only)。
+                 檔案不存在會報錯而非默默建空 db;validate.py 用它強制自己的
+                 「讀 db 不寫 db」宣稱。分析腳本一律走這裡
 hypotheses.py    事先登錄的可證偽假設(§⑪)。`spec_sha` 覆蓋規格欄位**與評估函式原始碼**
                  ——改任一邊即視為新假設、OOS 時鐘重新起算。登錄假設而非策略名單:
                  分辨兩個正交策略真差 ΔIC=0.02 需約 2.3 年,名次註定分不出來
