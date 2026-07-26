@@ -28,11 +28,22 @@ NODE = shutil.which("node")
 
 
 def extract(name):
-    """抽出模板裡某個 top-level function 的完整原始碼(以下一個 top-level 宣告為界)。"""
+    """抽出模板裡某個 top-level function 的完整原始碼(以下一個 top-level 宣告為界)。
+
+    重複定義會讓這整套測試靜默失效:`re.search` 取第一個,若有人後面又定義一次
+    (JS 是後者勝),測試會一直驗證那個被遮蔽的死版本而照樣通過。所以先擋重複。
+    截斷的情況不必特別處理——抽壞了餵給 node 會語法錯誤、returncode != 0,是大聲失敗。
+    """
     src = TEMPLATE.read_text(encoding="utf-8")
-    m = re.search(r"^(?:function %s\(|const %s=)" % (name, name), src, re.M)
-    if not m:
+    pat = r"^(?:function %s\(|const %s=)" % (name, name)
+    hits = list(re.finditer(pat, src, re.M))
+    if not hits:
         raise AssertionError(f"模板裡找不到 top-level 的 {name}")
+    if len(hits) > 1:
+        raise AssertionError(
+            f"{name} 有 {len(hits)} 個 top-level 定義 —— JS 取最後一個,"
+            f"但本測試抽第一個,會驗到被遮蔽的死版本")
+    m = hits[0]
     rest = src[m.start():]
     nxt = re.search(r"^(?:function |const |document\.getElementById)", rest[1:], re.M)
     return rest[:nxt.start() + 1] if nxt else rest
@@ -85,13 +96,24 @@ class DashboardJsBehaviourTest(unittest.TestCase):
                                "var(--muted)", "var(--muted)"],
                          "0 與 −0 不可上漲跌色")
 
-    def test_only_one_percent_formatter_exists(self):
-        """單一入口才擋得住「兩個畫面同一個數字長得不一樣」。"""
+    def test_no_inline_percent_formatter_bypasses_fmtPct(self):
+        """單一入口才擋得住「同一個數字在兩個畫面長得不一樣」與 −0 的漏網。
+
+        原本這條只檢查兩個舊拼法就宣稱「單一入口」,而模板裡還有 5 處自寫正負號
+        (lensBar tooltip、熱圖 rel20、族群動能欄、台積電專區兩處),其中
+        `mom>=0?strong:weak` 會把 −0.0 印成漲色的「+0.0%」——正是 fmtPct 要殺的 bug。
+        改成掃全檔:任何「判正負號後接 % 或 pp」的寫法都不准繞過 fmtPct。"""
         src = TEMPLATE.read_text(encoding="utf-8")
-        # 舊的行內寫法各自處理正負號與小數位,是這次三個格式 bug 的來源
-        self.assertNotIn("(r>=0?'+':'−')", src)
-        self.assertNotIn("(a.med>=0?'+':'−')", src)
-        self.assertNotIn("r.toFixed(0)+'%'", src)
+        own = set(extract("fmtPct").splitlines())   # fmtPct 自己當然要判正負號
+        bad = []
+        for n, line in enumerate(src.splitlines(), 1):
+            s = line.strip()
+            if s.startswith(("/*", "*", "//")) or line in own:
+                continue
+            if re.search(r"[><]=?\s*0\s*\?\s*'[+−-]?'", line) and \
+               re.search(r"'%'|%）|%\)|'pp'|\+'%", line):
+                bad.append(f"L{n}: {s[:90]}")
+        self.assertEqual(bad, [], "這些地方自己處理正負號,沒走 fmtPct:\n" + "\n".join(bad))
         self.assertEqual(len(re.findall(r"^function fmtPct\(", src, re.M)), 1)
 
     # ---------- lensShape:全站最容易誤導人的一段文案 ----------

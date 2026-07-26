@@ -158,6 +158,19 @@ jobs:
         if: steps.mode.outputs.mode == 'complete'
         run: python scripts/build_dashboard.py
 
+      # tests.yml 的 paths 刻意不吃 index.html/data/(每交易日 3~4 個資料 commit),
+      # 所以「產出物」契約測試不會在每日管線跑。少了這一步,build_lenses 之類的
+      # 區段一旦因 schema/資料變動落到 except sqlite3.Error 就回 None,頁面會少掉
+      # 整塊、導覽留下死連結,而 Actions 全綠、Pages 照常部署——沒有人會發現。
+      # 這兩個檔只讀已產生的 index.html,純 stdlib,約 2 秒。
+      - name: 驗證產出的儀表板沒有整塊消失
+        if: steps.mode.outputs.mode == 'complete'
+        run: |
+          python -m unittest -v \
+            tests.test_absolute_return_contract.AbsoluteReturnContractTest.test_built_dashboard_has_full_absolute_coverage \
+            tests.test_time_lens_contract.TimeLensContractTest.test_built_lens_section_is_present_and_consistent \
+            tests.test_dashboard_sections_present.DashboardSectionsPresentTest
+
       - name: commit 回 repo(有變動才提交)
         id: commit_push
         env:

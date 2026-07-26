@@ -21,6 +21,7 @@ from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
                    DZ_FOREIGN, DZ_TRUST, STEALTH_OFF_HIGH, _chip_signal)
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
 from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
+import db_ro                     # 唯讀開啟的唯一入口(鐵律);這支只讀 db,只寫 html
 import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡報、週報 §⑦⑧ 同一組函式)
 import hypotheses as hyp         # 兩視角分歧的籌碼定義 = H1 檢定的同一個定義
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
@@ -1352,10 +1353,17 @@ def build_divergence(con, last, names, group_names):
         cur = hist.get(last)
         pct = (sum(1 for x in vals if x <= cur) / len(vals) * 100) if (vals and cur is not None) else None
 
+        # 20 日絕對報酬:兩欄都是族群內名次,沒有它就會被讀成漲跌
+        # (2026-07-24:標題原本說「價格還沒動」的 8 檔全部為負,最深 −34.3%)
+        r20 = {r["stock_id"]: r["ret20"] for r in con.execute(
+            "SELECT stock_id, ret20 FROM daily_metrics WHERE date=?", (last,))}
+
         def deco(x):
+            v = r20.get(x["stock_id"])
             return {"id": x["stock_id"], "nm": names.get(x["stock_id"], x["stock_id"]),
                     "g": group_names.get(x["grp"], x["grp"]),
-                    "mom": x["mom_pct"], "chip": x["chip_pct"], "gap": x["gap"]}
+                    "mom": x["mom_pct"], "chip": x["chip_pct"], "gap": x["gap"],
+                    "r20": round(v * 100, 1) if v is not None else None}
 
         first_month = dates[0][:7] if dates else None
         fm = [v for d, v in hist.items() if d[:7] == first_month]
@@ -1408,6 +1416,21 @@ def build_lenses(con, last, names, group_names):
                         hist.setdefault(k, []).append(v)
         rho_median = {k: round(statistics.median(v), 2) for k, v in hist.items() if v}
         first, n_days = (days[0] if days else None), len(days)
+        # 這段窗口的大盤走勢由資料現算,**不可寫死**。初版把「先漲 8.2% 到 6/22
+        # 再回 7.9%」直接寫在文案裡,而窗口每個交易日都會長一天:隔天動態的
+        # 「41 個交易日」會變 42,旁邊那句硬字仍寫「41 天」;「再回 7.9%」是
+        # 高點到最新日,每天都不同;大盤一旦收破前高,「6/22 的期間高」直接變假話。
+        path = None
+        if days:
+            mk = [(r[0], r[1]) for r in con.execute(
+                "SELECT date, taiex FROM market_daily WHERE date>=? AND date<=? ORDER BY date",
+                (days[0], last)) if r[1]]
+            if len(mk) >= 3:
+                pk = max(mk, key=lambda x: x[1])
+                path = {"rise": round((pk[1] / mk[0][1] - 1) * 100, 1),
+                        "peak": pk[0], "peak_i": [d for d, _ in mk].index(pk[0]) + 1,
+                        "n": len(mk),
+                        "fall": round((mk[-1][1] / pk[1] - 1) * 100, 1)}
         tiers = {r["stock_id"]: r["tier"] for r in con.execute(
             "SELECT stock_id, tier FROM daily_scores WHERE date=?", (last,))}
 
@@ -1423,6 +1446,7 @@ def build_lenses(con, last, names, group_names):
         return {
             "rho": {k: (round(v, 2) if v is not None else None) for k, v in s["rho"].items()},
             "rho_median": rho_median,
+            "path": path,
             "spread_median": s["spread_median"], "threshold": sig.LENS_SPREAD_NOTABLE,
             "n_notable": len(s["notable"]), "n_total": len(s["detail"]),
             "first_date": first, "n_days": n_days,
@@ -1433,8 +1457,10 @@ def build_lenses(con, last, names, group_names):
 
 
 def main():
-    con = sqlite3.connect(DB)
-    con.row_factory = sqlite3.Row
+    # 唯讀開啟(鐵律:唯讀一律走 db_ro)。這支只從 db 讀、寫的是 index.html 與
+    # archive/,不曾寫 db;bare sqlite3.connect 會在路徑打錯時無聲建一個空 db,
+    # 然後產出一份「0 檔」的頁面覆蓋掉正常的那份。
+    con = db_ro.connect(DB)
     last = con.execute("SELECT MAX(date) FROM daily_scores").fetchone()[0]
     if not last:
         print("daily_scores 沒有資料,請先跑 score.py")
@@ -1999,8 +2025,8 @@ def main():
     # 可選區段算不出來時前端只會少一整塊、導覽還留著死連結,而 build 照印「已重生」。
     # CI 的 tests.yml 刻意不吃 index.html/data 的路徑(每日 3~4 個資料 commit),
     # 所以產出物契約測試不會在每日管線上跑 → 這行是每日唯一會出聲的地方,務必留著。
-    dead = [n for n, v in (("策略狀態", strategy), ("兩視角分歧", diverge),
-                           ("時間尺度", lenses)) if not v]
+    dead = [n for n, v in (("策略狀態", strategy), ("台積電專區", tsmc),
+                           ("兩視角分歧", diverge), ("時間尺度", lenses)) if not v]
     if dead:
         print(f"⚠ 下列區段沒有 payload,頁面會少掉整塊(導覽連結仍在):{'、'.join(dead)}")
 

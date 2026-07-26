@@ -449,13 +449,16 @@ function quadEl(G){ const W=470,H=380,m={l:52,r:22,t:26,b:44},xs=[],ys=[];
   k.push(sv('line',{x1:m.l,y1:y0,x2:W-m.r,y2:y0,stroke:'var(--line)','stroke-width':1.2}));
   k.push(sv('line',{x1:x0,y1:m.t,x2:x0,y2:H-m.b,stroke:'var(--line)','stroke-width':1.2}));
   const _axv=(x,y,txt,anc)=>{const e=sv('text',{x,y,'text-anchor':anc,'font-size':9,'font-weight':600,fill:'var(--muted)'});e.textContent=txt;return e;};
-  k.push(_axv(m.l+3, y0-4, (xmin>0?'+':'')+xmin.toFixed(0)+'%', 'start'));
-  k.push(_axv(W-m.r-3, y0-4, (xmax>0?'+':'')+xmax.toFixed(0)+'%', 'end'));
+  k.push(_axv(m.l+3, y0-4, fmtPct(xmin,0), 'start'));
+  k.push(_axv(W-m.r-3, y0-4, fmtPct(xmax,0), 'end'));
   k.push(_axv(x0+5, m.t+9, (ymax>0?'+':'')+ymax.toFixed(2), 'start'));
   k.push(_axv(x0+5, H-m.b-4, (ymin>0?'+':'')+ymin.toFixed(2), 'start'));
   const ql=(x,y,t,a)=>{const e=sv('text',{x,y,'text-anchor':a,'font-size':10.5,'font-weight':700,fill:'var(--muted)'});e.textContent=t;return e;};
-  k.push(ql(W-m.r-4,m.t+13,'領漲 · 有人接','end')); k.push(ql(m.l+4,m.t+13,'佈局中 · 價未動','start'));
-  k.push(ql(m.l+4,H-m.b-6,'退潮 · 沒人接','start')); k.push(ql(W-m.r-4,H-m.b-6,'領漲但調節','end'));
+  /* 象限標籤只能講「相對其他族群」。橫軸是 rel20(跨族群相對),寫「領漲」「價未動」
+     等於用相對名次宣稱絕對漲跌——全市場同跌時,跑輸最少的族群會落在右上角而被標成
+     「領漲」。族群的絕對表現看排行榜的「絕對」列。 */
+  k.push(ql(W-m.r-4,m.t+13,'跑贏 · 有人接','end')); k.push(ql(m.l+4,m.t+13,'跑輸 · 有人接','start'));
+  k.push(ql(m.l+4,H-m.b-6,'跑輸 · 沒人接','start')); k.push(ql(W-m.r-4,H-m.b-6,'跑贏 · 沒人接','end'));
   const xt=sv('text',{x:(m.l+W-m.r)/2,y:H-8,'text-anchor':'middle','font-size':11,'font-weight':700,fill:'var(--ink2)'});xt.textContent='← 跑輸        20日動能        跑贏 →';k.push(xt);
   const cy2=(m.t+H-m.b)/2,yt=sv('text',{x:14,y:cy2,'text-anchor':'middle','font-size':11,'font-weight':700,fill:'var(--ink2)',transform:`rotate(-90 14 ${cy2})`});yt.textContent='← 淨賣   修正日外資   淨買 →';k.push(yt);
   // 每族群獨立 <g>：預設只顯示圓點與標籤，軌跡隱藏；focus 時才顯示該族群軌跡並淡化其他
@@ -593,17 +596,28 @@ function buildDiverge(){
         h('span',{text:`動能 ${x.mom.toFixed(0)}`}),
         h('span',{style:'color:var(--muted)',text:' / '}),
         h('span',{text:`籌碼 ${x.chip.toFixed(0)}`}),
-        h('span',{style:`margin-left:8px;font-weight:800;color:${col}`,text:(x.gap>=0?'+':'')+x.gap.toFixed(0)})))));
+        h('span',{style:`margin-left:8px;font-weight:800;color:${col}`,text:(x.gap>=0?'+':'')+x.gap.toFixed(0)}),
+        // 兩欄都是名次,沒有絕對值就會被讀成漲跌 —— 與時間尺度卡同一套處理
+        x.r20==null?null:h('span',{style:`margin-left:10px;font-weight:700;color:${pctCol(x.r20)}`,
+          title:'20 日絕對報酬（左邊兩欄是族群內名次，與漲跌是兩件事）',
+          text:fmtPct(x.r20,1)})))));
     box.appendChild(tb);
     return box;
   };
   const grid=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:18px'});
-  grid.appendChild(card(`漲了但沒人接（${D2.n_price_ahead} 檔）`,
-    '族群內價格位置明顯領先籌碼位置。可能是籌碼還沒跟上,也可能是漲勢缺乏法人支撐——本頁不判斷是哪一種。',
-    D2.price_ahead, '價格領先', 'var(--amber)'));
-  grid.appendChild(card(`有人在買但價格還沒動（${D2.n_chips_ahead} 檔）`,
-    '族群內籌碼位置明顯領先價格位置。這是「蓄勢」那一層想捕捉的形狀,但這裡不套用任何分層條件,只呈現落差。',
-    D2.chips_ahead, '籌碼領先', 'var(--teal)'));
+  /* 標題原本寫「漲了但沒人接」「有人在買但價格還沒動」,那是拿**族群內名次**宣稱
+     絕對漲跌與買賣事實。2026-07-24 實測:標題說「漲了」的 8 檔裡有 6 檔 20 日絕對
+     報酬為負;標題說「價格還沒動」的 8 檔**全部**為負,最深 頎邦 −34.3%、台半 −33.1%
+     ——它們不是沒動,是跌了三成。同一頁的個股分層區才剛用 ↓ 標出「相對靠前但絕對
+     在跌」,這裡卻反過來把名次講成漲跌。標題一律改講名次,並在每列附 20 日絕對報酬。*/
+  grid.appendChild(card(`價格名次領先、籌碼名次落後（${D2.n_price_ahead} 檔）`,
+    '族群內價格位置明顯領先籌碼位置。名次領先不代表絕對在漲——右側附 20 日絕對報酬。'
+    +'可能是籌碼還沒跟上,也可能是相對強勢缺乏法人支撐,本頁不判斷是哪一種。',
+    D2.price_ahead, '價格名次領先', 'var(--amber)'));
+  grid.appendChild(card(`籌碼名次領先、價格名次落後（${D2.n_chips_ahead} 檔）`,
+    '族群內籌碼位置明顯領先價格位置。這是「蓄勢」那一層想捕捉的形狀,但這裡不套用任何'
+    +'分層條件,只呈現落差;價格名次落後不等於「沒動」,絕對報酬可能是大跌。',
+    D2.chips_ahead, '籌碼名次領先', 'var(--teal)'));
   const rho=h('div',{class:'card',style:'padding:20px 22px;margin-top:16px;border-left:3px solid var(--teal)'},
     h('b',{style:'font-size:15px',text:'兩視角的一致程度'}),
     h('p',{style:'margin:6px 0 10px;font-size:13px;color:var(--ink)',
@@ -651,7 +665,7 @@ function lensShape(s,w,t){
 function lensBar(label,v,raw){
   const col=v>=LENS_HI?'var(--strong)':(v<LENS_LO?'var(--weak)':'var(--muted)');
   return h('div',{style:'display:grid;grid-template-columns:22px 1fr 30px;gap:6px;align-items:center',
-    title:`${label}：族群內第 ${v.toFixed(0)} 百分位（原始值 ${(raw>=0?'+':'−')+Math.abs(raw).toFixed(1)}%）`},
+    title:`${label}：族群內第 ${v.toFixed(0)} 百分位（原始值 ${fmtPct(raw,1)}）`},
     h('span',{style:'font-size:10px;color:var(--muted);font-weight:700',text:label}),
     h('div',{style:'height:6px;border-radius:3px;background:var(--inset);overflow:hidden'},
       h('div',{style:`height:100%;width:${Math.max(v,1.5)}%;background:${col};border-radius:3px`})),
@@ -711,10 +725,17 @@ function buildLenses(){
         +`今日三欄極差中位 <b>${L.spread_median.toFixed(0)}</b> 個百分位點，`
         +`<b>${L.n_notable}</b> 檔達 ${L.threshold} 點以上。`}),
     h('p',{style:'margin:8px 0 0;font-size:12px;color:var(--muted);line-height:1.6',
+      /* 窗口走勢一律由 L.path 現算。寫死的話,窗口每天長一天而句子不會跟著改,
+         「再回 x%」（高點到最新日）更是每天都不同。 */
       text:`中位取自 ${L.first_date} 起的 ${L.n_days} 個交易日——趨勢欄需要 60 個交易日暖身，`
-        +`所以這個視角比其他區年輕。這段窗口不是單一走勢：大盤先漲 8.2% 到 6/22 的期間高，`
-        +`再回 7.9%；但 41 天仍然很短，在別的行情下 ρ 未必相同。`
-        +`單日 ρ 很吵（短↔趨當日 −0.29 vs 全期中位 +0.04），所以並列全期中位。`
+        +`所以這個視角比其他區年輕。`
+        +(L.path?`這段窗口${L.path.rise>3&&L.path.fall<-3?'不是單一走勢':'的形狀'}：`
+            +`大盤先${L.path.rise>=0?'漲':'跌'} ${Math.abs(L.path.rise).toFixed(1)}% 到 `
+            +`${L.path.peak.slice(5).replace('-','/')} 的期間高（第 ${L.path.peak_i}/${L.path.n} 天），`
+            +`再${L.path.fall>=0?'漲':'回'} ${Math.abs(L.path.fall).toFixed(1)}%；`:'')
+        +`但 ${L.n_days} 天仍然很短，在別的行情下 ρ 未必相同。`
+        +`單日 ρ 很吵（短↔趨當日 ${fx(L.rho['short-trend'])} vs 全期中位 ${fx(L.rho_median['short-trend'])}），`
+        +`所以並列全期中位。`
         +`ρ 低不等於兩個視角獨立——波段與趨勢共用同一段 20 日價格，機械相關的底線`
         +`本頁尚未拆解；這裡只把 ρ 當「會不會重複」的篩子，不當假設檢定，故不附標準誤。`}));
   return [h('p',{class:'kicker',text:'三個時間尺度'}),
@@ -815,7 +836,7 @@ function buildGroup(){
   const metrics=[
     {k:'dip',label:'修正日外資',hint:'下跌日淨買/賣',fmt:v=>(v>=0?'淨買 ':'淨賣 ')+Math.abs(v).toFixed(2)+'%'},
     {k:'breadth_f',label:'外資廣度',hint:'多少檔被增持',fmt:v=>Math.round(v*100)+'%'},
-    {k:'rel20',label:'20日動能',hint:'贏/輸全市場',fmt:v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1)+'%'},
+    {k:'rel20',label:'20日動能',hint:'贏/輸全市場',fmt:v=>fmtPct(v*100,1)},
     {k:'dist60',label:'距60日高',hint:'離高點多遠',fmt:v=>(v*100).toFixed(1)+'%'},
     {k:'breadth_t',label:'投信廣度',hint:'多少檔被買超',fmt:v=>Math.round(v*100)+'%'}];
   const sorted={}; metrics.forEach(m=>sorted[m.k]=G.map(g=>g.heat[m.k][0]).sort((a,b)=>b-a));
@@ -849,7 +870,7 @@ function buildGroup(){
         h('div',{style:'display:flex;align-items:center;gap:7px;flex-wrap:wrap'},h('b',{style:'font-size:15.5px;font-weight:700',text:grp(g.g).short}),
           h('span',{class:'chip',style:`color:${st.col};background:${st.bg}`,text:g.state})),
         h('div',{style:'font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap',text:grp(g.g).tag||''})),
-      h('div',{},metricCell(mom,(mom>=0?'+':'−')+Math.abs(mom).toFixed(1)+'%',mom>=0?'var(--strong)':'var(--weak)',md,25),absLine(g.abs20)),
+      h('div',{},metricCell(mom,fmtPct(mom,1),pctCol(mom),md,25),absLine(g.abs20)),
       metricCell(dip,(dip>=0?'淨買 ':'淨賣 ')+Math.abs(dip).toFixed(2)+'%',dip>=0?'var(--strong)':'var(--weak)',dd,3)));
   });
 
@@ -881,9 +902,9 @@ const UPPER_TIERS={'真強':1,'蓄勢·外資佈局':1,'強但過熱':1};
    ② |v|<1 保留一位小數 —— 否則 −0.4% 印成「-0%」,把在跌讀成持平;
    ③ **0 與 −0 都不給正負號、不上漲跌色**。JS 裡 -0<0 是 false 而 -0>=0 是 true,
       用 `v>=0?'+':'−'` 會把後端 round(−0.04,1) 得到的 −0.0 印成綠色的「+0.0%」。 */
-function fmtPct(v,dp){ if(v==null) return '—';
+function fmtPct(v,dp,unit){ if(v==null) return '—';
   const d=dp!=null?dp:(Math.abs(v)<1?1:0);
-  return (v>0?'+':(v<0?'−':''))+Math.abs(v).toFixed(d)+'%'; }
+  return (v>0?'+':(v<0?'−':''))+Math.abs(v).toFixed(d)+(unit||'%'); }
 function pctCol(v){ return v==null||v===0?'var(--muted)':(v>0?'var(--strong)':'var(--weak)'); }
 
 /* 相對強勢層裡有多少檔 20 日絕對報酬其實是負的——由當日資料現算,不寫死。
@@ -1197,7 +1218,7 @@ function flowSection(f){ if(!f||!f.rows||!f.rows.length)return null;
   const rDir=_row(/方向強度|方向中位/); if(rDir){ const v=_firstPct(rDir[1]);
     if(v!=null)cards.push(h('div',{style:'background:'+(v>=0?'var(--strongbg)':'var(--weakbg)')+';border-radius:12px;padding:12px 14px'},
       h('div',{style:'font-size:10.5px;font-weight:800;color:var(--muted)',text:'法人方向強度'}),
-      h('div',{class:'mono',style:'font-size:20px;font-weight:600;margin:2px 0 7px;color:'+(v>=0?'var(--strong)':'var(--weak)'),text:(v>=0?'+':'')+v+'%'}),
+      h('div',{class:'mono',style:'font-size:20px;font-weight:600;margin:2px 0 7px;color:'+pctCol(v),text:fmtPct(v,1)}),
       diverg(v,100,150,16),
       h('div',{style:'font-size:10px;color:var(--ink2);line-height:1.4;margin-top:5px',text:rDir[1]}))); }
   const rAct=_row(/總活動|參與中位/); if(rAct){ const p=_firstPct(rAct[1]);
@@ -1208,14 +1229,14 @@ function flowSection(f){ if(!f||!f.rows||!f.rows.length)return null;
       h('div',{style:'font-size:10px;color:var(--ink2);line-height:1.4;margin-top:5px',text:'占雙邊成交（'+p+'%）'}))); }
   const rExc=_row(/超額報酬|超額中位/); if(rExc){ const arr=_pps(rExc[1]);
     if(arr.length){ const last=arr[arr.length-1],mxA=Math.max(...arr.map(Math.abs),1),lbs=['1日','5日','20日'];
-      cards.push(h('div',{style:'background:'+(last>=0?'var(--strongbg)':'var(--weakbg)')+';border-radius:12px;padding:12px 14px'},
+      cards.push(h('div',{style:'background:'+(last>0?'var(--strongbg)':(last<0?'var(--weakbg)':'var(--inset)'))+';border-radius:12px;padding:12px 14px'},
         h('div',{style:'font-size:10.5px;font-weight:800;color:var(--muted)',text:'官方指數超額報酬'}),
-        h('div',{class:'mono',style:'font-size:20px;font-weight:600;margin:2px 0 7px;color:'+(last>=0?'var(--strong)':'var(--weak)'),text:(last>=0?'+':'')+last+'pp'}),
+        h('div',{class:'mono',style:'font-size:20px;font-weight:600;margin:2px 0 7px;color:'+pctCol(last),text:fmtPct(last,1,'pp')}),
         h('div',{style:'display:flex;flex-direction:column;gap:5px'},
           ...arr.map((v,i)=>h('div',{style:'display:grid;grid-template-columns:28px 1fr 46px;gap:6px;align-items:center'},
             h('span',{style:'font-size:10px;color:var(--muted)',text:lbs[i]||('#'+(i+1))}),
             diverg(v,mxA,90,12),
-            h('span',{class:'mono',style:'font-size:10px;text-align:right;color:'+(v>=0?'var(--strong)':'var(--weak)'),text:(v>=0?'+':'')+v+'pp'})))),
+            h('span',{class:'mono',style:'font-size:10px;text-align:right;color:'+pctCol(v),text:fmtPct(v,1,'pp')})))),
         h('div',{style:'font-size:10px;color:var(--ink2);margin-top:5px',text:'正＝跑贏市場'}))); } }
   const hero=cards.length?h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:2px 0 12px'},...cards):null;
 
