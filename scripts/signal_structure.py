@@ -357,6 +357,94 @@ def divergence_summary(groups, chip_weights, momentum_col="s_price"):
     }
 
 
+# ── 時間尺度視角(結構指標第四組)──────────────────────────────────────
+#
+# 前面所有東西都活在同一個時間尺度上:五元素裡的價格軸是 rs20,族群層的動能也是
+# 20 日。也就是說整個系統只有一個週期的視野,而「這檔強不強」在不同週期可以是
+# 完全不同的答案——2026-07-24 的南電 tier=真強、波段與趨勢都在族群內 100 分位,
+# 短期卻只有 9 分位(剛開始回檔);健策則相反,波段 100 而趨勢 0(剛從長期低檔翻上來)。
+#
+# 三個視角都是**絕對價格事實**,再各自做族群內平均秩百分位——這樣三欄才可比:
+#   短期 close_adj/ma5   最近 5 日相對自身均線
+#   波段 ret20           20 日報酬(族群內排名 ⇔ 排 rs20,兩者只差一個族群常數)
+#   趨勢 ma20/ma60       中期均線相對長期均線
+#
+# 冗餘門檻沿用分歧視角那次的規矩 |ρ| ≥ 0.8 不採用。2026-07-26 實測(4961 stock-days,
+# 2026-05-27..07-24 共 41 個交易日;ma60 需 60 日暖身,起點早於此的資料還沒有):
+#   ρ(短期,趨勢) +0.02、ρ(短期,波段) +0.34、ρ(波段,趨勢) +0.49  → 三者互補
+#   ρ(波段,rs20) +1.00                                        → 波段即現行視角
+# 最初的趨勢定義 close_adj/ma60 對波段 +0.78、對 ma20/ma60 +0.79,逼近門檻且兩邊
+# 都像,已否決。**注意窗口只有 41 天且幾乎全在同一段修正裡**,ρ 在其他行情下未必相同;
+# 這裡只把它當冗餘篩,不當假設檢定,故不附標準誤與 t。
+#
+# 與分歧視角一樣:**這是描述,不是訊號**,未計分、未進 tier、無前瞻報酬主張。
+LENS_SPREAD_NOTABLE = 50.0   # 三視角百分位極差 ≥ 此值才列為「週期看法不一致」
+
+TIME_LENSES = (
+    ("short", "短期", "close_adj", "ma5"),
+    ("swing", "波段", None, None),          # 直接用 ret20
+    ("trend", "趨勢", "ma20", "ma60"),
+)
+
+
+def _lens_raw(row, key, num, den):
+    if key == "swing":
+        return _get(row, "ret20")
+    a, b = _get(row, num), _get(row, den)
+    if a is None or b is None or not b:
+        return None
+    return a / b - 1
+
+
+def time_lenses(rows):
+    """回傳該族群每檔在三個時間尺度上的族群內百分位與極差。
+
+    任一視角缺值(暖身不足)就整檔略過——只排得出兩欄的極差不可與三欄的比較。
+    """
+    ok = []
+    for r in rows:
+        vals = {k: _lens_raw(r, k, n, d) for k, _, n, d in TIME_LENSES}
+        if all(v is not None for v in vals.values()):
+            ok.append((r, vals))
+    if len(ok) < 2:
+        return []
+    pct = {k: lens_pct([v[k] for _, v in ok]) for k, _, _, _ in TIME_LENSES}
+    out = []
+    for i, (r, vals) in enumerate(ok):
+        p = {k: round(pct[k][i], 1) for k, _, _, _ in TIME_LENSES}
+        out.append({"stock_id": r["stock_id"], "pct": p,
+                    "raw": {k: round(vals[k] * 100, 2) for k in vals},
+                    "spread": round(max(p.values()) - min(p.values()), 1)})
+    return out
+
+
+def time_lens_summary(groups):
+    """跨族群彙總 + 三視角兩兩相關(pooled,用來證明它們不是同一件事講三遍)。"""
+    detail, series = [], {k: [] for k, _, _, _ in TIME_LENSES}
+    for rows in groups:
+        d = time_lenses(rows)
+        g = rows[0]["grp"] if rows and "grp" in rows[0].keys() else None
+        for x in d:
+            x["grp"] = g
+            for k in series:
+                series[k].append(x["pct"][k])
+        detail.extend(d)
+    if not detail:
+        return None
+    keys = [k for k, _, _, _ in TIME_LENSES]
+    rho = {}
+    for i, a in enumerate(keys):
+        for b in keys[i + 1:]:
+            rho[f"{a}-{b}"] = spearman(series[a], series[b])
+    return {
+        "detail": detail,
+        "rho": rho,
+        "spread_median": round(statistics.median(x["spread"] for x in detail), 1),
+        "notable": sorted((x for x in detail if x["spread"] >= LENS_SPREAD_NOTABLE),
+                          key=lambda x: -x["spread"]),
+    }
+
+
 def group_rows(con, date, *, snapshot_id=None):
     """把某資料日的評分列依族群分組。snapshot_id 給定時讀 as-seen 快照(自帶當日族群)。"""
     if snapshot_id:
@@ -366,6 +454,18 @@ def group_rows(con, date, *, snapshot_id=None):
         rows = [dict(r) for r in con.execute(
             """SELECT s.*, u.grp FROM daily_scores s JOIN universe u USING(stock_id)
                WHERE s.date=?""", (date,))]
+    by = {}
+    for r in rows:
+        by.setdefault(r["grp"], []).append(r)
+    return list(by.values())
+
+
+def group_metric_rows(con, date):
+    """同上,但取原始 daily_metrics —— 時間尺度視角要的是均線與報酬,
+    不是 daily_scores 的 −2..+2 分數(快照表也沒有這些欄,故不支援 snapshot_id)。"""
+    rows = [dict(r) for r in con.execute(
+        """SELECT m.*, u.grp FROM daily_metrics m JOIN universe u USING(stock_id)
+           WHERE m.date=?""", (date,))]
     by = {}
     for r in rows:
         by.setdefault(r["grp"], []).append(r)

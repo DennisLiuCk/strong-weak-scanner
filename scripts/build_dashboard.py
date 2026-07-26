@@ -1378,6 +1378,54 @@ def build_divergence(con, last, names, group_names):
         return None
 
 
+def build_lenses(con, last, names, group_names):
+    """時間尺度視角 payload。整套訊號只有 20 日一個週期,這裡把同一檔放到
+    短(5日)/波段(20日)/趨勢(20日vs60日)三個尺度上各排一次名。
+
+    與分歧視角相同:描述用,未計分、未進 tier、不作前瞻報酬主張。"""
+    try:
+        s = sig.time_lens_summary(sig.group_metric_rows(con, last))
+        if not s:
+            return None
+        # 冗餘判定不能只看一天:單日 ρ 很吵(2026-07-24 的 short-trend 是 −0.29,
+        # 全期卻接近 0)。逐日算再取中位,並同時給出今日值,與分歧區同一套呈現。
+        # 起算日 = 三個視角都排得出來的第一天(ma60 要 60 個交易日暖身),
+        # 讓前端能誠實說出「這個視角只有 N 天資料」而不是看起來與其他區同齡。
+        days = [r[0] for r in con.execute(
+            """SELECT DISTINCT date FROM daily_metrics
+               WHERE ma60 IS NOT NULL AND ma5 IS NOT NULL AND ret20 IS NOT NULL
+               AND date<=? ORDER BY date""", (last,))]
+        hist = {}
+        for d in days:
+            hs = sig.time_lens_summary(sig.group_metric_rows(con, d))
+            if hs:
+                for k, v in hs["rho"].items():
+                    if v is not None:
+                        hist.setdefault(k, []).append(v)
+        rho_median = {k: round(statistics.median(v), 2) for k, v in hist.items() if v}
+        first, n_days = (days[0] if days else None), len(days)
+        tiers = {r["stock_id"]: r["tier"] for r in con.execute(
+            "SELECT stock_id, tier FROM daily_scores WHERE date=?", (last,))}
+
+        def deco(x):
+            return {"id": x["stock_id"], "nm": names.get(x["stock_id"], x["stock_id"]),
+                    "g": group_names.get(x["grp"], x["grp"]),
+                    "tier": tiers.get(x["stock_id"]),
+                    "s": x["pct"]["short"], "w": x["pct"]["swing"], "t": x["pct"]["trend"],
+                    "raw": x["raw"], "sp": x["spread"]}
+
+        return {
+            "rho": {k: (round(v, 2) if v is not None else None) for k, v in s["rho"].items()},
+            "rho_median": rho_median,
+            "spread_median": s["spread_median"], "threshold": sig.LENS_SPREAD_NOTABLE,
+            "n_notable": len(s["notable"]), "n_total": len(s["detail"]),
+            "first_date": first, "n_days": n_days,
+            "all": [deco(x) for x in sorted(s["detail"], key=lambda x: -x["spread"])],
+        }
+    except sqlite3.Error:
+        return None
+
+
 def main():
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
@@ -1525,6 +1573,7 @@ def main():
     # 策略狀態(證據強度)與兩視角分歧——都必須在 con.close() 之前算
     strategy = build_strategy_status(con, last)
     diverge = build_divergence(con, last, _names(con), GROUP_NM)
+    lenses = build_lenses(con, last, _names(con), GROUP_NM)
     con.close()
     # 質化筆記(觀察層、AI 協作＋獨立 reviewer,見 notes/qualitative/):無筆記時 load_notes
     # 回傳空 dict,同 fund_map 的「從缺不擋主管線」慣例
@@ -1911,6 +1960,7 @@ def main():
     html = html.replace("__WEIGHTS_JSON__", json.dumps(WEIGHTS))
     html = html.replace("__STRATEGY_JSON__", json.dumps(strategy, ensure_ascii=False))
     html = html.replace("__DIVERGE_JSON__", json.dumps(diverge, ensure_ascii=False))
+    html = html.replace("__LENS_JSON__", json.dumps(lenses, ensure_ascii=False))
     # 量尺門檻(②量比/⑤融資水位)——單一事實來源 score.py,調旋鈕量尺刻度自動同步
     html = html.replace("__THRESH_JSON__", json.dumps({
         "volr_active": list(VOLR_ACTIVE), "volr_dry": VOLR_DRY, "volr_overheat": VOLR_OVERHEAT,

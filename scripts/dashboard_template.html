@@ -158,7 +158,7 @@ svg{display:block;overflow:visible}
     <h1>__H1__</h1>
     <p class="sub">每個交易日收盤後，把同族群個股放上同一把尺：比較價格與抗跌、法人原始買賣及其同業位置、融資槓桿，再依公開規則分層。每個分數都可點開，看原始數據與判讀；資料來源見頁尾。</p>
     <nav class="quicknav" aria-label="快速導覽">
-      <a href="#ov">今日重點</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
+      <a href="#ov">今日重點</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#lens">時間尺度</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
     </nav>
   </header>
 
@@ -168,6 +168,7 @@ svg{display:block;overflow:visible}
     <section id="tsmc" class="blk"></section>
     <section id="grp" class="blk"></section>
     <section id="diverge" class="blk"></section>
+    <section id="lens" class="blk"></section>
     <section id="tier" class="blk"></section>
     <section id="stocks" class="blk"></section>
 
@@ -215,7 +216,7 @@ svg{display:block;overflow:visible}
    ============================================================ */
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
-      TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
+      TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,tier:s.tier_confirmed,
   tierLabel:s.tier_label,waiting:s.tier_waiting,
   f:(s.factors||[]).map(function(f){return [f.label,f.score,f.weight];}),
@@ -623,6 +624,92 @@ function buildDiverge(){
       +'<br><b style="color:var(--ink)">這是描述,不是買賣訊號</b>——落差有沒有預測力,'
       +'正由事先登錄的假設 H1 檢定中(見週報 ⑪),目前尚無結論。'}),
     grid, rho];
+}
+
+/* 時間尺度視角:整套訊號只有 20 日一個週期,這裡把同一檔放到短(5日)/波段(20日)/
+   趨勢(20日vs60日)三個尺度上各排一次名。三欄都是族群內平均秩百分位,所以可比。
+   同樣是描述、不計分、不進 tier、不作前瞻報酬主張。 */
+const LENS_HI=60, LENS_LO=40;   // 靠前/靠後的門檻(百分位點)
+function lensShape(s,w,t){
+  const hi=v=>v>=LENS_HI, lo=v=>v<LENS_LO;
+  if(hi(s)&&hi(w)&&hi(t)) return ['三個週期都靠前','var(--strong)'];
+  if(lo(s)&&lo(w)&&lo(t)) return ['三個週期都靠後','var(--weak)'];
+  if(lo(s)&&hi(w)&&hi(t)) return ['中長期靠前，短線剛回檔','var(--amber)'];
+  if(hi(s)&&lo(w)&&lo(t)) return ['短線反彈，中長期仍在後段','var(--amber)'];
+  if(hi(w)&&lo(t))        return ['波段轉強，長期趨勢還沒跟上','var(--teal)'];
+  if(hi(t)&&lo(w))        return ['長期趨勢仍靠前，波段已轉弱','var(--amber)'];
+  return ['週期之間看法分歧','var(--muted)'];
+}
+function lensBar(label,v,raw){
+  const col=v>=LENS_HI?'var(--strong)':(v<LENS_LO?'var(--weak)':'var(--muted)');
+  return h('div',{style:'display:grid;grid-template-columns:22px 1fr 30px;gap:6px;align-items:center',
+    title:`${label}：族群內第 ${v.toFixed(0)} 百分位（原始值 ${(raw>=0?'+':'−')+Math.abs(raw).toFixed(1)}%）`},
+    h('span',{style:'font-size:10px;color:var(--muted);font-weight:700',text:label}),
+    h('div',{style:'height:6px;border-radius:3px;background:var(--inset);overflow:hidden'},
+      h('div',{style:`height:100%;width:${Math.max(v,1.5)}%;background:${col};border-radius:3px`})),
+    h('span',{class:'mono',style:`font-size:10.5px;font-weight:700;color:${col};text-align:right`,text:v.toFixed(0)}));
+}
+function buildLenses(){
+  const L=LENS; if(!L) return [];
+  const fx=v=>v==null?'—':(v>=0?'+':'')+v.toFixed(2);
+  const rho=k=>fx(L.rho_median[k]), rhoToday=k=>fx(L.rho[k]);
+  const gsel=h('select',{class:'sel','aria-label':'選擇族群'},h('option',{value:'',text:'全部族群'}));
+  [...new Set(L.all.map(x=>x.g))].sort().forEach(g=>gsel.appendChild(h('option',{value:g,text:g})));
+  const listBox=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px'});
+  const foot=h('p',{style:'margin:12px 0 0;font-size:12px;color:var(--muted)'});
+  let showAll=false;
+  const more=h('button',{class:'lnk',style:'margin-top:12px',onclick:()=>{showAll=!showAll;render();}});
+  function render(){
+    listBox.textContent='';
+    const g=gsel.value;
+    const rows=L.all.filter(x=>!g||x.g===g);
+    const shown=showAll?rows:rows.slice(0,12);
+    shown.forEach(x=>{
+      const [txt,col]=lensShape(x.s,x.w,x.t);
+      listBox.appendChild(h('div',{class:'card clickrow',role:'button',tabindex:'0',
+        style:'padding:13px 15px;cursor:pointer',
+        onclick:()=>openStockDetail(x.id),
+        onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(x.id);}}},
+        h('div',{style:'display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-bottom:2px'},
+          h('b',{style:'font-size:14px',text:x.nm}),
+          h('span',{class:'mono',style:'font-size:10.5px;color:var(--muted)',text:x.id}),
+          h('span',{style:'font-size:10.5px;color:var(--muted)',text:x.g}),
+          x.tier?h('span',{class:'chip',style:'font-size:10px',text:x.tier}):null),
+        h('div',{style:`font-size:11px;color:${col};font-weight:700;margin-bottom:7px`,text:txt}),
+        h('div',{style:'display:grid;gap:4px'},
+          lensBar('短',x.s,x.raw.short),lensBar('波',x.w,x.raw.swing),lensBar('趨',x.t,x.raw.trend))));
+    });
+    foot.textContent=`顯示 ${shown.length} / ${rows.length} 檔`
+      +(g?`（${g}）`:`（全 ${L.n_total} 檔，依三欄極差由大到小）`);
+    more.textContent=showAll?'只看落差最大的 12 檔':`展開全部 ${rows.length} 檔`;
+    more.style.display=rows.length>12?'':'none';
+  }
+  gsel.onchange=()=>{showAll=false;render();};
+  render();
+  const note=h('div',{class:'card',style:'padding:18px 22px;margin-top:16px;border-left:3px solid var(--teal)'},
+    h('b',{style:'font-size:15px',text:'三個尺度不是同一件事講三遍'}),
+    h('p',{style:'margin:6px 0 0;font-size:13px;color:var(--ink);line-height:1.7',
+      html:`族群內排名相關（<b>全期 ${L.n_days} 日中位</b> / 今日）：`
+        +`短期↔趨勢 <b class="mono">${rho('short-trend')}</b> / ${rhoToday('short-trend')}、`
+        +`短期↔波段 <b class="mono">${rho('short-swing')}</b> / ${rhoToday('short-swing')}、`
+        +`波段↔趨勢 <b class="mono">${rho('swing-trend')}</b> / ${rhoToday('swing-trend')}。`
+        +`三者都遠低於 0.8 的冗餘門檻，其中短期與趨勢幾乎獨立。`
+        +`今日三欄極差中位 <b>${L.spread_median.toFixed(0)}</b> 個百分位點，`
+        +`<b>${L.n_notable}</b> 檔達 ${L.threshold} 點以上。`}),
+    h('p',{style:'margin:8px 0 0;font-size:12px;color:var(--muted);line-height:1.6',
+      text:`中位取自 ${L.first_date} 起的 ${L.n_days} 個交易日——趨勢欄需要 60 個交易日暖身，`
+        +`所以這個視角比其他區年輕，且窗口幾乎落在同一段回檔裡；在別的行情下 ρ 未必相同。`
+        +`單日 ρ 很吵（同一組視角當日可以差到 0.3 以上），所以並列全期中位；`
+        +`這裡只把 ρ 當「會不會重複」的篩子，不當假設檢定，故不附標準誤。`}));
+  return [h('p',{class:'kicker',text:'三個時間尺度'}),
+    h('h2',{class:'sec',text:'時間尺度 · 同一檔在短、波段、長期的位置'}),
+    h('p',{class:'lead',html:'評分只看一個週期（20 日），但「這檔強不強」在不同週期可以是相反的答案。'
+      +'這裡把同一檔放到<b style="color:var(--ink)">短期</b>（收盤 vs 5 日均線）、'
+      +'<b style="color:var(--ink)">波段</b>（20 日報酬）、<b style="color:var(--ink)">趨勢</b>'
+      +'（20 日均線 vs 60 日均線）三個尺度上各排一次名，數字是<b style="color:var(--ink)">族群內百分位</b>'
+      +'（100＝族群內最前，50＝中間）。<br><b style="color:var(--ink)">這是描述，不是買賣訊號</b>——'
+      +'三欄都未計分、未進分層，也不宣稱哪個週期比較準。'}),
+    h('div',{class:'toolbar'},gsel),listBox,more,foot,note];
 }
 
 function buildTSMC(){
@@ -1299,6 +1386,7 @@ document.getElementById('tsmc').append(...buildTSMC());
 document.getElementById('grp').append(...buildGroup());
 document.getElementById('tier').append(...buildTier());
 document.getElementById('diverge').append(...buildDiverge());
+document.getElementById('lens').append(...buildLenses());
 document.getElementById('stocks').append(...buildStocks1c());
 </script>
 </body>
