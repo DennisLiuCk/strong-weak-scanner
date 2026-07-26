@@ -12,6 +12,31 @@
 | schema 新增原始欄位，舊列該欄為 `NULL` | `--backfill-expanded-fields` | 只掃既有交易日與 `RAW_COLUMN_MIGRATIONS` 缺欄，可續跑 |
 | 交易所已公告來源修正版，既有非空值也必須覆寫 | `--force` | 無條件重抓指定範圍；不具欄位缺口續跑語意 |
 | 只想確認正式 DB | `scripts/audit_raw_data.py` | SQLite `mode=ro`＋`query_only`，不做 schema migration 或寫入 |
+| 往 2026-03-02 之前延伸歷史（pre-IS 檢定場） | `--db tmp/history.db --start …` | **必須另開 db**；對正式 db 會被擋下（見下節） |
+
+## 歷史延伸（2026-03-02 之前）必須落在另一個 db
+
+`fetch_daily.py` 的 `HISTORY_FLOOR = 2026-03-02` 是正式 DB 的起算日。`--start` 早於它
+而 `--db` 仍指向正式 DB 時，argparse 直接 `exit 2`。
+
+**理由不是潔癖，是實測結果（2026-07-26）**：把 2026-02 一個月接到既有歷史前面之後，
+**3～4 月既有的個股綜合分有 51% 改變**——評分是族群內排名，而 `rs20`／`dist_hi60` 的
+視窗一旦有了更早資料，就從 `NULL` 變成有值，連帶改寫排名與 tier。正式 DB 正在累積
+不可改寫的 as-seen 快照；底下的重算歷史若被延伸改掉，快照與歷史就不再可比，且不可逆。
+
+整條鏈都支援改道：`fetch_daily.py --db`、`score.py --db`、`validate.py --db`、
+`audit_raw_data.py --db`。
+
+一個月試跑（2026-02，12 個交易日）的實測結果與已知限制：
+
+| 項目 | 結果 |
+|---|---|
+| 五張原始表 | 每表 1452 列＝121 檔 × 12 日，**零缺漏**；148 次官方批次請求，免 token |
+| 還原股價 | 正確。83 檔與原始價不同，且**全部**都有 2 月之後的除權息；最新日錨點差異 0 |
+| 大盤指數（regime 來源） | `--raw-only` 不碰 FinMind，`market` 會是空的；需另跑 `fetch_index` 補（實測可回補） |
+| TPEx 報酬指數 | **永久無法回補**——櫃買 OpenAPI 只服務當月。屬觀察層，不進 regime／評分／發布門檻 |
+| 冷啟動 | 起點前 20 日無 `rs20`、60 日無 `dist_hi60`，但 `composite` 仍會產出（缺項以 0 計）→ **回補起點必須比預計分析的最早日再往前 ≥60 個交易日**，否則前段分數不可比 |
+| TDCC | 不可回補（缺週＝永久洞） |
 
 `--backfill-expanded-fields` 自動採 `raw-only`：不讀 FinMind token、不抓事件、不重算
 衍生表，也不發布 OOS／archive。它必須明確指定 `--start`，`--end` 省略時為今天。

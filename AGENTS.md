@@ -72,6 +72,10 @@ fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件
                  ⚠ 每張待補表每交易日各呼叫 TWSE/TPEx 一次；五表完整新日共 10 次免 token
                  ⚠ market_index:TWSE 報酬指數沿用價格 MI_INDEX；TPEx 當月報酬指數 +1 req
                    屬非阻斷觀察層，不取代 FinMind market、不進 regime/評分/發布門檻
+                 ⚠ 往 2026-03-02(HISTORY_FLOOR)之前延伸歷史一律要 --db 指到別的檔案,
+                   對正式 db 會被 argparse 擋下。實測接一個月 2026-02 上去,3~4 月既有
+                   綜合分 51% 改變(rs20/dist_hi60 視窗一有更早資料就從 NULL 變有值)
+                   → 會毀掉 as-seen 快照與重算歷史的可比性,且不可逆。score.py 同有 --db
                  ⚠ schema 新欄歷史回補用 --backfill-expanded-fields：只掃既有交易日與 NULL
                    欄位、自動 raw-only、可續跑；來源修正版才用 --force
                  ⚠ 18:07/19:07/21:47 在 23:40 前只落地價格/法人 checkpoint；

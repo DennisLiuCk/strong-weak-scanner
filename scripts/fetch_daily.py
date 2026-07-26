@@ -37,6 +37,9 @@ from observation_metrics import build_observation_metrics
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
+# 正式 db 的資料起算日 = 策略歷史起點。往前延伸屬於「另一個檢定場」,必須落在別的檔案:
+# 評分是族群內排名,任何成員或期間的改動都會改寫既有排名,已封存的 as-seen 快照就不可比了。
+HISTORY_FLOOR = "2026-03-02"
 UNIVERSE = os.path.join(ROOT, "config", "universe.csv")
 GROUPS_CSV = os.path.join(ROOT, "config", "groups.csv")
 API = "https://api.finmindtrade.com/api/v4/data"
@@ -1917,15 +1920,25 @@ def main():
     fetch_mode.add_argument(
         "--backfill-expanded-fields", action="store_true",
         help="只在既有交易日補 RAW_COLUMN_MIGRATIONS 的 NULL 欄位;可續跑且自動 raw-only")
+    # 歷史延伸(pre-IS 檢定場)專用:把資料寫到另一個檔案,不碰正式 db。
+    # 正式 db 正在累積 as-seen 快照與 OOS 證據,一旦混入 2026-03-02 之前的回補歷史,
+    # 族群中位數與所有成員排名都會被改寫 → 既有快照的可比性毀掉且不可逆。
+    ap.add_argument("--db", default=DB,
+                    help="SQLite 路徑(預設正式 db);歷史延伸/實驗一律指向別的檔案")
     args = ap.parse_args()
 
     if args.backfill_expanded_fields and not args.start:
         ap.error("--backfill-expanded-fields 必須明確指定 --start，避免意外回打過大範圍")
     if args.backfill_expanded_fields and args.final_pass:
         ap.error("--backfill-expanded-fields 不可與 --final-pass 同時使用")
+    # 正式 db 只放 2026-03-02(策略起算日)之後的資料。要往前延伸必須改用 --db,
+    # 否則會把回補歷史混進正在累積證據的正式庫。
+    if args.start and args.start < HISTORY_FLOOR and os.path.abspath(args.db) == os.path.abspath(DB):
+        ap.error(f"--start {args.start} 早於 {HISTORY_FLOOR}(正式 db 的起算日)。"
+                 f"歷史延伸請加 --db 指向另一個檔案,例如 --db data/history.db")
 
     if args.metrics_only:
-        con = sqlite3.connect(DB)
+        con = sqlite3.connect(args.db)
         ensure_schema(con)
         load_universe(con)
         con.commit()
@@ -1957,8 +1970,8 @@ def main():
     # 指定原始表、raw-only、欄位回補全程不碰 FinMind；正式晚場才需 token 補事件／觀察序列。
     effective_raw_only = args.raw_only or args.backfill_expanded_fields
     token = None if (args.datasets or effective_raw_only) else get_token()
-    os.makedirs(os.path.dirname(DB), exist_ok=True)
-    con = sqlite3.connect(DB)
+    os.makedirs(os.path.dirname(os.path.abspath(args.db)), exist_ok=True)
+    con = sqlite3.connect(args.db)
     ensure_schema(con)
     ids = load_universe(con)
     con.commit()

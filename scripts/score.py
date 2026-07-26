@@ -198,8 +198,12 @@ def build_chip_health(con):
 
 
 def main():
-    argparse.ArgumentParser(description="v2 排名制評分(永遠重算全歷史)").parse_args()
-    con = sqlite3.connect(DB)
+    ap = argparse.ArgumentParser(description="v2 排名制評分(永遠重算全歷史)")
+    # 與 fetch_daily/validate/audit_raw_data 同慣例:歷史延伸(pre-IS 檢定場)要能整條鏈
+    # 指向別的 db,不碰正在累積 as-seen 證據的正式庫。
+    ap.add_argument("--db", default=DB, help="SQLite 路徑(預設正式 db);歷史延伸/實驗指向別的檔案")
+    args = ap.parse_args()
+    con = sqlite3.connect(args.db)
     con.row_factory = sqlite3.Row
     con.execute("DROP TABLE IF EXISTS daily_scores")
     con.execute("""CREATE TABLE daily_scores(
