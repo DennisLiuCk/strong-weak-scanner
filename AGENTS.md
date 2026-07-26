@@ -95,9 +95,13 @@ build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db
                  archive 同資料日首次建立後不覆寫;本地重跑只更新 index.html
                  含台積電專區(觀察層):ref 表+fund_map[2330]+事件錨點 → __TSMC_JSON__
 validate.py      → reports/ 週報(§⑥=觀察因子 IC、§⑦=元素邊際貢獻、§⑧=tier 持續性、
-                 §⑨=判讀強度)。**§⑨ 是讀其他節的前置**:格數不是獨立樣本,前瞻窗重疊
-                 使日 IC 自相關 ≈ +0.6,配 Newey-West 後 composite_s 全期 t=+0.7 與 0
-                 無法分辨;10 個成熟日 ≈ 1 個獨立觀測。點估計 t<2 時不得當調旋鈕依據
+                 §⑨=判讀強度、§⑩=淨成本下限)。**§⑨⑩ 是讀其他節的前置**:
+                 §⑨ 格數不是獨立樣本(前瞻窗重疊使日 IC 自相關 ≈ +0.6),配 Newey-West
+                 後 composite_s 全期 t=+0.7 與 0 無法分辨;10 個成熟日 ≈ 1 個獨立觀測;
+                 有效獨立觀測 <3 時刻意不報 SE/t,避免 OOS 剛成熟時吐出假精確的 t 值。
+                 §⑩ 訊號 18:07 才產出 → close(d) 買不到,一律改隔日開盤並扣 0.585%
+                 來回成本;真強固定持有 3 日(≈照 tier 進出)淨超額 −0.09%(t=−0.2)、
+                 10 日 +1.41%(t=+1.4),**無一格 |t|>2 → 不得宣稱扣成本後仍有效**
 config/          universe.csv(成員+主業)、groups.csv(族群定義)、candidates.csv(候選)
 qual_notes.py    notes/qualitative/*.md(年報MD&A/法說會重點,人工撰寫)狀態追蹤+骨架建立
                  ⚠ 唯讀盤點工具,不抓資料;已有筆記的股票不會被要求重寫,除非模板版本升級

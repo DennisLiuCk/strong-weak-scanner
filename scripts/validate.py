@@ -38,6 +38,13 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 REPORTS = os.path.join(ROOT, "reports")
 IS_CUTOFF = "2026-07-05"      # v2.1 權重校準日:此日(含)之前 = in-sample
+
+# ── §⑩ 淨成本下限的市場參數(不是策略旋鈕,是台股交易事實)────────────────
+# 訊號在台北 18:07 之後才算出來 → close(d) 買不到。可成交的最早進場是隔日開盤。
+COST_ROUND_TRIP = 0.1425 * 2 + 0.3    # 手續費 0.1425%×2 + 證交稅 0.3%(賣出)= 0.585%
+COST_DISCOUNTED = 0.1425 * 0.6 * 2 + 0.3   # 手續費 6 折 = 0.471%
+NET_HOLD_DAYS = (3, 5, 10, 20)        # 固定持有期對照(3 日 ≈ 照 tier 進出的實際持有)
+NET_TIERS = ("真強", "蓄勢·外資佈局")   # 只算「可能被當進場訊號」的層
 ELEMENTS = ["s_price", "s_resil", "s_vol", "s_foreign", "s_trust", "s_dip", "s_margin",
             "composite", "composite_s"]
 
@@ -711,6 +718,143 @@ def main():
     w("")
     w("> **規矩**:沒有標準誤與區段數的數字,不得作為調旋鈕的依據——"
       "點估計的大小順序在 t<2 時沒有意義。§①②③ 的點估計請一律回到本節查證據強度。")
+    w("")
+    # ── ⑩ 淨成本下限 ──────────────────────────────────────────────
+    # §①~⑨ 量的全是「毛」訊號品質,且用 close(d) → close(d+F)。但訊號在台北 18:07
+    # 之後才算出來,**close(d) 買不到**;而 §⑧ 顯示真強中位停留只有 4~5 日,
+    # 照 tier 進出的年化換手上百次。這節把兩件事都算進去:進出各延一天到隔日開盤,
+    # 再扣來回成本,看還剩什麼。
+    w("## ⑩ 淨成本下限(可成交價 + 交易成本)")
+    w("")
+    w(f"訊號 18:07 後才產出 → **close(d) 買不到**,以下一律用**隔日開盤**進出"
+      f"(還原開盤 = 原始開盤 × 還原收盤/原始收盤)。"
+      f"來回成本 **{COST_ROUND_TRIP:.3f}%**(手續費 0.1425%×2 + 證交稅 0.3%);"
+      f"6 折手續費為 {COST_DISCOUNTED:.3f}%。")
+    w("")
+    # 還原開盤(price_adj 只存 close,係數逐日逐股相同)
+    adj_o = {}
+    for r in con.execute("""SELECT p.date, p.stock_id, p.open, p.close, a.close AS ac
+                            FROM price p JOIN price_adj a
+                              ON a.date=p.date AND a.stock_id=p.stock_id"""):
+        if r["open"] and r["close"] and r["ac"]:
+            adj_o[(r["date"], r["stock_id"])] = r["open"] * (r["ac"] / r["close"])
+
+    def shift(d, n):
+        i = didx.get(d)
+        return dates[i + n] if (i is not None and 0 <= i + n < len(dates)) else None
+
+    def oret(s, d0, d1):
+        a, b = adj_o.get((d0, s)), adj_o.get((d1, s))
+        return (b / a - 1) if (a and b) else None
+
+    # (A) 執行時差:同一個 composite_s,只換報酬定義
+    w("### A 執行時差:換成可成交的報酬定義後,毛 IC 變多少")
+    w("")
+    w("| 報酬定義 | 日均 IC ±NW SE (t) | 交易日 | 有效獨立觀測 |")
+    w("|---|---|---|---|")
+    for label, n0, n1, use_open in (
+            (f"close(d) → close(d+{F})  §① 現行定義(**買不到**)", 0, F, False),
+            (f"open(d+1) → open(d+1+{F})  隔日開盤進出(可成交)", 1, 1 + F, True)):
+        by_d = {}
+        for d in dates:
+            if d not in v2:
+                continue
+            d0, d1 = shift(d, n0), shift(d, n1)
+            if not d0 or not d1:
+                continue
+            v = []
+            for g in grps_on(d):
+                sids = [s for s in v2[d] if grp_of(d, s) == g]
+                rr = {s: (oret(s, d0, d1) if use_open
+                          else ((cadj.get((d1, s)) / cadj[(d0, s)] - 1)
+                                if cadj.get((d1, s)) and cadj.get((d0, s)) else None))
+                      for s in sids}
+                ok = [s for s in sids if rr[s] is not None]
+                if len(ok) < 6:
+                    continue
+                ic = spearman([v2[d][s]["composite_s"] for s in ok], [rr[s] for s in ok])
+                if ic is not None:
+                    v.append(ic)
+            if v:
+                by_d[d] = mean(v)
+        ds = sorted(by_d)
+        s = sci.summarize([by_d[d] for d in ds], F, ds, dates)
+        if s:
+            w(f"| {label} | {sci.fmt(s)} | {s['n_days']} | {s['eff_obs']:.1f} |")
+    w("")
+
+    # (B) 優勢是否藏在買不到的隔夜跳空
+    gp = {}
+    for d in dates:
+        if d not in v2:
+            continue
+        d1 = shift(d, 1)
+        if not d1:
+            continue
+        v = []
+        for g in grps_on(d):
+            sids = [s for s in v2[d] if grp_of(d, s) == g
+                    and cadj.get((d, s)) and adj_o.get((d1, s))]
+            if len(sids) < 6:
+                continue
+            ic = spearman([v2[d][s]["composite_s"] for s in sids],
+                          [adj_o[(d1, s)] / cadj[(d, s)] - 1 for s in sids])
+            if ic is not None:
+                v.append(ic)
+        if v:
+            gp[d] = mean(v)
+    ds = sorted(gp)
+    sg = sci.summarize([gp[d] for d in ds], 1, ds, dates)   # 跳空不重疊 → lag 0
+    if sg:
+        w(f"- **B 隔夜跳空**:composite_s 對「當日收盤 → 隔日開盤」的族群內 IC "
+          f"**{sci.fmt(sg)}**——若接近 0,代表優勢不是集中在買不到的那一刻。")
+        w("")
+
+    # (C) 固定持有期的淨超額(先按日聚合再 NW,避免同股連續日重複計入)
+    w(f"### C 固定持有期的淨超額(vs 族群中位,已扣 {COST_ROUND_TRIP:.3f}%)")
+    w("")
+    w("| 進場層 | 固定持有 | 交易日 | 有效獨立觀測 | 淨超額 ±NW SE (t) | 判讀 |")
+    w("|---|---|---|---|---|---|")
+    for tier_name in NET_TIERS:
+        for H in NET_HOLD_DAYS:
+            daily = {}
+            for d in dates:
+                if d not in v2:
+                    continue
+                d0, d1 = shift(d, 1), shift(d, 1 + H)
+                if not d0 or not d1:
+                    continue
+                # 每個族群的報酬只算一次
+                gret = {}
+                for g in grps_on(d):
+                    gr = {s: oret(s, d0, d1) for s in v2[d] if grp_of(d, s) == g}
+                    gr = {k: x for k, x in gr.items() if x is not None}
+                    if len(gr) >= 6:
+                        gret[g] = gr
+                vals = []
+                for s, row in v2[d].items():
+                    if row["tier"] != tier_name:
+                        continue
+                    g = grp_of(d, s)
+                    gr = gret.get(g)
+                    if not gr or s not in gr:
+                        continue
+                    peers = [x for k, x in gr.items() if k != s]
+                    if len(peers) < 5:
+                        continue
+                    vals.append((gr[s] - statistics.median(peers)) * 100 - COST_ROUND_TRIP)
+                if vals:
+                    daily[d] = mean(vals)
+            ds = sorted(daily)
+            s = sci.summarize([daily[d] for d in ds], H, ds, dates)
+            if s:
+                w(f"| {tier_name} | {H} 日 | {s['n_days']} | **{s['eff_obs']:.1f}** | "
+                  f"{sci.fmt(s)} | {sci.verdict(s)} |")
+    w("")
+    w(f"> **怎麼讀**:`{NET_HOLD_DAYS[0]} 日`約等於「照 tier 進出」的實際持有"
+      f"(§⑧ 顯示真強中位停留 4~5 日,進出各延一天後約 3 日)。持有期越長,"
+      f"固定成本被攤薄、點估計越好——但有效獨立觀測同時變少,長持有反而更難判讀。"
+      f"**沒有一格達到 |t|>2 之前,不可宣稱這套訊號在扣成本後仍有效。**")
     w("")
     w("## 判讀警語")
     w("")
