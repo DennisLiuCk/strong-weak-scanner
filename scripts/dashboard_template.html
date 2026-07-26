@@ -232,7 +232,7 @@ function _adaptTSMC(T){ if(!T||!T.event)return null; const e=T.event;
     sections:e.sections||[], history:e.history||[]}; }
 const D={ groups:GROUPS, grpMeta:GRP, overview:OVERVIEW, tierFlow:TIER_FLOW, date:DATE_STR,
   stocks:DATA.map(_slim),
-  allStocks:DATA.map(function(s){return {id:s.id,nm:s.nm,g:s.g,comp:s.comp,tier:s.tier_confirmed,tl:s.tier_label,w:s.tier_waiting,cs:(s.cells||[]).map(function(c){return c[0];})};}),
+  allStocks:DATA.map(function(s){return {id:s.id,nm:s.nm,g:s.g,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,tl:s.tier_label,w:s.tier_waiting,cs:(s.cells||[]).map(function(c){return c[0];})};}),
   byId:Object.fromEntries(DATA.map(function(s){return [s.id,s];})),
   tsmc:_adaptTSMC(TSMC) };
 const COMP_MAX=2*Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
@@ -746,7 +746,7 @@ function buildGroup(){
         h('div',{style:'display:flex;align-items:center;gap:7px;flex-wrap:wrap'},h('b',{style:'font-size:15.5px;font-weight:700',text:grp(g.g).short}),
           h('span',{class:'chip',style:`color:${st.col};background:${st.bg}`,text:g.state})),
         h('div',{style:'font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap',text:grp(g.g).tag||''})),
-      metricCell(mom,(mom>=0?'+':'−')+Math.abs(mom).toFixed(1)+'%',mom>=0?'var(--strong)':'var(--weak)',md,25),
+      h('div',{},metricCell(mom,(mom>=0?'+':'−')+Math.abs(mom).toFixed(1)+'%',mom>=0?'var(--strong)':'var(--weak)',md,25),absLine(g.abs20)),
       metricCell(dip,(dip>=0?'淨買 ':'淨賣 ')+Math.abs(dip).toFixed(2)+'%',dip>=0?'var(--strong)':'var(--weak)',dd,3)));
   });
 
@@ -770,6 +770,29 @@ function buildGroup(){
 }
 function deltaTxt(txt){ if(!txt)return{t:'',c:'var(--muted)'}; const m=txt.match(/([+\-−]?\d[\d.]*\s*(?:pp|%|張)?)\s*$/),num=m?m[1]:'';
   if(/改善|增/.test(txt))return{t:'▲ '+num,c:'var(--teal)'}; if(/惡化|減/.test(txt))return{t:'▼ '+num,c:'var(--amber)'}; return{t:'→ '+num,c:'var(--muted)'}; }
+/* 分數靠前的三個 tier(其餘是中性/弱層,相對後段本來就不會被誤讀成在漲)。 */
+const UPPER_TIERS={'真強':1,'蓄勢·外資佈局':1,'強但過熱':1};
+
+/* 相對強勢層裡有多少檔 20 日絕對報酬其實是負的——由當日資料現算,不寫死。
+   數字為 0 時整句不出現,避免在多頭時留下沒有指涉對象的警語。 */
+function absCaveat(){ const up=D.allStocks.filter(s=>UPPER_TIERS[s.tier]&&s.r20!=null);
+  const neg=up.filter(s=>s.r20<0);
+  if(!up.length||!neg.length) return '';
+  const worst=neg.reduce((a,b)=>a.r20<b.r20?a:b);
+  return `分數是<b style="color:var(--ink)">族群內相對排名</b>，與絕對漲跌是兩件事：今日相對強勢的 ${up.length} 檔裡有 `
+    +`<b style="color:var(--weak)">${neg.length} 檔 20 日絕對報酬為負</b>（最深 ${worst.nm} −${Math.abs(worst.r20).toFixed(1)}%）。`
+    +`每列分數右側的百分比即為該檔 20 日絕對報酬，標 <b style="color:var(--weak)">↓</b> 者＝相對靠前但絕對在跌。`; }
+
+/* 「動能 vs 全體」是族群間的**相對**名次:全市場一起跌時,跌得最少的族群照樣排第一。
+   絕對列補上該族群 20 日中位報酬與上漲家數,讓「領漲」與「抗跌」分得開。 */
+function absLine(a){ if(!a) return null;
+  const c=a.med>=0?'var(--strong)':'var(--weak)';
+  return h('div',{style:'margin-top:4px;font-size:10px;color:var(--muted);white-space:nowrap',
+    title:`族群 ${a.n} 檔的 20 日還原報酬中位數,以及其中 ${a.pos} 檔為正`},
+    h('span',{text:'絕對 '}),
+    h('span',{class:'mono',style:`color:${c};font-weight:700`,text:(a.med>=0?'+':'−')+Math.abs(a.med).toFixed(1)+'%'}),
+    h('span',{text:` · ${a.pos}/${a.n} 檔漲`})); }
+
 function metricCell(v,valTxt,col,d,max){ return h('div',{},
   h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:6px'},
     h('span',{class:'mono',style:`font-size:13px;font-weight:600;color:${col}`,text:valTxt}),
@@ -940,13 +963,27 @@ function buildTier(){
     else mem=D.allStocks.filter(s=>s.tier===k);
     if(curG)mem=mem.filter(s=>s.g===curG);
     return mem.sort((a,b)=>b.comp-a.comp); }
+  /* 整套分數都是**族群內相對**,所以「相對強勢」可能與「絕對在跌」並存
+     ——2026-07-24 實測 11 檔相對強勢裡有 7 檔 20 日絕對報酬為負,最深 −21.8%。
+     只顯示綜合分會讓人把「相對強」讀成「在漲」,故每一列並列 20 日絕對報酬;
+     相對靠前的層若絕對為負,額外標記。 */
   function stockPill(s){ const cc=s.comp>=0?'var(--strong)':'var(--weak)';
+    const r=s.r20, rc=r==null?'var(--muted)':(r>=0?'var(--strong)':'var(--weak)');
+    const mismatch=r!=null&&r<0&&UPPER_TIERS[s.tier];
     return h('span',{class:'clickrow',role:'button',tabindex:'0',
+      title:r==null?'':`20 日絕對報酬 ${(r>=0?'+':'')+r.toFixed(1)}%`
+        +(mismatch?'(族群內相對靠前,但絕對報酬為負)':''),
       onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
-      style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid var(--line2);border-radius:100px;padding:4px 11px;cursor:pointer'},
+      style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid '
+        +(mismatch?'var(--weak)':'var(--line2)')+';border-radius:100px;padding:4px 11px;cursor:pointer'},
       h('b',{style:'font-weight:700',text:s.nm}),h('span',{class:'mono',style:'font-size:10px;color:var(--muted)',text:grp(s.g).short}),
       s.cs&&s.cs.length?microStrip(s.cs):null,
-      h('span',{class:'mono',style:`font-size:11px;font-weight:600;color:${cc}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)})); }
+      h('span',{class:'mono',style:`font-size:11px;font-weight:600;color:${cc}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)}),
+      /* 小數位動態:|r|<1 用一位,否則整數——否則 −0.4% 會印成「-0%」,把在跌讀成持平。
+         負號用 U+2212 與族群列一致,不用 toFixed 產生的 ASCII hyphen。 */
+      r==null?null:h('span',{class:'mono',style:`font-size:10.5px;color:${rc};opacity:.9`,
+        text:(r>=0?'+':'−')+Math.abs(r).toFixed(Math.abs(r)<1?1:0)+'%'}),
+      mismatch?h('span',{style:'font-size:10px;color:var(--weak);font-weight:800',text:'↓'}):null); }
   const bands=h('div',{style:'display:flex;flex-direction:column;gap:11px'});
   function renderBands(){ bands.replaceChildren(...order.map(([k,t,d])=>{
     const mem=memFor(k),col=tierColorKey(k==='__cand'?'蓄勢·外資佈局':k),cw=h('div',{style:'display:flex;flex-wrap:wrap;gap:7px'});
@@ -981,7 +1018,8 @@ function buildTier(){
   D.groups.forEach(g=>gsel.appendChild(h('option',{value:g.g,text:grp(g.g).nm})));
   return [h('p',{class:'kicker',text:'族群層'}),h('h2',{class:'sec',text:'個股分層 · 已確認的相對強弱'}),
     h('p',{class:'lead',html:`把全 ${D.allStocks.length} 檔依分數組合分成幾層（<b style="color:var(--strong)">強</b> → <b style="color:var(--weak)">弱</b>）。分層名稱描述相對位置，<b style="color:var(--ink)">不是買賣指示</b>。選族群可看該族群全部成員；<b style="color:var(--ink)">點任一檔</b>看完整明細。`
-      +(STRATEGY&&STRATEGY.dwell!=null?`各層停留天數不長（相對強勢中位 <b style="color:var(--ink)">${STRATEGY.dwell.toFixed(0)} 個交易日</b>），名單本身會頻繁變動；穩定度與證據狀態見上方<a href="#strategy-status" style="color:var(--teal);font-weight:700">策略狀態</a>。`:'')}),
+      +(STRATEGY&&STRATEGY.dwell!=null?`各層停留天數不長（相對強勢中位 <b style="color:var(--ink)">${STRATEGY.dwell.toFixed(0)} 個交易日</b>），名單本身會頻繁變動；穩定度與證據狀態見上方<a href="#strategy-status" style="color:var(--teal);font-weight:700">策略狀態</a>。`:'')
+      +absCaveat()}),
     h('div',{class:'toolbar'},gsel),
     bands,
     h('div',{style:'margin-top:34px'},h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px'},h('h3',{style:'margin:0;font-size:17px;font-weight:800',text:'近 5 日變層軌跡'}),

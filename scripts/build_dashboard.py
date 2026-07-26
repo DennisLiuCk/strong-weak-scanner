@@ -1447,6 +1447,17 @@ def main():
             SUM(CASE WHEN m.trust5_pct>0 THEN 1 ELSE 0 END) t_pos, COUNT(m.trust5_pct) t_n
             FROM daily_metrics m JOIN universe u USING(stock_id)
             WHERE m.date=? GROUP BY u.grp""", (last,))}
+    # 族群「絕對」20 日中位報酬。group_metrics 只存 rel20(跨族群相對),整套訊號也都是
+    # 相對排名——沒有絕對值時,「這族群相對強」會被讀成「這族群在漲」。族群卡與個股列
+    # 並列絕對報酬後,才分得出「它強」與「它跌得比較少」。
+    gabs = {}
+    _gret = defaultdict(list)
+    for r in con.execute("""SELECT u.grp, m.ret20 FROM daily_metrics m JOIN universe u USING(stock_id)
+            WHERE m.date=? AND m.ret20 IS NOT NULL""", (last,)):
+        _gret[r["grp"]].append(r["ret20"])
+    for g, v in _gret.items():
+        gabs[g] = {"med": round(statistics.median(v) * 100, 1),
+                   "pos": sum(1 for x in v if x > 0), "n": len(v)}
     # 處置/注意股票(觀察層、不計分):交易所官方認證的異常價量列管,五元素分數看不到——
     # 只顯示當天名單,不判斷起訖(risk_flags 由 fetch_daily 每日整表重建)
     risk = {}
@@ -1580,6 +1591,7 @@ def main():
         bt = r["breadth_t"]
         gobj = {"g": g, "nm": GROUP_NM.get(g, g), "state": r["state"],
                 "col": STATE_COL.get(r["state"], "var(--neutral)"), "note": note,
+                "abs20": gabs.get(g),
                 "axis": {"price": rel, "dip": dip,
                          "price5": _five_day_value(ser, "rel20"),
                          "dip5": _five_day_value(ser, "med_dip"),
@@ -1723,6 +1735,10 @@ def main():
                "comp": round(r["composite_s"], 2) if r["composite_s"] is not None else None,
                "comp3": [round(h["composite"], 2) for h in comp_hist],
                "comp3Dates": [h["date"] for h in comp_hist],
+               # 20 日**絕對**報酬。整套系統都是族群內相對,所以「相對強勢」可能與
+               # 「絕對在跌」並存——2026-07-24 實測 11 檔真強裡有 7 檔 20 日為負,
+               # 最深一檔 −21.8%。不把絕對值放在同一列,讀者會把「相對強」讀成「在漲」。
+               "ret20": round(r["ret20"] * 100, 1) if r["ret20"] is not None else None,
                "cells": build_cells(r, r, mkt20)}
         obj.update(tier_meta)
         tech = build_technical_view(r, tech_hist.get(r["stock_id"]))
