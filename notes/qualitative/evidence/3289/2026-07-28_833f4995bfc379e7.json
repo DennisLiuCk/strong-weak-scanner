@@ -1,0 +1,178 @@
+{
+  "content_as_of": "2026-07-28",
+  "documents": [
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 114,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "d40c8f8d59175f6894360df8ae5b7efcf706952d0ace5d495bc331df0ecda286",
+      "size_bytes": 2311087,
+      "url": "https://www.istgroup.com/tw/wp-content/uploads/2026/06/3.pdf"
+    },
+    {
+      "cited_pages": [
+        5,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 79,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "82acdd86bd98e9919db07ea8f4299b4859eeaf163437e272d149ce1b03a44c49",
+      "size_bytes": 1619967,
+      "url": "https://www.istgroup.com/tw/wp-content/uploads/2026/03/114Q4.pdf"
+    },
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        20,
+        21,
+        22,
+        39,
+        40
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 57,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        19,
+        20,
+        21,
+        22,
+        23,
+        38,
+        39,
+        40,
+        41
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "03b4020fd0ebf6f5e02696c0ea362fd31aa45e27ee5a615db9bf5811ef5c67b0",
+      "size_bytes": 1506251,
+      "url": "https://www.istgroup.com/tw/wp-content/uploads/2026/06/115Q1.pdf"
+    },
+    {
+      "cited_pages": [
+        5,
+        6,
+        9,
+        12,
+        14,
+        15,
+        16,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 27,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "0522bd38e65656a3923170a351b047fff508b4eb368c7b9ce5dc75bebb4f123d",
+      "size_bytes": 801319,
+      "url": "https://www.istgroup.com/tw/wp-content/uploads/2025/12/2025Q3-TW.pdf"
+    }
+  ],
+  "pack_sha256": "833f4995bfc379e7d0d028438f21b209f0e27be42a58a29d04894e139868b9af",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3289",
+  "unverified_claims_removed": true
+}
