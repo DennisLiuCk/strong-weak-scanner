@@ -292,6 +292,23 @@ python scripts/leading_hypotheses.py --context <股號>
 完整收錄邊界與操作見 [`LEADING_HYPOTHESES.md`](LEADING_HYPOTHESES.md) 與
 [`LEADING_HYPOTHESES_PHASE2_RUNBOOK.md`](LEADING_HYPOTHESES_PHASE2_RUNBOOK.md)。
 
+## 研究更新佇列與市場議題
+
+`scripts/research_queue.py` 把正式筆記、逐則 H#、事件錨點、財報覆蓋、候選市場議題與
+實際掃描紀錄聚成一張唯讀待辦；A–D 四個 cohort 每週輪一組，四週涵蓋全 universe。
+`notes/research_topics/` 只保存「值得查」的候選議題，不是第四套正式事實庫，也不計分。
+
+```powershell
+python scripts/research_queue.py --attention
+python scripts/research_queue.py --calendar --weeks 8 --output tmp/research_calendar.md
+python scripts/research_queue.py --lint
+```
+
+候選議題必須明列來源發布日、研究捕捉日、受影響族群／股票、route、action due 與
+證據邊界；沒有新題目也要在 `scan_log.csv` 留下實際掃描範圍。已簽筆記的 `next_review`
+不可單獨 snooze，否則內容 SHA 會失效。完整節奏、SLA 與路由規則見
+[`RESEARCH_MAINTENANCE.md`](RESEARCH_MAINTENANCE.md)。
+
 ## 事件錨點與台積電專區
 
 台積電 2330 是觀察層參考股，不在 universe，也不參與 `daily_metrics`、`daily_scores` 或任何
@@ -315,6 +332,7 @@ python scripts/qual_notes.py --lint
 | Universe 與候選 | 本頁「Universe 治理」、`scripts/screen.py`、`config/` |
 | 質化筆記 | [`QUALITATIVE_RESEARCH_RUNBOOK.md`](QUALITATIVE_RESEARCH_RUNBOOK.md)、`scripts/qual_notes.py`、`scripts/qual_evidence.py`、`scripts/qual_review.py` |
 | 領先假說 | [`LEADING_HYPOTHESES.md`](LEADING_HYPOTHESES.md)、[`LEADING_HYPOTHESES_PHASE2_RUNBOOK.md`](LEADING_HYPOTHESES_PHASE2_RUNBOOK.md) |
+| 研究更新／市場議題 | [`RESEARCH_MAINTENANCE.md`](RESEARCH_MAINTENANCE.md)、`scripts/research_queue.py`、`notes/research_topics/` |
 | 策略與資料變更歷史 | [`CHANGELOG.md`](CHANGELOG.md) |
 
 ## 已知限制

@@ -5,48 +5,58 @@ on:
     paths:
       - "notes/qualitative/**"
       - "notes/leading_hypotheses/**"
+      - "notes/research_topics/**"
       - "notes/events/**"
       - "config/groups.csv"
       - "LEADING_HYPOTHESES.md"
       - "LEADING_HYPOTHESES_PHASE1_REVIEW.md"
       - "LEADING_HYPOTHESES_PHASE2_RUNBOOK.md"
+      - "RESEARCH_MAINTENANCE.md"
       - "config/universe.csv"
       - "scripts/qual_notes.py"
       - "scripts/qual_evidence.py"
       - "scripts/leading_hypotheses.py"
+      - "scripts/research_queue.py"
       - "scripts/build_dashboard.py"
       - "scripts/dashboard_template.html"
       - "tests/test_qual_notes_quality.py"
       - "tests/test_qual_evidence.py"
       - "tests/test_leading_hypotheses.py"
+      - "tests/test_research_queue.py"
       - "tests/test_dashboard_ux_contract.py"
       - "tests/test_entry_docs_sync.py"
       - "CLAUDE.md"
       - "AGENTS.md"
       - ".github/workflows/qualitative-quality.yml"
+      - ".github/workflows/research-watch.yml"
   pull_request:
     paths:
       - "notes/qualitative/**"
       - "notes/leading_hypotheses/**"
+      - "notes/research_topics/**"
       - "notes/events/**"
       - "config/groups.csv"
       - "LEADING_HYPOTHESES.md"
       - "LEADING_HYPOTHESES_PHASE1_REVIEW.md"
       - "LEADING_HYPOTHESES_PHASE2_RUNBOOK.md"
+      - "RESEARCH_MAINTENANCE.md"
       - "config/universe.csv"
       - "scripts/qual_notes.py"
       - "scripts/qual_evidence.py"
       - "scripts/leading_hypotheses.py"
+      - "scripts/research_queue.py"
       - "scripts/build_dashboard.py"
       - "scripts/dashboard_template.html"
       - "tests/test_qual_notes_quality.py"
       - "tests/test_qual_evidence.py"
       - "tests/test_leading_hypotheses.py"
+      - "tests/test_research_queue.py"
       - "tests/test_dashboard_ux_contract.py"
       - "tests/test_entry_docs_sync.py"
       - "CLAUDE.md"
       - "AGENTS.md"
       - ".github/workflows/qualitative-quality.yml"
+      - ".github/workflows/research-watch.yml"
   workflow_dispatch: {}
 
 permissions:
@@ -68,5 +78,8 @@ jobs:
       - name: 稽核領先假說格式與正式筆記錨定
         run: python scripts/leading_hypotheses.py --lint
 
+      - name: 稽核研究議題與掃描紀錄
+        run: python scripts/research_queue.py --lint
+
       - name: 執行質化品質、dashboard 與入口文件契約測試
-        run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_leading_hypotheses tests.test_dashboard_ux_contract tests.test_entry_docs_sync
+        run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_leading_hypotheses tests.test_research_queue tests.test_dashboard_ux_contract tests.test_entry_docs_sync

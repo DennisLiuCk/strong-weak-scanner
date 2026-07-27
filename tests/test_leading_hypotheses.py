@@ -202,6 +202,13 @@ review_due: 2026-08-31
             info = lh.analyse_report("1234_測試.md", report_text(), notes=self.notes)
         self.assertFalse(info["quality_invalid"], info["quality_errors"])
 
+    def test_quant_context_uses_enforced_read_only_connector(self):
+        with mock.patch.object(
+                lh.db_ro, "connect", side_effect=RuntimeError("read-only guard")) as connect:
+            with self.assertRaisesRegex(RuntimeError, "read-only guard"):
+                lh.quant_context("1234", "typo.db")
+        connect.assert_called_once_with("typo.db")
+
     def test_all_verified_notes_have_valid_reports_and_hypotheses(self):
         reports = lh.load_reports()
         self.assertEqual(len(reports), 118)

@@ -4,6 +4,8 @@ on:
   schedule:
     # 月營收:每月 12 日 UTC 02:00(= 台灣 10:00)——公司約月初 10 日內公布上月數字,留 2 天緩衝。
     - cron: "0 2 12 * *"
+    # 月營收缺口重試:排除另有季報全抓的 5/8/11 月；17 日仍不完整就標紅。
+    - cron: "0 2 17 1,2,3,4,6,7,9,10,12 *"
     # 季報四表(順帶重抓月營收,冪等):申報截止後幾天抓一次。
     # Q1(3/31結算)截止 5/15 → 5/17 抓;Q2(6/30)截止 8/14 → 8/17 抓;
     # Q3(9/30)截止 11/14 → 11/17 抓;Q4/年報(12/31)截止次年 3/31 → 4/3 抓。
@@ -34,7 +36,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      # 月營收排程(12日)只抓月營收,省額度;其餘排程(季報截止後)+手動觸發抓全部四個。
+      # 12 日為首抓；17 日非季報月定向重試、季報月全抓，兩者都要求月營收完整。
       - name: 抓取財報
         env:
           FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
@@ -43,6 +45,13 @@ jobs:
         run: |
           if [ "${{ github.event.schedule }}" = "0 2 12 * *" ]; then
             python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue
+          elif [ "${{ github.event.schedule }}" = "0 2 17 1,2,3,4,6,7,9,10,12 *" ]; then
+            python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue \
+              --require-latest-month-complete
+          elif [ "${{ github.event.schedule }}" = "0 2 17 5 *" ] || \
+               [ "${{ github.event.schedule }}" = "0 2 17 8 *" ] || \
+               [ "${{ github.event.schedule }}" = "0 2 17 11 *" ]; then
+            python scripts/fetch_financials.py --require-latest-month-complete
           else
             python scripts/fetch_financials.py
           fi

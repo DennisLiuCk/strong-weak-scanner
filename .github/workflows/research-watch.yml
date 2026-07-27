@@ -1,0 +1,44 @@
+name: research-watch
+
+on:
+  schedule:
+    # 台灣每週一 09:00：只產出提醒，不自動把候選議題寫進正式筆記。
+    - cron: "0 1 * * 1"
+  workflow_run:
+    workflows: ["fetch-financials"]
+    types: [completed]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  queue:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: 產生研究待辦
+        run: python scripts/research_queue.py --attention --output tmp/research_attention.md
+
+      - name: 寫入 Actions 摘要
+        run: |
+          echo "候選議題與到期項目是研究提醒，不是投資訊號，也不會自動更新正式筆記。" \
+            >> "$GITHUB_STEP_SUMMARY"
+          cat tmp/research_attention.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: research-attention
+          path: tmp/research_attention.md
+          retention-days: 14

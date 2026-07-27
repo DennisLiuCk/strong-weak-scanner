@@ -8,10 +8,10 @@ name: tests
 # 路徑刻意排除 data/、index.html、archive/、reports/:每個交易日有 3~4 個資料 commit,
 # 那些 commit 不會改動程式,不需要重跑測試。
 #
-# 與 qualitative-quality.yml 的關係:那條**刻意**保留自己的 5 模組 unittest 與兩個 lint,
+# 與 qualitative-quality.yml 的關係:那條**刻意**保留自己的 6 模組 unittest 與三個 lint,
 # 由 test_qual_notes_quality.test_quality_ci_is_independent_from_daily_market_pipeline
 # 釘住——質化 gate 必須獨立於每日市場管線、且釘在自己的 workflow。兩邊在 notes/ 或
-# qual_* 變更時會重複跑那 5 個模組(約 20 秒),那是刻意接受的代價,不要為了去重而鬆綁
+# qual_* 變更時會重複跑那 6 個模組,那是刻意接受的代價,不要為了去重而鬆綁
 # 該契約。
 
 on:
@@ -24,6 +24,7 @@ on:
       - "CLAUDE.md"
       - "AGENTS.md"
       - ".github/workflows/tests.yml"
+      - ".github/workflows/fetch-financials.yml"
   pull_request:
     paths:
       - "scripts/**"
@@ -33,6 +34,7 @@ on:
       - "CLAUDE.md"
       - "AGENTS.md"
       - ".github/workflows/tests.yml"
+      - ".github/workflows/fetch-financials.yml"
   workflow_dispatch: {}
 
 permissions:

@@ -30,6 +30,7 @@
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
 | 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` + `scripts/qual_review.py`(複核 triage) |
 | 領先假說收錄/複核/多空小作文 | `LEADING_HYPOTHESES.md` + `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` + `scripts/leading_hypotheses.py`(`--context` 產量化背景) |
+| 研究更新盤點、定期時間表、市場議題掃描 | `RESEARCH_MAINTENANCE.md` + `scripts/research_queue.py` + `notes/research_topics/` |
 | 每季台積電法說會後,更新事件錨點與專區指引 | README「事件錨點與台積電專區」+ `scripts/qual_notes.py --lint` |
 
 ## 鐵律
@@ -96,6 +97,8 @@ audit_raw_data.py 唯讀稽核 current universe×price∪market 交易日的五�
 fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現金流量表)
                  → month_revenue/financials/balance_sheet/cash_flow;獨立月/季排程,不掛每日管線
                  範圍 = universe + REF_IDS(2330,供台積電專區)
+                 月營收缺口以 TWSE/TPEx 官方 OpenAPI 補援;12 日首抓、每月 17 日
+                 重驗(季報月由全抓順帶),並要求最新應公布月份完整,否則 workflow 標紅
 score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
                  archive 同資料日首次建立後不覆寫;本地重跑只更新 index.html
@@ -124,6 +127,8 @@ qual_evidence.py focused_v1 evidence pack 建立/渲染規劃/離線驗證;可�
                  → notes/qualitative/evidence/,PDF/PNG → tmp/qualitative_evidence/(不進版控)
 qual_review.py   focused_v1 機器輔助複核 triage(唯讀):claim 數字對 cited 頁全覆蓋比對
                  → tmp/qualitative_review/;HARD=缺頁/缺檔,未解決不得簽核;非簽核依據
+research_queue.py 唯讀聚合正式筆記/H#/事件/財務覆蓋/候選議題與 A–D 四週輪掃;
+                 notes/research_topics/ 是候選來源與路由,不自動改正式筆記、不進計分
 ```
 
 資料表:原始 price(含成交筆數)/inst(買賣分項)/margin(流量與限額)/holding(持股股數、

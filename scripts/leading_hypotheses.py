@@ -9,6 +9,7 @@ import re
 import sys
 from urllib.parse import urlparse
 
+import db_ro
 from qual_notes import _extract_sections, _parse_meta_details, _today, load_notes, note_review_status
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -686,11 +687,8 @@ def quant_context(stock_id, db_path=None):
     資料面向:月營收路徑、價格/相對強弱、族群內排名、外資持股、借券、融資、
     TDCC 大戶、處置/注意旗標、台積電法說對所屬族群的方向指引。作者貼上後可裁剪,
     但警語與截至日期必須保留(lint 檢查)。"""
-    import sqlite3
-
     db_path = db_path or os.path.join(ROOT, "data", "findmind.db")
-    con = sqlite3.connect(db_path)
-    con.row_factory = sqlite3.Row
+    con = db_ro.connect(db_path)
     uni = con.execute("SELECT name, grp FROM universe WHERE stock_id=?", (stock_id,)).fetchone()
     if not uni:
         raise SystemExit(f"universe 沒有 {stock_id}")

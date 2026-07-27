@@ -1,0 +1,2 @@
+scan_id,window_start,window_end,scanned_at,scope,source_domains,result_topic_ids,next_scan_due,coverage_note
+scan-2026-07-27,2026-07-19,2026-07-27,2026-07-27,partial,twse.com.tw;tpex.org.tw;nvidia.com;ustr.gov;whitehouse.gov,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP;MI-2026-07-23-US-SECTION301-TAIWAN,2026-08-03,"已查官方最新重大訊息端點與 NVIDIA／USTR／白宮主題來源；MOPS 日端點只提供當前批次，repo 先前又沒有 scan log，因此不能證明 7/19–7/27 每一日、每一家公司都已完整掃過。"

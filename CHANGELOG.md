@@ -2,6 +2,32 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 研究更新佇列、候選議題與財報完整度閘門 — 2026-07-27
+
+**策略規則、權重、tier 與 `IS_CUTOFF` 零變動**；本次只改研究維護與觀察層資料完整度。
+完整普查與來源見 `reports/research_maintenance_2026-07-27.md`。
+
+- 121/121 有正式筆記，118 篇已獨立核驗、3 篇仍為 draft；0 篇逾期，但 81 篇在 30 日內
+  到期，65 篇集中 8/20–8/21。118 份領先假說報告含 219 則 H#，全部仍 open；196 則
+  回溯基線集中於 8/20、8/21、8/31 到期。這些是全集普查，非抽樣，SE 不適用。
+- 新增唯讀 `scripts/research_queue.py`，聚合正式筆記、H#、事件、財務 coverage、
+  `notes/research_topics/` 與 scan log；四個族群平衡 cohort 為 31/30/30/30，
+  每週輪一組。季報應有期由申報截止日推導，不拿全 DB `MAX(date)` 自我證明完整。
+  已簽筆記的 `next_review` 不拿來 snooze，避免內容 SHA 失效。
+- 新增 `notes/research_topics/`。首批收錄 NVIDIA Vera Rubin／Spectrum-6 量產部署，
+  以及美國 Section 301 台灣商品框架；兩者都保留個股映射與證據邊界，不自動改正式筆記、
+  H# 終態或量化分數。本次只把 2376 小作文未加日期的 Rubin 階段敘述改回 5/15 歷史
+  切面；政策 Annex 初查確認 8471、8473.30、8486、8517.62、8541／8542 等一般豁免，
+  仍待公司 HTS／原產地／Incoterms 映射。本次 scan 因缺歷史逐日 log 明標 `partial`。
+- 2026-06 月營收初查 117/121，缺 3016、3661、3680、3707；TWSE／TPEx 官方 OpenAPI
+  已有四筆，定向補入後為 121/121。三張季報表皆為 121/121、最新 2026Q1。
+- `fetch_financials.py` 加官方當期月營收 fallback；workflow 在每月 12 日首抓、非季報月
+  17 日定向重試，季報月 17 日由全抓順帶重驗；兩種 17 日路徑都用完整度閘門標紅。
+  新增 `research-watch.yml` 每週一及財報 workflow 後產出唯讀 Actions
+  summary／artifact，不寫 main。
+- 修正 `leading_hypotheses.quant_context()`：改用 `db_ro.connect()`，不再以裸
+  `sqlite3.connect()` 違反唯讀宣稱。
+
 ## 儀表板補上兩個缺席的軸:絕對報酬與時間尺度 — 2026-07-26
 
 **策略規則、權重、tier 與 `IS_CUTOFF` 零變動**；兩者都是觀察層顯示，未計分、
