@@ -1,0 +1,137 @@
+{
+  "content_as_of": "2026-07-28",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        5,
+        6,
+        30,
+        31,
+        32,
+        77,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 122,
+      "rendered_pages": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        29,
+        30,
+        31,
+        32,
+        33,
+        76,
+        77,
+        78,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113
+      ],
+      "roles": [
+        "annual_report",
+        "annual_financials"
+      ],
+      "sha256": "a02e047ff526ef714baab70e77695dd84c9faf0b95aa8bbc29dba28674a08e39",
+      "size_bytes": 3678096,
+      "url": "https://www.waferworks.com/uploads/investor/financial_information/annual_reports/2025_annual_report.pdf"
+    },
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        56,
+        57,
+        58,
+        62
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 86,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        55,
+        56,
+        57,
+        58,
+        59,
+        61,
+        62,
+        63
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "7d606cba47f7b4e8c96d6da4069bf24e1f50e36ab04cd3c6f58341f6390778b2",
+      "size_bytes": 1442088,
+      "url": "https://www.waferworks.com/uploads/2026_con_q1.pdf"
+    },
+    {
+      "cited_pages": [
+        12
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 23,
+      "rendered_pages": [
+        11,
+        12,
+        13
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "7cf57091f60c3c9c43585f6c6f90c6e3bcc778a0e5de0ed5fb66ccfad063af26",
+      "size_bytes": 3150143,
+      "url": "https://mopsov.twse.com.tw/nas/STR/618220251203M001.pdf"
+    }
+  ],
+  "pack_sha256": "6bd5c9ee6cea74cd38a7cd867133a7debda509360e5f77aba1a2c93599d7398f",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "6182",
+  "unverified_claims_removed": true
+}
