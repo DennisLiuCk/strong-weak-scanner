@@ -114,6 +114,23 @@ class QualitativeEvidenceTests(unittest.TestCase):
             self.assertEqual(document["sha256"], qual_evidence._sha256_file(copied))
             self.assertEqual(document["size_bytes"], copied.stat().st_size)
 
+    def test_windows_build_seals_after_atomic_move(self):
+        original_seal = qual_evidence._seal_pack
+        sealed_paths = []
+
+        def record_seal(path):
+            sealed_paths.append(Path(path))
+            original_seal(path)
+
+        with (
+            mock.patch.object(qual_evidence.sys, "platform", "win32"),
+            mock.patch.object(qual_evidence, "_seal_pack", side_effect=record_seal),
+        ):
+            _, pack_dir, _ = self._build(case="windows-seal-order")
+
+        self.assertEqual([pack_dir], sealed_paths)
+        self.assertFalse(pack_dir.name.startswith(".building-"))
+
     def test_verify_detects_document_and_manifest_tampering(self):
         manifest, pack_dir, _ = self._build(case="document-tamper")
         target = pack_dir / "documents" / "S2.pdf"

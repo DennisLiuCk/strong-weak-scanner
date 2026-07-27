@@ -487,7 +487,12 @@ def build_pack(
             manifest = existing
         else:
             _write_json_new_or_same(staging / "manifest.json", manifest)
-            _seal_pack(staging)
+            # Windows treats a read-only directory as non-renamable.  Keep the
+            # staging root writable until the atomic move, then seal the final
+            # content-addressed directory before verification.
+            seal_after_move = sys.platform == "win32"
+            if not seal_after_move:
+                _seal_pack(staging)
             moved = False
             try:
                 os.replace(staging, final_pack)
@@ -501,6 +506,8 @@ def build_pack(
                 manifest = existing
             if moved:
                 try:
+                    if seal_after_move:
+                        _seal_pack(final_pack)
                     _, final_errors = verify_pack(final_pack, pdfinfo=pdfinfo)
                     if final_errors:
                         raise EvidenceError("；".join(final_errors))
