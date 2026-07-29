@@ -110,7 +110,11 @@ class ResearchTopicContractTest(unittest.TestCase):
     def test_repo_topic_register_and_scan_log_lint(self):
         topics = rq.load_topics(reports=lh.load_reports())
         scan = rq.load_scan_log(topic_ids=[topic["topic_id"] for topic in topics])
-        self.assertEqual(len(topics), 3)
+        self.assertGreaterEqual(len(topics), 4)
+        self.assertIn(
+            "MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL",
+            {topic["topic_id"] for topic in topics},
+        )
         self.assertFalse(any(topic["quality_errors"] for topic in topics))
         self.assertFalse(scan["errors"])
         self.assertEqual(scan["latest"]["scope"], "partial")

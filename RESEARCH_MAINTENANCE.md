@@ -67,12 +67,17 @@ pack 與獨立複核。
    python scripts/research_queue.py --calendar --weeks 4 --output tmp/research_calendar.md
    ```
 
-2. 依 `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` 的來源分層，掃描該週 cohort、跨族群上游
-   錨點、交易所／MOPS 重大訊息、公司 IR、關鍵客戶／平台官方公告與重大政策。
+2. 先用交易所／MOPS 與官方法說日曆，對**全 universe** 做前次掃描窗口以來的事件
+   索引快掃；法說、季報、財報董事會等事件先逐檔升為 P1 triage，再依
+   `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` 的來源分層，對該週 cohort、跨族群上游錨點、
+   公司 IR、關鍵客戶／平台官方公告與重大政策做語意深掃。事件快掃不能被 30 檔 cohort
+   或臨時指定名單取代。
 3. 有新議題時複製 `notes/research_topics/_template.md`；沒有新議題也要在
    `scan_log.csv` 寫 `result_topic_ids=none`。
 4. `scope=full` 只能在預定來源與完整時間窗真的都掃完時使用。只查當前日端點、主題式
    搜尋或缺歷史頁面時必須寫 `partial` 與 coverage limitation。
+   對外發布「優先更新對象」前若尚未完成全 universe 事件快掃，標題與摘要必須明示
+   「部分掃描」，不可讓指定股票名單被理解成全體優先排序。
 5. 先完成 topic impact 與 evidence boundary，再選 route：
    - 公司一手文件且改變既有事實 → `formal_note_candidate`。
    - 市場流傳、可證偽但未被正式資料覆蓋 → `hypothesis_candidate`。
