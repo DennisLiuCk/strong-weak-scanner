@@ -755,8 +755,9 @@ def quant_context(stock_id, db_path=None):
         "",
         f"- **月營收路徑：** {'、'.join(revenue_lines) or '-'}。[DB]",
         f"- **價格動能：** 收盤 {_fmt(metric['close'])} 元;20 日 "
-        f"{_fmt(metric['ret20'], 1, '%') if metric['ret20'] is not None else '-'}、60 日 "
-        f"{_fmt(ret60, 1, '%')};族群相對強弱 rs20 {_fmt(metric['rs20'], 3)}。[DB]",
+        f"{_fmt(metric['ret20'] * 100, 1, '%') if metric['ret20'] is not None else '-'}、60 日 "
+        f"{_fmt(ret60, 1, '%')};族群相對強弱 rs20 "
+        f"{_fmt(metric['rs20'] * 100, 1, 'pp') if metric['rs20'] is not None else '-'}。[DB]",
         f"- **族群內位置：** {uni['grp']} 綜合分排名 "
         f"{rank or '-'}/{len(peers)},tier {score['tier'] if score else '-'}"
         f"(平滑綜合分 {_fmt(score['composite_s'] if score else None, 2)})。[DB]",

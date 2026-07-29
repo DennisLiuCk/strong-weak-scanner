@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import research_queue as rq
+import leading_hypotheses as lh
 
 
 def topic_text(stock_id="1234", group_id="serverodm"):
@@ -107,9 +108,9 @@ class ResearchTopicContractTest(unittest.TestCase):
         self.assertTrue(any("未銜接上一狀態" in error for error in info["quality_errors"]))
 
     def test_repo_topic_register_and_scan_log_lint(self):
-        topics = rq.load_topics()
+        topics = rq.load_topics(reports=lh.load_reports())
         scan = rq.load_scan_log(topic_ids=[topic["topic_id"] for topic in topics])
-        self.assertEqual(len(topics), 2)
+        self.assertEqual(len(topics), 3)
         self.assertFalse(any(topic["quality_errors"] for topic in topics))
         self.assertFalse(scan["errors"])
         self.assertEqual(scan["latest"]["scope"], "partial")

@@ -1,3 +1,4 @@
+import sqlite3
 import tempfile
 import unittest
 from datetime import date
@@ -208,6 +209,39 @@ review_due: 2026-08-31
             with self.assertRaisesRegex(RuntimeError, "read-only guard"):
                 lh.quant_context("1234", "typo.db")
         connect.assert_called_once_with("typo.db")
+
+    def test_quant_context_formats_ratio_returns_as_percent_and_pp(self):
+        con = sqlite3.connect(":memory:")
+        con.row_factory = sqlite3.Row
+        con.executescript("""
+            CREATE TABLE universe(stock_id TEXT, name TEXT, grp TEXT);
+            CREATE TABLE daily_metrics(
+                date TEXT, stock_id TEXT, close REAL, ret20 REAL, rs20 REAL,
+                foreign_pct REAL, fpct_chg20 REAL, sbl_pct REAL, sbl_chg20 REAL,
+                margin_util_pct REAL, margin_chg20 REAL,
+                tdcc_big400_pct REAL, tdcc_big400_chg REAL, tdcc_date TEXT
+            );
+            CREATE TABLE daily_scores(
+                date TEXT, stock_id TEXT, composite_s REAL, tier TEXT
+            );
+            CREATE TABLE month_revenue(
+                date TEXT, stock_id TEXT, revenue REAL,
+                revenue_month INTEGER, revenue_year INTEGER
+            );
+            CREATE TABLE risk_flags(
+                date TEXT, stock_id TEXT, kind TEXT, reason TEXT
+            );
+        """)
+        con.execute("INSERT INTO universe VALUES ('1234','測試','test')")
+        con.execute("""INSERT INTO daily_metrics VALUES
+            ('2026-07-28','1234',185.5,-0.1188,-0.0291,
+             12.87,0.06,4.72,-1.85,4.37,-0.10,NULL,NULL,NULL)""")
+        con.execute("INSERT INTO daily_scores VALUES ('2026-07-28','1234',0.4,'潛在/中性')")
+        with mock.patch.object(lh.db_ro, "connect", return_value=con):
+            block = lh.quant_context("1234", "test.db")
+        self.assertIn("20 日 -11.9%", block)
+        self.assertIn("族群相對強弱 rs20 -2.9pp", block)
+        self.assertNotIn("20 日 -0.1%", block)
 
     def test_all_verified_notes_have_valid_reports_and_hypotheses(self):
         reports = lh.load_reports()
