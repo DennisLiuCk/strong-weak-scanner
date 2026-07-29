@@ -110,6 +110,23 @@ svg{display:block;overflow:visible}
 .quicknav{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 0}
 .quicknav a{font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:100px;padding:7px 14px}
 .quicknav a:hover{color:var(--ink);border-color:var(--muted);text-decoration:none}
+.recent-summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.recent-total{font-size:13px;font-weight:800;color:var(--ink)}
+.recent-count{font-size:11.5px;color:var(--ink2);background:var(--inset);border:1px solid var(--line2);border-radius:100px;padding:3px 9px}
+.recent-list{display:grid;gap:8px}
+.recent-item{display:grid;grid-template-columns:112px minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:13px;min-height:72px}
+.recent-item:hover{color:var(--ink);background:var(--inset);border-color:var(--muted);text-decoration:none}
+.recent-item:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.recent-date{display:block;font-family:'IBM Plex Mono',Consolas,ui-monospace,monospace;font-size:11.5px;color:var(--muted)}
+.recent-type{display:inline-block;margin-top:4px;font-size:10.5px;font-weight:800;color:var(--teal)}
+.recent-who{font-size:12px;font-weight:800;color:var(--ink2)}
+.recent-title{margin:3px 0 0;font-size:14px;line-height:1.55;color:var(--ink)}
+.recent-status{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:700;color:var(--muted)}
+.recent-status.verified{color:var(--teal)} .recent-status.warning{color:var(--amber)}
+.recent-status.observational{color:var(--hypoink)}
+.recent-arrow{font-size:18px;color:var(--muted)}
+.recent-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.recent-shown{font-size:11.5px;color:var(--muted)}
 .srow{display:grid;grid-template-columns:44px minmax(210px,1fr) 340px minmax(200px,240px);gap:22px;align-items:center}
 .shead{align-items:end}
 .board-row{display:grid;grid-template-columns:30px minmax(120px,1fr) 150px 150px;gap:14px;align-items:center}
@@ -145,6 +162,11 @@ svg{display:block;overflow:visible}
   .togglebtn,.sortbtn,.rtab,.sheetclose,.msearch,.quicknav a{min-height:44px}
   .quicknav a{display:inline-flex;align-items:center}
   .clickrow{min-height:44px}
+  .recent-item{grid-template-columns:1fr;gap:7px;padding:14px;min-height:88px}
+  .recent-arrow{display:none}
+  .recent-status{display:block;margin:3px 0 0}
+  .recent-actions{align-items:stretch}
+  .recent-actions .togglebtn{width:100%;justify-content:center}
 }
 </style>
 </head>
@@ -158,13 +180,14 @@ svg{display:block;overflow:visible}
     <h1>__H1__</h1>
     <p class="sub">每個交易日收盤後，把同族群個股放上同一把尺：比較價格與抗跌、法人原始買賣及其同業位置、融資槓桿，再依公開規則分層。每個分數都可點開，看原始數據與判讀；資料來源見頁尾。</p>
     <nav class="quicknav" aria-label="快速導覽">
-      <a href="#ov">今日重點</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#lens">時間尺度</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
+      <a href="#ov">今日重點</a><a href="#recent">最近研究</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#lens">時間尺度</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
     </nav>
   </header>
 
   <!-- 各段由 JS 建構 -->
   <main id="main">
     <section id="ov" class="blk" style="margin-top:56px"></section>
+    <section id="recent" class="blk"></section>
     <section id="tsmc" class="blk"></section>
     <section id="grp" class="blk"></section>
     <section id="diverge" class="blk"></section>
@@ -216,7 +239,8 @@ svg{display:block;overflow:visible}
    ============================================================ */
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
-      TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
+      TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__,
+      RECENT=__RECENT_ARTICLES_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,
   tierLabel:s.tier_label,waiting:s.tier_waiting,
   f:(s.factors||[]).map(function(f){return [f.label,f.score,f.weight];}),
@@ -1421,6 +1445,65 @@ function buildDetail(){
   return card;
 }
 
+/* ---------- 最近 14 天研究文章 ---------- */
+const RECENT_DEFAULT_LIMIT=12;
+function buildRecentArticles(){
+  const fmtDate=value=>String(value||'').replaceAll('-','/');
+  const head=[
+    h('p',{class:'kicker',text:'研究更新 · 可稽核文章日期'}),
+    h('h2',{class:'sec',text:'最近 '+((RECENT&&RECENT.days)||14)+' 天更新文章'}),
+    h('p',{class:'lead',text:'文章窗 '+fmtDate(RECENT&&RECENT.start)+'～'+fmtDate(RECENT&&RECENT.anchor)+'，日期取自各文章 metadata；新近不代表證據較強，正式筆記查核狀態與觀察層警語逐篇保留。'})
+  ];
+  const card=h('div',{class:'card',style:'padding:20px 22px'});
+  const items=(RECENT&&RECENT.items)||[];
+  const summary=h('div',{class:'recent-summary'},
+    h('span',{class:'recent-total',text:'共 '+items.length+' 篇'}));
+  ((RECENT&&RECENT.counts)||[]).forEach(c=>summary.appendChild(
+    h('span',{class:'recent-count',text:c.label+' '+c.count})));
+  card.appendChild(summary);
+  if(!items.length){
+    card.appendChild(h('p',{style:'margin:4px 0;color:var(--muted);font-size:13px',text:'這個文章窗沒有可可靠解析的更新。'}));
+    return head.concat(card);
+  }
+
+  const list=h('div',{id:'recent-list',class:'recent-list','aria-label':'近期研究文章'});
+  const shown=h('span',{class:'recent-shown','aria-live':'polite'});
+  const toggle=h('button',{class:'togglebtn',type:'button','aria-expanded':'false','aria-controls':'recent-list'});
+  let expanded=false;
+  const render=()=>{
+    list.replaceChildren();
+    const visible=expanded?items:items.slice(0,RECENT_DEFAULT_LIMIT);
+    visible.forEach(item=>{
+      const statusClass='recent-status '+(item.statusTone||'');
+      list.appendChild(h('a',{
+        class:'recent-item',href:item.url,target:'_blank',rel:'noopener noreferrer',
+        'aria-label':item.date+' '+item.typeLabel+' '+item.subject+'：'+item.title+'；'+item.status+'，在新分頁開啟'
+      },
+        h('div',{},
+          h('time',{class:'recent-date',datetime:item.date,text:fmtDate(item.date)}),
+          h('span',{class:'recent-type',text:item.typeLabel})),
+        h('div',{style:'min-width:0'},
+          h('div',{},
+            h('span',{class:'recent-who',text:item.subject}),
+            h('span',{class:statusClass,text:item.status})),
+          h('p',{class:'recent-title',text:item.title})),
+        h('span',{class:'recent-arrow','aria-hidden':'true',text:'↗'})
+      ));
+    });
+    shown.textContent='目前顯示 '+visible.length+'／'+items.length+' 篇';
+    toggle.setAttribute('aria-expanded',String(expanded));
+    toggle.textContent=expanded?'收合至最近 '+Math.min(RECENT_DEFAULT_LIMIT,items.length)+' 篇':'展開全部 '+items.length+' 篇';
+  };
+  render();
+  const actions=h('div',{class:'recent-actions'},shown);
+  if(items.length>RECENT_DEFAULT_LIMIT){
+    toggle.addEventListener('click',()=>{expanded=!expanded;render();});
+    actions.appendChild(toggle);
+  }
+  card.append(list,actions);
+  return head.concat(card);
+}
+
 /* ---------- 主題切換 ---------- */
 const _html=document.documentElement;
 { const saved=localStorage.getItem('dashTheme'); if(saved)_html.dataset.theme=saved; }
@@ -1434,6 +1517,7 @@ document.body.appendChild(sheetwrap);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 /* ---------- 掛載 ---------- */
 document.getElementById('ov').append(...buildOverview());
+document.getElementById('recent').append(...buildRecentArticles());
 document.getElementById('tsmc').append(...buildTSMC());
 document.getElementById('grp').append(...buildGroup());
 document.getElementById('tier').append(...buildTier());

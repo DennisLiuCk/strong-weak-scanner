@@ -6,6 +6,7 @@ build_dashboard.py — 從 SQLite(daily_scores + daily_metrics)自動重生儀�
 並把同一份頁面凍結成 archive/<資料日>.html(as-seen 歷史快照,供日期選單回看)。
 零第三方依賴。用法:  python scripts/build_dashboard.py
 """
+import datetime as dt
 import json, os, re, sqlite3, statistics, sys
 from collections import defaultdict
 
@@ -30,6 +31,7 @@ from qual_notes import (load_notes, note_status, note_review_status,
                         TEMPLATE_VERSION as NOTE_TEMPLATE_VERSION)
 from leading_hypotheses import (HYPOTHESIS_STATUS_INFO,
                                 load_reports as load_hypothesis_reports)
+from research_queue import load_topics as load_research_topics
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -41,6 +43,7 @@ CHART_DAYS = 120   # 互動股價圖每檔保留交易日數(1f;vol=股數、含
 ARCHIVE = os.path.join(ROOT, "archive")
 NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 HYPOTHESES_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
+TOPICS_DIR = os.path.join(ROOT, "notes", "research_topics")
 # 筆記全文放 repo 裡,儀表板不 embed 全文(質化筆記是長文,不適合塞進 tooltip)——
 # badge 點開直接連到 GitHub 的 render 版本,讀 repo remote 免寫死也行,但這裡固定
 # 域名比較簡單(僅供內部 GitHub Pages 使用,repo 搬家機率低)
@@ -51,6 +54,13 @@ NOTE_LABEL = {
     "independently_verified": "已獨立核對來源",
     "conflicted": "來源衝突・待釐清",
 }
+RECENT_ARTICLE_DAYS = 14
+RECENT_ARTICLE_TYPES = (
+    ("formal_note", "正式筆記"),
+    ("narrative", "多空小作文"),
+    ("topic", "市場議題"),
+    ("event", "事件錨點"),
+)
 
 # 標題設定。TITLE_TAIL 是品牌尾綴、ALL_SCOPE 是「全部族群」時的範圍詞;篩選到單一族群時,
 # 前端會把標題換成「族群名 · TITLE_TAIL」(見 dashboard_template.html 的 group filter JS)。
@@ -1456,6 +1466,170 @@ def build_lenses(con, last, names, group_names):
         return None
 
 
+def _article_date(value):
+    """只接受可稽核的 YYYY-MM-DD meta；不碰檔案 mtime 或建置機器時間。"""
+    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return None
+    try:
+        return dt.date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def _article_excerpt(value, limit=116):
+    """把既有 parser 的標題／摘要壓成首頁可讀的一行，不重新解讀文章內容。"""
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", str(value or ""))
+    text = re.sub(r"[*_`]+", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= limit:
+        return text
+    cut = max(text.rfind(mark, 0, limit + 1) for mark in "。；！？")
+    return text[:cut + 1] if cut >= limit // 2 else text[:limit].rstrip() + "…"
+
+
+def _article_metadata_usable(info):
+    """契約失敗的文章不拿來推動 feed anchor，避免壞日期把整個 14 天窗帶走。"""
+    return bool(info) and not info.get("quality_invalid") and not info.get("quality_errors")
+
+
+def build_recent_articles(market_date, notes, reports, events=None, topics=None,
+                          stock_names=None, days=RECENT_ARTICLE_DAYS):
+    """聚合近期研究文章；anchor=max(市場資料日,可解析文章日期)，確保快照可重現。"""
+    market_anchor = _article_date(market_date)
+    if market_anchor is None:
+        raise ValueError(f"market_date 不是合法 YYYY-MM-DD：{market_date}")
+    if days < 1:
+        raise ValueError("days 必須至少為 1")
+
+    stock_names = stock_names or {}
+    candidates = []
+    type_order = {key: index for index, (key, _label) in enumerate(RECENT_ARTICLE_TYPES)}
+    type_labels = dict(RECENT_ARTICLE_TYPES)
+
+    def stock_subject(stock_id, relpath=""):
+        name = stock_names.get(stock_id)
+        if not name and relpath:
+            stem = os.path.splitext(os.path.basename(relpath))[0]
+            if "_" in stem:
+                name = stem.split("_", 1)[1]
+        return " ".join(part for part in (stock_id, name) if part) or "未指定公司"
+
+    def add(value, article_type, stock_id, subject, title, relpath, status, status_tone):
+        parsed = _article_date(value)
+        if parsed is None or not relpath:
+            return
+        candidates.append({
+            "_date": parsed,
+            "date": parsed.isoformat(),
+            "type": article_type,
+            "typeLabel": type_labels[article_type],
+            "stockId": stock_id or "",
+            "subject": subject,
+            "title": _article_excerpt(title) or type_labels[article_type],
+            "url": NOTE_REPO_BLOB + relpath,
+            "status": status,
+            "statusTone": status_tone,
+            "relpath": relpath,
+        })
+
+    for stock_id, note in (notes or {}).items():
+        if not _article_metadata_usable(note):
+            continue
+        verification = note_review_status(note)
+        tone = ("verified" if verification == "independently_verified"
+                else "warning" if verification == "conflicted" else "draft")
+        add(
+            note.get("last_updated"), "formal_note", stock_id,
+            stock_subject(stock_id, note.get("relpath", "")),
+            note.get("summary") or f"{stock_subject(stock_id)}質化研究筆記",
+            note.get("relpath"), NOTE_LABEL.get(verification, verification), tone,
+        )
+
+    for stock_id, report in (reports or {}).items():
+        if not _article_metadata_usable(report):
+            continue
+        narrative = report.get("narrative")
+        if not narrative:
+            continue
+        hypothesis_titles = [
+            item.get("title", "").strip() for item in report.get("hypotheses", [])
+            if item.get("title", "").strip()
+        ]
+        title = ("／".join(hypothesis_titles[:2]) if hypothesis_titles
+                 else "看多、看空觀點與勝負手")
+        add(
+            narrative.get("updated"), "narrative", stock_id,
+            stock_subject(stock_id, report.get("relpath", "")),
+            title, report.get("relpath"), "觀察層・不等於事實認證", "observational",
+        )
+
+    for topic in topics or []:
+        if not _article_metadata_usable(topic):
+            continue
+        meta = topic.get("meta") or {}
+        topic_date = (meta.get("last_reviewed_at")
+                      if _article_date(meta.get("last_reviewed_at"))
+                      else topic.get("captured_at"))
+        stock_ids = topic.get("stock_ids") or []
+        if stock_ids:
+            subject = "、".join(stock_subject(sid) for sid in stock_ids)
+            sort_stock = stock_ids[0]
+        elif topic.get("group_ids"):
+            subject = "跨族群：" + "、".join(topic["group_ids"])
+            sort_stock = ""
+        else:
+            subject, sort_stock = "市場／政策", ""
+        add(
+            topic_date, "topic", sort_stock, subject, topic.get("title"),
+            topic.get("relpath"), "候選議題・不等於正式公司事實", "observational",
+        )
+
+    for event in (events or {}).get("all", []):
+        if not _article_metadata_usable(event):
+            continue
+        event_date = (event.get("content_as_of")
+                      if _article_date(event.get("content_as_of"))
+                      else event.get("event_date"))
+        subject_key = event.get("subject") or ""
+        subject = "2330 台積電" if subject_key == "tsmc" else subject_key or "市場事件"
+        stock_id = "2330" if subject_key == "tsmc" else ""
+        verification = event.get("verification") or "ai_draft"
+        tone = ("verified" if verification == "independently_verified"
+                else "warning" if verification == "conflicted" else "draft")
+        add(
+            event_date, "event", stock_id, subject, event.get("title"),
+            event.get("relpath"), NOTE_LABEL.get(verification, verification), tone,
+        )
+
+    anchor = max([market_anchor] + [item["_date"] for item in candidates])
+    start = anchor - dt.timedelta(days=days - 1)
+    items = [item for item in candidates if start <= item["_date"] <= anchor]
+    items.sort(key=lambda item: (
+        -item["_date"].toordinal(),
+        type_order[item["type"]],
+        item["stockId"],
+        item["relpath"],
+    ))
+    for item in items:
+        del item["_date"]
+        del item["relpath"]
+
+    counts = {key: 0 for key, _label in RECENT_ARTICLE_TYPES}
+    for item in items:
+        counts[item["type"]] += 1
+    return {
+        "anchor": anchor.isoformat(),
+        "start": start.isoformat(),
+        "days": days,
+        "total": len(items),
+        "counts": [
+            {"type": key, "label": label, "count": counts[key]}
+            for key, label in RECENT_ARTICLE_TYPES
+        ],
+        "items": items,
+    }
+
+
 def main():
     # 唯讀開啟(鐵律:唯讀一律走 db_ro)。這支只從 db 讀、寫的是 index.html 與
     # archive/,不曾寫 db;bare sqlite3.connect 會在路徑打錯時無聲建一個空 db,
@@ -1612,6 +1786,13 @@ def main():
     notes_map = load_notes(NOTES_DIR)
     # 領先假說是獨立觀察層；lint 會要求其錨定有效 independently_verified 正式筆記。
     hypotheses_map = load_hypothesis_reports(HYPOTHESES_DIR, notes=notes_map)
+    # 最近研究文章使用各層既有 parser 的可稽核 meta；不讀 git/檔案 mtime。
+    # anchor 取市場資料日與文章日期較晚者，避免市場資料尚未換日時漏掉今天剛更新的文章。
+    research_topics = load_research_topics(TOPICS_DIR, reports=hypotheses_map)
+    recent_articles = build_recent_articles(
+        last, notes_map, hypotheses_map, events, research_topics,
+        {r["stock_id"]: r["name"] for r in rows},
+    )
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
     chip_by_grp = {}
@@ -1993,6 +2174,8 @@ def main():
     html = html.replace("__STRATEGY_JSON__", json.dumps(strategy, ensure_ascii=False))
     html = html.replace("__DIVERGE_JSON__", json.dumps(diverge, ensure_ascii=False))
     html = html.replace("__LENS_JSON__", json.dumps(lenses, ensure_ascii=False))
+    html = html.replace("__RECENT_ARTICLES_JSON__",
+                        json.dumps(recent_articles, ensure_ascii=False))
     # 量尺門檻(②量比/⑤融資水位)——單一事實來源 score.py,調旋鈕量尺刻度自動同步
     html = html.replace("__THRESH_JSON__", json.dumps({
         "volr_active": list(VOLR_ACTIVE), "volr_dry": VOLR_DRY, "volr_overheat": VOLR_OVERHEAT,

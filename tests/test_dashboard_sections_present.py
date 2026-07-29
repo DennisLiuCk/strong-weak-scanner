@@ -26,6 +26,7 @@ INDEX = ROOT / "index.html"
 # (payload 變數名, section id, 導覽是否有連結, 人看得懂的名字)
 SECTIONS = [
     ("STRATEGY", "strategy-status", False, "策略狀態"),
+    ("RECENT", "recent", True, "最近研究"),
     ("TSMC", "tsmc", True, "台積電專區"),
     ("DIVERGE", "diverge", True, "兩視角分歧"),
     ("LENS", "lens", True, "時間尺度"),
