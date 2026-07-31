@@ -204,6 +204,10 @@ python -m unittest discover -s tests
   額外官方請求會分開列示；後者是非阻斷觀察層。
 - 一個市場成功、另一個失敗時，成功資料先落地；下次依 SQLite 缺口接續。空回應或 universe
   覆蓋不足不會被補成 0。
+- 交易所價格表若明確回傳 OHLC 全空、成交量／金額／筆數皆為 0，會衍生一筆
+  `trading_status=no_trade`。這類股票當日不在法人日報的有效母體內，但 price、margin、
+  holding、sbl 仍須有官方列；未知或未被原始價格列驗證的缺口照常標紅。停牌日不產生
+  `daily_metrics`／`daily_scores`，不推進平滑分數或 tier，復牌後的技術視窗接續前一有效交易日。
 - `holding` 日內初版不視為正式終版；`--final-pass` 對當日資料有台北 23:40 硬門檻，
   23:47 排程會刷新 holding，上游資料未齊時不發布，同日重跑維持冪等。
 - schema 新增欄位的歷史 `NULL` 使用 `--backfill-expanded-fields`；只有交易所公告來源修正版、

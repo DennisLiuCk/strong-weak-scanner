@@ -439,10 +439,17 @@ def main():
     for d in oos_dates:
         try:
             q = json.loads(snap_quality[d])
+            universe_n = q.get("universe", 0)
+            eligible_n = q.get("eligible", universe_n)
             for table in ("price", "inst", "margin", "holding", "sbl"):
-                if q.get(table, 0) < q.get("universe", 0):
+                expected_n = eligible_n if table == "inst" else universe_n
+                if q.get(table, 0) < expected_n:
                     snapshot_quality_issues.append(
-                        f"{d} {table}={q.get(table, 0)}/{q.get('universe', 0)}")
+                        f"{d} {table}={q.get(table, 0)}/{expected_n}")
+            for table in ("daily_scores", "daily_metrics"):
+                if q.get(table, 0) < eligible_n:
+                    snapshot_quality_issues.append(
+                        f"{d} {table}={q.get(table, 0)}/{eligible_n}")
             if q.get("market_date") != d:
                 snapshot_quality_issues.append(f"{d} market 僅至 {q.get('market_date')}")
         except (KeyError, TypeError, ValueError):

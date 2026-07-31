@@ -813,6 +813,61 @@ class IncrementalFetchTest(unittest.TestCase):
             n = self.con.execute(f"SELECT COUNT(*) FROM {table} WHERE date='2026-07-10'").fetchone()[0]
             self.assertEqual(n, 2, table)
 
+    def test_official_zero_trade_row_exempts_only_institutional_report(self):
+        def price_fetch(source, day, wanted_ids):
+            self.price_calls.append((source, day, set(wanted_ids)))
+            sid = "2330" if source == "TWSE" else "2454"
+            if sid not in wanted_ids:
+                return [], True
+            if sid == "2454":
+                return [{
+                    "date": day, "stock_id": sid, "open": None, "max": None,
+                    "min": None, "close": None, "Trading_Volume": 0,
+                    "Trading_money": 0, "Trading_turnover": 0,
+                }], True
+            return [{
+                "date": day, "stock_id": sid, "open": 2, "max": 3,
+                "min": 2, "close": 3, "Trading_Volume": 100,
+                "Trading_money": 300, "Trading_turnover": 9,
+            }], True
+
+        def raw_fetch(dataset, source, day, wanted_ids):
+            self.calls.append((dataset, source, day, set(wanted_ids)))
+            sid = "2330" if source == "TWSE" else "2454"
+            if sid not in wanted_ids:
+                return [], True
+            return self.fake_fetch(dataset, source, day, wanted_ids)
+
+        stats = fd.fetch_missing_raw(
+            self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-10", None,
+            sleep=0, fetcher=raw_fetch, price_fetcher=price_fetch)
+
+        self.assertEqual(stats["non_trading"], 1)
+        self.assertEqual(self.con.execute(
+            "SELECT stock_id,status,source FROM trading_status WHERE date='2026-07-10'"
+        ).fetchall(), [("2454", "no_trade", "official_price_zero_trade")])
+        self.assertEqual(self.con.execute(
+            "SELECT COUNT(*) FROM inst WHERE date='2026-07-10'").fetchone()[0], 1)
+        for table in ("price", "margin", "holding", "sbl"):
+            self.assertEqual(self.con.execute(
+                f"SELECT COUNT(*) FROM {table} WHERE date='2026-07-10'"
+            ).fetchone()[0], 2, table)
+        inst_calls = [call for call in self.calls
+                      if call[0] == "TaiwanStockInstitutionalInvestorsBuySell"]
+        self.assertTrue(inst_calls)
+        self.assertTrue(all(call[3] == {"2330"} for call in inst_calls))
+
+    def test_active_stock_missing_institutional_report_still_fails(self):
+        def missing_inst(dataset, source, day, wanted_ids):
+            if dataset == "TaiwanStockInstitutionalInvestorsBuySell" and source == "TPEx":
+                return [], True
+            return self.fake_fetch(dataset, source, day, wanted_ids)
+
+        with self.assertRaisesRegex(fd.ExchangeRawFetchError, "inst=1/2;缺 2454"):
+            fd.fetch_missing_raw(
+                self.con, self.ids, fd.DATASETS, "2026-07-08", "2026-07-10", None,
+                sleep=0, fetcher=missing_inst, price_fetcher=self.fake_price_fetch)
+
     def test_market_date_reveals_global_price_gap_without_probe(self):
         self.con.execute("INSERT INTO market VALUES('2026-07-10',100)")
         self.con.commit()
@@ -905,6 +960,31 @@ class IncrementalFetchTest(unittest.TestCase):
         self.assertEqual(fd._window_mean(values, 59, 60), 30.5)
         values[58] = None
         self.assertIsNone(fd._window_mean(values, 59, 60))
+
+    def test_metrics_pause_stock_clock_across_zero_trade_day(self):
+        con = sqlite3.connect(":memory:")
+        con.executescript(fd.SCHEMA)
+        con.execute("INSERT INTO universe VALUES('2454','測試','g','biz')")
+        for day, close, volume in (
+                ("2026-07-08", 10.0, 100),
+                ("2026-07-09", None, 0),
+                ("2026-07-10", 11.0, 100)):
+            con.execute(
+                "INSERT INTO price(date,stock_id,open,high,low,close,volume,amount,trades) "
+                "VALUES(?,?,?,?,?,?,?,?,?)",
+                (day, "2454", close, close, close, close, volume,
+                 0 if close is None else close * volume, 0 if close is None else 10))
+        fd.build_price_adj(con)
+        fd.build_metrics(con)
+
+        self.assertIsNone(con.execute(
+            "SELECT 1 FROM daily_metrics WHERE date='2026-07-09' AND stock_id='2454'"
+        ).fetchone())
+        resumed = con.execute(
+            "SELECT ret1 FROM daily_metrics WHERE date='2026-07-10' AND stock_id='2454'"
+        ).fetchone()[0]
+        self.assertAlmostEqual(resumed, 0.10)
+        con.close()
 
     def test_wilder_rsi_handles_trending_and_flat_prices(self):
         rising = fd._wilder_rsi(list(range(1, 17)), 14)

@@ -34,11 +34,14 @@ class SnapshotSignalsTest(unittest.TestCase):
           rel20 REAL, med_dip REAL, breadth_t REAL, state TEXT, note TEXT, PRIMARY KEY(date,grp));
         CREATE TABLE market_daily(date TEXT PRIMARY KEY, taiex REAL, dd20 REAL, regime INTEGER);
         CREATE TABLE risk_flags(date TEXT, stock_id TEXT, kind TEXT, reason TEXT, period TEXT);
-        CREATE TABLE price(date TEXT, stock_id TEXT);
+        CREATE TABLE price(date TEXT, stock_id TEXT, open REAL, high REAL, low REAL,
+                           close REAL, volume INTEGER, amount REAL, trades INTEGER);
         CREATE TABLE inst(date TEXT, stock_id TEXT);
         CREATE TABLE margin(date TEXT, stock_id TEXT);
         CREATE TABLE holding(date TEXT, stock_id TEXT);
         CREATE TABLE sbl(date TEXT, stock_id TEXT);
+        CREATE TABLE trading_status(date TEXT, stock_id TEXT, status TEXT, source TEXT,
+                                    reason TEXT, PRIMARY KEY(date,stock_id));
         """)
         self.date = "2026-07-10"
         self.con.execute("INSERT INTO groups VALUES('g','測試族群','測',1)")
@@ -57,7 +60,9 @@ class SnapshotSignalsTest(unittest.TestCase):
                 (self.date, sid, *(score_values[c] for c in ss.SCORE_COLS)))
             self.con.execute("INSERT INTO chip_health VALUES(?,?,?,?,?,?)",
                              (self.date, sid, 2, "健康", i, 2))
-            for table in ("price", "inst", "margin", "holding", "sbl"):
+            self.con.execute("INSERT INTO price VALUES(?,?,?,?,?,?,?,?,?)",
+                             (self.date, sid, 10, 10, 10, 10, 100, 1000, 10))
+            for table in ("inst", "margin", "holding", "sbl"):
                 self.con.execute(f"INSERT INTO {table} VALUES(?,?)", (self.date, sid))
         self.con.execute("INSERT INTO group_metrics VALUES(?,?,?,?,?,?,?,?,?)",
                          (self.date, "g", .5, -.1, .02, .03, .5, "中性觀察", "test"))
@@ -164,6 +169,43 @@ class SnapshotSignalsTest(unittest.TestCase):
         self.con.commit()
         with self.assertRaisesRegex(RuntimeError, "原始資料不完整"):
             self.capture("run-raw-gap", "2026-07-10T14:00:00+00:00")
+
+    def test_documented_zero_trade_stock_uses_eligible_universe(self):
+        self.con.execute("DELETE FROM daily_scores WHERE stock_id='1002'")
+        self.con.execute("DELETE FROM daily_metrics WHERE stock_id='1002'")
+        self.con.execute("DELETE FROM chip_health WHERE stock_id='1002'")
+        self.con.execute("DELETE FROM inst WHERE stock_id='1002'")
+        self.con.execute(
+            "UPDATE price SET open=NULL,high=NULL,low=NULL,close=NULL,volume=0,amount=0,trades=0 "
+            "WHERE stock_id='1002'")
+        self.con.execute("INSERT INTO trading_status VALUES(?,?,?,?,?)", (
+            self.date, "1002", "no_trade", "official_price_zero_trade", "官方零交易"))
+        self.con.commit()
+
+        sid, date_, created = self.capture("run-halt", "2026-07-10T14:00:00+00:00")
+        self.assertEqual((sid, date_, created), ("run-halt", self.date, True))
+        run = self.con.execute(
+            "SELECT stock_count,quality_json FROM oos_snapshot_runs WHERE snapshot_id='run-halt'"
+        ).fetchone()
+        self.assertEqual(run["stock_count"], 1)
+        import json
+        quality = json.loads(run["quality_json"])
+        self.assertEqual((quality["universe"], quality["eligible"], quality["inst"]),
+                         (2, 1, 1))
+        self.assertEqual(quality["excluded"][0]["stock_id"], "1002")
+        self.assertEqual(self.con.execute(
+            "SELECT COUNT(*) FROM oos_signal_snapshots WHERE snapshot_id='run-halt'"
+        ).fetchone()[0], 1)
+
+    def test_unverified_status_cannot_hide_active_gap(self):
+        self.con.execute("DELETE FROM daily_scores WHERE stock_id='1002'")
+        self.con.execute("DELETE FROM daily_metrics WHERE stock_id='1002'")
+        self.con.execute("DELETE FROM inst WHERE stock_id='1002'")
+        self.con.execute("INSERT INTO trading_status VALUES(?,?,?,?,?)", (
+            self.date, "1002", "no_trade", "official_price_zero_trade", "錯誤標記"))
+        self.con.commit()
+        with self.assertRaisesRegex(RuntimeError, "拒絕凍結不完整快照"):
+            self.capture("run-unverified", "2026-07-10T14:00:00+00:00")
 
     def test_official_publish_rejects_stale_market(self):
         self.con.execute("UPDATE market_daily SET date='2026-07-09'")

@@ -2,6 +2,34 @@
 
 版本沿革與各版設計決策的實證依據。週度滾動驗證見 `reports/validate_*.md`。
 
+## 官方零交易狀態與有效評分母體 — 2026-08-01
+
+**策略權重、tier 條件與 `IS_CUTOFF` 零變動**；本次修正交易資格與資料完整性語意，
+不把停牌股票的凍結值寫成當日正式分數。
+
+- 3587 閎康自 2026-07-31 起暫停交易；TPEx 當日價格表仍有該股，但 OHLC 全空且
+  成交量／金額／筆數皆為 0，法人表不列該股，融資券、外資持股與借券表仍有資料。
+  舊管線固定要求五表各 121 筆，因此四次排程都在 `inst=120/121` 中止，後三表與儀表板
+  無法更新。這是交易狀態，不是可用補零處理的來源缺口。
+- 新增 `trading_status` 衍生索引；只有可由官方 price 原始列嚴格重算的零交易狀態，
+  才把 inst 的當日預期母體由 universe 扣除。price／margin／holding／sbl 仍要求完整
+  universe；一般可交易股票少法人資料仍 hard fail。狀態索引不補造或覆蓋原始資料。
+- `daily_metrics` 與描述性 observation 只沿有效收盤序列計算：停牌日不產生分數、
+  不推進 3 日平滑或兩日 tier 遲滯，復牌後 ret／MA／RSI 接續前一有效交易日。
+  OOS quality JSON 現在同時保存 `universe`、`eligible` 與附來源的 `excluded` 清單；
+  dashboard 保留停牌股票，但獨立列示「暫停／未交易」及最後訊號日期。
+- 2026-07-31 正式資料驗收為 price 121、inst 120（排除 3587 一個可驗證 pair）、
+  margin／holding／sbl 各 121；`audit_raw_data.py` 全期 121 檔 × 105 交易日 PASS，
+  八項原始公式 mismatch 皆 0，只有 1 個既有 off-spine warning。正式 OOS 快照為
+  `universe=121、eligible=120、signals=120、excluded=[3587]`；儀表板資料日 7/31，
+  仍顯示 121 檔，3587 的訊號明標截至 7/30。這些是完整資料格／確定性重算，SE 不適用。
+- 隔離 DB 固定上游事件資料的前後對照中，7/30 以前 `daily_metrics` 12,584 筆與
+  `daily_scores` 12,584 筆逐欄 SHA-256 比對完全相同，確認本次狀態排除本身沒有改寫既有
+  歷史；正式每日流程另取得 7/31 新除權息事件，依既有還原價規則正常重算，不與本項混稱。
+- 驗收環境為 Windows、python.org CPython 3.12、預設 console：
+  `python -m unittest discover -s tests` 共 321 項全綠；產出 HTML 的 JavaScript
+  `node --check` 通過，`AGENTS.md`／`CLAUDE.md` 完全一致。
+
 ## 最近研究索引與八檔優先更新 — 2026-07-29
 
 **策略規則、權重、tier、H# 生命週期與 `IS_CUTOFF` 零變動**；本次只更新研究維護、

@@ -248,7 +248,8 @@ function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,r20:s.ret
   tech:[s.tech?s.tech.cls:'flat', s.tech?s.tech.label:'—'],
   chip:[s.chip?s.chip.cls:'neutral', s.chip?s.chip.label:'中性'],
   fund:s.fund?[s.fund.cls,(s.fund.rows.find(function(r){return /年增/.test(r[0]);})||[])[1]||s.fund.label]:null,
-  note:s.note?[s.note.cls,s.note.summary]:null, risk:(s.risk||[]).map(function(r){return r.kind;})}; }
+  note:s.note?[s.note.cls,s.note.summary]:null, risk:(s.risk||[]).map(function(r){return r.kind;}),
+  trading:s.trading||null}; }
 function _adaptTSMC(T){ if(!T||!T.event)return null; const e=T.event;
   return {title:e.title||'', quarter:e.quarter||'', eventDate:e.date||'', status:e.vcls||'', statusLabel:e.vlabel||'', url:e.url,
     contentAsOf:e.contentAsOf||'', nextReview:e.nextReview||'',
@@ -257,7 +258,7 @@ function _adaptTSMC(T){ if(!T||!T.event)return null; const e=T.event;
     sections:e.sections||[], history:e.history||[]}; }
 const D={ groups:GROUPS, grpMeta:GRP, overview:OVERVIEW, tierFlow:TIER_FLOW, date:DATE_STR,
   stocks:DATA.map(_slim),
-  allStocks:DATA.map(function(s){return {id:s.id,nm:s.nm,g:s.g,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,tl:s.tier_label,w:s.tier_waiting,cs:(s.cells||[]).map(function(c){return c[0];})};}),
+  allStocks:DATA.map(function(s){return {id:s.id,nm:s.nm,g:s.g,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,tl:s.tier_label,w:s.tier_waiting,cs:(s.cells||[]).map(function(c){return c[0];}),trading:s.trading||null};}),
   byId:Object.fromEntries(DATA.map(function(s){return [s.id,s];})),
   tsmc:_adaptTSMC(TSMC) };
 const COMP_MAX=2*Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
@@ -933,7 +934,7 @@ function pctCol(v){ return v==null||v===0?'var(--muted)':(v>0?'var(--strong)':'v
 
 /* 相對強勢層裡有多少檔 20 日絕對報酬其實是負的——由當日資料現算,不寫死。
    數字為 0 時整句不出現,避免在多頭時留下沒有指涉對象的警語。 */
-function absCaveat(){ const up=D.allStocks.filter(s=>UPPER_TIERS[s.tier]&&s.r20!=null);
+function absCaveat(){ const up=D.allStocks.filter(s=>!s.trading&&UPPER_TIERS[s.tier]&&s.r20!=null);
   const neg=up.filter(s=>s.r20<0);
   if(!up.length||!neg.length) return '';
   const worst=neg.reduce((a,b)=>a.r20<b.r20?a:b);
@@ -964,6 +965,7 @@ function stockChips(s){ const c=[];
   c.push({t:'籌碼'+s.chip[1],col:hc,bg:hb,bd:0});
   if(s.fund)c.push({t:'營收'+s.fund[1],col:s.fund[0]==='up'?'var(--strong)':s.fund[0]==='down'?'var(--weak)':'var(--muted)',bg:'transparent',bd:1});
   if(s.note&&s.note[0]==='independently_verified')c.push({t:'✓已核筆記',col:'var(--teal)',bg:'var(--tealbg)',bd:0});
+  if(s.trading)c.push({t:'暫停／未交易',col:'#fff',bg:'var(--amber)',bd:0});
   (s.risk||[]).forEach(r=>c.push({t:r,col:'#fff',bg:'var(--strong)',bd:0}));
   return c; }
 function chipRow(chips){ const w=h('div',{style:'display:flex;flex-wrap:wrap;gap:5px'});
@@ -993,7 +995,7 @@ function buildStocks1c(){
   function row(s,i){ const ts=tierStyle(s.tier),compCol=s.comp>=0?'var(--strong)':'var(--weak)';
     return h('div',{class:'clickrow srow',role:'button',tabindex:'0',style:'padding:16px 6px;border-top:1px solid var(--line2)',
       onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}}},
-      h('div',{class:'mono',style:'text-align:center;font-size:16px;font-weight:600;color:var(--ink2)',text:i+1}),
+      h('div',{class:'mono',style:'text-align:center;font-size:16px;font-weight:600;color:var(--ink2)',text:s.trading?'—':i+1}),
       h('div',{style:'min-width:0'},
         h('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap'},h('b',{style:'font-size:16px;font-weight:800',text:s.nm}),
           h('span',{class:'mono',style:'font-size:11.5px;color:var(--muted)',text:s.id}),h('span',{class:'chip',style:`color:${ts.col};background:${ts.bg}`,text:s.tierLabel})),
@@ -1010,7 +1012,7 @@ function buildStocks1c(){
           h('span',{class:'mono',style:`font-size:11.5px;font-weight:600;color:${pctCol(s.r20)}`,
             title:'20 日絕對報酬（綜合分是族群內相對排名，與漲跌是兩件事）',text:fmtPct(s.r20,1)})))); }
   function apply(){ const all=D.stocks.filter(s=>s.g===curG);
-    const f=all.filter(s=>{const t=(s.nm+' '+s.id).toLowerCase();return !q||t.includes(q);}).sort((a,b)=>{const av=sortKey==='comp'?a.comp:(a.cs[+sortKey]||0),bv=sortKey==='comp'?b.comp:(b.cs[+sortKey]||0),d=sortDesc?bv-av:av-bv;return d||(b.comp-a.comp);});
+    const f=all.filter(s=>{const t=(s.nm+' '+s.id).toLowerCase();return !q||t.includes(q);}).sort((a,b)=>{if(!!a.trading!==!!b.trading)return a.trading?1:-1;const av=sortKey==='comp'?a.comp:(a.cs[+sortKey]||0),bv=sortKey==='comp'?b.comp:(b.cs[+sortKey]||0),d=sortDesc?bv-av:av-bv;return d||(b.comp-a.comp);});
     rows.replaceChildren(...f.map((s,i)=>row(s,i))); count.textContent=grp(curG).nm+' '+f.length+' / '+all.length+' 檔'; }
   const gsel=h('select',{class:'sortbtn','aria-label':'選擇族群',onchange:e=>{curG=e.target.value;apply();}});
   D.groups.forEach(g=>gsel.appendChild(h('option',{value:g.g,text:grp(g.g).nm})));
@@ -1023,7 +1025,7 @@ function buildStocks1c(){
   [['comp','綜合分'],['0','①價'],['1','②量'],['2','③外資'],['3','④投信'],['4','⑤融資']].forEach(o=>dimSel.appendChild(h('option',{value:o[0],text:o[1]})));
   const toolbar=h('div',{class:'toolbar'},gsel,dimSel,search,sortBtn,count);
   return [h('p',{class:'kicker',text:'個股層'}),h('h2',{class:'sec',text:'族群內個股比較 · 同一族群誰強誰弱'}),
-    h('p',{class:'lead',html:'選定族群後依<b style="color:var(--ink)">族群內綜合分</b>排序，可搜尋／切換排序。<b style="color:var(--ink)">點任一列</b>看該檔完整研究與近期數據。注意：五面向是族群內相對排名——相對分靠前不保證原始值為正，▲ 也不代表原始值為正或股價會漲；本頁不宣稱法人一定買進或賣出，請以明細內原始數字為準。'}),
+    h('p',{class:'lead',html:'選定族群後依<b style="color:var(--ink)">族群內綜合分</b>排序，可搜尋／切換排序；暫停／未交易股票置底且不列名次，數值是標示日期的前次訊號。<b style="color:var(--ink)">點任一列</b>看該檔完整研究與近期數據。注意：五面向是族群內相對排名——相對分靠前不保證原始值為正，▲ 也不代表原始值為正或股價會漲；本頁不宣稱法人一定買進或賣出，請以明細內原始數字為準。'}),
     toolbar,cont];
 }
 function openSheet(s){
@@ -1041,6 +1043,7 @@ function openSheet(s){
       h('b',{style:'font-size:22px;font-weight:900',text:s.nm}),h('span',{class:'mono',style:'font-size:13px;color:var(--muted)',text:s.id}),
       h('span',{class:'chip',style:`color:${ts.col};background:${ts.bg}`,text:s.tierLabel})),
     h('div',{style:'font-size:12px;color:var(--muted);margin-bottom:12px',text:s.biz}),
+    s.trading?h('div',{style:'font-size:12px;font-weight:800;color:var(--amber);margin-bottom:10px',text:'暫停／未交易；以下訊號截至 '+s.trading.signalDate}):null,
     h('p',{style:'margin:0 0 14px;font-size:14.5px;font-weight:500;color:var(--ink);line-height:1.6',text:plainVerdict(s.cs)}),
     h('div',{style:'display:flex;align-items:center;gap:10px;background:var(--inset);border-radius:10px;padding:11px 14px'},
       h('span',{style:'font-size:12px;color:var(--muted);white-space:nowrap',text:'族群內綜合分'}),h('div',{style:'flex:1'},diverg(s.comp,COMP_MAX,180,14)),
@@ -1118,13 +1121,15 @@ function microStrip(cs){ const lb=['價','量','外資','投信','融資'];
 function buildTier(){
   const order=[['真強','相對強勢','價格與籌碼多在族群前段'],['蓄勢·外資佈局','相對蓄勢','籌碼靠前、價格尚未發動'],
     ['__cand','蓄勢候補','籌碼已符，等抗跌／綜合分補齊'],['強但過熱','相對強勢·過熱','價格靠前但量能或融資過熱'],
-    ['潛在/中性','中性觀察','各指標相對位置分歧'],['真弱','相對弱勢','價格與綜合分在族群後段'],['真弱·陷阱','相對弱勢·槓桿風險','外資靠後且融資偏弱']];
+    ['潛在/中性','中性觀察','各指標相對位置分歧'],['真弱','相對弱勢','價格與綜合分在族群後段'],['真弱·陷阱','相對弱勢·槓桿風險','外資靠後且融資偏弱'],
+    ['__halt','暫停／未交易','不參與當日排名；顯示最近一次正式訊號供脈絡參考']];
   let curG='';                 // ''=全部族群;選定族群時各層顯示全部成員
   const expanded={};           // 全部族群模式下,各層「＋N 檔」點擊展開
   function memFor(k){ let mem;
-    if(k==='__cand')mem=D.allStocks.filter(s=>s.tier==='潛在/中性'&&s.w);
-    else if(k==='潛在/中性')mem=D.allStocks.filter(s=>s.tier==='潛在/中性'&&!s.w);
-    else mem=D.allStocks.filter(s=>s.tier===k);
+    if(k==='__halt')mem=D.allStocks.filter(s=>s.trading);
+    else if(k==='__cand')mem=D.allStocks.filter(s=>!s.trading&&s.tier==='潛在/中性'&&s.w);
+    else if(k==='潛在/中性')mem=D.allStocks.filter(s=>!s.trading&&s.tier==='潛在/中性'&&!s.w);
+    else mem=D.allStocks.filter(s=>!s.trading&&s.tier===k);
     if(curG)mem=mem.filter(s=>s.g===curG);
     return mem.sort((a,b)=>b.comp-a.comp); }
   /* 整套分數都是**族群內相對**,所以「相對強勢」可能與「絕對在跌」並存
@@ -1136,14 +1141,15 @@ function buildTier(){
     const r=s.r20, rc=pctCol(r);
     const mismatch=r!=null&&r<0&&UPPER_TIERS[s.tier];
     return h('span',{class:'clickrow',role:'button',tabindex:'0',
-      title:r==null?'':`20 日絕對報酬 ${fmtPct(r,1)}`
-        +(mismatch?'(族群內相對靠前,但絕對報酬為負)':''),
+      title:s.trading?`當日不參與排名；畫面訊號截至 ${s.trading.signalDate}`:(r==null?'':`20 日絕對報酬 ${fmtPct(r,1)}`
+        +(mismatch?'(族群內相對靠前,但絕對報酬為負)':'')),
       onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
       style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid '
         +(mismatch?'var(--weak)':'var(--line2)')+';border-radius:100px;padding:4px 11px;cursor:pointer'},
       h('b',{style:'font-weight:700',text:s.nm}),h('span',{class:'mono',style:'font-size:10px;color:var(--muted)',text:grp(s.g).short}),
       s.cs&&s.cs.length?microStrip(s.cs):null,
       h('span',{class:'mono',style:`font-size:11px;font-weight:600;color:${cc}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)}),
+      s.trading?h('span',{style:'font-size:10px;color:var(--amber);font-weight:800',text:'截至 '+s.trading.signalDate.slice(5)}):null,
       r==null?null:h('span',{class:'mono',style:`font-size:10.5px;color:${rc};opacity:.9`,
         text:fmtPct(r)}),
       mismatch?h('span',{style:'font-size:10px;color:var(--weak);font-weight:800',text:'↓'}):null); }
@@ -1180,7 +1186,7 @@ function buildTier(){
   gsel.appendChild(h('option',{value:'',text:'全部族群'}));
   D.groups.forEach(g=>gsel.appendChild(h('option',{value:g.g,text:grp(g.g).nm})));
   return [h('p',{class:'kicker',text:'族群層'}),h('h2',{class:'sec',text:'個股分層 · 已確認的相對強弱'}),
-    h('p',{class:'lead',html:`把全 ${D.allStocks.length} 檔依分數組合分成幾層（<b style="color:var(--strong)">強</b> → <b style="color:var(--weak)">弱</b>）。分層名稱描述相對位置，<b style="color:var(--ink)">不是買賣指示</b>。選族群可看該族群全部成員；<b style="color:var(--ink)">點任一檔</b>看完整明細。`
+    h('p',{class:'lead',html:`有效交易標的依分數組合分層；暫停／未交易股票另列並保留最近一次訊號。完整追蹤 ${D.allStocks.length} 檔，分層名稱描述相對位置，<b style="color:var(--ink)">不是買賣指示</b>。選族群可看該族群全部成員；<b style="color:var(--ink)">點任一檔</b>看完整明細。`
       +(STRATEGY&&STRATEGY.dwell!=null?`各層停留天數不長（相對強勢中位 <b style="color:var(--ink)">${STRATEGY.dwell.toFixed(0)} 個交易日</b>），名單本身會頻繁變動；穩定度與證據狀態見上方<a href="#strategy-status" style="color:var(--teal);font-weight:700">策略狀態</a>。`:'')
       +absCaveat()}),
     h('div',{class:'toolbar'},gsel),
@@ -1407,6 +1413,8 @@ function buildDetail(){
       h('span',{style:`font-size:10.5px;font-weight:700;color:${col};min-width:30px;text-align:right`,text:tag})));});
   const riskW=h('div',{style:'display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px'});
   riskW.appendChild(h('span',{style:'font-size:15px;color:var(--ink);font-weight:500',text:plainVerdict(cs)}));
+  if(d.trading)riskW.appendChild(h('span',{style:'font-size:11px;font-weight:800;color:#fff;background:var(--amber);border-radius:6px;padding:2px 9px',
+    text:'暫停／未交易 · 訊號截至 '+d.trading.signalDate}));
   (d.risk||[]).forEach(r=>riskW.appendChild(h('span',{style:'font-size:11px;font-weight:800;color:#fff;background:var(--strong);border-radius:6px;padding:2px 9px',text:'官方'+r.kind})));
   const compCol=d.comp>=0?'var(--strong)':'var(--weak)';
   const card=h('div',{class:'card',style:'padding:30px 32px'},

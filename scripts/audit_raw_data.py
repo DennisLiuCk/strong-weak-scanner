@@ -14,6 +14,7 @@ from datetime import date
 from pathlib import Path
 
 import fetch_daily as fd
+import trading_status as tstatus
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -182,9 +183,16 @@ def audit_connection(con, stock_ids, start=None, end=None):
     first, last = min(dates), max(dates)
     expected_pairs = {(day, sid) for day in dates for sid in stock_ids}
     expected_count = len(expected_pairs)
+    excluded_pairs = {
+        (day, sid)
+        for day in dates
+        for sid in tstatus.verified_exclusion_ids(con, day, stock_ids)
+    }
     report["scope"] = {
         "stocks": len(stock_ids), "trading_dates": len(dates),
-        "expected_rows_per_table": expected_count, "start": first, "end": last,
+        "expected_rows_per_table": expected_count,
+        "documented_non_trading_pairs": len(excluded_pairs),
+        "start": first, "end": last,
     }
 
     raw_maps = {}
@@ -200,22 +208,36 @@ def audit_connection(con, stock_ids, start=None, end=None):
                 continue
             in_scope[pair] = dict(zip(columns, row[2:]))
         raw_maps[table] = in_scope
-        missing_pairs = sorted(expected_pairs - set(in_scope))
+        table_expected_pairs = (expected_pairs - excluded_pairs
+                                if table == "inst" else expected_pairs)
+        missing_pairs = sorted(table_expected_pairs - set(in_scope))
+        allowed_nulls = {"open", "high", "low", "close"} if table == "price" else set()
+
+        def is_required_complete(pair, values, selected_columns):
+            return all(values[column] is not None
+                       or (pair in excluded_pairs and column in allowed_nulls)
+                       for column in selected_columns)
+
         null_by_column = {
-            column: sum(values[column] is None for values in in_scope.values())
+            column: sum(values[column] is None
+                        and not (pair in excluded_pairs and column in allowed_nulls)
+                        for pair, values in in_scope.items())
             for column in columns
         }
         null_by_column = {key: value for key, value in null_by_column.items() if value}
         required_complete = sum(
-            all(values[column] is not None for column in columns)
-            for values in in_scope.values())
+            is_required_complete(pair, values, columns)
+            for pair, values in in_scope.items() if pair in table_expected_pairs)
         expanded_complete = sum(
             all(values[column] is not None for column in expanded)
-            for values in in_scope.values())
+            for pair, values in in_scope.items() if pair in table_expected_pairs)
         report["tables"][table] = {
-            "rows": len(in_scope), "expected_rows": expected_count,
+            "rows": len(in_scope), "expected_rows": len(table_expected_pairs),
             "required_complete_rows": required_complete,
             "expanded_complete_rows": expanded_complete,
+            "excluded_pairs": len(excluded_pairs) if table == "inst" else 0,
+            "excluded_samples": ([_pair_text(pair) for pair in sorted(excluded_pairs)[:MAX_SAMPLES]]
+                                 if table == "inst" else []),
             "missing_pairs": len(missing_pairs),
             "missing_samples": [_pair_text(pair) for pair in missing_pairs[:MAX_SAMPLES]],
             "null_by_column": null_by_column,

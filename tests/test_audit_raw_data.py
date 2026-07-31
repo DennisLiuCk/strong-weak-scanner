@@ -103,6 +103,23 @@ class RawDataAuditTest(unittest.TestCase):
         self.assertEqual(report["tables"]["margin"]["null_by_column"], {"margin_buy": 1})
         self.assertTrue(any("margin 必備欄為 NULL" in error for error in report["errors"]))
 
+    def test_documented_zero_trade_pair_allows_missing_institutional_row_only(self):
+        self.con.execute(
+            "UPDATE price SET open=NULL,high=NULL,low=NULL,close=NULL,volume=0,amount=0,trades=0 "
+            "WHERE date='2026-07-10' AND stock_id='2454'")
+        self.con.execute(
+            "DELETE FROM inst WHERE date='2026-07-10' AND stock_id='2454'")
+        fd.tstatus.refresh_from_prices(self.con, {"2026-07-10"}, self.ids)
+        self.con.commit()
+
+        report = audit.audit_connection(self.con, self.ids)
+
+        self.assertTrue(report["ok"], report["errors"])
+        self.assertEqual(report["scope"]["documented_non_trading_pairs"], 1)
+        self.assertEqual(report["tables"]["inst"]["expected_rows"], 3)
+        self.assertEqual(report["tables"]["inst"]["excluded_pairs"], 1)
+        self.assertEqual(report["tables"]["price"]["null_by_column"], {})
+
     def test_formula_mismatch_fails(self):
         self.con.execute(
             "UPDATE inst SET foreign_net=999 WHERE date='2026-07-08' AND stock_id='2330'")

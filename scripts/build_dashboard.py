@@ -23,6 +23,7 @@ from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
 from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
 import db_ro                     # 唯讀開啟的唯一入口(鐵律);這支只讀 db,只寫 html
+import trading_status as tstatus
 import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡報、週報 §⑦⑧ 同一組函式)
 import hypotheses as hyp         # 兩視角分歧的籌碼定義 = H1 檢定的同一個定義
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
@@ -1642,6 +1643,27 @@ def main():
     rows = con.execute("""SELECT u.stock_id, u.name, u.grp, u.biz, sc.*, m.*
         FROM daily_scores sc JOIN universe u USING(stock_id) JOIN daily_metrics m USING(date, stock_id)
         WHERE sc.date=?""", (last,)).fetchall()
+    active_n = len(rows)
+    universe_n = con.execute("SELECT COUNT(*) FROM universe").fetchone()[0]
+    trading_map = {}
+    active_ids = {r["stock_id"] for r in rows}
+    status_rows = tstatus.verified_exclusions(con, last)
+    eligible_n = universe_n - len(status_rows)
+    for status in status_rows:
+        sid, state, source, reason = status
+        # 停牌日不產生新分數；畫面只展示最近一次正式訊號，並明確標出其資料日期。
+        stale = con.execute("""SELECT u.stock_id, u.name, u.grp, u.biz, sc.*, m.*
+            FROM daily_scores sc JOIN universe u USING(stock_id)
+            JOIN daily_metrics m USING(date, stock_id)
+            WHERE sc.stock_id=? AND sc.date<? ORDER BY sc.date DESC LIMIT 1""",
+            (sid, last)).fetchone()
+        if stale and sid not in active_ids:
+            rows.append(stale)
+            trading_map[sid] = {
+                "status": state, "source": source, "reason": reason,
+                "date": last, "signalDate": stale["date"],
+                "label": "暫停／未交易",
+            }
     # 使用每日未平滑 composite 讓使用者能驗算 composite_s；同一份近5日歷史也供
     # 「五日變層軌跡」使用。verdict() 仍只取最後3筆驗算 composite_s。
     tier_dates = [r[0] for r in con.execute(
@@ -2002,6 +2024,8 @@ def main():
                # 最深一檔 −21.8%。不把絕對值放在同一列,讀者會把「相對強」讀成「在漲」。
                "ret20": round(r["ret20"] * 100, 1) if r["ret20"] is not None else None,
                "cells": build_cells(r, r, mkt20)}
+        if r["stock_id"] in trading_map:
+            obj["trading"] = trading_map[r["stock_id"]]
         obj.update(tier_meta)
         tech = build_technical_view(r, tech_hist.get(r["stock_id"]))
         if tech:
@@ -2108,7 +2132,8 @@ def main():
             }
         obj["_comp"] = r["composite_s"]
         data.append(obj)
-        tiers_map.setdefault(tier, []).append((r["composite_s"], r["stock_id"]))
+        if r["stock_id"] not in trading_map:
+            tiers_map.setdefault(tier, []).append((r["composite_s"], r["stock_id"]))
 
     # 排序:族群順序,族群內綜合分數由高到低
     data.sort(key=lambda o: (GROUP_ORDER.index(o["g"]), -o["_comp"]))
@@ -2119,6 +2144,8 @@ def main():
     # states 保留策略 key，顯示名稱與顏色由 tiers 單一對照表提供。
     tier_flow_stocks = []
     for o in data:
+        if o.get("trading"):
+            continue
         by_date = {h["date"]: h["tier"] for h in score_hist.get(o["id"], [])}
         states = [by_date.get(d) for d in tier_dates]
         observed = [s for s in states if s is not None]
@@ -2141,7 +2168,8 @@ def main():
 
     # ◇ 蓄勢候補獨立卡片:從中性池抽出、插在蓄勢旁(缺項少者排前)
     cands = sorted(((r["pending"].count("、"), -r["composite_s"], r["stock_id"], r["pending"])
-                    for r in rows if r["pending"] and r["tier"] == "潛在/中性"))
+                    for r in rows if r["stock_id"] not in trading_map
+                    and r["pending"] and r["tier"] == "潛在/中性"))
     cand_ids = [c[2] for c in cands]
     cand_sub = {c[2]: c[3].replace("蓄勢候補·", "") for c in cands}
 
@@ -2183,7 +2211,10 @@ def main():
     html = html.replace("__PAGE_TITLE__", PAGE_TITLE)
     html = html.replace("__H1__", H1_TITLE)
     html = html.replace("__TITLE_TAIL_JSON__", json.dumps(TITLE_TAIL, ensure_ascii=False))
-    html = html.replace("__SCOPE__", f"{len(GROUP_ORDER)} 族群 · {len(data)} 檔")
+    scope = f"{len(GROUP_ORDER)} 族群 · 有效評分 {active_n}/{eligible_n} 檔"
+    if status_rows:
+        scope += f" · 暫停／未交易 {len(status_rows)} 檔（完整名單 {universe_n}）"
+    html = html.replace("__SCOPE__", scope)
     html = html.replace("__MARKET_CHIP__", mchip)
     html = html.replace("__MKT_TIP_JSON__", json.dumps(mtip, ensure_ascii=False))
     html = html.replace("__TSMC_JSON__", json.dumps(tsmc, ensure_ascii=False))

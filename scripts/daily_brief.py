@@ -7,10 +7,12 @@ daily_brief.py — 盤後日常簡報(唯讀,不寫 db)。給「當日檢視/討
 用法:  git pull 之後  python scripts/daily_brief.py
 注意:  db 通常由 GitHub Actions 更新，也可由本地 runner 正式發布；不先 git pull 可能是在看舊資料。
 """
-import datetime, os, sqlite3, sys
+import datetime, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import signal_structure as sig
+import db_ro
+import trading_status as tstatus
 from snapshot_signals import MIN_DATA_DATE as OOS_SNAPSHOT_START
 
 try:
@@ -23,21 +25,28 @@ DB = os.path.join(ROOT, "data", "findmind.db")
 
 
 def main():
-    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
-    con.row_factory = sqlite3.Row
+    con = db_ro.connect(DB)
     uni = {r["stock_id"]: (r["name"], r["grp"]) for r in con.execute("SELECT stock_id, name, grp FROM universe")}
     dates = [r[0] for r in con.execute("SELECT DISTINCT date FROM daily_scores ORDER BY date")]
     if len(dates) < 2:
         print("daily_scores 資料不足")
         return
     last, prev = dates[-1], dates[-2]
+    excluded_rows = tstatus.verified_exclusions(con, last, uni)
+    excluded_ids = {r[0] for r in excluded_rows}
+    eligible_n = len(uni) - len(excluded_ids)
 
     # ── 1. 資料鮮度 ──
     today = datetime.date.today()
     lag = (today - datetime.date.fromisoformat(last)).days
     n_last = con.execute("SELECT COUNT(*) FROM daily_scores WHERE date=?", (last,)).fetchone()[0]
     print(f"■ 資料鮮度:最新評分日 {last}(距今 {lag} 天{';週末/假日屬正常' if lag <= 3 else ' ⚠ 偏舊——先確認 git pull 與 Actions'})")
-    print(f"  覆蓋 {n_last}/{len(uni)} 檔" + ("" if n_last == len(uni) else " ⚠ 有缺——查 Actions log 的 stderr 警告"))
+    print(f"  有效評分 {n_last}/{eligible_n} 檔；完整 universe {len(uni)} 檔"
+          + ("" if n_last == eligible_n else " ⚠ 有未說明缺口——查 Actions log"))
+    if excluded_rows:
+        print("  暫停／未交易:" + "、".join(
+            f"{sid} {uni.get(sid, (sid,))[0]}({reason})"
+            for sid, _status, _source, reason in excluded_rows))
 
     # ── 2. 市場 + 族群雷達 ──
     mk = con.execute("""SELECT * FROM market_daily WHERE date<=? AND dd20 IS NOT NULL
@@ -134,8 +143,9 @@ def main():
     issues = []
     for tbl in ("price", "inst", "margin", "holding", "sbl"):
         n = con.execute(f"SELECT COUNT(*) FROM {tbl} WHERE date=?", (last,)).fetchone()[0]
-        if n < len(uni):
-            issues.append(f"{tbl} 最新日僅 {n}/{len(uni)} 列")
+        expected_n = eligible_n if tbl == "inst" else len(uni)
+        if n < expected_n:
+            issues.append(f"{tbl} 最新日僅 {n}/{expected_n} 列")
     # 正式 OOS 只認 append-only 正式快照(可由 Actions 或本地 runner 發布)。表不存在/
     # 最新日未凍結都代表本日訊號
     # 日後只能當 restated history,不可進 OOS；快照步驟設計為 hard fail,此處再做事後守門。
@@ -155,8 +165,8 @@ def main():
             else:
                 n_snap = con.execute(
                     "SELECT COUNT(*) FROM oos_signal_snapshots WHERE snapshot_id=?", (run[0],)).fetchone()[0]
-                if n_snap != len(uni):
-                    issues.append(f"OOS as-seen 快照 {last} 僅 {n_snap}/{len(uni)} 檔")
+                if n_snap != eligible_n:
+                    issues.append(f"OOS as-seen 快照 {last} 僅 {n_snap}/{eligible_n} 有效檔")
     # TDCC 週快照鮮度:正常最大 age = 10 天(週一 23:47 完整場前);>10 = 漏抓一週(不可回補,永久洞)
     if con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='tdcc_holding'").fetchone():
         td_last = con.execute("SELECT MAX(date) FROM tdcc_holding").fetchone()[0]

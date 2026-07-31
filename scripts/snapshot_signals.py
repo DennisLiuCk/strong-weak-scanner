@@ -19,6 +19,8 @@ import subprocess
 import sys
 import uuid
 
+import trading_status as tstatus
+
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
@@ -200,14 +202,28 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
     data_date = score_date
     if min_data_date and data_date < min_data_date:
         return None, data_date, False
-    universe_n = con.execute("SELECT COUNT(*) FROM universe").fetchone()[0]
+    universe_ids = [r[0] for r in con.execute("SELECT stock_id FROM universe ORDER BY stock_id")]
+    universe_n = len(universe_ids)
+    excluded_rows = tstatus.verified_exclusions(con, data_date, universe_ids)
+    excluded = [{"stock_id": r[0], "status": r[1], "source": r[2], "reason": r[3]}
+                for r in excluded_rows]
+    excluded_ids = {row["stock_id"] for row in excluded}
+    eligible_ids = [sid for sid in universe_ids if sid not in excluded_ids]
+    eligible_n = len(eligible_ids)
     score_n = _table_count(con, "daily_scores", data_date)
     metric_n = _table_count(con, "daily_metrics", data_date)
-    if score_n != universe_n or metric_n != universe_n:
+    if score_n != eligible_n or metric_n != eligible_n:
         raise RuntimeError(
-            f"拒絕凍結不完整快照 {data_date}:universe={universe_n},scores={score_n},metrics={metric_n}")
+            f"拒絕凍結不完整快照 {data_date}:universe={universe_n},eligible={eligible_n},"
+            f"scores={score_n},metrics={metric_n}")
 
-    group_n = con.execute("SELECT COUNT(DISTINCT grp) FROM universe").fetchone()[0]
+    if eligible_ids:
+        marks = ",".join("?" for _ in eligible_ids)
+        group_n = con.execute(
+            f"SELECT COUNT(DISTINCT grp) FROM universe WHERE stock_id IN ({marks})",
+            eligible_ids).fetchone()[0]
+    else:
+        group_n = 0
     gm_n = _table_count(con, "group_metrics", data_date)
     if gm_n != group_n:
         raise RuntimeError(f"拒絕凍結不完整族群快照 {data_date}:groups={group_n},group_metrics={gm_n}")
@@ -216,16 +232,22 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
     counts = {t: _universe_table_count(con, t, data_date) for t in raw_tables}
     counts["risk_flags"] = _table_count(con, "risk_flags", data_date)
     if is_official:
-        missing = {t: universe_n - counts[t] for t in raw_tables if counts[t] != universe_n}
+        expected_raw = {t: (eligible_n if t == "inst" else universe_n) for t in raw_tables}
+        missing = {t: expected_raw[t] - counts[t] for t in raw_tables
+                   if counts[t] != expected_raw[t]}
         if missing:
-            detail = ",".join(f"{t}={counts[t]}/{universe_n}" for t in missing)
+            detail = ",".join(
+                f"{t}={counts[t]}/{eligible_n if t == 'inst' else universe_n}"
+                for t in missing)
             raise RuntimeError(f"拒絕發布原始資料不完整快照 {data_date}:{detail}")
     market = con.execute(
         "SELECT * FROM market_daily WHERE date<=? ORDER BY date DESC LIMIT 1", (data_date,)).fetchone()
     if is_official and (not market or market["date"] != data_date):
         got = market["date"] if market else None
         raise RuntimeError(f"拒絕發布大盤資料未同步快照 {data_date}:market_daily={got}")
-    counts.update({"universe": universe_n, "daily_scores": score_n, "daily_metrics": metric_n,
+    counts.update({"universe": universe_n, "eligible": eligible_n,
+                   "excluded_count": len(excluded), "excluded": excluded,
+                   "daily_scores": score_n, "daily_metrics": metric_n,
                    "group_metrics": gm_n, "market_date": market["date"] if market else None})
 
     # 空事件/空風險名單在事件表本身看不出「已檢查」；fetch_daily 以 coverage 保存負面
@@ -271,8 +293,9 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
               LEFT JOIN chip_health c USING(date, stock_id)
               WHERE m.date=? ORDER BY u.grp, m.stock_id"""
     signals = con.execute(sql, (data_date,)).fetchall()
-    if len(signals) != universe_n:
-        raise RuntimeError(f"拒絕凍結 join 不完整快照 {data_date}:universe={universe_n},joined={len(signals)}")
+    if len(signals) != eligible_n:
+        raise RuntimeError(
+            f"拒絕凍結 join 不完整快照 {data_date}:eligible={eligible_n},joined={len(signals)}")
 
     groups = con.execute(
         """SELECT gm.*, g.name group_name, g.tag, g.ord
@@ -313,7 +336,7 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (snapshot_id, data_date, captured_at, source, is_official, git_sha, content_hash,
              hashes["score_hash"], hashes["metrics_hash"], hashes["universe_hash"],
-             hashes["groups_hash"], universe_n, group_n,
+             hashes["groups_hash"], eligible_n, group_n,
              json.dumps(counts, ensure_ascii=False, sort_keys=True)))
 
         signal_cols = ("snapshot_id", "date", "stock_id", "grp") + METRIC_COLS + SCORE_COLS + (

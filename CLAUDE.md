@@ -87,6 +87,9 @@ fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件
                    欄位、自動 raw-only、可續跑；來源修正版才用 --force
                  ⚠ 18:07/19:07/21:47 在 23:40 前只落地價格/法人 checkpoint；
                    23:47 final pass 補三表、刷新 holding
+                 ⚠ 官方 price 列若 OHLC 全空且量/額/筆數皆 0，衍生 trading_status=no_trade：
+                   inst 只驗有效母體，其餘四表仍驗全 universe；該日不進 metrics/score/tier，
+                   復牌後接續前一有效交易日，未被 price 嚴格驗證的缺口仍標紅
                  ⚠ 當日 final pass 有台北 23:40 硬門檻；提前觸發不得凍結 OOS 或發布
                  ⚠ Actions 以 UTC 日期鎖定原交易日；延遲跨過台北午夜仍補原交易日
                  ⚠ 另直抓 TWSE/TPEx 處置/注意股票旗標；日誌批次 0 次=缺口已完整、非失敗
@@ -134,7 +137,8 @@ research_queue.py 唯讀聚合正式筆記/H#/事件/財務覆蓋/候選議題�
 資料表:原始 price(含成交筆數)/inst(買賣分項)/margin(流量與限額)/holding(持股股數、
 可投資餘額與上限)/sbl(借券流量、調整、餘額與限額；單位=股)+ market_index(交易所
 官方報酬指數,觀察層)+ tdcc_holding(週頻)+
-risk_flags(TWSE/TPEx 處置/注意公告)(依主鍵冪等 upsert；holding 當日初版只在 23:47
+risk_flags(TWSE/TPEx 處置/注意公告)+trading_status(官方零交易 price 列的可重算衍生索引)
+(依主鍵冪等 upsert；holding 當日初版只在 23:47
 final pass 刷新一次)+ 衍生
 price_adj/daily_metrics/daily_scores/group_metrics/market_daily(每次重建)。
 舊制凍結:daily_scores_v1。**觀察層(TDCC 大戶/借券)未計分**,歸宿等 OOS 裁決

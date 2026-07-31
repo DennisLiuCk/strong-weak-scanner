@@ -34,6 +34,7 @@ import urllib.parse, urllib.request
 from datetime import date, datetime, timedelta, timezone
 
 from observation_metrics import build_observation_metrics
+import trading_status as tstatus
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -125,6 +126,9 @@ CREATE TABLE IF NOT EXISTS sbl(date TEXT, stock_id TEXT, sbl_bal INTEGER,
   PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS risk_flags(date TEXT, stock_id TEXT, kind TEXT, reason TEXT, period TEXT,
   PRIMARY KEY(date,stock_id,kind));
+CREATE TABLE IF NOT EXISTS trading_status(date TEXT, stock_id TEXT, status TEXT NOT NULL,
+  source TEXT NOT NULL, reason TEXT, PRIMARY KEY(date,stock_id));
+CREATE INDEX IF NOT EXISTS idx_trading_status_date_status ON trading_status(date,status);
 CREATE TABLE IF NOT EXISTS dividend_result(date TEXT, stock_id TEXT, before_price REAL,
   reference_price REAL, PRIMARY KEY(date,stock_id));
 CREATE TABLE IF NOT EXISTS split_event(date TEXT, stock_id TEXT, before_price REAL,
@@ -1109,18 +1113,15 @@ def _missing_dataset_dates(con, table, ids, dates, required_columns=()):
     dates = set(dates)
     if not ids or not dates:
         return set()
-    marks = ",".join("?" for _ in ids)
-    nonnull = _nonnull_sql(required_columns)
-    counts = dict(con.execute(
-        f"""SELECT date,COUNT(*) FROM {table}
-            WHERE stock_id IN ({marks}) AND date BETWEEN ? AND ?{nonnull} GROUP BY date""",
-        (*ids, min(dates), max(dates))).fetchall())
-    return {day for day in dates if counts.get(day, 0) != len(ids)}
+    # 法人日報對官方零交易股票不會列資料；預期母體因此是逐日的，不能用固定
+    # len(ids) 聚合所有日期。其他四表仍由 trading_status.expected_ids 要求完整 universe。
+    return {day for day in dates
+            if _missing_dataset_ids(con, table, ids, day, required_columns)}
 
 
 def _missing_dataset_ids(con, table, ids, day, required_columns=()):
     """同日精準到股票的缺列／缺欄集合，供欄位回補中斷後續跑。"""
-    wanted = set(ids)
+    wanted = tstatus.expected_ids(con, table, ids, day)
     if not wanted:
         return set()
     marks = ",".join("?" for _ in wanted)
@@ -1179,6 +1180,9 @@ def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None, required_co
         if all(flags):
             found_dates.add(day)
             if write:
+                # 狀態完全由已 checkpoint 的官方價格列重建，不補造任何 raw row。
+                tstatus.refresh_from_prices(con, {day}, wanted)
+                con.commit()
                 missing_ids = _missing_dataset_ids(
                     con, "price", wanted, day, required_columns=required_columns)
                 if missing_ids:
@@ -1211,8 +1215,9 @@ def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, f
     total_rows = requests = 0
     found_dates, written_dates = set(), set()
     for day in sorted(set(dates)):
-        day_wanted = wanted if day in overwrite_dates else _missing_dataset_ids(
-            con, table, wanted, day, required_columns=required_columns)
+        expected_wanted = tstatus.expected_ids(con, table, wanted, day)
+        day_wanted = expected_wanted if day in overwrite_dates else _missing_dataset_ids(
+            con, table, expected_wanted, day, required_columns=required_columns)
         if not day_wanted:
             continue
         availability, errors = {}, []
@@ -1238,11 +1243,12 @@ def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, f
             raise ExchangeRawFetchError(
                 f"{day} 已是交易日但 {','.join(missing_sources)} {dataset} 回傳空白")
         missing_ids = _missing_dataset_ids(
-            con, table, wanted, day, required_columns=required_columns)
+            con, table, expected_wanted, day, required_columns=required_columns)
         if missing_ids:
             raise ExchangeRawFetchError(
                 f"拒絕完成不完整資料日／欄位 {day}:{table}="
-                f"{len(wanted) - len(missing_ids)}/{len(wanted)};缺 {','.join(sorted(missing_ids))}")
+                f"{len(expected_wanted) - len(missing_ids)}/{len(expected_wanted)};"
+                f"缺 {','.join(sorted(missing_ids))}")
         found_dates.add(day)
     return {
         "rows": total_rows,
@@ -1312,6 +1318,17 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
         expected.update(price_stats["found_dates"])
         price_dates_written.update(price_stats["written_dates"])
 
+    # 既有 price checkpoint 也必須能在不重抓價格時重建狀態（早場法人失敗後，終版
+    # 直接從此處續跑）。只有嚴格零交易的官方價格列會被認定。
+    status_n = tstatus.refresh_from_prices(con, expected, ids)
+    con.commit()
+    if expected:
+        latest_status = max(expected)
+        excluded = sorted(tstatus.verified_exclusion_ids(con, latest_status, ids))
+        if excluded:
+            print(f"trading_status: {latest_status} 非交易 {len(excluded)} 檔 "
+                  f"({','.join(excluded)})；法人表改驗有效母體")
+
     final_holding_day = None
     for ds in exchange_ds:
         table = DATASET_TABLE[ds]
@@ -1374,6 +1391,7 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
         "price_dates_written": price_dates_written,
         "probe_start": probe_start,
         "backfill_expanded_fields": backfill_expanded_fields,
+        "non_trading": status_n,
     }
 
 
@@ -1717,7 +1735,8 @@ def build_metrics(con):
                               LEFT JOIN inst    i ON i.date=p.date AND i.stock_id=p.stock_id
                               LEFT JOIN price_adj pa ON pa.date=p.date AND pa.stock_id=p.stock_id
                               LEFT JOIN sbl     s ON s.date=p.date AND s.stock_id=p.stock_id
-                              WHERE p.stock_id=? ORDER BY p.date""", (sid,)).fetchall()
+                              WHERE p.stock_id=? AND p.close IS NOT NULL ORDER BY p.date""",
+                           (sid,)).fetchall()
         n = len(rows)
         adj = [(r[9] if r[9] is not None else r[1]) for r in rows]  # 還原價;缺值退回原始價
         sh = [r[8] for r in rows]   # 股本逐日 forward-fill,0/None 都視為缺值
@@ -2070,7 +2089,7 @@ def main():
         print("原始/事件資料無變更且 metrics/observation 已同步,略過衍生表重建")
     n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
     con.close()
-    print(f"完成 — 原始 {total} rows 落地,daily_metrics {n} rows → {DB}")
+    print(f"完成 — 原始 {total} rows 落地,daily_metrics {n} rows → {os.path.abspath(args.db)}")
 
 if __name__ == "__main__":
     main()

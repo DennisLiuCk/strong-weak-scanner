@@ -122,6 +122,7 @@ def _stock_rows(con):
         LEFT JOIN holding h ON h.date=p.date AND h.stock_id=p.stock_id
         LEFT JOIN sbl s ON s.date=p.date AND s.stock_id=p.stock_id
         LEFT JOIN security_market sm ON sm.stock_id=p.stock_id
+        WHERE p.close IS NOT NULL
         ORDER BY p.stock_id,p.date
     """))
 
