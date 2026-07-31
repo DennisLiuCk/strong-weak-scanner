@@ -111,7 +111,7 @@
 | 原始層 | `price`、`inst`、`margin`、`holding`、`sbl`、`risk_flags`、`market`、`market_index`、`tdcc_holding`、財報與 `ref_*` | 依主鍵冪等補缺；成功來源可先 checkpoint |
 | 衍生層 | `price_adj`、`daily_metrics`、`observation_metrics`、`daily_scores`、`chip_health`、`group_metrics`、`market_daily` | 依目前規則全量重建，屬 restated history |
 | OOS as-seen 層 | `oos_snapshot_runs`、`oos_signal_snapshots`、`oos_group_snapshots`、`oos_market_snapshots` | append-only，不覆寫舊發布 |
-| 發布層 | `index.html`、`archive/<資料日>.html`、`reports/` | 首頁可重建；同日 archive 首次建立後不覆寫 |
+| 發布層 | `index.html`、`research.html`、`archive/<資料日>.html`、`reports/` | 首頁與研究中心可重建；同日 archive 首次建立後不覆寫 |
 
 衍生表回答「把現行規則套回歷史會得到什麼」；正式 OOS 回答「當天第一次發布時，使用者
 實際看到了什麼」。同一資料日若修復後重跑會新增快照，驗證固定採最早正式發布版；只有 HTML

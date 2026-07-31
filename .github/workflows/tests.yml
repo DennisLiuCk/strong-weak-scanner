@@ -5,7 +5,7 @@ name: tests
 # 契約、原始表稽核、快照凍結、抓取續跑)。這裡改跑完整 discover,不再逐一列舉,
 # 新增測試檔自動納入。
 #
-# 路徑刻意排除 data/、index.html、archive/、reports/:每個交易日有 3~4 個資料 commit,
+# 路徑刻意排除 data/、index.html、research.html、archive/、reports/:每個交易日有 3~4 個資料 commit,
 # 那些 commit 不會改動程式,不需要重跑測試。
 #
 # 與 qualitative-quality.yml 的關係:那條**刻意**保留自己的 6 模組 unittest 與三個 lint,

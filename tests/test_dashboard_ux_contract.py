@@ -229,7 +229,7 @@ class DashboardUxContractTest(unittest.TestCase):
     def test_stock_detail_has_seven_factor_profile_with_null_guards(self):
         for marker in ("function buildDetail()", "七因子拆解", "diverg(f.score,2",
                        "(d.tech||{}).chart", "d.note&&h(",
-                       "if(d.note)card.appendChild(researchTabs(d));"):
+                       "if(d.note)card.appendChild(researchEntry(d));"):
             self.assertIn(marker, self.template)
         # 綜合分尺度由注入的 WEIGHTS 導出,不得寫死(改權重時長條刻度須自動跟上)
         self.assertIn("const COMP_MAX=2*Object.values(WEIGHTS)", self.template)
@@ -391,19 +391,26 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("s.note[0]==='independently_verified'", self.template)
         self.assertIn("✓已核筆記", self.template)
 
-    # ---------- 研究面板:正式筆記與領先假說分層 ----------
+    # ---------- 研究內容移往獨立頁；首頁個股面板只留入口 ----------
 
-    def test_research_tabs_split_formal_note_and_hypotheses(self):
-        for marker in ("function researchTabs(d)", "正式筆記", "領先假說",
-                       "可證偽", "不代表已證實", "narrativeBlock",
-                       "勝負手 · 可觀測裁決點",
-                       "不得作為生命週期轉移證據"):
+    def test_research_entry_links_to_formal_note_and_narrative(self):
+        for marker in ("function researchEntry(d)", "閱讀正式筆記",
+                       "閱讀多空小作文", "RESEARCH_BASE", "全文閱讀已移到研究中心"):
             self.assertIn(marker, self.template)
-        # 筆記/假說內容單一歸屬研究面板——右欄不得再放品質框或假說 teaser 複述
+        self.assertNotIn("function researchTabs(d)", self.template)
+        # 首頁 payload 不再重複塞入兩套長文 sections，避免 5MB 首頁繼續膨脹。
+        note_payload = self.builder[self.builder.index('obj["note"]'):self.builder.index(
+            'hypothesis = hypotheses_map.get', self.builder.index('obj["note"]'))]
+        hypothesis_payload = self.builder[self.builder.index('obj["hypothesis"]'):self.builder.index(
+            'obj["_comp"]', self.builder.index('obj["hypothesis"]'))]
+        self.assertNotIn('"sections"', note_payload)
+        self.assertNotIn('"sections"', hypothesis_payload)
+        self.assertIn('"researchUrl"', note_payload)
+        self.assertIn('"researchUrl"', hypothesis_payload)
         self.assertNotIn("研究筆記品質", self.template)
         self.assertNotIn("sec30", self.template)
         for marker in ("load_hypothesis_reports", 'obj["hypothesis"]',
-                       '"statusCounts"', '"sections"', '"statusInfo"',
+                       '"statusCounts"', '"statusInfo"',
                        '"captureModeCounts"', '"lifecycleCounts"', '"dueCount"',
                        '"independentChains"', '"schemaVersion"'):
             self.assertIn(marker, self.builder)

@@ -185,7 +185,7 @@ jobs:
             git add data/
             message="data: $(date -u +%Y-%m-%d) 早場官方資料 checkpoint"
           else
-            git add data/ index.html archive/
+            git add data/ index.html research.html archive/
             message="data: $(date -u +%Y-%m-%d) 五元素更新"
           fi
           if git diff --staged --quiet; then

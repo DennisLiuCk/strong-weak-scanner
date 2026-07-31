@@ -180,7 +180,7 @@ svg{display:block;overflow:visible}
     <h1>__H1__</h1>
     <p class="sub">每個交易日收盤後，把同族群個股放上同一把尺：比較價格與抗跌、法人原始買賣及其同業位置、融資槓桿，再依公開規則分層。每個分數都可點開，看原始數據與判讀；資料來源見頁尾。</p>
     <nav class="quicknav" aria-label="快速導覽">
-      <a href="#ov">今日重點</a><a href="#recent">最近研究</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#lens">時間尺度</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
+      <a href="#ov">今日重點</a><a href="research.html" data-research-link>研究中心</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#lens">時間尺度</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
     </nav>
   </header>
 
@@ -241,6 +241,8 @@ const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLO
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
       TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__,
       RECENT=__RECENT_ARTICLES_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
+const RESEARCH_BASE=location.pathname.includes('/archive/')?'../research.html':'research.html';
+document.querySelectorAll('[data-research-link]').forEach(link=>link.href=RESEARCH_BASE);
 function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,
   tierLabel:s.tier_label,waiting:s.tier_waiting,
   f:(s.factors||[]).map(function(f){return [f.label,f.score,f.weight];}),
@@ -1297,27 +1299,18 @@ function flowSection(f){ if(!f||!f.rows||!f.rows.length)return null;
 function noteVerifyMeta(n){ const col=n.cls==='independently_verified'?'var(--teal)':n.cls==='conflicted'?'var(--amber)':'var(--muted)';
   return {label:(n.cls==='independently_verified'?'✓ ':'')+n.label, col,
     scope:n.reviewScope==='all_material_claims'?'全部重要主張':(n.reviewScope&&n.reviewScope!=='-'?n.reviewScope:'—')}; }
-function researchTabs(d){
+function researchEntry(d){
+  const nv=noteVerifyMeta(d.note);
   const wrap=h('div',{style:'margin-top:28px;padding-top:22px;border-top:1px solid var(--line)'});
-  wrap.appendChild(h('h3',{style:'margin:0 0 4px;font-size:15px;font-weight:800',text:'個股研究面板'}));
-  wrap.appendChild(h('p',{style:'margin:0 0 14px;font-size:12px;color:var(--muted)',text:'正式筆記（一手揭露、經獨立核驗）與領先假說（市場流傳、可證偽主張）分層並列。'}));
-  const tabbar=h('div',{style:'display:inline-flex;gap:4px;padding:4px;background:var(--inset);border-radius:12px;margin-bottom:16px'});
-  const noteTab=h('button',{class:'rtab',text:'正式筆記'});
-  const hypTab=h('button',{class:'rtab',text:'領先假說 · '+((d.hypothesis&&d.hypothesis.count)||0)+' 則'});
-  tabbar.append(noteTab,hypTab); wrap.appendChild(tabbar);
-  const notePanel=h('div',{}),nv=noteVerifyMeta(d.note);
-  notePanel.appendChild(h('div',{style:'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px'},
-    metaBox('查核狀態',nv.label,nv.col),metaBox('核驗範圍',nv.scope),metaBox('一手來源',(d.note.primarySources||0)+' 份'),metaBox('資料截至',d.note.latestPeriod||'—')));
-  (d.note.sections||[]).forEach((s,i)=>notePanel.appendChild(nbSection(s,i<2)));
-  notePanel.appendChild(h('a',{href:d.note.url,style:'display:inline-block;margin-top:12px;font-size:12px;font-weight:700',text:'GitHub 原始筆記與一手來源 →'}));
-  const hypPanel=h('div',{class:'hide'});
-  hypPanel.appendChild(h('div',{style:'background:var(--hypobg);border:1px solid var(--hypoline);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--hypotext);line-height:1.6'},'領先假說是市場流傳、可追溯且可證偽的主張，與正式筆記分層保存，不代表已證實，也不進入量化分數。'));
-  if(d.hypothesis&&d.hypothesis.narrative)hypPanel.appendChild(narrativeBlock(d.hypothesis.narrative));
-  ((d.hypothesis&&d.hypothesis.sections)||[]).forEach((s,i)=>hypPanel.appendChild(nbSection(s,i<3)));
-  wrap.append(notePanel,hypPanel);
-  const sel=n=>{ noteTab.setAttribute('aria-selected',n); hypTab.setAttribute('aria-selected',!n); notePanel.classList.toggle('hide',!n); hypPanel.classList.toggle('hide',n); };
-  noteTab.addEventListener('click',()=>sel(true)); hypTab.addEventListener('click',()=>sel(false)); sel(true);
-  return wrap; }
+  wrap.append(
+    h('h3',{style:'margin:0 0 4px;font-size:15px;font-weight:800',text:'深度研究'}),
+    h('p',{style:'margin:0 0 14px;font-size:12px;color:var(--muted)',text:'全文閱讀已移到研究中心；查核狀態與觀察層警語不變。'}),
+    h('div',{style:'display:flex;align-items:center;gap:9px;flex-wrap:wrap'},
+      h('a',{class:'togglebtn',href:RESEARCH_BASE+'#formal-'+encodeURIComponent(d.id),style:'font-weight:800',text:'閱讀正式筆記 →'}),
+      d.hypothesis&&h('a',{class:'togglebtn',href:RESEARCH_BASE+'#narrative-'+encodeURIComponent(d.id),style:'font-weight:800;color:var(--hypoink)',text:'閱讀多空小作文 →'}),
+      h('span',{style:'font-size:11px;color:'+nv.col,text:nv.label})));
+  return wrap;
+}
 /* ---- F1/F3：七因子 → cell 明細（rows / 判讀 / 原始方向 / 依據 / 量尺）---- */
 // 7 因子對映到 build_cells 的 5 格：①價與抗跌共用 cell0；③外資與修正日買賣共用 cell2
 const FAC2CELL = {price:0, resil:0, vol:1, foreign:2, dip:2, trust:3, margin:4};
@@ -1449,18 +1442,17 @@ function buildDetail(){
       h('p',{style:'margin:8px 0 0;font-size:11.5px;color:var(--muted);line-height:1.6',text:d.tech.why})));
   const fs=flowSection(d.flow);
   if(fs)card.appendChild(h('div',{style:'margin-top:24px;border-top:1px solid var(--line)'},fs));
-  if(d.note)card.appendChild(researchTabs(d));
+  if(d.note)card.appendChild(researchEntry(d));
   return card;
 }
 
-/* ---------- 最近 14 天研究文章 ---------- */
-const RECENT_DEFAULT_LIMIT=12;
+/* ---------- 研究中心入口：首頁只留三類各一篇，完整內容移到獨立頁 ---------- */
 function buildRecentArticles(){
   const fmtDate=value=>String(value||'').replaceAll('-','/');
   const head=[
-    h('p',{class:'kicker',text:'研究更新 · 可稽核文章日期'}),
-    h('h2',{class:'sec',text:'最近 '+((RECENT&&RECENT.days)||14)+' 天更新文章'}),
-    h('p',{class:'lead',text:'文章窗 '+fmtDate(RECENT&&RECENT.start)+'～'+fmtDate(RECENT&&RECENT.anchor)+'，日期取自各文章 metadata；新近不代表證據較強，正式筆記查核狀態與觀察層警語逐篇保留。'})
+    h('p',{class:'kicker',text:'深度研究 · 獨立閱讀空間'}),
+    h('h2',{class:'sec',text:'研究中心'}),
+    h('p',{class:'lead',text:'正式筆記、多空小作文與市場議題已移到獨立頁面，可搜尋、篩選並在站內閱讀全文。首頁只保留三類最新入口；新近不代表證據較強，查核狀態與觀察層警語逐篇保留。'})
   ];
   const card=h('div',{class:'card',style:'padding:20px 22px'});
   const items=(RECENT&&RECENT.items)||[];
@@ -1474,19 +1466,15 @@ function buildRecentArticles(){
     return head.concat(card);
   }
 
-  const list=h('div',{id:'recent-list',class:'recent-list','aria-label':'近期研究文章'});
-  const shown=h('span',{class:'recent-shown','aria-live':'polite'});
-  const toggle=h('button',{class:'togglebtn',type:'button','aria-expanded':'false','aria-controls':'recent-list'});
-  let expanded=false;
-  const render=()=>{
-    list.replaceChildren();
-    const visible=expanded?items:items.slice(0,RECENT_DEFAULT_LIMIT);
-    visible.forEach(item=>{
+  const list=h('div',{id:'recent-list',class:'recent-list','aria-label':'研究中心最新文章'});
+  const visible=['formal_note','narrative','topic'].map(type=>items.find(item=>item.type===type)).filter(Boolean);
+  if(visible.length<3)items.forEach(item=>{if(visible.length<3&&!visible.includes(item))visible.push(item)});
+  visible.forEach(item=>{
       const statusClass='recent-status '+(item.statusTone||'');
-      list.appendChild(h('a',{
-        class:'recent-item',href:item.url,target:'_blank',rel:'noopener noreferrer',
-        'aria-label':item.date+' '+item.typeLabel+' '+item.subject+'：'+item.title+'；'+item.status+'，在新分頁開啟'
-      },
+      const attrs={class:'recent-item',href:item.researchId?RESEARCH_BASE+'#'+encodeURIComponent(item.researchId):item.url,
+        'aria-label':item.date+' '+item.typeLabel+' '+item.subject+'：'+item.title+'；'+item.status};
+      if(!item.researchId){attrs.target='_blank';attrs.rel='noopener noreferrer';}
+      list.appendChild(h('a',attrs,
         h('div',{},
           h('time',{class:'recent-date',datetime:item.date,text:fmtDate(item.date)}),
           h('span',{class:'recent-type',text:item.typeLabel})),
@@ -1497,17 +1485,10 @@ function buildRecentArticles(){
           h('p',{class:'recent-title',text:item.title})),
         h('span',{class:'recent-arrow','aria-hidden':'true',text:'↗'})
       ));
-    });
-    shown.textContent='目前顯示 '+visible.length+'／'+items.length+' 篇';
-    toggle.setAttribute('aria-expanded',String(expanded));
-    toggle.textContent=expanded?'收合至最近 '+Math.min(RECENT_DEFAULT_LIMIT,items.length)+' 篇':'展開全部 '+items.length+' 篇';
-  };
-  render();
-  const actions=h('div',{class:'recent-actions'},shown);
-  if(items.length>RECENT_DEFAULT_LIMIT){
-    toggle.addEventListener('click',()=>{expanded=!expanded;render();});
-    actions.appendChild(toggle);
-  }
+  });
+  const actions=h('div',{class:'recent-actions'},
+    h('span',{class:'recent-shown','aria-live':'polite',text:'首頁精選 '+visible.length+'／'+items.length+' 篇'}),
+    h('a',{class:'togglebtn',href:RESEARCH_BASE,style:'margin-left:auto;font-weight:800',text:'開啟研究中心 →'}));
   card.append(list,actions);
   return head.concat(card);
 }

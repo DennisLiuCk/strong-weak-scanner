@@ -27,7 +27,7 @@ import trading_status as tstatus
 import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡報、週報 §⑦⑧ 同一組函式)
 import hypotheses as hyp         # 兩視角分歧的籌碼定義 = H1 檢定的同一個定義
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
-from qual_notes import (load_notes, note_status, note_review_status,
+from qual_notes import (_extract_sections, load_notes, note_status, note_review_status,
                         load_events, EVENT_KPI_KEYS,
                         TEMPLATE_VERSION as NOTE_TEMPLATE_VERSION)
 from leading_hypotheses import (HYPOTHESIS_STATUS_INFO,
@@ -37,7 +37,9 @@ from research_queue import load_topics as load_research_topics
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 TEMPLATE = os.path.join(ROOT, "scripts", "dashboard_template.html")
+RESEARCH_TEMPLATE = os.path.join(ROOT, "scripts", "research_template.html")
 OUT = os.path.join(ROOT, "index.html")   # 根目錄 index.html → GitHub Pages 乾淨網址
+RESEARCH_OUT = os.path.join(ROOT, "research.html")
 CHART_DAYS = 120   # 互動股價圖每檔保留交易日數(1f;vol=股數、含外資/投信,前端 slice 切 20/60/120)
 # 歷史快照:每日 build 原樣存檔,回看的是「當天使用者看到的報告」而非以現行規則重算
 # (daily_scores 等衍生表每日全量重建,事後從 db 重繪會是 restated history,不可稽核)。
@@ -45,9 +47,7 @@ ARCHIVE = os.path.join(ROOT, "archive")
 NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 HYPOTHESES_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
 TOPICS_DIR = os.path.join(ROOT, "notes", "research_topics")
-# 筆記全文放 repo 裡,儀表板不 embed 全文(質化筆記是長文,不適合塞進 tooltip)——
-# badge 點開直接連到 GitHub 的 render 版本,讀 repo remote 免寫死也行,但這裡固定
-# 域名比較簡單(僅供內部 GitHub Pages 使用,repo 搬家機率低)
+# GitHub 原文仍保留作為來源檔與版本歷史入口；站內研究中心另外提供適合長文閱讀的 render。
 NOTE_REPO_BLOB = "https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/"
 NOTE_LABEL = {
     "ai_draft": "AI 草稿・未獨立查核",
@@ -1515,7 +1515,8 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
                 name = stem.split("_", 1)[1]
         return " ".join(part for part in (stock_id, name) if part) or "未指定公司"
 
-    def add(value, article_type, stock_id, subject, title, relpath, status, status_tone):
+    def add(value, article_type, stock_id, subject, title, relpath, status, status_tone,
+            research_id=None):
         parsed = _article_date(value)
         if parsed is None or not relpath:
             return
@@ -1530,6 +1531,7 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
             "url": NOTE_REPO_BLOB + relpath,
             "status": status,
             "statusTone": status_tone,
+            "researchId": research_id,
             "relpath": relpath,
         })
 
@@ -1544,6 +1546,7 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
             stock_subject(stock_id, note.get("relpath", "")),
             note.get("summary") or f"{stock_subject(stock_id)}質化研究筆記",
             note.get("relpath"), NOTE_LABEL.get(verification, verification), tone,
+            f"formal-{stock_id}",
         )
 
     for stock_id, report in (reports or {}).items():
@@ -1562,6 +1565,7 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
             narrative.get("updated"), "narrative", stock_id,
             stock_subject(stock_id, report.get("relpath", "")),
             title, report.get("relpath"), "觀察層・不等於事實認證", "observational",
+            f"narrative-{stock_id}",
         )
 
     for topic in topics or []:
@@ -1583,6 +1587,7 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
         add(
             topic_date, "topic", sort_stock, subject, topic.get("title"),
             topic.get("relpath"), "候選議題・不等於正式公司事實", "observational",
+            f"topic-{topic.get('topic_id') or os.path.basename(topic.get('relpath', 'topic'))}",
         )
 
     for event in (events or {}).get("all", []):
@@ -1628,6 +1633,180 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
             for key, label in RECENT_ARTICLE_TYPES
         ],
         "items": items,
+    }
+
+
+def _research_reading_minutes(sections):
+    """用實際可見中文字數估計閱讀時間；只作 UI 導覽，不是研究統計量。"""
+    def walk(value):
+        if isinstance(value, str):
+            return len(re.sub(r"https?://\S+", "", value))
+        if isinstance(value, dict):
+            return sum(walk(item) for item in value.values())
+        if isinstance(value, (list, tuple)):
+            return sum(walk(item) for item in value)
+        return 0
+
+    # 中文研究長文含表格與數字，採每分鐘約 500 字並向上取整；至少顯示 2 分鐘。
+    return max(2, (walk(sections) + 499) // 500)
+
+
+def build_research_library(notes, reports, topics=None, stock_meta=None, group_names=None):
+    """建立獨立研究中心 payload；只發布通過各自品質契約的三類研究。"""
+    stock_meta = stock_meta or {}
+    group_names = group_names or {}
+    articles = []
+    type_order = {"formal_note": 0, "narrative": 1, "topic": 2}
+
+    def stock_subject(stock_id):
+        row = stock_meta.get(stock_id, {})
+        name = row.get("name") or ""
+        return " ".join(part for part in (stock_id, name) if part) or "未指定公司"
+
+    def stock_groups(stock_ids, declared=None):
+        result = [group for group in (declared or []) if group]
+        result.extend(
+            stock_meta.get(stock_id, {}).get("group")
+            for stock_id in stock_ids
+            if stock_meta.get(stock_id, {}).get("group")
+        )
+        return list(dict.fromkeys(result))
+
+    def add(article):
+        date = _article_date(article.get("date"))
+        if date is None:
+            return
+        article["date"] = date.isoformat()
+        article["groups"] = list(dict.fromkeys(article.get("groups") or []))
+        article["groupLabels"] = [group_names.get(group, group) for group in article["groups"]]
+        article["readingMinutes"] = _research_reading_minutes(article.get("sections") or [])
+        article["searchText"] = " ".join(str(value) for value in (
+            article.get("subject", ""), article.get("title", ""),
+            article.get("summary", ""), " ".join(article["groupLabels"]),
+            article.get("typeLabel", ""), article.get("status", ""),
+        )).lower()
+        articles.append(article)
+
+    for stock_id, note in (notes or {}).items():
+        if not _article_metadata_usable(note):
+            continue
+        verification = note_review_status(note)
+        tone = ("verified" if verification == "independently_verified"
+                else "warning" if verification == "conflicted" else "draft")
+        subject = stock_subject(stock_id)
+        sections = note.get("sections") or []
+        add({
+            "id": f"formal-{stock_id}", "type": "formal_note", "typeLabel": "正式筆記",
+            "date": note.get("last_updated"), "stockIds": [stock_id],
+            "subject": subject, "readerTitle": f"{subject} — 質化研究筆記",
+            "title": _article_excerpt(note.get("summary")) or f"{subject} 質化研究筆記",
+            "summary": _article_excerpt(note.get("summary")),
+            "status": NOTE_LABEL.get(verification, verification), "statusTone": tone,
+            "statusKey": "verified" if verification == "independently_verified" else "review",
+            "groups": stock_groups([stock_id]), "sections": sections,
+            "sources": note.get("sources") or [],
+            "sourceUrl": NOTE_REPO_BLOB + note["relpath"],
+            "meta": {
+                "contentAsOf": note.get("content_as_of") or "-",
+                "latestPeriod": note.get("latest_financial_period") or "-",
+                "nextReview": note.get("next_review") or "-",
+                "reviewedAt": note.get("reviewed_at") or "-",
+                "reviewedBy": note.get("reviewed_by") or "-",
+                "primarySources": note.get("primary_source_count", 0),
+                "claimCount": note.get("claim_count", 0),
+                "citedClaims": note.get("cited_claim_count", 0),
+            },
+        })
+
+    for stock_id, report in (reports or {}).items():
+        if not _article_metadata_usable(report) or not report.get("narrative"):
+            continue
+        subject = stock_subject(stock_id)
+        hypothesis_titles = [
+            item.get("title", "").strip() for item in report.get("hypotheses", [])
+            if item.get("title", "").strip()
+        ]
+        title = "／".join(hypothesis_titles[:2]) or "看多、看空觀點與勝負手"
+        sections = report.get("sections") or []
+        add({
+            "id": f"narrative-{stock_id}", "type": "narrative", "typeLabel": "多空小作文",
+            "date": report.get("narrative", {}).get("updated"), "stockIds": [stock_id],
+            "subject": subject, "readerTitle": f"{subject} — 領先假說報告",
+            "title": title, "summary": "看多、看空兩篇對立敘事與可觀測勝負手。",
+            "status": "觀察層・不等於事實認證", "statusTone": "observational",
+            "statusKey": "observational", "groups": stock_groups([stock_id]),
+            "sections": sections, "sources": [],
+            "sourceUrl": NOTE_REPO_BLOB + report["relpath"],
+            "meta": {
+                "contentAsOf": report.get("content_as_of") or "-",
+                "nextReview": report.get("next_review") or "-",
+                "hypothesisCount": report.get("hypothesis_count", 0),
+                "reportStatus": report.get("status") or "-",
+            },
+        })
+
+    for topic in topics or []:
+        if not _article_metadata_usable(topic):
+            continue
+        meta = topic.get("meta") or {}
+        topic_date = (meta.get("last_reviewed_at")
+                      if _article_date(meta.get("last_reviewed_at"))
+                      else topic.get("captured_at"))
+        stock_ids = topic.get("stock_ids") or []
+        if stock_ids:
+            subject = "、".join(stock_subject(stock_id) for stock_id in stock_ids)
+        elif topic.get("group_ids"):
+            subject = "跨族群：" + "、".join(
+                group_names.get(group, group) for group in topic["group_ids"]
+            )
+        else:
+            subject = "市場／政策"
+        sections = topic.get("sections")
+        if sections is None and topic.get("path") and os.path.exists(topic["path"]):
+            with open(topic["path"], encoding="utf-8") as handle:
+                sections = _extract_sections(handle.read())
+        sections = sections or []
+        add({
+            "id": f"topic-{topic.get('topic_id') or os.path.basename(topic.get('relpath', 'topic'))}",
+            "type": "topic", "typeLabel": "市場議題", "date": topic_date,
+            "stockIds": stock_ids, "subject": subject,
+            "readerTitle": topic.get("title") or "市場議題",
+            "title": topic.get("title") or "市場議題", "summary": "跨公司研究線索與後續驗證路由。",
+            "status": "候選議題・不等於正式公司事實", "statusTone": "observational",
+            "statusKey": "observational",
+            "groups": stock_groups(stock_ids, topic.get("group_ids")),
+            "sections": sections, "sources": [],
+            "sourceUrl": NOTE_REPO_BLOB + topic["relpath"],
+            "meta": {
+                "capturedAt": topic.get("captured_at") or "-",
+                "reviewDue": topic.get("review_due") or "-",
+                "priority": topic.get("priority") or "-",
+                "topicStatus": topic.get("status") or "-",
+                "publisher": meta.get("publisher") or meta.get("publisher_domain") or "-",
+                "canonicalUrl": meta.get("canonical_url") or "",
+            },
+        })
+
+    articles.sort(key=lambda item: (
+        -dt.date.fromisoformat(item["date"]).toordinal(),
+        type_order[item["type"]], item["stockIds"][0] if item["stockIds"] else "",
+        item["id"],
+    ))
+    counts = {key: 0 for key in type_order}
+    group_counts = defaultdict(int)
+    for article in articles:
+        counts[article["type"]] += 1
+        for group in article["groups"]:
+            group_counts[group] += 1
+    return {
+        "anchor": max((item["date"] for item in articles), default=None),
+        "total": len(articles),
+        "counts": counts,
+        "groups": [
+            {"id": group, "label": group_names.get(group, group), "count": group_counts[group]}
+            for group in group_names if group_counts[group]
+        ],
+        "articles": articles,
     }
 
 
@@ -1811,9 +1990,16 @@ def main():
     # 最近研究文章使用各層既有 parser 的可稽核 meta；不讀 git/檔案 mtime。
     # anchor 取市場資料日與文章日期較晚者，避免市場資料尚未換日時漏掉今天剛更新的文章。
     research_topics = load_research_topics(TOPICS_DIR, reports=hypotheses_map)
+    stock_names = {r["stock_id"]: r["name"] for r in rows}
+    stock_meta = {
+        r["stock_id"]: {"name": r["name"], "group": r["grp"], "biz": r["biz"] or ""}
+        for r in rows
+    }
     recent_articles = build_recent_articles(
-        last, notes_map, hypotheses_map, events, research_topics,
-        {r["stock_id"]: r["name"] for r in rows},
+        last, notes_map, hypotheses_map, events, research_topics, stock_names,
+    )
+    research_library = build_research_library(
+        notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM,
     )
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
@@ -2087,7 +2273,8 @@ def main():
                 "primaryClaims": n.get("primary_cited_claim_count", 0),
                 "primarySources": n.get("primary_source_count", 0),
                 "summary": n["summary"], "tmplOld": n["template_version"] < NOTE_TEMPLATE_VERSION,
-                "url": NOTE_REPO_BLOB + n["relpath"], "sections": n["sections"],
+                "url": NOTE_REPO_BLOB + n["relpath"],
+                "researchUrl": f"research.html#formal-{r['stock_id']}",
             }
         hypothesis = hypotheses_map.get(r["stock_id"])
         if hypothesis:
@@ -2127,7 +2314,7 @@ def main():
                 "dueCount": due_count,
                 "independentChains": independent_chains,
                 "schemaVersion": hypothesis.get("report_version", 0),
-                "sections": hypothesis.get("sections", []),
+                "researchUrl": f"research.html#narrative-{r['stock_id']}",
                 "url": NOTE_REPO_BLOB + hypothesis["relpath"],
             }
         obj["_comp"] = r["composite_s"]
@@ -2227,13 +2414,21 @@ def main():
     dates = sorted({f[:10] for f in os.listdir(ARCHIVE)
                     if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.html", f)} | {last})
     html = html.replace("__DATES_JSON__", json.dumps(dates))
+    research_html = open(RESEARCH_TEMPLATE, encoding="utf-8").read()
+    research_html = research_html.replace(
+        "__RESEARCH_JSON__", json.dumps(research_library, ensure_ascii=False)
+    )
+    research_html = research_html.replace("__DATE_ISO__", last)
+    research_html = research_html.replace("__DATE__", date_str)
     open(OUT, "w", encoding="utf-8").write(html)
+    open(RESEARCH_OUT, "w", encoding="utf-8").write(research_html)
     archive_path = os.path.join(ARCHIVE, f"{last}.html")
     archive_created = not os.path.exists(archive_path)
     if archive_created:
         open(archive_path, "w", encoding="utf-8").write(html)
     open(os.path.join(ARCHIVE, "manifest.json"), "w", encoding="utf-8").write(json.dumps(dates))
-    print(f"已重生 {OUT} — 資料日 {date_str},{len(data)} 檔,{len(tiers)} 個 tier;"
+    print(f"已重生 {OUT}、{RESEARCH_OUT} — 資料日 {date_str},{len(data)} 檔,"
+          f"研究 {research_library['total']} 篇,{len(tiers)} 個 tier;"
           f"{'建立' if archive_created else '保留既有'}快照 archive/{last}.html,"
           f"manifest 共 {len(dates)} 日")
     # 可選區段算不出來時前端只會少一整塊、導覽還留著死連結,而 build 照印「已重生」。

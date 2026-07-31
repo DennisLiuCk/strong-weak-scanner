@@ -156,24 +156,26 @@ class RecentResearchArticlesTest(unittest.TestCase):
         self.assertNotIn("mtime", source)
         self.assertNotIn("datetime.now", source)
 
-    def test_template_defaults_to_twelve_and_keeps_links_keyboard_native(self):
+    def test_home_is_a_small_gateway_to_the_independent_research_center(self):
         template = (SCRIPTS / "dashboard_template.html").read_text(encoding="utf-8")
         builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
-        self.assertIn('<a href="#recent">最近研究</a>', template)
+        start = template.index("function buildRecentArticles()")
+        end = template.index("/* ---------- 主題切換", start)
+        recent = template[start:end]
+        self.assertIn('<a href="research.html" data-research-link>研究中心</a>', template)
         self.assertIn('<section id="recent" class="blk"></section>', template)
         self.assertIn("RECENT=__RECENT_ARTICLES_JSON__", template)
         self.assertIn('html.replace("__RECENT_ARTICLES_JSON__"', builder)
-        self.assertIn("const RECENT_DEFAULT_LIMIT=12", template)
-        self.assertIn("items.slice(0,RECENT_DEFAULT_LIMIT)", template)
-        self.assertIn("'aria-expanded':'false'", template)
-        self.assertIn("'aria-controls':'recent-list'", template)
-        self.assertIn("展開全部 ", template)
-        self.assertIn("收合至最近 ", template)
-        self.assertIn("class:'recent-item',href:item.url", template)
+        self.assertIn("['formal_note','narrative','topic']", template)
+        self.assertIn("首頁精選 ", template)
+        self.assertIn("開啟研究中心 →", template)
+        self.assertNotIn("const RECENT_DEFAULT_LIMIT=12", template)
+        self.assertNotIn("展開全部 ", recent)
+        self.assertIn("class:'recent-item'", template)
         self.assertIn(".recent-item:focus-visible", template)
         self.assertIn(".recent-item{grid-template-columns:1fr", template)
         self.assertIn("新近不代表證據較強", template)
-        self.assertIn("觀察層警語逐篇保留", template)
+        self.assertIn("查核狀態與觀察層警語逐篇保留", template)
 
 
 if __name__ == "__main__":

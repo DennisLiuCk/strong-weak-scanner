@@ -22,11 +22,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
+RESEARCH = ROOT / "research.html"
 
 # (payload 變數名, section id, 導覽是否有連結, 人看得懂的名字)
 SECTIONS = [
     ("STRATEGY", "strategy-status", False, "策略狀態"),
-    ("RECENT", "recent", True, "最近研究"),
+    ("RECENT", "recent", False, "研究中心入口"),
     ("TSMC", "tsmc", True, "台積電專區"),
     ("DIVERGE", "diverge", True, "兩視角分歧"),
     ("LENS", "lens", True, "時間尺度"),
@@ -77,6 +78,18 @@ class DashboardSectionsPresentTest(unittest.TestCase):
         self.assertGreater(len(data), 50, f"只有 {len(data)} 檔,遠少於 universe 規模")
         groups = dec.raw_decode(self.html, self.html.index("GROUPS=", i) + len("GROUPS="))[0]
         self.assertGreater(len(groups), 5)
+
+    def test_research_center_was_built_with_full_catalog(self):
+        self.assertTrue(RESEARCH.exists(), "research.html 未產生，研究中心會是死連結")
+        html = RESEARCH.read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r"__[A-Z_]+__", html), [], "研究中心仍有未替換 placeholder")
+        dec = json.JSONDecoder()
+        marker = "const LIB="
+        start = html.index(marker) + len(marker)
+        library = dec.raw_decode(html, start)[0]
+        self.assertGreater(library.get("total", 0), 50)
+        self.assertEqual(set(library.get("counts", {})), {"formal_note", "narrative", "topic"})
+        self.assertTrue(all(article.get("sections") for article in library.get("articles", [])))
 
 
 if __name__ == "__main__":
