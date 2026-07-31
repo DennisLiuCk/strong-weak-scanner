@@ -46,9 +46,11 @@ class DashboardUxContractTest(unittest.TestCase):
 
     def test_quicknav_reaches_every_section(self):
         self.assertIn('aria-label="快速導覽"', self.template)
-        for anchor in ("ov", "tsmc", "grp", "diverge", "tier", "stocks", "flow-guide"):
+        for anchor in ("ov", "grp", "diverge", "tier", "stocks", "flow-guide"):
             self.assertIn(f'href="#{anchor}"', self.template)
             self.assertIn(f'<section id="{anchor}"', self.template)
+        self.assertNotIn('href="#tsmc"', self.template)
+        self.assertNotIn('<section id="tsmc"', self.template)
         # 個股詳情只由點列開抽屜,不再有底部常駐展示區(設計稿 demo 殘留,已移除)
         self.assertNotIn('<section id="detail"', self.template)
         # 提案文件的螢幕編號/選項徽章不得出現在正式版面
@@ -64,7 +66,7 @@ class DashboardUxContractTest(unittest.TestCase):
     def test_placeholders_are_injected_and_adapted(self):
         pairs = ("__DATA_JSON__", "__GROUPS_JSON__", "__TIERS_JSON__",
                  "__TIER_FLOW_JSON__", "__OVERVIEW_JSON__", "__GRPMETA_JSON__",
-                 "__WEIGHTS_JSON__", "__THRESH_JSON__", "__TSMC_JSON__",
+                 "__WEIGHTS_JSON__", "__THRESH_JSON__",
                  "__STRATEGY_JSON__", "__DIVERGE_JSON__",
                  "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__",
                  "__SCOPE__")
@@ -73,7 +75,6 @@ class DashboardUxContractTest(unittest.TestCase):
             self.assertIn(f'"{ph}"', self.builder)
         # adapter 把完整 DATA 轉成 render 層的 slim 形狀;點列時用 byId 取完整物件
         self.assertIn("function _slim(s)", self.template)
-        self.assertIn("_adaptTSMC", self.template)
         self.assertIn("D.byId", self.template)
         self.assertIn("tier:s.tier_confirmed", self.template)
         self.assertIn("tierLabel:s.tier_label", self.template)
@@ -319,20 +320,18 @@ class DashboardUxContractTest(unittest.TestCase):
         )
         self.assertEqual(validate.IS_CUTOFF, "2026-07-05")
 
-    # ---------- 台積電專區:觀察層鐵律(原樣保留 + 新模板 marker) ----------
+    # ---------- 台積電法說:搬到研究中心，族群指引與觀察層鐵律保留 ----------
 
-    def test_tsmc_section_is_observation_layer_only(self):
-        self.assertIn('id="tsmc"', self.template)
-        self.assertIn("TSMC=__TSMC_JSON__", self.template)
-        self.assertIn("上游錨點 · 觀察層（不計分）", self.template)
-        self.assertIn("不在掃描範圍、不參與任何排名與評分", self.template)
-        # 期別與查核狀態 chip 一律吃事件錨點資料,不得寫死
-        self.assertIn("'台積電官方 IR · '+T.quarter", self.template)
-        self.assertNotIn("2026 Q2", self.template)
-        self.assertIn("scMap[T.status]", self.template)
-        self.assertIn('html.replace("__TSMC_JSON__"', self.builder)
+    def test_tsmc_event_moved_to_research_center_without_entering_scores(self):
+        self.assertNotIn('href="#tsmc"', self.template)
+        self.assertNotIn('<section id="tsmc"', self.template)
+        self.assertNotIn("document.getElementById('tsmc')", self.template)
+        self.assertNotIn("function buildTSMC", self.template)
+        self.assertNotIn("TSMC=__TSMC_JSON__", self.template)
+        self.assertNotIn('html.replace("__TSMC_JSON__"', self.builder)
         self.assertIn("load_events", self.builder)
-        self.assertIn("ref_price", self.builder)
+        self.assertIn('"eventKind": "tsmc_earnings"', self.builder)
+        self.assertIn('"type": "topic", "typeLabel": "市場議題"', self.builder)
         # 鐵律守護:2330 只能是觀察層參考個股——不在 universe、score.py 不讀 ref 表
         self.assertEqual(fd.REF_IDS, ["2330"])
         universe_csv = (ROOT / "config" / "universe.csv").read_text(encoding="utf-8")

@@ -180,7 +180,7 @@ svg{display:block;overflow:visible}
     <h1>__H1__</h1>
     <p class="sub">每個交易日收盤後，把同族群個股放上同一把尺：比較價格與抗跌、法人原始買賣及其同業位置、融資槓桿，再依公開規則分層。每個分數都可點開，看原始數據與判讀；資料來源見頁尾。</p>
     <nav class="quicknav" aria-label="快速導覽">
-      <a href="#ov">今日重點</a><a href="research.html" data-research-link>研究中心</a><a href="#tsmc">台積電專區</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#lens">時間尺度</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
+      <a href="#ov">今日重點</a><a href="research.html" data-research-link>研究中心</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#lens">時間尺度</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
     </nav>
   </header>
 
@@ -188,7 +188,6 @@ svg{display:block;overflow:visible}
   <main id="main">
     <section id="ov" class="blk" style="margin-top:56px"></section>
     <section id="recent" class="blk"></section>
-    <section id="tsmc" class="blk"></section>
     <section id="grp" class="blk"></section>
     <section id="diverge" class="blk"></section>
     <section id="lens" class="blk"></section>
@@ -227,7 +226,7 @@ svg{display:block;overflow:visible}
   </main>
 
   <footer style="margin:86px 0 0;border-top:1px solid var(--line);padding-top:18px">
-    <p class="note" style="line-height:1.7;max-width:70ch">資料來源：TWSE／TPEx 官方每日批次與公告（價格、三大法人、融資券、借券、外資持股、處置／注意），FinMind（月營收、財報、市場事件與台積電參考數據）。所有分數皆為族群內相對排名；觀察層（台積電專區）不計分。計算規則與原始碼見 <a href="https://github.com/DennisLiuCk/strong-weak-scanner">GitHub repo</a>。</p>
+    <p class="note" style="line-height:1.7;max-width:70ch">資料來源：TWSE／TPEx 官方每日批次與公告（價格、三大法人、融資券、借券、外資持股、處置／注意），FinMind（月營收、財報、市場事件與台積電參考數據）。所有分數皆為族群內相對排名；研究中心的法說事件與其他觀察層內容不計分。計算規則與原始碼見 <a href="https://github.com/DennisLiuCk/strong-weak-scanner">GitHub repo</a>。</p>
   </footer>
 
 </div>
@@ -239,7 +238,7 @@ svg{display:block;overflow:visible}
    ============================================================ */
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
-      TSMC=__TSMC_JSON__, STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__,
+      STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__,
       RECENT=__RECENT_ARTICLES_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 const RESEARCH_BASE=location.pathname.includes('/archive/')?'../research.html':'research.html';
 document.querySelectorAll('[data-research-link]').forEach(link=>link.href=RESEARCH_BASE);
@@ -252,17 +251,10 @@ function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,r20:s.ret
   fund:s.fund?[s.fund.cls,(s.fund.rows.find(function(r){return /年增/.test(r[0]);})||[])[1]||s.fund.label]:null,
   note:s.note?[s.note.cls,s.note.summary]:null, risk:(s.risk||[]).map(function(r){return r.kind;}),
   trading:s.trading||null}; }
-function _adaptTSMC(T){ if(!T||!T.event)return null; const e=T.event;
-  return {title:e.title||'', quarter:e.quarter||'', eventDate:e.date||'', status:e.vcls||'', statusLabel:e.vlabel||'', url:e.url,
-    contentAsOf:e.contentAsOf||'', nextReview:e.nextReview||'',
-    kpis:(e.kpi||[]).map(function(kv){return {k:kv[0],v:kv[1],note:''};}),
-    guidance:(e.guidance||[]).map(function(g){return {g:g.g,dir:g.dir,text:g.text};}),
-    sections:e.sections||[], history:e.history||[]}; }
 const D={ groups:GROUPS, grpMeta:GRP, overview:OVERVIEW, tierFlow:TIER_FLOW, date:DATE_STR,
   stocks:DATA.map(_slim),
   allStocks:DATA.map(function(s){return {id:s.id,nm:s.nm,g:s.g,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,tl:s.tier_label,w:s.tier_waiting,cs:(s.cells||[]).map(function(c){return c[0];}),trading:s.trading||null};}),
-  byId:Object.fromEntries(DATA.map(function(s){return [s.id,s];})),
-  tsmc:_adaptTSMC(TSMC) };
+  byId:Object.fromEntries(DATA.map(function(s){return [s.id,s];})) };
 const COMP_MAX=2*Object.values(WEIGHTS).reduce((a,b)=>a+b,0);
 
 /* ---------- DOM 小工具 ---------- */
@@ -776,82 +768,6 @@ function buildLenses(){
     h('div',{class:'toolbar'},gsel),listBox,more,foot,note];
 }
 
-function buildTSMC(){
-  const T=D.tsmc; if(!T)return [];
-  const dirMap={up:{s:'↑',col:'var(--strong)',bg:'var(--strongbg)',l:'看增'},mixed:{s:'↕',col:'var(--amber)',bg:'var(--amberbg)',l:'分歧'},down:{s:'↓',col:'var(--weak)',bg:'var(--weakbg)',l:'看減'},flat:{s:'→',col:'var(--muted)',bg:'var(--neubg)',l:'持平'},none:{s:'·',col:'var(--muted)',bg:'var(--neubg)',l:'未提及'}};
-
-  // KPI（常駐）
-  const kpi=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:4px'});
-  (T.kpis||[]).forEach(k=>kpi.appendChild(h('div',{style:'background:var(--inset);border-radius:12px;padding:12px 14px'},
-    h('div',{style:'font-size:11px;font-weight:800;color:var(--muted)',text:k.k}),
-    h('div',{class:'mono',style:'font-size:17px;font-weight:600;color:var(--ink);margin:3px 0 1px',text:k.v}),
-    k.note?h('div',{style:'font-size:11px;color:var(--ink2)',text:k.note}):null)));
-
-  // 分頁 A：法說會重點（sections）
-  const _splitP=b=>{ if(b.t!=='p'||!(b.runs||[]).length) return [b];
-    const groups=[[]];
-    b.runs.forEach((r,i)=>{ const nx=b.runs[i+1];
-      if(r.b && nx && typeof nx.s==='string' && /^[:：]/.test(nx.s) && groups[groups.length-1].length) groups.push([]);
-      groups[groups.length-1].push(r); });
-    return groups.map(g=>({t:'p',runs:g})); };
-  const secWrap=h('div',{});
-  const secs=T.sections||[];
-  if(secs.length)secs.forEach((s,i)=>secWrap.appendChild(nbSection({h:s.h,blocks:(s.blocks||[]).flatMap(_splitP)},i<2)));
-  else secWrap.appendChild(h('p',{style:'font-size:12.5px;color:var(--muted)',text:'本季法說會全文整理尚未載入；見下方官方 IR 連結。'}));
-  const notesPanel=h('div',{},
-    h('p',{style:'margin:0 0 10px;font-size:11.5px;color:var(--muted)',text:'台積電法說會原文彙整（營運、需求、資本支出、各平台展望）。'}),
-    secWrap);
-
-  // 分頁 B：各族群方向指引（guidance）
-  const gl=h('div',{style:'display:flex;flex-direction:column;gap:8px'});
-  (T.guidance||[]).forEach(gd=>{ const dm=dirMap[gd.dir]||dirMap.none, gobj=D.groups.find(x=>x.g===gd.g);
-    const a={class:'grow',style:'background:var(--card);border:1px solid var(--line);border-left:4px solid '+dm.col+';border-radius:12px;padding:12px 16px'};
-    if(gobj){a.class='clickrow grow';a.role='button';a.tabindex='0';a.onclick=()=>openGroupSheet(gobj);a.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(gobj);}};}
-    gl.appendChild(h('div',a,
-      h('div',{style:'display:flex;align-items:center;gap:8px'},
-        h('span',{class:'mono',style:`font-size:16px;font-weight:600;color:${dm.col}`,text:dm.s}),
-        h('b',{style:'font-size:14px',text:grp(gd.g).nm}),
-        h('span',{class:'chip',style:`margin-left:auto;color:${dm.col};background:${dm.bg}`,text:dm.l})),
-      h('div',{style:'font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:5px',text:gd.text}))); });
-  const groupsPanel=h('div',{class:'hide'},
-    h('p',{style:'margin:0 0 10px;font-size:11.5px;color:var(--muted)',text:'↑看增 ↕分歧 ↓看減 ·未提及；點族群看目前狀態。'}),
-    gl);
-
-  // 分頁列（沿用 .rtab / .hide）
-  const nGuide=(T.guidance||[]).length;
-  const tabbar=h('div',{style:'display:inline-flex;gap:4px;padding:4px;background:var(--inset);border-radius:12px;margin:20px 0 16px'});
-  const notesTab=h('button',{class:'rtab',text:'法說會重點'});
-  const groupsTab=h('button',{class:'rtab',text:'各族群方向 · '+nGuide});
-  tabbar.append(notesTab,groupsTab);
-  const sel=n=>{ notesTab.setAttribute('aria-selected',n); groupsTab.setAttribute('aria-selected',!n); notesPanel.classList.toggle('hide',!n); groupsPanel.classList.toggle('hide',n); };
-  notesTab.addEventListener('click',()=>sel(true)); groupsTab.addEventListener('click',()=>sel(false)); sel(true);
-
-  // 往期法說 + 查核狀態 + 頁尾（與原版相同）
-  const hist=h('div',{style:'display:flex;flex-wrap:wrap;gap:8px;align-items:center'});
-  (T.history||[]).forEach(hh=>hist.appendChild(h('a',{href:hh.url,style:'font-size:12px;font-weight:600;color:var(--teal);background:var(--inset);border-radius:100px;padding:5px 12px',text:hh.title+(hh.date?' · '+hh.date:'')})));
-  const scMap={independently_verified:{col:'var(--teal)',bg:'var(--tealbg)'},partially_verified:{col:'var(--amber)',bg:'var(--amberbg)'},conflicted:{col:'var(--strong)',bg:'var(--strongbg)'}};
-  const scc=scMap[T.status]||{col:'var(--muted)',bg:'var(--neubg)'}, sc={t:T.statusLabel||T.status||'',col:scc.col,bg:scc.bg};
-
-  return [
-    h('p',{class:'kicker',text:'上游錨點 · 觀察層（不計分）'}),
-    h('h2',{class:'sec',text:'台積電專區 · 法說會脈絡與族群方向'}),
-    h('p',{class:'lead',html:'台積電（2330）<b style="color:var(--ink)">不在掃描範圍、不參與任何排名與評分</b>。以下為每季法說後人工彙整的<b style="color:var(--ink)">法說會重點</b>與其對各族群的<b style="color:var(--ink)">方向指引</b>——用分頁切換，一次專心看一塊。'}),
-    h('div',{class:'card',style:'padding:24px 26px'},
-      h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px'},
-        h('b',{style:'font-size:18px;font-weight:800',text:(T.title||('台積電 '+T.quarter))}),
-        h('span',{class:'mono',style:'font-size:12px;color:var(--muted)',text:T.eventDate}),
-        h('span',{class:'chip',style:`color:${sc.col};background:${sc.bg}`,text:sc.t})),
-      kpi,
-      tabbar,
-      notesPanel,
-      groupsPanel,
-      hist.children.length?h('div',{style:'margin-top:18px;border-top:1px solid var(--line2);padding-top:14px'},h('div',{style:'font-size:12px;font-weight:800;margin-bottom:8px',text:'往期法說'}),hist):null,
-      h('div',{style:'display:flex;flex-wrap:wrap;gap:14px;font-size:11.5px;color:var(--muted);margin-top:14px'},
-        T.contentAsOf?h('span',{text:'資料截至 '+T.contentAsOf}):null,
-        T.nextReview?h('span',{text:'下次複核 '+T.nextReview}):null),
-      h('a',{href:T.url,style:'display:inline-block;margin-top:12px;font-size:12px;font-weight:700',text:'台積電官方 IR · '+T.quarter+' →'}))
-  ];
-}
 // F10：族群跨視圖高亮。各 view 用 GHL.add 登錄自己的「亮起/還原」，hover 時互相觸發。
 const GHL = { map:{},
   add(g,on,off){ (this.map[g]=this.map[g]||[]).push({on,off}); },
@@ -1507,7 +1423,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 /* ---------- 掛載 ---------- */
 document.getElementById('ov').append(...buildOverview());
 document.getElementById('recent').append(...buildRecentArticles());
-document.getElementById('tsmc').append(...buildTSMC());
 document.getElementById('grp').append(...buildGroup());
 document.getElementById('tier').append(...buildTier());
 document.getElementById('diverge').append(...buildDiverge());

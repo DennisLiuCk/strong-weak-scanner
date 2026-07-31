@@ -82,7 +82,7 @@ class RecentResearchArticlesTest(unittest.TestCase):
         self.assertEqual(feed["total"], 4)
         self.assertEqual(
             {row["type"]: row["count"] for row in feed["counts"]},
-            {"formal_note": 1, "narrative": 1, "topic": 1, "event": 1},
+            {"formal_note": 1, "narrative": 1, "topic": 2},
         )
         self.assertEqual(
             [(row["date"], row["type"], row["stockId"]) for row in feed["items"]],
@@ -90,13 +90,14 @@ class RecentResearchArticlesTest(unittest.TestCase):
                 ("2026-07-29", "formal_note", "1111"),
                 ("2026-07-29", "narrative", "1111"),
                 ("2026-07-28", "topic", "1111"),
-                ("2026-07-27", "event", "2330"),
+                ("2026-07-27", "topic", "2330"),
             ],
         )
         self.assertEqual(feed["items"][0]["status"], "AI 草稿・未獨立查核")
         self.assertNotIn("**", feed["items"][0]["title"])
         self.assertEqual(feed["items"][1]["status"], "觀察層・不等於事實認證")
         self.assertEqual(feed["items"][0]["subject"], "1111 測試公司")
+        self.assertEqual(feed["items"][3]["researchId"], "event-tsmc-2026-07-26")
 
     def test_invalid_metadata_cannot_drag_anchor_to_a_bad_future_date(self):
         notes = {
@@ -122,7 +123,7 @@ class RecentResearchArticlesTest(unittest.TestCase):
         )
         self.assertEqual([item["stockId"] for item in feed["items"]], ["1111", "2222"])
 
-    def test_topic_and_event_use_the_documented_fallback_dates(self):
+    def test_market_topics_and_event_anchors_use_the_documented_fallback_dates(self):
         topics = [{
             "meta": {"last_reviewed_at": ""},
             "captured_at": "2026-07-20",
@@ -147,7 +148,7 @@ class RecentResearchArticlesTest(unittest.TestCase):
         )
         self.assertEqual(
             [(row["date"], row["type"]) for row in feed["items"]],
-            [("2026-07-21", "event"), ("2026-07-20", "topic")],
+            [("2026-07-21", "topic"), ("2026-07-20", "topic")],
         )
 
     def test_feed_has_no_wall_clock_or_file_mtime_dependency(self):

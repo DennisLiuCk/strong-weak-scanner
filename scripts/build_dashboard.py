@@ -60,7 +60,6 @@ RECENT_ARTICLE_TYPES = (
     ("formal_note", "正式筆記"),
     ("narrative", "多空小作文"),
     ("topic", "市場議題"),
-    ("event", "事件錨點"),
 )
 
 # 標題設定。TITLE_TAIL 是品牌尾綴、ALL_SCOPE 是「全部族群」時的範圍詞;篩選到單一族群時,
@@ -1054,88 +1053,6 @@ def build_fund_map(con):
     return out
 
 
-# ── 台積電專區(觀察層)──────────────────────────────────────────────
-# 方向標記描述的是「法說會內容對該族群的方向性」,不是對族群或個股的預測;
-# 措辭刻意不用「動能向上/轉弱」等營運斷言(見 test_public_copy 禁語)。
-TSMC_DIR_META = {
-    "up":    {"mark": "↑", "label": "指引偏正向", "col": "var(--strong)"},
-    "down":  {"mark": "↓", "label": "指引偏負向", "col": "var(--weak)"},
-    "flat":  {"mark": "→", "label": "中性/持平", "col": "var(--neutral)"},
-    "mixed": {"mark": "↕", "label": "多空並陳", "col": "var(--warn)"},
-    "none":  {"mark": "·", "label": "未提及", "col": "var(--muted)"},
-}
-
-
-def build_tsmc_payload(con, fund_map, events, last):
-    """台積電專區 payload(觀察層,不進評分)。四塊各自可缺:quote/foreign(ref 隔離表)、
-    rev(fund_map)、event(notes/events 事件錨點)——缺料回 None 靠前端降級,不擋主管線。
-    查詢一律 clip 到資料日 last,archive 快照才可重現(同筆記 asof 慣例)。"""
-    def _series(table, col):
-        try:
-            rows = con.execute(
-                f"SELECT date, {col} FROM {table} WHERE stock_id='2330' AND date<=? "
-                "ORDER BY date", (last,)).fetchall()
-        except sqlite3.OperationalError:   # 舊 db 尚無 ref 表
-            return []
-        return [(r[0], r[1]) for r in rows if r[1] is not None]
-
-    def _dir(v):
-        return "flat" if v is None else "up" if v > 0 else "down" if v < 0 else "flat"
-
-    quote = foreign = None
-    px = _series("ref_price", "close")[-41:]
-    if px:
-        chg20 = (px[-1][1] / px[-21][1] - 1) if (len(px) >= 21 and px[-21][1]) else None
-        quote = {"close": f"{px[-1][1]:,.0f}", "asof": px[-1][0],
-                 "chg20": f"{chg20*100:+.1f}%" if chg20 is not None else "-",
-                 "dir": _dir(chg20),
-                 "spark": [p[1] for p in px[-20:]],
-                 "sparkDates": [p[0] for p in px[-20:]]}
-    hd = _series("ref_holding", "foreign_pct")[-41:]
-    if hd:
-        chg20pp = (hd[-1][1] - hd[-21][1]) if len(hd) >= 21 else None
-        foreign = {"pct": f"{hd[-1][1]:.2f}%", "asof": hd[-1][0],
-                   "chg20pp": f"{chg20pp:+.2f}pp" if chg20pp is not None else "-",
-                   "dir": _dir(chg20pp)}
-
-    rev = fund_map.get("2330")
-
-    event = None
-    ev = events.get("latest")
-    if ev:
-        st = note_status(ev, last)
-        vlabel = NOTE_LABEL[ev["verification"]]
-        if st == "due":
-            vlabel += "・待更新"
-        guidance = []
-        for g in GROUP_ORDER:
-            gi = ev["guidance"].get(g)
-            if not gi:
-                continue
-            m = TSMC_DIR_META.get(gi["dir"], TSMC_DIR_META["none"])
-            guidance.append({"g": g, "nm": GROUP_NM.get(g, g),
-                             "short": GROUP_SHORT.get(g, GROUP_NM.get(g, g)),
-                             "dir": gi["dir"], "mark": m["mark"], "label": m["label"],
-                             "col": m["col"], "text": gi["text"]})
-        event = {"title": ev["title"], "quarter": ev["fiscal_quarter"],
-                 "date": ev["event_date"] or "-", "vcls": ev["verification"],
-                 "vlabel": vlabel, "freshness": st, "due": st == "due",
-                 "contentAsOf": ev["content_as_of"] or "-",
-                 "nextReview": ev["next_review"] or "-",
-                 "kpi": [[EVENT_KPI_KEYS[k], ev["kpi"].get(k) or "—"]
-                         for k in EVENT_KPI_KEYS],
-                 "guidance": guidance,
-                 "url": NOTE_REPO_BLOB + ev["relpath"],
-                 "sections": ev["sections"],
-                 "history": [{"title": h["title"], "date": h["event_date"],
-                              "url": NOTE_REPO_BLOB + h["relpath"]}
-                             for h in events.get("history", [])]}
-
-    if not (quote or foreign or rev or event):
-        return None
-    return {"quote": quote, "foreign": foreign, "rev": rev, "event": event}
-
-
 # 族群狀態→顏色(狀態本身由 fetch_daily._gstate 在資料層算好,存 group_metrics.state)
 # 蓄勢用 --warn 而非 --warn-line:此色會當「狀態文字」的前景色,warn-line(#d69e2e)在
 # 淺色 surface 上對比僅約 2.2:1,warn 是同語彙的可讀文字版
@@ -1493,6 +1410,16 @@ def _article_metadata_usable(info):
     return bool(info) and not info.get("quality_invalid") and not info.get("quality_errors")
 
 
+def _event_research_id(event):
+    """事件錨點在研究中心的穩定深連結；不依檔名語系或排序位置。"""
+    subject = re.sub(r"[^a-z0-9]+", "-", (event.get("subject") or "market").lower()).strip("-")
+    period = re.sub(
+        r"[^a-z0-9]+", "-",
+        (event.get("fiscal_quarter") or event.get("event_date") or "undated").lower(),
+    ).strip("-")
+    return f"event-{subject or 'market'}-{period or 'undated'}"
+
+
 def build_recent_articles(market_date, notes, reports, events=None, topics=None,
                           stock_names=None, days=RECENT_ARTICLE_DAYS):
     """聚合近期研究文章；anchor=max(市場資料日,可解析文章日期)，確保快照可重現。"""
@@ -1603,8 +1530,9 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
         tone = ("verified" if verification == "independently_verified"
                 else "warning" if verification == "conflicted" else "draft")
         add(
-            event_date, "event", stock_id, subject, event.get("title"),
+            event_date, "topic", stock_id, subject, event.get("title"),
             event.get("relpath"), NOTE_LABEL.get(verification, verification), tone,
+            _event_research_id(event),
         )
 
     anchor = max([market_anchor] + [item["_date"] for item in candidates])
@@ -1651,8 +1579,9 @@ def _research_reading_minutes(sections):
     return max(2, (walk(sections) + 499) // 500)
 
 
-def build_research_library(notes, reports, topics=None, stock_meta=None, group_names=None):
-    """建立獨立研究中心 payload；只發布通過各自品質契約的三類研究。"""
+def build_research_library(notes, reports, topics=None, stock_meta=None, group_names=None,
+                           events=None):
+    """建立獨立研究中心 payload；事件錨點歸入市場議題，不另造第四種閱讀模式。"""
     stock_meta = stock_meta or {}
     group_names = group_names or {}
     articles = []
@@ -1784,6 +1713,47 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
                 "topicStatus": topic.get("status") or "-",
                 "publisher": meta.get("publisher") or meta.get("publisher_domain") or "-",
                 "canonicalUrl": meta.get("canonical_url") or "",
+            },
+        })
+
+    for event in (events or {}).get("all", []):
+        if not _article_metadata_usable(event):
+            continue
+        event_date = (event.get("content_as_of")
+                      if _article_date(event.get("content_as_of"))
+                      else event.get("event_date"))
+        subject_key = event.get("subject") or ""
+        stock_ids = ["2330"] if subject_key == "tsmc" else []
+        subject = "2330 台積電" if subject_key == "tsmc" else subject_key or "跨市場事件"
+        verification = event.get("verification") or "ai_draft"
+        tone = ("verified" if verification == "independently_verified"
+                else "warning" if verification == "conflicted" else "draft")
+        guidance = event.get("guidance") or {}
+        declared_groups = [group for group in GROUP_ORDER if group in guidance]
+        kpis = [
+            {"key": key, "label": label, "value": event.get("kpi", {}).get(key) or "—"}
+            for key, label in EVENT_KPI_KEYS.items()
+        ]
+        add({
+            "id": _event_research_id(event), "type": "topic", "typeLabel": "市場議題",
+            "date": event_date, "stockIds": stock_ids, "subject": subject,
+            "readerTitle": event.get("title") or "市場事件錨點",
+            "title": event.get("title") or "市場事件錨點",
+            "summary": "法說會事件脈絡、關鍵 KPI 與各族群方向指引。",
+            "status": NOTE_LABEL.get(verification, verification), "statusTone": tone,
+            "statusKey": "verified" if verification == "independently_verified" else "review",
+            "groups": stock_groups(stock_ids, declared_groups),
+            "sections": event.get("sections") or [], "sources": [],
+            "sourceUrl": NOTE_REPO_BLOB + event["relpath"],
+            "meta": {
+                "eventKind": "tsmc_earnings" if subject_key == "tsmc" else "market_event",
+                "fiscalQuarter": event.get("fiscal_quarter") or "-",
+                "eventDate": event.get("event_date") or "-",
+                "contentAsOf": event.get("content_as_of") or "-",
+                "nextReview": event.get("next_review") or "-",
+                "verification": verification,
+                "kpis": kpis,
+                "guidanceCount": len(declared_groups),
             },
         })
 
@@ -1973,10 +1943,8 @@ def main():
         fund_map = build_fund_map(con)
     except sqlite3.OperationalError:
         fund_map = {}
-    # 台積電專區(觀察層、上游錨定股 2330 不在 universe):ref 隔離表+事件錨點+fund_map,
-    # 任一塊從缺不擋主管線(load_events 目錄不存在回 latest=None,同 fund_map 慣例)
+    # 事件錨點是研究中心的市場議題來源；目錄不存在時回 latest=None，不擋主管線。
     events = load_events()
-    tsmc = build_tsmc_payload(con, fund_map, events, last)
     # 策略狀態(證據強度)與兩視角分歧——都必須在 con.close() 之前算
     strategy = build_strategy_status(con, last)
     diverge = build_divergence(con, last, _names(con), GROUP_NM)
@@ -1999,7 +1967,7 @@ def main():
         last, notes_map, hypotheses_map, events, research_topics, stock_names,
     )
     research_library = build_research_library(
-        notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM,
+        notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM, events,
     )
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
@@ -2016,9 +1984,6 @@ def main():
     dip_rows = [x for x in grows if x["med_dip"] is not None]
     best_dip_row = max(dip_rows, key=lambda x: x["med_dip"]) if dip_rows else None
     best_dip = best_dip_row["grp"] if best_dip_row else None
-    # 族群卡「台積電指引」chip 的原料(有最新事件錨點才有;缺=九卡皆不出 chip)
-    tsmc_by_grp = {gi["g"]: gi for gi in
-                   ((tsmc or {}).get("event") or {}).get("guidance", [])}
     groups = []
     for g in GROUP_ORDER:
         r = next((x for x in grows if x["grp"] == g), None)
@@ -2128,26 +2093,6 @@ def main():
         if g in group_observation_map:
             gobj["flow"] = build_group_observation_view(
                 group_observation_map[g], GROUP_NM.get(g, g), GROUP_TAG.get(g, ""))
-        if g in tsmc_by_grp:
-            gi = tsmc_by_grp[g]
-            ev_meta = tsmc["event"]
-            gobj["tsmc"] = {
-                "mark": gi["mark"], "label": gi["label"], "col": gi["col"],
-                "tip": {"el": "台積電指引 · 觀察層(不計分)",
-                        "scLabel": f"{gi['mark']} {gi['label']}",
-                        "scColor": gi["col"], "scBg": "var(--neutral-tint)",
-                        "who": gi["nm"],
-                        "rows": [["方向", f"{gi['mark']} {gi['label']}"],
-                                 ["指引內容", gi["text"]],
-                                 ["事件", f"{ev_meta['quarter']} 法說會({ev_meta['date']})"],
-                                 ["查核狀態", ev_meta["vlabel"]],
-                                 ["資料截至", ev_meta["contentAsOf"]]],
-                        "why": ("這是台積電法說會內容對本族群的方向性彙整——上游客戶的說法,"
-                                "不是本族群個股的營運數字,也不參與任何評分或排名。"),
-                        "how": ("每季法說會後,人工/AI 協作把法說內容整理進 notes/events 事件錨點"
-                                "並標注方向;詳細依據與全文見「台積電專區」。"),
-                        "howLabel": "指引怎麼來",
-                        "src": "notes/events 事件錨點(官方財報+法說內容彙整,季頻人工更新)"}}
         groups.append(gobj)
     overview = build_overview(grows)
     lag = f",指數至 {int(mk['date'][5:7])}/{int(mk['date'][8:10])}" if (mk and mk["date"] != last) else ""
@@ -2404,7 +2349,6 @@ def main():
     html = html.replace("__SCOPE__", scope)
     html = html.replace("__MARKET_CHIP__", mchip)
     html = html.replace("__MKT_TIP_JSON__", json.dumps(mtip, ensure_ascii=False))
-    html = html.replace("__TSMC_JSON__", json.dumps(tsmc, ensure_ascii=False))
     html = html.replace("__GROUP_HOW_JSON__", json.dumps({"how": GROUP_HOW, "src": GROUP_SRC},
                                                          ensure_ascii=False))
     html = html.replace("__DATE_ISO__", last)
@@ -2434,7 +2378,7 @@ def main():
     # 可選區段算不出來時前端只會少一整塊、導覽還留著死連結,而 build 照印「已重生」。
     # CI 的 tests.yml 刻意不吃 index.html/data 的路徑(每日 3~4 個資料 commit),
     # 所以產出物契約測試不會在每日管線上跑 → 這行是每日唯一會出聲的地方,務必留著。
-    dead = [n for n, v in (("策略狀態", strategy), ("台積電專區", tsmc),
+    dead = [n for n, v in (("策略狀態", strategy),
                            ("兩視角分歧", diverge), ("時間尺度", lenses)) if not v]
     if dead:
         print(f"⚠ 下列區段沒有 payload,頁面會少掉整塊(導覽連結仍在):{'、'.join(dead)}")

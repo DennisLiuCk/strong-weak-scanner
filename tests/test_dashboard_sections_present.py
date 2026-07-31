@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """產出的 index.html 沒有整塊消失(2026-07-26)。
 
-`build_dashboard.py` 的可選區段(策略狀態、台積電專區、兩視角分歧、時間尺度)
+`build_dashboard.py` 的可選區段(策略狀態、研究中心入口、兩視角分歧、時間尺度)
 都用 `except sqlite3.Error: return None` 包住。這個窄捕捉本身是對的——程式錯誤
 還是會炸出來——但**資料層真的出事時,結果是頁面少掉一整塊、導覽留下死連結,
 而 build 照印「已重生」、Actions 全綠、Pages 照常部署**。
@@ -28,7 +28,6 @@ RESEARCH = ROOT / "research.html"
 SECTIONS = [
     ("STRATEGY", "strategy-status", False, "策略狀態"),
     ("RECENT", "recent", False, "研究中心入口"),
-    ("TSMC", "tsmc", True, "台積電專區"),
     ("DIVERGE", "diverge", True, "兩視角分歧"),
     ("LENS", "lens", True, "時間尺度"),
 ]
@@ -90,6 +89,13 @@ class DashboardSectionsPresentTest(unittest.TestCase):
         self.assertGreater(library.get("total", 0), 50)
         self.assertEqual(set(library.get("counts", {})), {"formal_note", "narrative", "topic"})
         self.assertTrue(all(article.get("sections") for article in library.get("articles", [])))
+        event = next(
+            (article for article in library.get("articles", [])
+             if article.get("meta", {}).get("eventKind") == "tsmc_earnings"),
+            None,
+        )
+        self.assertIsNotNone(event, "台積電法說事件未搬入研究中心的市場議題")
+        self.assertEqual(event.get("type"), "topic")
 
 
 if __name__ == "__main__":

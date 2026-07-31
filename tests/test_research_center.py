@@ -56,22 +56,36 @@ class ResearchCenterTest(unittest.TestCase):
             "relpath": "notes/research_topics/test.md", "sections": SECTIONS,
             "quality_invalid": False, "quality_errors": [],
         }]
+        self.events = {"all": [{
+            "subject": "tsmc", "event_date": "2026-07-16", "fiscal_quarter": "2026Q2",
+            "content_as_of": "2026-07-16", "next_review": "2026-10-15",
+            "verification": "partially_verified", "title": "台積電 2026 Q2 法說會",
+            "relpath": "notes/events/2026-07-16_台積電Q2法說會.md", "sections": SECTIONS,
+            "guidance": {"power": {"dir": "up", "text": "資本支出上修"}},
+            "kpi": {
+                "kpi_capex": "US$60–64B", "kpi_fy_growth": "略高於 +40%",
+                "kpi_gm": "65–67%", "kpi_hpc_share": "66%",
+            },
+            "quality_invalid": False, "quality_errors": [],
+        }]}
         self.stock_meta = {"1111": {"name": "甲公司", "group": "power", "biz": "功率元件"}}
 
     def test_library_has_all_three_types_and_excludes_invalid_articles(self):
         library = bd.build_research_library(
-            self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"}
+            self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"},
+            self.events,
         )
-        self.assertEqual(library["total"], 3)
-        self.assertEqual(library["counts"], {"formal_note": 1, "narrative": 1, "topic": 1})
+        self.assertEqual(library["total"], 4)
+        self.assertEqual(library["counts"], {"formal_note": 1, "narrative": 1, "topic": 2})
         self.assertEqual([row["type"] for row in library["articles"]],
-                         ["formal_note", "narrative", "topic"])
+                         ["formal_note", "narrative", "topic", "topic"])
         self.assertEqual(library["anchor"], "2026-07-31")
         self.assertNotIn("9999", " ".join(row["id"] for row in library["articles"]))
 
     def test_article_payload_preserves_sections_evidence_and_deep_links(self):
         library = bd.build_research_library(
-            self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"}
+            self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"},
+            self.events,
         )
         formal = library["articles"][0]
         self.assertEqual(formal["id"], "formal-1111")
@@ -83,6 +97,21 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertGreaterEqual(formal["readingMinutes"], 2)
         self.assertTrue(formal["sourceUrl"].endswith("notes/qualitative/1111_甲公司.md"))
 
+    def test_tsmc_event_is_published_as_a_market_topic_with_full_reader_content(self):
+        library = bd.build_research_library(
+            self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"},
+            self.events,
+        )
+        event = next(row for row in library["articles"] if row["id"] == "event-tsmc-2026q2")
+        self.assertEqual(event["type"], "topic")
+        self.assertEqual(event["subject"], "2330 台積電")
+        self.assertEqual(event["sections"], SECTIONS)
+        self.assertEqual(event["groupLabels"], ["功率元件"])
+        self.assertEqual(event["status"], "部分核驗")
+        self.assertEqual(event["meta"]["eventKind"], "tsmc_earnings")
+        self.assertEqual(event["meta"]["kpis"][0]["value"], "US$60–64B")
+        self.assertTrue(event["sourceUrl"].endswith("notes/events/2026-07-16_台積電Q2法說會.md"))
+
     def test_template_has_functional_master_detail_and_accessibility_markers(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
@@ -90,6 +119,7 @@ class ResearchCenterTest(unittest.TestCase):
             "const LIB=__RESEARCH_JSON__", "研究中心", "搜尋公司、產業、主題",
             "function filteredArticles()", "function selectArticle(", "function renderReader(",
             "正式筆記", "多空小作文", "市場議題", "返回研究清單",
+            "事件錨點整理法說脈絡與族群方向",
             "aria-label=\"研究文章清單\"", ":focus-visible", "@media(max-width:780px)",
         ):
             self.assertIn(marker, template)
@@ -103,6 +133,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("@media(max-width:1180px){\n  .shell{display:block}", template)
         self.assertIn('id="filterClose"', template)
         self.assertIn("getElementById('filterClose').addEventListener", template)
+        self.assertIn("if(byId.has(deepLink))document.body.classList.add('article-open')", template)
         self.assertNotIn("github.com/DennisLiuCk/strong-weak-scanner/blob/main/notes/qualitative/8261", template)
 
 
