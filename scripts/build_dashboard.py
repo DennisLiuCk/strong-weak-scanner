@@ -1700,7 +1700,9 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
             "type": "topic", "typeLabel": "市場議題", "date": topic_date,
             "stockIds": stock_ids, "subject": subject,
             "readerTitle": topic.get("title") or "市場議題",
-            "title": topic.get("title") or "市場議題", "summary": "跨公司研究線索與後續驗證路由。",
+            "title": topic.get("title") or "市場議題",
+            "summary": (_article_excerpt(topic.get("summary"))
+                        or "跨公司研究線索與後續驗證路由。"),
             "status": "候選議題・不等於正式公司事實", "statusTone": "observational",
             "statusKey": "observational",
             "groups": stock_groups(stock_ids, topic.get("group_ids")),

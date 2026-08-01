@@ -64,6 +64,51 @@ evidence_boundary: 不構成訂單或營收事實
 """
 
 
+def topic_text_v2():
+    return topic_text().replace("schema_version: 1", "schema_version: 2") + """
+
+## 新手先讀：這篇在講什麼
+
+### 名詞小字典
+
+- **CPO**：把光學元件放到交換晶片旁邊，縮短高速電訊號要走的距離。
+- **可插拔光模組**：可以從交換器面板拔換的光通訊模組，維修與升級比較直觀。
+- **量產**：產品已進入持續製造，但不自動代表營收、毛利或市占已達特定水準。
+
+### 三句話抓重點
+
+- 這是第一句足以讓新手理解事件本身的完整重點摘要。
+- 這是第二句用來說明證據邊界而不是把產業事件外推成訂單。
+- 這是第三句提醒讀者等待公司正式文件與可觀察數字再做判斷。
+
+### 為什麼重要
+
+同一個產業事件可能同時帶來新需求與替代風險；先拆清楚技術位置、商業階段與公司曝險，讀者才不會把新聞標題直接當成營收結論。
+
+### 接下來怎麼追
+
+- 下一季公司文件是否首次揭露量產收入、客戶認證或毛利。
+- 後續平台是否維持原時程，並出現可核對的出貨或部署節點。
+
+### 想一想
+
+- 哪個可觀察數字若沒有出現，會推翻目前的正面說法？
+- 這是整體市場新增需求，還是把既有支出從另一種架構搬過來？
+
+## 來源與證據邊界
+
+- [官方來源](https://ir.example.com/news)
+
+## 影響路由
+
+只保留候選映射，不升格成公司事實。
+
+## 下一個可證明／否定的節點
+
+- 等待公司正式文件。
+"""
+
+
 class ResearchTopicContractTest(unittest.TestCase):
     def setUp(self):
         self.universe = [
@@ -82,6 +127,37 @@ class ResearchTopicContractTest(unittest.TestCase):
         self.assertEqual(info["stock_ids"], ["1234"])
         self.assertEqual(info["impacts"][0]["hypothesis_refs"], ["1234:H1"])
         self.assertEqual(info["status"], "triaged")
+
+    def test_valid_schema_v2_requires_substantive_beginner_guide_and_builds_summary(self):
+        info = rq.analyse_topic(
+            "topic.md", topic_text_v2(), self.universe,
+            {"serverodm", "pcb"}, self.reports)
+        self.assertFalse(info["quality_invalid"], info["quality_errors"])
+        self.assertIn("第一句", info["summary"])
+        self.assertIn("第三句", info["summary"])
+
+    def test_schema_v2_rejects_missing_or_underfilled_beginner_content(self):
+        text = topic_text_v2().replace("### 想一想", "### 延伸思考")
+        text = text.replace(
+            "- 這是第三句提醒讀者等待公司正式文件與可觀察數字再做判斷。\n", "")
+        info = rq.analyse_topic(
+            "topic.md", text, self.universe, {"serverodm", "pcb"}, self.reports)
+        self.assertTrue(any("想一想" in error for error in info["quality_errors"]))
+        self.assertIn("三句話抓重點必須恰好有 3 個頂層 bullet", info["quality_errors"])
+
+    def test_schema_v1_is_grandfathered_but_new_topics_after_cutover_require_v2(self):
+        legacy = rq.analyse_topic(
+            "legacy.md", topic_text(), self.universe,
+            {"serverodm", "pcb"}, self.reports)
+        self.assertFalse(legacy["quality_invalid"], legacy["quality_errors"])
+
+        new_text = topic_text().replace(
+            "captured_at: 2026-07-27", "captured_at: 2026-08-02")
+        new_text = new_text.replace(
+            "last_reviewed_at: 2026-07-27", "last_reviewed_at: 2026-08-02")
+        info = rq.analyse_topic(
+            "new.md", new_text, self.universe, {"serverodm", "pcb"}, self.reports)
+        self.assertTrue(any("schema_version: 2" in error for error in info["quality_errors"]))
 
     def test_stock_group_mismatch_is_rejected(self):
         info = rq.analyse_topic(

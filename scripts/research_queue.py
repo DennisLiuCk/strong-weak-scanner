@@ -32,6 +32,15 @@ IMPACT_RE = re.compile(r"<!--\s*impact\s*(.*?)-->", re.S | re.I)
 TRANSITION_RE = re.compile(r"<!--\s*transition\s*(.*?)-->", re.S | re.I)
 TOPIC_ID_RE = re.compile(r"^MI-\d{4}-\d{2}-\d{2}-[A-Z0-9-]+$")
 HYPOTHESIS_REF_RE = re.compile(r"^(\d{4}):H(\d+)$")
+V2_CUTOVER_DATE = dt.date(2026, 8, 2)
+BEGINNER_HEADING = "新手先讀：這篇在講什麼"
+BEGINNER_SUBHEADINGS = (
+    "名詞小字典",
+    "三句話抓重點",
+    "為什麼重要",
+    "接下來怎麼追",
+    "想一想",
+)
 
 TOPIC_STATUSES = {"inbox", "triaged", "promoted", "dismissed", "resolved"}
 TOPIC_PRIORITIES = {"p0", "p1", "p2", "p3"}
@@ -103,6 +112,90 @@ def _publisher_matches_url(publisher_domain, url):
     return bool(domain and hostname and (hostname == domain or hostname.endswith("." + domain)))
 
 
+def _heading_sections(text, level):
+    """依 Markdown heading 切段；只處理研究 topic 需要的 H2/H3 結構。"""
+    marks = "#" * level
+    pattern = re.compile(rf"^{re.escape(marks)}\s+(.+?)\s*$", re.M)
+    matches = list(pattern.finditer(text))
+    return [
+        (match.group(1).strip(), text[match.end():matches[index + 1].start()]
+         if index + 1 < len(matches) else text[match.end():])
+        for index, match in enumerate(matches)
+    ]
+
+
+def _top_level_bullets(body):
+    return [
+        match.group(1).strip()
+        for match in re.finditer(r"^-\s+(.+?)\s*$", body, re.M)
+    ]
+
+
+def _visible_markdown_text(body):
+    body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
+    body = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", body)
+    body = re.sub(r"[*_`#>|-]+", " ", body)
+    return re.sub(r"\s+", " ", body).strip()
+
+
+def _validate_beginner_section(text):
+    """schema v2 的新手導讀是內容契約，不只檢查標題存在。"""
+    errors = []
+    h2_sections = _heading_sections(text, 2)
+    beginner = [(index, body) for index, (heading, body) in enumerate(h2_sections)
+                if heading == BEGINNER_HEADING]
+    if len(beginner) != 1:
+        return [f"schema v2 必須且只能有一個 H2：{BEGINNER_HEADING}"]
+    index, body = beginner[0]
+    if index != 0:
+        errors.append(f"schema v2 的第一個 H2 必須是：{BEGINNER_HEADING}")
+
+    h3_sections = _heading_sections(body, 3)
+    headings = [heading for heading, _section_body in h3_sections]
+    required_found = [heading for heading in headings if heading in BEGINNER_SUBHEADINGS]
+    if required_found != list(BEGINNER_SUBHEADINGS):
+        errors.append(
+            "新手導讀 H3 必須依序包含：" + "、".join(BEGINNER_SUBHEADINGS))
+    for heading in BEGINNER_SUBHEADINGS:
+        if headings.count(heading) != 1:
+            errors.append(f"新手導讀必須且只能有一個 H3：{heading}")
+
+    bodies = {heading: section_body for heading, section_body in h3_sections}
+    glossary = _top_level_bullets(bodies.get("名詞小字典", ""))
+    glossary_pattern = re.compile(r"^\*\*[^*]+\*\*[：:].+")
+    if len(glossary) < 3 or any(not glossary_pattern.match(item) for item in glossary):
+        errors.append("名詞小字典至少需要 3 個「- **術語**：白話解釋」")
+
+    summary = _top_level_bullets(bodies.get("三句話抓重點", ""))
+    if len(summary) != 3:
+        errors.append("三句話抓重點必須恰好有 3 個頂層 bullet")
+    elif any(len(_visible_markdown_text(item)) < 12 for item in summary):
+        errors.append("三句話抓重點每句至少需要 12 個可見字元")
+
+    if len(_visible_markdown_text(bodies.get("為什麼重要", ""))) < 40:
+        errors.append("為什麼重要至少需要 40 個可見字元，說明與讀者判斷的關係")
+
+    tracking = _top_level_bullets(bodies.get("接下來怎麼追", ""))
+    if len(tracking) < 2:
+        errors.append("接下來怎麼追至少需要 2 個可觀察節點")
+
+    questions = _top_level_bullets(bodies.get("想一想", ""))
+    if len(questions) < 2 or any(not item.rstrip().endswith(("？", "?")) for item in questions):
+        errors.append("想一想至少需要 2 個以問號結尾的問題")
+    return errors
+
+
+def _topic_summary(text):
+    """v2 用三句導讀形成列表摘要；v1 保持空值，由既有 UI fallback 處理。"""
+    h2 = dict(_heading_sections(text, 2))
+    beginner = h2.get(BEGINNER_HEADING, "")
+    h3 = dict(_heading_sections(beginner, 3))
+    return " ".join(
+        _visible_markdown_text(item)
+        for item in _top_level_bullets(h3.get("三句話抓重點", ""))
+    ).strip()
+
+
 def _hypothesis_ids(reports):
     return {
         f"{sid}:{item['id']}"
@@ -137,8 +230,15 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
     topic_id = meta.get("topic_id", "")
     if topic_id and not TOPIC_ID_RE.fullmatch(topic_id):
         errors.append(f"topic_id 格式錯誤:{topic_id}")
-    if meta.get("schema_version") and meta["schema_version"] != "1":
-        errors.append("schema_version 必須是 1")
+    schema_version = meta.get("schema_version")
+    if schema_version and schema_version not in {"1", "2"}:
+        errors.append("schema_version 必須是 1 或 2")
+    if (schema_version == "1" and _valid_date(meta.get("captured_at"))
+            and dt.date.fromisoformat(meta["captured_at"]) >= V2_CUTOVER_DATE):
+        errors.append(
+            f"{V2_CUTOVER_DATE.isoformat()} 起新建議題必須使用 schema_version: 2")
+    if schema_version == "2":
+        errors.extend(_validate_beginner_section(text))
     if meta.get("status") and meta["status"] not in TOPIC_STATUSES:
         errors.append(f"status 不在值域:{meta['status']}")
     if meta.get("priority") and meta["priority"] not in TOPIC_PRIORITIES:
@@ -266,6 +366,7 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
         "path": path,
         "relpath": os.path.relpath(path, ROOT).replace("\\", "/"),
         "title": title,
+        "summary": _topic_summary(text) if schema_version == "2" else "",
         "meta": meta,
         "topic_id": topic_id,
         "status": meta.get("status"),
