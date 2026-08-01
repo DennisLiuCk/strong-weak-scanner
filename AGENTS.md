@@ -30,7 +30,7 @@
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
 | 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` + `scripts/qual_review.py`(複核 triage) |
 | 領先假說收錄/複核/多空小作文 | `LEADING_HYPOTHESES.md` + `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` + `scripts/leading_hypotheses.py`(`--context` 產量化背景) |
-| 研究更新盤點、定期時間表、市場議題掃描 | `RESEARCH_MAINTENANCE.md` + `scripts/research_queue.py` + `notes/research_topics/` |
+| 研究更新盤點、定期時間表、市場議題掃描 | `RESEARCH_MAINTENANCE.md` + `MARKET_RESEARCH_METHOD.md` + `scripts/research_queue.py` + `notes/research_topics/` |
 | 每季台積電法說會後,更新事件錨點與族群指引 | README「事件錨點與研究中心的台積電法說」+ `scripts/qual_notes.py --lint` |
 
 ## 鐵律

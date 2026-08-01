@@ -2,7 +2,7 @@
 
 <!-- research_topic
 topic_id: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE
-schema_version: 2
+schema_version: 3
 status: triaged
 priority: p2
 captured_at: 2026-08-01
@@ -18,6 +18,11 @@ group_ids: pcb,ipdesign,packtest
 trigger_type: industry_standard
 evidence_role: candidate_source
 route: market_issue_watch
+thesis_claim_id: C2
+base_confidence: medium
+confidence_basis: 標準內容與產品時鐘有一手資料，但尚未出現 SPHBM4 採用與供應商訂單
+cross_company_numbers: false
+schema_migrated_at: 2026-08-02
 -->
 
 <!-- transition
@@ -28,12 +33,153 @@ reason: jedec_sphbm4_standard_captured
 evidence: source_chain:jedec-sphbm4-hbm4-product-clock-20260618-20260713
 -->
 
+<!-- research_source
+source_id: S1
+role: standard
+publisher: JEDEC
+title: JESD330-4 SPHBM4 標準公告
+published_at: 2026-07-13
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.jedec.org/news/pressreleases/new-jedec%C2%AE-sphbm4-standard-enables-hbm4-class-bandwidth-organic-substrates
+locator: interface base die、4:1 serialization 與 organic substrate 段落
+limitation: 標準公告沒有產品、客戶採用、量產時程、良率或供應商名單
+-->
+
+<!-- research_source
+source_id: S2
+role: company_release
+publisher: Micron
+title: Micron 2026 財年第三季產品與 HBM4 進度
+published_at: 2026-06-24
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://investors.micron.com/node/50671
+locator: HBM4 high-volume production 段落
+limitation: Micron 談的是既有 HBM4 產品，沒有表示採用 SPHBM4
+-->
+
+<!-- research_source
+source_id: S3
+role: competitor_primary
+publisher: SK hynix
+title: 12 層 HBM4E 樣品公告
+published_at: 2026-06-18
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://news.skhynix.com/en/12-layer-hbm4e-sample-1/
+locator: sample 與 base die 產品時程段落
+limitation: 樣品公告沒有說明 SPHBM4 介面、量產採用或外部封裝供應商
+-->
+
+<!-- research_source
+source_id: S4
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 公開資訊觀測站公司申報查詢入口
+published_at:
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://mops.twse.com.tw/mops/web/index
+locator: 台灣基板、矽智財與封測公司季報、法說及重大訊息查找入口
+limitation: JEDEC 與記憶體供應商資料只支持技術路徑；入口本身不證明台灣公司料號、認證或量產
+-->
+
+<!-- research_claim
+claim_id: C1
+label: verified
+status: active
+claim: JEDEC 的 JESD330-4 定義以 interface base die 將 2,048 個 HBM4 資料訊號透過 4 比 1 序列化降為 512 個主機側訊號，並支援標準有機基板
+supporting_source_ids: S1
+contrary_source_ids:
+as_of: 2026-07-13
+basis: 標準組織公告直接列出訊號數、序列化比例與基板路徑
+boundary: 證實的是介面規格，不是產品效能、採用率、良率或量產時程
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C2
+label: inference
+status: active
+claim: SPHBM4 提供一條降低主機側連線密度、讓 HBM4 級頻寬可使用有機基板的工程路徑，但近期基準情境仍是補充而非立刻取代既有 HBM4 封裝
+supporting_source_ids: S1,S2,S3
+contrary_source_ids:
+as_of: 2026-07-13
+basis: JEDEC 已定義新路徑，而兩家記憶體廠同期仍以既有 HBM4 或 HBM4E 產品階段推進
+boundary: 沒有 SPHBM4 產品、客戶採用或成本良率資料，不能估計滲透率與替代速度
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C3
+label: verified
+status: active
+claim: Micron 公告 HBM4 已進入大量生產，SK hynix 公告 HBM4E 仍處於樣品階段
+supporting_source_ids: S2,S3
+contrary_source_ids:
+as_of: 2026-06-24
+basis: 兩家記憶體供應商分別直接揭露自身產品階段
+boundary: 不同公司的產品名稱與階段不可拿來排名技術優劣，也都沒有證實 SPHBM4 採用
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C4
+label: unverified
+status: active
+claim: 台灣 PCB、矽智財或封測公司已取得 SPHBM4 量產訂單或可量化受惠
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-01
+basis: JEDEC 與兩家記憶體公司均未列名台灣供應商，也沒有產品級採用資料
+boundary: 不建立特定基板材料、base die 設計服務、OSAT 訂單、收入或毛利事實
+verification_needed: 需記憶體供應商產品文件與台灣公司法說雙向確認料號、客戶、驗證與量產
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T1
+status: active
+claim_ids: C1,C2,C3
+metric: 記憶體供應商是否發布 SPHBM4 產品、樣品、客戶採用及功耗延遲數據
+source_ids: S1,S2,S3
+watch_source_ids: S4
+frequency: monthly
+frequency_detail: 每月產品公告與每季法說
+next_check: 2026-08-15
+trigger: 任一供應商首次直接使用 SPHBM4 名稱並揭露樣品、客戶或量產時程
+invalidation: 若未出現產品採用且序列化功耗、延遲或可靠度代價抵銷基板優勢，快速採用假說失效
+-->
+
+<!-- monitoring_item
+monitor_id: T2
+status: active
+claim_ids: C4
+metric: 台灣基板、矽智財與封測公司的 SPHBM4 料號、認證與量產證據
+source_ids: S1,S2,S3,S4
+watch_source_ids: S4
+frequency: quarterly
+frequency_detail: 每季法說與重大訊息
+next_check: 2026-10-31
+trigger: 公司與記憶體客戶文件可雙向核對相同產品、時程及供應角色
+invalidation: 若只有產業標準推導而沒有公司級產品與財務證據，個股受惠映射持續無效
+-->
+
 <!-- transition
 date: 2026-08-01
 from: inbox
 to: triaged
 reason: standard_product_timeline_and_supplier_boundary_reviewed
-evidence: source_chain:jedec-sphbm4-hbm4-product-clock-20260618-20260713
+evidence: sources:S1,S2,S3
 -->
 
 ## 新手先讀：這篇在講什麼

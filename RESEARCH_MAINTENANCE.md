@@ -1,6 +1,8 @@
 # 研究更新與市場議題維護
 
-本文件管理「什麼時候該看、先看什麼、看完留下什麼紀錄」。正式公司事實仍由
+本文件管理「什麼時候該看、先看什麼、看完留下什麼紀錄」。來源取得、claim ledger、
+跨公司可比性、monitor、可信度與修正規則統一由 `MARKET_RESEARCH_METHOD.md` 定義。
+正式公司事實仍由
 `QUALITATIVE_RESEARCH_RUNBOOK.md` 的 evidence pack／獨立 reviewer 契約治理；
 可證偽市場主張仍由 `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` 治理。本流程不改量化分數。
 
@@ -73,7 +75,9 @@ pack 與獨立複核。
    公司 IR、關鍵客戶／平台官方公告與重大政策做語意深掃。事件快掃不能被 30 檔 cohort
    或臨時指定名單取代。
 3. 有新議題時複製 `notes/research_topics/_template.md`；沒有新議題也要在
-   `scan_log.csv` 寫 `result_topic_ids=none`。
+   `scan_log.csv` 寫 `result_topic_ids=none`。scan log 採 append-only：每個掃描窗口新增穩定
+   `scan_id`，不得改寫或刪除既有 row；紀錄錯誤時另加新 row，並在 `coverage_note` 明示
+   `correction_of:<old_scan_id>`。
 4. `scope=full` 只能在預定來源與完整時間窗真的都掃完時使用。只查當前日端點、主題式
    搜尋或缺歷史頁面時必須寫 `partial` 與 coverage limitation。
    對外發布「優先更新對象」前若尚未完成全 universe 事件快掃，標題與摘要必須明示
@@ -116,14 +120,23 @@ python scripts/fetch_financials.py --official-month-revenue-only `
 initial → inbox → triaged → promoted / dismissed / resolved
 ```
 
-每則議題必須保存來源發布日、研究捕捉日、review due、來源鏈、受影響族群／股票、方向、
-route、`note_action`、action due 與證據邊界。`candidate_source` 只表示可作後續研究來源；
-`trigger_only` 連候選證據都不是。狀態轉移追加保存，不覆寫歷史。
+每則議題必須保存來源發布日、研究捕捉日、review due、來源鏈、route 與證據邊界；
+一般 topic 另須在 impact 保存受影響族群／股票、方向、`note_action` 與 action due。尚未完成適用性或公司暴露
+映射的 `policy_watch` 可以沒有 impact，此時必須維持 warning／watch、不得路由正式筆記；
+只有追加公司層級 impact evidence 後才可建立 impact 與正式 route。`candidate_source` 只表示
+可作後續研究來源；`trigger_only` 連候選證據都不是。狀態轉移追加保存，不覆寫歷史。
 
-### Topic schema v2：新手導讀契約
+### Topic schema v2 → v3
 
-2026-08-02 起新建 topic 一律使用 `schema_version: 2`；既有 v1 保留，不因模板升級失效。
-v2 的第一個 H2 固定為「新手先讀：這篇在講什麼」，並依序包含五個 H3：
+v2 是 2026-08-01 三篇研究先導入新手導讀的短暫過渡契約；原訂自 2026-08-02 起成為
+新建 topic 的最低版本，但同日即由 v3 的持續驗證契約取代。2026-08-02 起新建 topic
+一律使用 `schema_version: 3`。parser 對 cutover 前的 v1／v2 只保留歷史相容；舊格式
+沒有結構化 ledger，應顯示為「未結構化驗證」，不可默認具有一般可信度。
+
+live `notes/research_topics/` register 現已全數遷移，loader 只接受 v3；v1／v2 parser 僅供
+歷史檔案的個別分析相容，不能把已登錄議題降版或用回填舊 `captured_at` 規避契約。
+
+v3 繼承 v2 的新手導讀。第一個 H2 固定為「新手先讀：這篇在講什麼」，並依序包含五個 H3：
 
 1. 「名詞小字典」至少 3 個 `- **術語**：白話解釋`。
 2. 「三句話抓重點」恰好 3 個頂層 bullet。
@@ -131,7 +144,47 @@ v2 的第一個 H2 固定為「新手先讀：這篇在講什麼」，並依序�
 4. 「接下來怎麼追」至少 2 個可觀察節點。
 5. 「想一想」至少 2 個以問號結尾、能幫助反證的問題。
 
-`research_queue.py --lint` 會檢查結構與最低內容量；它不能替代來源核對或推論審查。
+另外，每篇 v3 必須具備：
+
+1. meta 的 `thesis_claim_id`、`base_confidence`、`confidence_basis` 與
+   `cross_company_numbers`。
+2. 至少兩份可定位的 `research_source`，保存來源角色、發布／捕捉／接受日期、locator
+   與 limitation；`verified` 只表示指定來源直接支持 claim 的精確措辭。
+3. `research_claim` ledger，以 `verified／inference／unverified` 分開保存證實、推論與
+   待驗證內容。主命題、公司映射與反方證據不可混在同一句。
+4. 若使用跨公司數字形成判斷，逐一建立 `metric_comparison` observation，明列 entity、
+   期間、單位、定義、來源及 `directly_comparable／normalized_comparable／not_comparable`
+   裁決；「不可比」是有效結果。observation 採 append-only；新期間、重編數字或定義改變
+   只能追加 observation，不能覆寫既有 ID。
+5. 至少兩個 `monitoring_item`，各自保存 claim IDs、metric、基線 `source_ids`、未來重查的
+   `watch_source_ids`、頻率、`next_check`、trigger 與 invalidation；每個 active monitor 的
+   watch 至少包含一個 active `living_index`，topic 的 `review_due` 等於最早的 `next_check`。
+
+`last_evidence_at` 不手填，而是取 active `thesis_claim_id` 引用之 active source 的
+`accepted_at` 最大值；其他周邊 claim 的新證據不得刷新主命題。
+active topic 以 runtime 當下的臺北日曆日（`Asia/Taipei`）判斷是否逾 `review_due`；不得用
+UTC 日期、資料日或手填舊日期規避期限。沒有新 evidence 時，effective confidence 只自動
+降一級；這是新鮮度處理，不會改 claim 的真假標籤、topic lifecycle 或 H# 狀態。已查但沒有
+新證據時，只在 append-only scan log 留下範圍與結果，不可更新 source `accepted_at`、
+`last_reviewed_at` 或把 `review_due` 往後推。
+
+`last_reviewed_at`、延後 `review_due` 與調高 `base_confidence` 都需要新追加、被 active thesis
+claim 引用且晚於原 thesis clock 的 evidence，並追加 transition；「重新看過但沒有新資料」
+不能刷新 meta。`dismissed`／`resolved` 為關閉狀態，monitor 應退役、時鐘凍結。重開必須先
+追加比關閉時更新的 source、active claim 與 active monitor，再以引用該新 source 的
+`dismissed/resolved → triaged` transition 重開；不得覆寫原關閉紀錄。
+
+新證據推翻或縮窄舊結論時採 append-only：保留舊 source／claim／transition ID，追加新
+source 與新 claim。新 claim 以 `correction_kind: supersedes|refutes` 與
+`corrects_claim_id` 指向上一代，舊 claim 以 `corrected_by_claim_id` 回指新 claim；
+`resolution` 預設空白，只供存在 active contrary evidence 時的人工作法裁決。多代修正逐代
+追加、只連相鄰 claim，不壓平中間版本；新 claim 的 `basis` 同時記
+`correction_of:<old_claim_id>`，但不以此自由文字取代結構欄位。舊 monitor 標為 `retired`。只有第一筆
+`initial → inbox` transition 可用 `evidence: source_chain:<meta.source_chain_id>`，其後一律用
+`evidence: sources:S1,S2` 引用已登錄來源。詳細欄位、
+來源角色、可信度及跨公司數字規則見 `MARKET_RESEARCH_METHOD.md`。
+
+`research_queue.py --lint` 會檢查結構、引用與最低內容量；它不能替代來源核對或推論審查。
 新手導讀要說清楚「已知／未知／下一步」，不可為了白話而刪除證據邊界。
 
 特別注意：
@@ -139,6 +192,7 @@ v2 的第一個 H2 固定為「新手先讀：這篇在講什麼」，並依序�
 - 平台商列名「生態系夥伴」不等於個別公司的新增訂單、營收、份額或毛利。
 - 同業 HBM、先進封裝或液冷事件不等於本 universe 同族群每家公司受惠。
 - 政策新聞在完成 HTS code、豁免、原產地、客戶／Incoterms 暴露前，不建立公司層級損益
-  主張。
+  主張；`policy_watch` 可不建立 impact，但必須保留 warning，且不得路由或 promoted 到
+  正式筆記。
 - 敘事早於新 topic 只產生「review」提示；review 結果可以是無關、留在 watch，而不是
   必然改文。

@@ -2,7 +2,7 @@
 
 <!-- research_topic
 topic_id: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
-schema_version: 2
+schema_version: 3
 status: triaged
 priority: p1
 captured_at: 2026-08-01
@@ -18,6 +18,11 @@ group_ids: packtest
 trigger_type: product_ramp
 evidence_role: candidate_source
 route: market_issue_watch
+thesis_claim_id: C2
+base_confidence: medium
+confidence_basis: 多家一手來源證實兩種架構同時商品化，但尚無可比出貨占比
+cross_company_numbers: false
+schema_migrated_at: 2026-08-02
 -->
 
 <!-- transition
@@ -28,12 +33,181 @@ reason: official_cpo_production_and_pluggable_volume_sources_captured
 evidence: source_chain:nvidia-cpo-production-marvell-1p6t-20260312-20260721
 -->
 
+<!-- research_source
+source_id: S1
+role: company_release
+publisher: NVIDIA
+title: Vera Rubin 與 Spectrum-X Ethernet Photonics full production 公告
+published_at: 2026-05-31
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory
+locator: Spectrum-X Ethernet Photonics 與 full production 段落
+limitation: 只能證實 NVIDIA 的產品階段，未揭露 CPO 出貨占比或客戶部署數
+-->
+
+<!-- research_source
+source_id: S2
+role: company_release
+publisher: NVIDIA
+title: GTC Taipei 製造生態系與 SPIL 角色
+published_at: 2026-06-01
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://blogs.nvidia.com/blog/nvidia-gtc-taipei-computex-2026-news/
+locator: manufacturing ecosystem 與 co-packaged optics 段落
+limitation: 生態系列名不等於供應商新增訂單、份額或獲利
+-->
+
+<!-- research_source
+source_id: S3
+role: company_release
+publisher: NVIDIA
+title: Spectrum-6 同時支援 pluggable 與 co-packaged optics
+published_at: 2026-07-21
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://blogs.nvidia.com/blog/nvidia-spectrum-six-arrives-in-gigascale-ai-factories/
+locator: Spectrum-6 form factors 段落
+limitation: 未提供兩種形式的出貨量、收入或長期占比
+-->
+
+<!-- research_source
+source_id: S4
+role: competitor_primary
+publisher: Marvell
+title: Ara 1.6T 可插拔光 DSP 大量出貨
+published_at: 2026-03-12
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.marvell.com/company/newsroom/marvell-1-6t-optical-dsp-ai-data-center-connectivity.html
+locator: mass volume production 與 pluggable modules 段落
+limitation: 供應商公告未揭露終端客戶、實際模組數量或市場份額
+-->
+
+<!-- research_source
+source_id: S5
+role: other_primary
+publisher: ASE Technology
+title: SPIL 新廠與 NVIDIA 合作關係
+published_at: 2025-01-16
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.aseglobal.com/press-room/spil-hosts-nvidia-founder-and-ceo-at-new-factory-site/
+locator: SPIL subsidiary 與 packaging relationship 段落
+limitation: 只能確認公司關係與合作脈絡，未量化 CPO 訂單或收入
+-->
+
+<!-- research_source
+source_id: S6
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 公開資訊觀測站公司申報查詢入口
+published_at:
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://mops.twse.com.tw/mops/web/index
+locator: 2026-08-01 以 3711 與相關台灣供應商代號重查法說、重大訊息與季度財報的入口
+limitation: 查詢入口會持續更新；入口本身不證明 CPO 客戶、料號、量產或收入
+-->
+
+<!-- research_claim
+claim_id: C1
+label: verified
+status: active
+claim: NVIDIA 已將 Spectrum-X Ethernet Photonics 描述為進入 full production
+supporting_source_ids: S1
+contrary_source_ids:
+as_of: 2026-05-31
+basis: 指定來源直接使用 full production 描述產品階段
+boundary: 證實的是 NVIDIA 的公開產品階段，不代表已知出貨占比、市占或供應商損益
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C2
+label: inference
+status: active
+claim: 現有證據較支持 CPO 與 1.6T 可插拔在本階段共存，而非可插拔立即被全面取代
+supporting_source_ids: S3,S4
+contrary_source_ids:
+as_of: 2026-07-21
+basis: Spectrum-6 公開支援兩種形式，且 Marvell 同期宣告 1.6T 可插拔 DSP 大量出貨
+boundary: 這是由產品組合與供應商階段推導的市場結構判讀，沒有全市場出貨占比可直接驗證
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C3
+label: verified
+status: active
+claim: NVIDIA 公開資料列出 SPIL 的 CPO 封裝、組裝與測試角色，ASE 資料確認 SPIL 的集團關係
+supporting_source_ids: S2,S5
+contrary_source_ids:
+as_of: 2026-06-01
+basis: 兩份公司一手資料分別支持製造角色與公司歸屬
+boundary: 只能證實列名與角色，不能外推新增訂單、份額、收入或毛利
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C4
+label: unverified
+status: active
+claim: SPIL 已因 Spectrum-X CPO 取得可量化且具財務重大性的新增訂單
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-01
+basis: 目前來源只有生態系列名與合作脈絡，沒有公司層級財務證據
+boundary: 未確認料號、訂單、出貨量、收入占比、毛利或客戶合約
+verification_needed: 日月光投控法說、財報或客戶文件需直接揭露 CPO 量產貢獻
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T1
+status: active
+claim_ids: C1,C2
+metric: Spectrum-X 後續世代的 CPO 與可插拔產品組合、部署量或占比
+source_ids: S1,S3,S4
+watch_source_ids: S6
+frequency: event_driven
+frequency_detail: 每季與重大產品發布
+next_check: 2026-08-15
+trigger: NVIDIA 或光通訊供應商首次量化任一形式的系統數、埠數或收入占比
+invalidation: 若後續兩個產品世代仍未擴大 CPO 部署且可插拔持續主導，快速替代論失效
+-->
+
+<!-- monitoring_item
+monitor_id: T2
+status: active
+claim_ids: C3,C4
+metric: SPIL CPO 客戶、料號、量產與財務貢獻
+source_ids: S2,S5
+watch_source_ids: S6
+frequency: quarterly
+frequency_detail: 每季法說與財報
+next_check: 2026-10-31
+trigger: 日月光投控首次直接揭露 CPO 量產、客戶或收入貢獻
+invalidation: 若公司持續只被生態系列名而沒有量產或財務證據，個股受惠映射維持未證
+-->
+
 <!-- transition
 date: 2026-08-01
 from: inbox
 to: triaged
 reason: architecture_coexistence_and_taiwan_mapping_reviewed
-evidence: source_chain:nvidia-cpo-production-marvell-1p6t-20260312-20260721
+evidence: sources:S1,S2,S3,S4,S5
 -->
 
 ## 新手先讀：這篇在講什麼

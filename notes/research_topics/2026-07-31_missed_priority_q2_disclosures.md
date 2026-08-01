@@ -2,7 +2,7 @@
 
 <!-- research_topic
 topic_id: MI-2026-07-31-MISSED-PRIORITY-Q2
-schema_version: 1
+schema_version: 3
 status: triaged
 priority: p1
 captured_at: 2026-07-31
@@ -18,6 +18,11 @@ group_ids: power,powersupply,memory,packtest,material
 trigger_type: quarterly_results_and_company_events
 evidence_role: candidate_source
 route: formal_note_candidate
+thesis_claim_id: C7
+base_confidence: medium
+confidence_basis: 六家公司 Q2 一手揭露足以重估證據強弱，但文件口徑與尚未驗證的市場主張仍有差異
+cross_company_numbers: true
+schema_migrated_at: 2026-08-02
 -->
 
 <!-- transition
@@ -32,8 +37,593 @@ date: 2026-07-31
 from: inbox
 to: triaged
 reason: separated_verified_q2_results_from_unproven_market_claims_and_pending_documents
-evidence: source_chain:missed-priority-q2-official-scan-20260731
+evidence: sources:S1,S3,S4,S5,S6,S7,S8,S9,S10
 -->
+
+<!-- research_source
+source_id: S1
+role: company_release
+publisher: Delta Electronics
+title: 台達電 2026Q2 官方法說簡報
+published_at: 2026-07-30
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://filecenter.deltaww.com/ir/download/calendar/2Q26_Analyst%20Meeting.pdf
+locator: pp.4-10 財務與事業部表格
+limitation: 基礎設施成長未拆 AI、液冷或 HVDC 收入，亦無正式季度財測
+-->
+
+<!-- research_source
+source_id: S2
+role: company_release
+source_kind: living_index
+publisher: Macronix
+title: 旺宏季度法說入口
+published_at:
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://www.mxic.com.tw/zh-tw/about/investor-relations/Pages/quarterly-results.aspx/financial-reports.aspx
+locator: 2026Q2 quarterly results 索引
+limitation: 索引只確認文件入口，數字與產品主張仍須回簡報定位
+-->
+
+<!-- research_source
+source_id: S3
+role: company_release
+publisher: Macronix
+title: 旺宏 2026Q2 官方法說簡報
+published_at: 2026-07-28
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://mopsov.twse.com.tw/nas/STR/233720260728M001.pdf
+locator: pp.5-6、14、17 財務與產品段落
+limitation: 缺貨與當期價格方向不證明逐月議價、滿載、長約或高毛利延續
+-->
+
+<!-- research_source
+source_id: S4
+role: company_release
+publisher: Ardentec
+title: 欣銓 2026Q2 官方法說簡報
+published_at: 2026-07-24
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://www.ardentec.com/UserFiles/2026Q2%E6%B3%95%E8%AA%AA%E6%9C%83%E7%B0%A1%E5%A0%B1%20%E4%B8%AD%E6%96%87_20260724%282%29.pdf
+locator: pp.5-12、21-24 財務、量產與 CPO 能力段落
+limitation: 客戶導入與設備能力未揭露具名客戶、收入、毛利或利用率
+-->
+
+<!-- research_source
+source_id: S5
+role: company_release
+publisher: Powertech Technology
+title: 力成 2026Q2 官方法說簡報
+published_at: 2026-07-28
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://www.pti.com.tw/Handlers/ConferenceDownload.ashx?col=briefing&lang=zh&id=a9c72472-574a-49a7-ab9c-f5b553a7df29
+locator: 2026Q2 簡報 pp.5-7、19-23
+limitation: Q2 數字未經會計師查核，HBM 需求與技術能力不證明 HBM2 訂單
+-->
+
+<!-- research_source
+source_id: S6
+role: company_release
+publisher: GlobalWafers
+title: 環球晶 2026Q2 營收公告
+published_at: 2026-07-07
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://www.sas-globalwafers.com/en/gwc_news_en_20260707/
+locator: Q2 與 H1 revenue 段落
+limitation: 營收公告沒有毛利、營業利益、產品 ASP 或漲價歸因
+-->
+
+<!-- research_source
+source_id: S7
+role: exchange
+publisher: MOPS
+title: 環球晶 2026 年 6 月未核閱自結公告
+published_at: 2026-07-29
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://mopsov.twse.com.tw/mops/web/ajax_t05st01?TYPEK=otc&step=2&firstin=true&off=1&co_id=6488&spoke_date=20260729&spoke_time=170710&seq_no=4
+locator: 六月歸母損益、EPS 與 Siltronic 評價原因
+limitation: 單月未核閱自結缺毛利與營業利益，不能判斷本業趨勢
+-->
+
+<!-- research_source
+source_id: S8
+role: exchange
+publisher: MOPS
+title: 環球晶 Novara 火災公告
+published_at: 2026-07-22
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://mopsov.twse.com.tw/mops/web/ajax_t05st01?TYPEK=otc&step=2&firstin=true&off=1&co_id=6488&spoke_date=20260722&spoke_time=193616&seq_no=1
+locator: 8 吋與 12 吋產線影響段落
+limitation: 只確認初步停產範圍，復工、設備損失與供貨影響仍待評估
+-->
+
+<!-- research_source
+source_id: S9
+role: exchange
+publisher: MOPS
+title: 環球晶 2026-08-04 法說公告
+published_at: 2026-07-20
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://mopsov.twse.com.tw/mops/web/ajax_t05st01?TYPEK=otc&step=2&firstin=true&off=1&co_id=6488&spoke_date=20260720&spoke_time=151446&seq_no=1
+locator: 法說日期與事件資訊
+limitation: 只證實事件時間，不支持漲價、方形晶圓或量產主張
+-->
+
+<!-- research_source
+source_id: S10
+role: company_release
+publisher: Advanced Power Electronics
+title: 富鼎 2026Q2 官方法說簡報
+published_at: 2026-07-29
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://mopsov.twse.com.tw/server-java/FileDownLoad?step=9&filePath=%2Fhome%2Fhtml%2Fnas%2FSTR%2F&fileName=826120260729M002.pdf&functionName=t100sb02_1
+locator: pp.3-6、8、11-13 財務與產品組合段落
+limitation: EPS 年增含重大業外轉正，且產品數字未拆 AI 與一般伺服器
+-->
+
+<!-- research_source
+source_id: S11
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 公開資訊觀測站公司申報查詢入口
+published_at:
+captured_at: 2026-07-31
+accepted_at: 2026-07-31
+status: active
+url: https://mops.twse.com.tw/mops/web/index
+locator: 2026-07-31 以各公司代號重查季度財報、法說與重大訊息的入口
+limitation: 查詢入口會持續更新；入口本身不證明附件存在，也不能替代實際 PDF 的頁碼與數字
+-->
+
+<!-- research_claim
+claim_id: C1
+label: verified
+status: active
+claim: 台達電 Q2 獲利增量仍以營業利益為主，但毛利率與營益率季減且交通與自動化部門虧損
+supporting_source_ids: S1
+contrary_source_ids:
+as_of: 2026-07-30
+basis: 法說簡報財務與事業部表格可直接回溯
+boundary: 不把基礎設施量利成長自動改寫成 AI、液冷或 HVDC 收入
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C2
+label: verified
+status: active
+claim: 旺宏 Q2 headline 與本業方向一致，且簡報支持 NOR、SLC 與 eMMC 的需求及當期價格方向
+supporting_source_ids: S2,S3
+contrary_source_ids:
+as_of: 2026-07-31
+basis: 官方法說財務與產品頁可直接定位
+boundary: 不證明逐月議價、滿載、長供合約或下半年毛利持續
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C3
+label: verified
+status: active
+claim: 欣銓 Q2 營收與龍潭七月量產里程碑成立，但 H1 自由現金流為負且銀行借款增加
+supporting_source_ids: S4
+contrary_source_ids:
+as_of: 2026-07-24
+basis: 同一法說簡報提供財務運算元與廠區時程
+boundary: 量產時程與 CPO 能力不證明 AI ASIC 客戶、收入、毛利或大量出貨
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C4
+label: verified
+status: active
+claim: 力成 Q2 EPS 季增主要由營業利益改善，而公司文件沒有 HBM2 客戶、訂單、認證完成或收入證據
+supporting_source_ids: S5
+contrary_source_ids:
+as_of: 2026-07-30
+basis: 官方法說可回溯 Q2 損益與 HBM、先進封裝產品段落
+boundary: 未查核簡報與技術能力不能升格為 HBM2 商業訂單
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C5
+label: verified
+status: active
+claim: 環球晶 Q2 營收回升，但六月巨額虧損主要由公司所述 Siltronic 非現金評價造成，Novara 火災初步只影響 8 吋線
+supporting_source_ids: S6,S7,S8,S9
+contrary_source_ids:
+as_of: 2026-07-29
+basis: 公司營收與 MOPS 重大訊息分別支持營收、評價損失與火災範圍
+boundary: 單月未核閱損益與事件公告不足以判斷本業毛利、ASP、復工與供貨影響
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C6
+label: verified
+status: active
+claim: 富鼎 Q2 EPS 年增主要來自業外由負轉正，同期營業利益年減且高壓產品占比仍未提升
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-07-29
+basis: 法說簡報損益與產品組合頁可直接回溯
+boundary: 風扇年增與 SPS 季增不等於 AI 伺服器收入或全年組合升級已證實
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C7
+label: inference
+status: active
+claim: 六家公司 Q2 headline 不能用單一營收或 EPS 排名代替本業、現金流、會計與產品階段分析
+supporting_source_ids: S1,S3,S4,S5,S6,S7,S10
+contrary_source_ids:
+as_of: 2026-07-31
+basis: 各公司分別出現本業與業外、現金流、未查核口徑或產品時程的不同組合
+boundary: 這是研究分流判讀，不是跨產業公司優劣、估值或投資報酬排名
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: unverified
+status: active
+claim: 旺宏已簽長供、力成已取得 HBM2 訂單、環球晶已完成漲價或富鼎 AI 組合已顯著升級
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-07-31
+basis: 現有一手文件沒有提供相應合約、具名客戶、認證、價格橋接或收入拆分
+boundary: 四項主張都只能留在既有 H# 或搜尋清單，不能寫入正式公司事實
+verification_needed: 公司季報、法說與客戶文件須直接提供合約、產品、時程及財務貢獻
+resolution:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O1
+claim_id: C7
+entity: Delta Electronics
+metric: 2026Q2 consolidated revenue
+reported_value: 1832
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: TWD 100 million
+definition_key: issuer_reported_consolidated_revenue
+definition: 公司揭露的第二季合併營業收入
+evidence_ids: S1
+comparability: not_comparable
+comparability_reason: 期間與單位可對齊，但產業結構、規模與本業品質不同，不能用營收高低取代研究判讀
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O2
+claim_id: C7
+entity: Macronix
+metric: 2026Q2 consolidated revenue
+reported_value: 191.25
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: TWD 100 million
+definition_key: issuer_reported_consolidated_revenue
+definition: 公司揭露的第二季合併營業收入
+evidence_ids: S3
+comparability: not_comparable
+comparability_reason: 期間與單位可對齊，但產業結構、規模與本業品質不同，不能用營收高低取代研究判讀
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O3
+claim_id: C7
+entity: Ardentec
+metric: 2026Q2 consolidated revenue
+reported_value: 45.34
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: TWD 100 million
+definition_key: issuer_reported_consolidated_revenue
+definition: 公司揭露的第二季合併營業收入
+evidence_ids: S4
+comparability: not_comparable
+comparability_reason: 期間與單位可對齊，但產業結構、規模與本業品質不同，不能用營收高低取代研究判讀
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O4
+claim_id: C7
+entity: Powertech Technology
+metric: 2026Q2 consolidated revenue
+reported_value: 231.16
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: TWD 100 million
+definition_key: issuer_reported_consolidated_revenue
+definition: 公司揭露的第二季合併營業收入
+evidence_ids: S5
+comparability: not_comparable
+comparability_reason: 期間與單位可對齊，但產業結構、規模與本業品質不同，不能用營收高低取代研究判讀
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O5
+claim_id: C7
+entity: GlobalWafers
+metric: 2026Q2 consolidated revenue
+reported_value: 152
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: TWD 100 million
+definition_key: issuer_reported_consolidated_revenue
+definition: 公司揭露的第二季合併營業收入
+evidence_ids: S6
+comparability: not_comparable
+comparability_reason: 期間與單位可對齊，但產業結構、規模與本業品質不同，不能用營收高低取代研究判讀
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O6
+claim_id: C7
+entity: Advanced Power Electronics
+metric: 2026Q2 consolidated revenue
+reported_value: 8.77
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: TWD 100 million
+definition_key: issuer_reported_consolidated_revenue
+definition: 公司揭露的第二季合併營業收入
+evidence_ids: S10
+comparability: not_comparable
+comparability_reason: 期間與單位可對齊，但產業結構、規模與本業品質不同，不能用營收高低取代研究判讀
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O1
+claim_id: C7
+entity: Delta Electronics
+metric: non-operating share of pretax profit increase
+value_kind: point
+reported_value: 23
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: year_over_year_quarterly_increase_bridge
+unit: percent
+definition_key: non_operating_increase_divided_by_pretax_increase
+definition: Q2 業外損益年增額占稅前利益年增額的比例
+evidence_ids: S1
+comparability: not_comparable
+comparability_reason: 這是獲利增量橋接，不是營收、FCF 或另一家公司相同口徑的業外比率
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O2
+claim_id: C7
+entity: Macronix
+metric: non-operating share of pretax profit
+value_kind: point
+reported_value: 2.5
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar_quarter
+unit: percent
+definition_key: non_operating_profit_divided_by_pretax_profit
+definition: Q2 業外損益占當季稅前利益的比例
+evidence_ids: S3
+comparability: not_comparable
+comparability_reason: 分母是當季稅前利益，與台達的年增額橋接及其他公司的現金流指標不同
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O3
+claim_id: C7
+entity: Ardentec
+metric: free cash flow
+value_kind: point
+reported_value: -44.66
+period_start: 2026-01-01
+period_end: 2026-06-30
+period_basis: first_half
+unit: TWD 100 million
+definition_key: operating_cash_flow_minus_equipment_capex
+definition: H1 營業現金流減設備支出
+evidence_ids: S4
+comparability: not_comparable
+comparability_reason: 這是半年現金流與資本支出差額，不是單季損益或收入品質比率
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O4
+claim_id: C7
+entity: Powertech Technology
+metric: quarter-over-quarter operating profit change
+value_kind: point
+reported_value: 7.70
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: quarter_over_quarter_change
+unit: TWD 100 million
+definition_key: q2_operating_profit_minus_q1_operating_profit
+definition: Q2 營業利益減 Q1 營業利益
+evidence_ids: S5
+comparability: not_comparable
+comparability_reason: 這是單季本業增量，與半年 FCF、業外占比與單月評價損失不是同一 metric
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O5
+claim_id: C7
+entity: GlobalWafers
+metric: June attributable net loss
+value_kind: point
+reported_value: -39.55
+period_start: 2026-06-01
+period_end: 2026-06-30
+period_basis: unaudited_single_month
+unit: TWD 100 million
+definition_key: unaudited_monthly_loss_attributable_to_parent
+definition: 六月未核閱歸屬母公司淨損，含 Siltronic 非現金評價影響
+evidence_ids: S7
+comparability: not_comparable
+comparability_reason: 單月未核閱歸母損益含重大評價噪音，不能與季度本業或半年現金流排名
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O6
+claim_id: C7
+entity: Advanced Power Electronics
+metric: year-over-year operating profit change
+value_kind: point
+reported_value: -10.7
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: year_over_year_quarterly_change
+unit: percent
+definition_key: q2_operating_profit_yoy_change
+definition: Q2 營業利益相較去年同期的變動率
+evidence_ids: S10
+comparability: not_comparable
+comparability_reason: 這是營業利益年變動率，與業外占比、單月淨損及半年 FCF 口徑不同
+-->
+
+<!-- monitoring_item
+monitor_id: T1
+status: active
+claim_ids: C1,C2,C3,C4,C6
+metric: 完整 Q2 財報、法說數字與 focused evidence pack 更新
+source_ids: S1,S2,S3,S4,S5,S10
+watch_source_ids: S2,S11
+frequency: event_driven
+frequency_detail: 每個正式文件發布後
+next_check: 2026-08-05
+trigger: 完整季報或新法說提供可重算的期間、單位、現金流與產品證據
+invalidation: 若文件仍不完整或只增加 headline，正式筆記不得升為已獨立驗證
+-->
+
+<!-- monitoring_item
+monitor_id: T2
+status: active
+claim_ids: C5,C8
+metric: 環球晶毛利、營業利益、Siltronic 評價橋接、Novara 復工與 ASP
+source_ids: S6,S7,S8,S9
+watch_source_ids: S11
+frequency: quarterly
+frequency_detail: 2026-08-04 法說後與每季
+next_check: 2026-08-05
+trigger: 公司提供完整 Q2 營運、火災復工、供貨與產品價格證據
+invalidation: 若仍只有單月自結、事件公告或管理層形容詞，本業與漲價主張維持未證
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C2,C3,C4,C6,C8
+metric: 旺宏長供、欣銓量產收入、力成 HBM2 訂單與富鼎 AI 組合 H# proof points
+source_ids: S3,S4,S5,S10
+watch_source_ids: S11
+frequency: quarterly
+frequency_detail: 每季與 H# 到期日
+next_check: 2026-08-31
+trigger: 公司文件首次提供具名產品、客戶、合約、收入或毛利
+invalidation: 到期仍無一手證據時標記 expired_unresolved，不得硬判 confirmed
+-->
+
+## 新手先讀：這篇在講什麼
+
+### 名詞小字典
+
+- **本業**：公司日常產品與服務帶來的營業利益，與投資評價、匯兌等業外損益分開看。
+- **EPS**：每股盈餘，把歸屬股東的獲利除以股數；上升不一定代表本業同幅改善。
+- **自由現金流**：營業現金流扣掉設備等資本支出後的現金餘額，可用來檢查成長是否需要大量外部資金。
+- **未核閱**：數字尚未經會計師完成核閱，能提供方向但證據強度低於完整季報。
+
+### 三句話抓重點
+
+- 六家公司都已有新的 Q2 一手資料，但 headline 背後分別混有本業、業外、現金流、未查核口徑與產品時程差異。
+- 旺宏與力成本業改善較直接；台達電、欣銓、環球晶與富鼎則各有利潤率、現金流、評價或業外因素需要拆解。
+- 真正可執行的工作是補齊正式筆記與證據包，並把長供、HBM2 訂單、漲價與 AI 組合等說法留在待驗證清單。
+
+### 為什麼重要
+
+同樣是營收或 EPS 上升，可能來自本業改善、業外轉正、存貨與價格、資本支出甚至未查核估計。若只把六家公司放在同一張 headline 排名，會錯過真正影響現金流與獲利品質的差異，也可能把產品能力提前寫成訂單。
+
+### 接下來怎麼追
+
+- 追完整 Q2 季報與法說，逐項重算營業利益、業外、現金流、設備支出與負債變化。
+- 追每家公司是否首次以一手文件證實長供、HBM2、量產收入、漲價、復工與產品組合，而不只延續市場說法。
+
+### 想一想
+
+- EPS 增加時，若營業利益沒有同步增加，讀者還需要拆解哪些業外或會計因素？
+- 公司展示技術能力或完成客戶驗證，距離可持續收入與現金回收還缺哪些證據？
 
 ## 為何值得進佇列
 
@@ -43,6 +633,8 @@ evidence: source_chain:missed-priority-q2-official-scan-20260731
 但毛利率、營益率季減且兩個事業部虧損；欣銓營收與量產里程碑成立，卻同時出現負自由現金流
 與負債上升；環球晶 6 月巨額虧損則是 Siltronic 評價噪音，不能誤判成本業崩壞。旺宏與力成
 的本業改善較乾淨，但市場流傳的「逐月議價／長供」與「已簽 HBM2 訂單」仍沒有一手證據。
+跨公司營收觀測對應 `M1`；真正用來辨識本業、業外、現金流與會計差異的異質證據籃子
+對應 `M2`。兩組都明列為不可直接比較，不做公司優劣排名。
 
 ## 來源與證據邊界
 
@@ -79,7 +671,7 @@ evidence: source_chain:missed-priority-q2-official-scan-20260731
 
 ### 6239 力成
 
-- [公司官方法說頁](https://www.pti.com.tw/zh/ir/news)的 2026Q2 簡報 pp.5–7 顯示 Q2
+- [公司官方 2026Q2 法說簡報](https://www.pti.com.tw/Handlers/ConferenceDownload.ashx?col=briefing&lang=zh&id=a9c72472-574a-49a7-ab9c-f5b553a7df29) pp.5–7 顯示 Q2
   營收 231.16 億元、毛利率 21.8%、營益率 15.3%、EPS 3.00 元；營業利益季增
   7.70 億元，業外反而減少 2.66 億元，因此 EPS 季增主要由本業改善推動。簡報明示
   Q2 數字尚未經會計師查核。

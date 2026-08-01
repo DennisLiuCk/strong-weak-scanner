@@ -6,12 +6,14 @@ import argparse
 import csv
 import datetime as dt
 import glob
+import io
 import json
 import os
 import re
+import subprocess
 import sys
 from collections import Counter, defaultdict
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, urlencode, urlparse, urlsplit, urlunsplit
 
 import db_ro
 from leading_hypotheses import load_reports
@@ -27,12 +29,21 @@ SCAN_LOG = os.path.join(TOPICS_DIR, "scan_log.csv")
 ROTATION_ANCHOR = dt.date(2026, 7, 27)  # 星期一；A cohort 的第一個營運週
 TAIPEI_TZ = dt.timezone(dt.timedelta(hours=8))
 
-TOPIC_META_RE = re.compile(r"<!--\s*research_topic\s*(.*?)-->", re.S | re.I)
-IMPACT_RE = re.compile(r"<!--\s*impact\s*(.*?)-->", re.S | re.I)
-TRANSITION_RE = re.compile(r"<!--\s*transition\s*(.*?)-->", re.S | re.I)
+TOPIC_META_RE = re.compile(r"<!--\s*research_topic\b(.*?)-->", re.S | re.I)
+IMPACT_RE = re.compile(r"<!--\s*impact\b(.*?)-->", re.S | re.I)
+TRANSITION_RE = re.compile(r"<!--\s*transition\b(.*?)-->", re.S | re.I)
+SOURCE_RE = re.compile(r"<!--\s*research_source\b(.*?)-->", re.S | re.I)
+CLAIM_RE = re.compile(r"<!--\s*research_claim\b(.*?)-->", re.S | re.I)
+COMPARISON_RE = re.compile(r"<!--\s*metric_comparison\b(.*?)-->", re.S | re.I)
+MONITOR_RE = re.compile(r"<!--\s*monitoring_item\b(.*?)-->", re.S | re.I)
 TOPIC_ID_RE = re.compile(r"^MI-\d{4}-\d{2}-\d{2}-[A-Z0-9-]+$")
 HYPOTHESIS_REF_RE = re.compile(r"^(\d{4}):H(\d+)$")
-V2_CUTOVER_DATE = dt.date(2026, 8, 2)
+SOURCE_ID_RE = re.compile(r"^S[1-9]\d*$")
+CLAIM_ID_RE = re.compile(r"^C[1-9]\d*$")
+COMPARISON_ID_RE = re.compile(r"^M[1-9]\d*$")
+OBSERVATION_ID_RE = re.compile(r"^M[1-9]\d*-O[1-9]\d*$")
+MONITOR_ID_RE = re.compile(r"^T[1-9]\d*$")
+V3_CUTOVER_DATE = dt.date(2026, 8, 2)
 BEGINNER_HEADING = "新手先讀：這篇在講什麼"
 BEGINNER_SUBHEADINGS = (
     "名詞小字典",
@@ -49,6 +60,34 @@ SOURCE_TYPES = {
     "management_relay", "broker_relay", "media_report", "mixed",
 }
 EVIDENCE_ROLES = {"candidate_source", "trigger_only"}
+SOURCE_ROLES = {
+    "company_release", "company_filing", "regulator_or_policy", "exchange",
+    "standard", "competitor_primary", "management_commentary", "market_estimate",
+    "media", "other_primary",
+}
+VERIFIED_SUPPORT_ROLES = SOURCE_ROLES - {"market_estimate", "media"}
+SOURCE_STATUSES = {"active", "superseded", "rejected"}
+SOURCE_KINDS = {"document", "living_index"}
+CLAIM_LABELS = {
+    "verified": "證實",
+    "inference": "推論",
+    "unverified": "待驗證",
+}
+CLAIM_STATUSES = {"active", "superseded", "refuted"}
+COMPARABILITY = {
+    "directly_comparable": "可直接比較",
+    "normalized_comparable": "正規化後可比",
+    "not_comparable": "不可比",
+}
+COMPARISON_KINDS = {"aligned_metric", "heterogeneous_evidence"}
+VALUE_KINDS = {"point", "range", "lower_bound", "upper_bound"}
+MONITOR_STATUSES = {"active", "retired"}
+MONITOR_FREQUENCIES = {"event_driven", "weekly", "monthly", "quarterly", "annual"}
+CONFIDENCE_LABELS = {
+    "high": "高", "medium": "中", "low": "低",
+    "needs_revalidation": "待重新驗證", "unstructured": "未結構化",
+}
+CONFIDENCE_ORDER = ("needs_revalidation", "low", "medium", "high")
 ROUTES = {
     "undecided", "market_issue_watch", "formal_note_candidate",
     "hypothesis_candidate", "event_anchor_candidate", "policy_watch",
@@ -58,11 +97,11 @@ NOTE_ACTIONS = {"none", "watch", "review_due", "update_required", "done"}
 ACTIVE_NOTE_ACTIONS = {"watch", "review_due", "update_required"}
 ALLOWED_TRANSITIONS = {
     "initial": {"inbox"},
-    "inbox": {"triaged", "dismissed"},
-    "triaged": {"promoted", "dismissed", "resolved"},
-    "promoted": {"resolved"},
-    "dismissed": set(),
-    "resolved": set(),
+    "inbox": {"inbox", "triaged", "dismissed"},
+    "triaged": {"triaged", "promoted", "dismissed", "resolved"},
+    "promoted": {"promoted", "resolved"},
+    "dismissed": {"triaged"},
+    "resolved": {"triaged"},
 }
 
 
@@ -92,6 +131,50 @@ def _valid_date(value):
         return False
 
 
+def _transition_source_ids(evidence):
+    """Return strict revision evidence ids; ``source_chain`` is initial-only."""
+    match = re.fullmatch(r"sources:(S[1-9]\d*(?:,S[1-9]\d*)*)", evidence or "")
+    return _csv_values(match.group(1)) if match else None
+
+
+def _visible_history_lines(text):
+    """保留可見文字的標點與 URL；逐行比對仍允許在任意位置追加新行。"""
+    visible = re.sub(r"<!--.*?-->", "", text or "", flags=re.S)
+    return [
+        normalized
+        for raw in visible.splitlines()
+        if (normalized := re.sub(r"\s+", " ", raw).strip())
+    ]
+
+
+def _is_subsequence(before, after):
+    """Whether every historical item is still present, in the original order."""
+    cursor = iter(after)
+    return all(any(candidate == item for candidate in cursor) for item in before)
+
+
+def _canonical_source_url(value):
+    """Normalize identity-only URL differences without erasing document selectors."""
+    parsed = urlsplit(value or "")
+    scheme = parsed.scheme.lower()
+    host = (parsed.hostname or "").lower()
+    try:
+        port = parsed.port
+    except ValueError:
+        port = None
+    if port and not (scheme == "https" and port == 443):
+        host = f"{host}:{port}"
+    path = re.sub(r"/{2,}", "/", parsed.path or "/")
+    if path != "/":
+        path = path.rstrip("/")
+    query = urlencode(sorted(
+        (key, item) for key, item in parse_qsl(parsed.query, keep_blank_values=True)
+        if not key.lower().startswith("utm_")
+        and key.lower() not in {"fbclid", "gclid", "mc_cid", "mc_eid"}
+    ), doseq=True)
+    return urlunsplit((scheme, host, path, query, ""))
+
+
 def taipei_today():
     return dt.datetime.now(TAIPEI_TZ).date()
 
@@ -110,6 +193,25 @@ def _publisher_matches_url(publisher_domain, url):
     hostname = (urlparse(url).hostname or "").lower()
     domain = (publisher_domain or "").lower()
     return bool(domain and hostname and (hostname == domain or hostname.endswith("." + domain)))
+
+
+def _source_independence_key(source):
+    """用內容來源群組判斷獨立消息鏈；hosted filing 可用顯式 override。"""
+    override = (source.get("independence_group") or "").strip().lower()
+    if override:
+        return override
+    hostname = (urlparse(source.get("url") or "").hostname or "").lower()
+    if hostname.startswith("www."):
+        hostname = hostname[4:]
+    parts = hostname.split(".")
+    if len(parts) <= 2:
+        return hostname
+    common_second_level = {
+        "com.tw", "org.tw", "net.tw", "gov.tw", "edu.tw",
+        "co.uk", "org.uk", "com.au", "co.jp", "co.kr",
+    }
+    return ".".join(parts[-3:] if ".".join(parts[-2:]) in common_second_level
+                    else parts[-2:])
 
 
 def _heading_sections(text, level):
@@ -139,16 +241,16 @@ def _visible_markdown_text(body):
 
 
 def _validate_beginner_section(text):
-    """schema v2 的新手導讀是內容契約，不只檢查標題存在。"""
+    """schema v2+ 的新手導讀是內容契約，不只檢查標題存在。"""
     errors = []
     h2_sections = _heading_sections(text, 2)
     beginner = [(index, body) for index, (heading, body) in enumerate(h2_sections)
                 if heading == BEGINNER_HEADING]
     if len(beginner) != 1:
-        return [f"schema v2 必須且只能有一個 H2：{BEGINNER_HEADING}"]
+        return [f"schema v2+ 必須且只能有一個 H2：{BEGINNER_HEADING}"]
     index, body = beginner[0]
     if index != 0:
-        errors.append(f"schema v2 的第一個 H2 必須是：{BEGINNER_HEADING}")
+        errors.append(f"schema v2+ 的第一個 H2 必須是：{BEGINNER_HEADING}")
 
     h3_sections = _heading_sections(body, 3)
     headings = [heading for heading, _section_body in h3_sections]
@@ -186,7 +288,7 @@ def _validate_beginner_section(text):
 
 
 def _topic_summary(text):
-    """v2 用三句導讀形成列表摘要；v1 保持空值，由既有 UI fallback 處理。"""
+    """v2+ 用三句導讀形成列表摘要；v1 保持空值，由既有 UI fallback 處理。"""
     h2 = dict(_heading_sections(text, 2))
     beginner = h2.get(BEGINNER_HEADING, "")
     h3 = dict(_heading_sections(beginner, 3))
@@ -194,6 +296,623 @@ def _topic_summary(text):
         _visible_markdown_text(item)
         for item in _top_level_bullets(h3.get("三句話抓重點", ""))
     ).strip()
+
+
+def _require_fields(item, required, label, errors):
+    for key in required:
+        if not item.get(key):
+            errors.append(f"{label} 缺少必填欄位:{key}")
+
+
+def _parse_contract_fields(body, allowed, label, errors):
+    """v3 block 採 strict key:value；拒絕壞行、未知欄位與重複 key。"""
+    fields = {}
+    for line_no, raw in enumerate(body.strip().splitlines(), 1):
+        if not raw.strip():
+            continue
+        if ":" not in raw:
+            errors.append(f"{label} 第 {line_no} 行不是 key:value")
+            continue
+        key, value = (part.strip() for part in raw.split(":", 1))
+        if not key:
+            errors.append(f"{label} 第 {line_no} 行 key 空白")
+            continue
+        if key not in allowed:
+            errors.append(f"{label} 含未知欄位:{key}")
+        if key in fields:
+            errors.append(f"{label} 欄位重複:{key}")
+        fields[key] = value
+    return fields
+
+
+def _referenced_ids(value, known_ids, label, errors, required=True):
+    ids = _csv_values(value)
+    if required and not ids:
+        errors.append(f"{label} 至少需要一個 evidence/source id")
+    for source_id in ids:
+        if source_id not in known_ids:
+            errors.append(f"{label} 找不到 source id:{source_id}")
+    return ids
+
+
+def _topic_confidence(meta, last_evidence_at=None, as_of=None):
+    """保留人工宣告值；活躍 topic 逾期且未更新證據時只自動降一級。"""
+    as_of = as_of or taipei_today()
+    declared = meta.get("base_confidence")
+    due = meta.get("review_due")
+    active = meta.get("status") not in {"dismissed", "resolved"}
+    stale = bool(
+        active and declared in CONFIDENCE_ORDER and _valid_date(due)
+        and _valid_date(last_evidence_at) and as_of > dt.date.fromisoformat(due)
+        and dt.date.fromisoformat(last_evidence_at) <= dt.date.fromisoformat(due)
+    )
+    effective = declared
+    if stale and declared in CONFIDENCE_ORDER:
+        effective = CONFIDENCE_ORDER[max(0, CONFIDENCE_ORDER.index(declared) - 1)]
+    days_overdue = ((as_of - dt.date.fromisoformat(due)).days
+                    if stale and _valid_date(due) else 0)
+    return {
+        "declared": declared or "unrated",
+        "declared_label": CONFIDENCE_LABELS.get(declared, "未評級"),
+        "effective": effective or "unrated",
+        "effective_label": CONFIDENCE_LABELS.get(effective, "未評級"),
+        "stale": stale,
+        "days_overdue": days_overdue,
+        "reason": "overdue_no_new_evidence" if stale else "current",
+        "as_of": as_of.isoformat(),
+        "last_evidence_at": last_evidence_at or "-",
+        "review_due": due or "-",
+        "basis": meta.get("confidence_basis") or "",
+    }
+
+
+def _analyse_v3_contract(text, meta, errors, warnings, as_of):
+    """解析可持續驗證契約；所有結構均保留在 Markdown 的 append-friendly blocks。"""
+    is_closed = meta.get("status") in {"dismissed", "resolved"}
+    sources, source_ids = [], set()
+    source_allowed = {
+        "source_id", "role", "publisher", "title", "published_at", "captured_at",
+        "accepted_at", "status", "url", "locator", "limitation", "source_kind",
+        "independence_group",
+    }
+    source_required = (
+        "source_id", "role", "publisher", "title", "captured_at",
+        "accepted_at", "status", "url", "locator", "limitation",
+    )
+    for idx, body in enumerate(SOURCE_RE.findall(text), 1):
+        label = f"research_source {idx}"
+        source = _parse_contract_fields(body, source_allowed, label, errors)
+        _require_fields(source, source_required, label, errors)
+        source_id = source.get("source_id", "")
+        if source_id and not SOURCE_ID_RE.fullmatch(source_id):
+            errors.append(f"{label} source_id 格式錯誤:{source_id}")
+        elif source_id in source_ids:
+            errors.append(f"{label} source_id 重複:{source_id}")
+        else:
+            source_ids.add(source_id)
+        if source.get("role") and source["role"] not in SOURCE_ROLES:
+            errors.append(f"{label} role 不在值域:{source['role']}")
+        source["source_kind"] = source.get("source_kind") or "document"
+        if source["source_kind"] not in SOURCE_KINDS:
+            errors.append(f"{label} source_kind 不在值域:{source['source_kind']}")
+        if source["source_kind"] == "document" and not source.get("published_at"):
+            errors.append(f"{label} document 缺少必填欄位:published_at")
+        if source["source_kind"] == "living_index" and source.get("published_at"):
+            errors.append(f"{label} living_index 的 published_at 必須留空")
+        if source.get("status") and source["status"] not in SOURCE_STATUSES:
+            errors.append(f"{label} status 不在值域:{source['status']}")
+        for key in ("published_at", "captured_at", "accepted_at"):
+            if source.get(key) and not _valid_date(source[key]):
+                errors.append(f"{label} {key} 不是 YYYY-MM-DD:{source[key]}")
+            elif (_valid_date(source.get(key))
+                  and dt.date.fromisoformat(source[key]) > as_of):
+                errors.append(f"{label} {key} 晚於研究判定日 {as_of.isoformat()}")
+        captured, accepted = source.get("captured_at"), source.get("accepted_at")
+        if (all(_valid_date(value) for value in (captured, accepted))
+                and captured > accepted):
+            errors.append(f"{label} 日期必須符合 captured_at <= accepted_at")
+        published = source.get("published_at")
+        if (all(_valid_date(value) for value in (published, captured))
+                and published > captured):
+            errors.append(f"{label} 日期必須符合 published_at <= captured_at")
+        url = source.get("url", "")
+        parsed = urlparse(url)
+        if url and (parsed.scheme != "https" or not parsed.hostname):
+            errors.append(f"{label} url 必須是有效 https URL")
+        source["id"] = source_id
+        source["document"] = source.get("title", "")
+        sources.append(source)
+    active_sources = [source for source in sources if source.get("status") == "active"]
+    minimum_active_sources = 1 if is_closed else 2
+    if len(active_sources) < minimum_active_sources:
+        errors.append(
+            f"schema v3 至少需要 {minimum_active_sources} 個 active research_source")
+    active_urls = [source.get("url") for source in active_sources if source.get("url")]
+    active_url_keys = [_canonical_source_url(url) for url in active_urls]
+    if len(active_url_keys) != len(set(active_url_keys)):
+        errors.append("schema v3 active research_source 不可重複使用同一 URL")
+    if len(set(active_url_keys)) < minimum_active_sources:
+        errors.append(
+            f"schema v3 至少需要 {minimum_active_sources} 個不同 URL 的 active research_source")
+
+    visible_text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
+    linked_urls = set(re.findall(r"\]\((https://[^)]+)\)", visible_text))
+    all_source_urls = {source.get("url") for source in sources if source.get("url")}
+    missing_link_sources = sorted(linked_urls - all_source_urls)
+    if missing_link_sources:
+        errors.append(
+            "正文 Markdown 來源連結未納入 research_source ledger:" +
+            "、".join(missing_link_sources))
+
+    source_by_id = {source.get("source_id"): source for source in sources}
+
+    def source_refs(value, label, required=True, require_active=True):
+        ids = _referenced_ids(value, source_ids, label, errors, required=required)
+        for source_id in ids:
+            source = source_by_id.get(source_id) or {}
+            if require_active and source.get("status") != "active":
+                errors.append(f"{label} 引用非 active source:{source_id}")
+        return ids
+
+    claims, claim_ids = [], set()
+    claim_allowed = {
+        "claim_id", "label", "claim", "supporting_source_ids", "contrary_source_ids",
+        "as_of", "basis", "boundary", "verification_needed", "resolution", "status",
+        "correction_kind", "corrects_claim_id", "corrected_by_claim_id",
+    }
+    claim_required = (
+        "claim_id", "label", "status", "claim", "as_of", "basis", "boundary")
+    for idx, body in enumerate(CLAIM_RE.findall(text), 1):
+        label = f"research_claim {idx}"
+        claim = _parse_contract_fields(body, claim_allowed, label, errors)
+        _require_fields(claim, claim_required, label, errors)
+        claim_id = claim.get("claim_id", "")
+        if claim_id and not CLAIM_ID_RE.fullmatch(claim_id):
+            errors.append(f"{label} claim_id 格式錯誤:{claim_id}")
+        elif claim_id in claim_ids:
+            errors.append(f"{label} claim_id 重複:{claim_id}")
+        else:
+            claim_ids.add(claim_id)
+        if claim.get("label") and claim["label"] not in CLAIM_LABELS:
+            errors.append(f"{label} label 不在值域:{claim['label']}")
+        if claim.get("status") and claim["status"] not in CLAIM_STATUSES:
+            errors.append(f"{label} status 不在值域:{claim['status']}")
+        if claim.get("as_of") and not _valid_date(claim["as_of"]):
+            errors.append(f"{label} as_of 不是 YYYY-MM-DD:{claim['as_of']}")
+        elif (_valid_date(claim.get("as_of"))
+              and dt.date.fromisoformat(claim["as_of"]) > as_of):
+            errors.append(f"{label} as_of 晚於研究判定日 {as_of.isoformat()}")
+        needs_support = claim.get("label") in {"verified", "inference"}
+        is_active = claim.get("status") == "active"
+        claim["supporting_source_ids"] = source_refs(
+            claim.get("supporting_source_ids"), label, required=needs_support,
+            require_active=is_active)
+        claim["contrary_source_ids"] = source_refs(
+            claim.get("contrary_source_ids"), label, required=False,
+            require_active=is_active)
+        if claim.get("label") == "verified" and claim["supporting_source_ids"]:
+            eligible = [
+                source_id for source_id in claim["supporting_source_ids"]
+                if (source_by_id.get(source_id) or {}).get("role")
+                in VERIFIED_SUPPORT_ROLES
+            ]
+            if not eligible:
+                errors.append(
+                    f"{label} verified 不可只由 media／market_estimate 支持")
+        if _valid_date(claim.get("as_of")):
+            for source_id in (claim["supporting_source_ids"]
+                              + claim["contrary_source_ids"]):
+                source = source_by_id.get(source_id) or {}
+                source_as_of = source.get("published_at") or source.get("captured_at")
+                if (_valid_date(source_as_of) and source_as_of > claim["as_of"]):
+                    errors.append(
+                        f"{label} as_of 早於引用來源 {source_id} 的資訊日期 {source_as_of}")
+        if claim.get("label") == "unverified" and not claim.get("verification_needed"):
+            errors.append(f"{label} 待驗證 claim 必須填 verification_needed")
+        if (claim.get("label") == "verified" and claim["contrary_source_ids"]
+                and not claim.get("resolution")):
+            errors.append(f"{label} 有 contrary source 時必須填 resolution")
+        claim["label_text"] = CLAIM_LABELS.get(claim.get("label"), claim.get("label", ""))
+        claim["status_text"] = {
+            "active": "現行", "superseded": "已取代", "refuted": "已推翻",
+        }.get(claim.get("status"), claim.get("status", ""))
+        claims.append(claim)
+    active_claims = [claim for claim in claims if claim.get("status") == "active"]
+    if is_closed:
+        if not active_claims:
+            errors.append("closed schema v3 至少需要 1 個 active final claim")
+        if any(claim.get("label") == "unverified" for claim in active_claims):
+            errors.append("closed schema v3 不可保留 active unverified claim")
+    else:
+        if len(active_claims) < 2:
+            errors.append("schema v3 至少需要 2 個 active research_claim")
+        missing_labels = {"verified", "unverified"} - {
+            claim.get("label") for claim in active_claims}
+        if missing_labels:
+            errors.append(
+                "schema v3 的 claim ledger 至少必須包含證實與待驗證；缺少:"
+                + "、".join(
+                    CLAIM_LABELS[label] for label in CLAIM_LABELS
+                    if label in missing_labels))
+
+    claim_by_id = {claim.get("claim_id"): claim for claim in claims}
+    active_claim_source_ids = {
+        source_id
+        for claim in active_claims
+        for key in ("supporting_source_ids", "contrary_source_ids")
+        for source_id in claim.get(key, [])
+        if (source_by_id.get(source_id) or {}).get("status") == "active"
+    }
+    minimum_claim_sources = 1 if is_closed else 2
+    if len(active_claim_source_ids) < minimum_claim_sources:
+        errors.append(
+            f"schema v3 至少需要 {minimum_claim_sources} 個被 active claim 實際引用的來源")
+    thesis_claim_id = meta.get("thesis_claim_id")
+    if thesis_claim_id not in claim_by_id:
+        errors.append(f"schema v3 thesis_claim_id 找不到:{thesis_claim_id or '-'}")
+    else:
+        thesis_claim = claim_by_id[thesis_claim_id]
+        if thesis_claim.get("status") != "active":
+            errors.append("schema v3 thesis_claim_id 必須指向 active claim")
+        if thesis_claim.get("label") == "unverified":
+            errors.append("schema v3 thesis_claim_id 不可指向 unverified claim")
+        thesis_source_ids = {
+            source_id
+            for key in ("supporting_source_ids", "contrary_source_ids")
+            for source_id in thesis_claim.get(key, [])
+            if (source_by_id.get(source_id) or {}).get("status") == "active"
+        }
+        independence = {
+            _source_independence_key(source_by_id[source_id])
+            for source_id in thesis_source_ids if source_id in source_by_id
+        }
+        if len(independence) < 2:
+            warnings.append(
+                "schema v3 主命題證據只有一個獨立來源群組；尚未形成交叉驗證")
+
+    forward_links = {}
+    reverse_links = {}
+    for claim in claims:
+        claim_id = claim.get("claim_id")
+        kind = claim.get("correction_kind") or ""
+        target_id = claim.get("corrects_claim_id") or ""
+        corrected_by = claim.get("corrected_by_claim_id") or ""
+        if bool(kind) != bool(target_id):
+            errors.append(
+                f"research_claim {claim_id} correction_kind 與 corrects_claim_id 必須同時填寫")
+        elif kind:
+            if kind not in {"supersedes", "refutes"}:
+                errors.append(
+                    f"research_claim {claim_id} correction_kind 不在值域:{kind}")
+            elif not CLAIM_ID_RE.fullmatch(target_id):
+                errors.append(
+                    f"research_claim {claim_id} corrects_claim_id 格式錯誤:{target_id}")
+            else:
+                forward_links[claim_id] = (kind, target_id)
+            if f"correction_of:{target_id}" not in (claim.get("basis") or ""):
+                errors.append(
+                    f"research_claim {claim_id} basis 必須標明 correction_of:{target_id}")
+        elif re.search(r"(?<![A-Z0-9])correction_of:C[1-9]\d*", claim.get("basis") or ""):
+            errors.append(
+                f"research_claim {claim_id} basis 有 correction_of 但缺少結構化修正欄位")
+        if corrected_by:
+            if not CLAIM_ID_RE.fullmatch(corrected_by):
+                errors.append(
+                    f"research_claim {claim_id} corrected_by_claim_id 格式錯誤:{corrected_by}")
+            else:
+                reverse_links[claim_id] = corrected_by
+        if claim.get("status") in {"superseded", "refuted"} and not corrected_by:
+            errors.append(
+                f"research_claim {claim_id} 歷史狀態必須填 corrected_by_claim_id")
+        if claim.get("status") == "active" and corrected_by:
+            errors.append(
+                f"research_claim {claim_id} active 狀態不可填 corrected_by_claim_id")
+    for claim_id, (verb, target_id) in forward_links.items():
+        target = claim_by_id.get(target_id)
+        expected_status = "superseded" if verb == "supersedes" else "refuted"
+        if not target:
+            errors.append(f"research_claim {claim_id} corrects_claim_id 找不到:{target_id}")
+        elif target_id == claim_id:
+            errors.append(f"research_claim {claim_id} 不可修正自己")
+        elif target.get("status") != expected_status:
+            errors.append(
+                f"research_claim {claim_id} 的 {verb} 目標必須標為 {expected_status}")
+        if reverse_links.get(target_id) != claim_id:
+            errors.append(
+                f"research_claim {claim_id} 與 {target_id} 的修正關係未雙向對齊")
+    for claim_id, correcting_id in reverse_links.items():
+        expected_kind = (
+            "supersedes" if (claim_by_id.get(claim_id) or {}).get("status") == "superseded"
+            else "refutes")
+        if forward_links.get(correcting_id) != (expected_kind, claim_id):
+            errors.append(
+                f"research_claim {claim_id} 與 {correcting_id} 的修正關係未雙向對齊")
+
+    for start_id in forward_links:
+        seen_chain = set()
+        current_id = start_id
+        while current_id in forward_links:
+            if current_id in seen_chain:
+                errors.append(f"research_claim 修正關係形成循環:{start_id}")
+                break
+            seen_chain.add(current_id)
+            current_id = forward_links[current_id][1]
+
+    comparisons, observation_ids = [], set()
+    comparison_allowed = {
+        "comparison_id", "observation_id", "claim_id", "entity", "metric",
+        "reported_value", "period_start", "period_end", "period_basis", "unit",
+        "definition_key", "definition", "evidence_ids", "comparability",
+        "comparability_reason", "normalization_method", "normalized_value",
+        "normalized_unit", "comparison_kind", "value_kind",
+        "normalized_period_start", "normalized_period_end",
+        "normalized_definition_key",
+    }
+    comparison_required = (
+        "comparison_id", "observation_id", "claim_id", "entity", "metric",
+        "reported_value", "period_start", "period_end", "period_basis", "unit",
+        "definition_key", "definition", "evidence_ids", "comparability",
+        "comparability_reason",
+    )
+    for idx, body in enumerate(COMPARISON_RE.findall(text), 1):
+        label = f"metric_comparison {idx}"
+        comparison = _parse_contract_fields(body, comparison_allowed, label, errors)
+        _require_fields(comparison, comparison_required, label, errors)
+        comparison_id = comparison.get("comparison_id", "")
+        if comparison_id and not COMPARISON_ID_RE.fullmatch(comparison_id):
+            errors.append(f"{label} comparison_id 格式錯誤:{comparison_id}")
+        observation_id = comparison.get("observation_id", "")
+        if observation_id and not OBSERVATION_ID_RE.fullmatch(observation_id):
+            errors.append(f"{label} observation_id 格式錯誤:{observation_id}")
+        elif observation_id in observation_ids:
+            errors.append(f"{label} observation_id 重複:{observation_id}")
+        else:
+            observation_ids.add(observation_id)
+        if (comparison_id and observation_id
+                and not observation_id.startswith(comparison_id + "-O")):
+            errors.append(f"{label} observation_id 必須隸屬 comparison_id")
+        if comparison.get("claim_id") not in claim_by_id:
+            errors.append(f"{label} 找不到 claim_id:{comparison.get('claim_id') or '-'}")
+        linked_claim = claim_by_id.get(comparison.get("claim_id")) or {}
+        for key in ("period_start", "period_end"):
+            if comparison.get(key) and not _valid_date(comparison[key]):
+                errors.append(f"{label} {key} 不是 YYYY-MM-DD:{comparison[key]}")
+        if (all(_valid_date(comparison.get(key)) for key in ("period_start", "period_end"))
+                and comparison["period_start"] > comparison["period_end"]):
+            errors.append(f"{label} period_start 不可晚於 period_end")
+        if _valid_date(comparison.get("period_end")):
+            if (_valid_date(linked_claim.get("as_of"))
+                    and comparison["period_end"] > linked_claim["as_of"]):
+                errors.append(
+                    f"{label} period_end 不可晚於關聯 claim as_of:"
+                    f"{linked_claim['as_of']}")
+            if dt.date.fromisoformat(comparison["period_end"]) > as_of:
+                errors.append(
+                    f"{label} period_end 晚於研究判定日 {as_of.isoformat()}")
+        if (comparison.get("comparability")
+                and comparison["comparability"] not in COMPARABILITY):
+            errors.append(f"{label} comparability 不在值域:{comparison['comparability']}")
+        comparison["value_kind"] = comparison.get("value_kind") or "point"
+        if comparison["value_kind"] not in VALUE_KINDS:
+            errors.append(f"{label} value_kind 不在值域:{comparison['value_kind']}")
+        value = comparison.get("reported_value", "")
+        number = r"-?\d+(?:\.\d+)?"
+        if comparison["value_kind"] == "range":
+            match = re.fullmatch(rf"({number})\.\.({number})", value)
+            if not match:
+                errors.append(f"{label} range reported_value 必須是 min..max 數字")
+            elif float(match.group(1)) > float(match.group(2)):
+                errors.append(f"{label} range reported_value 下限不可大於上限")
+        elif not re.fullmatch(number, value):
+            errors.append(f"{label} reported_value 必須是可重算數字")
+        comparison["comparison_kind"] = comparison.get("comparison_kind") or "aligned_metric"
+        if comparison["comparison_kind"] not in COMPARISON_KINDS:
+            errors.append(
+                f"{label} comparison_kind 不在值域:{comparison['comparison_kind']}")
+        comparison["evidence_ids"] = source_refs(
+            comparison.get("evidence_ids"), label,
+            require_active=linked_claim.get("status") == "active")
+        linked_evidence = set(
+            linked_claim.get("supporting_source_ids", [])
+            + linked_claim.get("contrary_source_ids", []))
+        extra_evidence = set(comparison["evidence_ids"]) - linked_evidence
+        if extra_evidence:
+            errors.append(
+                f"{label} evidence_ids 未納入關聯 claim 的證據鏈:"
+                + ",".join(sorted(extra_evidence)))
+        comparison["claim_status"] = linked_claim.get("status")
+        if comparison.get("comparability") == "normalized_comparable":
+            _require_fields(
+                comparison, (
+                    "normalization_method", "normalized_value", "normalized_unit",
+                    "normalized_period_start", "normalized_period_end",
+                    "normalized_definition_key",
+                ),
+                label, errors)
+        if (comparison.get("normalized_value")
+                and not re.fullmatch(number, comparison["normalized_value"])):
+            errors.append(f"{label} normalized_value 必須是可重算數字")
+        for key in ("normalized_period_start", "normalized_period_end"):
+            if comparison.get(key) and not _valid_date(comparison[key]):
+                errors.append(f"{label} {key} 不是 YYYY-MM-DD:{comparison[key]}")
+        if (all(_valid_date(comparison.get(key)) for key in (
+                "normalized_period_start", "normalized_period_end"))
+                and comparison["normalized_period_start"]
+                > comparison["normalized_period_end"]):
+            errors.append(
+                f"{label} normalized_period_start 不可晚於 normalized_period_end")
+        if _valid_date(comparison.get("normalized_period_end")):
+            if (_valid_date(linked_claim.get("as_of"))
+                    and comparison["normalized_period_end"] > linked_claim["as_of"]):
+                errors.append(
+                    f"{label} normalized_period_end 不可晚於關聯 claim as_of:"
+                    f"{linked_claim['as_of']}")
+            if dt.date.fromisoformat(comparison["normalized_period_end"]) > as_of:
+                errors.append(
+                    f"{label} normalized_period_end 晚於研究判定日 "
+                    f"{as_of.isoformat()}")
+        comparison["comparability_text"] = COMPARABILITY.get(
+            comparison.get("comparability"), comparison.get("comparability", ""))
+        comparisons.append(comparison)
+    has_cross_company = meta.get("cross_company_numbers")
+    if has_cross_company not in {"true", "false"}:
+        errors.append("schema v3 cross_company_numbers 必須是 true 或 false")
+    elif has_cross_company == "true" and not comparisons:
+        errors.append("cross_company_numbers=true 時至少需要一個 metric_comparison")
+    elif has_cross_company == "false" and comparisons:
+        errors.append("cross_company_numbers=false 不可同時宣告 metric_comparison")
+
+    grouped = defaultdict(list)
+    for observation in comparisons:
+        grouped[observation.get("comparison_id")].append(observation)
+    for comparison_id, rows in grouped.items():
+        label = f"metric_comparison {comparison_id}"
+        if len({row.get("entity") for row in rows}) < 2:
+            errors.append(f"{label} 至少需要 2 個不同 entity")
+        if len(rows) != len({row.get("entity") for row in rows}):
+            errors.append(f"{label} 同一 entity 不可重複 observation")
+        for key in ("claim_id", "comparability", "comparison_kind"):
+            if len({row.get(key) for row in rows}) != 1:
+                errors.append(f"{label} 所有 observation 的 {key} 必須一致")
+        kind = rows[0].get("comparison_kind") if rows else "aligned_metric"
+        if kind == "aligned_metric" and len({row.get("metric") for row in rows}) != 1:
+            errors.append(f"{label} aligned_metric 的 metric 必須一致")
+        if kind == "heterogeneous_evidence":
+            if rows and rows[0].get("comparability") != "not_comparable":
+                errors.append(
+                    f"{label} heterogeneous_evidence 只能標為 not_comparable")
+            if len({row.get("metric") for row in rows}) < 2:
+                errors.append(
+                    f"{label} heterogeneous_evidence 至少需要 2 種不同 metric")
+        if rows and rows[0].get("comparability") == "directly_comparable":
+            for key in (
+                    "period_start", "period_end", "period_basis", "unit",
+                    "definition_key", "definition"):
+                if len({row.get(key) for row in rows}) != 1:
+                    errors.append(f"{label} 標為可直接比較但 {key} 不一致")
+        if rows and rows[0].get("comparability") == "normalized_comparable":
+            for key in (
+                    "normalized_unit", "normalized_period_start", "normalized_period_end",
+                    "normalized_definition_key"):
+                if len({row.get(key) for row in rows}) != 1:
+                    errors.append(f"{label} 正規化後的 {key} 必須一致")
+        if not re.search(rf"(?<![A-Z0-9]){re.escape(comparison_id)}(?![A-Z0-9-])", visible_text):
+            errors.append(
+                f"{label} 必須在可見正文以 ID 標註對應的跨公司數字段落")
+
+    monitoring, monitor_ids = [], set()
+    monitor_allowed = {
+        "monitor_id", "claim_ids", "metric", "source_ids", "frequency", "next_check",
+        "trigger", "invalidation", "status", "frequency_detail", "retired_at",
+        "retirement_reason", "watch_source_ids",
+    }
+    monitor_required = (
+        "monitor_id", "status", "claim_ids", "metric", "source_ids", "frequency",
+        "next_check", "trigger", "invalidation",
+    )
+    for idx, body in enumerate(MONITOR_RE.findall(text), 1):
+        label = f"monitoring_item {idx}"
+        monitor = _parse_contract_fields(body, monitor_allowed, label, errors)
+        _require_fields(monitor, monitor_required, label, errors)
+        monitor_id = monitor.get("monitor_id", "")
+        if monitor_id and not MONITOR_ID_RE.fullmatch(monitor_id):
+            errors.append(f"{label} monitor_id 格式錯誤:{monitor_id}")
+        elif monitor_id in monitor_ids:
+            errors.append(f"{label} monitor_id 重複:{monitor_id}")
+        else:
+            monitor_ids.add(monitor_id)
+        if monitor.get("status") and monitor["status"] not in MONITOR_STATUSES:
+            errors.append(f"{label} status 不在值域:{monitor['status']}")
+        is_active = monitor.get("status") == "active"
+        monitor["source_ids"] = source_refs(
+            monitor.get("source_ids"), label, require_active=is_active)
+        monitor["watch_source_ids"] = source_refs(
+            monitor.get("watch_source_ids"), label, required=is_active,
+            require_active=is_active)
+        if (is_active and monitor["watch_source_ids"]
+                and not any(
+                    (source_by_id.get(source_id) or {}).get("source_kind")
+                    == "living_index"
+                    for source_id in monitor["watch_source_ids"])):
+            errors.append(
+                f"{label} active monitor 的 watch_source_ids 至少需要一個 living_index")
+        monitor["claim_ids"] = _csv_values(monitor.get("claim_ids"))
+        if not monitor["claim_ids"]:
+            errors.append(f"{label} 至少需要一個 claim_id")
+        for claim_id in monitor["claim_ids"]:
+            if claim_id not in claim_by_id:
+                errors.append(f"{label} 找不到 claim_id:{claim_id}")
+            elif is_active and claim_by_id[claim_id].get("status") != "active":
+                errors.append(f"{label} active monitor 不可追蹤歷史 claim:{claim_id}")
+        if monitor.get("frequency") and monitor["frequency"] not in MONITOR_FREQUENCIES:
+            errors.append(f"{label} frequency 不在值域:{monitor['frequency']}")
+        if monitor.get("next_check") and not _valid_date(monitor["next_check"]):
+            errors.append(f"{label} next_check 不是 YYYY-MM-DD:{monitor['next_check']}")
+        if monitor.get("status") == "retired":
+            _require_fields(
+                monitor, ("retired_at", "retirement_reason"), label, errors)
+            if monitor.get("retired_at") and not _valid_date(monitor["retired_at"]):
+                errors.append(f"{label} retired_at 不是 YYYY-MM-DD:{monitor['retired_at']}")
+            elif (_valid_date(monitor.get("retired_at"))
+                  and dt.date.fromisoformat(monitor["retired_at"]) > as_of):
+                errors.append(f"{label} retired_at 晚於研究判定日 {as_of.isoformat()}")
+        monitoring.append(monitor)
+    active_monitoring = [item for item in monitoring if item.get("status") == "active"]
+    if is_closed and active_monitoring:
+        errors.append("closed schema v3 不可保留 active monitoring_item")
+    elif not is_closed and len(active_monitoring) < 2:
+        errors.append("schema v3 至少需要 2 個 active monitoring_item")
+
+    signatures = set()
+    for monitor in active_monitoring:
+        signature = (
+            tuple(monitor.get("claim_ids") or []), monitor.get("metric"),
+            tuple(monitor.get("source_ids") or []), monitor.get("frequency"),
+            tuple(monitor.get("watch_source_ids") or []),
+            monitor.get("next_check"), monitor.get("trigger"), monitor.get("invalidation"),
+        )
+        if signature in signatures:
+            errors.append("active monitoring_item 不可只改 ID 後重複")
+        signatures.add(signature)
+
+    due_dates = [monitor.get("next_check") for monitor in active_monitoring
+                 if _valid_date(monitor.get("next_check"))]
+    if not is_closed and due_dates and meta.get("review_due") != min(due_dates):
+        errors.append("schema v3 review_due 必須等於所有 monitoring_item 最早的 next_check")
+
+    ledger_referenced = {
+        source_id
+        for claim in active_claims
+        for key in ("supporting_source_ids", "contrary_source_ids")
+        for source_id in claim.get(key, [])
+        if (source_by_id.get(source_id) or {}).get("status") == "active"
+    }
+    ledger_accepted = [source_by_id[source_id].get("accepted_at")
+                       for source_id in ledger_referenced
+                if _valid_date(source_by_id[source_id].get("accepted_at"))]
+    ledger_last_evidence_at = max(ledger_accepted) if ledger_accepted else None
+    thesis = claim_by_id.get(thesis_claim_id) or {}
+    thesis_referenced = {
+        source_id
+        for key in ("supporting_source_ids", "contrary_source_ids")
+        for source_id in thesis.get(key, [])
+        if (source_by_id.get(source_id) or {}).get("status") == "active"
+    }
+    thesis_accepted = [source_by_id[source_id].get("accepted_at")
+                       for source_id in thesis_referenced
+                       if _valid_date(source_by_id[source_id].get("accepted_at"))]
+    last_evidence_at = max(thesis_accepted) if thesis_accepted else None
+    if not last_evidence_at:
+        errors.append("schema v3 無法由 active thesis claim source 推導 last_evidence_at")
+    if (_valid_date(last_evidence_at) and _valid_date(meta.get("last_reviewed_at"))
+            and last_evidence_at > meta["last_reviewed_at"]):
+        errors.append("衍生 last_evidence_at 不可晚於 last_reviewed_at")
+    if (_valid_date(last_evidence_at) and _valid_date(meta.get("review_due"))
+            and last_evidence_at >= meta["review_due"]):
+        errors.append("新增 evidence 後必須把 review_due 往 last_evidence_at 之後移動")
+
+    return (sources, claims, comparisons, monitoring, last_evidence_at,
+            ledger_last_evidence_at)
 
 
 def _hypothesis_ids(reports):
@@ -204,7 +923,7 @@ def _hypothesis_ids(reports):
     }
 
 
-def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
+def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None, as_of=None):
     """解析單一候選議題；議題只負責路由，不把主張升格成正式公司事實。"""
     universe_rows = universe_rows if universe_rows is not None else _load_universe()
     group_ids = group_ids if group_ids is not None else _load_groups()
@@ -212,11 +931,41 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
     universe = {row["stock_id"]: row for row in universe_rows}
     known_hypotheses = _hypothesis_ids(reports)
     errors, warnings = [], []
-
+    if as_of is None:
+        as_of = taipei_today()
+    elif isinstance(as_of, dt.datetime):
+        as_of = as_of.date()
+    elif isinstance(as_of, str) and _valid_date(as_of):
+        as_of = dt.date.fromisoformat(as_of)
+    elif not isinstance(as_of, dt.date):
+        errors.append("as_of 必須是 date、datetime 或 YYYY-MM-DD")
+        as_of = taipei_today()
     matches = TOPIC_META_RE.findall(text)
     if len(matches) != 1:
         errors.append("每個議題必須且只能有一個 research_topic meta")
-    meta = _parse_fields(matches[0]) if matches else {}
+    raw_meta = matches[0] if matches else ""
+    version_values = re.findall(
+        r"^\s*schema_version\s*:\s*([^\r\n]+?)\s*$", raw_meta, re.M)
+    if len(version_values) != 1:
+        errors.append("research_topic meta 的 schema_version 必須且只能出現一次")
+    # 任一重複值宣告 v3 時仍走最嚴格 parser，不能用最後一個 v2 覆蓋繞過契約。
+    schema_version = (version_values[0] if len(version_values) == 1
+                      else "3" if "3" in version_values
+                      else version_values[-1] if version_values else "")
+    meta = _parse_fields(raw_meta) if matches else {}
+    if schema_version == "3" and matches:
+        meta_allowed = {
+            "topic_id", "schema_version", "status", "priority", "captured_at",
+            "source_published_at", "last_reviewed_at", "review_due", "source_type",
+            "publisher", "publisher_domain", "canonical_url", "source_chain_id",
+            "stock_ids", "group_ids", "trigger_type", "evidence_role", "route",
+            "thesis_claim_id", "base_confidence", "confidence_basis",
+            "cross_company_numbers", "schema_migrated_at",
+        }
+        meta = _parse_contract_fields(
+            matches[0], meta_allowed, "research_topic meta", errors)
+    if schema_version:
+        meta["schema_version"] = schema_version
     required = (
         "topic_id", "schema_version", "status", "priority", "captured_at",
         "source_published_at", "last_reviewed_at", "review_due", "source_type",
@@ -227,17 +976,23 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
         if not meta.get(key):
             errors.append(f"research_topic meta 缺少必填欄位:{key}")
 
+    if schema_version == "3":
+        for key in ("thesis_claim_id", "base_confidence", "confidence_basis",
+                    "cross_company_numbers"):
+            if not meta.get(key):
+                errors.append(f"research_topic meta 缺少必填欄位:{key}")
+
     topic_id = meta.get("topic_id", "")
     if topic_id and not TOPIC_ID_RE.fullmatch(topic_id):
         errors.append(f"topic_id 格式錯誤:{topic_id}")
     schema_version = meta.get("schema_version")
-    if schema_version and schema_version not in {"1", "2"}:
-        errors.append("schema_version 必須是 1 或 2")
-    if (schema_version == "1" and _valid_date(meta.get("captured_at"))
-            and dt.date.fromisoformat(meta["captured_at"]) >= V2_CUTOVER_DATE):
+    if schema_version and schema_version not in {"1", "2", "3"}:
+        errors.append("schema_version 必須是 1、2 或 3")
+    if (schema_version != "3" and _valid_date(meta.get("captured_at"))
+            and dt.date.fromisoformat(meta["captured_at"]) >= V3_CUTOVER_DATE):
         errors.append(
-            f"{V2_CUTOVER_DATE.isoformat()} 起新建議題必須使用 schema_version: 2")
-    if schema_version == "2":
+            f"{V3_CUTOVER_DATE.isoformat()} 起新建議題必須使用 schema_version: 3")
+    if schema_version in {"2", "3"}:
         errors.extend(_validate_beginner_section(text))
     if meta.get("status") and meta["status"] not in TOPIC_STATUSES:
         errors.append(f"status 不在值域:{meta['status']}")
@@ -249,11 +1004,18 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
         errors.append(f"evidence_role 不在值域:{meta['evidence_role']}")
     if meta.get("route") and meta["route"] not in ROUTES:
         errors.append(f"route 不在值域:{meta['route']}")
+    if (schema_version == "3" and meta.get("base_confidence")
+            and meta["base_confidence"] not in {"high", "medium", "low"}):
+        errors.append(f"base_confidence 不在值域:{meta['base_confidence']}")
 
-    for key in ("source_published_at", "captured_at", "last_reviewed_at", "review_due"):
+    for key in ("source_published_at", "captured_at", "last_reviewed_at", "review_due",
+                "schema_migrated_at"):
         value = meta.get(key)
         if value and not _valid_date(value):
             errors.append(f"{key} 不是 YYYY-MM-DD:{value}")
+        elif (key != "review_due" and _valid_date(value)
+              and dt.date.fromisoformat(value) > as_of):
+            errors.append(f"{key} 晚於研究判定日 {as_of.isoformat()}")
     if (_valid_date(meta.get("source_published_at"))
             and _valid_date(meta.get("captured_at"))
             and meta["source_published_at"] > meta["captured_at"]):
@@ -266,6 +1028,12 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
             and _valid_date(meta.get("review_due"))
             and meta["review_due"] < meta["captured_at"]):
         errors.append("review_due 不可早於 captured_at")
+    if (schema_version == "3"
+            and meta.get("status") not in {"dismissed", "resolved"}
+            and _valid_date(meta.get("last_reviewed_at"))
+            and _valid_date(meta.get("review_due"))
+            and meta["review_due"] <= meta["last_reviewed_at"]):
+        errors.append("schema v3 review_due 必須晚於 last_reviewed_at")
 
     canonical_url = meta.get("canonical_url", "")
     if canonical_url:
@@ -331,7 +1099,15 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
     if set(declared_groups) != impact_groups:
         errors.append("meta group_ids 必須等於所有 impact group_id 聯集")
 
-    transitions = [_parse_fields(body) for body in TRANSITION_RE.findall(text)]
+    if schema_version == "3":
+        transition_allowed = {"date", "from", "to", "reason", "evidence"}
+        transitions = [
+            _parse_contract_fields(
+                body, transition_allowed, f"transition {idx}", errors)
+            for idx, body in enumerate(TRANSITION_RE.findall(text), 1)
+        ]
+    else:
+        transitions = [_parse_fields(body) for body in TRANSITION_RE.findall(text)]
     if not transitions:
         errors.append("議題必須保留至少一筆 transition")
     state, previous_date = "initial", None
@@ -339,6 +1115,8 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
         value = transition.get("date")
         if not _valid_date(value):
             errors.append(f"transition {idx} 日期不合法")
+        elif dt.date.fromisoformat(value) > as_of:
+            errors.append(f"transition {idx} 日期晚於研究判定日 {as_of.isoformat()}")
         elif previous_date and value < previous_date:
             errors.append(f"transition {idx} 日期早於前一筆")
         if transition.get("from") != state:
@@ -362,11 +1140,59 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
     if not impacts:
         warnings.append("尚無 impact；在完成產業/個股映射前不可路由進正式筆記")
 
+    sources, claims, comparisons, monitoring = [], [], [], []
+    last_evidence_at = ledger_last_evidence_at = None
+    if schema_version == "3":
+        (sources, claims, comparisons, monitoring, last_evidence_at,
+         ledger_last_evidence_at) = _analyse_v3_contract(
+            text, meta, errors, warnings, as_of)
+        known_source_ids = {source.get("source_id") for source in sources}
+        source_by_id = {source.get("source_id"): source for source in sources}
+        for idx, transition in enumerate(transitions, 1):
+            evidence = transition.get("evidence") or ""
+            is_initial = idx == 1 and transition.get("from") == "initial"
+            if is_initial:
+                expected = f"source_chain:{meta.get('source_chain_id') or ''}"
+                if evidence != expected:
+                    errors.append(
+                        f"transition {idx} initial evidence 必須等於 {expected}")
+                continue
+            evidence_ids = _transition_source_ids(evidence)
+            if evidence_ids is None:
+                errors.append(
+                    f"transition {idx} evidence 必須使用 sources:S1[,S2...]，"
+                    "source_chain 僅限 initial transition")
+                continue
+            for source_id in evidence_ids:
+                source = source_by_id.get(source_id)
+                if source_id not in known_source_ids:
+                    errors.append(f"transition {idx} evidence 找不到 source:{source_id}")
+                    continue
+                if (_valid_date(transition.get("date"))
+                        and _valid_date((source or {}).get("accepted_at"))
+                        and transition["date"] < source["accepted_at"]):
+                    errors.append(
+                        f"transition {idx} 日期早於 evidence {source_id} accepted_at")
+        confidence = _topic_confidence(meta, last_evidence_at, as_of)
+        if confidence["stale"]:
+            warnings.append(
+                f"review_due 已逾 {confidence['days_overdue']} 天且無新 evidence；"
+                f"可信度自動由 {confidence['declared_label']} 降為"
+                f"{confidence['effective_label']}")
+    else:
+        confidence = {
+            "declared": "unstructured", "declared_label": "未結構化",
+            "effective": "unstructured", "effective_label": "未結構化",
+            "stale": False, "days_overdue": 0, "reason": "legacy_schema",
+            "as_of": as_of.isoformat(), "last_evidence_at": "-",
+            "review_due": meta.get("review_due") or "-", "basis": "舊制未建立 v3 帳本",
+        }
+
     return {
         "path": path,
         "relpath": os.path.relpath(path, ROOT).replace("\\", "/"),
         "title": title,
-        "summary": _topic_summary(text) if schema_version == "2" else "",
+        "summary": _topic_summary(text) if schema_version in {"2", "3"} else "",
         "meta": meta,
         "topic_id": topic_id,
         "status": meta.get("status"),
@@ -377,13 +1203,21 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None):
         "group_ids": declared_groups,
         "impacts": impacts,
         "transitions": transitions,
+        "sources": sources,
+        "claims": claims,
+        "comparisons": comparisons,
+        "monitoring": monitoring,
+        "last_evidence_at": last_evidence_at,
+        "ledger_last_evidence_at": ledger_last_evidence_at,
+        "confidence": confidence,
         "quality_errors": errors,
         "quality_warnings": warnings,
         "quality_invalid": bool(errors),
     }
 
 
-def load_topics(topics_dir=TOPICS_DIR, universe_rows=None, group_ids=None, reports=None):
+def load_topics(topics_dir=TOPICS_DIR, universe_rows=None, group_ids=None, reports=None,
+                as_of=None, require_v3=True):
     universe_rows = universe_rows if universe_rows is not None else _load_universe()
     group_ids = group_ids if group_ids is not None else _load_groups()
     reports = reports or {}
@@ -394,7 +1228,13 @@ def load_topics(topics_dir=TOPICS_DIR, universe_rows=None, group_ids=None, repor
         if os.path.basename(path).startswith("_"):
             continue
         with open(path, encoding="utf-8") as handle:
-            topic = analyse_topic(path, handle.read(), universe_rows, group_ids, reports)
+            topic = analyse_topic(
+                path, handle.read(), universe_rows, group_ids, reports, as_of=as_of)
+        if require_v3 and topic.get("meta", {}).get("schema_version") != "3":
+            topic["quality_errors"].append(
+                "live research register 僅接受 schema_version: 3；"
+                "舊格式只供 analyse_topic 歷史相容")
+            topic["quality_invalid"] = True
         if topic["topic_id"] in seen:
             topic["quality_errors"].append(
                 f"topic_id 重複:{os.path.basename(seen[topic['topic_id']]['path'])}")
@@ -408,9 +1248,298 @@ def load_topics(topics_dir=TOPICS_DIR, universe_rows=None, group_ids=None, repor
     return topics
 
 
-def load_scan_log(path=SCAN_LOG, topic_ids=None):
+def audit_topic_history(previous_text, current_text):
+    """比較前版與現版 block；舊 ID 不可刪除或重寫，只能做合法 lifecycle transition。"""
+    errors = []
+    old_meta_match = TOPIC_META_RE.findall(previous_text)
+    new_meta_match = TOPIC_META_RE.findall(current_text)
+    old_meta = _parse_fields(old_meta_match[0]) if len(old_meta_match) == 1 else {}
+    new_meta = _parse_fields(new_meta_match[0]) if len(new_meta_match) == 1 else {}
+    both_v3 = (
+        old_meta.get("schema_version") == "3"
+        and new_meta.get("schema_version") == "3"
+    )
+
+    def records(pattern, id_key, text):
+        return {
+            item.get(id_key): item
+            for item in (_parse_fields(body) for body in pattern.findall(text))
+            if item.get(id_key)
+        }
+
+    specs = (
+        ("source", SOURCE_RE, "source_id", {"status"}, {
+            "active": {"active", "superseded", "rejected"},
+            "superseded": {"superseded"}, "rejected": {"rejected"},
+        }),
+        ("claim", CLAIM_RE, "claim_id", {
+            "status", "resolution", "corrected_by_claim_id",
+        }, {
+            "active": {"active", "superseded", "refuted"},
+            "superseded": {"superseded"}, "refuted": {"refuted"},
+        }),
+        ("comparison", COMPARISON_RE, "observation_id", set(), None),
+        ("monitor", MONITOR_RE, "monitor_id", {
+            "status", "retired_at", "retirement_reason",
+        }, {
+            "active": {"active", "retired"}, "retired": {"retired"},
+        }),
+    )
+    record_sets = {}
+    for kind, pattern, id_key, mutable, transitions in specs:
+        before = records(pattern, id_key, previous_text)
+        after = records(pattern, id_key, current_text)
+        record_sets[kind] = (before, after)
+        for record_id, old in before.items():
+            if record_id not in after:
+                errors.append(f"歷史 {kind} ID 不可刪除:{record_id}")
+                continue
+            new = after[record_id]
+            for key in set(old).union(new):
+                if key in mutable:
+                    continue
+                if new.get(key, "") != old.get(key, ""):
+                    errors.append(f"歷史 {kind} {record_id} immutable 欄位被改寫:{key}")
+            old_status = old.get("status") or "active"
+            new_status = new.get("status") or "active"
+            if transitions is not None:
+                if new_status not in transitions.get(old_status, {old_status}):
+                    errors.append(
+                        f"歷史 {kind} {record_id} lifecycle 不允許 "
+                        f"{old_status}→{new_status}")
+            if kind == "claim":
+                status_changed = old_status != new_status
+                if not status_changed and new.get("resolution", "") != old.get("resolution", ""):
+                    errors.append(f"歷史 claim {record_id} 未轉歷史狀態卻改寫 resolution")
+                if (not status_changed
+                        and new.get("corrected_by_claim_id", "")
+                        != old.get("corrected_by_claim_id", "")):
+                    errors.append(
+                        f"歷史 claim {record_id} 未轉歷史狀態卻改寫 "
+                        "corrected_by_claim_id")
+            if kind == "monitor" and old_status == new_status:
+                for key in ("retired_at", "retirement_reason"):
+                    if new.get(key, "") != old.get(key, ""):
+                        errors.append(f"歷史 monitor {record_id} 未退役卻改寫 {key}")
+
+    old_transitions = [_parse_fields(body) for body in TRANSITION_RE.findall(previous_text)]
+    new_transitions = [_parse_fields(body) for body in TRANSITION_RE.findall(current_text)]
+    transition_prefix_ok = (
+        not both_v3 or new_transitions[:len(old_transitions)] == old_transitions)
+    if both_v3 and not transition_prefix_ok:
+        errors.append("既有 transition 不可刪除、重排或改寫；只能在尾端追加")
+    appended_transitions = (
+        new_transitions[len(old_transitions):]
+        if both_v3 and transition_prefix_ok else [])
+
+    if both_v3:
+        current_source_ids = set(record_sets["source"][1])
+        revision_transition_sources = set()
+        for transition in appended_transitions:
+            source_ids = _transition_source_ids(transition.get("evidence"))
+            if source_ids and all(source_id in current_source_ids for source_id in source_ids):
+                revision_transition_sources.update(source_ids)
+        has_source_bound_revision = bool(revision_transition_sources)
+
+        old_visible = _visible_history_lines(previous_text)
+        new_visible = _visible_history_lines(current_text)
+        if (not _is_subsequence(old_visible, new_visible)
+                and not has_source_bound_revision):
+            errors.append(
+                "歷史可見正文不可靜默改寫；必須保留舊敘述或追加綁定 sources 的 "
+                "revision transition")
+
+        old_impacts = [_parse_fields(body) for body in IMPACT_RE.findall(previous_text)]
+        new_impacts = [_parse_fields(body) for body in IMPACT_RE.findall(current_text)]
+        if (not _is_subsequence(old_impacts, new_impacts)
+                and not has_source_bound_revision):
+            errors.append(
+                "歷史 impact 不可靜默改寫；必須保留舊 block 或追加綁定 sources 的 "
+                "revision transition")
+
+        immutable_meta = (
+            "topic_id", "schema_version", "captured_at", "source_published_at",
+            "source_type", "publisher", "publisher_domain", "canonical_url",
+            "source_chain_id", "schema_migrated_at",
+        )
+        for key in immutable_meta:
+            if old_meta.get(key, "") != new_meta.get(key, ""):
+                errors.append(f"歷史 research_topic meta immutable 欄位被改寫:{key}")
+
+        revision_meta = (
+            "priority", "stock_ids", "group_ids", "trigger_type", "evidence_role",
+            "route", "thesis_claim_id", "base_confidence", "confidence_basis",
+            "cross_company_numbers", "last_reviewed_at", "review_due",
+        )
+        changed_meta = [
+            key for key in revision_meta
+            if old_meta.get(key, "") != new_meta.get(key, "")
+        ]
+        if changed_meta and not has_source_bound_revision:
+            errors.append(
+                "research_topic meta 變更必須追加綁定 sources 的 revision transition:"
+                + ",".join(changed_meta))
+
+        old_sources, new_sources = record_sets["source"]
+        old_claims, new_claims = record_sets["claim"]
+
+        def thesis_evidence(meta, sources, claims):
+            claim = claims.get(meta.get("thesis_claim_id")) or {}
+            source_ids = {
+                source_id
+                for key in ("supporting_source_ids", "contrary_source_ids")
+                for source_id in _csv_values(claim.get(key))
+                if (sources.get(source_id) or {}).get("status", "active") == "active"
+            }
+            accepted = [
+                sources[source_id].get("accepted_at") for source_id in source_ids
+                if _valid_date((sources.get(source_id) or {}).get("accepted_at"))
+            ]
+            return source_ids, max(accepted) if accepted else None
+
+        old_thesis_sources, old_last_evidence = thesis_evidence(
+            old_meta, old_sources, old_claims)
+        new_thesis_sources, new_last_evidence = thesis_evidence(
+            new_meta, new_sources, new_claims)
+        fresh_thesis_sources = new_thesis_sources - set(old_sources)
+        has_new_thesis_evidence = bool(fresh_thesis_sources)
+        transition_sources = set()
+        for transition in appended_transitions:
+            evidence_ids = _transition_source_ids(transition.get("evidence"))
+            if evidence_ids:
+                transition_sources.update(evidence_ids)
+
+        if (_valid_date(old_meta.get("last_reviewed_at"))
+                and _valid_date(new_meta.get("last_reviewed_at"))
+                and new_meta["last_reviewed_at"] < old_meta["last_reviewed_at"]):
+            errors.append("last_reviewed_at 不可往回改寫")
+
+        confidence_rank = {"low": 0, "medium": 1, "high": 2}
+        freshness_changes = []
+        if (_valid_date(old_meta.get("last_reviewed_at"))
+                and _valid_date(new_meta.get("last_reviewed_at"))
+                and new_meta["last_reviewed_at"] > old_meta["last_reviewed_at"]):
+            freshness_changes.append("last_reviewed_at")
+        if (_valid_date(old_meta.get("review_due"))
+                and _valid_date(new_meta.get("review_due"))
+                and new_meta["review_due"] > old_meta["review_due"]):
+            freshness_changes.append("review_due")
+        if old_meta.get("thesis_claim_id") != new_meta.get("thesis_claim_id"):
+            freshness_changes.append("thesis_claim_id")
+            if new_meta.get("thesis_claim_id") in old_claims:
+                errors.append("thesis_claim_id 變更必須指向本次追加的新 claim")
+        if (confidence_rank.get(new_meta.get("base_confidence"), -1)
+                > confidence_rank.get(old_meta.get("base_confidence"), -1)):
+            freshness_changes.append("base_confidence")
+        if (old_meta.get("status") in {"dismissed", "resolved"}
+                and new_meta.get("status") not in {"dismissed", "resolved"}):
+            freshness_changes.append("status_reopened")
+        evidence_clock_advanced = (
+            has_new_thesis_evidence
+            and _valid_date(old_last_evidence)
+            and _valid_date(new_last_evidence)
+            and new_last_evidence > old_last_evidence
+        )
+        fresh_transition_sources = (
+            fresh_thesis_sources.intersection(transition_sources))
+        transition_clock_advanced = any(
+            _valid_date((new_sources.get(source_id) or {}).get("accepted_at"))
+            and (not _valid_date(old_last_evidence)
+                 or new_sources[source_id]["accepted_at"] > old_last_evidence)
+            for source_id in fresh_transition_sources
+        )
+        if freshness_changes and not evidence_clock_advanced:
+            errors.append(
+                "沒有 accepted_at 較前版更新、且由新主命題引用的 evidence，不得刷新:"
+                + ",".join(freshness_changes))
+        elif freshness_changes and not transition_clock_advanced:
+            errors.append("刷新可信度／期限的 revision transition 必須引用新增主命題 evidence")
+        if (has_new_thesis_evidence and _valid_date(old_last_evidence)
+                and _valid_date(new_last_evidence)
+                and new_last_evidence < old_last_evidence):
+            errors.append("新主命題 evidence clock 不可早於前版")
+    return errors
+
+
+def audit_git_topic_history(topics, baseline_ref):
+    """以 Git 前版作不可變基線；新檔略過，既有 v1/v2 可單向遷移到 v3。"""
+    check = subprocess.run(
+        ["git", "rev-parse", "--verify", f"{baseline_ref}^{{commit}}"],
+        cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if check.returncode:
+        return [f"baseline ref 無法解析:{baseline_ref}"]
+    by_relpath = {topic["relpath"]: topic for topic in topics}
+    global_errors = []
+    listing = subprocess.run(
+        ["git", "ls-tree", "-r", "--name-only", baseline_ref, "--",
+         "notes/research_topics"],
+        cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if listing.returncode:
+        return [f"baseline topic 清單無法讀取:{baseline_ref}"]
+    baseline_paths = {
+        path.strip() for path in listing.stdout.splitlines()
+        if path.strip().endswith(".md")
+        and not os.path.basename(path.strip()).startswith("_")
+    }
+    for relpath in sorted(baseline_paths - set(by_relpath)):
+        global_errors.append(f"歷史 topic 檔案不可刪除或重新命名:{relpath}")
+
+    for relpath, topic in by_relpath.items():
+        if relpath not in baseline_paths:
+            continue
+        prior = subprocess.run(
+            ["git", "show", f"{baseline_ref}:{relpath}"], cwd=ROOT,
+            capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if prior.returncode:
+            global_errors.append(f"baseline topic 無法讀取:{relpath}")
+            continue
+        with open(topic["path"], encoding="utf-8") as handle:
+            current_text = handle.read()
+        for issue in audit_topic_history(prior.stdout, current_text):
+            topic["quality_errors"].append(f"history:{issue}")
+            topic["quality_invalid"] = True
+
+    scan_relpath = os.path.relpath(SCAN_LOG, ROOT).replace("\\", "/")
+    prior_scan = subprocess.run(
+        ["git", "show", f"{baseline_ref}:{scan_relpath}"], cwd=ROOT,
+        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if prior_scan.returncode == 0:
+        if not os.path.exists(SCAN_LOG):
+            global_errors.append("歷史 scan_log.csv 不可刪除")
+        else:
+            with open(SCAN_LOG, encoding="utf-8") as handle:
+                current_scan = handle.read()
+            global_errors.extend(audit_scan_log_history(prior_scan.stdout, current_scan))
+    return global_errors
+
+
+def audit_scan_log_history(previous_text, current_text):
+    """scan rows are append-only: an existing scan_id and every field stay immutable."""
+    def rows_by_id(text):
+        return {
+            row.get("scan_id"): dict(row)
+            for row in csv.DictReader(io.StringIO(text))
+            if row.get("scan_id")
+        }
+
+    before = rows_by_id(previous_text)
+    after = rows_by_id(current_text)
+    errors = []
+    for scan_id, old in before.items():
+        if scan_id not in after:
+            errors.append(f"歷史 scan_id 不可刪除:{scan_id}")
+        elif after[scan_id] != old:
+            errors.append(f"歷史 scan_id 不可改寫:{scan_id}")
+    return errors
+
+
+def load_scan_log(path=SCAN_LOG, topic_ids=None, as_of=None):
     """讀取有證據的掃描紀錄；partial 明確不等於完整涵蓋窗口。"""
     topic_ids = set(topic_ids or [])
+    if as_of is None:
+        as_of = taipei_today()
+    elif isinstance(as_of, str) and _valid_date(as_of):
+        as_of = dt.date.fromisoformat(as_of)
     rows, errors = [], []
     if not os.path.exists(path):
         return {"rows": [], "latest": None, "errors": ["缺少 scan_log.csv"]}
@@ -439,6 +1568,10 @@ def load_scan_log(path=SCAN_LOG, topic_ids=None):
             if (all(_valid_date(row.get(k)) for k in ("scanned_at", "next_scan_due"))
                     and row["scanned_at"] > row["next_scan_due"]):
                 row_errors.append("scanned_at 晚於 next_scan_due")
+            for key in ("window_start", "window_end", "scanned_at"):
+                if (_valid_date(row.get(key))
+                        and dt.date.fromisoformat(row[key]) > as_of):
+                    row_errors.append(f"{key} 晚於研究判定日 {as_of.isoformat()}")
             if row.get("scope") not in {"full", "partial"}:
                 row_errors.append("scope 必須是 full 或 partial")
             if not _semicolon_values(row.get("source_domains")):
@@ -594,8 +1727,9 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
     notes = load_notes()
     reports = load_reports(notes=notes)
     groups = _load_groups()
-    topics = load_topics(topics_dir, universe_rows, groups, reports)
-    scan = load_scan_log(scan_log_path, [topic["topic_id"] for topic in topics])
+    topics = load_topics(topics_dir, universe_rows, groups, reports, as_of=as_of)
+    scan = load_scan_log(
+        scan_log_path, [topic["topic_id"] for topic in topics], as_of=as_of)
     end = as_of + dt.timedelta(days=horizon)
     items = []
 
@@ -955,6 +2089,8 @@ def main(argv=None):
     parser.add_argument("--db", default=DB, help="正式 SQLite 路徑（唯讀）")
     parser.add_argument("--output", help="UTF-8 輸出檔；省略則印 stdout")
     parser.add_argument("--json", action="store_true", help="--attention 輸出 JSON")
+    parser.add_argument(
+        "--baseline-ref", help="--lint 時比較 Git 前版，防止舊 source/claim/monitor 被重寫")
     args = parser.parse_args(argv)
 
     try:
@@ -970,8 +2106,12 @@ def main(argv=None):
         universe_rows = _load_universe()
         notes = load_notes()
         reports = load_reports(notes=notes)
-        topics = load_topics(TOPICS_DIR, universe_rows, _load_groups(), reports)
-        scan = load_scan_log(SCAN_LOG, [topic["topic_id"] for topic in topics])
+        topics = load_topics(
+            TOPICS_DIR, universe_rows, _load_groups(), reports, as_of=as_of)
+        scan = load_scan_log(
+            SCAN_LOG, [topic["topic_id"] for topic in topics], as_of=as_of)
+        if args.baseline_ref:
+            scan["errors"].extend(audit_git_topic_history(topics, args.baseline_ref))
         rendered, errors = render_lint(topics, scan)
         _write_output(rendered, args.output)
         return 1 if errors else 0

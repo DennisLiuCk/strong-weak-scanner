@@ -32,7 +32,9 @@ from qual_notes import (_extract_sections, load_notes, note_status, note_review_
                         TEMPLATE_VERSION as NOTE_TEMPLATE_VERSION)
 from leading_hypotheses import (HYPOTHESIS_STATUS_INFO,
                                 load_reports as load_hypothesis_reports)
-from research_queue import load_topics as load_research_topics
+from research_queue import (_topic_confidence as topic_confidence_at,
+                            load_topics as load_research_topics,
+                            taipei_today as research_today)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -1564,6 +1566,222 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
     }
 
 
+def _research_run(value, bold=False):
+    """研究中心合成表格使用與 Markdown parser 相同的 inline run 格式。"""
+    run = {"s": str(value if value not in (None, "") else "—")}
+    if bold:
+        run["b"] = True
+    return [run]
+
+
+def _inline_script_json(value):
+    """JSON 嵌入 script 時避開 HTML parser 的結束標籤與 entity 邊界。"""
+    return (json.dumps(value, ensure_ascii=False)
+            .replace("&", "\\u0026")
+            .replace("<", "\\u003c")
+            .replace(">", "\\u003e"))
+
+
+def _research_source_refs(source_ids, source_by_id):
+    labels = []
+    for source_id in source_ids or []:
+        source = source_by_id.get(source_id) or {}
+        title = source.get("title") or source.get("document") or ""
+        labels.append(f"{source_id} {title}".strip())
+    return "、".join(labels) or "—"
+
+
+def _topic_structured_sections(topic, sections):
+    """把 v3 ledger 轉成讀者可見段落；原始 Markdown blocks 仍是唯一事實來源。"""
+    sections = [section for section in (sections or []) if section.get("blocks")]
+    source_by_id = {
+        source.get("source_id") or source.get("id"): source
+        for source in topic.get("sources") or []
+        if source.get("source_id") or source.get("id")
+    }
+    generated = []
+
+    claims = topic.get("claims") or []
+    if claims:
+        rows = []
+        for claim in claims:
+            supporting = _research_source_refs(
+                claim.get("supporting_source_ids"), source_by_id)
+            contrary = _research_source_refs(
+                claim.get("contrary_source_ids"), source_by_id)
+            evidence = f"支持：{supporting}；反證：{contrary}"
+            next_step = claim.get("verification_needed") or "—"
+            if str(next_step).lower() == "none":
+                next_step = "—"
+            correction = []
+            if claim.get("corrects_claim_id"):
+                verb = ("取代" if claim.get("correction_kind") == "supersedes"
+                        else "推翻")
+                correction.append(f"{verb} {claim['corrects_claim_id']}")
+            if claim.get("corrected_by_claim_id"):
+                correction.append(f"由 {claim['corrected_by_claim_id']} 修正")
+            resolution = claim.get("resolution") or ""
+            if resolution and resolution.lower() not in {"active", "open"}:
+                correction.append(f"反證裁決：{resolution}")
+            rows.append([
+                _research_run(
+                    f"{claim.get('claim_id') or '—'}｜"
+                    f"{claim.get('label_text') or claim.get('label') or '—'}｜"
+                    f"{claim.get('status_text') or claim.get('status') or '—'}",
+                    bold=True,
+                ),
+                _research_run(claim.get("claim")),
+                _research_run(evidence),
+                _research_run(claim.get("basis")),
+                _research_run(claim.get("boundary")),
+                _research_run("；".join(correction) or "—"),
+                _research_run(next_step),
+            ])
+        generated.append({
+            "h": "主張—證據帳本",
+            "blocks": [
+                {"t": "p", "runs": _research_run(
+                    "「證實」只表示目前一手證據直接支持；「推論」與「待驗證」"
+                    "仍須依後續節點更新，不能當成個股訂單或報酬保證。")},
+                {"t": "table", "head": [
+                    _research_run("狀態"), _research_run("主張"),
+                    _research_run("支持／反證來源"), _research_run("查核／推論基礎"),
+                    _research_run("證據邊界"), _research_run("修正／反證裁決"),
+                    _research_run("下一步驗證"),
+                ], "rows": rows},
+            ],
+        })
+
+    impacts = topic.get("impacts") or []
+    if impacts:
+        rows = []
+        for item in impacts:
+            scope = item.get("group_id") or "—"
+            if item.get("stock_ids"):
+                scope += "｜" + "、".join(item["stock_ids"])
+            action = item.get("note_action") or "—"
+            if item.get("action_due"):
+                action += f"；期限 {item['action_due']}"
+            rows.append([
+                _research_run(scope, bold=True),
+                _research_run(item.get("direction")),
+                _research_run(action),
+                _research_run("、".join(item.get("hypothesis_refs") or []) or "—"),
+                _research_run(item.get("rationale")),
+                _research_run(item.get("evidence_boundary")),
+            ])
+        generated.append({
+            "h": "影響路由與證據邊界",
+            "blocks": [{"t": "table", "head": [
+                _research_run("族群／個股"), _research_run("方向"),
+                _research_run("筆記動作／期限"), _research_run("關聯假說"),
+                _research_run("路由理由"), _research_run("證據邊界"),
+            ], "rows": rows}],
+        })
+
+    comparisons = topic.get("comparisons") or []
+    if comparisons:
+        rows = []
+        for item in comparisons:
+            period = "～".join(filter(None, (
+                item.get("period_start"), item.get("period_end")))) or "—"
+            if item.get("period_basis"):
+                period += f"（{item['period_basis']}）"
+            value = str(item.get("reported_value") or "—")
+            if item.get("value_kind") == "range":
+                value = value.replace("..", "–")
+            elif item.get("value_kind") == "lower_bound":
+                value = ">" + value
+            elif item.get("value_kind") == "upper_bound":
+                value = "<" + value
+            if item.get("normalized_value"):
+                value += (f"；正規化 {item['normalized_value']} "
+                          f"{item.get('normalized_unit') or ''}").rstrip()
+            definition = f"{item.get('unit') or '—'}；{item.get('definition') or '—'}"
+            comparability = (
+                f"{item.get('comparability_text') or item.get('comparability') or '—'}："
+                f"{item.get('comparability_reason') or '—'}"
+            )
+            if item.get("normalization_method"):
+                comparability += f"；正規化方法：{item['normalization_method']}"
+            evidence = _research_source_refs(item.get("evidence_ids"), source_by_id)
+            claim_status = {
+                "active": "現行", "superseded": "已取代", "refuted": "已推翻",
+            }.get(item.get("claim_status"), item.get("claim_status") or "—")
+            rows.append([
+                _research_run(
+                    f"{item.get('comparison_id') or '—'}｜"
+                    f"{item.get('claim_id') or '—'}｜"
+                    f"{claim_status}",
+                    bold=True,
+                ),
+                _research_run(item.get("entity")),
+                _research_run(f"{item.get('metric') or '—'}：{value}"),
+                _research_run(period),
+                _research_run(definition),
+                _research_run(evidence),
+                _research_run(comparability),
+            ])
+        generated.append({
+            "h": "跨公司數字可比性",
+            "blocks": [{"t": "table", "head": [
+                _research_run("比較組／主張"), _research_run("公司／對象"),
+                _research_run("指標與原值"), _research_run("期間"),
+                _research_run("單位／定義"), _research_run("證據來源"),
+                _research_run("可比性／正規化"),
+            ], "rows": rows}],
+        })
+
+    monitoring = topic.get("monitoring") or []
+    if monitoring:
+        rows = []
+        for item in monitoring:
+            source_refs = _research_source_refs(item.get("source_ids"), source_by_id)
+            watch_refs = _research_source_refs(
+                item.get("watch_source_ids"), source_by_id)
+            schedule = item.get("frequency") or "—"
+            if item.get("frequency_detail"):
+                schedule += f"（{item['frequency_detail']}）"
+            if item.get("status") == "retired":
+                schedule += (
+                    f"；退役 {item.get('retired_at') or '—'}；"
+                    f"原因：{item.get('retirement_reason') or '—'}")
+            else:
+                schedule += f"；下次 {item.get('next_check') or '—'}"
+            rows.append([
+                _research_run(
+                    f"{item.get('monitor_id') or '—'}｜"
+                    f"{'現行' if item.get('status') == 'active' else '已退役'}",
+                    bold=True,
+                ),
+                _research_run("、".join(item.get("claim_ids") or []) or "—"),
+                _research_run(f"{item.get('metric') or '—'}；基準來源：{source_refs}"),
+                _research_run(watch_refs),
+                _research_run(schedule),
+                _research_run(item.get("trigger")),
+                _research_run(item.get("invalidation")),
+            ])
+        generated.append({
+            "h": "追蹤節點與失效條件",
+            "blocks": [{"t": "table", "head": [
+                _research_run("節點"), _research_run("關聯主張"),
+                _research_run("指標／基準來源"), _research_run("回查入口"),
+                _research_run("頻率／下次檢查"),
+                _research_run("觸發條件"), _research_run("失效條件"),
+            ], "rows": rows}],
+        })
+
+    if not generated:
+        return sections
+    beginner_index = next(
+        (index for index, section in enumerate(sections)
+         if section.get("h") == "新手先讀：這篇在講什麼"),
+        -1,
+    )
+    insertion = beginner_index + 1 if beginner_index >= 0 else 0
+    return sections[:insertion] + generated + sections[insertion:]
+
+
 def _research_reading_minutes(sections):
     """用實際可見中文字數估計閱讀時間；只作 UI 導覽，不是研究統計量。"""
     def walk(value):
@@ -1580,11 +1798,12 @@ def _research_reading_minutes(sections):
 
 
 def build_research_library(notes, reports, topics=None, stock_meta=None, group_names=None,
-                           events=None):
+                           events=None, as_of=None):
     """建立獨立研究中心 payload；事件錨點歸入市場議題，不另造第四種閱讀模式。"""
     stock_meta = stock_meta or {}
     group_names = group_names or {}
     articles = []
+    topic_by_article_id = {}
     type_order = {"formal_note": 0, "narrative": 1, "topic": 2}
 
     def stock_subject(stock_id):
@@ -1694,9 +1913,13 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
         if sections is None and topic.get("path") and os.path.exists(topic["path"]):
             with open(topic["path"], encoding="utf-8") as handle:
                 sections = _extract_sections(handle.read())
-        sections = sections or []
+        sections = _topic_structured_sections(topic, sections or [])
+        article_id = (
+            f"topic-{topic.get('topic_id') or os.path.basename(topic.get('relpath', 'topic'))}"
+        )
+        topic_by_article_id[article_id] = topic
         add({
-            "id": f"topic-{topic.get('topic_id') or os.path.basename(topic.get('relpath', 'topic'))}",
+            "id": article_id,
             "type": "topic", "typeLabel": "市場議題", "date": topic_date,
             "stockIds": stock_ids, "subject": subject,
             "readerTitle": topic.get("title") or "市場議題",
@@ -1706,7 +1929,8 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
             "status": "候選議題・不等於正式公司事實", "statusTone": "observational",
             "statusKey": "observational",
             "groups": stock_groups(stock_ids, topic.get("group_ids")),
-            "sections": sections, "sources": [],
+            "sections": sections, "sources": topic.get("sources") or [],
+            "confidence": dict(topic.get("confidence") or {}),
             "sourceUrl": NOTE_REPO_BLOB + topic["relpath"],
             "meta": {
                 "capturedAt": topic.get("captured_at") or "-",
@@ -1759,6 +1983,34 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
             },
         })
 
+    article_anchor = max((item["date"] for item in articles), default=None)
+    if isinstance(as_of, dt.datetime):
+        passed_as_of = as_of.date()
+    else:
+        passed_as_of = as_of if isinstance(as_of, dt.date) else _article_date(as_of)
+    as_of_candidates = [value for value in (
+        _article_date(article_anchor), passed_as_of,
+    ) if value is not None]
+    library_as_of = max(as_of_candidates) if as_of_candidates else None
+    if library_as_of:
+        for article in articles:
+            topic = topic_by_article_id.get(article["id"])
+            if not topic:
+                continue
+            confidence = topic.get("confidence") or {}
+            if confidence.get("declared") in {"high", "medium", "low"}:
+                confidence = topic_confidence_at(
+                    topic.get("meta") or {}, topic.get("last_evidence_at"), library_as_of)
+            else:
+                confidence = dict(confidence)
+                confidence["as_of"] = library_as_of.isoformat()
+            article["confidence"] = confidence
+            article["searchText"] += " " + " ".join(str(value) for value in (
+                confidence.get("declared_label", ""),
+                confidence.get("effective_label", ""),
+                "已到期" if confidence.get("stale") else "",
+            )).strip().lower()
+
     articles.sort(key=lambda item: (
         -dt.date.fromisoformat(item["date"]).toordinal(),
         type_order[item["type"]], item["stockIds"][0] if item["stockIds"] else "",
@@ -1771,7 +2023,8 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
         for group in article["groups"]:
             group_counts[group] += 1
     return {
-        "anchor": max((item["date"] for item in articles), default=None),
+        "anchor": article_anchor,
+        "asOf": library_as_of.isoformat() if library_as_of else None,
         "total": len(articles),
         "counts": counts,
         "groups": [
@@ -1959,7 +2212,10 @@ def main():
     hypotheses_map = load_hypothesis_reports(HYPOTHESES_DIR, notes=notes_map)
     # 最近研究文章使用各層既有 parser 的可稽核 meta；不讀 git/檔案 mtime。
     # anchor 取市場資料日與文章日期較晚者，避免市場資料尚未換日時漏掉今天剛更新的文章。
-    research_topics = load_research_topics(TOPICS_DIR, reports=hypotheses_map)
+    # 研究 freshness 跟日曆日走，不跟最後交易日走；否則週末與休市日會延後降級。
+    research_as_of = research_today()
+    research_topics = load_research_topics(
+        TOPICS_DIR, reports=hypotheses_map, as_of=research_as_of)
     stock_names = {r["stock_id"]: r["name"] for r in rows}
     stock_meta = {
         r["stock_id"]: {"name": r["name"], "group": r["grp"], "biz": r["biz"] or ""}
@@ -1970,6 +2226,7 @@ def main():
     )
     research_library = build_research_library(
         notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM, events,
+        as_of=research_as_of,
     )
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
@@ -2362,7 +2619,7 @@ def main():
     html = html.replace("__DATES_JSON__", json.dumps(dates))
     research_html = open(RESEARCH_TEMPLATE, encoding="utf-8").read()
     research_html = research_html.replace(
-        "__RESEARCH_JSON__", json.dumps(research_library, ensure_ascii=False)
+        "__RESEARCH_JSON__", _inline_script_json(research_library)
     )
     research_html = research_html.replace("__DATE_ISO__", last)
     research_html = research_html.replace("__DATE__", date_str)

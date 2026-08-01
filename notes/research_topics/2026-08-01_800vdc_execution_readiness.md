@@ -2,7 +2,7 @@
 
 <!-- research_topic
 topic_id: MI-2026-08-01-800VDC-EXECUTION-READINESS
-schema_version: 1
+schema_version: 3
 status: triaged
 priority: p1
 captured_at: 2026-08-01
@@ -18,6 +18,11 @@ group_ids: power,powersupply,thermal
 trigger_type: architecture_update_and_validation
 evidence_role: candidate_source
 route: market_issue_watch
+thesis_claim_id: C4
+base_confidence: medium
+confidence_basis: 架構、展示與公司產品階段有一手資料，但客戶驗收、量產與財務貢獻尚未證實
+cross_company_numbers: false
+schema_migrated_at: 2026-08-02
 -->
 
 <!-- transition
@@ -32,8 +37,234 @@ date: 2026-08-01
 from: inbox
 to: triaged
 reason: separated_800v_validation_from_50v_shipments_and_2027_full_scale_timing
-evidence: source_chain:nvidia-800v-ecosystem-update-20260731
+evidence: sources:S1,S2,S3,S4,S5
 -->
+
+<!-- research_source
+source_id: S1
+role: company_release
+publisher: NVIDIA
+title: 800V HVDC architecture 技術文章
+published_at: 2025-05-20
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/
+locator: 1MW racks、2027 Kyber 與 full-scale production 段落
+limitation: 效率與 TCO 數字是架構目標，未提供客戶營運實績或量產數量
+-->
+
+<!-- research_source
+source_id: S2
+role: company_release
+publisher: NVIDIA
+title: GTC Taipei 800V power rack 與 hybrid bridge 更新
+published_at: 2026-06-01
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://blogs.nvidia.com/blog/nvidia-gtc-taipei-computex-2026-news/
+locator: 800VDC power rack 與 hybrid AC bridge 段落
+limitation: 參考設計與生態系列名不等於資料中心全面部署或供應商訂單
+-->
+
+<!-- research_source
+source_id: S3
+role: company_release
+publisher: Delta Electronics
+title: 台達電 GTC 800VDC 系統展示
+published_at: 2026-03-16
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.delta-americas.com/en-US/news/40116
+locator: 660kW power rack、480kW BBU 與 2.4MW CDU 展示規格
+limitation: 展示規格與公司效能主張不證實客戶驗收、量產數量、收入或毛利
+-->
+
+<!-- research_source
+source_id: S4
+role: company_release
+publisher: LITEON Technology
+title: 光寶科 2026Q1 結果與電源產品時程
+published_at: 2026-04-29
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.liteon.com/en/news/press-center/content/quarterly-first-eps-2026
+locator: 50V power rack、110kW power shelf 與 800V validation 段落
+limitation: 公司時程不等於驗證完成、量產出貨或客戶採購承諾
+-->
+
+<!-- research_source
+source_id: S5
+role: company_release
+publisher: LITEON Technology
+title: 光寶科 2026 年 6 月營收
+published_at: 2026-07-09
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.liteon.com/en/news/press-center/content/liteon-monthly-sales-june-2026
+locator: Cloud and AIoT 營收占比與成長段落
+limitation: 月營收沒有拆出 800V 產品，不能把整體 Cloud and AIoT 成長歸因於 800V
+-->
+
+<!-- research_source
+source_id: S6
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 公開資訊觀測站公司申報查詢入口
+published_at:
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://mops.twse.com.tw/mops/web/index
+locator: 2026-08-01 以台灣電源供應商代號重查重大訊息、法說與季度財報的入口
+limitation: 查詢入口會持續更新；入口本身不證明 800V 驗證、量產、訂單或財務貢獻
+-->
+
+<!-- research_claim
+claim_id: C1
+label: verified
+status: active
+claim: NVIDIA 仍把 1MW 以上機櫃與 800VDC full-scale production 錨定於 2027 Kyber 世代
+supporting_source_ids: S1
+contrary_source_ids:
+as_of: 2026-07-31
+basis: NVIDIA 更新後的技術文章直接提供架構定位與量產時鐘
+boundary: 這是平台商路線圖，不是已完成的客戶驗收、部署量或營收
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C2
+label: verified
+status: active
+claim: 台達電已展示 800VDC power rack、BBU 與 CDU 系統規格
+supporting_source_ids: S3
+contrary_source_ids:
+as_of: 2026-03-16
+basis: 公司官方展示公告列出系統與功率規格
+boundary: 證實的是展示內容，不代表客戶訂單、量產、利用率或財務貢獻
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C3
+label: verified
+status: active
+claim: 光寶科表示 50V power rack 已量產、110kW power shelf 已出貨，而 800V power rack 預計在 2026 下半年進入驗證
+supporting_source_ids: S4
+contrary_source_ids:
+as_of: 2026-04-29
+basis: 公司季度結果直接區分量產、出貨與待驗證三個產品階段
+boundary: 50V 出貨不可改寫成 800V 出貨，預計驗證也不等於驗證完成
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C4
+label: inference
+status: active
+claim: 2026 年較合理的基準情境是 800VDC 從參考設計與展示走向驗證的過渡期，而非全面商用年
+supporting_source_ids: S1,S2,S3,S4
+contrary_source_ids:
+as_of: 2026-07-31
+basis: 平台量產時鐘仍在 2027，供應商證據分別停在展示、過渡產品量產與 800V 驗證
+boundary: 沒有全產業客戶驗收、部署數、出貨占比或供應商收入資料可估計轉換速度
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C5
+label: unverified
+status: active
+claim: 台達電、光寶科或其他台灣供應商已由 800VDC 取得可量化的大規模訂單與獲利
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-01
+basis: 現有來源是架構、展示、驗證時程與未拆分的 Cloud and AIoT 營收
+boundary: 不建立 800V 客戶、出貨量、收入占比、市占、毛利或朋程供應關係
+verification_needed: 需平台客戶驗收與台灣公司法說或財報雙向核對產品、數量及財務貢獻
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C6
+label: verified
+status: active
+claim: 光寶科 2026 年 6 月 Cloud and AIoT 營收年增逾 80%、占營收 56%，成長驅動包含高階伺服器電源與 BBU
+supporting_source_ids: S5
+contrary_source_ids:
+as_of: 2026-07-09
+basis: S5 直接揭露事業占比、年增幅與高階資料中心伺服器電源及 BBU 需求背景
+boundary: 公司沒有把 Cloud and AIoT 增量拆為 800V 產品收入，不能以此證明 800V 已出貨或貢獻獲利
+verification_needed:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T1
+status: active
+claim_ids: C1,C4
+metric: 800VDC 客戶驗證、資料中心部署與 2027 full-scale production 時程
+source_ids: S1,S2
+watch_source_ids: S6
+frequency: monthly
+frequency_detail: 每月平台更新與重大產品發布
+next_check: 2026-08-08
+trigger: NVIDIA 或客戶首次揭露通過驗收、部署機櫃數、功率規模或正式量產日期
+invalidation: 若 2027 時程延後或客戶持續只採 hybrid bridge，快速全面切換假說失效
+-->
+
+<!-- monitoring_item
+monitor_id: T2
+status: active
+claim_ids: C2,C3,C5,C6
+metric: 台灣電源供應商 800V 產品的驗證、出貨、收入占比與毛利
+source_ids: S3,S4,S5
+watch_source_ids: S6
+frequency: quarterly
+frequency_detail: 每季法說、財報與月營收後複核
+next_check: 2026-10-31
+trigger: 公司首次明確區分 800V 客戶驗證、量產數量及財務貢獻
+invalidation: 若成長只來自 50V 或其他 Cloud and AIoT 產品，800V 個股受惠映射維持未證
+-->
+
+## 新手先讀：這篇在講什麼
+
+### 名詞小字典
+
+- **800VDC**：以約 800 伏特直流電在資料中心傳送電力，目的是降低超高功率機櫃的電流、線材與轉換損耗。
+- **Power rack**：集中把資料中心電力轉換、分配給多個運算機櫃的電源系統，不等於伺服器本身。
+- **BBU**：電池備援單元，停電或負載突升時短暫供電，避免高功率 AI 機櫃中斷。
+- **驗證**：客戶測試產品是否符合規格與可靠度；開始驗證不等於驗證完成或已大量出貨。
+
+### 三句話抓重點
+
+- NVIDIA 仍把 800VDC full-scale production 放在 2027，2026 的證據主要是參考設計、系統展示與供應商驗證。
+- 台達電已展示高功率系統，光寶科則清楚區分 50V 已量產與 800V 待驗證，兩者不能混成同一個出貨故事。
+- 真正需要等待的是客戶驗收、正式量產數量，以及台灣供應商可辨識的收入與毛利，而不是更多合作夥伴名單。
+
+### 為什麼重要
+
+800VDC 可能改變資料中心從配電、電源轉換到備援與散熱的價值分配，但路線圖、展示、驗證與量產是完全不同的商業階段。若沒有先拆開，讀者很容易把 2027 的架構方向提前當成 2026 的訂單與獲利。
+
+### 接下來怎麼追
+
+- 追平台或客戶是否公布通過驗收、部署機櫃數、功率規模與正式量產日期。
+- 追台達電、光寶科法說是否首次拆出 800V 的客戶、出貨、收入占比與毛利，而非只談整體 AI 電源成長。
+
+### 想一想
+
+- 一項產品從展示走到驗證，再走到量產，哪一個階段最容易被市場提前重複計價？
+- 若 50V 過渡產品持續成長但 800V 驗證延後，這對供應商的收入與長期技術方向各代表什麼？
 
 ## 為何值得進佇列
 

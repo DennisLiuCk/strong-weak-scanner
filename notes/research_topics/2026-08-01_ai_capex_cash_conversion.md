@@ -2,7 +2,7 @@
 
 <!-- research_topic
 topic_id: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION
-schema_version: 2
+schema_version: 3
 status: triaged
 priority: p1
 captured_at: 2026-08-01
@@ -18,6 +18,11 @@ group_ids: serverodm,pcb,powersupply,thermal
 trigger_type: earnings_release
 evidence_role: candidate_source
 route: market_issue_watch
+thesis_claim_id: C2
+base_confidence: medium
+confidence_basis: 三家公司官方數字與公式可回溯，但期間和定義不同且台灣供應鏈映射未證
+cross_company_numbers: true
+schema_migrated_at: 2026-08-02
 -->
 
 <!-- transition
@@ -28,12 +33,366 @@ reason: hyperscaler_cash_and_capex_disclosures_captured
 evidence: source_chain:hyperscaler-capex-cash-conversion-20260729-30
 -->
 
+<!-- research_source
+source_id: S1
+role: company_release
+publisher: Microsoft
+title: Microsoft FY2026 Q4 earnings call 與財務表
+published_at: 2026-07-29
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q4
+locator: capital expenditures、cash flow、Azure demand 與 useful-life 段落
+limitation: CapEx 包含現金購置與 finance leases，且沒有完整拆分 AI 晶片、建物與網路設備
+-->
+
+<!-- research_source
+source_id: S2
+role: company_release
+publisher: Meta Platforms
+title: Meta 2026 Q2 results
+published_at: 2026-07-29
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://investor.atmeta.com/investor-news/press-release-details/2026/Meta-Reports-Second-Quarter-2026-Results/default.aspx
+locator: cash flow、capital expenditures 與 2026 outlook 表格
+limitation: 公司自訂 FCF 公式含 finance-lease principal，不能直接套用到同業
+-->
+
+<!-- research_source
+source_id: S3
+role: company_release
+publisher: Amazon
+title: Amazon 2026 Q2 results
+published_at: 2026-07-30
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Second-Quarter-Results/default.aspx
+locator: trailing twelve months cash flow、PP&E 與 AWS results 表格
+limitation: 核心現金流資料是 TTM 而非單季，淨 PP&E 公式也不同於 Microsoft 與 Meta
+-->
+
+<!-- research_source
+source_id: S4
+role: company_filing
+publisher: Meta Platforms
+title: Meta 2025 Form 10-K
+published_at: 2026-01-29
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1326801/000162828026003942/meta-20251231.htm
+locator: useful lives of servers and network equipment 會計估計段落
+limitation: 會計估計變更影響折舊與淨利，不直接衡量 AI 投資報酬率
+-->
+
+<!-- research_source
+source_id: S5
+role: company_filing
+publisher: Amazon
+title: Amazon 2025 Form 10-K
+published_at: 2026-02-06
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1018724/000101872426000004/amzn-20251231.htm
+locator: useful life change for servers and networking equipment 段落
+limitation: 折舊年限變更不等於實際伺服器汰換速度或 AI ROI 排名
+-->
+
+<!-- research_source
+source_id: S6
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 公開資訊觀測站公司申報查詢入口
+published_at:
+captured_at: 2026-08-01
+accepted_at: 2026-08-01
+status: active
+url: https://mops.twse.com.tw/mops/web/index
+locator: 台灣 ODM、PCB、電源與散熱公司季報、法說及重大訊息查找入口
+limitation: 買方 CapEx 只能觸發此入口的公司級查找；入口本身不證明訂單、收入或毛利
+-->
+
+<!-- research_claim
+claim_id: C1
+label: verified
+status: active
+claim: Microsoft、Meta 與 Amazon 各自揭露的 CapEx 或 PP&E、OCF 與 FCF 可依各公司公式回溯
+supporting_source_ids: S1,S2,S3
+contrary_source_ids:
+as_of: 2026-07-30
+basis: 三家公司官方財務表提供各自數字與非 GAAP 公式
+boundary: 可回溯只代表公司內部公式一致，不代表三家公司之間具有相同期間或定義
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C2
+label: inference
+status: active
+claim: 三家公司 headline CapEx 或 PP&E 數字不能直接橫向排名 AI 投資強度或現金回收效率
+supporting_source_ids: S1,S2,S3
+contrary_source_ids:
+as_of: 2026-07-30
+basis: Microsoft 與 Meta 是單季、Amazon 是 TTM，且現金購置、租賃本金與淨 PP&E 定義不同
+boundary: 這是可比性判定，不是三家公司 AI ROI、估值或投資優劣排名
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C3
+label: verified
+status: active
+claim: 三家公司仍揭露 AI 或雲端基礎建設投入與需求成長訊號，但現金回收表現分化
+supporting_source_ids: S1,S2,S3
+contrary_source_ids:
+as_of: 2026-07-30
+basis: 官方資料同時揭露資本投入、Azure 或 AWS 成長、需求與自由現金流
+boundary: 需求成長與 FCF 分化可以同時成立，不能由單一季度推定長期投資報酬率
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C4
+label: verified
+status: active
+claim: Microsoft、Meta 與 Amazon 的資產耐用年限或租賃分類變更會改變折舊、CapEx 或淨利呈現
+supporting_source_ids: S1,S4,S5
+contrary_source_ids:
+as_of: 2026-07-29
+basis: 公司法說與 10-K 直接揭露會計估計變更及其財務影響
+boundary: 會計呈現變化不等於實際建置意圖、設備物理壽命或 AI ROI 同幅改變
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C5
+label: unverified
+status: active
+claim: 雲端巨頭整體 CapEx 可直接換算成任一台灣 ODM、PCB、電源或散熱公司的訂單與獲利
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-01
+basis: 買方揭露沒有提供台灣供應商、料號、採購份額、上線時程或毛利資料
+boundary: 目前只建立族群需求搜尋觸發，不建立任何個股收入、市占或獲利事實
+verification_needed: 需要雲端客戶與台灣供應商文件雙向核對產品、時程、數量與財務貢獻
+resolution:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O1
+claim_id: C2
+entity: Microsoft
+metric: reported capital expenditure or PP&E
+reported_value: 41.0
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: fiscal quarter
+unit: USD billion
+definition_key: headline_capex_including_finance_leases
+definition: 公司 headline CapEx，包含 cash paid for PP&E 與 finance leases
+evidence_ids: S1
+comparability: not_comparable
+comparability_reason: 與 Meta 的租賃本金公式及 Amazon 的 TTM 淨 PP&E 期間和口徑不同
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O2
+claim_id: C2
+entity: Meta Platforms
+metric: reported capital expenditure or PP&E
+reported_value: 31.08
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: USD billion
+definition_key: cash_ppe_plus_finance_lease_principal
+definition: cash paid for PP&E 加 finance-lease principal payments
+evidence_ids: S2
+comparability: not_comparable
+comparability_reason: 雖與 Microsoft 同為單季，租賃與 FCF 定義不同，亦不同於 Amazon TTM 淨 PP&E
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+observation_id: M1-O3
+claim_id: C2
+entity: Amazon
+metric: reported capital expenditure or PP&E
+reported_value: 169.007
+period_start: 2025-07-01
+period_end: 2026-06-30
+period_basis: trailing twelve months
+unit: USD billion
+definition_key: net_cash_ppe_after_sales_and_incentives
+definition: PP&E purchases 扣除出售與設備 incentives 的 TTM 淨額
+evidence_ids: S3
+comparability: not_comparable
+comparability_reason: 資料為 TTM、未另扣 finance-lease principal，不能和兩家單季 headline 直接排名
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+observation_id: M2-O1
+claim_id: C2
+entity: Microsoft
+metric: operating cash flow
+reported_value: 55.4
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: fiscal quarter
+unit: USD billion
+definition_key: issuer_reported_net_cash_from_operations
+definition: 公司財務表揭露的單季營業活動現金流量淨額
+evidence_ids: S1
+comparability: not_comparable
+comparability_reason: Microsoft 與 Meta 為單季但財務季口徑不同，Amazon 則為 TTM，不能直接排現金產生能力
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+observation_id: M2-O2
+claim_id: C2
+entity: Meta Platforms
+metric: operating cash flow
+reported_value: 31.862
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: USD billion
+definition_key: issuer_reported_net_cash_from_operations
+definition: 公司財務表揭露的單季營業活動現金流量淨額
+evidence_ids: S2
+comparability: not_comparable
+comparability_reason: Microsoft 與 Meta 為單季但財務季口徑不同，Amazon 則為 TTM，不能直接排現金產生能力
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+observation_id: M2-O3
+claim_id: C2
+entity: Amazon
+metric: operating cash flow
+reported_value: 161.403
+period_start: 2025-07-01
+period_end: 2026-06-30
+period_basis: trailing twelve months
+unit: USD billion
+definition_key: issuer_reported_net_cash_from_operations
+definition: 公司財務表揭露的過去十二個月營業活動現金流量淨額
+evidence_ids: S3
+comparability: not_comparable
+comparability_reason: Amazon 是 TTM，另外兩家是單季；期間未對齊前不能用金額高低判斷回收效率
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+observation_id: M3-O1
+claim_id: C2
+entity: Microsoft
+metric: issuer-defined free cash flow
+reported_value: 19.6
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: fiscal quarter
+unit: USD billion
+definition_key: ocf_minus_cash_paid_for_ppe
+definition: 單季 OCF 減 cash paid for PP&E，不直接扣 headline finance leases
+evidence_ids: S1
+comparability: not_comparable
+comparability_reason: Meta 另扣 finance-lease principal，Amazon 又是 TTM 淨 PP&E；公式與期間均不同
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+observation_id: M3-O2
+claim_id: C2
+entity: Meta Platforms
+metric: issuer-defined free cash flow
+reported_value: 0.784
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar quarter
+unit: USD billion
+definition_key: ocf_minus_cash_ppe_minus_finance_lease_principal
+definition: 單季 OCF 減 cash paid for PP&E，再減 finance-lease principal payments
+evidence_ids: S2
+comparability: not_comparable
+comparability_reason: Microsoft 未用相同方式扣租賃本金，Amazon 又是 TTM 淨 PP&E；不能做 FCF 高低榜
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+observation_id: M3-O3
+claim_id: C2
+entity: Amazon
+metric: issuer-defined free cash flow
+reported_value: -7.604
+period_start: 2025-07-01
+period_end: 2026-06-30
+period_basis: trailing twelve months
+unit: USD billion
+definition_key: ocf_minus_net_cash_ppe_after_sales_and_incentives
+definition: TTM OCF 減 PP&E purchases，再加回出售與設備 incentives
+evidence_ids: S3
+comparability: not_comparable
+comparability_reason: Amazon 是 TTM 且公式不同，不能和 Microsoft、Meta 的單季公司定義 FCF 排名
+-->
+
+<!-- monitoring_item
+monitor_id: T1
+status: active
+claim_ids: C1,C2,C4
+metric: 三家公司 cash PP&E、finance leases、租賃本金、折舊政策與 FCF 公式
+source_ids: S1,S2,S3,S4,S5
+watch_source_ids: S6
+frequency: quarterly
+frequency_detail: 每季財報與重大會計政策更新
+next_check: 2026-08-15
+trigger: 公司首次提供可對齊的單季現金購置、租賃增加與本金付款橋接表
+invalidation: 若未先完成期間與定義正規化，任何跨公司 CapEx 或 FCF 高低排名均視為無效
+-->
+
+<!-- monitoring_item
+monitor_id: T2
+status: active
+claim_ids: C3,C5
+metric: AI 基礎設施投入、上線容量、雲端營收利用率與供應商財務貢獻
+source_ids: S1,S2,S3,S6
+watch_source_ids: S6
+frequency: quarterly
+frequency_detail: 每季法說與財報
+next_check: 2026-10-31
+trigger: 支出增加後出現可核對的容量上線、使用率、營收與毛利改善，或台灣供應商直接揭露訂單
+invalidation: 若投入未轉為容量、需求與現金回收，或供應商文件無法雙向核對，受惠論維持未證
+-->
+
 <!-- transition
 date: 2026-08-01
 from: inbox
 to: triaged
 reason: periods_definitions_and_supplier_mapping_reviewed
-evidence: source_chain:hyperscaler-capex-cash-conversion-20260729-30
+evidence: sources:S1,S2,S3
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -70,7 +429,7 @@ evidence: source_chain:hyperscaler-capex-cash-conversion-20260729-30
 
 ## 三家公司要先按各自口徑讀
 
-單位為十億美元；微軟與 Meta 是截至 2026-06-30 的**單季**，Amazon 的 OCF／淨 PP&E／FCF 是截至同日的**過去十二個月（TTM）**。這張表刻意不做橫向排名。
+單位為十億美元；微軟與 Meta 是截至 2026-06-30 的**單季**，Amazon 的 OCF／淨 PP&E／FCF 是截至同日的**過去十二個月（TTM）**。這張表刻意不做橫向排名。CapEx／PP&E、OCF、公司自訂 FCF 分別對應比較帳本 `M1`、`M2`、`M3`。
 
 | 公司／期間 | 公司揭露的 CapEx 或 PP&E 口徑 | OCF | FCF | 讀法 |
 |---|---:|---:|---:|---|
