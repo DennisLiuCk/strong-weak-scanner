@@ -391,7 +391,30 @@ Git 歷史能看到文字變更，但不能以 Git 歷史取代文章內的修�
 monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID，或把 lifecycle 單向
 改成 superseded／refuted／retired 並補齊雙向修正關係。
 
-## 九、發布前檢查
+## 九、方法本身也要留下可回測的歷史
+
+文章逐篇通過 lint，只能證明欄位與引用完整；它不能回答研究是否有回頭檢查、是否願意
+承認沒有新證據，或錯誤是否真的被修正。方法層另使用：
+
+- `notes/research_method_reviews/YYYY-MM-DD_NN.json`：append-only 稽核快照，保存當時的
+  topic、claim、source、monitor、圖譜與候選雷達覆蓋。registry 有任何變動都要新增快照，
+  不得改寫舊檔。
+- `notes/research_method_reviews/monitor_reviews.csv`：append-only 到期檢查帳本，每列連到
+  既有 topic／monitor，結果只能是 `new_support`、`new_contrary`、`no_new_evidence` 或
+  `not_yet_testable`。
+- `scripts/research_method_audit.py`：驗證 snapshot fingerprint、review 引用與歷史不可改寫，
+  並在研究雷達顯示可追溯、可證偽、新鮮度、修正學習與校準可用性五道 gate。
+
+`no_new_evidence` 是有效的回顧結果，但**不得**刷新 topic source 的 `accepted_at`、
+`last_reviewed_at` 或 `review_due`。它只在方法帳本設定下一次工作期限；原文章仍照既有
+evidence clock 降級，直到真的有新 evidence。
+
+候選升格數、文章數與圖譜線數是研究產出，不是正確率。只有到期 monitor 全數留下 review
+event，且至少三個結果帶有新證據時，audit 才允許顯示附樣本數的描述性支持率；即使如此，
+它仍不是投資命中率、報酬率或因果效果。樣本不足時只報 counts 與 `not_ready`，不補零、
+不把未到期主張算成功。
+
+## 十、發布前檢查
 
 1. 新手導讀是否清楚說明已知、未知與下一步。
 2. 每個材料性 claim 是否有正確標籤、來源 ID、basis 與 boundary。
@@ -404,7 +427,9 @@ monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID�
 8. impact 是否仍清楚寫 evidence boundary，沒有把 topic 升格為公司事實。
 9. 執行 `python scripts/research_queue.py --lint` 與 `python scripts/knowledge_graph.py --lint`；
    lint 只驗結構與引用完整性，不會重新下載或證明來源內容為真。
-10. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
+10. 執行 `python scripts/research_method_audit.py --lint --baseline-ref HEAD`，確認 registry
+    有新快照、舊快照未被改寫，review ledger 也只追加新列。
+11. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
     行動版顯示。
 
 ## Schema 沿革

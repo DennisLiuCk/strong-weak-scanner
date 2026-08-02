@@ -22,3 +22,7 @@ organization:cxl,organization,Compute Express Link Consortium,,,US,CXL Consortiu
 organization:ualink,organization,UALink Consortium,,,US,Ultra Accelerator Link Consortium,https://ualinkconsortium.org/,AI accelerator scale-up 互連標準組織
 organization:uec,organization,Ultra Ethernet Consortium,,,US,,https://ultraethernet.org/,AI 與 HPC scale-out Ethernet 標準組織
 organization:ucie,organization,UCIe Consortium,,,US,Universal Chiplet Interconnect Express,https://www.uciexpress.org/,封裝內 chiplet 互連標準組織
+company:lumentum,company,Lumentum,LITE,NASDAQ,US,,https://www.lumentum.com/,光通訊與雷射元件供應商
+company:ev-group,company,EV Group,,,AT,EVG,https://www.evgroup.com/,晶圓接合與微影設備供應商
+company:lam-research,company,Lam Research,LRCX,NASDAQ,US,科林研發,https://www.lamresearch.com/,半導體製造與先進封裝設備供應商
+organization:imec,organization,imec,,,BE,,https://www.imec-int.com/,半導體研發與試驗線機構

@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-08-02",
+  "methodologyVersion": "1.0",
+  "registryFingerprint": "0fc806b757335de023fb507f613e06237f683a70c6fc20253b60b34c1e212689",
+  "scope": {
+    "topics": 19,
+    "activeTopics": 19,
+    "radarCandidates": 8,
+    "promotedCandidates": 6,
+    "graphs": 9
+  },
+  "claims": {
+    "active": 106,
+    "verified": 65,
+    "inference": 19,
+    "unverified": 22,
+    "withBoundary": 106,
+    "unverifiedWithNextEvidence": 22,
+    "comparisonObservations": 27
+  },
+  "sources": {
+    "active": 128,
+    "withLocatorAndLimitation": 128,
+    "thesesWithTwoIndependentGroups": 17,
+    "activeTheses": 19
+  },
+  "monitors": {
+    "active": 46,
+    "withLivingWatchSource": 46,
+    "dueOrOverdue": 0,
+    "overdue": 0,
+    "reviewedMature": 2
+  },
+  "freshness": {
+    "staleTopics": 2,
+    "staleEdges": 0
+  },
+  "corrections": {
+    "supersededOrRefutedClaims": 0,
+    "monitorReviewEvents": 2,
+    "resultCounts": {
+      "new_contrary": 0,
+      "new_support": 0,
+      "no_new_evidence": 2,
+      "not_yet_testable": 0
+    }
+  },
+  "calibration": {
+    "evidenceBearingOutcomes": 0,
+    "minimumOutcomesForDescriptiveRate": 3,
+    "descriptiveRateReady": false,
+    "supportRate": null,
+    "boundary": "此處只描述到期 monitor 的證據結果，不是投資命中率、報酬率或因果效果。"
+  },
+  "graphs": {
+    "activeEdges": 133,
+    "traceableEdges": 133,
+    "verified": 100,
+    "inference": 18,
+    "unverified": 15,
+    "financialMateriality": 0
+  },
+  "gates": [
+    {
+      "id": "traceability",
+      "label": "可追溯性",
+      "status": "pass",
+      "observed": "133/133 條圖譜線可回查；106/106 個 active claim 有邊界",
+      "boundary": "通過代表引用完整，不代表主張一定為真。"
+    },
+    {
+      "id": "falsifiability",
+      "label": "可證偽性",
+      "status": "pass",
+      "observed": "46/46 個 monitor 有 living watch source；22/22 個待驗證 claim 寫明下一份證據",
+      "boundary": "Monitor 完整不等於結果已成熟。"
+    },
+    {
+      "id": "freshness",
+      "label": "新鮮度",
+      "status": "attention",
+      "observed": "2 篇 topic、0 條 edge 過期；0 個 monitor 逾期",
+      "boundary": "過期會降可信度，但不自動判定主張錯誤。"
+    },
+    {
+      "id": "correction_learning",
+      "label": "修正學習",
+      "status": "pass",
+      "observed": "目前沒有待回顧 monitor；歷史已完成 2 次到期回顧",
+      "boundary": "沒有新證據必須留下 no_new_evidence，而不能刷新 evidence clock。"
+    },
+    {
+      "id": "calibration",
+      "label": "校準可用性",
+      "status": "not_ready",
+      "observed": "0 個具新證據的到期結果；最低揭露門檻 3",
+      "boundary": "樣本不足時不報支持率；即使可報也只附樣本數，不稱為投資命中率。"
+    }
+  ],
+  "caveats": [
+    "升格候選數是研究流程產出，不是研究正確率。",
+    "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
+    "no_new_evidence 是一次有紀錄的檢查，不得刷新 claim 的證據時鐘。"
+  ],
+  "snapshotId": "RMA-2026-08-02-01"
+}

@@ -313,6 +313,7 @@ python scripts/research_queue.py --attention
 python scripts/research_queue.py --calendar --weeks 8 --output tmp/research_calendar.md
 python scripts/research_queue.py --lint
 python scripts/research_radar.py --lint
+python scripts/research_method_audit.py --lint --baseline-ref HEAD
 ```
 
 候選議題必須明列來源發布日、研究捕捉日、受影響族群／股票、route、action due 與
@@ -346,7 +347,7 @@ python scripts/qual_notes.py --lint
 | Universe 與候選 | 本頁「Universe 治理」、`scripts/screen.py`、`config/` |
 | 質化筆記 | [`QUALITATIVE_RESEARCH_RUNBOOK.md`](QUALITATIVE_RESEARCH_RUNBOOK.md)、`scripts/qual_notes.py`、`scripts/qual_evidence.py`、`scripts/qual_review.py` |
 | 領先假說 | [`LEADING_HYPOTHESES.md`](LEADING_HYPOTHESES.md)、[`LEADING_HYPOTHESES_PHASE2_RUNBOOK.md`](LEADING_HYPOTHESES_PHASE2_RUNBOOK.md) |
-| 研究更新／市場議題 | [`RESEARCH_MAINTENANCE.md`](RESEARCH_MAINTENANCE.md)、`scripts/research_queue.py`、`notes/research_topics/` |
+| 研究更新／市場議題 | [`RESEARCH_MAINTENANCE.md`](RESEARCH_MAINTENANCE.md)、`scripts/research_queue.py`、`scripts/research_method_audit.py`、`notes/research_topics/`、`notes/research_method_reviews/` |
 | 策略與資料變更歷史 | [`CHANGELOG.md`](CHANGELOG.md) |
 
 ## 已知限制

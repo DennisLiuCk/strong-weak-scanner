@@ -9,12 +9,31 @@ radar_id: RR-2026-08-02-MARKET-MAP
 as_of: 2026-08-02
 next_review: 2026-08-09
 status: active
-method: 優先級依近期一手里程碑、可證偽性與台股研究路由排序；知識價值依能否重組既有概念、減少錯誤外推及連接多個研究主題判定；兩軸不加權成假精確分數
+method: 優先級依近期一手里程碑、可證偽性、成熟度落差與台股研究路由排序；知識價值依能否重組既有概念、減少錯誤外推及連接多個研究主題判定；保留已升格項目供回測，但兩軸不加權成假精確分數
+-->
+
+<!-- research_candidate
+candidate_id: RC-CPO-PRODUCTION
+rank: 1
+title: CPO 從平台生產走向部署與財務驗證
+priority: p1
+knowledge_value: high
+status: promoted
+evidence_posture: research_grade
+why_now: NVIDIA 已把 Spectrum-X Ethernet Photonics 定義為進入生產，並列出 SPIL 與外部雷射角色；研究問題已從有沒有產品轉為部署分母、可插拔共存與價值量落點
+knowledge_gain: 把平台產品、共同封裝光學、具名生態系、可插拔替代路徑與供應商財務認列拆成不同節點，避免以 production 一詞同步升級所有公司
+first_rejection: 若後續沒有 production shipment／deployment 分母，或 Spectrum-6 長期仍由可插拔主導，CPO 快速擴散與供應鏈財務外推必須下修
+next_evidence: 首批雲端採用者的交換器與埠數、CPO／pluggable 產品組合，以及日月光對 SPIL CPO 量產收入與毛利的直接揭露
+next_check: 2026-08-15
+route: article_and_graph
+article_topic_id: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
+graph_id: cpo-networking
+sources: NVIDIA Vera Rubin and Spectrum-X production => https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Vera-Rubin-Ramps-Into-Full-Production-to-Power-Agentic-AI-Factories-Worldwide/default.aspx | Lumentum Spectrum-X laser role => https://investor.lumentum.com/financial-news-releases/news-details/2025/Lumentum-Selected-as-an-NVIDIA-Silicon-Photonics-Ecosystem-Partner-to-Advance-AI-Networking-at-Scale/default.aspx | Marvell 1.6T pluggable production => https://www.marvell.com/company/newsroom/marvell-1-6t-optical-dsp-ai-data-center-connectivity.html
 -->
 
 <!-- research_candidate
 candidate_id: RC-BACKSIDE-POWER
-rank: 1
+rank: 6
 title: 背面供電從研發概念進入量產時鐘
 priority: p1
 knowledge_value: high
@@ -33,7 +52,7 @@ sources: TSMC 2025 Annual Report => https://investor.tsmc.com/static/annualRepor
 
 <!-- research_candidate
 candidate_id: RC-AI-MEMORY-HIERARCHY
-rank: 2
+rank: 7
 title: AI 記憶體分層：HBM、SOCAMM、CXL 與 context storage
 priority: p1
 knowledge_value: high
@@ -52,7 +71,7 @@ sources: NVIDIA Vera Rubin architecture => https://developer.nvidia.com/blog/ins
 
 <!-- research_candidate
 candidate_id: RC-OPEN-AI-FABRICS
-rank: 3
+rank: 8
 title: 開放 AI 互連的分工：UALink scale-up 與 UEC scale-out
 priority: p1
 knowledge_value: high
@@ -71,45 +90,45 @@ sources: UALink 2.0 release => https://ualinkconsortium.org/wp-content/uploads/2
 
 <!-- research_candidate
 candidate_id: RC-HYBRID-BONDING
-rank: 4
+rank: 2
 title: 細間距 hybrid bonding 與 RDL 從 PDK、試驗車走向量產資格
-priority: p2
+priority: p1
 knowledge_value: high
-status: watch
-evidence_posture: preliminary
+status: promoted
+evidence_posture: research_grade
 why_now: imec 在 2026 年開放 fine-pitch RDL／D2W hybrid bonding PDK，並公布 200nm W2W 接點間距試驗；設備商也將平坦度、沉積與檢查連到 3D 封裝
 knowledge_gain: 能把接合間距、表面平坦度、疊對、缺陷檢查與良率學習連成一條可追蹤製程鏈，而不是只把 hybrid bonding 當成單一設備題材
 first_rejection: 若證據持續只有研究試驗車與設備商產品主張，沒有客戶資格或量產良率，不能建立台灣供應商收入映射
 next_evidence: 客戶資格完成、量產封裝產品、良率／throughput 邊界，以及台灣公司具名產品的雙向核對
 next_check: 2026-08-16
-route: watch_only
-article_topic_id:
-graph_id:
+route: article_and_graph
+article_topic_id: MI-2026-08-02-HYBRID-BONDING-READINESS
+graph_id: hybrid-bonding
 sources: imec fine-pitch RDL and D2W PDK => https://www.imec-int.com/en/press/nanoic-opens-access-first-ever-fine-pitch-rdl-and-d2w-hybrid-bonding-interconnect-pdks | imec and EVG 200nm W2W demonstration => https://www.imec-int.com/en/press/imec-and-ev-group-demonstrate-wafer-wafer-hybrid-bonding-200nm-interconnect-pitch-and-record | Applied Materials 3D packaging systems => https://investors.appliedmaterials.com/news-releases/news-release-details/applied-materials-introduces-new-systems-accelerate-dram-and
 -->
 
 <!-- research_candidate
 candidate_id: RC-PANEL-LEVEL-PACKAGING
-rank: 5
+rank: 3
 title: Panel-level packaging 的面積效率與量產難題
-priority: p2
+priority: p1
 knowledge_value: high
-status: watch
-evidence_posture: preliminary
+status: promoted
+evidence_posture: research_grade
 why_now: Lam 在 2026 年建立 panel-level packaging 研發中心，Applied Materials 也透過 NEXX 交易擴大大面積封裝設備布局，但來源仍多停在 R&D 與 manufacturing readiness
 knowledge_gain: 可把大型 AI 封裝的幾何利用率，與 uniformity、yield、throughput、設備尺寸及標準化約束放在同一個成本框架
 first_rejection: 若 panel 尺寸、載板翹曲、均勻度或良率無法在客戶線達標，較佳面積利用率不會自動轉成較低單位成本
 next_evidence: 客戶 pilot line 資格、panel 尺寸標準、量產 throughput／yield，以及實際 AI 封裝產品採用
 next_check: 2026-08-23
-route: watch_only
-article_topic_id:
-graph_id:
+route: article_and_graph
+article_topic_id: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS
+graph_id: panel-level-packaging
 sources: Lam Panel-Level Packaging CoE => https://newsroom.lamresearch.com/Lam-Research-Establishes-Panel-Level-Packaging-CoE | Lam wafer-to-panel manufacturing note => https://newsroom.lamresearch.com/wafer-to-panel-lam-scaling-advanced-packaging-panel-level-processing | Applied Materials Q2 2026 results => https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-announces-second-quarter-2026-results/
 -->
 
 <!-- research_candidate
 candidate_id: RC-UCIE-3
-rank: 6
+rank: 4
 title: UCIe 3.0 把 chiplet 互通延伸到更高速率與 UALink chiplet
 priority: p2
 knowledge_value: high
@@ -128,7 +147,7 @@ sources: UCIe specifications => https://www.uciexpress.org/specifications | UALi
 
 <!-- research_candidate
 candidate_id: RC-800V-WBG
-rank: 7
+rank: 5
 title: 800VDC 內部的 Si、SiC 與 GaN 分工
 priority: p2
 knowledge_value: medium

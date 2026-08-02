@@ -118,6 +118,22 @@ locator: 2026-08-01 以 3711 與相關台灣供應商代號重查法說、重大
 limitation: 查詢入口會持續更新；入口本身不證明 CPO 客戶、料號、量產或收入
 -->
 
+<!-- research_source
+source_id: S7
+role: competitor_primary
+source_kind: document
+publisher: Lumentum
+title: Lumentum selected as NVIDIA silicon photonics ecosystem partner
+published_at: 2025-03-18
+captured_at: 2026-08-02
+accepted_at: 2026-08-02
+status: active
+url: https://investor.lumentum.com/financial-news-releases/news-details/2025/Lumentum-Selected-as-an-NVIDIA-Silicon-Photonics-Ecosystem-Partner-to-Advance-AI-Networking-at-Scale/default.aspx
+locator: key contributor、high-power high-efficiency lasers 與 Spectrum-X Photonics role 段落
+limitation: 具名技術角色不等於 Spectrum-X 量產出貨量、供應份額、sole source、收入或毛利貢獻
+independence_group: lumentum
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -174,6 +190,20 @@ verification_needed: 日月光投控法說、財報或客戶文件需直接揭�
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C5
+label: verified
+status: active
+claim: Lumentum 公告其高功率高效率 InP laser 是 NVIDIA Spectrum-X Photonics networking switches 的具名矽光子生態系角色
+supporting_source_ids: S7
+contrary_source_ids:
+as_of: 2025-03-18
+basis: S7 直接使用 selected as a key contributor，並明列 Lumentum laser 在 Spectrum-X Photonics 的角色
+boundary: 只能證實具名角色，不能外推量產數量、供應份額、sole source、收入或毛利
+verification_needed:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -208,6 +238,13 @@ from: inbox
 to: triaged
 reason: architecture_coexistence_and_taiwan_mapping_reviewed
 evidence: sources:S1,S2,S3,S4,S5
+-->
+<!-- transition
+date: 2026-08-02
+from: triaged
+to: triaged
+reason: added_named_external_laser_role_without_financial_promotion
+evidence: sources:S7
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -247,6 +284,7 @@ evidence: sources:S1,S2,S3,S4,S5
 |---|---|---|
 | NVIDIA CPO | 2026-05-31 新聞稿稱 Spectrum-X Ethernet Photonics 已進入生產，採 200Gb/s SerDes；CoreWeave、Lambda、OCI 被列為首批生態系採用者。 | 5 倍功耗效率、5 倍 uptime 與 1.3 倍部署速度是 NVIDIA 的比較結果；未見獨立測試、部署數量、售價或收入。
 | 台灣製造鏈 | NVIDIA 2026-06-01 更新列名 TSMC 做矽光子製造、SPIL 做晶片級封裝／組裝／測試、TFC 做雷射模組、Foxconn 做系統組裝。 | 列名角色不等於新增訂單金額、市占或毛利；也不能把未列名的同業自動放進同一供應鏈。
+| 外部雷射角色 | Lumentum 自身公告被選為 NVIDIA silicon photonics ecosystem key contributor，InP lasers 用於 Spectrum-X Photonics。 | 未揭露出貨量、供應份額、sole source、收入或毛利；不能用外部公司角色替台灣同業背書。
 | 同代雙架構 | NVIDIA 2026-07-21 說明 Spectrum-6 支援可插拔與 CPO 兩種 form factor。 | 官方沒有公布兩種形式的出貨配比、使用位置與生命週期成本。
 | 1.6T 可插拔 | Marvell 2026-03-12 表示 Ara 1.6T 光 DSP 正大量出貨給全球客戶，用於可插拔連線。 | 「大量」未附數量、客戶拆分或市占；新 Ara 衍生產品的效能與成本優勢仍是供應商描述。
 
@@ -276,6 +314,7 @@ SPIL 已有第 1 級且平台已宣布量產，但 NVIDIA 沒有給 SPIL 的公�
 - [NVIDIA：Spectrum-6 同時支援可插拔與 CPO，2026-07-21](https://blogs.nvidia.com/blog/nvidia-spectrum-six-arrives-in-gigascale-ai-factories/)
 - [Marvell：Ara 1.6T 可插拔 DSP 大量出貨，2026-03-12](https://www.marvell.com/company/newsroom/marvell-1-6t-optical-dsp-ai-data-center-connectivity.html)
 - [ASE：SPIL 為日月光投控子公司，2025-01-16](https://www.aseglobal.com/press-room/spil-hosts-nvidia-founder-and-ceo-at-new-factory-site/)
+- [Lumentum：Spectrum-X Photonics 的具名 InP laser 生態系角色，2025-03-18](https://investor.lumentum.com/financial-news-releases/news-details/2025/Lumentum-Selected-as-an-NVIDIA-Silicon-Photonics-Ecosystem-Partner-to-Advance-AI-Networking-at-Scale/default.aspx)
 
 **已知：** CPO 平台已被 NVIDIA 定義為進入生產，SPIL 被直接列名；Spectrum-6 與 Marvell 的資料同時證明可插拔路徑仍在量產生態中。
 

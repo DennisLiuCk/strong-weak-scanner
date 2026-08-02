@@ -13,6 +13,7 @@ python scripts/research_queue.py --attention
 python scripts/research_queue.py --calendar --weeks 8 --output tmp/research_calendar.md
 python scripts/research_queue.py --lint
 python scripts/research_radar.py --lint
+python scripts/research_method_audit.py --lint --baseline-ref HEAD
 ```
 
 `research_queue.py` 以台灣研究日聚合：
@@ -111,9 +112,26 @@ pack 與獨立複核。
    topic v3 與圖譜 lint，再填入 article／graph route。
 7. 執行 `research_queue.py --lint` 與 `research_radar.py --lint`。topic 不能自動貼入正式
    筆記；正式更新仍需同一 evidence pack 離線重算與獨立 reviewer。
+8. 回查所有到期 monitor，在 `notes/research_method_reviews/monitor_reviews.csv` 追加
+   `new_support／new_contrary／no_new_evidence／not_yet_testable`。沒有新證據時不得延後
+   topic evidence clock；registry 有變動就新增 method audit snapshot，不能改舊快照。
 
 GitHub 的 `research-watch.yml` 會在台灣每週一 09:00，以及 `fetch-financials` 成功後，
 把唯讀待辦寫入 Actions summary／artifact。它只提醒，不會替代語意掃描，也不會寫 main。
+
+### 每月方法回顧
+
+每月第一個研究週額外執行 `research_method_audit.py --json`，新增一份
+`notes/research_method_reviews/YYYY-MM-DD_NN.json`。逐項看 gate，不合成健康分數：
+
+- **可追溯性**：active claim 是否都有邊界、圖譜線是否能回查 exact claim／source。
+- **可證偽性**：待驗證 claim 是否寫下一份證據，monitor 是否有 living watch source。
+- **新鮮度**：逾期 topic／edge／monitor 數，不以「已重新看過」消除 stale。
+- **修正學習**：到期 monitor 是否留下 review event，反方證據是否真的觸發新 claim 或修正。
+- **校準可用性**：證據型 outcome 的樣本與覆蓋是否足以描述；不足就維持 `not_ready`。
+
+若 gate 變差，先修 evidence／monitor／review 流程；不得因候選升格率好看就宣布方法有效，
+也不得用一輪 `no_new_evidence` 當成主命題獲得支持。
 
 ## 財務資料完整度
 

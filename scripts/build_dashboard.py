@@ -37,6 +37,7 @@ from research_queue import (_topic_confidence as topic_confidence_at,
                             taipei_today as research_today)
 from knowledge_graph import build_knowledge_graph
 from research_radar import load_research_radar
+from research_method_audit import load_method_audit
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -2242,6 +2243,9 @@ def main():
         graph_ids={graph["id"] for graph in research_library["knowledgeGraph"]["graphs"]},
         strict=True,
     )
+    # 方法稽核讀取 versioned、append-only snapshot；不在 build 當下動態重算後假裝成歷史。
+    # registry 變動卻沒有新 snapshot 會由 research_method_audit.py --lint 標紅。
+    research_library["methodAudit"] = load_method_audit(strict=True)
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
     chip_by_grp = {}
