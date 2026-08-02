@@ -1,0 +1,391 @@
+# AI 電容不是單一受惠品：先按電壓、頻帶與系統位置拆分
+
+<!-- research_topic
+topic_id: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP
+schema_version: 3
+status: triaged
+priority: p1
+captured_at: 2026-08-03
+source_published_at: 2026-03-01
+last_reviewed_at: 2026-08-03
+review_due: 2026-09-01
+source_type: mixed
+publisher: Open Compute Project
+publisher_domain: opencompute.org
+canonical_url: https://www.opencompute.org/documents/ocp-specification-diablo-400-v0-7-0-final-pdf
+source_chain_id: ai-capacitor-role-primary-scan-20260803
+stock_ids:
+group_ids: passive,powersupply
+trigger_type: architecture_standard_and_supplier_role_map
+evidence_role: candidate_source
+route: market_issue_watch
+thesis_claim_id: C4
+base_confidence: medium
+confidence_basis: OCP 與 TI 可定位 rack CBU 角色，TDK 與 Murata 兩條獨立供應商鏈又分別公開高低壓及 PDN 頻帶角色；足以建立「位置×電壓×頻帶×任務」框架，但供應商文件仍是自身產品地圖，尚無共同量產 BOM、替代率、台灣公司 qualification 或財務分母
+cross_company_numbers: false
+-->
+
+<!-- transition
+date: 2026-08-03
+from: initial
+to: inbox
+reason: captured_rack_bus_board_and_package_capacitor_roles
+evidence: source_chain:ai-capacitor-role-primary-scan-20260803
+-->
+<!-- transition
+date: 2026-08-03
+from: inbox
+to: triaged
+reason: separated_capacitors_by_system_position_voltage_frequency_and_task
+evidence: sources:S1,S2,S3,S4
+-->
+
+## 新手先讀：這篇在講什麼
+
+### 名詞小字典
+
+- **CBU（Capacitor Bank Unit）**：靠近機架、用電容或超級電容吸收快速功率波動的儲能模組；它不是處理器旁的一顆去耦電容。
+- **DC link／高壓直流匯流排**：電源轉換級之間輸送數百伏直流電的節點；此處元件先面對耐壓、紋波、壽命與安全條件。
+- **PDN（Power Delivery Network）**：從電源轉換器、電路板、封裝到晶片的供電路徑；頻率越高，元件位置與寄生電感通常越重要。
+- **ESR／ESL**：電容不是理想元件；等效串聯電阻與電感會限制它在不同頻率處理紋波或瞬態的能力。
+
+### 三句話抓重點
+
+- OCP 與 TI 已把 rack CBU 定位為獨立儲能選項，TI 的展示以 EDLC 超級電容實作；它和 DC link 或晶片旁去耦不是同一個 BOM 位置。
+- TDK 把 400–800V 區域映射到高壓鋁電解、MLCC 與薄膜電容，Murata 則把 MLCC、silicon capacitor 與 polymer capacitor 放在不同 PDN 頻帶與距離；這些都是供應商公開的產品角色，不是全產業統一用量表。
+- 現有證據足以阻止「所有電容一起受惠」的錯誤外推，仍不足以證明台灣 passive 或 powersupply 族群的具名量產 BOM、替代份額、單機價值、訂單或獲利。
+
+### 為什麼重要
+
+AI 電力題材最容易把「電容量增加」誤當成一個可以直接加總的需求。實際上，rack CBU 要處理
+快速功率波動，高壓 bus／DC link 要承受數百伏、紋波與壽命條件，板級 bulk capacitor 要處理
+較慢的電流變化，封裝或晶片旁的去耦則要壓低高頻阻抗。材料、尺寸與名稱相同不代表任務相同；
+任務不同也不代表各類電容一定同時增加。先建立角色圖，才知道下一步應向公司查哪一個產品、
+規格、qualification 與財務分母。
+
+### 接下來怎麼追
+
+- 追 OCP／平台文件是否公布同一 production rack 的 CBU、DC link、board 與 package PDN 介面、額定條件及 qualification。
+- 追元件供應商是否把產品地圖推進到具名 part number、客戶測試、量產出貨與可重建的替代／用量資料。
+- 追台灣 passive 與 powersupply 公司法說、季報及重大訊息，要求客戶與供應商雙向對齊產品位置、規格、量產節點、收入與毛利。
+
+### 想一想
+
+- 一顆能在 800V bus 上承受紋波的電容，可以因為容量相近就取代封裝旁的高頻去耦嗎？
+- 若某一 PDN 層的元件效能提高而數量下降，市場只看「規格升級」是否會高估總價值量？
+- 供應商的應用地圖和客戶的 production BOM 之間，還缺哪些 qualification、份額與財務證據？
+
+## 主張與證據帳本
+
+本文的「證實」只表示指定官方文件直接支持產品或架構角色。TDK 與 Murata 的文件是發行人
+對自身產品組合的說法；沒有被改寫成全產業標準、台灣供應商訂單或被動元件需求倍數。
+
+<!-- research_source
+source_id: S1
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Diablo 400 Project Rack and Power Specification 0.7.0
+published_at: 2026-03-01
+captured_at: 2026-08-03
+accepted_at: 2026-08-03
+status: active
+url: https://www.opencompute.org/documents/ocp-specification-diablo-400-v0-7-0-final-pdf
+locator: PDF pp.14–15，7.2 Energy Storage Solutions、7.2.1 BBU Option 與 7.2.2 Capacitor Bank Option；rack 支援 BBU 與 CBU，CBU 的 power 與 capacity 依 application 決定
+limitation: 這是 OCP Diablo 400 0.7.0 的 rack option，不是所有 AI rack 的共同 production BOM；沒有 CBU 材料、元件數、供應商、採購量或財務資料
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S2
+role: company_release
+source_kind: document
+publisher: Texas Instruments
+title: TI unveils complete 800 VDC power architecture for future generation AI data centers with NVIDIA
+published_at: 2026-03-16
+captured_at: 2026-08-03
+accepted_at: 2026-08-03
+status: active
+url: https://www.ti.com/about-ti/newsroom/news-releases/2026/2026-03-16-ti-unveils-complete-800-vdc-power-architecture-for-future-generation-ai-data-centers-with-nvidia.html
+locator: Complete power solution；hot-swap、800V-to-6V、6V-to-<1V 分列，另展示以 EDLC super capacitor cells 實作、40W/in³ 的 800V CBU
+limitation: TI 展示與 reference design 支持技術角色及公司產品能力，不等於指定客戶 qualification、production deployment、固定 BOM 或台灣供應商參與
+independence_group: texas-instruments
+-->
+
+<!-- research_source
+source_id: S3
+role: company_filing
+source_kind: document
+publisher: TDK Corporation
+title: Full Year Performance Briefing Fiscal Year March 2026
+published_at: 2026-04-28
+captured_at: 2026-08-03
+accepted_at: 2026-08-03
+status: active
+url: https://www.tdk.com/system/files/2026_4q01_0mqf56xw_en.pdf
+locator: PDF p.30（投影片 29），400–800V High-Voltage Capacitors 圖與講稿；列出 aluminum capacitors、MLCCs、film capacitors，並把 polymer／MLCC 等低壓元件映射到 48V、12V、<1V 與 package 區域
+limitation: 這是 TDK 對自身產品與成長機會的管理層地圖，不是中立的系統 requirement、客戶 production BOM、跨供應商份額或台灣公司證據
+independence_group: tdk
+-->
+
+<!-- research_source
+source_id: S4
+role: management_commentary
+source_kind: document
+publisher: Murata Manufacturing
+title: AI System with Advanced Packaging Webinar Q&A
+published_at: 2026-04-25
+captured_at: 2026-08-03
+accepted_at: 2026-08-03
+status: active
+url: https://www.murata.com/-/media/webrenewal/campaign/events/asean/2026/apr26_ai-system-with-advance-packaging/qna.ashx?cvid=20260425083237000000&la=en-sg
+locator: PDF p.3，Q21；選型依 target impedance、transient requirement 與 placement constraint，MLCC 對應 high-frequency decoupling、silicon capacitor 靠近 die 的 ultra-fast response、polymer capacitor 對應 low-frequency bulk stability
+limitation: 這是 Murata webinar Q&A 對自身 PDN 解法的回答，沒有共同測試條件、跨廠替代率、量產客戶、BOM 數量、價格或財務分母
+independence_group: murata
+-->
+
+<!-- research_source
+source_id: S5
+role: standard
+source_kind: living_index
+publisher: Open Compute Project
+title: Open Rack Specifications and Designs
+published_at:
+captured_at: 2026-08-03
+accepted_at: 2026-08-03
+status: active
+url: https://www.opencompute.org/wiki/Open_Rack/SpecsAndDesigns
+locator: 2026-08-03 的 Open Rack 規格索引；持續回查 Diablo／rack power／energy storage 的正式版本與附件
+limitation: 動態索引不能替代已發布文件或證明量產採用；出現新附件時須另建 document source
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S6
+role: company_release
+source_kind: living_index
+publisher: TDK Corporation
+title: TDK Investor Relations Events
+published_at:
+captured_at: 2026-08-03
+accepted_at: 2026-08-03
+status: active
+url: https://www.tdk.com/en/ir/ir_events/index.html
+locator: 2026-08-03 的 IR events 索引；回查後續決算、Investor Day 與 AI data center passive-component 資料
+limitation: 動態索引只供未來重查；不能證明產品已 qualification、出貨、形成份額或達到成長目標
+independence_group: tdk
+-->
+
+<!-- research_source
+source_id: S7
+role: company_release
+source_kind: living_index
+publisher: Murata Manufacturing
+title: Murata Product and Event News
+published_at:
+captured_at: 2026-08-03
+accepted_at: 2026-08-03
+status: active
+url: https://www.murata.com/news
+locator: 2026-08-03 的產品與活動新聞索引；回查 AI server PDN、MLCC、silicon 與 polymer capacitor 新文件
+limitation: 動態索引不能替代具日期的產品文件，也不證明客戶 BOM、量產採用、份額或台灣公司曝險
+independence_group: murata
+-->
+
+<!-- research_source
+source_id: S8
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 公開資訊觀測站公司申報查詢入口
+published_at:
+captured_at: 2026-08-03
+accepted_at: 2026-08-03
+status: active
+url: https://mops.twse.com.tw/mops/web/index
+locator: 2026-08-03 起追蹤 passive 與 powersupply 族群公司的法說、季報、重大訊息與產品說明
+limitation: 索引頁本身不證明任何公司具有 AI capacitor BOM、qualification、訂單、收入或獲利；命中文件後須另建 document source
+independence_group: twse-mops
+-->
+
+<!-- research_claim
+claim_id: C1
+label: verified
+status: active
+claim: OCP Diablo 400 0.7.0 把 rack BBU 與 CBU 分成不同 energy-storage options，CBU 的 power 與 capacity 由 application 決定；TI 另展示以 EDLC super capacitor cells 實作的 800V CBU
+supporting_source_ids: S1,S2
+contrary_source_ids:
+as_of: 2026-03-16
+basis: S1 的 7.2.1／7.2.2 與 S2 的 Complete power solution 可直接定位 BBU、CBU 及 EDLC 實作
+boundary: 只證實兩份公開架構與 reference design；不固定所有平台的 CBU 容量、cell chemistry、元件數、供應商、採用率或財務貢獻
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C2
+label: verified
+status: active
+claim: TDK 在 2026-04-28 的公司簡報把 400–800V 區域映射到高壓 aluminum、MLCC 與 film capacitors，並把 polymer／MLCC 等低壓電容映射到 48V、12V、<1V 與 package 附近
+supporting_source_ids: S3
+contrary_source_ids:
+as_of: 2026-04-28
+basis: S3 p.30（投影片 29）的產品地圖與同頁管理層講稿直接列出電壓區域及公司產品類別
+boundary: 這是 TDK 自身 portfolio／opportunity map，不代表所有 AI rack 採同一配置，也不支持跨公司用量、份額或營收比較
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C3
+label: verified
+status: active
+claim: Murata 的 webinar Q&A 表示 PDN capacitor 選型由 target impedance、transient 與 placement 約束共同決定，並把 MLCC、silicon capacitor、polymer capacitor 分別對應 high-frequency decoupling、near-die ultra-fast response 與 low-frequency bulk stability
+supporting_source_ids: S4
+contrary_source_ids:
+as_of: 2026-04-25
+basis: S4 p.3 Q21 直接回答三類電容在該公司 PDN 解法中的角色與選擇目標
+boundary: 只支持 Murata 的技術角色說法；沒有共同頻帶切點、跨供應商替代率、量產客戶、價格或財務資料
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C4
+label: inference
+status: active
+claim: AI 電容需求應先按系統位置、工作電壓、主要頻帶與任務分層，再談材料、數量與供應商；CBU、高壓 bus／DC link、板級 bulk 與 package／near-die decoupling 可同時存在，但不能合併成單一「電容受惠」需求或預設彼此可替代
+supporting_source_ids: S1,S2,S3,S4
+contrary_source_ids:
+as_of: 2026-08-03
+basis: S1／S2 建立 rack CBU，S3 建立高低壓位置地圖，S4 建立頻帶、瞬態與 placement 分工；四條獨立來源鏈共同支持先分層再映射的研究框架
+boundary: 這是研究端的分類推論，不宣稱唯一架構、固定頻帶、材料優劣、元件數、單機價值、供應商份額、價格、收入或股價尚未反映
+verification_needed: 需同一 production platform 的完整 PDN／CBU design、qualification、BOM、field data 與客戶—供應商雙向文件驗證實際配置及替代
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C5
+label: unverified
+status: active
+claim: 台灣 passive 或 powersupply 族群已有公司以具名電容產品進入上述 AI CBU、800V bus、board 或 package PDN 的 production BOM，並取得可辨識份額、訂單、收入與毛利
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-03
+basis: 現有一手來源只到 OCP／TI 架構及 TDK／Murata 自身產品角色，沒有 universe 公司與客戶雙向核對的 part number、qualification、production BOM、數量、價格及財務分母
+boundary: 不把架構必要性、海外供應商產品地圖、AI 關鍵字或同族群營收成長改寫成台灣公司供貨事實
+verification_needed: 客戶 qualification／採購或 production BOM，並與台灣公司法說、季報或重大訊息交叉核對具名產品、位置、規格、量產、收入及毛利
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 角色地圖：先定位，再談材料與價值量
+
+| 系統位置 | 主要任務 | 本輪可見的一手證據 | 目前不能外推 |
+|---|---|---|---|
+| Rack CBU | 快速功率緩衝與 capacitive energy storage | OCP 把 CBU 與 BBU 分列；TI 展示 EDLC 800V CBU | 固定 cell chemistry、容量、元件數、供應商或 deployment |
+| 400–800V bus／DC link | 高壓下的能量平滑、紋波與轉換級支援 | TDK 公司地圖列 aluminum、MLCC、film capacitors | 全產業共同 BOM、三類元件同增、替代率或市占 |
+| 48V／12V board bulk | 較低頻的 bulk stability、VR input／output smoothing | TDK 低壓地圖與 Murata polymer 角色 | 每張板的顆數、容量、價格、壽命或客戶 qualification |
+| Package／near-die decoupling | 壓低高頻阻抗與寄生、支援快速瞬態 | Murata 對 MLCC、silicon capacitor 的頻帶與 placement 說法 | 固定頻帶切點、哪一材料勝出、量產用量或良率 |
+
+這張表的用途不是替產品排第一名，而是建立查核順序：先問元件在哪一段電力鏈、承受什麼
+電壓與頻率、失效時造成什麼後果，再問規格升級是否增加顆數、提高單價、減少其他元件，或
+只是把價值從一種電容移到另一種。沒有這一步，研究容易把 CBU 的 EDLC、DC link 的高壓
+電容與晶片旁的 MLCC／silicon capacitor 重複加總。
+
+## 分析師如何使用這張圖
+
+1. **先找 production architecture**：reference design 只證明可行；客戶平台文件才可能固定位置與接口。
+2. **再找 qualification**：part number、電壓、容量、ESR／ESL、溫度、壽命與失效測試必須對到同一應用。
+3. **最後才做公司映射**：客戶與供應商雙向確認後，再查出貨量、ASP、份額、收入與毛利；缺一層就維持 watch。
+4. **避免雙重計算**：高規格元件可能減少顆數或取代另一層零件，不能只把每個供應商的 opportunity map 相加。
+
+## 研究判定
+
+- **可保留的結論**：CBU、高壓 bus／DC link、板級 bulk 與 package／near-die decoupling 是不同查核單位；四條一手來源鏈足以建立角色邊界。
+- **可信度為中而不是高**：OCP／TI 支持架構，TDK／Murata 支持供應商產品角色，但尚無同一 production platform 的完整 PDN、共同測試與 BOM。
+- **不得發布的結論**：所有電容同步增量、指定材料或台廠勝出、顆數／ASP／市占／訂單／獲利，以及市場是否已反映。
+- **升格條件**：買方 production 文件與供應商申報雙向對齊具名產品、qualification、配置、出貨及財務分母。
+
+## 來源
+
+- [OCP：Diablo 400 Rack and Power Specification 0.7.0](https://www.opencompute.org/documents/ocp-specification-diablo-400-v0-7-0-final-pdf)
+- [Texas Instruments：800 VDC architecture 與 EDLC CBU](https://www.ti.com/about-ti/newsroom/news-releases/2026/2026-03-16-ti-unveils-complete-800-vdc-power-architecture-for-future-generation-ai-data-centers-with-nvidia.html)
+- [TDK：FY March 2026 Full Year Performance Briefing](https://www.tdk.com/system/files/2026_4q01_0mqf56xw_en.pdf)
+- [Murata：AI System with Advanced Packaging Webinar Q&A](https://www.murata.com/-/media/webrenewal/campaign/events/asean/2026/apr26_ai-system-with-advance-packaging/qna.ashx?cvid=20260425083237000000&la=en-sg)
+- [OCP Open Rack 規格索引](https://www.opencompute.org/wiki/Open_Rack/SpecsAndDesigns)
+- [TDK IR events](https://www.tdk.com/en/ir/ir_events/index.html)
+- [Murata news](https://www.murata.com/news)
+- [公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
+
+## 族群影響
+
+<!-- impact
+group_id: passive
+stock_ids:
+direction: uncertain
+hypothesis_refs:
+note_action: watch
+action_due: 2026-09-30
+rationale: 電容角色可把 passive 族群的公司研究從 AI 關鍵字改為 CBU、high-voltage bus、board bulk 與 near-die decoupling 的具名產品及資格查核
+evidence_boundary: 現有來源沒有台灣公司 production BOM、份額、訂單或財務分母；不做材料、公司或受惠排行
+-->
+
+<!-- impact
+group_id: powersupply
+stock_ids:
+direction: uncertain
+hypothesis_refs:
+note_action: watch
+action_due: 2026-09-30
+rationale: 電源模組與板級 PDN 整合會決定電容位置、額定與替代關係，適合追具名模組、客戶 qualification 與 BOM 變化
+evidence_boundary: 不把外部供應商產品圖或 reference design 改寫成台灣電源公司已採用、量產、取得訂單或改善毛利
+-->
+
+## 監測器
+
+<!-- monitoring_item
+monitor_id: T1
+status: active
+claim_ids: C1,C2,C3,C4
+metric: OCP／平台與元件供應商是否把 capacitor role map 推進到共同介面、具名 part、qualification 與 production configuration
+source_ids: S1,S2,S3,S4
+watch_source_ids: S5,S6,S7
+frequency: monthly
+next_check: 2026-09-01
+trigger: 新規格或 production 文件同時公布系統位置、電壓、頻帶／瞬態、元件類型、qualification 與可重建配置
+invalidation: 新平台顯示本文分層無法描述實際 PDN，或供應商後續文件撤回／實質縮窄原產品角色
+-->
+
+<!-- monitoring_item
+monitor_id: T2
+status: active
+claim_ids: C5
+metric: 台灣 passive／powersupply 公司是否出現客戶與供應商雙向核對的具名 capacitor、量產 BOM、份額與財務分母
+source_ids: S1,S2,S3,S4
+watch_source_ids: S8
+frequency: quarterly
+next_check: 2026-09-30
+trigger: 公司申報與客戶文件同時指向具名產品、系統位置、qualification、量產出貨、收入及毛利
+invalidation: 公司明確否認相關產品或應用，或產品長期停在樣品／機會地圖而沒有 qualification 與 production evidence
+-->
+
+## 什麼會推翻這篇
+
+- Production platform 證明不同位置與頻帶的電容可在相同可靠度、成本與空間條件下完全互換，使本文分層失去解釋力。
+- OCP／平台移除 CBU 或重新定義其任務，而現場資料顯示它與 BBU／board bulk 的邊界不成立。
+- 若台灣公司長期只有「AI、高壓、被動元件」敘事而沒有具名產品、資格、量產與財務分母，族群 route 應維持待驗證，不能因題材熱度升格。

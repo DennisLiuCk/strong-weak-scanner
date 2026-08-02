@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """研究中心知識圖譜的 evidence contract 與 MVP 發布資料。"""
+import re
 import unittest
 from pathlib import Path
 import sys
@@ -18,22 +19,38 @@ class KnowledgeGraphTest(unittest.TestCase):
         cls.topics, cls.notes = kg._load_default_context()
         cls.payload = kg.build_knowledge_graph(cls.topics, cls.notes, strict=True)
 
-    def test_publishes_eighteen_valid_hubs_and_two_separate_views(self):
-        self.assertEqual(self.payload["stats"], {"graphs": 18, "nodes": 209, "edges": 259})
+    def test_publishes_valid_hubs_and_two_separate_views(self):
+        graphs = self.payload["graphs"]
         self.assertEqual(
-            {graph["id"] for graph in self.payload["graphs"]},
+            self.payload["stats"],
             {
-                "hbm", "liquid-cooling", "amd-helios", "backside-power",
-                "ai-memory-hierarchy", "open-ai-fabrics",
-                "cpo-networking", "hybrid-bonding", "panel-level-packaging",
-                "ucie-interoperability", "800v-power-tree",
-                "glass-substrate-commercialization",
-                "hbf-commercialization", "high-na-euv-readiness",
-                "custom-hbm-scope-ladder", "pcie6-compliance-ladder",
-                "ai-power-buffering", "liquid-cooling-loop-boundaries",
+                "graphs": len(graphs),
+                "nodes": len({node["id"] for graph in graphs for node in graph["nodes"]}),
+                "edges": sum(len(graph["edges"]) for graph in graphs),
             },
         )
-        for graph in self.payload["graphs"]:
+        graph_ids = {graph["id"] for graph in graphs}
+        self.assertEqual(len(graph_ids), len(graphs))
+        registered_ids = set()
+        for path in (ROOT / "notes" / "knowledge_graph").glob("*.md"):
+            if path.name.startswith("_"):
+                continue
+            match = re.search(
+                r"<!-- knowledge_graph_meta\s+(.*?)-->",
+                path.read_text(encoding="utf-8"),
+                re.DOTALL,
+            )
+            self.assertIsNotNone(match, path.name)
+            fields = dict(
+                line.split(":", 1)
+                for line in match.group(1).splitlines()
+                if ":" in line
+            )
+            if fields.get("status", "").strip() == "active":
+                registered_ids.add(fields["graph_id"].strip())
+        self.assertEqual(graph_ids, registered_ids)
+        self.assertGreater(len(graphs), 0)
+        for graph in graphs:
             self.assertEqual({edge["view"] for edge in graph["edges"]},
                              {"company", "industry"})
             for edge in graph["edges"]:

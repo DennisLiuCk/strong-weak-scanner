@@ -199,6 +199,12 @@ v3 繼承 v2 的新手導讀。第一個 H2 固定為「新手先讀：這篇在
 4. 「接下來怎麼追」至少 2 個可觀察節點。
 5. 「想一想」至少 2 個以問號結尾、能幫助反證的問題。
 
+發布頁另由 v3 register 自動合成「分析師快讀：判定、缺口與下一步」，置於新手導讀之前；
+它必須直接重用 `thesis_claim_id`、主命題來源鏈、active `unverified` claim、impact 與最早
+monitor，不得靠另一段人工摘要提升語氣。產業學習者的機制說明與研究判定先於完整控制表；
+主張、impact、comparison、monitor 詳表集中在其後，原文帳本導言可保留，但同義標題只顯示
+一次。這項雙讀者 gate 是發布可用性契約，不改變 topic schema 或證據層級。
+
 另外，每篇 v3 必須具備：
 
 1. meta 的 `thesis_claim_id`、`base_confidence`、`confidence_basis` 與

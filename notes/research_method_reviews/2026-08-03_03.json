@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-08-03",
+  "methodologyVersion": "1.3",
+  "registryFingerprint": "f8fa1476097ebd5a0605af5ec777723149efeb2cb785fbc869924964ed459024",
+  "scope": {
+    "topics": 30,
+    "activeTopics": 30,
+    "radarCandidates": 5,
+    "promotedCandidates": 2,
+    "graphs": 20,
+    "scanEvents": 13
+  },
+  "selection": {
+    "cycleId": "RS-2026-08-03-03",
+    "candidates": 5,
+    "frozenBeforeResearch": 5,
+    "advanceDecisions": 2,
+    "promotedAfterResearch": 2,
+    "rejectedAfterResearch": 0,
+    "accountable": true,
+    "boundary": "凍結紀錄只能證明選擇與拒絕條件可被事後稽核；升格是研究產出，不是選題正確率或投資命中率。"
+  },
+  "claims": {
+    "active": 177,
+    "verified": 107,
+    "inference": 32,
+    "unverified": 38,
+    "withBoundary": 177,
+    "unverifiedWithNextEvidence": 38,
+    "comparisonObservations": 27
+  },
+  "sources": {
+    "active": 211,
+    "withLocatorAndLimitation": 211,
+    "thesesWithTwoIndependentGroups": 27,
+    "activeTheses": 30,
+    "thesesNeedingSecondIndependentGroup": [
+      "MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP",
+      "MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL",
+      "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION"
+    ]
+  },
+  "monitors": {
+    "active": 68,
+    "withLivingWatchSource": 68,
+    "dueOrOverdue": 0,
+    "overdue": 0,
+    "reviewedMature": 3
+  },
+  "freshness": {
+    "staleTopics": 2,
+    "staleEdges": 0
+  },
+  "scans": {
+    "events": 13,
+    "full": 0,
+    "partial": 13,
+    "overdue": 0,
+    "latestAt": "2026-08-03",
+    "latestId": "scan-2026-08-03-passive-power-layer-map",
+    "latestScope": "partial"
+  },
+  "corrections": {
+    "supersededOrRefutedClaims": 2,
+    "monitorReviewEvents": 3,
+    "resultCounts": {
+      "new_contrary": 0,
+      "new_support": 0,
+      "no_new_evidence": 3,
+      "not_yet_testable": 0
+    }
+  },
+  "calibration": {
+    "evidenceBearingOutcomes": 0,
+    "minimumOutcomesForDescriptiveRate": 3,
+    "descriptiveRateReady": false,
+    "supportRate": null,
+    "boundary": "此處只描述到期 monitor 的證據結果，不是投資命中率、報酬率或因果效果。"
+  },
+  "graphs": {
+    "activeEdges": 283,
+    "traceableEdges": 283,
+    "verified": 193,
+    "inference": 40,
+    "unverified": 50,
+    "financialMateriality": 0
+  },
+  "gates": [
+    {
+      "id": "selection_accountability",
+      "label": "選題前承諾",
+      "status": "pass",
+      "observed": "5/5 個本輪候選有研究前凍結；2 個 advance 中 2 個完成升格、0 個研究後拒絕",
+      "boundary": "通過只代表初始排名、第一拒絕與下一份證據沒有被事後改寫；不能由單輪升格率判定方法有效。"
+    },
+    {
+      "id": "traceability",
+      "label": "可追溯性",
+      "status": "pass",
+      "observed": "283/283 條圖譜線可回查；177/177 個 active claim 有邊界",
+      "boundary": "通過代表引用完整，不代表主張一定為真。"
+    },
+    {
+      "id": "cross_check_depth",
+      "label": "獨立交叉驗證",
+      "status": "attention",
+      "observed": "27/30 個主命題有至少兩條獨立來源鏈；缺口 MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP,MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION",
+      "boundary": "兩條獨立消息鏈只能降低單一來源偏誤，不代表主張一定為真。"
+    },
+    {
+      "id": "falsifiability",
+      "label": "可證偽性",
+      "status": "pass",
+      "observed": "68/68 個 monitor 有 living watch source；38/38 個待驗證 claim 寫明下一份證據",
+      "boundary": "Monitor 完整不等於結果已成熟。"
+    },
+    {
+      "id": "freshness",
+      "label": "新鮮度",
+      "status": "attention",
+      "observed": "2 篇 topic、0 條 edge 過期；0 個 monitor 逾期",
+      "boundary": "過期會降可信度，但不自動判定主張錯誤。"
+    },
+    {
+      "id": "correction_learning",
+      "label": "修正學習",
+      "status": "pass",
+      "observed": "目前沒有待回顧 monitor；歷史已完成 3 次到期回顧；累積 2 個已修正 claim",
+      "boundary": "沒有新證據必須留下 no_new_evidence，而不能刷新 evidence clock。"
+    },
+    {
+      "id": "scan_accountability",
+      "label": "掃描覆蓋問責",
+      "status": "attention",
+      "observed": "13 次掃描：0 次 full、13 次 partial；最新 cadence 逾期 0 次；最新 scan-2026-08-03-passive-power-layer-map",
+      "boundary": "Partial 只證明指定來源與題材已查過，不能證明全市場沒有其他重要主題；逾期只檢查最新全域 cadence，尚未量化每個歷史 scope 是否被後續掃描覆蓋；通過也不代表每則公告都被正確解讀。"
+    },
+    {
+      "id": "calibration",
+      "label": "校準可用性",
+      "status": "not_ready",
+      "observed": "0 個具新證據的到期結果；最低揭露門檻 3",
+      "boundary": "樣本不足時不報支持率；即使可報也只附樣本數，不稱為投資命中率。"
+    }
+  ],
+  "caveats": [
+    "選題前凍結與升格結果分開保存；至少累積多輪到期結果前，不計算選題命中率。",
+    "升格候選數是研究流程產出，不是研究正確率。",
+    "獨立來源鏈覆蓋是交叉檢查深度，不是多數決或真實性分數。",
+    "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
+    "no_new_evidence 是一次有紀錄的檢查，不得刷新 claim 的證據時鐘。",
+    "Partial scan 不等於全 universe 或全市場覆蓋；研究漏網風險必須持續顯示。",
+    "Scan overdue 目前只量最新全域 cadence；尚無 scope lineage 前，不把歷史期限累加成永久逾期。"
+  ],
+  "snapshotId": "RMA-2026-08-03-03"
+}

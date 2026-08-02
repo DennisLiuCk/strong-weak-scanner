@@ -72,6 +72,9 @@ class ResearchCenterTest(unittest.TestCase):
                 "h": "新手先讀：這篇在講什麼",
                 "blocks": [{"t": "p", "runs": [{"s": "先釐清已知、未知與追蹤方式。"}]}],
             }, {
+                "h": "主張與證據帳本",
+                "blocks": [{"t": "p", "runs": [{"s": "原文的帳本邊界必須保留。"}]}],
+            }, {
                 "h": "只含 metadata 的空段落", "blocks": [],
             }] + SECTIONS,
             "sources": [
@@ -167,8 +170,8 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(topic["confidence"]["effective"], "medium")
         self.assertEqual(
             [section["h"] for section in topic["sections"][:5]],
-            ["新手先讀：這篇在講什麼", "主張—證據帳本", "影響路由與證據邊界",
-             "跨公司數字可比性", "追蹤節點與失效條件"],
+            ["分析師快讀：判定、缺口與下一步", "新手先讀：這篇在講什麼",
+             "30 秒摘要", "主張—證據帳本", "影響路由與證據邊界"],
         )
         self.assertIn("不可比", str(topic["sections"]))
         self.assertIn("供應商首次確認訂單", str(topic["sections"]))
@@ -178,7 +181,14 @@ class ResearchCenterTest(unittest.TestCase):
 
         headings = [section["h"] for section in topic["sections"]]
         self.assertNotIn("只含 metadata 的空段落", headings)
+        self.assertNotIn("主張與證據帳本", headings)
+        self.assertEqual(headings.count("主張—證據帳本"), 1)
         self.assertTrue(all(section["blocks"] for section in topic["sections"]))
+        analyst = topic["sections"][0]
+        self.assertIn("目前判定：公司已正式公告擴產", str(analyst))
+        self.assertIn("功率元件（方向未定／watch）", str(analyst))
+        self.assertIn("2026-08-05", str(analyst))
+        self.assertIn("原文的帳本邊界必須保留", str(topic["sections"]))
 
         impact = next(
             section for section in topic["sections"]
@@ -296,6 +306,7 @@ class ResearchCenterTest(unittest.TestCase):
             "來源帳本", "mobile-evidence", "可水平捲動的研究資料表",
             "aria-label=\"搜尋研究文章\"", "filtersPanel.inert", "clearArticleRoute",
             "aria-label=\"研究文章清單\"", ":focus-visible", "@media(max-width:780px)",
+            "分析師快讀：判定、缺口與下一步", "function resetReaderScroll()",
         ):
             self.assertIn(marker, template)
         self.assertIn("RESEARCH_TEMPLATE", builder)
@@ -304,7 +315,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('新手先讀：這篇在講什麼', template)
         self.assertIn('beginner-toc', template)
         self.assertIn('_article_excerpt(topic.get("summary"))', builder)
-        self.assertIn('_topic_structured_sections(topic, sections or [])', builder)
+        self.assertIn('_topic_structured_sections(topic, sections or [], group_names)', builder)
         self.assertIn('"asOf": library_as_of.isoformat()', builder)
         self.assertIn('as_of=research_as_of', builder)
         self.assertIn('taipei_today as research_today', builder)
@@ -312,7 +323,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('research_library["knowledgeGraph"] = build_knowledge_graph(', builder)
         self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
         self.assertIn("body.append(mobileBack,h('h1'", template)
-        self.assertIn("body.append(meta,articleSections(article)", template)
+        self.assertIn("body.append(meta,articleSections(article,'analyst'))", template)
+        self.assertIn("body.appendChild(articleSections(article,'rest'))", template)
+        self.assertIn("body.append(mobileEvidence,h('p'", template)
         self.assertIn("'aria-selected':state.type===type?'true':'false'", template)
         self.assertIn("'data-testid':'article-'+article.id", template)
         self.assertIn("@media(max-width:1180px){\n  .shell{display:block}", template)

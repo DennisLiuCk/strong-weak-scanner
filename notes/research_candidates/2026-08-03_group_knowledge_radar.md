@@ -8,7 +8,7 @@ schema_version: 2
 radar_id: RADAR-2026-08-03-02
 as_of: 2026-08-03
 next_review: 2026-08-10
-status: active
+status: retired
 method: 先以族群文章與圖譜端點覆蓋找缺口，再按一手來源獨立性、能否建立可證偽機制、相對既有研究的新增知識、台灣公司映射風險與維護成本排序；候選先寫入 append-only selection log，深研後只更新 research grade、promoted 或 deferred 結果
 selection_cycle_id: RS-2026-08-03-02
 -->

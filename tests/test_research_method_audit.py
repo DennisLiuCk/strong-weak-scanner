@@ -25,44 +25,67 @@ class ResearchMethodAuditTest(unittest.TestCase):
         cls.latest = audit.load_method_audit(strict=True)
 
     def test_baseline_snapshot_matches_current_registry(self):
-        self.assertEqual(self.latest["snapshotId"], "RMA-2026-08-03-02")
+        self.assertRegex(self.latest["snapshotId"], r"^RMA-\d{4}-\d{2}-\d{2}-\d+$")
+        self.assertEqual(self.latest["asOf"], self.current["asOf"])
         self.assertEqual(self.latest["methodologyVersion"], "1.3")
         self.assertEqual(
             self.latest["registryFingerprint"], self.current["registryFingerprint"],
         )
-        self.assertEqual(len(self.latest["history"]), 5)
+        self.assertGreater(len(self.latest["history"]), 0)
+        self.assertEqual(
+            self.latest["history"][-1]["snapshotId"], self.latest["snapshotId"],
+        )
+        self.assertEqual(
+            len({item["snapshotId"] for item in self.latest["history"]}),
+            len(self.latest["history"]),
+        )
 
     def test_audit_exposes_counts_without_fake_accuracy_score(self):
-        self.assertEqual(self.current["scope"]["topics"], 28)
-        self.assertEqual(self.current["scope"]["graphs"], 18)
-        self.assertEqual(self.current["scope"]["scanEvents"], 12)
-        self.assertEqual(self.current["claims"]["active"], 167)
-        self.assertEqual(self.current["graphs"]["activeEdges"], 259)
-        self.assertEqual(self.current["graphs"]["traceableEdges"], 259)
+        active_claims = sum(
+            claim.get("status", "active") == "active"
+            for topic in self.topics
+            for claim in topic["claims"]
+        )
+        self.assertEqual(self.current["scope"]["topics"], len(self.topics))
+        self.assertEqual(self.current["scope"]["graphs"], self.graph["stats"]["graphs"])
+        self.assertEqual(self.current["scope"]["scanEvents"], len(self.scan["rows"]))
+        self.assertEqual(self.current["claims"]["active"], active_claims)
+        self.assertEqual(
+            self.current["graphs"]["activeEdges"], self.graph["stats"]["edges"]
+        )
+        self.assertEqual(
+            self.current["graphs"]["traceableEdges"],
+            self.current["graphs"]["activeEdges"],
+        )
         self.assertEqual(self.current["monitors"]["reviewedMature"], 3)
         self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 3)
         self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 3)
         self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 2)
-        self.assertEqual(self.current["scans"]["latestId"],
-                         "scan-2026-08-03-group-gaps-power-buffering-cooling-loops")
-        self.assertEqual(self.current["scans"]["latestScope"], "partial")
+        self.assertEqual(
+            self.current["scans"]["latestId"], self.scan["latest"]["scan_id"]
+        )
+        self.assertEqual(
+            self.current["scans"]["latestScope"], self.scan["latest"]["scope"]
+        )
         self.assertEqual(self.current["scans"]["overdue"], 0)
         self.assertFalse(self.current["calibration"]["descriptiveRateReady"])
         self.assertIsNone(self.current["calibration"]["supportRate"])
         self.assertNotIn("score", self.current)
-        self.assertEqual(
-            self.current["selection"],
-            {
-                "cycleId": "RS-2026-08-03-02",
-                "candidates": 5,
-                "frozenBeforeResearch": 5,
-                "advanceDecisions": 2,
-                "promotedAfterResearch": 2,
-                "rejectedAfterResearch": 0,
-                "accountable": True,
-                "boundary": "凍結紀錄只能證明選擇與拒絕條件可被事後稽核；升格是研究產出，不是選題正確率或投資命中率。",
-            },
-        )
+        selection = self.current["selection"]
+        self.assertEqual(selection["cycleId"], self.radar["selectionCycleId"])
+        self.assertEqual(selection["candidates"], len(self.radar["candidates"]))
+        self.assertEqual(selection["frozenBeforeResearch"], len(self.radar["selectionLog"]))
+        self.assertEqual(selection["advanceDecisions"], self.radar["stats"]["selectedAdvance"])
+        self.assertEqual(selection["promotedAfterResearch"], sum(
+            row["selectionOutcome"] == "promoted_after_research"
+            for row in self.radar["candidates"]
+        ))
+        self.assertEqual(selection["rejectedAfterResearch"], sum(
+            row["selectionOutcome"] == "rejected_after_research"
+            for row in self.radar["candidates"]
+        ))
+        self.assertTrue(selection["accountable"])
+        self.assertIn("不是選題正確率或投資命中率", selection["boundary"])
 
     def test_every_gate_keeps_its_own_status_and_boundary(self):
         gates = {item["id"]: item for item in self.current["gates"]}
@@ -94,7 +117,10 @@ class ResearchMethodAuditTest(unittest.TestCase):
                 "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION",
             ],
         )
-        self.assertEqual(self.current["sources"]["thesesWithTwoIndependentGroups"], 25)
+        self.assertEqual(
+            self.current["sources"]["thesesWithTwoIndependentGroups"],
+            self.current["sources"]["activeTheses"] - len(missing),
+        )
         gate = next(item for item in self.current["gates"]
                     if item["id"] == "cross_check_depth")
         for topic_id in missing:

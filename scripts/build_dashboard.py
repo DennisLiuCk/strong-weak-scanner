@@ -1635,7 +1635,97 @@ def _research_source_refs(source_ids, source_by_id):
     return "、".join(labels) or "—"
 
 
-def _topic_structured_sections(topic, sections):
+def _topic_analyst_section(topic, source_by_id, group_names=None):
+    """由 v3 register 合成首屏快讀；只摘要現有 claim／impact／monitor。"""
+    group_names = group_names or {}
+    claims = [
+        item for item in (topic.get("claims") or [])
+        if item.get("status", "active") == "active"
+    ]
+    claim_by_id = {item.get("claim_id"): item for item in claims}
+    meta = topic.get("meta") or {}
+    thesis = claim_by_id.get(meta.get("thesis_claim_id"))
+    if thesis is None and claims:
+        thesis = claims[0]
+    if thesis is None:
+        return None
+
+    supporting_ids = thesis.get("supporting_source_ids") or []
+    supporting_sources = [
+        source_by_id[source_id] for source_id in supporting_ids
+        if source_id in source_by_id
+        and source_by_id[source_id].get("status", "active") == "active"
+    ]
+    independence_groups = {
+        (source.get("independence_group") or source.get("publisher")
+         or source.get("source_id") or source.get("id") or "unknown")
+        .strip().lower()
+        for source in supporting_sources
+    }
+    confidence = topic.get("confidence") or {}
+    confidence_label = (
+        confidence.get("effective_label")
+        or {"high": "高", "medium": "中", "low": "低"}.get(
+            meta.get("base_confidence"), meta.get("base_confidence") or "未評級")
+    )
+    thesis_label = thesis.get("label_text") or thesis.get("label") or "—"
+
+    unverified = [item for item in claims if item.get("label") == "unverified"]
+    if unverified:
+        gap = unverified[0].get("claim") or "—"
+        if len(unverified) > 1:
+            gap += f"（另有 {len(unverified) - 1} 項待驗證）"
+    else:
+        gap = "沒有 active 待驗證 claim；仍須遵守各主張的 evidence boundary。"
+
+    direction_labels = {
+        "tailwind": "順風", "headwind": "逆風", "mixed": "混合",
+        "uncertain": "方向未定",
+    }
+    routed = []
+    for item in topic.get("impacts") or []:
+        scope = group_names.get(item.get("group_id"), item.get("group_id") or "—")
+        action = item.get("note_action") or "—"
+        direction = direction_labels.get(item.get("direction"), item.get("direction") or "—")
+        routed.append(f"{scope}（{direction}／{action}）")
+    route_text = "、".join(routed) if routed else "目前沒有公司或族群 impact route。"
+
+    active_monitors = [
+        item for item in (topic.get("monitoring") or [])
+        if item.get("status", "active") == "active"
+    ]
+    active_monitors.sort(key=lambda item: item.get("next_check") or "9999-12-31")
+    if active_monitors:
+        first_monitor = active_monitors[0]
+        next_check = (
+            f"{first_monitor.get('next_check') or '—'}："
+            f"{first_monitor.get('trigger') or first_monitor.get('metric') or '—'}"
+        )
+    else:
+        next_check = "目前沒有 active monitor；不可把本文當成持續有效的研究結論。"
+
+    evidence_text = (
+        f"有效可信度 {confidence_label}；主命題標記為「{thesis_label}」，"
+        f"連到 {len(supporting_sources)} 份 active 來源、"
+        f"{len(independence_groups)} 條獨立來源鏈。"
+    )
+    return {
+        "h": "分析師快讀：判定、缺口與下一步",
+        "blocks": [
+            {"t": "p", "runs": _research_run(
+                "這是結構化帳本的導覽摘要，不會提升 claim、impact 或圖譜的證據層級。")},
+            {"t": "ul", "items": [
+                _research_run(f"目前判定：{thesis.get('claim') or '—'}", bold=True),
+                _research_run(f"證據強度：{evidence_text}"),
+                _research_run(f"尚未證實：{gap}"),
+                _research_run(f"可行動範圍：{route_text}"),
+                _research_run(f"下一個檢驗：{next_check}"),
+            ]},
+        ],
+    }
+
+
+def _topic_structured_sections(topic, sections, group_names=None):
     """把 v3 ledger 轉成讀者可見段落；原始 Markdown blocks 仍是唯一事實來源。"""
     sections = [section for section in (sections or []) if section.get("blocks")]
     source_by_id = {
@@ -1644,6 +1734,17 @@ def _topic_structured_sections(topic, sections):
         if source.get("source_id") or source.get("id")
     }
     generated = []
+
+    # 原文的帳本導言仍保留，但由完整結構化表格承接，避免同一文章出現兩個近義標題。
+    ledger_headings = {"主張與證據帳本", "主張—證據帳本"}
+    original_ledger_blocks = []
+    retained_sections = []
+    for section in sections:
+        if section.get("h") in ledger_headings:
+            original_ledger_blocks.extend(section.get("blocks") or [])
+        else:
+            retained_sections.append(section)
+    sections = retained_sections
 
     claims = topic.get("claims") or []
     if claims:
@@ -1684,6 +1785,7 @@ def _topic_structured_sections(topic, sections):
         generated.append({
             "h": "主張—證據帳本",
             "blocks": [
+                *original_ledger_blocks,
                 {"t": "p", "runs": _research_run(
                     "「證實」只表示目前一手證據直接支持；「推論」與「待驗證」"
                     "仍須依後續節點更新，不能當成個股訂單或報酬保證。")},
@@ -1815,15 +1917,18 @@ def _topic_structured_sections(topic, sections):
             ], "rows": rows}],
         })
 
+    analyst = _topic_analyst_section(topic, source_by_id, group_names)
     if not generated:
-        return sections
-    beginner_index = next(
+        return ([analyst] if analyst else []) + sections
+
+    # 先讓讀者理解機制與研究判定，再提供完整控制表；來源清單仍留在詳細帳本之後。
+    source_index = next(
         (index for index, section in enumerate(sections)
-         if section.get("h") == "新手先讀：這篇在講什麼"),
-        -1,
+         if section.get("h") in {"來源", "來源與證據邊界"}),
+        len(sections),
     )
-    insertion = beginner_index + 1 if beginner_index >= 0 else 0
-    return sections[:insertion] + generated + sections[insertion:]
+    result = sections[:source_index] + generated + sections[source_index:]
+    return ([analyst] if analyst else []) + result
 
 
 def _research_reading_minutes(sections):
@@ -1957,7 +2062,7 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
         if sections is None and topic.get("path") and os.path.exists(topic["path"]):
             with open(topic["path"], encoding="utf-8") as handle:
                 sections = _extract_sections(handle.read())
-        sections = _topic_structured_sections(topic, sections or [])
+        sections = _topic_structured_sections(topic, sections or [], group_names)
         article_id = (
             f"topic-{topic.get('topic_id') or os.path.basename(topic.get('relpath', 'topic'))}"
         )

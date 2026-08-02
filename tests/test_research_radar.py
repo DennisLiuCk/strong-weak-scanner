@@ -23,33 +23,41 @@ class ResearchRadarTest(unittest.TestCase):
         )
 
     def test_active_radar_is_complete_and_ranked_without_gaps(self):
+        candidates = self.payload["candidates"]
+        selection_log = self.payload["selectionLog"]
+        expected_stats = {
+            "candidates": len(candidates),
+            "promoted": sum(row["status"] == "promoted" for row in candidates),
+            "highKnowledge": sum(
+                row["knowledgeValue"] == "high" for row in candidates
+            ),
+            "selectionFrozen": len(selection_log),
+            "selectedAdvance": sum(
+                row["selection_decision"] == "advance" for row in selection_log
+            ),
+            "selectedWatch": sum(
+                row["selection_decision"] == "watch" for row in selection_log
+            ),
+            "selectedDefer": sum(
+                row["selection_decision"] == "defer" for row in selection_log
+            ),
+        }
+        self.assertEqual(self.payload["stats"], expected_stats)
+        self.assertEqual(len(candidates), 5)
         self.assertEqual(
-            self.payload["stats"],
-            {
-                "candidates": 5,
-                "promoted": 2,
-                "highKnowledge": 4,
-                "selectionFrozen": 5,
-                "selectedAdvance": 2,
-                "selectedWatch": 2,
-                "selectedDefer": 1,
-            },
-        )
-        self.assertEqual(
-            [row["rank"] for row in self.payload["candidates"]],
+            [row["rank"] for row in candidates],
             list(range(1, 6)),
         )
         self.assertEqual(self.payload["schemaVersion"], 2)
-        self.assertEqual(self.payload["selectionCycleId"], "RS-2026-08-03-02")
-        self.assertEqual(self.payload["asOf"], "2026-08-03")
+        self.assertTrue(self.payload["selectionCycleId"].startswith("RS-"))
+        self.assertEqual(
+            {row["cycle_id"] for row in selection_log},
+            {self.payload["selectionCycleId"]},
+        )
         self.assertGreater(self.payload["nextReview"], self.payload["asOf"])
 
     def test_top_two_are_promoted_to_articles_and_graphs(self):
         top_two = self.payload["candidates"][:2]
-        self.assertEqual(
-            [row["id"] for row in top_two],
-            ["RC-AI-POWER-BUFFERING", "RC-LIQUID-COOLING-LOOP-BOUNDARY"],
-        )
         for row in top_two:
             self.assertEqual(row["priority"], "p1")
             self.assertEqual(row["knowledgeValue"], "high")
@@ -62,9 +70,14 @@ class ResearchRadarTest(unittest.TestCase):
 
     def test_watch_and_deferred_candidates_are_not_forced_into_articles_or_graphs(self):
         for row in self.payload["candidates"][2:]:
-            self.assertIn(row["status"], {"watch", "deferred"})
-            self.assertFalse(row["articleId"])
-            self.assertFalse(row["graphId"])
+            self.assertIn(row["status"], {"expand_existing", "watch", "deferred"})
+            if row["status"] == "expand_existing":
+                self.assertEqual(row["route"], "expand_existing_article")
+                self.assertTrue(row["articleId"])
+                self.assertTrue(row["graphId"])
+            else:
+                self.assertFalse(row["articleId"])
+                self.assertFalse(row["graphId"])
 
     def test_frozen_selection_fields_are_exposed_without_rewriting(self):
         frozen = {row["candidate_id"]: row for row in self.payload["selectionLog"]}

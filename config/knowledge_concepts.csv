@@ -144,3 +144,15 @@ component:quick-disconnect,component,液冷快接,QD|Quick disconnect|UQD,concep
 capability:coolant-compatibility,capability,冷卻液與材料相容性,Coolant compatibility|Fluid chemistry,concept:liquid-cooling-loop-boundary,控制腐蝕結垢污染與材料反應以維持液冷迴路可靠度的能力
 capability:liquid-cooling-telemetry,capability,液冷可觀測性,Liquid cooling telemetry|BMS liquid points,concept:liquid-cooling-loop-boundary,以溫度流量壓差漏液與狀態資料觀測及控制液冷系統的能力
 capability:leak-isolation,capability,漏液偵測與隔離,Leak detection|Liquid isolation,concept:liquid-cooling-loop-boundary,偵測液體外洩並將受影響機架或支路安全隔離的能力
+concept:ai-capacitor-role-map,concept,AI 電容角色地圖,AI capacitor role map|capacitor placement hierarchy,concept:800v-power-tree,依系統位置 工作電壓 頻帶與任務分開 CBU 高壓匯流排 板級 bulk 與近晶片去耦的研究框架
+component:dc-link-capacitor,component,高壓 DC-link 電容,DC-link capacitor|HV bus capacitor,concept:ai-capacitor-role-map,位於高壓直流匯流排或轉換級之間並承受高壓 紋波與壽命要求的電容
+component:board-bulk-capacitor,component,板級 Bulk 電容,Board bulk capacitor|bulk decoupling,concept:ai-capacitor-role-map,位於電源輸入輸出或電路板電源軌並處理較低頻能量與電流變化的電容
+component:polymer-capacitor,component,聚合物電容,Polymer aluminum capacitor|polymer capacitor,concept:ai-capacitor-role-map,以低 ESR 與較大容量支援板級 bulk stability 與電源輸入輸出平滑的電容
+component:mlcc-decoupling,component,MLCC 去耦電容,MLCC decoupling|multilayer ceramic capacitor,concept:ai-capacitor-role-map,以低阻抗和小型化支援板級或封裝附近高頻去耦的多層陶瓷電容
+component:silicon-capacitor,component,Silicon capacitor,矽電容|silicon decoupling capacitor,concept:ai-capacitor-role-map,可靠近或嵌入封裝以降低寄生並支援快速瞬態的矽電容
+concept:800v-protection-layers,concept,800VDC 保護責任層,800V protection layers|HVDC fault protection map,concept:800v-power-tree,把人身維修 絕緣接地 故障電流 hot-swap 與備援能量分開追蹤的 800VDC fault framework
+capability:safety-interlock,capability,高壓安全連鎖,Safety interlock|de-energization interlock,concept:800v-protection-layers,在人員接近帶電高壓部位前強制斷電或阻止接近的維修安全能力
+capability:protective-earthing,capability,保護接地與等電位,Protective earthing|protective bonding,concept:800v-protection-layers,為故障電流提供受控接地路徑並維持機構等電位的安全能力
+capability:overcurrent-protection,capability,過電流保護,Overcurrent protection|short-circuit protection,concept:800v-protection-layers,偵測並限制或切斷超額電流與短路故障的保護能力
+capability:ground-fault-detection,capability,接地故障偵測,Ground fault detection|insulation fault detection,concept:800v-protection-layers,偵測高壓導體對保護地或機殼異常電流路徑的能力
+capability:controlled-inrush,capability,受控湧入與預充,Controlled inrush|pre-charge control,concept:800v-protection-layers,帶電連接大電容負載時依功率開關安全工作區控制充電軌跡的能力
