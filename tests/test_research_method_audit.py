@@ -113,7 +113,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertIn('research_library["methodAudit"] = load_method_audit(', builder)
         for token in (
             'id="methodAudit"', "const AUDIT=LIB.methodAudit", "function renderMethodAudit()",
-            "方法健康度（不合成分數）",
+            "方法健康度（不合成分數）", "逐項顯示可追溯、獨立交叉驗證",
         ):
             self.assertIn(token, template)
         self.assertIn("monitor_reviews.csv", method)
