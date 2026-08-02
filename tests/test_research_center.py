@@ -386,13 +386,23 @@ class ResearchCenterTest(unittest.TestCase):
             'name="graphEvidence"', 'id="graphUniverseOnly"',
             "const KG=LIB.knowledgeGraph", "function renderGraph()",
             "function renderGraphSvg(", "function renderGraphDetail(",
+            "function renderGraphExposureRings(",
+            "function graphPositions(nodes,rootId,edges)",
             "['company','公司曝險']", "['industry','產業依賴']",
+            "GRAPH_EXPOSURE_RINGS", "GRAPH_RELATION_GROUPS",
+            "graph-exposure-ring", "graph-node-materiality",
+            "graph-relation-group", "graph-relation-items",
+            'viewBox="0 0 1100 700"',
+            "if(!isRoot)group.append(svgEl('rect',{class:'graph-node-materiality-bg",
             "graphMaterialityWidth", "stroke-dasharray",
             "證據邊界", "下一個升降級節點", "供應集中度範圍",
-            "點線與細線表示仍需更多商業證據",
+            "同心環距離＋節點標籤＝商業曝險層級",
+            "節點離中心越近", "空的「財務可辨識」內圈",
             "role:'button',tabindex:'0'", "graphKeyboard(",
         ):
             self.assertIn(contract, template)
+        self.assertNotIn("線寬表示商業曝險", template)
+        self.assertNotIn("點線與細線表示仍需更多商業證據", template)
         self.assertIn("state.graphUniverseOnly=event.target.checked", template)
         self.assertIn("state.graphEvidence.add(input.value)", template)
 
