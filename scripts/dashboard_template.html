@@ -114,7 +114,9 @@ svg{display:block;overflow:visible}
 .recent-total{font-size:13px;font-weight:800;color:var(--ink)}
 .recent-count{font-size:11.5px;color:var(--ink2);background:var(--inset);border:1px solid var(--line2);border-radius:100px;padding:3px 9px}
 .recent-list{display:grid;gap:8px}
+.recent-batch-label{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:7px 2px 1px;color:var(--ink2);font-size:12px;font-weight:800}.recent-batch-label span:last-child{font-size:10.5px;font-weight:600;color:var(--muted)}
 .recent-item{display:grid;grid-template-columns:112px minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:13px;min-height:72px}
+.recent-item.latest{border-color:color-mix(in srgb,var(--teal) 32%,var(--line))}
 .recent-item:hover{color:var(--ink);background:var(--inset);border-color:var(--muted);text-decoration:none}
 .recent-item:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 .recent-date{display:block;font-family:'IBM Plex Mono',Consolas,ui-monospace,monospace;font-size:11.5px;color:var(--muted)}
@@ -1362,19 +1364,29 @@ function buildDetail(){
   return card;
 }
 
-/* ---------- 研究中心入口：首頁只留三類各一篇，完整內容移到獨立頁 ---------- */
+/* ---------- 研究中心入口：完整列出最近發布批次，再補其他類型的最近一篇 ---------- */
 function buildRecentArticles(){
   const fmtDate=value=>String(value||'').replaceAll('-','/');
   const head=[
     h('p',{class:'kicker',text:'深度研究 · 獨立閱讀空間'}),
     h('h2',{class:'sec',text:'研究中心'}),
-    h('p',{class:'lead',text:'正式筆記、多空小作文與市場議題已移到獨立頁面，可搜尋、篩選並在站內閱讀全文。首頁只保留三類最新入口；新近不代表證據較強，查核狀態與觀察層警語逐篇保留。'})
+    h('p',{class:'lead',text:'正式筆記、多空小作文與市場議題已移到獨立頁面，可搜尋、篩選並在站內閱讀全文。首頁完整列出最近一個發布批次，再補上該批次未包含類型的最近文章；新近不代表證據較強，查核狀態與觀察層警語逐篇保留。'})
   ];
   const card=h('div',{class:'card',style:'padding:20px 22px'});
   const items=(RECENT&&RECENT.items)||[];
+  const latestDate=(RECENT&&RECENT.latestDate)||(items[0]&&items[0].date)||'';
+  const latestItems=items.filter(item=>item.date===latestDate);
+  const latestTypes=new Set(latestItems.map(item=>item.type));
+  const supplemental=['formal_note','narrative','topic'].map(type=>
+    latestTypes.has(type)?null:items.find(item=>item.type===type)).filter(Boolean);
+  const visible=latestItems.concat(supplemental);
+  const libraryTotal=(RECENT&&Number.isFinite(RECENT.libraryTotal))?RECENT.libraryTotal:items.length;
+  const libraryCounts=(RECENT&&RECENT.libraryCounts)||((RECENT&&RECENT.counts)||[]);
   const summary=h('div',{class:'recent-summary'},
-    h('span',{class:'recent-total',text:'共 '+items.length+' 篇'}));
-  ((RECENT&&RECENT.counts)||[]).forEach(c=>summary.appendChild(
+    h('span',{class:'recent-total',text:'研究庫共 '+libraryTotal+' 篇'}),
+    h('span',{class:'recent-count',text:'近 '+((RECENT&&RECENT.days)||14)+' 日 '+items.length+' 篇'}),
+    latestDate&&h('span',{class:'recent-count',text:'最新批次 '+fmtDate(latestDate)+' · '+latestItems.length+' 篇'}));
+  libraryCounts.forEach(c=>summary.appendChild(
     h('span',{class:'recent-count',text:c.label+' '+c.count})));
   card.appendChild(summary);
   if(!items.length){
@@ -1383,11 +1395,9 @@ function buildRecentArticles(){
   }
 
   const list=h('div',{id:'recent-list',class:'recent-list','aria-label':'研究中心最新文章'});
-  const visible=['formal_note','narrative','topic'].map(type=>items.find(item=>item.type===type)).filter(Boolean);
-  if(visible.length<3)items.forEach(item=>{if(visible.length<3&&!visible.includes(item))visible.push(item)});
-  visible.forEach(item=>{
+  const appendItem=(item,isLatest)=>{
       const statusClass='recent-status '+(item.statusTone||'');
-      const attrs={class:'recent-item',href:item.researchId?RESEARCH_BASE+'#'+encodeURIComponent(item.researchId):item.url,
+      const attrs={class:'recent-item'+(isLatest?' latest':''),href:item.researchId?RESEARCH_BASE+'#'+encodeURIComponent(item.researchId):item.url,
         'aria-label':item.date+' '+item.typeLabel+' '+item.subject+'：'+item.title+'；'+item.status};
       if(!item.researchId){attrs.target='_blank';attrs.rel='noopener noreferrer';}
       list.appendChild(h('a',attrs,
@@ -1401,9 +1411,21 @@ function buildRecentArticles(){
           h('p',{class:'recent-title',text:item.title})),
         h('span',{class:'recent-arrow','aria-hidden':'true',text:'↗'})
       ));
-  });
+  };
+  if(latestItems.length){
+    list.appendChild(h('div',{class:'recent-batch-label'},
+      h('span',{text:'最近發布批次'}),
+      h('span',{text:fmtDate(latestDate)+' · '+latestItems.length+' 篇全部列出'})));
+    latestItems.forEach(item=>appendItem(item,true));
+  }
+  if(supplemental.length){
+    list.appendChild(h('div',{class:'recent-batch-label'},
+      h('span',{text:'其他類型最近更新'}),
+      h('span',{text:'補列 '+supplemental.length+' 篇'})));
+    supplemental.forEach(item=>appendItem(item,false));
+  }
   const actions=h('div',{class:'recent-actions'},
-    h('span',{class:'recent-shown','aria-live':'polite',text:'首頁精選 '+visible.length+'／'+items.length+' 篇'}),
+    h('span',{class:'recent-shown','aria-live':'polite',text:'首頁顯示 '+visible.length+' 篇：最新批次 '+latestItems.length+' 篇全部列出；另補 '+supplemental.length+' 篇其他類型'}),
     h('a',{class:'togglebtn',href:RESEARCH_BASE,style:'margin-left:auto;font-weight:800',text:'開啟研究中心 →'}));
   card.append(list,actions);
   return head.concat(card);

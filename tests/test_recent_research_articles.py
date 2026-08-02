@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """首頁近期研究文章：日期、證據層級、排序與可操作 UI 契約。"""
 import inspect
+import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -157,6 +159,54 @@ class RecentResearchArticlesTest(unittest.TestCase):
         self.assertNotIn("mtime", source)
         self.assertNotIn("datetime.now", source)
 
+    def test_progress_uses_library_total_and_keeps_every_latest_batch_article(self):
+        notes = {"1111": note("2026-07-29", "1111")}
+        topics = [
+            {
+                "meta": {"last_reviewed_at": "2026-07-30"},
+                "captured_at": "2026-07-30",
+                "topic_id": topic_id,
+                "stock_ids": [],
+                "group_ids": ["packtest"],
+                "title": title,
+                "relpath": f"notes/research_topics/{topic_id}.md",
+                "quality_invalid": False,
+                "quality_errors": [],
+            }
+            for topic_id, title in (("TOPIC-A", "同日新研究 A"), ("TOPIC-B", "同日新研究 B"))
+        ]
+        feed = bd.build_recent_articles(
+            "2026-07-30", notes, {}, {"all": []}, topics, {"1111": "測試公司"},
+        )
+        library_articles = [
+            {"id": item["researchId"], "date": item["date"]} for item in feed["items"]
+        ]
+        progress = bd.attach_research_library_progress(feed, {
+            "total": 3,
+            "counts": {"formal_note": 1, "narrative": 0, "topic": 2},
+            "articles": library_articles,
+        })
+        self.assertEqual(progress["libraryTotal"], 3)
+        self.assertEqual(progress["latestDate"], "2026-07-30")
+        self.assertEqual(progress["latestCount"], 2)
+        self.assertEqual(
+            {item["researchId"] for item in progress["items"]
+             if item["date"] == progress["latestDate"]},
+            {"topic-TOPIC-A", "topic-TOPIC-B"},
+        )
+
+    def test_progress_rejects_home_and_research_center_drift(self):
+        feed = {
+            "anchor": "2026-07-30", "start": "2026-07-17", "days": 14,
+            "total": 0, "counts": [], "items": [],
+        }
+        with self.assertRaisesRegex(ValueError, "漏列"):
+            bd.attach_research_library_progress(feed, {
+                "total": 1,
+                "counts": {"formal_note": 0, "narrative": 0, "topic": 1},
+                "articles": [{"id": "topic-MISSING", "date": "2026-07-30"}],
+            })
+
     def test_home_is_a_small_gateway_to_the_independent_research_center(self):
         template = (SCRIPTS / "dashboard_template.html").read_text(encoding="utf-8")
         builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
@@ -167,8 +217,12 @@ class RecentResearchArticlesTest(unittest.TestCase):
         self.assertIn('<section id="recent" class="blk"></section>', template)
         self.assertIn("RECENT=__RECENT_ARTICLES_JSON__", template)
         self.assertIn('html.replace("__RECENT_ARTICLES_JSON__"', builder)
-        self.assertIn("['formal_note','narrative','topic']", template)
-        self.assertIn("首頁精選 ", template)
+        self.assertIn("items.filter(item=>item.date===latestDate)", template)
+        self.assertIn("latestItems.concat(supplemental)", template)
+        self.assertIn("研究庫共 ", template)
+        self.assertIn("最新批次 ", template)
+        self.assertIn("篇全部列出", template)
+        self.assertIn("attach_research_library_progress(recent_articles, research_library)", builder)
         self.assertIn("開啟研究中心 →", template)
         self.assertNotIn("const RECENT_DEFAULT_LIMIT=12", template)
         self.assertNotIn("展開全部 ", recent)
@@ -177,6 +231,29 @@ class RecentResearchArticlesTest(unittest.TestCase):
         self.assertIn(".recent-item{grid-template-columns:1fr", template)
         self.assertIn("新近不代表證據較強", template)
         self.assertIn("查核狀態與觀察層警語逐篇保留", template)
+
+    def test_committed_home_progress_matches_committed_research_center(self):
+        home = (ROOT / "index.html").read_text(encoding="utf-8")
+        center = (ROOT / "research.html").read_text(encoding="utf-8")
+        recent_match = re.search(r"\bRECENT=(\{.*?\}), DATE_ISO=", home, re.S)
+        library_match = re.search(r"const LIB=(\{.*?\}), MARKET_DATE=", center, re.S)
+        self.assertIsNotNone(recent_match, "index.html 缺 RECENT payload")
+        self.assertIsNotNone(library_match, "research.html 缺 LIB payload")
+        recent = json.loads(recent_match.group(1))
+        library = json.loads(library_match.group(1))
+        self.assertEqual(recent["libraryTotal"], library["total"])
+        self.assertEqual(
+            {row["type"]: row["count"] for row in recent["libraryCounts"]},
+            library["counts"],
+        )
+        latest_date = max(article["date"] for article in library["articles"])
+        expected = {article["id"] for article in library["articles"]
+                    if article["date"] == latest_date}
+        actual = {item["researchId"] for item in recent["items"]
+                  if item["date"] == recent["latestDate"]}
+        self.assertEqual(recent["latestDate"], latest_date)
+        self.assertEqual(recent["latestCount"], len(expected))
+        self.assertEqual(actual, expected)
 
 
 if __name__ == "__main__":

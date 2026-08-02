@@ -1569,6 +1569,47 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
     }
 
 
+def attach_research_library_progress(recent, research_library):
+    """讓首頁摘要與研究中心使用同一份文章集合，並在不一致時直接中止 build。"""
+    result = dict(recent)
+    articles = research_library.get("articles") or []
+    library_counts = research_library.get("counts") or {}
+    result["libraryTotal"] = research_library.get("total", len(articles))
+    result["libraryCounts"] = [
+        {"type": key, "label": label, "count": int(library_counts.get(key, 0))}
+        for key, label in RECENT_ARTICLE_TYPES
+    ]
+
+    item_dates = [item["date"] for item in result.get("items", [])
+                  if _article_date(item.get("date"))]
+    latest_date = max(item_dates) if item_dates else None
+    result["latestDate"] = latest_date
+    result["latestCount"] = sum(
+        item.get("date") == latest_date for item in result.get("items", [])
+    ) if latest_date else 0
+
+    start = _article_date(result.get("start"))
+    anchor = _article_date(result.get("anchor"))
+    expected_ids = {
+        article.get("id") for article in articles
+        if article.get("id") and start and anchor
+        and (article_date := _article_date(article.get("date")))
+        and start <= article_date <= anchor
+    }
+    actual_ids = {
+        item.get("researchId") for item in result.get("items", [])
+        if item.get("researchId")
+    }
+    if expected_ids != actual_ids:
+        missing = sorted(expected_ids - actual_ids)
+        unexpected = sorted(actual_ids - expected_ids)
+        raise ValueError(
+            "首頁研究摘要與研究中心文章集合不一致；"
+            f"漏列={missing or '無'}；多列={unexpected or '無'}"
+        )
+    return result
+
+
 def _research_run(value, bold=False):
     """研究中心合成表格使用與 Markdown parser 相同的 inline run 格式。"""
     run = {"s": str(value if value not in (None, "") else "—")}
@@ -2231,6 +2272,9 @@ def main():
         notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM, events,
         as_of=research_as_of,
     )
+    # 首頁不再自行解讀「研究總進度」；總數、分類數與最新批次都以研究中心 library
+    # 為準，且同一時間窗有任何 article id 漏列都直接讓 build 失敗。
+    recent_articles = attach_research_library_progress(recent_articles, research_library)
     # 證據型知識圖譜只投影既有 active claim／獨立核驗筆記來源；任何失效引用都讓
     # build 直接標紅，避免圖上關係悄悄與研究帳本分岔。
     research_library["knowledgeGraph"] = build_knowledge_graph(
