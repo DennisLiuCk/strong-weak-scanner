@@ -403,7 +403,9 @@ monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID�
   既有 topic／monitor，結果只能是 `new_support`、`new_contrary`、`no_new_evidence` 或
   `not_yet_testable`。
 - `scripts/research_method_audit.py`：驗證 snapshot fingerprint、review 引用與歷史不可改寫，
-  並在研究雷達顯示可追溯、可證偽、新鮮度、修正學習與校準可用性五道 gate。
+  並在研究雷達顯示可追溯、獨立交叉驗證、可證偽、新鮮度、修正學習與校準可用性六道
+  gate。獨立交叉驗證會直接列出仍缺第二條消息鏈的 topic ID，避免缺口被總體比例掩蓋；
+  兩條來源鏈只代表降低單一來源偏誤，不代表多數決或主張已被證真。
 
 `no_new_evidence` 是有效的回顧結果，但**不得**刷新 topic source 的 `accepted_at`、
 `last_reviewed_at` 或 `review_due`。它只在方法帳本設定下一次工作期限；原文章仍照既有

@@ -25,21 +25,23 @@ class ResearchMethodAuditTest(unittest.TestCase):
         cls.latest = audit.load_method_audit(strict=True)
 
     def test_baseline_snapshot_matches_current_registry(self):
-        self.assertEqual(self.latest["snapshotId"], "RMA-2026-08-02-01")
+        self.assertEqual(self.latest["snapshotId"], "RMA-2026-08-02-02")
+        self.assertEqual(self.latest["methodologyVersion"], "1.1")
         self.assertEqual(
             self.latest["registryFingerprint"], self.current["registryFingerprint"],
         )
-        self.assertEqual(len(self.latest["history"]), 1)
+        self.assertEqual(len(self.latest["history"]), 2)
 
     def test_audit_exposes_counts_without_fake_accuracy_score(self):
-        self.assertEqual(self.current["scope"]["topics"], 19)
-        self.assertEqual(self.current["scope"]["graphs"], 9)
-        self.assertEqual(self.current["claims"]["active"], 106)
-        self.assertEqual(self.current["graphs"]["activeEdges"], 133)
-        self.assertEqual(self.current["graphs"]["traceableEdges"], 133)
+        self.assertEqual(self.current["scope"]["topics"], 22)
+        self.assertEqual(self.current["scope"]["graphs"], 12)
+        self.assertEqual(self.current["claims"]["active"], 123)
+        self.assertEqual(self.current["graphs"]["activeEdges"], 176)
+        self.assertEqual(self.current["graphs"]["traceableEdges"], 176)
         self.assertEqual(self.current["monitors"]["reviewedMature"], 2)
         self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 2)
         self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 2)
+        self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 1)
         self.assertFalse(self.current["calibration"]["descriptiveRateReady"])
         self.assertIsNone(self.current["calibration"]["supportRate"])
         self.assertNotIn("score", self.current)
@@ -48,14 +50,39 @@ class ResearchMethodAuditTest(unittest.TestCase):
         gates = {item["id"]: item for item in self.current["gates"]}
         self.assertEqual(
             set(gates),
-            {"traceability", "falsifiability", "freshness", "correction_learning", "calibration"},
+            {
+                "traceability", "cross_check_depth", "falsifiability",
+                "freshness", "correction_learning", "calibration",
+            },
         )
+        self.assertEqual(gates["cross_check_depth"]["status"], "attention")
         self.assertEqual(gates["freshness"]["status"], "attention")
         self.assertEqual(gates["correction_learning"]["status"], "pass")
         self.assertEqual(gates["calibration"]["status"], "not_ready")
         for gate in gates.values():
             self.assertTrue(gate["observed"])
             self.assertTrue(gate["boundary"])
+
+    def test_cross_check_gate_names_every_topic_missing_a_second_chain(self):
+        missing = self.current["sources"]["thesesNeedingSecondIndependentGroup"]
+        self.assertEqual(
+            missing,
+            [
+                "MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP",
+                "MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL",
+                "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION",
+            ],
+        )
+        self.assertEqual(self.current["sources"]["thesesWithTwoIndependentGroups"], 19)
+        gate = next(item for item in self.current["gates"]
+                    if item["id"] == "cross_check_depth")
+        for topic_id in missing:
+            self.assertIn(topic_id, gate["observed"])
+
+    def test_method_audit_uses_same_corporate_domain_grouping_as_topic_lint(self):
+        investor = {"url": "https://investor.nvidia.com/news/example"}
+        newsroom = {"url": "https://www.nvidia.com/en-us/news/example"}
+        self.assertEqual(audit._source_group(investor), audit._source_group(newsroom))
 
     def test_no_new_evidence_reviews_do_not_claim_sources_or_actions(self):
         for row in self.reviews:
@@ -90,6 +117,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         ):
             self.assertIn(token, template)
         self.assertIn("monitor_reviews.csv", method)
+        self.assertIn("獨立交叉驗證", method)
         self.assertIn("每月方法回顧", maintenance)
         self.assertIn("python scripts/research_method_audit.py --lint", workflow)
 

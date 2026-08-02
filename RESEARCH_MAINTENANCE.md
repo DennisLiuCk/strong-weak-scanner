@@ -125,6 +125,8 @@ GitHub 的 `research-watch.yml` 會在台灣每週一 09:00，以及 `fetch-fina
 `notes/research_method_reviews/YYYY-MM-DD_NN.json`。逐項看 gate，不合成健康分數：
 
 - **可追溯性**：active claim 是否都有邊界、圖譜線是否能回查 exact claim／source。
+- **獨立交叉驗證**：每篇 active topic 的主命題是否至少有兩條獨立來源鏈；逐一處理 audit
+  列出的 topic ID，不能用整體覆蓋率掩蓋單篇缺口，也不能把兩條來源當成真實性分數。
 - **可證偽性**：待驗證 claim 是否寫下一份證據，monitor 是否有 living watch source。
 - **新鮮度**：逾期 topic／edge／monitor 數，不以「已重新看過」消除 stale。
 - **修正學習**：到期 monitor 是否留下 review event，反方證據是否真的觸發新 claim 或修正。

@@ -20,7 +20,6 @@ import re
 import subprocess
 import sys
 from collections import Counter
-from urllib.parse import urlparse
 
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -33,7 +32,9 @@ from knowledge_graph import (  # noqa: E402
 )
 from leading_hypotheses import load_reports  # noqa: E402
 from qual_notes import load_notes  # noqa: E402
-from research_queue import load_topics, taipei_today  # noqa: E402
+from research_queue import (  # noqa: E402
+    _source_independence_key, load_topics, taipei_today,
+)
 from research_radar import load_research_radar  # noqa: E402
 
 
@@ -69,13 +70,8 @@ def _valid_date(value: str) -> bool:
 
 
 def _source_group(source: dict) -> str:
-    override = (source.get("independence_group") or "").strip().lower()
-    if override:
-        return override
-    hostname = (urlparse(source.get("url") or "").hostname or "").lower()
-    if hostname.startswith("www."):
-        hostname = hostname[4:]
-    return hostname or (source.get("publisher") or "unknown").strip().lower()
+    """與逐篇 topic lint 共用同一個消息鏈邊界，避免總體 gate 高估覆蓋。"""
+    return _source_independence_key(source)
 
 
 def _load_context(as_of: dt.date):
@@ -274,18 +270,27 @@ def compute_method_audit(
             monitor_watch_complete += 1
 
     thesis_cross_checked = 0
+    theses_needing_second_group: list[str] = []
     for topic in active_topics:
         thesis_id = (topic.get("meta") or {}).get("thesis_claim_id")
         thesis = next((claim for claim in topic.get("claims", [])
                        if claim.get("claim_id") == thesis_id), {})
         source_by_id = {source.get("source_id"): source for source in topic.get("sources", [])}
+        thesis_source_ids = {
+            source_id
+            for key in ("supporting_source_ids", "contrary_source_ids")
+            for source_id in thesis.get(key, [])
+        }
         groups = {
             _source_group(source_by_id[source_id])
-            for source_id in thesis.get("supporting_source_ids", [])
+            for source_id in thesis_source_ids
             if source_id in source_by_id and source_by_id[source_id].get("status") == "active"
         }
         if len(groups) >= 2:
             thesis_cross_checked += 1
+        else:
+            theses_needing_second_group.append(topic.get("topic_id") or "-")
+    theses_needing_second_group.sort()
 
     graph_traceable = sum(bool(edge.get("claimRefs") or edge.get("noteRefs")) for edge in graph_edges)
     stale_edges = sum(
@@ -300,6 +305,7 @@ def compute_method_audit(
     comparisons = [item for topic in topics for item in topic.get("comparisons", [])]
 
     trace_ok = graph_traceable == len(graph_edges) and boundary_complete == len(active_claims)
+    cross_check_ok = not theses_needing_second_group
     falsifiable_ok = (
         all(sum(item.get("status") == "active" for item in topic.get("monitoring", [])) >= 2
             for topic in active_topics)
@@ -308,13 +314,13 @@ def compute_method_audit(
     )
     if mature_monitors:
         correction_status = "attention"
-        correction_observed = f"{len(mature_monitors)} 個 monitor 目前待回顧；歷史已完成 {mature_review_events} 次到期回顧"
+        correction_observed = f"{len(mature_monitors)} 個 monitor 目前待回顧；歷史已完成 {mature_review_events} 次到期回顧；累積 {len(corrected_claims)} 個已修正 claim"
     elif mature_review_events:
         correction_status = "pass"
-        correction_observed = f"目前沒有待回顧 monitor；歷史已完成 {mature_review_events} 次到期回顧"
+        correction_observed = f"目前沒有待回顧 monitor；歷史已完成 {mature_review_events} 次到期回顧；累積 {len(corrected_claims)} 個已修正 claim"
     else:
         correction_status = "not_ready"
-        correction_observed = "尚無到期 review event；不能把未被檢驗視為成功"
+        correction_observed = f"尚無到期 review event；不能把未被檢驗視為成功；累積 {len(corrected_claims)} 個已修正 claim"
 
     descriptive_ready = (
         not mature_monitors
@@ -329,7 +335,7 @@ def compute_method_audit(
     core = {
         "schemaVersion": 1,
         "asOf": date_text,
-        "methodologyVersion": "1.0",
+        "methodologyVersion": "1.1",
         "registryFingerprint": _registry_fingerprint(topics, graph, radar, reviews),
         "scope": {
             "topics": len(topics),
@@ -352,6 +358,7 @@ def compute_method_audit(
             "withLocatorAndLimitation": source_complete,
             "thesesWithTwoIndependentGroups": thesis_cross_checked,
             "activeTheses": len(active_topics),
+            "thesesNeedingSecondIndependentGroup": theses_needing_second_group,
         },
         "monitors": {
             "active": len(active_monitors),
@@ -392,6 +399,12 @@ def compute_method_audit(
                 "boundary": "通過代表引用完整，不代表主張一定為真。",
             },
             {
+                "id": "cross_check_depth", "label": "獨立交叉驗證",
+                "status": "pass" if cross_check_ok else "attention",
+                "observed": f"{thesis_cross_checked}/{len(active_topics)} 個主命題有至少兩條獨立來源鏈；缺口 {','.join(theses_needing_second_group) or '無'}",
+                "boundary": "兩條獨立消息鏈只能降低單一來源偏誤，不代表主張一定為真。",
+            },
+            {
                 "id": "falsifiability", "label": "可證偽性",
                 "status": "pass" if falsifiable_ok else "attention",
                 "observed": f"{monitor_watch_complete}/{len(active_monitors)} 個 monitor 有 living watch source；{verification_complete}/{len(unverified_claims)} 個待驗證 claim 寫明下一份證據",
@@ -418,6 +431,7 @@ def compute_method_audit(
         ],
         "caveats": [
             "升格候選數是研究流程產出，不是研究正確率。",
+            "獨立來源鏈覆蓋是交叉檢查深度，不是多數決或真實性分數。",
             "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
             "no_new_evidence 是一次有紀錄的檢查，不得刷新 claim 的證據時鐘。",
         ],

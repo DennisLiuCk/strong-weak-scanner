@@ -26,3 +26,12 @@ company:lumentum,company,Lumentum,LITE,NASDAQ,US,,https://www.lumentum.com/,光�
 company:ev-group,company,EV Group,,,AT,EVG,https://www.evgroup.com/,晶圓接合與微影設備供應商
 company:lam-research,company,Lam Research,LRCX,NASDAQ,US,科林研發,https://www.lamresearch.com/,半導體製造與先進封裝設備供應商
 organization:imec,organization,imec,,,BE,,https://www.imec-int.com/,半導體研發與試驗線機構
+company:cadence,company,Cadence Design Systems,CDNS,NASDAQ,US,Cadence,https://www.cadence.com/,EDA 與半導體介面 IP 供應商
+company:synopsys,company,Synopsys,SNPS,NASDAQ,US,新思科技,https://www.synopsys.com/,EDA 與半導體介面 IP 供應商
+company:infineon,company,Infineon Technologies,IFX,XETRA,DE,英飛凌,https://www.infineon.com/,功率半導體與控制元件供應商
+company:onsemi,company,onsemi,ON,NASDAQ,US,安森美,https://www.onsemi.com/,功率半導體與感測元件供應商
+company:rohm,company,ROHM,6963,TSE,JP,羅姆,https://www.rohm.com/,功率半導體與電子元件供應商
+company:absolics,company,Absolics,,,US,SKC Absolics,https://www.absolicsinc.com/,SKC 旗下半導體玻璃基板開發與製造公司
+company:lens-technology,company,Lens Technology,300433,SZSE,CN,藍思科技,https://www.hnlens.com/,精密玻璃加工與製造公司
+company:samsung-electro-mechanics,company,Samsung Electro-Mechanics,009150,KRX,KR,三星電機,https://samsungsem.com/,封裝基板與電子元件供應商
+company:corning,company,Corning,GLW,NYSE,US,康寧,https://www.corning.com/,玻璃材料與光通訊產品供應商

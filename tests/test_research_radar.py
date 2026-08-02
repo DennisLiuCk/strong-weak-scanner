@@ -25,11 +25,11 @@ class ResearchRadarTest(unittest.TestCase):
     def test_active_radar_is_complete_and_ranked_without_gaps(self):
         self.assertEqual(
             self.payload["stats"],
-            {"candidates": 8, "promoted": 6, "highKnowledge": 7},
+            {"candidates": 9, "promoted": 9, "highKnowledge": 9},
         )
         self.assertEqual(
             [row["rank"] for row in self.payload["candidates"]],
-            list(range(1, 9)),
+            list(range(1, 10)),
         )
         self.assertEqual(self.payload["asOf"], "2026-08-02")
         self.assertGreater(self.payload["nextReview"], self.payload["asOf"])
@@ -38,7 +38,7 @@ class ResearchRadarTest(unittest.TestCase):
         top_three = self.payload["candidates"][:3]
         self.assertEqual(
             [row["id"] for row in top_three],
-            ["RC-CPO-PRODUCTION", "RC-HYBRID-BONDING", "RC-PANEL-LEVEL-PACKAGING"],
+            ["RC-GLASS-SUBSTRATE", "RC-UCIE-3", "RC-800V-WBG"],
         )
         for row in top_three:
             self.assertEqual(row["priority"], "p1")

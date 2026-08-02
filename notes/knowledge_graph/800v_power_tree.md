@@ -1,0 +1,314 @@
+# 800VDC 功率半導體鏈知識圖譜
+
+本圖依電力鏈位置呈現 SiC、GaN 與 Si 的功能，而不是把材料畫成單一勝負。公司節點只表示
+已公開的架構、reference design 或產品規劃；沒有一條線代表台灣公司已取得訂單。
+
+<!-- knowledge_graph_meta
+schema_version: 1
+graph_id: 800v-power-tree
+root_node_id: concept:800v-power-tree
+label: 800VDC 功率半導體鏈
+summary: 從 SST、BBU、保護、IBC 到末端供電拆解 SiC、GaN 與 Si 的角色，並分開 reference design、qualification 與 2027 deployment。
+article_ids: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION
+status: active
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-C01
+view: company
+from_id: company:nvidia
+to_id: concept:800v-power-tree
+relation: owns_platform
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C1
+note_refs:
+evidence_state: verified
+commercial_stage: planned
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: NVIDIA 公開的是 800VDC 架構與多家 silicon／power ecosystem；並非單一元件、材料或供應商的排他平台。
+as_of: 2026-08-02
+review_due: 2026-09-02
+status: active
+boundary: Starting in 2027 是架構錨點，不證明 2026 full-scale deployment、固定 BOM 或個別供應商收入。
+next_trigger: NVIDIA 公布 production-level power tree、qualification 與實際 rack deployment。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-C02
+view: company
+from_id: company:infineon
+to_id: concept:800v-power-tree
+relation: has_capability
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C2,MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C3
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: Infineon 同時展示 GaN IBC 與 SiC BBU 路徑；這是多材料 portfolio，不是任何 stage 的獨家供應證據。
+as_of: 2026-06-02
+review_due: 2026-08-16
+status: active
+boundary: 具名 reference design 支持技術角色，不等於 hyperscaler qualification、量產、部署或財務貢獻。
+next_trigger: 客戶把具名 Infineon design／device 導入 production rack 並揭露 qualification 與 shipment。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-C03
+view: company
+from_id: company:onsemi
+to_id: concept:800v-power-tree
+relation: has_capability
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C4
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-02
+review_due: 2026-08-16
+status: active
+boundary: onsemi 公開 SST 高壓 SiC 路徑與產品定位；不等於具名 AI 資料中心採用、量產份額或收入。
+next_trigger: 客戶或 onsemi 公布具名 SST／800V product qualification、shipment 與 deployment。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-C04
+view: company
+from_id: company:rohm
+to_id: concept:800v-power-tree
+relation: plans_production
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C4
+note_refs:
+evidence_state: verified
+commercial_stage: planned
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: ROHM 規劃在特定 AC-DC PSU 同時採用 Si 與 SiC MOSFET；不是單一材料或供應商排他設計。
+as_of: 2026-08-02
+review_due: 2026-08-16
+status: active
+boundary: Management planned adoption 不等於截至本輪已量產、客戶驗收、800V full-scale rack 或財務貢獻。
+next_trigger: ROHM／客戶確認 production start、具名 PSU、出貨與收入。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I01
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:sic-power
+relation: uses_component
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C5
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: SiC 在本輪分布於 SST、BBU、hot-swap 與 PSU 等多種 stage，且各 stage 仍可能有其他材料／topology。
+as_of: 2026-08-02
+review_due: 2026-08-16
+status: active
+boundary: 功能分區來自多份供應商設計，不是固定 BOM、材料份額或 winner-takes-all 結論。
+next_trigger: 同一 production rack 公布各 stage 的 SiC device、qualification 與 volume。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I02
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:gan-power
+relation: uses_component
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C5
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: GaN 在 Infineon design 用於高頻 HV IBC，仍與低壓 Si device、driver、controller 共同工作且不是唯一可行 topology。
+as_of: 2026-08-02
+review_due: 2026-08-16
+status: active
+boundary: Reference design 支持應用位置，不代表全產業採用、量產份額或公司財務貢獻。
+next_trigger: 具名客戶完成 GaN HV IBC qualification、production 與 deployment。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I03
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:silicon-power
+relation: uses_component
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C5
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: Si 與 WBG 元件可在同一 PSU／IBC 共存；位置取決於 voltage、control、cost 與 topology。
+as_of: 2026-08-02
+review_due: 2026-08-16
+status: active
+boundary: Silicon 保留部分環節不代表內容量固定，也不表示 SiC／GaN 無法往相鄰 stage 延伸。
+next_trigger: Production BOM 揭露 Si、SiC、GaN 的 stage 與 device count。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I04
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:solid-state-transformer
+relation: contains
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C4
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-14
+review_due: 2026-08-16
+status: active
+boundary: SST 是 onsemi 描述的 early-commercialization 高壓路徑；不代表具名 AI 資料中心已量產採用。
+next_trigger: 具名 hyperscaler SST qualification、deployment 與 operating data。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I05
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:high-voltage-bbu
+relation: contains
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C3
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-06-02
+review_due: 2026-08-16
+status: active
+boundary: Infineon 24 kW SiC BBU 是 reference design，不是具名客戶 production module 或 deployed rack。
+next_trigger: 客戶 qualification、production shipment 與 field reliability。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I06
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:hv-ibc
+relation: contains
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C2
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-03-17
+review_due: 2026-08-16
+status: active
+boundary: 800V／±400V 至 50V／12V GaN design 已具體；不等於所有 rack 採同一路徑或已量產。
+next_trigger: 具名 platform／customer 導入 production HV IBC。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I07
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:hot-swap-protection
+relation: contains
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C3
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-06-02
+review_due: 2026-08-16
+status: active
+boundary: SiC JFET 在指定 BBU reference design 提供 ORing／hot-swap；不代表所有保護節點或客戶 BOM。
+next_trigger: 800V production rack 的 fault protection、qualification 與 serviceability 規格。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I08
+view: industry
+from_id: concept:800v-power-tree
+to_id: stage:reference-design
+relation: reaches_stage
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C2,MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C3
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-06-02
+review_due: 2026-08-16
+status: active
+boundary: GaN IBC 與 SiC BBU 已到 reference design；這一階不能改寫成 customer qualification 或 production。
+next_trigger: Reference design 被具名客戶採用並完成 qualification。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I09
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:point-of-load
+relation: contains
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C5
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-02
+review_due: 2026-09-02
+status: active
+boundary: Grid-to-core 功能框架保留 processor-level silicon；本輪沒有同一 rack 的完整 POL production BOM。
+next_trigger: Platform 公布 800V 到 GPU core 的完整轉換鏈與量產元件。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I10
+view: industry
+from_id: concept:800v-power-tree
+to_id: group:power
+relation: routes_to
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C6
+note_refs:
+evidence_state: unverified
+commercial_stage: application_opportunity
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-02
+review_due: 2026-09-02
+status: active
+boundary: 功率元件是研究路由；本輪沒有 universe 公司具名 800V qualification、訂單或財務證據。
+next_trigger: 客戶與公司雙向核對具名 device、stage、量產與收入。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I11
+view: industry
+from_id: concept:800v-power-tree
+to_id: group:powersupply
+relation: routes_to
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C6
+note_refs:
+evidence_state: unverified
+commercial_stage: application_opportunity
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-02
+review_due: 2026-09-02
+status: active
+boundary: PSU、BBU 與 IBC 形成電源族群搜尋路由；外部 reference design 不證明台灣廠採相同 BOM 或已認列收入。
+next_trigger: 具名 800V power product、客戶 qualification、shipment、收入與毛利。
+-->

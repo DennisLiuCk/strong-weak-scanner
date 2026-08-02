@@ -14,7 +14,7 @@ method: 優先級依近期一手里程碑、可證偽性、成熟度落差與台
 
 <!-- research_candidate
 candidate_id: RC-CPO-PRODUCTION
-rank: 1
+rank: 4
 title: CPO 從平台生產走向部署與財務驗證
 priority: p1
 knowledge_value: high
@@ -33,7 +33,7 @@ sources: NVIDIA Vera Rubin and Spectrum-X production => https://investor.nvidia.
 
 <!-- research_candidate
 candidate_id: RC-BACKSIDE-POWER
-rank: 6
+rank: 7
 title: 背面供電從研發概念進入量產時鐘
 priority: p1
 knowledge_value: high
@@ -52,7 +52,7 @@ sources: TSMC 2025 Annual Report => https://investor.tsmc.com/static/annualRepor
 
 <!-- research_candidate
 candidate_id: RC-AI-MEMORY-HIERARCHY
-rank: 7
+rank: 8
 title: AI 記憶體分層：HBM、SOCAMM、CXL 與 context storage
 priority: p1
 knowledge_value: high
@@ -71,7 +71,7 @@ sources: NVIDIA Vera Rubin architecture => https://developer.nvidia.com/blog/ins
 
 <!-- research_candidate
 candidate_id: RC-OPEN-AI-FABRICS
-rank: 8
+rank: 9
 title: 開放 AI 互連的分工：UALink scale-up 與 UEC scale-out
 priority: p1
 knowledge_value: high
@@ -90,7 +90,7 @@ sources: UALink 2.0 release => https://ualinkconsortium.org/wp-content/uploads/2
 
 <!-- research_candidate
 candidate_id: RC-HYBRID-BONDING
-rank: 2
+rank: 5
 title: 細間距 hybrid bonding 與 RDL 從 PDK、試驗車走向量產資格
 priority: p1
 knowledge_value: high
@@ -109,7 +109,7 @@ sources: imec fine-pitch RDL and D2W PDK => https://www.imec-int.com/en/press/na
 
 <!-- research_candidate
 candidate_id: RC-PANEL-LEVEL-PACKAGING
-rank: 3
+rank: 6
 title: Panel-level packaging 的面積效率與量產難題
 priority: p1
 knowledge_value: high
@@ -128,40 +128,59 @@ sources: Lam Panel-Level Packaging CoE => https://newsroom.lamresearch.com/Lam-R
 
 <!-- research_candidate
 candidate_id: RC-UCIE-3
-rank: 4
-title: UCIe 3.0 把 chiplet 互通延伸到更高速率與 UALink chiplet
-priority: p2
+rank: 2
+title: UCIe 3.0：64G 規格、16G 跨廠 demo 與客戶產品之間的落差
+priority: p1
 knowledge_value: high
-status: expand_existing
+status: promoted
 evidence_posture: research_grade
-why_now: UCIe 3.0 已成為現行公開規格，UALink 2.0 的 chiplet specification 又明確宣告與 UCIe 3.0 相容，使封裝內與機架級互連開始出現可追蹤介面
-knowledge_gain: 分辨 package 內 die-to-die、pod 內 accelerator scale-up 與機架間 scale-out 三層，並找出測試、PHY、封裝與系統整合的不同證據
-first_rejection: 規格相容若沒有 multi-vendor compliance 與實體 silicon，不構成可替換 chiplet 生態或供應商財務曝險
-next_evidence: UCIe 3.0 compliance、UALink chiplet 測試平台、具名 silicon 與封裝產品
-next_check: 2026-08-23
-route: fold_into_graph
-article_topic_id: MI-2026-08-02-OPEN-AI-FABRICS
-graph_id: open-ai-fabrics
-sources: UCIe specifications => https://www.uciexpress.org/specifications | UALink 2.0 release => https://ualinkconsortium.org/wp-content/uploads/2026/04/UALink-2.0-Specification-PR_FINAL.pdf | UCIe resources => https://www.uciexpress.org/ucie-resources
+why_now: UCIe 3.0 已定義 64 GT/s，2026 Chiplet Summit 又出現 Intel／Cadence 16G 實體跨廠 demo，Synopsys 於 6 月完成 64G IP tape-out；速度與互通階段第一次能被明確拆開驗證
+knowledge_gain: 把規格、IP tape-out、回片、跨廠 demo、compliance 與客戶產品分開，避免用 16G 互通替 64G UCIe 3.0 提前畢業
+first_rejection: 規格相容或單一 IP tape-out 若沒有 64G multi-vendor compliance 與實體 silicon，不構成可替換 chiplet 生態或供應商財務曝險
+next_evidence: 64G test silicon 回片、第三方 compliance，以及至少兩家獨立 chiplet 的實體互通與客戶 qualification
+next_check: 2026-08-17
+route: article_and_graph
+article_topic_id: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER
+graph_id: ucie-interoperability
+sources: UCIe 3.0 release => https://www.uciexpress.org/_files/ugd/8dc731_ae67289d0ec646cdba5c1aee245538b3.pdf | UCIe 2026 cross-vendor demo => https://www.uciexpress.org/post/chiplet-summit-2026-ucie-momentum-across-a-growing-ecosystem | Synopsys 64G IP tape-out => https://www.synopsys.com/blogs/chip-design/64g-ucie-ip-high-speed-die-to-die-connectivity.html
 -->
 
 <!-- research_candidate
 candidate_id: RC-800V-WBG
-rank: 5
+rank: 3
 title: 800VDC 內部的 Si、SiC 與 GaN 分工
-priority: p2
-knowledge_value: medium
-status: expand_existing
-evidence_posture: preliminary
-why_now: Infineon 與 onsemi 已把 SiC、GaN、hot-swap 與中間匯流排放進 NVIDIA MGX／800VDC 架構，但目前多為供應商產品與生態系主張
-knowledge_gain: 將 800V 題目由單一電源規格拆成 grid-to-rack、保護、hot-swap、中間匯流排與 point-of-load，不再把所有寬能隙元件視為同一個位置
-first_rejection: 若客戶長期使用 hybrid 50V 過渡方案，或 SiC／GaN 內容沒有量產與收入證據，材料分工只能停在設計機會
-next_evidence: 800V 客戶驗證、具名料號、量產時間與台灣公司可辨識財務貢獻
+priority: p1
+knowledge_value: high
+status: promoted
+evidence_posture: research_grade
+why_now: Infineon 已分別公開 GaN HV IBC 與 SiC HV BBU reference design，onsemi 把高壓 SiC 放進 SST，ROHM 則規劃 Si 與 SiC 共存於 PSU；材料分工已可由一手設計驗證
+knowledge_gain: 將 800V 由單一題材拆成 SST、PSU、BBU、保護、IBC 與 point-of-load，辨認 SiC、GaN 與 Si 的功能位置及可能被 topology 移除的價值段
+first_rejection: Reference design、planned adoption 與 2027 full-scale architecture 不是同一量產事件；沒有 production BOM 與客戶財務證據時不能宣稱材料勝負
+next_evidence: 同一 production rack 的完整 power tree、客戶 qualification、具名料號、出貨與台灣公司可辨識財務貢獻
 next_check: 2026-08-16
-route: expand_existing_article
-article_topic_id: MI-2026-08-01-800VDC-EXECUTION-READINESS
-graph_id:
+route: article_and_graph
+article_topic_id: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION
+graph_id: 800v-power-tree
 sources: Infineon joins NVIDIA MGX ecosystem => https://www.infineon.com/press-release/2026/infxx202605-092 | onsemi 800V and solid-state transformer note => https://www.onsemi.com/company/newsroom/featured-stories/data-center/the-emerging-way-to-conquer-power-challenges-in-ai-data-centers | onsemi NVIDIA 800V collaboration => https://www.onsemi.com/company/newsroom/news-and-insights/onsemi-collaborates-with-nvidia-to-accelerate-transition-to-800-vdc-power-solutions-for-next-generation-ai-data-centers
+-->
+
+<!-- research_candidate
+candidate_id: RC-GLASS-SUBSTRATE
+rank: 1
+title: 玻璃基板商業化：工廠、樣品、客戶可靠度與量產良率
+priority: p1
+knowledge_value: high
+status: promoted
+evidence_posture: research_grade
+why_now: Intel 與 Lens Technology 於 2026-07-24 新增玻璃封裝合作，但 SKC 2026 文件顯示 Absolics 仍在 proof sample／客戶 reliability evaluation，足以修正先前 2025 HVM 預期
+knowledge_gain: 建立 collaboration→pilot→proof sample→reliability→qualification→production→repeat order 階梯，並把 roadmap 滑動保存成可追溯修正，而不是只整理材料優點
+first_rejection: 有工廠、CAPEX、production-ready sample 或合作公告，都不等於客戶可靠度通過、穩定 production yield 與重複出貨
+next_evidence: Absolics 客戶 evaluation 結果、production yield／throughput、具名客戶或 repeat order；Intel／Lens 與 Samsung 的 sample／qualification 更新
+next_check: 2026-08-14
+route: article_and_graph
+article_topic_id: MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION
+graph_id: glass-substrate-commercialization
+sources: SKC 4Q25 proof samples and reliability plan => https://www.skc.kr/upload/ir/20260212/20260212093406953002.pdf | SKC May 2026 customer evaluation => https://www.skc.kr/m/eng/Conmmunication/pr/newsDetail.do?gubun=004003&seq=1723 | Intel and Lens collaboration => https://newsroom.intel.com/new-technologies/intel-and-lens-technology-collaborate-to-enable-advanced-semiconductor-packaging-for-the-ai-era | Samsung glass substrate roadmap => https://samsungsem.com/global/newsroom/news/view.do?id=8922
 -->
 
 ## 排名判讀

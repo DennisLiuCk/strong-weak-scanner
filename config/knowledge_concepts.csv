@@ -73,3 +73,26 @@ capability:yield-management,capability,良率管理,Yield management,concept:pan
 metric:panel-throughput,metric,Panel throughput,面板節拍|Cycle time,concept:panel-level-packaging,單位時間可完成的面板數與製造週期
 standard:panel-size,standard,Panel 尺寸標準,Panel form factor standard,concept:panel-level-packaging,設備 材料與自動化共同採用的面板長寬與厚度規格
 process:panel-ecd,process,Panel-level ECD,面板電化學沉積|Electrochemical deposition,concept:panel-level-packaging,在大面積面板上形成金屬互連的電化學沉積製程
+concept:ucie-interoperability,concept,UCIe 互通成熟度,UCIe interoperability ladder|開放 chiplet 互通,,把規格 IP tape-out 實體跨廠測試與客戶量產分開追蹤的 UCIe 成熟度框架
+stage:specification,stage,規格發布,Specification release,concept:ucie-interoperability,介面功能與測試要求已由標準組織發布但尚不代表實體產品
+stage:ip-tapeout,stage,IP Tape-out,Silicon IP tapeout,concept:ucie-interoperability,介面 IP 已完成設計並送交製造但尚待回片與實測
+stage:cross-vendor-demo,stage,跨廠實體展示,Cross-vendor silicon demo,concept:ucie-interoperability,兩家以上獨立設計的實體晶粒在指定條件完成互通展示
+stage:compliance,stage,合規測試,Compliance testing,concept:ucie-interoperability,依標準測試計畫驗證產品符合指定介面要求
+stage:customer-qualification,stage,客戶產品認證,Customer product qualification,concept:ucie-interoperability,具名客戶把介面與封裝導入產品並完成驗證
+concept:800v-power-tree,concept,800VDC 功率半導體鏈,800V power tree|800V HVDC power chain,,從電網到處理器分解 SST PSU BBU 保護 IBC 與末端轉換的功率架構
+component:sic-power,component,SiC 功率元件,Silicon carbide power device,concept:800v-power-tree,適合高壓高功率與高可靠度轉換及保護的寬能隙功率元件
+component:gan-power,component,GaN 功率元件,Gallium nitride power device,concept:800v-power-tree,適合高頻高密度電力轉換的寬能隙功率元件
+component:silicon-power,component,Si 功率與控制元件,Silicon power device,concept:800v-power-tree,用於低壓功率 控制 驅動與成本敏感環節的成熟矽元件
+component:solid-state-transformer,component,SST,固態變壓器|Solid-state transformer,concept:800v-power-tree,以功率電子直接處理中壓交流與直流匯流排的轉換系統
+component:high-voltage-bbu,component,高壓 BBU,HV battery backup unit,concept:800v-power-tree,在電池與高壓直流匯流排間雙向轉換並提供短時備援的模組
+component:hv-ibc,component,高壓 IBC,High-voltage intermediate bus converter,concept:800v-power-tree,把 800V 或正負 400V 直流降為 50V 12V 等中間匯流排的轉換器
+component:hot-swap-protection,component,高壓 Hot-swap／保護,Hot-swap|Solid-state circuit breaker,concept:800v-power-tree,控制湧入電流 隔離故障並支援不停機維修的高壓保護節點
+component:point-of-load,component,Point-of-load,POL|末端供電,concept:800v-power-tree,在處理器附近把低壓匯流排轉成核心電壓的最後供電級
+stage:reference-design,stage,Reference design,參考設計|Demo board,concept:800v-power-tree,供應商已完成可展示的系統設計但尚不代表客戶認證或量產
+concept:glass-substrate-commercialization,concept,玻璃基板商業化,Glass substrate commercialization|Glass core readiness,,把材料能力 試產 樣品 客戶可靠度 良率與量產分開追蹤的封裝基板框架
+component:glass-core,component,Glass core,玻璃核心|玻璃基板,concept:glass-substrate-commercialization,以玻璃取代傳統有機核心並承載封裝互連的基板結構
+process:through-glass-via,process,TGV,Through-Glass Via|玻璃通孔,concept:glass-substrate-commercialization,穿過玻璃並經金屬化形成垂直電性連接的製程
+stage:pilot-line,stage,Pilot line,試產線,concept:glass-substrate-commercialization,用小規模產線建立製程與樣品但尚未證明穩定量產
+stage:proof-sample,stage,Proof sample,Production-ready sample|工程樣品,concept:glass-substrate-commercialization,已完成可供內部或客戶評估的工程樣品但尚未通過量產資格
+stage:reliability-evaluation,stage,客戶可靠度測試,Reliability evaluation,concept:glass-substrate-commercialization,客戶驗證熱機械 電性與壽命等條件的量產前節點
+capability:production-yield,capability,量產良率,Production yield,concept:glass-substrate-commercialization,投入製造後合格產品比例及其穩定分布
