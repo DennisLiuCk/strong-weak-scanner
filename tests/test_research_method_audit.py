@@ -25,26 +25,26 @@ class ResearchMethodAuditTest(unittest.TestCase):
         cls.latest = audit.load_method_audit(strict=True)
 
     def test_baseline_snapshot_matches_current_registry(self):
-        self.assertEqual(self.latest["snapshotId"], "RMA-2026-08-03-01")
+        self.assertEqual(self.latest["snapshotId"], "RMA-2026-08-03-02")
         self.assertEqual(self.latest["methodologyVersion"], "1.3")
         self.assertEqual(
             self.latest["registryFingerprint"], self.current["registryFingerprint"],
         )
-        self.assertEqual(len(self.latest["history"]), 4)
+        self.assertEqual(len(self.latest["history"]), 5)
 
     def test_audit_exposes_counts_without_fake_accuracy_score(self):
-        self.assertEqual(self.current["scope"]["topics"], 26)
-        self.assertEqual(self.current["scope"]["graphs"], 16)
-        self.assertEqual(self.current["scope"]["scanEvents"], 11)
-        self.assertEqual(self.current["claims"]["active"], 155)
-        self.assertEqual(self.current["graphs"]["activeEdges"], 233)
-        self.assertEqual(self.current["graphs"]["traceableEdges"], 233)
+        self.assertEqual(self.current["scope"]["topics"], 28)
+        self.assertEqual(self.current["scope"]["graphs"], 18)
+        self.assertEqual(self.current["scope"]["scanEvents"], 12)
+        self.assertEqual(self.current["claims"]["active"], 167)
+        self.assertEqual(self.current["graphs"]["activeEdges"], 259)
+        self.assertEqual(self.current["graphs"]["traceableEdges"], 259)
         self.assertEqual(self.current["monitors"]["reviewedMature"], 3)
         self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 3)
         self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 3)
         self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 2)
         self.assertEqual(self.current["scans"]["latestId"],
-                         "scan-2026-08-03-selection-freeze-custom-hbm-pcie6")
+                         "scan-2026-08-03-group-gaps-power-buffering-cooling-loops")
         self.assertEqual(self.current["scans"]["latestScope"], "partial")
         self.assertEqual(self.current["scans"]["overdue"], 0)
         self.assertFalse(self.current["calibration"]["descriptiveRateReady"])
@@ -53,7 +53,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(
             self.current["selection"],
             {
-                "cycleId": "RS-2026-08-03-01",
+                "cycleId": "RS-2026-08-03-02",
                 "candidates": 5,
                 "frozenBeforeResearch": 5,
                 "advanceDecisions": 2,
@@ -94,7 +94,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
                 "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION",
             ],
         )
-        self.assertEqual(self.current["sources"]["thesesWithTwoIndependentGroups"], 23)
+        self.assertEqual(self.current["sources"]["thesesWithTwoIndependentGroups"], 25)
         gate = next(item for item in self.current["gates"]
                     if item["id"] == "cross_check_depth")
         for topic_id in missing:

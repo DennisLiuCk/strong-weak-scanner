@@ -18,8 +18,8 @@ class KnowledgeGraphTest(unittest.TestCase):
         cls.topics, cls.notes = kg._load_default_context()
         cls.payload = kg.build_knowledge_graph(cls.topics, cls.notes, strict=True)
 
-    def test_publishes_sixteen_valid_hubs_and_two_separate_views(self):
-        self.assertEqual(self.payload["stats"], {"graphs": 16, "nodes": 194, "edges": 233})
+    def test_publishes_eighteen_valid_hubs_and_two_separate_views(self):
+        self.assertEqual(self.payload["stats"], {"graphs": 18, "nodes": 209, "edges": 259})
         self.assertEqual(
             {graph["id"] for graph in self.payload["graphs"]},
             {
@@ -30,6 +30,7 @@ class KnowledgeGraphTest(unittest.TestCase):
                 "glass-substrate-commercialization",
                 "hbf-commercialization", "high-na-euv-readiness",
                 "custom-hbm-scope-ladder", "pcie6-compliance-ladder",
+                "ai-power-buffering", "liquid-cooling-loop-boundaries",
             },
         )
         for graph in self.payload["graphs"]:

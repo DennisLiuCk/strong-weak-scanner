@@ -40,7 +40,7 @@ class ResearchRadarTest(unittest.TestCase):
             list(range(1, 6)),
         )
         self.assertEqual(self.payload["schemaVersion"], 2)
-        self.assertEqual(self.payload["selectionCycleId"], "RS-2026-08-03-01")
+        self.assertEqual(self.payload["selectionCycleId"], "RS-2026-08-03-02")
         self.assertEqual(self.payload["asOf"], "2026-08-03")
         self.assertGreater(self.payload["nextReview"], self.payload["asOf"])
 
@@ -48,7 +48,7 @@ class ResearchRadarTest(unittest.TestCase):
         top_two = self.payload["candidates"][:2]
         self.assertEqual(
             [row["id"] for row in top_two],
-            ["RC-CUSTOM-HBM", "RC-PCIE6-COMPLIANCE"],
+            ["RC-AI-POWER-BUFFERING", "RC-LIQUID-COOLING-LOOP-BOUNDARY"],
         )
         for row in top_two:
             self.assertEqual(row["priority"], "p1")

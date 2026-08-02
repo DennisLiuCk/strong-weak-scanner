@@ -5,7 +5,7 @@ schema_version: 2
 radar_id: RADAR-2026-08-03
 as_of: 2026-08-03
 next_review: 2026-08-10
-status: active
+status: retired
 method: 先凍結初始排行、第一拒絕條件與下一份證據，再以一手來源拆分定義、產品階段、官方驗證及部署；升格只代表值得形成可證偽研究，不代表題材成立或投資有效。
 selection_cycle_id: RS-2026-08-03-01
 -->

@@ -132,3 +132,15 @@ stage:vendor-interoperability,stage,供應商互通,Vendor interoperability,conc
 stage:official-compliance,stage,PCI-SIG 官方測試,Official compliance testing,concept:pcie6-deployment-readiness,依 PCI-SIG 指定程序與速率執行 official testing 的節點
 stage:integrators-listing,stage,Integrators List 列名,PCI-SIG Integrators List,concept:pcie6-deployment-readiness,產品依指定 specification revision 與 rate 通過程序後出現在 PCI-SIG 公開列表的節點
 stage:pcie6-platform-deployment,stage,PCIe 6 平台部署,PCIe 6 production fleet,concept:pcie6-deployment-readiness,具名客戶把 host switch retimer endpoint 與 firmware 組成可運行 production fleet 的節點
+concept:ai-power-buffering,concept,AI 功率緩衝,AI power buffering|multi-timescale energy storage,concept:800v-power-tree,依負載波動的時間尺度與系統位置分配 CBU BBU 與 BESS 的電力架構
+component:rack-capacitor-bank,component,機架電容儲能,CBU|Capacitor Bank Unit,concept:ai-power-buffering,靠近機架處理快速功率波動的電容或超級電容模組
+component:facility-bess,component,設施級 BESS,Battery Energy Storage System,concept:ai-power-buffering,位於設施或併網側管理較慢且較大範圍功率變化的電池儲能
+concept:liquid-cooling-loop-boundary,concept,液冷迴路責任邊界,Liquid cooling interface contract|loop responsibility map,concept:liquid-cooling,把 FWS TCS ITE 控制與維護的責任及交接條件分開追蹤的系統框架
+concept:facility-water-system,concept,設施水系統,FWS|Facility Water System,concept:liquid-cooling-loop-boundary,從設施冷源至 CDU 一次側並把熱帶往冷卻塔 dry cooler 或 chiller 的水系統
+concept:technology-cooling-system,concept,技術冷卻系統,TCS|Technology Cooling System|DECS,concept:liquid-cooling-loop-boundary,從 CDU 經機架 manifold 與 ITE 再回 CDU 的二次冷卻迴路
+component:rack-manifold,component,機架液冷 Manifold,Rack manifold|分歧管,concept:liquid-cooling-loop-boundary,在機架內分配與回收各 ITE 支路冷卻液的管路元件
+component:cold-plate,component,冷板,Cold plate|Direct-to-chip cold plate,concept:liquid-cooling-loop-boundary,貼近高熱元件並把熱傳入 TCS 冷卻液的熱交換元件
+component:quick-disconnect,component,液冷快接,QD|Quick disconnect|UQD,concept:liquid-cooling-loop-boundary,允許液冷管路快速連接分離並控制洩漏與維修風險的介面
+capability:coolant-compatibility,capability,冷卻液與材料相容性,Coolant compatibility|Fluid chemistry,concept:liquid-cooling-loop-boundary,控制腐蝕結垢污染與材料反應以維持液冷迴路可靠度的能力
+capability:liquid-cooling-telemetry,capability,液冷可觀測性,Liquid cooling telemetry|BMS liquid points,concept:liquid-cooling-loop-boundary,以溫度流量壓差漏液與狀態資料觀測及控制液冷系統的能力
+capability:leak-isolation,capability,漏液偵測與隔離,Leak detection|Liquid isolation,concept:liquid-cooling-loop-boundary,偵測液體外洩並將受影響機架或支路安全隔離的能力

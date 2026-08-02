@@ -43,3 +43,5 @@ company:broadcom,company,Broadcom,AVGO,NASDAQ,US,博通,https://www.broadcom.com
 company:samsung-electronics,company,Samsung Electronics,005930,KRX,KR,三星電子,https://www.samsung.com/,記憶體 邏輯晶圓代工與先進封裝供應商
 company:astera-labs,company,Astera Labs,ALAB,NASDAQ,US,Astera,https://www.asteralabs.com/,AI 與雲端 PCIe CXL connectivity 半導體供應商
 organization:pci-sig,organization,PCI-SIG,,,US,PCI Special Interest Group,https://pcisig.com/,PCI Express 規格 合規計畫與 Integrators List 維護組織
+company:texas-instruments,company,Texas Instruments,TXN,NASDAQ,US,TI|德州儀器,https://www.ti.com/,類比與嵌入式處理半導體及電源參考設計供應商
+company:lenovo,company,Lenovo Group,0992,HKEX,CN,Lenovo|聯想,https://www.lenovo.com/,伺服器與資料中心系統及液冷整合供應商
