@@ -8,7 +8,7 @@ schema_version: 1
 radar_id: RR-2026-08-02-MARKET-MAP
 as_of: 2026-08-02
 next_review: 2026-08-09
-status: active
+status: retired
 method: 優先級依近期一手里程碑、可證偽性、成熟度落差、修正既有錯誤與台股研究路由排序；知識價值依能否重組既有概念、減少錯誤外推及連接多個研究主題判定；保留已升格與未升格項目供回測，不以兩軸加權成假精確分數
 -->
 

@@ -116,3 +116,19 @@ capability:high-na-metrology,capability,High-NA 量測與檢查,High-NA metrolog
 standard:esun,standard,ESUN,Ethernet for Scale-Up Networking,concept:open-ai-fabrics,OCP 針對 AI scale-up 網路交換與 Ethernet framing 的開放規格工作組
 standard:sue-t,standard,SUE-T,Scale-Up Ethernet Transport,concept:open-ai-fabrics,OCP 針對 XPU endpoint 與 transport 功能的 Scale-Up Ethernet 工作組
 product:arista-7060xe7,product,Arista 7060XE7,7060XE7 Series|Etherlink 1.6T,concept:open-ai-fabrics,Arista 於 2026 年公告可服務 scale-up 與 scale-out 的 1.6T 網路平台
+concept:custom-hbm-commercialization,concept,Custom HBM 商用成熟度,Custom HBM scope ladder|客製 HBM,,依客製對象 樣品 客戶資格 量產與財務分開追蹤的 HBM 研究框架
+product:custom-hbm,product,Custom HBM,Customized HBM|cHBM,concept:custom-hbm-commercialization,依客戶加速器架構調整介面 base die 或工作負載的非單一規格產品集合
+process:customer-codesign,process,客戶共同設計,Customer co-design,concept:custom-hbm-commercialization,記憶體供應商與加速器客戶共同定義介面 邏輯與產品條件的開發流程
+capability:workload-offload,capability,Base-die 工作負載下放,Workload offload|Near-memory preprocessing,concept:custom-hbm-commercialization,把部分前處理或資料路徑功能移入 HBM base die 的架構能力
+stage:custom-hbm-sample,stage,Custom HBM 客戶樣品,Custom HBM customer sample,concept:custom-hbm-commercialization,依客戶規格交付可測實體樣品但尚未完成產品資格的節點
+stage:custom-hbm-qualification,stage,Custom HBM 客戶資格,Custom HBM customer qualification,concept:custom-hbm-commercialization,客戶完成介面 功耗 熱 效能 良率與系統相容性驗證的節點
+stage:custom-hbm-production,stage,Custom HBM 量產,Custom HBM production,concept:custom-hbm-commercialization,客製產品進入穩定製造與出貨但不自動代表財務分母已揭露的節點
+concept:pcie6-deployment-readiness,concept,PCIe 6 部署成熟度,PCIe 6 compliance ladder|Gen6 readiness,,把產品功能 供應商互通 官方測試 公開列表與平台部署分開追蹤的 PCIe 6 框架
+standard:pcie6,standard,PCIe 6.x,PCI Express 6|PCIe Gen6,concept:pcie6-deployment-readiness,最高 64 GT/s 並採 PAM4 與 FLIT 模式的 PCI Express 第六代規格家族
+component:pcie-retimer,component,PCIe retimer,PCIe 6 retimer,concept:pcie6-deployment-readiness,重整高速 PCIe 電訊號並延伸可用板級或纜線距離的連接元件
+component:pcie-fabric-switch,component,PCIe fabric switch,PCIe 6 switch,concept:pcie6-deployment-readiness,在 host 與多個 endpoint 間交換及管理 PCIe 流量的元件
+product:micron-9650,product,Micron 9650 SSD,9650 NVMe SSD,concept:pcie6-deployment-readiness,Micron 公告進入 high-volume production 的 PCIe Gen6 data center SSD
+stage:vendor-interoperability,stage,供應商互通,Vendor interoperability,concept:pcie6-deployment-readiness,供應商或客戶平台驗證不同元件共同運作但不必然等於標準組織正式測試的節點
+stage:official-compliance,stage,PCI-SIG 官方測試,Official compliance testing,concept:pcie6-deployment-readiness,依 PCI-SIG 指定程序與速率執行 official testing 的節點
+stage:integrators-listing,stage,Integrators List 列名,PCI-SIG Integrators List,concept:pcie6-deployment-readiness,產品依指定 specification revision 與 rate 通過程序後出現在 PCI-SIG 公開列表的節點
+stage:pcie6-platform-deployment,stage,PCIe 6 平台部署,PCIe 6 production fleet,concept:pcie6-deployment-readiness,具名客戶把 host switch retimer endpoint 與 firmware 組成可運行 production fleet 的節點

@@ -40,3 +40,6 @@ organization:open-compute-project,organization,Open Compute Project,,,US,OCP,htt
 company:asml,company,ASML,ASML,NASDAQ,NL,艾司摩爾,https://www.asml.com/,EUV 與先進微影設備供應商
 company:arista,company,Arista Networks,ANET,NYSE,US,Arista,https://www.arista.com/,資料中心與 AI Ethernet 網路平台供應商
 company:broadcom,company,Broadcom,AVGO,NASDAQ,US,博通,https://www.broadcom.com/,網路交換晶片與客製運算半導體供應商
+company:samsung-electronics,company,Samsung Electronics,005930,KRX,KR,三星電子,https://www.samsung.com/,記憶體 邏輯晶圓代工與先進封裝供應商
+company:astera-labs,company,Astera Labs,ALAB,NASDAQ,US,Astera,https://www.asteralabs.com/,AI 與雲端 PCIe CXL connectivity 半導體供應商
+organization:pci-sig,organization,PCI-SIG,,,US,PCI Special Interest Group,https://pcisig.com/,PCI Express 規格 合規計畫與 Integrators List 維護組織

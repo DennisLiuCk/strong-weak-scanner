@@ -12,7 +12,9 @@ evidence pack 與獨立 reviewer 治理；可證偽 H# 仍由
 每篇市場議題都必須走完以下鏈條：
 
 ```text
-可證偽問題
+候選快掃
+  → 研究前凍結初始排名／第一拒絕／下一份證據
+  → 可證偽問題
   → 至少兩條可定位的來源
   → claim–evidence ledger
   → 反方來源與證據邊界
@@ -24,6 +26,21 @@ evidence pack 與獨立 reviewer 治理；可證偽 H# 仍由
 
 「找不到公司級證據」是有效結果。這時應把公司映射標成 `unverified`，而不是用同業、
 平台生態系名單或市場轉述補洞。
+
+### 選題前承諾：先留下可被打臉的選擇
+
+候選文章開始深研前，先在 `notes/research_candidates/selection_log.csv` 追加一個 cycle，凍結
+`candidate_id`、初始 `rank`、`priority`、`knowledge_value`、`evidence_posture`、
+`selection_decision`、`selection_reason`、`first_rejection` 與 `next_evidence`。同一 cycle 的
+候選共用一個含 `+08:00` 的 `selected_at`，rank 必須從 1 連續排列。這份帳本 append-only；
+`research_method_audit.py --baseline-ref` 會以 Git 前版檢查既有列前綴，不能在看到深研結果後
+回填或改寫初始理由。
+
+Active radar 使用 schema 2 並以 `selection_cycle_id` 指向該輪凍結記錄。雷達可以另記深研後
+的 `promoted／watch／deferred` 與 evidence posture，但初始 rank、priority、knowledge value、
+第一拒絕和下一份證據必須逐字等於 selection log。`advance → promoted` 只表示完成本輪研究產物；
+`advance → watch/deferred` 是研究後拒絕，也同樣是有效方法結果。兩者都不能稱為題材、投資或
+報酬命中。首個 cycle 以獨立 Git commit 先凍結，再提交文章與圖譜；後續每輪沿用同一順序。
 
 ## 一、先按文件角色取得來源
 
@@ -403,9 +420,11 @@ monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID�
 - `notes/research_method_reviews/monitor_reviews.csv`：append-only 到期檢查帳本，每列連到
   既有 topic／monitor，結果只能是 `new_support`、`new_contrary`、`no_new_evidence` 或
   `not_yet_testable`。
+- `notes/research_candidates/selection_log.csv`：append-only 研究前選擇帳本；把初始選擇、
+  第一拒絕與下一份證據和研究後 route 分開，使日後能檢查 selection drift 與事後重排。
 - `scripts/research_method_audit.py`：驗證 snapshot fingerprint、review 引用與歷史不可改寫，
-  並在研究雷達顯示可追溯、獨立交叉驗證、可證偽、新鮮度、修正學習、掃描覆蓋問責與
-  校準可用性七道
+  並在研究雷達顯示選題前承諾、可追溯、獨立交叉驗證、可證偽、新鮮度、修正學習、
+  掃描覆蓋問責與校準可用性八道
   gate。獨立交叉驗證會直接列出仍缺第二條消息鏈的 topic ID，避免缺口被總體比例掩蓋；
   兩條來源鏈只代表降低單一來源偏誤，不代表多數決或主張已被證真。
 
@@ -441,11 +460,13 @@ event，且至少三個結果帶有新證據時，audit 才允許顯示附樣本
    至少包含一個 living index，並具備頻率、日期、trigger 與 invalidation。
 7. `review_due` 是否等於最早 monitor 日期，且晚於 `last_reviewed_at`。
 8. impact 是否仍清楚寫 evidence boundary，沒有把 topic 升格為公司事實。
-9. 執行 `python scripts/research_queue.py --lint` 與 `python scripts/knowledge_graph.py --lint`；
+9. Active radar 是否先有同 cycle 的 selection log，且初始 rank、第一拒絕與下一份證據沒有
+   因深研結果回寫；執行 `python scripts/research_radar.py --lint`。
+10. 執行 `python scripts/research_queue.py --lint` 與 `python scripts/knowledge_graph.py --lint`；
    lint 只驗結構與引用完整性，不會重新下載或證明來源內容為真。
-10. 執行 `python scripts/research_method_audit.py --lint --baseline-ref HEAD`，確認 registry
-    有新快照、舊快照未被改寫，review ledger 也只追加新列。
-11. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
+11. 執行 `python scripts/research_method_audit.py --lint --baseline-ref HEAD`，確認 registry
+    有新快照、舊快照未被改寫，review 與 selection ledger 也只追加新列。
+12. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
     行動版顯示。
 
 ## Schema 沿革

@@ -35,7 +35,7 @@ from qual_notes import load_notes  # noqa: E402
 from research_queue import (  # noqa: E402
     _source_independence_key, load_scan_log, load_topics, taipei_today,
 )
-from research_radar import load_research_radar  # noqa: E402
+from research_radar import SELECTION_LOG, load_research_radar  # noqa: E402
 
 
 AUDIT_DIR = os.path.join(ROOT, "notes", "research_method_reviews")
@@ -208,6 +208,14 @@ def _registry_fingerprint(
          row.get("nextCheck"), row.get("articleTopicId"), row.get("graphId")]
         for row in radar.get("candidates", [])
     ]
+    selection_rows = [
+        [row.get("selection_id"), row.get("cycle_id"), row.get("selected_at"),
+         row.get("candidate_id"), row.get("rank"), row.get("priority"),
+         row.get("knowledge_value"), row.get("evidence_posture"),
+         row.get("selection_decision"), row.get("selection_reason"),
+         row.get("first_rejection"), row.get("next_evidence")]
+        for row in radar.get("selectionLog", [])
+    ]
     scan_rows = [
         [row.get("scan_id"), row.get("window_start"), row.get("window_end"),
          row.get("scanned_at"), row.get("scope"), row.get("source_domains"),
@@ -218,6 +226,7 @@ def _registry_fingerprint(
         "topics": topic_rows,
         "edges": edge_rows,
         "radar": radar_rows,
+        "selectionLog": selection_rows,
         "reviews": reviews,
         "scanLog": scan_rows,
     }
@@ -336,6 +345,23 @@ def compute_method_audit(
         and latest_scan["next_scan_due"] < date_text
     ) else []
 
+    radar_candidates = radar.get("stats", {}).get("candidates", 0)
+    frozen_selections = radar.get("stats", {}).get("selectionFrozen", 0)
+    selection_advance = radar.get("stats", {}).get("selectedAdvance", 0)
+    promoted_after_research = sum(
+        row.get("selectionOutcome") == "promoted_after_research"
+        for row in radar.get("candidates", [])
+    )
+    rejected_after_research = sum(
+        row.get("selectionOutcome") == "rejected_after_research"
+        for row in radar.get("candidates", [])
+    )
+    selection_accountable = bool(
+        radar.get("schemaVersion") == 2
+        and radar_candidates
+        and frozen_selections == radar_candidates
+    )
+
     trace_ok = graph_traceable == len(graph_edges) and boundary_complete == len(active_claims)
     cross_check_ok = not theses_needing_second_group
     falsifiable_ok = (
@@ -367,7 +393,7 @@ def compute_method_audit(
     core = {
         "schemaVersion": 1,
         "asOf": date_text,
-        "methodologyVersion": "1.2",
+        "methodologyVersion": "1.3",
         "registryFingerprint": _registry_fingerprint(topics, graph, radar, reviews, scan),
         "scope": {
             "topics": len(topics),
@@ -376,6 +402,16 @@ def compute_method_audit(
             "promotedCandidates": radar.get("stats", {}).get("promoted", 0),
             "graphs": graph.get("stats", {}).get("graphs", 0),
             "scanEvents": len(scan_rows),
+        },
+        "selection": {
+            "cycleId": radar.get("selectionCycleId", ""),
+            "candidates": radar_candidates,
+            "frozenBeforeResearch": frozen_selections,
+            "advanceDecisions": selection_advance,
+            "promotedAfterResearch": promoted_after_research,
+            "rejectedAfterResearch": rejected_after_research,
+            "accountable": selection_accountable,
+            "boundary": "凍結紀錄只能證明選擇與拒絕條件可被事後稽核；升格是研究產出，不是選題正確率或投資命中率。",
         },
         "claims": {
             "active": len(active_claims),
@@ -435,6 +471,16 @@ def compute_method_audit(
         },
         "gates": [
             {
+                "id": "selection_accountability", "label": "選題前承諾",
+                "status": "pass" if selection_accountable else "attention",
+                "observed": (
+                    f"{frozen_selections}/{radar_candidates} 個本輪候選有研究前凍結；"
+                    f"{selection_advance} 個 advance 中 {promoted_after_research} 個完成升格、"
+                    f"{rejected_after_research} 個研究後拒絕"
+                ),
+                "boundary": "通過只代表初始排名、第一拒絕與下一份證據沒有被事後改寫；不能由單輪升格率判定方法有效。",
+            },
+            {
                 "id": "traceability", "label": "可追溯性",
                 "status": "pass" if trace_ok else "attention",
                 "observed": f"{graph_traceable}/{len(graph_edges)} 條圖譜線可回查；{boundary_complete}/{len(active_claims)} 個 active claim 有邊界",
@@ -478,6 +524,7 @@ def compute_method_audit(
             },
         ],
         "caveats": [
+            "選題前凍結與升格結果分開保存；至少累積多輪到期結果前，不計算選題命中率。",
             "升格候選數是研究流程產出，不是研究正確率。",
             "獨立來源鏈覆蓋是交叉檢查深度，不是多數決或真實性分數。",
             "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
@@ -585,6 +632,24 @@ def _baseline_errors(baseline_ref: str) -> list[str]:
             current_lines = current.splitlines()
             if current_lines[:len(old_lines)] != old_lines:
                 errors.append("monitor_reviews.csv 必須 append-only，既有列不可改寫或刪除")
+    selection_relpath = os.path.relpath(SELECTION_LOG, ROOT).replace(os.sep, "/")
+    try:
+        old_selection = subprocess.run(
+            ["git", "show", f"{baseline_ref}:{selection_relpath}"], cwd=ROOT,
+            text=True, encoding="utf-8", capture_output=True, check=True,
+        ).stdout
+    except subprocess.CalledProcessError:
+        old_selection = ""
+    if old_selection:
+        if not os.path.exists(SELECTION_LOG):
+            errors.append("歷史 selection_log.csv 不可刪除")
+        else:
+            with open(SELECTION_LOG, encoding="utf-8-sig", newline="") as handle:
+                current_selection = handle.read()
+            old_lines = old_selection.splitlines()
+            current_lines = current_selection.splitlines()
+            if current_lines[:len(old_lines)] != old_lines:
+                errors.append("selection_log.csv 必須 append-only，研究前凍結列不可改寫或刪除")
     return errors
 
 

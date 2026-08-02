@@ -30,7 +30,8 @@ python scripts/research_method_audit.py --lint --baseline-ref HEAD
 
 跨市場候選另由 `notes/research_candidates/*.md` 的單一 active radar 管理，
 `research_radar.py --lint` 會驗證排名、來源、下一個證據、反證條件，以及升格文章／圖譜是否
-真的存在。雷達是研究資源排序，不併入個股分數，也不是投資建議。
+真的存在。Schema 2 active radar 還必須指向 `selection_log.csv` 的研究前凍結 cycle；雷達是
+研究資源排序，不併入個股分數，也不是投資建議。
 
 季報「應有期間」依年報 3/31、Q1 5/15、Q2 8/14、Q3 11/14 的截止日推導，不用資料庫
 自己的 `MAX(date)` 當標準；否則整批落後一季仍會自我回報完整，單一早報者又會誤傷
@@ -67,6 +68,12 @@ pack 與獨立複核。
 
 只有已通過 topic v3 claim ledger 與 knowledge graph evidence contract 的候選可標為
 `promoted`；其餘候選即使知識價值高，也只保留 watch／expand 狀態。
+
+候選進入深研前，先在 `notes/research_candidates/selection_log.csv` 追加同一 cycle 的完整
+候選集合，並單獨 commit。凍結欄位包括初始 rank、priority、knowledge value、evidence
+posture、`advance／watch／defer`、選擇理由、第一拒絕及下一份證據。這一步不是增加一個綜合
+分數，而是讓後續能分辨：原本就選對了可研究問題、深研後被拒絕，或看到結果才事後調整排行。
+初始欄位不得因文章結果回寫；研究後 route 只留在 active radar。
 
 ## 可持續的 121 檔節奏
 
@@ -108,8 +115,9 @@ pack 與獨立複核。
    - 市場流傳、可證偽但未被正式資料覆蓋 → `hypothesis_candidate`。
    - 跨族群上游正式事件 → `event_anchor_candidate`。
    - 尚未能映射公司 → `market_issue_watch`／`policy_watch`。
-6. 更新 active candidate radar：保留連續排名、反證條件與下次查核日；若候選升格，先完成
-   topic v3 與圖譜 lint，再填入 article／graph route。
+6. 先把本輪候選寫入 append-only selection log 並獨立 commit，再開始深研；完成後更新
+   schema 2 active radar，保留凍結的連續排名、第一拒絕與下一份證據，只新增研究後 route。
+   若候選升格，先完成 topic v3 與圖譜 lint，再填入 article／graph route。
 7. 執行 `research_queue.py --lint` 與 `research_radar.py --lint`。topic 不能自動貼入正式
    筆記；正式更新仍需同一 evidence pack 離線重算與獨立 reviewer。
 8. 回查所有到期 monitor，在 `notes/research_method_reviews/monitor_reviews.csv` 追加
@@ -124,6 +132,8 @@ GitHub 的 `research-watch.yml` 會在台灣每週一 09:00，以及 `fetch-fina
 每月第一個研究週額外執行 `research_method_audit.py --json`，新增一份
 `notes/research_method_reviews/YYYY-MM-DD_NN.json`。逐項看 gate，不合成健康分數：
 
+- **選題前承諾**：active radar 的每個候選是否都有同 cycle 的研究前凍結，且初始排名、
+  第一拒絕與下一份證據未被改寫。通過不代表選題有效；單輪 advance／promoted 比例不報命中率。
 - **可追溯性**：active claim 是否都有邊界、圖譜線是否能回查 exact claim／source。
 - **獨立交叉驗證**：每篇 active topic 的主命題是否至少有兩條獨立來源鏈；逐一處理 audit
   列出的 topic ID，不能用整體覆蓋率掩蓋單篇缺口，也不能把兩條來源當成真實性分數。
