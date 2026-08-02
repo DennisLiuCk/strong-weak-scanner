@@ -310,6 +310,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('taipei_today as research_today', builder)
         self.assertIn('research_html.replace(', builder)
         self.assertIn('research_library["knowledgeGraph"] = build_knowledge_graph(', builder)
+        self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
         self.assertIn("body.append(mobileBack,h('h1'", template)
         self.assertIn("body.append(meta,articleSections(article)", template)
         self.assertIn("'aria-selected':state.type===type?'true':'false'", template)
@@ -405,6 +406,22 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("點線與細線表示仍需更多商業證據", template)
         self.assertIn("state.graphUniverseOnly=event.target.checked", template)
         self.assertIn("state.graphEvidence.add(input.value)", template)
+
+    def test_template_publishes_ranked_candidate_research_radar(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            'id="surfaceRadar"', 'id="radarPage"', 'id="radarStats"',
+            'id="radarMethod"', 'id="radarList"',
+            "const RADAR=LIB.candidateRadar", "function renderRadar()",
+            "function renderRadarCandidate(", "function openRadarGraph(",
+            "'data-testid':'radar-'+candidate.id", "candidate.firstRejection",
+            "candidate.nextEvidence", "candidate.nextCheck",
+            "排名用於配置研究時間，不代表預期報酬、股價方向或投資建議",
+            "候選排名不是投資評分", "deepLink==='radar'",
+            "document.getElementById('surfaceRadar').addEventListener",
+        ):
+            self.assertIn(contract, template)
+        self.assertIn("grid-template-columns:repeat(3,1fr)", template)
 
 
 if __name__ == "__main__":

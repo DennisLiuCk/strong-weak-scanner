@@ -36,6 +36,7 @@ from research_queue import (_topic_confidence as topic_confidence_at,
                             load_topics as load_research_topics,
                             taipei_today as research_today)
 from knowledge_graph import build_knowledge_graph
+from research_radar import load_research_radar
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -2233,6 +2234,13 @@ def main():
     # build 直接標紅，避免圖上關係悄悄與研究帳本分岔。
     research_library["knowledgeGraph"] = build_knowledge_graph(
         research_topics, notes_map, strict=True,
+    )
+    # 候選雷達與正式文章／圖譜分層：它可以排序「下一題研究什麼」，但候選來源本身
+    # 不會繞過 knowledge_graph 的 active claim 契約。升格連結也在 build 時查存在性。
+    research_library["candidateRadar"] = load_research_radar(
+        topic_ids={topic.get("meta", {}).get("topic_id", "") for topic in research_topics},
+        graph_ids={graph["id"] for graph in research_library["knowledgeGraph"]["graphs"]},
+        strict=True,
     )
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}

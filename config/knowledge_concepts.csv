@@ -29,3 +29,26 @@ stage:validation,stage,客戶驗證,Validation,product:amd-helios,客戶仍在�
 component:efb,component,EFB,Elevated Fanout Bridge,process:advanced-packaging,AMD 生態系文件列示的先進封裝技術路徑
 component:substrate,component,載板／基板,Package substrate,process:advanced-packaging,承載晶片並連接封裝與系統電路板的結構
 concept:purpose-built-silicon,concept,客製晶片／自研系統,Purpose-built silicon,,雲端業者自行設計的晶片與系統替代路徑
+concept:backside-power,concept,背面供電,Backside power delivery|BSPDN,,把供電網路移到晶圓背面並與前側訊號佈線分離的先進邏輯製程架構
+process:super-power-rail,process,Super Power Rail,SPR,concept:backside-power,台積電 A16 的背面供電實作名稱
+process:powervia,process,PowerVia,Intel PowerVia,concept:backside-power,Intel 18A 家族的背面供電實作名稱
+component:buried-power-rail,component,埋置電源軌,Buried power rail|BPR,concept:backside-power,位於電晶體下方並把背面電力送近元件的金屬電源軌
+component:nano-tsv,component,nano-TSV,nTSV|nano-through-silicon via,concept:backside-power,從薄化晶圓背面連到埋置電源軌的奈米級矽穿孔
+process:wafer-thinning,process,晶圓薄化,Wafer thinning,concept:backside-power,背面加工前以研磨 CMP 與蝕刻降低晶圓厚度的整合步驟
+process:backside-alignment,process,背面對準,Backside alignment,concept:backside-power,在晶圓接合與變形條件下把背面結構對準前側電源軌的製程能力
+concept:ai-memory-hierarchy,concept,AI 記憶體分層,AI memory hierarchy,,依頻寬 容量 延遲 持久性與共享性分配 AI 工作資料的系統架構
+product:socamm2,product,SOCAMM2,LPDRAM SOCAMM2,concept:ai-memory-hierarchy,以低功耗 DRAM 提供可維護高容量 system memory 的模組
+concept:kv-cache,concept,KV cache,Key-Value cache,concept:ai-memory-hierarchy,Transformer 推論保存既有上下文中間結果以避免重算的資料
+product:nvidia-cmx,product,NVIDIA CMX,Context Memory Storage|G3.5,concept:ai-memory-hierarchy,以 BlueField 與 flash 建立的共享 inference context memory storage 層
+standard:cxl4,standard,CXL 4.0,Compute Express Link 4.0,concept:ai-memory-hierarchy,處理器 記憶體擴充與加速器之間的 cache-coherent 開放互連規格
+component:system-ram,component,System RAM,Host memory|CPU memory,concept:ai-memory-hierarchy,位於 CPU 主機側的系統記憶體層
+component:local-ssd,component,Local SSD,Local flash,concept:ai-memory-hierarchy,位於單一節點或機架內的本地快閃儲存層
+component:shared-storage,component,Shared storage,Networked storage,concept:ai-memory-hierarchy,提供持久性與跨節點存取的一般共享儲存層
+concept:open-ai-fabrics,concept,開放 AI 互連,Open AI fabrics,,把 accelerator scale-up 與 Ethernet scale-out 分層追蹤的開放互連框架
+standard:ualink,standard,UALink,Ultra Accelerator Link,concept:open-ai-fabrics,針對 AI accelerator scale-up 的開放互連規格
+standard:uec,standard,Ultra Ethernet,UEC,concept:open-ai-fabrics,針對 AI 與 HPC scale-out Ethernet 的開放規格
+concept:scale-up,concept,Scale-up,Accelerator scale-up,concept:open-ai-fabrics,在 pod 或機架內以低延遲和記憶體語意連接多顆加速器
+concept:scale-out,concept,Scale-out,Ethernet scale-out,concept:open-ai-fabrics,把多個機架或節點連成更大叢集的網路層
+standard:ualoe,standard,UALink over Ethernet,UALoE,concept:open-ai-fabrics,以 Ethernet 傳輸路徑承載 UALink protocol 的互連方式
+standard:ucie3,standard,UCIe 3.0,Universal Chiplet Interconnect Express 3.0,process:advanced-packaging,封裝內 die-to-die 的開放 chiplet 互連規格
+stage:interoperability,stage,Multi-vendor interoperability,互通測試|Plugfest,concept:open-ai-fabrics,不同廠商實作完成規格合規並可彼此工作的成熟度節點

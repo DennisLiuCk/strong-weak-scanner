@@ -12,6 +12,7 @@
 python scripts/research_queue.py --attention
 python scripts/research_queue.py --calendar --weeks 8 --output tmp/research_calendar.md
 python scripts/research_queue.py --lint
+python scripts/research_radar.py --lint
 ```
 
 `research_queue.py` 以台灣研究日聚合：
@@ -25,6 +26,10 @@ python scripts/research_queue.py --lint
 
 所有 DB 查詢都走 `db_ro.connect()`。到期是正常待辦，不使命令失敗；topic／scan schema
 錯誤才 exit 1。
+
+跨市場候選另由 `notes/research_candidates/*.md` 的單一 active radar 管理，
+`research_radar.py --lint` 會驗證排名、來源、下一個證據、反證條件，以及升格文章／圖譜是否
+真的存在。雷達是研究資源排序，不併入個股分數，也不是投資建議。
 
 季報「應有期間」依年報 3/31、Q1 5/15、Q2 8/14、Q3 11/14 的截止日推導，不用資料庫
 自己的 `MAX(date)` 當標準；否則整批落後一季仍會自我回報完整，單一早報者又會誤傷
@@ -46,6 +51,21 @@ pack 與獨立複核。
 
 月營收、股價、tier、法人、TDCC 或借券異常都只能是 `trigger_only`。它們可以要求搜尋，
 不能直接成為 H# 生命週期轉移或正式筆記事實。
+
+### 候選雷達：優先級與知識價值分開
+
+候選雷達的 `priority` 回答「現在要不要投入研究時間」；`knowledge_value` 回答「完成後能否
+增加可重用的產業理解」。兩者不得混成一個看似精確的分數，也不得轉譯成股價方向。每個候選
+至少保存兩份一手來源，並明列：
+
+- `why_now`：時效、事件或證據成熟度。
+- `knowledge_gain`：將補上的機制、產業鏈或比較框架。
+- `first_rejection`：哪個觀察最先推翻研究必要性或核心假設。
+- `next_evidence`／`next_check`：下一份要找的證據與期限。
+- `route`：升格文章＋圖譜、併入既有研究，或只留觀察。
+
+只有已通過 topic v3 claim ledger 與 knowledge graph evidence contract 的候選可標為
+`promoted`；其餘候選即使知識價值高，也只保留 watch／expand 狀態。
 
 ## 可持續的 121 檔節奏
 
@@ -87,8 +107,10 @@ pack 與獨立複核。
    - 市場流傳、可證偽但未被正式資料覆蓋 → `hypothesis_candidate`。
    - 跨族群上游正式事件 → `event_anchor_candidate`。
    - 尚未能映射公司 → `market_issue_watch`／`policy_watch`。
-6. 執行 lint。topic 不能自動貼入正式筆記；正式更新仍需同一 evidence pack 離線重算與
-   獨立 reviewer。
+6. 更新 active candidate radar：保留連續排名、反證條件與下次查核日；若候選升格，先完成
+   topic v3 與圖譜 lint，再填入 article／graph route。
+7. 執行 `research_queue.py --lint` 與 `research_radar.py --lint`。topic 不能自動貼入正式
+   筆記；正式更新仍需同一 evidence pack 離線重算與獨立 reviewer。
 
 GitHub 的 `research-watch.yml` 會在台灣每週一 09:00，以及 `fetch-financials` 成功後，
 把唯讀待辦寫入 Actions summary／artifact。它只提醒，不會替代語意掃描，也不會寫 main。

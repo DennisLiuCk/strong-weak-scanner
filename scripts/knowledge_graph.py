@@ -73,6 +73,8 @@ RELATION_LABELS = {
     "builds_systems": "協助打造系統",
     "develops_packaging": "封裝開發／資格",
     "supports_substrate": "載板／基板生態系",
+    "plans_production": "規劃量產",
+    "uses_standard": "採用／整合標準",
     # Industry dependency view.
     "generation_of": "世代／變體",
     "alternative_standard": "替代介面路徑",

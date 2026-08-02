@@ -14,3 +14,11 @@ company:openai,company,OpenAI,,,US,,https://openai.com/,AI 研究與產品公司
 company:meta,company,Meta Platforms,META,NASDAQ,US,Meta,https://about.meta.com/,社群平台與 AI 基礎設施公司
 company:anthropic,company,Anthropic,,,US,,https://www.anthropic.com/,AI 模型與產品公司
 organization:jedec,organization,JEDEC,,,US,,https://www.jedec.org/,半導體標準組織
+company:tsmc,company,TSMC,2330,TWSE,TW,台積電|Taiwan Semiconductor Manufacturing Company,https://www.tsmc.com/,晶圓代工與先進製程提供者；本專案為觀察層而非 universe 成員
+company:intel,company,Intel,INTC,NASDAQ,US,英特爾|Intel Foundry,https://www.intel.com/,處理器與晶圓代工製程提供者
+company:oracle,company,Oracle,ORCL,NYSE,US,甲骨文|OCI,https://www.oracle.com/,雲端基礎設施與軟體公司
+company:marvell,company,Marvell Technology,MRVL,NASDAQ,US,Marvell,https://www.marvell.com/,資料基礎設施與客製運算半導體供應商
+organization:cxl,organization,Compute Express Link Consortium,,,US,CXL Consortium,https://computeexpresslink.org/,CXL 開放互連標準組織
+organization:ualink,organization,UALink Consortium,,,US,Ultra Accelerator Link Consortium,https://ualinkconsortium.org/,AI accelerator scale-up 互連標準組織
+organization:uec,organization,Ultra Ethernet Consortium,,,US,,https://ultraethernet.org/,AI 與 HPC scale-out Ethernet 標準組織
+organization:ucie,organization,UCIe Consortium,,,US,Universal Chiplet Interconnect Express,https://www.uciexpress.org/,封裝內 chiplet 互連標準組織

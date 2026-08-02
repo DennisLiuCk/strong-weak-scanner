@@ -149,9 +149,11 @@ Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會
 1. **今日重點**：先確認「資料至」日期、陳舊警示與大盤 regime，不把最新頁誤認為最新資料。
 2. **最近研究**：首頁只保留正式筆記、多空小作文、市場議題三類入口；事件錨點歸入市場議題，
    點擊後在研究中心閱讀完整法說脈絡、KPI 與族群方向。新近不代表證據較強，畫面保留每篇文章
-   的查核狀態與觀察層警語。研究中心另提供同一證據底層的知識圖譜，可分開查看「公司曝險」
-   與「產業依賴」；線型表示證據層級，商業材料性由同心環距離、節點標籤與分組清單呈現，
-   成熟度與供應集中度仍是不同維度。每條關係都可回到 claim、來源、證據邊界與下一個驗證節點。
+   的查核狀態與觀察層警語。研究中心的「研究雷達」把研究優先級與知識價值分開，保存每個
+   候選的反證條件、下一份證據與查核期限；這是研究資源排序，不是投資評分。知識圖譜則用同一
+   證據底層分開查看「公司曝險」與「產業依賴」；線型表示證據層級，商業材料性由同心環距離、
+   節點標籤與分組清單呈現，成熟度與供應集中度仍是不同維度。每條關係都可回到 claim、來源、
+   證據邊界與下一個驗證節點。
 3. **族群比較**：四象限看價籌位置與 5 日位移，熱圖比較各欄名次，排行榜逐欄排序；三個視圖
    使用同一批資料並聯動高亮。相對最好不等於原始值已轉正。
 4. **個股分層**：可按族群篩選、展開所有成員，並查看近 5 日已確認分層的變化。
@@ -310,11 +312,14 @@ python scripts/leading_hypotheses.py --context <股號>
 python scripts/research_queue.py --attention
 python scripts/research_queue.py --calendar --weeks 8 --output tmp/research_calendar.md
 python scripts/research_queue.py --lint
+python scripts/research_radar.py --lint
 ```
 
 候選議題必須明列來源發布日、研究捕捉日、受影響族群／股票、route、action due 與
 證據邊界；沒有新題目也要在 `scan_log.csv` 留下實際掃描範圍。已簽筆記的 `next_review`
-不可單獨 snooze，否則內容 SHA 會失效。完整節奏、SLA 與路由規則見
+不可單獨 snooze，否則內容 SHA 會失效。跨市場候選另記於 `notes/research_candidates/` 的
+active radar，優先級、知識價值、反證與下次證據都要可機讀；只有文章與圖譜同時通過契約後
+才可標為升格。完整節奏、SLA 與路由規則見
 [`RESEARCH_MAINTENANCE.md`](RESEARCH_MAINTENANCE.md)。
 
 ## 事件錨點與研究中心的台積電法說
