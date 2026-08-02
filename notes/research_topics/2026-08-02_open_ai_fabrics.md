@@ -1,4 +1,4 @@
-# 開放 AI 互連不是單一標準戰：UALink 管 scale-up，UEC 管 scale-out
+# 開放 AI 互連不是兩分法：UALink 與 Ethernet 都進入 scale-up
 
 <!-- research_topic
 topic_id: MI-2026-08-02-OPEN-AI-FABRICS
@@ -19,9 +19,9 @@ group_ids: serverodm,ipdesign,pcb
 trigger_type: interconnect_specification_and_platform_update
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C5
+thesis_claim_id: C9
 base_confidence: medium
-confidence_basis: UALink、UEC、AMD、Oracle 與 Marvell 一手來源可交叉確認 scale-up／scale-out 分工、規格與具名規劃；但合規互通、商用 silicon、Oracle 實際可用狀態及台灣財務曝險仍待驗證
+confidence_basis: UALink、UEC、OCP ESUN／SUE-T、AMD、Arista、Broadcom 與 Oracle 一手來源可交叉確認多條 scale-up／scale-out 路徑；但各規格的 multi-vendor compliance、實際 silicon、客戶部署、相對份額及台灣財務曝險仍待驗證
 cross_company_numbers: false
 -->
 
@@ -38,6 +38,13 @@ from: inbox
 to: triaged
 reason: separated_scale_up_scale_out_specification_product_and_deployment_stages
 evidence: sources:S1,S2,S3,S4,S5
+-->
+<!-- transition
+date: 2026-08-02
+from: triaged
+to: triaged
+reason: superseded_two_layer_ualink_uec_frame_after_esun_scale_up_evidence
+evidence: sources:S9,S10,S11,S12
 -->
 
 <!-- research_source
@@ -168,6 +175,102 @@ limitation: 新聞索引只用來找到新文件；合作、production、shipmen
 independence_group: amd
 -->
 
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: document
+publisher: Open Compute Project Networking Project
+title: The OCP ESUN 1.0 Specification Has Been Released
+published_at: 2026-03-10
+captured_at: 2026-08-02
+accepted_at: 2026-08-02
+status: active
+url: https://www.opencompute.org/blog/the-ocp-esun-10-specification-has-been-released
+locator: ESUN 1.0 highlights；Ethernet scale-up、lossless、4-byte ESUN header、link-level retry 與 multi-hop 段落
+limitation: OCP 規格發布與參與公司數不等於 silicon、compliance、互通、客戶部署或 UALink／UEC 的市場份額
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: OCP ESUN Network Operator Requirements Base Specification 1.0
+published_at: 2026-02-09
+captured_at: 2026-08-02
+accepted_at: 2026-08-02
+status: active
+url: https://www.opencompute.org/documents/ocp-esun-network-operator-requirements-base-specification-rev-1-0-final-pdf
+locator: PDF 封面與 Scope／Requirements；effective 2026-02-09，定義 ESUN network operator requirements
+limitation: 規格文件描述要求，不提供已通過的產品、測試報告、客戶部署、效能比較或財務資料
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S11
+role: competitor_primary
+source_kind: document
+publisher: Arista Networks
+title: Arista Introduces Next-Generation 1.6Terabit Portfolio for AI Fabrics
+published_at: 2026-06-09
+captured_at: 2026-08-02
+accepted_at: 2026-08-02
+status: active
+url: https://investors.arista.com/Communications/Press-Releases-and-Events/Press-Release-Detail/2026/Arista-Introduces-Next-Generation-1-6Terabit-Portfolio-for-AI-Fabrics/default.aspx
+locator: 標題摘要與 7060XE7 前三段；產品組合明列 scale-up、scale-out、rack-scale 與 intra／inter-rack 用途
+limitation: 產品公告證實具名平台與用途，不證明它遵守 ESUN 1.0、完成 multi-vendor compliance、量產部署數或市占
+independence_group: arista
+-->
+
+<!-- research_source
+source_id: S12
+role: competitor_primary
+source_kind: document
+publisher: Broadcom
+title: Scale-up Is Simple Ethernet Makes It Smarter
+published_at: 2025-05-21
+captured_at: 2026-08-02
+accepted_at: 2026-08-02
+status: active
+url: https://www.broadcom.com/blog/scale-up-is-simple-ethernet-makes-it-smarter
+locator: Introducing the Scale-Up Ethernet framework；SUE endpoint、memory model、packet format 與貢獻給 OCP 段落
+limitation: Broadcom 自述架構與產品方向不等於 OCP 最終規格、跨廠互通、客戶採用或相對 UALink 的效能／份額
+independence_group: broadcom
+-->
+
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: living_index
+publisher: Open Compute Project
+title: OCP Networking ESUN Workstream Wiki
+published_at:
+captured_at: 2026-08-02
+accepted_at: 2026-08-02
+status: active
+url: https://www.opencompute.org/wiki/Networking/ESUN
+locator: 2026-08-02 查得 ESUN documents、SUE-T 分工、key focus、meeting records 與後續 specification 入口
+limitation: 動態 wiki 只供追蹤新規格與會議；不能把會議、參與或草案視為產品互通與部署
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S14
+role: competitor_primary
+source_kind: living_index
+publisher: Arista Networks
+title: Arista Investor Press Releases and Events
+published_at:
+captured_at: 2026-08-02
+accepted_at: 2026-08-02
+status: active
+url: https://investors.arista.com/Communications/Press-Releases-and-Events/default.aspx
+locator: 2026-08-02 查得 7060XE7、Etherlink、scale-up／scale-out 與客戶部署後續入口
+limitation: 新聞索引只用來找到新附件；不證明 ESUN compliance、shipment、客戶部署或收入
+independence_group: arista
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -227,7 +330,7 @@ resolution:
 <!-- research_claim
 claim_id: C5
 label: inference
-status: active
+status: superseded
 claim: 開放 AI 互連目前較合理的研究框架不是 UALink 與 UEC 二選一，而是把 pod／rack 內 accelerator scale-up 與 rack 間 Ethernet scale-out 視為互補層，再分別追規格、silicon、互通、系統與部署成熟度
 supporting_source_ids: S1,S2,S3,S4
 contrary_source_ids:
@@ -235,6 +338,7 @@ as_of: 2026-08-02
 basis: S1 與 S2 分別定義 scale-up／scale-out，S3 把兩者放進同一 Helios 架構，S4 提供具名雲端規劃節點
 boundary: 不推估標準市占、交換器／NIC TAM、台灣供應鏈份額或市場定價；規格、產品與部署不能合併計數
 verification_needed:
+corrected_by_claim_id: C9
 resolution:
 -->
 
@@ -280,9 +384,96 @@ verification_needed:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C9
+label: inference
+status: active
+claim: 開放 AI 互連不能再只用「UALink 管 scale-up、UEC 管 scale-out」理解；UALink 是 accelerator scale-up 路徑，OCP ESUN／SUE-T 與具名 Ethernet 平台也直接進入 scale-up，而 UEC 仍聚焦 scale-out ecosystem，研究上必須把每條路徑的規格、endpoint／switch、silicon、互通、系統與部署分開
+supporting_source_ids: S1,S2,S3,S9,S10,S11,S12
+contrary_source_ids:
+as_of: 2026-08-02
+basis: correction_of:C5；S9／S10 直接定義 Ethernet scale-up，S11 提供同時服務 scale-up／scale-out 的具名平台，S12 與 OCP 分工顯示 endpoint transport 也有獨立路徑，縮窄原先二層對應
+boundary: 不推估 UALink、ESUN、SUE-T 或 UEC 的效能勝負、市占、TAM、部署分母、台灣供應鏈份額或市場定價
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C5
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: OCP ESUN 1.0 明確以 Ethernet 支援高效能 AI scale-up network，規格要求涵蓋 lossless／congestion management、link-level reliability、精簡 header 與 multi-hop topology
+supporting_source_ids: S9,S10
+contrary_source_ids:
+as_of: 2026-03-10
+basis: S9 的 ESUN 1.0 highlights 與 S10 正式 specification 可直接定位 network scope 與要求
+boundary: 規格發布不等於 endpoint、switch ASIC、NIC 或 accelerator 已完成 compliance、互通或部署
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: Arista 於 2026-06-09 公告 7060XE7 1.6T 網路平台，將產品定位為同時支援 scale-up 與 scale-out AI fabrics，並涵蓋 rack-scale、intra-rack 與 inter-rack 使用
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-06-09
+basis: S11 的標題摘要、產品說明與 intra／inter-rack 段落直接支持
+boundary: Arista 沒有在本來源證明 7060XE7 已通過 ESUN 1.0 multi-vendor compliance、部署數、利用率或市占
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: Broadcom 公開的 SUE framework 定義 XPU endpoint、memory model、packet format 與 congestion functions，並表示已把 SUE specification 貢獻給 OCP；OCP 後續將 endpoint／transport 路徑稱為 SUE-T，與 ESUN 的 network switching／framing 分工
+supporting_source_ids: S12,S13
+contrary_source_ids:
+as_of: 2026-08-02
+basis: S12 直接描述 SUE 與 OCP contribution，S13 的現行 workstream 說明區分 SUE-T endpoint／transport 與 ESUN network side
+boundary: 架構分工不等於 SUE-T 規格成熟、產品 compliance、跨廠互通或客戶部署
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: unverified
+status: active
+claim: ESUN 1.0 或 SUE-T 已完成 multi-vendor compliance、在 7060XE7 或其他具名平台量產部署，並已取得可和 UALink／UEC 比較的效能、份額或財務分母
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-02
+basis: 現有來源提供規格、工作組、架構與產品用途，沒有 ESUN／SUE-T compliance report、明確產品對應、客戶部署分母或共同比較口徑
+boundary: 規格成員、產品支援 scale-up 或一般 Ethernet 出貨不能替代 ESUN／SUE-T 實作與部署證據
+verification_needed: OCP compliance／plugfest、至少兩家 endpoint 與 switch silicon 實體互通、具名系統採用及客戶部署結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
+retired_at: 2026-08-02
+retirement_reason: C5 的 UALink scale-up／UEC scale-out 二層框架已由 C9 的多路徑框架取代
 claim_ids: C1,C2,C3,C5,C7,C8
 metric: UALink／UEC／UCIe 的規格版本、compliance、multi-vendor interoperability 與商用 silicon
 source_ids: S1,S2,S3,S5
@@ -308,6 +499,20 @@ trigger: Oracle 或 AMD 確認實際部署／GA，且供應商能以具名產品
 invalidation: Q3 2026 規劃延後、叢集未公開可用或只停在 reference design，部署與供應鏈信心下修
 -->
 
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C1,C2,C9,C10,C11,C12,C13
+metric: UALink、ESUN、SUE-T、UEC 的規格分工、endpoint／switch silicon、compliance、multi-vendor interoperability 與部署
+source_ids: S1,S2,S9,S10,S11,S12
+watch_source_ids: S6,S7,S13,S14
+frequency: weekly
+frequency_detail: 每週檢查四條標準／工作組及 Arista 等產品更新；只有規格、silicon、互通與部署各自有文件才升級
+next_check: 2026-08-10
+trigger: OCP／UALink／UEC 公布 compliance 或 plugfest，至少兩家 endpoint 與 switch silicon 完成互通，或具名客戶部署 ESUN／SUE-T／UALink／UEC
+invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、互通失敗或客戶仍只採封閉互連，多路徑開放化信心下修
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -316,38 +521,43 @@ invalidation: Q3 2026 規劃延後、叢集未公開可用或只停在 reference
 - **Scale-out**：把多個機架或節點連成更大的叢集，重點是 Ethernet 網路、壅塞控制、路由與大規模可靠性。
 - **UALink**：針對 accelerator scale-up 的開放互連規格。
 - **UEC**：針對 AI／HPC scale-out Ethernet 的規格與生態系。
+- **ESUN**：OCP 的 Ethernet for Scale-Up Networking，處理 scale-up 的 Ethernet switching、framing、lossless 與 reliability 要求。
+- **SUE-T**：Scale-Up Ethernet Transport，偏向 XPU endpoint、memory model 與 transport；它和 ESUN 分工，但都屬 Ethernet scale-up 路徑。
 - **UALoE**：把 UALink protocol 放在 Ethernet 傳輸路徑上的做法；它不表示 UALink 與 UEC 已變成同一個標準。
 - **Compliance／interoperability**：前者確認產品遵守規格，後者確認不同廠商產品能互相工作；規格發布時兩件事不會自動完成。
 
 ### 三句話抓重點
 
-- UALink 與 UEC 解決的是不同距離與語意的網路層，不能只用「誰打敗誰」來閱讀。
-- AMD Helios 把 UALink／UALoE 放在 scale-up，把 UEC-ready Ethernet 放在 scale-out，提供了兩層共存的具體架構。
-- 截至 2026-08-02，最重要的缺口仍是 multi-vendor compliance、商用 silicon 與 Oracle 實際可用狀態；規格與規劃都不是部署。
+- 原先只用「UALink 做 scale-up、UEC 做 scale-out」的兩層說法不夠完整，因為 OCP ESUN／SUE-T 也把 Ethernet 直接帶入 scale-up。
+- AMD Helios 提供 UALink／UALoE 路徑，Arista 7060XE7 又同時定位 scale-up 與 scale-out，顯示開放互連是多條規格、endpoint 與 switch 路徑的組合。
+- 截至 2026-08-02，ESUN／SUE-T 的 multi-vendor compliance、具名產品對應與部署分母仍未完成；規格、產品用途與真正互通不能合併。
 
 ### 為什麼重要
 
 AI 系統的資料移動成本已跨過單一 GPU：機架內要解決 accelerator-to-accelerator，機架間又要處理
-Ethernet 壅塞、路由與可靠性。如果把 scale-up 與 scale-out 混在一起，讀者會重複計算同一個平台，
+Ethernet 壅塞、路由與可靠性。更重要的是，「Ethernet」不再自動等於 scale-out；ESUN 與 SUE-T
+正在處理 scale-up 的 network 與 endpoint。若仍用二分法，讀者會漏掉替代路徑、重複計算同一平台，
 也會把標準會員或產品 roadmap 提前當成交換器、NIC、光模組與 ODM 的收入。
 
 ### 接下來怎麼追
 
-- 先看 UALink／UEC 是否公布 compliance、plugfest 或 multi-vendor interoperability，而不只看版本號。
-- 再看 merchant switch、NIC、retimer、PHY 與 accelerator 是否有具名 silicon、樣品、量產與客戶。
+- 先分別看 UALink、ESUN、SUE-T、UEC 是否公布 compliance、plugfest 或 multi-vendor interoperability，而不只看版本號。
+- 再把 endpoint／accelerator、switch ASIC、NIC、retimer、PHY 與系統分開，找具名 silicon、樣品、量產與客戶。
+- 對 Arista 7060XE7，要確認產品是否對應 ESUN／SUE-T、是否出貨，以及具名客戶用在 scale-up 還是 scale-out。
 - 對 Oracle／AMD，依序追 shipment、preview、GA、部署數與利用率；任何一步都不能跳過。
 
 ### 想一想
 
-- 一個標準有很多會員，和兩家公司的晶片真的能互通，兩者中間還缺哪些測試與軟體證據？
-- 若 UALink scale-up 成功、但 UEC scale-out 延後，Helios 能否用其他 Ethernet 路徑先部署？這對供應商映射有何差別？
+- ESUN 有很多參與者，和兩家不同廠商的 XPU endpoint、switch ASIC 真的能互通，兩者中間還缺哪些測試與軟體證據？
+- UALink 與 ESUN 都瞄準 scale-up 時，它們是競爭、互補，還是會依 accelerator／rack 架構並存？
+- 若同一台交換器能同時服務 scale-up 與 scale-out，研究者要如何避免把一份收入或埠數計算兩次？
 
 ## 三張表要分開
 
 | 層級 | 已證實 | 未證實 |
 |---|---|---|
-| 規格 | UALink 2.0 已 ratify；UEC 現行版本為 1.0.3 | 多廠 compliance、互通與實際效能 |
-| 產品／系統 | AMD Helios 公開描述 UALink／UALoE scale-up 與 UEC-ready scale-out；Marvell 有 custom UALink offering | OEM 量產、客戶驗收與供應商份額 |
+| 規格 | UALink 2.0 已 ratify；UEC 現行版本為 1.0.3；ESUN 1.0 已發布；SUE-T 有獨立 workstream | 各路徑的多廠 compliance、互通與共同效能口徑 |
+| 產品／系統 | AMD Helios 描述 UALink／UALoE 與 UEC-ready；Marvell 有 UALink offering；Arista 7060XE7 定位 scale-up／scale-out | 產品對應 ESUN／SUE-T 的正式證據、OEM 量產、客戶驗收與供應商份額 |
 | 部署 | Oracle／AMD 公告 Q3 2026 起的 MI450／Helios 規劃 | 截至本輪的 shipment、preview、GA、實際部署與利用率 |
 
 這種拆法會讓同一件新聞只進一個格子：規格升版不會自動把產品與部署兩格一起升級；產品被
@@ -360,9 +570,14 @@ reference design 列名，也不會自動產生財務貢獻。
 - [AMD Helios product page](https://www.amd.com/en/products/rackscale-solutions/helios.html)（scale-up／scale-out 架構與 reference design 邊界）。
 - [Oracle and AMD deployment plan](https://newsroom.amd.com/news/oracle-and-amd-expand-partnership-to-help-customers-achieve-next-gen-ai-scale/)（Q3 2026 前瞻規劃）。
 - [Marvell custom UALink solution](https://www.marvell.com/company/newsroom/marvell-expands-custom-compute-platform-with-ualink.html)（IP／產品開發路徑）。
+- [OCP ESUN 1.0 release](https://www.opencompute.org/blog/the-ocp-esun-10-specification-has-been-released)（Ethernet scale-up 的 network requirements 與規格階段）。
+- [Arista 7060XE7](https://investors.arista.com/Communications/Press-Releases-and-Events/Press-Release-Detail/2026/Arista-Introduces-Next-Generation-1-6Terabit-Portfolio-for-AI-Fabrics/default.aspx)（具名 scale-up／scale-out 平台，不代表 ESUN compliance）。
+- [Broadcom SUE framework](https://www.broadcom.com/blog/scale-up-is-simple-ethernet-makes-it-smarter)（endpoint／memory model／transport 起點）。
+- [OCP ESUN workstream](https://www.opencompute.org/wiki/Networking/ESUN)（ESUN 與 SUE-T 分工及後續文件入口）。
 
 本篇不使用會員數、宣稱頻寬、GPU 數或公司效能數字做跨公司比較，也不推估 TAM、市占、估值或
-市場預期。Oracle 規劃已進入原訂季度，不代表部署已發生；沒有新一手文件時，狀態仍停在 planned。
+市場預期。ESUN 1.0 發布與 7060XE7 支援 scale-up 是兩個不同事件，尚不能合併成「Arista 已部署
+ESUN」。Oracle 規劃已進入原訂季度，也不代表部署已發生；沒有新一手文件時仍停在 planned。
 
 ## 影響路由
 
@@ -401,7 +616,9 @@ evidence_boundary: 更高頻寬的工程需求不自動對應任一 PCB／CCL �
 
 ## 下一個可證明／否定的節點
 
-- UALink／UEC 公布 compliance program、plugfest 與可重現的 multi-vendor interoperability 結果。
-- Merchant silicon、switch、NIC、retimer 或 chiplet 從 IP／樣品升級為 production，並有具名客戶。
+- UALink／ESUN／SUE-T／UEC 各自公布 compliance program、plugfest 與可重現的 multi-vendor interoperability 結果。
+- ESUN network side 與 SUE-T endpoint／transport 由至少兩家獨立 silicon 實作互通，而不是只有同一公司端到端展示。
+- Merchant silicon、switch、NIC、retimer 或 chiplet 從 IP／樣品升級為 production，並能對應正式標準與具名客戶。
+- Arista 或客戶確認 7060XE7 實際出貨、部署層級與 scale-up／scale-out 分母。
 - Oracle 或 AMD 確認 MI450／Helios shipment、preview 或 GA，而不是沿用 2025 年的前瞻規劃。
 - 台灣公司用具名產品、qualification、出貨與財務資料完成雙向核對；否則只保留產業節點，不畫公司受惠線。

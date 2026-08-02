@@ -25,11 +25,11 @@ class ResearchRadarTest(unittest.TestCase):
     def test_active_radar_is_complete_and_ranked_without_gaps(self):
         self.assertEqual(
             self.payload["stats"],
-            {"candidates": 9, "promoted": 9, "highKnowledge": 9},
+            {"candidates": 12, "promoted": 11, "highKnowledge": 12},
         )
         self.assertEqual(
             [row["rank"] for row in self.payload["candidates"]],
-            list(range(1, 10)),
+            list(range(1, 13)),
         )
         self.assertEqual(self.payload["asOf"], "2026-08-02")
         self.assertGreater(self.payload["nextReview"], self.payload["asOf"])
@@ -38,7 +38,7 @@ class ResearchRadarTest(unittest.TestCase):
         top_three = self.payload["candidates"][:3]
         self.assertEqual(
             [row["id"] for row in top_three],
-            ["RC-GLASS-SUBSTRATE", "RC-UCIE-3", "RC-800V-WBG"],
+            ["RC-OPEN-AI-FABRICS", "RC-HBF-COMMERCIALIZATION", "RC-HIGH-NA-EUV"],
         )
         for row in top_three:
             self.assertEqual(row["priority"], "p1")
@@ -47,6 +47,14 @@ class ResearchRadarTest(unittest.TestCase):
             self.assertTrue(row["articleId"])
             self.assertTrue(row["graphId"])
             self.assertGreaterEqual(len(row["sources"]), 2)
+
+    def test_watch_only_candidate_is_not_forced_into_article_or_graph(self):
+        custom_hbm = next(
+            row for row in self.payload["candidates"] if row["id"] == "RC-CUSTOM-HBM"
+        )
+        self.assertEqual(custom_hbm["status"], "watch")
+        self.assertFalse(custom_hbm["articleId"])
+        self.assertFalse(custom_hbm["graphId"])
 
     def test_every_candidate_has_rejection_and_next_evidence(self):
         for row in self.payload["candidates"]:

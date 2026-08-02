@@ -17,31 +17,36 @@ class ResearchMethodAuditTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.as_of = dt.date(2026, 8, 2)
-        cls.topics, cls.graph, cls.radar = audit._load_context(cls.as_of)
+        cls.topics, cls.graph, cls.radar, cls.scan = audit._load_context(cls.as_of)
         cls.reviews = audit.load_monitor_reviews(cls.topics, cls.as_of, strict=True)
         cls.current = audit.compute_method_audit(
-            cls.topics, cls.graph, cls.radar, cls.reviews, cls.as_of,
+            cls.topics, cls.graph, cls.radar, cls.reviews, cls.scan, cls.as_of,
         )
         cls.latest = audit.load_method_audit(strict=True)
 
     def test_baseline_snapshot_matches_current_registry(self):
-        self.assertEqual(self.latest["snapshotId"], "RMA-2026-08-02-02")
-        self.assertEqual(self.latest["methodologyVersion"], "1.1")
+        self.assertEqual(self.latest["snapshotId"], "RMA-2026-08-02-03")
+        self.assertEqual(self.latest["methodologyVersion"], "1.2")
         self.assertEqual(
             self.latest["registryFingerprint"], self.current["registryFingerprint"],
         )
-        self.assertEqual(len(self.latest["history"]), 2)
+        self.assertEqual(len(self.latest["history"]), 3)
 
     def test_audit_exposes_counts_without_fake_accuracy_score(self):
-        self.assertEqual(self.current["scope"]["topics"], 22)
-        self.assertEqual(self.current["scope"]["graphs"], 12)
-        self.assertEqual(self.current["claims"]["active"], 123)
-        self.assertEqual(self.current["graphs"]["activeEdges"], 176)
-        self.assertEqual(self.current["graphs"]["traceableEdges"], 176)
+        self.assertEqual(self.current["scope"]["topics"], 24)
+        self.assertEqual(self.current["scope"]["graphs"], 14)
+        self.assertEqual(self.current["scope"]["scanEvents"], 10)
+        self.assertEqual(self.current["claims"]["active"], 141)
+        self.assertEqual(self.current["graphs"]["activeEdges"], 206)
+        self.assertEqual(self.current["graphs"]["traceableEdges"], 206)
         self.assertEqual(self.current["monitors"]["reviewedMature"], 2)
         self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 2)
         self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 2)
-        self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 1)
+        self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 2)
+        self.assertEqual(self.current["scans"]["latestId"],
+                         "scan-2026-08-02-hbf-high-na-esun-correction")
+        self.assertEqual(self.current["scans"]["latestScope"], "partial")
+        self.assertEqual(self.current["scans"]["overdue"], 0)
         self.assertFalse(self.current["calibration"]["descriptiveRateReady"])
         self.assertIsNone(self.current["calibration"]["supportRate"])
         self.assertNotIn("score", self.current)
@@ -52,12 +57,14 @@ class ResearchMethodAuditTest(unittest.TestCase):
             set(gates),
             {
                 "traceability", "cross_check_depth", "falsifiability",
-                "freshness", "correction_learning", "calibration",
+                "freshness", "correction_learning", "scan_accountability",
+                "calibration",
             },
         )
         self.assertEqual(gates["cross_check_depth"]["status"], "attention")
         self.assertEqual(gates["freshness"]["status"], "attention")
         self.assertEqual(gates["correction_learning"]["status"], "pass")
+        self.assertEqual(gates["scan_accountability"]["status"], "attention")
         self.assertEqual(gates["calibration"]["status"], "not_ready")
         for gate in gates.values():
             self.assertTrue(gate["observed"])
@@ -73,7 +80,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
                 "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION",
             ],
         )
-        self.assertEqual(self.current["sources"]["thesesWithTwoIndependentGroups"], 19)
+        self.assertEqual(self.current["sources"]["thesesWithTwoIndependentGroups"], 21)
         gate = next(item for item in self.current["gates"]
                     if item["id"] == "cross_check_depth")
         for topic_id in missing:
@@ -114,11 +121,13 @@ class ResearchMethodAuditTest(unittest.TestCase):
         for token in (
             'id="methodAudit"', "const AUDIT=LIB.methodAudit", "function renderMethodAudit()",
             "方法健康度（不合成分數）", "逐項顯示可追溯、獨立交叉驗證",
+            "掃描覆蓋問責", "scope.scanEvents",
         ):
             self.assertIn(token, template)
         self.assertIn("monitor_reviews.csv", method)
         self.assertIn("獨立交叉驗證", method)
         self.assertIn("每月方法回顧", maintenance)
+        self.assertIn("掃描覆蓋問責", method)
         self.assertIn("python scripts/research_method_audit.py --lint", workflow)
 
 

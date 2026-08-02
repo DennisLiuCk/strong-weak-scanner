@@ -9,12 +9,50 @@ radar_id: RR-2026-08-02-MARKET-MAP
 as_of: 2026-08-02
 next_review: 2026-08-09
 status: active
-method: 優先級依近期一手里程碑、可證偽性、成熟度落差與台股研究路由排序；知識價值依能否重組既有概念、減少錯誤外推及連接多個研究主題判定；保留已升格項目供回測，但兩軸不加權成假精確分數
+method: 優先級依近期一手里程碑、可證偽性、成熟度落差、修正既有錯誤與台股研究路由排序；知識價值依能否重組既有概念、減少錯誤外推及連接多個研究主題判定；保留已升格與未升格項目供回測，不以兩軸加權成假精確分數
+-->
+
+<!-- research_candidate
+candidate_id: RC-HBF-COMMERCIALIZATION
+rank: 2
+title: HBF 從 OCP 標準化走向樣品與裝置整合
+priority: p1
+knowledge_value: high
+status: promoted
+evidence_posture: research_grade
+why_now: Sandisk 與 SK hynix 已在 2026 年成立 OCP HBF workstream，而公開時程仍把 memory sample 放在 2026 下半年、device sample 放在 2027 年初，標準與產品成熟度落差可被明確追蹤
+knowledge_gain: 把 NAND、logic base die、KV cache、HBM／DRAM／storage 分層與 sample／qualification 階梯連起來，避免把新記憶體名詞直接當成量產市場
+first_rejection: 若 2026 下半年沒有實體 memory sample、OCP 沒有公開規格，或延遲／寫入／耐久／熱測試無法支援目標工作負載，HBF 新記憶體層與商業化速度必須下修
+next_evidence: OCP specification／compliance、Sandisk 或 SK hynix 實體 sample、具名 inference device 與客戶 qualification
+next_check: 2026-08-17
+route: article_and_graph
+article_topic_id: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER
+graph_id: hbf-commercialization
+sources: Sandisk and SK hynix HBF standardization => https://www.sandisk.com/company/newsroom/press-releases/2026/2026-02-25-sandisk-and-sk-hynix-begin-global-standardization-of-next-generation-memory-solution-high-bandwidth-flash-hbf | OCP semi-private workstreams => https://www.opencompute.org/community/semi-private-workstreams | SK hynix TSMC Symposium HBF architecture => https://news.skhynix.com/en/tsmc-technology-symposium-2026/
+-->
+
+<!-- research_candidate
+candidate_id: RC-HIGH-NA-EUV
+rank: 3
+title: High-NA EUV 從工具 fleet 走向製程資格與 HVM 插入
+priority: p1
+knowledge_value: high
+status: promoted
+evidence_posture: research_grade
+why_now: ASML 已揭露八台出貨、六台運轉與 product-wafer testing，imec 又把 EXE:5200 fully qualified 目標放在 2026Q4；工具、資格與 2027–2028 客戶插入開始有可分離時鐘
+knowledge_gain: 建立 shipment→operation→qualification→product wafer→HVM insertion 階梯，並把 scanner、resist、mask、metrology 與良率放回同一製程系統
+first_rejection: 若 imec qualification、ASML HVM requirements 或客戶 insertion 延後，或 Low-NA multi-patterning 在成本與良率持續勝出，不能由工具出貨推導先進節點量產
+next_evidence: imec 2026Q4 qualification 結果、ASML HVM readiness，以及 Intel／其他客戶的實際節點、High-NA 層數、良率與產品
+next_check: 2026-10-01
+route: article_and_graph
+article_topic_id: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER
+graph_id: high-na-euv-readiness
+sources: ASML 2026 AGM High-NA fleet and insertion => https://ourbrand.asml.com/asset/d5e933d7-78d0-406c-aed7-a46626e63381/2026_-AGM-_presentation.pdf | imec EXE 5200 arrival and qualification target => https://www.imec-int.com/en/press/imec-receives-worlds-most-advanced-high-na-euv-system | Intel High-NA installation baseline => https://newsroom.intel.com/press-kit/intel-high-na-euv
 -->
 
 <!-- research_candidate
 candidate_id: RC-CPO-PRODUCTION
-rank: 4
+rank: 7
 title: CPO 從平台生產走向部署與財務驗證
 priority: p1
 knowledge_value: high
@@ -33,7 +71,7 @@ sources: NVIDIA Vera Rubin and Spectrum-X production => https://investor.nvidia.
 
 <!-- research_candidate
 candidate_id: RC-BACKSIDE-POWER
-rank: 7
+rank: 10
 title: 背面供電從研發概念進入量產時鐘
 priority: p1
 knowledge_value: high
@@ -52,7 +90,7 @@ sources: TSMC 2025 Annual Report => https://investor.tsmc.com/static/annualRepor
 
 <!-- research_candidate
 candidate_id: RC-AI-MEMORY-HIERARCHY
-rank: 8
+rank: 11
 title: AI 記憶體分層：HBM、SOCAMM、CXL 與 context storage
 priority: p1
 knowledge_value: high
@@ -71,26 +109,26 @@ sources: NVIDIA Vera Rubin architecture => https://developer.nvidia.com/blog/ins
 
 <!-- research_candidate
 candidate_id: RC-OPEN-AI-FABRICS
-rank: 9
-title: 開放 AI 互連的分工：UALink scale-up 與 UEC scale-out
+rank: 1
+title: 修正開放 AI 互連二分法：ESUN 與 SUE-T 也進入 scale-up
 priority: p1
 knowledge_value: high
 status: promoted
 evidence_posture: research_grade
-why_now: UALink 2.0 於 2026 年 4 月完成新一輪規格，UEC 1.0.3 於 7 月成為現行版本，AMD Helios 則把兩者放進同一個機架到資料中心架構
-knowledge_gain: 釐清 GPU pod 內的 scale-up 與機架間 scale-out 是不同網路層，標準發布、產品整合與雲端部署也分屬不同成熟度
-first_rejection: 若 2026 至 2027 仍沒有互通測試、商用交換器或具名雲端部署，開放標準的產業影響只能停在規格與開發階段
-next_evidence: UALink／UEC 互通與合規計畫、商用晶片及交換器時程，以及 Oracle／AMD 的 MI450 叢集實際可用狀態
+why_now: OCP ESUN 1.0 已明確把 Ethernet 帶入 scale-up，SUE-T 又處理 endpoint／transport，Arista 7060XE7 同時定位 scale-up／scale-out；現有 UALink scale-up／UEC scale-out 二分法必須立即修正
+knowledge_gain: 把 UALink、ESUN、SUE-T、UEC 的 network／endpoint／transport 分工與規格、silicon、互通、產品、部署分開，並保存舊主張被新證據縮窄的修正鏈
+first_rejection: 若 ESUN／SUE-T 長期沒有 multi-vendor endpoint 與 switch compliance、具名產品對應或客戶部署，Ethernet scale-up 的商業成熟度只能停在規格與產品用途
+next_evidence: UALink／ESUN／SUE-T／UEC compliance、至少兩家 endpoint 與 switch silicon 互通、7060XE7 實際標準對應與部署，以及 Oracle／AMD MI450 可用狀態
 next_check: 2026-08-10
 route: article_and_graph
 article_topic_id: MI-2026-08-02-OPEN-AI-FABRICS
 graph_id: open-ai-fabrics
-sources: UALink 2.0 release => https://ualinkconsortium.org/wp-content/uploads/2026/04/UALink-2.0-Specification-PR_FINAL.pdf | UEC specification history => https://ultraethernet.org/specification-history/ | AMD Helios product page => https://www.amd.com/en/products/rackscale-solutions/helios.html | Oracle and AMD deployment plan => https://newsroom.amd.com/news/oracle-and-amd-expand-partnership-to-help-customers-achieve-next-gen-ai-scale/
+sources: OCP ESUN 1.0 release => https://www.opencompute.org/blog/the-ocp-esun-10-specification-has-been-released | Arista 7060XE7 scale-up and scale-out => https://investors.arista.com/Communications/Press-Releases-and-Events/Press-Release-Detail/2026/Arista-Introduces-Next-Generation-1-6Terabit-Portfolio-for-AI-Fabrics/default.aspx | UALink 2.0 release => https://ualinkconsortium.org/wp-content/uploads/2026/04/UALink-2.0-Specification-PR_FINAL.pdf | UEC specification history => https://ultraethernet.org/specification-history/
 -->
 
 <!-- research_candidate
 candidate_id: RC-HYBRID-BONDING
-rank: 5
+rank: 8
 title: 細間距 hybrid bonding 與 RDL 從 PDK、試驗車走向量產資格
 priority: p1
 knowledge_value: high
@@ -109,7 +147,7 @@ sources: imec fine-pitch RDL and D2W PDK => https://www.imec-int.com/en/press/na
 
 <!-- research_candidate
 candidate_id: RC-PANEL-LEVEL-PACKAGING
-rank: 6
+rank: 9
 title: Panel-level packaging 的面積效率與量產難題
 priority: p1
 knowledge_value: high
@@ -128,7 +166,7 @@ sources: Lam Panel-Level Packaging CoE => https://newsroom.lamresearch.com/Lam-R
 
 <!-- research_candidate
 candidate_id: RC-UCIE-3
-rank: 2
+rank: 5
 title: UCIe 3.0：64G 規格、16G 跨廠 demo 與客戶產品之間的落差
 priority: p1
 knowledge_value: high
@@ -147,7 +185,7 @@ sources: UCIe 3.0 release => https://www.uciexpress.org/_files/ugd/8dc731_ae6728
 
 <!-- research_candidate
 candidate_id: RC-800V-WBG
-rank: 3
+rank: 6
 title: 800VDC 內部的 Si、SiC 與 GaN 分工
 priority: p1
 knowledge_value: high
@@ -166,7 +204,7 @@ sources: Infineon joins NVIDIA MGX ecosystem => https://www.infineon.com/press-r
 
 <!-- research_candidate
 candidate_id: RC-GLASS-SUBSTRATE
-rank: 1
+rank: 4
 title: 玻璃基板商業化：工廠、樣品、客戶可靠度與量產良率
 priority: p1
 knowledge_value: high
@@ -183,8 +221,26 @@ graph_id: glass-substrate-commercialization
 sources: SKC 4Q25 proof samples and reliability plan => https://www.skc.kr/upload/ir/20260212/20260212093406953002.pdf | SKC May 2026 customer evaluation => https://www.skc.kr/m/eng/Conmmunication/pr/newsDetail.do?gubun=004003&seq=1723 | Intel and Lens collaboration => https://newsroom.intel.com/new-technologies/intel-and-lens-technology-collaborate-to-enable-advanced-semiconductor-packaging-for-the-ai-era | Samsung glass substrate roadmap => https://samsungsem.com/global/newsroom/news/view.do?id=8922
 -->
 
+<!-- research_candidate
+candidate_id: RC-CUSTOM-HBM
+rank: 12
+title: Custom HBM 與 logic base die 的客製化價值鏈
+priority: p2
+knowledge_value: high
+status: watch
+evidence_posture: preliminary
+why_now: SK hynix 已把 custom HBM、base die 與 workload optimization 連在一起，Samsung 將 custom HBM sample 排在 2027，Micron 也公開 TSMC base logic die 與客製化方向；但三家公司所稱 custom 的範圍與產品世代尚未完全對齊
+knowledge_gain: 可把標準 HBM、logic base die、foundry、記憶體供應商、accelerator co-design、qualification 與較長設計週期放進同一張價值鏈
+first_rejection: 若客製化只停在供應商 roadmap、不同客戶無法重用設計、良率與成本抵消毛利，或客戶仍採標準 HBM，不能把 base die 客製化外推成普遍高價值市場
+next_evidence: 具名客戶 custom HBM sample／qualification、可比較的 base die 功能定義、產品世代與量產時程，以及 foundry／memory 雙方財務揭露
+next_check: 2026-09-15
+route: watch_only
+sources: SK hynix full-stack memory roadmap => https://news.skhynix.com/hbm-to-essd/ | Samsung commercial HBM4 and custom HBM timeline => https://news.samsungsemiconductor.com/global/samsung-ships-industry-first-commercial-hbm4-with-ultimate-performance-for-ai-computing/ | Micron HBM4E customized base logic die plan => https://investors.micron.com/static-files/5fb98d73-2134-4446-8d1b-0f90285f6c02
+-->
+
 ## 排名判讀
 
 - **優先級**回答「現在先花研究時間在哪裡」；它受近期一手里程碑、可證偽性與台股路由影響。
 - **知識價值**回答「研究完是否能改善其他主題的理解」；能跨記憶體、封裝、製程、網路或電源建立共同語言者較高。
 - **升格**只表示文章與圖譜已能逐條查回來源。沒有客戶驗收、量產或財務資料時，圖上的公司關係仍停在規劃、樣品或相鄰搜尋路由。
+- **保留觀察**也是研究結果：Custom HBM 有高知識價值，但本輪因定義、世代與具名客戶資格尚未對齊而不升格，避免雷達只留下成功候選。

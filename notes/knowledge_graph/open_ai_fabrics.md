@@ -1,14 +1,14 @@
 # 開放 AI 互連知識圖譜
 
-本圖把 scale-up、scale-out、chiplet 與部署成熟度分開。規格、產品與雲端規劃可以相連，
-但不能相加成已部署收入；台灣族群仍只保留為待驗證搜尋路由。
+本圖把 UALink 與 Ethernet scale-up、UEC scale-out、chiplet 與部署成熟度分開。規格、產品
+與雲端規劃可以相連，但不能相加成已互通或已部署收入；台灣族群仍只保留為待驗證搜尋路由。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: open-ai-fabrics
 root_node_id: concept:open-ai-fabrics
 label: 開放 AI 互連
-summary: 將 UALink scale-up、UEC scale-out、UALoE 與 UCIe chiplet 分層，逐步追蹤規格、silicon、互通、系統與雲端部署。
+summary: 將 UALink、ESUN／SUE-T 兩類 scale-up 路徑與 UEC scale-out、UALoE、UCIe 分層，逐步追蹤規格、silicon、互通、系統與雲端部署。
 article_ids: MI-2026-08-02-OPEN-AI-FABRICS
 status: active
 -->
@@ -119,7 +119,7 @@ view: industry
 from_id: concept:open-ai-fabrics
 to_id: concept:scale-up
 relation: contains
-claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C1,MI-2026-08-02-OPEN-AI-FABRICS#C3
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C1,MI-2026-08-02-OPEN-AI-FABRICS#C3,MI-2026-08-02-OPEN-AI-FABRICS#C10,MI-2026-08-02-OPEN-AI-FABRICS#C11
 note_refs:
 evidence_state: verified
 commercial_stage: capability
@@ -129,8 +129,8 @@ exclusivity_scope:
 as_of: 2026-08-02
 review_due: 2026-08-10
 status: active
-boundary: UALink 與 Helios 文件證實 accelerator scale-up 層；不代表同一技術處理所有跨機架流量。
-next_trigger: 商用 accelerator、switch 與軟體完成可重現的 scale-up interoperability。
+boundary: UALink／Helios 與 ESUN／Arista 文件都證實 scale-up 路徑存在；不代表各路徑已 compliance、互通、部署或能用共同口徑比較。
+next_trigger: UALink 與 Ethernet scale-up 各自有商用 accelerator endpoint、switch 與軟體完成可重現的 multi-vendor interoperability。
 -->
 
 <!-- knowledge_edge
@@ -291,4 +291,104 @@ review_due: 2026-08-17
 status: active
 boundary: 高速訊號與連接形成 PCB／CCL 搜尋路由，沒有具名板材、載板、連接器或光模組財務證據。
 next_trigger: 平台與台灣公司雙向核對具名 UALink／UEC 系統材料、qualification、出貨與收入。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-C04
+view: company
+from_id: company:arista
+to_id: concept:open-ai-fabrics
+relation: owns_platform
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C11
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: 7060XE7 被定位為同時服務 scale-up 與 scale-out 的 Ethernet 平台，不是單一標準、單一 accelerator 或排他客戶架構。
+as_of: 2026-06-09
+review_due: 2026-08-10
+status: active
+boundary: Arista 公告具名平台與用途，不等於 ESUN／SUE-T compliance、shipment、部署數或市占。
+next_trigger: Arista 或客戶公布 7060XE7 對應標準、出貨、互通、部署層級與分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-C05
+view: company
+from_id: company:broadcom
+to_id: concept:open-ai-fabrics
+relation: develops_ip
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C12
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: Broadcom 提出 SUE 並貢獻 OCP；SUE-T 與 ESUN 是開放工作組的一部分，不代表 Broadcom 獨家或唯一實作。
+as_of: 2026-08-02
+review_due: 2026-08-10
+status: active
+boundary: SUE 架構與 OCP contribution 不等於 SUE-T 規格完成、multi-vendor compliance、客戶部署或收入。
+next_trigger: OCP 與獨立廠商公布 SUE-T endpoint silicon、合規、互通與具名系統部署。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I12
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: standard:esun
+relation: includes
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C10
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-03-10
+review_due: 2026-08-10
+status: active
+boundary: ESUN 1.0 已定義 Ethernet scale-up network requirements；規格不等於 endpoint／switch silicon、compliance、互通或部署。
+next_trigger: OCP 公布 ESUN compliance／plugfest 與至少兩家 endpoint、switch 實體互通。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I13
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: standard:sue-t
+relation: includes
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C12
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-02
+review_due: 2026-08-10
+status: active
+boundary: OCP 現行 workstream 將 SUE-T 放在 endpoint／transport；不等於 specification、產品與互通已成熟。
+next_trigger: OCP 發布 SUE-T 正式規格、測試計畫與 multi-vendor endpoint 實作。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I14
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: product:arista-7060xe7
+relation: integrated_with
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C11
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: 7060XE7 同時定位 scale-up／scale-out，且支援多樣 accelerator；產品公告未宣稱排他標準或唯一客戶。
+as_of: 2026-06-09
+review_due: 2026-08-10
+status: active
+boundary: 產品用途不等於 ESUN／SUE-T 實作、shipment、客戶部署或 scale-up／scale-out 收入分拆。
+next_trigger: Arista 或客戶公布正式標準對應、出貨與實際部署拓撲。
 -->

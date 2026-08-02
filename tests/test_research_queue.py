@@ -979,6 +979,63 @@ class ResearchTopicSchemaV3ContractTest(unittest.TestCase):
         errors = rq.audit_topic_history(old, rollover)
         self.assertTrue(any("不得刷新:last_reviewed_at,review_due" in error for error in errors))
 
+    def test_history_audit_allows_same_day_thesis_correction_without_clock_refresh(self):
+        old = topic_text_v3()
+        source = _contract_block("research_source", [
+            ("source_id", "S3"),
+            ("role", "competitor_primary"),
+            ("source_kind", "document"),
+            ("publisher", "丙同業"),
+            ("title", "同日發布的架構修正證據"),
+            ("published_at", "2026-07-27"),
+            ("captured_at", "2026-07-27"),
+            ("accepted_at", "2026-07-27"),
+            ("status", "active"),
+            ("url", "https://third.example.com/correction"),
+            ("locator", "架構分流段落"),
+            ("limitation", "只修正技術分工，不支持收入"),
+        ])
+        claim = _contract_block("research_claim", [
+            ("claim_id", "C3"),
+            ("label", "verified"),
+            ("status", "active"),
+            ("claim", "新證據顯示原量產主張必須縮窄為特定產品"),
+            ("supporting_source_ids", "S1,S3"),
+            ("contrary_source_ids", ""),
+            ("as_of", "2026-07-27"),
+            ("basis", "correction_of:C1；同日新來源縮窄原主張"),
+            ("boundary", "不延後期限、不提高信心，也不推導收入"),
+            ("verification_needed", ""),
+            ("resolution", ""),
+            ("correction_kind", "supersedes"),
+            ("corrects_claim_id", "C1"),
+            ("corrected_by_claim_id", ""),
+        ])
+        transition = _contract_block("transition", [
+            ("date", "2026-07-27"),
+            ("from", "triaged"),
+            ("to", "triaged"),
+            ("reason", "same_day_thesis_correction"),
+            ("evidence", "sources:S3"),
+        ])
+        revised = old.replace("thesis_claim_id: C1", "thesis_claim_id: C3", 1)
+        revised = revised.replace(
+            "claim_id: C1\nlabel: verified\nstatus: active",
+            "claim_id: C1\nlabel: verified\nstatus: superseded",
+            1,
+        ).replace(
+            "corrects_claim_id: \ncorrected_by_claim_id: \n-->",
+            "corrects_claim_id: \ncorrected_by_claim_id: C3\n-->",
+            1,
+        )
+        revised = revised.replace(
+            "<!-- research_source", transition + "\n\n<!-- research_source", 1)
+        revised = revised.replace(
+            "<!-- research_claim", source + "\n\n<!-- research_claim", 1)
+        revised = revised.replace(
+            "<!-- monitoring_item", claim + "\n\n<!-- monitoring_item", 1)
+        self.assertEqual(rq.audit_topic_history(old, revised), [])
+
     def test_scan_log_history_is_append_only(self):
         header = (
             "scan_id,window_start,window_end,scanned_at,scope,source_domains,"
@@ -990,6 +1047,21 @@ class ResearchTopicSchemaV3ContractTest(unittest.TestCase):
             "歷史 scan_id 不可改寫:SC-1" in error
             for error in rq.audit_scan_log_history(
                 old, old.replace("2026-08-08", "2026-09-08"))))
+
+    def test_scan_log_same_day_latest_uses_append_order_not_scan_id_sort(self):
+        text = (
+            "scan_id,window_start,window_end,scanned_at,scope,source_domains,"
+            "result_topic_ids,next_scan_due,coverage_note\n"
+            "Z-FIRST,2026-08-01,2026-08-02,2026-08-02,partial,a.com,none,"
+            "2026-08-08,第一輪\n"
+            "A-LAST,2026-08-02,2026-08-02,2026-08-02,partial,b.com,none,"
+            "2026-08-09,同日追加的第二輪\n"
+        )
+        with mock.patch.object(rq.os.path, "exists", return_value=True):
+            with mock.patch("builtins.open", mock.mock_open(read_data=text)):
+                scan = rq.load_scan_log("scan.csv", as_of=date(2026, 8, 2))
+        self.assertFalse(scan["errors"])
+        self.assertEqual(scan["latest"]["scan_id"], "A-LAST")
 
     def test_direct_comparison_requires_a_group_and_matching_dimensions(self):
         valid = self.analyse(topic_text_v3_with_comparisons())

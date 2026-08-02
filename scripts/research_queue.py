@@ -1424,10 +1424,9 @@ def audit_topic_history(previous_text, current_text):
                 and _valid_date(new_meta.get("review_due"))
                 and new_meta["review_due"] > old_meta["review_due"]):
             freshness_changes.append("review_due")
-        if old_meta.get("thesis_claim_id") != new_meta.get("thesis_claim_id"):
-            freshness_changes.append("thesis_claim_id")
-            if new_meta.get("thesis_claim_id") in old_claims:
-                errors.append("thesis_claim_id 變更必須指向本次追加的新 claim")
+        thesis_changed = old_meta.get("thesis_claim_id") != new_meta.get("thesis_claim_id")
+        if thesis_changed and new_meta.get("thesis_claim_id") in old_claims:
+            errors.append("thesis_claim_id 變更必須指向本次追加的新 claim")
         if (confidence_rank.get(new_meta.get("base_confidence"), -1)
                 > confidence_rank.get(old_meta.get("base_confidence"), -1)):
             freshness_changes.append("base_confidence")
@@ -1442,6 +1441,14 @@ def audit_topic_history(previous_text, current_text):
         )
         fresh_transition_sources = (
             fresh_thesis_sources.intersection(transition_sources))
+        if thesis_changed and not has_new_thesis_evidence:
+            errors.append("thesis_claim_id 變更必須引用本次追加的新 evidence")
+        elif thesis_changed and not fresh_transition_sources:
+            errors.append("thesis_claim_id 修正 transition 必須引用新增主命題 evidence")
+        if (thesis_changed and _valid_date(old_last_evidence)
+                and _valid_date(new_last_evidence)
+                and new_last_evidence < old_last_evidence):
+            errors.append("新主命題 evidence clock 不可早於前版")
         transition_clock_advanced = any(
             _valid_date((new_sources.get(source_id) or {}).get("accepted_at"))
             and (not _valid_date(old_last_evidence)
@@ -1454,7 +1461,7 @@ def audit_topic_history(previous_text, current_text):
                 + ",".join(freshness_changes))
         elif freshness_changes and not transition_clock_advanced:
             errors.append("刷新可信度／期限的 revision transition 必須引用新增主命題 evidence")
-        if (has_new_thesis_evidence and _valid_date(old_last_evidence)
+        if (not thesis_changed and has_new_thesis_evidence and _valid_date(old_last_evidence)
                 and _valid_date(new_last_evidence)
                 and new_last_evidence < old_last_evidence):
             errors.append("新主命題 evidence clock 不可早於前版")
@@ -1596,7 +1603,12 @@ def load_scan_log(path=SCAN_LOG, topic_ids=None, as_of=None):
         row for row in rows
         if _valid_date(row.get("scanned_at")) and not row["quality_errors"]
     ]
-    latest = max(valid, key=lambda row: (row["scanned_at"], row.get("scan_id", ""))) if valid else None
+    latest = None
+    if valid:
+        latest_date = max(row["scanned_at"] for row in valid)
+        # scan_log 是 append-only；同一研究日可能有多輪掃描或更正，最後追加的
+        # valid row 才是當日最新狀態，不能讓 scan_id 的字母排序改寫時間語意。
+        latest = next(row for row in reversed(valid) if row["scanned_at"] == latest_date)
     return {"rows": rows, "latest": latest, "errors": errors}
 
 

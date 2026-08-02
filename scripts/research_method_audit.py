@@ -33,7 +33,7 @@ from knowledge_graph import (  # noqa: E402
 from leading_hypotheses import load_reports  # noqa: E402
 from qual_notes import load_notes  # noqa: E402
 from research_queue import (  # noqa: E402
-    _source_independence_key, load_topics, taipei_today,
+    _source_independence_key, load_scan_log, load_topics, taipei_today,
 )
 from research_radar import load_research_radar  # noqa: E402
 
@@ -84,7 +84,13 @@ def _load_context(as_of: dt.date):
         graph_ids={item["id"] for item in graph["graphs"]},
         strict=True,
     )
-    return topics, graph, radar
+    scan = load_scan_log(
+        topic_ids={topic.get("topic_id", "") for topic in topics},
+        as_of=as_of,
+    )
+    if scan.get("errors"):
+        raise ResearchMethodAuditError("\n".join(scan["errors"]))
+    return topics, graph, radar, scan
 
 
 def _read_review_text(text: str, topics: list[dict], as_of: dt.date) -> tuple[list[dict], list[str]]:
@@ -162,7 +168,9 @@ def load_monitor_reviews(topics: list[dict], as_of: dt.date, *, strict: bool = T
     return rows
 
 
-def _registry_fingerprint(topics: list[dict], graph: dict, radar: dict, reviews: list[dict]) -> str:
+def _registry_fingerprint(
+    topics: list[dict], graph: dict, radar: dict, reviews: list[dict], scan: dict,
+) -> str:
     def ref_value(ref) -> str:
         return ref.get("ref", "") if isinstance(ref, dict) else str(ref)
 
@@ -200,13 +208,26 @@ def _registry_fingerprint(topics: list[dict], graph: dict, radar: dict, reviews:
          row.get("nextCheck"), row.get("articleTopicId"), row.get("graphId")]
         for row in radar.get("candidates", [])
     ]
-    payload = {"topics": topic_rows, "edges": edge_rows, "radar": radar_rows, "reviews": reviews}
+    scan_rows = [
+        [row.get("scan_id"), row.get("window_start"), row.get("window_end"),
+         row.get("scanned_at"), row.get("scope"), row.get("source_domains"),
+         row.get("result_topic_ids"), row.get("next_scan_due"), row.get("coverage_note")]
+        for row in sorted(scan.get("rows", []), key=lambda item: item.get("scan_id", ""))
+    ]
+    payload = {
+        "topics": topic_rows,
+        "edges": edge_rows,
+        "radar": radar_rows,
+        "reviews": reviews,
+        "scanLog": scan_rows,
+    }
     canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def compute_method_audit(
-    topics: list[dict], graph: dict, radar: dict, reviews: list[dict], as_of: dt.date,
+    topics: list[dict], graph: dict, radar: dict, reviews: list[dict], scan: dict,
+    as_of: dt.date,
 ) -> dict:
     active_topics = [topic for topic in topics if topic.get("status") not in {"dismissed", "resolved"}]
     active_claims = [
@@ -303,6 +324,17 @@ def compute_method_audit(
         if claim.get("status") in {"superseded", "refuted"}
     ]
     comparisons = [item for topic in topics for item in topic.get("comparisons", [])]
+    scan_rows = scan.get("rows", [])
+    full_scans = [row for row in scan_rows if row.get("scope") == "full"]
+    partial_scans = [row for row in scan_rows if row.get("scope") == "partial"]
+    latest_scan = scan.get("latest") or {}
+    # scan row 是歷史事件，不是會被關閉的 work item。若把每一列的舊期限都累加，
+    # 已完成的掃描也會永久顯示逾期。現階段只量最新一輪的全域 cadence；個別 scope
+    # 是否被後續掃描覆蓋，必須等 scan lineage 契約後才能誠實量化。
+    overdue_scans = [latest_scan] if (
+        _valid_date(latest_scan.get("next_scan_due"))
+        and latest_scan["next_scan_due"] < date_text
+    ) else []
 
     trace_ok = graph_traceable == len(graph_edges) and boundary_complete == len(active_claims)
     cross_check_ok = not theses_needing_second_group
@@ -335,14 +367,15 @@ def compute_method_audit(
     core = {
         "schemaVersion": 1,
         "asOf": date_text,
-        "methodologyVersion": "1.1",
-        "registryFingerprint": _registry_fingerprint(topics, graph, radar, reviews),
+        "methodologyVersion": "1.2",
+        "registryFingerprint": _registry_fingerprint(topics, graph, radar, reviews, scan),
         "scope": {
             "topics": len(topics),
             "activeTopics": len(active_topics),
             "radarCandidates": radar.get("stats", {}).get("candidates", 0),
             "promotedCandidates": radar.get("stats", {}).get("promoted", 0),
             "graphs": graph.get("stats", {}).get("graphs", 0),
+            "scanEvents": len(scan_rows),
         },
         "claims": {
             "active": len(active_claims),
@@ -370,6 +403,15 @@ def compute_method_audit(
         "freshness": {
             "staleTopics": stale_topics,
             "staleEdges": stale_edges,
+        },
+        "scans": {
+            "events": len(scan_rows),
+            "full": len(full_scans),
+            "partial": len(partial_scans),
+            "overdue": len(overdue_scans),
+            "latestAt": latest_scan.get("scanned_at"),
+            "latestId": latest_scan.get("scan_id"),
+            "latestScope": latest_scan.get("scope"),
         },
         "corrections": {
             "supersededOrRefutedClaims": len(corrected_claims),
@@ -423,6 +465,12 @@ def compute_method_audit(
                 "boundary": "沒有新證據必須留下 no_new_evidence，而不能刷新 evidence clock。",
             },
             {
+                "id": "scan_accountability", "label": "掃描覆蓋問責",
+                "status": "pass" if full_scans and not overdue_scans else "attention",
+                "observed": f"{len(scan_rows)} 次掃描：{len(full_scans)} 次 full、{len(partial_scans)} 次 partial；最新 cadence 逾期 {len(overdue_scans)} 次；最新 {latest_scan.get('scan_id') or '無'}",
+                "boundary": "Partial 只證明指定來源與題材已查過，不能證明全市場沒有其他重要主題；逾期只檢查最新全域 cadence，尚未量化每個歷史 scope 是否被後續掃描覆蓋；通過也不代表每則公告都被正確解讀。",
+            },
+            {
                 "id": "calibration", "label": "校準可用性",
                 "status": "pass" if descriptive_ready else "not_ready",
                 "observed": f"{evidence_outcomes} 個具新證據的到期結果；最低揭露門檻 {MIN_DESCRIPTIVE_OUTCOMES}",
@@ -434,6 +482,8 @@ def compute_method_audit(
             "獨立來源鏈覆蓋是交叉檢查深度，不是多數決或真實性分數。",
             "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
             "no_new_evidence 是一次有紀錄的檢查，不得刷新 claim 的證據時鐘。",
+            "Partial scan 不等於全 universe 或全市場覆蓋；研究漏網風險必須持續顯示。",
+            "Scan overdue 目前只量最新全域 cadence；尚無 scope lineage 前，不把歷史期限累加成永久逾期。",
         ],
     }
     return core
@@ -557,9 +607,9 @@ def main(argv: list[str] | None = None) -> int:
     as_of = taipei_today()
     errors: list[str] = []
     try:
-        topics, graph, radar = _load_context(as_of)
+        topics, graph, radar, scan = _load_context(as_of)
         reviews = load_monitor_reviews(topics, as_of, strict=True)
-        current = compute_method_audit(topics, graph, radar, reviews, as_of)
+        current = compute_method_audit(topics, graph, radar, reviews, scan, as_of)
     except (ResearchMethodAuditError, ValueError) as exc:
         print(f"ERROR：{exc}")
         return 1

@@ -96,3 +96,23 @@ stage:pilot-line,stage,Pilot line,試產線,concept:glass-substrate-commercializ
 stage:proof-sample,stage,Proof sample,Production-ready sample|工程樣品,concept:glass-substrate-commercialization,已完成可供內部或客戶評估的工程樣品但尚未通過量產資格
 stage:reliability-evaluation,stage,客戶可靠度測試,Reliability evaluation,concept:glass-substrate-commercialization,客戶驗證熱機械 電性與壽命等條件的量產前節點
 capability:production-yield,capability,量產良率,Production yield,concept:glass-substrate-commercialization,投入製造後合格產品比例及其穩定分布
+concept:hbf-commercialization,concept,HBF 商用化,High Bandwidth Flash commercialization|HBF commercialization ladder,,把 HBF 的架構 標準化 樣品 裝置整合 客戶資格與量產分開追蹤的 NAND 型 AI 記憶體框架
+product:hbf,product,High Bandwidth Flash,HBF|高頻寬快閃記憶體,concept:hbf-commercialization,以大量平行 NAND 與邏輯 base die 提供高讀取頻寬與容量的提案中記憶體產品
+component:nand-flash,component,NAND Flash,NAND|快閃記憶體,concept:hbf-commercialization,以非揮發儲存單元提供高密度容量的記憶體技術
+component:logic-base-die,component,Logic base die,邏輯基底晶片|Base die,concept:hbf-commercialization,位於記憶體堆疊底部並負責介面 控制與資料路徑的邏輯晶片
+standard:hbf-workstream,standard,HBF 標準化工作組,HBF standardization workstream,concept:hbf-commercialization,Sandisk 與 SK hynix 在 OCP 推進 HBF 規格與生態系的工作組
+stage:hbf-memory-sample,stage,HBF 記憶體樣品,Memory sample,concept:hbf-commercialization,實體 HBF 記憶體交付客戶或合作夥伴測試但尚未完成裝置資格的階段
+stage:hbf-device-sample,stage,HBF 推論裝置樣品,Inference device sample,concept:hbf-commercialization,整合 HBF 的 AI 推論裝置開始送樣但尚未證明量產部署的階段
+stage:hbf-customer-qualification,stage,HBF 客戶資格,HBF customer qualification,concept:hbf-commercialization,客戶完成介面 效能 耐久 熱與工作負載驗證的量產前節點
+concept:high-na-euv-readiness,concept,High-NA EUV 導入成熟度,High-NA EUV insertion ladder|高數值孔徑極紫外光刻,,把掃描機出貨 運轉 製程資格 產品晶圓與高量產插入分開追蹤的微影框架
+component:high-na-euv-scanner,component,High-NA EUV scanner,0.55 NA EUV scanner|High NA 掃描機,concept:high-na-euv-readiness,以 0.55 數值孔徑提高解析度的下一代 EUV 微影曝光系統
+product:exe-5200b,product,ASML EXE:5200B,TWINSCAN EXE:5200B,concept:high-na-euv-readiness,ASML 第二代 High-NA EUV 掃描機
+stage:high-na-operation,stage,High-NA 客戶端運轉,Customer-site operation,concept:high-na-euv-readiness,掃描機在客戶或研發機構完成安裝並開始運作但尚未代表製程量產
+stage:high-na-process-qualification,stage,High-NA 製程資格,Process qualification,concept:high-na-euv-readiness,掃描機與材料 掩模 量測及製程整合完成目標資格的階段
+stage:high-na-product-wafer,stage,High-NA 產品晶圓測試,Product wafer testing,concept:high-na-euv-readiness,客戶開始以實際產品晶圓驗證 High-NA 層與製程視窗的階段
+stage:high-na-hvm-insertion,stage,High-NA HVM 插入,High-volume manufacturing insertion,concept:high-na-euv-readiness,客戶把 High-NA 納入量產節點與產品流程的商用成熟度節點
+component:high-na-resist,component,High-NA 光阻,High-NA photoresist|EUV resist,concept:high-na-euv-readiness,把 High-NA 曝光圖形穩定轉移到晶圓所需的感光材料
+capability:high-na-metrology,capability,High-NA 量測與檢查,High-NA metrology and inspection,concept:high-na-euv-readiness,量測疊對 線寬 缺陷與製程穩定度以支援 High-NA 資格的能力
+standard:esun,standard,ESUN,Ethernet for Scale-Up Networking,concept:open-ai-fabrics,OCP 針對 AI scale-up 網路交換與 Ethernet framing 的開放規格工作組
+standard:sue-t,standard,SUE-T,Scale-Up Ethernet Transport,concept:open-ai-fabrics,OCP 針對 XPU endpoint 與 transport 功能的 Scale-Up Ethernet 工作組
+product:arista-7060xe7,product,Arista 7060XE7,7060XE7 Series|Etherlink 1.6T,concept:open-ai-fabrics,Arista 於 2026 年公告可服務 scale-up 與 scale-out 的 1.6T 網路平台

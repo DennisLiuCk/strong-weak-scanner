@@ -397,15 +397,29 @@ monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID�
 承認沒有新證據，或錯誤是否真的被修正。方法層另使用：
 
 - `notes/research_method_reviews/YYYY-MM-DD_NN.json`：append-only 稽核快照，保存當時的
-  topic、claim、source、monitor、圖譜與候選雷達覆蓋。registry 有任何變動都要新增快照，
-  不得改寫舊檔。
+  topic、claim、source、monitor、圖譜、候選雷達與 scan log 覆蓋。registry 有任何變動都
+  要新增快照，不得改寫舊檔；scan row 也納入 fingerprint，避免文章有更新、掃描責任卻未
+  留痕。
 - `notes/research_method_reviews/monitor_reviews.csv`：append-only 到期檢查帳本，每列連到
   既有 topic／monitor，結果只能是 `new_support`、`new_contrary`、`no_new_evidence` 或
   `not_yet_testable`。
 - `scripts/research_method_audit.py`：驗證 snapshot fingerprint、review 引用與歷史不可改寫，
-  並在研究雷達顯示可追溯、獨立交叉驗證、可證偽、新鮮度、修正學習與校準可用性六道
+  並在研究雷達顯示可追溯、獨立交叉驗證、可證偽、新鮮度、修正學習、掃描覆蓋問責與
+  校準可用性七道
   gate。獨立交叉驗證會直接列出仍缺第二條消息鏈的 topic ID，避免缺口被總體比例掩蓋；
   兩條來源鏈只代表降低單一來源偏誤，不代表多數決或主張已被證真。
+
+掃描覆蓋問責把 `full`、`partial`、最新全域 cadence 是否逾期與最新 scan ID 分開揭露。
+只有至少存在一筆 `full` 且最新 cadence 沒有逾期時才可通過這一 gate；`partial` 是誠實的
+主題式抽樣，不是失敗，但不能用來宣稱全 universe 或全市場沒有漏網題材。舊 scan row 是
+不可變的歷史事件，不把每列已過的 `next_scan_due` 永久累加為逾期；在建立 scope lineage
+之前，也不宣稱個別歷史 scope 已被後續掃描完整覆蓋。這個 gate 只檢查工作範圍有沒有被
+如實記錄，不證明每則公告都被看見或正確解讀。
+
+同一天若出現新反證，可以用新增 source、append-only correction claim 與綁定該 source 的
+revision transition 立即修正 `thesis_claim_id`；日期相同不應阻止修錯。這種同日修正不得
+順便延後 `review_due`、提高 `base_confidence` 或刷新 `last_reviewed_at`，後三者仍要求
+accepted date 嚴格晚於舊主命題 evidence clock。
 
 `no_new_evidence` 是有效的回顧結果，但**不得**刷新 topic source 的 `accepted_at`、
 `last_reviewed_at` 或 `review_due`。它只在方法帳本設定下一次工作期限；原文章仍照既有
