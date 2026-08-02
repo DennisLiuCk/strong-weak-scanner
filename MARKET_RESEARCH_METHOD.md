@@ -85,7 +85,7 @@ limitation: 此表是 TTM，不能直接與另一公司的單季數字排名
 說明頁面之後可能改變。不得把掃描日冒充發布日；living index 也不能替代已發布附件。
 
 `status` 值域為 `active`、`superseded`、`rejected`。只有 `active` source 可以被 active
-claim 或 monitor 引用。若來源後來失效，不刪除原 block；依「七、修正採追加保存」處理。
+claim 或 monitor 引用。若來源後來失效，不刪除原 block；依「八、修正採追加保存」處理。
 
 獨立消息鏈不是靠自由填寫的 publisher 名稱計數。系統預設以 URL 的註冊網域近似分組；
 同一 nvidia.com 上的共同新聞稿仍算同一發布鏈。若監管網站代為託管不同發行人的文件，可用
@@ -151,7 +151,7 @@ resolution:
   證據的權重、目前保留或縮窄哪一段措辭，以及仍不能排除什麼。它不是 claim 狀態、
   「active」標記或修正鏈欄位。
 - `correction_kind`、`corrects_claim_id` 與 `corrected_by_claim_id` 平時留空；只有追加修正
-  claim 時依「七、修正採追加保存」填寫。
+  claim 時依「八、修正採追加保存」填寫。
 - `basis` 說明「為什麼能這樣寫」，`boundary` 說明「這句話不能被用來證明什麼」。
 - `as_of` 是該 claim 的資訊截點，不是文章發布日。
 - `evidence_role: trigger_only` 的 topic 不得只靠 trigger 建立 verified 公司事實。
@@ -316,7 +316,43 @@ source ID，重新設定 `last_reviewed_at` 與 `review_due`，並完整保留�
   route 成 `formal_note_candidate`、promoted 或任何正式筆記動作。補齊可定位的公司層級
   impact evidence 後，才可追加 impact 並重新路由。
 
-## 七、修正採追加保存
+## 七、知識圖譜：把研究投影成關係，不另造一套事實
+
+研究中心的知識圖譜只讀取已通過 topic／正式筆記契約的證據。它不以關鍵字共現、文章篇數、
+同業分類或模型相似度自動建立公司關係；因此「沒有線」只表示目前沒有可發布的可追溯證據，
+不表示現實世界不存在關係。
+
+同一份底層 graph 分成兩個檢視，避免資訊混成毛線球：
+
+1. `company`（公司曝險）：主題／產品與 universe 台股、外部公司或組織的關係。外部公司可
+   顯示，但與 `config/universe.csv` 成員有明確視覺區隔。
+2. `industry`（產業依賴）：主題與標準、元件、製程、能力、成熟度節點及正式族群的關係；
+   此檢視不直接放公司。
+
+線的「強弱」不能壓成單一分數，至少拆成四個正交維度：
+
+- `evidence_state`：證實／推論／待驗證，決定實線、虛線或點線；不得強於引用 claim。
+- `commercial_stage`：概念、樣品、資格、平台列名、生產、出貨、部署、財務認列等成熟度。
+- `materiality`：未知、相鄰搜尋路由、具名產品角色、可辨識財務貢獻，決定線寬。
+- `exclusivity`：未知、多路徑、少數來源、具證據的獨家。非 unknown 必須明示適用範圍；
+  `unverified` 不得宣稱集中度或獨家。
+
+每條 edge 至少要保存 `claim_refs` 或 `note_refs`、`boundary`、`next_trigger`、`as_of` 與
+`review_due`。到期線會降透明度並標成需要複核，但「沒有新證據」不是反證，不會自動把
+verified 改成 refuted；其上游 topic 可信度仍按第五節規則自動降級。點選關係時，研究中心
+必須能回到原文章、claim 與一手來源。
+
+節點 registry 分三層：`config/knowledge_concepts.csv` 保存專有名詞與製程節點，
+`config/external_entities.csv` 保存不在 universe 的公司／組織，台股公司與正式族群則直接由
+`config/universe.csv`、`config/groups.csv` 注入。顯示關係保存在
+`notes/knowledge_graph/*.md`；新增主題先複製 `_template.md`。MVP 每條 active edge 只允許
+root 的一跳關係，先把證據品質與可讀性做穩，再考慮多跳探索。
+
+發布前執行 `python scripts/knowledge_graph.py --lint`。lint 會檢查 endpoint、值域、雙視圖、
+一跳限制、來源引用、證據不可升格、財務 materiality 與 exclusivity 邊界；它不重新下載來源，
+也不替代內容 reviewer。
+
+## 八、修正採追加保存
 
 研究結論改變時，不刪除舊 source、claim 或 transition，也不重用其 ID：
 
@@ -352,7 +388,7 @@ Git 歷史能看到文字變更，但不能以 Git 歷史取代文章內的修�
 monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID，或把 lifecycle 單向
 改成 superseded／refuted／retired 並補齊雙向修正關係。
 
-## 八、發布前檢查
+## 九、發布前檢查
 
 1. 新手導讀是否清楚說明已知、未知與下一步。
 2. 每個材料性 claim 是否有正確標籤、來源 ID、basis 與 boundary。
@@ -363,9 +399,10 @@ monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID�
    至少包含一個 living index，並具備頻率、日期、trigger 與 invalidation。
 7. `review_due` 是否等於最早 monitor 日期，且晚於 `last_reviewed_at`。
 8. impact 是否仍清楚寫 evidence boundary，沒有把 topic 升格為公司事實。
-9. 執行 `python scripts/research_queue.py --lint`；lint 只驗結構與引用完整性，不會重新下載
-   或證明來源內容為真。
-10. 重建研究中心並檢查 ledger、比較表、可信度與 deep link 的桌機／行動版顯示。
+9. 執行 `python scripts/research_queue.py --lint` 與 `python scripts/knowledge_graph.py --lint`；
+   lint 只驗結構與引用完整性，不會重新下載或證明來源內容為真。
+10. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
+    行動版顯示。
 
 ## Schema 沿革
 

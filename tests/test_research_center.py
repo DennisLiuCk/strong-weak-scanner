@@ -309,6 +309,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('as_of=research_as_of', builder)
         self.assertIn('taipei_today as research_today', builder)
         self.assertIn('research_html.replace(', builder)
+        self.assertIn('research_library["knowledgeGraph"] = build_knowledge_graph(', builder)
         self.assertIn("body.append(mobileBack,h('h1'", template)
         self.assertIn("body.append(meta,articleSections(article)", template)
         self.assertIn("'aria-selected':state.type===type?'true':'false'", template)
@@ -347,7 +348,9 @@ class ResearchCenterTest(unittest.TestCase):
             "mobileBack.addEventListener('click',clearArticleRoute)",
             "if(document.body.classList.contains('article-open'))setArticleHash(state.selected)",
             "if(document.body.classList.contains('article-open'))clearArticleRoute()",
-            "else if(!id)document.body.classList.remove('article-open')",
+            "function graphHashRoute(value)",
+            "selectSurface('graph',false)",
+            "else{state.surface='library';syncSurface();document.body.classList.remove('article-open');renderAll()}",
         ):
             self.assertIn(contract, template)
         self.assertNotIn(
@@ -374,6 +377,24 @@ class ResearchCenterTest(unittest.TestCase):
             "if(event.key==='Escape'&&filtersPanel.classList.contains('open'))closeFilters()",
             template,
         )
+
+    def test_template_has_evidence_backed_dual_view_knowledge_graph(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            'id="surfaceGraph"', 'id="graphHubTabs"', 'id="graphViewTabs"',
+            'id="knowledgeGraph"', 'id="graphDetail"', 'id="graphRelationList"',
+            'name="graphEvidence"', 'id="graphUniverseOnly"',
+            "const KG=LIB.knowledgeGraph", "function renderGraph()",
+            "function renderGraphSvg(", "function renderGraphDetail(",
+            "['company','公司曝險']", "['industry','產業依賴']",
+            "graphMaterialityWidth", "stroke-dasharray",
+            "證據邊界", "下一個升降級節點", "供應集中度範圍",
+            "點線與細線表示仍需更多商業證據",
+            "role:'button',tabindex:'0'", "graphKeyboard(",
+        ):
+            self.assertIn(contract, template)
+        self.assertIn("state.graphUniverseOnly=event.target.checked", template)
+        self.assertIn("state.graphEvidence.add(input.value)", template)
 
 
 if __name__ == "__main__":

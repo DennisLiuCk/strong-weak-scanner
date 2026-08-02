@@ -35,6 +35,7 @@ from leading_hypotheses import (HYPOTHESIS_STATUS_INFO,
 from research_queue import (_topic_confidence as topic_confidence_at,
                             load_topics as load_research_topics,
                             taipei_today as research_today)
+from knowledge_graph import build_knowledge_graph
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -2227,6 +2228,11 @@ def main():
     research_library = build_research_library(
         notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM, events,
         as_of=research_as_of,
+    )
+    # 證據型知識圖譜只投影既有 active claim／獨立核驗筆記來源；任何失效引用都讓
+    # build 直接標紅，避免圖上關係悄悄與研究帳本分岔。
+    research_library["knowledgeGraph"] = build_knowledge_graph(
+        research_topics, notes_map, strict=True,
     )
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}

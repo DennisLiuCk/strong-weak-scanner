@@ -132,6 +132,8 @@ qual_review.py   focused_v1 機器輔助複核 triage(唯讀):claim 數字對 ci
                  → tmp/qualitative_review/;HARD=缺頁/缺檔,未解決不得簽核;非簽核依據
 research_queue.py 唯讀聚合正式筆記/H#/事件/財務覆蓋/候選議題與 A–D 四週輪掃;
                  notes/research_topics/ 是候選來源與路由,不自動改正式筆記、不進計分
+knowledge_graph.py 將 topic claim/正式筆記 source 投影成研究中心雙視圖知識圖譜;
+                 每條線 lint 證據層級、商業成熟度、材料性、集中度、期限與一跳邊界
 ```
 
 資料表:原始 price(含成交筆數)/inst(買賣分項)/margin(流量與限額)/holding(持股股數、

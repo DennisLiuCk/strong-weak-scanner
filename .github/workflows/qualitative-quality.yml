@@ -6,8 +6,11 @@ on:
       - "notes/qualitative/**"
       - "notes/leading_hypotheses/**"
       - "notes/research_topics/**"
+      - "notes/knowledge_graph/**"
       - "notes/events/**"
       - "config/groups.csv"
+      - "config/knowledge_concepts.csv"
+      - "config/external_entities.csv"
       - "LEADING_HYPOTHESES.md"
       - "LEADING_HYPOTHESES_PHASE1_REVIEW.md"
       - "LEADING_HYPOTHESES_PHASE2_RUNBOOK.md"
@@ -18,6 +21,7 @@ on:
       - "scripts/qual_evidence.py"
       - "scripts/leading_hypotheses.py"
       - "scripts/research_queue.py"
+      - "scripts/knowledge_graph.py"
       - "scripts/build_dashboard.py"
       - "scripts/dashboard_template.html"
       - "scripts/research_template.html"
@@ -27,6 +31,7 @@ on:
       - "tests/test_research_queue.py"
       - "tests/test_dashboard_ux_contract.py"
       - "tests/test_research_center.py"
+      - "tests/test_knowledge_graph.py"
       - "tests/test_entry_docs_sync.py"
       - "CLAUDE.md"
       - "AGENTS.md"
@@ -37,8 +42,11 @@ on:
       - "notes/qualitative/**"
       - "notes/leading_hypotheses/**"
       - "notes/research_topics/**"
+      - "notes/knowledge_graph/**"
       - "notes/events/**"
       - "config/groups.csv"
+      - "config/knowledge_concepts.csv"
+      - "config/external_entities.csv"
       - "LEADING_HYPOTHESES.md"
       - "LEADING_HYPOTHESES_PHASE1_REVIEW.md"
       - "LEADING_HYPOTHESES_PHASE2_RUNBOOK.md"
@@ -49,6 +57,7 @@ on:
       - "scripts/qual_evidence.py"
       - "scripts/leading_hypotheses.py"
       - "scripts/research_queue.py"
+      - "scripts/knowledge_graph.py"
       - "scripts/build_dashboard.py"
       - "scripts/dashboard_template.html"
       - "scripts/research_template.html"
@@ -58,6 +67,7 @@ on:
       - "tests/test_research_queue.py"
       - "tests/test_dashboard_ux_contract.py"
       - "tests/test_research_center.py"
+      - "tests/test_knowledge_graph.py"
       - "tests/test_entry_docs_sync.py"
       - "CLAUDE.md"
       - "AGENTS.md"
@@ -101,5 +111,8 @@ jobs:
           fi
           python scripts/research_queue.py --lint --baseline-ref "$baseline"
 
+      - name: 稽核研究中心知識圖譜與證據引用
+        run: python scripts/knowledge_graph.py --lint
+
       - name: 執行質化品質、dashboard 與入口文件契約測試
-        run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_leading_hypotheses tests.test_research_queue tests.test_dashboard_ux_contract tests.test_research_center tests.test_entry_docs_sync
+        run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_leading_hypotheses tests.test_research_queue tests.test_dashboard_ux_contract tests.test_research_center tests.test_knowledge_graph tests.test_entry_docs_sync

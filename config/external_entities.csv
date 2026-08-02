@@ -1,0 +1,16 @@
+entity_id,entity_type,label,ticker,exchange,country,aliases,url,description
+company:micron,company,Micron,MU,NASDAQ,US,美光,https://www.micron.com/,記憶體供應商
+company:sk-hynix,company,SK hynix,000660,KRX,KR,SK海力士,https://www.skhynix.com/,記憶體供應商
+company:kla,company,KLA,KLAC,NASDAQ,US,KLA Corporation,https://www.kla.com/,製程控制設備供應商
+company:applied-materials,company,Applied Materials,AMAT,NASDAQ,US,應用材料,https://www.appliedmaterials.com/,半導體與先進封裝設備供應商
+company:onto-innovation,company,Onto Innovation,ONTO,NYSE,US,Onto,https://ontoinnovation.com/,量測與檢查設備供應商
+company:nvidia,company,NVIDIA,NVDA,NASDAQ,US,輝達,https://www.nvidia.com/,AI 平台與 Marketplace 提供者
+company:lg-electronics,company,LG Electronics,066570,KRX,KR,LGE,https://www.lg.com/global/,電子與資料中心冷卻設備供應商
+company:daikin,company,Daikin Industries,6367,TSE,JP,大金,https://www.daikin.com/,空調與資料中心冷卻系統供應商
+company:ntt-data,company,NTT DATA Group,9613,TSE,JP,NTT DATA,https://www.nttdata.com/global/en/,資料中心與 IT 服務供應商
+company:amd,company,AMD,AMD,NASDAQ,US,Advanced Micro Devices,https://www.amd.com/,運算晶片與 Helios 平台提供者
+company:microsoft,company,Microsoft,MSFT,NASDAQ,US,微軟|Azure,https://www.microsoft.com/,雲端與軟體平台公司
+company:openai,company,OpenAI,,,US,,https://openai.com/,AI 研究與產品公司
+company:meta,company,Meta Platforms,META,NASDAQ,US,Meta,https://about.meta.com/,社群平台與 AI 基礎設施公司
+company:anthropic,company,Anthropic,,,US,,https://www.anthropic.com/,AI 模型與產品公司
+organization:jedec,organization,JEDEC,,,US,,https://www.jedec.org/,半導體標準組織

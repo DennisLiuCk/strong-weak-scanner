@@ -1,0 +1,31 @@
+node_id,node_type,label,aliases,parent_id,description
+concept:hbm,concept,HBM,高頻寬記憶體|High Bandwidth Memory,,多層 DRAM 垂直堆疊並以寬介面提供高頻寬的記憶體架構
+product:hbm4,product,HBM4,第四代 HBM,concept:hbm,第四代高頻寬記憶體產品世代
+product:hbm4e,product,HBM4E,HBM4 Enhanced,concept:hbm,HBM4 後續增強產品世代
+standard:sphbm4,standard,SPHBM4,JESD330-4,concept:hbm,以介面 base die 與序列化連接標準有機基板的 JEDEC 路徑
+component:interface-base-die,component,Interface base die,介面基底晶片,standard:sphbm4,位於記憶體堆疊底部並管理高速介面與資料傳送的邏輯晶片
+process:serialization,process,序列化,Serialization,standard:sphbm4,以較少實體訊號線承載較高速資料傳輸
+component:organic-substrate,component,有機基板,Organic substrate,process:advanced-packaging,負責晶片與電路板之間訊號及電源扇出的封裝基板
+process:advanced-packaging,process,先進封裝,Advanced packaging,,異質整合與高密度晶片連接的封裝製程集合
+process:2_5d-3d,process,2.5D／3D 整合,2.5D|3D IC,process:advanced-packaging,將多顆晶片並排連接或垂直堆疊的整合路徑
+capability:process-control,capability,製程控制,Process control,,在製造途中以量測、檢查與缺陷分析回饋製程
+capability:metrology,capability,量測,Metrology,capability:process-control,確認尺寸、形貌與材料等製程參數是否合規
+capability:inspection,capability,缺陷檢查,Inspection,capability:process-control,尋找顆粒、刮傷與接合不良等缺陷
+capability:yield-learning,capability,良率學習,Yield learning,capability:process-control,把缺陷資料回饋製程並辨識報廢原因
+concept:liquid-cooling,concept,液冷,Liquid cooling,,使用冷卻液帶走資料中心或伺服器熱量的系統集合
+component:cdu,component,CDU,Coolant Distribution Unit,concept:liquid-cooling,透過泵浦、熱交換器與控制系統分配冷卻液的設備
+metric:cooling-capacity-4c-atd,metric,Cooling Capacity @ 4°C ATD,4C ATD cooling capacity,component:cdu,NVIDIA Marketplace 使用的 CDU 額定排熱能力欄位
+stage:platform-validation,stage,平台驗證,Platform validation,component:cdu,通過平台商指定測試或進入合格清單的節點
+stage:supply-status,stage,供應狀態,Supply Chain Status,component:cdu,平台標示的 Sample Ready 或 MP Ready 等供應類別
+process:system-integration,process,系統整合,System integration,concept:liquid-cooling,把 CDU、設施冷卻與控制系統整合成可運行方案
+process:field-poc,process,場域 PoC,Proof of Concept,process:system-integration,在實際或近實際場域驗證節能、可靠度與控制效果
+component:chiller-hvac,component,Chiller／HVAC,冰水主機|空調系統,concept:liquid-cooling,資料中心設施端產生與管理冷源的設備及控制系統
+product:amd-helios,product,AMD Helios,Helios,,AMD 的機架級 AI 系統平台
+concept:rack-scale,concept,機架級系統,Rack-scale system,product:amd-helios,把運算、網路、電力、散熱與軟體整合成整櫃交付的系統
+stage:production,stage,Production,生產階段,product:amd-helios,平台進入生產但不代表所有客戶已驗收或上線
+stage:shipment,stage,Shipment,出貨節點,product:amd-helios,產品開始向客戶交付的里程碑
+stage:cloud-deployment,stage,雲端部署,Cloud deployment,product:amd-helios,雲端 SKU、online 或 GW 部署等客戶落地節點
+stage:validation,stage,客戶驗證,Validation,product:amd-helios,客戶仍在測試與確認 workloads 的階段
+component:efb,component,EFB,Elevated Fanout Bridge,process:advanced-packaging,AMD 生態系文件列示的先進封裝技術路徑
+component:substrate,component,載板／基板,Package substrate,process:advanced-packaging,承載晶片並連接封裝與系統電路板的結構
+concept:purpose-built-silicon,concept,客製晶片／自研系統,Purpose-built silicon,,雲端業者自行設計的晶片與系統替代路徑
