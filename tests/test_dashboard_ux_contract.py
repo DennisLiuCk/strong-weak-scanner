@@ -57,9 +57,25 @@ class DashboardUxContractTest(unittest.TestCase):
         for artifact in ("畫面 1", "畫面 2", "畫面 3", "畫面 4", "畫面 5",
                          "optHead(", "badgeid", "最白話"):
             self.assertNotIn(artifact, self.template)
-        # header kicker 用動態範圍詞,不與 __H1__ 重複同文
-        self.assertIn('<p class="kicker" style="color:var(--strong)">__SCOPE__</p>',
-                      self.template)
+        # A 版用緊湊 utility header 分出每日掃描與研究中心；範圍資訊退到輔助層。
+        self.assertIn('<header class="sitebar">', self.template)
+        self.assertIn('<nav class="primarynav" aria-label="主要區域">', self.template)
+        self.assertIn('aria-current="page">市場掃描</a>', self.template)
+        self.assertIn('<span class="brand-scope">__H1__</span>', self.template)
+        self.assertIn('<span class="menu-scope">__SCOPE__</span>', self.template)
+
+    def test_daily_workspace_prioritises_scan_then_research_and_trust(self):
+        """首頁順序就是產品決策：今日焦點→族群→個股→研究→深層分析→方法證據。"""
+        order = [
+            '<section id="ov"', '<section id="grp"', '<section id="tier"',
+            '<section id="recent"', '<section id="diverge"', '<section id="lens"',
+            '<section id="stocks"', '<section id="flow-guide"', '<section id="trust"',
+        ]
+        positions = [self.template.index(marker) for marker in order]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("class:'command-grid'", self.template)
+        self.assertIn("text:'進入族群比較 ↓'", self.template)
+        self.assertIn("text:'今日強弱個股名單'", self.template)
 
     # ---------- 資料契約:placeholder 注入與 adapter ----------
 
@@ -81,7 +97,7 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("waiting:s.tier_waiting", self.template)
 
     def test_strategy_status_card_shows_evidence_state_not_judgement(self):
-        """首屏「策略狀態」卡:只放證據狀態與結構事實,不得放對個別因子的判斷。
+        """頁尾折疊「策略狀態」:只放證據狀態與結構事實,不得放個別因子判斷。
 
         儀表板原本只傳達「透明可追溯」,沒有傳達「這套規則有多可信」——分層看起來很確定,
         但預測力還在累積樣本外證據。這張卡補上那一軸;同時它不可以變成把 in-sample 的
@@ -90,6 +106,8 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("function buildStrategyStatus()", self.template)
         self.assertIn("buildStrategyStatus()", self.template)
         self.assertIn("id:'strategy-status'", self.template)
+        self.assertIn("h('details',{class:'card strategy-disclosure',id:'strategy-status'}", self.template)
+        self.assertIn("document.getElementById('trust').append(buildStrategyStatus())", self.template)
         # 四項事實都要在
         for key in ("權重校準窗", "樣本外驗證", "訊號集中度", "分層穩定度"):
             self.assertIn(key, self.template, f"策略狀態卡缺「{key}」")
@@ -182,6 +200,9 @@ class DashboardUxContractTest(unittest.TestCase):
         for marker in ("function buildGroup()", "quadEl", "族群價籌四象限", "族群熱圖",
                        "rankClass", "openGroupSheet", 'class:\'hscroll\''):
             self.assertIn(marker, self.template)
+        for marker in ("role:'tablist'", "grp-tab-board", "selectView(key)",
+                       "① 動能排序 · 族群排行榜"):
+            self.assertIn(marker, self.template)
         # 熱圖五欄對應 builder 的族群 heat payload
         for key in ("'dip'", "'breadth_f'", "'rel20'", "'dist60'", "'breadth_t'"):
             self.assertIn(key, self.template)
@@ -199,6 +220,9 @@ class DashboardUxContractTest(unittest.TestCase):
     def test_tier_bands_and_five_day_flow(self):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",
                        "D.tierFlow", "蓄勢候補", "不是買賣指示"):
+            self.assertIn(marker, self.template)
+        for marker in ("class:'tier-snapshot'", "相對強勢", "相對蓄勢", "相對弱勢",
+                       "class:'tier-full'", "完整八層、族群篩選與近 5 日變層軌跡"):
             self.assertIn(marker, self.template)
         # 分層區可依族群篩選(選定=全列)、全部模式「＋N 檔」可展開、chip/變層列點開明細
         for marker in ("'aria-label':'分層篩選族群'", "檔 展開",

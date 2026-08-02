@@ -50,11 +50,12 @@
 } }
 *{box-sizing:border-box}
 html,body{margin:0}
+html{scroll-padding-top:108px}
 body{background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
   font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif}
 .mono{font-family:'IBM Plex Mono',Consolas,ui-monospace,monospace;font-variant-numeric:tabular-nums}
 a{color:var(--teal);text-decoration:none} a:hover{color:#0a5060;text-decoration:underline}
-.wrap{max-width:1180px;margin:0 auto;padding:44px 44px 120px}
+.wrap{max-width:1180px;margin:0 auto;padding:36px 44px 120px}
 .brandrule{width:38px;height:4px;background:var(--strong);border-radius:2px;margin-bottom:18px}
 h1{margin:0 0 14px;font-size:40px;line-height:1.15;font-weight:900;letter-spacing:.5px;text-wrap:balance}
 .kicker{margin:0 0 6px;font-size:12px;font-weight:800;letter-spacing:.16em;color:var(--muted)}
@@ -67,9 +68,99 @@ h2.sec{margin:0 0 6px;font-size:28px;font-weight:800;letter-spacing:.3px}
 .opthd{display:flex;align-items:center;gap:10px;margin-bottom:13px}
 .opthd b{font-size:16px} .opthd span{font-size:12.5px;color:var(--muted)}
 .chip{font-size:11px;font-weight:700;border-radius:100px;padding:2px 9px;white-space:nowrap}
-section.blk{max-width:1180px;margin:86px auto 0}
+section.blk{max-width:1180px;margin:72px auto 0}
 h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .note{font-size:12px;color:var(--muted)}
+/* ---------- A 版：每日決策工作區 ---------- */
+.sitebar{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--line)}
+.sitebar-inner{max-width:1180px;margin:0 auto;padding:11px 44px;display:flex;align-items:center;gap:20px;min-height:70px}
+.sitebrand{display:flex;align-items:center;gap:11px;min-width:0;color:var(--ink)}
+.sitebrand:hover{color:var(--ink);text-decoration:none}
+.sitebrand .brandrule{width:30px;height:3px;margin:0;flex:0 0 auto}
+.brand-copy{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.brand-name{font-size:17px;font-weight:900;letter-spacing:-.01em;white-space:nowrap}
+.brand-scope{max-width:290px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;color:var(--muted)}
+.primarynav{display:flex;align-items:center;gap:2px;padding:3px;background:var(--inset);border:1px solid var(--line2);border-radius:10px}
+.primarynav a{padding:6px 13px;border-radius:7px;font-size:12.5px;font-weight:800;color:var(--muted);white-space:nowrap}
+.primarynav a:hover{color:var(--ink);text-decoration:none}
+.primarynav a[aria-current="page"]{color:var(--ink);background:var(--card);box-shadow:0 1px 3px rgba(26,23,18,.10)}
+.site-tools{margin-left:auto;display:flex;align-items:center;gap:10px}
+.data-anchor{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;white-space:nowrap}
+.data-anchor span{font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--muted)}
+.data-anchor b{font-size:11.5px;font-weight:700}
+.utility-menu{position:relative}
+.utility-menu>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;min-height:38px;padding:6px 11px;border:1px solid var(--line);border-radius:100px;background:var(--card);font-size:11.5px;font-weight:800;color:var(--ink2)}
+.utility-menu>summary::-webkit-details-marker{display:none}
+.utility-menu>summary::after{content:'▾';margin-left:6px;color:var(--muted)}
+.utility-menu[open]>summary{color:var(--ink);border-color:var(--muted)}
+.utility-menu[open]>summary::after{transform:rotate(180deg)}
+.quicknav{position:absolute;right:0;top:calc(100% + 9px);width:230px;display:grid;gap:3px;padding:9px;background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:0 16px 38px rgba(26,23,18,.14)}
+.quicknav a{display:flex;align-items:center;min-height:38px;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;color:var(--ink2)}
+.quicknav a:hover{color:var(--ink);background:var(--inset);text-decoration:none}
+.quicknav .menu-scope{padding:8px 10px 3px;border-top:1px solid var(--line2);font-size:10px;color:var(--muted);line-height:1.5}
+.themebtn{width:38px;height:38px;padding:0;justify-content:center;font-size:0}
+.themebtn::before{content:'◐';font-size:16px}
+#ov{margin-top:0}
+.command-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);gap:18px;align-items:stretch}
+.command-hero{padding:30px 32px;display:flex;flex-direction:column;justify-content:space-between;min-height:390px}
+.command-headline{margin:0;font-size:34px;line-height:1.2;font-weight:900;letter-spacing:.2px;text-wrap:balance;word-break:keep-all}
+.command-summary{margin:12px 0 0;max-width:66ch;font-size:14.5px;color:var(--ink2);line-height:1.75}
+.command-signals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:22px}
+.command-signal{padding:11px 13px;border-radius:11px}
+.command-signal span{display:block;font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.03em}
+.command-signal b{display:block;margin-top:3px;font-size:14px;line-height:1.45}
+.command-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line2)}
+.tier-counts{display:flex;gap:17px;align-items:baseline;flex-wrap:wrap}
+.tier-counts-label{display:block;width:100%;font-size:10.5px;font-weight:800;color:var(--muted)}
+.tier-counts span{font-size:12.5px;color:var(--ink2);white-space:nowrap}
+.tier-counts b{font-size:20px;margin-right:3px}
+.primary-cta{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:100px;background:var(--ink);color:var(--card);font-size:12.5px;font-weight:800;white-space:nowrap}
+.primary-cta:hover{color:var(--card);text-decoration:none;opacity:.88}
+.command-side{display:grid;grid-template-rows:1fr auto;gap:14px}
+.pulse-card{padding:19px 20px}
+.pulse-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:11px}
+.pulse-head b{font-size:14.5px}.pulse-head a{font-size:11.5px;font-weight:800}
+.pulse-list{display:grid;gap:7px}
+.pulse-row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:9px;align-items:center;padding:10px 11px;border-radius:10px;background:var(--inset);color:var(--ink)}
+.pulse-row:hover{color:var(--ink);text-decoration:none;background:var(--card)}
+.pulse-rank{font-size:10.5px;color:var(--muted)}
+.pulse-name{min-width:0;font-size:12.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pulse-value{font-size:11.5px;font-weight:700}
+.shortlist-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 19px;color:var(--ink);background:var(--tealbg);border-color:var(--teal)}
+.shortlist-cta:hover{color:var(--ink);text-decoration:none;transform:translateY(-1px)}
+.shortlist-cta b{display:block;font-size:14px}.shortlist-cta span{display:block;margin-top:2px;font-size:11px;color:var(--ink2)}
+.shortlist-cta>span:last-child{font-size:18px;color:var(--teal)}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:18px}
+.section-head .lead{margin-bottom:0}
+.viewtabs{display:flex;gap:3px;padding:3px;background:var(--inset);border-radius:11px;overflow-x:auto}
+.group-panel[hidden]{display:none}
+.group-panel{margin-top:14px}
+.group-visual-card{margin:0;padding:22px}
+.tier-snapshot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+.tier-snapshot-card{padding:18px 19px;border-left:4px solid var(--muted)}
+.tier-snapshot-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+.tier-snapshot-head b{font-size:15px}.tier-snapshot-head span{font-size:14px;font-weight:700}
+.tier-snapshot-list{display:flex;flex-wrap:wrap;gap:7px}
+.tier-snapshot-more{margin-top:10px;font-size:10.5px;color:var(--muted)}
+.tier-full{margin-top:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.tier-full>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;font-size:12.5px;font-weight:800;color:var(--ink2)}
+.tier-full>summary::-webkit-details-marker{display:none}
+.tier-full>summary::after{content:'展開 ＋';font-size:11px;color:var(--teal)}
+.tier-full[open]>summary{border-bottom:1px solid var(--line2)}
+.tier-full[open]>summary::after{content:'收合 −'}
+.tier-full-body{padding:18px}
+.research-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:16px}
+.research-head .lead{margin-bottom:0}
+.research-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.research-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.strategy-disclosure{border-left:4px solid var(--amber)}
+.strategy-disclosure>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:19px 22px}
+.strategy-disclosure>summary::-webkit-details-marker{display:none}
+.strategy-summary-copy b{display:block;font-size:14.5px}.strategy-summary-copy span{display:block;margin-top:2px;font-size:11.5px;color:var(--muted)}
+.strategy-disclosure>summary::after{content:'展開 ＋';font-size:11px;font-weight:800;color:var(--amber);white-space:nowrap}
+.strategy-disclosure[open]>summary{border-bottom:1px solid var(--line2)}
+.strategy-disclosure[open]>summary::after{content:'收合 −'}
+.strategy-body{padding:18px 22px 22px}
 /* strip tile（五面向骨架） */
 .strip{display:flex;gap:6px}
 .tile{flex:1;text-align:center;border-radius:9px;padding:6px 3px 5px}
@@ -83,6 +174,7 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 svg{display:block;overflow:visible}
 .togglebtn{display:inline-flex;align-items:center;gap:7px;cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink2);border-radius:100px;padding:7px 14px;font:inherit;font-size:12.5px}
 .togglebtn:hover{color:var(--ink);border-color:var(--muted)}
+.togglebtn.themebtn{width:38px;height:38px;padding:0;justify-content:center;font-size:0}
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}
 .msearch{font:inherit;font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:100px;padding:8px 15px;min-width:220px;outline:none}
 .msearch::placeholder{color:var(--muted)} .msearch:focus{border-color:var(--strong)}
@@ -106,27 +198,23 @@ svg{display:block;overflow:visible}
 .sheetclose{position:absolute;top:14px;right:16px;width:38px;height:38px;border-radius:100px;background:var(--inset);border:1px solid var(--line);color:var(--ink2);cursor:pointer;font-size:15px}
 .sheetclose:hover{color:var(--ink)}
 @media(max-width:680px){#sheetwrap{align-items:flex-end}#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%)}#sheetwrap.on #sheet{transform:translateY(0)}}
-/* ---------- 響應式與觸控（移植自舊版 UX 契約：窄幅改卡片、觸控目標 min-height:44px） ---------- */
-.quicknav{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 0}
-.quicknav a{font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:100px;padding:7px 14px}
-.quicknav a:hover{color:var(--ink);border-color:var(--muted);text-decoration:none}
+/* ---------- 響應式與觸控（窄幅改卡片、觸控目標 min-height:44px） ---------- */
 .recent-summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .recent-total{font-size:13px;font-weight:800;color:var(--ink)}
 .recent-count{font-size:11.5px;color:var(--ink2);background:var(--inset);border:1px solid var(--line2);border-radius:100px;padding:3px 9px}
-.recent-list{display:grid;gap:8px}
-.recent-batch-label{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:7px 2px 1px;color:var(--ink2);font-size:12px;font-weight:800}.recent-batch-label span:last-child{font-size:10.5px;font-weight:600;color:var(--muted)}
-.recent-item{display:grid;grid-template-columns:112px minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:13px;min-height:72px}
+.recent-item{position:relative;display:flex;flex-direction:column;gap:11px;padding:18px 19px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:15px;min-height:164px}
 .recent-item.latest{border-color:color-mix(in srgb,var(--teal) 32%,var(--line))}
 .recent-item:hover{color:var(--ink);background:var(--inset);border-color:var(--muted);text-decoration:none}
 .recent-item:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
-.recent-date{display:block;font-family:'IBM Plex Mono',Consolas,ui-monospace,monospace;font-size:11.5px;color:var(--muted)}
-.recent-type{display:inline-block;margin-top:4px;font-size:10.5px;font-weight:800;color:var(--teal)}
-.recent-who{font-size:12px;font-weight:800;color:var(--ink2)}
-.recent-title{margin:3px 0 0;font-size:14px;line-height:1.55;color:var(--ink)}
-.recent-status{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:700;color:var(--muted)}
+.recent-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-right:20px}
+.recent-date{font-family:'IBM Plex Mono',Consolas,ui-monospace,monospace;font-size:10.5px;color:var(--muted)}
+.recent-type{font-size:10px;font-weight:800;color:var(--teal)}
+.recent-who{display:block;font-size:11.5px;font-weight:800;color:var(--ink2)}
+.recent-title{margin:4px 0 0;font-size:14px;line-height:1.6;color:var(--ink)}
+.recent-status{display:block;margin-top:auto;font-size:10.5px;font-weight:700;color:var(--muted)}
 .recent-status.verified{color:var(--teal)} .recent-status.warning{color:var(--amber)}
 .recent-status.observational{color:var(--hypoink)}
-.recent-arrow{font-size:18px;color:var(--muted)}
+.recent-arrow{position:absolute;right:17px;top:15px;font-size:15px;color:var(--muted)}
 .recent-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
 .recent-shown{font-size:11.5px;color:var(--muted)}
 .srow{display:grid;grid-template-columns:44px minmax(210px,1fr) 340px minmax(200px,240px);gap:22px;align-items:center}
@@ -146,11 +234,33 @@ svg{display:block;overflow:visible}
 .dl dt{font-size:12.5px;font-weight:700;margin-top:12px}
 .dl dd{margin:2px 0 0;font-size:12px;color:var(--ink2);line-height:1.65}
 .dl .f{display:block;font-family:'IBM Plex Mono',Consolas,ui-monospace,monospace;font-size:11px;color:var(--teal);margin-bottom:2px}
-@media (max-width:1240px){.wrap{padding:32px 22px 90px}}
-@media (max-width:1000px){.fgrid{grid-template-columns:1fr 1fr}.dgrid{grid-template-columns:1fr}}
-@media (max-width:900px){.srow{grid-template-columns:34px minmax(150px,1fr) minmax(200px,1fr)}.srow>*:nth-child(4){grid-column:2/-1}}
+@media (max-width:1240px){.wrap{padding:32px 22px 90px}.sitebar-inner{padding:11px 22px}}
+@media (max-width:1000px){.fgrid{grid-template-columns:1fr 1fr}.dgrid{grid-template-columns:1fr}.research-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){
+  .command-grid{grid-template-columns:1fr}.command-hero{min-height:0}
+  .tier-snapshot{grid-template-columns:1fr}.research-grid{grid-template-columns:1fr}
+  .srow{grid-template-columns:34px minmax(150px,1fr) minmax(200px,1fr)}.srow>*:nth-child(4){grid-column:2/-1}
+}
 @media (max-width:720px){
+  html{scroll-padding-top:138px}
   h1{font-size:30px} h2.sec{font-size:22px}
+  .sitebar-inner{padding:9px 14px;gap:8px;flex-wrap:wrap}
+  .sitebrand{flex:1 1 auto}.brand-name{font-size:15px}.brand-scope{display:none}
+  .site-tools{margin-left:0}.data-anchor{display:none}
+  .primarynav{order:3;width:100%;display:grid;grid-template-columns:1fr 1fr;text-align:center}
+  .primarynav a{padding:7px 10px}
+  .utility-menu>summary,.themebtn{min-width:44px;min-height:44px}
+  .utility-menu>summary{font-size:0;padding:0;justify-content:center}
+  .utility-menu>summary::before{content:'☰';font-size:16px}
+  .utility-menu>summary::after{display:none}
+  .quicknav{position:fixed;top:62px;right:14px;left:14px;width:auto;grid-template-columns:1fr 1fr}
+  .quicknav .menu-scope{grid-column:1/-1}
+  .wrap{padding-top:24px}
+  .command-hero{padding:24px 21px}.command-headline{font-size:28px}
+  .command-signals{grid-template-columns:1fr}
+  .command-foot{align-items:stretch;flex-direction:column}.primary-cta{width:100%;min-height:44px}
+  .section-head,.research-head{display:block}.viewtabs{margin-top:14px}.research-actions{justify-content:flex-start;margin-top:13px}
+  .tier-full-body{padding:13px}.strategy-disclosure>summary{padding:17px 18px}.strategy-body{padding:15px 18px 19px}
   .stepgrid,.fgrid{grid-template-columns:1fr}
   .tband{grid-template-columns:1fr;gap:10px}
   .grow{grid-template-columns:1fr;gap:6px}
@@ -164,36 +274,59 @@ svg{display:block;overflow:visible}
   .togglebtn,.sortbtn,.rtab,.sheetclose,.msearch,.quicknav a{min-height:44px}
   .quicknav a{display:inline-flex;align-items:center}
   .clickrow{min-height:44px}
-  .recent-item{grid-template-columns:1fr;gap:7px;padding:14px;min-height:88px}
-  .recent-arrow{display:none}
-  .recent-status{display:block;margin:3px 0 0}
+  .recent-item{gap:8px;padding:15px;min-height:138px}
+  .recent-arrow{right:14px;top:12px}
   .recent-actions{align-items:stretch}
   .recent-actions .togglebtn{width:100%;justify-content:center}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <header style="position:relative">
-    <button class="togglebtn" id="themeBtn" style="position:fixed;top:16px;right:16px;z-index:50" aria-label="切換深淺色">◐ 深／淺色</button>
-    <div class="brandrule"></div>
-    <p class="kicker" style="color:var(--strong)">11 族群 · 有效評分 120/120 檔 · 暫停／未交易 1 檔（完整名單 121）</p>
-    <h1>台股半導體與 AI 供應鏈 · 汰弱留強掃描</h1>
-    <p class="sub">每個交易日收盤後，把同族群個股放上同一把尺：比較價格與抗跌、法人原始買賣及其同業位置、融資槓桿，再依公開規則分層。每個分數都可點開，看原始數據與判讀；資料來源見頁尾。</p>
-    <nav class="quicknav" aria-label="快速導覽">
-      <a href="#ov">今日重點</a><a href="research.html" data-research-link>研究中心</a><a href="#grp">族群比較</a><a href="#diverge">兩視角分歧</a><a href="#lens">時間尺度</a><a href="#tier">個股分層</a><a href="#stocks">族群內個股</a><a href="#flow-guide">數據解剖指南</a>
+<header class="sitebar">
+  <div class="sitebar-inner">
+    <a class="sitebrand" href="#ov" aria-label="Strong–Weak Scanner 首頁">
+      <span class="brandrule" aria-hidden="true"></span>
+      <span class="brand-copy">
+        <span class="brand-name">Strong–Weak Scanner</span>
+        <span class="brand-scope">台股半導體與 AI 供應鏈 · 汰弱留強掃描</span>
+      </span>
+    </a>
+    <nav class="primarynav" aria-label="主要區域">
+      <a href="#ov" aria-current="page">市場掃描</a>
+      <a href="research.html" data-research-link>研究中心</a>
     </nav>
-  </header>
+    <div class="site-tools">
+      <span class="data-anchor"><span>資料錨點</span><b class="mono">2026/7/31</b></span>
+      <details class="utility-menu">
+        <summary>快速前往</summary>
+        <nav class="quicknav" aria-label="快速導覽">
+          <a href="#ov">今日掃描焦點</a>
+          <a href="#grp">族群比較</a>
+          <a href="#tier">個股分層</a>
+          <a href="research.html" data-research-link>研究中心</a>
+          <a href="#diverge">兩視角分歧</a>
+          <a href="#lens">時間尺度</a>
+          <a href="#stocks">族群內個股</a>
+          <a href="#flow-guide">數據解剖指南</a>
+          <a href="#strategy-status">策略狀態與證據</a>
+          <span class="menu-scope">11 族群 · 有效評分 120/120 檔 · 暫停／未交易 1 檔（完整名單 121）</span>
+        </nav>
+      </details>
+      <button class="togglebtn themebtn" id="themeBtn" aria-label="切換深淺色">切換深淺色</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
 
   <!-- 各段由 JS 建構 -->
   <main id="main">
-    <section id="ov" class="blk" style="margin-top:56px"></section>
-    <section id="recent" class="blk"></section>
+    <section id="ov" class="blk"></section>
     <section id="grp" class="blk"></section>
+    <section id="tier" class="blk"></section>
+    <section id="recent" class="blk"></section>
     <section id="diverge" class="blk"></section>
     <section id="lens" class="blk"></section>
-    <section id="tier" class="blk"></section>
     <section id="stocks" class="blk"></section>
 
     <section id="flow-guide" class="blk">
@@ -225,9 +358,10 @@ svg{display:block;overflow:visible}
         <p style="margin:18px 0 0;font-size:12px;color:var(--ink2);line-height:1.7"><b>建議順序：</b>方向強度回答「買賣哪一側較多」→ 活動占比回答「法人參與多少」→ 流量恆等式回答「餘額為何改變」→ 限額回答「空間還有多少」→ 超額報酬回答「扣除市場後是否仍跑贏」。缺值顯示「-」，代表資料或所需歷史不足，不代表0。</p>
       </div>
     </section>
+    <section id="trust" class="blk" aria-label="方法與證據"></section>
   </main>
 
-  <footer style="margin:86px 0 0;border-top:1px solid var(--line);padding-top:18px">
+  <footer style="margin:58px 0 0;border-top:1px solid var(--line);padding-top:18px">
     <p class="note" style="line-height:1.7;max-width:70ch">資料來源：TWSE／TPEx 官方每日批次與公告（價格、三大法人、融資券、借券、外資持股、處置／注意），FinMind（月營收、財報、市場事件與台積電參考數據）。所有分數皆為族群內相對排名；研究中心的法說事件與其他觀察層內容不計分。計算規則與原始碼見 <a href="https://github.com/DennisLiuCk/strong-weak-scanner">GitHub repo</a>。</p>
   </footer>
 
@@ -512,34 +646,43 @@ function buildOverview(){
   const strong=bt['真強']||0,accum=bt['蓄勢·外資佈局']||0,weak=(bt['真弱']||0)+(bt['真弱·陷阱']||0);
   const toneCol=t=>t==='strong'?'var(--strong)':t==='weak'?'var(--weak)':'var(--teal)';
   const toneBg=t=>t==='strong'?'var(--strongbg)':t==='weak'?'var(--weakbg)':'var(--tealbg)';
-  const cards=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:14px;margin-top:24px'});
-  (o.points||[]).forEach(p=>cards.appendChild(h('div',{style:`background:${toneBg(p.tone)};border-radius:13px;padding:15px 17px`},
-    h('div',{style:'font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.04em',text:p.label}),
-    h('div',{style:`font-size:16px;font-weight:800;margin-top:4px;color:${toneCol(p.tone)}`,text:p.value||p.text}))));
-  cards.appendChild(h('div',{style:'background:var(--inset);border-radius:13px;padding:15px 17px'},
-    h('div',{style:'font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.04em',text:`今日分層概況（相對分層）· 全 ${D.allStocks.length} 檔`}),
-    h('div',{style:'display:flex;gap:16px;align-items:baseline;margin-top:6px'},
-      h('span',{style:'font-size:13px;color:var(--ink2)',html:`<b class="mono cstrong" style="font-size:19px">${strong}</b> 強勢`}),
-      h('span',{style:'font-size:13px;color:var(--ink2)',html:`<b class="mono cteal" style="font-size:19px">${accum}</b> 蓄勢`}),
-      h('span',{style:'font-size:13px;color:var(--ink2)',html:`<b class="mono cweak" style="font-size:19px">${weak}</b> 弱勢`}))));
-  const steps=[['1','先看族群方向','資金正在佈局哪個族群？往下的「族群比較」看跑贏／跑輸與有沒有人接。'],
-    ['2','再看個股相對位置','在同族群裡誰強誰弱？「個股分層」與「族群內個股」把相對排名攤開。'],
-    ['3','想知道為什麼就點開','每個結論都能往下追到原始數字、計算規則與一手來源，可自行驗算。']];
-  const stepGrid=h('div',{class:'stepgrid'});
-  steps.forEach(s=>stepGrid.appendChild(h('div',{class:'card',style:'padding:16px 18px'},
-    h('div',{style:'display:flex;align-items:center;gap:9px;margin-bottom:5px'},
-      h('span',{class:'mono',style:'width:24px;height:24px;border-radius:100px;background:var(--ink);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center',text:s[0]}),
-      h('b',{style:'font-size:14px',text:s[1]})),
-    h('p',{style:'margin:0;font-size:12.5px;color:var(--ink2);line-height:1.6',text:s[2]}))));
-  return [h('p',{class:'kicker',text:'今日重點'}),
-    h('div',{class:'card',style:'padding:30px 32px'},
-      h('p',{style:'margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--teal)',text:'今日先看這裡 · '+D.date}),
-      h('h2',{style:'margin:0 0 8px;font-size:30px;font-weight:900;line-height:1.2;letter-spacing:.3px',text:o.headline}),
-      h('p',{style:'margin:0;max-width:72ch;font-size:15px;color:var(--ink2);line-height:1.7',text:o.summary}),
-      cards,
-      h('p',{style:'margin:18px 0 0;font-size:12.5px;color:var(--muted)',text:o.note})),
-    buildStrategyStatus(),
-    stepGrid];
+  const signals=h('div',{class:'command-signals'});
+  (o.points||[]).slice(0,2).forEach(p=>signals.appendChild(h('div',{class:'command-signal',style:`background:${toneBg(p.tone)}`},
+    h('span',{text:p.label}),h('b',{style:`color:${toneCol(p.tone)}`,text:p.value||p.text}))));
+  const counts=h('div',{class:'tier-counts'},
+    h('span',{class:'tier-counts-label',text:`今日分層概況（相對分層）· 全 ${D.allStocks.length} 檔`}),
+    h('span',{html:`<b class="mono cstrong">${strong}</b>強勢`}),
+    h('span',{html:`<b class="mono cteal">${accum}</b>蓄勢`}),
+    h('span',{html:`<b class="mono cweak">${weak}</b>弱勢`}));
+  const hero=h('article',{class:'card command-hero'},
+    h('div',{},
+      h('p',{class:'kicker',style:'color:var(--teal);margin-bottom:9px',text:'今日掃描焦點 · '+D.date}),
+      h('h1',{class:'command-headline',text:o.headline}),
+      h('p',{class:'command-summary',text:o.summary}),
+      signals,
+      h('p',{class:'note',style:'margin:13px 0 0;line-height:1.55',text:o.note})),
+    h('div',{class:'command-foot'},counts,
+      h('a',{class:'primary-cta',href:'#grp',text:'進入族群比較 ↓'})));
+
+  const leaders=[...D.groups].sort((a,b)=>b.axis.price-a.axis.price).slice(0,3);
+  const pulse=h('div',{class:'pulse-list'});
+  leaders.forEach((g,i)=>{const mom=g.axis.price*100,st=stateStyle(g.state);
+    pulse.appendChild(h('div',{class:'clickrow pulse-row',role:'button',tabindex:'0',
+      onclick:()=>openGroupSheet(g),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}},
+      title:'點開 '+grp(g.g).nm+' 族群明細'},
+      h('span',{class:'mono pulse-rank',text:String(i+1).padStart(2,'0')}),
+      h('div',{class:'pulse-name'},h('b',{text:grp(g.g).short}),
+        h('span',{style:`display:block;font-size:9.5px;color:${st.col};font-weight:700`,text:g.state})),
+      h('span',{class:'mono pulse-value',style:`color:${pctCol(mom)}`,text:fmtPct(mom,1)})));
+  });
+  const side=h('aside',{class:'command-side','aria-label':'今日快速入口'},
+    h('div',{class:'card pulse-card'},
+      h('div',{class:'pulse-head'},h('b',{text:'動能領先族群'}),h('a',{href:'#grp',text:'看完整比較 →'})),pulse,
+      h('p',{class:'note',style:'margin:11px 0 0',text:'依「動能 vs 全體」排序；點族群看明細。'})),
+    h('a',{class:'card shortlist-cta',href:'#tier'},
+      h('div',{},h('b',{text:'今日強弱個股名單'}),h('span',{text:'先看已確認分層，再展開完整八層'})),
+      h('span',{'aria-hidden':'true',text:'›'})));
+  return [h('div',{class:'command-grid'},hero,side)];
 }
 
 /* 策略狀態(證據強度)——只放事實,不放判斷。
@@ -571,13 +714,17 @@ function buildStrategyStatus(){
       : `所有 tier 的 OOS 欄目前為空(成熟 ${S.oos_mature==null?'—':S.oos_mature} 日);全期欄以校準窗為主、前瞻窗重疊會高估顯著性——OOS 欄有值前不下結論`,
     S.report_tier_url, '週報 ② →']);
   if(!rows.length) return h('div');
-  const box=h('div',{class:'card',id:'strategy-status',style:'padding:22px 26px;margin-top:22px;border-left:3px solid var(--amber)'});
-  const head=h('div',{style:'display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:4px'},
-    h('b',{style:'font-size:15px',text:'策略狀態 · 證據強度'}));
+  const box=h('details',{class:'card strategy-disclosure',id:'strategy-status'});
+  box.appendChild(h('summary',{},h('span',{class:'strategy-summary-copy'},
+    h('b',{text:'策略狀態 · 證據強度'}),
+    h('span',{text:'方法與可信度資訊；需要時再展開查看'}))));
+  const body=h('div',{class:'strategy-body'});
+  const head=h('div',{style:'display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:8px'},
+    h('b',{style:'font-size:12px;color:var(--muted)',text:'方法與證據'}));
   if(S.report_url) head.appendChild(h('a',{href:S.report_url,target:'_blank',rel:'noopener',
     style:'font-size:12px;font-weight:700;color:var(--teal)',text:'完整週度驗證報告 →'}));
-  box.appendChild(head);
-  box.appendChild(h('p',{style:'margin:0 0 14px;font-size:12.5px;color:var(--ink2);line-height:1.6',
+  body.appendChild(head);
+  body.appendChild(h('p',{style:'margin:0 0 14px;font-size:12.5px;color:var(--ink2);line-height:1.6',
     text:'下列全部是「證據狀態」與「結構」的事實,不是對個別因子有效性的判斷。分層本身描述相對位置,不是買賣指示。'}));
   const dl=h('div',{style:'display:grid;gap:11px'});
   rows.forEach(r=>{
@@ -589,7 +736,8 @@ function buildStrategyStatus(){
       h('div',{}, val,
         h('div',{style:'margin-top:2px;font-size:12px;color:var(--muted);line-height:1.55',text:r[2]}))));
   });
-  box.appendChild(dl);
+  body.appendChild(dl);
+  box.appendChild(body);
   return box;
 }
 
@@ -819,22 +967,32 @@ function buildGroup(){
       metricCell(dip,(dip>=0?'淨買 ':'淨賣 ')+Math.abs(dip).toFixed(2)+'%',dip>=0?'var(--strong)':'var(--weak)',dd,3)));
   });
 
+  const boardPanel=h('div',{id:'grp-panel-board',class:'group-panel',role:'tabpanel','aria-labelledby':'grp-tab-board'},
+    h('div',{class:'opthd'},h('b',{text:'① 動能排序 · 族群排行榜'}),h('span',{text:'每日先看這張表；點任一列看族群明細'})),board);
+  const quadPanel=h('div',{id:'grp-panel-quad',class:'group-panel',role:'tabpanel','aria-labelledby':'grp-tab-quad',hidden:''},
+    h('figure',{class:'card group-visual-card'},
+      h('figcaption',{style:'display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px'},
+        h('b',{style:'font-size:15px',text:'② 定位 · 族群價籌四象限'}),
+        h('span',{style:'font-size:12px;color:var(--muted)',text:'hover 圓點：單獨顯示該族群的 5 日移動 · 點圓點看明細'})),quadEl(G)));
+  const heatPanel=h('div',{id:'grp-panel-heat',class:'group-panel',role:'tabpanel','aria-labelledby':'grp-tab-heat',hidden:''},
+    h('figure',{class:'card group-visual-card'},
+      h('figcaption',{style:'margin-bottom:14px',html:`<b style="font-size:15px">③ 多維名次 · 族群熱圖</b> <span style="font-size:12px;color:var(--muted);margin-left:8px">每欄各自比較 ${G.length} 族群：<b style="color:var(--strong)">紅＝前段</b>、<b style="color:var(--weak)">綠＝後段</b>；▲▼＝較 5 日前</span>`}),
+      h('div',{class:'hscroll'},heatGrid)));
+  const panels={board:boardPanel,quad:quadPanel,heat:heatPanel},buttons=[];
+  const tabs=h('div',{class:'viewtabs',role:'tablist','aria-label':'族群比較視角'});
+  const specs=[['board','① 排行榜'],['quad','② 四象限'],['heat','③ 熱圖']];
+  function selectView(key){
+    specs.forEach(([k])=>{panels[k].hidden=k!==key; buttons.find(b=>b.dataset.key===k).setAttribute('aria-selected',k===key?'true':'false');});
+  }
+  specs.forEach(([key,label],idx)=>{const btn=h('button',{class:'rtab',id:'grp-tab-'+key,role:'tab','aria-controls':'grp-panel-'+key,
+      'aria-selected':idx===0?'true':'false',text:label,onclick:()=>selectView(key),
+      onkeydown:e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key))return;e.preventDefault();const step=e.key==='ArrowRight'?1:-1,next=(idx+step+specs.length)%specs.length;buttons[next].focus();selectView(specs[next][0]);}});
+    btn.dataset.key=key;buttons.push(btn);tabs.appendChild(btn);});
   return [
-    h('p',{class:'kicker',text:'族群層'}),
-    h('h2',{class:'sec',text:'族群比較 · 最近誰在領漲、誰有人接'}),
-    h('p',{class:'lead',html:'回答「資金正在佈局哪個族群」。橫軸＝族群整體<b style="color:var(--ink)">跑贏/跑輸</b>全市場，縱軸＝下跌時外資<b style="color:var(--ink)">淨買/淨賣</b>。同一組族群、三種互補視角：<b style="color:var(--ink)">① 四象限</b>定位、<b style="color:var(--ink)">② 熱圖</b>看多維名次、<b style="color:var(--ink)">③ 排行榜</b>逐欄排序。'}),
-    h('div',{style:'display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start'},
-      h('div',{style:'flex:1 1 540px;min-width:min(520px,100%)'},
-        h('div',{class:'opthd'},h('b',{text:'四象限地圖與熱圖'}),h('span',{text:'看全貌與 5 日位移'})),
-        h('figure',{class:'card',style:'margin:0 0 18px;padding:22px'},
-          h('figcaption',{style:'display:flex;justify-content:space-between;margin-bottom:6px'},h('b',{style:'font-size:15px',text:'① 定位 · 族群價籌四象限'}),h('span',{style:'font-size:12px;color:var(--muted)',text:'hover 圓點：單獨顯示該族群的 5 日移動 · 點圓點看明細'})),
-          quadEl(G)),
-        h('figure',{class:'card',style:'margin:0;padding:22px'},
-          h('figcaption',{style:'margin-bottom:14px',html:`<b style="font-size:15px">② 多維名次 · 族群熱圖</b> <span style="font-size:12px;color:var(--muted);margin-left:8px">每欄各自比較 ${G.length} 族群：<b style="color:var(--strong)">紅＝前段</b>、<b style="color:var(--weak)">綠＝後段</b>；▲▼＝較 5 日前</span>`}),
-          h('div',{class:'hscroll'},heatGrid))),
-      h('div',{style:'flex:1 1 540px;min-width:min(520px,100%)'},
-        h('div',{class:'opthd'},h('b',{text:'③ 可排序 · 族群排行榜'}),h('span',{text:'點任一列看族群明細'})),
-        board))
+    h('div',{class:'section-head'},
+      h('div',{},h('p',{class:'kicker',text:'族群層'}),h('h2',{class:'sec',text:'族群比較 · 最近誰在領先、誰有人接'}),
+        h('p',{class:'lead',html:'回答「資金正在佈局哪個族群」。排行榜先比較族群整體<b style="color:var(--ink)">跑贏／跑輸</b>全市場與下跌時外資<b style="color:var(--ink)">淨買／淨賣</b>；四象限與熱圖保留為第二視角。'})),tabs),
+    boardPanel,quadPanel,heatPanel
   ];
 }
 function deltaTxt(txt){ if(!txt)return{t:'',c:'var(--muted)'}; const m=txt.match(/([+\-−]?\d[\d.]*\s*(?:pp|%|張)?)\s*$/),num=m?m[1]:'';
@@ -1105,15 +1263,33 @@ function buildTier(){
   const gsel=h('select',{class:'sortbtn','aria-label':'分層篩選族群',onchange:e=>{curG=e.target.value;renderBands();renderFlow();}});
   gsel.appendChild(h('option',{value:'',text:'全部族群'}));
   D.groups.forEach(g=>gsel.appendChild(h('option',{value:g.g,text:grp(g.g).nm})));
-  return [h('p',{class:'kicker',text:'族群層'}),h('h2',{class:'sec',text:'個股分層 · 已確認的相對強弱'}),
-    h('p',{class:'lead',html:`有效交易標的依分數組合分層；暫停／未交易股票另列並保留最近一次訊號。完整追蹤 ${D.allStocks.length} 檔，分層名稱描述相對位置，<b style="color:var(--ink)">不是買賣指示</b>。選族群可看該族群全部成員；<b style="color:var(--ink)">點任一檔</b>看完整明細。`
-      +(STRATEGY&&STRATEGY.dwell!=null?`各層停留天數不長（相對強勢中位 <b style="color:var(--ink)">${STRATEGY.dwell.toFixed(0)} 個交易日</b>），名單本身會頻繁變動；穩定度與證據狀態見上方<a href="#strategy-status" style="color:var(--teal);font-weight:700">策略狀態</a>。`:'')
-      +absCaveat()}),
-    h('div',{class:'toolbar'},gsel),
-    bands,
-    h('div',{style:'margin-top:34px'},h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px'},h('h3',{style:'margin:0;font-size:17px;font-weight:800',text:'近 5 日變層軌跡'}),
-      flowNote),
-      h('div',{class:'card',style:'padding:8px 24px 16px'},fg))];
+  const snapshot=h('div',{class:'tier-snapshot'});
+  const snapshotDefs=[
+    ['相對強勢','價格與籌碼多在族群前段','var(--strong)',D.allStocks.filter(s=>!s.trading&&s.tier==='真強')],
+    ['相對蓄勢','籌碼靠前、價格位置仍待確認','var(--teal)',D.allStocks.filter(s=>!s.trading&&s.tier==='蓄勢·外資佈局')],
+    ['相對弱勢','價格與綜合分在族群後段','var(--weak)',D.allStocks.filter(s=>!s.trading&&(s.tier==='真弱'||s.tier==='真弱·陷阱'))]
+  ];
+  snapshotDefs.forEach(([title,desc,col,mem])=>{mem.sort((a,b)=>b.comp-a.comp);const list=h('div',{class:'tier-snapshot-list'});
+    mem.slice(0,6).forEach(s=>list.appendChild(stockPill(s)));
+    if(!mem.length)list.appendChild(h('span',{class:'note',text:'目前無成員'}));
+    snapshot.appendChild(h('div',{class:'card tier-snapshot-card',style:`border-left-color:${col}`},
+      h('div',{class:'tier-snapshot-head'},h('b',{style:`color:${col}`,text:title}),h('span',{class:'mono',style:`color:${col}`,text:mem.length})),
+      h('p',{class:'note',style:'margin:-7px 0 11px',text:desc}),list,
+      mem.length>6?h('div',{class:'tier-snapshot-more',text:'另 '+(mem.length-6)+' 檔，展開完整分層查看'}):null));});
+  const caveat=absCaveat();
+  const fullBody=h('div',{class:'tier-full-body'},
+    caveat?h('p',{style:'margin:0 0 14px;font-size:12px;color:var(--ink2);line-height:1.65',html:caveat}):null,
+    h('div',{class:'toolbar'},gsel),bands,
+    h('div',{style:'margin-top:34px'},
+      h('div',{style:'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px'},
+        h('h3',{style:'margin:0;font-size:17px;font-weight:800',text:'近 5 日變層軌跡'}),flowNote),
+      h('div',{class:'card',style:'padding:8px 24px 16px'},fg)));
+  const full=h('details',{class:'tier-full'},
+    h('summary',{text:'完整八層、族群篩選與近 5 日變層軌跡'}),fullBody);
+  return [h('p',{class:'kicker',text:'個股層'}),h('h2',{class:'sec',text:'今日確認名單 · 先看主要強弱層'}),
+    h('p',{class:'lead',html:`完整追蹤 ${D.allStocks.length} 檔；這裡先呈現相對強勢、蓄勢與弱勢三個主要名單。分層名稱描述族群內相對位置，<b style="color:var(--ink)">不是買賣指示</b>；點任一檔可看完整明細。`
+      +(STRATEGY&&STRATEGY.dwell!=null?`各層停留天數不長（相對強勢中位 <b style="color:var(--ink)">${STRATEGY.dwell.toFixed(0)} 個交易日</b>），名單本身會頻繁變動；穩定度與證據狀態見頁尾<a href="#strategy-status" style="color:var(--teal);font-weight:700">策略狀態</a>。`:'')}),
+    snapshot,full];
 }
 
 function nbRuns(runs){ return (runs||[]).map(r=>{ if(r.a)return h('a',{href:r.a,text:r.s}); if(r.b)return h('b',{style:'color:var(--ink)',text:r.s}); return document.createTextNode(r.s==null?'':r.s); }); }
@@ -1364,71 +1540,46 @@ function buildDetail(){
   return card;
 }
 
-/* ---------- 研究中心入口：完整列出最近發布批次，再補其他類型的最近一篇 ---------- */
+/* ---------- 研究中心入口：首頁只做三篇跨類型導覽，完整批次留在研究中心 ---------- */
 function buildRecentArticles(){
   const fmtDate=value=>String(value||'').replaceAll('-','/');
-  const head=[
-    h('p',{class:'kicker',text:'深度研究 · 獨立閱讀空間'}),
-    h('h2',{class:'sec',text:'研究中心'}),
-    h('p',{class:'lead',text:'正式筆記、多空小作文與市場議題已移到獨立頁面，可搜尋、篩選並在站內閱讀全文。首頁完整列出最近一個發布批次，再補上該批次未包含類型的最近文章；新近不代表證據較強，查核狀態與觀察層警語逐篇保留。'})
-  ];
-  const card=h('div',{class:'card',style:'padding:20px 22px'});
   const items=(RECENT&&RECENT.items)||[];
   const latestDate=(RECENT&&RECENT.latestDate)||(items[0]&&items[0].date)||'';
-  const latestItems=items.filter(item=>item.date===latestDate);
-  const latestTypes=new Set(latestItems.map(item=>item.type));
-  const supplemental=['formal_note','narrative','topic'].map(type=>
-    latestTypes.has(type)?null:items.find(item=>item.type===type)).filter(Boolean);
-  const visible=latestItems.concat(supplemental);
   const libraryTotal=(RECENT&&Number.isFinite(RECENT.libraryTotal))?RECENT.libraryTotal:items.length;
   const libraryCounts=(RECENT&&RECENT.libraryCounts)||((RECENT&&RECENT.counts)||[]);
-  const summary=h('div',{class:'recent-summary'},
+  const summary=h('div',{class:'recent-summary',style:'margin:0'},
     h('span',{class:'recent-total',text:'研究庫共 '+libraryTotal+' 篇'}),
     h('span',{class:'recent-count',text:'近 '+((RECENT&&RECENT.days)||14)+' 日 '+items.length+' 篇'}),
-    latestDate&&h('span',{class:'recent-count',text:'最新批次 '+fmtDate(latestDate)+' · '+latestItems.length+' 篇'}));
+    latestDate&&h('span',{class:'recent-count',text:'最新 '+fmtDate(latestDate)}));
   libraryCounts.forEach(c=>summary.appendChild(
     h('span',{class:'recent-count',text:c.label+' '+c.count})));
-  card.appendChild(summary);
+  const head=h('div',{class:'research-head'},
+    h('div',{},h('p',{class:'kicker',text:'深度研究 · 獨立閱讀空間'}),
+      h('h2',{class:'sec',text:'研究中心 · 近期研究'}),
+      h('p',{class:'lead',text:'首頁保留三篇跨類型入口；完整發布批次、搜尋、篩選與全文閱讀都在研究中心。'})),
+    h('div',{class:'research-actions'},summary,
+      h('a',{class:'togglebtn',href:RESEARCH_BASE,style:'font-weight:800',text:'進入研究中心 →'})));
   if(!items.length){
-    card.appendChild(h('p',{style:'margin:4px 0;color:var(--muted);font-size:13px',text:'這個文章窗沒有可可靠解析的更新。'}));
-    return head.concat(card);
+    return [head,h('div',{class:'card',style:'padding:20px 22px'},
+      h('p',{style:'margin:0;color:var(--muted);font-size:13px',text:'這個文章窗沒有可可靠解析的更新。'}))];
   }
-
-  const list=h('div',{id:'recent-list',class:'recent-list','aria-label':'研究中心最新文章'});
-  const appendItem=(item,isLatest)=>{
-      const statusClass='recent-status '+(item.statusTone||'');
-      const attrs={class:'recent-item'+(isLatest?' latest':''),href:item.researchId?RESEARCH_BASE+'#'+encodeURIComponent(item.researchId):item.url,
-        'aria-label':item.date+' '+item.typeLabel+' '+item.subject+'：'+item.title+'；'+item.status};
-      if(!item.researchId){attrs.target='_blank';attrs.rel='noopener noreferrer';}
-      list.appendChild(h('a',attrs,
-        h('div',{},
-          h('time',{class:'recent-date',datetime:item.date,text:fmtDate(item.date)}),
-          h('span',{class:'recent-type',text:item.typeLabel})),
-        h('div',{style:'min-width:0'},
-          h('div',{},
-            h('span',{class:'recent-who',text:item.subject}),
-            h('span',{class:statusClass,text:item.status})),
-          h('p',{class:'recent-title',text:item.title})),
-        h('span',{class:'recent-arrow','aria-hidden':'true',text:'↗'})
-      ));
-  };
-  if(latestItems.length){
-    list.appendChild(h('div',{class:'recent-batch-label'},
-      h('span',{text:'最近發布批次'}),
-      h('span',{text:fmtDate(latestDate)+' · '+latestItems.length+' 篇全部列出'})));
-    latestItems.forEach(item=>appendItem(item,true));
-  }
-  if(supplemental.length){
-    list.appendChild(h('div',{class:'recent-batch-label'},
-      h('span',{text:'其他類型最近更新'}),
-      h('span',{text:'補列 '+supplemental.length+' 篇'})));
-    supplemental.forEach(item=>appendItem(item,false));
-  }
-  const actions=h('div',{class:'recent-actions'},
-    h('span',{class:'recent-shown','aria-live':'polite',text:'首頁顯示 '+visible.length+' 篇：最新批次 '+latestItems.length+' 篇全部列出；另補 '+supplemental.length+' 篇其他類型'}),
-    h('a',{class:'togglebtn',href:RESEARCH_BASE,style:'margin-left:auto;font-weight:800',text:'開啟研究中心 →'}));
-  card.append(list,actions);
-  return head.concat(card);
+  const chosen=[];
+  ['formal_note','narrative','topic'].forEach(type=>{const item=items.find(x=>x.type===type);if(item)chosen.push(item);});
+  items.forEach(item=>{if(chosen.length<3&&!chosen.includes(item))chosen.push(item);});
+  const visible=items.filter(item=>chosen.includes(item)).slice(0,3);
+  const list=h('div',{id:'recent-list',class:'research-grid','aria-label':'研究中心近期文章'});
+  visible.forEach(item=>{const statusClass='recent-status '+(item.statusTone||'');
+    const attrs={class:'recent-item'+(item.date===latestDate?' latest':''),href:item.researchId?RESEARCH_BASE+'#'+encodeURIComponent(item.researchId):item.url,
+      'aria-label':item.date+' '+item.typeLabel+' '+item.subject+'：'+item.title+'；'+item.status};
+    if(!item.researchId){attrs.target='_blank';attrs.rel='noopener noreferrer';}
+    list.appendChild(h('a',attrs,
+      h('div',{class:'recent-meta'},h('time',{class:'recent-date',datetime:item.date,text:fmtDate(item.date)}),
+        h('span',{class:'recent-type',text:item.typeLabel})),
+      h('div',{style:'min-width:0'},h('span',{class:'recent-who',text:item.subject}),h('p',{class:'recent-title',text:item.title})),
+      h('span',{class:statusClass,text:item.status}),h('span',{class:'recent-arrow','aria-hidden':'true',text:'↗'})));
+  });
+  return [head,list,h('p',{class:'note',style:'margin:11px 2px 0;line-height:1.6',
+    text:'首頁各類型最多先取一篇，再依時間補足三篇。新近不代表證據較強；查核狀態與觀察層警語逐篇保留。'})];
 }
 
 /* ---------- 主題切換 ---------- */
@@ -1444,12 +1595,13 @@ document.body.appendChild(sheetwrap);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 /* ---------- 掛載 ---------- */
 document.getElementById('ov').append(...buildOverview());
-document.getElementById('recent').append(...buildRecentArticles());
 document.getElementById('grp').append(...buildGroup());
 document.getElementById('tier').append(...buildTier());
+document.getElementById('recent').append(...buildRecentArticles());
 document.getElementById('diverge').append(...buildDiverge());
 document.getElementById('lens').append(...buildLenses());
 document.getElementById('stocks').append(...buildStocks1c());
+document.getElementById('trust').append(buildStrategyStatus());
 </script>
 </body>
 </html>
