@@ -84,7 +84,7 @@ class DashboardUxContractTest(unittest.TestCase):
                  "__TIER_FLOW_JSON__", "__OVERVIEW_JSON__", "__GRPMETA_JSON__",
                  "__WEIGHTS_JSON__", "__THRESH_JSON__",
                  "__STRATEGY_JSON__", "__DIVERGE_JSON__",
-                 "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__",
+                 "__MKT_TIP_JSON__", "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__",
                  "__SCOPE__")
         for ph in pairs:
             self.assertIn(ph, self.template)
@@ -95,6 +95,29 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("tier:s.tier_confirmed", self.template)
         self.assertIn("tierLabel:s.tier_label", self.template)
         self.assertIn("waiting:s.tier_waiting", self.template)
+
+    def test_market_source_note_discloses_primary_crosscheck_and_fallback(self):
+        self.assertIn("MKT=__MKT_TIP_JSON__", self.template)
+        self.assertIn("text:MKT.src", self.template)
+        self.assertIn("market-source-note", self.template)
+        self.assertEqual(
+            bd.market_source_text({
+                "canonical_source": fd.MARKET_SOURCE_TWSE,
+                "finmind_taiex": 100.0,
+            }),
+            "TWSE 官方 MI_INDEX 發行量加權股價報酬指數（FinMind 已交叉驗證）")
+        self.assertIn("FinMind 待交叉驗證", bd.market_source_text({
+            "canonical_source": fd.MARKET_SOURCE_TWSE,
+            "finmind_taiex": None,
+        }))
+        self.assertIn("TWSE 官方缺值備援", bd.market_source_text({
+            "canonical_source": fd.MARKET_SOURCE_FINMIND,
+            "finmind_taiex": 100.0,
+        }))
+        self.assertIn("來源異常", bd.market_source_text({
+            "canonical_source": fd.MARKET_SOURCE_CONFLICT,
+            "finmind_taiex": 101.0,
+        }))
 
     def test_strategy_status_card_shows_evidence_state_not_judgement(self):
         """頁尾折疊「策略狀態」:只放證據狀態與結構事實,不得放個別因子判斷。

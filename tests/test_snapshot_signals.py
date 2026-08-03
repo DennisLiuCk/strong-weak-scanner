@@ -33,6 +33,9 @@ class SnapshotSignalsTest(unittest.TestCase):
         CREATE TABLE group_metrics(date TEXT, grp TEXT, breadth_f REAL, med_dist60 REAL,
           rel20 REAL, med_dip REAL, breadth_t REAL, state TEXT, note TEXT, PRIMARY KEY(date,grp));
         CREATE TABLE market_daily(date TEXT PRIMARY KEY, taiex REAL, dd20 REAL, regime INTEGER);
+        CREATE TABLE market_provenance(
+          date TEXT PRIMARY KEY, canonical_source TEXT NOT NULL, official_taiex REAL,
+          finmind_taiex REAL, abs_diff REAL, checked_at TEXT);
         CREATE TABLE risk_flags(date TEXT, stock_id TEXT, kind TEXT, reason TEXT, period TEXT);
         CREATE TABLE price(date TEXT, stock_id TEXT, open REAL, high REAL, low REAL,
                            close REAL, volume INTEGER, amount REAL, trades INTEGER);
@@ -67,6 +70,9 @@ class SnapshotSignalsTest(unittest.TestCase):
         self.con.execute("INSERT INTO group_metrics VALUES(?,?,?,?,?,?,?,?,?)",
                          (self.date, "g", .5, -.1, .02, .03, .5, "中性觀察", "test"))
         self.con.execute("INSERT INTO market_daily VALUES(?,?,?,?)", (self.date, 100.0, -.04, 1))
+        self.con.execute(
+            "INSERT INTO market_provenance VALUES(?,?,?,?,?,?)",
+            (self.date, "TWSE_MI_INDEX", 100.0, 100.0, 0.0, "now"))
         self.con.execute("INSERT INTO risk_flags VALUES(?,?,?,?,?)",
                          (self.date, "1001", "注意", "test", None))
         self.con.commit()
@@ -193,6 +199,8 @@ class SnapshotSignalsTest(unittest.TestCase):
         self.assertEqual((quality["universe"], quality["eligible"], quality["inst"]),
                          (2, 1, 1))
         self.assertEqual(quality["excluded"][0]["stock_id"], "1002")
+        self.assertEqual(quality["market_source"], "TWSE_MI_INDEX")
+        self.assertEqual(quality["market_abs_diff"], 0.0)
         self.assertEqual(self.con.execute(
             "SELECT COUNT(*) FROM oos_signal_snapshots WHERE snapshot_id='run-halt'"
         ).fetchone()[0], 1)
@@ -212,6 +220,30 @@ class SnapshotSignalsTest(unittest.TestCase):
         self.con.commit()
         with self.assertRaisesRegex(RuntimeError, "大盤資料未同步"):
             self.capture("run-market-lag", "2026-07-10T14:00:00+00:00")
+
+    def test_official_publish_rejects_market_source_conflict(self):
+        self.con.execute(
+            """UPDATE market_provenance
+               SET canonical_source='conflict',official_taiex=100,finmind_taiex=101,abs_diff=1""")
+        self.con.commit()
+        with self.assertRaisesRegex(RuntimeError, "來源／canonical 不一致"):
+            self.capture("run-market-conflict", "2026-07-10T14:00:00+00:00")
+
+    def test_official_publish_accepts_finmind_fallback_with_provenance(self):
+        self.con.execute(
+            """UPDATE market_provenance
+               SET canonical_source='FinMind_fallback',official_taiex=NULL,
+                   finmind_taiex=100,abs_diff=NULL""")
+        self.con.commit()
+        sid, _date, created = self.capture(
+            "run-market-fallback", "2026-07-10T14:00:00+00:00")
+        self.assertEqual((sid, created), ("run-market-fallback", True))
+
+    def test_official_publish_rejects_missing_market_provenance_table(self):
+        self.con.execute("DROP TABLE market_provenance")
+        self.con.commit()
+        with self.assertRaisesRegex(RuntimeError, "缺 provenance 表"):
+            self.capture("run-market-no-source", "2026-07-10T14:00:00+00:00")
 
     def test_official_publish_rejects_lagging_event_coverage(self):
         self.con.execute("""CREATE TABLE fetch_coverage(

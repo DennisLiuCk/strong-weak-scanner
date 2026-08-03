@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""唯讀稽核正式 SQLite 的五張原始表與 market_index。
+"""唯讀稽核正式 SQLite 的五張原始表、market canonical/provenance 與 market_index。
 
 退出碼：0=五表完整且公式正確（可含非阻斷 warning）、1=資料契約失敗、2=參數／檔案錯誤。
 預設 universe 來自 config/universe.csv；交易日 spine 使用該 universe 的 price ∪ market。
@@ -131,10 +131,83 @@ def _audit_market_index(con, dates, report):
     }
     if twse_missing:
         report["warnings"].append(
-            f"TWSE market_index 缺 {len(twse_missing)} 個交易日（觀察層、非阻斷）")
+            f"TWSE market_index 主來源缺 {len(twse_missing)} 個交易日（須由 FinMind 備援）")
     if tpex_missing:
         report["warnings"].append(
             f"TPEx market_index 最新月缺 {len(tpex_missing)} 個交易日（觀察層、非阻斷）")
+
+
+def _audit_market_canonical(con, dates, report):
+    required = {
+        "market": {"date", "taiex"},
+        "market_provenance": {
+            "date", "canonical_source", "official_taiex", "finmind_taiex", "abs_diff",
+        },
+    }
+    for table, columns in required.items():
+        if not _table_exists(con, table):
+            report["errors"].append(f"缺少正式大盤表 {table}")
+            return
+        missing = columns - _table_columns(con, table)
+        if missing:
+            report["errors"].append(
+                f"{table} 缺欄 {','.join(sorted(missing))}")
+            return
+    first, last = min(dates), max(dates)
+    market_rows = {row[0]: row[1] for row in con.execute(
+        "SELECT date,taiex FROM market WHERE date BETWEEN ? AND ?", (first, last))
+        if row[0] in dates}
+    provenance_rows = {row[0]: row for row in con.execute(
+        """SELECT date,canonical_source,official_taiex,finmind_taiex,abs_diff
+           FROM market_provenance WHERE date BETWEEN ? AND ?""", (first, last))
+        if row[0] in dates}
+    missing_market = sorted(dates - set(market_rows))
+    missing_provenance = sorted(dates - set(provenance_rows))
+    conflicts = []
+    sources = {}
+    pending_crosscheck = 0
+    for day in sorted(dates):
+        provenance = provenance_rows.get(day)
+        if provenance is None:
+            continue
+        _date, source, official, finmind, diff = provenance
+        taiex = market_rows.get(day)
+        sources[source] = sources.get(source, 0) + 1
+        if finmind is None:
+            pending_crosscheck += 1
+        bad = source not in {fd.MARKET_SOURCE_TWSE, fd.MARKET_SOURCE_FINMIND}
+        if official is not None and finmind is not None:
+            calculated_diff = abs(official - finmind)
+            bad = (bad or calculated_diff > fd.MARKET_CROSSCHECK_TOLERANCE
+                   or diff is None
+                   or abs(diff - calculated_diff) > fd.MARKET_CROSSCHECK_TOLERANCE)
+        if source == fd.MARKET_SOURCE_TWSE:
+            bad = (bad or taiex is None or official is None
+                   or abs(taiex - official) > fd.MARKET_CROSSCHECK_TOLERANCE)
+        elif source == fd.MARKET_SOURCE_FINMIND:
+            bad = (bad or taiex is None or official is not None or finmind is None
+                   or abs(taiex - finmind) > fd.MARKET_CROSSCHECK_TOLERANCE)
+        if bad:
+            conflicts.append(day)
+    report["market_canonical"] = {
+        "complete_dates": len(market_rows), "expected_dates": len(dates),
+        "missing_dates": len(missing_market), "missing_samples": missing_market[:MAX_SAMPLES],
+        "missing_provenance": len(missing_provenance),
+        "provenance_samples": missing_provenance[:MAX_SAMPLES],
+        "source_counts": dict(sorted(sources.items())),
+        "pending_finmind_crosscheck": pending_crosscheck,
+        "conflicts": len(conflicts), "conflict_samples": conflicts[:MAX_SAMPLES],
+    }
+    if missing_market:
+        report["errors"].append(f"market canonical 缺 {len(missing_market)} 個交易日")
+    if missing_provenance:
+        report["errors"].append(
+            f"market provenance 缺 {len(missing_provenance)} 個交易日")
+    if conflicts:
+        report["errors"].append(f"market 來源／canonical 不一致 {len(conflicts)} 個交易日")
+    if pending_crosscheck:
+        report["warnings"].append(
+            f"FinMind TAIEX 尚有 {pending_crosscheck} 日待交叉驗證（TWSE canonical 可正常使用）")
 
 
 def audit_connection(con, stock_ids, start=None, end=None):
@@ -147,6 +220,7 @@ def audit_connection(con, stock_ids, start=None, end=None):
                   "expected_rows_per_table": 0, "start": start, "end": end},
         "tables": {},
         "invariants": {},
+        "market_canonical": {},
         "market_index": {},
         "warnings": [],
         "errors": [],
@@ -284,6 +358,7 @@ def audit_connection(con, stock_ids, start=None, end=None):
                     "sbl_adjustment"),
                    lambda bal, prev, sell, returned, adjustment:
                    bal == prev + sell - returned + adjustment)
+    _audit_market_canonical(con, dates, report)
     _audit_market_index(con, dates, report)
     report["ok"] = not report["errors"]
     return report
@@ -307,6 +382,14 @@ def format_report(report):
             f"expanded {item['expanded_complete_rows']}/{item['expected_rows']}")
     for name, item in report["invariants"].items():
         lines.append(f"公式 {name}: mismatch {item['mismatches']}")
+    if report["market_canonical"]:
+        market = report["market_canonical"]
+        source_text = ",".join(
+            f"{name}={count}" for name, count in market["source_counts"].items()) or "none"
+        lines.append(
+            f"market canonical: {market['complete_dates']}/{market['expected_dates']} 交易日 · "
+            f"sources {source_text} · conflicts {market['conflicts']} · "
+            f"FinMind pending {market['pending_finmind_crosscheck']}")
     if report["market_index"]:
         twse = report["market_index"]["twse"]
         tpex = report["market_index"]["tpex_latest_month"]

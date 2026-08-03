@@ -21,7 +21,9 @@ from score import (WEIGHTS, VOLR_ACTIVE, VOLR_DRY, VOL_OVERHEAT, VOLR_OVERHEAT,
                    MARGIN_UTIL_HOT, MARGIN_UTIL_MID, MARGIN_DOWN_BIG, MARGIN_UP_BIG,
                    DZ_FOREIGN, DZ_TRUST, STEALTH_OFF_HIGH, _chip_signal)
 # 族群/大盤門檻單一事實來源(fetch_daily 頂部旋鈕),族群卡與市場籤條 tooltip 顯示用
-from fetch_daily import REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW
+from fetch_daily import (REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW,
+                         MARKET_SOURCE_TWSE, MARKET_SOURCE_FINMIND,
+                         MARKET_SOURCE_LEGACY)
 import db_ro                     # 唯讀開啟的唯一入口(鐵律);這支只讀 db,只寫 html
 import trading_status as tstatus
 import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡報、週報 §⑦⑧ 同一組函式)
@@ -116,6 +118,22 @@ def pct(x, signed=False):
 def pctp(x):
     """給『本身已是百分比』的欄位(turnover_pct / margin_util_pct):不再 × 100。"""
     return "-" if x is None else f"{x:.1f}%"
+
+
+def market_source_text(provenance):
+    """把 market_provenance 轉成使用者看得懂、可稽核的來源說明。"""
+    if not provenance:
+        return "大盤來源未記錄（舊資料庫）"
+    source = provenance["canonical_source"]
+    if source == MARKET_SOURCE_TWSE:
+        checked = provenance["finmind_taiex"] is not None
+        return ("TWSE 官方 MI_INDEX 發行量加權股價報酬指數"
+                f"（FinMind {'已交叉驗證' if checked else '待交叉驗證'}）")
+    if source == MARKET_SOURCE_FINMIND:
+        return "FinMind TAIEX 含息報酬指數（TWSE 官方缺值備援）"
+    if source == MARKET_SOURCE_LEGACY:
+        return "FinMind TAIEX 含息報酬指數（舊資料，待來源遷移）"
+    return f"大盤來源異常：{source}"
 
 # 每個元素:score → 理由文字
 R_PRICE = {2: "20日相對報酬位於族群前20%", 1: "20日相對報酬位於族群前20–40%",
@@ -2267,6 +2285,14 @@ def main():
                                WHERE date<=? ORDER BY date""", (last,)).fetchall()
     except sqlite3.OperationalError:
         grows, mk, mkt20, ghist = [], None, None, []
+    market_provenance = None
+    if mk:
+        try:
+            market_provenance = con.execute(
+                """SELECT canonical_source,official_taiex,finmind_taiex,abs_diff
+                   FROM market_provenance WHERE date=?""", (mk["date"],)).fetchone()
+        except sqlite3.OperationalError:
+            pass
     gseries = {}
     for x in ghist:
         gseries.setdefault(x["grp"], []).append(x)
@@ -2521,9 +2547,6 @@ def main():
                 group_observation_map[g], GROUP_NM.get(g, g), GROUP_TAG.get(g, ""))
         groups.append(gobj)
     overview = build_overview(grows)
-    lag = f",指數至 {int(mk['date'][5:7])}/{int(mk['date'][8:10])}" if (mk and mk["date"] != last) else ""
-    mchip = (f"市場 <b>{'⚠ 修正' if mk['regime'] else '多頭/中性'}</b>(報酬指數距20日高 {mk['dd20']*100:+.1f}%{lag})"
-             if (mk and mk["dd20"] is not None) else "市場 <b>-</b>")
     mtip = None
     if mk and mk["dd20"] is not None:
         regime = bool(mk["regime"])
@@ -2543,7 +2566,7 @@ def main():
                     "距 20 日高回落未達門檻,市場處於多頭/中性,個股訊號以族群內相對強弱為主。"),
             "how": (f"距20日高 ≤ {REGIME_DD*100:.0f}% → 修正市場情境。使用「含息」報酬指數而非"
                     "價格指數,避免除息季的機械性下跌扭曲市場比較。"),
-            "src": "FinMind 加權報酬指數(TAIEX 含息)"}
+            "src": market_source_text(market_provenance)}
 
     data, tiers_map = [], {}
     for r in rows:
@@ -2773,7 +2796,6 @@ def main():
     if status_rows:
         scope += f" · 暫停／未交易 {len(status_rows)} 檔（完整名單 {universe_n}）"
     html = html.replace("__SCOPE__", scope)
-    html = html.replace("__MARKET_CHIP__", mchip)
     html = html.replace("__MKT_TIP_JSON__", json.dumps(mtip, ensure_ascii=False))
     html = html.replace("__GROUP_HOW_JSON__", json.dumps({"how": GROUP_HOW, "src": GROUP_SRC},
                                                          ensure_ascii=False))

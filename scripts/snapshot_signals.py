@@ -20,6 +20,7 @@ import sys
 import uuid
 
 import trading_status as tstatus
+import fetch_daily as fd
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -245,10 +246,52 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
     if is_official and (not market or market["date"] != data_date):
         got = market["date"] if market else None
         raise RuntimeError(f"拒絕發布大盤資料未同步快照 {data_date}:market_daily={got}")
+    market_provenance = None
+    have_market_provenance = con.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='market_provenance'").fetchone()
+    if is_official and not have_market_provenance:
+        raise RuntimeError(f"拒絕發布大盤缺 provenance 表快照 {data_date}")
+    if have_market_provenance:
+        market_provenance = con.execute(
+            """SELECT canonical_source,official_taiex,finmind_taiex,abs_diff
+               FROM market_provenance WHERE date=?""", (data_date,)).fetchone()
+        if is_official and not market_provenance:
+            raise RuntimeError(f"拒絕發布大盤缺 provenance 快照 {data_date}")
+        if market_provenance:
+            market_source = market_provenance["canonical_source"]
+            official = market_provenance["official_taiex"]
+            finmind = market_provenance["finmind_taiex"]
+            diff = market_provenance["abs_diff"]
+            allowed = {fd.MARKET_SOURCE_TWSE, fd.MARKET_SOURCE_FINMIND}
+            canonical = official if market_source == fd.MARKET_SOURCE_TWSE else finmind
+            dual_source_bad = (
+                official is not None and finmind is not None
+                and (diff is None
+                     or abs(official - finmind) > fd.MARKET_CROSSCHECK_TOLERANCE
+                     or abs(diff - abs(official - finmind))
+                     > fd.MARKET_CROSSCHECK_TOLERANCE))
+            fallback_bad = (market_source == fd.MARKET_SOURCE_FINMIND
+                            and official is not None)
+            if is_official and (
+                    market_source not in allowed or canonical is None
+                    or dual_source_bad or fallback_bad
+                    or abs(market["taiex"] - canonical)
+                    > fd.MARKET_CROSSCHECK_TOLERANCE):
+                raise RuntimeError(
+                    f"拒絕發布大盤來源／canonical 不一致快照 "
+                    f"{data_date}:source={market_source}")
     counts.update({"universe": universe_n, "eligible": eligible_n,
                    "excluded_count": len(excluded), "excluded": excluded,
                    "daily_scores": score_n, "daily_metrics": metric_n,
-                   "group_metrics": gm_n, "market_date": market["date"] if market else None})
+                   "group_metrics": gm_n, "market_date": market["date"] if market else None,
+                   "market_source": (market_provenance["canonical_source"]
+                                     if market_provenance else None),
+                   "market_official_taiex": (market_provenance["official_taiex"]
+                                             if market_provenance else None),
+                   "market_finmind_taiex": (market_provenance["finmind_taiex"]
+                                            if market_provenance else None),
+                   "market_abs_diff": (market_provenance["abs_diff"]
+                                       if market_provenance else None)})
 
     # 空事件/空風險名單在事件表本身看不出「已檢查」；fetch_daily 以 coverage 保存負面
     # 證據。升級前 db 沒有此表時維持相容，升級後正式發布必須全部檢查到資料日。

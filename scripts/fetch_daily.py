@@ -20,8 +20,8 @@
 
 Token 讀取順序:環境變數 FINMIND_TOKEN/FINMIND_TOKEN2/FINMIND_TOKEN3
 → 專案根目錄 .mcp.json。
-五張原始表皆由 TWSE/TPEx 官方全市場日報各抓一次；FinMind 僅留除權息、分割、
-加權報酬指數與參考個股等事件／觀察序列。
+五張原始表皆由 TWSE/TPEx 官方全市場日報各抓一次；大盤以 TWSE 官方加權報酬指數為
+正式主來源，FinMind 同序列只做交叉驗證／官方缺值備援，另留除權息、分割與參考個股。
 抓完會自動重算 daily_metrics(五元素衍生指標表)。
 價格類指標(ret1/距高)用還原股價 price_adj。FinMind 的 TaiwanStockPriceAdj 免費層不可用
 (需 Sponsor),所以改抓 TaiwanStockDividendResult + TaiwanStockSplitPrice(皆免費),
@@ -80,6 +80,11 @@ GRP_MIN_N      = 6       # 族群聚合最少有效檔數(避免 1 檔代表全�
 GS_OFF_HIGH    = -0.05   # 族群狀態:「價未回高」門檻(中位距60日高)
 GS_BREADTH_LOW = 0.4     # 族群狀態:「佈局廣度低」門檻
 TDCC_LAG_DAYS  = 3       # 資料層假設:TDCC 週快照(週五結算、週六公布)自次週一生效(T−3 日曆日)
+MARKET_CROSSCHECK_TOLERANCE = 1e-6
+MARKET_SOURCE_TWSE = "TWSE_MI_INDEX"
+MARKET_SOURCE_FINMIND = "FinMind_fallback"
+MARKET_SOURCE_LEGACY = "FinMind_legacy"
+MARKET_SOURCE_CONFLICT = "conflict"
 TAIPEI_TZ = timezone(timedelta(hours=8))
 FINAL_PASS_READY_HM = (23, 40)  # TWSE 借券終版約 23:30，留 10 分鐘緩衝
 
@@ -137,6 +142,14 @@ CREATE TABLE IF NOT EXISTS market(date TEXT PRIMARY KEY, taiex REAL);
 CREATE TABLE IF NOT EXISTS market_index(date TEXT, market TEXT, index_key TEXT, index_name TEXT,
   index_type TEXT, close REAL, PRIMARY KEY(date,market,index_key));
 CREATE INDEX IF NOT EXISTS idx_market_index_date_type ON market_index(date,index_type);
+CREATE TABLE IF NOT EXISTS market_provenance(
+  date TEXT PRIMARY KEY,
+  canonical_source TEXT NOT NULL,
+  official_taiex REAL,
+  finmind_taiex REAL,
+  abs_diff REAL,
+  checked_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 CREATE TABLE IF NOT EXISTS security_market(stock_id TEXT PRIMARY KEY, market TEXT,
   observed_date TEXT);
 CREATE TABLE IF NOT EXISTS ref_price(date TEXT, stock_id TEXT, close REAL, PRIMARY KEY(date,stock_id));
@@ -205,6 +218,32 @@ def ensure_schema(con):
         for name, sql_type in columns:
             if name not in existing:
                 con.execute(f"ALTER TABLE {table} ADD COLUMN {name} {sql_type}")
+    # 舊 market 全由 FinMind 建立；若同日 TWSE 官方值在容許誤差內，升為官方 canonical
+    # 並把 market 精確改存官方原值。超差列保留 legacy，交給正式同步 hard-fail 對帳。
+    con.execute(
+        """INSERT OR IGNORE INTO market_provenance(
+               date,canonical_source,official_taiex,finmind_taiex,abs_diff,checked_at)
+           SELECT m.date,
+                  CASE WHEN mi.close IS NOT NULL AND ABS(m.taiex-mi.close)<=?
+                       THEN ? ELSE ? END,
+                  mi.close,m.taiex,
+                  CASE WHEN mi.close IS NULL THEN NULL ELSE ABS(m.taiex-mi.close) END,
+                  CURRENT_TIMESTAMP
+           FROM market m
+           LEFT JOIN market_index mi
+             ON mi.date=m.date AND mi.market='TWSE' AND mi.index_key=?""",
+        (MARKET_CROSSCHECK_TOLERANCE, MARKET_SOURCE_TWSE,
+         MARKET_SOURCE_LEGACY, TWSE_TOTAL_RETURN_KEY))
+    con.execute(
+        """UPDATE market
+           SET taiex=(SELECT p.official_taiex FROM market_provenance p
+                      WHERE p.date=market.date)
+           WHERE EXISTS(
+             SELECT 1 FROM market_provenance p
+             WHERE p.date=market.date AND p.canonical_source=?
+               AND p.official_taiex IS NOT NULL
+               AND market.taiex!=p.official_taiex)""",
+        (MARKET_SOURCE_TWSE,))
     con.commit()
 
 _TOKENS = []   # get_tokens() 快取
@@ -227,7 +266,11 @@ class ExchangeRawFetchError(RuntimeError):
 
 
 class MarketDataNotReadyError(RuntimeError):
-    """完整場的 TAIEX 含息報酬指數尚未同步到目標交易日。"""
+    """TWSE 官方與 FinMind 都尚未提供目標交易日的 TAIEX 含息報酬指數。"""
+
+
+class MarketDataMismatchError(RuntimeError):
+    """TWSE 官方與 FinMind 的同日 TAIEX 含息報酬指數不一致。"""
 
 
 def get_tokens():
@@ -466,7 +509,8 @@ def fetch_exchange_price_source(source, day, wanted_ids=None, retries=3):
                     try:
                         indices = parse_twse_market_indices(payload, day)
                     except Exception as exc:
-                        # 指數是非阻斷觀察層；不可因子表格式／發布延遲拖垮價格 checkpoint。
+                        # 不讓附帶指數子表拖垮價格 checkpoint；稍後會獨立補 TWSE，仍失敗
+                        # 才由 FinMind 備援，兩邊都缺則完整場發布閘門會擋下。
                         print(f"  ! TWSE {day} market_index 順手解析失敗:{exc}", file=sys.stderr)
                 return rows, available, indices
             if source == "TPEx":
@@ -1020,11 +1064,13 @@ def fetch_tpex_market_indices(retries=3):
 
 def fetch_missing_market_indices(con, dates, force=False, twse_fetcher=None,
                                  tpex_fetcher=None):
-    """補觀察層報酬指數，不作為五表完整性或 dashboard 發布門檻。
+    """補交易所報酬指數：TWSE 是正式大盤主來源，TPEx 仍是觀察層。
 
     正常新交易日的 TWSE 指數已隨 MI_INDEX 價格批次落地，因此這裡通常只需 TPEx
     OpenAPI 1 次。舊 DB 首次 migration 若最新日尚無 TWSE 指數，僅補最新交易日，
     避免部署當下突然回打整個歷史視窗；需要歷史 TWSE 時可用 --force 隨價格回補。
+    TWSE 補缺本身先記錄 error；稍後 fetch_index() 會以 FinMind 備援，兩邊都沒有時才
+    由完整場發布閘門擋下。TPEx 不進正式 market/regime。
     """
     dates = set(dates)
     if not dates:
@@ -1476,32 +1522,151 @@ def fetch_splits(con, ids, token, start, end, sleep, force=False):
         time.sleep(sleep)
     return len(rows), 1
 
-def fetch_index(con, token, start, end, sleep, expected_dates=None, force=False):
-    """加權報酬指數(TAIEX,含息)→ market(upsert)。大盤 regime 旗標的原料。"""
-    if not force and expected_dates:
-        have = {r[0] for r in con.execute(
-            "SELECT date FROM market WHERE date BETWEEN ? AND ?", (start, end))}
-        missing = set(expected_dates) - have
-        if not missing:
-            return 0, 0
-        start, end = min(missing), max(missing)
-    data = api_get("TaiwanStockTotalReturnIndex", "TAIEX", start, end, token)
-    rows = [(d["date"], d.get("price")) for d in data
-            if d.get("stock_id") == "TAIEX" and d.get("price")]   # 防呆:只收 TAIEX 序列
-    if rows:
-        con.executemany("INSERT OR REPLACE INTO market VALUES(?,?)", rows)
+def fetch_index(con, token, start, end, sleep, expected_dates=None, force=False,
+                finmind_fetcher=None):
+    """同步正式 TAIEX 含息序列：TWSE 官方主來源，FinMind 交叉驗證／缺值備援。
+
+    canonical 值寫入既有 `market`，來源與兩邊原值寫入 `market_provenance`。兩邊都有值時
+    必須在容許誤差內完全一致；FinMind 尚未發布不阻擋官方值，官方缺值才使用 FinMind。
+    """
+    dates = set(expected_dates or _trading_dates(con, start, end))
+    dates = {day for day in dates if start <= day <= end}
+    if not dates:
+        return 0, 0
+
+    official = {row[0]: row[1] for row in con.execute(
+        """SELECT date,close FROM market_index
+           WHERE market='TWSE' AND index_key=? AND date BETWEEN ? AND ?""",
+        (TWSE_TOTAL_RETURN_KEY, min(dates), max(dates)))}
+    provenance = {row[0]: row for row in con.execute(
+        """SELECT date,canonical_source,official_taiex,finmind_taiex,abs_diff
+           FROM market_provenance WHERE date BETWEEN ? AND ?""",
+        (min(dates), max(dates)))}
+    finmind = {day: row[3] for day, row in provenance.items() if row[3] is not None}
+    # 衝突列每次都重查 FinMind，讓上游修正後能自行恢復；一般已驗證列不浪費額度。
+    query_dates = (set(dates) if force else
+                   {day for day in dates
+                    if day not in finmind
+                    or (day in provenance
+                        and provenance[day][1] == MARKET_SOURCE_CONFLICT)})
+    requests = 0
+    api_ok = True
+    api_error = None
+    if query_dates:
+        req_start, req_end = min(query_dates), max(query_dates)
+        requests = 1
+        try:
+            if finmind_fetcher is None:
+                data, api_ok = api_get(
+                    "TaiwanStockTotalReturnIndex", "TAIEX", req_start, req_end, token,
+                    return_status=True)
+            else:
+                result = finmind_fetcher(req_start, req_end)
+                if isinstance(result, tuple) and len(result) == 2:
+                    data, api_ok = result
+                else:
+                    data, api_ok = result, True
+        except Exception as exc:
+            # FinMind 在這裡是交叉驗證／備援；官方已足夠時不能因 token 或網路拖垮發布。
+            # 若官方也缺值，後面的 require_market_date() 仍會正確擋下完整場。
+            data, api_ok, api_error = [], False, exc
+        for item in data or []:
+            day = item.get("date")
+            value = _market_number(item.get("price"))
+            if day in dates and item.get("stock_id") == "TAIEX" and value is not None:
+                finmind[day] = value
+
+    current = {row[0]: row[1] for row in con.execute(
+        "SELECT date,taiex FROM market WHERE date BETWEEN ? AND ?",
+        (min(dates), max(dates)))}
+    planned = []
+    conflicts = []
+    compared = pending = fallback = changed = 0
+    for day in sorted(dates):
+        official_value = official.get(day)
+        finmind_value = finmind.get(day)
+        diff = (abs(official_value - finmind_value)
+                if official_value is not None and finmind_value is not None else None)
+        if diff is not None:
+            compared += 1
+            if diff > MARKET_CROSSCHECK_TOLERANCE:
+                conflicts.append((day, official_value, finmind_value, diff))
+                continue
+        if official_value is not None:
+            canonical, source = official_value, MARKET_SOURCE_TWSE
+            if finmind_value is None:
+                pending += 1
+        elif finmind_value is not None:
+            canonical, source = finmind_value, MARKET_SOURCE_FINMIND
+            fallback += 1
+        else:
+            continue
+        old = current.get(day)
+        if old is None or old != canonical:
+            changed += 1
+        planned.append((day, canonical, source, official_value, finmind_value, diff))
+
+    def same_stored_value(left, right):
+        return left == right
+
+    def provenance_changed(day, source, official_value, finmind_value, diff):
+        old = provenance.get(day)
+        return (old is None or old[1] != source
+                or not same_stored_value(old[2], official_value)
+                or not same_stored_value(old[3], finmind_value)
+                or not same_stored_value(old[4], diff))
+
+    if conflicts:
+        conflict_rows = [
+            (day, MARKET_SOURCE_CONFLICT, official_value, finmind_value, diff)
+            for day, official_value, finmind_value, diff in conflicts
+            if provenance_changed(
+                day, MARKET_SOURCE_CONFLICT, official_value, finmind_value, diff)]
+        if conflict_rows:
+            con.executemany(
+                """INSERT OR REPLACE INTO market_provenance(
+                       date,canonical_source,official_taiex,finmind_taiex,abs_diff,checked_at)
+                   VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)""", conflict_rows)
+            con.commit()
+        sample = ";".join(
+            f"{day}:TWSE={official_value},FinMind={finmind_value},diff={diff}"
+            for day, official_value, finmind_value, diff in conflicts[:3])
+        raise MarketDataMismatchError(
+            f"TAIEX 來源對帳不一致 {len(conflicts)} 日({sample})")
+
+    market_rows = [(day, canonical) for day, canonical, *_ in planned
+                   if not same_stored_value(current.get(day), canonical)]
+    provenance_rows = [
+        (day, source, official_value, finmind_value, diff)
+        for day, _canonical, source, official_value, finmind_value, diff in planned
+        if provenance_changed(day, source, official_value, finmind_value, diff)]
+    if market_rows:
+        con.executemany(
+            "INSERT OR REPLACE INTO market(date,taiex) VALUES(?,?)", market_rows)
+    if provenance_rows:
+        con.executemany(
+            """INSERT OR REPLACE INTO market_provenance(
+                   date,canonical_source,official_taiex,finmind_taiex,abs_diff,checked_at)
+               VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)""", provenance_rows)
+    if market_rows or provenance_rows:
         con.commit()
-    else:
-        print("  ! TAIEX 指數抓取為空——市場 regime 將沿用舊資料", file=sys.stderr)
-    if sleep:
+    if not api_ok:
+        detail = f":{api_error}" if api_error is not None else ""
+        print(f"  ! FinMind TAIEX 交叉驗證暫時失敗{detail}；"
+              "官方 canonical 不受影響", file=sys.stderr)
+    elif query_dates and pending:
+        print(f"  ! FinMind TAIEX 尚有 {pending} 日未發布；保留待後續交叉驗證", file=sys.stderr)
+    print(f"market canonical:TWSE 主來源 {len(planned)-fallback} 日 · "
+          f"FinMind 備援 {fallback} 日 · 已對帳 {compared} 日 · 待對帳 {pending} 日")
+    if sleep and requests:
         time.sleep(sleep)
-    return len(rows), 1
+    return changed, requests
 
 
 def require_market_date(con, target_date):
-    """完整場發布前要求 FinMind TAIEX 精確覆蓋目標交易日。
+    """完整場發布前要求 TWSE 官方或 FinMind 備援精確覆蓋目標交易日。
 
-    這個閘門刻意放在衍生表重建之前：上游尚未發布時讓 fetch step 失敗，Actions 才會
+    這個閘門刻意放在衍生表重建之前：兩個來源都尚未發布時讓 fetch step 失敗，Actions 才會
     先保存已落地的五表／TDCC checkpoint，而不是到 OOS snapshot 才失敗並丟掉進度。
     """
     if con.execute("SELECT 1 FROM market WHERE date=?", (target_date,)).fetchone():
@@ -1509,7 +1674,7 @@ def require_market_date(con, target_date):
     got = con.execute(
         "SELECT MAX(date) FROM market WHERE date<=?", (target_date,)).fetchone()[0]
     raise MarketDataNotReadyError(
-        f"拒絕完成大盤資料未同步 {target_date}:market={got}")
+        f"拒絕完成大盤資料未同步 {target_date}:TWSE/FinMind canonical={got}")
 
 
 def fetch_ref_series(con, token, start, end, sleep, expected_dates=None, force=False):
@@ -2039,7 +2204,7 @@ def main():
             con, stats["expected_dates"], force=args.force)
         market_index_rows += index_stats["rows"]
         for error in index_stats["errors"]:
-            print(f"  ! market_index 非阻斷補缺失敗:{error}", file=sys.stderr)
+            print(f"  ! market_index 補缺失敗（TWSE 可由 FinMind 備援）:{error}", file=sys.stderr)
     print(f"原始資料規劃:FinMind {stats['finmind_requests']} 次;"
           f"TWSE/TPEx 官方批次 {stats['exchange_requests']} 次"
           f"(新交易日探針 {stats['probe_requests']}),"
@@ -2080,7 +2245,7 @@ def main():
         # ref_* 是觀察層隔離表、不餵任何衍生表 → 刻意不併入 data_changed(避免無謂 metrics 重建)
         data_changed = data_changed or bool(nd or ns or ni)
         print(f"事件 API {rd + rs + ri + rr} 次:dividend_result upsert {nd};"
-              f"split_event upsert {ns};TAIEX {ni};參考個股 {nr}")
+              f"split_event upsert {ns};market canonical 更新 {ni};參考個股 {nr}")
     if target_date and not args.datasets:
         risk_through = None if args.force else _coverage_get(con, "risk_flags", "*")
         if not risk_through or risk_through < target_date:

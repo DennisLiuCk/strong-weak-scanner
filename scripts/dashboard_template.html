@@ -105,6 +105,8 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .command-hero{padding:30px 32px;display:flex;flex-direction:column;justify-content:space-between;min-height:390px}
 .command-headline{margin:0;font-size:34px;line-height:1.2;font-weight:900;letter-spacing:.2px;text-wrap:balance;word-break:keep-all}
 .command-summary{margin:12px 0 0;max-width:66ch;font-size:14.5px;color:var(--ink2);line-height:1.75}
+.market-source-note{margin:8px 0 0;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.market-source-note b{color:var(--ink)}
 .command-signals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:22px}
 .command-signal{padding:11px 13px;border-radius:11px}
 .command-signal span{display:block;font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.03em}
@@ -362,7 +364,7 @@ svg{display:block;overflow:visible}
   </main>
 
   <footer style="margin:58px 0 0;border-top:1px solid var(--line);padding-top:18px">
-    <p class="note" style="line-height:1.7;max-width:70ch">資料來源：TWSE／TPEx 官方每日批次與公告（價格、三大法人、融資券、借券、外資持股、處置／注意），FinMind（月營收、財報、市場事件與台積電參考數據）。所有分數皆為族群內相對排名；研究中心的法說事件與其他觀察層內容不計分。計算規則與原始碼見 <a href="https://github.com/DennisLiuCk/strong-weak-scanner">GitHub repo</a>。</p>
+    <p class="note" style="line-height:1.7;max-width:70ch">資料來源：TWSE／TPEx 官方每日批次與公告（價格、三大法人、融資券、借券、外資持股、處置／注意）；大盤以 TWSE 官方含息報酬指數為主，FinMind 同序列只作交叉驗證／官方缺值備援，另提供月營收、財報、市場事件與台積電參考數據。所有分數皆為族群內相對排名；研究中心的法說事件與其他觀察層內容不計分。計算規則與原始碼見 <a href="https://github.com/DennisLiuCk/strong-weak-scanner">GitHub repo</a>。</p>
   </footer>
 
 </div>
@@ -375,7 +377,8 @@ svg{display:block;overflow:visible}
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
       STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__,
-      RECENT=__RECENT_ARTICLES_JSON__, DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
+      RECENT=__RECENT_ARTICLES_JSON__, MKT=__MKT_TIP_JSON__,
+      DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 const RESEARCH_BASE=location.pathname.includes('/archive/')?'../research.html':'research.html';
 document.querySelectorAll('[data-research-link]').forEach(link=>link.href=RESEARCH_BASE);
 function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,
@@ -654,13 +657,16 @@ function buildOverview(){
     h('span',{html:`<b class="mono cstrong">${strong}</b>強勢`}),
     h('span',{html:`<b class="mono cteal">${accum}</b>蓄勢`}),
     h('span',{html:`<b class="mono cweak">${weak}</b>弱勢`}));
+  const marketSource=MKT?h('p',{class:'note market-source-note'},
+    h('b',{text:`大盤 ${MKT.scLabel}：`}),h('span',{text:MKT.src})):null;
   const hero=h('article',{class:'card command-hero'},
     h('div',{},
       h('p',{class:'kicker',style:'color:var(--teal);margin-bottom:9px',text:'今日掃描焦點 · '+D.date}),
       h('h1',{class:'command-headline',text:o.headline}),
       h('p',{class:'command-summary',text:o.summary}),
       signals,
-      h('p',{class:'note',style:'margin:13px 0 0;line-height:1.55',text:o.note})),
+      h('p',{class:'note',style:'margin:13px 0 0;line-height:1.55',text:o.note}),
+      marketSource),
     h('div',{class:'command-foot'},counts,
       h('a',{class:'primary-cta',href:'#grp',text:'進入族群比較 ↓'})));
 

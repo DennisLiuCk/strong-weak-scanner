@@ -51,10 +51,26 @@ def main():
     # ── 2. 市場 + 族群雷達 ──
     mk = con.execute("""SELECT * FROM market_daily WHERE date<=? AND dd20 IS NOT NULL
                         ORDER BY date DESC LIMIT 1""", (last,)).fetchone()
+    market_provenance = None
+    if mk and con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='market_provenance'").fetchone():
+        market_provenance = con.execute(
+            """SELECT canonical_source,official_taiex,finmind_taiex,abs_diff
+               FROM market_provenance WHERE date=?""", (mk["date"],)).fetchone()
     if mk:
         lagn = "" if mk["date"] == last else f"(指數至 {mk['date']})"
+        source = market_provenance["canonical_source"] if market_provenance else None
+        if source == "TWSE_MI_INDEX":
+            source_note = ("TWSE 官方；FinMind 已對帳" if market_provenance["finmind_taiex"] is not None
+                           else "TWSE 官方；FinMind 待對帳")
+        elif source == "FinMind_fallback":
+            source_note = "FinMind 備援；TWSE 缺值"
+        elif source:
+            source_note = source
+        else:
+            source_note = "來源未記錄"
         print(f"\n■ 市場:報酬指數距20日高 {mk['dd20']*100:+.1f}%{lagn} → "
-              f"{'⚠ 修正 regime' if mk['regime'] else '多頭/中性'}")
+              f"{'⚠ 修正 regime' if mk['regime'] else '多頭/中性'}；{source_note}")
     print("■ 族群雷達:")
     for g in con.execute("SELECT * FROM group_metrics WHERE date=? ORDER BY grp", (last,)):
         def f(v, fmt):
@@ -141,6 +157,16 @@ def main():
 
     # ── 8. 資料品質快檢 ──
     issues = []
+    if mk and not market_provenance:
+        issues.append(f"market {mk['date']} 缺來源 provenance")
+    elif market_provenance:
+        market_source = market_provenance["canonical_source"]
+        if market_source == "TWSE_MI_INDEX" and market_provenance["finmind_taiex"] is None:
+            issues.append(f"FinMind TAIEX 尚未交叉驗證 {mk['date']}（不影響 TWSE 正式值）")
+        elif market_source == "FinMind_fallback":
+            issues.append(f"TWSE 官方指數缺 {mk['date']}，目前使用 FinMind 備援")
+        elif market_source != "TWSE_MI_INDEX":
+            issues.append(f"market {mk['date']} 來源狀態異常:{market_source}")
     for tbl in ("price", "inst", "margin", "holding", "sbl"):
         n = con.execute(f"SELECT COUNT(*) FROM {tbl} WHERE date=?", (last,)).fetchone()[0]
         expected_n = eligible_n if tbl == "inst" else len(uni)

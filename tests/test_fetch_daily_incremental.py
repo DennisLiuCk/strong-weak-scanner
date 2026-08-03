@@ -98,8 +98,19 @@ class SchemaMigrationTest(unittest.TestCase):
               PRIMARY KEY(date,stock_id));
             CREATE TABLE sbl(date TEXT, stock_id TEXT, sbl_bal INTEGER,
               PRIMARY KEY(date,stock_id));
+            CREATE TABLE market(date TEXT PRIMARY KEY, taiex REAL);
+            CREATE TABLE market_index(date TEXT, market TEXT, index_key TEXT, index_name TEXT,
+              index_type TEXT, close REAL, PRIMARY KEY(date,market,index_key));
             INSERT INTO price VALUES('2026-07-17','2330',1,2,1,2,100,200);
+            INSERT INTO market VALUES('2026-07-16',100),('2026-07-17',200);
         """)
+        con.executemany(
+            "INSERT INTO market_index VALUES(?,?,?,?,?,?)", [
+                ("2026-07-16", "TWSE", fd.TWSE_TOTAL_RETURN_KEY,
+                 fd.TWSE_TOTAL_RETURN_KEY, "total_return", 100),
+                ("2026-07-17", "TWSE", fd.TWSE_TOTAL_RETURN_KEY,
+                 fd.TWSE_TOTAL_RETURN_KEY, "total_return", 201),
+            ])
 
         fd.ensure_schema(con)
         fd.ensure_schema(con)
@@ -113,6 +124,15 @@ class SchemaMigrationTest(unittest.TestCase):
         self.assertIsNotNone(con.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' AND name='market_index'"
         ).fetchone())
+        self.assertEqual(con.execute(
+            "SELECT date,canonical_source,official_taiex,finmind_taiex,abs_diff "
+            "FROM market_provenance ORDER BY date").fetchall(), [
+                ("2026-07-16", fd.MARKET_SOURCE_TWSE, 100.0, 100.0, 0.0),
+                ("2026-07-17", fd.MARKET_SOURCE_LEGACY, 201.0, 200.0, 1.0),
+            ])
+        self.assertEqual(con.execute(
+            "SELECT date,taiex FROM market ORDER BY date").fetchall(), [
+                ("2026-07-16", 100.0), ("2026-07-17", 200.0)])
         con.close()
 
 
@@ -1145,7 +1165,7 @@ class FinalPassReadinessTest(unittest.TestCase):
                     mock.patch.object(fd, "build_metrics") as build_metrics:
                 with self.assertRaisesRegex(
                         fd.MarketDataNotReadyError,
-                        "大盤資料未同步 2026-08-03:market=None"):
+                        "大盤資料未同步 2026-08-03:TWSE/FinMind canonical=None"):
                     fd.main()
 
             fetch_ref.assert_not_called()
@@ -1153,13 +1173,130 @@ class FinalPassReadinessTest(unittest.TestCase):
         finally:
             con.close()
 
+
+class MarketCanonicalSourceTest(unittest.TestCase):
+    day = "2026-08-03"
+
+    def setUp(self):
+        self.con = sqlite3.connect(":memory:")
+        fd.ensure_schema(self.con)
+
+    def tearDown(self):
+        self.con.close()
+
+    def add_official(self, value):
+        self.con.execute(
+            "INSERT INTO market_index VALUES(?,?,?,?,?,?)",
+            (self.day, "TWSE", fd.TWSE_TOTAL_RETURN_KEY,
+             fd.TWSE_TOTAL_RETURN_KEY, "total_return", value))
+        self.con.commit()
+
+    @staticmethod
+    def finmind(value):
+        return [{"date": "2026-08-03", "stock_id": "TAIEX", "price": value}]
+
+    def sync(self, fetcher):
+        return fd.fetch_index(
+            self.con, "token", self.day, self.day, 0,
+            expected_dates={self.day}, finmind_fetcher=fetcher)
+
+    def test_twse_is_primary_when_finmind_has_not_published(self):
+        self.add_official(100027.02)
+        self.assertEqual(self.sync(lambda _start, _end: ([], True)), (1, 1))
+        self.assertEqual(self.con.execute(
+            "SELECT date,taiex FROM market").fetchone(), (self.day, 100027.02))
+        self.assertEqual(self.con.execute(
+            "SELECT canonical_source,official_taiex,finmind_taiex,abs_diff "
+            "FROM market_provenance").fetchone(),
+            (fd.MARKET_SOURCE_TWSE, 100027.02, None, None))
+
+    def test_finmind_error_does_not_block_official_primary(self):
+        self.add_official(100027.02)
+
+        def unavailable(_start, _end):
+            raise fd.TokenPoolExhausted("測試 token 不可用")
+
+        self.assertEqual(self.sync(unavailable), (1, 1))
+        self.assertEqual(self.con.execute(
+            "SELECT taiex FROM market").fetchone()[0], 100027.02)
+        self.assertEqual(self.con.execute(
+            "SELECT canonical_source,finmind_taiex FROM market_provenance").fetchone(),
+            (fd.MARKET_SOURCE_TWSE, None))
+
+    def test_finmind_crosscheck_is_stored_and_not_repeated(self):
+        self.add_official(100027.02)
+        self.assertEqual(self.sync(
+            lambda _start, _end: (self.finmind(100027.02), True)), (1, 1))
+        self.assertEqual(self.con.execute(
+            "SELECT canonical_source,official_taiex,finmind_taiex,abs_diff "
+            "FROM market_provenance").fetchone(),
+            (fd.MARKET_SOURCE_TWSE, 100027.02, 100027.02, 0.0))
+        fetcher = mock.Mock(side_effect=AssertionError("不應重抓已對帳日期"))
+        changes_before = self.con.total_changes
+        self.assertEqual(self.sync(fetcher), (0, 0))
+        self.assertEqual(self.con.total_changes, changes_before)
+        fetcher.assert_not_called()
+
+    def test_finmind_is_fallback_when_official_is_missing(self):
+        self.assertEqual(self.sync(
+            lambda _start, _end: (self.finmind(100027.02), True)), (1, 1))
+        self.assertEqual(self.con.execute(
+            "SELECT taiex FROM market").fetchone()[0], 100027.02)
+        self.assertEqual(self.con.execute(
+            "SELECT canonical_source,official_taiex,finmind_taiex "
+            "FROM market_provenance").fetchone(),
+            (fd.MARKET_SOURCE_FINMIND, None, 100027.02))
+
+    def test_official_replaces_fallback_even_within_crosscheck_tolerance(self):
+        self.assertEqual(self.sync(
+            lambda _start, _end: (self.finmind(100027.02), True)), (1, 1))
+        official = 100027.0200005
+        self.add_official(official)
+
+        fetcher = mock.Mock(side_effect=AssertionError("已有 FinMind 原值，不應重抓"))
+        self.assertEqual(self.sync(fetcher), (1, 0))
+        fetcher.assert_not_called()
+        self.assertEqual(self.con.execute(
+            "SELECT taiex FROM market").fetchone()[0], official)
+        source, stored_official, stored_finmind, diff = self.con.execute(
+            "SELECT canonical_source,official_taiex,finmind_taiex,abs_diff "
+            "FROM market_provenance").fetchone()
+        self.assertEqual((source, stored_official, stored_finmind),
+                         (fd.MARKET_SOURCE_TWSE, official, 100027.02))
+        self.assertLess(diff, fd.MARKET_CROSSCHECK_TOLERANCE)
+
+    def test_cross_source_mismatch_is_persisted_and_blocks_canonical(self):
+        self.add_official(100027.02)
+        with self.assertRaisesRegex(fd.MarketDataMismatchError, "來源對帳不一致"):
+            self.sync(lambda _start, _end: (self.finmind(100027.03), True))
+        self.assertIsNone(self.con.execute("SELECT 1 FROM market").fetchone())
+        row = self.con.execute(
+            "SELECT canonical_source,official_taiex,finmind_taiex,abs_diff "
+            "FROM market_provenance").fetchone()
+        self.assertEqual(row[:3],
+                         (fd.MARKET_SOURCE_CONFLICT, 100027.02, 100027.03))
+        self.assertAlmostEqual(row[3], 0.01, places=9)
+
+    def test_conflict_rechecks_finmind_and_recovers_after_upstream_correction(self):
+        self.add_official(100027.02)
+        with self.assertRaises(fd.MarketDataMismatchError):
+            self.sync(lambda _start, _end: (self.finmind(100027.03), True))
+
+        fetcher = mock.Mock(return_value=(self.finmind(100027.02), True))
+        self.assertEqual(self.sync(fetcher), (1, 1))
+        fetcher.assert_called_once_with(self.day, self.day)
+        self.assertEqual(self.con.execute(
+            "SELECT canonical_source,official_taiex,finmind_taiex,abs_diff "
+            "FROM market_provenance").fetchone(),
+            (fd.MARKET_SOURCE_TWSE, 100027.02, 100027.02, 0.0))
+
     def test_final_pass_accepts_exact_market_date(self):
         con = sqlite3.connect(":memory:")
         try:
             con.executescript(fd.SCHEMA)
             con.execute("INSERT INTO market VALUES('2026-07-31',100)")
             with self.assertRaisesRegex(
-                    fd.MarketDataNotReadyError, "market=2026-07-31"):
+                    fd.MarketDataNotReadyError, "canonical=2026-07-31"):
                 fd.require_market_date(con, "2026-08-03")
             con.execute("INSERT INTO market VALUES('2026-08-03',101)")
             fd.require_market_date(con, "2026-08-03")

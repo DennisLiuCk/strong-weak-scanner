@@ -74,11 +74,12 @@
 ```
 fetch_tdcc.py    TDCC 股權分散週快照(opendata 直抓,免 token)→ tdcc_holding
                  ⚠ 僅供最新一週、缺週=永久洞;失敗 exit 0 不擋管線(Actions 綠≠成功)
-fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件/指數/參考個股
+fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 留事件/TAIEX 對帳備援/參考個股
                  → 還原價(除權息/分割自算)→ 五元素+觀察欄 → 族群層聚合
                  ⚠ 每張待補表每交易日各呼叫 TWSE/TPEx 一次；五表完整新日共 10 次免 token
-                 ⚠ market_index:TWSE 報酬指數沿用價格 MI_INDEX；TPEx 當月報酬指數 +1 req
-                   屬非阻斷觀察層，不取代 FinMind market、不進 regime/評分/發布門檻
+                 ⚠ market_index:TWSE 報酬指數沿用價格 MI_INDEX，正式寫入 market/regime；
+                   FinMind TAIEX 逐日交叉驗證、官方缺值才備援，雙邊不一致硬停；
+                   TPEx 當月報酬指數 +1 req，仍屬非阻斷觀察層
                  ⚠ 往 2026-03-02(HISTORY_FLOOR)之前延伸歷史一律要 --db 指到別的檔案,
                    對正式 db 會被 argparse 擋下。實測接一個月 2026-02 上去,3~4 月既有
                    綜合分 51% 改變(rs20/dist_hi60 視窗一有更早資料就從 NULL 變有值)
@@ -96,7 +97,8 @@ fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 只留事件
                  日誌/API 次數/斷點續跑判讀見 README「Daily Fetch 日誌判讀與續跑語意」
                  另抓觀察層參考個股 REF_IDS(2330)收盤/外資持股 → ref_price/ref_holding 隔離表
 audit_raw_data.py 唯讀稽核 current universe×price∪market 交易日的五表 grid、core/expanded
-                 NULL、法人/借券公式、SQLite integrity 與 market_index 覆蓋；exit 0/1/2
+                 NULL、法人/借券公式、SQLite integrity、market canonical/provenance 與
+                 market_index 覆蓋；exit 0/1/2
 fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現金流量表)
                  → month_revenue/financials/balance_sheet/cash_flow;獨立月/季排程,不掛每日管線
                  範圍 = universe + REF_IDS(2330,供台積電觀察層研究)
@@ -137,8 +139,9 @@ knowledge_graph.py 將 topic claim/正式筆記 source 投影成研究中心雙�
 ```
 
 資料表:原始 price(含成交筆數)/inst(買賣分項)/margin(流量與限額)/holding(持股股數、
-可投資餘額與上限)/sbl(借券流量、調整、餘額與限額；單位=股)+ market_index(交易所
-官方報酬指數,觀察層)+ tdcc_holding(週頻)+
+可投資餘額與上限)/sbl(借券流量、調整、餘額與限額；單位=股)+ market(TAIEX canonical)+
+market_provenance(逐日正式來源/TWSE/FinMind 原值/差異)+market_index(交易所官方報酬指數；
+TWSE 為正式主來源、TPEx 為觀察層)+tdcc_holding(週頻)+
 risk_flags(TWSE/TPEx 處置/注意公告)+trading_status(官方零交易 price 列的可重算衍生索引)
 (依主鍵冪等 upsert；holding 當日初版只在 23:47
 final pass 刷新一次)+ 衍生

@@ -1,5 +1,30 @@
 # Changelog
 
+## TWSE 官方含息指數升為正式主來源 — 2026-08-04
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只更換同口徑大盤
+序列的來源優先權與發布資料契約。
+
+- `market` canonical 現在優先使用 TWSE `MI_INDEX` 的「發行量加權股價報酬指數」；
+  FinMind `TaiwanStockTotalReturnIndex/TAIEX` 改為逐日交叉驗證，只有官方同日值缺少時
+  才作備援。FinMind 尚未發布不再阻擋已有 TWSE 正式值；兩邊都缺仍硬停。
+- 新增 `market_provenance`，逐日保存 canonical 來源、TWSE／FinMind 原值、絕對差異與
+  對帳時間。雙邊值差異超過 `1e-6` 會保存衝突證據並拒絕衍生表與 OOS 發布；衝突日
+  下次會重查 FinMind，讓上游修正後可自行恢復。正式快照也會驗證來源與 canonical 一致。
+- 切換前以正式 DB 全重疊區間 2026-03-02～2026-07-31 做逐日配對：105/105 個交易日
+  完全相同，最大絕對差 0；這是全重疊資料的確定性 census，不是抽樣估計，SE 不適用。
+  2026-08-03 TWSE 已有 100027.02，而當次 FinMind 尚未發布，正是本次備援方向調整要處理
+  的失敗型態。
+- 原始資料稽核、每日簡報、儀表板 tooltip 與 OOS quality JSON 均揭露來源、待交叉驗證、
+  備援或衝突狀態；TPEx 報酬指數維持不進 regime 的觀察層。
+- 在正式 DB 的隔離複本完成 migration、補入 2026-08-03、重建 metrics／score 後，
+  `market`、`price_adj`、`daily_metrics`、`observation_metrics`、
+  `group_observation_metrics`、`group_metrics`、`market_daily`、`daily_scores`、
+  `chip_health` 截至 2026-07-31 均逐列完全相同；獨立 SQL 雙向 `EXCEPT` 也全為 0。
+  稽核為 121 檔 × 106 日、五表完整、canonical 106/106、衝突 0；最新日評分 121 檔。
+- 驗收環境為 Windows、python.org CPython 3.12、預設 console：
+  `python -m unittest discover -s tests` 共 405 項全綠；`git diff --check` 通過。
+
 ## 終版大盤缺口前移至 checkpoint 閘門 — 2026-08-04
 
 **策略權重、tier、regime 門檻、資料來源與 `IS_CUTOFF` 零變動**；本次只修正每日抓取

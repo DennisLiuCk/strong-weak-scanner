@@ -78,8 +78,9 @@
 | 籌碼退潮 | `med_dip < 0` 且 `breadth_f ≤ 40%` |
 | 中性觀察 / 資料不足 | 其他情況 / 樣本不足 |
 
-大盤使用含息報酬指數；距 20 日高 ≤−3% 時標為修正 regime。含息口徑可避免除息季的
-機械性下跌被誤判為市場修正，與個股使用還原價的原則一致。
+大盤使用 TWSE 官方 `MI_INDEX` 的發行量加權股價報酬指數（含息）；距 20 日高 ≤−3%
+時標為修正 regime。FinMind 同口徑 TAIEX 只做逐日交叉驗證，官方缺值時才作備援。
+含息口徑可避免除息季的機械性下跌被誤判為市場修正，與個股使用還原價的原則一致。
 
 ### 明確不計分的內容
 
@@ -97,7 +98,7 @@
 | 類別 | 來源與用途 |
 |---|---|
 | 每日五張原始表 | TWSE/TPEx 全市場批次：價格、法人、融資券、外資持股、借券；另抓處置/注意公告 |
-| 還原與市場序列 | FinMind：除權息/分割事件、TAIEX 含息報酬指數；交易所官方 `market_index` 只供觀察，不取代 regime |
+| 還原與市場序列 | FinMind 提供除權息/分割事件；TAIEX 含息序列以 TWSE 官方 `MI_INDEX` 為正式主來源，FinMind 同序列作交叉驗證／官方缺值備援；TPEx 報酬指數仍只供觀察 |
 | 週/月/季資料 | TDCC 股權分散週快照；FinMind 月營收、損益表、資產負債表、現金流量表 |
 | 研究資料 | 公司 IR、MOPS、TWSE/TPEx 文件與人工維護的質化筆記、領先假說、事件錨點 |
 
@@ -108,7 +109,7 @@
 
 | 層 | 主要內容 | 更新語意 |
 |---|---|---|
-| 原始層 | `price`、`inst`、`margin`、`holding`、`sbl`、`risk_flags`、`market`、`market_index`、`tdcc_holding`、財報與 `ref_*` | 依主鍵冪等補缺；成功來源可先 checkpoint |
+| 原始層 | `price`、`inst`、`margin`、`holding`、`sbl`、`risk_flags`、`market`、`market_provenance`、`market_index`、`tdcc_holding`、財報與 `ref_*` | 依主鍵冪等補缺；成功來源可先 checkpoint；大盤 canonical 保留逐日來源與雙邊原值 |
 | 衍生層 | `price_adj`、`daily_metrics`、`observation_metrics`、`daily_scores`、`chip_health`、`group_metrics`、`market_daily` | 依目前規則全量重建，屬 restated history |
 | OOS as-seen 層 | `oos_snapshot_runs`、`oos_signal_snapshots`、`oos_group_snapshots`、`oos_market_snapshots` | append-only，不覆寫舊發布 |
 | 發布層 | `index.html`、`research.html`、`archive/<資料日>.html`、`reports/` | 首頁與研究中心可重建；同日 archive 首次建立後不覆寫 |
@@ -204,7 +205,8 @@ python -m unittest discover -s tests
 - 日誌的「官方批次 `P` 次」只計五張表的 TWSE/TPEx 呼叫。完整新交易日通常為 10 次；
   早場為 4 次，早場已完成時晚場通常再補 6 次。
 - `P=0` 代表指定缺口已完整而跳過，不是資料源失敗。FinMind 事件呼叫與 `market_index`
-  額外官方請求會分開列示；後者是非阻斷觀察層。
+  額外官方請求會分開列示；其中 TWSE 含息報酬指數是正式大盤主來源，TPEx 指數仍是
+  非阻斷觀察層。
 - 一個市場成功、另一個失敗時，成功資料先落地；下次依 SQLite 缺口接續。空回應或 universe
   覆蓋不足不會被補成 0。
 - 交易所價格表若明確回傳 OHLC 全空、成交量／金額／筆數皆為 0，會衍生一筆
@@ -213,9 +215,11 @@ python -m unittest discover -s tests
   `daily_metrics`／`daily_scores`，不推進平滑分數或 tier，復牌後的技術視窗接續前一有效交易日。
 - `holding` 日內初版不視為正式終版；`--final-pass` 對當日資料有台北 23:40 硬門檻，
   23:47 排程會刷新 holding，上游資料未齊時不發布，同日重跑維持冪等。
-- 完整場的 FinMind TAIEX 含息報酬指數必須精確到最新交易日；若仍落後，會在重建
-  `daily_metrics`／`market_daily` 前停止，先由 Actions 保存五表與 TDCC checkpoint，
-  稍後重跑只補大盤與剩餘缺口，不會把舊 regime 凍結成新 OOS 快照。
+- 完整場的 TAIEX canonical 必須精確到最新交易日：優先採 TWSE 官方含息報酬指數；
+  FinMind 未發布只留下「待交叉驗證」狀態，不阻擋官方值。若 TWSE 缺值而 FinMind 已有
+  同日值，明示啟用 FinMind 備援；兩邊同日值超出 `1e-6` 容許誤差則硬停，兩邊都缺也會
+  在重建 `daily_metrics`／`market_daily` 前停止。Actions 會先保存五表與 TDCC checkpoint，
+  不會把舊 regime 凍結成新 OOS 快照。
 - schema 新增欄位的歷史 `NULL` 使用 `--backfill-expanded-fields`；只有交易所公告來源修正版、
   既有非空值也必須覆寫時才用 `--force`。
 

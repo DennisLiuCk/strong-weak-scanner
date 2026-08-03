@@ -31,6 +31,11 @@ class RawDataAuditTest(unittest.TestCase):
                 "index_name": fd.TPEX_TOTAL_RETURN_KEY, "index_type": "total_return",
                 "close": 100.0,
             }])
+            self.con.execute(
+                """INSERT INTO market_provenance(
+                     date,canonical_source,official_taiex,finmind_taiex,abs_diff)
+                   VALUES(?,?,?,?,?)""",
+                (day, fd.MARKET_SOURCE_TWSE, 100.0, 100.0, 0.0))
         self.con.commit()
 
     def tearDown(self):
@@ -92,6 +97,45 @@ class RawDataAuditTest(unittest.TestCase):
                             for item in report["invariants"].values()))
         self.assertEqual(report["market_index"]["twse"]["complete_dates"], 2)
         self.assertEqual(report["market_index"]["tpex_latest_month"]["complete_dates"], 2)
+        self.assertEqual(report["market_canonical"]["source_counts"],
+                         {fd.MARKET_SOURCE_TWSE: 2})
+        self.assertEqual(report["market_canonical"]["conflicts"], 0)
+
+    def test_market_provenance_conflict_fails(self):
+        self.con.execute(
+            """UPDATE market_provenance
+               SET canonical_source=?,official_taiex=100,finmind_taiex=101,abs_diff=1
+               WHERE date='2026-07-10'""", (fd.MARKET_SOURCE_CONFLICT,))
+        report = audit.audit_connection(self.con, self.ids)
+
+        self.assertFalse(report["ok"])
+        self.assertEqual(report["market_canonical"]["conflicts"], 1)
+        self.assertTrue(any("canonical 不一致" in error for error in report["errors"]))
+
+    def test_finmind_fallback_is_valid_when_twse_is_missing(self):
+        self.con.execute(
+            "DELETE FROM market_index WHERE date='2026-07-10' AND market='TWSE'")
+        self.con.execute(
+            """UPDATE market_provenance
+               SET canonical_source=?,official_taiex=NULL,finmind_taiex=100,abs_diff=NULL
+               WHERE date='2026-07-10'""", (fd.MARKET_SOURCE_FINMIND,))
+        report = audit.audit_connection(self.con, self.ids)
+
+        self.assertTrue(report["ok"])
+        self.assertEqual(report["market_canonical"]["source_counts"],
+                         {fd.MARKET_SOURCE_FINMIND: 1, fd.MARKET_SOURCE_TWSE: 1})
+        self.assertTrue(any("須由 FinMind 備援" in warning
+                            for warning in report["warnings"]))
+
+    def test_pending_finmind_crosscheck_is_warning_not_error(self):
+        self.con.execute(
+            """UPDATE market_provenance SET finmind_taiex=NULL,abs_diff=NULL
+               WHERE date='2026-07-10'""")
+        report = audit.audit_connection(self.con, self.ids)
+
+        self.assertTrue(report["ok"])
+        self.assertEqual(report["market_canonical"]["pending_finmind_crosscheck"], 1)
+        self.assertTrue(any("待交叉驗證" in warning for warning in report["warnings"]))
 
     def test_null_expanded_field_fails_with_column_evidence(self):
         self.con.execute(
