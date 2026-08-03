@@ -98,7 +98,15 @@ posture、`advance／watch／defer`、選擇理由、第一拒絕及下一份證
    ```
 
 2. 先用交易所／MOPS 與官方法說日曆，對**全 universe** 做前次掃描窗口以來的事件
-   索引快掃；法說、季報、財報董事會等事件先逐檔升為 P1 triage，再依
+   索引快掃；法說、季報、財報董事會等事件先逐檔升為 P1 triage。季報窗口至少依序核對：
+   - TWSE 與 TPEx 的重大訊息端點，以及當季損益表／資產負債表 OpenAPI；兩市場與完整
+     日期窗均成功，才可把這一小段 scope 記為 `full`。
+   - OpenAPI 命中的每家公司都再查 MOPS `t57sb01` 直接文件索引；公司 IR 活頁可能落後，
+     未查直接索引前不得寫「完整附件尚未定位」。
+   - OpenAPI 數值列只是一個申報 trigger，不證明完整 PDF、會計師核閱報告或附註已取得；
+     MOPS 檔名／時間／大小也只證明附件存在，不得刷新 evidence clock 或替代 evidence pack。
+
+   完成事件索引後，再依
    `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` 的來源分層，對該週 cohort、跨族群上游錨點、
    公司 IR、關鍵客戶／平台官方公告與重大政策做語意深掃。事件快掃不能被 30 檔 cohort
    或臨時指定名單取代。

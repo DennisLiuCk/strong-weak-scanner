@@ -393,7 +393,7 @@ def compute_method_audit(
     core = {
         "schemaVersion": 1,
         "asOf": date_text,
-        "methodologyVersion": "1.3",
+        "methodologyVersion": "1.4",
         "registryFingerprint": _registry_fingerprint(topics, graph, radar, reviews, scan),
         "scope": {
             "topics": len(topics),

@@ -16,7 +16,7 @@ import research_method_audit as audit
 class ResearchMethodAuditTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.as_of = dt.date(2026, 8, 3)
+        cls.as_of = dt.date(2026, 8, 4)
         cls.topics, cls.graph, cls.radar, cls.scan = audit._load_context(cls.as_of)
         cls.reviews = audit.load_monitor_reviews(cls.topics, cls.as_of, strict=True)
         cls.current = audit.compute_method_audit(
@@ -27,7 +27,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
     def test_baseline_snapshot_matches_current_registry(self):
         self.assertRegex(self.latest["snapshotId"], r"^RMA-\d{4}-\d{2}-\d{2}-\d+$")
         self.assertEqual(self.latest["asOf"], self.current["asOf"])
-        self.assertEqual(self.latest["methodologyVersion"], "1.3")
+        self.assertEqual(self.latest["methodologyVersion"], "1.4")
         self.assertEqual(
             self.latest["registryFingerprint"], self.current["registryFingerprint"],
         )
@@ -60,7 +60,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(self.current["monitors"]["reviewedMature"], 3)
         self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 3)
         self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 3)
-        self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 2)
+        self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 3)
         self.assertEqual(
             self.current["scans"]["latestId"], self.scan["latest"]["scan_id"]
         )
@@ -101,7 +101,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(gates["cross_check_depth"]["status"], "attention")
         self.assertEqual(gates["freshness"]["status"], "attention")
         self.assertEqual(gates["correction_learning"]["status"], "pass")
-        self.assertEqual(gates["scan_accountability"]["status"], "attention")
+        self.assertEqual(gates["scan_accountability"]["status"], "pass")
         self.assertEqual(gates["calibration"]["status"], "not_ready")
         for gate in gates.values():
             self.assertTrue(gate["observed"])
@@ -137,7 +137,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.assertEqual(row["evidence_source_ids"], [])
             self.assertEqual(row["claim_action"], "none")
         self.assertEqual(self.current["monitors"]["dueOrOverdue"], 0)
-        self.assertEqual(self.current["freshness"]["staleTopics"], 2)
+        self.assertEqual(self.current["freshness"]["staleTopics"], 3)
 
     def test_evidence_result_requires_registered_source(self):
         text = (
