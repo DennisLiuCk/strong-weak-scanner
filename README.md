@@ -213,6 +213,9 @@ python -m unittest discover -s tests
   `daily_metrics`／`daily_scores`，不推進平滑分數或 tier，復牌後的技術視窗接續前一有效交易日。
 - `holding` 日內初版不視為正式終版；`--final-pass` 對當日資料有台北 23:40 硬門檻，
   23:47 排程會刷新 holding，上游資料未齊時不發布，同日重跑維持冪等。
+- 完整場的 FinMind TAIEX 含息報酬指數必須精確到最新交易日；若仍落後，會在重建
+  `daily_metrics`／`market_daily` 前停止，先由 Actions 保存五表與 TDCC checkpoint，
+  稍後重跑只補大盤與剩餘缺口，不會把舊 regime 凍結成新 OOS 快照。
 - schema 新增欄位的歷史 `NULL` 使用 `--backfill-expanded-fields`；只有交易所公告來源修正版、
   既有非空值也必須覆寫時才用 `--force`。
 

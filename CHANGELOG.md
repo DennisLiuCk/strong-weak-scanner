@@ -1,5 +1,22 @@
 # Changelog
 
+## 終版大盤缺口前移至 checkpoint 閘門 — 2026-08-04
+
+**策略權重、tier、regime 門檻、資料來源與 `IS_CUTOFF` 零變動**；本次只修正每日抓取
+失敗時的進度保存時點。
+
+- 事故證據：`daily-fetch` #57 正確鎖定 2026-08-03，五張官方表的終版補抓與計分皆完成，
+  但 FinMind TAIEX 查詢回傳 0 筆，`market_daily` 仍停在 2026-07-31。OOS 閘門正確拒絕
+  發布，卻因失敗發生在 `fetch_daily` step 之後，8/3 的 margin／holding／sbl 各 121 筆
+  與已抓到的 TDCC 2026-07-31 快照都未被 checkpoint commit。
+- `--final-pass` 現在於 TAIEX 抓取後要求 `market` 精確存在目標交易日；落後時在衍生表
+  重建前以失敗退出，讓既有 workflow 先保存五表／TDCC「每日抓取進度（未完成）」並
+  停止 score、OOS 與網站發布。下一次仍沿 SQLite 缺口冪等續跑。
+- 新增 stale／exact-date 回歸測試，並驗證 stale 情境不會進入參考序列抓取或
+  `daily_metrics` 重建。上述筆數是正式資料格與 run log 的確定性計數，SE 不適用。
+- 驗收環境為 Windows、python.org CPython 3.12、預設 console：
+  `python -m unittest discover -s tests` 共 391 項全綠；`git diff --check` 通過。
+
 ## 市場議題可持續驗證契約（schema v3）— 2026-08-02
 
 - `notes/research_topics/` 的 11 篇現行市場議題全面升級為 schema v3；每篇都必須建立

@@ -1115,6 +1115,57 @@ class FinalPassReadinessTest(unittest.TestCase):
                 fd.main()
         self.assertIn("拒絕過早 final-pass", str(raised.exception))
 
+    def test_final_pass_rejects_stale_market_before_derived_rebuild(self):
+        stats = {
+            "rows": 363, "market_index_rows": 0, "finmind_requests": 0,
+            "exchange_requests": 6, "probe_requests": 0,
+            "skipped_batches": 1, "expected_dates": {"2026-08-03"},
+        }
+        con = sqlite3.connect(":memory:")
+        try:
+            argv = [
+                "fetch_daily.py", "--final-pass", "--start", "2026-08-03",
+                "--end", "2026-08-03", "--db", "ignored-stale-market.db",
+            ]
+            with mock.patch.object(sys, "argv", argv), \
+                    mock.patch.object(fd.sqlite3, "connect", return_value=con), \
+                    mock.patch.object(
+                        fd, "taipei_now",
+                        return_value=datetime(2026, 8, 4, 0, 30, tzinfo=fd.TAIPEI_TZ)), \
+                    mock.patch.object(fd, "load_universe", return_value=[]), \
+                    mock.patch.object(fd, "get_token", return_value="token"), \
+                    mock.patch.object(fd, "fetch_missing_raw", return_value=stats), \
+                    mock.patch.object(
+                        fd, "fetch_missing_market_indices",
+                        return_value={"rows": 0, "requests": 0, "errors": []}), \
+                    mock.patch.object(fd, "fetch_dividends", return_value=(0, 0)), \
+                    mock.patch.object(fd, "fetch_splits", return_value=(0, 0)), \
+                    mock.patch.object(fd, "fetch_index", return_value=(0, 1)), \
+                    mock.patch.object(fd, "fetch_ref_series") as fetch_ref, \
+                    mock.patch.object(fd, "build_metrics") as build_metrics:
+                with self.assertRaisesRegex(
+                        fd.MarketDataNotReadyError,
+                        "大盤資料未同步 2026-08-03:market=None"):
+                    fd.main()
+
+            fetch_ref.assert_not_called()
+            build_metrics.assert_not_called()
+        finally:
+            con.close()
+
+    def test_final_pass_accepts_exact_market_date(self):
+        con = sqlite3.connect(":memory:")
+        try:
+            con.executescript(fd.SCHEMA)
+            con.execute("INSERT INTO market VALUES('2026-07-31',100)")
+            with self.assertRaisesRegex(
+                    fd.MarketDataNotReadyError, "market=2026-07-31"):
+                fd.require_market_date(con, "2026-08-03")
+            con.execute("INSERT INTO market VALUES('2026-08-03',101)")
+            fd.require_market_date(con, "2026-08-03")
+        finally:
+            con.close()
+
 
 class RawOnlyModeTest(unittest.TestCase):
     def test_raw_only_needs_no_token_and_skips_derived_rebuild(self):

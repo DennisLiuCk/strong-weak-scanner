@@ -226,6 +226,10 @@ class ExchangeRawFetchError(RuntimeError):
     """TWSE/TPEx 官方原始表批次失敗或交易日不完整。"""
 
 
+class MarketDataNotReadyError(RuntimeError):
+    """完整場的 TAIEX 含息報酬指數尚未同步到目標交易日。"""
+
+
 def get_tokens():
     """可用 token 清單:環境變數 FINMIND_TOKEN{,2,3} → .mcp.json 同名欄位。
     多組 token = 時額(600/hr)輪替池;401/402/403 時熔斷該把並換下一組。"""
@@ -1493,6 +1497,21 @@ def fetch_index(con, token, start, end, sleep, expected_dates=None, force=False)
         time.sleep(sleep)
     return len(rows), 1
 
+
+def require_market_date(con, target_date):
+    """完整場發布前要求 FinMind TAIEX 精確覆蓋目標交易日。
+
+    這個閘門刻意放在衍生表重建之前：上游尚未發布時讓 fetch step 失敗，Actions 才會
+    先保存已落地的五表／TDCC checkpoint，而不是到 OOS snapshot 才失敗並丟掉進度。
+    """
+    if con.execute("SELECT 1 FROM market WHERE date=?", (target_date,)).fetchone():
+        return
+    got = con.execute(
+        "SELECT MAX(date) FROM market WHERE date<=?", (target_date,)).fetchone()[0]
+    raise MarketDataNotReadyError(
+        f"拒絕完成大盤資料未同步 {target_date}:market={got}")
+
+
 def fetch_ref_series(con, token, start, end, sleep, expected_dates=None, force=False):
     """觀察層參考個股(REF_IDS)收盤/外資持股 → ref_price/ref_holding(upsert)。
     隔離表:不進 universe/daily_metrics/daily_scores,只供儀表板專區顯示;
@@ -2054,6 +2073,8 @@ def main():
         ns, rs = fetch_splits(con, ids, token, adj_start, target_date, args.sleep, args.force)
         ni, ri = fetch_index(con, token, adj_start, target_date, args.sleep,
                              expected_dates=expected_dates, force=args.force)
+        if args.final_pass:
+            require_market_date(con, target_date)
         nr, rr = fetch_ref_series(con, token, adj_start, target_date, args.sleep,
                                   expected_dates=expected_dates, force=args.force)
         # ref_* 是觀察層隔離表、不餵任何衍生表 → 刻意不併入 data_changed(避免無謂 metrics 重建)
