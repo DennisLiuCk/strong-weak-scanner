@@ -1,5 +1,60 @@
 # Changelog
 
+## 手機版版面溢出、返回路徑與字級／觸控目標 — 2026-08-05
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改儀表板兩份 HTML
+模板的版面與導覽，不動任何計分、資料或發布契約。
+
+- 兩頁 `html` 補上 `-webkit-text-size-adjust:100%`。缺這行時 iOS Safari 的
+  text autosizing 會挑特定區塊放大字級，被放大的卡片 min-content 隨之變寬而撐破視窗，
+  其他區塊維持視窗寬 —— 就是「有些區塊很寬、有些正常」的成因。以 1.6 倍字級模擬：
+  修復前 `.command-headline` 單一元素 min-content 就到 407px（視窗 375px），
+  修復後全頁 `scrollWidth` 375px、零個元素超出視窗。
+- `.command-headline` 在 ≤720px 解除 `word-break:keep-all`。keep-all 讓中文只能在標點
+  斷行，最小內容寬 = 最長無標點詞組；當日標題實測 min-content 254px，改回一般斷行
+  後為 28px。標題文字每日由資料產生，沒有標點的長句會直接撐破版面。
+- `.tier-counts span` 的 `white-space:nowrap` 會套到 `.tier-counts-label`（實測 287px），
+  窄幅改回可斷行；`.wrap` 手機左右內距 22px→14px。
+- 兩處 JS 產生的 grid 由 `minmax(320px,1fr)`／`minmax(310px,1fr)` 改為
+  `minmax(min(…,100%),1fr)`，並在 ≤720px 為 grid/flex 子項補 `min-width:0`
+  （特異度 0,0,1，刻意低於 `.hscroll>*{min-width:640px}`，橫向捲動表格不受影響）。
+  修復後 320／360／375／430／760／900／1280px 七個寬度的 `scrollWidth` 皆等於視窗寬。
+- 研究中心手機版原本把唯一的 `index.html` 連結整個 `display:none`，回主頁只剩瀏覽器
+  上一頁。改為保留精簡版返回鍵（44px 觸控目標）、`.topbar` 改 `position:sticky`，
+  並讓「返回研究清單」sticky 在 58px 下方 —— 文章高度上看 19,000px，非 sticky 等同沒有。
+- 手機版 `.reader-scroll` 是 `height:auto`、真正捲動的是 window，`resetReaderScroll()`
+  只重設前者，導致從清單中段點開文章會落在文章中段；補上 window 重設，並把 inline
+  `overflow-y` 一律清成空字串（原本還原「上次讀到的值」，重入時會把暫時的 `hidden`
+  永久留下，使 `.reader-scroll` 變成不捲動的 scroll container）。
+- 小字級改走 `--fs-8`～`--fs-115` token（兩份模板共 170 處 `font-size` 字面值改成
+  `var(--fs-*)`）。桌機 token 值等於改版前的 px，外觀零變動（`.chip` 11px、
+  `.tile .lb` 9px、`.tile .vv` 9.5px、`.recent-date` 10.5px 等逐項比對一致）；
+  手機斷點統一抬高下限。原本 614/809 個小字節點的字級寫死在 JS 產生的 inline style 裡，
+  media query 碰不到，這是改用 token 的主因——不要再在別處寫死 8~11.5px。
+- 375px 下 <11px 的文字節點：儀表板 667→64（剩 60 個 `ⓘ` 圖示 10.5px 與 4 個圖表座標
+  刻度 10px，都不是內文），研究中心 1198→0。
+- 字級下限的斷點設在 **900px**（版面仍走原本的 720／780／1180）：iPhone 橫向是
+  844~932px，落在這段的多半仍是手邊的手機，物理字級跟直向一樣小。實測 844×390
+  兩頁 <11px 節點皆為 0、無溢出；920px 以上回到桌機值。
+- 觸控目標（WCAG 2.5.5）：375px 下未達 44px 且非行內豁免者，儀表板 9→0、
+  研究中心 26→0。桌機另補 2.5.8 的 24×24 下限（`.sel` 19→28px、`.pulse-head a`
+  18→24px、`.strategy-body a` 19→24px），1265px 下非行內豁免者 3→0。
+  句子裡的行內連結刻意不放大（2.5.5／2.5.8 的 Inline 例外；放大會撐開行高）。
+- 順手修掉一個既有溢出（與本次字級無關）：`.srow` 的軌道下限
+  `44px+210px+340px+200px+3*22px=860px` 是硬下限，但 901~955px 視窗扣掉 `.wrap` 44px
+  與卡片內距 50px 後只剩 811px，整列會溢出（`≤900px` 才換三欄版，剛好漏掉這段）。
+  各軌下限改 0；1265px 下新舊定義解析出的軌道完全相同（`44px 340px 340px 240px`），
+  桌機外觀零變動，905px 由 `docSW 913 > 視窗 905` 變成相等。
+- 四象限散布圖是 `viewBox="0 0 470 380"` 的 `width:100%`，375px 手機被縮到 scale 0.64、
+  `font-size:9` 的座標標籤實際只有 5.8px。改成卡片內橫向捲動維持 1:1（與熱圖同一套），
+  並把座標刻度 9→10、象限標籤 10.5→11；實測最小有效字級 5.8px→10px。
+- 字級抬高後五元素 tile（一列 5 格）在 320px 只剩 42px 寬，「投信 -1,807張」放不下：
+  `.strip` gap 6→5、`.tile` 左右內距 3→1，並在 ≤360px 改成 3+2 換行。
+  320／375／430／720px 四個寬度重測 60 個 tile 皆 0 溢出。
+- 測試：`python -m unittest discover -s tests` 412 tests OK，`PYTHONUTF8=1` 與預設
+  cp950 兩種環境各跑一次皆綠。`test_dashboard_ux_contract` 的圖例斷言改釘 token 形式
+  （該契約要保護的是「圖例帶數值文字、不只靠顏色」，不是某個 px 值）。
+
 ## 研究到期監測加入 MOPS 直接索引檢查 — 2026-08-05
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善研究來源取得、

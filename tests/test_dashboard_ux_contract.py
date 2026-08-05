@@ -330,7 +330,8 @@ class DashboardUxContractTest(unittest.TestCase):
             self.assertIn(marker, self.template)
         # 圖例帶文字標籤與數值,不只靠顏色(1f 起圖例=priceChart 的指標 chip:
         # 色塊+文字標籤+最新值,勾選狀態另以 ✓ 雙編碼)
-        self.assertIn("h('span',{class:'mono',style:'font-size:10.5px;color:var(--muted)'}, val)",
+        # 字級走 --fs-* token(手機斷點統一抬高下限),這裡釘的是「有數值文字」而非某個 px
+        self.assertIn("h('span',{class:'mono',style:'font-size:var(--fs-105);color:var(--muted)'}, val)",
                       self.template)
         self.assertIn("onx?'✓':''", self.template)
 
