@@ -61,6 +61,8 @@ Active radar 使用 schema 2 並以 `selection_cycle_id` 指向該輪凍結記�
    這一層只負責找 trigger。單一當日端點或只掃一個市場必須標 `partial`。
 2. 對每個命中逐檔查 MOPS `t57sb01` 直接文件索引，記錄檔名、申報時間與大小。公司官網
    還沒更新時，不能據此寫「完整附件不存在」；反過來，索引有檔案也只證明可取得。
+   優先名單使用 `scripts/research_filing_index.py` 產出唯讀 JSON，避免人工只開公司 IR 而
+   重複漏掃；工具的網路／解碼／表格解析失敗必須整輪標紅，不能降格成「查無資料」。
 3. 要把附件內容升為公司事實，仍須封存同一版本、記錄 SHA 與引用頁，並依
    `QUALITATIVE_RESEARCH_RUNBOOK.md` 由另一位 reviewer 離線重算期間、單位、數字與推論
    邊界。OpenAPI 列與檔案索引都不能替代這一步，也不能單獨刷新 thesis evidence clock。

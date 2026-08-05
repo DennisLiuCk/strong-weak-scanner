@@ -236,7 +236,9 @@ class RecentResearchArticlesTest(unittest.TestCase):
     def test_committed_home_progress_matches_committed_research_center(self):
         home = (ROOT / "index.html").read_text(encoding="utf-8")
         center = (ROOT / "research.html").read_text(encoding="utf-8")
-        recent_match = re.search(r"\bRECENT=(\{.*?\}), DATE_ISO=", home, re.S)
+        # RECENT 後面目前先注入市場提示 MKT，再宣告 DATE_ISO；以相鄰 payload
+        # 邊界擷取，避免儀表板變數排序調整讓首頁／研究中心同步檢查失效。
+        recent_match = re.search(r"\bRECENT=(\{.*?\}), MKT=", home, re.S)
         library_match = re.search(r"const LIB=(\{.*?\}), MARKET_DATE=", center, re.S)
         self.assertIsNotNone(recent_match, "index.html 缺 RECENT payload")
         self.assertIsNotNone(library_match, "research.html 缺 LIB payload")

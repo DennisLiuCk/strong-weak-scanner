@@ -16,7 +16,7 @@ import research_method_audit as audit
 class ResearchMethodAuditTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.as_of = dt.date(2026, 8, 4)
+        cls.as_of = dt.date(2026, 8, 5)
         cls.topics, cls.graph, cls.radar, cls.scan = audit._load_context(cls.as_of)
         cls.reviews = audit.load_monitor_reviews(cls.topics, cls.as_of, strict=True)
         cls.current = audit.compute_method_audit(
@@ -58,7 +58,8 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["graphs"]["activeEdges"],
         )
         self.assertEqual(self.current["monitors"]["reviewedMature"], 3)
-        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 3)
+        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 5)
+        self.assertEqual(self.current["corrections"]["resultCounts"]["new_support"], 2)
         self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 3)
         self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 3)
         self.assertEqual(
@@ -132,10 +133,16 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(audit._source_group(investor), audit._source_group(newsroom))
 
     def test_no_new_evidence_reviews_do_not_claim_sources_or_actions(self):
-        for row in self.reviews:
-            self.assertEqual(row["result"], "no_new_evidence")
+        no_new = [row for row in self.reviews if row["result"] == "no_new_evidence"]
+        evidence_bearing = [row for row in self.reviews if row["result"] != "no_new_evidence"]
+        self.assertEqual(len(no_new), 3)
+        self.assertEqual(len(evidence_bearing), 2)
+        for row in no_new:
             self.assertEqual(row["evidence_source_ids"], [])
             self.assertEqual(row["claim_action"], "none")
+        for row in evidence_bearing:
+            self.assertTrue(row["evidence_source_ids"])
+            self.assertEqual(row["claim_action"], "new_claim")
         self.assertEqual(self.current["monitors"]["dueOrOverdue"], 0)
         self.assertEqual(self.current["freshness"]["staleTopics"], 3)
 

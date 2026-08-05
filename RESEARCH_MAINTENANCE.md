@@ -103,6 +103,14 @@ posture、`advance／watch／defer`、選擇理由、第一拒絕及下一份證
      日期窗均成功，才可把這一小段 scope 記為 `full`。
    - OpenAPI 命中的每家公司都再查 MOPS `t57sb01` 直接文件索引；公司 IR 活頁可能落後，
      未查直接索引前不得寫「完整附件尚未定位」。
+     對優先名單使用唯讀工具留下可重跑的檔名／時間／大小清單，例如：
+
+     ```powershell
+     python scripts/research_filing_index.py --stock-ids 2308,2337 --year 115 --season 2 --checked-at 2026-08-05 --output tmp/research_filing_index.json
+     ```
+
+     工具遇到連線或解析錯誤會標紅，不會把取檔失敗誤記為 `NO_FILE`；輸出的 `found` 仍只
+     是索引存在，不是內容已驗證。
    - OpenAPI 數值列只是一個申報 trigger，不證明完整 PDF、會計師核閱報告或附註已取得；
      MOPS 檔名／時間／大小也只證明附件存在，不得刷新 evidence clock 或替代 evidence pack。
 
