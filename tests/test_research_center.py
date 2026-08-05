@@ -323,7 +323,10 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('research_library["knowledgeGraph"] = build_knowledge_graph(', builder)
         self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
         self.assertIn("body.append(mobileBack,h('h1'", template)
-        self.assertIn("body.append(meta,articleSections(article,'analyst'))", template)
+        # meta 之後、分析師快讀之前插入行動版大綱(≤1180px 桌機側欄 .outline 隱藏時接手)
+        self.assertIn("body.append(meta);const mobileToc=renderMobileToc(article);"
+                      "if(mobileToc)body.appendChild(mobileToc);"
+                      "body.appendChild(articleSections(article,'analyst'))", template)
         self.assertIn("body.appendChild(articleSections(article,'rest'))", template)
         self.assertIn("body.append(mobileEvidence,h('p'", template)
         self.assertIn("'aria-selected':state.type===type?'true':'false'", template)
