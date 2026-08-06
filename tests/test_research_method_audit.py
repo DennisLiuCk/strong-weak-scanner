@@ -16,7 +16,7 @@ import research_method_audit as audit
 class ResearchMethodAuditTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.as_of = dt.date(2026, 8, 5)
+        cls.as_of = dt.date(2026, 8, 6)
         cls.topics, cls.graph, cls.radar, cls.scan = audit._load_context(cls.as_of)
         cls.reviews = audit.load_monitor_reviews(cls.topics, cls.as_of, strict=True)
         cls.current = audit.compute_method_audit(
@@ -58,10 +58,10 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["graphs"]["activeEdges"],
         )
         self.assertEqual(self.current["monitors"]["reviewedMature"], 3)
-        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 5)
-        self.assertEqual(self.current["corrections"]["resultCounts"]["new_support"], 2)
-        self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 3)
-        self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 3)
+        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 7)
+        self.assertEqual(self.current["corrections"]["resultCounts"]["new_support"], 3)
+        self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 4)
+        self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 4)
         self.assertEqual(
             self.current["scans"]["latestId"], self.scan["latest"]["scan_id"]
         )
@@ -69,8 +69,9 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["scans"]["latestScope"], self.scan["latest"]["scope"]
         )
         self.assertEqual(self.current["scans"]["overdue"], 0)
-        self.assertFalse(self.current["calibration"]["descriptiveRateReady"])
-        self.assertIsNone(self.current["calibration"]["supportRate"])
+        self.assertTrue(self.current["calibration"]["descriptiveRateReady"])
+        self.assertEqual(self.current["calibration"]["evidenceBearingOutcomes"], 3)
+        self.assertEqual(self.current["calibration"]["supportRate"], 1.0)
         self.assertNotIn("score", self.current)
         selection = self.current["selection"]
         self.assertEqual(selection["cycleId"], self.radar["selectionCycleId"])
@@ -103,7 +104,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(gates["freshness"]["status"], "attention")
         self.assertEqual(gates["correction_learning"]["status"], "pass")
         self.assertEqual(gates["scan_accountability"]["status"], "pass")
-        self.assertEqual(gates["calibration"]["status"], "not_ready")
+        self.assertEqual(gates["calibration"]["status"], "pass")
         for gate in gates.values():
             self.assertTrue(gate["observed"])
             self.assertTrue(gate["boundary"])
@@ -135,8 +136,8 @@ class ResearchMethodAuditTest(unittest.TestCase):
     def test_no_new_evidence_reviews_do_not_claim_sources_or_actions(self):
         no_new = [row for row in self.reviews if row["result"] == "no_new_evidence"]
         evidence_bearing = [row for row in self.reviews if row["result"] != "no_new_evidence"]
-        self.assertEqual(len(no_new), 3)
-        self.assertEqual(len(evidence_bearing), 2)
+        self.assertEqual(len(no_new), 4)
+        self.assertEqual(len(evidence_bearing), 3)
         for row in no_new:
             self.assertEqual(row["evidence_source_ids"], [])
             self.assertEqual(row["claim_action"], "none")

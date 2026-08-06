@@ -1245,7 +1245,13 @@ class ResearchTopicSchemaV3ContractTest(unittest.TestCase):
         )
         self.assertFalse(any(topic["quality_errors"] for topic in topics))
         self.assertFalse(scan["errors"])
-        self.assertEqual(scan["latest"]["scope"], "full")
+        self.assertEqual(
+            scan["latest"]["scan_id"],
+            "scan-2026-08-06-priority-q2-due-monitors",
+        )
+        self.assertEqual(scan["latest"]["scope"], "partial")
+        self.assertEqual(scan["latest"]["next_scan_due"], "2026-08-07")
+        self.assertIn("full", {row["scope"] for row in scan["rows"]})
 
     def test_scan_log_rejects_empty_id_and_impossible_clock_order(self):
         text = (

@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-07-29
 source_published_at: 2026-07-28
-last_reviewed_at: 2026-08-03
-review_due: 2026-08-06
+last_reviewed_at: 2026-08-06
+review_due: 2026-08-13
 source_type: mixed
 publisher_domain: cht-pt.com.tw
 canonical_url: https://www.cht-pt.com.tw/xccompdoc?xsmsid=0G328557247962808262
@@ -18,7 +18,7 @@ group_ids: ipdesign,semiequip,pcb,memory,packtest,power
 trigger_type: quarterly_results_and_board_events
 evidence_role: candidate_source
 route: formal_note_candidate
-thesis_claim_id: C9
+thesis_claim_id: C11
 base_confidence: medium
 confidence_basis: Q2 文件已由事件、簡報、量產與完整季報層級重新分流；智原的 NRE／MP 應用佔比可定位，但不是轉單率，完整季報仍待 evidence pack 獨立重算
 cross_company_numbers: false
@@ -45,6 +45,13 @@ from: triaged
 to: triaged
 reason: corrected_document_discovery_and_separated_nre_from_mass_production
 evidence: sources:S15,S16,S17,S18
+-->
+<!-- transition
+date: 2026-08-06
+from: triaged
+to: triaged
+reason: registered_eris_q2_attachment_without_upgrading_unreviewed_contents
+evidence: sources:S19
 -->
 
 <!-- research_source
@@ -308,6 +315,21 @@ locator: 202602_6271_AI1.pdf；索引列示 115/07/30 16:46:53，1113765 bytes
 limitation: 活頁索引只證實附件已上線與當時檔案資訊；本輪未將該完整季報封存成 evidence pack，不宣稱附註已重算
 -->
 
+<!-- research_source
+source_id: S19
+role: exchange
+source_kind: living_index
+publisher: Taipei Exchange
+title: 德微 115Q2 正式文件查詢
+published_at:
+captured_at: 2026-08-06
+accepted_at: 2026-08-06
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3675&year=115&seamon=2&mtype=A
+locator: 202602_3675_AI1.pdf；索引列示 115/08/04 17:11:22，1486228 bytes，IFRSs 合併財報，無更正
+limitation: 活頁索引只證實附件在 8 月 6 日可取得與當時檔案資訊；尚未封存 evidence pack 或獨立重算報表、附註與會計師結論
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -424,7 +446,7 @@ resolution:
 <!-- research_claim
 claim_id: C9
 label: inference
-status: active
+status: superseded
 claim: Q2 研究分流必須同時區分事件、簡報、交易所完整附件與 evidence pack 簽核，並把 NRE 開發階段與 MP 量產階段分開；文件上線不能直接升格為量產或財務受惠
 supporting_source_ids: S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18
 contrary_source_ids:
@@ -434,6 +456,37 @@ boundary: 這是研究路由與證據邊界，不是八家公司的營運優劣�
 verification_needed:
 correction_kind: supersedes
 corrects_claim_id: C4
+corrected_by_claim_id: C11
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: 8 月 6 日重查交易所文件索引時，德微 115Q2 合併財報附件已可定位；索引列示檔案於 8 月 4 日 17:11:22 上線
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-08-06
+basis: S19 的 MOPS 直接文件索引列出檔名、申報時間、檔案大小、文件類型與更正狀態
+boundary: 索引只證明檔案可取得，不證明報表內容、附註、商業化規模或任何營收受惠主張已通過 evidence pack 與獨立重算
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: inference
+status: active
+claim: Q2 研究分流必須把活頁索引視為有捕捉日期的「文件可取得」證據，並持續區分事件、簡報、完整附件、evidence pack 簽核及 NRE／MP 商業階段；後續附件上線應追加修正，而不能回寫成先前已知或直接升格為財務受惠
+supporting_source_ids: S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19
+contrary_source_ids:
+as_of: 2026-08-06
+basis: correction_of:C9；S19 顯示德微附件在前次未定位後才於 8 月 4 日上線，證明文件索引必須保留 as-of，且索引存在仍不等於內容已重算
+boundary: 這是研究路由、時間邊界與證據角色修正，不是公司的營運優劣、估值、股價、投資排名或台股供應鏈營收受惠判斷
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C9
 corrected_by_claim_id:
 resolution:
 -->
@@ -488,7 +541,9 @@ invalidation: 到期仍沒有直接證據時標記 expired_unresolved，不用�
 
 <!-- monitoring_item
 monitor_id: T4
-status: active
+status: retired
+retired_at: 2026-08-06
+retirement_reason: 精測與欣興正式筆記在本 monitor 建立前已完成 independently_verified，8 月 6 日回查亦無 pack 狀態增量；停止重複追蹤，不刷新 evidence clock
 claim_ids: C1,C2,C9
 metric: 精測與欣興 focused evidence pack 的文件角色、數字重算與 reviewer 狀態
 source_ids: S1,S2,S3,S4,S5
@@ -502,7 +557,9 @@ invalidation: 若只有簡報摘要、缺完整季報角色或 reviewer 有未�
 
 <!-- monitoring_item
 monitor_id: T5
-status: active
+status: retired
+retired_at: 2026-08-06
+retirement_reason: 德微新增可定位附件使追蹤母體狀態改變，由 T7 以更新後來源集合接續附件、封存與獨立重算檢查
 claim_ids: C3,C5,C8,C9
 metric: 智原、同欣電、德微、威剛、日月光投控與弘塑 Q2 附件上線、封存與獨立重算狀態
 source_ids: S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18
@@ -516,11 +573,41 @@ invalidation: 只有事件標題、OpenAPI 數值列、文件索引或媒體轉�
 
 <!-- monitoring_item
 monitor_id: T6
-status: active
+status: retired
+retired_at: 2026-08-06
+retirement_reason: 主命題 C9 已由帶 as-of 索引邊界的 C11 取代，由 T8 接續相同 NRE／MP proof point
 claim_ids: C5,C6,C7,C9
 metric: Q2 文件中從 NRE 開發到 MP 量產的可比口徑、合約、具名客戶、量產收入、現金流、存貨與負債 proof points
 source_ids: S2,S3,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18
 watch_source_ids: S4,S6,S7,S8,S9,S10,S11,S17,S18
+frequency: event_driven
+frequency_detail: 每份新一手文件、法說後與每個 H# 到期日
+next_check: 2026-08-15
+trigger: 文件首次以同一 cohort 或具名專案提供 NRE→MP 轉化、時程與可辨識財務貢獻
+invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無法與前期專案對齊時，不宣稱 AI 轉量產或財務受惠
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C3,C5,C8,C10,C11
+metric: 智原、同欣電、德微、威剛、日月光投控與弘塑 Q2 附件上線、封存與獨立重算狀態
+source_ids: S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19
+watch_source_ids: S6,S7,S8,S9,S10,S11,S17,S18,S19
+frequency: weekly
+frequency_detail: 事件日後先掃交易所直接文件索引，再核對公司 IR，直到 evidence pack 簽核或法定申報節點
+next_check: 2026-08-13
+trigger: 新附件完成檔案封存，且 reviewer 可對頁碼、期間、單位、數字與附註獨立重算
+invalidation: 只有事件標題、OpenAPI 數值列、文件索引或媒體轉述時，不升格為已驗證季報
+-->
+
+<!-- monitoring_item
+monitor_id: T8
+status: active
+claim_ids: C5,C6,C7,C11
+metric: Q2 文件中從 NRE 開發到 MP 量產的可比口徑、合約、具名客戶、量產收入、現金流、存貨與負債 proof points
+source_ids: S2,S3,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19
+watch_source_ids: S4,S6,S7,S8,S9,S10,S11,S17,S18,S19
 frequency: event_driven
 frequency_detail: 每份新一手文件、法說後與每個 H# 到期日
 next_check: 2026-08-15
@@ -542,7 +629,7 @@ invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無�
 ### 三句話抓重點
 
 - 精測、欣興與智原已有 Q2 一手簡報；智原 Q2 的 AI 應用占 NRE 35.4%，卻只占 MP 0.4%，正好說明「開發題材」不等於「量產收入」。
-- MOPS 顯示智原完整附件在 7 月 28 日已上線卻被原流程漏掃；同欣電附件則在 7 月 30 日上線，必須把公司官網與交易所索引交叉查找。
+- MOPS 顯示智原、同欣電與德微附件分別在 7 月 28 日、7 月 30 日與 8 月 4 日上線；活頁索引必須保留檢查日期，且「可取得」仍不等於內容已由另一位 reviewer 重算。
 - 這篇的價值是把「檔案可取得、內容可重算、商業階段成立」三件事分開管理，而不是把 Q2 標題一律當成已證實結論。
 
 ### 為什麼重要
@@ -570,7 +657,8 @@ invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無�
 含會計師核閱報告與附註的完整季報，不能承擔 evidence pack 的 `latest_quarterly_report`
 角色。8 月 3 日回查時，智原 Q2 簡報與新聞稿已可直接定位，且 MOPS 文件索引顯示智原
 115Q2 完整附件早在 7 月 28 日上線；原流程只看公司事件入口而漏掉附件，這是需要留下的
-方法修正。同欣電完整附件則於 7 月 30 日才上線，與 7 月 29 日 as-of 結論不衝突。這批
+方法修正。同欣電完整附件則於 7 月 30 日才上線，與 7 月 29 日 as-of 結論不衝突。8 月 6 日
+到期重查再定位到德微於 8 月 4 日上線的完整附件，但本輪仍只驗證索引，沒有重算內容。這批
 資料現在應按「事件→附件→證據包」與「NRE 開發→MP 量產」兩條軸分流，不能因公告標題、
 文件存在或 AI 開發占比就先填量產與財務受惠結論。
 
@@ -602,14 +690,17 @@ invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無�
   已列 `202602_6271_AI1.pdf`，申報時間為 7 月 30 日 16:46:53。這證明公司 IR 頁面可落後，
   也只證明檔案存在；8 月 5 日法說與 evidence pack 仍需用來驗證產品組合、菲律賓廠進度及
   光通訊收入。
-- [德微 Q2 董事會預告](https://www.eris.com.tw/ShowMops.php?seq_no=1&spoke_time=153338&spoke_date=1150721)
-  與[公司財報頁](https://www.eris.com.tw/financialReport.php)。截至本次掃描只確認開會
-  事件，不能據此更新毛利、現金流、庫存或 H1／H2 商業化規模。
+- [德微 Q2 董事會預告](https://www.eris.com.tw/ShowMops.php?seq_no=1&spoke_time=153338&spoke_date=1150721)、
+  [公司財報頁](https://www.eris.com.tw/financialReport.php)與
+  [MOPS 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3675&year=115&seamon=2&mtype=A)。
+  8 月 6 日回查時，索引已列 `202602_3675_AI1.pdf`，申報時間為 8 月 4 日 17:11:22；
+  本輪只確認檔案可取得，尚未封存或重算，因此不能更新毛利、現金流、庫存或 H1／H2
+  商業化規模。
 - 交易所正式文件清單在本次掃描時，對
   [威剛](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3260&year=115&seamon=2&mtype=A)、
   [日月光投控](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3711&year=115&seamon=2&mtype=A)與
   [弘塑](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3131&year=115&seamon=2&mtype=A)
-  均無可定位的 115Q2 正式財報 PDF。這只描述 7 月 29 日的查找結果；Q2 法定申報期限
+  在 8 月 6 日重查時仍無可定位的 115Q2 正式財報 PDF。這是有檢查時間的未定位結果；Q2 法定申報期限
   尚未到，不代表逾期或未通過董事會。
 
 ## 影響路由
@@ -620,7 +711,7 @@ stock_ids: 3035
 direction: uncertain
 hypothesis_refs: 3035:H1,3035:H2
 note_action: update_required
-action_due: 2026-08-06
+action_due: 2026-08-13
 rationale: Q2 簡報、新聞稿與 MOPS 完整附件均已定位；下一步是封存完整季報並重算專案組合、毛利、現金流與 NRE 到 MP 的可比路徑
 evidence_boundary: AI 占 NRE 35.4% 與占 MP 0.4% 是兩個不同收入池的應用占比，不是專案轉單率，也不支持未揭露的客戶、投片時程或量產收入
 -->
@@ -653,7 +744,7 @@ stock_ids: 3260
 direction: uncertain
 hypothesis_refs: 3260:H1,3260:H2
 note_action: review_due
-action_due: 2026-08-01
+action_due: 2026-08-13
 rationale: 本次未定位到 115Q2 正式附件，待公司或交易所檔案上線後再檢查存貨、現金流與應收
 evidence_boundary: 月營收與股價只能觸發搜尋，不能證實缺貨延續、2027 長約或全年營收倍增
 -->
@@ -664,7 +755,7 @@ stock_ids: 6271,3711
 direction: uncertain
 hypothesis_refs: 6271:H1,6271:H2,3711:H1,3711:H2
 note_action: review_due
-action_due: 2026-08-06
+action_due: 2026-08-13
 rationale: 同欣電 MOPS 完整附件已於 7 月 30 日上線，等待封存重算與 8 月 5 日法說補足營運橋接；日月光投控仍等待可下載 Q2 正式文件
 evidence_boundary: 文件索引、事件預告或產業封裝需求不能替代公司收入組合、產能、毛利與具名客戶證據
 -->
@@ -674,10 +765,10 @@ group_id: power
 stock_ids: 3675
 direction: uncertain
 hypothesis_refs: 3675:H1,3675:H2
-note_action: review_due
-action_due: 2026-08-01
-rationale: 已有董事會事件但尚無本次可重算的 Q2 正式附件，待公司財報頁更新
-evidence_boundary: 董事會預告不能支持 AI server 晶圓商業化或小訊號產品量產規模
+note_action: update_required
+action_due: 2026-08-13
+rationale: MOPS 已定位 8 月 4 日上線的 115Q2 合併財報附件；下一步是封存 evidence pack 並重算報表、附註與商業化邊界
+evidence_boundary: 文件索引只證明可取得，不能支持 AI server 晶圓商業化、小訊號產品量產規模或營收受惠
 -->
 
 <!-- impact
@@ -686,7 +777,7 @@ stock_ids: 3131
 direction: uncertain
 hypothesis_refs: 3131:H1,3131:H2
 note_action: watch
-action_due: 2026-08-05
+action_due: 2026-08-13
 rationale: Q2 董事會預計 8 月 4 日召開，事件後檢查設備收入、合約負債、在製與毛利
 evidence_boundary: 產業 CoWoS 需求不能替代弘塑具名急單或全年營收大於 80 億元的公司證據
 -->
@@ -698,7 +789,7 @@ evidence_boundary: 產業 CoWoS 需求不能替代弘塑具名急單或全年營
 - 智原把已定位的完整 115Q2 附件封存成 focused evidence pack，由另一位 reviewer 重算；
   後續以同一 cohort 的 tape-out、qualification 與 MP 收入追蹤 NRE 轉量產，而不是比較兩個
   不同收入池的百分比。
-- 8 月 4 日後重查弘塑，8 月 5 日同欣電法說後把已上線完整附件封存重算；威剛、德微與
-  日月光投控以 MOPS 直接附件優先於公司 IR 活頁索引。
+- 德微、智原與同欣電已定位完整附件，下一步是各自封存與獨立重算；威剛、日月光投控與
+  弘塑截至 8 月 6 日仍無附件，以 MOPS 直接索引優先於公司 IR 活頁索引持續追蹤。
 - 任一事件若只有標題、董事會預告或媒體數字，保持 `review_due`／`watch`，不更新正式
   筆記、不轉移 H# 生命週期，也不改量化分數。
