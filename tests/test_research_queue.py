@@ -1480,6 +1480,23 @@ class ReadabilityGateTest(unittest.TestCase):
         result, _, _ = self._run(body, entities={"nvidia"})
         self.assertEqual(result["undefinedHard"], [])
 
+    def test_publishers_of_cited_sources_are_entities_not_jargon(self):
+        # 公司名不該被要求寫進名詞小字典；從文章自己的 source block 收割 publisher，
+        # 比另外維護一份公司清單更不會過期。
+        body = self.GLOSSARY + "說明。" * 200 + (
+            "\n<!-- research_source\nsource_id: S1\npublisher: Advantest\n-->\n"
+            "<!-- research_claim\nclaim: " + "Advantest " * 9 + "\n-->\n")
+        result, _, _ = self._run(body)
+        self.assertEqual(result["undefinedHard"], [])
+
+    def test_digit_prefixed_words_do_not_produce_phantom_terms(self):
+        # "2nd" 曾被切成 "nd"，讓 gate 要求作者解釋一個不存在的術語。
+        body = self.GLOSSARY + "說明。" * 200 + "\n<!-- research_claim\nclaim: " \
+            + "2nd 115Q2 " * 6 + "\n-->\n"
+        result, _, _ = self._run(body)
+        self.assertEqual(result["undefinedHard"], [])
+        self.assertEqual(result["undefinedSoft"], [])
+
     def test_ledger_ids_and_common_abbreviations_are_not_jargon(self):
         body = self.GLOSSARY + "說明。" * 200 + "\n<!-- research_claim\nclaim: " \
             + "C7 S12 MI-2026-08-08-X AI Q2 GPU " * 6 + "\n-->\n"

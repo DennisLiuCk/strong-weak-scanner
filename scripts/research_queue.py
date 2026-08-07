@@ -1287,11 +1287,21 @@ READABILITY_COMMON_TERMS = {
     "cfo", "gpu", "cpu", "odm", "oem", "pcb", "tam", "mou", "pdf", "url", "api",
     "csp", "hpc", "it", "ot", "id", "cagr", "yoy", "qoq", "roe", "capex", "r&d",
     "ip", "bom", "kpi", "nre", "mvp",
+    # 單位與規模詞
+    "gb", "tb", "mb", "kb", "kw", "mw", "gw", "multi-gw", "nm", "ghz", "mhz",
+    "hz", "vdc", "vac", "kv", "ma", "usd", "twd", "jpy", "pcs", "sq", "ft",
+    # 出現在英文片語裡、本身不是術語的常見英文字
+    "supply", "chain", "status", "design", "reference", "production", "business",
+    "review", "report", "guide", "overview", "summary", "note", "notes", "page",
+    "table", "figure", "section", "appendix", "press", "release", "results",
+    "quarter", "full", "year", "first", "second", "third", "fourth", "next",
+    "and", "for", "with", "from", "the", "of", "in", "on", "to", "by", "at",
 }
 # C7 / S12 / T3 / M1-O2 / MI-2026-08-07-... are record IDs, not terms to look up.
 _LEDGER_ID_RE = re.compile(
     r"^(?:[CSTM][1-9]\d*(?:-O[1-9]\d*)?|H\d+|MI-\d{4}-\d{2}-\d{2}-.*)$", re.I)
-_LATIN_TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z0-9.\-]*")
+# 負向後查:避免把 "2nd" 切成 "nd"、"115Q2" 切成 "Q2"。
+_LATIN_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9])[A-Za-z][A-Za-z0-9.\-]*")
 _ANY_BLOCK_RE = re.compile(r"<!--(.*?)-->", re.S)
 
 # 已發布文章原本只能靠「綁定 sources 的 revision transition」改寫正文，也就是預設
@@ -1351,6 +1361,17 @@ def analyse_readability(text, meta, errors, warnings, entity_terms=None):
     欄位；只量 markdown 正文會把帳本裡的術語全部漏掉。
     """
     entity_terms = _entity_terms() if entity_terms is None else entity_terms
+    # 若某個名字已被登錄為引用來源的 publisher，它是一個實體，不是讀者要查字典的
+    # 概念。從文章自己的 source block 收割，比另外維護一份公司清單更不會過期。
+    entity_terms = set(entity_terms)
+    for body in _ANY_BLOCK_RE.findall(text):
+        for line in body.splitlines():
+            if ":" not in line:
+                continue
+            key, value = line.split(":", 1)
+            if key.strip() in {"publisher", "independence_group"}:
+                for token in _LATIN_TOKEN_RE.findall(value):
+                    entity_terms.add(token.strip(".-").lower())
     prose = _ANY_BLOCK_RE.sub(" ", text)
     shown = [prose]
     for body in _ANY_BLOCK_RE.findall(text):
