@@ -5,9 +5,15 @@
 This tool only builds a reproducible trigger index. It never opens the project
 database and cannot turn an OpenAPI row into verified filing content. Daily
 announcement endpoints publish an output batch dated after the speech date, so
-coverage is conservatively defined as the earlier market output date minus one
-day. A requested window is full only when that derived boundary reaches the
-window end for both markets.
+coverage is conservatively bounded by the market output date minus one day.
+
+That bound alone is not sufficient. The daily batch is non-retentive: it carries
+a single speech date and is replaced when the output date rolls forward, so date
+arithmetic would certify a window using a batch that never contained any of its
+days. A requested window is therefore full only when, for both markets, the
+derived boundary reaches the window end AND the batch actually read carries a
+speech date inside the window. Once a batch has rolled past a window, the gap
+cannot be closed by re-running; only the scan row that truly read that day counts.
 """
 from __future__ import annotations
 
