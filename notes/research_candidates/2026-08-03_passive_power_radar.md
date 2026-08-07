@@ -8,7 +8,7 @@ schema_version: 2
 radar_id: RADAR-2026-08-03-03
 as_of: 2026-08-03
 next_review: 2026-08-10
-status: active
+status: retired
 method: 先由現有族群文章與圖譜覆蓋確認 passive 仍是最薄的一群，再按一手來源能否對齊系統位置／故障模型、可證偽性、相對既有 CBU／800V 研究的新增知識、台灣公司映射風險與維護成本排序；候選先寫入 append-only selection log，深研後只更新 evidence posture、route 與結果，另以學習者／分析師雙讀者 gate 檢驗發布可用性
 selection_cycle_id: RS-2026-08-03-03
 -->

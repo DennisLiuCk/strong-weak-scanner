@@ -156,3 +156,11 @@ capability:protective-earthing,capability,保護接地與等電位,Protective ea
 capability:overcurrent-protection,capability,過電流保護,Overcurrent protection|short-circuit protection,concept:800v-protection-layers,偵測並限制或切斷超額電流與短路故障的保護能力
 capability:ground-fault-detection,capability,接地故障偵測,Ground fault detection|insulation fault detection,concept:800v-protection-layers,偵測高壓導體對保護地或機殼異常電流路徑的能力
 capability:controlled-inrush,capability,受控湧入與預充,Controlled inrush|pre-charge control,concept:800v-protection-layers,帶電連接大電容負載時依功率開關安全工作區控制充電軌跡的能力
+concept:ai-rack-action-contract,concept,AI 機櫃控制契約,AI rack action contract|rack telemetry action loop,concept:liquid-cooling-loop-boundary,把機櫃身分 資料語意 動作所有權 安全裁決 隔離狀態與維修結果串成可驗證閉環的研究框架
+capability:rack-identity-coordination,capability,機櫃身分對齊,Rack identity coordination|rackLocationId,concept:ai-rack-action-contract,讓 IT 與 OT 以穩定且一致的識別碼指向同一物理機櫃的能力
+capability:typed-event-context,capability,具語意事件資料,Typed telemetry context|Value and Metadata,concept:ai-rack-action-contract,以時間 品質 單位 設備與關係上下文使即時數值可以被下游系統正確解讀的能力
+capability:action-ownership,capability,動作所有權,Action ownership|integration publisher contract,concept:ai-rack-action-contract,界定誰可以發布請求 誰持有資料語意以及誰對實體動作負最終裁決責任的契約能力
+capability:guardrailed-isolation,capability,具安全邊界的隔離,Guardrailed isolation|safe-default action,concept:ai-rack-action-contract,在上下限 變化率 失聯與越界條件下裁決液冷或電力隔離請求並回到安全狀態的能力
+capability:action-state-feedback,capability,動作狀態回報,Action acknowledgement|isolation state feedback,concept:ai-rack-action-contract,把請求 接受 拒絕 執行 完成 失敗 復原與維修結果回傳給營運系統的能力
+standard:openrmc-northbound,standard,OpenRMC Northbound Interface,OpenRMC profile|rack manager northbound API,concept:ai-rack-action-contract,OCP 以 Redfish resources 定義 rack manager 對資料中心管理端暴露的 power thermal event telemetry 與維護介面
+standard:redfish-management,standard,Redfish 管理標準,DMTF Redfish|DSP0266,concept:ai-rack-action-contract,DMTF 維護的通用 RESTful 系統管理標準與 schema profile event action 等文件集合
