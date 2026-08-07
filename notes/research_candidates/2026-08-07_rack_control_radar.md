@@ -9,7 +9,7 @@ schema_version: 2
 radar_id: RADAR-2026-08-07-01
 as_of: 2026-08-07
 next_review: 2026-08-14
-status: active
+status: retired
 method: 先做全 universe 官方事件端點快掃並明示 8 月 7 日資料尚未出現在來源端點，因此 scope 維持 partial；再依上一輪明示 next evidence、族群圖譜缺口、可證偽性、至少兩條一手來源鏈、台灣公司映射風險與維護成本排序。候選先寫入 append-only selection log 並獨立 commit；深研後只更新 evidence posture、route 與結果，不改凍結排名、第一拒絕與下一份證據
 selection_cycle_id: RS-2026-08-07-01
 -->

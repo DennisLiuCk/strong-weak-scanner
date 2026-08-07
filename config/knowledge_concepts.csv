@@ -164,3 +164,11 @@ capability:guardrailed-isolation,capability,具安全邊界的隔離,Guardrailed
 capability:action-state-feedback,capability,動作狀態回報,Action acknowledgement|isolation state feedback,concept:ai-rack-action-contract,把請求 接受 拒絕 執行 完成 失敗 復原與維修結果回傳給營運系統的能力
 standard:openrmc-northbound,standard,OpenRMC Northbound Interface,OpenRMC profile|rack manager northbound API,concept:ai-rack-action-contract,OCP 以 Redfish resources 定義 rack manager 對資料中心管理端暴露的 power thermal event telemetry 與維護介面
 standard:redfish-management,standard,Redfish 管理標準,DMTF Redfish|DSP0266,concept:ai-rack-action-contract,DMTF 維護的通用 RESTful 系統管理標準與 schema profile event action 等文件集合
+concept:ai-rack-trust-root,concept,AI 機櫃信任根,AI rack trust root|silicon RoT to rack authorization,concept:ai-rack-action-contract,把晶片內量測信任根 元件證明 動作授權與第三方保證分成不同責任層的研究框架
+standard:caliptra,standard,Caliptra,Caliptra R1|Caliptra silicon RoT|SiRoT,concept:ai-rack-trust-root,OCP 定義在 SoC 內實作 Root of Trust for Measurement 區塊的規格 矽邏輯 ROM 與韌體
+standard:spdm,standard,SPDM,DSP0274|Security Protocol and Data Model,concept:ai-rack-trust-root,DMTF 維護的元件間身分認證 韌體與組態量測及加密工作階段協定
+standard:spdm-authorization,standard,SPDM Authorization,DSP0289|SPDM 授權規格,concept:ai-rack-trust-root,DMTF 另行發布的授權規格 處理通過認證之後可以做什麼的決定
+capability:silicon-rtm,capability,晶片內量測信任根,Silicon RTM|Root of Trust for Measurement,concept:ai-rack-trust-root,在 SoC 內建立身分 執行 measured boot 並產出可簽章量測值的能力
+capability:device-attestation,capability,元件證明,Device attestation|measurement reporting,concept:ai-rack-trust-root,把量測值與身分憑證以可驗證方式提供給外部系統的能力
+capability:action-authorization,capability,動作授權,Action authorization|authenticated request permission,concept:ai-rack-trust-root,在確認身分之後決定該身分是否可執行特定實體動作的能力
+capability:security-conformance-assurance,capability,安全一致性保證,Security conformance assurance|third-party security audit,concept:ai-rack-trust-root,讓採購方不必依賴供應商自述即可查證實作是否符合安全規格的第三方稽核與測試制度
