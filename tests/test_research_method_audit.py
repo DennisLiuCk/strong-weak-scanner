@@ -16,7 +16,9 @@ import research_method_audit as audit
 class ResearchMethodAuditTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.as_of = dt.date(2026, 8, 7)
+        # 必須 >= 最新一輪 topic 的 captured_at，否則新發佈的 topic 會被視為
+        # 尚未存在而判為品質不合格；每次發佈新研究時同步更新。
+        cls.as_of = dt.date(2026, 8, 8)
         cls.topics, cls.graph, cls.radar, cls.scan = audit._load_context(cls.as_of)
         cls.reviews = audit.load_monitor_reviews(cls.topics, cls.as_of, strict=True)
         cls.current = audit.compute_method_audit(
@@ -57,10 +59,13 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["graphs"]["traceableEdges"],
             self.current["graphs"]["activeEdges"],
         )
-        self.assertEqual(self.current["monitors"]["reviewedMature"], 3)
-        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 7)
+        self.assertEqual(self.current["monitors"]["reviewedMature"], 6)
+        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 10)
         self.assertEqual(self.current["corrections"]["resultCounts"]["new_support"], 3)
-        self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 4)
+        self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 6)
+        self.assertEqual(self.current["corrections"]["resultCounts"]["not_yet_testable"], 1)
+        # 佐證回填不得計入修正學習：2026-08-08 為 US-ADV-PKG 追加第二條來源鏈後，
+        # 這個數字必須維持不變，否則代表有人用 supersede 假造了一次修正。
         self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 4)
         self.assertEqual(
             self.current["scans"]["latestId"], self.scan["latest"]["scan_id"]
@@ -127,7 +132,6 @@ class ResearchMethodAuditTest(unittest.TestCase):
             [
                 "MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP",
                 "MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL",
-                "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION",
             ],
         )
         self.assertEqual(
@@ -145,11 +149,18 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(audit._source_group(investor), audit._source_group(newsroom))
 
     def test_no_new_evidence_reviews_do_not_claim_sources_or_actions(self):
-        no_new = [row for row in self.reviews if row["result"] == "no_new_evidence"]
-        evidence_bearing = [row for row in self.reviews if row["result"] != "no_new_evidence"]
-        self.assertEqual(len(no_new), 4)
-        self.assertEqual(len(evidence_bearing), 3)
-        for row in no_new:
+        # not_yet_testable 與 no_new_evidence 同樣不帶新證據：前者是觸發條件的觀測窗
+        # 尚未開啟，後者是查過但沒有新資料。原本把「非 no_new_evidence」一律當成帶證據，
+        # 在第一筆 not_yet_testable 出現時就會誤要求它附 source 與 new_claim。
+        # 只有 new_support／new_contrary 才是 audit 計入 calibration 的帶證據結果。
+        non_evidence = [row for row in self.reviews
+                        if row["result"] in {"no_new_evidence", "not_yet_testable"}]
+        evidence_bearing = [row for row in self.reviews
+                            if row["result"] in {"new_support", "new_contrary"}]
+        self.assertEqual(len(non_evidence) + len(evidence_bearing), len(self.reviews))
+        self.assertEqual(len(evidence_bearing),
+                         self.current["calibration"]["evidenceBearingOutcomes"])
+        for row in non_evidence:
             self.assertEqual(row["evidence_source_ids"], [])
             self.assertEqual(row["claim_action"], "none")
         for row in evidence_bearing:

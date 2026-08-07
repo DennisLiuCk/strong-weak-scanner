@@ -33,6 +33,11 @@
   （TSMC 自有新聞室 2024-10-04 MOU），其五份既有來源全在 ir.amkor.com。獨立交叉驗證
   缺口由 3 篇降為 2 篇，且 `last_evidence_at` 維持 2026-08-01、`review_due` 與
   `last_reviewed_at` 均未變動——佐證變寬但新鮮度不動，正是本次兩項修正的合力結果。
+- 修正契約測試把 `not_yet_testable` 誤當成帶證據結果。原測試以「非 no_new_evidence」
+  一律要求附 source 與 `new_claim`，在本輪出現第一筆 `not_yet_testable` 時即誤判；
+  改為只有 `new_support`／`new_contrary` 算帶證據，並與 audit 的 calibration 計數對齊。
+  另把雷達測試中寫死的候選張數改為「雷達與凍結帳本逐一對應且排名連續」，
+  不再讓每次發佈都必須改測試。410 → 418 tests，UTF-8 與 cp950 兩種環境皆 OK。
 - 三個到期 monitor 全數留下 review event（兩筆 no_new_evidence、一筆 not_yet_testable，
   後者因 Advantest FY2026 Q2 業績排定 2026 年 10 月才公布）。修正學習與校準可用性
   兩道 gate 由 ATTENTION／NOT_READY 轉為 PASS；校準仍只報 counts，不計支持率。

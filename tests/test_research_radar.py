@@ -43,10 +43,13 @@ class ResearchRadarTest(unittest.TestCase):
             ),
         }
         self.assertEqual(self.payload["stats"], expected_stats)
-        self.assertEqual(len(candidates), 5)
+        # 每輪候選數本來就會變；要驗的是雷達與凍結帳本逐一對應且排名連續，
+        # 不是某一輪的固定張數。寫死張數只會讓每次發佈都得改測試。
+        self.assertGreaterEqual(len(candidates), 1)
+        self.assertEqual(len(candidates), len(selection_log))
         self.assertEqual(
             [row["rank"] for row in candidates],
-            list(range(1, 6)),
+            list(range(1, len(candidates) + 1)),
         )
         self.assertEqual(self.payload["schemaVersion"], 2)
         self.assertTrue(self.payload["selectionCycleId"].startswith("RS-"))
@@ -92,7 +95,7 @@ class ResearchRadarTest(unittest.TestCase):
 
     def test_frozen_selection_fields_are_exposed_without_rewriting(self):
         frozen = {row["candidate_id"]: row for row in self.payload["selectionLog"]}
-        self.assertEqual(len(frozen), 5)
+        self.assertEqual(len(frozen), len(self.payload["candidates"]))
         for row in self.payload["candidates"]:
             original = frozen[row["id"]]
             self.assertEqual(row["rank"], original["rank"])
