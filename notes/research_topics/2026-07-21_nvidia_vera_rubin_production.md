@@ -40,6 +40,13 @@ to: triaged
 reason: cross_group_mapping_completed_with_explicit_evidence_boundaries
 evidence: sources:S1,S2,S3,S4,S5
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -49,6 +56,9 @@ evidence: sources:S1,S2,S3,S4,S5
 - **AI factory**：把大量運算、網路、儲存、電力與散熱設備整合成 AI 基礎設施的資料中心，不是傳統製造工廠。
 - **生態系夥伴**：平台商公開列名能配合設計或供應的公司；被列名不等於已取得特定金額的新增訂單。
 - **客戶驗收**：客戶確認設備符合規格、可以交付或認列的程序；通常比展示、送樣或合作公告更接近財務貢獻。
+- **Rubin 與 Vera**：NVIDIA 下一代平台的兩顆晶片代號——Rubin 是 GPU、Vera 是 CPU，合稱 Vera Rubin 平台。代號只表示產品世代，不表示已量產或已出貨。
+- **Spectrum-6**：NVIDIA 資料中心網路交換平台的新一代產品名稱。它與 Vera Rubin 是同一波發布的不同產品，供應鏈也不同，不應混為一談。
+- **HBM**：貼著 GPU 封裝的高頻寬記憶體。本文只涉及 NVIDIA 與記憶體廠的合作揭露，不支持任何台灣記憶體公司的訂單推論。
 
 ### 三句話抓重點
 
