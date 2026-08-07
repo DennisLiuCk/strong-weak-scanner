@@ -14,6 +14,10 @@
   Smart App Control 會擋 `_socket.pyd`;症狀是唯讀腳本(daily_brief/validate/audit)正常、
   `fetch_*.py` 一 import urllib 就死,很容易誤判成程式碼問題。
 - 中文 stdout 在 console 會亂碼(cp950),寫檔 UTF-8 正常;必要時輸出到檔案再讀。
+- **產生 append-only 帳本檔(method audit snapshot、scan log 等)不要用 shell 重導向**
+  ——Windows 上 `python ... > file.json` 會把 `\n` 轉成 CRLF,git 以 LF 入庫後
+  `--baseline-ref` 會逐行比對失敗、誤報「歷史 snapshot 不可改寫」。用 Python 直接
+  `open(...,'wb')` 或寫完以 LF 正規化;既有檔案一律是 LF。
 - **判斷「現在台灣時間」直接下 `date`(不要加 `TZ=Asia/Taipei` 前綴)**——這台機器系統
   本地時區就是 Asia/Taipei,但 git-bash 沒裝 tzdata,`TZ=Asia/Taipei date` 會轉換失敗、
   靜默印出系統原始值並貼錯時區標籤(曾把 23:32 台灣時間誤判成 15:31,少算 8 小時,
