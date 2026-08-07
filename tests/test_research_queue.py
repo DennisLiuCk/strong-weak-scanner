@@ -1440,5 +1440,132 @@ class ResearchFinancialCoverageTest(unittest.TestCase):
             for item in result["quarter_tables"].values()))
 
 
+class ReadabilityGateTest(unittest.TestCase):
+    """雙讀者 gate 的可判定條件：術語要解釋、正文不能被帳本蓋過。"""
+
+    GLOSSARY = (
+        "# T\n\n### 名詞小字典\n\n"
+        "- **SPDM**：零件之間互相驗證身分的對話規則。\n\n"
+        "### 三句話抓重點\n\n"
+    )
+
+    def _run(self, text, captured_at="2026-08-20", entities=None):
+        errors, warnings = [], []
+        result = rq.analyse_readability(
+            text, {"captured_at": captured_at}, errors, warnings,
+            entity_terms=entities if entities is not None else set())
+        return result, errors, warnings
+
+    def test_ledger_text_counts_because_the_reader_sees_it_rendered(self):
+        # 術語只出現在 claim 欄位裡，正文一次都沒有：讀者仍然看得到，必須計入。
+        body = self.GLOSSARY + "說明。" * 200 + "\n<!-- research_claim\nclaim: " \
+            + "Caliptra " * 6 + "\n-->\n"
+        result, errors, _ = self._run(body)
+        self.assertEqual([term for term, _ in result["undefinedHard"]], ["caliptra"])
+        self.assertTrue(any("名詞小字典" in error for error in errors))
+
+    def test_glossary_entry_clears_the_term(self):
+        body = self.GLOSSARY + "說明。" * 200 + "\n<!-- research_claim\nclaim: " \
+            + "SPDM " * 9 + "\n-->\n"
+        result, errors, warnings = self._run(body)
+        self.assertEqual(result["undefinedHard"], [])
+        self.assertFalse([item for item in errors if "名詞小字典" in item])
+        self.assertFalse([item for item in warnings if "名詞小字典" in item])
+
+    def test_citation_metadata_and_registered_entities_are_not_jargon(self):
+        body = self.GLOSSARY + "說明。" * 200 + (
+            "\n<!-- research_source\ntitle: " + "Security Review Provider " * 8
+            + "\nlocator: " + "Appendix " * 8
+            + "\n-->\n<!-- research_claim\nclaim: " + "NVIDIA " * 8 + "\n-->\n")
+        result, _, _ = self._run(body, entities={"nvidia"})
+        self.assertEqual(result["undefinedHard"], [])
+
+    def test_ledger_ids_and_common_abbreviations_are_not_jargon(self):
+        body = self.GLOSSARY + "說明。" * 200 + "\n<!-- research_claim\nclaim: " \
+            + "C7 S12 MI-2026-08-08-X AI Q2 GPU " * 6 + "\n-->\n"
+        result, _, _ = self._run(body)
+        self.assertEqual(result["undefinedHard"], [])
+
+    def test_three_to_four_uses_warn_but_never_error(self):
+        body = self.GLOSSARY + "說明。" * 200 + "\n<!-- research_claim\nclaim: " \
+            + "Caliptra " * 3 + "\n-->\n"
+        result, errors, warnings = self._run(body)
+        self.assertEqual([term for term, _ in result["undefinedSoft"]], ["caliptra"])
+        self.assertEqual(errors, [])
+        self.assertTrue(any("3~4" in warning for warning in warnings))
+
+    def test_ledger_may_not_outgrow_the_explanation(self):
+        body = self.GLOSSARY + "短。" + "\n<!-- research_claim\nboundary: " \
+            + "邊界說明。" * 200 + "\n-->\n"
+        result, errors, _ = self._run(body)
+        self.assertLess(result["proseRatio"], rq.READABILITY_MIN_PROSE_RATIO)
+        self.assertTrue(any("正文解釋" in error for error in errors))
+
+    def test_pre_cutover_topics_warn_instead_of_failing_signed_work(self):
+        body = self.GLOSSARY + "說明。" * 200 + "\n<!-- research_claim\nclaim: " \
+            + "Caliptra " * 9 + "\n-->\n"
+        _, errors, warnings = self._run(body, captured_at="2026-08-01")
+        self.assertEqual(errors, [])
+        self.assertTrue(any("名詞小字典" in warning for warning in warnings))
+        _, errors_new, _ = self._run(body, captured_at=rq.READABILITY_CUTOVER)
+        self.assertTrue(errors_new)
+
+    def test_published_trust_root_article_passes_the_gate(self):
+        path = rq.os.path.join(
+            rq.TOPICS_DIR, "2026-08-08_ai_rack_trust_root.md")
+        with open(path, encoding="utf-8") as handle:
+            text = handle.read()
+        result, _, _ = self._run(text, entities=rq._entity_terms())
+        self.assertEqual(result["undefinedHard"], [])
+        self.assertGreaterEqual(
+            result["proseRatio"], rq.READABILITY_MIN_PROSE_RATIO)
+
+
+class EditorialRevisionTest(unittest.TestCase):
+    """可讀性改寫要留痕，但不能變成偷改結論的後門。"""
+
+    META = ("<!-- research_topic\ntopic_id: MI-2026-08-08-X\nschema_version: 3\n"
+            "status: triaged\nthesis_claim_id: C1\nbase_confidence: medium\n"
+            "review_due: 2026-09-30\nlast_reviewed_at: 2026-08-08\n-->\n")
+    T1 = ("<!-- transition\ndate: 2026-08-08\nfrom: initial\nto: inbox\n"
+          "reason: r\nevidence: source_chain:x\n-->\n")
+    EDITORIAL = ("<!-- transition\ndate: 2026-08-08\nfrom: triaged\nto: triaged\n"
+                 "reason: editorial_rewrite\nevidence: editorial:readability\n-->\n")
+    SRC = ("<!-- research_source\nsource_id: S1\npublished_at: 2026-07-01\n"
+           "captured_at: 2026-08-08\naccepted_at: 2026-08-08\nstatus: active\n-->\n")
+
+    def claim(self, text="原始結論"):
+        return ("<!-- research_claim\nclaim_id: C1\nlabel: inference\n"
+                f"status: active\nas_of: 2026-08-08\nclaim: {text}\n"
+                "supporting_source_ids: S1\n-->\n")
+
+    def test_prose_rewrite_without_any_revision_marker_is_rejected(self):
+        before = self.META + self.T1 + self.SRC + self.claim() + "\n舊的敘述段落。\n"
+        after = self.META + self.T1 + self.SRC + self.claim() + "\n完全不同的敘述。\n"
+        errors = rq.audit_topic_history(before, after)
+        self.assertTrue(any("歷史可見正文不可靜默改寫" in error for error in errors))
+
+    def test_editorial_revision_allows_prose_only_rewrite(self):
+        before = self.META + self.T1 + self.SRC + self.claim() + "\n舊的敘述段落。\n"
+        after = (self.META + self.T1 + self.EDITORIAL + self.SRC + self.claim()
+                 + "\n改寫後更好讀的敘述。\n")
+        self.assertEqual(rq.audit_topic_history(before, after), [])
+
+    def test_editorial_revision_cannot_smuggle_a_claim_change(self):
+        before = self.META + self.T1 + self.SRC + self.claim() + "\n舊的敘述段落。\n"
+        after = (self.META + self.T1 + self.EDITORIAL + self.SRC
+                 + self.claim("偷偷換掉的結論") + "\n改寫後的敘述。\n")
+        errors = rq.audit_topic_history(before, after)
+        self.assertTrue(any("editorial revision 只能改敘述" in error for error in errors))
+
+    def test_editorial_revision_cannot_move_the_clocks(self):
+        before = self.META + self.T1 + self.SRC + self.claim() + "\n舊的敘述段落。\n"
+        moved = self.META.replace("review_due: 2026-09-30", "review_due: 2026-12-31")
+        after = (moved + self.T1 + self.EDITORIAL + self.SRC + self.claim()
+                 + "\n改寫後的敘述。\n")
+        errors = rq.audit_topic_history(before, after)
+        self.assertTrue(any("editorial revision 只能改敘述" in error for error in errors))
+
+
 if __name__ == "__main__":
     unittest.main()

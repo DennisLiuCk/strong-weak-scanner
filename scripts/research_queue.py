@@ -1162,6 +1162,7 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None, 
         (sources, claims, comparisons, monitoring, last_evidence_at,
          ledger_last_evidence_at) = _analyse_v3_contract(
             text, meta, errors, warnings, as_of)
+        analyse_readability(text, meta, errors, warnings)
         known_source_ids = {source.get("source_id") for source in sources}
         source_by_id = {source.get("source_id"): source for source in sources}
         for idx, transition in enumerate(transitions, 1):
@@ -1172,6 +1173,11 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None, 
                 if evidence != expected:
                     errors.append(
                         f"transition {idx} initial evidence 必須等於 {expected}")
+                continue
+            if EDITORIAL_EVIDENCE_RE.match(evidence.strip()):
+                if transition.get("from") != transition.get("to"):
+                    errors.append(
+                        f"transition {idx} editorial revision 不可改變 lifecycle 狀態")
                 continue
             evidence_ids = _transition_source_ids(evidence)
             if evidence_ids is None:
@@ -1262,6 +1268,146 @@ def load_topics(topics_dir=TOPICS_DIR, universe_rows=None, group_ids=None, repor
             seen[topic["topic_id"]] = topic
         topics.append(topic)
     return topics
+
+
+READABILITY_CUTOVER = "2026-08-09"
+READABILITY_HARD_USES = 5
+READABILITY_SOFT_USES = 3
+READABILITY_MIN_PROSE_RATIO = 0.50
+
+# Reader-facing ledger fields. title/locator/url are citation metadata: a reader
+# does not need a document's English title glossed, so they are excluded.
+READER_FACING_FIELDS = (
+    "claim", "basis", "boundary", "verification_needed", "rationale",
+    "evidence_boundary", "metric", "trigger", "invalidation", "confidence_basis",
+)
+# Abbreviations a Taiwan equity reader already shares with the author.
+READABILITY_COMMON_TERMS = {
+    "ai", "q1", "q2", "q3", "q4", "1h", "2h", "ir", "asp", "us", "eps", "ceo",
+    "cfo", "gpu", "cpu", "odm", "oem", "pcb", "tam", "mou", "pdf", "url", "api",
+    "csp", "hpc", "it", "ot", "id", "cagr", "yoy", "qoq", "roe", "capex", "r&d",
+    "ip", "bom", "kpi", "nre", "mvp",
+}
+# C7 / S12 / T3 / M1-O2 / MI-2026-08-07-... are record IDs, not terms to look up.
+_LEDGER_ID_RE = re.compile(
+    r"^(?:[CSTM][1-9]\d*(?:-O[1-9]\d*)?|H\d+|MI-\d{4}-\d{2}-\d{2}-.*)$", re.I)
+_LATIN_TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z0-9.\-]*")
+_ANY_BLOCK_RE = re.compile(r"<!--(.*?)-->", re.S)
+
+# 已發布文章原本只能靠「綁定 sources 的 revision transition」改寫正文，也就是預設
+# 每次改寫都由新證據驅動。可讀性修正沒有新證據，於是唯一的路是假裝有——這會讓
+# 文章一旦難讀就永遠難讀。editorial revision 是給這種情況的窄口：它只允許改敘述，
+# 且必須證明沒有動到任何一條 source／claim／comparison／monitor 與所有 meta 時鐘。
+EDITORIAL_EVIDENCE_RE = re.compile(r"^editorial:[a-z0-9_]+$")
+EDITORIAL_LOCKED_META = (
+    "thesis_claim_id", "base_confidence", "confidence_basis", "status",
+    "review_due", "last_reviewed_at", "stock_ids", "group_ids", "route",
+    "cross_company_numbers",
+)
+
+
+def _entity_terms(universe_rows=None):
+    """Names already carried by the entity registries are entities, not jargon."""
+    terms = set()
+    files = (
+        (os.path.join(ROOT, "config", "external_entities.csv"), ("label", "aliases")),
+        (UNIVERSE_CSV, ("name",)),
+    )
+    for path, columns in files:
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, encoding="utf-8-sig", newline="") as handle:
+                for row in csv.DictReader(handle):
+                    for column in columns:
+                        for token in _LATIN_TOKEN_RE.findall(row.get(column) or ""):
+                            terms.add(token.strip(".-").lower())
+        except OSError:
+            continue
+    return terms
+
+
+def _is_jargon(token):
+    text = token.strip(".-")
+    if len(text) < 2 or text.lower() in READABILITY_COMMON_TERMS:
+        return False
+    if _LEDGER_ID_RE.match(text):
+        return False
+    return (
+        any(ch.isdigit() for ch in text)
+        or text.isupper()
+        or text[0].isupper()
+        or any(ch.isupper() for ch in text[1:])
+    )
+
+
+def analyse_readability(text, meta, errors, warnings, entity_terms=None):
+    """雙讀者 gate 的可判定部分：讀者看得到的術語必須解釋，帳本不得吃掉正文。
+
+    這一關原本只驗結構（新手導讀在不在、幾個 bullet），可以完全機械式通過而
+    文章仍不可讀。2026-08-08 的 AI 機櫃信任根一文即是：SPDM 出現 31 次、
+    Caliptra 28 次，兩個主角都沒進小字典，讀者從第一句就無法解析。
+    衡量基準必須是「讀者看得到的文字」——正文加上研究中心會渲染成表格的帳本
+    欄位；只量 markdown 正文會把帳本裡的術語全部漏掉。
+    """
+    entity_terms = _entity_terms() if entity_terms is None else entity_terms
+    prose = _ANY_BLOCK_RE.sub(" ", text)
+    shown = [prose]
+    for body in _ANY_BLOCK_RE.findall(text):
+        for line in body.splitlines():
+            if ":" not in line:
+                continue
+            key, value = line.split(":", 1)
+            if key.strip() in READER_FACING_FIELDS:
+                shown.append(value)
+    shown_text = " ".join(shown)
+
+    start, end = prose.find("名詞小字典"), prose.find("三句話抓重點")
+    glossary = prose[start:end].lower() if 0 <= start < end else ""
+
+    counts = {}
+    for match in _LATIN_TOKEN_RE.finditer(shown_text):
+        token = match.group(0).strip(".-")
+        if _is_jargon(token) and token.lower() not in entity_terms:
+            counts[token.lower()] = counts.get(token.lower(), 0) + 1
+
+    hard = sorted(
+        ((term, n) for term, n in counts.items()
+         if n >= READABILITY_HARD_USES and term not in glossary),
+        key=lambda item: (-item[1], item[0]),
+    )
+    soft = sorted(
+        ((term, n) for term, n in counts.items()
+         if READABILITY_SOFT_USES <= n < READABILITY_HARD_USES and term not in glossary),
+        key=lambda item: (-item[1], item[0]),
+    )
+
+    prose_chars = len(re.sub(r"\s+", "", prose))
+    shown_chars = len(re.sub(r"\s+", "", shown_text))
+    ratio = prose_chars / shown_chars if shown_chars else 1.0
+
+    captured = meta.get("captured_at") or ""
+    enforced = _valid_date(captured) and captured >= READABILITY_CUTOVER
+    sink = errors if enforced else warnings
+
+    if hard:
+        shown_terms = "、".join(f"{term}×{n}" for term, n in hard[:6])
+        sink.append(
+            f"讀者看得到的文字裡有 {len(hard)} 個術語出現 {READABILITY_HARD_USES} 次以上"
+            f"卻沒進名詞小字典：{shown_terms}")
+    if soft:
+        warnings.append(
+            f"另有 {len(soft)} 個術語出現 {READABILITY_SOFT_USES}~"
+            f"{READABILITY_HARD_USES - 1} 次未解釋："
+            + "、".join(f"{term}×{n}" for term, n in soft[:6]))
+    if ratio < READABILITY_MIN_PROSE_RATIO:
+        sink.append(
+            f"正文解釋只占讀者可見文字的 {ratio:.0%}，低於 "
+            f"{READABILITY_MIN_PROSE_RATIO:.0%}；帳本渲染後會蓋過說明")
+    return {
+        "undefinedHard": hard, "undefinedSoft": soft,
+        "proseRatio": round(ratio, 3), "enforced": enforced,
+    }
 
 
 def audit_topic_history(previous_text, current_text):
@@ -1394,10 +1540,27 @@ def audit_topic_history(previous_text, current_text):
                 revision_transition_sources.update(source_ids)
         has_source_bound_revision = bool(revision_transition_sources)
 
+        # editorial revision：只改敘述，且必須證明帳本與時鐘一個字都沒動。
+        declares_editorial = any(
+            EDITORIAL_EVIDENCE_RE.match((transition.get("evidence") or "").strip())
+            for transition in appended_transitions)
+        ledger_unchanged = all(
+            record_sets[kind][0] == record_sets[kind][1]
+            for kind in ("source", "claim", "comparison", "monitor"))
+        meta_unchanged = all(
+            old_meta.get(key, "") == new_meta.get(key, "")
+            for key in EDITORIAL_LOCKED_META)
+        has_editorial_revision = declares_editorial and ledger_unchanged and meta_unchanged
+        if declares_editorial and not (ledger_unchanged and meta_unchanged):
+            errors.append(
+                "editorial revision 只能改敘述；本次同時改到 source／claim／monitor "
+                "或 meta 時鐘，必須改用綁定 sources 的 revision transition")
+
         old_visible = _visible_history_lines(previous_text)
         new_visible = _visible_history_lines(current_text)
         if (not _is_subsequence(old_visible, new_visible)
-                and not has_source_bound_revision):
+                and not has_source_bound_revision
+                and not has_editorial_revision):
             errors.append(
                 "歷史可見正文不可靜默改寫；必須保留舊敘述或追加綁定 sources 的 "
                 "revision transition")

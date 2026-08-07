@@ -428,7 +428,16 @@ root 的一跳關係，先把證據品質與可讀性做穩，再考慮多跳探
 
 transition 的 evidence 也有固定契約：只有第一筆 `initial → inbox` 可以使用
 `evidence: source_chain:<meta.source_chain_id>`；其後所有 transition 一律使用
-`evidence: sources:S1,S2` 形式引用已登錄 source ID。修正、關閉、重開或 meta 時鐘變動都
+`evidence: sources:S1,S2` 形式引用已登錄 source ID。
+
+唯一的例外是**可讀性改寫**（2026-08-08 起）。原本已發布文章要改正文，只能追加綁定
+sources 的 revision transition——等於預設每次改寫都由新證據驅動。純粹把文章寫得更好懂
+並沒有新證據，於是唯一的路是假裝有，結果是文章一旦難讀就永遠難讀。此時可追加
+`evidence: editorial:<slug>` 的同狀態 transition，但它受三重限制：lifecycle 狀態不可改變；
+所有 source／claim／comparison／monitor 必須逐字不變；`thesis_claim_id`、`base_confidence`、
+`review_due`、`last_reviewed_at`、`stock_ids`、`group_ids`、`route` 等 meta 也必須不變。
+只要同時動到其中任何一項，這個窄口即失效，必須改用綁定 sources 的 revision。
+它記錄的是「敘述重寫、結論未變」，不刷新任何時鐘，也不是修正鏈的一環。修正、關閉、重開或 meta 時鐘變動都
 不得再用自由文字或 `source_chain:` 取代實際 evidence。
 
 `scan_log.csv` 與 comparison observation 同樣 append-only：新的掃描窗口、coverage、結果、
@@ -529,9 +538,26 @@ counts 與 `not_ready`，不補零、不把未到期主張算成功。
     測試若因「本輪候選張數不同」而紅，正確做法是把寫死的張數改成與凍結帳本對應的
     不變式，不是每輪改一個數字。
 13. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
-    行動版顯示。另做雙讀者 gate：產業學習者應先看懂名詞、已知／未知與機制；分析師應在
-    第一個快讀區直接取得主命題、證據強度、未證實缺口、可行動範圍與下一個檢驗。完整
-    ledger／impact／monitor 控制表放在機制與研究判定之後，且同一帳本標題不得重複。
+    行動版顯示。完整 ledger／impact／monitor 控制表放在機制與研究判定之後，且同一
+    帳本標題不得重複。
+
+    **雙讀者 gate 有可判定條件，不能只驗結構。** `research_queue.py --lint` 會以
+    「讀者實際看得到的文字」為基準檢查兩件事——基準是正文**加上**研究中心會渲染成
+    表格的帳本欄位（claim、basis、boundary、rationale、metric、trigger 等）；只量
+    markdown 正文會把帳本裡的術語全部漏掉，而讀者是看得到那些的。文件標題與 locator
+    屬引用資訊，不計入：
+
+    - 任何術語在讀者可見文字出現 **5 次以上**卻沒出現在「名詞小字典」→ 2026-08-09
+      起新建 topic 直接 error，既有 topic 標 warning。出現 3～4 次一律 warning。
+      術語偵測排除 registry 已登錄的公司／組織名、常見縮寫（AI、Q2、GPU…）與帳本
+      ID（C7、S12、MI-…）。
+    - 正文解釋不得低於讀者可見文字的 **50%**，否則帳本渲染後會蓋過說明。
+
+    通過機器條件仍不等於好讀。人的部分要另外確認：產業學習者能不能先看懂名詞、
+    已知／未知與機制；分析師能不能在第一個快讀區直接取得主命題、證據強度、未證實
+    缺口、可行動範圍與下一個檢驗。實務上最容易失敗的是**用「一份文件還沒發布」這類
+    抽象缺席當主命題卻不給具體場景**，以及**把否定邊界寫滿正文**——邊界屬於帳本，
+    正文每句都被下一句收回，讀者累積不出任何圖像。
 14. 在文章間切換與由雷達／圖譜開啟文章時，確認閱讀區立即回到頂端；桌機與行動版均檢查
     首屏層級、表格密度、截斷與全頁水平 overflow。快讀只能由既有結構化 register 合成，
     不得另寫一套無 claim ID、source ID 或 monitor 支撐的結論。
