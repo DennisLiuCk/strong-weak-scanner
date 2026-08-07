@@ -121,6 +121,8 @@ def compute_census(
 
     output_dates: dict[str, str] = {}
     coverage_through: dict[str, str] = {}
+    observed_speech: dict[str, list[str]] = {}
+    batch_covers_window: dict[str, bool] = {}
     announcement_rows: list[dict] = []
     market_source_rows: dict[str, int] = {}
     for market, rows in announcements_by_market.items():
@@ -135,6 +137,15 @@ def compute_census(
         output_dates[market] = output_date.isoformat()
         coverage_through[market] = through.isoformat()
         market_source_rows[market] = len(rows)
+        # The daily batch is non-retentive: it carries a single speech date and is
+        # replaced when the output date rolls forward. Date arithmetic alone would
+        # certify a window using a batch that never contained any of its days, so
+        # coverage also requires that the batch actually carries in-window content.
+        speech_dates = sorted({_speech_date(row) for row in rows})
+        observed_speech[market] = [item.isoformat() for item in speech_dates]
+        batch_covers_window[market] = any(
+            window_start <= item <= window_end for item in speech_dates
+        )
         for row in rows:
             stock_id = _stock_id(row)
             speech = _speech_date(row)
@@ -158,10 +169,25 @@ def compute_census(
     income_ids = quarterly_ids(income_rows)
     balance_ids = quarterly_ids(balance_rows)
     paired_ids = sorted(income_ids & balance_ids)
-    complete = all(
+    reached_window_end = all(
         dt.date.fromisoformat(value) >= window_end
         for value in coverage_through.values()
     )
+    carries_window = all(batch_covers_window.values())
+    complete = reached_window_end and carries_window
+    if not reached_window_end:
+        limitation = (
+            "重大訊息日批次尚未覆蓋 window_end；不得把目前 0 列或最新發言日當成最終結果"
+        )
+    elif not carries_window:
+        limitation = (
+            "重大訊息日批次已滾過本窗口且不保留舊發言日，本次讀到的批次不含窗內任何一天；"
+            "缺口不能由這次重跑關閉，必須沿用當時真的讀到該日的既有 scan row"
+        )
+    else:
+        limitation = (
+            "full 只涵蓋兩市場重大訊息日批次與指定季度兩張數值表，不含附件內容或全市場語意"
+        )
     speech_dates = sorted({row["speechDate"] for row in announcement_rows})
     return {
         "schemaVersion": 1,
@@ -175,14 +201,15 @@ def compute_census(
         "coverage": {
             "scope": "full" if complete else "partial",
             "complete": complete,
-            "rule": "each_market_announcement_output_date_minus_one_day_reaches_window_end",
+            "rule": (
+                "each_market_output_date_minus_one_day_reaches_window_end"
+                "_and_batch_speech_dates_fall_inside_window"
+            ),
             "announcementOutputDates": output_dates,
             "announcementCoverageThrough": coverage_through,
-            "limitation": (
-                "重大訊息日批次尚未覆蓋 window_end；不得把目前 0 列或最新發言日當成最終結果"
-                if not complete else
-                "full 只涵蓋兩市場重大訊息日批次與指定季度兩張數值表，不含附件內容或全市場語意"
-            ),
+            "observedSpeechDatesByMarket": observed_speech,
+            "batchCoversWindowByMarket": batch_covers_window,
+            "limitation": limitation,
         },
         "announcements": {
             "rowsInUniverseWindow": len(announcement_rows),

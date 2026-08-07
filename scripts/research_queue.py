@@ -887,10 +887,29 @@ def _analyse_v3_contract(text, meta, errors, warnings, as_of):
         for source_id in claim.get(key, [])
         if (source_by_id.get(source_id) or {}).get("status") == "active"
     }
-    ledger_accepted = [source_by_id[source_id].get("accepted_at")
-                       for source_id in ledger_referenced
-                if _valid_date(source_by_id[source_id].get("accepted_at"))]
-    ledger_last_evidence_at = max(ledger_accepted) if ledger_accepted else None
+    def _evidence_clock(referenced):
+        """Clock follows publication recency; accepted_at only breaks ties.
+
+        Taking max(accepted_at) alone let a newly located but OLD document refresh
+        freshness, because accepted_at is whatever day the researcher accepted it.
+        A back-filled source strengthens independent source chains, but it is not
+        newer evidence, so only the newest-published sources may set the clock.
+        A living_index has no published_at; its captured_at is the observation date.
+        """
+        dated = []
+        for source_id in referenced:
+            source = source_by_id[source_id]
+            accepted = source.get("accepted_at")
+            effective = source.get("published_at") or source.get("captured_at")
+            if _valid_date(accepted) and _valid_date(effective):
+                dated.append((effective, accepted))
+        if not dated:
+            return None
+        newest_published = max(item[0] for item in dated)
+        return max(accepted for effective, accepted in dated
+                   if effective == newest_published)
+
+    ledger_last_evidence_at = _evidence_clock(ledger_referenced)
     thesis = claim_by_id.get(thesis_claim_id) or {}
     thesis_referenced = {
         source_id
@@ -898,10 +917,7 @@ def _analyse_v3_contract(text, meta, errors, warnings, as_of):
         for source_id in thesis.get(key, [])
         if (source_by_id.get(source_id) or {}).get("status") == "active"
     }
-    thesis_accepted = [source_by_id[source_id].get("accepted_at")
-                       for source_id in thesis_referenced
-                       if _valid_date(source_by_id[source_id].get("accepted_at"))]
-    last_evidence_at = max(thesis_accepted) if thesis_accepted else None
+    last_evidence_at = _evidence_clock(thesis_referenced)
     if not last_evidence_at:
         errors.append("schema v3 無法由 active thesis claim source 推導 last_evidence_at")
     if (_valid_date(last_evidence_at) and _valid_date(meta.get("last_reviewed_at"))
@@ -1285,6 +1301,37 @@ def audit_topic_history(previous_text, current_text):
             "active": {"active", "retired"}, "retired": {"retired"},
         }),
     )
+    current_sources = records(SOURCE_RE, "source_id", current_text)
+
+    def corroboration_backfill_errors(record_id, key, old_value, new_value, as_of):
+        """Evidence lists grow only; appended sources must predate the claim as_of.
+
+        A frozen list gave no append-only way to add a later-located independent
+        source chain, so the only route was a supersede that misreports a
+        correction. Appending is allowed, but restricted to backfill: an appended
+        source published after the claim's as_of is new evidence and still needs a
+        new claim generation, which is what forces the wording to be re-derived.
+        """
+        old_ids = [item.strip() for item in old_value.split(",") if item.strip()]
+        new_ids = [item.strip() for item in new_value.split(",") if item.strip()]
+        if new_ids[:len(old_ids)] != old_ids:
+            return [f"歷史 claim {record_id} {key} 只能在既有順序後追加:{key}"]
+        found = []
+        for source_id in new_ids[len(old_ids):]:
+            source = current_sources.get(source_id)
+            if source is None:
+                found.append(f"歷史 claim {record_id} {key} 追加了不存在的 source:{source_id}")
+                continue
+            effective = source.get("published_at") or source.get("captured_at")
+            if not _valid_date(effective) or not _valid_date(as_of):
+                found.append(
+                    f"歷史 claim {record_id} {key} 追加 {source_id} 缺少可比對日期")
+            elif effective > as_of:
+                found.append(
+                    f"歷史 claim {record_id} {key} 追加的 {source_id} 發布日 {effective} "
+                    f"晚於 claim as_of {as_of}；新證據必須另立新 claim，不可回填舊 claim")
+        return found
+
     record_sets = {}
     for kind, pattern, id_key, mutable, transitions in specs:
         before = records(pattern, id_key, previous_text)
@@ -1298,8 +1345,14 @@ def audit_topic_history(previous_text, current_text):
             for key in set(old).union(new):
                 if key in mutable:
                     continue
-                if new.get(key, "") != old.get(key, ""):
-                    errors.append(f"歷史 {kind} {record_id} immutable 欄位被改寫:{key}")
+                if new.get(key, "") == old.get(key, ""):
+                    continue
+                if kind == "claim" and key in {"supporting_source_ids", "contrary_source_ids"}:
+                    errors.extend(corroboration_backfill_errors(
+                        record_id, key, old.get(key, ""), new.get(key, ""),
+                        new.get("as_of", "")))
+                    continue
+                errors.append(f"歷史 {kind} {record_id} immutable 欄位被改寫:{key}")
             old_status = old.get("status") or "active"
             new_status = new.get("status") or "active"
             if transitions is not None:

@@ -40,6 +40,13 @@ to: triaged
 reason: separated_funding_commitment_from_receipt_revenue_and_operating_capacity
 evidence: sources:S1,S2,S3,S4,S5
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: corroboration_backfill_second_source_chain_no_clock_change
+evidence: sources:S7
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -161,6 +168,21 @@ locator: 台灣封測與先進封裝供應商季報、法說及重大訊息查�
 limitation: Amkor 美國擴產與框架協議不能替代台灣供應商自己的利用率、毛利與轉單證據
 -->
 
+<!-- research_source
+source_id: S7
+role: company_release
+source_kind: document
+publisher: TSMC
+title: Amkor and TSMC to Expand Partnership and Collaborate on Advanced Packaging in Arizona
+published_at: 2024-10-04
+captured_at: 2026-08-08
+accepted_at: 2026-08-08
+status: active
+url: https://pr.tsmc.com/english/news/3174
+locator: TSMC 自有新聞室頁面，MOU 敘述與「TSMC will contract turnkey advanced packaging and test services from Amkor in their planned facility in Peoria, Arizona」段落，另列 InFO 與 CoWoS 共同定義封裝技術
+limitation: 這是雙方共同發布的 MOU 文字放在交易對手自有頻道，代表 TSMC 具名承認此合作關係，不是完全獨立的第三方揭露；MOU 也不是具約束力的最終協議，未揭露最低採購量、價格、利用率或毛利。本源為 2024 年回填的佐證，只擴充獨立來源鏈，不刷新本篇 evidence clock
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -180,7 +202,7 @@ claim_id: C2
 label: inference
 status: active
 claim: 美國先進封裝區域化已從政策方向推進到有資金與合作框架的產能建置階段，但在 2028 年規劃投產前仍不是營運中產能
-supporting_source_ids: S1,S2,S3,S4
+supporting_source_ids: S1,S2,S3,S4,S7
 contrary_source_ids:
 as_of: 2026-08-01
 basis: 協議、預付款預期、十年框架與工程時程共同支持建置進度，且 S4 將投產放在未來

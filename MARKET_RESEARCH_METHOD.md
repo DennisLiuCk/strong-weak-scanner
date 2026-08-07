@@ -143,7 +143,13 @@ topic 不手填 `last_evidence_at`。它固定由下列集合推導：
 1. 找出 `thesis_claim_id` 指向之 active claim 的 `supporting_source_ids` 與
    `contrary_source_ids`。
 2. 只保留 `status: active` 的被引用 source。
-3. 取其 `accepted_at` 最大值。
+3. 取其中 **effective published date 最新**的來源（`document` 用 `published_at`，
+   `living_index` 用 `captured_at`），再取這些來源的 `accepted_at` 最大值。
+
+第 3 步自 2026-08-08 起改為以發布時間決定、`accepted_at` 只作同日排序。原先直接取
+`accepted_at` 最大值，會讓「後來才找到的舊文件」把時鐘刷成當天——因為 `accepted_at`
+必然是研究者接受它的那一天。回填一份 2024 年的佐證可以增加獨立來源鏈，但它不是更新的
+證據，不得改變新鮮度。
 
 其他 active claim 的最新證據另保留為 `ledger_last_evidence_at` 供稽核，但不能刷新主命題
 的 confidence clock。未被 claim 引用的書目、只出現在 monitor 的未來來源，或
@@ -325,7 +331,7 @@ effective confidence：
 
 1. `dismissed`／`resolved` 不做新鮮度降級。
 2. active topic 以執行當下的**臺北日曆日**（`Asia/Taipei`）為 `as_of`；不得用 UTC 日期、
-   儀表板資料日或作者手填的舊日期規避到期。當 `as_of > review_due`，且沒有 accepted-at 較新的 active referenced
+   儀表板資料日或作者手填的舊日期規避到期。當 `as_of > review_due`，且沒有發布時間較新的 active referenced
    evidence 時，**只自動降一級**：`high → medium → low → needs_revalidation`。
 3. 自動降級不改 claim 的 `verified/inference/unverified`，不改 topic lifecycle，也不把
    任何主張自動判成 `refuted`。
@@ -435,6 +441,13 @@ Git 歷史能看到文字變更，但不能以 Git 歷史取代文章內的修�
 monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID，或把 lifecycle 單向
 改成 superseded／refuted／retired 並補齊雙向修正關係。
 
+唯一的例外是 claim 的 `supporting_source_ids` 與 `contrary_source_ids`：自 2026-08-08 起
+改為**只可追加**（既有 ID 的順序與內容必須逐字保留為前綴），且追加來源的 effective
+published date 必須 `<=` 該 claim 的 `as_of`。這個例外只開放「事後才找到、但本來就已存在」
+的佐證回填；發布日晚於 `as_of` 的來源屬於新證據，仍須依第八節另立新 claim，讓結論措辭
+重新被推導一次。開放這個窄口是因為原本完全凍結的清單，使「補上第二條獨立來源鏈」只能
+借用 supersede 完成，而那會在方法帳本上記錄一次從未發生的修正、汙染修正學習的計數。
+
 ## 九、方法本身也要留下可回測的歷史
 
 文章逐篇通過 lint，只能證明欄位與引用完整；它不能回答研究是否有回頭檢查、是否願意
@@ -461,6 +474,13 @@ monitor 的 immutable 欄位及 transition 前綴不可刪改；只能新增 ID�
 不可變的歷史事件，不把每列已過的 `next_scan_due` 永久累加為逾期；在建立 scope lineage
 之前，也不宣稱個別歷史 scope 已被後續掃描完整覆蓋。這個 gate 只檢查工作範圍有沒有被
 如實記錄，不證明每則公告都被看見或正確解讀。
+
+交易所重大訊息日端點是**不保留的單日批次**：它只帶一個出表日期，實測全部列的發言日期
+只有出表日期減一那一天，批次更新後舊發言日永久消失。因此逾期的窗口不能靠「之後再重跑
+一次」補回——重跑讀到的是另一天的批次。`full` 除了日期算術，還必須有該批次實際觀測到的
+發言日期落在窗口內；批次已滾過窗口時維持 `partial`，並在 coverage_note 說明缺口只能沿用
+當時真的讀到該日的 scan row。把 `next_scan_due` 排到端點不會前進的日子（例如週末）只會
+再產生一列相同的 partial，不會關閉缺口。
 
 同一天若出現新反證，可以用新增 source、append-only correction claim 與綁定該 source 的
 revision transition 立即修正 `thesis_claim_id`；日期相同不應阻止修錯。這種同日修正不得

@@ -1,5 +1,42 @@
 # Changelog
 
+## 掃描覆蓋、新鮮度時鐘與佐證回填三項方法修正 — 2026-08-08
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只修正研究中心方法層
+與新增一篇研究，不動量化評分。三項修正都由本輪實際執行時撞到的問題觸發，不是預想。
+
+- 新增 AI 機櫃信任根研究與圖譜（12 條線）：把 silicon RTM、device attestation、
+  action authorization 與第三方保證分成四層，並把「規格層」與「可獨立查證的保證層」
+  分開。主命題為推論——OCP Caliptra 側已有 S.A.F.E. 稽核報告與 Security Review Provider
+  制度，DMTF SPDM 側的一致性測試指引 DSP-IS0023 至 2026-08-08 仍為 Work in Progress、
+  日期停在 2022-07-11，故「支援 Caliptra／SPDM」不等於授權鏈已被第三方驗證。
+  5274 信驊為唯一直接對應 universe 個股，其出貨與財務貢獻維持 unverified。
+- **修正事件掃描 coverage 規則可誤標 `full`。** 實測重大訊息日端點只保留單一出表日期
+  批次：TWSE 384 列與 TPEx 308 列的發言日期全部只有出表日期減一那一天，批次不具保留性。
+  以合成的 1150810 批次（僅含 1150809 發言）重跑 2026-08-06～08-07 窗口，舊規則回傳
+  `scope=full`、`complete=True`，但窗內命中 0 列、窗內發言日為空——批次完全不含窗內
+  任何一天仍被認證為完整覆蓋。新規則另要求批次實際觀測到的發言日期落在窗口內，
+  並在輸出加上 `observedSpeechDatesByMarket` 與 `batchCoversWindowByMarket`。
+  三案驗證：批次已滾過窗口→partial、批次尚未到窗尾→partial、批次正好覆蓋窗尾→full。
+- **修正新鮮度時鐘可被新找到的舊文件刷新。** `last_evidence_at` 原取 active thesis
+  source 的 `accepted_at` 最大值，而 `accepted_at` 必然是研究者接受它的當天；因此回填
+  一份 2024 年文件會把時鐘刷成當天。改為先取 effective published date（`document` 用
+  `published_at`、`living_index` 用 `captured_at`）最新的來源，再於其中取 `accepted_at`
+  最大值。全 32 篇 topic 重跑後 0 errors、warning 數不變，既有時鐘未受擾動。
+- **開放 claim 證據清單的窄口追加。** 原本 `supporting_source_ids` 完全 immutable，使
+  「補上第二條獨立來源鏈」只能借用 supersede 完成，而那會在方法帳本記錄一次從未發生的
+  修正、汙染修正學習計數。改為只可追加（既有 ID 必須逐字保留為前綴），且追加來源的
+  effective published date 必須 `<=` 該 claim 的 `as_of`；發布日晚於 `as_of` 者仍屬新
+  證據，必須另立新 claim。四案驗證：回填舊文件接受、追加新文件拒絕、改寫既有順序拒絕、
+  追加不存在 source 拒絕。
+- 依修正後的規則替 MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION 回填 S7
+  （TSMC 自有新聞室 2024-10-04 MOU），其五份既有來源全在 ir.amkor.com。獨立交叉驗證
+  缺口由 3 篇降為 2 篇，且 `last_evidence_at` 維持 2026-08-01、`review_due` 與
+  `last_reviewed_at` 均未變動——佐證變寬但新鮮度不動，正是本次兩項修正的合力結果。
+- 三個到期 monitor 全數留下 review event（兩筆 no_new_evidence、一筆 not_yet_testable，
+  後者因 Advantest FY2026 Q2 業績排定 2026 年 10 月才公布）。修正學習與校準可用性
+  兩道 gate 由 ATTENTION／NOT_READY 轉為 PASS；校準仍只報 counts，不計支持率。
+
 ## 研究雷達歷史問責、事件 coverage 與校準語意 — 2026-08-07
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只強化研究中心方法、

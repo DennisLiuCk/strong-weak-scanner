@@ -107,7 +107,12 @@ posture、`advance／watch／defer`、選擇理由、第一拒絕及下一份證
      python scripts/research_event_scan.py --window-start 2026-08-06 --window-end 2026-08-07 --quarter-year 115 --quarter 2 --output tmp/research_event_scan.json
      ```
 
-     工具以兩市場重大訊息的 `出表日期／Date - 1 日` 作保守 coverage-through；任一市場
+     工具以兩市場重大訊息的 `出表日期／Date - 1 日` 作保守 coverage-through，並自
+     2026-08-08 起**另要求該批次實際觀測到的發言日期落在請求窗口內**；重大訊息日端點
+     只保留單一出表日期批次（實測全部列的發言日期僅有出表日期減一那一天），批次滾過
+     窗口後舊發言日永久消失，只靠日期算術會把「批次完全不含窗內任何一天」誤標成
+     `full`。批次已滾過窗口時一律維持 `partial`，缺口只能沿用當時真的讀到該日的既有
+     scan row，不得由後來的重跑追認。任一市場
      尚未到 window end 就輸出 `partial`。只有在準備讓不完整窗口硬失敗時才加
      `--require-full`。輸出的 `universeN`、公告列與兩表交集是母體 census，不是推論樣本；
      JSON 仍只是 trigger index，不能替代附件與內容驗證。
@@ -249,8 +254,10 @@ monitor，不得靠另一段人工摘要提升語氣。產業學習者的機制�
    `watch_source_ids`、頻率、`next_check`、trigger 與 invalidation；每個 active monitor 的
    watch 至少包含一個 active `living_index`，topic 的 `review_due` 等於最早的 `next_check`。
 
-`last_evidence_at` 不手填，而是取 active `thesis_claim_id` 引用之 active source 的
-`accepted_at` 最大值；其他周邊 claim 的新證據不得刷新主命題。
+`last_evidence_at` 不手填，而是在 active `thesis_claim_id` 引用之 active source 中，先取
+effective published date（`document` 用 `published_at`、`living_index` 用 `captured_at`）
+最新者，再取其 `accepted_at` 最大值；其他周邊 claim 的新證據不得刷新主命題。後來才找到的
+舊文件只增加獨立來源鏈，不刷新新鮮度。
 active topic 以 runtime 當下的臺北日曆日（`Asia/Taipei`）判斷是否逾 `review_due`；不得用
 UTC 日期、資料日或手填舊日期規避期限。沒有新 evidence 時，effective confidence 只自動
 降一級；這是新鮮度處理，不會改 claim 的真假標籤、topic lifecycle 或 H# 狀態。已查但沒有
