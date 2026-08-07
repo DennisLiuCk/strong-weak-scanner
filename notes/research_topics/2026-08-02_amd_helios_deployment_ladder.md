@@ -40,6 +40,13 @@ to: triaged
 reason: named_deployment_ladder_separated_from_taiwan_order_mapping
 evidence: sources:S1,S2,S3,S4,S5
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -50,6 +57,10 @@ evidence: sources:S1,S2,S3,S4,S5
 - **shipment／online／validation**：shipment 是開始出貨，online 在本來源只表示接通並投入運行，validation 是仍在測試與確認；online 不等於已對外商用、Azure GA、已有利用率或收入，三者不能互換。
 - **GW（gigawatt）**：十億瓦，這裡描述大型 AI 基礎設施的電力規模；「最高可達」是合作上限，不是目前已啟用容量。
 - **生態系夥伴**：公開參與設計、製造或封裝的公司；被列名只能證明合作角色，不能自動推成新增訂單、收入或毛利。
+- **Helios**：AMD 的機架級 AI 系統平台名稱，也就是本文追蹤的那一整櫃系統。
+- **MI455X**：AMD 的 Instinct 加速器（GPU）型號，是 Helios 裡的運算主角。
+- **ND MI455X v7**：微軟 Azure 雲端虛擬機器的規格名稱。ND 是 Azure 給 GPU 加速機型的系列代號，MI455X 指所用的 AMD 加速器，v7 是該系列的版本。**它是一個雲端產品型號，不是硬體出貨數量**；微軟目前把它列為 upcoming，尚未給上線日期。
+- **EFB（Elevated Fanout Bridge）**：AMD 生態系文件列出的一種先進封裝技術路徑，用橋接結構連接同一封裝內的多顆晶片。它出現在封裝夥伴的合作敘述裡，不代表任何一家封測廠已取得可辨識的訂單。
 
 ### 三句話抓重點
 
