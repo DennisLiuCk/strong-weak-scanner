@@ -246,6 +246,13 @@ to: triaged
 reason: added_named_external_laser_role_without_financial_promotion
 evidence: sources:S7
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -255,6 +262,9 @@ evidence: sources:S7
 - **可插拔光模組（pluggable optics）**：裝在交換器面板、可以拔換的光通訊模組；維修與升級彈性較高，資料中心已累積成熟的部署流程。
 - **SerDes**：把晶片內的平行資料轉成高速序列訊號、再在另一端還原的介面；速度愈高，傳輸距離、耗電與訊號完整性愈難兼顧。
 - **1.6T**：每秒 1.6 兆位元的光連線容量，描述連線速度，不等於某一種固定封裝或光學架構。
+- **Spectrum-X 與 Spectrum-X Ethernet Photonics**：NVIDIA 資料中心乙太網路平台的產品名稱；後者是把光學共同封裝進去的版本，也就是本文所指已進入 full production 的那條產品線。Spectrum-6 是同一系列的另一個世代名稱，兩者不可互換。
+- **Photonics（光學）**：泛指以光傳輸取代電傳輸的元件與封裝方式。它出現在產品名稱裡時是型號的一部分，不是獨立的技術主張。
+- **SPIL（矽品）**：日月光投控旗下的封測廠，在本文中以封裝與測試角色被列名。被列名代表合作角色存在，不代表已取得可辨識的訂單金額或毛利。
 
 ### 三句話抓重點
 
