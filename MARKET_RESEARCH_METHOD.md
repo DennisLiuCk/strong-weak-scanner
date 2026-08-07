@@ -515,11 +515,24 @@ counts 與 `not_ready`，不補零、不把未到期主張算成功。
    lint 只驗結構與引用完整性，不會重新下載或證明來源內容為真。
 11. 執行 `python scripts/research_method_audit.py --lint --baseline-ref HEAD`，確認 registry
     有新快照、舊快照未被改寫，review 與 selection ledger 也只追加新列。
-12. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
+12. **執行 `python -m unittest discover -s tests -q`——四個 lint 全過不等於測試會過。**
+    lint 驗的是當前 register 的結構與引用，測試另外綁了幾個必須隨每輪發佈同步的常數；
+    只跑 lint 就推，CI 會在 push 之後才轉紅。已知需要每輪確認的有：
+    - `tests/test_research_method_audit.py` 的 `as_of`：必須 `>=` 本輪新 topic 的
+      `captured_at`，否則新文章會被判為尚未存在、品質不合格，並讓整個 `setUpClass`
+      error（連帶使其下所有測試靜默不執行，紅字看起來只有一條）。
+    - `tests/test_research_queue.py` 綁定的最新 `scan_id` 與 `next_scan_due`。
+    - `test_research_method_audit.py` 的帳本累計數：`reviewedMature`、
+      `monitorReviewEvents`、`resultCounts`、獨立交叉驗證缺口名單。其中
+      `supersededOrRefutedClaims` **刻意不隨佐證回填改變**——它變動就代表有人用
+      supersede 假造了一次修正，應視為警訊而不是要更新的數字。
+    測試若因「本輪候選張數不同」而紅，正確做法是把寫死的張數改成與凍結帳本對應的
+    不變式，不是每輪改一個數字。
+13. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
     行動版顯示。另做雙讀者 gate：產業學習者應先看懂名詞、已知／未知與機制；分析師應在
     第一個快讀區直接取得主命題、證據強度、未證實缺口、可行動範圍與下一個檢驗。完整
     ledger／impact／monitor 控制表放在機制與研究判定之後，且同一帳本標題不得重複。
-13. 在文章間切換與由雷達／圖譜開啟文章時，確認閱讀區立即回到頂端；桌機與行動版均檢查
+14. 在文章間切換與由雷達／圖譜開啟文章時，確認閱讀區立即回到頂端；桌機與行動版均檢查
     首屏層級、表格密度、截斷與全頁水平 overflow。快讀只能由既有結構化 register 合成，
     不得另寫一套無 claim ID、source ID 或 monitor 支撐的結論。
 

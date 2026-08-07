@@ -14,7 +14,12 @@ python scripts/research_queue.py --calendar --weeks 8 --output tmp/research_cale
 python scripts/research_queue.py --lint
 python scripts/research_radar.py --lint
 python scripts/research_method_audit.py --lint --baseline-ref HEAD
+python -m unittest discover -s tests -q
 ```
+
+最後一行不可省。lint 只驗當前 register 的結構與引用；契約測試另外綁了幾個必須隨每輪
+發佈同步的常數（audit `as_of`、最新 `scan_id`、帳本累計數），只跑 lint 就 push，
+CI 會在推上去之後才轉紅。詳見 `MARKET_RESEARCH_METHOD.md` 發布前檢查第 12 項。
 
 `research_queue.py` 以台灣研究日聚合：
 
@@ -149,8 +154,9 @@ posture、`advance／watch／defer`、選擇理由、第一拒絕及下一份證
 6. 先把本輪候選寫入 append-only selection log 並獨立 commit，再開始深研；完成後更新
    schema 2 active radar，保留凍結的連續排名、第一拒絕與下一份證據，只新增研究後 route。
    若候選升格，先完成 topic v3 與圖譜 lint，再填入 article／graph route。
-7. 執行 `research_queue.py --lint` 與 `research_radar.py --lint`。topic 不能自動貼入正式
-   筆記；正式更新仍需同一 evidence pack 離線重算與獨立 reviewer。
+7. 執行 `research_queue.py --lint` 與 `research_radar.py --lint`，並在 push 前補跑
+   `python -m unittest discover -s tests -q`（lint 全過不等於測試會過）。topic 不能
+   自動貼入正式筆記；正式更新仍需同一 evidence pack 離線重算與獨立 reviewer。
 8. 回查所有到期 monitor，在 `notes/research_method_reviews/monitor_reviews.csv` 追加
    `new_support／new_contrary／no_new_evidence／not_yet_testable`。沒有新證據時不得延後
    topic evidence clock；registry 有變動就新增 method audit snapshot，不能改舊快照。
