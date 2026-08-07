@@ -39,6 +39,13 @@ to: triaged
 reason: separated_pathfinding_test_vehicle_customer_tool_use_and_hvm_evidence
 evidence: sources:S1,S2,S3
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 <!-- research_source
 source_id: S1
@@ -227,6 +234,10 @@ invalidation: 公司只使用 hybrid bonding、2.5D／3D 或先進封裝概念�
 - **PDK**：把製程能做什麼整理成設計規則與驗證元件的工具包；探索型 PDK 能開始畫設計，不代表已能送量產 tape-out。
 - **Overlay**：上下兩層接點的對準誤差；接點間距愈小，允許的偏差愈小。
 - **Test vehicle**：為了量製程與電性而設計的測試結構，不是客戶最終商品。
+
+- **HVM（High Volume Manufacturing，量產）**：真正的大量生產階段。PDK、試驗車與客戶設備使用都排在它之前，任何一項都不能替代 HVM。
+- **CMP（化學機械研磨）**：把晶圓表面磨到極平的製程。hybrid bonding 靠兩片表面直接貼合，對平整度與粗糙度要求極高，CMP 因此是能否貼合成功的關鍵前處理。
+- **OSAT（委外封測廠）**：專門承接封裝與測試的外包廠商，台灣的日月光投控、力成等屬於這一類。
 
 ### 三句話抓重點
 
