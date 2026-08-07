@@ -46,6 +46,13 @@ to: triaged
 reason: added_direct_mops_filing_index_results_and_globalwafers_full_quarter_evidence
 evidence: sources:S12,S13,S14,S15,S16,S17
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 <!-- research_source
 source_id: S1
@@ -782,6 +789,9 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 - **未核閱**：數字尚未經會計師完成核閱，能提供方向但證據強度低於完整季報。
 - **按市價評價**：持有的股票等金融資產依期末市價重估；它會改變當期損益，但不等於本業同期收到同額現金。
 - **附件索引**：MOPS 列出的檔名、時間與大小，只證明檔案可以取得；內容仍須封存、逐頁重算與獨立複核。
+- **Siltronic**：德國矽晶圓公司。本文只涉及它在環球晶（6488）單季損益中造成的評價差異——**那是按市價評價的業外項目，與環球晶本業表現是兩件事**，不可混談。
+- **Novara**：環球晶位於義大利 Novara 的廠區。本文指該廠火災公告，以及復工時程尚未確定這件事。
+- **HBM2**：HBM 的第二代。文中出現在封測公司的技術能力敘述裡；具備能力不等於已取得 HBM2 客戶、訂單或收入。
 
 ### 三句話抓重點
 
