@@ -46,6 +46,13 @@ to: triaged
 reason: superseded_two_layer_ualink_uec_frame_after_esun_scale_up_evidence
 evidence: sources:S9,S10,S11,S12
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 <!-- research_source
 source_id: S1
@@ -525,6 +532,9 @@ invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、
 - **SUE-T**：Scale-Up Ethernet Transport，偏向 XPU endpoint、memory model 與 transport；它和 ESUN 分工，但都屬 Ethernet scale-up 路徑。
 - **UALoE**：把 UALink protocol 放在 Ethernet 傳輸路徑上的做法；它不表示 UALink 與 UEC 已變成同一個標準。
 - **Compliance／interoperability**：前者確認產品遵守規格，後者確認不同廠商產品能互相工作；規格發布時兩件事不會自動完成。
+- **Helios**：AMD 的機架級 AI 系統平台名稱。本文只把它當作 scale-up 互連路徑的其中一個實例，不評價該平台本身的進度。
+- **GA（General Availability）**：雲端服務正式對外開放、任何符合資格的客戶都能購買使用的階段。**合作公告、預覽與 GA 是三個不同節點**，只有 GA 才最接近可認列的收入；本文一再強調的正是不要把前兩者讀成後者。
+- **NIC（網路介面卡）**：伺服器上負責連接網路的介面卡。在 scale-out 網路裡，NIC、交換器、光模組與線材必須整套互通，任何一段沒到位，整條路徑就不算完成。
 
 ### 三句話抓重點
 
