@@ -39,6 +39,13 @@ to: triaged
 reason: separated_platform_tiers_from_product_sampling_and_supplier_financial_exposure
 evidence: sources:S1,S2,S3,S4
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 <!-- research_source
 source_id: S1
@@ -273,6 +280,11 @@ invalidation: SOCAMM2 樣品延後、CXL 4.0 缺乏互通產品或台灣公司�
 - **KV cache**：模型推論時保存先前 token 的中間結果，避免每一步都重新計算全部上下文。
 - **Context storage／CMX**：NVIDIA 為可重建、延遲敏感 KV cache 設計的共享儲存層，位置介於本地記憶體與一般共享儲存之間。
 - **CXL**：讓 CPU、記憶體擴充裝置與加速器維持一致記憶體視圖的開放互連標準；規格發布不等於裝置已互通。
+- **Rubin 與 Vera**：NVIDIA 下一代平台的兩顆晶片代號——Rubin 是 GPU、Vera 是 CPU，合稱 Vera Rubin 平台。代號只表示產品世代，不表示已量產或已出貨。
+- **HBM4**：HBM 的下一個世代，文中指 Rubin GPU 所配置的版本。
+- **SOCAMM2**：SOCAMM 模組的第二代，文中指 Micron 已進入送樣階段的 256GB 產品。送樣是產品節點，不等於量產或客戶採用。
+- **SSD（local SSD）**：伺服器本機的固態硬碟。在本文的分層裡，它比記憶體慢，但比機房共享儲存更靠近運算。
+- **G1–G4 與 G3.5**：NVIDIA 在 CMX 文章裡把資料存放位置由近到遠編成 G1 到 G4；CMX 新增的那一層落在 G3 與 G4 之間，因此稱為 G3.5。這是該份文件自己的分層命名，不是產業共通標準。
 
 ### 三句話抓重點
 
