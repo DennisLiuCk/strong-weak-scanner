@@ -39,6 +39,13 @@ to: triaged
 reason: separated_comparable_capacity_from_qualification_supply_and_financial_maturity
 evidence: sources:S1,S2,S3,S4
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -48,6 +55,8 @@ evidence: sources:S1,S2,S3,S4
 - **Cooling Capacity @ 4°C ATD**：NVIDIA 清單以這個欄名標示 CDU 的額定排熱能力。MW／kW 是絕對容量，不是效率或產品優劣；同欄數字可在單位換算後比較，但頁面沒有公布完整跨廠測試協定，實際水溫、流量、壓差與備援仍會改變可用能力。
 - **Sample Ready／MP Ready**：NVIDIA Marketplace 的供應狀態標籤。本文保留原文，不自行把 `MP Ready` 解釋成已有大量客戶訂單，也不把 `Sample Ready` 解釋成產品不成熟。
 - **平台驗證**：產品通過平台商指定測試或被列進合格清單；它降低部分技術採購風險，仍不等於客戶已下單、完成部署或供應商已認列收入。
+- **PoC（Proof of Concept，概念驗證）**：在真實或接近真實的環境做小規模試行，用來確認方案可行。**PoC 進行中不等於已交付節電、成本或可靠度數字**，本文多處出現的 PoC 都停在這個階段。
+- **Delta（台達電，2308）與 LITEON（光寶科，2301）**：本文以英文公司名出現的兩家台灣電源與散熱供應商，都是本 universe 成員。文中提到它們時只涉及產品被列出或通過平台驗證，不含訂單、出貨量或毛利證據。
 
 ### 三句話抓重點
 
