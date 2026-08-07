@@ -40,6 +40,13 @@ to: triaged
 reason: validated_global_demand_but_withheld_taiwan_supplier_attribution
 evidence: sources:S1,S2,S3,S4,S5
 -->
+<!-- transition
+date: 2026-08-08
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:readability
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -49,6 +56,9 @@ evidence: sources:S1,S2,S3,S4,S5
 - **Tester TAM**：測試設備商估計某一期間整體測試機市場的金額，不等於任何一家台灣供應商已取得的訂單。
 - **Test insertion**：晶片製造過程中安排測試的節點與次數；晶片更複雜、測試時間更長，可能提高設備與介面的需求。
 - **年化營收規模**：把目前一季或當下速度換算成一年的概略規模，不等於已完成的全年會計收入。
+- **Trainium**：Amazon（AWS）自行設計的 AI 晶片系列。它是雲端業者自研晶片的代表之一，與外購 GPU 是不同採購路徑。
+- **Maia**：Microsoft 自行設計的 AI 加速晶片系列，角色與 Trainium 類似。
+- **DRAM**：主流的動態隨機存取記憶體。本文提到它，是因為記憶體測試需求也構成測試機市場的一部分，與推論晶片需求要分開看。
 
 ### 三句話抓重點
 
