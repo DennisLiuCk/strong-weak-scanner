@@ -56,20 +56,31 @@ class ResearchRadarTest(unittest.TestCase):
         )
         self.assertGreater(self.payload["nextReview"], self.payload["asOf"])
 
-    def test_top_two_are_promoted_to_articles_and_graphs(self):
-        top_two = self.payload["candidates"][:2]
-        for row in top_two:
-            self.assertEqual(row["priority"], "p1")
-            self.assertEqual(row["knowledgeValue"], "high")
-            self.assertEqual(row["status"], "promoted")
-            self.assertEqual(row["selectionDecision"], "advance")
-            self.assertEqual(row["selectionOutcome"], "promoted_after_research")
+    def test_promotion_is_evidence_gated_not_a_fixed_top_n_quota(self):
+        promoted = [
+            row for row in self.payload["candidates"] if row["status"] == "promoted"
+        ]
+        self.assertGreaterEqual(len(promoted), 1)
+        self.assertLess(len(promoted), len(self.payload["candidates"]))
+        for row in promoted:
+            self.assertEqual(row["route"], "article_and_graph")
             self.assertTrue(row["articleId"])
             self.assertTrue(row["graphId"])
             self.assertGreaterEqual(len(row["sources"]), 2)
+        advance = [
+            row for row in self.payload["candidates"]
+            if row["selectionDecision"] == "advance"
+        ]
+        for row in advance:
+            self.assertIn(
+                row["selectionOutcome"],
+                {"promoted_after_research", "rejected_after_research"},
+            )
 
     def test_watch_and_deferred_candidates_are_not_forced_into_articles_or_graphs(self):
-        for row in self.payload["candidates"][2:]:
+        for row in self.payload["candidates"]:
+            if row["status"] == "promoted":
+                continue
             self.assertIn(row["status"], {"expand_existing", "watch", "deferred"})
             if row["status"] == "expand_existing":
                 self.assertEqual(row["route"], "expand_existing_article")
@@ -107,6 +118,45 @@ class ResearchRadarTest(unittest.TestCase):
             self.assertTrue(row["nextEvidence"], row["id"])
             self.assertGreater(row["nextCheck"], self.payload["asOf"])
             self.assertGreaterEqual(len(row["sources"]), 2, row["id"])
+
+    def test_retired_schema2_radars_remain_accountable(self):
+        stats = self.payload["historyStats"]
+        self.assertGreater(stats["schema2Cycles"], 1)
+        self.assertEqual(
+            stats["accountableSchema2Cycles"], stats["schema2Cycles"],
+        )
+        self.assertGreater(
+            stats["candidates"], self.payload["stats"]["candidates"],
+        )
+        for item in self.payload["history"]:
+            if item["schemaVersion"] == 2:
+                self.assertTrue(item["accountable"], item["id"])
+
+    def test_early_reselection_requires_a_new_frozen_source_after_cutover(self):
+        required = [
+            row for row in self.payload["earlyReselections"] if row["required"]
+        ]
+        self.assertGreaterEqual(len(required), 1)
+        self.assertTrue(all(row["valid"] for row in required))
+        self.assertEqual(
+            self.payload["historyStats"]["documentedEarlyTriggers"],
+            len(required),
+        )
+        self.assertGreaterEqual(
+            self.payload["historyStats"]["grandfatheredEarlyReselections"], 1,
+        )
+        valid = research_radar._early_trigger(
+            "early_trigger:New spec@2026-08-01=>https://example.com/new；reason",
+            "2026-08-07",
+            {"https://example.com/old"},
+        )
+        repeated = research_radar._early_trigger(
+            "early_trigger:Old spec@2026-08-01=>https://example.com/old；reason",
+            "2026-08-07",
+            {"https://example.com/old"},
+        )
+        self.assertTrue(valid["valid"])
+        self.assertFalse(repeated["valid"])
 
 
 if __name__ == "__main__":

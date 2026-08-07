@@ -42,6 +42,14 @@ Active radar 使用 schema 2 並以 `selection_cycle_id` 指向該輪凍結記�
 `advance → watch/deferred` 是研究後拒絕，也同樣是有效方法結果。兩者都不能稱為題材、投資或
 報酬命中。首個 cycle 以獨立 Git commit 先凍結，再提交文章與圖譜；後續每輪沿用同一順序。
 
+退役雷達仍是方法歷史，不因換成新 active radar 就退出稽核。`research_radar.py` 會逐輪核對
+所有 schema 2 radar 與 selection log，並把它們納入 method fingerprint。候選若在前一輪
+`next_check` 前被重選，自 2026-08-07 起，新的 frozen `selection_reason` 必須以
+`early_trigger:<source title>@YYYY-MM-DD=>https://URL` 留下觸發來源；URL 必須是前輪尚未列
+過的一手來源，日期不可晚於本輪 selected date。它可以是新發布文件，也可以是前輪漏看的
+既有文件；兩者都只授權**提前重查**，不預先保證升格。cutover 前未留 trigger 的重選保留
+原紀錄並在 audit 揭露，不回溯粉飾。
+
 ## 一、先按文件角色取得來源
 
 搜尋順序以能直接承擔主張的文件為先，不以搜尋結果排名或文章數量為準：
@@ -464,9 +472,10 @@ accepted date 嚴格晚於舊主命題 evidence clock。
 evidence clock 降級，直到真的有新 evidence。
 
 候選升格數、文章數與圖譜線數是研究產出，不是正確率。只有到期 monitor 全數留下 review
-event，且至少三個結果帶有新證據時，audit 才允許顯示附樣本數的描述性支持率；即使如此，
-它仍不是投資命中率、報酬率或因果效果。樣本不足時只報 counts 與 `not_ready`，不補零、
-不把未到期主張算成功。
+event，且至少三個結果帶有新證據時，audit 才允許分列 `new_support／new_contrary` 與 N；
+**不計算支持率**。`new_support` 只表示該 monitor 找到支持其檢查方向的新證據，現有 outcome
+schema 尚不能把它等同於主命題為真，更不是投資命中率、報酬率或因果效果。樣本不足時只報
+counts 與 `not_ready`，不補零、不把未到期主張算成功。
 
 ## 十、發布前檢查
 
@@ -480,7 +489,8 @@ event，且至少三個結果帶有新證據時，audit 才允許顯示附樣本
 7. `review_due` 是否等於最早 monitor 日期，且晚於 `last_reviewed_at`。
 8. impact 是否仍清楚寫 evidence boundary，沒有把 topic 升格為公司事實。
 9. Active radar 是否先有同 cycle 的 selection log，且初始 rank、第一拒絕與下一份證據沒有
-   因深研結果回寫；執行 `python scripts/research_radar.py --lint`。
+   因深研結果回寫；所有 retired schema 2 radar 是否仍可逐輪核對；未到期重選是否留下新的
+   `early_trigger`；執行 `python scripts/research_radar.py --lint`。
 10. 執行 `python scripts/research_queue.py --lint` 與 `python scripts/knowledge_graph.py --lint`；
    lint 只驗結構與引用完整性，不會重新下載或證明來源內容為真。
 11. 執行 `python scripts/research_method_audit.py --lint --baseline-ref HEAD`，確認 registry

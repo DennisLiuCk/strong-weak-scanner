@@ -101,6 +101,16 @@ posture、`advance／watch／defer`、選擇理由、第一拒絕及下一份證
    索引快掃；法說、季報、財報董事會等事件先逐檔升為 P1 triage。季報窗口至少依序核對：
    - TWSE 與 TPEx 的重大訊息端點，以及當季損益表／資產負債表 OpenAPI；兩市場與完整
      日期窗均成功，才可把這一小段 scope 記為 `full`。
+     先以唯讀、零 DB 寫入的 census 工具固定來源批次邊界，例如：
+
+     ```powershell
+     python scripts/research_event_scan.py --window-start 2026-08-06 --window-end 2026-08-07 --quarter-year 115 --quarter 2 --output tmp/research_event_scan.json
+     ```
+
+     工具以兩市場重大訊息的 `出表日期／Date - 1 日` 作保守 coverage-through；任一市場
+     尚未到 window end 就輸出 `partial`。只有在準備讓不完整窗口硬失敗時才加
+     `--require-full`。輸出的 `universeN`、公告列與兩表交集是母體 census，不是推論樣本；
+     JSON 仍只是 trigger index，不能替代附件與內容驗證。
    - OpenAPI 命中的每家公司都再查 MOPS `t57sb01` 直接文件索引；公司 IR 活頁可能落後，
      未查直接索引前不得寫「完整附件尚未定位」。
      對優先名單使用唯讀工具留下可重跑的檔名／時間／大小清單，例如：
@@ -148,8 +158,9 @@ GitHub 的 `research-watch.yml` 會在台灣每週一 09:00，以及 `fetch-fina
 每月第一個研究週額外執行 `research_method_audit.py --json`，新增一份
 `notes/research_method_reviews/YYYY-MM-DD_NN.json`。逐項看 gate，不合成健康分數：
 
-- **選題前承諾**：active radar 的每個候選是否都有同 cycle 的研究前凍結，且初始排名、
-  第一拒絕與下一份證據未被改寫。通過不代表選題有效；單輪 advance／promoted 比例不報命中率。
+- **選題前承諾**：所有 schema 2 radar（含 retired）是否都有同 cycle 的研究前凍結，且
+  初始排名、第一拒絕與下一份證據未被改寫；未到期重選在 cutover 後是否留下新來源
+  `early_trigger`。通過不代表選題有效；單輪 advance／promoted 比例不報命中率。
 - **可追溯性**：active claim 是否都有邊界、圖譜線是否能回查 exact claim／source。
 - **獨立交叉驗證**：每篇 active topic 的主命題是否至少有兩條獨立來源鏈；逐一處理 audit
   列出的 topic ID，不能用整體覆蓋率掩蓋單篇缺口，也不能把兩條來源當成真實性分數。
@@ -159,7 +170,8 @@ GitHub 的 `research-watch.yml` 會在台灣每週一 09:00，以及 `fetch-fina
 - **掃描覆蓋問責**：scan log 是否納入方法指紋、是否存在 full scan、partial 與最新全域
   cadence 是否如實顯示；partial 不得冒充全市場覆蓋。歷史 scan row 是不可變事件，未建立
   scope lineage 前不把舊期限永久累加為逾期，也不宣稱個別 scope 已由後續掃描關閉。
-- **校準可用性**：證據型 outcome 的樣本與覆蓋是否足以描述；不足就維持 `not_ready`。
+- **校準可用性**：證據型 outcome 的樣本與覆蓋是否足以分列結果 counts；不足就維持
+  `not_ready`。即使足夠也不計支持率，因現有 outcome 尚未編碼主命題真假。
 
 若 gate 變差，先修 evidence／monitor／review 流程；不得因候選升格率好看就宣布方法有效，
 也不得用一輪 `no_new_evidence` 當成主命題獲得支持。

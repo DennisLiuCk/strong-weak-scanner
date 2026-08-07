@@ -1,5 +1,28 @@
 # Changelog
 
+## 研究雷達歷史問責、事件 coverage 與校準語意 — 2026-08-07
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只強化研究中心方法、
+候選雷達與發布內容，不動量化評分。
+
+- 新增 AI 機櫃 action-contract 研究與圖譜：由 NVIDIA DSX 的 rack identity、
+  Value／Metadata、publisher ownership、liquid／electrical isolation request、BMS guardrail
+  與 isolation status 建立可反證階梯；OCP OpenRMC／DMTF Redfish 只作獨立管理邊界。
+  Production interoperability、field outcome 與台灣公司財務曝險維持 unverified。
+- 雷達不再假設「前兩名必須升格」。本輪 5 題只有 rank 1 通過 article＋graph，rank 2–5
+  維持 watch；測試改驗 promotion 是否具 route／來源契約，而不是固定產出配額。
+- `research_radar.py` 開始稽核所有 schema 2 歷史雷達，不讓 retired cycle 退出
+  fingerprint；共回查 4 輪、32 個候選。偵測到 4 次未到期重選，其中 3 次為 cutover 前
+  未留 trigger 的歷史紀錄，原樣揭露；本輪 telemetry 以新 URL 的
+  `early_trigger` 通過 2026-08-07 起的新 gate。
+- 新增唯讀 `scripts/research_event_scan.py`。它不開 DB，以兩市場重大訊息出表批次的
+  coverage-through 防止把尚未發布的同日事件誤標 full，並把 universe N、公告列、Q2
+  損益／資產負債交集明示為母體 census。8 月 7 日實跑 N=121、公告 60 列、Q2 pair=43，
+  但兩市場 coverage 只到 8 月 6 日，因此正確標為 partial。
+- 方法 v1.5 移除 `supportRate`。7 筆 review event 中具新證據者只有 3 筆，且
+  `new_support` 不能等同主命題為真；新快照只發布 `new_support=3`、
+  `new_contrary=0` 與 N，舊快照 append-only 保留。
+
 ## 手機版寬表格改排與長頁面導覽 — 2026-08-05
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；接續同日的手機版修復，

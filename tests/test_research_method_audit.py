@@ -16,7 +16,7 @@ import research_method_audit as audit
 class ResearchMethodAuditTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.as_of = dt.date(2026, 8, 6)
+        cls.as_of = dt.date(2026, 8, 7)
         cls.topics, cls.graph, cls.radar, cls.scan = audit._load_context(cls.as_of)
         cls.reviews = audit.load_monitor_reviews(cls.topics, cls.as_of, strict=True)
         cls.current = audit.compute_method_audit(
@@ -27,7 +27,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
     def test_baseline_snapshot_matches_current_registry(self):
         self.assertRegex(self.latest["snapshotId"], r"^RMA-\d{4}-\d{2}-\d{2}-\d+$")
         self.assertEqual(self.latest["asOf"], self.current["asOf"])
-        self.assertEqual(self.latest["methodologyVersion"], "1.4")
+        self.assertEqual(self.latest["methodologyVersion"], "1.5")
         self.assertEqual(
             self.latest["registryFingerprint"], self.current["registryFingerprint"],
         )
@@ -69,9 +69,13 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["scans"]["latestScope"], self.scan["latest"]["scope"]
         )
         self.assertEqual(self.current["scans"]["overdue"], 0)
-        self.assertTrue(self.current["calibration"]["descriptiveRateReady"])
+        self.assertTrue(self.current["calibration"]["descriptiveBreakdownReady"])
         self.assertEqual(self.current["calibration"]["evidenceBearingOutcomes"], 3)
-        self.assertEqual(self.current["calibration"]["supportRate"], 1.0)
+        self.assertEqual(
+            self.current["calibration"]["outcomeCounts"],
+            {"new_support": 3, "new_contrary": 0},
+        )
+        self.assertNotIn("supportRate", self.current["calibration"])
         self.assertNotIn("score", self.current)
         selection = self.current["selection"]
         self.assertEqual(selection["cycleId"], self.radar["selectionCycleId"])
@@ -86,6 +90,13 @@ class ResearchMethodAuditTest(unittest.TestCase):
             row["selectionOutcome"] == "rejected_after_research"
             for row in self.radar["candidates"]
         ))
+        self.assertEqual(selection["cycles"], self.radar["historyStats"]["schema2Cycles"])
+        self.assertEqual(
+            selection["accountableCycles"], selection["cycles"],
+        )
+        self.assertEqual(selection["requiredEarlyReselections"], 1)
+        self.assertEqual(selection["documentedEarlyTriggers"], 1)
+        self.assertEqual(selection["grandfatheredEarlyReselections"], 3)
         self.assertTrue(selection["accountable"])
         self.assertIn("不是選題正確率或投資命中率", selection["boundary"])
 
@@ -168,7 +179,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertIn('research_library["methodAudit"] = load_method_audit(', builder)
         for token in (
             'id="methodAudit"', "const AUDIT=LIB.methodAudit", "function renderMethodAudit()",
-            "方法健康度（不合成分數）", "逐項顯示選題前承諾、可追溯、獨立交叉驗證",
+            "方法健康度（不合成分數）", "逐項顯示歷史選題承諾、提前重選觸發",
             "掃描覆蓋問責", "scope.scanEvents",
         ):
             self.assertIn(token, template)
@@ -177,6 +188,9 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertIn("每月方法回顧", maintenance)
         self.assertIn("掃描覆蓋問責", method)
         self.assertIn("selection_log.csv", method)
+        self.assertIn("early_trigger", method)
+        self.assertIn("research_event_scan.py", maintenance)
+        self.assertIn("不計算支持率", method)
         self.assertIn("選題前承諾", maintenance)
         self.assertIn("python scripts/research_method_audit.py --lint", workflow)
 

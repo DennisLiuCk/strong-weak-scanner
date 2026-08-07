@@ -31,6 +31,11 @@ CANDIDATE_ID_RE = re.compile(r"RC-[A-Z0-9-]+")
 TOPIC_ID_RE = re.compile(r"MI-\d{4}-\d{2}-\d{2}-[A-Z0-9-]+")
 SELECTION_ID_RE = re.compile(r"RS-\d{4}-\d{2}-\d{2}-\d{2}-[A-Z0-9-]+")
 CYCLE_ID_RE = re.compile(r"RS-\d{4}-\d{2}-\d{2}-\d{2}")
+EARLY_TRIGGER_RE = re.compile(
+    r"early_trigger:(?P<title>[^@；]+)@(?P<date>\d{4}-\d{2}-\d{2})=>"
+    r"(?P<url>https://[^；\s]+)"
+)
+EARLY_TRIGGER_REQUIRED_FROM = "2026-08-07"
 
 PRIORITIES = {"p1", "p2", "p3"}
 KNOWLEDGE_VALUES = {"high", "medium", "low"}
@@ -115,6 +120,31 @@ def _valid_timestamp(value: str) -> bool:
     except (TypeError, ValueError):
         return False
     return parsed.tzinfo is not None and parsed.utcoffset() == dt.timedelta(hours=8)
+
+
+def _early_trigger(reason: str, selected_date: str, prior_source_urls: set[str]) -> dict:
+    """Parse a frozen early-reselection trigger without pretending it proves the thesis.
+
+    A previously missed source can legitimately trigger an early revisit even when its
+    publication date predates the previous selection.  The accountable conditions are
+    therefore: a frozen title/date/URL, a date no later than selection, and a URL that
+    was not already listed on the prior radar candidate.
+    """
+    match = EARLY_TRIGGER_RE.search(reason or "")
+    if not match:
+        return {"documented": False, "valid": False, "title": "", "date": "", "url": ""}
+    item = match.groupdict()
+    parsed = urlparse(item["url"])
+    valid = bool(
+        item["title"].strip()
+        and _valid_date(item["date"])
+        and _valid_date(selected_date)
+        and item["date"] <= selected_date
+        and parsed.scheme == "https"
+        and parsed.hostname
+        and item["url"] not in prior_source_urls
+    )
+    return {"documented": True, "valid": valid, **item}
 
 
 def _read_selection_text(text: str) -> tuple[list[dict], list[str]]:
@@ -223,6 +253,7 @@ def load_research_radar(
         errors.append(f"找不到研究雷達：{radar_dir}")
 
     active_payloads: list[tuple[dict[str, str], list[dict], str]] = []
+    radar_payloads: list[tuple[dict[str, str], list[dict], str]] = []
     meta_allowed = {
         "schema_version", "radar_id", "as_of", "next_review", "status", "method",
         "selection_cycle_id",
@@ -347,72 +378,148 @@ def load_research_radar(
                 "graphId": graph_id,
                 "sources": source_rows,
             })
+        radar_payloads.append((meta, candidates, label))
         if meta.get("status") == "active":
             active_payloads.append((meta, candidates, label))
 
     if len(active_payloads) != 1:
         errors.append(f"研究雷達必須剛好有一份 active，目前為 {len(active_payloads)}")
 
-    meta, candidates, source_file = active_payloads[0] if active_payloads else ({}, [], "")
-    ids = [row["id"] for row in candidates]
-    ranks = [row["rank"] for row in candidates]
-    if len(ids) != len(set(ids)):
-        errors.append("active 研究雷達 candidate_id 不可重複")
-    if len(ranks) != len(set(ranks)):
-        errors.append("active 研究雷達 rank 不可重複")
-    if ranks and sorted(ranks) != list(range(1, len(ranks) + 1)):
-        errors.append("active 研究雷達 rank 必須由 1 連續排列")
-    candidates.sort(key=lambda row: row["rank"])
+    history: list[dict] = []
+    for radar_meta, radar_candidates, radar_file in radar_payloads:
+        ids = [row["id"] for row in radar_candidates]
+        ranks = [row["rank"] for row in radar_candidates]
+        prefix = radar_file
+        if len(ids) != len(set(ids)):
+            errors.append(f"{prefix} candidate_id 不可重複")
+        if len(ranks) != len(set(ranks)):
+            errors.append(f"{prefix} rank 不可重複")
+        if ranks and sorted(ranks) != list(range(1, len(ranks) + 1)):
+            errors.append(f"{prefix} rank 必須由 1 連續排列")
+        radar_candidates.sort(key=lambda row: row["rank"])
 
-    selection_cycle_id = meta.get("selection_cycle_id", "")
-    selected = [row for row in selection_rows if row["cycle_id"] == selection_cycle_id]
-    selected_by_id = {row["candidate_id"]: row for row in selected}
-    if meta.get("schema_version") == "2":
-        if not selected:
-            errors.append(f"active 研究雷達找不到 selection cycle：{selection_cycle_id or '-'}")
-        candidate_set = set(ids)
-        selection_set = set(selected_by_id)
-        if candidate_set != selection_set:
-            errors.append(
-                "active 研究雷達候選必須等於凍結 selection cycle；"
-                f"雷達獨有 {','.join(sorted(candidate_set - selection_set)) or '無'}；"
-                f"紀錄獨有 {','.join(sorted(selection_set - candidate_set)) or '無'}"
-            )
-        for candidate in candidates:
-            frozen = selected_by_id.get(candidate["id"])
-            if not frozen:
-                continue
-            for radar_key, selection_key in (
-                ("rank", "rank"), ("priority", "priority"),
-                ("knowledgeValue", "knowledge_value"),
-                ("firstRejection", "first_rejection"),
-                ("nextEvidence", "next_evidence"),
-            ):
-                if candidate[radar_key] != frozen[selection_key]:
+        cycle_id = radar_meta.get("selection_cycle_id", "")
+        selected_rows = [row for row in selection_rows if row["cycle_id"] == cycle_id]
+        selected_by_id = {row["candidate_id"]: row for row in selected_rows}
+        accountable = radar_meta.get("schema_version") != "2"
+        if radar_meta.get("schema_version") == "2":
+            if not selected_rows:
+                errors.append(f"{prefix} 找不到 selection cycle：{cycle_id or '-'}")
+            candidate_set = set(ids)
+            selection_set = set(selected_by_id)
+            accountable = bool(selected_rows and candidate_set == selection_set)
+            if candidate_set != selection_set:
+                errors.append(
+                    f"{prefix} 候選必須等於凍結 selection cycle；"
+                    f"雷達獨有 {','.join(sorted(candidate_set - selection_set)) or '無'}；"
+                    f"紀錄獨有 {','.join(sorted(selection_set - candidate_set)) or '無'}"
+                )
+            for candidate in radar_candidates:
+                frozen = selected_by_id.get(candidate["id"])
+                if not frozen:
+                    continue
+                for radar_key, selection_key in (
+                    ("rank", "rank"), ("priority", "priority"),
+                    ("knowledgeValue", "knowledge_value"),
+                    ("firstRejection", "first_rejection"),
+                    ("nextEvidence", "next_evidence"),
+                ):
+                    if candidate[radar_key] != frozen[selection_key]:
+                        accountable = False
+                        errors.append(
+                            f"{prefix} {candidate['id']} 的 {radar_key} "
+                            "不可改寫研究前凍結值")
+                selected_date = frozen["selected_at"][:10]
+                if (_valid_date(radar_meta.get("as_of", ""))
+                        and selected_date > radar_meta["as_of"]):
+                    accountable = False
                     errors.append(
-                        f"{candidate['id']} 的 {radar_key} 不可改寫研究前凍結值")
-            selected_date = frozen["selected_at"][:10]
-            if _valid_date(meta.get("as_of", "")) and selected_date > meta["as_of"]:
-                errors.append(f"{candidate['id']} selected_at 不可晚於雷達 as_of")
-            candidate["selectedAt"] = frozen["selected_at"]
-            candidate["selectionDecision"] = frozen["selection_decision"]
-            candidate["selectionReason"] = frozen["selection_reason"]
-            candidate["initialEvidencePosture"] = frozen["evidence_posture"]
-            if frozen["selection_decision"] == "advance":
-                candidate["selectionOutcome"] = (
-                    "promoted_after_research" if candidate["status"] == "promoted"
-                    else "rejected_after_research"
+                        f"{prefix} {candidate['id']} selected_at 不可晚於雷達 as_of")
+                candidate["selectedAt"] = frozen["selected_at"]
+                candidate["selectionDecision"] = frozen["selection_decision"]
+                candidate["selectionReason"] = frozen["selection_reason"]
+                candidate["initialEvidencePosture"] = frozen["evidence_posture"]
+                if frozen["selection_decision"] == "advance":
+                    candidate["selectionOutcome"] = (
+                        "promoted_after_research" if candidate["status"] == "promoted"
+                        else "rejected_after_research"
+                    )
+                elif frozen["selection_decision"] == "watch":
+                    candidate["selectionOutcome"] = (
+                        "promoted_from_watch" if candidate["status"] == "promoted"
+                        else "remained_watch"
+                    )
+                else:
+                    candidate["selectionOutcome"] = (
+                        "promoted_from_defer" if candidate["status"] == "promoted"
+                        else "remained_deferred"
+                    )
+        history.append({
+            "id": radar_meta.get("radar_id", ""),
+            "schemaVersion": int(radar_meta.get("schema_version") or 1),
+            "cycleId": cycle_id,
+            "asOf": radar_meta.get("as_of", ""),
+            "nextReview": radar_meta.get("next_review", ""),
+            "status": radar_meta.get("status", ""),
+            "sourceFile": radar_file,
+            "candidates": radar_candidates,
+            "selectionLog": selected_rows,
+            "accountable": accountable,
+        })
+
+    early_reselections: list[dict] = []
+    occurrences: dict[str, list[dict]] = {}
+    for item in history:
+        if item["schemaVersion"] != 2:
+            continue
+        for candidate in item["candidates"]:
+            if not candidate.get("selectedAt"):
+                continue
+            occurrences.setdefault(candidate["id"], []).append({
+                "candidate": candidate,
+                "cycleId": item["cycleId"],
+                "selectedAt": candidate["selectedAt"],
+                "nextCheck": candidate["nextCheck"],
+                "sourceUrls": {source["url"] for source in candidate.get("sources", [])},
+            })
+    for candidate_id, items in occurrences.items():
+        items.sort(key=lambda row: (row["selectedAt"], row["cycleId"]))
+        for prior, current in zip(items, items[1:]):
+            selected_date = current["selectedAt"][:10]
+            if not (_valid_date(prior["nextCheck"]) and selected_date < prior["nextCheck"]):
+                continue
+            trigger = _early_trigger(
+                current["candidate"].get("selectionReason", ""),
+                selected_date,
+                prior["sourceUrls"],
+            )
+            required = selected_date >= EARLY_TRIGGER_REQUIRED_FROM
+            if required and not trigger["valid"]:
+                errors.append(
+                    f"{current['cycleId']} {candidate_id} 在前次 next_check "
+                    f"{prior['nextCheck']} 前重選，必須凍結新的 early_trigger:title@date=>https://URL，"
+                    "且 URL 不可已存在前輪來源"
                 )
-            elif frozen["selection_decision"] == "watch":
-                candidate["selectionOutcome"] = (
-                    "promoted_from_watch" if candidate["status"] == "promoted"
-                    else "remained_watch"
-                )
-            else:
-                candidate["selectionOutcome"] = (
-                    "promoted_from_defer" if candidate["status"] == "promoted"
-                    else "remained_deferred"
-                )
+            early_reselections.append({
+                "candidateId": candidate_id,
+                "priorCycleId": prior["cycleId"],
+                "cycleId": current["cycleId"],
+                "selectedAt": current["selectedAt"],
+                "priorNextCheck": prior["nextCheck"],
+                "documented": trigger["documented"],
+                "valid": trigger["valid"],
+                "required": required,
+                "grandfathered": not required and not trigger["valid"],
+                "triggerTitle": trigger["title"],
+                "triggerDate": trigger["date"],
+                "triggerUrl": trigger["url"],
+            })
+
+    meta, candidates, source_file = active_payloads[0] if active_payloads else ({}, [], "")
+    active_history = next(
+        (item for item in history if item["sourceFile"] == source_file), {})
+    selection_cycle_id = meta.get("selection_cycle_id", "")
+    selected = active_history.get("selectionLog", [])
 
     payload = {
         "schemaVersion": int(meta.get("schema_version") or 1),
@@ -433,6 +540,20 @@ def load_research_radar(
             "selectedDefer": sum(row["selection_decision"] == "defer" for row in selected),
         },
         "selectionLog": selected,
+        "history": history,
+        "earlyReselections": early_reselections,
+        "historyStats": {
+            "radars": len(history),
+            "schema2Cycles": sum(item["schemaVersion"] == 2 for item in history),
+            "candidates": sum(len(item["candidates"]) for item in history),
+            "accountableSchema2Cycles": sum(
+                item["schemaVersion"] == 2 and item["accountable"] for item in history),
+            "earlyReselections": len(early_reselections),
+            "documentedEarlyTriggers": sum(
+                item["valid"] for item in early_reselections),
+            "grandfatheredEarlyReselections": sum(
+                item["grandfathered"] for item in early_reselections),
+        },
         "errors": errors,
     }
     if strict and errors:

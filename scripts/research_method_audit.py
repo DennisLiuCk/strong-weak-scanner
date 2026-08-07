@@ -204,9 +204,12 @@ def _registry_fingerprint(
         for item in graph.get("graphs", []) for edge in item.get("edges", [])
     )
     radar_rows = [
-        [row.get("id"), row.get("rank"), row.get("status"), row.get("evidencePosture"),
-         row.get("nextCheck"), row.get("articleTopicId"), row.get("graphId")]
-        for row in radar.get("candidates", [])
+        [item.get("id"), item.get("cycleId"), item.get("status"),
+         row.get("id"), row.get("rank"), row.get("status"),
+         row.get("evidencePosture"), row.get("nextCheck"),
+         row.get("articleTopicId"), row.get("graphId")]
+        for item in radar.get("history", [])
+        for row in item.get("candidates", [])
     ]
     selection_rows = [
         [row.get("selection_id"), row.get("cycle_id"), row.get("selected_at"),
@@ -214,7 +217,8 @@ def _registry_fingerprint(
          row.get("knowledge_value"), row.get("evidence_posture"),
          row.get("selection_decision"), row.get("selection_reason"),
          row.get("first_rejection"), row.get("next_evidence")]
-        for row in radar.get("selectionLog", [])
+        for item in radar.get("history", [])
+        for row in item.get("selectionLog", [])
     ]
     scan_rows = [
         [row.get("scan_id"), row.get("window_start"), row.get("window_end"),
@@ -356,10 +360,19 @@ def compute_method_audit(
         row.get("selectionOutcome") == "rejected_after_research"
         for row in radar.get("candidates", [])
     )
+    history_stats = radar.get("historyStats", {})
+    schema2_cycles = history_stats.get("schema2Cycles", 0)
+    accountable_cycles = history_stats.get("accountableSchema2Cycles", 0)
+    early_reselections = radar.get("earlyReselections", [])
+    required_early = [item for item in early_reselections if item.get("required")]
+    valid_required_early = [item for item in required_early if item.get("valid")]
     selection_accountable = bool(
         radar.get("schemaVersion") == 2
         and radar_candidates
         and frozen_selections == radar_candidates
+        and schema2_cycles
+        and accountable_cycles == schema2_cycles
+        and len(valid_required_early) == len(required_early)
     )
 
     trace_ok = graph_traceable == len(graph_edges) and boundary_complete == len(active_claims)
@@ -385,21 +398,19 @@ def compute_method_audit(
         and mature_review_events > 0
         and evidence_outcomes >= MIN_DESCRIPTIVE_OUTCOMES
     )
-    support_rate = (
-        round(result_counts["new_support"] / evidence_outcomes, 4)
-        if descriptive_ready and evidence_outcomes else None
-    )
 
     core = {
         "schemaVersion": 1,
         "asOf": date_text,
-        "methodologyVersion": "1.4",
+        "methodologyVersion": "1.5",
         "registryFingerprint": _registry_fingerprint(topics, graph, radar, reviews, scan),
         "scope": {
             "topics": len(topics),
             "activeTopics": len(active_topics),
             "radarCandidates": radar.get("stats", {}).get("candidates", 0),
             "promotedCandidates": radar.get("stats", {}).get("promoted", 0),
+            "radarCycles": schema2_cycles,
+            "radarHistoryCandidates": history_stats.get("candidates", 0),
             "graphs": graph.get("stats", {}).get("graphs", 0),
             "scanEvents": len(scan_rows),
         },
@@ -410,8 +421,16 @@ def compute_method_audit(
             "advanceDecisions": selection_advance,
             "promotedAfterResearch": promoted_after_research,
             "rejectedAfterResearch": rejected_after_research,
+            "cycles": schema2_cycles,
+            "accountableCycles": accountable_cycles,
+            "historicalCandidates": history_stats.get("candidates", 0),
+            "earlyReselections": len(early_reselections),
+            "requiredEarlyReselections": len(required_early),
+            "documentedEarlyTriggers": len(valid_required_early),
+            "grandfatheredEarlyReselections": history_stats.get(
+                "grandfatheredEarlyReselections", 0),
             "accountable": selection_accountable,
-            "boundary": "凍結紀錄只能證明選擇與拒絕條件可被事後稽核；升格是研究產出，不是選題正確率或投資命中率。",
+            "boundary": "歷史雷達退役後仍逐輪核對凍結值；未到期重選自 2026-08-07 起必須留下新來源 early trigger。這只能證明選擇可稽核，升格不是選題正確率或投資命中率。",
         },
         "claims": {
             "active": len(active_claims),
@@ -456,10 +475,13 @@ def compute_method_audit(
         },
         "calibration": {
             "evidenceBearingOutcomes": evidence_outcomes,
-            "minimumOutcomesForDescriptiveRate": MIN_DESCRIPTIVE_OUTCOMES,
-            "descriptiveRateReady": descriptive_ready,
-            "supportRate": support_rate,
-            "boundary": "此處只描述到期 monitor 的證據結果，不是投資命中率、報酬率或因果效果。",
+            "minimumOutcomesForDescriptiveBreakdown": MIN_DESCRIPTIVE_OUTCOMES,
+            "descriptiveBreakdownReady": descriptive_ready,
+            "outcomeCounts": {
+                "new_support": result_counts["new_support"],
+                "new_contrary": result_counts["new_contrary"],
+            },
+            "boundary": "只列到期 monitor 找到的新支持／反方證據筆數，不計算支持率。new_support 表示找到支持該 monitor 檢查方向的新證據，不等於主命題正確、投資命中、報酬或因果效果。",
         },
         "graphs": {
             "activeEdges": len(graph_edges),
@@ -474,11 +496,14 @@ def compute_method_audit(
                 "id": "selection_accountability", "label": "選題前承諾",
                 "status": "pass" if selection_accountable else "attention",
                 "observed": (
-                    f"{frozen_selections}/{radar_candidates} 個本輪候選有研究前凍結；"
+                    f"{accountable_cycles}/{schema2_cycles} 輪 schema 2 雷達保留凍結值；"
+                    f"本輪 {frozen_selections}/{radar_candidates} 個候選有研究前凍結；"
                     f"{selection_advance} 個 advance 中 {promoted_after_research} 個完成升格、"
-                    f"{rejected_after_research} 個研究後拒絕"
+                    f"{rejected_after_research} 個研究後拒絕；"
+                    f"cutover 後 early trigger {len(valid_required_early)}/{len(required_early)}，"
+                    f"另揭露 {history_stats.get('grandfatheredEarlyReselections', 0)} 次舊制未留 trigger"
                 ),
-                "boundary": "通過只代表初始排名、第一拒絕與下一份證據沒有被事後改寫；不能由單輪升格率判定方法有效。",
+                "boundary": "通過只代表歷史初始排名、第一拒絕、下一份證據與未到期重選理由可回查；不能由單輪升格數或 early trigger 判定研究正確。",
             },
             {
                 "id": "traceability", "label": "可追溯性",
@@ -519,18 +544,25 @@ def compute_method_audit(
             {
                 "id": "calibration", "label": "校準可用性",
                 "status": "pass" if descriptive_ready else "not_ready",
-                "observed": f"{evidence_outcomes} 個具新證據的到期結果；最低揭露門檻 {MIN_DESCRIPTIVE_OUTCOMES}",
-                "boundary": "樣本不足時不報支持率；即使可報也只附樣本數，不稱為投資命中率。",
+                "observed": (
+                    f"{evidence_outcomes} 個具新證據的到期結果："
+                    f"new_support {result_counts['new_support']}、"
+                    f"new_contrary {result_counts['new_contrary']}；"
+                    f"最低分類揭露門檻 {MIN_DESCRIPTIVE_OUTCOMES}"
+                ),
+                "boundary": "即使達門檻也只報結果分類與 N，不計支持率；review outcome 尚未編碼主命題真假或投資結果。",
             },
         ],
         "caveats": [
             "選題前凍結與升格結果分開保存；至少累積多輪到期結果前，不計算選題命中率。",
             "升格候選數是研究流程產出，不是研究正確率。",
+            "退役雷達仍納入 selection fingerprint；cutover 前 3 次未留 early trigger 的重選被保留揭露，不回溯改寫。",
             "獨立來源鏈覆蓋是交叉檢查深度，不是多數決或真實性分數。",
             "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
             "no_new_evidence 是一次有紀錄的檢查，不得刷新 claim 的證據時鐘。",
             "Partial scan 不等於全 universe 或全市場覆蓋；研究漏網風險必須持續顯示。",
             "Scan overdue 目前只量最新全域 cadence；尚無 scope lineage 前，不把歷史期限累加成永久逾期。",
+            "Monitor outcome 只描述新證據方向；在 outcome schema 能分辨主命題效應前，不計算 support rate。",
         ],
     }
     return core
