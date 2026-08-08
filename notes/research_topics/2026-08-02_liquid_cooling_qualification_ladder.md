@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-07-27
-last_reviewed_at: 2026-08-02
-review_due: 2026-08-09
+last_reviewed_at: 2026-08-09
+review_due: 2026-08-14
 source_type: mixed
 publisher: NVIDIA
 publisher_domain: marketplace.nvidia.com
@@ -19,7 +19,7 @@ group_ids: thermal,powersupply
 trigger_type: qualification_and_supply_stage
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C5
+thesis_claim_id: C9
 base_confidence: medium
 confidence_basis: NVIDIA 動態清單在捕捉日以同一欄標示三個型號的額定容量與供應狀態，容量保留原始 MW／kW 後可正規化比較；另有 LG 與 Daikin 一手文件補充認證、合作及 PoC 階段，但 Marketplace 沒有固定版本與完整跨廠測試協定，台廠訂單、收入與獲利也尚未證實
 cross_company_numbers: true
@@ -45,6 +45,13 @@ from: triaged
 to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:readability
+-->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: weekly_monitor_trigger_lge_added_to_marketplace_without_supply_status
+evidence: sources:S8
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -196,6 +203,22 @@ limitation: 動態索引只供追蹤新文件；索引本身不證明 PoC 結果
 independence_group: daikin
 -->
 
+<!-- research_source
+source_id: S8
+role: other_primary
+source_kind: living_index
+publisher: NVIDIA Marketplace
+title: DSX Infrastructure for AI Factory validated CDU list — 2026-08-09 capture
+published_at:
+captured_at: 2026-08-09
+accepted_at: 2026-08-09
+status: active
+url: https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/?category=liquid_to_liquid&page=1&limit=15
+locator: 2026-08-09 捕捉的 Liquid to Liquid CDU 表；LGE／LGE 列為 600kW、850LPM，validation type 列出 Hydraulic Test-Constant DP／Constant Flow、Flow Sensor Accuracy、Cold Start、Thermal Test-Low Load／Nominal Capacity、Pump Failover、Pumping Capacity，Supply Chain Status 欄空白；AVC、Delta、LITEON 三列容量與狀態同 2026-08-02 capture
+limitation: 動態頁沒有不可變版本與變更日誌；本 source 只支持 2026-08-09 當下可定位欄位，不把空白供應狀態解釋為 Sample Ready、MP Ready、撤銷或量產，也不提供客戶、訂單、出貨、收入、毛利或完整跨廠測試協定
+independence_group: nvidia-marketplace
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -315,6 +338,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: 2026-08-09 捕捉的 NVIDIA Marketplace 已以可定位同表列項顯示 LGE／LGE 600kW、850LPM 與八類 validation test，Supply Chain Status 欄空白；同日 AVC 1.2MW／Sample Ready、Delta 1MW／MP Ready、LITEON 380kW／Sample Ready 的型號、容量與供應狀態未較 2026-08-02 capture 改變
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-09
+basis: S8 在同一張 Liquid to Liquid CDU 表可直接定位四個 vendor、model、Cooling Capacity @ 4°C ATD、validation type 與原始 Supply Chain Status 欄
+boundary: 只證實 2026-08-09 動態清單內容；空白狀態不自行補值，列名與 validation test 也不證明客戶驗收、量產訂單、收入、市占、毛利或跨廠測試結果可完全等同
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: inference
+status: active
+claim: LGE 從 2026-08-02 只有公司公告的 NVIDIA validation，前進到 2026-08-09 可在 NVIDIA Marketplace 同欄定位的 600kW 列項；但平台沒有給 LGE Supply Chain Status，因此證據階梯只升到「平台列名／validation」，不能升為 MP Ready、客戶部署、訂單或財務認列
+supporting_source_ids: S2,S8
+contrary_source_ids:
+as_of: 2026-08-09
+basis: S2 是 LG 對 600kW CDU validation 的公司公告，S8 是不同發行人的 NVIDIA 平台 capture；兩條來源鏈共同支持產品與平台列名，S8 的供應狀態欄仍為空白
+boundary: 兩條來源鏈降低單一公司自述風險，但不等於獨立客戶驗收；不推算 supply stage、訂單、出貨量、市占、收入、毛利或現金流
+verification_needed: 持續保存 NVIDIA 欄位變化，並以具名客戶部署與 LG 財務揭露驗證量產及經濟結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 跨公司數字與可比性
 
 跨公司比較帳本：`M1`。三筆觀測皆取自 2026-08-02 捕捉的 NVIDIA Marketplace 同一張表、
@@ -353,6 +410,113 @@ normalized_value: 1200
 normalized_unit: kW
 normalized_period_start: 2026-08-02
 normalized_period_end: 2026-08-02
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
+2026-08-09 的新 capture 另建 `M2`，不覆寫 `M1`。它把新出現的 LGE 同欄列項納入，並重新
+保存當日四筆來源值；這只表示同日同欄的額定容量可做固定單位換算，仍不是商業成熟度排名。
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: aligned_metric
+observation_id: M2-O1
+claim_id: C8
+entity: AVC
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 1.2
+value_kind: point
+period_start: 2026-08-09
+period_end: 2026-08-09
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: MW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-09 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S8
+comparability: normalized_comparable
+comparability_reason: 四筆資料來自同日同表同欄，但原始單位含 MW 與 kW；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態或財務
+normalization_method: reported_MW_multiply_by_1000_using_1MW_equals_1000kW
+normalized_value: 1200
+normalized_unit: kW
+normalized_period_start: 2026-08-09
+normalized_period_end: 2026-08-09
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: aligned_metric
+observation_id: M2-O2
+claim_id: C8
+entity: Delta
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 1
+value_kind: point
+period_start: 2026-08-09
+period_end: 2026-08-09
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: MW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-09 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S8
+comparability: normalized_comparable
+comparability_reason: 四筆資料來自同日同表同欄，但原始單位含 MW 與 kW；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態或財務
+normalization_method: reported_MW_multiply_by_1000_using_1MW_equals_1000kW
+normalized_value: 1000
+normalized_unit: kW
+normalized_period_start: 2026-08-09
+normalized_period_end: 2026-08-09
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: aligned_metric
+observation_id: M2-O3
+claim_id: C8
+entity: LITEON
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 380
+value_kind: point
+period_start: 2026-08-09
+period_end: 2026-08-09
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: kW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-09 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S8
+comparability: normalized_comparable
+comparability_reason: 四筆資料來自同日同表同欄，但原始單位含 MW 與 kW；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態或財務
+normalization_method: identity_conversion_reported_kW_equals_normalized_kW
+normalized_value: 380
+normalized_unit: kW
+normalized_period_start: 2026-08-09
+normalized_period_end: 2026-08-09
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: aligned_metric
+observation_id: M2-O4
+claim_id: C8
+entity: LGE
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 600
+value_kind: point
+period_start: 2026-08-09
+period_end: 2026-08-09
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: kW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-09 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S8
+comparability: normalized_comparable
+comparability_reason: 四筆資料來自同日同表同欄，但原始單位含 MW 與 kW；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態或財務
+normalization_method: identity_conversion_reported_kW_equals_normalized_kW
+normalized_value: 600
+normalized_unit: kW
+normalized_period_start: 2026-08-09
+normalized_period_end: 2026-08-09
 normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
 -->
 
@@ -446,11 +610,22 @@ CDU 的 kW，還包括設施端 chiller、伺服器端冷卻、控制與長期�
 - [S5：公開資訊觀測站持續更新入口](https://mops.twse.com.tw/mops/web/index)。
 - [S6：AVC 官方首頁的 Asia Vital Components／TSE 3017 映射](https://www.avc.co/en-us/)。
 - [S7：Daikin 2026 新聞稿索引](https://www.daikin.com/press/2026)。
+- [S8：NVIDIA Marketplace DSX Infrastructure 動態清單](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)（2026-08-09 capture；LGE 已有可定位 600kW 列項，供應狀態欄空白）。
 
 **可證實：** 同日同欄的容量、原始 supply status、LG 自述認證、MOU 範圍與 PoC 時鐘。
 
 **待驗證：** 平台狀態的精確判準、具名客戶、部署數、訂單、收入、毛利、現金流與實際
 節能結果。合作名單、平台列名或額定 kW 不得替代這些公司層級證據。
+
+## 2026-08-09 到期複核增量
+
+- `T1` 的預先登錄觸發條件命中：LGE 已從公司公告中的 validation，前進到 NVIDIA Marketplace
+  可定位的 600kW／850LPM 列項；但原始 Supply Chain Status 欄為空白，不能代填成
+  `Sample Ready` 或 `MP Ready`。
+- AVC、Delta、LITEON 的原列型號、容量與供應狀態未變；`M1` 保留 2026-08-02 的三筆歷史
+  capture，`M2` 另存 2026-08-09 的四筆同欄觀測。
+- 新證據只把 LGE 推到「平台列名／validation」；客戶部署、訂單、量產、收入與獲利仍沒有
+  可重算證據。下一輪改由 `T4` 追蹤原始欄位變化。
 
 ## 影響路由
 
@@ -480,7 +655,7 @@ evidence_boundary: 平台列名、狀態與 MOU 都不證明台達電或光寶�
 
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
 claim_ids: C1,C5
 metric: NVIDIA CDU 型號、同欄額定容量、validation type 與 Supply Chain Status 變化
 source_ids: S1
@@ -490,6 +665,8 @@ frequency_detail: 每週保存一次 Marketplace 表格 capture；重大產品�
 next_check: 2026-08-09
 trigger: AVC、Delta、LITEON 的型號、容量、validation type 或供應狀態改變，Sample Ready 轉階段，或 LGE 以可定位欄位正式出現
 invalidation: NVIDIA 移除型號、撤回資格、重新定義 4°C ATD 欄位，或同一型號容量被重編；屆時保留舊 observation 並追加新比較，不覆寫 M1
+retired_at: 2026-08-09
+retirement_reason: 預先登錄的 LGE 可定位列項 trigger 已命中；新增 S8、C8、C9 與 M2 保存 2026-08-09 capture，後續欄位變化改由 T4 接續
 -->
 
 <!-- monitoring_item
@@ -518,6 +695,20 @@ frequency_detail: Daikin 新聞稿、PoC 里程碑或 FY2027 商用更新出現�
 next_check: 2026-09-30
 trigger: PoC 公布可重算的基線、節電、成本或可靠度結果，或正式商用部署、客戶採購與部署範圍
 invalidation: Daikin／NTT DATA 官方宣告 PoC 失敗、取消或延後超過 2027-03，或結果顯示整合控制沒有改善預先定義指標；沒有公開結果只維持待驗證並觸發 freshness downgrade
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C8,C9
+metric: NVIDIA CDU 型號、同欄額定容量、validation type 與 Supply Chain Status 的後續變化
+source_ids: S8
+watch_source_ids: S8
+frequency: weekly
+frequency_detail: 每週保存一次 Marketplace 表格 capture；重大產品、資格或供應狀態更新時提前
+next_check: 2026-08-16
+trigger: AVC、Delta、LITEON、LGE 的型號、容量、validation type 或原始供應狀態改變，空白狀態取得平台明示值，或新增 universe 供應商的可定位列項
+invalidation: NVIDIA 移除型號、撤回資格、重新定義 4°C ATD 欄位，或同一型號容量被重編；屆時保留 M1／M2，另建新 comparison，不回寫歷史 capture
 -->
 
 ## 下一個可證明／否定的節點

@@ -39,7 +39,8 @@ from research_queue import (_topic_confidence as topic_confidence_at,
                             taipei_today as research_today)
 from knowledge_graph import build_knowledge_graph
 from research_radar import load_research_radar
-from research_method_audit import load_method_audit
+from research_method_audit import (effective_monitor_schedule, load_method_audit,
+                                   load_monitor_reviews)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -2202,6 +2203,245 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
     }
 
 
+def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph,
+                         reviews, method_audit, as_of):
+    """Build an orthogonal group-research matrix without collapsing it to a score.
+
+    Coverage, named-company linkage, evidence state, commercial materiality and
+    maintenance are deliberately separate axes.  All values are full registry counts,
+    not estimates from a sample.
+    """
+    if isinstance(as_of, dt.datetime):
+        as_of = as_of.date()
+    elif not isinstance(as_of, dt.date):
+        as_of = _article_date(as_of) or research_today()
+    date_text = as_of.isoformat()
+    notes = notes or {}
+    topics = topics or []
+    stock_meta = stock_meta or {}
+    group_names = group_names or {}
+    knowledge_graph = knowledge_graph or {"graphs": []}
+    reviews = reviews or []
+    method_audit = method_audit or {}
+
+    group_ids = list(group_names)
+    for row in stock_meta.values():
+        group_id = row.get("group")
+        if group_id and group_id not in group_ids:
+            group_ids.append(group_id)
+    universe_ids = defaultdict(set)
+    for stock_id, row in stock_meta.items():
+        if row.get("group"):
+            universe_ids[row["group"]].add(stock_id)
+
+    note_available = defaultdict(set)
+    note_verified = defaultdict(set)
+    for stock_id, note in notes.items():
+        group_id = (stock_meta.get(stock_id) or {}).get("group")
+        if not group_id or not _article_metadata_usable(note):
+            continue
+        note_available[group_id].add(stock_id)
+        if note_review_status(note) == "independently_verified":
+            note_verified[group_id].add(stock_id)
+
+    def mapped_groups(topic):
+        result = [group for group in topic.get("group_ids", []) if group]
+        result.extend(
+            (stock_meta.get(stock_id) or {}).get("group")
+            for stock_id in topic.get("stock_ids", [])
+        )
+        return list(dict.fromkeys(group for group in result if group))
+
+    active_topics = [
+        topic for topic in topics
+        if topic.get("status") not in {"dismissed", "resolved"}
+    ]
+    topics_by_group = defaultdict(list)
+    unrouted_topics = []
+    for topic in active_topics:
+        groups = mapped_groups(topic)
+        if not groups:
+            unrouted_topics.append(topic)
+        for group_id in groups:
+            topics_by_group[group_id].append(topic)
+
+    missing_source_topics = set(
+        (method_audit.get("sources") or {}).get(
+            "thesesNeedingSecondIndependentGroup", []
+        )
+    )
+    review_pairs = defaultdict(list)
+    for row in reviews:
+        review_pairs[(row.get("topic_id"), row.get("monitor_id"))].append(row)
+    effective_due = effective_monitor_schedule(topics, reviews)
+
+    company_any = defaultdict(set)
+    company_by_materiality = defaultdict(lambda: defaultdict(set))
+    company_by_evidence = defaultdict(lambda: defaultdict(set))
+    edge_counts = defaultdict(lambda: defaultdict(int))
+    for graph in knowledge_graph.get("graphs", []):
+        nodes = {node.get("id"): node for node in graph.get("nodes", [])}
+        for edge in graph.get("edges", []):
+            if edge.get("status") != "active" or edge.get("view") != "company":
+                continue
+            edge_key = f"{graph.get('id')}:{edge.get('id')}"
+            companies = []
+            for node_id in (edge.get("from"), edge.get("to")):
+                node = nodes.get(node_id) or {}
+                if node.get("type") == "company" and node.get("universe"):
+                    companies.append(node)
+            for node in companies:
+                stock_id = node.get("ticker") or node.get("id", "").split(":")[-1]
+                group_id = (node.get("groupId")
+                            or (stock_meta.get(stock_id) or {}).get("group"))
+                if not group_id:
+                    continue
+                company_any[group_id].add(stock_id)
+                company_by_materiality[group_id][
+                    edge.get("materiality") or "unknown"
+                ].add(stock_id)
+                company_by_evidence[group_id][
+                    edge.get("evidenceState") or "unverified"
+                ].add(stock_id)
+                edge_counts[group_id][edge_key] += 1
+
+    reviewed_stale_ids = set()
+    unique_due_pairs = set()
+    for topic in active_topics:
+        topic_id = topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
+        due_pairs = []
+        has_review_after_topic_due = False
+        for monitor in topic.get("monitoring", []):
+            if monitor.get("status") != "active":
+                continue
+            pair = (topic_id, monitor.get("monitor_id"))
+            due = effective_due.get(pair, monitor.get("next_check", ""))
+            if re.fullmatch(r"\d{4}-\d{2}-\d{2}", due or "") and due <= date_text:
+                due_pairs.append(pair)
+                unique_due_pairs.add(pair)
+            for row in review_pairs.get(pair, []):
+                if row.get("checked_at", "") >= (topic.get("review_due") or ""):
+                    has_review_after_topic_due = True
+        if ((topic.get("confidence") or {}).get("stale")
+                and has_review_after_topic_due and not due_pairs):
+            reviewed_stale_ids.add(topic_id)
+
+    rows = []
+    for group_id in group_ids:
+        universe = universe_ids[group_id]
+        group_topics = topics_by_group[group_id]
+        topic_ids = {
+            topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
+            for topic in group_topics
+        }
+        stale_topics = {
+            topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
+            for topic in group_topics if (topic.get("confidence") or {}).get("stale")
+        }
+        due_pairs = set()
+        for topic in group_topics:
+            topic_id = topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
+            for monitor in topic.get("monitoring", []):
+                if monitor.get("status") != "active":
+                    continue
+                pair = (topic_id, monitor.get("monitor_id"))
+                due = effective_due.get(pair, monitor.get("next_check", ""))
+                if re.fullmatch(r"\d{4}-\d{2}-\d{2}", due or "") and due <= date_text:
+                    due_pairs.add(pair)
+
+        materiality = {
+            key: len(company_by_materiality[group_id][key])
+            for key in ("financial", "named_product", "adjacent", "unknown")
+        }
+        evidence = {
+            key: len(company_by_evidence[group_id][key])
+            for key in ("verified", "inference", "unverified")
+        }
+        deepest = (
+            "financial" if materiality["financial"]
+            else "named_product" if materiality["named_product"]
+            else "adjacent" if materiality["adjacent"]
+            else "unknown"
+        )
+        verified_notes = len(note_verified[group_id])
+        source_gaps = len(topic_ids.intersection(missing_source_topics))
+        bridge_count = len(company_any[group_id])
+        if verified_notes < len(universe):
+            action, tone = "補正式公司筆記", "critical"
+            reason = f"尚缺 {len(universe) - verified_notes} 檔獨立核驗筆記"
+        elif due_pairs:
+            action, tone = "先清到期監控", "critical"
+            reason = f"仍有 {len(due_pairs)} 個 monitor 到期未處理"
+        elif bridge_count == 0:
+            action, tone = "補具名公司橋接", "critical"
+            reason = "已有公司筆記，但知識圖譜尚無 universe 公司證據邊"
+        elif source_gaps:
+            action, tone = "補第二條來源鏈", "warning"
+            reason = f"有 {source_gaps} 篇主命題仍只有一個獨立來源群組"
+        elif materiality["financial"] == 0:
+            action, tone = "補財務材料性", "warning"
+            reason = "現有橋接尚未到具名收入、毛利或現金流"
+        else:
+            action, tone = "維持監控", "progress"
+            reason = "公司覆蓋、交叉驗證與財務材料性均已有可追溯節點"
+
+        rows.append({
+            "id": group_id,
+            "label": group_names.get(group_id, group_id),
+            "universe": len(universe),
+            "formalNotes": len(note_available[group_id]),
+            "verifiedNotes": verified_notes,
+            "topics": len(topic_ids),
+            "companyBridges": bridge_count,
+            "materiality": materiality,
+            "deepestMateriality": deepest,
+            "evidence": evidence,
+            "activeCompanyEdges": len(edge_counts[group_id]),
+            "staleTopics": len(stale_topics),
+            "reviewedStaleTopics": len(stale_topics.intersection(reviewed_stale_ids)),
+            "dueMonitors": len(due_pairs),
+            "sourceGaps": source_gaps,
+            "action": action,
+            "actionTone": tone,
+            "actionReason": reason,
+        })
+
+    all_stale_ids = {
+        topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
+        for topic in active_topics if (topic.get("confidence") or {}).get("stale")
+    }
+    return {
+        "asOf": date_text,
+        "summary": {
+            "groups": len(rows),
+            "universe": sum(len(value) for value in universe_ids.values()),
+            "verifiedNotes": sum(len(value) for value in note_verified.values()),
+            "groupsWithoutTopics": sum(row["topics"] == 0 for row in rows),
+            "groupsWithoutCompanyBridge": sum(row["companyBridges"] == 0 for row in rows),
+            "groupsWithFinancialMateriality": sum(
+                row["materiality"]["financial"] > 0 for row in rows
+            ),
+            "dueMonitors": len(unique_due_pairs),
+            "staleTopics": len(all_stale_ids),
+            "reviewedStaleTopics": len(all_stale_ids.intersection(reviewed_stale_ids)),
+            "sourceGapTopics": len(missing_source_topics),
+            "unroutedTopics": len(unrouted_topics),
+        },
+        "rows": rows,
+        "materialityLabels": {
+            "unknown": "未建立具名公司橋接",
+            "adjacent": "相鄰／搜尋路由",
+            "named_product": "具名產品或角色",
+            "financial": "財務可辨識",
+        },
+        "boundary": (
+            "這是 11 族群、121 檔 universe 與目前研究 registry 的全數盤點，不是抽樣；"
+            "公司筆記篇數、題材篇數、圖譜邊、商業材料性與時效是不同軸，刻意不合成分數。"
+            "圖譜只計可追溯的 curated edges，0 代表研究中心尚未建立證據邊，不代表產業關係不存在。"
+        ),
+    }
+
+
 def main():
     # 唯讀開啟(鐵律:唯讀一律走 db_ro)。這支只從 db 讀、寫的是 index.html 與
     # archive/,不曾寫 db;bare sqlite3.connect 會在路徑打錯時無聲建一個空 db,
@@ -2421,6 +2661,17 @@ def main():
     # 方法稽核讀取 versioned、append-only snapshot；不在 build 當下動態重算後假裝成歷史。
     # registry 變動卻沒有新 snapshot 會由 research_method_audit.py --lint 標紅。
     research_library["methodAudit"] = load_method_audit(strict=True)
+    # 族群成熟度不是 article count 排名：公司筆記、題材、具名公司橋接、材料性、
+    # 證據層級與維護期限分軸顯示。到期狀態重播 append-only monitor review ledger，
+    # 避免已檢查但沒有新 evidence 的 stale topic 被誤標成「從未處理」。
+    research_reviews = load_monitor_reviews(
+        research_topics, research_as_of, strict=True,
+    )
+    research_library["groupMaturity"] = build_group_maturity(
+        notes_map, research_topics, stock_meta, GROUP_NM,
+        research_library["knowledgeGraph"], research_reviews,
+        research_library["methodAudit"], research_as_of,
+    )
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
     chip_by_grp = {}

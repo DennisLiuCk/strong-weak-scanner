@@ -59,10 +59,10 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["graphs"]["traceableEdges"],
             self.current["graphs"]["activeEdges"],
         )
-        self.assertEqual(self.current["monitors"]["reviewedMature"], 6)
-        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 10)
-        self.assertEqual(self.current["corrections"]["resultCounts"]["new_support"], 3)
-        self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 6)
+        self.assertEqual(self.current["monitors"]["reviewedMature"], 9)
+        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 14)
+        self.assertEqual(self.current["corrections"]["resultCounts"]["new_support"], 4)
+        self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 9)
         self.assertEqual(self.current["corrections"]["resultCounts"]["not_yet_testable"], 1)
         # 佐證回填不得計入修正學習：2026-08-08 為 US-ADV-PKG 追加第二條來源鏈後，
         # 這個數字必須維持不變，否則代表有人用 supersede 假造了一次修正。
@@ -74,11 +74,11 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["scans"]["latestScope"], self.scan["latest"]["scope"]
         )
         self.assertEqual(self.current["scans"]["overdue"], 0)
-        self.assertFalse(self.current["calibration"]["descriptiveBreakdownReady"])
-        self.assertEqual(self.current["calibration"]["evidenceBearingOutcomes"], 3)
+        self.assertTrue(self.current["calibration"]["descriptiveBreakdownReady"])
+        self.assertEqual(self.current["calibration"]["evidenceBearingOutcomes"], 4)
         self.assertEqual(
             self.current["calibration"]["outcomeCounts"],
-            {"new_support": 3, "new_contrary": 0},
+            {"new_support": 4, "new_contrary": 0},
         )
         self.assertNotIn("supportRate", self.current["calibration"])
         self.assertNotIn("score", self.current)
@@ -118,9 +118,9 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(gates["selection_accountability"]["status"], "pass")
         self.assertEqual(gates["cross_check_depth"]["status"], "attention")
         self.assertEqual(gates["freshness"]["status"], "attention")
-        self.assertEqual(gates["correction_learning"]["status"], "attention")
+        self.assertEqual(gates["correction_learning"]["status"], "pass")
         self.assertEqual(gates["scan_accountability"]["status"], "pass")
-        self.assertEqual(gates["calibration"]["status"], "not_ready")
+        self.assertEqual(gates["calibration"]["status"], "pass")
         for gate in gates.values():
             self.assertTrue(gate["observed"])
             self.assertTrue(gate["boundary"])
@@ -166,7 +166,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         for row in evidence_bearing:
             self.assertTrue(row["evidence_source_ids"])
             self.assertEqual(row["claim_action"], "new_claim")
-        self.assertEqual(self.current["monitors"]["dueOrOverdue"], 4)
+        self.assertEqual(self.current["monitors"]["dueOrOverdue"], 0)
         self.assertEqual(self.current["freshness"]["staleTopics"], 6)
 
     def test_evidence_result_requires_registered_source(self):

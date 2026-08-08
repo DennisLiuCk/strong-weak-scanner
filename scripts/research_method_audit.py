@@ -238,6 +238,34 @@ def _registry_fingerprint(
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def effective_monitor_schedule(
+    topics: list[dict], reviews: list[dict],
+) -> dict[tuple[str, str], str]:
+    """Return the next effective check after replaying the append-only review ledger.
+
+    Topic monitor blocks preserve their original schedule.  A completed review moves only
+    the method-ledger work date, so consumers must replay the same events instead of
+    treating the immutable ``next_check`` field as an unreviewed overdue item forever.
+    """
+    review_groups: dict[tuple[str, str], list[dict]] = {}
+    for row in reviews:
+        review_groups.setdefault((row["topic_id"], row["monitor_id"]), []).append(row)
+    schedule: dict[tuple[str, str], str] = {}
+    for topic in topics:
+        if topic.get("status") in {"dismissed", "resolved"}:
+            continue
+        for monitor in topic.get("monitoring", []):
+            if monitor.get("status") != "active":
+                continue
+            pair = (topic.get("topic_id"), monitor.get("monitor_id"))
+            expected_due = monitor.get("next_check", "")
+            for row in review_groups.get(pair, []):
+                if _valid_date(expected_due) and row["checked_at"] >= expected_due:
+                    expected_due = row["next_check"]
+            schedule[pair] = expected_due
+    return schedule
+
+
 def compute_method_audit(
     topics: list[dict], graph: dict, radar: dict, reviews: list[dict], scan: dict,
     as_of: dt.date,
@@ -267,7 +295,7 @@ def compute_method_audit(
     review_groups: dict[tuple[str, str], list[dict]] = {}
     for row in reviews:
         review_groups.setdefault((row["topic_id"], row["monitor_id"]), []).append(row)
-    effective_due: dict[tuple[str, str], str] = {}
+    effective_due = effective_monitor_schedule(topics, reviews)
     mature_review_events = 0
     for topic, monitor in active_monitors:
         pair = (topic.get("topic_id"), monitor.get("monitor_id"))
@@ -276,7 +304,6 @@ def compute_method_audit(
             if _valid_date(expected_due) and row["checked_at"] >= expected_due:
                 mature_review_events += 1
             expected_due = row["next_check"]
-        effective_due[pair] = expected_due
     mature_monitors = [
         (topic, monitor) for topic, monitor in active_monitors
         if _valid_date(effective_due[(topic.get("topic_id"), monitor.get("monitor_id"))])

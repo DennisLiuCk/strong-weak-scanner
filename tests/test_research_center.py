@@ -271,6 +271,48 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("datetime.now", source)
         self.assertNotIn("mtime", source)
 
+    def test_group_maturity_keeps_coverage_materiality_and_maintenance_separate(self):
+        topics = copy.deepcopy(self.topics)
+        topics[0]["monitoring"][0]["status"] = "active"
+        topics[0]["confidence"]["stale"] = True
+        topics[0]["confidence"]["days_overdue"] = 1
+        graph = {"graphs": [{
+            "id": "test-graph",
+            "nodes": [
+                {"id": "company:1111", "type": "company", "universe": True,
+                 "ticker": "1111", "groupId": "power"},
+                {"id": "concept:test", "type": "concept", "universe": False},
+            ],
+            "edges": [{
+                "id": "E1", "status": "active", "view": "company",
+                "from": "company:1111", "to": "concept:test",
+                "materiality": "named_product", "evidenceState": "verified",
+            }],
+        }]}
+        reviews = [{
+            "topic_id": "MI-2026-07-29-TEST", "monitor_id": "T1",
+            "checked_at": "2026-08-05", "next_check": "2026-08-12",
+        }]
+        method = {"sources": {"thesesNeedingSecondIndependentGroup": [
+            "MI-2026-07-29-TEST",
+        ]}}
+        maturity = bd.build_group_maturity(
+            self.notes, topics, self.stock_meta, {"power": "功率元件"},
+            graph, reviews, method, "2026-08-06",
+        )
+        row = maturity["rows"][0]
+        self.assertEqual(maturity["summary"]["verifiedNotes"], 1)
+        self.assertEqual(maturity["summary"]["dueMonitors"], 0)
+        self.assertEqual(row["verifiedNotes"], 1)
+        self.assertEqual(row["topics"], 1)
+        self.assertEqual(row["companyBridges"], 1)
+        self.assertEqual(row["materiality"]["named_product"], 1)
+        self.assertEqual(row["materiality"]["financial"], 0)
+        self.assertEqual(row["reviewedStaleTopics"], 1)
+        self.assertEqual(row["sourceGaps"], 1)
+        self.assertEqual(row["action"], "補第二條來源鏈")
+        self.assertNotIn("score", maturity)
+
     def test_inline_research_json_cannot_close_script(self):
         value = {"claim": "</script><script>alert(1)</script>", "amp": "A&B"}
         encoded = bd._inline_script_json(value)
@@ -395,6 +437,46 @@ class ResearchCenterTest(unittest.TestCase):
             template,
         )
 
+    def test_template_focus_mode_reclaims_left_and_top_navigation_space(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            'id="focusToggle"', 'aria-pressed="false"',
+            "body.focus-mode .filters,body.focus-mode .tools{display:none}",
+            "body.focus-mode .catalog{display:none}",
+            "body.focus-mode .reader-inner{max-width:1180px",
+            "localStorage.getItem('researchFocusMode')",
+            "localStorage.setItem('researchFocusMode'",
+            "focusToggleButton.setAttribute('aria-pressed'",
+            "focusToggleButton.textContent=active?'展開選單':'專注閱讀'",
+            "focusMedia.addEventListener('change',applyFocusMode)",
+        ):
+            self.assertIn(contract, template)
+        self.assertIn("@media(min-width:781px){", template)
+        self.assertIn(".focusbtn{display:none}", template)
+
+    def test_template_outline_scroll_spy_tracks_reader_and_window_scroll(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function setupOutlineScrollSpy(root)",
+            "function setActiveOutlineSection(root,index)",
+            "scroll.addEventListener('scroll',schedule",
+            "window.addEventListener('scroll',schedule",
+            "window.addEventListener('resize',schedule",
+            "scroll.getBoundingClientRect().top+70",
+            "mobile?112:",
+            "button.setAttribute('aria-current','location')",
+            "button.classList.toggle('is-active',active)",
+            "'data-section-index':index",
+            "setupOutlineScrollSpy(root)",
+            ".toc button.is-active",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn(
+            ".toc button.beginner-toc{border-left-color:var(--teal);"
+            "color:var(--teal)",
+            template,
+        )
+
     def test_template_has_evidence_backed_dual_view_knowledge_graph(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
@@ -437,7 +519,21 @@ class ResearchCenterTest(unittest.TestCase):
             "document.getElementById('surfaceRadar').addEventListener",
         ):
             self.assertIn(contract, template)
-        self.assertIn("grid-template-columns:repeat(3,1fr)", template)
+        self.assertIn("grid-template-columns:repeat(4,1fr)", template)
+
+    def test_template_publishes_group_maturity_matrix_without_a_composite_score(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
+        for contract in (
+            'id="surfaceMaturity"', 'id="maturityPage"', 'id="maturitySummary"',
+            'id="maturityMatrix"', "const MATURITY=LIB.groupMaturity",
+            "function renderMaturity()", "function openGroupResearch(",
+            "deepLink==='maturity'", "已檢查仍舊", "不做總分或名次",
+            "可水平捲動的族群研究成熟度矩陣",
+        ):
+            self.assertIn(contract, template)
+        self.assertIn('research_library["groupMaturity"] = build_group_maturity(', builder)
+        self.assertIn("def build_group_maturity(", builder)
 
 
 if __name__ == "__main__":
