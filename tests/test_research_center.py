@@ -447,7 +447,7 @@ class ResearchCenterTest(unittest.TestCase):
             "localStorage.getItem('researchFocusMode')",
             "localStorage.setItem('researchFocusMode'",
             "focusToggleButton.setAttribute('aria-pressed'",
-            "focusToggleButton.textContent=active?'展開選單':'專注閱讀'",
+            "focusToggleButton.textContent=active?'展開選單':'收合選單'",
             "focusMedia.addEventListener('change',applyFocusMode)",
         ):
             self.assertIn(contract, template)

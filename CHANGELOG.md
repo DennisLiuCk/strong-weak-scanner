@@ -1,5 +1,25 @@
 # Changelog
 
+## 研究中心選單收合與文章大綱動態高亮 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只調整研究中心的
+閱讀導覽與知識圖譜可用空間，不改研究內容、證據狀態或任何量化資料。
+
+- topbar 新增可隨時復原的「收合選單／展開選單」。在桌機／平板進入收合狀態後，
+  研究文章會同時隱藏 220px 篩選欄、400px 文章清單與上方搜尋工具列；圖譜、雷達與
+  族群矩陣則收起共同上方工具列。狀態以 `localStorage` 保留，切換鈕本身留在 topbar，
+  不會出現收起後找不到入口；≤780px 沿用既有清單→閱讀器流程，因此不顯示此鈕。
+- 單一 1440×900 viewport 的 deterministic layout QA（不是抽樣統計）中，DOM bounding box
+  與 CSS／viewport 算式獨立核對一致：文章 reader 由 820px 擴為 1440px，內文最大寬
+  1180px；圖譜可用高度由 536.5px 擴為 834px。
+- 「本頁大綱」改為真正的 scroll-spy：桌機監聽實際捲動的 `#readerScroll`，手機監聽
+  `window`，並在 resize／版面收合後重算。章節與按鈕以 `data-section-index` 對應，避免
+  「分析師快讀」提前排版後 DOM 順序與原文章順序不同；現行章節同步寫入
+  `aria-current="location"`。移除「新手先讀」永久藍綠高亮，現在只會有一個現行章節。
+- 瀏覽器實測 1440×900 桌機與 390×844 手機：高亮皆可由「分析師快讀」切換到後續章節，
+  console warning／error 0。預設環境 `Darwin 25.5.0 arm64`、Python 3.11.11、
+  `C.UTF-8` 執行 `python -m unittest discover -s tests`：436 tests OK。
+
 ## 雙讀者 gate 改成可判定條件，並開放可讀性改寫 — 2026-08-08
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**。使用者回報 AI 機櫃信任根
