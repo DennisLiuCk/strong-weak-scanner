@@ -1,0 +1,274 @@
+# AI 儲存資料平面知識圖譜
+
+本圖將訓練資料讀取、checkpoint 與模型權重分發拆成不同 I/O 契約。公司線只表示已核驗的
+儲存能力或平台路徑；沒有買方 qualification、部署分母與財務資料前，不把相鄰能力畫成訂單。
+
+<!-- knowledge_graph_meta
+schema_version: 1
+graph_id: ai-storage-data-plane
+root_node_id: concept:ai-storage-data-plane
+label: AI 儲存資料平面
+summary: 以尾端延遲、持久性／復原與副本位置分開三條 AI 儲存資料路徑，再把平台機制與台灣公司能力保持在不同證據層。
+article_ids: MI-2026-08-09-AI-STORAGE-DATA-PLANE
+status: active
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-C01
+view: company
+from_id: company:8299
+to_id: concept:ai-storage-data-plane
+relation: has_capability
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C4,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C6
+note_refs: 8299#S1,8299#S4
+evidence_state: inference
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-16
+review_due: 2026-08-28
+status: active
+boundary: 群聯文件只證實 NAND 控制器 韌體 企業級 SSD 與廣義 AI Ecosystem 產品能力；沒有把具名產品接到資料集 checkpoint 或模型分發的客戶資格 部署 訂單 收入或毛利。
+next_trigger: 平台與群聯雙向揭露具名產品 路徑角色 qualification production 數量及財務分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-C02
+view: company
+from_id: company:meta
+to_id: concept:ai-storage-data-plane
+relation: owns_platform
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C1
+note_refs:
+evidence_state: verified
+commercial_stage: deployment
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-01
+review_due: 2026-08-31
+status: active
+boundary: Meta 公開自身 BLOB storage production 架構與 stall 機制；不代表其他 operator 採同一架構或外部設備供應商與財務曝險已知。
+next_trigger: Meta 公布具名硬體配置 pMax cache hit failure domain 與前後期部署分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-C03
+view: company
+from_id: company:nvidia
+to_id: concept:ai-storage-data-plane
+relation: owns_platform
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C3
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-24
+review_due: 2026-08-31
+status: active
+boundary: ModelExpress 文件證明權重來源與 transport fallback 能力；不證明所有 inference stack 採用 production deployment 或各路徑硬體增量。
+next_trigger: NVIDIA 或客戶公布 production rollout cold-start SLO 路徑命中率與具名設備配置。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I01
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: capability:training-dataset-fetch
+relation: contains
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C1
+note_refs:
+evidence_state: verified
+commercial_stage: deployment
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-01
+review_due: 2026-08-31
+status: active
+boundary: Meta 證實自身訓練資料讀取與 GPU stall；不建立跨 operator SLO 一致性或設備需求量。
+next_trigger: 第二個 operator 公布可比的 dataset fetch pMax 同步停等及設備配置。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I02
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: capability:checkpoint-persistence
+relation: contains
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C2
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-09
+review_due: 2026-08-31
+status: active
+boundary: AWS 文件支持 write read barrier 與多層 checkpoint 取捨；不是跨平台 benchmark 客戶採用或具名設備資格。
+next_trigger: Operator 公布 checkpoint window recovery point failure domain media endurance 與 production 配置。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I03
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: capability:model-artifact-distribution
+relation: contains
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C3
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-24
+review_due: 2026-08-31
+status: active
+boundary: ModelExpress 具名 remote local peer 與 fallback 路徑；不表示每個 worker 都讀 SSD 或硬體需求可按模型大小等比例外推。
+next_trigger: Production fleet 公布 first-worker 與 peer-worker 路徑比例 cold start 及設備分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I04
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: capability:tail-latency-control
+relation: requires
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C1
+note_refs:
+evidence_state: verified
+commercial_stage: deployment
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-01
+review_due: 2026-08-31
+status: active
+boundary: Meta 的同步訓練案例支持尾端讀取造成 stall；不指定通用 pMax 門檻或瓶頸必在儲存媒體。
+next_trigger: 公開 pMax 分解 metadata cache network queue 與 media 各自貢獻。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I05
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: capability:direct-storage-gpu-transfer
+relation: includes
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C3
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-24
+review_due: 2026-08-31
+status: active
+boundary: GPUDirect Storage 是 ModelExpress 的條件式 fallback 之一；不是所有節點的必要路徑或特定 SSD NIC 供應商 design win。
+next_trigger: 客戶公布 GDS 啟用條件 命中率 效能與 production hardware BOM。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I06
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: component:local-ssd
+relation: uses_component
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C1,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C3
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-24
+review_due: 2026-08-31
+status: active
+boundary: Meta 與 NVIDIA 路徑都可使用 local flash storage；不表示每條資料流都經過本地 SSD 或其容量隨 compute 等比例增加。
+next_trigger: 同一 production cluster 公布 local SSD 型號 容量 路徑比例 命中率與利用率。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I07
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: component:shared-storage
+relation: uses_component
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C1,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C2
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-09
+review_due: 2026-08-31
+status: active
+boundary: Operator 架構包含共享或 durable storage 層；不證明其媒體 拓撲 供應商 TCO 或新增容量。
+next_trigger: Operator 公布 shared durable tier 的設備配置 容量 耐久與前後期需求。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I08
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: concept:ai-memory-hierarchy
+relation: integrated_with
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C5
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-09
+review_due: 2026-08-31
+status: active
+boundary: 將三條資料流放回記憶體分層是跨來源研究推論；不表示 HBM system RAM local SSD 與 shared storage 可以互換或需求可重複加總。
+next_trigger: 同一平台公開資料 placement SLO 搬移成本與各層容量利用率。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I09
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: group:memory
+relation: routes_to
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C6,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C7
+note_refs:
+evidence_state: unverified
+commercial_stage: application_opportunity
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-09
+review_due: 2026-08-28
+status: active
+boundary: 控制器 SSD 與儲存系統能力只形成 memory 族群搜尋路由；沒有買方資格 產品部署 訂單或財務證據。
+next_trigger: 平台與公司雙向確認具名產品在三條契約之一的 qualification production 與財務貢獻。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I10
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: group:serverodm
+relation: routes_to
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C7
+note_refs:
+evidence_state: unverified
+commercial_stage: application_opportunity
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-09
+review_due: 2026-08-31
+status: active
+boundary: 儲存節點與機櫃整合只形成 ODM 搜尋路由；不證明 universe 公司承擔特定 I/O 契約或取得增量訂單。
+next_trigger: 買方 test plan 與 ODM 文件對齊 storage-node BOM 路徑責任 部署量 收入與毛利。
+-->

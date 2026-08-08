@@ -1247,10 +1247,10 @@ class ResearchTopicSchemaV3ContractTest(unittest.TestCase):
         self.assertFalse(scan["errors"])
         self.assertEqual(
             scan["latest"]["scan_id"],
-            "scan-2026-08-08-ai-rack-trust-root",
+            "scan-2026-08-09-industry-coverage-strengthening",
         )
         self.assertEqual(scan["latest"]["scope"], "partial")
-        self.assertEqual(scan["latest"]["next_scan_due"], "2026-08-10")
+        self.assertEqual(scan["latest"]["next_scan_due"], "2026-08-16")
         self.assertIn(
             "scan-2026-08-06-priority-q2-due-monitors",
             {row["scan_id"] for row in scan["rows"]},

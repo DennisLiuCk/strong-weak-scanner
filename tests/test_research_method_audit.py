@@ -18,7 +18,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
     def setUpClass(cls):
         # 必須 >= 最新一輪 topic 的 captured_at，否則新發佈的 topic 會被視為
         # 尚未存在而判為品質不合格；每次發佈新研究時同步更新。
-        cls.as_of = dt.date(2026, 8, 8)
+        cls.as_of = dt.date(2026, 8, 9)
         cls.topics, cls.graph, cls.radar, cls.scan = audit._load_context(cls.as_of)
         cls.reviews = audit.load_monitor_reviews(cls.topics, cls.as_of, strict=True)
         cls.current = audit.compute_method_audit(
@@ -74,7 +74,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["scans"]["latestScope"], self.scan["latest"]["scope"]
         )
         self.assertEqual(self.current["scans"]["overdue"], 0)
-        self.assertTrue(self.current["calibration"]["descriptiveBreakdownReady"])
+        self.assertFalse(self.current["calibration"]["descriptiveBreakdownReady"])
         self.assertEqual(self.current["calibration"]["evidenceBearingOutcomes"], 3)
         self.assertEqual(
             self.current["calibration"]["outcomeCounts"],
@@ -118,9 +118,9 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(gates["selection_accountability"]["status"], "pass")
         self.assertEqual(gates["cross_check_depth"]["status"], "attention")
         self.assertEqual(gates["freshness"]["status"], "attention")
-        self.assertEqual(gates["correction_learning"]["status"], "pass")
+        self.assertEqual(gates["correction_learning"]["status"], "attention")
         self.assertEqual(gates["scan_accountability"]["status"], "pass")
-        self.assertEqual(gates["calibration"]["status"], "pass")
+        self.assertEqual(gates["calibration"]["status"], "not_ready")
         for gate in gates.values():
             self.assertTrue(gate["observed"])
             self.assertTrue(gate["boundary"])
@@ -166,8 +166,8 @@ class ResearchMethodAuditTest(unittest.TestCase):
         for row in evidence_bearing:
             self.assertTrue(row["evidence_source_ids"])
             self.assertEqual(row["claim_action"], "new_claim")
-        self.assertEqual(self.current["monitors"]["dueOrOverdue"], 0)
-        self.assertEqual(self.current["freshness"]["staleTopics"], 3)
+        self.assertEqual(self.current["monitors"]["dueOrOverdue"], 4)
+        self.assertEqual(self.current["freshness"]["staleTopics"], 6)
 
     def test_evidence_result_requires_registered_source(self):
         text = (

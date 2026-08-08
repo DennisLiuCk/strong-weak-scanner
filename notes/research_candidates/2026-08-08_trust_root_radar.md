@@ -9,7 +9,7 @@ schema_version: 2
 radar_id: RADAR-2026-08-08-01
 as_of: 2026-08-08
 next_review: 2026-08-15
-status: active
+status: retired
 method: 先執行前一輪承諾的官方事件端點重查並如實記錄仍為 partial，再回查三個到期 monitor；由回查結果與既有圖譜缺口找出「上一輪動作契約未處理的身分前提」這個明確空白，按可證偽性、至少兩條獨立一手來源鏈、universe 個股是否有直接對應、以及能否把規格層與保證層分開檢驗來排序。候選先寫入 append-only selection log 並獨立 commit；深研後只更新 evidence posture、route 與結果，不改凍結排名、第一拒絕與下一份證據
 selection_cycle_id: RS-2026-08-08-01
 -->

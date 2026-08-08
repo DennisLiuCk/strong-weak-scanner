@@ -172,3 +172,17 @@ capability:silicon-rtm,capability,晶片內量測信任根,Silicon RTM|Root of T
 capability:device-attestation,capability,元件證明,Device attestation|measurement reporting,concept:ai-rack-trust-root,把量測值與身分憑證以可驗證方式提供給外部系統的能力
 capability:action-authorization,capability,動作授權,Action authorization|authenticated request permission,concept:ai-rack-trust-root,在確認身分之後決定該身分是否可執行特定實體動作的能力
 capability:security-conformance-assurance,capability,安全一致性保證,Security conformance assurance|third-party security audit,concept:ai-rack-trust-root,讓採購方不必依賴供應商自述即可查證實作是否符合安全規格的第三方稽核與測試制度
+concept:ai-storage-data-plane,concept,AI 儲存資料平面,AI storage data plane|AI storage I/O contracts,concept:ai-memory-hierarchy,把訓練資料讀取 checkpoint 持久化與模型權重分發分成三條可獨立驗收的資料路徑
+capability:training-dataset-fetch,capability,訓練資料集讀取,Training dataset fetch|dataset input pipeline,concept:ai-storage-data-plane,持續把訓練樣本送入加速器並控制尾端延遲與同步停等的資料路徑
+capability:checkpoint-persistence,capability,Checkpoint 持久化,Checkpoint persistence|training state recovery,concept:ai-storage-data-plane,保存並回載模型訓練狀態以平衡停算時間故障域與復原點的能力
+capability:model-artifact-distribution,capability,模型權重分發,Model artifact distribution|model weight distribution,concept:ai-storage-data-plane,從遠端本地或同儕節點把模型權重送到推論工作節點的能力
+capability:tail-latency-control,capability,儲存尾端延遲控制,Storage tail latency control|pMax latency control,concept:ai-storage-data-plane,限制最慢資料讀取對同步訓練步驟造成停等的能力
+capability:direct-storage-gpu-transfer,capability,儲存直達 GPU 傳輸,GPUDirect Storage|storage to GPU transfer,concept:ai-storage-data-plane,減少主機記憶體中轉並把儲存資料直接送入 GPU 的資料搬運路徑
+concept:ai-rack-emc-certification,concept,AI 機櫃 EMC 驗證,AI rack EMC certification|rack-scale electromagnetic compliance,concept:ai-rack-action-contract,把元件抑制設備量測與完整機櫃實驗室能力分開追蹤的電磁相容驗證框架
+standard:cispr-32,standard,CISPR 32,CISPR 32 multimedia equipment emissions,concept:ai-rack-emc-certification,IEC 體系中多媒體設備排放要求與可重複量測目標的標準
+standard:fcc-part-15-emissions,standard,FCC Part 15 排放量測,FCC Part 15 unintentional radiator measurement,concept:ai-rack-emc-certification,美國非刻意輻射器合規量測方法與監管詢問入口
+capability:full-rack-emc-testing,capability,完整機櫃 EMC 測試,Full-rack EMC testing|rack-scale EMC validation,concept:ai-rack-emc-certification,以最終運作配置量測大型機櫃傳導與輻射排放的能力
+capability:component-emi-suppression,capability,元件級 EMI 抑制,Component EMI suppression|noise attenuation,concept:ai-rack-emc-certification,以濾波遮蔽吸波或阻抗元件降低指定頻帶電磁雜訊的能力
+capability:emc-precompliance-modeling,capability,EMC 預掃與建模,EMC pre-compliance|EMC simulation,concept:ai-rack-emc-certification,正式送驗前以模擬探棒或子系統測試定位高風險雜訊路徑的能力
+capability:accredited-emc-lab-capacity,capability,認可 EMC 實驗室容量,Accredited EMC lab capacity|large chamber availability,concept:ai-rack-emc-certification,同時具備適用認可範圍空間承重供電冷卻與量測程序的可用測試能力
+component:emi-absorber,component,EMI 吸波材,EMI absorber|flexible noise suppression sheet,concept:ai-rack-emc-certification,用於吸收指定頻帶電磁能量並降低局部雜訊的材料或薄片元件
