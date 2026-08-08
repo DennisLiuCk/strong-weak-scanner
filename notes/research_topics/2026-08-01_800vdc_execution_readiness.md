@@ -237,6 +237,14 @@ trigger: 公司首次明確區分 800V 客戶驗證、量產數量及財務貢�
 invalidation: 若成長只來自 50V 或其他 Cloud and AIoT 產品，800V 個股受惠映射維持未證
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -245,6 +253,7 @@ invalidation: 若成長只來自 50V 或其他 Cloud and AIoT 產品，800V 個�
 - **Power rack**：集中把資料中心電力轉換、分配給多個運算機櫃的電源系統，不等於伺服器本身。
 - **BBU**：電池備援單元，停電或負載突升時短暫供電，避免高功率 AI 機櫃中斷。
 - **驗證**：客戶測試產品是否符合規格與可靠度；開始驗證不等於驗證完成或已大量出貨。
+- **Cloud and AIoT**：光寶科揭露的雲端運算與人工智慧物聯網營收分類；它包含多種產品，不能直接當成 800V 收入。
 
 ### 三句話抓重點
 

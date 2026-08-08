@@ -395,6 +395,14 @@ reason: periods_definitions_and_supplier_mapping_reviewed
 evidence: sources:S1,S2,S3
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -404,6 +412,8 @@ evidence: sources:S1,S2,S3
 - **自由現金流（FCF）**：公司用營業現金流減掉某種資本支出口徑後得到的非 GAAP 指標；不同公司公式不同，不能只看同一個名稱就直接比較。
 - **融資租賃（finance lease）**：先取得資產使用權、分期付款的融資方式；它可能計入 headline CapEx，卻不在當期「cash paid for PP&E」裡一次流出。
 - **耐用年限**：會計上預估資產可使用多久，決定每年折舊速度；改變耐用年限會改變損益與租賃分類，卻不一定改變實際建置計畫。
+- **AWS**：Amazon Web Services，Amazon 的雲端運算事業；其營收成長不能直接分配到任一台灣供應商。
+- **TTM**：Trailing Twelve Months，往回累計十二個月；它不是單季數字，與季度資料不能直接並排比較。
 
 ### 三句話抓重點
 

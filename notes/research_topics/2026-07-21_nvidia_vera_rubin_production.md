@@ -47,7 +47,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:readability
 -->
-
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: backfilled_independent_gigabyte_system_vendor_source_without_refreshing_evidence_clock
+evidence: sources:S7
+-->
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -59,6 +65,9 @@ evidence: editorial:readability
 - **Rubin 與 Vera**：NVIDIA 下一代平台的兩顆晶片代號——Rubin 是 GPU、Vera 是 CPU，合稱 Vera Rubin 平台。代號只表示產品世代，不表示已量產或已出貨。
 - **Spectrum-6**：NVIDIA 資料中心網路交換平台的新一代產品名稱。它與 Vera Rubin 是同一波發布的不同產品，供應鏈也不同，不應混為一談。
 - **HBM**：貼著 GPU 封裝的高頻寬記憶體。本文只涉及 NVIDIA 與記憶體廠的合作揭露，不支持任何台灣記憶體公司的訂單推論。
+- **DRAM**：伺服器與一般運算常用的動態隨機存取記憶體；HBM 是其中更靠近加速器、頻寬更高的封裝路徑，不能把兩者的供應關係互相代換。
+- **QCT**：廣達旗下的雲端資料中心系統品牌 Quanta Cloud Technology；本文的列名只表示系統夥伴角色，不等於廣達已認列 Vera Rubin 收入。
+- **Wistron／Wiwynn**：緯創與緯穎的英文名稱。兩家公司是不同法人；被平台商或自身文件列為合作／展示者，仍不等於具名客戶驗收或財務貢獻。
 
 ### 三句話抓重點
 
@@ -190,6 +199,20 @@ locator: 台灣系統與零組件供應商季報、法說與重大訊息查找�
 limitation: 平台量產與韓國合作不能替代台灣供應商自己的毛利、存貨與現金流文件
 -->
 
+<!-- research_source
+source_id: S7
+role: competitor_primary
+publisher: GIGABYTE / Giga Computing
+title: Giga Computing Expands AI Infrastructure Portfolio with Next-Gen Solutions at COMPUTEX 2026
+published_at: 2026-06-01
+captured_at: 2026-08-09
+accepted_at: 2026-08-09
+status: active
+url: https://www.gigabyte.com/vn/press/news/2393
+locator: Vera Rubin NVL72 展示段落與 HGX Rubin NVL8 系統 G2L4-SD4 段落
+limitation: 技嘉自身文件獨立支持其展示 Vera Rubin NVL72 元件與具名 Rubin NVL8 系統角色；不支持客戶驗收、量產出貨、訂單金額、收入或毛利
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -209,7 +232,7 @@ claim_id: C2
 label: inference
 status: active
 claim: 研究重點應由是否仍在路線圖轉向客戶驗收、量產出貨、收入認列與獲利品質
-supporting_source_ids: S1,S2,S5
+supporting_source_ids: S1,S2,S5,S7
 contrary_source_ids:
 as_of: 2026-07-27
 basis: 平台已公開進入量產與部署且系統夥伴先前被列名，因此下一個可裁決階段已移到公司執行與財務足跡
@@ -237,7 +260,7 @@ claim_id: C4
 label: verified
 status: active
 claim: NVIDIA 先前公開列名 GIGABYTE、QCT、Wistron 與 Wiwynn 為 Vera 系統夥伴
-supporting_source_ids: S5
+supporting_source_ids: S5,S7
 contrary_source_ids:
 as_of: 2026-07-27
 basis: S5 的系統夥伴段落直接列出四家公司

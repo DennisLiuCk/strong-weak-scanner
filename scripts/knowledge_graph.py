@@ -75,6 +75,7 @@ RELATION_LABELS = {
     "supports_substrate": "載板／基板生態系",
     "plans_production": "規劃量產",
     "uses_standard": "採用／整合標準",
+    "reports_financials": "揭露可辨識財務結果",
     # Industry dependency view.
     "generation_of": "世代／變體",
     "alternative_standard": "替代介面路徑",

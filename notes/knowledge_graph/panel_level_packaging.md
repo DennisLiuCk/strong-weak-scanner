@@ -54,6 +54,26 @@ next_trigger: 交易完成、NEXX 整合、具名客戶 qualification 與財務�
 -->
 
 <!-- knowledge_edge
+edge_id: KG-PLP-C03
+view: company
+from_id: company:5234
+to_id: concept:panel-level-packaging
+relation: develops_packaging
+claim_refs:
+note_refs: 5234#S1,5234#S4
+evidence_state: inference
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-12
+review_due: 2026-08-21
+status: active
+boundary: 達興材料獨立核驗筆記支持其布局 WLP／PLP 的離型層與感光介電材料，且半導體產品組合已有量產與驗證項目；公開資料未把特定料號、量產項目或收入逐一對到 panel-level packaging 客戶與 HVM 線，因此此線維持推論。
+next_trigger: 達興與客戶雙向公布 PLP 具名材料、panel form factor、qualification、量產項目、出貨量及產品收入／毛利。
+-->
+
+<!-- knowledge_edge
 edge_id: KG-PLP-I01
 view: industry
 from_id: concept:panel-level-packaging

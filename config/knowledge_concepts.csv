@@ -151,6 +151,7 @@ component:polymer-capacitor,component,聚合物電容,Polymer aluminum capacitor
 component:mlcc-decoupling,component,MLCC 去耦電容,MLCC decoupling|multilayer ceramic capacitor,concept:ai-capacitor-role-map,以低阻抗和小型化支援板級或封裝附近高頻去耦的多層陶瓷電容
 component:silicon-capacitor,component,Silicon capacitor,矽電容|silicon decoupling capacitor,concept:ai-capacitor-role-map,可靠近或嵌入封裝以降低寄生並支援快速瞬態的矽電容
 concept:800v-protection-layers,concept,800VDC 保護責任層,800V protection layers|HVDC fault protection map,concept:800v-power-tree,把人身維修 絕緣接地 故障電流 hot-swap 與備援能量分開追蹤的 800VDC fault framework
+concept:yageo-q2-financial-materiality,concept,國巨 Q2 財務材料性,YAGEO Q2 financial materiality|國巨季度財務橋接,,把公司季度營收交叉驗證與產品 組合 毛利 現金流等尚待補證的層級分開顯示
 capability:safety-interlock,capability,高壓安全連鎖,Safety interlock|de-energization interlock,concept:800v-protection-layers,在人員接近帶電高壓部位前強制斷電或阻止接近的維修安全能力
 capability:protective-earthing,capability,保護接地與等電位,Protective earthing|protective bonding,concept:800v-protection-layers,為故障電流提供受控接地路徑並維持機構等電位的安全能力
 capability:overcurrent-protection,capability,過電流保護,Overcurrent protection|short-circuit protection,concept:800v-protection-layers,偵測並限制或切斷超額電流與短路故障的保護能力

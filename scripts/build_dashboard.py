@@ -2204,7 +2204,7 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
 
 
 def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph,
-                         reviews, method_audit, as_of):
+                         reviews, method_audit, as_of, candidate_radar=None):
     """Build an orthogonal group-research matrix without collapsing it to a score.
 
     Coverage, named-company linkage, evidence state, commercial materiality and
@@ -2223,6 +2223,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     knowledge_graph = knowledge_graph or {"graphs": []}
     reviews = reviews or []
     method_audit = method_audit or {}
+    candidate_radar = candidate_radar or {"candidates": []}
 
     group_ids = list(group_names)
     for row in stock_meta.values():
@@ -2279,6 +2280,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     company_by_materiality = defaultdict(lambda: defaultdict(set))
     company_by_evidence = defaultdict(lambda: defaultdict(set))
     edge_counts = defaultdict(lambda: defaultdict(int))
+    company_routes = defaultdict(list)
     for graph in knowledge_graph.get("graphs", []):
         nodes = {node.get("id"): node for node in graph.get("nodes", [])}
         for edge in graph.get("edges", []):
@@ -2304,6 +2306,14 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
                     edge.get("evidenceState") or "unverified"
                 ].add(stock_id)
                 edge_counts[group_id][edge_key] += 1
+                company_routes[group_id].append({
+                    "stockId": stock_id,
+                    "graphId": graph.get("id") or "",
+                    "articleIds": list(edge.get("articleIds") or []),
+                    "materiality": edge.get("materiality") or "unknown",
+                    "evidenceState": edge.get("evidenceState") or "unverified",
+                    "reviewDue": edge.get("reviewDue") or "",
+                })
 
     reviewed_stale_ids = set()
     unique_due_pairs = set()
@@ -2410,6 +2420,243 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
         topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
         for topic in active_topics if (topic.get("confidence") or {}).get("stale")
     }
+    topic_by_id = {
+        topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id"): topic
+        for topic in active_topics
+    }
+    candidates = {
+        candidate.get("id"): candidate
+        for candidate in candidate_radar.get("candidates", [])
+        if candidate.get("id")
+    }
+    bridge_candidate_ids = {
+        "power": "RC-SIC-AI-POWER-QUALIFICATION",
+        "material": "RC-224G-PCB-MATERIAL-QUALIFICATION",
+    }
+
+    def topic_title(topic):
+        return topic.get("title") or (topic.get("meta") or {}).get("title") or (
+            topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id") or "研究議題"
+        )
+
+    def topic_next_check(topic):
+        topic_id = topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
+        values = []
+        for monitor in topic.get("monitoring", []):
+            if monitor.get("status") != "active":
+                continue
+            due = effective_due.get(
+                (topic_id, monitor.get("monitor_id")), monitor.get("next_check", ""))
+            if re.fullmatch(r"\d{4}-\d{2}-\d{2}", due or ""):
+                values.append(due)
+        return min(values) if values else ""
+
+    def topic_next_evidence(topic):
+        active = [
+            monitor for monitor in topic.get("monitoring", [])
+            if monitor.get("status") == "active"
+        ]
+        if not active:
+            return "取得能直接支持或否定主命題的第二條獨立一手來源。"
+        active.sort(key=lambda monitor: (
+            effective_due.get(
+                (topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id"),
+                 monitor.get("monitor_id")),
+                monitor.get("next_check", "9999-12-31")),
+            monitor.get("monitor_id", ""),
+        ))
+        monitor = active[0]
+        return monitor.get("trigger") or monitor.get("metric") or (
+            "取得能直接支持或否定主命題的新一手文件。")
+
+    def group_payload(group_values):
+        return [
+            {"id": group_id, "label": group_names.get(group_id, group_id)}
+            for group_id in dict.fromkeys(group_values) if group_id
+        ]
+
+    actions = []
+    action_ids = set()
+
+    def add_action(item):
+        if not item.get("id") or item["id"] in action_ids:
+            return
+        action_ids.add(item["id"])
+        item.setdefault("articleId", "")
+        item.setdefault("graphId", "")
+        item.setdefault("candidateId", "")
+        item.setdefault("companyIds", [])
+        item.setdefault("nextCheck", "")
+        item.setdefault("status", "open")
+        item.setdefault("statusLabel", "待處理")
+        item.setdefault("tone", "warning")
+        actions.append(item)
+
+    # Formal-note gaps are one root task per group, not one repeated table cell.
+    for row in rows:
+        missing = row["universe"] - row["verifiedNotes"]
+        if missing <= 0:
+            continue
+        group_id = row["id"]
+        add_action({
+            "id": f"formal-note:{group_id}",
+            "category": "formal_note",
+            "categoryLabel": "正式筆記覆蓋",
+            "priorityRank": 0,
+            "priorityLabel": "P0",
+            "title": f"補齊{row['label']}的 {missing} 檔獨立核驗公司筆記",
+            "affectedGroups": group_payload([group_id]),
+            "boundary": "只計 independently_verified 正式筆記；篇數不足不以題材文章替代。",
+            "nextEvidence": "依 focused_v1 契約取得核心一手文件、建立 evidence pack，並由獨立 reviewer 離線重算後逐篇簽核。",
+            "tone": "critical",
+        })
+
+    # A monitor is keyed by topic+monitor.  A topic mapped to five groups still appears once.
+    for topic in active_topics:
+        topic_id = topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
+        groups = mapped_groups(topic)
+        for monitor in topic.get("monitoring", []):
+            if monitor.get("status") != "active":
+                continue
+            monitor_id = monitor.get("monitor_id") or "monitor"
+            due = effective_due.get((topic_id, monitor_id), monitor.get("next_check", ""))
+            if not (re.fullmatch(r"\d{4}-\d{2}-\d{2}", due or "") and due <= date_text):
+                continue
+            add_action({
+                "id": f"monitor:{topic_id}:{monitor_id}",
+                "category": "due_monitor",
+                "categoryLabel": "到期監控",
+                "priorityRank": 0,
+                "priorityLabel": "P0",
+                "title": f"{topic_title(topic)} · {monitor_id} 到期回查",
+                "affectedGroups": group_payload(groups),
+                "articleId": f"topic-{topic_id}",
+                "boundary": monitor.get("metric") or "只依預先登錄 trigger 裁決，不以市場敘事刷新證據時鐘。",
+                "nextEvidence": monitor.get("trigger") or monitor.get("metric") or "完成一手來源回查並寫入 monitor review ledger。",
+                "nextCheck": due,
+                "tone": "critical",
+                "statusLabel": "已到期",
+            })
+
+    # Independent-source gaps are root-deduplicated by thesis topic ID.
+    for topic_id in sorted(missing_source_topics):
+        topic = topic_by_id.get(topic_id)
+        if not topic:
+            continue
+        groups = mapped_groups(topic)
+        add_action({
+            "id": f"source-gap:{topic_id}",
+            "category": "source_gap",
+            "categoryLabel": "獨立來源鏈",
+            "priorityRank": 1,
+            "priorityLabel": "P1",
+            "title": f"{topic_title(topic)} · 補第二條獨立來源鏈",
+            "affectedGroups": group_payload(groups),
+            "articleId": f"topic-{topic_id}",
+            "boundary": f"同一個主命題目前影響 {len(groups)} 個族群，但根因只有一個；不得按族群重複計成 {len(groups)} 件。",
+            "nextEvidence": topic_next_evidence(topic),
+            "nextCheck": topic_next_check(topic),
+            "tone": "warning",
+        })
+
+    # A group without a company edge gets one bridge task.  Power/material reuse the
+    # frozen radar candidate so the queue points to the exact pre-registered rejection rule.
+    for row in rows:
+        if row["verifiedNotes"] < row["universe"] or row["companyBridges"]:
+            continue
+        group_id = row["id"]
+        candidate = candidates.get(bridge_candidate_ids.get(group_id, ""), {})
+        add_action({
+            "id": f"company-bridge:{group_id}",
+            "category": "company_bridge",
+            "categoryLabel": "具名公司橋接",
+            "priorityRank": 2,
+            "priorityLabel": "P1",
+            "title": candidate.get("title") or f"為{row['label']}建立第一條 universe 公司證據邊",
+            "affectedGroups": group_payload([group_id]),
+            "candidateId": candidate.get("id", ""),
+            "articleId": candidate.get("articleId", ""),
+            "graphId": candidate.get("graphId", ""),
+            "boundary": "公司筆記已存在，但 curated knowledge graph 尚無 universe 公司邊；0 不表示產業關係不存在。",
+            "nextEvidence": candidate.get("nextEvidence") or "找出公司自身一手文件中的具名產品／製程角色，建立有 boundary 與 next trigger 的一跳證據邊。",
+            "nextCheck": candidate.get("nextCheck", ""),
+            "tone": "critical",
+        })
+
+    # Once a bridge exists, push the same named company/product to a verifiable financial
+    # denominator.  This is one root task per group, not one task per repeated graph edge.
+    materiality_rank = {"financial": 3, "named_product": 2, "adjacent": 1, "unknown": 0}
+    evidence_rank = {"verified": 2, "inference": 1, "unverified": 0}
+    for row in rows:
+        group_id = row["id"]
+        if not row["companyBridges"] or row["materiality"]["financial"]:
+            continue
+        routes = sorted(company_routes[group_id], key=lambda route: (
+            -materiality_rank.get(route["materiality"], -1),
+            -evidence_rank.get(route["evidenceState"], -1),
+            route["graphId"], route["stockId"],
+        ))
+        route = routes[0] if routes else {}
+        stock_ids = sorted(company_any[group_id])
+        names = [
+            f"{stock_id} {(stock_meta.get(stock_id) or {}).get('name', '')}".strip()
+            for stock_id in stock_ids
+        ]
+        add_action({
+            "id": f"financial:{group_id}",
+            "category": "financial_materiality",
+            "categoryLabel": "財務材料性",
+            "priorityRank": 3,
+            "priorityLabel": "P2",
+            "title": f"把{row['label']}的具名橋接推進到財務可辨識",
+            "affectedGroups": group_payload([group_id]),
+            "companyIds": stock_ids,
+            "articleId": (route.get("articleIds") or [""])[0],
+            "graphId": route.get("graphId", ""),
+            "candidateId": (
+                bridge_candidate_ids.get(group_id, "")
+                if bridge_candidate_ids.get(group_id, "") in candidates else ""
+            ),
+            "boundary": f"目前具名公司為{'、'.join(names) or '—'}，最深只到 {row['deepestMateriality']}；尚未建立 verified／financial edge。",
+            "nextEvidence": "取得同一具名產品或角色的收入、毛利、現金流，或可重算的出貨量×單價分母；由 verified claim 建立 financial edge，不能以公司總營收代替產品貢獻。",
+            "nextCheck": route.get("reviewDue", ""),
+            "tone": "warning",
+        })
+
+    # Unrouted policy watches are explicit non-errors: they wait for a transmission
+    # mechanism before mapping to groups, instead of being labelled as a generic routing gap.
+    for topic in unrouted_topics:
+        topic_id = topic.get("topic_id") or (topic.get("meta") or {}).get("topic_id")
+        add_action({
+            "id": f"policy-watch:{topic_id}",
+            "category": "policy_watch",
+            "categoryLabel": "政策觀察（暫不路由）",
+            "priorityRank": 4,
+            "priorityLabel": "WATCH",
+            "title": topic_title(topic),
+            "affectedGroups": [],
+            "articleId": f"topic-{topic_id}",
+            "boundary": "尚未建立 impact 是刻意的證據邊界；在條文、適用範圍與產業傳導可定位前，不把政策事件硬塞進族群。",
+            "nextEvidence": topic_next_evidence(topic),
+            "nextCheck": topic_next_check(topic),
+            "status": "watch",
+            "statusLabel": "等待傳導證據",
+            "tone": "progress",
+        })
+
+    actions.sort(key=lambda item: (
+        item.get("priorityRank", 99), item.get("nextCheck") or "9999-12-31",
+        item.get("title", ""), item.get("id", ""),
+    ))
+    action_order = {item["id"]: index for index, item in enumerate(actions)}
+    actions_by_group = defaultdict(list)
+    for item in actions:
+        for group in item.get("affectedGroups", []):
+            actions_by_group[group["id"]].append(item["id"])
+    for row in rows:
+        row["actionIds"] = sorted(
+            actions_by_group[row["id"]], key=lambda action_id: action_order[action_id])
+
     return {
         "asOf": date_text,
         "summary": {
@@ -2426,8 +2673,12 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "reviewedStaleTopics": len(all_stale_ids.intersection(reviewed_stale_ids)),
             "sourceGapTopics": len(missing_source_topics),
             "unroutedTopics": len(unrouted_topics),
+            "rootActions": len(actions),
+            "openActions": sum(item["status"] == "open" for item in actions),
+            "policyWatchTopics": sum(item["category"] == "policy_watch" for item in actions),
         },
         "rows": rows,
+        "actionQueue": actions,
         "materialityLabels": {
             "unknown": "未建立具名公司橋接",
             "adjacent": "相鄰／搜尋路由",
@@ -2437,6 +2688,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
         "boundary": (
             "這是 11 族群、121 檔 universe 與目前研究 registry 的全數盤點，不是抽樣；"
             "公司筆記篇數、題材篇數、圖譜邊、商業材料性與時效是不同軸，刻意不合成分數。"
+            "行動佇列按根因去重：同一 topic 即使映射多個族群也只算一件；"
             "圖譜只計可追溯的 curated edges，0 代表研究中心尚未建立證據邊，不代表產業關係不存在。"
         ),
     }
@@ -2671,6 +2923,7 @@ def main():
         notes_map, research_topics, stock_meta, GROUP_NM,
         research_library["knowledgeGraph"], research_reviews,
         research_library["methodAudit"], research_as_of,
+        candidate_radar=research_library["candidateRadar"],
     )
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}

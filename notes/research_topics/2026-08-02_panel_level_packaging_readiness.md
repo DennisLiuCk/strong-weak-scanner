@@ -218,6 +218,14 @@ trigger: 台灣公司與客戶對同一 panel 產品或流程完成雙向核對�
 invalidation: 公司只描述先進封裝或大尺寸基板機會，未披露 form factor、客戶、qualification 與財務足跡
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -227,6 +235,8 @@ invalidation: 公司只描述先進封裝或大尺寸基板機會，未披露 fo
 - **Good-package yield**：投入製程後最後能通過電性、可靠度與尺寸要求的合格封裝比例，才真正影響每顆成本。
 - **Uniformity**：面板中央與邊緣的沉積、蝕刻、清洗、線寬或厚度是否一致。
 - **Throughput**：設備在單位時間能完成多少面板；面板較大不代表每小時一定做出更多合格產品。
+- **HVM（High-Volume Manufacturing）**：高量產階段，需同時滿足良率、節拍、可靠度、成本與客戶資格；pilot 或 early qualification 還不是 HVM。
+- **NEXX**：Applied Materials 宣布簽約收購、用來補強大型面板電鍍能力的設備公司；簽約不等於交易完成或客戶已量產。
 
 ### 三句話抓重點
 

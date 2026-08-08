@@ -40,6 +40,14 @@ reason: separated_capacitors_by_system_position_voltage_frequency_and_task
 evidence: sources:S1,S2,S3,S4
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -48,6 +56,8 @@ evidence: sources:S1,S2,S3,S4
 - **DC link／高壓直流匯流排**：電源轉換級之間輸送數百伏直流電的節點；此處元件先面對耐壓、紋波、壽命與安全條件。
 - **PDN（Power Delivery Network）**：從電源轉換器、電路板、封裝到晶片的供電路徑；頻率越高，元件位置與寄生電感通常越重要。
 - **ESR／ESL**：電容不是理想元件；等效串聯電阻與電感會限制它在不同頻率處理紋波或瞬態的能力。
+- **MLCC（積層陶瓷電容）**：把多層陶瓷介質與電極疊合的小型電容，常用於去耦與濾波；不同尺寸、介質與耐壓不可視為同一產品。
+- **EDLC（電雙層電容）**：以電雙層儲能的超級電容，適合高功率充放電；它和晶片旁 MLCC 的位置與時間尺度不同。
 
 ### 三句話抓重點
 

@@ -94,6 +94,26 @@ next_trigger: ROHM／客戶確認 production start、具名 PSU、出貨與收�
 -->
 
 <!-- knowledge_edge
+edge_id: KG-8VP-C05
+view: company
+from_id: company:2481
+to_id: concept:800v-power-tree
+relation: has_capability
+claim_refs:
+note_refs: 2481#S1,2481#S4
+evidence_state: inference
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-12
+review_due: 2026-08-20
+status: active
+boundary: 強茂獨立核驗筆記支持 650V／1200V SiC SBD 已發佈、伺服器主板導入及 AI／運算應用曝險；把這些具名產品能力連到 800VDC 功率鏈仍是相鄰推論，不證明 800V rack qualification、production BOM、訂單、收入或毛利。
+next_trigger: 強茂與平台／客戶雙向公布 800V BBU、PSU 或保護節點的具名料號、failure criteria、qualification、量產出貨與財務分母。
+-->
+
+<!-- knowledge_edge
 edge_id: KG-8VP-I01
 view: industry
 from_id: concept:800v-power-tree

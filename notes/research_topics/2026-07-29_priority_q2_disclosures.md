@@ -615,6 +615,14 @@ trigger: 文件首次以同一 cohort 或具名專案提供 NRE→MP 轉化、�
 invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無法與前期專案對齊時，不宣稱 AI 轉量產或財務受惠
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -625,6 +633,7 @@ invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無�
 - **事件預告**：只證明某場法說或董事會預計發生；它本身不證明營收、毛利、訂單或量產結果。
 - **NRE／MP**：NRE 是委託設計等開發階段收入；MP 是量產收入。兩者分母不同，不能把應用占比直接當成專案轉量產率。
 - **MOPS 文件索引**：交易所正式申報附件的查詢入口；它可證明檔案已上線，但仍不等於研究者已重算內容。
+- **T57sb01**：交易所文件伺服器用來列出公司、年度與季度附件的查詢頁；頁面有檔案只證明可取得，不代表內容已核對。
 
 ### 三句話抓重點
 

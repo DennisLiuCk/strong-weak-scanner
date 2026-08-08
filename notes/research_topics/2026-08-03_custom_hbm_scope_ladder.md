@@ -315,6 +315,14 @@ trigger: 公司揭露已實現 custom HBM 收入／毛利或具名客戶 qualifi
 invalidation: 管理層只重複較高毛利或合作敘事，沒有 NRE、產品資格、量產與財務分母
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -323,6 +331,7 @@ invalidation: 管理層只重複較高毛利或合作敘事，沒有 NRE、產�
 - **Logic base die**：位在 HBM 堆疊底部的邏輯晶片，負責介面、資料路徑與控制；能做多少額外運算要看實際設計。
 - **Custom HBM**：不是一套已有共同規格的單一產品名稱；公開資料可能指容量／介面客製、base-die 邏輯客製，或把部分工作搬到記憶體附近。
 - **Sample／qualification／production**：樣品可供測試、資格代表客戶完成指定驗證、量產才是穩定製造；三個節點不能互相代替。
+- **HBM4E**：供應商對 HBM4 後續強化版本使用的產品名稱；公開文件中的 HBM4E 不必然採用相同客製範圍或時程。
 
 ### 三句話抓重點
 

@@ -40,6 +40,14 @@ reason: rebuilt_fws_tcs_ite_control_and_maintenance_responsibility_map
 evidence: sources:S1,S2,S3,S4,S5
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -48,6 +56,7 @@ evidence: sources:S1,S2,S3,S4,S5
 - **TCS（Technology Cooling System）**：技術冷卻系統，從 CDU 經 rack、manifold、ITE 冷板再回到 CDU 的二次迴路；冷卻液、管路、快接、壓力、流量與維護都在這一圈互相制約。
 - **ITE（Information Technology Equipment）**：伺服器、加速器與內部冷板等 IT 設備。規格若只管 TCS，不代表 ITE 端所有設計與責任都已被涵蓋。
 - **BMS（Building Management System）**：建築管理系統，收集溫度、流量、壓差、漏液與設備狀態，並在安全 guardrails 內執行控制或隔離。
+- **DSX**：NVIDIA 用來描述 AI factory 基礎設施資料、控制契約與驗證生態的文件／平台名稱；列入 DSX 不等於場域已完成驗收。
 
 ### 三句話抓重點
 

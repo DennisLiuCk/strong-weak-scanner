@@ -218,6 +218,14 @@ trigger: 至少一組晶圓廠與供應商文件可雙向核對同一製程步�
 invalidation: 若製程整合由晶圓廠自有方案完成、供應商無具名資格或只有研發合作，台灣公司映射維持未證
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -225,8 +233,9 @@ invalidation: 若製程整合由晶圓廠自有方案完成、供應商無具名
 - **背面供電（BSPDN）**：把原本和訊號線擠在晶片正面的電源網路移到晶圓背面，讓電力用較直接的路徑抵達電晶體。
 - **Super Power Rail／PowerVia**：分別是台積電與 Intel 對背面供電實作的名稱；名稱不同，不代表可以只看一個效能數字直接判輸贏。
 - **埋置電源軌（BPR）**：埋在電晶體下方的金屬電源軌，配合背面導通結構把電力送到元件。
-- **nano-TSV**：從薄化後的晶圓背面連到前側元件附近的微小矽穿孔，是 imec 描述的一種實作路徑。
+- **nTSV／nano-TSV**：從薄化後的晶圓背面連到前側元件附近的微小矽穿孔，是 imec 描述的一種實作路徑。
 - **風險生產**：製程已進入早期製造驗證，但仍不是成熟量產、客戶大量出貨或穩定良率的同義詞。
+- **A16**：台積電具名的製程家族，規劃結合 Super Power Rail 背面供電；名稱與時程不等於所有客戶產品已量產。
 
 ### 三句話抓重點
 

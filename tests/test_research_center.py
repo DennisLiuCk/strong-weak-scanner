@@ -311,7 +311,40 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(row["reviewedStaleTopics"], 1)
         self.assertEqual(row["sourceGaps"], 1)
         self.assertEqual(row["action"], "補第二條來源鏈")
+        source_actions = [
+            item for item in maturity["actionQueue"]
+            if item["category"] == "source_gap"
+        ]
+        self.assertEqual(len(source_actions), 1)
+        self.assertEqual(source_actions[0]["articleId"], "topic-MI-2026-07-29-TEST")
+        self.assertEqual(row["actionIds"][0], "source-gap:MI-2026-07-29-TEST")
         self.assertNotIn("score", maturity)
+
+    def test_group_maturity_deduplicates_one_source_gap_across_multiple_groups(self):
+        topics = copy.deepcopy(self.topics)
+        topics[0]["group_ids"] = ["power", "material"]
+        topics[0]["monitoring"] = []
+        method = {"sources": {"thesesNeedingSecondIndependentGroup": [
+            "MI-2026-07-29-TEST",
+        ]}}
+        maturity = bd.build_group_maturity(
+            self.notes, topics, self.stock_meta,
+            {"power": "功率元件", "material": "半導體材料"},
+            {"graphs": []}, [], method, "2026-08-06",
+        )
+        source_actions = [
+            item for item in maturity["actionQueue"]
+            if item["category"] == "source_gap"
+        ]
+        self.assertEqual(len(source_actions), 1)
+        self.assertEqual(
+            [group["id"] for group in source_actions[0]["affectedGroups"]],
+            ["power", "material"],
+        )
+        self.assertIn("根因只有一個", source_actions[0]["boundary"])
+        rows = {row["id"]: row for row in maturity["rows"]}
+        self.assertIn(source_actions[0]["id"], rows["power"]["actionIds"])
+        self.assertIn(source_actions[0]["id"], rows["material"]["actionIds"])
 
     def test_inline_research_json_cannot_close_script(self):
         value = {"claim": "</script><script>alert(1)</script>", "amp": "A&B"}
@@ -526,13 +559,17 @@ class ResearchCenterTest(unittest.TestCase):
         builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
         for contract in (
             'id="surfaceMaturity"', 'id="maturityPage"', 'id="maturitySummary"',
-            'id="maturityMatrix"', "const MATURITY=LIB.groupMaturity",
-            "function renderMaturity()", "function openGroupResearch(",
-            "deepLink==='maturity'", "已檢查仍舊", "不做總分或名次",
+            'id="maturityActionQueue"', 'id="maturityMatrix"',
+            "const MATURITY=LIB.groupMaturity", "function renderMaturity()",
+            "function renderMaturityAction(", "function focusMaturityAction(",
+            "function openGroupResearch(", "deepLink==='maturity'",
+            "已完成回查、證據仍逾期", "根因去重", "不做總分或名次",
             "可水平捲動的族群研究成熟度矩陣",
         ):
             self.assertIn(contract, template)
+        self.assertIn("body.article-open .tools{display:none}", template)
         self.assertIn('research_library["groupMaturity"] = build_group_maturity(', builder)
+        self.assertIn('candidate_radar=research_library["candidateRadar"]', builder)
         self.assertIn("def build_group_maturity(", builder)
 
 

@@ -298,6 +298,14 @@ trigger: 平台確認 production rack 與客戶部署，供應商同步揭露具
 invalidation: Full-scale 時程延後、只有 demo／sample，或出貨仍集中在 48／54V 過渡產品而非 800V
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -307,6 +315,7 @@ invalidation: Full-scale 時程延後、只有 demo／sample，或出貨仍集�
 - **IBC**：中間匯流排轉換器，把 800V 高壓 DC 降成 50V、12V 等較低電壓供伺服器板使用。
 - **BBU**：電池備援單元，在電網切換、斷電或負載突增時維持運算設備供電。
 - **Hot-swap**：設備不停機時安全接入或移除模組，需限制湧入電流並隔離故障。
+- **PSU（Power Supply Unit）**：把輸入電力轉成伺服器可用電壓的電源供應器；它只是整條 800V 電力鏈的一個節點。
 
 ### 三句話抓重點
 

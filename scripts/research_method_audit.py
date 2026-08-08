@@ -412,10 +412,10 @@ def compute_method_audit(
     )
     if mature_monitors:
         correction_status = "attention"
-        correction_observed = f"{len(mature_monitors)} 個 monitor 目前待回顧；歷史已完成 {mature_review_events} 次到期回顧；累積 {len(corrected_claims)} 個已修正 claim"
+        correction_observed = f"{len(mature_monitors)} 個 monitor 目前待回顧；仍 active 的 monitor 過往已完成 {mature_review_events} 次到期回查；回顧帳本累積 {len(reviews)} 筆（含已退役 monitor）；累積 {len(corrected_claims)} 個已修正 claim"
     elif mature_review_events:
         correction_status = "pass"
-        correction_observed = f"目前沒有待回顧 monitor；歷史已完成 {mature_review_events} 次到期回顧；累積 {len(corrected_claims)} 個已修正 claim"
+        correction_observed = f"目前沒有待回顧 monitor；仍 active 的 monitor 過往已完成 {mature_review_events} 次到期回查；回顧帳本累積 {len(reviews)} 筆（含已退役 monitor）；累積 {len(corrected_claims)} 個已修正 claim"
     else:
         correction_status = "not_ready"
         correction_observed = f"尚無到期 review event；不能把未被檢驗視為成功；累積 {len(corrected_claims)} 個已修正 claim"

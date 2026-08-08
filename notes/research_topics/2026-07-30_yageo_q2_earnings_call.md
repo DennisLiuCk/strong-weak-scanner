@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-07-30
 source_published_at: 2026-07-29
-last_reviewed_at: 2026-07-30
-review_due: 2026-07-31
+last_reviewed_at: 2026-08-09
+review_due: 2026-08-15
 source_type: official_company
 publisher: YAGEO Group
 publisher_domain: yageogroup.com
@@ -19,9 +19,9 @@ group_ids: passive
 trigger_type: quarterly_results_and_earnings_call
 evidence_role: candidate_source
 route: formal_note_candidate
-thesis_claim_id: C3
+thesis_claim_id: C5
 base_confidence: medium
-confidence_basis: Q2 結果與管理層產品組合說法可由公司簡報定位，但完整核閱季報、價格範圍、交期與稼動率仍待補
+confidence_basis: Q2 營收可由國巨簡報與 TWSE 個股報告兩條獨立官方鏈交叉重算；毛利、AI 組合與價格歸因仍主要來自公司簡報，完整核閱季報附註、價格範圍、交期與稼動率仍待補
 cross_company_numbers: false
 schema_migrated_at: 2026-08-02
 -->
@@ -40,7 +40,13 @@ to: triaged
 reason: official_q2_deck_directly_hits_registered_h1_h2_proof_points
 evidence: sources:S1,S2
 -->
-
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: twse_stock_report_independently_reconciled_q2_revenue_without_overstating_full_filing_coverage
+evidence: sources:S2,S4
+-->
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -48,11 +54,13 @@ evidence: sources:S1,S2
 - **毛利率**：營收扣掉直接銷售成本後占營收的比例；改善可能來自價格、產品組合、成本或稼動率，不能只靠一個原因解釋。
 - **產品組合**：不同產品或應用在營收中的占比；高毛利產品占比提高，可能推升整體毛利率。
 - **鉭質電容**：使用鉭材料、常見於高可靠度或高階電子應用的電容；銷售成長不等於所有被動元件同步漲價。
+- **MLCC（積層陶瓷電容）**：以多層陶瓷與金屬電極堆疊的小型電容。不同尺寸、容量、電壓與可靠度等級的供需可能分化，不能把單一高階料號的變化寫成全產品線同步漲價。
+- **TWSE（臺灣證券交易所）**：上市公司申報與市場資料的官方入口。本文使用其個股報告交叉核對月營收；該摘要頁不等同完整季度財報與會計師附註。
 - **核閱財務報告**：包含會計師核閱報告與附註的季度正式文件；法說簡報中的已檢閱摘要不等同完整季報。
 
 ### 三句話抓重點
 
-- 國巨官方 Q2 簡報顯示營收、毛利率、EPS、AI 終端占比與鉭質電容銷售均有可定位的新數字。
+- 國巨官方 Q2 簡報顯示營收、毛利率、EPS、AI 終端占比與鉭質電容銷售均有可定位的新數字；其中營收另可由 TWSE 個股報告逐月加總交叉驗證。
 - 公司把部分毛利改善歸因於價格調整與 AI 產品組合，但也說投入成本與標準品需求抵銷部分效益。
 - 這些資料足以觸發正式筆記與 H# 複核，尚不足以證明 MLCC 全面漲價、交期拉長、滿載或長約訂單。
 
@@ -128,8 +136,25 @@ locator: 2026-07-30 以 2327 查詢季度財報與法說重大訊息的入口
 limitation: 查詢入口會持續更新；入口本身不證明完整 Q2 財報已發布，也不能支持任何財務數字
 -->
 
+<!-- research_source
+source_id: S4
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: TWSE 個股資訊－國巨股份有限公司（2327）
+published_at:
+captured_at: 2026-08-09
+accepted_at: 2026-08-09
+status: active
+url: https://www.twse.com.tw/pdf/ch/2327_ch.pdf
+locator: 2026-08-09 產製版 p.4 的 2026/04、05、06 月營收與 p.5 的 2026-07-29 Q2 合併財務報告提報董事會公告列
+limitation: 個股報告可獨立重算季度營收並確認公告存在，但不是含會計師核閱報告與完整附註的季度財報，也不交叉驗證毛利率、AI 組合、價格範圍、交期或稼動率
+independence_group: twse-stock-profile
+-->
+
 - [國巨官方 2026Q2 法說頁](https://yageogroup.com/SalesResources/ResourceLibrary/item/19061)
 - [國巨官方中文法說簡報](https://www.yageogroup.com/content/Resource%20Library/Financial/YAGEO%202Q26_Earnings%20Conference%20Presentation_CH.pdf)
+- [TWSE 2327 個股資訊](https://www.twse.com.tw/pdf/ch/2327_ch.pdf)（2026-08-09 產製版）列示 4、5、6 月營收分別為 140.39098、150.58220、153.59009 億元；全數加總為 444.56327 億元，與公司簡報 444.56 億元的差異只來自億元顯示位數四捨五入。
 - 簡報第 4 頁表示，毛利率改善主要受惠於價格調整與 AI 產品組合優化，但投入成本
   上升及標準品需求增加抵銷部分效益；這能更新獲利品質判讀，不能直接推成特定 MLCC
   料號已全面漲價。
@@ -199,6 +224,20 @@ verification_needed: 公司須揭露價格調整範圍、交期、稼動率、�
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C5
+label: verified
+status: active
+claim: TWSE 2026-08-09 個股報告列示國巨 2026 年 4、5、6 月營收合計 444.56327 億元，與公司 Q2 簡報的 444.56 億元在四捨五入後一致
+supporting_source_ids: S2,S4
+contrary_source_ids:
+as_of: 2026-08-09
+basis: S4 三個月的原始元數字相加為 44,456,327,000 元；換算億元後為 444.56327 億元，與 S2 顯示至小數點後兩位的 444.56 億元一致
+boundary: 這只獨立交叉驗證合併營收；不代表 TWSE 個股報告已提供完整核閱附註，也不交叉驗證毛利率、EPS、AI 終端占比、價格、交期、稼動率或長約
+verification_needed: 取得完整 2026Q2 核閱財務報告與附註，另以公司後續文件驗證產品與價格主張
+resolution:
+-->
+
 ## 影響路由
 
 <!-- impact
@@ -216,7 +255,9 @@ evidence_boundary: 官方簡報支持 Q2 結果與管理層產品組合說法，
 
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
+retired_at: 2026-08-09
+retirement_reason: TWSE 個股報告已提供獨立季度營收對帳與 Q2 報告提報董事會公告，但完整核閱報告及附註仍待可下載版本，後續由 T3 接續
 claim_ids: C1,C3
 metric: 完整 Q2 核閱財報的現金流、存貨、應收、借款與併購後資產負債
 source_ids: S1,S2
@@ -238,6 +279,19 @@ frequency: quarterly
 next_check: 2026-08-15
 trigger: 公司法說或正式文件提供可重建的產品、價格、產能與毛利資料
 invalidation: 後續毛利回落、標準品需求抵銷擴大，或公司仍未證實全面漲價與長約主張
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C5
+metric: 完整 Q2 核閱財報的現金流、存貨、應收、借款與併購後資產負債
+source_ids: S2,S4
+watch_source_ids: S3
+frequency: event_driven
+next_check: 2026-08-15
+trigger: 公司或交易所提供可下載、含會計師核閱報告及完整附註的 2026Q2 財務報告
+invalidation: 完整財報與已交叉驗證的季度營收出現重大差異，或現金流與資產負債不支持表面獲利改善
 -->
 
 ## 下一個可證明／否定的節點

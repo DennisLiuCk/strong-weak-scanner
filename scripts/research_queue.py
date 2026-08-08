@@ -1303,6 +1303,8 @@ _LEDGER_ID_RE = re.compile(
 # 負向後查:避免把 "2nd" 切成 "nd"、"115Q2" 切成 "Q2"。
 _LATIN_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9])[A-Za-z][A-Za-z0-9.\-]*")
 _ANY_BLOCK_RE = re.compile(r"<!--(.*?)-->", re.S)
+_MARKDOWN_LINK_RE = re.compile(r"\[([^\]]+)\]\((?:[^()\s]|\([^)]*\))+\)")
+_BARE_URL_RE = re.compile(r"https?://\S+", re.I)
 
 # 已發布文章原本只能靠「綁定 sources 的 revision transition」改寫正文，也就是預設
 # 每次改寫都由新證據驅動。可讀性修正沒有新證據，於是唯一的路是假裝有——這會讓
@@ -1351,6 +1353,17 @@ def _is_jargon(token):
     )
 
 
+def _reader_visible_link_text(text):
+    """Keep rendered link labels, but drop destinations a reader never sees.
+
+    Percent-encoded URLs previously produced phantom terms such as ``EC`` and
+    repeated endpoint names.  Bare URLs are citation plumbing too, not prose a
+    glossary should explain.
+    """
+    value = _MARKDOWN_LINK_RE.sub(r"\1", text)
+    return _BARE_URL_RE.sub(" ", value)
+
+
 def analyse_readability(text, meta, errors, warnings, entity_terms=None):
     """雙讀者 gate 的可判定部分：讀者看得到的術語必須解釋，帳本不得吃掉正文。
 
@@ -1372,7 +1385,7 @@ def analyse_readability(text, meta, errors, warnings, entity_terms=None):
             if key.strip() in {"publisher", "independence_group"}:
                 for token in _LATIN_TOKEN_RE.findall(value):
                     entity_terms.add(token.strip(".-").lower())
-    prose = _ANY_BLOCK_RE.sub(" ", text)
+    prose = _reader_visible_link_text(_ANY_BLOCK_RE.sub(" ", text))
     shown = [prose]
     for body in _ANY_BLOCK_RE.findall(text):
         for line in body.splitlines():
@@ -1381,7 +1394,7 @@ def analyse_readability(text, meta, errors, warnings, entity_terms=None):
             key, value = line.split(":", 1)
             if key.strip() in READER_FACING_FIELDS:
                 shown.append(value)
-    shown_text = " ".join(shown)
+    shown_text = _reader_visible_link_text(" ".join(shown))
 
     start, end = prose.find("名詞小字典"), prose.find("三句話抓重點")
     glossary = prose[start:end].lower() if 0 <= start < end else ""

@@ -316,6 +316,14 @@ trigger: 客戶確認 High-NA 實際節點、層數、產品與 HVM，且供應�
 invalidation: 客戶 insertion 延至 2029 以後、只在 R&D 使用，或 Low-NA／多重圖形化在成本與良率上持續勝出
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -325,6 +333,7 @@ invalidation: 客戶 insertion 延至 2029 以後、只在 R&D 使用，或 Low-
 - **Availability**：設備在預定生產時間內可正常工作的比例；它重要，但不等於產能、良率或客戶已量產。
 - **Product wafer**：用實際產品設計而非單純 test pattern 的晶圓做製程驗證；仍可能只在研發或 qualification 階段。
 - **HVM insertion**：把設備與製程真正放進高量產節點；需要穩定 throughput、availability、良率、成本與客戶設計共同成立。
+- **EXE**：ASML 對 High-NA EUV 系統使用的產品平台前綴，例如 EXE:5200；型號到廠不等於製程資格或量產插入完成。
 
 ### 三句話抓重點
 

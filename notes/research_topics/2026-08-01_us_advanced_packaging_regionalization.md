@@ -48,6 +48,14 @@ reason: corroboration_backfill_second_source_chain_no_clock_change
 evidence: sources:S7
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -56,6 +64,7 @@ evidence: sources:S7
 - **預付款**：客戶先提供資金支持建廠或未來服務；收到現金通常先形成負債，不等於當期已認列收入與獲利。
 - **採購框架**：雙方約定未來合作方式與期間的合約骨架，不一定包含保底數量、固定價格或最低利用率。
 - **區域化**：把部分產能移到接近客戶或政策需求的地區，以降低地理集中風險；它可能補充亞洲產能，也可能重新分配訂單。
+- **Arizona（亞利桑那州）**：本篇 Amkor 與台積電美國先進封裝計畫所在州；地點被具名不代表廠房已完工或產能已投產。
 
 ### 三句話抓重點
 

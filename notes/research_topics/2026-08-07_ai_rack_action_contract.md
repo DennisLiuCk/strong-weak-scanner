@@ -40,6 +40,14 @@ reason: separated_telemetry_semantics_action_ownership_and_field_outcomes
 evidence: sources:S1,S2,S4,S6
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -48,6 +56,9 @@ evidence: sources:S1,S2,S4,S6
 - **Metadata（中繼資料）**：描述數值是什麼、單位、設備身分與關係的上下文；同一個 `32.5` 可能是攝氏溫度、百分比或功率，必須靠 metadata 才能解讀。
 - **Action contract（動作契約）**：不只定義誰送資料，也定義誰可以提出請求、誰有權決定、要回到哪個狀態，以及失聯或越界時的安全行為。
 - **BMS／RMC**：BMS 是設施端建築管理系統；RMC 是機櫃管理控制器。兩者可能看到相似資料，但控制範圍與責任並不相同。
+- **DSX**：NVIDIA 的 AI factory 基礎設施資料與控制契約；本篇引用的是其中 BMS Event Bus，不代表所有場域已部署。
+- **OpenRMC**：OCP 的開放機櫃管理控制器專案，處理 rack manager 的硬體、軟體與介面邊界。
+- **Redfish**：DMTF 定義的設備管理 API 標準，提供通用資源與動作模型；有 Redfish 介面不等於已實作 DSX 的隔離狀態機。
 
 ### 三句話抓重點
 

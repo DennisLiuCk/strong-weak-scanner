@@ -41,6 +41,14 @@ reason: policy_is_material_but_company_mapping_requires_hts_and_export_exposure
 evidence: sources:S1,S2,S3
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -49,6 +57,7 @@ evidence: sources:S1,S2,S3
 - **HTS code**：美國進口報關使用的商品分類號碼；產品俗稱相同，也可能因規格、組態或用途而落在不同 code。
 - **MFN 稅率**：美國對一般貿易夥伴適用的基礎關稅；本題的 Section 301 稅要和它一起判讀。
 - **Incoterms**：買賣雙方約定運輸、報關、風險與部分費用由誰負擔的條件，會影響新增關稅最終由誰承受。
+- **Annex（附件）**：正式公告附帶的清單，用來逐項列出適用品目、豁免或條件；它不是另一套獨立關稅。
 
 ### 三句話抓重點
 

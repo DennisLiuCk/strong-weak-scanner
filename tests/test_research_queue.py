@@ -1497,6 +1497,14 @@ class ReadabilityGateTest(unittest.TestCase):
         self.assertEqual(result["undefinedHard"], [])
         self.assertEqual(result["undefinedSoft"], [])
 
+    def test_link_destinations_do_not_produce_phantom_terms(self):
+        body = self.GLOSSARY + "說明。" * 200 + "\n" + (
+            "[官方頁](https://example.com/%EC%82%BC%EC%84%B1) " * 8
+        ) + "https://example.com/OpenAPI/T57sb01 " * 8
+        result, _, _ = self._run(body)
+        self.assertEqual(result["undefinedHard"], [])
+        self.assertEqual(result["undefinedSoft"], [])
+
     def test_ledger_ids_and_common_abbreviations_are_not_jargon(self):
         body = self.GLOSSARY + "說明。" * 200 + "\n<!-- research_claim\nclaim: " \
             + "C7 S12 MI-2026-08-08-X AI Q2 GPU " * 6 + "\n-->\n"

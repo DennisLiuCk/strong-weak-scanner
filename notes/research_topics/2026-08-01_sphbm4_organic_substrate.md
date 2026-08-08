@@ -182,6 +182,14 @@ reason: standard_product_timeline_and_supplier_boundary_reviewed
 evidence: sources:S1,S2,S3
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -190,6 +198,8 @@ evidence: sources:S1,S2,S3
 - **有機基板（organic substrate）**：由樹脂等有機材料製成、負責在晶片與電路板之間扇出訊號與電源的封裝基板；「有機」不是指環保認證。
 - **interface base die**：位在記憶體堆疊底部、管理高速介面與資料傳送的邏輯晶片；SPHBM4 會更換這一層，而不是更換上方的 HBM4 DRAM dies。
 - **序列化（serialization）**：用較少的實體訊號線、讓每條線跑得更快；SPHBM4 以 4:1 序列化降低訊號數，代價要由功耗、延遲與訊號完整性驗證裁決。
+- **JESD330-4**：JEDEC 發布 SPHBM4 的標準編號，描述介面與訊號架構；標準發布不等於已有量產產品採用。
+- **HBM4E**：記憶體廠對 HBM4 後續強化版本的產品名稱；它與 SPHBM4 的有機基板介面路徑不是同一件事。
 
 ### 三句話抓重點
 

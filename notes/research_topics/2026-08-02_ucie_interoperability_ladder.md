@@ -249,6 +249,14 @@ trigger: 客戶公布含多廠 UCIe chiplet 的量產產品，且供應商能以
 invalidation: 客戶仍採 captive chiplet、專有 die-to-die，或 UCIe 僅作內部同廠介面而沒有可交易生態系
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -258,6 +266,7 @@ invalidation: 客戶仍採 captive chiplet、專有 die-to-die，或 UCIe 僅作
 - **Tape-out**：設計完成並送交晶圓廠製造；它早於回片、實測、客戶驗證與量產。
 - **Interoperability**：不同廠商各自設計的元件真的接在一起並能工作，而不只是都聲稱遵守同一份規格。
 - **UCIe-S／UCIe-A**：分別對應標準封裝與更高密度先進封裝的實體介面路徑。
+- **PHY（Physical Layer）**：實體層電路，負責把數位資料真正轉成晶粒間可傳送與接收的電氣訊號；有 PHY 不等於完整協定已互通。
 
 ### 三句話抓重點
 

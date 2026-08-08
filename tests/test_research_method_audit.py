@@ -59,7 +59,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["graphs"]["traceableEdges"],
             self.current["graphs"]["activeEdges"],
         )
-        self.assertEqual(self.current["monitors"]["reviewedMature"], 9)
+        self.assertEqual(self.current["monitors"]["reviewedMature"], 8)
         self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 14)
         self.assertEqual(self.current["corrections"]["resultCounts"]["new_support"], 4)
         self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 9)
@@ -116,7 +116,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
             },
         )
         self.assertEqual(gates["selection_accountability"]["status"], "pass")
-        self.assertEqual(gates["cross_check_depth"]["status"], "attention")
+        self.assertEqual(gates["cross_check_depth"]["status"], "pass")
         self.assertEqual(gates["freshness"]["status"], "attention")
         self.assertEqual(gates["correction_learning"]["status"], "pass")
         self.assertEqual(gates["scan_accountability"]["status"], "pass")
@@ -127,13 +127,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
 
     def test_cross_check_gate_names_every_topic_missing_a_second_chain(self):
         missing = self.current["sources"]["thesesNeedingSecondIndependentGroup"]
-        self.assertEqual(
-            missing,
-            [
-                "MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP",
-                "MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL",
-            ],
-        )
+        self.assertEqual(missing, [])
         self.assertEqual(
             self.current["sources"]["thesesWithTwoIndependentGroups"],
             self.current["sources"]["activeTheses"] - len(missing),
@@ -167,7 +161,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.assertTrue(row["evidence_source_ids"])
             self.assertEqual(row["claim_action"], "new_claim")
         self.assertEqual(self.current["monitors"]["dueOrOverdue"], 0)
-        self.assertEqual(self.current["freshness"]["staleTopics"], 6)
+        self.assertEqual(self.current["freshness"]["staleTopics"], 5)
 
     def test_evidence_result_requires_registered_source(self):
         text = (

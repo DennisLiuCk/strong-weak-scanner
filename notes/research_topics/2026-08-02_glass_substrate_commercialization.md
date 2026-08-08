@@ -331,6 +331,14 @@ trigger: 具名 AI／HPC customer、package product、qualification 與 producti
 invalidation: 合作長期停在 explore、pilot sample 沒有客戶驗證，或 roadmap 延後且無新 evidence
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -340,6 +348,7 @@ invalidation: 合作長期停在 explore、pilot sample 沒有客戶驗證，或
 - **Pilot line**：用來建立製程與樣品的小規模試產線，不等於穩定大量生產。
 - **Reliability evaluation**：客戶檢查熱循環、機械、電性與長期壽命等條件；通過前不能視為量產合格。
 - **Production yield**：投入製造後能成為合格產品的比例；大型玻璃、TGV、金屬化與組裝缺陷都會影響它。
+- **HVM（High-Volume Manufacturing）**：高量產階段，要求製程、良率、產出與成本能長期穩定；pilot line 或送樣都還不是 HVM。
 
 ### 三句話抓重點
 

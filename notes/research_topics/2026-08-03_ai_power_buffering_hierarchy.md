@@ -40,6 +40,14 @@ reason: separated_cbu_bbu_bess_by_timescale_location_and_function
 evidence: sources:S1,S2,S3
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -48,6 +56,8 @@ evidence: sources:S1,S2,S3
 - **BBU（Battery Backup Unit）**：以電池在機架或直流匯流排側提供短時 ride-through，目的通常是跨過電源切換或受控停機，不等於設施級儲能。
 - **BESS（Battery Energy Storage System）**：位於設施或公用電網介面側的較大型電池儲能，用來處理較慢、影響範圍更大的負載變化與發電機切換。
 - **時間尺度**：事件從發生到需要被補償的快慢。元件若在錯誤的時間尺度工作，即使都能儲能，也不代表可互相替代。
+- **Diablo 400**：OCP 的機架與電源規格專案，分別列出 BBU 與 capacitor bank 選項；規格選項不等於所有平台都採用。
+- **EDLC（電雙層電容）**：可快速反覆充放電的超級電容；TI 用它示範 CBU，但 reference design 不等於量產 BOM。
 
 ### 三句話抓重點
 

@@ -299,6 +299,14 @@ trigger: 具名客戶公布 production PCIe 6 platform，並列出至少兩家�
 invalidation: 客戶 rollout 延後、gearbox 長期只橋接 Gen5、跨廠互通不穩，或 Gen6 元件沒有形成可核對 production fleet
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_glossary_for_repeated_terms_no_conclusion_change
+evidence: editorial:high_frequency_glossary
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -307,6 +315,7 @@ invalidation: 客戶 rollout 延後、gearbox 長期只橋接 Gen5、跨廠互�
 - **Retimer／switch／endpoint**：retimer 重整高速訊號、switch 連接多個端點、endpoint 是 SSD 或加速器等終端裝置；完整系統需要它們共同工作。
 - **Vendor interoperability**：供應商在自家實驗室或客戶平台測試不同元件能互通，測試範圍可能與標準組織程序不同。
 - **Official Testing／Integrators List**：PCI-SIG 指定程序的正式測試，以及通過指定 revision／rate 後的公開列表；產品名寫 Gen6 不會自動產生 64 GT/s listing。
+- **Compliance Workshop**：PCI-SIG 安排會員執行正式相容性與互通測試的活動；活動提供某項測試，不代表所有參加產品都通過。
 
 ### 三句話抓重點
 
