@@ -58,6 +58,10 @@ HYPOTHESES_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
 TOPICS_DIR = os.path.join(ROOT, "notes", "research_topics")
 GROUPS_CONFIG = os.path.join(ROOT, "config", "groups.csv")
 RESEARCH_GROUP_GUIDE = os.path.join(ROOT, "config", "research_group_guide.csv")
+RESEARCH_READER_TERMS = os.path.join(ROOT, "config", "research_reader_terms.csv")
+READER_OPAQUE_GROUP_IDS = (
+    "passive", "powersupply", "serverodm", "semiequip", "packtest", "ipdesign",
+)
 # GitHub 原文仍保留作為來源檔與版本歷史入口；站內研究中心另外提供適合長文閱讀的 render。
 NOTE_REPO_BLOB = "https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/"
 NOTE_LABEL = {
@@ -129,6 +133,78 @@ def load_research_group_guide(strict=True):
     if strict and errors:
         raise ValueError("族群白話導覽契約失敗：\n- " + "\n- ".join(errors))
     return guide
+
+
+def load_research_reader_terms(strict=True):
+    """Load the governed, reader-only vocabulary shared across research articles."""
+    errors = []
+    terms = []
+    seen_ids = set()
+    seen_aliases = {}
+    expected = ["term_id", "label", "aliases", "definition", "boundary"]
+    try:
+        with open(RESEARCH_READER_TERMS, encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            if reader.fieldnames != expected:
+                errors.append(
+                    "research_reader_terms.csv 欄位必須是 " + ",".join(expected)
+                )
+            for line_no, row in enumerate(reader, 2):
+                term_id = (row.get("term_id") or "").strip()
+                label = (row.get("label") or "").strip()
+                aliases = [
+                    alias.strip() for alias in (row.get("aliases") or "").split("|")
+                    if alias.strip()
+                ]
+                definition = (row.get("definition") or "").strip()
+                boundary = (row.get("boundary") or "").strip()
+                if not re.fullmatch(r"[a-z0-9_]+", term_id):
+                    errors.append(
+                        f"research_reader_terms.csv:{line_no} term_id 格式錯誤：{term_id or '空白'}"
+                    )
+                elif term_id in seen_ids:
+                    errors.append(
+                        f"research_reader_terms.csv:{line_no} term_id 重複：{term_id}"
+                    )
+                seen_ids.add(term_id)
+                if not label:
+                    errors.append(f"research_reader_terms.csv:{line_no} label 不可留空")
+                if not aliases:
+                    errors.append(f"research_reader_terms.csv:{line_no} aliases 不可留空")
+                for alias in aliases:
+                    alias_key = alias.casefold()
+                    if len(alias) < 2:
+                        errors.append(
+                            f"research_reader_terms.csv:{line_no} alias 至少 2 字元：{alias}"
+                        )
+                    if alias_key in seen_aliases:
+                        errors.append(
+                            f"research_reader_terms.csv:{line_no} alias 重複：{alias}"
+                            f"（先前位於第 {seen_aliases[alias_key]} 行）"
+                        )
+                    else:
+                        seen_aliases[alias_key] = line_no
+                for key, value in (("definition", definition), ("boundary", boundary)):
+                    if not value:
+                        errors.append(
+                            f"research_reader_terms.csv:{line_no} {key} 不可留空"
+                        )
+                    elif not value.endswith("。"):
+                        errors.append(
+                            f"research_reader_terms.csv:{line_no} {key} 必須是完整句"
+                        )
+                terms.append({
+                    "id": term_id,
+                    "label": label,
+                    "aliases": aliases,
+                    "definition": definition,
+                    "boundary": boundary,
+                })
+    except OSError as exc:
+        errors.append(f"無法讀取研究中心共通語：{exc}")
+    if strict and errors:
+        raise ValueError("研究中心共通語契約失敗：\n- " + "\n- ".join(errors))
+    return terms
 RESEARCH_LEARNING_ROUTES = [
     {
         "id": "power-cooling", "label": "供電與散熱",
@@ -2072,6 +2148,41 @@ def _topic_structured_sections(topic, sections, group_names=None):
     return ([analyst] if analyst else []) + result
 
 
+def _reader_group_labels_in_sections(sections, group_names=None):
+    """Replace opaque group IDs only in reader-visible runs and headings.
+
+    Machine-readable topic metadata and source URLs keep their registered IDs.  The
+    replacement is deliberately limited to identifiers that are not normal prose;
+    generic technical words such as ``power`` or ``memory`` are never rewritten.
+    """
+    group_names = group_names or {}
+    replacements = [
+        (re.compile(
+            rf"(?<![A-Za-z0-9_]){re.escape(group_id)}(?![A-Za-z0-9_-])",
+            re.IGNORECASE,
+        ), group_names.get(group_id) or group_id)
+        for group_id in READER_OPAQUE_GROUP_IDS
+        if group_names.get(group_id) and group_names.get(group_id) != group_id
+    ]
+
+    def replace_text(value):
+        result = value
+        for pattern, label in replacements:
+            result = pattern.sub(label, result)
+        return result
+
+    def walk(value, key=None):
+        if isinstance(value, list):
+            return [walk(item) for item in value]
+        if isinstance(value, dict):
+            return {item_key: walk(item, item_key) for item_key, item in value.items()}
+        if isinstance(value, str) and key in {"s", "h"}:
+            return replace_text(value)
+        return value
+
+    return walk(sections or [])
+
+
 def _research_reading_minutes(sections):
     """用實際可見中文字數估計閱讀時間；只作 UI 導覽，不是研究統計量。"""
     def walk(value):
@@ -2161,7 +2272,7 @@ def _research_reading_mission(sections):
 
 
 def build_research_library(notes, reports, topics=None, stock_meta=None, group_names=None,
-                           events=None, as_of=None):
+                           events=None, as_of=None, reader_terms=None):
     """建立獨立研究中心 payload；事件錨點歸入市場議題，不另造第四種閱讀模式。"""
     stock_meta = stock_meta or {}
     group_names = group_names or {}
@@ -2280,6 +2391,7 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
             with open(topic["path"], encoding="utf-8") as handle:
                 sections = _extract_sections(handle.read())
         sections = _topic_structured_sections(topic, sections or [], group_names)
+        sections = _reader_group_labels_in_sections(sections, group_names)
         article_id = (
             f"topic-{topic.get('topic_id') or os.path.basename(topic.get('relpath', 'topic'))}"
         )
@@ -2335,7 +2447,9 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
             "status": NOTE_LABEL.get(verification, verification), "statusTone": tone,
             "statusKey": "verified" if verification == "independently_verified" else "review",
             "groups": stock_groups(stock_ids, declared_groups),
-            "sections": event.get("sections") or [], "sources": [],
+            "sections": _reader_group_labels_in_sections(
+                event.get("sections") or [], group_names,
+            ), "sources": [],
             "sourceUrl": NOTE_REPO_BLOB + event["relpath"],
             "meta": {
                 "eventKind": "tsmc_earnings" if subject_key == "tsmc" else "market_event",
@@ -2397,6 +2511,10 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
             {"id": group, "label": group_names.get(group, group), "count": group_counts[group]}
             for group in group_names if group_counts[group]
         ],
+        "readerTerms": [
+            {**term, "aliases": list(term.get("aliases") or [])}
+            for term in (reader_terms or [])
+        ],
         "articles": articles,
     }
 
@@ -2416,6 +2534,69 @@ def attach_research_learning_paths(research_library, knowledge_graph):
     routes = (knowledge_graph or {}).get("learningRoutes") or []
     article_by_id = {article.get("id"): article for article in articles if article.get("id")}
     graph_by_id = {graph.get("id"): graph for graph in graphs if graph.get("id")}
+
+    def graph_reader_handoff(graph):
+        """Describe the exact graph projection opened from an article card.
+
+        The frontend enters the company projection by default.  Counts and the
+        guided relation therefore must use that same projection instead of the
+        graph-wide node/edge totals, which combine company and industry views.
+        Legacy test fixtures without an explicit view remain company-facing.
+        """
+        graph_edges = list(graph.get("edges") or [])
+        company_edges = [
+            edge for edge in graph_edges if edge.get("view") == "company"
+        ]
+        industry_edges = [
+            edge for edge in graph_edges if edge.get("view") == "industry"
+        ]
+        if company_edges:
+            view, view_label, visible_edges = "company", "公司曝險", company_edges
+        elif industry_edges:
+            view, view_label, visible_edges = "industry", "產業依賴", industry_edges
+        else:
+            view, view_label, visible_edges = "company", "公司曝險", graph_edges
+
+        node_map = {
+            node.get("id"): node for node in graph.get("nodes") or []
+            if node.get("id")
+        }
+        visible_node_ids = {graph.get("rootNodeId")}
+        for edge in visible_edges:
+            visible_node_ids.update((edge.get("from"), edge.get("to")))
+        visible_node_ids.discard(None)
+        node_count = sum(node_id in node_map for node_id in visible_node_ids)
+
+        guided = next((
+            edge for edge in visible_edges
+            if edge.get("evidenceState") == "verified"
+        ), visible_edges[0] if visible_edges else None)
+        relation = None
+        if guided:
+            relation = {
+                "edgeId": guided.get("id") or "",
+                "fromLabel": (
+                    (node_map.get(guided.get("from")) or {}).get("label")
+                    or guided.get("from") or "未命名節點"
+                ),
+                "toLabel": (
+                    (node_map.get(guided.get("to")) or {}).get("label")
+                    or guided.get("to") or "未命名節點"
+                ),
+                "relationLabel": guided.get("relationLabel") or "已登錄關係",
+                "evidenceLabel": guided.get("evidenceLabel") or "待確認",
+                "commercialStageLabel": (
+                    guided.get("commercialStageLabel") or "階段未標示"
+                ),
+                "boundary": guided.get("boundary") or "",
+            }
+        return {
+            "graphView": view,
+            "graphViewLabel": view_label,
+            "nodeCount": node_count,
+            "edgeCount": len(visible_edges),
+            "guidedRelation": relation,
+        }
 
     route_sequences = []
     routed_article_ids = set()
@@ -2626,16 +2807,21 @@ def attach_research_learning_paths(research_library, knowledge_graph):
 
         graph = matching_graph(article)
         if graph:
+            handoff = graph_reader_handoff(graph)
             cards.append({
                 "kind": "graph", "label": "看產業關聯",
                 "title": graph.get("label") or "產業知識圖譜",
                 "description": (
-                    "查看既有研究已建立的公司、產品與產業關係；"
-                    "關係線只代表證據層級，不是投資強弱。"
+                    f"先用一條既有關係理解「{handoff['graphViewLabel']}」怎麼讀，"
+                    "再進完整圖譜回查；關係線只代表證據層級，不是投資強弱。"
                 ),
-                "meta": (f"{len(graph.get('nodes') or [])} 個節點 · "
-                         f"{len(graph.get('edges') or [])} 條關係"),
+                "meta": (f"{handoff['graphViewLabel']} · "
+                         f"{handoff['nodeCount']} 個節點 · "
+                         f"{handoff['edgeCount']} 條關係"),
                 "graphId": graph.get("id") or "",
+                "graphView": handoff["graphView"],
+                "graphViewLabel": handoff["graphViewLabel"],
+                "guidedRelation": handoff["guidedRelation"],
             })
 
         # A cross-market article can declare nearly the whole universe (for example
@@ -2673,7 +2859,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 5
+    research_library["learningPathVersion"] = 6
     return research_library
 
 
@@ -3613,9 +3799,11 @@ def main():
         last, notes_map, hypotheses_map, events, research_topics, stock_names,
     )
     research_group_guide = load_research_group_guide(strict=True)
+    research_reader_terms = load_research_reader_terms(strict=True)
     research_library = build_research_library(
         notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM, events,
         as_of=research_as_of,
+        reader_terms=research_reader_terms,
     )
     for group in research_library.get("groups", []):
         group.update(research_group_guide.get(group.get("id"), {}))

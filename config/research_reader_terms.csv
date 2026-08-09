@@ -1,0 +1,11 @@
+term_id,label,aliases,definition,boundary
+bom,BOM（物料清單）,BOM,產品或系統預計使用的零件、材料與數量清單。,列入 BOM 只表示設計或採購配置，仍不等於已大量出貨、取得固定份額或認列收入。
+reference_design,Reference design（參考設計）,reference design,由平台或元件供應商提供的可實作設計範例，用來說明元件如何組成系統。,參考設計證明可行路徑，不等於客戶採用、完成驗證或量產訂單。
+sample,Sample（樣品）,sample|samples,供客戶或研發端測試功能、整合與可靠度的早期實體。,樣品可用不等於通過資格驗證、量產或重複訂單。
+qualification,Qualification（資格驗證）,qualification|qualified,客戶、平台或製程依指定條件確認產品是否可被採用的驗證階段。,完成某一層驗證不等於所有標準通過、全面部署或已產生收入。
+pilot,Pilot（試產／試驗）,pilot,在正式大量生產前，用較小規模驗證製程、設備與品質的階段。,試產可運作不等於量產良率、產能與成本已穩定。
+production,Production（生產／量產）,production,供應商用來表示產品已進入持續製造或放量的階段；各公司門檻可能不同。,仍要另查客戶、出貨量、良率、利用率與財務貢獻，不能只憑這個詞判定商業成熟。
+full_scale,Full-scale（完整規模）,full-scale,從單機、樣品或示範擴大到完整系統或預定部署規模。,規劃中的完整規模不等於已建置、已驗收或已量產。
+hvm,HVM（高量產）,HVM|high-volume production|high volume manufacturing,High-volume manufacturing 的縮寫，指製程進入大量、持續生產。,仍需用良率、產出、穩定度與客戶產品證據確認，不能只靠設備到廠或單次測試。
+tam,TAM（整體可服務市場）,TAM,Total Addressable Market 的縮寫，指某一產品或服務可觸及的整體市場金額或需求範圍。,TAM 是市場大小估計，不等於單一公司市占、訂單或營收。
+asp,ASP（平均售價）,ASP,Average Selling Price 的縮寫，指一段期間的平均銷售價格。,平均售價變動仍要和產品組合、數量、成本與毛利一起判讀。

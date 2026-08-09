@@ -6,8 +6,10 @@ import inspect
 import json
 import re
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -254,15 +256,33 @@ class ResearchCenterTest(unittest.TestCase):
         graph = {"graphs": [{
             "id": "test-graph", "label": "測試產業關聯",
             "articleIds": ["topic-MI-2026-07-29-TEST"],
-            "nodes": [{"id": "company:1111", "ticker": "1111"},
-                      {"id": "concept:test"}],
-            "edges": [{"id": "E1", "from": "company:1111", "to": "concept:test"}],
+            "rootNodeId": "concept:test",
+            "nodes": [
+                {"id": "company:1111", "ticker": "1111", "label": "甲公司"},
+                {"id": "concept:test", "label": "測試主題"},
+                {"id": "industry:power", "label": "功率元件"},
+            ],
+            "edges": [
+                {
+                    "id": "E1", "view": "company",
+                    "from": "company:1111", "to": "concept:test",
+                    "relationLabel": "供應測試角色", "evidenceState": "verified",
+                    "evidenceLabel": "證實", "commercialStageLabel": "量產前驗證",
+                    "boundary": "公司角色不等於具名量產訂單。",
+                },
+                {
+                    "id": "E2", "view": "industry",
+                    "from": "industry:power", "to": "concept:test",
+                    "relationLabel": "參與產業環節", "evidenceState": "inference",
+                    "evidenceLabel": "推論", "commercialStageLabel": "研究路由",
+                },
+            ],
         }]}
 
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 5)
+        self.assertEqual(library["learningPathVersion"], 6)
         article_ids = {article["id"] for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
         group_ids = {item["id"] for item in library["groups"]}
@@ -295,10 +315,56 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("test-graph", {
             card.get("graphId") for card in topic["learningPath"]["cards"]
         })
+        graph_card = next(
+            card for card in topic["learningPath"]["cards"]
+            if card["kind"] == "graph"
+        )
+        self.assertEqual(graph_card["graphView"], "company")
+        self.assertEqual(graph_card["graphViewLabel"], "公司曝險")
+        self.assertEqual(graph_card["meta"], "公司曝險 · 2 個節點 · 1 條關係")
+        self.assertEqual(graph_card["guidedRelation"], {
+            "edgeId": "E1", "fromLabel": "甲公司", "toLabel": "測試主題",
+            "relationLabel": "供應測試角色", "evidenceLabel": "證實",
+            "commercialStageLabel": "量產前驗證",
+            "boundary": "公司角色不等於具名量產訂單。",
+        })
+        self.assertNotIn("3 個節點", graph_card["meta"])
+        self.assertNotIn("2 條關係", graph_card["meta"])
         event = next(
             article for article in library["articles"] if article["id"] == "event-tsmc-2026q2"
         )
         self.assertIn("group", {card["kind"] for card in event["learningPath"]["cards"]})
+
+    def test_graph_learning_card_falls_back_to_an_existing_industry_view(self):
+        library = {"counts": {"topic": 1}, "groups": [], "articles": [{
+            "id": "topic-industry", "type": "topic", "groups": [], "stockIds": [],
+        }]}
+        graph = {"graphs": [{
+            "id": "industry-only", "label": "產業測試圖",
+            "rootNodeId": "concept:test", "articleIds": ["topic-industry"],
+            "nodes": [
+                {"id": "concept:test", "label": "測試主題"},
+                {"id": "industry:power", "label": "功率元件"},
+            ],
+            "edges": [{
+                "id": "I1", "view": "industry",
+                "from": "industry:power", "to": "concept:test",
+                "relationLabel": "參與產業環節", "evidenceState": "inference",
+                "evidenceLabel": "推論", "commercialStageLabel": "研究路由",
+                "boundary": "產業關聯不等於公司受惠。",
+            }],
+        }]}
+
+        bd.attach_research_learning_paths(library, graph)
+
+        card = next(
+            card for card in library["articles"][0]["learningPath"]["cards"]
+            if card["kind"] == "graph"
+        )
+        self.assertEqual(card["graphView"], "industry")
+        self.assertEqual(card["graphViewLabel"], "產業依賴")
+        self.assertEqual(card["meta"], "產業依賴 · 2 個節點 · 1 條關係")
+        self.assertEqual(card["guidedRelation"]["edgeId"], "I1")
 
     def test_learning_path_prioritizes_next_registered_route_article(self):
         reading_mission = {
@@ -596,6 +662,99 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(row["readerRole"], guide["power"]["readerRole"])
         self.assertEqual(row["readerBoundary"], guide["power"]["readerBoundary"])
 
+    def test_research_reader_terms_are_strict_and_reach_library_payload(self):
+        builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
+        self.assertIn("load_research_reader_terms(strict=True)", builder)
+        self.assertIn("reader_terms=research_reader_terms", builder)
+        terms = bd.load_research_reader_terms(strict=True)
+        self.assertEqual(
+            [term["id"] for term in terms],
+            [
+                "bom", "reference_design", "sample", "qualification", "pilot",
+                "production", "full_scale", "hvm", "tam", "asp",
+            ],
+        )
+        for term in terms:
+            self.assertTrue(term["aliases"], term["id"])
+            self.assertTrue(term["definition"].endswith("。"), term["id"])
+            self.assertTrue(term["boundary"].endswith("。"), term["id"])
+
+        library = bd.build_research_library(
+            self.notes, self.reports, self.topics, self.stock_meta,
+            {"power": "功率元件"}, reader_terms=terms,
+        )
+        self.assertEqual(library["readerTerms"], terms)
+        library["readerTerms"][0]["aliases"].append("mutated")
+        self.assertNotIn("mutated", terms[0]["aliases"])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            invalid = Path(tmp) / "research_reader_terms.csv"
+            invalid.write_text(
+                "term_id,label,aliases,definition,boundary\n"
+                "first,第一詞,BOM,第一個解釋。,第一個邊界。\n"
+                "second,第二詞,bom,第二個解釋。,第二個邊界。\n",
+                encoding="utf-8",
+            )
+            with mock.patch.object(bd, "RESEARCH_READER_TERMS", str(invalid)):
+                with self.assertRaisesRegex(ValueError, "alias 重複"):
+                    bd.load_research_reader_terms(strict=True)
+
+    def test_topic_reader_copy_does_not_expose_opaque_group_ids(self):
+        opaque = re.compile(
+            r"(?<![a-z0-9])(?:passive|powersupply|serverodm|semiequip|packtest|ipdesign)"
+            r"(?![a-z0-9-])",
+            re.I,
+        )
+        source = [{
+            "h": "passive 與 powersupply",
+            "blocks": [{"t": "p", "runs": [{
+                "s": "passive、powersupply、serverodm；passive-component",
+                "a": "https://example.com/serverodm",
+            }]}],
+        }]
+        labels = {
+            "passive": "被動元件", "powersupply": "電源供應",
+            "serverodm": "伺服器組裝/機構",
+        }
+        rendered = bd._reader_group_labels_in_sections(source, labels)
+        self.assertEqual(rendered[0]["h"], "被動元件 與 電源供應")
+        self.assertEqual(
+            rendered[0]["blocks"][0]["runs"][0]["s"],
+            "被動元件、電源供應、伺服器組裝/機構；passive-component",
+        )
+        self.assertEqual(
+            rendered[0]["blocks"][0]["runs"][0]["a"],
+            "https://example.com/serverodm",
+        )
+        self.assertEqual(source[0]["h"], "passive 與 powersupply")
+
+        notes = bd.load_notes(bd.NOTES_DIR)
+        reports = bd.load_hypothesis_reports(bd.HYPOTHESES_DIR, notes=notes)
+        as_of = bd.research_today()
+        topics = bd.load_research_topics(
+            bd.TOPICS_DIR, reports=reports, as_of=as_of,
+        )
+        with (ROOT / "config" / "groups.csv").open(encoding="utf-8", newline="") as handle:
+            group_names = {row["group"]: row["name"] for row in csv.DictReader(handle)}
+        library = bd.build_research_library(
+            notes, reports, topics, {}, group_names, bd.load_events(), as_of=as_of,
+        )
+
+        def visible_text(value, key=None):
+            if isinstance(value, list):
+                return " ".join(visible_text(item) for item in value)
+            if isinstance(value, dict):
+                return " ".join(
+                    visible_text(item, item_key) for item_key, item in value.items()
+                )
+            return value if isinstance(value, str) and key in {"s", "h"} else ""
+
+        for article in library["articles"]:
+            if article["type"] == "topic":
+                self.assertNotRegex(
+                    visible_text(article["sections"]), opaque, article["id"],
+                )
+
     def test_group_maturity_deduplicates_one_source_gap_across_multiple_groups(self):
         topics = copy.deepcopy(self.topics)
         topics[0]["group_ids"] = ["power", "material"]
@@ -712,10 +871,29 @@ class ResearchCenterTest(unittest.TestCase):
             "研究摘要：已知、未知與下一步", "function resetReaderScroll()",
             "ARTICLE_AUDIT_HEADINGS", "function renderResearchAppendix(",
             "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
-            "function renderReadingMission(", "reading-mission-grid",
+            "function focusBeginnerHighlights(", "function renderReadingMission(",
+            "reading-mission-grid", "'data-testid':'reading-mission-start'",
+            "開始讀三句重點", "想先比較族群角色",
+            ".reading-mission-start{width:100%;min-height:44px}",
+            "function articleGroupGuideRows(", "function renderArticleRoleContext(",
+            "'data-testid':'article-role-context'", "article-role-context",
+            "'aria-live':'polite'", "選擇本文產業角色",
+            "if(rows.length>4)section.appendChild(h('details',{class:'article-role-more'}",
+            "切換本文產業角色", "個角色可逐一比較", ".article-role-more[open]",
+            "並列只表示本文同時討論這些族群，不代表上下游、受惠、訂單或投資排序。",
             "function orderedBeginnerGroups(", "BEGINNER_BLOCK_ORDER",
             "function beginnerGlossary(", "beginner-glossary-state",
             "function beginnerGlossaryTerms(", "function articleGlossaryTerms(",
+            "function glossaryTokenPosition(", "function beginnerKeyPointMatches(",
+            "const READER_TERMS=LIB.readerTerms||[]", "function sharedReaderTermMatches(",
+            "function beginnerKeyPointBoundary(",
+            "function beginnerKeyPoints(",
+            "class:'beginner-keypoints'", "data-keypoint-term-count",
+            "data-keypoint-shared-term-count", "研究中心共通語",
+            "先看懂這句的 ", "解釋逐字取自本篇「名詞小字典」；不另外改寫。",
+            "共通語只解釋研究流程與常見指標的字面",
+            ".beginner-keypoint-terms>summary{min-height:44px}",
+            "articleSections(article,'beginner',glossaryTerms)",
             "名詞小字典'+(termCount?'（'+termCount+' 個）':'')",
             "遇到陌生詞再展開，不用一次背完",
             "function renderGlossaryQuickView(", "articleGlossaryDialog",
@@ -731,12 +909,30 @@ class ResearchCenterTest(unittest.TestCase):
             "從這篇接著學", "function openLearningGroups(",
             "function openLearningCollection(", "learning-path-grid",
             "function learningCheckpoint(", "function learningCard(",
+            "function learningRelationPreview(", "一條既有關係示範",
+            "先看一條既有關係", "先別外推到哪裡",
+            "data-graph-view", "data-guided-edge",
+            "card.graphView,card.guidedRelation?.edgeId",
+            "查看'+(card.graphViewLabel||'產業關聯')+'圖",
+            ".learning-relation-boundary>summary{min-height:44px}",
             "你能用自己的話回答嗎？", "需要提示？查看本文三句重點",
             "提示逐字取自本篇「三句話抓重點」；不新增或改寫結論。",
             "繼續第 '+card.routeStep+'/'+card.routeTotal+' 站",
-            "text:'回看本篇三句重點'", "target.focus();requestAnimationFrame",
+            "text:'回看本篇三句重點'",
+            "review.addEventListener('click',focusBeginnerHighlights)",
+            "target.focus();requestAnimationFrame",
             "window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-120",
             ".learning-checkpoint-hints>summary{min-height:44px}",
+            "articleOrigin:null", "function articleOriginContext(",
+            "function returnArticleOrigin(", "function renderArticleLearningOrigin(",
+            "function renderLearningOriginReturn(",
+            "'data-testid':'article-origin-top'",
+            "'data-testid':'article-origin-back-top'",
+            "'data-testid':'article-origin-back-bottom'",
+            "originContext?.mobileBackLabel||'返回研究清單'",
+            "selectArticle(value,false,null)",
+            ".article-learning-origin", ".learning-origin-return",
+            "只表示路線收錄，不代表上下游或受惠排序",
             "maturity-reading-key", "先選一個系統問題",
             "這頁的「完成度」怎麼看？", "maturityRouteCards",
             "function renderMaturityLearningRoute(",
@@ -778,14 +974,28 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('research_library["knowledgeGraph"] = build_knowledge_graph(', builder)
         self.assertIn('attach_research_learning_paths(', builder)
         self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
-        self.assertIn("body.append(mobileBack,h('h1'", template)
+        self.assertIn(
+            "body.appendChild(mobileBack);const originBar="
+            "renderArticleLearningOrigin();if(originBar)body.appendChild(originBar);"
+            "body.appendChild(h('h1'",
+            template,
+        )
         self.assertIn(
             "body.appendChild(verification);const readingMission=renderReadingMission(article);"
             "if(readingMission)body.appendChild(readingMission);",
             template,
         )
+        self.assertIn(
+            "if(readingMission)body.appendChild(readingMission);const roleContext="
+            "renderArticleRoleContext(article);if(roleContext)body.appendChild(roleContext);",
+            template,
+        )
         self.assertLess(
             template.index("const readingMission=renderReadingMission(article)"),
+            template.index("const meta=h('div',{class:'article-meta'}"),
+        )
+        self.assertLess(
+            template.index("const roleContext=renderArticleRoleContext(article)"),
             template.index("const meta=h('div',{class:'article-meta'}"),
         )
         # meta 之後先標示學習路線，再由行動版大綱接手隱藏的桌機側欄。
@@ -793,7 +1003,7 @@ class ResearchCenterTest(unittest.TestCase):
                       "if(routeContext)body.appendChild(routeContext);"
                       "const mobileToc=renderMobileToc(article);"
                       "if(mobileToc)body.appendChild(mobileToc);"
-                      "body.appendChild(articleSections(article,'beginner'));"
+                      "body.appendChild(articleSections(article,'beginner',glossaryTerms));"
                       "body.appendChild(articleSections(article,'analyst'))", template)
         self.assertIn(
             "body.appendChild(articleSections(article,'reader',glossaryTerms))", template)
@@ -881,18 +1091,18 @@ class ResearchCenterTest(unittest.TestCase):
             r"if\(current!==RESEARCH_TODAY\)\{RESEARCH_TODAY=current;renderAll\(\)\}\},60000\)",
         )
 
-    def test_template_mobile_route_keeps_list_and_hash_state_consistent(self):
+    def test_template_mobile_route_keeps_list_hash_and_learning_origin_consistent(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
             "function setArticleHash(id)",
             "function clearArticleRoute()",
             "setArticleHash('')",
-            "mobileBack.addEventListener('click',clearArticleRoute)",
+            "mobileBack.addEventListener('click',originContext?returnArticleOrigin:clearArticleRoute)",
             "if(document.body.classList.contains('article-open'))setArticleHash(state.selected)",
             "if(document.body.classList.contains('article-open'))clearArticleRoute()",
             "function graphHashRoute(value)",
             "selectSurface('graph',false)",
-            "else{state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}",
+            "else{state.articleOrigin=null;state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}",
             "if(guide)guide.hidden=!showEntryGuide()",
             "button.dataset.testid==='article-'+state.selected",
             "let catalogReturnPosition=null",
@@ -1159,6 +1369,21 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
             "row.readerRole", "row.readerBoundary", "研究中心怎麼分",
             "先別混淆：", ".maturity-group-guide",
+            'id="maturityGroupChoices"', 'id="maturityGroupPreview"',
+            "function renderMaturityGroupExplorer(",
+            "function renderMaturityGroupPreview(",
+            "function maturityRoutesForGroup(", "function focusMaturityRoute(",
+            "function maturityGroupArticleOrigin(",
+            "function maturityRouteArticleOrigin(",
+            "function openMaturityGroupArticle(",
+            "function openMaturityRouteArticle(",
+            "openMaturityGroupArticle(row,start.articleId)",
+            "openMaturityRouteArticle(route,route.firstArticleId)",
+            "mode==='matrix'?openMaturityRouteArticle(route,station.articleId)",
+            "state.maturityGuideGroupId", "data-maturity-guide-group",
+            "'aria-pressed':'false'", "會出現在：", "從第一篇開始",
+            "看完整族群進度", "只表示既有閱讀路線收錄",
+            ".maturity-group-explorer", ".maturity-group-choice",
             'id="maturityRouteCards"', "function renderMaturityLearningRoute(",
             "MATURITY.learningRoutes", "maturity-route-question",
             "從「'+graphLabel+'」開始", "族群重複出現＝同時參與不同系統問題",
@@ -1169,6 +1394,10 @@ class ResearchCenterTest(unittest.TestCase):
             "完整查核矩陣與方法說明", "題材財務影響", "maturitySummarySentence",
         ):
             self.assertIn(contract, template)
+        self.assertLess(
+            template.index('id="maturityGroupExplorerTitle"'),
+            template.index('id="maturityRouteGuideTitle"'),
+        )
         self.assertIn("body.article-open .tools{display:none}", template)
         self.assertIn('research_library["groupMaturity"] = build_group_maturity(', builder)
         self.assertIn("load_research_group_guide(strict=True)", builder)
