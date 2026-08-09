@@ -1,5 +1,91 @@
 # Changelog
 
+## 族群矩陣讓新手先從系統問題開始 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只調整族群矩陣的行動版
+入口順序，不修改 topic 原文、學習路線、族群映射、證據關係或投資排序。
+
+- 原本 390×844 手機首屏先放 11 個族群名稱，「先選一個系統問題」頂端位於頁面 942px，
+  不熟產業分類的讀者得先穿過一整個術語選擇器。現在手機新增雙入口並預設系統問題，問題區
+  頂端提前到 392px，早 550px 進入同一個首屏；11 個正式族群完整保留在另一個入口。
+- 入口使用原生按鈕與 `aria-pressed`，可在「從系統問題開始／依族群名稱查找」間切換；
+  從族群預覽點既有系統問題會自動切回並定位正確路線。桌機仍同時顯示兩區，桌機／手機
+  resize 不會遺失本次選擇，390px 與 884px 實測水平溢出均為 0。
+- 這次沒有新增文章、族群或學習路線，也沒有用文字相似度建立關係；發布集合仍維持
+  4 路線／10 階段／25 站與 11 個正式族群。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 463 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `a70adf52…`。
+
+## 學習路線只先展開目前階段 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只調整既有學習階段的
+漸進揭露，不修改 topic 原文、文章問題、route／graph 站次、證據關係或投資排序。
+
+- 上一版雖把 9 站路線分成 3 個可辨識階段，390px 手機展開後仍高 1,019px，所有 9 個問題
+  同時出現。多階段路線現在使用巢狀原生 `details／summary`：文章只預先打開目前所在階段，
+  族群矩陣只預先打開第一階段，其餘摘要直接保留 phase 名稱、站數與站次範圍。
+- 代表文章在同一 390×844 狀態的路線高度降至 545px（縮短 474px，約 47%）；320×844 為
+  651px、1440×900 為 471px，三個尺寸的水平溢出皆為 0。9 個原站點、逐站「想一想」問題、
+  閱讀時間與 `aria-current="step"` 全數保留，沒有把內容截短來換高度。
+- 每個 phase 摘要至少 44px，可用滑鼠、Enter 或 Space 切換；resize 不會重新打開已收合階段。
+  使用者可同時展開多個階段，系統不保存或推測閱讀進度。螢幕閱讀器實機朗讀仍保留為人工輔具
+  驗收項目。
+- source registry 與發布 `research.html` 兩條獨立解析路徑仍為 4 路線／10 階段／25 站；
+  25/25 篇主文章保有路線定位，21 張跨文章下一站卡與 4 張末站完成卡未變。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 463 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `046acdd3…`。
+
+## 學習路線從平面站點拆成可辨識的系統階段 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只補研究中心的閱讀章節與
+跨介面定位，不修改 topic 原文、文章問題、graph 站次、節點／關係、公司映射或投資排序。
+
+- 代表「供電與散熱」路線原有 9 個站點與逐站問題，但手機展開後是一張 892px 高的平面清單；
+  現行總述還略過機櫃控制、EMC 與信任鏈三站，讀者知道下一篇是哪篇，卻不容易看出整條路線
+  正在建立哪一層系統理解。
+- `RESEARCH_LEARNING_ROUTES` 新增明示 `phases`：4 條路線共 10 個階段、25 個原有站點；每個
+  phase 必須以唯一 id／白話 label，把 route `graphIds` 依原順序逐站且恰好覆蓋一次，遺漏、
+  重複或換序會直接讓建置失敗。階段是閱讀章節，不新增上下游、供應鏈或受惠方向。
+- 文章頁首、可展開路線地圖、族群起點與下一站卡共用同一份 phase；目前文章同時標示站次與
+  階段，下一站明說是留在原階段或進入下一階段。從文章進入知識圖譜後，「目前位置」仍保留
+  同一階段，行動版原生主題選單以 `optgroup` 分組；payload 升為 `learningPathVersion: 7`。
+- source registry 與發布 `research.html` 兩條獨立解析路徑均得到 4 路線／10 階段／25 站；
+  25/25 篇主文章 phase 與 station 完全一致，21 張下一站卡全數指向下一站的正式 phase，
+  0 failures。這是完整發布集合，不是抽樣。
+- 瀏覽器驗收 320×844、390×844 與 1440×900：全頁水平溢出皆為 0；目前階段、跨階段標題、
+  下一站 phase 與圖譜 `optgroup` 均可回查。DOM 保留巢狀有序清單、`aria-current="step"`、
+  原生 `details／select／optgroup`；螢幕閱讀器實機朗讀仍保留為人工輔具驗收項目。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 463 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `fe6ab763…`。
+
+## 研究摘要把主張類型與證據可信度拆成兩把尺 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只新增市場議題的證據
+閱讀輔助，不修改 topic 原文、主張 label、可信度、來源、圖譜關係、公司映射或投資排序。
+
+- 現行摘要把「主結論標記為推論」與「證據可信度為中」放在同一句，手機首屏沒有立即解釋兩者
+  差異。34 篇結構化 topic 中，33 篇主命題為 `inference`、1 篇為 `verified`；若讀者把
+  claim label 當成有無證據，或把高／中／低當成發生機率，會系統性誤讀多數市場議題。
+- 研究摘要導言後新增「先分清兩把尺」：主張類型逐篇沿用 active `thesis_claim_id` 的正式
+  `verified／inference／unverified`，說明結論是由來源直接支持、由已接受資料連接而成或仍待
+  驗證；證據可信度則明示只衡量來源品質、獨立消息鏈、反方證據與主要缺口，不是真假或機率。
+- 畫面只計 active thesis 實際引用的 active supporting sources 與其 `independence_group`，並
+  明示兩把尺都不能換算成公司訂單、受惠程度或投資排名。前端沿用 `liveConfidence(article)`；
+  到期文章實測會由「中」同步顯示成「中 → 低（已到期）」，且說明降級不代表主張被推翻。
+- source-loader 與發布 `research.html` 兩條獨立解析路徑均得到 34 篇／34 組導讀，claim 分布
+  33 推論＋1 證實、effective confidence 分布 26 中＋7 低＋1 高；主張、可信度、來源數與獨立
+  鏈數逐篇比對均為 0 failures。這是完整發布集合，不是抽樣。
+- 瀏覽器驗收 320×844、390×844 與 1440×900：全頁水平溢出皆為 0；手機兩把尺改為單欄，
+  320px 導讀卡仍完整落在 viewport 內，桌機維持雙欄。DOM 保留 complementary、heading、list
+  與 `data-claim-key／data-confidence-key`；螢幕閱讀器實機朗讀仍保留為人工輔具驗收項目。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 462 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings），JavaScript 語法檢查
+  通過。連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html`
+  `cbef5f95…`。
+
 ## 文章到知識圖譜的同視角關係導讀 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只校正文章與既有知識圖譜

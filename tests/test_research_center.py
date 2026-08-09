@@ -208,6 +208,16 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(headings.count("主張—證據帳本"), 1)
         self.assertTrue(all(section["blocks"] for section in topic["sections"]))
         analyst = topic["sections"][0]
+        guide = analyst["readerEvidenceGuide"]
+        self.assertEqual(guide["claimKey"], "verified")
+        self.assertEqual(guide["claimLabel"], "證實")
+        self.assertIn("直接支持這句主張的精確措辭", guide["claimMeaning"])
+        self.assertEqual(guide["confidenceKey"], "medium")
+        self.assertEqual(guide["confidenceLabel"], "中")
+        self.assertIn("不是主張真假，也不是發生機率", guide["confidenceMeaning"])
+        self.assertEqual(guide["sourceCount"], 1)
+        self.assertEqual(guide["independenceCount"], 1)
+        self.assertIn("不能直接換算成公司訂單", guide["boundary"])
         self.assertEqual(
             [item[0]["s"] for item in analyst["blocks"][1]["items"]],
             ["一句話結論：", "目前已知：", "尚未知道：", "對哪些族群有意義：", "下一步看什麼："],
@@ -248,6 +258,24 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("S1 甲公司正式公告", monitoring["rows"][0][2][0]["s"])
         self.assertEqual(monitoring["rows"][0][3][0]["s"], "S2 主管機關資料")
 
+    def test_evidence_reader_guide_separates_inference_from_confidence(self):
+        topics = copy.deepcopy(self.topics)
+        topics[0]["meta"]["thesis_claim_id"] = "C1"
+        topics[0]["claims"][0]["label"] = "inference"
+        topics[0]["claims"][0]["label_text"] = "推論"
+        library = bd.build_research_library(
+            self.notes, self.reports, topics, self.stock_meta, {"power": "功率元件"},
+            self.events,
+        )
+        article = next(row for row in library["articles"] if row["id"].startswith("topic-MI-"))
+        guide = article["sections"][0]["readerEvidenceGuide"]
+        self.assertEqual(guide["claimKey"], "inference")
+        self.assertEqual(guide["claimLabel"], "推論")
+        self.assertIn("不是任一來源逐字寫出的整句結論", guide["claimMeaning"])
+        self.assertEqual(guide["confidenceKey"], "medium")
+        self.assertEqual(guide["confidenceLabel"], "中")
+        self.assertIn("兩把不同的尺", guide["boundary"])
+
     def test_learning_paths_only_route_to_existing_articles_graphs_and_groups(self):
         library = bd.build_research_library(
             self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"},
@@ -282,7 +310,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 6)
+        self.assertEqual(library["learningPathVersion"], 7)
         article_ids = {article["id"] for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
         group_ids = {item["id"] for item in library["groups"]}
@@ -389,6 +417,16 @@ class ResearchCenterTest(unittest.TestCase):
             "learningRoutes": [{
                 "id": "route", "label": "測試路線",
                 "description": "依序閱讀", "graphIds": ["graph-a", "graph-b", "graph-c"],
+                "phases": [
+                    {
+                        "id": "foundation", "label": "基礎概念",
+                        "graphIds": ["graph-a"],
+                    },
+                    {
+                        "id": "application", "label": "系統應用",
+                        "graphIds": ["graph-b", "graph-c"],
+                    },
+                ],
             }],
             "graphs": [
                 {"id": "graph-a", "label": "第一圖", "articleIds": ["topic-a"],
@@ -411,12 +449,21 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(first["routeStep"], 2)
         self.assertEqual(first["routeTotal"], 3)
         self.assertEqual(first["question"], "讀完後能回答哪個問題？")
+        self.assertEqual(first["phaseLabel"], "系統應用")
+        self.assertEqual(first["phaseStep"], 2)
+        self.assertEqual(first["phaseTotal"], 2)
+        self.assertIn("下一站進入「系統應用」階段", first["description"])
+        self.assertIn("測試路線 · 系統應用 · 第 2/3 站", first["meta"])
         self.assertIn("不新增供應鏈或受惠關係", first["description"])
         self.assertEqual(second["articleId"], "topic-c")
+        self.assertIn("下一站仍在「系統應用」階段", second["description"])
         self.assertIn("第 3/3 站", second["meta"])
         self.assertEqual(library["articles"][0]["learningRoute"], {
             "id": "route", "label": "測試路線", "description": "依序閱讀",
             "step": 1, "total": 3, "graphId": "graph-a", "graphLabel": "第一圖",
+            "phaseId": "foundation", "phaseLabel": "基礎概念",
+            "phaseStep": 1, "phaseTotal": 2,
+            "phaseStationStep": 1, "phaseStationTotal": 1,
         })
         stations = graph["learningRoutes"][0]["stations"]
         self.assertEqual(
@@ -428,6 +475,13 @@ class ResearchCenterTest(unittest.TestCase):
             ["第一圖", "第二圖", "第三圖"],
         )
         self.assertEqual([station["step"] for station in stations], [1, 2, 3])
+        self.assertEqual(
+            [station["phaseLabel"] for station in stations],
+            ["基礎概念", "系統應用", "系統應用"],
+        )
+        self.assertEqual([station["phaseStep"] for station in stations], [1, 2, 2])
+        self.assertEqual(
+            [station["phaseStationStep"] for station in stations], [1, 1, 2])
         self.assertEqual(stations[0]["question"], "讀完後能回答哪個問題？")
         self.assertEqual(stations[1]["articleTitle"], "第二站")
         self.assertEqual(stations[2]["readingMinutes"], 7)
@@ -439,6 +493,20 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(completed["graphId"], "graph-c")
         self.assertIn("第 3/3 站", completed["meta"])
         self.assertIn("不代表研究結論已完成", completed["description"])
+
+        invalid_graph = {
+            "learningRoutes": [{
+                "id": "invalid-route", "label": "缺站路線",
+                "graphIds": ["graph-a", "graph-b"],
+                "phases": [{
+                    "id": "only", "label": "只含一站",
+                    "graphIds": ["graph-a"],
+                }],
+            }],
+            "graphs": graph["graphs"][:2],
+        }
+        with self.assertRaisesRegex(ValueError, "逐站、依原順序完整覆蓋"):
+            bd.attach_research_learning_paths({"articles": []}, invalid_graph)
 
         missing_mission = {"counts": {"topic": 1}, "groups": [], "articles": [{
             "id": "topic-a", "type": "topic", "groups": [], "stockIds": [],
@@ -489,6 +557,7 @@ class ResearchCenterTest(unittest.TestCase):
                     "learningRoute": {
                         "id": "route-a", "label": "路線 A", "step": 1,
                         "total": 2, "graphId": "graph-a", "graphLabel": "第一站",
+                        "phaseLabel": "基礎", "phaseStep": 1, "phaseTotal": 2,
                     },
                 },
                 {
@@ -497,6 +566,7 @@ class ResearchCenterTest(unittest.TestCase):
                     "learningRoute": {
                         "id": "route-a", "label": "路線 A", "step": 2,
                         "total": 2, "graphId": "graph-b", "graphLabel": "第二站",
+                        "phaseLabel": "應用", "phaseStep": 2, "phaseTotal": 2,
                     },
                 },
                 {"id": "topic-unrouted", "groups": ["passive"]},
@@ -525,6 +595,9 @@ class ResearchCenterTest(unittest.TestCase):
             "topic-passive-first",
         )
         self.assertEqual(rows["passive"]["learningStart"]["scope"], "primary_group")
+        self.assertEqual(rows["passive"]["learningStart"]["phaseLabel"], "應用")
+        self.assertEqual(rows["passive"]["learningStart"]["phaseStep"], 2)
+        self.assertEqual(rows["passive"]["learningStart"]["phaseTotal"], 2)
         self.assertEqual(rows["passive"]["articleCount"], 3)
         self.assertEqual(
             rows["power"]["learningStart"]["articleId"], "topic-power-first")
@@ -539,6 +612,21 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(guide["stationCount"], 2)
         self.assertEqual(guide["groupIds"], ["passive", "power"])
         self.assertEqual(guide["groupLabels"], ["被動元件", "功率元件"])
+
+    def test_registered_learning_route_phases_cover_every_graph_in_order(self):
+        for route in bd.RESEARCH_LEARNING_ROUTES:
+            phases = route.get("phases") or []
+            self.assertTrue(phases, route["id"])
+            self.assertEqual(
+                [graph_id for phase in phases for graph_id in phase["graphIds"]],
+                route["graphIds"],
+                route["id"],
+            )
+            self.assertEqual(
+                len({phase["id"] for phase in phases}), len(phases), route["id"])
+            for phase in phases:
+                self.assertTrue(phase["label"].strip(), route["id"])
+                self.assertTrue(phase["graphIds"], route["id"])
 
     def test_topic_confidence_uses_explicit_as_of_without_changing_article_anchor(self):
         due_day = bd.build_research_library(
@@ -905,6 +993,13 @@ class ResearchCenterTest(unittest.TestCase):
             "function researchSummaryGrid(", "RESEARCH_SUMMARY_KINDS",
             "research-summary-grid", "data-summary-kind",
             "role:'list','aria-label':'研究摘要重點'",
+            "function evidenceReadingGuide(section,article)",
+            "新手證據讀法", "先分清兩把尺",
+            "data-claim-key", "data-confidence-key",
+            "主張類型與證據可信度", ".evidence-reading-guide",
+            ".evidence-reading-scales{grid-template-columns:1fr}",
+            "confidence?.effective||guide.confidenceKey",
+            "降級只表示證據需要更新，不代表主張已被推翻",
             "這篇先釐清", "讀完試著回答",
             "從這篇接著學", "function openLearningGroups(",
             "function openLearningCollection(", "learning-path-grid",
@@ -957,7 +1052,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("search?.focus({preventScroll:true});restorePosition()", template)
         self.assertIn("if(event.target===dialog)dialog.close()", template)
         self.assertNotIn("orderedBeginnerBlocks", template)
-        self.assertIn("else if(analyst)(section.blocks||[]).forEach", template)
+        self.assertIn("else if(analyst){let guideInserted=false;", template)
         self.assertIn("researchSummaryGrid(item)||block(item)", template)
         self.assertIn("entry.label!==expected[index]", template)
         for label in ("一句話結論", "目前已知", "尚未知道", "對哪些族群有意義", "下一步看什麼"):
@@ -1218,6 +1313,9 @@ class ResearchCenterTest(unittest.TestCase):
             "function availableGraphRoutes()",
             "function graphRouteId(graphId)", "function activateGraphRoute(routeId)",
             "function activateGraphTopic(graphId)",
+            "function graphRoutePhase(route,graphId)",
+            "parts.push('階段 '+phase.step+'/'+phase.total+' · '+phase.label)",
+            "const group=h('optgroup',{label:'階段 '+(index+1)+'/'+phases.length+' · '+phase.label})",
             "graphRoute:graphRouteId((KG.graphs||[])[0]?.id||'')",
             "state.graphRoute=graphRouteId(graphId)",
             "學習路線只整理導覽",
@@ -1228,17 +1326,34 @@ class ResearchCenterTest(unittest.TestCase):
             "openGraphArticle(startArticle.id)",
             "function renderLearningRouteContext(article)",
             "'aria-label':'學習路線定位'",
-            "站次只代表閱讀順序，不是研究完成度或投資排名",
+            "階段與站次只代表閱讀順序，不是上下游、研究完成度或投資排名",
             "看這站證據關係",
             "function learningRouteById(routeId)",
+            "function learningRoutePhaseGroups(stations)",
+            "function learningRouteStation(route,station,total,currentArticleId,mode)",
             "function learningRouteMap(route,currentArticleId='',mode='article')",
             "'data-testid':'learning-route-map-'+route.id",
             "'data-testid':'learning-route-station-'+route.id+'-'+station.step",
             "question=station.question?'讀完試著回答：'+station.question",
+            "'aria-label':route.label+' 學習階段與站點'",
+            "'data-phase-id':phase.id,'data-current':isCurrent?'true':'false'",
+            "shouldOpen=isCurrent||(!currentArticleId&&index===0)",
+            "class:'learning-route-phase-fold',open:shouldOpen",
+            "'data-testid':'learning-route-phase-'+route.id+'-'+phase.step",
+            "class:'learning-route-phase-summary'",
+            "text:(isCurrent?'目前階段 · ':phase.stations.length+' 站 · ')+range",
+            "summary.addEventListener('keydown',event=>{if(event.key!=='Enter'&&event.key!==' ')",
+            "event.preventDefault();phaseFold.open=!phaseFold.open",
+            "目前第 '+current.step+' 站'+phaseHint",
             "learningRouteMap(learningRouteById(route.id),article.id,'article')",
             "learningRouteMap(learningRouteById(route.id)||route,'','matrix')",
-            "站點與問題只取自既有路線、graph 第一篇文章與同篇「想一想」",
+            "階段只整理既有站點；站點與問題仍取自既有路線",
             ".learning-route-map>summary:focus-visible",
+            ".learning-route-phases{display:grid;gap:7px",
+            ".learning-route-phase[data-current=\"true\"]",
+            ".learning-route-phase-summary{min-height:44px",
+            ".learning-route-phase-summary:focus-visible",
+            ".learning-route-phase-fold[open] .learning-route-phase-state::before{content:'收合'}",
             ".learning-route-station-button{width:100%;min-height:58px",
             "function resetGraphSurfaceScroll()",
             "graphPage.scrollTo(0,0)",
@@ -1249,6 +1364,7 @@ class ResearchCenterTest(unittest.TestCase):
             ".graph-intro-action{width:100%;min-height:44px}",
         ):
             self.assertIn(contract, template)
+        self.assertNotIn("learning-route-phase-head", template)
         self.assertIn(
             "document.getElementById('graphHubSelect').addEventListener('change'",
             template,
@@ -1258,7 +1374,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("v2 direct assessment 能進入", template)
         for contract in (
             "RESEARCH_LEARNING_ROUTES", "供電與散熱", "記憶體與封裝",
-            "運算與互連", "公司財務案例", "先辨識液冷產品資格",
+            "運算與互連", "公司財務案例", "供電、保護與元件",
+            '"phases": [', "def route_phase_map(route):",
+            "學習路線階段必須逐站、依原順序完整覆蓋 graphIds",
             'research_library["knowledgeGraph"]["learningRoutes"]',
             'route["stations"] = []',
             'article.get("readingMission") or {}',
@@ -1369,6 +1487,19 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
             "row.readerRole", "row.readerBoundary", "研究中心怎麼分",
             "先別混淆：", ".maturity-group-guide",
+            'id="maturityEntrySwitch"', 'data-maturity-entry="routes"',
+            'data-maturity-entry="groups"', 'data-maturity-entry-panel="routes"',
+            'data-maturity-entry-panel="groups"', "不熟族群名稱",
+            "從系統問題開始", "依族群名稱查找",
+            "maturityEntry:'routes'", "function syncMaturityEntry(",
+            "function selectMaturityEntry(",
+            "panel.hidden=mobile&&panel.dataset.maturityEntryPanel!==selected",
+            "state.maturityEntry='groups';selectSurface('maturity',true)",
+            "state.maturityEntry='routes';syncMaturityEntry();const cards",
+            "state.maturityEntry='groups';syncMaturityEntry();const rows",
+            "maturityEntryResizeFrame", ".maturity-entry-switch{display:none}",
+            ".maturity-entry-button{min-width:0;min-height:56px",
+            "@media(max-width:780px){.maturity-entry-switch{display:grid",
             'id="maturityGroupChoices"', 'id="maturityGroupPreview"',
             "function renderMaturityGroupExplorer(",
             "function renderMaturityGroupPreview(",
@@ -1394,6 +1525,9 @@ class ResearchCenterTest(unittest.TestCase):
             "完整查核矩陣與方法說明", "題材財務影響", "maturitySummarySentence",
         ):
             self.assertIn(contract, template)
+        self.assertNotIn(
+            '不熟族群名稱，從「先認識一個族群」開始', template
+        )
         self.assertLess(
             template.index('id="maturityGroupExplorerTitle"'),
             template.index('id="maturityRouteGuideTitle"'),

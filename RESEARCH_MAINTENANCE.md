@@ -312,7 +312,23 @@ boundary 都由 CSV 逐字發布，只是閱讀輔助，不得改寫文章主張
 以及選題原因、來源、研究判定等維運段落收進預設關閉的「研究查核附錄」；一般讀者先讀
 結論與機制，需要逐項核對時再展開，原始資料與證據層級都不刪除、不改寫。
 
-族群矩陣頂端先顯示「先認識一個族群」：選項必須依 `groupMaturity.rows` 的正式族群順序完整
+研究摘要導言後的「新手證據讀法」必須把 `thesis_claim_id` 的 active claim label 與 topic
+effective confidence 分成兩把尺。claim copy 固定依正式 `verified／inference／unverified`
+值域解釋：`verified` 只表示指定來源直接支持精確措辭，`inference` 表示研究判讀由已接受資料
+連接而成，`unverified` 仍不能當成已發生事實；不得自行提高或降低 label。可信度 copy 只說明它
+衡量來源品質、獨立鏈、反方證據與主要缺口，不得寫成真假或發生機率。來源數只計 active thesis
+實際引用的 active supporting sources；獨立鏈沿用同一批來源的 `independence_group`，不得拿全文
+來源總數灌大。前端必須用 `liveConfidence(article)` 顯示 effective confidence，使臺北日曆日
+跨過 `review_due` 時和卡片、可信度 panel 同步降級；降級仍不代表主張被推翻。整段是讀法輔助，
+不得換算成公司訂單、受惠程度、投資排名或修改原始 topic 帳本。
+
+族群矩陣在桌機必須同時顯示「先認識一個族群」與「先選一個系統問題」；在 780px 以下則顯示
+兩個至少 56px 高的入口按鈕，預設選取系統問題，讓不熟族群名稱的讀者不必先穿過 11 個術語。
+切換時用 `aria-pressed` 公開目前入口並只隱藏另一個面板；resize 到桌機不得隱藏任一面板，縮回
+手機後要保留使用者本次選擇。從族群預覽定位系統問題時必須自動切回問題入口；由雷達或文章
+返回特定族群時則切到族群入口。這只是行動版漸進揭露，不得重排、刪除或推導研究關係。
+
+「先認識一個族群」選項必須依 `groupMaturity.rows` 的正式族群順序完整
 列出，預覽只能重用同列 `readerRole`、`readerBoundary` 與 `learningStart`；「會出現在」則只
 能由 `RESEARCH_LEARNING_ROUTES` 已保存的 `groupIds` 反查，不得用文字相似度、公司名或模型
 推導。選取族群時必須以 `aria-pressed` 公開目前狀態；第一篇按鈕開啟既有起讀文章，完整進度
@@ -392,7 +408,20 @@ verified → verified → 第一條可見 edge」，且畫面必須明示它只�
 graph 數必須與文章站次一致，且各 graph 的主文章不可重複。文章頁首須顯示路線、目前站次及
 可原位展開的完整路線地圖；矩陣的系統問題卡須重用同一地圖。每個 station 只能保存 step、
 既有 graph ID／label、該 graph 第一篇既有 article ID／title、同篇 `readingMission.question`、
-閱讀時間與既有 group labels；不得生成第二份站點摘要。站點按鈕直接開啟該文並回到頁首，
+閱讀時間、既有 group labels 與下述 phase 定位；不得生成第二份站點摘要。route 若宣告
+`phases`，每個 phase 必須有唯一 `id`、白話 `label` 與連續 `graphIds`，把所有 route `graphIds`
+依原順序逐站且恰好覆蓋一次。phase 只能整理閱讀章節，不得改寫成上下游、供應鏈、重要性或
+受惠順序；建置必須在遺漏、重複或換序時失敗。發布 station 與 article route 只可由該登錄表
+附加 `phaseId／phaseLabel／phaseStep／phaseTotal／phaseStationStep／phaseStationTotal`；文章
+頁首、可展開路線地圖、族群起點與下一站卡都須重用同一份 phase，不得各自另寫分組。
+從文章開啟圖譜後，「目前位置」必須顯示同一 phase；行動版原生圖譜主題選單須用 phase
+`optgroup` 分組。無 phase 的相容路線可維持單層選單，不得依圖譜標題臨時猜分組。
+多 phase 的路線地圖須以巢狀原生 `details／summary` 做逐階段揭露：文章模式只在初次 render
+打開目前文章所在 phase，矩陣模式只在初次 render 打開第一個 phase，其餘 phase 預設收合；
+resize 不得重設使用者已切換的開合狀態。每個 phase 摘要須顯示 phase 名稱、站數或「目前階段」
+及完整站次範圍，觸控高度至少 44px，Enter 與 Space 都可切換。所有站點與原問題仍須保留在
+同一有序結構中，不得為縮短畫面而刪除、截斷或改寫；單 phase 路線可維持原單層站點清單。
+站點按鈕直接開啟該文並回到頁首，
 目前文章用 `aria-current="step"` 標示；前往圖譜的按鈕必須明寫「看這站證據關係」，不能再把
 單一圖譜頁稱為「完整路線」。跨介面返回時須重設到圖譜頂端，不能沿用文章頁的捲動位置。下一站卡須
 明示「閱讀順序不新增供應鏈或受惠關係」；末站另明示只完成閱讀順序、不代表研究結論完成，

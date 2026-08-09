@@ -210,39 +210,107 @@ RESEARCH_LEARNING_ROUTES = [
         "id": "power-cooling", "label": "供電與散熱",
         "question": "電力如何送進 AI 機櫃，產生的熱又如何被帶走？",
         "description": (
-            "建議順序：先讀 800VDC 功率半導體鏈，再看保護與緩衝，"
-            "最後先辨識液冷產品資格，再拆迴路責任邊界。"
+            "建議分三階段：先分清供電、保護與元件角色，再看機櫃緩衝、控制、"
+            "EMC 與信任鏈，最後追液冷產品資格與迴路責任。"
         ),
         "graphIds": [
             "800v-power-tree", "800vdc-protection-layers", "ai-capacitor-role-map",
             "ai-power-buffering", "ai-rack-action-contract", "ai-rack-emc-certification",
             "ai-rack-trust-root", "liquid-cooling", "liquid-cooling-loop-boundaries",
         ],
+        "phases": [
+            {
+                "id": "power-components",
+                "label": "供電、保護與元件",
+                "graphIds": [
+                    "800v-power-tree", "800vdc-protection-layers",
+                    "ai-capacitor-role-map",
+                ],
+            },
+            {
+                "id": "rack-operation",
+                "label": "機櫃運作與驗證",
+                "graphIds": [
+                    "ai-power-buffering", "ai-rack-action-contract",
+                    "ai-rack-emc-certification", "ai-rack-trust-root",
+                ],
+            },
+            {
+                "id": "cooling-deployment",
+                "label": "液冷部署",
+                "graphIds": [
+                    "liquid-cooling", "liquid-cooling-loop-boundaries",
+                ],
+            },
+        ],
     },
     {
         "id": "memory-packaging", "label": "記憶體與封裝",
         "question": "資料放在哪裡，記憶體與封裝又如何一起影響運算？",
         "description": (
-            "建議順序：先讀 AI 記憶體分層，再看 HBM／SPHBM4，"
-            "最後追鍵結與封裝路徑。"
+            "建議分三階段：先建立記憶體層級與客製範圍，再看材料、基板與"
+            "記憶體商業化，最後追鍵結與封裝路徑。"
         ),
         "graphIds": [
             "ai-memory-hierarchy", "custom-hbm-scope-ladder",
             "glass-substrate-commercialization", "hbf-commercialization", "hbm",
             "hybrid-bonding", "panel-level-packaging",
         ],
+        "phases": [
+            {
+                "id": "memory-architecture",
+                "label": "記憶體層級與客製範圍",
+                "graphIds": [
+                    "ai-memory-hierarchy", "custom-hbm-scope-ladder",
+                ],
+            },
+            {
+                "id": "memory-commercialization",
+                "label": "材料、基板與記憶體商業化",
+                "graphIds": [
+                    "glass-substrate-commercialization", "hbf-commercialization", "hbm",
+                ],
+            },
+            {
+                "id": "bonding-packaging",
+                "label": "鍵結與封裝路徑",
+                "graphIds": ["hybrid-bonding", "panel-level-packaging"],
+            },
+        ],
     },
     {
         "id": "compute-connect", "label": "運算與互連",
         "question": "算力與資料如何在晶片、儲存與網路之間移動？",
         "description": (
-            "建議順序：先讀 AI 儲存資料平面，再看開放 AI 互連，"
-            "最後用 PCIe 6／UCIe 檢查成熟度。"
+            "建議分三階段：先看資料平面與平台部署，再補晶片供電、光網路與"
+            "製程條件，最後用開放互連、PCIe 6 與 UCIe 檢查標準成熟度。"
         ),
         "graphIds": [
             "ai-storage-data-plane", "amd-helios", "backside-power", "cpo-networking",
             "high-na-euv-readiness", "open-ai-fabrics", "pcie6-compliance-ladder",
             "ucie-interoperability",
+        ],
+        "phases": [
+            {
+                "id": "data-platform",
+                "label": "資料平面與平台部署",
+                "graphIds": ["ai-storage-data-plane", "amd-helios"],
+            },
+            {
+                "id": "chip-process",
+                "label": "晶片供電、光網路與製程",
+                "graphIds": [
+                    "backside-power", "cpo-networking", "high-na-euv-readiness",
+                ],
+            },
+            {
+                "id": "interconnect-standards",
+                "label": "互連與標準驗證",
+                "graphIds": [
+                    "open-ai-fabrics", "pcie6-compliance-ladder",
+                    "ucie-interoperability",
+                ],
+            },
         ],
     },
     {
@@ -252,6 +320,11 @@ RESEARCH_LEARNING_ROUTES = [
             "建議讀法：用國巨 Q2 案例，練習把公司總額與題材可歸因貢獻分開。"
         ),
         "graphIds": ["yageo-q2-financial-materiality"],
+        "phases": [{
+            "id": "financial-attribution",
+            "label": "公司分母與題材歸因",
+            "graphIds": ["yageo-q2-financial-materiality"],
+        }],
     },
 ]
 
@@ -1926,8 +1999,44 @@ def _topic_analyst_section(topic, source_by_id, group_names=None):
         f"目前有 {len(supporting_sources)} 份有效來源，"
         f"分屬 {len(independence_groups)} 條互相獨立的來源鏈。"
     )
+    claim_key = thesis.get("label") or ""
+    claim_meaning = {
+        "verified": (
+            "指定來源直接支持這句主張的精確措辭；"
+            "仍只在來源寫明的範圍內成立。"
+        ),
+        "inference": (
+            "這句是把已接受資料連起來後得到的研究判讀；"
+            "推理材料有來源支持，但不是任一來源逐字寫出的整句結論。"
+        ),
+        "unverified": (
+            "這句仍待下一份證據驗證；目前不能當成已發生的事實。"
+        ),
+    }.get(
+        claim_key,
+        "先回查原始主張與來源；這個標記尚未落在新制三種主張類型。",
+    )
     return {
         "h": "研究摘要：已知、未知與下一步",
+        "readerEvidenceGuide": {
+            "claimKey": claim_key,
+            "claimLabel": thesis_label,
+            "claimMeaning": claim_meaning,
+            "confidenceKey": (
+                confidence.get("effective") or meta.get("base_confidence") or "unrated"
+            ),
+            "confidenceLabel": confidence_label,
+            "confidenceMeaning": (
+                "衡量來源品質、獨立消息鏈、反方證據與主要缺口；"
+                "不是主張真假，也不是發生機率。"
+            ),
+            "sourceCount": len(supporting_sources),
+            "independenceCount": len(independence_groups),
+            "boundary": (
+                "主張類型與證據可信度是兩把不同的尺；"
+                "都不能直接換算成公司訂單、受惠程度或投資排名。"
+            ),
+        },
         "blocks": [
             {"t": "p", "runs": _research_run(
                 "以下只整理原始文章已有的結論與證據，不會改變查核狀態。")},
@@ -2535,6 +2644,60 @@ def attach_research_learning_paths(research_library, knowledge_graph):
     article_by_id = {article.get("id"): article for article in articles if article.get("id")}
     graph_by_id = {graph.get("id"): graph for graph in graphs if graph.get("id")}
 
+    def route_phase_map(route):
+        """Map each registered station to one explicit, contiguous learning phase."""
+        graph_ids = list(route.get("graphIds") or [])
+        declared = route.get("phases")
+        if not declared:
+            # Legacy fixtures remain valid; published routes all declare phases.
+            declared = [{
+                "id": (route.get("id") or "route") + "-all",
+                "label": route.get("label") or "學習路線",
+                "graphIds": graph_ids,
+            }]
+        flattened = []
+        phase_ids = set()
+        mapped = {}
+        total = len(declared)
+        for phase_index, phase in enumerate(declared, 1):
+            phase_id = str(phase.get("id") or "").strip()
+            phase_label = str(phase.get("label") or "").strip()
+            phase_graph_ids = list(phase.get("graphIds") or [])
+            if not phase_id or not phase_label or not phase_graph_ids:
+                raise ValueError(
+                    f"學習路線階段缺少 id、label 或 graphIds：{route.get('id') or 'route'}"
+                )
+            if phase_id in phase_ids:
+                raise ValueError(
+                    f"學習路線階段 id 重複：{route.get('id') or 'route'} / {phase_id}"
+                )
+            phase_ids.add(phase_id)
+            flattened.extend(phase_graph_ids)
+            for station_index, graph_id in enumerate(phase_graph_ids, 1):
+                if graph_id in mapped:
+                    raise ValueError(
+                        f"學習路線站點重複分組：{route.get('id') or 'route'} / {graph_id}"
+                    )
+                mapped[graph_id] = {
+                    "phaseId": phase_id,
+                    "phaseLabel": phase_label,
+                    "phaseStep": phase_index,
+                    "phaseTotal": total,
+                    "phaseStationStep": station_index,
+                    "phaseStationTotal": len(phase_graph_ids),
+                }
+        if flattened != graph_ids:
+            raise ValueError(
+                "學習路線階段必須逐站、依原順序完整覆蓋 graphIds："
+                f"{route.get('id') or 'route'}"
+            )
+        return mapped
+
+    phase_maps = {
+        route.get("id") or "": route_phase_map(route)
+        for route in routes
+    }
+
     def graph_reader_handoff(graph):
         """Describe the exact graph projection opened from an article card.
 
@@ -2621,7 +2784,9 @@ def attach_research_learning_paths(research_library, knowledge_graph):
 
     for route, sequence in route_sequences:
         total = len(sequence)
+        phase_map = phase_maps.get(route.get("id") or "", {})
         for index, station in enumerate(sequence):
+            phase = phase_map.get(station["graphId"], {})
             article_by_id[station["articleId"]]["learningRoute"] = {
                 "id": route.get("id") or "",
                 "label": route.get("label") or "學習路線",
@@ -2630,6 +2795,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 "total": total,
                 "graphId": station["graphId"],
                 "graphLabel": (graph_by_id.get(station["graphId"]) or {}).get("label") or "",
+                **phase,
             }
 
     missing_reading_missions = sorted(
@@ -2655,6 +2821,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
     # question 逐字沿用該文章已通過契約的 readingMission，不另寫站點摘要。
     for route, sequence in route_sequences:
         route["stations"] = []
+        phase_map = phase_maps.get(route.get("id") or "", {})
         for index, station in enumerate(sequence):
             graph = graph_by_id.get(station["graphId"]) or {}
             article = article_by_id[station["articleId"]]
@@ -2669,6 +2836,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 "question": (article.get("readingMission") or {}).get("question") or "",
                 "readingMinutes": article.get("readingMinutes") or 1,
                 "groupLabels": list(article.get("groupLabels") or []),
+                **phase_map.get(station["graphId"], {}),
             })
 
     def overlap(left, right):
@@ -2742,14 +2910,30 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             route_context = article.get("learningRoute") or {}
             if route_next:
                 route, candidate, step, total = route_next
+                current_route = article.get("learningRoute") or {}
+                candidate_route = candidate.get("learningRoute") or {}
+                next_phase = candidate_route.get("phaseLabel") or ""
+                phase_transition = ""
+                if next_phase:
+                    phase_transition = (
+                        f"下一站仍在「{next_phase}」階段；"
+                        if next_phase == current_route.get("phaseLabel")
+                        else f"下一站進入「{next_phase}」階段；"
+                    )
                 next_card = article_card(
                     "沿學習路線往下讀", candidate,
-                    "同一路線的下一個既有主題；這只是閱讀順序，不新增供應鏈或受惠關係。",
-                    (f"{route.get('label') or '學習路線'} · 第 {step}/{total} 站 · "
+                    phase_transition
+                    + "這只是閱讀順序，不新增供應鏈或受惠關係。",
+                    (f"{route.get('label') or '學習路線'}"
+                     + (f" · {next_phase}" if next_phase else "")
+                     + f" · 第 {step}/{total} 站 · "
                      f"閱讀約 {candidate.get('readingMinutes') or 1} 分鐘"),
                 )
                 next_card["routeStep"] = step
                 next_card["routeTotal"] = total
+                next_card["phaseLabel"] = next_phase
+                next_card["phaseStep"] = candidate_route.get("phaseStep") or 0
+                next_card["phaseTotal"] = candidate_route.get("phaseTotal") or 0
                 next_card["question"] = (
                     (candidate.get("readingMission") or {}).get("question") or ""
                 )
@@ -2859,7 +3043,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 6
+    research_library["learningPathVersion"] = 7
     return research_library
 
 
@@ -2917,6 +3101,9 @@ def attach_group_learning_starts(research_library):
             "graphLabel": route.get("graphLabel") or "",
             "step": route.get("step") or 0,
             "total": route.get("total") or 0,
+            "phaseLabel": route.get("phaseLabel") or "",
+            "phaseStep": route.get("phaseStep") or 0,
+            "phaseTotal": route.get("phaseTotal") or 0,
             "scope": (
                 "primary_group"
                 if (article.get("groups") or [""])[0] == group_id
