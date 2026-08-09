@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """獨立研究中心：完整文章 payload、站內閱讀與首頁分流契約。"""
 import copy
+import csv
 import inspect
 import json
 import re
@@ -577,6 +578,24 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(row["actionIds"][0], "source-gap:MI-2026-07-29-TEST")
         self.assertNotIn("score", maturity)
 
+    def test_research_group_guide_covers_every_formal_group_and_reaches_matrix_rows(self):
+        with (ROOT / "config" / "groups.csv").open(encoding="utf-8", newline="") as handle:
+            formal_ids = [row["group"] for row in csv.DictReader(handle)]
+        guide = bd.load_research_group_guide(strict=True)
+        self.assertEqual(list(guide), formal_ids)
+        for group_id, item in guide.items():
+            self.assertTrue(item["readerRole"].endswith("。"), group_id)
+            self.assertTrue(item["readerBoundary"].endswith("。"), group_id)
+
+        maturity = bd.build_group_maturity(
+            self.notes, [], self.stock_meta, {"power": "功率元件"},
+            {"graphs": []}, [], {}, "2026-08-06",
+            group_guide={"power": guide["power"]},
+        )
+        row = maturity["rows"][0]
+        self.assertEqual(row["readerRole"], guide["power"]["readerRole"])
+        self.assertEqual(row["readerBoundary"], guide["power"]["readerBoundary"])
+
     def test_group_maturity_deduplicates_one_source_gap_across_multiple_groups(self):
         topics = copy.deepcopy(self.topics)
         topics[0]["group_ids"] = ["power", "material"]
@@ -776,7 +795,8 @@ class ResearchCenterTest(unittest.TestCase):
                       "if(mobileToc)body.appendChild(mobileToc);"
                       "body.appendChild(articleSections(article,'beginner'));"
                       "body.appendChild(articleSections(article,'analyst'))", template)
-        self.assertIn("body.appendChild(articleSections(article,'reader'))", template)
+        self.assertIn(
+            "body.appendChild(articleSections(article,'reader',glossaryTerms))", template)
         self.assertIn("body.appendChild(appendix)", template)
         self.assertIn("schedule();requestAnimationFrame(()=>requestAnimationFrame(schedule))", template)
         self.assertLess(template.index('id="entryGuide"'), template.index('id="results"'))
@@ -795,6 +815,54 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("function hashArticleId()", template)
         self.assertIn("url.hash=article.id", template)
         self.assertNotIn("github.com/DennisLiuCk/strong-weak-scanner/blob/main/notes/qualitative/8261", template)
+
+    def test_template_brings_existing_glossary_terms_to_each_reader_section(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function glossaryTermLabel(term)",
+            "function sectionBlockText(node)",
+            "function glossarySearchTokens(label)",
+            "function sectionHasGlossaryTerm(text,label)",
+            "function sectionGlossaryGuide(section,terms)",
+            "'data-section-glossary':section.h||''",
+            "'data-glossary-term':entry.fullLabel",
+            "'aria-haspopup':'dialog','aria-controls':'articleGlossaryDialog'",
+            "'aria-label':'查看本文名詞定義：'+entry.fullLabel",
+            "openGlossaryQuickView(button,entry.fullLabel)",
+            "詞名與解釋只取自同篇「名詞小字典」；這裡不新增第二套定義。",
+            "articleSections(article,'reader',glossaryTerms)",
+            ".section-glossary-term{min-height:38px",
+            ".section-glossary-term{min-height:44px",
+            "search.value=query;search.dispatchEvent",
+            "requestAnimationFrame(restorePosition)",
+        ):
+            self.assertIn(contract, template)
+        self.assertIn("const guide=!audit?sectionGlossaryGuide(section,glossaryTerms):null", template)
+        self.assertNotIn("本節名詞由模型", template)
+
+    def test_template_stacks_topic_reader_tables_with_original_column_labels_on_mobile(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "const labels=(node.head||[]).map(cell=>runText(cell).trim())",
+            "h('th',{scope:'col'}",
+            "'data-label':labels[index]||'欄 '+(index+1)",
+            "if(article.type==='topic'&&!audit)sectionEl.querySelectorAll('.table-wrap')",
+            "wrap.classList.add('reader-table')",
+            ".article-section{container-type:inline-size",
+            "@container (max-width:620px)",
+            ".article-section .reader-table thead{position:absolute",
+            ".article-section .reader-table td::before{content:attr(data-label)",
+            "wrap.classList.contains('reader-table')",
+            "getComputedStyle(wrap.querySelector('table')).display==='block'",
+            "wrap.removeAttribute('tabindex')",
+            "markScrollableTables(document.getElementById('reader'))",
+            "outlineSpyRefresh();markScrollableTables(document.getElementById('reader'))",
+        ):
+            self.assertIn(contract, template)
+        self.assertIn(
+            ".table-wrap[data-scrollable]:not(.reader-table)::before", template)
+        self.assertNotIn(
+            "class:'table-wrap',tabindex:'0',role:'region'", template)
 
     def test_template_recomputes_confidence_from_taipei_calendar_at_runtime(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -825,6 +893,12 @@ class ResearchCenterTest(unittest.TestCase):
             "function graphHashRoute(value)",
             "selectSurface('graph',false)",
             "else{state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}",
+            "if(guide)guide.hidden=!showEntryGuide()",
+            "button.dataset.testid==='article-'+state.selected",
+            "let catalogReturnPosition=null",
+            "catalogReturnPosition={windowTop:window.scrollY,catalogTop:",
+            "target.scrollIntoView({block:'center',behavior:'instant'})",
+            "target.focus({preventScroll:true})",
         ):
             self.assertIn(contract, template)
         self.assertNotIn(
@@ -1058,6 +1132,13 @@ class ResearchCenterTest(unittest.TestCase):
             "候選排名不是投資評分", "deepLink==='radar'",
             "candidate.readerQuestion", "candidate.readerNextStep",
             "candidate.readerTerms", "先用一句話理解", "關鍵詞白話解釋",
+            "candidate.groupIds", "candidate.readerGroupQuestions",
+            "function renderRadarGroups(",
+            "function openRadarGroup(", "function focusMaturityGroup(",
+            "先分清：每個族群在這題要回答什麼？", "從研究雷達定位",
+            "這個族群要回答", "不代表上下游順序",
+            ".radar-group-copy", ".maturity-origin-question",
+            "'data-radar-group-id':group.id", "state.maturityOrigin",
             "查看研究判定、原始文字與來源",
             "auditBadges,copy,track,foot", "研究方法與稽核資料（供查核）",
             "document.getElementById('surfaceRadar').addEventListener",
@@ -1076,6 +1157,8 @@ class ResearchCenterTest(unittest.TestCase):
             "function openGroupResearch(", "deepLink==='maturity'",
             "各族群研究完整度", "族群起點", "開始學這個族群",
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
+            "row.readerRole", "row.readerBoundary", "研究中心怎麼分",
+            "先別混淆：", ".maturity-group-guide",
             'id="maturityRouteCards"', "function renderMaturityLearningRoute(",
             "MATURITY.learningRoutes", "maturity-route-question",
             "從「'+graphLabel+'」開始", "族群重複出現＝同時參與不同系統問題",
@@ -1088,6 +1171,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, template)
         self.assertIn("body.article-open .tools{display:none}", template)
         self.assertIn('research_library["groupMaturity"] = build_group_maturity(', builder)
+        self.assertIn("load_research_group_guide(strict=True)", builder)
+        self.assertIn("group_guide=research_group_guide", builder)
         self.assertIn("def attach_group_learning_starts(", builder)
         self.assertIn('maturity["learningRoutes"] = route_guides', builder)
         self.assertIn('"question": "電力如何送進 AI 機櫃', builder)

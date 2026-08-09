@@ -1,5 +1,113 @@
 # Changelog
 
+## 族群矩陣白話角色與混淆邊界 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只替正式族群補上
+讀者導覽用的角色說明與混淆邊界，不修改 `groups.csv`、universe、文章主張、圖譜關係、
+公司曝險、財務歸因或投資判斷。
+
+- 原矩陣從「被動元件／封測／矽智財」等族群名稱直接跳到進階起讀文章；不熟產業的讀者在
+  閱讀文章前，無法先建立該族群負責哪一層工作、又不該和哪一個相鄰角色混為一談。
+- 新增 `config/research_group_guide.csv`，逐一覆蓋 `config/groups.csv` 的 11 個正式族群；每列
+  只保存一個白話角色與一個「先別混淆」邊界。建置器會拒絕缺族群、多餘族群、重複值、空句、
+  欄位錯誤或未以句號收尾，避免介面靜默退回不完整說明。
+- 族群矩陣先顯示「研究中心怎麼分」，再接既有研究雷達問句、起讀文章、完成度與下一步。
+  這份指南是讀者分類層，不會建立上下游順序、公司認證、受惠方向或新的研究證據。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 458 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `ae296bc8…`。
+
+## 研究雷達族群分工問句與矩陣脈絡延續 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只把候選已寫明的知識
+缺口、責任角色與驗證動作縮成讀者問句，不修改 rank、priority、selection log、evidence
+posture、文章主張、graph edge、公司曝險、財務歸因或投資判斷。
+
+- 原雷達已能把 8 張候選卡連到 18 個正式族群，但桌機與手機都只顯示族群名稱；新手無法從
+  「被動元件／電源供應／伺服器組裝」理解各自要處理零件抑制、子系統除錯或整櫃驗收哪一層
+  問題，進入矩陣後也只剩「從研究雷達定位」，原研究問題沒有跟著移動。
+- Active radar 新增必填 `reader_group_questions`：必須依 `group_ids` 順序逐一提供白話問句，
+  parser 擋缺項、錯序、重複族群與非問句。現行 8／8 候選共 18／18 條路由都有問句；卡片以
+  完整問題按鈕取代單字籤，並明示這是在拆分研究責任，不代表上下游順序、受惠或已證實公司
+  連結。
+- 點任一族群後，矩陣目標列保留「這個族群要回答」與同一問句，再接既有起讀文章、完成度、
+  缺口與下一步；返回原候選仍恢復同一卡片焦點。首題被動元件與末題散熱兩端流程都實際往返，
+  後者另以鍵盤聚焦確認按鈕可達；完整鍵盤啟動與螢幕閱讀器朗讀仍留待人工輔具驗收。
+- Python parser 與瀏覽器 DOM 兩條獨立路徑都重算出 8 張卡、8 個關聯區、18 個問句按鈕，0 個
+  缺問句、錯序、空問句或無問句可及名稱。320×844 下 18 個按鈕最小高 `70.594px`，按鈕、
+  卡片與全頁水平溢出皆為 0；390×844 與 1280×720 版面亦完成視覺檢查。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 457 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `1333caea…`。
+
+## 研究雷達連回正式族群與雙向定位 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只替候選雷達補上由
+既有候選責任範圍宣告的正式族群導覽，不修改 rank、priority、selection log、evidence posture、
+文章主張、graph edge、公司曝險、財務歸因或投資判斷。
+
+- 原雷達 8 張候選卡都能說明白話問題、名詞與下一個證據，但 8／8 都沒有顯示題目會使用哪些
+  正式族群資料；只有 2 張已升格卡另有文章／圖譜動作，6 張 watch／deferred 卡讀完後沒有可
+  繼續建立產業位置的讀者路由。
+- Active radar 新增必填 `group_ids`：每題只能宣告 1–4 個 `config/groups.csv` 既有族群，parser
+  擋未知、重複與超量值。現行 8 題共 18 個族群路由；每張卡正面以「這題會碰到哪些族群」顯示，
+  並明示這只是研究資料路由，不代表族群、公司或題材已被證實受惠。
+- 點族群會直接開啟族群矩陣並聚焦同一族群的起讀文章、已完成、最大缺口與下一步；目標列顯示
+  「從研究雷達定位」與「返回原候選」，返回後原候選卡取得焦點且標題讓開 sticky header。
+  兩個方向都使用可辨識的按鈕名稱，並保留鍵盤焦點與原候選脈絡。
+- 建置 JSON 獨立解析確認 8／8 候選都有路由、18 個值全屬正式族群，0 個缺值、未知值、重複值；
+  2 張已升格候選的宣告族群與對應文章完全一致。瀏覽器第二條路徑確認 8／8 張卡渲染 18 個按鈕；
+  320px 時按鈕最小高 44px，卡片與全頁水平溢出皆為 0，首題與末題都能往返矩陣並把焦點送回。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 457 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `c3cc2dd9…`。
+
+## 市場議題窄欄表格完整閱讀與返回定位 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只重排既有文章 table 的
+窄欄顯示與清單返回定位，不修改 Markdown、table 欄名／cell、研究主張、來源、graph edge、
+公司映射、財務歸因或投資判斷。
+
+- 390×844 代表文章的三欄功能表原本水平溢出 `248px`，首屏只見「電力鏈位置」與元件路徑，
+  最右側「成熟度邊界」必須橫向捲動才看得到；1280px 桌機 master-detail 的實際正文欄也只有
+  `365px`，所以單看 viewport 斷點仍會漏掉同一欄。
+- 市場議題一般正文表為每個 `th` 補上 `scope="col"`，每個 cell 的窄欄標籤逐字取自同欄表頭；
+  article section 容器不足 `620px` 時按 row 改排成卡片，365px master-detail 與 320／390px 手機
+  都直接看得到全部欄位。836px 專注閱讀自動回復原生 table；查核附錄不套卡片，只有實際溢出
+  時才加可聚焦 region 與水平捲動提示。
+- 建置 JSON 的獨立解析與瀏覽器逐篇渲染兩條路徑重算一致：35 篇市場議題中 25 篇共有 27 張
+  一般正文表、436 個 cell；0 個空表頭、0 個無表頭對位 cell。320×844 全文枚舉時 436／436
+  個 cell 都有原欄名，27／27 張表與 35／35 篇頁面水平溢出皆為 0，窄欄 wrapper 也沒有留下
+  多餘 `tabindex`／region。
+- 修正返回清單時沿用 `article-open` render 結果、使「第一次來」導覽維持 hidden 的狀態錯誤。
+  由清單開文會保存 window／catalog 捲動位置，返回後聚焦同一文章卡；由深連結或其他表面開文
+  則把對應卡捲入可視區後聚焦。兩條流程均實際驗收 hash 清除、導覽重現與焦點可見。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 457 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `cfa851fe…`。
+
+## 正文段落原字典詞直達 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只把同篇「名詞小字典」
+帶到實際使用術語的正文節，不修改 Markdown、研究摘要、主張、來源、graph edge、公司映射、
+財務歸因或投資判斷。
+
+- 390×844 代表流程顯示：第一個專業正文節直接進入含 SST、BBU、IBC、PSU、SiC／GaN 等詞的
+  表格；原字典已相隔多個螢幕，浮動「名詞速查」也未提示本節應先查哪些詞。
+- 一般正文節新增「本節先認得」：以確定性字串比對同節 heading、段落、清單、表頭與表格列，
+  只列同篇字典粗體詞名。詞鈕開啟既有原生 dialog 並預填完整詞名，解釋仍逐字取自同一份 list
+  runs；新手段落、研究摘要、研究查核附錄與零命中節不插入，不使用模型或相似度補詞。
+- 代表 800VDC 功能節命中 6 個詞；手機卡高 `188.5px`，6 個詞鈕皆為 `44px`，水平溢出為 0。
+  實際點擊 SST 後搜尋欄取得焦點、只顯示原字典 1／8 筆，直接指標點擊前後 window scroll 都是
+  `3401.5px`；關閉後焦點回到 SST 詞鈕。最高密度案例「分層不是替代排行榜」命中 9 個詞、卡高
+  `238.5px`，仍無溢出；1280×720 桌機代表卡高 `152.672px`。
+- 完整 registry 枚舉由建置 JSON 獨立解析與瀏覽器逐篇渲染兩條路徑重算一致：25 篇 route 主文章
+  中 24 篇共有 57 個命中節、246 個詞鈕；公司財務案例只有摘要與查核區，依契約不插入正文詞鈕。
+  246／246 個詞鈕都可回查同篇字典，0 個未知詞、0 個空卡、25／25 篇水平溢出為 0。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 456 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings），連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `faa91891…`。
+
 ## 學習路線全站地圖與文章定位 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只把既有學習路線、圖譜

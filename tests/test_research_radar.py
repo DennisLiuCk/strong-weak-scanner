@@ -131,6 +131,19 @@ class ResearchRadarTest(unittest.TestCase):
             terms = [item["term"] for item in row["readerTerms"]]
             self.assertEqual(len(terms), len(set(terms)), row["id"])
             self.assertTrue(all(item["explanation"] for item in row["readerTerms"]))
+            self.assertGreaterEqual(len(row["groupIds"]), 1, row["id"])
+            self.assertLessEqual(len(row["groupIds"]), 4, row["id"])
+            self.assertEqual(len(row["groupIds"]), len(set(row["groupIds"])), row["id"])
+            group_questions = row["readerGroupQuestions"]
+            self.assertEqual(
+                [item["groupId"] for item in group_questions],
+                row["groupIds"],
+                row["id"],
+            )
+            self.assertTrue(
+                all(item["question"].endswith(("？", "?")) for item in group_questions),
+                row["id"],
+            )
 
         errors = []
         self.assertEqual(
@@ -145,6 +158,43 @@ class ResearchRadarTest(unittest.TestCase):
             ],
         )
         self.assertEqual(errors, [])
+
+        errors = []
+        self.assertEqual(
+            research_radar._candidate_group_ids(
+                "passive,powersupply,serverodm", "candidate", errors,
+            ),
+            ["passive", "powersupply", "serverodm"],
+        )
+        self.assertEqual(errors, [])
+        invalid_errors = []
+        research_radar._candidate_group_ids(
+            "passive,not-a-formal-group", "candidate", invalid_errors,
+        )
+        self.assertTrue(any("不在正式族群" in error for error in invalid_errors))
+
+        question_errors = []
+        self.assertEqual(
+            research_radar._candidate_group_questions(
+                "passive => 零件要回答什麼？ | powersupply => 系統要回答什麼？",
+                ["passive", "powersupply"],
+                "candidate",
+                question_errors,
+            ),
+            [
+                {"groupId": "passive", "question": "零件要回答什麼？"},
+                {"groupId": "powersupply", "question": "系統要回答什麼？"},
+            ],
+        )
+        self.assertEqual(question_errors, [])
+        mismatched_errors = []
+        research_radar._candidate_group_questions(
+            "powersupply => 系統要回答什麼？ | passive => 零件要回答什麼？",
+            ["passive", "powersupply"],
+            "candidate",
+            mismatched_errors,
+        )
+        self.assertTrue(any("依 group_ids 順序" in error for error in mismatched_errors))
 
     def test_retired_schema2_radars_remain_accountable(self):
         stats = self.payload["historyStats"]

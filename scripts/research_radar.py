@@ -23,6 +23,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(SCRIPT_DIR)
 RADAR_DIR = os.path.join(ROOT, "notes", "research_candidates")
 SELECTION_LOG = os.path.join(RADAR_DIR, "selection_log.csv")
+GROUPS_CSV = os.path.join(ROOT, "config", "groups.csv")
 
 META_RE = re.compile(r"<!--\s*research_radar\b(.*?)-->", re.S | re.I)
 CANDIDATE_RE = re.compile(r"<!--\s*research_candidate\b(.*?)-->", re.S | re.I)
@@ -130,6 +131,66 @@ def _reader_terms(value: str, label: str, errors: list[str]) -> list[dict[str, s
         errors.append(f"{label} reader_terms 必須提供 2–4 個關鍵詞")
     if len({row["term"] for row in rows}) != len(rows):
         errors.append(f"{label} reader_terms 術語不可重複")
+    return rows
+
+
+def _candidate_group_ids(value: str, label: str, errors: list[str]) -> list[str]:
+    """Parse formal research-group routes without treating them as beneficiaries."""
+    if not value:
+        return []
+    rows = [item.strip() for item in (value or "").split(",") if item.strip()]
+    if value and not 1 <= len(rows) <= 4:
+        errors.append(f"{label} group_ids 必須提供 1–4 個正式族群")
+    if len(rows) != len(set(rows)):
+        errors.append(f"{label} group_ids 不可重複")
+    known: set[str] = set()
+    try:
+        with open(GROUPS_CSV, encoding="utf-8-sig", newline="") as handle:
+            known = {
+                row.get("group", "").strip()
+                for row in csv.DictReader(handle)
+                if row.get("group", "").strip()
+            }
+    except OSError as exc:
+        errors.append(f"{label} 無法讀取正式族群設定：{exc}")
+    unknown = [item for item in rows if known and item not in known]
+    if unknown:
+        errors.append(f"{label} group_ids 不在正式族群：{','.join(unknown)}")
+    return rows
+
+
+def _candidate_group_questions(
+    value: str,
+    group_ids: list[str],
+    label: str,
+    errors: list[str],
+) -> list[dict[str, str]]:
+    """Parse one novice-facing research question for every declared group route."""
+    rows: list[dict[str, str]] = []
+    for item in [part.strip() for part in (value or "").split("|") if part.strip()]:
+        if "=>" not in item:
+            errors.append(
+                f"{label} reader_group_questions 必須使用 group_id => 白話問句：{item}"
+            )
+            continue
+        group_id, question = [part.strip() for part in item.split("=>", 1)]
+        if not group_id or not question:
+            errors.append(
+                f"{label} reader_group_questions 族群與問句不可留空：{item}"
+            )
+            continue
+        if not question.endswith(("？", "?")):
+            errors.append(
+                f"{label} reader_group_questions 必須是問句：{group_id}"
+            )
+        rows.append({"groupId": group_id, "question": question})
+    ids = [row["groupId"] for row in rows]
+    if len(ids) != len(set(ids)):
+        errors.append(f"{label} reader_group_questions 族群不可重複")
+    if value and ids != group_ids:
+        errors.append(
+            f"{label} reader_group_questions 必須依 group_ids 順序逐一提供問句"
+        )
     return rows
 
 
@@ -281,11 +342,13 @@ def load_research_radar(
         "candidate_id", "rank", "title", "priority", "knowledge_value", "status",
         "evidence_posture", "why_now", "knowledge_gain", "first_rejection",
         "next_evidence", "next_check", "route", "article_topic_id", "graph_id", "sources",
-        "reader_question", "reader_terms", "reader_next_step",
+        "reader_question", "reader_terms", "reader_next_step", "group_ids",
+        "reader_group_questions",
     }
     candidate_required = candidate_allowed - {
         "article_topic_id", "graph_id",
-        "reader_question", "reader_terms", "reader_next_step",
+        "reader_question", "reader_terms", "reader_next_step", "group_ids",
+        "reader_group_questions",
     }
 
     for path in files:
@@ -329,7 +392,10 @@ def load_research_radar(
                 if not fields.get(key):
                     errors.append(f"{row_label} 缺少欄位：{key}")
             if meta.get("status") == "active":
-                for key in ("reader_question", "reader_terms", "reader_next_step"):
+                for key in (
+                    "reader_question", "reader_terms", "reader_next_step", "group_ids",
+                    "reader_group_questions",
+                ):
                     if not fields.get(key):
                         errors.append(f"{row_label} active radar 缺少讀者欄位：{key}")
                 question = fields.get("reader_question", "")
@@ -386,6 +452,10 @@ def load_research_radar(
 
             source_rows = _sources(fields.get("sources", ""), row_label, errors)
             reader_terms = _reader_terms(fields.get("reader_terms", ""), row_label, errors)
+            group_ids = _candidate_group_ids(fields.get("group_ids", ""), row_label, errors)
+            group_questions = _candidate_group_questions(
+                fields.get("reader_group_questions", ""), group_ids, row_label, errors,
+            )
             candidates.append({
                 "id": candidate_id,
                 "rank": rank,
@@ -402,6 +472,8 @@ def load_research_radar(
                 "readerQuestion": fields.get("reader_question", ""),
                 "readerTerms": reader_terms,
                 "readerNextStep": fields.get("reader_next_step", ""),
+                "groupIds": group_ids,
+                "readerGroupQuestions": group_questions,
                 "knowledgeGain": fields.get("knowledge_gain", ""),
                 "firstRejection": fields.get("first_rejection", ""),
                 "nextEvidence": fields.get("next_evidence", ""),

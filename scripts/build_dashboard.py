@@ -6,6 +6,7 @@ build_dashboard.py — 從 SQLite(daily_scores + daily_metrics)自動重生儀�
 並把同一份頁面凍結成 archive/<資料日>.html(as-seen 歷史快照,供日期選單回看)。
 零第三方依賴。用法:  python scripts/build_dashboard.py
 """
+import csv
 import datetime as dt
 import json, os, re, sqlite3, statistics, sys
 from collections import Counter, defaultdict
@@ -55,6 +56,8 @@ ARCHIVE = os.path.join(ROOT, "archive")
 NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 HYPOTHESES_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
 TOPICS_DIR = os.path.join(ROOT, "notes", "research_topics")
+GROUPS_CONFIG = os.path.join(ROOT, "config", "groups.csv")
+RESEARCH_GROUP_GUIDE = os.path.join(ROOT, "config", "research_group_guide.csv")
 # GitHub 原文仍保留作為來源檔與版本歷史入口；站內研究中心另外提供適合長文閱讀的 render。
 NOTE_REPO_BLOB = "https://github.com/DennisLiuCk/strong-weak-scanner/blob/main/"
 NOTE_LABEL = {
@@ -69,6 +72,63 @@ RECENT_ARTICLE_TYPES = (
     ("narrative", "多空小作文"),
     ("topic", "市場議題"),
 )
+
+
+def load_research_group_guide(strict=True):
+    """Load the reader-only group primer and require exact formal-group coverage."""
+    errors = []
+    try:
+        with open(GROUPS_CONFIG, encoding="utf-8", newline="") as handle:
+            formal_rows = list(csv.DictReader(handle))
+    except OSError as exc:
+        formal_rows = []
+        errors.append(f"無法讀取正式族群設定：{exc}")
+    formal_ids = [row.get("group", "").strip() for row in formal_rows]
+    formal_ids = [group_id for group_id in formal_ids if group_id]
+
+    guide = {}
+    try:
+        with open(RESEARCH_GROUP_GUIDE, encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            expected = ["group", "reader_role", "reader_boundary"]
+            if reader.fieldnames != expected:
+                errors.append(
+                    "research_group_guide.csv 欄位必須是 " + ",".join(expected)
+                )
+            for line_no, row in enumerate(reader, 2):
+                group_id = (row.get("group") or "").strip()
+                role = (row.get("reader_role") or "").strip()
+                boundary = (row.get("reader_boundary") or "").strip()
+                if not group_id:
+                    errors.append(f"research_group_guide.csv:{line_no} group 不可留空")
+                    continue
+                if group_id in guide:
+                    errors.append(f"research_group_guide.csv:{line_no} group 重複：{group_id}")
+                for key, value in (("reader_role", role), ("reader_boundary", boundary)):
+                    if not value:
+                        errors.append(
+                            f"research_group_guide.csv:{line_no} {key} 不可留空"
+                        )
+                    elif not value.endswith("。"):
+                        errors.append(
+                            f"research_group_guide.csv:{line_no} {key} 必須是完整句"
+                        )
+                guide[group_id] = {
+                    "readerRole": role,
+                    "readerBoundary": boundary,
+                }
+    except OSError as exc:
+        errors.append(f"無法讀取族群白話導覽：{exc}")
+
+    missing = [group_id for group_id in formal_ids if group_id not in guide]
+    extra = [group_id for group_id in guide if group_id not in set(formal_ids)]
+    if missing:
+        errors.append("族群白話導覽缺少正式族群：" + ",".join(missing))
+    if extra:
+        errors.append("族群白話導覽含未知族群：" + ",".join(extra))
+    if strict and errors:
+        raise ValueError("族群白話導覽契約失敗：\n- " + "\n- ".join(errors))
+    return guide
 RESEARCH_LEARNING_ROUTES = [
     {
         "id": "power-cooling", "label": "供電與散熱",
@@ -2735,7 +2795,8 @@ def attach_group_learning_starts(research_library):
 
 
 def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph,
-                         reviews, method_audit, as_of, candidate_radar=None):
+                         reviews, method_audit, as_of, candidate_radar=None,
+                         group_guide=None):
     """Build an orthogonal group-research matrix without collapsing it to a score.
 
     Coverage, named-company linkage, evidence state, commercial materiality and
@@ -2755,6 +2816,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     reviews = reviews or []
     method_audit = method_audit or {}
     candidate_radar = candidate_radar or {"candidates": []}
+    group_guide = group_guide or {}
 
     group_ids = list(group_names)
     for row in stock_meta.values():
@@ -2985,9 +3047,12 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             action, tone = "持續追蹤", "progress"
             reason = "公司覆蓋、交叉驗證與可直接辨識的財務影響都有可追溯證據"
 
+        reader_guide = group_guide.get(group_id) or {}
         rows.append({
             "id": group_id,
             "label": group_names.get(group_id, group_id),
+            "readerRole": reader_guide.get("readerRole", ""),
+            "readerBoundary": reader_guide.get("readerBoundary", ""),
             "universe": len(universe),
             "formalNotes": len(note_available[group_id]),
             "verifiedNotes": verified_notes,
@@ -3547,10 +3612,13 @@ def main():
     recent_articles = build_recent_articles(
         last, notes_map, hypotheses_map, events, research_topics, stock_names,
     )
+    research_group_guide = load_research_group_guide(strict=True)
     research_library = build_research_library(
         notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM, events,
         as_of=research_as_of,
     )
+    for group in research_library.get("groups", []):
+        group.update(research_group_guide.get(group.get("id"), {}))
     # 首頁不再自行解讀「研究總進度」；總數、分類數與最新批次都以研究中心 library
     # 為準，且同一時間窗有任何 article id 漏列都直接讓 build 失敗。
     recent_articles = attach_research_library_progress(recent_articles, research_library)
@@ -3590,6 +3658,7 @@ def main():
         research_library["knowledgeGraph"], research_reviews,
         research_library["methodAudit"], research_as_of,
         candidate_radar=research_library["candidateRadar"],
+        group_guide=research_group_guide,
     )
     attach_group_learning_starts(research_library)
 
