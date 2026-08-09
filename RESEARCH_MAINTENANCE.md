@@ -173,6 +173,9 @@ GitHub 的 `research-watch.yml` 會在台灣每週一 09:00，以及 `fetch-fina
   初始排名、第一拒絕與下一份證據未被改寫；未到期重選在 cutover 後是否留下新來源
   `early_trigger`。通過不代表選題有效；單輪 advance／promoted 比例不報命中率。
 - **可追溯性**：active claim 是否都有邊界、圖譜線是否能回查 exact claim／source。
+- **財務材料性 v2**：每筆 assessment 是否有期間、分子、分母、定義、exact source 與
+  歸因邊界；`company_total` 是否維持 `not_disclosed`，`bounded_proxy` 是否沒有被升為
+  題材財務貢獻。通過只代表口徑可稽核，不代表公司題材重要或投資有效。
 - **獨立交叉驗證**：每篇 active topic 的主命題是否至少有兩條獨立來源鏈；逐一處理 audit
   列出的 topic ID，不能用整體覆蓋率掩蓋單篇缺口，也不能把兩條來源當成真實性分數。
 - **可證偽性**：待驗證 claim 是否寫下一份證據，monitor 是否有 living watch source。

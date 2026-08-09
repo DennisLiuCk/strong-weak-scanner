@@ -29,7 +29,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
     def test_baseline_snapshot_matches_current_registry(self):
         self.assertRegex(self.latest["snapshotId"], r"^RMA-\d{4}-\d{2}-\d{2}-\d+$")
         self.assertEqual(self.latest["asOf"], self.current["asOf"])
-        self.assertEqual(self.latest["methodologyVersion"], "1.5")
+        self.assertEqual(self.latest["methodologyVersion"], "1.6")
         self.assertEqual(
             self.latest["registryFingerprint"], self.current["registryFingerprint"],
         )
@@ -82,6 +82,12 @@ class ResearchMethodAuditTest(unittest.TestCase):
         )
         self.assertNotIn("supportRate", self.current["calibration"])
         self.assertNotIn("score", self.current)
+        self.assertEqual(self.current["scope"]["financialAssessments"], 4)
+        self.assertEqual(self.current["graphs"]["financialAssessments"], 4)
+        self.assertEqual(self.current["graphs"]["financialContractComplete"], 4)
+        self.assertEqual(self.current["graphs"]["directFinancialAttribution"], 0)
+        self.assertEqual(self.current["graphs"]["boundedFinancialProxies"], 3)
+        self.assertEqual(self.current["graphs"]["financialDenominatorsNotDisclosed"], 1)
         selection = self.current["selection"]
         self.assertEqual(selection["cycleId"], self.radar["selectionCycleId"])
         self.assertEqual(selection["candidates"], len(self.radar["candidates"]))
@@ -112,11 +118,12 @@ class ResearchMethodAuditTest(unittest.TestCase):
             {
                 "selection_accountability", "traceability", "cross_check_depth", "falsifiability",
                 "freshness", "correction_learning", "scan_accountability",
-                "calibration",
+                "calibration", "financial_materiality_contract",
             },
         )
         self.assertEqual(gates["selection_accountability"]["status"], "pass")
         self.assertEqual(gates["cross_check_depth"]["status"], "pass")
+        self.assertEqual(gates["financial_materiality_contract"]["status"], "pass")
         self.assertEqual(gates["freshness"]["status"], "attention")
         self.assertEqual(gates["correction_learning"]["status"], "pass")
         self.assertEqual(gates["scan_accountability"]["status"], "pass")

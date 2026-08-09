@@ -1,5 +1,35 @@
 # Changelog
 
+## 財務材料性契約 v2 與散熱／電源試點 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只修正研究中心對
+「公司有財務數字」與「題材對公司可直接歸因」的語意，不把任何研究欄位接入量化評分。
+
+- 新增 `financial_materiality` contract v2：每筆 assessment 必須有穩定 ID、linked company
+  edge、期間、揭露值、同期間分母、單位、分子／分母定義、exact source refs、證據邊界、
+  複核時鐘與下一個升降級節點。歸因固定分為 `direct`、`bounded_proxy`、`not_disclosed`；
+  lint 會重算占比、檢查來源與 universe company，並阻止 `company_total`／代理值被升成
+  `materiality: financial`。只有 v2 direct 才能進入「題材財務可歸因」內圈。
+- 修正國巨舊 pilot 的語意：2026Q2 合併營收 444.56327 億元仍保留兩份官方來源與重算結果，
+  但它只能建立 `company_total／not_disclosed` 分母錨點，不能辨識 AI、MLCC、鉭質電容或
+  其他產品貢獻。因此目前 edge 由 financial 改回 adjacent；前一版 changelog 與方法快照保留
+  當時紀錄，不回溯改寫歷史。
+- 完成散熱試點：3017 奇鋐 2026Q1 散熱產品收入 311.91 億元／合併營收 490.38 億元＝
+  63.6%。公司未拆液冷／CDU，故正式裁決為 `product／bounded_proxy`，不是液冷收入占比。
+- 完成電源供應試點：2301 光寶科雲端及物聯網外部營收 229.03／434.07 億元＝52.8%，
+  2308 台達電電源及零組件 856.23／約 1,594 億元＝重算 53.72%、公司簡報四捨五入 54%；
+  兩者的事業部都含非 CDU／非 AI 電源產品，故均為 `segment／bounded_proxy`。
+- 11 族群、121 檔 universe 的 registry census 現為 4 筆 v2 assessment、3／11 族群已評估、
+  0／11 族群可直接歸因；其中 bounded proxy 3、題材分子未揭露 1。根因佇列因此由 10 件
+  財務 open task 改為 8 件 open task，另有 3 件「等待題材分母」watch 與 1 件政策 watch。
+  這是全 registry 計數，不是抽樣估計，沒有抽樣 SE，也不是題材或投資評分。
+- 方法稽核升為 v1.6，將 assessment 全欄納入 registry fingerprint，新增「財務材料性 v2」
+  gate；研究中心矩陣與圖譜關係詳情同步顯示 scope、分子、分母、占比、歸因狀態與邊界。
+- 預設環境 `Darwin arm64`、Python 3.11.11、UTF-8 執行 442 tests 全綠；knowledge graph、
+  radar、method audit、topic 與質化筆記 lint、inline JavaScript、`git diff --check` 及
+  `CLAUDE.md`／`AGENTS.md` 同步檢查均通過。研究中心另以 1280×720 與 375×812 實機瀏覽器
+  複核矩陣、行動佇列、圖譜收合及 v2 明細，兩個 viewport 皆無全頁溢出，console 0 errors。
+
 ## 研究成熟度根因行動佇列、證據補強與閱讀修正 — 2026-08-09
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只補研究證據、

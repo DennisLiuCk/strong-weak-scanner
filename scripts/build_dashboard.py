@@ -8,7 +8,7 @@ build_dashboard.py — 從 SQLite(daily_scores + daily_metrics)自動重生儀�
 """
 import datetime as dt
 import json, os, re, sqlite3, statistics, sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -2281,8 +2281,14 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     company_by_evidence = defaultdict(lambda: defaultdict(set))
     edge_counts = defaultdict(lambda: defaultdict(int))
     company_routes = defaultdict(list)
+    financial_assessment_ids = defaultdict(set)
+    financial_companies = defaultdict(set)
+    financial_by_attribution = defaultdict(Counter)
+    financial_by_scope = defaultdict(Counter)
+    financial_routes = defaultdict(list)
     for graph in knowledge_graph.get("graphs", []):
         nodes = {node.get("id"): node for node in graph.get("nodes", [])}
+        graph_edges = {edge.get("id"): edge for edge in graph.get("edges", [])}
         for edge in graph.get("edges", []):
             if edge.get("status") != "active" or edge.get("view") != "company":
                 continue
@@ -2313,6 +2319,42 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
                     "materiality": edge.get("materiality") or "unknown",
                     "evidenceState": edge.get("evidenceState") or "unverified",
                     "reviewDue": edge.get("reviewDue") or "",
+                })
+        for assessment in graph.get("financialAssessments", []):
+            if assessment.get("status") != "active":
+                continue
+            edge = graph_edges.get(assessment.get("edgeId")) or {}
+            for node_id in (edge.get("from"), edge.get("to")):
+                node = nodes.get(node_id) or {}
+                if node.get("type") != "company" or not node.get("universe"):
+                    continue
+                stock_id = node.get("ticker") or node.get("id", "").split(":")[-1]
+                group_id = (node.get("groupId")
+                            or (stock_meta.get(stock_id) or {}).get("group"))
+                if not group_id:
+                    continue
+                assessment_id = assessment.get("id") or ""
+                if assessment_id in financial_assessment_ids[group_id]:
+                    continue
+                financial_assessment_ids[group_id].add(assessment_id)
+                financial_companies[group_id].add(stock_id)
+                financial_by_attribution[group_id][
+                    assessment.get("attributionStatus") or "not_disclosed"
+                ] += 1
+                financial_by_scope[group_id][
+                    assessment.get("financialScope") or "company_total"
+                ] += 1
+                financial_routes[group_id].append({
+                    "assessmentId": assessment_id,
+                    "stockId": stock_id,
+                    "graphId": graph.get("id") or "",
+                    "edgeId": edge.get("id") or "",
+                    "articleIds": list(edge.get("articleIds") or []),
+                    "attributionStatus": assessment.get("attributionStatus") or "",
+                    "financialScope": assessment.get("financialScope") or "",
+                    "reviewDue": assessment.get("reviewDue") or "",
+                    "boundary": assessment.get("boundary") or "",
+                    "nextTrigger": assessment.get("nextTrigger") or "",
                 })
 
     reviewed_stale_ids = set()
@@ -2367,6 +2409,18 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             key: len(company_by_evidence[group_id][key])
             for key in ("verified", "inference", "unverified")
         }
+        financial = {
+            "assessments": len(financial_assessment_ids[group_id]),
+            "companies": len(financial_companies[group_id]),
+            "attribution": {
+                key: financial_by_attribution[group_id][key]
+                for key in ("direct", "bounded_proxy", "not_disclosed")
+            },
+            "scopes": {
+                key: financial_by_scope[group_id][key]
+                for key in ("company_total", "segment", "product", "unit_economics")
+            },
+        }
         deepest = (
             "financial" if materiality["financial"]
             else "named_product" if materiality["named_product"]
@@ -2388,12 +2442,17 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
         elif source_gaps:
             action, tone = "補第二條來源鏈", "warning"
             reason = f"有 {source_gaps} 篇主命題仍只有一個獨立來源群組"
-        elif materiality["financial"] == 0:
-            action, tone = "補財務材料性", "warning"
-            reason = "現有橋接尚未到具名收入、毛利或現金流"
+        elif financial["attribution"]["direct"] == 0 and financial["assessments"]:
+            action, tone = "等待題材分母", "progress"
+            reason = (
+                f"已完成 {financial['assessments']} 筆 v2 評估，但目前只有有界代理或題材分子未揭露"
+            )
+        elif financial["attribution"]["direct"] == 0:
+            action, tone = "補財務材料性 v2", "warning"
+            reason = "現有橋接尚未建立期間、分子、分母與歸因狀態"
         else:
             action, tone = "維持監控", "progress"
-            reason = "公司覆蓋、交叉驗證與財務材料性均已有可追溯節點"
+            reason = "公司覆蓋、交叉驗證與可直接歸因的財務材料性均已有可追溯節點"
 
         rows.append({
             "id": group_id,
@@ -2405,6 +2464,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "companyBridges": bridge_count,
             "materiality": materiality,
             "deepestMateriality": deepest,
+            "financialMateriality": financial,
             "evidence": evidence,
             "activeCompanyEdges": len(edge_counts[group_id]),
             "staleTopics": len(stale_topics),
@@ -2584,12 +2644,51 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
         })
 
     # Once a bridge exists, push the same named company/product to a verifiable financial
-    # denominator.  This is one root task per group, not one task per repeated graph edge.
+    # denominator.  A completed bounded/not-disclosed assessment becomes a watch rather
+    # than remaining an open research task; only direct attribution closes the gap.
     materiality_rank = {"financial": 3, "named_product": 2, "adjacent": 1, "unknown": 0}
     evidence_rank = {"verified": 2, "inference": 1, "unverified": 0}
     for row in rows:
         group_id = row["id"]
-        if not row["companyBridges"] or row["materiality"]["financial"]:
+        financial = row["financialMateriality"]
+        if not row["companyBridges"] or financial["attribution"]["direct"]:
+            continue
+        assessed_routes = sorted(financial_routes[group_id], key=lambda route: (
+            {"direct": 0, "bounded_proxy": 1, "not_disclosed": 2}.get(
+                route["attributionStatus"], 9),
+            route["reviewDue"] or "9999-12-31", route["stockId"], route["assessmentId"],
+        ))
+        if assessed_routes:
+            route = assessed_routes[0]
+            stock_ids = sorted(financial_companies[group_id])
+            attribution = financial["attribution"]
+            scopes = financial["scopes"]
+            scope_text = "、".join(
+                f"{key} {value}"
+                for key, value in scopes.items() if value
+            )
+            add_action({
+                "id": f"financial-watch:{group_id}",
+                "category": "financial_materiality_watch",
+                "categoryLabel": "財務材料性 v2",
+                "priorityRank": 4,
+                "priorityLabel": "WATCH",
+                "title": f"{row['label']}已完成 v2 評估，等待可歸因題材分母",
+                "affectedGroups": group_payload([group_id]),
+                "companyIds": stock_ids,
+                "articleId": (route.get("articleIds") or [""])[0],
+                "graphId": route.get("graphId", ""),
+                "boundary": (
+                    f"全數盤點已有 {financial['assessments']} 筆 assessment（{scope_text or '—'}）；"
+                    f"direct {attribution['direct']}、bounded_proxy {attribution['bounded_proxy']}、"
+                    f"not_disclosed {attribution['not_disclosed']}。代理值不能改寫為題材收入。"
+                ),
+                "nextEvidence": route.get("nextTrigger") or "取得同期間、同合併分母的題材收入或毛利揭露。",
+                "nextCheck": route.get("reviewDue", ""),
+                "status": "watch",
+                "statusLabel": "等待題材分母",
+                "tone": "progress",
+            })
             continue
         routes = sorted(company_routes[group_id], key=lambda route: (
             -materiality_rank.get(route["materiality"], -1),
@@ -2605,10 +2704,10 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
         add_action({
             "id": f"financial:{group_id}",
             "category": "financial_materiality",
-            "categoryLabel": "財務材料性",
+            "categoryLabel": "財務材料性 v2",
             "priorityRank": 3,
             "priorityLabel": "P2",
-            "title": f"把{row['label']}的具名橋接推進到財務可辨識",
+            "title": f"為{row['label']}建立可稽核的財務分子／分母",
             "affectedGroups": group_payload([group_id]),
             "companyIds": stock_ids,
             "articleId": (route.get("articleIds") or [""])[0],
@@ -2617,8 +2716,8 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
                 bridge_candidate_ids.get(group_id, "")
                 if bridge_candidate_ids.get(group_id, "") in candidates else ""
             ),
-            "boundary": f"目前具名公司為{'、'.join(names) or '—'}，最深只到 {row['deepestMateriality']}；尚未建立 verified／financial edge。",
-            "nextEvidence": "取得同一具名產品或角色的收入、毛利、現金流，或可重算的出貨量×單價分母；由 verified claim 建立 financial edge，不能以公司總營收代替產品貢獻。",
+            "boundary": f"目前具名公司為{'、'.join(names) or '—'}，最深只到 {row['deepestMateriality']}；尚未建立含期間、口徑、分子、分母與歸因狀態的 v2 assessment。",
+            "nextEvidence": "先建立公司總額分母；再取得同一具名產品或角色的收入、毛利、現金流，或可重算的出貨量×單價。公司總額只能標 not_disclosed，不能升成題材 financial edge。",
             "nextCheck": route.get("reviewDue", ""),
             "tone": "warning",
         })
@@ -2666,7 +2765,16 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "groupsWithoutTopics": sum(row["topics"] == 0 for row in rows),
             "groupsWithoutCompanyBridge": sum(row["companyBridges"] == 0 for row in rows),
             "groupsWithFinancialMateriality": sum(
-                row["materiality"]["financial"] > 0 for row in rows
+                row["financialMateriality"]["attribution"]["direct"] > 0 for row in rows
+            ),
+            "groupsWithFinancialAssessment": sum(
+                row["financialMateriality"]["assessments"] > 0 for row in rows
+            ),
+            "groupsWithDirectFinancialAttribution": sum(
+                row["financialMateriality"]["attribution"]["direct"] > 0 for row in rows
+            ),
+            "financialAssessments": sum(
+                row["financialMateriality"]["assessments"] for row in rows
             ),
             "dueMonitors": len(unique_due_pairs),
             "staleTopics": len(all_stale_ids),
@@ -2675,6 +2783,10 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "unroutedTopics": len(unrouted_topics),
             "rootActions": len(actions),
             "openActions": sum(item["status"] == "open" for item in actions),
+            "watchActions": sum(item["status"] == "watch" for item in actions),
+            "financialAssessmentWatches": sum(
+                item["category"] == "financial_materiality_watch" for item in actions
+            ),
             "policyWatchTopics": sum(item["category"] == "policy_watch" for item in actions),
         },
         "rows": rows,
@@ -2683,11 +2795,24 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "unknown": "未建立具名公司橋接",
             "adjacent": "相鄰／搜尋路由",
             "named_product": "具名產品或角色",
-            "financial": "財務可辨識",
+            "financial": "題材財務可直接歸因",
+        },
+        "financialScopeLabels": {
+            "company_total": "公司總額",
+            "segment": "事業部",
+            "product": "產品類別",
+            "unit_economics": "單位經濟",
+        },
+        "financialAttributionLabels": {
+            "direct": "可直接歸因",
+            "bounded_proxy": "有界代理",
+            "not_disclosed": "題材分子未揭露",
         },
         "boundary": (
             "這是 11 族群、121 檔 universe 與目前研究 registry 的全數盤點，不是抽樣；"
-            "公司筆記篇數、題材篇數、圖譜邊、商業材料性與時效是不同軸，刻意不合成分數。"
+            "公司筆記篇數、題材篇數、圖譜邊、商業材料性、財務分子／分母與時效是不同軸，刻意不合成分數。"
+            "財務材料性 v2 把公司總額、事業部、產品與單位經濟分開；bounded_proxy／not_disclosed "
+            "代表已完成評估但尚不能把代理值改寫成題材收入。"
             "行動佇列按根因去重：同一 topic 即使映射多個族群也只算一件；"
             "圖譜只計可追溯的 curated edges，0 代表研究中心尚未建立證據邊，不代表產業關係不存在。"
         ),

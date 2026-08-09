@@ -383,10 +383,10 @@ source ID，重新設定 `last_reviewed_at` 與 `review_due`，並完整保留�
 
 - `evidence_state`：證實／推論／待驗證，決定實線、虛線或點線；不得強於引用 claim。
 - `commercial_stage`：概念、樣品、資格、平台列名、生產、出貨、部署、財務認列等成熟度。
-- `materiality`：未知、相鄰搜尋路由、具名產品角色、可辨識財務貢獻。圖上以同心環距離
+- `materiality`：未知、相鄰搜尋路由、具名產品角色、題材財務可直接歸因。圖上以同心環距離
   （越靠近中心代表目前證據支持的材料性越高）、節點標籤與分組清單三重呈現；線寬只作
-  輔助提示，不承擔唯一判讀，也不得與證據強弱混為一談。空的財務內圈表示目前篩選結果
-  尚無可辨識財務貢獻，不表示不存在商業關係。
+  輔助提示，不承擔唯一判讀，也不得與證據強弱混為一談。只有下述 v2 `direct` assessment
+  能進入財務內圈；空圈不表示不存在商業關係或公司財務曝險。
 - `exclusivity`：未知、多路徑、少數來源、具證據的獨家。非 unknown 必須明示適用範圍；
   `unverified` 不得宣稱集中度或獨家。
 
@@ -395,6 +395,37 @@ source ID，重新設定 `last_reviewed_at` 與 `review_due`，並完整保留�
 verified 改成 refuted；其上游 topic 可信度仍按第五節規則自動降級。點選關係時，研究中心
 必須能回到原文章、claim 與一手來源。
 
+### 財務材料性契約 v2：公司分母不等於題材分子
+
+`financial_materiality` block 與 edge 分開保存。edge 回答「公司與題材為何相連」；v2 block
+回答「已揭露的財務範圍有多大、能否歸因到這個題材」。每筆都必須保存：
+
+- 穩定的 `assessment_id` 與 linked `edge_id`。
+- `financial_scope`：`company_total`、`segment`、`product`、`unit_economics`。
+- `metric`、`reported_value`、`unit`、`value_kind`，以及期間起訖與 `period_basis`。
+- `denominator_metric`、`denominator_value`、`denominator_unit`；可比占比另存
+  `share_percent`。`derived` 值必須附可重算 `calculation`。
+- `metric_definition` 與 `denominator_definition`，明示會計科目、合併範圍、產品／事業部範圍。
+- exact `source_refs`、`as_of`、`review_due`、`boundary` 與 `next_trigger`。
+
+歸因狀態只有三種，不能用文字模糊帶過：
+
+1. `not_disclosed`：只取得公司總額分母，題材分子未揭露。必須使用 `company_total`，不得填
+   題材占比；公司總營收不能改寫成 AI、產品或族群收入。
+2. `bounded_proxy`：取得較窄的事業部或產品值及同期間分母，但該範圍仍比題材寬。必須填可
+   重算占比與明確 boundary；它表示評估已完成、等待更窄揭露，不是 direct 的較低分版本。
+3. `direct`：同一期間與分母已能直接辨識題材收入、毛利、現金流或可重算的單位經濟貢獻。
+   只有 `direct` 能連到 `verified／financial stage／materiality: financial` edge。
+
+lint 會重算 `reported_value ÷ denominator_value`（容許公司百分比四捨五入 0.5 個百分點）、
+檢查 source ref 必須已由 linked edge 解析、assessment 必須連到 universe company，並阻止
+`company_total` 或 `bounded_proxy` 升格成題材財務內圈。若公司沒有產品級揭露，正式結果就是
+`not_disclosed` 或 `bounded_proxy`；不得以同業推估、市場 TAM 或公司總額補洞。
+
+族群成熟度矩陣把「已做 v2 評估」與「題材可直接歸因」拆成兩個欄位。未評估族群保留一件
+根因去重的 open task；已完成 `bounded_proxy／not_disclosed` 的族群轉為「等待題材分母」
+watch；只有 `direct` 才關閉財務歸因缺口。這些都是 registry census，不是投資分數或抽樣估計。
+
 節點 registry 分三層：`config/knowledge_concepts.csv` 保存專有名詞與製程節點，
 `config/external_entities.csv` 保存不在 universe 的公司／組織，台股公司與正式族群則直接由
 `config/universe.csv`、`config/groups.csv` 注入。顯示關係保存在
@@ -402,7 +433,7 @@ verified 改成 refuted；其上游 topic 可信度仍按第五節規則自動�
 root 的一跳關係，先把證據品質與可讀性做穩，再考慮多跳探索。
 
 發布前執行 `python scripts/knowledge_graph.py --lint`。lint 會檢查 endpoint、值域、雙視圖、
-一跳限制、來源引用、證據不可升格、財務 materiality 與 exclusivity 邊界；它不重新下載來源，
+一跳限制、來源引用、證據不可升格、財務材料性 v2 與 exclusivity 邊界；它不重新下載來源，
 也不替代內容 reviewer。
 
 ## 八、修正採追加保存
@@ -473,7 +504,7 @@ published date 必須 `<=` 該 claim 的 `as_of`。這個例外只開放「事�
   第一拒絕與下一份證據和研究後 route 分開，使日後能檢查 selection drift 與事後重排。
 - `scripts/research_method_audit.py`：驗證 snapshot fingerprint、review 引用與歷史不可改寫，
   並在研究雷達顯示選題前承諾、可追溯、獨立交叉驗證、可證偽、新鮮度、修正學習、
-  掃描覆蓋問責與校準可用性八道
+  掃描覆蓋問責、財務材料性 v2 與校準可用性九道
   gate。獨立交叉驗證會直接列出仍缺第二條消息鏈的 topic ID，避免缺口被總體比例掩蓋；
   兩條來源鏈只代表降低單一來源偏誤，不代表多數決或主張已被證真。
 
@@ -513,18 +544,20 @@ counts 與 `not_ready`，不補零、不把未到期主張算成功。
 3. `verified` 是否只重述來源直接支持的精確措辭。
 4. 是否主動找過競爭者、替代方案、政策附件或財務附註等反方來源。
 5. 跨公司數字是否逐 observation 記錄期間、單位、定義及可比性。
-6. 每個 monitor 是否分開記錄基線 `source_ids` 與未來 `watch_source_ids`，且 active watch
+6. 財務 assessment 是否明列 scope、期間、分子、分母、定義、exact source、歸因狀態與
+   boundary；公司總額與有界代理是否仍被擋在題材財務內圈之外。
+7. 每個 monitor 是否分開記錄基線 `source_ids` 與未來 `watch_source_ids`，且 active watch
    至少包含一個 living index，並具備頻率、日期、trigger 與 invalidation。
-7. `review_due` 是否等於最早 monitor 日期，且晚於 `last_reviewed_at`。
-8. impact 是否仍清楚寫 evidence boundary，沒有把 topic 升格為公司事實。
-9. Active radar 是否先有同 cycle 的 selection log，且初始 rank、第一拒絕與下一份證據沒有
+8. `review_due` 是否等於最早 monitor 日期，且晚於 `last_reviewed_at`。
+9. impact 是否仍清楚寫 evidence boundary，沒有把 topic 升格為公司事實。
+10. Active radar 是否先有同 cycle 的 selection log，且初始 rank、第一拒絕與下一份證據沒有
    因深研結果回寫；所有 retired schema 2 radar 是否仍可逐輪核對；未到期重選是否留下新的
    `early_trigger`；執行 `python scripts/research_radar.py --lint`。
-10. 執行 `python scripts/research_queue.py --lint` 與 `python scripts/knowledge_graph.py --lint`；
+11. 執行 `python scripts/research_queue.py --lint` 與 `python scripts/knowledge_graph.py --lint`；
    lint 只驗結構與引用完整性，不會重新下載或證明來源內容為真。
-11. 執行 `python scripts/research_method_audit.py --lint --baseline-ref HEAD`，確認 registry
+12. 執行 `python scripts/research_method_audit.py --lint --baseline-ref HEAD`，確認 registry
     有新快照、舊快照未被改寫，review 與 selection ledger 也只追加新列。
-12. **執行 `python -m unittest discover -s tests -q`——四個 lint 全過不等於測試會過。**
+13. **執行 `python -m unittest discover -s tests -q`——四個 lint 全過不等於測試會過。**
     lint 驗的是當前 register 的結構與引用，測試另外綁了幾個必須隨每輪發佈同步的常數；
     只跑 lint 就推，CI 會在 push 之後才轉紅。已知需要每輪確認的有：
     - `tests/test_research_method_audit.py` 的 `as_of`：必須 `>=` 本輪新 topic 的
@@ -537,7 +570,7 @@ counts 與 `not_ready`，不補零、不把未到期主張算成功。
       supersede 假造了一次修正，應視為警訊而不是要更新的數字。
     測試若因「本輪候選張數不同」而紅，正確做法是把寫死的張數改成與凍結帳本對應的
     不變式，不是每輪改一個數字。
-13. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜證據面板與 deep link 的桌機／
+14. 重建研究中心並檢查 ledger、比較表、可信度、知識圖譜財務 v2 面板與 deep link 的桌機／
     行動版顯示。完整 ledger／impact／monitor 控制表放在機制與研究判定之後，且同一
     帳本標題不得重複。
 

@@ -346,6 +346,58 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(source_actions[0]["id"], rows["power"]["actionIds"])
         self.assertIn(source_actions[0]["id"], rows["material"]["actionIds"])
 
+    def test_group_maturity_v2_turns_bounded_proxy_into_watch_not_direct_attribution(self):
+        topics = copy.deepcopy(self.topics)
+        topics[0]["monitoring"] = []
+        graph = {"graphs": [{
+            "id": "test-graph",
+            "nodes": [
+                {"id": "company:1111", "type": "company", "universe": True,
+                 "ticker": "1111", "groupId": "power"},
+                {"id": "concept:test", "type": "concept", "universe": False},
+            ],
+            "edges": [{
+                "id": "E1", "status": "active", "view": "company",
+                "from": "company:1111", "to": "concept:test",
+                "materiality": "named_product", "evidenceState": "verified",
+                "articleIds": ["topic-MI-2026-07-29-TEST"], "reviewDue": "2026-08-31",
+            }],
+            "financialAssessments": [{
+                "id": "FM1", "edgeId": "E1", "status": "active",
+                "financialScope": "segment", "attributionStatus": "bounded_proxy",
+                "reviewDue": "2026-08-31", "boundary": "部門大於題材",
+                "nextTrigger": "等待題材收入分母",
+            }],
+        }]}
+        maturity = bd.build_group_maturity(
+            self.notes, topics, self.stock_meta, {"power": "功率元件"},
+            graph, [], {"sources": {"thesesNeedingSecondIndependentGroup": []}},
+            "2026-08-06",
+        )
+        row = maturity["rows"][0]
+        self.assertEqual(row["financialMateriality"]["assessments"], 1)
+        self.assertEqual(row["financialMateriality"]["attribution"]["bounded_proxy"], 1)
+        self.assertEqual(row["financialMateriality"]["attribution"]["direct"], 0)
+        self.assertEqual(row["action"], "等待題材分母")
+        self.assertEqual(maturity["summary"]["groupsWithFinancialAssessment"], 1)
+        self.assertEqual(maturity["summary"]["groupsWithDirectFinancialAttribution"], 0)
+        self.assertEqual(maturity["summary"]["openActions"], 0)
+        self.assertEqual(maturity["summary"]["watchActions"], 1)
+        action = maturity["actionQueue"][0]
+        self.assertEqual(action["id"], "financial-watch:power")
+        self.assertEqual(action["status"], "watch")
+        self.assertIn("代理值不能改寫為題材收入", action["boundary"])
+
+        graph["graphs"][0]["financialAssessments"] = []
+        maturity = bd.build_group_maturity(
+            self.notes, topics, self.stock_meta, {"power": "功率元件"},
+            graph, [], {"sources": {"thesesNeedingSecondIndependentGroup": []}},
+            "2026-08-06",
+        )
+        self.assertEqual(maturity["rows"][0]["action"], "補財務材料性 v2")
+        self.assertEqual(maturity["summary"]["openActions"], 1)
+        self.assertEqual(maturity["actionQueue"][0]["id"], "financial:power")
+
     def test_inline_research_json_cannot_close_script(self):
         value = {"claim": "</script><script>alert(1)</script>", "amp": "A&B"}
         encoded = bd._inline_script_json(value)
@@ -529,7 +581,8 @@ class ResearchCenterTest(unittest.TestCase):
             "graphMaterialityWidth", "stroke-dasharray",
             "證據邊界", "下一個升降級節點", "供應集中度範圍",
             "同心環距離＋節點標籤＝商業曝險層級",
-            "節點離中心越近", "空的「財務可辨識」內圈",
+            "節點離中心越近", "只有 v2 direct assessment 能進入",
+            "function graphFinancialPanel(", "題材占比未揭露", "分子／揭露值定義",
             "role:'button',tabindex:'0'", "graphKeyboard(",
         ):
             self.assertIn(contract, template)
@@ -565,6 +618,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function openGroupResearch(", "deepLink==='maturity'",
             "已完成回查、證據仍逾期", "根因去重", "不做總分或名次",
             "可水平捲動的族群研究成熟度矩陣",
+            "財務材料性 v2", "題材財務可直接歸因", "等待題材分母",
         ):
             self.assertIn(contract, template)
         self.assertIn("body.article-open .tools{display:none}", template)

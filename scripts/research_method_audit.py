@@ -203,6 +203,18 @@ def _registry_fingerprint(
          [ref_value(ref) for ref in edge.get("noteRefs", [])]]
         for item in graph.get("graphs", []) for edge in item.get("edges", [])
     )
+    financial_assessment_rows = sorted(
+        [item.get("id"), item.get("edgeId"), item.get("status"),
+         item.get("financialScope"), item.get("metric"), item.get("valueKind"),
+         item.get("reportedValue"), item.get("unit"), item.get("periodStart"),
+         item.get("periodEnd"), item.get("periodBasis"), item.get("denominatorMetric"),
+         item.get("denominatorValue"), item.get("denominatorUnit"),
+         item.get("sharePercent"), item.get("attributionStatus"), item.get("sourceRefs"),
+         item.get("asOf"), item.get("reviewDue"), item.get("metricDefinition"),
+         item.get("denominatorDefinition"), item.get("boundary"), item.get("nextTrigger")]
+        for graph_item in graph.get("graphs", [])
+        for item in graph_item.get("financialAssessments", [])
+    )
     radar_rows = [
         [item.get("id"), item.get("cycleId"), item.get("status"),
          row.get("id"), row.get("rank"), row.get("status"),
@@ -229,6 +241,7 @@ def _registry_fingerprint(
     payload = {
         "topics": topic_rows,
         "edges": edge_rows,
+        "financialAssessments": financial_assessment_rows,
         "radar": radar_rows,
         "selectionLog": selection_rows,
         "reviews": reviews,
@@ -286,6 +299,12 @@ def compute_method_audit(
     graph_edges = [
         edge for item in graph.get("graphs", []) for edge in item.get("edges", [])
         if edge.get("status") == "active"
+    ]
+    financial_assessments = [
+        assessment
+        for item in graph.get("graphs", [])
+        for assessment in item.get("financialAssessments", [])
+        if assessment.get("status") == "active"
     ]
     date_text = as_of.isoformat()
     mature_monitors = [
@@ -354,6 +373,27 @@ def compute_method_audit(
     theses_needing_second_group.sort()
 
     graph_traceable = sum(bool(edge.get("claimRefs") or edge.get("noteRefs")) for edge in graph_edges)
+    direct_financial = [
+        item for item in financial_assessments
+        if item.get("attributionStatus") == "direct"
+    ]
+    bounded_financial = [
+        item for item in financial_assessments
+        if item.get("attributionStatus") == "bounded_proxy"
+    ]
+    undisclosed_financial = [
+        item for item in financial_assessments
+        if item.get("attributionStatus") == "not_disclosed"
+    ]
+    financial_contract_complete = sum(
+        item.get("contractVersion") == 2
+        and bool(item.get("sourceRefs"))
+        and bool(item.get("metricDefinition"))
+        and bool(item.get("denominatorDefinition"))
+        and bool(item.get("boundary"))
+        and bool(item.get("nextTrigger"))
+        for item in financial_assessments
+    )
     stale_edges = sum(
         _valid_date(edge.get("reviewDue")) and edge["reviewDue"] < date_text
         for edge in graph_edges
@@ -403,6 +443,11 @@ def compute_method_audit(
     )
 
     trace_ok = graph_traceable == len(graph_edges) and boundary_complete == len(active_claims)
+    financial_contract_ok = (
+        financial_contract_complete == len(financial_assessments)
+        and sum(edge.get("materiality") == "financial" for edge in graph_edges)
+        == len({item.get("edgeId") for item in direct_financial})
+    )
     cross_check_ok = not theses_needing_second_group
     falsifiable_ok = (
         all(sum(item.get("status") == "active" for item in topic.get("monitoring", [])) >= 2
@@ -429,7 +474,7 @@ def compute_method_audit(
     core = {
         "schemaVersion": 1,
         "asOf": date_text,
-        "methodologyVersion": "1.5",
+        "methodologyVersion": "1.6",
         "registryFingerprint": _registry_fingerprint(topics, graph, radar, reviews, scan),
         "scope": {
             "topics": len(topics),
@@ -439,6 +484,7 @@ def compute_method_audit(
             "radarCycles": schema2_cycles,
             "radarHistoryCandidates": history_stats.get("candidates", 0),
             "graphs": graph.get("stats", {}).get("graphs", 0),
+            "financialAssessments": len(financial_assessments),
             "scanEvents": len(scan_rows),
         },
         "selection": {
@@ -517,6 +563,11 @@ def compute_method_audit(
             "inference": sum(edge.get("evidenceState") == "inference" for edge in graph_edges),
             "unverified": sum(edge.get("evidenceState") == "unverified" for edge in graph_edges),
             "financialMateriality": sum(edge.get("materiality") == "financial" for edge in graph_edges),
+            "financialAssessments": len(financial_assessments),
+            "financialContractComplete": financial_contract_complete,
+            "directFinancialAttribution": len(direct_financial),
+            "boundedFinancialProxies": len(bounded_financial),
+            "financialDenominatorsNotDisclosed": len(undisclosed_financial),
         },
         "gates": [
             {
@@ -537,6 +588,16 @@ def compute_method_audit(
                 "status": "pass" if trace_ok else "attention",
                 "observed": f"{graph_traceable}/{len(graph_edges)} 條圖譜線可回查；{boundary_complete}/{len(active_claims)} 個 active claim 有邊界",
                 "boundary": "通過代表引用完整，不代表主張一定為真。",
+            },
+            {
+                "id": "financial_materiality_contract", "label": "財務材料性 v2",
+                "status": "pass" if financial_contract_ok else "attention",
+                "observed": (
+                    f"{financial_contract_complete}/{len(financial_assessments)} 筆 assessment 有完整分子、分母、"
+                    f"期間、來源與邊界；direct {len(direct_financial)}、"
+                    f"bounded_proxy {len(bounded_financial)}、not_disclosed {len(undisclosed_financial)}"
+                ),
+                "boundary": "通過只代表財務口徑與歸因狀態可稽核；bounded_proxy 與 not_disclosed 不得被解讀成題材收入，direct 也不等於投資報酬或因果效果。",
             },
             {
                 "id": "cross_check_depth", "label": "獨立交叉驗證",
@@ -590,6 +651,7 @@ def compute_method_audit(
             "Partial scan 不等於全 universe 或全市場覆蓋；研究漏網風險必須持續顯示。",
             "Scan overdue 目前只量最新全域 cadence；尚無 scope lineage 前，不把歷史期限累加成永久逾期。",
             "Monitor outcome 只描述新證據方向；在 outcome schema 能分辨主命題效應前，不計算 support rate。",
+            "財務材料性 v2 的 company_total 只是分母錨點；bounded_proxy 與 not_disclosed 都不能升級成題材財務貢獻。",
         ],
     }
     return core

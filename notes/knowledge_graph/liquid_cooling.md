@@ -20,7 +20,7 @@ from_id: company:3017
 to_id: concept:liquid-cooling
 relation: platform_lists
 claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C7
-note_refs:
+note_refs: 3017#S1
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: named_product
@@ -33,6 +33,34 @@ boundary: AVC 與 3017 的實體映射、CDU 型號、1.2MW 與 Sample Ready 只
 next_trigger: 3017 將具名 CDU 型號連到客戶驗收、量產數量、收入占比與毛利。
 -->
 
+<!-- financial_materiality
+contract_version: 2
+assessment_id: FM-LC-3017-01
+edge_id: KG-LC-C01
+financial_scope: product
+metric: thermal_products_revenue
+value_kind: reported
+reported_value: 311.91
+unit: TWD_100m
+period_start: 2026-01-01
+period_end: 2026-03-31
+period_basis: quarter
+denominator_metric: consolidated_revenue
+denominator_value: 490.38
+denominator_unit: TWD_100m
+share_percent: 63.6
+attribution_status: bounded_proxy
+source_refs: QUAL-3017#S1
+calculation:
+as_of: 2026-08-09
+review_due: 2026-08-20
+status: active
+metric_definition: 奇鋐 2026Q1 公司揭露的散熱產品收入，涵蓋範圍大於液冷與 CDU。
+denominator_definition: 奇鋐 2026Q1 合併營收 490.38 億元，與散熱產品收入為同一期間及合併範圍。
+boundary: 63.6% 是散熱產品占公司營收的有界代理，不是液冷、CDU 或特定客戶收入占比；公司未拆出各散熱產品毛利。
+next_trigger: 奇鋐以同期間合併分母單獨揭露液冷／CDU 收入、出貨量乘單價或毛利。
+-->
+
 <!-- knowledge_edge
 edge_id: KG-LC-C02
 view: company
@@ -40,7 +68,7 @@ from_id: company:2308
 to_id: concept:liquid-cooling
 relation: platform_lists
 claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1
-note_refs:
+note_refs: 2308#S4
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: named_product
@@ -53,6 +81,34 @@ boundary: Delta 型號、1MW 與 MP Ready 是 Marketplace 原始欄位，不等�
 next_trigger: 2308 揭露具名 CDU 客戶驗收、量產數量與可辨識財務貢獻。
 -->
 
+<!-- financial_materiality
+contract_version: 2
+assessment_id: FM-LC-2308-01
+edge_id: KG-LC-C02
+financial_scope: segment
+metric: power_and_components_revenue
+value_kind: reported
+reported_value: 856.23
+unit: TWD_100m
+period_start: 2026-01-01
+period_end: 2026-03-31
+period_basis: quarter
+denominator_metric: consolidated_revenue
+denominator_value: 1594.00
+denominator_unit: TWD_100m
+share_percent: 54.0
+attribution_status: bounded_proxy
+source_refs: QUAL-2308#S4
+calculation:
+as_of: 2026-08-09
+review_due: 2026-08-31
+status: active
+metric_definition: 台達電 2026Q1 電源及零組件事業營收，包含電源、零組件與散熱等多種產品。
+denominator_definition: 台達電 2026Q1 合併營收約 1,594 億元；簡報事業占比以整數百分比揭露。
+boundary: 54% 是電源及零組件事業占公司營收的有界代理，不是液冷、CDU、AI 電源或資料中心收入占比；四捨五入口徑使金額重算約 53.72%。
+next_trigger: 台達電以同期間合併分母單獨揭露液冷／CDU 或 AI 電源收入與毛利。
+-->
+
 <!-- knowledge_edge
 edge_id: KG-LC-C03
 view: company
@@ -60,7 +116,7 @@ from_id: company:2301
 to_id: concept:liquid-cooling
 relation: platform_lists
 claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1
-note_refs:
+note_refs: 2301#S3
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: named_product
@@ -71,6 +127,34 @@ review_due: 2026-08-09
 status: active
 boundary: LITEON 型號、380kW 與 Sample Ready 不證明量產規模、訂單、收入或產品優劣。
 next_trigger: 2301 將具名 CDU 型號連到客戶驗收、出貨、收入與毛利。
+-->
+
+<!-- financial_materiality
+contract_version: 2
+assessment_id: FM-LC-2301-01
+edge_id: KG-LC-C03
+financial_scope: segment
+metric: cloud_and_iot_external_revenue
+value_kind: reported
+reported_value: 229.03
+unit: TWD_100m
+period_start: 2026-01-01
+period_end: 2026-03-31
+period_basis: quarter
+denominator_metric: consolidated_revenue
+denominator_value: 434.07
+denominator_unit: TWD_100m
+share_percent: 52.8
+attribution_status: bounded_proxy
+source_refs: QUAL-2301#S3
+calculation:
+as_of: 2026-08-09
+review_due: 2026-08-31
+status: active
+metric_definition: 光寶科 2026Q1 雲端及物聯網部門外部營收，亦包含網通、AIoT、影像等非 AI 電源產品。
+denominator_definition: 光寶科 2026Q1 合併營收 434.07 億元，與部門外部營收為同一期間及合併範圍。
+boundary: 52.8% 是雲端及物聯網部門占公司營收的有界代理，不是 CDU、AI 電源或特定電源產品收入占比。
+next_trigger: 光寶科以同期間合併分母單獨揭露 CDU／AI 電源收入、出貨量乘單價或毛利。
 -->
 
 <!-- knowledge_edge
