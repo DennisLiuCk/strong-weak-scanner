@@ -47,6 +47,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave7_power_cooling_learning_no_conclusion_change
+evidence: editorial:plain_language_wave7
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -54,6 +61,7 @@ evidence: editorial:high_frequency_glossary
 
 - **Telemetry（遙測）**：設備持續送出的溫度、流量、功率、漏液、狀態等資料；有數值不代表接收端知道它屬於哪個機櫃，也不代表系統會採取動作。
 - **Metadata（中繼資料）**：描述數值是什麼、單位、設備身分與關係的上下文；同一個 `32.5` 可能是攝氏溫度、百分比或功率，必須靠 metadata 才能解讀。
+- **Value payload（即時值封包）**：DSX 把每筆讀數放在 Value payload；其中 `value` 是數字本身，還要搭配時間戳與品質欄位。只看到 value，仍不能判斷資料是否新鮮、可靠或屬於哪座機櫃。
 - **Action contract（動作契約）**：不只定義誰送資料，也定義誰可以提出請求、誰有權決定、要回到哪個狀態，以及失聯或越界時的安全行為。
 - **BMS／RMC**：BMS 是設施端建築管理系統；RMC 是機櫃管理控制器。兩者可能看到相似資料，但控制範圍與責任並不相同。
 - **DSX**：NVIDIA 的 AI factory 基礎設施資料與控制契約；本篇引用的是其中 BMS Event Bus，不代表所有場域已部署。

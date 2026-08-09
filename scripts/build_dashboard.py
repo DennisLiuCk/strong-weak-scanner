@@ -69,6 +69,51 @@ RECENT_ARTICLE_TYPES = (
     ("narrative", "多空小作文"),
     ("topic", "市場議題"),
 )
+RESEARCH_LEARNING_ROUTES = [
+    {
+        "id": "power-cooling", "label": "供電與散熱",
+        "description": (
+            "建議順序：先讀 800VDC 功率半導體鏈，再看保護與緩衝，"
+            "最後先辨識液冷產品資格，再拆迴路責任邊界。"
+        ),
+        "graphIds": [
+            "800v-power-tree", "800vdc-protection-layers", "ai-capacitor-role-map",
+            "ai-power-buffering", "ai-rack-action-contract", "ai-rack-emc-certification",
+            "ai-rack-trust-root", "liquid-cooling", "liquid-cooling-loop-boundaries",
+        ],
+    },
+    {
+        "id": "memory-packaging", "label": "記憶體與封裝",
+        "description": (
+            "建議順序：先讀 AI 記憶體分層，再看 HBM／SPHBM4，"
+            "最後追鍵結與封裝路徑。"
+        ),
+        "graphIds": [
+            "ai-memory-hierarchy", "custom-hbm-scope-ladder",
+            "glass-substrate-commercialization", "hbf-commercialization", "hbm",
+            "hybrid-bonding", "panel-level-packaging",
+        ],
+    },
+    {
+        "id": "compute-connect", "label": "運算與互連",
+        "description": (
+            "建議順序：先讀 AI 儲存資料平面，再看開放 AI 互連，"
+            "最後用 PCIe 6／UCIe 檢查成熟度。"
+        ),
+        "graphIds": [
+            "ai-storage-data-plane", "amd-helios", "backside-power", "cpo-networking",
+            "high-na-euv-readiness", "open-ai-fabrics", "pcie6-compliance-ladder",
+            "ucie-interoperability",
+        ],
+    },
+    {
+        "id": "company-finance", "label": "公司財務案例",
+        "description": (
+            "建議讀法：用國巨 Q2 案例，練習把公司總額與題材可歸因貢獻分開。"
+        ),
+        "graphIds": ["yageo-q2-financial-materiality"],
+    },
+]
 
 # 標題設定。TITLE_TAIL 是品牌尾綴、ALL_SCOPE 是「全部族群」時的範圍詞;篩選到單一族群時,
 # 前端會把標題換成「族群名 · TITLE_TAIL」(見 dashboard_template.html 的 group filter JS)。
@@ -2219,13 +2264,52 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
 def attach_research_learning_paths(research_library, knowledge_graph):
     """Attach a novice-safe continuation path using only existing library links.
 
-    The path is navigation, not a new research assertion: article suggestions must
-    share a named company or declared group, while graph suggestions must already
-    cite the article or contain one of its named companies.
+    The path is navigation, not a new research assertion: every route station uses
+    the first existing articleId already registered on that graph, so the article
+    station count stays identical to the graph-route count. Other article suggestions
+    must share a named company or declared group, while graph suggestions must already
+    cite the article or contain one of its companies.
     """
     research_library = research_library or {"articles": []}
     articles = research_library.get("articles") or []
     graphs = (knowledge_graph or {}).get("graphs") or []
+    routes = (knowledge_graph or {}).get("learningRoutes") or []
+    article_by_id = {article.get("id"): article for article in articles if article.get("id")}
+    graph_by_id = {graph.get("id"): graph for graph in graphs if graph.get("id")}
+
+    route_sequences = []
+    routed_article_ids = set()
+    for route in routes:
+        sequence = []
+        for graph_id in route.get("graphIds") or []:
+            graph = graph_by_id.get(graph_id) or {}
+            article_id = next((
+                candidate for candidate in graph.get("articleIds") or []
+                if candidate in article_by_id
+            ), None)
+            if not article_id:
+                continue
+            if article_id in routed_article_ids:
+                raise ValueError(
+                    f"學習路線主文章不可重複：{article_id}（graph {graph_id}）"
+                )
+            routed_article_ids.add(article_id)
+            sequence.append({"graphId": graph_id, "articleId": article_id})
+        if sequence:
+            route_sequences.append((route, sequence))
+
+    for route, sequence in route_sequences:
+        total = len(sequence)
+        for index, station in enumerate(sequence):
+            article_by_id[station["articleId"]]["learningRoute"] = {
+                "id": route.get("id") or "",
+                "label": route.get("label") or "學習路線",
+                "description": route.get("description") or "",
+                "step": index + 1,
+                "total": total,
+                "graphId": station["graphId"],
+                "graphLabel": (graph_by_id.get(station["graphId"]) or {}).get("label") or "",
+            }
 
     def overlap(left, right):
         return set(left or []).intersection(right or [])
@@ -2250,15 +2334,28 @@ def attach_research_learning_paths(research_library, knowledge_graph):
         matches.sort(key=lambda item: item[:4], reverse=True)
         return matches[0][-1] if matches else None
 
-    def article_card(label, candidate, description):
+    def article_card(label, candidate, description, meta=None):
         return {
             "kind": "article", "label": label,
             "title": candidate.get("readerTitle") or candidate.get("title") or "研究文章",
             "description": description,
-            "meta": (f"{candidate.get('typeLabel') or '研究文章'} · "
-                     f"閱讀約 {candidate.get('readingMinutes') or 1} 分鐘"),
+            "meta": meta or (f"{candidate.get('typeLabel') or '研究文章'} · "
+                             f"閱讀約 {candidate.get('readingMinutes') or 1} 分鐘"),
             "articleId": candidate.get("id") or "",
         }
+
+    def next_route_article(article):
+        article_id = article.get("id")
+        for route, sequence in route_sequences:
+            article_ids = [station["articleId"] for station in sequence]
+            if article_id not in article_ids:
+                continue
+            index = article_ids.index(article_id)
+            if index + 1 >= len(sequence):
+                return None
+            candidate = article_by_id[sequence[index + 1]["articleId"]]
+            return route, candidate, index + 2, len(sequence)
+        return None
 
     def matching_graph(article):
         stock_ids = set(article.get("stockIds") or [])
@@ -2281,13 +2378,35 @@ def attach_research_learning_paths(research_library, knowledge_graph):
         cards = []
         article_type = article.get("type")
         if article_type == "topic":
+            route_next = next_route_article(article)
+            route_context = article.get("learningRoute") or {}
+            if route_next:
+                route, candidate, step, total = route_next
+                cards.append(article_card(
+                    "沿學習路線往下讀", candidate,
+                    "同一路線的下一個既有主題；這只是閱讀順序，不新增供應鏈或受惠關係。",
+                    (f"{route.get('label') or '學習路線'} · 第 {step}/{total} 站 · "
+                     f"閱讀約 {candidate.get('readingMinutes') or 1} 分鐘"),
+                ))
+            elif route_context and route_context.get("step") == route_context.get("total"):
+                cards.append({
+                    "kind": "route", "label": "已完成這條學習路線",
+                    "title": route_context.get("label") or "學習路線",
+                    "description": (
+                        "你已讀到這條路線最後一站；回到知識圖譜可選下一條路線。"
+                        "這只表示閱讀順序完成，不代表研究結論已完成。"
+                    ),
+                    "meta": (f"第 {route_context.get('step')}/{route_context.get('total')} 站 · "
+                             f"共 {route_context.get('total')} 個主題"),
+                    "graphId": route_context.get("graphId") or "",
+                })
             formal = best_related(article, "formal_note", require_stock=True)
             if formal:
                 cards.append(article_card(
                     "先認識公司", formal,
                     "先了解公司實際賣什麼、收入從哪裡來，再回頭判斷題材敘事。",
                 ))
-            related_topic = best_related(article, "topic")
+            related_topic = None if route_next else best_related(article, "topic")
             if related_topic:
                 cards.append(article_card(
                     "補一篇相關研究", related_topic,
@@ -2369,7 +2488,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 1
+    research_library["learningPathVersion"] = 3
     return research_library
 
 
@@ -3198,6 +3317,7 @@ def main():
     research_library["knowledgeGraph"] = build_knowledge_graph(
         research_topics, notes_map, strict=True,
     )
+    research_library["knowledgeGraph"]["learningRoutes"] = RESEARCH_LEARNING_ROUTES
     # 新手延伸閱讀只串接 library 中已存在的文章、族群與圖譜；它是導覽層，
     # 不新增供應鏈關係，也不把共享族群誤寫成已驗證的公司曝險。
     attach_research_learning_paths(

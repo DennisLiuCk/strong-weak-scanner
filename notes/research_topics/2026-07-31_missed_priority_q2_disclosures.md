@@ -53,6 +53,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:readability
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave8_learning_no_conclusion_change
+evidence: editorial:plain_language_wave8
+-->
 
 <!-- research_source
 source_id: S1
@@ -792,6 +799,11 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 - **Siltronic**：德國矽晶圓公司。本文只涉及它在環球晶（6488）單季損益中造成的評價差異——**那是按市價評價的業外項目，與環球晶本業表現是兩件事**，不可混談。
 - **Novara**：環球晶位於義大利 Novara 的廠區。本文指該廠火災公告，以及復工時程尚未確定這件事。
 - **HBM2**：HBM 的第二代。文中出現在封測公司的技術能力敘述裡；具備能力不等於已取得 HBM2 客戶、訂單或收入。
+- **eMMC（嵌入式儲存）**：把快閃記憶體與控制器封裝成標準化元件，常見於消費電子與嵌入式設備；單季成長不能直接外推成長期缺貨或漲價。
+- **ASIC（客製化晶片）**：為特定工作設計的晶片。公司具備相關測試或封裝能力，不等於已取得具名 AI 客戶或量產收入。
+- **CPO（共同封裝光學）**：把光學元件放到交換晶片附近，縮短高速電訊號路徑；具備設備與流程仍須等待客戶、量產及財務證據。
+- **AI1.pdf**：公開資訊觀測站法說附件常見的檔名尾碼；它只協助辨識檔案版本，本身不代表內容已完成查核。
+- **pp.5（第 5 頁）**：`pp.` 是英文 pages 的縮寫，後面的數字是引用頁碼；頁碼只負責定位來源，不是新的營運指標。
 
 ### 三句話抓重點
 

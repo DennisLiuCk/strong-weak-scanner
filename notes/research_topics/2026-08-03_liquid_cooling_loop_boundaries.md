@@ -47,6 +47,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave7_power_cooling_learning_no_conclusion_change
+evidence: editorial:plain_language_wave7
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -57,6 +64,8 @@ evidence: editorial:high_frequency_glossary
 - **ITE（Information Technology Equipment）**：伺服器、加速器與內部冷板等 IT 設備。規格若只管 TCS，不代表 ITE 端所有設計與責任都已被涵蓋。
 - **BMS（Building Management System）**：建築管理系統，收集溫度、流量、壓差、漏液與設備狀態，並在安全 guardrails 內執行控制或隔離。
 - **DSX**：NVIDIA 用來描述 AI factory 基礎設施資料、控制契約與驗證生態的文件／平台名稱；列入 DSX 不等於場域已完成驗收。
+- **QD／UQD（快速接頭／通用快速接頭）**：QD 是讓液冷管路能快速拆接的連接器；UQD 是 OCP 推動的通用介面方向。單一接頭通過測試，不代表混用不同管路、流體與 manifold 後整套系統仍可靠。
+- **rackLocationId（機櫃位置識別碼）**：DSX 用來讓設施端與 IT 端指向同一座實體機櫃的穩定 ID。若兩邊映射不同，告警或隔離命令可能落到錯誤機櫃。
 
 ### 三句話抓重點
 

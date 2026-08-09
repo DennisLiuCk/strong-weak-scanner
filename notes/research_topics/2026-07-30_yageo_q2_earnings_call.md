@@ -47,6 +47,13 @@ to: triaged
 reason: twse_stock_report_independently_reconciled_q2_revenue_without_overstating_full_filing_coverage
 evidence: sources:S2,S4
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave8_learning_no_conclusion_change
+evidence: editorial:plain_language_wave8
+-->
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -62,7 +69,7 @@ evidence: sources:S2,S4
 
 - 國巨官方 Q2 簡報顯示營收、毛利率、EPS、AI 終端占比與鉭質電容銷售均有可定位的新數字；其中營收另可由 TWSE 個股報告逐月加總交叉驗證。
 - 公司把部分毛利改善歸因於價格調整與 AI 產品組合，但也說投入成本與標準品需求抵銷部分效益。
-- 這些資料足以觸發正式筆記與 H# 複核，尚不足以證明 MLCC 全面漲價、交期拉長、滿載或長約訂單。
+- 這些資料值得提早更新正式公司研究與既有可驗證假說，尚不足以證明 MLCC 全面漲價、交期拉長、滿載或長約訂單。
 
 ### 為什麼重要
 
@@ -74,7 +81,7 @@ evidence: sources:S2,S4
 
 - 取得完整 2026Q2 核閱財務報告，核對現金流、存貨、應收、借款與併購後資產負債變化。
 - 追公司後續法說是否說明價格調整涵蓋的產品、交期、稼動率、通路庫存與客戶合約。
-- 追正式筆記完成 focused evidence pack 與獨立 reviewer 後，H1／H2 是否具備轉移條件。
+- 等正式筆記完成原始文件封存、逐頁核對與第二次獨立複核後，再判斷原本兩個可驗證假說是否需要改變。
 
 ### 想一想
 

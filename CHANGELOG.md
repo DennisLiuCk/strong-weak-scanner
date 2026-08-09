@@ -1,5 +1,57 @@
 # Changelog
 
+## 研究中心路線定位、站次一致與最後一站返回 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善學習路線定位、
+文章接續與五篇文章用詞，不修改研究來源、主張、證據層級、comparison、monitor、圖譜 edge、
+公司映射或財務歸因。
+
+- 修正「記憶體與封裝」圖譜顯示 7 個主題、文章卡卻標成 8 站的不一致：每張 graph 固定只取
+  第一篇可解析的既有 `article_ids` 作為主題站，補充文章不再膨脹站次。契約測試確認 25／25
+  張 active graph 的主文章均存在且不重複；發布 payload 升為 `learningPathVersion: 3`。
+- 深連結進文章時，標題下方新增「所屬學習路線、目前第幾站／共幾站、中心主題」定位與
+  「查看完整路線」入口；正文後的下一站卡讀同一份 route 順序。最後一站改為明示閱讀路線完成，
+  同時提醒不代表研究結論完成。手機驗收另修正返回圖譜仍停在文章原捲動位置的問題，現在會回到
+  原路線與中心主題，且文件與圖譜捲動位置都重設到頂端。
+- 完成國巨法說、優先 Q2 文件、AI 資本支出現金轉換、推論算力測試機 TAM、先進封裝區域化
+  五篇白話補強，補齊正式研究／可驗證假說、eMMC、ASIC、CPO、AI1.pdf、pp.5、FY2026、ROI、
+  CY2026、SoC 與 OSAT 等讀者會遇到的術語。五篇 source、claim、comparison、monitor 與鎖定
+  meta 均未改動；baseline editorial lint 通過。
+- 完整 34 篇 topic registry 的 warning 由 13 降至 6（非抽樣；剩餘皆為證據時效或尚未完成
+  影響映射的治理提醒），新增 append-only 方法快照 `RMA-2026-08-09-11`。讀者學習升級測試
+  擴為 28 篇，並新增主文章唯一性、站次一致、末站完成與跨介面返回頂端契約。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 451 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留前述 6 個 warning），inline JavaScript、
+  `git diff --check`、方法快照 JSON／LF、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。
+  連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `ce74dad5…`。
+  以 1280×720 與 390×844 同狀態前後對照：文章頁首可見第 1／7 站、下一站為第 2／7 站，末站
+  為第 7／7 站；兩個手機狀態的頁面寬度皆等於 viewport，返回後 `scrollY=0`、圖譜捲動位置為 0。
+
+## 研究中心液冷閱讀接力與名詞補齊 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善供電與散熱路線的
+閱讀順序、文章接續入口與三篇文章用詞，不修改研究來源、主張、證據層級、monitor、圖譜 edge、
+公司映射或財務歸因。
+
+- 將四條讀者學習路線集中到 `RESEARCH_LEARNING_ROUTES`，發布 payload、知識圖譜入口與文章
+  接續卡共用同一份順序。供電與散熱路線明示先辨識液冷產品資格、再拆迴路責任邊界；契約測試
+  確認 25／25 張 active graph 各被一條路線覆蓋且沒有重複。
+- 市場議題的「從這篇接著學」優先顯示同一路線的下一篇既有文章，並揭露路線站次與閱讀時間。
+  接續關係只依 `route.graphIds → graph.articleIds` 解析；卡片明示這是閱讀順序，不新增供應鏈、
+  客戶、受惠關係或任何研究證據。
+- 完成液冷 CDU 資格、液冷迴路責任邊界與 AI 機櫃控制契約三篇白話補強：新增設備型號、TSE、
+  FY2027、QD／UQD、`rackLocationId` 與 Value payload 的中文解釋。三篇 source、claim、comparison、
+  monitor 與鎖定 meta 均未改動；baseline editorial lint 通過。
+- 完整 34 篇 topic registry 的 warning 由 18 降至 13（非抽樣；其餘為既有時效、映射與其他文章
+  可讀性債），新增 append-only 方法快照 `RMA-2026-08-09-10`。讀者學習升級測試擴為 23 篇，
+  並新增路線唯一覆蓋與下一站優先順序契約。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 451 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留前述 13 個 warning），inline JavaScript、
+  `git diff --check`、方法快照 JSON／LF 與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次
+  dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `81a27c7d…`。以
+  1280×720 與 390×844 實機前後對照：路線文案與下一站卡可見、點擊抵達正確文章且閱讀區回到
+  頂端，頁面寬度等於 viewport，三篇字典補詞可見、查核附錄預設關閉，console 無 warning／error。
+
 ## 研究中心圖譜起讀入口與運算／互連白話升級 — 2026-08-09
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善知識圖譜的

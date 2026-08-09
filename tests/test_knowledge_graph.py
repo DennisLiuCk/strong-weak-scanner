@@ -12,6 +12,7 @@ SCRIPTS = ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 import knowledge_graph as kg
+import build_dashboard as bd
 
 
 class KnowledgeGraphTest(unittest.TestCase):
@@ -64,6 +65,20 @@ class KnowledgeGraphTest(unittest.TestCase):
                              {"company", "industry"})
             for edge in graph["edges"]:
                 self.assertIn(graph["rootNodeId"], {edge["from"], edge["to"]})
+
+    def test_reader_learning_routes_cover_every_active_graph_once(self):
+        graph_ids = {graph["id"] for graph in self.payload["graphs"]}
+        graph_by_id = {graph["id"]: graph for graph in self.payload["graphs"]}
+        routed_ids = [
+            graph_id
+            for route in bd.RESEARCH_LEARNING_ROUTES
+            for graph_id in route["graphIds"]
+        ]
+        self.assertEqual(len(routed_ids), len(set(routed_ids)))
+        self.assertEqual(set(routed_ids), graph_ids)
+        self.assertTrue(all(route["description"] for route in bd.RESEARCH_LEARNING_ROUTES))
+        primary_articles = [graph_by_id[graph_id]["articleIds"][0] for graph_id in routed_ids]
+        self.assertEqual(len(primary_articles), len(set(primary_articles)))
 
     def test_every_edge_preserves_evidence_boundary_clock_and_monitoring_trigger(self):
         for graph in self.payload["graphs"]:

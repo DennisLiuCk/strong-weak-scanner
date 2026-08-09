@@ -1574,8 +1574,16 @@ class ReadabilityGateTest(unittest.TestCase):
             "2026-08-03_800vdc_protection_layers.md",
             "2026-08-03_ai_capacitor_role_map.md",
             "2026-08-03_ai_power_buffering_hierarchy.md",
+            "2026-08-02_liquid_cooling_qualification_ladder.md",
+            "2026-08-03_liquid_cooling_loop_boundaries.md",
+            "2026-08-07_ai_rack_action_contract.md",
             "2026-08-09_ai_rack_emc_certification.md",
             "2026-08-09_ai_storage_data_plane.md",
+            "2026-07-30_yageo_q2_earnings_call.md",
+            "2026-07-31_missed_priority_q2_disclosures.md",
+            "2026-08-01_ai_capex_cash_conversion.md",
+            "2026-08-01_inference_compute_tester_tam.md",
+            "2026-08-01_us_advanced_packaging_regionalization.md",
         )
         entities = rq._entity_terms()
         for filename in filenames:

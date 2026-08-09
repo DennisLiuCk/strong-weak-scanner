@@ -402,6 +402,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave8_learning_no_conclusion_change
+evidence: editorial:plain_language_wave8
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -414,6 +421,8 @@ evidence: editorial:high_frequency_glossary
 - **耐用年限**：會計上預估資產可使用多久，決定每年折舊速度；改變耐用年限會改變損益與租賃分類，卻不一定改變實際建置計畫。
 - **AWS**：Amazon Web Services，Amazon 的雲端運算事業；其營收成長不能直接分配到任一台灣供應商。
 - **TTM**：Trailing Twelve Months，往回累計十二個月；它不是單季數字，與季度資料不能直接並排比較。
+- **FY2026（2026 財政年度）**：公司的 2026 會計年度，起訖日不一定等於 2026 曆年；跨公司比較前要先核對涵蓋月份。
+- **ROI（投資報酬率）**：投入資本後產生多少收益的比例。CapEx 或自由現金流單一數字不足以計算 AI ROI，還需要收入、成本、利用率與可比期間。
 
 ### 三句話抓重點
 

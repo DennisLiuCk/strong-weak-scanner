@@ -55,6 +55,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave8_learning_no_conclusion_change
+evidence: editorial:plain_language_wave8
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -65,6 +72,7 @@ evidence: editorial:high_frequency_glossary
 - **採購框架**：雙方約定未來合作方式與期間的合約骨架，不一定包含保底數量、固定價格或最低利用率。
 - **區域化**：把部分產能移到接近客戶或政策需求的地區，以降低地理集中風險；它可能補充亞洲產能，也可能重新分配訂單。
 - **Arizona（亞利桑那州）**：本篇 Amkor 與台積電美國先進封裝計畫所在州；地點被具名不代表廠房已完工或產能已投產。
+- **OSAT（委外封裝與測試廠）**：替晶片公司承接封裝與測試的專業廠商。Amkor 與台灣的日月光投控都屬這一類，但美國擴產不自動等於台灣訂單流失。
 
 ### 三句話抓重點
 

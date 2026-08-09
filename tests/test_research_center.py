@@ -233,7 +233,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 1)
+        self.assertEqual(library["learningPathVersion"], 3)
         article_ids = {article["id"] for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
         group_ids = {item["id"] for item in library["groups"]}
@@ -247,6 +247,8 @@ class ResearchCenterTest(unittest.TestCase):
                     self.assertIn(card["articleId"], article_ids)
                     self.assertNotEqual(card["articleId"], article["id"])
                 elif card["kind"] == "graph":
+                    self.assertIn(card["graphId"], graph_ids)
+                elif card["kind"] == "route":
                     self.assertIn(card["graphId"], graph_ids)
                 elif card["kind"] == "group":
                     self.assertTrue(set(card["groupIds"]).issubset(group_ids))
@@ -268,6 +270,55 @@ class ResearchCenterTest(unittest.TestCase):
             article for article in library["articles"] if article["id"] == "event-tsmc-2026q2"
         )
         self.assertIn("group", {card["kind"] for card in event["learningPath"]["cards"]})
+
+    def test_learning_path_prioritizes_next_registered_route_article(self):
+        library = {"counts": {"topic": 3}, "groups": [], "articles": [
+            {"id": "topic-a", "type": "topic", "groups": [], "stockIds": [],
+             "readerTitle": "第一站", "typeLabel": "市場議題", "readingMinutes": 3},
+            {"id": "topic-b", "type": "topic", "groups": [], "stockIds": [],
+             "readerTitle": "第二站", "typeLabel": "市場議題", "readingMinutes": 5},
+            {"id": "topic-b-detail", "type": "topic", "groups": [], "stockIds": [],
+             "readerTitle": "第二站補充", "typeLabel": "市場議題", "readingMinutes": 4},
+            {"id": "topic-c", "type": "topic", "groups": [], "stockIds": [],
+             "readerTitle": "第三站", "typeLabel": "市場議題", "readingMinutes": 7},
+        ]}
+        graph = {
+            "learningRoutes": [{
+                "id": "route", "label": "測試路線",
+                "description": "依序閱讀", "graphIds": ["graph-a", "graph-b", "graph-c"],
+            }],
+            "graphs": [
+                {"id": "graph-a", "label": "第一圖", "articleIds": ["topic-a"],
+                 "nodes": [], "edges": []},
+                {"id": "graph-b", "label": "第二圖",
+                 "articleIds": ["topic-b", "topic-b-detail", "topic-missing"],
+                 "nodes": [], "edges": []},
+                {"id": "graph-c", "label": "第三圖", "articleIds": ["topic-c"],
+                 "nodes": [], "edges": []},
+            ],
+        }
+
+        bd.attach_research_learning_paths(library, graph)
+
+        first = library["articles"][0]["learningPath"]["cards"][0]
+        second = library["articles"][1]["learningPath"]["cards"][0]
+        self.assertEqual(first["label"], "沿學習路線往下讀")
+        self.assertEqual(first["articleId"], "topic-b")
+        self.assertIn("第 2/3 站", first["meta"])
+        self.assertIn("不新增供應鏈或受惠關係", first["description"])
+        self.assertEqual(second["articleId"], "topic-c")
+        self.assertIn("第 3/3 站", second["meta"])
+        self.assertEqual(library["articles"][0]["learningRoute"], {
+            "id": "route", "label": "測試路線", "description": "依序閱讀",
+            "step": 1, "total": 3, "graphId": "graph-a", "graphLabel": "第一圖",
+        })
+        self.assertNotIn("learningRoute", library["articles"][2])
+        completed = library["articles"][3]["learningPath"]["cards"][0]
+        self.assertEqual(completed["kind"], "route")
+        self.assertEqual(completed["label"], "已完成這條學習路線")
+        self.assertEqual(completed["graphId"], "graph-c")
+        self.assertIn("第 3/3 站", completed["meta"])
+        self.assertIn("不代表研究結論已完成", completed["description"])
 
         orphan = {"counts": {"topic": 1}, "groups": [], "articles": [{
             "id": "topic-policy", "type": "topic", "groups": [], "stockIds": [],
@@ -536,8 +587,10 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('attach_research_learning_paths(', builder)
         self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
         self.assertIn("body.append(mobileBack,h('h1'", template)
-        # meta 之後、首屏重點之前插入行動版大綱(≤1180px 桌機側欄 .outline 隱藏時接手)
-        self.assertIn("body.append(meta);const mobileToc=renderMobileToc(article);"
+        # meta 之後先標示學習路線，再由行動版大綱接手隱藏的桌機側欄。
+        self.assertIn("body.append(meta);const routeContext=renderLearningRouteContext(article);"
+                      "if(routeContext)body.appendChild(routeContext);"
+                      "const mobileToc=renderMobileToc(article);"
                       "if(mobileToc)body.appendChild(mobileToc);"
                       "body.appendChild(articleSections(article,'beginner'));"
                       "body.appendChild(articleSections(article,'analyst'))", template)
@@ -690,23 +743,33 @@ class ResearchCenterTest(unittest.TestCase):
 
     def test_template_graph_uses_progressive_learning_routes_without_changing_evidence(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
         for contract in (
             'id="graphLearningTitle"', 'id="graphRouteTabs"',
             'id="graphHubSelect"', 'id="graphIntroActions"',
             'aria-label="知識圖譜學習路線"',
-            "const GRAPH_LEARNING_ROUTES=[", "function availableGraphRoutes()",
+            "const GRAPH_LEARNING_ROUTES=KG.learningRoutes||[]",
+            "function availableGraphRoutes()",
             "function graphRouteId(graphId)", "function activateGraphRoute(routeId)",
             "function activateGraphTopic(graphId)",
             "graphRoute:graphRouteId((KG.graphs||[])[0]?.id||'')",
             "state.graphRoute=graphRouteId(graphId)",
-            "供電與散熱", "記憶體與封裝", "運算與互連", "公司財務案例",
-            "建議順序：先讀 AI 儲存資料平面",
             "學習路線只整理導覽",
             ".graph-hub-tabs{display:none}", ".graph-hub-select{display:block}",
             "const startArticle=(graph.articleIds||[])",
             "'data-testid':'graph-primary-article'",
             "先讀主題文章 · ",
             "openGraphArticle(startArticle.id)",
+            "function renderLearningRouteContext(article)",
+            "'aria-label':'學習路線定位'",
+            "站次只代表閱讀順序，不是研究完成度或投資排名",
+            "查看完整路線",
+            "function resetGraphSurfaceScroll()",
+            "graphPage.scrollTo(0,0)",
+            "window.scrollTo(0,0)",
+            "requestAnimationFrame(()=>requestAnimationFrame(reset))",
+            "selectSurface('graph',true);resetGraphSurfaceScroll()",
+            "card.kind==='route'?'回到學習路線'",
             ".graph-intro-action{width:100%;min-height:44px}",
         ):
             self.assertIn(contract, template)
@@ -717,6 +780,14 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(
             "other=(KG.graphs||[]).filter(graph=>!known.has(graph.id))", template)
         self.assertNotIn("v2 direct assessment 能進入", template)
+        for contract in (
+            "RESEARCH_LEARNING_ROUTES", "供電與散熱", "記憶體與封裝",
+            "運算與互連", "公司財務案例", "先辨識液冷產品資格",
+            'research_library["knowledgeGraph"]["learningRoutes"]',
+            "沿學習路線往下讀", "不新增供應鏈或受惠關係",
+            "已完成這條學習路線", "first existing articleId",
+        ):
+            self.assertIn(contract, builder)
 
     def test_template_publishes_ranked_candidate_research_radar(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

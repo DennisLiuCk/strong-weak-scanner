@@ -53,6 +53,13 @@ to: triaged
 reason: weekly_monitor_trigger_lge_added_to_marketplace_without_supply_status
 evidence: sources:S8
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave7_power_cooling_learning_no_conclusion_change
+evidence: editorial:plain_language_wave7
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -64,6 +71,9 @@ evidence: sources:S8
 - **平台驗證**：產品通過平台商指定測試或被列進合格清單；它降低部分技術採購風險，仍不等於客戶已下單、完成部署或供應商已認列收入。
 - **PoC（Proof of Concept，概念驗證）**：在真實或接近真實的環境做小規模試行，用來確認方案可行。**PoC 進行中不等於已交付節電、成本或可靠度數字**，本文多處出現的 PoC 都停在這個階段。
 - **Delta（台達電，2308）與 LITEON（光寶科，2301）**：本文以英文公司名出現的兩家台灣電源與散熱供應商，都是本 universe 成員。文中提到它們時只涉及產品被列出或通過平台驗證，不含訂單、出貨量或毛利證據。
+- **CDU1000-LTL-RW／RDF106CDT5192／LC-LL-WCDU-6011(S)**：分別是 AVC、Delta 與 LITEON 在 NVIDIA 清單中的 CDU 型號。型號只是辨識產品的名字；容量、供應狀態與量產證據仍要分欄閱讀。
+- **TSE（Taiwan Stock Exchange，臺灣證券交易所）**：本文只用公司官網的 `TSE: 3017` 把 AVC 對應到臺灣上市公司奇鋐；這個代號本身不證明該 CDU 的客戶或收入。
+- **FY2027（2027 財政年度）**：公司的 2027 會計年度，起訖日不一定等於 2027 曆年。本文引用的是 Daikin 的商用目標時間，不是目前已完成部署。
 
 ### 三句話抓重點
 

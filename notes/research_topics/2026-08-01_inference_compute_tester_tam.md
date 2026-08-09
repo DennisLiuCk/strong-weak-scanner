@@ -47,6 +47,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:readability
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave8_learning_no_conclusion_change
+evidence: editorial:plain_language_wave8
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -59,6 +66,8 @@ evidence: editorial:readability
 - **Trainium**：Amazon（AWS）自行設計的 AI 晶片系列。它是雲端業者自研晶片的代表之一，與外購 GPU 是不同採購路徑。
 - **Maia**：Microsoft 自行設計的 AI 加速晶片系列，角色與 Trainium 類似。
 - **DRAM**：主流的動態隨機存取記憶體。本文提到它，是因為記憶體測試需求也構成測試機市場的一部分，與推論晶片需求要分開看。
+- **CY2026（2026 曆年）**：從 2026 年 1 月到 12 月；它與公司的財政年度可能不同，本文用它表示 Advantest 市場預估涵蓋的時間。
+- **SoC（系統單晶片）**：把處理器、控制器與其他功能整合在同一顆晶片；本文的 SoC tester 市場不只包含 AI 加速器。
 
 ### 三句話抓重點
 
