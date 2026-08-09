@@ -306,6 +306,14 @@ reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave5_power_system_learning_no_conclusion_change
+evidence: editorial:plain_language_wave5
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -313,6 +321,8 @@ evidence: editorial:high_frequency_glossary
 - **Si／SiC／GaN**：矽、碳化矽與氮化鎵三種功率元件材料；耐壓、切換速度、成本與成熟度各不相同。
 - **SST**：固態變壓器，用功率電子元件處理中壓 AC 到 DC，可減少傳統轉換層級。
 - **IBC**：中間匯流排轉換器，把 800V 高壓 DC 降成 50V、12V 等較低電壓供伺服器板使用。
+- **HV（High Voltage）**：高壓。本文用來標示數百伏的輸入或轉換節點，不是特定公司或單一產品名。
+- **POL（Point of Load，負載點轉換）**：靠近 CPU、GPU 或其他晶片的最後一段電壓轉換，把較低電壓變成晶片直接使用的電壓。
 - **BBU**：電池備援單元，在電網切換、斷電或負載突增時維持運算設備供電。
 - **Hot-swap**：設備不停機時安全接入或移除模組，需限制湧入電流並隔離故障。
 - **PSU（Power Supply Unit）**：把輸入電力轉成伺服器可用電壓的電源供應器；它只是整條 800V 電力鏈的一個節點。

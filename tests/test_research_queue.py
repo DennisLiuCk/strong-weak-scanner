@@ -1554,10 +1554,26 @@ class ReadabilityGateTest(unittest.TestCase):
         self.assertGreaterEqual(
             result["proseRatio"], rq.READABILITY_MIN_PROSE_RATIO)
 
-    def test_reader_learning_pilot_articles_have_no_readability_debt(self):
+    def test_reader_learning_upgrade_articles_have_no_readability_debt(self):
         filenames = (
+            "2026-07-29_priority_q2_disclosures.md",
+            "2026-08-01_cpo_pluggable_coexistence.md",
+            "2026-08-01_sphbm4_organic_substrate.md",
+            "2026-08-02_ai_memory_hierarchy.md",
+            "2026-08-02_amd_helios_deployment_ladder.md",
+            "2026-08-02_high_na_euv_insertion_ladder.md",
+            "2026-08-02_hybrid_bonding_readiness.md",
             "2026-08-02_open_ai_fabrics.md",
+            "2026-08-02_ai_process_control_intensity.md",
+            "2026-08-02_panel_level_packaging_readiness.md",
+            "2026-08-02_ucie_interoperability_ladder.md",
             "2026-08-03_custom_hbm_scope_ladder.md",
+            "2026-08-03_pcie6_compliance_ladder.md",
+            "2026-08-01_800vdc_execution_readiness.md",
+            "2026-08-02_800v_power_semiconductor_partition.md",
+            "2026-08-03_800vdc_protection_layers.md",
+            "2026-08-03_ai_capacitor_role_map.md",
+            "2026-08-03_ai_power_buffering_hierarchy.md",
             "2026-08-09_ai_rack_emc_certification.md",
             "2026-08-09_ai_storage_data_plane.md",
         )

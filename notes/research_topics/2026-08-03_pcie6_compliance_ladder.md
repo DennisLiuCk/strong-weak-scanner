@@ -306,42 +306,82 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave3_no_conclusion_change
+evidence: editorial:plain_language_wave3
+-->
 
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
-- **PCIe 6**：PCI Express 第六代，最高原始傳輸率為每 lane 64 GT/s；規格存在不表示產品已通過官方測試。
-- **Retimer／switch／endpoint**：retimer 重整高速訊號、switch 連接多個端點、endpoint 是 SSD 或加速器等終端裝置；完整系統需要它們共同工作。
-- **Vendor interoperability**：供應商在自家實驗室或客戶平台測試不同元件能互通，測試範圍可能與標準組織程序不同。
-- **Official Testing／Integrators List**：PCI-SIG 指定程序的正式測試，以及通過指定 revision／rate 後的公開列表；產品名寫 Gen6 不會自動產生 64 GT/s listing。
-- **Compliance Workshop**：PCI-SIG 安排會員執行正式相容性與互通測試的活動；活動提供某項測試，不代表所有參加產品都通過。
+- **第六代高速周邊連接（PCIe 6）**：PCI Express 第六代，最高原始傳輸率為每條通道 64 GT/s；規格存在不表示產品已通過官方測試。
+- **訊號重整器／交換器／終端（retimer／switch／endpoint）**：訊號重整器修復高速訊號，交換器連接多個端點，終端則是 SSD 或加速器等裝置；完整系統需要它們共同工作。
+- **跨廠互通（vendor interoperability）**：供應商在自家實驗室或客戶平台測試不同廠商的元件能否一起工作；測試範圍可能與標準組織程序不同。
+- **官方測試／合格清單（Official Testing／Integrators List）**：PCI-SIG 指定程序的正式測試，以及通過特定版本與速率後的公開列表；產品名稱寫 Gen6，不會自動產生 64 GT/s 的清單項目。
+- **相容性工作坊（Compliance Workshop）**：PCI-SIG 安排會員執行正式相容性與互通測試的活動；活動提供某項測試，不代表所有參加產品都通過。
+- **主機端／韌體（host／firmware）**：主機端發起資料交換，韌體負責裝置的低階控制；元件規格相同，韌體與平台組合仍可能影響穩定性。
+- **客戶驗證（qualification）**：客戶依自己的平台與條件確認產品可用；它可能早於或晚於標準組織的公開測試，也不等於已大規模部署。
 
 ### 三句話抓重點
 
-- Workshop #140 已把 PCIe 6.x official testing 開到 64 GT/s，retimer 也納入正式測試。
-- Astera Labs 已稱 PCIe 6 connectivity portfolio 通過客戶 qualification 並 ramp production，Micron 也稱 Gen6 SSD high-volume production；但 PCI-SIG 列表中仍可見部分 Gen6 功能產品只列 PCIe 5.0 at 32GT/s。
-- 這不是矛盾，而是不同時鐘：產品能力、供應商互通、官方測試、公開 listing 與客戶部署必須各自記錄。
+- 第 140 次相容性工作坊已把 PCIe 6.x 官方測試開到 64 GT/s，訊號重整器也納入正式測試。
+- Astera Labs 表示其 PCIe 6 連接產品已通過客戶驗證並開始增產，Micron 也表示 Gen6 SSD 已大量生產；但 PCI-SIG 清單中，部分 Gen6 功能產品仍只列 PCIe 5.0、32 GT/s。
+- 這不是矛盾，而是不同時鐘：產品能力、跨廠互通、官方測試、公開清單與客戶部署必須分開記錄。
 
 ### 為什麼重要
 
-高速介面生態很容易把「產品名」當成「官方合規」，再把「量產」當成「平台大規模部署」。實際上，
-retimer 可以先量產、SSD 可以對應 reference architecture、供應商可以完成客戶 qualification，而正式
-64 GT/s listing 仍在另一個程序與時間軸。把每一格拆開，才能知道風險是在 silicon、訊號完整性、
-firmware、跨廠互通、平台驗收還是客戶 rollout，也能避免一則公告讓所有供應鏈節點同時升級。
+高速介面新聞很容易把「產品名稱」當成「官方合規」，再把「元件量產」當成「整套平台已大規模
+部署」。實際上，這些動作由不同組織、用不同條件確認。
+
+訊號重整器可以先量產，SSD 也可以先進入參考架構，供應商還可能先完成客戶驗證；但正式的
+64 GT/s 公開清單仍走另一套程序。它們可以同時為真，卻不能互相代替。
+
+把每個階段拆開，才能知道風險落在晶片、訊號完整性、韌體、跨廠互通、平台驗收，還是客戶
+導入時程，也能避免一則公告讓所有供應鏈節點同時升級。
 
 ### 接下來怎麼追
 
-- 保存 Workshop #140 後每一筆新 listing 的產品、function、revision、rate、lane 與日期。
-- 對供應商的 interop，找出 host、endpoint、retimer／switch 是否來自不同公司，以及測試是否為 64 GT/s。
-- 對 production，區分元件出貨、客戶 qualification、reference architecture 與實際 fleet deployment。
-- 台灣公司必須有平台端具名與公司端產品／財務雙向證據，不能只用 PCIe IP 或 server 能力推導。
+- 保存第 140 次工作坊後每一筆新清單項目的產品、功能、規格版本、速率、通道數與日期。
+- 對跨廠互通測試，找出主機端、終端、訊號重整器或交換器是否來自不同公司，以及測試是否真的跑到 64 GT/s。
+- 對量產消息，區分元件出貨、客戶驗證、參考架構與實際大規模平台部署。
+- 台灣公司必須同時有平台端具名與公司端產品、財務證據，不能只用 PCIe IP 或伺服器製造能力推導。
 
 ### 想一想
 
-- 一顆 Gen6 retimer 在 PCIe 5.0 32 GT/s listing 中出現，究竟證明了什麼，又沒有證明什麼？
-- Endpoint 與 retimer 各自量產，是否足以保證任一 host、switch、firmware 組合都能穩定運行？
-- Official compliance 與客戶 qualification 哪一個先發生，會因產品與平台而不同嗎？
+- 一顆 Gen6 訊號重整器出現在 PCIe 5.0、32 GT/s 清單中，究竟證明了什麼，又沒有證明什麼？
+- 終端與訊號重整器各自量產，是否足以保證任一主機端、交換器與韌體組合都能穩定運行？
+- 官方合規與客戶驗證哪一個先發生，會因產品與平台而不同嗎？
+
+## 五個動詞，代表五個不同階段
+
+### 支援
+
+產品資料寫「支援 PCIe 6」，只表示設計目標或功能範圍包含該規格。讀者還不知道它在哪個
+速率、通道數與拓撲下運作，也不知道測試時搭配了哪些元件。
+
+### 互通
+
+跨廠互通表示不同公司的主機端、交換器、訊號重整器與終端曾一起運作。這比單一元件功能
+多走一步，但仍要核對參與者、測試條件與結果是否公開，不能只看活動名稱。
+
+### 通過
+
+通過官方程序，代表產品在特定版本、速率與功能下符合標準組織的測試要求。合格清單只支持
+列出的那一格；32 GT/s 的項目不能自動升成 64 GT/s，也不能替未列出的產品背書。
+
+### 量產
+
+量產回答供應商是否穩定製造某個元件。它不保證其他元件、韌體與平台已準備完成，也不告訴
+讀者有多少產品真正裝進客戶的生產系統。
+
+### 部署
+
+部署才回答完整平台是否被客戶實際採用。此時要看到具名平台、元件組合、運行條件、數量或
+可重現結果。只有走到這一步，才能開始把介面成熟度連到供應鏈出貨與財務影響。
 
 ## 五格成熟度表
 

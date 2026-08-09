@@ -48,6 +48,14 @@ reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:readability
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave6_compute_interconnect_learning_no_conclusion_change
+evidence: editorial:plain_language_wave6
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -61,6 +69,10 @@ evidence: editorial:readability
 - **MI455X**：AMD 的 Instinct 加速器（GPU）型號，是 Helios 裡的運算主角。
 - **ND MI455X v7**：微軟 Azure 雲端虛擬機器的規格名稱。ND 是 Azure 給 GPU 加速機型的系列代號，MI455X 指所用的 AMD 加速器，v7 是該系列的版本。**它是一個雲端產品型號，不是硬體出貨數量**；微軟目前把它列為 upcoming，尚未給上線日期。
 - **EFB（Elevated Fanout Bridge）**：AMD 生態系文件列出的一種先進封裝技術路徑，用橋接結構連接同一封裝內的多顆晶片。它出現在封裝夥伴的合作敘述裡，不代表任何一家封測廠已取得可辨識的訂單。
+- **ASIC（特定用途集成電路）**：為特定客戶或任務設計的晶片。Helios 的支出成長可能是新增，也可能排擠客製 ASIC 或其他 GPU 平台。
+- **SKU（可銷售規格項目）**：客戶可以選購或使用的具體產品配置。Azure 預告型號，不等於該 SKU 已普遍開放使用。
+- **ASE／SPIL／PTI**：分別指日月光、矽品與力成的英文簡稱。AMD 文件列名合作角色，仍不等於已有 Helios 訂單或財務貢獻。
+- **Helios-based／Helios-specific**：前者是「以 Helios 為基礎」，後者是「明確專屬 Helios」。一般 AMD 封裝合作不能自動改寫成 Helios 專屬出貨。
 
 ### 三句話抓重點
 

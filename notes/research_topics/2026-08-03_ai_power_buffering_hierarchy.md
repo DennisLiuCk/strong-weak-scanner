@@ -48,11 +48,21 @@ reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave5_power_system_learning_no_conclusion_change
+evidence: editorial:plain_language_wave5
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **CBU（Capacitor Bank Unit）**：以電容或超級電容靠近機架吸收很快的功率尖峰與低谷，重點是高功率、快速反應，不是長時間供電。
+- **Rack（機架／機櫃）**：集中安裝運算、電源、儲能與冷卻設備的結構單位。「靠近機架」代表需更快回應局部功率波動。
+- **DC（Direct Current，直流電）**：電流主要往固定方向流動。機架內的高壓直流匯流排，是 CBU 或 BBU 可能連接的電力節點。
 - **BBU（Battery Backup Unit）**：以電池在機架或直流匯流排側提供短時 ride-through，目的通常是跨過電源切換或受控停機，不等於設施級儲能。
 - **BESS（Battery Energy Storage System）**：位於設施或公用電網介面側的較大型電池儲能，用來處理較慢、影響範圍更大的負載變化與發電機切換。
 - **時間尺度**：事件從發生到需要被補償的快慢。元件若在錯誤的時間尺度工作，即使都能儲能，也不代表可互相替代。

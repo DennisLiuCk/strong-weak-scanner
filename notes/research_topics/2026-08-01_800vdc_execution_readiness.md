@@ -245,6 +245,14 @@ reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave5_power_system_learning_no_conclusion_change
+evidence: editorial:plain_language_wave5
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -252,6 +260,9 @@ evidence: editorial:high_frequency_glossary
 - **800VDC**：以約 800 伏特直流電在資料中心傳送電力，目的是降低超高功率機櫃的電流、線材與轉換損耗。
 - **Power rack**：集中把資料中心電力轉換、分配給多個運算機櫃的電源系統，不等於伺服器本身。
 - **BBU**：電池備援單元，停電或負載突升時短暫供電，避免高功率 AI 機櫃中斷。
+- **CDU（冷卻液分配單元）**：把冷卻液送往機櫃、帶走熱量的設備；展示功率不等於已有客戶大量部署。
+- **GTC**：NVIDIA 舉辦的開發者與產業活動。展會公開的架構或展示規格，仍需客戶驗收與量產資料才能確認商業進度。
+- **Kyber**：NVIDIA 公開路線圖中預計於 2027 導入的高功率機櫃世代；路線圖上有名稱，不等於目前已大量出貨。
 - **驗證**：客戶測試產品是否符合規格與可靠度；開始驗證不等於驗證完成或已大量出貨。
 - **Cloud and AIoT**：光寶科揭露的雲端運算與人工智慧物聯網營收分類；它包含多種產品，不能直接當成 800V 收入。
 

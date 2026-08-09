@@ -225,6 +225,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave4_packaging_learning_no_conclusion_change
+evidence: editorial:plain_language_wave4
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -237,6 +244,8 @@ evidence: editorial:high_frequency_glossary
 - **Throughput**：設備在單位時間能完成多少面板；面板較大不代表每小時一定做出更多合格產品。
 - **HVM（High-Volume Manufacturing）**：高量產階段，需同時滿足良率、節拍、可靠度、成本與客戶資格；pilot 或 early qualification 還不是 HVM。
 - **NEXX**：Applied Materials 宣布簽約收購、用來補強大型面板電鍍能力的設備公司；簽約不等於交易完成或客戶已量產。
+- **HBM**：貼近 GPU 的高頻寬記憶體；多顆 HBM 與大型運算晶片放在同一封裝時，封裝尺寸與製造難度都會上升。
+- **電鍍沉積（ECD）**：用電化學方式在金屬表面沉積材料的製程；本文指大型面板上的銅電鍍能力。
 
 ### 三句話抓重點
 
@@ -253,7 +262,7 @@ AI 封裝把 GPU、HBM 與 I/O chiplet 放在更大的基板上，圓形晶圓�
 ### 接下來怎麼追
 
 - 每次看到 panel 新聞，先標記是 R&D、pilot、early qualification、HVM readiness 還是真正 HVM。
-- 要求同時披露 panel 長寬／厚度、可排產品數、good-package yield、cycle time、設備利用率與可靠度。
+- 要求同時披露面板長寬／厚度、可排產品數、合格封裝良率、製程週期（cycle time）、設備利用率與可靠度。
 - 公司映射要對上具名客戶、料號或工具、qualification 與財務，不把一般先進封裝能力當作 PLP 訂單。
 
 ### 想一想
@@ -266,7 +275,7 @@ AI 封裝把 GPU、HBM 與 I/O chiplet 放在更大的基板上，圓形晶圓�
 
 可以把每顆合格封裝成本想成：
 
-`面板與材料 + 設備折舊 + 製程時間 + 報廢損失 ÷ 最終合格封裝數`
+`（面板與材料 + 設備折舊 + 製程時間 + 報廢損失）÷ 最終合格封裝數`
 
 面積利用率只改善分子與理論可排數的一部分；uniformity、翹曲、edge control、yield 與 throughput
 會共同決定分母。沒有這些欄位，就只能說 PLP 有幾何潛力，不能說已具經濟優勢。

@@ -257,6 +257,14 @@ reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave6_compute_interconnect_learning_no_conclusion_change
+evidence: editorial:plain_language_wave6
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -267,6 +275,7 @@ evidence: editorial:high_frequency_glossary
 - **Interoperability**：不同廠商各自設計的元件真的接在一起並能工作，而不只是都聲稱遵守同一份規格。
 - **UCIe-S／UCIe-A**：分別對應標準封裝與更高密度先進封裝的實體介面路徑。
 - **PHY（Physical Layer）**：實體層電路，負責把數位資料真正轉成晶粒間可傳送與接收的電氣訊號；有 PHY 不等於完整協定已互通。
+- **GT／GT/s（每秒十億次傳輸）**：介面每秒可完成的傳輸次數。64 GT/s 是規格速度，不代表已有晶片通過該速度的跨廠實體測試。
 
 ### 三句話抓重點
 

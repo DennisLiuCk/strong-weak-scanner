@@ -48,6 +48,14 @@ reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave5_power_system_learning_no_conclusion_change
+evidence: editorial:plain_language_wave5
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -55,6 +63,10 @@ evidence: editorial:high_frequency_glossary
 - **Interlock（安全連鎖）**：當人員要接近高壓帶電部位時，先強制斷電或阻止接近；它處理的是人身與維修安全，不是吸收功率尖峰。
 - **Overcurrent／ground fault**：前者偵測或切斷超額電流，後者處理電流錯誤流向接地或機殼；兩者的偵測條件與故障路徑不同。
 - **Hot-swap**：設備仍帶電時控制連接、預充與切離，避免插入大電容時的湧入電流或故障擴散；它不等於長時間備援電源。
+- **DC（Direct Current，直流電）**：電流主要往固定方向流動。800VDC 代表約 800 伏的直流供電架構。
+- **BBU（電池備援單元）**：斷電或電源切換時短暫供電，它處理的是維持運作，不是取代故障隔離與人身安全保護。
+- **SiC（碳化矽）**：可處理較高電壓與功率的半導體材料；參考設計使用 SiC，不等於所有量產系統都會採用。
+- **JFET（接面場效電晶體）**：一種電子開關。本文引用的 SiC JFET 用於控制高壓接入時的電流，不代表已完成客戶量產驗收。
 - **SOA（Safe Operating Area）**：功率開關在電壓、電流與時間組合下可安全工作的範圍；預充軌跡若超出 SOA，開關可能在保護動作前受損。
 - **Diablo 400**：OCP 的機架與電源規格專案，列出 400／800V 系統需求；它不是單一供應商的量產產品。
 - **eFuse（電子保險絲）**：用功率開關、感測與控制快速限制或切斷異常電流；功能與一次性熔絲、hot-swap 或備援儲能不同。

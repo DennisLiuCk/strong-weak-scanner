@@ -48,11 +48,21 @@ reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave5_power_system_learning_no_conclusion_change
+evidence: editorial:plain_language_wave5
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **CBU（Capacitor Bank Unit）**：靠近機架、用電容或超級電容吸收快速功率波動的儲能模組；它不是處理器旁的一顆去耦電容。
+- **BBU（Battery Backup Unit，電池備援單元）**：用電池支撐較長的斷電或切換過渡。它和處理快速功率波動的 CBU 是不同機架選項。
+- **Rack（機架／機櫃）**：集中安裝運算、電源、儲能與冷卻設備的結構單位。同一機架裡的電容，仍可能位在完全不同的電氣節點。
 - **DC link／高壓直流匯流排**：電源轉換級之間輸送數百伏直流電的節點；此處元件先面對耐壓、紋波、壽命與安全條件。
 - **PDN（Power Delivery Network）**：從電源轉換器、電路板、封裝到晶片的供電路徑；頻率越高，元件位置與寄生電感通常越重要。
 - **ESR／ESL**：電容不是理想元件；等效串聯電阻與電感會限制它在不同頻率處理紋波或瞬態的能力。
@@ -67,11 +77,11 @@ evidence: editorial:high_frequency_glossary
 
 ### 為什麼重要
 
-AI 電力題材最容易把「電容量增加」誤當成一個可以直接加總的需求。實際上，rack CBU 要處理
-快速功率波動，高壓 bus／DC link 要承受數百伏、紋波與壽命條件，板級 bulk capacitor 要處理
-較慢的電流變化，封裝或晶片旁的去耦則要壓低高頻阻抗。材料、尺寸與名稱相同不代表任務相同；
-任務不同也不代表各類電容一定同時增加。先建立角色圖，才知道下一步應向公司查哪一個產品、
-規格、qualification 與財務分母。
+AI 電力題材最容易把「電容量增加」誤當成一個可以直接加總的需求。實際上，機架旁的 CBU 處理快速功率波動；高壓直流匯流排上的電容則先面對耐壓、紋波與壽命條件。
+
+電路板上的大容量電容要處理較慢的電流變化，封裝或晶片旁的去耦電容則要壓低高頻阻抗。材料、尺寸或名稱相同，不代表任務相同。
+
+先建立角色圖，才知道下一步應向公司查哪一個產品、規格、客戶驗證與財務分母；不能由某一層規格升級，推導所有電容都同時增加。
 
 ### 接下來怎麼追
 

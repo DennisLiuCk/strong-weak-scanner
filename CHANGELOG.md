@@ -1,5 +1,103 @@
 # Changelog
 
+## 研究中心圖譜起讀入口與運算／互連白話升級 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善知識圖譜的
+學習順序與三篇文章用詞，不修改研究來源、主張、證據層級、monitor、圖譜 edge、公司映射
+或財務歸因。
+
+- 「運算與互連」路線由概括描述改為可執行的建議順序：先讀 AI 儲存資料平面，再看開放
+  AI 互連，最後用 PCIe 6／UCIe 檢查成熟度；其他三條路線同步明示起讀與接續順序。
+  每張 active graph 的摘要下方新增「先讀主題文章」入口，且只解析 graph 已登錄的
+  `article_ids`。契約測試確認 25／25 張圖譜都有可解析的既有文章，不以標題或關鍵字推測
+  新文章映射。
+- 完成 AMD Helios、High-NA EUV 與 UCIe 互通成熟度三篇白話升級：補齊 ASIC、SKU、
+  ASE／SPIL／PTI、Helios-based／Helios-specific、Low-NA 與 GT／GT/s 等高頻術語。
+  三篇 source、claim、comparison、monitor 與鎖定 meta 均未改動；baseline editorial lint 通過。
+- 完整 34 篇 topic registry 的 warning 由 24 降至 18（非抽樣；其餘為既有時效、映射與
+  其他文章可讀性債），新增 append-only 方法快照 `RMA-2026-08-09-09`。讀者學習升級測試
+  擴為 20 篇，避免已改善文章回退。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 449 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留前述 18 個 warning），inline JavaScript
+  語法通過。連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html`
+  `fbedadd3…`。以 1280×720 與 390×844 實機複核：桌機可直接看到起讀入口；手機按鈕高 44px、
+  頁面寬度等於 viewport，點擊後文章與閱讀區皆回到頂端；三篇新手導讀字典可見、查核附錄
+  預設關閉，console 無 warning／error。
+
+## 研究中心知識圖譜漸進導覽與 800V 電力學習路徑白話升級 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善知識圖譜導覽、
+首屏說明與文章用詞，不修改研究來源、主張、證據層級、monitor、公司映射或量化資料。
+
+- 同狀態實機稽核發現：行動版知識圖譜在主內容前平鋪 25 個主題按鈕，讀者尚未學會讀圖就先面對
+  大量縮寫。改為「學習路線 → 中心主題 → 投影視角 → 關係來源」四步，並以供電與散熱 9、
+  記憶體與封裝 7、運算與互連 8、公司財務案例 1 四條路線縮小選擇範圍。路線只分組現有 graph ID；
+  新增未分類 graph 會自動落入其他主題，不會生成新 edge 或受惠關係。
+- 行動版只顯示當前路線的 44px 主題下拉選擇，桌機版則保留可掃讀的主題 chips。路線、主題與公司／
+  產業視角切換都會同步 deep link；圖譜首屏把 `v2 direct assessment`、`bounded proxy`
+  等內部語彙改寫為「公司直接揭露且能用同期間分母重算」，財務帳本與判定不變。
+- 完成 800V 執行成熟度、功率半導體分工、保護責任層、AI 電容角色與功率緩衝五篇白話升級：
+  補齊 CDU、GTC、Kyber、HV、POL、DC、BBU、SiC、JFET 與 Rack 等高頻名詞，並把電容角色的
+  過長段落拆成機架緩衝、高壓匯流排、板級與晶片旁四種位置。五篇的 source、claim、comparison、
+  monitor 與鎖定 meta 均未改動；baseline editorial lint 通過。
+- 完整 34 篇 topic registry 的 warning 由 33 降至 24（非抽樣；剩餘為既有時效、映射與其他文章的
+  可讀性債），新增 append-only 方法快照 `RMA-2026-08-09-08`。讀者學習升級測試擴為 17 篇，
+  避免已改善文章回退。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 449 tests 全綠；research queue、radar、method audit、
+  knowledge graph lint 均為 0 errors（queue 保留前述 24 個 warning），inline JavaScript 語法通過。
+  連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `f27bc990…`。
+  以 1280×720 與 390×844 實機複核：四條路線合計完整覆蓋 25 張圖譜，路線、主題下拉與投影視角
+  皆可操作；兩個 viewport 的頁面寬度等於 viewport，五篇文章均以新手導讀開場、研究查核附錄預設關閉，
+  console 無 warning／error。
+
+## 研究中心首次進站三步導覽與 HBM／先進封裝白話升級 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善首次進站導覽、
+文章解釋順序與文字，不修改研究來源、主張、證據層級、monitor 或量化資料。
+
+- 研究文章清單在未搜尋、未篩選、未開啟文章的乾淨狀態新增「第一次來？照三步開始」：
+  先到族群矩陣看產業全貌，再只看市場議題建立共同語言，最後到知識圖譜追可回查的關係。
+  導覽可收合，讀者開始操作後即隱藏；三個入口會回到頁面頂端，不把原清單捲動位置帶進
+  新表面。這只是安排既有內容的閱讀順序，不新增公司映射、圖譜線或投資排名。
+- 完成 SPHBM4、有層次的 AI 記憶體、hybrid bonding 與 panel-level packaging 四篇白話升級：
+  分別加入封裝四層、資料放置四層、三種成熟度新聞與合格封裝單位經濟的判讀框架，補齊
+  SerDes／CoWoS／ABF／BT、Dynamo／NIXL、RDL／Kinex、HBM／ECD 等高頻名詞。來源、claim、
+  comparison、monitor 與鎖定 meta 均未改動；baseline editorial lint 通過。
+- 完整 34 篇 topic registry 的 warning 由 40 降至 33（非抽樣；本輪刻意處理上述四篇，
+  其餘 33 個既有可讀性／時效／映射 warning 留待後續批次），新增 append-only 方法快照
+  `RMA-2026-08-09-07`。讀者學習升級測試擴為 12 篇，避免已改善文章回退。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 448 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留前述 33 個 warning），inline
+  JavaScript、`git diff --check`、`CLAUDE.md`／`AGENTS.md` 同步及連續兩次 dashboard build
+  SHA 均通過。以 1280×720 與 390×844 實機複核：三個新手入口皆到達正確表面且 `scrollY=0`，
+  頁面寬度等於 viewport；導覽摘要高 57px、三個入口高 64–72px，console 無 warning／error，
+  四篇文章均以新手導讀開場且研究查核附錄預設關閉。
+
+## 研究中心新手第一屏、族群矩陣讀法與第二批白話升級 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善研究中心的
+閱讀順序、解釋層與文章文字，不修改研究來源、主張、證據層級、monitor 或量化資料。
+
+- 市場議題改為先顯示「新手先讀：這篇在講什麼」，再顯示由結構化 register 合成的
+  「研究摘要：已知、未知與下一步」。桌機首屏的新手導讀頂端由約 730–774px 提前到 355px；
+  390×844 手機由 1,128px 提前到 535px，讀者不必先穿過研究帳本語言才看到名詞與判讀框架。
+- 族群矩陣新增「公司本業底稿 → 題材具名連結 → 財務落地」三層讀法，並明示矩陣數字是
+  研究覆蓋進度、不是多空分數；「0 個能直接辨識」只表示公司尚未拆出題材財務分子。
+- 完成優先 Q2 文件、CPO／可插拔光模組、AI 製程控制強度與 PCIe 6 合規階梯四篇白話升級：
+  先寫中文概念再附英文術語，補齊判讀步驟與成熟階段，並拆開過長句。四篇的來源、claim、
+  comparison、monitor 與鎖定 meta 均未改動；baseline editorial lint 通過。
+- 完整 34 篇 topic registry 的 warning 由 52 降至 40（非抽樣；本輪刻意處理上述四篇，
+  其餘 40 個既有可讀性／時效／映射 warning 留待後續批次），新增 append-only 方法快照
+  `RMA-2026-08-09-06`。讀者學習升級測試同步擴成八篇，避免本輪文章回退。
+- 同狀態瀏覽器複核另發現：段落重排後，初次排版完成前的大綱座標會誤把「從這篇接著學」
+  標成目前段落；改為跨兩個 animation frame 重算並加回歸契約。修正後桌機與手機第一項均
+  正確高亮新手導讀，研究查核附錄維持預設關閉。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 448 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留前述 40 個 warning），inline
+  JavaScript、`git diff --check`、`CLAUDE.md`／`AGENTS.md` 同步及連續兩次 dashboard build
+  SHA 均通過。以同狀態 1280×720 與 390×844 前後對照複核，頁面寬度等於 viewport、console
+  無 error／warning。
+
 ## 研究中心文章接續學習路徑與白話導讀試行 — 2026-08-09
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善研究中心文章的

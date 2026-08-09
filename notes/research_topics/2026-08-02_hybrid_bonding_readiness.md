@@ -225,6 +225,14 @@ trigger: 台灣公司與客戶對同一 hybrid bonding 產品或製程完成 qua
 invalidation: 公司只使用 hybrid bonding、2.5D／3D 或先進封裝概念詞，未揭露客戶、產品、階段與財務足跡
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave4_packaging_learning_no_conclusion_change
+evidence: editorial:plain_language_wave4
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -238,11 +246,13 @@ invalidation: 公司只使用 hybrid bonding、2.5D／3D 或先進封裝概念�
 - **HVM（High Volume Manufacturing，量產）**：真正的大量生產階段。PDK、試驗車與客戶設備使用都排在它之前，任何一項都不能替代 HVM。
 - **CMP（化學機械研磨）**：把晶圓表面磨到極平的製程。hybrid bonding 靠兩片表面直接貼合，對平整度與粗糙度要求極高，CMP 因此是能否貼合成功的關鍵前處理。
 - **OSAT（委外封測廠）**：專門承接封裝與測試的外包廠商，台灣的日月光投控、力成等屬於這一類。
+- **重新佈線層（RDL）**：在晶片或封裝表面重新安排金屬線與接點的位置，讓上下層可以用更細的間距連接。
+- **Kinex**：Applied Materials 與 Besi 合作推出的整合式 die-to-wafer hybrid bonding 設備；有客戶使用設備，不等於客戶產品已量產。
 
 ### 三句話抓重點
 
-- 2026 年的進展讓 hybrid bonding 同時有 pathfinding PDK 與 200nm W2W 試驗車，不再只是概念圖。
-- Applied Materials 的 Kinex 又提供整合設備與多類客戶使用節點，但官方沒有公開具名量產產品、qualification、yield 或 throughput。
+- 2026 年的進展讓 hybrid bonding 同時出現「用來找路的設計工具包」與 200nm 晶圓對晶圓試驗車，不再只是概念圖。
+- Applied Materials 的 Kinex 又提供整合設備與多類客戶使用節點，但官方沒有公開具名量產產品、客戶認證、良率或每小時產能。
 - 因此最有價值的判讀是「技術階梯向前」，不是「所有相關封測、設備與材料公司已開始賺錢」。
 
 ### 為什麼重要
@@ -262,6 +272,15 @@ Hybrid bonding 把接點做得更密，能讓邏輯、記憶體與 chiplet 之�
 - 一個 200nm 試驗車的 overlay 很好，還缺哪些資料才能證明它能在客戶產品上長期大量生產？
 - D2W 可以挑已知良品、W2W 可以整片處理，兩者的良率與成本應該用同一個分母比較嗎？
 - 設備被多家客戶「使用」，和設備已完成 HVM qualification 並貢獻收入，中間還有哪些節點？
+
+## 先把三種新聞放到正確位置
+
+1. **設計工具可用**：PDK 讓設計者開始畫線與檢查規則，表示有入口，不表示已能直接送量產。
+2. **製程試驗成功**：試驗車證明特定結構做得出來，還要補上客戶產品的良率、可靠度與產能。
+3. **客戶產品量產**：具名產品完成認證並穩定大量生產，才接近可驗證的訂單與財務貢獻。
+
+這三類新聞不能彼此替代。設計工具、實驗紀錄或設備被使用，都能讓技術階梯前進；只有走到具名產品
+認證、量產與財務揭露，才足以把產業進展連成公司的確定受惠。
 
 ## 成熟度階梯：三個進展，三個不能跳過的邊界
 

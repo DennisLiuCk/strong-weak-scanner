@@ -324,12 +324,21 @@ reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:high_frequency_glossary
 -->
 
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave6_compute_interconnect_learning_no_conclusion_change
+evidence: editorial:plain_language_wave6
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **EUV**：用極短波長光把先進晶片圖形印到晶圓上的微影技術；它是製程中的一段，不是完整晶片工廠。
 - **High-NA**：把 EUV 光學系統的數值孔徑提高到 0.55，以印更小圖形；解析度提高，同時也帶來光阻、掩模、量測與製程整合的新要求。
+- **Low-NA**：現行數值孔徑較低的 EUV 平台。它可用多重曝光及圖形化完成部分任務，是 High-NA 必須在成本、良率與生產穩定度上比較的替代路徑。
 - **Availability**：設備在預定生產時間內可正常工作的比例；它重要，但不等於產能、良率或客戶已量產。
 - **Product wafer**：用實際產品設計而非單純 test pattern 的晶圓做製程驗證；仍可能只在研發或 qualification 階段。
 - **HVM insertion**：把設備與製程真正放進高量產節點；需要穩定 throughput、availability、良率、成本與客戶設計共同成立。

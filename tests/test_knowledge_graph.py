@@ -53,7 +53,13 @@ class KnowledgeGraphTest(unittest.TestCase):
                 registered_ids.add(fields["graph_id"].strip())
         self.assertEqual(graph_ids, registered_ids)
         self.assertGreater(len(graphs), 0)
+        topic_article_ids = {f"topic-{topic['topic_id']}" for topic in self.topics}
         for graph in graphs:
+            self.assertTrue(graph["articleIds"], graph["id"])
+            self.assertTrue(
+                set(graph["articleIds"]).issubset(topic_article_ids),
+                graph["id"],
+            )
             self.assertEqual({edge["view"] for edge in graph["edges"]},
                              {"company", "industry"})
             for edge in graph["edges"]:

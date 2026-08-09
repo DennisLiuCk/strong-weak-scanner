@@ -170,7 +170,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(topic["confidence"]["effective"], "medium")
         self.assertEqual(
             [section["h"] for section in topic["sections"][:5]],
-            ["先看重點：已知、未知與下一步", "新手先讀：這篇在講什麼",
+            ["研究摘要：已知、未知與下一步", "新手先讀：這篇在講什麼",
              "30 秒摘要", "主張—證據帳本", "影響路由與證據邊界"],
         )
         self.assertIn("不可比", str(topic["sections"]))
@@ -507,11 +507,16 @@ class ResearchCenterTest(unittest.TestCase):
             "來源帳本", "mobile-evidence", "可水平捲動的研究資料表",
             "aria-label=\"搜尋研究文章\"", "filtersPanel.inert", "clearArticleRoute",
             "aria-label=\"研究文章清單\"", ":focus-visible", "@media(max-width:780px)",
-            "先看重點：已知、未知與下一步", "function resetReaderScroll()",
+            "研究摘要：已知、未知與下一步", "function resetReaderScroll()",
             "ARTICLE_AUDIT_HEADINGS", "function renderResearchAppendix(",
             "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
             "從這篇接著學", "function openLearningGroups(",
             "function openLearningCollection(", "learning-path-grid",
+            "maturity-reading-key", "先從左到右讀三層",
+            "entry-guide", "第一次來？照三步開始",
+            'id="entryMatrix"', 'id="entryTopics"', 'id="entryGraph"',
+            "function showEntryGuide()", "function resetEntryScroll()",
+            "function openEntrySurface(", "function openEntryTopics()",
             "text:'延伸學習'",
             "document.body.classList.remove('article-open');selectSurface('library',true)",
         ):
@@ -534,9 +539,17 @@ class ResearchCenterTest(unittest.TestCase):
         # meta 之後、首屏重點之前插入行動版大綱(≤1180px 桌機側欄 .outline 隱藏時接手)
         self.assertIn("body.append(meta);const mobileToc=renderMobileToc(article);"
                       "if(mobileToc)body.appendChild(mobileToc);"
+                      "body.appendChild(articleSections(article,'beginner'));"
                       "body.appendChild(articleSections(article,'analyst'))", template)
         self.assertIn("body.appendChild(articleSections(article,'reader'))", template)
         self.assertIn("body.appendChild(appendix)", template)
+        self.assertIn("schedule();requestAnimationFrame(()=>requestAnimationFrame(schedule))", template)
+        self.assertLess(template.index('id="entryGuide"'), template.index('id="results"'))
+        self.assertIn("!document.body.classList.contains('article-open')", template)
+        self.assertIn("document.getElementById('entryMatrix').addEventListener", template)
+        self.assertIn("document.getElementById('entryTopics').addEventListener", template)
+        self.assertIn("document.getElementById('entryGraph').addEventListener", template)
+        self.assertIn("window.scrollTo({top:0,left:0,behavior:'instant'})", template)
         self.assertIn("body.append(mobileEvidence,h('p'", template)
         self.assertIn("'aria-selected':state.type===type?'true':'false'", template)
         self.assertIn("'data-testid':'article-'+article.id", template)
@@ -665,7 +678,7 @@ class ResearchCenterTest(unittest.TestCase):
             "graphMaterialityWidth", "stroke-dasharray",
             "證據邊界", "下一個升降級節點", "供應集中度範圍",
             "同心環距離＋節點標籤＝商業曝險層級",
-            "節點離中心越近", "只有 v2 direct assessment 能進入",
+            "節點越靠近中心", "只有公司直接揭露且能用同期間分母重算的數字",
             "function graphFinancialPanel(", "題材占比未揭露", "分子／揭露值定義",
             "role:'button',tabindex:'0'", "graphKeyboard(",
         ):
@@ -674,6 +687,36 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("點線與細線表示仍需更多商業證據", template)
         self.assertIn("state.graphUniverseOnly=event.target.checked", template)
         self.assertIn("state.graphEvidence.add(input.value)", template)
+
+    def test_template_graph_uses_progressive_learning_routes_without_changing_evidence(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            'id="graphLearningTitle"', 'id="graphRouteTabs"',
+            'id="graphHubSelect"', 'id="graphIntroActions"',
+            'aria-label="知識圖譜學習路線"',
+            "const GRAPH_LEARNING_ROUTES=[", "function availableGraphRoutes()",
+            "function graphRouteId(graphId)", "function activateGraphRoute(routeId)",
+            "function activateGraphTopic(graphId)",
+            "graphRoute:graphRouteId((KG.graphs||[])[0]?.id||'')",
+            "state.graphRoute=graphRouteId(graphId)",
+            "供電與散熱", "記憶體與封裝", "運算與互連", "公司財務案例",
+            "建議順序：先讀 AI 儲存資料平面",
+            "學習路線只整理導覽",
+            ".graph-hub-tabs{display:none}", ".graph-hub-select{display:block}",
+            "const startArticle=(graph.articleIds||[])",
+            "'data-testid':'graph-primary-article'",
+            "先讀主題文章 · ",
+            "openGraphArticle(startArticle.id)",
+            ".graph-intro-action{width:100%;min-height:44px}",
+        ):
+            self.assertIn(contract, template)
+        self.assertIn(
+            "document.getElementById('graphHubSelect').addEventListener('change'",
+            template,
+        )
+        self.assertIn(
+            "other=(KG.graphs||[]).filter(graph=>!known.has(graph.id))", template)
+        self.assertNotIn("v2 direct assessment 能進入", template)
 
     def test_template_publishes_ranked_candidate_research_radar(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

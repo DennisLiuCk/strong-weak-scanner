@@ -1742,7 +1742,7 @@ def _topic_analyst_section(topic, source_by_id, group_names=None):
         f"分屬 {len(independence_groups)} 條互相獨立的來源鏈。"
     )
     return {
-        "h": "先看重點：已知、未知與下一步",
+        "h": "研究摘要：已知、未知與下一步",
         "blocks": [
             {"t": "p", "runs": _research_run(
                 "以下只整理原始文章已有的結論與證據，不會改變查核狀態。")},

@@ -46,6 +46,13 @@ to: triaged
 reason: editorial_glossary_for_repeated_terms_no_conclusion_change
 evidence: editorial:readability
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave4_memory_learning_no_conclusion_change
+evidence: editorial:plain_language_wave4
+-->
 
 <!-- research_source
 source_id: S1
@@ -285,6 +292,8 @@ invalidation: SOCAMM2 樣品延後、CXL 4.0 缺乏互通產品或台灣公司�
 - **SOCAMM2**：SOCAMM 模組的第二代，文中指 Micron 已進入送樣階段的 256GB 產品。送樣是產品節點，不等於量產或客戶採用。
 - **SSD（local SSD）**：伺服器本機的固態硬碟。在本文的分層裡，它比記憶體慢，但比機房共享儲存更靠近運算。
 - **G1–G4 與 G3.5**：NVIDIA 在 CMX 文章裡把資料存放位置由近到遠編成 G1 到 G4；CMX 新增的那一層落在 G3 與 G4 之間，因此稱為 G3.5。這是該份文件自己的分層命名，不是產業共通標準。
+- **Dynamo**：NVIDIA 開源的推論服務軟體；它可協調模型運算，但軟體存在不等於 CMX 已被客戶部署。
+- **NIXL**：協助不同記憶體與儲存位置搬移資料的軟體函式庫；它回答「資料怎麼移動」，不直接回答哪一層會形成收入。
 
 ### 三句話抓重點
 
@@ -301,13 +310,23 @@ SSD 與 coherent expansion 的內容，也可能重複計算同一份資料需�
 ### 接下來怎麼追
 
 - 追 SOCAMM2 是仍在送樣、已 qualification，還是已量產；三種狀態不能混用。
-- 追 CMX 是否由參考架構進入具名客戶部署，以及 Dynamo／NIXL 是否實際管理 KV cache placement。
+- 追 CMX 是否由參考架構進入具名客戶部署，以及 Dynamo／NIXL 是否實際管理 KV cache 的放置與移動。
 - 追 CXL 4.0 是否出現主機、switch、retimer 與記憶體裝置的互通清單，而不是只有規格版本。
 
 ### 想一想
 
 - 一份 KV cache 從 HBM 移到 system RAM 或 context storage，省下的是容量、成本還是 GPU idle time？三者需要哪些不同數據驗證？
 - 如果 SOCAMM 出貨成長但 HBM 也同步成長，這是替代，還是平台把更多資料分配到不同層？
+
+## 先問資料放在哪裡，再問誰受惠
+
+1. **GPU 工作資料／HBM**：正在計算、最在意頻寬與延遲的資料放得離 GPU 最近。
+2. **CPU 系統記憶體／SOCAMM**：容量較大、仍需快速取用的資料放在 CPU 一側。
+3. **上下文層／CMX**：可重建的 KV cache 放進共享層，避免長時間占住較昂貴的近端記憶體。
+4. **更遠的儲存／本機 SSD 與共享儲存**：容量最大、可接受較慢存取的資料再往外放。
+
+CXL 是連接處理器、記憶體擴充裝置與加速器的互連方式，不是第五種記憶體層。把新聞連到公司以前，
+要先確認它服務哪一層、資料如何移動，以及產品位於送樣、認證、量產還是財務貢獻哪個階段。
 
 ## 分層不是替代排行榜
 
