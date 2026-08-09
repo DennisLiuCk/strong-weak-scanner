@@ -217,6 +217,79 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("S1 甲公司正式公告", monitoring["rows"][0][2][0]["s"])
         self.assertEqual(monitoring["rows"][0][3][0]["s"], "S2 主管機關資料")
 
+    def test_learning_paths_only_route_to_existing_articles_graphs_and_groups(self):
+        library = bd.build_research_library(
+            self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"},
+            self.events,
+        )
+        graph = {"graphs": [{
+            "id": "test-graph", "label": "測試產業關聯",
+            "articleIds": ["topic-MI-2026-07-29-TEST"],
+            "nodes": [{"id": "company:1111", "ticker": "1111"},
+                      {"id": "concept:test"}],
+            "edges": [{"id": "E1", "from": "company:1111", "to": "concept:test"}],
+        }]}
+
+        returned = bd.attach_research_learning_paths(library, graph)
+
+        self.assertIs(returned, library)
+        self.assertEqual(library["learningPathVersion"], 1)
+        article_ids = {article["id"] for article in library["articles"]}
+        graph_ids = {item["id"] for item in graph["graphs"]}
+        group_ids = {item["id"] for item in library["groups"]}
+        for article in library["articles"]:
+            path = article["learningPath"]
+            self.assertEqual(path["title"], "從這篇接著學")
+            self.assertLessEqual(len(path["cards"]), 3)
+            self.assertIn("不會把相似題材當成已證實的供應鏈", path["description"])
+            for card in path["cards"]:
+                if card["kind"] == "article":
+                    self.assertIn(card["articleId"], article_ids)
+                    self.assertNotEqual(card["articleId"], article["id"])
+                elif card["kind"] == "graph":
+                    self.assertIn(card["graphId"], graph_ids)
+                elif card["kind"] == "group":
+                    self.assertTrue(set(card["groupIds"]).issubset(group_ids))
+                else:
+                    self.assertEqual(card["kind"], "collection")
+                    self.assertIn(card["articleType"], {"formal_note", "narrative", "topic"})
+
+        topic = next(
+            article for article in library["articles"]
+            if article["id"] == "topic-MI-2026-07-29-TEST"
+        )
+        self.assertIn("formal-1111", {
+            card.get("articleId") for card in topic["learningPath"]["cards"]
+        })
+        self.assertIn("test-graph", {
+            card.get("graphId") for card in topic["learningPath"]["cards"]
+        })
+        event = next(
+            article for article in library["articles"] if article["id"] == "event-tsmc-2026q2"
+        )
+        self.assertIn("group", {card["kind"] for card in event["learningPath"]["cards"]})
+
+        orphan = {"counts": {"topic": 1}, "groups": [], "articles": [{
+            "id": "topic-policy", "type": "topic", "groups": [], "stockIds": [],
+        }]}
+        bd.attach_research_learning_paths(orphan, {"graphs": []})
+        self.assertEqual(orphan["articles"][0]["learningPath"]["cards"], [{
+            "kind": "collection", "label": "先比較其他議題",
+            "title": "市場議題資料庫",
+            "description": "這篇尚未建立可驗證的公司或族群連結；先比較其他議題的已知、未知與追蹤方式。",
+            "meta": "1 篇市場議題", "articleType": "topic",
+        }])
+
+        wide = {"counts": {"topic": 1}, "groups": [
+            {"id": group_id} for group_id in ("g1", "g2", "g3", "g4")
+        ], "articles": [{
+            "id": "topic-wide", "type": "topic",
+            "groups": ["g1", "g2", "g3", "g4"], "stockIds": [],
+        }]}
+        bd.attach_research_learning_paths(wide, {"graphs": []})
+        self.assertEqual(
+            wide["articles"][0]["learningPath"]["cards"][0]["kind"], "collection")
+
     def test_topic_confidence_uses_explicit_as_of_without_changing_article_anchor(self):
         due_day = bd.build_research_library(
             self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"},
@@ -436,7 +509,11 @@ class ResearchCenterTest(unittest.TestCase):
             "aria-label=\"研究文章清單\"", ":focus-visible", "@media(max-width:780px)",
             "先看重點：已知、未知與下一步", "function resetReaderScroll()",
             "ARTICLE_AUDIT_HEADINGS", "function renderResearchAppendix(",
-            "查核附錄：主張、影響與追蹤表",
+            "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
+            "從這篇接著學", "function openLearningGroups(",
+            "function openLearningCollection(", "learning-path-grid",
+            "text:'延伸學習'",
+            "document.body.classList.remove('article-open');selectSurface('library',true)",
         ):
             self.assertIn(marker, template)
         self.assertIn("RESEARCH_TEMPLATE", builder)
@@ -451,6 +528,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('taipei_today as research_today', builder)
         self.assertIn('research_html.replace(', builder)
         self.assertIn('research_library["knowledgeGraph"] = build_knowledge_graph(', builder)
+        self.assertIn('attach_research_learning_paths(', builder)
         self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
         self.assertIn("body.append(mobileBack,h('h1'", template)
         # meta 之後、首屏重點之前插入行動版大綱(≤1180px 桌機側欄 .outline 隱藏時接手)

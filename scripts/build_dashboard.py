@@ -2216,6 +2216,163 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
     }
 
 
+def attach_research_learning_paths(research_library, knowledge_graph):
+    """Attach a novice-safe continuation path using only existing library links.
+
+    The path is navigation, not a new research assertion: article suggestions must
+    share a named company or declared group, while graph suggestions must already
+    cite the article or contain one of its named companies.
+    """
+    research_library = research_library or {"articles": []}
+    articles = research_library.get("articles") or []
+    graphs = (knowledge_graph or {}).get("graphs") or []
+
+    def overlap(left, right):
+        return set(left or []).intersection(right or [])
+
+    def best_related(article, article_type, require_stock=False):
+        matches = []
+        for candidate in articles:
+            if candidate.get("id") == article.get("id"):
+                continue
+            if candidate.get("type") != article_type:
+                continue
+            shared_stocks = overlap(article.get("stockIds"), candidate.get("stockIds"))
+            shared_groups = overlap(article.get("groups"), candidate.get("groups"))
+            if require_stock and not shared_stocks:
+                continue
+            if not shared_stocks and not shared_groups:
+                continue
+            matches.append((
+                len(shared_stocks), len(shared_groups), candidate.get("date") or "",
+                candidate.get("id") or "", candidate,
+            ))
+        matches.sort(key=lambda item: item[:4], reverse=True)
+        return matches[0][-1] if matches else None
+
+    def article_card(label, candidate, description):
+        return {
+            "kind": "article", "label": label,
+            "title": candidate.get("readerTitle") or candidate.get("title") or "研究文章",
+            "description": description,
+            "meta": (f"{candidate.get('typeLabel') or '研究文章'} · "
+                     f"閱讀約 {candidate.get('readingMinutes') or 1} 分鐘"),
+            "articleId": candidate.get("id") or "",
+        }
+
+    def matching_graph(article):
+        stock_ids = set(article.get("stockIds") or [])
+        ranked = []
+        for graph in graphs:
+            graph_articles = set(graph.get("articleIds") or [])
+            graph_stocks = {
+                node.get("ticker") for node in graph.get("nodes") or []
+                if node.get("ticker")
+            }
+            direct = int(article.get("id") in graph_articles)
+            shared_stocks = len(stock_ids.intersection(graph_stocks))
+            if not direct and not shared_stocks:
+                continue
+            ranked.append((direct, shared_stocks, graph.get("id") or "", graph))
+        ranked.sort(key=lambda item: item[:3], reverse=True)
+        return ranked[0][-1] if ranked else None
+
+    for article in articles:
+        cards = []
+        article_type = article.get("type")
+        if article_type == "topic":
+            formal = best_related(article, "formal_note", require_stock=True)
+            if formal:
+                cards.append(article_card(
+                    "先認識公司", formal,
+                    "先了解公司實際賣什麼、收入從哪裡來，再回頭判斷題材敘事。",
+                ))
+            related_topic = best_related(article, "topic")
+            if related_topic:
+                cards.append(article_card(
+                    "補一篇相關研究", related_topic,
+                    "用同公司或同族群的另一篇研究，補上不同環節與待驗證問題。",
+                ))
+        elif article_type == "formal_note":
+            related_topic = best_related(article, "topic")
+            if related_topic:
+                cards.append(article_card(
+                    "連到市場題材", related_topic,
+                    "把公司本業放進近期題材，並保留題材尚未證實的邊界。",
+                ))
+            narrative = best_related(article, "narrative", require_stock=True)
+            if narrative:
+                cards.append(article_card(
+                    "比較正反說法", narrative,
+                    "比較看多、看空與失效條件，練習分辨公司事實與研究假說。",
+                ))
+        elif article_type == "narrative":
+            formal = best_related(article, "formal_note", require_stock=True)
+            if formal:
+                cards.append(article_card(
+                    "回到公司底稿", formal,
+                    "先核對公司本業與收入來源，再判斷多空故事是否跨過證據邊界。",
+                ))
+            related_topic = best_related(article, "topic")
+            if related_topic:
+                cards.append(article_card(
+                    "補上市場脈絡", related_topic,
+                    "用相關市場議題補上產業機制、外部證據與下一個查證節點。",
+                ))
+
+        graph = matching_graph(article)
+        if graph:
+            cards.append({
+                "kind": "graph", "label": "看產業關聯",
+                "title": graph.get("label") or "產業知識圖譜",
+                "description": (
+                    "查看既有研究已建立的公司、產品與產業關係；"
+                    "關係線只代表證據層級，不是投資強弱。"
+                ),
+                "meta": (f"{len(graph.get('nodes') or [])} 個節點 · "
+                         f"{len(graph.get('edges') or [])} 條關係"),
+                "graphId": graph.get("id") or "",
+            })
+
+        # A cross-market article can declare nearly the whole universe (for example
+        # an event anchor with 11 guidance fields).  Turning that into one giant
+        # "related group" filter teaches nothing, so only offer the shortcut when
+        # the article actually narrows the reader to at most three groups.
+        group_ids = list(article.get("groups") or [])
+        if 0 < len(group_ids) <= 3:
+            cards.append({
+                "kind": "group", "label": "建立族群全貌",
+                "title": "、".join(article.get("groupLabels") or group_ids),
+                "description": "查看同族群的公司筆記與市場議題，分清公司角色和題材敘事。",
+                "meta": f"{len(group_ids)} 個相關族群",
+                "groupIds": group_ids,
+            })
+
+        if not cards:
+            cards.append({
+                "kind": "collection", "label": "先比較其他議題",
+                "title": "市場議題資料庫",
+                "description": (
+                    "這篇尚未建立可驗證的公司或族群連結；先比較其他議題的"
+                    "已知、未知與追蹤方式。"
+                ),
+                "meta": f"{(research_library.get('counts') or {}).get('topic', 0)} 篇市場議題",
+                "articleType": "topic",
+            })
+
+        article["learningPath"] = {
+            "title": "從這篇接著學",
+            "description": (
+                "以下只串起既有文章、族群與可追溯關係，不會把相似題材"
+                "當成已證實的供應鏈。"
+            ),
+            "cards": cards[:3],
+        }
+
+    research_library["learningPathVersion"] = 1
+    return research_library
+
+
 def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph,
                          reviews, method_audit, as_of, candidate_radar=None):
     """Build an orthogonal group-research matrix without collapsing it to a score.
@@ -3040,6 +3197,11 @@ def main():
     # build 直接標紅，避免圖上關係悄悄與研究帳本分岔。
     research_library["knowledgeGraph"] = build_knowledge_graph(
         research_topics, notes_map, strict=True,
+    )
+    # 新手延伸閱讀只串接 library 中已存在的文章、族群與圖譜；它是導覽層，
+    # 不新增供應鏈關係，也不把共享族群誤寫成已驗證的公司曝險。
+    attach_research_learning_paths(
+        research_library, research_library["knowledgeGraph"],
     )
     # 候選雷達與正式文章／圖譜分層：它可以排序「下一題研究什麼」，但候選來源本身
     # 不會繞過 knowledge_graph 的 active claim 契約。升格連結也在 build 時查存在性。

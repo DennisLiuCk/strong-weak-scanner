@@ -1554,6 +1554,27 @@ class ReadabilityGateTest(unittest.TestCase):
         self.assertGreaterEqual(
             result["proseRatio"], rq.READABILITY_MIN_PROSE_RATIO)
 
+    def test_reader_learning_pilot_articles_have_no_readability_debt(self):
+        filenames = (
+            "2026-08-02_open_ai_fabrics.md",
+            "2026-08-03_custom_hbm_scope_ladder.md",
+            "2026-08-09_ai_rack_emc_certification.md",
+            "2026-08-09_ai_storage_data_plane.md",
+        )
+        entities = rq._entity_terms()
+        for filename in filenames:
+            with self.subTest(filename=filename):
+                path = Path(rq.TOPICS_DIR) / filename
+                text = path.read_text(encoding="utf-8")
+                raw_meta = rq.TOPIC_META_RE.findall(text)[0]
+                captured_at = rq._parse_fields(raw_meta)["captured_at"]
+                result, errors, warnings = self._run(
+                    text, captured_at=captured_at, entities=entities)
+                self.assertEqual(errors, [])
+                self.assertEqual(warnings, [])
+                self.assertGreaterEqual(
+                    result["proseRatio"], rq.READABILITY_MIN_PROSE_RATIO)
+
     def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):
         body = self.LEAD + "- active claim 已進入 watch，對應 H1。\n"
         result, errors, _ = self._run(

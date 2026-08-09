@@ -39,13 +39,20 @@ to: triaged
 reason: separated_operator_mechanisms_from_taiwan_company_exposure
 evidence: sources:S1,S2,S3,S4
 -->
+<!-- transition
+date: 2026-08-09
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave2_no_conclusion_change
+evidence: editorial:plain_language_wave2
+-->
 
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **資料集讀取（dataset fetch）**：訓練時持續把下一批樣本送到 GPU；只要最慢的一筆讀取超時，同步訓練的其他 GPU 也可能一起等。
-- **Checkpoint**：定期把模型參數、最佳化器狀態與訓練進度存下來，故障後才能接著跑；寫得太慢會停算，讀得太慢會拖長復原。
+- **訓練存檔（checkpoint）**：定期把模型參數、最佳化器狀態與訓練進度存下來，故障後才能接著跑；寫得太慢會停算，讀得太慢會拖長復原。
 - **模型權重分發（model artifact distribution）**：把已訓練好的模型權重與執行快取送到新的推論節點，決定 cold start、擴容與滾動更新要等多久。
 - **pMax／尾端延遲**：不是平均讀取時間，而是最慢端的上界；同步工作只要被一個落後者卡住，平均值再漂亮也救不了整步完成時間。
 - **GPUDirect Storage／RDMA**：讓儲存或另一台機器更直接地把資料送進 GPU，減少主機記憶體搬運；它是一條資料路徑，不是某種 SSD 已取得訂單的證明。
@@ -54,6 +61,7 @@ evidence: sources:S1,S2,S3,S4
 - **NIC**：網路介面卡；在遠端儲存與 RDMA 路徑負責資料搬運，但存在於架構圖不等於特定供應商取得訂單。
 - **SLO**：服務水準目標，例如允許的尾端延遲、checkpoint 完成時間或模型冷啟動時間；沒有共同 SLO 就不能直接比較三條路徑。
 - **NAND／NVMe**：NAND 是快閃記憶體媒體，NVMe 是主機存取非揮發儲存的協定家族；兩者都只是資料路徑的一層。
+- **HBM（高頻寬記憶體）**：放在運算晶片附近、供 GPU 高速使用的記憶體；它和長期保存資料的 SSD 承擔不同工作。
 - **P2P**：peer-to-peer，讓已持有模型的節點直接把資料交給另一節點；它可能避開重複讀取遠端或本地儲存。
 
 ### 三句話抓重點
@@ -64,18 +72,22 @@ evidence: sources:S1,S2,S3,S4
 
 ### 為什麼重要
 
-市場常把 HBM、CXL、企業級 SSD、資料湖與模型載入混成同一個「AI 記憶體／儲存」題材，
-但三條資料流的失敗條件完全不同。資料集讀取怕尾端延遲拖住同步步驟，checkpoint 要在寫入
-時間、復原點與故障範圍間取捨，模型權重分發則取決於副本已在哪裡以及網路能否直接搬到
-GPU。把它們拆開後，研究問題會從「容量成長多少」變成「哪條路徑被驗收、瓶頸落在哪個
-device／controller／NIC／storage node、誰能提出 production 數據」。這才有機會把產業需求
-接到公司，而不把 operator 的架構文章誤讀成台灣供應商訂單。
+市場常把高頻寬記憶體（HBM）、CXL、企業級 SSD、資料湖與模型載入混成同一個
+「AI 記憶體／儲存」題材，但三條資料流的失敗條件完全不同。
+
+資料集讀取怕最慢的一筆拖住所有 GPU；訓練存檔要在寫入時間、可回復進度與故障範圍間
+取捨；模型權重分發則取決於副本已在哪裡，以及網路能否直接送到 GPU。同一顆 SSD 即使
+峰值速度很高，也不代表三條路徑都已通過驗收。
+
+拆開後，研究問題會從「容量成長多少」變成「哪條路徑被驗收、瓶頸落在儲存裝置、控制器、
+網路介面卡還是儲存節點，以及誰能提出正式運作數據」。這才有機會把產業需求接到公司，
+而不把雲端業者的架構文章誤讀成台灣供應商訂單。
 
 ### 接下來怎麼追
 
-- 2026-08-31 重查 Meta、AWS 與 NVIDIA 是否新增可定位的 pMax／checkpoint window／cold-start SLO、failure domain、media endurance 或 production 路徑數據。
-- 2026Q2 群聯法說後、最晚 2026-08-28，檢查企業級 SSD／AI Storage 是否首次從廣義 AI Ecosystem 38% 中拆出產品、客戶認證、出貨與毛利口徑。
-- 等待同一平台把 storage node、local NVMe、NIC／switch、GPU-direct 路徑與實際 BOM／qualification 串在一起；只有其中一段的產品公告不算閉環。
+- 2026-08-31 重查 Meta、AWS 與 NVIDIA 是否新增可定位的尾端延遲、存檔時間窗、冷啟動目標、故障範圍、媒體耐用度或正式運作數據。
+- 2026Q2 群聯法說後、最晚 2026-08-28，檢查企業級 SSD／AI Storage 是否首次從廣義 AI 產品組合的 38% 中拆出產品、客戶認證、出貨與毛利口徑。
+- 等待同一平台把儲存節點、本地 NVMe、網路介面卡／交換器、GPUDirect Storage 路徑與實際物料表／客戶驗證串在一起；只有其中一段的產品公告不算閉環。
 
 ### 想一想
 
