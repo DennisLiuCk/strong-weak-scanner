@@ -1637,6 +1637,14 @@ def _research_run(value, bold=False):
     return [run]
 
 
+def _research_labeled_run(label, value):
+    """Make generated reader summaries scan like prose, not ledger output."""
+    return [
+        {"s": f"{label}：", "b": True},
+        {"s": str(value if value not in (None, "") else "—")},
+    ]
+
+
 def _inline_script_json(value):
     """JSON 嵌入 script 時避開 HTML parser 的結束標籤與 entity 邊界。"""
     return (json.dumps(value, ensure_ascii=False)
@@ -1655,7 +1663,7 @@ def _research_source_refs(source_ids, source_by_id):
 
 
 def _topic_analyst_section(topic, source_by_id, group_names=None):
-    """由 v3 register 合成首屏快讀；只摘要現有 claim／impact／monitor。"""
+    """由 v3 register 合成首屏重點；只摘要既有結論、證據與追蹤項目。"""
     group_names = group_names or {}
     claims = [
         item for item in (topic.get("claims") or [])
@@ -1695,19 +1703,24 @@ def _topic_analyst_section(topic, source_by_id, group_names=None):
         if len(unverified) > 1:
             gap += f"（另有 {len(unverified) - 1} 項待驗證）"
     else:
-        gap = "沒有 active 待驗證 claim；仍須遵守各主張的 evidence boundary。"
+        gap = "目前沒有列出待查證的主張；仍要依文章註明的適用範圍閱讀。"
 
     direction_labels = {
-        "tailwind": "順風", "headwind": "逆風", "mixed": "混合",
+        "tailwind": "可能有利", "headwind": "可能不利", "mixed": "正反訊號並存",
         "uncertain": "方向未定",
+    }
+    action_labels = {
+        "none": "目前不需處理", "watch": "持續觀察", "review_due": "待複核",
+        "update_required": "需要更新", "done": "已完成",
     }
     routed = []
     for item in topic.get("impacts") or []:
         scope = group_names.get(item.get("group_id"), item.get("group_id") or "—")
-        action = item.get("note_action") or "—"
+        action = action_labels.get(
+            item.get("note_action"), item.get("note_action") or "—")
         direction = direction_labels.get(item.get("direction"), item.get("direction") or "—")
         routed.append(f"{scope}（{direction}／{action}）")
-    route_text = "、".join(routed) if routed else "目前沒有公司或族群 impact route。"
+    route_text = "、".join(routed) if routed else "目前尚未連到特定公司或族群。"
 
     active_monitors = [
         item for item in (topic.get("monitoring") or [])
@@ -1721,24 +1734,24 @@ def _topic_analyst_section(topic, source_by_id, group_names=None):
             f"{first_monitor.get('trigger') or first_monitor.get('metric') or '—'}"
         )
     else:
-        next_check = "目前沒有 active monitor；不可把本文當成持續有效的研究結論。"
+        next_check = "目前沒有安排下一次檢查；本文不應被當成永久有效的結論。"
 
     evidence_text = (
-        f"有效可信度 {confidence_label}；主命題標記為「{thesis_label}」，"
-        f"連到 {len(supporting_sources)} 份 active 來源、"
-        f"{len(independence_groups)} 條獨立來源鏈。"
+        f"證據可信度為{confidence_label}；主結論標記為「{thesis_label}」，"
+        f"目前有 {len(supporting_sources)} 份有效來源，"
+        f"分屬 {len(independence_groups)} 條互相獨立的來源鏈。"
     )
     return {
-        "h": "分析師快讀：判定、缺口與下一步",
+        "h": "先看重點：已知、未知與下一步",
         "blocks": [
             {"t": "p", "runs": _research_run(
-                "這是結構化帳本的導覽摘要，不會提升 claim、impact 或圖譜的證據層級。")},
+                "以下只整理原始文章已有的結論與證據，不會改變查核狀態。")},
             {"t": "ul", "items": [
-                _research_run(f"目前判定：{thesis.get('claim') or '—'}", bold=True),
-                _research_run(f"證據強度：{evidence_text}"),
-                _research_run(f"尚未證實：{gap}"),
-                _research_run(f"可行動範圍：{route_text}"),
-                _research_run(f"下一個檢驗：{next_check}"),
+                _research_labeled_run("一句話結論", thesis.get("claim") or "—"),
+                _research_labeled_run("目前已知", evidence_text),
+                _research_labeled_run("尚未知道", gap),
+                _research_labeled_run("對哪些族群有意義", route_text),
+                _research_labeled_run("下一步看什麼", next_check),
             ]},
         ],
     }
@@ -2434,25 +2447,25 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             action, tone = "補正式公司筆記", "critical"
             reason = f"尚缺 {len(universe) - verified_notes} 檔獨立核驗筆記"
         elif due_pairs:
-            action, tone = "先清到期監控", "critical"
-            reason = f"仍有 {len(due_pairs)} 個 monitor 到期未處理"
+            action, tone = "先完成到期查證", "critical"
+            reason = f"仍有 {len(due_pairs)} 個追蹤項目已到期"
         elif bridge_count == 0:
-            action, tone = "補具名公司橋接", "critical"
-            reason = "已有公司筆記，但知識圖譜尚無 universe 公司證據邊"
+            action, tone = "補上具名公司證據", "critical"
+            reason = "已有公司筆記，但尚未把題材連到具名公司證據"
         elif source_gaps:
             action, tone = "補第二條來源鏈", "warning"
             reason = f"有 {source_gaps} 篇主命題仍只有一個獨立來源群組"
         elif financial["attribution"]["direct"] == 0 and financial["assessments"]:
-            action, tone = "等待題材分母", "progress"
+            action, tone = "等待可拆分的題材財務資料", "progress"
             reason = (
-                f"已完成 {financial['assessments']} 筆 v2 評估，但目前只有有界代理或題材分子未揭露"
+                f"已完成 {financial['assessments']} 筆財務檢查，但尚無法直接拆出題材貢獻"
             )
         elif financial["attribution"]["direct"] == 0:
-            action, tone = "補財務材料性 v2", "warning"
-            reason = "現有橋接尚未建立期間、分子、分母與歸因狀態"
+            action, tone = "補上題材財務影響", "warning"
+            reason = "已有具名公司證據，但尚未檢查題材對收入或獲利的實際影響"
         else:
-            action, tone = "維持監控", "progress"
-            reason = "公司覆蓋、交叉驗證與可直接歸因的財務材料性均已有可追溯節點"
+            action, tone = "持續追蹤", "progress"
+            reason = "公司覆蓋、交叉驗證與可直接辨識的財務影響都有可追溯證據"
 
         rows.append({
             "id": group_id,
@@ -2566,8 +2579,8 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "priorityLabel": "P0",
             "title": f"補齊{row['label']}的 {missing} 檔獨立核驗公司筆記",
             "affectedGroups": group_payload([group_id]),
-            "boundary": "只計 independently_verified 正式筆記；篇數不足不以題材文章替代。",
-            "nextEvidence": "依 focused_v1 契約取得核心一手文件、建立 evidence pack，並由獨立 reviewer 離線重算後逐篇簽核。",
+            "boundary": "只計已完成獨立核驗的正式公司筆記；篇數不足不能用題材文章替代。",
+            "nextEvidence": "取得年報、季報與法說等核心一手文件，完成數字重算與第二人核對後逐篇簽核。",
             "tone": "critical",
         })
 
@@ -2585,14 +2598,14 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             add_action({
                 "id": f"monitor:{topic_id}:{monitor_id}",
                 "category": "due_monitor",
-                "categoryLabel": "到期監控",
+                "categoryLabel": "到期查證",
                 "priorityRank": 0,
                 "priorityLabel": "P0",
-                "title": f"{topic_title(topic)} · {monitor_id} 到期回查",
+                "title": f"{topic_title(topic)} · 到期查證",
                 "affectedGroups": group_payload(groups),
                 "articleId": f"topic-{topic_id}",
-                "boundary": monitor.get("metric") or "只依預先登錄 trigger 裁決，不以市場敘事刷新證據時鐘。",
-                "nextEvidence": monitor.get("trigger") or monitor.get("metric") or "完成一手來源回查並寫入 monitor review ledger。",
+                "boundary": monitor.get("metric") or "只依文章預先寫下的檢驗標準判斷，不因市場說法改變就延長有效期限。",
+                "nextEvidence": monitor.get("trigger") or monitor.get("metric") or "完成一手來源查證並記錄結果。",
                 "nextCheck": due,
                 "tone": "critical",
                 "statusLabel": "已到期",
@@ -2613,7 +2626,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "title": f"{topic_title(topic)} · 補第二條獨立來源鏈",
             "affectedGroups": group_payload(groups),
             "articleId": f"topic-{topic_id}",
-            "boundary": f"同一個主命題目前影響 {len(groups)} 個族群，但根因只有一個；不得按族群重複計成 {len(groups)} 件。",
+            "boundary": f"同一個主結論目前影響 {len(groups)} 個族群，但缺口只有一個；不按族群重複計成 {len(groups)} 件。",
             "nextEvidence": topic_next_evidence(topic),
             "nextCheck": topic_next_check(topic),
             "tone": "warning",
@@ -2629,16 +2642,16 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
         add_action({
             "id": f"company-bridge:{group_id}",
             "category": "company_bridge",
-            "categoryLabel": "具名公司橋接",
+            "categoryLabel": "具名公司證據",
             "priorityRank": 2,
             "priorityLabel": "P1",
-            "title": candidate.get("title") or f"為{row['label']}建立第一條 universe 公司證據邊",
+            "title": candidate.get("title") or f"為{row['label']}補上第一條具名公司證據",
             "affectedGroups": group_payload([group_id]),
             "candidateId": candidate.get("id", ""),
             "articleId": candidate.get("articleId", ""),
             "graphId": candidate.get("graphId", ""),
-            "boundary": "公司筆記已存在，但 curated knowledge graph 尚無 universe 公司邊；0 不表示產業關係不存在。",
-            "nextEvidence": candidate.get("nextEvidence") or "找出公司自身一手文件中的具名產品／製程角色，建立有 boundary 與 next trigger 的一跳證據邊。",
+            "boundary": "公司筆記已存在，但研究中心尚未找到可把題材連到具名公司的直接證據；0 不表示產業關係不存在。",
+            "nextEvidence": candidate.get("nextEvidence") or "從公司一手文件找出具名產品或製程角色，並寫清楚適用範圍與下一個查證條件。",
             "nextCheck": candidate.get("nextCheck", ""),
             "tone": "critical",
         })
@@ -2664,29 +2677,29 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             attribution = financial["attribution"]
             scopes = financial["scopes"]
             scope_text = "、".join(
-                f"{key} {value}"
+                f"{({'company_total': '公司整體', 'segment': '事業部', 'product': '產品', 'unit_economics': '單位經濟'}.get(key, key))} {value}"
                 for key, value in scopes.items() if value
             )
             add_action({
                 "id": f"financial-watch:{group_id}",
                 "category": "financial_materiality_watch",
-                "categoryLabel": "財務材料性 v2",
+                "categoryLabel": "題材財務影響",
                 "priorityRank": 4,
                 "priorityLabel": "WATCH",
-                "title": f"{row['label']}已完成 v2 評估，等待可歸因題材分母",
+                "title": f"{row['label']}已有財務資料，但還無法拆出題材貢獻",
                 "affectedGroups": group_payload([group_id]),
                 "companyIds": stock_ids,
                 "articleId": (route.get("articleIds") or [""])[0],
                 "graphId": route.get("graphId", ""),
                 "boundary": (
-                    f"全數盤點已有 {financial['assessments']} 筆 assessment（{scope_text or '—'}）；"
-                    f"direct {attribution['direct']}、bounded_proxy {attribution['bounded_proxy']}、"
-                    f"not_disclosed {attribution['not_disclosed']}。代理值不能改寫為題材收入。"
+                    f"全數盤點已有 {financial['assessments']} 筆財務檢查（{scope_text or '—'}）；"
+                    f"可直接辨識 {attribution['direct']} 筆、只能當參考 {attribution['bounded_proxy']} 筆、"
+                    f"題材金額未揭露 {attribution['not_disclosed']} 筆。參考值不能改寫為題材收入。"
                 ),
                 "nextEvidence": route.get("nextTrigger") or "取得同期間、同合併分母的題材收入或毛利揭露。",
                 "nextCheck": route.get("reviewDue", ""),
                 "status": "watch",
-                "statusLabel": "等待題材分母",
+                "statusLabel": "等待可拆分資料",
                 "tone": "progress",
             })
             continue
@@ -2704,10 +2717,10 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
         add_action({
             "id": f"financial:{group_id}",
             "category": "financial_materiality",
-            "categoryLabel": "財務材料性 v2",
+            "categoryLabel": "題材財務影響",
             "priorityRank": 3,
             "priorityLabel": "P2",
-            "title": f"為{row['label']}建立可稽核的財務分子／分母",
+            "title": f"檢查{row['label']}題材對收入或獲利的實際影響",
             "affectedGroups": group_payload([group_id]),
             "companyIds": stock_ids,
             "articleId": (route.get("articleIds") or [""])[0],
@@ -2716,8 +2729,8 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
                 bridge_candidate_ids.get(group_id, "")
                 if bridge_candidate_ids.get(group_id, "") in candidates else ""
             ),
-            "boundary": f"目前具名公司為{'、'.join(names) or '—'}，最深只到 {row['deepestMateriality']}；尚未建立含期間、口徑、分子、分母與歸因狀態的 v2 assessment。",
-            "nextEvidence": "先建立公司總額分母；再取得同一具名產品或角色的收入、毛利、現金流，或可重算的出貨量×單價。公司總額只能標 not_disclosed，不能升成題材 financial edge。",
+            "boundary": f"目前具名公司為{'、'.join(names) or '—'}；尚未用一致期間與口徑，檢查題材金額占公司收入或獲利多少。",
+            "nextEvidence": "先確認同期間的公司總收入，再找同一具名產品或角色的收入、毛利、現金流，或可重算的出貨量乘單價。只有公司總額時，不能宣稱為題材收入。",
             "nextCheck": route.get("reviewDue", ""),
             "tone": "warning",
         })
@@ -2735,7 +2748,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "title": topic_title(topic),
             "affectedGroups": [],
             "articleId": f"topic-{topic_id}",
-            "boundary": "尚未建立 impact 是刻意的證據邊界；在條文、適用範圍與產業傳導可定位前，不把政策事件硬塞進族群。",
+            "boundary": "尚未連到族群是刻意保留的限制；在條文、適用範圍與產業傳導可確認前，不把政策事件硬套進族群。",
             "nextEvidence": topic_next_evidence(topic),
             "nextCheck": topic_next_check(topic),
             "status": "watch",
@@ -2809,12 +2822,12 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "not_disclosed": "題材分子未揭露",
         },
         "boundary": (
-            "這是 11 族群、121 檔 universe 與目前研究 registry 的全數盤點，不是抽樣；"
-            "公司筆記篇數、題材篇數、圖譜邊、商業材料性、財務分子／分母與時效是不同軸，刻意不合成分數。"
-            "財務材料性 v2 把公司總額、事業部、產品與單位經濟分開；bounded_proxy／not_disclosed "
-            "代表已完成評估但尚不能把代理值改寫成題材收入。"
-            "行動佇列按根因去重：同一 topic 即使映射多個族群也只算一件；"
-            "圖譜只計可追溯的 curated edges，0 代表研究中心尚未建立證據邊，不代表產業關係不存在。"
+            "這是 11 個族群、121 檔股票與目前全部研究資料的完整盤點，不是抽樣；"
+            "公司筆記、題材文章、具名公司證據、財務影響與更新時效分開顯示，刻意不合成分數。"
+            "財務檢查會區分公司整體、事業部、產品與單位經濟；只有參考值或未揭露題材金額時，"
+            "不能把它改寫成題材收入。"
+            "待辦按共同缺口去重：同一議題即使影響多個族群也只算一件；"
+            "0 代表研究中心尚未建立可追溯證據，不代表產業關係不存在。"
         ),
     }
 

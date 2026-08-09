@@ -170,7 +170,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(topic["confidence"]["effective"], "medium")
         self.assertEqual(
             [section["h"] for section in topic["sections"][:5]],
-            ["分析師快讀：判定、缺口與下一步", "新手先讀：這篇在講什麼",
+            ["先看重點：已知、未知與下一步", "新手先讀：這篇在講什麼",
              "30 秒摘要", "主張—證據帳本", "影響路由與證據邊界"],
         )
         self.assertIn("不可比", str(topic["sections"]))
@@ -185,8 +185,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(headings.count("主張—證據帳本"), 1)
         self.assertTrue(all(section["blocks"] for section in topic["sections"]))
         analyst = topic["sections"][0]
-        self.assertIn("目前判定：公司已正式公告擴產", str(analyst))
-        self.assertIn("功率元件（方向未定／watch）", str(analyst))
+        self.assertIn("一句話結論", str(analyst))
+        self.assertIn("公司已正式公告擴產", str(analyst))
+        self.assertIn("功率元件（方向未定／持續觀察）", str(analyst))
         self.assertIn("2026-08-05", str(analyst))
         self.assertIn("原文的帳本邊界必須保留", str(topic["sections"]))
 
@@ -341,7 +342,7 @@ class ResearchCenterTest(unittest.TestCase):
             [group["id"] for group in source_actions[0]["affectedGroups"]],
             ["power", "material"],
         )
-        self.assertIn("根因只有一個", source_actions[0]["boundary"])
+        self.assertIn("缺口只有一個", source_actions[0]["boundary"])
         rows = {row["id"]: row for row in maturity["rows"]}
         self.assertIn(source_actions[0]["id"], rows["power"]["actionIds"])
         self.assertIn(source_actions[0]["id"], rows["material"]["actionIds"])
@@ -378,7 +379,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(row["financialMateriality"]["assessments"], 1)
         self.assertEqual(row["financialMateriality"]["attribution"]["bounded_proxy"], 1)
         self.assertEqual(row["financialMateriality"]["attribution"]["direct"], 0)
-        self.assertEqual(row["action"], "等待題材分母")
+        self.assertEqual(row["action"], "等待可拆分的題材財務資料")
         self.assertEqual(maturity["summary"]["groupsWithFinancialAssessment"], 1)
         self.assertEqual(maturity["summary"]["groupsWithDirectFinancialAttribution"], 0)
         self.assertEqual(maturity["summary"]["openActions"], 0)
@@ -386,7 +387,7 @@ class ResearchCenterTest(unittest.TestCase):
         action = maturity["actionQueue"][0]
         self.assertEqual(action["id"], "financial-watch:power")
         self.assertEqual(action["status"], "watch")
-        self.assertIn("代理值不能改寫為題材收入", action["boundary"])
+        self.assertIn("參考值不能改寫為題材收入", action["boundary"])
 
         graph["graphs"][0]["financialAssessments"] = []
         maturity = bd.build_group_maturity(
@@ -394,7 +395,7 @@ class ResearchCenterTest(unittest.TestCase):
             graph, [], {"sources": {"thesesNeedingSecondIndependentGroup": []}},
             "2026-08-06",
         )
-        self.assertEqual(maturity["rows"][0]["action"], "補財務材料性 v2")
+        self.assertEqual(maturity["rows"][0]["action"], "補上題材財務影響")
         self.assertEqual(maturity["summary"]["openActions"], 1)
         self.assertEqual(maturity["actionQueue"][0]["id"], "financial:power")
 
@@ -433,7 +434,9 @@ class ResearchCenterTest(unittest.TestCase):
             "來源帳本", "mobile-evidence", "可水平捲動的研究資料表",
             "aria-label=\"搜尋研究文章\"", "filtersPanel.inert", "clearArticleRoute",
             "aria-label=\"研究文章清單\"", ":focus-visible", "@media(max-width:780px)",
-            "分析師快讀：判定、缺口與下一步", "function resetReaderScroll()",
+            "先看重點：已知、未知與下一步", "function resetReaderScroll()",
+            "ARTICLE_AUDIT_HEADINGS", "function renderResearchAppendix(",
+            "查核附錄：主張、影響與追蹤表",
         ):
             self.assertIn(marker, template)
         self.assertIn("RESEARCH_TEMPLATE", builder)
@@ -450,11 +453,12 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('research_library["knowledgeGraph"] = build_knowledge_graph(', builder)
         self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
         self.assertIn("body.append(mobileBack,h('h1'", template)
-        # meta 之後、分析師快讀之前插入行動版大綱(≤1180px 桌機側欄 .outline 隱藏時接手)
+        # meta 之後、首屏重點之前插入行動版大綱(≤1180px 桌機側欄 .outline 隱藏時接手)
         self.assertIn("body.append(meta);const mobileToc=renderMobileToc(article);"
                       "if(mobileToc)body.appendChild(mobileToc);"
                       "body.appendChild(articleSections(article,'analyst'))", template)
-        self.assertIn("body.appendChild(articleSections(article,'rest'))", template)
+        self.assertIn("body.appendChild(articleSections(article,'reader'))", template)
+        self.assertIn("body.appendChild(appendix)", template)
         self.assertIn("body.append(mobileEvidence,h('p'", template)
         self.assertIn("'aria-selected':state.type===type?'true':'false'", template)
         self.assertIn("'data-testid':'article-'+article.id", template)
@@ -494,7 +498,7 @@ class ResearchCenterTest(unittest.TestCase):
             "if(document.body.classList.contains('article-open'))clearArticleRoute()",
             "function graphHashRoute(value)",
             "selectSurface('graph',false)",
-            "else{state.surface='library';syncSurface();document.body.classList.remove('article-open');renderAll()}",
+            "else{state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}",
         ):
             self.assertIn(contract, template)
         self.assertNotIn(
@@ -532,7 +536,9 @@ class ResearchCenterTest(unittest.TestCase):
             "localStorage.getItem('researchFocusMode')",
             "localStorage.setItem('researchFocusMode'",
             "focusToggleButton.setAttribute('aria-pressed'",
-            "focusToggleButton.textContent=active?'展開選單':'收合選單'",
+            "localStorage.getItem('researchFocusMode')!=='0'",
+            "articleOpen&&focusModeRequested&&focusMedia.matches",
+            "focusToggleButton.textContent=active?'文章清單':'專注閱讀'",
             "focusMedia.addEventListener('change',applyFocusMode)",
         ):
             self.assertIn(contract, template)
@@ -600,8 +606,9 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderRadarCandidate(", "function openRadarGraph(",
             "'data-testid':'radar-'+candidate.id", "candidate.firstRejection",
             "candidate.nextEvidence", "candidate.nextCheck",
-            "排名用於配置研究時間，不代表預期報酬、股價方向或投資建議",
+            "排序只用來安排研究先後，不代表預期報酬、股價方向或投資建議",
             "候選排名不是投資評分", "deepLink==='radar'",
+            "研究判定與來源", "研究方法與稽核資料（供查核）",
             "document.getElementById('surfaceRadar').addEventListener",
         ):
             self.assertIn(contract, template)
@@ -616,9 +623,9 @@ class ResearchCenterTest(unittest.TestCase):
             "const MATURITY=LIB.groupMaturity", "function renderMaturity()",
             "function renderMaturityAction(", "function focusMaturityAction(",
             "function openGroupResearch(", "deepLink==='maturity'",
-            "已完成回查、證據仍逾期", "根因去重", "不做總分或名次",
+            "各族群研究完整度", "最大缺口", "不做總分或名次",
             "可水平捲動的族群研究成熟度矩陣",
-            "財務材料性 v2", "題材財務可直接歸因", "等待題材分母",
+            "完整查核矩陣與方法說明", "題材財務影響", "maturitySummarySentence",
         ):
             self.assertIn(contract, template)
         self.assertIn("body.article-open .tools{display:none}", template)

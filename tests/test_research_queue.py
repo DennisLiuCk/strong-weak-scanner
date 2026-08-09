@@ -1343,8 +1343,11 @@ class ResearchScheduleTest(unittest.TestCase):
         self.assertIn("PUSH_BEFORE: ${{ github.event.before }}", quality)
         self.assertIn("PR_BASE: ${{ github.event.pull_request.base.sha }}", quality)
         self.assertIn('--baseline-ref "$baseline"', quality)
+        self.assertIn("python scripts/build_dashboard.py", quality)
+        self.assertIn("git diff --exit-code -- index.html research.html", quality)
         self.assertGreaterEqual(quality.count('"notes/research_topics/**"'), 2)
         self.assertGreaterEqual(quality.count('"tests/test_research_queue.py"'), 2)
+        self.assertGreaterEqual(quality.count('"research.html"'), 2)
 
 
 class ResearchFinancialCoverageTest(unittest.TestCase):
@@ -1448,6 +1451,12 @@ class ReadabilityGateTest(unittest.TestCase):
         "- **SPDM**：零件之間互相驗證身分的對話規則。\n\n"
         "### 三句話抓重點\n\n"
     )
+    LEAD = (
+        "## 新手先讀：這篇在講什麼\n\n"
+        "### 名詞小字典\n\n"
+        "- **SPDM**：零件之間互相驗證身分的對話規則。\n\n"
+        "### 三句話抓重點\n\n"
+    )
 
     def _run(self, text, captured_at="2026-08-20", entities=None):
         errors, warnings = [], []
@@ -1544,6 +1553,36 @@ class ReadabilityGateTest(unittest.TestCase):
         self.assertEqual(result["undefinedHard"], [])
         self.assertGreaterEqual(
             result["proseRatio"], rq.READABILITY_MIN_PROSE_RATIO)
+
+    def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):
+        body = self.LEAD + "- active claim 已進入 watch，對應 H1。\n"
+        result, errors, _ = self._run(
+            body, captured_at=rq.READABILITY_PLAIN_LANGUAGE_CUTOVER)
+        self.assertTrue(result["plainLanguageEnforced"])
+        self.assertIn("active claim/source/monitor", result["internalLeadTerms"])
+        self.assertIn("內部研究欄位", result["internalLeadTerms"])
+        self.assertIn("內部紀錄 ID", result["internalLeadTerms"])
+        self.assertTrue(any("內部維運用詞" in error for error in errors))
+
+    def test_existing_beginner_guide_only_warns_on_plain_language_cutover(self):
+        body = self.LEAD + "- active monitor 仍是 stale。\n"
+        _, errors, warnings = self._run(body, captured_at="2026-08-09")
+        self.assertEqual(errors, [])
+        self.assertTrue(any("內部維運用詞" in warning for warning in warnings))
+
+    def test_future_beginner_guide_explains_english_term_on_first_use(self):
+        body = self.LEAD + "- FooEngine 會改變驗證流程。\n"
+        result, errors, _ = self._run(
+            body, captured_at=rq.READABILITY_PLAIN_LANGUAGE_CUTOVER)
+        self.assertEqual(result["undefinedLeadTerms"], ["FooEngine"])
+        self.assertTrue(any("英文術語" in error for error in errors))
+
+    def test_future_beginner_guide_splits_overlong_blocks(self):
+        body = self.LEAD + "這是一個需要拆開的段落。" * 30 + "\n"
+        result, errors, _ = self._run(
+            body, captured_at=rq.READABILITY_PLAIN_LANGUAGE_CUTOVER)
+        self.assertEqual(len(result["longLeadBlocks"]), 1)
+        self.assertTrue(any("一段一個意思" in error for error in errors))
 
 
 class EditorialRevisionTest(unittest.TestCase):

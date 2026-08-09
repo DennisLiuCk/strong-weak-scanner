@@ -1271,9 +1271,11 @@ def load_topics(topics_dir=TOPICS_DIR, universe_rows=None, group_ids=None, repor
 
 
 READABILITY_CUTOVER = "2026-08-09"
+READABILITY_PLAIN_LANGUAGE_CUTOVER = "2026-08-10"
 READABILITY_HARD_USES = 5
 READABILITY_SOFT_USES = 3
 READABILITY_MIN_PROSE_RATIO = 0.50
+READABILITY_MAX_LEAD_BLOCK_CHARS = 180
 
 # Reader-facing ledger fields. title/locator/url are citation metadata: a reader
 # does not need a document's English title glossed, so they are excluded.
@@ -1305,6 +1307,20 @@ _LATIN_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9])[A-Za-z][A-Za-z0-9.\-]*")
 _ANY_BLOCK_RE = re.compile(r"<!--(.*?)-->", re.S)
 _MARKDOWN_LINK_RE = re.compile(r"\[([^\]]+)\]\((?:[^()\s]|\([^)]*\))+\)")
 _BARE_URL_RE = re.compile(r"https?://\S+", re.I)
+READABILITY_INTERNAL_LEAD_PATTERNS = (
+    ("active claim/source/monitor", re.compile(
+        r"\bactive\s+(?:claim|source|monitor)s?\b", re.I)),
+    ("內部狀態碼", re.compile(
+        r"\b(?:update_required|review_due|bounded_proxy|not_disclosed|"
+        r"independently_verified|early_trigger)\b", re.I)),
+    ("內部研究欄位", re.compile(
+        r"\b(?:impact route|evidence boundary|evidence posture|selection log|"
+        r"focused evidence pack|independent reviewer|financial edge|curated edges?|"
+        r"schema_version|registry|ledger|stale|watch)\b", re.I)),
+    ("內部紀錄 ID", re.compile(
+        r"(?<![A-Za-z0-9])(?:H\d+|(?:claim|monitor|impact|assessment)\s*ID)"
+        r"(?![A-Za-z0-9-])", re.I)),
+)
 
 # 已發布文章原本只能靠「綁定 sources 的 revision transition」改寫正文，也就是預設
 # 每次改寫都由新證據驅動。可讀性修正沒有新證據，於是唯一的路是假裝有——這會讓
@@ -1362,6 +1378,42 @@ def _reader_visible_link_text(text):
     """
     value = _MARKDOWN_LINK_RE.sub(r"\1", text)
     return _BARE_URL_RE.sub(" ", value)
+
+
+def _beginner_body(text):
+    """Return only the first-screen reader guide, excluding later audit prose."""
+    return dict(_heading_sections(text, 2)).get(BEGINNER_HEADING, "")
+
+
+def _beginner_visible_blocks(body):
+    """Approximate rendered paragraphs/bullets for a sentence-length guard."""
+    visible = _ANY_BLOCK_RE.sub("", body or "")
+    blocks, paragraph = [], []
+
+    def flush():
+        if paragraph:
+            value = _visible_markdown_text(" ".join(paragraph))
+            if value:
+                blocks.append(value)
+            paragraph.clear()
+
+    for raw in visible.splitlines():
+        line = raw.strip()
+        if not line:
+            flush()
+            continue
+        if re.match(r"^#{1,6}\s+", line):
+            flush()
+            continue
+        if re.match(r"^(?:[-*+]\s+|\d+[.)]\s+)", line):
+            flush()
+            value = _visible_markdown_text(line)
+            if value:
+                blocks.append(value)
+            continue
+        paragraph.append(line)
+    flush()
+    return blocks
 
 
 def analyse_readability(text, meta, errors, warnings, entity_terms=None):
@@ -1438,9 +1490,53 @@ def analyse_readability(text, meta, errors, warnings, entity_terms=None):
         sink.append(
             f"正文解釋只占讀者可見文字的 {ratio:.0%}，低於 "
             f"{READABILITY_MIN_PROSE_RATIO:.0%}；帳本渲染後會蓋過說明")
+
+    # The first screen has a stricter contract than the audit appendix.  Internal
+    # state codes may remain in machine-readable blocks, but the beginner guide
+    # must be understandable without knowing the repository's schema vocabulary.
+    beginner = _beginner_body(text)
+    beginner_text = _reader_visible_link_text(_ANY_BLOCK_RE.sub(" ", beginner))
+    beginner_h3 = dict(_heading_sections(beginner, 3))
+    beginner_glossary = _reader_visible_link_text(
+        _ANY_BLOCK_RE.sub(" ", beginner_h3.get("名詞小字典", ""))).lower()
+    internal_lead_terms = [
+        label for label, pattern in READABILITY_INTERNAL_LEAD_PATTERNS
+        if pattern.search(beginner_text)
+    ]
+    undefined_lead_terms = sorted({
+        token
+        for match in _LATIN_TOKEN_RE.finditer(beginner_text)
+        if (token := match.group(0).strip(".-"))
+        and _is_jargon(token)
+        and token.lower() not in entity_terms
+        and token.lower() not in beginner_glossary
+    }, key=str.lower)
+    long_lead_blocks = [
+        block for block in _beginner_visible_blocks(beginner)
+        if len(re.sub(r"\s+", "", block)) > READABILITY_MAX_LEAD_BLOCK_CHARS
+    ]
+    plain_enforced = (
+        _valid_date(captured) and captured >= READABILITY_PLAIN_LANGUAGE_CUTOVER)
+    plain_sink = errors if plain_enforced else warnings
+    if internal_lead_terms:
+        plain_sink.append(
+            "新手導讀出現內部維運用詞，請改成一般讀者能直接理解的中文："
+            + "、".join(internal_lead_terms))
+    if undefined_lead_terms:
+        plain_sink.append(
+            "新手導讀有未在小字典解釋的英文術語："
+            + "、".join(undefined_lead_terms[:8]))
+    if long_lead_blocks:
+        plain_sink.append(
+            f"新手導讀有 {len(long_lead_blocks)} 個段落或項目超過 "
+            f"{READABILITY_MAX_LEAD_BLOCK_CHARS} 個可見字，請拆成一段一個意思")
     return {
         "undefinedHard": hard, "undefinedSoft": soft,
         "proseRatio": round(ratio, 3), "enforced": enforced,
+        "internalLeadTerms": internal_lead_terms,
+        "undefinedLeadTerms": undefined_lead_terms,
+        "longLeadBlocks": long_lead_blocks,
+        "plainLanguageEnforced": plain_enforced,
     }
 
 

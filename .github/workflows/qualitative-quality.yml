@@ -18,6 +18,8 @@ on:
       - "LEADING_HYPOTHESES_PHASE2_RUNBOOK.md"
       - "RESEARCH_MAINTENANCE.md"
       - "MARKET_RESEARCH_METHOD.md"
+      - "README.md"
+      - "CHANGELOG.md"
       - "config/universe.csv"
       - "scripts/qual_notes.py"
       - "scripts/qual_evidence.py"
@@ -40,6 +42,8 @@ on:
       - "tests/test_research_center.py"
       - "tests/test_knowledge_graph.py"
       - "tests/test_entry_docs_sync.py"
+      - "index.html"
+      - "research.html"
       - "CLAUDE.md"
       - "AGENTS.md"
       - ".github/workflows/qualitative-quality.yml"
@@ -61,6 +65,8 @@ on:
       - "LEADING_HYPOTHESES_PHASE2_RUNBOOK.md"
       - "RESEARCH_MAINTENANCE.md"
       - "MARKET_RESEARCH_METHOD.md"
+      - "README.md"
+      - "CHANGELOG.md"
       - "config/universe.csv"
       - "scripts/qual_notes.py"
       - "scripts/qual_evidence.py"
@@ -83,6 +89,8 @@ on:
       - "tests/test_research_center.py"
       - "tests/test_knowledge_graph.py"
       - "tests/test_entry_docs_sync.py"
+      - "index.html"
+      - "research.html"
       - "CLAUDE.md"
       - "AGENTS.md"
       - ".github/workflows/qualitative-quality.yml"
@@ -146,3 +154,8 @@ jobs:
 
       - name: 執行質化品質、dashboard 與入口文件契約測試
         run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_leading_hypotheses tests.test_research_queue tests.test_research_radar tests.test_research_method_audit tests.test_recent_research_articles tests.test_dashboard_ux_contract tests.test_research_center tests.test_knowledge_graph tests.test_entry_docs_sync
+
+      - name: 重建並驗證研究中心讀者介面
+        run: |
+          python scripts/build_dashboard.py
+          git diff --exit-code -- index.html research.html
