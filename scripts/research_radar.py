@@ -114,6 +114,25 @@ def _sources(value: str, label: str, errors: list[str]) -> list[dict[str, str]]:
     return rows
 
 
+def _reader_terms(value: str, label: str, errors: list[str]) -> list[dict[str, str]]:
+    """Parse editorial term definitions used only by the reader-facing radar card."""
+    rows: list[dict[str, str]] = []
+    for item in [part.strip() for part in (value or "").split("|") if part.strip()]:
+        if "=>" not in item:
+            errors.append(f"{label} reader_terms 必須使用 術語 => 白話解釋：{item}")
+            continue
+        term, explanation = [part.strip() for part in item.split("=>", 1)]
+        if not term or not explanation:
+            errors.append(f"{label} reader_terms 術語與解釋不可留空：{item}")
+            continue
+        rows.append({"term": term, "explanation": explanation})
+    if value and not 2 <= len(rows) <= 4:
+        errors.append(f"{label} reader_terms 必須提供 2–4 個關鍵詞")
+    if len({row["term"] for row in rows}) != len(rows):
+        errors.append(f"{label} reader_terms 術語不可重複")
+    return rows
+
+
 def _valid_timestamp(value: str) -> bool:
     try:
         parsed = dt.datetime.fromisoformat(value)
@@ -262,8 +281,12 @@ def load_research_radar(
         "candidate_id", "rank", "title", "priority", "knowledge_value", "status",
         "evidence_posture", "why_now", "knowledge_gain", "first_rejection",
         "next_evidence", "next_check", "route", "article_topic_id", "graph_id", "sources",
+        "reader_question", "reader_terms", "reader_next_step",
     }
-    candidate_required = candidate_allowed - {"article_topic_id", "graph_id"}
+    candidate_required = candidate_allowed - {
+        "article_topic_id", "graph_id",
+        "reader_question", "reader_terms", "reader_next_step",
+    }
 
     for path in files:
         with open(path, encoding="utf-8") as handle:
@@ -305,6 +328,13 @@ def load_research_radar(
             for key in sorted(candidate_required):
                 if not fields.get(key):
                     errors.append(f"{row_label} 缺少欄位：{key}")
+            if meta.get("status") == "active":
+                for key in ("reader_question", "reader_terms", "reader_next_step"):
+                    if not fields.get(key):
+                        errors.append(f"{row_label} active radar 缺少讀者欄位：{key}")
+                question = fields.get("reader_question", "")
+                if question and not question.endswith(("？", "?")):
+                    errors.append(f"{row_label} reader_question 必須是問句")
 
             candidate_id = fields.get("candidate_id", "")
             if not CANDIDATE_ID_RE.fullmatch(candidate_id):
@@ -355,6 +385,7 @@ def load_research_radar(
                 errors.append(f"{row_label} expand_existing_article 必須提供 article_topic_id")
 
             source_rows = _sources(fields.get("sources", ""), row_label, errors)
+            reader_terms = _reader_terms(fields.get("reader_terms", ""), row_label, errors)
             candidates.append({
                 "id": candidate_id,
                 "rank": rank,
@@ -368,6 +399,9 @@ def load_research_radar(
                 "evidencePosture": posture,
                 "evidenceLabel": EVIDENCE_LABELS.get(posture, posture),
                 "whyNow": fields.get("why_now", ""),
+                "readerQuestion": fields.get("reader_question", ""),
+                "readerTerms": reader_terms,
+                "readerNextStep": fields.get("reader_next_step", ""),
                 "knowledgeGain": fields.get("knowledge_gain", ""),
                 "firstRejection": fields.get("first_rejection", ""),
                 "nextEvidence": fields.get("next_evidence", ""),

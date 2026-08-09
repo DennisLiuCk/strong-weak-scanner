@@ -2492,6 +2492,75 @@ def attach_research_learning_paths(research_library, knowledge_graph):
     return research_library
 
 
+def attach_group_learning_starts(research_library):
+    """Give every maturity row a novice-safe entrance using existing routes only.
+
+    This is editorial navigation, not a relevance or investment score.  Prefer a
+    routed article whose declared primary group matches the row, then preserve the
+    existing route order and station order.  A missing route stays explicit instead
+    of silently promoting a latest or popular article.
+    """
+    research_library = research_library or {}
+    maturity = research_library.get("groupMaturity") or {}
+    rows = maturity.get("rows") or []
+    articles = research_library.get("articles") or []
+    routes = ((research_library.get("knowledgeGraph") or {}).get("learningRoutes")
+              or [])
+    route_order = {
+        route.get("id"): index for index, route in enumerate(routes)
+        if route.get("id")
+    }
+    article_counts = Counter(
+        group_id
+        for article in articles
+        for group_id in article.get("groups") or []
+        if group_id
+    )
+    groups_with_start = 0
+    for row in rows:
+        group_id = row.get("id") or ""
+        candidates = [
+            article for article in articles
+            if group_id in (article.get("groups") or [])
+            and article.get("learningRoute")
+        ]
+        candidates.sort(key=lambda article: (
+            0 if (article.get("groups") or [""])[0] == group_id else 1,
+            route_order.get((article.get("learningRoute") or {}).get("id"), 99),
+            (article.get("learningRoute") or {}).get("step", 999),
+            article.get("id") or "",
+        ))
+        row["articleCount"] = article_counts[group_id]
+        if not candidates:
+            row["learningStart"] = None
+            continue
+        article = candidates[0]
+        route = article.get("learningRoute") or {}
+        groups_with_start += 1
+        row["learningStart"] = {
+            "articleId": article.get("id") or "",
+            "articleTitle": article.get("readerTitle") or article.get("title") or "研究文章",
+            "routeId": route.get("id") or "",
+            "routeLabel": route.get("label") or "學習路線",
+            "graphId": route.get("graphId") or "",
+            "graphLabel": route.get("graphLabel") or "",
+            "step": route.get("step") or 0,
+            "total": route.get("total") or 0,
+            "scope": (
+                "primary_group"
+                if (article.get("groups") or [""])[0] == group_id
+                else "cross_group"
+            ),
+        }
+    summary = maturity.setdefault("summary", {})
+    summary["groupsWithLearningStart"] = groups_with_start
+    maturity["learningBoundary"] = (
+        "族群起讀文章只從已登錄的學習路線主文章中挑選：優先使用把該族群列在第一位的文章，"
+        "再沿用既有路線順序與站次；這不是熱門度、研究完整度或投資排序。"
+    )
+    return research_library
+
+
 def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph,
                          reviews, method_audit, as_of, candidate_radar=None):
     """Build an orthogonal group-research matrix without collapsing it to a score.
@@ -3345,6 +3414,7 @@ def main():
         research_library["methodAudit"], research_as_of,
         candidate_radar=research_library["candidateRadar"],
     )
+    attach_group_learning_starts(research_library)
 
     CHIP_CLS = {"健康": "health", "中性": "neutral", "待觀察": "warn"}
     chip_by_grp = {}

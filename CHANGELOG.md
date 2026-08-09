@@ -1,5 +1,56 @@
 # Changelog
 
+## 族群矩陣起讀文章與篩選上下文 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善族群矩陣到文章的
+新手學習入口，不修改研究來源、主張、證據層級、圖譜 edge、公司映射、財務歸因或投資判斷。
+
+- 同狀態實機稽核發現：族群名稱雖是按鈕，視覺上卻像靜態標題；390px 手機從矩陣中段點擊後
+  會停在文章清單 `scrollY=471`，畫面既看不到族群篩選名稱，也沒有建議起讀文章。
+- 11／11 個現行族群現在都有一篇既有學習路線主文章作為起點。每張族群卡直接顯示路線、站次、
+  文章標題、「開始學這個族群」與「全部 N 篇」；起點只先找 `article.groups[0]` 等於該族群的文章，
+  再沿用既有路線與站次，不使用最新、熱門度、文字相似度或模型判斷。未來若有族群尚無路線，
+  會明示缺口而不自動補位。
+- 新增族群起點發布契約：文章數逐族群與 library 完整計數一致；起讀文章開啟後位於頁首並保留
+  原路線定位；「全部文章」同樣回到頁首，工具列與清單標題持續顯示目前族群。這只是整理既有
+  導覽，不新增文章／圖譜映射、產業關係、公司曝險或受惠排名。
+- 方法 registry 與 selection fingerprint 均未變動，最新 append-only 快照仍為
+  `RMA-2026-08-09-12`、fingerprint `322e5d86…`；README、研究維護與發布檢查契約已同步。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 453 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 個證據時效／影響映射 warning），
+  inline JavaScript、`git diff --check`、方法快照 JSON／LF、衝突標記與 `CLAUDE.md`／`AGENTS.md`
+  同步檢查通過。連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html`
+  `00445335…`。
+- 以 1280×720 與 390×844 同狀態前後對照：族群卡的起點與兩個動作均可見，手機按鈕高 44px、
+  頁面寬度等於 viewport；被動元件起點抵達「供電與散熱」第 3／9 站且 `scrollY=0`，全部 30 篇
+  清單也在 `scrollY=0` 顯示「被動元件 · 全部文章」，瀏覽器 console 無 warning／error。
+
+## 研究雷達白話問題、關鍵詞與驗證動作 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善研究雷達的
+讀者入口與查核層次，不修改候選排序、priority、knowledge value、第一拒絕條件、下一份研究
+證據、升格決定、研究來源、文章／圖譜映射、公司曝險或投資判斷。
+
+- 同狀態實機稽核發現，雷達雖已收起方法細節，卡片正面仍把 OCP、CISPR、FCC、chamber、
+  lab capacity 與 qualification 等規格語言排成長段落；新手還沒理解研究問題就先被術語擋住。
+  8／8 個 active 候選現改為先顯示一句白話研究問題、2–4 個關鍵詞解釋與一個下一步驗證動作。
+- 完整 `why_now`、`next_evidence`、knowledge gain、first rejection 與來源沒有刪除或改寫，統一
+  收進每張卡片預設關閉的「查看研究判定、原始文字與來源」查核區；已升格候選的「閱讀研究」
+  與「查看證據關係」仍留在正面，點擊後文章與圖譜都由頁首開啟。
+- `research_radar.py` 新增 reader-only 欄位解析與契約：active 候選必須有問句、下一個驗證動作
+  及 2–4 個不重複的「術語 → 白話解釋」。這些欄位不納入 selection fingerprint，也不能改變
+  凍結值、研究證據姿態或發布新的公司／投資結論；README 與兩份研究方法文件同步記錄邊界。
+- 研究雷達 lint 確認 8 個候選、2 個已升格、8 個研究前凍結，方法 fingerprint 維持
+  `322e5d86…`；新增 append-only 方法快照 `RMA-2026-08-09-12`。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 452 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 個證據時效／影響映射 warning），
+  inline JavaScript、`git diff --check`、方法快照 JSON／LF、衝突標記與 `CLAUDE.md`／`AGENTS.md`
+  同步檢查通過。連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html`
+  `dffadb2a…`。
+- 以 1280×720 與 390×844 同狀態前後對照：桌機與手機首張卡均先出現白話問題、關鍵詞與驗證
+  動作；390px 手機頁面寬度等於 viewport。查核區展開後原始文字仍完整可見，文章與圖譜入口
+  均抵達正確 deep link 且 `scrollY=0`，瀏覽器 console 無 warning／error。
+
 ## 研究中心路線定位、站次一致與最後一站返回 — 2026-08-09
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善學習路線定位、

@@ -341,6 +341,59 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(
             wide["articles"][0]["learningPath"]["cards"][0]["kind"], "collection")
 
+    def test_group_learning_start_prefers_declared_primary_group_then_route_order(self):
+        library = {
+            "groups": [
+                {"id": "passive"}, {"id": "power"}, {"id": "orphan"},
+            ],
+            "articles": [
+                {
+                    "id": "topic-power-first", "groups": ["power", "passive"],
+                    "readerTitle": "功率優先文章",
+                    "learningRoute": {
+                        "id": "route-a", "label": "路線 A", "step": 1,
+                        "total": 2, "graphId": "graph-a", "graphLabel": "第一站",
+                    },
+                },
+                {
+                    "id": "topic-passive-first", "groups": ["passive", "power"],
+                    "readerTitle": "被動元件優先文章",
+                    "learningRoute": {
+                        "id": "route-a", "label": "路線 A", "step": 2,
+                        "total": 2, "graphId": "graph-b", "graphLabel": "第二站",
+                    },
+                },
+                {"id": "topic-unrouted", "groups": ["passive"]},
+            ],
+            "knowledgeGraph": {
+                "learningRoutes": [{"id": "route-a", "label": "路線 A"}],
+            },
+            "groupMaturity": {
+                "summary": {"groups": 3},
+                "rows": [
+                    {"id": "passive", "label": "被動元件"},
+                    {"id": "power", "label": "功率元件"},
+                    {"id": "orphan", "label": "尚無路線"},
+                ],
+            },
+        }
+
+        bd.attach_group_learning_starts(library)
+
+        rows = {row["id"]: row for row in library["groupMaturity"]["rows"]}
+        self.assertEqual(
+            rows["passive"]["learningStart"]["articleId"],
+            "topic-passive-first",
+        )
+        self.assertEqual(rows["passive"]["learningStart"]["scope"], "primary_group")
+        self.assertEqual(rows["passive"]["articleCount"], 3)
+        self.assertEqual(
+            rows["power"]["learningStart"]["articleId"], "topic-power-first")
+        self.assertIsNone(rows["orphan"]["learningStart"])
+        self.assertEqual(
+            library["groupMaturity"]["summary"]["groupsWithLearningStart"], 2)
+        self.assertIn("不是熱門度", library["groupMaturity"]["learningBoundary"])
+
     def test_topic_confidence_uses_explicit_as_of_without_changing_article_anchor(self):
         due_day = bd.build_research_library(
             self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"},
@@ -563,7 +616,7 @@ class ResearchCenterTest(unittest.TestCase):
             "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
             "從這篇接著學", "function openLearningGroups(",
             "function openLearningCollection(", "learning-path-grid",
-            "maturity-reading-key", "先從左到右讀三層",
+            "maturity-reading-key", "讀完族群起點後，再從左到右看三層",
             "entry-guide", "第一次來？照三步開始",
             'id="entryMatrix"', 'id="entryTopics"', 'id="entryGraph"',
             "function showEntryGuide()", "function resetEntryScroll()",
@@ -800,7 +853,10 @@ class ResearchCenterTest(unittest.TestCase):
             "candidate.nextEvidence", "candidate.nextCheck",
             "排序只用來安排研究先後，不代表預期報酬、股價方向或投資建議",
             "候選排名不是投資評分", "deepLink==='radar'",
-            "研究判定與來源", "研究方法與稽核資料（供查核）",
+            "candidate.readerQuestion", "candidate.readerNextStep",
+            "candidate.readerTerms", "先用一句話理解", "關鍵詞白話解釋",
+            "查看研究判定、原始文字與來源",
+            "auditBadges,copy,track,foot", "研究方法與稽核資料（供查核）",
             "document.getElementById('surfaceRadar').addEventListener",
         ):
             self.assertIn(contract, template)
@@ -815,13 +871,19 @@ class ResearchCenterTest(unittest.TestCase):
             "const MATURITY=LIB.groupMaturity", "function renderMaturity()",
             "function renderMaturityAction(", "function focusMaturityAction(",
             "function openGroupResearch(", "deepLink==='maturity'",
-            "各族群研究完整度", "最大缺口", "不做總分或名次",
+            "各族群研究完整度", "族群起點", "開始學這個族群",
+            "function renderMaturityGroupStart(", "groupsWithLearningStart",
+            "function resetLibrarySurfaceScroll(", "resetLibrarySurfaceScroll()",
+            "MATURITY.learningBoundary", 'id="catalogTitle"', "groupScope",
+            "selectedGroups.length===1", "最大缺口", "不做總分或名次",
             "可水平捲動的族群研究成熟度矩陣",
             "完整查核矩陣與方法說明", "題材財務影響", "maturitySummarySentence",
         ):
             self.assertIn(contract, template)
         self.assertIn("body.article-open .tools{display:none}", template)
         self.assertIn('research_library["groupMaturity"] = build_group_maturity(', builder)
+        self.assertIn("def attach_group_learning_starts(", builder)
+        self.assertIn("attach_group_learning_starts(research_library)", builder)
         self.assertIn('candidate_radar=research_library["candidateRadar"]', builder)
         self.assertIn("def build_group_maturity(", builder)
 

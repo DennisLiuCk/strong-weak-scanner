@@ -122,6 +122,30 @@ class ResearchRadarTest(unittest.TestCase):
             self.assertGreater(row["nextCheck"], self.payload["asOf"])
             self.assertGreaterEqual(len(row["sources"]), 2, row["id"])
 
+    def test_active_candidates_have_a_plain_language_reader_layer(self):
+        for row in self.payload["candidates"]:
+            self.assertTrue(row["readerQuestion"].endswith(("？", "?")), row["id"])
+            self.assertTrue(row["readerNextStep"], row["id"])
+            self.assertGreaterEqual(len(row["readerTerms"]), 2, row["id"])
+            self.assertLessEqual(len(row["readerTerms"]), 4, row["id"])
+            terms = [item["term"] for item in row["readerTerms"]]
+            self.assertEqual(len(terms), len(set(terms)), row["id"])
+            self.assertTrue(all(item["explanation"] for item in row["readerTerms"]))
+
+        errors = []
+        self.assertEqual(
+            research_radar._reader_terms(
+                "EMC => 電磁相容 | chamber => 專用測試室",
+                "candidate",
+                errors,
+            ),
+            [
+                {"term": "EMC", "explanation": "電磁相容"},
+                {"term": "chamber", "explanation": "專用測試室"},
+            ],
+        )
+        self.assertEqual(errors, [])
+
     def test_retired_schema2_radars_remain_accountable(self):
         stats = self.payload["historyStats"]
         self.assertGreater(stats["schema2Cycles"], 1)
