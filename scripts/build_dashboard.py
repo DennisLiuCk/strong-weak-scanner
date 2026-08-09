@@ -72,6 +72,7 @@ RECENT_ARTICLE_TYPES = (
 RESEARCH_LEARNING_ROUTES = [
     {
         "id": "power-cooling", "label": "供電與散熱",
+        "question": "電力如何送進 AI 機櫃，產生的熱又如何被帶走？",
         "description": (
             "建議順序：先讀 800VDC 功率半導體鏈，再看保護與緩衝，"
             "最後先辨識液冷產品資格，再拆迴路責任邊界。"
@@ -84,6 +85,7 @@ RESEARCH_LEARNING_ROUTES = [
     },
     {
         "id": "memory-packaging", "label": "記憶體與封裝",
+        "question": "資料放在哪裡，記憶體與封裝又如何一起影響運算？",
         "description": (
             "建議順序：先讀 AI 記憶體分層，再看 HBM／SPHBM4，"
             "最後追鍵結與封裝路徑。"
@@ -96,6 +98,7 @@ RESEARCH_LEARNING_ROUTES = [
     },
     {
         "id": "compute-connect", "label": "運算與互連",
+        "question": "算力與資料如何在晶片、儲存與網路之間移動？",
         "description": (
             "建議順序：先讀 AI 儲存資料平面，再看開放 AI 互連，"
             "最後用 PCIe 6／UCIe 檢查成熟度。"
@@ -108,6 +111,7 @@ RESEARCH_LEARNING_ROUTES = [
     },
     {
         "id": "company-finance", "label": "公司財務案例",
+        "question": "市場題材何時能落到可辨識的收入、毛利或現金流？",
         "description": (
             "建議讀法：用國巨 Q2 案例，練習把公司總額與題材可歸因貢獻分開。"
         ),
@@ -2023,6 +2027,79 @@ def _research_reading_minutes(sections):
     return max(2, (walk(sections) + 499) // 500)
 
 
+def _structured_runs_text(runs):
+    """Flatten parser inline runs without rewording their research content."""
+    return "".join(
+        str(run.get("s") or "")
+        for run in (runs or [])
+        if isinstance(run, dict)
+    ).strip()
+
+
+def _reader_orientation_excerpt(value, limit=180):
+    """Lift enough complete opening sentences to orient a reader without rewording."""
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    if not text:
+        return ""
+    sentences = re.findall(r"[^。！？]*[。！？]", text)
+    lifted = ""
+    for sentence in sentences:
+        lifted += sentence.strip()
+        if len(lifted) >= 24:
+            break
+    if lifted:
+        return lifted if len(lifted) <= limit else _article_excerpt(lifted, limit=limit)
+    return _article_excerpt(text, limit=limit)
+
+
+def _research_reading_mission(sections):
+    """Reuse novice-section passages for the opening mission and closing check.
+
+    This is presentation metadata only. The strings stay anchored to the existing
+    ``三句話抓重點``, ``為什麼重要`` and ``想一想`` blocks, so the reader UI
+    cannot introduce a new claim.
+    """
+    beginner = next((
+        section for section in (sections or [])
+        if section.get("h") == "新手先讀：這篇在講什麼"
+    ), None)
+    if not beginner:
+        return None
+
+    current_heading = ""
+    orientation = ""
+    question = ""
+    key_points = []
+    for item in beginner.get("blocks") or []:
+        item_type = item.get("t")
+        if item_type == "h3":
+            current_heading = _structured_runs_text(item.get("runs"))
+            continue
+        if (current_heading == "三句話抓重點" and not key_points
+                and item_type in {"ul", "ol"}):
+            key_points = [
+                _structured_runs_text(runs)
+                for runs in (item.get("items") or [])
+                if _structured_runs_text(runs)
+            ][:3]
+        elif current_heading == "為什麼重要" and not orientation and item_type == "p":
+            orientation = _reader_orientation_excerpt(
+                _structured_runs_text(item.get("runs"))
+            )
+        elif (current_heading == "想一想" and not question
+              and item_type in {"ul", "ol"} and item.get("items")):
+            question = _structured_runs_text(item["items"][0])
+
+    if not orientation or not question:
+        return None
+    return {
+        "orientation": orientation,
+        "question": question,
+        "keyPoints": key_points,
+        "source": "本文既有的「三句話抓重點」、「為什麼重要」與「想一想」",
+    }
+
+
 def build_research_library(notes, reports, topics=None, stock_meta=None, group_names=None,
                            events=None, as_of=None):
     """建立獨立研究中心 payload；事件錨點歸入市場議題，不另造第四種閱讀模式。"""
@@ -2054,6 +2131,9 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
         article["groups"] = list(dict.fromkeys(article.get("groups") or []))
         article["groupLabels"] = [group_names.get(group, group) for group in article["groups"]]
         article["readingMinutes"] = _research_reading_minutes(article.get("sections") or [])
+        reading_mission = _research_reading_mission(article.get("sections") or [])
+        if reading_mission:
+            article["readingMission"] = reading_mission
         article["searchText"] = " ".join(str(value) for value in (
             article.get("subject", ""), article.get("title", ""),
             article.get("summary", ""), " ".join(article["groupLabels"]),
@@ -2311,6 +2391,25 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 "graphLabel": (graph_by_id.get(station["graphId"]) or {}).get("label") or "",
             }
 
+    missing_reading_missions = sorted(
+        article_id for article_id in routed_article_ids
+        if not article_by_id[article_id].get("readingMission")
+    )
+    if missing_reading_missions:
+        raise ValueError(
+            "學習路線主文章缺少由新手段落產生的閱讀任務："
+            + "、".join(missing_reading_missions)
+        )
+    missing_learning_checks = sorted(
+        article_id for article_id in routed_article_ids
+        if not (article_by_id[article_id].get("readingMission") or {}).get("keyPoints")
+    )
+    if missing_learning_checks:
+        raise ValueError(
+            "學習路線主文章缺少可逐字回查的三句重點："
+            + "、".join(missing_learning_checks)
+        )
+
     def overlap(left, right):
         return set(left or []).intersection(right or [])
 
@@ -2382,12 +2481,18 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             route_context = article.get("learningRoute") or {}
             if route_next:
                 route, candidate, step, total = route_next
-                cards.append(article_card(
+                next_card = article_card(
                     "沿學習路線往下讀", candidate,
                     "同一路線的下一個既有主題；這只是閱讀順序，不新增供應鏈或受惠關係。",
                     (f"{route.get('label') or '學習路線'} · 第 {step}/{total} 站 · "
                      f"閱讀約 {candidate.get('readingMinutes') or 1} 分鐘"),
-                ))
+                )
+                next_card["routeStep"] = step
+                next_card["routeTotal"] = total
+                next_card["question"] = (
+                    (candidate.get("readingMission") or {}).get("question") or ""
+                )
+                cards.append(next_card)
             elif route_context and route_context.get("step") == route_context.get("total"):
                 cards.append({
                     "kind": "route", "label": "已完成這條學習路線",
@@ -2488,7 +2593,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 3
+    research_library["learningPathVersion"] = 4
     return research_library
 
 
@@ -2552,10 +2657,58 @@ def attach_group_learning_starts(research_library):
                 else "cross_group"
             ),
         }
+    row_labels = {
+        row.get("id"): row.get("label") or row.get("id")
+        for row in rows if row.get("id")
+    }
+    route_guides = []
+    for route in routes:
+        route_id = route.get("id") or ""
+        stations = sorted(
+            (
+                article for article in articles
+                if (article.get("learningRoute") or {}).get("id") == route_id
+            ),
+            key=lambda article: (
+                (article.get("learningRoute") or {}).get("step", 999),
+                article.get("id") or "",
+            ),
+        )
+        if not stations:
+            continue
+        station_group_ids = {
+            group_id
+            for article in stations
+            for group_id in article.get("groups") or []
+            if group_id in row_labels
+        }
+        ordered_group_ids = [
+            row.get("id") for row in rows
+            if row.get("id") in station_group_ids
+        ]
+        first = stations[0]
+        first_route = first.get("learningRoute") or {}
+        route_guides.append({
+            "id": route_id,
+            "label": route.get("label") or "學習路線",
+            "question": route.get("question") or "這條路線先回答什麼系統問題？",
+            "description": route.get("description") or "",
+            "firstArticleId": first.get("id") or "",
+            "firstArticleTitle": (
+                first.get("readerTitle") or first.get("title") or "研究文章"
+            ),
+            "firstGraphId": first_route.get("graphId") or "",
+            "firstGraphLabel": first_route.get("graphLabel") or "第一站",
+            "stationCount": len(stations),
+            "groupIds": ordered_group_ids,
+            "groupLabels": [row_labels[group_id] for group_id in ordered_group_ids],
+        })
+    maturity["learningRoutes"] = route_guides
     summary = maturity.setdefault("summary", {})
     summary["groupsWithLearningStart"] = groups_with_start
     maturity["learningBoundary"] = (
-        "族群起讀文章只從已登錄的學習路線主文章中挑選：優先使用把該族群列在第一位的文章，"
+        "系統問題卡只沿用已登錄學習路線、第一站與主文章宣告的 group IDs，"
+        "不會因文字相似新增跨族群關係。族群起讀文章優先使用把該族群列在第一位的文章，"
         "再沿用既有路線順序與站次；這不是熱門度、研究完整度或投資排序。"
     )
     return research_library

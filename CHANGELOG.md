@@ -1,5 +1,151 @@
 # Changelog
 
+## 文章讀後理解檢查與下一站交接 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只把同篇新手段落與既有
+學習路線重排成讀後交接，不修改研究來源、主張、三句重點、想一想、證據層級、圖譜 edge、
+公司映射、財務歸因或投資判斷。
+
+- 390×844 同狀態基準顯示：正文後只有「下一篇／看關係／看同族群」三個平行出口；讀者可選
+  去向，卻沒有先確認本篇應帶走的因果問題，也看不到下一站將補哪個問題。
+- 「從這篇接著學」先加入讀完檢查，逐字重問首屏「想一想」；三句提示使用原生 `details`
+  預設收合，展開後逐字呈現同篇「三句話抓重點」，並明示沒有新增或改寫結論。回看按鈕會把
+  「三句話抓重點」移入鍵盤焦點，手機停在 viewport `y≈120px`、桌機停在 reader `y≈142px`
+  （捲動容器頂端 `66px`），不再被黏性導覽遮住。
+- 下一站主卡另顯示下一篇既有閱讀任務的問題，主按鈕直接標示「繼續第 2/9 站」。代表流程在
+  390×844 的第一屏仍看得到主按鈕（底部 `y≈742px`）；點擊後開啟既有 800VDC 保護文章、回到
+  `scrollY=0`，並顯示「供電與散熱 · 第 2/9 站」及相同的下一站問題。
+- 產出 payload 與瀏覽器執行時各自完整枚舉：4 條路線的 25／25 篇主文章都有理解問題與 3 點
+  原文提示。建置新增硬閘門，任何 route 主文章缺閱讀任務或三句重點都直接失敗；下一站仍只由
+  `RESEARCH_LEARNING_ROUTES` 與 graph 第一篇既有 `articleIds` 決定，payload 升為
+  `learningPathVersion: 4`。
+- 另以 390×844 逐篇渲染全部 25 個 route 主文章：25／25 都有理解檢查與主動作、0 篇水平
+  溢出，主按鈕全數留在交接區第一屏；最長的是液冷產品資格站，按鈕底部 `y≈806px`。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 453 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 warnings），inline JavaScript、
+  `git diff --check`、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `ce883bda…`。
+
+## 族群矩陣系統問題選路 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只把既有學習路線與
+文章宣告族群整理成矩陣起讀入口，不修改研究來源、主張、證據層級、圖譜 edge、公司映射、
+財務歸因或投資判斷。
+
+- 390×844 同狀態基準顯示：矩陣首個「開始學這個族群」在 `y=980px`，第一屏只有三層方法與
+  四組覆蓋數字；整頁高 `9,144px`。讀者被要求從 11 個族群任選一個，卻沒有先看到它們如何
+  共同回答同一個系統問題。
+- 矩陣頂端新增「先選一個系統問題」，逐卡呈現供電與散熱、記憶體與封裝、運算與互連、公司
+  財務案例四條既有學習路線。每張卡直接顯示白話問題、主文章已宣告的相關族群、站數與第一站；
+  同一族群跨卡出現明示為多個系統角色，不是重複計分。
+- route guide 由 `RESEARCH_LEARNING_ROUTES`、25 篇既有 route 主文章與其 `article.groups`
+  決定；第一站固定取 route step 1，不使用最新、熱門度、相似度或模型另推關係。獨立解析
+  建置 payload 與瀏覽器 DOM 均得到 4 張路線卡；供電與散熱卡的 6 個族群逐項一致。
+- 手機第一個可執行起點提前到 `y≈574px`，且無水平溢出；桌機 1280×720 同時看得到四條路線
+  與四個起讀按鈕。點擊供電與散熱第一站會開啟既有 800VDC 文章、回到 `scrollY=0`，並顯示
+  「第 1/9 站」。原本的三層完成度方法改為原生 `details` 預設收合，展開後三層與非多空分數
+  警語完整保留。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 453 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 warnings），inline JavaScript、
+  `git diff --check`、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `782cb79e…`。
+
+## 長文名詞速查與原位返回 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只增加既有文章字典的
+閱讀期回查入口，不修改研究來源、主張、術語解釋、證據層級、圖譜 edge、公司映射、財務歸因
+或投資判斷。
+
+- 390×844 同狀態基準顯示：記憶體起點文章全長 `6,486px`，原名詞小字典與正文
+  「分層不是替代排行榜」相隔 `2,117px`；1280×720 的同段距離也有 `1,287px`。讀者在正文
+  遇到 HBM4、SOCAMM、CMX、CXL 4.0 時，原本只能離開當下位置回捲查字典。
+- 窄幅畫面在原字典離開閱讀區後才顯示左下「名詞速查」，桌機則在 sticky 本頁大綱與來源摘要
+  之間固定顯示入口；兩者共用同一個原生 `dialog`，不和右下回頂端按鈕重疊，也不會在仍看得到
+  原字典時重複催促。
+- dialog 的標題詞數、搜尋索引與每一列內容都直接從同篇「名詞小字典」list runs 取得；沒有
+  字典的 `event-tsmc-2026q2` 實測為 0 個 dialog、0 個速查入口。搜尋 `CXL` 得到 1／12 個結果，
+  顯示文字逐字等於原字典，不生成第二份定義。
+- 390×844 與 1280×720 都在同一正文位置驗證：開啟後搜尋欄取得焦點，window／reader scroll
+  保持不變；關閉後回到原觸發按鈕與閱讀位置。按鈕具 `aria-haspopup=dialog`／`aria-controls`，
+  結果狀態以 `aria-live` 回報，對話框沿用原生 Escape 行為並支援明示關閉與背景點擊。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 453 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 warnings），inline JavaScript、
+  `git diff --check`、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `316b3381…`。
+
+## 研究摘要結論與驗證卡 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只重排既有 generated
+研究摘要，不修改主命題、證據文字、可信度、影響路由、monitor、來源、圖譜 edge 或投資判斷。
+
+- 390×844 基準顯示：摘要五個項目全塞在同一個 `497px` bullet list；一句話結論、已知、未知、
+  影響範圍與下一步沒有視覺層級。1280×720 雖縮至 `258px`，但變成一整塊橫向密集小字。
+- 讀者畫面將相同五段內容重排為一張全寬「一句話結論」主卡，以及「目前已知、尚未知道、
+  對哪些族群有意義、下一步看什麼」四張驗證卡；桌機用兩欄、手機單欄，文字標籤與 H3 語意
+  同時保留，不以顏色單獨表意。
+- renderer 只有在五個預定標籤完整、唯一時才轉成 `role=list`／`role=listitem` 卡片，否則退回
+  原本清單；每張卡只拆出既有 bold label，正文 runs 的文字與連結不重寫、不摘要。
+- 目前 34／34 篇一般市場議題都符合五標籤契約；唯一不同的 `event-tsmc-2026q2` 是事件錨點，
+  本來就沒有這組 generated summary，因此保留既有格式。以瀏覽器 DOM 對建置 JSON 逐欄比較，
+  代表文章的 5／5 個 label 與正文完全一致；另以獨立 Python 解析重算得到相同 34＋1 範圍。
+- 手機卡片版高度由 `497px` 增至 `712px`，用較大的正文與分組空間交換掃讀清楚度；390×844
+  畫面仍能同時看到五張卡與下一個可信度區塊起點，深淺色均無水平溢出。桌機版為 `388px`、
+  兩欄各 `390.5px`，結論固定全寬。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 453 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 warnings），inline JavaScript、
+  `git diff --check`、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `1b08bdae…`。
+
+## 新手名詞小字典漸進展開 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只調整既有新手字典的
+顯示方式，不修改研究來源、主張、術語解釋、證據層級、圖譜 edge、公司映射、財務歸因或
+投資判斷。
+
+- 390×844 同狀態基準顯示：記憶體起點文章有 12 個名詞，從「名詞小字典」到
+  「接下來怎麼追」相隔約 `1,231px`；即使三句重點已提前，讀者仍會在追蹤與反證問題前遇到
+  一整段定義牆。
+- 讀者畫面把名詞小字典改成原生 `details`，預設收合並顯示詞數與「遇到陌生詞再展開」；
+  收合狀態讓「接下來怎麼追」與「想一想」直接接續重要性，展開後仍逐項呈現原始定義。
+- 展開控制保留瀏覽器原生展開狀態、鍵盤操作與焦點輪廓，手機觸控高度至少 56px。來源
+  Markdown、parser blocks、搜尋文字與研究查核內容不變；這是顯示層的漸進揭露，不是摘要或刪節。
+- 同一篇文章收合後，小字典到下一節只剩約 `83px`，「接下來怎麼追」由頁面 `y=3,064px`
+  提前到 `y=1,914px`；390×844 與 1280×720 均無水平溢出。實機展開核對 12／12 項，首項
+  HBM、末項 NIXL 與原始內容一致，收合控制為可聚焦的原生 `SUMMARY` 且保留 3px 焦點輪廓。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 453 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 warnings），inline JavaScript、
+  `git diff --check`、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `3dbcc9bf…`。
+
+## 研究文章首屏閱讀任務與新手段落重排 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善文章首屏定位與
+新手段落的顯示順序，不修改研究來源、主張、證據層級、圖譜 edge、公司映射、財務歸因或
+投資判斷。
+
+- 390×844 同狀態基準顯示：文章雖在首屏底部露出「新手先讀」，但記憶體起點文章先排 12 個
+  名詞，真正的「三句話抓重點」位於頁面 `y=2,041px`；讀者還沒知道文章要解決什麼，就先穿過
+  查核狀態、日期、路線、大綱與整份字典。
+- 標題與查核警語後新增「新手閱讀任務」，只逐字擷取同篇「為什麼重要」開頭的完整句子與
+  「想一想」第一題，分別顯示「這篇先釐清」與「讀完試著回答」。卡片明示來源在本文
+  既有段落，不另寫摘要、不新增或提高研究主張；有學習路線時同步顯示路線與站次。
+- 完整「新手先讀」在讀者畫面重排為「三句話抓重點 → 為什麼重要 → 名詞小字典 → 接下來
+  怎麼追 → 想一想」，並提醒先抓主線、遇到陌生詞再查。Markdown、parser blocks 與查核附錄
+  內容維持原樣。
+- 現行 25／25 個學習路線主文章均可由原始 Markdown 獨立回查上述兩個來源段落；
+  `attach_research_learning_paths()` 新增發布閘門，任何路線主文章缺少閱讀任務即停止建置。
+  方法 registry 與 selection fingerprint 未變動，最新 append-only 快照仍為
+  `RMA-2026-08-09-12`。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 執行 453 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 個證據時效／影響映射 warning），
+  inline JavaScript、`git diff --check`、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。
+  連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `ff3dca0c…`。
+- 以 1280×720 與 390×844 同狀態前後對照：兩種寬度都在文章頂端直接看到閱讀任務；手機卡片
+  完整落在第一屏內、頁面寬度等於 viewport；25 站中內容最長的 HBF 任務卡底部仍在
+  `y=830px`。第二篇記憶體起點亦顯示正確內容，完整新手段落
+  的三句重點與重要性已排在字典之前；「查看完整路線」仍能抵達同一中心主題並回到頁首。
+  瀏覽器 console 無 warning／error。
+
 ## 族群矩陣起讀文章與篩選上下文 — 2026-08-09
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只改善族群矩陣到文章的

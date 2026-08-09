@@ -77,6 +77,7 @@ class KnowledgeGraphTest(unittest.TestCase):
         self.assertEqual(len(routed_ids), len(set(routed_ids)))
         self.assertEqual(set(routed_ids), graph_ids)
         self.assertTrue(all(route["description"] for route in bd.RESEARCH_LEARNING_ROUTES))
+        self.assertTrue(all(route["question"] for route in bd.RESEARCH_LEARNING_ROUTES))
         primary_articles = [graph_by_id[graph_id]["articleIds"][0] for graph_id in routed_ids]
         self.assertEqual(len(primary_articles), len(set(primary_articles)))
 

@@ -70,7 +70,21 @@ class ResearchCenterTest(unittest.TestCase):
             "relpath": "notes/research_topics/test.md",
             "sections": [{
                 "h": "新手先讀：這篇在講什麼",
-                "blocks": [{"t": "p", "runs": [{"s": "先釐清已知、未知與追蹤方式。"}]}],
+                "blocks": [
+                    {"t": "h3", "runs": [{"s": "名詞小字典"}]},
+                    {"t": "ul", "items": [[{"s": "擴產：增加既有或新建產能。"}]]},
+                    {"t": "h3", "runs": [{"s": "三句話抓重點"}]},
+                    {"t": "ul", "items": [[{"s": "公司公告與供應商受惠是兩件事。"}]]},
+                    {"t": "h3", "runs": [{"s": "為什麼重要"}]},
+                    {"t": "p", "runs": [{
+                        "s": "把公司擴產直接寫成特定供應商訂單，是本文要避免的誤解。"
+                             "後續仍要等供應商文件。",
+                    }]},
+                    {"t": "h3", "runs": [{"s": "想一想"}]},
+                    {"t": "ul", "items": [[{
+                        "s": "還缺哪一份公司文件，才能把擴產連到供應商？",
+                    }]]},
+                ],
             }, {
                 "h": "主張與證據帳本",
                 "blocks": [{"t": "p", "runs": [{"s": "原文的帳本邊界必須保留。"}]}],
@@ -168,6 +182,12 @@ class ResearchCenterTest(unittest.TestCase):
         topic = next(row for row in library["articles"] if row["id"].startswith("topic-MI-"))
         self.assertEqual(topic["sources"][0]["source_id"], "S1")
         self.assertEqual(topic["confidence"]["effective"], "medium")
+        self.assertEqual(topic["readingMission"], {
+            "orientation": "把公司擴產直接寫成特定供應商訂單，是本文要避免的誤解。",
+            "question": "還缺哪一份公司文件，才能把擴產連到供應商？",
+            "keyPoints": ["公司公告與供應商受惠是兩件事。"],
+            "source": "本文既有的「三句話抓重點」、「為什麼重要」與「想一想」",
+        })
         self.assertEqual(
             [section["h"] for section in topic["sections"][:5]],
             ["研究摘要：已知、未知與下一步", "新手先讀：這篇在講什麼",
@@ -185,6 +205,14 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(headings.count("主張—證據帳本"), 1)
         self.assertTrue(all(section["blocks"] for section in topic["sections"]))
         analyst = topic["sections"][0]
+        self.assertEqual(
+            [item[0]["s"] for item in analyst["blocks"][1]["items"]],
+            ["一句話結論：", "目前已知：", "尚未知道：", "對哪些族群有意義：", "下一步看什麼："],
+        )
+        self.assertTrue(all(
+            len(item) == 2 and item[0].get("b") is True and not item[1].get("b", False)
+            for item in analyst["blocks"][1]["items"]
+        ))
         self.assertIn("一句話結論", str(analyst))
         self.assertIn("公司已正式公告擴產", str(analyst))
         self.assertIn("功率元件（方向未定／持續觀察）", str(analyst))
@@ -233,7 +261,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 3)
+        self.assertEqual(library["learningPathVersion"], 4)
         article_ids = {article["id"] for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
         group_ids = {item["id"] for item in library["groups"]}
@@ -272,15 +300,23 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("group", {card["kind"] for card in event["learningPath"]["cards"]})
 
     def test_learning_path_prioritizes_next_registered_route_article(self):
+        reading_mission = {
+            "orientation": "這是測試文章要先釐清的情境。",
+            "question": "讀完後能回答哪個問題？",
+            "keyPoints": ["這是測試文章的既有重點。"],
+        }
         library = {"counts": {"topic": 3}, "groups": [], "articles": [
             {"id": "topic-a", "type": "topic", "groups": [], "stockIds": [],
-             "readerTitle": "第一站", "typeLabel": "市場議題", "readingMinutes": 3},
+             "readerTitle": "第一站", "typeLabel": "市場議題", "readingMinutes": 3,
+             "readingMission": reading_mission},
             {"id": "topic-b", "type": "topic", "groups": [], "stockIds": [],
-             "readerTitle": "第二站", "typeLabel": "市場議題", "readingMinutes": 5},
+             "readerTitle": "第二站", "typeLabel": "市場議題", "readingMinutes": 5,
+             "readingMission": reading_mission},
             {"id": "topic-b-detail", "type": "topic", "groups": [], "stockIds": [],
              "readerTitle": "第二站補充", "typeLabel": "市場議題", "readingMinutes": 4},
             {"id": "topic-c", "type": "topic", "groups": [], "stockIds": [],
-             "readerTitle": "第三站", "typeLabel": "市場議題", "readingMinutes": 7},
+             "readerTitle": "第三站", "typeLabel": "市場議題", "readingMinutes": 7,
+             "readingMission": reading_mission},
         ]}
         graph = {
             "learningRoutes": [{
@@ -305,6 +341,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(first["label"], "沿學習路線往下讀")
         self.assertEqual(first["articleId"], "topic-b")
         self.assertIn("第 2/3 站", first["meta"])
+        self.assertEqual(first["routeStep"], 2)
+        self.assertEqual(first["routeTotal"], 3)
+        self.assertEqual(first["question"], "讀完後能回答哪個問題？")
         self.assertIn("不新增供應鏈或受惠關係", first["description"])
         self.assertEqual(second["articleId"], "topic-c")
         self.assertIn("第 3/3 站", second["meta"])
@@ -319,6 +358,22 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(completed["graphId"], "graph-c")
         self.assertIn("第 3/3 站", completed["meta"])
         self.assertIn("不代表研究結論已完成", completed["description"])
+
+        missing_mission = {"counts": {"topic": 1}, "groups": [], "articles": [{
+            "id": "topic-a", "type": "topic", "groups": [], "stockIds": [],
+        }]}
+        with self.assertRaisesRegex(ValueError, "學習路線主文章缺少.*topic-a"):
+            bd.attach_research_learning_paths(missing_mission, graph)
+
+        missing_key_points = {"counts": {"topic": 1}, "groups": [], "articles": [{
+            "id": "topic-a", "type": "topic", "groups": [], "stockIds": [],
+            "readingMission": {
+                "orientation": "這篇先釐清的情境。",
+                "question": "讀完後能回答哪個問題？",
+            },
+        }]}
+        with self.assertRaisesRegex(ValueError, "缺少可逐字回查的三句重點.*topic-a"):
+            bd.attach_research_learning_paths(missing_key_points, graph)
 
         orphan = {"counts": {"topic": 1}, "groups": [], "articles": [{
             "id": "topic-policy", "type": "topic", "groups": [], "stockIds": [],
@@ -366,7 +421,10 @@ class ResearchCenterTest(unittest.TestCase):
                 {"id": "topic-unrouted", "groups": ["passive"]},
             ],
             "knowledgeGraph": {
-                "learningRoutes": [{"id": "route-a", "label": "路線 A"}],
+                "learningRoutes": [{
+                    "id": "route-a", "label": "路線 A",
+                    "question": "這條路線要回答什麼？",
+                }],
             },
             "groupMaturity": {
                 "summary": {"groups": 3},
@@ -393,6 +451,13 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(
             library["groupMaturity"]["summary"]["groupsWithLearningStart"], 2)
         self.assertIn("不是熱門度", library["groupMaturity"]["learningBoundary"])
+        guide = library["groupMaturity"]["learningRoutes"][0]
+        self.assertEqual(guide["question"], "這條路線要回答什麼？")
+        self.assertEqual(guide["firstArticleId"], "topic-power-first")
+        self.assertEqual(guide["firstGraphLabel"], "第一站")
+        self.assertEqual(guide["stationCount"], 2)
+        self.assertEqual(guide["groupIds"], ["passive", "power"])
+        self.assertEqual(guide["groupLabels"], ["被動元件", "功率元件"])
 
     def test_topic_confidence_uses_explicit_as_of_without_changing_article_anchor(self):
         due_day = bd.build_research_library(
@@ -614,9 +679,34 @@ class ResearchCenterTest(unittest.TestCase):
             "研究摘要：已知、未知與下一步", "function resetReaderScroll()",
             "ARTICLE_AUDIT_HEADINGS", "function renderResearchAppendix(",
             "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
+            "function renderReadingMission(", "reading-mission-grid",
+            "function orderedBeginnerGroups(", "BEGINNER_BLOCK_ORDER",
+            "function beginnerGlossary(", "beginner-glossary-state",
+            "function beginnerGlossaryTerms(", "function articleGlossaryTerms(",
+            "名詞小字典'+(termCount?'（'+termCount+' 個）':'')",
+            "遇到陌生詞再展開，不用一次背完",
+            "function renderGlossaryQuickView(", "articleGlossaryDialog",
+            "function setupGlossaryQuickAction(", "glossaryQuickReturnFocus",
+            "內容逐字取自本篇「新手先讀」名詞小字典；不新增解釋。",
+            "id:'glossaryQuickStatus','aria-live':'polite'",
+            "'aria-haspopup':'dialog'", "floating-glossary-action",
+            "outline-glossary-action", "placeholder:'例如：CXL、HBM'",
+            "function researchSummaryGrid(", "RESEARCH_SUMMARY_KINDS",
+            "research-summary-grid", "data-summary-kind",
+            "role:'list','aria-label':'研究摘要重點'",
+            "這篇先釐清", "讀完試著回答",
             "從這篇接著學", "function openLearningGroups(",
             "function openLearningCollection(", "learning-path-grid",
-            "maturity-reading-key", "讀完族群起點後，再從左到右看三層",
+            "function learningCheckpoint(", "function learningCard(",
+            "你能用自己的話回答嗎？", "需要提示？查看本文三句重點",
+            "提示逐字取自本篇「三句話抓重點」；不新增或改寫結論。",
+            "繼續第 '+card.routeStep+'/'+card.routeTotal+' 站",
+            "text:'回看本篇三句重點'", "target.focus();requestAnimationFrame",
+            "window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-120",
+            ".learning-checkpoint-hints>summary{min-height:44px}",
+            "maturity-reading-key", "先選一個系統問題",
+            "這頁的「完成度」怎麼看？", "maturityRouteCards",
+            "function renderMaturityLearningRoute(",
             "entry-guide", "第一次來？照三步開始",
             'id="entryMatrix"', 'id="entryTopics"', 'id="entryGraph"',
             "function showEntryGuide()", "function resetEntryScroll()",
@@ -628,9 +718,25 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("RESEARCH_TEMPLATE", builder)
         self.assertIn("RESEARCH_OUT", builder)
         self.assertIn('beginner-section', template)
+        self.assertIn("h('details',{class:'beginner-glossary','data-term-count':termCount}", template)
+        self.assertIn("if(group.heading==='名詞小字典')sectionEl.appendChild(beginnerGlossary(group))", template)
+        self.assertIn("terms.forEach(term=>list.appendChild", template)
+        self.assertIn("...runs(term)", template)
+        self.assertIn("if(glossaryTerms.length)body.append(renderGlossaryQuickView(glossaryTerms)", template)
+        self.assertIn("if(glossaryTerms.length)sticky.appendChild(glossaryQuickAction", template)
+        self.assertIn("if(target?.isConnected)target.focus({preventScroll:true})", template)
+        self.assertIn("search?.focus({preventScroll:true});restorePosition()", template)
+        self.assertIn("if(event.target===dialog)dialog.close()", template)
+        self.assertNotIn("orderedBeginnerBlocks", template)
+        self.assertIn("else if(analyst)(section.blocks||[]).forEach", template)
+        self.assertIn("researchSummaryGrid(item)||block(item)", template)
+        self.assertIn("entry.label!==expected[index]", template)
+        for label in ("一句話結論", "目前已知", "尚未知道", "對哪些族群有意義", "下一步看什麼"):
+            self.assertIn(label, template)
         self.assertIn('新手先讀：這篇在講什麼', template)
         self.assertIn('beginner-toc', template)
         self.assertIn('_article_excerpt(topic.get("summary"))', builder)
+        self.assertIn('_research_reading_mission(article.get("sections") or [])', builder)
         self.assertIn('_topic_structured_sections(topic, sections or [], group_names)', builder)
         self.assertIn('"asOf": library_as_of.isoformat()', builder)
         self.assertIn('as_of=research_as_of', builder)
@@ -640,6 +746,15 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('attach_research_learning_paths(', builder)
         self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
         self.assertIn("body.append(mobileBack,h('h1'", template)
+        self.assertIn(
+            "body.appendChild(verification);const readingMission=renderReadingMission(article);"
+            "if(readingMission)body.appendChild(readingMission);",
+            template,
+        )
+        self.assertLess(
+            template.index("const readingMission=renderReadingMission(article)"),
+            template.index("const meta=h('div',{class:'article-meta'}"),
+        )
         # meta 之後先標示學習路線，再由行動版大綱接手隱藏的桌機側欄。
         self.assertIn("body.append(meta);const routeContext=renderLearningRouteContext(article);"
                       "if(routeContext)body.appendChild(routeContext);"
@@ -822,7 +937,7 @@ class ResearchCenterTest(unittest.TestCase):
             "window.scrollTo(0,0)",
             "requestAnimationFrame(()=>requestAnimationFrame(reset))",
             "selectSurface('graph',true);resetGraphSurfaceScroll()",
-            "card.kind==='route'?'回到學習路線'",
+            "if(card.kind==='route')return'回到學習路線'",
             ".graph-intro-action{width:100%;min-height:44px}",
         ):
             self.assertIn(contract, template)
@@ -873,6 +988,9 @@ class ResearchCenterTest(unittest.TestCase):
             "function openGroupResearch(", "deepLink==='maturity'",
             "各族群研究完整度", "族群起點", "開始學這個族群",
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
+            'id="maturityRouteCards"', "function renderMaturityLearningRoute(",
+            "MATURITY.learningRoutes", "maturity-route-question",
+            "從「'+graphLabel+'」開始", "族群重複出現＝同時參與不同系統問題",
             "function resetLibrarySurfaceScroll(", "resetLibrarySurfaceScroll()",
             "MATURITY.learningBoundary", 'id="catalogTitle"', "groupScope",
             "selectedGroups.length===1", "最大缺口", "不做總分或名次",
@@ -883,6 +1001,8 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("body.article-open .tools{display:none}", template)
         self.assertIn('research_library["groupMaturity"] = build_group_maturity(', builder)
         self.assertIn("def attach_group_learning_starts(", builder)
+        self.assertIn('maturity["learningRoutes"] = route_guides', builder)
+        self.assertIn('"question": "電力如何送進 AI 機櫃', builder)
         self.assertIn("attach_group_learning_starts(research_library)", builder)
         self.assertIn('candidate_radar=research_library["candidateRadar"]', builder)
         self.assertIn("def build_group_maturity(", builder)
