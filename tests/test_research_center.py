@@ -961,13 +961,21 @@ class ResearchCenterTest(unittest.TestCase):
             "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
             "function focusBeginnerHighlights(", "function renderReadingMission(",
             "reading-mission-grid", "'data-testid':'reading-mission-start'",
-            "開始讀三句重點", "想先比較族群角色",
+            "開始讀三句重點", "先抓住一句，再帶著問題讀",
+            "先抓住這一句", "讀完能回答", "為什麼值得讀",
+            "lead=(mission.keyPoints||[]).find(Boolean)||mission.orientation",
+            "reading-mission-why", "需要更多脈絡時再展開",
+            "三句重點之後，再比較本文族群角色與所在學習階段。",
             ".reading-mission-start{width:100%;min-height:44px}",
+            ".article-learning-origin{display:none}",
             "function articleGroupGuideRows(", "function renderArticleRoleContext(",
             "'data-testid':'article-role-context'", "article-role-context",
-            "'aria-live':'polite'", "選擇本文產業角色",
-            "if(rows.length>4)section.appendChild(h('details',{class:'article-role-more'}",
-            "切換本文產業角色", "個角色可逐一比較", ".article-role-more[open]",
+            "function articleRoleCard(", "function articleRoleGrid(",
+            "'data-testid':'article-role-card-'", "article-role-grid",
+            "'aria-labelledby':titleId", "角色說明",
+            "if(rows.length<=4)section.appendChild(articleRoleGrid(rows))",
+            "再比較其餘 ", "一次展開全部角色說明，不必逐一切換",
+            ".article-role-more[open]",
             "並列只表示本文同時討論這些族群，不代表上下游、受惠、訂單或投資排序。",
             "function orderedBeginnerGroups(", "BEGINNER_BLOCK_ORDER",
             "function beginnerGlossary(", "beginner-glossary-state",
@@ -981,7 +989,12 @@ class ResearchCenterTest(unittest.TestCase):
             "先看懂這句的 ", "解釋逐字取自本篇「名詞小字典」；不另外改寫。",
             "共通語只解釋研究流程與常見指標的字面",
             ".beginner-keypoint-terms>summary{min-height:44px}",
-            "articleSections(article,'beginner',glossaryTerms)",
+            "articleSections(article,'beginner-highlights',glossaryTerms)",
+            "articleSections(article,'beginner-followup',glossaryTerms)",
+            "beginnerHighlights&&group.heading!=='三句話抓重點'",
+            "beginnerFollowup&&group.heading==='三句話抓重點'",
+            "beginner-followup", "再補重要性、名詞與追蹤",
+            ".beginner-highlights+.article-role-context{margin-top:12px}",
             "名詞小字典'+(termCount?'（'+termCount+' 個）':'')",
             "遇到陌生詞再展開，不用一次背完",
             "function renderGlossaryQuickView(", "articleGlossaryDialog",
@@ -1000,7 +1013,6 @@ class ResearchCenterTest(unittest.TestCase):
             ".evidence-reading-scales{grid-template-columns:1fr}",
             "confidence?.effective||guide.confidenceKey",
             "降級只表示證據需要更新，不代表主張已被推翻",
-            "這篇先釐清", "讀完試著回答",
             "從這篇接著學", "function openLearningGroups(",
             "function openLearningCollection(", "learning-path-grid",
             "function learningCheckpoint(", "function learningCard(",
@@ -1082,24 +1094,34 @@ class ResearchCenterTest(unittest.TestCase):
         )
         self.assertIn(
             "if(readingMission)body.appendChild(readingMission);const roleContext="
-            "renderArticleRoleContext(article);if(roleContext)body.appendChild(roleContext);",
+            "renderArticleRoleContext(article);",
             template,
         )
         self.assertLess(
             template.index("const readingMission=renderReadingMission(article)"),
             template.index("const meta=h('div',{class:'article-meta'}"),
         )
-        self.assertLess(
-            template.index("const roleContext=renderArticleRoleContext(article)"),
-            template.index("const meta=h('div',{class:'article-meta'}"),
+        # 三句重點後立刻建立族群角色與路線位置，再補 metadata 與其餘新手內容。
+        self.assertIn(
+            "const routeContext=renderLearningRouteContext(article),mobileToc="
+            "renderMobileToc(article);body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms));"
+            "if(roleContext)body.appendChild(roleContext);if(routeContext)body.appendChild(routeContext);"
+            "body.appendChild(meta);body.appendChild(articleSections(article,'beginner-followup',glossaryTerms));"
+            "if(mobileToc)body.appendChild(mobileToc);"
+            "body.appendChild(articleSections(article,'analyst'))",
+            template,
         )
-        # meta 之後先標示學習路線，再由行動版大綱接手隱藏的桌機側欄。
-        self.assertIn("body.append(meta);const routeContext=renderLearningRouteContext(article);"
-                      "if(routeContext)body.appendChild(routeContext);"
-                      "const mobileToc=renderMobileToc(article);"
-                      "if(mobileToc)body.appendChild(mobileToc);"
-                      "body.appendChild(articleSections(article,'beginner',glossaryTerms));"
-                      "body.appendChild(articleSections(article,'analyst'))", template)
+        self.assertLess(
+            template.index("body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms))"),
+            template.index("if(roleContext)body.appendChild(roleContext)"),
+        )
+        self.assertLess(
+            template.index("if(roleContext)body.appendChild(roleContext)"),
+            template.index("body.appendChild(articleSections(article,'beginner-followup',glossaryTerms))"),
+        )
+        self.assertNotIn("先別急著記名詞，先掌握問題", template)
+        self.assertNotIn("article-role-choice", template)
+        self.assertNotIn("article-role-preview", template)
         self.assertIn(
             "body.appendChild(articleSections(article,'reader',glossaryTerms))", template)
         self.assertIn("body.appendChild(appendix)", template)
