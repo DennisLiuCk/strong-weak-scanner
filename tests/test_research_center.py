@@ -787,6 +787,56 @@ class ResearchCenterTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "alias 重複"):
                     bd.load_research_reader_terms(strict=True)
 
+    def test_research_topic_guide_is_chinese_first_and_covers_published_topics(self):
+        builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
+        self.assertIn("load_research_topic_guide(strict=True)", builder)
+        self.assertIn("attach_research_topic_guide(", builder)
+        guide = bd.load_research_topic_guide(strict=True)
+        self.assertEqual(len(guide), 35)
+        for article_id, item in guide.items():
+            question = item["readerQuestion"]
+            self.assertTrue(question.endswith("？"), article_id)
+            self.assertGreaterEqual(len(question), 18, article_id)
+            self.assertLessEqual(len(question), 56, article_id)
+            self.assertNotRegex(question, r"[A-Za-z`]", article_id)
+
+        notes = bd.load_notes(bd.NOTES_DIR)
+        reports = bd.load_hypothesis_reports(bd.HYPOTHESES_DIR, notes=notes)
+        as_of = bd.research_today()
+        topics = bd.load_research_topics(
+            bd.TOPICS_DIR, reports=reports, as_of=as_of,
+        )
+        with (ROOT / "config" / "groups.csv").open(encoding="utf-8", newline="") as handle:
+            group_names = {row["group"]: row["name"] for row in csv.DictReader(handle)}
+        library = bd.build_research_library(
+            notes, reports, topics, {}, group_names, bd.load_events(), as_of=as_of,
+        )
+        bd.attach_research_topic_guide(library, guide, strict=True)
+        published = {
+            article["id"]: article for article in library["articles"]
+            if article["type"] == "topic"
+        }
+        self.assertEqual(set(published), set(guide))
+        self.assertTrue(all(article.get("readerQuestion") for article in published.values()))
+        memory = published["topic-MI-2026-08-02-AI-MEMORY-HIERARCHY"]
+        self.assertEqual(
+            memory["readerQuestion"],
+            "訓練資料放在不同記憶與儲存層，究竟是在省容量、成本還是等待時間？",
+        )
+        self.assertIn("HBM 不是全部", memory["readerTitle"])
+        self.assertIn(memory["readerQuestion"].lower(), memory["searchText"])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            invalid = Path(tmp) / "research_topic_guide.csv"
+            invalid.write_text(
+                "article_id,reader_question\n"
+                "topic-test,AI 題目為何難懂？\n",
+                encoding="utf-8",
+            )
+            with mock.patch.object(bd, "RESEARCH_TOPIC_GUIDE", str(invalid)):
+                with self.assertRaisesRegex(ValueError, "必須先用中文概念"):
+                    bd.load_research_topic_guide(strict=True)
+
     def test_topic_reader_copy_does_not_expose_opaque_group_ids(self):
         opaque = re.compile(
             r"(?<![a-z0-9])(?:passive|powersupply|serverodm|semiequip|packtest|ipdesign)"
@@ -954,6 +1004,9 @@ class ResearchCenterTest(unittest.TestCase):
             "function liveConfidence(", "Asia/Taipei", "confidenceAsOf()",
             "證據可信度", "主命題最後有效證據", "可信度判定",
             "來源帳本", "mobile-evidence", "可水平捲動的研究資料表",
+            "function articleReaderHeading(", "article.readerQuestion",
+            "這篇先回答", "這篇先弄懂", "研究題名：", "研究範圍：",
+            ".result-reader-question", ".article-reader-heading",
             "aria-label=\"搜尋研究文章\"", "filtersPanel.inert", "clearArticleRoute",
             "aria-label=\"研究文章清單\"", ":focus-visible", "@media(max-width:780px)",
             "研究摘要：已知、未知與下一步", "function resetReaderScroll()",
@@ -1040,7 +1093,7 @@ class ResearchCenterTest(unittest.TestCase):
             "selectArticle(value,false,null)",
             ".article-learning-origin", ".learning-origin-return",
             "只表示路線收錄，不代表上下游或受惠排序",
-            "maturity-reading-key", "先選一個系統問題",
+            "maturity-reading-key", "先選一個想弄懂的問題",
             "這頁的「完成度」怎麼看？", "maturityRouteCards",
             "function renderMaturityLearningRoute(",
             "entry-guide", "第一次來？照三步開始",
@@ -1084,7 +1137,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(
             "body.appendChild(mobileBack);const originBar="
             "renderArticleLearningOrigin();if(originBar)body.appendChild(originBar);"
-            "body.appendChild(h('h1'",
+            "body.appendChild(articleReaderHeading(article))",
             template,
         )
         self.assertIn(
@@ -1481,7 +1534,9 @@ class ResearchCenterTest(unittest.TestCase):
             "排序只用來安排研究先後，不代表預期報酬、股價方向或投資建議",
             "候選排名不是投資評分", "deepLink==='radar'",
             "candidate.readerQuestion", "candidate.readerNextStep",
-            "candidate.readerTerms", "先用一句話理解", "關鍵詞白話解釋",
+            "candidate.readerTerms", "questionText=candidate.readerQuestion||candidate.title",
+            "這題想弄清楚", "研究題名：", "接著查什麼", "關鍵詞白話解釋",
+            ".radar-head-copy", ".radar-technical-title",
             "candidate.groupIds", "candidate.readerGroupQuestions",
             "function renderRadarGroups(",
             "function openRadarGroup(", "function focusMaturityGroup(",
@@ -1494,6 +1549,8 @@ class ResearchCenterTest(unittest.TestCase):
             "document.getElementById('surfaceRadar').addEventListener",
         ):
             self.assertIn(contract, template)
+        self.assertNotIn("先用一句話理解", template)
+        self.assertNotIn("class:'radar-question'", template)
         self.assertIn("grid-template-columns:repeat(4,1fr)", template)
 
     def test_template_publishes_group_maturity_matrix_without_a_composite_score(self):
@@ -1505,14 +1562,14 @@ class ResearchCenterTest(unittest.TestCase):
             "const MATURITY=LIB.groupMaturity", "function renderMaturity()",
             "function renderMaturityAction(", "function focusMaturityAction(",
             "function openGroupResearch(", "deepLink==='maturity'",
-            "各族群研究完整度", "族群起點", "開始學這個族群",
+            "先從一個想弄懂的問題開始", "族群起點", "開始學這個族群",
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
             "row.readerRole", "row.readerBoundary", "研究中心怎麼分",
             "先別混淆：", ".maturity-group-guide",
             'id="maturityEntrySwitch"', 'data-maturity-entry="routes"',
             'data-maturity-entry="groups"', 'data-maturity-entry-panel="routes"',
             'data-maturity-entry-panel="groups"', "不熟族群名稱",
-            "從系統問題開始", "依族群名稱查找",
+            "從問題開始", "依族群名稱查找",
             "maturityEntry:'routes'", "function syncMaturityEntry(",
             "function selectMaturityEntry(",
             "panel.hidden=mobile&&panel.dataset.maturityEntryPanel!==selected",
@@ -1539,7 +1596,7 @@ class ResearchCenterTest(unittest.TestCase):
             ".maturity-group-explorer", ".maturity-group-choice",
             'id="maturityRouteCards"', "function renderMaturityLearningRoute(",
             "MATURITY.learningRoutes", "maturity-route-question",
-            "從「'+graphLabel+'」開始", "族群重複出現＝同時參與不同系統問題",
+            "從「'+graphLabel+'」開始", "族群重複出現，表示同一族群會在多個問題中出現",
             "function resetLibrarySurfaceScroll(", "resetLibrarySurfaceScroll()",
             "MATURITY.learningBoundary", 'id="catalogTitle"', "groupScope",
             "selectedGroups.length===1", "最大缺口", "不做總分或名次",

@@ -59,6 +59,7 @@ TOPICS_DIR = os.path.join(ROOT, "notes", "research_topics")
 GROUPS_CONFIG = os.path.join(ROOT, "config", "groups.csv")
 RESEARCH_GROUP_GUIDE = os.path.join(ROOT, "config", "research_group_guide.csv")
 RESEARCH_READER_TERMS = os.path.join(ROOT, "config", "research_reader_terms.csv")
+RESEARCH_TOPIC_GUIDE = os.path.join(ROOT, "config", "research_topic_guide.csv")
 READER_OPAQUE_GROUP_IDS = (
     "passive", "powersupply", "serverodm", "semiequip", "packtest", "ipdesign",
 )
@@ -205,6 +206,86 @@ def load_research_reader_terms(strict=True):
     if strict and errors:
         raise ValueError("研究中心共通語契約失敗：\n- " + "\n- ".join(errors))
     return terms
+
+
+def load_research_topic_guide(strict=True):
+    """Load manually reviewed, reader-only questions for market-topic entry points."""
+    errors = []
+    guide = {}
+    expected = ["article_id", "reader_question"]
+    try:
+        with open(RESEARCH_TOPIC_GUIDE, encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            if reader.fieldnames != expected:
+                errors.append(
+                    "research_topic_guide.csv 欄位必須是 " + ",".join(expected)
+                )
+            for line_no, row in enumerate(reader, 2):
+                article_id = (row.get("article_id") or "").strip()
+                question = (row.get("reader_question") or "").strip()
+                if not re.fullmatch(r"(?:topic|event)-[A-Za-z0-9-]+", article_id):
+                    errors.append(
+                        f"research_topic_guide.csv:{line_no} article_id 格式錯誤："
+                        f"{article_id or '空白'}"
+                    )
+                elif article_id in guide:
+                    errors.append(
+                        f"research_topic_guide.csv:{line_no} article_id 重複：{article_id}"
+                    )
+                if not question:
+                    errors.append(
+                        f"research_topic_guide.csv:{line_no} reader_question 不可留空"
+                    )
+                else:
+                    if not question.endswith("？"):
+                        errors.append(
+                            f"research_topic_guide.csv:{line_no} reader_question 必須是問句"
+                        )
+                    if not 18 <= len(question) <= 56:
+                        errors.append(
+                            f"research_topic_guide.csv:{line_no} reader_question 應為 18–56 字"
+                        )
+                    if re.search(r"[A-Za-z]", question) or "`" in question:
+                        errors.append(
+                            f"research_topic_guide.csv:{line_no} reader_question 必須先用中文概念"
+                        )
+                guide[article_id] = {"readerQuestion": question}
+    except OSError as exc:
+        errors.append(f"無法讀取市場議題白話導覽：{exc}")
+    if strict and errors:
+        raise ValueError("市場議題白話導覽契約失敗：\n- " + "\n- ".join(errors))
+    return guide
+
+
+def attach_research_topic_guide(research_library, guide, strict=True):
+    """Attach exact, human-authored questions without altering topic research fields."""
+    research_library = research_library or {"articles": []}
+    topic_articles = [
+        article for article in (research_library.get("articles") or [])
+        if article.get("type") == "topic" and article.get("id")
+    ]
+    published_ids = [article["id"] for article in topic_articles]
+    guide_ids = set(guide or {})
+    errors = []
+    missing = [article_id for article_id in published_ids if article_id not in guide_ids]
+    extra = sorted(guide_ids - set(published_ids))
+    if missing:
+        errors.append("缺少已發布市場議題：" + ",".join(missing))
+    if extra:
+        errors.append("包含未發布市場議題：" + ",".join(extra))
+    if strict and errors:
+        raise ValueError("市場議題白話導覽覆蓋失敗：\n- " + "\n- ".join(errors))
+    for article in topic_articles:
+        entry = (guide or {}).get(article["id"])
+        if not entry:
+            continue
+        article["readerQuestion"] = entry["readerQuestion"]
+        article["searchText"] = (
+            article.get("searchText", "") + " " + entry["readerQuestion"]
+        ).strip().lower()
+    return research_library
+
+
 RESEARCH_LEARNING_ROUTES = [
     {
         "id": "power-cooling", "label": "供電與散熱",
@@ -3987,10 +4068,14 @@ def main():
     )
     research_group_guide = load_research_group_guide(strict=True)
     research_reader_terms = load_research_reader_terms(strict=True)
+    research_topic_guide = load_research_topic_guide(strict=True)
     research_library = build_research_library(
         notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM, events,
         as_of=research_as_of,
         reader_terms=research_reader_terms,
+    )
+    attach_research_topic_guide(
+        research_library, research_topic_guide, strict=True,
     )
     for group in research_library.get("groups", []):
         group.update(research_group_guide.get(group.get("id"), {}))
