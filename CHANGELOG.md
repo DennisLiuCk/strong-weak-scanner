@@ -1,5 +1,74 @@
 # Changelog
 
+## 學習路線全站地圖與文章定位 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只把既有學習路線、圖譜
+主文章與同篇閱讀任務重排成可展開的路線地圖，不修改研究主張、來源、graph edge、公司映射、
+財務歸因或投資判斷。
+
+- 原文章頁的「查看完整路線」實際只開啟當站圖譜，手機圖譜控制又預設收合；讀者離開文章後
+  仍看不到整條閱讀順序。族群矩陣也只提供第一站入口，無法先比較後續問題或跳到指定站。
+- 矩陣四張系統問題卡與文章站次定位新增原生 `details` 路線地圖；每站逐字重用 route
+  `graphIds`、各 graph 第一篇既有 `articleIds` 與同篇 `readingMission.question`，並顯示閱讀
+  時間。文章目前站使用 `aria-current="step"`，任一站可直接開文並回到頁首；單站圖譜動作改為
+  誠實的「看這站證據關係」。輸出契約升為 `learningPathVersion: 5`。
+- 完整枚舉建置 payload 與瀏覽器 DOM：4 條路線共 25／25 站都有既有文章與問題，0 個停用站點、
+  0 個水平溢出。實際從供電與散熱第 1 站展開 9 站、跳到第 2 站並確認目前站標記，再開啟同站
+  800VDC 保護圖譜；站次、文章與圖譜 deep link 皆一致。
+- 390×844 同狀態中，第一張路線卡由 `224.414px` 增為 `284.586px`，收合地圖高
+  `51.172px`，起讀按鈕仍在首屏 `y=633.875–677.875px`。1280×720 展開第一條 9 站路線時，
+  只有該卡增高至 `1288.188px`，其他卡維持 `272.945–297.641px`；深淺色與兩種寬度皆無溢出。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 455 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 依 2026-08-10 時點保留 8 warnings），
+  `git diff --check`、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `6f180fda…`。
+
+## 知識圖譜手機入口漸進展開 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只重排知識圖譜既有導讀與
+控制區，不修改 learning route、graph registry、edge、claim、source、evidence state、公司映射、
+財務歸因或投資判斷。
+
+- 390×844 同狀態基準中，四步導讀、四條路線、主題、視角與證據控制合計高 `630.023px`；主題
+  標題到 `y=782.023px` 才開始，關係示範按鈕則在 `y=1004.820px`，第一次進入看不到真正內容。
+- 「新手讀圖」與完整控制分成兩個原生 `details`。markup 預設展開以保留無 JavaScript fallback；
+  手機只在載入時收起一次，之後不以 resize 覆寫使用者狀態；桌機仍預設完整展開。第二個摘要
+  直接顯示目前路線、主題、視角、證據層級與台股範圍，切換路線／視角／證據時同步更新。
+- 同一 390×844 深連結中，收合後控制區高 `168.188px`，主題標題提前到 `y=320.188px`；「先讀
+  主題文章」與「示範讀一條證實關係」分別位於 `y=491.984–535.984px`、`542.984–586.984px`，
+  都進入首屏且水平溢出為 0。展開後四個路線按鈕、主題選擇、兩個視角與四個證據控制皆維持
+  至少 `44px` 觸控高度；深淺色手機與 1280×720 桌機畫面均完成檢視。
+- 實際互動驗收確認：四步導讀與完整控制可獨立展開；取消「推論」後摘要變為「證實＋待驗證」；
+  切到產業依賴會同步更新標題、摘要與 deep link，並停用只看台股；切換到記憶體與封裝後摘要
+  顯示「記憶體與封裝 · AI 記憶體分層」，控制區保持展開。瀏覽器 console 為 0 筆訊息。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 455 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 warnings），`git diff --check`、
+  衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次 dashboard build SHA 一致：
+  `index.html` `1e3a48ae…`、`research.html` `534699f5…`。
+
+## 知識圖譜關係白話解讀與示範入口 — 2026-08-09
+
+**策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只重排既有知識圖譜 edge
+欄位與延伸入口，不修改 graph registry、endpoint、relation、claim、source、evidence state、
+commercial stage、materiality、boundary、next trigger、公司映射、財務歸因或投資判斷。
+
+- 1280×720 與 390×844 同狀態基準顯示：關係列原本把「揭露技術能力 · 推論 · 能力／研發」
+  等不同維度排成未命名狀態串；點選後詳情直接進入「證據邊界」等研究術語，讀者沒有先得到
+  「現在能說什麼、不能推到哪裡、接下來等什麼」的閱讀框架。
+- 每個目前篩選後仍有 edge 的圖譜新增一個關係示範；固定先取未到期 verified、再取 verified、
+  最後才取第一條可見 edge，並明示只教讀法，不代表重要性、受惠或投資排序。關係列改為直接
+  標出「關係／證據／階段」，詳情 badges 另標出「商業位置」。
+- 關係詳情新增「用三步讀這條線」：第一步只組合 endpoints、relation、evidence、materiality
+  與 commercial stage；第二、三步逐字顯示同一 edge 的 `boundary`、`nextTrigger`。卡片下方的
+  「讀完整研究脈絡」只解析該 edge 既有 `articleIds`，不另寫摘要或建立文章／公司關係。
+- 示範操作會把鍵盤焦點送到 `aria-live` 關係詳情，並遵守 reduced-motion；390×844 實機定位
+  的詳情頂端為 `y≈74px`，避開黏性頁首，三步與文章按鈕同屏可見。按鈕實際開啟既有 800VDC
+  主文章、回到 `scrollY=0`，並保留「供電與散熱 · 第 1/9 站」。桌機仍維持圖與詳情並排。
+- `Darwin arm64`、Python 3.11.11 預設環境執行 454 tests 全綠；research queue、radar、method
+  audit、knowledge graph lint 均為 0 errors（queue 保留既有 6 warnings），inline JavaScript、
+  `git diff --check`、衝突標記與 `CLAUDE.md`／`AGENTS.md` 同步檢查通過。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `4b896e5d…`。
+
 ## 文章讀後理解檢查與下一站交接 — 2026-08-09
 
 **策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次只把同篇新手段落與既有

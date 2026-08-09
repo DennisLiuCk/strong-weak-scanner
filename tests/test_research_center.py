@@ -261,7 +261,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 4)
+        self.assertEqual(library["learningPathVersion"], 5)
         article_ids = {article["id"] for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
         group_ids = {item["id"] for item in library["groups"]}
@@ -351,6 +351,20 @@ class ResearchCenterTest(unittest.TestCase):
             "id": "route", "label": "測試路線", "description": "依序閱讀",
             "step": 1, "total": 3, "graphId": "graph-a", "graphLabel": "第一圖",
         })
+        stations = graph["learningRoutes"][0]["stations"]
+        self.assertEqual(
+            [station["articleId"] for station in stations],
+            ["topic-a", "topic-b", "topic-c"],
+        )
+        self.assertEqual(
+            [station["graphLabel"] for station in stations],
+            ["第一圖", "第二圖", "第三圖"],
+        )
+        self.assertEqual([station["step"] for station in stations], [1, 2, 3])
+        self.assertEqual(stations[0]["question"], "讀完後能回答哪個問題？")
+        self.assertEqual(stations[1]["articleTitle"], "第二站")
+        self.assertEqual(stations[2]["readingMinutes"], 7)
+        self.assertEqual(stations[0]["groupLabels"], [])
         self.assertNotIn("learningRoute", library["articles"][2])
         completed = library["articles"][3]["learningPath"]["cards"][0]
         self.assertEqual(completed["kind"], "route")
@@ -897,7 +911,7 @@ class ResearchCenterTest(unittest.TestCase):
             'viewBox="0 0 1100 700"',
             "if(!isRoot)group.append(svgEl('rect',{class:'graph-node-materiality-bg",
             "graphMaterialityWidth", "stroke-dasharray",
-            "證據邊界", "下一個升降級節點", "供應集中度範圍",
+            "還不能推到哪裡", "看到什麼才升級", "供應集中度範圍",
             "同心環距離＋節點標籤＝商業曝險層級",
             "節點越靠近中心", "只有公司直接揭露且能用同期間分母重算的數字",
             "function graphFinancialPanel(", "題材占比未揭露", "分子／揭露值定義",
@@ -931,7 +945,17 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderLearningRouteContext(article)",
             "'aria-label':'學習路線定位'",
             "站次只代表閱讀順序，不是研究完成度或投資排名",
-            "查看完整路線",
+            "看這站證據關係",
+            "function learningRouteById(routeId)",
+            "function learningRouteMap(route,currentArticleId='',mode='article')",
+            "'data-testid':'learning-route-map-'+route.id",
+            "'data-testid':'learning-route-station-'+route.id+'-'+station.step",
+            "question=station.question?'讀完試著回答：'+station.question",
+            "learningRouteMap(learningRouteById(route.id),article.id,'article')",
+            "learningRouteMap(learningRouteById(route.id)||route,'','matrix')",
+            "站點與問題只取自既有路線、graph 第一篇文章與同篇「想一想」",
+            ".learning-route-map>summary:focus-visible",
+            ".learning-route-station-button{width:100%;min-height:58px",
             "function resetGraphSurfaceScroll()",
             "graphPage.scrollTo(0,0)",
             "window.scrollTo(0,0)",
@@ -952,10 +976,74 @@ class ResearchCenterTest(unittest.TestCase):
             "RESEARCH_LEARNING_ROUTES", "供電與散熱", "記憶體與封裝",
             "運算與互連", "公司財務案例", "先辨識液冷產品資格",
             'research_library["knowledgeGraph"]["learningRoutes"]',
+            'route["stations"] = []',
+            'article.get("readingMission") or {}',
             "沿學習路線往下讀", "不新增供應鏈或受惠關係",
             "已完成這條學習路線", "first existing articleId",
         ):
             self.assertIn(contract, builder)
+        self.assertNotIn("查看完整路線", template)
+
+    def test_template_graph_mobile_entry_progressively_discloses_controls(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            'details class="graph-learning-key" id="graphLearningKey" open',
+            'details class="graph-control-fold" id="graphControlFold" open',
+            'class="graph-learning-body" aria-labelledby="graphLearningTitle"',
+            'class="graph-control-current" id="graphControlCurrent"',
+            'class="graph-control-meta" id="graphControlMeta"',
+            "function renderGraphControlSummary(graph,route)",
+            "evidence=['verified','inference','unverified']",
+            "state.graphView==='company'&&state.graphUniverseOnly",
+            "renderGraphControlSummary(graph,route);introActions.replaceChildren()",
+            "(function foldGraphGuidesOnNarrow()",
+            "['graphLearningKey','graphControlFold']",
+            "if(fold)fold.open=false",
+            "只在載入時收起一次，不覆寫使用者之後的手動狀態",
+            ".graph-learning-head:focus-visible,.graph-control-summary:focus-visible",
+            ".graph-control-summary{min-height:72px",
+            ".graph-chip{min-height:44px}.graph-filter{min-height:44px}",
+            ".graph-control-fold[open]>.graph-control-summary{display:none}",
+        ):
+            self.assertIn(contract, template)
+
+    def test_template_graph_guides_novice_through_existing_edge_fields(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            'id="graphDetail" aria-live="polite" tabindex="-1"',
+            "function focusGraphDetail()",
+            "detail.focus({preventScroll:true})",
+            "selectGraphEdge(id,focusDetail=false)",
+            "if(focusDetail)focusGraphDetail()",
+            "function graphEvidenceReaderCopy(edge)",
+            "來源直接支持這項關係",
+            "還不是來源直接確認的關係",
+            "不能先當成已確認事實",
+            "function graphRelationReader(edge,from,to)",
+            "'data-testid':'graph-reader-brief'",
+            "graphReaderStep(1,'這條線現在怎麼讀',now)",
+            "graphReaderStep(2,'還不能推到哪裡',edge.boundary)",
+            "graphReaderStep(3,'看到什麼才升級',edge.nextTrigger)",
+            "'data-testid':'graph-reader-article'",
+            "(edge.articleIds||[]).map(articleId=>byId.get(articleId)).find(Boolean)",
+            "'data-testid':'graph-guided-relation'",
+            "edges.find(edge=>edge.evidenceState==='verified'&&!edgeIsStale(edge))",
+            "edges.find(edge=>edge.evidenceState==='verified')||edges[0]",
+            "selectGraphEdge(guidedEdge.id,true)",
+            "示範只用一條既有關係教讀法，不代表重要性、受惠或投資排序",
+            "關係：'+edge.relationLabel+' · 證據：'+edge.evidenceLabel+' · 階段：",
+            "證據：'+edge.evidenceLabel",
+            "商業位置：'+edge.materialityLabel",
+            "h('span',{text:'關係解讀'})",
+            "這張卡只重排原關係資料，不新增關係或結論",
+            ".graph-reader-step",
+            ".graph-reader-cta",
+            ".graph-detail:focus-visible",
+            "matchMedia('(prefers-reduced-motion: reduce)')",
+            "@media(max-width:780px){.graph-detail{scroll-margin-top:74px}}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("原 edge 欄位", template)
 
     def test_template_publishes_ranked_candidate_research_radar(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

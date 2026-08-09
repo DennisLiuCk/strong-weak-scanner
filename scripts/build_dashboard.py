@@ -2410,6 +2410,26 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             + "、".join(missing_learning_checks)
         )
 
+    # 路線地圖只重排同一份 route graphIds 與各 graph 的第一篇既有文章。
+    # question 逐字沿用該文章已通過契約的 readingMission，不另寫站點摘要。
+    for route, sequence in route_sequences:
+        route["stations"] = []
+        for index, station in enumerate(sequence):
+            graph = graph_by_id.get(station["graphId"]) or {}
+            article = article_by_id[station["articleId"]]
+            route["stations"].append({
+                "step": index + 1,
+                "graphId": station["graphId"],
+                "graphLabel": graph.get("label") or "第 " + str(index + 1) + " 站",
+                "articleId": article.get("id") or "",
+                "articleTitle": (
+                    article.get("readerTitle") or article.get("title") or "研究文章"
+                ),
+                "question": (article.get("readingMission") or {}).get("question") or "",
+                "readingMinutes": article.get("readingMinutes") or 1,
+                "groupLabels": list(article.get("groupLabels") or []),
+            })
+
     def overlap(left, right):
         return set(left or []).intersection(right or [])
 
@@ -2593,7 +2613,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 4
+    research_library["learningPathVersion"] = 5
     return research_library
 
 
@@ -3539,7 +3559,11 @@ def main():
     research_library["knowledgeGraph"] = build_knowledge_graph(
         research_topics, notes_map, strict=True,
     )
-    research_library["knowledgeGraph"]["learningRoutes"] = RESEARCH_LEARNING_ROUTES
+    # 每次 build 使用獨立 route dict；attach_research_learning_paths 會在輸出物上
+    # 加入由既有 graph／article 產生的 stations，不可污染模組級常數或下一次 build。
+    research_library["knowledgeGraph"]["learningRoutes"] = [
+        dict(route) for route in RESEARCH_LEARNING_ROUTES
+    ]
     # 新手延伸閱讀只串接 library 中已存在的文章、族群與圖譜；它是導覽層，
     # 不新增供應鏈關係，也不把共享族群誤寫成已驗證的公司曝險。
     attach_research_learning_paths(
