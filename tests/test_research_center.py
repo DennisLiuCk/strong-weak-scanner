@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 14)
+        self.assertEqual(library["learningPathVersion"], 16)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1668,6 +1668,43 @@ class ResearchCenterTest(unittest.TestCase):
         # 白話目的只在 reader 顯示層產生，不寫回 article.sections 或原始 Markdown。
         self.assertNotIn('section["readerPurpose"]', template)
         self.assertNotIn("section.readerPurpose=", template)
+
+    def test_catalog_leads_every_research_article_type_with_a_reader_question(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function catalogReaderQuestion(article)",
+            "article.type==='topic'",
+            "article.readerQuestion||''",
+            "article.type==='formal_note'||article.type==='narrative'",
+            "article.readingMission?.question||''",
+            "function catalogSourceLabel(article)",
+            "article.type==='formal_note'?'原始摘要：'",
+            "article.type==='narrative'?'待驗命題：':'研究題名：'",
+            "readerQuestion=catalogReaderQuestion(article)",
+            "'data-reader-question-type':article.type",
+            "'data-reader-question-id':article.id",
+            "text:'這篇先回答'",
+        ):
+            self.assertIn(contract, template)
+        # 清單只讀取既有導讀欄位，沒有從正文或題名生成新的研究問題。
+        self.assertNotIn("article.catalogQuestion=", template)
+        self.assertNotIn("article.readingMission.question=", template)
+
+    def test_article_heading_continues_the_catalog_reader_question(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function articleReaderTitleLabel(article)",
+            "article.type==='topic'?'研究題名：':'原研究頁名：'",
+            "function articleReaderHeading(article)",
+            "const readerQuestion=catalogReaderQuestion(article)",
+            "'data-reader-heading-type':article.type",
+            "'data-reader-heading-id':article.id",
+            "h('h1',{text:readerQuestion})",
+            "h('strong',{text:articleReaderTitleLabel(article)})",
+            "article.readerTitle",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("article.type==='topic'&&article.readerQuestion", template)
 
     def test_template_explains_why_generic_article_recommendations_connect(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

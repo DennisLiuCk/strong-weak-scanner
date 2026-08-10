@@ -281,6 +281,18 @@ master-detail 的正文欄也可能比手機窄。容器足夠時仍用原生 ta
 讀者 payload 與搜尋索引，不得回寫 topic Markdown、替換下方閱讀任務、改變 claim／source／
 confidence／group／route，或被當成新的研究主張。
 
+整份研究文章清單另有問題先讀契約：`catalogReaderQuestion()` 對 topic 只讀上述
+`readerQuestion`，對正式筆記與多空小作文只讀已通過來源契約的 `readingMission.question`；
+沒有既有問題時退回原清單格式，不得從 `title`、正文、搜尋字或公司題材生成替代問句。問題是卡片
+第一閱讀層，原 `title` 依類型完整保留為「原始摘要／待驗命題／研究題名」，並保留原公司、日期、
+查核狀態與閱讀時間。這只是 renderer 排序，不得新增 `catalogQuestion` 到 article payload。
+
+文章頁首必須與同張清單卡共用 `catalogReaderQuestion()`，不得為正式筆記、多空文章或 topic
+另取一份問題。三類都有既有問題時，頁首一律先顯示「這篇先弄懂」與同一問句；topic 原
+`readerTitle` 標為「研究題名」，正式筆記／多空文章原 `readerTitle` 標為「原研究頁名」。沒有
+既有問題時才退回原 `h1`，不得由 renderer 生成替代問句；`readerTitle`、Markdown、section、
+reading mission 與 payload 都不能因頁首重排而改寫。
+
 標題與查核警語後另顯示一張
 「新手閱讀任務」：`build_dashboard.py` 只擷取「三句話抓重點」前三句、「為什麼重要」開頭的
 完整句子與「想一想」第一題。頁首先逐字使用第一句重點與第一題，分別標成「先抓住這個重點」與

@@ -1,5 +1,50 @@
 # Changelog
 
+## 清單問題一路延續到文章首屏 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic／正式筆記／多空 Markdown、正文、
+主張、證據、graph edge、族群映射、路線順序、文章推薦、清單問題與卡片順序零變動**；本次只讓
+文章頁首沿用同張清單卡的既有問題。
+
+- 完整盤點 274 篇發布文章（不是抽樣）：35 篇市場議題原本已由 `readerQuestion` 同時驅動清單
+  與文章 `h1`；121 篇正式筆記和 118 篇多空文章雖已在清單顯示 `readingMission.question`，
+  點入後 0／239 篇延續同一問題，首屏重新回到「質化研究筆記／領先假說報告」等研究頁名。
+- `learningPathVersion` 升為 16。`articleReaderHeading()` 現在與清單共用
+  `catalogReaderQuestion()`：三類文章都先顯示「這篇先弄懂」與同一問句，再把 topic 原
+  `readerTitle` 標為「研究題名」、正式筆記／多空文章原 `readerTitle` 標為「原研究頁名」；
+  沒有既有問題時仍退回原 `h1`，不另生問句。
+- 完整 payload 與共用 renderer 枚舉 274／274 篇首屏均有既有問題，正式筆記 121／121、多空
+  文章 118／118、市場議題 35／35，缺口為 0。瀏覽器另逐類核對清單問題、文章 `h1`、閱讀任務、
+  type／article ID 與原頁名標籤；代表文章與 10 篇市場議題互動均吻合。320×760、390×844、
+  884×900、1280×900 都無水平溢位。相對 `HEAD` 的 version 14，排除現行 version 16 後完整
+  payload canonical SHA 同為 `50862ce6…`，`articles` 與 `knowledgeGraph` 逐項相同；螢幕閱讀器
+  實機朗讀仍保留為人工輔具驗收項目。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 473 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `580ce5d8…`。
+
+## 三類文章清單都先交代閱讀問題 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic／正式筆記／多空 Markdown、正文、
+主張、證據、graph edge、族群映射、路線順序、文章推薦與卡片順序零變動**；本次只把既有閱讀
+問題提升為清單第一閱讀層。
+
+- 完整盤點 274 篇發布文章（不是抽樣）：35 篇市場議題清單原本已是問題先讀；121 篇正式筆記與
+  118 篇多空小作文雖全都有非空 `readingMission.question`，改版前清單卻 0／239 篇顯示，讀者
+  選文時仍先看到 `fabless`、`MOSFET`、季度或待驗假說等原始文字。
+- `learningPathVersion` 升為 15。`catalogReaderQuestion()` 對市場議題只讀既有
+  `readerQuestion`，對正式筆記／多空文章只讀既有 `readingMission.question`；三類卡片都先顯示
+  「這篇先回答」，原內容依類型完整保留為次要的「研究題名／原始摘要／待驗命題」。缺既有問題時
+  仍退回原卡片，不從正文、題名、搜尋字或公司題材另生問句。
+- 移除本次 renderer 並把版本還原為 14 後，改版前後正規化 payload canonical SHA 均為
+  `50862ce6…`，`articles` 與 `knowledgeGraph` 逐項相同。瀏覽器另逐類核對 274／274 張卡：
+  正式筆記 121／121、多空文章 118／118、市場議題 35／35 的問題文字與既有 payload 完全一致，
+  data type／article ID、三種原文標籤與點擊後文章 hash 也正確。320×760、390×844、884×900、
+  1280×900 均無水平溢位；螢幕閱讀器實機朗讀仍保留為人工輔具驗收項目。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 472 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `630259b5…`。
+
 ## 正文每節先說明閱讀目的 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic／正式筆記／多空 Markdown、原段落標題、
