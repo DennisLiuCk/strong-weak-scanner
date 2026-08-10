@@ -20,13 +20,13 @@ stage:supply-status,stage,供應狀態,Supply Chain Status,component:cdu,平台�
 process:system-integration,process,系統整合,System integration,concept:liquid-cooling,把 CDU、設施冷卻與控制系統整合成可運行方案
 process:field-poc,process,場域 PoC,Proof of Concept,process:system-integration,在實際或近實際場域驗證節能、可靠度與控制效果
 component:chiller-hvac,component,Chiller／HVAC,冰水主機|空調系統,concept:liquid-cooling,資料中心設施端產生與管理冷源的設備及控制系統
-product:amd-helios,product,AMD Helios,Helios,,AMD 的機架級 AI 系統平台
-concept:rack-scale,concept,機架級系統,Rack-scale system,product:amd-helios,把運算、網路、電力、散熱與軟體整合成整櫃交付的系統
-stage:production,stage,Production,生產階段,product:amd-helios,平台進入生產但不代表所有客戶已驗收或上線
-stage:shipment,stage,Shipment,出貨節點,product:amd-helios,產品開始向客戶交付的里程碑
-stage:cloud-deployment,stage,雲端部署,Cloud deployment,product:amd-helios,雲端 SKU、online 或 GW 部署等客戶落地節點
-stage:validation,stage,客戶驗證,Validation,product:amd-helios,客戶仍在測試與確認 workloads 的階段
-component:efb,component,EFB,Elevated Fanout Bridge,process:advanced-packaging,AMD 生態系文件列示的先進封裝技術路徑
+product:amd-helios,product,AMD Helios 機架級平台,Helios,,AMD 把運算 網路 電力 散熱與軟體整合成整櫃交付的人工智慧系統平台
+concept:rack-scale,concept,機架級系統（Rack-scale）,Rack-scale system,product:amd-helios,把運算 網路 電力 散熱與軟體整合成整櫃交付的系統
+stage:production,stage,開始生產（Production）,生產階段,product:amd-helios,平台進入生產但不代表產品已出貨或所有客戶已驗收上線
+stage:shipment,stage,實際出貨（Shipment）,出貨節點,product:amd-helios,產品真正離開供應端並開始向客戶交付的里程碑
+stage:cloud-deployment,stage,客戶上線與雲端部署,Cloud deployment,product:amd-helios,雲端產品開放 客戶上線或規模部署等落地節點
+stage:validation,stage,客戶測試與驗證（Validation）,客戶驗證,product:amd-helios,客戶仍在測試與確認自己的工作能否穩定執行
+component:efb,component,高架扇出橋接（EFB）,Elevated Fanout Bridge,process:advanced-packaging,AMD 生態系文件列示的先進封裝技術路徑
 component:substrate,component,載板／基板,Package substrate,process:advanced-packaging,承載晶片並連接封裝與系統電路板的結構
 concept:purpose-built-silicon,concept,客製晶片／自研系統,Purpose-built silicon,,雲端業者自行設計的晶片與系統替代路徑
 concept:backside-power,concept,背面供電,Backside power delivery|BSPDN,,把供電網路移到晶圓背面並與前側訊號佈線分離的先進邏輯製程架構
@@ -173,12 +173,12 @@ capability:silicon-rtm,capability,晶片內量測信任根,Silicon RTM|Root of T
 capability:device-attestation,capability,元件證明,Device attestation|measurement reporting,concept:ai-rack-trust-root,把量測值與身分憑證以可驗證方式提供給外部系統的能力
 capability:action-authorization,capability,動作授權,Action authorization|authenticated request permission,concept:ai-rack-trust-root,在確認身分之後決定該身分是否可執行特定實體動作的能力
 capability:security-conformance-assurance,capability,安全一致性保證,Security conformance assurance|third-party security audit,concept:ai-rack-trust-root,讓採購方不必依賴供應商自述即可查證實作是否符合安全規格的第三方稽核與測試制度
-concept:ai-storage-data-plane,concept,AI 儲存資料平面,AI storage data plane|AI storage I/O contracts,concept:ai-memory-hierarchy,把訓練資料讀取 checkpoint 持久化與模型權重分發分成三條可獨立驗收的資料路徑
-capability:training-dataset-fetch,capability,訓練資料集讀取,Training dataset fetch|dataset input pipeline,concept:ai-storage-data-plane,持續把訓練樣本送入加速器並控制尾端延遲與同步停等的資料路徑
-capability:checkpoint-persistence,capability,Checkpoint 持久化,Checkpoint persistence|training state recovery,concept:ai-storage-data-plane,保存並回載模型訓練狀態以平衡停算時間故障域與復原點的能力
-capability:model-artifact-distribution,capability,模型權重分發,Model artifact distribution|model weight distribution,concept:ai-storage-data-plane,從遠端本地或同儕節點把模型權重送到推論工作節點的能力
-capability:tail-latency-control,capability,儲存尾端延遲控制,Storage tail latency control|pMax latency control,concept:ai-storage-data-plane,限制最慢資料讀取對同步訓練步驟造成停等的能力
-capability:direct-storage-gpu-transfer,capability,儲存直達 GPU 傳輸,GPUDirect Storage|storage to GPU transfer,concept:ai-storage-data-plane,減少主機記憶體中轉並把儲存資料直接送入 GPU 的資料搬運路徑
+concept:ai-storage-data-plane,concept,AI 資料讀取與儲存路徑,AI 儲存資料平面|AI storage data plane|AI storage I/O contracts,concept:ai-memory-hierarchy,把訓練時餵資料 保存進度與搬模型分成三種可獨立驗收的工作
+capability:training-dataset-fetch,capability,訓練資料持續餵送,Training dataset fetch|dataset input pipeline|訓練資料集讀取,concept:ai-storage-data-plane,持續把訓練樣本送進運算晶片並控制最慢讀取與整群停等的資料路徑
+capability:checkpoint-persistence,capability,訓練進度保存,Checkpoint persistence|training state recovery|Checkpoint 持久化,concept:ai-storage-data-plane,保存並載回模型訓練進度以平衡停算時間故障範圍與復原點的能力
+capability:model-artifact-distribution,capability,模型檔案分發,Model artifact distribution|model weight distribution|模型權重分發,concept:ai-storage-data-plane,從遠端本機或附近節點把模型檔案送到新服務機器的能力
+capability:tail-latency-control,capability,最慢讀取時間控制,Storage tail latency control|pMax latency control|儲存尾端延遲控制,concept:ai-storage-data-plane,限制最慢一次資料讀取對同步訓練造成整群停等的能力
+capability:direct-storage-gpu-transfer,capability,儲存直達運算晶片,GPUDirect Storage|storage to GPU transfer|儲存直達 GPU 傳輸,concept:ai-storage-data-plane,減少主機記憶體中轉並把儲存資料較直接送進運算晶片的資料搬運路徑
 concept:ai-rack-emc-certification,concept,AI 機櫃 EMC 驗證,AI rack EMC certification|rack-scale electromagnetic compliance,concept:ai-rack-action-contract,把元件抑制設備量測與完整機櫃實驗室能力分開追蹤的電磁相容驗證框架
 standard:cispr-32,standard,CISPR 32,CISPR 32 multimedia equipment emissions,concept:ai-rack-emc-certification,IEC 體系中多媒體設備排放要求與可重複量測目標的標準
 standard:fcc-part-15-emissions,standard,FCC Part 15 排放量測,FCC Part 15 unintentional radiator measurement,concept:ai-rack-emc-certification,美國非刻意輻射器合規量測方法與監管詢問入口

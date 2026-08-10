@@ -1,14 +1,14 @@
-# AI 儲存資料平面知識圖譜
+# AI 資料讀取與儲存路徑知識圖譜
 
-本圖將訓練資料讀取、checkpoint 與模型權重分發拆成不同 I/O 契約。公司線只表示已核驗的
-儲存能力或平台路徑；沒有買方 qualification、部署分母與財務資料前，不把相鄰能力畫成訂單。
+本圖把訓練時餵資料、故障前保存進度與服務擴充時搬模型拆成三種工作。公司線只表示已核驗的
+儲存能力或平台路徑；沒有買方客戶認證、部署分母與財務資料前，不把相鄰能力畫成訂單。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-storage-data-plane
 root_node_id: concept:ai-storage-data-plane
-label: AI 儲存資料平面
-summary: 以尾端延遲、持久性／復原與副本位置分開三條 AI 儲存資料路徑，再把平台機制與台灣公司能力保持在不同證據層。
+label: AI 資料讀取與儲存路徑
+summary: 以最慢讀取時間 保存與復原 以及模型副本位置分開三種人工智慧資料工作 再把平台機制與台灣公司能力保持在不同證據層。
 article_ids: MI-2026-08-09-AI-STORAGE-DATA-PLANE
 status: active
 -->

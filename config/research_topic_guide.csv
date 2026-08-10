@@ -14,7 +14,7 @@ topic-MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION,客戶先付款蓋新�
 topic-MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION,高壓直流供電改變時，哪些轉換環節會保留、轉移或被整合？
 topic-MI-2026-08-02-AI-MEMORY-HIERARCHY,人工智慧資料為什麼要分層存放，越常用的資料就一定要離運算晶片越近嗎？
 topic-MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY,先進封裝讓缺陷更昂貴後，哪些檢測環節會變得更重要？
-topic-MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER,平台開始出貨後，還要看到哪些客戶節點才算真正部署？
+topic-MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER,一整櫃人工智慧設備開始生產後，為什麼還不能算客戶已經上線使用？
 topic-MI-2026-08-02-BACKSIDE-POWER-DELIVERY,晶片改用背面供電後，設備需求如何從製程變化走到公司獲利？
 topic-MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION,玻璃基板已有工廠與樣品，為什麼還不能算穩定量產？
 topic-MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER,新的記憶體層要滿足哪些讀寫與耐久條件，才不只是特殊儲存裝置？
@@ -33,4 +33,4 @@ topic-MI-2026-08-03-PCIE6-COMPLIANCE-LADDER,高速介面元件量產後，還要
 topic-MI-2026-08-07-AI-RACK-ACTION-CONTRACT,機櫃感測到過熱或漏液後，系統如何找到正確設備並安全隔離？
 topic-MI-2026-08-08-AI-RACK-TRUST-ROOT,資料中心收到高風險控制指令時，如何確認身分、版本與權限？
 topic-MI-2026-08-09-AI-RACK-EMC-CERTIFICATION,單一設備都通過測試後，整櫃一起運作為何仍可能不合格？
-topic-MI-2026-08-09-AI-STORAGE-DATA-PLANE,人工智慧系統的三種資料流，為何不能只用硬碟容量判斷需求？
+topic-MI-2026-08-09-AI-STORAGE-DATA-PLANE,人工智慧為什麼會一邊餵訓練資料、一邊保存進度，還要把模型送到新機器？

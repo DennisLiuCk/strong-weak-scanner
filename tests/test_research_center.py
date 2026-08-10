@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 58)
+        self.assertEqual(library["learningPathVersion"], 60)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1617,9 +1617,9 @@ class ResearchCenterTest(unittest.TestCase):
                 "**最後用三個責任盒查證。**",
             ),
             "2026-08-09_ai_storage_data_plane.md": (
-                "**先分清三條資料流。**",
-                "**每條路徑卡住的方式不同。**",
-                "**最後才把需求接回公司。**",
+                "**三種工作像三種物流。**",
+                "**資料放在哪裡，也會改變硬體需求。**",
+                "**最後才把平台需求接回公司。**",
             ),
         }
         for filename, leads in expectations.items():
@@ -1642,9 +1642,9 @@ class ResearchCenterTest(unittest.TestCase):
                 "共模扼流圈、濾波器、屏蔽結構、導電墊片、吸波材與 PCB 佈局",
             ),
             "2026-08-09_ai_storage_data_plane.md": (
-                "**資料集讀取**",
-                "**訓練存檔（checkpoint）**",
-                "**模型權重分發**是副本位置與資料傳輸路徑問題。",
+                "| 1. 訓練時持續餵資料 |",
+                "| 2. 故障前保存進度 |",
+                "| 3. 上線或擴充時搬模型 |",
             ),
         }
         for filename, phrases in expectations.items():
@@ -2987,6 +2987,168 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 面板級封裝（PLP）", graph)
+
+    def test_compute_connect_station_one_separates_ai_storage_jobs_positions_and_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-09_ai_storage_data_plane.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# AI 儲存不是容量越大越好："
+            "先分清餵資料、保存進度與搬模型\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave96_ai_storage_three_jobs_five_positions_and_six_gate_ladder",
+            "三種工作卡住的原因不同",
+            "不能直接換算成更多硬碟或某家公司營收",
+            "## 先把三種「存資料」工作分開",
+            "| 本文三種工作 | 何時發生 | 最怕什麼 | 先看哪個結果 | 不能直接推成 |",
+            "| 1. 訓練時持續餵資料 |", "| 2. 故障前保存進度 |",
+            "| 3. 上線或擴充時搬模型 |",
+            "## 再看資料可能經過的五個位置",
+            "| 本文五個位置 | 它負責什麼 | 常見資料去向 | 卡住時先查誰 | 不能直接推成 |",
+            "| 1. 軟體、索引與排程 |", "| 2. 近端記憶體與快取 |",
+            "| 3. 單機本地 SSD |", "| 4. 共享與長期儲存 |",
+            "| 5. 網路與系統整合 |",
+            "## 最後用六關把平台需求接回公司",
+            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 三種工作已分開 |", "| 2. 同一平台量到瓶頸 |",
+            "| 3. 瓶頸落到具名元件 |", "| 4. 客戶資格認證 |",
+            "| 5. 正式部署與設備分母 |", "| 6. 可辨識收入與毛利 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 主張與證據帳本", 1
+        )[0]
+        for jargon in (
+            "pMax", "checkpoint", "dataset", "fetch", "object storage",
+            "local storage", "peer", "GPUDirect", "RDMA", "NIC", "SLO",
+            "NAND", "NVMe", "AI Ecosystem", "qualification", "production",
+            "I/O", "BOM", "TAM", "Meta", "AWS", "NVIDIA", "GPU",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 8),
+            ("research_claim", 8), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-09-AI-STORAGE-DATA-PLANE,"
+            "人工智慧為什麼會一邊餵訓練資料、一邊保存進度，"
+            "還要把模型送到新機器？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_storage_data_plane.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "concept:ai-storage-data-plane,concept,AI 資料讀取與儲存路徑",
+            "capability:training-dataset-fetch,capability,訓練資料持續餵送",
+            "capability:checkpoint-persistence,capability,訓練進度保存",
+            "capability:model-artifact-distribution,capability,模型檔案分發",
+            "capability:tail-latency-control,capability,最慢讀取時間控制",
+            "capability:direct-storage-gpu-transfer,capability,儲存直達運算晶片",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: AI 資料讀取與儲存路徑", graph)
+
+    def test_compute_connect_station_two_separates_helios_stages_customers_and_company_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_amd_helios_deployment_ladder.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# AI 機櫃做出來，不等於客戶已上線："
+            "用六個關卡讀懂 AMD Helios\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave97_helios_six_stage_five_customer_timeline_and_six_gate_ladder",
+            "中間還要經過出貨、測試與產品開放",
+            "它們不能相加成已部署",
+            "## 先把六個部署關卡排成順序",
+            "| 本文六個關卡 | 白話意思 | 可接受的證據 | 本篇目前到哪裡 | 不能直接推成 |",
+            "| 1. 方案成形 |", "| 2. 開始生產 |", "| 3. 實際出貨 |",
+            "| 4. 客戶測試與產品開放 |", "| 5. 正式上線 |",
+            "| 6. 規模部署與財務轉換 |",
+            "## 再把五組公開節點放回自己的時間線",
+            "| 本文五條時間線 | 已公開到哪一步 | 時間或上限 | 下一個可驗收節點 | 不能混成 |",
+            "| 1. AMD 整體平台 |", "| 2. Microsoft／Azure |",
+            "| 3. OpenAI |", "| 4. Meta |", "| 5. Anthropic |",
+            "## 最後用六關把平台進度接回台灣公司",
+            "| 本文六關 | 要回答的問題 | 現有資料能確認 | 下一份公司證據 | 不能外推 |",
+            "| 1. 公開列名 |", "| 2. 具體角色 |", "| 3. 平台專屬產品 |",
+            "| 4. 驗證與量產出貨 |", "| 5. 可辨識財務結果 |",
+            "| 6. 現金流與重複訂單 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先把六個部署關卡排成順序", 1
+        )[0]
+        for jargon in (
+            "Helios", "production", "shipment", "online", "validation",
+            "GW", "SKU", "MI455X", "upcoming", "preview", "GA",
+            "rack-scale", "purpose-built", "GPU", "ASIC", "EFB", "ODM",
+            "compute-tray", "Azure", "OpenAI", "Meta", "Anthropic", "AMD",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 11),
+            ("research_claim", 9), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 5),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER,"
+            "一整櫃人工智慧設備開始生產後，為什麼還不能算客戶已經上線使用？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "amd_helios.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "product:amd-helios,product,AMD Helios 機架級平台",
+            "concept:rack-scale,concept,機架級系統（Rack-scale）",
+            "stage:production,stage,開始生產（Production）",
+            "stage:shipment,stage,實際出貨（Shipment）",
+            "stage:cloud-deployment,stage,客戶上線與雲端部署",
+            "stage:validation,stage,客戶測試與驗證（Validation）",
+            "component:efb,component,高架扇出橋接（EFB）",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: AMD Helios 部署階梯", graph)
 
 
 if __name__ == "__main__":

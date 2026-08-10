@@ -1,5 +1,97 @@
 # Changelog
 
+## AMD Helios 第二站改成六個部署關卡、五條客戶時間線與六關公司證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有 AMD Helios 部署議題的讀者層文字、標題、中文優先圖譜
+標籤、發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、
+`research_source`、`research_claim`、`impact` 與 `monitoring_item` 共 29 個正式區塊均與 Git
+`HEAD` 逐字相同，聚合 SHA-256 維持
+`b6a1e3650b5691f2de6a9b5fe0091a0a3f11e1a93e8363c1c9ec0ae42ee64a7f`。
+
+- 從「研究中心 → 族群矩陣 → 運算與互連 → 第二站」固定走讀發現，原首屏與第一句先要求
+  理解 Helios、production 與 SKU，三句重點又同時放入 shipment、multi-GW、online、
+  validation、EFB、2.5D 與 ODM。不熟產業的讀者還沒有建立「做出來、送出去、客戶測試、
+  真正上線」的順序，就要先翻譯平台、容量與供應鏈術語；原題名「從參考設計走向具名部署」
+  也容易讓「具名」被誤讀成客戶已實際部署。
+- `learningPathVersion` 升為 60。研究題名改成「AI 機櫃做出來，不等於客戶已上線：用六個
+  關卡讀懂 AMD Helios」；入口問句改成「一整櫃人工智慧設備開始生產後，為什麼還不能算
+  客戶已經上線使用？」。三句重點第一句需先認得的詞改為「機架級系統、開始生產、正式
+  上線」三個中文概念，名詞小字典由 13 項增為 32 項。圖譜題名與核心階段顯示改為中文優先，
+  並追加純編輯 transition，沒有刷新來源、複核日期或證據時鐘。
+- 核心內容先用「方案成形 → 開始生產 → 實際出貨 → 客戶測試與產品開放 → 正式上線 →
+  規模部署與財務轉換」六個關卡建立通用順序；再把 AMD 整體平台、Microsoft／Azure、
+  OpenAI、Meta、Anthropic 五組公開節點放回各自時間線，避免把不同客戶、期限與容量相加成
+  已部署；最後以「公開列名 → 具體角色 → 平台專屬產品 → 驗證與量產出貨 → 可辨識財務結果
+  → 現金流與重複訂單」六關接回台灣整機、機構、封裝與載板公司。三張表都明示這是本文
+  讀法，不是供應商名單、訂單、公司排名或投資排序。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後並排檢查；桌機
+  `scrollWidth == innerWidth == 1280`，手機 `scrollWidth == innerWidth == 390`。行動版三張
+  5 欄表都重排為具欄名卡片，沒有水平溢位。名詞速查可完整載入 32 個中文優先定義，搜尋
+  「現金流足跡」只顯示 1／32 個相符項目，關閉後焦點回到原按鈕。這些是 deterministic
+  viewport 與互動契約，不是抽樣統計，SE／t／有效獨立觀測不適用；固定瀏覽器尺寸不是實機，
+  本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化
+  WCAG 對比量測。
+- 文章數維持 274；第二站閱讀時間由 23 分鐘更新為 25 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 59 → 60`。
+  排除版本後 canonical payload SHA 由
+  `2a88f4d5597897f259c7b2231d9e17e8d9fe984278f48c414350853aa1d12cb4` 變為
+  `6dcb38ec3cce96cf160bf0d2b0e1c938f265972e88883701dbb06d6f89e22bcc`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 501 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `1bb4bb7f1c3306ae6bede4144ef243a4bb4547d06ec1edb04eaf0e5f1fb328eb`、
+  `research.html` `e8cc92d151a45d71482c55a69c32bfc43a730666fcd2d32bdf18fa21040b2323`。
+
+## AI 儲存第一站改成三種工作、五個位置與六關證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有 AI 儲存資料平面議題的讀者層文字、標題、中文優先圖譜
+標籤、發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、
+`research_source`、`research_claim`、`impact` 與 `monitoring_item` 共 21 個正式區塊均與 Git
+`HEAD` 逐字相同，聚合 SHA-256 維持
+`8df4853b4fc1f42ca9b4a71833918574d20d2cb9760ccfe1e3ce6c8ed1624ef4`。
+
+- 從「研究中心 → 族群矩陣 → 運算與互連 → 第一站」固定走讀發現，原首屏先要求理解
+  pMax、I/O 合約與 peer-to-peer 分發，三句重點又把 object storage、local storage、
+  checkpoint 與 qualification 放進同一層。不熟產業的讀者要先翻譯系統詞，才看得出 AI
+  儲存其實同時承接「持續餵資料、故障前保存進度、把模型送到新機器」三種不同工作；390px
+  畫面會把這段翻譯負擔進一步放大。
+- `learningPathVersion` 升為 59。研究題名改成「AI 儲存不是容量越大越好：先分清餵資料、
+  保存進度與搬模型」；入口問句改成「人工智慧為什麼會一邊餵訓練資料、一邊保存進度，還要
+  把模型送到新機器？」。首屏改為只先認得「訓練資料、保存進度、模型檔案」三個中文概念，
+  名詞小字典由 12 項增為 32 項。學習站名、圖譜題名與核心概念顯示改為「AI 資料讀取與
+  儲存路徑」中文優先，並追加純編輯 transition，沒有刷新來源、複核日期或證據時鐘。
+- 核心內容先把「訓練時持續餵資料／故障前保存進度／上線或擴充時搬模型」三種工作分開；
+  再用「軟體、索引與排程／近端記憶體與快取／單機本地 SSD／共享與長期儲存／網路與系統
+  整合」五個位置標出資料可能經過的路徑；最後以「三種工作已分開 → 同一平台量到瓶頸 →
+  瓶頸落到具名元件 → 客戶資格認證 → 正式部署與設備分母 → 可辨識收入與毛利」六關，把
+  平台需求接回公司。三張表均明示這是本文讀法，不是完整架構、供應商名單、訂單、公司排名
+  或投資排序。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後並排檢查；桌機
+  `scrollWidth == innerWidth == 1280`，手機 `scrollWidth == innerWidth == 390`。行動版三張
+  5 欄表都重排為具欄名卡片，沒有水平溢位。名詞速查可完整載入 32 個中文優先定義，搜尋
+  「最慢讀取時間」只顯示 1／32 個相符項目，關閉後焦點回到原按鈕。這些是 deterministic
+  viewport 與互動契約，不是抽樣統計，SE／t／有效獨立觀測不適用；固定瀏覽器尺寸不是實機，
+  本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化
+  WCAG 對比量測。
+- 文章數維持 274；第一站閱讀時間由 21 分鐘更新為 22 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 58 → 59`。
+  排除版本後 canonical payload SHA 由
+  `d0179241021c7f6380c23a7025174701a925166c1ecb23d1c299b61585f5ea8e` 變為
+  `2a88f4d5597897f259c7b2231d9e17e8d9fe984278f48c414350853aa1d12cb4`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 500 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `0443a6b17b6137f5709f86ad9430635907d18c5e532d99a682cefa72d3cf0328`、
+  `research.html` `3e1f07c3ce14a2812787177104b6b4be4a00328a51938438b5ad864cbb76b638`。
+
 ## 面板級封裝第七站改成四把成本尺、五個生產關卡與六關證據 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與

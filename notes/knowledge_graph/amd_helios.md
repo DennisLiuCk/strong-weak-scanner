@@ -1,14 +1,14 @@
-# AMD Helios 知識圖譜
+# AMD Helios 部署階梯知識圖譜
 
-本圖把 production、planned shipment、online、validation 與 future deployment 分開，並將
-台灣夥伴的具名角色停在生態系層級；沒有公司財務證據前，線條不升級成訂單或獲利。
+本圖把開始生產、預計出貨、客戶測試、正式上線與未來部署分開，並將台灣夥伴的具名角色
+停在生態系層級；沒有公司財務證據前，線條不升級成訂單或獲利。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
-label: AMD Helios
-summary: 以部署階梯連結具名客戶與台灣 ODM、封裝、載板角色，同時保留多架構競爭及財務未驗證邊界。
+label: AMD Helios 部署階梯
+summary: 以六個部署關卡連結具名客戶與台灣整機、封裝、載板角色，同時保留多架構競爭及財務未驗證邊界。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
