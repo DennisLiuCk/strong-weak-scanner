@@ -1,14 +1,14 @@
-# Panel-level packaging 知識圖譜
+# 面板級封裝（PLP）知識圖譜
 
-本圖把面積利用率、pilot／early qualification 與 HVM 經濟性拆開。公司節點只呈現設備商已公開的
-研發或交易布局；台灣族群在具名客戶與 good-package yield 出現前維持待驗證。
+本圖把面積利用率、試產／早期認證與穩定量產經濟性拆開。公司節點只呈現設備商已公開的
+研發或交易布局；台灣族群在具名客戶與合格封裝良率出現前維持待驗證。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: panel-level-packaging
 root_node_id: concept:panel-level-packaging
-label: Panel-level packaging
-summary: 以面積利用率連接 uniformity、yield、throughput、panel standard 與 ECD，顯示 pilot readiness 為何尚不能直接推成 HVM 成本優勢。
+label: 面板級封裝（PLP）
+summary: 以面積利用率連接大面積均勻度、良率、單位時間產出、面板尺寸標準與電鍍沉積，顯示試產準備為何尚不能直接推成穩定量產成本優勢。
 article_ids: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS
 status: active
 -->

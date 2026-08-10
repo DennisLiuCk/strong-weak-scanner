@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 56)
+        self.assertEqual(library["learningPathVersion"], 58)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2825,6 +2825,168 @@ class ResearchCenterTest(unittest.TestCase):
             "記憶體接點變少，為什麼不代表成本一定下降或產品已經可用？",
             guide,
         )
+
+    def test_ai_memory_station_six_separates_bonding_paths_process_windows_and_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_hybrid_bonding_readiness.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 晶片貼得更近，量產反而更難："
+            "混合接合要同時守住五個製程窗口\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave94_hybrid_bonding_paths_process_windows_and_six_gate_ladder",
+            "兩層晶片讓平坦表面與細小銅接點直接貼合後",
+            "不能把試驗成功直接讀成量產成熟",
+            "## 先分清兩種「貼法」的良率分母",
+            "| 本文兩條接合路徑 | 怎麼接 | 主要優點 | 主要風險 | 為什麼不能直接比較 |",
+            "| 單顆晶粒接晶圓（D2W） |", "| 晶圓接晶圓（W2W） |",
+            "## 再看五個量產窗口如何接力",
+            "| 本文五個量產窗口 | 先回答什麼 | 主要接力角色 | 失敗會怎樣 | 本輪可確認到哪裡 |",
+            "| 1. 設計規則與試驗結構 |", "| 2. 表面平坦與銅高度 |",
+            "| 3. 潔淨與顆粒控制 |", "| 4. 對準、接合與量測 |",
+            "| 5. 良率、產能與可靠度 |",
+            "## 最後用六關分開技術進展與收入",
+            "| 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |",
+            "| 1. 開放設計入口 |", "| 2. 試驗結構成功 |",
+            "| 3. 整合設備與流程使用 |", "| 4. 具名產品資格認證 |",
+            "| 5. 穩定大量生產 |", "| 6. 重複出貨與形成收入 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先分清兩種「貼法」的良率分母", 1
+        )[0]
+        for jargon in (
+            "Hybrid bonding", "D2W", "W2W", "PDK", "Test vehicle",
+            "Overlay", "HVM", "CMP", "OSAT", "Kinex", "Applied Materials",
+            "imec", "EVG", "200nm", "good-die yield", "throughput",
+            "qualification", "tape-out", "pitch", "chiplet",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 5),
+            ("research_claim", 5), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-HYBRID-BONDING-READINESS,"
+            "兩層晶片貼得更密，為什麼一次試驗成功還不能證明可長期量產？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "hybrid_bonding.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "concept:hybrid-bonding,concept,混合接合（Hybrid bonding）",
+            concepts,
+        )
+        for concept in (
+            "process:die-to-wafer-hybrid-bonding,process,單顆晶粒接晶圓（D2W）",
+            "process:wafer-to-wafer-hybrid-bonding,process,晶圓接晶圓（W2W）",
+            "stage:test-vehicle,stage,試驗結構",
+            "capability:overlay-control,capability,對準控制（Overlay）",
+            "process:cmp-planarization,process,表面平坦化（CMP）",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: 混合接合（Hybrid bonding）", graph)
+
+    def test_ai_memory_station_seven_separates_area_yield_output_and_cost(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_panel_level_packaging_readiness.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 面板排得更滿，成品不一定更便宜："
+            "要一起看面積、良率、速度與報廢\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave95_panel_cost_four_measures_production_chain_and_six_gate_ladder",
+            "這只回答「排得下多少」，還沒回答最後能做出多少合格品",
+            "不能把「排得更多」直接讀成「每顆更便宜」或台灣公司已受惠",
+            "## 先用四把尺拆開「更便宜」",
+            "| 本文四把尺 | 它先回答什麼 | 最簡單的關係 | 容易忽略什麼 | 不能直接推成 |",
+            "| 1. 面積利用率 |", "| 2. 合格封裝良率 |",
+            "| 3. 單位時間合格產出 |", "| 4. 每顆合格品總成本 |",
+            "## 再看五個生產關卡如何接力",
+            "| 本文五個生產關卡 | 先回答什麼 | 主要接力角色 | 過不了會怎樣 | 本輪可確認到哪裡 |",
+            "| 1. 載體與共同尺寸 |", "| 2. 圖形、金屬與均勻度 |",
+            "| 3. 翹曲、搬運與缺陷 |", "| 4. 封裝整合、測試與認證 |",
+            "| 5. 良率、產出與財務 |",
+            "## 最後用六關分開研發能力與收入",
+            "| 本文六關 | 這一關要證明 | 本輪公開資料 | 下一份證據 | 不能外推 |",
+            "| 1. 研發場域與設備能力 |", "| 2. 試產與工程測試 |",
+            "| 3. 早期共同開發與認證 |", "| 4. 共同尺寸與具名產品認證 |",
+            "| 5. 穩定大量生產 |", "| 6. 重複出貨與形成收入 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先用四把尺拆開", 1
+        )[0]
+        for jargon in (
+            "Panel-level packaging", "PLP", "area utilization",
+            "Good-package yield", "Uniformity", "Throughput",
+            "cycle time", "panel size", "form factor", "ECD", "PVD",
+            "CVD", "HVM", "pilot", "qualification", "NEXX", "Lam",
+            "Applied Materials",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 5),
+            ("research_claim", 5), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS,"
+            "面板能排進更多封裝，為什麼還要一起看良率、製程速度與報廢成本？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "panel_level_packaging.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "concept:panel-level-packaging,concept,面板級封裝（PLP）",
+            "component:panel-substrate,component,面板載體（Panel substrate）",
+            "metric:panel-throughput,metric,面板單位時間產出（Throughput）",
+            "standard:panel-size,standard,面板尺寸標準",
+            "process:panel-ecd,process,面板電鍍沉積（ECD）",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: 面板級封裝（PLP）", graph)
 
 
 if __name__ == "__main__":

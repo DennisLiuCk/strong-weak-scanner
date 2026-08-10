@@ -57,22 +57,22 @@ product:spectrum-x-ethernet-photonics,product,Spectrum-X Ethernet Photonics,Spec
 component:co-packaged-optics,component,共同封裝光學,CPO|Co-packaged optics,concept:cpo-networking,把光學元件與交換晶片共同整合以降低高速電訊號傳輸距離
 component:pluggable-optics,component,可插拔光模組,Pluggable optics|Optical transceiver,concept:cpo-networking,可從交換器面板拔換並具成熟維修與升級流程的光模組
 stage:product-production,stage,產品生產,Product production,concept:cpo-networking,平台商將具名產品定義為進入生產但尚未量化部署與供應商財務貢獻的階段
-concept:hybrid-bonding,concept,Hybrid bonding,混合鍵合|混合接合,,以介電層接合與細間距銅互連直接堆疊晶粒或晶圓的 3D 整合路徑
-process:die-to-wafer-hybrid-bonding,process,Die-to-wafer hybrid bonding,D2W hybrid bonding,concept:hybrid-bonding,把已切割晶粒逐顆接合到目標晶圓的混合鍵合方式
-process:wafer-to-wafer-hybrid-bonding,process,Wafer-to-wafer hybrid bonding,W2W hybrid bonding,concept:hybrid-bonding,把兩片晶圓整面對準並接合的混合鍵合方式
+concept:hybrid-bonding,concept,混合接合（Hybrid bonding）,混合鍵合|混合接合,,以介電層接合與細間距銅互連直接堆疊晶粒或晶圓的 3D 整合路徑
+process:die-to-wafer-hybrid-bonding,process,單顆晶粒接晶圓（D2W）,Die-to-wafer hybrid bonding|D2W hybrid bonding,concept:hybrid-bonding,把已切割晶粒逐顆接合到目標晶圓的混合鍵合方式
+process:wafer-to-wafer-hybrid-bonding,process,晶圓接晶圓（W2W）,Wafer-to-wafer hybrid bonding|W2W hybrid bonding,concept:hybrid-bonding,把兩片晶圓整面對準並接合的混合鍵合方式
 component:fine-pitch-rdl,component,細間距 RDL,Fine-pitch redistribution layer,process:advanced-packaging,在封裝介面重新分配高密度訊號的細線寬重佈線層
 stage:pathfinding-pdk,stage,探索型 PDK,Pathfinding PDK,concept:hybrid-bonding,提供初步設計規則與驗證元件但尚未具備完整 tape-out 能力的設計套件
-stage:test-vehicle,stage,試驗車,Test vehicle,concept:hybrid-bonding,用來驗證製程與電性而非證明客戶量產產品的測試結構
-capability:overlay-control,capability,疊對控制,Overlay control,concept:hybrid-bonding,讓上下層銅接點在細間距下保持對準的製程與量測能力
-process:cmp-planarization,process,CMP 平坦化,Chemical mechanical planarization,concept:hybrid-bonding,在接合前把介電層與銅墊表面控制到足夠平坦的製程
-concept:panel-level-packaging,concept,Panel-level packaging,PLP|面板級封裝,,以方形或長方形大面板取代圓形晶圓處理大型先進封裝的製造路徑
-component:panel-substrate,component,Panel substrate,方形基板|矩形基板,concept:panel-level-packaging,用於面板級製程的大面積方形或長方形載體
+stage:test-vehicle,stage,試驗結構,Test vehicle|試驗車,concept:hybrid-bonding,用來驗證製程與電性而非證明客戶量產產品的測試結構
+capability:overlay-control,capability,對準控制（Overlay）,疊對控制|Overlay control,concept:hybrid-bonding,讓上下層銅接點在細間距下保持對準的製程與量測能力
+process:cmp-planarization,process,表面平坦化（CMP）,CMP 平坦化|Chemical mechanical planarization,concept:hybrid-bonding,在接合前把介電層與銅墊表面控制到足夠平坦的製程
+concept:panel-level-packaging,concept,面板級封裝（PLP）,Panel-level packaging|面板級封裝,,以方形或長方形大面板取代圓形晶圓處理大型先進封裝的製造路徑
+component:panel-substrate,component,面板載體（Panel substrate）,方形基板|矩形基板,concept:panel-level-packaging,用於面板級製程的大面積方形或長方形載體
 metric:area-utilization,metric,面積利用率,Area utilization,concept:panel-level-packaging,面板或晶圓可實際排入合格封裝面積的比例
 capability:uniformity-control,capability,大面積均勻度控制,Panel uniformity,concept:panel-level-packaging,在整片大面板維持沉積 蝕刻 清洗與線寬一致性的能力
 capability:yield-management,capability,良率管理,Yield management,concept:panel-level-packaging,追蹤並降低大面積製程缺陷與報廢的製造能力
-metric:panel-throughput,metric,Panel throughput,面板節拍|Cycle time,concept:panel-level-packaging,單位時間可完成的面板數與製造週期
-standard:panel-size,standard,Panel 尺寸標準,Panel form factor standard,concept:panel-level-packaging,設備 材料與自動化共同採用的面板長寬與厚度規格
-process:panel-ecd,process,Panel-level ECD,面板電化學沉積|Electrochemical deposition,concept:panel-level-packaging,在大面積面板上形成金屬互連的電化學沉積製程
+metric:panel-throughput,metric,面板單位時間產出（Throughput）,Panel throughput|面板節拍|Cycle time,concept:panel-level-packaging,單位時間可完成的面板數與製造週期
+standard:panel-size,standard,面板尺寸標準,Panel form factor standard|Panel 尺寸標準,concept:panel-level-packaging,設備 材料與自動化共同採用的面板長寬與厚度規格
+process:panel-ecd,process,面板電鍍沉積（ECD）,Panel-level ECD|面板電化學沉積|Electrochemical deposition,concept:panel-level-packaging,在大面積面板上形成金屬互連的電化學沉積製程
 concept:ucie-interoperability,concept,UCIe 互通成熟度,UCIe interoperability ladder|開放 chiplet 互通,,把規格 IP tape-out 實體跨廠測試與客戶量產分開追蹤的 UCIe 成熟度框架
 stage:specification,stage,規格發布,Specification release,concept:ucie-interoperability,介面功能與測試要求已由標準組織發布但尚不代表實體產品
 stage:ip-tapeout,stage,IP Tape-out,Silicon IP tapeout,concept:ucie-interoperability,介面 IP 已完成設計並送交製造但尚待回片與實測

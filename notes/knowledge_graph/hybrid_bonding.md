@@ -1,14 +1,14 @@
-# Hybrid bonding 知識圖譜
+# 混合接合（Hybrid bonding）知識圖譜
 
-本圖用 PDK、試驗車、整合設備與 HVM 缺口呈現成熟度，不以最小 pitch 取代良率、throughput
-與客戶 qualification。台灣族群只保留研究路由，沒有公司量產線。
+本圖用設計規則、試驗結構、整合設備與穩定大量生產缺口呈現成熟度，不以最小接點間距取代
+良率、每小時產能與客戶資格認證。台灣族群只保留研究路由，沒有公司量產線。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: hybrid-bonding
 root_node_id: concept:hybrid-bonding
-label: Hybrid bonding
-summary: 連接 D2W／W2W、探索型 PDK、200nm 試驗車、overlay、CMP 與具名設備，同時把 HVM 與台灣財務映射留在待驗證層。
+label: 混合接合（Hybrid bonding）
+summary: 連接逐顆接晶圓與晶圓接晶圓、探索型設計規則、200nm 試驗結構、對準控制、平坦化與具名設備，同時把穩定大量生產與台灣財務映射留在待驗證層。
 article_ids: MI-2026-08-02-HYBRID-BONDING-READINESS
 status: active
 -->

@@ -19,10 +19,10 @@ topic-MI-2026-08-02-BACKSIDE-POWER-DELIVERY,晶片改用背面供電後，設備
 topic-MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION,玻璃基板已有工廠與樣品，為什麼還不能算穩定量產？
 topic-MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER,新的記憶體層要滿足哪些讀寫與耐久條件，才不只是特殊儲存裝置？
 topic-MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER,新一代曝光設備能少做步驟，為何仍不一定降低總成本？
-topic-MI-2026-08-02-HYBRID-BONDING-READINESS,晶片接合做得更細後，還缺哪些證據才能證明可長期量產？
+topic-MI-2026-08-02-HYBRID-BONDING-READINESS,兩層晶片貼得更密，為什麼一次試驗成功還不能證明可長期量產？
 topic-MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER,液冷設備容量比較大，為什麼不代表已量產或有訂單？
 topic-MI-2026-08-02-OPEN-AI-FABRICS,不同廠商的運算晶片與交換器，要通過哪些測試才算真正互通？
-topic-MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS,方形面板能排更多封裝，為何每顆合格品不一定更便宜？
+topic-MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS,面板能排進更多封裝，為什麼還要一起看良率、製程速度與報廢成本？
 topic-MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER,小晶片能在一次測試中互通，還要哪些證據才算生態系成熟？
 topic-MI-2026-08-03-800VDC-PROTECTION-LAYERS,高壓直流系統為何不能只靠一顆保險絲保護？
 topic-MI-2026-08-03-AI-CAPACITOR-ROLE-MAP,不同位置的電容容量相近，為何仍不能互相取代？

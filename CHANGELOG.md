@@ -1,5 +1,97 @@
 # Changelog
 
+## 面板級封裝第七站改成四把成本尺、五個生產關卡與六關證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有面板級封裝議題的讀者層文字、標題、中文優先圖譜標籤、發布
+payload 與對應測試，不改變原研究結論。該篇 `research_topic`、`research_source`、
+`research_claim`、`impact` 與 `monitoring_item` 共 16 個正式區塊均與 Git `HEAD` 逐字相同，
+聚合 SHA-256 維持 `5d4ac95294d1e505041978527050895eae35edd103e723e1e45ece9743863310`。
+
+- 從「研究中心 → 族群矩陣 → 記憶體與封裝 → 第七站」固定走讀發現，首屏先要求理解
+  `Pilot` 與 `Qualification`，研究題名又直接使用 `Panel-level packaging` 與
+  `good-package yield`；原成本段落把 `Uniformity`、`Throughput`、`HVM`、`NEXX` 等六個詞
+  與一條帶反引號的文字公式放在同一視野。390px 畫面中，名詞列先進入 sticky 閱讀列下方，
+  公式又以程式碼外觀斷行；不熟產業的讀者難以分清「排得下更多」只改善幾何機會，不等於
+  最後合格品更多、每小時產出更高或每顆成本更低。
+- `learningPathVersion` 升為 58。研究題名改成「面板排得更滿，成品不一定更便宜：要一起看
+  面積、良率、速度與報廢」；入口問句改成「面板能排進更多封裝，為什麼還要一起看良率、
+  製程速度與報廢成本？」。首屏需先認得的詞由兩個英文階段詞改為「方形面板、合格品、報廢」
+  三個中文概念，名詞小字典由 9 項增為 32 項。學習站名、圖譜題名與核心概念顯示改為「面板級
+  封裝（PLP）」中文優先，並追加純編輯 transition，沒有刷新來源、複核日期或證據時鐘。
+- 核心內容先用「面積利用率／合格封裝良率／單位時間合格產出／每顆合格品總成本」四把尺，
+  拆開幾何、良率、速度與單位成本；再用「載體與共同尺寸／圖形、金屬與均勻度／翹曲、搬運與
+  缺陷／封裝整合、測試與認證／良率、產出與財務」五個生產關卡放回材料、設備、封測、客戶與
+  財務的接力位置；最後以「研發場域與設備能力 → 試產與工程測試 → 早期共同開發與認證 →
+  共同尺寸與具名產品認證 → 穩定大量生產 → 重複出貨與收入」六關定位本輪資料只涵蓋第 1～3
+  關的場域與能力敘述，尚無第 2、3 關的具名產品結果。三張表均明示這是本文讀法，不是完整
+  規格、成本比較、供應商名單、訂單、公司排名或投資排序。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後並排檢查；桌機
+  `scrollWidth == innerWidth == 1280`，390px 含邊框的 iframe 內容寬 388px，亦有
+  `scrollWidth == innerWidth == 388`。行動版三張 5 欄表都重排為具欄名卡片，沒有水平溢位。
+  名詞速查可完整載入 32 個中文優先定義，搜尋「單位時間產出」只顯示 1／32 個相符項目，
+  關閉後焦點回到原按鈕。這些是 deterministic viewport 與互動契約，不是抽樣統計，SE／t／
+  有效獨立觀測不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、
+  VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第七站閱讀時間由 14 分鐘更新為 18 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 57 → 58`。
+  排除版本後 canonical payload SHA 由
+  `66dcc56d3e31e1fe231edbfe4cb9317651fca0dd0ffbf215b522ae4595220f66` 變為
+  `d0179241021c7f6380c23a7025174701a925166c1ecb23d1c299b61585f5ea8e`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 499 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `27c6f775f3425bace4131ee031045c4db9c8bb289964bb161ffd9eab6828caa1`、
+  `research.html` `c93b78da919cde9b1d9748ccb559a6d7a0e314c0cca6d84a550e0c91c0cd55db`。
+
+## 混合接合第六站改成兩條接合路徑、五個製程窗口與六關證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有混合接合議題的讀者層文字、標題、中文優先圖譜標籤、發布
+payload 與對應測試，不改變原研究結論。該篇 `research_topic`、`research_source`、
+`research_claim`、`impact` 與 `monitoring_item` 共 16 個正式區塊均與 Git `HEAD` 逐字相同，
+聚合 SHA-256 維持 `45ee305b2dc4cfa0c1c7644f93074006a25e4ad7ce4e8e2b6b0df968afc8bfa1`。
+
+- 從「研究中心 → 族群矩陣 → 記憶體與封裝 → 第六站」固定走讀發現，首屏先要求理解
+  `Hybrid bonding` 與 `Overlay`，研究題名又直接使用 PDK、200nm 與 HVM；原成熟度表把
+  `fine-pitch RDL`、`pathfinding PDK`、`test vehicle`、`good-die yield`、`throughput`、
+  `inline metrology` 與 `qualification` 集中在三列。不熟產業的讀者要先翻譯製程詞，才看得出
+  「接得準」仍不足以回答表面、潔淨、良率、產能、可靠度與收入是否一起過關。
+- `learningPathVersion` 升為 57。研究題名改成「晶片貼得更近，量產反而更難：混合接合要
+  同時守住五個製程窗口」；入口問句改成「兩層晶片貼得更密，為什麼一次試驗成功還不能證明
+  可長期量產？」。首屏需先認得的詞由兩個英文技術詞改為「銅接點、晶粒」兩個中文概念，
+  名詞小字典由 10 項增為 32 項。學習站名、圖譜題名與核心概念顯示改為「混合接合
+  （Hybrid bonding）」中文優先，並追加純編輯 transition，沒有刷新來源、複核日期或證據時鐘。
+- 核心內容先把「單顆晶粒接晶圓／晶圓接晶圓」兩條路徑的做法、優點、風險與良率分母分開；
+  再用「設計規則與試驗結構／表面平坦與銅高度／潔淨與顆粒控制／對準、接合與量測／良率、
+  產能與可靠度」五個窗口，標出研究機構、材料、設備、晶圓廠、封測、產品客戶與財務的接力
+  位置；最後以「設計入口 → 試驗結構 → 整合設備與流程 → 具名產品認證 → 穩定大量生產 →
+  重複出貨與收入」六關定位本輪證據只到第 1～3 關。三張表均明示這是本文讀法，不是完整
+  規格、路徑勝負、供應商名單、量產名次、訂單或投資排序。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後並排檢查；桌機
+  `scrollWidth == innerWidth == 1280`，390px 含邊框的 iframe 內容寬 388px，亦有
+  `scrollWidth == innerWidth == 388`。行動版三張 5 欄表都重排為具欄名卡片，沒有水平溢位。
+  名詞速查可完整載入 32 個中文優先定義，搜尋「對準誤差」只顯示 1／32 個相符項目，關閉後
+  焦點回到原按鈕。這些是 deterministic viewport 與互動契約，不是抽樣統計，SE／t／有效
+  獨立觀測不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、
+  VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第六站閱讀時間由 14 分鐘更新為 18 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 56 → 57`。
+  排除版本後 canonical payload SHA 由
+  `b2a66d023fddb115a18612fa2e100b28ad8a0e49a00e777a8424e025e3a8a00e` 變為
+  `66dcc56d3e31e1fe231edbfe4cb9317651fca0dd0ffbf215b522ae4595220f66`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 498 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `0d0940e0f64fa1185b3958a62711f8487a4a4619b50fb617146bbc4e7ea5bf89`、
+  `research.html` `cca4c8e74d9d030a3f1aef155cdea1a592022004d28ae897b25cb9918a46ad6c`。
+
 ## SPHBM4 第五站改成五項連線代價、五組角色與六關證據 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
