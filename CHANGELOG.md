@@ -1,5 +1,127 @@
 # Changelog
 
+## 液冷第九站改成五次交接與五關證據讀法 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有液冷迴路議題的讀者層文字、標題、學習路線交接、發布
+payload 與對應測試，不改變原研究結論。該篇 `research_topic`、`research_source`、
+`research_claim`、`impact` 與 `monitoring_item` 共 19 個正式區塊均與 Git `HEAD` 逐字相同。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第八站 → 第九站」固定走讀發現，第九站首屏先
+  使用 FWS、TCS、ITE 與 CDU 四個縮寫，再要求讀者從責任矩陣自行推導冷源、循環水路、機櫃
+  分流、伺服器冷板與控制系統的交接關係；另一張成熟度表則以 Requirement、Qualification、
+  Integration、Reliability 與 Commercial 組織證據層級。責任資料完整，但不熟產業的讀者要
+  先翻譯兩套術語，才看得出「誰跟誰交接」以及「目前只走到哪一關」。
+- `learningPathVersion` 升為 51。研究題名改成「液冷不是買完設備就能運作：冷源、管路、
+  伺服器與控制必須共同交接」；首屏閱讀任務由 4 個英文縮寫改成 2 個中文概念，反思題不再
+  要求先理解 FWS、TCS 或 `rackLocationId`。名詞小字典由 7 項增為 27 項；三句重點、重要性、
+  持續追蹤、研究判定與推翻條件均改為中文概念先行，並新增純編輯 transition。原 OCP、
+  Lenovo、NVIDIA 與平台產品清單的來源角色、公司映射、商業階段和限制均保留。
+- 責任矩陣改成「機房設施 ↔ 冷卻設備 → 循環水路 → 機櫃分流 → 伺服器冷板」，另把建築控制
+  與 IT 控制列為第五個交接點；欄位為「交接點／這一段由誰或什麼負責／雙方要說清楚什麼／
+  沒說清楚會怎樣／本輪依據」。證據層級改成「責任與範圍寫清楚 → 零件與設備通過測試 →
+  平台列出具名產品 → 具名場域完成驗收 → 長期運作與財務出現」五關。320／390px 的責任表
+  5 列 25 格與證據表 5 列 15 格均重排為具欄名卡片；780／884／1280px 保留原生 table
+  row／cell，五個固定 viewport 都有 `documentElement.scrollWidth == innerWidth`。桌機、
+  390px、深色與淺色均完成目視走讀；點擊「水質／腐蝕／污染」會開啟本文 27 詞名詞速查、
+  預填搜尋並只顯示對應定義，關閉後焦點回到原按鈕。這些是 deterministic viewport 契約，
+  不是抽樣統計，SE／t／有效獨立觀測不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、
+  完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第九站閱讀時間由 17 分鐘更新為 19 分鐘，並由建置器同步更新第八站的
+  下一站題名、問句、閱讀時間、知識圖譜 `learningRoutes` 與
+  `learningPathVersion: 50 → 51`。排除版本後 canonical payload SHA 由
+  `41ae8a980839f1e7339c5e22d22a0c5aed6b7d115fe255218672138e48b3d1a2` 變為
+  `9fed1caf4521ceba022644dec9df29e70dafcd476b09b61913b8238d0a214331`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 492 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 11 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `2021cbf7d33121f6564454c7951b8f7e6f07c3a740df0e8cac05ebf1701aaa06`、`research.html`
+  `09c00befcc3a0cf2b23d2d0eca008cc8f080e54b3c8c914b1ea9913c09562e1b`；輸出已包含推送前
+  rebase 的 GitHub Actions `2026-08-10` 資料更新。
+
+## 液冷第八站改成從容量規格到收入證據的五關讀法 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+impact、證據判定與複核時鐘零變動**；本次只改寫既有液冷市場議題的讀者層文字、標題、
+學習路線交接、發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、
+`research_source`、`research_claim`、`metric_comparison`、`impact` 與 `monitoring_item` 共 31 個
+正式區塊均與 Git `HEAD` 逐字相同。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第七站 → 第八站」固定走讀發現，第八站首屏先列
+  1.2MW、1MW、380kW，再要求讀者比較 `Sample Ready／MP Ready`；五關概念雖已存在，核心表
+  仍用「階段／本輪可定位證據／尚不能知道」呈現，容量帳本又以 capture、M1、reported value、
+  verdict 與 Supply Chain Status 起句。不熟產業的讀者必須先翻譯術語，才能分清容量、資格、
+  供應準備、部署與收入是不同證據。
+- `learningPathVersion` 升為 50。讀者標題改成「液冷設備容量比較大，為什麼不代表已量產或有
+  訂單？」；研究題名改成「液冷設備不能只比容量：平台列名、供應準備與收入是三種不同證據」。
+  首屏需先認得的詞由 3 個降為 1 個，反思題不再先要求理解兩個英文供應標籤；名詞小字典由
+  9 項增為 32 項，容量比較、重要性、持續追蹤、反方路徑、到期複核與判定改變條件都改為
+  中文概念先行，並新增同日純編輯 transition。原 NVIDIA、LG、Daikin、奇鋐、台達電、光寶科
+  的證據角色、數值、公司映射、商業階段與限制均保留。
+- 核心內容改成「容量規格 → 平台列名與測試 → 供應準備 → 場域整合與客戶部署 → 公司收入」
+  五關；表格欄位為「先問哪一關／這一關能回答什麼／本輪已有的公開證據／仍然缺什麼」。
+  容量帳本另把欄名改為供應商、產品、來源原始容量、換算值、平台原始標籤與證據界線。
+  320／390px 的 5 列、20 個儲存格完整重排為具欄名卡片；780／884／1280px 保留原生 table
+  row／cell，五個固定 viewport 都有 `documentElement.scrollWidth == innerWidth`。桌機、390px、
+  深色與淺色均完成目視走讀；點擊「MW／kW」會開啟本文 32 詞名詞速查、預填搜尋並顯示
+  2 個相關定義，關閉後焦點回到原按鈕。這些是 deterministic viewport 契約，不是抽樣統計，
+  SE／t／有效獨立觀測不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、
+  VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；相對前版改動第八站
+  `topic-MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER`，並由建置器同步更新第七站文章的
+  下一站題名、問句、閱讀時間、知識圖譜 `learningRoutes` 與 `learningPathVersion: 49 → 50`。
+  排除版本後 canonical payload SHA 由
+  `eec9eb42e2ce0d560b1a1b71969469367b3af8d2a4e5b5d1be03c51df659a3ca` 變為
+  `41ae8a980839f1e7339c5e22d22a0c5aed6b7d115fe255218672138e48b3d1a2`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 491 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `a7a1ca628fe372c19c21e802a5f36541c5457469504a85f645b2da102ceb2c18`、`research.html`
+  `05f47d9fc19de856a87dd9ef966cc1ca6cd1573887352182be4a8bbe61d0e8c8`。
+
+## AI 機櫃信任第七站改成身分到查證的四關流程 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+impact、證據判定與複核時鐘零變動**；本次只改寫既有 AI 機櫃信任市場議題的讀者層文字、
+標題、學習路線敘述、發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、
+`research_source`、`research_claim`、`impact` 與 `monitoring_item` 共 23 個區塊均與 Git `HEAD`
+逐字相同。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第六站 → 第七站」固定走讀發現，第七站已用
+  「一道斷電指令為什麼可信」建立具體場景，但研究題名先丟出「信任根」，讀後問題再要求讀者
+  先理解 `attestation`；核心四關則用 Caliptra、SPDM、OCP S.A.F.E. 四段長文呈現，讀者必須
+  一邊翻譯術語，一邊自己整理身分、版本、權限與第三方查證的責任順序。
+- `learningPathVersion` 升為 49。文章標題改成「AI 機櫃如何判斷控制指令可信：確認身分、版本
+  與權限，還要有人查證」；首屏先認得的詞由 1 個降為 0 個，三句重點與反思題先問送出者是誰、
+  目前執行哪一版，以及驗證失敗後系統會做什麼。名詞小字典由 7 項增為 30 項；重要性、追蹤、
+  判定改變條件、公司新聞查核與結論邊界均改為中文概念先行，並新增同日純編輯 transition。
+  原 OCP、DMTF、Caliptra、SPDM 與 5274 信驊的證據角色、公司映射、商業階段和限制均保留。
+- 核心內容改成「確認身分 → 確認版本 → 核對權限 → 查證是否照做」四關，表格欄位為「系統先
+  問什麼／已有的公開機制／還不能因此判定」；公司段另用四問把功能、獨立查證、買方採用與財務
+  足跡分開。320／390px 的 4 列、16 個儲存格完整重排為具欄名卡片；780／884／1280px 保留
+  原生 table row／cell，五個固定 viewport 都有 `documentElement.scrollWidth == innerWidth`。
+  桌機、390px、深色與淺色均完成目視走讀；點擊「授權」會開啟本文 30 詞名詞速查、預填搜尋
+  並只顯示對應定義，關閉後焦點回到原按鈕。這些是 deterministic viewport 契約，不是抽樣
+  統計，SE／t／有效獨立觀測不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤
+  巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；相對前版改動第七站
+  `topic-MI-2026-08-08-AI-RACK-TRUST-ROOT`，並由建置器同步更新第六站文章的下一站標題、問句、
+  閱讀時間、供電與散熱路線說明、知識圖譜 `learningRoutes` 與
+  `learningPathVersion: 48 → 49`。排除版本後 canonical payload SHA 由
+  `8d4a157381cfe1c47d9b4413b5190b5c1a75c783d6d1542a846c4bbb404d5f09` 變為
+  `eec9eb42e2ce0d560b1a1b71969469367b3af8d2a4e5b5d1be03c51df659a3ca`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 490 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `9e199380c4d458bc062044519596312022844f62e9460334a5d54fde4daa0d55`、`research.html`
+  `7fdc8d8ac1ef3323fd8345c42a984a53d3dc4ce9c8430c5c2515aeb4732161c4`。
+
 ## AI 機櫃 EMC 第六站改成零件到實驗室的四關驗證 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、

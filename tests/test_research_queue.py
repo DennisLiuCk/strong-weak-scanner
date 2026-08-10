@@ -1577,6 +1577,7 @@ class ReadabilityGateTest(unittest.TestCase):
             "2026-08-02_liquid_cooling_qualification_ladder.md",
             "2026-08-03_liquid_cooling_loop_boundaries.md",
             "2026-08-07_ai_rack_action_contract.md",
+            "2026-08-08_ai_rack_trust_root.md",
             "2026-08-09_ai_rack_emc_certification.md",
             "2026-08-09_ai_storage_data_plane.md",
             "2026-07-30_yageo_q2_earnings_call.md",
@@ -1730,6 +1731,36 @@ class ReadabilityGateTest(unittest.TestCase):
         )
         self.assertIn(
             "evidence: editorial:plain_language_wave85_full_rack_emc_layers",
+            text,
+        )
+
+    def test_ai_rack_trust_article_separates_four_instruction_checks(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-08_ai_rack_trust_root.md"
+        text = path.read_text(encoding="utf-8")
+        self.assertNotIn(
+            "# AI 機櫃信任根：晶片能證明自己是誰，但沒人能替你查證廠商有沒有照做",
+            text,
+        )
+        self.assertNotIn("## 那道斷電指令，要過四關", text)
+        self.assertNotIn("如果一台機器的 attestation 驗證失敗", text)
+        self.assertIn(
+            "# AI 機櫃如何判斷控制指令可信：確認身分、版本與權限，還要有人查證",
+            text,
+        )
+        self.assertIn(
+            "## 高風險指令要過四關：身分、版本、權限與查證",
+            text,
+        )
+        self.assertIn(
+            "| 驗證關卡 | 系統先問什麼 | 已有的公開機制 | 還不能因此判定 |",
+            text,
+        )
+        self.assertIn(
+            "一條會切斷整櫃水電的指令，不能只看誰送出",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave86_instruction_trust_four_checks",
             text,
         )
 

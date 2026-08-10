@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 48)
+        self.assertEqual(library["learningPathVersion"], 51)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2422,6 +2422,105 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("attach_group_learning_starts(research_library)", builder)
         self.assertIn('candidate_radar=research_library["candidateRadar"]', builder)
         self.assertIn("def build_group_maturity(", builder)
+
+    def test_liquid_cooling_station_eight_separates_capacity_progress_and_income(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_liquid_cooling_qualification_ladder.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 液冷設備不能只比容量：平台列名、供應準備與收入是三種不同證據\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave87_capacity_maturity_evidence_ladder",
+            "容量只回答設備在指定條件下設計可帶走多少熱",
+            "要判斷誰更接近收入，還要看到客戶驗收、量產數量與公司財務揭露",
+            "## 容量可以換算，商業成熟度不能跟著換算",
+            "| 2026-08-02 清單中的供應商 | 產品型號 | 來源原始容量 | 換算成 kW | 平台原始供應標籤 | 這一列只能證明 |",
+            "## 從規格到收入要過五關",
+            "| 先問哪一關 | 這一關能回答什麼 | 本輪已有的公開證據 | 仍然缺什麼 |",
+            "| 1. 容量規格 |", "| 2. 平台列名與測試 |",
+            "| 3. 供應準備 |", "| 4. 場域整合與客戶部署 |",
+            "| 5. 公司收入 |", "## 接下來看到什麼，判定才會改變",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 主張與證據帳本", 1
+        )[0]
+        self.assertNotIn("Sample Ready", reflection)
+        self.assertNotIn("MP Ready", reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 8),
+            ("research_claim", 9), ("metric_comparison", 7),
+            ("impact", 2), ("monitoring_item", 4),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER,"
+            "液冷設備容量比較大，為什麼不代表已量產或有訂單？",
+            guide,
+        )
+
+    def test_liquid_cooling_station_nine_maps_handoffs_and_evidence_gates_in_plain_language(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-03_liquid_cooling_loop_boundaries.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 液冷不是買完設備就能運作：冷源、管路、伺服器與控制必須共同交接\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave88_cooling_loop_handoffs_and_evidence_gates",
+            "液冷可以先分成三段：機房把熱送走的設施水路",
+            "完整部署還要讓冷源、管路、接頭、分流器、冷板、控制與維護一起通過驗收",
+            "## 冷源到伺服器要交接五次",
+            "| 交接點 | 這一段由誰或什麼負責 | 雙方要說清楚什麼 | 沒說清楚會怎樣 | 本輪依據 |",
+            "| 1. 機房設施 ↔ 冷卻設備 |",
+            "| 2. 冷卻設備 ↔ 循環水路 |",
+            "| 3. 循環水路 ↔ 機櫃分流 |",
+            "| 4. 機櫃分流 ↔ 伺服器冷板 |",
+            "| 5. 建築控制 ↔ IT 控制 |",
+            "## 從文件要求到長期營運要過五關",
+            "| 先過哪一關 | 看到什麼才算往前 | 還不能因此判定 |",
+            "| 1. 責任與範圍寫清楚 |", "| 2. 零件與設備通過測試 |",
+            "| 3. 平台列出具名產品 |", "| 4. 具名場域完成驗收 |",
+            "| 5. 長期運作與財務出現 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 27
+        )
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 主張與證據帳本", 1
+        )[0]
+        for jargon in ("FWS", "TCS", "rackLocationId"):
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 6),
+            ("research_claim", 7), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES,"
+            "液冷系統出問題時，如何分清設備、整合與設施的責任？",
+            guide,
+        )
 
 
 if __name__ == "__main__":

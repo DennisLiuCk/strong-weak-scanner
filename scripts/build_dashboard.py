@@ -292,7 +292,7 @@ RESEARCH_LEARNING_ROUTES = [
         "question": "電力如何送進 AI 機櫃，產生的熱又如何被帶走？",
         "description": (
             "建議分三階段：先分清供電、保護與元件角色，再看機櫃緩衝、控制、"
-            "EMC 與信任鏈，最後追液冷產品資格與迴路責任。"
+            "電磁干擾驗證與信任查證，最後追液冷產品資格與迴路責任。"
         ),
         "graphIds": [
             "800v-power-tree", "800vdc-protection-layers", "ai-capacitor-role-map",
@@ -3472,7 +3472,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 48
+    research_library["learningPathVersion"] = 51
     return research_library
 
 
