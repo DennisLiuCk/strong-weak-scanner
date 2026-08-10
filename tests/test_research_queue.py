@@ -1646,6 +1646,93 @@ class ReadabilityGateTest(unittest.TestCase):
             text,
         )
 
+    def test_ai_power_buffering_article_starts_from_duration_location_and_task(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_power_buffering_hierarchy.md"
+        text = path.read_text(encoding="utf-8")
+        self.assertNotIn(
+            "# AI 機櫃功率緩衝不是一顆大電池：CBU、BBU、BESS 必須按時間尺度分開看",
+            text,
+        )
+        self.assertNotIn(
+            "## 架構地圖：先問「哪一種波動」，再問「哪一顆元件」",
+            text,
+        )
+        self.assertNotIn("靠近 rack／DC bus", text)
+        self.assertIn(
+            "# AI 機櫃儲能要接力：短暫尖峰、機櫃備援與設施儲能各有任務",
+            text,
+        )
+        self.assertIn("## 三種儲能怎麼接力：先看事件持續多久", text)
+        self.assertIn(
+            "| 事件持續多久 | 誰來處理 | 設備在哪裡 | 目前一手證據 | 還不能因此判定 |",
+            text,
+        )
+        self.assertIn(
+            "機櫃旁的電容儲能模組只能處理毫秒到秒的尖峰",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave83_storage_timescale",
+            text,
+        )
+
+    def test_ai_rack_action_article_follows_identity_to_safe_isolation(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-07_ai_rack_action_contract.md"
+        text = path.read_text(encoding="utf-8")
+        self.assertNotIn(
+            "# AI 機櫃控制契約：Telemetry 要連到隔離動作才有營運意義",
+            text,
+        )
+        self.assertNotIn("## Action contract：從數值走到安全動作", text)
+        self.assertNotIn("| 契約層 | DSX 可定位證據 | 仍缺的 production 證據 |", text)
+        self.assertIn(
+            "# AI 機櫃如何從感測警報走到安全隔離：先找對設備，再決定動作",
+            text,
+        )
+        self.assertIn("## 從警報到復原：七個步驟不能少", text)
+        self.assertIn(
+            "| 控制步驟 | 這一步要回答什麼 | 公開文件目前支持什麼 | 還缺哪些現場證據 |",
+            text,
+        )
+        self.assertIn(
+            "機櫃收到溫度、功率或漏液資料後，不能立刻切電",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave84_sensor_to_isolation",
+            text,
+        )
+
+    def test_ai_rack_emc_article_separates_four_validation_gates(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-09_ai_rack_emc_certification.md"
+        text = path.read_text(encoding="utf-8")
+        self.assertNotIn(
+            "# AI 機櫃 EMC 驗證：元件能抑制雜訊，不代表整櫃就能進實驗室",
+            text,
+        )
+        self.assertNotIn("## 四道關卡，不能用同一張證書跳過", text)
+        self.assertNotIn("AI rack placement、目標頻帶或 system attenuation", text)
+        self.assertIn(
+            "# AI 機櫃為什麼要重新驗證電磁干擾：零件合格，不等於整櫃合格",
+            text,
+        )
+        self.assertIn(
+            "## 整櫃驗證要過四關：零件、配置、量測與實驗室",
+            text,
+        )
+        self.assertIn(
+            "| 驗證關卡 | 先問什麼 | 現有證據能證明 | 還不能證明 |",
+            text,
+        )
+        self.assertIn(
+            "每一個零件或子系統各自合格，全部設備重新接線並同時運作後",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave85_full_rack_emc_layers",
+            text,
+        )
+
     def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):
         body = self.LEAD + "- active claim 已進入 watch，對應 H1。\n"
         result, errors, _ = self._run(

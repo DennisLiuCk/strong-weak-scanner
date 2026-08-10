@@ -1,5 +1,113 @@
 # Changelog
 
+## AI 機櫃 EMC 第六站改成零件到實驗室的四關驗證 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+impact、證據判定與複核時鐘零變動**；本次只改寫既有 AI 機櫃 EMC 市場議題的讀者層文字、
+標題、發布 payload 與對應測試，不改變原研究結論。三篇連續改寫文章的 `research_topic`、
+`research_source`、`research_claim`、`impact` 與 `monitoring_item` 區塊均與 Git `HEAD` 逐字相同。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第五站 → 第六站」固定走讀發現，第六站主問題已能
+  用「單一設備合格，整櫃仍可能不合格」建立懸念，但研究題名與第一張架構表仍用 `EMC`、
+  `placement`、`attenuation`、`configuration` 與 `lab capacity` 組織內容；讀者必須先翻譯術語，
+  才能看出零件、完整配置、量測程序與實驗室是四種不能互相代替的責任。
+- `learningPathVersion` 升為 48。文章標題改成「AI 機櫃為什麼要重新驗證電磁干擾：零件合格，
+  不等於整櫃合格」；首屏先認得的詞由 1 個降為 0 個，三句重點與反思題改為先問設備重新接線
+  並同時運作後為何仍會彼此干擾。名詞小字典由 7 項增為 26 項；重要性、追蹤方法、測試資料
+  判讀、公司研究與結論邊界均改為中文概念先行，並新增同日純編輯 transition。OCP、IEC、FCC
+  與國巨的原角色、公司映射、商業階段和證據限制均保留。
+- 核心內容改成「零件降低雜訊 → 定義完整被測配置 → 依程序完成量測 → 確認實驗室能承載」
+  四關，表格欄位為「先問什麼／現有證據能證明／還不能證明」。320／390px 的 4 列、16 個
+  儲存格完整重排為具欄名卡片；780／884／1280px 保留原生 table row／cell，五個固定 viewport
+  都有 `documentElement.scrollWidth == innerWidth`。桌機、390px、深色與淺色均完成目視走讀；
+  點擊「被測配置」會開啟本文 26 詞名詞速查、預填搜尋並顯示 3 筆相關定義，關閉後焦點回到
+  原按鈕。這些是 deterministic viewport 契約，不是抽樣統計，SE／t／有效獨立觀測不適用；
+  固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、
+  200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；相對前版改動第六站
+  `topic-MI-2026-08-09-AI-RACK-EMC-CERTIFICATION`，並由建置器同步更新第五站文章的下一站標題、
+  問句、閱讀時間、知識圖譜 `learningRoutes` 與 `learningPathVersion: 47 → 48`。排除版本後
+  canonical payload SHA 由 `31f276f53ce395640b5162949730988e8dd69ecda841d67322c4831a6745e5f2`
+  變為 `8d4a157381cfe1c47d9b4413b5190b5c1a75c783d6d1542a846c4bbb404d5f09`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 489 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `481b6038a9190d92dd3aa687faca4bf9e4479190c18096fcdd35680ed1ccc985`、`research.html`
+  `ff8d6fb7ff1c608e006061f710a438f56537ae19348466a88a20be6212e18945`。
+
+## AI 機櫃控制第五站改成從警報到復原的七步流程 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+impact、證據判定與複核時鐘零變動**；本次只改寫既有 AI 機櫃控制市場議題的讀者層文字、
+標題、發布 payload 與對應測試，不改變原研究結論。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第四站 → 第五站」固定走讀發現，第五站已用
+  過熱、漏液與找對機櫃建立好問題，但首屏重點又以 `metadata`、`rack identity`、`request`、
+  `guardrail` 起句；第一張表再用「契約層／DSX 可定位證據／production 證據」組織內容，
+  不熟產業的讀者必須先翻譯欄位，才看得出控制流程。
+- `learningPathVersion` 升為 47。文章標題改成「AI 機櫃如何從感測警報走到安全隔離：先找對
+  設備，再決定動作」；首屏先認得的詞由 3 個降為 2 個，三句重點與反思題改為先問設備編號
+  是否一致、讀數是否可信、誰能決定動作。名詞小字典由 8 項增為 28 項；重要性、追蹤方法、
+  規格分工、公司新聞判讀、研究判定與證據缺口均改為中文概念先行，並新增同日純編輯
+  transition。NVIDIA、OCP、DMTF 的原角色、公司映射、商業階段與證據限制均保留。
+- 核心表格改成「控制步驟 → 這一步要回答什麼 → 公開文件目前支持什麼 → 還缺哪些現場證據」，
+  從找到正確設備、確認讀數一路走到結果回報與維修閉環。320／390px 的 7 列、28 個儲存格
+  完整重排為具欄名卡片；780／884／1280px 保留原生 table row／cell，五個固定 viewport
+  都有 `documentElement.scrollWidth == innerWidth`。桌機、390px、深色與淺色均完成目視走讀；
+  點擊「隔離」會開啟本文 28 詞名詞速查、預填搜尋並顯示逐字定義，關閉後焦點回到原按鈕。
+  這些是 deterministic viewport 契約，不是抽樣統計，SE／t／有效獨立觀測不適用；固定 iframe
+  不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom
+  與儀器化 WCAG 對比量測。
+- 文章數維持 274；相對前版改動第五站
+  `topic-MI-2026-08-07-AI-RACK-ACTION-CONTRACT`，並由建置器同步更新第四站文章的下一站標題、
+  問句、閱讀時間、知識圖譜 `learningRoutes` 與 `learningPathVersion: 46 → 47`。排除版本後
+  canonical payload SHA 由 `91e799b2b8d8547816224c828a62eeeb47c840e7254eda8a26730e5801324740`
+  變為 `31f276f53ce395640b5162949730988e8dd69ecda841d67322c4831a6745e5f2`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 488 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `4235c98193742f116035dfc203828a660881cfc5dbf5863ca8f12bebff2bbed5`、`research.html`
+  `658221dd64903b006de865b6e5ba76867cef6f24089457d825a4f26f8efc66c7`。
+
+## AI 儲能第四站先按事件持續時間拆分三層任務 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+impact、證據判定與複核時鐘零變動**；本次只改寫既有 AI 功率緩衝市場議題的讀者層文字、
+標題、發布 payload 與對應測試，不改變原研究結論。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第三站 → 第四站」固定走讀發現，第四站首屏已能
+  用電力尖峰與停電時間建立問題，但第一張架構表又以 `rack／DC bus`、`ride-through`、
+  `facility／utility interconnection` 與設備縮寫起句；讀者剛理解「不同時間長度要分工」，
+  就必須重新翻譯位置與任務。
+- `learningPathVersion` 升為 46。文章標題改成「AI 機櫃儲能要接力：短暫尖峰、機櫃備援與設施
+  儲能各有任務」；首屏先認得的詞由 3 個降為 2 個，反思題改成以毫秒到秒和數十秒的差異發問。
+  名詞小字典由 8 項增為 22 項；三句重點、重要性、追蹤方法、三列架構表、800V 文章分工、
+  研究判定與推翻條件均改為中文概念先行，並新增同日純編輯 transition。NVIDIA、OCP、TI 的
+  原角色、三層時間與位置邊界、公司映射、商業階段及證據限制均保留。
+- 架構表改成「事件持續多久 → 誰來處理 → 設備在哪裡 → 一手證據 → 還不能判定」；320／390px
+  三列完整重排為具欄名卡片，780／884／1280px 保留原生 table row／cell，五個固定 viewport
+  都有 `documentElement.scrollWidth == innerWidth`。桌機、390px、深色與淺色均完成目視走讀；
+  點擊「備援」會開啟本文 22 詞名詞速查、預填搜尋並顯示逐字定義，關閉後焦點回到原按鈕。
+  這些是 deterministic viewport 契約，不是抽樣統計，SE／t／有效獨立觀測不適用；固定 iframe
+  不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom
+  與儀器化 WCAG 對比量測。
+- 文章數維持 274；相對前版改動第四站
+  `topic-MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY`，並由建置器同步更新第三站文章的下一站
+  標題、問句、閱讀時間、知識圖譜 `learningRoutes` 與 `learningPathVersion: 45 → 46`。排除版本後
+  canonical payload SHA 由 `d584694bb7f6a4adbd472ce24be53fe17bcb6ccf614aada6f1197a9e0d669eea`
+  變為 `91e799b2b8d8547816224c828a62eeeb47c840e7254eda8a26730e5801324740`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 487 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `cfd985c1fa7720bcda7f6240f24d20e0cb780180e6f40aae800b7a1554b16b8d`、`research.html`
+  `6f71ec4567243ba643ac0ce263b4e7b5dc8fa12ac0a2fb52254b900e360c8cd8`。
+
 ## AI 電容第三站先用四個位置建立角色地圖 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
