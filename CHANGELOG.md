@@ -1,5 +1,30 @@
 # Changelog
 
+## 正式筆記與多空文章先看產業角色再進正文 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic／正式筆記／多空 Markdown、正文、
+主張、證據、graph edge、族群映射、路線順序、文章推薦、閱讀問題與來源段落零變動**；本次只修正
+正式筆記與多空文章的起讀焦點順序。
+
+- 以本輪新擷取畫面逐類走過文章首屏。市場議題原本已是「三句重點 → 產業角色」；正式筆記與
+  多空文章的角色卡雖緊接閱讀任務，主行動卻直接跳到「30 秒摘要／多空觀點」。台達電桌機樣本
+  點擊後角色卡頂端落在視窗上方 278px，390px 手機樣本則整張角色卡底端仍在視窗上方 271px，
+  讀者會在不知公司位於哪一層時直接進入研究正文。
+- `learningPathVersion` 升為 17。`readingMissionStartsWithRole()` 只對正式筆記／多空文章且至少
+  有一筆正式族群白話指南時啟用：首個按鈕改為「先看產業角色」，角色卡尾端再由原
+  `startLabel` 產生「接著讀 30 秒摘要／接著讀多空觀點」，兩步都移動鍵盤焦點；缺族群指南時
+  直接退回原來源段落。市場議題仍顯示「開始讀三句重點」，不增加第二顆按鈕。
+- 由原始筆記／假說與 `research_group_guide.csv` 重新建 library，以及由發布 `research.html`
+  獨立解碼 payload，兩條路徑都得到 239／239 篇可採兩段式導引：正式筆記 121／121、多空文章
+  118／118，缺口 0。瀏覽器實測第一步分別落在角色標題，第二步落在「30 秒摘要／多空觀點」；
+  市場議題仍落在「三句話抓重點」。320×760、390×844、884×900、1280×900 的深／淺色畫面
+  均無水平溢位；螢幕閱讀器實機朗讀仍保留為人工輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 均為
+  `50862ce6…`，`articles` 與 `knowledgeGraph` 逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11
+  預設環境執行 474 tests 全綠；research queue、radar、method audit、knowledge graph lint 均為
+  0 errors（queue 保留 8 warnings）。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48ae…`、`research.html` `f758c474…`。
+
 ## 清單問題一路延續到文章首屏 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic／正式筆記／多空 Markdown、正文、

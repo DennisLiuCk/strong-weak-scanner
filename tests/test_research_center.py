@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 16)
+        self.assertEqual(library["learningPathVersion"], 17)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1228,7 +1228,10 @@ class ResearchCenterTest(unittest.TestCase):
             "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
             "function focusReadingTarget(", "function focusBeginnerHighlights(",
             "function focusReadingMissionSource(", "function renderReadingMission(",
+            "function readingMissionStartsWithRole(", "function focusArticleRoleContext(",
+            "function focusReadingMissionStart(",
             "reading-mission-grid", "'data-testid':'reading-mission-start'",
+            "'data-reading-start':roleFirst?'role':'source'", "先看產業角色",
             "開始讀三句重點", "先抓住一個重點，再帶著問題讀",
             "先抓住這個重點", "讀完能回答", "為什麼值得讀",
             "lead=(mission.keyPoints||[]).find(Boolean)||mission.orientation",
@@ -1244,6 +1247,7 @@ class ResearchCenterTest(unittest.TestCase):
             ".article-learning-origin{display:none}",
             "function articleGroupGuideRows(", "function renderArticleRoleContext(",
             "'data-testid':'article-role-context'", "article-role-context",
+            "'data-testid':'article-role-next'", "article-role-next",
             "function articleRoleCard(", "function articleRoleGrid(",
             "'data-testid':'article-role-card-'", "article-role-grid",
             "'aria-labelledby':titleId", "角色說明",
@@ -1310,7 +1314,7 @@ class ResearchCenterTest(unittest.TestCase):
             "繼續第 '+card.routeStep+'/'+card.routeTotal+' 站",
             "text:'回看本篇'+sourceLabel",
             "review.addEventListener('click',()=>focusReadingMissionSource(article,'review'))",
-            "start.addEventListener('click',()=>focusReadingMissionSource(article,'start'))",
+            "start.addEventListener('click',()=>focusReadingMissionStart(article))",
             "target.focus();requestAnimationFrame",
             "window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-120",
             ".learning-checkpoint-hints>summary{min-height:44px}",
@@ -1439,6 +1443,30 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("function hashArticleId()", template)
         self.assertIn("url.hash=article.id", template)
         self.assertNotIn("github.com/DennisLiuCk/strong-weak-scanner/blob/main/notes/qualitative/8261", template)
+
+    def test_formal_and_narrative_reading_actions_do_not_skip_industry_role_context(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function readingMissionStartsWithRole(article)",
+            "article?.type==='formal_note'||article?.type==='narrative'",
+            "articleGroupGuideRows(article).length>0",
+            "function focusArticleRoleContext()",
+            "document.querySelector('.article-role-context h2')",
+            "function focusReadingMissionStart(article)",
+            "if(readingMissionStartsWithRole(article)){focusArticleRoleContext();return}",
+            "focusReadingMissionSource(article,'start')",
+            "'data-reading-start':roleFirst?'role':'source'",
+            "text:roleFirst?'先看產業角色'",
+            "'data-testid':'article-role-next'",
+            "String(mission.startLabel||'開始讀正文').replace(/^開始/,'接著')",
+            "角色看完後，再回到同篇原文檢查證據。",
+            "action.addEventListener('click',()=>focusReadingMissionSource(article,'start'))",
+            ".article-role-next .reading-mission-start{width:100%;min-height:44px}",
+        ):
+            self.assertIn(contract, template)
+        # 市場議題仍先去既有三句重點；沒有正式族群指南時也直接退回原來源段落。
+        self.assertIn("focusReadingMissionSource(article,'start')", template)
+        self.assertNotIn("article.roleFirst=", template)
 
     def test_template_brings_existing_glossary_terms_to_each_reader_section(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
