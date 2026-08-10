@@ -1,5 +1,61 @@
 # Changelog
 
+## 升格文章「為什麼重要」改為主句先行 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+證據判定與複核時鐘零變動**；本次只改寫兩篇已升格研究雷達文章的白話導讀，並讓作者明寫的
+段落主句成為可掃讀錨點。
+
+- 1280×720 深色走讀「雷達候選 → 角色問句 → 為什麼重要」發現，角色卡已把被動元件、電源與
+  整櫃責任拆開，下一段卻立即回到四個沒有主句的長段落；讀者必須重新從內文整理情境、常見
+  誤讀、責任與證據邊界，角色脈絡沒有順利接回正常文章。
+- `learningPathVersion` 升為 31。AI 機櫃 EMC 與 AI 儲存資料平面的「為什麼重要」分別改為
+  4 個與 3 個作者明寫的粗體白話主句，並把長複句拆成較短句子；原結論、公司邊界與反證方向
+  保留。renderer 只在粗體確實是段落第一個 run 時加 `data-reader-lead`、青色主句與分隔線，
+  沒有主句的文章維持原樣，不從正文自動摘要。
+- 兩篇各追加 `editorial:reader_led_why_it_matters` 同狀態 transition；baseline lint 證明全部
+  source／claim／comparison／monitor 與鎖定 meta 未變。registry 變動另以 append-only
+  `notes/research_method_reviews/2026-08-10_01.json` 保存 `RMA-2026-08-10-01`，測試判定日同步
+  到 2026-08-10；快照如實保留目前 4 個待回顧 monitor、修正學習 attention 與校準 not-ready，
+  不把可讀性改寫冒充新證據或完成回查。
+- 瀏覽器實測 EMC 文章顯示 4 個主句、儲存文章顯示 3 個，深色與淺色
+  `documentScrollWidth == innerWidth == 1280`；直接文章 deep link 不虛構雷達來處。修改前後畫面
+  留在 `tmp/research-learning-audit-2026-08-10-wave68/`。本輪未涵蓋實機手機、實體鍵盤、
+  螢幕閱讀器與完整 WCAG 對比量測，仍保留為人工裝置／輔具驗收項目。
+- 相對 `HEAD`，payload 頂層只改 `learningPathVersion` 與新 method audit；文章只改上述兩篇的
+  `sections` 與由「為什麼重要」首段逐字擷取的 `readingMission.orientation`，文章數與 ID 零
+  變動。`Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 478 tests 全綠；qual notes、
+  leading hypotheses、research radar、method audit、knowledge graph lint 均通過，research
+  queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `22a4a01ea531116a58881d2176b2ded7cfe19049523ca1dbc3a4a215d690fbfb`。
+
+## 雷達族群問句帶進原升格文章 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、候選排序、證據與研究進度零變動**；本次只把研究雷達既有的族群分工問題帶到
+同一候選自己的升格文章，補齊新手從選題進文後遺失的一層脈絡。
+
+- 1280×720 深色走讀「雷達第 1 題 → 已升格 EMC 文章 → 產業角色」發現，候選卡已分別問清
+  被動元件、電源供應與整櫃組裝要驗證什麼，進文後三張角色卡卻只剩通用族群介紹；新手必須
+  自己重新把三個角色接回本題，容易把一般角色與這次研究責任混在一起。
+- `learningPathVersion` 升為 30。前端只在 origin 為 `radar`、candidate 可解析，且
+  `candidate.articleId === article.id` 時，把同一候選既有 `readerGroupQuestions` 逐字放到相符
+  角色卡；通用角色與混淆邊界仍沿用正式族群指南。直接文章 deep link 與沿路線切到下一站都
+  顯示 0 張雷達問句卡，不把前一題脈絡套到另一篇文章，也不新增或改寫研究 payload。
+- 1280×720 深色與淺色瀏覽器實測，原升格文章顯示 3 張問句卡且全文可見，
+  `documentScrollWidth == innerWidth == 1280`；直接 deep link 與下一站各為 0 張。修改前後及
+  淺色畫面留在 `tmp/research-learning-audit-2026-08-10-wave67/`。本輪以固定桌機 viewport、
+  瀏覽器語意樹與程式化焦點／入口檢查為證據，未涵蓋實機手機、實體鍵盤與螢幕閱讀器，仍保留
+  為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 皆為
+  `50862ce6c16d786e1ee530944eeea7417f5c68c77a1ae2220f129de76ace1018` 且逐項相同。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 477 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue
+  保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `6930ddc24026cfe53f07329ab39d08490e95f4cb4dc960e8375dcb0705bb0d75`。
+
 ## 雷達文章保留原研究問題 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、

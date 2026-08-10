@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 29)
+        self.assertEqual(library["learningPathVersion"], 31)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1251,7 +1251,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function articleRoleCard(", "function articleRoleGrid(",
             "'data-testid':'article-role-card-'", "article-role-grid",
             "'aria-labelledby':titleId", "角色說明",
-            "if(rows.length<=4)section.appendChild(articleRoleGrid(rows))",
+            "if(rows.length<=4)section.appendChild(articleRoleGrid(rows,radarContext))",
             "再比較其餘 ", "一次展開全部角色說明，不必逐一切換",
             ".article-role-more[open]",
             "並列只表示本文同時討論這些族群，不代表上下游、受惠、訂單或投資排序。",
@@ -1279,6 +1279,10 @@ class ResearchCenterTest(unittest.TestCase):
             "beginnerHighlights&&group.heading!=='三句話抓重點'",
             "beginnerFollowup&&group.heading==='三句話抓重點'",
             "beginner-followup", "再補重要性、名詞與追蹤",
+            "function appendBeginnerWhy(parent,items)",
+            "beginnerFollowup&&group.heading==='為什麼重要'",
+            "rendered.dataset.readerLead='true'",
+            ".beginner-why-paragraph.has-reader-lead>strong:first-child",
             ".beginner-highlights+.article-role-context{margin-top:12px}",
             "名詞小字典'+(termCount?'（'+termCount+' 個）':'')",
             "遇到陌生詞再展開，不用一次背完",
@@ -1486,6 +1490,47 @@ class ResearchCenterTest(unittest.TestCase):
         # 市場議題仍先去既有三句重點；沒有正式族群指南時也直接退回原來源段落。
         self.assertIn("focusReadingMissionSource(article,'start')", template)
         self.assertNotIn("article.roleFirst=", template)
+
+    def test_radar_role_questions_only_follow_the_promoted_article_origin(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function articleRadarRoleContext(article)",
+            "if(origin?.kind!=='radar')return null",
+            "candidate.articleId!==article.id",
+            "candidate.readerGroupQuestions||[]",
+            "'data-role-question-source':'radar'",
+            "雷達第 '+radarContext.candidate.rank+' 題要問",
+            "先對回雷達第 '+radarContext.candidate.rank+' 題中各角色要驗證什麼",
+            "逐字取自同一候選，只拆分本題研究責任",
+            "articleRoleGrid(rows,radarContext)",
+            ".article-role-question{margin:0 0 10px",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("article.radarRoleQuestions", template)
+
+    def test_promoted_topics_use_authored_reader_leads_in_why_it_matters(self):
+        expectations = {
+            "2026-08-09_ai_rack_emc_certification.md": (
+                "**先看問題怎麼從單機變成整櫃。**",
+                "**別把元件測試當成整櫃合規。**",
+                "**再拆開每一層的責任。**",
+                "**最後用三個責任盒查證。**",
+            ),
+            "2026-08-09_ai_storage_data_plane.md": (
+                "**先分清三條資料流。**",
+                "**每條路徑卡住的方式不同。**",
+                "**最後才把需求接回公司。**",
+            ),
+        }
+        for filename, leads in expectations.items():
+            source = (ROOT / "notes" / "research_topics" / filename).read_text(
+                encoding="utf-8"
+            )
+            why = source.split("### 為什麼重要", 1)[1].split(
+                "### 接下來怎麼追", 1
+            )[0]
+            for lead in leads:
+                self.assertIn(lead, why)
 
     def test_template_brings_existing_glossary_terms_to_each_reader_section(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
