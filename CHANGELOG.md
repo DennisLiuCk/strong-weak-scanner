@@ -1,5 +1,29 @@
 # Changelog
 
+## 雷達文章保留原研究問題 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、候選排序、證據與研究進度零變動**；本次只補上已升格雷達候選進文後的
+工作階段導覽脈絡。
+
+- 走讀「研究雷達候選題 → 已升格文章 → 返回雷達」發現，候選卡原本已說明順序只是研究資源
+  安排，但按下「閱讀研究」後這個邊界完全消失；文章也沒有顯示原白話問題或返回同一候選卡的
+  行動，讀者容易把雷達名次誤讀成受惠或投資排序。
+- `learningPathVersion` 升為 29。已升格文章按鈕補上既有閱讀時間，開文時只在前端保存正式
+  candidate ID、雷達與 window 捲動位置；文章頁首、行動版返回鈕與閱讀末端會顯示原第 N 題、
+  同一白話問句與非投資排名邊界。返回恢復同一候選卡位置與鍵盤焦點；一般文章清單與直接文章
+  deep link 不顯示雷達來處，也不把導覽狀態寫進研究 payload。
+- 884×863 in-app browser 深色實測，文章來處完整可見、`documentScrollWidth == innerWidth`；返回後
+  雷達捲動位置恢復為 309.5px，焦點回到同一候選卡。淺色狀態與直接文章 deep link 另行走讀，
+  前者保留相同導覽，後者維持「返回研究清單」。修改前後畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave66/`；本輪未涵蓋實機手機、實體鍵盤與螢幕閱讀器，
+  仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 皆為
+  `50862ce6…` 且逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 476 tests 全綠；
+  qual notes、leading hypotheses、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48ae…`、`research.html` `066388ae…`。
+
 ## 圖譜關係解讀改為單一捲動 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、

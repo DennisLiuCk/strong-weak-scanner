@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 28)
+        self.assertEqual(library["learningPathVersion"], 29)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1330,6 +1330,11 @@ class ResearchCenterTest(unittest.TestCase):
             "originContext?.mobileBackLabel||'返回研究清單'",
             "selectArticle(value,false,null)",
             ".article-learning-origin", ".learning-origin-return",
+            "origin.kind==='radar'", "研究雷達第 '+candidate.rank+' 題",
+            "只表示研究資源安排",
+            "該題已升格為文章",
+            "返回會保留同一張候選卡與閱讀位置",
+            "radarPage?.scrollTo({top:Math.max(0,origin.radarScrollTop||0)",
             "只表示路線收錄，不代表上下游或受惠排序",
             "maturity-reading-key", "先選一個想弄懂的問題",
             "這頁的「完成度」怎麼看？", "maturityRouteCards",
@@ -2062,6 +2067,9 @@ class ResearchCenterTest(unittest.TestCase):
             "candidate.readerQuestion", "candidate.readerNextStep",
             "candidate.readerTerms", "questionText=candidate.readerQuestion||candidate.title",
             "這題想弄清楚", "研究題名：", "接著查什麼", "關鍵詞白話解釋",
+            "function radarArticleOrigin(", "function openRadarArticle(",
+            "radarScrollTop:page?.scrollTop||0", "openRadarArticle(candidate)",
+            "閱讀已升格文章 · '+article.readingMinutes+' 分鐘",
             ".radar-head-copy", ".radar-technical-title",
             "candidate.groupIds", "candidate.readerGroupQuestions",
             "function renderRadarGroups(",
