@@ -56,6 +56,14 @@ reason: editorial_plain_language_wave5_power_system_learning_no_conclusion_chang
 evidence: editorial:plain_language_wave5
 -->
 
+<!-- transition
+date: 2026-08-10
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave81_protection_roles_no_conclusion_change
+evidence: editorial:plain_language_wave81_protection_roles
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -71,31 +79,44 @@ evidence: editorial:plain_language_wave5
 - **Diablo 400**：OCP 的機架與電源規格專案，列出 400／800V 系統需求；它不是單一供應商的量產產品。
 - **eFuse（電子保險絲）**：用功率開關、感測與控制快速限制或切斷異常電流；功能與一次性熔絲、hot-swap 或備援儲能不同。
 - **CBU（Capacitor Bank Unit）**：靠近機架、以電容處理快速功率波動的儲能模組；它不負責取代故障隔離或人身安全保護。
+- **絕緣距離（creepage／clearance）**：帶電零件之間沿表面與穿過空氣必須保留的安全距離，用來降低電弧、漏電或擊穿風險。
+- **保護接地與漏電（protective earthing／leakage current）**：前者替異常電流提供安全流向，後者檢查不該流出的電流；兩者都不是只靠切斷大電流就能處理。
+- **湧入電流／預充（inrush／pre-charge）**：設備剛接上電源時，大電容會瞬間吸收很大的電流；預充會先限制這股電流，再讓設備正式接通。
+- **參考設計（reference design）**：供應商公開的可行電路與元件組合，用來示範一種做法；不等於客戶已採用或量產。
+- **樣品板（sampling board）**：供測試與評估的早期電路板；可運作不等於已通過客戶驗證或進入量產。
+- **量產材料清單（production BOM）**：量產產品實際採用的零件與材料清單；比規格、展示板或規劃更接近真實採購。
+- **客戶資格驗證（qualification）**：客戶依自己的安全、可靠度與系統條件測試產品是否可用；通過後仍不等於已大量出貨。
+- **監測資料（telemetry）**：設備持續回報的電壓、電流、溫度、故障與狀態資料；只有數值而沒有後續動作，還不能形成完整的保護流程。
+- **故障與處置對照表（fault matrix）**：把每種故障、偵測方式、處置裝置、反應時間與隔離範圍對在一起的表格。
 
 ### 三句話抓重點
 
-- OCP Diablo 400 的 safety requirements 把 live-access interlock、creepage／clearance、overcurrent、protective earthing、leakage current 與 ground-fault detection 分別列出，顯示 800V rack 不是靠單一元件承擔全部風險。
-- TI 把 800V hot-swap 定義為 input power protection 並與 DC/DC、末端轉換及 CBU 分列；Infineon 的 400／800V reference design 又把可程式化 inrush control、SiC JFET 與 12kW sampling board 具體化。
-- 這些資料足以建立保護責任圖，不能直接證明台灣 power、powersupply 或 passive 公司已進入 production BOM、具有共同 telemetry schema、取得訂單或形成可辨識獲利。
+- OCP Diablo 400 規格把人員接近高壓、絕緣與接地、過大電流及漏電等風險分開規定，表示 800V 機櫃不能只靠一種保護方式。
+- TI 與 Infineon 的公開設計顯示，帶電插入設備時還要先限制湧入電流，再安全接通或隔離；這和長時間備援、接地或人員防護是不同責任。
+- 目前證據只足以畫出誰負責什麼，尚不能證明台灣功率元件、電源供應或被動元件公司已進入量產材料清單、取得訂單或形成可辨識獲利。
 
 ### 為什麼重要
 
-「800V 保護需求增加」若沒有故障模型，幾乎沒有公司研究價值。人員接近帶電部位、導體過流、
-絕緣或接地故障、插拔時對大電容充電，以及停電時維持運作，是不同事件；它們可能分別由
-機構／連鎖、被動斷路、感測與主動開關、hot-swap／eFuse、CBU／BBU 處理。把這些層混成
-「保護元件」會重複計算 BOM，也會把 reference board 的技術能力誤寫成量產訂單。
+**先問要保護的是誰、遇到什麼事。** 人員接近帶電部位、導體過流、絕緣或接地故障、設備帶電
+插入時替大電容充電，以及停電時維持運作，是五種不同事件。
+
+**再把每個事件交給不同保護責任。** 安全連鎖先保護人員，斷路與主動開關處理異常電流，
+不停機更換與電子保險絲控制接通，電容與電池備援則維持短暫供電；它們可以合作，但不能互相取代。
+
+**最後才談公司與元件價值。** 把所有責任混成「保護元件」，會重複計算量產材料清單，也會把
+供應商參考設計的技術能力誤寫成客戶量產訂單。
 
 ### 接下來怎麼追
 
-- 追 OCP／平台的 fault matrix 是否把每個 fault、偵測時間、斷電範圍、interlock、grounding 與 service procedure 對齊。
-- 追 800V hot-swap／eFuse 從 reference design 推進到具名 platform qualification、production deployment、field fault log 與維修閉環。
-- 追台灣相關族群是否由客戶與公司申報雙向確認具名 protection product、額定、測試、量產、收入及毛利。
+- 追 OCP 或平台規格是否把每種故障、偵測時間、斷電範圍、安全連鎖、接地與維修程序對齊。
+- 追 800V 不停機更換與電子保險絲，是否從參考設計推進到具名平台的客戶資格驗證、實際量產、現場故障紀錄與維修閉環。
+- 追台灣相關公司是否由客戶文件與公司申報雙向確認具名保護產品、額定規格、測試、量產、收入及毛利。
 
 ### 想一想
 
-- 保險絲能切斷大故障電流，是否也能安全控制設備插入時對 bulk capacitor 的預充軌跡？
-- Hot-swap 能限制湧入電流，是否就能取代 interlock、protective earthing 或 ground-fault detection？
-- 若 telemetry 只有控制器功能清單、沒有共同事件欄位與維修動作，它能否被當成獨立商業價值？
+- 保險絲可以切斷過大的故障電流，但設備帶電插入時，大電容也會瞬間吸收電流；為什麼還要先限流再接通？
+- 不停機更換功能能限制湧入電流，是否就能取代安全連鎖、保護接地或接地故障偵測？
+- 如果監測資料只有數值與故障清單，沒有規定發生事件後要隔離哪裡、怎麼維修，能否成為獨立產品價值？
 
 ## 主張與證據帳本
 
@@ -299,42 +320,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
-## Fault map：先問誰或什麼要被保護
+## 先分清楚：保護誰、發生什麼事、誰來處理
 
-| 責任層 | 主要事件 | 本輪證據 | 不能被它取代 |
+| 保護責任 | 主要事件 | 目前證據說了什麼 | 仍需要其他保護處理 |
 |---|---|---|---|
-| Accessibility／interlock | 人員接近帶電高壓部位或維修開蓋 | OCP 要求帶電 PS2 以上部位不可接近，必要時先 interlock／斷電 | overcurrent、ground-fault、inrush control、ride-through |
-| Creepage／clearance、earthing、leakage | 絕緣距離、機殼／保護地故障路徑與漏電 | OCP 分列 spacing、bonding、leakage limits | hot-swap 或單一主動開關 |
-| Overcurrent／ground-fault | 導體過流、短路或電流錯誤流向地／機殼 | OCP 要求 output overcurrent 與 ground-fault detection | 人員 interlock、controlled pre-charge、backup energy |
-| Hot-swap／inrush | 帶電插拔、bulk capacitance 預充、快速隔離 power path | TI 定義 input protection；Infineon reference design 依 SOA 控制 inrush | creepage、earthing、完整 fault coverage 或長時備援 |
-| CBU／BBU ride-through | 快速功率波動、停電跨越或受控停機 | TI 把 CBU 與 hot-swap 分列；既有 OCP power-buffering 研究另有時間尺度 | fault isolation、interlock 與接地保護 |
+| 人員與維修安全（安全連鎖） | 人員接近帶電高壓部位或維修開蓋 | OCP 要求高風險帶電部位不可直接接近，必要時先由安全連鎖斷電 | 過大電流、接地故障、插入限流與停電備援仍須分開處理 |
+| 絕緣、接地與漏電 | 帶電零件距離不足、電流流向機殼或保護地，以及不正常漏電 | OCP 分別規定絕緣距離、接地連接與漏電上限 | 不停機更換功能或單一主動開關不能取代這些責任 |
+| 過大電流／接地故障 | 導體過流、短路，或電流錯誤流向地面與機殼 | OCP 要求輸出過流保護與接地故障偵測 | 人員安全連鎖、預先限流與備援儲能仍須另外處理 |
+| 帶電插拔／湧入電流 | 設備帶電插入時替大電容預充，並在異常時快速隔離電力路徑 | TI 把它列為輸入電力保護；Infineon 參考設計依開關的安全工作範圍控制湧入電流 | 絕緣、接地、完整故障處理或長時間備援不能被它取代 |
+| 電容／電池備援 | 快速功率波動、短暫停電或受控停機 | TI 把電容備援與帶電插拔保護分開；既有 OCP 功率緩衝研究再依持續時間區分 | 故障隔離、人員安全連鎖與接地保護仍須另外處理 |
 
-這張表把「誰被保護、哪一種故障、要多快動作」放在元件名稱之前。同一個 controller 或
-module 可能整合多項功能，但整合不代表責任消失；反過來，一項 requirement 也可能由多顆
-元件與機構共同完成。因此，元件價值量必須由 production topology 與 qualification 重建，
-不能把 requirement 數量直接當成 BOM 顆數。
+這張表先分「誰被保護、發生什麼事、要多快動作」，再看需要哪些元件。同一個控制器或模組
+可能整合多項功能，但整合不代表責任消失；反過來，一項安全要求也可能由多顆元件與機構共同完成。
+因此，元件價值仍要由量產電路架構與客戶資格驗證重建，不能把規格要求的項目數直接當成材料清單顆數。
 
-## Telemetry 為什麼先併入保護層
+## 為什麼監測資料暫時仍屬於保護功能
 
-Infineon 的 48V eFuse 發布已列出 voltage、current、energy、power、faults 與 anomalies 等
-real-time telemetry；800V 產品頁也把 monitoring 列為功能方向。然而本輪沒有找到跨平台共同
-event schema、timestamp、fault action、retention、site log 與維修決策契約。因此 telemetry
-目前只作 protection monitor 的一部分，不另建「AI 電源監控」商業題材；待 OCP／買方把
-欄位與 action contract 固定後再評估是否獨立升格。
+Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率、故障與異常等即時監測值，
+800V 產品頁也把監測列為功能方向。然而本輪尚未找到跨平台共用的事件格式、時間戳記、故障後
+動作、資料保存、現場紀錄與維修決策契約。因此，監測資料目前只視為保護流程的一部分，不另建
+「AI 電源監控」商業題材；等 OCP 或買方把欄位與後續動作固定後，再評估是否具有獨立價值。
 
-## 分析師如何使用這張圖
+## 怎麼用這張表判讀公司新聞
 
-1. **先建立 fault matrix**：列出 fault、偵測器、清除裝置、反應時間、隔離範圍與 fail-safe 狀態。
-2. **分清 requirement 與產品階段**：OCP requirement、reference design、sampling、qualification、production deployment 不能混成一級。
-3. **再做 BOM 與公司映射**：只有同一 platform 的 topology、part number、客戶驗證與供應商申報對齊後，才談份額與財務。
-4. **把 telemetry 綁到動作**：只有量測值、事件欄位與隔離／維修決策形成閉環，才有獨立知識價值。
+1. **先列出故障與處置對照表**：寫下每種故障、偵測器、清除裝置、反應時間、隔離範圍與安全失效狀態。
+2. **分清規格與產品階段**：OCP 規格、供應商參考設計、樣品、客戶資格驗證與實際量產不能混成同一級。
+3. **再對回量產材料清單與公司**：只有同一平台的電路架構、料號、客戶驗證與供應商申報對齊後，才能討論份額與財務。
+4. **把監測資料綁到實際動作**：量測值與事件欄位還要連到隔離或維修決策，形成閉環後才有獨立知識價值。
 
 ## 研究判定
 
-- **可保留的結論**：800V protection 至少包含人身／維修、絕緣接地、故障電流與 hot-swap／inrush 等不同責任；三條一手來源鏈能重建基本 fault map。
-- **可信度為中而不是高**：OCP 是 requirement，TI／Infineon 是供應商架構與 sampling reference design；仍缺共同 production fault matrix 與 field data。
-- **不得發布的結論**：保護元件顆數倍增、指定 SiC／Si／被動元件或台廠勝出、共同 telemetry 商業價值、訂單／收入／毛利及市場是否已反映。
-- **升格條件**：具名 production platform 公布完整 protection topology、qualification、fault log、service action 與 BOM，並由台灣公司申報交叉確認財務分母。
+- **目前可保留的結論**：800V 保護至少包含人身與維修、絕緣與接地、故障電流，以及帶電插拔與湧入電流等不同責任；三條一手來源鏈足以重建基本的故障與處置對照表。
+- **可信度為中而不是高**：OCP 提供系統規格，TI 與 Infineon 提供供應商架構、樣品與參考設計；目前仍缺共用的量產故障處置表與現場資料。
+- **目前不能發布的結論**：保護元件顆數倍增、指定 SiC／Si／被動元件或台灣公司勝出、監測資料已形成獨立商業價值，以及已取得訂單、收入或毛利。
+- **需要看到什麼才能前進**：具名量產平台公布完整保護電路架構、客戶資格驗證、故障紀錄、維修動作與材料清單，再由台灣公司申報交叉確認財務分母。
 
 ## 來源
 

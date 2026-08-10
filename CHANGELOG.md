@@ -1,5 +1,38 @@
 # Changelog
 
+## 800V 保護第二站先分保護對象與事件 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+impact、證據判定與複核時鐘零變動**；本次只改寫既有 800V 保護市場議題的讀者層文字、
+發布 payload 與對應測試，不改變原研究結論。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第二站」固定走讀發現，頁名雖已說明保護不能只靠
+  保險絲，但首屏把 `safety requirements`、`live-access interlock`、`creepage／clearance`、
+  `protective earthing`、`leakage current` 與 `ground-fault detection` 同時交給新手；反思題又以
+  `bulk capacitor` 與「預充軌跡」表達，讀者必須先翻譯名詞，才能理解保護責任。
+- `learningPathVersion` 升為 44。文章改成先分「保護誰、發生什麼事、誰來處理」，再介紹技術
+  名稱；三句重點、重要性、追蹤方法、反思題、五列責任表與表後判讀均改為中文概念先行。名詞
+  小字典由 11 項增為 20 項，並新增同日純編輯 transition；OCP、TI、Infineon 的原角色、公司映射、
+  商業階段與證據限制均保留。
+- 320／390／780／884／1280px 固定 iframe 契約皆有
+  `documentElement.scrollWidth == innerWidth`；320／390px 四欄責任表完整重排為具欄名卡片，780px
+  起維持原生 table row／cell。桌機、390px、深色與淺色均完成目視走讀；「湧入電流／預充」名詞
+  速查顯示 1／20 的精確定義，關閉後焦點回到原按鈕。這些是 deterministic viewport 契約，不是
+  抽樣統計，SE／t／有效獨立觀測不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體
+  鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；相對前版改動第二站
+  `topic-MI-2026-08-03-800VDC-PROTECTION-LAYERS`，並由建置器同步更新第一站文章的下一站問句／
+  閱讀時間、知識圖譜 `learningRoutes` 與 `learningPathVersion: 43 → 44`。排除版本後 canonical
+  payload SHA 由 `fc7e797773308701c0a48f1169c70ce0f621abf6b910177c3ef14d7d2e18cc45` 變為
+  `d4553d02469ab40bec6276073fd1cce061c542e2261cf3db22a860108816aee9`。方法 registry fingerprint
+  維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增 append-only
+  方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 485 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `19e8eb6fecf119a5498ca7762fa2765c46986c28bb6f43fb7a14491e8a629bcf`。
+
 ## 800V 第一站改用中文概念解釋電力轉換 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、

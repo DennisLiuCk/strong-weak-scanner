@@ -1610,6 +1610,24 @@ class ReadabilityGateTest(unittest.TestCase):
             text,
         )
 
+    def test_800v_protection_article_starts_from_people_events_and_actions(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-03_800vdc_protection_layers.md"
+        text = path.read_text(encoding="utf-8")
+        self.assertNotIn("bulk capacitor 的預充軌跡", text)
+        self.assertNotIn("## Fault map：先問誰或什麼要被保護", text)
+        self.assertIn(
+            "保險絲可以切斷過大的故障電流，但設備帶電插入時",
+            text,
+        )
+        self.assertIn(
+            "## 先分清楚：保護誰、發生什麼事、誰來處理",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave81_protection_roles",
+            text,
+        )
+
     def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):
         body = self.LEAD + "- active claim 已進入 watch，對應 H1。\n"
         result, errors, _ = self._run(
