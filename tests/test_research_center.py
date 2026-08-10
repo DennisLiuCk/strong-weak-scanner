@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 36)
+        self.assertEqual(library["learningPathVersion"], 41)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1251,7 +1251,8 @@ class ResearchCenterTest(unittest.TestCase):
             "function articleRoleCard(", "function articleRoleGrid(",
             "'data-testid':'article-role-card-'", "article-role-grid",
             "'aria-labelledby':titleId", "角色說明",
-            "if(rows.length<=4)section.appendChild(articleRoleGrid(rows,radarContext))",
+            "if(radarContext)section.append(articleRoleQuestionGrid(rows,radarContext),articleRoleGuideFold(rows))",
+            "else if(rows.length<=4)section.appendChild(articleRoleGrid(rows))",
             "再比較其餘 ", "一次展開全部角色說明，不必逐一切換",
             ".article-role-more[open]",
             "並列只表示本文同時討論這些族群，不代表上下游、受惠、訂單或投資排序。",
@@ -1471,6 +1472,29 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("url.hash=article.id", template)
         self.assertNotIn("github.com/DennisLiuCk/strong-weak-scanner/blob/main/notes/qualitative/8261", template)
 
+    def test_mobile_reading_mission_puts_the_start_action_before_the_reflection_question(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "'data-mission-question':'reflection'",
+            "desktopFollowup=roleFirst?",
+            "mobileFollowup=roleFirst?'先看產業角色；下方問題留作讀後檢查。':"
+            "'先讀三句重點；下方問題留作讀後檢查。'",
+            "reading-mission-followup-desktop",
+            "reading-mission-followup-mobile",
+            ".reading-mission{display:flex;flex-direction:column;padding:12px 13px 10px}",
+            ".reading-mission-grid{display:contents}",
+            ".reading-mission-item:first-child{order:1}",
+            ".reading-mission-actions{order:2",
+            ".reading-mission-item[data-mission-question=\"reflection\"]{order:3;margin-top:8px}",
+            ".reading-mission-followup-desktop{display:none}",
+            ".reading-mission-followup-mobile{display:inline}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn(
+            '.reading-mission-item[data-mission-question="reflection"]{display:none}',
+            template,
+        )
+
     def test_reader_surfaces_existing_conclusion_boundary_before_technical_detail(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
@@ -1555,21 +1579,33 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("focusReadingMissionSource(article,'start')", template)
         self.assertNotIn("article.roleFirst=", template)
 
-    def test_radar_role_questions_only_follow_the_promoted_article_origin(self):
+    def test_promoted_topic_role_questions_follow_the_article_across_entry_paths(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
             "function articleRadarRoleContext(article)",
-            "if(origin?.kind!=='radar'&&origin?.kind!=='maturity-radar')return null",
-            "candidate.articleId!==article.id",
+            "originCandidate?.articleId===article.id?originCandidate:",
+            "directCandidates=(RADAR.candidates||[]).filter(item=>item.articleId===article.id",
+            "directCandidates.length===1?directCandidates[0]:null",
             "candidate.readerGroupQuestions||[]",
+            "function articleRoleQuestionGrid(rows,radarContext)",
+            "'data-testid':'article-role-question-'",
             "'data-role-question-source':'radar'",
-            "雷達第 '+radarContext.candidate.rank+' 題要問",
-            "先對回雷達第 '+radarContext.candidate.rank+' 題中各角色要驗證什麼",
-            "逐字取自同一候選，只拆分本題研究責任",
-            "articleRoleGrid(rows,radarContext)",
-            ".article-role-question{margin:0 0 10px",
+            "text:'本文先問'",
+            "function articleRoleGuideFold(rows)",
+            "需要背景？再看平常角色與界線",
+            "完整保留 '+rows.length+' 個族群的通用說明",
+            "先分清：本文每個族群要回答什麼？",
+            "先把本文問題分給各角色；需要背景時，再展開平常職責與最容易混淆的界線。",
+            "articleRoleQuestionGrid(rows,radarContext),articleRoleGuideFold(rows)",
+            "個問句逐字取自同一篇升格前的研究雷達候選",
+            ".article-role-question-grid{display:grid",
+            ".article-role-guide-fold>summary{min-height:44px",
         ):
             self.assertIn(contract, template)
+        self.assertNotIn(
+            "if(origin?.kind!=='radar'&&origin?.kind!=='maturity-radar')return null",
+            template,
+        )
         self.assertNotIn("article.radarRoleQuestions", template)
 
     def test_promoted_topics_use_authored_reader_leads_in_why_it_matters(self):
@@ -1773,6 +1809,7 @@ class ResearchCenterTest(unittest.TestCase):
             "body.focus-mode .filters,body.focus-mode .tools{display:none}",
             "body.focus-mode .catalog{display:none}",
             "body.focus-mode .reader-inner{max-width:1180px",
+            "body.focus-mode .reader-inner{grid-template-columns:minmax(0,1fr);max-width:720px;gap:0}",
             "localStorage.getItem('researchFocusMode')",
             "localStorage.setItem('researchFocusMode'",
             "focusToggleButton.setAttribute('aria-pressed'",
@@ -1784,6 +1821,12 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, template)
         self.assertIn("@media(min-width:781px){", template)
         self.assertIn(".focusbtn{display:none}", template)
+        self.assertGreater(
+            template.index(
+                "body.focus-mode .reader-inner{grid-template-columns:minmax(0,1fr);max-width:720px;gap:0}"
+            ),
+            template.index("body.focus-mode .reader-inner{max-width:1180px"),
+        )
 
     def test_template_outline_scroll_spy_tracks_reader_and_window_scroll(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2216,7 +2259,10 @@ class ResearchCenterTest(unittest.TestCase):
             "這題想弄清楚", "研究題名：", "接著查什麼", "關鍵詞白話解釋",
             "function radarArticleOrigin(", "function openRadarArticle(",
             "radarScrollTop:page?.scrollTop||0", "openRadarArticle(candidate)",
-            "閱讀已升格文章 · '+article.readingMinutes+' 分鐘",
+            "function radarReaderStatusLabel(candidate)",
+            "promoted:'已有文章與關係圖'", "watch:'等待更多證據'",
+            "研究順序 '+candidate.rank", "只排研究待辦，不是股票或投資排名",
+            "閱讀這題的文章 · '+article.readingMinutes+' 分鐘",
             ".radar-head-copy", ".radar-technical-title",
             "candidate.groupIds", "candidate.readerGroupQuestions",
             "function renderRadarGroups(",
@@ -2232,6 +2278,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, template)
         self.assertNotIn("先用一句話理解", template)
         self.assertNotIn("class:'radar-question'", template)
+        self.assertIn(".radar-card{display:block", template)
+        self.assertIn(".radar-rank{min-height:42px;display:flex;flex-direction:row", template)
         self.assertIn("grid-template-columns:repeat(4,1fr)", template)
 
     def test_radar_group_matrix_keeps_promoted_question_article_and_return_path(self):
@@ -2255,13 +2303,13 @@ class ResearchCenterTest(unittest.TestCase):
             "下方四欄是「'+row.label+'」整體研究盤點，不是本題答案。",
             "origin=renderMaturityOrigin(row);if(origin)readerRow.appendChild(origin)",
             "fromRadar?'start':'center'",
-            ".maturity-origin-wide{grid-column:1/-1",
+            ".maturity-origin-wide{width:auto;grid-column:1/-1",
             "@media(max-width:1000px) and (min-width:781px){.maturity-origin-wide",
             "@media(max-width:780px){.maturity-origin-wide",
             "讀完本題後 · 族群基礎起點",
             "再讀族群基礎",
-            "if(origin?.kind!=='radar'&&origin?.kind!=='maturity-radar')return null",
-            "candidate.articleId!==article.id",
+            "originCandidate?.articleId===article.id?originCandidate:",
+            "item.articleId===article.id",
             "state.articleOrigin?.kind==='maturity-radar'",
             "radarById.get(state.articleOrigin.candidateId)?.articleId!==id",
             "if(state.articleOrigin.kind==='maturity-radar')state.maturityOrigin=null",
@@ -2271,6 +2319,22 @@ class ResearchCenterTest(unittest.TestCase):
             ".maturity-origin .maturity-origin-start",
         ):
             self.assertIn(contract, template)
+        medium_start = template.index(
+            "@media(max-width:1000px) and (min-width:781px){.maturity-origin-wide"
+        )
+        medium_end = template.index(
+            "@media(max-width:780px){.maturity-origin-wide", medium_start
+        )
+        medium_contract = template[medium_start:medium_end]
+        for contract in (
+            ".maturity-reader{border:0;background:transparent;overflow:visible}",
+            ".maturity-reader-head{display:none}",
+            ".maturity-reader-row{grid-template-columns:repeat(2,minmax(0,1fr))",
+            ".maturity-reader-cell:nth-of-type(2n){border-right:0}",
+            ".maturity-reader-cell:nth-last-child(-n+2){border-bottom:0}",
+            ".maturity-reader-cell>small{display:block",
+        ):
+            self.assertIn(contract, medium_contract)
         self.assertNotIn("wrap.prepend(card)", template)
         self.assertLess(
             template.index("'data-testid':'group-radar-start-'+row.id"),

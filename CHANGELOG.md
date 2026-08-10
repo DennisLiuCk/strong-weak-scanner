@@ -1,5 +1,161 @@
 # Changelog
 
+## 市場議題先用本文問句拆角色，通用族群指南改為可展開補充 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、候選與族群資料、原始 Markdown、
+`readingMission`、文章／圖譜映射、來源、claim、comparison、monitor、證據判定與複核時鐘零變動**；
+本次只調整三句重點後的產業角色 renderer、候選問句解析、說明文件與發布版本。
+
+- 固定 390px 走讀 23 分鐘「AI 機櫃 EMC 驗證」發現，三句重點後雖立即顯示本文三個正式族群，
+  但 701px 高的區塊只放通用角色與混淆界線；研究雷達已為同篇登錄「零件層／電源子系統／整櫃
+  送驗」三個本文問句，清單或 deep link 進文時卻完全不顯示，讀者仍要自行把通用介紹對回 EMC。
+- `learningPathVersion` 升為 41。`articleRadarRoleContext()` 現在先接受同一 origin 的精確候選；
+  沒有 origin 時只在目前 article ID **唯一**匹配一個已升格候選時使用，歧義或無匹配都安全退回
+  一般角色卡。候選問句依正式 `groups`／`group_id` 逐字顯示為「本文先問」，不讀正文、不摘要、
+  不沿用前一篇候選，也不替 deep link 虛構雷達題次或返回脈絡。
+- 三個本文問句成為角色區主層；既有 `readerRole／readerBoundary` 完整保留在一個原生
+  `details／summary`，摘要明示「需要背景？再看平常角色與界線」。390px 角色區由 701px 降為
+  520px，縮短 181px；884px 由 417px 降為 361px，縮短 56px。320／390／780／781／884／1280px
+  皆有 `documentElement.scrollWidth == innerWidth`，補充摘要為 49–52px 且預設收合；這些是固定
+  viewport 的 deterministic layout 契約，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 實際驗證直接 deep link 會顯示本文問句但不顯示雷達來處；由研究雷達開文會同時保留真正的返回
+  脈絡；沿路線由第 6/9 站換到第 7/9 站後，前一篇三個 EMC 問句全數消失。正式點擊補充摘要後，
+  三個通用角色 heading、原角色說明與原混淆界線全部出現，狀態切成「收合」。修改前、source／
+  target、正式前後、補充展開與桌機畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave78/`。固定 iframe 不是實機；本輪未涵蓋真機旋轉、
+  完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 本輪相對 wave77 的 payload 只改 `learningPathVersion: 40 → 41`；文章數維持 274，排除版本後
+  canonical payload SHA 維持
+  `1df222fbbfe61c45f9708ecf26d0de5410ed00085aacee9341727083d5fbb189`。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 483 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue 保留
+  8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `7f06d063a515b28b5f6717e2bc7145f23439b91a2d1275da9cedba5c15b52ea9`。
+
+## 手機市場議題先露出起讀行動，完整反思題移到按鈕後 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、候選與族群資料、原始 Markdown、
+`readingMission`、文章／圖譜映射、來源、claim、comparison、monitor、證據判定與複核時鐘零變動**；
+本次只調整手機文章首屏的 renderer 排序、查核警語密度與發布版本。
+
+- 固定 390px 走讀 23 分鐘「AI 機櫃 EMC 驗證」發現，頁首問題與查核警語之後，任務的第一句
+  重點、完整「讀完能回答」反思題都先於主要行動，導致 44px「開始讀三句重點」位於約 y=836；
+  720–844px 高的常見首屏只能看到第一句或按鈕極小一部分。
+- `learningPathVersion` 升為 40。780px 以下現在用 `display: contents` 保留原 DOM／輔助科技
+  閱讀順序，視覺上改成「第一句重點 → 主要行動 → 完整反思題 → 選用輔助」。查核警語同步縮短
+  padding、gap 與次要文字行高；390px 主要行動提前至 y=680，共提前 156px。反思題仍逐字顯示於
+  y=758，沒有 `display:none`、截斷、摘要或第二份 payload。
+- 響應式邊界量測為：320px 行動／反思題 y=753／831、780px 582／660、781px 622／471、
+  884px 622／471、1280px 554／428；所有寬度皆有
+  `documentElement.scrollWidth == innerWidth`。781px 起恢復桌機兩欄，第一句與反思題同列、主行動
+  在兩欄下方。這些是固定 viewport 的 deterministic layout 契約，不是抽樣統計，SE／t／有效
+  獨立觀測不適用。
+- 實際點擊新位置的「開始讀三句重點」後，畫面與鍵盤焦點仍抵達同篇三句重點；三句順序、完整
+  反思題、名詞提示、來源邊界與文末理解檢查都保留。修改前、同畫面 source／target、正式修改後、
+  反思題與桌機畫面留在 `tmp/research-learning-audit-2026-08-10-wave77/`。固定 iframe 不是實機；
+  本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG
+  對比量測。
+- 本輪相對 wave76 的 payload 只改 `learningPathVersion: 39 → 40`；目前相對 Git `HEAD` 的完整
+  payload 也只有版本 `36 → 40`，文章數維持 274。排除版本後 canonical payload SHA 前後均為
+  `1df222fbbfe61c45f9708ecf26d0de5410ed00085aacee9341727083d5fbb189`。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 483 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue 保留
+  8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `9bb471a23da354b3e5cccd7c0545afd886fd306613a41d3b341f5399d449eba7`。
+
+## 中幅族群矩陣改成具欄名的 2×2，雷達承接卡不再溢出 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、候選與族群資料、原始 Markdown、文章／
+圖譜映射、來源、claim、comparison、monitor、證據判定與複核時鐘零變動**；本次只調整由研究
+雷達進入族群矩陣後的 responsive layout、承接卡盒模型與發布版本。
+
+- 用同一個「雷達第 1 題 → 被動元件」狀態量測發現，884px 仍把四個盤點欄壓成
+  `240／220／210／175px`，欄名只在遠處共用表頭；`.maturity-origin-wide` 又以 `width:100%`
+  加左右 margin，造成 830px row 內的承接卡寬 845px，問句、文章或返回行動可能被 row 的
+  `overflow:hidden` 裁切。
+- `learningPathVersion` 升為 39。781–1000px 現在隱藏共用表頭，將同一列四個 cell 改成 2×2，
+  每格直接顯示既有「族群起點、已完成、最大缺口、下一步」欄名；884px 每格寬 415px，選取列
+  由 482px 增為 524px。1000px 為 `473px × 2`，1001px 立即恢復四欄與共用表頭。
+- 雷達承接卡改用 auto width 把外距算進 grid area。884px 由 845px 收進 806px；390px 由
+  368px 收進 348px，為了完整換行高度由 280px 增為 299px。1280px 仍是三欄承接卡與四欄矩陣，
+  780px 以下仍依 DOM 單欄；780／781、1000／1001 邊界及 390／884／1280 均無全頁水平溢出。
+- 實際完成「雷達族群問句 → 矩陣本題文章 → 返回被動元件本題」：文章從頂端開啟，首尾保留
+  原問句；返回後同一矩陣列重新取得焦點、問句與「先讀本題文章」行動仍在。排版沒有改動任何
+  數字、文字、DOM 順序、article ID 或一次性 origin 狀態。
+- 修改前、視覺 mock、正式修改後與各 breakpoint 畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave76/`。固定 iframe 不是實機；本輪未涵蓋真機旋轉、
+  完整實體鍵盤巡覽、螢幕閱讀器、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 本輪相對 wave75 的 payload 只改 `learningPathVersion: 38 → 39`；目前相對 Git `HEAD` 的完整
+  payload 也只有版本 `36 → 39`，文章數維持 274。排除版本後 canonical payload SHA 前後均為
+  `1df222fbbfe61c45f9708ecf26d0de5410ed00085aacee9341727083d5fbb189`。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 482 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue 保留
+  8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `003dbe9148b38b191fa457f00cd3a48dab215f86a5f81c9c010cc4ec5e758d60`。
+
+## 研究雷達把待辦順序與投資排名分開，卡片正文改用完整寬度 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、候選 rank／status、selection log、原始
+Markdown、文章／圖譜映射、來源、claim、comparison、monitor、證據判定與複核時鐘零變動**；
+本次只調整研究雷達候選卡的閱讀層級、顯示翻譯與發布版本。
+
+- 固定 884px、390px iframe 走讀發現，原本的「順序 N」置於 72px／51px 左側直欄，既可能被
+  新手誤讀成股票排名，也把 390px 卡片正文壓到 291px。設計 mock 與同狀態修改前畫面並排後，
+  採用卡頂橫列「研究順序 N · 只排研究待辦，不是股票或投資排名」，正文改用完整卡寬。
+- `learningPathVersion` 升為 38。884px 第一張卡由 635px 降為 581px，正文內寬由 720px 增為
+  792px，三個族群問句可同列；390px 正文內寬由 291px 增為 342px，卡高因新增完整邊界句由
+  910px 微增為 916px。320px、390px、884px、1280px 均有
+  `documentElement.scrollWidth == body.scrollWidth == innerWidth`，水平溢出為 0。這些是固定 viewport
+  的 deterministic layout 契約，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 卡面只把既有 status 顯示翻成「已有文章與關係圖」、「補進既有研究」、「等待更多證據」與
+  「暫緩研究」；已升格文章按鈕改為「閱讀這題的文章 · N 分鐘」。原始 status label、rank 與
+  audit payload 均保留，沒有改寫研究判定。實際點擊第一題後能在文章首尾看到雷達來處，返回時
+  恢復原候選 `radar-RC-AI-RACK-EMC-CERTIFICATION` 的焦點與捲動位置。
+- 深色、淺色與 1280／884／390／320px 完成目視與 DOM 走讀；修改前、設計 mock、正式修改後與
+  量測紀錄留在 `tmp/research-learning-audit-2026-08-10-wave75/`。固定 iframe 不是實機；本輪未
+  涵蓋真機旋轉、完整實體鍵盤巡覽、螢幕閱讀器、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 本輪相對 wave74 的 payload 只改 `learningPathVersion: 37 → 38`；目前相對 Git `HEAD` 的完整
+  payload 也只有版本 `36 → 38`，文章數維持 274。排除版本後 canonical payload SHA 前後均為
+  `1df222fbbfe61c45f9708ecf26d0de5410ed00085aacee9341727083d5fbb189`。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 482 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue 保留
+  8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `55ae6b63426e5537f8df3f6aec6bb6b1fa5357ece873d0077811503e42eeefbe`。
+
+## 窄幅專注閱讀移除已隱藏的大綱空欄 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、來源、
+claim、comparison、monitor、證據判定與複核時鐘零變動**；本次只修正 781–1180px 專注閱讀的
+CSS grid 契約與對應發布版本。
+
+- 固定 884px iframe 走讀 AI 機櫃 EMC 文章發現，`.outline` 雖已隱藏，較高 specificity 的
+  `body.focus-mode .reader-inner` 仍保留 240px 大綱欄與 48px gap；專注閱讀正文因此只有 540px
+  且靠左，畫面右側留下無內容空間。一般 master-detail 狀態則是清單 360px、正文 468px，並非
+  同一根因。
+- `learningPathVersion` 升為 37。`≤1180px` 現在明確把 focus-mode reader grid 改為單欄、
+  `max-width:720px`、`gap:0`；同一 884px 契約量得容器 x=82／720px、正文 x=110／664px，
+  `documentScrollWidth == bodyScrollWidth == innerWidth == 884`。這是單一 deterministic viewport
+  契約，不是抽樣統計，SE／t／有效獨立觀測不適用；獨立 CSS 算式
+  `720 - 2×28 = 664` 與 `(884 - 720) / 2 = 82` 和瀏覽器量測一致。
+- 1280px 專注閱讀仍維持 `836px 240px` 雙欄與 48px gap，右側大綱可見；關閉專注閱讀後 884px
+  仍還原清單／文章雙欄。正文中段的浮動名詞速查右緣為 88px，置中文章左緣為 110px，相隔
+  22px，畫面不再壓住本文。深色、淺色、返回清單與正文中段均完成本輪目視檢查。
+- 修改前後、寬幅與名詞速查畫面留在 `tmp/research-learning-audit-2026-08-10-wave74/`。884px 是
+  固定 iframe 契約，不是實機；本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、螢幕閱讀器、200%／400%
+  zoom 與儀器化 WCAG 對比量測。
+- 相對 Git `HEAD`，payload 頂層只改 `learningPathVersion: 36 → 37`；文章數維持 274，排除版本後
+  canonical payload SHA 前後均為
+  `1df222fbbfe61c45f9708ecf26d0de5410ed00085aacee9341727083d5fbb189`。`Darwin 25.5.0 arm64`、
+  Python 3.11.11 預設環境執行 482 tests 全綠；qual notes、leading hypotheses、research radar、
+  method audit、knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次
+  dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `cfa1f4d0effaaf37fd119a39e0a9118c3517b6c6d08dccfac614de4130df2710`。
+
 ## 文末關聯依實際閱讀欄重排且可穿越原搜尋 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、來源、
