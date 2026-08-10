@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 41)
+        self.assertEqual(library["learningPathVersion"], 42)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1892,6 +1892,7 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-reader-sentences':sentenceCount",
             "text.length>=120&&sentenceCount>=2",
             "{readableProse:mode==='reader',textTransform}",
+            "@container (max-width:860px){.reader-prose-dense .reader-sentence-break{display:block;height:.45em}}",
             ".reader-prose-dense .reader-sentence-break{display:block;height:.55em}",
             "class:'reader-sentence-break','aria-hidden':'true'",
             ".evidence-row{min-width:0",

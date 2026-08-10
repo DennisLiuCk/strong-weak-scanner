@@ -1,5 +1,34 @@
 # Changelog
 
+## 寬螢幕長段落改依正文寬度保留句子停頓 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、來源、
+claim、comparison、monitor、證據判定與複核時鐘零變動**；本次只把既有長段落視覺停頓由
+viewport 判斷改成正文容器判斷，並同步說明文件與發布版本。
+
+- 固定 1280×720 走讀 31 分鐘「液冷 CDU 額定容量」市場議題發現，表後 161 字、3 句的結論
+  位在 836px 專注閱讀欄，卻因整體 viewport 大於 1180px 而把兩個既有零文字停頓隱藏；「只有
+  容量可比／供應標籤不能換成量產率／公司財務仍不可比」因此重新黏成單一文字塊。390px 同篇
+  已有自然的三句停頓，可直接作為既有設計目標，不需新增摘要或改寫研究文字。
+- `learningPathVersion` 升為 42。`.article-section` 原本已有 inline-size container；現在內容欄
+  不超過 860px 時顯示既有 `reader-sentence-break`，寬視窗用 0.45em，`≤1180px` 仍保留原本
+  0.55em。原段落仍是單一 `<p>`，兩個 span 都是空字串且 `aria-hidden="true"`；DOM `textContent`、
+  原字序、runs、連結、粗體與複製文字完全不變。
+- 320／390／780／781／884／1181／1280px 固定 iframe 契約中，實際 section 寬分別為
+  284／354／684／664／664／836／836px；兩個停頓全部為 block，且每個
+  `documentElement.scrollWidth == innerWidth`。這些是固定 viewport 的 deterministic layout
+  契約，不是抽樣統計，SE／t／有效獨立觀測不適用。深色、淺色、原大綱跳節、手機第 3/7 節
+  閱讀位置與表格卡片均保留；修改前、手機既有目標、正式修改後與同畫面比對留在
+  `tmp/research-learning-audit-2026-08-10-wave79/`。固定 iframe 不是實機；本輪未涵蓋真機旋轉、
+  完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- payload 相對前版只改 `learningPathVersion: 41 → 42`；文章數維持 274，排除版本後 canonical
+  payload SHA 維持 `1df222fbbfe61c45f9708ecf26d0de5410ed00085aacee9341727083d5fbb189`。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 483 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue 保留
+  8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `0ec3a9b2722f2ca0f5f7b036188aecc361e7d676bad5f51cd845a2926ef96ba4`。
+
 ## 市場議題先用本文問句拆角色，通用族群指南改為可展開補充 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、候選與族群資料、原始 Markdown、
