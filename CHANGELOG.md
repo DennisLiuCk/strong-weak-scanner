@@ -1,5 +1,55 @@
 # Changelog
 
+## 族群矩陣從白話問題進入精確追問 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章與圖譜映射、
+學習路線順序、主張、證據及原本的白話／精確問題零變動**；本次只調整閱讀入口、問題顯示順序
+與文章開啟後的鍵盤焦點。
+
+- 本輪新擷取的首頁與矩陣畫面顯示，首頁原本承諾「先看產業全貌」，實際卻開啟問題式族群矩陣；
+  路線展開後又直接以 `bulk capacitor`、`800V bus`、`rack ID`、`overlay` 等精確追問當入口。
+  首頁第一步因此改成「先選一個系統問題」，逐字對齊矩陣實際提供的入口。
+- `learningPathVersion` 升為 19。完整盤點發布中的 4 條路線、25 個站點後，25／25 篇站點文章都
+  已有既存 `readerQuestion`。路線站點現在先顯示同篇白話問題，原本的
+  `readingMission.question` 逐字留在「讀完再試著回答精確追問」原生 `details` 與文章「想一想」；
+  欄位缺漏時安全退回原問題，不從正文或題名生成新文案。瀏覽器 DOM 與獨立解析的發布 payload
+  逐站比對為 25／25 完全一致。
+- 從清單、矩陣、雷達或圖譜開啟文章後，window 與閱讀欄都回到頂端，鍵盤焦點改送到新文章的
+  H1；實測焦點、文章 ID 與網址 hash 相符，避免入口按鈕被移除後把焦點留在頁面根節點。
+- 深／淺色 1280×720 實測無水平溢位、console 無錯誤；本輪畫面與逐站 DOM 留在
+  `tmp/research-learning-audit-2026-08-10-wave55/`。實機螢幕閱讀器與無法在目前 Browser 固定
+  viewport 中執行的手機重排，仍保留為人工輔具／裝置驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 均為
+  `50862ce6…`，`articles` 與 `knowledgeGraph` 逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11
+  預設環境執行 475 tests 全綠；qual notes、leading hypotheses、research radar、method audit、
+  knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次 dashboard build
+  SHA 一致：`index.html` `1e3a48ae…`、`research.html` `efcef630…`。
+
+## 正式筆記開場改用讀者語言 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、sections／runs payload、
+主張、證據、graph edge、族群映射、學習路線與文章推薦零變動**；本次只翻譯正式筆記
+「研究定位與重要註記」的可見維運文字。
+
+- 本輪新擷取畫面顯示，讀者沿「先看產業角色 → 接著讀 30 秒摘要」進入第一段正文後，仍直接
+  遇到 `族群：power`、`Universe 質化參考`、`meta`、`qual_notes.py --lint` 與
+  `last_updated`。由原始筆記與發布 `research.html` payload 兩條獨立路徑完整盤點，結果同為
+  121 篇正式筆記中 100 篇含「研究定位與重要註記」及 `族群：<ID>`、97 篇含 Universe 維運語、
+  81 篇含查核指令與更新欄位；不是抽樣，兩條路徑的族群 ID 也都沒有錯配。
+- `learningPathVersion` 升為 18。閱讀模式只在上述正式筆記段落，把同時屬於該篇
+  `article.groups` 的 `族群：<ID>` 顯示為「本文族群：<正式中文標籤>」，並將三組固定維運語
+  顯示為「研究中心的公司質化參考／文章上方查核標示／更新日期」。其他文章類型、段落與不完全
+  符合白名單的文字原樣保留；轉換只在建立 DOM 時發生，不寫回 run、section 或 payload。
+- 瀏覽器實測 8261 茂達及 2337 旺宏，`power／memory` 代碼與固定維運語都已消失，深／淺色
+  1280×720 無水平溢位、console 無錯誤。實機螢幕閱讀器與本輪未能調整 viewport 的手機重排，
+  仍保留為人工輔具／裝置驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 均為
+  `50862ce6…`，`articles` 與 `knowledgeGraph` 逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11
+  預設環境執行 475 tests 全綠；qual notes、
+  leading hypotheses、research radar、method audit、knowledge graph lint 均為 0 errors，research
+  queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48ae…`、`research.html` `39763345…`。
+
 ## 正式筆記與多空文章先看產業角色再進正文 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic／正式筆記／多空 Markdown、正文、

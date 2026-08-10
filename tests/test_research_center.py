@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 17)
+        self.assertEqual(library["learningPathVersion"], 19)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1495,7 +1495,7 @@ class ResearchCenterTest(unittest.TestCase):
     def test_template_stacks_topic_reader_tables_with_original_column_labels_on_mobile(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
-            "const labels=(node.head||[]).map(cell=>runText(cell).trim())",
+            "const labels=(node.head||[]).map(cell=>displayText(cell).trim())",
             "h('th',{scope:'col'}",
             "'data-label':labels[index]||'欄 '+(index+1)",
             "if(article.type==='topic'&&!audit)sectionEl.querySelectorAll('.table-wrap')",
@@ -1653,12 +1653,14 @@ class ResearchCenterTest(unittest.TestCase):
             "function normalizeReaderRunText(value)",
             "function normalizedReaderRunTexts(nodes)",
             "function readerRunNode(run,text)",
-            "function runs(nodes,{sentenceBreaks=false}={})",
+            "function escapeReaderPattern(value)",
+            "function formalPositioningReaderText(article,value)",
+            "function runs(nodes,{sentenceBreaks=false,textTransform=null}={})",
             "reader-prose-dense",
             "'data-reader-chars':text.length",
             "'data-reader-sentences':sentenceCount",
             "text.length>=120&&sentenceCount>=2",
-            "{readableProse:mode==='reader'}",
+            "{readableProse:mode==='reader',textTransform}",
             ".reader-prose-dense .reader-sentence-break{display:block;height:.55em}",
             "class:'reader-sentence-break','aria-hidden':'true'",
             ".evidence-row{min-width:0",
@@ -1671,6 +1673,27 @@ class ResearchCenterTest(unittest.TestCase):
         # 顯示層只讀 run.s；不改寫發布 payload 或原始 Markdown。
         self.assertIn("String(value==null?'':value)", template)
         self.assertNotIn("run.s=normalizeReaderRunText", template)
+
+    def test_formal_positioning_hides_internal_maintenance_terms_in_reader_view_only(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function formalPositioningReaderText(article,value)",
+            "if(article?.type!=='formal_note')return source",
+            "groupById.get(groupId)?.label",
+            "'本文族群：'+label",
+            "replace(/Universe 質化參考/g,'研究中心的公司質化參考')",
+            "replace(/\\s+研究中心的公司質化參考/g,'研究中心的公司質化參考')",
+            "replace(/查核狀態以 meta 與 `qual_notes\\.py --lint` 為準/g,'查核狀態請以文章上方標示為準')",
+            "replace(/`last_updated`/g,'「更新日期」')",
+            "replace(/「更新日期」\\s+/g,'「更新日期」')",
+            "section.h==='研究定位與重要註記'?value=>formalPositioningReaderText(article,value):null",
+            "appendBlocks(sectionEl,section.blocks||[],{readableProse:mode==='reader',textTransform})",
+            "normalizedReaderRunTexts(source).map(text=>textTransform?textTransform(text):text)",
+        ):
+            self.assertIn(contract, template)
+        # 只轉換實際建立 DOM 的文字；原始 run、文章 sections 與 payload 都不回寫。
+        self.assertNotIn("run.s=formalPositioningReaderText", template)
+        self.assertNotIn("article.sections=formalPositioningReaderText", template)
 
     def test_template_explains_the_reading_purpose_of_research_section_headings(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -1727,9 +1750,15 @@ class ResearchCenterTest(unittest.TestCase):
             "const readerQuestion=catalogReaderQuestion(article)",
             "'data-reader-heading-type':article.type",
             "'data-reader-heading-id':article.id",
-            "h('h1',{text:readerQuestion})",
+            "tabindex:'-1'",
+            "'data-reader-heading-focus':article.id",
+            "h('h1',{...headingAttrs,text:readerQuestion})",
             "h('strong',{text:articleReaderTitleLabel(article)})",
             "article.readerTitle",
+            "function focusArticleHeading(articleId)",
+            "heading.focus({preventScroll:true})",
+            "resetReaderScroll();focusArticleHeading(id)",
+            ".article h1[data-reader-heading-focus]:focus-visible",
         ):
             self.assertIn(contract, template)
         self.assertNotIn("article.type==='topic'&&article.readerQuestion", template)
@@ -1813,14 +1842,21 @@ class ResearchCenterTest(unittest.TestCase):
             "看這站證據關係",
             "function learningRouteById(routeId)",
             "function learningRoutePhaseGroups(stations)",
+            "function learningRouteStationReaderQuestion(station)",
             "function learningRouteStation(route,station,total,currentArticleId,mode)",
             "function learningRouteMap(route,currentArticleId='',mode='article')",
             "'data-testid':'learning-route-map-'+route.id",
             "'data-testid':'learning-route-station-'+route.id+'-'+station.step",
-            "readerQuestion=station.question||''",
-            "class:'learning-route-station-kicker',text:'這站先回答'",
-            "context=readerQuestion?'研究節點：'+graphLabel",
+            "byId.get(station.articleId)?.readerQuestion||station.question",
+            "sourceQuestion=String(station.question||'').trim()",
+            "hasPlainQuestion?'這站先弄懂':'這站先回答'",
+            "'data-reader-question':hasPlainQuestion?'article':'route'",
             "h('strong',{text:primary}),h('small',{text:context})",
+            "class:'learning-route-station-precise'",
+            "'data-testid':'learning-route-precise-'+route.id+'-'+station.step",
+            "讀完再試著回答精確追問",
+            "h('p',{text:sourceQuestion})",
+            "白話問題與精確追問都沿用同篇既有內容",
             "'aria-label':route.label+' 學習階段與站點'",
             "'data-phase-id':phase.id,'data-current':isCurrent?'true':'false'",
             "shouldOpen=isCurrent||(!currentArticleId&&index===0)",
@@ -1833,7 +1869,8 @@ class ResearchCenterTest(unittest.TestCase):
             "目前第 '+current.step+' 站'+phaseHint",
             "learningRouteMap(learningRouteById(route.id),article.id,'article')",
             "learningRouteMap(learningRouteById(route.id)||route,'','matrix')",
-            "階段只整理既有站點；站點與問題仍取自既有路線",
+            "每站先沿用同篇既有讀者問句",
+            "精確追問仍逐字保留在可展開內容與文章「想一想」",
             ".learning-route-map>summary:focus-visible",
             ".learning-route-phases{display:grid;gap:7px",
             ".learning-route-phase[data-current=\"true\"]",
@@ -1841,6 +1878,8 @@ class ResearchCenterTest(unittest.TestCase):
             ".learning-route-phase-summary:focus-visible",
             ".learning-route-phase-fold[open] .learning-route-phase-state::before{content:'收合'}",
             ".learning-route-station-button{width:100%;min-height:72px",
+            ".learning-route-station-precise>summary{min-height:44px",
+            ".learning-route-station-precise>summary:focus-visible",
             "function resetGraphSurfaceScroll()",
             "graphPage.scrollTo(0,0)",
             "window.scrollTo(0,0)",
@@ -1975,6 +2014,8 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderMaturityAction(", "function focusMaturityAction(",
             "function openGroupResearch(", "deepLink==='maturity'",
             "先從一個想弄懂的問題開始", "族群起點", "開始學這個族群",
+            "先選問題，再讀主題，最後追關係", "先選一個系統問題",
+            "從四條既有學習路線，看每個問題會用到哪些族群",
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
             "row.readerRole", "row.readerBoundary", "研究中心怎麼分",
             "先別混淆：", ".maturity-group-guide",
