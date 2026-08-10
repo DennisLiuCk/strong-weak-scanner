@@ -1,5 +1,28 @@
 # Changelog
 
+## 推薦下一篇先給可比較的閱讀問題 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic Markdown、文章正文、主張、證據、
+graph edge、族群映射與正式學習路線零變動**；本次只補齊一般跨文章推薦的閱讀任務。
+
+- 完整盤點 274 篇發布文章（不是抽樣）：813 張延伸卡中有 522 張 article card。21 張正式 route
+  下一站原本已逐字顯示下一篇閱讀任務；其餘 501 張一般推薦雖已揭露共同公司／族群，改版前卻
+  0 張告訴讀者打開下一篇時要比較什麼。這是完整母體描述，無抽樣誤差。
+- `learningPathVersion` 升為 10。501 張一般推薦新增 `questionLabel: 讀下一篇時比較` 與非空
+  `question`；固定句型只使用來源／目標文章類型，以及同卡既有 `relationBasis.labels[0]`，引導
+  比較公司事實、題材情境、多空假說或證據邊界。多個共同標記只顯示第一個名稱與既有數量；不讀
+  正文、題名或關鍵字，不使用模型生成，也不建立新的公司、供應鏈、受惠或因果結論。21 張正式
+  route 卡維持原問題與「下一站試著回答」標籤。
+- 移除 501 組 `question／questionLabel` 並把版本還原為 9 後，完整發布 payload 與 `HEAD`
+  canonical SHA 逐位元相同（`0b076ad2…`），證明本次沒有改寫文章、證據、卡片順序或既有關係。
+  完整瀏覽器母體驗收 274/274 篇、501/501 張一般推薦與 21/21 張 route 卡：問題、標籤、共同
+  標記與顯示順序均吻合，0 個卡片或文件水平溢位；代表卡實際跳到正確文章並回頁首。
+  320×844、390×844、884×863、1280×900 均完成視覺複核；螢幕閱讀器實機朗讀仍保留為人工
+  輔具驗收項目。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 468 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `67c8e506…`。
+
 ## 推薦下一篇先說清楚兩篇為什麼相連 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic Markdown、文章正文、主張、證據、

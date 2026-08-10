@@ -310,7 +310,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 9)
+        self.assertEqual(library["learningPathVersion"], 10)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -327,6 +327,9 @@ class ResearchCenterTest(unittest.TestCase):
                     if not card.get("routeBridge"):
                         target = article_by_id[card["articleId"]]
                         basis = card["relationBasis"]
+                        self.assertEqual(card["questionLabel"], "讀下一篇時比較")
+                        self.assertTrue(card["question"])
+                        self.assertIn(basis["labels"][0], card["question"])
                         self.assertIn(basis["kind"], {"stock", "group"})
                         self.assertTrue(basis["ids"])
                         self.assertEqual(len(basis["ids"]), len(basis["labels"]))
@@ -368,6 +371,11 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(formal_card["relationBasis"], {
             "kind": "stock", "ids": ["1111"], "labels": ["1111 甲公司"],
         })
+        self.assertEqual(
+            formal_card["question"],
+            "回到「1111 甲公司」的公司底稿，哪些是已確認本業，"
+            "哪些仍只是本篇的題材情境？",
+        )
         graph_card = next(
             card for card in topic["learningPath"]["cards"]
             if card["kind"] == "graph"
@@ -448,6 +456,12 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(card["relationBasis"], {
             "kind": "group", "ids": ["power"], "labels": ["功率元件"],
         })
+        self.assertEqual(card["questionLabel"], "讀下一篇時比較")
+        self.assertEqual(
+            card["question"],
+            "兩篇都談「功率元件」；下一篇多了什麼市場情境？"
+            "哪些內容仍不能套回本篇公司？",
+        )
 
     def test_learning_path_prioritizes_next_registered_route_article(self):
         reading_mission = {
@@ -1514,6 +1528,8 @@ class ResearchCenterTest(unittest.TestCase):
             "查看全部'+kindLabel",
             "不代表上下游、受惠、訂單或因果關係",
             "const articleBasis=learningArticleBasis(card)",
+            "'data-question-label':card.questionLabel||'下一站試著回答'",
+            "text:card.questionLabel||'下一站試著回答'",
             ".learning-article-basis{",
             ".learning-article-basis-more>summary{min-height:44px}",
         ):

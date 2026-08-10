@@ -2973,6 +2973,63 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             }
         return None
 
+    def article_comparison_question(source, candidate, relation_basis):
+        """Give a generic article handoff one bounded question to compare.
+
+        The prompt uses only the two article types and the already-proven shared
+        company/group label.  It does not inspect prose or infer a new relation.
+        """
+        labels = [
+            str(label).strip() for label in (relation_basis.get("labels") or [])
+            if str(label).strip()
+        ]
+        if not labels:
+            raise ValueError("一般文章推薦的比較問題缺少共同標記名稱")
+        basis_kind = relation_basis.get("kind")
+        anchor = labels[0]
+        if len(labels) > 1:
+            unit = "家公司" if basis_kind == "stock" else "個族群"
+            anchor += f"等 {len(labels)} {unit}"
+
+        source_type = source.get("type") or ""
+        target_type = candidate.get("type") or ""
+        if source_type == "formal_note" and target_type == "narrative":
+            return (
+                f"下一篇對「{anchor}」的多空說法，哪些能由本篇公司事實支持，"
+                "哪些仍待驗證？"
+            )
+        if source_type == "formal_note" and target_type == "topic":
+            if basis_kind == "stock":
+                return (
+                    f"下一篇把「{anchor}」放進什麼市場情境？"
+                    "哪些內容仍不能當成公司事實？"
+                )
+            return (
+                f"兩篇都談「{anchor}」；下一篇多了什麼市場情境？"
+                "哪些內容仍不能套回本篇公司？"
+            )
+        if source_type == "narrative" and target_type == "formal_note":
+            return (
+                f"回到「{anchor}」的公司底稿，哪些事實能支持或限制本篇的多空說法？"
+            )
+        if source_type == "narrative" and target_type == "topic":
+            if basis_kind == "stock":
+                return (
+                    f"下一篇為「{anchor}」補了哪些市場證據與待驗證問題？"
+                    "是否改變本篇的多空假說？"
+                )
+            return (
+                f"兩篇都談「{anchor}」；下一篇補了哪些產業機制與待驗證問題？"
+            )
+        if source_type == "topic" and target_type == "formal_note":
+            return (
+                f"回到「{anchor}」的公司底稿，哪些是已確認本業，"
+                "哪些仍只是本篇的題材情境？"
+            )
+        return (
+            f"兩篇都談「{anchor}」；它們各自回答什麼問題，證據邊界有何不同？"
+        )
+
     def best_related(article, article_type, require_stock=False):
         matches = []
         for candidate in articles:
@@ -3011,6 +3068,10 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                     f"{candidate.get('id') or 'unknown'}"
                 )
             card["relationBasis"] = relation_basis
+            card["questionLabel"] = "讀下一篇時比較"
+            card["question"] = article_comparison_question(
+                source, candidate, relation_basis,
+            )
         return card
 
     def next_route_article(article):
@@ -3203,7 +3264,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 9
+    research_library["learningPathVersion"] = 10
     return research_library
 
 
