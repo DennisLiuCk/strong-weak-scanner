@@ -1,5 +1,45 @@
 # Changelog
 
+## 文章清單先交代學習目標、讀後問題與證據位置 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、monitor、impact、
+證據判定、複核時鐘與 `learningPathVersion` 零變動**；本次只重排研究文章清單的讀者層
+介面、手機導覽預設與對應測試，不改寫任何研究 payload。建置後 `const LIB` JSON 與 Git
+`HEAD` 逐 byte 相同，SHA-256 均為
+`fcd37cc388506aecd30ec52cde28f706a3f94da91eb55e867e5d0f42dfa32bb5`。
+
+- 1280×900 改寫前畫面顯示，文章卡已有讀者問題、研究題名、範圍、可信度與查核狀態，
+  但「先學什麼」尚未出現，主張類型、可信度、來源數與「候選議題」邊界也分散在不同位置；
+  讀者要先自行猜測文章用途。390×844 手機版的三步導覽預設全部展開，第一篇文章幾乎落在
+  首屏之外。
+- 274 張文章卡現在依序顯示「先認識本業／先看勝負手／先學一件事 → 讀完能回答 →
+  證據位置」。第一行逐字沿用同篇 `readingMission.keyPoints[0]`，沒有重寫摘要；三種起讀
+  標籤分別對應正式筆記、多空小作文與市場議題，避免把公司本業、待驗勝負手與產業概念
+  混成同一種閱讀任務。
+- 「證據位置」直接重用文章查核狀態；市場議題再併列同篇 `readerEvidenceGuide` 的主張類型、
+  即時 `liveConfidence()` 判定與有效來源數。例如國巨 Q2 卡會顯示「候選議題・不等於正式
+  公司事實 · 主張『證實』 · 可信度中 · 2 份有效來源」。這只是把既有證據標籤放到同一行，
+  不把來源數換算成真實機率、受惠或投資排序。
+- 桌機仍預設展開「第一次來？照三步開始」；手機只在首次載入時收起一次，使用者可原位
+  展開，旋轉或 resize 不會覆寫後續手動狀態。手機首屏因此能同時看到三步導覽摘要與第一張
+  文章卡；完整導覽、研究題名、範圍與證據文字均保留。
+- 固定瀏覽器實測「市場議題」仍為 35／274 篇，正式筆記、多空小作文與市場議題首張卡分別
+  顯示「先認識本業／先看勝負手／先學一件事」；卡片可開啟全文，焦點落到同一個讀者問題，
+  返回與篩選狀態不受影響。桌機 `scrollWidth == clientWidth == innerWidth == 1280`，手機三者
+  均為 390，沒有頁面水平溢位。這是完整發布 payload 與固定 viewport 的決定性契約，不是
+  抽樣統計，SE／t／有效獨立觀測不適用。
+- 完整前後畫面、流程紀錄與限制存於
+  `tmp/research-learning-audit-2026-08-11-wave104-catalog/`。固定瀏覽器尺寸不是實機，本輪未涵蓋
+  VoiceOver／TalkBack、完整實體鍵盤巡覽、200%／400% zoom、儀器化 WCAG 對比與理解率
+  使用者測試，因此不宣稱完整無障礙合規或閱讀成效。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 508 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被介面重排掩蓋。連續兩次 dashboard build SHA
+  一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `a6447c3b4c5728d57241f22cb8b1d8f64579476ee80c70fd35ee597a5b348be2`。
+
 ## UCIe 第八站改成五個封裝位置、五把測試尺與六關生態系證據 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與

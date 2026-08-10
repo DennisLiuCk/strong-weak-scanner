@@ -1219,7 +1219,8 @@ class ResearchCenterTest(unittest.TestCase):
             "證據可信度", "主命題最後有效證據", "可信度判定",
             "來源帳本", "mobile-evidence", "可水平捲動的研究資料表",
             "function articleReaderHeading(", "article.readerQuestion",
-            "這篇先回答", "這篇先弄懂", "研究題名：", "研究範圍：",
+            "先學一件事", "讀完能回答", "證據位置：", "這篇先弄懂",
+            "研究題名：", "研究範圍：",
             ".result-reader-question", ".article-reader-heading",
             "aria-label=\"搜尋研究文章\"", "filtersPanel.inert", "clearArticleRoute",
             "aria-label=\"研究文章清單\"", ":focus-visible", "@media(max-width:780px)",
@@ -1964,14 +1965,48 @@ class ResearchCenterTest(unittest.TestCase):
             "article.type==='formal_note'?'原始摘要：'",
             "article.type==='narrative'?'待驗命題：':'研究題名：'",
             "readerQuestion=catalogReaderQuestion(article)",
+            "function catalogLearningLead(article)",
+            "(mission.keyPoints||[]).find(Boolean)||mission.orientation||''",
+            "function catalogLearningLabel(article)",
+            "article.type==='formal_note'?'先認識本業'",
+            "article.type==='narrative'?'先看勝負手':'先學一件事'",
+            "function catalogLearningPreview(article,readerQuestion)",
+            "'data-catalog-learning-id':article.id",
+            "text:catalogLearningLabel(article)",
+            "text:'讀完能回答'",
             "'data-reader-question-type':article.type",
             "'data-reader-question-id':article.id",
-            "text:'這篇先回答'",
         ):
             self.assertIn(contract, template)
         # 清單只讀取既有導讀欄位，沒有從正文或題名生成新的研究問題。
         self.assertNotIn("article.catalogQuestion=", template)
         self.assertNotIn("article.readingMission.question=", template)
+
+    def test_catalog_cards_explain_evidence_position_and_mobile_preserves_first_screen(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function catalogEvidencePosition(article)",
+            "(article.sections||[]).map(section=>section.readerEvidenceGuide).find(Boolean)",
+            "parts=[String(article.status||'').trim()].filter(Boolean)",
+            "guide?.claimLabel",
+            "confidenceText(confidence)",
+            "Number.isInteger(guide.sourceCount)",
+            "guide.sourceCount+' 份有效來源'",
+            "'data-catalog-evidence-id':article.id",
+            "text:'證據位置：'",
+            ".result-learning-preview{display:grid",
+            ".result-evidence{display:grid",
+            "function foldCatalogGuideOnNarrow()",
+            "const guide=document.getElementById('entryGuide')",
+            "window.matchMedia('(max-width:780px)').matches",
+            "guide.open=false",
+            "不在旋轉或 resize 時覆寫使用者之後的手動狀態",
+        ):
+            self.assertIn(contract, template)
+        # 卡片只重排已發布的導讀、狀態與 readerEvidenceGuide，不回寫研究 payload。
+        self.assertNotIn("article.readingMission=", template)
+        self.assertNotIn("section.readerEvidenceGuide=", template)
+        self.assertNotIn("article.status=", template)
 
     def test_article_heading_continues_the_catalog_reader_question(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
