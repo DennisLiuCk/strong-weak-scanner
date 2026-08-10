@@ -18,10 +18,10 @@ topic-MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER,一整櫃人工智慧設備開�
 topic-MI-2026-08-02-BACKSIDE-POWER-DELIVERY,晶片為什麼要把供電線移到背面，這會新增哪些製程，又怎麼判斷公司真的受惠？
 topic-MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION,玻璃基板已有工廠與樣品，為什麼還不能算穩定量產？
 topic-MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER,新的記憶體層要滿足哪些讀寫與耐久條件，才不只是特殊儲存裝置？
-topic-MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER,新一代曝光設備能少做步驟，為何仍不一定降低總成本？
+topic-MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER,晶片圖形能一次印得更細，為什麼少做幾個步驟仍不一定更便宜？
 topic-MI-2026-08-02-HYBRID-BONDING-READINESS,兩層晶片貼得更密，為什麼一次試驗成功還不能證明可長期量產？
 topic-MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER,液冷設備容量比較大，為什麼不代表已量產或有訂單？
-topic-MI-2026-08-02-OPEN-AI-FABRICS,不同廠商的運算晶片與交換器，要通過哪些測試才算真正互通？
+topic-MI-2026-08-02-OPEN-AI-FABRICS,資料要從一顆運算晶片送到另一顆，端點、交換器和軟體要一起通過哪些測試？
 topic-MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS,面板能排進更多封裝，為什麼還要一起看良率、製程速度與報廢成本？
 topic-MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER,小晶片能在一次測試中互通，還要哪些證據才算生態系成熟？
 topic-MI-2026-08-03-800VDC-PROTECTION-LAYERS,高壓直流系統為何不能只靠一顆保險絲保護？
@@ -29,7 +29,7 @@ topic-MI-2026-08-03-AI-CAPACITOR-ROLE-MAP,不同位置的電容容量相近，�
 topic-MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY,電力尖峰與停電持續時間不同時，該由哪種儲能設備處理？
 topic-MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER,客製高頻寬記憶體只改規格或重做底部晶片，為何不能排在一起？
 topic-MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES,液冷系統出問題時，如何分清設備、整合與設施的責任？
-topic-MI-2026-08-03-PCIE6-COMPLIANCE-LADDER,高速介面元件量產後，還要跨過哪些互通、測試與部署關卡？
+topic-MI-2026-08-03-PCIE6-COMPLIANCE-LADDER,一個高速元件已經量產，為什麼還不能說整台伺服器已通過第六代連線？
 topic-MI-2026-08-07-AI-RACK-ACTION-CONTRACT,機櫃感測到過熱或漏液後，系統如何找到正確設備並安全隔離？
 topic-MI-2026-08-08-AI-RACK-TRUST-ROOT,資料中心收到高風險控制指令時，如何確認身分、版本與權限？
 topic-MI-2026-08-09-AI-RACK-EMC-CERTIFICATION,單一設備都通過測試後，整櫃一起運作為何仍可能不合格？

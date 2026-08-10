@@ -1,14 +1,15 @@
-# 開放 AI 互連知識圖譜
+# AI 資料路徑與跨廠互通知識圖譜
 
-本圖把 UALink 與 Ethernet scale-up、UEC scale-out、chiplet 與部署成熟度分開。規格、產品
-與雲端規劃可以相連，但不能相加成已互通或已部署收入；台灣族群仍只保留為待驗證搜尋路由。
+本圖先把運算端點、連接傳輸、交換器、控制軟體與目的端點放回同一條資料路徑，再分開
+機架內 UALink、ESUN／SUE-T 與跨機架 UEC、UALoE、晶粒及部署成熟度。規格、產品與雲端
+規劃可以相連，但不能相加成已互通或已部署收入；台灣族群仍只保留為待驗證搜尋路由。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: open-ai-fabrics
 root_node_id: concept:open-ai-fabrics
-label: 開放 AI 互連
-summary: 將 UALink、ESUN／SUE-T 兩類 scale-up 路徑與 UEC scale-out、UALoE、UCIe 分層，逐步追蹤規格、silicon、互通、系統與雲端部署。
+label: AI 資料路徑與跨廠互通
+summary: 先展開端點、連接傳輸、交換器、控制軟體與目的端點，再把 UALink、ESUN／SUE-T 機架內路徑與 UEC 跨機架路徑分開，依序追蹤規格、實體晶片、合規、跨廠互通、系統與雲端部署。
 article_ids: MI-2026-08-02-OPEN-AI-FABRICS
 status: active
 -->

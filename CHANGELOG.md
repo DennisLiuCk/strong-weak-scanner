@@ -1,5 +1,165 @@
 # Changelog
 
+## PCIe 6 第七站改成五個連線位置、五把測試尺與六關部署證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有 PCIe 6 合規議題的讀者層文字、標題、中文優先圖譜
+標籤、發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、
+`research_source`、`research_claim`、`impact` 與 `monitoring_item` 共 20 個正式區塊均與 Git
+`HEAD` 逐字相同，聚合 SHA-256 維持
+`1842e1e1b80d05e05ecb767ef43785c6c7588eec5375571fdab47c35bdca9a9a`；知識圖譜 14 條
+`knowledge_edge` 也逐字相同，聚合 SHA-256 維持
+`2a725824d7bd78bd322c7bd4107094f94cfc032ccc1c6e2db9ac79476da5e4b6`。
+
+- 從「研究中心 → 族群矩陣 → 運算與互連 → 第七站」固定走讀發現，修改前首屏第一句直接
+  放入第 140 次工作坊、PCIe 6.x、64 GT/s 與訊號重整器；名詞速查只有 7 項。正文以
+  「支援、互通、通過、量產、部署」五段散文後，只留一張「時鐘／已證實／尚未證實」
+  三列表；讀者尚未看見完整連線有哪些位置，就被要求判讀產品名稱、實際速度與正式程序。
+- `learningPathVersion` 升為 65。研究題名改成「PCIe 6 元件寫著第六代，不代表整套系統
+  已通過：先分清裝置、連線、正式測試與部署」；入口問句改為「一個高速元件已經量產，
+  為什麼還不能說整台伺服器已通過第六代連線？」。三句重點第一句只先建立完整高速連線，
+  名詞小字典由 7 項增為 32 項。圖譜與核心概念改為「PCIe 6 高速連線的測試與部署階梯」，
+  另追加純編輯 transition，沒有刷新來源、複核日期或證據時鐘。
+- 核心內容先用「主機與連線控制／板路、連接器與線材／訊號修復或速率轉換／連線交換與
+  分支／終端與實際工作」五個位置建立接力；並明示第三與第四位置不是每套系統都需要，
+  五格也不是固定接線順序或完整協定堆疊。
+- 再以「規格版本與連線世代／每條通道傳輸率／通道數與拓撲／產品、韌體與軟體組合／
+  測試主體與結果狀態」五把尺，限制每筆測試能支持的範圍。32 GT/s 正式列項只支持該列，
+  不能外推成 64 GT/s 已失敗或已通過；活動提供測試也不能替具名產品補成通過結果。
+- 規格與測試入口、具名產品、供應商或客戶互通、正式通過與公開列名、單一元件量產、完整
+  客戶平台部署分成六個時鐘，不假設固定先後。標準組織、主機平台、連接元件、終端、客戶
+  系統與台灣供應鏈查證六類角色各自分責，避免一家公司在一個位置有產品，就替其他位置
+  補上證據。
+- 最後以「完整連線位置可辨認 → 測試合約寫完整 → 具名產品在目標速度正式通過 → 不同廠商
+  完整路徑互通 → 具名客戶穩定部署 → 台灣公司財務雙向核對」六關分開元件量產與整套系統
+  通過。本輪第一關只有分散產品，第二關只有部分欄位，第三關沒有具名 64 GT/s 結果，第四關
+  缺完整跨廠矩陣，第五關仍停在元件量產與參考架構，第六關也尚未通過。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後對照；桌機
+  `scrollWidth == innerWidth == clientWidth == 1280`，手機
+  `scrollWidth == innerWidth == clientWidth == 390`。行動版五個位置、五把測試尺、六個時鐘、
+  六類角色與六關表格均重排為具欄名卡片，沒有水平溢位。名詞速查可完整載入 32 個中文優先
+  定義，搜尋「跨廠互通」只顯示 1／32 個相符項目，關閉後焦點回到原按鈕；第七站可進入
+  中文優先證據圖譜，也可前往第 8／8 站。這些是 deterministic viewport 與互動契約，
+  不是抽樣統計，SE／t／有效獨立觀測不適用；固定瀏覽器尺寸不是實機，本輪未涵蓋真機旋轉、
+  完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第七站閱讀時間由 17 分鐘更新為 26 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 64 → 65`。
+  排除版本後 canonical payload SHA 由
+  `f29a0f4e7ca3ad8846d8ab9619659d8d66d70bd43c9d306e2307447d497e47ca` 變為
+  `e2927e172b0ad7a89df1138c0da3706e6ce6b1b2ed0edaa7dba4da891b09f2e8`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 506 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `5b4abaafacc6fb63a6c7b0379554cebdcdfc22b78ccf15f0d105769313b08c0f`、
+  `research.html` `e2d1db44ec85ab5e97e91b0b078e9881bcc60e34d8197a58d5b28161230b9911`。
+
+## 開放 AI 互連第六站改成五個資料位置、兩種網路範圍與六關跨廠互通 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有開放 AI 互連議題的讀者層文字、標題、中文優先
+圖譜標籤、發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、
+`research_source`、`research_claim`、`impact` 與 `monitoring_item` 共 34 個正式區塊均與 Git
+`HEAD` 逐字相同，聚合 SHA-256 維持
+`f1c4ad5f1461e5d2ddda8ae31e13d472e89c079e195c6f951bc76b89c612a9f3`；知識圖譜 19 條
+`knowledge_edge` 也逐字相同，聚合 SHA-256 維持
+`f27f9a1c6ae999df5cf88d68ac03c917fce73345ce2385c62d64c89fb66c6d01`。
+
+- 從「研究中心 → 族群矩陣 → 運算與互連 → 第六站」固定走讀發現，首屏的唯一重點同時
+  放入 UALink、scale-up、UEC、scale-out、OCP、ESUN、SUE-T 與 Ethernet，名詞速查只有
+  15 項。正文用五道散文關卡後，只留一張「規格／產品／部署」三列表；不熟網路的
+  讀者還沒看見資料實際經過哪些位置，就被要求判斷規格分工與多廠成熟度。
+- `learningPathVersion` 升為 64。研究題名改成「資料從一顆運算晶片走到另一顆：先分清
+  機架內外，再判斷跨廠互通」；入口問句改為「資料要從一顆運算晶片送到另一顆，
+  端點、交換器和軟體要一起通過哪些測試？」。三句重點第一句先只建立完整資料
+  路徑，名詞小字典由 15 項增為 32 項。圖譜題名與核心節點改為「AI 資料路徑與
+  跨廠互通」，另追加純編輯 transition，沒有刷新來源、複核日期或證據時鐘。
+- 核心內容先用「資料出發的運算端點／連接與傳輸／交換與網路／協調與控制軟體／
+  目的端點與工作負載」五個位置建立接力；再用距離與連線形狀、延遲與記憶體、交換路由
+  與壅塞、可靠性與恢復、實際工作與客戶驗收五把尺，分開機架內與跨機架。
+- UALink、ESUN、SUE-T、UEC 與 UALoE 被放回各自的距離、端點、網路與承載位置；
+  規格工作組、加速器／晶片智財、交換平台、機架整合、雲端客戶與台灣供應鏈查證六類
+  角色各自分責。這些表是閱讀路徑與證據分工，不是完整網路協定、供應商名單或標準勝負。
+- 最後以「共同規則可查核 → 路徑各位置有具名實物 → 單件產品符合指定規格 → 不同廠商
+  完成交叉互通 → 整個系統與工作可重現 → 客戶部署與公司財務對上」六關分開「能連」與
+  「真正互通」。本輪第一關有多份文件，第二關只有分散產品路徑，第三至六關尚未由本輪
+  證據通過；不以單廠展示、會員名單、參考設計或客戶規劃補上缺口。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後對照；桌機
+  `scrollWidth == innerWidth == 1280`，手機 `scrollWidth == innerWidth == 390`。行動版五個資料
+  位置、機架內外五把尺、五條路徑、六類角色與六關互通表均重排為具欄名卡片，沒有水平
+  溢位。名詞速查可完整載入 32 個中文優先定義，搜尋「跨廠互通」只顯示 1／32 個相符項目，
+  關閉後焦點回到原按鈕。這些是 deterministic viewport 與互動契約，不是抽樣統計，
+  SE／t／有效獨立觀測不適用；固定瀏覽器尺寸不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、
+  VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第六站閱讀時間由 26 分鐘更新為 32 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 63 → 64`。
+  排除版本後 canonical payload SHA 由
+  `fa7e0dd9f64d4ad60b9300100e3e6ae6970a4fce3db9075dab16415192cc0231` 變為
+  `f29a0f4e7ca3ad8846d8ab9619659d8d66d70bd43c9d306e2307447d497e47ca`。方法 registry fingerprint 維持
+  `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 505 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `4c5527a0bda5fc3798543650591bf9f286be9027f90813a9e6a7d191fafb749f`、
+  `research.html` `796e446bd67e18fcc0b607fc93d331747943f0125660c80e2f22e3a69fc77950`。
+
+## High-NA EUV 第五站改成五個曝光位置、五把成本尺與六關量產證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有 High-NA EUV 導入議題的讀者層文字、標題、中文優先
+圖譜標籤、發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、
+`research_source`、`research_claim`、`impact` 與 `monitoring_item` 共 20 個正式區塊均與 Git
+`HEAD` 逐字相同，聚合 SHA-256 維持
+`392c78061c8c297d49652ff0c3b7ff23dec2767b80364a156f9aaee46bda934f`；知識圖譜 13 條
+`knowledge_edge` 也逐字相同，聚合 SHA-256 維持
+`34deda80c760fff0186761c4a7e1df04471feffc0e861ce64b55a37bd3552dac`。
+
+- 從「研究中心 → 族群矩陣 → 運算與互連 → 第五站」固定走讀發現，首屏雖已問「少做步驟
+  為何不一定降低總成本」，第一句卻先放入 High-NA、wafer、product-wafer testing，精確追問
+  又加入 availability、Low-NA 與 multi-patterning。唯一核心表接著連續出現 shipment、
+  acceptance、throughput、maintenance、qualification、resist、mask 與 metrology；不熟
+  製程的讀者還沒建立「圖形怎麼印上晶圓」，就被要求判斷設備成熟度與量產經濟性。
+- `learningPathVersion` 升為 63。研究題名改成「曝光次數少了，晶片不一定更便宜：先看圖形
+  怎麼印、哪些成本又冒出來」；入口問句改成「晶片圖形能一次印得更細，為什麼少做幾個步驟
+  仍不一定更便宜？」。三句重點第一句只先認得「晶圓、光阻、光罩」三個中文概念，名詞
+  小字典由 7 項增為 32 項。圖譜題名與核心節點改為中文優先，並追加純編輯 transition，沒有
+  刷新來源、複核日期或證據時鐘。
+- 核心內容先用「設計圖形與光罩／晶圓表面與光阻／曝光機與光學／顯影與圖形轉移／量測、
+  檢查與下一層」五個位置建立微影接力；再以「曝光與加工次數／機器可用時間與每小時產出／
+  光罩、光阻與缺陷／對準、製程視窗與良率／每顆合格晶片總成本」五把尺，比較較高數值孔徑
+  與現行多步驟方案。設備商、研發整合、晶圓製造客戶、材料與圖形轉移、量測與生產經濟五類
+  角色各自放回公開證據；八台出貨、六台運轉、逾五十萬片、逾八成可用率與 2027–2028 目標
+  被拆回五個里程碑，不合併成假精確完成率。
+- 最後以「目標圖形可以印出 → 多台設備能持續運轉 → 共同製程通過資格 → 實際產品達成視窗
+  與良率 → 量產層數、產出與成本可重算 → 供應商財務足跡出現」六關，把設備進度接到客戶
+  量產與公司受惠。本輪設備平台最多走到第二關，第三關仍是待完成目標，第四關只有開始測試
+  而沒有產品結果，第五與第六關尚未通過；表格是閱讀與證據排序，不是完整製程配方、供應商
+  名單、營收預測或投資排名。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後並排檢查；桌機
+  `scrollWidth == innerWidth == 1280`，手機 `scrollWidth == innerWidth == 390`。行動版五個
+  曝光位置、五把成本尺與六關證據表均重排為具欄名卡片，沒有水平溢位。名詞速查可完整載入
+  32 個中文優先定義，搜尋「每顆合格晶片成本」只顯示 1／32 個相符項目，關閉後焦點回到
+  原按鈕。這些是 deterministic viewport 與互動契約，不是抽樣統計，SE／t／有效獨立觀測
+  不適用；固定瀏覽器尺寸不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、
+  VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第五站閱讀時間由 14 分鐘更新為 21 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 62 → 63`。
+  排除版本後 canonical payload SHA 由
+  `888a2f961fcab653157db360072f95a2a3babe7b048e78ea14a95ee81865905a` 變為
+  `fa7e0dd9f64d4ad60b9300100e3e6ae6970a4fce3db9075dab16415192cc0231`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 504 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `e7595986eb10f9cf9cbe7c51c17505ea1202ad9e7318e58da0f86c47e4cb9bbd`、
+  `research.html` `859381bedfcbc9c3976a6ca9889b1f282884c1b4315ab2e843184401d0151431`。
+
 ## CPO 第四站改成五個光電位置、五把取捨尺與六關部署證據 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與

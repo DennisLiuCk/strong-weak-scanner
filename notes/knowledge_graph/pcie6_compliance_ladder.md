@@ -1,11 +1,11 @@
-# PCIe 6 合規與部署階梯
+# PCIe 6 高速連線的測試與部署階梯
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: pcie6-compliance-ladder
 root_node_id: concept:pcie6-deployment-readiness
-label: PCIe 6 合規與部署階梯
-summary: 把 Gen6 產品 供應商互通 PCI-SIG official testing Integrators List 與客戶部署分開；不能由任一節點推導整體成熟或台灣公司收入。
+label: PCIe 6 高速連線的測試與部署階梯
+summary: 把具名裝置 實際連線條件 跨廠元件互通 PCI-SIG 官方測試 公開列名 元件量產與客戶完整平台部署分開；不能由任一節點推導整體成熟或台灣公司收入。
 article_ids: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER
 status: active
 -->

@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 62)
+        self.assertEqual(library["learningPathVersion"], 65)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -3323,6 +3323,295 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 光電轉換位置與兩種光學路徑", graph)
+
+    def test_compute_connect_station_five_separates_exposure_cost_roles_and_company_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_high_na_euv_insertion_ladder.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 曝光次數少了，晶片不一定更便宜："
+            "先看圖形怎麼印、哪些成本又冒出來\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave100_high_na_five_positions_five_cost_lenses_roles_and_six_gate_ladder",
+            "先在晶圓表面塗上光阻，再用光罩控制光線落在哪裡",
+            "每顆合格晶片的總成本",
+            "## 先用五個位置看圖形怎麼印到晶圓",
+            "| 本文五個位置 | 眼前發生什麼 | 主要接力角色 | 下一個要驗收 | 不能直接推成 |",
+            "| 1. 設計圖形與光罩 |", "| 2. 晶圓表面與光阻 |",
+            "| 3. 曝光機與光學 |", "| 4. 顯影與圖形轉移 |",
+            "| 5. 量測、檢查與下一層 |",
+            "## 再用五把尺比較少做步驟是否真的省錢",
+            "| 本文五把尺 | 較高數值孔徑方案 | 現行多步驟方案 | 下一個要量的結果 | 不能直接推成 |",
+            "| 1. 曝光與加工次數 |", "| 2. 機器可用時間與每小時產出 |",
+            "| 3. 光罩、光阻與缺陷 |", "| 4. 對準、製程視窗與良率 |",
+            "| 5. 每顆合格晶片總成本 |",
+            "## 把五類角色放回同一段曝光接力",
+            "| 本文五類角色 | 它交付什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |",
+            "| 1. 曝光設備與平台 |", "| 2. 研發與資格整合 |",
+            "| 3. 晶圓製造客戶 |", "| 4. 光罩、材料與圖形轉移 |",
+            "| 5. 量測、檢查與生產經濟 |",
+            "## 把五個里程碑排成同一條導入階梯",
+            "| 本文五個里程碑 | 白話意思 | 本輪可確認 | 下一份證據 | 不能合併成 |",
+            "| 1. 機器送達 |", "| 2. 開始運轉與校準 |",
+            "| 3. 研發資格與共同整合 |", "| 4. 實際產品晶圓測試 |",
+            "| 5. 穩定量產導入 |",
+            "## 最後用六關分開設備進度、客戶量產與公司受惠",
+            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 目標圖形可以印出 |", "| 2. 多台設備能持續運轉 |",
+            "| 3. 共同製程通過資格 |", "| 4. 實際產品達成視窗與良率 |",
+            "| 5. 量產層數、產出與成本可重算 |",
+            "| 6. 供應商財務足跡出現 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先用五個位置看", 1
+        )[0]
+        for jargon in (
+            "High-NA", "Low-NA", "EUV", "EXE", "HVM", "wafer",
+            "product", "availability", "throughput", "qualification",
+            "insertion", "scanner", "resist", "mask", "metrology",
+            "ASML", "imec", "Intel", "multi-patterning", "calibration",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 7),
+            ("research_claim", 8), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER,"
+            "晶片圖形能一次印得更細，為什麼少做幾個步驟仍不一定更便宜？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "high_na_euv_readiness.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "concept:high-na-euv-readiness,concept,晶圓圖形曝光與 High-NA 導入階梯",
+            "component:high-na-euv-scanner,component,高數值孔徑 EUV 曝光機",
+            "product:exe-5200b,product,ASML EXE:5200B 曝光機",
+            "stage:high-na-operation,stage,客戶端開始運轉",
+            "stage:high-na-process-qualification,stage,製程資格驗證",
+            "stage:high-na-product-wafer,stage,實際產品晶圓測試",
+            "stage:high-na-hvm-insertion,stage,高量產導入",
+            "component:high-na-resist,component,高數值孔徑曝光用光阻",
+            "capability:high-na-metrology,capability,高數值孔徑曝光量測與檢查",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: 晶圓圖形曝光與 High-NA 導入階梯", graph)
+
+    def test_compute_connect_station_six_separates_data_path_scopes_roles_and_interoperability_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_open_ai_fabrics.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 資料從一顆運算晶片走到另一顆："
+            "先分清機架內外，再判斷跨廠互通\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave101_data_path_two_network_scopes_roles_and_six_gate_interoperability",
+            "一條完整資料路徑，要讓運算端點、連接傳輸、交換器、"
+            "控制軟體與另一個端點接力",
+            "## 先用五個位置看資料怎麼從一顆晶片走到另一顆",
+            "| 本文五個位置 | 它做什麼 | 代表元件或軟體 | 下一個要驗收 | 不能直接推成 |",
+            "| 1. 資料出發的運算端點 |", "| 2. 連接與傳輸 |",
+            "| 3. 交換與網路 |", "| 4. 協調與控制軟體 |",
+            "| 5. 目的端點與工作負載 |",
+            "## 再用五把尺分開機架內與跨機架網路",
+            "| 本文五把尺 | 機架內擴充 | 跨機架擴充 | 下一個要量的結果 | 不能直接推成 |",
+            "| 1. 距離與連線形狀 |", "| 2. 延遲與記憶體 |",
+            "| 3. 交換、路由與壅塞 |", "| 4. 可靠性與恢復 |",
+            "| 5. 實際工作與客戶驗收 |",
+            "## 把五條規格與傳輸路徑放回機架內外",
+            "| 本文五條路徑 | 主要範圍 | 它定義或承載什麼 | 本輪可確認 | 還不能說 |",
+            "| 1. UALink |", "| 2. ESUN |", "| 3. SUE-T |",
+            "| 4. UEC |", "| 5. UALoE |",
+            "## 把六類角色放回同一條資料路徑",
+            "| 本文六類角色 | 它交付什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |",
+            "| 1. 規格與開放工作組 |", "| 2. 加速器、端點與晶片智財 |",
+            "| 3. 交換器專用晶片與平台 |", "| 4. 機架與系統整合 |",
+            "| 5. 雲端客戶與實際部署 |", "| 6. 台灣供應鏈查證 |",
+            "## 最後用六關判斷「能連」到「真正互通」",
+            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 共同規則可查核 |", "| 2. 路徑各位置有具名實物 |",
+            "| 3. 單件產品符合指定規格 |", "| 4. 不同廠商完成交叉互通 |",
+            "| 5. 整個系統與工作可重現 |",
+            "| 6. 客戶部署與公司財務對上 |",
+            "## 這篇對公司判斷的用處與界線",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先用五個位置看", 1
+        )[0]
+        for jargon in (
+            "UALink", "UEC", "ESUN", "SUE-T", "UALoE", "scale-up",
+            "scale-out", "endpoint", "switch", "ASIC", "compliance",
+            "interoperability", "plugfest", "Helios", "MI450", "AMD",
+            "Arista", "Broadcom", "Marvell", "Oracle", "OCP",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-OPEN-AI-FABRICS,"
+            "資料要從一顆運算晶片送到另一顆，"
+            "端點、交換器和軟體要一起通過哪些測試？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "open_ai_fabrics.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "concept:open-ai-fabrics,concept,AI 資料路徑與跨廠互通",
+            "standard:ualink,standard,UALink 加速器互連",
+            "standard:uec,standard,超乙太網路（UEC）",
+            "concept:scale-up,concept,機架內擴充（scale-up）",
+            "concept:scale-out,concept,跨機架擴充（scale-out）",
+            "standard:ualoe,standard,以乙太網路承載 UALink（UALoE）",
+            "stage:interoperability,stage,跨廠互通",
+            "standard:esun,standard,機架內乙太網路交換（ESUN）",
+            "standard:sue-t,standard,機架內乙太傳輸（SUE-T）",
+            "product:arista-7060xe7,product,Arista 7060XE7 網路平台",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: AI 資料路徑與跨廠互通", graph)
+
+    def test_compute_connect_station_seven_separates_link_test_clocks_roles_and_deployment_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-03_pcie6_compliance_ladder.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# PCIe 6 元件寫著第六代，不代表整套系統已通過："
+            "先分清裝置、連線、正式測試與部署\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave102_complete_link_test_dimensions_roles_and_six_gate_deployment",
+            "一條完整高速連線，要讓主機、板路與線材、必要的訊號或交換元件、"
+            "終端裝置，以及低階控制軟體一起工作",
+            "## 先用五個位置看一條高速連線怎麼接起來",
+            "| 本文五個位置 | 它做什麼 | 代表裝置或軟體 | 下一個要驗收 | 不能直接推成 |",
+            "| 1. 主機與連線控制 |", "| 2. 板路、連接器與線材 |",
+            "| 3. 訊號修復或速率轉換 |", "| 4. 連線交換與分支 |",
+            "| 5. 終端與實際工作 |",
+            "## 再用五把尺讀懂一筆測試到底證明什麼",
+            "| 本文五把尺 | 每筆結果要記錄 | 本輪可看到的例子 | 下一份證據 | 不能直接推成 |",
+            "| 1. 規格版本與連線世代 |", "| 2. 每條通道的傳輸率 |",
+            "| 3. 通道數與連線拓撲 |", "| 4. 產品、韌體與軟體組合 |",
+            "| 5. 測試主體與結果狀態 |",
+            "## 把六個動作分成不同時鐘",
+            "| 本文六個時鐘 | 誰來確認 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 規格與測試入口存在 |", "| 2. 具名產品宣稱支援 |",
+            "| 3. 供應商或客戶完成互通 |", "| 4. 具名產品正式通過並列名 |",
+            "| 5. 單一元件進入量產 |", "| 6. 完整平台進入客戶部署 |",
+            "## 把六類角色放回同一套平台",
+            "| 本文六類角色 | 它負責什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |",
+            "| 1. 規格與正式測試組織 |", "| 2. 主機、控制器與平台 |",
+            "| 3. 連接與訊號元件 |", "| 4. 終端與儲存裝置 |",
+            "| 5. 系統整合、雲端客戶與營運者 |", "| 6. 台灣供應鏈查證 |",
+            "## 最後用六關分開「元件已量產」與「整套系統已通過」",
+            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 完整連線的位置與責任可辨認 |", "| 2. 測試合約寫完整 |",
+            "| 3. 具名產品在目標速度正式通過 |", "| 4. 不同廠商的完整路徑互通 |",
+            "| 5. 具名客戶的完整平台穩定部署 |",
+            "| 6. 台灣公司財務足跡可雙向核對 |",
+            "## 這篇對公司判斷的用處與界線",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先用五個位置看", 1
+        )[0]
+        for jargon in (
+            "PCIe", "Gen6", "GT/s", "retimer", "switch", "endpoint",
+            "host", "firmware", "Official", "Integrators", "Workshop",
+            "Astera", "Micron", "PCI-SIG", "qualification",
+            "production", "deployment",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 7),
+            ("research_claim", 7), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-03-PCIE6-COMPLIANCE-LADDER,"
+            "一個高速元件已經量產，為什麼還不能說整台伺服器已通過第六代連線？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "pcie6_compliance_ladder.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "concept:pcie6-deployment-readiness,concept,PCIe 6 高速連線的測試與部署階梯",
+            "standard:pcie6,standard,第六代高速周邊連接（PCIe 6）",
+            "component:pcie-retimer,component,高速訊號重整器（retimer）",
+            "component:pcie-fabric-switch,component,高速連線交換器（switch）",
+            "product:micron-9650,product,Micron 9650 固態硬碟",
+            "stage:vendor-interoperability,stage,跨廠元件互通",
+            "stage:official-compliance,stage,PCI-SIG 官方相容性測試",
+            "stage:integrators-listing,stage,PCI-SIG 合格清單列名",
+            "stage:pcie6-platform-deployment,stage,客戶完整平台部署",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: PCIe 6 高速連線的測試與部署階梯", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 14)
 
 
 if __name__ == "__main__":

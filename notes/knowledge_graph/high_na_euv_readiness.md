@@ -1,14 +1,15 @@
-# High-NA EUV 導入成熟度知識圖譜
+# 晶圓圖形曝光與 High-NA 導入階梯知識圖譜
 
-本圖將掃描機供應商與客戶／研發機構分開，並把出貨、運轉、製程資格、產品晶圓與 HVM
-插入投影成不同節點。它不以工具數量推估客戶良率或台灣公司財務曝險。
+本圖先把圖形如何印上晶圓放回光罩、光阻、曝光、圖形轉移與量測接力，再將設備商、客戶與
+研發機構分開，並把出貨、運轉、製程資格、產品晶圓與高量產導入投影成不同節點。它不以
+機器數量推估客戶良率、每顆合格晶片成本或台灣公司財務曝險。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: high-na-euv-readiness
 root_node_id: concept:high-na-euv-readiness
-label: High-NA EUV 導入
-summary: 追蹤 High-NA EUV 從 scanner shipment、customer operation、process qualification、product wafer 到 HVM insertion 的證據階梯與生態系依賴。
+label: 晶圓圖形曝光與 High-NA 導入階梯
+summary: 追蹤圖形曝光接力，以及 High-NA 從機器送達、客戶端運轉、製程資格、實際產品晶圓到高量產導入的證據階梯與生態系依賴。
 article_ids: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER
 status: active
 -->

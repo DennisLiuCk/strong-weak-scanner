@@ -44,14 +44,14 @@ standard:cxl4,standard,CXL 4.0,Compute Express Link 4.0,concept:ai-memory-hierar
 component:system-ram,component,System RAM,Host memory|CPU memory,concept:ai-memory-hierarchy,位於 CPU 主機側的系統記憶體層
 component:local-ssd,component,Local SSD,Local flash,concept:ai-memory-hierarchy,位於單一節點或機架內的本地快閃儲存層
 component:shared-storage,component,Shared storage,Networked storage,concept:ai-memory-hierarchy,提供持久性與跨節點存取的一般共享儲存層
-concept:open-ai-fabrics,concept,開放 AI 互連,Open AI fabrics,,把 accelerator scale-up 與 Ethernet scale-out 分層追蹤的開放互連框架
-standard:ualink,standard,UALink,Ultra Accelerator Link,concept:open-ai-fabrics,針對 AI accelerator scale-up 的開放互連規格
-standard:uec,standard,Ultra Ethernet,UEC,concept:open-ai-fabrics,針對 AI 與 HPC scale-out Ethernet 的開放規格
-concept:scale-up,concept,Scale-up,Accelerator scale-up,concept:open-ai-fabrics,在 pod 或機架內以低延遲和記憶體語意連接多顆加速器
-concept:scale-out,concept,Scale-out,Ethernet scale-out,concept:open-ai-fabrics,把多個機架或節點連成更大叢集的網路層
-standard:ualoe,standard,UALink over Ethernet,UALoE,concept:open-ai-fabrics,以 Ethernet 傳輸路徑承載 UALink protocol 的互連方式
+concept:open-ai-fabrics,concept,AI 資料路徑與跨廠互通,Open AI fabrics,,先展開運算端點 連接傳輸 交換器 控制軟體與目的端點 再分開機架內外的開放互連框架
+standard:ualink,standard,UALink 加速器互連,Ultra Accelerator Link,concept:open-ai-fabrics,針對機架內加速器擴充的開放互連規格
+standard:uec,standard,超乙太網路（UEC）,Ultra Ethernet,concept:open-ai-fabrics,針對人工智慧與高效能運算跨機架乙太網路的開放規格
+concept:scale-up,concept,機架內擴充（scale-up）,Accelerator scale-up,concept:open-ai-fabrics,在運算群組或機架內以低延遲和記憶體使用方式連接多顆加速器
+concept:scale-out,concept,跨機架擴充（scale-out）,Ethernet scale-out,concept:open-ai-fabrics,把多個機架或節點連成更大叢集的網路層
+standard:ualoe,standard,以乙太網路承載 UALink（UALoE）,UALink over Ethernet,concept:open-ai-fabrics,以乙太網路傳輸路徑承載 UALink 協定的互連方式
 standard:ucie3,standard,UCIe 3.0,Universal Chiplet Interconnect Express 3.0,process:advanced-packaging,封裝內 die-to-die 的開放 chiplet 互連規格
-stage:interoperability,stage,Multi-vendor interoperability,互通測試|Plugfest,concept:open-ai-fabrics,不同廠商實作完成規格合規並可彼此工作的成熟度節點
+stage:interoperability,stage,跨廠互通,Multi-vendor interoperability|互通測試|Plugfest,concept:open-ai-fabrics,不同廠商端點 交換器與軟體完成指定版本 錯誤情境與工作負載測試的成熟度節點
 concept:cpo-networking,concept,共同封裝光學網路（CPO）,Co-packaged optics networking,,把光引擎靠近交換晶片以縮短高速電訊號路徑的網路架構
 product:spectrum-x-ethernet-photonics,product,Spectrum-X 共同封裝光學交換器,Spectrum-X Ethernet Photonics|Spectrum-6 SPX,concept:cpo-networking,NVIDIA 以共同封裝光學實作的 Spectrum-X Ethernet 交換器產品
 component:co-packaged-optics,component,共同封裝光學（CPO）,Co-packaged optics,concept:cpo-networking,把光學元件與交換晶片共同整合以降低高速電訊號傳輸距離
@@ -104,18 +104,18 @@ standard:hbf-workstream,standard,HBF 標準化工作組,HBF standardization work
 stage:hbf-memory-sample,stage,HBF 記憶體樣品,Memory sample,concept:hbf-commercialization,實體 HBF 記憶體交付客戶或合作夥伴測試但尚未完成裝置資格的階段
 stage:hbf-device-sample,stage,HBF 推論裝置樣品,Inference device sample,concept:hbf-commercialization,整合 HBF 的 AI 推論裝置開始送樣但尚未證明量產部署的階段
 stage:hbf-customer-qualification,stage,HBF 客戶資格,HBF customer qualification,concept:hbf-commercialization,客戶完成介面 效能 耐久 熱與工作負載驗證的量產前節點
-concept:high-na-euv-readiness,concept,High-NA EUV 導入成熟度,High-NA EUV insertion ladder|高數值孔徑極紫外光刻,,把掃描機出貨 運轉 製程資格 產品晶圓與高量產插入分開追蹤的微影框架
-component:high-na-euv-scanner,component,High-NA EUV scanner,0.55 NA EUV scanner|High NA 掃描機,concept:high-na-euv-readiness,以 0.55 數值孔徑提高解析度的下一代 EUV 微影曝光系統
-product:exe-5200b,product,ASML EXE:5200B,TWINSCAN EXE:5200B,concept:high-na-euv-readiness,ASML 第二代 High-NA EUV 掃描機
-stage:high-na-operation,stage,High-NA 客戶端運轉,Customer-site operation,concept:high-na-euv-readiness,掃描機在客戶或研發機構完成安裝並開始運作但尚未代表製程量產
-stage:high-na-process-qualification,stage,High-NA 製程資格,Process qualification,concept:high-na-euv-readiness,掃描機與材料 掩模 量測及製程整合完成目標資格的階段
-stage:high-na-product-wafer,stage,High-NA 產品晶圓測試,Product wafer testing,concept:high-na-euv-readiness,客戶開始以實際產品晶圓驗證 High-NA 層與製程視窗的階段
-stage:high-na-hvm-insertion,stage,High-NA HVM 插入,High-volume manufacturing insertion,concept:high-na-euv-readiness,客戶把 High-NA 納入量產節點與產品流程的商用成熟度節點
-component:high-na-resist,component,High-NA 光阻,High-NA photoresist|EUV resist,concept:high-na-euv-readiness,把 High-NA 曝光圖形穩定轉移到晶圓所需的感光材料
-capability:high-na-metrology,capability,High-NA 量測與檢查,High-NA metrology and inspection,concept:high-na-euv-readiness,量測疊對 線寬 缺陷與製程穩定度以支援 High-NA 資格的能力
-standard:esun,standard,ESUN,Ethernet for Scale-Up Networking,concept:open-ai-fabrics,OCP 針對 AI scale-up 網路交換與 Ethernet framing 的開放規格工作組
-standard:sue-t,standard,SUE-T,Scale-Up Ethernet Transport,concept:open-ai-fabrics,OCP 針對 XPU endpoint 與 transport 功能的 Scale-Up Ethernet 工作組
-product:arista-7060xe7,product,Arista 7060XE7,7060XE7 Series|Etherlink 1.6T,concept:open-ai-fabrics,Arista 於 2026 年公告可服務 scale-up 與 scale-out 的 1.6T 網路平台
+concept:high-na-euv-readiness,concept,晶圓圖形曝光與 High-NA 導入階梯,High-NA EUV insertion ladder|高數值孔徑極紫外光刻,,把圖形如何印上晶圓與設備出貨 運轉 資格 產品晶圓及高量產導入分開追蹤的微影框架
+component:high-na-euv-scanner,component,高數值孔徑 EUV 曝光機,0.55 NA EUV scanner|High NA 掃描機,concept:high-na-euv-readiness,以 0.55 數值孔徑提高解析度的下一代極紫外光微影曝光系統
+product:exe-5200b,product,ASML EXE:5200B 曝光機,TWINSCAN EXE:5200B,concept:high-na-euv-readiness,ASML 第二代高數值孔徑極紫外光曝光機
+stage:high-na-operation,stage,客戶端開始運轉,Customer-site operation|High-NA 客戶端運轉,concept:high-na-euv-readiness,曝光機在客戶或研發機構完成安裝並開始運作但尚未代表製程量產
+stage:high-na-process-qualification,stage,製程資格驗證,Process qualification|High-NA 製程資格,concept:high-na-euv-readiness,曝光機與材料 光罩 量測及製程整合完成目標資格的階段
+stage:high-na-product-wafer,stage,實際產品晶圓測試,Product wafer testing|High-NA 產品晶圓測試,concept:high-na-euv-readiness,客戶開始用實際產品晶圓驗證使用層與製程視窗的階段
+stage:high-na-hvm-insertion,stage,高量產導入,High-volume manufacturing insertion|High-NA HVM 插入,concept:high-na-euv-readiness,客戶把高數值孔徑曝光納入量產節點與產品流程的商用成熟度節點
+component:high-na-resist,component,高數值孔徑曝光用光阻,High-NA photoresist|EUV resist,concept:high-na-euv-readiness,把高數值孔徑曝光圖形穩定轉移到晶圓所需的感光材料
+capability:high-na-metrology,capability,高數值孔徑曝光量測與檢查,High-NA metrology and inspection,concept:high-na-euv-readiness,量測疊對 線寬 缺陷與製程穩定度以支援資格驗證的能力
+standard:esun,standard,機架內乙太網路交換（ESUN）,Ethernet for Scale-Up Networking,concept:open-ai-fabrics,OCP 針對人工智慧機架內擴充的網路交換 乙太網路封包與可靠性開放規格
+standard:sue-t,standard,機架內乙太傳輸（SUE-T）,Scale-Up Ethernet Transport,concept:open-ai-fabrics,OCP 針對加速器端點 記憶體使用方式與傳輸功能的工作流
+product:arista-7060xe7,product,Arista 7060XE7 網路平台,7060XE7 Series|Etherlink 1.6T,concept:open-ai-fabrics,Arista 於 2026 年公告可服務機架內與跨機架的 1.6T 網路平台
 concept:custom-hbm-commercialization,concept,Custom HBM 商用成熟度,Custom HBM scope ladder|客製 HBM,,依客製對象 樣品 客戶資格 量產與財務分開追蹤的 HBM 研究框架
 product:custom-hbm,product,Custom HBM,Customized HBM|cHBM,concept:custom-hbm-commercialization,依客戶加速器架構調整介面 base die 或工作負載的非單一規格產品集合
 process:customer-codesign,process,客戶共同設計,Customer co-design,concept:custom-hbm-commercialization,記憶體供應商與加速器客戶共同定義介面 邏輯與產品條件的開發流程
@@ -123,15 +123,15 @@ capability:workload-offload,capability,Base-die 工作負載下放,Workload offl
 stage:custom-hbm-sample,stage,Custom HBM 客戶樣品,Custom HBM customer sample,concept:custom-hbm-commercialization,依客戶規格交付可測實體樣品但尚未完成產品資格的節點
 stage:custom-hbm-qualification,stage,Custom HBM 客戶資格,Custom HBM customer qualification,concept:custom-hbm-commercialization,客戶完成介面 功耗 熱 效能 良率與系統相容性驗證的節點
 stage:custom-hbm-production,stage,Custom HBM 量產,Custom HBM production,concept:custom-hbm-commercialization,客製產品進入穩定製造與出貨但不自動代表財務分母已揭露的節點
-concept:pcie6-deployment-readiness,concept,PCIe 6 部署成熟度,PCIe 6 compliance ladder|Gen6 readiness,,把產品功能 供應商互通 官方測試 公開列表與平台部署分開追蹤的 PCIe 6 框架
-standard:pcie6,standard,PCIe 6.x,PCI Express 6|PCIe Gen6,concept:pcie6-deployment-readiness,最高 64 GT/s 並採 PAM4 與 FLIT 模式的 PCI Express 第六代規格家族
-component:pcie-retimer,component,PCIe retimer,PCIe 6 retimer,concept:pcie6-deployment-readiness,重整高速 PCIe 電訊號並延伸可用板級或纜線距離的連接元件
-component:pcie-fabric-switch,component,PCIe fabric switch,PCIe 6 switch,concept:pcie6-deployment-readiness,在 host 與多個 endpoint 間交換及管理 PCIe 流量的元件
-product:micron-9650,product,Micron 9650 SSD,9650 NVMe SSD,concept:pcie6-deployment-readiness,Micron 公告進入 high-volume production 的 PCIe Gen6 data center SSD
-stage:vendor-interoperability,stage,供應商互通,Vendor interoperability,concept:pcie6-deployment-readiness,供應商或客戶平台驗證不同元件共同運作但不必然等於標準組織正式測試的節點
-stage:official-compliance,stage,PCI-SIG 官方測試,Official compliance testing,concept:pcie6-deployment-readiness,依 PCI-SIG 指定程序與速率執行 official testing 的節點
-stage:integrators-listing,stage,Integrators List 列名,PCI-SIG Integrators List,concept:pcie6-deployment-readiness,產品依指定 specification revision 與 rate 通過程序後出現在 PCI-SIG 公開列表的節點
-stage:pcie6-platform-deployment,stage,PCIe 6 平台部署,PCIe 6 production fleet,concept:pcie6-deployment-readiness,具名客戶把 host switch retimer endpoint 與 firmware 組成可運行 production fleet 的節點
+concept:pcie6-deployment-readiness,concept,PCIe 6 高速連線的測試與部署階梯,PCIe 6 compliance ladder|Gen6 readiness,,把具名裝置 實際連線條件 正式測試 公開列名 元件量產與完整平台部署分開追蹤的閱讀框架
+standard:pcie6,standard,第六代高速周邊連接（PCIe 6）,PCI Express 6|PCIe Gen6,concept:pcie6-deployment-readiness,每條通道最高 64 GT/s 並採 PAM4 與 FLIT 模式的 PCI Express 第六代規格家族
+component:pcie-retimer,component,高速訊號重整器（retimer）,PCIe 6 retimer,concept:pcie6-deployment-readiness,重新整理衰減或變形的高速電訊號並延伸可用板路或線材距離的連接元件
+component:pcie-fabric-switch,component,高速連線交換器（switch）,PCIe 6 switch,concept:pcie6-deployment-readiness,在主機與多個終端裝置之間交換及管理 PCIe 資料的元件
+product:micron-9650,product,Micron 9650 固態硬碟,9650 NVMe SSD,concept:pcie6-deployment-readiness,Micron 公告進入大量生產的第六代 PCIe 資料中心固態硬碟
+stage:vendor-interoperability,stage,跨廠元件互通,Vendor interoperability,concept:pcie6-deployment-readiness,供應商或客戶平台驗證不同公司的主機 訊號元件 交換器與終端共同運作的節點
+stage:official-compliance,stage,PCI-SIG 官方相容性測試,Official compliance testing,concept:pcie6-deployment-readiness,依 PCI-SIG 指定程序 規格版本與速度執行正式測試的節點
+stage:integrators-listing,stage,PCI-SIG 合格清單列名,PCI-SIG Integrators List,concept:pcie6-deployment-readiness,產品依指定規格版本與速度通過程序後出現在 PCI-SIG 公開清單的節點
+stage:pcie6-platform-deployment,stage,客戶完整平台部署,PCIe 6 production fleet,concept:pcie6-deployment-readiness,具名客戶把主機 交換器 訊號重整器 終端與韌體組成可長期運行生產系統的節點
 concept:ai-power-buffering,concept,AI 功率緩衝,AI power buffering|multi-timescale energy storage,concept:800v-power-tree,依負載波動的時間尺度與系統位置分配 CBU BBU 與 BESS 的電力架構
 component:rack-capacitor-bank,component,機架電容儲能,CBU|Capacitor Bank Unit,concept:ai-power-buffering,靠近機架處理快速功率波動的電容或超級電容模組
 component:facility-bess,component,設施級 BESS,Battery Energy Storage System,concept:ai-power-buffering,位於設施或併網側管理較慢且較大範圍功率變化的電池儲能
