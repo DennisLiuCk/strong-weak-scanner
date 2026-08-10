@@ -53,6 +53,13 @@ to: triaged
 reason: editorial_reader_led_why_it_matters_no_conclusion_change
 evidence: editorial:reader_led_why_it_matters
 -->
+<!-- transition
+date: 2026-08-10
+from: triaged
+to: triaged
+reason: editorial_reader_section_leads_plain_language_no_conclusion_change
+evidence: editorial:reader_section_leads_plain_language
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -251,12 +258,12 @@ resolution:
 prefetch、hedged reads 與 concurrency control，所以單看 SSD sequential throughput 會漏掉真正的
 瓶頸。
 
-**Checkpoint**是可靠度契約。它要回答多久存一次、停算多久、壞掉時丟多少進度、哪一層
+**訓練存檔（checkpoint）**是可靠度契約。它要回答多久存一次、停算多久、壞掉時丟多少進度、哪一層
 能承受節點或區域故障。AWS 把同步／非同步、hierarchical distribution 及 fast／durable tier
 分開（C2），表示 local NVMe 很快不等於具備 durable recovery，durable object storage 也不等於
 適合每幾分鐘的 fast checkpoint。
 
-**模型權重分發**是副本位置與 transport 問題。第一個 worker 可能從 object 或 local storage
+**模型權重分發**是副本位置與資料傳輸路徑問題。第一個 worker 可能從 object 或 local storage
 啟動，後續 worker 則可能直接從已上線的 peer GPU 取得權重（C3）。這條路徑甚至會主動避開
 local disk，因此「模型越大，所有節點就等比例多讀一次 SSD」並不是可直接接受的假設。
 

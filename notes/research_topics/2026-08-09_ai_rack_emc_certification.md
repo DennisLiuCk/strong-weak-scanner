@@ -53,6 +53,13 @@ to: triaged
 reason: editorial_reader_led_why_it_matters_no_conclusion_change
 evidence: editorial:reader_led_why_it_matters
 -->
+<!-- transition
+date: 2026-08-10
+from: triaged
+to: triaged
+reason: editorial_reader_section_leads_plain_language_no_conclusion_change
+evidence: editorial:reader_section_leads_plain_language
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -246,21 +253,22 @@ resolution:
 
 ## 四道關卡，不能用同一張證書跳過
 
-**第一道是元件與材料。** common-mode choke、filter、shield、gasket、吸波材與 PCB layout 各自
-處理不同的 conducted／radiated path。國巨集團的 FLEX SUPPRESSOR 能證明公司有一項具名
+**第一道是元件與材料。** 共模扼流圈、濾波器、屏蔽結構、導電墊片、吸波材與 PCB 佈局，
+各自處理不同的傳導／輻射雜訊路徑。國巨集團的 FLEX SUPPRESSOR 能證明公司有一項具名
 EMI 抑制能力（C4），但產品公告沒有 AI rack placement、目標頻帶或 system attenuation。
 
-**第二道是 equipment scope。** CISPR 32 說明多媒體設備的 emission 要求與可重複量測目標
-（C2）；它不會自動回答一套由 compute rack、power sidecar、cooling skid 與外接纜線構成的
-system，哪一種 configuration 才是正式被測物。
+**第二道先確認被測設備範圍。** CISPR 32 說明多媒體設備的排放要求與可重複量測目標（C2）；
+它不會自動回答一套由運算機櫃（compute rack）、電源側櫃（power sidecar）、液冷設備
+（cooling skid）與外接纜線構成的完整系統，哪一種配置才是正式被測物。
 
-**第三道是 measurement procedure 與責任。** FCC KDB 提供一般量測方法入口，但遇到其他
-方法要向 FCC Laboratory 查詢；accredited-firm dataset 更明說使用者要自行確認該 firm 能否
-量特定 device（C3）。「在名單上」因此不等於能處理兆瓦級重型機櫃。
+**第三道是量測程序與責任。** FCC KDB 提供一般量測方法入口；若採用其他方法，需向
+FCC Laboratory 查詢。合格測試機構資料集（accredited-firm dataset）也明示，使用者仍須自行
+確認該機構是否能量測特定裝置（C3）。「在名單上」因此不等於能處理兆瓦級重型機櫃。
 
-**第四道才是可用 capacity。** OCP 訪談指出 weight、power 與 chamber size 同時卡住 lab，
-並提出全球一至兩家的急迫主張（C1）。本研究接受前三項物理限制作為待查核機制，卻把實際
-家數、時槽與部署延遲留在 C8，因為沒有 census 就不能把訪談升格成市場規模。
+**第四道才是實驗室可用量能。** OCP 訪談指出重量、供電與隔離測試室尺寸同時限制實驗室
+可用性，並提出全球一至兩家的急迫主張（C1）。本研究接受前三項物理限制作為待查核機制，
+卻把實際家數、時槽與部署延遲留在 C8；沒有具名實驗室的全面盤點（census），就不能把訪談
+升格成市場規模。
 
 ## 如何判斷一份 EMC 證據走到哪一層
 

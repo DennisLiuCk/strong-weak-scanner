@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 33)
+        self.assertEqual(library["learningPathVersion"], 36)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1305,6 +1305,8 @@ class ResearchCenterTest(unittest.TestCase):
             "降級只表示證據需要更新，不代表主張已被推翻",
             "從這篇接著學", "function openLearningGroups(",
             "function openLearningCollection(", "learning-path-grid",
+            ".learning-path{container-type:inline-size",
+            "@container (max-width:620px){.learning-handoff,.learning-path-grid{grid-template-columns:1fr}",
             "function learningCheckpoint(", "function learningCard(",
             "function learningRouteBridge(", "learning-route-bridge",
             "本篇與下一站的閱讀順序", "data-route-from-graph",
@@ -1463,7 +1465,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("if(byId.has(deepLink))document.body.classList.add('article-open')", template)
         self.assertIn("state.selected=byId.has(deepLink)?deepLink:null", template)
         self.assertIn("renderAll();if(byId.has(deepLink))focusArticleHeading(deepLink)", template)
-        self.assertIn("if(!document.body.classList.contains('article-open')){state.selected=null;return null}", template)
+        self.assertIn("if(!open){state.selected=null;return null}", template)
         self.assertNotIn("if(!state.selected||!rows.some(article=>article.id===state.selected)){state.selected=rows[0].id", template)
         self.assertIn("function hashArticleId()", template)
         self.assertIn("url.hash=article.id", template)
@@ -1499,6 +1501,35 @@ class ResearchCenterTest(unittest.TestCase):
         )
         self.assertIn("const parsed=researchSummaryEntries(node)", template)
         self.assertNotIn("text:'現在能說到哪裡？'", template)
+
+    def test_topic_reader_maps_authored_section_leads_before_dense_prose(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function readerSectionMapItems(section)",
+            "if(block.t!=='p')break",
+            "if(!lead?.b)break",
+            "return items.length>=3?items:[]",
+            "function readerSectionMap(section,index)",
+            "'data-reader-section-map':section.h||''",
+            "'data-reader-section-map-count':items.length",
+            "'data-reader-section-map-step':itemIndex+1",
+            "本節先看",
+            "先把這 '+items.length+' 個重點放在一起",
+            "先比較它們負責什麼、哪裡不同，再往下讀完整說明。",
+            "重點逐字沿用本節原文；編號只表示出現順序，不代表重要性、上下游或因果關係。",
+            "showReaderAids=mode==='reader'&&article.type==='topic'&&!audit",
+            "sectionMap=showReaderAids?readerSectionMap(section,index):null",
+            "if(sectionMap)sectionEl.appendChild(sectionMap);if(guide)sectionEl.appendChild(guide)",
+            ".reader-section-map-steps{display:grid",
+            "@container (max-width:480px){.reader-section-map-head{grid-template-columns:1fr}",
+        ):
+            self.assertIn(contract, template)
+        reader_render = template.index("const showReaderAids=mode==='reader'")
+        self.assertLess(
+            template.index("if(sectionMap)sectionEl.appendChild(sectionMap)", reader_render),
+            template.index("if(guide)sectionEl.appendChild(guide)", reader_render),
+        )
+        self.assertNotIn("section.readerSectionMap", template)
 
     def test_formal_and_narrative_reading_actions_do_not_skip_industry_role_context(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -1564,6 +1595,36 @@ class ResearchCenterTest(unittest.TestCase):
             )[0]
             for lead in leads:
                 self.assertIn(lead, why)
+
+    def test_promoted_topics_keep_first_reader_section_labels_in_plain_chinese(self):
+        expectations = {
+            "2026-08-09_ai_rack_emc_certification.md": (
+                "**第一道是元件與材料。**",
+                "**第二道先確認被測設備範圍。**",
+                "**第三道是量測程序與責任。**",
+                "**第四道才是實驗室可用量能。**",
+                "共模扼流圈、濾波器、屏蔽結構、導電墊片、吸波材與 PCB 佈局",
+            ),
+            "2026-08-09_ai_storage_data_plane.md": (
+                "**資料集讀取**",
+                "**訓練存檔（checkpoint）**",
+                "**模型權重分發**是副本位置與資料傳輸路徑問題。",
+            ),
+        }
+        for filename, phrases in expectations.items():
+            source = (ROOT / "notes" / "research_topics" / filename).read_text(
+                encoding="utf-8"
+            )
+            for phrase in phrases:
+                self.assertIn(phrase, source)
+            self.assertIn(
+                "evidence: editorial:reader_section_leads_plain_language", source
+            )
+        emc = (ROOT / "notes" / "research_topics" /
+               "2026-08-09_ai_rack_emc_certification.md").read_text(encoding="utf-8")
+        self.assertNotIn("**第二道是 equipment scope。**", emc)
+        self.assertNotIn("**第三道是 measurement procedure 與責任。**", emc)
+        self.assertNotIn("**第四道才是可用 capacity。**", emc)
 
     def test_template_brings_existing_glossary_terms_to_each_reader_section(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -1659,8 +1720,8 @@ class ResearchCenterTest(unittest.TestCase):
             "function clearArticleRoute()",
             "setArticleHash('')",
             "mobileBack.addEventListener('click',originContext?returnArticleOrigin:clearArticleRoute)",
-            "if(document.body.classList.contains('article-open'))setArticleHash(state.selected)",
-            "if(document.body.classList.contains('article-open'))clearArticleRoute()",
+            "state.selected=rows[0].id;setArticleHash(state.selected)",
+            "if(!rows.length){state.selected=null;if(open)clearArticleRoute();return null}",
             "function graphHashRoute(value)",
             "selectSurface('graph',false)",
             "else{state.articleOrigin=null;state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}",
@@ -1668,6 +1729,14 @@ class ResearchCenterTest(unittest.TestCase):
             "button.dataset.testid==='article-'+state.selected",
             "let catalogReturnPosition=null",
             "catalogReturnPosition={windowTop:window.scrollY,catalogTop:",
+            "articleId:id",
+            "if(position?.articleId&&byId.has(position.articleId))state.selected=position.articleId",
+            "const open=document.body.classList.contains('article-open')",
+            "if(open&&state.selected&&byId.has(state.selected))return byId.get(state.selected)",
+            "renderAll();const target=",
+            "catalog-reader-detached",
+            "目前閱讀不在左側結果",
+            "這篇由延伸學習開啟；原搜尋與篩選仍保留。",
             "target.scrollIntoView({block:'center',behavior:'instant'})",
             "target.focus({preventScroll:true})",
         ):
@@ -2153,7 +2222,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderRadarGroups(",
             "function openRadarGroup(", "function focusMaturityGroup(",
             "先分清：每個族群在這題要回答什麼？", "從研究雷達定位",
-            "這個族群要回答", "不代表上下游順序",
+            "在這題要回答", "不代表上下游順序",
             ".radar-group-copy", ".maturity-origin-question",
             "'data-radar-group-id':group.id", "state.maturityOrigin",
             "查看研究判定、原始文字與來源",
@@ -2173,10 +2242,22 @@ class ResearchCenterTest(unittest.TestCase):
             "kind:'maturity-radar'",
             "function openMaturityRadarArticle(row,candidate,question)",
             "candidate?.articleId&&byId.has(candidate.articleId)",
+            "function maturityRadarContext(row)",
+            "function renderMaturityOrigin(row)",
+            "'data-maturity-radar-origin':candidate.id",
+            "'data-maturity-radar-group':row.id",
+            "maturity-origin-pending",
+            "row.label+'在這題要回答'",
+            "先讀這篇回答本題",
             "'data-testid':'group-radar-start-'+row.id",
             "先讀本題文章 · ",
             "openMaturityRadarArticle(row,candidate,question)",
-            "下方「已完成／最大缺口／下一步」是",
+            "下方四欄是「'+row.label+'」整體研究盤點，不是本題答案。",
+            "origin=renderMaturityOrigin(row);if(origin)readerRow.appendChild(origin)",
+            "fromRadar?'start':'center'",
+            ".maturity-origin-wide{grid-column:1/-1",
+            "@media(max-width:1000px) and (min-width:781px){.maturity-origin-wide",
+            "@media(max-width:780px){.maturity-origin-wide",
             "讀完本題後 · 族群基礎起點",
             "再讀族群基礎",
             "if(origin?.kind!=='radar'&&origin?.kind!=='maturity-radar')return null",
@@ -2190,6 +2271,7 @@ class ResearchCenterTest(unittest.TestCase):
             ".maturity-origin .maturity-origin-start",
         ):
             self.assertIn(contract, template)
+        self.assertNotIn("wrap.prepend(card)", template)
         self.assertLess(
             template.index("'data-testid':'group-radar-start-'+row.id"),
             template.index("'data-testid':'group-start-'+row.id"),

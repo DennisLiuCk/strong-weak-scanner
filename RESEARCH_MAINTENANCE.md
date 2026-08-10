@@ -84,7 +84,11 @@ Active radar 另必須提供純編輯／導覽層的 `reader_question`、`reader
 族群基礎起點與研究缺口，矩陣保留同一問句、同步選取相同族群，並提供返回原候選的焦點路徑。
 候選已升格且正式 article 可解析時，矩陣主要行動必須開同一 `candidate.articleId`，不得改開該族群
 通用 `learningStart`；後者只能降為「再讀族群基礎」。候選未升格時必須明示本題尚無文章，不得由
-族群或題名猜一篇替代。完整
+族群或題名猜一篇替代。這個雷達承接區必須由 `renderMaturityOrigin()` 直接插入所選
+`.maturity-reader-row`，並以 `grid-column: 1 / -1` 排在四個盤點 cell 之前；不得再塞進第一欄的
+族群起點。寬桌面可分成問句／本題文章／行動三欄，中幅改成問句與文章兩欄、行動另列，窄幅依
+DOM 順序單欄。未升格狀態只保留問句與返回行動，不得因共用三欄版而留下空白文章欄。開文再返回
+時必須重建同一承接卡、選取族群並把焦點送回整列起點。完整
 `why_now`、`next_evidence`、knowledge gain、第一拒絕與來源仍保留在預設關閉的查核區。
 這五個欄位不能改寫 rank、priority、evidence posture、selection decision 或任何凍結值，
 也不能新增文章、圖譜、公司曝險或投資結論。
@@ -283,7 +287,18 @@ v3 繼承 v2 的新手導讀。第一個 H2 固定為「新手先讀：這篇在
 只有真正命中的詞可出現在節首「本節先認得」，按鈕只把同一原生 dialog 預填為該詞並顯示原始
 list runs。新手段落已有完整字典、研究摘要已有白話卡、研究查核附錄保留專業用途，三者都不重複
 插入節首詞鈕。沒有命中時不顯示空容器，不得用相似度、模型或另一份詞表補詞。畫面不刪除或
-改寫任何 block。市場議題一般正文內的 table 在 `mode=reader` 且非查核附錄時，必須先由
+改寫任何 block。
+
+市場議題主正文若一節從第一個 block 起連續出現至少三個 paragraph，且每段第一個非空 run 都有
+作者明寫的 bold，`readerSectionMapItems()` 才可逐 run 建立「本節先看」。遇到非 paragraph 或
+第一個非空 run 不是 bold 就立即停止，累積少於三項時回傳空清單；不得跳過中間 block 拼湊、讀取
+後文摘要，或替沒有粗體主句的段落生成文字。卡片置於同節名詞提示與完整 blocks 之前，label 必須
+逐字重用原 bold run，原段落、連結、順序與來源仍完整渲染。`ol` 保留原文順序語意，視覺編號須對
+輔具隱藏，並明示編號不代表重要性、上下游或因果關係。這項提示只可出現在 `mode=reader` 的
+`type=topic` 非查核附錄；新手導讀、研究摘要、正式筆記、多空小作文與其他 mode 都不得插入。
+section 容器不超過 480px 時，標題、說明與步驟須改為單欄且不得造成水平溢出。
+
+市場議題一般正文內的 table 在 `mode=reader` 且非查核附錄時，必須先由
 `readerTableGuide()` 讀取同一個 `table.head`；至少兩個非空欄名才顯示帶 `aria-label="表格閱讀順序"`
 的 `aside` 與有序步驟。兩欄表只提示左欄、右欄；三欄以上固定提示最左欄、中間欄與最右欄，
 其中中間標題只能依原順序串接既有欄名。函式不得讀 `table.rows` 或 cell 內容生成摘要；提示必須
@@ -638,7 +653,16 @@ resize 不得重設使用者已切換的開合狀態。每個 phase 摘要須顯
 用文章題名、相似度或模型補寫。這個 ordered list 只表示 route 既有次序，必須明示不代表
 供應鏈、受惠或因果關係，也不得建立 knowledge graph edge。任何 route 主文章缺少問題或
 三句重點都必須讓建置失敗。回看按鈕須把鍵盤焦點與捲動位置一起送回「三句話抓重點」，不能被
-黏性導覽遮住；下一站按鈕須顯示站次、開啟既有文章並回到文章頂端。
+黏性導覽遮住；下一站按鈕須顯示站次、開啟既有文章並回到文章頂端。`.learning-path` 必須建立
+inline-size container；實際內容寬度不超過 620px 時，`.learning-handoff` 與
+`.learning-path-grid` 都改為單欄，不能只依 viewport 判斷，因桌機 master-detail 的正文也可能
+只剩三百多 px。寬專注閱讀才保留並排比較。
+
+文章內換篇時，`ensureSelected()` 必須優先保留仍開啟且存在於 `byId` 的文章，即使它不符合左側
+目前搜尋、類型或族群條件；不得再由 `filteredArticles()` 的第一篇覆寫下一站。清單須保留原條件
+並顯示「目前閱讀不在左側結果」，讓讀者知道差異來自延伸導覽。首次由清單開文時另保存原 article
+ID、window 與 catalog 捲動位置；返回清單須重建原選取並恢復焦點，不得把下一站硬塞入搜尋結果，
+也不得清除使用者的搜尋或篩選。
 
 延伸區的圖譜卡必須描述它實際會開啟的同一投影：優先使用有 edge 的 `company` 視角，只有沒有
 公司 edge 時才退到 `industry`；節點數只計 root 與該視角 edge 實際連到、且存在於 graph nodes
@@ -659,6 +683,12 @@ topic schema 或證據層級。
 該段第一個 run 時加上 `data-reader-lead`、色彩與分隔線，不得從段落自動摘要或替沒有主句的
 文章生成文字。改寫仍須追加同狀態 `editorial:<slug>` transition，並由 baseline lint 證明
 source／claim／comparison／monitor 與鎖定 meta 逐字未變。
+
+若同一批次也把主正文的多步機制改成段首主句，主句先寫中文概念，必要英文放在括號；每一段仍要
+保留足以理解責任、差異與證據邊界的完整說明。只有從該節第一個 block 起連續至少三段都符合
+`**短主句。**`，發布頁才會顯示上述「本節先看」；不能為了湊卡片把不同位置的段落拉在一起。
+這類正文改寫同樣必須追加同狀態 `editorial:<slug>` transition，且不改 source／claim／comparison／
+monitor 與鎖定 meta。
 
 既有文章一旦列入讀者學習路徑的白話升級批次，就不得再保留 readability warning；測試以
 明確文章清單鎖住這項品質債，避免後續回退。改寫先寫中文概念，再把英文專有名詞放在括號，
