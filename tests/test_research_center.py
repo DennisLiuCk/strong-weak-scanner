@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 26)
+        self.assertEqual(library["learningPathVersion"], 27)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1856,6 +1856,7 @@ class ResearchCenterTest(unittest.TestCase):
         for contract in (
             'id="graphLearningTitle"', 'id="graphRouteTabs"',
             'id="graphHubSelect"', 'id="graphIntroActions"',
+            'id="graphOrigin"', 'aria-labelledby="graphOriginTitle"',
             'aria-label="知識圖譜學習路線"',
             "const GRAPH_LEARNING_ROUTES=KG.learningRoutes||[]",
             "function availableGraphRoutes()",
@@ -1877,6 +1878,20 @@ class ResearchCenterTest(unittest.TestCase):
             "graphScrollTop:graphPage?.scrollTop||0",
             "openGraphArticle(startArticle.id)",
             "selectArticle(articleId,true,graphArticleOrigin())",
+            "graphOrigin:null", "function graphLearningOrigin()",
+            "kind:'article-learning'", "articleScrollTop:reader?.scrollTop||0",
+            "articleWindowTop:window.scrollY||0", "articleOrigin}",
+            "function graphLearningNextLabel(article)",
+            "function renderGraphOrigin()", "'data-testid':'graph-origin-back'",
+            "回到剛才文章", "文章 → 關係圖",
+            "function focusGraphOrigin()", "function returnGraphLearningOrigin()",
+            "#learningPath .learning-card.kind-graph .learning-card-action",
+            "openRadarGraph(graphId,graphView='company',edgeId='',origin=null)",
+            "state.graphOrigin=origin", "if(origin)focusGraphOrigin()",
+            "card.guidedRelation?.edgeId,graphLearningOrigin()",
+            "state.graphOrigin=null;selectSurface('graph')",
+            ".graph-origin{display:grid;grid-template-columns:minmax(0,1fr) auto",
+            ".graph-origin button{min-height:44px",
             "if(origin.kind==='graph')",
             "返回這張知識圖譜",
             "返回會保留原主題、投影視角與已選關係",

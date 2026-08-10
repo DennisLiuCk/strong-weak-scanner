@@ -1,5 +1,30 @@
 # Changelog
 
+## 圖譜保留文章學習脈絡 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、階段、站次、關係、證據與研究進度零變動**；本次只補齊文章延伸卡進入圖譜後的
+一次性讀者導覽狀態。
+
+- 完整走讀「系統問題 → 第一站文章 → 從這篇接著學 → 查看公司曝險圖」發現，圖譜雖能顯示
+  同一學習路線與階段，首屏卻沒有說明讀者從哪篇文章來、如何回去繼續下一站；原按鈕被移除後
+  鍵盤焦點也落到 `body`，使建立關聯的步驟反而切斷原學習脈絡。
+- `learningPathVersion` 升為 27。文章的圖譜卡現在保存文章 ID、閱讀欄與 window 捲動位置，並
+  連同文章原本的矩陣／圖譜起點建立一次性 `article-learning` origin。圖譜首屏新增「文章 →
+  關係圖」、剛才文章、下一站與至少 44px 的「回到剛才文章」；進圖焦點送到此脈絡，返回後恢復
+  同一張圖譜卡位置、按鈕焦點與原系統問題。直接圖譜 deep link、頁首圖譜分頁、雷達與其他入口
+  都清空 origin，不會虛構文章來源或把狀態寫進 payload。
+- 1280×720 深色與淺色實測，文章進圖後 origin 可見、返回按鈕高度 44px、焦點落在脈絡標題；
+  返回後 URL、矩陣起點與第 1/9 站文章都保留，焦點回到「查看公司曝險圖」，頁面寬度等於
+  viewport。一般圖譜分頁會隱藏空 origin。修改前後畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave63/`；固定桌機 viewport 未涵蓋實機手機與螢幕閱讀器，
+  仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 皆為
+  `50862ce6…`，`articles`、`knowledgeGraph` 與 `groupMaturity` 逐項相同。`Darwin 25.5.0 arm64`、
+  Python 3.11.11 預設環境執行 476 tests 全綠；qual notes、leading hypotheses、research radar、
+  method audit、knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次
+  dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `026ca800…`。
+
 ## 市場議題先顯示閱讀行動與三句讀法 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
