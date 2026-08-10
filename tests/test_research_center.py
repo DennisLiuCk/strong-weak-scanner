@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 23)
+        self.assertEqual(library["learningPathVersion"], 26)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1262,6 +1262,9 @@ class ResearchCenterTest(unittest.TestCase):
             "const READER_TERMS=LIB.readerTerms||[]", "function sharedReaderTermMatches(",
             "function beginnerKeyPointBoundary(",
             "function readerTermDefinitionList(", "function beginnerKeyPoints(",
+            "article=byId.get(state.selected)",
+            "第 1 句 · 先看資料", "第 2 句 · 再補脈絡", "第 3 句 · 最後看邊界",
+            "topicGuide?topicRoles[index]:null",
             "function readingMissionTermGuide(", "data-reading-mission-term-count",
             "data-reading-mission-article-term-count", "先認得這兩句的 ",
             "const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)",
@@ -1335,6 +1338,10 @@ class ResearchCenterTest(unittest.TestCase):
             'id="entryMatrix"', 'id="entryTopics"', 'id="entryGraph"',
             "function showEntryGuide()", "function resetEntryScroll()",
             "function openEntrySurface(", "function openEntryTopics()",
+            "function renderReaderWelcome(", "reader-welcome-maturity",
+            "先選一個系統問題，再打開文章",
+            'id="maturityIntroTitle" tabindex="-1"',
+            "heading?.focus({preventScroll:true})",
             "text:'延伸學習'",
             "document.body.classList.remove('article-open');selectSurface('library',true)",
         ):
@@ -1363,6 +1370,10 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertLess(
             template.index("const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)"),
             template.index("if(mission.orientation&&mission.orientation!==lead)"),
+        )
+        self.assertLess(
+            template.index("section=h('section',{class:'reading-mission','aria-labelledby':'readingMissionTitle'},head,grid,actions)"),
+            template.index("const notationGuide=readingMissionNotationGuide(mission)"),
         )
         self.assertNotIn("orderedBeginnerBlocks", template)
         self.assertIn("else if(analyst){let guideInserted=false;", template)
@@ -1440,6 +1451,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('id="filterClose"', template)
         self.assertIn("if(byId.has(deepLink))document.body.classList.add('article-open')", template)
         self.assertIn("state.selected=byId.has(deepLink)?deepLink:null", template)
+        self.assertIn("renderAll();if(byId.has(deepLink))focusArticleHeading(deepLink)", template)
+        self.assertIn("if(!document.body.classList.contains('article-open')){state.selected=null;return null}", template)
+        self.assertNotIn("if(!state.selected||!rows.some(article=>article.id===state.selected)){state.selected=rows[0].id", template)
         self.assertIn("function hashArticleId()", template)
         self.assertIn("url.hash=article.id", template)
         self.assertNotIn("github.com/DennisLiuCk/strong-weak-scanner/blob/main/notes/qualitative/8261", template)
@@ -2102,6 +2116,15 @@ class ResearchCenterTest(unittest.TestCase):
             template.index('id="maturityRouteGuideTitle"'),
             template.index('id="maturityGroupExplorerTitle"'),
         )
+        for contract in (
+            "@media(min-width:781px){.maturity-route-card:has(.learning-route-map[open]){grid-column:1/-1}",
+            ".learning-route-phases{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:start}",
+            ".learning-route-map-body>.learning-route-stations{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}",
+            "document.getElementById('maturityRouteCards').addEventListener('keydown'",
+            "event.target.closest?.('.learning-route-map>summary')",
+            "summary.parentElement.open=!summary.parentElement.open",
+        ):
+            self.assertIn(contract, template)
         self.assertIn("body.article-open .tools{display:none}", template)
         self.assertIn('research_library["groupMaturity"] = build_group_maturity(', builder)
         self.assertIn("load_research_group_guide(strict=True)", builder)

@@ -1,5 +1,74 @@
 # Changelog
 
+## 市場議題先顯示閱讀行動與三句讀法 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、階段、站次、問題、證據與研究進度零變動**；本次只調整文章開場的既有閱讀任務與
+三句重點顯示方式。
+
+- 1280×720 新手走讀發現，文章開場先連續顯示符號、名詞與背景三個可展開輔助區，真正的
+  「開始讀三句重點」落在首屏之外；進入三句後又只有「重點 1／2／3」，未交代新手應如何依序
+  建立主線。
+- `learningPathVersion` 升為 26。閱讀任務改為「兩個任務句 → 主要閱讀行動 → 選用輔助說明 →
+  原文來源」，主要行動至少 44px；市場議題既有三句只在恰好三句時依原順序標成「先看資料 →
+  再補脈絡 → 最後看邊界」，並保留 list／listitem、H3 與 `evidence／context／boundary` 讀法角色。
+  其他文章類型仍顯示「重點 N」。所有標籤都屬 renderer 讀法，不是新 claim 或證據分級。
+- 1280×720 深色畫面確認主要行動回到文章首屏，點擊後焦點落在同篇三句重點，頁面沒有水平溢位；
+  修改前後畫面留在 `tmp/research-learning-audit-2026-08-10-wave62/`。固定桌機 viewport 未涵蓋
+  實機手機與螢幕閱讀器，仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 皆為
+  `50862ce6…`，`articles`、`knowledgeGraph` 與 `groupMaturity` 逐項相同。`Darwin 25.5.0 arm64`、
+  Python 3.11.11 預設環境執行 476 tests 全綠；qual notes、leading hypotheses、research radar、
+  method audit、knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次
+  dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `7a3d3bfb…`。
+
+## 研究中心首次進入不再自動選文 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、階段、站次、問題、證據與研究進度零變動**；本次只調整研究文章第一次進入時的
+未選文狀態與既有入口焦點。
+
+- 1280×720 首屏走讀發現左側已要求新手「先選一個系統問題」，右側卻自動顯示最新文章全文；
+  最新更新與建議起點因而同時成為兩個互相競爭的主要任務。
+- `learningPathVersion` 升為 25。尚未開文時不再由 `ensureSelected()` 自動選取清單第一篇；預設
+  閱讀欄改為同一條「系統問題 → 市場議題 → 知識圖譜」順序，且只把「先看族群矩陣」設為主要
+  行動，並明示清單第一篇只代表更新排序。搜尋／篩選後若仍未選文，改顯示一般選文或無結果提示；
+  已開文章被篩掉時才沿用既有第一筆 fallback。直接文章深連結仍立即開文，並補齊標題焦點；從
+  首屏前往族群矩陣後，焦點改送到矩陣標題。
+- 1280×720 淺色與深色實測，首屏沒有 `.result.selected` 或文章標題，右側只顯示未選文起點，
+  `documentElement.scrollWidth` 等於 1280px。主按鈕可進入 `#maturity` 並聚焦
+  `maturityIntroTitle`；主動選文與直接深連結都開啟同一文章、閱讀欄回頂且聚焦白話主標。搜尋
+  有結果／無結果時分別顯示一般選文／空結果提示。修改前後畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave61/`；固定桌機 viewport 未涵蓋實機手機與螢幕閱讀器，
+  仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 皆為
+  `50862ce6…`，`articles`、`knowledgeGraph` 與 `groupMaturity` 逐項相同。`Darwin 25.5.0 arm64`、
+  Python 3.11.11 預設環境執行 476 tests 全綠；qual notes、leading hypotheses、research radar、
+  method audit、knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次
+  dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `385c0a24…`。
+
+## 族群路線展開改用整列階段圖 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、階段、站次、問題、證據與研究進度零變動**；本次只調整族群矩陣的既有路線預覽排版。
+
+- 完整走讀「第一次進入 → 系統問題 → 第一篇文章 → 三句重點 → 延伸學習 → 關係圖譜」後，
+  文章與圖譜已有明確起點；較大的剩餘斷點是桌機展開 9 站路線時，全部階段仍被塞在四欄中的
+  單一窄卡，形成很長的直向清單，也讓讀者難以先看出三個學習階段。
+- `learningPathVersion` 升為 24。780px 以上只要路線 map 展開，該卡就跨滿整列；多階段路線按
+  至少 240px 的自適應欄寬並排，單階段站點使用至少 280px 的自適應欄寬。路線收合時仍保留四張
+  問題卡比較，780px 以下仍維持單欄，不以橫排犧牲閱讀順序。路線 summary 另明確處理 Enter／
+  Space，展開後焦點留在原控制上。
+- 1280×720 淺色與深色實測，收合時四張路線卡同列，展開後三個既有階段同列且頁面無水平溢位；
+  Enter 可展開、Space 可收合，兩次焦點都留在同一個 summary。修改前後與完整流程畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave60/`。固定桌機 viewport 未涵蓋實機手機與螢幕閱讀器，
+  仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 為 `50862ce6…`，
+  `articles`、`knowledgeGraph` 與 `groupMaturity` 逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11
+  預設環境執行 476 tests 全綠；qual notes、leading hypotheses、research radar、method audit、
+  knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次 dashboard build
+  SHA 一致：`index.html` `1e3a48ae…`、`research.html` `c3dd548d…`。
+
 ## 族群矩陣第一屏改為問題優先 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
