@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 60)
+        self.assertEqual(library["learningPathVersion"], 62)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -3149,6 +3149,180 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AMD Helios 部署階梯", graph)
+
+    def test_compute_connect_station_three_separates_backside_power_path_process_and_company_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_backside_power_delivery.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 晶片把供電線移到背面，不只是換條路："
+            "先看電力路徑、製程接力與量產證據\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave98_backside_power_path_process_roles_and_six_gate_ladder",
+            "這種做法把供電網路移到晶圓背面",
+            "看到某道製程變重要只代表值得研究",
+            "## 先用五個位置分開「送訊號」和「送電」",
+            "| 本文五個位置 | 它負責什麼 | 和下一位置怎麼接 | 主要工程問題 | 不能直接推成 |",
+            "| 1. 正面訊號佈線 |", "| 2. 背面金屬網路 |",
+            "| 3. 奈米級背面導通孔 |", "| 4. 埋置電源軌 |",
+            "| 5. 電晶體 |",
+            "## 再把背面加工排成六個製程步驟",
+            "| 本文六個步驟 | 在做什麼 | 主要接力角色 | 要驗收什麼 | 本輪可確認到哪裡 |",
+            "| 1. 完成前側元件與電源軌 |", "| 2. 接到支撐載體 |",
+            "| 3. 從背面把晶圓變薄 |", "| 4. 從背面重新找準位置 |",
+            "| 5. 形成導通孔與背面金屬 |", "| 6. 驗證完整流程能重複生產 |",
+            "## 把晶圓廠時鐘與供應商時鐘分開",
+            "## 最後用六關把製程需要接回公司",
+            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 一般機制與流程成立 |",
+            "| 2. 晶圓廠具名製程進入製造時鐘 |",
+            "| 3. 供應商具名到同一製程步驟 |",
+            "| 4. 通過資格並進入量產出貨 |",
+            "| 5. 份額、價格與重複需求可辨識 |",
+            "| 6. 收入、毛利與現金流出現 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先用五個位置分開", 1
+        )[0]
+        for jargon in (
+            "BSPDN", "A16", "18A", "Super Power Rail", "PowerVia",
+            "BPR", "nano-TSV", "nTSV", "CMP", "PDK", "DTCO",
+            "qualification", "production", "risk production", "HVM",
+            "TSMC", "Intel", "imec",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 5),
+            ("research_claim", 5), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-BACKSIDE-POWER-DELIVERY,"
+            "晶片為什麼要把供電線移到背面，這會新增哪些製程，"
+            "又怎麼判斷公司真的受惠？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "backside_power.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "concept:backside-power,concept,背面供電路徑（BSPDN）",
+            "process:super-power-rail,process,超級電源軌（Super Power Rail）",
+            "process:powervia,process,背面供電導通（PowerVia）",
+            "component:buried-power-rail,component,埋置電源軌（BPR）",
+            "component:nano-tsv,component,奈米級背面導通孔（nano-TSV）",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: 背面供電路徑與製程接力", graph)
+
+    def test_compute_connect_station_four_separates_optical_path_tradeoffs_roles_and_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-01_cpo_pluggable_coexistence.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 資料先是電、再變成光："
+            "轉換器放哪裡，決定可插拔與共同封裝的取捨\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave99_cpo_five_positions_five_tradeoffs_roles_and_six_gate_ladder",
+            "資料先以電訊號進入交換晶片，再轉成光訊號",
+            "一種方案開始生產，不代表另一種立刻消失",
+            "## 先用五個位置看資料怎麼從電變成光",
+            "| 本文五個位置 | 資料現在是什麼 | 這裡負責什麼 | 主要接力角色 | 不能直接推成 |",
+            "| 1. 交換晶片內部 |", "| 2. 晶片到轉換器的高速電路 |",
+            "| 3. 電光轉換位置 |", "| 4. 雷射與光纖耦合 |",
+            "| 5. 光纖與下一台設備 |",
+            "## 再用五把尺比較兩種轉換位置",
+            "| 本文五把尺 | 可插拔光模組 | 共同封裝光學 | 下一個要量的結果 | 不能直接推成 |",
+            "| 1. 高速電路長度與功耗 |", "| 2. 前面板空間與頻寬密度 |",
+            "| 3. 維修與故障範圍 |", "| 4. 升級與多供應商彈性 |",
+            "| 5. 封裝、測試與生命週期成本 |",
+            "## 把五類角色放回同一條光電接力",
+            "| 本文五類角色 | 它交付什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |",
+            "| 1. 平台與交換器產品 |", "| 2. 可插拔訊號處理 |",
+            "| 3. 雷射與光源 |", "| 4. 封裝、組裝與測試 |",
+            "| 5. 客戶部署與營運 |",
+            "## 把兩條產品時鐘放回同一代共存",
+            "## 最後用六關分開產品生產、部署與公司受惠",
+            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 兩種產品路徑已具名 |", "| 2. 產品進入持續生產 |",
+            "| 3. 供應商角色能雙向核對 |", "| 4. 客戶驗收與部署分母出現 |",
+            "| 5. 供應商出貨、份額與價格可辨識 |",
+            "| 6. 收入、毛利與現金流留下來 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先用五個位置看", 1
+        )[0]
+        for jargon in (
+            "CPO", "Spectrum-X", "Photonics", "Spectrum-6", "1.6T",
+            "Ara", "DSP", "SerDes", "SPIL", "Lumentum", "Marvell",
+            "NVIDIA", "InP", "production", "full production",
+            "pluggable", "TSMC", "TFC", "Foxconn",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 7),
+            ("research_claim", 5), ("metric_comparison", 0),
+            ("impact", 1), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE,"
+            "資料從交換晶片送出去時，為什麼有的光模組能拔換，"
+            "有的要和晶片放在一起？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "cpo_networking.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "concept:cpo-networking,concept,共同封裝光學網路（CPO）",
+            "product:spectrum-x-ethernet-photonics,product,"
+            "Spectrum-X 共同封裝光學交換器",
+            "component:co-packaged-optics,component,共同封裝光學（CPO）",
+            "component:pluggable-optics,component,可插拔光模組",
+            "stage:product-production,stage,進入產品生產",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: 光電轉換位置與兩種光學路徑", graph)
 
 
 if __name__ == "__main__":

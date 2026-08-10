@@ -1,14 +1,15 @@
-# CPO 網路知識圖譜
+# 光電轉換位置與兩種光學路徑知識圖譜
 
-本圖把平台產品生產、具名生態系角色、可插拔共存與公司財務貢獻拆開。線條較粗只能代表
-已公開的角色或成熟度；沒有出貨、份額與損益證據前，不代表供應商已取得重大經濟利益。
+本圖先把交換晶片、電光轉換與光纖路徑串起來，再把平台產品生產、具名生態系角色、可插拔
+共存與公司財務貢獻拆開。線條較粗只能代表已公開的角色或成熟度；沒有部署、出貨、份額與
+損益證據前，不代表供應商已取得重大經濟利益。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: cpo-networking
 root_node_id: concept:cpo-networking
-label: CPO 網路
-summary: 以 Spectrum-X Ethernet Photonics 的產品生產節點連接 NVIDIA、SPIL、Lumentum 與可插拔光學替代路徑，同時保留財務映射缺口。
+label: 光電轉換位置與兩種光學路徑
+summary: 以交換晶片到光纖的五個位置，連接 Spectrum-X 共同封裝產品、可插拔光模組、NVIDIA、SPIL 與 Lumentum，再用部署分母與財務證據阻止具名角色被誤寫成公司受惠。
 article_ids: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
 status: active
 -->

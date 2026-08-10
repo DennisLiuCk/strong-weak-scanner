@@ -1,14 +1,15 @@
-# 背面供電知識圖譜
+# 背面供電路徑與製程接力知識圖譜
 
-本圖把晶圓廠的製造成熟度與一般製程步驟分開。台灣設備、材料與 IP 只保留成待驗證的
-搜尋路由；沒有具名 qualification 與財務證據前，不建立公司受惠線。
+本圖先把正面訊號與背面送電分開，再把晶圓廠的製造成熟度、一般製程步驟與供應商證據時鐘
+分開。台灣設備、材料與 IP 只保留成待驗證的搜尋路由；沒有具名資格認證與財務足跡前，
+不建立公司受惠線。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: backside-power
 root_node_id: concept:backside-power
-label: 背面供電
-summary: 以 A16／18A 製造時鐘連接 BPR、晶圓薄化、背面對準與 nano-TSV，同時阻止必要製程步驟被誤寫成供應商訂單。
+label: 背面供電路徑與製程接力
+summary: 先用背面金屬、奈米級背面導通孔與埋置電源軌讀懂送電路徑，再以 A16／18A 製造時鐘連接薄化、背面對準與六關公司證據，阻止必要步驟被誤寫成供應商訂單。
 article_ids: MI-2026-08-02-BACKSIDE-POWER-DELIVERY
 status: active
 -->

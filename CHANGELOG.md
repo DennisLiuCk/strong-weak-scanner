@@ -1,5 +1,98 @@
 # Changelog
 
+## CPO 第四站改成五個光電位置、五把取捨尺與六關部署證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有 CPO 與可插拔共存議題的讀者層文字、標題、中文優先圖譜
+標籤、發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、
+`research_source`、`research_claim`、`impact` 與 `monitoring_item` 共 16 個正式區塊均與 Git
+`HEAD` 逐字相同，聚合 SHA-256 維持
+`518948065b324552aad50cd54a194b0e296e0dcfc44b617eb2df9adf955d62dc`。
+
+- 從「研究中心 → 族群矩陣 → 運算與互連 → 第四站」固定走讀發現，原首屏先問 CPO 是否
+  取代可插拔，三句重點又立即放入 Spectrum-X Ethernet Photonics、Spectrum-6、1.6T、Ara、
+  DSP 與 SPIL。不熟產業的讀者還沒有建立「資料先是電訊號、在哪裡轉成光訊號」的路徑，
+  就要先比較產品名與供應鏈角色；原文也沒有把維修、故障範圍、功耗、密度、升級彈性與
+  生命週期成本放在同一組取捨尺上。
+- `learningPathVersion` 升為 62。研究題名改成「資料先是電、再變成光：轉換器放哪裡，決定
+  可插拔與共同封裝的取捨」；入口問句改成「資料從交換晶片送出去時，為什麼有的光模組能
+  拔換，有的要和晶片放在一起？」。三句重點第一句只先認得「電訊號、交換晶片、光訊號」
+  三個中文概念，名詞小字典由 11 項增為 32 項。圖譜題名與核心產品顯示改為中文優先，並
+  追加純編輯 transition，沒有刷新來源、複核日期或證據時鐘。
+- 核心內容先用「交換晶片內部／晶片到轉換器的高速電路／電光轉換位置／雷射與光纖耦合／
+  光纖與下一台設備」五個位置建立光電接力；再以「高速電路長度與功耗／前面板空間與頻寬
+  密度／維修與故障範圍／升級與多供應商彈性／封裝測試與生命週期成本」五把尺比較可插拔與
+  共同封裝；最後把平台與交換器、可插拔訊號處理、雷射與光源、封裝組裝測試、客戶部署營運
+  五類角色，接到「產品列名 → 進入生產 → 供應商角色雙向核對 → 客戶驗收與部署分母 →
+  供應商出貨、份額與價格 → 收入、毛利與現金流」六關。這些表格是閱讀框架，不是完整交換器
+  設計、架構勝負、供應商名單、部署占比或投資排序。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後並排檢查；桌機
+  `scrollWidth == innerWidth == 1280`，手機 `scrollWidth == innerWidth == 390`。行動版五個
+  位置、五把取捨尺與六關證據表均重排為具欄名卡片，沒有水平溢位。名詞速查可完整載入
+  32 個中文優先定義，搜尋「生命週期成本」只顯示 1／32 個相符項目，關閉後焦點回到原按鈕。
+  這些是 deterministic viewport 與互動契約，不是抽樣統計，SE／t／有效獨立觀測不適用；
+  固定瀏覽器尺寸不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、
+  200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第四站閱讀時間由 12 分鐘更新為 18 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 61 → 62`。
+  排除版本後 canonical payload SHA 由
+  `cba45776516bceea4349e4a76012d8863dfe9d4ac8980ec8ed5cc4a9f536df10` 變為
+  `888a2f961fcab653157db360072f95a2a3babe7b048e78ea14a95ee81865905a`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 503 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `cde203928ad46bfbf02f854f71afb099e74fd998eea89731fe4e6de1e58fb910`、
+  `research.html` `3d9cd0ea4561a985dadf5b66910f9df94220851e359a9cf29b981426b6f8214e`。
+
+## 背面供電第三站改成五個位置、六個製程步驟與六關公司證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有背面供電議題的讀者層文字、標題、中文優先圖譜標籤、
+發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、`research_source`、
+`research_claim`、`impact` 與 `monitoring_item` 共 16 個正式區塊均與 Git `HEAD` 逐字相同，
+聚合 SHA-256 維持 `70d23616d4a3e9d61951310d3ce1cbf60cfb74f672a37e52b2fc93c51c8ddc8a`。
+
+- 從「研究中心 → 族群矩陣 → 運算與互連 → 第三站」固定走讀發現，原首屏先問設備需求如何
+  變成公司獲利，三句重點又立即放入 A16、18A、18A-P、風險生產與跨廠成熟度。讀者還沒有
+  建立「訊號和電力原本都擠在正面、供電為什麼改走背面」的路徑，就要先比較公司自訂節點與
+  製造用語；原文把薄化、接合、對準、nTSV、金屬與製程控制濃縮在一段，也看不出角色接力與
+  公司受惠之間還缺哪些證據。
+- `learningPathVersion` 升為 61。研究題名改成「晶片把供電線移到背面，不只是換條路：先看
+  電力路徑、製程接力與量產證據」；入口問句改成「晶片為什麼要把供電線移到背面，這會新增
+  哪些製程，又怎麼判斷公司真的受惠？」。三句重點第一句需先認得的詞改為「訊號線、供電線、
+  晶圓背面」三個中文概念，名詞小字典由 6 項增為 32 項。圖譜題名與核心製程顯示改為中文
+  優先，並追加純編輯 transition，沒有刷新來源、複核日期或證據時鐘。
+- 核心內容先用「正面訊號佈線／背面金屬網路／奈米級背面導通孔／埋置電源軌／電晶體」
+  五個位置建立送電與送訊號的最短路徑；再把「完成前側元件與電源軌／接到支撐載體／從背面
+  變薄／重新對準／形成導通孔與背面金屬／驗證可重複生產」排成六個製程步驟，逐列標出晶圓廠、
+  設計規則與 IP、設備、材料、量測、可靠度與客戶產品團隊的接力位置；最後以「一般機制成立
+  → 晶圓廠進入製造時鐘 → 供應商具名步驟 → 資格與量產出貨 → 份額、價格與重複需求 → 收入、
+  毛利與現金流」六關把製程需要接回公司。本輪只支持技術第一關與各晶圓廠各自的第二關，
+  台灣公司仍停在第三關之前；三張表都不是完整晶片設計、量產配方、供應商名單或投資排序。
+- 1280px 與 390px 固定畫面均完成逐張開圖及同 viewport 前後並排檢查；桌機
+  `scrollWidth == innerWidth == 1280`，手機 `scrollWidth == innerWidth == 390`。行動版三張
+  5 欄表都重排為具欄名卡片，沒有水平溢位。名詞速查可完整載入 32 個中文優先定義，搜尋
+  「蝕刻停止層」只顯示 1／32 個相符項目，關閉後焦點回到原按鈕。這些是 deterministic
+  viewport 與互動契約，不是抽樣統計，SE／t／有效獨立觀測不適用；固定瀏覽器尺寸不是實機，
+  本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化
+  WCAG 對比量測。
+- 文章數維持 274；第三站閱讀時間由 10 分鐘更新為 17 分鐘，族群矩陣站卡、文章題名、讀者
+  問句、知識圖譜路線與正式證據數量均由建置器同步核對，`learningPathVersion: 60 → 61`。
+  排除版本後 canonical payload SHA 由
+  `6dcb38ec3cce96cf160bf0d2b0e1c938f265972e88883701dbb06d6f89e22bcc` 變為
+  `cba45776516bceea4349e4a76012d8863dfe9d4ac8980ec8ed5cc4a9f536df10`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 502 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar、method audit 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `376d993bad3d434d167abfa52cfbbea571517702961ef010545306f334d6d8a1`、
+  `research.html` `d8e0a8cfd4c73b79135fb2c02fe7055ec3f3017442453173d0fe38fdd6a527f7`。
+
 ## AMD Helios 第二站改成六個部署關卡、五條客戶時間線與六關公司證據 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與

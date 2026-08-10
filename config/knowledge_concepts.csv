@@ -29,11 +29,11 @@ stage:validation,stage,客戶測試與驗證（Validation）,客戶驗證,produc
 component:efb,component,高架扇出橋接（EFB）,Elevated Fanout Bridge,process:advanced-packaging,AMD 生態系文件列示的先進封裝技術路徑
 component:substrate,component,載板／基板,Package substrate,process:advanced-packaging,承載晶片並連接封裝與系統電路板的結構
 concept:purpose-built-silicon,concept,客製晶片／自研系統,Purpose-built silicon,,雲端業者自行設計的晶片與系統替代路徑
-concept:backside-power,concept,背面供電,Backside power delivery|BSPDN,,把供電網路移到晶圓背面並與前側訊號佈線分離的先進邏輯製程架構
-process:super-power-rail,process,Super Power Rail,SPR,concept:backside-power,台積電 A16 的背面供電實作名稱
-process:powervia,process,PowerVia,Intel PowerVia,concept:backside-power,Intel 18A 家族的背面供電實作名稱
-component:buried-power-rail,component,埋置電源軌,Buried power rail|BPR,concept:backside-power,位於電晶體下方並把背面電力送近元件的金屬電源軌
-component:nano-tsv,component,nano-TSV,nTSV|nano-through-silicon via,concept:backside-power,從薄化晶圓背面連到埋置電源軌的奈米級矽穿孔
+concept:backside-power,concept,背面供電路徑（BSPDN）,Backside power delivery,,把供電網路移到晶圓背面並與前側訊號佈線分離的先進邏輯製程架構
+process:super-power-rail,process,超級電源軌（Super Power Rail）,SPR,concept:backside-power,台積電 A16 的背面供電實作名稱
+process:powervia,process,背面供電導通（PowerVia）,Intel PowerVia,concept:backside-power,Intel 18A 家族的背面供電實作名稱
+component:buried-power-rail,component,埋置電源軌（BPR）,Buried power rail,concept:backside-power,位於電晶體下方並把背面電力送近元件的金屬電源軌
+component:nano-tsv,component,奈米級背面導通孔（nano-TSV）,nTSV|nano-through-silicon via,concept:backside-power,從薄化晶圓背面連到埋置電源軌的奈米級矽穿孔
 process:wafer-thinning,process,晶圓薄化,Wafer thinning,concept:backside-power,背面加工前以研磨 CMP 與蝕刻降低晶圓厚度的整合步驟
 process:backside-alignment,process,背面對準,Backside alignment,concept:backside-power,在晶圓接合與變形條件下把背面結構對準前側電源軌的製程能力
 concept:ai-memory-hierarchy,concept,AI 記憶體分層,AI memory hierarchy,,依頻寬 容量 延遲 持久性與共享性分配 AI 工作資料的系統架構
@@ -52,11 +52,11 @@ concept:scale-out,concept,Scale-out,Ethernet scale-out,concept:open-ai-fabrics,�
 standard:ualoe,standard,UALink over Ethernet,UALoE,concept:open-ai-fabrics,以 Ethernet 傳輸路徑承載 UALink protocol 的互連方式
 standard:ucie3,standard,UCIe 3.0,Universal Chiplet Interconnect Express 3.0,process:advanced-packaging,封裝內 die-to-die 的開放 chiplet 互連規格
 stage:interoperability,stage,Multi-vendor interoperability,互通測試|Plugfest,concept:open-ai-fabrics,不同廠商實作完成規格合規並可彼此工作的成熟度節點
-concept:cpo-networking,concept,CPO 網路,Co-packaged optics networking|共同封裝光學網路,,把光引擎靠近交換晶片以縮短高速電訊號路徑的網路架構
-product:spectrum-x-ethernet-photonics,product,Spectrum-X Ethernet Photonics,Spectrum-6 SPX,concept:cpo-networking,NVIDIA 以共同封裝光學實作的 Spectrum-X Ethernet 交換器產品
-component:co-packaged-optics,component,共同封裝光學,CPO|Co-packaged optics,concept:cpo-networking,把光學元件與交換晶片共同整合以降低高速電訊號傳輸距離
+concept:cpo-networking,concept,共同封裝光學網路（CPO）,Co-packaged optics networking,,把光引擎靠近交換晶片以縮短高速電訊號路徑的網路架構
+product:spectrum-x-ethernet-photonics,product,Spectrum-X 共同封裝光學交換器,Spectrum-X Ethernet Photonics|Spectrum-6 SPX,concept:cpo-networking,NVIDIA 以共同封裝光學實作的 Spectrum-X Ethernet 交換器產品
+component:co-packaged-optics,component,共同封裝光學（CPO）,Co-packaged optics,concept:cpo-networking,把光學元件與交換晶片共同整合以降低高速電訊號傳輸距離
 component:pluggable-optics,component,可插拔光模組,Pluggable optics|Optical transceiver,concept:cpo-networking,可從交換器面板拔換並具成熟維修與升級流程的光模組
-stage:product-production,stage,產品生產,Product production,concept:cpo-networking,平台商將具名產品定義為進入生產但尚未量化部署與供應商財務貢獻的階段
+stage:product-production,stage,進入產品生產,Product production,concept:cpo-networking,平台商將具名產品定義為進入生產但尚未量化部署與供應商財務貢獻的階段
 concept:hybrid-bonding,concept,混合接合（Hybrid bonding）,混合鍵合|混合接合,,以介電層接合與細間距銅互連直接堆疊晶粒或晶圓的 3D 整合路徑
 process:die-to-wafer-hybrid-bonding,process,單顆晶粒接晶圓（D2W）,Die-to-wafer hybrid bonding|D2W hybrid bonding,concept:hybrid-bonding,把已切割晶粒逐顆接合到目標晶圓的混合鍵合方式
 process:wafer-to-wafer-hybrid-bonding,process,晶圓接晶圓（W2W）,Wafer-to-wafer hybrid bonding|W2W hybrid bonding,concept:hybrid-bonding,把兩片晶圓整面對準並接合的混合鍵合方式

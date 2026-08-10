@@ -7,7 +7,7 @@ topic-MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL,毛利率變好，究竟來自漲價�
 topic-MI-2026-07-31-MISSED-PRIORITY-Q2,獲利增加卻不是本業帶動時，還要拆解哪些會計與現金流因素？
 topic-MI-2026-08-01-800VDC-EXECUTION-READINESS,新電力架構從展示走到量產，中間還要通過哪些關卡？
 topic-MI-2026-08-01-AI-CAPEX-CASH-CONVERSION,雲端巨頭都在擴建資料中心，為何現金流表現仍會分化？
-topic-MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE,光纖連線的新舊形式，會全面替代還是長期並存？
+topic-MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE,資料從交換晶片送出去時，為什麼有的光模組能拔換，有的要和晶片放在一起？
 topic-MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM,運算晶片種類變多，測試設備需求一定會同步增加嗎？
 topic-MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE,記憶體接點變少，為什麼不代表成本一定下降或產品已經可用？
 topic-MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION,客戶先付款蓋新廠，何時才能算成服務收入與獲利？
@@ -15,7 +15,7 @@ topic-MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION,高壓直流供電改變�
 topic-MI-2026-08-02-AI-MEMORY-HIERARCHY,人工智慧資料為什麼要分層存放，越常用的資料就一定要離運算晶片越近嗎？
 topic-MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY,先進封裝讓缺陷更昂貴後，哪些檢測環節會變得更重要？
 topic-MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER,一整櫃人工智慧設備開始生產後，為什麼還不能算客戶已經上線使用？
-topic-MI-2026-08-02-BACKSIDE-POWER-DELIVERY,晶片改用背面供電後，設備需求如何從製程變化走到公司獲利？
+topic-MI-2026-08-02-BACKSIDE-POWER-DELIVERY,晶片為什麼要把供電線移到背面，這會新增哪些製程，又怎麼判斷公司真的受惠？
 topic-MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION,玻璃基板已有工廠與樣品，為什麼還不能算穩定量產？
 topic-MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER,新的記憶體層要滿足哪些讀寫與耐久條件，才不只是特殊儲存裝置？
 topic-MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER,新一代曝光設備能少做步驟，為何仍不一定降低總成本？
