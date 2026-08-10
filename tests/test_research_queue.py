@@ -1599,6 +1599,17 @@ class ReadabilityGateTest(unittest.TestCase):
                 self.assertGreaterEqual(
                     result["proseRatio"], rq.READABILITY_MIN_PROSE_RATIO)
 
+    def test_800v_learning_article_uses_plain_language_for_component_demand(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-02_800v_power_semiconductor_partition.md"
+        text = path.read_text(encoding="utf-8")
+        self.assertNotIn("功率元件內容量會增加還是消失", text)
+        self.assertIn("元件需求會轉移到別處，還是直接消失", text)
+        self.assertIn("## 從電網到晶片：每一段電力怎麼轉換", text)
+        self.assertIn(
+            "evidence: editorial:plain_language_wave80_power_conversion_roles",
+            text,
+        )
+
     def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):
         body = self.LEAD + "- active claim 已進入 watch，對應 H1。\n"
         result, errors, _ = self._run(

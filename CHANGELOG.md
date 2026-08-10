@@ -1,5 +1,37 @@
 # Changelog
 
+## 800V 第一站改用中文概念解釋電力轉換 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+impact、證據判定與複核時鐘零變動**；本次只改寫既有 800V 市場議題的讀者層文字、族群矩陣
+問句、發布 payload 與對應測試，不改變原研究結論。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第一站」固定走讀發現，原文把 `grid`、`core`、
+  `device classes`、`qualification`、`production BOM`、`HVM` 與 `topology` 混在第一層閱讀，
+  且「功率元件內容量會增加還是消失」沒有說清楚是在問元件數量、需求位置或價值占比。
+- `learningPathVersion` 升為 43。族群矩陣入口改問「哪些轉換環節會保留、轉移或被整合」；
+  文章反思題改為追問取消一層轉換後，元件需求會轉移或消失。文章新增同日純編輯 transition，
+  名詞小字典由 8 項增為 15 項，並把「為什麼重要」、追蹤方法、段落標題、五列功能表與表後
+  邊界全面改成中文概念先行；Si／SiC／GaN、公司、商業階段與證據限制均保留。
+- 320／390／780／884／1280px 固定 iframe 契約皆有
+  `documentElement.scrollWidth == innerWidth`；780px 以下五列表格完整重排為具欄名卡片，884px
+  起維持原生 table row／cell。桌機、390px、深色與淺色均完成目視走讀；「參考設計」名詞速查
+  顯示 1／15 的精確定義，關閉後焦點回到原按鈕。這些是 deterministic viewport 契約，不是
+  抽樣統計，SE／t／有效獨立觀測不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體
+  鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；相對前版只改
+  `topic-MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION`、其知識圖譜學習站問句與
+  `learningPathVersion: 42 → 43`。排除版本後 canonical payload SHA 由
+  `1df222fbbfe61c45f9708ecf26d0de5410ed00085aacee9341727083d5fbb189` 變為
+  `fc7e797773308701c0a48f1169c70ce0f621abf6b910177c3ef14d7d2e18cc45`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 484 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue 保留
+  8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `a5327a91efbd65c75542892c91de13fdf1fd6ca33b4221a2037ac6d9a6fb65ca`。
+
 ## 寬螢幕長段落改依正文寬度保留句子停頓 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、來源、
