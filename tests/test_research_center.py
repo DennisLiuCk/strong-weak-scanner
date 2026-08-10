@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 21)
+        self.assertEqual(library["learningPathVersion"], 23)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1516,6 +1516,28 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn(
             "class:'table-wrap',tabindex:'0',role:'region'", template)
 
+    def test_template_guides_novices_across_topic_table_columns_without_rewriting_data(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function readerTableGuide(table)",
+            "const headers=(table?.head||[]).map(runText)",
+            "headers.slice(1,-1).join('、')",
+            "title:headers.at(-1)",
+            "'data-reader-table-step':index+1",
+            "'aria-label':'表格閱讀順序'",
+            "'data-reader-table-guide':headers.length",
+            "新手讀表",
+            "一次只讀一列，從左往右",
+            "欄名逐字取自原表；這裡只安排閱讀順序，不改寫表格內容、數字或證據邊界。",
+            "showTableGuide=mode==='reader'&&article.type==='topic'&&!audit",
+            "if(showTableGuide&&item.t==='table')",
+            ".reader-table-guide-steps{display:grid",
+            ".article-section .reader-table-guide-steps{grid-template-columns:1fr}",
+            ".reader-table-guide-steps{grid-template-columns:1fr}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("table?.rows", template)
+
     def test_template_recomputes_confidence_from_taipei_calendar_at_runtime(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
@@ -1687,7 +1709,7 @@ class ResearchCenterTest(unittest.TestCase):
             "replace(/`last_updated`/g,'「更新日期」')",
             "replace(/「更新日期」\\s+/g,'「更新日期」')",
             "section.h==='研究定位與重要註記'?value=>formalPositioningReaderText(article,value):null",
-            "appendBlocks(sectionEl,section.blocks||[],{readableProse:mode==='reader',textTransform})",
+            "const rendered=block(item,{readableProse:mode==='reader',textTransform})",
             "normalizedReaderRunTexts(source).map(text=>textTransform?textTransform(text):text)",
         ):
             self.assertIn(contract, template)
@@ -2075,9 +2097,10 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn(
             '不熟族群名稱，從「先認識一個族群」開始', template
         )
+        self.assertIn("已知道族群名稱？直接查找", template)
         self.assertLess(
-            template.index('id="maturityGroupExplorerTitle"'),
             template.index('id="maturityRouteGuideTitle"'),
+            template.index('id="maturityGroupExplorerTitle"'),
         )
         self.assertIn("body.article-open .tools{display:none}", template)
         self.assertIn('research_library["groupMaturity"] = build_group_maturity(', builder)

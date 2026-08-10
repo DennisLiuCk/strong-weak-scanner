@@ -1,5 +1,49 @@
 # Changelog
 
+## 族群矩陣第一屏改為問題優先 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、族群、站次、證據與研究進度零變動**；本次只調整族群矩陣兩個既有入口的顯示順序與標題。
+
+- 頁首已告訴新手「先選一個想弄懂的問題」，但桌機第一個互動區原本仍是 11 個正式族群名稱，
+  四張系統問題卡落在其後，讓尚不熟產業分類的讀者又先做一次名詞選擇。
+- `learningPathVersion` 升為 23。桌機 DOM 與視覺順序改為先顯示四張既有系統問題卡，再顯示
+  「已知道族群名稱？直接查找」；兩個面板仍同時可見。780px 以下仍預設「從問題開始」，並保留
+  使用者切換入口、從雷達定位族群及文章返回原路線的既有狀態。
+- 1280×720 淺色與深色畫面確認四張問題卡都在族群名稱查找之前，頁面沒有水平溢位；從第一張
+  問題卡開啟文章後，頁首保留原系統問題與返回入口，返回時回復同一路線卡與鍵盤焦點。畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave59/`。固定桌機 viewport 未涵蓋實機手機與螢幕閱讀器，
+  仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 為 `50862ce6…`，
+  `articles` 與 `knowledgeGraph` 逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行
+  476 tests 全綠；qual notes、leading hypotheses、research radar、method audit、knowledge graph
+  lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：
+  `index.html` `1e3a48ae…`、`research.html` `e13ae64c…`。
+
+## 市場議題技術表加入原欄名讀法 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、節點、關係、表格內容、數字、證據層級與財務判定零變動**；本次只在市場議題主閱讀
+流程替既有正文表加入顯示層閱讀順序。
+
+- 本輪從「800VDC 功率半導體鏈」文章實際進入第一個技術段落後，名詞卡雖已解釋 6 個縮寫，
+  下一張三欄表仍直接要求新手同時理解「電力鏈位置、材料／元件路徑、成熟度邊界」，沒有說明
+  一列應該先看哪裡、最後用哪一欄限制結論。
+- `learningPathVersion` 升為 22。`readerTableGuide()` 只在市場議題 `mode=reader` 且非查核附錄時，
+  逐字讀取原表欄名：兩欄依序讀左、右，三欄以上依序讀最左、中間、最右。提示以 `aside`、有序
+  步驟與 data marker 發布，不讀 row／cell 生成摘要，也不改寫原 table；窄於 620px 的 section
+  容器與手機 viewport 都把步驟改成單欄。
+- 1280×720 淺色專注閱讀實測，讀法卡位於 330.5–474.7px，原表從 484.7px 開始，首屏仍可看到
+  表頭與部分原始列；深色版位置相同。兩者 `documentElement.scrollWidth` 均為 1280px。關閉專注
+  閱讀後，實際 365px 正文欄的讀法改成 341px 單欄，原表維持既有 block 卡片與雙欄 cell，沒有
+  水平頁面溢位。本輪畫面留在 `tmp/research-learning-audit-2026-08-10-wave58/`。固定 1280×720
+  Browser 未涵蓋實機手機 viewport 與螢幕閱讀器，仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 均為
+  `50862ce6…`，`articles` 與 `knowledgeGraph` 逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11
+  預設環境執行 476 tests 全綠；qual notes、leading hypotheses、research radar、method audit、
+  knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次 dashboard build
+  SHA 一致：`index.html` `1e3a48ae…`、`research.html` `9fb41f2c…`。
+
 ## 圖譜開文保留學習起點與返回狀態 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
