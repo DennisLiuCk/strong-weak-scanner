@@ -2484,6 +2484,29 @@ def _section_list_points(sections, section_heading, block_heading=None):
     return []
 
 
+def _research_reader_boundary_brief(sections):
+    """Lift a novice conclusion boundary from text already authored in the topic.
+
+    The research summary deliberately keeps ledger-level wording.  The opening reader
+    card instead reuses the same article's novice key points and first tracking action,
+    so it can be easier to read without creating a second research claim.
+    """
+    key_points = _section_list_points(
+        sections, "新手先讀：這篇在講什麼", "三句話抓重點",
+    )
+    next_steps = _section_list_points(
+        sections, "新手先讀：這篇在講什麼", "接下來怎麼追",
+    )
+    if len(key_points) < 2 or not next_steps:
+        return None
+    return {
+        "known": key_points[0],
+        "unknown": key_points[-1],
+        "next": next_steps[0],
+        "source": "同篇既有的「三句話抓重點」與「接下來怎麼追」",
+    }
+
+
 def _research_article_reading_mission(article):
     """Build a type-aware opening task from text already present in the article."""
     sections = article.get("sections") or []
@@ -2703,6 +2726,10 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
             raise ValueError(
                 f"發布文章缺少可逐字回查的新手閱讀任務來源：{article.get('id') or '未命名'}"
             )
+        if article.get("type") == "topic":
+            reader_boundary = _research_reader_boundary_brief(article.get("sections") or [])
+            if reader_boundary:
+                article["readerBoundaryBrief"] = reader_boundary
         article["searchText"] = " ".join(str(value) for value in (
             article.get("subject", ""), article.get("title", ""),
             article.get("summary", ""), " ".join(article["groupLabels"]),

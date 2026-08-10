@@ -1,5 +1,40 @@
 # Changelog
 
+## 市場議題首屏先用同篇白話交代已知、界線與查證方向 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、summary、monitor、
+confidence、topic fingerprint、route、圖譜、公司曝險與投資判斷零變動**；本次只新增市場議題
+文章的 reader-only 結論邊界 payload、窄正文欄版面與對應契約。方法 registry fingerprint 未改變，
+`research_method_audit.py --baseline-ref HEAD` 通過，因此不建立內容相同的新方法快照。
+
+- 固定走讀 AI 機櫃 EMC 議題發現，首屏「這篇目前能說到哪裡」直接重用 ledger 摘要，混有
+  `AI rack EMC`、`equipment emission`、`lab capacity`、`full-rack test` 等英文與研究縮寫；
+  1280px 一般模式的實際正文欄只有 365px，三卡仍並排，形成近乎逐字換行。文章末端既有
+  自我檢查、下一站、公司筆記與知識圖譜承接已完整，本輪沒有再複製一套文末導覽。
+- `_research_reader_boundary_brief()` 只在同篇同時有至少兩句「三句話抓重點」與一項
+  「接下來怎麼追」時建立發布用 payload：`known` 逐字取第一句、`unknown` 逐字取最後一句、
+  `next` 逐字取第一個追蹤動作，首屏依序標成「先知道／先別下結論／接著怎麼查」。完整研究摘要
+  仍保留原始主張、待驗命題與 monitor 文字；來源不完整時安全退回原摘要，不抽長文、不讀題名，
+  也不由模型補句。
+- 發布版 35 篇市場議題中，34 篇具有完整 `readerBoundaryBrief`；唯一例外是未採同一新手段落
+  契約的台積電事件文章 `event-tsmc-2026q2`，會使用既有摘要 fallback。這是完整發布 payload 的
+  決定性列舉，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 1181–1500px 且未開專注閱讀時，結論卡改為單欄；寬版專注閱讀仍保留三欄。固定瀏覽器實測
+  1280 × 720 一般模式 grid 欄寬 328px、`scrollWidth == innerWidth == 1280`；390 × 844 手機
+  同樣無水平溢位，同區幾何高度約由 752px 降至 654px。這只證明版面與文字密度改變，不宣稱
+  真實讀者理解率已提升。
+- 「看完整研究摘要」可把焦點移到「研究摘要：已知、未知與下一步」，原始技術文字仍逐字保留；
+  「查本文名詞（26）」開啟 dialog 後焦點落在搜尋框，關閉後回到原按鈕。前後畫面、同尺寸比較
+  與完整稽核存於 `tmp/research-learning-audit-2026-08-11-wave107-market-boundary/`。固定 viewport
+  不是實機，本輪未涵蓋 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化
+  WCAG 對比或真實讀者理解測試，因此不宣稱完整無障礙合規或實際理解成效。
+- `Darwin 25.5.0 arm64`、Python 3.11.11、UTF-8 執行 508 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0。method audit 仍如實揭露既有新鮮度、修正學習與校準提醒。連續兩次 dashboard
+  build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `46513755cc486ffc120ff808a11c31d3dac4688641052e6ee9ce43693db45f9e`。
+
 ## 研究雷達先交代目前線索與證據缺口 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究排序、selection log、priority、

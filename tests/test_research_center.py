@@ -103,7 +103,11 @@ class ResearchCenterTest(unittest.TestCase):
                     {"t": "h3", "runs": [{"s": "名詞小字典"}]},
                     {"t": "ul", "items": [[{"s": "擴產：增加既有或新建產能。"}]]},
                     {"t": "h3", "runs": [{"s": "三句話抓重點"}]},
-                    {"t": "ul", "items": [[{"s": "公司公告與供應商受惠是兩件事。"}]]},
+                    {"t": "ul", "items": [
+                        [{"s": "公司公告與供應商受惠是兩件事。"}],
+                        [{"s": "公司公告擴產，只能證明公司自己的規劃。"}],
+                        [{"s": "沒有供應商文件，還不能把擴產寫成特定供應商訂單。"}],
+                    ]},
                     {"t": "h3", "runs": [{"s": "為什麼重要"}]},
                     {"t": "p", "runs": [{
                         "s": "把公司擴產直接寫成特定供應商訂單，是本文要避免的誤解。"
@@ -112,6 +116,10 @@ class ResearchCenterTest(unittest.TestCase):
                     {"t": "h3", "runs": [{"s": "想一想"}]},
                     {"t": "ul", "items": [[{
                         "s": "還缺哪一份公司文件，才能把擴產連到供應商？",
+                    }]]},
+                    {"t": "h3", "runs": [{"s": "接下來怎麼追"}]},
+                    {"t": "ul", "items": [[{
+                        "s": "先找供應商正式文件，確認是否揭露具名訂單與可辨識收入。",
                     }]]},
                 ],
             }, {
@@ -284,8 +292,18 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(topic["readingMission"], {
             "orientation": "把公司擴產直接寫成特定供應商訂單，是本文要避免的誤解。",
             "question": "還缺哪一份公司文件，才能把擴產連到供應商？",
-            "keyPoints": ["公司公告與供應商受惠是兩件事。"],
+            "keyPoints": [
+                "公司公告與供應商受惠是兩件事。",
+                "公司公告擴產，只能證明公司自己的規劃。",
+                "沒有供應商文件，還不能把擴產寫成特定供應商訂單。",
+            ],
             "source": "本文既有的「三句話抓重點」、「為什麼重要」與「想一想」",
+        })
+        self.assertEqual(topic["readerBoundaryBrief"], {
+            "known": "公司公告與供應商受惠是兩件事。",
+            "unknown": "沒有供應商文件，還不能把擴產寫成特定供應商訂單。",
+            "next": "先找供應商正式文件，確認是否揭露具名訂單與可辨識收入。",
+            "source": "同篇既有的「三句話抓重點」與「接下來怎麼追」",
         })
         self.assertEqual(
             [section["h"] for section in topic["sections"][:5]],
@@ -1032,6 +1050,16 @@ class ResearchCenterTest(unittest.TestCase):
         }
         self.assertEqual(set(published), set(guide))
         self.assertTrue(all(article.get("readerQuestion") for article in published.values()))
+        topic_reader_boundaries = [
+            article["readerBoundaryBrief"]
+            for article in published.values()
+            if article.get("readingMission")
+        ]
+        self.assertEqual(len(topic_reader_boundaries), 34)
+        self.assertTrue(all(
+            boundary.get("known") and boundary.get("unknown") and boundary.get("next")
+            for boundary in topic_reader_boundaries
+        ))
         memory = published["topic-MI-2026-08-02-AI-MEMORY-HIERARCHY"]
         self.assertEqual(
             memory["readerQuestion"],
@@ -1509,12 +1537,16 @@ class ResearchCenterTest(unittest.TestCase):
             "'aria-controls':'articleGlossaryDialog'",
             "查本文名詞（'+glossaryTerms.length+'）",
             "openGlossaryQuickView(glossaryAction)",
-            "['thesis','現在能說']",
-            "['unknown','還不能說']",
-            "['next','接著查什麼']",
+            "plain=article.readerBoundaryBrief",
+            "['thesis','先知道',plain.known]",
+            "['unknown','先別下結論',plain.unknown]",
+            "['next','接著怎麼查',plain.next]",
+            "'data-boundary-source':hasPlain?'beginner':'summary'",
+            "'data-reader-chars':value.length",
             "這篇目前能說到哪裡",
-            "先確認結論、限制與下一份證據，再進入技術細節。",
-            "三張卡逐字重用同篇研究摘要；這裡只前移閱讀順序，不改寫主張、證據或判定。",
+            "先用白話抓住已知、界線與查證方向；需要精確措辭時，再看完整研究摘要。",
+            "白話卡逐字重用同篇「三句話抓重點」與「接下來怎麼追」；完整研究摘要保留原始主張與追蹤文字。",
+            "body:not(.focus-mode) .reader-boundary-grid{grid-template-columns:1fr}",
             ".reader-boundary-grid{grid-template-columns:1fr}",
             ".reader-boundary-buttons{grid-template-columns:1fr}",
             "heading.focus({preventScroll:true})",
