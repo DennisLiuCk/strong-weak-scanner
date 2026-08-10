@@ -2461,6 +2461,205 @@ def _research_reading_mission(sections):
     }
 
 
+def _section_list_points(sections, section_heading, block_heading=None):
+    """Return an existing list from one named section without rewording it."""
+    section = next((
+        item for item in (sections or [])
+        if item.get("h") == section_heading
+    ), None)
+    if not section:
+        return []
+
+    active_heading = block_heading is None
+    for item in section.get("blocks") or []:
+        if item.get("t") == "h3":
+            active_heading = _structured_runs_text(item.get("runs")) == block_heading
+            continue
+        if active_heading and item.get("t") in {"ul", "ol"}:
+            return [
+                _structured_runs_text(runs)
+                for runs in (item.get("items") or [])
+                if _structured_runs_text(runs)
+            ]
+    return []
+
+
+def _research_article_reading_mission(article):
+    """Build a type-aware opening task from text already present in the article."""
+    sections = article.get("sections") or []
+    beginner_mission = _research_reading_mission(sections)
+    if beginner_mission:
+        return beginner_mission
+
+    article_type = article.get("type")
+    subject = str(article.get("subject") or "本文").strip() or "本文"
+    if article_type == "formal_note":
+        points = _section_list_points(sections, "30 秒摘要")[:3]
+        if not points:
+            return None
+        return {
+            "orientation": points[0],
+            "question": (
+                f"讀完後，你能用自己的話說明「{subject}」的本業、收入來源，"
+                "以及最容易誤讀的證據邊界嗎？"
+            ),
+            "keyPoints": points,
+            "source": "本文既有的「30 秒摘要」",
+            "sourceLabel": "30 秒摘要",
+            "sourceSection": "30 秒摘要",
+            "sourceHeading": "",
+            "startLabel": "開始讀 30 秒摘要",
+            "startHeading": "",
+            "followup": "摘要之後，再確認本文的公司本業、收入來源與證據邊界。",
+            "sourceBoundary": "這裡只重排原文，不新增主張或改寫結論。",
+        }
+    if article_type == "narrative":
+        points = _section_list_points(
+            sections, "多空觀點（小作文）", "勝負手",
+        )[:3]
+        if not points:
+            return None
+        return {
+            "orientation": points[0],
+            "question": (
+                f"讀完後，你能分別說出「{subject}」的看多與看空論點各需要哪些證據，"
+                "以及哪個勝負手會改變判斷嗎？"
+            ),
+            "keyPoints": points,
+            "source": "本文既有的「多空觀點（小作文）」與「勝負手」",
+            "sourceLabel": "勝負手",
+            "sourceSection": "多空觀點（小作文）",
+            "sourceHeading": "勝負手",
+            "startLabel": "開始讀多空觀點",
+            "startHeading": "",
+            "followup": "先讀完看多與看空兩邊，再用勝負手檢查哪一邊正在獲得證據。",
+            "sourceBoundary": "這裡只重排原文，不新增主張或改寫結論。",
+        }
+    return None
+
+
+def _research_reading_mission_notations(article, mission, group_names=None):
+    """Explain recurring research notation without changing the source sentence."""
+    group_names = group_names or {}
+    lead = next((
+        str(point) for point in (mission.get("keyPoints") or []) if point
+    ), str(mission.get("orientation") or ""))
+    text = f"{lead} {mission.get('question') or ''}".strip()
+    if not text:
+        return []
+
+    entries = []
+
+    def unique_matches(pattern, flags=0):
+        found = []
+        for match in re.finditer(pattern, text, flags):
+            token = match.group(1) if match.lastindex else match.group(0)
+            if token not in found:
+                found.append(token)
+        return found
+
+    def add(kind, position, tokens, label, definition, boundary):
+        if tokens:
+            entries.append({
+                "kind": kind,
+                "position": position,
+                "tokens": tokens,
+                "label": label,
+                "definition": definition,
+                "boundary": boundary,
+            })
+
+    source_refs = unique_matches(r"\[(S\d+)\]", re.IGNORECASE)
+    if source_refs:
+        add(
+            "source_index", text.find(f"[{source_refs[0]}]"), source_refs,
+            "、".join(source_refs) + "（來源編號）",
+            "這些 S 編號指向本文來源索引，可在文末的來源與證據區對照原始文件。",
+            "編號只用來定位來源，不代表證據強弱、重要性或排序。",
+        )
+
+    if article.get("type") == "narrative":
+        hypothesis_ids = unique_matches(
+            r"(?<![A-Za-z0-9])(H\d+)(?![A-Za-z0-9])", re.IGNORECASE,
+        )
+        if hypothesis_ids:
+            match = re.search(
+                r"(?<![A-Za-z0-9])H\d+(?![A-Za-z0-9])", text, re.IGNORECASE,
+            )
+            add(
+                "hypothesis_id", match.start(), hypothesis_ids,
+                "、".join(hypothesis_ids) + "（假說編號）",
+                "H 編號是本文預先登錄、可由後續資料證明或否定的假說代號。",
+                "這裡的 H 編號不是上、下半年，也不表示假說已獲證實。",
+            )
+
+    quarter_matches = list(re.finditer(
+        r"(?<![A-Za-z0-9])((?:20\d{2})?Q[1-4])(?![A-Za-z0-9])",
+        text, re.IGNORECASE,
+    ))
+    quarters = list(dict.fromkeys(match.group(1).upper() for match in quarter_matches))
+    if quarters:
+        add(
+            "quarter", quarter_matches[0].start(), quarters,
+            "、".join(quarters) + "（季度）",
+            "Q1、Q2、Q3、Q4 分別表示一年的第一、第二、第三、第四季；前面的年份指出所屬年度。",
+            "季度標記只說明期間，不代表營收或獲利必然成長。",
+        )
+
+    half_year_matches = list(re.finditer(
+        r"(?<![A-Za-z0-9])(20\d{2}H[12])(?![A-Za-z0-9])",
+        text, re.IGNORECASE,
+    ))
+    half_years = list(dict.fromkeys(match.group(1).upper() for match in half_year_matches))
+    if half_years:
+        add(
+            "half_year", half_year_matches[0].start(), half_years,
+            "、".join(half_years) + "（半年期間）",
+            "年度後的 H1 表示上半年，H2 表示下半年。",
+            "半年標記只說明期間；不要和本文的 H 編號假說混讀。",
+        )
+
+    mops_match = re.search(
+        r"(?<![A-Za-z0-9])(MOPS)(?![A-Za-z0-9])", text, re.IGNORECASE,
+    )
+    if mops_match:
+        add(
+            "mops", mops_match.start(), [mops_match.group(1).upper()],
+            "MOPS（公開資訊觀測站）",
+            "台灣上市櫃公司公告月營收、財報與重大訊息的官方資訊平台。",
+            "資料公布後仍要依本文指定的期間與門檻核對，不能只因公告出現就判定假說成立。",
+        )
+
+    taxonomy_ids = {
+        "serverodm", "semiequip", "packtest", "ipdesign", "powersupply",
+    }
+    taxonomy_matches = list(re.finditer(
+        r"(?<![A-Za-z0-9])(Universe|serverodm|semiequip|packtest|ipdesign|powersupply)"
+        r"(?![A-Za-z0-9])",
+        text, re.IGNORECASE,
+    ))
+    taxonomy_tokens = list(dict.fromkeys(match.group(1) for match in taxonomy_matches))
+    if taxonomy_tokens:
+        translations = []
+        for token in taxonomy_tokens:
+            token_key = token.lower()
+            if token_key == "universe":
+                translations.append(f"{token}＝研究中心追蹤範圍")
+            elif token_key in taxonomy_ids:
+                translations.append(f"{token}＝{group_names.get(token_key, token_key)}族群")
+        add(
+            "internal_taxonomy", taxonomy_matches[0].start(), taxonomy_tokens,
+            "、".join(taxonomy_tokens) + "（研究分類）",
+            "；".join(translations) + "。",
+            "這些名稱只說明追蹤範圍或族群歸屬，不代表收入純度、受惠或投資排序。",
+        )
+
+    entries.sort(key=lambda item: (item["position"], item["kind"]))
+    for entry in entries:
+        entry.pop("position", None)
+    return entries
+
+
 def build_research_library(notes, reports, topics=None, stock_meta=None, group_names=None,
                            events=None, as_of=None, reader_terms=None):
     """建立獨立研究中心 payload；事件錨點歸入市場議題，不另造第四種閱讀模式。"""
@@ -2492,9 +2691,18 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
         article["groups"] = list(dict.fromkeys(article.get("groups") or []))
         article["groupLabels"] = [group_names.get(group, group) for group in article["groups"]]
         article["readingMinutes"] = _research_reading_minutes(article.get("sections") or [])
-        reading_mission = _research_reading_mission(article.get("sections") or [])
+        reading_mission = _research_article_reading_mission(article)
         if reading_mission:
+            notations = _research_reading_mission_notations(
+                article, reading_mission, group_names,
+            )
+            if notations:
+                reading_mission["readerNotations"] = notations
             article["readingMission"] = reading_mission
+        elif article.get("type") in {"formal_note", "narrative"}:
+            raise ValueError(
+                f"發布文章缺少可逐字回查的新手閱讀任務來源：{article.get('id') or '未命名'}"
+            )
         article["searchText"] = " ".join(str(value) for value in (
             article.get("subject", ""), article.get("title", ""),
             article.get("summary", ""), " ".join(article["groupLabels"]),
@@ -3264,7 +3472,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 10
+    research_library["learningPathVersion"] = 13
     return research_library
 
 

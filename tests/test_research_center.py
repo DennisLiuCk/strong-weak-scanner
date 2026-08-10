@@ -24,6 +24,31 @@ SECTIONS = [{
     "blocks": [{"t": "p", "runs": [{"s": "這是一段可搜尋、可站內閱讀的研究內容。"}]}],
 }]
 
+FORMAL_SECTIONS = [{
+    "h": "30 秒摘要",
+    "blocks": [{"t": "ul", "items": [
+        [{"s": "甲公司以功率元件銷售為主要收入來源。"}],
+        [{"s": "題材連結仍須回到公司文件逐項核對。"}],
+        [{"s": "元件出現在系統裡，不等於已取得平台訂單。"}],
+    ]}],
+}]
+
+NARRATIVE_SECTIONS = [{
+    "h": "多空觀點（小作文）",
+    "blocks": [
+        {"t": "h3", "runs": [{"s": "看多小作文"}]},
+        {"t": "p", "runs": [{"s": "多方需要營收與毛利同步改善。"}]},
+        {"t": "h3", "runs": [{"s": "看空小作文"}]},
+        {"t": "p", "runs": [{"s": "空方需要庫存與價格壓力延續。"}]},
+        {"t": "h3", "runs": [{"s": "勝負手"}]},
+        {"t": "ul", "items": [
+            [{"s": "營收是否連續兩季成長。"}],
+            [{"s": "毛利率是否同步改善。"}],
+            [{"s": "庫存天數是否下降。"}],
+        ]},
+    ],
+}]
+
 
 class ResearchCenterTest(unittest.TestCase):
     def setUp(self):
@@ -31,7 +56,7 @@ class ResearchCenterTest(unittest.TestCase):
             "1111": {
                 "last_updated": "2026-07-31", "verification": "independently_verified",
                 "quality_invalid": False, "quality_errors": [], "summary": "正式筆記摘要",
-                "relpath": "notes/qualitative/1111_甲公司.md", "sections": SECTIONS,
+                "relpath": "notes/qualitative/1111_甲公司.md", "sections": FORMAL_SECTIONS,
                 "sources": [{"id": "S1", "type": "一手", "document": "2026Q2 法說簡報",
                              "url": "https://example.com/source.pdf"}],
                 "content_as_of": "2026-07-30", "latest_financial_period": "2026Q2",
@@ -50,7 +75,8 @@ class ResearchCenterTest(unittest.TestCase):
                 "quality_invalid": False, "quality_errors": [],
                 "narrative": {"updated": "2026-07-30"},
                 "hypotheses": [{"title": "營收將季增"}], "hypothesis_count": 1,
-                "sections": SECTIONS, "relpath": "notes/leading_hypotheses/1111_甲公司.md",
+                "sections": NARRATIVE_SECTIONS,
+                "relpath": "notes/leading_hypotheses/1111_甲公司.md",
                 "content_as_of": "2026-07-30", "next_review": "2026-08-15",
                 "status": "active_monitoring",
             }
@@ -167,6 +193,58 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(library["asOf"], "2026-07-31")
         self.assertNotIn("9999", " ".join(row["id"] for row in library["articles"]))
 
+    def test_formal_and_narrative_articles_require_traceable_mission_sources(self):
+        broken_notes = copy.deepcopy(self.notes)
+        broken_notes["1111"]["sections"] = SECTIONS
+        with self.assertRaisesRegex(ValueError, "formal-1111"):
+            bd.build_research_library(
+                broken_notes, {}, [], self.stock_meta, {"power": "功率元件"}, {},
+            )
+
+        broken_reports = copy.deepcopy(self.reports)
+        broken_reports["1111"]["sections"] = SECTIONS
+        with self.assertRaisesRegex(ValueError, "narrative-1111"):
+            bd.build_research_library(
+                {}, broken_reports, [], self.stock_meta, {"power": "功率元件"}, {},
+            )
+
+    def test_reading_mission_notations_decode_periods_sources_and_internal_labels(self):
+        formal = bd._research_reading_mission_notations(
+            {"type": "formal_note"},
+            {
+                "keyPoints": [
+                    "2026Q2 營收成長，Universe 歸入 serverodm。[S1][S3]"
+                ],
+                "question": "這些數字如何回查？",
+            },
+            {"serverodm": "伺服器組裝/機構"},
+        )
+        self.assertEqual(
+            [item["kind"] for item in formal],
+            ["quarter", "internal_taxonomy", "source_index"],
+        )
+        self.assertEqual(formal[0]["tokens"], ["2026Q2"])
+        self.assertIn("研究中心追蹤範圍", formal[1]["definition"])
+        self.assertIn("伺服器組裝/機構族群", formal[1]["definition"])
+        self.assertEqual(formal[2]["tokens"], ["S1", "S3"])
+        self.assertIn("不代表證據強弱", formal[2]["boundary"])
+
+        narrative = bd._research_reading_mission_notations(
+            {"type": "narrative"},
+            {
+                "keyPoints": [
+                    "MOPS 公告 2026Q4 數字後，依 H1 門檻判定。"
+                ],
+                "question": "哪個資料會改變判斷？",
+            },
+        )
+        self.assertEqual(
+            [item["kind"] for item in narrative],
+            ["mops", "quarter", "hypothesis_id"],
+        )
+        self.assertIn("公開資訊觀測站", narrative[0]["label"])
+        self.assertIn("不是上、下半年", narrative[2]["boundary"])
+
     def test_article_payload_preserves_sections_evidence_and_deep_links(self):
         library = bd.build_research_library(
             self.notes, self.reports, self.topics, self.stock_meta, {"power": "功率元件"},
@@ -175,12 +253,30 @@ class ResearchCenterTest(unittest.TestCase):
         formal = library["articles"][0]
         self.assertEqual(formal["id"], "formal-1111")
         self.assertEqual(formal["readerTitle"], "1111 甲公司 — 質化研究筆記")
-        self.assertEqual(formal["sections"], SECTIONS)
+        self.assertEqual(formal["sections"], FORMAL_SECTIONS)
         self.assertEqual(formal["sources"][0]["id"], "S1")
         self.assertEqual(formal["statusKey"], "verified")
         self.assertEqual(formal["groupLabels"], ["功率元件"])
         self.assertGreaterEqual(formal["readingMinutes"], 2)
         self.assertTrue(formal["sourceUrl"].endswith("notes/qualitative/1111_甲公司.md"))
+        self.assertEqual(formal["readingMission"]["keyPoints"], [
+            "甲公司以功率元件銷售為主要收入來源。",
+            "題材連結仍須回到公司文件逐項核對。",
+            "元件出現在系統裡，不等於已取得平台訂單。",
+        ])
+        self.assertEqual(formal["readingMission"]["sourceLabel"], "30 秒摘要")
+        self.assertIn("1111 甲公司", formal["readingMission"]["question"])
+
+        narrative = library["articles"][1]
+        self.assertEqual(narrative["sections"], NARRATIVE_SECTIONS)
+        self.assertEqual(narrative["readingMission"]["keyPoints"], [
+            "營收是否連續兩季成長。",
+            "毛利率是否同步改善。",
+            "庫存天數是否下降。",
+        ])
+        self.assertEqual(narrative["readingMission"]["sourceLabel"], "勝負手")
+        self.assertEqual(narrative["readingMission"]["sourceSection"], "多空觀點（小作文）")
+        self.assertIn("1111 甲公司", narrative["readingMission"]["question"])
 
         topic = next(row for row in library["articles"] if row["id"].startswith("topic-MI-"))
         self.assertEqual(topic["sources"][0]["source_id"], "S1")
@@ -310,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 10)
+        self.assertEqual(library["learningPathVersion"], 13)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -909,6 +1005,26 @@ class ResearchCenterTest(unittest.TestCase):
         library = bd.build_research_library(
             notes, reports, topics, {}, group_names, bd.load_events(), as_of=as_of,
         )
+        formal_articles = [
+            article for article in library["articles"]
+            if article["type"] == "formal_note"
+        ]
+        narrative_articles = [
+            article for article in library["articles"]
+            if article["type"] == "narrative"
+        ]
+        self.assertTrue(formal_articles)
+        self.assertTrue(narrative_articles)
+        self.assertTrue(all(
+            article.get("readingMission", {}).get("sourceLabel") == "30 秒摘要"
+            and 1 <= len(article["readingMission"].get("keyPoints") or []) <= 3
+            for article in formal_articles
+        ))
+        self.assertTrue(all(
+            article.get("readingMission", {}).get("sourceLabel") == "勝負手"
+            and len(article["readingMission"].get("keyPoints") or []) == 3
+            for article in narrative_articles
+        ))
         bd.attach_research_topic_guide(library, guide, strict=True)
         published = {
             article["id"]: article for article in library["articles"]
@@ -1110,11 +1226,18 @@ class ResearchCenterTest(unittest.TestCase):
             "研究摘要：已知、未知與下一步", "function resetReaderScroll()",
             "ARTICLE_AUDIT_HEADINGS", "function renderResearchAppendix(",
             "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
-            "function focusBeginnerHighlights(", "function renderReadingMission(",
+            "function focusReadingTarget(", "function focusBeginnerHighlights(",
+            "function focusReadingMissionSource(", "function renderReadingMission(",
             "reading-mission-grid", "'data-testid':'reading-mission-start'",
-            "開始讀三句重點", "先抓住一句，再帶著問題讀",
-            "先抓住這一句", "讀完能回答", "為什麼值得讀",
+            "開始讀三句重點", "先抓住一個重點，再帶著問題讀",
+            "先抓住這個重點", "讀完能回答", "為什麼值得讀",
             "lead=(mission.keyPoints||[]).find(Boolean)||mission.orientation",
+            "function readerMissionLeadNodes(", "reading-mission-clause-break",
+            "function readingMissionNotationGuide(", "mission?.readerNotations||[]",
+            "data-reading-mission-notation-count", "先解碼這段的 ",
+            "const notationGuide=readingMissionNotationGuide(mission)",
+            ".reading-mission-notation>summary{min-height:44px;",
+            "event.preventDefault();fold.open=!fold.open});return fold",
             "reading-mission-why", "需要更多脈絡時再展開",
             "三句重點之後，再比較本文族群角色與所在學習階段。",
             ".reading-mission-start{width:100%;min-height:44px}",
@@ -1181,11 +1304,13 @@ class ResearchCenterTest(unittest.TestCase):
             "card.graphView,card.guidedRelation?.edgeId",
             "查看'+(card.graphViewLabel||'產業關聯')+'圖",
             ".learning-relation-boundary>summary{min-height:44px}",
-            "你能用自己的話回答嗎？", "需要提示？查看本文三句重點",
-            "提示逐字取自本篇「三句話抓重點」；不新增或改寫結論。",
+            "你能用自己的話回答嗎？", "sourceLabel=mission.sourceLabel||'三句重點'",
+            "text:'需要提示？查看本文'+sourceLabel",
+            "text:'提示逐字取自本篇「'+sourceHeading+'」；不新增或改寫結論。'",
             "繼續第 '+card.routeStep+'/'+card.routeTotal+' 站",
-            "text:'回看本篇三句重點'",
-            "review.addEventListener('click',focusBeginnerHighlights)",
+            "text:'回看本篇'+sourceLabel",
+            "review.addEventListener('click',()=>focusReadingMissionSource(article,'review'))",
+            "start.addEventListener('click',()=>focusReadingMissionSource(article,'start'))",
             "target.focus();requestAnimationFrame",
             "window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-120",
             ".learning-checkpoint-hints>summary{min-height:44px}",
@@ -1212,6 +1337,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(marker, template)
         self.assertIn("RESEARCH_TEMPLATE", builder)
         self.assertIn("RESEARCH_OUT", builder)
+        self.assertIn("def _research_reading_mission_notations(", builder)
+        self.assertIn('reading_mission["readerNotations"] = notations', builder)
         self.assertIn('beginner-section', template)
         self.assertIn("h('details',{class:'beginner-glossary','data-term-count':termCount}", template)
         self.assertIn("if(group.heading==='名詞小字典')sectionEl.appendChild(beginnerGlossary(group))", template)
@@ -1226,6 +1353,10 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("readerTermDefinitionList(matches,'reading-mission-term-list')", template)
         self.assertIn("if(!matches.length)return null;const articleCount=", template)
         self.assertLess(
+            template.index("const notationGuide=readingMissionNotationGuide(mission)"),
+            template.index("const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)"),
+        )
+        self.assertLess(
             template.index("const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)"),
             template.index("if(mission.orientation&&mission.orientation!==lead)"),
         )
@@ -1238,7 +1369,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('新手先讀：這篇在講什麼', template)
         self.assertIn('beginner-toc', template)
         self.assertIn('_article_excerpt(topic.get("summary"))', builder)
-        self.assertIn('_research_reading_mission(article.get("sections") or [])', builder)
+        self.assertIn('_research_article_reading_mission(article)', builder)
         self.assertIn('_topic_structured_sections(topic, sections or [], group_names)', builder)
         self.assertIn('"asOf": library_as_of.isoformat()', builder)
         self.assertIn('as_of=research_as_of', builder)
@@ -1596,7 +1727,10 @@ class ResearchCenterTest(unittest.TestCase):
             "function learningRouteMap(route,currentArticleId='',mode='article')",
             "'data-testid':'learning-route-map-'+route.id",
             "'data-testid':'learning-route-station-'+route.id+'-'+station.step",
-            "question=station.question?'讀完試著回答：'+station.question",
+            "readerQuestion=station.question||''",
+            "class:'learning-route-station-kicker',text:'這站先回答'",
+            "context=readerQuestion?'研究節點：'+graphLabel",
+            "h('strong',{text:primary}),h('small',{text:context})",
             "'aria-label':route.label+' 學習階段與站點'",
             "'data-phase-id':phase.id,'data-current':isCurrent?'true':'false'",
             "shouldOpen=isCurrent||(!currentArticleId&&index===0)",
@@ -1616,7 +1750,7 @@ class ResearchCenterTest(unittest.TestCase):
             ".learning-route-phase-summary{min-height:44px",
             ".learning-route-phase-summary:focus-visible",
             ".learning-route-phase-fold[open] .learning-route-phase-state::before{content:'收合'}",
-            ".learning-route-station-button{width:100%;min-height:58px",
+            ".learning-route-station-button{width:100%;min-height:72px",
             "function resetGraphSurfaceScroll()",
             "graphPage.scrollTo(0,0)",
             "window.scrollTo(0,0)",
@@ -1627,6 +1761,7 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, template)
         self.assertNotIn("learning-route-phase-head", template)
+        self.assertNotIn("讀完試著回答：", template)
         self.assertIn(
             "document.getElementById('graphHubSelect').addEventListener('change'",
             template,
