@@ -80,18 +80,27 @@ Active radar 另必須提供純編輯／導覽層的 `reader_question`、`reader
 為每個族群各寫一個白話問句，說清它在同一研究題中負責回答哪個問題；不得寫成上下游排名、
 受惠方向或已證實公司連結。發布卡必須把 `reader_question` 當成卡片 heading，先標示「這題想
 弄清楚」；原候選 `title` 只縮成次要的「研究題名」脈絡，不得把技術題名再放回第一閱讀層。
-其後顯示 `reader_next_step`、`reader_terms` 與族群問句；族群問句按鈕負責定位族群矩陣的起讀文章
-與研究缺口，矩陣保留同一問句並提供返回原候選的焦點路徑；完整
+其後顯示 `reader_next_step`、`reader_terms` 與族群問句；族群問句按鈕負責定位族群矩陣的本題文章、
+族群基礎起點與研究缺口，矩陣保留同一問句、同步選取相同族群，並提供返回原候選的焦點路徑。
+候選已升格且正式 article 可解析時，矩陣主要行動必須開同一 `candidate.articleId`，不得改開該族群
+通用 `learningStart`；後者只能降為「再讀族群基礎」。候選未升格時必須明示本題尚無文章，不得由
+族群或題名猜一篇替代。完整
 `why_now`、`next_evidence`、knowledge gain、第一拒絕與來源仍保留在預設關閉的查核區。
 這五個欄位不能改寫 rank、priority、evidence posture、selection decision 或任何凍結值，
 也不能新增文章、圖譜、公司曝險或投資結論。
 
-已升格候選開文時，顯示層必須建立一次性 `radar` article origin，只保存正式
+已升格候選從雷達卡直接開文時，顯示層必須建立一次性 `radar` article origin，只保存正式
 `candidateId`、雷達捲動位置與 window 位置。文章桌機頁首、行動版返回鈕與
 「從這篇接著學」末端都要顯示雷達第 N 題與同一 `reader_question`，並明示 N 只是研究資源
 安排，不是族群受惠、股價方向或投資排名。返回後必須恢復同一候選卡的位置並將鍵盤
 焦點送回該卡。直接文章 deep link、一般文章清單與矩陣／圖譜入口不得假造雷達來處；
-這個狀態不得寫進 radar、article 或 knowledge graph payload。
+切到不是該候選正式 article 的其他文章時必須清除這個來處。這個狀態不得寫進 radar、article 或
+knowledge graph payload。若先由雷達族群問句進矩陣，再開同一
+候選的升格文章，則使用一次性 `maturity-radar` origin 保存 `candidateId`、正式 `groupId` 與同一
+問句；文章首尾須同時顯示族群、雷達題次與問句，返回後重建 `maturityOrigin`、選取並聚焦原矩陣列。
+矩陣的完成度、財務缺口與下一步必須明示為族群整體盤點，不得冒充該雷達問題的答案。換到其他
+文章時同時清除 `maturity-radar` 與暫存 `maturityOrigin`；只有通用 `maturity-group`／
+`maturity-route` 依原契約延續。
 
 只有已通過 topic v3 claim ledger 與 knowledge graph evidence contract 的候選可標為
 `promoted`；其餘候選即使知識價值高，也只保留 watch／expand 狀態。
@@ -429,6 +438,13 @@ boundary 都由 CSV 逐字發布，只是閱讀輔助，不得改寫文章主張
 以及選題原因、來源、研究判定等維運段落收進預設關閉的「研究查核附錄」；一般讀者先讀
 結論與機制，需要逐項核對時再展開，原始資料與證據層級都不刪除、不改寫。
 
+同一份五項摘要若標籤完整、各自唯一且可按固定順序解析，讀者畫面須在閱讀任務後、技術細節前
+另顯示「先看結論邊界」。這張卡只逐 run 重用「一句話結論、尚未知道、下一步看什麼」，並以
+`thesis_claim_id` 的 active claim label 與 `liveConfidence(article)` 顯示兩把尺；不得從正文
+改寫、截短或補推論。主要行動把鍵盤焦點送到原「研究摘要：已知、未知與下一步」標題，次要行動
+只在同篇已有名詞小字典時開啟既有原生 dialog。缺任一摘要欄、重複標籤、非 topic 或沒有字典時，
+對應卡片／行動必須安全消失；完整五項摘要仍留在原位置，payload、Markdown 與查核狀態都不變。
+
 研究摘要導言後的「新手證據讀法」必須把 `thesis_claim_id` 的 active claim label 與 topic
 effective confidence 分成兩把尺。claim copy 固定依正式 `verified／inference／unverified`
 值域解釋：`verified` 只表示指定來源直接支持精確措辭，`inference` 表示研究判讀由已接受資料
@@ -459,8 +475,10 @@ effective confidence 分成兩把尺。claim copy 固定依正式 `verified／in
 `maturity-route` 與既有 `routeId`。文章頁首、行動版返回鈕與「從這篇接著學」末端必須用
 同一狀態顯示並返回原入口；換到下一站文章時延續，回到矩陣後把同一族群或路線聚焦。一般
 文章清單、圖譜、雷達或直接深連結開文時必須清空這個**矩陣**狀態，不能由文章族群或
-文字相似度猜測矩陣來處。雷達若由已升格候選的正式 article ID 開文，可依上述獨立 `radar`
-origin 契約建立來處；圖譜與矩陣分別沿用自己的 origin 契約，未帶來處的一般清單與直接連結才
+文字相似度猜測矩陣來處。雷達若先定位矩陣族群，再由「本題起讀文章」開啟同一已升格 article，
+必須改用上述 `maturity-radar` origin；通用族群起點仍使用 `maturity-group`，兩者不得互換。
+雷達卡直接開文則依獨立 `radar` origin 契約建立來處；圖譜與矩陣分別沿用自己的 origin 契約，
+未帶來處的一般清單與直接連結才
 保留「返回研究清單」。矩陣起點說明只可重用既有族群指南與學習路線數量／名稱，
 不得新增上下游、受惠或研究排名。
 
@@ -475,8 +493,9 @@ origin 契約建立來處；圖譜與矩陣分別沿用自己的 origin 契約�
 的下一步按鈕，說明角色看完後會回到同篇原文檢查證據；市場議題不得多出這顆按鈕，因為它的
 三句重點本來就位在角色卡之前。
 
-若文章是由已升格研究雷達候選直接開啟，角色卡可先顯示同一候選、同一 `group_id` 的既有
-`reader_group_questions`，但必須同時滿足前端 origin 為 `radar`、candidate ID 可解析，且
+若文章是由已升格研究雷達候選直接開啟，或經同一候選的矩陣族群入口開啟同一升格文章，角色卡
+可先顯示同一候選、同一 `group_id` 的既有 `reader_group_questions`，但必須同時滿足前端 origin
+為 `radar` 或 `maturity-radar`、candidate ID 可解析，且
 `candidate.articleId === article.id`。問句必須逐字重用，不得由文章、族群指南或模型重寫；
 直接文章連結、一般清單入口與路線下一站都不得顯示。這只把本題研究責任帶到原升格文章，角色
 說明仍來自正式族群指南，也不得推成上下游、受惠、訂單或投資排序。

@@ -1,5 +1,63 @@
 # Changelog
 
+## 市場議題在技術細節前先說結論邊界 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+來源、claim、comparison、monitor、證據判定與複核時鐘零變動**；本次只把同篇既有研究摘要的
+結論、未知與下一步提到讀者導讀後，讓不熟產業的讀者先知道本文能下到哪一層。
+
+- 884×863 深色走讀 EMC 市場議題發現，閱讀任務約在文章內 571px，既有「研究摘要：已知、未知
+  與下一步」約在 4,304px；大綱跳轉本身正常，但讀者必須先穿過三句重點、角色、路線、重要性、
+  名詞與追蹤，才知道本文現在能說、不能說與接著查什麼。
+- `learningPathVersion` 升為 33。只有市場議題既有五項摘要標籤完整且唯一時，導讀後才新增
+  「這篇目前能說到哪裡」，逐 run 重用「一句話結論、尚未知道、下一步看什麼」，並沿用 active
+  主張類型與 `liveConfidence(article)`。缺欄或重複標籤不猜測；正式筆記與多空小作文不套用。
+- 「看完整研究摘要」會把捲動與鍵盤焦點送到原摘要標題；「查本文名詞」只在同篇有字典時開啟
+  既有原生 dialog，關閉後回到原按鈕。完整五項摘要仍留在原位置，沒有建立第二套結論或術語。
+- 深色與淺色固定 884×863 viewport 均完成目視檢查，`documentScrollWidth == bodyScrollWidth ==
+  innerWidth == 884`；另一篇市場議題可依同一契約顯示，正式公司筆記維持 0 張。修改前後畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave70/`。本輪未涵蓋實機手機、完整實體鍵盤巡覽、
+  螢幕閱讀器與 WCAG 對比量測，仍保留為人工裝置／輔具驗收項目。
+- 相對修改前的 wave70 基線，payload 頂層只改 `learningPathVersion: 32 → 33`；文章數維持 274，
+  排除版本後完整 canonical payload 逐項相同，前後 SHA 均為
+  `780c8bb050fc994f0b05eaaed1b16f5ed4c7135263e3d197b5746ad154bafb62`。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 480 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue 保留
+  8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `cf06dc08a2eda92be4711930a14868542fb49d805a88baf8ab456f3d99236d92`。
+
+## 雷達問句在族群矩陣維持同一篇本題文章 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、候選排序、文章／圖譜映射、
+來源、claim、comparison、monitor、證據判定與複核時鐘零變動**；本次只修正讀者由雷達族群問句
+進入矩陣後的文章承接與一次性導覽狀態。
+
+- 1280×720 深色走讀「雷達第 1 題的被動元件問句 → 族群矩陣 → 起讀文章」發現，矩陣雖保留
+  「零件層如何抑制或隔離電磁干擾？」，主要按鈕卻改開通用的 AI 電容角色文章；進文後也只記得
+  被動元件矩陣，EMC 問句完全消失。讀者不是看不懂單句，而是在跨頁時被換成另一個學習任務。
+- `learningPathVersion` 升為 32。由雷達定位矩陣時同步選取正式族群；已升格候選在矩陣新增
+  「本題起讀文章」，只開同一 `candidate.articleId`，通用 `learningStart` 降為「再讀族群基礎」。
+  卡片明示「已完成／最大缺口／下一步」是族群整體盤點、不是本題答案。未升格候選不猜替代文章，
+  改寫明「本題尚未升格文章」，再以族群基礎協助認識角色。
+- 本題文章使用前端一次性 `maturity-radar` origin，保存正式 candidate、group 與同一逐字問句；
+  文章首尾顯示「被動元件 · 雷達第 1 題」、問句與返回矩陣行動，相符角色卡仍重用同候選既有
+  `readerGroupQuestions`。返回後重建矩陣來處、選取並聚焦原列；切到任何非該候選正式 article
+  的下一站或相關文章時立即清除舊雷達脈絡，不把 EMC 問句錯套到別篇。
+- 最終 1280×720 深色走讀證實矩陣主要行動開啟 EMC 升格文章，而不是 AI 電容文章；返回後問句、
+  本題文章與焦點均保留，下一站則三者清除。淺色首屏亦完成目視檢查，`documentScrollWidth ==
+  bodyScrollWidth == innerWidth == 1280`。修改前後畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave69/`。本輪未涵蓋實機手機、實體鍵盤完整巡覽、
+  螢幕閱讀器與完整 WCAG 對比量測，仍保留為人工裝置／輔具驗收項目。
+- 相對修改前的 wave69 基線，payload 頂層只改 `learningPathVersion: 31 → 32`；排除版本後完整
+  canonical payload 逐項相同，前後 SHA 均為
+  `780c8bb050fc994f0b05eaaed1b16f5ed4c7135263e3d197b5746ad154bafb62`。
+  `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 479 tests 全綠；qual notes、leading
+  hypotheses、research radar、method audit、knowledge graph lint 均通過，research queue 保留
+  8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `150a140499bf18db5fb1d03a89d270f437a37821c7ae5d47703acb84278d8957`。
+
 ## 升格文章「為什麼重要」改為主句先行 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、

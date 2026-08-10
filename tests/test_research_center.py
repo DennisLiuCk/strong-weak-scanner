@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 31)
+        self.assertEqual(library["learningPathVersion"], 33)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1292,6 +1292,7 @@ class ResearchCenterTest(unittest.TestCase):
             "id:'glossaryQuickStatus','aria-live':'polite'",
             "'aria-haspopup':'dialog'", "floating-glossary-action",
             "outline-glossary-action", "placeholder:'例如：CXL、HBM'",
+            "function researchSummaryEntries(", "function articleResearchSummary(",
             "function researchSummaryGrid(", "RESEARCH_SUMMARY_KINDS",
             "research-summary-grid", "data-summary-kind",
             "role:'list','aria-label':'研究摘要重點'",
@@ -1414,8 +1415,9 @@ class ResearchCenterTest(unittest.TestCase):
             template,
         )
         self.assertIn(
-            "if(readingMission)body.appendChild(readingMission);const roleContext="
-            "renderArticleRoleContext(article);",
+            "if(readingMission)body.appendChild(readingMission);const boundaryBrief="
+            "renderReaderBoundaryBrief(article,glossaryTerms);if(boundaryBrief)body.appendChild(boundaryBrief);"
+            "const roleContext=renderArticleRoleContext(article);",
             template,
         )
         self.assertLess(
@@ -1467,6 +1469,37 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("url.hash=article.id", template)
         self.assertNotIn("github.com/DennisLiuCk/strong-weak-scanner/blob/main/notes/qualitative/8261", template)
 
+    def test_reader_surfaces_existing_conclusion_boundary_before_technical_detail(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function researchSummaryEntries(node)",
+            "function articleResearchSummary(article)",
+            "function focusResearchSummary(sectionIndex)",
+            "function renderReaderBoundaryBrief(article,glossaryTerms=[])",
+            "'data-testid':'reader-boundary-brief'",
+            "'data-testid':'reader-boundary-summary-action'",
+            "'data-testid':'reader-boundary-glossary-action'",
+            "'aria-controls':'articleGlossaryDialog'",
+            "查本文名詞（'+glossaryTerms.length+'）",
+            "openGlossaryQuickView(glossaryAction)",
+            "['thesis','現在能說']",
+            "['unknown','還不能說']",
+            "['next','接著查什麼']",
+            "這篇目前能說到哪裡",
+            "先確認結論、限制與下一份證據，再進入技術細節。",
+            "三張卡逐字重用同篇研究摘要；這裡只前移閱讀順序，不改寫主張、證據或判定。",
+            ".reader-boundary-grid{grid-template-columns:1fr}",
+            ".reader-boundary-buttons{grid-template-columns:1fr}",
+            "heading.focus({preventScroll:true})",
+        ):
+            self.assertIn(contract, template)
+        self.assertLess(
+            template.index("const boundaryBrief=renderReaderBoundaryBrief(article,glossaryTerms)"),
+            template.index("body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms))"),
+        )
+        self.assertIn("const parsed=researchSummaryEntries(node)", template)
+        self.assertNotIn("text:'現在能說到哪裡？'", template)
+
     def test_formal_and_narrative_reading_actions_do_not_skip_industry_role_context(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
@@ -1495,7 +1528,7 @@ class ResearchCenterTest(unittest.TestCase):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
             "function articleRadarRoleContext(article)",
-            "if(origin?.kind!=='radar')return null",
+            "if(origin?.kind!=='radar'&&origin?.kind!=='maturity-radar')return null",
             "candidate.articleId!==article.id",
             "candidate.readerGroupQuestions||[]",
             "'data-role-question-source':'radar'",
@@ -2131,6 +2164,36 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("先用一句話理解", template)
         self.assertNotIn("class:'radar-question'", template)
         self.assertIn("grid-template-columns:repeat(4,1fr)", template)
+
+    def test_radar_group_matrix_keeps_promoted_question_article_and_return_path(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "state.maturityGuideGroupId=groupId",
+            "function maturityRadarArticleOrigin(row,candidate,question)",
+            "kind:'maturity-radar'",
+            "function openMaturityRadarArticle(row,candidate,question)",
+            "candidate?.articleId&&byId.has(candidate.articleId)",
+            "'data-testid':'group-radar-start-'+row.id",
+            "先讀本題文章 · ",
+            "openMaturityRadarArticle(row,candidate,question)",
+            "下方「已完成／最大缺口／下一步」是",
+            "讀完本題後 · 族群基礎起點",
+            "再讀族群基礎",
+            "if(origin?.kind!=='radar'&&origin?.kind!=='maturity-radar')return null",
+            "candidate.articleId!==article.id",
+            "state.articleOrigin?.kind==='maturity-radar'",
+            "radarById.get(state.articleOrigin.candidateId)?.articleId!==id",
+            "if(state.articleOrigin.kind==='maturity-radar')state.maturityOrigin=null",
+            "if(origin.kind==='maturity-radar')",
+            "state.maturityOrigin={candidateId:origin.candidateId,groupId:origin.groupId}",
+            "state.articleOrigin?.kind==='maturity-group'||state.articleOrigin?.kind==='maturity-radar'",
+            ".maturity-origin .maturity-origin-start",
+        ):
+            self.assertIn(contract, template)
+        self.assertLess(
+            template.index("'data-testid':'group-radar-start-'+row.id"),
+            template.index("'data-testid':'group-start-'+row.id"),
+        )
 
     def test_template_publishes_group_maturity_matrix_without_a_composite_score(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
