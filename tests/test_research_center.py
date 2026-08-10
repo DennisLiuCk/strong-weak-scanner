@@ -1200,11 +1200,11 @@ class ResearchCenterTest(unittest.TestCase):
         )
         # 三句重點後立刻建立族群角色與路線位置，再補 metadata 與其餘新手內容。
         self.assertIn(
-            "const routeContext=renderLearningRouteContext(article),mobileToc="
-            "renderMobileToc(article);body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms));"
+            "const routeContext=renderLearningRouteContext(article),mobileProgress="
+            "renderMobileReadingProgress(article);body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms));"
             "if(roleContext)body.appendChild(roleContext);if(routeContext)body.appendChild(routeContext);"
             "body.appendChild(meta);body.appendChild(articleSections(article,'beginner-followup',glossaryTerms));"
-            "if(mobileToc)body.appendChild(mobileToc);"
+            "if(mobileProgress)body.appendChild(mobileProgress);"
             "body.appendChild(articleSections(article,'analyst'))",
             template,
         )
@@ -1378,10 +1378,11 @@ class ResearchCenterTest(unittest.TestCase):
             "window.addEventListener('scroll',schedule",
             "window.addEventListener('resize',schedule",
             "scroll.getBoundingClientRect().top+70",
-            "mobile?112:",
+            "mobile?160:narrow?",
             "button.setAttribute('aria-current','location')",
             "button.classList.toggle('is-active',active)",
             "'data-section-index':index",
+            ".article > .research-appendix[data-section-index]",
             "setupOutlineScrollSpy(root)",
             ".toc button.is-active",
         ):
@@ -1391,6 +1392,57 @@ class ResearchCenterTest(unittest.TestCase):
             "color:var(--teal)",
             template,
         )
+
+    def test_template_keeps_narrow_article_reading_position_sticky(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function articleReadingStops(article)",
+            "function openReadingStop(index)",
+            "function renderMobileReadingProgress(article)",
+            "class:'mobile-reading-progress'",
+            "'data-reading-stop-total':total",
+            "'data-reading-position':index+1",
+            "role:'progressbar'",
+            "'aria-valuemin':'1'",
+            "'aria-valuemax':total",
+            "step.setAttribute('aria-valuenow',String(position))",
+            "tracker.style.setProperty('--reading-progress'",
+            "'data-section-index':'appendix'",
+            ".mobile-reading-progress{display:block;position:sticky;top:58px",
+            ".mobile-reading-progress{top:102px",
+            ".article-section{scroll-margin-top:160px}",
+            ".learning-path{scroll-margin-top:160px",
+            ".research-appendix{scroll-margin-top:160px}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("function renderMobileToc(article)", template)
+        self.assertNotIn("class:'mobile-toc'", template)
+
+    def test_template_normalizes_chinese_wrap_spaces_and_breaks_dense_prose(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function normalizeReaderAsciiPunctuation(value)",
+            "function normalizeReaderRunText(value)",
+            "function normalizedReaderRunTexts(nodes)",
+            "function readerRunNode(run,text)",
+            "function runs(nodes,{sentenceBreaks=false}={})",
+            "reader-prose-dense",
+            "'data-reader-chars':text.length",
+            "'data-reader-sentences':sentenceCount",
+            "text.length>=120&&sentenceCount>=2",
+            "{readableProse:mode==='reader'}",
+            ".reader-prose-dense .reader-sentence-break{display:block;height:.55em}",
+            "class:'reader-sentence-break','aria-hidden':'true'",
+            ".evidence-row{min-width:0",
+            ".evidence-name{max-width:100%;overflow-wrap:anywhere",
+            "if(mark===','&&!latinPair&&!digitPair)return'，'",
+            "if(mark===';'&&!latinPair&&!digitPair)return'；'",
+            "replace(/([A-Za-z]),(?=[A-Za-z])/g,'$1, ')",
+        ):
+            self.assertIn(contract, template)
+        # 顯示層只讀 run.s；不改寫發布 payload 或原始 Markdown。
+        self.assertIn("String(value==null?'':value)", template)
+        self.assertNotIn("run.s=normalizeReaderRunText", template)
 
     def test_template_has_evidence_backed_dual_view_knowledge_graph(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
