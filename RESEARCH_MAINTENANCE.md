@@ -340,6 +340,14 @@ powersupply` 分類名稱。每個 `readerNotations` 項目必須保留實際 to
 摘要或改寫句子。查核附錄、研究摘要與新手三句重點不套用長段落斷句，避免改變證據表與既有卡片
 結構。
 
+正式筆記與多空小作文的 `mode=reader` 另有 section heading 白話契約：每個非空原始 `section.h`
+都必須由 `readerSectionPurpose()` 產生非空的固定閱讀目的，緊接原 `h2` 顯示為
+「這節先看」。正式筆記先用 canonical heading map，再用「證據索引／營運獲利／融資資本／假說」
+等可判定字樣收斂，最後以不帶公司結論的固定句兜底；多空文章只分研究定位、多空觀點、量化背景、
+`H#` 假說與固定兜底。提示須保留 `aria-label="本節閱讀目的"` 與原 heading 的 data attribute，
+只存在顯示層，不得新增 `readerPurpose` 到 section、改寫 Markdown／payload 或拿正文生成摘要。
+市場議題已有新手段落與研究摘要，`readerSectionPurpose()` 對其必須回傳空字串，避免同一目的重複。
+
 「三句話抓重點」在發布頁以有序逐句卡片呈現；卡片順序、粗體與連結必須逐 run 保留，文字不得
 因版型改變而摘要或改寫。唯一的讀者層例外，是把 `passive`、`powersupply`、`serverodm` 等不會
 被誤認為一般技術英文的內部族群 ID，以正式 `group_names` 中文標籤替換；只改可見 run 的 `s` 與

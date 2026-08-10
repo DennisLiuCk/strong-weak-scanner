@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 13)
+        self.assertEqual(library["learningPathVersion"], 14)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1643,6 +1643,31 @@ class ResearchCenterTest(unittest.TestCase):
         # 顯示層只讀 run.s；不改寫發布 payload 或原始 Markdown。
         self.assertIn("String(value==null?'':value)", template)
         self.assertNotIn("run.s=normalizeReaderRunText", template)
+
+    def test_template_explains_the_reading_purpose_of_research_section_headings(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "const FORMAL_SECTION_PURPOSES=new Map([",
+            "const NARRATIVE_SECTION_PURPOSES=new Map([",
+            "function readerSectionPurpose(article,section)",
+            "function readerSectionPurposeNote(article,section,purpose)",
+            "mode==='reader'?readerSectionPurpose(article,section):''",
+            "if(purpose)sectionEl.appendChild(readerSectionPurposeNote(article,section,purpose))",
+            "'data-reader-purpose-type':article.type",
+            "'data-reader-purpose-heading':section.h||''",
+            "'aria-label':'本節閱讀目的'",
+            "text:'這節先看'",
+            "把可持續的能力、尚未量化的宣稱與結構風險分開。",
+            "這些數字只交代假說形成時的市場位置，不負責證明假說。",
+            "把這一則假說拆成主張、來源、可證偽條件、驗證期限與目前判讀。",
+            ".article-section-purpose{display:grid",
+            ".article-section-purpose strong{padding-top:1px",
+        ):
+            self.assertIn(contract, template)
+        self.assertIn(r"if(/^H\d+｜/.test(heading))", template)
+        # 白話目的只在 reader 顯示層產生，不寫回 article.sections 或原始 Markdown。
+        self.assertNotIn('section["readerPurpose"]', template)
+        self.assertNotIn("section.readerPurpose=", template)
 
     def test_template_explains_why_generic_article_recommendations_connect(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
