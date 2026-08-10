@@ -12,7 +12,7 @@ topic-MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM,運算晶片種類變多，測�
 topic-MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE,記憶體改走有機基板，成本下降的同時會把難題移到哪裡？
 topic-MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION,客戶先付款蓋新廠，何時才能算成服務收入與獲利？
 topic-MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION,高壓直流供電改變時，哪些轉換環節會保留、轉移或被整合？
-topic-MI-2026-08-02-AI-MEMORY-HIERARCHY,訓練資料放在不同記憶與儲存層，究竟是在省容量、成本還是等待時間？
+topic-MI-2026-08-02-AI-MEMORY-HIERARCHY,人工智慧資料為什麼要分層存放，越常用的資料就一定要離運算晶片越近嗎？
 topic-MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY,先進封裝讓缺陷更昂貴後，哪些檢測環節會變得更重要？
 topic-MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER,平台開始出貨後，還要看到哪些客戶節點才算真正部署？
 topic-MI-2026-08-02-BACKSIDE-POWER-DELIVERY,晶片改用背面供電後，設備需求如何從製程變化走到公司獲利？
@@ -27,7 +27,7 @@ topic-MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER,小晶片能在一次測試中�
 topic-MI-2026-08-03-800VDC-PROTECTION-LAYERS,高壓直流系統為何不能只靠一顆保險絲保護？
 topic-MI-2026-08-03-AI-CAPACITOR-ROLE-MAP,不同位置的電容容量相近，為何仍不能互相取代？
 topic-MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY,電力尖峰與停電持續時間不同時，該由哪種儲能設備處理？
-topic-MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER,記憶體客製範圍不同時，為何不能只用一條進度排名？
+topic-MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER,客製高頻寬記憶體只改規格或重做底部晶片，為何不能排在一起？
 topic-MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES,液冷系統出問題時，如何分清設備、整合與設施的責任？
 topic-MI-2026-08-03-PCIE6-COMPLIANCE-LADDER,高速介面元件量產後，還要跨過哪些互通、測試與部署關卡？
 topic-MI-2026-08-07-AI-RACK-ACTION-CONTRACT,機櫃感測到過熱或漏液後，系統如何找到正確設備並安全隔離？

@@ -1,5 +1,91 @@
 # Changelog
 
+## 客製記憶體第二站改成三種客製範圍與雙軸進度讀法 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有客製高頻寬記憶體議題的讀者層文字、標題、學習路線交接、
+發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、`research_source`、
+`research_claim`、`impact` 與 `monitoring_item` 共 21 個正式區塊均與 Git `HEAD` 逐字相同。
+
+- 從「研究中心 → 族群矩陣 → 記憶體與封裝 → 第二站」固定走讀發現，首屏先以 Samsung、
+  Custom HBM 與 HBM 樣品時程起句；正文核心表再把 `Base die`、`Stream DQ`、
+  `preprocessing`、`roadmap`、`qualification`、`benchmark` 與 `foundry` 混在「客製對象」與
+  「本輪可確認階段」兩欄。不熟產業的讀者要先翻譯公司產品詞，才看得出「改了哪裡」與
+  「公開證據走到哪一步」其實是兩個不同問題。
+- `learningPathVersion` 升為 53。讀者問句改成「客製高頻寬記憶體只改規格或重做底部晶片，
+  為何不能排在一起？」；研究題名改成「高頻寬記憶體可以客製到哪裡：先分規格、底部晶片與
+  工作搬移」。首屏讀者任務需先認得的詞由 3 個降為 0 個，先用「調整規格／重做底部晶片／
+  搬移資料整理工作」建立概念，再把三星、SK 海力士與美光放回第二句。反思題不再先要求理解
+  HBM、Stream DQ、NRE、qualification 或 roadmap；名詞小字典由 7 項增為 32 項，並新增純編輯
+  transition，沒有用可讀性改版刷新複核日期或證據時鐘。
+- 核心內容先以「調整記憶體規格／重做堆疊底部邏輯／搬移部分資料整理工作」三種本文讀法，
+  分別說明改了什麼、可能共同參與的角色、可能增加的功能與不能外推的結論；第二張表再把
+  三家公司分成公開改法、公開證據、目前階段與仍不能說的事項。文末明確說明第一張表回答
+  「改了哪裡」，第二張表回答「走到哪一步」，沒有共同產品、測試、數量與財務分母就不產生
+  單一供應商名次。
+- 1280px 與 390px 固定畫面均完成逐張開圖、同 viewport／同路線狀態前後並排檢查；桌機
+  `scrollWidth == innerWidth == 1280`，390px 含邊框的 iframe 內容寬 388px，亦有
+  `scrollWidth == innerWidth == 388`。行動版兩張 3 列 × 5 欄表均重排為具欄名卡片，沒有水平
+  溢位。名詞速查可完整載入 32 個中文優先定義，搜尋「毛利」只顯示 2／32 個相符項目並可正常
+  關閉。這些是 deterministic viewport 與互動契約，不是抽樣統計，SE／t／有效獨立觀測不適用；
+  固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、
+  200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第二站閱讀時間由 14 分鐘更新為 17 分鐘，並由建置器同步更新族群矩陣、
+  第二站卡片、文章標題、讀者問句、知識圖譜 `learningRoutes` 與
+  `learningPathVersion: 52 → 53`。排除版本後 canonical payload SHA 由
+  `7e81282a8682fc319d4db14bf49037731d3f9f57ef119a9cb71e2e42d2975c94` 變為
+  `5cf89fe110920f5f5288893e31ec1ed2adb5b4f0dbe7d3ea7958c6fd81c2bd5a`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 494 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph 六項 lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `04b2ebcebf4b016436f120938de1dbf2de33ddabbfb53322e2833ab9d6fd3582`、
+  `research.html` `8d99cf04622887f2c18766c31319c097229bfb18b0988209e22c4a22d5271110`。
+
+## AI 記憶體第一站改成四層資料與商業進度讀法 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與
+複核時鐘零變動**；本次只改寫既有 AI 記憶體分層議題的讀者層文字、標題、學習路線交接、
+發布 payload 與對應測試，不改變原研究結論。該篇 `research_topic`、`research_source`、
+`research_claim`、`impact` 與 `monitoring_item` 共 18 個正式區塊均與 Git `HEAD` 逐字相同。
+
+- 從「研究中心 → 族群矩陣 → 記憶體與封裝 → 第一站」固定走讀發現，首屏先要求讀者理解
+  Rubin 與 Vera、HBM、SOCAMM、KV cache 與 Context storage／CMX 五個產品或英文術語；正文
+  雖已把資料分成四層，仍以 GPU／HBM、CPU／SOCAMM、CMX 與 SSD 起句。成熟度表又直接使用
+  `qualification`、`placement` 與 `context tier`，不熟產業的讀者要先翻譯名詞，才看得出
+  「資料為什麼放這裡」和「商業進度走到哪裡」是兩個不同問題。
+- `learningPathVersion` 升為 52。讀者問句改成「人工智慧資料為什麼要分層存放，越常用的資料
+  就一定要離運算晶片越近嗎？」；研究題名改成「人工智慧資料為什麼要分層存放：正在運算、
+  等待取用與長期保存各有位置」。首屏需先認得的詞由 5 個產品／英文術語降為「容量、等待時間」
+  2 個中文概念，反思題不再先要求理解 HBM、SOCAMM、CMX、KV cache 或 Rubin。名詞小字典由
+  12 項增為 32 項，並新增純編輯 transition；原本已逾期的複核日期與可信度降級完整保留，
+  沒有用可讀性改版假裝取得新證據。
+- 核心內容先用「正在計算 → 系統快速取用 → 可重建且可共享 → 長期保存」四種資料任務說明
+  存放位置，再在最後一欄放回 HBM4、SOCAMM／SOCAMM2、CMX 與 SSD 原名；第二張表另把
+  「平台規格 → 客戶送樣 → 架構與軟體設計 → 公開標準」和仍缺的資格認證、量產、具名部署、
+  利用率與財務證據分開。320／390px 的資料位置表 4 列 20 格、商業進度表 4 列 16 格均重排
+  為具欄名卡片；780／884／1280px 保留原生 table row／cell，五個固定 iframe 寬度都有
+  `documentElement.scrollWidth == innerWidth`。同一路線、同 viewport 的前後畫面完成並排檢查；
+  桌機、390px、深色與淺色均完成目視走讀。點擊 `CXL 4.0` 會開啟本文 32 詞名詞速查、預填
+  搜尋並只顯示對應定義，關閉後焦點回到原按鈕。這些是 deterministic viewport 契約，不是
+  抽樣統計，SE／t／有效獨立觀測不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體
+  鍵盤巡覽、VoiceOver／TalkBack、200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；第一站閱讀時間由 13 分鐘更新為 16 分鐘，並由建置器同步更新族群矩陣、
+  第一站卡片、文章標題、讀者問句、知識圖譜 `learningRoutes` 與
+  `learningPathVersion: 51 → 52`。排除版本後 canonical payload SHA 由
+  `9fed1caf4521ceba022644dec9df29e70dafcd476b09b61913b8238d0a214331` 變為
+  `7e81282a8682fc319d4db14bf49037731d3f9f57ef119a9cb71e2e42d2975c94`。方法 registry
+  fingerprint 維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增
+  append-only 方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 493 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均以
+  exit 0 通過。research queue 保留 11 個既有提醒；method audit 仍揭露新鮮度與修正學習
+  `ATTENTION`、校準可用性 `NOT_READY`，未被本次編輯改寫。連續兩次 dashboard build SHA
+  一致：`index.html` `f93acbaa2458d2425e22cbb7326b2dd70fab5a9af9b1537e9e59aeb93fbff78a`、
+  `research.html` `a5a0b93ebccb35903056085a3885253f03e85fe95767a27259ea2c7fb671eebb`。
+
 ## 液冷第九站改成五次交接與五關證據讀法 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、monitor、impact、證據判定與

@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 51)
+        self.assertEqual(library["learningPathVersion"], 53)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1035,9 +1035,9 @@ class ResearchCenterTest(unittest.TestCase):
         memory = published["topic-MI-2026-08-02-AI-MEMORY-HIERARCHY"]
         self.assertEqual(
             memory["readerQuestion"],
-            "訓練資料放在不同記憶與儲存層，究竟是在省容量、成本還是等待時間？",
+            "人工智慧資料為什麼要分層存放，越常用的資料就一定要離運算晶片越近嗎？",
         )
-        self.assertIn("HBM 不是全部", memory["readerTitle"])
+        self.assertIn("人工智慧資料為什麼要分層存放", memory["readerTitle"])
         self.assertIn(memory["readerQuestion"].lower(), memory["searchText"])
 
         with tempfile.TemporaryDirectory() as tmp:
@@ -2519,6 +2519,123 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(
             "topic-MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES,"
             "液冷系統出問題時，如何分清設備、整合與設施的責任？",
+            guide,
+        )
+
+    def test_ai_memory_station_one_starts_from_data_roles_and_separates_maturity(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_ai_memory_hierarchy.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 人工智慧資料為什麼要分層存放："
+            "正在運算、等待取用與長期保存各有位置\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave89_memory_layers_and_maturity",
+            "人工智慧系統不會把所有資料都塞在同一個地方",
+            "架構、樣品、量產與收入必須分開判讀",
+            "## 先按資料的急迫程度分四層",
+            "| 資料任務 | 本文怎麼分位置 | 為什麼放這裡 | 本輪產品名稱 | 目前不能因此判定 |",
+            "| 正在計算、最怕等待的工作資料 |",
+            "| 容量較大、仍需快速取用的系統資料 |",
+            "| 可以重新建立、也可能需要共享的上下文資料 |",
+            "| 容量最大、可接受較慢存取或需長期保存的資料 |",
+            "## 四層互補，不是誰取代誰",
+            "## 每一層的商業進度要各自驗證",
+            "| 資料層或連接路徑 | 已看到的一手證據 | 目前走到哪一步 | 還缺哪些商業證據 |",
+            "| 圖形運算晶片旁的高速層（HBM4） |",
+            "| 中央處理器旁的系統記憶體（SOCAMM） |",
+            "| 共享上下文層（CMX） |",
+            "| 記憶體擴充連接（CXL 4.0） |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0].splitlines()[2]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先按資料的急迫程度分四層", 1
+        )[0]
+        for jargon in ("HBM", "SOCAMM", "CMX", "KV cache", "Rubin"):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 7),
+            ("research_claim", 6), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-AI-MEMORY-HIERARCHY,"
+            "人工智慧資料為什麼要分層存放，越常用的資料就一定要離運算晶片越近嗎？",
+            guide,
+        )
+
+    def test_ai_memory_station_two_separates_custom_scope_from_business_progress(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-03_custom_hbm_scope_ladder.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 高頻寬記憶體可以客製到哪裡："
+            "先分規格、底部晶片與工作搬移\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave90_custom_scope_and_progress",
+            "同樣寫「客製」，公開資料可能在談三種不同改法",
+            "把「改了哪裡」和「走到哪一步」分成兩把尺",
+            "## 先拆「改了哪裡」，再看「走到哪一步」",
+            "### 先用三種範圍讀懂「客製」",
+            "| 本文讀法 | 改了什麼 | 可能需要哪些角色一起做 | 本輪可能增加的功能 | 還不能因此判定 |",
+            "| 調整記憶體規格 |", "| 重做堆疊底部邏輯 |",
+            "| 搬移部分資料整理工作 |",
+            "### 再把每家公司放回自己的證據位置",
+            "| 公開公司 | 本輪談的是哪種改法 | 已看到的公開證據 | 目前走到哪一步 | 還不能說什麼 |",
+            "| 三星（Samsung） |", "| SK 海力士（SK hynix） |",
+            "| 美光（Micron） |",
+            "一般版本的樣品、客製版本的",
+            "不能合併成一條供應商進度排名",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0].splitlines()[2]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先拆「改了哪裡」，再看「走到哪一步」", 1
+        )[0]
+        for jargon in (
+            "HBM", "Stream DQ", "NRE", "qualification", "roadmap",
+            "Samsung", "Micron",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 8),
+            ("research_claim", 7), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER,"
+            "客製高頻寬記憶體只改規格或重做底部晶片，為何不能排在一起？",
             guide,
         )
 
