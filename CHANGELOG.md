@@ -1,5 +1,36 @@
 # Changelog
 
+## 研究雷達先交代目前線索與證據缺口 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究排序、selection log、priority、
+evidence posture、來源、主張、圖譜、公司曝險與投資判斷零變動**；本次只新增候選雷達的
+reader-only 起點、發布版面與對應契約。方法 registry fingerprint 未改變，
+`research_method_audit.py --baseline-ref HEAD` 通過，因此不建立內容相同的新方法快照。
+
+- 1280×720 與 390×844 修改前畫面都顯示，候選卡在白話問題後直接跳到「接著查什麼」；
+  讀者雖知道研究動作，卻沒有先看見動作所依據的已知線索與仍缺證據。8／8 個 active 候選
+  現在各加入 `reader_starting_point`：第一句只摘要同一 `why_now` 已有線索，第二句固定以
+  「目前還」明示證據缺口或不能跨過的推論邊界。
+- parser 要求每個起點恰為兩句、32–120 字且包含「目前還」；缺欄、單句、過長或沒有邊界
+  都會使 radar lint 失敗。完整 `why_now`、凍結 `next_evidence`、knowledge gain、第一拒絕與
+  來源仍在預設關閉的查核區，selection log 沒有改寫。
+- 候選卡閱讀順序改成「這題想弄清楚 → 先知道這件事 → 接著查什麼 → 關鍵詞 → 各族群要回答
+  什麼」。桌機把起點與驗證動作並排；780px 以下依同一 DOM 順序改為單欄。沿用既有色票、
+  圓角、字級與間距，沒有另造一套視覺語言。
+- 固定瀏覽器實測桌機與手機 `scrollWidth == innerWidth`，分別為 1280 與 390；手機起點與下一步
+  單欄排列，族群按鈕高 62px。從雷達第 1 題開啟 23 分鐘文章後，H1、hash 與 390px 寬度正確；
+  返回仍恢復 `#radar`、同一候選卡與鍵盤焦點。頁面執行紀錄沒有 warning／error。
+- 前後畫面、同尺寸比較與稽核素材存於
+  `tmp/research-learning-audit-2026-08-11-wave106-radar-context/`。固定 viewport 不是實機，本輪
+  未涵蓋 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化對比或讀者理解率
+  測試，因此不宣稱完整無障礙合規或實際理解成效。
+- `Darwin 25.5.0 arm64`、Python 3.11.11、UTF-8 執行 508 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0。method audit 仍如實揭露既有新鮮度、修正學習與校準提醒。連續兩次 dashboard
+  build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `908d48143d06dfa82a742590a5ed6fc3db68bfcdf5bdda8409d3e8c68639e9d1`。
+
 ## 文章清單先交代學習目標、讀後問題與證據位置 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、monitor、impact、

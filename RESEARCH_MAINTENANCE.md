@@ -71,16 +71,20 @@ pack 與獨立複核。
 - `next_evidence`／`next_check`：下一份要找的證據與期限。
 - `route`：升格文章＋圖譜、併入既有研究，或只留觀察。
 
-Active radar 另必須提供純編輯／導覽層的 `reader_question`、`reader_terms`、
-`reader_next_step`、`group_ids` 與 `reader_group_questions`：
-第一項用一個問句說明「研究完成後要能回答什麼」，第二項只挑 2–4 個會擋住新手的關鍵詞，
-第三項把凍結的 `next_evidence` 縮成可執行的下一步；`group_ids` 只能列 1–4 個
+Active radar 另必須提供純編輯／導覽層的 `reader_question`、`reader_starting_point`、
+`reader_terms`、`reader_next_step`、`group_ids` 與 `reader_group_questions`：
+第一項用一個問句說明「研究完成後要能回答什麼」；第二項固定寫成兩句、32–120 字，第一句只
+摘要既有 `why_now` 已出現的線索，第二句以「目前還」明示尚缺的證據或不能跨過的推論邊界；
+第三項只挑 2–4 個會擋住新手的關鍵詞；第四項把凍結的 `next_evidence` 縮成可執行的下一步。
+`reader_starting_point` 不得新增來源未支持的事實，也不得把候選寫成已證實結論。
+`group_ids` 只能列 1–4 個
 `config/groups.csv` 既有正式族群，且必須能由同一候選已寫明的知識缺口、責任角色或升格文章
 回查，不能為了增加按鈕而擴張成受惠名單。`reader_group_questions` 必須依 `group_ids` 順序，
 為每個族群各寫一個白話問句，說清它在同一研究題中負責回答哪個問題；不得寫成上下游排名、
 受惠方向或已證實公司連結。發布卡必須把 `reader_question` 當成卡片 heading，先標示「這題想
 弄清楚」；原候選 `title` 只縮成次要的「研究題名」脈絡，不得把技術題名再放回第一閱讀層。
-其後顯示 `reader_next_step`、`reader_terms` 與族群問句；族群問句按鈕負責定位族群矩陣的本題文章、
+其後依序顯示 `reader_starting_point`、`reader_next_step`、`reader_terms` 與族群問句；族群問句
+按鈕負責定位族群矩陣的本題文章、
 族群基礎起點與研究缺口，矩陣保留同一問句、同步選取相同族群，並提供返回原候選的焦點路徑。
 候選已升格且正式 article 可解析時，矩陣主要行動必須開同一 `candidate.articleId`，不得改開該族群
 通用 `learningStart`；後者只能降為「再讀族群基礎」。候選未升格時必須明示本題尚無文章，不得由
@@ -90,7 +94,7 @@ Active radar 另必須提供純編輯／導覽層的 `reader_question`、`reader
 DOM 順序單欄。未升格狀態只保留問句與返回行動，不得因共用三欄版而留下空白文章欄。開文再返回
 時必須重建同一承接卡、選取族群並把焦點送回整列起點。完整
 `why_now`、`next_evidence`、knowledge gain、第一拒絕與來源仍保留在預設關閉的查核區。
-這五個欄位不能改寫 rank、priority、evidence posture、selection decision 或任何凍結值，
+這六個欄位不能改寫 rank、priority、evidence posture、selection decision 或任何凍結值，
 也不能新增文章、圖譜、公司曝險或投資結論。
 
 族群完整度摘要在寬度大於 1000px 時保留四欄同列比較；781–1000px 必須改成 2×2 grid、隱藏

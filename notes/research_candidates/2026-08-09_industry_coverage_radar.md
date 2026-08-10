@@ -21,6 +21,7 @@ title: AI 機櫃 EMC 測試容量與驗收責任階梯
 group_ids: passive,powersupply,serverodm
 reader_group_questions: passive => 零件層如何抑制或隔離電磁干擾？ | powersupply => 電源子系統由誰整合測試並修正干擾？ | serverodm => 整櫃送驗、跨模組除錯與最終簽收由誰負責？
 reader_question: 大型 AI 機櫃送驗時，零件、子系統與整櫃的電磁干擾，分別由誰測試、修正與簽收？
+reader_starting_point: 零件各自合格，不等於整櫃一定合格；尺寸、供電與設備互相干擾仍要另外確認。目前還缺可重複的整櫃驗收方法與足夠測試空間。
 reader_terms: EMC => 電磁相容，檢查設備是否會干擾別人或被外界干擾 | chamber => 隔離外界電磁干擾的專用測試室 | qualification => 產品正式採用前必須通過的合格驗證
 reader_next_step: 先找整櫃測試方法、合格實驗室與買方驗收條款，確認大型機櫃是否真的面臨測試容量瓶頸。
 priority: p1
@@ -45,6 +46,7 @@ title: AI 訓練資料、checkpoint 與模型權重分發的 I/O 契約
 group_ids: memory,serverodm
 reader_group_questions: memory => 訓練資料、checkpoint 與模型權重分別需要哪種記憶與儲存層？ | serverodm => GPU、網路、儲存節點與軟體之間的資料路徑由誰整合？
 reader_question: AI 訓練從讀資料、保存中途進度到分發模型，各階段卡住時是否由不同設備與軟體負責？
+reader_starting_point: 讀訓練資料、保存中途進度與搬動模型，是三種不同的資料流，卡住的位置與負責設備可能不同。目前還缺一套能直接比較速度與失敗門檻的資料。
 reader_terms: I/O => 資料讀入與寫出的路徑 | checkpoint => 訓練途中保存的進度快照，失敗後可從這裡恢復 | SLO => 系統承諾達到的服務目標，例如最慢回應時間
 reader_next_step: 先取得三種資料流的速度與失敗門檻，再分清 GPU、網路、儲存節點和軟體各自負責哪一段。
 priority: p1
@@ -69,6 +71,7 @@ title: Chiplet design kit、metadata 與 conformance workflow
 group_ids: ipdesign,packtest,semiequip
 reader_group_questions: ipdesign => 共同設計資料與介面規則如何交給工具與各家晶粒？ | packtest => 多家晶粒組合後，誰負責封裝整合與合格驗證？ | semiequip => 哪些量測、測試與製程設備能執行共同驗證？
 reader_question: 多家小晶片要組成一套系統時，熱、供電、機構與測試資料能否用共同格式交換並通過驗證？
+reader_starting_point: 把小晶片連起來的介面標準只解決一部分問題，各家還要交換熱、供電、機構與測試資料。目前還缺多供應商工具與封測實作的共同驗證。
 reader_terms: Chiplet => 可與其他晶粒共同封裝的小晶片 | design kit => 讓不同團隊依同一規則設計與檢查的資料包 | conformance => 是否符合共同規格的驗證流程
 reader_next_step: 先找共同格式能被設計工具實際讀入、並由晶圓廠或封測廠完成多供應商驗證的案例。
 priority: p1
@@ -91,6 +94,7 @@ title: AI 硬體 silent data corruption 的跨生命週期責任鏈
 group_ids: packtest,semiequip,serverodm
 reader_group_questions: packtest => 工廠測試與 burn-in 能提早抓到哪些無聲錯誤？ | semiequip => 哪些測試與分析工具負責定位錯誤來源？ | serverodm => 整機驗收與資料中心運行時，誰隔離設備並追查？
 reader_question: AI 硬體算錯卻沒有警報時，工廠、整機驗收與資料中心運行階段要由誰發現、隔離並追查？
+reader_starting_point: 無聲錯誤可能在出廠測試、整機驗收或上線運行後才被發現，三個階段的發現與處置責任不同。目前還缺跨平台一致的錯誤分類與隔離門檻。
 reader_terms: silent data corruption => 系統沒有報錯，但資料或運算結果已悄悄損壞 | burn-in => 用長時間或高負載提早找出不穩定硬體 | RMA => 故障品退回供應商分析或更換的流程
 reader_next_step: 先對齊不同平台如何分類錯誤、何時隔離設備，再確認測試機、伺服器與管理控制器的責任。
 priority: p1
@@ -113,6 +117,7 @@ title: 224G PCB 材料、stackup 與系統 BER 資格鏈
 group_ids: material,pcb
 reader_group_questions: material => 材料本身的介電與損耗規格是否符合高速需求？ | pcb => 材料做成含走線、孔洞與連接器的整板後，BER 能否過關？
 reader_question: 材料規格表宣稱能跑高速後，做成含走線、孔洞與連接器的完整電路板，錯誤率仍能過關嗎？
+reader_starting_point: 材料規格、測試片與完整電路板，是三種不同層次的證據；單一材料數字不能直接代表整板表現。目前還缺同一塊參考板從材料到錯誤率的完整資料。
 reader_terms: stackup => 電路板各層銅箔、介質與厚度的排列方式 | BER => 位元錯誤率，資料傳輸中出錯的比例 | coupon => 與正式電路板同製程製作、專門用來量測的測試片
 reader_next_step: 先取得同一塊參考板的材料、走線損耗與錯誤率資料，避免只拿單一材料數字推論整板表現。
 priority: p2
@@ -135,6 +140,7 @@ title: SiC reliability guideline 到 AI BBU／PSU qualification
 group_ids: power,powersupply
 reader_group_questions: power => SiC 元件的短路、閘極與熱循環可靠度是否過關？ | powersupply => BBU／PSU 是否引用新指引並改變設計與驗收？
 reader_question: 新的碳化矽可靠度指引，是否真的進入 AI 備援電源與電源供應器的驗收並改變設計？
+reader_starting_point: 新的碳化矽測試指引、參考設計與單一產品採用案例已經出現，但三者不等於平台驗收規則已改變。目前還缺買方驗收條款與實際測試流程。
 reader_terms: SiC => 碳化矽，適合高電壓與高效率電力轉換的半導體材料 | BBU => 電池備援單元，主電源中斷時短暫供電 | PSU => 把輸入電力轉成設備所需電壓的電源供應器 | derating => 刻意低於元件極限使用，以換取可靠度
 reader_next_step: 先確認平台驗收是否引用新指引，以及短路、閘極壓力與熱循環測試是否因此改變。
 priority: p2
@@ -157,6 +163,7 @@ title: 半導體 PFAS 的 substance×process×jurisdiction 曝險
 group_ids: material,semiequip
 reader_group_questions: material => 哪種 PFAS 用在哪道製程，替代材料是否需要重驗？ | semiequip => 設備是否依賴受限物質，替代後需改哪些製程條件？
 reader_question: 哪一種 PFAS 用在哪一道半導體製程、受哪個地區規則約束，限制後是否必須重新驗證材料或設備？
+reader_starting_point: PFAS 是一大類物質，不同物質、製程用途與地區規則可能完全不同。目前還不能從「限制 PFAS」直接推成全面換料或設備改造。
 reader_terms: PFAS => 一大類耐熱、耐化學的含氟物質，部分用途正面臨限制 | jurisdiction => 法規實際適用的國家或地區 | qualification => 替代材料或設備正式導入前的合格驗證
 reader_next_step: 先把特定物質、製程用途與適用法域逐項對上，再查豁免、過渡期與替代品驗證成本。
 priority: p2
@@ -179,6 +186,7 @@ title: 兩相冷卻 qualification 與單相反證
 group_ids: thermal
 reader_group_questions: thermal => 在相同熱負載下，兩相冷卻何時才優於單相方案？
 reader_question: 當單相冷板仍能帶走熱量時，熱負載要高到什麼程度，兩相冷卻才真的有必要？
+reader_starting_point: 兩相冷卻已有工程文件，但單相冷板也持續提高散熱能力。目前還缺相同負載下的直接比較與平台正式驗收。
 reader_terms: 單相冷卻 => 冷卻液全程維持液態帶走熱量 | 兩相冷卻 => 冷媒利用液態與氣態轉換吸收更多熱量 | thermal resistance => 熱從晶片傳到冷卻液時遇到的阻力 | serviceability => 系統是否容易維修、更換與恢復運作
 reader_next_step: 先在相同熱負載下比較單相與兩相的散熱、壓力、耗能、安全和維修，再等待平台正式驗收。
 priority: p3

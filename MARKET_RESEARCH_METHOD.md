@@ -42,6 +42,12 @@ Active radar 使用 schema 2 並以 `selection_cycle_id` 指向該輪凍結記�
 `advance → watch/deferred` 是研究後拒絕，也同樣是有效方法結果。兩者都不能稱為題材、投資或
 報酬命中。首個 cycle 以獨立 Git commit 先凍結，再提交文章與圖譜；後續每輪沿用同一順序。
 
+Active 候選的讀者卡必須在 `reader_question` 與 `reader_next_step` 之間提供
+`reader_starting_point`。它固定是兩句白話：第一句只把同一候選 `why_now` 已有的起始線索
+說清楚，第二句以「目前還」標出證據缺口或推論邊界。這是 reader-only 編輯層，不加入 selection
+log、method fingerprint、知識圖譜或文章 claim，也不得藉此提高 evidence posture、宣告升格或
+補出新的公司關係。完整 `why_now` 仍留在預設關閉的查核區供回查。
+
 Active 候選另必須宣告 1–4 個 `group_ids`，值域逐一對齊 `config/groups.csv`。這是讀者從
 「研究什麼」前往族群矩陣查看起讀文章與缺口的導覽索引，不屬 selection log 凍結欄位，也不
 構成公司曝險、供應鏈認證或受惠判斷；原候選沒有寫明的族群責任，不可由介面關鍵字自行補上。
@@ -707,7 +713,8 @@ counts 與 `not_ready`，不補零、不把未到期主張算成功。
     `relationBasis.labels[0]` 形成，不得讀正文、題名、關鍵字或模型補寫。正式 route 下一站仍須逐字
     使用下一篇既有閱讀任務問題，不得被一般比較問題覆寫。
     完整 ledger／impact／monitor 控制表與來源、研究判定收在預設關閉的研究查核附錄；
-    「下一步研究什麼」先用白話問句、2–4 個關鍵詞與下一個驗證動作解釋每個候選，原始
+    「下一步研究什麼」先用白話問句、兩句「已知線索＋目前缺口」、2–4 個關鍵詞與下一個
+    驗證動作解釋每個候選，原始
     `why_now`、凍結的下一份證據、第一拒絕與來源收在逐卡查核區，方法稽核另行收合；
     「各族群研究完整度」頂端須先以四個系統問題呈現全部既有學習路線；每張卡的 label、問題、
     第一站、站數與相關族群都必須可逐項回查 `RESEARCH_LEARNING_ROUTES`、route 主文章與其

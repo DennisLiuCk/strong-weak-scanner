@@ -125,6 +125,9 @@ class ResearchRadarTest(unittest.TestCase):
     def test_active_candidates_have_a_plain_language_reader_layer(self):
         for row in self.payload["candidates"]:
             self.assertTrue(row["readerQuestion"].endswith(("？", "?")), row["id"])
+            self.assertTrue(row["readerStartingPoint"], row["id"])
+            self.assertEqual(row["readerStartingPoint"].count("。"), 2, row["id"])
+            self.assertIn("目前還", row["readerStartingPoint"], row["id"])
             self.assertTrue(row["readerNextStep"], row["id"])
             self.assertGreaterEqual(len(row["readerTerms"]), 2, row["id"])
             self.assertLessEqual(len(row["readerTerms"]), 4, row["id"])
@@ -158,6 +161,26 @@ class ResearchRadarTest(unittest.TestCase):
             ],
         )
         self.assertEqual(errors, [])
+
+        starting_point_errors = []
+        research_radar._reader_starting_point(
+            "零件通過單體測試，不代表整個系統一定合格。目前還缺整機驗收條件與可重複測試結果。",
+            "candidate",
+            starting_point_errors,
+        )
+        self.assertEqual(starting_point_errors, [])
+        invalid_starting_point_errors = []
+        research_radar._reader_starting_point(
+            "這題已經可以直接下結論。",
+            "candidate",
+            invalid_starting_point_errors,
+        )
+        self.assertTrue(
+            any("已知線索＋目前缺口" in error for error in invalid_starting_point_errors)
+        )
+        self.assertTrue(
+            any("目前還" in error for error in invalid_starting_point_errors)
+        )
 
         errors = []
         self.assertEqual(

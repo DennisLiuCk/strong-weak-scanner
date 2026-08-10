@@ -134,6 +134,22 @@ def _reader_terms(value: str, label: str, errors: list[str]) -> list[dict[str, s
     return rows
 
 
+def _reader_starting_point(value: str, label: str, errors: list[str]) -> None:
+    """Validate the plain-language clue shown before a candidate's next action."""
+    if not value:
+        return
+    if not 32 <= len(value) <= 120:
+        errors.append(f"{label} reader_starting_point 應為 32–120 字")
+    if value.count("。") != 2 or not value.endswith("。"):
+        errors.append(
+            f"{label} reader_starting_point 必須是兩句完整句：已知線索＋目前缺口"
+        )
+    if "目前還" not in value:
+        errors.append(
+            f"{label} reader_starting_point 第二句必須用「目前還」明示不確定邊界"
+        )
+
+
 def _candidate_group_ids(value: str, label: str, errors: list[str]) -> list[str]:
     """Parse formal research-group routes without treating them as beneficiaries."""
     if not value:
@@ -342,13 +358,13 @@ def load_research_radar(
         "candidate_id", "rank", "title", "priority", "knowledge_value", "status",
         "evidence_posture", "why_now", "knowledge_gain", "first_rejection",
         "next_evidence", "next_check", "route", "article_topic_id", "graph_id", "sources",
-        "reader_question", "reader_terms", "reader_next_step", "group_ids",
-        "reader_group_questions",
+        "reader_question", "reader_starting_point", "reader_terms", "reader_next_step",
+        "group_ids", "reader_group_questions",
     }
     candidate_required = candidate_allowed - {
         "article_topic_id", "graph_id",
-        "reader_question", "reader_terms", "reader_next_step", "group_ids",
-        "reader_group_questions",
+        "reader_question", "reader_starting_point", "reader_terms", "reader_next_step",
+        "group_ids", "reader_group_questions",
     }
 
     for path in files:
@@ -393,8 +409,8 @@ def load_research_radar(
                     errors.append(f"{row_label} 缺少欄位：{key}")
             if meta.get("status") == "active":
                 for key in (
-                    "reader_question", "reader_terms", "reader_next_step", "group_ids",
-                    "reader_group_questions",
+                    "reader_question", "reader_starting_point", "reader_terms",
+                    "reader_next_step", "group_ids", "reader_group_questions",
                 ):
                     if not fields.get(key):
                         errors.append(f"{row_label} active radar 缺少讀者欄位：{key}")
@@ -451,6 +467,9 @@ def load_research_radar(
                 errors.append(f"{row_label} expand_existing_article 必須提供 article_topic_id")
 
             source_rows = _sources(fields.get("sources", ""), row_label, errors)
+            _reader_starting_point(
+                fields.get("reader_starting_point", ""), row_label, errors,
+            )
             reader_terms = _reader_terms(fields.get("reader_terms", ""), row_label, errors)
             group_ids = _candidate_group_ids(fields.get("group_ids", ""), row_label, errors)
             group_questions = _candidate_group_questions(
@@ -470,6 +489,7 @@ def load_research_radar(
                 "evidenceLabel": EVIDENCE_LABELS.get(posture, posture),
                 "whyNow": fields.get("why_now", ""),
                 "readerQuestion": fields.get("reader_question", ""),
+                "readerStartingPoint": fields.get("reader_starting_point", ""),
                 "readerTerms": reader_terms,
                 "readerNextStep": fields.get("reader_next_step", ""),
                 "groupIds": group_ids,
