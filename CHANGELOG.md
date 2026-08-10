@@ -1,5 +1,38 @@
 # Changelog
 
+## AI 電容第三站先用四個位置建立角色地圖 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、
+impact、證據判定與複核時鐘零變動**；本次只改寫既有 AI 電容市場議題的讀者層文字、
+發布 payload 與對應測試，不改變原研究結論。
+
+- 從「研究中心 → 族群矩陣 → 供電與散熱 → 第三站」固定走讀發現，首屏同時要求讀者理解
+  Rack、CBU、EDLC、DC link 與 BOM，角色表又以 `capacitive energy storage`、
+  `board bulk`、`near-die decoupling` 等英文概念起句；不熟產業的讀者必須先翻譯名詞，才能
+  理解電容其實位於四個不同位置、負責四種不同任務。
+- `learningPathVersion` 升為 45。首屏先認得的詞由 5 個降為 2 個，三句重點與反思題改為先問
+  「電容放在哪裡、處理什麼變化」；名詞小字典由 8 項增為 20 項，角色表、表後結論、公司新聞
+  判讀步驟與研究判定均改為中文概念先行，並新增同日純編輯 transition。OCP、TI、TDK、Murata
+  的原角色、公司映射、商業階段與證據限制均保留。
+- 320／390px 四欄角色表完整重排為具欄名卡片，780／884／1280px 保留原生 table row／cell；
+  五個固定 viewport 都有 `documentElement.scrollWidth == innerWidth`。桌機、390px、深色與淺色
+  均完成目視走讀；點擊「紋波」會開啟本文 20 詞名詞速查、預填搜尋並顯示逐字原始定義，關閉
+  後焦點回到原按鈕。這些是 deterministic viewport 契約，不是抽樣統計，SE／t／有效獨立觀測
+  不適用；固定 iframe 不是實機，本輪未涵蓋真機旋轉、完整實體鍵盤巡覽、VoiceOver／TalkBack、
+  200%／400% zoom 與儀器化 WCAG 對比量測。
+- 文章數維持 274；相對前版改動第三站
+  `topic-MI-2026-08-03-AI-CAPACITOR-ROLE-MAP`，並由建置器同步更新第二站文章的下一站問句／
+  閱讀時間、知識圖譜 `learningRoutes` 與 `learningPathVersion: 44 → 45`。排除版本後 canonical
+  payload SHA 由 `d4553d02469ab40bec6276073fd1cce061c542e2261cf3db22a860108816aee9` 變為
+  `d584694bb7f6a4adbd472ce24be53fe17bcb6ccf614aada6f1197a9e0d669eea`。方法 registry fingerprint
+  維持 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，因此不新增 append-only
+  方法快照。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 486 tests 全綠；qual notes、leading
+  hypotheses、research queue、research radar、method audit、knowledge graph lint 均通過，
+  research queue 保留 8 個既有時效提醒。連續兩次 dashboard build SHA 一致：`index.html`
+  `1e3a48aeae784116da44274eb81cb38f9ba38c5d04e3e7efd6e41c97b94e4861`、`research.html`
+  `f32d1f9f9a7f5928bc52f597fc44a4a6d1981606883f3b41b04612939a7f0d29`。
+
 ## 800V 保護第二站先分保護對象與事件 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、來源、claim、comparison、monitor、

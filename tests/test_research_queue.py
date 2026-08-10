@@ -1628,6 +1628,24 @@ class ReadabilityGateTest(unittest.TestCase):
             text,
         )
 
+    def test_ai_capacitor_article_starts_from_position_and_task(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_capacitor_role_map.md"
+        text = path.read_text(encoding="utf-8")
+        self.assertNotIn("一顆能在 800V bus 上承受紋波的電容", text)
+        self.assertNotIn("## 角色地圖：先定位，再談材料與價值量", text)
+        self.assertIn(
+            "兩顆電容的容量即使相近，一顆放在高壓供電路徑",
+            text,
+        )
+        self.assertIn(
+            "## 四個位置、四種任務：先找電容放在哪裡",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave82_capacitor_positions",
+            text,
+        )
+
     def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):
         body = self.LEAD + "- active claim 已進入 watch，對應 H1。\n"
         result, errors, _ = self._run(
