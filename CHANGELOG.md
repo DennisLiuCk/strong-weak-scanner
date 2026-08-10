@@ -1,5 +1,40 @@
 # Changelog
 
+## 族群矩陣把每一站對回產業角色，並保留文章與關係圖來處 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、summary、monitor、
+confidence、topic fingerprint、圖譜 edge、公司曝險與投資判斷零變動**；本次只調整學習路線
+站點的 reader-only 族群標示、展開排版與文章—關係圖工作階段 origin。方法 registry fingerprint
+未改變，`research_method_audit.py --baseline-ref HEAD` 通過，因此不建立內容相同的新方法快照。
+
+- 固定走讀「族群矩陣 → 供電與散熱 → 第 1／9 站」發現，桌機展開九站路線後三個階段仍固定
+  三欄；第一階段的三站全擠在左側三分之一，其餘欄只剩空白。每站只顯示讀者問題與研究節點，
+  聚合卡雖列出六個相關族群，讀者仍無法判斷各站實際會接觸哪些產業角色。
+- 路線 station 既有 `groupLabels` 現在逐項顯示為「這站會用到」；來源只可是同篇主文章正式
+  研究範圍，不從 route 總族群、圖譜節點、題名、相似度或模型補關係。發布版四條路線共 25 站，
+  25／25 都有非空族群且逐站與主文章 `groupLabels` 完全相同；另一條由
+  `RESEARCH_LEARNING_ROUTES.graphIds` 獨立列舉也得到 25 站。這是完整 payload 的決定性核對，
+  不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 桌機任一路線展開時仍跨滿問題卡整列；任一 phase 展開後再跨滿 route map，站點用至少 280px
+  自適應欄寬排列。1280 × 900 實測第一階段寬 1148px，前三站各約 375px；390 × 844 維持單欄且
+  `scrollWidth == innerWidth == 390`。桌機與手機都保留相同 DOM 閱讀順序、原生 details／summary、
+  問句、站次、文章映射與精確追問。
+- 從路線文章按「看這站證據關係」原本會以一般圖譜入口開啟，沒有文章來處、返回行動或矩陣
+  origin。現在共用 article-learning origin 並另記 `route-context` 來源；圖譜首屏明示
+  「文章 → 關係圖」、剛才文章與下一站。返回後仍是原文章與供電散熱矩陣路線，焦點回到同一顆
+  `.learning-route-action`，不是錯誤地跳到文末延伸卡。這個狀態只存在前端工作階段，不寫入研究
+  payload。
+- 前後畫面、同尺寸比較與完整稽核存於
+  `tmp/research-learning-audit-2026-08-11-wave108-matrix-relations/`。固定 viewport 不是實機，本輪
+  未涵蓋 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化 WCAG 對比或真實
+  讀者理解測試，因此不宣稱完整無障礙合規或實際理解成效。
+- `Darwin 25.5.0 arm64`、Python 3.11.11、UTF-8 執行 508 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0。method audit 仍如實揭露既有新鮮度、修正學習與校準提醒。連續兩次 dashboard build
+  SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `98a02078d52302476ef340a207f7c7b53dd7273d7219a585a5fbe225a740974d`。
+
 ## 市場議題首屏先用同篇白話交代已知、界線與查證方向 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、summary、monitor、

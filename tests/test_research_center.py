@@ -586,15 +586,16 @@ class ResearchCenterTest(unittest.TestCase):
         library = {"counts": {"topic": 3}, "groups": [], "articles": [
             {"id": "topic-a", "type": "topic", "groups": [], "stockIds": [],
              "readerTitle": "第一站", "typeLabel": "市場議題", "readingMinutes": 3,
+             "groupLabels": ["功率元件", "電源供應"],
              "readingMission": reading_mission},
             {"id": "topic-b", "type": "topic", "groups": [], "stockIds": [],
              "readerTitle": "第二站", "typeLabel": "市場議題", "readingMinutes": 5,
-             "readingMission": reading_mission},
+             "groupLabels": ["電源供應"], "readingMission": reading_mission},
             {"id": "topic-b-detail", "type": "topic", "groups": [], "stockIds": [],
              "readerTitle": "第二站補充", "typeLabel": "市場議題", "readingMinutes": 4},
             {"id": "topic-c", "type": "topic", "groups": [], "stockIds": [],
              "readerTitle": "第三站", "typeLabel": "市場議題", "readingMinutes": 7,
-             "readingMission": reading_mission},
+             "groupLabels": ["散熱"], "readingMission": reading_mission},
         ]}
         graph = {
             "learningRoutes": [{
@@ -676,7 +677,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(stations[0]["question"], "讀完後能回答哪個問題？")
         self.assertEqual(stations[1]["articleTitle"], "第二站")
         self.assertEqual(stations[2]["readingMinutes"], 7)
-        self.assertEqual(stations[0]["groupLabels"], [])
+        self.assertEqual(stations[0]["groupLabels"], ["功率元件", "電源供應"])
+        self.assertEqual(stations[1]["groupLabels"], ["電源供應"])
+        self.assertEqual(stations[2]["groupLabels"], ["散熱"])
         self.assertNotIn("learningRoute", library["articles"][2])
         completed = library["articles"][3]["learningPath"]["cards"][0]
         self.assertEqual(completed["kind"], "route")
@@ -2141,7 +2144,8 @@ class ResearchCenterTest(unittest.TestCase):
             "graphScrollTop:graphPage?.scrollTop||0",
             "openGraphArticle(startArticle.id)",
             "selectArticle(articleId,true,graphArticleOrigin())",
-            "graphOrigin:null", "function graphLearningOrigin()",
+            "graphOrigin:null", "function graphLearningOrigin(source='learning-card')",
+            "return{kind:'article-learning',source,articleId:article.id",
             "kind:'article-learning'", "articleScrollTop:reader?.scrollTop||0",
             "articleWindowTop:window.scrollY||0", "articleOrigin}",
             "function graphLearningNextLabel(article)",
@@ -2152,6 +2156,8 @@ class ResearchCenterTest(unittest.TestCase):
             "openRadarGraph(graphId,graphView='company',edgeId='',origin=null)",
             "state.graphOrigin=origin", "if(origin)focusGraphOrigin()",
             "card.guidedRelation?.edgeId,graphLearningOrigin()",
+            "openRadarGraph(route.graphId,'company','',graphLearningOrigin('route-context'))",
+            "focusSelector=origin.source==='route-context'?'.learning-route-action'",
             "state.graphOrigin=null;selectSurface('graph')",
             ".graph-origin{display:grid;grid-template-columns:minmax(0,1fr) auto",
             ".graph-origin button{min-height:44px",
@@ -2175,6 +2181,10 @@ class ResearchCenterTest(unittest.TestCase):
             "sourceQuestion=String(station.question||'').trim()",
             "hasPlainQuestion?'這站先弄懂':'這站先回答'",
             "'data-reader-question':hasPlainQuestion?'article':'route'",
+            "groupLabels=[...new Set((station.groupLabels||[]).map",
+            "'data-station-group-count':groupLabels.length",
+            "'aria-label':'這站研究範圍：'+groupLabels.join('、')",
+            "class:'learning-route-station-groups-label',text:'這站會用到'",
             "h('strong',{text:primary}),h('small',{text:context})",
             "class:'learning-route-station-precise'",
             "'data-testid':'learning-route-precise-'+route.id+'-'+station.step",
@@ -2194,6 +2204,7 @@ class ResearchCenterTest(unittest.TestCase):
             "learningRouteMap(learningRouteById(route.id),article.id,'article')",
             "learningRouteMap(learningRouteById(route.id)||route,'','matrix')",
             "每站先沿用同篇既有讀者問句",
+            "「這站會用到」只列同篇正式研究範圍",
             "精確追問仍逐字保留在可展開內容與文章「想一想」",
             ".learning-route-map>summary:focus-visible",
             ".learning-route-phases{display:grid;gap:7px",
@@ -2201,7 +2212,10 @@ class ResearchCenterTest(unittest.TestCase):
             ".learning-route-phase-summary{min-height:44px",
             ".learning-route-phase-summary:focus-visible",
             ".learning-route-phase-fold[open] .learning-route-phase-state::before{content:'收合'}",
+            ".learning-route-phase:has(>.learning-route-phase-fold[open]){grid-column:1/-1}",
+            ".learning-route-phase-fold[open]>.learning-route-stations",
             ".learning-route-station-button{width:100%;min-height:72px",
+            ".learning-route-station-groups{display:flex;flex-wrap:wrap",
             ".learning-route-station-precise>summary{min-height:44px",
             ".learning-route-station-precise>summary:focus-visible",
             "function resetGraphSurfaceScroll()",
