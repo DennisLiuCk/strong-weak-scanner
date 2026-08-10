@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 27)
+        self.assertEqual(library["learningPathVersion"], 28)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2014,7 +2014,10 @@ class ResearchCenterTest(unittest.TestCase):
             "還不是來源直接確認的關係",
             "不能先當成已確認事實",
             "function graphRelationReader(edge,from,to)",
+            "function graphRelationOrigin()",
             "'data-testid':'graph-reader-brief'",
+            "'data-testid':'graph-reader-origin'",
+            "'data-testid':'graph-reader-origin-back'",
             "graphReaderStep(1,'這條線現在怎麼讀',now)",
             "graphReaderStep(2,'還不能推到哪裡',edge.boundary)",
             "graphReaderStep(3,'看到什麼才升級',edge.nextTrigger)",
@@ -2024,14 +2027,20 @@ class ResearchCenterTest(unittest.TestCase):
             "edges.find(edge=>edge.evidenceState==='verified'&&!edgeIsStale(edge))",
             "edges.find(edge=>edge.evidenceState==='verified')||edges[0]",
             "selectGraphEdge(guidedEdge.id,true)",
+            "button.addEventListener('click',()=>selectGraphEdge(edge.id,true))",
             "示範只用一條既有關係教讀法，不代表重要性、受惠或投資排序",
             "關係：'+edge.relationLabel+' · 證據：'+edge.evidenceLabel+' · 階段：",
             "證據：'+edge.evidenceLabel",
             "商業位置：'+edge.materialityLabel",
             "h('span',{text:'關係解讀'})",
+            "完成這條線後",
+            "graphLearningNextLabel(article)",
+            "button.addEventListener('click',returnGraphLearningOrigin)",
             "這張卡只重排原關係資料，不新增關係或結論",
             ".graph-reader-step",
             ".graph-reader-cta",
+            ".graph-reader-origin button{width:100%;min-height:44px",
+            "@media(max-height:840px) and (min-width:981px){.graph-detail{position:static;max-height:none;overflow:visible}}",
             ".graph-detail:focus-visible",
             "matchMedia('(prefers-reduced-motion: reduce)')",
             "@media(max-width:780px){.graph-detail{scroll-margin-top:74px}}",

@@ -1,5 +1,30 @@
 # Changelog
 
+## 圖譜關係解讀改為單一捲動 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、階段、站次、關係、證據與研究進度零變動**；本次只改善文章進圖後閱讀一條關係與
+回到原學習路線的顯示層。
+
+- 1280×720 走讀「文章 → 公司曝險圖 → 示範讀一條關係」發現，關係詳情只有 328px 可視高度，
+  實際內容為 875px，形成圖譜頁與詳情卡兩層捲動；三步解讀首屏只露出約兩步。讀到卡片內部後，
+  原本的文章返回脈絡也離開視野，必須再找回圖譜頂端。
+- `learningPathVersion` 升為 28。桌機寬度至少 981px、可視高度不超過 840px 時，詳情取消 sticky
+  與自身 overflow，改由 `graphPage` 單一捲動；從下方關係清單選線時同步聚焦並捲到新詳情。
+  article-learning origin 另投影到三步解讀末端，顯示剛才文章、下一站與至少 44px 的返回按鈕；
+  返回沿用原契約恢復延伸卡位置、焦點與矩陣起點。直接圖譜入口不顯示這份一次性狀態。
+- 1280×720 深色與淺色實測，修改後詳情 `clientHeight == scrollHeight`（NVIDIA 關係均為
+  1025px）、`overflow-y: visible`、頁面無水平溢位；返回按鈕高度 44px。從關係清單改選
+  Infineon 後，標題、焦點與捲動都到新詳情；從文章進圖再返回時 URL、系統問題、第 1/9 站、
+  原圖譜按鈕焦點與約 4599px 閱讀位置均保留。修改前後畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave64/`；固定桌機 viewport 未涵蓋實機手機、實體鍵盤
+  導覽與螢幕閱讀器，仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 皆為
+  `50862ce6…`，`articles`、`knowledgeGraph` 與 `groupMaturity` 逐項相同。`Darwin 25.5.0 arm64`、
+  Python 3.11.11 預設環境執行 476 tests 全綠；qual notes、leading hypotheses、research radar、
+  method audit、knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次
+  dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `afec3f9c…`。
+
 ## 圖譜保留文章學習脈絡 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
