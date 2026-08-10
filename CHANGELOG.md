@@ -1,5 +1,40 @@
 # Changelog
 
+## 文章讀完後先看兩站概念如何交接 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic Markdown、主張、證據、graph edge、
+族群映射與站次零變動**；本次只讓既有學習路線的文章交接更容易理解。
+
+- 對 274 篇發布文章中的 25 篇正式路線主文章做完整母體盤點（不是抽樣）：21 篇非末站原本都有
+  下一篇問題與 CTA，但 0 篇會把剛讀完與下一站的 graph／phase label 並列；其中 15 次留在同一
+  phase、6 次跨 phase。另 4 篇是正式末站，繼續保留完成路線狀態，不虛構下一站。
+- 21 張下一站卡現在都以兩步 ordered list 顯示「這一站／下一站」，逐字重用兩篇既有
+  `learningRoute.graphLabel／phaseLabel`；並明示這只是學習次序，不代表供應鏈、受惠或因果關係。
+  `learningPathVersion` 升為 8；沒有用題名、相似度或模型補 label，也沒有建立 knowledge graph edge。
+- 兩條獨立路徑皆驗證 21/21 個交接精確吻合、4/4 個末站無交接卡；逐篇瀏覽器 DOM 驗收沒有空白、
+  重複或錯配。320×844、390×844 與 884×863 均無水平溢位；「繼續第 2/7 站」仍開啟正確文章、
+  回到頁首並顯示第 2/7 站。`Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 464 tests 全綠；
+  research queue、radar、method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。
+  連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `881dc078…`。
+
+## 閱讀任務先解釋首屏已出現的名詞 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic Markdown、主張、證據、族群映射與
+metadata 零變動**；本次只把既有名詞解釋提前到市場議題首屏。
+
+- 對 34 篇具有閱讀任務的一般市場議題做完整母體盤點（不是抽樣）：32 篇的「先抓住這一句／
+  讀完能回答」可確定性命中既有解釋，共 91 組文章－名詞（86 組同篇字典、5 組研究中心共通語），
+  每篇最多 5 個。另 2 篇沒有安全命中，發布頁不顯示空入口，也不以模型或新文案補詞。
+- 閱讀任務新增預設收合的「先認得這兩句的 N 個詞」，本文字典優先，再只用既有共通語補研究
+  流程／常見指標；兩句重複詞合併一次。展開列與原本逐句重點共用同一個 definition renderer，
+  逐字保留來源標籤、定義與判讀邊界；完整字典、下方逐句提示與「為什麼值得讀」仍保留。
+- 瀏覽器逐篇 DOM 驗收 34/34：32 個非空入口、91 列、2 篇無入口，資料屬性與實際列數全數一致。
+  320×844、390×844 與 884×863 都沒有水平溢位；原生 `details` 可展開／收合且不改文章 hash，
+  「開始讀三句重點」仍把鍵盤焦點送到原標題。`Darwin 25.5.0 arm64`、Python 3.11.11 預設環境
+  執行 464 tests 全綠；research queue、radar、method audit、knowledge graph lint 均為 0 errors
+  （queue 保留 8 warnings）。連續兩次 dashboard build SHA 一致：`index.html` `1e3a48ae…`、
+  `research.html` `2c22a00c…`。
+
 ## 市場議題先用中文問題開場，再保留研究題名 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic 原文、主張、證據與 metadata

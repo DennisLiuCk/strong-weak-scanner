@@ -310,7 +310,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 7)
+        self.assertEqual(library["learningPathVersion"], 8)
         article_ids = {article["id"] for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
         group_ids = {item["id"] for item in library["groups"]}
@@ -452,10 +452,18 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(first["phaseLabel"], "系統應用")
         self.assertEqual(first["phaseStep"], 2)
         self.assertEqual(first["phaseTotal"], 2)
+        self.assertEqual(first["routeBridge"], {
+            "fromGraphLabel": "第一圖", "fromPhaseLabel": "基礎概念",
+            "toGraphLabel": "第二圖", "toPhaseLabel": "系統應用",
+        })
         self.assertIn("下一站進入「系統應用」階段", first["description"])
         self.assertIn("測試路線 · 系統應用 · 第 2/3 站", first["meta"])
         self.assertIn("不新增供應鏈或受惠關係", first["description"])
         self.assertEqual(second["articleId"], "topic-c")
+        self.assertEqual(second["routeBridge"], {
+            "fromGraphLabel": "第二圖", "fromPhaseLabel": "系統應用",
+            "toGraphLabel": "第三圖", "toPhaseLabel": "系統應用",
+        })
         self.assertIn("下一站仍在「系統應用」階段", second["description"])
         self.assertIn("第 3/3 站", second["meta"])
         self.assertEqual(library["articles"][0]["learningRoute"], {
@@ -523,6 +531,27 @@ class ResearchCenterTest(unittest.TestCase):
         }]}
         with self.assertRaisesRegex(ValueError, "缺少可逐字回查的三句重點.*topic-a"):
             bd.attach_research_learning_paths(missing_key_points, graph)
+
+        missing_bridge_labels = {
+            "counts": {"topic": 2}, "groups": [], "articles": [
+                {"id": "topic-a", "type": "topic", "groups": [], "stockIds": [],
+                 "readerTitle": "第一站", "readingMission": reading_mission},
+                {"id": "topic-b", "type": "topic", "groups": [], "stockIds": [],
+                 "readerTitle": "第二站", "readingMission": reading_mission},
+            ],
+        }
+        missing_bridge_graph = {
+            "learningRoutes": [{
+                "id": "route", "label": "測試路線",
+                "graphIds": ["graph-a", "graph-b"],
+            }],
+            "graphs": [
+                {"id": "graph-a", "label": "第一圖", "articleIds": ["topic-a"]},
+                {"id": "graph-b", "label": "", "articleIds": ["topic-b"]},
+            ],
+        }
+        with self.assertRaisesRegex(ValueError, "交接缺少 graph／phase label.*topic-a.*topic-b"):
+            bd.attach_research_learning_paths(missing_bridge_labels, missing_bridge_graph)
 
         orphan = {"counts": {"topic": 1}, "groups": [], "articles": [{
             "id": "topic-policy", "type": "topic", "groups": [], "stockIds": [],
@@ -1036,7 +1065,11 @@ class ResearchCenterTest(unittest.TestCase):
             "function glossaryTokenPosition(", "function beginnerKeyPointMatches(",
             "const READER_TERMS=LIB.readerTerms||[]", "function sharedReaderTermMatches(",
             "function beginnerKeyPointBoundary(",
-            "function beginnerKeyPoints(",
+            "function readerTermDefinitionList(", "function beginnerKeyPoints(",
+            "function readingMissionTermGuide(", "data-reading-mission-term-count",
+            "data-reading-mission-article-term-count", "先認得這兩句的 ",
+            "const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)",
+            ".reading-mission-terms>summary{min-height:44px;",
             "class:'beginner-keypoints'", "data-keypoint-term-count",
             "data-keypoint-shared-term-count", "研究中心共通語",
             "先看懂這句的 ", "解釋逐字取自本篇「名詞小字典」；不另外改寫。",
@@ -1069,6 +1102,10 @@ class ResearchCenterTest(unittest.TestCase):
             "從這篇接著學", "function openLearningGroups(",
             "function openLearningCollection(", "learning-path-grid",
             "function learningCheckpoint(", "function learningCard(",
+            "function learningRouteBridge(", "learning-route-bridge",
+            "本篇與下一站的閱讀順序", "data-route-from-graph",
+            "把兩站串起來 · 閱讀順序",
+            "只表示學習次序，不代表供應鏈、受惠或因果關係。",
             "function learningRelationPreview(", "一條既有關係示範",
             "先看一條既有關係", "先別外推到哪裡",
             "data-graph-view", "data-guided-edge",
@@ -1116,6 +1153,13 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("if(target?.isConnected)target.focus({preventScroll:true})", template)
         self.assertIn("search?.focus({preventScroll:true});restorePosition()", template)
         self.assertIn("if(event.target===dialog)dialog.close()", template)
+        self.assertIn("readerTermDefinitionList(matches,'beginner-keypoint-term-list')", template)
+        self.assertIn("readerTermDefinitionList(matches,'reading-mission-term-list')", template)
+        self.assertIn("if(!matches.length)return null;const articleCount=", template)
+        self.assertLess(
+            template.index("const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)"),
+            template.index("if(mission.orientation&&mission.orientation!==lead)"),
+        )
         self.assertNotIn("orderedBeginnerBlocks", template)
         self.assertIn("else if(analyst){let guideInserted=false;", template)
         self.assertIn("researchSummaryGrid(item)||block(item)", template)
@@ -1141,7 +1185,7 @@ class ResearchCenterTest(unittest.TestCase):
             template,
         )
         self.assertIn(
-            "body.appendChild(verification);const readingMission=renderReadingMission(article);"
+            "body.appendChild(verification);const readingMission=renderReadingMission(article,glossaryTerms);"
             "if(readingMission)body.appendChild(readingMission);",
             template,
         )
@@ -1151,7 +1195,7 @@ class ResearchCenterTest(unittest.TestCase):
             template,
         )
         self.assertLess(
-            template.index("const readingMission=renderReadingMission(article)"),
+            template.index("const readingMission=renderReadingMission(article,glossaryTerms)"),
             template.index("const meta=h('div',{class:'article-meta'}"),
         )
         # 三句重點後立刻建立族群角色與路線位置，再補 metadata 與其餘新手內容。

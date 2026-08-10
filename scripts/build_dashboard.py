@@ -3015,6 +3015,19 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 next_card["phaseLabel"] = next_phase
                 next_card["phaseStep"] = candidate_route.get("phaseStep") or 0
                 next_card["phaseTotal"] = candidate_route.get("phaseTotal") or 0
+                route_bridge = {
+                    "fromGraphLabel": current_route.get("graphLabel") or "",
+                    "fromPhaseLabel": current_route.get("phaseLabel") or "",
+                    "toGraphLabel": candidate_route.get("graphLabel") or "",
+                    "toPhaseLabel": candidate_route.get("phaseLabel") or "",
+                }
+                if not all(route_bridge.values()):
+                    raise ValueError(
+                        "學習路線文章交接缺少 graph／phase label："
+                        f"{article.get('id') or 'unknown'} → "
+                        f"{candidate.get('id') or 'unknown'}"
+                    )
+                next_card["routeBridge"] = route_bridge
                 next_card["question"] = (
                     (candidate.get("readingMission") or {}).get("question") or ""
                 )
@@ -3124,7 +3137,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 7
+    research_library["learningPathVersion"] = 8
     return research_library
 
 
