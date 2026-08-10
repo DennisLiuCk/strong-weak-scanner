@@ -1,5 +1,28 @@
 # Changelog
 
+## 推薦下一篇先說清楚兩篇為什麼相連 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic Markdown、文章正文、主張、證據、
+graph edge、族群映射與正式學習路線零變動**；本次只公開一般跨文章推薦既有的連結依據。
+
+- 完整盤點 274 篇發布文章（不是抽樣）：813 張延伸卡中有 522 張 article card；21 張正式 route
+  下一站已用 graph／phase 解釋閱讀順序，其餘 501 張一般推薦分布在 258 篇文章。這 501 張全部
+  都能由兩篇既有 `stockIds` 或 `groups` 交集精確說明，但改版前 0 張把交集顯示給讀者。這是完整
+  母體描述，無抽樣誤差。
+- `learningPathVersion` 升為 9。一般推薦先找共同公司，沒有時才找共同族群；326 張顯示共同公司、
+  175 張顯示共同族群。卡片新增 machine-readable `relationBasis` 與「這兩篇為什麼相連」，並明示
+  共同標記不代表上下游、受惠、訂單或因果關係。3 張超過三個共同族群的卡先顯示三個，可用 44px
+  入口原位展開全部；正式 route 與 72 張已有關係示範的圖譜卡不重複加資訊。
+- 移除 501 筆 `relationBasis` 並把版本還原為 8 後，完整發布 payload 與 `HEAD` canonical SHA
+  逐位元相同（`6518ef5d…`），證明本次沒有改寫文章、證據或既有導覽。完整瀏覽器母體驗收
+  274/274 篇、813/813 張卡、501/501 個理由：標題、順序、kind、ID、顯示名稱、ARIA 與收合狀態
+  皆吻合，501/501 個目標文章存在；代表卡實際跳到正確文章並回頂。沒有多餘 route 理由或水平
+  溢位。320×844、390×844、884×863、1280×900
+  均完成視覺複核；螢幕閱讀器實機朗讀仍保留為人工輔具驗收項目。
+- `Darwin 25.5.0 arm64`、Python 3.11.11 預設環境執行 468 tests 全綠；research queue、radar、
+  method audit、knowledge graph lint 均為 0 errors（queue 保留 8 warnings）。連續兩次 dashboard
+  build SHA 一致：`index.html` `1e3a48ae…`、`research.html` `53c59f09…`。
+
 ## 中文正文保留原文、改成可掃讀句群 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、topic Markdown、文章正文、主張、證據、

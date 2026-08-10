@@ -310,8 +310,9 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 8)
+        self.assertEqual(library["learningPathVersion"], 9)
         article_ids = {article["id"] for article in library["articles"]}
+        article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
         group_ids = {item["id"] for item in library["groups"]}
         for article in library["articles"]:
@@ -323,6 +324,23 @@ class ResearchCenterTest(unittest.TestCase):
                 if card["kind"] == "article":
                     self.assertIn(card["articleId"], article_ids)
                     self.assertNotEqual(card["articleId"], article["id"])
+                    if not card.get("routeBridge"):
+                        target = article_by_id[card["articleId"]]
+                        basis = card["relationBasis"]
+                        self.assertIn(basis["kind"], {"stock", "group"})
+                        self.assertTrue(basis["ids"])
+                        self.assertEqual(len(basis["ids"]), len(basis["labels"]))
+                        if basis["kind"] == "stock":
+                            self.assertTrue(set(basis["ids"]).issubset(
+                                set(article["stockIds"]).intersection(target["stockIds"])
+                            ))
+                        else:
+                            self.assertFalse(
+                                set(article["stockIds"]).intersection(target["stockIds"])
+                            )
+                            self.assertTrue(set(basis["ids"]).issubset(
+                                set(article["groups"]).intersection(target["groups"])
+                            ))
                 elif card["kind"] == "graph":
                     self.assertIn(card["graphId"], graph_ids)
                 elif card["kind"] == "route":
@@ -342,6 +360,13 @@ class ResearchCenterTest(unittest.TestCase):
         })
         self.assertIn("test-graph", {
             card.get("graphId") for card in topic["learningPath"]["cards"]
+        })
+        formal_card = next(
+            card for card in topic["learningPath"]["cards"]
+            if card.get("articleId") == "formal-1111"
+        )
+        self.assertEqual(formal_card["relationBasis"], {
+            "kind": "stock", "ids": ["1111"], "labels": ["1111 甲公司"],
         })
         graph_card = next(
             card for card in topic["learningPath"]["cards"]
@@ -393,6 +418,36 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(card["graphViewLabel"], "產業依賴")
         self.assertEqual(card["meta"], "產業依賴 · 2 個節點 · 1 條關係")
         self.assertEqual(card["guidedRelation"]["edgeId"], "I1")
+
+    def test_learning_article_basis_falls_back_to_shared_group(self):
+        library = {
+            "counts": {"formal_note": 1, "topic": 1},
+            "groups": [{"id": "power", "label": "功率元件", "count": 2}],
+            "articles": [
+                {
+                    "id": "formal-a", "type": "formal_note",
+                    "readerTitle": "1111 甲公司 — 質化研究筆記",
+                    "subject": "1111 甲公司", "stockIds": ["1111"],
+                    "groups": ["power"], "groupLabels": ["功率元件"],
+                },
+                {
+                    "id": "topic-b", "type": "topic",
+                    "readerTitle": "另一家公司同族群議題",
+                    "stockIds": ["2222"], "groups": ["power"],
+                    "groupLabels": ["功率元件"],
+                },
+            ],
+        }
+
+        bd.attach_research_learning_paths(library, {"graphs": []})
+
+        card = next(
+            card for card in library["articles"][0]["learningPath"]["cards"]
+            if card.get("articleId") == "topic-b"
+        )
+        self.assertEqual(card["relationBasis"], {
+            "kind": "group", "ids": ["power"], "labels": ["功率元件"],
+        })
 
     def test_learning_path_prioritizes_next_registered_route_article(self):
         reading_mission = {
@@ -1443,6 +1498,26 @@ class ResearchCenterTest(unittest.TestCase):
         # 顯示層只讀 run.s；不改寫發布 payload 或原始 Markdown。
         self.assertIn("String(value==null?'':value)", template)
         self.assertNotIn("run.s=normalizeReaderRunText", template)
+
+    def test_template_explains_why_generic_article_recommendations_connect(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function learningArticleBasis(card)",
+            "card.kind!=='article'||card.routeBridge||!labels.length",
+            "這兩篇為什麼相連",
+            "共同公司",
+            "共同族群",
+            "'data-relation-basis-kind':kind",
+            "'data-relation-basis-count':labels.length",
+            "'data-relation-basis-ids':(basis.ids||[]).join('|')",
+            "labels.slice(0,3).join('、')",
+            "查看全部'+kindLabel",
+            "不代表上下游、受惠、訂單或因果關係",
+            "const articleBasis=learningArticleBasis(card)",
+            ".learning-article-basis{",
+            ".learning-article-basis-more>summary{min-height:44px}",
+        ):
+            self.assertIn(contract, template)
 
     def test_template_has_evidence_backed_dual_view_knowledge_graph(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

@@ -2923,6 +2923,56 @@ def attach_research_learning_paths(research_library, knowledge_graph):
     def overlap(left, right):
         return set(left or []).intersection(right or [])
 
+    group_label_by_id = {
+        row.get("id"): row.get("label") or row.get("id")
+        for row in (research_library.get("groups") or [])
+        if row.get("id")
+    }
+    stock_label_by_id = {}
+    for article in articles:
+        if article.get("type") != "formal_note":
+            continue
+        stock_ids = list(article.get("stockIds") or [])
+        subject = str(article.get("subject") or "").strip()
+        if len(stock_ids) == 1 and subject:
+            stock_label_by_id[stock_ids[0]] = subject
+
+    def article_relation_basis(source, candidate):
+        """Expose the exact existing tag that made a generic handoff eligible.
+
+        A named company is more specific than a declared group, so prefer it when
+        both exist.  This is navigation provenance, not a new supply-chain edge.
+        """
+        candidate_stocks = set(candidate.get("stockIds") or [])
+        shared_stocks = [
+            stock_id for stock_id in (source.get("stockIds") or [])
+            if stock_id in candidate_stocks
+        ]
+        if shared_stocks:
+            return {
+                "kind": "stock",
+                "ids": shared_stocks,
+                "labels": [
+                    stock_label_by_id.get(stock_id, stock_id)
+                    for stock_id in shared_stocks
+                ],
+            }
+        candidate_groups = set(candidate.get("groups") or [])
+        shared_groups = [
+            group_id for group_id in (source.get("groups") or [])
+            if group_id in candidate_groups
+        ]
+        if shared_groups:
+            return {
+                "kind": "group",
+                "ids": shared_groups,
+                "labels": [
+                    group_label_by_id.get(group_id, group_id)
+                    for group_id in shared_groups
+                ],
+            }
+        return None
+
     def best_related(article, article_type, require_stock=False):
         matches = []
         for candidate in articles:
@@ -2943,8 +2993,8 @@ def attach_research_learning_paths(research_library, knowledge_graph):
         matches.sort(key=lambda item: item[:4], reverse=True)
         return matches[0][-1] if matches else None
 
-    def article_card(label, candidate, description, meta=None):
-        return {
+    def article_card(label, candidate, description, meta=None, source=None):
+        card = {
             "kind": "article", "label": label,
             "title": candidate.get("readerTitle") or candidate.get("title") or "研究文章",
             "description": description,
@@ -2952,6 +3002,16 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                              f"閱讀約 {candidate.get('readingMinutes') or 1} 分鐘"),
             "articleId": candidate.get("id") or "",
         }
+        if source is not None:
+            relation_basis = article_relation_basis(source, candidate)
+            if not relation_basis:
+                raise ValueError(
+                    "一般文章推薦缺少共同公司或共同族群："
+                    f"{source.get('id') or 'unknown'} → "
+                    f"{candidate.get('id') or 'unknown'}"
+                )
+            card["relationBasis"] = relation_basis
+        return card
 
     def next_route_article(article):
         article_id = article.get("id")
@@ -3049,12 +3109,14 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 cards.append(article_card(
                     "先認識公司", formal,
                     "先了解公司實際賣什麼、收入從哪裡來，再回頭判斷題材敘事。",
+                    source=article,
                 ))
             related_topic = None if route_next else best_related(article, "topic")
             if related_topic:
                 cards.append(article_card(
                     "補一篇相關研究", related_topic,
                     "用同公司或同族群的另一篇研究，補上不同環節與待驗證問題。",
+                    source=article,
                 ))
         elif article_type == "formal_note":
             related_topic = best_related(article, "topic")
@@ -3062,12 +3124,14 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 cards.append(article_card(
                     "連到市場題材", related_topic,
                     "把公司本業放進近期題材，並保留題材尚未證實的邊界。",
+                    source=article,
                 ))
             narrative = best_related(article, "narrative", require_stock=True)
             if narrative:
                 cards.append(article_card(
                     "比較正反說法", narrative,
                     "比較看多、看空與失效條件，練習分辨公司事實與研究假說。",
+                    source=article,
                 ))
         elif article_type == "narrative":
             formal = best_related(article, "formal_note", require_stock=True)
@@ -3075,12 +3139,14 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 cards.append(article_card(
                     "回到公司底稿", formal,
                     "先核對公司本業與收入來源，再判斷多空故事是否跨過證據邊界。",
+                    source=article,
                 ))
             related_topic = best_related(article, "topic")
             if related_topic:
                 cards.append(article_card(
                     "補上市場脈絡", related_topic,
                     "用相關市場議題補上產業機制、外部證據與下一個查證節點。",
+                    source=article,
                 ))
 
         graph = matching_graph(article)
@@ -3137,7 +3203,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 8
+    research_library["learningPathVersion"] = 9
     return research_library
 
 
