@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 53)
+        self.assertEqual(library["learningPathVersion"], 56)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2636,6 +2636,193 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(
             "topic-MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER,"
             "客製高頻寬記憶體只改規格或重做底部晶片，為何不能排在一起？",
+            guide,
+        )
+
+    def test_ai_memory_station_three_uses_five_commercialization_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_glass_substrate_commercialization.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 玻璃基板從工廠走到穩定出貨："
+            "樣品、客戶驗證、良率與訂單不能跳級\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave91_commercialization_ladder_and_role_handoffs",
+            "工廠建好、設備就位與樣品完成，只證明已具備開發和試製能力",
+            "商業化還要依序看客戶是否完成可靠度測試",
+            "## 先把玻璃基板商業化拆成五關",
+            "| 本文五關 | 這一關要回答 | 主要接力角色 | 看到這些仍不能直接跳到下一關 |",
+            "| 1. 能力與設備就位 |", "| 2. 交出可測樣品 |",
+            "| 3. 完成客戶驗證 |", "| 4. 穩定製造 |",
+            "| 5. 重複出貨與收入 |",
+            "## 再把四組公開證據放回正確關卡",
+            "| 公開公司或合作 | 本輪可確認 | 放在五關哪裡 | 接下來缺什麼 | 不能外推 |",
+            "| SKC／Absolics |", "| Samsung Electro-Mechanics |",
+            "| Intel／Lens Technology |", "| Corning |",
+            "同一家公司的證據可能同時出現在不同關",
+            "不替公司排快慢",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先把玻璃基板商業化拆成五關", 1
+        )[0]
+        for jargon in (
+            "HVM", "TGV", "reliability", "production", "pilot",
+            "proof sample", "mass-production", "Intel", "Samsung",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 9),
+            ("research_claim", 7), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION,"
+            "玻璃基板已有工廠與樣品，為什麼還不能算穩定量產？",
+            guide,
+        )
+
+    def test_ai_memory_station_four_separates_system_conditions_roles_and_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_hbf_commercialization_ladder.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 新記憶體層不能只靠大容量："
+            "HBF 還要通過讀寫、耐久、系統整合與量產\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave92_hbf_system_conditions_roles_and_six_gate_ladder",
+            "新的記憶體層不能只提供更大容量",
+            "目前只能說兩家公司和開放運算計畫正討論共同規則",
+            "## 先判斷它能不能成為新的記憶體層",
+            "| 本文五項系統條件 | 讀者先問 | 沒通過會怎樣 | 主要接力角色 | 本輪可確認到哪裡 |",
+            "| 1. 容量與資料保留 |", "| 2. 讀取與等待時間 |",
+            "| 3. 寫入、更新與耐久 |", "| 4. 功耗、熱與封裝 |",
+            "| 5. 系統整合與軟體調度 |",
+            "## 再把商用化拆成六關",
+            "| 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |",
+            "| 1. 技術位置與工作負載說清楚 |", "| 2. 共同規則公開 |",
+            "| 3. 交出可測記憶體樣品 |", "| 4. 完成裝置整合 |",
+            "| 5. 通過客戶資格認證 |", "| 6. 穩定量產與形成收入 |",
+            "## 再把五組角色接力放回正確位置",
+            "| 接力角色 | 要交付什麼 | 要和下一角色說清楚 | 本輪證據 | 不能外推 |",
+            "| 快閃記憶體與堆疊 |", "| 底部邏輯晶片與控制器 |",
+            "| 封裝、測試與熱管理 |", "| 裝置、系統與軟體 |",
+            "| 客戶、製造與財務 |",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先判斷它能不能成為新的記憶體層", 1
+        )[0]
+        for jargon in (
+            "HBF", "HBM", "NAND", "KV cache", "OCP", "logic base die",
+            "memory sample", "device sample", "qualification",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 6),
+            ("research_claim", 6), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER,"
+            "新的記憶體層要滿足哪些讀寫與耐久條件，才不只是特殊儲存裝置？",
+            guide,
+        )
+
+    def test_ai_memory_station_five_separates_signal_tradeoffs_roles_and_evidence_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-01_sphbm4_organic_substrate.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 接點變少不等於設計變簡單："
+            "SPHBM4 把難題移到高速傳輸、功耗與系統驗證\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave93_sphbm4_signal_tradeoffs_roles_and_six_gate_ladder",
+            "記憶體可以用很多條較慢的資料線，也可以用較少但更快的資料線",
+            "本輪只能確認標準文件已發布",
+            "## 先看難題從哪裡搬到哪裡",
+            "| 本文五項接力問題 | 原路徑較難的地方 | 新路徑把壓力移到 | 主要接力角色 | 本輪可確認到哪裡 |",
+            "| 1. 接點與扇出 |", "| 2. 每線速度與訊號品質 |",
+            "| 3. 功耗、延遲與熱 |", "| 4. 材料、組裝與良率 |",
+            "| 5. 系統容量與配置 |",
+            "## 再把五組角色接力放回正確位置",
+            "| 接力角色 | 要交付什麼 | 要和下一角色說清楚 | 本輪證據 | 不能外推 |",
+            "| 記憶體裸晶與堆疊 |", "| 底部介面晶片與高速介面 |",
+            "| 有機基板與材料 |", "| 封裝、測試與熱管理 |",
+            "| 運算晶片、系統與客戶 |",
+            "## 最後用六關判斷標準能不能變成收入",
+            "| 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |",
+            "| 1. 共同標準發布 |", "| 2. 底部介面晶片完成 |",
+            "| 3. 記憶體與封裝樣品完成 |", "| 4. 運算晶片與系統整合 |",
+            "| 5. 客戶資格與可靠度通過 |", "| 6. 穩定量產與形成收入 |",
+            "## 把既有產品與新標準分成兩條時鐘",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先看難題從哪裡搬到哪裡", 1
+        )[0]
+        for jargon in (
+            "JEDEC", "JESD330-4", "SPHBM4", "HBM4", "DRAM", "SerDes",
+            "base die", "data signals", "throughput", "Micron", "SK hynix",
+            "CoWoS", "ABF", "BT",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 4),
+            ("research_claim", 4), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE,"
+            "記憶體接點變少，為什麼不代表成本一定下降或產品已經可用？",
             guide,
         )
 
