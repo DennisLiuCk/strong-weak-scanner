@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 19)
+        self.assertEqual(library["learningPathVersion"], 21)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1835,7 +1835,17 @@ class ResearchCenterTest(unittest.TestCase):
             "const startArticle=(graph.articleIds||[])",
             "'data-testid':'graph-primary-article'",
             "先讀主題文章 · ",
+            "function graphArticleOrigin()",
+            "kind:'graph',graphId:state.graphId,graphView:state.graphView",
+            "graphSelection:state.graphSelection?{...state.graphSelection}:null",
+            "graphScrollTop:graphPage?.scrollTop||0",
             "openGraphArticle(startArticle.id)",
+            "selectArticle(articleId,true,graphArticleOrigin())",
+            "if(origin.kind==='graph')",
+            "返回這張知識圖譜",
+            "返回會保留原主題、投影視角與已選關係",
+            "state.graphSelection=origin.graphSelection||null",
+            "graphPage?.scrollTo({top:Math.max(0,origin.graphScrollTop||0)",
             "function renderLearningRouteContext(article)",
             "'aria-label':'學習路線定位'",
             "階段與站次只代表閱讀順序，不是上下游、研究完成度或投資排名",
@@ -1912,11 +1922,12 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, builder)
         self.assertNotIn("查看完整路線", template)
 
-    def test_template_graph_mobile_entry_progressively_discloses_controls(self):
+    def test_template_graph_entry_progressively_discloses_controls(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
             'details class="graph-learning-key" id="graphLearningKey" open',
-            'details class="graph-control-fold" id="graphControlFold" open',
+            'details class="graph-control-fold" id="graphControlFold">',
+            '<span class="graph-control-summary-label">目前這張圖</span>',
             'class="graph-learning-body" aria-labelledby="graphLearningTitle"',
             'class="graph-control-current" id="graphControlCurrent"',
             'class="graph-control-meta" id="graphControlMeta"',
@@ -1931,9 +1942,13 @@ class ResearchCenterTest(unittest.TestCase):
             ".graph-learning-head:focus-visible,.graph-control-summary:focus-visible",
             ".graph-control-summary{min-height:72px",
             ".graph-chip{min-height:44px}.graph-filter{min-height:44px}",
-            ".graph-control-fold[open]>.graph-control-summary{display:none}",
+            ".graph-control-fold[open]>.graph-control-summary{border-bottom:1px solid var(--line2)}",
         ):
             self.assertIn(contract, template)
+        self.assertNotIn(
+            ".graph-control-fold[open]>.graph-control-summary{display:none}",
+            template,
+        )
 
     def test_template_graph_guides_novice_through_existing_edge_fields(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

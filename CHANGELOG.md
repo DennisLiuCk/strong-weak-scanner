@@ -1,5 +1,52 @@
 # Changelog
 
+## 圖譜開文保留學習起點與返回狀態 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、節點、關係、證據層級、篩選結果與財務判定零變動**；本次只補齊圖譜與既有文章之間
+的一次性導覽狀態及返回操作。
+
+- 本輪從「800VDC 功率半導體鏈」公司曝險圖實際進入主題文章後，文章原本只呈現一般閱讀畫面，
+  沒有說明讀者從哪張圖、哪個投影或哪條關係而來；讀完只能自行切換全域分頁，容易中斷
+  「先讀文章、再把內容對回關係線」的學習脈絡。
+- `learningPathVersion` 升為 21。所有 `openGraphArticle()` 入口現在先保存 graph ID、公司曝險／
+  產業依賴視角、已選節點或關係，以及圖譜捲動位置；文章首尾沿用既有「本次學習起點」元件，
+  行動版則沿用黏性返回鍵。返回後重建原圖、恢復選取與捲動位置，並把焦點送回關係詳情或原本的
+  起讀按鈕。直接文章深連結與一般清單仍保持無 origin，不會虛構圖譜來源。
+- 1280×720 實測從 NVIDIA 證實關係開文，首屏新增 79.5px 起點列並仍看得到新手閱讀任務；
+  返回後網址、800VDC 主題、公司曝險視角、NVIDIA 關係與 `graphDetail` 焦點皆恢復。深／淺色
+  `documentElement.scrollWidth` 均等於 1280px，沒有水平溢位；本輪畫面留在
+  `tmp/research-learning-audit-2026-08-10-wave57/`。目前 Browser 的固定 viewport 未涵蓋實機
+  手機重排與螢幕閱讀器，仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 均為
+  `50862ce6…`，`articles` 與 `knowledgeGraph` 逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11
+  預設環境執行 475 tests 全綠；qual notes、leading hypotheses、research radar、method audit、
+  knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次 dashboard build
+  SHA 一致：`index.html` `1e3a48ae…`、`research.html` `9a84f233…`。
+
+## 知識圖譜首屏先看目前關係再展開控制 — 2026-08-10
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章／圖譜映射、
+學習路線、節點、關係、證據層級、篩選狀態與財務判定零變動**；本次只調整知識圖譜完整控制的
+初始開合、摘要層級與可逆操作。
+
+- 本輪新擷取的 1280×720 圖譜首屏顯示，四步讀法後仍同時攤開 4 條路線、9 個目前路線主題、
+  2 個投影與 4 個證據／台股篩選，真正的關係畫布直到 644px 才開始，首屏只剩 76px 可見。
+  這讓產業新手在看到關係前先處理一整面控制，與「最後追產業關係」的入口承諾不一致。
+- `learningPathVersion` 升為 20。完整控制現在於所有寬度預設收進原生 `details`，摘要改為
+  「目前這張圖」，直接同步目前路線、主題、階段、投影視角與已選證據。桌機仍保留四步新手讀法；
+  手機依既有規則再收合讀法。展開完整控制後 summary 不再消失，可再次收合，且切換狀態不會
+  另造或覆寫任何圖譜資料。
+- 同一 1280×720 狀態下，關係畫布起點提前到 556px，首屏可見範圍由 76px 增為 164px；深／淺色
+  均無水平溢位，summary 觸控高度 56px，瀏覽器 console 無錯誤。滑鼠實測可展開 4 條路線與完整
+  控制後再收合；本輪畫面留在 `tmp/research-learning-audit-2026-08-10-wave56/`。目前 Browser 的
+  固定 viewport 未涵蓋實機手機重排與螢幕閱讀器，仍保留為人工裝置／輔具驗收項目。
+- 排除 `learningPathVersion` 後，相對 `HEAD` 的完整 payload canonical SHA 均為
+  `50862ce6…`，`articles` 與 `knowledgeGraph` 逐項相同。`Darwin 25.5.0 arm64`、Python 3.11.11
+  預設環境執行 475 tests 全綠；qual notes、leading hypotheses、research radar、method audit、
+  knowledge graph lint 均通過，research queue 保留 8 個既有時效提醒。連續兩次 dashboard build
+  SHA 一致：`index.html` `1e3a48ae…`、`research.html` `0c6538f6…`。
+
 ## 族群矩陣從白話問題進入精確追問 — 2026-08-10
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、文章與圖譜映射、
