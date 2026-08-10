@@ -23,7 +23,7 @@ topic-MI-2026-08-02-HYBRID-BONDING-READINESS,兩層晶片貼得更密，為什�
 topic-MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER,液冷設備容量比較大，為什麼不代表已量產或有訂單？
 topic-MI-2026-08-02-OPEN-AI-FABRICS,資料要從一顆運算晶片送到另一顆，端點、交換器和軟體要一起通過哪些測試？
 topic-MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS,面板能排進更多封裝，為什麼還要一起看良率、製程速度與報廢成本？
-topic-MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER,小晶片能在一次測試中互通，還要哪些證據才算生態系成熟？
+topic-MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER,把一顆大晶片拆成多顆小晶片後，還要通過哪些關卡，才能讓不同公司的零件一起量產？
 topic-MI-2026-08-03-800VDC-PROTECTION-LAYERS,高壓直流系統為何不能只靠一顆保險絲保護？
 topic-MI-2026-08-03-AI-CAPACITOR-ROLE-MAP,不同位置的電容容量相近，為何仍不能互相取代？
 topic-MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY,電力尖峰與停電持續時間不同時，該由哪種儲能設備處理？

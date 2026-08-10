@@ -406,7 +406,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 65)
+        self.assertEqual(library["learningPathVersion"], 66)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -3612,6 +3612,103 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(concept, concepts)
         self.assertIn("label: PCIe 6 高速連線的測試與部署階梯", graph)
         self.assertEqual(graph.count("<!-- knowledge_edge"), 14)
+
+    def test_compute_connect_station_eight_separates_package_positions_test_dimensions_and_ecosystem_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_ucie_interoperability_ladder.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# UCIe 讓小晶片共用語言，但一次互通不代表生態系成熟："
+            "先分清設計、實體測試與客戶產品\n"
+        ))
+        for contract in (
+            "editorial_plain_language_wave103_ucie_package_positions_test_dimensions_evidence_objects_roles_and_six_gate_ecosystem_ladder",
+            "把一顆大晶片拆成多顆小晶片後，它們仍要在同一封裝裡交換資料、"
+            "時鐘、管理訊息與錯誤狀態",
+            "## 先用五個位置看小晶片如何在同一封裝裡接力",
+            "| 本文五個位置 | 它做什麼 | 代表元件或工作 | 下一個要驗收 | 不能直接推成 |",
+            "| 1. 執行功能的小晶片 |", "| 2. 介面控制與傳輸協定 |",
+            "| 3. 實體傳輸電路與通道 |", "| 4. 接點與封裝內布線 |",
+            "| 5. 封裝整體協調與測試 |",
+            "## 再用五把尺讀懂一次互通展示證明什麼",
+            "| 本文五把尺 | 每筆展示要記錄 | 本輪可看到的例子 | 下一份證據 | 不能直接推成 |",
+            "| 1. 傳輸率 |", "| 2. 實體路徑 |",
+            "| 3. 協定與管理功能 |", "| 4. 廠商獨立性與晶片狀態 |",
+            "| 5. 封裝、時間與故障條件 |",
+            "## 把五種證據物件分開，不讓它們斜著畢業",
+            "| 本文五種證據物件 | 白話意思 | 本輪可確認 | 下一份證據 | 不能借用 |",
+            "| 1. 共同規格 |", "| 2. 介面智財與設計工具 |",
+            "| 3. 送廠設計與回片 |", "| 4. 測試晶片互通展示 |",
+            "| 5. 客戶量產產品 |",
+            "## 把六類角色放回同一個小晶片產品",
+            "| 本文六類角色 | 它交付什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |",
+            "| 1. 規格聯盟與測試規則 |", "| 2. 介面智財與設計工具 |",
+            "| 3. 小晶片設計者 |", "| 4. 晶圓製造 |",
+            "| 5. 封裝、載板與測試服務 |", "| 6. 客戶產品與台灣財務查證 |",
+            "## 最後用六關判斷「能互通」到「生態系成熟」",
+            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 共同規格與測試合約可查 |", "| 2. 介面實作完成並送廠 |",
+            "| 3. 實體晶片在目標速度運作 |", "| 4. 跨廠互通與正式測試對齊 |",
+            "| 5. 客戶產品通過資格並量產 |",
+            "| 6. 台灣公司財務足跡可雙向核對 |",
+            "## 這篇對公司判斷的用處與界線",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+        lead = topic.split("### 三句話抓重點", 1)[1].split(
+            "### 為什麼重要", 1
+        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split(
+            "## 先用五個位置看", 1
+        )[0]
+        for jargon in (
+            "UCIe", "GT/s", "chiplet", "die-to-die", "controller",
+            "PHY", "lane", "sideband", "manageability", "protocol",
+            "tape-out", "silicon", "test chip", "simulation", "loopback",
+            "interoperability", "compliance", "qualification", "OSAT",
+            "substrate", "Intel", "Cadence", "Synopsys", "Consortium",
+        ):
+            self.assertNotIn(jargon, lead)
+            self.assertNotIn(jargon, reflection)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 6),
+            ("research_claim", 5), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER,"
+            "把一顆大晶片拆成多顆小晶片後，還要通過哪些關卡，"
+            "才能讓不同公司的零件一起量產？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ucie_interoperability.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "concept:ucie-interoperability,concept,UCIe 小晶片互通與量產階梯",
+            "standard:ucie3,standard,第三代通用小晶片互連（UCIe 3.0）",
+            "stage:specification,stage,共同規格發布",
+            "stage:ip-tapeout,stage,介面設計送廠（IP tape-out）",
+            "stage:cross-vendor-demo,stage,跨廠測試晶片互通",
+            "stage:compliance,stage,正式符合規格測試",
+            "stage:customer-qualification,stage,客戶產品資格驗證",
+        ):
+            self.assertIn(concept, concepts)
+        self.assertIn("label: UCIe 小晶片互通與量產階梯", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 13)
 
 
 if __name__ == "__main__":

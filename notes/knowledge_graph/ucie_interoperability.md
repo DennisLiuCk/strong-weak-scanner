@@ -1,14 +1,14 @@
-# UCIe 互通成熟度知識圖譜
+# UCIe 小晶片互通與量產階梯知識圖譜
 
-本圖把規格速度、IP tape-out、實體跨廠 demo、compliance 與客戶產品分開。16G demo 是重要
-進展，但不能替尚未公開的 64G multi-vendor product 提前畢業。
+本圖把共同規格、介面設計送廠、實體跨廠測試、符合規格測試與客戶量產分開。較低速度的
+跨廠展示是重要進展，但不能替尚未公開的最高速度多廠客戶產品提前畢業。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ucie-interoperability
 root_node_id: concept:ucie-interoperability
-label: UCIe 互通成熟度
-summary: 從 64G 規格、IP tape-out、16G 跨廠 demo 追到 compliance 與客戶量產，避免速度與成熟度錯配。
+label: UCIe 小晶片互通與量產階梯
+summary: 從最高速度規格、介面設計送廠、較低速度跨廠測試追到符合規格測試與客戶量產，避免把不同產品的速度與成熟度拼在一起。
 article_ids: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER
 status: active
 -->

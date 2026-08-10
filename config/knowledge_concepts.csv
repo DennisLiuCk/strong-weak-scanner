@@ -50,7 +50,7 @@ standard:uec,standard,超乙太網路（UEC）,Ultra Ethernet,concept:open-ai-fa
 concept:scale-up,concept,機架內擴充（scale-up）,Accelerator scale-up,concept:open-ai-fabrics,在運算群組或機架內以低延遲和記憶體使用方式連接多顆加速器
 concept:scale-out,concept,跨機架擴充（scale-out）,Ethernet scale-out,concept:open-ai-fabrics,把多個機架或節點連成更大叢集的網路層
 standard:ualoe,standard,以乙太網路承載 UALink（UALoE）,UALink over Ethernet,concept:open-ai-fabrics,以乙太網路傳輸路徑承載 UALink 協定的互連方式
-standard:ucie3,standard,UCIe 3.0,Universal Chiplet Interconnect Express 3.0,process:advanced-packaging,封裝內 die-to-die 的開放 chiplet 互連規格
+standard:ucie3,standard,第三代通用小晶片互連（UCIe 3.0）,Universal Chiplet Interconnect Express 3.0,process:advanced-packaging,為封裝內小晶片定義電氣 協定 管理與測試規則的第三代開放介面
 stage:interoperability,stage,跨廠互通,Multi-vendor interoperability|互通測試|Plugfest,concept:open-ai-fabrics,不同廠商端點 交換器與軟體完成指定版本 錯誤情境與工作負載測試的成熟度節點
 concept:cpo-networking,concept,共同封裝光學網路（CPO）,Co-packaged optics networking,,把光引擎靠近交換晶片以縮短高速電訊號路徑的網路架構
 product:spectrum-x-ethernet-photonics,product,Spectrum-X 共同封裝光學交換器,Spectrum-X Ethernet Photonics|Spectrum-6 SPX,concept:cpo-networking,NVIDIA 以共同封裝光學實作的 Spectrum-X Ethernet 交換器產品
@@ -73,12 +73,12 @@ capability:yield-management,capability,良率管理,Yield management,concept:pan
 metric:panel-throughput,metric,面板單位時間產出（Throughput）,Panel throughput|面板節拍|Cycle time,concept:panel-level-packaging,單位時間可完成的面板數與製造週期
 standard:panel-size,standard,面板尺寸標準,Panel form factor standard|Panel 尺寸標準,concept:panel-level-packaging,設備 材料與自動化共同採用的面板長寬與厚度規格
 process:panel-ecd,process,面板電鍍沉積（ECD）,Panel-level ECD|面板電化學沉積|Electrochemical deposition,concept:panel-level-packaging,在大面積面板上形成金屬互連的電化學沉積製程
-concept:ucie-interoperability,concept,UCIe 互通成熟度,UCIe interoperability ladder|開放 chiplet 互通,,把規格 IP tape-out 實體跨廠測試與客戶量產分開追蹤的 UCIe 成熟度框架
-stage:specification,stage,規格發布,Specification release,concept:ucie-interoperability,介面功能與測試要求已由標準組織發布但尚不代表實體產品
-stage:ip-tapeout,stage,IP Tape-out,Silicon IP tapeout,concept:ucie-interoperability,介面 IP 已完成設計並送交製造但尚待回片與實測
-stage:cross-vendor-demo,stage,跨廠實體展示,Cross-vendor silicon demo,concept:ucie-interoperability,兩家以上獨立設計的實體晶粒在指定條件完成互通展示
-stage:compliance,stage,合規測試,Compliance testing,concept:ucie-interoperability,依標準測試計畫驗證產品符合指定介面要求
-stage:customer-qualification,stage,客戶產品認證,Customer product qualification,concept:ucie-interoperability,具名客戶把介面與封裝導入產品並完成驗證
+concept:ucie-interoperability,concept,UCIe 小晶片互通與量產階梯,UCIe interoperability ladder|開放 chiplet 互通,,把共同規格 介面送廠 實體跨廠測試 客戶驗證與量產分開追蹤的成熟度框架
+stage:specification,stage,共同規格發布,Specification release,concept:ucie-interoperability,介面功能與測試要求已由標準組織發布但尚不代表實體產品
+stage:ip-tapeout,stage,介面設計送廠（IP tape-out）,Silicon IP tapeout,concept:ucie-interoperability,介面智財已完成設計並送交製造但尚待回片與實測
+stage:cross-vendor-demo,stage,跨廠測試晶片互通,Cross-vendor silicon demo,concept:ucie-interoperability,兩家以上獨立設計的實體測試晶片在指定條件完成互通展示
+stage:compliance,stage,正式符合規格測試,Compliance testing,concept:ucie-interoperability,依共同測試計畫驗證產品符合指定版本 速度與功能要求
+stage:customer-qualification,stage,客戶產品資格驗證,Customer product qualification,concept:ucie-interoperability,具名客戶把介面與封裝導入產品並完成可靠度 良率與實際工作驗證
 concept:800v-power-tree,concept,800VDC 功率半導體鏈,800V power tree|800V HVDC power chain,,從電網到處理器分解 SST PSU BBU 保護 IBC 與末端轉換的功率架構
 component:sic-power,component,SiC 功率元件,Silicon carbide power device,concept:800v-power-tree,適合高壓高功率與高可靠度轉換及保護的寬能隙功率元件
 component:gan-power,component,GaN 功率元件,Gallium nitride power device,concept:800v-power-tree,適合高頻高密度電力轉換的寬能隙功率元件
