@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 94)
+        self.assertEqual(library["learningPathVersion"], 95)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2796,6 +2796,7 @@ class ResearchCenterTest(unittest.TestCase):
             "看這站證據關係 · ",
             "function learningRouteById(routeId)",
             "function learningRoutePhaseGroups(stations)",
+            "purpose=String(station.phasePurpose||'').trim()",
             "function learningRouteStationReaderQuestion(station)",
             "function learningRouteStation(route,station,total,currentArticleId,mode)",
             "function learningRouteMap(route,currentArticleId='',mode='article')",
@@ -2816,11 +2817,15 @@ class ResearchCenterTest(unittest.TestCase):
             "h('p',{text:sourceQuestion})",
             "白話問題與精確追問都沿用同篇既有內容",
             "'aria-label':route.label+' 學習階段與站點'",
-            "'data-phase-id':phase.id,'data-current':isCurrent?'true':'false'",
-            "shouldOpen=isCurrent||(!currentArticleId&&index===0)",
+            "'data-phase-id':phase.id,'data-phase-purpose':phase.purpose||null,"
+            "'data-current':isCurrent?'true':'false'",
+            "summaryHint=current?'目前第 '+current.step+' 站'+phaseHint+'；可直接跳到任一站':'先比較每個階段任務，再決定從哪裡開始'",
+            "shouldOpen=isCurrent",
             "class:'learning-route-phase-fold',open:shouldOpen",
             "'data-testid':'learning-route-phase-'+route.id+'-'+phase.step",
             "class:'learning-route-phase-summary'",
+            "class:'learning-route-phase-purpose',text:phase.purpose",
+            "class:'learning-route-phase-meta '+(isCurrent?'learning-route-phase-current':'')",
             "text:(isCurrent?'目前階段 · ':phase.stations.length+' 站 · ')+range",
             "summary.addEventListener('keydown',event=>{if(event.key!=='Enter'&&event.key!==' ')",
             "event.preventDefault();phaseFold.open=!phaseFold.open",
@@ -2828,12 +2833,15 @@ class ResearchCenterTest(unittest.TestCase):
             "learningRouteMap(learningRouteById(route.id),article.id,'article')",
             "learningRouteMap(learningRouteById(route.id)||route,'','matrix')",
             "每站先沿用同篇既有讀者問句",
+            "階段任務逐字沿用正式閱讀課綱",
             "「這站會用到」只列同篇正式研究範圍",
             "精確追問仍逐字保留在可展開內容與文章「想一想」",
             ".learning-route-map>summary:focus-visible",
             ".learning-route-phases{display:grid;gap:7px",
             ".learning-route-phase[data-current=\"true\"]",
             ".learning-route-phase-summary{min-height:44px",
+            ".learning-route-phase-summary{min-height:66px",
+            ".learning-route-phase-purpose{display:block",
             ".learning-route-phase-summary:focus-visible",
             ".learning-route-phase-fold[open] .learning-route-phase-state::before{content:'收合'}",
             ".learning-route-phase:has(>.learning-route-phase-fold[open]){grid-column:1/-1}",
@@ -2849,6 +2857,7 @@ class ResearchCenterTest(unittest.TestCase):
             "selectSurface('graph',true);resetGraphSurfaceScroll()",
             "if(card.kind==='route')return'回到學習路線'",
             ".graph-intro-action{width:100%;min-height:44px}",
+            "phaseCue=phasePurpose?' 本階段任務：'+phasePurpose:''",
         ):
             self.assertIn(contract, template)
         self.assertNotIn(

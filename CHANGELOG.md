@@ -1,5 +1,40 @@
 # Changelog
 
+## 選站前先看懂三個階段各要學什麼 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、
+group／route／graph 關係、active radar／selection log、公司證據與投資判斷零變動**；本次只把
+正式 phase 已有的白話 purpose 提前放進文章定位與 route map，並調整尚未進站時的預覽展開狀態；
+同步研究維護契約、方法清單、README、payload 版本、發布頁與測試。
+
+- 以同一個 1280×720 Browser viewport 展開「供電與散熱」文章 route map。修改前，三個 phase
+  summary 各約 44px 高，只能讀到 phase label、站數與站次；看不到「供電、保護與元件」要新增
+  什麼判斷能力。修改後，每個 summary 逐字加入同一正式 `phasePurpose`，目前文章的定位說明也
+  先顯示「本階段任務」。這是同一畫面與完整 DOM 的資訊架構觀察，不是理解率、完成率或學習
+  成效統計。
+- 沒有目前 article 的族群矩陣 route preview 現在預設收合全部 phase，先讓讀者比較三段任務，
+  再自行展開要看的站點；文章內仍只預設展開目前 phase。320×844 的「供電與散熱」預覽可在同一
+  viewport 看完 3/3 張 phase summary，三張皆為收合、各約 230×98px；展開第二 phase 後可見
+  4 個正式站點。這只調整 progressive disclosure，不改站次、第一站或文章入口。
+- 390×844 文章 map 的 phase summary 約 308×84–85px，320×844 約 238×100–101px；兩者皆
+  `innerWidth = document.scrollWidth`，沒有水平溢位。1440×900 矩陣預覽為三欄，每欄約 407px
+  寬、66–82px 高，route map 約 1262×179px，也沒有水平溢位。purpose、站數與收合狀態都在
+  可聚焦 summary 的 DOM 閱讀順序裡。
+- `learningPathVersion: 94 → 95`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章、4 條正式
+  route、10 個 phase、10/10 個非空 purpose 與 25 站；排除 reader-only 版本後，current 與 HEAD
+  payload 完全相同，兩邊 canonical SHA-256 都是
+  `af97e43694a980da1d0cec9b4e77c838784abda7beabe6818f38dbf9f11aa205`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 預設環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `977a81743b332766540759a87606a0efba43d0833466be3e45bf0db8f40f7a9f`。
+- 修改前、文章定位、320／390px 與桌機矩陣預覽畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave142-phase-overview/`。明確 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
 ## 跨階段換站先收好上一段，再說清楚下一段要新增什麼 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、

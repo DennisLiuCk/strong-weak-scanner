@@ -910,6 +910,15 @@ reader 捲動位置保留成單次 reader-only `station-transition`。下一篇�
 只代表課綱已走過，不代表讀者已掌握；同 phase 換站仍沿用前一篇重點／下一篇問題，不得重複堆疊
 階段卡。直接 deep link、route map 跳站、非相鄰換篇與其他 origin 都不得虛構 phase transition。
 
+文章「學習路線定位」與族群矩陣的 route map 也必須把同一個 `phasePurpose` 提前帶到選站之前：
+目前文章的定位說明須逐字顯示本 phase 任務；多 phase 路線展開後，每個 phase 的可聚焦 summary
+須在站數／站次之前顯示自己的非空 purpose，收合的 phase 也不能藏掉這句課綱。前端只可依正式
+station 投影分組，不得由 phase label、graph label、文章題名、正文、相似度或模型另寫摘要；畫面
+邊界須明示這是正式閱讀課綱，不是上下游、重要性、研究完成度或投資排序。單 phase 的 legacy
+fixture 可維持原站點清單，但所有發布中的顯式 `phases[]` 仍由 build 契約要求非空 purpose。
+沒有目前 article 的矩陣 route preview 必須先讓所有 phase 維持收合，讓讀者比較完目的再選擇
+展開；文章內 route map 則只預設展開目前 phase，不得把讀者正在閱讀的站藏起來。
+
 文章內換篇時，`ensureSelected()` 必須優先保留仍開啟且存在於 `byId` 的文章，即使它不符合左側
 目前搜尋、類型或族群條件；不得再由 `filteredArticles()` 的第一篇覆寫下一站。清單須保留原條件
 並顯示「目前閱讀不在左側結果」，讓讀者知道差異來自延伸導覽。首次由清單開文時另保存原 article
