@@ -1,5 +1,34 @@
 # Changelog
 
+## 未編固定路線的市場議題也先交代文章位置 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷零變動**；本次只調整
+研究中心未編固定路線之市場議題的 reader-only 文章位置提示，並同步研究維護契約、方法清單及
+測試。方法 registry fingerprint 仍為
+`322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，與既有基線完全相同，
+因此不建立內容相同的新方法快照。
+
+- 完整解析建置後 35 篇市場議題：25 篇已有固定路線、10 篇未編路線；後者有 8 篇可回查既有
+  圖譜，另外 2 篇只有既有文章或資料庫入口。修改前 10／10 篇都不會在文章前段說明為何沒有
+  站次或讀完可接去哪裡。這是完整發布母體的決定性列舉，不是抽樣統計，SE／t／有效獨立觀測
+  不適用。
+- 未編路線文章現在於查核狀態後顯示「文章位置 · 目前沒有固定站次」，逐張重用同篇既有
+  `learningPath.cards` 的 graph、article、collection 入口及原題名；只有資料庫入口時明示尚無
+  可回查圖譜。不得用題名、正文、族群、相似度或模型補 route、graph、上下游、受惠或投資關係。
+- 「看這篇怎麼接下去」會把焦點送到同篇既有「從這篇接著學」；實際瀏覽器驗證焦點落在
+  `learningPathTitle`、閱讀欄正確捲動。已有正式 route 的文章不會疊加未編路線提示；圖譜、
+  只有資料庫與正式路線三種分支皆符合契約，console 無錯誤。
+- 1280 × 720 的前後畫面與互動稽核存於
+  `tmp/research-learning-audit-2026-08-11-wave117-article-orientation/`。固定 viewport 不是實機，
+  本輪未做 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化 WCAG 對比或
+  真實新手理解測試，因此不宣稱實際理解率已提升或完整無障礙合規。
+- Darwin arm64、Python 3.11.11、UTF-8 執行 516 tests 全綠；qual notes、leading hypotheses、
+  research queue、knowledge graph、research radar 與 method audit 六項 lint 均為 exit 0；研究
+  queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `d38f7e19557590a0a8a1b681d1c2ed8a061b3efaca7c76f8afdb6cfbc06b068d`。
+
 ## 研究中心首訪直接從四條問題路線開始 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、

@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 69)
+        self.assertEqual(library["learningPathVersion"], 70)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1581,13 +1581,11 @@ class ResearchCenterTest(unittest.TestCase):
             template,
         )
         self.assertIn(
-            "body.appendChild(verification);const readingMission=renderReadingMission(article,glossaryTerms);"
-            "if(readingMission)body.appendChild(readingMission);",
-            template,
-        )
-        self.assertIn(
-            "if(readingMission)body.appendChild(readingMission);const boundaryBrief="
-            "renderReaderBoundaryBrief(article,glossaryTerms);if(boundaryBrief)body.appendChild(boundaryBrief);"
+            "body.appendChild(verification);const topicPosition=renderTopicLearningPosition(article);"
+            "if(topicPosition)body.appendChild(topicPosition);const readingMission="
+            "renderReadingMission(article,glossaryTerms);if(readingMission)body.appendChild(readingMission);"
+            "const boundaryBrief=renderReaderBoundaryBrief(article,glossaryTerms);"
+            "if(boundaryBrief)body.appendChild(boundaryBrief);"
             "const roleContext=renderArticleRoleContext(article);",
             template,
         )
@@ -1595,7 +1593,7 @@ class ResearchCenterTest(unittest.TestCase):
             template.index("const readingMission=renderReadingMission(article,glossaryTerms)"),
             template.index("const meta=h('div',{class:'article-meta'}"),
         )
-        # 三句重點後立刻建立族群角色與路線位置，再補 metadata 與其餘新手內容。
+        # 未編固定路線的位置提示先接在查核狀態後；三句重點後再建立族群角色與正式路線位置。
         self.assertIn(
             "const routeContext=renderLearningRouteContext(article),mobileProgress="
             "renderMobileReadingProgress(article);body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms));"
@@ -2449,6 +2447,34 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, builder)
         self.assertNotIn("查看完整路線", template)
+
+    def test_unrouted_market_topic_exposes_registered_learning_position(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function renderTopicLearningPosition(article)",
+            "article?.type!=='topic'||article.learningRoute",
+            "const cards=article.learningPath?.cards||[]",
+            "graphCards=cards.filter(card=>card.kind==='graph')",
+            "articleCards=cards.filter(card=>card.kind==='article')",
+            "collectionCards=cards.filter(card=>card.kind==='collection')",
+            "文章位置 · 目前沒有固定站次",
+            "讀完可從「'+graph.title+'」查看既有關係",
+            "讀完可接著比較「'+nextArticle.title+'」",
+            "研究中心尚未建立可回查圖譜或固定站次",
+            "這是明示缺口，不會用相似題材補關係",
+            "'data-testid':'topic-learning-position'",
+            "'data-learning-position':'unrouted-topic'",
+            "'data-graph-card-count':graphCards.length",
+            "'data-article-card-count':articleCards.length",
+            "'data-collection-card-count':collectionCards.length",
+            "'data-testid':'topic-learning-position-jump'",
+            "focusReadingTarget(document.getElementById('learningPathTitle'))",
+            "const topicPosition=renderTopicLearningPosition(article)",
+            "if(topicPosition)body.appendChild(topicPosition)",
+            ".learning-position-context{",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("renderTopicLearningPosition(article.readerTitle", template)
 
     def test_template_graph_entry_progressively_discloses_controls(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
