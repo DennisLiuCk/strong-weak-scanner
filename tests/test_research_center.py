@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 107)
+        self.assertEqual(library["learningPathVersion"], 108)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -3206,6 +3206,7 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-radar-reader-article':hasArticle?'true':'false'",
             "'data-radar-reader-graph':hasGraph?'true':'false'",
             "已有文章可讀：先讀文章建立共同語言",
+            "再展開下方 '+groupCount+' 個族群問句分清責任",
             "目前沒有文章可讀：先把它當成待驗證問題",
             "目前不投入完整研究：先保留問題",
             ".radar-reader-status{", ".radar-reader-status .radar-actions{margin:0}",
@@ -3219,6 +3220,16 @@ class ResearchCenterTest(unittest.TestCase):
             "在這題要回答", "不代表上下游順序",
             ".radar-group-copy", ".maturity-origin-question",
             "'data-radar-group-id':group.id", "state.maturityOrigin",
+            "radarContextStates:new Map()", "function renderRadarContext(",
+            "'data-radar-reader-context':candidate.id",
+            "open:state.radarContextStates.get(candidate.id)===true",
+            "看目前線索與產業角色", "termCount+' 個名詞'",
+            "groupCount+' 個族群問句'",
+            "context.addEventListener('toggle'",
+            ".radar-reader-context>summary{min-height:50px",
+            ".radar-reader-context-state::before{content:'展開'}",
+            ".radar-reader-context[open] .radar-reader-context-state::before{content:'收合'}",
+            ".radar-reader-status .radar-actions{width:100%;display:grid",
             "查看研究判定、原始文字與來源",
             "selectionLabel?radarBadge(selectionLabel,'selection'):null",
             "radarBadge(candidate.priorityLabel,candidate.priority)",
@@ -3274,8 +3285,10 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("candidate.priorityLabel", radar_first_layer)
         self.assertNotIn("selectionLabel?radarBadge", radar_first_layer)
         self.assertEqual(radar_card.count("radarReaderActions(candidate)"), 1)
-        self.assertIn("body.append(head,readerStatus,reader)", radar_card)
+        self.assertIn("body.append(head,readerStatus,context)", radar_card)
+        self.assertIn("renderRadarContext(candidate,reader,groupRoute,groupCount)", radar_card)
         self.assertIn("body.append(audit,mapReturn)", radar_card)
+        self.assertNotIn("body.append(head,readerStatus,reader)", radar_card)
         self.assertNotIn("body.append(head,reader,groups,actions,audit", radar_card)
 
     def test_radar_group_matrix_keeps_promoted_question_article_and_return_path(self):

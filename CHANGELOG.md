@@ -1,5 +1,36 @@
 # Changelog
 
+## 雷達先比較問題，線索與產業角色需要時再展開 — 2026-08-12
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
+文章文字與順序、正式 route／phase／station／graph／edge、族群映射、雷達候選與投資判斷零變動**；
+本次只把研究雷達候選卡原本整段攤開的讀者線索、下一步、名詞與族群問句收成可展開脈絡，並同步
+研究維護契約、方法清單、README、payload 版本、發布頁與測試。
+
+- 固定走讀「研究雷達 → 第 1 題 → 升格文章 → 三句重點 → 返回原候選」。修改前，390×844 的
+  第一張候選卡高約 1,175.7px，第二題頂端在 1,594.7px；文章主行動雖在首屏，但其後完整攤開的
+  線索、三個名詞與三個族群問句，使下一題還要再捲近一個 viewport。修改後，第一張卡預設收成
+  約 538.9px，第二題頂端提前到 957.9px；「看目前線索與產業角色」58px 摘要仍在同一首屏可見。
+  這是固定候選與 viewport 的單次 DOM／畫面量測，不是點擊率、理解率或學習成效統計。
+- 收合採原生 `details`／`summary`；摘要只列「接著查什麼」、同卡三個名詞與三個正式族群問句。
+  展開後完整保留 `reader_starting_point`、`reader_next_step`、名詞解釋、族群問句、族群定位行動
+  與原邊界；研究判定／來源仍在另一個獨立查核區。從展開狀態開文再返回，已實際確認同卡重新
+  聚焦、原捲動位置與展開狀態都保留。
+- 320×844 會把文章與圖譜行動改成兩列，各 44px，中文不再留下單一「鐘」字換行；390×844
+  保持同列並讓文章行動取得剩餘寬度。884×900 的第一張卡由約 644.8px 降為 403.2px；1280×900
+  修改後約 397.6px。320／390 明暗模式、884 與 1280px 均無水平溢位。
+- `learningPathVersion: 107 → 108`。獨立 Python 與 Node JSON 路徑各自核對修改前後 274 篇文章：
+  排除 reader-only 版本後完整 payload 相等；以遞迴 key 排序、UTF-8 compact JSON 重算，兩條
+  路徑的前後 SHA-256 均為 `008f70ffed96a2b0ad271e4b6127aa2f90843453fa27daf48aa8b6a44751fcfd`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 環境執行 531 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build 的
+  `research.html` SHA-256 一致：`83c520d5e54123122e49bd7441fcfe8aef0d5d60f798677c67b1270a663c408a`。
+- 修改前、收合後、展開後、開文與返回、320／390px 明暗模式、884 與 1280px 畫面存於
+  `tmp/research-learning-audit-2026-08-12-wave155-radar-article-bridge/`。本輪未做真實新手理解測試、
+  長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱學習
+  成效已提升或完整無障礙合規。
+
 ## 最後一站先看整條問題，再直接選下一條路線 — 2026-08-12
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、

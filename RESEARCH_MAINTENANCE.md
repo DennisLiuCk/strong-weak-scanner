@@ -130,6 +130,15 @@ status、rank 與 audit payload 均須保留。已升格文章行動用「閱讀
 `deferred` 必須明說目前不投入完整研究。既有主要行動前移後不得在卡尾重複；這個 reader-only
 導讀不得改 rank、status、selection log、證據姿態、文章／圖譜映射或 audit payload。
 
+「這題現在怎麼讀」與 article／graph 主要行動之後，`reader_starting_point`、`reader_next_step`、
+`reader_terms` 與 `reader_group_questions` 必須完整放進同一個原生
+`.radar-reader-context`。摘要固定使用「看目前線索與產業角色」，並明列「接著查什麼」、原名詞數與
+正式族群問句數；首次載入在所有寬度預設收合，讀者展開或收合後，本工作階段的重繪與開文返回須
+保留同一候選的狀態。完整內容的文字、順序、族群定位行動與邊界不得縮寫或刪除；研究查核仍是
+另一個獨立 `details`。這個收合只改讀者層，不得寫回 radar、article、graph、selection log 或
+任何研究 payload。341–780px 的文章／圖譜行動可同列，但文章行動要取得剩餘寬度；340px 以下
+改成兩列，兩個行動都至少 44px，不能為了同列把中文拆成難讀的孤字。
+
 已升格候選從雷達卡直接開文時，顯示層必須建立一次性 `radar` article origin，只保存正式
 `candidateId`、雷達捲動位置與 window 位置。文章桌機頁首、行動版返回鈕與
 「從這篇接著學」末端都要顯示雷達第 N 題與同一 `reader_question`，並明示 N 只是研究資源
