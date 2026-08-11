@@ -1,5 +1,65 @@
 # Changelog
 
+## 主正文入口重新顯示首屏問題 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷零變動**；本次只調整
+一般市場議題從長導讀進入主正文時的 reader-only 問題定位，並同步研究維護契約、方法清單及
+測試。方法 registry fingerprint 仍為
+`322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，與既有基線完全相同，
+因此不建立內容相同的新方法快照。
+
+- 完整實際渲染 35 篇市場議題：30 篇一般市場議題有主正文與既有 `readerQuestion`，首屏 H1
+  到第一個主正文 H2 的畫面距離全部至少 4,546px，中位 5,371px、最高 5,780px；修改前 30／30
+  篇都沒有在主正文入口重現全文問題。另有 4 篇沒有主正文；台積電事件錨點的 H1 到第一節只有
+  754px 且使用不同事件結構，刻意不插入。這是完整發布母體的決定性列舉，不是抽樣統計，
+  SE／t／有效獨立觀測不適用。
+- `readerMainQuestionAnchor()` 現在只在一般市場議題第一個主正文 H2 前顯示一次「進入主正文 ·
+  回到這篇要回答的問題」，逐字重用同篇既有 `catalogReaderQuestion(article)`。卡片明示只作閱讀
+  定位、不改寫正文、研究結論或證據；不讀 blocks、題名、族群、graph 或 route 另寫問題。
+- 實際瀏覽器逐篇驗證 35／35 篇：30／30 個符合條件的主正文各有且只有一張卡，問題逐字等於
+  首屏 H1，section 標記逐字等於第一個主正文 H2，卡片為該 section 第一個 child、原 H2 緊接
+  其後；4 篇無主正文與事件錨點皆為 0 張，0 個契約錯誤。上一輪 90 張相鄰章節接力仍全部存在。
+  前後畫面與完整 census 存於
+  `tmp/research-learning-audit-2026-08-11-wave120-section-purpose/`。
+- 固定 1280 × 720 viewport 不是實機；本輪未做 VoiceOver／TalkBack、200%／400% zoom、完整
+  實體鍵盤巡覽、儀器化 WCAG 對比或真實新手理解測試，因此不宣稱實際理解率已提升或完整
+  無障礙合規。
+- Darwin arm64、Python 3.11.11、預設 UTF-8 環境執行 519 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：
+  `index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `4799569e8e5e060fccab6572802b0f41303dd384ba9265c1c60fb8af38ea887c`。
+
+## 市場議題長文加入相鄰章節接力 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷零變動**；本次只調整
+市場議題主正文的 reader-only 章節交接，並同步研究維護契約、方法清單及測試。方法 registry
+fingerprint 仍為 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，
+與既有基線完全相同，因此不建立內容相同的新方法快照。
+
+- 完整解析建置後 35 篇市場議題的 121 個主閱讀章節：28 篇至少有兩節、共有 90 個相鄰交接；
+  另外 7 篇只有 0～1 節，不需要交接。修改前 90／90 個位置都只能靠右側本頁大綱找回上一節，
+  正文進入下一節時沒有就地脈絡。這是完整發布母體的決定性列舉，不是抽樣統計，SE／t／有效
+  獨立觀測不適用。
+- 第二節起現在於原 H2 前顯示「章節接力 · 第 x／n 節」，只逐字重用上一節作者標題，再要求讀者
+  接著看下方原標題。卡片明示本文先後不代表上下游、因果、成熟度或投資排序；第一節、單節文章、
+  新手導讀、研究摘要及非事件文章的查核附錄都不顯示，也不讀 blocks、題名、族群、graph 或 route
+  生成摘要。
+- 實際瀏覽器逐篇開啟 35／35 篇市場議題，90／90 張接力卡的 previous／current heading 都與
+  相鄰原 H2 完全一致，站次連續、總節數一致、第一節沒有卡，0 個契約錯誤。代表記憶體文章第二節
+  會直接看見上一節「先按資料的急迫程度分四層」，再進入「四層互補，不是誰取代誰」。前後畫面與
+  完整 census 存於 `tmp/research-learning-audit-2026-08-11-wave119-section-handoffs/`。
+- 固定 1280 × 720 viewport 不是實機；本輪未做 VoiceOver／TalkBack、200%／400% zoom、完整
+  實體鍵盤巡覽、儀器化 WCAG 對比或真實新手理解測試，因此不宣稱實際理解率已提升或完整
+  無障礙合規。
+- Darwin arm64、Python 3.11.11、預設 UTF-8 環境執行 518 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：
+  `index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `6d2ef5a9d12edea0c4da17f3529a7fc28d0251ae3427a789b5436bf5444650e7`。
+
 ## 高密度本節名詞改為按需展開 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、

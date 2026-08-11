@@ -308,6 +308,22 @@ list runs。新手段落已有完整字典、研究摘要已有白話卡、研�
 可由鍵盤操作的原生 `details`，並明示順序不代表重要性；展開後仍須保留全部命中詞、完整詞名、
 同一 dialog 與原始定義，不得因漸進揭露刪詞、重新排序或另寫解釋。8 個以下維持全部直接顯示。
 
+市場議題主正文的章節交接由 `topicReaderSectionItems()` 先依原始 `article.sections` 順序排除
+「新手先讀：這篇在講什麼」、三種 analyst heading 與非事件文章的查核附錄；
+`readerSectionHandoff()` 只在所得清單的第二節起，於原 H2 前顯示「章節接力」、目前站次與
+上一節逐字 heading。第一節、單節文章、正式筆記與多空小作文不得顯示。卡片不得讀 blocks、
+題名、族群、graph 或 route 推寫摘要，也不得把相鄰章節解讀成上下游、因果、成熟度或投資排序；
+原 heading、blocks、順序與研究 payload 必須完全不變。每篇有 `n` 個主正文節時，接力卡必須
+恰為 `max(0, n-1)` 張，且每張的 previous／current heading 都須與相鄰原 H2 完全相同。
+
+第一個主正文節另由 `readerMainQuestionAnchor()` 逐字讀取既有 `catalogReaderQuestion(article)`；
+只有 `type=topic`、非 `eventKind`、確實有主正文且目前 section 是
+`topicReaderSectionItems(article)` 第一項時，才可在原 H2 前顯示一次「回到這篇要回答的問題」。
+其 `data-main-question-text` 必須逐字等於首屏 H1／文章清單「讀完能回答」，
+`data-main-question-section` 必須逐字等於所在第一個主正文 H2。事件錨點、沒有主正文、第二節以後、
+正式筆記、多空小作文及非 reader mode 都不得顯示。不得讀取 blocks、題名、族群、graph 或 route
+另寫問題；卡片只作閱讀定位，不改寫正文、研究結論、證據或查核狀態。
+
 市場議題主正文若一節從第一個 block 起連續出現至少三個 paragraph，且每段第一個非空 run 都有
 作者明寫的 bold，`readerSectionMapItems()` 才可逐 run 建立「本節先看」。遇到非 paragraph 或
 第一個非空 run 不是 bold 就立即停止，累積少於三項時回傳空清單；不得跳過中間 block 拼湊、讀取

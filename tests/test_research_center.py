@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 71)
+        self.assertEqual(library["learningPathVersion"], 73)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1743,6 +1743,59 @@ class ResearchCenterTest(unittest.TestCase):
             template.index("if(guide)sectionEl.appendChild(guide)", reader_render),
         )
         self.assertNotIn("section.readerSectionMap", template)
+
+    def test_topic_reader_handoff_reuses_only_adjacent_authored_headings(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function topicReaderSectionItems(article)",
+            "section.h!=='新手先讀：這篇在講什麼'",
+            "!ANALYST_HEADINGS.has(section.h)",
+            "!isArticleAuditSection(article,section)",
+            "function readerSectionHandoff(article,index)",
+            "position=items.findIndex(item=>item.index===index)",
+            "if(position<=0)return null",
+            "'data-reader-section-handoff':current.h||''",
+            "'data-reader-section-position':position+1",
+            "'data-reader-section-total':total",
+            "'data-reader-previous-heading':previous.h||''",
+            "'data-reader-current-heading':current.h||''",
+            "章節接力 · 第 '+(position+1)+'/'+total+' 節",
+            "接著讀下方本節標題",
+            "h('span',{text:'上一節'})",
+            "標題逐字沿用原文；只表示本文先後，不代表上下游、因果、成熟度或投資排序。",
+            "handoff=showReaderAids?readerSectionHandoff(article,index):null",
+            "if(handoff)sectionEl.prepend(handoff)",
+            ".reader-section-handoff{margin:0 0 12px",
+            ".reader-section-handoff+h2{margin-top:0}",
+            "@container (max-width:480px){.reader-section-handoff-head{display:block}",
+        ):
+            self.assertIn(contract, template)
+        reader_render = template.index("const showReaderAids=mode==='reader'")
+        self.assertLess(
+            template.index("if(handoff)sectionEl.prepend(handoff)", reader_render),
+            template.index("if(sectionMap)sectionEl.appendChild(sectionMap)", reader_render),
+        )
+        self.assertNotIn("section.readerSectionHandoff", template)
+
+    def test_topic_main_question_anchor_reuses_catalog_question_only_at_first_main_section(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function readerMainQuestionAnchor(article,index)",
+            "if(article?.meta?.eventKind)return null",
+            "question=catalogReaderQuestion(article)",
+            "if(position!==0||!question)return null",
+            "'data-main-question-anchor':article.id",
+            "'data-main-question-section':current.h||''",
+            "'data-main-question-text':question",
+            "進入主正文 · 回到這篇要回答的問題",
+            "問題逐字沿用文章首屏「讀完能回答」；只作閱讀定位，不改寫正文、研究結論或證據。",
+            "mainQuestionAnchor=showReaderAids?readerMainQuestionAnchor(article,index):null",
+            "if(mainQuestionAnchor)sectionEl.prepend(mainQuestionAnchor)",
+            ".reader-main-question-anchor{margin:0 0 14px",
+            ".reader-main-question-anchor+h2{margin-top:0}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("section.readerMainQuestion", template)
 
     def test_formal_and_narrative_reading_actions_do_not_skip_industry_role_context(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
