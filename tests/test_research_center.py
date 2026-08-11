@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 75)
+        self.assertEqual(library["learningPathVersion"], 76)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2197,6 +2197,29 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, template)
         # 顯示層只重排作者明寫的 fence／箭頭語法，不回寫研究 payload。
         self.assertNotIn("node.runs=readerTextFlowItems", template)
+
+    def test_template_turns_exact_kpi_compass_bullets_into_a_definition_list(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "const READER_KPI_COMPASS_ITEMS=[",
+            "{label:'主要驅動 KPI',kind:'primary',hint:'先看 · 核心條件是否落地'}",
+            "{label:'次要 KPI',kind:'secondary',hint:'再看 · 營運結果是否跟上'}",
+            "{label:'常見假訊號',kind:'false-signal',hint:'避開 · 不能直接當成證據'}",
+            "{label:'最關鍵分歧',kind:'key-fork',hint:'分辨 · 哪一條路徑正在發生'}",
+            "function readerKpiCompass(node,profile='default')",
+            "profile!=='topic'||node?.t!=='ul'",
+            "String(item[0].s||'').trim()===READER_KPI_COMPASS_ITEMS[index].label",
+            "runText(item.slice(1)).startsWith('：')",
+            "class:'reader-kpi-compass'",
+            "'data-reader-kpi-position':index+1",
+            "'aria-label':'投資判讀四個位置'",
+            "const compass=readableProse?readerKpiCompass(node,readerProseProfile):null",
+            ".reader-kpi-compass-wrap{margin:0 0 16px",
+            "@container (min-width:600px){.reader-kpi-compass{grid-template-columns:repeat(2,minmax(0,1fr))}}",
+        ):
+            self.assertIn(contract, template)
+        # 只讀並複製原 runs 的顯示值，不回寫文章或把一般清單推成投資框架。
+        self.assertNotIn("node.items=READER_KPI_COMPASS_ITEMS", template)
 
     def test_formal_positioning_hides_internal_maintenance_terms_in_reader_view_only(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

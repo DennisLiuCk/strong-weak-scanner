@@ -1,5 +1,37 @@
 # Changelog
 
+## 市場議題四類 KPI 改為判讀卡 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、研究 source／claim／
+comparison／monitor、鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷
+零變動**；本次只把三篇市場議題既有的四種判讀角色，在 reader mode 改成可分辨的語意結構，
+並同步研究維護契約、方法清單及測試。
+
+- Python 靜態解析完整重算 35 篇市場議題、273 個清單，其中 57 個至少有一項首段粗體＋冒號
+  標籤；只有 3 篇、3 個清單精確依序使用「主要驅動 KPI、次要 KPI、常見假訊號、最關鍵分歧」。
+  瀏覽器內另一條獨立解析路徑也得到同一組 3 篇；這是完整發布母體的決定性列舉，不是抽樣統計，
+  SE／t／有效獨立觀測不適用。
+- `readerKpiCompass()` 只在市場議題 reader mode，且節點為四項 `ul`、每項首 run 為對應粗體
+  固定標籤、順序完全相同、剩餘 runs 以全形冒號開頭時，改用
+  `section[aria-label="投資判讀四個位置"]` 與 `<dl>`。固定提示把四個角色翻成「先看、再看、
+  避開、分辨」；沒有加入公司、產業、數字、方向或結論，任何契約不符都退回一般清單。
+- 實際瀏覽器逐篇開啟 35／35 篇：預期與實際命中皆為同一 3 篇，32 篇為 0 張；3 張卡的
+  `<dt>`、`<dd>` 與位置 1–4 都能逐字同序重建回原四個項目，0 個語意或範圍錯誤。1280px
+  專注閱讀為 2 × 2；390px iframe 為單欄，正文寬 354px、卡片寬 328px、
+  `innerWidth = scrollWidth = 390px`，沒有水平溢位。前後畫面與兩條 census 存於
+  `tmp/research-learning-audit-2026-08-11-wave123-kpi-reading/`。
+- `learningPathVersion: 75 → 76`；排除版本後 canonical LIB payload 前後完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。方法 registry
+  fingerprint 仍為 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，
+  因此不建立內容相同的新方法快照。
+- 固定瀏覽器與 iframe 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400%
+  zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱理解率已提升或完整無障礙合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 UTF-8 環境執行 521 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：
+  `index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `f59e7b984c37cf48ef2a76e9d7bb4346fdd9d95525293bfb83041e2dbf8ab8d8`。
+
 ## 市場議題推論鏈改為語意化五步清單 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、研究 source／claim／
