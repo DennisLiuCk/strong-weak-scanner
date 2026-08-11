@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 76)
+        self.assertEqual(library["learningPathVersion"], 77)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2733,6 +2733,24 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-radar-group-id':group.id", "state.maturityOrigin",
             "查看研究判定、原始文字與來源",
             "auditBadges,copy,track,foot", "研究方法與稽核資料（供查核）",
+            'id="radarOverviewFold"', 'id="radarOverviewSummary"',
+            'id="radarOverviewList"', "function renderRadarOverview(candidates)",
+            "function focusRadarCandidate(candidateId)",
+            "function focusRadarOverview()",
+            "'data-radar-jump':candidate.id", "'aria-controls':targetId",
+            "id:'radar-candidate-'+candidate.id", "tabindex:'-1'",
+            "fold.open=!matchMedia('(max-width:780px)').matches",
+            "card.scrollIntoView({block:'start'",
+            "card.focus({preventScroll:true})",
+            "fold.open=true", "summary.focus({preventScroll:true})",
+            "class:'radar-map-return'", "text:'回候選題地圖'",
+            "mapReturn.addEventListener('click',focusRadarOverview)",
+            "研究順序只安排研究資源；不是重要性、報酬、族群受惠或投資排名",
+            ".radar-overview-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))",
+            "@media(max-width:1000px){.radar-overview-list{grid-template-columns:repeat(2,minmax(0,1fr))}}",
+            "@media(max-width:780px){.radar-overview{scroll-margin-top:74px}.radar-overview>summary{min-height:64px",
+            ".radar-overview-list{grid-template-columns:1fr}",
+            ".radar-map-return{width:100%;min-height:44px}",
             "document.getElementById('surfaceRadar').addEventListener",
         ):
             self.assertIn(contract, template)
@@ -2741,6 +2759,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(".radar-card{display:block", template)
         self.assertIn(".radar-rank{min-height:42px;display:flex;flex-direction:row", template)
         self.assertIn("grid-template-columns:repeat(4,1fr)", template)
+        self.assertNotIn("candidate.readerQuestion=", template)
 
     def test_radar_group_matrix_keeps_promoted_question_article_and_return_path(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

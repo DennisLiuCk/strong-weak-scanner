@@ -1,5 +1,37 @@
 # Changelog
 
+## 研究雷達新增候選題地圖 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、
+priority、status、reader 文案、研究 source／claim／monitor、文章、圖譜、公司曝險與投資判斷
+零變動**；本次只在候選卡前新增 reader-only 快速導覽，並同步研究維護契約、方法清單及測試。
+
+- 目前 active radar 完整母體為 8 題；修改前瀏覽器 DOM 有 8 張候選卡、0 個跨卡跳題控制。
+  1280px 的 `.radar-page` 需捲 4,618px，390px 頁面高 8,084px，讀者只能依序掃過長卡片後才知道
+  後面還有哪些問題。這是完整發布母體的決定性列舉，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 新增原生 `details`「候選題地圖」：逐題只重用既有 rank、`readerQuestion`、固定 status 讀者標籤
+  與 `nextCheck`；每個按鈕的 `aria-controls` 對到唯一候選卡。點擊後依 reduced-motion 偏好捲動，
+  再把程式焦點送到同卡；每張卡尾可展開並聚焦同一地圖。地圖明示順序只安排研究資源，不代表
+  重要性、報酬、族群受惠或投資排名。
+- 1280px 初始展開為 4 × 2，8／8 題按鈕都在同一 viewport；884px 為 2 欄，390px 為單欄且首次
+  預設收合，第一張卡 top 仍為 415px，`innerWidth = scrollWidth` 分別為 1280、884、390px。
+  行動版展開後有 8／8 個入口；桌機點第 8 題後焦點落在同卡，radar scrollTop 4,138px、卡頂距
+  容器 126px。卡尾返回在桌機與 390px 都會展開地圖並把焦點送回 summary；行動版另保留 74px
+  捲動距離，穩定後 summary top 75px，不被固定頁首遮住且無水平溢位。Python 直接解析 active
+  Markdown 的 8 題，另一條瀏覽器 DOM 路徑逐一比對 ID、rank、問句、status、日期及 target，
+  8／8 全部同序相符。前後、窄幅、884px、跳題與返回畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave124-radar-map/`。
+- `learningPathVersion: 76 → 77`；Python 與獨立 Node 路徑排除版本後，都確認 current／HEAD
+  canonical LIB payload 完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- 固定瀏覽器與 iframe 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400%
+  zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱理解率已提升或完整無障礙合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 UTF-8 環境執行 521 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：
+  `index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `80401905a7330df36fa30040fea188be8551e230cbd41815b20a630bb79a6c83`。
+
 ## 市場議題四類 KPI 改為判讀卡 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、研究 source／claim／
