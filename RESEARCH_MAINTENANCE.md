@@ -465,6 +465,12 @@ profile：至少兩個句末且達 100 字，或至少三個句末且達 80 字�
 也不得據此生成摘要或改寫句子。查核附錄、研究摘要與新手三句重點不套用長段落斷句，避免改變
 證據表與既有卡片結構；市場議題 profile 也不得套到正式筆記或多空小作文。
 
+市場議題主正文若精確命中 fenced `text` paragraph，且 fence 內有 3–8 個由 `→` 分隔的非空項目，
+reader mode 可把 fence 與箭頭視為 Markdown 呈現語法，依原順序改用單一語意化 `<ol>`。每個 `<li>`
+必須逐字等於原項目，並保留可辨識的總步數與位置；原始 paragraph、runs、Markdown 與研究 payload
+都不得回寫。非市場議題、非 reader mode、其他語言 fence、沒有箭頭或項目數超出範圍時必須安全
+退回原 renderer，不能由技術文字、清單或模型自行推導流程與因果。
+
 正式筆記與多空小作文的 `mode=reader` 另有 section heading 白話契約：每個非空原始 `section.h`
 都必須由 `readerSectionPurpose()` 產生非空的固定閱讀目的，緊接原 `h2` 顯示為
 「這節先看」。正式筆記先用 canonical heading map，再用「證據索引／營運獲利／融資資本／假說」

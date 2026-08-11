@@ -1,5 +1,36 @@
 # Changelog
 
+## 市場議題推論鏈改為語意化五步清單 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、研究 source／claim／
+comparison／monitor、鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷
+零變動**；本次只修正 reader mode 將 fenced `text` 推論鏈顯示成一般 paragraph 的問題，並同步
+研究維護契約、方法清單及測試。
+
+- Python 靜態解析與瀏覽器內另一條獨立解析路徑，完整重算 35 篇市場議題、121 個主正文節、
+  140 個原始 paragraph：句末標點不超過 1 個者共 15 段／9 篇，但至少 120 字者只有 1 段；它是
+  132 字、0 個句末、0 個內部分號的 fenced `text` 推論鏈。至少 120 字且可由分號安全切分者為 0，
+  因此不新增廣泛的分號／冒號斷句規則。這是完整發布母體的決定性列舉，不是抽樣統計，SE／t／
+  有效獨立觀測不適用。
+- `readerTextFlow()` 只在市場議題 reader mode，且單一 paragraph 精確由 fenced `text` 包住、內含
+  3–8 個由 `→` 分隔的非空項目時，移除 fence／箭頭語法並依原順序顯示 `<ol>`；其他文章、其他
+  fence 或超出項目數時安全退回既有 renderer。現行唯一命中為 5 步，實際 DOM 的五個 `<li>` 與
+  原項目逐字同序，位置 1–5、`aria-label="原文推論鏈，共 5 步"`，reader 畫面的裸 fence 為 0。
+- 1280px 畫面與 390px iframe 都已實際開啟核對；窄幅 `innerWidth = scrollWidth = 390px`、清單寬
+  354px，沒有水平溢位。修改前、修改後、窄幅畫面、完整 census 與稽核筆記存於
+  `tmp/research-learning-audit-2026-08-11-wave122-clause-rhythm/`。
+- `learningPathVersion: 74 → 75`；排除版本後 canonical LIB payload 前後完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。方法 registry
+  fingerprint 仍為 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，
+  因此不建立內容相同的新方法快照。
+- 固定瀏覽器與 iframe 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400%
+  zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱理解率已提升或完整無障礙合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 UTF-8 環境執行 520 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：
+  `index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `4f9663d580702aa55ac71e53430be9adaedc0a566cbabee4fb7ff25f0517e8b0`。
+
 ## 市場議題中長段落依句數補足閱讀停頓 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、研究 source／claim／

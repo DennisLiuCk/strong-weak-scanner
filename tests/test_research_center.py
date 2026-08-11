@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 74)
+        self.assertEqual(library["learningPathVersion"], 75)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2177,6 +2177,26 @@ class ResearchCenterTest(unittest.TestCase):
         # 顯示層只讀 run.s；不改寫發布 payload 或原始 Markdown。
         self.assertIn("String(value==null?'':value)", template)
         self.assertNotIn("run.s=normalizeReaderRunText", template)
+
+    def test_template_turns_authored_fenced_text_flow_into_a_semantic_list(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function readerTextFlowItems(node,profile='default')",
+            "profile!=='topic'||node?.t!=='p'",
+            "text.match(/^```text\\s+([\\s\\S]*?)\\s+```$/i)",
+            "split(/\\s*→\\s*/)",
+            "items.length>=3&&items.length<=8",
+            "function readerTextFlow(node,profile='default')",
+            "class:'reader-flow-sequence'",
+            "'data-reader-flow-steps':items.length",
+            "'data-reader-flow-position':index+1",
+            "'aria-label':'原文推論鏈，共 '+items.length+' 步'",
+            "const flow=readableProse?readerTextFlow(node,readerProseProfile):null",
+            ".reader-flow-sequence{margin:0 0 16px!important",
+        ):
+            self.assertIn(contract, template)
+        # 顯示層只重排作者明寫的 fence／箭頭語法，不回寫研究 payload。
+        self.assertNotIn("node.runs=readerTextFlowItems", template)
 
     def test_formal_positioning_hides_internal_maintenance_terms_in_reader_view_only(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
