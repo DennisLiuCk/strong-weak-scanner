@@ -1,5 +1,37 @@
 # Changelog
 
+## 長篇正文先分清多套閱讀框架 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章 Markdown、reader 問句、
+reading mission、source／claim／monitor、topic lifecycle、confidence、group／route、文章／圖譜
+關係、公司曝險與投資判斷零變動**；本次只新增市場議題正文前的 reader-only 讀法地圖，
+並同步研究維護契約、方法清單、README 與測試。
+
+- 以固定 1280×720 與 390×844 重新走讀「族群矩陣 → 運算與互連路線第 7/8 站 → PCIe 6
+  文章正文」。修改前每節已有表格與局部讀法，但文章會依序切換「位置、尺、時鐘、角色、關」
+  五套分類，正文前沒有先說明它們回答不同問題；這是同一瀏覽器狀態的結構與版面觀察，不是
+  讀者理解率或閱讀速度統計。
+- `readerArticleFrameItems()` 現在只檢查同篇主正文各節第一張表的第一個原始欄名；至少命中三種
+  完整且不重複的「本文 N 個位置／把尺／個時鐘／類角色／關」才顯示地圖。PCIe 6 文章因此得到
+  5 張「先拆系統／再核對條件／分開事件／分清責任／檢查缺口」按鈕；標籤、順序、目標章節均
+  沿用原表頭與 H2，固定用途文案不讀 row、cell 或正文推寫摘要，並明示不代表上下游、因果、
+  成熟度或投資排序。
+- 1280px 桌機把五種讀法放在同一列比較；390px 手機改為單欄且每個按鈕高度至少 68px。
+  實際操作第 1、3、5 張按鈕後，黏性閱讀位置分別到第 3/10、5/10、7/10 節，標題與原 H2 一致；
+  正式筆記、多空小作文與未滿三種框架的 AI 機櫃市場議題均為 0 張。桌機／手機前後截圖與跳轉
+  證據存於 `tmp/research-learning-audit-2026-08-11-wave132-reading-frames/`。
+- `learningPathVersion: 84 → 85`；排除版本後 current／HEAD 的 274 篇 canonical LIB payload
+  完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- macOS 26.5.2 arm64、Python 3.11.11、`C.UTF-8` 環境執行 523 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `0376239c22cd1880c922810ed9665694497b6a8dbf65bbaf34afa3e62bc2366e`。
+- 固定瀏覽器與 responsive viewport 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、
+  200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱理解率已提升或完整無障礙合規。
+
 ## 研究文章改為問題先讀，查核排程退出第一閱讀層 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章 Markdown、reader 問句、

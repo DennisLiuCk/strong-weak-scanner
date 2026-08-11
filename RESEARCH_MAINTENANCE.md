@@ -336,6 +336,16 @@ list runs。新手段落已有完整字典、研究摘要已有白話卡、研�
 正式筆記、多空小作文及非 reader mode 都不得顯示。不得讀取 blocks、題名、族群、graph 或 route
 另寫問題；卡片只作閱讀定位，不改寫正文、研究結論、證據或查核狀態。
 
+同一組主正文節另可由 `readerArticleFrameItems()` 依原 section 順序檢查各節第一張 table 的
+第一個欄名；只接受「本文 N 個位置／本文 N 把尺／本文 N 個時鐘／本文 N 類角色／本文 N 關」
+五種完整格式，且至少命中三種、kind 彼此不重複時，`readerArticleFrameMap()` 才可在原主正文前
+顯示文章級「正文怎麼走」。畫面 label、順序與定位目標須逐一對應原 table header／section H2；
+固定 purpose 只能解釋「拆系統／核對條件／分開事件／分清責任／檢查缺口」五種閱讀工作，不得
+讀取 row、cell、其他 blocks、題名、族群、graph 或 route 生成摘要。事件錨點、正式筆記、多空
+小作文、少於三種或重複 kind 必須完全不顯示；手機採單欄且每個按鈕維持可觸控、可聚焦。
+這是 renderer-only 導覽，必須明示順序不代表上下游、因果、成熟度或投資排序，並保持 Markdown、
+原表、原 H2、主張、來源、查核狀態與 canonical research payload 不變。
+
 市場議題主正文若一節從第一個 block 起連續出現至少三個 paragraph，且每段第一個非空 run 都有
 作者明寫的 bold，`readerSectionMapItems()` 才可逐 run 建立「本節先看」。遇到非 paragraph 或
 第一個非空 run 不是 bold 就立即停止，累積少於三項時回傳空清單；不得跳過中間 block 拼湊、讀取

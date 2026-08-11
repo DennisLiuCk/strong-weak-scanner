@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 84)
+        self.assertEqual(library["learningPathVersion"], 85)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1846,6 +1846,58 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, template)
         self.assertNotIn("section.readerMainQuestion", template)
+
+    def test_topic_article_frame_map_separates_distinct_authored_table_frameworks(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "const READER_ARTICLE_FRAME_CONFIGS=[",
+            "kind:'positions',pattern:/^本文[一二三四五六七八九十兩0-9]+個位置$/",
+            "kind:'measures',pattern:/^本文[一二三四五六七八九十兩0-9]+把尺$/",
+            "kind:'clocks',pattern:/^本文[一二三四五六七八九十兩0-9]+個時鐘$/",
+            "kind:'roles',pattern:/^本文[一二三四五六七八九十兩0-9]+類角色$/",
+            "kind:'gates',pattern:/^本文[一二三四五六七八九十兩0-9]+關$/",
+            "function readerArticleFrameConfig(header)",
+            "function readerArticleFrameItems(article)",
+            "article?.type!=='topic'||article?.meta?.eventKind",
+            "const table=(section.blocks||[]).find(block=>block.t==='table')",
+            "firstHeader=runText(table?.head?.[0]||[])",
+            "items.length<3||new Set(items.map(item=>item.kind)).size!==items.length",
+            "function readerArticleFrameMap(article)",
+            "'data-reader-article-frame-map':article.id",
+            "'data-reader-frame-count':items.length",
+            "'data-reader-frame-kind':item.kind",
+            "'data-reader-frame-heading':item.section.h||''",
+            "'data-reader-frame-header':item.firstHeader",
+            "這篇正文會換 '+items.length+' 種讀法",
+            "labels=items.map(item=>item.label).join('、')",
+            "text:labels+'各自回答不同問題。先分清每一種讀法，再逐段深入。'",
+            "focusReadingTarget(document.getElementById(sectionId(item.index)))",
+            "按鈕只沿用本文既有表頭與章節順序；用途文案只說怎麼讀，不改寫研究內容。順序不代表上下游、因果、成熟度或投資排序。",
+            "const frameMap=readerArticleFrameMap(article);if(frameMap)body.appendChild(frameMap)",
+            ".reader-article-frame-map{margin:18px 0 20px",
+            ".reader-article-frame-button{width:100%;min-height:112px",
+            ".reader-article-frame-button:focus-visible{outline:3px solid",
+            ".reader-article-frame-list{grid-template-columns:1fr}",
+            ".reader-article-frame-button{min-height:68px",
+        ):
+            self.assertIn(contract, template)
+        render_reader = template[
+            template.index("function renderReader(article,hasRows=true)"):
+            template.index("function renderAll()")
+        ]
+        self.assertLess(
+            render_reader.index("const frameMap=readerArticleFrameMap(article)"),
+            render_reader.index("body.appendChild(articleSections(article,'reader',glossaryTerms))"),
+        )
+        self.assertNotIn("article.readerArticleFrames", template)
+
+        pcie = (ROOT / "notes" / "research_topics" /
+                "2026-08-03_pcie6_compliance_ladder.md").read_text(encoding="utf-8")
+        for authored_header in (
+            "本文五個位置", "本文五把尺", "本文六個時鐘",
+            "本文六類角色", "本文六關",
+        ):
+            self.assertIn(authored_header, pcie)
 
     def test_formal_and_narrative_reading_actions_do_not_skip_industry_role_context(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
