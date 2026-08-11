@@ -1,5 +1,38 @@
 # Changelog
 
+## 推論算力文章把市場需求到公司獲利拆成三道證據關卡 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜、公司曝險與投資判斷零變動**；本次只改寫一篇代表文章的
+新手導讀、兩段正文與三列證據表，並把相同的三關因果橋寫進研究維護契約、方法清單與測試。
+方法 registry fingerprint 仍為
+`322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，與既有基線完全相同，
+因此不建立內容相同的新方法快照。
+
+- 完整掃描 35 份 topic Markdown（34 篇議題＋1 份模板）的正文與表格後，推論算力測試設備文章
+  同時出現最長 275 字正文段落與 128 字表格 cell。改寫後最長正文段落降為 138 字、超過 180 字
+  的段落由 1 段歸零，最長表格 cell 降為 125 字；這是完整檔案母體的決定性字元計數，不是抽樣
+  統計，SE／t／有效獨立觀測不適用。
+- 新手導讀新增「晶片需求真的增加 → 測試工作真的增加 → 台灣公司真的有收入」三道關卡。
+  原本混在同一段的 Amazon 晶片業務、Microsoft Maia 與 Advantest 測試機市場資料，改成三個有
+  主詞與動詞的重點；同時明示全球測試需求不能直接證明台灣公司取得訂單。
+- 跨公司表格改用「這份資料直接說了什麼／讀完仍不能下什麼結論」，逐列保留 130–145 億美元、
+  250 億美元、30%／40% 等原數字及 GPU 仍最大、容量承諾不是採購金額、自研晶片與 NVIDIA、
+  AMD 並行等原邊界。三組資料仍維持 `not_comparable`，不建立排名或受惠推論。
+- 正文追加同狀態 `editorial:plain_language_wave113_test_demand_bridge` transition；方法契約新增
+  「市場需求 → 元件／設備工作量 → 公司財務」的三關檢查，禁止 renderer 依族群或公司清單自動
+  補寫因果。`research_queue.py --lint --baseline-ref HEAD` 證明鎖定帳本與 meta 未改。
+- 自然窄欄 559 × 863 的同狀態前後畫面顯示，長段落已拆成三個可掃讀重點，新表頭與逐列讀法
+  完整顯示，整頁沒有水平溢位。前後畫面與完整稽核存於
+  `tmp/research-learning-audit-2026-08-11-wave113-learning-links/`。固定 viewport 不是實機，本輪
+  未做 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化 WCAG 對比或真實
+  新手理解測試，因此不宣稱實際理解率已提升或完整無障礙合規。
+- Darwin arm64、Python 3.11.11、UTF-8 執行 511 tests 全綠；qual notes、leading hypotheses、
+  research queue、knowledge graph、research radar 與 method audit 六項 lint 均為 exit 0。連續
+  兩次 dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `f2ef043ef16fe7aecf1658c03bf90e4434f5380de95f88973df1b31a7ff5ef4c`。
+
 ## 800V 證據表改用正常句子交代做法與尚缺證據 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、

@@ -55,6 +55,14 @@ reason: editorial_plain_language_wave8_learning_no_conclusion_change
 evidence: editorial:plain_language_wave8
 -->
 
+<!-- transition
+date: 2026-08-11
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave113_inference_test_profit_bridge_no_conclusion_change
+evidence: editorial:plain_language_wave113_test_demand_bridge
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -78,6 +86,12 @@ evidence: editorial:plain_language_wave8
 ### 為什麼重要
 
 市場容易把「自研 ASIC 成長」解讀成 GPU 單向流失，或把全球 tester TAM 上修直接分配給台灣個股。這篇的重要性在於把運算架構、測試需求與公司獲利拆成不同證據層級：晶片種類與複雜度增加只是需求機制，仍要等公司專案、稼動率、售價、收入與毛利才能證明經濟利益落地。
+
+### 從晶片變多到公司獲利，要過三關
+
+1. **先確認晶片需求真的增加。** Amazon 與 Microsoft 的公開資料顯示自研晶片持續擴大，但它們仍與 NVIDIA、AMD 的通用加速器並行。
+2. **再確認測試工作真的增加。** Advantest 把 2026 年測試機市場預估提高到 130–145 億美元，並把推論 ASIC、CPU 與 DRAM 的產量和複雜度列為原因；這仍是市場預估，不是已出貨設備。
+3. **最後確認台灣公司真的有收入。** 還要看到具名專案、量產、稼動率、平均售價、收入和毛利；只有全球市場擴張，不能證明哪一家台灣公司受惠。
 
 ### 接下來怎麼追
 
@@ -222,25 +236,32 @@ verification_needed: 台灣公司正式法說、季報或公告須揭露專案�
 resolution:
 -->
 
-## 為何值得進佇列
+## 為什麼這三份資料要一起看
 
-7 月底出現了比「CSP 會做自研晶片」更可驗證的組合證據：Amazon 的 chips business 已
-超過 250 億美元年化營收規模，Microsoft 的 Maia 200 正擴大使用，而 Advantest 同時把
-CY2026 tester TAM 中值上修約 19%。最重要的判讀不是「ASIC 取代 GPU」，而是推論工作負載
-讓 ASIC、CPU、DRAM 與 GPU 並行，晶片數量、複雜度與 test insertion 共同抬高測試需求。
-這能驗證全球需求機制，仍不能自動驗證任何台灣設計服務、封測或測試介面公司的訂單。
+**三份資料回答同一條鏈的不同位置。** Amazon 的晶片業務年化營收規模已超過 250 億美元，
+Microsoft 正擴大使用 Maia 200，Advantest 則把 2026 年測試機市場預估中值上修約 19%。
 
-## 跨公司數字與可比性
+**不是自研晶片單向取代 GPU。** 推論工作負載讓 ASIC、CPU、DRAM 與 GPU 並行；晶片數量、
+複雜度與測試節點（test insertion）可能一起增加測試需求。
 
-### 三組相互校驗的證據
+**全球測試需求不是台灣公司訂單。** 這些資料支持全球需求機制，仍不能證明任何台灣設計服務、
+封測或測試介面公司已取得訂單。
 
-| 來源 | 已驗證 | 必須保留的邊界 |
+## 三組數字不能直接排高低
+
+### 三份資料各自回答什麼
+
+| 公司資料 | 這份資料直接說了什麼 | 讀完仍不能下什麼結論 |
 |---|---|---|
-| Advantest 2026-07-29 | CY2026 SoC＋memory tester TAM 上修至 130–145 億美元：SoC 105–115 億、memory 25–30 億；較 4 月預估中值約增 19%。公司歸因於 AI 晶片產量、複雜度，特別是推論用 ASIC、CPU、DRAM | 這是 Advantest 的市場估計；Q&A 明說無法拆分 GPU／CPU／ASIC 各自貢獻，GPU 目前仍是最大市場 |
-| Amazon 2026-07-30 | AWS chips business 年化營收規模超過 250 億美元且年增三位數；Trainium 取得 Anthropic、OpenAI 多年、多 GW 承諾 | 250 億美元包含 Graviton、Trainium、Nitro，不能全算 Trainium；容量承諾不等於晶片採購金額，Amazon 也同時大量採用 NVIDIA |
-| Microsoft 2026-07-29 | Maia 200 持續擴大，已支援 OpenAI 與 MAI models；公司稱相對其 fleet 最新硬體 performance／dollar 高 30%，MAI models 的 performance／watt 高 40% | 比較基準是 Microsoft 自有 fleet，並非點名擊敗特定 GPU；同一段明說自研晶片與 NVIDIA、AMD 並行 |
+| Advantest 2026-07-29 | Advantest 預估 CY2026 測試機市場為 130–145 億美元（SoC 105–115 億、memory 25–30 億），較 4 月中值約增 19%。公司把 AI 晶片產量與複雜度，尤其推論 ASIC、CPU、DRAM，列為需求因素。 | 這只是 Advantest 的市場預估。公司在 Q&A 明說無法拆分 GPU、CPU、ASIC 各自貢獻，而且 GPU 目前仍是最大市場。 |
+| Amazon 2026-07-30 | Amazon 表示 AWS 晶片業務年化營收超過 250 億美元、年增三位數；Trainium 已取得 Anthropic、OpenAI 的多年、多 GW 承諾。 | 250 億美元包含 Graviton、Trainium 與 Nitro，不能全部算成 Trainium。容量承諾也不是晶片採購金額，Amazon 同時仍大量採用 NVIDIA。 |
+| Microsoft 2026-07-29 | Microsoft 表示 Maia 200 已支援 OpenAI 與 MAI models，且仍在擴大。相較自有機隊最新硬體，每美元效能高 30%，MAI models 的每瓦效能高 40%。 | 比較只限 Microsoft 自有機隊，沒有點名擊敗特定 GPU。同一段也明說自研晶片與 NVIDIA、AMD 並行。 |
 
-三個 headline 分別是設備市場預估、晶片業務年化收入規模與相對效能比，期間、單位與定義都不同。下列帳本把它們歸在同一個研究問題下，但明確判定為 `not_comparable`，只用來交叉觀察推論算力需求，不能橫向排名或加總。對應比較帳本：`M1`。
+**三組數字的時間、單位與定義不同。** 它們分別是設備市場預估、晶片業務年化營收規模與相對
+效能比，不能橫向排名或加總。
+
+**本文只把它們放進同一個研究問題。** 比較帳本 `M1` 將它們判定為不可直接比較
+（`not_comparable`）；用途只是交叉觀察推論算力需求。
 
 <!-- metric_comparison
 comparison_id: M1

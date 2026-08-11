@@ -1656,6 +1656,31 @@ class ReadabilityGateTest(unittest.TestCase):
             text,
         )
 
+    def test_inference_tester_article_explains_demand_to_profit_chain(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-01_inference_compute_tester_tam.md"
+        text = path.read_text(encoding="utf-8")
+        self.assertNotIn("## 為何值得進佇列", text)
+        self.assertNotIn("### 三組相互校驗的證據", text)
+        self.assertNotIn("| 來源 | 已驗證 | 必須保留的邊界 |", text)
+        self.assertIn("### 從晶片變多到公司獲利，要過三關", text)
+        self.assertIn("**先確認晶片需求真的增加。**", text)
+        self.assertIn("**再確認測試工作真的增加。**", text)
+        self.assertIn("**最後確認台灣公司真的有收入。**", text)
+        self.assertIn("## 為什麼這三份資料要一起看", text)
+        self.assertIn("## 三組數字不能直接排高低", text)
+        self.assertIn(
+            "| 公司資料 | 這份資料直接說了什麼 | 讀完仍不能下什麼結論 |",
+            text,
+        )
+        self.assertIn(
+            "比較帳本 `M1` 將它們判定為不可直接比較",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave113_test_demand_bridge",
+            text,
+        )
+
     def test_800v_protection_article_starts_from_people_events_and_actions(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-03_800vdc_protection_layers.md"
         text = path.read_text(encoding="utf-8")
