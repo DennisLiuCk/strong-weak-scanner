@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 86)
+        self.assertEqual(library["learningPathVersion"], 91)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2514,6 +2514,73 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, template)
 
+    def test_learning_route_handoffs_keep_the_system_question_and_completion_review(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function registeredLearningRoute(article)",
+            "routeId?learningRouteById(routeId):null",
+            "function learningRouteQuestionContext(article)",
+            "整條路線要回答",
+            "'data-route-question-id':route.id",
+            "function learningRouteCompletionReview(article)",
+            "回頭回答整條路線",
+            "(route.phases||[]).filter(phase=>phase?.label)",
+            "'data-route-review-id':route.id",
+            "'data-route-phase-count':phases.length",
+            "text:(phase.graphIds||[]).length+' 站'",
+            "問題、階段與站數逐字沿用既有學習路線",
+            "function learningRouteBridge(card,sourceArticle)",
+            "question=learningRouteQuestionContext(sourceArticle)",
+            "function learningCard(card,primary=false,sourceArticle=null)",
+            "card.kind==='route'?learningRouteCompletionReview(sourceArticle):null",
+            "learningCard(cards[0],true,article)",
+            "learningCard(card,false,article)",
+            ".learning-route-bridge-question{",
+            ".learning-route-completion-review{",
+            ".learning-route-completion-phases{display:grid",
+        ):
+            self.assertIn(contract, template)
+        self.assertTrue(bd.RESEARCH_LEARNING_ROUTES)
+        for route in bd.RESEARCH_LEARNING_ROUTES:
+            self.assertTrue(route.get("question"), route.get("id"))
+            self.assertTrue(route.get("phases"), route.get("id"))
+
+    def test_completed_learning_route_returns_to_an_explicit_next_route_choice(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            'id="graphRouteComplete"',
+            'aria-labelledby="graphRouteCompleteTitle"',
+            "function routeCompletionGraphOrigin(article)",
+            "kind:'route-complete',source:'route-complete'",
+            "articleScrollTop:reader?.scrollTop||0",
+            "function routeCompletionChoices(origin)",
+            "route.id!==origin.routeId",
+            "function renderRouteCompletionOrigin(root,origin,article)",
+            "你已完成「'+route.label+'」",
+            "你剛完成的系統問題：'+route.question",
+            "下一個想弄懂的系統問題",
+            "'data-testid':'graph-route-next-'+candidate.id",
+            "'aria-pressed':selected?'true':'false'",
+            "問題與順序逐字沿用既有學習路線",
+            "function chooseNextLearningRoute(routeId)",
+            "activateGraphRoute(route.id)",
+            "function syncRouteCompletionSelection(routeId)",
+            "function routeStartArticle(route)",
+            "'data-testid':'graph-route-next-start-action'",
+            "openGraphArticle(start.article.id)",
+            "function bindLearningAction(action,card,sourceArticle=null)",
+            "routeCompletionGraphOrigin(sourceArticle)",
+            "bindLearningAction(action,card,sourceArticle)",
+            "origin.kind==='route-complete'?'#learningPath .learning-card.kind-route .learning-card-action'",
+            ".graph-route-next-grid{display:grid;grid-template-columns:repeat(3",
+            ".graph-route-next-grid{grid-template-columns:1fr}",
+        ):
+            self.assertIn(contract, template)
+        self.assertLess(
+            template.index('id="graphRouteComplete"'),
+            template.index('id="graphLearningKey"'),
+        )
+
     def test_template_explains_why_a_shared_company_graph_connects(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
@@ -2602,7 +2669,7 @@ class ResearchCenterTest(unittest.TestCase):
             "state.graphOrigin=origin", "if(origin)focusGraphOrigin()",
             "card.guidedRelation?.edgeId,graphLearningOrigin()",
             "openRadarGraph(route.graphId,view,'',graphLearningOrigin('route-context'))",
-            "focusSelector=origin.source==='route-context'?'.learning-route-action'",
+            "origin.source==='route-context'?'.learning-route-action'",
             "state.graphOrigin=null;selectSurface('graph')",
             ".graph-origin{display:grid;grid-template-columns:minmax(0,1fr) auto",
             ".graph-origin button{min-height:44px",
@@ -2890,7 +2957,18 @@ class ResearchCenterTest(unittest.TestCase):
             "auditBadges,copy,track,foot", "研究方法與稽核資料（供查核）",
             "個待查問題", "題已有文章", "下次總檢查",
             'id="radarOverviewFold"', 'id="radarOverviewSummary"',
+            'id="radarOverviewReady"', 'id="radarOverviewReadyList"',
+            'id="radarOverviewAllFold"', 'id="radarOverviewAllSummary"',
             'id="radarOverviewList"', "function renderRadarOverview(candidates)",
+            "function radarOverviewButton(candidate,mode='all')",
+            "candidate.articleId&&byId.has(candidate.articleId)",
+            "readySection.hidden=!ready.length",
+            "ready.forEach(candidate=>readyList.appendChild(radarOverviewButton(candidate,'ready')))",
+            "candidates.forEach(candidate=>list.appendChild(radarOverviewButton(candidate)))",
+            "題可直接讀", "題先看問題", "現在可以讀",
+            "先從已有文章的問題開始；完整研究順序仍保留在下方。",
+            "查看全部候選問題", "全部 '+candidates.length+' 題 · 保留原研究順序",
+            "已有文章可讀 · 閱讀約 '+article.readingMinutes+' 分鐘",
             "function focusRadarCandidate(candidateId)",
             "function focusRadarOverview()",
             "'data-radar-jump':candidate.id", "'aria-controls':targetId",
@@ -2903,9 +2981,13 @@ class ResearchCenterTest(unittest.TestCase):
             "mapReturn.addEventListener('click',focusRadarOverview)",
             "研究順序只安排研究資源；不是重要性、報酬、族群受惠或投資排名",
             ".radar-overview-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))",
+            ".radar-overview-ready-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))",
+            ".radar-overview-item.ready{min-height:94px",
+            ".radar-overview-all>summary{min-height:52px",
             "@media(max-width:1000px){.radar-overview-list{grid-template-columns:repeat(2,minmax(0,1fr))}}",
             "@media(max-width:780px){.radar-overview{scroll-margin-top:74px}.radar-overview>summary{min-height:64px",
             ".radar-overview-list{grid-template-columns:1fr}",
+            ".radar-overview-ready-list{grid-template-columns:1fr}",
             ".radar-map-return{width:100%;min-height:44px}",
             "document.getElementById('surfaceRadar').addEventListener",
         ):
@@ -3015,7 +3097,21 @@ class ResearchCenterTest(unittest.TestCase):
             'id="maturityGroupChoices"', 'id="maturityGroupPreview"',
             "function renderMaturityGroupExplorer(",
             "function renderMaturityGroupPreview(",
+            "function renderMaturityGroupStartPreview(row)",
+            "start?.articleId&&byId.has(start.articleId)?byId.get(start.articleId):null",
+            "'data-testid':'maturity-guide-start-card-'+row.id",
+            "建議先讀", "帶著這題讀", "article.readerQuestion",
+            "族群主題起點", "跨族群基礎起點",
+            "第 '+start.step+'/'+start.total+' 站",
+            "站次只說明它在完整路線的位置",
+            "text:minutes?'讀這篇 · '+minutes+' 分鐘':'讀這篇'",
             "function maturityRoutesForGroup(", "function focusMaturityRoute(",
+            "function openMaturityRouteGroup(groupId)",
+            "selectMaturityEntry('groups');selectMaturityGuideGroup(groupId)",
+            "routeGroups=(route.groupIds||[]).map(groupId=>groupById.get(groupId)).filter(Boolean)",
+            "點族群名稱，先看它在產業裡做什麼",
+            "'data-testid':'maturity-route-group-'+route.id+'-'+group.id",
+            "最容易和哪一層混淆",
             "function maturityGroupArticleOrigin(",
             "function maturityRouteArticleOrigin(",
             "function openMaturityGroupArticle(",
@@ -3024,7 +3120,7 @@ class ResearchCenterTest(unittest.TestCase):
             "openMaturityRouteArticle(route,route.firstArticleId)",
             "mode==='matrix'?openMaturityRouteArticle(route,station.articleId)",
             "state.maturityGuideGroupId", "data-maturity-guide-group",
-            "'aria-pressed':'false'", "會出現在：", "從第一篇開始",
+            "'aria-pressed':'false'", "會出現在：",
             "看完整族群進度", "只表示既有閱讀路線收錄",
             "function renderMaturityCompanyEvidence(",
             "function renderMaturityCompleted(",
@@ -3047,6 +3143,11 @@ class ResearchCenterTest(unittest.TestCase):
             "完整查核矩陣與方法說明", "題材財務影響", "maturitySummarySentence",
         ):
             self.assertIn(contract, template)
+        preview_start = template.index("renderMaturityGroupStartPreview(row),routeLinks")
+        preview_companies = template.index(
+            "renderMaturityCompanyEvidence(row,'preview')", preview_start
+        )
+        self.assertLess(preview_start, preview_companies)
         self.assertNotIn(
             '不熟族群名稱，從「先認識一個族群」開始', template
         )
@@ -3059,6 +3160,12 @@ class ResearchCenterTest(unittest.TestCase):
             "@media(min-width:781px){.maturity-route-card:has(.learning-route-map[open]){grid-column:1/-1}",
             ".learning-route-phases{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:start}",
             ".learning-route-map-body>.learning-route-stations{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}",
+            ".maturity-route-group{min-height:32px",
+            ".maturity-route-group:not(.static):focus-visible",
+            ".maturity-route-group{min-height:44px;padding:6px 9px}",
+            ".maturity-group-start-preview{margin-top:10px",
+            ".maturity-group-start-preview-question{margin:7px 0 0",
+            ".maturity-group-preview-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}",
             "document.getElementById('maturityRouteCards').addEventListener('keydown'",
             "event.target.closest?.('.learning-route-map>summary')",
             "summary.parentElement.open=!summary.parentElement.open",

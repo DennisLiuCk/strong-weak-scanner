@@ -97,14 +97,16 @@ DOM 順序單欄。未升格狀態只保留問句與返回行動，不得因共�
 這六個欄位不能改寫 rank、priority、evidence posture、selection decision 或任何凍結值，
 也不能新增文章、圖譜、公司曝險或投資結論。
 
-發布頁的候選卡之前必須提供一個可收合的「候選題地圖」，完整枚舉同一 active radar 的全部
-候選，不得挑題、重排或另寫摘要。每個入口只能逐字使用該候選既有 `rank`、`reader_question`、
-由正式 status 固定翻譯出的讀者標籤與 `next_check`，並以 `aria-controls` 對到唯一候選卡；點擊後
-須把同卡捲入畫面並以程式焦點公開位置；每張卡尾須能展開並聚焦同一地圖，讓讀者改選問題。
-寬桌面四欄、中幅兩欄，780px 以下單欄且首次載入預設
-收合；使用者展開或收合後，重繪不得覆寫本次選擇。地圖必須明示順序只安排研究資源，不代表
-重要性、報酬、族群受惠或投資排名；不得改寫 radar、selection log、article、graph 或任何
-研究判定 payload。
+發布頁的候選卡之前必須提供一個可收合的「候選題地圖」。地圖第一層只可從同一 active radar
+中確定存在 `article_id` 且能解析到正式發布文章的候選，依原 rank 顯示為「現在可以讀」，並只
+附同篇既有 `readingMinutes`；不得依題名、熱門度、文字相似度或模型挑題。第二層「查看全部候選
+問題」仍須完整且同序枚舉全部候選，不得漏題、重排或另寫摘要；每個入口只能逐字使用該候選既有
+`rank`、`reader_question`、由正式 status 固定翻譯出的讀者標籤與 `next_check`。兩層入口都須以
+`aria-controls` 對到唯一候選卡，點擊後把同卡捲入畫面並以程式焦點公開位置；每張卡尾須能展開
+並聚焦同一地圖。可讀起點寬桌面兩欄、780px 以下單欄；完整清單展開後寬桌面四欄、中幅兩欄、
+窄幅單欄。手機整張地圖首次載入預設收合；使用者展開或收合後，重繪不得覆寫本次選擇。地圖必須
+明示順序只安排研究資源，不代表重要性、報酬、族群受惠或投資排名；不得改寫 radar、selection
+log、article、graph 或任何研究判定 payload。
 
 族群完整度摘要在寬度大於 1000px 時保留四欄同列比較；781–1000px 必須改成 2×2 grid、隱藏
 遠處共用表頭，並在每個 `.maturity-reader-cell` 顯示自己的原欄名；780px 以下維持既有單欄
@@ -610,16 +612,20 @@ effective confidence 分成兩把尺。claim copy 固定依正式 `verified／in
 「已知道族群名稱？直接查找」選項必須依 `groupMaturity.rows` 的正式族群順序完整
 列出，預覽只能重用同列 `readerRole`、`readerBoundary` 與 `learningStart`；「會出現在」則只
 能由 `RESEARCH_LEARNING_ROUTES` 已保存的 `groupIds` 反查，不得用文字相似度、公司名或模型
-推導。選取族群時必須以 `aria-pressed` 公開目前狀態；第一篇按鈕開啟既有起讀文章，完整進度
-按鈕定位同一族群矩陣列，系統問題按鈕則定位既有路線卡。這些連結都是閱讀入口，不代表上下游、
-重要性、成熟度或受惠排序。
+推導。選取族群時必須以 `aria-pressed` 公開目前狀態；角色與混淆邊界後必須先顯示既有
+`learningStart.articleTitle`、同篇既有 `readerQuestion`、route／phase／step／total 與實際
+`readingMinutes`，再顯示系統問題與公司證據。起讀按鈕開啟同一 article ID，完整進度按鈕定位
+同一族群矩陣列，系統問題按鈕則定位既有路線卡。若 article ID 無法解析，必須明示缺口，不得以
+題名或相似內容替代。介面須說清楚站次只是該文在完整路線的位置，不要求讀者先讀完前面各站；
+這些連結都是閱讀入口，不代表上下游、重要性、成熟度或受惠排序。
 
 族群預覽的「從公司證據接下去」只能列出同一列已計入 `companyBridges` 的公司：來源必須是
 知識圖譜中 `status=active`、`view=company`、`universe=true`，且公司正式 `groupId` 等於該族群
 的既有 edge。每家公司只選一條關係當穩定入口，依序避開已過複核期的 edge，再按既有
 `materiality`、`evidenceState` 與 graph／edge ID 決定；所有其他 edge 仍保留在圖譜，不得因入口
 選擇而刪除。介面必須完整列出所有已計數公司，不得挑「代表公司」、熱門公司或模型推薦，也不得
-從題名、正文或同業名單推導新公司。
+從題名、正文或同業名單推導新公司。公司證據必須排在上述族群起讀文章與系統問題之後，但內容、
+公司數與兩步回查行動不得因漸進揭露而刪減。
 
 每家公司以「先認識本業 → 再看題材關係」兩步承接：第一步只能開該公司的既有正式質化筆記，
 第二步必須直接開同一個已登錄 graph／edge 並顯示證據、商業階段與推論邊界；沒有正式筆記時明示
@@ -666,6 +672,11 @@ question、既有第一站與站次；每張卡的相關族群只取該路線主
 矩陣既有族群順序去重。相同族群可以出現在多條路線，這表示同一角色連到不同系統問題，不是
 重複計分。任何路線沒有可解析的主文章時不得顯示空卡，也不能用熱門度、文字相似度或模型補一條
 關係。第一站按鈕必須實際開啟該路線 step 1 的文章並回到文章頂端。
+問題卡的相關族群必須依 route 已保存的 `groupIds` 對回同一份 `groupMaturity.rows`，並顯示為
+可操作的族群角色入口；點擊後，手機須切換到「依族群名稱查找」，桌機保留兩個面板，兩者都要
+捲到並聚焦同一正式族群選項，再逐字顯示既有 `readerRole` 與 `readerBoundary`。族群預覽既有的
+「會出現在」按鈕仍負責回到原路線，形成雙向導覽；不得由 route label、question、題名、公司名、
+相似度或模型推導新族群或新角色。這些族群按鈕在 780px 以下須至少 44px 高，並有可見鍵盤焦點。
 路線展開後，每一站另以「這站會用到」依原順序顯示該站主文章既有 `groupLabels`；這只是把同篇
 正式研究範圍放到問句旁，幫讀者分辨每站牽涉的產業角色。不得由 route 總族群、圖譜節點、題名、
 相似度或模型替站點補族群，也不得把並列標籤解讀為上下游、因果、受惠或重要性排序；文章沒有
@@ -820,7 +831,13 @@ resize 不得重設使用者已切換的開合狀態。每個 phase 摘要須顯
 主閱讀流程在正文後固定顯示「從這篇接著學」。延伸卡只能由現有 library 與 knowledge graph
 產生：文章必須共享具名公司或宣告族群；圖譜必須已引用本文，或已包含本文的具名公司；族群
 入口只能使用本文已宣告的族群。它是導覽層，不得依文字相似度自行建立供應鏈、客戶或受惠關係。
-正式 route 下一站已由 `routeBridge` 解釋 graph／phase 次序；除此之外，每張一般 article card
+正式 route 下一站已由 `routeBridge` 解釋 graph／phase 次序；每張下一站卡在兩步次序之前還必須
+由目前 article 的 `learningRoute.id` 回查同一份正式 route，逐字顯示 route `question`，讓跨題材
+或跨 phase 時仍保有整條路線的系統問題。最後一站的 route card 必須再逐字顯示同一 `question`、
+`description` 與全部既有 `phases[].label`／各自 `graphIds` 站數，形成「回頭回答整條路線」；缺少
+可解析 route 或 question 時不顯示這個 reader-only 複習，不得用文章題名、正文、相似度或模型補寫。
+這只重排 knowledge graph 已發布的 route，不得建立 phase 之間的上下游、因果、受惠或重要性結論。
+除此之外，每張一般 article card
 都必須附 machine-readable `relationBasis`。先依來源文章 `stockIds` 原順序列出兩篇共同公司，
 只有沒有共同公司時才依來源文章 `groups` 原順序列出共同族群；公司名稱只取對應正式筆記 subject，
 族群名稱只取 library groups，找不到顯示名稱時保留原 ID。共同公司與共同族群都不存在時建置必須
@@ -852,12 +869,22 @@ resize 不得重設使用者已切換的開合狀態。每個 phase 摘要須顯
 語氣；下一站問題逐字取自下一篇已登錄 route 主文章的閱讀任務。所有非末站另須把本篇
 `learningRoute.graphLabel／phaseLabel` 與下一篇相同欄位逐字排成兩步閱讀交接；缺 label 時不得
 用文章題名、相似度或模型補寫。這個 ordered list 只表示 route 既有次序，必須明示不代表
-供應鏈、受惠或因果關係，也不得建立 knowledge graph edge。任何 route 主文章缺少問題或
+供應鏈、受惠或因果關係，也不得建立 knowledge graph edge。末站須在單篇理解檢查旁，把正式
+route 的原系統問題、原路線說明、全部 phase label 與各 phase 站數完整收回，並再次明示只是閱讀
+總複習；不得把完成站次改寫成已掌握、研究結論完成或產業關係已證實。任何 route 主文章缺少問題或
 三句重點都必須讓建置失敗。回看按鈕須把鍵盤焦點與捲動位置一起送回「三句話抓重點」，不能被
 黏性導覽遮住；下一站按鈕須顯示站次、開啟既有文章並回到文章頂端。`.learning-path` 必須建立
 inline-size container；實際內容寬度不超過 620px 時，`.learning-handoff` 與
 `.learning-path-grid` 都改為單欄，不能只依 viewport 判斷，因桌機 master-detail 的正文也可能
 只剩三百多 px。寬專注閱讀才保留並排比較。
+
+末站的「回到學習路線」不得退化成一般 graph deep link。必須把來源 article ID、已完成 route ID、
+文章原 origin 與 window／reader 捲動位置保留成單次 reader-only `route-complete` origin；圖譜控制
+之前先逐字顯示已完成 route label 與原 `question`，再只列其他正式 `learningRoutes` 的 label 與
+question。選項順序沿用 route registry，不得依相似度、人氣、投資重要性或模型排序；不得把 `other`
+暫存圖譜混入正式下一條路線。選定後同步切到該 route 第一個既有 graph，並只從該 route 第一個
+既有 station 建立文章入口；找不到 route、graph 或 station 時不得補寫替代內容。返回文章須恢復
+完成卡、焦點與捲動位置；一般圖譜分頁、hash deep link 及其他 origin 必須維持無完成狀態。
 
 文章內換篇時，`ensureSelected()` 必須優先保留仍開啟且存在於 `byId` 的文章，即使它不符合左側
 目前搜尋、類型或族群條件；不得再由 `filteredArticles()` 的第一篇覆寫下一站。清單須保留原條件

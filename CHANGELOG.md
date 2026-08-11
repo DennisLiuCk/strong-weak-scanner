@@ -1,5 +1,183 @@
 # Changelog
 
+## 完成路線後不再掉回一般圖譜，直接銜接下一個系統問題 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章、group／route／graph 關係、
+active radar／selection log、研究 source／claim／monitor、公司證據與投資判斷零變動**；本次只在
+正式學習路線末站返回知識圖譜時，保留 reader-only 完成脈絡並補上下一條正式問題路線的選擇，
+同步研究維護契約、方法清單、README、payload 版本與測試。
+
+- 以固定 1440×900 與 390×844 實際走讀「公司財務案例第 1/1 站 → 回到學習路線 → 知識圖譜 →
+  供電與散熱 → 800VDC 功率半導體鏈」。修改前末站按鈕只呼叫一般 `openRadarGraph(card.graphId)`；
+  回圖後 `graphOrigin` 為 hidden，首屏只剩「目前這張圖 · 公司財務案例」，讀者必須展開一般控制、
+  自行辨認四條 route 並猜下一步。這是同一瀏覽器尺寸與完整 DOM 的版面／資訊架構觀察，不是讀者
+  理解率或學習成效統計。
+- 末站現在把來源 article、已完成 route、原 article origin 與 window／reader 捲動位置保留成
+  `route-complete` origin。圖譜控制之前先逐字顯示「你已完成哪一條」與該 route 原 `question`，
+  再依 registry 原順序只列其他正式 route 的 label／question；不含已完成 route，也不把 `other`
+  暫存圖譜混入。選定後同步切到該 route 第一個既有 graph，並只用同 route 第一個既有 station
+  建立「從這一站開始」入口；沒有 route／graph／station 時不生成替代內容。
+- 390px 實測 `innerWidth = body.scrollWidth = 390px`；三個下一條選項各為 341×82px，返回文章為
+  341×44px，選定後第一站行動為 317×44px。1440px 桌機同樣無水平溢位，三個選項為三欄、各
+  452×80px。完成「公司財務案例」後選「供電與散熱」，hash 與目前圖譜同步變成
+  `800v-power-tree`，起點逐字顯示「800VDC 功率半導體鏈」，開文後為同一路線第 1/9 站。
+  同一 390px 尺寸返回剛才文章時，window 捲動位置與完成按鈕 top 差值皆為 0，焦點回到原
+  「回到學習路線」按鈕；直接 graph deep link 的完成卡維持 hidden 且 0 個 children。
+- `learningPathVersion: 90 → 91`。獨立 Python 與 Node JSON 路徑各自核對 4 條正式路線、25 站、
+  每條完成後 3 個其他選項，且每條第一 station 的 article 都存在。current 為 91、HEAD 為 86；
+  排除累積五輪 reader-only 版本後兩邊都是 274 篇、article IDs 完全相同，canonical LIB payload
+  SHA-256 均為 `f039aa829e7b3a08bccc472968aee94fb1cdd71d2e6d834ef783e539fe2264f0`。
+- Darwin 25.5.0 arm64、Python 3.11.11、`C.UTF-8` 環境執行 526 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `917f5ee40cfaab698a312364fac64b061b146b307fa4d74468644605d1d05a1e`；`git diff --check` 為空。
+- 修正前後完成卡、手機／桌機返回圖譜、下一條已選與第一站畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave138-route-complete-next/`。固定 Browser viewport 不是
+  實機；本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或
+  完整實體鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
+## 下一站不再掉出系統問題，末站補上整條路線總複習 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章、group／route／graph 關係、
+active radar／selection log、研究 source／claim／monitor、公司證據與投資判斷零變動**；本次只在
+既有正式學習路線的文章交接與完成卡，重排已發布的 route 問題、說明、階段與站數，並同步研究
+維護契約、方法清單、README、payload 版本與測試。
+
+- 以固定 1280×720 與 390×844 實際走讀「矽智財族群起點 → 供電與散熱第 7/9 站 → 第 8/9 站 →
+  第 9/9 站」。修改前單篇已具備讀後自我檢查、三句提示、下一站問句與 graph／phase 兩步交接，
+  但跨到「液冷部署」時沒有再顯示整條路線原本要回答的問題；末站完成卡也只有「供電與散熱、
+  第 9/9 站」，沒有重問系統問題或回顧三個階段。這是同一瀏覽器尺寸與完整 DOM 的版面／資訊架構
+  觀察，不是讀者理解率或學習成效統計。
+- 4 條正式路線的 21 個非末站交接現在會先由目前 article `learningRoute.id` 回查同一份已發布
+  route，逐字顯示 `question`，再顯示原 graph／phase 兩步次序。4 張末站卡則逐字顯示同一
+  `question`、`description`、全部 `phases[].label` 與各 phase 原 `graphIds` 站數；解析不到正式
+  route 或問題時不生成替代內容，也不讀題名、正文、相似度或模型補寫關係。
+- 實際瀏覽器確認：「AI 機櫃信任根 → 液冷 CDU」交接前新增原系統問題「電力如何送進 AI 機櫃，
+  產生的熱又如何被帶走？」；最後一站總複習依正式資料列出「供電、保護與元件 3 站／機櫃運作與
+  驗證 4 站／液冷部署 2 站」。390px 與 1280px 均為 `innerWidth = body.scrollWidth`，原本的單篇
+  理解檢查、下一站問句、公司／圖譜延伸與返回矽智財族群入口皆保留。
+- `learningPathVersion: 89 → 90`。獨立 Python 與 Node 路徑各自核對 4 條路線、25 站、21 個非末站
+  交接與 4 個末站總複習，4/4 route 都有正式 question、phase 且 phase 站數完整覆蓋 stations。
+  current 為 90、HEAD 為 86；排除累積四輪 reader-only 版本後兩邊都是 274 篇且 canonical LIB
+  payload 完全相同，SHA-256 均為
+  `f039aa829e7b3a08bccc472968aee94fb1cdd71d2e6d834ef783e539fe2264f0`。
+- Darwin 25.5.0 arm64、Python 3.11.11、`C.UTF-8` 環境執行 525 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `6989a30957fcead73a623c9b0249f33f44baaf515d1ecff0761026c36c3e1e57`。
+- 族群起點、文章首屏、單篇理解檢查、跨階段交接、末站總複習，以及桌機／手機同尺寸前後比較存於
+  `tmp/research-learning-audit-2026-08-11-wave137-learning-handoff/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
+## 族群入口先交代首篇問題，再進公司證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章、group／route／graph 關係、
+active radar／selection log、研究 source／claim／monitor、公司證據與投資判斷零變動**；本次只把
+族群矩陣既有起讀文章的讀前脈絡提前，並同步研究維護契約、方法清單、README、payload 版本與
+測試。
+
+- 以固定 1280×720 與 390×844 走讀「族群角色 → 首篇文章 → 返回族群」。修改前選取「矽智財」
+  後，3 張公司證據先於通用的「從第一篇開始」按鈕出現；按鈕前看不到文章標題、要回答的問題、
+  路線位置或閱讀時間。文章本身已能正確顯示族群來源與第 7/9 站，所以本輪修補的是點擊前的脈絡
+  與資訊順序，不改寫文章或路線關係。這是同一瀏覽器尺寸與狀態的 DOM／畫面觀察，不是讀者理解率
+  或閱讀速度統計。
+- 11 個正式族群現在依序顯示原有 `readerRole`／`readerBoundary`、可解析的既有
+  `learningStart.articleId`、該文章的原標題與 `readerQuestion`、原路線階段／站次及
+  `readingMinutes`，再顯示路線收錄與公司證據。起讀文章不存在時明示缺口，不使用相似標題、
+  題材文字或模型推論補位；公司卡、按鈕與既有關係完整保留。
+- 實際瀏覽器操作確認：「矽智財」入口在公司證據前顯示「AI 機櫃如何判斷控制指令可信」、原讀者
+  問句、「供電與散熱 · 機櫃運作與驗證 · 第 7/9 站」及 21 分鐘；390px 手機兩個操作按鈕高度
+  皆為 44px，且 `innerWidth = body.scrollWidth = 390px`。點擊後開啟同一篇文章，文章顯示
+  「矽智財 · 族群矩陣」與第 7/9 站；返回後保留同一族群與起讀卡。
+- `learningPathVersion: 88 → 89`。獨立 Python 與 Node 路徑解析 current 與
+  `git show HEAD:research.html`；current 為 89、HEAD 為 86，排除累積三輪 reader-only 版本後
+  兩邊都是 274 篇且 canonical LIB payload 完全相同，SHA-256 均為
+  `f039aa829e7b3a08bccc472968aee94fb1cdd71d2e6d834ef783e539fe2264f0`。兩條路徑也各自確認
+  11/11 個族群起點都能解析到標題完全相同且具有讀者問句的既有文章。
+- Darwin 25.5.0 arm64、Python 3.11.11、`C.UTF-8` 環境執行 524 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `93658bc7c8afe74a933d9da8533283926bc04298e1245c1a5528e2b5270e0788`。
+- 桌機／手機族群入口、文章開啟、返回狀態與同尺寸前後比較存於
+  `tmp/research-learning-audit-2026-08-11-wave136-group-start/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，因此
+  不宣稱理解率已提升或完整無障礙合規。
+
+## 學習路線可直接查族群角色，並回到原問題 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章、group／route／graph 關係、
+active radar／selection log、研究 source／claim／monitor、公司曝險與投資判斷零變動**；本次只把
+族群矩陣既有的路線—族群關係做成 reader-only 雙向導覽，並同步研究維護契約、方法清單、README、
+payload 版本與測試。
+
+- 以固定 1280×720 與 390×844 走讀「族群矩陣 → 學習路線 → 族群角色」。修改前 4 張路線卡
+  已列出 21 個族群位置、涵蓋全部 11 個正式族群，但 21 個都是靜態標籤；讀者若想知道「功率元件」
+  和「電源供應」在同一路線裡各自負責什麼，需要自行切到另一個入口再尋找。這是完整 route DOM
+  與既有 payload 的決定性列舉，不是讀者理解率或閱讀速度統計。
+- 路線卡現在把既有 `route.groupIds` 與 `groupMaturity.rows` 對上的 21 個正式族群全部做成按鈕，
+  並明示「點族群名稱，先看它在產業裡做什麼」。點擊只開啟該族群原有的 `readerRole` 與
+  `readerBoundary`，不依標題相似度、文章文字或模型判斷推建新關係；無法解析的 ID 仍退回靜態
+  標籤。族群角色原有的「會出現在」路線連結則保留，因此形成「系統問題 → 族群角色／邊界 →
+  原系統問題」的雙向路徑。
+- 實際瀏覽器操作確認：桌機點「功率元件」後，族群角色區聚焦並顯示原有角色與邊界，路線與族群
+  兩欄仍同時可見；再點「供電與散熱」會回到原路線。390px 手機點「電源供應」後只顯示族群角色
+  面板，回點路線後只顯示路線面板；21 個按鈕高度都至少 44px，且
+  `innerWidth = body.scrollWidth = 390px`。
+- `learningPathVersion: 87 → 88`；獨立 Python 路徑解析 current 與
+  `git show HEAD:research.html`，排除版本後兩邊都是 274 篇且 canonical LIB payload 完全相同，
+  SHA-256 均為 `f039aa829e7b3a08bccc472968aee94fb1cdd71d2e6d834ef783e539fe2264f0`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 環境執行 524 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `4b92a5b37be55f7ff1df9dc196108252f1bed662dd0a1edf3ebd83130e5b10f2`。
+- 桌機／手機矩陣、族群角色、雙向跳轉與同尺寸前後比較存於
+  `tmp/research-learning-audit-2026-08-11-wave135-group-connections/`。固定 Browser viewport 不是
+  實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，
+  因此不宣稱理解率已提升或完整無障礙合規。
+
+## 研究雷達先呈現現在可讀的問題 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、
+priority、status、selection decision、article／graph／group 關係、研究 source／claim／monitor、
+公司曝險與投資判斷零變動**；本次只調整研究雷達候選題地圖的 reader-only 分組與文案，並同步
+研究維護契約、方法清單、README、payload 版本與測試。
+
+- 以固定 1280×720 與 390×844 走讀「研究雷達入口 → 候選題地圖 → 候選卡」。修改前展開地圖
+  會把 8 題以同一視覺權重一次列出；390px 首屏只看得到前 5 題的一部分，讀者要靠較小的狀態列
+  才能分辨其中 2 題已經有文章、其餘 6 題仍待查或暫緩。這是完整 8 題的決定性 DOM 列舉與同一
+  瀏覽器尺寸的版面觀察，不是讀者理解率或閱讀速度統計。
+- 候選題地圖現在先顯示「現在可以讀」：只沿用 `candidate.articleId` 且該 ID 確實存在於已發布
+  article map 的候選，依原候選順序列出問題與既有閱讀分鐘。完整清單放在次一層原生
+  `details／summary`，仍逐題保留原 rank、reader status、next check、問題文字與順序；沒有使用
+  標題相似度、模型判斷或新建跨族群關係。沒有已發布文章時，完整清單會預設展開。
+- 實際瀏覽器 DOM 為 2 張「現在可以讀」、8 張完整候選、合計 10 個跳轉按鈕；ready IDs 與
+  可解析 articleId 的候選完全相同，完整清單的 8 個 IDs、8 段問題文字與 active radar 原順序
+  完全相同。390px 為 `innerWidth = body.scrollWidth = 390px`；桌機與手機都能展開／收合完整
+  清單。點擊可讀第 2 題後，焦點停在原候選卡 `radar-candidate-RC-AI-STORAGE-DATA-PLANE`，
+  內層雷達頁捲動至該卡，沒有繞過候選脈絡直接開文章。
+- `learningPathVersion: 86 → 87`；獨立 Python 路徑解析 current 與 `git show HEAD:research.html`，
+  排除版本後兩邊都是 274 篇且 canonical LIB payload 完全相同，SHA-256 均為
+  `f039aa829e7b3a08bccc472968aee94fb1cdd71d2e6d834ef783e539fe2264f0`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 環境執行 524 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `4ed536f3eb5a5fb1a13f9fdbe9128fc3c91c9d7ec47a7d0915636f92b9a29c66`。
+- 桌機／手機預設、ready-first、完整清單與跳轉後焦點截圖，以及同尺寸前後比較，存於
+  `tmp/research-learning-audit-2026-08-11-wave134-radar-guidance/`。固定 Browser viewport 不是
+  實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，
+  因此不宣稱理解率已提升或完整無障礙合規。
+
 ## 公司財報案例補上毛利率拆解正文 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、topic
