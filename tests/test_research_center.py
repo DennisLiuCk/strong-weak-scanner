@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 95)
+        self.assertEqual(library["learningPathVersion"], 96)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2752,7 +2752,6 @@ class ResearchCenterTest(unittest.TestCase):
             "function graphRouteId(graphId)", "function activateGraphRoute(routeId)",
             "function activateGraphTopic(graphId)",
             "function graphRoutePhase(route,graphId)",
-            "parts.push('階段 '+phase.step+'/'+phase.total+' · '+phase.label)",
             "const group=h('optgroup',{label:'階段 '+(index+1)+'/'+phases.length+' · '+phase.label})",
             "graphRoute:graphRouteId((KG.graphs||[])[0]?.id||'')",
             "state.graphRoute=graphRouteId(graphId)",
@@ -2951,6 +2950,21 @@ class ResearchCenterTest(unittest.TestCase):
             'class="graph-control-current" id="graphControlCurrent"',
             'class="graph-control-meta" id="graphControlMeta"',
             "function renderGraphControlSummary(graph,route)",
+            'id="graphReadingMission" aria-labelledby="graphReadingMissionTitle" aria-live="polite" aria-atomic="true"',
+            'id="graphReadingMissionTitle"',
+            'id="graphReadingMissionPosition"',
+            'id="graphReadingPhasePurpose"',
+            'id="graphReadingGraphFocus"',
+            "function renderGraphReadingMission(graph,route)",
+            "question=String(route?.question||'').trim()",
+            "purpose=String(phase?.purpose||route?.description||'').trim()",
+            "focus=String(graph.summary||'').trim()",
+            "root.dataset.phaseId=phase?.id||''",
+            "'本階段先練習 · '+phase.label",
+            "'這張圖先看 · '+graph.label",
+            "mission?.dataset.graphId!==graph.id",
+            "整體問題與階段任務逐字沿用正式學習路線",
+            "圖譜焦點逐字沿用目前圖譜摘要",
             "evidence=['verified','inference','unverified']",
             "state.graphView==='company'&&state.graphUniverseOnly",
             "renderGraphControlSummary(graph,route);introActions.replaceChildren()",
@@ -2962,10 +2976,15 @@ class ResearchCenterTest(unittest.TestCase):
             ".graph-control-summary{min-height:72px",
             ".graph-chip{min-height:44px}.graph-filter{min-height:44px}",
             ".graph-control-fold[open]>.graph-control-summary{border-bottom:1px solid var(--line2)}",
+            ".graph-reading-mission-grid{grid-template-columns:1fr}",
         ):
             self.assertIn(contract, template)
         self.assertNotIn(
             ".graph-control-fold[open]>.graph-control-summary{display:none}",
+            template,
+        )
+        self.assertNotIn(
+            "document.getElementById('graphSummary').textContent=graph.summary+",
             template,
         )
 

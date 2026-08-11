@@ -1,5 +1,40 @@
 # Changelog
 
+## 圖譜首屏先說明整體問題、階段任務與這張圖的閱讀焦點 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、
+group／route／phase／graph 關係、active radar／selection log、公司證據與投資判斷零變動**；
+本次只把正式學習路線與圖譜已有的三層讀圖任務放進圖譜首屏，並同步研究維護契約、方法清單、
+README、reader-only payload 版本、發布頁與測試。
+
+- 修改前，收合控制列只顯示 route、graph 與 phase label，讀者看不到整條路線要回答的問題、目前
+  階段要建立的判斷能力，或當前圖譜先看什麼。修改後，控制列下方固定顯示「整體問題／本階段先
+  練習／這張圖先看」三層任務，分別逐字沿用正式 `route.question`、`phase.purpose` 與
+  `graph.summary`；換 route 或 graph 時同步更新。圖譜既有介紹改成下一步操作提示，不再重複
+  `graph.summary`。這是資訊架構與畫面觀察，不是讀者理解率或學習成效統計。
+- Browser 實走「記憶體與封裝 → AI 記憶體分層 → 玻璃基板商業化」及「供電與散熱 → 液冷
+  CDU」：mission 的 route／phase／graph ID、問題、purpose 與焦點都隨正式選站資料切換；只有
+  關係或檢視狀態改變時不重複觸發 live region。卡片同時明示中心距離、題材財務與投資排序邊界，
+  沒有由版面位置新增供應鏈、受惠或因果關係。
+- 320×844、390×844、780×900、1280×720、1440×900 五個 viewport 的
+  `documentElement.scrollWidth` 都等於 viewport 寬度，沒有水平溢位。320px 卡片約 300px 寬、
+  390px 約 370px、780px 約 760px；1280px 與 1440px 皆維持雙欄，欄寬分別約 600.5px 與
+  680.5px，窄版改為單欄。
+- `learningPathVersion: 95 → 96`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章、4 條正式
+  route、10 個 phase、25 站、25 張 graph，以及 4/4 非空問題、10/10 非空 purpose、25/25
+  非空 summary；排除 reader-only 版本後，current 與 HEAD payload 完全相同，兩邊 canonical
+  SHA-256 都是 `af97e43694a980da1d0cec9b4e77c838784abda7beabe6818f38dbf9f11aa205`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 預設環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `bc05244d9c93a6abb543bc514f8554c039aae12837d2bdbb171e99f73e33c813`。
+- 修改前、桌機／手機同狀態比較、phase 3 動態任務與 320px 畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave143-graph-mission/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
 ## 選站前先看懂三個階段各要學什麼 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、
