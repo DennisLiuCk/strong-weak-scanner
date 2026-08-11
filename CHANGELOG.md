@@ -1,5 +1,39 @@
 # Changelog
 
+## 市場議題中長段落依句數補足閱讀停頓 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、原始 Markdown、研究 source／claim／
+comparison／monitor、鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷
+零變動**；本次只調整市場議題主正文的 reader-only 句末停頓 profile，並同步研究維護契約、
+方法清單及測試。
+
+- Python 靜態解析與瀏覽器內另一條獨立解析路徑，完整重算 35 篇市場議題、121 個主正文節、
+  140 個原始 paragraph，兩邊逐項一致：段落中位數 95.5 字、最長 390 字；既有「120 字且至少
+  兩句」只涵蓋 32 段／15 篇、形成 61 個停頓。這是完整發布母體的決定性列舉，不是抽樣統計，
+  SE／t／有效獨立觀測不適用；字數門檻只是版面契約，不是內容品質分數。
+- `readerProseNeedsBreak()` 保留正式筆記與多空小作文既有 120 字／兩句契約；只有
+  `showReaderAids` 成立的市場議題主正文，才改成「100 字以上且至少兩句，或 80 字以上且至少
+  三句」。新 profile 共涵蓋 61 段／23 篇、形成 103 個停頓，相對舊契約新增 29 段／16 篇；
+  新手導讀、研究摘要、查核附錄及其他文章類型不套用。
+- 實際瀏覽器逐篇驗證 35／35 篇、140／140 段：61 段 class、字數、句數與 103 個停頓全部符合
+  契約，原 paragraph 數、`textContent`、粗體、連結數及順序逐段等於 payload，停頓全為空字串且
+  `aria-hidden="true"`，0 個契約錯誤。代表 103 字兩句與 82 字三句的段落現在都有可見停頓；
+  390px iframe 的正文寬 354px、`scrollWidth == innerWidth == 390px`，停頓為 8.25px block，
+  沒有水平溢位。前後畫面、完整 census 與稽核筆記存於
+  `tmp/research-learning-audit-2026-08-11-wave121-paragraph-rhythm/`。
+- `learningPathVersion: 73 → 74`；排除版本後 canonical LIB payload 前後完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。方法 registry
+  fingerprint 仍為 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，
+  因此不建立內容相同的新方法快照。
+- 固定 1280 × 720 瀏覽器與 390px iframe 不是實機；本輪未做真實新手理解測試、VoiceOver／
+  TalkBack、200%／400% zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱實際理解率
+  已提升或完整無障礙合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 `C.UTF-8` 環境執行 519 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA
+  一致：`index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `74908d0bea4cc72d2b23f6127a04c35f19f5af13fc7bb3abf2c507af828cf0d3`。
+
 ## 主正文入口重新顯示首屏問題 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、

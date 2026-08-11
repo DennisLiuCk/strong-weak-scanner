@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 73)
+        self.assertEqual(library["learningPathVersion"], 74)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1972,7 +1972,7 @@ class ResearchCenterTest(unittest.TestCase):
             "class:'reader-table-system-row-label',text:positionLabel",
             "class:'table-wrap'+(systemRows?' reader-system-table':'')",
             "readerTablePositions=readerTableSystemPositions(item,tableHeaders)",
-            "block(item,{readableProse:mode==='reader',textTransform,readerTablePositions})",
+            "block(item,{readableProse:mode==='reader',readerProseProfile:showReaderAids?'topic':'default',textTransform,readerTablePositions})",
             "'data-reader-table-system-map':positions.length",
             "系統位置索引",
             "先把第一欄放在一起，知道本文正在比較哪些位置，再逐列核對其餘欄位。",
@@ -2155,11 +2155,15 @@ class ResearchCenterTest(unittest.TestCase):
             "function escapeReaderPattern(value)",
             "function formalPositioningReaderText(article,value)",
             "function runs(nodes,{sentenceBreaks=false,textTransform=null}={})",
+            "function readerProseNeedsBreak(text,sentenceCount,profile='default')",
+            "if(sentenceCount<2)return false",
+            "if(text.length>=120)return true",
+            "profile==='topic'&&((text.length>=100)||(text.length>=80&&sentenceCount>=3))",
             "reader-prose-dense",
             "'data-reader-chars':text.length",
             "'data-reader-sentences':sentenceCount",
-            "text.length>=120&&sentenceCount>=2",
-            "{readableProse:mode==='reader',textTransform,readerTablePositions}",
+            "readerProseNeedsBreak(text,sentenceCount,readerProseProfile)",
+            "readerProseProfile:showReaderAids?'topic':'default'",
             "@container (max-width:860px){.reader-prose-dense .reader-sentence-break{display:block;height:.45em}}",
             ".reader-prose-dense .reader-sentence-break{display:block;height:.55em}",
             "class:'reader-sentence-break','aria-hidden':'true'",
@@ -2187,7 +2191,7 @@ class ResearchCenterTest(unittest.TestCase):
             "replace(/`last_updated`/g,'「更新日期」')",
             "replace(/「更新日期」\\s+/g,'「更新日期」')",
             "section.h==='研究定位與重要註記'?value=>formalPositioningReaderText(article,value):null",
-            "const rendered=block(item,{readableProse:mode==='reader',textTransform,readerTablePositions})",
+            "const rendered=block(item,{readableProse:mode==='reader',readerProseProfile:showReaderAids?'topic':'default',textTransform,readerTablePositions})",
             "normalizedReaderRunTexts(source).map(text=>textTransform?textTransform(text):text)",
         ):
             self.assertIn(contract, template)
