@@ -1,5 +1,77 @@
 # Changelog
 
+## 研究雷達先講未解問題，族群矩陣分開學習與盤點 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、
+priority、status、selection decision、文章／圖譜／族群矩陣 payload、研究 source／claim／monitor、
+公司曝險與投資判斷零變動**；本次只調整研究雷達、族群矩陣與頂部導覽的 reader-only 顯示，
+並同步研究維護契約、方法清單及測試。
+
+- 本輪以 1280×720 與 390×844 重新走讀「研究文章入口 → 研究雷達 → 雷達候選 → 族群矩陣 →
+  本題文章」。修改前雷達首屏同時顯示 5 個摘要 pill，候選卡再把 selection decision、`P1／P2／P3`
+  priority 與讀者 status 並排；族群矩陣主標題與第一區都以相近的「從問題開始」措辭開場，手機
+  首屏未先把學習入口與研究盤點分開。這些是當輪固定瀏覽器畫面的結構觀察，不是理解率統計。
+- 雷達改以「研究中心還在追哪些問題」明示每張卡都尚未完整回答，並逐一解釋「已有文章／等待
+  更多證據／暫緩研究」的讀者動作。摘要只留待查問題數、已有文章數與下次總檢查；完整 DOM
+  census 為 8 張候選卡、8／8 張首層各只有 1 個正式 status、0 個 `P1／P2／P3` 或 selection
+  decision，8 個 priority 與 8 個 selection decision 全數保留在逐卡查核區。第一層沒有因此刪除
+  技術題名、已知線索、缺口、下一證據、族群問句、文章或圖譜行動。
+- 族群矩陣主標題改成「把一個產業問題拆成角色與文章」；頁首先說明第一次只看上半部的問題、
+  第一篇與站次，下半部完成度只表示研究資料是否齊全，不是產業成熟度、股票排名或受惠程度。
+  頂部共用說明也改成四個可執行選擇：找現有答案、看未解問題、認識產業分工、核對證據關係。
+- 390px 雷達與族群矩陣皆為 `innerWidth = scrollWidth = 390px`；1280px 亦無水平溢位。雷達
+  查核區用既有原生 `details／summary` 保留操作資料，click 後焦點停在同一 `SUMMARY`，開啟與
+  收合狀態正確；固定 Browser 的鍵盤事件模擬不足以支持完整鍵盤相容宣稱，故本輪不宣稱已完成
+  實體鍵盤或輔具驗收。桌機、手機、雷達→矩陣承接與前後合併比較存於
+  `tmp/research-learning-audit-2026-08-11-wave130-cross-surface/`。
+- `learningPathVersion: 82 → 83`；Python 與獨立 Node 路徑排除版本後都確認 current／HEAD
+  canonical LIB payload 完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- macOS 26.5.2 arm64、Python 3.11.11、預設 UTF-8 環境執行 521 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning，inline JavaScript syntax 通過。
+  連續兩次 dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `db6fc9cfef872d6a5ff35e3be550d0036d6e7f892d17b3edfba1135188114e59`。
+- 固定瀏覽器與 responsive viewport 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、
+  200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱理解率已提升或完整無障礙合規。
+
+## 正式筆記首屏移除內部分類與重複摘要 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、
+priority、status、文章 groups／reader 問句、研究 source／claim／monitor、圖譜 node／edge／view、
+正式筆記 Markdown、查核狀態、公司曝險與投資判斷零變動**；本次只整理正式筆記清單與首屏的
+reader-only 顯示，並同步研究維護契約、方法清單及測試。
+
+- Python 與獨立 Node 路徑解析目前完整發布母體 121 篇正式筆記：121／121 個首個重點直接含
+  `[S#]`，共 220 個來源編號；12 篇含 `semiequip／serverodm／packtest／powersupply／passive`
+  等不透明內部分類；121／121 個原始摘要在移除來源編號、空白及標點後，與首個重點互相包含。
+  這是完整發布母體的決定性列舉，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- `readerLeadParts()` 只在可見開場把 `[S#]` 從主句移到獨立「原文來源標記」列；正文、來源區、
+  原始 Markdown 與 payload 仍完整保留。`formalReaderDisplayText()` 只對該篇 `article.groups` 中
+  六個白名單內部分類換成既有中文族群名，`power／memory／material` 等正常技術英文仍只在固定
+  `族群：<ID>` 語境翻譯。查核提示與頁尾也改用「原始正式筆記／查核資料」等一般讀者語言。
+- 正式筆記清單用可重現的字元正規化比較原摘要與首個重點；互相包含時不再顯示第二遍，未來兩者
+  真正不同時仍保留「原始摘要」。實際瀏覽器完整 DOM census 為 121 張卡、121 行來源提示、
+  0 個不透明 ID、0 張重複摘要；3587 閎康首屏與正文均顯示「半導體設備」，`semiequip` 與
+  `metadata` 在可見 snapshot 中皆為 0，console error 亦為 0。
+- 390px 實測 `innerWidth = scrollWidth = 390px`，新手任務卡寬 354px、主要行動高 44px；1280px
+  同樣無水平溢位。修改前後合併比較確認原問題、查核狀態、主行動與完整來源提示都未被裁切；
+  桌機、手機、清單、完整 DOM census 及前後比較存於
+  `tmp/research-learning-audit-2026-08-11-wave129-next-break/`。
+- `learningPathVersion: 81 → 82`；Python 與獨立 Node 路徑排除版本後都確認 current／HEAD
+  canonical LIB payload 完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- 固定瀏覽器與 responsive viewport 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、
+  200%／400% zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱理解率已提升或完整無障礙
+  合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 UTF-8 環境執行 521 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning，inline JavaScript syntax 通過。
+  連續兩次 dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `688a63d12d6d2430fc1db25c1b3329ef14b5531b242d2d6751868fbabd3d2583`。
+
 ## 關係詳情可連續比較同篇文章角色 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、

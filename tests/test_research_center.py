@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 81)
+        self.assertEqual(library["learningPathVersion"], 83)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1402,11 +1402,15 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-reading-start':roleFirst?'role':'source'", "先看產業角色",
             "開始讀三句重點", "先抓住一個重點，再帶著問題讀",
             "先抓住這個重點", "讀完能回答", "為什麼值得讀",
-            "lead=(mission.keyPoints||[]).find(Boolean)||mission.orientation",
+            "rawLead=(mission.keyPoints||[]).find(Boolean)||mission.orientation",
+            "lead=readerLeadParts(article,rawLead)",
             "function readerMissionLeadNodes(", "reading-mission-clause-break",
-            "function readingMissionNotationGuide(", "mission?.readerNotations||[]",
+            "function readingMissionNotationGuide(article,mission)",
+            "mission?.readerNotations||[]",
             "data-reading-mission-notation-count", "先解碼這段的 ",
-            "const notationGuide=readingMissionNotationGuide(mission)",
+            "const notationGuide=readingMissionNotationGuide(article,mission)",
+            "class:'reading-mission-citations'", "原文來源標記：",
+            "正文與來源區完整保留",
             ".reading-mission-notation>summary{min-height:44px;",
             "event.preventDefault();fold.open=!fold.open});return fold",
             "reading-mission-why", "需要更多脈絡時再展開",
@@ -1440,7 +1444,7 @@ class ResearchCenterTest(unittest.TestCase):
             "topicGuide?topicRoles[index]:null",
             "function readingMissionTermGuide(", "data-reading-mission-term-count",
             "data-reading-mission-article-term-count", "先認得這兩句的 ",
-            "const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)",
+            "const termGuide=readingMissionTermGuide(lead.text,mission.question,glossaryTerms)",
             ".reading-mission-terms>summary{min-height:44px;",
             "class:'beginner-keypoints'", "data-keypoint-term-count",
             "data-keypoint-shared-term-count", "研究中心共通語",
@@ -1589,16 +1593,16 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("readerTermDefinitionList(matches,'reading-mission-term-list')", template)
         self.assertIn("if(!matches.length)return null;const articleCount=", template)
         self.assertLess(
-            template.index("const notationGuide=readingMissionNotationGuide(mission)"),
-            template.index("const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)"),
+            template.index("const notationGuide=readingMissionNotationGuide(article,mission)"),
+            template.index("const termGuide=readingMissionTermGuide(lead.text,mission.question,glossaryTerms)"),
         )
         self.assertLess(
-            template.index("const termGuide=readingMissionTermGuide(lead,mission.question,glossaryTerms)"),
-            template.index("if(mission.orientation&&mission.orientation!==lead)"),
+            template.index("const termGuide=readingMissionTermGuide(lead.text,mission.question,glossaryTerms)"),
+            template.index("if(mission.orientation&&mission.orientation!==rawLead)"),
         )
         self.assertLess(
             template.index("section=h('section',{class:'reading-mission','aria-labelledby':'readingMissionTitle'},head,grid,actions)"),
-            template.index("const notationGuide=readingMissionNotationGuide(mission)"),
+            template.index("const notationGuide=readingMissionNotationGuide(article,mission)"),
         )
         self.assertNotIn("orderedBeginnerBlocks", template)
         self.assertIn("else if(analyst){let guideInserted=false;", template)
@@ -2199,7 +2203,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function normalizedReaderRunTexts(nodes)",
             "function readerRunNode(run,text)",
             "function escapeReaderPattern(value)",
-            "function formalPositioningReaderText(article,value)",
+            "function formalReaderDisplayText(article,value)",
             "function runs(nodes,{sentenceBreaks=false,textTransform=null}={})",
             "function readerProseNeedsBreak(text,sentenceCount,profile='default')",
             "if(sentenceCount<2)return false",
@@ -2267,26 +2271,35 @@ class ResearchCenterTest(unittest.TestCase):
         # 只讀並複製原 runs 的顯示值，不回寫文章或把一般清單推成投資框架。
         self.assertNotIn("node.items=READER_KPI_COMPASS_ITEMS", template)
 
-    def test_formal_positioning_hides_internal_maintenance_terms_in_reader_view_only(self):
+    def test_formal_reader_hides_internal_taxonomy_and_maintenance_terms_in_view_only(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
-            "function formalPositioningReaderText(article,value)",
+            "const FORMAL_READER_OPAQUE_GROUP_IDS=new Set([",
+            "'passive','powersupply','serverodm','semiequip','packtest','ipdesign'",
+            "function formalReaderDisplayText(article,value)",
             "if(article?.type!=='formal_note')return source",
+            "FORMAL_READER_OPAQUE_GROUP_IDS.has(groupId)",
             "groupById.get(groupId)?.label",
+            "prefix+label",
             "'本文族群：'+label",
             "replace(/Universe 質化參考/g,'研究中心的公司質化參考')",
             "replace(/\\s+研究中心的公司質化參考/g,'研究中心的公司質化參考')",
             "replace(/查核狀態以 meta 與 `qual_notes\\.py --lint` 為準/g,'查核狀態請以文章上方標示為準')",
             "replace(/`last_updated`/g,'「更新日期」')",
             "replace(/「更新日期」\\s+/g,'「更新日期」')",
-            "section.h==='研究定位與重要註記'?value=>formalPositioningReaderText(article,value):null",
+            "textTransform=mode==='reader'&&article.type==='formal_note'?value=>formalReaderDisplayText(article,value):null",
+            "function readerLeadParts(article,value)",
+            "source.replace(/\\[(S\\d+)\\]/gi",
+            "article.type!=='formal_note'||item.kind!=='internal_taxonomy'",
             "const rendered=block(item,{readableProse:mode==='reader',readerProseProfile:showReaderAids?'topic':'default',textTransform,readerTablePositions})",
             "normalizedReaderRunTexts(source).map(text=>textTransform?textTransform(text):text)",
+            "查核狀態沿用原始正式筆記；本頁只改善導覽，不改動原始證據邊界。",
+            "研究內容以原始 Markdown 與查核資料為準",
         ):
             self.assertIn(contract, template)
         # 只轉換實際建立 DOM 的文字；原始 run、文章 sections 與 payload 都不回寫。
-        self.assertNotIn("run.s=formalPositioningReaderText", template)
-        self.assertNotIn("article.sections=formalPositioningReaderText", template)
+        self.assertNotIn("run.s=formalReaderDisplayText", template)
+        self.assertNotIn("article.sections=formalReaderDisplayText", template)
 
     def test_template_explains_the_reading_purpose_of_research_section_headings(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2331,6 +2344,13 @@ class ResearchCenterTest(unittest.TestCase):
             "article.type==='formal_note'?'先認識本業'",
             "article.type==='narrative'?'先看勝負手':'先學一件事'",
             "function catalogLearningPreview(article,readerQuestion)",
+            "function catalogComparableText(value)",
+            "function catalogTechnicalTitle(article,lead)",
+            "titleKey.includes(leadKey)||leadKey.includes(titleKey)",
+            "lead=readerLeadParts(article,rawLead)",
+            "class:'result-learning-source'",
+            "原文來源標記：",
+            "if(technicalTitle)button.appendChild",
             "'data-catalog-learning-id':article.id",
             "text:catalogLearningLabel(article)",
             "text:'讀完能回答'",
@@ -2759,12 +2779,14 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderRadarCandidate(", "function openRadarGraph(",
             "'data-testid':'radar-'+candidate.id", "candidate.firstRejection",
             "candidate.nextEvidence", "candidate.nextCheck",
-            "排序只用來安排研究先後，不代表預期報酬、股價方向或投資建議",
+            "研究中心還在追哪些問題",
+            "每張卡都是一個還沒有完整答案的產業問題", "已有文章與關係圖",
+            "順序只安排研究先後，不代表預期報酬、股價方向或投資建議",
             "候選排名不是投資評分", "deepLink==='radar'",
             "candidate.readerQuestion", "candidate.readerStartingPoint",
             "candidate.readerNextStep",
             "candidate.readerTerms", "questionText=candidate.readerQuestion||candidate.title",
-            "這題想弄清楚", "研究題名：", "先知道這件事", "接著查什麼",
+            "還沒回答完整的問題", "研究題名：", "目前先知道", "接著查什麼",
             "關鍵詞白話解釋", ".radar-reader-steps", ".radar-reader-start",
             "'data-reader-starting-point':candidate.id",
             "function radarArticleOrigin(", "function openRadarArticle(",
@@ -2782,7 +2804,10 @@ class ResearchCenterTest(unittest.TestCase):
             ".radar-group-copy", ".maturity-origin-question",
             "'data-radar-group-id':group.id", "state.maturityOrigin",
             "查看研究判定、原始文字與來源",
+            "selectionLabel?radarBadge(selectionLabel,'selection'):null",
+            "radarBadge(candidate.priorityLabel,candidate.priority)",
             "auditBadges,copy,track,foot", "研究方法與稽核資料（供查核）",
+            "個待查問題", "題已有文章", "下次總檢查",
             'id="radarOverviewFold"', 'id="radarOverviewSummary"',
             'id="radarOverviewList"', "function renderRadarOverview(candidates)",
             "function focusRadarCandidate(candidateId)",
@@ -2810,6 +2835,13 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(".radar-rank{min-height:42px;display:flex;flex-direction:row", template)
         self.assertIn("grid-template-columns:repeat(4,1fr)", template)
         self.assertNotIn("candidate.readerQuestion=", template)
+        radar_card = template[
+            template.index("function renderRadarCandidate(candidate)"):
+            template.index("function renderMethodAudit()")
+        ]
+        radar_first_layer = radar_card.split("const copy=", 1)[0]
+        self.assertNotIn("candidate.priorityLabel", radar_first_layer)
+        self.assertNotIn("selectionLabel?radarBadge", radar_first_layer)
 
     def test_radar_group_matrix_keeps_promoted_question_article_and_return_path(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2879,7 +2911,8 @@ class ResearchCenterTest(unittest.TestCase):
             "const MATURITY=LIB.groupMaturity", "function renderMaturity()",
             "function renderMaturityAction(", "function focusMaturityAction(",
             "function openGroupResearch(", "deepLink==='maturity'",
-            "先從一個想弄懂的問題開始", "族群起點", "開始學這個族群",
+            "把一個產業問題拆成角色與文章", "族群起點", "開始學這個族群",
+            "第一次來只看上半部", "下半部的完成度是研究資料是否齊全",
             "先選問題，再讀主題，最後追關係", "先選一個系統問題",
             "從 4 條既有學習路線，看每個問題會用到哪些族群",
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
@@ -2928,7 +2961,7 @@ class ResearchCenterTest(unittest.TestCase):
             "從「'+graphLabel+'」開始", "族群重複出現，表示同一族群會在多個問題中出現",
             "function resetLibrarySurfaceScroll(", "resetLibrarySurfaceScroll()",
             "MATURITY.learningBoundary", 'id="catalogTitle"', "groupScope",
-            "selectedGroups.length===1", "最大缺口", "不做總分或名次",
+            "selectedGroups.length===1", "最大缺口", "不是產業成熟度、股票排名或受惠程度",
             "可水平捲動的族群研究成熟度矩陣",
             "完整查核矩陣與方法說明", "題材財務影響", "maturitySummarySentence",
         ):

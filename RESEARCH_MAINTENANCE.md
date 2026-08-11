@@ -81,8 +81,8 @@ Active radar 另必須提供純編輯／導覽層的 `reader_question`、`reader
 `config/groups.csv` 既有正式族群，且必須能由同一候選已寫明的知識缺口、責任角色或升格文章
 回查，不能為了增加按鈕而擴張成受惠名單。`reader_group_questions` 必須依 `group_ids` 順序，
 為每個族群各寫一個白話問句，說清它在同一研究題中負責回答哪個問題；不得寫成上下游排名、
-受惠方向或已證實公司連結。發布卡必須把 `reader_question` 當成卡片 heading，先標示「這題想
-弄清楚」；原候選 `title` 只縮成次要的「研究題名」脈絡，不得把技術題名再放回第一閱讀層。
+受惠方向或已證實公司連結。發布卡必須把 `reader_question` 當成卡片 heading，先標示「還沒回答
+完整的問題」；原候選 `title` 只縮成次要的「研究題名」脈絡，不得把技術題名再放回第一閱讀層。
 其後依序顯示 `reader_starting_point`、`reader_next_step`、`reader_terms` 與族群問句；族群問句
 按鈕負責定位族群矩陣的本題文章、
 族群基礎起點與研究缺口，矩陣保留同一問句、同步選取相同族群，並提供返回原候選的焦點路徑。
@@ -112,7 +112,10 @@ DOM 順序。這三種排版只能重排同一列的族群起點、已完成、�
 缺口或行動。`.maturity-origin-wide` 的寬度必須扣除自己的左右 margin，完整留在所選 row 內；
 不得用 `width:100%` 再加外距，使雷達問句、文章標題或返回行動被 row 的 overflow 裁掉。
 
-候選卡正文必須使用整張卡的可用寬度；研究順序改以卡頂橫列顯示「研究順序 N」，同列逐字
+雷達頁首必須先說明「已有文章／等待更多證據／暫緩研究」各自對應的讀者行動，摘要數字只保留
+待查問題數、可直接閱讀文章數與下次總檢查日。selection freeze、priority、selection decision、
+knowledge value 與 evidence posture 都是研究團隊操作資料，必須收進方法或逐卡查核區，不得與
+讀者狀態並排在首屏。候選卡正文必須使用整張卡的可用寬度；研究順序改以卡頂橫列顯示「研究順序 N」，同列逐字
 說明「只排研究待辦，不是股票或投資排名」，不得再用獨立直欄把窄幅正文壓窄。卡面 status
 只能做顯示翻譯：`promoted`、`expand_existing`、`watch`、`deferred` 分別顯示為「已有文章與
 關係圖」、「補進既有研究」、「等待更多證據」、「暫緩研究」；原始 `candidate.statusLabel`、
@@ -381,8 +384,10 @@ confidence／group／route，或被當成新的研究主張。
 整份研究文章清單另有問題先讀契約：`catalogReaderQuestion()` 對 topic 只讀上述
 `readerQuestion`，對正式筆記與多空小作文只讀已通過來源契約的 `readingMission.question`；
 沒有既有問題時退回原清單格式，不得從 `title`、正文、搜尋字或公司題材生成替代問句。問題是卡片
-第一閱讀層，原 `title` 依類型完整保留為「原始摘要／待驗命題／研究題名」，並保留原公司、日期、
-查核狀態與閱讀時間。這只是 renderer 排序，不得新增 `catalogQuestion` 到 article payload。
+第一閱讀層；多空 `title` 與市場議題題名分別保留為「待驗命題／研究題名」。正式筆記則先把
+`title` 與首個既有重點移除 `[S#]`、空白及標點後比較：任一方完整包含另一方時不重複顯示，只有
+兩者確實不同才保留「原始摘要」。原公司、日期、查核狀態與閱讀時間必須保留。這只是 renderer
+排序，不得新增 `catalogQuestion` 到 article payload，也不得改寫 `title` 或 `readingMission`。
 
 文章頁首必須與同張清單卡共用 `catalogReaderQuestion()`，不得為正式筆記、多空文章或 topic
 另取一份問題。三類都有既有問題時，頁首一律先顯示「這篇先弄懂」與同一問句；topic 原
@@ -418,9 +423,11 @@ orientation，不能生成替代文案。
 powersupply` 分類名稱。每個 `readerNotations` 項目必須保留實際 token、固定 `kind`、白話
 `label／definition／boundary`，依首次出現位置排序；不得讀題名、推測縮寫或由模型生成。
 顯示層用原生 `details／summary` 預設收合，Enter 與 Space 都可切換，摘要與主行動至少 44px；
-完全沒有符號時不得顯示空容器。解釋只處理字面與研究中心分類，原句、來源編號、主張、證據與
-結論都不改寫。任務重點達 80 字時可在既有 `；。！？` 後加入 `aria-hidden` 的零文字視覺停頓，
-仍須維持同一段落、原字序與可複製全文。
+完全沒有符號時不得顯示空容器。正式筆記首屏另允許把首個重點的 `[S#]` 來源編號移到同卡獨立
+「原文來源標記」提示列，並在正文與來源區明示完整保留；內部分類 ID 已換成中文時，不得再顯示
+一個指向不可見 token 的 `internal_taxonomy` 解碼項。這只改可見 DOM，不得回寫原句、來源編號、
+主張、證據或 payload。任務重點達 80 字時可在既有 `；。！？` 後加入 `aria-hidden` 的零文字視覺
+停頓，仍須維持同一段落、原字序與可複製全文。
 所有被登錄為學習路線主文章的文章都必須能產生這張卡，缺任一來源段落時 dashboard build
 直接失敗，不能讓族群起點退回只有術語與查核資訊的首屏。
 市場議題若同時有至少兩句「三句話抓重點」與一項「接下來怎麼追」，
@@ -500,14 +507,16 @@ Markdown 與研究 payload 不得回寫。非市場議題、非 reader mode、�
 只存在顯示層，不得新增 `readerPurpose` 到 section、改寫 Markdown／payload 或拿正文生成摘要。
 市場議題已有新手段落與研究摘要，`readerSectionPurpose()` 對其必須回傳空字串，避免同一目的重複。
 
-正式筆記 `mode=reader` 的「研究定位與重要註記」另允許一組狹窄、可重現的維運語翻譯。只有
-`族群：<ID>` 的 ID 同時存在於該篇 `article.groups`，才以 `groupById` 顯示為
-「本文族群：<正式中文標籤>」；因此 `power／memory／material` 只在這個不含歧義的前綴位置可換，
-不得全域取代正常技術英文。同一節逐字命中的 `Universe 質化參考`、
+正式筆記 `mode=reader` 另允許一組狹窄、可重現的分類與維運語翻譯。`passive／powersupply／
+serverodm／semiequip／packtest／ipdesign` 只有在 ID 同時存在於該篇 `article.groups` 時，才可在
+清單首個重點、閱讀任務與正文的可見文字換成 `groupById` 正式中文標籤；不得讀題名、相似度或
+正文語意猜測其他分類。`power／memory／material` 等可能是正常技術英文的 ID 仍只在逐字命中
+`族群：<本文 article.groups ID>` 前綴時顯示為「本文族群：<正式中文標籤>」，不得全域替換。
+逐字命中的 `Universe 質化參考`、
 `查核狀態以 meta 與 qual_notes.py --lint 為準`、`last_updated` 分別顯示為
 「研究中心的公司質化參考」、「查核狀態請以文章上方標示為準」、「更新日期」。轉換函式只能經
 `runs(..., textTransform)` 建立可見文字，不得寫回 `run.s`、`article.sections`、Markdown 或 payload；
-非正式筆記、其他 section、沒有正式 label 的 ID，以及不完全符合上述字串的正文一律原樣保留。
+非正式筆記、沒有正式 label／article group 的 ID，以及不完全符合上述字串的正文一律原樣保留。
 
 「三句話抓重點」在發布頁以有序逐句卡片呈現；卡片順序、粗體與連結必須逐 run 保留，文字不得
 因版型改變而摘要或改寫。唯一的讀者層例外，是把 `passive`、`powersupply`、`serverodm` 等不會
@@ -532,10 +541,9 @@ boundary 都由 CSV 逐字發布，只是閱讀輔助，不得改寫文章主張
 原始 topic 帳本與 `group_ids`、`group_id` 等 machine-readable 欄位仍保留登錄值，發布建置只對
 可見文字套用上述明確白名單。畫面中的三句重點、追蹤項目、主張與監測文字因此使用「被動元件」、
 「電源供應」、「伺服器組裝／機構」等正式中文族群名稱；`power`、`memory`、`material` 等也可能是
-正常技術英文的字串不得自動替換。唯一例外是正式筆記「研究定位與重要註記」內的固定
-`族群：<ID>` 前綴：ID 必須同時出現在該篇 `article.groups`，才依 `groupById` 顯示本文中文族群。
-同一節的三組固定維運語也只在可見文字轉成上述讀者用語；其他 section、文章類型與任何 payload
-欄位不得套用。
+正常技術英文的字串不得自動替換。正式筆記依上一段契約只翻譯該篇已登錄的不透明 ID；其餘 ID
+仍只有固定 `族群：<ID>` 前綴可換。三組固定維運語也只在可見文字轉成上述讀者用語；其他文章
+類型與任何 payload 欄位不得套用。
 
 發布頁另由 v3 register 自動合成「研究摘要：已知、未知與下一步」；頁首閱讀任務後先呈現
 「新手先讀：這篇在講什麼」的三句主線，立即建立產業角色與學習路線位置，再回到同一新手段落的
@@ -565,7 +573,9 @@ effective confidence 分成兩把尺。claim copy 固定依正式 `verified／in
 跨過 `review_due` 時和卡片、可信度 panel 同步降級；降級仍不代表主張被推翻。整段是讀法輔助，
 不得換算成公司訂單、受惠程度、投資排名或修改原始 topic 帳本。
 
-族群矩陣在桌機必須先顯示 `maturityRouteGuide` 的「先選一個想弄懂的問題」，再顯示
+族群矩陣頁首先用「把一個產業問題拆成角色與文章」區分本頁用途：第一次來只看上半部的問題、
+第一篇與站次；下半部完成度只表示研究資料是否齊全，不是產業成熟度、股票排名或受惠程度。
+其後在桌機必須先顯示 `maturityRouteGuide` 的「先選一個想弄懂的問題」，再顯示
 `maturityGroupExplorer` 的「已知道族群名稱？直接查找」；兩個面板都保持可見，但 DOM 與視覺順序
 必須對齊頁首「先選問題」的承諾。在 780px 以下則顯示兩個至少 56px 高的入口按鈕，預設選取
 「從問題開始」，讓不熟族群名稱的讀者不必先穿過 11 個術語。
