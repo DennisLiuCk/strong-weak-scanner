@@ -1,5 +1,36 @@
 # Changelog
 
+## 圖譜推薦先說明共同公司，再示範同一公司的既有關係 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷零變動**；本次只調整
+文章延伸學習區的 reader-only 圖譜推薦理由與關係示範，並同步研究維護契約、方法清單及測試。
+方法 registry fingerprint 仍為
+`322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，與既有基線完全相同，
+因此不建立內容相同的新方法快照。
+
+- 逐一解析建置後完整 274 篇文章 registry，共有 72 張圖譜推薦卡：25 張由圖譜直接引用文章、
+  47 張只因文章與圖譜含有共同公司而成立。後 47 張原本沒有揭露是哪家公司，關係示範又從整張
+  圖的可見 edge 中挑選，因而沒有保證示範線與推薦原因相同。這是完整母體的決定性列舉，不是
+  抽樣統計，SE／t／有效獨立觀測不適用。
+- 共同公司圖譜卡現在顯示「這篇為什麼連到這張圖」與 `relationBasis` 公司，並明示共同節點不
+  等於上下游、受惠、訂單或因果關係。`guidedRelation` 只會從碰到同一批公司節點的可見 edge
+  選取；若沒有這種 edge，就不推薦該圖，不會退回圖內無關的高證據 edge 或文字相似度。
+- 代表案例「推論算力測試設備 TAM」原本因 3443 創意、3661 世芯-KY 連到 HBM 圖，卡片卻先
+  示範 `Micron → HBM`；修改後先揭露兩家共同公司，再示範 `創意 → HBM`。點入圖譜會直接開啟
+  `KG-HBM-C06`，返回文章時恢復原卡與鍵盤焦點。
+- 完整 registry 回歸確認 47／47 張間接圖譜卡都有共同公司 `relationBasis`，且 47／47 張的
+  `guidedRelation` 至少一端 ticker 屬於相同 basis。自然窄欄 559 × 863 的前後畫面、圖譜明細、
+  返回焦點與稽核程式存於
+  `tmp/research-learning-audit-2026-08-11-wave114-article-learning-links/`；整頁沒有水平溢位。
+  固定 viewport 不是實機，本輪未做 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、
+  儀器化 WCAG 對比或真實新手理解測試，因此不宣稱實際理解率已提升或完整無障礙合規。
+- Darwin arm64、Python 3.11.11、UTF-8 執行 513 tests 全綠；qual notes、leading hypotheses、
+  research queue、knowledge graph、research radar 與 method audit 六項 lint 均為 exit 0。連續兩次
+  dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `8c78e1bd6ba495985b657995f4bf488f29f63cd266d2982c70444b00b2192edc`。
+
 ## 推論算力文章把市場需求到公司獲利拆成三道證據關卡 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、

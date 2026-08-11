@@ -2951,7 +2951,9 @@ def attach_research_learning_paths(research_library, knowledge_graph):
     the first existing articleId already registered on that graph, so the article
     station count stays identical to the graph-route count. Other article suggestions
     must share a named company or declared group, while graph suggestions must already
-    cite the article or contain one of its companies.
+    cite the article or contain one of its companies on a visible graph relation.  When
+    a shared company is the only bridge, the card must disclose that company and guide
+    the reader through an edge that touches the same company node.
     """
     research_library = research_library or {"articles": []}
     articles = research_library.get("articles") or []
@@ -3014,7 +3016,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
         for route in routes
     }
 
-    def graph_reader_handoff(graph):
+    def graph_reader_handoff(graph, preferred_stock_ids=None):
         """Describe the exact graph projection opened from an article card.
 
         The frontend enters the company projection by default.  Counts and the
@@ -3046,10 +3048,29 @@ def attach_research_learning_paths(research_library, knowledge_graph):
         visible_node_ids.discard(None)
         node_count = sum(node_id in node_map for node_id in visible_node_ids)
 
+        preferred_stock_ids = set(preferred_stock_ids or [])
+        preferred_node_ids = {
+            node_id for node_id, node in node_map.items()
+            if node.get("ticker") in preferred_stock_ids
+        }
+        guided_edges = visible_edges
+        if preferred_stock_ids:
+            guided_edges = [
+                edge for edge in visible_edges
+                if edge.get("from") in preferred_node_ids
+                or edge.get("to") in preferred_node_ids
+            ]
+            if not guided_edges:
+                raise ValueError(
+                    "圖譜推薦的共同公司沒有出現在可見關係："
+                    f"{graph.get('id') or 'unknown'} / "
+                    + "、".join(sorted(preferred_stock_ids))
+                )
+
         guided = next((
-            edge for edge in visible_edges
+            edge for edge in guided_edges
             if edge.get("evidenceState") == "verified"
-        ), visible_edges[0] if visible_edges else None)
+        ), guided_edges[0] if guided_edges else None)
         relation = None
         if guided:
             relation = {
@@ -3332,12 +3353,30 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 if node.get("ticker")
             }
             direct = int(article.get("id") in graph_articles)
-            shared_stocks = len(stock_ids.intersection(graph_stocks))
-            if not direct and not shared_stocks:
+            shared_stock_ids = [
+                stock_id for stock_id in (article.get("stockIds") or [])
+                if stock_id in graph_stocks
+            ]
+            if not direct and not shared_stock_ids:
                 continue
-            ranked.append((direct, shared_stocks, graph.get("id") or "", graph))
+            if not direct:
+                try:
+                    graph_reader_handoff(graph, shared_stock_ids)
+                except ValueError:
+                    continue
+            ranked.append((
+                direct, len(shared_stock_ids), graph.get("id") or "",
+                graph, shared_stock_ids,
+            ))
         ranked.sort(key=lambda item: item[:3], reverse=True)
-        return ranked[0][-1] if ranked else None
+        if not ranked:
+            return None
+        direct, _, _, graph, shared_stock_ids = ranked[0]
+        return {
+            "graph": graph,
+            "direct": bool(direct),
+            "sharedStockIds": shared_stock_ids,
+        }
 
     for article in articles:
         cards = []
@@ -3445,10 +3484,14 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                     source=article,
                 ))
 
-        graph = matching_graph(article)
-        if graph:
-            handoff = graph_reader_handoff(graph)
-            cards.append({
+        graph_match = matching_graph(article)
+        if graph_match:
+            graph = graph_match["graph"]
+            preferred_stock_ids = (
+                [] if graph_match["direct"] else graph_match["sharedStockIds"]
+            )
+            handoff = graph_reader_handoff(graph, preferred_stock_ids)
+            graph_card = {
                 "kind": "graph", "label": "看產業關聯",
                 "title": graph.get("label") or "產業知識圖譜",
                 "description": (
@@ -3462,7 +3505,17 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                 "graphView": handoff["graphView"],
                 "graphViewLabel": handoff["graphViewLabel"],
                 "guidedRelation": handoff["guidedRelation"],
-            })
+            }
+            if preferred_stock_ids:
+                graph_card["relationBasis"] = {
+                    "kind": "stock",
+                    "ids": preferred_stock_ids,
+                    "labels": [
+                        stock_label_by_id.get(stock_id, stock_id)
+                        for stock_id in preferred_stock_ids
+                    ],
+                }
+            cards.append(graph_card)
 
         # A cross-market article can declare nearly the whole universe (for example
         # an event anchor with 11 guidance fields).  Turning that into one giant
@@ -3499,7 +3552,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 66
+    research_library["learningPathVersion"] = 67
     return research_library
 
 

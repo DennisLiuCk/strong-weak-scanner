@@ -424,10 +424,11 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 66)
+        self.assertEqual(library["learningPathVersion"], 67)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
+        graph_by_id = {item["id"]: item for item in graph["graphs"]}
         group_ids = {item["id"] for item in library["groups"]}
         for article in library["articles"]:
             path = article["learningPath"]
@@ -460,6 +461,27 @@ class ResearchCenterTest(unittest.TestCase):
                             ))
                 elif card["kind"] == "graph":
                     self.assertIn(card["graphId"], graph_ids)
+                    target_graph = graph_by_id[card["graphId"]]
+                    direct = article["id"] in (target_graph.get("articleIds") or [])
+                    if direct:
+                        self.assertNotIn("relationBasis", card)
+                    else:
+                        basis = card["relationBasis"]
+                        self.assertEqual(basis["kind"], "stock")
+                        self.assertTrue(basis["ids"])
+                        self.assertTrue(set(basis["ids"]).issubset(article["stockIds"]))
+                        node_by_id = {
+                            node["id"]: node for node in target_graph["nodes"]
+                        }
+                        edge = next(
+                            edge for edge in target_graph["edges"]
+                            if edge["id"] == card["guidedRelation"]["edgeId"]
+                        )
+                        guided_tickers = {
+                            node_by_id.get(edge.get(endpoint), {}).get("ticker")
+                            for endpoint in ("from", "to")
+                        }
+                        self.assertTrue(set(basis["ids"]).intersection(guided_tickers))
                 elif card["kind"] == "route":
                     self.assertIn(card["graphId"], graph_ids)
                 elif card["kind"] == "group":
@@ -540,6 +562,55 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(card["graphViewLabel"], "產業依賴")
         self.assertEqual(card["meta"], "產業依賴 · 2 個節點 · 1 條關係")
         self.assertEqual(card["guidedRelation"]["edgeId"], "I1")
+
+    def test_shared_company_graph_card_explains_and_previews_the_same_company(self):
+        library = {
+            "counts": {"formal_note": 1},
+            "groups": [{"id": "power", "label": "功率元件", "count": 1}],
+            "articles": [{
+                "id": "formal-1111", "type": "formal_note",
+                "readerTitle": "1111 甲公司 — 質化研究筆記",
+                "subject": "1111 甲公司", "stockIds": ["1111"],
+                "groups": ["power"], "groupLabels": ["功率元件"],
+            }],
+        }
+        graph = {"graphs": [{
+            "id": "shared-company", "label": "相鄰產業圖",
+            "rootNodeId": "concept:test", "articleIds": [],
+            "nodes": [
+                {"id": "company:2222", "ticker": "2222", "label": "乙公司"},
+                {"id": "company:1111", "ticker": "1111", "label": "甲公司"},
+                {"id": "concept:test", "label": "測試主題"},
+            ],
+            "edges": [
+                {
+                    "id": "E-OTHER", "view": "company",
+                    "from": "company:2222", "to": "concept:test",
+                    "relationLabel": "其他公司關係", "evidenceState": "verified",
+                    "evidenceLabel": "證實", "commercialStageLabel": "量產",
+                },
+                {
+                    "id": "E-SHARED", "view": "company",
+                    "from": "company:1111", "to": "concept:test",
+                    "relationLabel": "甲公司既有關係", "evidenceState": "inference",
+                    "evidenceLabel": "推論", "commercialStageLabel": "研究路由",
+                    "boundary": "共同公司不等於兩個題材具有因果關係。",
+                },
+            ],
+        }]}
+
+        bd.attach_research_learning_paths(library, graph)
+
+        card = next(
+            card for card in library["articles"][0]["learningPath"]["cards"]
+            if card["kind"] == "graph"
+        )
+        self.assertEqual(card["relationBasis"], {
+            "kind": "stock", "ids": ["1111"], "labels": ["1111 甲公司"],
+        })
+        self.assertEqual(card["guidedRelation"]["edgeId"], "E-SHARED")
+        self.assertEqual(card["guidedRelation"]["fromLabel"], "甲公司")
+        self.assertNotEqual(card["guidedRelation"]["edgeId"], "E-OTHER")
 
     def test_learning_article_basis_falls_back_to_shared_group(self):
         library = {
@@ -2175,6 +2246,24 @@ class ResearchCenterTest(unittest.TestCase):
             "text:card.questionLabel||'下一站試著回答'",
             ".learning-article-basis{",
             ".learning-article-basis-more>summary{min-height:44px}",
+        ):
+            self.assertIn(contract, template)
+
+    def test_template_explains_why_a_shared_company_graph_connects(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function learningGraphBasis(card)",
+            "card.kind!=='graph'||basis?.kind!=='stock'||!labels.length",
+            "這篇為什麼連到這張圖",
+            "共同公司 · ",
+            "本文與圖譜都有相同公司節點",
+            "下方只示範其中一家公司在圖譜中的既有關係",
+            "'data-graph-basis-kind':'stock'",
+            "'data-graph-basis-count':labels.length",
+            "'data-graph-basis-ids':(basis.ids||[]).join('|')",
+            "const graphBasis=learningGraphBasis(card)",
+            ".learning-graph-basis{",
+            ".learning-graph-basis-more>summary{min-height:44px}",
         ):
             self.assertIn(contract, template)
 
