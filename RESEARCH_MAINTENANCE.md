@@ -328,11 +328,21 @@ section 容器不超過 480px 時，標題、說明與步驟須改為單欄且�
 reader mode 不得插入這層提示。
 
 市場議題一般正文內的 table 另有窄欄閱讀契約：每個 `th` 必須保留原文並以
-`scope="col"` 成為欄標題，每個 `td` 的窄欄視覺標籤只能逐字取自同欄 `th`。當實際文章 section
-容器不足 620px 時，表格按 row 改排為卡片並同時顯示每個欄名；不能只看 viewport，因為桌機
+`scope="col"` 成為欄標題，一般表格每個 `td` 的窄欄視覺標籤只能逐字取自同欄 `th`。唯一例外是
+已通過上述 `readerTableSystemPositions()` 條件的系統表：第一欄卡片標籤須依原 row 順序顯示
+`位置 N／總數`，把前一個索引編號帶入逐列閱讀；同格仍須以 `data-reader-original-label` 保留原欄名、
+插入實際文字節點供視覺與輔具共同讀取，並完整渲染原 cell；不得同時保留 CSS generated label
+造成重複朗讀。其餘欄位仍逐字顯示原 `th`，一般表格不得取得位置標籤。當實際文章 section 容器
+不足 620px 時，表格按 row 改排為卡片並同時顯示上述標籤；不能只看 viewport，因為桌機
 master-detail 的正文欄也可能比手機窄。容器足夠時仍用原生 table；查核附錄不套卡片，真的溢出
 才加上可聚焦 region 與水平捲動提示。兩種版型都不得刪欄、摘要 cell、調換 row，或把最右側
 成熟度／證據邊界藏成預設不可見資訊。
+
+列入白話升級批次的系統型 table，欄名應改成讀者能逐列回答的短問法，例如「目前看到什麼做法」
+與「證據走到哪一步」，避免「目前看到的材料與元件做法」這類名詞堆疊。cell 優先使用明確主詞與
+動詞，並把「已公開／尚待資格驗證／尚未量產」等成熟階段寫成完整句；不得因此省略材料、元件、
+客戶階段或反證邊界，也不得把 reference design 改寫成量產。這是正文 editorial revision，仍須
+追加同狀態 `editorial:<slug>` transition，並由 baseline lint 證明所有鎖定帳本與 meta 不變。
 
 市場議題的清單卡與文章頁首必須先顯示 `config/research_topic_guide.csv` 中人工複核的
 `reader_question`，原始 `title`／`readerTitle` 完整保留為次要的「研究題名」。導覽表只接受

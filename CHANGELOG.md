@@ -1,5 +1,70 @@
 # Changelog
 
+## 800V 證據表改用正常句子交代做法與尚缺證據 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜、公司曝險與投資判斷零變動**；本次只改寫一篇代表文章的
+系統表欄名、五列正文與表後閱讀邊界，並補上 editorial 歷史重播契約、方法文件與測試。方法
+registry fingerprint 仍為
+`322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，與既有基線完全相同，
+因此不建立內容相同的新方法快照。
+
+- 完整檢視 11 張系統表欄名後，800V「從電網到晶片」是明顯離群：窄欄卡片反覆顯示
+  「目前看到的材料與元件做法／現在進展到哪裡」，cell 又使用「描述適用／規劃採用／功能分工」
+  等名詞化句型。現在欄名改為讀者能逐列回答的「目前看到什麼做法／證據走到哪一步」，五列均以
+  具名主詞與動詞說明供應商做了什麼，再用完整句交代 reference design、qualification、量產與
+  客戶採用還缺哪一步。
+- 表後邊界同步改成正常文章語序，明示同一材料可出現在不同位置、同一位置也可有多種做法；表格
+  只能回答公開資料出現了什麼，不能推出材料一定勝出，也不能直接比較不同公司、不同測試條件的
+  效率、功率密度或成本。所有來源、原 claim、成熟階段與反證邊界均保留。
+- 正文追加同狀態
+  `editorial:plain_language_wave112_power_evidence_cards` transition。`research_queue.py
+  --lint --baseline-ref HEAD` 證明鎖定帳本與 meta 未改；另修正歷史方法快照的回放語意，只容許
+  快照日後追加的同狀態 editorial 記號，不會放行未來日期、綁定 sources 或 lifecycle 變更，並以
+  新回歸測試鎖住兩側邊界。
+- 390 × 844 實際畫面已不含舊欄名與舊 onsemi 句型，`innerWidth == scrollWidth == 390`；自然桌機
+  側欄 559 × 863 同樣無水平溢位。前後畫面與完整稽核存於
+  `tmp/research-learning-audit-2026-08-11-wave112-plain-language-evidence/`。固定 viewport 不是實機，
+  本輪未做 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化 WCAG 對比或
+  真實新手理解測試，因此不宣稱實際理解率已提升或完整無障礙合規。
+- `Darwin 25.5.0 arm64 arm`、Python 3.11.11、UTF-8 執行 510 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0。連續兩次 dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `0405d12451681fc273fe782bd2616b32f379d3605abfc5a4539d52172bc2c8d7`。
+
+## 系統位置索引把列次一路帶進證據卡 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、summary、monitor、
+confidence、topic fingerprint、route、圖譜、公司曝險與投資判斷零變動**；本次只調整市場議題
+一般正文內、已符合系統位置條件的 reader-only 表格卡片與對應方法文件、測試。方法 registry
+fingerprint 未改變，`research_method_audit.py --baseline-ref HEAD` 通過，因此不建立內容相同的新方法
+快照。
+
+- 固定走讀「800VDC 功率半導體鏈 → 系統位置索引 → 五列證據卡」發現，索引已先列出 01–05，
+  但窄欄卡片第一格仍逐列重複「電力鏈位置」；一旦索引捲出畫面，新手無法知道正在核對第幾個
+  位置。現在只有通過 `readerTableSystemPositions()` 的同一張表，第一格才顯示 `位置 N／總數`；
+  原 `th`、原欄名 metadata、原 cell、row／column 順序與其他欄位全部保留。
+- 最初驗證發現 CSS generated label 與另加的隱藏列次文字會在 accessibility tree 重複；最終改用
+  畫面與輔具共用的實際 `reader-table-system-row-label` 文字節點，並對該格關閉 generated label。
+  代表列的結構只剩一次「位置 1／5」，未另寫第二份說明或推論關係。
+- 建置後 35 篇市場議題共有 71 張主閱讀表：11 張系統表、60 張一般表，系統表共 53 列。另從
+  `notes/research_topics/*.md` 逐行解析 H2 與 Markdown table，得到完全相同的 11 張表與 53 列；
+  這是完整 registry 的決定性核對，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 1280 × 720 同尺寸前後比對顯示，卡片第一格已由重複欄名改為連續 `位置 2／5`、`位置 3／5`；
+  390 × 844 手機版完整顯示 `位置 1／5` 至 `位置 5／5`，內容寬 354px 且 `innerWidth ==
+  scrollWidth == clientWidth == 390`。AI 機櫃 EMC 的一般表仍為 1 個欄名導讀、0 張系統表、
+  0 個位置列，第一欄維持「驗證關卡」。
+- 前後畫面、手機與 fallback 證據及完整稽核存於
+  `tmp/research-learning-audit-2026-08-11-wave111-position-to-evidence/`。固定 viewport 不是實機，
+  本輪未涵蓋 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化 WCAG 對比或
+  真實讀者理解測試，因此不宣稱實際理解率已提升或完整無障礙合規。
+- `Darwin 25.5.0 arm64 arm`、Python 3.11.11、UTF-8 執行 509 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0。連續兩次 dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `428f1230440566414514dc6ef22583d8713515706b90b9fc307cad9fb90cc19e`。
+
 ## 市場議題先把長表格還原成可掃讀的系統位置索引 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、summary、monitor、

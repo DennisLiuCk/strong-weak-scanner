@@ -522,6 +522,11 @@ sources 的 revision transition——等於預設每次改寫都由新證據驅�
 它記錄的是「敘述重寫、結論未變」，不刷新任何時鐘，也不是修正鏈的一環。修正、關閉、重開或 meta 時鐘變動都
 不得再用自由文字或 `source_chain:` 取代實際 evidence。
 
+歷史方法快照若用較早的 `as_of` 重播，可保留快照日之後追加的同狀態 `editorial:<slug>` 記號，
+不得因此把當時原本合格的研究判成品質不合格；因為這類記號不改研究狀態、帳本或時鐘。這個例外只
+適用於歷史重播：當日 lint 仍會拒絕日期晚於臺北今天的 editorial transition，綁定 sources 或會改變
+lifecycle 的 transition 也一律不得越過 `as_of`。
+
 `scan_log.csv` 與 comparison observation 同樣 append-only：新的掃描窗口、coverage、結果、
 限制與下一期限只能新增一列；不得回頭改寫或刪除舊 scan row。若更正記錄錯誤，追加明確
 指向舊 scan ID 的 correction row，在 `coverage_note` 寫
@@ -605,6 +610,12 @@ counts 與 `not_ready`，不補零、不把未到期主張算成功。
    主正文表格若最左欄名含「位置／環節／節點／路徑」且有 3–8 個非空、不重複 row，是否把
    `row[0]` 逐字集合成「系統位置索引」，讓讀者先看本文檢查哪些位置再逐列核對；是否完全不讀
    其餘 cell 生成摘要、不改 row 順序，並明示編號不代表上下游、流程一定相連、重要性或受惠排序。
+   同表在窄欄改成 row 卡時，第一欄是否把同一順序延續為 `位置 N／總數`，並保留原 `th`、原欄名
+   metadata、視覺與輔具共用的實際文字節點及完整原 cell，且沒有 CSS generated label 重複朗讀；
+   其餘欄與一般表格是否仍逐字使用原 `th` 標籤。
+   若同表正文列入白話升級，欄名是否改成「目前看到什麼做法／證據走到哪一步」這類短問法，
+   cell 是否改用明確主詞與動詞，並逐列保留 reference design、資格驗證、量產與客戶採用的原始
+   成熟階段；是否追加 `editorial:<slug>` transition，且 source／claim／monitor／鎖定 meta 未變。
    不符確定性條件時是否退回既有欄名導讀；兩種提示是否都不寫回 Markdown、table、claim 或來源。
    清單是否完整枚舉三類發布文章並先顯示問題：topic 逐字取 `readerQuestion`，正式筆記／多空
    小作文逐字取 `readingMission.question`；原摘要、待驗命題與研究題名是否仍完整保留為次要文字，

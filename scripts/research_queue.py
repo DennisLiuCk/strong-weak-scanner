@@ -1126,12 +1126,20 @@ def analyse_topic(path, text, universe_rows=None, group_ids=None, reports=None, 
         transitions = [_parse_fields(body) for body in TRANSITION_RE.findall(text)]
     if not transitions:
         errors.append("議題必須保留至少一筆 transition")
+    historical_replay = as_of < taipei_today()
     state, previous_date = "initial", None
     for idx, transition in enumerate(transitions, 1):
         value = transition.get("date")
+        later_editorial_in_historical_replay = (
+            historical_replay
+            and transition.get("from") == transition.get("to")
+            and EDITORIAL_EVIDENCE_RE.match(
+                (transition.get("evidence") or "").strip())
+        )
         if not _valid_date(value):
             errors.append(f"transition {idx} 日期不合法")
-        elif dt.date.fromisoformat(value) > as_of:
+        elif (dt.date.fromisoformat(value) > as_of
+              and not later_editorial_in_historical_replay):
             errors.append(f"transition {idx} 日期晚於研究判定日 {as_of.isoformat()}")
         elif previous_date and value < previous_date:
             errors.append(f"transition {idx} 日期早於前一筆")

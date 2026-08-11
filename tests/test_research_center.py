@@ -1792,7 +1792,7 @@ class ResearchCenterTest(unittest.TestCase):
         for contract in (
             "const labels=(node.head||[]).map(cell=>displayText(cell).trim())",
             "h('th',{scope:'col'}",
-            "'data-label':labels[index]||'欄 '+(index+1)",
+            ":labels[index]||'欄 '+(index+1)",
             "if(article.type==='topic'&&!audit)sectionEl.querySelectorAll('.table-wrap')",
             "wrap.classList.add('reader-table')",
             ".article-section{container-type:inline-size",
@@ -1822,6 +1822,16 @@ class ResearchCenterTest(unittest.TestCase):
             "function readerTableGuide(table)",
             "const headers=(table?.head||[]).map(runText)",
             "const positions=readerTableSystemPositions(table,headers)",
+            "readerTablePositions=[]",
+            "readerTablePositions.length>0&&readerTablePositions.length===(node.rows||[]).length",
+            "positionLabel='位置 '+(rowIndex+1)+'／'+readerTablePositions.length",
+            "'data-label':systemFirst?positionLabel",
+            "'data-reader-original-label':systemFirst?labels[index]:null",
+            "'data-reader-system-row':systemFirst?rowIndex+1:null",
+            "class:'reader-table-system-row-label',text:positionLabel",
+            "class:'table-wrap'+(systemRows?' reader-system-table':'')",
+            "readerTablePositions=readerTableSystemPositions(item,tableHeaders)",
+            "block(item,{readableProse:mode==='reader',textTransform,readerTablePositions})",
             "'data-reader-table-system-map':positions.length",
             "系統位置索引",
             "先把第一欄放在一起，知道本文正在比較哪些位置，再逐列核對其餘欄位。",
@@ -1842,6 +1852,9 @@ class ResearchCenterTest(unittest.TestCase):
             ".reader-table-system-steps{display:grid",
             ".reader-table-system-steps{grid-template-columns:1fr}",
             ".reader-table-system-label{min-width:0",
+            ".reader-table-system-row-label{display:none}",
+            ".article-section .reader-system-table td:first-child::before{content:none}",
+            ".article-section .reader-system-table .reader-table-system-row-label{display:block",
         ):
             self.assertIn(contract, template)
         self.assertNotIn("row.slice(1)", template)
@@ -2005,7 +2018,7 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-reader-chars':text.length",
             "'data-reader-sentences':sentenceCount",
             "text.length>=120&&sentenceCount>=2",
-            "{readableProse:mode==='reader',textTransform}",
+            "{readableProse:mode==='reader',textTransform,readerTablePositions}",
             "@container (max-width:860px){.reader-prose-dense .reader-sentence-break{display:block;height:.45em}}",
             ".reader-prose-dense .reader-sentence-break{display:block;height:.55em}",
             "class:'reader-sentence-break','aria-hidden':'true'",
@@ -2033,7 +2046,7 @@ class ResearchCenterTest(unittest.TestCase):
             "replace(/`last_updated`/g,'「更新日期」')",
             "replace(/「更新日期」\\s+/g,'「更新日期」')",
             "section.h==='研究定位與重要註記'?value=>formalPositioningReaderText(article,value):null",
-            "const rendered=block(item,{readableProse:mode==='reader',textTransform})",
+            "const rendered=block(item,{readableProse:mode==='reader',textTransform,readerTablePositions})",
             "normalizedReaderRunTexts(source).map(text=>textTransform?textTransform(text):text)",
         ):
             self.assertIn(contract, template)

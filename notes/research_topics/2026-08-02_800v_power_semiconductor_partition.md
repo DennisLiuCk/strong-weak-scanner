@@ -322,6 +322,14 @@ reason: editorial_plain_language_wave80_power_conversion_roles_no_conclusion_cha
 evidence: editorial:plain_language_wave80_power_conversion_roles
 -->
 
+<!-- transition
+date: 2026-08-11
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave112_system_table_evidence_steps_no_conclusion_change
+evidence: editorial:plain_language_wave112_power_evidence_cards
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -370,17 +378,17 @@ evidence: editorial:plain_language_wave80_power_conversion_roles
 
 ## 從電網到晶片：每一段電力怎麼轉換
 
-| 電力鏈位置 | 目前看到的材料與元件做法 | 現在進展到哪裡 |
+| 電力鏈位置 | 目前看到什麼做法 | 證據走到哪一步 |
 |---|---|---|
-| 中壓交流電（AC）→ 直流電（DC）／固態變壓器（SST） | onsemi 描述適用高電壓的 SiC 元件類別 | 仍在早期商用與開發階段；不是具名 AI 場域的量產證據 |
-| 800V 電池備援（BBU）／保護 | Infineon 以 SiC 建立雙向電池備援與不停機更換模組的保護參考設計 | 元件與設計已公開，尚未證實客戶完成資格驗證 |
-| 800V → 50V／12V 中間匯流排（IBC） | Infineon 以 GaN 為主，並搭配低壓 Si MOSFET、驅動器與控制器 | 供應商參考設計／展示板；不是已量產的材料清單 |
-| 交流轉直流電源供應器（AC-DC PSU） | ROHM 規劃讓 Si 與 SiC 同時進入特定電源供應器 | 規劃採用，不等於截至本輪已量產出貨 |
-| 處理器端 | Infineon 的策略描述保留 Si 在低壓末端 | 公司提出的功能分工，不是每位客戶唯一採用的電路架構 |
+| 中壓交流電（AC）→ 直流電（DC）／固態變壓器（SST） | onsemi 把這一段列為高電壓 SiC 元件的應用位置 | 仍在早期開發與商用階段；尚未看到具名 AI 系統採用並量產的證據 |
+| 800V 電池備援（BBU）／保護 | Infineon 公開一套 SiC 參考設計，示範雙向電池備援、保護與不停機更換模組 | 元件與參考設計已公開；尚未看到客戶完成資格驗證的證據 |
+| 800V → 50V／12V 中間匯流排（IBC） | Infineon 的參考設計以 GaN 為主，搭配低壓 Si MOSFET、驅動器和控制器 | 目前只是供應商的參考設計與展示板；還不是量產產品的材料清單 |
+| 交流轉直流電源供應器（AC-DC PSU） | ROHM 規劃在特定電源供應器中同時使用 Si 與 SiC | 目前只到規劃採用；截至本輪，尚未看到量產出貨證據 |
+| 處理器端 | Infineon 的策略說明中，低壓末端仍保留 Si | 這是公司提出的一種功能分工；不代表所有客戶都會採用同一套電路架構 |
 
-同一種材料可以出現在多個位置，同一位置也可以採用不同材料與電路架構。這張表只回答
-「目前在哪一個環節看到了哪一種做法」，不回答誰會贏，也不把各家公司在不同條件下的效率、
-功率密度或成本拿來排名。
+同一種材料可能出現在不同位置，同一個位置也可能有不只一種材料或電路架構。這張表只告訴你：
+「在哪個環節，公開資料出現了哪種做法。」它不能回答哪種材料一定勝出，也不能把不同公司、
+不同測試條件下的效率、功率密度或成本直接排在一起。
 
 ## 來源與證據邊界
 

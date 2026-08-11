@@ -839,6 +839,29 @@ class ResearchTopicSchemaV3ContractTest(unittest.TestCase):
             "日期早於 evidence S1 accepted_at",
         )
 
+    def test_historical_replay_allows_only_later_same_state_editorial_marker(self):
+        editorial = _contract_block("transition", [
+            ("date", "2026-08-11"),
+            ("from", "triaged"),
+            ("to", "triaged"),
+            ("reason", "editorial_plain_language_no_conclusion_change"),
+            ("evidence", "editorial:readability"),
+        ])
+        text = topic_text_v3().replace(
+            "<!-- research_source", editorial + "\n\n<!-- research_source", 1)
+
+        with mock.patch.object(
+                rq, "taipei_today", return_value=date(2026, 8, 11)):
+            historical = self.analyse(text, as_of=date(2026, 8, 10))
+        self.assertFalse(
+            historical["quality_invalid"], historical["quality_errors"])
+
+        with mock.patch.object(
+                rq, "taipei_today", return_value=date(2026, 8, 10)):
+            current_day = self.analyse(text, as_of=date(2026, 8, 10))
+        self.assert_error_contains(
+            current_day, "日期晚於研究判定日 2026-08-10")
+
     def test_history_audit_allows_append_and_lifecycle_but_rejects_rewrites(self):
         old = topic_text_v3()
         self.assertEqual(rq.audit_topic_history(topic_text_v2(), old), [])
@@ -1604,10 +1627,32 @@ class ReadabilityGateTest(unittest.TestCase):
         path = Path(rq.TOPICS_DIR) / "2026-08-02_800v_power_semiconductor_partition.md"
         text = path.read_text(encoding="utf-8")
         self.assertNotIn("功率元件內容量會增加還是消失", text)
+        self.assertNotIn("目前看到的材料與元件做法", text)
+        self.assertNotIn("onsemi 描述適用高電壓的 SiC 元件類別", text)
         self.assertIn("元件需求會轉移到別處，還是直接消失", text)
         self.assertIn("## 從電網到晶片：每一段電力怎麼轉換", text)
         self.assertIn(
+            "| 電力鏈位置 | 目前看到什麼做法 | 證據走到哪一步 |",
+            text,
+        )
+        self.assertIn(
+            "onsemi 把這一段列為高電壓 SiC 元件的應用位置",
+            text,
+        )
+        self.assertIn(
+            "這是公司提出的一種功能分工；不代表所有客戶都會採用同一套電路架構",
+            text,
+        )
+        self.assertIn(
+            "不同測試條件下的效率、功率密度或成本直接排在一起",
+            text,
+        )
+        self.assertIn(
             "evidence: editorial:plain_language_wave80_power_conversion_roles",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave112_power_evidence_cards",
             text,
         )
 
