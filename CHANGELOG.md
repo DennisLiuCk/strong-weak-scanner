@@ -1,5 +1,40 @@
 # Changelog
 
+## 最後一站先看整條問題，再直接選下一條路線 — 2026-08-12
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
+文章文字與順序、正式 route／phase／station／graph／edge、族群映射、雷達候選與投資判斷零變動**；
+本次只收合 reader mode 末站完成卡原本完整攤開的路線總複習，並把既有下一步改成直接說明會去
+選另一條學習路線；同步研究維護契約、方法清單、README、payload 版本、發布頁與測試。
+
+- 固定走讀「供電與散熱第 9/9 站 → 自我檢查 → 路線完成」。修改前，390×844 的完成卡高約
+  503.9px，三階段總複習約 275.3px；當學習區頂端位於 viewport 下方 154.6px 時，主要行動頂端
+  在 990.9px，低於首屏底部約 146.9px。修改後，總複習先收成 92.7px 摘要，完成卡降為
+  297.3px、整段學習收尾由 1,691.5px 降為 1,484.9px；「選下一條學習路線」位於 784.4px，
+  44px 按鈕可在同一張畫面完整看見。這是固定文章與 viewport 的單次 DOM／畫面量測，不是完成率
+  或理解率統計。
+- 收合採原生 `details`／`summary`，摘要直接保留完成站次、正式 route question 與 phase 數；
+  展開後仍完整顯示原 route description、三個 phase label、各自 3／4／2 站與原邊界，沒有刪除
+  或改寫內容。四條正式路線的末站均實際核對：供電與散熱 9/9、記憶體與封裝 7/7、運算與互連
+  8/8、公司財務案例 1/1，全部預設收合且顯示同一明確行動。
+- 點擊「選下一條學習路線」已實際開啟既有 route-complete 選擇器；畫面逐字保留剛完成的
+  「供電與散熱」及其系統問題，並只列其餘三條正式問題路線。這次只改完成卡上的讀者行動名稱，
+  既有 graph origin、選項順序、返回位置與跨路線接力都未改動。
+- 320×844 的 1/1 路線摘要約 114.8px、主要行動 44px；390×844 的 9/9 摘要約 92.7px、主要
+  行動 44px；1280×900 的完成卡由約 419.7px 降為 257.6px、摘要 86px、行動 36px。320px
+  明／暗模式、390px 收合／展開與 1280px 桌機均無水平溢位。
+- `learningPathVersion: 106 → 107`。獨立 Python 與 Node JSON 路徑各自核對修改前後 274 篇文章：
+  排除 reader-only 版本後完整 payload 相等；以遞迴 key 排序、UTF-8 compact JSON 重算，兩條
+  路徑的前後 SHA-256 均為 `008f70ffed96a2b0ad271e4b6127aa2f90843453fa27daf48aa8b6a44751fcfd`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 環境執行 531 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build 的
+  `research.html` SHA-256 一致：`a2752d866cf26a00fe455667ea522451f454500166e06c4479a13dbab10a716a`。
+- 修改前、收合後、展開後、下一路線選擇器、320px 明暗模式與 1280px 桌機畫面存於
+  `tmp/research-learning-audit-2026-08-12-wave154-route-completion/`。本輪未做真實新手理解測試、
+  長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱學習
+  成效已提升或完整無障礙合規。
+
 ## 自我檢查後先看下一站，路徑細節需要時再展開 — 2026-08-12
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、

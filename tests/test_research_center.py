@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 106)
+        self.assertEqual(library["learningPathVersion"], 107)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2625,8 +2625,10 @@ class ResearchCenterTest(unittest.TestCase):
             "function learningRouteCompletionReview(article)",
             "回頭回答整條路線",
             "(route.phases||[]).filter(phase=>phase?.label)",
+            "return review",
             "'data-route-review-id':route.id",
             "'data-route-phase-count':phases.length",
+            "'data-route-review-collapsed':'true'",
             "text:(phase.graphIds||[]).length+' 站'",
             "問題、階段與站數逐字沿用既有學習路線",
             "function learningRouteBridge(card,sourceArticle)",
@@ -2647,6 +2649,28 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertTrue(route.get("question"), route.get("id"))
             self.assertTrue(route.get("phases"), route.get("id"))
 
+    def test_completed_route_review_is_compact_until_the_reader_opens_it(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "position=article?.learningRoute?'完成第 '",
+            "summary=h('summary',{}",
+            "class:'learning-route-completion-summary'",
+            "text:phases.length+' 個階段 · 需要時再看總複習'",
+            "class:'learning-route-completion-state','aria-hidden':'true'",
+            "body=h('div',{class:'learning-route-completion-body'}",
+            "review=h('details',{class:'learning-route-completion-review'",
+            "body.appendChild(h('p',{class:'learning-route-completion-plan'",
+            "review.appendChild(body)",
+            "if(routeBridge||completion)item.appendChild(h('div',{class:'learning-route-card-footer'},meta,action))",
+            "if(card.kind==='route')return'選下一條學習路線'",
+            ".learning-route-completion-review>summary{min-height:84px",
+            ".learning-route-completion-state::before{content:'展開總複習'",
+            ".learning-route-completion-review[open] .learning-route-completion-state::before{content:'收合'",
+            ".learning-route-completion-body{padding:9px 10px",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("review=h('section',{class:'learning-route-completion-review'", template)
+
     def test_next_station_route_context_is_compact_until_the_reader_opens_it(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
@@ -2660,7 +2684,7 @@ class ResearchCenterTest(unittest.TestCase):
             "card.description?h('p',{class:'learning-route-bridge-description'",
             "if(routeBridge)item.appendChild(routeBridge);else item.appendChild",
             "const meta=h('span',{class:'learning-card-meta'",
-            "if(routeBridge)item.appendChild(h('div',{class:'learning-route-card-footer'},meta,action))",
+            "if(routeBridge||completion)item.appendChild(h('div',{class:'learning-route-card-footer'},meta,action))",
             ".learning-route-bridge>summary{min-height:72px",
             ".learning-route-bridge>summary::after{content:'展開脈絡'",
             ".learning-route-bridge[open]>summary::after{content:'收合'",
@@ -2951,7 +2975,7 @@ class ResearchCenterTest(unittest.TestCase):
             "window.scrollTo(0,0)",
             "requestAnimationFrame(()=>requestAnimationFrame(reset))",
             "selectSurface('graph',true);resetGraphSurfaceScroll()",
-            "if(card.kind==='route')return'回到學習路線'",
+            "if(card.kind==='route')return'選下一條學習路線'",
             ".graph-intro-action{width:100%;min-height:44px}",
             "phaseCue=phasePurpose?' 本階段任務：'+phasePurpose:''",
         ):

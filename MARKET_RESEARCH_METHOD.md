@@ -931,8 +931,11 @@ counts 與 `not_ready`，不補零、不把未到期主張算成功。
     只有「返回研究清單」且沒有虛構起點。320／390／780px 首屏仍須同時容納文章問題、查核警語、
     第一個任務重點與完整 44px 主行動，頁面不得水平溢位；884px 與 1280px 則仍只顯示桌機完整
     起點卡，不得重複手機摘要。
-    另完成任一正式學習路線後，實走「末站完成卡 → 回到學習路線 → 選另一條問題路線 → 開啟
-    第一站」：返回圖譜的第一個內容須逐字保留已完成 route label 與 question，只列 registry 中
+    另完成任一正式學習路線後，先在 320／390px 核對末站總複習預設收合：摘要須逐字保留完成
+    站次、route question 與 phase 數，展開後原 route description、全部 phase label／站數與邊界
+    必須完整存在；摘要與主要行動都至少 44px，收合時「選下一條學習路線」須在同一個完成交接
+    viewport 內可見。再實走「末站完成卡 → 選下一條學習路線 → 選另一條問題路線 → 開啟第一站」：
+    返回圖譜的第一個內容須逐字保留已完成 route label 與 question，只列 registry 中
     其他正式 route 的 label／question；選定後目前 graph、`aria-pressed`、reader-only
     `nextRouteId` 與第一 station 入口須指向同一路線。返回剛才文章要恢復完成卡與捲動位置；直接
     圖譜分頁與 hash deep link 必須是 0 張完成卡。390px 選項與起點行動至少 44px，桌機為三欄、

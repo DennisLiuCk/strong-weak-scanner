@@ -936,13 +936,16 @@ question、本篇 key point、下一站 description 與邊界。缺 label 時不
 建立 knowledge graph edge。末站須在單篇理解檢查旁，把正式
 route 的原系統問題、原路線說明、全部 phase label 與各 phase 站數完整收回，並再次明示只是閱讀
 總複習；不得把完成站次改寫成已掌握、研究結論完成或產業關係已證實。任何 route 主文章缺少問題或
-三句重點都必須讓建置失敗。回看按鈕須把鍵盤焦點與捲動位置一起送回「三句話抓重點」，不能被
-黏性導覽遮住；下一站按鈕須顯示站次、開啟既有文章並回到文章頂端。`.learning-path` 必須建立
+三句重點都必須讓建置失敗。末站的總複習須以原生 `details` 預設收合：摘要仍逐字顯示 route
+原問題、完成站次與 phase 數，展開後才顯示原路線說明、全部 phase label／站數與原邊界；完整
+內容不得刪除或改寫。完成卡主要行動固定寫成「選下一條學習路線」，並與站次 meta 同列，使窄幅
+讀者在自我檢查後可先看見下一步。回看按鈕須把鍵盤焦點與捲動位置一起送回「三句話抓重點」，
+不能被黏性導覽遮住；下一站按鈕須顯示站次、開啟既有文章並回到文章頂端。`.learning-path` 必須建立
 inline-size container；實際內容寬度不超過 620px 時，`.learning-handoff` 與
 `.learning-path-grid` 都改為單欄，不能只依 viewport 判斷，因桌機 master-detail 的正文也可能
 只剩三百多 px。寬專注閱讀才保留並排比較。
 
-末站的「回到學習路線」不得退化成一般 graph deep link。必須把來源 article ID、已完成 route ID、
+末站的「選下一條學習路線」不得退化成一般 graph deep link。必須把來源 article ID、已完成 route ID、
 文章原 origin 與 window／reader 捲動位置保留成單次 reader-only `route-complete` origin；圖譜控制
 之前先逐字顯示已完成 route label 與原 `question`，再只列其他正式 `learningRoutes` 的 label 與
 question。選項順序沿用 route registry，不得依相似度、人氣、投資重要性或模型排序；不得把 `other`
