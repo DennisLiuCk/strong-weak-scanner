@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 67)
+        self.assertEqual(library["learningPathVersion"], 68)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2504,6 +2504,29 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, template)
         self.assertNotIn("原 edge 欄位", template)
+
+    def test_template_skips_already_visited_article_and_graph_handoffs(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "sourceArticleId=state.graphOrigin?.kind==='article-learning'?state.graphOrigin.articleId:''",
+            "article.id===sourceArticleId",
+            "'data-testid':'graph-reader-article-already-read'",
+            "完整研究脈絡就是剛才文章",
+            "不另開同一篇",
+            "function originAdjustedLearningCards(article)",
+            "card.kind==='article'&&card.articleId===sourceArticleId",
+            "card.kind==='graph'&&card.graphId===origin.graphId",
+            "function learningOriginProgress(article,adjustment)",
+            "'data-skipped-source-article':adjustment.skippedSource?'true':'false'",
+            "'data-skipped-graph':adjustment.skippedGraph?'true':'false'",
+            "本次已走到這裡",
+            "下方先顯示尚未走過的下一站",
+            "originProgress=learningOriginProgress(article,adjustment)",
+            "if(originProgress)section.appendChild(originProgress)",
+            ".learning-origin-progress{",
+            ".graph-reader-foot.already-read strong",
+        ):
+            self.assertIn(contract, template)
 
     def test_template_publishes_ranked_candidate_research_radar(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

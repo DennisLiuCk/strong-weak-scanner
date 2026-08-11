@@ -1,5 +1,38 @@
 # Changelog
 
+## 跨文章學習路徑不再把剛走過的文章與圖譜當成下一站 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷零變動**；本次只調整
+「文章 → 關係圖 → 完整研究脈絡 → 延伸學習」的 reader-only origin 與卡片投影，並同步研究
+維護契約、方法清單及測試。方法 registry fingerprint 仍為
+`322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，與既有基線完全相同，
+因此不建立內容相同的新方法快照。
+
+- 逐一解析建置後完整 274 篇文章、25 張圖譜與 72 條 article graph card → guided edge → context
+  article 路徑。修改前有 30／72 條會把「完整研究脈絡」重新開成剛才文章；其餘路徑進入另一篇
+  後，13 條又推薦回來源文章、40 條又推薦回同一張圖。另有 30 條同篇路徑的靜態卡雖也含同圖，
+  但現在已不再重開文章。這是完整 registry 的決定性列舉，不是抽樣統計，SE／t／有效獨立觀測
+  不適用。
+- relation 的 context article 若等於來源文章，現在改顯示「完整研究脈絡就是剛才文章」，不再
+  建立重開同篇的 CTA；既有返回按鈕仍回復來源文章、原捲動位置與圖譜卡鍵盤焦點。若 context
+  article 是另一篇，origin 會一併保存來源文章 ID、graph ID、投影視角、已選 edge 與捲動位置。
+- 從圖譜開啟的文章在延伸區顯示「剛才文章 → 剛才關係圖 → 現在」；只在 origin 實際證明已
+  走過時，收起來源文章與同一圖譜的重複卡。72／72 條路徑模擬收起後都仍有至少一張未走過的
+  下一站；清單、雷達、矩陣及沒有 origin 的一般開文完全沿用原卡片。
+- 代表案例「推論算力測試設備 → HBM → 創意筆記」原本第一張主卡回到同一市場議題，後面又
+  回到 HBM；修改後先顯示本次三段路徑，第一張主卡直接變成「3443 創意 — 領先假說報告」。
+  另一條「AI 機櫃 EMC 文章 → 同篇 context」則明示不重開同篇，返回後仍聚焦原圖譜按鈕。
+- 自然窄欄 559 × 863 的前後畫面、兩種分支、返回焦點與完整 census 存於
+  `tmp/research-learning-audit-2026-08-11-wave115-cross-article-map/`；整頁沒有水平溢位。固定
+  viewport 不是實機，本輪未做 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、
+  儀器化 WCAG 對比或真實新手理解測試，因此不宣稱實際理解率已提升或完整無障礙合規。
+- Darwin arm64、Python 3.11.11、UTF-8 執行 514 tests 全綠；qual notes、leading hypotheses、
+  research queue、knowledge graph、research radar 與 method audit 六項 lint 均為 exit 0。連續兩次
+  dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `2e426f8784165b1d15808c2f24154d376081fa7fd5c37fed626387d1c95a14be`。
+
 ## 圖譜推薦先說明共同公司，再示範同一公司的既有關係 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
