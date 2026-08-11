@@ -1,5 +1,146 @@
 # Changelog
 
+## 關係詳情可連續比較同篇文章角色 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、
+priority、status、文章 groups／reader 文案、研究 source／claim／monitor、圖譜 node／edge／view、
+公司曝險與投資判斷零變動**；本次只補齊多族群文章進入產業依賴圖後，在三步關係詳情內繼續
+比較同篇角色的 reader-only 導覽，並同步研究維護契約、方法清單及測試。
+
+- 修改前已能從文章 origin 直接打開一個角色 edge，但三步詳情之後只剩返回文章與來源按鈕；若要
+  比較同篇另一角色，讀者必須回到圖譜首屏重新找線。Python 與獨立 Node 路徑完整列舉 23 篇
+  多族群路線文章、61 個 article-group／61 條唯一角色 edge；修改前 61／61 個詳情都沒有角色導覽。
+  這是完整發布母體的決定性列舉，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 新增詳情內「文章角色比較」，與文章 origin 共用 `graphArticleRoleEntries()` 的同一份 group 順序、
+  升格前雷達問句、edge 證據層級及商業位置。目前角色用 `aria-current="step"` 且停用；其他唯一
+  edge 可用 click、Enter 或 Space 原位切換，會恢復該 edge 原證據篩選並把焦點留在更新後詳情。
+  0 或多條仍停用且明示缺口，不依標題、相似度、edge 順序或模型猜線。
+- 完整瀏覽器 DOM census 驗證 61／61 個角色詳情都出現正確導覽，23／23 篇從第一個角色切到第二個
+  角色後，edge、group、順序、目前標記、問句與狀態全部一致，mismatch 0。EMC 範例依序以 click
+  切到 `KG-EMC-I09`、Enter 切到 `KG-EMC-I07`，兩次都把焦點保留在關係詳情。直接 graph deep
+  link、公司曝險與國巨單族群案例的詳情導覽均為 0，不虛構文章角色來處。
+- 320、390、780、884px 實測均無頁面水平溢位；詳情導覽寬度分別為 268、338、728、794px，
+  角色按鈕最小高度均約 69.99px。390px 前後同 viewport 比對確認原三步解讀未被裁切，新導覽只在
+  第三步後接續。前後、桌機、手機、完整 DOM census 與兩條靜態 census 存於
+  `tmp/research-learning-audit-2026-08-11-wave128-relation-to-next/`。
+- `learningPathVersion: 80 → 81`；相對目前 HEAD 77，Python 與獨立 Node 路徑排除版本後都確認
+  canonical LIB payload 完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- 固定瀏覽器與 iframe 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400%
+  zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱理解率已提升或完整無障礙合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 `C.UTF-8` 環境執行 521 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA
+  一致：`index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `5d19166a7ef6a852a8b8809625a4e82de5177d97b687357f9145ef7d34eb08d4`。
+
+## 文章角色在圖譜直接開對應關係 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、
+priority、status、文章 groups／reader 文案、研究 source／claim／monitor、圖譜 node／edge／view、
+公司曝險與投資判斷零變動**；本次只補上多族群文章抵達產業依賴圖後的 reader-only 承接，並
+同步研究維護契約、方法清單及測試。
+
+- 修改前 AI 機櫃 EMC 文章先分清被動元件、電源供應與伺服器組裝／機構三個角色，進圖後卻只剩
+  通用「先把文章中的角色對回可查核關係」與任選示範線；讀者必須自行在 9 條關係中重新找回剛讀
+  的三個角色。Python 與獨立 Node 路徑完整列舉 23 篇多族群路線文章、61 個 article-group：
+  23／23 篇的每個 group 都能只依 graph node `groupId` 對回恰好一條 industry edge，61／61 個
+  映射皆唯一。這是完整發布母體的決定性列舉，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 文章來源卡現在逐一顯示同篇既有族群、升格前雷達問句、edge 證據層級與商業位置；只在同篇、
+  同 graph、industry 視角且多族群時出現。恰好一條才可直接開既有三步關係解讀；0 或多條會禁用
+  並明示無法唯一定位，不依標題、相似度、edge 順序或模型猜線。若該證據層級先前被篩除，點擊會
+  恢復同一層再開線，不改 edge 或研究判定。
+- 實際瀏覽器逐篇重載文章、按「看這站證據關係」並比對 DOM：23／23 篇、61／61 個角色的順序、
+  `data-group-id`、`data-edge-id`、唯一性與可操作狀態全部等於既有 payload，mismatch 0。EMC 範例
+  分別定位 `KG-EMC-I07`、`KG-EMC-I08`、`KG-EMC-I09`；點電源供應後直接顯示
+  `RELATION · KG-EMC-I08` 的三步邊界。切到公司曝險後角色卡為 0；直接 graph deep link 的來源卡、
+  返回鈕與角色卡也都為 0，不虛構文章來處。返回文章後焦點恢復同一顆
+  「看這站證據關係 · 產業依賴」按鈕，reader scrollTop 恢復為 1,551px。
+- 1280、884、780、390、320px 實測均無頁面水平溢位；三個角色與三個唯一 edge 均完整保留。
+  320／390／780px 角色按鈕最小高度 88px，884px 為 92.43px；390px 三步詳情寬 370px，並直接
+  定位 `KG-EMC-I08`。前後、桌機、手機、完整 DOM census 與兩條靜態 census 存於
+  `tmp/research-learning-audit-2026-08-11-wave127-graph-arrival/`。
+- `learningPathVersion: 79 → 80`；相對目前 HEAD 77，Python 與獨立 Node 路徑排除版本後都確認
+  canonical LIB payload 完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- 固定瀏覽器與 iframe 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400%
+  zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱理解率已提升或完整無障礙合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 `C.UTF-8` 環境執行 521 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA
+  一致：`index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `d3828a00e36c7c9b40b75022aedad4be75613271c70d80a4098ced98233fbe7a`。
+
+## 多族群文章先接產業依賴圖 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、
+priority、status、文章 groups／reader 文案、研究 source／claim／monitor、圖譜 node／edge／view、
+公司曝險與投資判斷零變動**；本次只修正學習路線文章前段的 reader-only 圖譜入口，並同步研究
+維護契約、方法清單及測試。
+
+- Python 與獨立 Node 路徑完整列舉 25 篇學習路線主文章：25／25 張 graph 同時有 company 與
+  industry edge，但舊 `renderLearningRouteContext()` 仍固定開啟 company。23 篇文章宣告 2–3 個
+  正式族群；其中 22 篇的 industry edge 數也多於 company。完整母體共有 company 86 條、industry
+  249 條；這些數字只描述兩種投影的既有範圍，不代表 industry 較重要。這是完整發布母體的決定性
+  列舉，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 新增 `articleRouteGraphView()`：本文有兩個以上正式 `groups` 且既有 graph 含 industry edge 時，
+  「看這站證據關係」先開產業依賴；單一族群或只有 company edge 時維持公司曝險；company 缺席
+  而 industry 存在時安全退回產業依賴。判斷不讀 edge 數、標題、正文或相似度。按鈕直接標明實際
+  投影、說明另一視角仍可在圖內切換，桌機與手機高度均至少 44px。
+- 實際 DOM 逐篇開啟 25／25 篇：23 篇顯示並設定 `industry`、2 篇維持 `company`，預期／實際
+  mismatch 0、缺投影標籤 0。AI 機櫃 EMC 文章剛比較完被動元件、電源供應與伺服器組裝／機構後，
+  現在由原先 2 節點／1 關係的公司曝險，直接進入同題 10 節點／9 關係的產業依賴；國巨單一族群
+  財務案例仍進公司曝險。返回桌機與 390px 文章後，焦點都恢復同一顆已標投影的 route 按鈕；
+  直接 graph deep link 仍依 hash 保留 company／industry 且不虛構文章 origin。
+- 1280、884、780、390、320px 實測均無頁面水平溢位；route 按鈕高度皆為 44px。320px 內頁
+  `innerWidth = scrollWidth = 320px`、按鈕寬 258px；390px 為 390／390px、按鈕寬 328px；
+  780px 為 780／780px、按鈕寬 658px；884px 按鈕寬 165.27px。前後、桌機、手機、產業圖與完整
+  census 存於 `tmp/research-learning-audit-2026-08-11-wave126-article-to-graph/`。
+- `learningPathVersion: 78 → 79`；相對目前 HEAD 77，Python 與獨立 Node 路徑排除版本後都確認
+  canonical LIB payload 完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- 固定瀏覽器與 iframe 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400%
+  zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱理解率已提升或完整無障礙合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 UTF-8 環境執行 521 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：
+  `index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `6e5d6278e7a3b9d0b15ca81b71827a2ec068989f09ae69c6358e57f7f41768c8`。
+
+## 手機文章入口補回研究起點 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、
+priority、status、reader 文案、研究 source／claim／monitor、文章、圖譜、公司曝險與投資判斷
+零變動**；本次只修正窄幅文章入口遺失上一層問題脈絡的 reader-only 顯示，並同步研究維護契約、
+方法清單及測試。
+
+- 修改前由研究雷達進入文章時，桌機會顯示完整起點卡，但 390px 只有黏性「返回研究雷達第 1 題」；
+  `mobile-origin-context` 為 0，文章類型 tabs 仍佔首屏，而且原候選問句與本文 H1 不同，讀者無法在
+  文首重看自己從哪一題進來。這是單一路徑、固定 DOM 狀態的決定性驗收，不是抽樣統計，SE／t／
+  有效獨立觀測不適用。
+- 780px 以下保留既有唯一黏性返回鈕，隱藏重複的文章類型 tabs；本次確有雷達、族群矩陣或圖譜
+  起點時，新增不含第二個返回動作的原生 `details` 摘要，逐字重用既有
+  `articleOriginContext().title`，不生成或改寫研究內容。341–780px 預設展開；340px 以下預設
+  收合，summary 仍保留完整起點文字、至少 44px 高並可一次展開。直接 deep link 不建立摘要，
+  仍只顯示「返回研究清單」。
+- 實際瀏覽器在 390px 驗收起點全文、文章問題、查核警語、第一個任務重點與主行動；主行動底部
+  710.76px，完整落在 720px viewport。320px 預設收合時摘要高 48.375px、主行動底部 710.29px；
+  展開後仍能讀完整原題。780px 預設展開且主行動底部 616.03px。三種窄幅均無水平溢位。
+  884px 與 1280px 只顯示既有桌機起點卡與文章 tabs，不重複手機摘要；390px 直接 deep link 的
+  摘要數為 0，返回雷達後同一候選卡與原文章按鈕重新取得可見焦點。前後、320px 收合／展開、
+  390px、780px、884px、桌機、direct link 與返回畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave125-article-system-position/`。
+- `learningPathVersion: 77 → 78`；Python 與獨立 Node 路徑排除版本後，都確認 current／HEAD
+  canonical LIB payload 完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- 固定瀏覽器與 iframe 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400%
+  zoom、完整實體鍵盤巡覽或儀器化 WCAG 對比，因此不宣稱理解率已提升或完整無障礙合規。
+- Darwin 25.5.0 arm64、Python 3.11.11、預設 UTF-8 環境執行 521 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：
+  `index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `dd4ce33a9d98f01467b18350c90ce7ce622dc38e045d6376b8d6a633c6808c7b`。
+
 ## 研究雷達新增候選題地圖 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、

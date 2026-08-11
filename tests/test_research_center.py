@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 77)
+        self.assertEqual(library["learningPathVersion"], 81)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1413,6 +1413,10 @@ class ResearchCenterTest(unittest.TestCase):
             "三句重點之後，再比較本文族群角色與所在學習階段。",
             ".reading-mission-start{width:100%;min-height:44px}",
             ".article-learning-origin{display:none}",
+            "body.article-open .reader-tabs{display:none}",
+            ".mobile-origin-context{display:block",
+            ".mobile-origin-context:not([open]) strong{white-space:nowrap",
+            "@media(max-width:340px){.mobile-origin-context{margin-bottom:8px}",
             "function articleGroupGuideRows(", "function renderArticleRoleContext(",
             "'data-testid':'article-role-context'", "article-role-context",
             "'data-testid':'article-role-next'", "article-role-next",
@@ -1486,6 +1490,38 @@ class ResearchCenterTest(unittest.TestCase):
             "data-graph-view", "data-guided-edge",
             "card.graphView,card.guidedRelation?.edgeId",
             "查看'+(card.graphViewLabel||'產業關聯')+'圖",
+            "function articleRouteGraphView(article)",
+            ".learning-route-action{min-height:44px",
+            "roleCount>1&&hasIndustry", "!hasCompany&&hasIndustry",
+            "'data-graph-view':view", "'data-role-count':roleCount",
+            "text:'看這站證據關係 · '+viewLabel",
+            "openRadarGraph(route.graphId,view,'',graphLearningOrigin('route-context'))",
+            "本入口先開「產業依賴」", "要查具名公司時可在圖內切換「公司曝險」",
+            ".graph-origin-roles{grid-column:1/-1",
+            ".graph-origin button.graph-origin-role{display:grid",
+            "function graphArticleRoleMatches(graph,nodeMap,groupId)",
+            "function graphArticleRoleEntries(graph,nodeMap,article)",
+            "function graphArticleRoleNavigator(currentEdge)",
+            "function revealGraphArticleRole(edge)",
+            "function renderGraphArticleRoles(graph,nodeMap)",
+            "state.graphView!=='industry'",
+            "(graph.articleIds||[]).includes(article.id)",
+            "'data-testid':'graph-origin-role-'+group.id",
+            "'data-edge-count':matches.length",
+            "把剛才文章的 '+entries.length+' 個角色放回圖上",
+            "先選一個剛讀過的角色",
+            "state.graphEvidence.add(edge.evidenceState)",
+            "renderGraphArticleRoles(graph,nodeMap)",
+            ".graph-reader-role-nav{padding:10px 11px",
+            ".graph-reader-role-switch{display:grid",
+            "'data-testid':'graph-reader-role-nav'",
+            "'data-testid':'graph-reader-role-'+entry.group.id",
+            "'aria-current':current?'step':null",
+            "button.addEventListener('keydown',graphKeyboard(activate))",
+            "留在圖內比較本文 '+entries.length+' 個角色",
+            "切換只比較本文角色",
+            "roleNavigator=graphArticleRoleNavigator(edge)",
+            "if(roleNavigator)panel.appendChild(roleNavigator)",
             ".learning-relation-boundary>summary{min-height:44px}",
             "你能用自己的話回答嗎？", "sourceLabel=mission.sourceLabel||'三句重點'",
             "text:'需要提示？查看本文'+sourceLabel",
@@ -1504,6 +1540,14 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-testid':'article-origin-back-top'",
             "'data-testid':'article-origin-back-bottom'",
             "originContext?.mobileBackLabel||'返回研究清單'",
+            "function renderMobileArticleOrigin(context)",
+            "'data-testid':'mobile-origin-context'",
+            "fromQuestion?'你從這題進來':'你從這個位置進來'",
+            "open=!matchMedia('(max-width:340px)').matches",
+            "return h('details',{class:'mobile-origin-context'",
+            "h('strong',{text:context.title})",
+            "const mobileOrigin=renderMobileArticleOrigin(originContext)",
+            "if(mobileOrigin)body.appendChild(mobileOrigin)",
             "selectArticle(value,false,null)",
             ".article-learning-origin", ".learning-origin-return",
             "origin.kind==='radar'", "研究雷達第 '+candidate.rank+' 題",
@@ -1575,7 +1619,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn('attach_research_learning_paths(', builder)
         self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
         self.assertIn(
-            "body.appendChild(mobileBack);const originBar="
+            "body.appendChild(mobileBack);const mobileOrigin="
+            "renderMobileArticleOrigin(originContext);if(mobileOrigin)body.appendChild(mobileOrigin);"
+            "const originBar="
             "renderArticleLearningOrigin();if(originBar)body.appendChild(originBar);"
             "body.appendChild(articleReaderHeading(article))",
             template,
@@ -2454,7 +2500,7 @@ class ResearchCenterTest(unittest.TestCase):
             "openRadarGraph(graphId,graphView='company',edgeId='',origin=null)",
             "state.graphOrigin=origin", "if(origin)focusGraphOrigin()",
             "card.guidedRelation?.edgeId,graphLearningOrigin()",
-            "openRadarGraph(route.graphId,'company','',graphLearningOrigin('route-context'))",
+            "openRadarGraph(route.graphId,view,'',graphLearningOrigin('route-context'))",
             "focusSelector=origin.source==='route-context'?'.learning-route-action'",
             "state.graphOrigin=null;selectSurface('graph')",
             ".graph-origin{display:grid;grid-template-columns:minmax(0,1fr) auto",
@@ -2467,7 +2513,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderLearningRouteContext(article)",
             "'aria-label':'學習路線定位'",
             "階段與站次只代表閱讀順序，不是上下游、研究完成度或投資排名",
-            "看這站證據關係",
+            "看這站證據關係 · ",
             "function learningRouteById(routeId)",
             "function learningRoutePhaseGroups(stations)",
             "function learningRouteStationReaderQuestion(station)",
@@ -2525,6 +2571,10 @@ class ResearchCenterTest(unittest.TestCase):
             ".graph-intro-action{width:100%;min-height:44px}",
         ):
             self.assertIn(contract, template)
+        self.assertNotIn(
+            "openRadarGraph(route.graphId,'company','',graphLearningOrigin('route-context'))",
+            template,
+        )
         self.assertNotIn("learning-route-phase-head", template)
         self.assertNotIn("讀完試著回答：", template)
         self.assertIn(
