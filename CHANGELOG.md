@@ -1,5 +1,37 @@
 # Changelog
 
+## 自我檢查後先看下一站，路徑細節需要時再展開 — 2026-08-12
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
+文章文字與順序、正式 route／phase／station／graph／edge、族群映射、雷達候選與投資判斷零變動**；
+本次只收合 reader mode「下一站」卡內原本完整攤開的路徑說明，並同步研究維護契約、方法清單、
+README、payload 版本、發布頁與測試。
+
+- 固定走讀「族群矩陣 → 供電與散熱第 1/9 站 → 自我檢查 → 下一站」。修改前，390×844 的
+  下一站卡高約 668.6px，其中路徑銜接說明約 324.6px，讀者必須再捲近一個 viewport 才看到
+  繼續按鈕；修改後，卡片先以約 85.8px 的收合摘要直接顯示「這一站 → 下一站」、正式站名與
+  階段關係，卡高降為 350.3px，整段學習收尾由 1,627.6px 降為 1,309.3px，繼續按鈕在同一張
+  修改後畫面底部即可看見。這是固定文章與 viewport 的單次 DOM／畫面量測，不是完成率或理解率
+  統計。
+- 收合採原生 `details`／`summary`；展開後仍保留原路徑問題、本文第一個關鍵點、兩步銜接順序、
+  下一站說明與邊界提醒，沒有刪除或改寫內容。摘要與繼續按鈕的觸控高度都至少 44px；同階段與
+  跨階段各實走一次，後者會直接顯示正式階段轉換。點擊「繼續第 2/9 站」已實際開啟原定下一篇
+  「高壓直流系統為何不能只靠一顆保險絲保護？」。
+- 320×844 的下一站卡約 377.4px，390×844 約 350.3px，1280×900 約 306.3px；三個 viewport
+  均無水平溢位，另核對 320px 明／暗模式、390px 收合／展開與 1280px 桌機畫面。這些固定狀態
+  不涵蓋所有字級、縮放、瀏覽器或輔助科技組合。
+- `learningPathVersion: 105 → 106`。獨立 Python 與 Node JSON 路徑各自核對修改前後 274 篇文章：
+  排除 reader-only 版本後完整 payload 相等；以遞迴 key 排序、UTF-8 compact JSON 重算，兩條
+  路徑的前後 SHA-256 均為 `008f70ffed96a2b0ad271e4b6127aa2f90843453fa27daf48aa8b6a44751fcfd`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 環境執行 530 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build 的
+  `research.html` SHA-256 一致：`7e3de39fb96b2683aca0f1b69d464b7710c821b719f23501374a8064f8632e6c`。
+- 修改前、收合後、展開後、320px 明暗模式、1280px 桌機、下一站落地與跨階段摘要畫面存於
+  `tmp/research-learning-audit-2026-08-12-wave153-self-check-bridge/`。本輪未做真實新手理解測試、
+  長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱學習
+  成效已提升或完整無障礙合規。
+
 ## 系統表讀完先收束成能說與不能說 — 2026-08-12
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、

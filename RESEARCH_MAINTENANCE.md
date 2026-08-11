@@ -887,12 +887,15 @@ resize 不得重設使用者已切換的開合狀態。每個 phase 摘要須顯
 主閱讀流程在正文後固定顯示「從這篇接著學」。延伸卡只能由現有 library 與 knowledge graph
 產生：文章必須共享具名公司或宣告族群；圖譜必須已引用本文，或已包含本文的具名公司；族群
 入口只能使用本文已宣告的族群。它是導覽層，不得依文字相似度自行建立供應鏈、客戶或受惠關係。
-正式 route 下一站已由 `routeBridge` 解釋 graph／phase 次序；每張下一站卡在兩步次序之前還必須
-由目前 article 的 `learningRoute.id` 回查同一份正式 route，逐字顯示 route `question`，讓跨題材
-或跨 phase 時仍保有整條路線的系統問題；同一區再逐字顯示目前文章非空的
-`readingMission.keyPoints[0]`，標成「本篇替整條問題先補上」，並保留 article ID 與 key point
-index，不得從正文、題名、相似度或模型重寫。桌機自我檢查與下一站並排時各自維持內容高度，窄幅
-再改成單欄，不得用等高拉伸製造空白。最後一站的 route card 必須再逐字顯示同一 `question`、
+正式 route 下一站已由 `routeBridge` 解釋 graph／phase 次序；每張下一站卡的原生 `details` 摘要
+必須先逐字顯示目前站與下一站的 graph label，並以既有 phase label 標示同階段或跨階段。完整脈絡
+預設收合，展開後仍須由目前 article 的 `learningRoute.id` 回查同一份正式 route，逐字顯示 route
+`question`，讓跨題材或跨 phase 時仍保有整條路線的系統問題；同一區再逐字顯示目前文章非空的
+`readingMission.keyPoints[0]`，標成「本篇替整條問題先補上」，保留 article ID 與 key point
+index，並完整保留下個 article card 的既有 description 與兩步 ordered list，不得從正文、題名、
+相似度或模型重寫。收合狀態須讓下一站問題、站次與行動先出現；摘要須可鍵盤操作且至少 44px，
+展開內容不得改變 payload。桌機自我檢查與下一站並排時各自維持內容高度，窄幅再改成單欄，不得
+用等高拉伸製造空白。最後一站的 route card 必須再逐字顯示同一 `question`、
 `description` 與全部既有 `phases[].label`／各自 `graphIds` 站數，形成「回頭回答整條路線」；缺少
 可解析 route 或 question 時不顯示這個 reader-only 複習，不得用文章題名、正文、相似度或模型補寫。
 這只重排 knowledge graph 已發布的 route，不得建立 phase 之間的上下游、因果、受惠或重要性結論。
@@ -926,9 +929,11 @@ index，不得從正文、題名、相似度或模型重寫。桌機自我檢查
 列入正式學習路線的主文章另須在延伸區完成「本篇理解檢查 → 下一站問題」交接：理解問題逐字
 重用同篇「想一想」，預設收合的提示只能逐字重用同篇「三句話抓重點」，不得生成答案或改寫
 語氣；下一站問題逐字取自下一篇已登錄 route 主文章的閱讀任務。所有非末站另須把本篇
-`learningRoute.graphLabel／phaseLabel` 與下一篇相同欄位逐字排成兩步閱讀交接；缺 label 時不得
-用文章題名、相似度或模型補寫。這個 ordered list 只表示 route 既有次序，必須明示不代表
-供應鏈、受惠或因果關係，也不得建立 knowledge graph edge。末站須在單篇理解檢查旁，把正式
+`learningRoute.graphLabel／phaseLabel` 與下一篇相同欄位逐字放進 `routeBridge`：收合摘要先顯示
+兩個 graph label 的「這一站 → 下一站」與 phase；展開後再顯示同一份完整 ordered list、route
+question、本篇 key point、下一站 description 與邊界。缺 label 時不得用文章題名、相似度或模型
+補寫。這個 disclosure 只表示 route 既有次序，必須明示不代表供應鏈、受惠或因果關係，也不得
+建立 knowledge graph edge。末站須在單篇理解檢查旁，把正式
 route 的原系統問題、原路線說明、全部 phase label 與各 phase 站數完整收回，並再次明示只是閱讀
 總複習；不得把完成站次改寫成已掌握、研究結論完成或產業關係已證實。任何 route 主文章缺少問題或
 三句重點都必須讓建置失敗。回看按鈕須把鍵盤焦點與捲動位置一起送回「三句話抓重點」，不能被

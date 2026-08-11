@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 105)
+        self.assertEqual(library["learningPathVersion"], 106)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1522,7 +1522,7 @@ class ResearchCenterTest(unittest.TestCase):
             "learning-route-bridge-takeaway", "本篇替整條問題先補上",
             "takeaway=String((mission.keyPoints||[])[0]||'').trim()",
             "'data-source-key-point-index':'0'",
-            "把兩站串起來 · 閱讀順序",
+            "這一站 → 下一站", "data-route-context-collapsed",
             "只表示學習次序，不代表供應鏈、受惠或因果關係。",
             "function learningRelationPreview(", "一條既有關係示範",
             "先看一條既有關係", "先別外推到哪裡",
@@ -2646,6 +2646,30 @@ class ResearchCenterTest(unittest.TestCase):
         for route in bd.RESEARCH_LEARNING_ROUTES:
             self.assertTrue(route.get("question"), route.get("id"))
             self.assertTrue(route.get("phases"), route.get("id"))
+
+    def test_next_station_route_context_is_compact_until_the_reader_opens_it(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "phaseSummary=bridge.fromPhaseLabel&&bridge.toPhaseLabel",
+            "summary=h('summary',{}",
+            "class:'learning-route-bridge-summary-copy'",
+            "text:bridge.fromGraphLabel+' → '+bridge.toGraphLabel",
+            "return h('details',{class:'learning-route-bridge'",
+            "'data-route-context-collapsed':'true'",
+            "class:'learning-route-bridge-body'",
+            "card.description?h('p',{class:'learning-route-bridge-description'",
+            "if(routeBridge)item.appendChild(routeBridge);else item.appendChild",
+            "const meta=h('span',{class:'learning-card-meta'",
+            "if(routeBridge)item.appendChild(h('div',{class:'learning-route-card-footer'},meta,action))",
+            ".learning-route-bridge>summary{min-height:72px",
+            ".learning-route-bridge>summary::after{content:'展開脈絡'",
+            ".learning-route-bridge[open]>summary::after{content:'收合'",
+            ".learning-route-bridge-body{padding:9px 10px",
+            ".learning-route-card-footer{display:grid",
+            ".learning-route-card-footer .learning-card-action{margin:0}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("return h('aside',{class:'learning-route-bridge'", template)
 
     def test_completed_learning_route_returns_to_an_explicit_next_route_choice(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
