@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 102)
+        self.assertEqual(library["learningPathVersion"], 105)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2120,9 +2120,18 @@ class ResearchCenterTest(unittest.TestCase):
             "readerTablePositions=[]",
             "readerTablePositions.length>0&&readerTablePositions.length===(node.rows||[]).length",
             "positionLabel='位置 '+(rowIndex+1)+'／'+readerTablePositions.length",
+            "function readerTableStepCue(index,total)",
+            "index===0?'先定位':index===total-1?'最後核對':'接著看'",
             "'data-label':systemFirst?positionLabel",
             "'data-reader-original-label':systemFirst?labels[index]:null",
             "'data-reader-system-row':systemFirst?rowIndex+1:null",
+            "class:'reader-table-cell-guide'",
+            "'data-reader-table-cell-step':index+1",
+            "'aria-hidden':systemFirst?null:'true'",
+            "h('b',{'aria-hidden':'true'",
+            "h('small',{'aria-hidden':'true'",
+            "String(index+1).padStart(2,'0')+' · '+readerTableStepCue(index,row.length)",
+            "text:labels[index]||'欄 '+(index+1)",
             "class:'reader-table-system-row-label',text:positionLabel",
             "class:'table-wrap'+(systemRows?' reader-system-table':'')",
             "readerTablePositions=readerTableSystemPositions(item,tableHeaders)",
@@ -2147,12 +2156,51 @@ class ResearchCenterTest(unittest.TestCase):
             ".reader-table-system-steps{display:grid",
             ".reader-table-system-steps{grid-template-columns:1fr}",
             ".reader-table-system-label{min-width:0",
-            ".reader-table-system-row-label{display:none}",
-            ".article-section .reader-system-table td:first-child::before{content:none}",
+            ".reader-table-cell-guide,.reader-table-system-row-label{display:none}",
+            ".article-section .reader-system-table td{display:block;padding:8px 11px}",
+            ".article-section .reader-system-table td::before{content:none}",
+            ".article-section .reader-system-table .reader-table-cell-guide{display:grid",
+            "gap:4px 8px;margin:0 0 4px",
+            ".article-section .reader-table-cell-guide b{font:700 9.5px/1.45",
+            ".article-section .reader-table-cell-guide small{min-width:0",
             ".article-section .reader-system-table .reader-table-system-row-label{display:block",
         ):
             self.assertIn(contract, template)
         self.assertNotIn("row.slice(1)", template)
+
+    def test_template_turns_an_explicit_post_system_table_boundary_into_a_takeaway(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function readerSystemTableTakeawayParts(node)",
+            "node?.t!=='p'||(node.runs||[]).some(run=>run?.a||run?.b)",
+            "canToken='這張表只',limitToken='它不能'",
+            "text.indexOf(limitToken,canStart+canToken.length)",
+            "text.indexOf(canToken,canStart+canToken.length)>=0",
+            "text.indexOf(limitToken,limitStart+limitToken.length)>=0",
+            "limitStart<=canStart||repeated",
+            "!text.slice(0,canStart).endsWith('。')",
+            "text.slice(0,canStart),text.slice(canStart,limitStart),text.slice(limitStart)",
+            "kind:'principle',label:'01 · 先記住'",
+            "kind:'scope',label:'02 · 能說到這裡'",
+            "kind:'limit',label:'03 · 先不能說'",
+            "function readerSystemTableTakeaway(node)",
+            "'aria-label':'表格結論三句話'",
+            "'data-reader-table-takeaway-part':index+1",
+            "'aria-label':'表格讀完先收束'",
+            "'data-reader-table-takeaway':parts.length",
+            "'data-reader-table-takeaway-source-chars':parts.reduce",
+            "三句文字逐字沿用表後原文；標籤只安排閱讀順序，不新增研究結論。",
+            "let previousSystemTable=false",
+            "takeaway=showReaderAids&&previousSystemTable?readerSystemTableTakeaway(item):null",
+            "rendered=takeaway||block(item",
+            "previousSystemTable=readerTablePositions.length>0",
+            ".reader-table-takeaway{margin:4px 0 18px",
+            ".reader-table-takeaway-steps{display:grid",
+            ".reader-table-takeaway-item.limit{border-top-color:var(--amber)",
+            "@container (max-width:620px){.reader-table-takeaway-steps{grid-template-columns:1fr}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("readerSystemTableTakeaway(item.rows", template)
 
     def test_template_recomputes_confidence_from_taipei_calendar_at_runtime(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2395,7 +2443,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function readerLeadParts(article,value)",
             "source.replace(/\\[(S\\d+)\\]/gi",
             "article.type!=='formal_note'||item.kind!=='internal_taxonomy'",
-            "const rendered=block(item,{readableProse:mode==='reader',readerProseProfile:showReaderAids?'topic':'default',textTransform,readerTablePositions})",
+            "rendered=takeaway||block(item,{readableProse:mode==='reader',readerProseProfile:showReaderAids?'topic':'default',textTransform,readerTablePositions})",
             "normalizedReaderRunTexts(source).map(text=>textTransform?textTransform(text):text)",
             "查核狀態沿用原始正式筆記；本頁只改善導覽，不改動原始證據邊界。",
             "研究內容以原始 Markdown 與查核資料為準",
@@ -2939,31 +2987,30 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, template)
         self.assertNotIn("renderTopicLearningPosition(article.readerTitle", template)
 
-    def test_dense_section_glossary_progressively_discloses_registered_terms(self):
+    def test_dense_section_glossary_stays_folded_until_the_reader_needs_terms(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
-            "const SECTION_GLOSSARY_PREVIEW_LIMIT=6,SECTION_GLOSSARY_COLLAPSE_AT=9",
+            "const SECTION_GLOSSARY_FOLD_AT=4",
             "function sectionGlossaryTermButton(entry)",
-            "collapsed=matches.length>=SECTION_GLOSSARY_COLLAPSE_AT",
-            "preview=collapsed?matches.slice(0,SECTION_GLOSSARY_PREVIEW_LIMIT):matches",
-            "remaining=collapsed?matches.slice(SECTION_GLOSSARY_PREVIEW_LIMIT):[]",
+            "folded=matches.length>=SECTION_GLOSSARY_FOLD_AT",
             "'data-section-term-count':matches.length",
-            "'data-section-term-preview-count':preview.length",
-            "'data-section-term-hidden-count':remaining.length",
-            "本節會遇到 '+matches.length+' 個詞",
-            "先看 '+preview.length+' 個；其餘用到再展開",
-            "class:'section-glossary-more'",
-            "'data-remaining-term-count':remaining.length",
-            "再看其餘 '+remaining.length+' 個詞",
-            "remaining.forEach(entry=>moreList.appendChild(sectionGlossaryTermButton(entry)))",
-            "前 '+preview.length+' 個沿用原字典順序，並不代表比較重要",
-            ".section-glossary-more>summary{min-height:44px",
-            ".section-glossary-more>summary:focus-visible",
-            ".section-glossary-more-state::before{content:'展開'}",
-            ".section-glossary-more[open] .section-glossary-more-state::before{content:'收合'}",
+            "'data-section-term-visible-count':folded?0:matches.length",
+            "'data-section-term-folded-count':folded?matches.length:0",
+            "matches.forEach(entry=>list.appendChild(sectionGlossaryTermButton(entry)))",
+            "return h('details',attrs,summary",
+            "名詞先不用背：本節 '+matches.length+' 個",
+            "先讀內容；看到陌生詞再回來查",
+            "全部詞名與解釋只取自同篇「名詞小字典」",
+            ".section-glossary-fold>summary{min-height:52px",
+            ".section-glossary-fold>summary:focus-visible",
+            ".section-glossary-fold-state::before{content:'展開'}",
+            ".section-glossary-fold[open] .section-glossary-fold-state::before{content:'收合'}",
+            ".section-glossary-body{padding:10px 11px 11px",
+            ".section-glossary-fold>summary{min-height:56px",
         ):
             self.assertIn(contract, template)
-        self.assertNotIn("matches.slice(0,SECTION_GLOSSARY_PREVIEW_LIMIT).sort", template)
+        self.assertNotIn("SECTION_GLOSSARY_PREVIEW_LIMIT", template)
+        self.assertNotIn("section-glossary-more", template)
 
     def test_template_graph_entry_progressively_discloses_controls(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

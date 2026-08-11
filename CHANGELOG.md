@@ -1,5 +1,99 @@
 # Changelog
 
+## 系統表讀完先收束成能說與不能說 — 2026-08-12
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
+文章文字與順序、正式 route／phase／station／graph／edge、族群映射、雷達候選與投資判斷零變動**；
+本次只把 reader mode 中緊接系統位置表、且已自行明寫能力邊界的原段落，排成三句閱讀收束卡；
+同步研究維護契約、方法清單、README、payload 版本、發布頁與測試。
+
+- 固定走讀「族群矩陣 → 供電與散熱第 1/9 站 → 從電網到晶片」。修改前，第一張系統表後的
+  112 字原段落在 390×844 直接連續排版，能力與限制埋在同一段，句首的右引號也會因換行獨立
+  掛在前一行。修改後，同一段逐字切成 `01 · 先記住`、`02 · 能說到這裡`、`03 · 先不能說`，
+  並明示「標籤只安排閱讀順序，不新增研究結論」；三段合計仍為 112 字。這是同一 Browser
+  viewport／同一文章狀態的 DOM 與畫面核對，不是理解率、完成率或學習成效統計。
+- 轉換條件刻意保守：只接受緊接已通過 `readerTableSystemPositions()` 的純文字段落，且原文必須
+  能唯一切成一個以句號結束的前置原則、一個 `這張表只…` 與一個 `它不能…`；任一段超過
+  220 字、含連結／粗體、句型不完整或位置不相鄰都退回原段落。發布中的 274 篇文章目前只有
+  1 段符合；來源 Markdown、run 邊界與文章 payload 均未回寫。
+- 收束卡使用具名 `aside` 與三項原生 ordered list，卡內 0 個鍵盤停駐點。320×844 明／暗模式的
+  卡片為 284×451.2px、頁面 `scrollWidth=320`；390×844 為 354×427.1px；1280×900 為
+  836×209.8px，三欄各約 263.7px。三個 viewport 都無水平溢位；以上皆為固定狀態各一次的直接
+  DOM 量測，不外推到其他裝置或讀者。
+- `learningPathVersion: 104 → 105`。獨立 Python 與 Node JSON 路徑各自核對修改前後 274 篇文章：
+  排除 reader-only 版本後完整 payload 相等。以遞迴 key 排序、UTF-8 compact JSON 重算，兩條路徑
+  的前後 SHA-256 均為 `008f70ffed96a2b0ad271e4b6127aa2f90843453fa27daf48aa8b6a44751fcfd`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 環境執行 529 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA-256
+  一致：`index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `0a2d16044ae0642daba0b9c5d330c38b85dad64c3fa41de54acf0201b7597727`。
+- 同狀態修改前／後、320px 明暗模式與 1280px 桌機畫面存於
+  `tmp/research-learning-audit-2026-08-12-wave152-post-table-takeaway/`。本輪未做真實新手理解測試、
+  長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱學習
+  成效已提升或完整無障礙合規。
+
+## 系統表逐列改成先定位、再看內容、最後核對 — 2026-08-12
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
+文章文字與順序、正式 route／phase／station／graph／edge、族群映射、雷達候選與投資判斷零變動**；
+本次只調整 reader mode 已通過「系統位置索引」條件之表格的窄欄呈現，並同步研究維護契約、
+方法清單、README、payload 版本、發布頁與測試。
+
+- 固定走讀「族群矩陣 → 供電與散熱第 1/9 站 → 第一節第一張系統表」。修改前，390×844 的
+  row 卡用約 112.2px 標籤欄加 207.8px 內容欄，句子被壓在右側窄欄；第一列高約 197.6px。
+  修改後，每個 cell 改成全寬內容段，前方依原欄序顯示 `01 · 先定位`、`02 · 接著看`、
+  `03 · 最後核對` 與同欄原始 `th`，原文可用內容寬度為 330px；第一列高約 222.7px。這是同一
+  Browser viewport／同一文章狀態的 CSS 與 DOM 量測，不是理解率、完成率或學習成效統計。
+- 第一段仍顯示可回查前一個索引的 `位置 N／總數`；三個原始 `th`、15/15 個原 cell、5/5 個 row
+  與原順序都保留。固定 cue 不進 cell accessible name，原生 table header 與實際位置文字節點仍在；
+  表內沒有新增鍵盤停駐點。320px 的明、暗模式與 390px 都無水平溢位；1280px 仍是原生三欄 table，
+  cue 與 row 位置標籤不顯示，也沒有改成卡片。
+- `learningPathVersion: 103 → 104`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章：文章 ID／
+  順序完全相同；candidate radar、knowledge graph 與 group maturity 也完全相同。排除 reader-only
+  版本後，前後 payload 完全相同，兩條路徑的 canonical SHA-256 都是
+  `55de62373083597228ebeb00a5a6933b6eae86b99d1d91ca3ee020951565ba6a`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 環境執行 528 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA-256
+  一致：`index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `f68920b2d07b7a2d89aec9385b08a27a78cfa9d4c31129a16836aedc2896a780`。
+- 同狀態修改前／後、320px 明暗模式與 1280px 原生表格畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave151-table-row-reading/`。本輪未做真實新手理解測試、
+  長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱學習
+  成效已提升或完整無障礙合規。
+
+## 正文先讀內容，密集名詞改成遇到再查 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
+文章文字與順序、正式 route／phase／station／graph／edge、族群映射、雷達候選與投資判斷零變動**；
+本次只調整 reader mode 的本節名詞漸進揭露，並同步研究維護契約、方法清單、README、payload
+版本、發布頁與測試。
+
+- 固定走讀「族群矩陣 → 供電與散熱第 1/9 站 → 直接讀第一節」。修改前，390×844 的第一節在
+  白話問題與 H2 後先完整攤開 9 個名詞：名詞區約 256.5px 高，第一張原表約在 viewport 頂端下方
+  1,079px；讀者剛選擇進正文，仍先穿過 6 個詞鈕與第二層剩餘詞入口。修改後，4 個以上的本節
+  名詞預設收成 56px「名詞先不用背」，同一張表提前約 199px；正文的系統位置與原表更早出現。
+  1–3 個詞仍直接完整顯示。這是固定 Browser viewport 的版面與 DOM 量測，不是理解率、完成率
+  或學習成效統計。
+- 展開後仍一次顯示原字典順序的 9/9 個唯一詞鈕，沒有挑選重要詞或另建第二層剩餘詞；點
+  `Si／SiC／GaN` 仍開啟同一名詞速查、預填完整詞名且只顯示同一筆原始定義，關閉後焦點返回
+  原詞鈕。收合狀態的 accessibility tree 不含內部詞鈕；390px summary 高 56px、1280px 高 52px，
+  兩邊都無水平溢位。原始名詞小字典、正文、表格、研究摘要與 GitHub 原文均保留。
+- `learningPathVersion: 102 → 103`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章：文章 ID／
+  順序完全相同；Python 另確認 candidate radar、knowledge graph 與 group maturity 完全相同。
+  排除 reader-only 版本後，前後 payload 完全相同，兩條路徑的 canonical SHA-256 都是
+  `55de62373083597228ebeb00a5a6933b6eae86b99d1d91ca3ee020951565ba6a`。
+- Darwin 25.5.0 arm64、Python 3.11.11、`C.UTF-8` 環境執行 528 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA-256
+  一致：`index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `1f17d0179d48e51a822093eaeef86963b6cbdd7ae29bef4d0373fcd8ff0d0622`。
+- 修改前、收合後、展開後、原字典對話框與桌機畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave150-first-body-orientation/`。本輪未做真實新手理解測試、
+  長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱學習
+  成效已提升或完整無障礙合規。
+
 ## 族群矩陣先說第一站要學什麼，再讓讀者開始 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
