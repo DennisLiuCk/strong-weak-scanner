@@ -1,5 +1,72 @@
 # Changelog
 
+## 市場議題先把長表格還原成可掃讀的系統位置索引 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、summary、monitor、
+confidence、topic fingerprint、route、圖譜、公司曝險與投資判斷零變動**；本次只調整市場議題
+一般正文的 reader-only 表格導讀與對應方法文件、測試。方法 registry fingerprint 未改變，
+`research_method_audit.py --baseline-ref HEAD` 通過，因此不建立內容相同的新方法快照。
+
+- 固定走讀「族群矩陣 → 功率元件 → 800VDC 功率半導體鏈 → 從電網到晶片」發現，文章首屏已有
+  閱讀任務、結論邊界、三句重點與族群角色，但技術正文在 9 個名詞後只顯示三張通用的欄位讀法，
+  接著直接進入五列長表格。新手仍須從 row 卡自行拼出本文檢查哪些電力位置。
+- `readerTableSystemPositions()` 現在只在第一欄名含「位置／環節／節點／路徑」、row 為 3–8 列、
+  `row[0]` 全部非空、唯一且不超過 80 字時，逐字建立「系統位置索引」；索引後再依原欄名提示逐列
+  讀法。它不讀其他 cell 生成摘要，並明示編號不代表上下游、流程一定相連、重要性或受惠排序；
+  不符條件的表格仍安全退回既有欄名導讀。
+- 直接解析建置後完整 article registry，排除查核附錄後得到 11 張系統位置索引；另一條逐行解析
+  `notes/research_topics/*.md` 的 H2 與 Markdown table 也得到相同 11 張表、文章與段落。這是完整
+  registry 的決定性核對，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 1280 × 720 同尺寸前後比對顯示，通用三步卡已換成同表五個具名電力位置；390 × 844 手機版五個
+  位置維持單欄，`innerWidth == scrollWidth == clientWidth == 390`，索引寬 354px、左右界 18px／
+  372px。AI 機櫃 EMC 的一般「驗證關卡」表仍為 1 個欄名導讀、0 個系統位置索引，確認 fallback
+  沒有把比較表誤畫成流程。
+- 前後畫面、同尺寸比較、兩條完整母體列舉與稽核存於
+  `tmp/research-learning-audit-2026-08-11-wave110-article-system-map/`。固定 viewport 不是實機，本輪
+  未涵蓋 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化 WCAG 對比或真實
+  讀者理解測試，因此不宣稱實際理解率已提升或完整無障礙合規。
+- `Darwin 25.5.0 arm64 arm`、Python 3.11.11、UTF-8 執行 509 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0。method audit 仍如實揭露既有新鮮度、修正學習與校準提醒。連續兩次 dashboard build
+  SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `6226766557d7487363341516e650f51117ab068c226592e88b1452fb9759e545`。
+
+## 族群矩陣把具名公司證據變成可回查的學習步驟 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、summary、monitor、
+confidence、topic fingerprint、圖譜 edge、公司曝險與投資判斷零變動**；本次只把矩陣已計數的
+公司證據投影成 reader-only 入口，並調整完成度文字與工作階段 origin。方法 registry fingerprint
+未改變，`research_method_audit.py --baseline-ref HEAD` 通過，因此不建立內容相同的新方法快照。
+
+- 固定走讀「族群矩陣 → 功率元件 → 起讀文章 → 公司曝險圖 → 強茂關係 → 正式筆記」發現，
+  族群預覽只說角色與系統問題；完整進度雖寫「具名公司證據 1 檔」，既沒有公司名稱，也沒有回查
+  入口。讀者必須先猜一篇文章，再在關係圖裡自行找到公司，才能知道「1」指的是誰。
+- `groupMaturity.rows[].companyEvidence` 現在只從 active company-view、台股 universe 且正式族群
+  相符的既有 edge 產生。每家公司依「先避開過期 edge → 既有材料性 → 證據層級 → graph／edge
+  ID」選一條穩定入口，另附正式公司筆記 ID；所有公司與其他 edge 仍保留，不選代表公司、不新增
+  公司關係。發布 payload 的 11 個族群共 20 家公司、23 條 active 公司路由；11／11 列的
+  `companyEvidence` 家數都等於原 `companyBridges`，20／20 個公司、graph、edge 與正式筆記 ID
+  全部可解析。另一條直接重建 raw knowledge graph 的列舉也得到同一批 20 家、23 條路由。這是
+  完整 registry 的決定性核對，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 族群預覽新增「從公司證據接下去」，依序提供「1 先認識本業」與「2 再看題材關係」；證據層級、
+  商業階段與材料性沿用同一 edge。完整進度欄改成「公司筆記已核驗／可回查公司／題材財務檢查」
+  三列，具名公司用「家」而非「檔」，並可直接打開同一關係。介面明示這不是代表公司、受惠名單、
+  訂單、收入或投資排名。
+- 公司筆記使用 `maturity-company-note`、關係圖使用 `maturity-company` 工作階段 origin；桌機與手機
+  都能返回同一族群、同一家公司與原按鈕焦點。1280 × 720 與 390 × 844 實測公司卡、完成度列、
+  筆記及關係圖皆可操作，`scrollWidth == innerWidth`，瀏覽器 console 無錯誤。
+- 前後畫面、同尺寸比較、路由核對腳本與完整稽核存於
+  `tmp/research-learning-audit-2026-08-11-wave109-group-to-company/`。固定 viewport 不是實機，本輪
+  未涵蓋 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化 WCAG 對比或真實
+  讀者理解測試，因此不宣稱實際理解成效或完整無障礙合規。
+- `Darwin 25.5.0 arm64`、Python 3.11.11、UTF-8 執行 509 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0。method audit 仍如實揭露既有新鮮度、修正學習與校準提醒。連續兩次 dashboard build
+  SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `a38b183964d24311404c00e9f71fe33dd08713492f916bd06ba1ff32743718d3`。
+
 ## 族群矩陣把每一站對回產業角色，並保留文章與關係圖來處 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究來源、主張、summary、monitor、

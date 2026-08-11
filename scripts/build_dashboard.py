@@ -3703,6 +3703,9 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     company_by_evidence = defaultdict(lambda: defaultdict(set))
     edge_counts = defaultdict(lambda: defaultdict(int))
     company_routes = defaultdict(list)
+    materiality_rank = {"financial": 3, "named_product": 2, "adjacent": 1,
+                        "unknown": 0}
+    evidence_rank = {"verified": 2, "inference": 1, "unverified": 0}
     financial_assessment_ids = defaultdict(set)
     financial_companies = defaultdict(set)
     financial_by_attribution = defaultdict(Counter)
@@ -3734,12 +3737,38 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
                     edge.get("evidenceState") or "unverified"
                 ].add(stock_id)
                 edge_counts[group_id][edge_key] += 1
+                company_name = (node.get("label")
+                                or (stock_meta.get(stock_id) or {}).get("name")
+                                or "")
                 company_routes[group_id].append({
                     "stockId": stock_id,
+                    "companyName": company_name,
+                    "companyLabel": f"{stock_id} {company_name}".strip(),
+                    "formalArticleId": (
+                        f"formal-{stock_id}"
+                        if stock_id in note_available[group_id] else ""
+                    ),
+                    "formalVerified": stock_id in note_verified[group_id],
                     "graphId": graph.get("id") or "",
+                    "graphLabel": graph.get("label") or "",
+                    "edgeId": edge.get("id") or "",
                     "articleIds": list(edge.get("articleIds") or []),
+                    "relationLabel": (
+                        edge.get("relationLabel") or edge.get("relation") or ""
+                    ),
                     "materiality": edge.get("materiality") or "unknown",
+                    "materialityLabel": (
+                        edge.get("materialityLabel") or edge.get("materiality") or ""
+                    ),
                     "evidenceState": edge.get("evidenceState") or "unverified",
+                    "evidenceLabel": (
+                        edge.get("evidenceLabel") or edge.get("evidenceState") or ""
+                    ),
+                    "commercialStage": edge.get("commercialStage") or "",
+                    "commercialStageLabel": (
+                        edge.get("commercialStageLabel")
+                        or edge.get("commercialStage") or ""
+                    ),
                     "reviewDue": edge.get("reviewDue") or "",
                 })
         for assessment in graph.get("financialAssessments", []):
@@ -3778,6 +3807,39 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
                     "boundary": assessment.get("boundary") or "",
                     "nextTrigger": assessment.get("nextTrigger") or "",
                 })
+
+    def reader_company_evidence(group_id):
+        """Choose one deterministic, traceable starting relation per company.
+
+        This is a reader route, not a company or evidence ranking.  Every active
+        relation remains available in the graph; the matrix only needs one stable
+        doorway for each already-counted universe company.
+        """
+        by_company = defaultdict(list)
+        for route in company_routes[group_id]:
+            by_company[route["stockId"]].append(route)
+
+        def route_key(route):
+            review_due = route.get("reviewDue") or ""
+            stale = bool(
+                re.fullmatch(r"\d{4}-\d{2}-\d{2}", review_due)
+                and review_due < date_text
+            )
+            return (
+                stale,
+                -materiality_rank.get(route.get("materiality"), -1),
+                -evidence_rank.get(route.get("evidenceState"), -1),
+                route.get("graphId") or "",
+                route.get("edgeId") or "",
+            )
+
+        result = []
+        for stock_id in sorted(by_company):
+            routes = sorted(by_company[stock_id], key=route_key)
+            route = dict(routes[0])
+            route["routeCount"] = len(routes)
+            result.append(route)
+        return result
 
     reviewed_stale_ids = set()
     unique_due_pairs = set()
@@ -3852,6 +3914,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
         verified_notes = len(note_verified[group_id])
         source_gaps = len(topic_ids.intersection(missing_source_topics))
         bridge_count = len(company_any[group_id])
+        company_evidence = reader_company_evidence(group_id)
         if verified_notes < len(universe):
             action, tone = "補正式公司筆記", "critical"
             reason = f"尚缺 {len(universe) - verified_notes} 檔獨立核驗筆記"
@@ -3887,6 +3950,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
             "verifiedNotes": verified_notes,
             "topics": len(topic_ids),
             "companyBridges": bridge_count,
+            "companyEvidence": company_evidence,
             "materiality": materiality,
             "deepestMateriality": deepest,
             "financialMateriality": financial,
@@ -4071,8 +4135,6 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     # Once a bridge exists, push the same named company/product to a verifiable financial
     # denominator.  A completed bounded/not-disclosed assessment becomes a watch rather
     # than remaining an open research task; only direct attribution closes the gap.
-    materiality_rank = {"financial": 3, "named_product": 2, "adjacent": 1, "unknown": 0}
-    evidence_rank = {"verified": 2, "inference": 1, "unverified": 0}
     for row in rows:
         group_id = row["id"]
         financial = row["financialMateriality"]

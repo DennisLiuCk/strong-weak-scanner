@@ -907,13 +907,19 @@ class ResearchCenterTest(unittest.TestCase):
             "id": "test-graph",
             "nodes": [
                 {"id": "company:1111", "type": "company", "universe": True,
-                 "ticker": "1111", "groupId": "power"},
+                 "ticker": "1111", "groupId": "power", "label": "甲公司"},
                 {"id": "concept:test", "type": "concept", "universe": False},
             ],
             "edges": [{
                 "id": "E1", "status": "active", "view": "company",
                 "from": "company:1111", "to": "concept:test",
                 "materiality": "named_product", "evidenceState": "verified",
+                "relationLabel": "揭露技術能力",
+                "materialityLabel": "具名產品／角色",
+                "evidenceLabel": "證實",
+                "commercialStage": "capability",
+                "commercialStageLabel": "能力／研發",
+                "reviewDue": "2026-08-20",
             }],
         }]}
         reviews = [{
@@ -933,6 +939,26 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(row["verifiedNotes"], 1)
         self.assertEqual(row["topics"], 1)
         self.assertEqual(row["companyBridges"], 1)
+        self.assertEqual(row["companyEvidence"], [{
+            "stockId": "1111",
+            "companyName": "甲公司",
+            "companyLabel": "1111 甲公司",
+            "formalArticleId": "formal-1111",
+            "formalVerified": True,
+            "graphId": "test-graph",
+            "graphLabel": "",
+            "edgeId": "E1",
+            "articleIds": [],
+            "relationLabel": "揭露技術能力",
+            "materiality": "named_product",
+            "materialityLabel": "具名產品／角色",
+            "evidenceState": "verified",
+            "evidenceLabel": "證實",
+            "commercialStage": "capability",
+            "commercialStageLabel": "能力／研發",
+            "reviewDue": "2026-08-20",
+            "routeCount": 1,
+        }])
         self.assertEqual(row["materiality"]["named_product"], 1)
         self.assertEqual(row["materiality"]["financial"], 0)
         self.assertEqual(row["reviewedStaleTopics"], 1)
@@ -946,6 +972,45 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(source_actions[0]["articleId"], "topic-MI-2026-07-29-TEST")
         self.assertEqual(row["actionIds"][0], "source-gap:MI-2026-07-29-TEST")
         self.assertNotIn("score", maturity)
+
+    def test_group_maturity_company_evidence_uses_one_current_deterministic_route(self):
+        graph = {"graphs": [{
+            "id": "test-graph", "label": "測試題材",
+            "nodes": [
+                {"id": "company:1111", "type": "company", "universe": True,
+                 "ticker": "1111", "groupId": "power", "label": "甲公司"},
+                {"id": "concept:a", "type": "concept"},
+                {"id": "concept:b", "type": "concept"},
+                {"id": "concept:c", "type": "concept"},
+            ],
+            "edges": [
+                {"id": "E-stale", "status": "active", "view": "company",
+                 "from": "company:1111", "to": "concept:a",
+                 "relationLabel": "過期待複核", "materiality": "financial",
+                 "evidenceState": "verified", "reviewDue": "2026-08-01"},
+                {"id": "E-current", "status": "active", "view": "company",
+                 "from": "company:1111", "to": "concept:b",
+                 "relationLabel": "目前起點", "materiality": "named_product",
+                 "evidenceState": "inference", "reviewDue": "2026-08-20"},
+                {"id": "E-adjacent", "status": "active", "view": "company",
+                 "from": "company:1111", "to": "concept:c",
+                 "relationLabel": "相鄰證實", "materiality": "adjacent",
+                 "evidenceState": "verified", "reviewDue": "2026-08-20"},
+            ],
+        }]}
+
+        maturity = bd.build_group_maturity(
+            self.notes, [], self.stock_meta, {"power": "功率元件"},
+            graph, [], {}, "2026-08-06",
+        )
+
+        row = maturity["rows"][0]
+        self.assertEqual(row["companyBridges"], 1)
+        self.assertEqual(len(row["companyEvidence"]), 1)
+        self.assertEqual(row["companyEvidence"][0]["edgeId"], "E-current")
+        self.assertEqual(row["companyEvidence"][0]["routeCount"], 3)
+        self.assertEqual(row["companyEvidence"][0]["formalArticleId"], "formal-1111")
+        self.assertTrue(row["companyEvidence"][0]["formalVerified"])
 
     def test_research_group_guide_covers_every_formal_group_and_reaches_matrix_rows(self):
         with (ROOT / "config" / "groups.csv").open(encoding="utf-8", newline="") as handle:
@@ -1749,8 +1814,18 @@ class ResearchCenterTest(unittest.TestCase):
     def test_template_guides_novices_across_topic_table_columns_without_rewriting_data(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
+            "function readerTableSystemPositions(table,headers)",
+            "if(!/(位置|環節|節點|路徑)/.test(firstHeader))return[]",
+            "(table?.rows||[]).map(row=>runText(row?.[0]||[]).trim())",
+            "positions.length<3||positions.length>8",
+            "new Set(positions).size!==positions.length",
             "function readerTableGuide(table)",
             "const headers=(table?.head||[]).map(runText)",
+            "const positions=readerTableSystemPositions(table,headers)",
+            "'data-reader-table-system-map':positions.length",
+            "系統位置索引",
+            "先把第一欄放在一起，知道本文正在比較哪些位置，再逐列核對其餘欄位。",
+            "位置名稱逐字取自原表第一欄；編號只表示表內出現順序，不代表上下游、流程一定相連、重要性或受惠排序。",
             "headers.slice(1,-1).join('、')",
             "title:headers.at(-1)",
             "'data-reader-table-step':index+1",
@@ -1764,9 +1839,12 @@ class ResearchCenterTest(unittest.TestCase):
             ".reader-table-guide-steps{display:grid",
             ".article-section .reader-table-guide-steps{grid-template-columns:1fr}",
             ".reader-table-guide-steps{grid-template-columns:1fr}",
+            ".reader-table-system-steps{display:grid",
+            ".reader-table-system-steps{grid-template-columns:1fr}",
+            ".reader-table-system-label{min-width:0",
         ):
             self.assertIn(contract, template)
-        self.assertNotIn("table?.rows", template)
+        self.assertNotIn("row.slice(1)", template)
 
     def test_template_recomputes_confidence_from_taipei_calendar_at_runtime(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2468,6 +2546,16 @@ class ResearchCenterTest(unittest.TestCase):
             "state.maturityGuideGroupId", "data-maturity-guide-group",
             "'aria-pressed':'false'", "會出現在：", "從第一篇開始",
             "看完整族群進度", "只表示既有閱讀路線收錄",
+            "function renderMaturityCompanyEvidence(",
+            "function renderMaturityCompleted(",
+            "function openMaturityCompanyNote(",
+            "function openMaturityCompanyGraph(",
+            "function returnMaturityCompanyOrigin(",
+            "從公司證據接下去", "1 先認識本業", "2 再看題材關係",
+            "每家公司只選一條既有關係當起點",
+            "不是代表公司、受惠名單或投資排名",
+            "族群矩陣 → 公司證據", "maturity-company-note",
+            ".maturity-company-evidence", ".maturity-completed-facts",
             ".maturity-group-explorer", ".maturity-group-choice",
             'id="maturityRouteCards"', "function renderMaturityLearningRoute(",
             "MATURITY.learningRoutes", "maturity-route-question",
@@ -2506,6 +2594,8 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("attach_group_learning_starts(research_library)", builder)
         self.assertIn('candidate_radar=research_library["candidateRadar"]', builder)
         self.assertIn("def build_group_maturity(", builder)
+        self.assertIn('"companyEvidence": company_evidence', builder)
+        self.assertIn('"formalArticleId": (', builder)
 
     def test_liquid_cooling_station_eight_separates_capacity_progress_and_income(self):
         topic = (
