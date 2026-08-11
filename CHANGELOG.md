@@ -1,5 +1,38 @@
 # Changelog
 
+## 公司財報案例補上毛利率拆解正文 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、topic
+lifecycle、confidence、group／route、文章／圖譜關係、公司曝險與投資判斷零變動**；本次只替
+國巨 Q2 市場議題補上讀者可見的教學正文，並同步研究維護契約、方法清單、README、payload 版本
+與測試。
+
+- 以固定 1280×720 與 390×844 走讀研究文章、族群矩陣、研究雷達及代表文章。國巨 Q2 是「公司
+  財務案例」路線唯一主文章，修改前從研究摘要直接進入「從這篇接著學」，沒有主正文示範如何回答
+  首屏的毛利率問題；這是同一瀏覽器狀態的結構與版面觀察，不是讀者理解率統計。
+- 國巨文章新增三節「先把這一季的結果分成四組數字 → 毛利率上升，要依序追四種可能原因 →
+  最後把公司總額、AI 題材與個股結論分開」。每節以三段作者粗體主句先建立讀法，再用表格逐列
+  對照目前證據、缺口與不能外推的結論；字典另補季增／年增、EPS 與稼動率。所有數字與歸因均
+  沿用原有已接受來源及主張，並追加同狀態 `editorial:plain_language_wave133_yageo_margin_bridge`
+  留痕。
+- `python scripts/research_queue.py --lint --baseline-ref HEAD` 為 34 topics、0 errors、既有 11
+  warnings，證明 source／claim／monitor／topic meta 與鎖定時間未被改寫。專屬契約測試要求三節
+  都位於延伸學習前、各有至少三段粗體主句、三張邊界表與新增術語，避免未來退回摘要-only 文章。
+- `learningPathVersion: 85 → 86`。current／HEAD 均為 274 篇且 article IDs 完全相同；只有
+  `topic-MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL` 的 `sections` 與 `readingMinutes` 改變
+  （8 → 11 sections、10 → 14 分鐘），其餘 273 篇 canonical article 完全相同；知識圖譜也只讓
+  `company-finance` 站次同步新的 14 分鐘閱讀時間。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 環境執行 524 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0。連續兩次 dashboard build SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `2699c9bfa77b77e4533c60848779ffa4abc7224c336bd379dc14f5bf4e008d58`。
+- 1280px 與 390px 實測皆為 `innerWidth = scrollWidth`；手機正文大綱由 4 節增為 7 節，三張四欄
+  表都逐列改為保留原欄名的閱讀卡。桌機／手機前後截圖與互動證據存於
+  `tmp/research-learning-audit-2026-08-11-wave133-content-bridges/`。固定 Browser viewport 不是
+  實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，
+  因此不宣稱理解率已提升或完整無障礙合規。
+
 ## 長篇正文先分清多套閱讀框架 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章 Markdown、reader 問句、

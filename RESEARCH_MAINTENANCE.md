@@ -384,6 +384,14 @@ master-detail 的正文欄也可能比手機窄。容器足夠時仍用原生 ta
 客戶階段或反證邊界，也不得把 reference design 改寫成量產。這是正文 editorial revision，仍須
 追加同狀態 `editorial:<slug>` transition，並由 baseline lint 證明所有鎖定帳本與 meta 不變。
 
+學習路線中的公司財報案例不得只保留新手導讀、研究摘要與查核附錄後就直接進入延伸閱讀。主正文
+至少要把讀者帶過三層：先區分公司總額、獲利結果、應用占比與產品數字的分母；再依序檢查價格、
+產品組合、成本與稼動率，逐項寫出目前證據與缺口；最後分開公司總額、題材歸因與個股結論，明示
+哪一層尚不能跳級。國巨 Q2 財報案例以「四組數字 → 四種毛利原因 → 三層判讀」作為目前的
+deterministic 寫作契約；每節須從第一個 block 起至少有三段作者明寫的粗體主句，並各有一張同列
+「現在能說／還不能說」的表。任何白話補寫仍只能追加 `editorial:<slug>` transition，不能改動
+source、claim、monitor、topic lifecycle、confidence 或鎖定時間。
+
 市場議題的清單卡與文章頁首必須先顯示 `config/research_topic_guide.csv` 中人工複核的
 `reader_question`，原始 `title`／`readerTitle` 完整保留為次要的「研究題名」。導覽表只接受
 18–56 字、以全形問號結尾且不含英文字母或反引號的中文問題，並須與所有發布中的 `type=topic`

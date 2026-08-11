@@ -1681,6 +1681,42 @@ class ReadabilityGateTest(unittest.TestCase):
             text,
         )
 
+    def test_yageo_financial_case_teaches_margin_bridge_without_jump(self):
+        path = Path(rq.TOPICS_DIR) / "2026-07-30_yageo_q2_earnings_call.md"
+        text = path.read_text(encoding="utf-8")
+        headings = (
+            "## 先把這一季的結果分成四組數字",
+            "## 毛利率上升，要依序追四種可能原因",
+            "## 最後把公司總額、AI 題材與個股結論分開",
+        )
+        queue_index = text.index("## 為何值得進佇列")
+        for index, heading in enumerate(headings):
+            with self.subTest(heading=heading):
+                start = text.index(heading)
+                end = text.index(headings[index + 1]) if index + 1 < len(headings) \
+                    else queue_index
+                self.assertLess(start, queue_index)
+                self.assertGreaterEqual(text[start:end].count("\n**"), 3)
+        for term in ("季增／年增", "每股盈餘（EPS）", "稼動率"):
+            self.assertIn(f"- **{term}**：", text)
+        self.assertIn(
+            "| 本文四組數字 | 目前資料 | 先回答什麼 | 還不能回答什麼 |",
+            text,
+        )
+        self.assertIn(
+            "| 四個拆解問題 | 本篇目前能說 | 還要補什麼 | 不應直接推成 |",
+            text,
+        )
+        self.assertIn(
+            "| 判讀層次 | 現在能說 | 尚未知道 | 下一份關鍵證據 |",
+            text,
+        )
+        self.assertIn("這三層不能跳級", text)
+        self.assertIn(
+            "evidence: editorial:plain_language_wave133_yageo_margin_bridge",
+            text,
+        )
+
     def test_800v_protection_article_starts_from_people_events_and_actions(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-03_800vdc_protection_layers.md"
         text = path.read_text(encoding="utf-8")
