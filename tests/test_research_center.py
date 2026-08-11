@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 101)
+        self.assertEqual(library["learningPathVersion"], 102)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2855,7 +2855,7 @@ class ResearchCenterTest(unittest.TestCase):
             "event.preventDefault();phaseFold.open=!phaseFold.open",
             "目前第 '+current.step+' 站'+phaseHint",
             "learningRouteMap(learningRouteById(route.id),article.id,'article')",
-            "learningRouteMap(learningRouteById(route.id)||route,'','matrix')",
+            "learningRouteMap(fullRoute,'','matrix')",
             "每站先沿用同篇既有讀者問句",
             "階段任務逐字沿用正式閱讀課綱",
             "「這站會用到」只列同篇正式研究範圍",
@@ -3286,7 +3286,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function openMaturityRouteGroup(groupId)",
             "selectMaturityEntry('groups');selectMaturityGuideGroup(groupId)",
             "routeGroups=(route.groupIds||[]).map(groupId=>groupById.get(groupId)).filter(Boolean)",
-            "點族群名稱，先看它在產業裡做什麼",
+            "想先認識角色？這題會用到",
             "'data-testid':'maturity-route-group-'+route.id+'-'+group.id",
             "最容易和哪一層混淆",
             "function maturityGroupArticleOrigin(",
@@ -3312,7 +3312,14 @@ class ResearchCenterTest(unittest.TestCase):
             ".maturity-group-explorer", ".maturity-group-choice",
             'id="maturityRouteCards"', "function renderMaturityLearningRoute(",
             "MATURITY.learningRoutes", "maturity-route-question",
-            "從「'+graphLabel+'」開始", "族群重複出現，表示同一族群會在多個問題中出現",
+            "fullRoute=learningRouteById(route.id)||route",
+            "firstStation=stations.find(station=>station.articleId===route.firstArticleId)||stations[0]",
+            "maturity-route-first", "第一站先建立", "phasePurpose",
+            "'data-route-first-step':firstStep", "開始第 '+firstStep+'/'+routeTotal+' 站",
+            "graphLabel+(firstMinutes?' · '+firstMinutes+' 分鐘':'')",
+            "這條路線還會用到的族群；如需先認識角色可選擇",
+            ".maturity-route-start{width:100%;min-height:48px",
+            "族群重複出現，表示同一族群會在多個問題中出現",
             "function resetLibrarySurfaceScroll(", "resetLibrarySurfaceScroll()",
             "MATURITY.learningBoundary", 'id="catalogTitle"', "groupScope",
             "selectedGroups.length===1", "最大缺口", "不是產業成熟度、股票排名或受惠程度",
@@ -3332,6 +3339,13 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertLess(
             template.index('id="maturityRouteGuideTitle"'),
             template.index('id="maturityGroupExplorerTitle"'),
+        )
+        route_card = template.split(
+            "function renderMaturityLearningRoute(route,index)", 1
+        )[1].split("function maturityRoutesForGroup", 1)[0]
+        self.assertLess(
+            route_card.index("firstGuide,start,groups"),
+            route_card.index("learningRouteMap(fullRoute"),
         )
         for contract in (
             "@media(min-width:781px){.maturity-route-card:has(.learning-route-map[open]){grid-column:1/-1}",

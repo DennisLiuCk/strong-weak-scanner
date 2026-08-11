@@ -688,6 +688,12 @@ question、既有第一站與站次；每張卡的相關族群只取該路線主
 矩陣既有族群順序去重。相同族群可以出現在多條路線，這表示同一角色連到不同系統問題，不是
 重複計分。任何路線沒有可解析的主文章時不得顯示空卡，也不能用熱門度、文字相似度或模型補一條
 關係。第一站按鈕必須實際開啟該路線 step 1 的文章並回到文章頂端。
+問句後必須先逐字顯示第一站正式 `phaseLabel` 與 `phasePurpose`，再顯示第一站主要行動；主要
+行動須包含正式 step／total、同站既有 graph label 與 `readingMinutes`，accessible name 另保留
+第一篇完整題名。這些值只能取 `learningRouteById(route.id).stations` 中對應 `firstArticleId` 的
+正式 station；相關族群按鈕、站數 metadata 與完整路線 map 都保留，但排在主要行動之後，作為
+需要時再看的角色與全圖輔助。不得從 route 問句、題名或模型改寫階段任務，也不得重排站次、
+新增文章、族群或圖譜關係。
 問題卡的相關族群必須依 route 已保存的 `groupIds` 對回同一份 `groupMaturity.rows`，並顯示為
 可操作的族群角色入口；點擊後，手機須切換到「依族群名稱查找」，桌機保留兩個面板，兩者都要
 捲到並聚焦同一正式族群選項，再逐字顯示既有 `readerRole` 與 `readerBoundary`。族群預覽既有的

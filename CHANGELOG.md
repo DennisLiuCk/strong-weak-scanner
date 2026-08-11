@@ -1,5 +1,38 @@
 # Changelog
 
+## 族群矩陣先說第一站要學什麼，再讓讀者開始 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
+文章內容、正式 route／phase／station／graph／edge、族群映射、雷達候選與投資判斷零變動**；本次只
+重排族群矩陣四張問題卡的 reader-only 起讀層級，並同步研究維護契約、方法清單、README、payload
+版本、發布頁與測試。
+
+- 修改前，390×844 的第一張「供電與散熱」卡在問題後先出現 6 個族群按鈕與 1 個路線預覽
+  summary，開始行動位於卡片頂端下方約 291px；讀者必須先穿過角色選項與全圖入口，才知道該從
+  哪裡開始。修改後，問句先逐字顯示正式第一階段「供電、保護與元件」及其既有
+  `phasePurpose`，下一個可操作控制就是「開始第 1/9 站」；行動位於卡片頂端下方約 189px，前移
+  102px，並同時顯示既有 graph label 與 15 分鐘。相關族群與完整路線預覽都保留在行動後方，
+  沒有刪除角色或站點。
+- 4/4 張卡都只從 `learningRouteById(route.id).stations` 對應 `firstArticleId` 的正式 station 取
+  `phaseLabel`、`phasePurpose`、step／total 與 `readingMinutes`；accessible name 另保留第一篇
+  完整題名。1280×720 維持四欄比較、行動高 48px且無水平溢位；390px 行動高 52px且無水平
+  溢位。另在 320×720 實走第一站，仍開啟正式第一篇、保留 `maturity-route` origin 與原系統
+  問題；返回後回到 `#maturity` 並聚焦原路線卡。這是固定 Browser viewport 的版面與 DOM 量測，
+  不是理解率、完成率或學習成效統計。
+- `learningPathVersion: 101 → 102`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章：文章 ID／
+  順序完全相同；Python 另確認 candidate radar、knowledge graph 與 group maturity 完全相同。
+  排除 reader-only 版本後，前後 payload 完全相同，兩條路徑的 canonical SHA-256 都是
+  `55de62373083597228ebeb00a5a6933b6eae86b99d1d91ca3ee020951565ba6a`。
+- Darwin 25.5.0 arm64、Python 3.11.11、`C.UTF-8` 環境執行 528 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA-256
+  一致：`index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `336df57de168110d2a2ac0276ee2954bc0d2105d1b56faf81a83696c15c5840c`。
+- 修改前後手機／桌機矩陣與第一站畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave149-matrix-route-onboarding/`。本輪未做真實新手理解測試、
+  長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱學習
+  成效已提升或完整無障礙合規。
+
 ## 市場議題首屏可直接進正文，國巨導讀改回一般文章語氣 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
