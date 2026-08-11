@@ -3552,7 +3552,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 70
+    research_library["learningPathVersion"] = 71
     return research_library
 
 

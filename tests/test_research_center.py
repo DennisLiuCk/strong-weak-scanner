@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 70)
+        self.assertEqual(library["learningPathVersion"], 71)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -2475,6 +2475,32 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, template)
         self.assertNotIn("renderTopicLearningPosition(article.readerTitle", template)
+
+    def test_dense_section_glossary_progressively_discloses_registered_terms(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "const SECTION_GLOSSARY_PREVIEW_LIMIT=6,SECTION_GLOSSARY_COLLAPSE_AT=9",
+            "function sectionGlossaryTermButton(entry)",
+            "collapsed=matches.length>=SECTION_GLOSSARY_COLLAPSE_AT",
+            "preview=collapsed?matches.slice(0,SECTION_GLOSSARY_PREVIEW_LIMIT):matches",
+            "remaining=collapsed?matches.slice(SECTION_GLOSSARY_PREVIEW_LIMIT):[]",
+            "'data-section-term-count':matches.length",
+            "'data-section-term-preview-count':preview.length",
+            "'data-section-term-hidden-count':remaining.length",
+            "本節會遇到 '+matches.length+' 個詞",
+            "先看 '+preview.length+' 個；其餘用到再展開",
+            "class:'section-glossary-more'",
+            "'data-remaining-term-count':remaining.length",
+            "再看其餘 '+remaining.length+' 個詞",
+            "remaining.forEach(entry=>moreList.appendChild(sectionGlossaryTermButton(entry)))",
+            "前 '+preview.length+' 個沿用原字典順序，並不代表比較重要",
+            ".section-glossary-more>summary{min-height:44px",
+            ".section-glossary-more>summary:focus-visible",
+            ".section-glossary-more-state::before{content:'展開'}",
+            ".section-glossary-more[open] .section-glossary-more-state::before{content:'收合'}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("matches.slice(0,SECTION_GLOSSARY_PREVIEW_LIMIT).sort", template)
 
     def test_template_graph_entry_progressively_discloses_controls(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

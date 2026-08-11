@@ -1,5 +1,37 @@
 # Changelog
 
+## 高密度本節名詞改為按需展開 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷零變動**；本次只調整
+市場議題正文的 reader-only 名詞提示密度，並同步研究維護契約、方法清單及測試。方法 registry
+fingerprint 仍為 `322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，
+與既有基線完全相同，因此不建立內容相同的新方法快照。
+
+- 完整解析建置後 35 篇市場議題的 121 個主閱讀章節：110 節有「本節名詞」，其中 45 節一次
+  命中至少 9 個詞，最高 20 個。修改前這 45 節會把全部詞鈕直接排在正文、系統圖或比較表之前；
+  其餘 65 個有詞章節最多 8 個。Python 完整 registry census 與瀏覽器逐篇實際渲染 35 篇的結果
+  一致，這是決定性列舉，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 同節命中至少 9 個時，現在只先顯示原字典順序前 6 個，剩餘詞鈕放入可由鍵盤操作的原生
+  `details`；文案明示前 6 個不代表比較重要。8 個以下仍全部直接顯示，不增加多一層操作。
+  所有詞名、順序、按鈕、完整詞名搜尋與定義仍逐字取自同篇既有名詞小字典，不改正文或研究
+  payload。
+- 逐篇渲染驗證 110／110 個實際名詞提示：45 個高密度提示皆為 `6 + 剩餘`、65 個低密度提示
+  皆維持全部直顯，總詞鈕數逐節不變，0 個契約錯誤；最高 20 詞案例為 6 個直顯、14 個收合。
+  代表記憶體章節由 15 個全攤開改為 6 個直顯、9 個收合，下一張「新手讀表」因此提早出現在同一
+  視窗。
+- 展開後 15／15 個詞仍存在；從收合區點擊 `CXL 4.0` 會開啟同篇 32 詞名詞速查、搜尋欄取得
+  焦點並只顯示 1 筆原始定義，關閉後焦點回到原詞鈕，正文位置不變。前後畫面、展開狀態與完整
+  census 存於 `tmp/research-learning-audit-2026-08-11-wave118-causal-reading/`。
+- 固定 1280 × 720 viewport 不是實機；本輪未做 VoiceOver／TalkBack、200%／400% zoom、完整
+  實體鍵盤巡覽、儀器化 WCAG 對比或真實新手理解測試，因此不宣稱實際理解率已提升或完整
+  無障礙合規。
+- Darwin arm64、Python 3.11.11、預設 UTF-8 環境執行 517 tests 全綠；qual notes、leading
+  hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint 均為
+  exit 0；研究 queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：
+  `index.html` `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、
+  `research.html` `313a3c441915da16600b5970ebbccc21a45927947db942a56ec2af548ef60cd4`。
+
 ## 未編固定路線的市場議題也先交代文章位置 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
