@@ -1,5 +1,39 @@
 # Changelog
 
+## 從關係圖進長文時，不再忘記剛才正在查哪一條線 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、
+group／route／phase／graph／edge 關係、active radar／selection log、公司證據與投資判斷零變動**；
+本次只把 graph origin 已保存的 selected edge 帶進文章首尾與手機起點摘要，並同步研究維護契約、
+方法清單、README、reader-only payload 版本、發布頁與測試。
+
+- 以固定 390×844 實走「知識圖譜 → 示範讀一條證實關係 → 讀完整研究脈絡」。修改前，關係卡已
+  顯示「NVIDIA → 800VDC 功率半導體鏈／平台提供者／證實」，但進入 15 分鐘文章後，頁首只剩
+  「800VDC 功率半導體鏈 · 公司曝險」，讀者看不出剛才為什麼開文。修改後，起點摘要逐字保留
+  node labels 與 relation label，展開內容再保留 evidence、commercial stage、materiality，並以
+  `data-origin-edge-id="KG-8VP-C01"` 對回同一條 edge。這是同一 viewport 與狀態的資訊架構觀察，
+  不是理解率、完成率或學習成效統計。
+- 返回圖譜後仍選中 `KG-8VP-C01`，焦點回到同一關係詳情；沒有 selected edge 的「先讀主題文章」
+  仍顯示原 graph label／view，沒有 relation meta。直接 article deep link 維持 0 張 origin 卡與
+  「返回研究清單」，不會依文章題名、正文、公司或相似度猜一條關係。
+- 320×844 初始收合卡約 284×48px，展開後約 284×118px；390×844 展開卡約 354×87px；780px
+  顯示行動版摘要，884px 與 1280px 只顯示桌機完整起點卡，1280px 卡約 836×95px。320、390、
+  780、884、1280px 的 `documentElement.scrollWidth` 都等於 viewport 寬度，沒有水平溢位。
+- `learningPathVersion: 96 → 97`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章、4 條正式
+  route、10 個 phase、25 站、25 張 graph 與 335 條 edge；排除 reader-only 版本後，current 與
+  HEAD payload 完全相同，兩邊 canonical SHA-256 都是
+  `af97e43694a980da1d0cec9b4e77c838784abda7beabe6818f38dbf9f11aa205`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 預設環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `4ed4bbc70a286fe07f989d5f554c7c592df785f7700362f4e99f2a64ebab42d5`。
+- 修改前、同狀態手機前後比較、320px 收合與桌機完整起點存於
+  `tmp/research-learning-audit-2026-08-11-wave144-relation-reading/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
 ## 圖譜首屏先說明整體問題、階段任務與這張圖的閱讀焦點 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、

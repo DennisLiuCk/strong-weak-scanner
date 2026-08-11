@@ -480,7 +480,9 @@ readerBoundary`，首個行動一律顯示「先看產業角色」並定位 `.ar
 同一個「新手先讀」section，不得複製或改寫。主行動旁須明示三句重點後仍可比較族群角色與學習
 階段。780px 以下保留唯一的黏性返回鈕，並隱藏桌機版完整 `article-learning-origin`；若本次確有
 `articleOriginContext()`，返回鈕下方另顯示不含第二個返回動作的 `mobile-origin-context`，其文字
-只能逐字重用同一 `context.title`，不得另寫研究摘要。341–780px 預設展開，340px 以下預設收合成
+只能逐字重用同一 `context.title`，不得另寫研究摘要；若同一 context 已由 graph origin 唯一對回
+既有 edge，展開區可另逐字顯示該 edge 的 evidence、commercial stage 與 materiality label。
+341–780px 預設展開，340px 以下預設收合成
 至少 44px 的原生 `details` 摘要，但完整起點仍須在同一 summary 內並可一次展開；直接 deep link
 與一般清單入口不得顯示。手機開文時隱藏重複的文章類型 tabs，以換回首屏高度；黏性返回、原題、
 文章問題、查核警語、第一句任務重點與 44px 主行動仍須同屏可達。桌機繼續顯示完整起點卡，文章
@@ -757,7 +759,11 @@ route、phase 與 graph ID 的可機讀定位，以及三層可見文字。圖�
 從圖譜開啟既有文章時，顯示層必須建立一次性的 graph origin，至少保存 graph ID、投影視角、
 已選節點／關係與圖譜捲動位置。文章桌機首尾與行動版返回鍵都要清楚說明可回到原圖；返回後必須
 恢復這些狀態與合理的鍵盤焦點，不能把讀者丟回圖譜頂端或未選取狀態。直接文章深連結與一般清單
-開文的 origin 必須保持空值；這個往返狀態不得寫進文章、圖譜或研究證據 payload。
+開文的 origin 必須保持空值；這個往返狀態不得寫進文章、圖譜或研究證據 payload。若 graph origin
+保存的是既有 edge，文章首尾的起點標題必須逐字使用該 edge 兩端 node label 與 relation label，
+行動版展開內容再逐字顯示 evidence label、commercial stage 與 materiality label；可機讀
+`data-origin-edge-id` 必須等於同一 edge ID。沒有 edge、選到 node、edge 已不存在或不是 graph
+origin 時，安全退回原 graph label／view，不得讀文章題名、正文、公司、相似度或模型猜一條關係。
 反向從文章「看產業關聯」卡或學習路線的「看這站證據關係」進圖時，顯示層另建立一次性的
 article-learning graph origin，保存
 文章 ID、文章閱讀欄與 window 捲動位置，以及文章原本的矩陣／圖譜起點。圖譜首屏必須先說明

@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 96)
+        self.assertEqual(library["learningPathVersion"], 97)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1562,7 +1562,12 @@ class ResearchCenterTest(unittest.TestCase):
             "target.focus();requestAnimationFrame",
             "window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-120",
             ".learning-checkpoint-hints>summary{min-height:44px}",
-            "articleOrigin:null", "function articleOriginContext(",
+            "articleOrigin:null", "function graphArticleSelectedRelation(graph,origin)",
+            "selection?.type!=='edge'", "(graph?.edges||[]).find(item=>item.id===selection.id)",
+            "subject=(from?.label||edge.from)+' → '+(to?.label||edge.to)",
+            "title:subject+' · '+edge.relationLabel",
+            "function articleOriginContext(", "edgeId:relation?.edge.id||''",
+            "mobileMeta:relation?.meta||''", "關係類型「'+relation.edge.relationLabel",
             "function returnArticleOrigin(", "function renderArticleLearningOrigin(",
             "function renderLearningOriginReturn(",
             "'data-testid':'article-origin-top'",
@@ -1571,10 +1576,13 @@ class ResearchCenterTest(unittest.TestCase):
             "originContext?.mobileBackLabel||'返回研究清單'",
             "function renderMobileArticleOrigin(context)",
             "'data-testid':'mobile-origin-context'",
-            "fromQuestion?'你從這題進來':'你從這個位置進來'",
-            "open=!matchMedia('(max-width:340px)').matches",
-            "return h('details',{class:'mobile-origin-context'",
+            "'data-origin-edge-id':context.edgeId||null",
+            "context.edgeId?'你剛才查這條關係':'你從這個位置進來'",
+            "open:!matchMedia('(max-width:340px)').matches",
+            "root=h('details',{class:'mobile-origin-context'",
             "h('strong',{text:context.title})",
+            "class:'mobile-origin-context-meta',text:context.mobileMeta",
+            ".mobile-origin-context-meta{margin:0;padding:8px 9px 9px",
             "const mobileOrigin=renderMobileArticleOrigin(originContext)",
             "if(mobileOrigin)body.appendChild(mobileOrigin)",
             "selectArticle(value,false,null)",

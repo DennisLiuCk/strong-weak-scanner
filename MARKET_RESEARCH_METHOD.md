@@ -889,7 +889,10 @@ counts 與 `not_ready`，不補零、不把未到期主張算成功。
     在單一可展開補充區。改從清單、直接連結、雷達或路線下一站開同一篇時，本文問句必須一致；
     780px 以下由雷達、矩陣或圖譜開文時，單一黏性返回鈕下方是否逐字顯示同一
     `articleOriginContext().title`；341–780px 預設展開，340px 以下是否以 44px 以上原生摘要預設
-    收合並可一次看完完整起點。手機文章類型 tabs 是否收起而未移除返回能力；直接 deep link 是否
+    收合並可一次看完完整起點。若從圖譜已選 edge 的「讀完整研究脈絡」開文，title 是否逐字保留
+    node label 與 relation label，展開內容是否逐字保留 evidence、commercial stage、materiality，
+    且 `data-origin-edge-id` 與返回後選中 edge 完全相同；沒有 edge 的圖譜主文章入口是否維持原
+    graph label／view，而未猜一條關係。手機文章類型 tabs 是否收起而未移除返回能力；直接 deep link 是否
     只有「返回研究清單」且沒有虛構起點。320／390／780px 首屏仍須同時容納文章問題、查核警語、
     第一個任務重點與完整 44px 主行動，頁面不得水平溢位；884px 與 1280px 則仍只顯示桌機完整
     起點卡，不得重複手機摘要。
