@@ -1,5 +1,39 @@
 # Changelog
 
+## 研究文章改為問題先讀，查核排程退出第一閱讀層 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章 Markdown、reader 問句、
+reading mission、source／claim／monitor、topic lifecycle、confidence、group／route、文章／圖譜
+關係、公司曝險與投資判斷零變動**；本次只調整研究文章清單與文章頁的 reader-only 顯示，
+並同步研究維護契約、方法清單、README 與測試。
+
+- 以固定 1280×720 與 390×844 重新走讀 274 篇文章的清單及國巨 Q2 市場議題。修改前清單卡
+  先放較密集的「先學一件事」，再放讀者問題；桌機文章右欄持續展開 `triaged`、`P1` 等研究營運
+  欄位。這是同一瀏覽器狀態的結構與版面觀察，不是讀者理解率或閱讀速度統計。
+- 三類文章清單卡的 DOM 與視覺順序都改為先顯示「讀完能回答」，再顯示同篇既有重點；次要標籤
+  改成「先認識公司／先看要驗證的說法／先知道一件事」，卡尾「證據位置」改成較口語的
+  「目前怎麼看」。問題、重點、技術題名、研究範圍、狀態、可信度、來源數與閱讀時間仍逐字沿用
+  既有 payload，renderer 沒有生成新的研究問題或主張。
+- 文章側欄與窄幅文末的營運欄位改為預設收合的原生「文章查核資料」。摘要先顯示可回查來源數與
+  下次複核；展開後把 `triaged` 翻成「已整理，持續查證」，priority 顯示為「研究排程」，並明示
+  `P1` 等代號只排查核工作，不代表文章重要性、預期報酬或投資順位。原狀態、日期、可信度、來源
+  與 GitHub 原始文件仍完整保留；固定瀏覽器確認開啟／收合與展開後來源可捲動到達。
+- 新手段落把「再補重要性、名詞與追蹤」改成「再看為什麼重要、名詞與後續問題」，產業角色標題
+  改成「先認識這篇提到的產業角色」；這些都是 renderer 固定文案，沒有改動任一 topic Markdown，
+  因此不建立無內容變化的 editorial transition。桌機／手機前後截圖與互動證據存於
+  `tmp/research-learning-audit-2026-08-11-wave131-article-prose/`。
+- `learningPathVersion: 83 → 84`；排除版本後 current／HEAD 的 274 篇 canonical LIB payload
+  完全相同，SHA-256 均為
+  `ef0d7a9b05e0b3f5eb5639917883d7f61be64008dc5524c874434a0847e1c043`。
+- macOS 26.5.2 arm64、Python 3.11.11、預設 UTF-8 環境執行 522 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `c0dfd62a8f151f43158bb9e376d48496df52ac34db3540505011fa666e516f70`。
+- 固定瀏覽器與 responsive viewport 不是實機；本輪未做真實新手理解測試、VoiceOver／TalkBack、
+  200%／400% zoom 或完整實體鍵盤巡覽，因此不宣稱理解率已提升或完整無障礙合規。
+
 ## 研究雷達先講未解問題，族群矩陣分開學習與盤點 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、active radar／selection log、候選 rank、

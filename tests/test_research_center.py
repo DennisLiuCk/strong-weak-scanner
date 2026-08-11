@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 83)
+        self.assertEqual(library["learningPathVersion"], 84)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1384,9 +1384,9 @@ class ResearchCenterTest(unittest.TestCase):
             "function confidenceBadge(", "function confidencePanel(",
             "function liveConfidence(", "Asia/Taipei", "confidenceAsOf()",
             "證據可信度", "主命題最後有效證據", "可信度判定",
-            "來源帳本", "mobile-evidence", "可水平捲動的研究資料表",
+            "文章查核資料", "研究欄位與來源", "mobile-evidence", "可水平捲動的研究資料表",
             "function articleReaderHeading(", "article.readerQuestion",
-            "先學一件事", "讀完能回答", "證據位置：", "這篇先弄懂",
+            "先知道一件事", "讀完能回答", "目前怎麼看：", "這篇先弄懂",
             "研究題名：", "研究範圍：",
             ".result-reader-question", ".article-reader-heading",
             "aria-label=\"搜尋研究文章\"", "filtersPanel.inert", "clearArticleRoute",
@@ -1455,7 +1455,7 @@ class ResearchCenterTest(unittest.TestCase):
             "articleSections(article,'beginner-followup',glossaryTerms)",
             "beginnerHighlights&&group.heading!=='三句話抓重點'",
             "beginnerFollowup&&group.heading==='三句話抓重點'",
-            "beginner-followup", "再補重要性、名詞與追蹤",
+            "beginner-followup", "再看為什麼重要、名詞與後續問題",
             "function appendBeginnerWhy(parent,items)",
             "beginnerFollowup&&group.heading==='為什麼重要'",
             "rendered.dataset.readerLead='true'",
@@ -2341,8 +2341,8 @@ class ResearchCenterTest(unittest.TestCase):
             "function catalogLearningLead(article)",
             "(mission.keyPoints||[]).find(Boolean)||mission.orientation||''",
             "function catalogLearningLabel(article)",
-            "article.type==='formal_note'?'先認識本業'",
-            "article.type==='narrative'?'先看勝負手':'先學一件事'",
+            "article.type==='formal_note'?'先認識公司'",
+            "article.type==='narrative'?'先看要驗證的說法':'先知道一件事'",
             "function catalogLearningPreview(article,readerQuestion)",
             "function catalogComparableText(value)",
             "function catalogTechnicalTitle(article,lead)",
@@ -2358,6 +2358,14 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-reader-question-id':article.id",
         ):
             self.assertIn(contract, template)
+        preview_source = template[
+            template.index("function catalogLearningPreview(article,readerQuestion)"):
+            template.index("function resultItem(article)")
+        ]
+        self.assertLess(
+            preview_source.index("'data-catalog-learning':'question'"),
+            preview_source.index("'data-catalog-learning':'lead'"),
+        )
         # 清單只讀取既有導讀欄位，沒有從正文或題名生成新的研究問題。
         self.assertNotIn("article.catalogQuestion=", template)
         self.assertNotIn("article.readingMission.question=", template)
@@ -2373,7 +2381,7 @@ class ResearchCenterTest(unittest.TestCase):
             "Number.isInteger(guide.sourceCount)",
             "guide.sourceCount+' 份有效來源'",
             "'data-catalog-evidence-id':article.id",
-            "text:'證據位置：'",
+            "text:'目前怎麼看：'",
             ".result-learning-preview{display:grid",
             ".result-evidence{display:grid",
             "function restoreCatalogGuidePreference()",
@@ -2388,6 +2396,27 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("article.readingMission=", template)
         self.assertNotIn("section.readerEvidenceGuide=", template)
         self.assertNotIn("article.status=", template)
+
+    def test_article_check_data_is_collapsed_and_translates_research_operations(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function topicStatusReaderLabel(status)",
+            "triaged:'已整理，持續查證'",
+            "wrap=h('details',{class:'evidence'}",
+            "h('summary',{class:'evidence-summary'}",
+            "text:'文章查核資料'",
+            "activeSourceCount+' 份可回查來源'",
+            "text:'研究欄位與來源'",
+            "['研究排程',priority?priority+'（只排研究工作）':'—']",
+            "研究狀態與 P1 等排程代號只用來安排查核工作，不代表文章重要性、預期報酬或投資順位。",
+            "text:'可回查來源'",
+            "text:'開啟 GitHub 原始文件'",
+            ".evidence>summary{min-height:52px;",
+            ".evidence-summary-state::before{content:'展開'}",
+            ".evidence[open] .evidence-summary-state::before{content:'收合'}",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("h('h2',{text:'來源與證據摘要'})", template)
 
     def test_article_heading_continues_the_catalog_reader_question(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
