@@ -885,6 +885,22 @@ question。選項順序沿用 route registry，不得依相似度、人氣、投
 暫存圖譜混入正式下一條路線。選定後同步切到該 route 第一個既有 graph，並只從該 route 第一個
 既有 station 建立文章入口；找不到 route、graph 或 station 時不得補寫替代內容。返回文章須恢復
 完成卡、焦點與捲動位置；一般圖譜分頁、hash deep link 及其他 origin 必須維持無完成狀態。
+從完成卡的第一站入口開文時，須把已完成 route、已選 route、第一 article 與完成卡 origin 保留成
+單次 reader-only `route-transition`。第一站首屏必須逐字並列兩條 route 的原 `question`，再逐字
+顯示第一 station 的 `graphLabel`、同篇 `readingMission.keyPoints[0]` 與
+`readingMission.question`；任一正式欄位不存在時不得用文章題名、正文、相似度或模型補寫接力。
+返回須重建完成卡、保留已選 route 並把焦點
+送回第一站入口；讀者換到任何其他文章時立即清除 transition。一般圖譜開文、直接 article deep link
+與其他 origin 都不得顯示這張卡；閱讀次序並列不代表上下游、受惠、因果、成熟度或投資排名。
+
+非末站的「繼續第 x/y 站」另須把前一 article、下一 article、route ID、相鄰站次與當下 window／
+reader 捲動位置保留成單次 reader-only `station-transition`。下一篇首屏只可逐字並列前一 station
+的 `graphLabel` 與前一篇 `readingMission.keyPoints[0]`，以及目前 station 的 `graphLabel` 與目前篇
+`readingMission.question`；兩站必須屬於同一正式 route 且站次恰好相鄰，缺任一條件即退回一般換篇，
+不得從題名、正文、相似度或模型補寫。返回須恢復前一篇原接續卡、捲動位置與焦點；再從下一站
+繼續時依新的相鄰文章重建接力。直接 article deep link、route map 跳站、一般圖譜開文、跨路線
+第一站與其他 origin 不得誤顯這張卡；畫面須明示只重排既有文字，不代表上下游、受惠、因果、
+成熟度或投資排名。
 
 文章內換篇時，`ensureSelected()` 必須優先保留仍開啟且存在於 `byId` 的文章，即使它不符合左側
 目前搜尋、類型或族群條件；不得再由 `filteredArticles()` 的第一篇覆寫下一站。清單須保留原條件

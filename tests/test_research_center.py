@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 91)
+        self.assertEqual(library["learningPathVersion"], 93)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1627,6 +1627,10 @@ class ResearchCenterTest(unittest.TestCase):
             "renderMobileArticleOrigin(originContext);if(mobileOrigin)body.appendChild(mobileOrigin);"
             "const originBar="
             "renderArticleLearningOrigin();if(originBar)body.appendChild(originBar);"
+            "const routeTransition=renderRouteTransitionBridge(article);"
+            "if(routeTransition)body.appendChild(routeTransition);"
+            "const stationTransition=renderStationTransitionBridge(article);"
+            "if(stationTransition)body.appendChild(stationTransition);"
             "body.appendChild(articleReaderHeading(article))",
             template,
         )
@@ -2567,7 +2571,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function syncRouteCompletionSelection(routeId)",
             "function routeStartArticle(route)",
             "'data-testid':'graph-route-next-start-action'",
-            "openGraphArticle(start.article.id)",
+            "openGraphArticle(start.article.id,routeTransitionArticleOrigin(selected,start.article.id))",
             "function bindLearningAction(action,card,sourceArticle=null)",
             "routeCompletionGraphOrigin(sourceArticle)",
             "bindLearningAction(action,card,sourceArticle)",
@@ -2580,6 +2584,74 @@ class ResearchCenterTest(unittest.TestCase):
             template.index('id="graphRouteComplete"'),
             template.index('id="graphLearningKey"'),
         )
+
+    def test_next_route_first_station_keeps_an_explicit_cross_route_bridge(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function routeTransitionArticleOrigin(route,articleId)",
+            "kind:'route-transition'",
+            "fromRouteId:completion.routeId",
+            "toRouteId:route.id",
+            "firstArticleId:articleId",
+            "graphOrigin:{...completion,nextRouteId:route.id}",
+            "openGraphArticle(start.article.id,routeTransitionArticleOrigin(selected,start.article.id))",
+            "function routeTransitionContext(article)",
+            "origin.firstArticleId!==article?.id",
+            "article.readingMission?.keyPoints?.[0]",
+            "article.readingMission?.question",
+            "!station?.graphLabel",
+            "function renderRouteTransitionBridge(article)",
+            "'data-testid':'route-transition-bridge'",
+            "'data-from-route-id':from.id",
+            "'data-to-route-id':to.id",
+            "跨路線接力",
+            "剛完成的系統問題",
+            "現在要回答的系統問題",
+            "第一站先抓住",
+            "讀完這站試著回答",
+            "問題、重點與讀後追問都沿用已發布內容",
+            "不代表兩條路線存在上下游、受惠、因果或投資排序",
+            "context.kind==='route-transition'",
+            "state.articleOrigin?.kind==='route-transition'",
+            "origin.kind==='graph'||origin.kind==='route-transition'",
+            "state.graphOrigin=origin.graphOrigin||state.graphOrigin",
+            "[data-testid=\"graph-route-next-start-action\"]",
+            ".route-transition-bridge{",
+            ".route-transition-steps{display:grid;grid-template-columns:repeat(2",
+            ".route-transition-back,.station-transition-back{display:none}",
+        ):
+            self.assertIn(contract, template)
+
+    def test_route_next_article_carries_the_previous_station_framework(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            "function stationTransitionArticleOrigin(sourceArticle,card)",
+            "kind:'station-transition'",
+            "fromArticleId:sourceArticle.id",
+            "toArticleId:target.id",
+            "Number(to.step)!==Number(from.step)+1",
+            "sourceArticle?.readingMission?.keyPoints?.[0]",
+            "target?.readingMission?.question",
+            "stationTransitionArticleOrigin(sourceArticle,card)||undefined",
+            "'data-testid':card.kind==='article'&&card.routeStep?'learning-route-next-action':null",
+            "function stationTransitionContext(article)",
+            "origin.toArticleId!==article?.id",
+            "function renderStationTransitionBridge(article)",
+            "'data-testid':'station-transition-bridge'",
+            "同路線接力 · ",
+            "把第 '+origin.fromStep+' 站的框架，帶進第 '+origin.toStep+' 站",
+            "上一站先建立",
+            "這站接著回答",
+            "重點與問題逐字沿用前後兩篇既有文章",
+            "context.kind==='station-transition'",
+            "state.articleOrigin?.kind==='station-transition'",
+            "origin.kind==='station-transition'",
+            "[data-testid=\"learning-route-next-action\"]",
+            ".station-transition-bridge{",
+            ".station-transition-track{display:grid;grid-template-columns:repeat(2",
+            ".route-transition-back,.station-transition-back{display:none}",
+        ):
+            self.assertIn(contract, template)
 
     def test_template_explains_why_a_shared_company_graph_connects(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2655,7 +2727,8 @@ class ResearchCenterTest(unittest.TestCase):
             "graphSelection:state.graphSelection?{...state.graphSelection}:null",
             "graphScrollTop:graphPage?.scrollTop||0",
             "openGraphArticle(startArticle.id)",
-            "selectArticle(articleId,true,graphArticleOrigin())",
+            "function openGraphArticle(articleId,origin=null)",
+            "selectArticle(articleId,true,origin||graphArticleOrigin())",
             "graphOrigin:null", "function graphLearningOrigin(source='learning-card')",
             "return{kind:'article-learning',source,articleId:article.id",
             "kind:'article-learning'", "articleScrollTop:reader?.scrollTop||0",

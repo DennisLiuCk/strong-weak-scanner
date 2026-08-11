@@ -1,5 +1,75 @@
 # Changelog
 
+## 同一路線換站時保留上一站框架，不再把下一篇讀成孤立文章 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章、group／route／graph 關係、
+active radar／selection log、研究 source／claim／monitor、公司證據與投資判斷零變動**；本次只把
+正式下一站卡已知的前後文章脈絡帶進相鄰下一篇首屏，並同步研究維護契約、方法清單、README、
+payload 版本與測試。
+
+- 以固定 390×844 實走「供電與散熱第 1/9 站 → 繼續第 2/9 站」。修改前第二站直接從新文章問題
+  開始，上一站剛建立的「800V 是一整條電力鏈」框架完全消失，讀者無法從落地畫面判斷兩篇為何
+  相鄰。這是同一 viewport 與完整 DOM 的版面／資訊架構觀察，不是讀者理解率、完成率或學習成效
+  統計。
+- 正式 route 的相鄰下一站現在建立單次 reader-only `station-transition` origin；下一篇首屏逐字並列
+  前一 station 原 `graphLabel` 與前一篇 `readingMission.keyPoints[0]`，再並列目前 station 原
+  `graphLabel` 與目前篇 `readingMission.question`。兩站不同 route、不是恰好相鄰、或任一正式欄位
+  缺失時都不生成接力，也不從題名、正文、相似度或模型補寫。
+- 390px 實測 `innerWidth = document.scrollWidth = 390px`，無水平溢位；接力卡 354×240px，兩張
+  前後任務卡各約 161×128px，黏性返回行動 44px 高。1440px 同樣無水平溢位；接力卡
+  836×187px，兩張任務卡各約 399×94px，桌機返回行動 36px 高。第二站 H1 取得焦點；返回後焦點
+  回到原「繼續第 2/9 站」並復原接續卡與捲動位置。再從第二站前進到第三站可重建第 2→3 站接力；
+  直接 article deep link 為 0 張，返回文字維持「返回研究清單」。
+- `learningPathVersion: 92 → 93`。獨立 Python 與 Node JSON 路徑各自核對 4 條正式路線、25 站與
+  21 個相鄰換站；21/21 組前一篇重點、下一篇問題與站次都符合接力契約。兩邊都是 274 篇且
+  article IDs 與 HEAD 完全相同；排除 reader-only 版本後，current 與 HEAD 的 canonical LIB payload
+  SHA-256 都是 `f039aa829e7b3a08bccc472968aee94fb1cdd71d2e6d834ef783e539fe2264f0`。
+- Darwin 25.5.0 arm64、Python 3.11.11、`C.UTF-8` 環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `f6f440071a608d506810331e8227794b7ed83d3149c7a455aebeee85b42a87dd`。
+- 修改前、手機／桌機完成畫面與返回狀態存於
+  `tmp/research-learning-audit-2026-08-11-wave140-station-handoff/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
+## 換到下一條路線後，第一站保留上一題與新問題的知識接力 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章、group／route／graph 關係、
+active radar／selection log、研究 source／claim／monitor、公司證據與投資判斷零變動**；本次只把
+完成卡已知的前後 route 脈絡帶進下一條路線第一站，並同步研究維護契約、方法清單、README、
+payload 版本與測試。
+
+- 以固定 390×844 實走「完成公司財務案例 → 選供電與散熱 → 開啟 800VDC 功率半導體鏈」。修改前
+  第一站首屏只顯示一般「從知識圖譜開文」origin，讀者看不到剛完成哪個系統問題、為何現在換題，
+  也無法把新站放回上一段學習脈絡。這是同一 viewport 與完整 DOM 的版面／資訊架構觀察，不是
+  讀者理解率、完成率或學習成效統計。
+- 完成卡第一站入口現在建立單次 reader-only `route-transition` origin；首屏逐字並列前一 route 與
+  新 route 的原 `question`，再並列第一 station 原 `graphLabel`、同篇
+  `readingMission.keyPoints[0]` 與 `readingMission.question`。資料缺任一項即不生成接力，不從題名、
+  正文、相似度或模型補寫；畫面明示這只是閱讀順序，不代表上下游、受惠、因果或投資排序。
+- 390px 實測 `innerWidth = body.scrollWidth = 390px`，接力卡 354×374px，兩張系統問題卡各
+  160px 寬，兩張第一站任務卡各 149px 寬，黏性返回行動 44px 高。1440px 同樣無水平溢位，接力卡
+  836×299px，問題卡各約 398px、任務卡各約 385px，桌機返回行動 36px 高。第一站 H1 取得焦點；
+  返回完成卡後焦點回到同一路線第一站入口，已選「供電與散熱」仍保留；再次開文可重建同一接力，
+  切到第 2/9 站後接力為 0 張。直接 article deep link 同樣為 0 張，返回文字維持「返回研究清單」。
+- `learningPathVersion: 91 → 92`。獨立 Python 與 Node JSON 路徑各自核對 4 條正式路線、25 站、
+  12 種有方向的跨路線選擇，以及 4/4 個第一站都具備接力所需正式欄位；兩邊都是 274 篇、article
+  IDs 完全相同。排除 reader-only 版本後，current 與 HEAD 的 canonical LIB payload SHA-256 都是
+  `f039aa829e7b3a08bccc472968aee94fb1cdd71d2e6d834ef783e539fe2264f0`。
+- Darwin 25.5.0 arm64、Python 3.11.11、`C.UTF-8` 環境執行 527 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `c341da2422e3c793fb2c8a23174fee752ce26effcd5f4ce8f189a04f4e063550`。
+- 修改前、完成卡選路、第一站手機／桌機與返回狀態畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave139-route-bridge/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
 ## 完成路線後不再掉回一般圖譜，直接銜接下一個系統問題 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章、group／route／graph 關係、
