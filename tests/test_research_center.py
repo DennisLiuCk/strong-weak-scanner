@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 97)
+        self.assertEqual(library["learningPathVersion"], 101)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1422,10 +1422,17 @@ class ResearchCenterTest(unittest.TestCase):
             "function focusReadingTarget(", "function focusBeginnerHighlights(",
             "function focusReadingMissionSource(", "function renderReadingMission(",
             "function readingMissionStartsWithRole(", "function focusArticleRoleContext(",
-            "function focusReadingMissionStart(",
+            "function focusReadingMissionStart(", "function focusTopicMainStart(",
             "reading-mission-grid", "'data-testid':'reading-mission-start'",
             "'data-reading-start':roleFirst?'role':'source'", "先看產業角色",
             "開始讀三句重點", "先抓住一個重點，再帶著問題讀",
+            "'data-testid':'reading-mission-main-start'",
+            "'data-reading-main-section':firstMain.index", "直接讀第一節",
+            "first=topicReaderSectionItems(article)[0]",
+            "section?.querySelector('[data-main-question-anchor]')",
+            "section?.querySelector(':scope > h2')||section",
+            "if(target)focusReadingTarget(target)",
+            ".reading-mission-start.secondary{background:var(--card);color:var(--teal)}",
             "先抓住這個重點", "讀完能回答", "為什麼值得讀",
             "rawLead=(mission.keyPoints||[]).find(Boolean)||mission.orientation",
             "lead=readerLeadParts(article,rawLead)",
@@ -1512,6 +1519,9 @@ class ResearchCenterTest(unittest.TestCase):
             "function learningCheckpoint(", "function learningCard(",
             "function learningRouteBridge(", "learning-route-bridge",
             "本篇與下一站的閱讀順序", "data-route-from-graph",
+            "learning-route-bridge-takeaway", "本篇替整條問題先補上",
+            "takeaway=String((mission.keyPoints||[])[0]||'').trim()",
+            "'data-source-key-point-index':'0'",
             "把兩站串起來 · 閱讀順序",
             "只表示學習次序，不代表供應鏈、受惠或因果關係。",
             "function learningRelationPreview(", "一條既有關係示範",
@@ -1568,6 +1578,8 @@ class ResearchCenterTest(unittest.TestCase):
             "title:subject+' · '+edge.relationLabel",
             "function articleOriginContext(", "edgeId:relation?.edge.id||''",
             "mobileMeta:relation?.meta||''", "關係類型「'+relation.edge.relationLabel",
+            "routeId:route.id", "originQuestion=question?'整條路線要回答：'+question:''",
+            "originQuestion,mobileMeta:originQuestion",
             "function returnArticleOrigin(", "function renderArticleLearningOrigin(",
             "function renderLearningOriginReturn(",
             "'data-testid':'article-origin-top'",
@@ -1577,6 +1589,8 @@ class ResearchCenterTest(unittest.TestCase):
             "function renderMobileArticleOrigin(context)",
             "'data-testid':'mobile-origin-context'",
             "'data-origin-edge-id':context.edgeId||null",
+            "'data-origin-route-id':context.routeId||null",
+            "article-learning-origin-question", "learning-origin-return-question",
             "context.edgeId?'你剛才查這條關係':'你從這個位置進來'",
             "open:!matchMedia('(max-width:340px)').matches",
             "root=h('details',{class:'mobile-origin-context'",
@@ -1750,6 +1764,7 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-mission-question':'reflection'",
             "desktopFollowup=roleFirst?",
             "mobileFollowup=roleFirst?'先看產業角色；下方問題留作讀後檢查。':"
+            "firstMain?'先讀三句重點；熟悉背景時可直接進第一節，下方問題留作讀後檢查。':"
             "'先讀三句重點；下方問題留作讀後檢查。'",
             "reading-mission-followup-desktop",
             "reading-mission-followup-mobile",
@@ -2573,6 +2588,8 @@ class ResearchCenterTest(unittest.TestCase):
             "learningCard(cards[0],true,article)",
             "learningCard(card,false,article)",
             ".learning-route-bridge-question{",
+            ".learning-route-bridge-takeaway{",
+            "align-items:start;gap:9px;margin-bottom:9px",
             ".learning-route-completion-review{",
             ".learning-route-completion-phases{display:grid",
         ):
@@ -3089,6 +3106,14 @@ class ResearchCenterTest(unittest.TestCase):
             "radarScrollTop:page?.scrollTop||0", "openRadarArticle(candidate)",
             "function radarReaderStatusLabel(candidate)",
             "promoted:'已有文章與關係圖'", "watch:'等待更多證據'",
+            "function radarReaderActionGuide(", "function radarReaderActions(",
+            "這題現在怎麼讀", "'data-radar-reader-status':candidate.status",
+            "'data-radar-reader-article':hasArticle?'true':'false'",
+            "'data-radar-reader-graph':hasGraph?'true':'false'",
+            "已有文章可讀：先讀文章建立共同語言",
+            "目前沒有文章可讀：先把它當成待驗證問題",
+            "目前不投入完整研究：先保留問題",
+            ".radar-reader-status{", ".radar-reader-status .radar-actions{margin:0}",
             "研究順序 '+candidate.rank", "只排研究待辦，不是股票或投資排名",
             "閱讀這題的文章 · '+article.readingMinutes+' 分鐘",
             ".radar-head-copy", ".radar-technical-title",
@@ -3153,6 +3178,10 @@ class ResearchCenterTest(unittest.TestCase):
         radar_first_layer = radar_card.split("const copy=", 1)[0]
         self.assertNotIn("candidate.priorityLabel", radar_first_layer)
         self.assertNotIn("selectionLabel?radarBadge", radar_first_layer)
+        self.assertEqual(radar_card.count("radarReaderActions(candidate)"), 1)
+        self.assertIn("body.append(head,readerStatus,reader)", radar_card)
+        self.assertIn("body.append(audit,mapReturn)", radar_card)
+        self.assertNotIn("body.append(head,reader,groups,actions,audit", radar_card)
 
     def test_radar_group_matrix_keeps_promoted_question_article_and_return_path(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")

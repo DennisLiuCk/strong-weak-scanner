@@ -1712,8 +1712,22 @@ class ReadabilityGateTest(unittest.TestCase):
             text,
         )
         self.assertIn("這三層不能跳級", text)
+        self.assertNotIn("均有可定位的新數字", text)
+        self.assertNotIn("更新正式公司研究與既有可驗證假說", text)
+        for sentence in (
+            "公司公布的營收，還能用 TWSE 的 4、5、6 月月營收重新加總核對。",
+            "這些新資料足以啟動進一步查證",
+            "**先拆開看成長來源。**",
+            "**再看 AI 到底占多少。**",
+            "**最後確認文件能證明到哪裡。**",
+        ):
+            self.assertIn(sentence, text)
         self.assertIn(
             "evidence: editorial:plain_language_wave133_yageo_margin_bridge",
+            text,
+        )
+        self.assertIn(
+            "evidence: editorial:plain_language_wave148_yageo_beginner_opening",
             text,
         )
 

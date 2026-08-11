@@ -1,5 +1,136 @@
 # Changelog
 
+## 市場議題首屏可直接進正文，國巨導讀改回一般文章語氣 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、
+正式 route／graph／edge、公司曝險、雷達候選排序與研究判斷零變動**；本次只替一般市場議題增加
+一個 reader-only 正文捷徑，並把國巨 Q2 文章的新手開場改成正常中文文章語氣；同步研究維護契約、
+方法清單、README、payload 版本、發布頁與測試。
+
+- 以國巨 Q2 文章與固定 viewport 量測，修改前從文章根節點到第一個一般正文 section，在
+  390×844 約為 5,485px（約 6.5 個 viewport），1280×900 約為 3,686px。新手任務卡現在保留原
+  「開始讀三句重點」，並另提供次要「直接讀第一節」；accessible name 逐字包含第一個既有 H2，
+  行動只定位 `topicReaderSectionItems(article)[0]`，焦點優先落在同節既有問題定位卡、再退回 H2。
+  正式筆記、多空小作文、事件錨點與沒有一般正文的文章仍不顯示；中間三句重點、角色、路線、
+  字典、摘要與查核附錄都保留原 DOM 順序。這是版面距離與導覽行為，不是理解率或學習成效統計。
+- 國巨前三句改為先說公司公布了哪些數字、TWSE 月營收如何核對、毛利改善由哪些正負因素共同
+  構成，以及現有證據還不能證明全面漲價、滿載或長約；「為什麼重要」改成「先拆成長來源 →
+  再看 AI 占比 → 最後確認證據邊界」三段。另留
+  `editorial:plain_language_wave148_yageo_beginner_opening` transition；閱讀時間因字數由 14 增為
+  15 分鐘，沒有改動該文來源、主張、可信度、monitor、族群、學習路線或圖譜。
+- `learningPathVersion: 100 → 101`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章：ID、順序與
+  candidate radar 完全相同，只有 `topic-MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL` 的 sections、
+  summary、reading mission／boundary、搜尋文字與衍生閱讀時間改變。再排除該文、reader-only
+  版本及 route station 的衍生分鐘數後，前後 payload 完全相同，canonical SHA-256 兩邊都是
+  `2a6c86b52e3c6ece9925392417bd40e831a9bd59604c363723f1343d5f52aa9a`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 預設環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `1f645276f5f2bf7b27c2c017517baf9c3c2122b588606c0ec2ec3fdafe6c2c63`。
+- 修改前後手機／桌機文章與正文定位畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave148-topic-body-bridge/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
+## 研究雷達先告訴讀者現在能做什麼 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、
+group／route／phase／graph／edge 關係、active radar／selection log、候選 rank／status、公司證據與
+投資判斷零變動**；本次只把既有文章／圖譜行動前移到雷達題目後，並為 watch／deferred 題補上
+固定 reader-only 導讀；同步研究維護契約、方法清單、README、payload 版本、發布頁與測試。
+
+- 以同一張已升格候選與 390×844 viewport 比較。修改前，「閱讀這題的文章」在卡片約第 910px，
+  必須先滑過起點、下一步、三個名詞與三個族群問句；修改後「這題現在怎麼讀」在卡片約第 208px
+  出現，文章行動前移到約第 288px，同時保留同一 article、23 分鐘閱讀時間與 graph。第三張
+  `watch` 候選原本沒有文章也沒有可採取行動，現在於卡片約第 247px 明說目前沒有文章，先用原
+  三個族群問句分清責任並等待下一份證據；`deferred` 題明說目前不投入完整研究。這是同畫面與
+  DOM 的資訊架構量測，不是理解率、完成率或學習成效統計。
+- 每張卡只保留一組主要行動；390px 已升格卡為 1 個 article 與 1 個 graph 按鈕，watch／deferred
+  卡沒有虛構入口。從前移按鈕開文後，手機起點仍為 `radar`、逐字保留雷達第 1 題與原白話問題；
+  返回後同一卡片位於約 110px、焦點回到同一 candidate。320、390、780、884、1280、1440px 的
+  `documentElement.scrollWidth` 均等於 viewport 寬度；780px 以下為單欄且按鈕至少 44px 高，
+  884px 以上維持文字／行動雙欄。
+- `learningPathVersion: 99 → 100`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章與 8 個候選；
+  排除 reader-only 版本後，current 與本輪修改前 payload、候選順序、rank、status、article／graph
+  與 group 映射完全相同；Python canonical SHA-256 兩邊都是
+  `af97e43694a980da1d0cec9b4e77c838784abda7beabe6818f38dbf9f11aa205`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 預設環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `969db28f5343c07ca05d7ec5e28d563815b15ba0d03de1a7d11227937f5139ea`。
+- 修改前後手機可讀題、手機待證題與桌機畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave147-radar-reader-brief/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
+## 讀完一站後，先說清楚這篇替整條問題補上什麼 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、
+`readingMission`、group／route／phase／graph／edge 關係、active radar／selection log、公司證據與
+投資判斷零變動**；本次只在正式下一站卡逐字重用目前文章第一個既有重點，並修正桌機完成段的
+等高拉伸；同步研究維護契約、方法清單、README、reader-only payload 版本、發布頁與測試。
+
+- 以同一篇「800VDC 功率半導體鏈」與 1280×900 viewport 檢查「從這篇接著學」。修改前，左側
+  自我檢查卡被右側下一站卡強制拉到約 507px 高，內容下方形成大塊空白；右側只重顯整條系統問題
+  與「這一站／下一站」名稱，看不到剛讀完文章替整體問題建立的第一個框架。修改後，並排容器改為
+  `align-items:start`，自我檢查卡約 195px、下一站卡約 602px，各自維持真實內容高度；下一站卡在
+  系統問題後逐字顯示本篇 `readingMission.keyPoints[0]`，並以 article ID 與 index `0` 對回來源。
+  這是同一畫面與 DOM 的版面／資訊架構觀察，不是理解率、完成率或學習成效統計。
+- 按「繼續第 2/9 站」後，下一篇仍逐字帶入上一站 graph label、同一 key point、目前站 label 與
+  問題；返回後焦點回到原按鈕，系統問題與本篇重點都仍存在。320、390、780、884、1280、1440px
+  的 `documentElement.scrollWidth` 均等於 viewport 寬度；320／780／884px 為單欄，1280／1440px
+  保留雙欄且兩卡不再互相拉伸。
+- `learningPathVersion: 98 → 99`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章、4 條正式
+  route 與 25 個正式站點；25/25 站都有非空第一個既有 key point。排除 reader-only 版本後，
+  current 與本輪修改前 payload 完全相同，兩邊 canonical SHA-256 都是
+  `af97e43694a980da1d0cec9b4e77c838784abda7beabe6818f38dbf9f11aa205`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 預設環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `7e791afbc61fa2a015019305f56e6c8ddd04c26af9c05e2a563a7ee985c3d687`。
+- 修改前後手機／桌機與 320px 畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave146-completion-bridge/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
+## 從系統問題進文章後，首屏仍記得整條路線要回答什麼 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、
+group／route／phase／graph／edge 關係、active radar／selection log、公司證據與投資判斷零變動**；
+本次只把正式 route 已有的 `question` 帶進文章首尾與手機起點摘要，並同步研究維護契約、方法
+清單、README、reader-only payload 版本、發布頁與測試。
+
+- 以固定 390×844 實走「第一次來 → 供電與散熱系統問題 → 第一站文章」。修改前，入口已顯示
+  「電力如何送進 AI 機櫃，產生的熱又如何被帶走？」，但文章首屏只剩「系統問題 · 供電與
+  散熱」，整條路線正在回答的問題要到文章底部才再次出現。修改後，文章首屏與底部返回卡逐字
+  沿用同一 `route.question`，並以 `data-origin-route-id="power-cooling"` 對回同一條正式路線；
+  不從文章題名、正文、族群或相似度另寫問題。這是同一 viewport 與狀態的資訊架構觀察，不是
+  理解率、完成率或學習成效統計。
+- 320×844 仍預設收合起點摘要，卡高約 48px；展開後約 99px，可讀到完整系統問題。390×844
+  預設展開、卡高約 87px；780px 維持行動版摘要，884px 與 1280px 改用桌機完整起點卡。320、
+  390、780、884、1280px 的 `documentElement.scrollWidth` 都等於 viewport 寬度，沒有水平
+  溢位。返回後 hash 為 `#maturity`、焦點回到 `power-cooling` route；直接 article deep link
+  仍沒有 origin 卡，返回文字維持「返回研究清單」。
+- `learningPathVersion: 97 → 98`。獨立 Python 與 Node JSON 路徑各自核對 274 篇文章與 4 條正式
+  route；排除 reader-only 版本後，current 與 HEAD payload 完全相同，兩邊 canonical SHA-256
+  都是 `af97e43694a980da1d0cec9b4e77c838784abda7beabe6818f38dbf9f11aa205`。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 預設環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `4074362622a29f01bc6b70a007e7908d302dd3ff1ea633fdbb28a369c9f62741`。
+- 修改前矩陣入口、同狀態手機前後比較、320px 展開與桌機完整起點存於
+  `tmp/research-learning-audit-2026-08-11-wave145-matrix-start/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
 ## 從關係圖進長文時，不再忘記剛才正在查哪一條線 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、

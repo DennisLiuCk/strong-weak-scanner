@@ -124,6 +124,12 @@ knowledge value 與 evidence posture 都是研究團隊操作資料，必須收�
 status、rank 與 audit payload 均須保留。已升格文章行動用「閱讀這題的文章」描述讀者接下來
 會做什麼，不在第一閱讀層暴露「升格」等維護流程術語。
 
+每張候選卡必須在白話問題與 status 後立即顯示「這題現在怎麼讀」。說明與行動只能由原
+`candidate.status`、可解析的 `articleId`／`graphId` 及同卡正式 `groupIds` 數量決定：已有文章時
+先提供同一篇文章與既有圖譜入口；`watch` 必須明說目前沒有文章、先用族群問句拆責任並等待證據；
+`deferred` 必須明說目前不投入完整研究。既有主要行動前移後不得在卡尾重複；這個 reader-only
+導讀不得改 rank、status、selection log、證據姿態、文章／圖譜映射或 audit payload。
+
 已升格候選從雷達卡直接開文時，顯示層必須建立一次性 `radar` article origin，只保存正式
 `candidateId`、雷達捲動位置與 window 位置。文章桌機頁首、行動版返回鈕與
 「從這篇接著學」末端都要顯示雷達第 N 題與同一 `reader_question`，並明示 N 只是研究資源
@@ -472,6 +478,12 @@ readerBoundary`，首個行動一律顯示「先看產業角色」並定位 `.ar
 分別定位「30 秒摘要」與整個「多空觀點（小作文）」而不跳過兩邊敘事。沒有可用族群指南時，
 首個行動安全退回原來源段落，不顯示空的第二步。兩次定位都須同步移動鍵盤焦點；手機讓 heading
 停在黏性導覽下方約 120px，桌機則在 `readerScroll` 頂端下方約 76px，且不得改變文章 hash。
+市場議題若至少有一個非新手、非研究摘要、非查核附錄的一般正文 section，任務卡另顯示次要
+「直接讀第一節」行動。目標只能取 `topicReaderSectionItems(article)[0]` 的既有 section index；
+accessible name 須逐字保留該 H2，點擊後沿用 `focusReadingTarget()` 移動焦點與捲動位置。這個捷徑
+不得刪除、收合或重排中間的三句重點、產業角色、學習路線、其餘新手原文、研究摘要與可信度；
+正式筆記、多空小作文、事件錨點或沒有一般正文時安全不顯示，也不得由題名、blocks 或模型另猜
+一個起點。
 正文後「回看本篇三句重點／30 秒摘要／勝負手」仍共用來源定位函式；多空文章回看時定位
 「勝負手」。市場議題 DOM 閱讀順序固定為「閱讀任務 →
 完整新手三句重點 → 產業角色 → 學習路線定位 → metadata →
@@ -640,13 +652,15 @@ effective confidence 分成兩把尺。claim copy 固定依正式 `verified／in
 從族群選擇器或每列「開始學這個族群」開啟文章時，前端只保存本次工作階段的
 `maturity-group` 起點與正式 `groupId`；從系統問題卡或其展開站點開文時，則保存
 `maturity-route` 與既有 `routeId`。文章頁首、行動版返回鈕與「從這篇接著學」末端必須用
-同一狀態顯示並返回原入口；換到下一站文章時延續，回到矩陣後把同一族群或路線聚焦。一般
+同一狀態顯示並返回原入口；`maturity-route` 的頁首與 341–780px 行動版展開內容還必須逐字顯示
+同一份 `route.question`，320–340px 則放在可展開內容，不能只留下 route label。換到下一站文章時
+延續，回到矩陣後把同一族群或路線聚焦。一般
 文章清單、圖譜、雷達或直接深連結開文時必須清空這個**矩陣**狀態，不能由文章族群或
 文字相似度猜測矩陣來處。雷達若先定位矩陣族群，再由「本題起讀文章」開啟同一已升格 article，
 必須改用上述 `maturity-radar` origin；通用族群起點仍使用 `maturity-group`，兩者不得互換。
 雷達卡直接開文則依獨立 `radar` origin 契約建立來處；圖譜與矩陣分別沿用自己的 origin 契約，
 未帶來處的一般清單與直接連結才
-保留「返回研究清單」。矩陣起點說明只可重用既有族群指南與學習路線數量／名稱，
+保留「返回研究清單」。矩陣起點說明只可重用既有族群指南與學習路線問題／數量／名稱，
 不得新增上下游、受惠或研究排名。
 
 每篇文章前段的產業角色區只能依該文正式 `groups` 順序，對回同一份
@@ -845,7 +859,10 @@ resize 不得重設使用者已切換的開合狀態。每個 phase 摘要須顯
 入口只能使用本文已宣告的族群。它是導覽層，不得依文字相似度自行建立供應鏈、客戶或受惠關係。
 正式 route 下一站已由 `routeBridge` 解釋 graph／phase 次序；每張下一站卡在兩步次序之前還必須
 由目前 article 的 `learningRoute.id` 回查同一份正式 route，逐字顯示 route `question`，讓跨題材
-或跨 phase 時仍保有整條路線的系統問題。最後一站的 route card 必須再逐字顯示同一 `question`、
+或跨 phase 時仍保有整條路線的系統問題；同一區再逐字顯示目前文章非空的
+`readingMission.keyPoints[0]`，標成「本篇替整條問題先補上」，並保留 article ID 與 key point
+index，不得從正文、題名、相似度或模型重寫。桌機自我檢查與下一站並排時各自維持內容高度，窄幅
+再改成單欄，不得用等高拉伸製造空白。最後一站的 route card 必須再逐字顯示同一 `question`、
 `description` 與全部既有 `phases[].label`／各自 `graphIds` 站數，形成「回頭回答整條路線」；缺少
 可解析 route 或 question 時不顯示這個 reader-only 複習，不得用文章題名、正文、相似度或模型補寫。
 這只重排 knowledge graph 已發布的 route，不得建立 phase 之間的上下游、因果、受惠或重要性結論。

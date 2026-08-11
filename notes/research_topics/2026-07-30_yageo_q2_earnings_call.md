@@ -61,6 +61,13 @@ to: triaged
 reason: editorial_plain_language_wave133_yageo_margin_bridge_no_conclusion_change
 evidence: editorial:plain_language_wave133_yageo_margin_bridge
 -->
+<!-- transition
+date: 2026-08-11
+from: triaged
+to: triaged
+reason: editorial_plain_language_wave148_yageo_beginner_opening_no_conclusion_change
+evidence: editorial:plain_language_wave148_yageo_beginner_opening
+-->
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -77,15 +84,20 @@ evidence: editorial:plain_language_wave133_yageo_margin_bridge
 
 ### 三句話抓重點
 
-- 國巨官方 Q2 簡報顯示營收、毛利率、EPS、AI 終端占比與鉭質電容銷售均有可定位的新數字；其中營收另可由 TWSE 個股報告逐月加總交叉驗證。
-- 公司把部分毛利改善歸因於價格調整與 AI 產品組合，但也說投入成本與標準品需求抵銷部分效益。
-- 這些資料值得提早更新正式公司研究與既有可驗證假說，尚不足以證明 MLCC 全面漲價、交期拉長、滿載或長約訂單。
+- 國巨官方 Q2 簡報同時公布營收、毛利率、每股盈餘（EPS）、AI 終端占比與鉭質電容銷售變化。公司公布的營收，還能用 TWSE 的 4、5、6 月月營收重新加總核對。
+- 公司表示，價格調整與 AI 產品組合改善，幫助毛利率上升；但投入成本上升與標準品需求增加，也抵銷了部分效果。
+- 這些新資料足以啟動進一步查證，但還不能證明 MLCC 已全面漲價、交期拉長、產能滿載，或已有長約訂單。
 
 ### 為什麼重要
 
-營收和 EPS 成長若沒有拆解，很容易被當成所有產品同步變好。國巨這次資料同時提供產品
-組合、價格效果與抵銷因素，能幫助讀者把「AI 需求強」拆成實際占比與毛利路徑；但完整
-現金流、資產負債與附註仍需正式核閱季報，不能讓簡報摘要承擔超過它的文件角色。
+**先拆開看成長來源。** 營收和每股盈餘成長，不代表所有產品都同步變好。還要分清哪些改善
+來自價格、哪些來自高毛利產品占比提高，以及哪些效果被成本或較弱的標準品需求抵銷。
+
+**再看 AI 到底占多少。** 國巨這次公布 AI 終端占營收 16%，也說明價格調整與 AI 產品組合
+如何影響毛利率。這讓「AI 需求強」可以拆成較具體的營收占比與獲利線索。
+
+**最後確認文件能證明到哪裡。** 法說簡報不是完整季報。現金流、資產負債與附註仍要等正式
+核閱財務報告，不能只靠簡報摘要下結論。
 
 ### 接下來怎麼追
 
