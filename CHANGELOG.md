@@ -1,5 +1,35 @@
 # Changelog
 
+## 研究中心首訪直接從四條問題路線開始 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、
+鎖定 meta、confidence、route、圖譜節點與 edge、公司曝險及投資判斷零變動**；本次只調整
+研究中心首頁的 reader-only 新手入口、顯示偏好與閱讀導覽，並同步研究維護契約、方法清單及
+測試。方法 registry fingerprint 仍為
+`322e5d8604570e10bac53ee0f18dc13b1957e072c8d99e96f447a6d165415c6b`，與既有基線完全相同，
+因此不建立內容相同的新方法快照。
+
+- 完整解析建置後 274 篇文章與全部 `groupMaturity.learningRoutes`：共有 4 條路線、25 站，
+  4／4 個第一站都能解析到正式文章。修改前 559 × 863 窄欄會預設收起三步導覽，新手要先展開、
+  再進族群矩陣、再選路線才能開始；最新更新清單卻先佔據首屏，容易被誤認為推薦順序。這是完整
+  發布母體的決定性列舉，不是抽樣統計，SE／t／有效獨立觀測不適用。
+- 首訪現在明示「最新文章不是推薦順序」，並直接呈現 4 個白話問題與第一站；每張捷徑逐欄重用
+  既有路線 label、question、stationCount、firstGraphLabel 與 firstArticleId，不另寫問題、不猜測
+  文章，也不改動路線、圖譜或研究證據。點一下即以 `maturity-route` origin 進入第一篇，文章仍可
+  返回完整路線。
+- 窄幅首次載入改為預設展開；讀者手動收合或展開後，狀態會在同一瀏覽器重新載入時保留，resize
+  不會覆寫。四張捷徑均保留原生 button 語意，外層為 4 個 listitem；559px viewport 的
+  `scrollWidth` 與 `innerWidth` 同為 559，沒有水平溢位。
+- 前後畫面、第一站、一鍵路徑與完整 census 存於
+  `tmp/research-learning-audit-2026-08-11-wave116-new-reader-entry/`。固定 viewport 不是實機，本輪
+  未做 VoiceOver／TalkBack、200%／400% zoom、完整實體鍵盤巡覽、儀器化 WCAG 對比或真實
+  新手理解測試，因此不宣稱實際理解率已提升或完整無障礙合規。
+- Darwin arm64、Python 3.11.11、UTF-8 執行 515 tests 全綠；qual notes、leading hypotheses、
+  research queue、knowledge graph、research radar 與 method audit 六項 lint 均為 exit 0；研究
+  queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build SHA 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `f4dfd047431db4414b31afd186d102418c89cc8347eeb8cacc45baf0ad02184f`。
+
 ## 跨文章學習路徑不再把剛走過的文章與圖譜當成下一站 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／comparison／monitor、

@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 68)
+        self.assertEqual(library["learningPathVersion"], 69)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1515,7 +1515,7 @@ class ResearchCenterTest(unittest.TestCase):
             "maturity-reading-key", "先選一個想弄懂的問題",
             "這頁的「完成度」怎麼看？", "maturityRouteCards",
             "function renderMaturityLearningRoute(",
-            "entry-guide", "第一次來？照三步開始",
+            "entry-guide", "第一次來？先從問題開始",
             'id="entryMatrix"', 'id="entryTopics"', 'id="entryGraph"',
             "function showEntryGuide()", "function resetEntryScroll()",
             "function openEntrySurface(", "function openEntryTopics()",
@@ -1639,6 +1639,25 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("function hashArticleId()", template)
         self.assertIn("url.hash=article.id", template)
         self.assertNotIn("github.com/DennisLiuCk/strong-weak-scanner/blob/main/notes/qualitative/8261", template)
+
+    def test_first_visit_guide_opens_with_direct_registered_route_starts(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        for contract in (
+            'id="entryGuideRoutes"', "可直接開始的四條學習路線",
+            "function renderEntryGuideRoutes()", "(MATURITY.learningRoutes||[]).forEach",
+            "'data-testid':'entry-route-'+route.id",
+            "root.appendChild(h('div',{role:'listitem'},button))",
+            "openMaturityRouteArticle(route,route.firstArticleId)",
+            "renderEntryGuideRoutes();renderGroupFilters()",
+            "researchEntryGuideStateV1", "guide.open=saved!=='closed'",
+            "guide.addEventListener('toggle'",
+            "localStorage.setItem(key,guide.open?'open':'closed')",
+            ".entry-guide-routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))",
+            "@media(max-width:420px){.entry-guide-routes{grid-template-columns:1fr}}",
+            ".entry-guide-route:focus-visible",
+        ):
+            self.assertIn(contract, template)
+        self.assertNotIn("foldCatalogGuideOnNarrow", template)
 
     def test_mobile_reading_mission_puts_the_start_action_before_the_reflection_question(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2193,11 +2212,12 @@ class ResearchCenterTest(unittest.TestCase):
             "text:'證據位置：'",
             ".result-learning-preview{display:grid",
             ".result-evidence{display:grid",
-            "function foldCatalogGuideOnNarrow()",
+            "function restoreCatalogGuidePreference()",
             "const guide=document.getElementById('entryGuide')",
-            "window.matchMedia('(max-width:780px)').matches",
-            "guide.open=false",
-            "不在旋轉或 resize 時覆寫使用者之後的手動狀態",
+            "guide.open=saved!=='closed'",
+            "guide.addEventListener('toggle'",
+            "if(guide.hidden)return",
+            "也不由 resize 覆寫",
         ):
             self.assertIn(contract, template)
         # 卡片只重排已發布的導讀、狀態與 readerEvidenceGuide，不回寫研究 payload。
@@ -2640,7 +2660,7 @@ class ResearchCenterTest(unittest.TestCase):
             "function openGroupResearch(", "deepLink==='maturity'",
             "先從一個想弄懂的問題開始", "族群起點", "開始學這個族群",
             "先選問題，再讀主題，最後追關係", "先選一個系統問題",
-            "從四條既有學習路線，看每個問題會用到哪些族群",
+            "從 4 條既有學習路線，看每個問題會用到哪些族群",
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
             "row.readerRole", "row.readerBoundary", "研究中心怎麼分",
             "先別混淆：", ".maturity-group-guide",
