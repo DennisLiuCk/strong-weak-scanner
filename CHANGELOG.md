@@ -1,5 +1,43 @@
 # Changelog
 
+## 跨階段換站先收好上一段，再說清楚下一段要新增什麼 — 2026-08-11
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／monitor、文章主張、
+group／route／graph 關係、active radar／selection log、公司證據與投資判斷零變動**；本次只為
+正式學習 route 的 phase 補上人工白話課綱，並在相鄰站跨 phase 時顯示 reader-only 接力；同步
+研究維護契約、方法清單、README、payload 版本與測試。
+
+- 以固定 390×844 實走「供電與散熱第 3/9 站 → 第 4/9 站」。修改前，第三站底部已明示下一站
+  進入「機櫃運作與驗證」，但第四站首屏又退回一般「上一站重點／這站問題」；讀者看不到上一
+  階段建立了什麼，也看不出新階段要增加哪一層判斷。這是同一 viewport 與完整 DOM 的版面／
+  資訊架構觀察，不是讀者理解率、完成率或學習成效統計。
+- 10 個正式 phase 現在各有一個人工 `purpose`，只描述該階段的學習目的。相鄰站的 `phaseId`
+  不同時，首屏改顯「跨階段接力」：並列前後 phase label、回答「上一階段學到什麼／下一階段
+  要新增什麼」，再逐字重顯新階段第一 station 的 graph label 與原 `readingMission.question`。
+  前後 phaseStep 不相鄰、缺任一 purpose 或不是正式相鄰站時都不生成；畫面明示課綱走過不等於
+  已掌握，也不新增上下游、受惠、因果或投資排序。
+- 390px 實測 `innerWidth = document.scrollWidth = 390px`，無水平溢位；跨階段卡 354×345px，
+  兩張 phase 卡各約 161×111px，新階段問題卡 329×98px，黏性返回 44px 高。320px 改成單欄，
+  跨階段卡 284×468px、兩張 phase 卡各 259×93px，同樣無溢位。1440px 跨階段卡 836×231px，
+  phase 卡各約 399×76px、問題卡 805×54px，桌機返回 36px 高且無溢位。H1 取得焦點；桌機返回
+  後焦點回到原「繼續第 4/9 站」，按鈕完整落在 900px viewport 內。同 phase 的第 1→2 站仍只
+  顯示原 station track，沒有重複 phase 卡。
+- `learningPathVersion: 93 → 94`。獨立 Python 與 Node JSON 路徑各自核對 4 條正式路線、10 個
+  phase、25 站與 21 個相鄰換站：15 個 same-phase、6 個 cross-phase；6/6 個 cross-phase 都有
+  前後 purpose 且 phase／station step 恰好相鄰。274 篇 article IDs 與 HEAD 完全相同；排除
+  reader-only 版本及本輪 phase purpose 三個投影位置後，current 與 HEAD 的 normalized LIB
+  SHA-256 都是 `f039aa829e7b3a08bccc472968aee94fb1cdd71d2e6d834ef783e539fe2264f0`。
+- Darwin 25.5.0 arm64、Python 3.11.11、`C.UTF-8` 環境執行 528 tests 全綠；qual notes、
+  leading hypotheses、research queue、knowledge graph、research radar 與 method audit 六項 lint
+  均為 exit 0；research queue 保留既有 11 個新鮮度／映射 warning。連續兩次 dashboard build
+  SHA-256 一致：`index.html`
+  `82bf2fb334fb40351ce56d2448f4fec2b32594e74b927281a2463fad4652e943`、`research.html`
+  `8b0b1e3e97a4c1448dfbadfc2975413f07bd1196a5df6d9fe3302e48a29bf2a6`。
+- 修改前、320／390px、桌機與返回狀態畫面存於
+  `tmp/research-learning-audit-2026-08-11-wave141-phase-handoff/`。固定 Browser viewport 不是實機；
+  本輪未做真實新手理解測試、長期記憶測試、VoiceOver／TalkBack、200%／400% zoom 或完整實體
+  鍵盤巡覽，因此不宣稱學習成效已提升或完整無障礙合規。
+
 ## 同一路線換站時保留上一站框架，不再把下一篇讀成孤立文章 — 2026-08-11
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究文章、group／route／graph 關係、

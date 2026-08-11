@@ -902,6 +902,14 @@ reader 捲動位置保留成單次 reader-only `station-transition`。下一篇�
 第一站與其他 origin 不得誤顯這張卡；畫面須明示只重排既有文字，不代表上下游、受惠、因果、
 成熟度或投資排名。
 
+每個正式 `RESEARCH_LEARNING_ROUTES.phases[]` 另須提供單一、非空的 `purpose`，用一個白話句子
+說明該階段要新增的判斷能力；它是人工維護的閱讀課綱，不得寫成產業結論、公司事實、受惠方向或
+研究完成度。相鄰換站若 `phaseId` 改變，兩個 phase 必須恰好相鄰且前後 `phasePurpose` 都存在，
+首屏才可把一般 `station-transition` 升級為跨階段接力：逐字並列前後 phase label／purpose，再逐字
+顯示新階段第一 station 的 `graphLabel` 與該篇 `readingMission.question`。畫面須明示「上一階段」
+只代表課綱已走過，不代表讀者已掌握；同 phase 換站仍沿用前一篇重點／下一篇問題，不得重複堆疊
+階段卡。直接 deep link、route map 跳站、非相鄰換篇與其他 origin 都不得虛構 phase transition。
+
 文章內換篇時，`ensureSelected()` 必須優先保留仍開啟且存在於 `byId` 的文章，即使它不符合左側
 目前搜尋、類型或族群條件；不得再由 `filteredArticles()` 的第一篇覆寫下一站。清單須保留原條件
 並顯示「目前閱讀不在左側結果」，讓讀者知道差異來自延伸導覽。首次由清單開文時另保存原 article

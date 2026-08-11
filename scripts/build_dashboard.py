@@ -303,6 +303,7 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "power-components",
                 "label": "供電、保護與元件",
+                "purpose": "先分清電力在哪裡轉換、怎麼保護，以及不同元件各自負責什麼。",
                 "graphIds": [
                     "800v-power-tree", "800vdc-protection-layers",
                     "ai-capacitor-role-map",
@@ -311,6 +312,7 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "rack-operation",
                 "label": "機櫃運作與驗證",
+                "purpose": "再把元件放回整個機櫃，加入時間尺度、控制、電磁干擾與信任驗證。",
                 "graphIds": [
                     "ai-power-buffering", "ai-rack-action-contract",
                     "ai-rack-emc-certification", "ai-rack-trust-root",
@@ -319,6 +321,7 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "cooling-deployment",
                 "label": "液冷部署",
+                "purpose": "最後檢查液冷是否走到產品資格、實際部署與清楚的迴路責任。",
                 "graphIds": [
                     "liquid-cooling", "liquid-cooling-loop-boundaries",
                 ],
@@ -341,6 +344,7 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "memory-architecture",
                 "label": "記憶體層級與客製範圍",
+                "purpose": "先分清資料放在哪一層，以及客製記憶體究竟改了哪些部分。",
                 "graphIds": [
                     "ai-memory-hierarchy", "custom-hbm-scope-ladder",
                 ],
@@ -348,6 +352,7 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "memory-commercialization",
                 "label": "材料、基板與記憶體商業化",
+                "purpose": "再看材料與基板是否跨過樣品、資格驗證與穩定量產。",
                 "graphIds": [
                     "glass-substrate-commercialization", "hbf-commercialization", "hbm",
                 ],
@@ -355,6 +360,7 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "bonding-packaging",
                 "label": "鍵結與封裝路徑",
+                "purpose": "最後檢查鍵結與封裝路徑如何影響整合、良率與量產。",
                 "graphIds": ["hybrid-bonding", "panel-level-packaging"],
             },
         ],
@@ -375,11 +381,13 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "data-platform",
                 "label": "資料平面與平台部署",
+                "purpose": "先看資料怎麼被讀取與保存，再確認平台是否真正部署。",
                 "graphIds": ["ai-storage-data-plane", "amd-helios"],
             },
             {
                 "id": "chip-process",
                 "label": "晶片供電、光網路與製程",
+                "purpose": "再補上晶片供電、光網路與先進製程這三個底層條件。",
                 "graphIds": [
                     "backside-power", "cpo-networking", "high-na-euv-readiness",
                 ],
@@ -387,6 +395,7 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "interconnect-standards",
                 "label": "互連與標準驗證",
+                "purpose": "最後用互連規格、測試與跨廠互通，判斷標準是否成熟。",
                 "graphIds": [
                     "open-ai-fabrics", "pcie6-compliance-ladder",
                     "ucie-interoperability",
@@ -404,6 +413,7 @@ RESEARCH_LEARNING_ROUTES = [
         "phases": [{
             "id": "financial-attribution",
             "label": "公司分母與題材歸因",
+            "purpose": "把公司整體財務分母與題材可歸因貢獻分開。",
             "graphIds": ["yageo-q2-financial-materiality"],
         }],
     },
@@ -2966,11 +2976,13 @@ def attach_research_learning_paths(research_library, knowledge_graph):
         """Map each registered station to one explicit, contiguous learning phase."""
         graph_ids = list(route.get("graphIds") or [])
         declared = route.get("phases")
+        requires_purpose = bool(declared)
         if not declared:
             # Legacy fixtures remain valid; published routes all declare phases.
             declared = [{
                 "id": (route.get("id") or "route") + "-all",
                 "label": route.get("label") or "學習路線",
+                "purpose": route.get("description") or route.get("label") or "學習路線",
                 "graphIds": graph_ids,
             }]
         flattened = []
@@ -2980,10 +2992,13 @@ def attach_research_learning_paths(research_library, knowledge_graph):
         for phase_index, phase in enumerate(declared, 1):
             phase_id = str(phase.get("id") or "").strip()
             phase_label = str(phase.get("label") or "").strip()
+            phase_purpose = str(phase.get("purpose") or "").strip()
             phase_graph_ids = list(phase.get("graphIds") or [])
-            if not phase_id or not phase_label or not phase_graph_ids:
+            if (not phase_id or not phase_label or not phase_graph_ids
+                    or (requires_purpose and not phase_purpose)):
                 raise ValueError(
-                    f"學習路線階段缺少 id、label 或 graphIds：{route.get('id') or 'route'}"
+                    "學習路線階段缺少 id、label、purpose 或 graphIds："
+                    f"{route.get('id') or 'route'}"
                 )
             if phase_id in phase_ids:
                 raise ValueError(
@@ -3004,6 +3019,8 @@ def attach_research_learning_paths(research_library, knowledge_graph):
                     "phaseStationStep": station_index,
                     "phaseStationTotal": len(phase_graph_ids),
                 }
+                if phase_purpose:
+                    mapped[graph_id]["phasePurpose"] = phase_purpose
         if flattened != graph_ids:
             raise ValueError(
                 "學習路線階段必須逐站、依原順序完整覆蓋 graphIds："
@@ -3552,7 +3569,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 93
+    research_library["learningPathVersion"] = 94
     return research_library
 
 

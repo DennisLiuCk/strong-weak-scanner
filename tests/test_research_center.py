@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 93)
+        self.assertEqual(library["learningPathVersion"], 94)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -675,10 +675,12 @@ class ResearchCenterTest(unittest.TestCase):
                 "phases": [
                     {
                         "id": "foundation", "label": "基礎概念",
+                        "purpose": "先建立測試用的基礎概念。",
                         "graphIds": ["graph-a"],
                     },
                     {
                         "id": "application", "label": "系統應用",
+                        "purpose": "再把基礎概念放進系統應用。",
                         "graphIds": ["graph-b", "graph-c"],
                     },
                 ],
@@ -725,6 +727,7 @@ class ResearchCenterTest(unittest.TestCase):
             "id": "route", "label": "測試路線", "description": "依序閱讀",
             "step": 1, "total": 3, "graphId": "graph-a", "graphLabel": "第一圖",
             "phaseId": "foundation", "phaseLabel": "基礎概念",
+            "phasePurpose": "先建立測試用的基礎概念。",
             "phaseStep": 1, "phaseTotal": 2,
             "phaseStationStep": 1, "phaseStationTotal": 1,
         })
@@ -743,6 +746,11 @@ class ResearchCenterTest(unittest.TestCase):
             ["基礎概念", "系統應用", "系統應用"],
         )
         self.assertEqual([station["phaseStep"] for station in stations], [1, 2, 2])
+        self.assertEqual(
+            [station["phasePurpose"] for station in stations],
+            ["先建立測試用的基礎概念。", "再把基礎概念放進系統應用。",
+             "再把基礎概念放進系統應用。"],
+        )
         self.assertEqual(
             [station["phaseStationStep"] for station in stations], [1, 1, 2])
         self.assertEqual(stations[0]["question"], "讀完後能回答哪個問題？")
@@ -765,6 +773,7 @@ class ResearchCenterTest(unittest.TestCase):
                 "graphIds": ["graph-a", "graph-b"],
                 "phases": [{
                     "id": "only", "label": "只含一站",
+                    "purpose": "只用來測試缺站的階段。",
                     "graphIds": ["graph-a"],
                 }],
             }],
@@ -772,6 +781,21 @@ class ResearchCenterTest(unittest.TestCase):
         }
         with self.assertRaisesRegex(ValueError, "逐站、依原順序完整覆蓋"):
             bd.attach_research_learning_paths({"articles": []}, invalid_graph)
+
+        missing_purpose_graph = {
+            "learningRoutes": [{
+                "id": "missing-purpose", "label": "缺課綱路線",
+                "graphIds": ["graph-a"],
+                "phases": [{
+                    "id": "only", "label": "缺課綱階段",
+                    "graphIds": ["graph-a"],
+                }],
+            }],
+            "graphs": graph["graphs"][:1],
+        }
+        with self.assertRaisesRegex(ValueError, "purpose"):
+            bd.attach_research_learning_paths(
+                {"articles": []}, missing_purpose_graph)
 
         missing_mission = {"counts": {"topic": 1}, "groups": [], "articles": [{
             "id": "topic-a", "type": "topic", "groups": [], "stockIds": [],
@@ -912,6 +936,7 @@ class ResearchCenterTest(unittest.TestCase):
                 len({phase["id"] for phase in phases}), len(phases), route["id"])
             for phase in phases:
                 self.assertTrue(phase["label"].strip(), route["id"])
+                self.assertTrue(phase["purpose"].strip(), route["id"])
                 self.assertTrue(phase["graphIds"], route["id"])
 
     def test_topic_confidence_uses_explicit_as_of_without_changing_article_anchor(self):
@@ -2636,19 +2661,33 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-testid':card.kind==='article'&&card.routeStep?'learning-route-next-action':null",
             "function stationTransitionContext(article)",
             "origin.toArticleId!==article?.id",
+            "const phaseChange=Boolean(fromStation.phaseId&&toStation.phaseId",
+            "fromPhasePurpose=String(fromStation.phasePurpose||'').trim()",
+            "Number(toStation.phaseStep)!==Number(fromStation.phaseStep)+1",
             "function renderStationTransitionBridge(article)",
             "'data-testid':'station-transition-bridge'",
+            "'data-phase-change':phaseChange?'true':'false'",
             "同路線接力 · ",
             "把第 '+origin.fromStep+' 站的框架，帶進第 '+origin.toStep+' 站",
             "上一站先建立",
             "這站接著回答",
             "重點與問題逐字沿用前後兩篇既有文章",
+            "跨階段接力 · ",
+            "從「'+fromStation.phaseLabel+'」進入「'+toStation.phaseLabel+'」",
+            "上一階段學到什麼",
+            "下一階段要新增什麼",
+            "從這一站開始練習",
+            "階段目的來自正式學習路線",
+            "不代表已掌握",
             "context.kind==='station-transition'",
             "state.articleOrigin?.kind==='station-transition'",
             "origin.kind==='station-transition'",
             "[data-testid=\"learning-route-next-action\"]",
             ".station-transition-bridge{",
             ".station-transition-track{display:grid;grid-template-columns:repeat(2",
+            ".station-transition-bridge.phase-change{",
+            ".station-transition-phase-track{display:grid;grid-template-columns:repeat(2",
+            ".station-transition-phase-question{display:grid",
             ".route-transition-back,.station-transition-back{display:none}",
         ):
             self.assertIn(contract, template)
