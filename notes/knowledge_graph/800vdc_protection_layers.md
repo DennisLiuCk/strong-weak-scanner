@@ -1,15 +1,16 @@
 # 800VDC 保護責任層知識圖譜
 
 本圖從故障與安全責任出發，分開 interlock、接地／絕緣、overcurrent／ground fault、hot-swap／
-inrush 與 ride-through；hot-swap 再把預充與故障清除的時間欄位分開。公司線只到公開 requirement、
-reference-design 或 experimental stage，不表示量產訂單。
+inrush 與 ride-through；hot-swap 再把預充與故障清除的時間欄位分開，維修安全則把機械隔離、
+殘餘電壓與可安全接近狀態接回同一條證據鏈。公司線只到公開 requirement、reference-design 或
+experimental stage，不表示量產訂單。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: 800vdc-protection-layers
 root_node_id: concept:800v-protection-layers
 label: 800VDC 保護責任層
-summary: 以 fault model 拆分人身維修、絕緣接地、故障電流、帶電連接與備援能量，再分開預充與故障清除兩支時鐘，避免把所有保護需求合成一顆元件或台廠受惠結論。
+summary: 以 fault model 拆分人身維修、絕緣接地、故障電流、帶電連接與備援能量，再分開預充 故障清除 機械隔離 殘餘電壓與安全接近狀態，避免把所有保護需求合成一顆元件或台廠受惠結論。
 article_ids: MI-2026-08-03-800VDC-PROTECTION-LAYERS
 status: active
 -->
@@ -292,4 +293,64 @@ review_due: 2026-09-01
 status: active
 boundary: TI 的 10µs 與數微秒結果只屬指定 gradual-overcurrent／output-short 實驗，不是所有 fault type、配線、元件、隔離層或量產平台的共同清除時間。
 next_trigger: 具名 production platform 公布各 fault type 的 threshold、clearing time、selectivity、fail-safe state、qualification 與 field result。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8PL-I13
+view: industry
+from_id: concept:800v-protection-layers
+to_id: concept:service-safe-state
+relation: contains
+claim_refs: MI-2026-08-03-800VDC-PROTECTION-LAYERS#C10
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-13
+review_due: 2026-09-01
+status: active
+boundary: 可安全維修狀態是研究中心整合 IEC OCP 與 TI 文件的四道狀態與六欄護照，不是共同標準、完整 LOTO 程序、通用殘壓門檻或 production qualification。
+next_trigger: 具名 production rack 公布切斷 隔離 放電 安全確認 維修放行與復歸的固定版本 state machine 及 field results。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8PL-I14
+view: industry
+from_id: concept:800v-protection-layers
+to_id: capability:mechanical-isolation-contact
+relation: requires
+claim_refs: MI-2026-08-03-800VDC-PROTECTION-LAYERS#C8
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: IEC 60947-10 公開摘要只固定 SCCB 與 hybrid breaker 的 series mechanical isolation contact；其他 service-isolation topology 仍須按平台文件驗證。
+as_of: 2026-05-12
+review_due: 2026-09-01
+status: active
+boundary: 公開摘要支持 interruption 與 mechanical isolation 分工，不提供付費完整條文、特定 rack 接點架構、位置回饋、測試結果、量產採用或供應商財務。
+next_trigger: Production platform 公布隔離接點位置 回饋 fail-safe 測試 service sequence 與 qualification。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8PL-I15
+view: industry
+from_id: concept:800v-protection-layers
+to_id: metric:residual-voltage-after-disconnection
+relation: measured_by
+claim_refs: MI-2026-08-03-800VDC-PROTECTION-LAYERS#C9
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-03-01
+review_due: 2026-09-01
+status: active
+boundary: TI 的 2kΩ 10W 100µF 與 1.5 秒只是一組 output-discharge 設計例，不是 IEC OCP 或所有 800V platform 的共同殘餘電壓與等待時間。
+next_trigger: 具名 production rack 公布各儲能位置 初始條件 放電路徑 殘壓量測位置 時間門檻 pass-fail 與 field record。
 -->

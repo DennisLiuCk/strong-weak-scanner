@@ -1792,7 +1792,7 @@ class ReadabilityGateTest(unittest.TestCase):
             text,
         )
 
-    def test_800v_protection_article_starts_from_people_events_and_actions(self):
+    def test_800v_protection_article_separates_service_safe_state_gates(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-03_800vdc_protection_layers.md"
         text = path.read_text(encoding="utf-8")
         self.assertNotIn("bulk capacitor 的預充軌跡", text)
@@ -1817,7 +1817,22 @@ class ReadabilityGateTest(unittest.TestCase):
             "claim_id: C6",
             "claim_id: C7",
             "reason: added_precharge_and_fault_clearing_time_scale_evidence_without_refreshing_thesis_clock",
-            "last_reviewed_at: 2026-08-03",
+            "## 關掉不等於沒電：四道維修安全閘門",
+            "| 1. 故障電流切斷 |",
+            "| 2. 機械隔離 |",
+            "| 3. 儲能放電 |",
+            "| 4. 安全接近確認 |",
+            "### 六欄維修安全護照",
+            "source_id: S9",
+            "claim_id: C8",
+            "claim_id: C9",
+            "claim_id: C10",
+            "claim_id: C11",
+            "monitor_id: T4",
+            "reason: added_interruption_isolation_discharge_and_safe_access_"
+            "sequence_with_six_field_service_passport",
+            "supporting_source_ids: S1,S2,S3,S9",
+            "last_reviewed_at: 2026-08-13",
             "review_due: 2026-09-01",
         ):
             self.assertIn(token, text)
@@ -1832,8 +1847,23 @@ class ReadabilityGateTest(unittest.TestCase):
             "metric:hot-swap-fault-clearing-time,metric,Hot-swap 故障清除時間",
             concepts,
         )
+        self.assertIn(
+            "capability:mechanical-isolation-contact,capability,機械隔離接點",
+            concepts,
+        )
+        self.assertIn(
+            "metric:residual-voltage-after-disconnection,metric,斷電後殘餘電壓與時間",
+            concepts,
+        )
+        self.assertIn(
+            "concept:service-safe-state,concept,可安全維修狀態",
+            concepts,
+        )
         self.assertIn("edge_id: KG-8PL-I11", graph)
         self.assertIn("edge_id: KG-8PL-I12", graph)
+        self.assertIn("edge_id: KG-8PL-I13", graph)
+        self.assertIn("edge_id: KG-8PL-I14", graph)
+        self.assertIn("edge_id: KG-8PL-I15", graph)
 
     def test_ai_process_control_article_separates_three_missions_and_six_fields(self):
         path = Path(

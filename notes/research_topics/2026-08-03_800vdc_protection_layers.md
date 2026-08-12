@@ -7,7 +7,7 @@ status: triaged
 priority: p1
 captured_at: 2026-08-03
 source_published_at: 2026-03-01
-last_reviewed_at: 2026-08-03
+last_reviewed_at: 2026-08-13
 review_due: 2026-09-01
 source_type: mixed
 publisher: Open Compute Project
@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C4
 base_confidence: medium
-confidence_basis: OCP Diablo 400 明列 accessibility／interlock、creepage／clearance、overcurrent、earthing、leakage 與 ground-fault requirements，TI 與 Infineon 兩條獨立供應商鏈再把 800V hot-swap／inrush 與轉換、儲能分開；足以建立保護責任層，但尚無共同 production topology、完整 fault matrix、台灣供應商 qualification 或財務證據
+confidence_basis: OCP Diablo 400 明列 accessibility／interlock、creepage／clearance、overcurrent、earthing、leakage 與 ground-fault requirements，IEC 60947-10 公開摘要再把半導體斷路器的電流切斷與串聯機械隔離分開，TI 與 Infineon 則補上 800V hot-swap／inrush、故障清除與殘餘電荷放電；足以建立保護及維修安全責任層，但尚無共同 production topology、完整 safe-state fault matrix、台灣供應商 qualification 或財務證據
 cross_company_numbers: false
 -->
 
@@ -72,6 +72,14 @@ reason: added_precharge_and_fault_clearing_time_scale_evidence_without_refreshin
 evidence: sources:S8
 -->
 
+<!-- transition
+date: 2026-08-13
+from: triaged
+to: triaged
+reason: added_interruption_isolation_discharge_and_safe_access_sequence_with_six_field_service_passport
+evidence: sources:S9
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -97,11 +105,17 @@ evidence: sources:S8
 - **監測資料（telemetry）**：設備持續回報的電壓、電流、溫度、故障與狀態資料；只有數值而沒有後續動作，還不能形成完整的保護流程。
 - **故障與處置對照表（fault matrix）**：把每種故障、偵測方式、處置裝置、反應時間與隔離範圍對在一起的表格。
 - **故障清除時間（fault-clearing time）**：從異常被偵測，到電力路徑被限制或切斷所需的時間；必須連同故障型態、電壓、電流、溫度與開關安全工作區判讀。
+- **電流切斷與隔離（interruption／isolation）**：前者停止故障電流，後者建立可確認的機械斷開邊界；電子開關關閉不必然等於已具備維修隔離。
+- **殘餘電荷放電（stored-energy discharge）**：主開關關閉後，電容仍可能保有能量；需有明確放電路徑，並以指定時間後的殘餘電壓確認結果。
+- **可安全維修狀態（service-safe state）**：不是單一訊號，而是切斷、隔離、放電與獨立確認都達到規定條件後，才允許人員接近的狀態。
+- **IEC 60947-10**：2026 年發布、涵蓋最高 1,500VDC 半導體斷路器的國際標準；本文只使用 IEC 公開摘要，不把未取得的完整條文或測試細節自行補齊。
+- **STDA029**：TI 於 2026 年 3 月發布的 800V／±400V floating-ground hot-swap 技術白皮書代號；它是一組指定實驗架構，不是產業共同標準。
+- **OFF（關閉命令）**：控制器要求電子開關停止導通的狀態；它需要用實際電流、隔離接點與殘餘電壓再確認，不能單獨充當安全證明。
 
 ### 三句話抓重點
 
 - OCP Diablo 400 規格把人員接近高壓、絕緣與接地、過大電流及漏電等風險分開規定，表示 800V 機櫃不能只靠一種保護方式。
-- TI 與 Infineon 的公開設計顯示，帶電插入設備時要慢慢限制湧入電流，故障時卻要快速切斷；這兩支時鐘和長時間備援、接地或人員防護又是不同責任。
+- IEC、TI 與 Infineon 的公開資料顯示，帶電插入時要慢慢限制湧入、故障時要快速切斷，但切斷後仍要建立機械隔離並排掉殘餘電荷；這些時鐘和長時間備援、接地或人員防護又是不同責任。
 - 目前證據只足以畫出誰負責什麼，尚不能證明台灣功率元件、電源供應或被動元件公司已進入量產材料清單、取得訂單或形成可辨識獲利。
 
 ### 為什麼重要
@@ -119,6 +133,7 @@ evidence: sources:S8
 ### 接下來怎麼追
 
 - 追 OCP 或平台規格是否把每種故障、偵測時間、斷電範圍、安全連鎖、接地與維修程序對齊。
+- 追具名平台是否把電流切斷、機械隔離、儲能放電、殘餘電壓確認、維修放行與復歸測試串成同一個可稽核狀態機。
 - 追 800V 不停機更換與電子保險絲，是否從參考設計推進到具名平台的預充軌跡、故障清除時間、客戶資格驗證、實際量產、現場故障紀錄與維修閉環。
 - 追台灣相關公司是否由客戶文件與公司申報雙向確認具名保護產品、額定規格、測試、量產、收入及毛利。
 
@@ -127,6 +142,7 @@ evidence: sources:S8
 - 保險絲可以切斷過大的故障電流，但設備帶電插入時，大電容也會瞬間吸收電流；預充要慢、短路清除要快，為什麼同一條電力路徑需要兩支不同速度的時鐘？
 - 不停機更換功能能限制湧入電流，是否就能取代安全連鎖、保護接地或接地故障偵測？
 - 如果監測資料只有數值與故障清單，沒有規定發生事件後要隔離哪裡、怎麼維修，能否成為獨立產品價值？
+- 如果控制器顯示 FET 已關閉，但隔離接點沒有位置回饋、下游電容也沒有殘壓量測，能否允許人員接近？
 
 ## 主張與證據帳本
 
@@ -261,6 +277,22 @@ limitation: 文件只標示 March 2026，published_at 以月份首日作公開�
 independence_group: texas-instruments
 -->
 
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: document
+publisher: International Electrotechnical Commission
+title: IEC 60947-10:2026 Low-voltage switchgear and controlgear — Part 10: Semiconductor circuit-breakers
+published_at: 2026-05-12
+captured_at: 2026-08-13
+accepted_at: 2026-08-13
+status: active
+url: https://webstore.iec.ch/en/publication/67514
+locator: IEC 公開摘要的適用範圍與 covered types；最高 1,000VAC／1,500VDC，SCCB 與 semiconductor hybrid circuit-breaker 都另列為 isolation function 串聯的 mechanical isolation contacts
+limitation: 公開頁只提供標準範圍、斷路器類型與目標摘要，未提供付費標準 121 頁的完整定義、性能門檻、測試方法或 conformity 結果；不能由摘要外推特定 rack 拓撲、殘餘電壓門檻、量產採用或供應商財務
+independence_group: iec-60947-10
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -317,7 +349,7 @@ claim_id: C4
 label: inference
 status: active
 claim: 800VDC protection 應按人身／維修安全、絕緣與接地、故障電流、帶電連接／inrush 及 energy ride-through 分成不同責任層；interlock、earthing、overcurrent／ground-fault、hot-swap／eFuse 與 CBU／BBU 可以協同，但不能視為同一功能或互相替代
-supporting_source_ids: S1,S2,S3
+supporting_source_ids: S1,S2,S3,S9
 contrary_source_ids:
 as_of: 2026-08-03
 basis: S1 把 safety responsibilities 分列，S2 把 hot-swap 與 conversion／CBU 分開，S3 具體化 inrush／SOA 與 reference-design stage；三條獨立來源鏈共同支持責任分層
@@ -380,6 +412,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: IEC 60947-10:2026 的公開摘要適用最高 1,500VDC 半導體斷路器，並分別描述 semiconductor circuit-breaker 與 hybrid circuit-breaker；兩類都另以串聯 mechanical isolation contacts 執行 isolation function
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-05-12
+basis: S9 公開摘要逐項列出額定範圍與兩類 breaker 架構，且兩類的 isolation function 都明列 series mechanical isolation contacts
+boundary: 只證實 IEC 公開摘要中的適用範圍與類型分工；未取得的完整條文、性能門檻、測試方法、特定 800V rack 實作與 conformity 結果都不自行推論
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: TI STDA029 的指定 hot-swap 實驗架構在 FET 關閉或輸入斷開時啟用 output discharge circuit，並以 2kΩ、10W 電阻把 100µF 輸出電容設計為 1.5 秒內放電；文件的整體解法摘要只承諾小於 2 秒
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-03-01
+basis: S8 第 5 頁 Output Discharge Circuit 直接列出啟動條件、2kΩ／10W、100µF 與 1.5 秒設計值，摘要則列 output discharge time <2 seconds
+boundary: 這是 TI 指定電容量、電阻、功率與實驗架構的設計例，不是 IEC 或 OCP 的通用殘餘電壓門檻，也不能外推所有 800V 平台的放電時間、觸電風險或維修程序
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: inference
+status: active
+claim: 800V 維修安全至少要把故障電流切斷、機械隔離、儲能放電與可安全接近確認分成四道狀態；研究文件還應固定事件與工況、偵測門檻與計時、切斷裝置與清除時間、隔離邊界與接點狀態、儲能／放電路徑與殘餘電壓時間，以及安全接近與復歸責任六個欄位
+supporting_source_ids: S1,S8,S9
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S9 把 semiconductor interruption 與 series mechanical isolation 分開，S8 顯示主 FET 關閉後仍另需 output discharge，S1 又要求高壓部位帶電時不可接近並以 interlock／power-off 先去能；三條獨立來源共同支持四道狀態，六欄則是研究中心把可追溯條件整合成的查核護照
+boundary: 四道狀態與六欄護照是研究端綜合方法，不是 IEC、OCP 與 TI 共同發布的標準、完整 LOTO 程序或通用 pass-fail 門檻；不指定唯一拓撲、殘餘電壓、時間、元件、供應商或財務受惠
+verification_needed: 需具名 production platform 的 one-line diagram、fault／service state machine、隔離接點回饋、放電軌跡、殘餘電壓門檻、獨立驗證、維修許可、復歸測試與 field record
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: unverified
+status: active
+claim: 具名 800V production rack 已以同一固定版本公開完整六欄維修安全護照、逐項 pass-fail、故障注入、隔離回饋、放電曲線、殘餘電壓、現場維修紀錄與復歸結果
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-13
+basis: 現有來源分別只到 OCP 系統 requirement、IEC 公開標準摘要、TI 實驗架構與 Infineon sampling reference design，尚未找到同一具名量產平台把六欄及現場結果完整公開
+boundary: 不把規格存在、breaker 類型、FET OFF、單一放電設計例、interlock 訊號或 reference board 改寫成整機已完成 service-safe qualification
+verification_needed: 平台商或買方以固定版本公開完整六欄、測試條件、pass-fail、原始軌跡、維修與復歸紀錄，並能由第二條獨立來源鏈核對
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分清楚：保護誰、發生什麼事、誰來處理
 
 | 保護責任 | 主要事件 | 目前證據說了什麼 | 仍需要其他保護處理 |
@@ -410,6 +510,43 @@ resolution:
 電壓、電流、電容量、溫度、功率開關安全工作區、故障路徑與隔離範圍放在同一張故障與處置對照表；
 若只看到一個漂亮的反應時間，卻不知道測的是接通還是故障，就無法判斷保護是否完整。
 
+## 關掉不等於沒電：四道維修安全閘門
+
+**先停止電流，還不代表人可以伸手進去。** 電子開關可能已把故障電流切斷，但上游、下游或電容
+仍可能帶電；控制器顯示 `OFF` 也不等於已經形成可目視或可回饋確認的機械隔離。IEC 60947-10
+的公開摘要正好把這兩件事拆開：半導體元件負責 breaker 的切換，隔離功能另有串聯機械隔離接點。
+
+**隔離完成，還要處理儲存的能量。** TI 的 STDA029 在主 FET 關閉或輸入斷開後，仍另外啟動
+output discharge circuit；指定設計用 2kΩ、10W 電阻替 100µF 輸出電容放電，目標 1.5 秒內完成，
+而解法摘要只寫小於 2 秒。這是一個參考設計例，不是所有 800V 系統共同的安全秒數；真正的
+pass-fail 必須同時寫出初始電壓、電容量、放電路徑、時間點與可接受殘餘電壓。
+
+| 四道閘門 | 這一步回答什麼 | 只看到什麼還不夠 |
+|---|---|---|
+| 1. 故障電流切斷 | 異常電流是否已停止，清除時間與隔離範圍是什麼？ | 只看到 controller 報警、FET command OFF 或單一反應時間 |
+| 2. 機械隔離 | 哪一對接點建立維修斷開邊界，實際位置是否有回饋？ | 只由軟體狀態推定接點真的斷開 |
+| 3. 儲能放電 | 哪些電容或其他儲能仍帶電，由哪條路徑在多久內降到什麼電壓？ | 只寫「有 bleeder」或移植別份設計的秒數 |
+| 4. 安全接近確認 | 誰、用哪個獨立量測與程序放行維修，失敗時如何保持禁止接近？ | 只把 interlock 訊號、門鎖或斷路器標示當成量測結果 |
+
+OCP Diablo 400 要求高壓帶電部位不可讓人員接近，並以 interlock／power-off 在接近前去能；但本文
+引用的條文沒有替所有實作指定同一個殘餘電壓或等待時間。因此，研究時不能把「已切斷」「已隔離」
+「已放電」與「已確認可接近」合成一個綠燈，也不能把 TI 的 1.5 秒設計例升格為 OCP 或 IEC 門檻。
+
+### 六欄維修安全護照
+
+| 欄位 | 最少要記什麼 | 為什麼不能省略 |
+|---|---|---|
+| 1. 事件與工況 | 正常停機、過流、短路、接地故障或輸入拔除；電壓、負載、溫度與版本 | 不同事件的能量路徑與安全狀態不同 |
+| 2. 偵測與計時 | 感測器、門檻、去彈跳／延遲、計時起點與失效處理 | 不知道計時從哪裡開始，就不能比較反應時間 |
+| 3. 切斷結果 | 執行元件、峰值電流、清除時間、選擇性與受影響範圍 | command OFF 不等於電流已停止 |
+| 4. 隔離邊界 | 機械接點位置、回饋狀態、可見斷開或等效確認與失效安全狀態 | 電子開關不自動提供維修隔離證據 |
+| 5. 儲能與殘壓 | 電容／其他儲能、初始條件、放電路徑、殘餘電壓、量測位置與時間 | 關掉來源後，下游仍可能保留危險能量 |
+| 6. 放行與復歸 | 獨立驗證工具、放行者、維修許可、重新上電前檢查與變更紀錄 | 安全狀態必須能被證明，也要能安全退出 |
+
+這六欄是研究中心把 IEC、OCP 與 TI 文件拼成的查核方法，不是三方共同發布的表單，也不是完整的
+lockout／tagout 作業程序。它的用途是攔下最常見的跨級推論：breaker 有動作，不等於隔離接點已
+確認；接點已斷開，不等於電容已放完；電壓下降，也不等於現場已依程序允許接近。
+
 ## 為什麼監測資料暫時仍屬於保護功能
 
 Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率、故障與異常等即時監測值，
@@ -426,7 +563,7 @@ Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率
 
 ## 研究判定
 
-- **目前可保留的結論**：800V 保護至少包含人身與維修、絕緣與接地、故障電流，以及帶電插拔與湧入電流等不同責任；hot-swap 還要把受控預充與故障清除兩支時鐘分開判讀。
+- **目前可保留的結論**：800V 保護至少包含人身與維修、絕緣與接地、故障電流，以及帶電插拔與湧入電流等不同責任；hot-swap 還要把受控預充與故障清除兩支時鐘分開，維修安全則要再確認電流切斷、機械隔離、儲能放電與安全接近四道狀態。
 - **可信度為中而不是高**：OCP 提供系統規格，TI 與 Infineon 提供供應商架構、樣品與參考設計；TI 實驗架構補上了指定條件的時間尺度，但目前仍缺共用的量產故障處置表與現場資料。
 - **目前不能發布的結論**：保護元件顆數倍增、指定 SiC／Si／被動元件或台灣公司勝出、監測資料已形成獨立商業價值，以及已取得訂單、收入或毛利。
 - **需要看到什麼才能前進**：具名量產平台公布完整保護電路架構、客戶資格驗證、故障紀錄、維修動作與材料清單，再由台灣公司申報交叉確認財務分母。
@@ -437,6 +574,7 @@ Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率
 - [Texas Instruments：800V hot-swap input protection reference architecture](https://www.ti.com/about-ti/newsroom/news-releases/2026/2026-03-16-ti-unveils-complete-800-vdc-power-architecture-for-future-generation-ai-data-centers-with-nvidia.html)
 - [Texas Instruments：800V／±400V floating-ground hot-swap technical white paper](https://www.ti.com/lit/wp/stda029/stda029.pdf)
 - [Infineon：400／800V power-path protection 與 REF_XDP701_4800](https://www.infineon.com/technology-news/2025/INFPSS202510-002)
+- [IEC：IEC 60947-10:2026 半導體斷路器公開摘要](https://webstore.iec.ch/en/publication/67514)
 - [OCP Open Rack 規格索引](https://www.opencompute.org/wiki/Open_Rack/SpecsAndDesigns)
 - [TI Data Center Design Resources](https://www.ti.com/applications/data-center/overview.html)
 - [Infineon Protection and Monitoring ICs](https://www.infineon.com/products/power/protection-and-monitoring-ics)
@@ -516,6 +654,19 @@ frequency: monthly
 next_check: 2026-09-01
 trigger: 平台、規格或客戶文件以固定電壓、電流、電容量、溫度及 fault type 公布 pre-charge trajectory、clearing time、隔離範圍與 qualification 結果
 invalidation: Production data 顯示預充與故障清除不需分開建模，或本文雙時間尺度無法預測安全接通與限制故障能量
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C8,C9,C10,C11
+metric: 具名 800V production platform 是否公開從電流切斷、機械隔離、儲能放電到安全接近與復歸的完整六欄維修安全護照
+source_ids: S1,S8,S9
+watch_source_ids: S4,S5,S6
+frequency: monthly
+next_check: 2026-09-01
+trigger: 平台或買方文件以固定版本公布事件／工況、偵測與計時、切斷結果、隔離接點回饋、放電與殘壓軌跡、獨立安全確認、維修放行及復歸測試
+invalidation: Production architecture 或 field evidence 顯示切斷、隔離、放電與安全確認不需分開，或六欄護照無法辨識實際 service-safe failure
 -->
 
 ## 什麼會推翻這篇
