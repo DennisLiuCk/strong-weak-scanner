@@ -1,14 +1,15 @@
 # 800VDC 保護責任層知識圖譜
 
 本圖從故障與安全責任出發，分開 interlock、接地／絕緣、overcurrent／ground fault、hot-swap／
-inrush 與 ride-through。公司線只到公開 requirement 或 reference-design stage，不表示量產訂單。
+inrush 與 ride-through；hot-swap 再把預充與故障清除的時間欄位分開。公司線只到公開 requirement、
+reference-design 或 experimental stage，不表示量產訂單。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: 800vdc-protection-layers
 root_node_id: concept:800v-protection-layers
 label: 800VDC 保護責任層
-summary: 以 fault model 拆分人身維修、絕緣接地、故障電流、帶電連接與備援能量，避免把所有保護需求合成一顆元件或台廠受惠結論。
+summary: 以 fault model 拆分人身維修、絕緣接地、故障電流、帶電連接與備援能量，再分開預充與故障清除兩支時鐘，避免把所有保護需求合成一顆元件或台廠受惠結論。
 article_ids: MI-2026-08-03-800VDC-PROTECTION-LAYERS
 status: active
 -->
@@ -251,4 +252,44 @@ review_due: 2026-09-30
 status: active
 boundary: Bulk capacitance、temperature／overcurrent protection 與 filtering 只形成相鄰查核，不支持元件顆數、台灣供應商、ASP、份額或收入。
 next_trigger: Production BOM 與公司申報雙向確認具名 passive part、fault role、qualification、出貨及財務貢獻。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8PL-I11
+view: industry
+from_id: concept:800v-protection-layers
+to_id: metric:hot-swap-startup-time
+relation: measured_by
+claim_refs: MI-2026-08-03-800VDC-PROTECTION-LAYERS#C6
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-03-01
+review_due: 2026-09-01
+status: active
+boundary: TI 的 440ms 只屬 800V、100µF、200mA startup target 等指定實驗設計條件，不是所有平台、電容量、溫度或元件的共同預充時間。
+next_trigger: 具名 production tray 公布 pre-charge trajectory、bus sag、bulk capacitance、SOA margin、qualification 與 field log。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8PL-I12
+view: industry
+from_id: concept:800v-protection-layers
+to_id: metric:hot-swap-fault-clearing-time
+relation: measured_by
+claim_refs: MI-2026-08-03-800VDC-PROTECTION-LAYERS#C6
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-03-01
+review_due: 2026-09-01
+status: active
+boundary: TI 的 10µs 與數微秒結果只屬指定 gradual-overcurrent／output-short 實驗，不是所有 fault type、配線、元件、隔離層或量產平台的共同清除時間。
+next_trigger: 具名 production platform 公布各 fault type 的 threshold、clearing time、selectivity、fail-safe state、qualification 與 field result。
 -->

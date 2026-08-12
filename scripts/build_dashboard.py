@@ -291,11 +291,13 @@ RESEARCH_LEARNING_ROUTES = [
         "id": "power-cooling", "label": "供電與散熱",
         "question": "電力如何送進 AI 機櫃，產生的熱又如何被帶走？",
         "description": (
-            "建議分三階段：先分清供電、保護與元件角色，再看機櫃緩衝、控制、"
+            "建議分三階段：先看從路線圖到量產的七關，再分清供電、保護與元件角色；接著看機櫃緩衝、控制、"
             "電磁干擾驗證與信任查證，最後追液冷產品資格與迴路責任。"
         ),
         "graphIds": [
-            "800v-power-tree", "800vdc-protection-layers", "ai-capacitor-role-map",
+            "800vdc-execution-readiness", "800v-power-tree",
+            "800vdc-protection-layers", "ai-capacitor-role-map",
+            "sic-ai-power-qualification",
             "ai-power-buffering", "ai-rack-action-contract", "ai-rack-emc-certification",
             "ai-rack-trust-root", "liquid-cooling", "liquid-cooling-loop-boundaries",
         ],
@@ -303,10 +305,11 @@ RESEARCH_LEARNING_ROUTES = [
             {
                 "id": "power-components",
                 "label": "供電、保護與元件",
-                "purpose": "先分清電力在哪裡轉換、怎麼保護，以及不同元件各自負責什麼。",
+                "purpose": "先用七關分清架構、場站與財務時鐘，再看電力在哪裡轉換、怎麼保護，以及不同元件各自負責什麼。",
                 "graphIds": [
-                    "800v-power-tree", "800vdc-protection-layers",
-                    "ai-capacitor-role-map",
+                    "800vdc-execution-readiness", "800v-power-tree",
+                    "800vdc-protection-layers",
+                    "ai-capacitor-role-map", "sic-ai-power-qualification",
                 ],
             },
             {
@@ -333,12 +336,12 @@ RESEARCH_LEARNING_ROUTES = [
         "question": "資料放在哪裡，記憶體與封裝又如何一起影響運算？",
         "description": (
             "建議分三階段：先建立記憶體層級與客製範圍，再看材料、基板與"
-            "記憶體商業化，最後追鍵結與封裝路徑。"
+            "記憶體商業化，最後把扇出架構、面板載體與量產經濟性接起來。"
         ),
         "graphIds": [
             "ai-memory-hierarchy", "custom-hbm-scope-ladder",
             "glass-substrate-commercialization", "hbf-commercialization", "hbm",
-            "hybrid-bonding", "panel-level-packaging",
+            "panel-level-packaging",
         ],
         "phases": [
             {
@@ -359,9 +362,9 @@ RESEARCH_LEARNING_ROUTES = [
             },
             {
                 "id": "bonding-packaging",
-                "label": "鍵結與封裝路徑",
-                "purpose": "最後檢查鍵結與封裝路徑如何影響整合、良率與量產。",
-                "graphIds": ["hybrid-bonding", "panel-level-packaging"],
+                "label": "封裝路徑",
+                "purpose": "最後分清扇出架構、晶片先放／線路先做與面板載體，再檢查 planned line 是否走到良率、產出與量產成本。",
+                "graphIds": ["panel-level-packaging"],
             },
         ],
     },
@@ -369,53 +372,147 @@ RESEARCH_LEARNING_ROUTES = [
         "id": "compute-connect", "label": "運算與互連",
         "question": "算力與資料如何在晶片、儲存與網路之間移動？",
         "description": (
-            "建議分三階段：先看資料平面與平台部署，再補晶片供電、光網路與"
-            "製程條件，最後用開放互連、PCIe 6 與 UCIe 檢查標準成熟度。"
+            "建議分三階段：先看資料平面與 AMD、NVIDIA 平台部署，再補晶片供電與光網路，最後從"
+            "開放互連、224G 板級資格、PCIe 6 追到 UCIe 小晶片互通。"
         ),
         "graphIds": [
-            "ai-storage-data-plane", "amd-helios", "backside-power", "cpo-networking",
-            "high-na-euv-readiness", "open-ai-fabrics", "pcie6-compliance-ladder",
+            "ai-storage-data-plane", "amd-helios", "vera-rubin-delivery-contract",
+            "backside-power", "cpo-networking",
+            "open-ai-fabrics", "224g-pcb-qualification-chain",
+            "pcie6-compliance-ladder",
             "ucie-interoperability",
         ],
         "phases": [
             {
                 "id": "data-platform",
                 "label": "資料平面與平台部署",
-                "purpose": "先看資料怎麼被讀取與保存，再確認平台是否真正部署。",
-                "graphIds": ["ai-storage-data-plane", "amd-helios"],
+                "purpose": "先看資料怎麼被讀取與保存，再用 AMD 與 NVIDIA 的公開證據分辨平台生產、整櫃驗證、站點交付與財務歸因。",
+                "graphIds": [
+                    "ai-storage-data-plane", "amd-helios", "vera-rubin-delivery-contract",
+                ],
             },
             {
                 "id": "chip-process",
-                "label": "晶片供電、光網路與製程",
-                "purpose": "再補上晶片供電、光網路與先進製程這三個底層條件。",
+                "label": "晶片供電與光網路",
+                "purpose": "再補上晶片供電與光網路這些底層工程條件。",
                 "graphIds": [
-                    "backside-power", "cpo-networking", "high-na-euv-readiness",
+                    "backside-power", "cpo-networking",
                 ],
             },
             {
                 "id": "interconnect-standards",
                 "label": "互連與標準驗證",
-                "purpose": "最後用互連規格、測試與跨廠互通，判斷標準是否成熟。",
+                "purpose": "最後先驗證能否連線與通過板級通道，再追開放介面能否跨廠互通。",
                 "graphIds": [
-                    "open-ai-fabrics", "pcie6-compliance-ladder",
+                    "open-ai-fabrics", "224g-pcb-qualification-chain",
+                    "pcie6-compliance-ladder",
                     "ucie-interoperability",
                 ],
             },
         ],
     },
     {
-        "id": "company-finance", "label": "公司財務案例",
-        "question": "市場題材何時能落到可辨識的收入、毛利或現金流？",
+        "id": "design-test-quality", "label": "設計、製程控制、測試與良率",
+        "question": "晶片如何從可製造的設計交接，走到可信量測、封裝、量產測試與運行錯誤回饋？",
         "description": (
-            "建議讀法：用國巨 Q2 案例，練習把公司總額與題材可歸因貢獻分開。"
+            "建議分四階段：先把小晶片設計資料與製程條件交清楚，再確認量測系統與"
+            "control plan 能否支撐製程決策，接著看鍵結封裝如何進入量產測試的八個"
+            "需求分母，最後追運行中的無聲錯誤如何隔離並回饋製造端。"
         ),
-        "graphIds": ["yageo-q2-financial-materiality"],
-        "phases": [{
-            "id": "financial-attribution",
-            "label": "公司分母與題材歸因",
-            "purpose": "把公司整體財務分母與題材可歸因貢獻分開。",
-            "graphIds": ["yageo-q2-financial-materiality"],
-        }],
+        "graphIds": [
+            "chiplet-design-handoff-contracts", "high-na-euv-readiness",
+            "process-control-measurement-contract",
+            "hybrid-bonding", "inference-compute-test-demand",
+            "ai-hardware-sdc-lifecycle",
+        ],
+        "phases": [
+            {
+                "id": "design-manufacturing-contracts",
+                "label": "設計與製程交接",
+                "purpose": "先確認系統角色、設計資料與製程能力如何被固定、驗證並交給下一站。",
+                "graphIds": [
+                    "chiplet-design-handoff-contracts", "high-na-euv-readiness",
+                ],
+            },
+            {
+                "id": "measurement-process-control",
+                "label": "量測可信度與製程控制",
+                "purpose": "先證明量測對象、方法、校正、偏差、變異與不確定度可信，再看抽樣、逃逸、偽警報、結果時間與圍堵。",
+                "graphIds": ["process-control-measurement-contract"],
+            },
+            {
+                "id": "packaging-production-test",
+                "label": "封裝與量產測試",
+                "purpose": "再把鍵結與封裝放進實際測試插入點、內容時間、並行效率、良率重測與設備餘裕。",
+                "graphIds": [
+                    "hybrid-bonding", "inference-compute-test-demand",
+                ],
+            },
+            {
+                "id": "field-feedback",
+                "label": "運行錯誤與回饋",
+                "purpose": "最後追蹤量產測試未攔下的錯誤如何在機群中被偵測、隔離、重測並回饋供應商。",
+                "graphIds": ["ai-hardware-sdc-lifecycle"],
+            },
+        ],
+    },
+    {
+        "id": "policy-compliance", "label": "政策與合規",
+        "question": "政策與法規如何穿過商品分類、法域與資格驗證，最後才可能影響公司財務？",
+        "description": (
+            "建議讀法：先看跨境關稅如何按商品、原產地與交易責任分流，再看化學物質"
+            "法規如何按用途、法域與變更資格逐關落地。"
+        ),
+        "graphIds": [
+            "section301-taiwan-exposure", "semiconductor-pfas-exposure",
+        ],
+        "phases": [
+            {
+                "id": "trade-border-policy",
+                "label": "跨境關稅與交易責任",
+                "purpose": "先把國家稅率拆成 HTS、豁免、原產、進口責任、成本轉嫁與公司財務七關。",
+                "graphIds": ["section301-taiwan-exposure"],
+            },
+            {
+                "id": "substance-regulation",
+                "label": "物質法規與變更資格",
+                "purpose": "再把物質身分、製程用途、法域義務、豁免過渡與替代再驗證分開。",
+                "graphIds": ["semiconductor-pfas-exposure"],
+            },
+        ],
+    },
+    {
+        "id": "company-finance", "label": "資本投入與公司財務",
+        "question": "買方支出如何穿過資產上線與使用，最後落到供應商收入、毛利與現金流？",
+        "description": (
+            "建議讀法：先拆開買方 CapEx、上線、利用與現金回收，再把同一方法套到"
+            "美國先進封裝的補助、預付款、建設、資格與量產，最後用國巨 Q2 案例練習"
+            "把公司總額與題材可歸因貢獻分開。"
+        ),
+        "graphIds": [
+            "ai-capex-cash-conversion", "us-advanced-packaging-regionalization",
+            "yageo-q2-financial-materiality",
+        ],
+        "phases": [
+            {
+                "id": "buyer-capex-conversion",
+                "label": "買方投入與現金回收",
+                "purpose": "把資本承諾、付款、資產上線、容量使用、收入與買方現金回收分開。",
+                "graphIds": ["ai-capex-cash-conversion"],
+            },
+            {
+                "id": "regional-capacity-conversion",
+                "label": "區域產能與資格轉換",
+                "purpose": "把政策補助、客戶預付款、公司資本、建築、工具、資格、量產利用與區域替代逐關對齊。",
+                "graphIds": ["us-advanced-packaging-regionalization"],
+            },
+            {
+                "id": "supplier-financial-attribution",
+                "label": "供應商分母與題材歸因",
+                "purpose": "再把供應商公司總額與可由同一產品、期間和分母重算的題材貢獻分開。",
+                "graphIds": ["yageo-q2-financial-materiality"],
+            },
+        ],
     },
 ]
 
@@ -3569,7 +3666,7 @@ def attach_research_learning_paths(research_library, knowledge_graph):
             "cards": cards[:3],
         }
 
-    research_library["learningPathVersion"] = 108
+    research_library["learningPathVersion"] = 109
     return research_library
 
 
@@ -4050,7 +4147,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     }
     bridge_candidate_ids = {
         "power": "RC-SIC-AI-POWER-QUALIFICATION",
-        "material": "RC-224G-PCB-MATERIAL-QUALIFICATION",
+        "material": "RC-SEMICONDUCTOR-PFAS-EXPOSURE",
     }
 
     def topic_title(topic):

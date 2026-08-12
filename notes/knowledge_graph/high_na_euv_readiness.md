@@ -1,15 +1,16 @@
 # 晶圓圖形曝光與 High-NA 導入階梯知識圖譜
 
 本圖先把圖形如何印上晶圓放回光罩、光阻、曝光、圖形轉移與量測接力，再將設備商、客戶與
-研發機構分開，並把出貨、運轉、製程資格、產品晶圓與高量產導入投影成不同節點。它不以
-機器數量推估客戶良率、每顆合格晶片成本或台灣公司財務曝險。
+研發機構分開，並把非等向光學、半視場拼接、劑量—缺陷—產出視窗，以及從光阻圖形到電性
+載具、功能元件、客戶產品高量產的證據階梯投影成不同節點。它不以機器數量、單一解析度、
+單次良率或研究元件推估客戶量產、每顆合格晶片成本或台灣公司財務曝險。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: high-na-euv-readiness
 root_node_id: concept:high-na-euv-readiness
 label: 晶圓圖形曝光與 High-NA 導入階梯
-summary: 追蹤圖形曝光接力，以及 High-NA 從機器送達、客戶端運轉、製程資格、實際產品晶圓到高量產導入的證據階梯與生態系依賴。
+summary: 追蹤圖形曝光接力、非等向半視場與拼接、劑量缺陷產出視窗，以及 High-NA 從光阻圖形、電性載具、功能元件、機器送達、客戶端運轉、製程資格、實際產品晶圓到高量產導入的證據階梯與生態系依賴。
 article_ids: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER
 status: active
 -->
@@ -272,4 +273,84 @@ review_due: 2026-10-01
 status: active
 boundary: 光阻 化學品 晶圓與耗材形成搜尋路由，沒有具名材料規格、客戶資格、出貨或財務貢獻。
 next_trigger: 客戶與材料商雙向揭露具名產品、qualification、量產用量與收入。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HNA-I12
+view: industry
+from_id: concept:high-na-euv-readiness
+to_id: concept:high-na-anamorphic-half-field
+relation: includes
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C9
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2024-02-26
+review_due: 2026-10-01
+status: active
+boundary: ASML 與 imec 支持非等向四倍／八倍縮放、半視場及研究拼接；不證明所有客戶產品版圖、跨場漂移、良率或 HVM。
+next_trigger: 客戶公布同一產品版圖的半視場配置、接縫位置、跨晶圓重現、缺陷與電性結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HNA-I13
+view: industry
+from_id: concept:high-na-euv-readiness
+to_id: process:high-na-field-stitching
+relation: requires
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C9,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C13
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-02-20
+review_due: 2026-10-01
+status: active
+boundary: imec 展示解析度下拼接，Intel 把接縫列為客戶端挑戰；兩者沒有完整產品層跨場統計、qualification 或 HVM 分母。
+next_trigger: 客戶發布版本化的接縫對準、圖形與電性樣本分布，以及變更後回歸重驗。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HNA-I14
+view: industry
+from_id: concept:high-na-euv-readiness
+to_id: metric:high-na-dose-yield-throughput-window
+relation: measured_by
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C10,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C11,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C14
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-10-01
+status: active
+boundary: 特定電性結構與烘烤條件證明受測結果，不能把不同圖形、材料、分母或工具的最佳點拼成客戶量產視窗。
+next_trigger: 同一產品層公開劑量／焦距矩陣、材料版本、隨機缺陷、轉移後電性、合格產出與成本。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HNA-I15
+view: industry
+from_id: concept:high-na-euv-readiness
+to_id: process:high-na-electrical-evidence-ladder
+relation: passes_through
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C10,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C12,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C14
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-10-01
+status: active
+boundary: 公開證據已到金屬化電性測試結構與功能性研究元件；仍沒有邏輯／記憶體客戶產品層、HVM 良率、成本或供應商財務足跡。
+next_trigger: 客戶把同一產品層的圖形、轉移、電性、功能、可靠度、合格產出與 HVM 版本接成可重算證據鏈。
 -->

@@ -1,4 +1,4 @@
-# 資料先是電、再變成光：轉換器放哪裡，決定可插拔與共同封裝的取捨
+# 資料先是電、再變成光：別只問 CPO 或可插拔，要拆光引擎、訊號處理與雷射位置
 
 <!-- research_topic
 topic_id: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-01
 source_published_at: 2026-05-31
-last_reviewed_at: 2026-08-01
-review_due: 2026-08-15
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-26
 source_type: mixed
 publisher_domain: nvidia.com
 canonical_url: https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory
@@ -18,9 +18,9 @@ group_ids: packtest
 trigger_type: product_ramp
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C2
+thesis_claim_id: C9
 base_confidence: medium
-confidence_basis: 多家一手來源證實兩種架構同時商品化，但尚無可比出貨占比
+confidence_basis: OIF 正式文件把光引擎位置、訊號處理方式與雷射位置拆成可組合的設計選擇，NVIDIA 與 Marvell 又證實 CPO 與可插拔產品路徑同時存在；但 NPO／外部雷射的具名部署、多供應商互通、現場可靠度、產品配比與財務分母仍未公開
 cross_company_numbers: false
 schema_migrated_at: 2026-08-02
 -->
@@ -134,6 +134,70 @@ limitation: 具名技術角色不等於 Spectrum-X 量產出貨量、供應份�
 independence_group: lumentum
 -->
 
+<!-- research_source
+source_id: S8
+role: standard
+source_kind: document
+publisher: OIF
+title: Co-Packaging Framework Document
+published_at: 2022-02-03
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.oiforum.com/wp-content/uploads/OIF-Co-Packaging-FD-01.0.pdf
+locator: PDF pp. 9–10 的 co-packaging／socketed NPO 位置圖，以及 pp. 18–21 的 integrated／external laser、connector、loss 與 safety 討論
+limitation: 這是資訊性框架文件，用來定義安排與工程取捨；不是 Implementation Agreement、產品合格報告、多供應商互通結果或客戶部署證據
+independence_group: oif
+-->
+
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: document
+publisher: OIF
+title: 3.2T Co-Packaged Module Implementation Agreement 01.0
+published_at: 2023-03-29
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.oiforum.com/wp-content/uploads/OIF-Co-Packaging-3.2T-Module-01.0.pdf
+locator: 封面與 PDF p. 16；3.2T CPO module scope、外部光源耦合及 optical power／loss tolerance
+limitation: IA 定義互通所需的介面與最低契約，不證明任何具名模組已通過完整 qualification、量產、客戶驗收或長期可靠度
+independence_group: oif
+-->
+
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: document
+publisher: OIF
+title: External Laser Small Form Factor Pluggable Implementation Agreement 02.0
+published_at: 2025-01-08
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.oiforum.com/wp-content/uploads/OIF-ELSFP-02.0.pdf
+locator: PDF pp. 1、3、9、52；field-replaceable blindmate ELSFP、CPO optical-engine 使用情境與 IA 未涵蓋的 application-specific optical power／noise／wavelength
+limitation: 規格只建立 ELSFP 外形、管理與最低互通要求；不證明特定雷射、光引擎或交換器彼此合格，也未給現場故障率、維修時間、部署量或財務資料
+independence_group: oif
+-->
+
+<!-- research_source
+source_id: S11
+role: standard
+source_kind: living_index
+publisher: OIF
+title: Current OIF Work
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.oiforum.com/technical-work/current-work/
+locator: 2026-08-12 capture 的 CEI-224G-Linear、Energy Efficient Interfaces 與 Co-Packaged Optics for AI Scale-Up Networks 段落
+limitation: 活頁列的是 current project scope；linear、retimed、transmit-retimed、pluggable、NPO、CPO 或 COI 被納入工作範圍，不等於正式 IA 已發布、實作已互通或產品已部署
+independence_group: oif
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -151,7 +215,7 @@ resolution:
 <!-- research_claim
 claim_id: C2
 label: inference
-status: active
+status: superseded
 claim: 現有證據較支持 CPO 與 1.6T 可插拔在本階段共存，而非可插拔立即被全面取代
 supporting_source_ids: S3,S4
 contrary_source_ids:
@@ -159,6 +223,7 @@ as_of: 2026-07-21
 basis: Spectrum-6 公開支援兩種形式，且 Marvell 同期宣告 1.6T 可插拔 DSP 大量出貨
 boundary: 這是由產品組合與供應商階段推導的市場結構判讀，沒有全市場出貨占比可直接驗證
 verification_needed:
+corrected_by_claim_id: C9
 resolution:
 -->
 
@@ -204,9 +269,84 @@ verification_needed:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C6
+label: verified
+status: active
+claim: OIF co-packaging framework 把前面板可插拔、板上光引擎、socketed NPO 與同一第一層基板上的 co-packaging 畫成不同物理安排，光引擎位置因此不是只有前面板與 CPO 兩格
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2022-02-03
+basis: S8 PDF pp. 9–10 直接描述 optical／electrical communication device 的多種安排，並把可於組裝或 rework 拆裝的共同基板 socketed arrangement 稱為 socketed NPO
+boundary: 只證實 OIF 的位置分類與工程語彙，不表示所有廠商用相同定義，也不證明 NPO 已量產、具名部署或優於其他位置
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C7
+label: verified
+status: active
+claim: CPO 光引擎與雷射光源的位置是兩個不同選擇；外部前面板雷射可把光源變成可替換單元並與交換晶片熱分離，但額外連接與光路會帶來 insertion loss、較高光功率需求，以及控制與眼睛安全責任
+supporting_source_ids: S8,S10
+contrary_source_ids:
+as_of: 2025-01-08
+basis: S8 PDF pp. 18–21 比較 integrated／external laser、connector／pigtail、loss 與 safety；S10 pp. 3、9 定義可現場替換的 blindmate ELSFP
+boundary: 這些是架構取捨與標準設計目的，不是同一產品上的 A/B 測試，也沒有樣本數、故障率、修復時間、整機功耗或生命週期成本結果
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: OIF 3.2T CPO module 與 ELSFP Implementation Agreement 分別定義共同封裝模組及外部雷射的互通契約，但 ELSFP 02.0 明確不納入應用特定的 optical power、noise 與 wavelength，故 IA 不能替實際 link budget、產品 qualification 或部署背書
+supporting_source_ids: S9,S10
+contrary_source_ids:
+as_of: 2025-01-08
+basis: S9 建立 3.2T CPO module 的介面範圍並允許外部光源；S10 PDF p. 52 說明最低 multi-vendor interoperability 目標與刻意排除的應用特定光學條件
+boundary: 只確認公開 IA 的內容邊界；未稽核任何廠商的 conformity claim、測試報告、互通矩陣或現場安裝
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: inference
+status: active
+claim: AI 光互連較完整的研究框架至少要拆成光引擎位置（pluggable／on-board 或 NPO／CPO）、電介面訊號處理（retimed／transmit-retimed／linear）與雷射位置（integrated／external）三個獨立決策軸；因此「CPO 對可插拔」不是一條能單獨判斷替代速度的二選一產品軸
+supporting_source_ids: S3,S4,S8,S9,S10,S11
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C2；S8–S10 把 optical-engine placement 與 laser placement 分開，S11 又把 pluggable／NPO／CPO 和 retimed／transmit-retimed／linear 同時納入能源效率工作範圍；S3／S4 保留同代具名 CPO 與可插拔商品路徑
+boundary: 三軸是讀取產品組態與驗證責任的框架，不表示所有組合都可行、已標準化或已商品化，也不能推算架構市占、替代時程、每埠成本或供應商財務貢獻
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C2
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: unverified
+status: active
+claim: 任一具名 CPO／NPO／可插拔產品已公開完整的三軸組態，並完成跨供應商 optical-engine／ELS 互通、應用 link budget、field replacement、長期可靠度、規模部署與公司財務歸因
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8–S11 只提供框架、IA 與 current project scope；S1、S3、S4、S7 只提供各自產品階段或角色，沒有把同一具名產品的三軸組態、測試、部署與財務接成完整鏈
+boundary: 不以 IA 存在、標準會員、ecosystem 名單、production 用語、單廠展示或可替換設計目的替代跨廠實測、客戶營運資料與財務分母
+verification_needed: 公開同一產品與版本的 optical-engine placement、signal-processing mode、laser placement、link budget、互通矩陣、故障／更換／可靠度結果、部署埠數，以及買方與供應商同期間出貨與財務文件
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
+retired_at: 2026-08-12
+retirement_reason: C2 的 CPO／pluggable 二選一框架已由 C9 的光引擎位置、訊號處理與雷射位置三軸框架取代；原產品組合與部署問題由 T3 保留較細組態後接續
 claim_ids: C1,C2
 metric: Spectrum-X 後續世代的 CPO 與可插拔產品組合、部署量或占比
 source_ids: S1,S3,S4
@@ -230,6 +370,20 @@ frequency_detail: 每季法說與財報
 next_check: 2026-10-31
 trigger: 日月光投控首次直接揭露 CPO 量產、客戶或收入貢獻
 invalidation: 若公司持續只被生態系列名而沒有量產或財務證據，個股受惠映射維持未證
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C1,C6,C7,C8,C9,C10
+metric: 具名 AI 光學產品的 optical-engine placement、signal-processing mode、laser placement、標準版本、跨廠互通、field replacement、可靠度與部署分母
+source_ids: S1,S3,S4,S8,S9,S10,S11
+watch_source_ids: S6,S11
+frequency: event_driven
+frequency_detail: 每兩週核對 OIF current work、平台產品與公司正式文件；出現新 IA、具名 NPO／ELS 組態、互通矩陣或客戶部署即重審
+next_check: 2026-08-26
+trigger: 同一具名產品首次公開三軸組態，並至少提供跨廠互通、應用 link budget、現場更換／可靠度或客戶部署分母之一
+invalidation: 若後續多個產品世代仍把位置、訊號處理與雷射固定成不可拆的單一組合，且 NPO／ELS 長期沒有具名實作或互通結果，三軸作為商用產品組合框架的信心下修
 -->
 
 <!-- transition
@@ -267,6 +421,13 @@ to: triaged
 reason: editorial_plain_language_wave99_cpo_five_positions_five_tradeoffs_roles_and_six_gate_ladder
 evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: corrected_binary_optics_frame_with_engine_signal_and_laser_axes
+evidence: sources:S3,S4,S8,S9,S10,S11
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -280,12 +441,23 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 - **共同封裝光學（CPO）**：把光引擎放到交換晶片旁邊，縮短高速電訊號在電路板上行走的距離。
 - **可插拔光模組**：裝在交換器前面板、能從外部拔換的光通訊模組；它把轉換器與交換晶片分開。
 - **光引擎**：負責電光轉換、驅動與光學介面的模組；放在交換晶片旁邊時，維修方式會和前面板模組不同。
+- **板上光學（on-board optics）**：把光引擎放在交換器電路板上、介於前面板模組與交換晶片旁之間；板上不等於與交換晶片共同封裝。
+- **近封裝光學（NPO）**：把光引擎靠近交換晶片、但仍保留可分開安裝的封裝安排；OIF 也描述可在組裝或返修時拆裝的 socketed NPO。
+- **外部雷射光源（ELS）**：把連續波雷射留在光引擎之外，再用另一條光路供光；光引擎靠近交換晶片，不代表雷射也必須封在旁邊。
+- **ELSFP**：OIF 定義的前面板可插拔外部雷射形式，以 blindmate 光電連接器讓失效光源可在現場替換；它不是完整資料收發光模組。
 - **前面板**：交換器機箱面向維修人員、安裝光模組與光纖接頭的位置。
 - **連接埠**：交換器對外收送一條連線的介面；產品開始生產不等於已知部署了多少個連接埠。
 - **高速序列介面（SerDes）**：把資料轉成高速序列電訊號並在另一端還原的電路；速度愈高，傳輸距離、耗電與訊號完整性愈難兼顧。
 - **光訊號處理晶片（DSP）**：在光模組中處理高速訊號補償與轉換的晶片；晶片大量出貨不等於整體模組市場只剩一種架構。
+- **重定時（retimed）**：在電介面重新判決並整理高速訊號，讓主晶片與光學端較能分開滿足訊號要求，但會增加晶片功能、功耗與驗證項目。
+- **線性光學（linear optics）**：不以完整重定時把主晶片與光學端隔開，而讓兩端共同滿足訊號完整性；「線性」不等於沒有任何晶片或不需系統驗證。
+- **線性可插拔光學（LPO）**：把 linear electrical interface 放進前面板可插拔形式；LPO 同時描述訊號處理與光引擎位置的特定組合，不是所有 linear optics 的總稱。
+- **傳送端重定時（transmit-retimed）**：介於完整重定時與全線性之間的處理選項；名稱說的是電介面責任分配，不是光引擎一定放在哪裡。
 - **1.6T**：每秒 1.6 兆位元的連線容量；它描述速度，不是固定的封裝形式、產品數量或營收。
 - **雷射光源**：提供穩定光能給光引擎調變與傳輸的元件；光源位置與維修方式會影響整體設計。
+- **光學損耗預算（optical loss budget）**：從雷射到接收端沿途可容許的總光功率損失；多一個連接器、分光器或耦合點，都可能吃掉一部分預算。
+- **尾纖（pigtail）**：由元件固定帶出的短光纖；它可少一個可拆連接點，卻也會改變組裝與返修邊界。
+- **盲插（blindmate）**：不用直接看見或手動對準內部接點就能插合的介面；可盲插不等於任意兩家產品已通過互通。
 - **磷化銦雷射（InP laser）**：以磷化銦材料製作的雷射元件；具名角色不等於獨家供應、已知份額或已揭露收入。
 - **矽光子**：在矽基製程上整合光學元件的技術；有製程能力不等於已進入特定平台量產。
 - **光纖耦合**：把光準確送進或送出光纖與光學元件的連接步驟；對準、損耗與封裝一致性都要驗收。
@@ -307,35 +479,39 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 
 ### 三句話抓重點
 
-- 資料先以電訊號進入交換晶片，再轉成光訊號送往下一台設備；兩種做法真正不同的地方，是轉換位置離交換晶片多遠、能不能從面板拔換。
-- 轉換留在前面板比較容易維修與升級；把它移到交換晶片旁邊則縮短高速電路，卻把封裝、散熱、雷射、測試與故障處理綁得更緊。
-- 所以一種方案開始生產，不代表另一種立刻消失；還要看到它用在哪些連線、多少交換器與連接埠、誰通過驗收，以及收入與毛利，才能判斷公司真正受惠。
+- 資料先以電訊號進入交換晶片，再轉成光訊號送往下一台設備；先問光引擎放前面板、板上／NPO，還是和晶片共同封裝。
+- 再分開問電介面是重定時、傳送端重定時或線性，以及雷射整合在光引擎內還是放在外部；三個答案可以重新組合，不能濃縮成「CPO 對可插拔」。
+- 最後才追同一具名產品的互通、link budget、現場更換、可靠度、部署埠數與財務分母；標準存在或產品進入生產，都不能替後面幾關背書。
 
 ### 為什麼重要
 
-**先找「電在哪裡變成光」。** 可插拔光模組把轉換器留在前面板，壞掉時可以從外部更換；
-共同封裝光學把光引擎移到交換晶片旁邊，讓高速電訊號少走一段電路板。兩者不是單純的新舊
-版本，而是把功耗、密度、維修、封裝與測試壓力放在不同位置。
+**先找「電在哪裡變成光」。** 可插拔光模組把轉換器留在前面板，板上／NPO 把它搬近但仍
+保留獨立安裝邊界，共同封裝光學則把光引擎移到交換晶片的第一層基板旁。這不是一條只有新舊
+兩端的直線，而是光引擎位置改變後，功耗、密度、維修、封裝與測試責任跟著重排。
+
+**再找「誰整理電訊號、雷射又放哪裡」。** 同一個光引擎位置仍可搭配不同程度的重定時；
+共同封裝的光引擎也可以使用整合或外部雷射。把雷射移到前面板可建立獨立替換邊界，卻會新增
+光纖、連接器、損耗、安全與控制問題。把三軸混成一個名詞，會看不見真正失效與維修的是哪一段。
 
 **再看誰承接每一段工作。** 平台與交換晶片團隊決定架構，光引擎與雷射提供電光轉換，封裝
 測試把光學和電路整合，模組與系統團隊負責連接、維修與部署。任何一個角色被列名，都只證明
 它在接力中有位置，還沒有回答數量、份額與獲利。
 
-**最後分開產品生產與公司受惠。** 同一世代可以同時提供可插拔與共同封裝，兩條路也可能
-同步出貨。真正要量的是各自部署在哪裡、占多少連接埠、故障與維修結果如何，以及供應商的
-出貨、收入、毛利和現金流。
+**最後分開標準、產品生產與公司受惠。** OIF 的框架與 IA 讓不同廠商有共同語彙和最低介面
+契約，不代表某一組合已通過產品 qualification。同一世代仍可同時提供多種組態；真正要量的是
+每種組態部署在哪裡、占多少連接埠、故障與維修結果如何，以及供應商的出貨、收入、毛利和現金流。
 
 ### 接下來怎麼追
 
-- 先追平台端是否公布兩種形式用在哪些交換器與連線，並提供交換器數、連接埠數、故障率、維修時間與耗電結果。
-- 再追具名雷射、封裝測試與可插拔晶片角色，能否由平台端和供應商端對上同一產品、期間、驗收與出貨。
+- 先追平台端是否公布具名產品的光引擎位置、訊號處理方式與雷射位置，而不是只給 CPO、NPO、LPO 或 pluggable 標籤。
+- 再追同一組態的 link budget、跨供應商互通、故障率、現場更換時間、交換器數與連接埠數，並由平台端和供應商端對上同一版本、期間、驗收與出貨。
 - 最後追日月光投控是否拆出矽品相關產能、收入、毛利與現金流；其他台灣公司沒有具名文件前，維持研究候選。
 
 ### 想一想
 
-- 如果交換器最常壞的是可拔換模組，把轉換器移進晶片旁邊後，維修時間與受影響範圍會怎麼改變？
-- 同一世代同時提供兩種形式時，要看到哪些交換器數與連接埠比例，才能判斷誰正在取代誰？
-- 平台公布產品開始生產，但供應商沒有揭露出貨、收入或毛利時，技術信心與公司受惠信心應該一起上調嗎？
+- 如果 CPO 光引擎使用可插拔外部雷射，光源壞掉和光引擎壞掉的更換範圍會一樣嗎？
+- 兩個產品都叫 CPO，但一個完整重定時、另一個走線性介面，它們的功耗與訊號驗收責任能直接比較嗎？
+- IA 已經發布，但廠商沒有公開同一應用的 link budget、互通矩陣與現場結果時，技術信心應該升到哪一層就停？
 
 ## 先用五個位置看資料怎麼從電變成光
 
@@ -347,63 +523,107 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 | 4. 雷射與光纖耦合 | 光訊號 | 提供光源並把光準確送進光纖 | 雷射、光學元件、耦合、封裝與測試 | 具名雷射角色不等於獨家供應、份額或財務貢獻 |
 | 5. 光纖與下一台設備 | 光訊號 | 把資料送到另一台交換器或運算設備，再轉回電 | 光纖、連接器、交換器、營運與維修團隊 | 一條連線可用，不等於整個網路都採相同形式 |
 
-五個位置是閱讀資料流的最短路徑，不是完整交換器設計圖。兩種方案都要把電轉成光；差別在
-第三個位置靠近前面板還是交換晶片，以及這個選擇如何改變第二、四、五個位置的功耗、密度、
-封裝、維修與故障責任。
+五個位置是閱讀資料流的最短路徑，不是完整交換器設計圖。真正要記住的是：第三格的光引擎
+可以在前面板、板上／近封裝或共同封裝；第四格的雷射又可以留在光引擎內或移到外部。只寫
+「CPO」仍沒有說完訊號如何處理、光從哪裡來，以及哪個單元能在現場更換。
 
-## 再用五把尺比較兩種轉換位置
+## 不要把架構畫成一條線：先拆三個獨立決策軸
 
-| 本文五把尺 | 可插拔光模組 | 共同封裝光學 | 下一個要量的結果 | 不能直接推成 |
+| 決策軸 | 常見選項 | 真正移動或改變的東西 | 先問哪個驗證問題 | 不能只看名稱推成 |
 |---|---|---|---|---|
-| 1. 高速電路長度與功耗 | 轉換器在前面板，電訊號要走較長的板上路徑 | 光引擎靠近交換晶片，目標是縮短高速電路 | 同一速度與流量下的系統耗電、訊號損失與冷卻負擔 | 平台商倍數比較不能直接套到所有交換器 |
-| 2. 前面板空間與頻寬密度 | 每個模組占用面板位置，形式與尺寸受面板限制 | 光學移近晶片，面板可改用光纖連接方式 | 每台交換器的有效連接埠、纖芯、空間與散熱配置 | 密度較高不等於每埠成本或總成本較低 |
-| 3. 維修與故障範圍 | 模組可從外部替換，較容易隔離單一故障 | 光引擎與交換器整合更深，要看實際備援與維修設計 | 平均修復時間、備品、停機範圍與故障率 | 不能只憑位置斷言哪一種一定更可靠 |
-| 4. 升級與多供應商彈性 | 模組可依相容規格替換或升級 | 光學、封裝與交換晶片需更早共同設計 | 相容名單、升級週期、第二來源與客戶驗收 | 支援多家供應商不等於所有產品可任意互換 |
-| 5. 封裝、測試與生命週期成本 | 模組獨立製造與測試，系統端再插接 | 光學與晶片共同整合，封裝、測試、散熱與良率更緊密 | 合格品良率、測試時間、維修成本、耗電與資本支出 | 製程內容增加不等於封測商毛利一定提高 |
+| 1. 光引擎位置 | 前面板可插拔、板上光學、NPO、CPO | 電訊號要走多遠、光引擎與主晶片共用多少封裝與散熱邊界 | 同一具名產品的實際 placement、electrical reach、組裝與更換單元是什麼 | NPO 不等於 CPO；靠近晶片也不等於雷射一定一起封裝 |
+| 2. 電介面訊號處理 | retimed、transmit-retimed、linear | 重定時與補償責任留在光學端多少、主晶片與通道要共同承擔多少訊號完整性 | 同一速度、通道與誤碼條件下，DSP／retimer 功能、功耗與 pass/fail contract 是什麼 | LPO／linear 不等於沒有晶片、免測試或一定最低功耗 |
+| 3. 雷射位置 | 光引擎內整合、晶片上整合、板上／前面板／機架外部光源 | 熱源、可更換單元、供光纖路、連接點、光學損耗與安全控制 | 雷射到光引擎的 power／loss budget、備援、interlock 與 field replacement 是否通過 | 外部雷射可插拔，不等於承載資料的整個光引擎也可拔換 |
 
-這五把尺不是宣告誰勝出，而是把「省電」和「好維修」放回同一張成本表。共同封裝較可能先
-出現在電路長度、功耗或密度壓力最大的連線；可插拔則可能因維修、升級與多供應商彈性繼續
-保留。沒有同一部署環境的連接埠比例、耗電、故障與成本資料，就不能做全面替代結論。
+OIF 的 current-work 頁把 pluggable、NPO、CPO 與 retimed、transmit-retimed、linear 同時放在
+能源效率介面研究範圍；co-packaging framework 又把 optical-engine placement 與 laser placement
+分開。這支持三軸閱讀法，卻不表示表中的每個排列組合都有正式 IA、可互通產品或客戶部署。
+
+一個最容易記住的例子是：`CPO 光引擎 + 外部 ELSFP 雷射`。資料仍由交換晶片旁的光引擎調變，
+所以電訊號路徑很短；ELSFP 只把連續波光送進光引擎，讓雷射故障可以在前面板更換。它沒有把
+整個 CPO 光引擎搬回前面板，也沒有自動解決光學損耗、眼睛安全或跨廠互通。
+
+## 雷射移到外部後，維修邊界與損耗一起改變
+
+| 設計問題 | 雷射整合在光引擎 | 外部雷射／ELSFP | 下一份可裁決證據 |
+|---|---|---|---|
+| 故障替換 | 雷射與光引擎共用較深的維修邊界 | 光源可成為前面板 field-replaceable unit | 同型號故障模式、平均修復時間、備品與停機範圍 |
+| 熱管理 | 雷射熱源靠近光引擎與交換晶片 | 可把雷射熱源與交換晶片分開 | 同一輸出條件的溫度、效率、壽命與整機冷卻結果 |
+| 光學損耗 | 光路較短、連接點可較少 | 多一段供光纖路、連接器或分光可能增加 insertion loss | 從 ELS 到每顆光引擎的 power／loss budget 與最差條件 margin |
+| 組裝與返修 | 整合較深，實際返修範圍看封裝設計 | connector 方便分離，pigtail 可少一個接點但改變返修方式 | connector／pigtail 的 loss、污染、插拔壽命與返修良率 |
+| 控制與安全 | 仍需雷射監控與保護 | 另需跨模組控制、interlock、shutdown 與 eye-safety contract | 故障注入、斷纖／拔插情境與安全測試報告 |
+
+OIF framework 支持的是表中的工程方向，不是統計比較。沒有同一產品、條件與樣本的失效次數、
+測試時間和信賴區間，就不能宣稱外部或整合雷射「較可靠」；能說的只有它們把故障、散熱、損耗
+與控制責任放在不同位置。
+
+## 再用五把尺比較三種光引擎位置
+
+| 本文五把尺 | 前面板可插拔 | 板上／NPO | CPO | 共同要量的結果 |
+|---|---|---|---|---|
+| 1. 高速電路與功耗 | 電訊號走到前面板模組 | 路徑縮短，但仍跨板上或 socketed 邊界 | 光引擎與晶片共用第一層基板，目標是最短電路 | 同速同流量的電介面功耗、通道 loss、誤碼與冷卻負擔 |
+| 2. 空間與頻寬密度 | 模組占前面板體積 | 光引擎離開面板但仍占板上空間 | 光學靠近晶片，面板主要承接光纖介面 | 每台有效連接埠、纖芯、封裝面積、空間與散熱配置 |
+| 3. 維修與故障範圍 | 可從外部替換整個收發模組 | 要看 socket、pigtail、connector 與板級返修設計 | 光引擎整合最深，但外部雷射仍可另設替換邊界 | 元件故障率、受影響埠數、平均修復時間、備品與停機範圍 |
+| 4. 升級與第二來源 | 依相容規格更換的邊界最清楚 | 需核對板級尺寸、電介面、光纖與控制 | 光學、封裝與主晶片更早共同設計 | 具名相容名單、互通矩陣、版本升級與客戶驗收 |
+| 5. 製造與生命週期成本 | 模組獨立製造、測試後插接 | 新增板上組裝、耦合與返修取捨 | 封裝、散熱、光耦合、測試與已知良率更緊密 | 合格品良率、測試時間、每埠成本、耗電、維修與資本支出 |
+
+五把尺不是宣告誰勝出。NPO 讓「移近晶片」與「完全共同封裝」之間多一個可設計的組裝／返修
+邊界；外部雷射又能替 CPO 建立另一個可換單元。沒有同一部署環境的三軸組態、連接埠比例、
+耗電、故障與成本資料，就不能把一個架構標籤直接換成全面替代結論。
+
+## 四份 OIF 資料各回答不同問題
+
+| 文件層 | 它回答什麼 | 它沒有回答什麼 |
+|---|---|---|
+| Co-Packaging Framework（2022） | 有哪些光引擎與雷射安排、各自會移動哪些工程責任 | 哪個產品合格、哪家互通、誰已量產部署 |
+| 3.2T CPO Module IA（2023） | 3.2T CPO module 的電、光、機械、管理介面，以及外部光源耦合邊界 | 特定交換器的完整 link budget、客戶 qualification 與現場結果 |
+| ELSFP IA 02.0（2025） | 可現場替換外部雷射的 form factor、blindmate 與最低多供應商互通要求 | 應用特定 optical power、noise、wavelength，以及產品配對是否 pass |
+| Current OIF Work（2026-08-12 capture） | 標準組織目前正在研究哪些 placement、signal-processing 與 AI scale-up photonic interface | project 何時成為正式 IA、廠商何時實作或客戶何時部署 |
+
+閱讀順序應是「framework 建語彙 → IA 固定介面 → 廠商用具名版本做 qualification → 多供應商互通
+→ 客戶現場驗收」。前一格成立，不會自動把後一格塗綠。
 
 ## 把五類角色放回同一條光電接力
 
 | 本文五類角色 | 它交付什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |
 |---|---|---|---|---|
-| 1. 平台與交換器產品 | 決定交換晶片、連接埠、光學形式與產品時鐘 | NVIDIA 的 Spectrum-X Ethernet Photonics 與 Spectrum-6 | 前者被公司描述為進入生產，後者同代支援兩種形式 | 產品生產不等於已知客戶部署數與全市場占比 |
-| 2. 可插拔訊號處理 | 在前面板模組內處理高速訊號與電光轉換 | Marvell Ara 1.6T DSP | 供應商表示已大量出貨給全球客戶 | 「大量」沒有模組數、終端客戶與市場份額分母 |
-| 3. 雷射與光源 | 為共同封裝光引擎提供光源 | Lumentum 的磷化銦雷射角色 | 公司公告自己是具名生態系角色 | 自身公告不證明獨家、實際出貨量、收入或毛利 |
+| 1. 平台與交換器產品 | 決定交換晶片、連接埠與三軸光學組態 | NVIDIA 的 Spectrum-X Ethernet Photonics 與 Spectrum-6 | 前者被公司描述為進入生產，後者同代支援可插拔與 CPO | 名稱沒有完整揭露 NPO、訊號處理、雷射位置、客戶部署數與全市場占比 |
+| 2. 訊號處理與光引擎 | 依產品設計完成 retimed／linear 電介面及電光轉換 | Marvell Ara 1.6T 可插拔 DSP | 供應商表示具名可插拔 DSP 已大量出貨 | 不能把一顆 retimed pluggable DSP 的階段外推到 NPO、CPO 或所有 linear 路徑 |
+| 3. 雷射與光源 | 以整合或外部方式替光引擎供光 | Lumentum 的磷化銦雷射角色；OIF ELSFP 是標準形式 | 公司公告具名生態系角色；OIF 定義 field-replaceable ELSFP | 自身公告與 IA 都不證明獨家、產品配對互通、實際出貨量、收入或毛利 |
 | 4. 封裝、組裝與測試 | 把晶片、光學與電路整合並完成製造測試 | NVIDIA 列名 SPIL；ASE 文件確認集團關係 | 平台端列名與公司歸屬可雙向確認 | 列名不等於日月光新增訂單、份額或財務重大性 |
 | 5. 客戶部署與營運 | 決定連線位置、驗收、備援、維修與實際使用比例 | 本輪來源沒有可重算的部署分母 | 尚未確認交換器數、連接埠比例與營運結果 | 首批採用名單或展示不能改寫成規模部署 |
 
 角色表說明「誰負責哪一段」，不是完整供應商名單。只有 SPIL 的封裝、組裝與測試角色由
-NVIDIA 直接列名並可由 ASE 文件確認公司歸屬；Lumentum 是自身公告的外部雷射角色；Marvell
-用來證明可插拔 DSP 路徑仍在出貨。其他台灣公司不得借用這三組證據升級。
+NVIDIA 直接列名並可由 ASE 文件確認公司歸屬；Lumentum 是自身公告的雷射角色；Marvell
+用來證明具名可插拔 DSP 路徑仍在出貨。OIF 文件只建立共同語彙與介面，不替任何供應商列名；
+其他台灣公司不得借用標準或這三組公司證據升級。
 
-## 把兩條產品時鐘放回同一代共存
+## 產品時鐘不是一條「誰取代誰」的時鐘
 
 NVIDIA 把 Spectrum-X Ethernet Photonics 描述為進入產品生產，又說 Spectrum-6 同代支援
 可插拔與共同封裝兩種形式；Marvell 同期表示 Ara 1.6T 可插拔 DSP 已大量出貨。這三份一手
-資料支持「本階段兩條路並存」的推論，卻沒有告訴我們兩種形式各占多少交換器、連接埠、收入
-或網路資本支出。
+資料仍支持「本階段多條路並存」，卻沒有告訴我們各產品的 NPO／CPO placement、retimed／linear
+處理、integrated／external laser 組態，也沒有各占多少交換器、連接埠、收入或網路資本支出。
 
-因此可比較的是各自產品時鐘：共同封裝已有具名產品生產，可插拔也有具名晶片大量出貨。
-不能比較的是長期勝負、全市場份額與每埠經濟性；更不能把平台生產直接改寫成台灣供應商財務
-貢獻。
+因此可比較的是各自產品時鐘：具名共同封裝平台已被描述為進入生產，可插拔也有具名晶片大量
+出貨。不能做的是只用其中一軸排列長期勝負；即使未來 CPO 埠數增加，外部雷射、linear 介面或
+socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改寫成台灣供應商財務貢獻。
 
-## 最後用六關分開產品生產、部署與公司受惠
+## 最後用七關分開標準、產品、部署與公司受惠
 
-| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
+| 本文七關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
-| 1. 兩種產品路徑已具名 | 平台與供應商公開可插拔、共同封裝的具名產品 | Spectrum-X Ethernet Photonics、Spectrum-6 與 Ara 都有一手產品文件 | 第二個平台用可比較方式公開兩種路徑 | 有產品名稱不等於規模部署或市場成熟 |
-| 2. 產品進入持續生產 | 具名產品已從路線圖走到持續製造或大量出貨 | NVIDIA 描述共同封裝產品進入生產；Marvell 描述可插拔 DSP 大量出貨 | 實際出貨數、客戶驗收、期間與退貨／故障資料 | 各公司生產用語不能當成共同量尺 |
-| 3. 供應商角色能雙向核對 | 平台端與供應商端對上同一產品、角色與公司 | SPIL 角色與集團關係可核對；Lumentum 有自身具名雷射公告 | 平台與供應商共同確認料號、期間與量產角色 | 生態系列名不能改寫成份額、獨家或訂單金額 |
-| 4. 客戶驗收與部署分母出現 | 知道產品用在哪些連線、多少交換器與連接埠 | 尚無可重算的部署位置、交換器數與兩種形式比例 | 客戶驗收、連接埠配置、故障率、修復時間與耗電 | 首批採用者或展示不等於規模部署 |
-| 5. 供應商出貨、份額與價格可辨識 | 具名供應商有出貨量、單價、份額、產能利用與重複訂單 | 現有來源沒有 SPIL 或 Lumentum 的產品分母 | 公司文件與客戶文件對上同期間量產出貨 | 平台產品生產不能直接換算供應商營收 |
-| 6. 收入、毛利與現金流留下來 | 新增製造內容能接回公司收入、成本、毛利與現金流 | 日月光尚未拆出 Spectrum-X／CPO 的財務貢獻 | 具名產品收入、成本、毛利、資本支出與收款 | 營收成長不等於扣除良率、設備與維修成本後仍受惠 |
+| 1. 三軸組態可辨識 | 同一具名產品說清光引擎位置、訊號處理與雷射位置 | OIF 提供分類；NVIDIA／Marvell 的公開產品資料未完整填滿三軸 | 產品 block diagram、BOM、介面與可更換單元 | 只寫 CPO、NPO、LPO 或 pluggable 不等於組態完整 |
+| 2. 標準與應用契約閉合 | 正式 IA、應用 link budget、管理、安全與版本彼此對得上 | 3.2T CPO 與 ELSFP IA 已發布；應用特定 power／noise／wavelength 仍在 IA 外 | 具名產品的 IA 版本、loss budget、control／safety 與 pass criteria | IA 發布不等於產品合格或任意兩家互通 |
+| 3. 產品進入持續生產 | 具名產品從路線圖走到持續製造或大量出貨 | NVIDIA 描述 CPO 產品進入生產；Marvell 描述可插拔 DSP 大量出貨 | 實際出貨數、版本、qualification、退貨與故障資料 | 各公司 production 用語不能當共同量尺 |
+| 4. 供應商角色能雙向核對 | 平台端與供應商端對上同一產品、角色與公司 | SPIL 角色與集團關係可核對；Lumentum 有自身具名雷射公告 | 平台與供應商共同確認料號、組態、期間與量產角色 | 生態系列名不能改寫成份額、獨家或訂單金額 |
+| 5. 互通、客戶驗收與部署分母出現 | 同一組態跨廠可用，且知道用在哪些連線與多少埠 | 尚無完整互通矩陣、field result、交換器數與三軸組態比例 | 跨廠組合、客戶驗收、埠數、故障率、修復時間與耗電 | 展示、blindmate 或首批採用者不等於規模部署 |
+| 6. 供應商出貨、份額與價格可辨識 | 具名供應商有出貨量、單價、份額、產能利用與重複訂單 | 現有來源沒有 SPIL 或 Lumentum 的產品分母 | 公司與客戶文件對上同期間組態與量產出貨 | 平台產品生產不能直接換算供應商營收 |
+| 7. 收入、毛利與現金流留下來 | 新增製造內容能接回公司收入、成本、毛利與現金流 | 日月光尚未拆出 Spectrum-X／CPO 的財務貢獻 | 具名產品收入、成本、毛利、資本支出與收款 | 營收成長不等於扣除良率、設備與維修成本後仍受惠 |
 
-本輪兩條架構都能通過第一關，產品端各自走到第二關；SPIL 與 Lumentum 最多提供第三關的
-具名角色線索，尚未通過第四到第六關。六關是證據排序，不是技術排名、供應商名單、營收預測
-或投資建議。
+本輪框架與 IA 能到第一、二關，兩條具名產品路徑各自走到第三關；SPIL 與 Lumentum 最多提供
+第四關的角色線索，尚未通過第五到第七關。七關是證據排序，不是技術排名、供應商名單、營收
+預測或投資建議。
 
 ## 這篇對公司判斷的用處與界線
 
@@ -412,8 +632,9 @@ NVIDIA 把 Spectrum-X Ethernet Photonics 描述為進入產品生產，又說 Sp
 頎邦與訊芯等既有研究候選沒有被本輪平台或可插拔文件列名，仍要依自己的正式文件補齊客戶、
 料號、驗收與財務證據。
 
-因此研究下一步不是把所有光通訊或矽光子公司排成受惠名單，而是沿六關尋找部署分母、雙向
-核對與公司財務足跡。在第四到第六關出現前，本文不支持個股排序、營收推估或投資動作。
+因此研究下一步不是把所有光通訊或矽光子公司排成受惠名單，而是沿七關尋找完整組態、互通、
+部署分母、雙向核對與公司財務足跡。在第五到第七關出現前，本文不支持個股排序、營收推估或
+投資動作。
 
 ## 來源與證據邊界
 
@@ -423,12 +644,18 @@ NVIDIA 把 Spectrum-X Ethernet Photonics 描述為進入產品生產，又說 Sp
 - [Marvell：Ara 1.6T 可插拔 DSP 大量出貨，2026-03-12](https://www.marvell.com/company/newsroom/marvell-1-6t-optical-dsp-ai-data-center-connectivity.html)
 - [ASE：SPIL 為日月光投控子公司，2025-01-16](https://www.aseglobal.com/press-room/spil-hosts-nvidia-founder-and-ceo-at-new-factory-site/)
 - [Lumentum：Spectrum-X Photonics 的具名 InP laser 生態系角色，2025-03-18](https://investor.lumentum.com/financial-news-releases/news-details/2025/Lumentum-Selected-as-an-NVIDIA-Silicon-Photonics-Ecosystem-Partner-to-Advance-AI-Networking-at-Scale/default.aspx)
+- [OIF：Co-Packaging Framework Document，2022-02-03](https://www.oiforum.com/wp-content/uploads/OIF-Co-Packaging-FD-01.0.pdf)（pp. 9–10、18–21：光引擎／雷射位置、connector、loss 與 safety）。
+- [OIF：3.2T Co-Packaged Module IA 01.0，2023-03-29](https://www.oiforum.com/wp-content/uploads/OIF-Co-Packaging-3.2T-Module-01.0.pdf)（p. 16：外部光源與 optical loss tolerance）。
+- [OIF：ELSFP IA 02.0，2025-01-08](https://www.oiforum.com/wp-content/uploads/OIF-ELSFP-02.0.pdf)（pp. 3、9、52：field replacement、blindmate 與規格排除項）。
+- [OIF：Current Work，2026-08-12 capture](https://www.oiforum.com/technical-work/current-work/)（pluggable／NPO／CPO、retimed／transmit-retimed／linear 與 AI scale-up photonic interface 工作範圍）。
 
-**已知：** NVIDIA 將具名共同封裝產品描述為進入生產並直接列名 SPIL；Spectrum-6 與
-Marvell 的資料也證明可插拔路徑仍在同代產品與量產生態中。
+**已知：** OIF 文件證實光引擎位置、訊號處理與雷射位置必須分開閱讀，且 IA 只覆蓋指定互通
+邊界；NVIDIA 將具名共同封裝產品描述為進入生產並直接列名 SPIL，Spectrum-6 與 Marvell 的
+資料也證明可插拔路徑仍在同代產品與量產生態中。
 
-**還不知道：** 兩種形式的實際出貨配比、部署位置、每埠成本、故障率、台灣供應商收入與
-毛利，以及 6147、6451 是否參與上述具名平台。
+**還不知道：** 具名產品完整三軸組態、NPO／ELS 實際部署、應用 link budget、跨廠互通、
+field replacement 與長期可靠度結果、各組態出貨配比、每埠成本、台灣供應商收入與毛利，
+以及 6147、6451 是否參與上述具名平台。
 
 **不可外推：** NVIDIA、Marvell 與 Lumentum 的效能、角色或成本敘述仍有各自的發行人邊界；
 沒有共同部署、價格、估值、共識與部位資料，本題不判斷市場是否已反映。
@@ -443,14 +670,15 @@ stock_ids: 3711
 direction: mixed
 hypothesis_refs:
 note_action: review_due
-action_due: 2026-08-15
-rationale: SPIL 被 NVIDIA 直接列為 CPO 封裝組裝測試夥伴，需由日月光投控正式文件裁決量產收入與獲利。
-evidence_boundary: 平台量產與生態系列名不等於 3711 已有可量化新增訂單；不建立收入、市占或毛利事實，6147與6451僅保留在正文的既有 H# 複核清單。
+action_due: 2026-08-26
+rationale: SPIL 被 NVIDIA 直接列為 CPO 封裝組裝測試夥伴；新 OIF 三軸框架要求再固定具名產品組態、互通與部署，並由日月光投控正式文件裁決量產收入與獲利。
+evidence_boundary: OIF framework／IA、平台 production 與生態系列名都不等於 3711 已有可量化新增訂單；不建立收入、市占或毛利事實，6147與6451僅保留在正文的既有 H# 複核清單。
 -->
 
 ## 下一個可證明／否定的節點
 
-- **平台層**：首批雲端採用者是否公布 CPO 交換器數量、部署位置、可靠度或節能的實際值；若只停在展示或少量部署，量產解讀要降級。
-- **架構層**：Spectrum-6 後續產品組合是否仍維持雙形式；若可插拔占比長期居高且 CPO 未擴到更多場景，「快速替代」假說被否定。
+- **組態層**：具名產品是否同時公布 optical-engine placement、signal-processing mode 與 laser placement；只有一個 CPO／NPO／LPO 標籤就不算填滿。
+- **互通層**：3.2T CPO module、ELSFP 與應用 link budget 是否由多家產品在同一版本與條件下完成互通、故障注入、field replacement 與長期可靠度。
+- **平台層**：首批雲端採用者是否公布各三軸組態的交換器數、部署位置、可靠度、修復時間或節能實際值；若只停在 IA、展示或少量部署，量產解讀不升級。
 - **公司層**：3711 是否拆出光電共同封裝的收入／毛利；6147、6451 是否由送樣或小量生產轉為正式量產收入。沒有公司文件，就不把平台證據寫進正式筆記事實。
 - **經濟層**：新增封裝與測試內容量是否高於所需資本支出、良率爬坡與維修成本；若收入增加但毛利、現金流未改善，受惠只停在營收表面。

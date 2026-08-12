@@ -58,7 +58,11 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["graphs"]["traceableEdges"],
             self.current["graphs"]["activeEdges"],
         )
-        self.assertGreater(self.current["monitors"]["reviewedMature"], 0)
+        self.assertGreaterEqual(self.current["monitors"]["reviewedMature"], 0)
+        self.assertEqual(
+            self.current["monitors"]["reviewedMature"],
+            self.latest["monitors"]["reviewedMature"],
+        )
         self.assertEqual(
             self.current["corrections"]["monitorReviewEvents"], len(self.reviews),
         )

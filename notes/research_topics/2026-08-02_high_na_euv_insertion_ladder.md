@@ -7,7 +7,7 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-04-22
-last_reviewed_at: 2026-08-02
+last_reviewed_at: 2026-08-12
 review_due: 2026-10-01
 source_type: mixed
 publisher: ASML
@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C5
 base_confidence: medium
-confidence_basis: ASML、imec 與 Intel 一手來源可交叉確認工具出貨、客戶端運轉、產品晶圓測試與資格／插入時程；但 2026 年底 HVM readiness、2027 至 2028 客戶節點插入、台灣供應商角色與財務貢獻仍待驗證
+confidence_basis: ASML、imec 與 Intel 一手來源可交叉確認工具出貨、客戶端運轉、半視場與拼接、測試結構電性結果、整合元件展示、產品晶圓測試與資格／插入時程；但完整產品層製程視窗、2026 年底 HVM readiness、2027 至 2028 客戶節點插入、台灣供應商角色與財務貢獻仍待驗證
 cross_company_numbers: false
 -->
 
@@ -152,6 +152,102 @@ limitation: 動態 process page 與 roadmap 不能替代 High-NA 實際使用層
 independence_group: intel
 -->
 
+<!-- research_source
+source_id: S8
+role: company_release
+source_kind: document
+publisher: ASML
+title: 5 things you should know about High NA EUV lithography
+published_at: 2024-01-25
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.asml.com/en/company/stories/2024/5-things-high-na-euv
+locator: 正文 High-NA optics 與 productivity 段落；0.55 NA、單方向四倍與另一方向八倍的 anamorphic optics、半視場、每片兩次曝光及每小時產出路線
+limitation: ASML 是設備商；光學設計、速度目標與減少多重圖形化的說明不證明客戶產品層的拼接、良率、量產成本或 HVM
+independence_group: asml
+-->
+
+<!-- research_source
+source_id: S9
+role: other_primary
+source_kind: document
+publisher: imec
+title: Imec demonstrates readiness of High NA EUV patterning ecosystem
+published_at: 2024-02-26
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.imec-int.com/en/press/imec-demonstrates-readiness-high-na-euv-patterning-ecosystem
+locator: 正文 half field、at-resolution stitching、MOR／underlayer／mask／OPC、dose、depth of focus 與 stochastic defect 段落
+limitation: 研發圖形與特定材料條件只證明受測視窗；個別劑量或均勻度改善不能外推到所有圖形、完整產品、蝕刻後電性、產能或 HVM
+independence_group: imec
+-->
+
+<!-- research_source
+source_id: S10
+role: other_primary
+source_kind: document
+publisher: imec
+title: Imec demonstrates electrical yield of 20nm pitch metal lines obtained with High NA EUV single exposure
+published_at: 2025-02-24
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.imec-int.com/en/press/imec-demonstrates-electrical-yield-20nm-pitch-metal-lines-obtained-high-na-euv-single
+locator: 正文 20nm pitch、metallized test structures、serpentine／fork-fork 與 over 90 percent electrical yield 段落
+limitation: 兩類測試結構的初步電性驗證不是完整產品層、全部圖形族、長期製程能力、客戶 qualification 或 HVM 良率
+independence_group: imec
+-->
+
+<!-- research_source
+source_id: S11
+role: other_primary
+source_kind: document
+publisher: imec
+title: Imec unlocks lever for EUV dose reduction with oxygen injection during metal-oxide resist post-exposure bake
+published_at: 2026-02-25
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.imec-int.com/en/press/imec-unlocks-lever-euv-dose-reduction-oxygen-injection-during-metal-oxide-resist-post
+locator: 正文 oxygen-controlled post-exposure bake、50 percent versus 21 percent oxygen、15 to 20 percent photo-speed improvement 與 preliminary mechanism 段落
+limitation: 研究工具與受測光阻條件的感光速度結果尚未證明量產設備整合、跨批次穩定、缺陷／良率、產能或總成本
+independence_group: imec
+-->
+
+<!-- research_source
+source_id: S12
+role: other_primary
+source_kind: document
+publisher: imec
+title: World-first: imec presents quantum dot qubit device using High NA EUV lithography
+published_at: 2026-05-19
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.imec-int.com/en/press/world-first-imec-presents-quantum-dot-qubit-device-using-high-na-euv-lithography
+locator: 正文 functional quantum dot qubit network、approximately 6nm gaps、300mm fab-compatible flow 與 reproducibility 說明
+limitation: 功能性研究元件把證據推進到整合裝置，不等於邏輯或記憶體客戶產品層、量產樣本、長期良率、成本或 HVM
+independence_group: imec
+-->
+
+<!-- research_source
+source_id: S13
+role: competitor_primary
+source_kind: document
+publisher: Intel Foundry
+title: Delivering Technologies to Power the AI Era - Intel Foundry at SPIE 2026
+published_at: 2026-02-20
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://community.intel.com/t5/Blogs/Intel-Foundry/Systems-Foundry-for-the-AI-Era/Delivering-Technologies-to-Power-the-AI-Era-Intel-Foundry-at/post/1737961/jump-to/first-unread-message
+locator: High-NA direct-print、half-field seam stitching、21nm pitch、roughness／defectivity 與 resist／mask co-optimization 段落
+limitation: Intel 的會議技術摘要支持客戶端研發項目，不提供完整產品層、製程能力分布、qualification、量產層數、HVM 良率或成本
+independence_group: intel
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -225,7 +321,7 @@ claim_id: C5
 label: inference
 status: active
 claim: High-NA EUV 已跨過只有單機 prototype 的階段，進入多台客戶端運轉、研發資格與 product-wafer testing；但在證據階梯上仍位於客戶 HVM insertion 之前，不能用八台出貨、50 萬片處理量或 imec 到廠替 2027–2028 量產節點提前畢業
-supporting_source_ids: S1,S2,S3,S4
+supporting_source_ids: S1,S2,S3,S4,S12
 contrary_source_ids:
 as_of: 2026-08-02
 basis: S1 提供 fleet 與 insertion 時程，S2 提供 imec qualification 目標，S3 提供平台與 product-wafer testing，S4 提供首個客戶安裝基線
@@ -276,11 +372,113 @@ claim_id: C8
 label: inference
 status: active
 claim: High-NA 的量產準備度是 scanner、resist、mask、pattern transfer、metrology 與 process stability 的共同結果，而不是只由掃描機數量決定
-supporting_source_ids: S2,S3
+supporting_source_ids: S2,S3,S8,S9,S10,S11,S12,S13
 contrary_source_ids:
 as_of: 2026-08-02
 basis: S2 明列 patterning、metrology、materials 與 resist／mask ecosystem，S3 把 resist 進度與 product-wafer testing 連到平台成熟
 boundary: 這個依賴鏈不證明任一材料或設備供應商已取得客戶資格、份額、訂單或財務貢獻
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: ASML 說明 High-NA 使用一方向四倍、另一方向八倍的非等向縮放光學，因此曝光視場縮為一半、每片晶圓要以兩個半場完成；imec 另在研究環境展示解析度下的半場拼接
+supporting_source_ids: S8,S9
+contrary_source_ids:
+as_of: 2024-02-26
+basis: S8 直接說明 anamorphic 4x／8x、half field 與 two exposures per wafer，S9 直接描述 half field 與 at-resolution stitching demonstration
+boundary: 光學架構與研究拼接成立不等於所有產品版圖都已處理接縫、跨場對準、長期漂移、良率或產能
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: imec 於 2025-02-24 報告以 High-NA 單次曝光製作 20nm pitch 金屬化測試結構，並在用來檢查斷路與橋接的 serpentine 與 fork-fork 結構上取得超過 90 percent 的電性良率
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2025-02-24
+basis: S10 直接列出圖形間距、金屬化、兩類電性測試結構、對應失效模式與報告良率
+boundary: 這是兩類測試結構的初步結果；沒有完整產品圖形族、樣本分布、長期製程能力、客戶 qualification 或 HVM 分母
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: imec 於 2026-02-25 報告在研究用烘烤工具中把金屬氧化物光阻曝光後烘烤的氧濃度由 21 percent 控制到 50 percent 時，受測條件的感光速度提升 15 to 20 percent
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-02-25
+basis: S11 直接列出氧濃度比較、研究工具與 photo-speed improvement 區間
+boundary: 機制仍屬初步研究，也沒有量產烘烤設備、跨批次缺陷、產品良率、每小時產出或每顆合格晶片成本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: imec 於 2026-05-19 公布以 High-NA 圖形化製作功能性量子點量子位元網路，報告約 6nm 間隙並把流程描述為與 300mm 晶圓廠相容且可重現
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-05-19
+basis: S12 直接描述 functional device、approximately 6nm gaps、300mm fab-compatible flow 與 reproducibility
+boundary: 單一研究裝置類別不等於邏輯或記憶體客戶產品層，也沒有 HVM 樣本、長期良率、產出或成本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: Intel Foundry 於 2026-02-20 把半視場接縫拼接列為 High-NA 客戶端挑戰，並說明 21nm pitch direct-print 的線邊粗糙度與缺陷持續改善、光阻與光罩仍在共同最佳化
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-02-20
+basis: S13 的 High-NA 段落直接描述 half-field seam stitching、21nm pitch direct print、roughness／defectivity improvement 與 continued resist／mask co-optimization
+boundary: 技術會議摘要沒有完整產品層、跨場統計、製程能力分布、qualification、量產層數、HVM 良率或成本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: High-NA 的製程視窗必須當成一份耦合契約驗證：半視場與拼接、曝光劑量與焦距、光阻與烘烤、光罩與修正、圖形轉移、隨機缺陷、電性結構、設備產出及變更沿革要綁在同一受測版本；任何單一解析度、劑量、良率或元件展示都不能替整份契約畢業
+supporting_source_ids: S8,S9,S10,S11,S12,S13
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8 至 S13 分別揭露半視場、拼接、焦深／材料、電性測試結構、烘烤條件、整合元件與客戶端共同最佳化，顯示各結果使用不同受測物與條件，必須保留版本與邊界
+boundary: 這是研究方法與證據排序，不是任何客戶已完成製程資格、任何供應商已取得訂單，亦不估算市場規模、收入、毛利或估值
 verification_needed:
 correction_kind:
 corrects_claim_id:
@@ -316,6 +514,20 @@ trigger: 客戶確認 High-NA 實際節點、層數、產品與 HVM，且供應�
 invalidation: 客戶 insertion 延至 2029 以後、只在 R&D 使用，或 Low-NA／多重圖形化在成本與良率上持續勝出
 -->
 
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C5,C8,C9,C10,C11,C12,C13,C14
+metric: 同一產品層的半視場拼接、劑量／焦距視窗、隨機缺陷、圖形轉移、電性良率、產出與變更後重驗
+source_ids: S8,S9,S10,S11,S12,S13
+watch_source_ids: S5,S6,S7
+frequency: monthly
+frequency_detail: 每月檢查 ASML、imec 與 Intel；出現客戶產品層或 full-field qualification 文件時立即重審
+next_check: 2026-10-01
+trigger: 同一客戶產品層公開版本化的 field／stitch、dose／focus、材料與烘烤、缺陷與電性、throughput／availability、變更沿革及 HVM 結果
+invalidation: 拼接或焦深使產品視窗不足、降劑量放大隨機缺陷、圖形轉移後電性失敗、變更後無法重現，或客戶延後／縮減插入層
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -340,6 +552,14 @@ reason: editorial_plain_language_wave100_high_na_five_positions_five_cost_lenses
 evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 -->
 
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_anamorphic_field_stitching_dose_yield_and_electrical_evidence_ladder_without_hvm_upgrade
+evidence: sources:S8,S9,S10,S11,S12,S13
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -358,9 +578,19 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 - **線寬**：晶圓上某條線或間距的尺寸；能印得更細不等於整個產品都會使用相同尺寸。
 - **解析度**：曝光系統分開細小圖形的能力；解析度提升只是製程成立的一項條件。
 - **數值孔徑**：描述光學系統收集與聚焦光線能力的指標；提高它可改善解析度，也會改變光罩、光阻與製程整合要求。
+- **非等向縮放光學**：兩個方向使用不同縮小倍率的光學設計，英文常寫 anamorphic optics；High-NA 因此改變單次曝光可覆蓋的面積。
+- **半視場**：單次曝光只覆蓋現行完整視場的一半；較大的產品版圖可能需要把兩個半場接起來。
+- **視場拼接**：把相鄰曝光區域在接縫處正確銜接；拼得出測試線不等於所有產品圖形都通過長期穩定驗證。
+- **焦深**：晶圓高度在多大範圍內仍能保持合格圖形；焦深縮小時，薄膜厚度、表面起伏與設備控制會更敏感。
+- **曝光劑量**：光阻接收的曝光能量；劑量較低可能提高速度，卻必須一起檢查隨機缺陷與良率。
 - **EUV**：極紫外光微影，用很短波長的光印製先進晶片圖形；它只是完整製程中的一段。
 - **High-NA**：把極紫外光系統的數值孔徑提高到 0.55 的方案；目標是一次印出更細圖形，但仍要驗證良率、產出與成本。
 - **Low-NA**：目前較低數值孔徑的極紫外光平台；部分細圖形會搭配多重圖形化完成。
+- **金屬氧化物光阻**：以金屬氧化物為核心的感光材料路徑，英文常寫 MOR；材料名稱本身不代表特定配方已通過量產資格。
+- **曝光後烘烤**：曝光後用受控溫度與氣氛推動光阻反應的步驟；條件改變可能同時影響感光速度、圖形與缺陷。
+- **隨機缺陷**：由少量光子、材料反應或局部波動造成的偶發圖形失敗；平均線寬合格仍可能出現斷路或橋接。
+- **線邊粗糙度**：圖形邊緣相對理想直線的起伏；線越細，邊緣波動越可能侵蝕電性餘裕。
+- **局部線寬均勻度**：同一小區域內圖形尺寸的一致程度；平均值好看不代表每個孔洞或線段都落在規格內。
 - **多重圖形化**：把原本難以一次印出的圖形拆成多次曝光與加工；步驟增加，也會增加對準與製程控制負擔。
 - **對準**：讓本次加工對到晶圓上預定位置；偏差過大可能讓圖形或電路失效。
 - **疊對**：量測不同製程層彼此位置是否重合；單層印得清楚仍不代表多層能正確接起來。
@@ -370,6 +600,8 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 - **每小時產出**：設備在一小時內可處理的晶圓或合格層數，英文常寫 throughput；要和停機、返工及良率一起判讀。
 - **維護時間**：設備保養、校正或故障修復占用的時間；它會影響可用率、排程與實際產出。
 - **測試圖形**：為了研究或校正而設計的簡化圖形；成功不等於實際產品的所有圖形都能量產。
+- **電性測試結構**：把特定線路做成可量測導通或短路的結構，讓圖形外觀進一步接受功能檢查；它仍不是完整產品。
+- **斷路與橋接**：細線中斷叫斷路，相鄰線意外相連叫橋接；兩者都可能來自局部或隨機圖形失敗。
 - **產品晶圓**：使用實際產品設計而非只有測試圖形的晶圓，英文常寫 product wafer；仍可能停在驗證階段。
 - **校準**：調整設備與量測基準，使結果落在預定範圍；校準完成不等於製程資格或量產完成。
 - **資格驗證**：依指定條件確認設備、材料與製程能否被採用，英文常寫 qualification；範圍可能只涵蓋部分圖形或條件。
@@ -416,6 +648,24 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 五個位置是最短閱讀路徑，不是完整晶片配方。高數值孔徑方案主要改變第三個位置的光學能力，
 但它能不能降低總成本，仍取決於第一、二、四、五個位置能否一起通過產品與量產驗收。
 
+## 解析度變好，為什麼反而多出五個新難題
+
+High-NA 把數值孔徑由 0.33 提高到 0.55，目標是一次分開更細的圖形。可是解析度不是免費午餐：
+光學、材料與產品版圖的限制會一起移動。下面五題要綁在同一個受測版本，不能各拿一張最佳成績
+拼成不存在的量產製程。
+
+| 本文五個新難題 | 變化從哪裡來 | 本輪一手證據走到哪裡 | 下一個要驗收 | 不能直接推成 |
+|---|---|---|---|---|
+| 1. 半視場與接縫 | 兩方向使用四倍與八倍縮放，單次只覆蓋半個視場；較大版圖要接兩次曝光 | ASML 說明光學與每片兩次半場曝光；imec 展示解析度下拼接，Intel 也把接縫列為客戶端挑戰 | 同一產品版圖的跨場對準、接縫圖形、長期漂移與重複性 | 研究環境拼得出來不等於所有產品版圖都能量產 |
+| 2. 焦深、薄膜與表面起伏 | 解析度提高時可容許的高度範圍縮小，光阻厚度、晶圓起伏與後續轉移更敏感 | imec 說明較小焦深需要較薄膜層與共同材料最佳化 | 實際膜堆、地形、焦距分布、蝕刻後尺寸與跨晶圓能力 | 單一平坦測試區合格不等於產品全晶圓視窗足夠 |
+| 3. 劑量、速度與隨機缺陷 | 劑量下降可縮短曝光時間，但少量光子與材料反應波動可能增加局部失敗 | imec 公布特定材料比較與氧氣控制烘烤的感光速度結果，也使用電子束與深紫外光檢查隨機缺陷 | 同一圖形的劑量—焦距矩陣、缺陷面積分母、返工、報廢與合格產出 | 劑量降低不等於每小時合格產出上升或成本下降 |
+| 4. 光罩、修正、光阻與烘烤 | 新光學會改變光罩圖形修正；材料、底層與曝光後烘烤又會改變圖形反應 | imec 與 Intel 都把光罩、光阻及共同最佳化列為工作項目 | 固定光罩版次、材料批次、底層、烘烤氣氛與變更後重驗 | 一項材料進步不等於整個材料家族或供應商已通過資格 |
+| 5. 圖形轉移與電性 | 光阻上看得見的線，經顯影、蝕刻或金屬化後仍可能斷掉或黏在一起 | imec 已把 20nm pitch 金屬化測試結構接到斷路／橋接電性量測，也展示功能性研究元件 | 完整產品圖形族、跨批次電性、最終良率與產品壽命 | 兩類測試結構或一個研究元件不等於客戶產品層 HVM |
+
+這五題也解釋了為什麼「材料需求變難」不等於「材料公司收入必然上升」。新配方可能減少劑量，
+也可能要求更薄膜層、不同烘烤、額外檢查或重做光罩；只有客戶用同一產品層把配方、缺陷、產出與
+成本完整簽核，才知道哪個角色得到多少可持續價值。
+
 ## 再用五把尺比較少做步驟是否真的省錢
 
 | 本文五把尺 | 較高數值孔徑方案 | 現行多步驟方案 | 下一個要量的結果 | 不能直接推成 |
@@ -457,6 +707,46 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 五個里程碑使用不同單位、期間與責任人。研究中心保留八台、六台、五十萬片、逾八成可用率
 與未來時程，卻不把它們相加或正規化成一個假精確的「完成率」。
 
+## 再用六級證據分清印得出來與產品能量產
+
+同一句「High-NA 成功」可能只指材料反應，也可能指完整產品。研究時要先問受測物是什麼，再問
+它通過哪一種判定。下面六級可以逐級累積，但上級不能由下級自動推得。
+
+| 本文六級圖形證據 | 這一級回答什麼 | 本輪可確認 | 還缺什麼 | 不能替代 |
+|---|---|---|---|---|
+| 1. 光學或材料單項結果 | 指定曝光、材料或烘烤條件能否改善解析度、劑量或局部均勻度 | ASML 說明光學架構；imec 公布特定材料與烘烤條件結果 | 不同圖形、晶圓區域、批次與設備重現 | 轉移後圖形、電性或產品良率 |
+| 2. 顯影後光阻圖形 | 光阻上是否真的留下指定線、孔與接縫 | imec 展示半場拼接與多種研究圖形 | 蝕刻或沉積後是否仍保有尺寸與低缺陷 | 實體電路可導通或不短路 |
+| 3. 蝕刻或金屬化測試結構 | 暫時圖形經後續加工後能否變成實體結構 | imec 公布 20nm pitch 金屬化結構 | 足夠面積、圖形族、跨晶圓與跨批次分布 | 完整產品功能與量產良率 |
+| 4. 電性測試載具 | 指定結構是否通過導通、短路等電性判定 | serpentine 與 fork-fork 結構報告超過九成電性良率 | 樣本分布、製程能力、更多失效模式與長期穩定 | 實際產品的所有電路與使用條件 |
+| 5. 功能性整合元件 | 多道製程組成的元件能否執行目標功能 | imec 公布功能性量子點量子位元網路 | 客戶產品類型、完整層級、可靠度、產出與長期良率 | 邏輯或記憶體客戶產品 HVM |
+| 6. 客戶產品層與高量產 | 具名產品層能否持續以可接受良率、產出與成本生產 | 本輪只有 product-wafer testing 與未來 insertion 目標 | 客戶、產品、層數、版本、視窗分布、量產日期及成本 | 供應商訂單、收入與毛利；這仍要再做財務雙向核對 |
+
+目前公開證據已從光阻圖形走到電性測試結構與功能性研究元件，這是實質進步；但第六級仍缺同一
+客戶產品層的完整分母。因此本文更新主命題的複核日期，卻不提高信心水位，也不把研究元件改寫成
+邏輯或記憶體量產。
+
+## 一份可重驗的製程視窗紀錄至少有十欄
+
+如果兩份新聞稿都說「良率提升」，卻使用不同光罩、光阻、烘烤或測試結構，兩個數字就不能直接
+相加。研究中心用下面十欄把結果鎖回受測版本；任何欄位變更，都要先決定哪些測項需要重跑。
+
+| 本文十欄製程視窗紀錄 | 至少要記什麼 | 為什麼不能省略 |
+|---|---|---|
+| 1. 受測物與版本 | 測試圖形、電性載具或產品、設計版次、晶圓與批次 | 不同受測物的良率分母不能混用 |
+| 2. 光罩、視場與拼接 | 光罩版次、半視場配置、接縫位置、對準與圖形修正版本 | 拼接成功可能只限特定方向、圖形與接縫位置 |
+| 3. 光阻與底層 | 材料類型、配方版本、批號、厚度、底層與塗佈條件 | 同名材料家族不代表同一實際配方與膜厚 |
+| 4. 曝光設定 | 劑量、焦距、照明條件、設備與校準版本 | 只報最佳點看不出可容許視窗與設備漂移 |
+| 5. 烘烤、顯影與環境 | 溫度、時間、氣氛、氧濃度、顯影條件與環境控制 | 材料反應可能因後段條件改變而無法重現 |
+| 6. 膜堆與表面地形 | 產品膜層、厚度、晶圓起伏與受測區域 | 平坦測試區的焦深結果不能代表產品全晶圓 |
+| 7. 圖形轉移與金屬化 | 蝕刻、沉積、清洗、金屬化 recipe 與設備版本 | 光阻圖形可能在後續加工中縮短、倒塌或橋接 |
+| 8. 量測與電性判定 | 被測量、工具、校準、取樣、斷路／橋接規則與決策門檻 | 平均尺寸、缺陷影像與電性良率回答不同問題 |
+| 9. 樣本、失效與良率分母 | 晶圓數、面積、結構數、失效分類、返工、報廢與不確定性 | 沒有分母就無法分辨穩定能力與少數最佳樣本 |
+| 10. 生產與變更沿革 | 可用率、每小時合格產出、停機、維護、成本、變更原因與重驗結果 | 技術成績只有接到穩定生產與版本沿革才可用於 HVM 判斷 |
+
+這份十欄紀錄不是要求公司公開機密配方，而是規定研究推論不能跨越哪些欄位。公開文件若只給一個
+劑量、線寬或良率，研究中心就只把它放在相應證據級別；缺少的欄位會轉成監測項，而不是用產業
+常識補成客戶 qualification、供應商份額或財務結果。
+
 ## 最後用六關分開設備進度、客戶量產與公司受惠
 
 | 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
@@ -487,6 +777,12 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 - [Imec EXE:5200 到達研發環境](https://www.imec-int.com/en/press/imec-receives-worlds-most-advanced-high-na-euv-system)（研發整合與 2026 年第四季資格目標）。
 - [ASML 2026 年第一季投資人電話會議](https://ourbrand.asml.com/asset/8e1f7393-33dd-4737-a436-cfe1b68cc577/2026_04_15-ASML-Transcript-investor-call-Q1-2026.pdf)（累計晶圓、可用率、產品晶圓與光阻進度）。
 - [Intel 高數值孔徑極紫外光資料](https://newsroom.intel.com/press-kit/intel-high-na-euv)（早期客戶安裝與校準基線）。
+- [ASML：High-NA 的五個重點](https://www.asml.com/en/company/stories/2024/5-things-high-na-euv)（0.55 數值孔徑、非等向光學、半視場與設備速度路線）。
+- [Imec：High-NA 圖形化生態系準備](https://www.imec-int.com/en/press/imec-demonstrates-readiness-high-na-euv-patterning-ecosystem)（半視場拼接、焦深、材料、劑量與隨機缺陷）。
+- [Imec：20nm pitch 金屬線電性測試](https://www.imec-int.com/en/press/imec-demonstrates-electrical-yield-20nm-pitch-metal-lines-obtained-high-na-euv-single)（金屬化測試結構、斷路／橋接與初步電性良率）。
+- [Imec：氧氣控制的曝光後烘烤研究](https://www.imec-int.com/en/press/imec-unlocks-lever-euv-dose-reduction-oxygen-injection-during-metal-oxide-resist-post)（特定研究條件的感光速度結果與未完成機制）。
+- [Imec：High-NA 製作的功能性量子點元件](https://www.imec-int.com/en/press/world-first-imec-presents-quantum-dot-qubit-device-using-high-na-euv-lithography)（整合研究裝置證據及產品量產邊界）。
+- [Intel Foundry：SPIE 2026 技術更新](https://community.intel.com/t5/Blogs/Intel-Foundry/Systems-Foundry-for-the-AI-Era/Delivering-Technologies-to-Power-the-AI-Era-Intel-Foundry-at/post/1737961/jump-to/first-unread-message)（客戶端半視場接縫、21nm pitch 與光阻／光罩共同最佳化）。
 
 本篇沒有拿 ASML、imec 與 Intel 的數字互相比較：一組是設備商平台、一組是研發機構資格，
 一組是早期客戶安裝事件，期間、單位與定義不同。也不使用設備出貨數推估台灣公司訂單、
@@ -521,5 +817,6 @@ evidence_boundary: 光阻 化學品 晶圓或耗材能力是搜尋路由，不�
 - Imec 在 2026 年第四季公開 EXE:5200 資格驗證結果、測試範圍與仍未達成項目。
 - ASML 確認量產準備條件是否如期達成，並提供能分開產品測試與持續生產的指標。
 - Intel 或其他客戶揭露實際節點、使用層數、產品晶圓、製程視窗、缺陷、良率與量產日期。
+- 同一產品層公開十欄製程視窗紀錄，能把半視場拼接、劑量／焦距、材料與烘烤、轉移後電性、產出及變更後重驗接在一起。
 - 若 2027–2028 客戶導入延後、只停在研發，或現行多重圖形化在成本與良率持續更有利，C5 必須下修。
 - 台灣設備與材料公司只有在客戶具名資格與公司產品、出貨及財務揭露相互吻合後，才從未驗證路由升級。

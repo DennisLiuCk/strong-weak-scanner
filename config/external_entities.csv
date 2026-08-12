@@ -12,9 +12,12 @@ company:amd,company,AMD,AMD,NASDAQ,US,Advanced Micro Devices,https://www.amd.com
 company:microsoft,company,Microsoft,MSFT,NASDAQ,US,微軟|Azure,https://www.microsoft.com/,雲端與軟體平台公司
 company:openai,company,OpenAI,,,US,,https://openai.com/,AI 研究與產品公司
 company:meta,company,Meta Platforms,META,NASDAQ,US,Meta,https://about.meta.com/,社群平台與 AI 基礎設施公司
+company:amazon,company,Amazon,AMZN,NASDAQ,US,亞馬遜|AWS,https://www.aboutamazon.com/,電商 雲端與 AI 基礎設施公司
+company:google,company,Google,GOOGL,NASDAQ,US,Alphabet|Google Cloud,https://about.google/,搜尋 雲端 AI 與大規模運算基礎設施公司
 company:anthropic,company,Anthropic,,,US,,https://www.anthropic.com/,AI 模型與產品公司
 organization:jedec,organization,JEDEC,,,US,,https://www.jedec.org/,半導體標準組織
 company:tsmc,company,TSMC,2330,TWSE,TW,台積電|Taiwan Semiconductor Manufacturing Company,https://www.tsmc.com/,晶圓代工與先進製程提供者；本專案為觀察層而非 universe 成員
+company:sony-semiconductor,company,Sony Semiconductor Solutions,,PRIVATE,JP,Sony Semiconductor|索尼半導體,https://www.sony-semicon.com/,影像感測器與三維晶片堆疊技術提供者
 company:intel,company,Intel,INTC,NASDAQ,US,英特爾|Intel Foundry,https://www.intel.com/,處理器與晶圓代工製程提供者
 company:oracle,company,Oracle,ORCL,NYSE,US,甲骨文|OCI,https://www.oracle.com/,雲端基礎設施與軟體公司
 company:marvell,company,Marvell Technology,MRVL,NASDAQ,US,Marvell,https://www.marvell.com/,資料基礎設施與客製運算半導體供應商
@@ -31,6 +34,8 @@ company:synopsys,company,Synopsys,SNPS,NASDAQ,US,新思科技,https://www.synops
 company:infineon,company,Infineon Technologies,IFX,XETRA,DE,英飛凌,https://www.infineon.com/,功率半導體與控制元件供應商
 company:onsemi,company,onsemi,ON,NASDAQ,US,安森美,https://www.onsemi.com/,功率半導體與感測元件供應商
 company:rohm,company,ROHM,6963,TSE,JP,羅姆,https://www.rohm.com/,功率半導體與電子元件供應商
+organization:echa,organization,European Chemicals Agency,,,EU,ECHA|歐洲化學品管理局,https://echa.europa.eu/,歐盟 REACH 化學品科學評估與程序支援機構
+organization:us-epa,organization,United States Environmental Protection Agency,,,US,US EPA|EPA|美國環保署,https://www.epa.gov/,美國聯邦環境與化學品主管機關
 company:absolics,company,Absolics,,,US,SKC Absolics,https://www.absolicsinc.com/,SKC 旗下半導體玻璃基板開發與製造公司
 company:lens-technology,company,Lens Technology,300433,SZSE,CN,藍思科技,https://www.hnlens.com/,精密玻璃加工與製造公司
 company:samsung-electro-mechanics,company,Samsung Electro-Mechanics,009150,KRX,KR,三星電機,https://samsungsem.com/,封裝基板與電子元件供應商
@@ -49,3 +54,14 @@ company:tdk,company,TDK Corporation,6762,TSE,JP,TDK,https://www.tdk.com/,被動�
 company:murata,company,Murata Manufacturing,6981,TSE,JP,Murata|村田製作所,https://www.murata.com/,陶瓷電容 矽電容 聚合物電容與電子元件供應商
 organization:dmtf,organization,DMTF,,,US,Distributed Management Task Force,https://www.dmtf.org/,制定 SPDM Redfish 等管理與安全標準的產業標準組織
 company:insyde,company,Insyde Software,6231,TPEx,TW,Insyde|Supervyse,https://www.insyde.com/,BIOS 與 BMC 韌體供應商 提供 OpenBMC 平台
+company:arm,company,Arm Holdings,ARM,NASDAQ,GB,Arm,https://www.arm.com/,處理器 IP Chiplet System Architecture 與運算生態系供應商
+organization:ipc,organization,IPC,,,US,Global Electronics Association|electronics.org,https://www.electronics.org/,電子製造與印刷電路板標準 測試方法及產品資格組織
+organization:oif,organization,OIF,,,US,Optical Internetworking Forum,https://www.oiforum.com/,光學與高速電氣互連 Implementation Agreement 及互通展示組織
+organization:ieee-8023,organization,IEEE 802.3,,,US,IEEE Ethernet Working Group,https://www.ieee802.org/3/,Ethernet 標準 task force ballot 與 channel tools 維護社群
+organization:ethernet-alliance,organization,Ethernet Alliance,,,US,Ethernet Alliance,https://ethernetalliance.org/,Ethernet 生態系 plugfest 測試與產業教育組織
+company:panasonic-industry,company,Panasonic Industry,6752,TSE,JP,Panasonic Electronic Materials,https://industry.panasonic.com/,電路板材料與電子元件供應商
+company:amkor,company,Amkor Technology,AMKR,NASDAQ,US,Amkor,https://amkor.com/,委外半導體封裝與測試供應商及 Arizona 先進封裝園區開發者
+company:advantest,company,Advantest,6857,TSE,JP,愛德萬測試,https://www.advantest.com/,半導體自動測試設備與系統級測試平台供應商
+company:teradyne,company,Teradyne,TER,NASDAQ,US,泰瑞達,https://www.teradyne.com/,半導體自動測試設備與測試單元平台供應商
+company:tenstorrent,company,Tenstorrent,,,US,,https://tenstorrent.com/,AI 運算處理器 晶片與系統供應商
+company:coreweave,company,CoreWeave,CRWV,NASDAQ,US,,https://www.coreweave.com/,AI 雲端與機架級基礎設施營運商

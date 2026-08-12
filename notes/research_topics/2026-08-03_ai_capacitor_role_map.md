@@ -7,7 +7,7 @@ status: triaged
 priority: p1
 captured_at: 2026-08-03
 source_published_at: 2026-03-01
-last_reviewed_at: 2026-08-03
+last_reviewed_at: 2026-08-12
 review_due: 2026-09-01
 source_type: mixed
 publisher: Open Compute Project
@@ -64,6 +64,14 @@ reason: editorial_plain_language_wave82_capacitor_positions_no_conclusion_change
 evidence: editorial:plain_language_wave82_capacitor_positions
 -->
 
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_effective_capacitance_impedance_ripple_heating_and_lifetime_envelope
+evidence: sources:S9,S10,S11
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -76,13 +84,21 @@ evidence: editorial:plain_language_wave82_capacitor_positions
 - **ESR／ESL**：電容不是理想元件；等效串聯電阻與電感會限制它在不同頻率處理紋波或瞬態的能力。
 - **MLCC（積層陶瓷電容）**：把多層陶瓷介質與電極疊合的小型電容，常用於去耦與濾波；不同尺寸、介質與耐壓不可視為同一產品。
 - **EDLC（電雙層電容）**：以電雙層儲能的超級電容，適合高功率充放電；它和晶片旁 MLCC 的位置與時間尺度不同。
+- **ESE**：KEMET／YAGEO 的一個 +105°C 徑向鋁電解電容系列；本文引用它的操作指南說明判讀方法，不把該系列公式套用到其他電容。
 - **電容量**：電容儲存電荷能力的指標；容量相近，不代表耐壓、反應速度、壽命與適用位置也相同。
+- **標稱容量**：料號或資料表在指定量測條件下標出的容量；它是選型起點，不一定等於實際工作時可用的容量。
+- **有效容量**：把實際直流電壓、交流訊號、頻率與溫度帶入後，元件在工作點真正呈現的容量。
+- **直流偏壓**：電容兩端持續存在的直流工作電壓；部分高介電常數積層陶瓷電容的有效容量會隨它改變。
 - **紋波**：電源轉換後仍殘留的週期性電壓或電流起伏；高壓供電路徑的電容會協助平滑這些起伏。
+- **紋波電流**：反覆流入、流出電容的交流電流成分；它流過等效串聯電阻時會產生損耗與熱。
+- **自發熱**：元件因內部損耗而升溫；電容的紋波電流、等效串聯電阻、散熱路徑與環境溫度會共同影響它。
 - **去耦**：把電容放在用電元件附近，短暫補上電流並降低電源雜訊，避免快速變化影響其他電路。
 - **頻帶**：元件能有效處理的一段變化速度或頻率範圍；不同頻帶通常需要不同位置與電容特性。
 - **瞬態**：負載、電壓或電流在很短時間內突然改變的事件。
 - **阻抗**：電路在特定頻率下阻礙電流變化的程度；供電路徑要在目標頻帶維持足夠低的阻抗。
+- **自共振頻率（SRF）**：電容的容性與寄生電感效應互相抵銷附近的頻率；超過後，阻抗可能重新上升，元件不再像理想電容。
 - **寄生電感**：導線、接點、電路板與封裝自然帶來的額外電感；距離越遠，越可能削弱高頻去耦效果。
+- **任務剖面（mission profile）**：元件在預定使用期間會遭遇的電壓、電流、溫度、頻率、冷卻與運轉時間組合。
 - **電路板大容量電容（board bulk）**：放在電路板供電入口或轉換器附近，處理比晶片旁去耦更慢的電流變化。
 - **封裝／晶片旁（package／near-die）**：非常靠近晶片的供電位置，用來縮短高頻電流路徑並降低寄生影響。
 - **參考設計（reference design）**：供應商公開的可行電路與元件組合，用來示範一種做法；不等於客戶已採用或量產。
@@ -92,7 +108,7 @@ evidence: editorial:plain_language_wave82_capacitor_positions
 ### 三句話抓重點
 
 - AI 機櫃裡的電容至少出現在四個不同位置：機櫃旁的電容儲能模組、高壓直流匯流排、電路板，以及封裝或晶片旁；位置不同，處理的電力變化也不同。
-- OCP 與 TI 顯示機櫃級電容儲能角色，TDK 與 Murata 的產品圖再分出高壓、板級與晶片旁電容；這些是公開架構與供應商角色圖，不是全產業共同用量表。
+- 分完位置後還要再過四道檢查：工作電壓下的有效容量、目標頻帶的阻抗、紋波造成的溫升，以及整段任務剖面下的壽命；同樣的標稱容量不代表可互換。
 - 因此，現有證據只能用來分清電容放在哪裡、負責什麼，還不能證明台灣被動元件或電源供應公司已進入量產材料清單、取得訂單或形成可辨識獲利。
 
 ### 為什麼重要
@@ -101,17 +117,21 @@ evidence: editorial:plain_language_wave82_capacitor_positions
 
 **再看它處理哪一種電力變化。** 機櫃級模組緩衝快速功率波動，高壓位置要兼顧耐壓、紋波與壽命，電路板大容量電容處理較慢變化，晶片旁去耦則處理高頻變化。容量或材料名稱相近，不代表任務相同。
 
+**同一位置也要帶入實際工作條件。** 高介電常數積層陶瓷電容的有效容量可能受直流偏壓影響；電解電容的阻抗、可承受紋波與壽命又會隨頻率、溫度及散熱條件改變。資料表上的容量值不能單獨回答能否替換。
+
 **最後才談公司與價值。** 先確認產品位置、規格與客戶資格驗證，才能判斷規格升級是增加顆數、提高單價、減少其他元件，還是把價值移到另一種電容。
 
 ### 接下來怎麼追
 
 - 追 OCP 或平台文件是否公布同一量產機櫃中，電容儲能模組、高壓直流匯流排、電路板與晶片旁供電路徑的介面、額定條件及客戶資格驗證。
 - 追元件供應商是否從產品角色圖推進到具名料號、客戶測試、量產出貨，以及可以重建的替代與用量資料。
+- 追同一具名料號在實際直流電壓、溫度與頻率下的有效容量、阻抗曲線、紋波溫升及壽命計算，避免只比較標稱容量。
 - 追台灣被動元件與電源供應公司的法說、季報及重大訊息，確認客戶與供應商是否能雙向對齊產品位置、規格、量產節點、收入與毛利。
 
 ### 想一想
 
 - 兩顆電容的容量即使相近，一顆放在高壓供電路徑、另一顆放在晶片旁，為什麼不能直接互換？
+- 即使兩顆電容位在同一位置、都標示相同容量，直流偏壓、阻抗曲線與散熱條件不同時，哪一顆才真正能完成任務？
 - 如果某一段供電路徑用了效能更高、但數量更少的元件，只看「規格升級」會不會高估整體價值？
 - 供應商的產品角色圖和客戶實際量產材料清單之間，還缺哪些資格驗證、份額與財務證據？
 
@@ -248,6 +268,54 @@ limitation: 索引頁本身不證明任何公司具有 AI capacitor BOM、qualif
 independence_group: twse-mops
 -->
 
+<!-- research_source
+source_id: S9
+role: company_release
+source_kind: document
+publisher: TDK Corporation
+title: Challenges in Next Generation Power Semiconductors and Application of MLCCs
+published_at: 2026-07-09
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://product.tdk.com/en/techlibrary/applicationnote/snubber_mlcc.html
+locator: Selection Criteria for Snubber Capacitors，Figures 5–8；Class 2 MLCC 要看實際工作電壓下的 effective capacitance，紋波電流經 ESR 產生 W=ESR×I² 自發熱，且應以接近實際的電壓波形核對溫升與壽命
+limitation: 這是 TDK 對高 dV/dt snubber 應用與自身 MLCC 測試的技術文件；20°C 溫升建議、波形結果與材料差異不能外推成所有 AI PDN、所有電容技術或共同客戶 qualification
+independence_group: tdk
+-->
+
+<!-- research_source
+source_id: S10
+role: company_release
+source_kind: document
+publisher: Murata Manufacturing
+title: The voltage characteristics of electrostatic capacitance
+published_at: 2012-11-28
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://article.murata.com/en-eu/article/voltage-characteristics-of-electrostatic-capacitance
+locator: DC bias characteristic，Figures 1–2；高介電常數 MLCC 施加直流電壓後 effective capacitance 會改變，選型時不能只接受 catalog capacitance，須在實際電壓條件下核對
+limitation: 文中百分比是指定 6.3V、100µF、1.8V 與介質的示例，不是所有 MLCC 或其他電容類型的共同降額；文章也沒有 AI 平台、量產 BOM 或客戶資格資料
+independence_group: murata
+-->
+
+<!-- research_source
+source_id: S11
+role: company_release
+source_kind: document
+publisher: KEMET / YAGEO Group
+title: Radial Aluminum Electrolytic Capacitors ESE +105°C — Application & Operation Guidelines
+published_at: 2026-06-30
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://content.kemet.com/datasheets/KEM_A4055_ESE.pdf
+locator: PDF pp.12–16；effective capacitance、ESR、ESL 與 impedance 的頻率／溫度關係，最大 ripple current 的環境溫度、散熱面積、ESR 與頻率條件，以及 operating temperature 對 expected life 的系列公式
+limitation: 這是 ESE +105°C 徑向鋁電解系列的應用指南；等效電路、圖線與壽命公式不可直接套到 MLCC、polymer、film、EDLC 或未指定的 AI 系統任務剖面
+independence_group: yageo-kemet
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -304,7 +372,7 @@ claim_id: C4
 label: inference
 status: active
 claim: AI 電容需求應先按系統位置、工作電壓、主要頻帶與任務分層，再談材料、數量與供應商；CBU、高壓 bus／DC link、板級 bulk 與 package／near-die decoupling 可同時存在，但不能合併成單一「電容受惠」需求或預設彼此可替代
-supporting_source_ids: S1,S2,S3,S4
+supporting_source_ids: S1,S2,S3,S4,S9,S10,S11
 contrary_source_ids:
 as_of: 2026-08-03
 basis: S1／S2 建立 rack CBU，S3 建立高低壓位置地圖，S4 建立頻帶、瞬態與 placement 分工；四條獨立來源鏈共同支持先分層再映射的研究框架
@@ -333,6 +401,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C6
+label: verified
+status: active
+claim: Murata 表示高介電常數 MLCC 施加直流電壓後有效容量會改變，選型不能只接受 catalog capacitance；TDK 亦要求 Class 2 MLCC 以實際工作電壓下的 effective capacitance 判斷
+supporting_source_ids: S9,S10
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S10 的 DC bias characteristic 與 S9 的 Selection Point 2 都直接要求把實際直流工作電壓帶入容量判斷
+boundary: 不同介質、尺寸、額定電壓、容量、溫度與工作點的曲線不同；本文不發布共同降額百分比，也不把 MLCC 特性套到所有電容技術
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C7
+label: verified
+status: active
+claim: KEMET／YAGEO 的 ESE 應用指南把有效容量、ESR、ESL 與總阻抗分開，並明示阻抗不是常數，而會隨頻率與溫度改變；超過共振區後，繞組與端子的感抗會使阻抗上升
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S11 pp.12–14 的等效電路、impedance-frequency 圖與逐段解釋直接支持 ESE 系列的頻率／溫度依賴
+boundary: 只證實該鋁電解系列的一般應用指南；不固定其他電容的共振點、目標頻帶、電路穩定性或跨材料替代關係
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: TDK 把 MLCC 自發熱寫成 ESR×I² 並要求以實際波形與溫度條件評估；KEMET／YAGEO 的 ESE 指南則把可承受紋波電流連到環境溫度、散熱面積、ESR、頻率與熱應力下的預期壽命
+supporting_source_ids: S9,S11
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 的 Selection Points 3–4／高 dV/dt evaluation 與 S11 pp.15–16 的 ripple-current、thermal-stress 及 expected-life 段落直接支持各自元件範圍內的熱與壽命條件
+boundary: TDK 的 20°C 建議與 KEMET ESE 的壽命公式屬不同技術及測試範圍，不能合併成全產業共同 pass line，也不能替代客戶任務剖面與可靠度試驗
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: inference
+status: active
+claim: 兩顆電容即使標稱容量相同，也應依序核對實際偏壓與溫度下的有效容量、目標頻帶阻抗、紋波造成的溫升，以及任務剖面下的壽命；四道條件未對齊前不能視為可替換或直接比較價值
+supporting_source_ids: S9,S10,S11
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9／S10 建立 effective capacitance 與實際波形條件，S11 建立 frequency-dependent impedance、ripple thermal stress 與系列壽命條件；研究端把它們整理成同一選型次序
+boundary: 四道檢查是研究與選型框架，不是跨材料的通用計分、唯一設計流程或 qualification；不支持料號、顆數、供應商、份額、價格、訂單、收入或獲利
+verification_needed: 同一 production platform 的 part-specific curves、完整 ripple spectrum、熱邊界、mission profile、qualification pass／fail、BOM 與 field reliability
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 四個位置、四種任務：先找電容放在哪裡
 
 | 電容位置 | 它主要處理什麼 | 目前一手證據 | 還不能因此判定 |
@@ -347,6 +483,25 @@ resolution:
 元件，還是只把價值移到另一種電容。跳過這一步，就容易把機櫃儲能、高壓匯流排、電路板與
 晶片旁的電容重複加總。
 
+## 同樣的容量，為什麼仍不能互換：四道可用能力檢查
+
+| 本文 4 把尺 | 先回答什麼 | 讀資料表時核對什麼 | 還不能因此判定 |
+|---|---|---|---|
+| 1. 有效容量 | 在實際直流電壓與溫度下，還剩多少容量？ | 具名料號的直流偏壓、交流電壓與溫度曲線；不能只抄標稱容量 | 所有積層陶瓷電容採同一降額，或其他材料也照同一曲線 |
+| 2. 頻率阻抗 | 在真正要處理的紋波或瞬態頻帶，阻抗是否夠低？ | 阻抗、等效串聯電阻、等效串聯電感與自共振頻率隨頻率及溫度的曲線 | 容量相同就有相同濾波效果，或低阻抗在所有控制迴路都更好 |
+| 3. 紋波溫升 | 實際交流電流流過元件後，會升溫多少？ | 紋波電流頻譜、等效串聯電阻、環境溫度、散熱面積、板子與冷卻條件 | 額定紋波值可脫離頻率與溫度直接跨料號比較 |
+| 4. 任務壽命 | 在預定電壓、溫度、運轉時間與冷卻條件下，能撐多久？ | 產品適用的壽命曲線或模型、熱點溫度、額定電壓與電流、加速試驗及失效判準 | 供應商計算值等於客戶保固、現場可靠度或所有電容技術的共同壽命 |
+
+同樣的 µF 只是一個起點。這張表只把選型縮成四個需要同時通過的工作條件；它不能替任何平台指定材料、料號、顆數或供應商。
+
+**第一道先把標稱容量換成有效容量。** Murata 與 TDK 都提醒，高介電常數積層陶瓷電容施加直流電壓後，工作中的容量可能不同於資料表標稱值。要用具名料號在實際電壓與溫度下的曲線，不能拿單一示例百分比套遍所有產品。
+
+**第二道看目標頻帶的阻抗。** KEMET／YAGEO 的鋁電解指南把容量、等效串聯電阻與等效串聯電感拆開；頻率升高到共振區之後，元件可能由容性轉為感性。這解釋了為什麼相同容量不等於相同的瞬態或濾波能力。
+
+**第三道把紋波換成溫升。** 交流電流流過等效串聯電阻會產生損耗，但實際溫升還取決於電流頻譜、環境溫度、散熱面積、板子與冷卻。只比較額定紋波安培數，仍可能把不同測試條件混在一起。
+
+**第四道才核對任務壽命。** KEMET／YAGEO 的 ESE 公式只適用指定鋁電解系列，TDK 的溫升建議也只屬其高壓積層陶瓷電容情境。平台要用自己的任務剖面、加速試驗與失效判準完成資格驗證，不能把供應商示例直接當成現場壽命。
+
 ## 怎麼用這張表判讀公司新聞
 
 1. **先找客戶的量產架構**：供應商參考設計只能證明做得到；客戶平台文件才可能固定元件位置與接口。
@@ -356,8 +511,8 @@ resolution:
 
 ## 研究判定
 
-- **目前可保留的結論**：機櫃儲能、高壓直流匯流排、電路板大容量電容，以及封裝或晶片旁去耦，是四個不同查核位置；四條一手來源鏈足以建立角色邊界。
-- **可信度為中而不是高**：OCP 與 TI 支持機櫃架構，TDK 與 Murata 支持供應商產品角色；目前仍缺同一量產平台的完整供電路徑、共同測試與材料清單。
+- **目前可保留的結論**：先分機櫃儲能、高壓直流匯流排、電路板與封裝／晶片旁四個位置，再核對有效容量、頻率阻抗、紋波溫升與任務壽命，才能討論元件是否可替換。
+- **可信度為中而不是高**：OCP 與 TI 支持機櫃架構，TDK、Murata 與 KEMET／YAGEO 支持供應商技術邊界；目前仍缺同一量產平台的完整供電路徑、共同測試與材料清單。
 - **目前不能發布的結論**：所有電容同步增加、指定材料或台灣公司勝出、顆數、平均售價、市占、訂單、獲利，以及市場是否已反映。
 - **需要看到什麼才能前進**：買方量產文件與供應商申報雙向對齊具名產品、客戶資格驗證、實際配置、出貨及財務分母。
 
@@ -367,6 +522,9 @@ resolution:
 - [Texas Instruments：800 VDC architecture 與 EDLC CBU](https://www.ti.com/about-ti/newsroom/news-releases/2026/2026-03-16-ti-unveils-complete-800-vdc-power-architecture-for-future-generation-ai-data-centers-with-nvidia.html)
 - [TDK：FY March 2026 Full Year Performance Briefing](https://www.tdk.com/system/files/2026_4q01_0mqf56xw_en.pdf)
 - [Murata：AI System with Advanced Packaging Webinar Q&A](https://www.murata.com/-/media/webrenewal/campaign/events/asean/2026/apr26_ai-system-with-advance-packaging/qna.ashx?cvid=20260425083237000000&la=en-sg)
+- [TDK：高 dV/dt 電路的 MLCC 選型與實際波形評估](https://product.tdk.com/en/techlibrary/applicationnote/snubber_mlcc.html)
+- [Murata：電容量的直流與交流電壓特性](https://article.murata.com/en-eu/article/voltage-characteristics-of-electrostatic-capacitance)
+- [KEMET／YAGEO：ESE 鋁電解電容應用與操作指南](https://content.kemet.com/datasheets/KEM_A4055_ESE.pdf)
 - [OCP Open Rack 規格索引](https://www.opencompute.org/wiki/Open_Rack/SpecsAndDesigns)
 - [TDK IR events](https://www.tdk.com/en/ir/ir_events/index.html)
 - [Murata news](https://www.murata.com/news)
@@ -422,6 +580,19 @@ frequency: quarterly
 next_check: 2026-09-30
 trigger: 公司申報與客戶文件同時指向具名產品、系統位置、qualification、量產出貨、收入及毛利
 invalidation: 公司明確否認相關產品或應用，或產品長期停在樣品／機會地圖而沒有 qualification 與 production evidence
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C6,C7,C8,C9
+metric: 具名料號在實際偏壓、溫度、頻率與紋波下的有效容量、阻抗、溫升、壽命及 qualification 結果
+source_ids: S9,S10,S11
+watch_source_ids: S6,S7
+frequency: monthly
+next_check: 2026-09-01
+trigger: 平台與元件供應商公布同一料號、工作點、完整頻譜、熱邊界、任務剖面及客戶 pass／fail，可逐步重建四道可用能力檢查
+invalidation: 量產平台證明本文四道檢查遺漏決定性條件，或實際 qualification 顯示標稱容量已足以在所有相關位置可靠判定互換
 -->
 
 ## 什麼會推翻這篇

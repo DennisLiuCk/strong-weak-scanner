@@ -67,6 +67,20 @@ to: triaged
 reason: editorial_plain_language_wave87_capacity_maturity_evidence_ladder_no_conclusion_change
 evidence: editorial:plain_language_wave87_capacity_maturity_evidence_ladder
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: older_ocp_document_added_as_operating_envelope_and_reliability_decoder_no_thesis_clock_refresh
+evidence: sources:S9
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_three_performance_scorecards_and_typed_telemetry_context_no_thesis_change
+evidence: sources:S9,S10
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -78,6 +92,21 @@ evidence: editorial:plain_language_wave87_capacity_maturity_evidence_ladder
 - **MW／kW**：兆瓦／千瓦，都是功率單位；`1MW = 1000kW`。換成同一單位後只能比較數值大小，不能順便比較產品成熟度。
 - **Cooling Capacity @ 4°C ATD**：NVIDIA 清單以這個欄名標示 CDU 的額定排熱能力。MW／kW 是絕對容量，不是效率或產品優劣；同欄數字可在單位換算後比較，但頁面沒有公布完整跨廠測試協定，實際水溫、流量、壓差與備援仍會改變可用能力。
 - **ATD（Approach Temperature Difference）**：熱交換兩側在指定位置的溫差條件。本文只沿用 NVIDIA 欄名中的 `4°C ATD`，不自行補上頁面未公布的完整測試程序。
+- **L-L CDU（Liquid-to-Liquid CDU）**：兩側都以液體循環換熱的 CDU；一側接機房設施水路，另一側接伺服器冷卻水路。這個名稱說明架構，不代表已通過哪一套驗證。
+- **FWS／TCS**：FWS 是設施水系統，負責把熱送往機房冷源；TCS 是技術冷卻系統，負責把熱從伺服器帶回 CDU。兩側各自的溫度、流量與壓力都會限制實際工作點。
+- **操作包絡線（Operating envelope）**：設備可安全、穩定運作的一組條件範圍，例如冷卻液種類、進水溫度、流量、壓力與負載。單一 kW 額定值只是這個範圍中的一個截面。
+- **熱性能曲線（Thermal performance curve）**：在指定流體、FWS／TCS 流量與進水溫度下，把 ATD 和可帶走熱負載畫成曲線。它回答「這組熱條件可支撐多少 kW」，不是供應商總分。
+- **PQ 曲線（Pressure–flow curve，壓力－流量曲線）**：把流量與壓力或壓差畫在同一張圖。CDU 的 TCS 側用它看泵浦能否克服二次水路阻力；FWS 側用它看設備會對機房一次水路形成多少阻力。
+- **TCS 壓頭（TCS pressure head）**：CDU 二次側泵浦在指定流量下能提供的壓力能力。壓頭要大到克服管路、接頭、分流器與冷板的壓降，但數字較大不自動代表效率、可靠度或產品較好。
+- **FWS 流動阻抗（FWS flow impedance）**：設施水流過 CDU 一次側時遇到的阻力。機房必須能供應所需溫度、流量與壓力；若設備需求超過現場水力能力，名牌容量就不一定能落地。
+- **量測身分證（Typed measurement context）**：讓一筆讀值帶著「哪台設備、哪一側／哪個位置、量的是什麼、使用什麼單位」的上下文。只看數字而沒有這些欄位，可能把一次側入口和二次側回水混在一起。
+- **時間戳與品質旗標（Timestamp／quality）**：時間戳說明讀值何時產生；品質旗標說明系統當下是否把讀值視為健康可用。`quality=1` 不是儀表已完成校正或產品通過資格驗證，只是資料契約中的讀值健康狀態。
+- **感測值／設定值／動作請求**：感測值描述設備實際量到什麼；設定值是控制目標；動作請求則要求 BMS 執行某個控制。NVIDIA 文件要求外部請求先經安全限制判斷，不能把「收到命令」當成「設備已安全執行」。
+- **DSX Exchange**：NVIDIA 用來讓建築管理系統與 IT 軟體交換設施資料、狀態與控制請求的資料契約。它規定訊息怎麼被辨識與傳遞，不取代 BMS、感測器校正、CDU 性能測試或場域驗收。
+- **processArea（量測位置上下文）**：DSX metadata 用來區分同一設備內不同位置或功能的欄位；例如同一台 CDU 的一次側入口、一次側出口、二次側供水與二次側回水。它是位置標籤，不是量測結果。
+- **資格驗證包（Qualification evidence packet）**：把測試對象、版本、條件、原始資料、通過／失敗結果與限制一起保存的證據集合。只有測試名稱而沒有這些內容，不能重現結果。
+- **水壓與環境可靠度測試**：水壓測試檢查承壓時是否洩漏或變形；運輸衝擊、振動、溫濕度與熱循環則檢查搬運及環境變化下的耐受性。通過其中一項不等於完整系統已通過所有驗證。
+- **Revision（修訂版）**：文件更新後的版本名稱。本文引用 Revision 1.0，只代表這份 OCP 方法文件的版本，不等於產品認證等級。
 - **流量**：冷卻液在一定時間內通過管路的體積；常見單位是每分鐘公升。流量會影響帶熱能力，但不能單獨代表整套系統效能。
 - **壓差**：冷卻液流過管路與元件前後的壓力差。壓差過大可能提高泵浦負擔，因此容量相同的設備仍可能有不同整合條件。
 - **備援**：主要泵浦、電源或控制元件失效時，由另一組元件接手。額定容量沒有說明設備在故障情境下還能維持多少能力。
@@ -108,12 +137,17 @@ evidence: editorial:plain_language_wave87_capacity_maturity_evidence_ladder
 ### 三句話抓重點
 
 - 2026 年 8 月 2 日保存的 NVIDIA 清單，在同一欄列出三個供應商型號的容量：1.2MW、1MW 與 380kW。把單位都換成 kW 後，這三個數字可以比較。
-- 容量只回答設備在指定條件下設計可帶走多少熱；平台列名與供應標籤只能說明部分資格與準備進度，兩者都不等於客戶已部署。
+- 容量只回答設備在指定條件下設計可帶走多少熱；還要把熱性能曲線、TCS 壓頭、FWS 阻抗，以及每筆讀值的設備、位置、單位、時間與品質接起來，才知道這個數字落在什麼操作包絡線。平台列名與供應標籤也都不等於客戶已部署。
 - 要判斷誰更接近收入，還要看到客戶驗收、量產數量與公司財務揭露。目前這些證據都缺，因此不能用容量大小替公司排行。
 
 ### 為什麼重要
 
-液冷題材最容易把不同關卡混成一張排行榜。讀這篇時先拆成五問：設備能帶走多少熱？是否已被平台列出或完成部分測試？供應準備到哪一步？客戶是否真的部署並驗收？公司是否已把交易認列為收入？容量只能回答第一問，平台欄位只回答中間兩問的一部分；最後兩問仍要靠客戶與公司資料。把五關分開，才不會看到 1MW 就推論某家公司一定比 380kW 的供應商更成熟或賺得更多。
+液冷題材最容易把不同關卡混成一張排行榜。讀這篇時先拆成五問：額定值是在什麼冷卻液、
+溫度、流量與壓力下量到？產品與整機通過哪些可靠度測試？供應準備到哪一步？客戶是否真的
+部署並驗收？公司是否已把交易認列為收入？
+
+容量只回答第一問的一個截面，平台欄位只回答中間幾問的一部分；最後兩問仍要靠客戶與公司
+資料。把五關分開，才不會看到 1MW 就推論某家公司一定比 380kW 的供應商更成熟或賺得更多。
 
 ### 接下來怎麼追
 
@@ -257,6 +291,38 @@ url: https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/?categor
 locator: 2026-08-09 捕捉的 Liquid to Liquid CDU 表；LGE／LGE 列為 600kW、850LPM，validation type 列出 Hydraulic Test-Constant DP／Constant Flow、Flow Sensor Accuracy、Cold Start、Thermal Test-Low Load／Nominal Capacity、Pump Failover、Pumping Capacity，Supply Chain Status 欄空白；AVC、Delta、LITEON 三列容量與狀態同 2026-08-02 capture
 limitation: 動態頁沒有不可變版本與變更日誌；本 source 只支持 2026-08-09 當下可定位欄位，不把空白供應狀態解釋為 Sample Ready、MP Ready、撤銷或量產，也不提供客戶、訂單、出貨、收入、毛利或完整跨廠測試協定
 independence_group: nvidia-marketplace
+-->
+
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Liquid to Liquid CDU Test Methodology and Performance Rating, Revision 1.0
+published_at: 2024-11-01
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.opencompute.org/documents/ocp-wp-l-lcdu-test-methodology-performance-rating-r1-pdf
+locator: PDF pp. 15–19 的 ingredient-level／system-level qualification、性能參數與建議 rating；pp. 20–22 的材料相容性、水壓、衝擊／振動、熱循環及法規文件要求
+limitation: 這是 OCP 提出的通用測試與性能溝通方法，不是所有平台或客戶強制採用的共同認證；封面標示 August 2024，版本表另記錄 2024-11-01 initial release，本文保留版本表日期並揭露差異。文件不證明 NVIDIA 清單中的任何型號依這套方法通過，也不提供客戶、訂單、出貨、收入、市占或毛利
+independence_group: opencompute-cdu
+-->
+
+<!-- research_source
+source_id: S10
+role: company_release
+source_kind: living_index
+publisher: NVIDIA
+title: DSX Exchange BMS Integration Companion Guide
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://docs.nvidia.com/dsx-exchange/bms-integration
+locator: 2026-08-12 Object Types and Point Types、processArea、Metadata／Value Publication、Integration-Published Points 與 FAQ；CDU 可發布 LiquidTemperature、LiquidDifferentialPressure、LiquidFlow、LiquidPressure 等點位，primary／secondary 位置以 processArea 區分，value 帶 timestamp 與 quality，外部 setpoint／action request 由 BMS 套用 guardrails
+limitation: 動態技術頁定義資料與控制交換契約，不要求每個場域發布所有點位，也不證明感測器校正精度、熱平衡、具名 CDU 的性能曲線、site commissioning、field reliability、客戶驗收或財務貢獻
+independence_group: nvidia-dsx-docs
 -->
 
 <!-- research_claim
@@ -406,6 +472,91 @@ as_of: 2026-08-09
 basis: S2 是 LG 對 600kW CDU validation 的公司公告，S8 是不同發行人的 NVIDIA 平台 capture；兩條來源鏈共同支持產品與平台列名，S8 的供應狀態欄仍為空白
 boundary: 兩條來源鏈降低單一公司自述風險，但不等於獨立客戶驗收；不推算 supply stage、訂單、出貨量、市占、收入、毛利或現金流
 verification_needed: 持續保存 NVIDIA 欄位變化，並以具名客戶部署與 LG 財務揭露驗證量產及經濟結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: OCP 的 L-L CDU 方法把性能測試分為元件層與完整系統層，建議以冷卻液、FWS 溫度與流量、TCS／FWS 壓力及 ATD 一起報告容量；可靠度章節另列材料相容性、水壓、衝擊／振動、熱循環與法規文件
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2024-11-01
+basis: S9 PDF pp. 15–19 直接列出 qualification 層級與建議性能參數，pp. 20–22 分列材料、水壓、運輸／環境及 regulatory 文件類別
+boundary: 只證實 OCP Revision 1.0 的建議方法與欄位，不宣稱它是所有客戶的共同強制標準，也不證明 NVIDIA 列名型號依此方法通過、產品彼此優劣、客戶採購或財務貢獻
+verification_needed: 後續若平台或供應商公開具名型號的固定版本、測試條件、原始資料與 pass／fail，才能把通用方法連到特定產品結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: inference
+status: active
+claim: CDU 的 kW 額定值是固定熱與水力條件下的容量主張，不是整體資格分數；跨廠判讀至少還要分開看操作包絡線、元件與整機可靠度、平台列名與供應狀態、場域驗收及公司財務證據
+supporting_source_ids: S8,S9
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 顯示容量必須連同冷卻液、溫度、流量、壓力與 ATD 閱讀，並把可靠度另列成多組測試；S8 又把容量、validation type 與 Supply Chain Status 分成不同欄位，因此不能把單一 kW 欄擴寫成總分
+boundary: 這是研究中心用來避免跨層誤讀的判讀框架，不替各平台定義一致門檻，也不建立供應商排名、客戶、訂單、收入、市占、毛利或市場是否反映的結論
+verification_needed: 需平台或客戶公布可重現的共同測試條件與具名型號結果，並由部署、採購與同期間公司財務資料分別驗證商業階段
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: OCP 的 L-L CDU 方法把性能報告分成熱性能、TCS 壓頭與 FWS 流動阻抗三張圖；其建議 rating 另把流體類型、FWS 溫度或水溫等級、流量、TCS／FWS 壓力條件與 ATD 綁在同一個 X kW 主張
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2024-11-01
+basis: S9 PDF pp.16–20 分別定義 ATD 對熱負載曲線、TCS pressure-head 對 flow 曲線、FWS impedance 對 flow 曲線，並列出 fluid、FWS temperature、flowrate、dP 與 ATD 的 performance-reporting 建議
+boundary: 只證實 OCP Revision 1.0 的建議報告格式與示例條件；不把示例數值當成所有客戶的強制門檻，也不證明 NVIDIA Marketplace 任一型號已依這三張圖測試、通過或可在具名場域達標
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: NVIDIA DSX Exchange 的 BMS 契約為 CDU 支援液體溫度、流量、壓力與壓差等點位，以同一設備 ID 配合 processArea 區分一次側與二次側位置，並要求 value 帶 timestamp 與 quality；外部設定值或動作請求仍由 BMS 依安全 guardrails 決定是否執行
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S10 的 Object Types and Point Types、processArea、Value Publication 與 Integration-Published Points 直接列出 CDU 點位、位置上下文、timestamp／quality payload 及 BMS guardrail 權責
+boundary: 資料契約支持的是欄位語意與交換責任，不表示所有點位都已安裝、讀值已校正、quality 等於量測不確定度合格、控制已 commissioned，或具名產品已完成平台／客戶驗收
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 一個可核對的 CDU 容量主張至少要同時保留熱性能、TCS 壓頭、FWS 阻抗三張性能圖，以及能辨識設備、迴路位置、單位、時間與讀值品質的量測上下文；名牌 kW、單一即時數字或資料流存在都不能替代完整 qualification 與 site acceptance
+supporting_source_ids: S9,S10
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 把同一 X kW 拆成熱與兩側水力條件，S10 則顯示即時值仍需設備／位置、工程單位、timestamp 與 quality 才能被正確解讀，且控制請求另受 guardrails 裁決；兩份文件共同形成性能與量測的雙層證據契約
+boundary: 這是研究中心的證據檢查框架，不宣稱 OCP 與 NVIDIA 已發布單一共同認證、所有場域採同一點位／頻率／門檻，亦不建立供應商排名、客戶、訂單、收入、毛利或市場是否反映的結論
+verification_needed: 需平台或客戶對具名型號公開版本化三張性能曲線、感測器位置／校正與品質規則、穩態測試原始資料、pass／fail、site commissioning 及驗收結果
 correction_kind:
 corrects_claim_id:
 corrected_by_claim_id:
@@ -613,6 +764,75 @@ normalized_period_end: 2026-08-02
 normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
 -->
 
+## 額定容量只是操作包絡線的一個截面
+
+OCP 的 2024 年 L-L CDU 方法補上 NVIDIA 動態清單沒有展開的「讀規格說明書」。它先提醒：
+不同供應商因客製化與缺乏共同格式，可能用不同條件描述性能；因此建議把容量連同冷卻液、
+FWS 進水溫度與流量、TCS／FWS 壓力及 ATD 一起報告。換句話說，`600kW` 不是一張總成績單，
+而是設備在一組熱與水力條件下的工作點。
+
+這也解釋了為什麼兩台都標 `600kW` 的 CDU，現場整合仍可能不同：一台可能需要較高流量或
+設施壓力，另一台可能只支援特定冷卻液；若沒有相同條件與原始資料，就不能只看 kW 說兩者
+完全等效。本文的 `M1`／`M2` 仍只比較 NVIDIA 同日同欄的**標示值**，不把 OCP 方法倒填成
+那些產品已實際採用的測試程序。
+
+| 證據包要固定什麼 | 新手可以問的白話問題 | OCP 方法能支持到哪裡 | 還不能因此判定 |
+|---|---|---|---|
+| 熱條件 | 這個容量是在多大的兩側溫差與熱負載下量到？ | ATD、熱負載與流量要一起說明 | 效率、產品優劣或現場一定可達 |
+| 水力條件 | 設施端與伺服器端各要多少流量與壓力？ | FWS／TCS 流量、壓力與壓頭是性能邊界 | 客戶機房一定有足夠泵送能力 |
+| 冷卻液與材料 | 用哪一種液體，金屬、密封件與濾材能否長期共存？ | 冷卻液種類、材料相容性、腐蝕與流體分析要分開記錄 | 已完成多年現場壽命驗證 |
+| 測試對象 | 測的是單一零件，還是整台 CDU 組裝完成後的系統？ | 元件層與完整系統層 qualification 是兩個層級 | 平台列名產品已走完同一套流程 |
+| 機械與環境可靠度 | 承壓、運輸、振動、溫濕度變化時會不會漏或變形？ | 水壓、衝擊／振動、熱循環等測試應分列 | 通過單項就等於整機與場域驗收 |
+| 文件與法規 | 測試版本、原始資料、限制及安全文件是否可回查？ | 方法要求一般測試報告與 safety／EMC／材料文件 | 已取得訂單、部署或收入 |
+
+這張表是**判讀框架，不是認證名單**。S9 是 OCP 提出的通用方法；沒有任何一頁證明 AVC、
+Delta、LITEON 或 LGE 依這份 Revision 1.0 完成全部測試。因此研究中心只把 C10／C12 的方法
+事實、C13 的資料契約與 C11／C14 的分層推論接在容量欄後面，不刷新 C9 的公司／平台證據時鐘，
+也不改變「財務證據仍缺」的結論。
+
+## 一個 kW 要同時讀三張性能圖與一張量測身分證
+
+**先看熱能不能搬走。** OCP 的熱性能圖不是只放一個最大 kW，而是在指定 FWS／TCS 流量與
+設施進水溫度下，把 ATD 對應到可支撐的熱負載。讀者可以把它想成「熱交換器在這組溫差與
+流量下，能把多少熱從伺服器側交給設施側」。換一種流體、進水溫度或流量，工作點就可能移動；
+所以不同型號若只報最大容量、沒有同一組曲線，仍不能說現場表現完全等效。
+
+**再看二次側推不推得動。** TCS 壓頭曲線回答 CDU 泵浦在不同流量下還能提供多少壓力能力；
+現場的管路、快速接頭、分流器與冷板則會形成壓降。只有泵浦能力和整條二次水路阻力在目標流量
+相交到可接受的工作點，冷卻液才真的能送到各支路。名牌 kW 不會自動告訴讀者這個交點在哪裡，
+也不會說明一台泵浦失效後的備援工作點。
+
+**最後看設施端供不供得上。** FWS 阻抗曲線回答設施水流過 CDU 一次側需要付出多少壓差；
+機房則必須供應相符的水溫、流量與壓力。這一關和 TCS 壓頭方向不同：前者在檢查設備向設施
+要求多少水力條件，後者在檢查 CDU 能向伺服器迴路提供多少泵送能力。把兩張 PQ 曲線混成一張，
+就會看不出瓶頸是在機房一次側、CDU 泵浦，還是伺服器二次側。
+
+| 要看的成績單 | 橫軸與縱軸在回答什麼 | 能支持的問題 | 還不能因此判定 |
+|---|---|---|---|
+| 熱性能曲線 | 在指定 FWS／TCS 流量與進水溫度下，ATD 對應多少熱負載 | 這組熱條件下可支撐的容量工作點 | 兩台不同條件的 CDU 完全等效、效率較高或已通過客戶驗收 |
+| TCS 壓頭 PQ 曲線 | CDU 二次側在不同流量下可提供多少壓頭 | 泵浦能否克服伺服器側管路、接頭、分流器與冷板阻力 | 備援切換一定成功、每個支路都有足夠流量或長期可靠 |
+| FWS 阻抗 PQ 曲線 | 設施水通過 CDU 一次側在不同流量下形成多少壓差 | 機房是否可能供應設備要求的溫度、流量與壓力 | 具名場域已完成改造、調試或可在所有季節達到名牌容量 |
+| 量測身分證 | 哪台設備、哪一側／位置、量測類型、單位、時間與讀值品質 | 即時資料是否能對到正確物件、位置與時間，並排除明示的不健康讀值 | 感測器已校正、量測不確定度合格、曲線已重現或產品已通過資格驗證 |
+
+三張曲線說明**性能條件**，量測身分證說明**現場數字如何被解讀**。NVIDIA DSX 契約讓同一台
+CDU 的一次側入口、一次側出口、二次側供水與二次側回水可以用相同設備 ID、不同 `processArea`
+區分；數值另帶工程單位、時間戳與品質旗標。這避免把 `27` 誤當成不同位置、不同單位或過期的
+讀值，卻不會自動證明感測器校正、穩態條件或熱平衡正確。
+
+控制資料還要再分成三類：感測值描述現況，設定值描述目標，動作請求要求系統改變狀態。
+NVIDIA 明示外部設定值與隔離請求要先經 BMS 的最小／最大值、變化速率與失聯回退等安全限制；
+因此「資料已送到」和「設備已安全執行」是兩個證據節點。研究中心把完整階梯依序讀成：
+
+1. 名牌容量與平台欄位先形成待核對主張。
+2. 三張性能圖固定熱與水力工作點。
+3. 量測身分證讓場域讀值能對到正確設備、位置與時間。
+4. 校正、穩態、故障切換與整體試運轉再驗證系統可重現。
+5. 客戶驗收、部署分母與公司財務最後才回答商業結果。
+
+這個順序是證據階梯，不是供應鏈或重要性排序。S9 沒有證明 NVIDIA 型號採用同一套 OCP
+曲線，S10 也沒有證明每個場域都發布全部點位；兩份資料只能共同說明，容量與即時資料要怎麼
+被問對問題，不能替任何供應商補上產品通過、客戶部署、訂單或收入。
+
 ## 為什麼值得持續追蹤
 
 市場現在不只問「有沒有液冷產品」，還問產品走到哪一關。NVIDIA 清單讓不同供應商的容量與
@@ -627,8 +847,8 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
 
 | 先問哪一關 | 這一關能回答什麼 | 本輪已有的公開證據 | 仍然缺什麼 |
 |---|---|---|---|
-| 1. 容量規格 | 設備在指定條件下設計可帶走多少熱 | NVIDIA 同日同欄的三筆容量，對應 M1 | 完整跨廠測試程序、實際資料中心工況、全生命週期效率與可靠度 |
-| 2. 平台列名與測試 | 產品是否出現在清單，以及完成哪一類平台測試 | NVIDIA 清單列出 AVC、Delta、LITEON；LG 另稱 600kW 設備通過超過 100 項條件 | LG 當時是否採同欄定義、完整門檻、各項分數，以及產品是否都走相同流程 |
+| 1. 容量規格 | 設備在指定熱與水力條件下設計可帶走多少熱 | NVIDIA 同日同欄的三筆容量，對應 M1；OCP 方法把容量拆成熱性能、TCS 壓頭與 FWS 阻抗三張曲線，NVIDIA DSX 再示範讀值需要設備／位置、單位、時間與品質上下文 | 各型號實際採用的共同測試程序、完整操作包絡線、感測器校正／不確定度、穩態原始資料與 pass／fail |
+| 2. 元件、整機與平台測試 | 零件與完整 CDU 是否通過性能、承壓、材料及環境可靠度測試，產品是否被平台列出 | OCP 提出元件層／系統層及多類可靠度方法；NVIDIA 列出 AVC、Delta、LITEON；LG 另稱 600kW 設備通過超過 100 項條件 | 哪些具名型號依哪一版方法通過、完整門檻與 pass／fail，以及各產品是否走相同流程 |
 | 3. 供應準備 | 平台在捕捉日給產品哪一個原始供應標籤 | Delta 為 MP Ready；AVC、LITEON 為 Sample Ready | 標籤對應的產能、良率、庫存、交期與客戶承諾；LG 當時沒有可重現狀態 |
 | 4. 場域整合與客戶部署 | 系統是否在接近真實或真實場域運作，並走向驗收 | Daikin／Delta 規劃 100 至 3000kW 產品範圍；Daikin／NTT DATA 概念驗證預計至 2027 年 3 月 | 節電、成本、可用率、商用接受度，以及具名客戶是否完成驗收 |
 | 5. 公司收入 | 產品是否帶來訂單、收入、毛利與現金流 | 尚無可重算證據 | 3017、2308、2301 的具名設備訂單、收入占比、毛利、現金流與投資回收 |
@@ -639,7 +859,8 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
 
 ## 什麼情況會讓容量排行榜失真
 
-- **客戶可能要的是模組化與維修能力**：客戶可能依機櫃或整排配置採多台設備，而不是選單台最大容量；流量、壓差、泵浦備援、材料相容性、占地與維修時間都可能更重要。
+- **相同 kW 可能落在不同操作包絡線**：客戶必須確認現場 FWS／TCS 的溫度、流量、壓力與冷卻液能否落入設備條件；只知道額定容量，還不知道泵浦負擔、材料相容性或故障時可用能力。
+- **客戶可能要的是模組化與維修能力**：客戶可能依機櫃或整排配置採多台設備，而不是選單台最大容量；泵浦備援、占地、隔離、維修時間與服務網路都可能更重要。
 - **平台通過測試不保證快速轉單**：LG 已公告超過 100 項驗證，但公告沒有同欄容量定義、平台供應狀態、客戶或訂單；這不是否定驗證，而是說不同來源的欄位不能互相代填。
 - **價值可能落在整套控制與設施端**：Daikin／NTT DATA 正驗證空調、冰水主機與液冷的整合控制。若節能與可靠度主要來自控制軟體或設施端設備，只看 CDU 容量會錯估價值分配。
 - **合作範圍不等於已完成產品**：Daikin／Delta 規劃的 100 至 3000kW 是合作備忘錄中的產品範圍，不能拿來覆蓋 NVIDIA 對 Delta 單一型號的 1MW 額定值，也不能當成未來收入預測。
@@ -654,11 +875,14 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
 - [S6：AVC 官方首頁的 Asia Vital Components／TSE 3017 映射](https://www.avc.co/en-us/)。
 - [S7：Daikin 2026 新聞稿索引](https://www.daikin.com/press/2026)。
 - [S8：NVIDIA Marketplace DSX Infrastructure 動態清單](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)（2026-08-09 capture；LGE 已有可定位 600kW 列項，供應狀態欄空白）。
+- [S9：OCP《Liquid to Liquid CDU Test Methodology and Performance Rating》Revision 1.0](https://www.opencompute.org/documents/ocp-wp-l-lcdu-test-methodology-performance-rating-r1-pdf)（元件／整機 qualification、性能條件與可靠度測試的建議方法；不是產品認證名單）。
+- [S10：NVIDIA DSX Exchange BMS Integration Companion Guide](https://docs.nvidia.com/dsx-exchange/bms-integration)（2026-08-12 capture；CDU 點位、位置／單位／時間／品質上下文與 BMS guardrails 的資料契約；不是產品性能或場域驗收結果）。
 
-**可證實：** 同日同欄的容量、平台原始供應標籤、LG 自述驗證、合作備忘錄範圍與概念驗證時程。
+**可證實：** 同日同欄的容量、平台原始供應標籤、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位與可靠度測試類別。
 
 **待驗證：** 平台狀態的精確判準、具名客戶、部署數、訂單、收入、毛利、現金流與實際
-節能結果。合作名單、平台列名或額定 kW 不得替代這些公司層級證據。
+節能結果。OCP 方法也不能證明某一具名產品已完成相同測試；合作名單、平台列名或額定 kW
+不得替代這些產品與公司層級證據。
 
 ## 8 月 9 日複核：LG 進入清單，但供應階段仍空白
 
@@ -668,6 +892,19 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
   快照，`M2` 另存 8 月 9 日四筆同欄觀測。
 - 新證據只把 LGE 推到「平台列名／validation」；客戶部署、訂單、量產、收入與獲利仍沒有
   可重算證據。下一輪改由 `T4` 追蹤原始欄位變化。
+
+## 8 月 12 日方法補強：三張性能圖與量測身分證補上 kW 背後的問題
+
+- 本輪後來找到的 S9 發布於 2024 年；它把容量拆成熱性能、TCS 壓頭與 FWS 阻抗三張圖，
+  也把元件、整機、水壓、材料、運輸與環境可靠度分開。這補的是讀法，不是 2026 年產品新進展。
+- S10 是 8 月 12 日捕捉的現行 NVIDIA 資料契約：它要求 CDU 讀值帶設備／位置、工程單位、
+  timestamp 與 quality，並把感測、設定值、動作請求及 BMS guardrails 分開。資料可以被正確
+  交換，仍不表示感測器已校正、三張性能圖已重現或場域已通過驗收。
+- S9 早於現有公司與平台證據；S10 雖是本日捕捉的現行頁面，卻只定義資料交換，沒有指向
+  任何 NVIDIA 列名產品的 pass／fail。本輪新增內容也沒有追加到 C9 主命題；因此保留 `last_reviewed_at: 2026-08-09`、
+  `review_due: 2026-08-14` 與 C9，不用周邊方法或資料契約假刷新證據時鐘。
+- 後續若平台公開同型號、同版本、同測試條件的原始資料與結果，才可把 C10 的通用方法推進
+  到特定產品；在那之前，C11／C14 只是避免把 kW 或即時資料當總分的分層框架。
 
 ## 影響路由
 
@@ -753,6 +990,34 @@ trigger: AVC、Delta、LITEON、LGE 的型號、容量、validation type 或原�
 invalidation: NVIDIA 移除型號、撤回資格、重新定義 4°C ATD 欄位，或同一型號容量被重編；屆時保留 M1／M2，另建新 comparison，不回寫歷史 capture
 -->
 
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C10,C11
+metric: NVIDIA CDU 列項是否公開可重現的操作包絡線、元件／整機範圍、可靠度結果與版本化證據包
+source_ids: S8,S9
+watch_source_ids: S8
+frequency: monthly
+frequency_detail: 每月在 Marketplace 週捕捉之外，另核對 validation type、測試條件與可下載文件；出現完整 protocol 或具名產品結果時提前
+next_check: 2026-08-31
+trigger: 平台對具名型號公開冷卻液、ATD、FWS／TCS 流量與壓力、測試版本、原始資料及 pass／fail，或明示採用與 OCP Revision 1.0 可對照的方法
+invalidation: 平台明示各型號使用不可互比的定義、撤回測試結果，或新文件顯示 C11 所列條件仍不足以描述性能；屆時縮窄判讀框架，不覆寫 S9 的歷史方法內容
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C12,C13,C14
+metric: 具名 CDU 是否把熱性能曲線、TCS 壓頭、FWS 阻抗與可辨識設備／位置／單位／時間／品質的 telemetry 接成可重現場域證據
+source_ids: S9,S10
+watch_source_ids: S8,S10
+frequency: monthly
+frequency_detail: 每月核對 Marketplace 產品附件與 DSX BMS 文件版本；具名型號新增曲線、校正、穩態或 commissioning evidence 時提前
+next_check: 2026-08-31
+trigger: 平台或客戶對同一型號公開版本化三張性能曲線、感測器位置與校正／不確定度、timestamp／quality 規則、穩態原始資料、故障切換及 site pass／fail
+invalidation: 新版共同方法證明單一 kW 與既有 Marketplace 欄位已完整固定三張性能圖、量測品質及所有場域驗收條件；屆時縮窄 C14，不把資料契約存在當成公司財務證據
+-->
+
 ## 接下來看到什麼，判定才會改變
 
 - **平台欄位改變**：若 NVIDIA 改寫 AVC、LITEON 或 LGE 的原始供應狀態，就追加新快照、來源與觀測；不得修改 `M1` 的 2026 年 8 月 2 日歷史紀錄。
@@ -760,3 +1025,5 @@ invalidation: NVIDIA 移除型號、撤回資格、重新定義 4°C ATD 欄位�
 - **概念驗證交付結果**：Daikin／NTT DATA 若公布結果，需有可重算的節電、成本或可靠度基線；官方宣告失敗、取消或延後超過 2027 年 3 月才構成反證，沒有公開結果只維持待驗證。
 - **容量與收入走出相反順序**：若較高容量型號長期停留送樣，而較低容量型號先取得部署與收入，就會直接否定「容量可代表商業成熟度」的市場捷徑。
 - **容量欄位定義改變**：若 NVIDIA 改變 `Cooling Capacity @ 4°C ATD` 定義，或顯示不同型號不能共用同一欄位，`M1` 的可比結論只保留在 2026 年 8 月 2 日快照，不外推到新版清單。
+- **公開可重現的資格驗證包**：只有平台或客戶把具名型號、版本、冷卻液、溫度、流量、壓力、測試矩陣、原始資料與 pass／fail 接起來，才把「列出測試名稱」升為可對照的產品結果；OCP 通用方法本身不能代替這份證據。
+- **三張曲線與量測品質接到同一型號**：只有熱性能、TCS 壓頭與 FWS 阻抗曲線能對回同一設備版本，且現場資料另揭露感測位置、單位、時間、quality、校正／不確定度與穩態條件，才可判斷名牌工作點是否可在具名場域重現；資料流存在本身仍不是驗收或收入。

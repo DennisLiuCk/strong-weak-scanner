@@ -1,14 +1,15 @@
 # AMD Helios 部署階梯知識圖譜
 
-本圖把開始生產、預計出貨、客戶測試、正式上線與未來部署分開，並將台灣夥伴的具名角色
-停在生態系層級；沒有公司財務證據前，線條不升級成訂單或獲利。
+本圖把參考設計、整機廠品牌系統化、整櫃資格、開始生產、預計出貨、客戶測試、正式上線與
+未來部署分開，並將運算、網路、電力、液冷、控制、配置基準、變更重驗與維修責任接回同一
+整櫃；沒有交付與公司財務證據前，線條不升級成客戶機群、訂單或獲利。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
 label: AMD Helios 部署階梯
-summary: 以六個部署關卡連結具名客戶與台灣整機、封裝、載板角色，同時保留多架構競爭及財務未驗證邊界。
+summary: 以參考設計、品牌系統、整櫃資格與六個部署關卡連結系統責任、具名客戶及台灣夥伴，同時保留交付、財務與多架構競爭的未驗證邊界。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
@@ -159,18 +160,18 @@ view: company
 from_id: company:6669
 to_id: product:amd-helios
 relation: builds_systems
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C6
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C6,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C19
 note_refs:
 evidence_state: verified
-commercial_stage: ecosystem
-materiality: adjacent
+commercial_stage: integration
+materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-05-21
-review_due: 2026-08-09
+as_of: 2026-05-26
+review_due: 2026-09-15
 status: active
-boundary: Wiwynn 被列名協助打造系統，不證明具名客戶、量產數量、收入、毛利或營運資金轉換。
-next_trigger: 6669 公司文件揭露 Helios／MI450 出貨、收入與現金流。
+boundary: 緯穎公司頁直接展示 Helios 整合方案並自述把參考設計推向量產；仍沒有品牌 SKU、固定 BOM、完整資格、具名客戶、已發生出貨、收入、毛利或營運資金分母。
+next_trigger: 6669 公開版本化品牌產品、整櫃 qualification、客戶／實際出貨與可辨識財務足跡。
 -->
 
 <!-- knowledge_edge
@@ -179,18 +180,18 @@ view: company
 from_id: company:3693
 to_id: product:amd-helios
 relation: builds_systems
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C6
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C6,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C20
 note_refs:
 evidence_state: verified
-commercial_stage: ecosystem
-materiality: adjacent
+commercial_stage: integration
+materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-05-21
-review_due: 2026-08-09
+as_of: 2026-06-01
+review_due: 2026-09-15
 status: active
-boundary: AIC 參與機架與 compute-tray 機構設計只證明合作角色，不等於新增訂單、量產收入或獲利。
-next_trigger: 3693 揭露具名 Helios 機構產品、量產出貨與財務貢獻。
+boundary: AIC 公司頁直接確認 Helios 關鍵機械架構角色與展會展示；仍沒有品牌 SKU、完整 BOM、整櫃資格、客戶驗收、量產出貨或財務分母。
+next_trigger: 3693 公開具名 Helios 產品、配置清單、qualification、已發生出貨與財務貢獻。
 -->
 
 <!-- knowledge_edge
@@ -299,18 +300,18 @@ view: industry
 from_id: product:amd-helios
 to_id: concept:rack-scale
 relation: contains
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C1
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C11
 note_refs:
 evidence_state: inference
 commercial_stage: capability
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-02
-review_due: 2026-08-09
-status: active
-boundary: 機架級系統更接近可用設備，但不表示具名客戶已驗收、上線或產生收入。
-next_trigger: 客戶端文件揭露實際交付、驗收、可用區域與運行規模。
+as_of: 2026-08-12
+review_due: 2026-08-12
+status: retired
+boundary: 原線條依 C1 把 Helios 寫成已跨過只有參考設計的階段；C11 已修正此讀法，改由 I13 以參考設計、品牌系統與整櫃資格邊界重建。
+next_trigger: 已由 KG-HEL-I13、I14、I22 與 I23 接續；本歷史線條不再參與 active graph。
 -->
 
 <!-- knowledge_edge
@@ -531,4 +532,264 @@ review_due: 2026-08-09
 status: active
 boundary: Helios 成為可部署選項不等於排他標準，新增支出與既有架構份額重分配仍無法分解。
 next_trigger: Microsoft 揭露各架構部署範圍、利用率、工作負載或資本支出分配。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I13
+view: industry
+from_id: product:amd-helios
+to_id: concept:rack-scale
+relation: contains
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C11,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C12
+note_refs:
+evidence_state: inference
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-19
+status: active
+boundary: Helios 是涵蓋運算、網路、電力、液冷、控制軟體與維修的機架級參考設計；這不表示 AMD 直接出售單一成品或任一品牌系統已通過整櫃資格。
+next_trigger: 具名 OEM／ODM 品牌系統公開固定配置、整櫃資格與實際交付。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I14
+view: industry
+from_id: product:amd-helios
+to_id: stage:reference-design
+relation: reaches_stage
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C10
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: AMD 現行 FAQ 明示 Helios 是 reference design 且 not a product for sale；這不是品牌型號、量產出貨或客戶部署。
+next_trigger: AMD 或 OEM／ODM 公開可採購品牌系統、配置邊界與正式產品文件。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I15
+view: industry
+from_id: product:amd-helios
+to_id: standard:open-rack-wide
+relation: uses_standard
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C10,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C12
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 採 Open Rack Wide 參考架構不等於任一 Helios 品牌系統取得 OCP 認證、通過客戶資格或已部署。
+next_trigger: 具名品牌系統提供 ORW 規格版本、符合性範圍與資格結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I16
+view: industry
+from_id: product:amd-helios
+to_id: component:ai-compute-tray
+relation: contains
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C12
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 參考設計包含 compute tray 角色；這不是任一 OEM 實際托盤 BOM、版本、測試結果或量產數量。
+next_trigger: OEM／ODM datasheet 固定運算托盤配置並提供托盤與整櫃資格邊界。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I17
+view: industry
+from_id: product:amd-helios
+to_id: component:ai-scale-up-switch-tray
+relation: contains
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C12
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 參考設計包含 switch tray 與 scale-up 角色；峰值頻寬或單一交換模組存在不等於整櫃工作負載穩定。
+next_trigger: 具名品牌系統公開拓撲、交換托盤版本、壓力測試與故障恢復結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I18
+view: industry
+from_id: product:amd-helios
+to_id: component:rack-power-shelf
+relation: contains
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C12
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 參考設計包含 power shelf 與垂直匯流排；這不證明機房供電、突波、保護、備援、效率或維修隔離已通過。
+next_trigger: 具名品牌系統與場站文件固定電力配置並公開整櫃負載、保護與備援資格。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I19
+view: industry
+from_id: product:amd-helios
+to_id: component:rack-manifold
+relation: contains
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C12
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 參考設計包含 cooling manifold 與 quick disconnect；接上冷卻迴路不等於流量、壓差、漏液、材料相容與故障隔離已通過。
+next_trigger: 具名品牌系統公開液冷版本、介面、整櫃熱負載與可靠度資格結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I20
+view: industry
+from_id: product:amd-helios
+to_id: capability:rack-serviceability
+relation: requires
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C12
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: AMD 公開設計強調模組抽換與低干擾維修；這不是客戶現場的故障定位時間、可用率或維修成功率。
+next_trigger: OEM／ODM 或客戶公開維修程序、替換時間、故障隔離與復原後重驗結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I21
+view: industry
+from_id: product:amd-helios
+to_id: capability:rack-lifecycle-control
+relation: requires
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C12
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 參考設計列出 BMC、ROCm、觀測與 lifecycle 管理責任；這不證明特定硬體、韌體與軟體組合已在生產機群長期穩定。
+next_trigger: 具名品牌系統固定軟硬體相容矩陣並提供更新、回退、遙測與復原證據。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I22
+view: industry
+from_id: product:amd-helios
+to_id: stage:oem-systemization
+relation: passes_through
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C10,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C11
+note_refs:
+evidence_state: inference
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-19
+status: active
+boundary: AMD 說藍圖供 OEM／ODM 打造品牌系統，支持把 systemization 當成必要交接；目前仍沒有完整公開的具名型號、BOM 與版本清單。
+next_trigger: OEM／ODM 正式產品頁與 datasheet 公開品牌型號、BOM 邊界、韌體、軟體、冷卻與製造狀態。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I23
+view: industry
+from_id: product:amd-helios
+to_id: stage:integrated-rack-qualification
+relation: passes_through
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C13,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C14,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C21
+note_refs:
+evidence_state: unverified
+commercial_stage: qualification
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 系統工程方法顯示整櫃資格要綁定配置與變更後重驗，但本輪沒有具名 Helios 品牌系統的完整 test matrix、pass／fail、change／retest、場站驗收與生產機群證據。
+next_trigger: 平台方、OEM／ODM 或客戶公開同一 Helios 品牌型號與版本的整櫃資格資料包及 site acceptance／production-fleet 結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I24
+view: industry
+from_id: product:amd-helios
+to_id: capability:rack-configuration-baseline
+relation: requires
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C21
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 多子系統整櫃要讓測試結果對回硬體、軟體、網路、場站與測試版本；這是由通用機櫃方法推得的必要證據，不是 Helios 已公開配置身分證或已通過資格。
+next_trigger: 具名 Helios 品牌系統公開 factory inventory、BOM／SBOM、設定、場站輸入、測試條件、簽核與交接的同版紀錄。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I25
+view: industry
+from_id: product:amd-helios
+to_id: process:rack-change-triggered-regression
+relation: requires
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C21
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: NVIDIA 與 Google／OCP 文件支持變更後重驗及變更紀錄的方法，但不能替 Helios 證明 retest matrix、結果、客戶驗收或生產穩定。
+next_trigger: 具名 Helios 品牌系統公開硬體、韌體、線纜、場站等變更類型與對應必重跑測項、結果及回退條件。
 -->

@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-03
 source_published_at: 2025-05-01
-last_reviewed_at: 2026-08-03
-review_due: 2026-08-10
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-19
 source_type: mixed
 publisher: PCI-SIG
 publisher_domain: pcisig.com
@@ -19,9 +19,9 @@ group_ids: ipdesign,serverodm,pcb
 trigger_type: interconnect_compliance_and_deployment_ladder
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C5
+thesis_claim_id: C10
 base_confidence: medium
-confidence_basis: PCI-SIG 的 Workshop #140 與 Integrators List 可直接核對官方測試選項及列表實測版本，Astera Labs 與 Micron 兩條獨立公司來源則確認不同元件的量產主張；但 #140 後正式 64 GT/s listing、跨廠結果、具名系統部署與台灣公司財務尚未完成
+confidence_basis: PCI-SIG 的規格、FAQ、Compliance Program、Workshop #140 與 Integrators List 可把 PAM4／FLIT／錯誤控制、四類合規測試、跨廠互通及公開列名分開，Synopsys 技術資料獨立確認設計連動，Astera Labs 與 Micron 則只支持不同元件的量產主張；但正式 64 GT/s listing、完整跨廠矩陣、具名系統部署與台灣公司財務仍未完成
 cross_company_numbers: false
 -->
 
@@ -152,6 +152,118 @@ limitation: IR 索引不能替代產品附件、PCI-SIG 結果或客戶端部署
 independence_group: micron
 -->
 
+<!-- research_source
+source_id: S8
+role: standard
+source_kind: living_index
+publisher: PCI-SIG
+title: PCI Express 6.0 Specification
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://pcisig.com/pci-express-6.0-specification
+locator: 2026-08-12 查得 Specification Features；64.0 GT/s、PAM4、lightweight FEC、CRC、Flit-based encoding、updated packet layout 與 backwards compatibility
+limitation: 規格頁定義技術機制與現行 6.4 索引，不證明任何具名產品已通過測試、列入 Integrators List、完成客戶 qualification 或形成出貨與收入
+independence_group: pci-sig
+-->
+
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: living_index
+publisher: PCI-SIG
+title: PCI-SIG Compliance Program
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://pcisig.com/developers/compliance-program
+locator: 2026-08-12 查得 interoperability 與 compliance tests 的分工、正式 compliant 門檻，以及 Electrical／Configuration／Link Protocol／Transaction Protocol 四類 test areas
+limitation: 通用計畫頁只定義測試制度與合格條件；不公布 Workshop #140 個別產品結果，也不代表某件 PCIe 6 產品已完成全部必測項或公開列名
+independence_group: pci-sig
+-->
+
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: living_index
+publisher: PCI-SIG
+title: PCI Express 6.0 FAQ
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://pcisig.com/faq?field_category_value%5B%5D=pci_express_6.0&keys=PAM4
+locator: 2026-08-12 查得 PAM4 相對 NRZ 的四電位／兩 bit、256-Byte Flit、FEC／CRC 與 Link 保持 Flit Mode 的問答
+limitation: FAQ 是規格教育資料，不提供實體 channel、板材、產品測試分布、客戶平台或量產可靠度結果；本文不把規格內誤碼假設外推成任一產品實測
+independence_group: pci-sig
+-->
+
+<!-- research_source
+source_id: S11
+role: standard
+source_kind: document
+publisher: PCI-SIG
+title: The Evolution of the PCI Express Specification: On its Sixth Generation Third Decade and Still Going Strong
+published_at: 2022-01-11
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://pcisig.com/blog/evolution-pci-express-specification-its-sixth-generation-third-decade-and-still-going-strong
+locator: Error Model with PAM4 Signaling、Error Handling with PCIe 6.0 Architecture at 64.0 GT/s 與 Flit Mode 段落；PAM4／burst errors、FEC、CRC、link-level replay 與 fixed-size Flit 的連動
+limitation: PCI-SIG 作者的架構分析說明規格取捨，不是跨廠產品 benchmark、量產板卡可靠度、Workshop pass 結果或客戶 production fleet 證據；本文不引用其模擬數值做公司比較
+independence_group: pci-sig
+-->
+
+<!-- research_source
+source_id: S12
+role: other_primary
+source_kind: living_index
+publisher: Synopsys
+title: Optimizing PCIe 6.0 Designs at 64GT/s
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.synopsys.com/articles/pcie-6-designs.html
+locator: The Channel and PAM-4、FLITS、PHY and Controller Integration 與 Testing and Debug Considerations；四電位訊號、board／package noise、FEC／CRC／retry、Flit mode 與 PHY-controller 整合
+limitation: IP 供應商技術文章可獨立交叉確認設計連動，但不是 PCI-SIG official pass、具名客戶 qualification、所有 channel 的共同量測或任何台灣公司 design win 與財務證據
+independence_group: synopsys
+-->
+
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: living_index
+publisher: PCI-SIG
+title: PCI-SIG Integrators List - Cadence Gen6 filtered capture
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://pcisig.com/developers/integrators-list?field_il_comp_product_type_value=All&keys=Cadence&order=field_il_spec_rev&sort=asc
+locator: 2026-08-12 以官方清單的 Cadence 篩選與 Spec Revision 排序捕捉；多筆產品名稱或 identifier 含 Gen6／64GT/s 的 Cadence controller／PHY IP demo platform 仍列 PCIe 5.0 at 32GT/s，頁面當時的 Filter By 只列 PCI Express 5.0 至 2.0
+limitation: 這是指定供應商與捕捉日的公開篩選結果，不是全體產品的不存在證明；也不能推論 64 GT/s 測試失敗、產品能力不足、結果未完成或稍後不會送出 listing form
+independence_group: pci-sig
+-->
+
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: living_index
+publisher: PCI-SIG
+title: PCI-SIG Compliance Workshop #140 Invitation and Testing Policy
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://pcisig.com/sites/default/files/2026-05/PCIWorkshop140%20Invitation%20Draft.pdf
+locator: 第 1 頁列出 PCIe 6.x System Configuration Space test 與 5.0／6.x Add-In Card／System Lane Margining 的必要性，並界定 CEM connector 後方 redriver／retimer 的 component listing 邊界；第 3 頁列出 one-on-one interoperability、Integrators List 80% 門檻、必要 compliance tests 與 Product Listing Request Form
+limitation: 工作坊邀請與政策文件只定義測試角色、邊界及列名程序，不公布任何個別產品結果；頁面未顯示可可靠採用的正式發布日，因此只登錄捕捉日
+independence_group: pci-sig
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -271,9 +383,162 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: PCIe 6 的 64 GT/s 不是只把時脈加倍；規格以 PAM4 在一個訊號時間單位承載兩個 bit，並把固定 256-Byte Flit、輕量 FEC、強 CRC 與鏈路重送串成同一套錯誤控制路徑
+supporting_source_ids: S8,S10,S11,S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8／S10 直接列出 PAM4、Flit、FEC 與 CRC，S11 說明 burst error、CRC 後重送及固定 Flit 的設計取捨，S12 從獨立 IP 設計角度確認 PAM4→FEC→Flit 與 PHY／controller 連動
+boundary: 這只證實規格機制與設計責任，不把規格的誤碼假設、延遲或通道取捨改寫成任何產品實測，也不證明官方 pass、量產良率、客戶部署或公司財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: PCI-SIG 的 Compliance Program 把跨廠 interoperability 與依 test modules 執行的 compliance 分成兩種測試，並把 compliance 再拆成 Electrical、Configuration、Link Protocol 與 Transaction Protocol 四個 test areas
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 直接定義兩種 testing、正式 compliant 條件及四類 test areas
+boundary: 制度頁的分類和門檻不是 Workshop #140 的個別產品結果；不能由其中一類 pass 推論其他類別、完整跨廠組合、公開列名、客戶 qualification 或 production deployment 已完成
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: inference
+status: active
+claim: PCIe 6 成熟度應同時用兩條不可互相替代的軸追蹤：連線正確性軸由 PAM4 電氣與通道、Flit／FEC／CRC／重送、設定、鏈路、交易走到跨廠互通；商業落地軸則由產品宣稱、官方測試與列名、客戶 qualification、完整平台部署走到財務歸因
+supporting_source_ids: S1,S2,S3,S4,S8,S9,S10,S11,S12,S13
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8／S10／S11／S12 建立規格與連線錯誤控制鏈，S9 明列四類 compliance 與 interoperability 分工，S1／S2／S13 提供測試入口與不同捕捉日的公開列名，S3／S4 只前進到公司 qualification／元件量產；這些證據位在不同軸、不能壓成單一 Gen6 標籤
+boundary: 兩軸是證據整理框架，不是效能、成熟度或投資分數；不宣稱 64 GT/s 列名已出現、整體生態系完成、任何台灣公司取得訂單，亦不判斷市場是否反映
+verification_needed: 同一具名 host-to-endpoint 組合公開電氣、設定、鏈路、交易與跨廠結果，並能接到 PCI-SIG 列名、客戶 production fleet、出貨及同期間財務分母
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: unverified
+status: active
+claim: 至少一套具名 PCIe 6、64 GT/s 產品組合已同時完成必要 Electrical／Configuration／Link Protocol／Transaction Protocol 測試、跨廠互通、Integrators List 列名與具名客戶 production deployment
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 只定義測試制度，S1 只證明 64 GT/s test option，S13 的指定供應商捕捉仍只有 32 GT/s listing；S3／S4 的公司 qualification 與元件量產也沒有完整公開四類 test area、跨廠矩陣及 production fleet
+boundary: 未找到完整公開鏈不是失敗或不存在的證據；在具名產品與測項出現前，只能把各段分開標成可測、公司自述 qualification、元件量產或未驗證
+verification_needed: PCI-SIG、至少兩家獨立元件供應商與具名客戶三方文件共同列出同一拓撲、產品、revision、64 GT/s、四類 test area、互通結果、listing 與 production fleet
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: Synopsys 的 PCIe 6 技術資料指出，PAM4 的四電位使封裝與電路板的雜訊、串擾與回損控制更關鍵，且 Flit mode 使 PHY、controller、protocol 與測試除錯需要一起規劃
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S12 的 Channel and PAM-4、FLITS、PHY and Controller Integration 與 Testing and Debug Considerations 段落直接連結 board／package channel、PHY、controller 與 protocol testing
+boundary: 這是設計責任與失效位置的技術證據，不表示任一 PCB／CCL、IP、ODM 公司已有具名 qualification、份額、ASP、訂單、收入或毛利
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: 截至 2026-08-12，PCI-SIG Integrators List 的 Cadence 篩選仍把多筆產品名稱或 identifier 含 Gen6／64GT/s 的 controller／PHY IP demo platform 列在 PCIe 5.0 at 32GT/s，頁面當時的版本篩選也只列 PCI Express 5.0 至 2.0
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S13 的官方篩選頁逐列提供產品、identifier、Spec Revision、lane、function 與 date，並顯示當時可選的世代與 revision 篩選項
+boundary: 這是捕捉日的 Cadence 篩選結果，不是全清單不存在 64 GT/s 項目的數學證明，也不表示測試失敗、產品能力不足、結果不存在或 listing form 尚未／不會提交
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: Workshop #140 政策把 PCIe 6.x System Configuration Space test 列為 Integrators List eligibility 的必要通過項，並要求 5.0／6.x Add-In Card 與 System 執行 Lane Margining；CEM 測試邊界位在 connector，因此板卡或系統通過不能自動替位於 connector 後方、未另行測試的 redriver／retimer 取得 component listing
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S14 第 1 頁的 mandatory tests、Lane Margining 與 Critical Components 政策直接界定測試角色、必要項及 connector 邊界
+boundary: 政策只說明怎樣才有資格列名與哪個物件真正受測，不表示任何具名板卡、系統或元件已通過，也不證明未列名產品失敗
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: 每一筆 PCIe 6 合規證據都應綁定受測產品、測試角色、暴露介面與測試邊界、規格版本與速率、必要測項、互通樣本，以及列名申請與公開狀態；板卡或系統結果不能移植給藏在測試邊界後方、未以元件角色另測的訊號元件
+supporting_source_ids: S9,S13,S14
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 分開 interoperability 與四類 compliance tests，S14 分開 Add-In Card／System／Component 角色與 CEM connector 邊界，S13 顯示公開列項又有產品、功能、revision／rate 與日期欄位；合併後形成可重現的測試物件合約
+boundary: 這是證據整理與防止外推的研究框架，不是 PCI-SIG 新增的單一認證名稱，也不對任何產品效能、通過機率、生態系完成度或公司財務評分
+verification_needed: 對第一項公開 PCIe 6.x 64 GT/s 列項保存註冊產品、角色、connector 邊界、所有必要測項、互通分母與 form／listing 日期，驗證欄位是否足以重建證據範圍
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: PCI-SIG 的正式 compliant 條件要求 interoperability tests 至少達 80% 並通過所有必要 compliance tests；進入 Integrators List 還要送出 Product Listing Request Form，而該表可在工作坊後任何時間提交、沒有截止期限
+supporting_source_ids: S9,S14
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 的 Compliance Program 直接列出 80% interoperability 與 required compliance test 門檻；S14 第 3 頁列出 Integrators List 三項條件及 listing form 的提交時間規則
+boundary: 未在工作坊後立刻列名只能記為公開狀態或流程時間缺口，不能直接解讀為測試失敗；門檻也不替具名產品公布各項結果、客戶驗證或部署
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
 claim_ids: C1,C2,C5,C6
 metric: Workshop #140 後 PCIe 6.x 64 GT/s official testing 與 Integrators List 結果
 source_ids: S1,S2,S5
@@ -283,6 +548,8 @@ frequency_detail: 每週核對 Workshop、Integrators List 與規格頁；新增
 next_check: 2026-08-10
 trigger: PCI-SIG 公開至少一項 64 GT/s official pass／listing，並可辨認產品類型及測試 revision
 invalidation: Workshop 後長期沒有 64 GT/s 公開結果、測試要求重大修正，或產品只能在較低速率穩定互通
+retired_at: 2026-08-12
+retirement_reason: T1 的 2026-08-12 no_new_evidence 回查已保留在 monitor_reviews；新 S8–S12 顯示 official compliance 本身還要拆成四類測試與跨廠互通，後續由 T3 以兩軸框架逐項追蹤，不覆寫舊檢查結果
 -->
 
 <!-- monitoring_item
@@ -297,6 +564,48 @@ frequency_detail: 每月檢查供應商與客戶文件；只有官方測試、�
 next_check: 2026-09-15
 trigger: 具名客戶公布 production PCIe 6 platform，並列出至少兩家獨立元件、測試條件、部署量或可重現運行結果
 invalidation: 客戶 rollout 延後、gearbox 長期只橋接 Gen5、跨廠互通不穩，或 Gen6 元件沒有形成可核對 production fleet
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C1,C2,C5,C9,C10,C11,C13
+metric: 具名 PCIe 6、64 GT/s 產品在 Electrical、Configuration、Link Protocol、Transaction Protocol、跨廠互通與 Integrators List 的逐項結果
+source_ids: S1,S9,S13
+watch_source_ids: S1,S2,S8,S9
+frequency: weekly
+frequency_detail: 每週核對 PCI-SIG Compliance Program、Workshop、Test Guide 與 Integrators List；逐產品保存功能、revision、rate、lane、四類 test area、interop 組合與 listing 日期
+next_check: 2026-08-19
+trigger: 至少一件具名 64 GT/s 產品可公開核對必要 compliance test areas 與 Integrators List，或跨廠結果公開足以重建同一拓撲
+invalidation: 64 GT/s 測試長期只能完成部分 test area、產品反覆降速、跨廠組合無法重現，或 Test Guide／listing program 重大延後
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C7,C8,C10,C12
+metric: 同一具名平台的 PAM4 channel、Flit／錯誤恢復、PHY-controller、板路材料、長時間運行與台灣公司資格／財務橋接
+source_ids: S8,S10,S11,S12
+watch_source_ids: S6,S7,S8,S9
+frequency: monthly
+frequency_detail: 每月檢查標準、IP／連接元件商、平台與客戶文件；只有同一產品與期間能跨設計、測試、部署及財務核對才升級
+next_check: 2026-09-12
+trigger: 具名平台公開 channel／board、PHY／controller、Flit／replay、長時間運行與供應商 qualification，且台灣公司端可雙向核對產品、出貨與財務
+invalidation: 平台需長期降速或大量依賴 Gen5 bridge、錯誤恢復影響穩定運行，或台灣公司只有一般高速能力而無具名 qualification
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C13,C14,C15,C16
+metric: 每件具名產品的受測物件、測試角色、CEM connector 邊界、revision／rate、必要測項、互通分母、listing form 與公開列名時間差
+source_ids: S9,S13,S14
+watch_source_ids: S1,S2,S9
+frequency: weekly
+frequency_detail: 每週核對 Integrators List、Compliance Program 與工作坊後續；首項 64 GT/s 列名出現時，逐欄保存產品身分、AIC／System／Component 角色、測試邊界、必要測項、interop 門檻、申請與列名日期
+next_check: 2026-08-19
+trigger: 首項具名 PCIe 6.x 64 GT/s 公開列名可把受測物件、角色、connector 邊界、所有必要測項與 interoperability 結果連在一起
+invalidation: 公開資料只有較低速率、部分測項、模糊物件或板卡／系統結果被錯接到未另測元件；若 form 延後才列名，維持流程時間差而不回寫成測試失敗
 -->
 
 <!-- transition
@@ -319,6 +628,20 @@ from: triaged
 to: triaged
 reason: editorial_plain_language_wave102_complete_link_test_dimensions_roles_and_six_gate_deployment
 evidence: editorial:plain_language_wave102
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: expanded_single_compliance_ladder_into_link_correctness_and_commercialization_axes
+evidence: sources:S8,S9,S10,S11,S12
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_test_object_boundary_post_workshop_listing_snapshot_and_listing_lag_contract
+evidence: sources:S9,S13,S14
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -350,38 +673,59 @@ evidence: editorial:plain_language_wave102
 - **跨廠互通（vendor interoperability）**：不同公司的主機、訊號元件、交換器與終端，在同一組條件下能一起工作並重現結果。
 - **符合規格（compliance）**：一件產品依共同程序通過指定版本、速率與功能的測試；單件合格不等於所有廠商組合都互通。
 - **周邊元件互連標準組織（PCI-SIG）**：維護 PCI Express 規格、相容性活動與公開合格清單的產業組織。
-- **相容性工作坊（Compliance Workshop）**：標準組織安排會員執行正式測試與交叉連接的活動；提供某項測試不表示參加產品都通過。
+- **相容性計畫與工作坊（Compliance Program／Compliance Workshop）**：標準組織用計畫定義測試制度，再由工作坊讓會員執行正式測試與交叉連接；提供某項測試不表示參加產品都通過。
 - **官方測試（Official Testing）**：依標準組織指定程序執行的正式測試；還要看到具名產品與結果，才能說誰通過。
 - **合格產品清單（Integrators List）**：公開記錄產品在指定規格版本與速率下結果的列表；每一列只支持自己寫出的條件。
 - **客戶驗證（qualification）**：客戶用自己的平台、韌體與工作負載確認產品可用；它可能早於或晚於公開的官方結果。
 - **參考架構（reference architecture）**：展示元件可以如何組成系統的設計範例；被放進參考架構不等於客戶已部署。
 - **元件量產（production）**：供應商能穩定製造並出貨某一產品；它沒有回答整套平台是否通過或實際使用多少。
 - **客戶正式部署（production fleet）**：具名客戶把完整平台放進生產環境持續運作，並能交代組合、規模、期間與結果。
+- **第五代高速連線（PCIe 5／Gen5）**：前一代 PCI Express 規格，每條通道原始傳輸率為 32 GT/s；第六代裝置仍可能和它向下相容或降速連線。
+- **兩電位訊號（NRZ）**：用高、低兩個電位表示資料的傳輸方式；前五代 PCIe 在最高速度使用這種訊號。
+- **四電位訊號（PAM4）**：用四個電位、在同一訊號時間單位承載兩個 bit；資料率提高，但接收端更難分辨相鄰電位。
+- **實體層（PHY）**：負責把數位資料轉成電訊號、送過封裝、板路與連接器，再由接收端還原的硬體層。
+- **固定資料單元（Flit）**：第六代把資料整理成固定 256 Byte 單元，讓錯誤修正、偵測與重送有共同處理範圍。
+- **前向錯誤修正（FEC）**：接收端利用附加資訊先修正一定範圍內的錯誤；修不了的錯誤仍要交給後續偵測與重送。
+- **循環冗餘檢查（CRC）**：用檢查碼判斷資料經修正後是否仍有錯；它負責偵測，並不自行把所有錯誤修好。
+- **否定回覆與鏈路重送（NAK／replay）**：接收端發現資料仍有錯時要求發送端重送；成功恢復不等於錯誤從未發生。
+- **位元錯誤率／首個位元錯誤率（BER／FBER）**：描述接收端出現錯誤的頻率或第一個錯誤事件的機率；規格假設不等於每件產品實測。
+- **設定空間測試（Configuration Testing）**：檢查裝置設定欄位、能力宣告與存取行為是否符合規則。
+- **鏈路協定測試（Link Protocol Testing）**：檢查裝置在連線建立、狀態轉換、錯誤回報與鏈路層行為上是否符合規則。
+- **交易協定測試（Transaction Protocol Testing）**：檢查讀寫請求、回覆、排序與交易層封包等上層行為是否符合規則。
+- **受測物件（tested object／DUT）**：這張成績單真正掛在哪一件產品上；同名產品家族、整張卡與卡上的單一元件不是同一個受測物件。
+- **測試邊界（test boundary）**：儀器或另一台裝置實際看得到、能施加條件並判斷結果的介面範圍；邊界後方的零件不能自動沿用結果。
+- **擴充卡機電連接器（CEM connector）**：擴充卡與系統板相接的共同電氣與機構介面；工作坊政策以它界定板卡／系統測試和內部關鍵元件的證據範圍。
+- **擴充卡（Add-In Card／AIC）**：插入系統插槽、承載終端或其他功能的完整板卡；它可以是一個受測角色，但不等於板上每顆元件都被單獨測過。
+- **通道餘裕量測（lane margining）**：由系統讀取接收端可用電壓與時間餘裕的標準化檢查；必要性不等於結果已通過或長期工作負載穩定。
+- **產品列名申請表（Product Listing Request Form）**：完成門檻後仍要提交的公開列名程序文件；可在工作坊後另行送出，因此列名時間不必等於測試日期。
+- **系統測試角色（System）**：以主機板、插槽與必要平台元件組成的系統身分受測；系統結果只涵蓋當次配置與測試邊界。
+- **Credo**：公開清單中的一家高速連接元件供應商；本文只引用其具名產品列的規格版本與速度，不比較公司能力或投資價值。
 
 ### 三句話抓重點
 
 - 一條完整高速連線，要讓主機、板路與線材、必要的訊號或交換元件、終端裝置，以及低階控制軟體一起工作。
 - 產品名稱寫著「第六代」、實際連線跑到哪一代、通過哪一項正式測試，以及是否進入客戶系統，是四件不同的事。
-- 本輪只確認最高速度的測試入口已存在，也確認部分元件已量產；還沒有公開資料把具名產品的最高速正式結果、完整跨廠系統與客戶部署串在一起。
+- 截至本輪，公開清單仍未出現最高速度列項；而且整張卡或系統板通過，也不能自動替藏在連接器後面的訊號元件背書。
 
 ### 為什麼重要
 
-高速連線新聞常把產品名稱、實際連線條件、正式測試與客戶部署寫在同一段，讀者很容易把
-「某個零件已量產」讀成「整台伺服器已經通過」。但一個零件能製造，只回答供應商自己的
-產品時鐘；整條連線還要把主機、板路、訊號元件、終端與軟體放進同一組測試。
+**第六代先改變信號的語言。** 它不是單純把電訊號切換得更快，而是改用四個電位，在同一個
+訊號時間單位承載更多資料。這讓接收端更難分辨相鄰電位，也把封裝、板路、連接器、雜訊與
+串擾重新拉進同一個問題。
 
-官方清單也不是產品的總能力證書。清單中的一列只證明那個產品在列出的規格版本、速度與功能
-下完成程序。產品名稱帶有第六代，清單卻記錄第五代速度，可以同時為真；這既不是最高速度
-已失敗，也不是最高速度已通過。
+**錯誤處理也跟著改。** 資料要先放進固定大小的單元，由前向錯誤修正處理可修正錯誤，再用
+檢查碼找出仍有問題的資料，必要時要求重送。只測眼圖或只看裝置能連上，都沒有證明設定、
+鏈路狀態、讀寫交易與長時間工作負載已正確。
 
-把裝置、連線條件、測試主體與部署分開，才能知道下一個缺口在訊號、軟體、跨廠組合、平台
-驗收或客戶導入，也能避免一則供應商公告讓所有供應鏈角色同時被誤判為已受惠。
+**通過測試仍是多張成績單。** PCI-SIG 把電氣、設定、鏈路協定、交易協定與跨廠互通分開；
+產品名稱、公司客戶驗證、正式測試、公開列名、元件量產與客戶部署也各有自己的證據。把這些
+欄位分開，才能避免一則供應商公告讓整台伺服器或所有台灣供應鏈角色同時被誤判為已受惠。
 
 ### 接下來怎麼追
 
-- 每一筆測試至少保存產品、功能、規格版本、速度、通道數、連接方式、軟體版本、測試主體與結果日期。
+- 每一筆測試至少保存產品、功能、規格版本、速度、通道數、連接方式、軟體版本、電氣／設定／鏈路／交易測項與結果日期。
 - 分開記錄「測試可以報名」、「具名產品通過」與「結果進入公開清單」，不要用活動頁替產品背書。
-- 跨廠結果要列出主機、訊號元件、交換器、終端與韌體來自誰，並確認是否真的跑在目標速度。
+- 跨廠結果要列出主機、訊號元件、交換器、終端與韌體來自誰，並確認目標速度、錯誤恢復與長時間讀寫能否重現。
 - 量產消息要再分元件出貨、參考架構、客戶驗證與完整平台部署；台灣公司還要補客戶端與公司端的雙向財務證據。
 
 ### 想一想
@@ -389,6 +733,23 @@ evidence: editorial:plain_language_wave102
 - 一個產品名稱寫著「第六代」，公開清單卻只記錄較低速度，這筆資料證明了什麼，又沒有證明什麼？
 - 主機、訊號元件與儲存裝置各自量產，還要補哪些共同測試，才能說整條連線穩定？
 - 公司客戶驗證先完成、正式測試較晚公布時，研究者該如何分開記錄？
+- 如果整張擴充卡通過，卡上的每一顆訊號元件是否都能沿用同一張成績單？
+
+## 先看 64 GT/s 為什麼牽動整條連線
+
+第六代的幾個新名詞不是互不相干的功能清單，而是一條前一個選擇會改變下一個責任的工程鏈：
+
+| 本文五個連動步驟 | 為什麼需要它 | 它把問題交給誰 | 要驗收什麼 | 不能直接推成 |
+|---|---|---|---|---|
+| 1. 以 PAM4 承載更多資料 | 四個電位可在同一訊號時間單位表示兩個 bit，達到每通道 64 GT/s | 發送端、接收端、封裝、板路、連接器與線材 | 電位是否可分辨、雜訊、抖動、串擾、回損與不同通道條件 | 規格定義 64 GT/s，不等於任何產品或板路已在該速度通過 |
+| 2. 接受更敏感的原始錯誤環境 | 四個電位的判讀空間更小，錯誤還可能成群出現 | 實體層、均衡器、時鐘資料恢復與通道設計 | 位元錯誤、錯誤聚集、不同溫度／距離與降速行為 | 規格的錯誤模型不是某一產品實測，也不能比較公司高低 |
+| 3. 把資料整理成固定 Flit | 錯誤修正需要固定大小的處理單元 | 控制器、鏈路層與封包格式 | 兩端是否進入相同模式、資料排列、狀態轉換與降速後行為 | Flit mode 能建立，不等於讀寫交易或應用已正確 |
+| 4. 依序修正、偵測與重送 | FEC 先修可修正錯誤，CRC 找出殘留錯誤，鏈路再重送 | 接收端錯誤控制、回覆與 replay 邏輯 | 修正範圍、殘留錯誤、重送、資料正確性與長時間穩定度 | 有 FEC 不等於沒有錯誤；成功重送也不等於通道品質相同 |
+| 5. 再驗設定、協定與工作負載 | 電氣連得上之後，裝置仍要正確宣告能力、轉換狀態並完成讀寫 | 設定空間、鏈路協定、交易協定、韌體、驅動與應用 | 設定、狀態機、請求／回覆、錯誤注入、壓力與恢復 | 單一眼圖、單一封包或一次開機不能替完整平台背書 |
+
+這五步是診斷順序，不是固定由左到右發生的單一故障，也不是供應商排名。實際系統可能在
+板路、接收端、韌體或交易層同時出現問題；只有把具名產品、版本、拓撲與測試結果放回每一步，
+才能知道哪一層真的跨過門檻。
 
 ## 先用五個位置看一條高速連線怎麼接起來
 
@@ -417,19 +778,63 @@ evidence: editorial:plain_language_wave102
 五把尺共同決定一筆結果能證明多大範圍。若新聞只寫「第六代互通」，卻沒有版本、速度、
 通道、拓撲、軟體與測試主體，研究中心只能把它記成待查線索，不能替讀者補出完整測試。
 
+## 先認清「誰真的被測到」
+
+同一件硬體可以用擴充卡、系統或元件等不同角色報名；成績單能證明的範圍，取決於測試儀器
+實際看到哪個介面。研究者應先寫完以下五個欄位，再讀「通過」二字：
+
+| 測試物件合約的五個欄位 | 要回答的問題 | 第 140 次工作坊政策給的線索 | 常見誤讀 | 下一份證據 |
+|---|---|---|---|---|
+| 1. 註冊產品身分 | 成績單掛在哪個型號、硬體修訂與功能上 | 報名與列名都以具名產品為單位 | 把同一家族或下一版產品視為同一物件 | 產品名稱、識別碼、硬體修訂與結果日期 |
+| 2. 測試角色 | 它以擴充卡、系統、元件或其他角色受測 | 交換器／橋接器與訊號重整器須按政策用指定角色註冊 | 整張卡通過就說板上每顆元件都通過 | 每個角色各自的註冊、必測項與結果 |
+| 3. 暴露介面與邊界 | 儀器實際在何處注入、讀取並判斷結果 | 板卡與系統的電氣測試以 CEM connector 為邊界 | 把連接器後方的內部元件當成已單獨受測 | 接線圖、連接器位置、內部訊號元件與測試點 |
+| 4. 必要測項與互通門檻 | 哪些電氣、設定、鏈路、交易與跨廠項目必須完成 | 第六代系統設定測試與通道餘裕量測有明列必要性；正式合格另有互通及必測門檻 | 一個眼圖、一次開機或一類測試替全部背書 | 每個必要模組的版本、速率、結果與互通分母 |
+| 5. 申請、列名與日期 | 何時測試、何時送表、何時出現在公開清單 | 完成門檻後仍要送列名申請表，且工作坊後沒有送件截止日 | 工作坊結束後沒立刻列名就判定失敗 | 測試日、送表日、接受日與公開列名日 |
+
+這個邊界尤其重要：若訊號重整器藏在連接器後方，板卡或系統可能以完整組件通過，但那顆
+元件並沒有因此取得自己的完整電氣與功能成績。反過來，工作坊結束後暫未出現在公開清單，
+也只表示公開列名鏈尚未閉合；申請表可稍後提交，所以不能把「未列名」直接翻譯成「測試失敗」。
+這些界線由 PCI-SIG 的 Compliance Program、公開清單與工作坊政策共同支持。[S9][S2][S14]
+
+## 把「連得對」和「賣得出去」分成兩條軸
+
+同一產品可以在商業軸走得很快，工程證據卻沒有公開完整；也可能已通過嚴格工程測試，客戶
+部署和收入仍然沒有分母。兩條軸必須各自保存，不能把其中一條的里程碑抄到另一條：
+
+| 兩條證據軸 | 第一步 | 中間要跨過 | 靠近完成時要看到 | 本輪位置 | 不能互相替代 |
+|---|---|---|---|---|---|
+| A. 連線正確性 | 電氣與通道：PAM4 訊號、封裝、板路、接收端 | Flit、錯誤修正／偵測／重送；設定、鏈路與交易協定 | 不同公司的主機、訊號元件、交換器與終端在同一條件下重現正常及錯誤恢復 | 規格與測試分類已明確；部分產品有公司互通主張，完整公開矩陣未見 | 元件量產不能替電氣或協定測試；一次連上不能替長時間互通 |
+| B. 商業落地 | 具名產品宣稱支援、樣品或公司 qualification | PCI-SIG official testing、公開列名、客戶平台驗收 | 具名 production fleet、重複出貨、份額、價格與財務歸因 | 連接元件與儲存終端已有量產主張；64 GT/s 公開列名、完整客戶部署與台灣財務未證 | 正式測試不能替客戶採用；客戶驗證也不能替公開合規或財務分母 |
+
+兩軸不是成熟度分數。新聞若只推進一格，就只更新那一格；缺少現價、共識、估值與部位資料時，
+本文也不把技術或公司成熟度轉成股票動作。
+
 ## 把六個動作分成不同時鐘
 
 | 本文六個時鐘 | 誰來確認 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
-| 1. 規格與測試入口存在 | 標準組織發布規格，並開放指定版本、速度與功能的測試 | PCIe 6.x 規格存在；第 140 次工作坊提供最高 64 GT/s 與訊號重整器測試 | 活動後具名產品、功能、版本、速度與結果 | 有考場不等於任何考生通過，也不等於產品已量產 |
+| 1. 規格與測試入口存在 | 標準組織發布規格，並定義電氣、設定、鏈路、交易與跨廠測試 | PCIe 6.x 規格、Compliance Program 與第 140 次工作坊已提供制度和最高 64 GT/s 測試入口 | 活動後具名產品在每個必要 test area 的版本、速度與結果 | 有考場和考科不等於任何考生通過，也不等於產品已量產 |
 | 2. 具名產品宣稱支援 | 供應商交代產品名稱、功能、速度目標與可用階段 | Astera Labs 有連接產品組合；Micron 有 9650 Gen6 固態硬碟 | 每項產品的硬體版本、韌體、正式結果與客戶平台 | 產品名稱中的 Gen6 不等於所有測試都在 64 GT/s 完成 |
 | 3. 供應商或客戶完成互通 | 供應商實驗室或客戶平台把不同裝置接在一起驗證 | Astera Labs 宣稱已完成實驗室與客戶驗證，但參與者與矩陣未完整公開 | 不同公司主機、交換器、訊號元件與終端的組合及重現結果 | 公司或客戶自訂驗證不等於標準組織正式測試 |
-| 4. 具名產品正式通過並列名 | 標準組織依指定程序確認結果，公開列表記下產品與條件 | 現行清單可見部分帶有 Gen6 功能名稱的產品列在 PCIe 5.0、32 GT/s | 第 140 次工作坊後具名 PCIe 6.x、64 GT/s 列項 | 較低速度列項不能當作最高速度失敗，也不能替其他產品背書 |
+| 4. 具名產品正式通過並列名 | 產品完成必要 compliance test areas 與跨廠門檻，公開列表記下產品與條件 | 制度要求已明確；現行清單可見部分帶有 Gen6 功能名稱的產品列在 PCIe 5.0、32 GT/s | 第 140 次工作坊後可核對四類測試、interop 與具名 PCIe 6.x、64 GT/s 列項 | 較低速度列項不能當作最高速度失敗，也不能替其他測項或產品背書 |
 | 5. 單一元件進入量產 | 供應商確認能穩定製造、出貨或提高產量 | Astera Labs 宣稱連接產品增產；Micron 宣稱 9650 大量生產 | 出貨產品、期間、客戶資格與裝入系統的分母 | 一顆元件量產不等於同一路徑的其他元件或軟體已準備完成 |
 | 6. 完整平台進入客戶部署 | 具名客戶用完整組合持續運作，交代規模、期間與利用結果 | 本輪沒有完整主機、交換器、訊號元件與終端的具名生產系統 | 客戶平台、元件表、軟硬體版本、部署數、期間與可重現運行結果 | 參考架構、未具名驗證或元件出貨不等於生產環境已部署 |
 
 六個時鐘不保證固定先後：客戶驗證可能早於公開清單，元件也可能在正式列項更新前量產。
 研究中心只要求每個時鐘各自有證據，不把它們壓成單一成熟度分數。
+
+## 8 月 12 日複核：考場已開，最高速度公開列名仍未見
+
+**公開清單只證明它寫出的條件。** 本輪完整頁面捕捉仍把 Cadence、Synopsys、Credo 與
+Astera 等功能名稱含 Gen6 或 64GT/s 的產品列在 PCIe 5.0 at 32GT/s，沒有捕捉到
+Spec Revision 為 PCIe 6.x at 64GT/s 的列。[S2]
+
+**工作坊結束不是一鍵列名。** 產品還要以正確角色完成必要測項與跨廠互通門檻，再提交
+Product Listing Request Form；表單可在工作坊後任何時間送出，沒有截止期限。[S9][S14]
+
+**因此缺列仍是待驗證，不是反證。** 它不能證明 64 GT/s 測試失敗、產品能力不足或結果
+不存在；研究中心只把「測試入口已存在」與「捕捉日尚未見最高速公開列項」分欄保存，等待
+第一筆能辨認受測物件、邊界、必要測項與列名日期的結果。[S2][S14]
 
 ## 把六類角色放回同一套平台
 
@@ -450,20 +855,22 @@ evidence: editorial:plain_language_wave102
 | 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
 | 1. 完整連線的位置與責任可辨認 | 主機、板路、必要訊號元件、交換器、終端與軟體都有具名角色 | 本輪來源分別出現連接產品、儲存終端與參考架構，但不在同一公開配置 | 同一測試中的產品表、接線圖與每個位置的負責者 | 不同新聞各有一個產品，不等於它們在同一系統裡工作 |
-| 2. 測試合約寫完整 | 規格版本、速度、通道、拓撲、軟硬體版本、測項與通過條件可重現 | 工作坊給出測試類別與最高速度；列表能給部分版本與速度 | 具名 64 GT/s 測試的完整組合、版本、測項、錯誤情境與結果 | 只有活動名稱、最高速度或單一截圖不等於完整測試 |
-| 3. 具名產品在目標速度正式通過 | 標準組織把產品、功能、規格版本與 64 GT/s 結果連在一起 | 本輪只見部分 Gen6 功能產品的 32 GT/s 列項，沒有捕捉到具名 64 GT/s 結果 | 第 140 次工作坊後可公開核對的 PCIe 6.x、64 GT/s 列項 | 32 GT/s 結果不是 64 GT/s 失敗，也不能拿活動入口補成通過 |
+| 2. 測試合約寫完整 | 規格版本、速度、通道、拓撲、軟硬體版本、四類 compliance、interop 與通過條件可重現 | Compliance Program 定義 Electrical、Configuration、Link Protocol、Transaction Protocol 及跨廠測試；工作坊給出最高速度 | 具名 64 GT/s 組合在各必要 test area 的版本、錯誤情境、結果與重現方法 | 只有活動名稱、最高速度、單一測項或單一截圖不等於完整測試 |
+| 3. 具名產品在目標速度正式通過 | 標準組織把產品、功能、規格版本、必要測項與 64 GT/s 結果連在一起 | 本輪只見部分 Gen6 功能產品的 32 GT/s 列項，沒有捕捉到具名 64 GT/s 完整結果 | 第 140 次工作坊後可公開核對的 PCIe 6.x、64 GT/s 測項與列項 | 32 GT/s 結果不是 64 GT/s 失敗，一類 pass 也不能替其他必測項背書 |
 | 4. 不同廠商的完整路徑互通 | 至少兩家獨立供應商的主機、訊號元件、交換器與終端，在共同軟體下重現正常與錯誤結果 | Astera Labs 有實驗室與客戶驗證主張，但沒有完整參與者與測試矩陣 | 廠商組合、拓撲、速度、通道、韌體、錯誤注入、期間與重現方法 | 單廠端到端展示或未具名客戶驗證不等於跨廠通過 |
 | 5. 具名客戶的完整平台穩定部署 | 客戶把同一組合放進生產環境，交代部署量、期間、工作負載、故障與利用率 | 只有元件增產、固態硬碟大量生產與參考架構，沒有完整客戶生產系統 | 客戶平台、元件與版本表、驗收結果、部署分母及實際運行指標 | 元件量產、參考架構或客戶驗證不等於生產環境已上線 |
 | 6. 台灣公司財務足跡可雙向核對 | 平台或客戶文件與公司文件對上同一產品、測試、資格、出貨、期間與財務分母 | 矽智財、伺服器組裝／機構與 PCB／CCL 仍是待驗證路由 | 具名設計導入、訂單或出貨，以及營收、毛利或利用率的可辨識貢獻 | 技術能力、會員、生態系或一般人工智慧伺服器收入不等於本題受惠 |
 
-本輪第一關只有分散產品，第二關只有部分測試欄位，第三關沒有具名最高速正式結果，第四關缺完整
+本輪第一關已補上規格機制與分散產品，第二關知道正式測試有哪些區域，第三關仍沒有具名最高速
+完整結果，第四關缺完整
 跨廠矩陣，第五關仍停在元件量產與參考架構，第六關也尚未通過。六關是閱讀與證據排序，不是
 效能分數、生態系完成率、供應商名單、市場份額、營收預測或投資排名。
 
 ## 這篇對公司判斷的用處與界線
 
-矽智財研究可追主機控制器、實體層電路、訊號重整與交換功能；伺服器組裝與機構研究可追板路、
-連接器、線材、韌體、散熱與整機驗收；PCB／CCL 可追材料、板層設計、訊號完整性與量產良率。
+矽智財研究可追主機控制器、實體層電路、Flit／錯誤控制、訊號重整與交換功能；伺服器組裝與
+機構研究可追板路、連接器、線材、韌體、散熱、四類 compliance 與整機驗收；PCB／CCL 可追
+PAM4 channel、材料、板層設計、訊號完整性與量產良率。
 這些都只是告訴研究者下一份證據要去哪裡找，不是公司已取得訂單。
 
 要升級任何台灣公司，必須由具名平台或客戶文件與公司文件雙向對上同一產品、64 GT/s 測試、
@@ -472,14 +879,21 @@ evidence: editorial:plain_language_wave102
 ## 來源與證據邊界
 
 - [PCI-SIG 第 140 次相容性工作坊](https://pcisig.com/events/pci-sig-compliance-workshop-140)（64 GT/s 與訊號重整器正式測試選項）。
-- [PCI-SIG 合格產品清單](https://pcisig.com/developers/integrators-list)（動態列表，捕捉日 2026-08-03）。
+- [PCI-SIG 合格產品清單](https://pcisig.com/developers/integrators-list)（動態列表，本輪再捕捉至 2026-08-12）。
 - [Astera Labs 第六代 PCIe 連接產品增產公告](https://ir.asteralabs.com/news-releases/news-release-details/astera-labs-ramps-production-pcie-6-connectivity-portfolio)（公司客戶驗證與量產主張）。
 - [Micron 9650 第六代 PCIe 固態硬碟](https://investors.micron.com/news-releases/news-release-details/micron-high-volume-production-hbm4-designed-nvidia-vera-rubin)（終端大量生產與參考架構）。
 - [PCI Express 基礎規格索引](https://pcisig.com/specification-overview/pci-express-base)（規格版本入口）。
+- [PCI-SIG PCI Express 6.0 Specification](https://pcisig.com/pci-express-6.0-specification)（PAM4、Flit、FEC、CRC 與相容性機制）。
+- [PCI-SIG Compliance Program](https://pcisig.com/developers/compliance-program)（interop／compliance 分工、正式門檻與四類 test areas）。
+- [PCI-SIG 第 140 次工作坊邀請與測試政策](https://pcisig.com/sites/default/files/2026-05/PCIWorkshop140%20Invitation%20Draft.pdf)（受測角色、CEM connector 邊界、必要測項與列名申請程序）。
+- [PCI Express 6.0 FAQ](https://pcisig.com/faq?field_category_value%5B%5D=pci_express_6.0&keys=PAM4)（四電位訊號、256-Byte Flit 與錯誤控制問答）。
+- [PCI-SIG：The Evolution of the PCI Express Specification](https://pcisig.com/blog/evolution-pci-express-specification-its-sixth-generation-third-decade-and-still-going-strong)（PAM4 error model、FEC／CRC／replay 與 Flit 連動）。
+- [Synopsys：Optimizing PCIe 6.0 Designs at 64GT/s](https://www.synopsys.com/articles/pcie-6-designs.html)（獨立 IP 設計視角的 channel、PHY／controller、Flit 與測試責任）。
 
-本文不比較 Astera 與 Micron 的效能數字，因為元件類型、測試方法與工作負載不同；也不以公開清單
-筆數推估市占。工作坊頁、公司互通實驗室、客戶驗證、量產公告與合格產品清單是五種不同證據，
-不合併計數，也不宣稱市場尚未反映。
+本文不比較 Astera、Micron 或 Synopsys 的效能數字，因為元件類型、測試方法與工作負載不同；
+也不以公開清單筆數推估市占。規格機制、正式 test area、工作坊入口、公司互通實驗室、客戶
+驗證、量產公告與合格產品清單是不同證據，不合併計數。本文沒有現價、共識、估值、部位或
+台灣公司可辨識題材財務，因此不宣稱市場尚未反映，也不給個股動作。
 
 ## 影響路由
 
@@ -519,7 +933,9 @@ evidence_boundary: 更高速率的物理要求不自動對應任一 PCB／CCL �
 ## 下一個可證明／否定的節點
 
 - PCI-SIG 公開 Workshop #140 後具名 PCIe 6.x 64 GT/s pass／Integrators List 列項。
-- 至少兩家獨立 host、retimer／switch 與 endpoint 供應商公開可重現的 64 GT/s multi-vendor 結果。
+- 首項最高速列項把受測物件、AIC／System／Component 角色、CEM connector 邊界、必要測項、互通分母與 listing form 日期一併保存。
+- 同一具名產品把 Electrical、Configuration、Link Protocol、Transaction Protocol 與 interoperability 的必要結果逐項公開。
+- 至少兩家獨立 host、retimer／switch 與 endpoint 供應商公開可重現的 64 GT/s 拓撲、Flit／錯誤恢復與長時間結果。
 - 具名客戶把完整平台從 qualification 升級到 production fleet，並揭露部署量或實際運行指標。
-- 若 Gen6 元件長期只以 gearbox 連 Gen5 生態、64 GT/s listing 延後或跨廠互通不穩，C5 的成熟度必須下修。
+- 若 Gen6 元件長期只以 gearbox 連 Gen5 生態、64 GT/s listing 延後、必要測項不完整或跨廠互通不穩，兩軸成熟度必須分別下修。
 - 台灣公司由平台端與公司端同時對上具名產品、64 GT/s 測試、客戶資格、出貨及財務後，才建立公司線。

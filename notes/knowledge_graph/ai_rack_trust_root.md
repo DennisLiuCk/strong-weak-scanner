@@ -1,15 +1,17 @@
 # AI 機櫃信任根知識圖譜
 
-本圖把「規格定義了什麼」與「誰能替採購方查證」分開。Caliptra、SPDM 與 SPDM Authorization
-各自是已發布規格，OCP S.A.F.E. 是稽核制度；三者都不代表任何具體裝置已通過驗證，也不建立
-台灣公司的供貨或受惠線。company:5274 的線只表示產品頁具名列出該功能，不含出貨與財務。
+本圖把「規格定義了什麼」與「誰能替採購方查證」分開，再把 Evidence、新鮮度、參考值、
+Verifier policy、Attestation Result、依賴方決策與可信復原接成可查核責任鏈。Caliptra、SPDM 與
+SPDM Authorization 各自是已發布規格，OCP S.A.F.E. 是稽核制度；它們都不代表任何具體裝置
+已通過驗證，也不建立台灣公司的供貨或受惠線。company:5274 的線只表示產品頁具名列出該功能，
+不含出貨與財務。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-rack-trust-root
 root_node_id: concept:ai-rack-trust-root
 label: AI 機櫃信任根
-summary: 從晶片內量測信任根走到元件證明與動作授權，並把可獨立查證的第三方保證層與規格層分開，暴露兩者成熟度不同步的缺口。
+summary: 從晶片內量測信任根走到元件證明 動作授權與可信復原 並以八欄護照分開裝置證據 驗證政策 證明結果 依賴方決策及第三方保證層。
 article_ids: MI-2026-08-08-AI-RACK-TRUST-ROOT
 status: active
 -->
@@ -252,4 +254,104 @@ review_due: 2026-11-14
 status: active
 boundary: 系統與機櫃整合商位於平台韌體與客戶驗收條款交界，只形成搜尋路由；沒有具名承擔 attestation 或授權鏈責任的文件與財務分母。
 next_trigger: 客戶驗收條款或公司申報首次具名要求 attestation、授權鏈或第三方稽核。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-TRT-I11
+view: industry
+from_id: concept:ai-rack-trust-root
+to_id: standard:ietf-rats-architecture
+relation: requires
+claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C11
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-11-14
+status: active
+boundary: RFC 9334 定義證明者 Evidence 驗證者 policy Attestation Result 與依賴方角色；資訊性架構不指定 AI rack 協定 policy 拓撲或實作品質。
+next_trigger: 具名平台以同一配置標出各角色 訊息流 policy ownership 與 authorization decision。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-TRT-I12
+view: industry
+from_id: concept:ai-rack-trust-root
+to_id: metric:attestation-evidence-freshness
+relation: measured_by
+claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C11,MI-2026-08-08-AI-RACK-TRUST-ROOT#C12
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-11-14
+status: active
+boundary: RFC 9334 與 RFC 9711 定義 timestamp nonce epoch 及 token freshness 邊界；欄位存在不證明產生 綁定 效期與 replay protection 已正確實作。
+next_trigger: 同一平台 test report 公開 freshness mechanism challenge owner result lifetime replay case 與 pass fail。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-TRT-I13
+view: industry
+from_id: concept:ai-rack-trust-root
+to_id: capability:reference-value-lifecycle
+relation: requires
+claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C13
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-11-14
+status: active
+boundary: TCG RIM 支持製造 整合 維護 patch 與 upgrade 後追加簽署 reference bundles；不證明 AI rack 多供應商資料已完整聚合 可取得或被客戶採用。
+next_trigger: 具名平台公開 component RIM aggregation 版本 lineage 撤銷 更新 ownership 與 verifier retrieval result。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-TRT-I14
+view: industry
+from_id: concept:ai-rack-trust-root
+to_id: process:attestation-decision-passport
+relation: includes
+claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C15
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-11-14
+status: active
+boundary: 八欄護照是研究中心整合 IETF TCG 與 NIST 文件的查核方法 不是三方共同標準 完整安全認證或 production adoption 證據。
+next_trigger: 具名平台以同一版本化配置公開八欄 acceptance plan failure injection result recovery 與 audit trail。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-TRT-I15
+view: industry
+from_id: concept:ai-rack-trust-root
+to_id: capability:trusted-firmware-recovery
+relation: requires
+claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C14,MI-2026-08-08-AI-RACK-TRUST-ROOT#C15
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-11-14
+status: active
+boundary: NIST 將 firmware protection detection recovery 分開可支持可信復原是獨立責任；不把 firmware recovery 外推成 AI rack 水電 服務或營運復原。
+next_trigger: 同一平台 fault injection 公開 trusted image restore re-attestation service restoration owner 時間與失敗處置。
 -->

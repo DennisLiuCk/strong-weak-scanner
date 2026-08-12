@@ -61,6 +61,13 @@ to: triaged
 reason: editorial_plain_language_wave88_cooling_loop_handoffs_and_evidence_gates_no_conclusion_change
 evidence: editorial:plain_language_wave88_cooling_loop_handoffs_and_evidence_gates
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_coolant_lifecycle_contract_and_commissioning_baseline
+evidence: sources:S3,S7,S8
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -85,12 +92,21 @@ evidence: editorial:plain_language_wave88_cooling_loop_handoffs_and_evidence_gat
 - **Sensor（感測器）**：量測溫度、流量、壓力、漏液或設備狀態的元件。讀數還要有正確位置、單位與品質標記，才能安全使用。
 - **供回水溫／流量／壓差**：供水溫是液體進入設備前的溫度，回水溫是帶熱後的溫度；流量是單位時間通過的液體量，壓差是前後壓力差。三者要一起看，不能只看單一數字。
 - **水質／腐蝕／污染**：冷卻液的化學成分、顆粒與微生物會影響金屬、密封件和流道。水質失控可能造成腐蝕、沉積或堵塞，即使設備額定容量沒有改變。
+- **浸液材料（Wetted materials）**：在迴路內會直接接觸冷卻液的金屬、塑膠、彈性體、密封件、接著劑與塗層。只要新增或更換一種材料，就要重新核對它和流體及其他材料是否相容。
+- **冷卻液基準（Coolant baseline）**：系統剛填充、條件合格時留下的流體配方、檢驗值與樣本。之後的讀值要和這個起點比較，才看得出趨勢，而不是只問有沒有超過單一警報值。
+- **TSS／TDS**：TSS 是懸浮在液體裡、可形成顆粒污染的固體；TDS 是已溶解的離子與物質總量。兩者都可能影響水路，但不能用同一個數字互相替代。
+- **導電度／pH／濁度**：導電度反映流體中離子導電的程度，pH 表示酸鹼性，濁度反映懸浮顆粒造成的混濁。它們是不同觀測窗，不是「水質」的一個總分。
+- **腐蝕抑制劑／殺生劑**：前者用來降低金屬腐蝕，後者用來控制微生物。兩者都必須和流體、材料及操作條件相容，不能看到濃度不足就自行加藥。
+- **結垢／污堵／腐蝕／微生物生長**：四種不同失效。結垢是礦物沉積，污堵是顆粒或殘留物堆積，腐蝕是材料被化學或電化學反應破壞，微生物生長則可能形成生物膜；四者的檢查與處置不能混為一談。
+- **沖洗／鈍化（Flushing／passivation）**：沖洗把施工殘留、顆粒與不合格流體帶出迴路；鈍化是在適用材料表面建立較穩定的保護狀態。它們是試運轉程序，不等於設備出廠時已自動完成。
+- **變更控制／行動門檻**：變更控制要求流體、材料、濾材或程序一有改動就重新評估；行動門檻則預先規定讀值偏離時由誰複驗、隔離、換液或停機，避免告警出現後才臨時決定。
 - **漏液偵測／隔離**：偵測是發現哪裡有液體異常；隔離是關閉正確閥件或設備，限制影響範圍。看得到告警不代表系統一定能安全隔離。
 - **備援**：主要泵浦、電源、感測或控制失效時，由另一組元件接手。備援要經過實際切換測試，不能只靠產品型錄判定。
 - **IT／OT**：IT 是伺服器、叢集與資料處理系統；OT 是建築、機電與現場設備控制。液冷告警常需要兩邊對到同一機櫃與同一事件。
 - **Guardrail／action ownership（安全限制／動作責任）**：安全限制規定控制動作不能超過哪些邊界；動作責任則回答誰有權下令、誰執行、誰確認結果。
 - **Interface control（介面控制）**：把兩個系統交界的尺寸、材料、訊號、設定值、測試與責任寫清楚，避免雙方都以為對方會處理。
 - **Commissioning／SAT（試運轉／場域驗收測試）**：試運轉是在現場確認整套系統按設計運作；SAT 是客戶或場域依約定條件完成的驗收測試。兩者比單件產品測試更接近實際部署。
+- **L1–L5 commissioning levels（五級試運轉）**：ASHRAE 框架以 L1 表示出貨前的工廠驗收，L2 核對到貨與安裝，L3 做單件／子系統運轉前檢查，L4 測完整系統在不同條件下的功能，L5 再測多系統於真實與故障情境下能否協同。本文提到 L4／L5 基準，就是後兩級留下的整體運轉與整合測試起點。
 - **Field reliability（場域可靠度）**：設備長期在真實環境運作後的故障、維修與可用情況；剛通過驗收還不能回答全生命週期表現。
 - **Deployment denominator（部署分母）**：用來說明部署規模的基礎，例如多少座場域、機櫃或設備。沒有分母，就不能把少數案例外推成大規模採用。
 
@@ -220,6 +236,38 @@ limitation: 索引頁本身不證明液冷責任範圍、客戶、驗收、量�
 independence_group: twse-mops
 -->
 
+<!-- research_source
+source_id: S7
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Guidelines for Using Water-Based Transfer Fluids in Single-Phase Cold Plate-Based Liquid-Cooled Racks
+published_at: 2022-10-03
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.opencompute.org/documents/guidelines-for-using-water-based-transfer-fluids-in-single-phase-cold-plate-based-liquid-cooled-racks-final-pdf
+locator: 文件頁碼 pp.5–10、14–17；fluid／wetted materials mutual compatibility、Table 1 baseline、startup sample 與 routine monitoring tables
+limitation: 這是 2022 年 water-based、non-PG TCS 的指引，數值須按專案客製，不能外推為 FWS、PG、介電液或所有平台的通用門檻；PDF 本身未標批准日，published_at 採共同作者公開 OCP publication listing 的日期，現行 OCP 工作頁另有後續 draft
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S8
+role: standard
+source_kind: living_index
+publisher: ASHRAE
+title: AI Data Center Energy Performance Framework - Commissioning & Performance Validation
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.ashrae.org/technical-resources/ai-data-center-framework/commissioning-performance-validation
+locator: 2026-08-12 Discussion and Highlights；L1–L5 commissioning、construction／startup fouling、cleaning／flushing／passivation 與 L4／L5 baseline trending
+limitation: 動態框架頁提供 commissioning 方法與風險邊界，沒有具名場域、冷卻液數值門檻、供應商結果、field failure rate 或財務貢獻
+independence_group: ashrae
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -339,6 +387,91 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: OCP 的 water-based TCS 指引要求冷卻液、完整浸液材料清單、接頭、溫度、壓力、過濾與安全條件彼此相容；若迴路加入新材料或元件，原相容性判定必須重新評估
+supporting_source_ids: S7
+contrary_source_ids:
+as_of: 2022-10-03
+basis: S7 pp.5–10 把 fluid、wetted materials、connectors 與 operating conditions 放在同一套 mutual-compatibility 要求，並明示 additions require reevaluation
+boundary: 只證實該 OCP water-based TCS 方法；不表示一份材料清單已涵蓋所有流體、FWS、PG 或介電液，也不證明任一供應商已完成客戶 qualification
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: OCP 指引要求啟動時在合格條件下保留代表性冷卻液樣本，並在運轉中監測導電度、pH、硬度、細菌、抑制劑、外觀與濾材負載，再以實驗室品質控制和趨勢比較判讀變化
+supporting_source_ids: S7
+contrary_source_ids:
+as_of: 2022-10-03
+basis: S7 pp.14–17 的 startup cleanliness、flushing、fill、retained sample 與 routine monitoring tables 直接列出採樣、檢測、QA 和 trending 要求
+boundary: 文件沒有替每座場域給出同一採樣頻率、全套 action limit 或 root-cause 決策；保留樣本和監測也不等於已證實長期可靠
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: Lenovo 的 Neptune 指引把 scaling、fouling、corrosion 與 microbiological growth 分成四類水質失效，並要求系統從設計、製造、運送、安裝到維護保持潔淨，持續監測 pH、導電度、細菌數與腐蝕抑制劑
+supporting_source_ids: S3
+contrary_source_ids:
+as_of: 2024-09-13
+basis: S3 Direct Water-Cooling Quality、Water Treatment 與 Monitoring 段落直接列出四類風險、全流程 cleanliness 和監測欄位
+boundary: 這是 Lenovo 平台實作指引，不是所有流體與材料的共同 failure limit，也不提供跨場域故障率或供應商比較
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: ASHRAE 的 AI data center commissioning 框架指出液冷設施會因施工與啟動潔淨度不良而產生 fouling 風險，因而把 cleaning、flushing、passivation 及 L4／L5 的效能基準與趨勢追蹤列為 commissioning 和營運交接重點
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8 2026-08-12 捕捉頁面的 Discussion and Highlights 直接描述 fouling susceptibility、清潔／沖洗／鈍化與 L1–L5 commissioning baseline
+boundary: 動態方法頁沒有提供具名專案的 pass／fail、冷卻液 action limit、長期可靠度或供應商責任結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: inference
+status: active
+claim: 一份可部署的冷卻液生命週期合約至少要固定操作包絡、化學基準、浸液材料與變更控制、潔淨度與污染預算、試運轉基準、長期監測與行動責任六欄；CDU 額定容量或一次壓測／漏測不能替代這六欄
+supporting_source_ids: S3,S7,S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S7 把 fluid、materials、startup sample 與 monitoring 串成生命週期，S3 補足四類失效與全流程 cleanliness，S8 再把施工啟動及 L4／L5 baseline 接到 commissioning；六欄是對三份文件的系統工程整理
+boundary: 六欄是研究檢查框架，不宣稱所有專案採相同流體、門檻、取樣頻率、責任分工或必須由單一供應商承擔，也不形成商業或財務判定
+verification_needed: 需具名多供應商量產場域公開完整 fluid baseline、wetted-material list、cleaning／flushing／passivation、action limits、責任矩陣及長期趨勢驗證完整性
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 冷源到伺服器要交接五次
 
 沿著冷卻液前進的方向讀這張表：先從機房設施把熱交給冷卻設備，再經循環水路、機櫃分流與
@@ -356,6 +489,43 @@ resolution:
 這張表刻意不指定「誰一定是贏家」。同一專案可以由 ODM、冷卻設備商、機電承包商、
 設施營運方與平台商分別負責不同列；真正的商業價值要看合約責任、驗收、維護與收入分母，
 不是產品型錄涵蓋的方框數。
+
+## 水質不是一個數字：先寫六欄流體生命週期合約
+
+額定散熱能力回答「設備在指定條件下能帶走多少熱」；流體生命週期合約回答「這些條件能否
+在施工、填充、運轉、維修與換件之後仍然成立」。兩者都重要，但不能互相代替。研究一座
+液冷場域時，至少要把下列六欄寫到能由不同團隊重複核對。
+
+| 合約欄位 | 必須固定什麼 | 怎麼驗 | 失敗訊號 | 不能被什麼替代 |
+|---|---|---|---|---|
+| 1. 操作包絡 | 流體類型、供回水溫、壓力、流量、熱負載與過濾條件 | 最差條件測試與趨勢資料 | 流量、壓差或換熱能力偏離設計區間 | CDU 名牌容量或單一穩態測點 |
+| 2. 化學基準 | 初始配方、pH、導電度、硬度、TSS、抑制劑／殺生劑與合格範圍 | 填充前檢驗、啟動樣本與實驗室 QA | 讀值持續漂移、顆粒或外觀異常 | 「使用純水」這種沒有數值與樣本的描述 |
+| 3. 浸液材料與變更控制 | 所有金屬、塑膠、密封、接著劑、塗層及替代料 | 材料清單、流體相容性評估與每次變更重審 | 新材料後出現腐蝕、膨潤、脆化或沉積 | 單一元件材質聲明或供應商列名 |
+| 4. 潔淨度與污染預算 | 製造、運送、現場管路、接管與維修可容許的顆粒／殘留 | 清潔封存、濾材檢查、沖洗終點與樣本 | 濁度、TSS、濾材負載或壓差上升 | 只在設備出廠時做一次清潔 |
+| 5. 試運轉基準 | 清洗、沖洗、必要時鈍化、填充、排氣、取樣與留樣順序 | 有簽核的程序、代表性基準樣本與 L4／L5 測試 | 啟動後很快污染，卻無法分辨原始或新增問題 | 壓測、漏測或單件 FAT |
+| 6. 監測與行動責任 | 取樣點、頻率、趨勢、行動門檻、複驗、隔離、換液與復原責任 | 儀表／實驗室交叉核對、趨勢圖與演練紀錄 | 告警存在但沒有人能判斷或執行下一步 | BMS 上有一個「水質正常」燈號 |
+
+OCP 2022 指引的 Table 1 提供一組 **water-based、non-PG TCS 的典型起點**：TSS 小於
+5 ppm、25°C 導電度小於 1,500 μS/cm、pH 8.0–10.5、運轉中細菌小於 100 CFU/mL。
+這些數字有助於理解規格必須帶單位、溫度與流體範圍，卻不是跨專案的通用答案；PG 配方、
+介電液、FWS 水質、不同材料與客戶條件都必須另行評估。研究上應先問「這是哪一段迴路、哪種
+流體、哪份材料清單、哪個版本」，再判斷數值能否比較。
+
+## 四種品質失效不是同一種髒
+
+「水髒了」無法指向可執行的處置。Lenovo 把水質風險拆成四類；OCP 與 ASHRAE 的啟動樣本、
+沖洗及長期趨勢，則提供區分「一開始就帶入」與「運轉後才生成」的時間軸。
+
+| 失效類型 | 常見可能成因 | 應一起看的觀測 | 可能造成的系統結果 | 要補的處置證據 |
+|---|---|---|---|---|
+| 結垢（scaling） | 礦物濃度、溫度或化學條件讓固體析出 | 硬度、pH、導電度、溫度與換熱趨勢 | 流道或換熱面沉積，熱阻與壓降增加 | 水處理紀錄、沉積物分析、清洗前後效能 |
+| 污堵（fouling） | 施工殘留、顆粒、密封碎屑或不合格流體進入 | TSS、濁度、濾材負載、流量與壓差 | 濾材或細流道堵塞，支路流量失衡 | 污染來源、沖洗終點、濾材與樣本紀錄 |
+| 腐蝕（corrosion） | 流體與浸液材料不相容，或抑制劑與化學條件失控 | pH、導電度、抑制劑、材料變更與外觀 | 材料劣化、產生顆粒，甚至形成漏液風險 | 完整材料清單、相容性重審與原因分析 |
+| 微生物生長 | 細菌進入並在適合條件下繁殖 | 細菌數、外觀、濾材負載、殺生程序與趨勢 | 生物膜、堵塞、腐蝕或水質持續惡化 | 取樣品質、處理紀錄、復驗與再發監測 |
+
+單次超標只能說「某個觀測點異常」，不能單獨證明根因。若沒有啟動基準、代表性取樣、材料
+與維修變更紀錄，就很難分辨問題來自原始填充、現場施工、某次換件，還是長期化學漂移；
+也無法把責任公平地交給設施端、整合商、設備商或營運方。
 
 ## 從文件要求到長期營運要過五關
 
@@ -381,7 +551,9 @@ resolution:
 
 - [OCP：Cold Plate Cooling Loop Requirements Rev 2](https://www.opencompute.org/documents/cold-plate-cooling-loop-requirements-rev-2-pdf)
 - [OCP：Cold Plate Sub-Project](https://www.opencompute.org/community/cold-plate)
+- [OCP：Water-Based Transfer Fluids Guidelines](https://www.opencompute.org/documents/guidelines-for-using-water-based-transfer-fluids-in-single-phase-cold-plate-based-liquid-cooled-racks-final-pdf)
 - [Lenovo：Neptune Direct Water-Cooling Standards](https://lenovopress.lenovo.com/lp2018-lenovo-neptune-direct-water-cooling-standards)
+- [ASHRAE：AI Data Center Commissioning & Performance Validation](https://www.ashrae.org/technical-resources/ai-data-center-framework/commissioning-performance-validation)
 - [NVIDIA：DSX Exchange BMS Integration](https://docs.nvidia.com/dsx-exchange/bms-integration)
 - [NVIDIA Marketplace：DSX Infrastructure validated CDU list](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)
 - [公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
@@ -447,6 +619,19 @@ frequency: quarterly
 next_check: 2026-09-30
 trigger: 客戶與公司文件共同指向具名場域、責任範圍、驗收、量產部署及收入／毛利分母
 invalidation: 公司明確只供單件且不承擔整合，或專案長期停在 MOU／PoC／sample 而未進場域驗收
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C8,C9,C10,C11,C12
+metric: 多供應商 TCS 是否公開完整的操作包絡、流體基準、浸液材料與變更控制、污染預算、試運轉樣本、監測門檻及動作責任
+source_ids: S3,S7,S8
+watch_source_ids: S2,S8
+frequency: monthly
+next_check: 2026-09-03
+trigger: 具名多供應商量產場域發布 fluid COA／baseline、wetted-material list、cleaning／flushing／passivation、sampling／action limits 與 field trend
+invalidation: 標準化密閉迴路以跨更新週期的長期 field evidence 證明設備 qualification 已固定全部六欄，新增材料或維修變更也不需重新評估
 -->
 
 ## 什麼會推翻這篇

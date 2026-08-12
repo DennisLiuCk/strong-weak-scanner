@@ -1,14 +1,15 @@
 # 800VDC 功率半導體鏈知識圖譜
 
-本圖依電力鏈位置呈現 SiC、GaN 與 Si 的功能，而不是把材料畫成單一勝負。公司節點只表示
-已公開的架構、reference design 或產品規劃；沒有一條線代表台灣公司已取得訂單。
+本圖先用 topology 判斷哪些轉換、隔離、備援與保護級存在，再把 SiC、GaN 與 Si 放回同一
+power stage 的六軸選材包絡線。公司節點只表示已公開的架構、reference design 或產品規劃；
+沒有一條線代表台灣公司已取得訂單。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: 800v-power-tree
 root_node_id: concept:800v-power-tree
 label: 800VDC 功率半導體鏈
-summary: 從 SST、BBU、保護、IBC 到末端供電拆解 SiC、GaN 與 Si 的角色，並分開 reference design、qualification 與 2027 deployment。
+summary: 先分開現行 48V、過渡 sidecar、設施級 800V 與靠近運算的直降 topology，再以工作電壓電流、切換、隔離、保護、熱封裝及 qualification 六軸拆解 SiC、GaN 與 Si，並分開 reference design、系統驗收與財務歸因。
 article_ids: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION
 status: active
 -->
@@ -331,4 +332,144 @@ review_due: 2026-09-02
 status: active
 boundary: PSU、BBU 與 IBC 形成電源族群搜尋路由；外部 reference design 不證明台灣廠採相同 BOM 或已認列收入。
 next_trigger: 具名 800V power product、客戶 qualification、shipment、收入與毛利。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I12
+view: industry
+from_id: concept:800v-power-tree
+to_id: concept:800v-topology-device-selection
+relation: includes
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C7
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: NVIDIA、TI、ST、OCP 與既有供應商來源展示不同 topology／stage；它們是獨立架構鏈，不是同一 production system 的多數決。
+as_of: 2026-08-12
+review_due: 2026-08-19
+status: active
+boundary: 兩層框架用來固定研究順序與比較條件，不是唯一最佳架構、材料份額、device count、供應商排名或財務預測。
+next_trigger: 平台或客戶固定 production topology／revision，逐級公開責任、具名 device 與 pass-fail。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I13
+view: industry
+from_id: concept:800v-power-tree
+to_id: metric:power-stage-selection-envelope
+relation: measured_by
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C7
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: 六軸來自多條轉換、保護與過渡架構的共同設計邊界；各公司仍使用不同 input／output、topology 與 reference plane。
+as_of: 2026-08-12
+review_due: 2026-08-19
+status: active
+boundary: 六軸是條件清單，不合成分數；未固定輸入輸出、負載、冷卻、隔離與測法時不得跨設計排名。
+next_trigger: 同一 power stage 公開兩個以上方案的對齊條件、原始結果、不確定度與 failure boundary。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I14
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:direct-hv-bus-converter
+relation: includes
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C8,MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C9
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: TI 與 ST 各自公開 800V-to-6V／12V 路徑，ST 另有 800V-to-50V prototype；不同供應商與 topology 不構成單一客戶 BOM。
+as_of: 2026-03-17
+review_due: 2026-08-19
+status: active
+boundary: Reference architecture／prototype 支持可行路徑，不證明 NVIDIA production topology、客戶 qualification、量產份額或收入。
+next_trigger: 具名平台固定 direct-conversion revision、converter raw test、rack integration、customer pass 與 production BOM。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I15
+view: industry
+from_id: concept:800v-power-tree
+to_id: component:48v-power-shelf
+relation: includes
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C10
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: named_product
+exclusivity: limited_source
+exclusivity_scope: 本邊只依 OCP HPR V2 1.0.0 規格固定一套 48V contract；不代表所有 rack、會員實作或 alternate architecture。
+as_of: 2026-06-12
+review_due: 2026-08-19
+status: active
+boundary: 規格支持 72kW、6×12kW、60kW N+1 與 48V 系統要求，不證明共同 qualification、部署量、供應商或財務。
+next_trigger: 具名產品依相同 revision 公開 qualification、production shipment、deployment denominator 與 transition plan。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I17
+view: industry
+from_id: concept:800v-power-tree
+to_id: stage:800v-subsystem-qualification
+relation: reaches_stage
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C11
+note_refs:
+evidence_state: unverified
+commercial_stage: qualification
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-19
+status: active
+boundary: 本輪沒有同一 800V converter／BBU／protection revision 的完整原始 test matrix、pass-fail、change control 與 customer acceptance。
+next_trigger: 具名 subsystem 固定 topology、device、firmware、cooling 與 fault boundary，公開可重算 qualification pack。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I18
+view: industry
+from_id: concept:800v-power-tree
+to_id: stage:800v-site-acceptance
+relation: reaches_stage
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C11
+note_refs:
+evidence_state: unverified
+commercial_stage: validation
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-19
+status: active
+boundary: Platform path、reference design 與 48V specification 都不證明具名 800V rack／site 已完成 as-built fault、safety、serviceability、load 與 operating-hours acceptance。
+next_trigger: 具名客戶場站公開 revision、commissioning、fault injection、acceptance、deployment denominator 與 field reliability。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I19
+view: industry
+from_id: concept:800v-power-tree
+to_id: stage:800v-commercial-attribution
+relation: reaches_stage
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C11
+note_refs:
+evidence_state: unverified
+commercial_stage: financial
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 本輪沒有買方與供應商對上同一 800V product／site／period 的 production BOM、shipment、revenue、cost、margin 與 cash。
+next_trigger: 雙方揭露可核對的 product revision、deployed volume、shipment、收入成本毛利與分母，且排除 48V／54V 過渡產品混入。
 -->

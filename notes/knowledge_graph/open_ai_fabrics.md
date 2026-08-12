@@ -1,15 +1,15 @@
 # AI 資料路徑與跨廠互通知識圖譜
 
-本圖先把運算端點、連接傳輸、交換器、控制軟體與目的端點放回同一條資料路徑，再分開
-機架內 UALink、ESUN／SUE-T 與跨機架 UEC、UALoE、晶粒及部署成熟度。規格、產品與雲端
-規劃可以相連，但不能相加成已互通或已部署收入；台灣族群仍只保留為待驗證搜尋路由。
+本圖用兩條軸閱讀開放人工智慧網路：先分清加速器機架內、跨機架、服務／處理器、儲存、
+帶內與帶外管理六種網路工作，再分開實體、端點、交換、軟體、管理、單件合規、跨廠互通、
+系統與部署契約。共同使用 Ethernet 或同一設備不會合併責任，也不能相加成已部署收入。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: open-ai-fabrics
 root_node_id: concept:open-ai-fabrics
 label: AI 資料路徑與跨廠互通
-summary: 先展開端點、連接傳輸、交換器、控制軟體與目的端點，再把 UALink、ESUN／SUE-T 機架內路徑與 UEC 跨機架路徑分開，依序追蹤規格、實體晶片、合規、跨廠互通、系統與雲端部署。
+summary: 先固定加速器機架內、跨機架、服務／處理器、儲存、帶內與帶外管理六種網路工作，再把實體、端點、交換、軟體、管理、單件合規、跨廠互通、系統壓力與客戶部署逐層驗收。
 article_ids: MI-2026-08-02-OPEN-AI-FABRICS
 status: active
 -->
@@ -392,4 +392,224 @@ review_due: 2026-08-10
 status: active
 boundary: 產品用途不等於 ESUN／SUE-T 實作、shipment、客戶部署或 scale-up／scale-out 收入分拆。
 next_trigger: Arista 或客戶公布正式標準對應、出貨與實際部署拓撲。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I15
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: concept:ai-network-plane-map
+relation: contains
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C18
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 六種網路工作是 OCP 現行範圍與一套 OPG-M 參考架構支持的閱讀框架；不表示所有叢集都有六套獨立實體設備或相同拓撲。
+next_trigger: 更多具名參考架構或客戶部署公開網路平面、是否匯聚、BOM、冗餘與驗收結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I16
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: concept:ai-front-end-network
+relation: contains
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C14,MI-2026-08-02-OPEN-AI-FABRICS#C15
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: OCP 現行範圍列出 front-end，OPG-M 以 SO-C 與帶內管理分工；這不證明所有叢集用相同實體網路或設備。
+next_trigger: 具名系統公開前端／SO-C 拓撲、流量、交換器、軟體、故障與驗收分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I17
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: concept:ai-storage-network
+relation: contains
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C14,MI-2026-08-02-OPEN-AI-FABRICS#C15
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: OCP 範圍與 OPG-M 參考設計把 storage network 分開；不證明特定儲存平台、吞吐、部署或供應商收入。
+next_trigger: 具名叢集公開儲存工作、拓撲、容量／吞吐、故障恢復、利用率與客戶驗收。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I18
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: concept:ai-in-band-management-network
+relation: contains
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C14,MI-2026-08-02-OPEN-AI-FABRICS#C15
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: OPG-M 把 in-band management 列為獨立網路；管理可達不等於資料平面、故障救援或客戶部署已驗收。
+next_trigger: 具名系統公開帶內管理的設備發現、設定、遙測、漂移、故障與恢復結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I19
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: concept:ai-out-of-band-management-network
+relation: contains
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C15
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: OPG-M 把 out-of-band management 列為獨立網路；救援通道存在不等於主資料網具冗餘或生產工作不會中斷。
+next_trigger: 具名部署公開帶外管理拓撲、隔離、權限、失聯情境、重置與維修時間。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I20
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: concept:ai-fabric-stack-contract
+relation: contains
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C16,MI-2026-08-02-OPEN-AI-FABRICS#C18
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 八層契約是把 UALink／UEC／OCP 的分工與驗收邊界投影成統一閱讀框架，不是官方共同認證等級或效能排名。
+next_trigger: 各組織發布完整測試架構，或具名產品結果顯示需要合併、拆分或重排驗收層。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I21
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: stage:compliance-self-attestation
+relation: passes_through
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C17
+note_refs:
+evidence_state: verified
+commercial_stage: qualification
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-19
+status: active
+boundary: UEC 已公開自我聲明、checklist 與測試床工具入口；另頁會員聲明是必要專利權利登錄，沒有具名產品聲明／通過或第三方認證清單，且不能替代跨廠互通。
+next_trigger: UEC 公開具名產品、版本、已填 checklist、測項與結果，並說明自我聲明或第三方驗證責任。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I22
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: stage:system-stress-validation
+relation: passes_through
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C17,MI-2026-08-02-OPEN-AI-FABRICS#C19
+note_refs:
+evidence_state: unverified
+commercial_stage: validation
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-19
+status: active
+boundary: UEC 測試床文件明示 system stress／scale 與 performance 不在範圍；本輪沒有具名產品或系統已通過的公開結果。
+next_trigger: 公開端點與機架數、版本、拓撲、負載、期間、故障、效能、恢復與通過條件的具名系統報告。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I23
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: capability:fabric-lifecycle-management
+relation: requires
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C14,MI-2026-08-02-OPEN-AI-FABRICS#C16,MI-2026-08-02-OPEN-AI-FABRICS#C18
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: OCP／UEC 將管理、遙測、除錯、生命週期與設定漂移列為責任範圍；這不證明特定工具已部署或產生收入。
+next_trigger: 具名系統公開設備上線、設定、更新、漂移偵測、告警、替換與退役的版本化結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I24
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: concept:ai-storage-data-plane
+relation: integrated_with
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C14,MI-2026-08-02-OPEN-AI-FABRICS#C15
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: OCP 把 storage network 列為人工智慧叢集的一張網，只建立與資料讀取／儲存路徑的概念連接，不證明具名產品、容量或部署。
+next_trigger: 具名叢集同時公開訓練資料、檢查點、模型搬運的網路拓撲、工作負載與驗收結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I25
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: concept:ai-rack-action-contract
+relation: integrated_with
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C14,MI-2026-08-02-OPEN-AI-FABRICS#C18
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-12
+status: active
+boundary: 管理網路與生命週期責任需要身分、資料語意、動作所有權及維修閉環；這是跨文章推論，不是已部署的共同標準。
+next_trigger: OCP、UEC 或具名平台公開跨設備管理資料、控制動作、安全裁決、隔離與維修結果的共同契約。
 -->

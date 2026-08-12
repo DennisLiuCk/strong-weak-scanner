@@ -1,4 +1,4 @@
-# 800VDC 不是 SiC 或 GaN 二選一：價值取決於它位在電力鏈哪一段
+# 800VDC 不是 SiC 或 GaN 二選一：先看拓撲，再用六把尺選元件
 
 <!-- research_topic
 topic_id: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION
@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-07-14
-last_reviewed_at: 2026-08-02
-review_due: 2026-08-16
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-19
 source_type: mixed
 publisher: Infineon Technologies
 publisher_domain: infineon.com
@@ -19,9 +19,9 @@ group_ids: power,powersupply
 trigger_type: power_architecture_component_partition
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C5
+thesis_claim_id: C7
 base_confidence: medium
-confidence_basis: NVIDIA 的 2027 架構錨點、Infineon 的 GaN IBC 與 SiC BBU 實體 reference design、onsemi 的高壓 SST 路徑及 ROHM 的產品規劃可交叉確認功能分工；但 reference design、planned adoption 與 full-scale deployment 仍未對齊，台灣財務曝險也未建立
+confidence_basis: NVIDIA 的分階段架構、TI 與 ST 兩條獨立直降 reference architecture、OCP 現行 48V power shelf contract，以及 Infineon／onsemi／ROHM 的元件設計可交叉確認「拓撲先決定 stage、選材再發生於 stage 內」；但公開鏈仍未接到同一客戶的 qualification、production BOM、field reliability 或財務分母
 cross_company_numbers: false
 -->
 
@@ -168,6 +168,70 @@ limitation: 供應商產品頁不能代替量產客戶、實際部署、系統�
 independence_group: onsemi
 -->
 
+<!-- research_source
+source_id: S9
+role: competitor_primary
+source_kind: document
+publisher: Texas Instruments
+title: TI unveils complete 800-VDC power architecture for future-generation AI data centers with NVIDIA
+published_at: 2026-03-16
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.ti.com/about-ti/newsroom/news-releases/2026/2026-03-16-ti-unveils-complete-800-vdc-power-architecture-for-future-generation-ai-data-centers-with-nvidia.html
+locator: 800V→6V isolated bus converter、6V→sub-1V multiphase、800V→12V、hot-swap、CBU 與 30kW AC-DC reference architecture 段落
+limitation: TI 公開的是供應商 reference architecture 與元件組合；不證明 NVIDIA production rack 已固定此 topology、客戶 qualification、跨廠比較、出貨或收入
+independence_group: texas-instruments
+-->
+
+<!-- research_source
+source_id: S10
+role: competitor_primary
+source_kind: document
+publisher: STMicroelectronics
+title: STMicroelectronics unveils power architectures for 800VDC AI data centers
+published_at: 2026-03-17
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://newsroom.st.com/media-center/press-item.html/t4766.html
+locator: 800V→50V GaN LLC prototype、800V→12V 與 800V→6V architectures，以及 Si／SiC／GaN／controller 組合段落
+limitation: ST 的 prototype 與 architecture 只支持可行轉換路徑及公司所採元件角色；不等於具名客戶 qualification、量產 BOM、可靠度或財務貢獻
+independence_group: stmicroelectronics
+-->
+
+<!-- research_source
+source_id: S11
+role: company_release
+source_kind: living_index
+publisher: NVIDIA
+title: 800 VDC Architecture for Next-Generation AI Factories
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.nvidia.com/en-au/data-center/technologies/800-vdc-architecture/
+locator: 2026-08-12 活頁的 gradual evolution、support existing data centers、path to all-800V future 與 fewer conversion stages；並逐頁核對頁面所連官方 whitepaper 的 phased strategy、transitional side power rack、facility rectifier、direct conversion 及 certification 邊界
+limitation: NVIDIA 的活頁與 whitepaper 是資訊性架構路徑，不是 rigid production specification、採購承諾、共同 pass report 或已部署場站清冊；文件亦明示客戶仍須自行測試
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Open Rack V3 HPR V2 72kW Power Shelf Specification Version 1.0.0
+published_at: 2026-06-12
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.opencompute.org/documents/open-rack-v3-hpr-v2-72kw-power-shelf-spec-v1-0-0-pdf
+locator: PDF pp.6–11；72kW shelf、6×12kW PSU、60kW N+1、48V narrow-range architecture、PSU／BBU transition、peak-load 與 busbar temperature requirements
+limitation: OCP specification 固定一套 48V power-shelf contract 與要求，不證明所有會員已部署、800V transition 延後、特定供應商通過 qualification 或取得收入
+independence_group: open-compute-project
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -270,9 +334,96 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C7
+label: inference
+status: active
+claim: 800VDC 的元件研究應採兩層契約：系統 topology 先決定哪些轉換、隔離、備援與保護 stage 仍存在；在每個保留 stage 內，再依工作電壓／電流、切換頻率與 topology、隔離安全、瞬態保護、熱與封裝，以及 qualification／供應六軸選擇 Si、SiC、GaN 與控制元件
+supporting_source_ids: S2,S3,S4,S5,S9,S10,S11,S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9／S10 兩家獨立供應商各自公開 800V→6V／12V／50V 路徑，顯示中間 stage 可被移動或整合；S11 明示既有、過渡與 all-800V 架構會並存且轉換級數不同；S12 固定一套現行 48V power-shelf contract；S2–S5 再顯示同一 power tree 內不同 stage 可採不同材料
+boundary: 兩層契約是整理設計變數與證據的研究框架，不是唯一最佳 topology、固定 material share、device count、供應商排名、客戶 production BOM 或財務預測；六軸也必須在相同輸入輸出與測試條件下才可比較
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: TI 已公開一條 800V→6V isolated bus converter 再由 6V 降至 sub-1V 的 reference architecture，並另列 800V→12V、hot-swap、CBU 與 AC-DC building blocks
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-03-16
+basis: S9 直接列出兩段 voltage path 與相鄰 reference designs／power stages
+boundary: 只支持 TI 所公開的架構與 building blocks；不代表 NVIDIA 已選定此 production topology、所有中間級都會消失、客戶通過或量產出貨
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: ST 已公開 800V→50V GaN LLC prototype，並提出 800V→12V 與 800V→6V architectures；同一套供電敘事仍同時包含 Si、SiC、GaN、analog 與 controller 角色
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-03-17
+basis: S10 直接列出三種 output-voltage 路徑、prototype 狀態與不同半導體角色
+boundary: Prototype／architecture 不等於具名客戶採用、共同 efficiency benchmark、production BOM、可靠度或營收；材料組合仍依各條 topology 改變
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: OCP 的 Open Rack V3 HPR V2 規格仍固定一套 72kW、6×12kW PSU、60kW N+1 的 48V narrow-range power shelf，並把 PSU／BBU transition、peak load 與 busbar temperature sensing 列為系統要求
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-06-12
+basis: S12 pp.6–11 的 architecture、power budget、transition、peak-load 與 temperature requirements
+boundary: 這證明現行 48V contract 仍具體存在，不證明所有平台採同一規格、800V 不會導入、任何產品已通過 OCP qualification 或特定公司取得訂單
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: unverified
+status: active
+claim: 任一公開的 800V device 或 reference architecture 已沿同一版本鏈完成 converter 原始測試、rack／site safety 與 fault qualification、多來源客戶驗收、production BOM、field deployment，並形成可雙向核對的供應商收入與毛利
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9／S10 只到供應商 architecture／prototype，S11 是資訊性 platform path，S12 是 48V specification；本輪沒有同一產品版本跨過全部工程、客戶、部署與財務節點
+boundary: 生態系名單、datasheet、reference board、單點效率、規格發布、planned deployment 或事業群營收均不能單獨補齊這條鏈
+verification_needed: 需固定同一 input／output／topology／cooling／revision，取得 device data、converter raw test、rack／site pass-fail、客戶 acceptance、production BOM、deployed denominator，以及買賣雙方同期間 shipment／revenue／cost／margin
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
+retired_at: 2026-08-12
+retirement_reason: C5 的材料功能分區已被 C7 的 topology-first／six-axis 兩層契約擴展；舊 stage 與 production BOM 問題由 T3 以更新後來源與 claim 集合接續
 claim_ids: C2,C3,C4,C5,C6
 metric: 各 power stage 的實際 topology、材料、qualification 與 production BOM
 source_ids: S2,S3,S4,S5,S6
@@ -286,7 +437,9 @@ invalidation: 客戶延長 48／54V 過渡、取消某轉換層，或實際 topo
 
 <!-- monitoring_item
 monitor_id: T2
-status: active
+status: retired
+retired_at: 2026-08-12
+retirement_reason: 2027 deployment 與財務問題需先分開 converter、rack／site、customer BOM 與 financial attribution；原 trigger 由 T4 依 C7／C11 的固定版本鏈接續
 claim_ids: C1,C5,C6
 metric: 2027 full-scale 800V rack 部署與供應商財務認列
 source_ids: S1,S2,S3,S4
@@ -296,6 +449,34 @@ frequency_detail: 每月檢查 platform、hyperscaler 與供應商法說的 qual
 next_check: 2026-09-02
 trigger: 平台確認 production rack 與客戶部署，供應商同步揭露具名產品出貨、收入占比或毛利
 invalidation: Full-scale 時程延後、只有 demo／sample，或出貨仍集中在 48／54V 過渡產品而非 800V
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C2,C3,C5,C7,C8,C9,C10,C11
+metric: 具名 800V topology 中保留／移除的轉換與保護 stage，以及每個 stage 的六軸選材條件
+source_ids: S2,S3,S4,S5,S9,S10,S11,S12
+watch_source_ids: S7,S8,S11
+frequency: weekly
+frequency_detail: 每週先畫 input-to-output power path，再逐級記錄 voltage／current、switching／topology、isolation、transient、thermal／package 與 qualification；不只搜尋材料名
+next_check: 2026-08-19
+trigger: 平台或客戶固定 production topology 與 revision，公開各 stage 的 input／output、protection／thermal boundary、具名 device 及 converter pass-fail
+invalidation: Production architecture 保留／取消的 stage、電壓路徑或材料角色與 C7 框架不相容，或相同條件下資料支持另一種 topology／material partition
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C1,C6,C7,C11
+metric: 同一版本由 reference architecture 到 converter、rack／site、customer、production BOM 與財務的交接證據
+source_ids: S1,S9,S10,S11,S12
+watch_source_ids: S7,S8,S11
+frequency: monthly
+frequency_detail: 每月分開檢查原始測試、qualification／acceptance、deployment denominator、shipment，以及同產品收入／成本／毛利；缺任一層就停在上一層
+next_check: 2026-09-12
+trigger: 買方與供應商雙向固定同一 platform／product／revision／period，公開 pass-fail、production BOM、deployed volume 與財務分母
+invalidation: Full-scale 時程或 topology 改變、只有 demo／sample／MOU，或出貨與財務仍無法對上同一 800V product／site
 -->
 
 <!-- transition
@@ -330,6 +511,14 @@ reason: editorial_plain_language_wave112_system_table_evidence_steps_no_conclusi
 evidence: editorial:plain_language_wave112_power_evidence_cards
 -->
 
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: expanded_functional_partition_to_topology_first_six_axis_and_five_gate_contract
+evidence: sources:S9,S10,S11,S12
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -349,46 +538,105 @@ evidence: editorial:plain_language_wave112_power_evidence_cards
 - **電路架構（topology）**：元件如何連接、在哪些位置升降壓或提供保護的設計方式。
 - **量產（HVM）**：高量產階段，表示製程與供應已進入大量生產；不能只由樣品或參考設計推定。
 - **實際部署（deployment）**：設備已進入客戶現場並投入使用；與展示、送樣或測試中的狀態不同。
+- **Power stage（功率級）**：完成一次升壓、降壓、整流、隔離或保護任務的一段電路。若拓撲取消這一級，原本放在這裡的元件需求可能一起消失。
+- **隔離（isolation）**：讓輸入與輸出沒有直接導電路徑，限制故障與觸電風險；隔離元件、爬電距離和安全驗證會占用空間與成本。
+- **軟切換（soft switching）**：讓功率開關在電壓或電流接近零時切換，以降低切換損耗；能否做到取決於拓撲與工作範圍，不是材料名稱自動保證。
+- **EMI（電磁干擾）**：快速切換產生的雜訊可能干擾其他電路或超過法規限制；效率高不代表 EMI、瞬態與可靠度也已過關。
+- **HPR V2**：OCP 第二版高功率機架電力架規格；本文只用它說明一套現行 48V contract，不把它當成所有機架的共同設計。
+- **Sub-1V**：低於 1 伏特的晶片核心供電；即使高壓匯流排改成 800V，靠近處理器的最後降壓仍然需要完成。
+- **AC-DC**：把交流電轉成直流電的整流與轉換級；它可放在 rack、side power rack 或設施端。
+- **All-800V**：NVIDIA 所述由設施到 IT 配電更全面採用 800VDC 的未來路徑，不代表今天所有設備都已切換。
+- **LLC**：利用電感與電容共振達成軟切換的一類 DC-DC topology；效率與可用範圍仍取決於實際設計條件。
 
 ### 三句話抓重點
 
-- 800V 是一整條電力鏈，不是一顆「800V 晶片」，每個轉換與保護節點需要的材料不同。
-- 目前一手設計顯示 SiC、GaN 與 Si 可以同時存在：高壓備援、快速中間轉換與低壓控制各有位置。
-- 2026 年已有供應商公開參考設計與產品規劃，但 NVIDIA 仍把整櫃規模的 800V 架構放在 2027；目前還沒有同時對上具名量產客戶與可辨識財務貢獻。
+- 「800V」只告訴你高壓匯流排的一個電壓，沒有告訴你電力中途會停在 50V、12V、6V，還是少掉某一層轉換。
+- 正確順序是先畫 topology、確認哪些 power stage 存在，再用六把尺比較同一 stage 裡的 Si、SiC、GaN 與控制元件；材料名不能反過來決定整套系統。
+- 2026 年已能看到 TI、ST、Infineon 等供應商的多條 reference architecture，但尚未有同一版本一路接到 rack／site qualification、production BOM、部署分母與財務歸因。
 
 ### 為什麼重要
 
-**先找電力在哪裡改變。** 電從電網送到 GPU 的途中，會經過固態變壓器、電源供應器、
-電池備援、保護、中間匯流排與負載點轉換。每一段處理的電壓、功率與責任不同，因此不能只問
-「SiC 還是 GaN 受惠」。
+**先找電力在哪裡改變。** 可以把供電想成一條有多個轉乘站的路線：800V 是幹線電壓，
+50V、12V、6V 與晶片核心電壓是可能的轉乘站。拓撲若把一個轉乘站取消，原本放在那裡的
+開關、磁性元件、控制器、連接器與散熱需求不一定「轉移」，也可能直接消失。
 
 **再確認那一層是否真的會留在量產系統。** 一張展示板採用某種材料，只能證明這種做法可行；
 還要看到客戶驗證、量產材料清單與出貨，才能判斷該轉換層是否存在，以及元件需求落在哪裡。
 
 ### 接下來怎麼追
 
-- 對每則新聞先標出它談的是電網端、固態變壓器、電源供應器、電池備援、保護、中間匯流排或負載點轉換，不能只記「800V」。
-- 分開記錄參考設計、樣品、客戶資格驗證、量產與實際部署，不用效率宣稱取代客戶階段。
-- 台灣公司要等具名料號、客戶驗證、出貨與財務揭露，不能只從材料能力或 NVIDIA 生態系名單推定。
+- 先寫完整的「輸入電壓 → 中間電壓 → 輸出電壓」，再標出整流、隔離、備援、hot-swap 與 POL；不能只記「800V」。
+- 比較兩個設計前，先對齊輸入輸出、功率、負載範圍、冷卻、開關頻率、隔離與測試方法；不同 reference plane 的效率不能直接排名。
+- 分開記錄元件資料、converter 測試、rack／site qualification、客戶 acceptance、production BOM 與財務，不能用前一關代替後一關。
 
 ### 想一想
 
 - 如果 800V 架構取消某一層電壓轉換，原本放在那一層的元件需求會轉移到別處，還是直接消失？
 - 同一家公司同時賣 Si、SiC 與 GaN，材料市占的變化是否一定等於公司整體毛利改善？
 
-## 從電網到晶片：每一段電力怎麼轉換
+## 先用四個位置看：拓撲會把元件工作移到哪裡
 
-| 電力鏈位置 | 目前看到什麼做法 | 證據走到哪一步 |
-|---|---|---|
-| 中壓交流電（AC）→ 直流電（DC）／固態變壓器（SST） | onsemi 把這一段列為高電壓 SiC 元件的應用位置 | 仍在早期開發與商用階段；尚未看到具名 AI 系統採用並量產的證據 |
-| 800V 電池備援（BBU）／保護 | Infineon 公開一套 SiC 參考設計，示範雙向電池備援、保護與不停機更換模組 | 元件與參考設計已公開；尚未看到客戶完成資格驗證的證據 |
-| 800V → 50V／12V 中間匯流排（IBC） | Infineon 的參考設計以 GaN 為主，搭配低壓 Si MOSFET、驅動器和控制器 | 目前只是供應商的參考設計與展示板；還不是量產產品的材料清單 |
-| 交流轉直流電源供應器（AC-DC PSU） | ROHM 規劃在特定電源供應器中同時使用 Si 與 SiC | 目前只到規劃採用；截至本輪，尚未看到量產出貨證據 |
-| 處理器端 | Infineon 的策略說明中，低壓末端仍保留 Si | 這是公司提出的一種功能分工；不代表所有客戶都會採用同一套電路架構 |
+| 本文四個位置 | 電力怎麼走 | 哪些工作被保留、移動或整合 | 本輪一手證據 | 不能直接推成 |
+|---|---|---|---|---|
+| 1. 現行機架入口 | 設施交流電進入 rack PSU，再送到 48V／54V 匯流排 | 整流與主要降壓仍在機架 power shelf，板端再繼續降壓 | OCP HPR V2 固定 48V、6×12kW PSU 與 60kW N+1 contract | 所有 AI rack 都採同一規格，或 48V 永遠不會被替換 |
+| 2. 過渡 side power rack | 既有設施交流架構先保留，由側邊電力櫃整流成 800V 再送入 compute rack | 高壓整流移到 sidecar；rack 內低壓轉換、保護與備援仍要重新分工 | NVIDIA whitepaper 把它列為過渡路徑 | 已是 rigid production spec、客戶場站已部署或 2027 時程保證 |
+| 3. 設施級 800V 匯流排 | 設施端集中整流，長距離以 800VDC 配電至機架 | 部分 AC-DC stage 移出 rack，銅線與配電介面改變；但隔離、fault protection、BBU 與 rack conversion 仍存在 | NVIDIA 公開 gradual evolution 與 facility-level rectifier 路徑 | SST 必然取代所有傳統設備，或任何一家供應商已取得份額 |
+| 4. 靠近運算的直降 | 800V 可先到 50V，也可直接到 12V／6V，再降到晶片 sub-1V | 50V 或其他 intermediate stage 可能保留、縮小或被整合；最後 POL 不會因 800V 標籤自動消失 | Infineon 有 50V／12V IBC；TI 與 ST 分別公開 6V／12V／50V 路徑 | 某一路徑已被 NVIDIA 客戶定案、材料內容量或 device count 已知 |
 
-同一種材料可能出現在不同位置，同一個位置也可能有不只一種材料或電路架構。這張表只告訴你：
-「在哪個環節，公開資料出現了哪種做法。」它不能回答哪種材料一定勝出，也不能把不同公司、
-不同測試條件下的效率、功率密度或成本直接排在一起。
+這四個位置不是四個互斥產品，而是「電力責任可能放在哪裡」的閱讀地圖。先畫出實際路徑，
+才能知道要研究幾個 power stage；只看「800V adoption」無法算出需要幾顆 SiC 或 GaN。
+
+## 為什麼 48V 與 800V 會共存一段時間
+
+OCP 在 2026 年 6 月發布的 HPR V2 規格，仍把 72kW power shelf 寫成六顆 12kW PSU，
+並以 60kW N+1 運作；它還要求處理 PSU／BBU 切換、尖峰負載與匯流排溫度。這是一份很具體的
+48V 系統契約。另一邊，NVIDIA 把 800V 描述成由現有資料中心逐步走向 all-800V 的路徑，
+而不是一夜切換。
+
+兩者並不矛盾：規格告訴你「現行系統今天必須怎麼交付」，路線圖告訴你「未來責任可能怎麼搬」。
+因此研究時要同時追兩個母體：新建 800V 架構走到哪一關，以及 48V／54V 過渡產品還有多少實際
+部署。只追其中一邊，容易把未來設計誤當今天 BOM，或把今天規格誤當永遠不變。
+
+## 再用六把尺：同一個 power stage 也不能只看材料
+
+| 本文六把尺 | 先問什麼 | 為何會改變 Si／SiC／GaN 的角色 | 比較時必須固定 | 不能直接推成 |
+|---|---|---|---|---|
+| 1. 工作電壓與電流 | 正常、尖峰與故障時各承受多少電壓／電流？需要多少安全餘裕？ | 高耐壓與高功率可能增加 SiC 的可行性；較低電壓仍可能由成熟 Si 處理 | input／output、功率、derating、fault envelope | 耐壓較高就一定效率、成本或可靠度最好 |
+| 2. 切換頻率與 topology | 是硬切換、LLC 等軟切換，還是雙向 buck-boost？全負載範圍都能維持嗎？ | 高頻可縮小磁性元件並提高 GaN 吸引力；但 switching condition 改變後損耗排序也會改 | topology、frequency、load range、control mode | 單一峰值效率可跨 topology 排名 |
+| 3. 隔離與安全 | 哪裡需要 galvanic isolation、爬電距離、維修斷電與人員保護？ | 隔離會加入變壓器、driver、sensor 與安全間距，影響密度與封裝 | insulation class、voltage band、標準與 service boundary | 功率開關可用就等於整機安全合格 |
+| 4. 瞬態與保護 | 如何處理 inrush、short circuit、load step、ORing、hot-swap 與 BBU 切換？ | 開關的安全工作區、偵測速度與控制責任可能比穩態效率更重要 | transient waveform、duration、fault energy、pass／fail | datasheet 額定值等於 rack fault 已驗證 |
+| 5. 熱、封裝與整合 | 熱從 junction 經封裝、PCB／busbar 到冷卻系統怎麼走？driver 與 sensor 是否整合？ | 高頻與高密度會把損耗、寄生參數與散熱問題綁在一起，材料優勢可能被封裝限制吃掉 | ambient／coolant、thermal path、package、layout | 晶片效率提升會等比例變成 rack 節能 |
+| 6. Qualification 與供應 | 誰測、依哪個版本、樣本多少、有哪些替代來源、客戶是否接受？ | 工程可行的材料若無可靠度資料、產能、second source 或客戶 pass，仍不能進 production BOM | revision、test matrix、sample／hours、change control、source count | 生態系列名、reference board 或 planned adoption 等於訂單 |
+
+六把尺的重點不是替材料打總分，而是防止跨條件比較。只有當兩個方案處理相同的輸入、輸出、
+功率、負載範圍、冷卻與安全責任時，效率、功率密度、成本與可靠度才有可比性。
+
+## 把公開設計放回正確的 power stage
+
+| 公開來源 | 它實際展示什麼 | 可支持的材料／元件角色 | 證據停在哪裡 |
+|---|---|---|---|
+| TI | 800V→6V isolated bus，再由 6V→sub-1V；另有 800V→12V、hot-swap 與 CBU building blocks | GaN power stage、低壓 multiphase、控制與保護需共同工作 | Reference architecture；未固定 NVIDIA production topology |
+| ST | 800V→50V GaN LLC prototype，以及 800V→12V／6V architectures | Si、SiC、GaN、analog 與 controller 在不同位置共存 | Prototype／architecture；未到具名客戶 qualification |
+| Infineon | GaN 800V／±400V→50V／12V IBC；SiC 800V BBU 與 hot-swap design | GaN 偏高頻 IBC，SiC 偏高壓雙向備援／保護，低壓 Si 仍存在 | 兩套 reference design；不是同一 production rack 的完整 BOM |
+| onsemi／ROHM | SST 不同電壓級的 SiC 路徑；特定 PSU 規劃同時採 Si 與 SiC | 高壓前端與成本／控制敏感位置可採不同材料 | 技術文章與 planned adoption；未到客戶部署與財務 |
+
+這些資料共同反駁「800V 只會有一種材料」的簡化說法，但仍不能回答哪一家會拿到多少份額。
+供應商可以同時賣多種材料；topology 改變也可能讓某個 stage 的元件數量下降，即使整體 800V
+部署上升。
+
+## 最後用五關：不要用元件資料替整套系統背書
+
+| 本文五關 | 這一關要交付什麼 | 本輪可確認到哪裡 | 下一份關鍵證據 | 不能跳成 |
+|---|---|---|---|---|
+| 1. Topology contract | 固定 input／output、保留的 stage、隔離／保護／備援責任與版本 | NVIDIA 提供分階段路徑，TI／ST／Infineon 提供多種可行轉換鏈 | 平台或客戶的 production schematic／interface specification | Reference architecture 就是最終 BOM |
+| 2. Device characterization | 在指定電壓、電流、溫度與 switching condition 下的損耗、SOA、短路與可靠度資料 | 供應商列出具名材料與元件系列，但本篇未取得同版完整 qualification pack | Datasheet、原始波形、sample／duration、失效與變更紀錄 | 元件額定值等於 converter 已通過 |
+| 3. Converter validation | 固定 topology、控制、layout、磁性元件、冷卻後測效率曲線、EMI、transient、thermal 與 fault | 已有 prototype／reference design | 同版硬體全負載 raw data、pass／fail、第三方或客戶重測 | 峰值效率等於 rack 節能或可靠度 |
+| 4. Rack／site／customer qualification | 把 power rack、BBU、busbar、protection、cooling 與負載放在一起驗收，包含 fault injection 與 serviceability | OCP 48V 規格提供要求；800V 尚無本輪可定位的同一產品 pass chain | 具名 rack／site、as-built revision、客戶 acceptance 與 operating hours | 規格發布或 partner list 等於部署 |
+| 5. Production BOM／財務 | 買方與供應商對上同一產品、期間、出貨量、收入、成本、毛利與現金 | 尚未取得 | Production BOM、shipment、deployed denominator 與同產品財務分子 | 題材能力、MOU 或事業群營收等於 800V 受惠 |
+
+這五關回答不同問題。元件測試是在問「這顆開關在指定條件下能否工作」；converter 測試是在問
+「整段電路是否可重現」；rack／site 驗收是在問「故障、維修與長時間運行時整套系統是否可用」；
+最後一關才有資格討論公司財務。任何前一關都不能替後一關簽名。
 
 ## 來源與證據邊界
 
@@ -398,11 +646,16 @@ evidence: editorial:plain_language_wave112_power_evidence_cards
 - [onsemi SST and high-voltage SiC path](https://www.onsemi.com/company/newsroom/featured-stories/data-center/the-emerging-way-to-conquer-power-challenges-in-ai-data-centers)（SST 與高壓 stage）。
 - [Infineon grid-to-core material partition](https://www.infineon.com/de/press-release/2026/infxx202606-117)（SiC／GaN／Si 功能定位）。
 - [ROHM HVDC dialogue](https://www.rohm.com/ir/dialogue/ai-server)（Si＋SiC planned PSU adoption）。
+- [TI 800VDC power architecture](https://www.ti.com/about-ti/newsroom/news-releases/2026/2026-03-16-ti-unveils-complete-800-vdc-power-architecture-for-future-generation-ai-data-centers-with-nvidia.html)（800V→6V→sub-1V 與相鄰 building blocks）。
+- [ST 800VDC power architectures](https://newsroom.st.com/media-center/press-item.html/t4766.html)（800V→50V／12V／6V paths）。
+- [NVIDIA 800VDC architecture hub](https://www.nvidia.com/en-au/data-center/technologies/800-vdc-architecture/)（分階段過渡、既有資料中心與 all-800V 路徑；含官方 whitepaper 入口）。
+- [OCP Open Rack V3 HPR V2 72kW power shelf specification](https://www.opencompute.org/documents/open-rack-v3-hpr-v2-72kw-power-shelf-spec-v1-0-0-pdf)（現行 48V power-shelf contract）。
 - [Infineon data-center living index](https://www.infineon.com/applications/ai-data-center/data-center-power-solutions) 與 [onsemi data-center living index](https://www.onsemi.com/solutions/computing/data-center)（後續產品與驗證入口）。
 
-本文刻意不比較不同 reference design 的效率、功率密度或電壓級，因為 topology、輸入輸出、
-冷卻與測試條件不同。ROHM 的 Q2–Q3 2026 敘述是 planned PSU adoption；NVIDIA 的 2027 是
-full-scale 架構錨點，兩者不是互相矛盾的同一個量產定義。
+本文刻意不把各供應商的峰值效率、功率密度或面積宣稱排成排行榜，因為 topology、輸入輸出、
+負載範圍、隔離、冷卻與 reference plane 不同。OCP 的 48V contract、ROHM 的 planned PSU
+adoption、供應商 reference architecture 與 NVIDIA 的 2027 full-scale 架構錨點，各自描述不同
+系統與證據階段，不能互相替代。
 
 ## 影響路由
 
@@ -430,7 +683,8 @@ evidence_boundary: 外部 reference design 與 planned adoption 不證明台灣�
 
 ## 下一個可證明／否定的節點
 
-- 平台或 hyperscaler 公布 production-level 800V power tree，清楚列出 SST、PSU、BBU、protection、IBC 與 POL。
-- 供應商將 reference design 推進到客戶 qualification、具名量產產品、出貨與現場可靠度。
-- 實際 topology 若減少轉換層，重新評估哪一種材料內容量增加、哪一段反而被整合掉。
-- 台灣公司只有在具名料號、客戶、量產與財務資料能雙向核對時才建立公司線；否則維持族群 watch。
+- 平台或 hyperscaler 固定 production-level 800V power tree 與 revision，清楚列出每一級的 input／output、隔離、SST／PSU／BBU／protection／IBC／POL 責任。
+- 同版 converter 公開全負載效率、EMI、thermal、transient、fault 與 change-control 原始資料，再由客戶或第三方重測；不能只補一個峰值數字。
+- 具名 rack／site 公開 as-built configuration、commissioning、fault injection、customer acceptance、operating hours 與 deployment denominator。
+- 實際 topology 若保留或取消不同轉換層，重畫六軸選材包絡線，檢查元件需求是轉移、增加還是直接消失。
+- 台灣公司只有在具名料號、客戶、production BOM、出貨與同產品財務資料能雙向核對時才建立公司線；否則維持族群 watch。

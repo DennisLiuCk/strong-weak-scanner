@@ -64,6 +64,14 @@ reason: editorial_plain_language_wave81_protection_roles_no_conclusion_change
 evidence: editorial:plain_language_wave81_protection_roles
 -->
 
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_precharge_and_fault_clearing_time_scale_evidence_without_refreshing_thesis_clock
+evidence: sources:S8
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -88,11 +96,12 @@ evidence: editorial:plain_language_wave81_protection_roles
 - **客戶資格驗證（qualification）**：客戶依自己的安全、可靠度與系統條件測試產品是否可用；通過後仍不等於已大量出貨。
 - **監測資料（telemetry）**：設備持續回報的電壓、電流、溫度、故障與狀態資料；只有數值而沒有後續動作，還不能形成完整的保護流程。
 - **故障與處置對照表（fault matrix）**：把每種故障、偵測方式、處置裝置、反應時間與隔離範圍對在一起的表格。
+- **故障清除時間（fault-clearing time）**：從異常被偵測，到電力路徑被限制或切斷所需的時間；必須連同故障型態、電壓、電流、溫度與開關安全工作區判讀。
 
 ### 三句話抓重點
 
 - OCP Diablo 400 規格把人員接近高壓、絕緣與接地、過大電流及漏電等風險分開規定，表示 800V 機櫃不能只靠一種保護方式。
-- TI 與 Infineon 的公開設計顯示，帶電插入設備時還要先限制湧入電流，再安全接通或隔離；這和長時間備援、接地或人員防護是不同責任。
+- TI 與 Infineon 的公開設計顯示，帶電插入設備時要慢慢限制湧入電流，故障時卻要快速切斷；這兩支時鐘和長時間備援、接地或人員防護又是不同責任。
 - 目前證據只足以畫出誰負責什麼，尚不能證明台灣功率元件、電源供應或被動元件公司已進入量產材料清單、取得訂單或形成可辨識獲利。
 
 ### 為什麼重要
@@ -101,7 +110,8 @@ evidence: editorial:plain_language_wave81_protection_roles
 插入時替大電容充電，以及停電時維持運作，是五種不同事件。
 
 **再把每個事件交給不同保護責任。** 安全連鎖先保護人員，斷路與主動開關處理異常電流，
-不停機更換與電子保險絲控制接通，電容與電池備援則維持短暫供電；它們可以合作，但不能互相取代。
+不停機更換與電子保險絲控制接通，電容與電池備援則維持短暫供電。即使都在同一條電力路徑，
+預充也要給大電容時間慢慢充電，短路或過流卻要盡快限制故障能量；它們可以合作，但不能互相取代。
 
 **最後才談公司與元件價值。** 把所有責任混成「保護元件」，會重複計算量產材料清單，也會把
 供應商參考設計的技術能力誤寫成客戶量產訂單。
@@ -109,12 +119,12 @@ evidence: editorial:plain_language_wave81_protection_roles
 ### 接下來怎麼追
 
 - 追 OCP 或平台規格是否把每種故障、偵測時間、斷電範圍、安全連鎖、接地與維修程序對齊。
-- 追 800V 不停機更換與電子保險絲，是否從參考設計推進到具名平台的客戶資格驗證、實際量產、現場故障紀錄與維修閉環。
+- 追 800V 不停機更換與電子保險絲，是否從參考設計推進到具名平台的預充軌跡、故障清除時間、客戶資格驗證、實際量產、現場故障紀錄與維修閉環。
 - 追台灣相關公司是否由客戶文件與公司申報雙向確認具名保護產品、額定規格、測試、量產、收入及毛利。
 
 ### 想一想
 
-- 保險絲可以切斷過大的故障電流，但設備帶電插入時，大電容也會瞬間吸收電流；為什麼還要先限流再接通？
+- 保險絲可以切斷過大的故障電流，但設備帶電插入時，大電容也會瞬間吸收電流；預充要慢、短路清除要快，為什麼同一條電力路徑需要兩支不同速度的時鐘？
 - 不停機更換功能能限制湧入電流，是否就能取代安全連鎖、保護接地或接地故障偵測？
 - 如果監測資料只有數值與故障清單，沒有規定發生事件後要隔離哪裡、怎麼維修，能否成為獨立產品價值？
 
@@ -235,6 +245,22 @@ limitation: 索引頁本身不證明任何公司具有 800V protection BOM、qua
 independence_group: twse-mops
 -->
 
+<!-- research_source
+source_id: S8
+role: other_primary
+source_kind: document
+publisher: Texas Instruments
+title: Floating Ground Hot-Swap Architecture to Enable Robust Protection on 800V or ±400V DC Power Distribution
+published_at: 2026-03-01
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.ti.com/lit/wp/stda029/stda029.pdf
+locator: PDF 第 1 頁摘要；第 4–5 頁的 800V、100µF、200mA startup 設計算例與 440ms 計算值；第 6 頁 Test Results 的 22A gradual-overcurrent 10µs 關斷與 steady-state output short 數微秒關斷
+limitation: 文件只標示 March 2026，published_at 以月份首日作公開月份錨點而非精確發布日；數字只屬 TI 指定元件、800V、100µF、17kW、60°C 最大環境溫度等條件下的實驗架構，不是跨廠標準、所有故障、量產平台、客戶資格、現場可靠度、production BOM 或台灣公司財務證據
+independence_group: texas-instruments
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -320,6 +346,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C6
+label: verified
+status: active
+claim: TI 的 STDA029 實驗架構在指定 800V、100µF 負載條件下，以 200mA startup target 算得約 440ms 預充時間；其第 6 頁測試另顯示 gradual overcurrent alert 約 22A 時在 10µs 內關斷 FET，steady-state output short 則在數微秒內關斷
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-03-01
+basis: S8 第 4–5 頁列出 system specification、startup target 與計算時間，第 6 頁 Test Results 分別列出 gradual-overcurrent 與 output-short 的實測關斷結果
+boundary: 只證實 TI 這組實驗架構與指定條件的設計算例及測試結果；不外推為所有電容量、負載、溫度、故障型態、元件、平台或量產系統的共同時間門檻
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C7
+label: inference
+status: active
+claim: 800V hot-swap／power-path protection 至少要分開檢查受控接通的預充時間與異常發生後的故障清除時間；前者避免匯流排壓降與開關超出安全工作區，後者限制故障能量，因此不能用單一「反應速度」評價整個保護設計
+supporting_source_ids: S3,S8
+contrary_source_ids:
+as_of: 2026-03-01
+basis: S3 以 SOA 控制 inrush，S8 又在同一 hot-swap 架構中分別給出 startup 設計時間與過流／短路關斷時間；兩條獨立公司來源鏈共同支持雙時間尺度的工程判讀
+boundary: 這是研究端對保護時序責任的推論，不建立通用的預充或清除時間、比較供應商性能，也不指定 fault matrix、元件數、production topology、客戶資格或財務受惠
+verification_needed: 需具名 production platform 在一致電壓、電流、電容量、溫度、SOA 與 fault-type 條件下，公布完整 pre-charge trajectory、fault-clearing matrix、qualification 與 field log
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分清楚：保護誰、發生什麼事、誰來處理
 
 | 保護責任 | 主要事件 | 目前證據說了什麼 | 仍需要其他保護處理 |
@@ -333,6 +393,22 @@ resolution:
 這張表先分「誰被保護、發生什麼事、要多快動作」，再看需要哪些元件。同一個控制器或模組
 可能整合多項功能，但整合不代表責任消失；反過來，一項安全要求也可能由多顆元件與機構共同完成。
 因此，元件價值仍要由量產電路架構與客戶資格驗證重建，不能把規格要求的項目數直接當成材料清單顆數。
+
+## 同一條電力路徑有兩支時鐘
+
+設備剛接上高壓匯流排時，負載端的大電容像空水桶：如果一次灌滿，瞬間電流可能拉低匯流排電壓，
+也可能讓功率開關超出安全工作區。因此，預充刻意把接通拉長。可是設備已接通後若發生短路或過流，
+時間拖得越久，故障能量就可能越大，此時反而要盡快限制或切斷。這不是設計互相矛盾，而是同一條
+電力路徑在不同事件下有不同任務。
+
+| 時鐘 | 發生什麼事 | TI STDA029 的指定條件例子 | 這個數字不能怎麼用 |
+|---|---|---|---|
+| 接通／預充時鐘 | 受控替負載電容充電，避免匯流排壓降與開關超出安全工作區 | 800V、100µF 的設計算例以 200mA 為 startup target，計算約 440ms | 不能當成不同電容量、負載、溫度或元件都應採用的固定預充時間 |
+| 故障清除時鐘 | 偵測過流或短路後限制故障能量，並切離電力路徑 | 第 6 頁測試中，約 22A gradual overcurrent 在 10µs 內關斷；steady-state output short 在數微秒內關斷 | 不能當成所有故障型態、配線、保護層或量產平台的共同清除時間 |
+
+這兩列不是在比較「440ms 比 10µs 慢多少」，而是在提醒讀者先辨認事件。真正的設計判讀仍要把
+電壓、電流、電容量、溫度、功率開關安全工作區、故障路徑與隔離範圍放在同一張故障與處置對照表；
+若只看到一個漂亮的反應時間，卻不知道測的是接通還是故障，就無法判斷保護是否完整。
 
 ## 為什麼監測資料暫時仍屬於保護功能
 
@@ -350,8 +426,8 @@ Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率
 
 ## 研究判定
 
-- **目前可保留的結論**：800V 保護至少包含人身與維修、絕緣與接地、故障電流，以及帶電插拔與湧入電流等不同責任；三條一手來源鏈足以重建基本的故障與處置對照表。
-- **可信度為中而不是高**：OCP 提供系統規格，TI 與 Infineon 提供供應商架構、樣品與參考設計；目前仍缺共用的量產故障處置表與現場資料。
+- **目前可保留的結論**：800V 保護至少包含人身與維修、絕緣與接地、故障電流，以及帶電插拔與湧入電流等不同責任；hot-swap 還要把受控預充與故障清除兩支時鐘分開判讀。
+- **可信度為中而不是高**：OCP 提供系統規格，TI 與 Infineon 提供供應商架構、樣品與參考設計；TI 實驗架構補上了指定條件的時間尺度，但目前仍缺共用的量產故障處置表與現場資料。
 - **目前不能發布的結論**：保護元件顆數倍增、指定 SiC／Si／被動元件或台灣公司勝出、監測資料已形成獨立商業價值，以及已取得訂單、收入或毛利。
 - **需要看到什麼才能前進**：具名量產平台公布完整保護電路架構、客戶資格驗證、故障紀錄、維修動作與材料清單，再由台灣公司申報交叉確認財務分母。
 
@@ -359,6 +435,7 @@ Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率
 
 - [OCP：Diablo 400 Rack and Power Specification 0.7.0](https://www.opencompute.org/documents/ocp-specification-diablo-400-v0-7-0-final-pdf)
 - [Texas Instruments：800V hot-swap input protection reference architecture](https://www.ti.com/about-ti/newsroom/news-releases/2026/2026-03-16-ti-unveils-complete-800-vdc-power-architecture-for-future-generation-ai-data-centers-with-nvidia.html)
+- [Texas Instruments：800V／±400V floating-ground hot-swap technical white paper](https://www.ti.com/lit/wp/stda029/stda029.pdf)
 - [Infineon：400／800V power-path protection 與 REF_XDP701_4800](https://www.infineon.com/technology-news/2025/INFPSS202510-002)
 - [OCP Open Rack 規格索引](https://www.opencompute.org/wiki/Open_Rack/SpecsAndDesigns)
 - [TI Data Center Design Resources](https://www.ti.com/applications/data-center/overview.html)
@@ -426,6 +503,19 @@ frequency: quarterly
 next_check: 2026-09-30
 trigger: 公司申報與客戶文件同時指向具名產品、額定、fault test、qualification、量產出貨、收入及毛利
 invalidation: 公司明確否認參與，或產品長期停在 reference design／sampling 而沒有 qualification 與 production evidence
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C6,C7
+metric: 具名 800V production platform 是否分別公開預充與各類故障清除的完整時間軌跡、SOA 與 pass-fail matrix
+source_ids: S3,S8
+watch_source_ids: S4,S5,S6
+frequency: monthly
+next_check: 2026-09-01
+trigger: 平台、規格或客戶文件以固定電壓、電流、電容量、溫度及 fault type 公布 pre-charge trajectory、clearing time、隔離範圍與 qualification 結果
+invalidation: Production data 顯示預充與故障清除不需分開建模，或本文雙時間尺度無法預測安全接通與限制故障能量
 -->
 
 ## 什麼會推翻這篇

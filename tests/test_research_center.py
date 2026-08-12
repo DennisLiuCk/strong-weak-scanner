@@ -424,7 +424,7 @@ class ResearchCenterTest(unittest.TestCase):
         returned = bd.attach_research_learning_paths(library, graph)
 
         self.assertIs(returned, library)
-        self.assertEqual(library["learningPathVersion"], 108)
+        self.assertEqual(library["learningPathVersion"], 109)
         article_ids = {article["id"] for article in library["articles"]}
         article_by_id = {article["id"]: article for article in library["articles"]}
         graph_ids = {item["id"] for item in graph["graphs"]}
@@ -1168,7 +1168,7 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("load_research_topic_guide(strict=True)", builder)
         self.assertIn("attach_research_topic_guide(", builder)
         guide = bd.load_research_topic_guide(strict=True)
-        self.assertEqual(len(guide), 35)
+        self.assertEqual(len(guide), 40)
         for article_id, item in guide.items():
             question = item["readerQuestion"]
             self.assertTrue(question.endswith("？"), article_id)
@@ -1219,7 +1219,7 @@ class ResearchCenterTest(unittest.TestCase):
             for article in published.values()
             if article.get("readingMission")
         ]
-        self.assertEqual(len(topic_reader_boundaries), 34)
+        self.assertEqual(len(topic_reader_boundaries), 39)
         self.assertTrue(all(
             boundary.get("known") and boundary.get("unknown") and boundary.get("next")
             for boundary in topic_reader_boundaries
@@ -1742,7 +1742,7 @@ class ResearchCenterTest(unittest.TestCase):
     def test_first_visit_guide_opens_with_direct_registered_route_starts(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
-            'id="entryGuideRoutes"', "可直接開始的四條學習路線",
+            'id="entryGuideRoutes"', "可直接開始的六條學習路線",
             "function renderEntryGuideRoutes()", "(MATURITY.learningRoutes||[]).forEach",
             "'data-testid':'entry-route-'+route.id",
             "root.appendChild(h('div',{role:'listitem'},button))",
@@ -2016,6 +2016,16 @@ class ResearchCenterTest(unittest.TestCase):
                 "**三種工作像三種物流。**",
                 "**資料放在哪裡，也會改變硬體需求。**",
                 "**最後才把平台需求接回公司。**",
+            ),
+            "2026-08-12_chiplet_design_handoff_contracts.md": (
+                "**這像蓋房子時的四份契約。**",
+                "**機器可讀也有成熟度。**",
+                "**這會改變研究順序。**",
+            ),
+            "2026-08-12_ai_hardware_sdc_lifecycle.md": (
+                "**這像一個沒有冒煙的火災。**",
+                "**每一站都要交接同一張病歷。**",
+                "**通過一項測試，只代表那一項沒有抓到錯。**",
             ),
         }
         for filename, leads in expectations.items():
@@ -2995,7 +3005,8 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("v2 direct assessment 能進入", template)
         for contract in (
             "RESEARCH_LEARNING_ROUTES", "供電與散熱", "記憶體與封裝",
-            "運算與互連", "公司財務案例", "供電、保護與元件",
+            "運算與互連", "設計、製程控制、測試與良率", "政策與合規", "資本投入與公司財務",
+            "供電、保護與元件",
             '"phases": [', "def route_phase_map(route):",
             "學習路線階段必須逐站、依原順序完整覆蓋 graphIds",
             'research_library["knowledgeGraph"]["learningRoutes"]',
@@ -3362,7 +3373,7 @@ class ResearchCenterTest(unittest.TestCase):
             "把一個產業問題拆成角色與文章", "族群起點", "開始學這個族群",
             "第一次來只看上半部", "下半部的完成度是研究資料是否齊全",
             "先選問題，再讀主題，最後追關係", "先選一個系統問題",
-            "從 4 條既有學習路線，看每個問題會用到哪些族群",
+            "從 6 條既有學習路線，看每個問題會用到哪些族群",
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
             "row.readerRole", "row.readerBoundary", "研究中心怎麼分",
             "先別混淆：", ".maturity-group-guide",
@@ -3497,18 +3508,26 @@ class ResearchCenterTest(unittest.TestCase):
             "要判斷誰更接近收入，還要看到客戶驗收、量產數量與公司財務揭露",
             "## 容量可以換算，商業成熟度不能跟著換算",
             "| 2026-08-02 清單中的供應商 | 產品型號 | 來源原始容量 | 換算成 kW | 平台原始供應標籤 | 這一列只能證明 |",
+            "## 額定容量只是操作包絡線的一個截面",
+            "| 證據包要固定什麼 | 新手可以問的白話問題 | OCP 方法能支持到哪裡 | 還不能因此判定 |",
+            "這張表是**判讀框架，不是認證名單**",
             "## 從規格到收入要過五關",
             "| 先問哪一關 | 這一關能回答什麼 | 本輪已有的公開證據 | 仍然缺什麼 |",
-            "| 1. 容量規格 |", "| 2. 平台列名與測試 |",
+            "| 1. 容量規格 |", "| 2. 元件、整機與平台測試 |",
             "| 3. 供應準備 |", "| 4. 場域整合與客戶部署 |",
-            "| 5. 公司收入 |", "## 接下來看到什麼，判定才會改變",
+            "| 5. 公司收入 |",
+            "## 一個 kW 要同時讀三張性能圖與一張量測身分證",
+            "## 8 月 12 日方法補強：三張性能圖與量測身分證補上 kW 背後的問題",
+            "older_ocp_document_added_as_operating_envelope_and_reliability_decoder_no_thesis_clock_refresh",
+            "added_three_performance_scorecards_and_typed_telemetry_context_no_thesis_change",
+            "## 接下來看到什麼，判定才會改變",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 47
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3516,11 +3535,31 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("Sample Ready", reflection)
         self.assertNotIn("MP Ready", reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 8),
-            ("research_claim", 9), ("metric_comparison", 7),
-            ("impact", 2), ("monitoring_item", 4),
+            ("research_topic", 1), ("research_source", 10),
+            ("research_claim", 14), ("metric_comparison", 7),
+            ("impact", 2), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "liquid_cooling.md"
+        ).read_text(encoding="utf-8")
+        for edge_id in (
+            "KG-LC-I10", "KG-LC-I11", "KG-LC-I12", "KG-LC-I13",
+            "KG-LC-I14", "KG-LC-I15", "KG-LC-I16",
+        ):
+            self.assertIn(f"edge_id: {edge_id}", graph)
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for node_id in (
+            "metric:cdu-operating-envelope",
+            "metric:cdu-thermal-performance-curve",
+            "metric:cdu-tcs-pressure-head-curve",
+            "metric:cdu-fws-impedance-curve",
+            "stage:cdu-assembly-qualification",
+            "capability:cdu-reliability-validation",
+        ):
+            self.assertIn(f"{node_id},", concepts)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
@@ -3554,13 +3593,21 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 責任與範圍寫清楚 |", "| 2. 零件與設備通過測試 |",
             "| 3. 平台列出具名產品 |", "| 4. 具名場域完成驗收 |",
             "| 5. 長期運作與財務出現 |",
+            "## 水質不是一個數字：先寫六欄流體生命週期合約",
+            "| 合約欄位 | 必須固定什麼 | 怎麼驗 | 失敗訊號 | 不能被什麼替代 |",
+            "| 1. 操作包絡 |", "| 2. 化學基準 |",
+            "| 3. 浸液材料與變更控制 |", "| 4. 潔淨度與污染預算 |",
+            "| 5. 試運轉基準 |", "| 6. 監測與行動責任 |",
+            "## 四種品質失效不是同一種髒",
+            "| 結垢（scaling） |", "| 污堵（fouling） |",
+            "| 腐蝕（corrosion） |", "| 微生物生長 |",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 27
+            sum(line.startswith("- **") for line in glossary.splitlines()), 36
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3568,9 +3615,9 @@ class ResearchCenterTest(unittest.TestCase):
         for jargon in ("FWS", "TCS", "rackLocationId"):
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 6),
-            ("research_claim", 7), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 8),
+            ("research_claim", 12), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -3593,15 +3640,40 @@ class ResearchCenterTest(unittest.TestCase):
         ))
         for contract in (
             "editorial_plain_language_wave89_memory_layers_and_maturity",
+            "added_kv_tiering_measurement_passport_and_refreshed_exact_host_storage_edges",
             "人工智慧系統不會把所有資料都塞在同一個地方",
-            "架構、樣品、量產與收入必須分開判讀",
+            "架構、容量型號、樣品、量產與收入必須分開判讀",
             "## 先按資料的急迫程度分四層",
             "| 資料任務 | 本文怎麼分位置 | 為什麼放這裡 | 本輪產品名稱 | 目前不能因此判定 |",
             "| 正在計算、最怕等待的工作資料 |",
             "| 容量較大、仍需快速取用的系統資料 |",
             "| 可以重新建立、也可能需要共享的上下文資料 |",
             "| 容量最大、可接受較慢存取或需長期保存的資料 |",
+            "## 分層不是靜態樓層：還要分清介質、處理、連接、搬運與決策",
+            "| 存放介質 | HBM、system RAM／SOCAMM、CMX、local SSD、shared storage |",
+            "| 資料處理 | Vera／BlueField-4 STX 文件所述的壓縮、加密、完整性與復原 |",
+            "| 連接路徑 | CXL，以及平台既有的記憶體、儲存與網路路徑 |",
+            "| 搬運工具 | NIXL 等資料移動介面 |",
+            "| 控制決策 | Dynamo、KV block manager 與資料放置規則 |",
+            "## 一個可驗證的資料放置迴路",
+            "## 再用八格量測護照判斷「多一層」有沒有真的更好",
+            "| 八格量測護照 | 要固定什麼 | 要保存什麼 | 少了最容易誤讀成 |",
+            "| 1. 受測系統與版本 |",
+            "| 4. 重用機會與冷熱起點 |",
+            "| 7. 機制是否真的發生 |",
+            "| 8. 使用者結果與代價 |",
+            "## 一個 TTFT 數字不能替整條資料路徑背書",
+            "| TTFT | 使用者送出請求後多久看到第一個 token |",
+            "| Good-request／errors／quality |",
+            "## 先問工作負載，再問該買哪一種記憶體",
+            "## 用一份 KV cache 看懂資料如何旅行",
+            "## 新手最常混在一起的六件事",
+            "## 在研究中心裡接著怎麼學",
             "## 四層互補，不是誰取代誰",
+            "## 同一家族也要拆到容量型號：192GB 與 256GB 不是同一個時鐘",
+            "| 具名容量：192GB | Micron 3 月 16 日明列 high-volume production |",
+            "| 具名容量：256GB | Micron 3 月 5 日明列 customer sampling |",
+            "| 產品家族 | Micron 6 月 24 日表示 LP5X SOCAMM2 products 已量產",
             "## 每一層的商業進度要各自驗證",
             "| 資料層或連接路徑 | 已看到的一手證據 | 目前走到哪一步 | 還缺哪些商業證據 |",
             "| 圖形運算晶片旁的高速層（HBM4） |",
@@ -3610,11 +3682,29 @@ class ResearchCenterTest(unittest.TestCase):
             "| 記憶體擴充連接（CXL 4.0） |",
         ):
             self.assertIn(contract, topic)
+        section_order = (
+            "## 先按資料的急迫程度分四層",
+            "## 分層不是靜態樓層：還要分清介質、處理、連接、搬運與決策",
+            "## 一個可驗證的資料放置迴路",
+            "## 再用八格量測護照判斷「多一層」有沒有真的更好",
+            "## 一個 TTFT 數字不能替整條資料路徑背書",
+            "## 先問工作負載，再問該買哪一種記憶體",
+            "## 用一份 KV cache 看懂資料如何旅行",
+            "## 新手最常混在一起的六件事",
+            "## 在研究中心裡接著怎麼學",
+            "## 四層互補，不是誰取代誰",
+            "## 同一家族也要拆到容量型號：192GB 與 256GB 不是同一個時鐘",
+            "## 每一層的商業進度要各自驗證",
+        )
+        self.assertEqual(
+            [topic.index(section) for section in section_order],
+            sorted(topic.index(section) for section in section_order),
+        )
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 53
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -3626,11 +3716,63 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 7),
-            ("research_claim", 6), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 17),
+            ("research_claim", 20), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for evidence_contract in (
+            "claim_id: C9\nlabel: verified",
+            "claim_id: C10\nlabel: verified",
+            "claim_id: C11\nlabel: inference",
+            "claim_id: C12\nlabel: verified",
+            "S9 只對 192GB 明列 high-volume production",
+            "不能用同一個家族名稱把所有容量自動升到最高成熟度",
+            "KV I/O、metadata、data placement、security 與 control operations",
+            "claim_id: C13\nlabel: verified",
+            "claim_id: C18\nlabel: verified",
+            "claim_id: C19\nlabel: inference",
+            "claim_id: C20\nlabel: unverified",
+            "只有在 cache reuse 的收益高於資料搬移 overhead 時",
+            "同一份 baseline-versus-treatment 量測護照",
+        ):
+            self.assertIn(evidence_contract, topic)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "product:micron-socamm2-192gb,product,Micron 192GB SOCAMM2",
+            "product:micron-socamm2-256gb,product,Micron 256GB SOCAMM2",
+            "product:nvidia-bluefield4-stx,product,NVIDIA Vera BlueField-4 STX",
+            "capability:ai-context-placement,capability,AI 上下文資料放置",
+            "capability:heterogeneous-data-movement,capability,異質記憶體資料搬移",
+            "capability:ai-storage-data-processing,capability,AI 儲存資料處理",
+            "metric:ai-data-path-end-to-end-slo,metric,AI 資料路徑端到端服務目標",
+            "metric:kv-cache-reuse-transfer-observability,metric,KV 快取重用與搬移可觀測欄位",
+            "metric:ai-inference-service-slo,metric,人工智慧推論服務等待與合格吞吐",
+            "process:ai-memory-tier-measurement-passport,process,人工智慧記憶體分層八格量測護照",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_memory_hierarchy.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
+        for graph_contract in (
+            "edge_id: KG-MEM-C03",
+            "to_id: product:micron-socamm2-192gb",
+            "to_id: product:micron-socamm2-256gb",
+            "to_id: product:nvidia-bluefield4-stx",
+            "to_id: capability:ai-context-placement",
+            "to_id: capability:heterogeneous-data-movement",
+            "to_id: capability:ai-storage-data-processing",
+            "to_id: metric:ai-data-path-end-to-end-slo",
+            "to_id: metric:kv-cache-reuse-transfer-observability",
+            "to_id: metric:ai-inference-service-slo",
+            "to_id: process:ai-memory-tier-measurement-passport",
+        ):
+            self.assertIn(graph_contract, graph)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
@@ -3664,13 +3806,26 @@ class ResearchCenterTest(unittest.TestCase):
             "| 美光（Micron） |",
             "一般版本的樣品、客製版本的",
             "不能合併成一條供應商進度排名",
+            "added_workload_interface_base_die_firmware_manufacturing_and_qualification_handoff_contract_without_refreshing_thesis_clock",
+            "## 客製不是一顆晶片：六份交接合約要一起凍結",
+            "| 本文六份交接合約 | 要固定哪些欄位 | 現有一手資料提供的入口 | 沒有這份合約會發生什麼誤讀 |",
+            "| 1. 工作負載與功能 |", "| 2. 容量、速度、功耗與介面 |",
+            "| 3. 底部邏輯與智財 |", "| 4. 韌體與系統軟體 |",
+            "| 5. 製造、封裝與熱 |", "| 6. 樣品、資格與商業 |",
+            "### 一個功能變更，為什麼會沿六份合約傳下去",
+            "source_id: S9", "source_id: S10", "source_id: S11",
+            "source_id: S12", "claim_id: C8", "claim_id: C9",
+            "claim_id: C10", "claim_id: C11", "claim_id: C12",
+            "monitor_id: T3",
+            "last_reviewed_at: 2026-08-03",
+            "review_due: 2026-09-15",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 43
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -3685,9 +3840,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 8),
-            ("research_claim", 7), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 12), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -3698,6 +3853,25 @@ class ResearchCenterTest(unittest.TestCase):
             "客製高頻寬記憶體只改規格或重做底部晶片，為何不能排在一起？",
             guide,
         )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "custom_hbm_scope_ladder.md"
+        ).read_text(encoding="utf-8")
+        for concept_id, edge_id in (
+            ("concept:custom-hbm-workload-contract", "KG-CHBM-I11"),
+            ("concept:custom-hbm-interface-contract", "KG-CHBM-I12"),
+            ("concept:custom-hbm-base-die-contract", "KG-CHBM-I13"),
+            ("concept:custom-hbm-firmware-contract", "KG-CHBM-I14"),
+            ("concept:custom-hbm-manufacturing-thermal-contract", "KG-CHBM-I15"),
+            ("stage:custom-hbm-handoff-qualification", "KG-CHBM-I16"),
+        ):
+            with self.subTest(concept_id=concept_id, edge_id=edge_id):
+                self.assertIn(concept_id, concepts)
+                self.assertIn(f"to_id: {concept_id}", graph)
+                self.assertIn(f"edge_id: {edge_id}", graph)
 
     def test_ai_memory_station_three_uses_five_commercialization_gates(self):
         topic = (
@@ -3710,13 +3884,22 @@ class ResearchCenterTest(unittest.TestCase):
         ))
         for contract in (
             "editorial_plain_language_wave91_commercialization_ladder_and_role_handoffs",
-            "工廠建好、設備就位與樣品完成，只證明已具備開發和試製能力",
-            "商業化還要依序看客戶是否完成可靠度測試",
+            "先分清玻璃是製造後會被剝離的暫時載板",
+            "商業化還要依序看完整產品是否完成客戶可靠度測試",
+            "## 先問：這片玻璃最後會不會留在封裝裡",
+            "| 本文四類角色 | 玻璃在製程或產品裡做什麼 | 最後是否留在封裝 |",
+            "| 1. 暫時玻璃載板 |", "| 2. 穿孔玻璃／玻璃中介層 |",
+            "| 3. 玻璃核心封裝基板 |", "| 4. 晶圓／面板加工形式 |",
             "## 先把玻璃基板商業化拆成五關",
             "| 本文五關 | 這一關要回答 | 主要接力角色 | 看到這些仍不能直接跳到下一關 |",
             "| 1. 能力與設備就位 |", "| 2. 交出可測樣品 |",
             "| 3. 完成客戶驗證 |", "| 4. 穩定製造 |",
             "| 5. 重複出貨與收入 |",
+            "## 同一句「可靠度通過」，可能在測三個不同東西",
+            "| 本文三把尺 | 實際測什麼 | 通過後能說什麼 | 還不能說什麼 |",
+            "| 1. 材料／局部結構可靠度 |",
+            "| 2. 供應商產品與製程可靠度 |",
+            "| 3. 客戶產品資格與壽命 |",
             "## 再把四組公開證據放回正確關卡",
             "| 公開公司或合作 | 本輪可確認 | 放在五關哪裡 | 接下來缺什麼 | 不能外推 |",
             "| SKC／Absolics |", "| Samsung Electro-Mechanics |",
@@ -3729,7 +3912,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 42
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -3744,9 +3927,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 9),
-            ("research_claim", 7), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 12), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -3769,13 +3952,21 @@ class ResearchCenterTest(unittest.TestCase):
         ))
         for contract in (
             "editorial_plain_language_wave92_hbf_system_conditions_roles_and_six_gate_ladder",
+            "split_specification_and_product_clocks_after_first_hbf_technical_specification",
             "新的記憶體層不能只提供更大容量",
-            "目前只能說兩家公司和開放運算計畫正討論共同規則",
+            "規則前進不等於產品同步前進",
             "## 先判斷它能不能成為新的記憶體層",
             "| 本文五項系統條件 | 讀者先問 | 沒通過會怎樣 | 主要接力角色 | 本輪可確認到哪裡 |",
             "| 1. 容量與資料保留 |", "| 2. 讀取與等待時間 |",
             "| 3. 寫入、更新與耐久 |", "| 4. 功耗、熱與封裝 |",
             "| 5. 系統整合與軟體調度 |",
+            "## 第一版技術規格先對齊哪四份合約",
+            "| 四份共同合約 | 公告摘要對齊什麼 | 初學者要避免的誤讀 | 下一份可升級證據 |",
+            "| 1. 產品包絡 |", "| 2. 主機與電氣介面 |",
+            "| 3. 堆疊、封裝與可靠度 |", "| 4. 軟體讀寫 |",
+            "## 用兩個時鐘避免把規格當產品",
+            "| 證據時鐘 | 依序要經過 | 截至本輪的位置 | 還不能說 |",
+            "| 規格時鐘 |", "| 產品時鐘 |",
             "## 再把商用化拆成六關",
             "| 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |",
             "| 1. 技術位置與工作負載說清楚 |", "| 2. 共同規則公開 |",
@@ -3792,7 +3983,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 39
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -3807,9 +3998,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 6),
-            ("research_claim", 6), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 10),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -3828,12 +4019,20 @@ class ResearchCenterTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertTrue(topic.startswith(
             "# 接點變少不等於設計變簡單："
-            "SPHBM4 把難題移到高速傳輸、功耗與系統驗證\n"
+            "用四層契約讀懂 SPHBM4\n"
         ))
         for contract in (
             "editorial_plain_language_wave93_sphbm4_signal_tradeoffs_roles_and_six_gate_ladder",
+            "corrected_pin_count_frame_with_four_layer_interface_package_and_qualification_contract",
             "記憶體可以用很多條較慢的資料線，也可以用較少但更快的資料線",
-            "本輪只能確認標準文件已發布",
+            "主標準與一家供應商的對應介面路徑已出現",
+            "## 先把一顆 SPHBM4 拆成四層",
+            "| 四層契約 | 這一層在做什麼 | JEDEC 公開資料已確認 | 尚未被公開資料證明 |",
+            "| 1. 記憶體裸晶與堆疊 |", "| 2. 介面基礎晶片 |",
+            "| 3. 分散式主機通道 |", "| 4. 接點圖與有機封裝 |",
+            "### 512 是資料訊號，不是「整顆只有 512 個接點」",
+            "## 相同總傳輸量，不等於每一次存取體驗相同",
+            "| 閱讀問題 | 已知的架構變化 | 必須另外驗證 |",
             "## 先看難題從哪裡搬到哪裡",
             "| 本文五項接力問題 | 原路徑較難的地方 | 新路徑把壓力移到 | 主要接力角色 | 本輪可確認到哪裡 |",
             "| 1. 接點與扇出 |", "| 2. 每線速度與訊號品質 |",
@@ -3844,12 +4043,13 @@ class ResearchCenterTest(unittest.TestCase):
             "| 記憶體裸晶與堆疊 |", "| 底部介面晶片與高速介面 |",
             "| 有機基板與材料 |", "| 封裝、測試與熱管理 |",
             "| 運算晶片、系統與客戶 |",
-            "## 最後用六關判斷標準能不能變成收入",
-            "| 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |",
-            "| 1. 共同標準發布 |", "| 2. 底部介面晶片完成 |",
-            "| 3. 記憶體與封裝樣品完成 |", "| 4. 運算晶片與系統整合 |",
-            "| 5. 客戶資格與可靠度通過 |", "| 6. 穩定量產與形成收入 |",
-            "## 把既有產品與新標準分成兩條時鐘",
+            "## 最後用七關判斷標準能不能變成收入",
+            "| 本文七關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |",
+            "| 1. 主標準發布 |", "| 2. 封裝接點契約公開 |",
+            "| 3. 介面晶片與主機 PHY 完成 |", "| 4. 記憶體與封裝樣品完成 |",
+            "| 5. 運算晶片與系統整合 |", "| 6. 客戶資格與可靠度通過 |",
+            "| 7. 穩定量產與形成收入 |",
+            "## 把「標準存在」拆成四條時鐘",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
@@ -3862,7 +4062,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 為什麼重要", 1
         )[0]
         reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先看難題從哪裡搬到哪裡", 1
+            "## 先把一顆 SPHBM4 拆成四層", 1
         )[0]
         for jargon in (
             "JEDEC", "JESD330-4", "SPHBM4", "HBM4", "DRAM", "SerDes",
@@ -3872,9 +4072,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 4),
-            ("research_claim", 4), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 7),
+            ("research_claim", 9), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -3886,19 +4086,26 @@ class ResearchCenterTest(unittest.TestCase):
             guide,
         )
 
-    def test_ai_memory_station_six_separates_bonding_paths_process_windows_and_gates(self):
+    def test_ai_memory_station_six_separates_application_generation_paths_and_gates(self):
         topic = (
             ROOT / "notes" / "research_topics"
             / "2026-08-02_hybrid_bonding_readiness.md"
         ).read_text(encoding="utf-8")
         self.assertTrue(topic.startswith(
-            "# 晶片貼得更近，量產反而更難："
-            "混合接合要同時守住五個製程窗口\n"
+            "# 同樣叫混合接合，成熟度可以差很多："
+            "先分應用世代，再看五個製程窗口\n"
         ))
         for contract in (
             "editorial_plain_language_wave94_hybrid_bonding_paths_process_windows_and_six_gate_ladder",
-            "兩層晶片讓平坦表面與細小銅接點直接貼合後",
-            "不能把試驗成功直接讀成量產成熟",
+            "split_hybrid_bonding_maturity_by_application_process_generation_and_product_stage",
+            "成熟的是其中幾個明確格子",
+            "200 奈米整片試驗",
+            "## 先畫四維地圖：成熟的是哪一格",
+            "| 應用或產品格 | 接法與介面範圍 | 公開證據到哪裡 | 可以說什麼 | 不能把什麼一起升級 |",
+            "| Sony 堆疊式影像感測器 |",
+            "| AMD EPYC 7003 3D V-Cache／TSMC N7 SoIC CoW |",
+            "| TSMC N7 SoIC WoW 的 logic＋DTC IPU |",
+            "應用 × 接法 × 介面世代／pitch × 具名產品階段",
             "## 先分清兩種「貼法」的良率分母",
             "| 本文兩條接合路徑 | 怎麼接 | 主要優點 | 主要風險 | 為什麼不能直接比較 |",
             "| 單顆晶粒接晶圓（D2W） |", "| 晶圓接晶圓（W2W） |",
@@ -3907,24 +4114,26 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 設計規則與試驗結構 |", "| 2. 表面平坦與銅高度 |",
             "| 3. 潔淨與顆粒控制 |", "| 4. 對準、接合與量測 |",
             "| 5. 良率、產能與可靠度 |",
-            "## 最後用六關分開技術進展與收入",
+            "## 最後用六關分開「已有產品」與「量產經濟可稽核」",
             "| 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |",
             "| 1. 開放設計入口 |", "| 2. 試驗結構成功 |",
-            "| 3. 整合設備與流程使用 |", "| 4. 具名產品資格認證 |",
-            "| 5. 穩定大量生產 |", "| 6. 重複出貨與形成收入 |",
+            "| 3. 整合設備與流程使用 |", "| 4. 具名商用產品 |",
+            "| 5. Production 聲明 |", "| 6. 量產經濟與財務歸因 |",
+            "claim_id: C8", "correction_kind: supersedes",
+            "corrects_claim_id: C4", "monitor_id: T3",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 40
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
         reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先分清兩種「貼法」的良率分母", 1
+            "## 先畫四維地圖：成熟的是哪一格", 1
         )[0]
         for jargon in (
             "Hybrid bonding", "D2W", "W2W", "PDK", "Test vehicle",
@@ -3935,9 +4144,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 5),
-            ("research_claim", 5), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 9),
+            ("research_claim", 8), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -3945,7 +4154,7 @@ class ResearchCenterTest(unittest.TestCase):
         )
         self.assertIn(
             "topic-MI-2026-08-02-HYBRID-BONDING-READINESS,"
-            "兩層晶片貼得更密，為什麼一次試驗成功還不能證明可長期量產？",
+            "同樣叫混合接合，為什麼舊產品已商用，200 奈米試驗仍不能算量產？",
             guide,
         )
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -3964,9 +4173,18 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:test-vehicle,stage,試驗結構",
             "capability:overlay-control,capability,對準控制（Overlay）",
             "process:cmp-planarization,process,表面平坦化（CMP）",
+            "product:stacked-cmos-image-sensor,product,堆疊式 CMOS 影像感測器",
+            "product:tsmc-soic,product,TSMC-SoIC 三維堆疊平台",
+            "product:amd-3d-v-cache,product,AMD 3D V-Cache 處理器",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 混合接合（Hybrid bonding）", graph)
+        for edge_id in (
+            "KG-HYB-C03", "KG-HYB-C04", "KG-HYB-C05",
+            "KG-HYB-I10", "KG-HYB-I11", "KG-HYB-I12",
+        ):
+            self.assertIn(f"edge_id: {edge_id}", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
 
     def test_ai_memory_station_seven_separates_area_yield_output_and_cost(self):
         topic = (
@@ -3979,8 +4197,15 @@ class ResearchCenterTest(unittest.TestCase):
         ))
         for contract in (
             "editorial_plain_language_wave95_panel_cost_four_measures_production_chain_and_six_gate_ladder",
-            "這只回答「排得下多少」，還沒回答最後能做出多少合格品",
-            "不能把「排得更多」直接讀成「每顆更便宜」或台灣公司已受惠",
+            "separated_fanout_architecture_panel_carrier_and_ase_310x310_planned_production_evidence",
+            "三個詞不能混成同一個成熟度",
+            "公司同一頁仍寫成預計 2027 年投產",
+            "## 先把兩條軸拆開：封裝做法不等於面板載體",
+            "| 本文兩軸地圖 | 它回答什麼 | 例子 | 本輪可確認 | 不能直接推成 |",
+            "| 1. 封裝架構 |", "| 2. 製程先後 |",
+            "| 3. 批次載體 |", "| 4. 商用階段 |",
+            "### 再用兩條簡化流程看先後順序",
+            "**晶片先放**：", "**線路先做**：", "**改用面板**：",
             "## 先用四把尺拆開「更便宜」",
             "| 本文四把尺 | 它先回答什麼 | 最簡單的關係 | 容易忽略什麼 | 不能直接推成 |",
             "| 1. 面積利用率 |", "| 2. 合格封裝良率 |",
@@ -4001,13 +4226,13 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 43
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
         reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先用四把尺拆開", 1
+            "## 先把兩條軸拆開", 1
         )[0]
         for jargon in (
             "Panel-level packaging", "PLP", "area utilization",
@@ -4019,9 +4244,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 5),
-            ("research_claim", 5), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 9),
+            ("research_claim", 8), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4029,7 +4254,7 @@ class ResearchCenterTest(unittest.TestCase):
         )
         self.assertIn(
             "topic-MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS,"
-            "面板能排進更多封裝，為什麼還要一起看良率、製程速度與報廢成本？",
+            "面板、扇出與晶片先放是同一件事嗎，為什麼預計投產仍不能當成穩定量產？",
             guide,
         )
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -4044,9 +4269,21 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:panel-throughput,metric,面板單位時間產出（Throughput）",
             "standard:panel-size,standard,面板尺寸標準",
             "process:panel-ecd,process,面板電鍍沉積（ECD）",
+            "concept:fan-out-packaging,concept,扇出封裝（Fan-out）",
+            "process:chip-first-fan-out,process,晶片先放扇出流程（Chip-first）",
+            "process:chip-last-fan-out,process,線路先做扇出流程（Chip-last）",
+            "component:reconstituted-panel,component,重構面板（Reconstituted panel）",
+            "standard:semi-3d20-panel-characteristics,standard,SEMI 3D20 面板物理特性",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 面板級封裝（PLP）", graph)
+        self.assertIn("edge_id: KG-PLP-C04", graph)
+        self.assertIn("from_id: company:3711", graph)
+        for edge_id in (
+            "KG-PLP-I11", "KG-PLP-I12", "KG-PLP-I13",
+            "KG-PLP-I14", "KG-PLP-I15", "KG-PLP-I16",
+        ):
+            self.assertIn(f"edge_id: {edge_id}", graph)
 
     def test_compute_connect_station_one_separates_ai_storage_jobs_positions_and_gates(self):
         topic = (
@@ -4065,6 +4302,18 @@ class ResearchCenterTest(unittest.TestCase):
             "| 本文三種工作 | 何時發生 | 最怕什麼 | 先看哪個結果 | 不能直接推成 |",
             "| 1. 訓練時持續餵資料 |", "| 2. 故障前保存進度 |",
             "| 3. 上線或擴充時搬模型 |",
+            "expanded_checkpoint_completion_recovery_and_training_goodput_measurement_contract",
+            "## 「存檔完成」其實有六層，不是按下 save 就結束",
+            "| 完成階梯 | 真正完成了什麼 | 最小證據 | 仍不能證明 |",
+            "| 1. I/O 模擬跑完 |", "| 2. 暫存完成 |",
+            "| 3. 上傳完成 |", "| 4. 耐久副本完成 |",
+            "| 5. 正確回載完成 |", "| 6. 訓練結果改善 |",
+            "## 用八格復原護照檢查 checkpoint 是否真的讓訓練更有效",
+            "| 八格復原護照 | 要先固定什麼 | 要保存什麼 | 少了最容易誤讀成 |",
+            "| 1. 受測系統與版本 |", "| 2. Checkpoint 內容與節奏 |",
+            "| 3. 比較組與訓練負載 |", "| 4. 完成語意與 barrier |",
+            "| 5. 資料路徑與故障範圍 |", "| 6. 故障與正確回載 |",
+            "| 7. 訓練使用者結果 |", "| 8. 資源、可靠度與經濟 |",
             "## 再看資料可能經過的五個位置",
             "| 本文五個位置 | 它負責什麼 | 常見資料去向 | 卡住時先查誰 | 不能直接推成 |",
             "| 1. 軟體、索引與排程 |", "| 2. 近端記憶體與快取 |",
@@ -4081,7 +4330,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 42
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4098,9 +4347,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 8),
-            ("research_claim", 8), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4125,9 +4374,16 @@ class ResearchCenterTest(unittest.TestCase):
             "capability:model-artifact-distribution,capability,模型檔案分發",
             "capability:tail-latency-control,capability,最慢讀取時間控制",
             "capability:direct-storage-gpu-transfer,capability,儲存直達運算晶片",
+            "process:checkpoint-recovery-measurement-passport,process,Checkpoint 八格復原護照",
+            "metric:checkpoint-completion-semantics,metric,Checkpoint 完成語意",
+            "metric:training-runtime-goodput,metric,訓練有效時間",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 資料讀取與儲存路徑", graph)
+        for edge_id in (
+            "KG-ASD-C04", "KG-ASD-I11", "KG-ASD-I12", "KG-ASD-I13",
+        ):
+            self.assertIn(f"edge_id: {edge_id}", graph)
 
     def test_compute_connect_station_two_separates_helios_stages_customers_and_company_gates(self):
         topic = (
@@ -4140,8 +4396,27 @@ class ResearchCenterTest(unittest.TestCase):
         ))
         for contract in (
             "editorial_plain_language_wave97_helios_six_stage_five_customer_timeline_and_six_gate_ladder",
-            "中間還要經過出貨、測試與產品開放",
-            "它們不能相加成已部署",
+            "corrected_production_reading_with_reference_design_and_integrated_rack_contract",
+            "added_configuration_passport_change_triggered_regression_and_company_stage_refinement_no_thesis_change",
+            "一整櫃還要讓運算、兩類網路、供電、液冷、控制軟體與維修共同通過",
+            "定義不同，不能相加或互相比較",
+            "## 先看一整櫃有哪些共同責任",
+            "| 本文八條責任線 | 它負責什麼 | 本輪可確認的 Helios 設計 | 整櫃要驗收什麼 | 不能直接推成 |",
+            "| 1. 機架與共同介面 |", "| 2. 運算托盤 |",
+            "| 3. 機架內交換 |", "| 4. 跨機架與前端網路 |",
+            "| 5. 集中供電 |", "| 6. 液冷迴路 |",
+            "| 7. 控制與軟體 |", "| 8. 可維修與營運 |",
+            "## 再分清參考設計、品牌系統與客戶機群",
+            "不是 AMD 直接出售的產品",
+            "| 本文五種交付物 | 誰要交付 | 必須固定什麼 | 本輪證據 | 不能直接推成 |",
+            "| 1. 開放標準與參考設計 |", "| 2. 整機廠品牌系統 |",
+            "| 3. 整櫃資格與驗收資料包 |", "| 4. 出貨與現場接收 |",
+            "| 5. 生產機群與財務 |",
+            "## 同一型號還要有一張配置身分證",
+            "| 本文六個配置欄位 | 要留下什麼 | 它防止哪種誤讀 | 變更後先問什麼 |",
+            "| 1. 工廠硬體與盤點 |", "| 2. 韌體、軟體與 SBOM |",
+            "| 3. 網路、拓撲與設定 |", "| 4. 電力、冷卻與場站輸入 |",
+            "| 5. 工作負載、條件與基準 |", "| 6. 簽核、交接與變更紀錄 |",
             "## 先把六個部署關卡排成順序",
             "| 本文六個關卡 | 白話意思 | 可接受的證據 | 本篇目前到哪裡 | 不能直接推成 |",
             "| 1. 方案成形 |", "| 2. 開始生產 |", "| 3. 實際出貨 |",
@@ -4162,13 +4437,13 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 57
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
         reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先把六個部署關卡排成順序", 1
+            "## 先看一整櫃有哪些共同責任", 1
         )[0]
         for jargon in (
             "Helios", "production", "shipment", "online", "validation",
@@ -4179,11 +4454,18 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 11),
-            ("research_claim", 9), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 5),
+            ("research_topic", 1), ("research_source", 21),
+            ("research_claim", 21), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for ledger_contract in (
+            "source_id: S12", "source_id: S21", "claim_id: C10",
+            "claim_id: C21", "claim_id: C1\nlabel: inference\nstatus: superseded",
+            "corrected_by_claim_id: C11", "correction_kind: supersedes",
+            "corrects_claim_id: C1", "monitor_id: T6", "monitor_id: T12",
+        ):
+            self.assertIn(ledger_contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
@@ -4205,10 +4487,36 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:shipment,stage,實際出貨（Shipment）",
             "stage:cloud-deployment,stage,客戶上線與雲端部署",
             "stage:validation,stage,客戶測試與驗證（Validation）",
+            "standard:open-rack-wide,standard,開放式寬機架（Open Rack Wide）",
+            "component:ai-compute-tray,component,人工智慧運算托盤",
+            "component:ai-scale-up-switch-tray,component,人工智慧機架內交換托盤",
+            "component:rack-power-shelf,component,機架電力架與匯流排",
+            "capability:rack-serviceability,capability,機架可維修性",
+            "capability:rack-lifecycle-control,capability,機架生命週期控制",
+            "capability:rack-configuration-baseline,capability,機櫃配置基準",
+            "process:rack-change-triggered-regression,process,機櫃變更觸發回歸測試",
+            "stage:oem-systemization,stage,整機廠品牌系統化",
+            "stage:integrated-rack-qualification,stage,整櫃整合資格驗證",
             "component:efb,component,高架扇出橋接（EFB）",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AMD Helios 部署階梯", graph)
+        for edge in (
+            "edge_id: KG-HEL-I13", "edge_id: KG-HEL-I14",
+            "edge_id: KG-HEL-I15", "edge_id: KG-HEL-I16",
+            "edge_id: KG-HEL-I17", "edge_id: KG-HEL-I18",
+            "edge_id: KG-HEL-I19", "edge_id: KG-HEL-I20",
+            "edge_id: KG-HEL-I21", "edge_id: KG-HEL-I22",
+            "edge_id: KG-HEL-I23", "edge_id: KG-HEL-I24",
+            "edge_id: KG-HEL-I25",
+        ):
+            self.assertIn(edge, graph)
+        self.assertIn(
+            "edge_id: KG-HEL-I01\nview: industry\nfrom_id: product:amd-helios\n"
+            "to_id: concept:rack-scale",
+            graph,
+        )
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 39)
 
     def test_compute_connect_station_three_separates_backside_power_path_process_and_company_gates(self):
         topic = (
@@ -4221,8 +4529,21 @@ class ResearchCenterTest(unittest.TestCase):
         ))
         for contract in (
             "editorial_plain_language_wave98_backside_power_path_process_roles_and_six_gate_ladder",
+            "superseded_single_manufacturing_clock_after_design_process_control_reliability_and_roadmap_evidence",
+            "added_conditioned_measurement_passport_for_static_dynamic_and_ppa_claims",
             "這種做法把供電網路移到晶圓背面",
             "看到某道製程變重要只代表值得研究",
+            "## 先用五個時鐘判斷成熟度",
+            "| 本文五個時鐘 | 核心問題 | 可以升級的證據 | 本輪位置 | 仍然缺什麼 |",
+            "| 1. 設計與電力完整性 |", "| 2. 背面製程成形 |",
+            "| 3. 製程控制與可靠度 |", "| 4. 晶圓節點與客戶產品 |",
+            "| 5. 供應商資格與財務轉換 |",
+            "## 看到百分比，先填八格比較護照",
+            "| 八格比較護照 | 要記下什麼 | 少了會讀錯什麼 |",
+            "| 1. 受測物與成熟度 |", "| 3. 固定條件 |",
+            "| 5. 工作負載與活動 |", "| 7. PDN 與環境邊界 |",
+            "### 四組官方數字，應該怎麼讀",
+            "### 靜態 IR drop 和動態下陷，差在時間",
             "## 先用五個位置分開「送訊號」和「送電」",
             "| 本文五個位置 | 它負責什麼 | 和下一位置怎麼接 | 主要工程問題 | 不能直接推成 |",
             "| 1. 正面訊號佈線 |", "| 2. 背面金屬網路 |",
@@ -4233,28 +4554,32 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 完成前側元件與電源軌 |", "| 2. 接到支撐載體 |",
             "| 3. 從背面把晶圓變薄 |", "| 4. 從背面重新找準位置 |",
             "| 5. 形成導通孔與背面金屬 |", "| 6. 驗證完整流程能重複生產 |",
-            "## 把晶圓廠時鐘與供應商時鐘分開",
-            "## 最後用六關把製程需要接回公司",
-            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
-            "| 1. 一般機制與流程成立 |",
-            "| 2. 晶圓廠具名製程進入製造時鐘 |",
-            "| 3. 供應商具名到同一製程步驟 |",
-            "| 4. 通過資格並進入量產出貨 |",
-            "| 5. 份額、價格與重複需求可辨識 |",
-            "| 6. 收入、毛利與現金流出現 |",
+            "## 看懂一個失敗怎麼沿鏈條放大",
+            "布局與幾何 → 微影／蝕刻形貌 → 對準與接觸面積 → 接點電阻 → "
+            "供電穩定性 → 電路速度、良率與可靠度",
+            "## 把晶圓廠、製程控制與供應商時鐘分開",
+            "## 最後用七關把製程需要接回公司",
+            "| 本文七關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 架構問題成立 |", "| 2. 設計與試驗晶片可行 |",
+            "| 3. 完整流程與接點導通成立 |", "| 4. 製程窗口與可靠度通過 |",
+            "| 5. 具名節點與客戶產品量產 |", "| 6. 供應商資格與重複出貨 |",
+            "| 7. 財務結果可以歸因 |",
+            "claim_id: C6", "claim_id: C17", "source_id: S6",
+            "source_id: S10", "source_id: S13", "source_id: S17",
+            "monitor_id: T4", "monitor_id: T5", "PROVision 10",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 57
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
         reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先用五個位置分開", 1
+            "## 先用五個時鐘判斷成熟度", 1
         )[0]
         for jargon in (
             "BSPDN", "A16", "18A", "Super Power Rail", "PowerVia",
@@ -4265,9 +4590,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 5),
-            ("research_claim", 5), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 17),
+            ("research_claim", 17), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4291,52 +4616,92 @@ class ResearchCenterTest(unittest.TestCase):
             "process:powervia,process,背面供電導通（PowerVia）",
             "component:buried-power-rail,component,埋置電源軌（BPR）",
             "component:nano-tsv,component,奈米級背面導通孔（nano-TSV）",
+            "capability:backside-dtco,capability,背面供電設計技術共同最佳化",
+            "metric:ntsv-bpr-contact-resistance,metric,nTSV 至 BPR 接點電阻",
+            "capability:backside-overlay-metrology,capability,背面疊對與形貌量測",
+            "capability:backside-stress-control,capability,背面機械應力控制",
+            "stage:backside-design-validation,stage,背面供電設計驗證",
+            "stage:backside-process-control,stage,背面製程控制與可靠度",
+            "stage:backside-node-production,stage,背面供電節點與產品量產",
+            "stage:backside-supplier-qualification,stage,背面供電供應商資格與出貨",
+            "stage:backside-financial-attribution,stage,背面供電財務歸因",
+            "concept:backside-performance-comparison-passport,concept,背面供電效能八格比較護照",
+            "metric:static-ir-drop,metric,靜態電壓降",
+            "metric:dynamic-voltage-droop,metric,動態電壓下陷",
+            "metric:conditional-ppa-comparison,metric,條件式效能功耗面積比較",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 背面供電路徑與製程接力", graph)
+        for edge in (
+            "edge_id: KG-BSP-C03", "from_id: company:lam-research",
+            "edge_id: KG-BSP-C04", "from_id: company:applied-materials",
+            "edge_id: KG-BSP-I11", "to_id: metric:ntsv-bpr-contact-resistance",
+            "edge_id: KG-BSP-I14", "to_id: stage:backside-design-validation",
+            "edge_id: KG-BSP-I15", "to_id: stage:backside-process-control",
+            "edge_id: KG-BSP-I16", "to_id: stage:backside-node-production",
+            "edge_id: KG-BSP-I17", "to_id: stage:backside-supplier-qualification",
+            "edge_id: KG-BSP-I18", "to_id: stage:backside-financial-attribution",
+            "edge_id: KG-BSP-I19", "to_id: concept:backside-performance-comparison-passport",
+            "edge_id: KG-BSP-I20", "to_id: metric:static-ir-drop",
+            "edge_id: KG-BSP-I21", "to_id: metric:dynamic-voltage-droop",
+            "edge_id: KG-BSP-I22", "to_id: metric:conditional-ppa-comparison",
+        ):
+            self.assertIn(edge, graph)
 
-    def test_compute_connect_station_four_separates_optical_path_tradeoffs_roles_and_gates(self):
+    def test_compute_connect_station_four_separates_three_axis_optics_and_evidence_gates(self):
         topic = (
             ROOT / "notes" / "research_topics"
             / "2026-08-01_cpo_pluggable_coexistence.md"
         ).read_text(encoding="utf-8")
         self.assertTrue(topic.startswith(
             "# 資料先是電、再變成光："
-            "轉換器放哪裡，決定可插拔與共同封裝的取捨\n"
+            "別只問 CPO 或可插拔，要拆光引擎、訊號處理與雷射位置\n"
         ))
         for contract in (
             "editorial_plain_language_wave99_cpo_five_positions_five_tradeoffs_roles_and_six_gate_ladder",
+            "corrected_binary_optics_frame_with_engine_signal_and_laser_axes",
             "資料先以電訊號進入交換晶片，再轉成光訊號",
-            "一種方案開始生產，不代表另一種立刻消失",
+            "三個答案可以重新組合，不能濃縮成「CPO 對可插拔」",
             "## 先用五個位置看資料怎麼從電變成光",
             "| 本文五個位置 | 資料現在是什麼 | 這裡負責什麼 | 主要接力角色 | 不能直接推成 |",
             "| 1. 交換晶片內部 |", "| 2. 晶片到轉換器的高速電路 |",
             "| 3. 電光轉換位置 |", "| 4. 雷射與光纖耦合 |",
             "| 5. 光纖與下一台設備 |",
-            "## 再用五把尺比較兩種轉換位置",
-            "| 本文五把尺 | 可插拔光模組 | 共同封裝光學 | 下一個要量的結果 | 不能直接推成 |",
-            "| 1. 高速電路長度與功耗 |", "| 2. 前面板空間與頻寬密度 |",
-            "| 3. 維修與故障範圍 |", "| 4. 升級與多供應商彈性 |",
-            "| 5. 封裝、測試與生命週期成本 |",
+            "## 不要把架構畫成一條線：先拆三個獨立決策軸",
+            "| 1. 光引擎位置 |", "| 2. 電介面訊號處理 |",
+            "| 3. 雷射位置 |", "CPO 光引擎 + 外部 ELSFP 雷射",
+            "## 雷射移到外部後，維修邊界與損耗一起改變",
+            "| 故障替換 |", "| 光學損耗 |", "| 控制與安全 |",
+            "## 再用五把尺比較三種光引擎位置",
+            "| 本文五把尺 | 前面板可插拔 | 板上／NPO | CPO | 共同要量的結果 |",
+            "| 1. 高速電路與功耗 |", "| 2. 空間與頻寬密度 |",
+            "| 3. 維修與故障範圍 |", "| 4. 升級與第二來源 |",
+            "| 5. 製造與生命週期成本 |",
+            "## 四份 OIF 資料各回答不同問題",
+            "Co-Packaging Framework（2022）", "ELSFP IA 02.0（2025）",
+            "framework 建語彙 → IA 固定介面",
             "## 把五類角色放回同一條光電接力",
             "| 本文五類角色 | 它交付什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |",
-            "| 1. 平台與交換器產品 |", "| 2. 可插拔訊號處理 |",
+            "| 1. 平台與交換器產品 |", "| 2. 訊號處理與光引擎 |",
             "| 3. 雷射與光源 |", "| 4. 封裝、組裝與測試 |",
             "| 5. 客戶部署與營運 |",
-            "## 把兩條產品時鐘放回同一代共存",
-            "## 最後用六關分開產品生產、部署與公司受惠",
-            "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
-            "| 1. 兩種產品路徑已具名 |", "| 2. 產品進入持續生產 |",
-            "| 3. 供應商角色能雙向核對 |", "| 4. 客戶驗收與部署分母出現 |",
-            "| 5. 供應商出貨、份額與價格可辨識 |",
-            "| 6. 收入、毛利與現金流留下來 |",
+            "## 產品時鐘不是一條「誰取代誰」的時鐘",
+            "## 最後用七關分開標準、產品、部署與公司受惠",
+            "| 本文七關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
+            "| 1. 三軸組態可辨識 |", "| 2. 標準與應用契約閉合 |",
+            "| 3. 產品進入持續生產 |", "| 4. 供應商角色能雙向核對 |",
+            "| 5. 互通、客戶驗收與部署分母出現 |",
+            "| 6. 供應商出貨、份額與價格可辨識 |",
+            "| 7. 收入、毛利與現金流留下來 |",
+            "claim_id: C9", "correction_kind: supersedes",
+            "corrects_claim_id: C2", "monitor_id: T3",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 43
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4345,17 +4710,15 @@ class ResearchCenterTest(unittest.TestCase):
             "## 先用五個位置看", 1
         )[0]
         for jargon in (
-            "CPO", "Spectrum-X", "Photonics", "Spectrum-6", "1.6T",
-            "Ara", "DSP", "SerDes", "SPIL", "Lumentum", "Marvell",
-            "NVIDIA", "InP", "production", "full production",
-            "pluggable", "TSMC", "TFC", "Foxconn",
+            "Spectrum-X", "Photonics", "Spectrum-6", "Ara", "SPIL",
+            "Lumentum", "Marvell", "NVIDIA", "TSMC", "TFC", "Foxconn",
         ):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 7),
-            ("research_claim", 5), ("metric_comparison", 0),
-            ("impact", 1), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 11),
+            ("research_claim", 10), ("metric_comparison", 0),
+            ("impact", 1), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4380,9 +4743,24 @@ class ResearchCenterTest(unittest.TestCase):
             "component:co-packaged-optics,component,共同封裝光學（CPO）",
             "component:pluggable-optics,component,可插拔光模組",
             "stage:product-production,stage,進入產品生產",
+            "concept:cpo-three-axis-architecture,concept,CPO 三軸組態框架",
+            "component:npo-optical-engine,component,近封裝光引擎（NPO）",
+            "concept:optical-interface-processing-mode,concept,光學電介面訊號處理模式",
+            "component:external-laser-source,component,外部雷射光源（ELS）",
+            "metric:optical-loss-budget,metric,光學損耗預算",
+            "stage:optics-multivendor-field-validation,stage,光學多供應商與現場驗證",
         ):
             self.assertIn(concept, concepts)
-        self.assertIn("label: 光電轉換位置與兩種光學路徑", graph)
+        self.assertIn("label: AI 光學三軸組態與產品證據", graph)
+        for edge in (
+            "edge_id: KG-CPO-I06", "to_id: concept:cpo-three-axis-architecture",
+            "edge_id: KG-CPO-I07", "to_id: component:npo-optical-engine",
+            "edge_id: KG-CPO-I08", "to_id: concept:optical-interface-processing-mode",
+            "edge_id: KG-CPO-I09", "to_id: component:external-laser-source",
+            "edge_id: KG-CPO-I10", "to_id: metric:optical-loss-budget",
+            "edge_id: KG-CPO-I11", "to_id: stage:optics-multivendor-field-validation",
+        ):
+            self.assertIn(edge, graph)
 
     def test_compute_connect_station_five_separates_exposure_cost_roles_and_company_gates(self):
         topic = (
@@ -4402,6 +4780,13 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 設計圖形與光罩 |", "| 2. 晶圓表面與光阻 |",
             "| 3. 曝光機與光學 |", "| 4. 顯影與圖形轉移 |",
             "| 5. 量測、檢查與下一層 |",
+            "added_anamorphic_field_stitching_dose_yield_and_electrical_evidence_ladder_without_hvm_upgrade",
+            "## 解析度變好，為什麼反而多出五個新難題",
+            "| 本文五個新難題 | 變化從哪裡來 | 本輪一手證據走到哪裡 | 下一個要驗收 | 不能直接推成 |",
+            "| 1. 半視場與接縫 |", "| 2. 焦深、薄膜與表面起伏 |",
+            "| 3. 劑量、速度與隨機缺陷 |",
+            "| 4. 光罩、修正、光阻與烘烤 |",
+            "| 5. 圖形轉移與電性 |",
             "## 再用五把尺比較少做步驟是否真的省錢",
             "| 本文五把尺 | 較高數值孔徑方案 | 現行多步驟方案 | 下一個要量的結果 | 不能直接推成 |",
             "| 1. 曝光與加工次數 |", "| 2. 機器可用時間與每小時產出 |",
@@ -4417,6 +4802,18 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 機器送達 |", "| 2. 開始運轉與校準 |",
             "| 3. 研發資格與共同整合 |", "| 4. 實際產品晶圓測試 |",
             "| 5. 穩定量產導入 |",
+            "## 再用六級證據分清印得出來與產品能量產",
+            "| 本文六級圖形證據 | 這一級回答什麼 | 本輪可確認 | 還缺什麼 | 不能替代 |",
+            "| 1. 光學或材料單項結果 |", "| 2. 顯影後光阻圖形 |",
+            "| 3. 蝕刻或金屬化測試結構 |", "| 4. 電性測試載具 |",
+            "| 5. 功能性整合元件 |", "| 6. 客戶產品層與高量產 |",
+            "## 一份可重驗的製程視窗紀錄至少有十欄",
+            "| 本文十欄製程視窗紀錄 | 至少要記什麼 | 為什麼不能省略 |",
+            "| 1. 受測物與版本 |", "| 2. 光罩、視場與拼接 |",
+            "| 3. 光阻與底層 |", "| 4. 曝光設定 |",
+            "| 5. 烘烤、顯影與環境 |", "| 6. 膜堆與表面地形 |",
+            "| 7. 圖形轉移與金屬化 |", "| 8. 量測與電性判定 |",
+            "| 9. 樣本、失效與良率分母 |", "| 10. 生產與變更沿革 |",
             "## 最後用六關分開設備進度、客戶量產與公司受惠",
             "| 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
             "| 1. 目標圖形可以印出 |", "| 2. 多台設備能持續運轉 |",
@@ -4429,7 +4826,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 44
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4446,9 +4843,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 7),
-            ("research_claim", 8), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 14), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4475,9 +4872,20 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:high-na-hvm-insertion,stage,高量產導入",
             "component:high-na-resist,component,高數值孔徑曝光用光阻",
             "capability:high-na-metrology,capability,高數值孔徑曝光量測與檢查",
+            "concept:high-na-anamorphic-half-field,concept,High-NA 非等向光學與半視場",
+            "process:high-na-field-stitching,process,High-NA 半視場接縫拼接",
+            "metric:high-na-dose-yield-throughput-window,metric,High-NA 劑量缺陷良率產出視窗",
+            "process:high-na-electrical-evidence-ladder,process,High-NA 圖形到電性量產證據階梯",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 晶圓圖形曝光與 High-NA 導入階梯", graph)
+        for edge in (
+            "edge_id: KG-HNA-I12", "to_id: concept:high-na-anamorphic-half-field",
+            "edge_id: KG-HNA-I13", "to_id: process:high-na-field-stitching",
+            "edge_id: KG-HNA-I14", "to_id: metric:high-na-dose-yield-throughput-window",
+            "edge_id: KG-HNA-I15", "to_id: process:high-na-electrical-evidence-ladder",
+        ):
+            self.assertIn(edge, graph)
 
     def test_compute_connect_station_six_separates_data_path_scopes_roles_and_interoperability_gates(self):
         topic = (
@@ -4486,12 +4894,24 @@ class ResearchCenterTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertTrue(topic.startswith(
             "# 資料從一顆運算晶片走到另一顆："
-            "先分清機架內外，再判斷跨廠互通\n"
+            "先分清六張網，再判斷跨廠互通\n"
         ))
         for contract in (
             "editorial_plain_language_wave101_data_path_two_network_scopes_roles_and_six_gate_interoperability",
-            "一條完整資料路徑，要讓運算端點、連接傳輸、交換器、"
-            "控制軟體與另一個端點接力",
+            "corrected_single_fabric_path_frame_with_network_plane_and_stack_contract",
+            "一座人工智慧叢集同時有運算同步、跨機架傳送、一般服務、"
+            "儲存與維修管理等不同工作",
+            "## 先把一座人工智慧叢集拆成六張網",
+            "| 本文六張網 | 它搬什麼／做什麼 | OCP 參考架構如何分 | 失效時先看到什麼 | 不能直接推成 |",
+            "| 1. 加速器機架內擴充 |", "| 2. 跨機架／後端擴充 |",
+            "| 3. 一般服務／處理器網路 |", "| 4. 儲存網路 |",
+            "| 5. 帶內管理網路 |", "| 6. 帶外管理網路 |",
+            "## 再把每張網拆成八層驗收契約",
+            "| 本文八層契約 | 要回答的問題 | 本輪一手文件走到哪裡 | 升級所需證據 | 不能直接推成 |",
+            "| 1. 實體與連結 |", "| 2. 端點、記憶體與傳輸 |",
+            "| 3. 交換、路由與壅塞 |", "| 4. 軟體與控制 |",
+            "| 5. 管理、遙測與除錯 |", "| 6. 單件合規與自我聲明 |",
+            "| 7. 多供應商互通 |", "| 8. 系統、部署與財務 |",
             "## 先用五個位置看資料怎麼從一顆晶片走到另一顆",
             "| 本文五個位置 | 它做什麼 | 代表元件或軟體 | 下一個要驗收 | 不能直接推成 |",
             "| 1. 資料出發的運算端點 |", "| 2. 連接與傳輸 |",
@@ -4524,13 +4944,13 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 44
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
         reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先用五個位置看", 1
+            "## 先把一座人工智慧叢集拆成六張網", 1
         )[0]
         for jargon in (
             "UALink", "UEC", "ESUN", "SUE-T", "UALoE", "scale-up",
@@ -4541,11 +4961,19 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 14),
-            ("research_claim", 13), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 20),
+            ("research_claim", 19), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for ledger_contract in (
+            "source_id: S15", "source_id: S20", "claim_id: C14",
+            "claim_id: C19", "monitor_id: T4", "monitor_id: T5",
+            "claim_id: C9\nlabel: inference\nstatus: superseded",
+            "claim_id: C18\nlabel: inference\nstatus: active",
+            "correction_kind: supersedes\ncorrects_claim_id: C9",
+        ):
+            self.assertIn(ledger_contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
@@ -4572,9 +5000,21 @@ class ResearchCenterTest(unittest.TestCase):
             "standard:esun,standard,機架內乙太網路交換（ESUN）",
             "standard:sue-t,standard,機架內乙太傳輸（SUE-T）",
             "product:arista-7060xe7,product,Arista 7060XE7 網路平台",
+            "concept:ai-network-plane-map,concept,AI 叢集網路平面圖",
+            "concept:ai-front-end-network,concept,AI 前端與服務網路",
+            "concept:ai-storage-network,concept,AI 儲存網路",
+            "concept:ai-in-band-management-network,concept,AI 帶內管理網路",
+            "concept:ai-out-of-band-management-network,concept,AI 帶外管理網路",
+            "concept:ai-fabric-stack-contract,concept,AI 網路分層驗收契約",
+            "stage:compliance-self-attestation,stage,合規自我聲明",
+            "stage:system-stress-validation,stage,系統壓力與規模驗收",
+            "capability:fabric-lifecycle-management,capability,網路生命週期管理",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 資料路徑與跨廠互通", graph)
+        for edge_id in range(15, 26):
+            self.assertIn(f"edge_id: KG-FAB-I{edge_id}", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 30)
 
     def test_compute_connect_station_seven_separates_link_test_clocks_roles_and_deployment_gates(self):
         topic = (
@@ -4587,8 +5027,15 @@ class ResearchCenterTest(unittest.TestCase):
         ))
         for contract in (
             "editorial_plain_language_wave102_complete_link_test_dimensions_roles_and_six_gate_deployment",
+            "expanded_single_compliance_ladder_into_link_correctness_and_commercialization_axes",
+            "added_test_object_boundary_post_workshop_listing_snapshot_and_listing_lag_contract",
             "一條完整高速連線，要讓主機、板路與線材、必要的訊號或交換元件、"
             "終端裝置，以及低階控制軟體一起工作",
+            "## 先看 64 GT/s 為什麼牽動整條連線",
+            "| 本文五個連動步驟 | 為什麼需要它 | 它把問題交給誰 | 要驗收什麼 | 不能直接推成 |",
+            "| 1. 以 PAM4 承載更多資料 |", "| 2. 接受更敏感的原始錯誤環境 |",
+            "| 3. 把資料整理成固定 Flit |", "| 4. 依序修正、偵測與重送 |",
+            "| 5. 再驗設定、協定與工作負載 |",
             "## 先用五個位置看一條高速連線怎麼接起來",
             "| 本文五個位置 | 它做什麼 | 代表裝置或軟體 | 下一個要驗收 | 不能直接推成 |",
             "| 1. 主機與連線控制 |", "| 2. 板路、連接器與線材 |",
@@ -4599,11 +5046,20 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 規格版本與連線世代 |", "| 2. 每條通道的傳輸率 |",
             "| 3. 通道數與連線拓撲 |", "| 4. 產品、韌體與軟體組合 |",
             "| 5. 測試主體與結果狀態 |",
+            "## 先認清「誰真的被測到」",
+            "| 測試物件合約的五個欄位 | 要回答的問題 | 第 140 次工作坊政策給的線索 | 常見誤讀 | 下一份證據 |",
+            "| 1. 註冊產品身分 |", "| 2. 測試角色 |",
+            "| 3. 暴露介面與邊界 |", "| 4. 必要測項與互通門檻 |",
+            "| 5. 申請、列名與日期 |",
+            "## 把「連得對」和「賣得出去」分成兩條軸",
+            "| 兩條證據軸 | 第一步 | 中間要跨過 | 靠近完成時要看到 | 本輪位置 | 不能互相替代 |",
+            "| A. 連線正確性 |", "| B. 商業落地 |",
             "## 把六個動作分成不同時鐘",
             "| 本文六個時鐘 | 誰來確認 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |",
             "| 1. 規格與測試入口存在 |", "| 2. 具名產品宣稱支援 |",
             "| 3. 供應商或客戶完成互通 |", "| 4. 具名產品正式通過並列名 |",
             "| 5. 單一元件進入量產 |", "| 6. 完整平台進入客戶部署 |",
+            "## 8 月 12 日複核：考場已開，最高速度公開列名仍未見",
             "## 把六類角色放回同一套平台",
             "| 本文六類角色 | 它負責什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |",
             "| 1. 規格與正式測試組織 |", "| 2. 主機、控制器與平台 |",
@@ -4622,13 +5078,13 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 52
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
         reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先用五個位置看", 1
+            "## 先看 64 GT/s 為什麼牽動整條連線", 1
         )[0]
         for jargon in (
             "PCIe", "Gen6", "GT/s", "retimer", "switch", "endpoint",
@@ -4639,11 +5095,18 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 7),
-            ("research_claim", 7), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 16), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for ledger_contract in (
+            "source_id: S8", "source_id: S12", "claim_id: C10",
+            "claim_id: C12", "source_id: S13", "claim_id: C13",
+            "source_id: S14", "claim_id: C16", "monitor_id: T3",
+            "monitor_id: T4", "monitor_id: T5",
+        ):
+            self.assertIn(ledger_contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
@@ -4668,10 +5131,34 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:official-compliance,stage,PCI-SIG 官方相容性測試",
             "stage:integrators-listing,stage,PCI-SIG 合格清單列名",
             "stage:pcie6-platform-deployment,stage,客戶完整平台部署",
+            "process:pcie-pam4-signaling,process,PCIe 6 四電位訊號（PAM4）",
+            "concept:pcie-flit-mode,concept,PCIe 6 固定資料單元（Flit Mode）",
+            "capability:pcie-error-control,capability,PCIe 6 錯誤修正偵測與重送",
+            "metric:pcie-first-bit-error-rate,metric,PCIe 首個位元錯誤率（FBER）",
+            "stage:pcie-electrical-testing,stage,PCIe 電氣測試",
+            "stage:pcie-configuration-testing,stage,PCIe 設定空間測試",
+            "stage:pcie-link-protocol-testing,stage,PCIe 鏈路協定測試",
+            "stage:pcie-transaction-protocol-testing,stage,PCIe 交易協定測試",
+            "stage:pcie6-financial-attribution,stage,PCIe 6 財務歸因",
+            "concept:pcie-test-object-contract,concept,PCIe 測試物件與邊界合約",
+            "stage:pcie-component-specific-testing,stage,PCIe 關鍵元件獨立測試",
+            "stage:pcie-lane-margining,stage,PCIe 通道餘裕量測",
+            "stage:pcie-integrators-eligibility,stage,PCIe 公開列名資格鏈",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: PCIe 6 高速連線的測試與部署階梯", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 14)
+        for graph_contract in (
+            "edge_id: KG-PCIE6-I13", "to_id: process:pcie-pam4-signaling",
+            "edge_id: KG-PCIE6-I16", "to_id: metric:pcie-first-bit-error-rate",
+            "edge_id: KG-PCIE6-I20", "to_id: stage:pcie-transaction-protocol-testing",
+            "edge_id: KG-PCIE6-I21", "to_id: stage:pcie6-financial-attribution",
+            "edge_id: KG-PCIE6-I22", "to_id: concept:pcie-test-object-contract",
+            "edge_id: KG-PCIE6-I23", "to_id: stage:pcie-component-specific-testing",
+            "edge_id: KG-PCIE6-I24", "to_id: stage:pcie-lane-margining",
+            "edge_id: KG-PCIE6-I25", "to_id: stage:pcie-integrators-eligibility",
+        ):
+            self.assertIn(graph_contract, graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 27)
 
     def test_compute_connect_station_eight_separates_package_positions_test_dimensions_and_ecosystem_gates(self):
         topic = (
@@ -4696,6 +5183,13 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 傳輸率 |", "| 2. 實體路徑 |",
             "| 3. 協定與管理功能 |", "| 4. 廠商獨立性與晶片狀態 |",
             "| 5. 封裝、時間與故障條件 |",
+            "added_taiwan_32g_silicon_and_64g_tapeout_schedule_without_promoting_64g_interoperability",
+            "## 先不要只畫一條階梯：三條軸要同時對齊",
+            "| 1. 證據物件階段 |", "| 2. 測試包絡 |", "| 3. 供應商獨立性 |",
+            "## 把 16、32、64 放進同一張證據矩陣",
+            "| Intel／Cadence Cameron Creek 16G |",
+            "| 創意 N3P／CoWoS 32G |", "| 創意 N3P／CoWoS 64G |",
+            "## 創意（3443）應該怎麼讀",
             "## 把五種證據物件分開，不讓它們斜著畢業",
             "| 本文五種證據物件 | 白話意思 | 本輪可確認 | 下一份證據 | 不能借用 |",
             "| 1. 共同規格 |", "| 2. 介面智財與設計工具 |",
@@ -4719,7 +5213,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 36
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4737,9 +5231,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 6),
-            ("research_claim", 5), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 11),
+            ("research_claim", 10), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4762,13 +5256,1384 @@ class ResearchCenterTest(unittest.TestCase):
             "standard:ucie3,standard,第三代通用小晶片互連（UCIe 3.0）",
             "stage:specification,stage,共同規格發布",
             "stage:ip-tapeout,stage,介面設計送廠（IP tape-out）",
+            "stage:silicon-validation,stage,實體晶片回片驗證",
             "stage:cross-vendor-demo,stage,跨廠測試晶片互通",
             "stage:compliance,stage,正式符合規格測試",
             "stage:customer-qualification,stage,客戶產品資格驗證",
+            "metric:ucie-evidence-matrix,metric,UCIe 互通證據矩陣",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: UCIe 小晶片互通與量產階梯", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 13)
+        for graph_contract in (
+            "edge_id: KG-UCI-C04", "from_id: company:3443",
+            "edge_id: KG-UCI-I11", "to_id: stage:silicon-validation",
+            "edge_id: KG-UCI-I12", "to_id: metric:ucie-evidence-matrix",
+        ):
+            self.assertIn(graph_contract, graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 16)
+
+    def test_design_test_quality_station_one_separates_chiplet_handoff_contracts_and_conformance_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-12_chiplet_design_handoff_contracts.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 小晶片會連線，還不等於能交付：從 FCSA、CDXML 到 3DK 合規鏈\n"
+        ))
+        for contract in (
+            "小晶片能用共同介面傳資料，只證明連線契約的一部分",
+            "## 先分四層契約，才知道問題卡在哪裡",
+            "| 1. 連線介面 |", "| 2. 系統角色 |",
+            "| 3. 設計資料 |", "| 4. 符合性流程 |",
+            "## 3DK 不是一個檔案，而是六種交接責任",
+            "| CDK |", "| ADK |", "| MDK |", "| TDK |",
+            "## 公開 schema 的可重現檢查",
+            "完整母體四份檔案，`n=4`，不是抽樣，所以沒有抽樣標準誤",
+            "## 用六關判斷是否真的能跨公司交接",
+            "| 1. 名詞與規格發布 |", "| 2. schema 可執行 |",
+            "| 3. 單工具匯入 |", "| 4. 跨工具重現 |",
+            "| 5. 製造與封測簽核 |", "| 6. 客戶與財務 |",
+            "## 誰負責交接，誰不能替別人背書",
+            "## 這篇對個股判斷的用處與界線",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 10),
+            ("research_claim", 10), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS,"
+            "小晶片已能互相連線後，為什麼設計資料還要經過工具、"
+            "晶圓廠與封測廠的共同驗證？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:chiplet-design-handoff,concept,小晶片設計資料交接與合規鏈",
+            "standard:fcsa,standard,基礎小晶片系統架構（FCSA）",
+            "standard:cdxml,standard,小晶片資料交換格式（CDXML）",
+            "concept:3d-ic-design-kits,concept,3D-IC 設計套件（3DK）",
+            "stage:executable-schema,stage,Schema 可執行驗證",
+            "stage:cross-tool-conformance,stage,跨工具符合性重現",
+            "stage:foundry-osat-conformance,stage,製造與封測共同簽核",
+        ):
+            self.assertIn(concept, concepts)
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "chiplet_design_handoff_contracts.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: 小晶片設計資料交接與合規鏈", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 12)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "design-test-quality"
+        )
+        self.assertEqual(
+            route["graphIds"][:2],
+            ["chiplet-design-handoff-contracts", "high-na-euv-readiness"],
+        )
+        phase = next(
+            row for row in route["phases"]
+            if row["id"] == "design-manufacturing-contracts"
+        )
+        self.assertEqual(
+            phase["graphIds"],
+            ["chiplet-design-handoff-contracts", "high-na-euv-readiness"],
+        )
+
+    def test_process_control_route_requires_measurement_contract_before_control_plan(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_ai_process_control_intensity.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "## 量得出數字，不代表能拿去控製程：先過量測系統六關",
+            "### 先分清「準」與「穩」",
+            "| 偏差／準確度 |", "| 重複性 |", "| 再現性 |",
+            "| 穩定性／漂移 |", "| 不確定度 |",
+            "### 一份可用的 measurement-system contract 至少有六欄",
+            "| 1. 被測量、單位與決策 |",
+            "| 2. 方法、組態與環境 |",
+            "| 3. 參考、校正與可追溯鏈 |",
+            "| 4. 偏差、解析度與線性 |",
+            "| 5. 重複性、再現性與穩定性 |",
+            "| 6. 不確定度與決策規則 |",
+            "可追溯的是**特定量測結果**，不是設備、",
+            "**量測系統契約**先證明數字",
+            "**Control plan 契約**再決定在哪一站",
+            "不能把方法完整\n直接當成財務材料性",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 17), ("metric_comparison", 0),
+            ("impact", 4), ("monitoring_item", 8),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:measurement-system-contract,concept,製程控制量測系統契約",
+            "metric:measurement-measurand-decision,metric,被測量單位與決策",
+            "capability:measurement-method-context,capability,量測方法組態與環境",
+            "capability:measurement-reference-traceability,capability,量測參考校正與可追溯鏈",
+            "metric:measurement-bias-resolution-linearity,metric,量測偏差解析度與線性",
+            "metric:measurement-repeatability-reproducibility-stability,metric,量測重複性再現性與穩定性",
+            "metric:measurement-uncertainty-decision-rule,metric,量測不確定度與決策規則",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "process_control_measurement_contract.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: 製程控制量測系統契約", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 16)
+        for node in (
+            "from_id: company:kla",
+            "to_id: metric:measurement-measurand-decision",
+            "to_id: capability:measurement-method-context",
+            "to_id: capability:measurement-reference-traceability",
+            "to_id: metric:measurement-bias-resolution-linearity",
+            "to_id: metric:measurement-repeatability-reproducibility-stability",
+            "to_id: metric:measurement-uncertainty-decision-rule",
+            "to_id: concept:inspection-control-plan",
+            "to_id: metric:inspection-sampling-coverage",
+            "to_id: metric:defect-sensitivity-escape",
+            "to_id: metric:nuisance-false-alarm",
+            "to_id: metric:inspection-cycle-time",
+            "to_id: capability:excursion-containment",
+            "to_id: group:semiequip", "to_id: group:packtest",
+        ):
+            self.assertIn(node, graph)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "design-test-quality"
+        )
+        phase = next(
+            row for row in route["phases"]
+            if row["id"] == "measurement-process-control"
+        )
+        self.assertEqual(
+            phase["graphIds"],
+            ["process-control-measurement-contract"],
+        )
+        self.assertEqual(route["graphIds"][2], phase["graphIds"][0])
+
+    def test_design_test_quality_sdc_lifecycle_separates_detection_isolation_and_commercial_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-12_ai_hardware_sdc_lifecycle.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# AI 硬體沒有報錯，答案仍可能算錯：從出廠測試到機群隔離的 SDC 責任鏈\n"
+        ))
+        for contract in (
+            "SDC 最危險的地方不是設備停機",
+            "## 先分清四種結果：沒有錯、已修正、停下來與悄悄算錯",
+            "| 良性錯誤 |", "| 已修正錯誤 |", "| DUE |", "| SDC |",
+            "## 一次通過不等於一生可靠：六個生命週期站點",
+            "| 1. 晶片與封裝製造測試 |", "| 2. 燒機與壓力測試 |",
+            "| 3. 整機整合與客戶驗收 |", "| 4. 工作前與維修後主動診斷 |",
+            "| 5. 運行中偵測 |", "| 6. 隔離、重測與供應商回饋 |",
+            "## 每一站要交接的不是「好／壞」，而是六欄測試契約",
+            "| 1. 測試身分 |", "| 2. 題目與答案 |", "| 3. 執行環境 |",
+            "| 4. 結果品質 |", "| 5. 定位與處置 |", "| 6. 零件病歷 |",
+            "## 三套公開做法，各自只看到責任鏈的一個切面",
+            "## 為什麼「多跑測試」仍可能抓不到",
+            "## 用七關判斷 SDC 需求是否真的形成",
+            "| 1. 分類對齊 |", "| 2. 可執行測試 |", "| 3. 品質可量化 |",
+            "| 4. 裝置可隔離 |", "| 5. 病歷可回傳 |", "| 6. 跨平台重現 |",
+            "| 7. 客戶與財務 |",
+            "## 誰負責，誰不能替別人背書",
+            "## 這篇對個股判斷的用處與界線",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 10),
+            ("research_claim", 10), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE,"
+            "人工智慧硬體沒有報錯卻算錯時，從工廠到資料中心要如何發現、隔離與追查？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:ai-hardware-sdc-lifecycle,concept,AI 硬體 SDC 生命週期責任鏈",
+            "concept:sdc-outcome-taxonomy,concept,SDC 錯誤結果分類",
+            "capability:factory-sdc-screening,capability,工廠 SDC 缺陷篩檢",
+            "capability:system-level-sdc-diagnostics,capability,系統層 SDC 主動診斷",
+            "capability:in-fleet-sdc-detection,capability,機群運行中 SDC 偵測",
+            "capability:workload-correctness-check,capability,工作負載正確性檢查",
+            "capability:sdc-device-quarantine,capability,SDC 可疑設備隔離",
+            "process:sdc-part-history-feedback,process,SDC 零件病歷回饋",
+            "stage:sdc-common-test-format,stage,SDC 共同測試格式跨框架實作",
+            "stage:sdc-commercial-attribution,stage,SDC 商業與財務歸因",
+        ):
+            self.assertIn(concept, concepts)
+        entities = (ROOT / "config" / "external_entities.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("company:google,company,Google,GOOGL", entities)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "ai_hardware_sdc_lifecycle.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: AI 硬體 SDC 生命週期責任鏈", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 16)
+
+        radar = (
+            ROOT / "notes" / "research_candidates"
+            / "2026-08-09_industry_coverage_radar.md"
+        ).read_text(encoding="utf-8")
+        candidate = radar.split(
+            "candidate_id: RC-AI-SILENT-DATA-CORRUPTION", 1
+        )[1].split("-->", 1)[0]
+        for field in (
+            "status: promoted",
+            "evidence_posture: research_grade",
+            "route: article_and_graph",
+            "article_topic_id: MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE",
+            "graph_id: ai-hardware-sdc-lifecycle",
+        ):
+            self.assertIn(field, candidate)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "design-test-quality"
+        )
+        self.assertIn("ai-hardware-sdc-lifecycle", route["graphIds"])
+        phase = next(
+            row for row in route["phases"]
+            if row["id"] == "field-feedback"
+        )
+        self.assertEqual(
+            phase["graphIds"],
+            ["ai-hardware-sdc-lifecycle"],
+        )
+
+    def test_compute_connect_224g_pcb_chain_separates_material_channel_ber_and_attribution(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-12_224g_pcb_qualification_chain.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 材料表寫著低損耗，整板仍可能出錯：224G PCB 從 Dk／Df 到 BER 的七關資格鏈\n"
+        ))
+        for contract in (
+            "材料規格表的 Dk／Df，只是高速連線的第一組輸入",
+            "## 先用七關看懂：一個「低損耗」標籤還缺什麼",
+            "| 1. 材料身分 |", "| 2. 測法對齊 |", "| 3. reference stackup |",
+            "| 4. coupon 與板級不連續點 |", "| 5. 完整通道 loss budget |",
+            "| 6. BER 與 FEC |", "| 7. 跨廠量產與公司歸因 |",
+            "## 為什麼同一材料會出現不同 Dk／Df",
+            "## 三組公開證據，為何還拼不成「同一塊板」",
+            "| IEEE 2022 PCB contribution |", "| OIF OFC 2024 VSR demo |",
+            "| IPC-4103 QPL |",
+            "## loss budget 不是把幾個 dB 隨手相加",
+            "## 為什麼 Df 不能直接換算 BER",
+            "## 標準、展示與量產各有自己的時鐘",
+            "## 台燿的 QPL 應該怎麼讀",
+            "## 用七個欄位建立可重算的 qualification 記錄",
+            "## 誰負責，誰不能替別人背書",
+            "## 這篇對公司判斷的用處與界線",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 10), ("metric_comparison", 0),
+            ("impact", 1), ("monitoring_item", 3),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN,"
+            "材料規格表宣稱能跑高速後，做成含走線、孔洞與連接器的完整電路板，"
+            "錯誤率仍能過關嗎？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:224g-pcb-qualification-chain,concept,224G PCB 材料到 BER 七關資格鏈",
+            "metric:pcb-dk-df,metric,PCB 材料 Dk／Df",
+            "component:pcb-stackup,component,高速 PCB stackup",
+            "component:low-dk-glass-weave,component,低 Dk 玻纖與編織結構",
+            "component:low-profile-copper-foil,component,低粗糙度銅箔",
+            "stage:pcb-loss-coupon,stage,板級損耗 coupon",
+            "component:pcb-via-connector,component,PCB via 與連接器不連續點",
+            "stage:channel-loss-budget,stage,完整通道損耗預算",
+            "metric:pre-post-fec-ber,metric,FEC 前後 BER",
+            "stage:multi-vendor-board-qualification,stage,跨廠同板資格重現",
+            "stage:224g-pcb-commercial-attribution,stage,224G PCB 商業與財務歸因",
+        ):
+            self.assertIn(concept, concepts)
+        entities = (ROOT / "config" / "external_entities.csv").read_text(
+            encoding="utf-8"
+        )
+        for entity in (
+            "organization:ipc,organization,IPC",
+            "organization:oif,organization,OIF",
+            "organization:ieee-8023,organization,IEEE 802.3",
+            "organization:ethernet-alliance,organization,Ethernet Alliance",
+            "company:panasonic-industry,company,Panasonic Industry",
+        ):
+            self.assertIn(entity, entities)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "224g_pcb_qualification_chain.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: 224G PCB 材料到 BER 七關資格鏈", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+        self.assertIn("from_id: company:6274", graph)
+        self.assertIn("to_id: standard:ipc-4103", graph)
+
+        radar = (
+            ROOT / "notes" / "research_candidates"
+            / "2026-08-09_industry_coverage_radar.md"
+        ).read_text(encoding="utf-8")
+        candidate = radar.split(
+            "candidate_id: RC-224G-PCB-MATERIAL-QUALIFICATION", 1
+        )[1].split("-->", 1)[0]
+        for field in (
+            "group_ids: pcb",
+            "status: promoted",
+            "evidence_posture: research_grade",
+            "route: article_and_graph",
+            "article_topic_id: MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN",
+            "graph_id: 224g-pcb-qualification-chain",
+        ):
+            self.assertIn(field, candidate)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "compute-connect"
+        )
+        phase = next(
+            row for row in route["phases"]
+            if row["id"] == "interconnect-standards"
+        )
+        self.assertEqual(
+            phase["graphIds"][0:3],
+            ["open-ai-fabrics", "224g-pcb-qualification-chain", "pcie6-compliance-ladder"],
+        )
+
+    def test_800v_power_tree_teaches_topology_before_material_selection(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_800v_power_semiconductor_partition.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 800VDC 不是 SiC 或 GaN 二選一：先看拓撲，再用六把尺選元件\n"
+        ))
+        for contract in (
+            "thesis_claim_id: C7",
+            "review_due: 2026-08-19",
+            "claim_id: C5\nlabel: inference\nstatus: active",
+            "claim_id: C7\nlabel: inference\nstatus: active",
+            "claim_id: C11\nlabel: unverified\nstatus: active",
+            "## 先用四個位置看：拓撲會把元件工作移到哪裡",
+            "| 本文四個位置 |",
+            "## 為什麼 48V 與 800V 會共存一段時間",
+            "## 再用六把尺：同一個 power stage 也不能只看材料",
+            "| 本文六把尺 |",
+            "| 1. 工作電壓與電流 |",
+            "| 6. Qualification 與供應 |",
+            "## 最後用五關：不要用元件資料替整套系統背書",
+            "| 本文五關 |",
+            "| 1. Topology contract |",
+            "| 5. Production BOM／財務 |",
+            "reason: expanded_functional_partition_to_topology_first_six_axis_and_five_gate_contract",
+            "monitor_id: T1\nstatus: retired",
+            "monitor_id: T3\nstatus: active",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 11), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 4),
+            ("transition", 7),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:800v-topology-device-selection,concept,800V 拓撲與元件選擇雙層框架",
+            "metric:power-stage-selection-envelope,metric,功率級六軸選材包絡線",
+            "component:direct-hv-bus-converter,component,高壓匯流排直降轉換器",
+            "component:48v-power-shelf,component,48V 機架電力架",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "800v_power_tree.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
+        for target in (
+            "to_id: concept:800v-topology-device-selection",
+            "to_id: metric:power-stage-selection-envelope",
+            "to_id: component:direct-hv-bus-converter",
+            "to_id: component:48v-power-shelf",
+            "to_id: stage:800v-subsystem-qualification",
+            "to_id: stage:800v-site-acceptance",
+            "to_id: stage:800v-commercial-attribution",
+        ):
+            self.assertIn(target, graph)
+
+    def test_800vdc_execution_route_separates_seven_facility_and_financial_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-01_800vdc_execution_readiness.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 800VDC 從路線圖走到量產要跨七關："
+            "2026 已到設計與驗證，full-scale 仍待 2027\n"
+        ))
+        for contract in (
+            "## 先用七關看懂：800VDC 何時才算真的走到量產",
+            "| 1. 架構與時鐘 |",
+            "| 2. 設施轉換邊界 |",
+            "| 3. 介面、冗餘與維修 |",
+            "| 4. 安全、標準與人員 |",
+            "| 5. 子系統資格 |",
+            "| 6. 場站 commissioning 與客戶驗收 |",
+            "| 7. 量產與財務歸因 |",
+            "## OCP 的三階段不是「成熟度排名」，而是改動範圍",
+            "## 為什麼子系統通過，還不等於場站穩定",
+            "## 公司公告要放回正確抽屜",
+            "## 新手最常混淆的七件事",
+            "## 在研究中心接著怎麼學",
+            "claim_id: C4\nlabel: inference\nstatus: superseded",
+            "corrected_by_claim_id: C13",
+            "thesis_claim_id: C13",
+            "review_due: 2026-09-12",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
+            ("transition", 5),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:800vdc-execution-readiness,concept,800VDC 七關執行準備度",
+            "stage:800v-architecture-roadmap,stage,架構需求與平台時鐘",
+            "stage:800v-facility-transition,stage,設施轉換邊界",
+            "stage:800v-interface-redundancy,stage,介面冗餘與維修",
+            "stage:800v-standards-readiness,stage,安全標準與人員準備",
+            "stage:800v-subsystem-qualification,stage,800V 子系統資格",
+            "stage:800v-site-acceptance,stage,場站試運轉與客戶驗收",
+            "stage:800v-commercial-attribution,stage,量產部署與財務歸因",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "800vdc_execution_readiness.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: 800VDC 七關執行準備度", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        for edge_target in (
+            "from_id: company:2308",
+            "from_id: organization:open-compute-project",
+            "to_id: stage:800v-architecture-roadmap",
+            "to_id: stage:800v-facility-transition",
+            "to_id: stage:800v-interface-redundancy",
+            "to_id: stage:800v-standards-readiness",
+            "to_id: stage:800v-subsystem-qualification",
+            "to_id: stage:800v-site-acceptance",
+            "to_id: stage:800v-commercial-attribution",
+            "to_id: group:powersupply", "to_id: group:power",
+            "to_id: group:thermal",
+        ):
+            self.assertIn(edge_target, graph)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "power-cooling"
+        )
+        self.assertEqual(route["graphIds"][0], "800vdc-execution-readiness")
+        phase = next(
+            row for row in route["phases"]
+            if row["id"] == "power-components"
+        )
+        self.assertEqual(
+            phase["graphIds"][:2],
+            ["800vdc-execution-readiness", "800v-power-tree"],
+        )
+
+        reviews = (
+            ROOT / "notes" / "research_method_reviews" / "monitor_reviews.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn("MR-2026-08-08-800VDC-T1", reviews)
+
+    def test_power_route_sic_chain_separates_device_system_customer_and_financial_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-12_sic_ai_power_qualification.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 元件通過短路測試，電源仍不能直接上機："
+            "SiC 從 JEP203／JEP204 到 AI BBU／PSU 的七關資格鏈\n"
+        ))
+        for contract in (
+            "元件測試回答「這顆開關在指定實驗條件下怎麼壞」",
+            "## 先用七關看懂：同一顆 SiC 要拿七張不同的證書",
+            "| 1. Application stress envelope |",
+            "| 2. Standardized device evaluation |",
+            "| 3. Supplier qualification data |",
+            "| 4. Converter validation |",
+            "| 5. System reliability／protection |",
+            "| 6. Mixed-source customer qualification |",
+            "| 7. Deployment／financial attribution |",
+            "## JEP203 解決的是測法一致，不是替平台設定關斷時間",
+            "## JEP204 是 stress catalog，不是壽命保證書",
+            "## 三份 OCP 規格真正教了什麼",
+            "## 「0 次命中」能說什麼，不能說什麼",
+            "## Reference design、adoption、platform qualification 是三張不同證書",
+            "## 從元件微秒到整機故障：時間線要閉合",
+            "## 用九個欄位建立可重算的 SiC qualification pack",
+            "## 誰負責，誰不能替別人背書",
+            "## 台達與 power／powersupply 族群應該怎麼讀",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 3),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-12-SIC-AI-POWER-QUALIFICATION,"
+            "新的碳化矽可靠度指引，是否真的進入人工智慧備援電源與"
+            "電源供應器的驗收並改變設計？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:sic-ai-power-qualification,concept,SiC 到 AI BBU／PSU 七關資格鏈",
+            "standard:jep203,standard,JEDEC JEP203",
+            "standard:jep204,standard,JEDEC JEP204",
+            "stage:sic-application-stress-envelope,stage,SiC 應用壓力範圍",
+            "stage:sic-device-evaluation,stage,SiC 元件標準化評估",
+            "stage:sic-supplier-qualification-data,stage,SiC 供應商資格資料包",
+            "stage:sic-converter-validation,stage,SiC BBU／PSU 轉換器驗證",
+            "stage:sic-system-reliability,stage,SiC 電源系統可靠度與保護",
+            "stage:sic-mixed-source-qualification,stage,SiC 跨來源客戶資格",
+            "stage:sic-commercial-attribution,stage,SiC AI 電源商業與財務歸因",
+            "standard:ipc-9592b,standard,IPC-9592B 電源轉換裝置要求",
+            "standard:telcordia-sr332,standard,Telcordia SR-332",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "sic_ai_power_qualification.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: SiC 到 AI BBU／PSU 七關資格鏈", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+        self.assertIn("from_id: company:2308", graph)
+        self.assertIn("to_id: standard:jep203", graph)
+        self.assertIn("to_id: standard:jep204", graph)
+
+        radar = (
+            ROOT / "notes" / "research_candidates"
+            / "2026-08-09_industry_coverage_radar.md"
+        ).read_text(encoding="utf-8")
+        candidate = radar.split(
+            "candidate_id: RC-SIC-AI-POWER-QUALIFICATION", 1
+        )[1].split("-->", 1)[0]
+        for field in (
+            "group_ids: power,powersupply",
+            "status: promoted",
+            "evidence_posture: research_grade",
+            "route: article_and_graph",
+            "article_topic_id: MI-2026-08-12-SIC-AI-POWER-QUALIFICATION",
+            "graph_id: sic-ai-power-qualification",
+            "因此事先第一拒絕已觸發",
+        ):
+            self.assertIn(field, candidate)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "power-cooling"
+        )
+        self.assertIn("sic-ai-power-qualification", route["graphIds"])
+        phase = next(
+            row for row in route["phases"]
+            if row["id"] == "power-components"
+        )
+        self.assertEqual(
+            phase["graphIds"],
+            [
+                "800vdc-execution-readiness", "800v-power-tree",
+                "800vdc-protection-layers",
+                "ai-capacitor-role-map", "sic-ai-power-qualification",
+            ],
+        )
+
+    def test_policy_route_pfas_chain_separates_substance_law_qualification_and_finance(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-12_semiconductor_pfas_exposure.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 不是看到 PFAS 限制就全面換料："
+            "半導體從物質、用途、法域到再驗證的七關曝險圖\n"
+        ))
+        for contract in (
+            "**PFAS**：一大類含碳氟鍵的人造物質",
+            "## 先用七關看懂：一個 PFAS 題材要補齊哪七張表",
+            "| 1. 物質身分 |",
+            "| 2. 製程功能 |",
+            "| 3. 產品形態 |",
+            "| 4. 法域義務 |",
+            "| 5. 豁免與過渡 |",
+            "| 6. 變更資格驗證 |",
+            "| 7. 公司與財務歸因 |",
+            "## 先分清三個政策時鐘：意見、法條與申報不是同一件事",
+            "## 同一台蝕刻設備，為什麼可能落進六個法規抽屜",
+            "## 「找到替代分子」為什麼離量產還很遠",
+            "## 建一份可重算的 PFAS qualification pack",
+            "## 本輪第一拒絕如何裁決",
+            "## 上品與三福化應該怎麼讀",
+            "## 誰負責，誰不能替別人背書",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 3),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE,"
+            "半導體使用的含氟物質，受限後為什麼不能直接換料或整台設備一起判定？",
+            guide,
+        )
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:semiconductor-pfas-exposure,concept,半導體 PFAS 七關曝險鏈",
+            "process:eu-reach-pfas-restriction,process,歐盟 REACH PFAS 限制程序",
+            "process:us-tsca-pfas-reporting,process,美國 TSCA PFAS 歷史申報",
+            "stage:pfas-substance-identity,stage,PFAS 物質身分盤點",
+            "stage:pfas-process-function,stage,PFAS 製程功能映射",
+            "stage:pfas-product-form,stage,PFAS 產品形態判定",
+            "stage:pfas-jurisdiction-duty,stage,PFAS 法域與義務判定",
+            "stage:pfas-derogation-transition,stage,PFAS 豁免與過渡條件",
+            "stage:pfas-change-qualification,stage,PFAS 替代變更資格驗證",
+            "stage:pfas-company-financial-attribution,stage,PFAS 公司與財務歸因",
+        ):
+            self.assertIn(concept, concepts)
+
+        entities = (ROOT / "config" / "external_entities.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("organization:echa,organization,European Chemicals Agency", entities)
+        self.assertIn(
+            "organization:us-epa,organization,United States Environmental Protection Agency",
+            entities,
+        )
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "semiconductor_pfas_exposure.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: 半導體 PFAS 七關曝險鏈", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+        for edge_target in (
+            "from_id: company:4755", "from_id: company:4770",
+            "from_id: organization:echa", "from_id: organization:us-epa",
+            "to_id: group:material", "to_id: group:semiequip",
+        ):
+            self.assertIn(edge_target, graph)
+
+        radar = (
+            ROOT / "notes" / "research_candidates"
+            / "2026-08-09_industry_coverage_radar.md"
+        ).read_text(encoding="utf-8")
+        candidate = radar.split(
+            "candidate_id: RC-SEMICONDUCTOR-PFAS-EXPOSURE", 1
+        )[1].split("-->", 1)[0]
+        for field in (
+            "group_ids: material,semiequip",
+            "status: promoted",
+            "evidence_posture: research_grade",
+            "route: article_and_graph",
+            "article_topic_id: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE",
+            "graph_id: semiconductor-pfas-exposure",
+            "因此事先第一拒絕已觸發",
+            "next_check: 2026-12-15",
+        ):
+            self.assertIn(field, candidate)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "policy-compliance"
+        )
+        self.assertEqual(
+            route["graphIds"],
+            ["section301-taiwan-exposure", "semiconductor-pfas-exposure"],
+        )
+        phase = next(
+            row for row in route["phases"]
+            if row["id"] == "substance-regulation"
+        )
+        self.assertEqual(
+            phase["graphIds"],
+            ["semiconductor-pfas-exposure"],
+        )
+
+    def test_section301_policy_route_separates_tariff_gates_from_company_finance(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-23_us_section_301_taiwan.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 先分流：四種「受限制」不是同一件事",
+            "### HTS 與 ECCN 都是代碼，卻回答不同問題",
+            "### 同樣出現在「清單」，BIS 與 OFAC 的後果仍不同",
+            "### 技術合格也不等於只有一張第三方證書",
+            "### 同一產品要留下四欄，而不是一個「合規」標籤",
+            "## 先用七關把國家稅率拆到公司財務",
+            "### 同一商品有三個名字",
+            "### 關稅由誰先付，和誰最後吸收，是兩個問題",
+            "### 新手最常混淆的六件事",
+            "### 在研究中心裡接著怎麼學",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "**原產地（country of origin）**",
+            "**Importer of record**",
+            "**關稅歸宿／轉嫁（incidence／pass-through）**",
+            "**Section 232**",
+            "**EAR（Export Administration Regulations）**",
+            "**ECCN**",
+            "**EAR99**",
+            "**Entity List**",
+            "**OFAC**",
+            "**SDN List**",
+            "**合格評定（conformity assessment）**",
+            "**第一方／第二方／第三方評定**",
+            "| 進口關稅／Section 301 |",
+            "| EAR 出口管制 |",
+            "| OFAC 制裁 |",
+            "| 技術合格評定／客戶資格 |",
+            "| 1. 政策行動與範圍 |",
+            "| 2. HTS 商品分類 |",
+            "| 3. Annex 豁免 |",
+            "| 4. 海關原產地 |",
+            "| 5. 出貨與交易責任 |",
+            "| 6. 需求與成本轉嫁 |",
+            "| 7. 公司財務歸因 |",
+            "thesis_claim_id: C6",
+            "claim_id: C5",
+            "claim_id: C6",
+            "claim_id: C7",
+            "claim_id: C8",
+            "claim_id: C9",
+            "claim_id: C10",
+            "reason: published_notice_confirmed_rate_formula_and_policy_to_company_exposure_framework",
+            "reason: distinguished_tariff_export_control_sanctions_and_conformity_without_changing_section301_thesis",
+            "monitor_id: T3",
+            "monitor_id: T4",
+            "status: retired",
+            "retirement_reason: 正式政策變動應追 USTR investigation docket",
+            "https://media.bis.gov/licensing/classify-your-item",
+            "https://ofac.treasury.gov/faqs/56",
+            "https://www.nist.gov/standardsgov/conformity-assessment-basics",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 11),
+            ("research_claim", 10), ("metric_comparison", 0),
+            ("impact", 4), ("monitoring_item", 4),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        glossary = topic[topic.index("### 名詞小字典"):topic.index("### 三句話抓重點")]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()),
+            21,
+        )
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:section301-taiwan-exposure,concept,Section 301 台灣商品七關曝險鏈",
+            "stage:policy-action-scope,stage,政策行動與適用範圍",
+            "stage:hts-product-classification,stage,HTS 商品分類",
+            "stage:annex-exemption-test,stage,Annex 豁免判定",
+            "stage:customs-origin-test,stage,海關原產地判定",
+            "stage:shipment-contract-incidence,stage,出貨與交易責任",
+            "stage:demand-pass-through-response,stage,需求與成本轉嫁",
+            "stage:section301-company-financial-attribution,stage,Section 301 公司財務歸因",
+            "concept:trade-regime-separation,concept,關稅、出口管制、制裁與資格四制度分流",
+            "stage:tariff-import-entry,stage,進口關稅與報關 entry",
+            "stage:ear-export-license-screen,stage,EAR 出口許可判定",
+            "stage:ofac-sanctions-transaction-screen,stage,OFAC 制裁交易判定",
+            "stage:technical-conformity-assessment,stage,技術合格評定與客戶資格",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "section301_taiwan_exposure.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: Section 301 台灣商品七關與四制度分流", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        for edge_target in (
+            "from_id: company:2308",
+            "to_id: stage:policy-action-scope",
+            "to_id: stage:hts-product-classification",
+            "to_id: stage:annex-exemption-test",
+            "to_id: stage:customs-origin-test",
+            "to_id: stage:shipment-contract-incidence",
+            "to_id: stage:demand-pass-through-response",
+            "to_id: stage:section301-company-financial-attribution",
+            "to_id: group:passive", "to_id: group:pcb",
+            "to_id: group:powersupply", "to_id: group:thermal",
+            "to_id: concept:trade-regime-separation",
+            "to_id: stage:tariff-import-entry",
+            "to_id: stage:ear-export-license-screen",
+            "to_id: stage:ofac-sanctions-transaction-screen",
+            "to_id: stage:technical-conformity-assessment",
+        ):
+            self.assertIn(edge_target, graph)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "policy-compliance"
+        )
+        self.assertEqual(
+            route["graphIds"],
+            ["section301-taiwan-exposure", "semiconductor-pfas-exposure"],
+        )
+        self.assertEqual(
+            [phase["id"] for phase in route["phases"]],
+            ["trade-border-policy", "substance-regulation"],
+        )
+        self.assertEqual(
+            [graph_id for phase in route["phases"] for graph_id in phase["graphIds"]],
+            route["graphIds"],
+        )
+
+        reviews = (
+            ROOT / "notes" / "research_method_reviews" / "monitor_reviews.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn("MR-2026-08-12-SECTION301-T1-FINAL-NOTICE", reviews)
+
+
+    def test_vera_rubin_article_separates_seven_delivery_gates_and_financial_attribution(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-21_nvidia_vera_rubin_production.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# NVIDIA Vera Rubin 由路線圖進入量產與首波部署\n"
+        ))
+        headings = (
+            "## 先把「量產」拆成七個交接關卡",
+            "## 看到「量產／就緒／驗證／上線」，先補齊五個欄位",
+            "## 一座 AI 機架不是放大的單機：七條責任鏈要同時接上",
+            "## 五份一手文件，為什麼不能合併成一句「已上線」",
+            "## 從工廠到工作負載的交付順序",
+            "## 用雙向證據把平台進度連回台灣公司",
+            "## 新手最常混淆的六件事",
+            "## 在研究中心裡接著怎麼學",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "| 1. 平台進入生產 |",
+            "| 2. 設計／型錄就緒 |",
+            "| 3. 工廠實際生產 |",
+            "| 4. 整櫃 bring-up／驗證 |",
+            "| 5. 站點啟用／客戶驗收 |",
+            "| 6. 雲端可用／工作負載運行 |",
+            "| 7. 供應商財務歸因 |",
+            "| 1. 誰在說 |",
+            "| 2. 說哪個物件 |",
+            "| 3. 用什麼動詞 |",
+            "| 4. 範圍與日期 |",
+            "| 5. 下一份裁決證據 |",
+            "CoreWeave 的 rack bring-up、Google 的 offer、緯創的未來生產",
+            "平台／客戶端往回找",
+            "台灣公司端往前找",
+            "平台 full production ≠ 每家供應商都在量產",
+            "thesis_claim_id: C11",
+            "reason: superseded_coarse_ramp_frame_after_operator_validation_cloud_offer_and_live_system_catalog_evidence",
+            "corrected_by_claim_id: C11",
+            "corrects_claim_id: C2",
+            "monitor_id: T3",
+            "monitor_id: T4",
+            "monitor_id: T5",
+            "source_id: S13",
+            "claim_id: C12",
+            "reason: added_current_platform_system_composition_and_graph_projection_without_changing_financial_boundary",
+        ):
+            self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertGreaterEqual(glossary.count("- **"), 23)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 12), ("metric_comparison", 0),
+            ("impact", 6), ("monitoring_item", 5),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "topic-MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP,"
+            "新一代運算平台開始量產後，何時才有台灣供應商的訂單或收入證據？",
+            guide,
+        )
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "product:nvidia-vera-rubin-nvl72,product,NVIDIA Vera Rubin NVL72",
+            "stage:vera-rubin-platform-production,stage,Vera Rubin 平台進入生產",
+            "stage:vera-rubin-system-ready,stage,Vera Rubin 系統設計與型錄就緒",
+            "stage:vera-rubin-factory-production,stage,Vera Rubin 工廠實際生產",
+            "stage:vera-rubin-rack-validation,stage,Vera Rubin 整櫃帶起與系統驗證",
+            "stage:vera-rubin-site-acceptance,stage,Vera Rubin 站點啟用與客戶驗收",
+            "stage:vera-rubin-cloud-workload,stage,Vera Rubin 雲端可用與工作負載",
+            "stage:vera-rubin-financial-attribution,stage,Vera Rubin 供應商財務歸因",
+        ):
+            self.assertIn(concept, concepts)
+        entities = (ROOT / "config" / "external_entities.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("company:coreweave,company,CoreWeave,CRWV", entities)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "vera_rubin_delivery_contract.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: Vera Rubin 七關交付與整櫃責任", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 24)
+        for node in (
+            "from_id: company:nvidia", "from_id: company:coreweave",
+            "from_id: company:google", "from_id: company:2376",
+            "from_id: company:2382", "from_id: company:3231",
+            "from_id: company:6669",
+            "to_id: stage:vera-rubin-platform-production",
+            "to_id: stage:vera-rubin-system-ready",
+            "to_id: stage:vera-rubin-factory-production",
+            "to_id: stage:vera-rubin-rack-validation",
+            "to_id: stage:vera-rubin-site-acceptance",
+            "to_id: stage:vera-rubin-cloud-workload",
+            "to_id: stage:vera-rubin-financial-attribution",
+            "to_id: concept:ai-memory-hierarchy",
+            "to_id: concept:open-ai-fabrics",
+            "to_id: concept:liquid-cooling-loop-boundary",
+            "to_id: concept:ai-storage-data-plane",
+            "to_id: capability:rack-lifecycle-control",
+            "to_id: group:memory", "to_id: group:pcb",
+            "to_id: group:powersupply", "to_id: group:serverodm",
+            "to_id: group:thermal",
+        ):
+            self.assertIn(node, graph)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "compute-connect"
+        )
+        phase = next(
+            row for row in route["phases"]
+            if row["id"] == "data-platform"
+        )
+        self.assertEqual(
+            phase["graphIds"],
+            [
+                "ai-storage-data-plane", "amd-helios",
+                "vera-rubin-delivery-contract",
+            ],
+        )
+        self.assertEqual(
+            [graph_id for row in route["phases"] for graph_id in row["graphIds"]],
+            route["graphIds"],
+        )
+
+    def test_company_finance_route_connects_buyer_capex_to_supplier_attribution(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-01_ai_capex_cash_conversion.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 同一個資料中心有四個時鐘",
+            "## 把四道閘門展成七張交接單",
+            "### 同一美元會在不同帳本、不同時間出現",
+            "### 買方與供應商要做兩端對帳",
+            "### 新手最常把哪幾件事畫上等號",
+            "### 在研究中心裡接著怎麼學",
+            "## 會計口徑本身也會移動",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "**PP&E（不動產、廠房及設備）**",
+            "**在建工程（CIP）**",
+            "**尚未起租的租賃（lease not yet commenced）**",
+            "**試運轉／啟用（commissioning／placed in service）**",
+            "**履約義務（performance obligation）**",
+            "**非現金資產增加**",
+            "**營運資金（working capital）**",
+            "| 合約承諾 | 尚未起租的租賃",
+            "| 資產可用 | 在建工程",
+            "| 客戶使用與收入 | 使用量、履約義務",
+            "| 現金支付與回收 | cash PP&E",
+            "| 1. 資本計畫與承諾 |",
+            "| 2. 現金 PP&E 與租賃 |",
+            "| 3. 資產建置與試運轉 |",
+            "| 4. 服務容量可用 |",
+            "| 5. 工作負載、利用與收入 |",
+            "| 6. 買方現金回收 |",
+            "| 7. 供應商財務歸因 |",
+            "供應商端還多一道時間差",
+            "國巨 Q2 公司財務分母",
+            "claim_id: C6",
+            "claim_id: C7",
+            "claim_id: C8",
+            "claim_id: C9",
+            "reason: capex_to_supplier_financial_bridge_synthesized_from_existing_disclosures",
+            "reason: four_accounting_clocks_added_from_meta_and_amazon_filings_without_refreshing_thesis_clock",
+            "evidence: sources:S1,S2,S3,S4,S5",
+            "evidence: sources:S7,S8",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 8),
+            ("research_claim", 9), ("metric_comparison", 9),
+            ("impact", 4), ("monitoring_item", 2),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:ai-capex-cash-conversion,concept,AI CapEx 到供應商財務七關橋接",
+            "concept:capital-asset-revenue-cash-clocks,concept,承諾、資產、收入與現金四個時鐘",
+            "stage:capital-commitment,stage,資本計畫與承諾",
+            "stage:cash-ppe-and-leases,stage,現金 PP&E 與租賃支出",
+            "stage:asset-construction-commissioning,stage,資產建置與試運轉",
+            "stage:service-capacity-available,stage,服務容量可用",
+            "stage:workload-utilization-revenue,stage,工作負載利用與收入",
+            "stage:buyer-cash-conversion,stage,買方現金回收",
+            "stage:supplier-financial-attribution,stage,供應商財務歸因",
+        ):
+            self.assertIn(concept, concepts)
+        entities = (ROOT / "config" / "external_entities.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("company:amazon,company,Amazon,AMZN", entities)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "ai_capex_cash_conversion.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: AI CapEx 到供應商財務七關橋接", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 15)
+        for node in (
+            "from_id: company:microsoft", "from_id: company:meta",
+            "from_id: company:amazon", "to_id: stage:capital-commitment",
+            "to_id: stage:supplier-financial-attribution",
+            "to_id: group:serverodm", "to_id: group:pcb",
+            "to_id: group:powersupply", "to_id: group:thermal",
+            "to_id: concept:capital-asset-revenue-cash-clocks",
+        ):
+            self.assertIn(node, graph)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "company-finance"
+        )
+        self.assertEqual(
+            route["graphIds"],
+            [
+                "ai-capex-cash-conversion",
+                "us-advanced-packaging-regionalization",
+                "yageo-q2-financial-materiality",
+            ],
+        )
+        self.assertEqual(
+            [phase["id"] for phase in route["phases"]],
+            [
+                "buyer-capex-conversion",
+                "regional-capacity-conversion",
+                "supplier-financial-attribution",
+            ],
+        )
+        self.assertEqual(
+            [graph_id for phase in route["phases"] for graph_id in phase["graphIds"]],
+            route["graphIds"],
+        )
+
+    def test_design_test_quality_route_uses_eight_denominators_before_financial_attribution(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-01_inference_compute_tester_tam.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 先把 tester TAM 拆成八個分母",
+            "## 一顆複雜晶片會在哪些地方被測",
+            "## 同樣叫「測試」，七種決策不能相加",
+            "## 一份測試責任護照至少有十欄",
+            "## 哪些變更要觸發回歸重測",
+            "## 為什麼測試時間增加，設備台數仍可能不線性增加",
+            "## 五組數字不能直接排高低",
+            "## 產業角色不要混在一起",
+            "## 新手最常混淆的八件事",
+            "## 在研究中心接著怎麼學",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "thesis_claim_id: C6",
+            "reason: reframed_tester_tam_as_eight_denominator_test_cell_and_financial_conversion",
+            "status: superseded",
+            "corrected_by_claim_id: C6",
+            "correction_kind: supersedes",
+            "corrects_claim_id: C2",
+            "monitor_id: T3",
+            "monitor_id: T4",
+            "monitor_id: T5",
+            "reason: added_test_responsibility_passport_and_change_triggered_regression_without_thesis_upgrade",
+            "claim_id: C8",
+            "claim_id: C9",
+            "| 1. 產品組合與數量 |",
+            "| 8. 公司財務歸因 |",
+            "| 1. 設計驗證與可測試性設計 |",
+            "| 10. 變更與回歸條件 |",
+            "需求的測試單元時數",
+            "同時站數 × 並行效率 × 可用率",
+            "observation_id: M2-O1",
+            "value_kind: upper_bound",
+            "reported_value: 720",
+            "observation_id: M2-O2",
+            "reported_value: 15..50",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 9), ("metric_comparison", 5),
+            ("impact", 3), ("monitoring_item", 5),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:inference-compute-test-demand,concept,推論晶片測試需求八分母",
+            "stage:test-device-mix-volume,stage,測試產品組合與數量",
+            "stage:test-insertion-map,stage,測試插入點地圖",
+            "stage:test-content-coverage,stage,測試內容與覆蓋",
+            "stage:test-time-power-pin-thermal,stage,單顆測試時間與負載",
+            "stage:test-multisite-throughput,stage,多站並行與吞吐",
+            "stage:test-yield-retest-escape,stage,良率重測與漏測",
+            "stage:test-installed-base-capex,stage,既有設備與增量資本支出",
+            "stage:test-company-financial-attribution,stage,測試需求公司財務歸因",
+            "concept:test-responsibility-passport,concept,測試責任護照",
+            "process:test-change-triggered-regression,process,測試變更觸發回歸重測",
+            "process:test-result-lineage-feedback,process,測試結果沿革與現場回饋",
+        ):
+            self.assertIn(concept, concepts)
+        entities = (ROOT / "config" / "external_entities.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("company:advantest,company,Advantest,6857", entities)
+        self.assertIn("company:teradyne,company,Teradyne,TER", entities)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "inference_compute_test_demand.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: 推論晶片測試需求八分母", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        for node in (
+            "from_id: company:advantest", "from_id: company:teradyne",
+            "from_id: company:amazon", "from_id: company:microsoft",
+            "from_id: company:amkor",
+            "to_id: stage:test-device-mix-volume",
+            "to_id: stage:test-insertion-map",
+            "to_id: stage:test-content-coverage",
+            "to_id: stage:test-time-power-pin-thermal",
+            "to_id: stage:test-multisite-throughput",
+            "to_id: stage:test-yield-retest-escape",
+            "to_id: stage:test-installed-base-capex",
+            "to_id: stage:test-company-financial-attribution",
+            "to_id: concept:test-responsibility-passport",
+            "to_id: process:test-change-triggered-regression",
+            "to_id: process:test-result-lineage-feedback",
+            "to_id: group:ipdesign", "to_id: group:packtest",
+            "to_id: group:semiequip",
+        ):
+            self.assertIn(node, graph)
+
+        route = next(
+            row for row in bd.RESEARCH_LEARNING_ROUTES
+            if row["id"] == "design-test-quality"
+        )
+        self.assertEqual(
+            route["graphIds"],
+            [
+                "chiplet-design-handoff-contracts", "high-na-euv-readiness",
+                "process-control-measurement-contract",
+                "hybrid-bonding", "inference-compute-test-demand",
+                "ai-hardware-sdc-lifecycle",
+            ],
+        )
+        self.assertEqual(
+            [phase["id"] for phase in route["phases"]],
+            [
+                "design-manufacturing-contracts",
+                "measurement-process-control",
+                "packaging-production-test",
+                "field-feedback",
+            ],
+        )
+        self.assertEqual(
+            [graph_id for phase in route["phases"] for graph_id in phase["graphIds"]],
+            route["graphIds"],
+        )
+
+    def test_us_advanced_packaging_route_preserves_scope_money_and_nine_gates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-01_us_advanced_packaging_regionalization.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 先把區域化拆成九個交接關卡",
+            "## 四種錢不能放進同一個加總",
+            "## 為什麼會看見 17 億、約 20 億與 70 億美元",
+            "## 產能數字至少有五個分母",
+            "## 事件、會計與產能時鐘",
+            "## 新手最常混淆的六件事",
+            "## 在研究中心裡接著怎麼學",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "thesis_claim_id: C6",
+            "reason: reconciled_chips_award_project_scope_with_expanded_campus_and_nine_gate_conversion",
+            "claim_id: C5",
+            "claim_id: C6",
+            "claim_id: C7",
+            "corrected_by_claim_id: C6",
+            "corrects_claim_id: C2",
+            "monitor_id: T3",
+            "monitor_id: T4",
+            "| 1. 政策獎勵與專案範圍 |",
+            "| 9. 財務與區域替代 |",
+            "最高 4.07 億美元直接補助",
+            "每月 14,500 片晶圓與 370 萬顆 units",
+            "project／phase／facility",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 9),
+            ("research_claim", 7), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:us-advanced-packaging-regionalization,concept,美國先進封裝區域化九關橋接",
+            "stage:chips-award-scope,stage,CHIPS 獎勵與專案範圍",
+            "stage:milestone-disbursement,stage,里程碑撥付",
+            "stage:regional-project-capital-stack,stage,區域專案資本結構",
+            "stage:regional-site-construction,stage,區域廠房建設交付",
+            "stage:regional-tool-process-enablement,stage,工具進場與製程啟用",
+            "stage:regional-process-qualification,stage,區域製程資格",
+            "stage:regional-customer-product-qualification,stage,區域客戶產品資格",
+            "stage:regional-capacity-ramp-utilization,stage,區域產能爬坡與利用",
+            "stage:regional-packaging-financial-attribution,stage,區域封裝財務與替代歸因",
+        ):
+            self.assertIn(concept, concepts)
+        entities = (ROOT / "config" / "external_entities.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("company:amkor,company,Amkor Technology,AMKR", entities)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "us_advanced_packaging_regionalization.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("label: 美國先進封裝區域化九關橋接", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 15)
+        for node in (
+            "from_id: company:amkor", "from_id: company:nvidia",
+            "from_id: company:tsmc", "to_id: stage:chips-award-scope",
+            "to_id: stage:milestone-disbursement",
+            "to_id: stage:regional-project-capital-stack",
+            "to_id: stage:regional-site-construction",
+            "to_id: stage:regional-tool-process-enablement",
+            "to_id: stage:regional-process-qualification",
+            "to_id: stage:regional-customer-product-qualification",
+            "to_id: stage:regional-capacity-ramp-utilization",
+            "to_id: stage:regional-packaging-financial-attribution",
+            "to_id: group:packtest", "to_id: group:semiequip",
+            "to_id: group:material",
+        ):
+            self.assertIn(node, graph)
 
 
 if __name__ == "__main__":

@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-07-28
-last_reviewed_at: 2026-08-02
-review_due: 2026-08-13
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-14
 source_type: mixed
 publisher: KLA Corporation
 publisher_domain: ir.kla.com
@@ -19,9 +19,9 @@ group_ids: semiequip,material,pcb,packtest
 trigger_type: industry_results_and_product_qualification
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C4
+thesis_claim_id: C9
 base_confidence: medium
-confidence_basis: KLA、Applied Materials 與 Onto Innovation 三個獨立公司一手來源共同支持複雜度、檢測需求與客戶資格節點，但都是設備供應商資料；尚無客戶端或全產業資料證明 wallet share、台灣公司訂單或 KLA 成長的來源分解
+confidence_basis: KLA、Applied Materials 與 Onto Innovation 三個獨立公司一手來源共同支持複雜度、檢測需求、客戶資格及供應商較寬事業組合的收入訊號，SEMI 官方議程另補充 3DIC 工序與失效模式；但資料仍以供應商陳述及議程摘要為主，Onto 未拆出 HBM／2.5D 或特定工具收入，尚無客戶端或全產業資料證明 wallet share、台灣公司訂單或 KLA 成長來源分解
 cross_company_numbers: false
 -->
 
@@ -46,6 +46,34 @@ to: triaged
 reason: editorial_plain_language_wave3_no_conclusion_change
 evidence: editorial:plain_language_wave3
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: onto_q2_bounded_revenue_signal_superseded_engineering_only_synthesis
+evidence: sources:S8
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: editorial_process_control_loop_and_failure_map_for_beginner_learning
+evidence: sources:S2,S9
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_control_plan_sampling_sensitivity_false_alarm_cycle_time_and_containment_without_refreshing_thesis_clock
+evidence: sources:S10,S11,S12
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_measurement_system_contract_before_process_control_decisions_without_refreshing_thesis_clock
+evidence: sources:S14,S15
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -59,31 +87,64 @@ evidence: editorial:plain_language_wave3
 - **設備預算占比（wallet share）**：客戶全部設備支出中，分給某類工具的比例；工程更重要不等於預算占比已上升。
 - **財政年度第 4 季（FY26Q4）**：公司依自己的會計年度命名季度；它不一定等於曆年的第四季，跨公司閱讀時要先對齊期間。
 - **電子束檢測（eBeam）**：用電子束觀察極細微結構與缺陷的量測方法；能看得更細不等於每一道製程都需要新增一台工具。
+- **製程視窗（process window）**：一道製程可穩定做出合格結果的參數範圍；視窗越窄，微小漂移越容易變成缺陷。
+- **TSV（矽穿孔）**：穿過矽晶片的垂直導電通道，常用於堆疊晶片；蝕刻深寬比、填孔空洞與介電層品質都可能成為控制點。
+- **RDL（重佈線層）**：把晶片接點重新拉線到封裝所需位置的細金屬線路；線寬、間距與面板翹曲會影響可製造性。
+- **翹曲（warpage）**：晶圓、面板或封裝受材料與溫度影響而彎曲；它會增加對位、量測與接合難度。
+- **關鍵缺陷／雜訊缺陷（critical／nuisance defect）**：前者會傷害良率或可靠度，後者雖被工具看見卻未必影響產品；分類能力會影響工程師是否把時間用在真正重要的異常。
+- **抽樣（sampling）**：只檢查部分晶圓、區域或製程批次，以速度換取資訊；抽樣較少不代表沒有風險，檢查較多也不保證能找到正確根因。
+- **Control plan（製程控制計畫）**：先定義要攔截的失效、在哪一道工序看、抽樣多少、看多細、多久得到結果，以及異常發生後要採取什麼動作的製造規則。
+- **缺陷逃逸（defect escape）**：真正會影響良率或可靠度的缺陷沒有被現行檢查攔截，繼續流到後續製程或客戶端。
+- **偽警報／雜訊（false alarm／nuisance）**：工具標記了異常候選，但複判後不屬於會傷害產品的關鍵缺陷；過多會消耗複判時間並延後真正異常的處理。
+- **週期時間（cycle time）**：產品或資料走完指定製造、量測、複判與決策流程所需的時間；結果太慢，前方產線可能已累積更多受影響批次。
+- **處置（disposition）**：依檢查結果決定放行、重工、報廢、隔離或追加檢查；它和找根因是相關但不同的工作。
+- **虛擬量測（virtual metrology）**：用設備感測器與製程資料估計原本要靠實體量測得到的結果；它可輔助抽樣，但仍受模型漂移、校正資料與不確定性限制。
+- **CMP（化學機械研磨）**：同時用化學反應與機械研磨把表面整平；本文引用的 NIST 公開資料用它示範動態抽樣方法，不代表 HBM 量產配方。
+- **FAR（false-alarm rate，偽警報率）**：被系統標成異常、但複判後不是目標關鍵缺陷的比例；分母與缺陷定義不同時不能直接比較。
+- **SEMVision 電子束系統**：Applied Materials 的缺陷複判產品系列；本文只用公司公告拆解速度、靈敏度、覆蓋與雜訊分類，不採用它推算市場規模。
+- **ICOS**：KLA 的封裝檢查與量測產品系列名稱；不同型號對應切割後裂縫、元件外觀或量測等任務，不能合併成全產線的單一覆蓋率。
+- **Dragonfly G5**：Onto Innovation 的檢查系統名稱；本文只引用公司揭露的資格節點，不把產品名稱等同 HBM 收入。
+- **CPO（Co-Packaged Optics，共同封裝光學）**：把光學引擎放到交換晶片附近的封裝路徑；本文只把它當作對位、污染與跨領域控制的相鄰案例，不推論其工具組合等同 HBM。
+- **Packaging（封裝）**：把晶片接合、互連並保護成可使用元件的製造階段；`advanced packaging` 是較複雜的整合路徑，不是單一產品或單一設備類別。
+- **Specialty Devices and Advanced Packaging**：Onto 使用的較寬事業組合名稱；它同時涵蓋多種應用，不能直接當成 HBM、2.5D 或 Dragonfly 的收入分子。
+- **被測量（measurand）**：真正要量的性質，例如某層厚度、線寬、翹曲或缺陷尺寸；只寫設備名稱，還沒有說清楚量的是什麼。
+- **準確度／偏差（accuracy／bias）**：準確度描述結果和參考值是否接近；偏差則把多次量測平均值與參考值之間的系統性差距量化。每次結果很集中，仍可能一起偏離目標。
+- **重複性／再現性／穩定性（repeatability／reproducibility／stability）**：重複性看相同設備、設定與短時間條件下是否一致；再現性看跨日期、設備、操作或環境是否仍一致；穩定性再追更長時間是否漂移。不同標準對 `reproducibility` 的細部定義可能不同，本文只採 NIST／SEMATECH 該章的使用邊界。
+- **量測不確定度（measurement uncertainty）**：量完之後對真值仍保留多少合理疑問；它不是「量錯了」的同義詞，而是判斷結果能否支撐放行、隔離或調參時不可缺的尺度。
+- **計量可追溯性（metrological traceability）**：特定量測結果可經由有文件紀錄、不中斷的校正鏈連到指定參考，而且每一環都把自己的不確定度納入；它是結果的性質，不是設備或實驗室的永久標籤。
+- **Gauge R＆R（量具重複性與再現性研究）**：用規劃好的重複量測，拆解設備、操作、日期、設定或樣品等來源造成的變異；一次短期研究不能自動代表日後長期穩定，也不能替代偏差與不確定度評估。
 - **公開資訊觀測站（MOPS）**：台灣上市櫃公司的正式申報入口；要用它找具名產品、客戶階段與財務揭露，不能只靠海外設備商說法推導台灣公司受惠。
 
 ### 三句話抓重點
 
-- 三家設備商的一手文件，分別說明需求方向、缺陷為何更昂貴，以及設備已走到客戶驗證的哪一步。
-- 真正要查的是：每一代產品是否需要更多量測、檢查與良率回饋，而不只是設備名稱變多。
-- 現有資料還不能證明全產業設備預算占比上升，也沒有台灣公司訂單，因此目前只建立族群觀察路徑。
+- 三家設備商的一手文件，分別說明需求方向、缺陷為何更昂貴、設備已走到客戶驗證的哪一步，以及一家較寬事業組合已出現收入新高訊號。
+- 真正要查的是：每一代產品的 control plan 是否改變抽樣覆蓋、靈敏度、偽警報、週期時間與圍堵動作，而不只是設備名稱變多。
+- Onto 的新揭露沒有拆出 HBM／2.5D 或特定工具金額；現有資料仍不能證明全產業設備預算占比上升，也沒有台灣公司訂單。
 
 ### 為什麼重要
 
 先進封裝把多顆昂貴晶片連在一起。若其中一顆在最後才被發現有缺陷，先前投入的晶片、封裝
 材料與製程時間可能一起損失，因此越早找到問題越有價值。
 
-但「更需要檢查」和「設備市場一定變大」仍是兩個問題。新工具或客戶驗證只說明工程需求與
-採用節點；產業的獲利池是否擴大，還要看實際新增的步驟、工具數、採購金額與收入組成。
+但「更需要檢查」和「設備市場一定變大」仍是兩個問題。新工具、客戶驗證或一個較寬事業
+組合的收入新高，只說明工程需求、採用節點與供應商商業訊號；產業的獲利池是否擴大，還要
+看實際新增的步驟、工具數、採購金額與收入組成。
 
 ### 接下來怎麼追
 
 - 追設備商是否揭露有期間與定義的訂單、收入、工具數或量產採用。
+- 追客戶端是否公布缺陷攔截、良率學習週期、重工／報廢改善與每單位產能支出。
+- 追同一產品世代的 control plan 是否公開抽樣單位、覆蓋範圍、靈敏度／逃逸、偽警報、結果時間與異常處置，避免把單一設備速度當成完整製程改善。
 - 追公開資訊觀測站是否出現台灣公司的具名產品、客戶階段與財務貢獻。
 
 ### 想一想
 
 - 若成長主要來自市占、漲價、產品組合或服務，主命題應如何縮小？
 - 一套工具通過一名客戶認證，還缺哪些證據才能推論成產業錢包占比上升？
+- 如果靈敏度提高卻同時產生大量偽警報、拖長複判時間，這份 control plan 一定更好嗎？
+- 如果同一個標準樣品每次都量得很接近、卻全部偏離參考值，這套系統是精密、準確，還是兩者兼具？
+- 設備貼著校正標籤，是否就能證明今天這個產品、這個方法與這次結果都可追溯且適合拿來判定放行？
+- 若公司只說「先進封裝事業創新高」，卻沒有產品分子與公司分母，你能安全地推論到哪一層？
 
 ## 用一條回饋迴路理解製程控制
 
@@ -106,6 +167,138 @@ evidence: editorial:plain_language_wave3
 對台灣族群也要走完同一條路：公司先具名產品，再說明客戶驗證或量產階段，最後才看得到
 訂單、收入或毛利。海外設備商說「先進封裝更需要製程控制」，只能建立搜尋方向，不能替本地
 公司完成後面三步。
+
+## 一個控制閉環，其實包含五種不同工作
+
+「製程控制設備」不是單一機器的同義詞。新手可以先把閉環拆成五種工作；同一平台可能做
+其中數項，也可能由不同工具與軟體接力，因此不能看到五個名詞就直接推論需要五台新設備。
+
+| 工作 | 它回答的問題 | 常見輸出 | 研究時最容易誤讀之處 |
+|---|---|---|---|
+| 量測 | 尺寸、厚度、形貌或材料是否落在規格內？ | CD、膜厚、翹曲或形貌資料 | 數值更精細不等於每片、每層都全面量測 |
+| 檢查 | 哪裡出現顆粒、刮傷、空洞、對位或接合異常？ | 缺陷位置、影像與分布圖 | 找到更多訊號不等於找到更多會傷害良率的缺陷 |
+| 缺陷複判與分類 | 哪些是關鍵缺陷，哪些只是雜訊？ | 缺陷類別、嚴重度與複判結果 | 自動分類是供應商功能陳述，仍要看誤報、漏報與客戶實績 |
+| 根因分析 | 缺陷和哪台設備、材料批次、參數或製程步驟一起出現？ | 批次、機台與製程參數的關聯 | 同時發生只是一條線索，不等於已證明因果 |
+| 回饋與管制 | 要調參數、停線、重工、改抽樣，還是修改設計規則？ | 製程調整、警報與抽樣策略 | 有資料不等於已形成可重複、可量化的良率改善 |
+
+Applied 的文件把高解析 eBeam 量測、缺陷複判與自動分類分成不同任務；SEMI 議程中的 3DIC
+摘要則把 equipment intelligence、data-driven control 與 yield learning 放在製造閉環裡。兩者
+共同提醒讀者：真正的價值不只在「看見」，而在能否把訊號變成製程決策；但公開資料尚未
+提供誤報率、漏報率、抽樣比例或客戶端良率改善，這些欄位不能自行補值。
+
+## 「多檢查」不是規格：先拆三種任務與六個 control-plan 欄位
+
+同一台設備可以用在新製程除錯、量產監控或成品篩選，但三種任務要回答的問題不同。若只把
+它們統稱為「檢查需求增加」，就會把研發期間的高靈敏度模式、量產中的抽樣監控，以及特定
+關鍵站點的全面篩選重複加總。
+
+| 任務 | 它要做的決定 | 常見資訊取捨 | 研究時不能直接推論 |
+|---|---|---|---|
+| 缺陷發現／製程除錯 | 新缺陷是什麼、在哪裡生成、要改哪個參數？ | 可把較多時間換成更細影像、更多候選與根因資訊 | 除錯模式會原樣進入每片量產晶圓，或必須新增同數量工具 |
+| 量產監控／異常圍堵 | 製程是否漂移、哪個 lot／wafer／tool 要隔離？ | 在抽樣覆蓋、結果速度、靈敏度與偽警報間維持可重複節奏 | 抽樣增加就一定降低逃逸，或單次結果較快就已縮短整體週期 |
+| 篩選／產品處置 | 哪一顆 die 或 package 可放行、重工或報廢？ | 對指定失效與站點提高覆蓋，必要時做到全面檢查 | 某站 100% screening 代表所有工序、所有缺陷都全面檢查 |
+
+KLA 的封裝產品公告本身就列出不同任務：Kronos 做 wafer-level inline control，ICOS F160XP
+在切割後找側壁裂縫，另以提升 throughput 支援指定的 100% IR inspection。這是供應商對自家
+產品的功能陳述，不是全產業共同 recipe；它的重要性在於證明「檢查」沒有單一覆蓋分母。
+
+接著把 control plan 寫成六個不能互相替代的欄位：
+
+| Control-plan 欄位 | 必須先回答什麼 | 少了這欄會怎麼誤讀 |
+|---|---|---|
+| 1. 失效與決策 | 要攔截哪種 defect of interest，結果用來調參、隔離、重工還是放行？ | 把看得見但不影響產品的訊號當成良率改善 |
+| 2. 工序與檢查單位 | 在哪一站看 lot、wafer、die、site 或 package？ | 把一個位置的覆蓋率外推到整條產線 |
+| 3. 抽樣與覆蓋 | 每批、每片、每區域看多少，是否會依漂移與不確定性調整？ | 把「樣本更多」直接寫成「風險已消失」 |
+| 4. 靈敏度與逃逸 | 最小可見缺陷、漏掉關鍵缺陷的風險與產品失效怎麼接起？ | 只看解析度，不知道真正 killer defect 是否被攔截 |
+| 5. 偽警報與分類 | 候選中有多少是 nuisance，分類錯誤會占用多少複判能力？ | 把缺陷候選數增加誤寫成關鍵缺陷增加 |
+| 6. 結果時間與圍堵 | 從量測、複判到停線／隔離要多久，期間會再流過多少產品？ | 把單機 throughput 當成完整 factory cycle-time 改善 |
+
+NIST 的 2025 研究用 CMP 公開資料示範：量測昂貴、資料有限且會漂移時，可以把模型不確定性
+帶入動態抽樣，依 process-control need 選擇何時量測。Applied 的 SEMVision H20 公告則從另一
+角度說明，光學檢查產生更密集候選後，eBeam review 必須同時維持速度、靈敏度、覆蓋與
+nuisance 分類。兩份文件都沒有公開 HBM 客戶的完整 control plan、逃逸率、偽警報率或整廠
+週期時間，因此本文只建立閱讀框架，不替任何量產線補寫數值。
+
+## 量得出數字，不代表能拿去控製程：先過量測系統六關
+
+把製程控制想成醫師依檢驗結果決定是否治療：若檢驗方法本身會偏、不同儀器彼此不一致，或
+結果的不確定度大到跨過判定門檻，再精細的小數點也不能安全地支撐決策。半導體產線同樣要
+先證明「量測系統能否回答這個問題」，才輪到抽樣、攔截與圍堵。
+
+### 先分清「準」與「穩」
+
+| 問題 | 它在檢查什麼 | 看似漂亮但仍可能失敗的例子 |
+|---|---|---|
+| 偏差／準確度 | 多次結果的中心是否接近參考值？ | 十次結果非常集中，卻全部比參考值高 2 nm |
+| 重複性 | 相同設備、設定與短時間條件下能否得到一致結果？ | 同一片晶圓連續量測就大幅跳動 |
+| 再現性 | 換日期、設備、操作或環境後，結果是否仍可比較？ | A 機與 B 機各自很穩，兩機平均值卻不同 |
+| 穩定性／漂移 | 量測系統跨較長時間是否仍維持原有特性？ | 上週校正後合格，本週因溫度或設備漂移而偏移 |
+| 不確定度 | 綜合已辨識誤差後，結果還有多大的合理範圍？ | 規格門檻是 10 nm，結果 9.9 nm，但不確定度足以跨過門檻 |
+
+NIST／SEMATECH 的 Measurement Process Characterization 把量測系統本身視為一個產出
+「量測結果」的製程，要求分開看 bias、短期精密度、日間／長期變異與 uncertainty；Gauge
+R&amp;R 章節又把 repeatability、reproducibility、stability、resolution、linearity、hysteresis、
+drift，以及設備、設定與操作差異列成不同誤差來源。這些是通用量測方法，不是 HBM 客戶的
+合格門檻，也不代表每個任務都要採相同統計設計。
+
+### 一份可用的 measurement-system contract 至少有六欄
+
+| 量測系統欄位 | 必須先固定什麼 | 少了這欄會怎麼誤讀 |
+|---|---|---|
+| 1. 被測量、單位與決策 | 量的是哪個性質、用什麼單位，結果要支撐調參、隔離、重工還是放行？ | 只看設備解析度，卻不知道數字是否對應真正失效 |
+| 2. 方法、組態與環境 | 樣品準備、演算法／recipe 版本、設備設定、操作、溫濕度與量測範圍為何？ | 把不同方法或環境的數字當成同口徑趨勢 |
+| 3. 參考、校正與可追溯鏈 | 結果連到哪個參考、何時如何校正，校正鏈與量測保證紀錄是否完整？ | 把一張校正證書當成所有後續結果的永久背書 |
+| 4. 偏差、解析度與線性 | 系統性偏移、可辨識最小變化及量測範圍內的反應是否已知？ | 結果很穩就誤以為一定接近真值，或在量程邊緣照樣外推 |
+| 5. 重複性、再現性與穩定性 | 同機短期、跨機／跨日與長期漂移各有多大？ | 只用一次 gauge study，忽略工作環境與時間變化 |
+| 6. 不確定度與決策規則 | 各誤差如何合成，結果靠近規格線時如何判定與處置？ | 用很多小數位製造確定感，卻沒有說明跨過門檻的風險 |
+
+NIST 的可追溯性政策再補上一條很容易被誤讀的界線：可追溯的是**特定量測結果**，不是設備、
+校正報告或實驗室本身；只有使用一台曾由 NIST 校正的儀器，並不足以建立後續結果的可追溯性。
+提供結果的一方仍要交代被測量、完整量測系統、帶不確定度的結果、校正參考與量測保證程序，
+而且要隨設備、標準與環境變化定期重查。
+
+因此本文把製程控制拆成兩層，不把欄位混在一起：
+
+1. **量測系統契約**先證明數字在指定方法、環境與時間內可信，且足以支撐決策。
+2. **Control plan 契約**再決定在哪一站、抽樣多少、要攔截什麼、容許多少逃逸與偽警報、多久形成處置。
+
+這兩層都完整，才有資格追問良率、重工、報廢與週期時間是否改善。它們仍只是工程證據；要
+推到設備商收入，還要另證明新增步驟、工具量、價格、重複採購與供應商份額，不能把方法完整
+直接當成財務材料性。
+
+## 沿著工序看：風險不是只出現在最後一站
+
+SEMI 2026 先進封裝峰會的官方議程摘要列出多個控制點。這些是講者對議題的摘要，不是完整
+簡報或經同口徑驗證的量產數據；它們適合建立「要問什麼」，不適合直接估算市場規模。
+
+| 工序／結構 | 摘要點出的風險 | 製程控制要回答的問題 | 目前證據邊界 |
+|---|---|---|---|
+| 高深寬比 TSV 蝕刻、填孔與介電層 | 蝕刻形貌、填孔空洞、沉積均勻性 | 孔的幾何與材料是否落在可接續堆疊的製程視窗？ | 議程列出挑戰，沒有工具數或單位產能支出 |
+| CMP、hybrid bonding 表面與異質基材 | 厚膜、較長拋光、非均勻、翹曲與細微缺陷 | 表面是否平坦、潔淨並足以接合？光學與 eBeam 各負責哪一段？ | Applied 為供應商自述，沒有客戶端良率橋接 |
+| 面板級封裝與細 RDL | 大面積翹曲與細線路製造 | 面板不同區域是否維持對位、線寬／線距與均勻性？ | Samsung 摘要說明技術題目，不代表全產業已量產 |
+| inter-die gap fill、切割與組裝 | 填隙、邊緣品質、die strength 與顆粒 | 缺陷在切割前後哪一站生成，能否在更多價值投入前攔截？ | 只有議程摘要，未揭露攔截率或報廢改善 |
+| CPO 封裝（相鄰案例） | 光學對位、熱、翹曲、CTE mismatch、污染、測試與重工 | 電、光、機、熱資料如何共同定位問題？ | 這是 CPO 的相鄰案例，不能反推 HBM 採相同 BOM 或工具組合 |
+
+這張表也說明為什麼「先進封裝」不能只用一個設備名稱代表。不同產品架構、材料、抽樣策略
+與既有工具能力，會改變新增量測點及採購內容。要把工程複雜度換成設備需求，至少還要知道
+哪些步驟是新增、哪些只是升級，以及同一工具能否覆蓋多個控制點。
+
+## 8 月 6 日的新訊號：從資格節點前進，但只前進一格
+
+Onto Innovation 的 2026Q2 8-K 附件把成熟度往前推了一步：公司稱
+`Specialty Devices and Advanced Packaging` 收入創季度新高，並把 2.5D logic、HBM 與
+silicon photonics 都列為支撐來源。這比 2026Q1 只揭露 Dragonfly G5 在兩類客戶完成資格
+認證更接近商業結果。
+
+但安全讀法只有「較寬事業組合出現收入訊號」，不能寫成「Dragonfly HBM 收入創高」：
+
+1. 公司沒有公布該較寬類別的收入金額或占公司總收入比例。
+2. 同一類別同時包含 2.5D logic、HBM、silicon photonics 與其他 specialty-device 曝險。
+3. 文件沒有把成長分解到 Dragonfly、量測、檢查、微影、工具數、價格或客戶數。
+
+因此證據階梯由「工程機制＋資格節點」升為「工程機制＋資格節點＋較寬收入訊號」，仍未到
+「題材收入分子」「客戶資本支出分母」或「全產業 wallet share」。這一格很重要，因為它
+證明商業訊號開始出現；界線也同樣重要，因為它還不能回答產業獲利池到底擴大多少。
 
 ## 主張與證據帳本
 
@@ -224,6 +417,134 @@ limitation: 查詢入口會持續更新；入口本身不證明任何台灣公�
 independence_group: twse-mops
 -->
 
+<!-- research_source
+source_id: S8
+role: company_filing
+source_kind: document
+publisher: Onto Innovation
+title: Onto Innovation Reports 2026 Second Quarter Results
+published_at: 2026-08-06
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.sec.gov/Archives/edgar/data/704532/000119312526337990/onto-ex99_1.htm
+locator: 2026-08-06 Form 8-K Exhibit 99.1，Second Quarter Business and Financial Highlights 的 Specialty Devices and Advanced Packaging bullet，以及其後 CEO 評論與 Operating Results
+limitation: 公司只表示較寬的 Specialty Devices and Advanced Packaging 收入創新高，並把 2.5D logic、HBM、silicon photonics 列為支撐；沒有揭露該類別金額、產品分子、客戶名稱、工具數或各驅動貢獻，不能改寫成 Dragonfly／HBM 專屬收入
+independence_group: onto-innovation
+-->
+
+<!-- research_source
+source_id: S9
+role: other_primary
+source_kind: document
+publisher: SEMI
+title: Advanced Packaging Summit 2026
+published_at: 2026-07-15
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.semi.org/en/connect/events/advanced-packaging-summit-2026
+locator: Agenda 中 Lam Research Making 3DIC Manufacturable for AI、Samsung Electronics Advanced Packaging Technology for AI/HPC，以及 NVIDIA CPO Packaging: Challenges and Opportunities 三段公開摘要
+limitation: 官方頁保存的是議程與講者摘要，不是完整簡報、同口徑實驗資料或第三方驗證；內容可建立 TSV、fill、deposition、warpage、RDL、alignment、contamination、test／rework、metrology 與 yield-learning 問題地圖，不能用來估算工具量、市場規模或台灣公司收入
+independence_group: semi
+-->
+
+<!-- research_source
+source_id: S10
+role: other_primary
+source_kind: document
+publisher: National Institute of Standards and Technology
+title: A Comparative Study of Semiconductor Virtual Metrology Methods and Novel Algorithmic Framework for Dynamic Sampling
+published_at: 2025-01-20
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.nist.gov/publications/comparative-study-semiconductor-virtual-metrology-methods-and-novel-algorithmic
+locator: Abstract；limited availability of metrology data、sensor drift／shift、uncertainty quantification、adaptive sampling，以及 public CMP dataset validation 段落
+limitation: 這是一篇以公開 CMP 資料驗證 virtual-metrology／dynamic-sampling 方法的研究，不是 HBM 或 advanced-packaging production recipe；摘要沒有客戶產線、逃逸率、偽警報率、工具數或財務資料
+independence_group: nist
+-->
+
+<!-- research_source
+source_id: S11
+role: competitor_primary
+source_kind: document
+publisher: Applied Materials
+title: Applied Materials Accelerates Chip Defect Review with Next-Gen eBeam System
+published_at: 2025-02-19
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-accelerates-chip-defect-review-next-gen-ebeam/
+locator: SEMVision H20 發布頁的 dense defect maps／sampling 段落與 Next-generation CFE、Deep learning AI image models 兩個 bullet；同頁另有 adoption 及 coverage 公司陳述
+limitation: 這是 Applied 對自家 leading-edge logic／memory defect-review 產品的技術與採用陳述；倍數、解析度、速度、分類及 adoption 未由客戶端同口徑資料驗證，也不能直接套到 HBM 封裝 control plan
+independence_group: applied-materials
+-->
+
+<!-- research_source
+source_id: S12
+role: company_release
+source_kind: document
+publisher: KLA Corporation
+title: KLA Announces Enhanced Portfolio of Systems for Advanced Packaging
+published_at: 2020-09-21
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://ir.kla.com/news-events/press-releases/detail/9/kla-announces-enhanced-portfolio-of-systems-for-advanced
+locator: Kronos 1190、ICOS F160XP 與 ICOS T3／T7 段落；分列 wafer-level inline control、切割後 crack inspection、100% IR inspection、component inspection／metrology 與 defect binning
+limitation: 這是 2020 年 KLA 自家封裝工具組合與功能公告；不同工具任務可用來拆 control-plan 分母，但不代表現行 HBM 客戶共同 recipe、部署量、良率改善、工具替代或台灣公司訂單
+independence_group: kla
+-->
+
+<!-- research_source
+source_id: S13
+role: other_primary
+source_kind: living_index
+publisher: National Institute of Standards and Technology
+title: CHIPS Metrology Program
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.nist.gov/chips/research-development-programs/metrology-program
+locator: 2026-08-12 的 CHIPS Metrology Program 活頁；後續回查 fit-for-purpose metrology、advanced packaging、modeling、standards 與 METIS 研究成果
+limitation: 動態計畫頁只供後續重查，不能替代具日期的研究成果，也不證明任何方法已進入客戶 production、改善良率或形成設備需求
+independence_group: nist
+-->
+
+<!-- research_source
+source_id: S14
+role: other_primary
+source_kind: living_index
+publisher: National Institute of Standards and Technology / SEMATECH
+title: NIST/SEMATECH e-Handbook of Statistical Methods — Measurement Process Characterization
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.itl.nist.gov/div898/handbook/mpc/mpc.htm
+locator: Chapter 2 的 2.1.1 What are the issues for characterization、2.1.1.3 Bias and Accuracy、2.1.1.4 Variability、2.4 Gauge R and R studies 與 2.4.6 Quantifying uncertainties from a gauge study
+limitation: 這是持續更新的通用工程統計手冊；章節以 ongoing measurement process 及 gauge study 建立 bias、repeatability、reproducibility、stability 與 uncertainty 方法，不是 HBM／advanced-packaging 客戶 recipe、產品允收門檻、產業標準或量產結果；reproducibility 一詞也可能和其他標準採不同細部定義
+independence_group: nist
+-->
+
+<!-- research_source
+source_id: S15
+role: other_primary
+source_kind: document
+publisher: National Institute of Standards and Technology
+title: Metrological Traceability Frequently Asked Questions and NIST Policy
+published_at: 2021-05-06
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.nist.gov/publications/metrological-traceability-frequently-asked-questions-and-nist-policy
+locator: NIST Technical Note 2156 的 §§5.1.1–5.1.3、5.2.1–5.2.3 與 5.4.3；定義 traceability 為特定 measurement result 的性質，並列出 calibration chain、uncertainty、measurement-system documentation 與 measurement-assurance 要件
+limitation: 這是跨領域計量政策與術語文件，不是半導體特定方法資格、產品 pass／fail 規格或客戶良率資料；可追溯也不表示不確定度一定適合某個製程決策，更不構成 NIST 對設備商或產品的背書
+independence_group: nist
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -278,7 +599,7 @@ resolution:
 <!-- research_claim
 claim_id: C4
 label: inference
-status: active
+status: superseded
 claim: 三個獨立設備供應商的一手文件共同支持一個縮窄後的研究判讀：HBM、2.5D 與 3D 整合提高幾何、材料、翹曲與缺陷代價，使量測、檢查及良率學習在工程上的重要性上升
 supporting_source_ids: S1,S2,S3
 contrary_source_ids:
@@ -288,8 +609,8 @@ boundary: 交叉證據只支持需求機制與資格節點，不證明全產業 
 verification_needed:
 correction_kind:
 corrects_claim_id:
-corrected_by_claim_id:
-resolution:
+corrected_by_claim_id: C9
+resolution: 2026-08-06 Onto Q2 文件新增較寬事業組合的收入訊號，原工程需求與資格節點判讀仍成立，但已不足以描述目前證據成熟度；由 C9 接續並保留不可歸因邊界
 -->
 
 <!-- research_claim
@@ -343,13 +664,188 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: Onto Innovation 在 2026Q2 結果中表示，Specialty Devices and Advanced Packaging 收入創季度新高，支撐來源包含 advanced packaging 的 2.5D logic、HBM 與 silicon photonics 應用
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-06
+basis: S8 的 Second Quarter Business and Financial Highlights 直接列出收入成熟度與支撐應用，且該附件隨 Form 8-K 公開
+boundary: 這是 Onto 對較寬事業組合的公司陳述；沒有揭露該類別收入金額、占比、產品分子、工具數、客戶數或各應用貢獻，不能改寫成 Dragonfly、HBM 或製程控制工具的專屬收入新高
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: inference
+status: active
+claim: 現有跨公司一手證據支持一個更新後且仍受限的成熟度判讀：HBM、2.5D 與 3D 整合提高製程控制的工程重要性，至少部分供應商產品已走到客戶資格或供應商自述的高量產，而 Onto 較寬事業組合又出現收入訊號
+supporting_source_ids: S1,S2,S3,S8
+contrary_source_ids:
+as_of: 2026-08-06
+basis: correction_of:C4；S1 提供需求方向，S2 提供缺陷機制及高量產使用陳述，S3 提供 2.5D logic／HBM 客戶資格節點，S8 提供較寬事業組合的收入成熟度；S8 與 S3 同屬 Onto 消息鏈，不另算第四個獨立公司
+boundary: 更新後判讀只把證據階梯推到供應商端商業訊號；它不證明全產業 wallet share、每世代工具數、題材收入分子、客戶資本支出分母、台灣公司訂單、價格、毛利或供應商排名
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C4
+corrected_by_claim_id:
+resolution: 保留 C4 的工程機制，但以 S8 新增的較寬收入訊號修正「只到資格節點」的舊成熟度描述
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: SEMI 2026 先進封裝峰會的官方議程摘要把 3DIC 製造挑戰具體拆到高深寬比 TSV 蝕刻、無空洞填孔、介電層沉積、inter-die gap fill、plasma dicing、面板翹曲與細 RDL，並把 data-driven control、metrology 與 yield learning 列為製造或採用問題
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-07-15
+basis: S9 的 Lam、Samsung 與 NVIDIA 三段公開議程摘要直接列出上述工序、控制點與整合障礙
+boundary: 證實的是 SEMI 官方頁保存的講者摘要內容，不是完整簡報、共同測試、第三方量產驗證或市場資料；CPO 段只作相鄰案例，不能反推 HBM 使用相同 BOM 或工具組合
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: NIST 的 2025 研究把 semiconductor virtual metrology 的限制拆成量測資料成本、sensor drift／shift 與資料可得性，並以模型不確定性驅動 adaptive sampling，在公開 CMP dataset 上驗證追蹤漂移且減少實體量測資料需求的方法
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2025-01-20
+basis: S10 abstract 直接列出問題、online Gaussian-process framework、uncertainty quantification、adaptive sampling 與 public CMP dataset validation
+boundary: 只證實該論文的方法與單一公開資料驗證；不代表 HBM／先進封裝量產線已採用、抽樣可以任意降低，或模型能取代實體量測、客戶 recipe 與失效驗證
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: Applied Materials 表示，先進邏輯與記憶體的 optical inspection defect map 變密後，eBeam review 要在更多 sampling candidates 下同時維持 throughput、sensitivity 與 coverage，並以 deep-learning classification 分離 true defects 與 nuisance signals
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2025-02-19
+basis: S11 的 dense defect maps／sampling 段落及 CFE、Deep learning AI image models 兩個 bullet 直接列出四項取捨與產品功能
+boundary: 這是 Applied 對 SEMVision H20 的公司技術陳述；不採用其倍數作共同產業參數，也不把 leading-edge wafer defect review 直接視為 HBM advanced-packaging control plan、客戶良率或收入
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: KLA 的 advanced-packaging 產品公告把 wafer-level inline control、切割後 sidewall-crack inspection、指定 100% IR inspection，以及 package assembly inspection／metrology 分成不同工具與任務
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2020-09-21
+basis: S12 的 Kronos 1190、ICOS F160XP 與 ICOS T3／T7 段落逐項列出製程位置、檢查對象、coverage 與處置功能
+boundary: 只證實 KLA 2020 產品組合的任務分工；不代表每座先進封裝廠採相同 recipe、每站都 100% inspection、現行 HBM 使用相同工具，或工具數與收入等比例增加
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 研究 advanced-packaging process control 時，「多檢查」不是可比較規格；一份可用 control plan 至少要對齊失效與決策、工序與檢查單位、抽樣覆蓋、靈敏度與逃逸、偽警報與分類，以及結果時間與異常圍堵六個欄位
+supporting_source_ids: S10,S11,S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S10 建立成本、漂移、不確定性與 adaptive sampling；S11 建立 candidate density、throughput、sensitivity、coverage 與 nuisance classification；S12 建立 inline monitoring、post-dicing inspection、100% screening 與 disposition 的不同任務，研究端將其整理為六欄閱讀契約
+boundary: 六欄是研究與 control-plan 查核框架，不是標準、唯一 recipe 或設備計分；沒有客戶端同產品 escape／false-alarm／cycle-time／yield 數據，不支持工具量、wallet share、供應商排名、台灣公司訂單或財務貢獻
+verification_needed: 同一 production product／layer 的版本化 control plan，公開 sampling unit／coverage、sensitivity／escape、FAR／classification、time-to-result／containment、良率與重工／報廢結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: NIST／SEMATECH e-Handbook 把量測系統視為一個以量測結果為輸出的製程，要求把 bias、短期精密度、日間／長期變異與 uncertainty 分開；Gauge R and R 章節另把 repeatability、reproducibility、stability、resolution、linearity、hysteresis、drift，以及設備、設定與操作差異列為不同誤差來源
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S14 Chapter 2 的 characterization、variability、Gauge R and R 與 uncertainty 章節直接列出量測品質、變異分層及 gauge-study 誤差來源
+boundary: 只證實 NIST／SEMATECH 手冊的通用量測框架；不代表所有半導體任務採相同研究設計、術語或允收值，也沒有提供 HBM 客戶 recipe、設備能力門檻、良率結果或財務資料
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: NIST 將計量可追溯性定義為特定量測結果可經由有文件紀錄且不中斷的校正鏈連到參考、每一環均納入不確定度；只使用曾校正的設備並不足夠，仍須交代被測量、量測系統、帶不確定度的結果、校正參考與持續量測保證
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2021-05-06
+basis: S15 §§5.1.1、5.2.1 與 5.4.3 直接區分 measurement result 與 instrument 的 traceability，並列出建立可追溯鏈所需文件及 measurement-assurance elements
+boundary: 可追溯不表示不確定度一定 fit for purpose，也不替特定產品決定放行／隔離門檻；NIST 校正或參考鏈不是對設備品牌、供應商能力、量產良率或收入的認證
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 在把量測或檢查結果用於 advanced-packaging process control 前，研究端應先對齊一份六欄 measurement-system contract：被測量／單位／決策、方法／組態／環境、參考／校正／可追溯鏈、偏差／解析度／線性、重複性／再現性／穩定性，以及不確定度／決策規則；通過後才接 control plan 的工序、抽樣、逃逸、偽警報、結果時間與圍堵
+supporting_source_ids: S10,S11,S12,S14,S15
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S14 建立 measurement-process error 與 variability 分層，S15 建立 measurand、calibration chain、uncertainty 與 measurement assurance，S10 顯示半導體 virtual metrology 仍受資料成本、drift／shift 與不確定性約束，S11／S12 分別拆出 defect review 的速度靈敏度覆蓋雜訊取捨及封裝檢查的不同工序任務；研究端將五者整理成量測系統與 control plan 兩層契約
+boundary: 六欄是本研究中心的閱讀與查核框架，不是正式半導體標準、唯一 Gauge R and R 設計或客戶 recipe；框架完整不代表新增工具、客戶良率、wallet share、台灣公司訂單或財務貢獻
+verification_needed: 同一 production product／layer 的版本化 measurement-system record，公開 measurand／unit、method／configuration／environment、reference／calibration chain、bias／resolution／linearity、repeatability／reproducibility／stability、uncertainty／decision rule，並接到實際 control-plan decision 與製造結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
-KLA 提供需求方向，Applied Materials 說明缺陷機制，Onto Innovation 提供 2.5D logic 與
-HBM 客戶資格節點。三條獨立消息鏈讓工程需求比單一廠商說法更可信。本題也不同於 ATE
-tester TAM：它研究製程中的量測、缺陷定位與良率回饋。尚待證明的是這些需求有沒有變成
-更多工具步驟與較高支出占比；未分解市占、ASP、產品組合與服務前，不能用 KLA 結果代表
-全產業，更不能外推台灣公司受惠。
+KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
+先提供 2.5D logic／HBM 客戶資格節點，再新增較寬事業組合的收入訊號；SEMI 議程則把控制
+問題落到 TSV、填孔、沉積、翹曲、RDL、切割與相鄰的 CPO 整合。這些資料讓工程與供應商
+商業成熟度比單一廠商說法更完整。NIST、Applied 與 KLA 的方法／產品文件又把 control plan
+拆成動態抽樣、靈敏度、覆蓋、偽警報、結果時間與不同製程任務；NIST／SEMATECH 的量測
+章節再補上 bias、repeatability、reproducibility、stability、uncertainty 與 traceability 的前置
+契約。本題也不同於 ATE tester TAM：它研究製程中的量測、
+缺陷定位與良率回饋。尚待證明的是需求有沒有變成更多工具步驟與較高支出占比；未拆出
+產品分子、客戶分母、市占、ASP、產品組合與服務前，不能用發行人結果代表全產業，更不能
+外推台灣公司受惠。
 
 ## 已驗證的證據階梯
 
@@ -357,27 +853,42 @@ tester TAM：它研究製程中的量測、缺陷定位與良率回饋。尚待�
 |---|---|---|
 | 需求方向 | KLA 把 memory complexity、advanced packaging 連到 process control | 全產業 wallet share 或工具數 |
 | 工程機制 | Applied 描述細小特徵、翹曲與高缺陷代價 | 第三方良率、總市場或排名 |
+| 量測可信度前置關卡 | NIST／SEMATECH 把 bias、短長期變異、不確定度與可追溯鏈分開 | 特定 HBM 客戶方法、允收門檻或設備收入 |
+| Control-plan 方法 | NIST、Applied 與 KLA 分別支持 adaptive sampling、coverage／sensitivity／nuisance 取捨及不同封裝檢查任務 | HBM 客戶 recipe、逃逸／偽警報、整廠 cycle time 或新增工具量 |
 | 採用節點 | Onto 披露 2.5D logic 與 HBM 客戶資格認證 | 大量採購、收入或台灣參與 |
+| 供應商端量產陳述 | Applied 稱特定 eBeam defect-analysis 系統已用於高量產先進封裝 | 客戶端部署數、良率實績或市占 |
+| 較寬收入訊號 | Onto 稱 Specialty Devices and Advanced Packaging 收入創高，支撐含 2.5D／HBM | 類別金額、題材分子、特定工具收入或全產業支出 |
 
 ## 跨公司數字與可比性
 
 本篇 `cross_company_numbers: false`：三家公司提供不同類型的證據，本文不比較營收、訂單、
-工具數或市占。KLA 分部屬發行人自身定義，本文不列其數字，也不與同業排名。
+工具數或市占。Onto 只說較寬類別創高而未提供類別金額，本文也不拿公司總營收替代題材
+分子。KLA 分部屬發行人自身定義，本文不列其數字，也不與同業排名。
 
 ## 來源與證據邊界
 
 - [S1：KLA FY26Q4 結果](https://ir.kla.com/news-events/press-releases/detail/518/kla-corporation-reports-fiscal-2026-fourth-quarter-and-full)。
 - [S2：Applied Materials DRAM／先進封裝與 eBeam 系統](https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-introduces-new-systems-accelerate-dram-and/)。
 - [S3：Onto Innovation 2026Q1 結果與 qualification](https://investors.ontoinnovation.com/news/news-details/2026/Onto-Innovation-Reports-2026-First-Quarter-Results/default.aspx)。
+- [S8：Onto Innovation 2026Q2 Form 8-K 附件](https://www.sec.gov/Archives/edgar/data/704532/000119312526337990/onto-ex99_1.htm)（較寬事業組合創高，不含產品分子）。
+- [S9：SEMI Advanced Packaging Summit 2026 官方議程](https://www.semi.org/en/connect/events/advanced-packaging-summit-2026)（講者摘要，不是完整實驗或量產資料）。
+- [S10：NIST virtual metrology 與 dynamic sampling 研究](https://www.nist.gov/publications/comparative-study-semiconductor-virtual-metrology-methods-and-novel-algorithmic)（public CMP dataset，不是 HBM production recipe）。
+- [S11：Applied Materials SEMVision H20 defect-review 公告](https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-accelerates-chip-defect-review-next-gen-ebeam/)（供應商技術與採用陳述）。
+- [S12：KLA advanced-packaging inspection portfolio](https://ir.kla.com/news-events/press-releases/detail/9/kla-announces-enhanced-portfolio-of-systems-for-advanced)（2020 產品任務分工，不是共同 control plan）。
+- [S14：NIST／SEMATECH Measurement Process Characterization](https://www.itl.nist.gov/div898/handbook/mpc/mpc.htm)（通用 bias、變異、Gauge R＆R 與 uncertainty 方法，不是 HBM recipe）。
+- [S15：NIST Technical Note 2156 計量可追溯性政策](https://www.nist.gov/publications/metrological-traceability-frequently-asked-questions-and-nist-policy)（可追溯的是特定量測結果，不是設備品牌背書）。
 - 後續入口：[KLA](https://ir.kla.com/financial-information/financial-results)、[Applied](https://ir.appliedmaterials.com/news-releases/)、[Onto](https://investors.ontoinnovation.com/news/default.aspx)、[MOPS](https://mops.twse.com.tw/mops/web/index)。
+- 中立方法入口：[NIST CHIPS Metrology Program](https://www.nist.gov/chips/research-development-programs/metrology-program)。
 
-三家設備商彼此獨立但都有商業動機，不能替代客戶端或全產業資本支出證據。本輪也沒有
-一致預期、估值、即時持倉或台灣公司客戶資料，因此不談市場是否反映或個股方向。
+三家設備商彼此獨立但都有商業動機；SEMI 議程保存多位講者摘要，也不能替代完整簡報、
+客戶端或全產業資本支出證據。本輪沒有一致預期、估值、即時持倉或台灣公司客戶資料，
+因此不談市場是否反映或個股方向。
 
 ## 反方與替代路徑
 
 - **供應商特有效果**：KLA 成長可能來自市占、ASP、產品組合或服務，而非類別支出增加。
 - **資格不等於規模**：Onto 的 qualification 可能停在單一工具或客戶，未形成跨客戶量產。
+- **較寬收入組合混合**：Onto 的新高可能由 silicon photonics、其他 specialty devices、產品組合或價格帶動，不能全歸因 HBM／2.5D 製程控制。
 - **替代解法**：設計規則、抽樣或既有光學工具升級，可能降低新增工具需求。
 - **價值沒有外溢**：支出即使增加，也可能集中於海外平台；台灣族群不必然受惠。
 
@@ -432,11 +943,11 @@ evidence_boundary: 使用端增加檢測不必然改善封測商收入或毛利�
 
 ## 持續驗證清單
 
-`review_due` 為 2026-08-13，等於所有 active monitoring item 中最早的 `next_check`。
+`review_due` 為 2026-08-14，等於所有 active monitoring item 中最早的 `next_check`。
 
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
 claim_ids: C4,C5
 metric: HBM／advanced-packaging 每一產品世代或單位產能所需的製程控制步驟、工具內容與客戶支出占比
 source_ids: S1,S2,S3
@@ -446,6 +957,8 @@ frequency_detail: KLA、Applied Materials 與 Onto Innovation 季報、法說及
 next_check: 2026-08-13
 trigger: 至少兩條獨立來源或一份客戶端文件，以相同期間與清楚定義顯示每一產品世代或單位產能的製程控制步驟、工具量或支出占比增加
 invalidation: 客戶端同口徑資料顯示連續兩個產品世代的製程控制步驟、工具量或單位產能支出持平／下降，或明確指出既有光學、抽樣或設計規則已吸收新增複雜度
+retired_at: 2026-08-12
+retirement_reason: S8 新增供應商較寬事業組合的收入訊號，但未命中同口徑工具量／支出占比 trigger；C4 已由 C9 的工程—資格—量產陳述—較寬收入階梯取代，後續由 T5 分開追收入分子與客戶分母，不把相鄰商業訊號誤記成 wallet-share 證實
 -->
 
 <!-- monitoring_item
@@ -478,7 +991,9 @@ invalidation: 公司明確否認相關產品／客戶曝險、退出該市場，
 
 <!-- monitoring_item
 monitor_id: T4
-status: active
+status: retired
+retired_at: 2026-08-12
+retirement_reason: 本輪已完成 KLA 現行文件重查且沒有可重建分解；下一個公司結果時鐘由 T6 接續
 claim_ids: C7
 metric: KLA FY26Q4 同期間成長中，單位出貨、ASP、市占、產品組合、服務與產業類別支出的可重建貢獻
 source_ids: S1
@@ -490,11 +1005,69 @@ trigger: 公司或可定位的獨立資料分解至少 80% 的同期間成長，
 invalidation: 可重建分解顯示超過 50% 的同期間成長來自市占、ASP、產品組合或服務，而非同口徑工具量或客戶類別支出增加
 -->
 
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C5,C8,C9
+metric: advanced-packaging process control 從工程需求、資格、高量產陳述到題材收入分子及客戶支出分母的逐層橋接
+source_ids: S1,S2,S3,S8
+watch_source_ids: S4,S5,S6
+frequency: quarterly
+frequency_detail: Applied Materials 2026-08-13 結果後先重查；其後按 KLA、Applied Materials、Onto Innovation 季報／法說與客戶端製造文件更新
+next_check: 2026-08-14
+trigger: 至少兩條獨立公司鏈或一份客戶端文件，以同期間揭露 advanced-packaging process-control 的產品／類別收入、工具數、重複採購或每單位產能支出，且能把題材分子對回公司或客戶分母
+invalidation: 客戶端或同口徑供應商資料顯示新增複雜度主要由既有工具、抽樣、軟體或設計規則吸收，連續兩個產品世代的工具量／單位產能支出持平或下降；只有較寬事業組合新高而無分子時不視為 trigger 命中
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C7
+metric: KLA FY26Q4 同期間成長中，單位出貨、ASP、市占、產品組合、服務與產業類別支出的可重建貢獻
+source_ids: S1
+watch_source_ids: S4
+frequency: quarterly
+frequency_detail: KLA 季報、法說、股東信與分部附註發布後重做 growth bridge
+next_check: 2026-10-28
+trigger: 公司或可定位的獨立資料分解至少 80% 的同期間成長，且顯示超過 50% 來自同口徑工具量或客戶類別支出增加
+invalidation: 可重建分解顯示超過 50% 的同期間成長來自市占、ASP、產品組合或服務，而非同口徑工具量或客戶類別支出增加
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C11,C12,C13,C14
+metric: 同一 production product／layer 的 control plan 是否同時公開抽樣覆蓋、靈敏度／逃逸、偽警報／分類、結果時間／圍堵及製造結果
+source_ids: S10,S11,S12
+watch_source_ids: S5,S13
+frequency: event_driven
+frequency_detail: 客戶技術論文、NIST／SEMI 方法文件或設備商公開版本化 control-plan evidence 時重查
+next_check: 2026-08-31
+trigger: 至少一份客戶端或可重建中立資料，以同一產品與製程層公開 sampling unit／coverage、sensitivity／escape、FAR／classification、time-to-result／containment，以及良率、重工或報廢結果
+invalidation: 量產客戶同口徑資料顯示新增 3D／advanced-packaging 複雜度可由原 control plan 吸收，且 coverage、escape、FAR、cycle time 與製造結果沒有惡化；單一供應商速度或解析度數字不算推翻或命中
+-->
+
+<!-- monitoring_item
+monitor_id: T8
+status: active
+claim_ids: C15,C16,C17
+metric: 同一 production product／layer 的 measurement-system contract 是否同時公開被測量、方法環境、參考校正鏈、偏差解析度線性、重複性再現性穩定性、不確定度決策規則及實際 control-plan 用途
+source_ids: S14,S15
+watch_source_ids: S13
+frequency: event_driven
+frequency_detail: 客戶製造文件、NIST／SEMI 方法成果或版本化量測系統資格報告公開時重查
+next_check: 2026-08-31
+trigger: 至少一份客戶端或可重建中立資料，對同一產品與製程層公開 measurand／unit、method／configuration／environment、reference／calibration chain、bias／resolution／linearity、repeatability／reproducibility／stability、uncertainty／decision rule，並接到放行、隔離、調參或重工及製造結果
+invalidation: 量產客戶以另一套可稽核且可重現的 measurement-assurance scheme 證明能在省略上述一個或多個欄位時維持同等 decision risk 與製造結果；只有沒有公開完整紀錄時維持 C17 閱讀框架，不視為反證
+-->
+
 ## 下一個可證明／否定的節點
 
-- 設備商是否首次提供 advanced-packaging process control 的收入、訂單、工具量或部署口徑。
+- Applied Materials 8 月 13 日結果是否提供 advanced-packaging process control 的收入、訂單、工具量或部署口徑；只有公司總額不算。
 - KLA 能否分解單位出貨、ASP、產品組合、服務與市占；否則 C7 維持待驗證。
-- Onto qualification 是否推進到重複採購或更廣泛高量產。
+- Onto 能否把較寬事業組合新高拆到 HBM／2.5D、具名工具、客戶數、重複採購或收入分子。
+- 客戶或中立研究能否在同一產品／layer 公開 control plan 六欄與結果；若只有速度、解析度或 AI 分類功能，C14 仍只是閱讀框架。
+- 同一產品／layer 能否先公開量測系統六欄，再把結果接到 control-plan 決策與良率、重工、報廢或週期時間；只有校正標籤或工具規格，C17 不升級。
 - 台灣公司若沒有產品、客戶階段與財務貢獻，C6 不升級，`stock_ids` 留空。
 
 到期時若沒有被 active thesis claim 引用的新證據，只在 append-only scan log 記錄重查結果，

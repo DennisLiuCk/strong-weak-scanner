@@ -53,6 +53,13 @@ to: triaged
 reason: editorial_plain_language_wave86_instruction_trust_four_checks_no_conclusion_change
 evidence: editorial:plain_language_wave86_instruction_trust_four_checks
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: expanded_attestation_evidence_policy_decision_and_recovery_contract
+evidence: sources:S8,S9,S10,S11
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -88,6 +95,20 @@ evidence: editorial:plain_language_wave86_instruction_trust_four_checks
 - **正式環境（production）**：產品已在真實營運場域持續使用的狀態，不是展示、樣品或實驗室測試。
 - **失敗時的預設動作（safe default）**：驗證失敗時系統預先選定的安全反應，例如拒絕指令、限制功能或等待人工處理；本文尚未取得機櫃場域的具體規則。
 - **可獨立查證／保證層**：買方不依賴賣方自述，也能用測試、稽核或驗收證據確認實作符合規格的能力。
+- **證據（Evidence）**：裝置交給外部查驗的身分、量測、設定或狀態資料；有簽章只能協助確認來源與完整性，不能自己決定是否合格。
+- **證明者（Attester）**：產生證據、希望被信任的裝置或元件，例如 BMC、加速器或其他管理端點。
+- **驗證者（Verifier）**：依參考值與評估規則檢查證據，再產生證明結果的角色；它可以和最後下決策的系統分開。
+- **依賴方（Relying Party）**：真正依證明結果決定要不要授權、隔離或提供資源的系統；它不是被證明的裝置。
+- **參考值（Reference Value）**：用來和實際量測比較的預期值；它可能是版本、允許集合或範圍，不一定只是單一「黃金雜湊值」。
+- **評估政策（Appraisal Policy）**：規定哪些證據、參考值與條件算合格的規則；同一份證據套用不同政策，可能得到不同結果。
+- **證明結果（Attestation Result）**：驗證者完成判讀後交給依賴方的結果；它可以是通過／不通過，也可以保留更多狀態資訊。
+- **新鮮度（freshness）**：確認這份證據反映的是現在，而不是攻擊者重播的舊合格報告。常見方法包含由外部產生的一次性隨機值。
+- **重播攻擊（replay attack）**：把以前合法取得的證據或結果重新送出，假裝裝置目前仍是同一狀態。
+- **RIM（Reference Integrity Manifest）**：由製造商、整合商或維護者簽署的參考值資料包，讓驗證者知道某個版本與配置預期量到什麼。
+- **RFC**：IETF 正式發布並編號保存的技術文件；不同 RFC 可能是標準、最佳實務或資訊性架構，必須看文件狀態，不能一概當成強制認證。
+- **IETF**：制定網際網路協定與共同技術文件的開放標準組織；本文使用它的遠端證明架構與 token 規格。
+- **EAT（Entity Attestation Token）**：用 CWT 或 JWT 承載遠端證明 claim 的格式；token 能被驗簽，不代表驗證者已執行買方期待的全部檢查。
+- **TCG**：制定可信運算規格的產業組織；本文使用它的 RIM 資訊模型說明參考值如何隨平台版本與維護變更。
 
 ### 三句話抓重點
 
@@ -109,11 +130,13 @@ evidence: editorial:plain_language_wave86_instruction_trust_four_checks
 
 - 先看零件互驗的共同測試指引（DSP-IS0023）是否由草稿轉成正式版本，以及授權白皮書是否如期發布；這會直接改變「規格比查證制度成熟」的判斷。
 - 再看 OCP 是否公布新的 S.A.F.E. 稽核報告或新增稽核機構，稽核範圍有沒有從單一晶片延伸到 BMC 或完整機櫃。
+- 若平台開始談遠端證明，要求它同時公開證據涵蓋範圍、新鮮度、參考值版本、驗證政策、結果效期、授權後果與失敗復原，不接受只有一張「簽章成功」截圖。
 - 最後看 5274 信驊是否首次在季報、法說或重大訊息中，揭露 AST2700 的客戶驗證階段、量產出貨與可辨識收入或毛利。
 
 ### 想一想
 
 - 如果身分或程式版本驗證失敗，系統會拒絕斷電指令、進入安全狀態，還是只留下紀錄？公開資料目前說清楚了嗎？
+- 同一份量測若昨天通過、今天才被重播，驗證者如何知道設備中間已經更新或被改動？
 - 一份第三方報告要寫到哪些被測功能與版本，才足以讓買方少做一次重複測試，而不只是讓賣方多一個標章？
 - 共同測試指引停在草稿，可能代表制度尚未成熟，也可能已有其他驗收方式；還要找什麼證據才能分辨？
 
@@ -291,6 +314,108 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: IETF RFC 9334 把遠端證明分成證明者產生 Evidence、驗證者依 Endorsements／Reference Values／Appraisal Policy 評估後產生 Attestation Result，以及依賴方再依自己的 policy 決定是否允許存取或操作；同一架構另把證據未通過、結果未通過及驗證者不可用列為三種不同失敗位置
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8 §§4–5 與 §§8.1–8.5 直接定義三個角色及四類概念訊息，§5.1 明列 Passport Model 的三種失敗，§10 另處理 Evidence 與 Attestation Result 的新鮮度
+boundary: RFC 9334 是資訊性架構與共同名詞，不指定 AI 機櫃協定、評估門檻、依賴方動作、實作品質或買方驗收，也不證明 Caliptra／SPDM 已依這套角色完整整合
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: IETF RFC 9711 的 EAT 規格可用 COSE／JOSE 提供 token 的真實性與完整性，並定義 nonce claim 供重播防護與新鮮度；但規格明示不替驗證者制定統一處理規則，依賴方必須理解各驗證者實際執行了哪些 policy 與檢查，且訊息格式本身不規定實作安全等級
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 §§1.3.1、8.4 與 9.1 分別說明 Evidence 到 Attestation Result 的 policy 邊界、nonce 的 replay／freshness 用途，以及 claim 格式不保證實作安全等級
+boundary: EAT 是可承載 Evidence 或 Attestation Result 的 token 規格，不代表任一 BMC、SPDM endpoint 或 AI rack 已採用 EAT；nonce 存在也不證明產生方式、綁定、效期與重播防護已正確實作
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: TCG RIM Information Model 1.1 把供驗證者比較 Evidence 的參考值做成可簽署、可識別建立者與版本的 RIM bundle；製造商、系統整合商與維護者若改變韌體、設定或硬體，可以追加並串接新的 bundle，使驗證者取得反映平台生產與維護歷程的 reference-value collection
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S10 pp.9、13–16 與 25–28 直接定義 RIM、Creator、簽章與 critical firmware／event／configuration hash，並說明 pre-delivery modification、maintenance update、patch／upgrade 如何建立 supplemental 或新 RIM 及 backward linkage
+boundary: RIM 是通用參考完整性資訊模型，不保證每個供應鏈角色都會及時產生正確 bundle，也不證明 AI rack 的多元件 reference values 已完整聚合、可取得或被客戶採用
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: NIST SP 800-193 把平台韌體韌性拆成保護未授權變更、偵測偏離授權狀態，以及把韌體程式與關鍵資料安全恢復到完整狀態三項原則；文件明示保護可能不完美或不適用所有裝置，因此偵測與復原是重新取得安全正常運作的獨立能力
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S11 §3.1 的 Protection、Detection、Recovery 定義與後續說明直接支持三項責任不可互相替代
+boundary: NIST 指引處理一般平台韌體與關鍵資料，Recovery 範圍也明示限於這兩者；它不是 AI 機櫃隔離、冷卻、供電或營運復原標準，不能直接決定 attestation 失敗時的 rack-level 動作
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: 要把一份遠端證明升格成可查核的 AI 機櫃授權依據，至少要保存八欄：受測裝置與配置版本、Evidence 內容及涵蓋範圍、新鮮度與重播防護、Endorsements／Reference Values 及變更歷程、驗證者與 Evidence policy、Attestation Result 語意與有效期、依賴方的授權／隔離動作，以及失敗後的安全預設、可信復原與稽核紀錄
+supporting_source_ids: S8,S9,S10,S11
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8 分開角色、policy、結果、失敗與 freshness；S9 縮窄 token 真實性與 policy／實作安全邊界；S10 補足跨製造、整合、維護變更的 reference-value lineage；S11 補足偵測後仍需可信復原，四條來源合併後形成八欄責任護照
+boundary: 八欄是研究中心整合四份官方文件的查核方法，不是 IETF、TCG、NIST 或 DMTF 共同發布的單一標準，也不證明八欄齊備就能消除所有攻擊、營運或供應鏈風險
+verification_needed: 具名平台依同一版本化配置公開八欄內容、失敗注入、授權結果、復原紀錄與變更後重驗
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: unverified
+status: active
+claim: 具名 AI 機櫃 production operator 已對同一版本化配置公開完整八欄遠端證明決策護照，包含新鮮度、參考值生命週期、驗證政策、結果效期、實際授權後果、故障注入、可信復原與稽核結果，並把此能力接到 5274 或其他 universe 公司產品資格、部署、訂單與可辨識財務貢獻
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8–S11 都是通用架構、token、reference-value 與 firmware-resiliency 文件；既有 S1–S7 只再提供規格、產品能力、展示與公司查詢入口，沒有一條買方到供應商的完整 production 證據鏈
+boundary: 沒有找到完整公開鏈是證據缺口，不表示 operator 未在私有環境實作；也不得用一般資安功能、標準支援或單一稽核標章補成客戶部署與財務歸因
+verification_needed: operator acceptance／incident／recovery 文件與供應商申報雙向對齊具名 rack configuration、八欄內容、qualification、部署分母、訂單、收入及毛利
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 高風險指令要過四關：身分、版本、權限與查證
 
 回到前面的場景。一道「關掉這櫃的水電」的指令要能被信任，不能只驗一張電子身分證；系統要依序回答四個不同問題。
@@ -305,6 +430,60 @@ resolution:
 四關有先後順序，也有不同責任。第一與第二關建立「這是誰、現在跑什麼」，第三關才決定「能做什麼」，第四關則讓買方不用只相信廠商自述。前一關通過，不能替後一關出具結果。
 
 **和上一篇的關係。** 上一篇談的是「誰發請求、誰做最終裁決」；本篇補上那個請求者的身分與版本如何被確認。兩篇在概念上相接，但目前沒有平台文件說明驗證失敗時，斷電指令會被拒絕、進入安全狀態，還是只留下紀錄後照常執行。
+
+## 有簽章的量測報告，為什麼仍不是「可以執行指令」
+
+IETF 的 RATS 架構用護照解釋這個差別：申請人交出的出生證明等資料像 **Evidence**，發照機關
+像 **Verifier**，護照像 **Attestation Result**，真正決定能不能入境的海關才是
+**Relying Party**。[S8] 一份出生證明是真的，不代表海關必須准許入境；同樣地，裝置交出的
+量測有合法簽章，也不代表機櫃控制器必須接受它的斷電請求。
+
+遠端證明至少要走完七站，任何一站少資料，研究結論就停在那一站：
+
+| 決策站 | 白話問題 | 需要的資料 | 前一站不能替它證明什麼 |
+|---|---|---|---|
+| 1. 裝置產生證據 | 誰在報告哪一個元件與狀態？ | 裝置身分、配置版本、量測涵蓋範圍與簽章 | 簽章正確不代表量測涵蓋所有關鍵韌體與設定 |
+| 2. 確認證據夠新 | 這是現在的狀態，還是昨天的舊報告？ | 外部一次性隨機值、時間或 epoch，以及結果有效期 | 身分正確不代表報告沒有被重播 |
+| 3. 準備比較基準 | 目前版本應該量到什麼？ | 建立者可查的參考值、適用產品／版本、簽章與變更歷程 | 實際量測值本身不會說明「合格值」是什麼 |
+| 4. 驗證者判讀 | 誰用哪套規則比較？ | 驗證者身分、Evidence policy、參考值與例外規則 | 兩個驗證者看同一份證據，不一定採相同門檻 |
+| 5. 產生證明結果 | 結果究竟代表什麼、能用多久？ | 通過／不通過或詳細狀態、簽章、產生時間與效期 | token 能被驗簽，不代表結果欄位已照買方期待檢查 |
+| 6. 依賴方做決定 | 這個結果允許哪一個動作？ | 依賴方政策、請求權限、允許／限制／隔離結果 | 證明結果是決策輸入，不等於授權決策本身 |
+| 7. 失敗與復原 | 驗證失敗、服務不可用或韌體受損時怎麼辦？ | 安全預設、隔離、可信映像、復原步驟、重驗與稽核紀錄 | 偵測異常不代表裝置能安全恢復，也不代表機櫃已回到可服務狀態 |
+
+第二站尤其容易被忽略。RFC 9334 說明證據與證明結果都要有新鮮度，RFC 9711 另定義 nonce
+供重播防護與 token freshness；但 nonce 欄位存在，仍不能替產生方式、綁定對象、有效期間及
+實作安全背書。[S8][S9]
+
+第三站也不是把一份「黃金雜湊值」永久放進資料庫。TCG 的 RIM 模型允許製造商先建立 primary
+bundle，系統整合商、維護者及後續 patch／upgrade 再追加有簽章且彼此串接的 bundle。[S10]
+因此韌體合法更新後量測改變，可能代表「參考值也應更新」，不一定代表遭入侵；反過來，若
+參考值來源、版本或變更鏈不清楚，量測完全相等也不足以證明比較基準可信。
+
+最後一站借用 NIST 的平台韌體韌性邊界：**保護、偵測、復原是三件事**。[S11] 遠端證明可以
+協助偵測偏離，卻不能自動產生可信映像、恢復韌體、重建服務或決定整櫃水電狀態。NIST 文件也
+只處理韌體程式與關鍵資料；把它延伸成 AI 機櫃級復原，仍需要平台自己的程序與實測。
+
+## 用八欄遠端證明決策護照查一份平台資料
+
+遇到「支援遠端證明」「安全啟動已完成」或「驗證通過」的產品資料，可以把下列八欄抄成一張
+護照。八欄不是要廠商公開私密金鑰或完整防禦規則，而是讓買方知道結果適用哪個版本、由誰判讀、
+能支持哪個動作，以及失敗後是否可回到可信狀態。
+
+| 八欄護照 | 至少記下什麼 | 缺少時最容易誤讀成 |
+|---|---|---|
+| 1. 受測物與版本 | 晶片、板卡、BMC／韌體、設定、機櫃配置與各自版本 | 「同系列產品」都得到同一結果 |
+| 2. Evidence 與涵蓋範圍 | 哪些量測、憑證、設定與 telemetry 被收集，哪些沒收集 | 有簽章就等於整台設備都可信 |
+| 3. 新鮮度與重播防護 | nonce／時間／epoch 的產生者、綁定對象、效期與拒絕舊結果規則 | 舊合格報告仍代表現在狀態 |
+| 4. Endorsement／Reference Value | 誰發布、適用版本、簽章、primary／supplemental lineage 與撤銷／更新 | 比對相等就代表比較基準正確 |
+| 5. 驗證者與 Evidence policy | 驗證者身分、信任錨、門檻、例外、缺值及不可用時怎麼處理 | 所有驗證者都會得到同一判斷 |
+| 6. Attestation Result | 欄位語意、簽章、產生時間、效期及哪些 claim 已檢查或只轉傳 | token 可驗簽就代表所有 claim 都已查過 |
+| 7. 依賴方決策 | 哪個控制器依哪套 policy 做允許、降權、隔離、拒絕或人工覆核 | 驗證通過就自動擁有所有操作權限 |
+| 8. 失敗、復原與稽核 | failure injection、safe default、可信恢復來源、重驗、時間與 audit trail | 發現異常就等於安全復原並恢復服務 |
+
+這張護照把「技術可以做」與「正式環境已採用」分開。完整規格或 demo 最多證明某些欄位可實作；
+要升到客戶資格，還要有同一版本配置的 acceptance plan、失敗注入、結果與復原紀錄。再往公司
+財務走，仍須買方與供應商雙向對上具名產品、部署分母、訂單、收入或毛利，不能用八欄方法本身
+推導 5274 或其他公司受惠。
 
 ## 什麼證據會讓這個判斷改變
 
@@ -436,6 +615,70 @@ locator: 2026-08-08 以 5274 代號重查季報、法說與重大訊息的入口
 limitation: 查詢入口會持續更新，入口本身不證明出貨、客戶認證或財務貢獻，也不能替代公司正式文件內容驗證
 -->
 
+<!-- research_source
+source_id: S8
+role: standard
+source_kind: document
+publisher: Internet Engineering Task Force
+independence_group: ietf-rats
+title: RFC 9334 Remote ATtestation procedureS (RATS) Architecture
+published_at: 2023-01-13
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.rfc-editor.org/rfc/rfc9334.html
+locator: §§4.1–4.2 定義 Attester／Verifier／Relying Party、Evidence／Attestation Result／Reference Values／Appraisal Policies；§§5.1–5.2 描述 passport／background-check models 與三種失敗；§§8.1–8.5 說明概念訊息；§10 說明 timestamp、nonce、epoch 的 freshness
+limitation: RFC 9334 是 IETF consensus 的 Informational 架構，不是 AI rack protocol、產品安全認證、評估 policy 或實作測試結果；其角色可由同一實體合併，不能由概念圖反推實際部署拓撲
+-->
+
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: document
+publisher: Internet Engineering Task Force
+independence_group: ietf-rats
+title: RFC 9711 The Entity Attestation Token (EAT)
+published_at: 2025-04-30
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.rfc-editor.org/rfc/rfc9711.html
+locator: §§1.3–1.3.1 說明 verifier 將 Evidence 轉成 Attestation Results 且處理規則屬 local policy；§8.4 定義由遠端來源衍生 nonce 的 replay protection／token freshness；§9.1 明示 claim semantics 不規定 attester 或實作的安全等級
+limitation: EAT 是 CWT／JWT 上的 attestation-oriented claims 與 token 格式，不等於任一裝置已採用、policy 已公開或安全實作已驗證；IETF 與 S8 同一標準鏈，不另計獨立來源組
+-->
+
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: document
+publisher: Trusted Computing Group
+independence_group: trusted-computing-group
+title: TCG Reference Integrity Manifest Information Model Version 1.1 Revision 1.0
+published_at: 2024-04-26
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://trustedcomputinggroup.org/wp-content/uploads/TCG-Reference-Integrity-Manifest-RIM-Information-Model-Version-1.1-Revision-1.0_pub-1.pdf
+locator: PDF pp.9、13–16 定義 RIM、Creator、Base／Support／Composite bundles、critical firmware／event／configuration digests、signature 與 backward-linked collection；pp.25–28 說明 installation、pre-delivery modification、maintenance update、patch 與 upgrade 的新 RIM／supplemental RIM 責任
+limitation: 此為通用 reference integrity information model，不是 Caliptra、SPDM、AI rack 或客戶 qualification；PDF header 日期為 2024-04-10，TCG resource page 將 Version 1.1 Revision 1.0 列為 2024-04-26 發布
+-->
+
+<!-- research_source
+source_id: S11
+role: regulator_or_policy
+source_kind: document
+publisher: National Institute of Standards and Technology
+independence_group: nist
+title: NIST SP 800-193 Platform Firmware Resiliency Guidelines
+published_at: 2018-05-04
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-193.pdf
+locator: §3.1（PDF pp.17–18、printed pp.10–11）分別定義 Protection、Detection、Recovery，並說明保護機制可能不完美或不適用所有裝置，需由偵測與復原重新取得正常安全運作
+limitation: 指引適用一般平台韌體與關鍵資料，Recovery 範圍亦明示限於兩者；不是 AI rack attestation、機櫃水電隔離、整體服務復原或任何產品／公司的驗收與財務證據
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -502,6 +745,19 @@ trigger: 公司季報、法說或重大訊息首次分開揭露 AST2700 出貨�
 invalidation: 僅有產品頁規格更新與生態系整合公告而無出貨與財務足跡，則 C10 維持未驗證，不得升格為公司事實
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C11,C12,C13,C14,C15,C16
+metric: 具名平台是否把 Evidence 涵蓋範圍 新鮮度 Reference Value lineage Verifier policy Attestation Result 效期 Relying Party 動作 failure injection 可信復原與稽核紀錄接成同一版本化遠端證明決策鏈
+source_ids: S8,S9,S10,S11
+watch_source_ids: S1,S3
+frequency: quarterly
+next_check: 2026-11-14
+trigger: OCP DMTF 或具名 operator／platform 公開同一配置的八欄 acceptance plan 測試結果 失敗授權後果及 recovery evidence，並可回查產品版本與責任人
+invalidation: 若後續正式架構顯示八欄遺漏會改變安全判讀的角色或狀態，則追加修正 claim 縮窄 C15；若 production 文件完整交付八欄，則 C16 應由待驗證改以新 claim 升級
+-->
+
 ## 還不能下哪些結論
 
 - 產品頁寫「支援 Caliptra」或「採用 SPDM」，只代表廠商宣稱具備某項機制，不能改寫成安全性已被獨立驗證。
@@ -509,3 +765,5 @@ invalidation: 僅有產品頁規格更新與生態系整合公告而無出貨與
 - 5274 信驊產品頁列出安全功能，不等於已取得訂單、市占、毛利或競爭優勢；目前仍缺買方採用與財務證據。
 - 韌體供應商的整合展示證明功能可以被放在同一套展示裡，不等於已有客戶部署、量產出貨或營收。
 - 身分或版本驗證失敗後，機櫃究竟會拒絕指令、限制功能或只留下紀錄，目前沒有平台或場域文件可以判定。
+- token 簽章可驗證、nonce 欄位存在或量測等於某個參考值，都不能單獨證明 policy、授權後果、結果效期與可信復原已正確實作。
+- RATS、EAT、RIM 與 NIST 韌性指引可以共同建立查核欄位，但四份文件沒有共同認證任何 AI 機櫃，也沒有把技術鏈接到 universe 公司資格、部署或財務。

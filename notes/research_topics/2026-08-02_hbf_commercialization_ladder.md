@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-02-25
-last_reviewed_at: 2026-08-02
-review_due: 2026-08-17
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-26
 source_type: mixed
 publisher: Sandisk and SK hynix
 publisher_domain: sandisk.com
@@ -19,9 +19,9 @@ group_ids: memory,packtest
 trigger_type: memory_standardization_and_sampling_ladder
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C4
+thesis_claim_id: C9
 base_confidence: medium
-confidence_basis: Sandisk、SK hynix 與 OCP 一手資料可交叉確認標準化工作組、NAND／logic base die 架構與樣品目標；但實體樣品、介面規格、客戶資格、裝置整合、量產及財務貢獻尚未被證實
+confidence_basis: Sandisk 與 SK hynix 的聯合規格公告及 SK hynix 技術摘要可確認第一版 HBF 技術規格已對外發布，並列出介面、堆疊容量、頻寬等級、封裝可靠度與軟體讀寫範圍；但本輪未獨立取得可定位版本的 OCP 規範原文，實體樣品、合規互通、客戶資格、裝置整合、量產及財務貢獻也尚未被證實
 cross_company_numbers: false
 -->
 
@@ -136,6 +136,70 @@ limitation: 動態新聞索引不能證明 HBF 有新規格、客戶樣品、量
 independence_group: sk-hynix
 -->
 
+<!-- research_source
+source_id: S7
+role: company_release
+source_kind: document
+publisher: Sandisk and SK hynix
+title: Sandisk and SK hynix Advance Global Standardization of High Bandwidth Flash Technology
+published_at: 2026-08-03
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://investor.sandisk.com/news-releases/news-release-details/sandisk-and-sk-hynix-advance-global-standardization-high
+locator: 第一版 HBF technical specification 發布、xPU-HBF host interface、electrical、performance、reliability／packaging、software read／write，以及 Google／Tenstorrent consortium membership 段落
+limitation: 聯合公告摘要不是本輪可逐條核對的 OCP 規範原文；Google 與 Tenstorrent 參與 consortium 也不等於獨立採用、產品 qualification、互通通過或部署
+independence_group: sandisk-sk-hynix-joint-spec
+-->
+
+<!-- research_source
+source_id: S8
+role: competitor_primary
+source_kind: document
+publisher: SK hynix
+title: SK hynix Unveils HBF Standard Specification and AI Memory Vision at FMS 2026
+published_at: 2026-08-04
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://news.skhynix.com/en/hbf-at-fms-2026/
+locator: 第一版 standard specification、8-high／16-high、最高 512GB、約 0.4 至 3.0 TB/s 三個 bandwidth grades、UCIe、reliability／packaging 與 software I/O 段落
+limitation: 這是 SK hynix 對同一共同規格的公司摘要，不是獨立產品實測或直接 OCP normative document；容量與頻寬是規格包絡，不是已交付樣品的量測結果
+independence_group: sandisk-sk-hynix-joint-spec
+-->
+
+<!-- research_source
+source_id: S9
+role: competitor_primary
+source_kind: document
+publisher: SK hynix
+title: SK hynix Showcases Full-Stack AI Memory Portfolio at FMS 2026
+published_at: 2026-08-07
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://news.skhynix.com/en/fms-2026/
+locator: Tiered Memory Architecture 段落；將 HBM、DRAM、NAND-based HBF 與 SSD 分層，並強調減少資料搬移及 hardware／software co-design
+limitation: 展會回顧提供供應商架構敘事，不是具名部署、共同 benchmark、客戶資格、樣品交付或收入證據
+independence_group: sk-hynix
+-->
+
+<!-- research_source
+source_id: S10
+role: company_release
+source_kind: document
+publisher: Sandisk
+title: Q4 FY26 Earnings Presentation
+published_at: 2026-08-05
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://investor.sandisk.com/static-files/c75d1bee-c5c9-4e5a-8605-302c1aeac59b
+locator: 第 2 頁 portfolio overview 的 advanced HBF；其後財務頁按公司與 end market 揭露，未提供 HBF 獨立分子
+limitation: 簡報在組合層級提到 HBF，沒有揭露 HBF sample、qualification、shipment、revenue 或 margin；公司與終端市場數字不能倒推為 HBF 貢獻
+independence_group: sandisk
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -190,7 +254,7 @@ resolution:
 <!-- research_claim
 claim_id: C4
 label: inference
-status: active
+status: superseded
 claim: HBF 目前最合理的成熟度定位，是一個已由單一公司概念前進到跨公司與 OCP 標準化、但仍位於實體 memory sample 之前的 NAND 型 AI 記憶體候選層；能否進入正式 AI memory hierarchy，要依序通過介面公開、樣品、裝置整合、客戶 qualification 與量產
 supporting_source_ids: S1,S2,S3,S4
 contrary_source_ids:
@@ -200,14 +264,14 @@ boundary: 不把標準化、公司模擬或樣品目標改寫成產品效能勝�
 verification_needed:
 correction_kind:
 corrects_claim_id:
-corrected_by_claim_id:
-resolution:
+corrected_by_claim_id: C9
+resolution: S7／S8 公告第一版 HBF 技術規格已發布，使規格時鐘越過「只有工作組」；原成熟度把規格與實體產品放在同一條線，改由 C9 的雙時鐘框架取代
 -->
 
 <!-- research_claim
 claim_id: C5
 label: unverified
-status: active
+status: superseded
 claim: 截至 2026-08-02，HBF 最終公開介面規格已完成、首批 memory samples 已實際交付、整合裝置已送樣，或已有具名客戶完成 qualification
 supporting_source_ids:
 contrary_source_ids:
@@ -217,8 +281,8 @@ boundary: 找不到完成證據不是反證；但在新文件出現前，圖譜�
 verification_needed: OCP 公開規格或合規文件、Sandisk／SK hynix 樣品交付公告，以及客戶或裝置端可交叉核對的 qualification 結果
 correction_kind:
 corrects_claim_id:
-corrected_by_claim_id:
-resolution:
+corrected_by_claim_id: C11
+resolution: S7／S8 已證明第一版技術規格公告發布，原句把已驗證的規格節點與仍未驗證的樣品、裝置及客戶資格混在同一主張；改由 C7／C8 記錄規格、C11 續追產品節點
 -->
 
 <!-- research_claim
@@ -238,9 +302,128 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C7
+label: verified
+status: active
+claim: Sandisk 與 SK hynix 於 2026-08-03 公告透過 OCP 發布第一版 HBF 技術規格；公告摘要涵蓋基本效能期望、xPU-HBF 主機介面、電氣連接、可靠度與封裝，以及軟體讀寫指引，並把 Google 與 Tenstorrent 列為參與技術驗證及標準工作的 consortium members
+supporting_source_ids: S7
+contrary_source_ids:
+as_of: 2026-08-03
+basis: S7 直接列出第一版 technical specification 的發布、規格範圍與新增成員角色
+boundary: S7 是 Sandisk／SK hynix 聯合公告；本輪未獨立取得可逐條核對的 OCP 規範原文，Google／Tenstorrent membership 也不證明其產品採用、qualification、跨廠互通或部署
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: SK hynix 對第一版共同規格的摘要列出 8-high 與 16-high NAND die 配置、最高 512GB，以及約 0.4 至 3.0 TB/s 的三個頻寬等級，並描述以 UCIe 連接、可靠度與封裝規範及軟體 I/O 指引
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-04
+basis: S8 直接列出 stack configuration、capacity、bandwidth grades、UCIe、reliability／packaging 與 software I/O
+boundary: 這些是供應商公布的規格包絡，不是已交付樣品的量測結果；文件未提供延遲、寫入、耐久、功耗、熱條件、測試方法或與 HBM 的共同基準
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: inference
+status: active
+claim: HBF 的成熟度現在必須用兩個時鐘閱讀：共同介面與規則的「規格時鐘」已從工作組前進到第一版技術規格公告發布；可測硬體與客戶導入的「產品時鐘」仍停在公開可驗證的實體 memory sample 之前
+supporting_source_ids: S2,S4,S7,S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C4；S2 確認 OCP 工作組、S7／S8 更新第一版規格公告與範圍，S4 的 memory／device sample 仍是未來目標；S9 的分層架構另由 C12 處理，不重複算入主命題來源鏈
+boundary: 規格發布不能外推為規範全文已被本輪獨立核對、silicon 存在、產品符合規格、多廠互通、客戶資格、量產、收入或 HBM 替代
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C4
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: 本輪核對的 2026-08-03／08-04 規格公告與 Sandisk 2026-08-05 財報簡報，沒有揭露具名且已交付的 HBF memory sample、device sample、客戶 qualification、量產出貨或 HBF 獨立財務分子；財報簡報只在產品組合層級列出 advanced HBF
+supporting_source_ids: S7,S8,S10
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S7／S8 的公開內容停在共同規格與技術包絡，S10 的 HBF 字樣停在 portfolio overview，財務表只到公司與 end-market 層級
+boundary: 這是對三份指定公開文件的揭露範圍判讀，不證明公司內部不存在 prototype、未公開測試或客戶接觸；也不能用公司營收反推 HBF 收入
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: unverified
+status: active
+claim: HBF 實體 memory sample 已具名交付並附規格與測試條件、整合 device sample 已運行目標工作負載、客戶 qualification 已完成，或已形成量產出貨與可辨識收入
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C5；S7／S8 已把第一版技術規格從原複合主張中移出，但 S7、S8、S10 仍沒有交付、裝置、客戶資格或財務分子的完成證據
+boundary: 找不到公開完成證據不是反證；在新文件出現前，產品時鐘不能越過 planned memory sample
+verification_needed: 供應商與接收方可交叉核對的 sample 文件、規格與測試條件；具名裝置工作負載；客戶 qualification；量產出貨及同產品財務分子
+correction_kind: supersedes
+corrects_claim_id: C5
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: SK hynix 的 FMS 2026 回顧把 HBM、DRAM、NAND 型 HBF 與 SSD 放在同一個 tiered memory architecture 中，並把減少資料搬移與硬體／軟體共同設計列為系統目標
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-08-07
+basis: S9 的 Tiered Memory Architecture 段落直接列出四層位置與 data movement、hardware／software co-design
+boundary: 這是供應商的系統架構敘事，不是已部署系統、共同 benchmark、資料放置策略成效、客戶採用或 HBF 優於其他層的證據
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: unverified
+status: active
+claim: 本輪可直接取得帶版本與定位條款的 OCP HBF normative specification、公開 compliance 測試方法、具名產品 pass result，或跨廠互通矩陣
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S2 仍只提供 workstream 索引，S7／S8 是廠商對第一版規格的摘要；本輪未在 OCP 公開入口取得可逐條核對的版本化規範或合規結果
+boundary: 未定位到公開文件不代表 OCP 貢獻者空間內沒有規格，也不否定廠商的發布公告；只限制本文不能自行補出規範版本、normative requirement、合規或互通結論
+verification_needed: OCP 公開且可定位版本的 HBF 規範原文、規範條款對應表、合規測試計畫、具名 pass list 或多供應商互通結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
 claim_ids: C1,C3,C4,C5
 metric: HBF 規格版本、memory sample、device sample 與客戶 qualification
 source_ids: S1,S2,S3,S4
@@ -250,11 +433,13 @@ frequency_detail: 週一三五自動研究循環檢查 OCP、Sandisk 與 SK hyni
 next_check: 2026-08-17
 trigger: OCP 發布可定位的 HBF 規格／合規資料，或 Sandisk、SK hynix、客戶公告實體樣品、測試條件與 qualification
 invalidation: 2026 下半年沒有 sample evidence、工作組不再列示、時程延後，或實測顯示延遲、寫入、耐久與熱邊界無法支援目標工作負載
+retired_at: 2026-08-12
+retirement_reason: S7／S8 命中第一版技術規格發布 trigger，但沒有命中實體樣品、合規互通或客戶資格；規格與產品時鐘已拆開，由 T3／T4 接續
 -->
 
 <!-- monitoring_item
 monitor_id: T2
-status: active
+status: retired
 claim_ids: C2,C5,C6
 metric: HBF 在 AI memory hierarchy 的實際工作負載與台灣供應鏈財務足跡
 source_ids: S2,S3,S4
@@ -264,6 +449,50 @@ frequency_detail: 每季檢查 HBF inference device、軟體調度、量產與�
 next_check: 2026-10-15
 trigger: 具名裝置公布 HBF／HBM／DRAM 分層、工作負載與測試結果，且供應商揭露產品、出貨、收入或毛利
 invalidation: HBF 長期只停留在模擬與標準化，或實際系統仍以 HBM、DRAM、CXL memory、SSD／context storage 完成需求
+retired_at: 2026-08-12
+retirement_reason: C5 已拆成規格文件／合規缺口 C13 與產品節點 C11，原 T2 混合工作負載、產品及財務三種時鐘；由 T3／T4／T5 分層接續
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C7,C8,C9,C13
+metric: HBF 直接規範原文、規範層級對應、合規計畫與跨廠互通
+source_ids: S2,S7,S8
+watch_source_ids: S2,S5,S6
+frequency: event_driven
+frequency_detail: 週一三五自動研究循環檢查 OCP、Sandisk 與 SK hynix；只在取得可定位版本原文、compliance artifact 或具名互通結果時升級
+next_check: 2026-08-26
+trigger: OCP 公開帶版本與條款定位的 HBF normative specification、xPU-HBF／UCIe 層級對應、合規測試方法、具名 pass list 或 multi-vendor interoperability result
+invalidation: 第一版規格撤回、範圍重大改寫，或後續公開測試顯示介面、封裝可靠度與軟體 I/O 無法共同成立
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C3,C9,C10,C11
+metric: HBF memory sample、device sample、測試包絡與客戶 qualification
+source_ids: S4,S7,S8,S10
+watch_source_ids: S5,S6
+frequency: weekly
+frequency_detail: 每週重查 Sandisk／SK hynix 的 sample、FMS 後續附件與客戶端公告；供應商目標日期本身不算交付
+next_check: 2026-08-26
+trigger: 具名 HBF memory sample 實際交付，且提供堆疊、容量、頻寬、延遲、寫入、耐久、功耗、熱或接收方測試中的可定位資訊；或裝置端確認工作負載及 qualification
+invalidation: 2026 下半年沒有可核對的 memory sample、時程明確延後、接收方未確認，或測試結果無法支持目標工作負載
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C2,C6,C11,C12
+metric: HBF 在具名 AI 系統的資料分層、軟體調度、部署與供應鏈財務足跡
+source_ids: S3,S9,S10
+watch_source_ids: S5,S6
+frequency: quarterly
+frequency_detail: 每季檢查具名 inference device、資料放置、部署分母與供應商法說；只有平台與公司兩端同產品、同期間證據才升級公司線
+next_check: 2026-10-15
+trigger: 具名裝置公布 HBF／HBM／DRAM／SSD 分層與工作負載結果，或平台端及台灣公司端同時揭露 qualification、出貨、收入或毛利
+invalidation: HBF 長期只停留在規格與 roadmap，未出現可測硬體、軟體支援與部署；或財務揭露無法隔離 HBF 分子
 -->
 
 <!-- transition
@@ -273,13 +502,20 @@ to: triaged
 reason: editorial_plain_language_wave92_hbf_system_conditions_roles_and_six_gate_ladder
 evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: split_specification_and_product_clocks_after_first_hbf_technical_specification
+evidence: sources:S7,S8,S9,S10
+-->
 
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **新記憶體層**：在既有高速工作記憶體與長期儲存之間增加一個資料位置；只有容量還不夠，系統還要知道哪些資料適合放進去。
-- **高頻寬快閃記憶體（HBF）**：嘗試把大量快閃記憶體平行化，再配上底部邏輯晶片，提高容量與讀取能力；目前仍在共同規則與樣品前階段。
+- **高頻寬快閃記憶體（HBF）**：嘗試把大量快閃記憶體平行化，再配上底部邏輯晶片，提高容量與讀取能力；第一版共同技術規格已公告發布，但本輪仍沒有可核對的實體樣品交付。
 - **高頻寬記憶體（HBM）**：把多層動態記憶體疊在一起並放在運算晶片附近；速度高，但容量、成本與封裝空間都有取捨。
 - **快閃記憶體（NAND）**：固態硬碟常用、斷電後仍可保留資料的記憶體；密度高，但讀寫等待、更新與耐久特性不同於工作記憶體。
 - **動態隨機存取記憶體（DRAM）**：需要持續供電、適合快速讀寫的工作記憶體；它與快閃記憶體的速度、成本與資料保留方式不同。
@@ -301,7 +537,14 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 - **軟體調度**：由系統軟體決定哪些資料何時搬移、放在哪一層；硬體存在不代表應用會自動使用。
 - **標準化**：多方討論共同名稱、介面與測試規則；開始標準化不等於規格完成或產品互通。
 - **工作組（workstream）**：由參與者共同推進特定議題的組織；工作組成立只證明有人開始協作。
-- **公開規格（specification）**：可定位版本與內容的共同技術文件；新聞稿提到標準化不能替代正式規格。
+- **公開規格（specification）**：可定位版本與內容的共同技術文件；廠商已公告第一版 HBF 規格發布，但本文仍把公告摘要與可逐條核對的規範原文分開。
+- **規格時鐘**：追蹤工作組、共同文件、規範條款、合規方法與互通結果；它回答「大家是否用同一套規則」。
+- **產品時鐘**：追蹤實體樣品、裝置整合、客戶資格、量產與收入；它回答「規則是否已變成可交付產品」。
+- **頻寬等級**：規格把可提供的資料搬移量分成數個級別；公布等級包絡不等於某顆樣品已在指定條件下量到同樣結果。
+- **UCIe 介面**：用來連接封裝內不同晶粒的共同互連方法；文件寫出介面名稱，仍要再確認版本、層級、封裝與合規結果。
+- **xPU-HBF 主機介面**：運算處理器與 HBF 系統交換資料、指令及狀態的主機端規則；名稱存在不等於任一處理器已完成整合。
+- **硬軟共同設計**：硬體資料路徑與軟體放置規則一起設計；只有硬體容量或頻寬，不能證明工作負載會自動受益。
+- **未來記憶體與儲存大會（FMS）**：Future of Memory and Storage 的縮寫，是記憶體與儲存技術活動；廠商在活動發表願景或規格摘要，仍不等於產品已完成。
 - **介面**：裝置與系統交換資料、指令與狀態的規則；介面名稱存在不等於多家產品已互通。
 - **合規計畫（compliance）**：用一致方法檢查產品是否符合規格；規劃測試不等於已有通過結果。
 - **記憶體樣品（memory sample）**：可被量測的實體記憶體產品；公布目標日期不等於樣品已交付。
@@ -314,8 +557,8 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 ### 三句話抓重點
 
 - 新的記憶體層不能只提供更大容量；它還要在目標工作負載下證明讀取速度、寫入與更新、耐久、功耗和熱管理都能成立。
-- 高頻寬快閃記憶體想用快閃記憶體搭配底部邏輯晶片，放在高速工作記憶體與長期儲存之間，但本輪公開資料仍只有共同標準化與未來樣品目標。
-- 因此目前只能說兩家公司和開放運算計畫正討論共同規則；還不能說公開規格已完成、實體樣品已交付、裝置已整合、客戶已通過或產品已量產。
+- 兩家記憶體公司已公告第一版共同技術框架，涵蓋容量、傳輸級別、主機連接、封裝可靠度與軟體讀寫，規格工作已比只有工作組時更前進一步。
+- 但規則前進不等於產品同步前進；本輪仍不能說實體樣品已交付、裝置已整合、客戶已通過或產品已量產。
 
 ### 為什麼重要
 
@@ -323,13 +566,13 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 只有在容量、等待時間、讀寫模式、耐久、功耗與成本共同成立，而且系統軟體知道何時搬移資料時，
 才可能真正分擔既有記憶體與儲存裝置的工作。
 
-因此「工作組成立」、「公司畫出架構」與「樣品目標」只能證明研發方向正在推進，不能自動創造
-可交付產品。把系統條件、角色交接與商用關卡分開，才能避免把新名詞直接寫成量產市場或台灣
-供應商訂單。
+因此第一版共同規則值得升級，但它只回答「預計如何連接與描述產品」，還沒有回答「哪一顆樣品
+在什麼條件下做到了」。把規格時鐘、產品時鐘、系統條件、角色交接與商用關卡分開，才能避免
+把新名詞或規格包絡直接寫成量產市場與台灣供應商訂單。
 
 ### 接下來怎麼追
 
-- 先找開放運算計畫公開的規格版本、介面與合規計畫，而不只看工作組名稱。
+- 先找開放運算計畫可直接定位的規格版本與條款，確認主機介面、晶粒互連、封裝可靠度及軟體讀寫各在哪一層，再追合規與互通方法。
 - 再找 2026 年下半年實體記憶體樣品的交付日、規格、測試條件與接收方。
 - 2027 年初若出現裝置樣品，要確認它真的完成裝置整合、軟體調度與目標工作負載測試，而非單一展示板。
 - 公司層級必須同時看到平台端具名、客戶資格認證、穩定製造、出貨、重複訂單與可辨識財務資料。
@@ -348,11 +591,34 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 
 | 本文五項系統條件 | 讀者先問 | 沒通過會怎樣 | 主要接力角色 | 本輪可確認到哪裡 |
 |---|---|---|---|---|
-| 1. 容量與資料保留 | 能否保存目標資料量，斷電後是否要保留 | 容量不足會頻繁搬移；保留方式不符則放錯資料層 | 快閃記憶體、堆疊與控制器 | 公司把 HBF 定位為快閃記憶體方案；尚無實體產品規格 |
-| 2. 讀取與等待時間 | 連續與分散讀取能否在工作負載要求內完成 | 總頻寬看似很高，單次取用仍可能等太久 | 底部邏輯晶片、控制器與介面 | 只有公司技術定位；沒有共同條件下可重現的第三方結果 |
-| 3. 寫入、更新與耐久 | 能否承受應用需要的改寫頻率與服務壽命 | 只能大量讀取時，可能仍較像特殊儲存裝置 | 記憶體元件、控制器與韌體 | 現有來源未證明寫入、更新與耐久已達目標工作負載要求 |
-| 4. 功耗、熱與封裝 | 堆疊與底部邏輯晶片能否在系統功率與溫度範圍內穩定運作 | 熱點、功耗或接合問題可能限制速度、壽命與良率 | 封裝、測試、供電與散熱角色 | 公開方向包含底部邏輯晶片；尚無實體樣品的熱與功耗結果 |
-| 5. 系統整合與軟體調度 | 裝置、控制器與軟體是否知道哪些資料何時搬移 | 硬體即使可用，也可能沒有應用願意或能夠使用 | 裝置商、系統軟體、應用與客戶 | 2027 年初裝置樣品仍是公司目標；尚無具名系統運行結果 |
+| 1. 容量與資料保留 | 能否保存目標資料量，斷電後是否要保留 | 容量不足會頻繁搬移；保留方式不符則放錯資料層 | 快閃記憶體、堆疊與控制器 | 規格摘要列出 8 層／16 層與最高 512GB 包絡；尚非實體產品量測 |
+| 2. 讀取與等待時間 | 連續與分散讀取能否在工作負載要求內完成 | 總頻寬看似很高，單次取用仍可能等太久 | 底部邏輯晶片、控制器與介面 | 規格摘要列約 0.4 至 3.0 TB/s 三級；沒有延遲、存取型態、測試條件或第三方結果 |
+| 3. 寫入、更新與耐久 | 能否承受應用需要的改寫頻率與服務壽命 | 只能大量讀取時，可能仍較像特殊儲存裝置 | 記憶體元件、控制器與韌體 | 規格公告涵蓋軟體讀寫與可靠度指引；尚無寫入、更新與耐久測試結果 |
+| 4. 功耗、熱與封裝 | 堆疊與底部邏輯晶片能否在系統功率與溫度範圍內穩定運作 | 熱點、功耗或接合問題可能限制速度、壽命與良率 | 封裝、測試、供電與散熱角色 | 規格公告涵蓋封裝與可靠度；尚無實體樣品的功耗、熱、接合或良率結果 |
+| 5. 系統整合與軟體調度 | 裝置、控制器與軟體是否知道哪些資料何時搬移 | 硬體即使可用，也可能沒有應用願意或能夠使用 | 裝置商、系統軟體、應用與客戶 | 公告列 UCIe、主機介面與軟體讀寫；2027 年初裝置樣品仍是目標，尚無具名系統運行結果 |
+
+## 第一版技術規格先對齊哪四份合約
+
+下表是依 Sandisk／SK hynix 的聯合公告與 SK hynix 技術摘要整理的閱讀地圖，不是本文自行補寫
+的規範條款。本輪沒有從 OCP 公開入口取得可逐條定位的版本化規範原文，所以只能確認「公告說
+規格涵蓋什麼」，不能宣稱每一條 normative requirement、版本號或合規方法已被獨立核對。
+
+| 四份共同合約 | 公告摘要對齊什麼 | 初學者要避免的誤讀 | 下一份可升級證據 |
+|---|---|---|---|
+| 1. 產品包絡 | 8 層／16 層、最高 512GB、約 0.4 至 3.0 TB/s 三個頻寬等級 | 規格上限等於已交付產品實測，或總頻寬等於低延遲 | 可定位規範條款、樣品型號、測試方法與完整操作條件 |
+| 2. 主機與電氣介面 | xPU-HBF 主機介面、電氣連接與 UCIe 路徑 | 寫出介面名稱等於任一運算晶片已接通，或多廠產品已互通 | 版本與層級對應、compliance checklist、具名 silicon 與跨廠結果 |
+| 3. 堆疊、封裝與可靠度 | 堆疊配置、可靠度與封裝設計指引 | 設計指引等於接合、熱、良率及長期壽命已通過 | 樣品結構、熱／機械條件、可靠度方法、結果與接收方 |
+| 4. 軟體讀寫 | 軟體 read／write user guide 與硬軟共同設計方向 | 有讀寫指引等於驅動、資料放置與目標工作負載已完成 | 公開軟體介面、資料放置策略、具名裝置與端到端工作負載 |
+
+## 用兩個時鐘避免把規格當產品
+
+規格與產品會互相影響，卻不一定同步。把它們拆成兩個時鐘，讀者就能理解「這次真的有進展」
+與「仍不能稱為商用產品」為何可以同時成立。
+
+| 證據時鐘 | 依序要經過 | 截至本輪的位置 | 還不能說 |
+|---|---|---|---|
+| 規格時鐘 | 工作組 → 第一版共同文件 → 可定位規範條款 → 合規方法 → 具名通過 → 跨廠互通 | 廠商公告第一版技術規格發布，並摘要四份合約；OCP 仍列工作組 | 本輪已逐條核對規範原文、產品已合規或多廠已互通 |
+| 產品時鐘 | 架構 → 實體記憶體樣品 → 裝置樣品 → 客戶資格 → 穩定量產 → 可辨識收入 | 架構與未來樣品時程已公開；本輪未見具名交付的實體樣品 | 裝置已完成、客戶已採用、量產出貨或供應鏈已有財務貢獻 |
 
 ## 再把商用化拆成六關
 
@@ -362,7 +628,7 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 | 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
 | 1. 技術位置與工作負載說清楚 | 想處理哪類資料，為何不能由既有記憶體或儲存裝置完成 | SK hynix 描述快閃記憶體、底部邏輯晶片與鍵值快取位置 | 共同工作負載、延遲、寫入、耐久、熱與功耗結果 | 效能已勝過高頻寬記憶體，或所有推論工作負載都適用 |
-| 2. 共同規則公開 | 多家產品要如何交換資料、測試與互通 | 兩家公司公告開放運算計畫工作組；官方索引列出 HBF | 公開規格、版本、介面與合規計畫 | 規格已完成、多家產品已互通或已有合規結果 |
+| 2. 共同規則公開 | 多家產品要如何交換資料、測試與互通 | 兩家公司已公告第一版技術規格發布，摘要主機／電氣介面、產品包絡、封裝可靠度與軟體讀寫 | OCP 可定位的版本化規範原文、條款對應、合規方法與跨廠結果 | 公告摘要已等同全文核對、多家產品已互通或已有合規結果 |
 | 3. 交出可測記憶體樣品 | 實體記憶體是否按規格做出並交給接收方測試 | Sandisk 以 2026 年下半年為首批樣品目標 | 實際交付日、規格、測試條件與接收方 | 樣品已交付、測試已通過或已有客戶訂單 |
 | 4. 完成裝置整合 | 記憶體是否被放入具名裝置，並由軟體安排目標工作負載 | Sandisk 以 2027 年初為首批裝置樣品目標 | 具名裝置、軟體調度、工作負載與運行結果 | 裝置樣品已完成、可大規模部署或已被客戶採用 |
 | 5. 通過客戶資格認證 | 客戶是否依指定產品與條件完成驗證 | 本輪沒有完成證據 | 客戶名稱、測試條件、通過結果與採購節點 | 開始測試就等於通過，或單一客戶可代表整個市場 |
@@ -375,11 +641,11 @@ HBF 若真的成為新記憶體層，不會只由一顆記憶體晶片完成。�
 
 | 接力角色 | 要交付什麼 | 要和下一角色說清楚 | 本輪證據 | 不能外推 |
 |---|---|---|---|---|
-| 快閃記憶體與堆疊 | 提供容量、資料保留與可製造的記憶體結構 | 晶粒、堆疊、讀寫、耐久與測試規格 | 公開方向使用快閃記憶體；尚無最終晶粒、堆疊或樣品規格 | 一般固態硬碟用快閃記憶體可直接替代，或所有記憶體廠都能生產 HBF |
-| 底部邏輯晶片與控制器 | 安排平行資料傳輸、命令與錯誤處理 | 介面、控制協定、製程、功耗與熱邊界 | SK hynix 公開底部邏輯晶片方向；沒有最終製程、供應商或實測 | 已完成設計、已選定晶圓代工或控制器供應商 |
-| 封裝、測試與熱管理 | 把堆疊與邏輯晶片整合成可測、可散熱的產品 | 接合、互連、測試覆蓋、良率與散熱條件 | 只形成封裝與測試搜尋入口；沒有具名供應商或產品 | 服務高頻寬記憶體的公司必然取得 HBF 訂單 |
-| 裝置、系統與軟體 | 把記憶體放進具名裝置，安排資料搬移與工作負載 | 裝置介面、驅動、軟體調度與端到端結果 | 裝置樣品仍是未來目標；沒有具名系統或軟體結果 | 單一展示板等於可部署產品，或應用會自動採用新硬體 |
-| 客戶、製造與財務 | 完成資格認證、穩定製造、持續採購與財務揭露 | 通過條件、良率、出貨、重複訂單與同期間收入 | 本輪沒有客戶通過、量產、訂單或可辨識財務證據 | 工作組、樣品目標或公司總營收等於 HBF 商業化成功 |
+| 快閃記憶體與堆疊 | 提供容量、資料保留與可製造的記憶體結構 | 晶粒、堆疊、讀寫、耐久與測試規格 | 共同規格摘要列出 8／16 層與容量包絡；尚無具名實體樣品、晶粒細節或量測 | 一般固態硬碟用快閃記憶體可直接替代，或所有記憶體廠都能生產 HBF |
+| 底部邏輯晶片與控制器 | 安排平行資料傳輸、命令與錯誤處理 | 介面、控制協定、製程、功耗與熱邊界 | 技術方向有底部邏輯晶片，規格摘要列主機／電氣介面與 UCIe；沒有具名 silicon 或實測 | 已完成設計、已選定晶圓代工或控制器供應商 |
+| 封裝、測試與熱管理 | 把堆疊與邏輯晶片整合成可測、可散熱的產品 | 接合、互連、測試覆蓋、良率與散熱條件 | 規格公告涵蓋可靠度與封裝指引；沒有具名產品、測試結果或供應商 | 服務高頻寬記憶體的公司必然取得 HBF 訂單 |
+| 裝置、系統與軟體 | 把記憶體放進具名裝置，安排資料搬移與工作負載 | 裝置介面、驅動、軟體調度與端到端結果 | 規格公告涵蓋軟體讀寫；裝置樣品仍是未來目標，沒有具名運行結果 | 加入規格 consortium 或單一展示板等於可部署產品 |
+| 客戶、製造與財務 | 完成資格認證、穩定製造、持續採購與財務揭露 | 通過條件、良率、出貨、重複訂單與同期間收入 | Google／Tenstorrent 只由聯合公告列為 consortium members；沒有產品通過、量產、訂單或 HBF 財務分子 | 參與技術驗證、規格發布或公司總營收等於 HBF 商業化成功 |
 
 ## 來源與證據邊界
 
@@ -387,9 +653,15 @@ HBF 若真的成為新記憶體層，不會只由一顆記憶體晶片完成。�
 - [OCP Semi-Private Workstreams](https://www.opencompute.org/community/semi-private-workstreams)（HBF 工作組的獨立索引）。
 - [SK hynix TSMC Symposium 2026](https://news.skhynix.com/en/tsmc-technology-symposium-2026/)（NAND、KV cache 與 logic base die 技術位置）。
 - [Sandisk Memory-Centric AI](https://www.sandisk.com/company/newsroom/blogs/2025/memory-centric-ai)（樣品目標與公司模擬邊界）。
+- [Sandisk／SK hynix 第一版 HBF 技術規格公告](https://investor.sandisk.com/news-releases/news-release-details/sandisk-and-sk-hynix-advance-global-standardization-high)（規格發布、主機／電氣介面、封裝可靠度、軟體讀寫與 consortium members）。
+- [SK hynix FMS 2026 HBF 規格摘要](https://news.skhynix.com/en/hbf-at-fms-2026/)（8／16 層、最高 512GB、三個頻寬等級、UCIe 與軟體 I/O）。
+- [SK hynix FMS 2026 回顧](https://news.skhynix.com/en/fms-2026/)（分層記憶體與硬軟共同設計敘事）。
+- [Sandisk Q4 FY26 Earnings Presentation](https://investor.sandisk.com/static-files/c75d1bee-c5c9-4e5a-8605-302c1aeac59b)（HBF 只在產品組合層級出現，沒有 HBF 獨立財務分子）。
 
-本篇不採用 Sandisk 的模擬結果來宣稱 HBF 與 HBM 效能相等，也不比較不同公司的頻寬、容量、
-成本或良率。因為沒有共同測試條件與外部實體產品，這些數字不能用來做跨產品勝負或公司估值。
+8 月 3 日與 8 月 4 日兩篇是同一 Sandisk／SK hynix 共同規格消息鏈，不能當成兩份獨立採用證據；
+Google 與 Tenstorrent 也只由這條聯合消息鏈列為 consortium members。本篇只把 512GB 與約 0.4
+至 3.0 TB/s 寫成公告的規格包絡，不採用 Sandisk 模擬來宣稱 HBF 與 HBM 效能相等，也不拿沒有
+共同測試條件的容量、頻寬、成本或良率做跨產品勝負與公司估值。
 
 ## 影響路由
 
@@ -399,9 +671,9 @@ stock_ids:
 direction: uncertain
 hypothesis_refs:
 note_action: watch
-action_due: 2026-08-17
-rationale: HBF 若形成新層，會連到 NAND、controller、logic base die 與記憶體分層；但本輪沒有 universe 公司被平台端具名，也沒有產品與財務雙向核對
-evidence_boundary: 記憶體或控制器能力不等於 HBF specification、sample、qualification、訂單或收入
+action_due: 2026-08-26
+rationale: 第一版共同規格讓 NAND、controller、logic base die、主機介面與軟體讀寫搜尋路由更具體；但本輪沒有 universe 公司被平台端具名，也沒有樣品、資格與財務雙向核對
+evidence_boundary: 外部共同規格或一般記憶體／控制器能力，不等於 universe 公司已有 HBF sample、qualification、訂單或收入
 -->
 
 <!-- impact
@@ -410,15 +682,15 @@ stock_ids:
 direction: uncertain
 hypothesis_refs:
 note_action: watch
-action_due: 2026-08-17
-rationale: HBF 概念使用堆疊與 logic base die，形成 bonding、TSV、測試與熱管理搜尋入口；但目前仍只有外部架構與樣品目標
-evidence_boundary: 具備先進封裝能力或服務 HBM 客戶，不等於取得 HBF 客戶 qualification、量產或財務貢獻
+action_due: 2026-08-26
+rationale: HBF 規格摘要已涵蓋 8／16 層堆疊、UCIe、封裝與可靠度指引，形成 bonding、TSV、測試與熱管理搜尋入口；但沒有具名封裝產品、樣品結果或 universe 供應商
+evidence_boundary: 規格指引、先進封裝能力或服務 HBM 客戶，不等於取得 HBF 客戶 qualification、量產或財務貢獻
 -->
 
 ## 下一個可證明／否定的節點
 
-- OCP 公開 HBF specification、介面、版本與 compliance 路線，而不是只有 workstream 名稱。
+- OCP 公開可直接定位的 HBF 規範版本與條款，並說清楚 xPU-HBF、UCIe、封裝可靠度及軟體 I/O 的層級與 compliance 路線。
 - Sandisk 或 SK hynix 公告實際 memory sample，並提供可核對的規格、測試條件與接收方。
 - 客戶或裝置端獨立確認 HBF device sample、工作負載、軟體調度與 qualification 結果。
-- 若 2026 下半年沒有樣品證據、時程延後或工作組停滯，C4 的成熟度與信心必須下修。
+- 若 2026 下半年沒有樣品證據、時程延後或規格沒有合規／互通路線，C9 的雙時鐘成熟度與信心必須下修。
 - 台灣公司只有在平台端與公司端完成具名產品、資格、出貨與財務雙向核對後，才能從搜尋路由升級為公司曝險線。

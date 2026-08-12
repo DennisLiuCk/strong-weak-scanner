@@ -212,3 +212,103 @@ status: active
 boundary: ODM 可能負責整櫃 configuration 與重設計只形成搜尋路由；沒有具名 test ownership pass fail deployment 或財務證據。
 next_trigger: 客戶與 ODM 雙向公布 test plan configuration ownership qualification retest 部署量及毛利。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-EMC-I10
+view: industry
+from_id: concept:ai-rack-emc-certification
+to_id: capability:large-eut-emc-test-site
+relation: requires
+claim_refs: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C9,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C10
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2023-03-14
+review_due: 2026-08-31
+status: active
+boundary: FCC 的大型設備 alternative 與 NIST 場地等效要求證明尺寸 幾何與場地能力要被記錄；不判定特定 AI rack 適用程序 實驗室家數 時槽或產品 pass。
+next_trigger: 具名 operator 或 lab 公布完整 rack 尺寸 測試體積 距離 場地等效與正式結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-EMC-I11
+view: industry
+from_id: concept:ai-rack-emc-certification
+to_id: process:emc-test-report-passport
+relation: requires
+claim_refs: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C13
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: 九欄護照是研究中心整合 FCC 與 NIST 文件的可比性工具 不是官方聯合標準 完整法規報告模板或具名產品合格證。
+next_trigger: 具名量產 AI rack 報告逐欄公開配置 方法 場地 結果 scope 與版本變更並可重複核對。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-EMC-I12
+view: industry
+from_id: concept:ai-rack-emc-certification
+to_id: metric:emc-compliance-margin
+relation: measured_by
+claim_refs: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C10,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C13
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: 裕量只有在方法 偵測器 頻寬 限制與不確定度固定時才可解讀；本文不建立跨方法通用 guard band 或公司排行。
+next_trigger: 完整 test report 同時揭露 measured value limit detector bandwidth margin uncertainty 與 decision rule。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-EMC-I13
+view: industry
+from_id: concept:ai-rack-emc-certification
+to_id: metric:measurement-uncertainty-decision-rule
+relation: measured_by
+claim_refs: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C10,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C13
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: NIST 支持 method-specific uncertainty budget 與校正證據 本線把它納入護照是研究整合；不替法規 客戶或 lab 指定單一判定規則。
+next_trigger: 具名 rack 報告公開 uncertainty budget decision rule 近限制值處置與重複量測分布。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-EMC-I14
+view: industry
+from_id: concept:ai-rack-emc-certification
+to_id: capability:emc-accreditation-scope-check
+relation: requires
+claim_refs: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C11,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C12,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C13
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: scope 核對只確認指定地點 方法 產品與活動是否在認可範圍 不能把 NVLAP mark 讀成產品 certification approval endorsement 或大型設備 capacity。
+next_trigger: 具名 lab scope 與 AI rack report 對上實際地點 方法 產品類別及 accredited unaccredited data 標示。
+-->

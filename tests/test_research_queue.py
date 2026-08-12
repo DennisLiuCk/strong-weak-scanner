@@ -1282,6 +1282,58 @@ class ResearchTopicSchemaV3ContractTest(unittest.TestCase):
         )
         self.assertIn("full", {row["scope"] for row in scan["rows"]})
 
+    def test_repo_ai_power_buffer_event_contract_preserves_thesis_clock(self):
+        topics = rq.load_topics(reports=lh.load_reports())
+        topic = next(
+            row for row in topics
+            if row["topic_id"] == "MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY"
+        )
+        self.assertEqual(topic["meta"]["last_reviewed_at"], "2026-08-03")
+        self.assertEqual(topic["meta"]["review_due"], "2026-09-01")
+        self.assertEqual(topic["meta"]["base_confidence"], "medium")
+        self.assertTrue(
+            {"S6", "S7"}.issubset(
+                {source["source_id"] for source in topic["sources"]}
+            )
+        )
+        claim = next(row for row in topic["claims"] if row["claim_id"] == "C9")
+        self.assertEqual(claim["label"], "inference")
+        self.assertEqual(
+            set(claim["supporting_source_ids"]),
+            {"S2", "S6", "S7"},
+        )
+        monitor = next(
+            row for row in topic["monitoring"] if row["monitor_id"] == "T3"
+        )
+        self.assertEqual(monitor["next_check"], "2026-09-01")
+        self.assertFalse(topic["quality_errors"])
+
+    def test_repo_liquid_cooling_coolant_contract_preserves_thesis_clock(self):
+        topics = rq.load_topics(reports=lh.load_reports())
+        topic = next(
+            row for row in topics
+            if row["topic_id"] == "MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES"
+        )
+        self.assertEqual(topic["meta"]["last_reviewed_at"], "2026-08-03")
+        self.assertEqual(topic["meta"]["review_due"], "2026-09-03")
+        self.assertEqual(topic["meta"]["base_confidence"], "high")
+        self.assertTrue(
+            {"S7", "S8"}.issubset(
+                {source["source_id"] for source in topic["sources"]}
+            )
+        )
+        claim = next(row for row in topic["claims"] if row["claim_id"] == "C12")
+        self.assertEqual(claim["label"], "inference")
+        self.assertEqual(
+            set(claim["supporting_source_ids"]),
+            {"S3", "S7", "S8"},
+        )
+        monitor = next(
+            row for row in topic["monitoring"] if row["monitor_id"] == "T3"
+        )
+        self.assertEqual(monitor["next_check"], "2026-09-03")
+        self.assertFalse(topic["quality_errors"])
+
     def test_scan_log_rejects_empty_id_and_impossible_clock_order(self):
         text = (
             "scan_id,window_start,window_end,scanned_at,scope,source_domains,"
@@ -1605,6 +1657,8 @@ class ReadabilityGateTest(unittest.TestCase):
             "2026-08-08_ai_rack_trust_root.md",
             "2026-08-09_ai_rack_emc_certification.md",
             "2026-08-09_ai_storage_data_plane.md",
+            "2026-08-12_chiplet_design_handoff_contracts.md",
+            "2026-08-12_ai_hardware_sdc_lifecycle.md",
             "2026-07-30_yageo_q2_earnings_call.md",
             "2026-07-31_missed_priority_q2_disclosures.md",
             "2026-08-01_ai_capex_cash_conversion.md",
@@ -1632,21 +1686,21 @@ class ReadabilityGateTest(unittest.TestCase):
         self.assertNotIn("目前看到的材料與元件做法", text)
         self.assertNotIn("onsemi 描述適用高電壓的 SiC 元件類別", text)
         self.assertIn("元件需求會轉移到別處，還是直接消失", text)
-        self.assertIn("## 從電網到晶片：每一段電力怎麼轉換", text)
+        self.assertIn("## 先用四個位置看：拓撲會把元件工作移到哪裡", text)
         self.assertIn(
-            "| 電力鏈位置 | 目前看到什麼做法 | 證據走到哪一步 |",
+            "| 本文四個位置 | 電力怎麼走 | 哪些工作被保留、移動或整合 |",
             text,
         )
         self.assertIn(
-            "onsemi 把這一段列為高電壓 SiC 元件的應用位置",
+            "| onsemi／ROHM | SST 不同電壓級的 SiC 路徑",
             text,
         )
         self.assertIn(
-            "這是公司提出的一種功能分工；不代表所有客戶都會採用同一套電路架構",
+            "這些資料共同反駁「800V 只會有一種材料」的簡化說法",
             text,
         )
         self.assertIn(
-            "不同測試條件下的效率、功率密度或成本直接排在一起",
+            "六把尺的重點不是替材料打總分，而是防止跨條件比較",
             text,
         )
         self.assertIn(
@@ -1664,12 +1718,13 @@ class ReadabilityGateTest(unittest.TestCase):
         self.assertNotIn("## 為何值得進佇列", text)
         self.assertNotIn("### 三組相互校驗的證據", text)
         self.assertNotIn("| 來源 | 已驗證 | 必須保留的邊界 |", text)
-        self.assertIn("### 從晶片變多到公司獲利，要過三關", text)
-        self.assertIn("**先確認晶片需求真的增加。**", text)
-        self.assertIn("**再確認測試工作真的增加。**", text)
-        self.assertIn("**最後確認台灣公司真的有收入。**", text)
-        self.assertIn("## 為什麼這三份資料要一起看", text)
-        self.assertIn("## 三組數字不能直接排高低", text)
+        self.assertIn("### 從晶片變多到公司獲利，先問四個問題", text)
+        self.assertIn("**測的是哪一種產品？**", text)
+        self.assertIn("**在哪些階段測？**", text)
+        self.assertIn("**一套單元能做多少工作？**", text)
+        self.assertIn("**誰真的收到錢？**", text)
+        self.assertIn("## 先把 tester TAM 拆成八個分母", text)
+        self.assertIn("## 五組數字不能直接排高低", text)
         self.assertIn(
             "| 公司資料 | 這份資料直接說了什麼 | 讀完仍不能下什麼結論 |",
             text,
@@ -1680,6 +1735,10 @@ class ReadabilityGateTest(unittest.TestCase):
         )
         self.assertIn(
             "evidence: editorial:plain_language_wave113_test_demand_bridge",
+            text,
+        )
+        self.assertIn(
+            "evidence: sources:S7,S8,S9,S10,S11",
             text,
         )
 
@@ -1750,6 +1809,83 @@ class ReadabilityGateTest(unittest.TestCase):
             "evidence: editorial:plain_language_wave81_protection_roles",
             text,
         )
+        for token in (
+            "## 同一條電力路徑有兩支時鐘",
+            "約 440ms 預充時間",
+            "在 10µs 內關斷 FET",
+            "source_id: S8",
+            "claim_id: C6",
+            "claim_id: C7",
+            "reason: added_precharge_and_fault_clearing_time_scale_evidence_without_refreshing_thesis_clock",
+            "last_reviewed_at: 2026-08-03",
+            "review_due: 2026-09-01",
+        ):
+            self.assertIn(token, text)
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "800vdc_protection_layers.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("metric:hot-swap-startup-time,metric,Hot-swap 預充時間", concepts)
+        self.assertIn(
+            "metric:hot-swap-fault-clearing-time,metric,Hot-swap 故障清除時間",
+            concepts,
+        )
+        self.assertIn("edge_id: KG-8PL-I11", graph)
+        self.assertIn("edge_id: KG-8PL-I12", graph)
+
+    def test_ai_process_control_article_separates_three_missions_and_six_fields(self):
+        path = Path(
+            rq.TOPICS_DIR
+        ) / "2026-08-02_ai_process_control_intensity.md"
+        text = path.read_text(encoding="utf-8")
+        for token in (
+            "reason: added_control_plan_sampling_sensitivity_false_alarm_"
+            "cycle_time_and_containment_without_refreshing_thesis_clock",
+            "## 「多檢查」不是規格：先拆三種任務與六個 control-plan 欄位",
+            "| 缺陷發現／製程除錯 |",
+            "| 量產監控／異常圍堵 |",
+            "| 篩選／產品處置 |",
+            "| 1. 失效與決策 |",
+            "| 2. 工序與檢查單位 |",
+            "| 3. 抽樣與覆蓋 |",
+            "| 4. 靈敏度與逃逸 |",
+            "| 5. 偽警報與分類 |",
+            "| 6. 結果時間與圍堵 |",
+            "source_id: S10",
+            "source_id: S11",
+            "source_id: S12",
+            "source_id: S13",
+            "claim_id: C11",
+            "claim_id: C12",
+            "claim_id: C13",
+            "claim_id: C14",
+            "monitor_id: T7",
+            "supporting_source_ids: S1,S2,S3,S8",
+            "last_reviewed_at: 2026-08-12",
+            "review_due: 2026-08-14",
+        ):
+            self.assertIn(token, text)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (ROOT / "notes" / "knowledge_graph" / "hbm.md").read_text(
+            encoding="utf-8"
+        )
+        concept_edges = (
+            ("concept:inspection-control-plan", "KG-HBM-I22"),
+            ("metric:inspection-sampling-coverage", "KG-HBM-I23"),
+            ("metric:defect-sensitivity-escape", "KG-HBM-I24"),
+            ("metric:nuisance-false-alarm", "KG-HBM-I25"),
+            ("metric:inspection-cycle-time", "KG-HBM-I26"),
+            ("capability:excursion-containment", "KG-HBM-I27"),
+        )
+        for concept_id, edge_id in concept_edges:
+            with self.subTest(concept_id=concept_id, edge_id=edge_id):
+                self.assertIn(concept_id, concepts)
+                self.assertIn(edge_id, graph)
 
     def test_ai_capacitor_article_starts_from_position_and_task(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_capacitor_role_map.md"
@@ -1768,6 +1904,45 @@ class ReadabilityGateTest(unittest.TestCase):
             "evidence: editorial:plain_language_wave82_capacitor_positions",
             text,
         )
+
+    def test_ai_capacitor_role_map_separates_nameplate_value_from_usable_envelope(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_capacitor_role_map.md"
+        text = path.read_text(encoding="utf-8")
+        for token in (
+            "reason: added_effective_capacitance_impedance_ripple_heating_and_lifetime_envelope",
+            "supporting_source_ids: S1,S2,S3,S4,S9,S10,S11",
+            "## 同樣的容量，為什麼仍不能互換：四道可用能力檢查",
+            "| 本文 4 把尺 |",
+            "| 1. 有效容量 |",
+            "| 2. 頻率阻抗 |",
+            "| 3. 紋波溫升 |",
+            "| 4. 任務壽命 |",
+            "source_id: S9",
+            "source_id: S10",
+            "source_id: S11",
+            "claim_id: C6",
+            "claim_id: C7",
+            "claim_id: C8",
+            "claim_id: C9",
+            "monitor_id: T3",
+        ):
+            self.assertIn(token, text)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_capacitor_role_map.md"
+        ).read_text(encoding="utf-8")
+        for metric, edge_id in (
+            ("metric:capacitor-effective-capacitance", "KG-ACR-I10"),
+            ("metric:capacitor-impedance-spectrum", "KG-ACR-I11"),
+            ("metric:capacitor-ripple-temperature-rise", "KG-ACR-I12"),
+            ("metric:capacitor-mission-life", "KG-ACR-I13"),
+        ):
+            self.assertIn(metric, concepts)
+            self.assertIn(f"to_id: {metric}", graph)
+            self.assertIn(f"edge_id: {edge_id}", graph)
 
     def test_ai_power_buffering_article_starts_from_duration_location_and_task(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_power_buffering_hierarchy.md"
@@ -1855,6 +2030,30 @@ class ReadabilityGateTest(unittest.TestCase):
             "evidence: editorial:plain_language_wave85_full_rack_emc_layers",
             text,
         )
+        self.assertIn(
+            "## 兩份都寫「通過」，為什麼仍可能不能相比",
+            text,
+        )
+        self.assertIn(
+            "## 用九欄 EMC 測試報告護照核對一份結果",
+            text,
+        )
+        self.assertIn(
+            "| 護照欄位 | 報告至少要留下什麼 | 缺欄時最容易誤讀成什麼 |",
+            text,
+        )
+        self.assertIn(
+            "## 裕量不是保證：量測不確定度與判定規則要一起看",
+            text,
+        )
+        self.assertIn(
+            "## 實驗室有認可標誌，為什麼仍不能替產品背書",
+            text,
+        )
+        self.assertIn(
+            "evidence: sources:S8,S9,S10,S11",
+            text,
+        )
 
     def test_ai_rack_trust_article_separates_four_instruction_checks(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-08_ai_rack_trust_root.md"
@@ -1885,6 +2084,25 @@ class ReadabilityGateTest(unittest.TestCase):
             "evidence: editorial:plain_language_wave86_instruction_trust_four_checks",
             text,
         )
+        self.assertIn(
+            "## 有簽章的量測報告，為什麼仍不是「可以執行指令」",
+            text,
+        )
+        self.assertIn(
+            "## 用八欄遠端證明決策護照查一份平台資料",
+            text,
+        )
+        self.assertIn(
+            "| 八欄護照 | 至少記下什麼 | 缺少時最容易誤讀成 |",
+            text,
+        )
+        self.assertIn(
+            "reason: expanded_attestation_evidence_policy_decision_and_recovery_contract",
+            text,
+        )
+        self.assertEqual(text.count("<!-- research_claim\n"), 16)
+        self.assertEqual(text.count("<!-- research_source\n"), 11)
+        self.assertEqual(text.count("<!-- monitoring_item\n"), 4)
 
     def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):
         body = self.LEAD + "- active claim 已進入 watch，對應 H1。\n"

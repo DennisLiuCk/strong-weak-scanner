@@ -118,6 +118,38 @@ locator: 台灣 ODM、PCB、電源與散熱公司季報、法說及重大訊息�
 limitation: 買方 CapEx 只能觸發此入口的公司級查找；入口本身不證明訂單、收入或毛利
 -->
 
+<!-- research_source
+source_id: S7
+role: company_filing
+source_kind: document
+publisher: Meta Platforms
+title: Meta Platforms 2026 Q1 Form 10-Q
+published_at: 2026-04-30
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1326801/000162828026028526/meta-20260331.htm
+locator: Note 6 Property and Equipment 的 construction in progress 與 held-for-sale assets；Note 8 尚未起租的租賃及 contractual commitments
+limitation: 申報把承諾 在建工程與待售資產分開，但沒有逐批 placed-in-service 日期 使用率 AI 專屬資產分子或台灣供應商對應
+independence_group: meta
+-->
+
+<!-- research_source
+source_id: S8
+role: company_filing
+source_kind: document
+publisher: Amazon
+title: Amazon 2026 Q1 Form 10-Q
+published_at: 2026-04-30
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1018724/000101872426000014/amzn-20260331.htm
+locator: supplemental cash-flow information 的 acquired but not yet paid；Note 1 AWS performance obligations 與 revenue timing；segment PP&E net additions
+limitation: Amazon 的資產增加與履約義務是公司級口徑，沒有把同一資產批次連到 AI 使用量 邊際收入 現金回收或台灣供應商
+independence_group: amazon
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -185,6 +217,62 @@ as_of: 2026-08-01
 basis: 買方揭露沒有提供台灣供應商、料號、採購份額、上線時程或毛利資料
 boundary: 目前只建立族群需求搜尋觸發，不建立任何個股收入、市占或獲利事實
 verification_needed: 需要雲端客戶與台灣供應商文件雙向核對產品、時程、數量與財務貢獻
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C6
+label: inference
+status: active
+claim: 要把雲端買方 AI CapEx 連到台灣供應商財務，至少要分開資本承諾、現金與租賃支出、資產建置與試運轉、可用容量、工作負載與收入、買方現金回收、供應商財務歸因七道證據閘門
+supporting_source_ids: S1,S2,S3,S4,S5
+contrary_source_ids:
+as_of: 2026-08-12
+basis: 三家公司揭露把支出、租賃、雲端需求、FCF 與折舊政策放在不同表格和期間；逐站分開可避免把會計分類、資產上線與供應商受惠合併成同一結論
+boundary: 七關是研究與對帳框架，不代表三家公司都已逐關揭露，也不證明任一台灣供應商已取得訂單、收入、毛利或現金
+verification_needed: 需要買方與供應商以同一平台、料號、期間、數量與公司財務分母雙向核對
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C7
+label: verified
+status: active
+claim: Meta 2026 Q1 申報分別揭露尚未起租的資料中心等租賃 在建工程中的資料中心 網路與伺服器成本，以及轉為待售的資料中心在建工程與土地
+supporting_source_ids: S7
+contrary_source_ids:
+as_of: 2026-04-30
+basis: S7 的 Note 6 與 Note 8 直接把 lease not yet commenced construction in progress 及 held-for-sale assets 分列
+boundary: 只證明 Meta 報表中的不同資產與承諾狀態；不代表所有承諾都會取消，也不提供逐批上線 使用率 收入或供應商分子
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: Amazon 2026 Q1 申報明示 PP&E 淨增加包含已取得但尚未付款的非現金活動，而 AWS 未認列的未來服務承諾要依客戶使用與公司履約決定收入時點
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-04-30
+basis: S8 的 supplemental cash-flow information segment PP&E 與 performance obligations 段落分別界定資產增加 付款及收入認列時點
+boundary: 只證明 Amazon 報表裡三個時點可以分離；不表示任何特定 AI 專案的資產 客戶使用 收入與現金已完成逐筆配對
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: inference
+status: active
+claim: 閱讀 AI 基建投入至少要同時保留合約承諾 資產可用 客戶使用與收入認列 現金支付與回收四個獨立時鐘；任一時鐘前進都不能代替另外三個
+supporting_source_ids: S1,S2,S3,S7,S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S1 至 S3 已把 headline CapEx cash PP&E 租賃 OCF 與 FCF 分開；S7 再分開未起租承諾 在建工程與待售；S8 又分開資產取得但未付款以及依使用與履約認列收入
+boundary: 四時鐘是跨申報建立的研究對帳框架，不是所有公司的共同會計科目，也不證明任一台灣供應商訂單 收入 毛利 現金或投資報酬
+verification_needed: 需要同一具名資產或平台批次的合約生效 placed-in-service 使用與收入 付款及供應商收款日期才能量出各時鐘的實際落差
 resolution:
 -->
 
@@ -409,14 +497,39 @@ to: triaged
 reason: editorial_plain_language_wave8_learning_no_conclusion_change
 evidence: editorial:plain_language_wave8
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: capex_to_supplier_financial_bridge_synthesized_from_existing_disclosures
+evidence: sources:S1,S2,S3,S4,S5
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: four_accounting_clocks_added_from_meta_and_amazon_filings_without_refreshing_thesis_clock
+evidence: sources:S7,S8
+-->
 
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **CapEx（資本支出）**：買進或建造可使用多年的資產，例如資料中心、伺服器與網路設備；公司對 CapEx 的揭露可能含現金購置、融資租賃或兩者。
+- **PP&E（不動產、廠房及設備）**：資產負債表上的長期實體資產類別；「cash paid for PP&E」是期間現金流，「PP&E 餘額」是某一時點仍留在帳上的資產，兩者不是同一個數字。
+- **在建工程（CIP）**：仍在施工、安裝或測試，通常還沒準備好按預定方式使用的資產；預算已花不代表它已能提供雲端容量。
+- **尚未起租的租賃（lease not yet commenced）**：合約已簽，但租期與資產使用權尚未開始；承諾金額不等於當期 CapEx、現金付款或可用容量。
+- **試運轉／啟用（commissioning／placed in service）**：設備完成通電、測試與驗收，轉成可使用資產的交接點；它不自動代表客戶已把容量用滿。
+- **利用率（utilization）**：可用容量實際被工作負載使用的程度；若沒有共同分母、時間窗和產品範圍，不同公司利用率不能直接比較。
 - **營業現金流（OCF）**：本業在一段期間內帶進或用掉的現金，會受收款、付款、預收與存貨等營運資金影響。
 - **自由現金流（FCF）**：公司用營業現金流減掉某種資本支出口徑後得到的非 GAAP 指標；不同公司公式不同，不能只看同一個名稱就直接比較。
+- **營運資金（working capital）**：存貨、應收、應付與預收等日常營運項目占用或釋放的資金；供應商即使已認列收入，也可能尚未收到現金。
+- **存貨**：已買入或製成、但尚未完成銷售與認列成本的原料、在製品或成品；增加可能是備貨，也可能是出貨延遲，需和訂單、出貨與周轉一起看。
+- **應收帳款**：已認列收入、但客戶尚未付款的金額；收入增加而應收同步拉長，不等於現金已回收。
+- **供應商財務歸因**：用同一平台、產品、期間與公司分母，把客戶需求連到供應商的出貨、收入、毛利與現金；只知道買方 CapEx 不足以完成歸因。
+- **履約義務（performance obligation）**：公司已承諾未來提供的服務；簽約或客戶預付不等於收入已認列，仍要看客戶使用與公司是否完成約定服務。
+- **非現金資產增加**：資產已取得或記入 PP&E，但付款可能尚未發生，或由租賃等方式取得；它會讓資產時鐘早於現金時鐘。
 - **融資租賃（finance lease）**：先取得資產使用權、分期付款的融資方式；它可能計入 headline CapEx，卻不在當期「cash paid for PP&E」裡一次流出。
 - **耐用年限**：會計上預估資產可使用多久，決定每年折舊速度；改變耐用年限會改變損益與租賃分類，卻不一定改變實際建置計畫。
 - **AWS**：Amazon Web Services，Amazon 的雲端運算事業；其營收成長不能直接分配到任一台灣供應商。
@@ -428,7 +541,7 @@ evidence: editorial:plain_language_wave8
 
 - 微軟 FY2026 Q4、Meta 2026 Q2 與 Amazon 2026 Q2 都顯示 AI 基建支出很強，但三家的 CapEx、租賃與 FCF 定義並不相同。
 - 微軟單季仍有 196 億美元 FCF，Meta 單季只剩 7.84 億美元；Amazon 公布的是過去十二個月 FCF 流出 76.04 億美元，不能把三個數字排成簡單高低榜。
-- 對台灣供應鏈，這些數字只證明大買方正在配置大量資本，尚未證明哪家 ODM、PCB、電源或散熱廠拿到多少訂單，更未證明投資回收率。
+- Meta 與 Amazon 的申報再顯示，合約承諾、資產可用、客戶使用／收入與現金是四個不同時鐘；任一個前進都不能單獨證明台灣供應商訂單或投資回收。
 
 ### 為什麼重要
 
@@ -481,6 +594,65 @@ evidence: editorial:plain_language_wave8
 3. **變現**：雲端／AI 營收、使用率、定價與毛利是否跟上。
 4. **回收**：OCF、FCF 與資產報酬是否在合理時間內改善。
 
+## 同一個資料中心有四個時鐘
+
+七關橋接可以逐站查證；第一次閱讀時，先把資料放進四個時鐘更容易避免重複計算。四個時鐘可能互相重疊，卻不會自動同步。
+
+| 時鐘 | 報表或文件裡會看到什麼 | 這個時鐘何時前進 | 還不能代替哪個時鐘 |
+|---|---|---|---|
+| 合約承諾 | 尚未起租的租賃、不可取消承諾、採購或容量合約 | 合約生效、租期開始，或承諾轉成實際採購 | 不代表資產已可用、客戶已使用或現金已全數支付 |
+| 資產可用 | 在建工程、設備安裝、試運轉、轉入可使用資產 | 通電、測試、驗收並可按預定用途服務 | 不代表容量已售出、利用率足夠或收入已認列 |
+| 客戶使用與收入 | 使用量、履約義務、未實現收入、服務收入與毛利 | 客戶實際使用，且公司完成合約要求的服務 | 不代表客戶已付款，也不直接等於供應商已收現 |
+| 現金支付與回收 | cash PP&E、租賃本金、應付、OCF、FCF、應收與收款 | 公司支付資產款，或由營運與客戶收款帶回現金 | 不說明資產是否已上線，也不能單獨證明是哪一批設備產生現金 |
+
+Meta 的 2026 Q1 申報提供一個很有用的反例：同一份報表同時列出尚未起租的資料中心等租賃、資料中心／網路／伺服器在建工程，以及被轉為待售的資料中心在建工程與土地。這證明「已承諾」與「仍在建」都不能自動改寫成「已提供服務」；轉為待售也提醒讀者，不是每一筆在建資本最後都照原路線上線。
+
+Amazon 的 2026 Q1 申報則把另外兩個時差寫得很清楚：PP&E 淨增加可包含資產已取得但尚未付款的非現金活動；AWS 的未來服務承諾則要依客戶使用與公司履約決定收入認列時點。因此資產時鐘可以早於現金時鐘，合約時鐘也可以早於收入時鐘。
+
+四個時鐘不是新的一套公司排名。真正可重算的橋接，仍要用同一具名資產或平台批次，把合約生效、轉入可使用、客戶使用與收入、付款與供應商收款日期一一對上；目前公開資料還做不到。
+
+## 把四道閘門展成七張交接單
+
+四道閘門適合快速閱讀；要把「大買方正在花錢」一路接到「台灣公司真的賺到錢」，則要拆成七張可以逐欄驗收的交接單。這七站是**研究順序**，不是保證每一美元都照同一天發生的物理流水線。
+
+| 站點 | 要找的原始證據 | 這一站能證明什麼 | 還不能證明什麼 |
+|---|---|---|---|
+| 1. 資本計畫與承諾 | 全年 CapEx 指引、董事會預算、採購或租賃承諾 | 管理層打算配置多少資本 | 當期已付款、設備已交付或供應商已認列收入 |
+| 2. 現金 PP&E 與租賃 | cash paid for PP&E、finance-lease additions／principal、其他租賃付款 | 哪部分已用現金或融資方式取得資產 | 這些支出全是 AI，也不能直接拆成 GPU、伺服器、建物或電力份額 |
+| 3. 資產建置與試運轉 | 在建工程、安裝、通電、測試、驗收、placed-in-service 日期 | 資本是否從付款進到可使用資產 | 容量已對客戶開放或已有足夠工作負載 |
+| 4. 服務容量可用 | 可供使用的運算、儲存、網路或電力容量與開通區域 | 系統已能承接工作負載 | 利用率、售價、營收與毛利已足以回收投資 |
+| 5. 工作負載、利用與收入 | 使用量、客戶數、定價、雲端／AI 收入與毛利 | 可用容量是否轉成商業活動 | 收入增量全由本期新資產造成，或買方現金已回收 |
+| 6. 買方現金回收 | 同期間 OCF、公司定義 FCF、營運資金與折舊政策 | 營運現金是否足以吸收資本投入 | 任一供應商取得多少訂單、毛利或現金 |
+| 7. 供應商財務歸因 | 共同平台／料號、客戶資格、出貨期間、收入分母、毛利、存貨、應收與 OCF | 題材是否真的落到具名公司的財務結果 | 沒有雙向核對時，不能由公司總額反推單一客戶或產品貢獻 |
+
+### 同一美元會在不同帳本、不同時間出現
+
+「預計投入一美元」、「簽下一美元租賃」、「支付一美元 PP&E」、「把一美元資產轉入可使用狀態」、「認列折舊」、「雲端收到一美元收入」與「供應商收回一美元應收」是不同事件。把它們加總會重複計算，把其中任何一個當成其他事件也會跳過證據。研究紀錄至少要保存**公司、期間、資產或產品範圍、現金／非現金分類、公式與交接狀態**。
+
+### 買方與供應商要做兩端對帳
+
+| 對帳端 | 最少需要的欄位 | 目前三家公司資料做到哪裡 |
+|---|---|---|
+| 買方資本端 | 資本指引、cash PP&E、租賃增加／本金、資產範圍、上線時間 | 已有公司總額與部分資產說明；缺少完整 AI 品項、站點與上線批次 |
+| 買方營運端 | 可用容量、使用量、收入、毛利、OCF 與一致公式 FCF | 已有需求、雲端成長與公司現金流；缺少同一批新增容量的利用率與回收橋接 |
+| 供應商交付端 | 平台、料號、資格日期、數量、出貨與驗收期間 | 買方資料沒有列出台灣供應商與份額 |
+| 供應商財務端 | 同期間收入分母、產品／客戶分子、毛利、存貨、應收、OCF | 尚無足以把三家買方支出直接歸因到 universe 個股的雙向文件 |
+
+供應商端還多一道時間差：先備料會增加存貨，出貨驗收後才可能認列收入，允許賒帳時又先形成應收，客戶付款後才進現金。因此「買方 CapEx 增加」與「供應商 OCF 改善」不必同季發生；反過來，供應商營收上升但存貨、應收或毛利惡化，也不能只看營收就說已完整受惠。
+
+### 新手最常把哪幾件事畫上等號
+
+- 資本**承諾**不等於已支付現金。
+- 已支付現金不等於全部是 AI 伺服器或台灣零組件。
+- 資產轉入可使用狀態不等於容量已被客戶用滿。
+- 雲端收入成長不等於本期新容量的 ROI 已可重算。
+- 買方 FCF 下降不等於供應商需求同步下降；兩端付款、存貨與認列時點不同。
+- 供應商營收成長不等於毛利與現金同步改善，更不等於可把增量全歸因單一題材。
+
+### 在研究中心裡接著怎麼學
+
+本篇是「資本投入與公司財務」路線第一站，教的是買方七關與雙向對帳。下一站的**國巨 Q2 公司財務分母**案例，會再示範：即使一家公司總營收可以由兩條官方路徑交叉重算，題材產品分子未揭露時，仍不能把公司總額改寫成 AI、單一產品或單一客戶收入。
+
 ## 會計口徑本身也會移動
 
 微軟宣布自 FY2027 起把資料中心與辦公建物的估計耐用年限由 15 年延長到 25 年。公司明說，此變動只改變未來折舊時點，對 FY2027 營業利益的好處很小；較大的影響是更多資料中心租賃會由 finance lease 轉為 operating lease。前者計入 CapEx、後者不計，因此公司把 calendar 2026 CapEx 預期調整為約 1,750 億美元，同時強調排除耐用年限影響後，投資期待沒有改變。
@@ -496,12 +668,16 @@ evidence: editorial:plain_language_wave8
 - [Amazon 2026 Q2 results，2026-07-30](https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Second-Quarter-Results/default.aspx)
 - [Meta 2025 Form 10-K：伺服器／網路設備耐用年限，2026-01-29](https://www.sec.gov/Archives/edgar/data/1326801/000162828026003942/meta-20251231.htm)
 - [Amazon 2025 Form 10-K：伺服器／網路設備耐用年限，2026-02-06](https://www.sec.gov/Archives/edgar/data/1018724/000101872426000004/amzn-20251231.htm)
+- [Meta 2026 Q1 Form 10-Q：尚未起租、在建工程與待售資產](https://www.sec.gov/Archives/edgar/data/1326801/000162828026028526/meta-20260331.htm)
+- [Amazon 2026 Q1 Form 10-Q：未付款資產與 AWS 履約義務](https://www.sec.gov/Archives/edgar/data/1018724/000101872426000014/amzn-20260331.htm)
 
-**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；微軟與 Amazon 的雲端成長、Meta 的全年 CapEx 區間也有正式披露。
+**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。
 
 **還不知道：** CapEx 中每一項 AI 晶片、伺服器、網路、電力與建物的精確拆分，新增容量的上線時間與利用率，以及台灣 universe 個股的訂單與獲利份額。
 
 **不可外推：** 這不是三家公司 AI ROI 排名；期間與公式不同。買方 CapEx 也不能直接等同任何台灣供應商收入。沒有價格、估值、共識與部位資料，本題不判斷市場是否已反映。
+
+七關圖譜只把待交接的證據層畫清楚。它不把「資本計畫 → 現金支出 → 上線 → 利用 → 現金回收」當成已完成的因果鏈，也不把四個台灣族群的搜尋路由當成公司財務曝險。
 
 ## 影響路由
 
@@ -557,3 +733,4 @@ evidence_boundary: 不由雲端需求直接指認台灣散熱個股受惠，等�
 - **容量變現**：Azure、AWS 與 Meta AI 產品的使用量、營收與毛利是否跟上資產上線；若容量投入增加卻無法變現，需求故事要降權。
 - **分類調節**：微軟租賃分類改變後，同時看 reported CapEx 與 operating-lease cash payments，避免把分類位移誤讀為採購位移。
 - **台灣公司交叉驗證**：供應商 Q2／Q3 正式文件是否出現客戶認證、出貨、存貨／應收、毛利與 OCF 的同向改善；只有營收、沒有毛利與現金，不算完整受惠。
+- **兩端共同鍵**：買方與供應商能否同時指向同一平台、料號、期間、數量與驗收節點；缺任一端，就只保留需求搜尋路由，不建立題材財務歸因。

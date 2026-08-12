@@ -1,14 +1,15 @@
 # 混合接合（Hybrid bonding）知識圖譜
 
-本圖用設計規則、試驗結構、整合設備與穩定大量生產缺口呈現成熟度，不以最小接點間距取代
-良率、每小時產能與客戶資格認證。台灣族群只保留研究路由，沒有公司量產線。
+本圖把成熟度拆成應用、W2W／D2W 接法、介面世代與具名產品階段：Sony 影像感測器、TSMC SoIC
+與 AMD 3D V-Cache 提供已應用或 production 格；200nm 試驗結構與 pathfinding PDK 則保留在各自
+早期格。台灣族群只保留研究路由，沒有公司量產線。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: hybrid-bonding
 root_node_id: concept:hybrid-bonding
 label: 混合接合（Hybrid bonding）
-summary: 連接逐顆接晶圓與晶圓接晶圓、探索型設計規則、200nm 試驗結構、對準控制、平坦化與具名設備，同時把穩定大量生產與台灣財務映射留在待驗證層。
+summary: 連接 Sony 影像感測器、TSMC SoIC 與 AMD 3D V-Cache 的既有應用／production 證據，再分開逐顆接晶圓、晶圓接晶圓、探索型設計規則、200nm 試驗結構、對準控制與平坦化；任何成熟格都不能替其他應用、接法或介面世代繼承資格。
 article_ids: MI-2026-08-02-HYBRID-BONDING-READINESS
 status: active
 -->
@@ -54,6 +55,66 @@ next_trigger: Applied／Besi 與具名客戶雙向確認 HVM qualification、出
 -->
 
 <!-- knowledge_edge
+edge_id: KG-HYB-C03
+view: company
+from_id: company:sony-semiconductor
+to_id: concept:hybrid-bonding
+relation: uses_packaging
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C6
+note_refs:
+evidence_state: verified
+commercial_stage: deployment
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2024-04-22
+review_due: 2026-08-19
+status: active
+boundary: Sony 官方技術回顧把 Cu-Cu hybrid bonding 放入 2015 stacked BI-CIS 與後續產品功能演進；未公開各代流程、良率、throughput、成本或供應商份額。
+next_trigger: Sony 對具名產品世代補充 W2W／D2W、pitch、合格產出、可靠度與量產分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-C04
+view: company
+from_id: company:tsmc
+to_id: concept:hybrid-bonding
+relation: owns_platform
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C7
+note_refs:
+evidence_state: verified
+commercial_stage: production
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-06-17
+review_due: 2026-08-19
+status: active
+boundary: TSMC 表示 N7 SoIC CoW／WoW chips 已在 production 並列出 CPU＋SRAM 與 IPU＋DTC 應用；沒有逐產品良率、throughput、成本、利用率或財務分子。
+next_trigger: TSMC 固定產品、接法與節點後披露 qualification、合格產出、產能利用或可定位財務分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-C05
+view: company
+from_id: company:amd
+to_id: concept:hybrid-bonding
+relation: uses_packaging
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C7
+note_refs:
+evidence_state: verified
+commercial_stage: production
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-03-21
+review_due: 2026-08-19
+status: active
+boundary: AMD 把 EPYC 7003 3D V-Cache 商用處理器描述為 copper-to-copper hybrid bonding bumpless design；不採用公司效能倍數，也未取得接合良率、成本或供應商分子。
+next_trigger: AMD 對具名世代補充製造資格、接合介面、出貨分母或供應鏈雙向核對。
+-->
+
+<!-- knowledge_edge
 edge_id: KG-HYB-I01
 view: industry
 from_id: concept:hybrid-bonding
@@ -69,7 +130,7 @@ exclusivity_scope:
 as_of: 2026-03-02
 review_due: 2026-08-16
 status: active
-boundary: D2W 路徑已有 pathfinding PDK 與整合設備客戶使用，仍不等於 fabrication-ready tape-out 或具名產品 HVM。
+boundary: 本邊只描述 NanoIC／Kinex 這組新 D2W 格已有 pathfinding PDK 與整合設備客戶使用；AMD／N7 CoW 的既有 production 格不能替它完成 tape-out 或 HVM。
 next_trigger: 完整 tape-out、客戶 qualification、good-die yield 與 throughput。
 -->
 
@@ -89,7 +150,7 @@ exclusivity_scope:
 as_of: 2026-05-28
 review_due: 2026-08-16
 status: active
-boundary: W2W 已在 imec 200nm 試驗車展示，不可把試驗車 overlay 結果寫成客戶 HVM electrical yield。
+boundary: 本邊只描述 imec 200nm W2W 試驗車；TSMC N7 WoW production 格不能讓不同 pitch 與產品的試驗車自動取得客戶 HVM electrical yield。
 next_trigger: 具名 logic-to-logic 或 memory-to-logic 產品 qualification 與 HVM 資料。
 -->
 
@@ -231,4 +292,64 @@ review_due: 2026-10-31
 status: active
 boundary: SiCN、Cu、清洗化學品與 CMP 耗材是材料入口；沒有台灣公司具名料號、qualification、份額或財務證據。
 next_trigger: 材料商與客戶對同一量產製程完成雙向核對。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I10
+view: industry
+from_id: concept:hybrid-bonding
+to_id: product:stacked-cmos-image-sensor
+relation: names_application
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C6
+note_refs:
+evidence_state: verified
+commercial_stage: deployment
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2024-04-22
+review_due: 2026-08-19
+status: active
+boundary: Sony 技術回顧證明 stacked CIS 是較早混合接合應用家族；不同感測器世代、材料與多層流程仍須逐格判定。
+next_trigger: 具名感測器世代對上接法、pitch、qualification、良率與出貨分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I11
+view: industry
+from_id: concept:hybrid-bonding
+to_id: product:tsmc-soic
+relation: names_application
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C7
+note_refs:
+evidence_state: verified
+commercial_stage: production
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-06-17
+review_due: 2026-08-19
+status: active
+boundary: N7 SoIC CoW／WoW 有 production 聲明；SoIC 平台內其他節點、接法與 bond pitch 不沿用同一成熟度。
+next_trigger: 各 SoIC 世代固定產品、接法與介面後公開 qualification、良率、throughput 或成本。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I12
+view: industry
+from_id: concept:hybrid-bonding
+to_id: product:amd-3d-v-cache
+relation: names_application
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C7
+note_refs:
+evidence_state: verified
+commercial_stage: production
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-03-21
+review_due: 2026-08-19
+status: active
+boundary: EPYC 7003 3D V-Cache 是具名商用 hybrid-bond product family；不代表其他 CPU、GPU、HBM 或細間距試驗格相同成熟。
+next_trigger: AMD 或製造端對同一產品世代補充接合資格、產量、良率或財務分母。
 -->

@@ -1,14 +1,15 @@
 # AI 資料讀取與儲存路徑知識圖譜
 
-本圖把訓練時餵資料、故障前保存進度與服務擴充時搬模型拆成三種工作。公司線只表示已核驗的
-儲存能力或平台路徑；沒有買方客戶認證、部署分母與財務資料前，不把相鄰能力畫成訂單。
+本圖把訓練時餵資料、故障前保存進度與服務擴充時搬模型拆成三種工作，並把 checkpoint 的
+暫存、上傳、耐久、正確回載與訓練有效時間分成不同驗證節點。公司線只表示已核驗的儲存能力
+或平台路徑；沒有買方客戶認證、部署分母與財務資料前，不把相鄰能力畫成訂單。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-storage-data-plane
 root_node_id: concept:ai-storage-data-plane
 label: AI 資料讀取與儲存路徑
-summary: 以最慢讀取時間 保存與復原 以及模型副本位置分開三種人工智慧資料工作 再把平台機制與台灣公司能力保持在不同證據層。
+summary: 以最慢讀取時間 checkpoint 完成與復原 以及模型副本位置分開三種人工智慧資料工作 再用八格復原護照把 I/O 模擬 暫存上傳 耐久回載 訓練有效時間與公司能力保持在不同證據層。
 article_ids: MI-2026-08-09-AI-STORAGE-DATA-PLANE
 status: active
 -->
@@ -71,6 +72,26 @@ review_due: 2026-08-31
 status: active
 boundary: ModelExpress 文件證明權重來源與 transport fallback 能力；不證明所有 inference stack 採用 production deployment 或各路徑硬體增量。
 next_trigger: NVIDIA 或客戶公布 production rollout cold-start SLO 路徑命中率與具名設備配置。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-C04
+view: company
+from_id: company:google
+to_id: concept:ai-storage-data-plane
+relation: owns_platform
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C11
+note_refs:
+evidence_state: verified
+commercial_stage: deployment
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2025-06-16
+review_due: 2026-08-31
+status: active
+boundary: Google Cloud 文件證實自身多層 checkpoint 路徑與單一具名工作負載組態的 vendor-reported Goodput 結果；沒有公開重複 run 變異原始資料完整 baseline 設備 BOM 或台灣供應商映射。
+next_trigger: Google 或客戶公開版本化受測系統 重複 run fault injection restore correctness Runtime Goodput 資源成本與具名設備配置。
 -->
 
 <!-- knowledge_edge
@@ -226,10 +247,10 @@ commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-09
+as_of: 2026-08-12
 review_due: 2026-08-31
 status: active
-boundary: 將三條資料流放回記憶體分層是跨來源研究推論；不表示 HBM system RAM local SSD 與 shared storage 可以互換或需求可重複加總。
+boundary: Google 多層 checkpoint 直接包含 node RAM 跨 slice 或 superblock 副本與 Cloud Storage；但將三條資料流統一放回記憶體分層仍是跨來源研究推論，不表示 HBM system RAM local SSD 與 shared storage 可以互換或需求可重複加總。
 next_trigger: 同一平台公開資料 placement SLO 搬移成本與各層容量利用率。
 -->
 
@@ -271,4 +292,64 @@ review_due: 2026-08-31
 status: active
 boundary: 儲存節點與機櫃整合只形成 ODM 搜尋路由；不證明 universe 公司承擔特定 I/O 契約或取得增量訂單。
 next_trigger: 買方 test plan 與 ODM 文件對齊 storage-node BOM 路徑責任 部署量 收入與毛利。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I11
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: process:checkpoint-recovery-measurement-passport
+relation: includes
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C12
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: 八格復原護照是研究中心整合 MLCommons PyTorch 與 Google 官方文件的檢查方法 不是三方共同標準 已完成 benchmark 或客戶採用證據。
+next_trigger: 具名 operator 以同一 production workload 公開完整版本化 baseline treatment 重複 run 故障回載 訓練結果與成本。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I12
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: metric:checkpoint-completion-semantics
+relation: measured_by
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C10
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: PyTorch 直接區分 staging 與 upload completion 並提供 load API；耐久副本 正確回載與指定故障域仍需受測系統另行驗證。
+next_trigger: Framework 或 operator 公開 stage upload durable replica restore 四種事件與 partial failure 的共同 trace。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I13
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: metric:training-runtime-goodput
+relation: measured_by
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C11
+note_refs:
+evidence_state: verified
+commercial_stage: deployment
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: Google 定義 Runtime Goodput 並公開單一多層 checkpoint 組態結果；沒有 run 數 分布 變異 原始樣本或跨平台複現 因此不能形成一般效果量。
+next_trigger: 具名 operator 以固定模型與 cluster 公開 event level lost steps resume time Runtime Goodput 重複 run 不確定度及完整資源成本。
 -->

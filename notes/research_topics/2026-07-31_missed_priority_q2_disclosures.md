@@ -18,9 +18,9 @@ group_ids: power,powersupply,memory,packtest,material
 trigger_type: quarterly_results_and_company_events
 evidence_role: candidate_source
 route: formal_note_candidate
-thesis_claim_id: C12
+thesis_claim_id: C14
 base_confidence: medium
-confidence_basis: 六家公司 Q2 一手揭露與六份 MOPS 正式附件索引已能重估證據強弱；環球晶完整季度數字拆出本業與 Siltronic 評價差異，但索引尚未完成 evidence pack，復工、ASP 與多項市場主張仍未驗證
+confidence_basis: 六家公司 Q2 一手揭露與六份 MOPS 正式附件索引已能重估證據強弱；力成核閱季報再把本業、現金流與產品收入歸因拆開，環球晶完整季度數字則拆出本業與 Siltronic 評價差異，但附件索引仍不等於 evidence pack，復工、ASP、HBM2 訂單與多項市場主張仍未驗證
 cross_company_numbers: true
 schema_migrated_at: 2026-08-02
 -->
@@ -66,6 +66,20 @@ from: triaged
 to: triaged
 reason: completed_six_company_mops_filing_index_availability_without_content_signoff
 evidence: sources:S19,S20
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_powertech_q2_reviewed_filing_and_refreshed_event_to_revenue_evidence_ladder
+evidence: sources:S21
+-->
+<!-- transition
+date: 2026-08-13
+from: triaged
+to: triaged
+reason: reconfirmed_powertech_and_globalwafers_q2_filing_availability_after_parallel_scan_reconciliation
+evidence: sources:S19,S20,S21
 -->
 
 <!-- research_source
@@ -359,6 +373,21 @@ limitation: 活頁索引只證實附件已上線；本輪未下載、封存、�
 independence_group: twse-mops
 -->
 
+<!-- research_source
+source_id: S21
+role: company_filing
+source_kind: document
+publisher: Powertech Technology
+title: 力成科技 115Q2 合併財務報告暨會計師核閱報告
+published_at: 2026-08-07
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=6239&filename=202602_6239_AI1.pdf
+locator: pp.3-10、36-38；64 頁 PDF；SHA-256 ad220e9985ca5b1d21b2b299603f9139b7be1c5164ce94b81ee48de32d3a950e
+limitation: 會計師因部分非重要子公司及權益法投資未經核閱而出具保留結論；收入附註只拆封裝、測試、模組與其他，不能歸因 HBM2 客戶、訂單或收入
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -404,7 +433,7 @@ resolution:
 <!-- research_claim
 claim_id: C4
 label: verified
-status: active
+status: superseded
 claim: 力成 Q2 EPS 季增主要由營業利益改善，而公司文件沒有 HBM2 客戶、訂單、認證完成或收入證據
 supporting_source_ids: S5
 contrary_source_ids:
@@ -412,6 +441,9 @@ as_of: 2026-07-30
 basis: 官方法說可回溯 Q2 損益與 HBM、先進封裝產品段落
 boundary: 未查核簡報與技術能力不能升格為 HBM2 商業訂單
 verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id: C13
 resolution:
 -->
 
@@ -525,7 +557,7 @@ resolution:
 <!-- research_claim
 claim_id: C12
 label: inference
-status: active
+status: superseded
 claim: 新增完整季度證據再次顯示六家公司不能用營收或 EPS headline 排名：MOPS 索引已能把六家公司送進 evidence pack，但不等於內容已核驗；環球晶更同時出現營收回升、營業利益下滑與 Siltronic 評價推升淨利三種不同方向
 supporting_source_ids: S1,S3,S4,S5,S10,S12,S13,S14,S15,S16,S17,S19,S20
 contrary_source_ids:
@@ -535,6 +567,40 @@ boundary: 這是研究流程與獲利品質分流，不是六家公司估值、�
 verification_needed:
 correction_kind: supersedes
 corrects_claim_id: C10
+corrected_by_claim_id: C14
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: 力成核閱季報確認 Q2 營收 231.16 億元、營業利益 35.31 億元、EPS 3.00 元；H1 營業現金流 100.75 億元，低於取得不動產、廠房及設備的 111.92 億元現金流出，而收入附註只拆封裝、測試、模組與其他，沒有 HBM2 專屬收入欄
+supporting_source_ids: S21
+contrary_source_ids:
+as_of: 2026-08-07
+basis: correction_of:C4；S21 pp.3-10 的核閱結論、損益與現金流可和 pp.36-38 的收入及費用附註逐頁交叉核對；金額由新台幣千元換算為億元並四捨五入至小數點後二位
+boundary: 會計師為部分非重要子公司及權益法投資未經核閱出具保留結論；營業現金流低於設備取得支出不等於公司定義的自由現金流，也不能由封裝收入反推 HBM2 客戶、訂單或收入
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C4
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 六家公司 Q2 合併財報附件都已可取得，而力成新季報進一步示範研究必須依序分開事件 headline、附件可取得性、核閱財報內容與產品／客戶／收入歸因；較高層證據成立不能自動穿越到下一層
+supporting_source_ids: S1,S3,S4,S5,S10,S12,S13,S14,S15,S16,S17,S19,S20,S21
+contrary_source_ids:
+as_of: 2026-08-13
+basis: correction_of:C12；六家 MOPS 查詢是附件索引 census，力成核閱季報才進入財報內容與收入附註，環球晶公司文件則拆出本業與 Siltronic 評價；三組證據位於不同層級
+boundary: 這是研究證據階梯與獲利品質分流，不是六家公司估值、股價、報酬、相對優劣或任何投資建議；附件、技術能力與產業需求都不能自行變成訂單或可辨識收入
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C12
 corrected_by_claim_id:
 resolution:
 -->
@@ -819,7 +885,9 @@ invalidation: 若仍只有單月自結、事件公告或管理層形容詞，本
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
+retired_at: 2026-08-12
+retirement_reason: 力成新增正式附件使原 H# 證據集合與 C4 邊界改變；同一 H# proof point 由 T8 以更新後 claim 集合接續
 claim_ids: C2,C3,C4,C6,C8
 metric: 旺宏長供、欣銓量產收入、力成 HBM2 訂單與富鼎 AI 組合 H# proof points
 source_ids: S3,S4,S5,S10
@@ -834,6 +902,8 @@ invalidation: 到期仍無一手證據時標記 expired_unresolved，不得硬�
 <!-- monitoring_item
 monitor_id: T4
 status: retired
+retired_at: 2026-08-12
+retirement_reason: 力成與環球晶附件索引已定位，六家公司檔案可取得性完成；尚未完成的 frozen pack、SHA、引用頁與 reviewer 由 T6 接續
 claim_ids: C1,C2,C3,C4,C6,C10
 metric: 六家公司完整 Q2 財報附件、focused evidence pack 與獨立 reviewer 狀態
 source_ids: S1,S2,S3,S4,S5,S10,S11,S12,S13,S14,S15
@@ -843,13 +913,13 @@ frequency_detail: 先查 MOPS 直接索引，再核對附件封存與 reviewer �
 next_check: 2026-08-12
 trigger: 新附件完成同版本封存、SHA 與引用頁規劃，並可由 reviewer 重算期間、單位、數字與附註
 invalidation: 只有 OpenAPI 數值列、檔名或法說摘要時，正式筆記不得升為已獨立驗證；6239／6488 索引仍無附件時保持缺口
-retired_at: 2026-08-12
-retirement_reason: 力成與環球晶附件索引已定位，六家公司檔案可取得性完成；尚未完成的 frozen pack、SHA、引用頁與 reviewer 由 T6 接續
 -->
 
 <!-- monitoring_item
 monitor_id: T5
 status: retired
+retired_at: 2026-08-12
+retirement_reason: 環球晶完整 Q2 附件索引已定位，關閉文件可取得性子問題；內容重算、Novara 復工、ASP 與財務橋接由 T7 接續
 claim_ids: C5,C8,C9,C10
 metric: 環球晶完整 Q2 核閱財報、Novara 8 吋復工、跨廠轉移、ASP 與漲價橋接
 source_ids: S6,S7,S8,S9,S11,S16,S17,S18
@@ -859,13 +929,13 @@ frequency_detail: 新財報、火災更新、公司法說或價格橋接發布�
 next_check: 2026-08-12
 trigger: 公司提供可定位的完整季報、8 吋復工日期與產能、交付影響，或 ASP／價格對營收與毛利的量化橋接
 invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫，漲價、復工與最終財務影響維持未證，不更新正式公司事實
-retired_at: 2026-08-12
-retirement_reason: 環球晶完整 Q2 附件索引已定位，關閉文件可取得性子問題；內容重算、Novara 復工、ASP 與財務橋接由 T7 接續
 -->
 
 <!-- monitoring_item
 monitor_id: T6
-status: active
+status: retired
+retired_at: 2026-08-13
+retirement_reason: 力成核閱內容與四層證據框架使追蹤集合擴大；原六份附件工作由 T9 以更新後 claim 與 source 集合接續
 claim_ids: C1,C2,C3,C4,C6,C11,C12
 metric: 六家公司 Q2 財報 frozen evidence pack、SHA、引用頁與獨立 reviewer 狀態
 source_ids: S1,S2,S3,S4,S5,S10,S12,S13,S14,S15,S19,S20
@@ -878,8 +948,24 @@ invalidation: 只有檔名、OpenAPI 數值列、法說摘要或未經獨立重�
 -->
 
 <!-- monitoring_item
-monitor_id: T7
+monitor_id: T8
 status: active
+claim_ids: C2,C3,C6,C8,C13
+metric: 旺宏長供、欣銓量產收入、力成 HBM2 訂單與富鼎 AI 組合 H# proof points
+source_ids: S3,S4,S5,S10
+watch_source_ids: S11
+frequency: quarterly
+frequency_detail: 每季與 H# 到期日
+next_check: 2026-08-31
+trigger: 公司文件首次提供具名產品、客戶、合約、收入或毛利
+invalidation: 到期仍無一手證據時標記 expired_unresolved，不得硬判 confirmed
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: retired
+retired_at: 2026-08-13
+retirement_reason: 力成內容證據與 C14 使跨公司層級框架更新；環球晶未關閉問題由 T10 接續
 claim_ids: C5,C8,C9,C11,C12
 metric: 環球晶 Q2 核閱財報內容、Novara 8 吋復工、跨廠轉移、ASP 與漲價橋接
 source_ids: S6,S7,S8,S9,S16,S17,S20
@@ -891,6 +977,34 @@ trigger: 季報內容完成獨立重算，或公司提供 8 吋復工日期與�
 invalidation: 若季報與後續文件仍只有產業復甦、稼動率形容詞或跨廠支援計畫，漲價、復工與最終財務影響維持未證
 -->
 
+<!-- monitoring_item
+monitor_id: T9
+status: active
+claim_ids: C1,C2,C3,C6,C11,C13,C14
+metric: 六份已定位 Q2 財報的 frozen evidence pack、引用頁與獨立 reviewer 狀態
+source_ids: S1,S2,S3,S4,S5,S10,S11,S12,S13,S14,S15,S19,S20,S21
+watch_source_ids: S2,S11,S18,S20
+frequency: weekly
+frequency_detail: 先保存 MOPS 附件與完整 SHA，再由不同 reviewer 離線重算期間、單位、數字、會計師結論與附註邊界
+next_check: 2026-08-19
+trigger: 任一附件完成同版本封存、引用頁規劃及獨立重算
+invalidation: 只有索引、檔名、簡報摘要或單一 drafter 核對時，正式筆記不得升為 independently_verified；附件收入欄也不得自行歸因產品或客戶
+-->
+
+<!-- monitoring_item
+monitor_id: T10
+status: active
+claim_ids: C5,C8,C9,C14
+metric: 環球晶完整 Q2 核閱財報、Novara 8 吋復工、跨廠轉移、ASP 與漲價橋接
+source_ids: S6,S7,S8,S9,S11,S16,S17,S18,S20
+watch_source_ids: S11,S18,S20
+frequency: event_driven
+frequency_detail: 新財報、火災更新、公司法說或價格橋接發布後；無事件時每週回查
+next_check: 2026-08-19
+trigger: 季報內容完成獨立重算，或公司提供 8 吋復工日期與產能、交付影響，或 ASP／價格對營收與毛利的量化橋接
+invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫，漲價、復工與最終財務影響維持未證，不更新正式公司事實
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -899,6 +1013,8 @@ invalidation: 若季報與後續文件仍只有產業復甦、稼動率形容詞
 - **EPS**：每股盈餘，把歸屬股東的獲利除以股數；上升不一定代表本業同幅改善。
 - **自由現金流**：營業現金流扣掉設備等資本支出後的現金餘額，可用來檢查成長是否需要大量外部資金。
 - **未核閱**：數字尚未經會計師完成核閱，能提供方向但證據強度低於完整季報。
+- **核閱與查核**：核閱主要用於期中財報，程序範圍低於年度財報查核；兩者都不是對公司未來營運的保證。
+- **保留結論**：會計師對特定範圍無法取得足夠核閱證據，但除該事項可能影響外，沒有發現財報在所有重大方面未依適用準則編製。讀者仍要看保留原因，不能只看「有會計師」四個字。
 - **按市價評價**：持有的股票等金融資產依期末市價重估；它會改變當期損益，但不等於本業同期收到同額現金。
 - **附件索引**：MOPS 列出的檔名、時間與大小，只證明檔案可以取得；內容仍須封存、逐頁重算與獨立複核。
 - **SHA（檔案雜湊）**：把檔案內容算成固定指紋；同一份 PDF 的 SHA 相同，才能確認撰寫者與複核者讀的是同一版本，但 SHA 本身不證明內容正確。
@@ -908,18 +1024,23 @@ invalidation: 若季報與後續文件仍只有產業復甦、稼動率形容詞
 - **eMMC（嵌入式儲存）**：把快閃記憶體與控制器封裝成標準化元件，常見於消費電子與嵌入式設備；單季成長不能直接外推成長期缺貨或漲價。
 - **ASIC（客製化晶片）**：為特定工作設計的晶片。公司具備相關測試或封裝能力，不等於已取得具名 AI 客戶或量產收入。
 - **CPO（共同封裝光學）**：把光學元件放到交換晶片附近，縮短高速電訊號路徑；具備設備與流程仍須等待客戶、量產及財務證據。
-- **AI1.pdf**：公開資訊觀測站法說附件常見的檔名尾碼；它只協助辨識檔案版本，本身不代表內容已完成查核。
+- **AI1.pdf**：公開資訊觀測站合併財報附件常見的檔名尾碼；它只協助辨識檔案版本，本身不代表研究者已讀過內容或完成獨立複核。
+- **SHA（文件指紋）**：本文使用 SHA-256 對完整檔案計算固定長度摘要，用來確認 drafter 與 reviewer 讀的是同一版本；它能偵測檔案是否改變，不能證明財報內容一定正確。
 - **pp.5（第 5 頁）**：`pp.` 是英文 pages 的縮寫，後面的數字是引用頁碼；頁碼只負責定位來源，不是新的營運指標。
 
 ### 三句話抓重點
 
-- 六家公司都已有 Q2 一手資料；8 月 12 日再直查 MOPS，六份中文合併財報索引都已定位，其中力成與環球晶附件在 8 月 7 日上線。
+- 六家公司都已有 Q2 一手資料；8 月 13 日再次以同一 MOPS 索引核對，六份中文合併財報都可定位，其中力成與環球晶附件皆於 8 月 7 日上線。
 - 環球晶完整季度數字顯示營收季增、營業利益反而季減，淨利大增則主要來自 Siltronic 評價；只看 EPS 會把本業與業外混在一起。
-- 真正可執行的工作是把已定位附件送進 evidence pack，並繼續追復工、ASP、長供、HBM2 訂單與 AI 組合；索引或產業敘事都不能自行升格。
+- 力成新核閱季報能確認損益、現金流與四類收入，卻仍不能證明 HBM2 客戶、訂單或收入；事件、附件、財報內容與產品收入歸因必須逐層過關。
 
 ### 為什麼重要
 
-同樣是營收或 EPS 上升，可能來自本業改善、業外轉正、存貨與價格、資本支出甚至未查核估計。若只把六家公司放在同一張 headline 排名，會錯過真正影響現金流與獲利品質的差異，也可能把產品能力提前寫成訂單。
+**EPS 是終點，不是原因。** 同樣是 EPS 上升，可能來自營業利益改善，也可能來自投資評價、匯兌或其他業外項目；環球晶與富鼎正好示範了為什麼要把營業利益與業外分開。
+
+**附件索引是門牌，不是屋內內容。** 索引能回答「檔案是否可取得」，卻不能回答會計師結論、現金流、附註或產品分部寫了什麼；只有把實際 PDF 固定版本、記錄 SHA 並逐頁核對，才能進到下一層。
+
+**技術能力也不是收入。** 公司展示 HBM、CPO 或 AI 相關能力，只能證明工程路徑存在；還要看到客戶驗證、量產／訂單、可辨識收入與現金回收，才能建立商業歸因。若只把六家公司放在同一張 headline 排名，會同時漏掉獲利品質與商業成熟度。
 
 ### 接下來怎麼追
 
@@ -930,6 +1051,45 @@ invalidation: 若季報與後續文件仍只有產業復甦、稼動率形容詞
 
 - EPS 增加時，若營業利益沒有同步增加，讀者還需要拆解哪些業外或會計因素？
 - 公司展示技術能力或完成客戶驗證，距離可持續收入與現金回收還缺哪些證據？
+
+## 季報不是一個數字：四層核對順序
+
+**先問這句話目前站在哪一層。** 上一層的證據通常只是下一層的查找入口；每往下一層，研究者都需要一份能直接定位的新文件，不能靠語意相近自行跨越。
+
+| 本文 4 個位置 | 先問什麼 | 看到什麼才可往下 |
+|---|---|---|
+| 事件／headline | 公司是否真的發布法說、財報或重大事件？ | 發布日期、正式標題與公司／交易所入口 |
+| 附件／索引 | 完整文件是否可取得，而且是哪個版本？ | 檔名、上傳時間、大小、固定檔案與 SHA |
+| 核閱財報內容 | 數字的期間、單位、會計師結論與附註是什麼？ | 損益、現金流、資產負債與引用頁可獨立重算 |
+| 產品／客戶／收入歸因 | 哪個產品、客戶或訂單實際造成財務結果？ | 具名產品與商業階段，再加可辨識收入、毛利或現金分母 |
+
+先把每個數字放回它的文件與分母。這張表只把研究工作分層，不替公司評分；它不能把附件上線改寫成訂單、收入或股價方向。
+
+## 獲利品質：四把尺要一起看
+
+**單一比率無法說完整故事。** 六檔公司處在不同產業、規模與投資週期，本文不做橫向分數；四把尺的用途，是在各家公司自己的文件內找出 headline 背後的來源與代價。
+
+| 本文 4 把尺 | 觀察欄位 | 六檔中的例子 | 常見誤讀 |
+|---|---|---|---|
+| 本業 | 營收、毛利、營業利益 | 台達電本業成長但季比率下滑；力成 Q2 營業利益改善 | 把營收增加直接等同獲利品質提高 |
+| 業外／EPS | 業外損益、稅前利益、歸母淨利 | 環球晶受 Siltronic 評價影響；富鼎業外由負轉正 | 只看 EPS 就判斷本業同步變強 |
+| 現金與投資 | 營業現金流、設備取得支出、借款 | 欣銓 H1 現金流與設備支出有缺口；力成 H1 設備取得現金流出高於營業現金流 | 把損益表獲利當成同額可動用現金 |
+| 產品歸因 | 收入分類、客戶、訂單、量產與毛利 | 力成收入只拆封裝、測試、模組與其他 | 把封裝收入全部命名為 HBM2 或 AI 收入 |
+
+四把尺看到的是不同切面：本業回答「日常營運賺多少」，業外回答「EPS 還被什麼改變」，現金回答「成長如何付款」，產品歸因才回答「哪個技術主張真正進入財務報表」。
+
+## 能力到收入：四道商業關卡
+
+**商業化是一條證據鏈，不是一個關鍵字。** 尤其在封測、測試與先進封裝，公司能做、客戶在測、開始量產與財報認列往往發生在不同時間。
+
+| 本文 4 關 | 能說什麼 | 還缺什麼 |
+|---|---|---|
+| 能力／設備 | 流程、設備或產品規格已具備 | 客戶是否採用、良率與資格狀態 |
+| 驗證／導入 | 樣品或流程進入客戶驗證 | 是否完成驗證、何時量產、對應哪個產品 |
+| 量產／訂單 | 有出貨、產能或訂單的直接證據 | 收入認列期間、單價、毛利與取消／延後風險 |
+| 收入／現金 | 財報能辨識收入、毛利或現金貢獻 | 持續性、客戶集中與下一期是否重複 |
+
+力成文件目前能支持 HBM 需求與先進封裝能力，但收入附註停在封裝／測試／模組分類；因此不能跳過驗證與量產關卡，把 153.14 億元封裝收入整體貼上 HBM2 標籤。
 
 ## 為何值得進佇列
 
@@ -987,16 +1147,19 @@ invalidation: 若季報與後續文件仍只有產業復甦、稼動率形容詞
 
 ### 6239 力成
 
-- [公司官方 2026Q2 法說簡報](https://www.pti.com.tw/Handlers/ConferenceDownload.ashx?col=briefing&lang=zh&id=a9c72472-574a-49a7-ab9c-f5b553a7df29) pp.5–7 顯示 Q2
-  營收 231.16 億元、毛利率 21.8%、營益率 15.3%、EPS 3.00 元；營業利益季增
-  7.70 億元，業外反而減少 2.66 億元，因此 EPS 季增主要由本業改善推動。簡報明示
-  Q2 數字尚未經會計師查核。
-- pp.19–23 只支持 HBM 需求、先進封裝轉型、大尺寸 FC-BGA MCM 能力、FOPLP 客戶
-  驗證與 2027 量產目標；全文沒有 HBM2 客戶、訂單、認證完成、產能或收入。原本「已簽
-  HBM2 封裝訂單」必須維持未證，8 月 31 日仍沒有直接證據時應轉逾期未決，而不是硬判真。
-- [MOPS 115Q2 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6239&year=115&seamon=2&mtype=A)
-  於 8 月 7 日新增中英文附件；中文版 `202602_6239_AI1.pdf` 上傳時間 18:11:27、大小
-  1,644,184 bytes。這關閉先前的附件查找缺口，但尚未完成 frozen pack、內容重算或獨立複核。
+- [公司官方 2026Q2 法說簡報](https://www.pti.com.tw/Handlers/ConferenceDownload.ashx?col=briefing&lang=zh&id=a9c72472-574a-49a7-ab9c-f5b553a7df29)
+  原先提供未核閱 headline；[MOPS 115Q2 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6239&year=115&seamon=2&mtype=A)
+  則顯示中文版合併財報於 8 月 7 日 18:11:27 上線。換言之，8 月 5 日的「未定位」是當時
+  查找結果，不是永久缺件；8 月 12 日重查後已能取得 `202602_6239_AI1.pdf`。
+- [115Q2 合併財務報告暨會計師核閱報告](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=6239&filename=202602_6239_AI1.pdf)
+  pp.6–10 確認 Q2 營收 231.16 億元、營業利益 35.31 億元、業外淨收益 1.31 億元、
+  EPS 3.00 元；H1 營業現金流 100.75 億元，而取得不動產、廠房及設備的現金流出為
+  111.92 億元。後一組只說明設備取得支出高於營業現金流，不自行命名為公司揭露的自由現金流。
+- 同份季報 p.36 把 Q2 客戶合約收入拆為封裝 153.14 億元、測試 53.72 億元、模組
+  24.26 億元與其他 0.04 億元。這比法說 headline 多了一層財務內容，卻仍沒有 HBM2 專屬
+  收入、客戶、訂單或認證完成欄位；因此不能把 153.14 億元封裝收入整體歸因 HBM2。
+- 核閱報告 pp.3–4 因部分非重要子公司與權益法投資的財務報表未經會計師核閱而出具保留
+  結論。保留原因必須隨數字一起揭露；「已有核閱季報」不等於所有合併範圍都由同一會計師核閱。
 
 ### 6488 環球晶
 
@@ -1017,8 +1180,7 @@ invalidation: 若季報與後續文件仍只有產業復甦、稼動率形容詞
 - 新聞稿把火災範圍縮窄為 8 吋線局部區域，明示 12 吋新廠未受影響，並說已啟動損害評估、
   保險與跨廠支援；但仍沒有 8 吋復工日期、受影響產能、交付量、ASP 或漲價對毛利的橋接。
 - [MOPS 115Q2 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6488&year=115&seamon=2&mtype=A)
-  列出 `202602_6488_AI1.pdf`（8 月 7 日 15:22:28，1,338,581 bytes）。它只關閉附件可取得性；
-  本輪未把檔名改寫成季報內容已驗證，也沒有因此證實 Novara 復工、ASP 或漲價。
+  於 8 月 13 日重查仍列出 `202602_6488_AI1.pdf`（8 月 7 日 15:22:28，1,338,581 bytes）。它只關閉附件可取得性；本輪未把檔名改寫成季報內容已驗證，也沒有因此證實 Novara 復工、ASP 或漲價。
 
 ### 8261 富鼎
 
@@ -1085,9 +1247,9 @@ stock_ids: 6239
 direction: tailwind
 hypothesis_refs: 6239:H1,6239:H2
 note_action: update_required
-action_due: 2026-08-03
-rationale: Q2 本業毛利與營益改善需更新正式筆記，並把 HBM 敘事降回產業需求與技術線索
-evidence_boundary: 管理層簡報數字未經查核，且沒有 HBM2 訂單、客戶、認證、產能或收入證據
+action_due: 2026-08-19
+rationale: 8 月 7 日核閱季報已補損益、現金流、收入附註與會計師保留結論，需以 focused_v1 frozen pack 交由不同 reviewer 重算後再更新正式筆記
+evidence_boundary: 核閱季報的收入附註只拆封裝、測試、模組與其他，仍沒有 HBM2 訂單、客戶、認證、產能或專屬收入證據
 -->
 
 <!-- impact
@@ -1097,18 +1259,18 @@ direction: mixed
 hypothesis_refs: 6488:H1,6488:H2
 note_action: update_required
 action_due: 2026-08-19
-rationale: 8 月 4 日公司文件已補 Q2 本業與 Siltronic 評價橋接，8 月 12 日確認完整季報索引可取得；待建立 focused pack 並完成獨立複核後，再更新正式筆記
+rationale: 8 月 4 日公司文件已補 Q2 本業與 Siltronic 評價橋接，8 月 13 日再次確認完整季報索引可取得；待建立 focused pack 並完成獨立複核後，再更新正式筆記
 evidence_boundary: 公司簡報與新聞稿仍沒有 8 吋復工日期、ASP／漲價橋接、客戶接受度或方形晶圓可辨識收入，不能先把產業復甦推成財務受惠
 -->
 
 ## 下一個可證明／否定的節點
 
-- 富鼎完成不同 reviewer 對同一 frozen pack 的離線重算後，才把正式筆記恢復為
-  `independently_verified`；H1／H2 維持 open，到 8 月 31 日依原規格裁決。
-- 8 月 19 日前依序盤點台達電、旺宏、欣銓與力成的正式筆記，並以已定位的 Q2 附件建立
-  frozen pack；只有同版本封存、引用頁規劃與獨立重算都完成後，才能更新驗證狀態。
-- 六家公司已定位的 Q2 附件依序封存，記錄 SHA 與引用頁並交由另一位 reviewer 離線重算；
-  索引可取得性已關閉，但尚未完成 evidence pack 的公司仍不能升為內容已驗證。
+- 富鼎正式筆記已完成 frozen pack 與不同 reviewer 離線重算；H1／H2 維持 open，到
+  8 月 31 日仍依原規格裁決，不因本篇更新提前改寫終態。
+- 台達電、旺宏、欣銓與力成已定位的 Q2 附件依序建立 focused_v1 frozen pack，記錄完整
+  SHA、實際引用頁與渲染規劃，再交由不同 reviewer 離線重算；本輪對力成 PDF 的研究核對
+  不是正式筆記的獨立簽核，不能直接把筆記狀態升級。
+- 環球晶附件已可定位；下一步建立同版本 frozen pack，記錄 SHA、引用頁與渲染規劃，再由不同 reviewer 離線重算。附件索引本身不等於財報內容已簽核。
 - 環球晶下一步只追尚未關閉的變數：完整核閱季報、8 吋復工日期／產能與交付影響、晶圓
   ASP／客戶接受度、方形晶圓驗證及可辨識收入；沒有直接證據就維持 H# open。
 - 所有 H# 均保留原 deadline。市場價格、單日法人或月營收只能觸發搜尋，不得作為生命週期

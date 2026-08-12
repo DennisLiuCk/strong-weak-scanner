@@ -269,3 +269,123 @@ status: active
 boundary: 客製 base-die 邏輯只形成 IC 設計搜尋路由；不證明 design win NRE 或收入。
 next_trigger: 客戶與公司雙向確認具名 IP tape-out qualification 與財務貢獻。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-I11
+view: industry
+from_id: concept:custom-hbm-commercialization
+to_id: concept:custom-hbm-workload-contract
+relation: requires
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C3,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C8,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C12
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-15
+status: active
+boundary: SK hynix 展示與三星研發分工支持工作負載設計入口；本線是查核框架，不表示所有 custom HBM 都搬移工作、使用相同輸入或已通過客戶端到端驗證。
+next_trigger: 具名客戶與供應商公開同一 workload 的輸入 正確答案 latency power 失效條件及 sample qualification 結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-I12
+view: industry
+from_id: concept:custom-hbm-commercialization
+to_id: concept:custom-hbm-interface-contract
+relation: includes
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C2,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C8
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-15
+status: active
+boundary: Samsung 文件直接列出容量 速度 電力 介面與 I/O architecture 工作，但沒有公開同一 custom product 的完整版本 通道 錯誤規則 客戶 sign-off 或共同標準。
+next_trigger: 同一具名產品公開可重現的 interface version channel power envelope error handling 與客戶通過條件。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-I13
+view: industry
+from_id: concept:custom-hbm-commercialization
+to_id: concept:custom-hbm-base-die-contract
+relation: includes
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C3,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C4,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C8,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C9,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C10
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-15
+status: active
+boundary: 多份供應商文件直接把 controller additional logic IP 與製程路徑放進 base die 設計，但沒有共同 die identity PPA 熱 sign-off 客戶 qualification 或量產分母。
+next_trigger: 同一產品公開 base-die function IP ownership foundry node tape-out PPA thermal 與 customer qualification。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-I14
+view: industry
+from_id: concept:custom-hbm-commercialization
+to_id: concept:custom-hbm-firmware-contract
+relation: includes
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C8
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-15
+status: active
+boundary: Samsung Memory Labs 直接列出 custom HBM firmware 工作，只支持該公司公開能力範圍；不表示所有客製路徑都需要相同韌體或任何版本已和客戶 runtime 完成整合。
+next_trigger: 具名產品公開 firmware runtime compiler data format error recovery 版本及客戶驗收結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-I15
+view: industry
+from_id: concept:custom-hbm-commercialization
+to_id: concept:custom-hbm-manufacturing-thermal-contract
+relation: requires
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C10,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C11,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C12
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-15
+status: active
+boundary: TSMC 製程分流與 Samsung D2D PHY 熱點共同支持製造封裝熱需另列，但兩條不是同一產品鏈，也沒有證明任何具名 custom HBM 已完成共同 sign-off。
+next_trigger: 同一產品公開 DRAM logic process stacking package power thermal hotspot test yield 與 change-control 結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-I16
+view: industry
+from_id: concept:custom-hbm-commercialization
+to_id: stage:custom-hbm-handoff-qualification
+relation: passes_through
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C6,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C12
+note_refs:
+evidence_state: unverified
+commercial_stage: qualification
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-15
+status: active
+boundary: 現有公開資料沒有把同一具名客戶的六份交接 版本 責任人 變更控制 pass criteria 與量產財務接起；此節點只保存待驗證條件。
+next_trigger: 客戶與供應商雙向公布同一 custom HBM 的六份 versioned handoff sign-off qualification 與 production outcome。
+-->

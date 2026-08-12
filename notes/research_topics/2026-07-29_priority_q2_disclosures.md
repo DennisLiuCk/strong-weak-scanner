@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-07-29
 source_published_at: 2026-07-28
-last_reviewed_at: 2026-08-06
-review_due: 2026-08-13
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-15
 source_type: mixed
 publisher_domain: cht-pt.com.tw
 canonical_url: https://www.cht-pt.com.tw/xccompdoc?xsmsid=0G328557247962808262
@@ -18,9 +18,9 @@ group_ids: ipdesign,semiequip,pcb,memory,packtest,power
 trigger_type: quarterly_results_and_board_events
 evidence_role: candidate_source
 route: formal_note_candidate
-thesis_claim_id: C11
+thesis_claim_id: C15
 base_confidence: medium
-confidence_basis: Q2 文件已由事件、簡報、量產與完整季報層級重新分流；智原的 NRE／MP 應用佔比可定位，但不是轉單率，完整季報仍待 evidence pack 獨立重算
+confidence_basis: 六檔同參數 MOPS 重查已有五檔附件；威剛與日月光投控季報可直接建立營運資金與部門分母，但兩份文件仍不能辨識 AI 收入，正式公司筆記亦待 frozen evidence pack 與獨立 reviewer
 cross_company_numbers: false
 schema_migrated_at: 2026-08-02
 -->
@@ -53,7 +53,6 @@ to: triaged
 reason: registered_eris_q2_attachment_without_upgrading_unreviewed_contents
 evidence: sources:S19
 -->
-
 <!-- research_source
 source_id: S1
 role: company_release
@@ -179,7 +178,7 @@ title: 威剛 115Q2 正式文件查詢
 published_at:
 captured_at: 2026-07-29
 accepted_at: 2026-07-29
-status: active
+status: superseded
 url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3260&year=115&seamon=2&mtype=A
 locator: 2026-07-29 交易所文件清單查詢結果
 limitation: 當日沒有可定位附件不代表逾期或未通過董事會，清單之後可能更新
@@ -194,7 +193,7 @@ title: 日月光投控 115Q2 正式文件查詢
 published_at:
 captured_at: 2026-07-29
 accepted_at: 2026-07-29
-status: active
+status: superseded
 url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3711&year=115&seamon=2&mtype=A
 locator: 2026-07-29 交易所文件清單查詢結果
 limitation: 當日沒有可定位附件不代表逾期或未通過董事會，清單之後可能更新
@@ -209,7 +208,7 @@ title: 弘塑 115Q2 正式文件查詢
 published_at:
 captured_at: 2026-07-29
 accepted_at: 2026-07-29
-status: active
+status: superseded
 url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3131&year=115&seamon=2&mtype=A
 locator: 2026-07-29 交易所文件清單查詢結果
 limitation: 當日沒有可定位附件不代表逾期或未通過董事會，清單之後可能更新
@@ -330,6 +329,107 @@ locator: 202602_3675_AI1.pdf；索引列示 115/08/04 17:11:22，1486228 bytes�
 limitation: 活頁索引只證實附件在 8 月 6 日可取得與當時檔案資訊；尚未封存 evidence pack 或獨立重算報表、附註與會計師結論
 -->
 
+<!-- research_source
+source_id: S20
+role: exchange
+source_kind: living_index
+publisher: Taipei Exchange
+title: 威剛 115Q2 正式文件查詢（8 月 12 日快照）
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3260&year=115&seamon=2&mtype=A
+locator: 202602_3260_AI1.pdf；索引列示 115/08/07 10:23:47，1699020 bytes
+limitation: 活頁索引只證實附件在本次捕捉時可取得；內容驗證須回到實際 PDF，且不回寫 7 月 29 日或 8 月 6 日的歷史未定位結果
+-->
+
+<!-- research_source
+source_id: S21
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 日月光投控 115Q2 正式文件查詢（8 月 12 日快照）
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3711&year=115&seamon=2&mtype=A
+locator: 202602_3711_AI1.pdf；索引列示 115/08/10 18:00:27，3492234 bytes
+limitation: 活頁索引只證實附件在本次捕捉時可取得；不能由檔名或索引推導先進封裝、AI 收入或公司受惠幅度
+-->
+
+<!-- research_source
+source_id: S22
+role: exchange
+source_kind: living_index
+publisher: Taipei Exchange
+title: 弘塑 115Q2 正式文件查詢（8 月 12 日快照）
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3131&year=115&seamon=2&mtype=A
+locator: 2026-08-12 同參數直接索引未回傳 115Q2 附件
+limitation: 有日期邊界的未定位結果不是逾期、未開董事會或營運反證；索引之後仍可能更新
+-->
+
+<!-- research_source
+source_id: S23
+role: company_filing
+publisher: ADATA Technology
+title: 威剛科技 2026Q2 合併財務報告
+published_at: 2026-08-07
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3260&filename=202602_3260_AI1.pdf
+locator: pages 4–12、29、59、95；sha256 1f4c55a39a46b3476aace313de9259dbec146e221ceb2628c309ff4d17f871bf
+limitation: 本輪由同一研究者以文字擷取與逐頁影像交叉核對，尚不是 focused frozen evidence pack 的獨立 reviewer 簽核；報表未拆 DRAM、SSD 或 AI 收入
+-->
+
+<!-- research_source
+source_id: S24
+role: company_filing
+publisher: ASE Technology Holding
+title: 日月光投控 2026Q2 合併財務報告
+published_at: 2026-08-10
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3711&filename=202602_3711_AI1.pdf
+locator: pages 3–10、28、60、80–81；sha256 3549d3be7d389935ce1bf357021a2454ab85a3d430582e3f36ce07ce1ae704de
+limitation: 本輪由同一研究者以文字擷取與逐頁影像交叉核對，尚不是 focused frozen evidence pack 的獨立 reviewer 簽核；部門資訊未把 AI 或先進封裝收入單獨列示
+-->
+
+<!-- research_source
+source_id: S25
+role: company_release
+publisher: ADATA Technology
+title: 威剛 2026 年 6 月營收公告
+published_at: 2026-07-06
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://nexus-api.adata.com/en/news/1321/
+locator: Q2 合併營收與 6 月 DRAM／SSD／其他產品銷售占比
+limitation: 單月未經查核產品占比不能替代 Q2 產品別收入、售價／數量橋接、AI 收入或完整財務報表
+-->
+
+<!-- research_source
+source_id: S26
+role: company_release
+publisher: ASE Technology Holding
+title: 日月光高雄新廠動土暨高階封裝測試規劃
+published_at: 2026-03-11
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.aseglobal.com/press-room/ase-breaks-ground-on-new-high-tech-facility-in-kaohsiung/
+locator: NT$17.8 billion 投資、2028Q2 預計完工、高階封裝測試與系統驗證用途
+limitation: 建廠計畫與預計完工日是前瞻性公司說明，不等於 2026H1 已形成的產能、收入、毛利或具名客戶訂單
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -361,7 +461,7 @@ resolution:
 <!-- research_claim
 claim_id: C3
 label: verified
-status: active
+status: superseded
 claim: 7 月 29 日掃描時，同欣電、德微、威剛、日月光投控與弘塑尚未在所查公司或交易所清單中提供可定位的 Q2 完整財報
 supporting_source_ids: S7,S8,S9,S10,S11
 contrary_source_ids:
@@ -369,6 +469,7 @@ as_of: 2026-07-29
 basis: 公司與交易所正式文件清單逐檔核對的 as-of 結果
 boundary: 這是有日期邊界的未定位結果，不是逾期、未開董事會或永遠沒有文件的斷言
 verification_needed:
+corrected_by_claim_id: C12
 resolution:
 -->
 
@@ -477,7 +578,7 @@ resolution:
 <!-- research_claim
 claim_id: C11
 label: inference
-status: active
+status: superseded
 claim: Q2 研究分流必須把活頁索引視為有捕捉日期的「文件可取得」證據，並持續區分事件、簡報、完整附件、evidence pack 簽核及 NRE／MP 商業階段；後續附件上線應追加修正，而不能回寫成先前已知或直接升格為財務受惠
 supporting_source_ids: S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19
 contrary_source_ids:
@@ -487,6 +588,67 @@ boundary: 這是研究路由、時間邊界與證據角色修正，不是公司�
 verification_needed:
 correction_kind: supersedes
 corrects_claim_id: C9
+corrected_by_claim_id: C15
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: 8 月 12 日以相同年度、季度與文件類型參數重查六家公司 MOPS 直接索引，五檔已有 115Q2 合併財報附件；威剛與日月光投控為本輪新增，弘塑仍未定位到附件
+supporting_source_ids: S17,S18,S19,S20,S21,S22
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C3；固定母體 N=6 的直接文件索引逐檔核對；可定位者為 3035、6271、3675、3260、3711，未定位者為 3131
+boundary: 5/6 是本次索引母體計數，不是推論樣本、申報完成率或營運結果；索引命中也不等於五份 evidence pack 均已通過獨立重算
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C3
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: 威剛 2026Q2 營收、營業利益與歸母淨利分別為 38,143,164、12,765,283 與 10,402,425 千元，但 2026H1 營業活動淨現金流出 8,392,303 千元；現金流表同時列出存貨增加 25,813,426 千元、應收帳款淨額增加 9,063,266 千元及關係人應收帳款淨額增加 3,059,363 千元
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-08-07
+basis: S23 pages 8–9 與 11 的同期間、同單位報表逐欄核對；page 29 另列期末存貨帳面金額 49,370,046 千元
+boundary: 高獲利與營業現金流出可同時成立；存貨與應收占用現金不自行證明備貨成功或需求反轉。核閱報告對部分未經會計師核閱之子公司與權益法投資採保留結論，不能把本輪內容檢查誤寫成正式筆記的獨立簽核
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: 日月光投控 2026H1 對外收入分為封裝 188,368,424 千元、測試 44,706,289 千元、電子組裝 126,771,804 千元與其他 4,879,157 千元；同頁明示集團內部收入在合併時銷除，且部門損益以稅前淨利衡量
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-08-10
+basis: S24 page 80 的部門定義、對外收入、集團內部收入、部門稅前淨利與銷除註記逐欄核對；page 3 的會計師核閱結論未見保留事項
+boundary: 封裝、測試與電子組裝是不同服務／收入分母；整體部門收入、稅前淨利或集團資本支出都不能改寫為 AI、先進封裝、CoWoS 收入或該業務營益率
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: Q2 研究除了區分事件、簡報、附件、evidence pack 與 NRE／MP 商業階段，還必須先找對公司的財務分母：記憶體通路／模組商要把毛利與存貨、應收、應付及融資的現金轉換一起讀；封測集團則要把封裝、測試、電子組裝與集團內部銷除分開，未揭露的 AI 分子一律留白
+supporting_source_ids: S1,S2,S3,S4,S5,S6,S7,S8,S12,S13,S14,S15,S16,S17,S18,S19,S20,S21,S22,S23,S24,S25,S26
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C11；S23 顯示獲利與營運資金占用可同時發生，S24 顯示同一集團內存在三種不同收入分母，S25／S26 又證明產品組合與未來產能說明不能直接填入季報未揭露的 AI 收入
+boundary: 這是閱讀順序與證據邊界，不是跨公司優劣、估值、股價、投資排名或台灣供應鏈營收受惠判斷；會計總額是完整報表列示值，不是抽樣統計，故不適用 SE／t 值
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C11
 corrected_by_claim_id:
 resolution:
 -->
@@ -589,7 +751,9 @@ invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無�
 
 <!-- monitoring_item
 monitor_id: T7
-status: active
+status: retired
+retired_at: 2026-08-12
+retirement_reason: 威剛與日月光投控新增正式附件並完成第一輪內容邊界核對，附件母體與主命題均已改變；由 T9 接續 frozen pack 與獨立 reviewer 狀態
 claim_ids: C3,C5,C8,C10,C11
 metric: 智原、同欣電、德微、威剛、日月光投控與弘塑 Q2 附件上線、封存與獨立重算狀態
 source_ids: S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19
@@ -603,11 +767,41 @@ invalidation: 只有事件標題、OpenAPI 數值列、文件索引或媒體轉�
 
 <!-- monitoring_item
 monitor_id: T8
-status: active
+status: retired
+retired_at: 2026-08-12
+retirement_reason: C11 的索引與 NRE／MP 框架已由加入財務分母的 C15 取代，更新後來源集合與 proof point 由 T10 接續
 claim_ids: C5,C6,C7,C11
 metric: Q2 文件中從 NRE 開發到 MP 量產的可比口徑、合約、具名客戶、量產收入、現金流、存貨與負債 proof points
 source_ids: S2,S3,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19
 watch_source_ids: S4,S6,S7,S8,S9,S10,S11,S17,S18,S19
+frequency: event_driven
+frequency_detail: 每份新一手文件、法說後與每個 H# 到期日
+next_check: 2026-08-15
+trigger: 文件首次以同一 cohort 或具名專案提供 NRE→MP 轉化、時程與可辨識財務貢獻
+invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無法與前期專案對齊時，不宣稱 AI 轉量產或財務受惠
+-->
+
+<!-- monitoring_item
+monitor_id: T9
+status: active
+claim_ids: C5,C12,C13,C14,C15
+metric: 智原、同欣電、德微、威剛、日月光投控與弘塑 Q2 附件上線、frozen evidence pack、獨立 reviewer 與正式筆記更新狀態
+source_ids: S6,S7,S8,S12,S13,S14,S15,S16,S17,S18,S19,S20,S21,S22,S23,S24,S25,S26
+watch_source_ids: S6,S7,S8,S17,S18,S19,S20,S21,S22
+frequency: weekly
+frequency_detail: 先查 MOPS 直接索引，再以正式附件建立 focused pack；每篇正式筆記須由不同 reviewer 離線重算後獨立提交
+next_check: 2026-08-19
+trigger: 任一新附件上線，或任一公司完成 frozen pack、HARD finding 歸零與 independently_verified 簽核
+invalidation: 索引命中、同一研究者內容檢查或公司摘要都不能替代獨立 reviewer；弘塑沒有附件時不得用事件或產業需求補洞
+-->
+
+<!-- monitoring_item
+monitor_id: T10
+status: active
+claim_ids: C5,C6,C7,C15
+metric: Q2 文件中從 NRE 開發到 MP 量產的可比口徑、合約、具名客戶、量產收入、現金流、存貨與負債 proof points
+source_ids: S2,S3,S5,S6,S7,S8,S12,S13,S14,S15,S16,S17,S18,S19,S20,S21,S22,S23,S24,S25,S26
+watch_source_ids: S4,S6,S7,S8,S17,S18,S19,S20,S21,S22
 frequency: event_driven
 frequency_detail: 每份新一手文件、法說後與每個 H# 到期日
 next_check: 2026-08-15
@@ -629,6 +823,13 @@ to: triaged
 reason: editorial_plain_language_wave3_no_conclusion_change
 evidence: editorial:plain_language_wave3
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_adata_and_aseh_q2_filings_and_business_denominator_learning_path
+evidence: sources:S20,S21,S22,S23,S24,S25,S26
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -644,12 +845,20 @@ evidence: editorial:plain_language_wave3
 - **公開資料介面（OpenAPI）**：交易所提供的結構化數值入口；它適合找出可能已申報的公司與期間，但不能取代完整報表及附註。
 - **AI1.pdf（季報附件檔名）**：交易所季報附件常見的檔名尾碼；檔名只用來定位文件，不代表內容與 AI 產業有關。
 - **已核閱（Reviewed）**：表示會計師執行過核閱程序；若檔案只有數頁摘要，仍不能當成含完整附註的季度報告。
+- **營運資金**：公司日常營運卡在存貨、應收與應付的資金。損益表有獲利時，存貨與應收增加仍可能讓現金流出。
+- **存貨跌價損失**：存貨帳面成本高於可回收金額時認列的損失；金額小不等於存貨一定能順利賣出，金額大也要先分辨價格、規格與產品生命週期。
+- **對外收入／集團內部收入**：對外收入來自集團外客戶；子公司彼此交易形成的內部收入在合併報表必須銷除，不能重複加進集團營收。
+- **電子組裝（EMS）**：替客戶設計、組裝與製造電子或通訊產品的服務；它和晶片封裝、晶片測試是不同商業活動。
+- **部門稅前淨利**：公司用來衡量部門績效的一種口徑；若報表沒有稱為營業利益，就不能拿它直接計算或命名為部門營益率。
+- **CoWoS**：台積電的先進封裝平台名稱；產業需求上升不代表每一家封測或設備公司的具名訂單、收入與毛利已經成立。
+- **DRAM／SSD**：DRAM 是運算時暫存資料的動態記憶體；SSD 是以 NAND Flash 儲存資料的固態硬碟。兩者價格、庫存與需求週期不同。
+- **HARD finding**：證據包複核時的硬性缺口，例如引用頁缺失、檔案不一致或數字無法重算；未清除前不能簽核正式筆記。
 
 ### 三句話抓重點
 
-- 精測、欣興與智原已有 Q2 一手簡報；智原 Q2 的 AI 應用占 NRE 35.4%，卻只占 MP 0.4%，正好說明「開發題材」不等於「量產收入」。
-- MOPS 顯示智原、同欣電與德微附件分別在 7 月 28 日、7 月 30 日與 8 月 4 日上線；查詢結果必須保留檢查日期，且「可取得」仍不等於內容已由另一位查核者重算。
-- 這篇的價值是把「檔案可取得、內容可重算、商業階段成立」三件事分開管理，而不是把 Q2 標題一律當成已證實結論。
+- 截至 8 月 12 日，同參數重查的六檔中已有五檔 Q2 完整附件；威剛與日月光投控是本輪新增，弘塑仍只有有日期邊界的「尚未定位」。
+- 智原要分 NRE 與 MP，威剛要把獲利與存貨／應收的現金占用一起讀，日月光投控則要把封裝、測試與電子組裝分開；三家公司不能共用一個「AI 收入」分母。
+- 文件上線只解決「能不能讀」，不會自動解決「哪個商業階段、哪個財務分母、AI 分子是多少」；季報沒有揭露的 AI 收入必須留白。
 
 ### 為什麼重要
 
@@ -657,8 +866,10 @@ evidence: editorial:plain_language_wave3
 文件清單。名稱相同，不代表內容完整度相同。
 
 若不先辨識文件角色，讀者很容易把「活動已公告」誤讀成「數字已成立」，或把開發收入中的
-AI 占比誤讀成量產收入。這次漏掃也提醒我們：公司投資人關係頁面不是唯一入口，研究流程
-本身也要接受反證與修正。
+AI 占比誤讀成量產收入。即使拿到完整季報，還要找對分母：記憶體模組商的高毛利可能同時
+伴隨大量存貨與應收占用現金；封測集團的合併營收則混合封裝、測試與電子組裝，不能整包標成
+AI 先進封裝。這次漏掃也提醒我們：公司投資人關係頁面不是唯一入口，研究流程本身也要接受
+反證與修正。
 
 ### 接下來怎麼追
 
@@ -666,12 +877,15 @@ AI 占比誤讀成量產收入。這次漏掃也提醒我們：公司投資人�
 - 文件可下載後，確認期間、頁碼、單位與是否含會計師核閱報告及附註。
 - 新附件上線後封存到證據包，由另一位查核者重算；只看到標題時，結論就留在「等待文件」階段。
 - 對產能、長約、具名客戶與量產收入，追公司是否提供金額、時程及財務貢獻；NRE 與 MP 要各用自己的分母追蹤。
+- 對記憶體公司，依序核對毛利、存貨、應收、應付、借款與營業現金流；對封測集團，先拆部門與內部銷除，再問 AI 或先進封裝分子是否真的揭露。
 
 ### 想一想
 
 - 一份法說簡報已揭露 EPS，為什麼仍可能不足以判斷現金流、存貨或借款風險？
 - 公司宣布法說日期時，哪些結論可以先寫，哪些一定要等實際附件才寫？
 - AI 占開發收入 35.4% 卻只占量產收入 0.4% 時，你會要求哪一批相同專案的流片、驗證或量產證據，才願意相信開發案正在轉成收入？
+- 公司上半年很賺錢，營業現金卻流出時，你會先查存貨、應收、應付還是借款？每個欄位各在回答什麼問題？
+- 日月光投控揭露封裝、測試與電子組裝收入後，還缺哪個「AI 分子」，才可以討論先進封裝的財務貢獻？
 - 如果新文件只重複產業需求，卻沒有公司收入或客戶證據，原本的投資主張應維持、降級還是失效？
 
 ## 用三道門判讀一則季報消息
@@ -697,17 +911,92 @@ AI 占比誤讀成量產收入。這次漏掃也提醒我們：公司投資人�
 三道門不能跳級。事件預告不能替代文件，文件存在不能替代重算，重算完成也不能把開發階段
 自動改寫成量產。照這個順序閱讀，八家公司看似混雜的更新就會變成一張清楚的等待清單。
 
+## 同一個「AI 供應鏈」，財務分母為什麼不同
+
+**AI 供應鏈是題材分類，不是會計科目。** 公司在產業鏈中扮演的角色不同，季報真正能回答的
+問題也不同。先找錯分母，後面即使每個數字都抄對，結論仍可能錯。
+
+| 公司與角色 | 第一個要找的分母 | 本期文件能回答 | 本期文件不能回答 |
+|---|---|---|---|
+| 智原：ASIC／IP 設計服務 | NRE 開發收入、MP 量產收入 | AI 各占兩個收入池多少 | 同一批專案的 NRE→MP 轉化率、未揭露客戶與未來量產額 |
+| 威剛：記憶體模組與儲存產品 | 毛利、存貨、應收、應付、借款與營業現金流 | 獲利與營運資金如何同時變動 | DRAM／SSD 的 Q2 各別收入、價格／數量橋接、AI 收入與長約 |
+| 日月光投控：封裝、測試與電子組裝集團 | 各部門對外收入、內部銷除及部門衡量口徑 | 封裝、測試、電子組裝各自的收入池 | AI／先進封裝收入、CoWoS 分子、具名客戶與專案毛利 |
+
+這三種分母也對應三種常見誤讀：把開發案當量產、把高毛利當成現金已入袋、把集團合併營收
+當成單一熱門技術收入。研究者的工作不是替空白欄位猜答案，而是把空白保留下來，等公司以
+同口徑文件補上。
+
+## 利潤高，為什麼現金仍可能流出：威剛案例
+
+損益表採權責發生基礎：產品交付並符合認列條件後可以先記收入與獲利，即使客戶尚未付款；
+現金流量表則追蹤錢實際有沒有進出。公司也可能先付款備貨，使存貨增加而現金先流出。因此，
+「很賺錢」與「營業現金流出」不是互相矛盾的兩個句子。
+
+威剛 2026H1 的合併營收與淨利分別為 `64,242,687` 與 `20,742,119` 千元，但營業活動淨現金
+流出 `8,392,303` 千元。現金流表中幾個主要營運資金項目如下；括號方向代表占用現金，正向
+應付款增加則暫時提供現金。表中都是完整財報列示的會計總額，不是抽樣估計，因此不適用
+SE／t 值。
+
+| 2026H1 現金橋接項目 | 財報列示（新台幣千元） | 初學者怎麼讀 |
+|---|---:|---|
+| 稅前淨利 | 26,568,675 | 損益表的起點，不等於已收現金 |
+| 應收帳款淨額增加 | (9,063,266) | 已認收入但款項尚未收回，現金被占用 |
+| 關係人應收帳款淨額增加 | (3,059,363) | 集團關係人交易的應收增加，也占用現金 |
+| 存貨增加 | (25,813,426) | 先買進或製成貨品，現金先離開、收入尚未完全實現 |
+| 應付帳款增加 | 4,102,463 | 尚未付給供應商，短期內保留現金 |
+| 收取利息、支付利息與所得稅前的營運現金 | (6,068,512) | 其餘非現金調整與營運資金項目合併後，已轉為淨流出 |
+| 營業活動淨現金流 | (8,392,303) | 再納入利息與所得稅後的最終 H1 結果 |
+
+期末存貨帳面金額為 `49,370,046` 千元，2025 年底為 `23,556,620` 千元；短期與長期借款也
+較年末增加。這能直接證明「備貨與應收占用了現金，融資端同步擴張」，卻不能單憑財報判定
+備貨一定會成功轉成銷售，或反過來判定存貨一定是需求反轉。下一步要追的是存貨週轉、價格、
+產品組合、應收回款與後續現金流是否改善。
+
+會計師對威剛本期合併財報採保留結論，保留基礎是部分非重要子公司及權益法投資的財務資料
+未經會計師核閱。這不是「整份財報無效」，也不是無保留結論；讀者在引用數字時應把這個
+核閱範圍一起帶著，而不能只摘獲利。
+
+## 封裝、測試、電子組裝不能合成一個 AI 分母
+
+日月光投控的部門附註把集團拆成封裝、測試、電子組裝與其他。電子組裝包含電子與通訊產品、
+主機板等設計、組裝、製造與銷售；它不是半導體封裝的另一個名字。2026H1 的對外收入與公司
+採用的部門稅前淨利如下：
+
+| 2026H1 部門 | 對外收入（新台幣千元） | 部門稅前淨利（新台幣千元） | 不能偷換成 |
+|---|---:|---:|---|
+| 封裝 | 188,368,424 | 26,031,146 | 全部都是 AI 或先進封裝 |
+| 測試 | 44,706,289 | 14,143,923 | 全部都是 AI 晶片測試 |
+| 電子組裝 | 126,771,804 | 3,937,055 | 半導體封裝或 CoWoS 收入 |
+| 其他 | 4,879,157 | (250,882) | 可任意歸入熱門技術的收入 |
+| 合併數 | 364,725,674 | 43,861,242 | AI 分子或部門營益率 |
+
+部門另有 `24,534,475` 千元集團內部收入在合併時銷除，不能再加進對外收入。公司把部門損益
+定義為稅前淨利，本文也不拿它計算或命名為「部門營益率」。同理，2026H1 購置不動產、廠房
+及設備支付的 `127,470,420` 千元是全集團數字，財報沒有把它拆成 AI 或先進封裝資本支出。
+
+公司 3 月公告的高雄新廠投資額為新台幣 178 億元，規劃高階封裝、測試與系統驗證，預計到
+2028Q2 完工。這是理解技術方向與未來產能節點的材料，不能倒填成 2026H1 已投產、已產生收入
+或已取得具名客戶。季報告訴我們「集團今天的財務分母」，建廠公告告訴我們「未來想增加哪種
+能力」；兩者時間軸不同，必須分開保存。
+
+把兩個案例合在一起，初學者可以用四個問題自查：這個數字屬於哪一段期間？分母是哪個產品、
+部門或商業階段？獲利是否已轉成現金？公司是否真的揭露 AI／先進封裝的分子？只要其中一格
+留白，就把結論停在留白處，不用題材或股價補答案。
+
 ## 為何值得進佇列
 
 7 月 28～29 日密集出現第二季法說、董事會與財報事件，但八檔的文件成熟度不同。精測與
-欣興已有可下載的公司 Q2 簡報，其中精測另有標示 `Reviewed` 的三頁財務摘要；該摘要不是
-含會計師核閱報告與附註的完整季報，不能承擔 evidence pack 的 `latest_quarterly_report`
-角色。8 月 3 日回查時，智原 Q2 簡報與新聞稿已可直接定位，且 MOPS 文件索引顯示智原
-115Q2 完整附件早在 7 月 28 日上線；原流程只看公司事件入口而漏掉附件，這是需要留下的
-方法修正。同欣電完整附件則於 7 月 30 日才上線，與 7 月 29 日 as-of 結論不衝突。8 月 6 日
-到期重查再定位到德微於 8 月 4 日上線的完整附件，但本輪仍只驗證索引，沒有重算內容。這批
-資料現在應按「事件→附件→證據包」與「NRE 開發→MP 量產」兩條軸分流，不能因公告標題、
-文件存在或 AI 開發占比就先填量產與財務受惠結論。
+欣興先有公司簡報；智原、同欣電與德微的完整附件分別在 7 月 28 日、7 月 30 日與 8 月 4 日
+出現在 MOPS。8 月 12 日用同一組年度、季度與文件類型參數重查六檔優先名單時，威剛與
+日月光投控也已有完整附件，母體 N=6 中共五檔可定位，弘塑仍未定位。每個結果都保留捕捉
+日期，所以後來出現的附件不會把先前的「當日未定位」改寫成漏報或營運反證。
+
+新文件也把研究方法從兩條軸擴成三條：先走「事件→附件→證據包」的證據成熟度，再辨識
+「NRE 開發→MP 量產」等商業階段，最後找對「獲利→營運資金→現金」或「封裝／測試／
+電子組裝→內部銷除」的財務分母。這樣才能知道文件真正回答了什麼，也能清楚標出沒有回答的
+AI 收入、具名客戶、量產轉化與專案毛利。本文完成的是研究中心的內容級逐頁核對；正式公司
+筆記仍須用 frozen evidence pack 交給不同 reviewer 離線重算，不能把同一研究者的閱讀升格為
+`independently_verified`。
 
 ## 來源與證據邊界
 
@@ -743,12 +1032,23 @@ AI 占比誤讀成量產收入。這次漏掃也提醒我們：公司投資人�
   8 月 6 日回查時，索引已列 `202602_3675_AI1.pdf`，申報時間為 8 月 4 日 17:11:22；
   本輪只確認檔案可取得，尚未封存或重算，因此不能更新毛利、現金流、庫存或 H1／H2
   商業化規模。
-- 交易所正式文件清單在本次掃描時，對
-  [威剛](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3260&year=115&seamon=2&mtype=A)、
-  [日月光投控](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3711&year=115&seamon=2&mtype=A)與
-  [弘塑](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3131&year=115&seamon=2&mtype=A)
-  在 8 月 6 日重查時仍無可定位的 115Q2 正式財報 PDF。這是有檢查時間的未定位結果；Q2 法定申報期限
-  尚未到，不代表逾期或未通過董事會。
+- [威剛 MOPS 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3260&year=115&seamon=2&mtype=A)
+  在 8 月 12 日已列出 8 月 7 日上線的
+  [2026Q2 合併財報](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3260&filename=202602_3260_AI1.pdf)。
+  本文逐頁核對核閱報告、損益、資產負債、現金流、存貨、收入與部門附註，能確認高獲利、
+  存貨／應收占用現金及借款擴張同時存在；[6 月營收公告](https://nexus-api.adata.com/en/news/1321/)
+  只補充單月 DRAM／SSD 產品占比。財報沒有 Q2 產品別或 AI 收入，單月占比也不能用來填空；
+  核閱報告對部分未經會計師核閱的子公司及權益法投資採保留結論。
+- [日月光投控 MOPS 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3711&year=115&seamon=2&mtype=A)
+  在 8 月 12 日已列出 8 月 10 日上線的
+  [2026Q2 合併財報](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3711&filename=202602_3711_AI1.pdf)。
+  核閱報告未見保留事項；部門附註可拆出封裝、測試、電子組裝與其他的對外收入、內部收入及
+  稅前淨利，但沒有 AI 或先進封裝收入。[高雄新廠公告](https://www.aseglobal.com/press-room/ase-breaks-ground-on-new-high-tech-facility-in-kaohsiung/)
+  可定位 178 億元投資、高階封裝測試用途與 2028Q2 預計完工，不能倒填成 2026H1 已投產或
+  已產生財務貢獻。
+- [弘塑 MOPS 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3131&year=115&seamon=2&mtype=A)
+  截至 8 月 12 日仍未回傳可定位的 115Q2 附件。這是有檢查時間與固定參數的未定位結果，
+  不代表逾期、未通過董事會或公司營運轉弱，也不能用 CoWoS 產業需求代替具名急單與財報。
 
 ## 影響路由
 
@@ -758,7 +1058,7 @@ stock_ids: 3035
 direction: uncertain
 hypothesis_refs: 3035:H1,3035:H2
 note_action: update_required
-action_due: 2026-08-13
+action_due: 2026-08-19
 rationale: Q2 簡報、新聞稿與 MOPS 完整附件均已定位；下一步是封存完整季報並重算專案組合、毛利、現金流與 NRE 到 MP 的可比路徑
 evidence_boundary: AI 占 NRE 35.4% 與占 MP 0.4% 是兩個不同收入池的應用占比，不是專案轉單率，也不支持未揭露的客戶、投片時程或量產收入
 -->
@@ -790,10 +1090,10 @@ group_id: memory
 stock_ids: 3260
 direction: uncertain
 hypothesis_refs: 3260:H1,3260:H2
-note_action: review_due
-action_due: 2026-08-13
-rationale: 本次未定位到 115Q2 正式附件，待公司或交易所檔案上線後再檢查存貨、現金流與應收
-evidence_boundary: 月營收與股價只能觸發搜尋，不能證實缺貨延續、2027 長約或全年營收倍增
+note_action: update_required
+action_due: 2026-08-19
+rationale: 8 月 7 日上線的 115Q2 正式附件已完成本文層級逐頁核對；下一步是依 focused_v1 建立 frozen pack，由不同 reviewer 重算核閱範圍、損益、營運資金、借款與收入附註後更新正式筆記
+evidence_boundary: 財報可證實獲利、存貨／應收現金占用與融資變化同時發生，但沒有 Q2 DRAM／SSD 或 AI 收入、價格／數量橋接、2027 長約與全年營收指引
 -->
 
 <!-- impact
@@ -801,10 +1101,10 @@ group_id: packtest
 stock_ids: 6271,3711
 direction: uncertain
 hypothesis_refs: 6271:H1,6271:H2,3711:H1,3711:H2
-note_action: review_due
-action_due: 2026-08-13
-rationale: 同欣電 MOPS 完整附件已於 7 月 30 日上線，等待封存重算與 8 月 5 日法說補足營運橋接；日月光投控仍等待可下載 Q2 正式文件
-evidence_boundary: 文件索引、事件預告或產業封裝需求不能替代公司收入組合、產能、毛利與具名客戶證據
+note_action: update_required
+action_due: 2026-08-19
+rationale: 同欣電與日月光投控的 MOPS 完整附件均已定位；日月光投控本文已拆出封裝、測試、電子組裝與內部銷除，兩家公司仍各自等待 frozen pack 與獨立 reviewer
+evidence_boundary: 日月光投控部門收入與全集團資本支出不能改寫成 AI／先進封裝收入、CoWoS 分子或部門營益率；同欣電仍須用法說與完整附註橋接產品組合及廠區進度
 -->
 
 <!-- impact
@@ -813,7 +1113,7 @@ stock_ids: 3675
 direction: uncertain
 hypothesis_refs: 3675:H1,3675:H2
 note_action: update_required
-action_due: 2026-08-13
+action_due: 2026-08-19
 rationale: MOPS 已定位 8 月 4 日上線的 115Q2 合併財報附件；下一步是封存 evidence pack 並重算報表、附註與商業化邊界
 evidence_boundary: 文件索引只證明可取得，不能支持 AI server 晶圓商業化、小訊號產品量產規模或營收受惠
 -->
@@ -824,19 +1124,22 @@ stock_ids: 3131
 direction: uncertain
 hypothesis_refs: 3131:H1,3131:H2
 note_action: watch
-action_due: 2026-08-13
-rationale: Q2 董事會預計 8 月 4 日召開，事件後檢查設備收入、合約負債、在製與毛利
+action_due: 2026-08-19
+rationale: 8 月 12 日以相同參數重查 MOPS 仍未定位到 115Q2 附件；持續等正式文件後再檢查設備收入、合約負債、在製與毛利
 evidence_boundary: 產業 CoWoS 需求不能替代弘塑具名急單或全年營收大於 80 億元的公司證據
 -->
 
 ## 下一個可證明／否定的節點
 
-- 精測與欣興完成 focused evidence pack、獨立 reviewer 重算及正式筆記簽核；未通過前只
-  顯示草稿狀態，不把 Q2 簡報摘要當成已核驗文章。
-- 智原把已定位的完整 115Q2 附件封存成 focused evidence pack，由另一位 reviewer 重算；
-  後續以同一 cohort 的 tape-out、qualification 與 MP 收入追蹤 NRE 轉量產，而不是比較兩個
-  不同收入池的百分比。
-- 德微、智原與同欣電已定位完整附件，下一步是各自封存與獨立重算；威剛、日月光投控與
-  弘塑截至 8 月 6 日仍無附件，以 MOPS 直接索引優先於公司 IR 活頁索引持續追蹤。
-- 任一事件若只有標題、董事會預告或媒體數字，保持 `review_due`／`watch`，不更新正式
-  筆記、不轉移 H# 生命週期，也不改量化分數。
+- 8 月 15 日依 T8 回查同一批專案是否新增 tape-out、qualification、MP 收入、具名客戶、
+  合約或可辨識財務貢獻；沒有同 cohort 證據時，不用 NRE 占比推算轉單率。
+- 智原、同欣電、德微、威剛與日月光投控均已有完整附件，後續按公司逐一建立 focused_v1
+  frozen evidence pack，由不同 reviewer 離線重算；每篇 `independently_verified` 筆記獨立提交，
+  不把本文的同一研究者閱讀當成簽核。
+- 威剛下一輪追存貨週轉／跌價、應收回款、產品價格與數量、營業現金流及借款；日月光投控
+  下一輪追封裝／測試的 AI 分子、先進封裝產能投產時點、具名客戶與可對應收入，而不是拿
+  全集團收入或資本支出代替。
+- 弘塑繼續以 MOPS 直接索引優先於事件與媒體說法追蹤；正式附件未出現前保持 `watch`，不以
+  CoWoS 需求、股價或同業數字補設備收入、急單與全年營收空白。
+- 任一更新都不轉移 H# 生命週期、不改量化分數；只有預登錄 trigger 命中並通過相應證據角色，
+  才升級主張。

@@ -273,3 +273,83 @@ status: active
 boundary: Liquid isolation、leak 與 CDU telemetry 只形成散熱族群搜尋路由；不支持元件 BOM、供應商份額、部署或收入。
 next_trigger: 客戶與公司雙向確認具名液冷 action contract、commissioning、field result 及財務貢獻。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-RAC-I13
+view: industry
+from_id: concept:ai-rack-action-contract
+to_id: capability:async-action-tracking
+relation: requires
+claim_refs: MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C7
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: Redfish 證實 202、Task Monitor、TaskState 與最後結果可分開；不證明 DSX 已採同一 Task 或物理設備已到位。
+next_trigger: 具名整合保存 request、Task、錯誤與完成時間，並可和設備讀值及工單按同一事件追查。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-RAC-I14
+view: industry
+from_id: concept:ai-rack-action-contract
+to_id: capability:stale-write-protection
+relation: requires
+claim_refs: MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C8
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: ETag 與條件式更新可攔版本衝突；不提供 action 去重、冪等、跨域仲裁、guardrail 或物理結果驗證。
+next_trigger: 具名 isolation 實作公開資源版本、衝突處理、重送去重與跨控制器競爭測試。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-RAC-I15
+view: industry
+from_id: concept:ai-rack-action-contract
+to_id: standard:redfish-interop-profile
+relation: integrated_with
+claim_refs: MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C10
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: Profile 與三類 validator 可固定並查核最低 API 能力；不等於多供應商 action sequence、故障注入、場域可靠度或驗收。
+next_trigger: 正式 rack action profile 公開逐項要求、工具版本、結果與至少兩個獨立實作的互通矩陣。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-RAC-I16
+view: industry
+from_id: concept:ai-rack-action-contract
+to_id: capability:physical-state-verification
+relation: requires
+claim_refs: MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C13,MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C15
+note_refs:
+evidence_state: inference
+commercial_stage: planned
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-31
+status: active
+boundary: 把 Task 完成後的設備狀態、獨立感測、復原與維修另列為必要驗收層是跨文件推論；公開資料沒有共同 production record。
+next_trigger: 同一場域公布 request／Task、commanded／observed power／cooling state、fault injection、rollback、repair 與 service sign-off。
+-->

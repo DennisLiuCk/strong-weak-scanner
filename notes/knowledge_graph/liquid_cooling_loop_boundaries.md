@@ -332,3 +332,123 @@ status: active
 boundary: ODM 位於 ITE、rack 與 site integration 交界，但沒有合約責任、驗收分母、收入或毛利的雙向證據。
 next_trigger: 客戶與 ODM 公布具名 site、interface scope、commissioning、部署量與財務貢獻。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I15
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: metric:cdu-operating-envelope
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C8
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-10-03
+review_due: 2026-09-03
+status: active
+boundary: OCP water-based TCS 方法要求固定溫度、壓力、過濾及安全條件，但不提供每一 CDU、流體或場域的通用工作點與 pass／fail。
+next_trigger: 具名多供應商量產場域公開 fluid-specific 溫度、壓力、流量、熱負載及最差條件測試。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I16
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: metric:coolant-chemistry-baseline
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C8,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C9
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-10-03
+review_due: 2026-09-03
+status: active
+boundary: 啟動基準與代表性樣本是可追蹤方法，不表示 OCP Table 1 數值可跨 PG、介電液、FWS 或不同材料直接套用。
+next_trigger: 具名場域發布 fluid COA、填充後代表樣本、實驗室 QA 及跨季趨勢。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I17
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: capability:wetted-material-change-control
+relation: requires
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C8
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-10-03
+review_due: 2026-09-03
+status: active
+boundary: 完整浸液材料清單與變更重審是方法要求，不證明任一供應商已取得客戶資格、排他料號或收入。
+next_trigger: 具名多供應商場域公布完整材料清單、替代料／維修變更及相容性重驗結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I18
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: metric:coolant-contamination-budget
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C9,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C10,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C11
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-03
+status: active
+boundary: 一手文件共同證明潔淨度要跨設計、施工、填充與運轉管理，但沒有形成所有平台共用的顆粒或微生物單一門檻。
+next_trigger: 具名量產場域按製造、運送、施工、填充與維修階段公布 contamination budget、沖洗終點及 field trend。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I19
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: stage:tcs-fluid-commissioning
+relation: passes_through
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C9,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C11
+note_refs:
+evidence_state: verified
+commercial_stage: qualification
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-03
+status: active
+boundary: 清洗、沖洗、必要鈍化、填充與基準取樣構成 commissioning gate，不代表具名 site 已通過、長期可靠或完成商業認列。
+next_trigger: 具名多供應商 production site 發布簽核程序、L4／L5 測試、代表樣本與驗收結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I20
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: metric:coolant-monitoring-action-limits
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C9,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C10,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C11
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-03
+status: active
+boundary: 文件列出監測、QA 與 trending 方法，沒有替每座場域指定相同採樣頻率、action limit、隔離權限或維修責任。
+next_trigger: 具名場域公開 sampling plan、lab／sensor cross-check、action limits、責任矩陣與異常處置結果。
+-->

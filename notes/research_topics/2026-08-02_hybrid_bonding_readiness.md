@@ -1,4 +1,4 @@
-# 晶片貼得更近，量產反而更難：混合接合要同時守住五個製程窗口
+# 同樣叫混合接合，成熟度可以差很多：先分應用世代，再看五個製程窗口
 
 <!-- research_topic
 topic_id: MI-2026-08-02-HYBRID-BONDING-READINESS
@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-05-28
-last_reviewed_at: 2026-08-02
-review_due: 2026-08-16
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-19
 source_type: mixed
 publisher: imec
 publisher_domain: imec-int.com
@@ -19,9 +19,9 @@ group_ids: packtest,semiequip,material
 trigger_type: advanced_packaging_readiness_update
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C4
+thesis_claim_id: C8
 base_confidence: medium
-confidence_basis: imec 的探索型 PDK與200nm試驗車，加上 Applied Materials 的整合設備客戶使用，可由兩個獨立來源群組重建成熟度階梯；但具名量產產品、客戶資格、良率、throughput 與台灣公司財務映射仍未公開
+confidence_basis: Sony、TSMC 與 AMD 一手資料證明特定影像感測器、N7 SoIC 與 3D V-Cache 路徑已有應用、產品或 production 證據；imec 的 200nm W2W 試驗車、NanoIC D2W pathfinding PDK 與 Applied／Besi 工具則仍停在另一組較早關卡，因此成熟度必須按應用、接法、介面世代與產品逐格判定；各格 HVM 良率、throughput、成本及台灣公司財務映射仍未公開
 cross_company_numbers: false
 -->
 
@@ -127,6 +127,70 @@ limitation: 新聞索引只用來找後續文件；產品行銷、合作或市�
 independence_group: applied-materials
 -->
 
+<!-- research_source
+source_id: S6
+role: company_release
+source_kind: document
+publisher: Sony Group
+title: 3D Stacking Process Technologies for Advanced CMOS Image Sensors
+published_at: 2024-04-22
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.sony.com/en/SonyInfo/technology/publications/3d-stacking-process-technologies-for-advanced-cmos-image-sensors/
+locator: VLSI TSA 2024 abstract；2015 Cu-Cu hybrid bonding、stacked BI-CIS、2019 InGaAs／Si、2020 edge-AI logic 與 2023 large-chip CoW 段落
+limitation: 公司技術回顧可證明應用與製程世代不是從 2026 試驗才開始，但未公開各代量產流程、出貨量、good-product yield、throughput、成本或供應商份額；2023 large-chip CoW 仍只是 announced process
+independence_group: sony
+-->
+
+<!-- research_source
+source_id: S7
+role: company_release
+source_kind: document
+publisher: TSMC
+title: TSMC FINFLEX N2 Process Innovations Debut at 2022 North American Technology Symposium
+published_at: 2022-06-17
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://pr.tsmc.com/english/news/2939
+locator: 3DFabric 3D Silicon Stacking Solutions 段落；SoIC-based CPU CoW、IPU WoW、N7 chips already in production 與 N5 support schedule
+limitation: 公司公告可證明 N7 CoW／WoW production 與兩種具名應用，但沒有逐產品良率、throughput、成本、產能利用、客戶採購量或 SoIC 財務分子；不同節點與後續細間距路徑不能沿用同一成熟度
+independence_group: tsmc
+-->
+
+<!-- research_source
+source_id: S8
+role: company_release
+source_kind: document
+publisher: AMD
+title: Leadership Performance for Technical Computing Workloads
+published_at: 2022-03-21
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.amd.com/ko/solutions/data-center/insights/leadership-performance-for-technical-computing-workloads.html
+locator: EPYC 7003 with 3D V-Cache product launch 與 Under the Hood 的 copper-to-copper hybrid bonding bumpless design 段落
+limitation: 可把具名商用處理器與 Cu-Cu hybrid bonding 對上，但效能、互連密度與效率是 AMD 公司主張；未揭露接合良率、throughput、成本、供應商設備材料或產品收入拆分
+independence_group: amd
+-->
+
+<!-- research_source
+source_id: S9
+role: company_release
+source_kind: living_index
+publisher: TSMC
+title: TSMC-SoIC platform and current technology status
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://3dfabric.tsmc.com/english/dedicatedFoundry/technology/SoIC.htm
+locator: 2026-08-12 建立的 CoW／WoW、known-good-die、bond pitch 與後續 node production 狀態重查入口
+limitation: 活頁只用來偵測新一代 SoIC 節點、產品與 production 更新；頁面行銷敘述不能替代逐產品良率、throughput、成本或客戶與供應商財務雙向核對
+independence_group: tsmc
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -172,7 +236,7 @@ resolution:
 <!-- research_claim
 claim_id: C4
 label: inference
-status: active
+status: superseded
 claim: Hybrid bonding 已同時跨入設計規則、細間距試驗車與整合設備客戶使用三個節點，但現有公開證據仍不足以把整條技術路徑判定為具名產品的高量產成熟
 supporting_source_ids: S1,S2,S3
 contrary_source_ids:
@@ -180,7 +244,8 @@ as_of: 2026-08-02
 basis: S1 明示 pathfinding 而非 tape-out-ready，S2 是可路由試驗車，S3 只到未具名客戶使用；三者能建立成熟度階梯但沒有完成 HVM 的共同分母
 boundary: 不推估 hybrid bonding TAM、量產良率、設備份額、台灣公司訂單或股價；不同 D2W／W2W 用例也不能用單一節距直接比較
 verification_needed:
-resolution:
+corrected_by_claim_id: C8
+resolution: Sony、TSMC 與 AMD 的較早一手資料證明部分應用與產品路徑已到商用或 production；原句把不同應用、接法與介面世代放進同一條成熟度階梯，改由 C8 的四維矩陣取代
 -->
 
 <!-- research_claim
@@ -197,9 +262,54 @@ verification_needed: 晶圓廠或 OSAT 的具名產品 qualification，搭配台
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C6
+label: verified
+status: active
+claim: Sony 的 2024 官方技術回顧把 Cu-Cu hybrid bonding 追溯到 2015 年的 stacked back-illuminated CMOS image sensor，並列出 2019 年異質材料影像感測器、2020 年 edge-AI logic 與後續多層堆疊演進
+supporting_source_ids: S6
+contrary_source_ids:
+as_of: 2024-04-22
+basis: S6 直接命名 Cu-Cu hybrid bonding、stacked BI-CIS 與各應用年份，證明「混合接合」並非到 2026 細間距試驗才出現的單一路徑
+boundary: 只證明 Sony 公開的技術與應用演進；不補推各代 W2W／D2W 流程、良率、產量、成本、供應商或 2023 large-chip CoW 已進量產
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C7
+label: verified
+status: active
+claim: TSMC 於 2022-06-17 表示 N7 SoIC 的 CoW 與 WoW chips 已在 production，並分別列出 SRAM 疊在 CPU 與 logic 疊在 deep-trench-capacitor die 的應用；AMD 於 2022-03-21 又把已加入 EPYC 7003 產品線的 3D V-Cache 處理器明確描述為 copper-to-copper hybrid bonding 的 bumpless design
+supporting_source_ids: S7,S8
+contrary_source_ids:
+as_of: 2022-06-17
+basis: S7 提供 foundry 端 CoW／WoW production 與應用，S8 提供產品端 EPYC 型號世代與 hybrid bonding 描述，兩個發行人可交叉建立特定 N7／3D V-Cache 路徑已越過純試驗車的證據
+boundary: production 與商用產品不等於公開可稽核的 HVM economics；兩份文件都沒有 good-product yield、throughput、成本、產能利用或供應商財務分子，也不能證明 200nm W2W 或新 D2W PDK 同樣成熟
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: inference
+status: active
+claim: Hybrid bonding 不能用一條共同成熟度曲線判斷；至少要同時固定應用、W2W／D2W 接法、介面世代或 pitch、具名產品與 qualification／production 狀態，因為已商用或進 production 的影像感測器與 N7 SoIC 路徑，正和 200nm W2W 試驗車、D2W pathfinding PDK 及未具名工具使用同時存在
+supporting_source_ids: S1,S2,S3,S6,S7,S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C4；S6–S8 證明較早應用與具名產品／production，S1–S3 則證明另一組細間距、設計入口與工具證據仍停在 pathfinding／test vehicle／unnamed customer use；差異來自研究單位不同而非互相矛盾
+boundary: 本矩陣只校正成熟度分類，不推估 hybrid bonding TAM、量產良率、設備材料份額、台灣公司訂單、財務貢獻或股價；任一已成熟格也不能替另一應用、接法或介面世代繼承資格
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C4
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
 claim_ids: C1,C2,C3,C4
 metric: Hybrid bonding 由 PDK／試驗車進入具名產品 qualification、HVM yield、throughput 與可靠度的成熟度
 source_ids: S1,S2,S3
@@ -209,6 +319,8 @@ frequency_detail: imec、設備商、晶圓廠或 OSAT 發布新 PDK、test chip
 next_check: 2026-08-16
 trigger: 具名邏輯或記憶體產品完成客戶 qualification，且公開可定位的 good-die yield、throughput 或量產可靠度
 invalidation: 後續證據持續停在 pathfinding PDK、試驗車或未具名客戶使用，HVM 成熟度維持未證並下修商業急迫性
+retired_at: 2026-08-12
+retirement_reason: Sony、TSMC 與 AMD 新納入的歷史一手資料顯示不同應用、接法與世代已處於不同商用階段；單一 monitor 把整體 hybrid bonding 當成一條 maturity ladder 會混淆已 production 格與 200nm／pathfinding 格，改由 T3 四維矩陣接續
 -->
 
 <!-- monitoring_item
@@ -225,6 +337,20 @@ trigger: 台灣公司與客戶對同一 hybrid bonding 產品或製程完成 qua
 invalidation: 公司只使用 hybrid bonding、2.5D／3D 或先進封裝概念詞，未揭露客戶、產品、階段與財務足跡
 -->
 
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C1,C2,C3,C6,C7,C8
+metric: Hybrid bonding 應用×W2W／D2W 接法×介面世代／pitch×具名產品階段矩陣
+source_ids: S1,S2,S3,S6,S7,S8
+watch_source_ids: S4,S5,S9
+frequency: event_driven
+frequency_detail: imec、TSMC、產品商、設備商或 OSAT 公布新 PDK、test vehicle、具名產品 qualification、production、yield、throughput 或可靠度時，先固定四個維度再更新該格
+next_check: 2026-08-19
+trigger: 任一既有或新應用同時披露可定位的接法、介面世代或 pitch、具名產品與 qualification／production 狀態，或進一步提供 good-product yield、throughput、可靠度與成本
+invalidation: 新文件只使用 generic hybrid bonding、3D stacking、customer use 或最小 pitch，卻沒有固定應用、接法、產品與階段；該資料不得讓其他矩陣格自動升級
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -239,6 +365,13 @@ to: triaged
 reason: editorial_plain_language_wave94_hybrid_bonding_paths_process_windows_and_six_gate_ladder
 evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: split_hybrid_bonding_maturity_by_application_process_generation_and_product_stage
+evidence: sources:S6,S7,S8
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -251,6 +384,11 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 - **晶圓（Wafer）**：尚未切成單顆晶粒的圓形半導體基板；整片處理效率高，但也要一起管理全片缺陷與對準。
 - **單顆晶粒接晶圓（D2W）**：先挑選單顆晶粒，再逐顆接到目標晶圓；可混搭不同晶粒，但放置速度與逐顆對準也要計入。
 - **晶圓接晶圓（W2W）**：把兩片晶圓整面對準後一次接合；平行處理效率高，但上下晶圓的良品位置與缺陷分布會一起影響結果。
+- **晶片接晶圓（CoW）**：產品與製造文件常用的另一個寫法，意思是把已切割晶片接到晶圓；本文只在來源原文使用 CoW 時保留該名稱，研究分組仍放在 D2W。
+- **晶圓疊晶圓（WoW）**：台積電文件使用的 wafer-on-wafer 縮寫，研究分組對應本文的 W2W；保留不同縮寫是為了能逐字回查來源。
+- **銅對銅接合（Cu-Cu）**：讓上下兩層銅接點直接形成電性連接；本文來源明確稱為 hybrid bonding 時才把它放入混合接合證據，不把所有銅互連都自動歸類。
+- **N7**：台積電七奈米製程家族的名稱；N7 SoIC production 只能證明該節點與具名接法，不能替 N5、N3 或 200 奈米研究介面升級。
+- **應用世代**：同一技術被用在哪種產品、哪一代製程與哪種介面；影像感測器、CPU 快取與 200 奈米試驗結構不能只因都叫混合接合就共用成熟度。
 - **設計製程套件（PDK）**：把製程可做的線寬、間距、材料與驗證元件整理成設計規則；有套件不等於已有實體量產產品。
 - **探索型設計製程套件（Pathfinding PDK）**：讓設計者先找可行路徑的早期版本；可以開始試畫與驗證，不代表已具備完整送製能力。
 - **試驗結構（Test vehicle）**：為量測製程、電性與缺陷而設計的測試結構，不是客戶最終商品，也不能直接代表量產良率。
@@ -276,30 +414,52 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 - **Kinex**：Applied Materials 與 Besi 合作的單顆晶粒接晶圓整合設備；多類客戶使用設備，仍不等於具名產品已量產。
 - **imec**：進行半導體研發與試驗線驗證的研究機構；試驗結果可證明技術能力，但不能替代客戶產品量產資料。
 - **EV Group（EVG）**：參與本輪晶圓接晶圓試驗的設備公司；合作試驗證明設備角色，不等於市場份額或台灣供應商受惠。
+- **堆疊式影像感測器（Stacked CIS）**：把感光像素與邏輯電路分層製作再垂直連接；Sony 的公開技術回顧顯示這條應用早於本輪 200 奈米試驗。
+- **TSMC-SoIC**：台積電的晶圓級三維晶片堆疊平台，包含晶片接晶圓與晶圓接晶圓路徑；平台已有 production 證據，不代表每個節點、pitch 與產品都同時成熟。
+- **AMD 3D V-Cache**：把額外快取晶片垂直疊到處理器上的產品技術；AMD 把 EPYC 7003 的作法明確描述為無凸塊的銅對銅混合接合。
 
 ### 三句話抓重點
 
-- 兩層晶片讓平坦表面與細小銅接點直接貼合後，連線可以更短、更密，但一點灰塵、高低差或錯位都可能造成失敗。
-- 本輪已有「設計規則可用、試驗結構做出細接點、整合設備被多類客戶使用」三種進展，證明技術往前走了一段。
-- 但還沒有具名產品認證、穩定良率、每小時產能、長期可靠度、量產出貨與供應商收入，不能把試驗成功直接讀成量產成熟。
+- 混合接合讓平坦絕緣表面與細小銅接點直接貼合，連線可更短、更密；但用途、整片貼或逐顆貼、介面世代與產品階段不同，成熟度就不能互相繼承。
+- 影像感測器與處理器快取已有正式產品或生產證據，證明這項技術不是整體都停在試驗；成熟的是其中幾個明確格子。
+- 200 奈米整片試驗、逐顆貼合的早期設計規則與未具名客戶使用設備仍是另外幾格，還缺逐產品良率、產能、可靠度、成本與財務分子。
 
 ### 為什麼重要
 
 混合接合讓邏輯、記憶體與小晶片之間的接點更密，可能縮短資料路徑與降低傳輸能耗；但接點越密，
-表面平坦度、潔淨度、對準、良品挑選與接合後檢查就越需要一起控制。只看最小接點間距，會把研發
-紀錄誤讀成量產良率，也容易把材料、設備、封測與客戶產品四種不同責任混成同一種受惠。
+表面平坦度、潔淨度、對準、良品挑選與接合後檢查就越需要一起控制。若只問「混合接合量產了嗎」，
+會同時犯兩種錯：把舊應用已商用的事實刪掉，或把舊應用的成熟度移植給新 pitch、新接法與新產品。
 
 ### 接下來怎麼追
 
-- 先問每份新資料位於設計規則、試驗結構、設備使用、客戶認證、穩定量產還是財務貢獻哪一關。
-- 把逐顆接合與整片接合分開追蹤，分別核對良率分母、對準分布、每小時產能、返工與長期可靠度。
+- 先替每份新資料填四格：應用、W2W／D2W 接法、介面世代或 pitch、具名產品與資格／生產階段。
+- 再把逐顆接合與整片接合分開，分別核對良率分母、對準分布、每小時產能、返工與長期可靠度。
 - 公司映射必須同時找到客戶端的具名製程與供應商端的料號、量產及收入，缺一邊就維持待驗證。
 
 ### 想一想
 
-- 如果所有接點都對得很準，還有哪些灰塵、表面高低差、壞晶粒與熱循環問題可能讓成品失敗？
+- Sony 影像感測器或 AMD 處理器已有產品證據，為什麼仍不能證明 200 奈米整片貼合已量產？
 - 逐顆挑選後再接合，與兩片晶圓整面接合，為什麼不能只用一個良率分母比較？
-- 設備已被客戶使用後，還要看到哪些認證、產能、可靠度與財務資料才算量產成熟？
+- 公司說晶片已進入生產後，還要看到哪些良率、產能、成本與財務資料，才能比較量產經濟性？
+
+## 先畫四維地圖：成熟的是哪一格
+
+最安全的問法不是「混合接合成熟了嗎」，而是：**哪一種應用、哪一種接法、哪一代介面、哪個產品階段成熟了？**
+下表把本輪一手證據放回各自格子；它是範圍地圖，不是技術排名。
+
+| 應用或產品格 | 接法與介面範圍 | 公開證據到哪裡 | 可以說什麼 | 不能把什麼一起升級 |
+|---|---|---|---|---|
+| Sony 堆疊式影像感測器 | Cu-Cu hybrid bonding；官方回顧沒有把每一代產品都固定成同一 W2W／D2W 流程 | 2015 年技術導入後，官方回顧列出異質材料感測器、edge-AI logic 與後續多層堆疊演進 | 這個應用家族不是到 2026 年才從試驗起步 | 不代表 2023 large-chip CoW、多層堆疊或其他公司產品已量產，也沒有公開良率與成本 |
+| AMD EPYC 7003 3D V-Cache／TSMC N7 SoIC CoW | 銅對銅無凸塊接合；晶片接晶圓 | AMD 已把具名處理器加入產品線；TSMC 表示 N7 CoW chips 已在 production | 特定 N7 CPU＋SRAM 路徑已越過純試驗結構 | 不代表所有 D2W、所有節點、200 奈米 pitch 或任何台灣設備材料商都已通過資格 |
+| TSMC N7 SoIC WoW 的 logic＋DTC IPU | 晶圓接晶圓 | TSMC 表示 N7 WoW chips 已在 production，並列出 logic 疊在深溝電容晶粒的應用 | 特定 N7 WoW 應用已有 foundry production 聲明 | 不代表 imec 200 奈米 W2W 的產品良率、throughput 或成本已完成 |
+| imec／EVG 200 奈米 W2W | 300 毫米晶圓、200 奈米 Cu pad pitch 的試驗結構 | 接合後對準結果與可路由試驗結構 | 能證明特定細間距與對準能力 | 不能繼承前述 N7／影像感測器的產品、qualification、HVM economics 或出貨 |
+| NanoIC D2W 與 Kinex 工具 | 探索型 D2W 設計規則；整合接合與線上量測工具 | pathfinding PDK 與未具名多類客戶使用 | 設計入口與工具整合正在前進 | 不能寫成完整 tape-out、具名產品資格、穩定量產或供應商收入 |
+
+所以本文採用的是「成熟度向量」，不是單一標籤：
+
+> 應用 × 接法 × 介面世代／pitch × 具名產品階段
+
+只要其中一格改變，就要重新驗證；舊格的 production 只能當可行性先例，不能替新格通過資格。
 
 ## 先分清兩種「貼法」的良率分母
 
@@ -315,37 +475,41 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 
 | 本文五個量產窗口 | 先回答什麼 | 主要接力角色 | 失敗會怎樣 | 本輪可確認到哪裡 |
 |---|---|---|---|---|
-| 1. 設計規則與試驗結構 | 設計者知道哪些線寬、間距與材料可製造嗎？ | 研究機構、設計工具與晶圓製程團隊 | 規則畫得出來，實體卻做不出或無法量測 | 已有探索型設計規則與細接點試驗結構；完整送製能力仍未公開 |
-| 2. 表面平坦與銅高度 | 介電層、銅接點與凹陷高度是否落在可接合窗口？ | 材料、研磨、沉積與表面處理設備 | 局部接觸不足、空洞、電阻不穩或整片報廢 | 試驗文件列出研磨與表面條件；沒有具名產品長期製程分布 |
+| 1. 設計規則與試驗結構 | 設計者知道哪些線寬、間距與材料可製造嗎？ | 研究機構、設計工具與晶圓製程團隊 | 規則畫得出來，實體卻做不出或無法量測 | N7 SoIC 等較早產品格已越過本關；新 D2W PDK 仍是探索型，200 奈米 W2W 仍是試驗結構 |
+| 2. 表面平坦與銅高度 | 介電層、銅接點與凹陷高度是否落在可接合窗口？ | 材料、研磨、沉積與表面處理設備 | 局部接觸不足、空洞、電阻不穩或整片報廢 | 技術文件列出研磨與表面條件；沒有把新舊各格放在同一口徑的長期製程分布 |
 | 3. 潔淨與顆粒控制 | 接合面能否在搬運、清洗與貼合前維持乾淨？ | 清洗設備、化學材料、晶圓廠與封測廠 | 一顆微粒就可能造成局部未接合或缺陷擴散 | 已知潔淨是製程節點；沒有量產缺陷密度與停機資料 |
 | 4. 對準、接合與量測 | 上下接點是否持續對準、導通，並能及早發現漂移？ | 接合設備、線上量測、檢查與製程整合團隊 | 接點錯位、開路、短路，或直到後段才發現損失 | 試驗結構有細間距與對準結果，整合設備也被多類客戶使用 |
-| 5. 良率、產能與可靠度 | 好產品比例、每小時產能、返工與長期壽命能否一起達標？ | 晶圓廠、封測廠、產品客戶與財務團隊 | 技術可做卻成本過高、產量不足或使用後失效 | 沒有具名產品良率、產能、長期可靠度、出貨與收入 |
+| 5. 良率、產能與可靠度 | 好產品比例、每小時產能、返工與長期壽命能否一起達標？ | 晶圓廠、封測廠、產品客戶與財務團隊 | 技術可做卻成本過高、產量不足或使用後失效 | 已有特定產品與 production 聲明，但各格仍沒有可共同稽核的良率、throughput、成本、利用率與財務分子 |
 
 五個窗口是接力關係：前一站達標不會自動替下一站畢業。這是本文的製程責任地圖，不是供應商名單、
 訂單判定、公司快慢或投資排序。
 
-## 最後用六關分開技術進展與收入
+## 最後用六關分開「已有產品」與「量產經濟可稽核」
 
 | 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
-| 1. 開放設計入口 | 設計者有可用規則與驗證元件 | NanoIC 提供探索型設計製程套件 | 完整送製工具、實體試製晶片與設計採用 | 規則可用不等於產品已做出或量產 |
-| 2. 試驗結構成功 | 特定接點結構能被製作、對準與量測 | imec／EVG 在 300 毫米晶圓試驗結構展示 200 奈米接點間距與低於 40 奈米的接合後對準誤差 | 電性良率、缺陷分布、重複批次與長期可靠度 | 對準達標不等於所有電路正常或良率 100% |
+| 1. 開放設計入口 | 設計者有可用規則與驗證元件 | 新 D2W 格有 NanoIC 探索型 PDK | 完整送製工具、實體試製晶片與設計採用 | 規則可用不等於產品已做出或量產 |
+| 2. 試驗結構成功 | 特定接點結構能被製作、對準與量測 | 新 W2W 格有 imec／EVG 200 奈米試驗結構與接合後對準結果 | 電性良率、缺陷分布、重複批次與長期可靠度 | 對準達標不等於所有電路正常或良率 100% |
 | 3. 整合設備與流程使用 | 接合與量測步驟能在整合設備中運作 | Applied Materials 表示 Kinex 已被多類邏輯、記憶體與封測客戶使用 | 具名客戶、使用階段、設備數量與產品結果 | 客戶使用不等於資格認證、量產或設備收入份額 |
-| 4. 具名產品資格認證 | 特定產品通過客戶功能與可靠度要求 | 未公開 | 客戶與製造端對上同一產品、製程與認證結果 | 試驗結構或未具名客戶不能替代產品認證 |
-| 5. 穩定大量生產 | 良率、每小時產能、返工、可靠度與成本能持續達標 | 未公開 | 具名產品的批次良率、產能、停機、可靠度與成本 | 單次紀錄、最小間距或設備安裝不等於穩定量產 |
-| 6. 重複出貨與形成收入 | 供應商產品或服務可重複交付並反映在財務 | 未公開 | 客戶與供應商雙向核對料號、量產出貨、收入或毛利 | 製程需要某類材料或設備不等於台灣公司已受惠 |
+| 4. 具名商用產品 | 特定產品公開採用同一接合路徑 | AMD EPYC 7003 3D V-Cache 被明確描述為銅對銅無凸塊混合接合；Sony 回顧也列出多代影像感測器應用 | 同產品製造資格、批次與接合界面資料 | 一個商用產品不能替所有應用、接法與 pitch 通過資格 |
+| 5. Production 聲明 | 製造端確認特定節點與接法已進生產 | TSMC 表示 N7 SoIC CoW 與 WoW chips 已在 production | 逐產品良率、throughput、停機、可靠度、成本與利用率 | production 一詞不等於上述量產經濟分母已公開，亦不證明 200 奈米格已完成 |
+| 6. 量產經濟與財務歸因 | 客戶與供應商對上同一產品、期間、合格產出、成本與收入 | 本輪沒有共同口徑證據 | 客戶與供應商雙向核對料號、合格產出、重複出貨、收入或毛利 | 製程需要某類材料或設備不等於台灣公司已受惠 |
 
-本輪三份核心資料只把公開證據推進到第 1～3 關；第 4～6 關仍缺資料。六關是本文的查證順序，
-不是共同產業標準，也不替公司建立量產名次、供應份額、訂單或財務貢獻。
+本輪六份文件顯示不同格子散落在第 1～5 關，第 6 關仍缺共同分母。六關是本文的查證順序，
+不是共同產業標準；更不是把 Sony、TSMC、AMD、imec 與設備商放在同一條公司排名上。
 
 ## 來源與證據邊界
 
 - [imec NanoIC：fine-pitch RDL 與 D2W pathfinding PDK](https://www.imec-int.com/en/press/nanoic-opens-access-first-ever-fine-pitch-rdl-and-d2w-hybrid-bonding-interconnect-pdks)
 - [imec／EVG：200nm W2W hybrid bonding test vehicle](https://www.imec-int.com/en/press/imec-and-ev-group-demonstrate-wafer-wafer-hybrid-bonding-200nm-interconnect-pitch-and-record)
 - [Applied Materials：Kinex integrated D2W hybrid bonder](https://investors.appliedmaterials.com/node/28506/pdf)
+- [Sony：advanced CMOS image sensor 的 3D stacking 與 Cu-Cu hybrid bonding 演進](https://www.sony.com/en/SonyInfo/technology/publications/3d-stacking-process-technologies-for-advanced-cmos-image-sensors/)
+- [TSMC：N7 SoIC CoW／WoW production 與應用](https://pr.tsmc.com/english/news/2939)
+- [AMD：EPYC 7003 3D V-Cache 的銅對銅無凸塊混合接合](https://www.amd.com/ko/solutions/data-center/insights/leadership-performance-for-technical-computing-workloads.html)
 
-本篇沒有把 imec 的效能改善、Applied Materials 的產品優勢或「highly yielding」措辭拿來做跨公司數字比較；
-也沒有 HVM 良率、每小時產能、每片成本與市場份額的共同定義，因此 `cross_company_numbers` 維持 false。
+本篇沒有把 imec、TSMC、AMD 或 Applied Materials 的效能與產品優勢拿來做跨公司數字比較；各文件的
+應用、製程、產品與測試分母不同，也沒有 HVM 良率、每小時產能、每片成本與市場份額的共同定義，
+因此 `cross_company_numbers` 維持 false。
 
 ## 影響路由
 
@@ -384,7 +548,8 @@ evidence_boundary: 材料類別被研究機構使用不證明台灣公司供貨�
 
 ## 下一個可證明／否定的節點
 
-- NanoIC PDK 由 pathfinding 進入 fabrication-ready tape-out，並有實體 silicon 結果。
-- 具名邏輯、記憶體或 OSAT 客戶公布 D2W／W2W qualification、good-die yield、throughput 與可靠度。
+- NanoIC PDK 由 pathfinding 進入 fabrication-ready tape-out，並固定應用、接法、pitch 與實體 silicon 結果。
+- 200 奈米 W2W、large-chip CoW 或其他新格的具名客戶公布 qualification、good-product yield、throughput 與可靠度。
+- Sony、TSMC 或 AMD 若更新既有 production 格，必須分開記錄產品節點、介面世代、合格產出、成本與利用率，不能只寫「hybrid bonding 成長」。
 - 台灣公司與客戶文件能對上同一工具、材料或製程，並披露量產與財務足跡。
-- 若未來一年仍只有試驗車與未具名 customer use，研究應把商業成熟度維持在 capability，而非 HVM。
+- 若新格未來一年仍只有試驗車與未具名 customer use，該格應維持 capability，而不是借用舊格 production 升級。

@@ -1,14 +1,15 @@
 # AI 電容角色知識圖譜
 
-本圖按位置、電壓、頻帶與任務拆分 rack CBU、高壓 DC-link、板級 bulk 與近晶片去耦。
-公司節點只投影其公開產品角色；族群線仍是搜尋路由，沒有一條線代表台灣公司已供貨。
+本圖按位置、電壓、頻帶與任務拆分 rack CBU、高壓 DC-link、板級 bulk 與近晶片去耦，
+再以有效容量、頻率阻抗、紋波溫升與任務壽命核對實際可用能力。公司節點只投影其公開產品角色；
+族群線仍是搜尋路由，沒有一條線代表台灣公司已供貨。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-capacitor-role-map
 root_node_id: concept:ai-capacitor-role-map
 label: AI 電容角色地圖
-summary: 把 rack CBU、高壓 bus／DC-link、板級 bulk 與 package／near-die decoupling 分成不同查核單位，並明示產品角色不等於台灣供應商量產或財務曝險。
+summary: 把 rack CBU、高壓 bus／DC-link、板級 bulk 與 package／near-die decoupling 分成不同查核單位，再用四道工作條件區分標稱容量與實際可用能力；產品角色不等於台灣供應商量產或財務曝險。
 article_ids: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP
 status: active
 -->
@@ -251,4 +252,84 @@ review_due: 2026-09-30
 status: active
 boundary: 電源模組決定 capacitor placement 與規格只形成搜尋路由，不證明台灣廠採用、量產、訂單或獲利。
 next_trigger: 具名電源模組與客戶文件公布 PDN／CBU configuration、qualified parts、shipment 與財務分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACR-I10
+view: industry
+from_id: concept:ai-capacitor-role-map
+to_id: metric:capacitor-effective-capacitance
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C6
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: Murata 與 TDK 支持高介電常數／Class 2 MLCC 應看實際工作電壓下的有效容量；沒有全產品共同降額、platform pass line、顆數或供應商資料。
+next_trigger: 具名 production platform 公布 part-specific bias／temperature curve、實際工作點、qualification pass／fail 與 BOM。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACR-I11
+view: industry
+from_id: concept:ai-capacitor-role-map
+to_id: metric:capacitor-impedance-spectrum
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C7
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: KEMET／YAGEO 的頻率與溫度曲線只屬 ESE 鋁電解系列；不固定其他材料的 SRF、目標頻帶、控制穩定性或替代關係。
+next_trigger: 同一 production power stage 公布完整 ripple／transient spectrum、part-specific Z／ESR／ESL curve、layout 與量測結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACR-I12
+view: industry
+from_id: concept:ai-capacitor-role-map
+to_id: metric:capacitor-ripple-temperature-rise
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C8
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: 供應商文件支持紋波、ESR、頻率、環境與散熱共同影響溫升；不同材料與測試不能合成共同額定或跨料號排行。
+next_trigger: 客戶以實際 waveform、ambient、board／busbar、cooling 與 thermal sensor 公布 qualification 溫升及失效結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACR-I13
+view: industry
+from_id: concept:ai-capacitor-role-map
+to_id: metric:capacitor-mission-life
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C8,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C9
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: 四道工作條件是研究框架；ESE 壽命公式與 TDK 溫升建議不可跨技術套用，也不等於客戶保固、field reliability 或財務貢獻。
+next_trigger: 具名平台固定 mission profile、加速試驗、failure criteria、field hours、BOM 與 supplier／customer 雙向結果。
 -->

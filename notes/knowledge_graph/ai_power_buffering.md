@@ -2,13 +2,15 @@
 
 本圖把 CBU、BBU 與 BESS 依時間尺度、系統位置及失效任務分層。公司節點只表示公開架構或
 reference design；族群節點仍是待驗證搜尋路由，沒有一條線代表台灣公司已取得量產訂單。
+新增的七欄事件合約把任務、功率波形、可用能量、反應交接、回充、損耗熱與壽命安全連回同一
+根節點，方便讀者看出「時間尺度」只是第一道篩選，不是完整替代性判準。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-power-buffering
 root_node_id: concept:ai-power-buffering
 label: AI 功率緩衝時間尺度
-summary: 以機架附近的 CBU、rack ride-through BBU 與設施級 BESS 拆解 AI 負載波動，並把架構必要性與台灣供應商財務證據分開。
+summary: 以機架附近的 CBU、rack ride-through BBU 與設施級 BESS 拆解 AI 負載波動，再以七欄事件合約核對功率 能量 交接 回充 損耗與壽命，並把架構必要性與台灣供應商財務證據分開。
 article_ids: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY
 status: active
 -->
@@ -211,4 +213,144 @@ review_due: 2026-09-30
 status: active
 boundary: 高壓保護與雙向轉換形成功率元件搜尋路由；沒有固定材料份額、supplier BOM 或公司收入證據。
 next_trigger: 客戶與供應商公布具名 device、stage、qualification、量產與財務結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I09
+view: industry
+from_id: concept:ai-power-buffering
+to_id: capability:buffer-mission-trigger
+relation: requires
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C8
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-03-01
+review_due: 2026-09-01
+status: active
+boundary: OCP 把正常動態負載與 BBU backup trigger 分開；本文不替其他平台指定偵測訊號或控制閾值。
+next_trigger: 同一 production rack 公布 event taxonomy、trigger／exit logic 與誤觸發測試結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I10
+view: industry
+from_id: concept:ai-power-buffering
+to_id: metric:buffer-power-waveform
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C8
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-03-01
+review_due: 2026-09-01
+status: active
+boundary: Diablo 400 Tables 5–8 證實 load、frequency、duty、pulse 與 slew 是不同欄位；不把範例 profile 外推到所有平台。
+next_trigger: 具名 production configuration 公布原始 load waveform、reference plane 與 pass／fail limits。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I11
+view: industry
+from_id: concept:ai-power-buffering
+to_id: metric:buffer-usable-energy-duration
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C6,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C9
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: DOE 支持 power／energy 分軸；可用能量窗口是本文套用到 AI 緩衝的規格方法，不是 DOE 的 rack 標準。
+next_trigger: 同一 CBU／BBU 公布額定與可用能量、電壓／SOC limits、老化餘裕及指定負載 duration。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I12
+view: industry
+from_id: concept:ai-power-buffering
+to_id: metric:buffer-response-handoff
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C8,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C9
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: OCP 要求保持能量涵蓋儲能 ramp-up，DOE 定義 response time；兩份文件不是同一 AI platform test。
+next_trigger: Production rack 公布 dropout detection、built-in holdup、storage ramp、handoff settling 與最差條件波形。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I13
+view: industry
+from_id: concept:ai-power-buffering
+to_id: metric:buffer-duty-recharge
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C8,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C9
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: OCP 動態 profile 包含 duty cycle，但沒有完整 CBU／BBU recharge contract；回充與再次武裝仍待平台證據。
+next_trigger: 同一系統公布連續事件間隔、充電功率限制、恢復 SOC、熱狀態與 second-pulse pass／fail。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I14
+view: industry
+from_id: concept:ai-power-buffering
+to_id: metric:buffer-efficiency-thermal
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C7,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C9
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: DOE 的 RTE 與 operating-condition 方法可揭露損耗邊界，但不提供 AI CBU／BBU 效率或散熱數值。
+next_trigger: 具名模組在固定 input／output reference plane、輔助負載、溫度與冷卻條件下公布充放電效率及熱限值。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I15
+view: industry
+from_id: concept:ai-power-buffering
+to_id: metric:buffer-life-safety
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C7,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C9
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-09-01
+status: active
+boundary: DOE 分列 cycle 與 calendar life；本文再把安全隔離與維修納入事件合約，不能視為已完成 rack qualification。
+next_trigger: 同一 production module 公布 depth-of-discharge、SOC、溫度、cycle／calendar aging、fault containment、maintenance 與 field reliability。
 -->

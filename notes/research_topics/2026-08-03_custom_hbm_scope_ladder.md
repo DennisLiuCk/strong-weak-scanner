@@ -168,6 +168,70 @@ limitation: IR 索引只供找到新附件；不能把管理層重複說法視�
 independence_group: micron
 -->
 
+<!-- research_source
+source_id: S9
+role: company_release
+source_kind: living_index
+publisher: Samsung Semiconductor
+title: Memory Labs — DRAM Design Lab and AGI Computing Lab
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://semiconductor.samsung.com/about-us/locations/us-rnd-labs/memory-labs/
+locator: DRAM Design Lab 的 HBM、MID、ESS、ACD teams，以及 AGI Computing Lab 的 System Technology／Architecture groups；逐項列出 HBM4E architecture／IP、Custom HBM I/O architecture／circuit／IP、firmware、base die、technical customer engagement、workload modeling 與 system software
+limitation: 這是會變動的公司研發組織與招募說明，只能證明公司公開描述的工作分解；不證明任一實際專案按同一流程執行、外部供應商分工、客戶 qualification、量產或財務貢獻
+independence_group: samsung-electronics
+-->
+
+<!-- research_source
+source_id: S10
+role: company_release
+source_kind: living_index
+publisher: Samsung Foundry
+title: Application Specific Service — HPC and AI
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://semiconductor.samsung.com/foundry/application-specific-service/hpc-ai/
+locator: Logic and memory integration 段落；把 die-to-die interface、base-die controller、additional logic、bandwidth／capacity、power／latency 與 application customization 放在同一供應商架構圖
+limitation: 動態應用服務頁與供應商效益主張不是產業共同標準、獨立 benchmark、具名 customer design、完整 PPA／thermal sign-off、qualification 或 production result
+independence_group: samsung-electronics
+-->
+
+<!-- research_source
+source_id: S11
+role: other_primary
+source_kind: document
+publisher: Taiwan Semiconductor Manufacturing Company
+title: A Shared Commitment to Energy-Efficient AI
+published_at: 2025-11-07
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.tsmc.com/english/node/233
+locator: OIP Forum 回顧的 memory capacity／bandwidth／latency 段落；明列 HBM4 logic base die 使用 N12、custom HBM4E design 使用 N3P
+limitation: 台積電 OIP 生態系文章只支持兩種設計路徑所述製程節點，不提供具名記憶體供應商或客戶、tape-out／qualification、wafer volume、yield、pricing 或財務歸因
+independence_group: tsmc-oip
+-->
+
+<!-- research_source
+source_id: S12
+role: company_release
+source_kind: living_index
+publisher: Samsung Semiconductor
+title: Samsung Showcases Next-Generation AI Semiconductor Innovations at COMPUTEX 2026
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://semiconductor.samsung.com/kr/news-events/tech-blog/samsung-showcases-next-generation-ai-semiconductor-innovations-at-computex-2026/
+locator: COMPUTEX 2026 HBM4E／HPB 段落；說明 base die 內 D2D PHY 是主要發熱區、HPB 提供獨立 thermal path，並標示 HBM4E validation 與未來 HBM5 adoption 的不同階段
+limitation: 公司展會技術回顧與前瞻規劃只支持特定 HBM4E／HPB 的熱邊界；它不是 custom HBM 的共同要求、客戶 pass result、量產採用或供應鏈財務證據
+independence_group: samsung-electronics
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -287,6 +351,91 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: Samsung Memory Labs 公開頁把 Custom HBM 相關研發拆到 I/O architecture／circuit／IP、firmware、base die 與 technical customer engagement，並另列 workload architecture、modeling、runtime prototype 與 system software；這些不是同一個工作項目
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 的 DRAM Design Lab 與 AGI Computing Lab team descriptions 逐項列出上述工作分工，可直接定位到不同團隊與輸出
+boundary: 組織頁只能證明三星如何公開描述研發範圍，不證明每個 custom HBM 專案都採相同組織、責任已完整交接、任何外部供應商參與或產品已通過客戶驗證
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: Samsung Foundry 的 HPC／AI 應用頁把 custom HBM 的公開架構描述為使用 die-to-die interface、把 HBM controller 整合進 base die，並可在 base die 加入 accelerator、memory controller 或 CPU 等額外邏輯
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S10 Logic and memory integration 段落逐項列出 interface、controller placement 與 additional logic examples
+boundary: 這是單一供應商的應用架構與效益主張，不是 JEDEC 共同定義，也不證明所有 custom HBM 都採相同 partition、效能數字可跨公司比較、具名客戶已 tape-out 或產品已量產
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: 台積電 2025 OIP Forum 回顧把 HBM4 logic base die 的 N12 路徑與 custom HBM4E design 的 N3P 路徑分開，顯示「底部邏輯晶片」名稱相同也不能假設製程節點與設計契約相同
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2025-11-07
+basis: S11 直接並列 N12 for HBM4 logic base die 與 N3P for custom HBM4E designs
+boundary: 製程路徑差異不證明具名客戶、記憶體供應商、tape-out、qualification、量產數量、良率、價格或台灣 IC 設計公司參與
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: Samsung COMPUTEX 2026 技術頁把 HBM4E base die 內的 D2D PHY 定位為主要發熱區，並把 HPB thermal path 描述為仍在 HBM4E 驗證、預計未來 HBM5 採用，證明介面邏輯改動與熱路徑不能被視為兩個完全獨立的設計問題
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S12 明示 D2D PHY 的位置與發熱原因、HPB 的散熱用途，以及 validation 與 future adoption 兩個不同階段
+boundary: 這只支持三星特定 HBM4E／HPB 技術邊界；不表示 HPB 是 custom HBM 必備項、驗證已通過、客戶會採用、封測供應商已取得資格或財務價值已形成
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: inference
+status: active
+claim: 研究一個具名 custom HBM 專案時，至少要把工作負載與功能、容量／速度／功耗／介面、base-die 邏輯與 IP、firmware／software、製程／封裝／熱，以及 sample／qualification／量產財務六份交接合約分開；任何一份成立都不能替另外五份背書
+supporting_source_ids: S2,S3,S4,S5,S9,S10,S11,S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S2 定義客戶規格欄位，S3 定位 workload offload，S4／S11 定位 base-die 與 foundry 路徑，S9 分開 architecture／IP／firmware／customer engagement，S10 定位 controller／D2D partition，S12 定位熱耦合，S5 則證明 sample 與 production 時鐘必須另列；合併後形成六份不可互相替代的查核欄位
+boundary: 六份合約是本文的研究閱讀框架，不是 JEDEC 標準、固定開發順序、供應商價值分配或成熟度分數；現有來源沒有同一具名客戶專案把六份文件、版本、sign-off 與財務全部公開接起
+verification_needed: 記憶體供應商與具名客戶雙向公開同一產品世代的 workload target、介面版本、base-die／firmware build、製程封裝熱條件、change control、qualification pass criteria、量產與財務分母
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -315,6 +464,20 @@ trigger: 公司揭露已實現 custom HBM 收入／毛利或具名客戶 qualifi
 invalidation: 管理層只重複較高毛利或合作敘事，沒有 NRE、產品資格、量產與財務分母
 -->
 
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C6,C8,C9,C10,C11,C12
+metric: 同一具名 custom HBM 專案的 workload、介面、base-die／IP、firmware／software、製程封裝熱、qualification／量產財務六份交接是否以版本與責任人閉合
+source_ids: S2,S3,S4,S5,S9,S10,S11,S12
+watch_source_ids: S6,S7,S8,S9,S10
+frequency: event_driven
+frequency_detail: 任一供應商或客戶公布 custom HBM design handoff、sample qualification、change control 或 production 文件時逐欄重審
+next_check: 2026-09-15
+trigger: 同一具名產品與客戶公開可對齊的 workload target、interface／base-die／firmware build、foundry／package／thermal condition、pass criteria、變更紀錄與量產結果
+invalidation: 後續一手資料顯示部分欄位由共同標準完整固定、某些客製路徑不需要 firmware 或 workload offload，或責任分界與本文六欄不同，則重畫合約而不是保留固定六欄
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -335,6 +498,13 @@ from: triaged
 to: triaged
 reason: editorial_plain_language_wave90_custom_scope_and_progress_no_conclusion_change
 evidence: editorial:plain_language_wave90_custom_scope_and_progress
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: added_workload_interface_base_die_firmware_manufacturing_and_qualification_handoff_contract_without_refreshing_thesis_clock
+evidence: sources:S2,S3,S4,S5,S9,S10,S11,S12
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -373,6 +543,17 @@ evidence: editorial:plain_language_wave90_custom_scope_and_progress
 - **毛利**：收入扣除直接成本後留下的金額或比率；沒有相同產品與會計分母時不能跨公司排名。
 - **預期毛利／已實現毛利**：前者是管理層對未來的看法，後者是已進入財務結果的數字；兩者不能互相替代。
 - **共同分母**：比較時各家公司都用相同產品範圍、階段、期間、數量與計算方式；缺少共同分母就不產生單一名次。
+- **輸入輸出架構（I/O architecture）**：規定資料、命令與狀態如何進出記憶體及底部邏輯；名稱相同不代表版本、通道與錯誤處理相同。
+- **晶粒對晶粒實體介面（D2D PHY）**：讓底部邏輯晶片與運算晶片交換高速訊號的實體電路；速度提高也會改變耗電與發熱條件。
+- **控制器**：接收請求、安排資料傳輸並處理狀態與錯誤的邏輯；把它移到底部晶片會改變設計、驗證與責任邊界。
+- **韌體（firmware）**：貼近硬體運作、負責初始化、控制與錯誤處理的程式；晶片完成不等於韌體已能配合客戶系統。
+- **設計凍結（design freeze）**：開發各方同意某一版規格與設計不再任意改動的節點；凍結一層不表示其他層也已凍結。
+- **變更控制（change control）**：設計凍結後記錄誰改了什麼、影響哪些介面，以及哪些測試必須重跑的程序。
+- **設計簽核（sign-off）**：負責方確認指定版本在既定條件下達標；模擬簽核、晶片簽核、封裝簽核與客戶驗收是不同結果。
+- **熱路徑（thermal path）**：熱從發熱位置傳到封裝與冷卻系統的路線；功能放進底部晶片後，熱不會自動消失。
+- **熱傳路徑塊（HPB）**：三星展示的獨立導熱結構，用來把底部晶片高速介面產生的熱向外傳；仍在驗證不等於已量產採用。
+- **N12／N3P 製程節點**：台積電兩種邏輯製程名稱；本文只用來說明一般 HBM4 與客製 HBM4E 的底部晶片路徑可能不同，不比較製程優劣。
+- **Memory Labs（記憶體實驗室）**：三星官方頁對多個研發團隊的合稱；組織頁列出能力範圍，不代表一個具名產品已完成所有工作。
 
 ### 三句話抓重點
 
@@ -430,6 +611,37 @@ evidence: editorial:plain_language_wave90_custom_scope_and_progress
 樣品規劃與底部晶片架構展示，不是同一個完成節點。三家公司也沒有共同產品定義、測試條件、
 數量與財務分母，因此目前不能合併成一條供應商進度排名。
 
+## 客製不是一顆晶片：六份交接合約要一起凍結
+
+「底部邏輯可以客製」只指出一個設計位置，沒有說明整套系統怎麼完成。三星公開的研發分工把
+工作負載建模、輸入輸出架構與智財、韌體、底部晶片及客戶技術合作分開；三星 Foundry 與台積電
+的資料又顯示控制器位置、晶粒介面與製程節點會跟著設計路徑改變。三星在另一份 HBM4E 技術頁
+還指出，底部晶片內的高速介面本身就是主要發熱區。這些資料不能合成一個已量產專案，卻足以
+說明研究時為何要逐份查六種交接。
+
+| 本文六份交接合約 | 要固定哪些欄位 | 現有一手資料提供的入口 | 沒有這份合約會發生什麼誤讀 |
+|---|---|---|---|
+| 1. 工作負載與功能 | 輸入資料、要搬走的工作、正確答案、等待時間、耗電目標與失效條件 | SK 海力士把資料前處理移到底部晶片；三星研發頁另列 workload modeling、runtime prototype 與 system software | 只看到功能名稱，就把模擬概念當成端到端效能或客戶需要 |
+| 2. 容量、速度、功耗與介面 | 容量、通道、腳位速度、電力包絡、命令／資料／錯誤規則與版本 | 三星的 custom HBM 定義列出容量、速度、電力特性與介面；研發頁另列 I/O architecture、circuit 與 IP | 用一個最高頻寬數字替整份介面與電力契約背書 |
+| 3. 底部邏輯與智財 | 控制器與額外邏輯放哪裡、誰提供 IP、製程、面積、時序、功耗與驗證版本 | 三星 Foundry 描述 controller／additional logic placement；美光與台積電分別揭露客製 base die 與 foundry node 路徑 | 看到「base die」三個字，就假設三家公司做的是同一顆晶片 |
+| 4. 韌體與系統軟體 | 初始化、排程、錯誤處理、資料格式、runtime／compiler 版本與回退方法 | 三星 Memory Labs 把 custom HBM firmware 與 architecture／base-die 工作分列 | 晶片能開機或展示，就被改寫成客戶軟體已能穩定使用 |
+| 5. 製造、封裝與熱 | DRAM／logic 製程、堆疊、接合、中介層、供電、熱點、測試與可製造條件 | 台積電分開 N12 HBM4 與 N3P custom HBM4E；三星把 D2D PHY 發熱與仍在驗證的 thermal path 分開 | 只比較邏輯功能，漏掉發熱、良率、封裝與重驗成本 |
+| 6. 樣品、資格與商業 | 樣品身分、客戶、pass criteria、change control、良率、量產數量、NRE、售價與毛利 | 現有公告只分別到樣品規劃、架構展示、產品選項或一般 HBM4E 樣品 | 把設計完成、送樣、客戶通過、量產與收入合成同一個里程碑 |
+
+六份合約不是固定的產業標準，也不表示每家公司都用相同組織開發。它們是查漏用的閱讀表：
+前五份回答「系統如何做出來」，第六份回答「客戶是否真的接受，以及是否進入公司財務」。目前
+沒有任何一份公開資料把同一具名客戶、同一產品世代與六份簽核全部接起來。
+
+### 一個功能變更，為什麼會沿六份合約傳下去
+
+假設供應商把一段資料前處理移到底部晶片，研究者不能只記「多了一項功能」。先要固定它處理
+哪種資料與正確結果；接著確認資料如何經過介面、控制器與客製邏輯，再核對韌體和系統軟體如何
+啟用、停用或回退。新增邏輯會占用面積與電力，也可能改變高速介面熱點、封裝及散熱，所以製程、
+封裝與熱測試要重新對齊。最後若其中任何欄位改版，客戶要依變更範圍決定重跑哪些資格測試。
+
+這條連鎖只說明要查哪些責任，不代表改動一定提高效能、成本或毛利。沒有固定版本、測試輸入、
+通過條件、變更紀錄與量產分母時，仍不能把技術相鄰關係寫成 design win 或台灣公司收入。
+
 ## 來源與證據邊界
 
 - [Samsung HBM4／Custom HBM roadmap](https://news.samsung.com/global/samsung-ships-industry-first-commercial-hbm4-with-ultimate-performance-for-ai-computing)（2027 樣品時程）。
@@ -437,6 +649,10 @@ evidence: editorial:plain_language_wave90_custom_scope_and_progress
 - [SK hynix GTC 2026 review](https://news.skhynix.com/gtc-2026-review/)（Stream DQ 與 base die）。
 - [Micron FY2025 Q4 slides](https://investors.micron.com/static-files/5fb98d73-2134-4446-8d1b-0f90285f6c02)（p.13，標準／客製 base logic die 與管理層毛利預期）。
 - [Samsung HBM4E sample shipment](https://news.samsung.com/global/samsung-electronics-begins-shipment-of-industry-first-hbm4e-samples)（標準 HBM4E 樣品與 custom 時鐘的分界）。
+- [Samsung Memory Labs](https://semiconductor.samsung.com/about-us/locations/us-rnd-labs/memory-labs/)（I/O architecture／IP、firmware、base die、customer engagement 與 workload／software 分工）。
+- [Samsung Foundry HPC／AI application service](https://semiconductor.samsung.com/foundry/application-specific-service/hpc-ai/)（die-to-die interface、base-die controller 與 additional logic 的供應商架構邊界）。
+- [TSMC OIP Forum：A Shared Commitment to Energy-Efficient AI](https://www.tsmc.com/english/node/233)（HBM4 N12 與 custom HBM4E N3P logic-base-die 路徑）。
+- [Samsung COMPUTEX 2026 HBM4E／HPB 技術頁](https://semiconductor.samsung.com/kr/news-events/tech-blog/samsung-showcases-next-generation-ai-semiconductor-innovations-at-computex-2026/)（D2D PHY 發熱位置、thermal path 驗證與未來採用時鐘）。
 
 本文不採用三家公司自述效能做跨公司比較，也不把客戶數、HBM 總銷售或 HBM4 量產套用到
 custom HBM。現有資料沒有同一產品世代、共同 benchmark、客戶資格、數量與財務定義，因此不報

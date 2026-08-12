@@ -26,6 +26,16 @@ stage:production,stage,開始生產（Production）,生產階段,product:amd-hel
 stage:shipment,stage,實際出貨（Shipment）,出貨節點,product:amd-helios,產品真正離開供應端並開始向客戶交付的里程碑
 stage:cloud-deployment,stage,客戶上線與雲端部署,Cloud deployment,product:amd-helios,雲端產品開放 客戶上線或規模部署等落地節點
 stage:validation,stage,客戶測試與驗證（Validation）,客戶驗證,product:amd-helios,客戶仍在測試與確認自己的工作能否穩定執行
+standard:open-rack-wide,standard,開放式寬機架（Open Rack Wide）,ORW|Open Rack Wide,concept:rack-scale,為高密度人工智慧設備定義雙寬機架 電力 液冷 托盤與共同機械介面的開放標準
+component:ai-compute-tray,component,人工智慧運算托盤,AI compute tray|Compute tray,product:amd-helios,承載主機處理器 加速器 記憶體與網路介面的可抽換運算模組
+component:ai-scale-up-switch-tray,component,人工智慧機架內交換托盤,AI scale-up switch tray|Switch tray,product:amd-helios,承載機架內高速交換與管理元件並連接多個運算托盤的模組
+component:rack-power-shelf,component,機架電力架與匯流排,Rack power shelf|Vertical busbar,product:amd-helios,集中轉換 監控並沿機架向各托盤分配電力的模組與導體
+capability:rack-serviceability,capability,機架可維修性,Rack serviceability|Module replacement,concept:rack-scale,在限制機群中斷下定位 抽換 隔離與復原故障模組的能力
+capability:rack-lifecycle-control,capability,機架生命週期控制,Rack lifecycle control|Fleet lifecycle management,concept:rack-scale,跨硬體 韌體 驅動 軟體與管理層執行版本 更新 回退 遙測及復原的能力
+capability:rack-configuration-baseline,capability,機櫃配置基準,Rack configuration baseline|Configuration passport,concept:rack-scale,把硬體 韌體軟體 網路 場站輸入 測試條件與簽核結果綁到同一可辨識版本的能力
+process:rack-change-triggered-regression,process,機櫃變更觸發回歸測試,Change-triggered rack regression|Rack retest matrix,capability:rack-configuration-baseline,關鍵元件 版本 線纜或場站條件改變後依影響範圍重跑測試並保存結果的流程
+stage:oem-systemization,stage,整機廠品牌系統化,OEM systemization|ODM branded system,product:amd-helios,把參考設計固定成具名品牌型號 BOM 韌體 軟體 冷卻與製造版本的交付節點
+stage:integrated-rack-qualification,stage,整櫃整合資格驗證,Integrated rack qualification|Rack evidence packet,product:amd-helios,在同一配置與版本邊界驗證運算 網路 電力 液冷 控制軟體 可維修性及場站介面的節點
 component:efb,component,高架扇出橋接（EFB）,Elevated Fanout Bridge,process:advanced-packaging,AMD 生態系文件列示的先進封裝技術路徑
 component:substrate,component,載板／基板,Package substrate,process:advanced-packaging,承載晶片並連接封裝與系統電路板的結構
 concept:purpose-built-silicon,concept,客製晶片／自研系統,Purpose-built silicon,,雲端業者自行設計的晶片與系統替代路徑
@@ -36,6 +46,15 @@ component:buried-power-rail,component,埋置電源軌（BPR）,Buried power rail
 component:nano-tsv,component,奈米級背面導通孔（nano-TSV）,nTSV|nano-through-silicon via,concept:backside-power,從薄化晶圓背面連到埋置電源軌的奈米級矽穿孔
 process:wafer-thinning,process,晶圓薄化,Wafer thinning,concept:backside-power,背面加工前以研磨 CMP 與蝕刻降低晶圓厚度的整合步驟
 process:backside-alignment,process,背面對準,Backside alignment,concept:backside-power,在晶圓接合與變形條件下把背面結構對準前側電源軌的製程能力
+capability:backside-dtco,capability,背面供電設計技術共同最佳化,Backside power DTCO,concept:backside-power,把電力完整性 面積 連接選擇與製造限制一起驗證的設計製程協同能力
+metric:ntsv-bpr-contact-resistance,metric,nTSV 至 BPR 接點電阻,nTSV-BPR contact resistance,concept:backside-power,觀察背面導通孔與埋置電源軌接觸品質及供電損失的工程量測
+capability:backside-overlay-metrology,capability,背面疊對與形貌量測,Backside overlay metrology,concept:backside-power,量測背面導通結構相對前側電源軌的位置 圖形邊緣與接觸形貌
+capability:backside-stress-control,capability,背面機械應力控制,Backside stress control,concept:backside-power,評估薄化 背面金屬與導通結構對電晶體應力和位移影響的製程控制能力
+stage:backside-design-validation,stage,背面供電設計驗證,Backside power design validation,concept:backside-power,以模型 試驗晶片與同產品結果驗證電力完整性及連接方案的成熟度節點
+stage:backside-process-control,stage,背面製程控制與可靠度,Backside process control and reliability,concept:backside-power,把疊對 形貌 接點電阻 應力 良率與可靠度納入製程窗口的成熟度節點
+stage:backside-node-production,stage,背面供電節點與產品量產,Backside node and product production,concept:backside-power,具名晶圓節點與客戶產品由計畫或風險生產走向穩定量產的成熟度節點
+stage:backside-supplier-qualification,stage,背面供電供應商資格與出貨,Backside supplier qualification,concept:backside-power,具名工具 材料或 IP 對上客戶節點 資格與重複出貨的成熟度節點
+stage:backside-financial-attribution,stage,背面供電財務歸因,Backside power financial attribution,concept:backside-power,把具名產品出貨接回份額 價格 收入 毛利與現金流的成熟度節點
 concept:ai-memory-hierarchy,concept,AI 記憶體分層,AI memory hierarchy,,依頻寬 容量 延遲 持久性與共享性分配 AI 工作資料的系統架構
 product:socamm2,product,SOCAMM2,LPDRAM SOCAMM2,concept:ai-memory-hierarchy,以低功耗 DRAM 提供可維護高容量 system memory 的模組
 concept:kv-cache,concept,KV cache,Key-Value cache,concept:ai-memory-hierarchy,Transformer 推論保存既有上下文中間結果以避免重算的資料
@@ -44,12 +63,28 @@ standard:cxl4,standard,CXL 4.0,Compute Express Link 4.0,concept:ai-memory-hierar
 component:system-ram,component,System RAM,Host memory|CPU memory,concept:ai-memory-hierarchy,位於 CPU 主機側的系統記憶體層
 component:local-ssd,component,Local SSD,Local flash,concept:ai-memory-hierarchy,位於單一節點或機架內的本地快閃儲存層
 component:shared-storage,component,Shared storage,Networked storage,concept:ai-memory-hierarchy,提供持久性與跨節點存取的一般共享儲存層
-concept:open-ai-fabrics,concept,AI 資料路徑與跨廠互通,Open AI fabrics,,先展開運算端點 連接傳輸 交換器 控制軟體與目的端點 再分開機架內外的開放互連框架
+product:micron-socamm2-192gb,product,Micron 192GB SOCAMM2,192GB LP5X SOCAMM2,product:socamm2,Micron 明列進入 high-volume production 的 192GB SOCAMM2 容量型號
+product:micron-socamm2-256gb,product,Micron 256GB SOCAMM2,256GB LPDRAM SOCAMM2,product:socamm2,Micron 2026 年 3 月明列進入 customer sampling 的 256GB SOCAMM2 容量型號
+product:nvidia-bluefield4-stx,product,NVIDIA Vera BlueField-4 STX,BlueField-4 STX|Vera BlueField-4 STX,concept:ai-memory-hierarchy,把 Vera CPU 網路與軟體資料服務放進 AI 儲存與 context memory 路徑的儲存處理器架構
+capability:ai-context-placement,capability,AI 上下文資料放置,Context data placement|KV cache placement,concept:ai-memory-hierarchy,決定 KV cache 等上下文資料留近移遠取回或預先載入的控制能力
+capability:heterogeneous-data-movement,capability,異質記憶體資料搬移,Heterogeneous data movement|Memory tier data movement,concept:ai-memory-hierarchy,在 GPU CPU 記憶體與儲存位置之間實際搬送資料的能力
+capability:ai-storage-data-processing,capability,AI 儲存資料處理,AI storage data processing|Storage infrastructure processing,concept:ai-memory-hierarchy,在儲存與網路路徑附近執行 KV I/O metadata 安全控制壓縮完整性與復原的處理能力
+metric:ai-data-path-end-to-end-slo,metric,AI 資料路徑端到端服務目標,End-to-end AI data-path SLO|Data path service objective,concept:ai-memory-hierarchy,以完整工作負載的等待時間運算閒置搬移量與復原結果驗證分層是否真的改善系統
+concept:open-ai-fabrics,concept,AI 資料路徑與跨廠互通,Open AI fabrics,,先固定運算同步 跨機架 服務 儲存與管理等網路平面 再分開實體到部署各層驗收契約的開放互連框架
 standard:ualink,standard,UALink 加速器互連,Ultra Accelerator Link,concept:open-ai-fabrics,針對機架內加速器擴充的開放互連規格
 standard:uec,standard,超乙太網路（UEC）,Ultra Ethernet,concept:open-ai-fabrics,針對人工智慧與高效能運算跨機架乙太網路的開放規格
 concept:scale-up,concept,機架內擴充（scale-up）,Accelerator scale-up,concept:open-ai-fabrics,在運算群組或機架內以低延遲和記憶體使用方式連接多顆加速器
 concept:scale-out,concept,跨機架擴充（scale-out）,Ethernet scale-out,concept:open-ai-fabrics,把多個機架或節點連成更大叢集的網路層
 standard:ualoe,standard,以乙太網路承載 UALink（UALoE）,UALink over Ethernet,concept:open-ai-fabrics,以乙太網路傳輸路徑承載 UALink 協定的互連方式
+concept:ai-network-plane-map,concept,AI 叢集網路平面圖,AI network plane map|六張網,concept:open-ai-fabrics,把機架內擴充 跨機架 服務 儲存 帶內與帶外管理依資料工作與故障責任分開的閱讀框架
+concept:ai-front-end-network,concept,AI 前端與服務網路,AI front-end network|SO-C network,concept:open-ai-fabrics,連接處理器 服務入口與運算節點的一般服務資料網路
+concept:ai-storage-network,concept,AI 儲存網路,AI storage network,concept:open-ai-fabrics,連接運算節點與共享資料 模型 檢查點及持久儲存的網路平面
+concept:ai-in-band-management-network,concept,AI 帶內管理網路,In-band management network,concept:open-ai-fabrics,沿正常系統路徑進行設備發現 設定 遙測與維護的管理平面
+concept:ai-out-of-band-management-network,concept,AI 帶外管理網路,Out-of-band management network,concept:open-ai-fabrics,主資料網失效時仍可進行開機 重置 診斷與救援的獨立管理平面
+concept:ai-fabric-stack-contract,concept,AI 網路分層驗收契約,AI fabric stack contract|八層驗收契約,concept:open-ai-fabrics,把實體 端點 交換 軟體 管理 合規 互通與系統部署逐層驗收且禁止互相替代的框架
+stage:compliance-self-attestation,stage,合規自我聲明,Compliance self-attestation,concept:open-ai-fabrics,實作者依共同清單申報具名產品實作狀態但尚未證明第三方認證與跨廠互通的成熟度節點
+stage:system-stress-validation,stage,系統壓力與規模驗收,System stress and scale validation,concept:open-ai-fabrics,在高負載 擴大節點 長時間與故障注入下驗證整套網路及工作負載的成熟度節點
+capability:fabric-lifecycle-management,capability,網路生命週期管理,Fabric lifecycle management|configuration drift management,concept:open-ai-fabrics,管理設備上線 設定 更新 監控 故障替換 退役與設定漂移的系統能力
 standard:ucie3,standard,第三代通用小晶片互連（UCIe 3.0）,Universal Chiplet Interconnect Express 3.0,process:advanced-packaging,為封裝內小晶片定義電氣 協定 管理與測試規則的第三代開放介面
 stage:interoperability,stage,跨廠互通,Multi-vendor interoperability|互通測試|Plugfest,concept:open-ai-fabrics,不同廠商端點 交換器與軟體完成指定版本 錯誤情境與工作負載測試的成熟度節點
 concept:cpo-networking,concept,共同封裝光學網路（CPO）,Co-packaged optics networking,,把光引擎靠近交換晶片以縮短高速電訊號路徑的網路架構
@@ -65,6 +100,9 @@ stage:pathfinding-pdk,stage,探索型 PDK,Pathfinding PDK,concept:hybrid-bonding
 stage:test-vehicle,stage,試驗結構,Test vehicle|試驗車,concept:hybrid-bonding,用來驗證製程與電性而非證明客戶量產產品的測試結構
 capability:overlay-control,capability,對準控制（Overlay）,疊對控制|Overlay control,concept:hybrid-bonding,讓上下層銅接點在細間距下保持對準的製程與量測能力
 process:cmp-planarization,process,表面平坦化（CMP）,CMP 平坦化|Chemical mechanical planarization,concept:hybrid-bonding,在接合前把介電層與銅墊表面控制到足夠平坦的製程
+product:stacked-cmos-image-sensor,product,堆疊式 CMOS 影像感測器,Stacked CMOS image sensor|stacked BI-CIS,concept:hybrid-bonding,把感光像素晶片與邏輯晶片垂直整合並可沿產品世代加入異質材料或運算功能的應用家族
+product:tsmc-soic,product,TSMC-SoIC 三維堆疊平台,TSMC SoIC|System on Integrated Chips,concept:hybrid-bonding,包含 chip-on-wafer 與 wafer-on-wafer 的晶圓級三維晶片堆疊平台
+product:amd-3d-v-cache,product,AMD 3D V-Cache 處理器,AMD EPYC 3D V-Cache|Milan-X,concept:hybrid-bonding,以銅對銅無凸塊混合接合把額外快取晶片垂直堆疊到處理器的商用產品家族
 concept:panel-level-packaging,concept,面板級封裝（PLP）,Panel-level packaging|面板級封裝,,以方形或長方形大面板取代圓形晶圓處理大型先進封裝的製造路徑
 component:panel-substrate,component,面板載體（Panel substrate）,方形基板|矩形基板,concept:panel-level-packaging,用於面板級製程的大面積方形或長方形載體
 metric:area-utilization,metric,面積利用率,Area utilization,concept:panel-level-packaging,面板或晶圓可實際排入合格封裝面積的比例
@@ -73,12 +111,19 @@ capability:yield-management,capability,良率管理,Yield management,concept:pan
 metric:panel-throughput,metric,面板單位時間產出（Throughput）,Panel throughput|面板節拍|Cycle time,concept:panel-level-packaging,單位時間可完成的面板數與製造週期
 standard:panel-size,standard,面板尺寸標準,Panel form factor standard|Panel 尺寸標準,concept:panel-level-packaging,設備 材料與自動化共同採用的面板長寬與厚度規格
 process:panel-ecd,process,面板電鍍沉積（ECD）,Panel-level ECD|面板電化學沉積|Electrochemical deposition,concept:panel-level-packaging,在大面積面板上形成金屬互連的電化學沉積製程
+concept:fan-out-packaging,concept,扇出封裝（Fan-out）,Fan-out packaging|FOWLP|FOPLP,process:advanced-packaging,以重構載體與重佈線把外部連接延伸到晶粒邊界之外的封裝架構
+process:chip-first-fan-out,process,晶片先放扇出流程（Chip-first）,Chip-first fan-out|Mold first,concept:fan-out-packaging,先放置並包封晶粒再形成重佈線的扇出流程
+process:chip-last-fan-out,process,線路先做扇出流程（Chip-last）,Chip-last fan-out|RDL first,concept:fan-out-packaging,先形成重佈線再接合晶粒並完成包封的扇出流程
+component:reconstituted-panel,component,重構面板（Reconstituted panel）,Reconfigured panel|Molded panel,concept:panel-level-packaging,把已切割晶粒重新排列並以封裝材料固定後供批次加工的中間載體
+standard:semi-3d20-panel-characteristics,standard,SEMI 3D20 面板物理特性,SEMI 3D20|Panel characteristics standard,concept:panel-level-packaging,界定面板外形 厚度 翹曲 重量及有無製程載體等共同設備條件的標準
 concept:ucie-interoperability,concept,UCIe 小晶片互通與量產階梯,UCIe interoperability ladder|開放 chiplet 互通,,把共同規格 介面送廠 實體跨廠測試 客戶驗證與量產分開追蹤的成熟度框架
 stage:specification,stage,共同規格發布,Specification release,concept:ucie-interoperability,介面功能與測試要求已由標準組織發布但尚不代表實體產品
 stage:ip-tapeout,stage,介面設計送廠（IP tape-out）,Silicon IP tapeout,concept:ucie-interoperability,介面智財已完成設計並送交製造但尚待回片與實測
+stage:silicon-validation,stage,實體晶片回片驗證,Silicon validation|silicon-proven,concept:ucie-interoperability,具名 test chip 回片後在公開範圍完成實體量測但尚不自動代表跨廠符合規格或客戶量產
 stage:cross-vendor-demo,stage,跨廠測試晶片互通,Cross-vendor silicon demo,concept:ucie-interoperability,兩家以上獨立設計的實體測試晶片在指定條件完成互通展示
 stage:compliance,stage,正式符合規格測試,Compliance testing,concept:ucie-interoperability,依共同測試計畫驗證產品符合指定版本 速度與功能要求
 stage:customer-qualification,stage,客戶產品資格驗證,Customer product qualification,concept:ucie-interoperability,具名客戶把介面與封裝導入產品並完成可靠度 良率與實際工作驗證
+metric:ucie-evidence-matrix,metric,UCIe 互通證據矩陣,UCIe evidence matrix|三軸證據矩陣,concept:ucie-interoperability,同時記錄證據物件階段 測試包絡與供應商獨立性以避免跨產品斜著拼接成熟度
 concept:800v-power-tree,concept,800VDC 功率半導體鏈,800V power tree|800V HVDC power chain,,從電網到處理器分解 SST PSU BBU 保護 IBC 與末端轉換的功率架構
 component:sic-power,component,SiC 功率元件,Silicon carbide power device,concept:800v-power-tree,適合高壓高功率與高可靠度轉換及保護的寬能隙功率元件
 component:gan-power,component,GaN 功率元件,Gallium nitride power device,concept:800v-power-tree,適合高頻高密度電力轉換的寬能隙功率元件
@@ -90,6 +135,8 @@ component:hot-swap-protection,component,高壓 Hot-swap／保護,Hot-swap|Solid-
 component:point-of-load,component,Point-of-load,POL|末端供電,concept:800v-power-tree,在處理器附近把低壓匯流排轉成核心電壓的最後供電級
 stage:reference-design,stage,Reference design,參考設計|Demo board,concept:800v-power-tree,供應商已完成可展示的系統設計但尚不代表客戶認證或量產
 concept:glass-substrate-commercialization,concept,玻璃基板商業化,Glass substrate commercialization|Glass core readiness,,把材料能力 試產 樣品 客戶可靠度 良率與量產分開追蹤的封裝基板框架
+component:glass-carrier,component,暫時玻璃載板,Carrier glass|Temporary glass carrier,concept:glass-substrate-commercialization,在薄化 扇出或面板製程中暫時支撐結構並於加工後剝離的玻璃載體
+component:glass-interposer,component,玻璃中介層,Glass interposer|TGV glass interposer,concept:glass-substrate-commercialization,以穿玻璃導電孔與表面線路重新分配封裝內電性連接且可留在成品中的玻璃層
 component:glass-core,component,Glass core,玻璃核心|玻璃基板,concept:glass-substrate-commercialization,以玻璃取代傳統有機核心並承載封裝互連的基板結構
 process:through-glass-via,process,TGV,Through-Glass Via|玻璃通孔,concept:glass-substrate-commercialization,穿過玻璃並經金屬化形成垂直電性連接的製程
 stage:pilot-line,stage,Pilot line,試產線,concept:glass-substrate-commercialization,用小規模產線建立製程與樣品但尚未證明穩定量產
@@ -132,9 +179,29 @@ stage:vendor-interoperability,stage,跨廠元件互通,Vendor interoperability,c
 stage:official-compliance,stage,PCI-SIG 官方相容性測試,Official compliance testing,concept:pcie6-deployment-readiness,依 PCI-SIG 指定程序 規格版本與速度執行正式測試的節點
 stage:integrators-listing,stage,PCI-SIG 合格清單列名,PCI-SIG Integrators List,concept:pcie6-deployment-readiness,產品依指定規格版本與速度通過程序後出現在 PCI-SIG 公開清單的節點
 stage:pcie6-platform-deployment,stage,客戶完整平台部署,PCIe 6 production fleet,concept:pcie6-deployment-readiness,具名客戶把主機 交換器 訊號重整器 終端與韌體組成可長期運行生產系統的節點
+process:pcie-pam4-signaling,process,PCIe 6 四電位訊號（PAM4）,PCIe PAM4 signaling,concept:pcie6-deployment-readiness,在同一訊號時間單位以四個電位承載兩個 bit 並達到每通道 64 GT/s 的實體層傳輸方式
+concept:pcie-flit-mode,concept,PCIe 6 固定資料單元（Flit Mode）,PCIe Flit,concept:pcie6-deployment-readiness,把資料整理成固定 256 Byte 單元以共同執行錯誤修正 偵測與鏈路重送的模式
+capability:pcie-error-control,capability,PCIe 6 錯誤修正偵測與重送,FEC CRC replay,concept:pcie6-deployment-readiness,以前向錯誤修正 循環冗餘檢查及鏈路重送共同維持資料正確性的能力
+metric:pcie-first-bit-error-rate,metric,PCIe 首個位元錯誤率（FBER）,First Bit Error Rate,concept:pcie6-deployment-readiness,描述接收端第一個錯誤事件機率並連到錯誤聚集 修正與重送取捨的規格量測
+stage:pcie-electrical-testing,stage,PCIe 電氣測試,Electrical Testing,concept:pcie6-deployment-readiness,檢查平台與擴充卡發送端及接收端電氣特性的正式測試區域
+stage:pcie-configuration-testing,stage,PCIe 設定空間測試,Configuration Testing,concept:pcie6-deployment-readiness,檢查 PCIe 裝置設定空間 能力宣告與存取行為的正式測試區域
+stage:pcie-link-protocol-testing,stage,PCIe 鏈路協定測試,Link Protocol Testing,concept:pcie6-deployment-readiness,檢查裝置連線建立 狀態轉換 錯誤回報與鏈路層行為的正式測試區域
+stage:pcie-transaction-protocol-testing,stage,PCIe 交易協定測試,Transaction Protocol Testing,concept:pcie6-deployment-readiness,檢查裝置讀寫請求 回覆 排序與交易層行為的正式測試區域
+stage:pcie6-financial-attribution,stage,PCIe 6 財務歸因,PCIe 6 financial attribution,concept:pcie6-deployment-readiness,把具名產品 qualification 與出貨接回同期間份額 價格 收入 毛利與現金流的成熟度節點
+concept:pcie-test-object-contract,concept,PCIe 測試物件與邊界合約,PCIe test object contract,concept:pcie6-deployment-readiness,把受測產品 測試角色 暴露介面 規格速率 必要測項 互通分母與列名日期綁在同一筆證據的閱讀框架
+stage:pcie-component-specific-testing,stage,PCIe 關鍵元件獨立測試,PCIe component-specific testing,concept:pcie6-deployment-readiness,位於 CEM connector 測試邊界後方的訊號元件以自己的 component 角色另行完成電氣與功能測試的節點
+stage:pcie-lane-margining,stage,PCIe 通道餘裕量測,PCIe lane margining,concept:pcie6-deployment-readiness,由系統讀取接收端電壓與時間餘裕並依工作坊政策完成指定 AIC 與 System 必要檢查的節點
+stage:pcie-integrators-eligibility,stage,PCIe 公開列名資格鏈,PCIe Integrators eligibility,concept:pcie6-deployment-readiness,把跨廠互通門檻 所有必要相容性測試與產品列名申請表接到 Integrators List 的程序節點
 concept:ai-power-buffering,concept,AI 功率緩衝,AI power buffering|multi-timescale energy storage,concept:800v-power-tree,依負載波動的時間尺度與系統位置分配 CBU BBU 與 BESS 的電力架構
 component:rack-capacitor-bank,component,機架電容儲能,CBU|Capacitor Bank Unit,concept:ai-power-buffering,靠近機架處理快速功率波動的電容或超級電容模組
 component:facility-bess,component,設施級 BESS,Battery Energy Storage System,concept:ai-power-buffering,位於設施或併網側管理較慢且較大範圍功率變化的電池儲能
+capability:buffer-mission-trigger,capability,緩衝任務與觸發邊界,Power-buffer mission and trigger,concept:ai-power-buffering,區分正常尖峰 電源切換 停電 受控停機與設施負載事件並固定啟動及退出條件
+metric:buffer-power-waveform,metric,緩衝功率缺口與波形,Power gap waveform|load step and pulse,concept:ai-power-buffering,以缺口大小 上升斜率 脈衝時間 頻率與波形描述儲能必須補上或吸收的瞬時功率
+metric:buffer-usable-energy-duration,metric,可用能量與持續時間,Usable energy and duration|energy window,concept:ai-power-buffering,在電壓 SOC 損耗 老化與安全餘裕限制下核對指定功率能維持多久的尺度
+metric:buffer-response-handoff,metric,緩衝反應與交接時間,Response and handoff time,concept:ai-power-buffering,從事件偵測到指定輸出並由前一層平順交給下一電源來源的時間契約
+metric:buffer-duty-recharge,metric,緩衝重複與回充節奏,Duty cycle and recharge time,concept:ai-power-buffering,固定事件重複頻率 放電後回充時間 可用率與再次武裝條件的尺度
+metric:buffer-efficiency-thermal,metric,緩衝損耗與熱包絡,Round-trip efficiency and thermal envelope,concept:ai-power-buffering,把儲能 轉換 控制 輔助負載損失與工作溫度冷卻條件一起核對的尺度
+metric:buffer-life-safety,metric,緩衝壽命與安全邊界,Cycle calendar life and safety,concept:ai-power-buffering,在放電深度 SOC 溫度循環與時間條件下核對退化 隔離 告警 維修及失效判準的尺度
 concept:liquid-cooling-loop-boundary,concept,液冷迴路責任邊界,Liquid cooling interface contract|loop responsibility map,concept:liquid-cooling,把 FWS TCS ITE 控制與維護的責任及交接條件分開追蹤的系統框架
 concept:facility-water-system,concept,設施水系統,FWS|Facility Water System,concept:liquid-cooling-loop-boundary,從設施冷源至 CDU 一次側並把熱帶往冷卻塔 dry cooler 或 chiller 的水系統
 concept:technology-cooling-system,concept,技術冷卻系統,TCS|Technology Cooling System|DECS,concept:liquid-cooling-loop-boundary,從 CDU 經機架 manifold 與 ITE 再回 CDU 的二次冷卻迴路
@@ -152,11 +219,22 @@ component:mlcc-decoupling,component,MLCC 去耦電容,MLCC decoupling|multilayer
 component:silicon-capacitor,component,Silicon capacitor,矽電容|silicon decoupling capacitor,concept:ai-capacitor-role-map,可靠近或嵌入封裝以降低寄生並支援快速瞬態的矽電容
 concept:800v-protection-layers,concept,800VDC 保護責任層,800V protection layers|HVDC fault protection map,concept:800v-power-tree,把人身維修 絕緣接地 故障電流 hot-swap 與備援能量分開追蹤的 800VDC fault framework
 concept:yageo-q2-financial-materiality,concept,國巨 Q2 財務材料性,YAGEO Q2 financial materiality|國巨季度財務橋接,,把公司季度營收交叉驗證與產品 組合 毛利 現金流等尚待補證的層級分開顯示
+concept:ai-capex-cash-conversion,concept,AI CapEx 到供應商財務七關橋接,AI capital spending to supplier finance|AI CapEx cash conversion,,把資本承諾 現金與租賃支出 資產建置上線 可用容量 工作負載與收入 買方現金回收及供應商財務歸因分開追蹤的研究框架
+concept:capital-asset-revenue-cash-clocks,concept,承諾、資產、收入與現金四個時鐘,capital asset revenue cash clocks,concept:ai-capex-cash-conversion,把合約承諾 資產可用 客戶使用與收入認列 現金支付與回收分成可各自前進的四個時鐘
+stage:capital-commitment,stage,資本計畫與承諾,Capital plan and commitment,concept:ai-capex-cash-conversion,董事會預算 全年指引 合約或租賃承諾等尚未等同當期付款與設備交付的投入意圖
+stage:cash-ppe-and-leases,stage,現金 PP&E 與租賃支出,Cash PP&E and lease bridge,concept:ai-capex-cash-conversion,分開現金購置 新增融資租賃 租賃本金及其他租賃付款以對齊資本投入的實際現金與融資口徑
+stage:asset-construction-commissioning,stage,資產建置與試運轉,Construction in progress and commissioning,concept:ai-capex-cash-conversion,把尚在建工程 設備安裝 通電 測試 驗收與轉入可使用資產的進度分開記錄
+stage:service-capacity-available,stage,服務容量可用,Service capacity available,concept:ai-capex-cash-conversion,資產已能對客戶或內部工作負載提供可量測運算 儲存 網路或人工智慧服務的節點
+stage:workload-utilization-revenue,stage,工作負載利用與收入,Workload utilization and revenue,concept:ai-capex-cash-conversion,以使用量 定價 服務收入與毛利觀察可用容量是否轉成商業需求而非只完成上線
+stage:buyer-cash-conversion,stage,買方現金回收,Buyer cash conversion,concept:ai-capex-cash-conversion,以一致期間與公式追蹤營業現金流 自由現金流 營運資金與資產回收而不只比較 CapEx 標題
+stage:supplier-financial-attribution,stage,供應商財務歸因,Supplier financial attribution,concept:ai-capex-cash-conversion,由同一平台 料號 客戶 期間與公司分母把資格 出貨 收入 毛利 營運資金及現金流接成可重算橋接
 capability:safety-interlock,capability,高壓安全連鎖,Safety interlock|de-energization interlock,concept:800v-protection-layers,在人員接近帶電高壓部位前強制斷電或阻止接近的維修安全能力
 capability:protective-earthing,capability,保護接地與等電位,Protective earthing|protective bonding,concept:800v-protection-layers,為故障電流提供受控接地路徑並維持機構等電位的安全能力
 capability:overcurrent-protection,capability,過電流保護,Overcurrent protection|short-circuit protection,concept:800v-protection-layers,偵測並限制或切斷超額電流與短路故障的保護能力
 capability:ground-fault-detection,capability,接地故障偵測,Ground fault detection|insulation fault detection,concept:800v-protection-layers,偵測高壓導體對保護地或機殼異常電流路徑的能力
 capability:controlled-inrush,capability,受控湧入與預充,Controlled inrush|pre-charge control,concept:800v-protection-layers,帶電連接大電容負載時依功率開關安全工作區控制充電軌跡的能力
+metric:hot-swap-startup-time,metric,Hot-swap 預充時間,Hot-swap startup time|pre-charge duration,concept:800v-protection-layers,從接入高壓匯流排到負載電容受控充電完成的時間欄位 必須連同電壓 電流 電容量 溫度與功率開關安全工作區判讀
+metric:hot-swap-fault-clearing-time,metric,Hot-swap 故障清除時間,Hot-swap fault-clearing time|overcurrent shutdown time,concept:800v-protection-layers,從異常被偵測到電力路徑被限制或切斷的時間欄位 必須連同故障型態 電壓 電流 溫度與功率開關安全工作區判讀
 concept:ai-rack-action-contract,concept,AI 機櫃控制契約,AI rack action contract|rack telemetry action loop,concept:liquid-cooling-loop-boundary,把機櫃身分 資料語意 動作所有權 安全裁決 隔離狀態與維修結果串成可驗證閉環的研究框架
 capability:rack-identity-coordination,capability,機櫃身分對齊,Rack identity coordination|rackLocationId,concept:ai-rack-action-contract,讓 IT 與 OT 以穩定且一致的識別碼指向同一物理機櫃的能力
 capability:typed-event-context,capability,具語意事件資料,Typed telemetry context|Value and Metadata,concept:ai-rack-action-contract,以時間 品質 單位 設備與關係上下文使即時數值可以被下游系統正確解讀的能力
@@ -187,3 +265,196 @@ capability:component-emi-suppression,capability,元件級 EMI 抑制,Component E
 capability:emc-precompliance-modeling,capability,EMC 預掃與建模,EMC pre-compliance|EMC simulation,concept:ai-rack-emc-certification,正式送驗前以模擬探棒或子系統測試定位高風險雜訊路徑的能力
 capability:accredited-emc-lab-capacity,capability,認可 EMC 實驗室容量,Accredited EMC lab capacity|large chamber availability,concept:ai-rack-emc-certification,同時具備適用認可範圍空間承重供電冷卻與量測程序的可用測試能力
 component:emi-absorber,component,EMI 吸波材,EMI absorber|flexible noise suppression sheet,concept:ai-rack-emc-certification,用於吸收指定頻帶電磁能量並降低局部雜訊的材料或薄片元件
+concept:chiplet-design-handoff,concept,小晶片設計資料交接與合規鏈,Chiplet design handoff contracts|Chiplet 3DK conformance,process:advanced-packaging,把連線介面 系統角色 設計資料 schema 執行 跨工具重現與製造封測簽核分開追蹤的框架
+standard:fcsa,standard,基礎小晶片系統架構（FCSA）,Foundation Chiplet System Architecture,concept:chiplet-design-handoff,定義共同系統拓撲 小晶片類型 功能與介面要求及分級符合性的開放架構規格
+standard:cdxml,standard,小晶片資料交換格式（CDXML）,Chiplet Data Exchange in XML Format,concept:chiplet-design-handoff,以 XML 與 schema 描述小晶片機構 接腳 電氣與相關設計交接資料的開放格式
+concept:3d-ic-design-kits,concept,3D-IC 設計套件（3DK）,3D-IC Design Kits|3DK,concept:chiplet-design-handoff,涵蓋小晶片 組裝 材料 測試 製程規則與訊號電源完整性資料的設計套件集合
+stage:executable-schema,stage,Schema 可執行驗證,Executable schema validation|XSD compile,concept:chiplet-design-handoff,固定版本的全部 XML schema 能被標準 parser 解析 編譯並正確驗證正反範例的節點
+stage:single-tool-import,stage,單工具資料匯入,Single-tool import|single EDA tool support,concept:chiplet-design-handoff,一套具名工具能讀入指定版本資料並執行已揭露功能但尚未證明跨工具一致的節點
+stage:cross-tool-conformance,stage,跨工具符合性重現,Cross-tool conformance|multi-tool reproducibility,concept:chiplet-design-handoff,兩套以上獨立工具對同一固定版本正反資料輸出一致診斷與通過結果的節點
+stage:foundry-osat-conformance,stage,製造與封測共同簽核,Foundry OSAT conformance|manufacturing handoff sign-off,concept:chiplet-design-handoff,晶圓代工 封裝測試與買方以同一資料包完成製造 封裝 測試及產品資格的節點
+concept:ai-hardware-sdc-lifecycle,concept,AI 硬體 SDC 生命週期責任鏈,AI hardware SDC lifecycle|silent data corruption responsibility chain,,把硬體錯誤分類 製造篩檢 系統診斷 機群與應用偵測 隔離 零件病歷及商業歸因分開追蹤的框架
+concept:sdc-outcome-taxonomy,concept,SDC 錯誤結果分類,SDC outcome taxonomy|benign corrected DUE SDC,concept:ai-hardware-sdc-lifecycle,把良性故障 已修正錯誤 偵測到但無法修正與未被偵測的錯誤輸出分開的共同語言
+capability:factory-sdc-screening,capability,工廠 SDC 缺陷篩檢,Factory SDC screening|manufacturing SDC test|SDC burn-in,concept:ai-hardware-sdc-lifecycle,在晶片封裝製造與燒機階段以結構 功能 電壓 溫度及壓力條件攔截可能造成無聲錯誤的缺陷
+capability:system-level-sdc-diagnostics,capability,系統層 SDC 主動診斷,System-level SDC diagnostics|known-answer hardware test|in-system diagnostics,concept:ai-hardware-sdc-lifecycle,在板卡或主機內以固定輸入 正確答案與資料路徑測試找出會算錯的設備
+capability:in-fleet-sdc-detection,capability,機群運行中 SDC 偵測,In-fleet SDC detection|periodic fleet screening|colocated SDC test,concept:ai-hardware-sdc-lifecycle,在設備生命週期與正式機群中以週期短測試或分析方法找出隨資料 負載 環境及磨耗顯現的無聲錯誤
+capability:workload-correctness-check,capability,工作負載正確性檢查,Workload correctness check|application-level SDC detection|deterministic replay,concept:ai-hardware-sdc-lifecycle,從資料 模型或應用結果比較正確輸出與實際輸出以發現硬體警報未捕捉的偏差
+capability:sdc-device-quarantine,capability,SDC 可疑設備隔離,SDC device quarantine|faulty host isolation|Q-pool,concept:ai-hardware-sdc-lifecycle,把已知或疑似造成無聲錯誤的主機 板卡或元件移出正式工作以重測 修復及根因分析
+process:sdc-part-history-feedback,process,SDC 零件病歷回饋,SDC part history feedback|factory-to-fleet feedback|RMA corrective action,concept:ai-hardware-sdc-lifecycle,沿同一零件身分串接製造 燒機 系統測試 機群事件 供應商分析 RMA 與新測項改善的流程
+stage:sdc-common-test-format,stage,SDC 共同測試格式跨框架實作,Common SDC test format|cross-framework SDC exchange,concept:ai-hardware-sdc-lifecycle,至少兩套獨立診斷框架依同一輸入輸出 schema 對相同設備池產出可比較結果的節點
+stage:sdc-commercial-attribution,stage,SDC 商業與財務歸因,SDC commercial attribution|SDC financial materiality,concept:ai-hardware-sdc-lifecycle,具名客戶把 SDC 測試 隔離或維修責任對齊產品資格 部署分母 收入及毛利的節點
+concept:224g-pcb-qualification-chain,concept,224G PCB 材料到 BER 七關資格鏈,224G PCB qualification chain|material to BER chain,concept:open-ai-fabrics,把材料數字 測法 stackup coupon 通道損耗 BER FEC 跨廠量產與公司歸因分開追蹤的框架
+metric:pcb-dk-df,metric,PCB 材料 Dk／Df,PCB dielectric constant and loss tangent|Dk Df,concept:224g-pcb-qualification-chain,以明確方法 頻率 試片 方向與環境量測電路板介質傳播及損耗特性的欄位
+component:pcb-stackup,component,高速 PCB stackup,High-speed PCB stackup|板層疊構,concept:224g-pcb-qualification-chain,銅層 介質 玻纖 厚度 訊號層與參考平面的完整排列
+component:low-dk-glass-weave,component,低 Dk 玻纖與編織結構,Low-Dk glass weave|ultra-low Dk glass fabric,concept:224g-pcb-qualification-chain,以玻纖類型 編織與樹脂比例影響有效介電常數 阻抗與差分延遲的基材構成
+component:low-profile-copper-foil,component,低粗糙度銅箔,Low-profile copper foil|VLP copper|HVLP copper,concept:224g-pcb-qualification-chain,以較平滑表面降低高頻導體損耗但仍需與黏著 製程及量產可靠度共同驗證的銅箔
+stage:pcb-loss-coupon,stage,板級損耗 coupon,PCB loss coupon|insertion loss coupon,concept:224g-pcb-qualification-chain,與正式板同製程製作並用來量測阻抗 傳播與 S 參數的測試結構節點
+component:pcb-via-connector,component,PCB via 與連接器不連續點,Via stub and connector discontinuity|PCB interconnect discontinuity,concept:224g-pcb-qualification-chain,訊號跨層或跨接頭時因幾何與阻抗改變形成反射 損耗 串擾及共振的通道位置
+stage:channel-loss-budget,stage,完整通道損耗預算,Channel loss budget|package-to-package channel budget,concept:224g-pcb-qualification-chain,在共同參考平面整合封裝 板路 via connector 線材與其他路徑 S 參數及 COM 假設的節點
+metric:pre-post-fec-ber,metric,FEC 前後 BER,Pre-FEC BER|post-FEC BER|bit error ratio,concept:224g-pcb-qualification-chain,以固定收發器 圖樣 總位元 錯誤數 FEC 測試期間與環境描述完整連線錯誤率的欄位
+standard:cei-224g,standard,OIF CEI-224G,CEI-224G XSR|CEI-224G VSR|CEI-224G MR|CEI-224G LR,concept:224g-pcb-qualification-chain,OIF 為每通道 224G class 電氣互連推進的多種 reach 介面專案與 Implementation Agreement 路徑
+standard:ieee-p8023dj,standard,IEEE P802.3dj,P802.3dj 200G per lane|1.6TbE amendment,concept:224g-pcb-qualification-chain,IEEE 802.3 對 200 Gb/s lane 及 200G 到 1.6T Ethernet 推進的 amendment 專案
+standard:ipc-4103,standard,IPC-4103 高速高頻基材規格,IPC-4103|IPC-4103 slash sheet,concept:224g-pcb-qualification-chain,IPC 對高速高頻 printed board clad unclad laminate 與 bonding layer 材料的規格及 QPL 路徑
+stage:multi-vendor-board-qualification,stage,跨廠同板資格重現,Multi-vendor board qualification|same-board reproducibility,concept:224g-pcb-qualification-chain,至少兩個獨立收發器與互連組合依同一 board identity 測試契約重現 S 參數 COM 與 BER 的節點
+stage:224g-pcb-commercial-attribution,stage,224G PCB 商業與財務歸因,224G PCB commercial attribution|224G board financial materiality,concept:224g-pcb-qualification-chain,買方與供應商對上同一料號 板 客戶資格 量產分母 出貨期間 單價收入及毛利的節點
+concept:sic-ai-power-qualification,concept,SiC 到 AI BBU／PSU 七關資格鏈,SiC AI power qualification|SiC device-to-system qualification,concept:800v-power-tree,把應用壓力 元件標準化評估 供應商資料 轉換器驗證 系統可靠度 跨來源客戶資格及商業歸因分開追蹤的框架
+standard:jep203,standard,JEDEC JEP203,JEP203 short-circuit evaluation,concept:sic-ai-power-qualification,JEDEC 對 power conversion transistor short-circuit capability 提供 test method 與 circuit 評估指引的 publication
+standard:jep204,standard,JEDEC JEP204,JEP204 SiC stress catalog,concept:sic-ai-power-qualification,JEDEC 對 SiC power electronic conversion devices 提供 reliability 與 ruggedness stress procedure overview 的 publication
+stage:sic-application-stress-envelope,stage,SiC 應用壓力範圍,SiC application stress envelope|fault energy envelope,concept:sic-ai-power-qualification,固定電壓 電流 接面溫度 dv dt 動態負載 故障能量 時間及重複次數的產品條件節點
+stage:sic-device-evaluation,stage,SiC 元件標準化評估,Standardized SiC device evaluation|JEP device test,concept:sic-ai-power-qualification,依固定 circuit procedure sample waveform failure criterion 與報告格式評估元件的節點
+stage:sic-supplier-qualification-data,stage,SiC 供應商資格資料包,Supplier SiC qualification data|device qualification report,concept:sic-ai-power-qualification,將具名 part lot package driver 原始 waveform pass fail 與 failure analysis 組成可審閱資料的節點
+stage:sic-converter-validation,stage,SiC BBU／PSU 轉換器驗證,SiC converter validation|BBU PSU reference hardware test,concept:sic-ai-power-qualification,把元件放入具名 topology 後驗證控制 熱 EMI transient fault protection 與效率 reference plane 的節點
+stage:sic-system-reliability,stage,SiC 電源系統可靠度與保護,SiC power system reliability|DFMEA derating fault coordination,concept:sic-ai-power-qualification,以 derating DFMEA MTBF HALT fault coordination 與 service action 將元件結果接到整機風險的節點
+stage:sic-mixed-source-qualification,stage,SiC 跨來源客戶資格,SiC mixed-source customer qualification|alternate part qualification,concept:sic-ai-power-qualification,主料與替代料在 EVT DVT PVT shelf rack 環境可靠度及 change control 中完成客戶驗收的節點
+stage:sic-commercial-attribution,stage,SiC AI 電源商業與財務歸因,SiC AI power commercial attribution|SiC BBU PSU financial materiality,concept:sic-ai-power-qualification,買方與供應商對上同一元件 模組 平台資格 量產 BOM 出貨期間 收入及毛利分母的節點
+standard:ipc-9592b,standard,IPC-9592B 電源轉換裝置要求,IPC-9592B power conversion reliability,concept:sic-ai-power-qualification,電腦與通訊產業 power conversion device 的設計 derating reliability 與 quality process 參考規格
+standard:telcordia-sr332,standard,Telcordia SR-332,SR-332 reliability prediction,concept:sic-ai-power-qualification,以 parts count 或 parts stress 等方法預測 electronic equipment reliability 的方法文件
+concept:semiconductor-pfas-exposure,concept,半導體 PFAS 七關曝險鏈,Semiconductor PFAS exposure|PFAS substance process jurisdiction qualification,,把物質身分 製程功能 產品形態 法域義務 豁免過渡 變更資格與公司財務歸因分開追蹤的框架
+process:eu-reach-pfas-restriction,process,歐盟 REACH PFAS 限制程序,EU REACH universal PFAS restriction|ECHA PFAS restriction,concept:semiconductor-pfas-exposure,從 ECHA 科學意見 經執委會提案 會員國表決到正式公布的廣泛 PFAS 限制程序
+process:us-tsca-pfas-reporting,process,美國 TSCA PFAS 歷史申報,US TSCA 8(a)(7) PFAS reporting|EPA PFAS reporting,concept:semiconductor-pfas-exposure,要求特定製造者與進口者回報歷史物質用途數量暴露危害與廢棄資料的聯邦申報程序
+stage:pfas-substance-identity,stage,PFAS 物質身分盤點,PFAS substance identity|CAS structure inventory,concept:semiconductor-pfas-exposure,以名稱 結構 識別碼 聚合物別 牌號 批次 添加物與濃度定位實際物質的節點
+stage:pfas-process-function,stage,PFAS 製程功能映射,PFAS process function map|semiconductor use map,concept:semiconductor-pfas-exposure,把物質逐一對到微影 蝕刻 沉積 清洗 控溫 密封 過濾 潤滑或封裝功能的節點
+stage:pfas-product-form,stage,PFAS 產品形態判定,PFAS product form|substance mixture article,concept:semiconductor-pfas-exposure,分辨單一物質 混合物 零件 備品與場址排放以避免把不同義務混用的節點
+stage:pfas-jurisdiction-duty,stage,PFAS 法域與義務判定,PFAS jurisdiction duty|restriction reporting emission,concept:semiconductor-pfas-exposure,固定法律版本 場址 進口 市場投放及禁限用 申報 標示 排放或紀錄義務的節點
+stage:pfas-derogation-transition,stage,PFAS 豁免與過渡條件,PFAS derogation transition|conditional use,concept:semiconductor-pfas-exposure,逐用途保存豁免 過渡期 濃度 場址計畫 排放監測 申報與備品條件的節點
+stage:pfas-change-qualification,stage,PFAS 替代變更資格驗證,PFAS substitution qualification|change control,concept:semiconductor-pfas-exposure,以基準 候選 功能 污染 良率 可靠度 排放 核准 回退與正式製程切換驗證變更的節點
+stage:pfas-company-financial-attribution,stage,PFAS 公司與財務歸因,PFAS company financial attribution|PFAS materiality,concept:semiconductor-pfas-exposure,把同一物質 產品 場址 客戶 法規 資格結果 數量價格成本與公司分母接起的節點
+component:pfas-process-chemistry,component,PFAS 製程化學品,PFAS process chemistry|photoresist surfactant wet chemistry,concept:semiconductor-pfas-exposure,直接參與微影 濕式清洗 蝕刻 剝離 電鍍或平坦化配方功能的含氟化學品
+component:fluorinated-process-gases,component,含氟製程氣體,Fluorinated process gases|PFC HFC etch chamber clean,concept:semiconductor-pfas-exposure,用於電漿蝕刻 沉積或腔體清潔並需同時追反應選擇性與排放控制的氣體
+component:fluoropolymer-process-components,component,氟聚合物製程零件,Fluoropolymer process components|PTFE PFA liner seal pipe filter,concept:semiconductor-pfas-exposure,以氟聚合物製作或內襯的管件 密封 桶槽 濾材與設備零件
+component:fluorinated-thermal-fluids,component,含氟熱管理流體,Fluorinated heat transfer fluids|fluorinated refrigerants,concept:semiconductor-pfas-exposure,用於設備精密控溫 熱傳或冷凍循環且法規分類可能依用途分流的流體
+concept:section301-taiwan-exposure,concept,Section 301 台灣商品七關曝險鏈,Section 301 Taiwan exposure|tariff-to-financial attribution,,把政策範圍 HTS 商品分類 附件豁免 海關原產地 交易責任 成本轉嫁與公司財務歸因分開追蹤的框架
+stage:policy-action-scope,stage,政策行動與適用範圍,Policy action and scope,concept:section301-taiwan-exposure,固定法律行動 經濟體 稅率公式 生效 entry 在途與其他法源排除條件的節點
+stage:hts-product-classification,stage,HTS 商品分類,HTS product classification,concept:section301-taiwan-exposure,把實際進口形態 料號 規格 功能 材質與用途對到報關 HTS code 的節點
+stage:annex-exemption-test,stage,Annex 豁免判定,Annex exemption test,concept:section301-taiwan-exposure,逐 code 核對一般豁免 Section 232 排除與其他附件條件的節點
+stage:customs-origin-test,stage,海關原產地判定,Customs country of origin test,concept:section301-taiwan-exposure,以實質轉型 製程 工廠與 ruling 或申報依據判定商品原產地的節點
+stage:shipment-contract-incidence,stage,出貨與交易責任,Shipment importer and contract incidence,concept:section301-taiwan-exposure,固定出貨路徑 importer of record Incoterms 報價與價格調整條款以區分先繳責任的節點
+stage:demand-pass-through-response,stage,需求與成本轉嫁,Demand and tariff pass-through response,concept:section301-taiwan-exposure,觀察供應商 進口商 客戶如何透過價格 數量 替代與供應鏈配置分配關稅成本的節點
+stage:section301-company-financial-attribution,stage,Section 301 公司財務歸因,Section 301 company financial attribution,concept:section301-taiwan-exposure,把同一產品 entry 原產 交易條款 價格數量成本與公司收入毛利現金流分母接起的節點
+concept:trade-regime-separation,concept,關稅、出口管制、制裁與資格四制度分流,Trade tariff export control sanctions and qualification separation,,把進口關稅 出口管制 制裁交易與技術資格四種制度的判斷單位 責任機關 結果及證據分開記錄的閱讀框架
+stage:tariff-import-entry,stage,進口關稅與報關 entry,Tariff and customs entry,concept:trade-regime-separation,以商品形態 HTS 原產 豁免 估價 進口主體與日期判斷一筆進口 entry 的關稅結果
+stage:ear-export-license-screen,stage,EAR 出口許可判定,EAR export license screen,concept:trade-regime-separation,固定 EAR jurisdiction ECCN或EAR99 管制理由 目的地 交易各方 最終用途 許可與例外的出口管制底稿
+stage:ofac-sanctions-transaction-screen,stage,OFAC 制裁交易判定,OFAC sanctions transaction screen,concept:trade-regime-separation,固定適用制裁方案 名單與所有權 司法連結 交易活動及一般或個別授權的制裁底稿
+stage:technical-conformity-assessment,stage,技術合格評定與客戶資格,Technical conformity assessment and customer qualification,concept:trade-regime-separation,以產品版本 要求 樣品 測試條件 執行者 原始結果 通過條件 變更控制與簽核證明技術符合性的節點
+concept:us-advanced-packaging-regionalization,concept,美國先進封裝區域化九關橋接,US advanced packaging regionalization|regional capacity conversion,process:advanced-packaging,把政策獎勵 里程碑撥付 資本結構 建設 工具 製程 客戶資格 量產利用與財務歸因分開追蹤的框架
+stage:chips-award-scope,stage,CHIPS 獎勵與專案範圍,CHIPS award scope|project scope,concept:us-advanced-packaging-regionalization,固定 award 所屬 project phase facility 金額資格與版本的節點
+stage:milestone-disbursement,stage,里程碑撥付,Milestone-based disbursement|grant draw,concept:us-advanced-packaging-regionalization,把核定上限 可請領 里程碑完成 核准與實際收到現金分開的節點
+stage:regional-project-capital-stack,stage,區域專案資本結構,Regional project capital stack|funding stack,concept:us-advanced-packaging-regionalization,調節政府補助 客戶預付款 自有資金 債務 稅務抵減與公司資本支出的節點
+stage:regional-site-construction,stage,區域廠房建設交付,Regional site construction|facility ready,concept:us-advanced-packaging-regionalization,固定土地 建築 無塵室 水電與設施驗收能否交付工具安裝的節點
+stage:regional-tool-process-enablement,stage,工具進場與製程啟用,Tool move-in and process enablement,concept:us-advanced-packaging-regionalization,追蹤具名工具 move-in hook-up 工程批次及封裝製程整合的節點
+stage:regional-process-qualification,stage,區域製程資格,Regional process qualification,concept:us-advanced-packaging-regionalization,以固定產品製程樣本 良率 可靠度 失效與放行門檻驗證製程的節點
+stage:regional-customer-product-qualification,stage,區域客戶產品資格,Regional customer product qualification,concept:us-advanced-packaging-regionalization,客戶對具名產品封裝完成 qualification 變更核准與量產 release 的節點
+stage:regional-capacity-ramp-utilization,stage,區域產能爬坡與利用,Regional capacity ramp and utilization,concept:us-advanced-packaging-regionalization,把名目或預期產能 實際 start 產品組合 合格產出 良率與利用率分開的節點
+stage:regional-packaging-financial-attribution,stage,區域封裝財務與替代歸因,Regional packaging financial attribution|regional substitution,concept:us-advanced-packaging-regionalization,把同一 project facility 產品期間的服務收入成本毛利現金與台美訂單利用率接起的節點
+concept:inference-compute-test-demand,concept,推論晶片測試需求八分母,Inference compute test demand|tester demand conversion,,把產品數量 插入點 內容時間 並行效率 良率重測 既有設備與公司財務歸因分開追蹤的測試需求框架
+stage:test-device-mix-volume,stage,測試產品組合與數量,Test device mix and volume,concept:inference-compute-test-demand,固定 GPU ASIC CPU 記憶體 裸晶或封裝產品及同期間合格出貨與替代量的節點
+stage:test-insertion-map,stage,測試插入點地圖,Test insertion map|wafer package module system test,concept:inference-compute-test-demand,把晶粒 堆疊 封裝 模組 系統與板級各站的必測抽測移動或合併分開記錄的節點
+stage:test-content-coverage,stage,測試內容與覆蓋,Test content and coverage|fault model,concept:inference-compute-test-demand,固定測試程式 故障模型 圖樣 介面 記憶體 覆蓋 誤判與漏測範圍的節點
+stage:test-time-power-pin-thermal,stage,單顆測試時間與負載,Test time power pin and thermal load,concept:inference-compute-test-demand,固定每插入點時間 功率 接腳 溫度 停機與換線條件的節點
+stage:test-multisite-throughput,stage,多站並行與吞吐,Multisite parallel efficiency and throughput,concept:inference-compute-test-demand,把同時站數 並行效率 每小時產出 可用率與瓶頸分開量測的節點
+stage:test-yield-retest-escape,stage,良率重測與漏測,Test yield retest and escape,concept:inference-compute-test-demand,追蹤各站良率 重測率 報廢成本 漏測與提早篩除效益的節點
+stage:test-installed-base-capex,stage,既有設備與增量資本支出,Installed test base reuse and incremental capex,concept:inference-compute-test-demand,調節已裝機剩餘時數 升級 相容重用 改機成本 交期與新增測試單元採購的節點
+stage:test-company-financial-attribution,stage,測試需求公司財務歸因,Test demand company financial attribution,concept:inference-compute-test-demand,把買方與供應商同產品 插入點 介面 數量 期間 售價收入毛利與現金接起的節點
+concept:test-responsibility-passport,concept,測試責任護照,Test responsibility passport|test responsibility contract,concept:inference-compute-test-demand,把受測物版本 決策目的 故障類別 插入點 存取組態 刺激環境 抽樣覆蓋 結果責任與重測條件綁在同一筆可回查紀錄
+process:test-change-triggered-regression,process,測試變更觸發回歸重測,Change-triggered test regression|test retest matrix,concept:inference-compute-test-demand,在晶片封裝介面程式製程或工作負載變更後依影響範圍重跑測項並保存新舊版本與結果的流程
+process:test-result-lineage-feedback,process,測試結果沿革與現場回饋,Test result lineage and field feedback|RMA test feedback,concept:inference-compute-test-demand,沿同一產品身分串接晶圓組裝成品系統資格與現場結果並把新失效回饋成圍堵修正及新測項的流程
+concept:800vdc-execution-readiness,concept,800VDC 七關執行準備度,800VDC execution readiness|800VDC qualification gates,concept:800v-power-tree,把架構時鐘 設施邊界 介面冗餘 安全標準 子系統資格 場站驗收與量產財務分開追蹤的證據框架
+stage:800v-architecture-roadmap,stage,架構需求與平台時鐘,800V architecture roadmap|platform timing,concept:800vdc-execution-readiness,確認高壓直流的需求邊界 目標 rack generation 固定版本與 production 時程
+stage:800v-facility-transition,stage,設施轉換邊界,800V facility transition|AC DC hybrid stage,concept:800vdc-execution-readiness,固定只改 IT rack 連 cooling 與 network 一起改或整座場站轉為直流的架構範圍
+stage:800v-interface-redundancy,stage,介面冗餘與維修,800V interface redundancy|maintenance bypass replacement,concept:800vdc-execution-readiness,固定 voltage band 長距離動態負載 fault selectivity redundancy topology 與維修程序的節點
+stage:800v-standards-readiness,stage,安全標準與人員準備,800V standards readiness|codes training AHJ,concept:800vdc-execution-readiness,把元件系統標準 地方法規 主管機關核准 commissioning 與工作人員訓練對齊的節點
+stage:800v-subsystem-qualification,stage,800V 子系統資格,800V subsystem qualification|evidence packet,concept:800vdc-execution-readiness,以固定版本邊界 test matrix 原始資料 pass fail change control 驗證 power rack BBU BESS 保護與控制子系統
+stage:800v-site-acceptance,stage,場站試運轉與客戶驗收,800V site commissioning|customer acceptance,concept:800vdc-execution-readiness,在 as built 場站以實際負載保護控制與異常情境完成 commissioning customer acceptance 與運行紀錄
+stage:800v-commercial-attribution,stage,量產部署與財務歸因,800V production deployment|financial attribution,concept:800vdc-execution-readiness,由買方與供應商對上同一產品場站期間 deployment volume 出貨收入成本毛利與現金的節點
+metric:cdu-operating-envelope,metric,CDU 操作包絡線,CDU operating envelope|thermal hydraulic operating point,concept:liquid-cooling,把冷卻液 ATD FWS與TCS溫度流量壓力及熱負載固定後描述 CDU 可運作範圍的性能尺度
+metric:cdu-thermal-performance-curve,metric,CDU 熱性能曲線,CDU thermal performance curve|ATD heat-load curve,concept:liquid-cooling,在指定流體 FWS與TCS流量及進水溫度下把 ATD 與可支撐熱負載接成可核對工作點的曲線
+metric:cdu-tcs-pressure-head-curve,metric,CDU TCS 壓頭曲線,TCS pressure-head curve|TCS PQ curve,concept:liquid-cooling,把 CDU 二次側泵浦在不同流量下可提供的壓頭與伺服器迴路水力需求對照的曲線
+metric:cdu-fws-impedance-curve,metric,CDU FWS 阻抗曲線,FWS flow-impedance curve|FWS PQ curve,concept:liquid-cooling,把設施水流過 CDU 一次側時不同流量對應的壓差與機房供水能力對照的曲線
+stage:cdu-assembly-qualification,stage,CDU 元件與整機資格驗證,CDU ingredient and system qualification|CDU evidence packet,concept:liquid-cooling,分開驗證元件與完整 CDU 組裝並保存版本條件原始資料通過失敗及限制的節點
+capability:cdu-reliability-validation,capability,CDU 可靠度驗證,CDU reliability validation|hydrostatic shock vibration thermal cycling,component:cdu,以材料相容性承壓洩漏運輸衝擊振動溫濕度熱循環與法規文件驗證設備耐受性的能力
+concept:cpo-three-axis-architecture,concept,CPO 三軸組態框架,CPO three-axis architecture|optical engine signal processing laser placement,concept:cpo-networking,把光引擎位置 電介面訊號處理與雷射位置拆成可獨立核對且可重新組合的產品組態框架
+component:npo-optical-engine,component,近封裝光引擎（NPO）,Near-packaged optics|NPO|socketed NPO,concept:cpo-three-axis-architecture,把光引擎放近主晶片但保留獨立安裝或 socketed 組裝返修邊界的光學安排
+concept:optical-interface-processing-mode,concept,光學電介面訊號處理模式,Optical interface signal processing|retimed|transmit-retimed|linear,concept:cpo-three-axis-architecture,分開記錄完整重定時 傳送端重定時與線性介面的責任功耗及驗證契約
+component:external-laser-source,component,外部雷射光源（ELS）,External laser source|ELS|ELSFP,concept:cpo-three-axis-architecture,把連續波雷射留在光引擎之外並經光纖向一個或多個光引擎供光的元件與服務邊界
+metric:optical-loss-budget,metric,光學損耗預算,Optical loss budget|optical power budget,concept:cpo-three-axis-architecture,固定雷射輸出 連接器 分光 耦合與接收靈敏度後核對端到端可容許損耗及最差條件餘裕
+stage:optics-multivendor-field-validation,stage,光學多供應商與現場驗證,Optics multi-vendor interoperability and field validation,concept:cpo-three-axis-architecture,把 IA conformity 應用 link budget 跨廠組合 現場更換 長期可靠度 客戶驗收與部署分母逐關對齊的節點
+concept:sphbm4-four-layer-contract,concept,SPHBM4 四層契約,SPHBM4 four-layer contract|SPHBM4 architecture layers,standard:sphbm4,把 HBM4 記憶體堆疊 介面基礎晶片 分散式主機通道與接點封裝路徑分開核對的閱讀框架
+component:sphbm4-dram-stack,component,SPHBM4 記憶體堆疊,SPHBM4 DRAM stack|HBM4 core stack,concept:sphbm4-four-layer-contract,沿用 HBM4 記憶體裸晶與堆疊並與新的底部介面及封裝路徑分開驗證的元件層
+component:sphbm4-distributed-host-interface,component,SPHBM4 分散式主機通道,SPHBM4 distributed host interface|independent host channels,concept:sphbm4-four-layer-contract,以彼此獨立且不必同步的 16-bit DDR 通道連接主機並承接高速傳輸的介面層
+stage:sphbm4-bump-map-publication,stage,SPHBM4 接點圖公開契約,SPHBM4 bump map publication|JESD330-4-1,concept:sphbm4-four-layer-contract,固定主標準 addendum 版本及訊號命令時脈電源接地配置且可由公開文件核對的節點
+stage:sphbm4-phy-device-qualification,stage,SPHBM4 PHY 與記憶體元件資格,SPHBM4 PHY device qualification|base die host PHY silicon,concept:sphbm4-four-layer-contract,把具名 base die 主機 PHY 記憶體堆疊 silicon 版本功耗延遲錯誤與跨廠測試接起的節點
+stage:sphbm4-system-customer-qualification,stage,SPHBM4 系統與客戶資格,SPHBM4 system customer qualification|SPHBM4 workload validation,concept:sphbm4-four-layer-contract,在具名運算平台固定記憶體封裝控制器工作負載熱可靠度與客戶通過條件的節點
+stage:sphbm4-commercial-attribution,stage,SPHBM4 量產與財務歸因,SPHBM4 commercial attribution|SPHBM4 financial materiality,concept:sphbm4-four-layer-contract,由買方與供應商對上同一標準版本產品資格量產出貨期間收入成本毛利與現金分母的節點
+concept:800v-topology-device-selection,concept,800V 拓撲與元件選擇雙層框架,800V topology-device selection|two-layer selection contract,concept:800v-power-tree,先用系統拓撲判斷哪些轉換隔離備援與保護級存在 再以六項工程尺度選擇 Si SiC GaN 與控制元件
+metric:power-stage-selection-envelope,metric,功率級六軸選材包絡線,Power-stage selection envelope|six-axis power device selection,concept:800v-topology-device-selection,以工作電壓電流 切換拓撲 隔離安全 瞬態保護 熱封裝及資格供應六軸比較同一 power stage
+component:direct-hv-bus-converter,component,高壓匯流排直降轉換器,Direct 800V bus converter|800V-to-12V|800V-to-6V,concept:800v-topology-device-selection,把高壓直流直接轉為 12V 或 6V 以減少中間轉換級的架構
+component:48v-power-shelf,component,48V 機架電力架,48V power shelf|HPR V2 power shelf,concept:800v-topology-device-selection,由多顆 PSU 以冗餘方式向 48V 機架匯流排供電的現行電力模組
+standard:hbf-technical-specification,standard,HBF 第一版技術規格,HBF technical specification|HBF first technical specification,concept:hbf-commercialization,由 HBF 工作組對外發布並涵蓋產品包絡 主機電氣介面 封裝可靠度與軟體讀寫的共同框架；規格發布不等於產品互通
+metric:hbf-performance-grade,metric,HBF 容量與頻寬等級,HBF capacity and bandwidth grades,concept:hbf-commercialization,共同規格摘要中的堆疊 容量與頻寬級別包絡；不是實體產品測量或跨產品效能排名
+standard:ucie-interface,standard,UCIe 介面,UCIe host interface,concept:hbf-commercialization,規格摘要中用於處理器與 HBF 連接的封裝內晶粒互連路徑；本文不自行指定版本與層級
+component:xpu-hbf-host-interface,component,xPU-HBF 主機介面,xPU-HBF host interface,concept:hbf-commercialization,共同規格公告用來描述運算處理器與 HBF 系統交換資料 指令及狀態的主機介面層
+capability:hbf-software-io,capability,HBF 軟體讀寫,HBF software I/O|HBF software user guide,concept:hbf-commercialization,規格摘要涵蓋的軟體讀寫指引；不等於驅動 資料放置與目標工作負載已完成
+stage:hbf-compliance,stage,HBF 合規與互通,HBF compliance|HBF interoperability,concept:hbf-commercialization,依公開規範與共同測試驗證具名產品符合介面並跨廠互通的未來節點
+metric:capacitor-effective-capacitance,metric,電容實際有效容量,Capacitor effective capacitance|capacitance under bias,concept:ai-capacitor-role-map,在具名料號的工作電壓 溫度與量測條件下核對實際可用電容量的尺度
+metric:capacitor-impedance-spectrum,metric,電容頻率阻抗曲線,Capacitor impedance spectrum|ESR ESL SRF,concept:ai-capacitor-role-map,沿目標頻帶同時核對 capacitance ESR ESL 自共振與總阻抗的尺度
+metric:capacitor-ripple-temperature-rise,metric,電容紋波溫升,Capacitor ripple temperature rise|ripple self-heating,concept:ai-capacitor-role-map,把紋波電流頻譜 ESR 環境溫度 散熱面積與冷卻條件轉成元件溫升的尺度
+metric:capacitor-mission-life,metric,電容任務壽命,Capacitor mission-profile life|useful life,concept:ai-capacitor-role-map,在指定電壓 電流 溫度 冷卻與運轉時間下核對產品壽命模型 試驗與失效判準的尺度
+concept:inspection-control-plan,concept,檢查製程控制計畫,Inspection control plan|Process control plan,capability:process-control,把失效決策 工序單位 抽樣覆蓋 靈敏度逃逸 偽警報分類及結果圍堵固定成可驗證契約
+metric:inspection-sampling-coverage,metric,檢查抽樣與覆蓋,Inspection sampling and coverage,concept:inspection-control-plan,按 lot wafer die site 或 package 記錄檢查比例 分布及動態抽樣規則的尺度
+metric:defect-sensitivity-escape,metric,缺陷靈敏度與逃逸,Defect sensitivity and escape,concept:inspection-control-plan,把最小可見缺陷與真正關鍵缺陷漏檢風險及後續失效接起的尺度
+metric:nuisance-false-alarm,metric,雜訊與偽警報,Nuisance and false-alarm rate|FAR,concept:inspection-control-plan,量測候選中非關鍵訊號 分類錯誤及其占用複判能力的尺度
+metric:inspection-cycle-time,metric,檢查結果週期時間,Inspection time to result|review cycle time,concept:inspection-control-plan,從檢查 複判 分類到形成可執行決策所需時間的尺度
+capability:excursion-containment,capability,製程異常圍堵,Process excursion containment,concept:inspection-control-plan,在製程漂移或缺陷異常後快速隔離受影響設備 批次與產品並限制後續損失的能力
+metric:coolant-chemistry-baseline,metric,冷卻液化學基準,Coolant chemistry baseline|fluid baseline,concept:liquid-cooling-loop-boundary,在合格填充與啟動條件下固定配方 pH 導電度硬度顆粒抑制劑微生物及代表樣本的比較起點
+capability:wetted-material-change-control,capability,浸液材料變更控制,Wetted-material change control|wetted materials list,concept:liquid-cooling-loop-boundary,完整記錄所有接液金屬塑膠密封接著劑與塗層並在新增替代或維修變更後重做流體相容性評估
+metric:coolant-contamination-budget,metric,冷卻液污染預算,Coolant contamination budget|fluid cleanliness budget,concept:liquid-cooling-loop-boundary,把製造運送施工接管填充與維修各階段可容許的顆粒殘留及微生物負荷固定成可驗證邊界
+stage:tcs-fluid-commissioning,stage,TCS 流體試運轉,TCS fluid commissioning|coolant commissioning,concept:liquid-cooling-loop-boundary,依程序完成清洗沖洗必要鈍化填充排氣取樣留樣及整體運轉基準簽核的場域節點
+metric:coolant-monitoring-action-limits,metric,冷卻液監測與行動門檻,Coolant monitoring and action limits|fluid action limits,concept:liquid-cooling-loop-boundary,把取樣點頻率趨勢複驗隔離換液復原與責任所有權接成異常後可執行的營運尺度
+concept:custom-hbm-workload-contract,concept,Custom HBM 工作負載與功能合約,Custom HBM workload contract|workload handoff,concept:custom-hbm-commercialization,固定輸入資料 搬移功能 正確答案 延遲耗電目標與失效條件的設計交接
+concept:custom-hbm-interface-contract,concept,Custom HBM 介面與電力合約,Custom HBM interface contract|I/O contract,concept:custom-hbm-commercialization,固定容量 通道 腳位速度 功耗包絡 命令資料錯誤規則及版本的介面交接
+concept:custom-hbm-base-die-contract,concept,Custom HBM 底部邏輯與智財合約,Custom HBM base-die contract|logic IP handoff,concept:custom-hbm-commercialization,固定控制器 額外邏輯 智財所有權 製程 面積 時序 功耗及驗證版本的底部晶片交接
+concept:custom-hbm-firmware-contract,concept,Custom HBM 韌體與系統軟體合約,Custom HBM firmware contract|software handoff,concept:custom-hbm-commercialization,固定初始化 排程 錯誤處理 資料格式 runtime compiler 版本及回退方法的軟硬體交接
+concept:custom-hbm-manufacturing-thermal-contract,concept,Custom HBM 製造封裝與熱合約,Custom HBM manufacturing package thermal contract,concept:custom-hbm-commercialization,固定 DRAM與logic製程 堆疊接合 中介層 供電 熱點 測試及可製造條件的實體交接
+stage:custom-hbm-handoff-qualification,stage,Custom HBM 六份交接與客戶資格,Custom HBM handoff qualification|six-contract sign-off,concept:custom-hbm-commercialization,由具名客戶對同一產品的工作負載 介面 底部邏輯 韌體 製造封裝熱及商業版本完成變更控制與通過簽核的節點
+concept:measurement-system-contract,concept,製程控制量測系統契約,Measurement system contract|measurement assurance contract,capability:process-control,在量測結果進入放行隔離重工或調參前固定被測量 方法環境 參考校正 偏差變異 不確定度及決策規則
+metric:measurement-measurand-decision,metric,被測量單位與決策,Measurand unit and decision,concept:measurement-system-contract,固定要量的性質 單位 規格範圍及結果要支撐的放行隔離重工或調參決定
+capability:measurement-method-context,capability,量測方法組態與環境,Measurement method configuration and environment,concept:measurement-system-contract,固定樣品準備 recipe演算法版本 設備設定 操作與溫濕度等工作環境以維持結果可比
+capability:measurement-reference-traceability,capability,量測參考校正與可追溯鏈,Measurement reference calibration and traceability,concept:measurement-system-contract,以有文件紀錄且不中斷的校正鏈將特定量測結果連到指定參考並納入每一環不確定度
+metric:measurement-bias-resolution-linearity,metric,量測偏差解析度與線性,Measurement bias resolution and linearity,concept:measurement-system-contract,分開核對系統性偏移 可辨識最小變化及量測範圍內反應是否足以支撐指定決策
+metric:measurement-repeatability-reproducibility-stability,metric,量測重複性再現性與穩定性,Measurement repeatability reproducibility and stability,concept:measurement-system-contract,分別量化同機短期 跨日跨機跨條件及長期漂移造成的結果變異
+metric:measurement-uncertainty-decision-rule,metric,量測不確定度與決策規則,Measurement uncertainty and decision rule,concept:measurement-system-contract,把已辨識誤差合成結果不確定度並固定靠近規格邊界時的判定與處置方法
+product:nvidia-vera-rubin-nvl72,product,NVIDIA Vera Rubin NVL72,Vera Rubin NVL72|Rubin NVL72,concept:rack-scale,由 Vera CPU Rubin GPU NVLink 網路儲存電力散熱與控制共同構成的 NVIDIA 機架級人工智慧平台
+stage:vera-rubin-platform-production,stage,Vera Rubin 平台進入生產,Vera Rubin platform production,product:nvidia-vera-rubin-nvl72,平台商把設計推進持續製造與供應鏈爬坡但尚未提供個別系統廠數量與財務的節點
+stage:vera-rubin-system-ready,stage,Vera Rubin 系統設計與型錄就緒,Vera Rubin system readiness,product:nvidia-vera-rubin-nvl72,系統廠公開可辨識機架配置或 production-ready 能力但尚未證明可下單與實際出貨的節點
+stage:vera-rubin-factory-production,stage,Vera Rubin 工廠實際生產,Vera Rubin factory production,product:nvidia-vera-rubin-nvl72,具名工廠以固定產品版本開始實際製造而不只保留未來生產計畫的節點
+stage:vera-rubin-rack-validation,stage,Vera Rubin 整櫃帶起與系統驗證,Vera Rubin rack bring-up and validation,product:nvidia-vera-rubin-nvl72,同一機架組態完成啟動並驗證運算網路電力散熱儲存與控制共同運作的節點
+stage:vera-rubin-site-acceptance,stage,Vera Rubin 站點啟用與客戶驗收,Vera Rubin site commissioning and acceptance,product:nvidia-vera-rubin-nvl72,在具名機房接上設施並依約定測試完成客戶簽收的交付節點
+stage:vera-rubin-cloud-workload,stage,Vera Rubin 雲端可用與工作負載,Vera Rubin cloud availability and workload,product:nvidia-vera-rubin-nvl72,以具名 SKU 區域容量與服務條件承載可觀測工作負載的營運節點
+stage:vera-rubin-financial-attribution,stage,Vera Rubin 供應商財務歸因,Vera Rubin supplier financial attribution,product:nvidia-vera-rubin-nvl72,把同一平台數量價格期間驗收連到具名供應商收入毛利存貨與現金流的節點
+concept:high-na-anamorphic-half-field,concept,High-NA 非等向光學與半視場,High-NA anamorphic optics and half field|anamorphic half field,concept:high-na-euv-readiness,以兩方向不同縮小倍率提高解析度並把單次曝光範圍縮成半視場的光學與版圖邊界
+process:high-na-field-stitching,process,High-NA 半視場接縫拼接,High-NA field stitching|half-field seam stitching,concept:high-na-anamorphic-half-field,把相鄰半視場在接縫位置保持圖形對準尺寸與電性連續且能跨晶圓批次重現的整合製程
+metric:high-na-dose-yield-throughput-window,metric,High-NA 劑量缺陷良率產出視窗,High-NA dose defect yield throughput window|dose-to-yield window,concept:high-na-euv-readiness,在同一圖形材料焦距轉移與設備版本下共同量測曝光劑量隨機缺陷電性良率及每小時合格產出
+process:high-na-electrical-evidence-ladder,process,High-NA 圖形到電性量產證據階梯,High-NA electrical evidence ladder|pattern-to-HVM evidence ladder,concept:high-na-euv-readiness,依序分開材料或光學結果 光阻圖形 轉移結構 電性載具 功能元件與客戶產品高量產的證據層級
+capability:async-action-tracking,capability,非同步動作追蹤,Async action tracking|Task Monitor,concept:ai-rack-action-contract,把長時間控制動作的接受 任務進度 最終結果與錯誤保留下來並可由同一事件追查
+capability:stale-write-protection,capability,舊狀態覆寫保護,Stale write protection|ETag conditional update,concept:ai-rack-action-contract,以資源版本與條件式更新攔下客戶端基於舊狀態提出的衝突變更
+standard:redfish-interop-profile,standard,Redfish 互通 Profile,Redfish interoperability profile|DSP0272,concept:ai-rack-action-contract,把指定設備必須支援的 Redfish 資源 欄位 訊息與動作固定成可供工具查核的最低要求
+capability:physical-state-verification,capability,實際物理狀態驗證,Observed physical state verification|commanded versus observed state,concept:ai-rack-action-contract,在邏輯任務完成後以設備狀態與獨立感測確認電力 液冷與環境真的到達目標狀態
+concept:backside-performance-comparison-passport,concept,背面供電效能八格比較護照,Backside power performance comparison passport|BSPDN benchmark passport,concept:backside-power,以受測物 基準 固定條件 指標 活動 時空視窗 PDN環境及共同取捨限制背面供電百分比的比較邊界
+metric:static-ir-drop,metric,靜態電壓降,Static IR drop|DC voltage drop,concept:backside-performance-comparison-passport,在近似固定電流下以直流電阻路徑為核心觀察供電損失的量測
+metric:dynamic-voltage-droop,metric,動態電壓下陷,Dynamic voltage droop|dynamic IR drop,concept:backside-performance-comparison-passport,在電晶體快速切換時依活動向量及時間視窗觀察電阻電感與電容共同造成的瞬態供電下降
+metric:conditional-ppa-comparison,metric,條件式效能功耗面積比較,Conditional PPA comparison|iso-Vdd iso-speed comparison,concept:backside-performance-comparison-passport,把速度 功耗 面積或密度結果逐一綁定相同電壓 相同速度 相同功耗及共同參考設計的比較方法
+metric:kv-cache-reuse-transfer-observability,metric,KV 快取重用與搬移可觀測欄位,KV cache reuse and transfer observability|matched tokens|cache hit rate|offload onboard blocks,concept:ai-memory-hierarchy,把 matched tokens 各層命中 搬出 搬回 淘汰 重算與錯誤放進同一時間窗以確認分層機制是否真的發生
+metric:ai-inference-service-slo,metric,人工智慧推論服務等待與合格吞吐,AI inference service latency and goodput|TTFT|ITL|good request fraction,concept:ai-memory-hierarchy,分開量測首字等待 逐字等待 request latency 每請求與總吞吐 合格請求比例 錯誤及品質而不以單一平均替代
+process:ai-memory-tier-measurement-passport,process,人工智慧記憶體分層八格量測護照,AI memory tier measurement passport|KV tier benchmark contract,concept:ai-memory-hierarchy,以受測系統 工作負載 流量 重用冷熱 各層政策 完整資料路徑 機制指標及使用者結果固定可重建的基準與處理組比較
+process:checkpoint-recovery-measurement-passport,process,Checkpoint 八格復原護照,Checkpoint recovery measurement passport|checkpoint benchmark contract,concept:ai-storage-data-plane,把受測系統 存檔內容節奏 比較組 完成語意 資料路徑 故障回載 訓練結果與資源成本綁成可重建的版本化比較
+metric:checkpoint-completion-semantics,metric,Checkpoint 完成語意,Checkpoint completion semantics|staging upload durable restore completion,concept:ai-storage-data-plane,分開記錄暫存 上傳 耐久副本與正確回載完成以避免把較早事件改寫成可復原存檔
+metric:training-runtime-goodput,metric,訓練有效時間,Training runtime goodput|ML runtime goodput,concept:ai-storage-data-plane,在訓練資源可用期間真正向前完成有效訓練進度的時間比例並納入失敗前遺失進度與恢復等待
+standard:ietf-rats-architecture,standard,IETF RATS 架構,RFC 9334|Remote ATtestation procedureS architecture,concept:ai-rack-trust-root,把證明者 證據 驗證者 評估政策 證明結果與依賴方決策分開的遠端證明共同角色模型
+metric:attestation-evidence-freshness,metric,遠端證明證據新鮮度,Attestation evidence freshness|nonce|epoch|replay protection,concept:ai-rack-trust-root,確認證據與證明結果反映目前狀態而不是被重播舊合格報告的時間與一次性挑戰條件
+capability:reference-value-lifecycle,capability,參考值生命週期,Reference value lifecycle|RIM bundle lineage,concept:ai-rack-trust-root,讓製造 整合 維護與更新後的預期量測可由建立者簽署 串接 發布 撤銷並供驗證者取得
+process:attestation-decision-passport,process,遠端證明八欄決策護照,Attestation decision passport|evidence to authorization contract,concept:ai-rack-trust-root,把受測版本 證據涵蓋 新鮮度 參考值 驗證政策 結果語意 依賴方動作與失敗復原綁成可查核決策鏈
+capability:trusted-firmware-recovery,capability,可信韌體復原,Trusted firmware recovery|platform firmware recovery,concept:ai-rack-trust-root,偵測未授權變更後以受信任來源恢復韌體程式與關鍵資料並重新取得可驗證狀態的能力
+capability:large-eut-emc-test-site,capability,大型被測設備 EMC 場地,Large-EUT EMC test site|expanded EMC test volume,concept:ai-rack-emc-certification,以適用距離測試體積承重供電接地與場地等效證據量測大型完整設備的場地能力
+process:emc-test-report-passport,process,EMC 測試報告九欄護照,EMC test report passport|EMC comparability contract,concept:ai-rack-emc-certification,把被測版本負載纜線方法場地儀器結果認可範圍與變更責任綁成逐份報告可查核的可比性契約
+metric:emc-compliance-margin,metric,EMC 合規測試裕量,EMC compliance margin|emission margin,concept:ai-rack-emc-certification,在指定方法偵測器與頻寬下量測排放結果距離限制值的空間且必須連同不確定度與判定規則解讀
+capability:emc-accreditation-scope-check,capability,EMC 認可範圍核對,EMC accreditation scope check|accredited activity boundary,concept:ai-rack-emc-certification,逐項核對實驗室地點產品類別方法測試與未認可資料標示而不把認可標誌改寫成產品背書

@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-06-25
-last_reviewed_at: 2026-08-02
-review_due: 2026-08-23
+last_reviewed_at: 2026-08-12
+review_due: 2026-09-12
 source_type: mixed
 publisher: Lam Research
 publisher_domain: lamresearch.com
@@ -19,9 +19,9 @@ group_ids: packtest,semiequip,pcb
 trigger_type: advanced_packaging_manufacturing_readiness
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C4
+thesis_claim_id: C8
 base_confidence: medium
-confidence_basis: Lam 的研發中心與製造說明可確認 pilot／early qualification 階段及均勻度、良率、throughput、標準化難題，Applied Materials 的 NEXX 交易提供第二個設備商布局證據；但交易仍待完成，且沒有具名客戶 HVM、good-package yield 或台灣公司財務貢獻
+confidence_basis: ASE 技術文章與 2026-05-26 正式公告可把 fan-out 架構、chip-first／chip-last 先後及 310x310mm planned production line 分開，SEMI current-standard page 另界定 panel 載體條件；Lam 與 Applied Materials 兩條獨立鏈支持 pilot／設備布局，但仍沒有具名客戶 HVM、同產品 good-package yield／throughput／cost 或可辨識財務貢獻
 cross_company_numbers: false
 -->
 
@@ -120,6 +120,70 @@ limitation: 新聞索引不證明交易完成、技術整合、客戶採用或�
 independence_group: applied-materials
 -->
 
+<!-- research_source
+source_id: S6
+role: company_release
+source_kind: document
+publisher: ASE
+title: The Opportunities and Challenges of FOPLP Technology
+published_at: 2025-10-07
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://ase.aseglobal.com/ch/blog/technology/the-opportunities-and-challenges-of-foplp-technology/
+locator: PLP 製程優勢、FOCoS Chip First vs Chip Last、Fan-out PLP 實踐與發展及 FOCoS-Bridge panel test-vehicle process 段落
+limitation: 公司技術文章可界定自家 fan-out 流程、panel test vehicle 與製造問題，但沒有具名客戶 qualification、連續批次良率、HVM throughput、同產品成本或財務分子
+independence_group: ase
+-->
+
+<!-- research_source
+source_id: S7
+role: standard
+source_kind: living_index
+publisher: SEMI
+title: SEMI 3D20 Specification for Panel Characteristics for Panel Level Packaging Applications
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://store-us.semi.org/products/3d02000-semi-3d20-en-specification-for-panel-characteristics-for-panel-level-packaging-plp-applications
+locator: current revision 與公開 abstract 中 panel external dimensions、with／without process carrier、thickness、warpage、mass 及 common-equipment rationale
+limitation: 公開摘要只界定共同設備所需的物理特性；標準存在不證明任一產品已 qualification、量產、達到經濟良率或採用特定尺寸
+independence_group: semi
+-->
+
+<!-- research_source
+source_id: S8
+role: company_release
+source_kind: document
+publisher: ASE
+title: ASE Launches Automated 310mm Panel-Level Packaging to Accelerate AI Innovation
+published_at: 2026-05-26
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.aseglobal.com/press-room/310x310/
+locator: announcement date、310x310mm automated line、FOCoS／FOCoS-Bridge compatibility、2/2um／8/8um line-space statements 與 expected production in first-half 2027
+limitation: 公司公告證實具名平台、線寬能力敘述與前瞻投產目標；不證明截至 2026-08-12 已 production release、完成客戶 qualification、達到穩定良率／throughput／cost 或形成收入
+independence_group: ase
+-->
+
+<!-- research_source
+source_id: S9
+role: company_release
+source_kind: living_index
+publisher: ASE
+title: ASE financials and investor information
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://ase.aseglobal.com/about-ase/financials/
+locator: 2026-08-12 建立的 monthly revenue、stock-exchange filing、quarterly result、financial report 與 investor information 重查入口
+limitation: 財務索引只用來定位後續文件；公司總營收、封裝部門收入或一般先進封裝資本支出都不能代替 310x310 PLP 的具名出貨、收入或毛利
+independence_group: ase
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -190,9 +254,51 @@ verification_needed: 具名客戶產品、panel form factor、qualification、go
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C6
+label: verified
+status: active
+claim: Fan-out 是把晶粒嵌入重構載體並以 RDL 把連接延伸到晶粒外的封裝架構；chip-first 與 chip-last／RDL-first 又代表不同先後順序，而 panel 是可承載這些流程的方形或長方形批次格式，三者不是同一個成熟度名詞
+supporting_source_ids: S6,S7
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S6 直接分列 chip-first、chip-last、fan-out RDL 與 panel test vehicle，S7 明示許多但非全部 panel applications 包含 fan-out 並把 panel 定義到外形與載體物理特性
+boundary: 只界定架構、製程先後與批次載體；不宣稱所有 PLP 都是 fan-out、所有 fan-out 都用 panel，也不比較任一流程的效能、良率或成本
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C7
+label: verified
+status: active
+claim: ASE 公開的 310x310mm 自動面板線對應 FOCoS／FOCoS-Bridge 平台並列出 2/2um 與 8/8um 線寬／線距能力，但同一頁把新線狀態寫為預計 2027 年進入生產
+supporting_source_ids: S6,S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8 直接列出 panel size、compatible platforms、line-space statements 與 expected production in first-half 2027；S6 補足兩種 fan-out 流程與較早的 panel test-vehicle／line-building 位置
+boundary: 這證實具名 planned line 與公司所述能力，不證明截至 2026-08-12 已 production release、完成客戶產品資格、達到穩定良率／產出／成本或形成可辨識收入
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: inference
+status: active
+claim: 判讀 panel-level packaging 必須同時沿「封裝架構與製程先後」及「面板尺寸、搬運、製造與商用階段」兩條軸前進；ASE 的具名 310x310mm planned line 讓公開成熟度前進到量產規劃，但在 2027 實際投產、客戶資格、連續良率、合格產出與同產品成本出現前，仍不能把面積利用率或 planned production 改寫成已實現的 HVM 成本優勢
+supporting_source_ids: S1,S2,S3,S6,S7,S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S6 分開 fan-out 與 chip-first／chip-last，S7 固定 panel 物理特性，S8 新增具名 planned line；S1／S2 仍顯示 pilot、qualification readiness 與 yield／throughput 難題，S3 的設備交易仍不等於採用結果
+boundary: 本框架不量化 wafer／panel 成本差、TAM、市占或公司份額，也不把 ASE 一條 planned line 外推成全產業量產、客戶採用或台灣供應鏈財務受惠
+verification_needed:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
 claim_ids: C1,C2,C3,C4
 metric: Panel-level packaging 的交易完成、form-factor 標準、客戶 qualification、good-package yield、throughput 與 HVM 狀態
 source_ids: S1,S2,S3
@@ -202,6 +308,8 @@ frequency_detail: 設備商、OSAT、基板商或 AI 平台公布 panel qualific
 next_check: 2026-08-23
 trigger: 具名客戶產品披露 panel size、qualification 與可定位的 good-package yield／throughput，或 NEXX 交易完成並出現整合與出貨證據
 invalidation: 量產仍受 panel 標準、翹曲、均勻度、良率或節拍阻擋，pilot 長期無法轉入 HVM，則商業急迫性下修
+retired_at: 2026-08-12
+retirement_reason: S6／S7 把 fan-out 架構與 panel 物理載體分開，S8 又新增 ASE 具名 310x310mm planned line；舊 T1 的單軸 readiness 由 T3 以製程軸與製造商用軸接續，且 2027 預計投產仍未命中客戶 qualification、good-package yield／throughput 或 HVM trigger
 -->
 
 <!-- monitoring_item
@@ -216,6 +324,20 @@ frequency_detail: 每季法說與財報檢查客戶 qualification、panel 工具
 next_check: 2026-10-31
 trigger: 台灣公司與客戶對同一 panel 產品或流程完成雙向核對，並揭露量產出貨或財務資訊
 invalidation: 公司只描述先進封裝或大尺寸基板機會，未披露 form factor、客戶、qualification 與財務足跡
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C1,C2,C3,C5,C6,C7,C8
+metric: Panel flow／form factor、SEMI common-carrier progression、ASE 310x310 line production release、客戶 qualification、good-package yield、throughput、cost 與 HVM 狀態
+source_ids: S1,S2,S3,S6,S7,S8
+watch_source_ids: S4,S5,S7,S9
+frequency: monthly
+frequency_detail: 每月先固定 chip-first／chip-last 與 panel size，再核對 planned line、production release、具名客戶批次、良率／throughput／cost 和財務分子；單一線寬或面積數字不替代整線結果
+next_check: 2026-09-12
+trigger: ASE 或另一具名 OSAT 公布同一 panel platform 的實際 production release，並同時提供客戶 qualification、連續批次 good-package yield／throughput、可靠度或可辨識出貨中的至少一項
+invalidation: 2027 投產目標後移、共同載體或搬運條件分裂、良率／節拍／成本無法達標，或 planned line 長期沒有客戶產品與實際製造結果
 -->
 
 <!-- transition
@@ -239,6 +361,13 @@ to: triaged
 reason: editorial_plain_language_wave95_panel_cost_four_measures_production_chain_and_six_gate_ladder
 evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: separated_fanout_architecture_panel_carrier_and_ase_310x310_planned_production_evidence
+evidence: sources:S6,S7,S8
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -248,6 +377,17 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 - **圓形晶圓（Wafer）**：半導體製程常用的圓形基板；排入大型方形封裝時，圓周邊緣可能留下較多無法使用的面積。
 - **方形面板（Panel）**：面板級製程使用的方形或長方形大載體；可排版面積較完整，但尺寸越大也越難維持平整與均勻。
 - **面板載體**：承接重佈線、金屬與封裝結構的大面積基板；材料、厚度與搬運方式都會影響製程結果。
+- **扇出封裝（Fan-out）**：把晶片接點經由重佈線延伸到晶粒邊界之外，以容納更多外部連接；它是一種封裝架構，不是面板尺寸。
+- **扇出晶片接基板（FOCoS）**：先用扇出重佈線把多顆晶粒連成一個模組，再把模組接到球柵陣列基板的封裝平台；名稱存在不代表已在面板線量產。
+- **扇出橋接封裝（FOCoS-Bridge）**：在扇出重佈線中加入局部橋接晶片，讓高密度連線集中在需要的位置；橋接試驗結構不能替代完整產品資格。
+- **重構面板**：把已切割晶粒重新排列並以封裝材料固定成可批次加工的面板；它是製造中的中間載體，不一定留在最終產品裡。
+- **重佈線層（RDL）**：在晶粒與外部接點之間重新安排電路連線的金屬與介電層；線路能做出來仍要通過對準、缺陷與可靠度驗證。
+- **晶片先放（Chip-first）**：先把晶粒放入暫時或永久結構，再形成重佈線；晶粒在包封時移動會增加後續對準難度。
+- **線路先做（Chip-last／RDL-first）**：先在載體上形成重佈線，再把晶粒接上；可減少重佈線製作期間的晶粒位移問題，但仍有接合、良率與成本關卡。
+- **已知良品晶粒（Known-good die）**：在封裝前已通過指定測試的晶粒；先測過能降低把壞晶粒裝入複雜封裝的風險，不能保證封裝後仍合格。
+- **晶粒位移（Die shift）**：晶粒在放置、包封或加熱後偏離原位置；位移超出補償範圍時，通孔或重佈線可能接不到正確接點。
+- **線寬／線距（L/S）**：金屬線寬與相鄰線之間的距離；單一最小值只證明圖形能力，不等於整片面板良率或產品已量產。
+- **預計投產**：公司對未來生產開始時間的目標；它比只有概念或設備規格更接近商用，但仍不是實際投產、客戶放行或出貨紀錄。
 - **面板尺寸標準**：設備、材料、載具與自動化共同採用的長寬與厚度規格；單一公司的可處理尺寸不等於全產業共同標準。
 - **面積利用率**：可用來排入產品的面積占載體可用面積的比例；它回答幾何效率，不等於最後合格品比例。
 - **理論可排數**：依產品尺寸與版圖估算一片載體最多能放多少顆；尚未扣除製程缺陷、測試失敗與報廢。
@@ -279,28 +419,55 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 
 ### 三句話抓重點
 
-- 方形面板能利用更多邊角、一次排進更多大型封裝；這只回答「排得下多少」，還沒回答最後能做出多少合格品。
-- 本輪公開資料只確認研發場域、試產與早期認證能力，也指出大面積均勻度、良率、產出速度、自動搬運與尺寸標準仍是量產難題。
-- 目前沒有具名產品的合格品良率、穩定產能、可靠度與財務貢獻，因此不能把「排得更多」直接讀成「每顆更便宜」或台灣公司已受惠。
+- 「扇出」說明連線如何離開晶粒，「晶片先放／線路先做」說明製程先後，「面板」只說明用哪種大面積載體批次加工；三個詞不能混成同一個成熟度。
+- 本輪新證據可確認 ASE 公開一條 310×310 mm 自動線與具名封裝平台，但公司同一頁仍寫成預計 2027 年投產，而不是截至 2026-08-12 已穩定量產。
+- 因此方形面板排得更多、線路做得更細或產線已展示，都不能替代具名客戶資格、連續良率、合格產出、可靠度、成本與穩定大量生產證據。
 
 ### 為什麼重要
 
-大型人工智慧封裝要把運算晶片、記憶體與輸入輸出晶片放在同一載體上，產品變大後，圓形晶圓
-邊緣的排版損失會更明顯。方形面板可能減少幾何浪費，卻也把難題放大到整片平整度、中央與邊緣
-一致性、搬運、返工與整片報廢。真正的成本問題不是「一片能排幾顆」，而是「一小時能穩定交付
-幾顆合格品，以及為此花了多少材料、設備與失敗成本」。
+大型人工智慧封裝要把運算晶片、記憶體與輸入輸出晶片連成可交付產品。讀者若把「面板」當成
+一種最終封裝，就會漏掉兩個先決問題：晶粒與重佈線按什麼順序接起來，以及加工用面板最後是否
+留在產品裡。
+
+圓形晶圓改成方形面板可能減少幾何浪費，卻也把難題放大到整片平整度、晶粒位移、
+中央與邊緣一致性、搬運、返工與整片報廢。真正的成本問題不是「一片能排幾顆」，而是「一小時
+能穩定交付幾顆合格品，以及為此花了多少材料、設備與失敗成本」。
 
 ### 接下來怎麼追
 
-- 先標記新資料位於研發場域、試產與工程測試、早期認證、具名產品認證、穩定量產或財務貢獻哪一關。
+- 先標記資料是在談扇出架構、晶片先放／線路先做，還是只在談圓形晶圓改為方形面板；不要用載體名稱替產品流程補空格。
+- 再標記新資料位於研發場域、試產與工程測試、預計投產、具名產品認證、實際量產或財務貢獻哪一關。
 - 比較同一產品時，同時核對面板尺寸、理論可排數、投入數、合格品良率、每小時產出、停機、返工、報廢與可靠度。
 - 公司映射要讓客戶端的具名產品與供應商端的設備、材料、量產出貨及財務資料互相對上，缺一邊就維持待驗證。
 
 ### 想一想
 
-- 面板一次排得下更多封裝，若報廢增加、製程變慢，每顆合格品還會更便宜嗎？
+- 同一種扇出封裝若由圓形晶圓改在方形面板加工，改變的是封裝架構、製程先後，還是批次載體？
+- 面板一次排得下更多封裝，若晶粒位移、報廢增加或製程變慢，每顆合格品還會更便宜嗎？
 - 大面板的平均厚度達標時，中央與邊緣仍可能有哪些翹曲、線寬、清洗與搬運問題？
-- 一座試產線能做工程批次後，還要看到哪些具名產品、連續良率、產出、可靠度與財務資料才算量產成熟？
+- 一條產線宣布預計 2027 年投產後，還要看到哪些實際生產放行、具名客戶、連續良率、產出、可靠度與財務資料才算量產成熟？
+
+## 先把兩條軸拆開：封裝做法不等於面板載體
+
+「面板級」最容易被誤讀成一種完整產品。其實讀資料時至少要同時固定兩條軸：第一條是晶粒、
+包封材料與重佈線如何組成封裝；第二條是這些步驟在圓形晶圓還是方形面板上批次加工。產品架構
+相同時可以更換載體，載體相同時也可能服務不同流程，兩條軸都不能替另一條證明量產。
+
+| 本文兩軸地圖 | 它回答什麼 | 例子 | 本輪可確認 | 不能直接推成 |
+|---|---|---|---|---|
+| 1. 封裝架構 | 晶粒接點如何延伸並和其他晶粒或基板連接？ | 扇出重佈線、扇出晶片接基板 | ASE 技術文章把扇出核心放在重佈線與晶粒整合 | 只要使用方形面板就一定是同一種扇出產品 |
+| 2. 製程先後 | 晶粒先放，還是重佈線先做？ | 晶片先放、線路先做 | ASE 公開分列兩條流程及各自限制 | 一條流程的線寬能力可替另一條流程證明良率 |
+| 3. 批次載體 | 多顆封裝在什麼外形、厚度與搬運條件下共同加工？ | 圓形晶圓、310×310 mm 或更大面板 | SEMI 把外形、厚度、翹曲、重量與有無製程載體列為共同設備條件 | 面板尺寸本身就是最終封裝、基板材料或客戶產品 |
+| 4. 商用階段 | 流程和產線是否已從能力走到客戶產品與穩定製造？ | 試驗結構、預計投產、實際投產、客戶放行 | ASE 已公開具名 310×310 mm planned line，目標 2027 年投產 | 自動線、平台相容或預計投產等於目前已有 HVM、出貨與收入 |
+
+### 再用兩條簡化流程看先後順序
+
+- **晶片先放**：先放置已知良品晶粒，再包封成重構載體，量測或補償晶粒位移後製作重佈線，最後才進入外部接點、切割與產品測試。
+- **線路先做**：先在載體上完成重佈線，再把晶粒接上並完成包封與後續組裝；它降低重佈線製作期間的晶粒位移風險，卻沒有消除接合、封裝後測試、良率與成本問題。
+- **改用面板**：兩條流程都可能在方形面板上做；改變的是批次外形與整線設備條件，不會自動決定最終產品是否仍要接到封裝基板。
+
+這三條是依一手來源整理的入門地圖，不是完整製程配方。不同產品還會增加多層重佈線、通孔、
+橋接晶片、基板、散熱與測試步驟；文章只用它來防止「流程名稱、載體尺寸與商用階段」互相冒充。
 
 ## 先用四把尺拆開「更便宜」
 
@@ -318,10 +485,10 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 
 | 本文五個生產關卡 | 先回答什麼 | 主要接力角色 | 過不了會怎樣 | 本輪可確認到哪裡 |
 |---|---|---|---|---|
-| 1. 載體與共同尺寸 | 面板的長寬、厚度、材料與載具能否被整條產線共同處理？ | 面板／基板、材料、設備與自動搬運團隊 | 每站可處理尺寸不同，轉站、搬運與良率無法穩定 | 設備商已展示大型面板能力，但生態系仍在決定共同尺寸 |
-| 2. 圖形、金屬與均勻度 | 中央與邊緣的曝光、沉積、蝕刻、清洗與線寬能否一起達標？ | 微影、電鍍、薄膜、蝕刻、清洗與量測設備 | 平均值看似合格，局部產品仍因厚度或圖形偏差失敗 | 公開資料列出多種製程能力與大面積均勻度難題；沒有客戶線分布 |
+| 1. 載體與共同尺寸 | 面板的長寬、厚度、材料與載具能否被整條產線共同處理？ | 面板／基板、材料、設備與自動搬運團隊 | 每站可處理尺寸不同，轉站、搬運與良率無法穩定 | SEMI 已固定外形、厚度、翹曲與重量等共同條件；ASE 另採 310×310 mm，仍不能把單一尺寸當成全產業唯一標準 |
+| 2. 圖形、金屬與均勻度 | 中央與邊緣的曝光、沉積、蝕刻、清洗與線寬能否一起達標？ | 微影、電鍍、薄膜、蝕刻、清洗與量測設備 | 平均值看似合格，局部產品仍因厚度或圖形偏差失敗 | ASE 公開平台線寬／線距能力，設備商也列出多種製程入口；沒有客戶線跨面板分布與良率相關性 |
 | 3. 翹曲、搬運與缺陷 | 大面板能否保持平整、乾淨並在各站安全移動？ | 材料、載具、自動化、製程整合與維修團隊 | 卡料、破損、定位偏差或整片缺陷讓理論可排數失去意義 | 公開資料把自動化與大面積製程列為轉換難題；沒有停機與報廢數據 |
-| 4. 封裝整合、測試與認證 | 完整封裝能否通過電性、尺寸與長期可靠度？ | 封測、測試、產品客戶與可靠度團隊 | 製程做得出來，成品仍不能交付或需要大量返工 | 場域定位包含工程測試與早期認證；沒有具名產品認證結果 |
+| 4. 封裝整合、測試與認證 | 完整封裝能否通過電性、尺寸與長期可靠度？ | 封測、測試、產品客戶與可靠度團隊 | 製程做得出來，成品仍不能交付或需要大量返工 | ASE 已把 310×310 mm 線對到 FOCoS／FOCoS-Bridge 平台，但沒有具名客戶產品認證結果 |
 | 5. 良率、產出與財務 | 合格品比例、每小時產出與總成本能否在連續批次維持？ | 製造營運、設備維護、品質、客戶與財務團隊 | 技術可做卻產量不足、成本過高或無法形成重複收入 | 沒有具名產品的合格品良率、產出速度、成本、出貨或收入 |
 
 五個關卡是接力關係：前一關達標不會替下一關畢業。這是本文用來找資料與分責任的地圖，不是
@@ -331,25 +498,31 @@ evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
 
 | 本文六關 | 這一關要證明 | 本輪公開資料 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
-| 1. 研發場域與設備能力 | 有可處理大面板的場域、工具與製程入口 | Lam 開設面板濕製程研發中心；Applied 簽約收購 NEXX 以補大型面板電鍍能力 | 交易完成、工具整合與可核對的設備規格 | 研發中心或簽約不等於客戶已認證、交易已整合或形成收入 |
-| 2. 試產與工程測試 | 製程能在試產線重複運作並留下缺陷與量測結果 | Lam 將場域定位涵蓋試產與工程測試 | 重複批次、跨面板分布、停機、返工與報廢資料 | 場域具備試產能力，不等於已有具名產品試產結果 |
+| 1. 研發場域與設備能力 | 有可處理大面板的場域、工具與製程入口 | Lam 開設面板濕製程研發中心；Applied 簽約收購 NEXX；ASE 公開 310×310 mm 自動線 | NEXX 交易完成、工具整合與 ASE 實際 production release | 研發中心、簽約或自動線展示不等於客戶已認證、穩定量產或形成收入 |
+| 2. 試產與工程測試 | 製程能在試產線重複運作並留下缺陷與量測結果 | Lam 場域涵蓋試產與工程測試；ASE 公開平台相容與線寬／線距能力 | 同一產品的重複批次、跨面板分布、停機、返工與報廢資料 | 平台與圖形能力不等於具名產品已完成工程批次或製程整合 |
 | 3. 早期共同開發與認證 | 客戶把目標產品帶入早期測試，開始核對製程條件 | Lam 將客戶共同開發與早期認證列入場域定位 | 具名客戶、產品、面板尺寸、測試條件與結果 | 未具名的早期認證能力不等於產品已通過資格認證 |
-| 4. 共同尺寸與具名產品認證 | 設備、材料與客戶對上同一面板規格，產品通過功能與可靠度 | 未公開 | 客戶與製造端共同揭露面板規格、產品與認證結果 | 單一設備可處理的最大尺寸不是共同標準，也不是產品認證 |
-| 5. 穩定大量生產 | 良率、每小時產出、停機、返工、可靠度與成本能持續達標 | 未公開 | 具名產品的連續批次良率、產出、設備利用與可靠度 | 樣品、工程批次或量產準備敘事不等於穩定大量生產 |
+| 4. 共同尺寸與具名產品認證 | 設備、材料與客戶對上同一面板規格，產品通過功能與可靠度 | ASE 已把 310×310 mm 線對到 FOCoS／FOCoS-Bridge，但頁面仍寫預計 2027 年投產 | 客戶與製造端共同揭露產品、面板規格、認證結果與 production release | 平台相容、線寬能力或預計投產不是客戶產品認證 |
+| 5. 穩定大量生產 | 良率、每小時產出、停機、返工、可靠度與成本能持續達標 | 未公開；ASE 的 2027 是前瞻目標 | 具名產品的實際投產日、連續批次良率、產出、設備利用與可靠度 | 產線建成、預計投產、樣品或工程批次不等於穩定大量生產 |
 | 6. 重複出貨與形成收入 | 供應商產品或服務可重複交付並反映在財務 | 未公開 | 客戶與供應商雙向核對料號、量產出貨、收入或毛利 | 製程需要某類設備、材料或基板不等於台灣公司已受惠 |
 
-本輪資料涵蓋第 1～3 關的場域與能力定位，但沒有第 2、3 關的具名產品結果，第 4～6 關也仍缺
-證據。六關是本文的查證順序，不是共同產業標準，也不替公司建立量產名次、訂單、份額或投資排序。
+本輪資料讓成熟度從設備商的研發／試產能力前進到 ASE 具名 310×310 mm 平台與 2027 投產目標，
+但這只把第 4 關的「尺寸與平台」補了一部分；客戶產品認證仍缺，第 5～6 關的實際量產、連續
+良率、出貨與財務也沒有證據。六關是本文的查證順序，不是共同產業標準，也不替公司建立量產
+名次、訂單、份額或投資排序。
 
 ## 來源與證據邊界
 
 - [Lam：Panel-Level Packaging Center of Excellence](https://newsroom.lamresearch.com/Lam-Research-Establishes-Panel-Level-Packaging-CoE)
 - [Lam：From Wafer to Panel](https://newsroom.lamresearch.com/wafer-to-panel-lam-scaling-advanced-packaging-panel-level-processing)
 - [Applied Materials：pending NEXX acquisition and panel-level ECD](https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-broadens-advanced-packaging-portfolio)
+- [SEMI 3D20：panel characteristics public abstract](https://store-us.semi.org/products/3d02000-semi-3d20-en-specification-for-panel-characteristics-for-panel-level-packaging-plp-applications)
+- [ASE：fan-out、chip-first、chip-last 與 panel test vehicle](https://ase.aseglobal.com/ch/blog/technology/the-opportunities-and-challenges-of-foplp-technology/)
+- [ASE：310×310 mm panel line and first-half 2027 production target](https://www.aseglobal.com/press-room/310x310/)
 
-Lam 與 Applied Materials 都是設備商，對產業採用、產品優勢與量產準備有商業立場。本篇只把
-它們直接揭露的研發場域、製程問題與交易狀態標成已證實；「面板級封裝將更便宜」與「台灣公司
-已受惠」均未被當成事實。
+Lam、Applied Materials 與 ASE 對產品優勢與量產準備都有商業立場；SEMI 可補共同載體定義，
+卻不替任何公司驗證產品。本文只把直接揭露的架構、場域、標準範圍、交易
+狀態與前瞻投產目標標成已證實；「面板級封裝已更便宜」、「2027 目標已完成」與「台灣公司已
+取得量產收入」均未被當成事實。
 
 ## 影響路由
 
@@ -389,6 +562,7 @@ evidence_boundary: 方形基板、ABF 載板或大尺寸板能力不能自動等
 ## 下一個可證明／否定的節點
 
 - NEXX 交易完成與實際整合結果，而不是沿用簽約日的前瞻敘述。
+- ASE 310×310 mm 線從「預計 2027 年投產」前進到可定位的 production release、首批具名產品與客戶資格結果，而不是只更新設備或線寬規格。
 - 具名人工智慧封裝或委外封測廠公布面板尺寸、客戶資格認證、合格封裝良率、單位時間產出與可靠度。
 - 設備、材料與基板公司對同一客戶面板流程完成雙向核對，並出現量產及財務資料。
 - 若面板尺寸標準長期分裂、試產無法進入穩定大量生產，或每顆合格品成本不優於晶圓路徑，研究優先級應下修。

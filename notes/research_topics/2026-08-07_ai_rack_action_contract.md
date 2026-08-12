@@ -61,6 +61,13 @@ to: triaged
 reason: editorial_plain_language_wave84_sensor_to_isolation_no_conclusion_change
 evidence: editorial:plain_language_wave84_sensor_to_isolation
 -->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: backfilled_redfish_action_state_conformance_and_physical_verification_evidence
+evidence: sources:S8,S9,S10,S11,S12
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -86,6 +93,27 @@ evidence: editorial:plain_language_wave84_sensor_to_isolation
 - **動作狀態**：告訴外部系統一項請求正在處理、已完成、失敗或已復原的回報。
 - **確認回覆（acknowledgement）**：接收端明確表示已收到請求；收到不等於同意執行，更不等於動作完成。
 - **逾時（timeout）**：超過預定時間仍未收到回覆或結果時的處理規則。
+- **請求關聯編號（correlation ID）**：把告警、請求、非同步任務、設備狀態與維修工單串成同一事件的穩定編號；本文沒有找到公開規格已替整條鏈固定共同欄位。
+- **冪等（idempotency）**：同一請求因逾時而重送時，不會重複執行危險動作的特性。資源版本檢查可以擋舊資料覆寫，卻不自動保證每個 action 都能安全重送。
+- **資源版本標籤（ETag）**：服務替一份資源狀態產生的版本標記；客戶端可用它說明「我是在這個版本上提出更新」。
+- **條件式更新（If-Match）**：要求服務只在資源仍符合先前 ETag 時接受更新，避免舊畫面把較新的狀態蓋回去。
+- **行動參數表（ActionInfo）**：Redfish 用來公開一項動作需要哪些參數與允許值的資源；參數格式正確不代表動作在現場情境下安全。
+- **202 Accepted**：HTTP 表示服務已接受一項非同步工作；它不是「已完成」，也不是「實體設備已到位」。
+- **非同步任務（asynchronous task）**：請求後不會立即完成的工作；服務先回覆一個可追蹤任務，客戶端之後再查狀態。
+- **任務監看入口（Task Monitor）**：Redfish 讓客戶端查詢長時間工作進度與最後成功或失敗的網址；任務完成仍需另看設備實際狀態。
+- **任務狀態（TaskState）**：Redfish Task 用來標示工作處於新建、執行中、完成、例外或被取消等階段的欄位；它仍是管理軟體所見狀態。
+- **回查位置（Location）**：HTTP 回應告訴客戶端接下來到哪個網址查詢非同步工作；網址日後可能失效，不能拿它代替長期事件紀錄。
+- **命令狀態（commanded state）**：控制系統認為自己已發出或完成的邏輯動作，例如要求關閉某個 outlet。
+- **實際觀測狀態（observed physical state）**：由設備狀態與獨立感測確認電力、流量、泵浦或漏液狀態真的改變；它不能只沿用命令回覆。
+- **互通 profile（interoperability profile）**：把必須支援的 Redfish 資源、欄位、訊息與 action 寫成機器可讀的最低要求，供採購與測試工具使用。
+- **一致性檢查工具（validator）**：檢查通訊規則、資料格式或 profile 要求的工具；不同工具測的範圍不同，通過 API 檢查不等於通過故障注入或場域驗收。
+- **通訊規則（protocol）**：規定 HTTP 方法、header、狀態碼與安全行為如何交換；protocol 正確不代表回傳內容或設備動作一定正確。
+- **冷卻液分配單元（CDU）**：在設施水路與機櫃液冷迴路之間換熱、循環並監測流量與壓力的設備。
+- **模式設定動作（SetMode）**：液冷設備模型用來要求冷卻單元或泵浦切換運轉模式的 action；動作回覆後仍要核對泵速、流量與設備狀態。
+- **電力控制動作（PowerControl）**：Redfish 電力設備模型用來要求開、關或循環供電的 action 名稱；收到動作不等於實體回路已切換。
+- **電力狀態（PowerState）**：電力設備模型回報目前供電狀態的唯讀欄位，應和轉換中狀態及獨立電氣讀值一起判讀。
+- **漏液偵測狀態（DetectorState）**：液冷設備模型中漏液偵測器回報目前判定的欄位；仍要確認位置、設備健康與現場處置。
+- **故障注入（fault injection）**：刻意製造感測失真、失聯、漏液或電力異常，確認系統能否依預期拒絕、隔離、回復並留下紀錄。
 - **手動介入（override）**：現場人員在必要時暫停、拒絕或取代自動控制的機制，必須留下權限與稽核紀錄。
 - **維修工單（service ticket）**：把告警、隔離結果、實體維修與復原確認串在一起的作業紀錄。
 - **介面規格（schema）**：規定資料欄位、名稱與格式的文件；規格存在，不等於不同廠牌的產品已實際連線成功。
@@ -99,7 +127,7 @@ evidence: editorial:plain_language_wave84_sensor_to_isolation
 
 - 機櫃收到溫度、功率或漏液資料後，不能立刻切電；系統要先確認資料屬於哪一座機櫃、何時量到，以及讀數是否可靠。
 - 外部監控系統可以提出隔離請求，但建築管理系統仍要檢查安全限制，才決定是否執行；告警、請求與真正命令是三件不同的事。
-- 公開文件證明 DSX 已把設備身分、感測資料、隔離請求與結果狀態寫進規格，卻不能證明現場已成功部署、不同廠牌已互通，或台灣供應商已取得收入。
+- DSX 已把設備身分、感測資料、隔離請求與狀態寫進契約；Redfish 又把「接受非同步工作」與「工作完成」分開，但兩者都不能單獨證明設備真的隔離、服務已恢復或台灣供應商已有收入。
 
 ### 為什麼重要
 
@@ -112,16 +140,24 @@ evidence: editorial:plain_language_wave84_sensor_to_isolation
 **最後才執行動作。** 系統還要分清楚誰能提出請求、誰負責安全判斷，以及隔離後如何回報完成、
 失敗與復原。少了任何一段，監控畫面可以很完整，卻不一定能安全處理故障。
 
+**接受不等於完成。** API 回覆 `202 Accepted` 時，只代表服務願意處理長時間工作；還要沿任務
+監看入口查到成功或失敗，才能知道控制軟體走到哪一步。
+
+**完成不等於恢復。** 邏輯命令顯示完成後，仍要用電力、流量、泵速、漏液與設備狀態確認物理
+結果，再完成回復測試與維修簽核。這幾層若共用同一個「成功」字樣，最容易把半條鏈誤當閉環。
+
 ### 接下來怎麼追
 
-- 先追一個隔離請求的完整履歷：是否收到、接受或拒絕，多久完成，失敗時原因為何，以及何時復原並開立維修工單。
-- 再看 OpenRMC 或 Redfish 是否提出共同測試，能跨廠牌核對機櫃身分、事件、控制動作與結果狀態。
-- 最後找具名量產場域的故障注入與隔離紀錄，再由客戶和台灣公司的一手申報交叉確認責任、部署量與財務貢獻。
+- 先追一個隔離請求的共同關聯編號：是否收到、接受或拒絕，建立哪個 Task、多久完成，以及重送時有沒有重複動作。
+- 再核對命令狀態與實際觀測狀態：電力是否真的斷開、泵浦或冷卻單元是否到達目標模式、獨立感測是否支持同一結果。
+- 查看 OpenRMC／Redfish 是否有具名 profile 與版本化測試報告，並分清 protocol、schema 與 interoperability validator 各自測了什麼。
+- 最後找具名量產場域的故障注入、跨電力／液冷 sequence、復原與維修紀錄，再由客戶和台灣公司一手申報交叉確認責任、部署量與財務貢獻。
 
 ### 想一想
 
 - 溫度與漏液警報都出現時，若監控畫面和設備控制系統使用不同的機櫃編號，系統要怎麼確定該隔離哪一座？
 - 告警只是提醒、請求可以被拒絕、命令才會驅動設備；誰負責攔下危險請求，失聯時又由誰讓設備回到安全狀態？
+- 一項非同步任務顯示完成後，要再看哪些獨立讀值，才能證明電力或冷卻設備真的到達安全狀態？
 - 一份公開介面規格，能不能直接證明不同廠牌已互通，或台灣機櫃供應商已因此取得收入？
 
 ## 主張與證據帳本
@@ -242,6 +278,86 @@ limitation: 查詢入口本身不證明任何公司實作 DSX／OpenRMC／Redfis
 independence_group: twse-mops
 -->
 
+<!-- research_source
+source_id: S8
+role: standard
+source_kind: document
+publisher: DMTF
+title: Redfish Specification 1.24.0
+published_at: 2026-04-02
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.24.0.html
+locator: sections 6.5 ETags、9.9.6 Action info annotation、12.1 Eventing 與 12.2 Asynchronous operations
+limitation: 規格定義 HTTP、action、Task Monitor、事件與版本前置條件；不指定 DSX 專屬隔離語意、場域 guardrail、物理動作、跨供應商產品通過或 production outcome
+independence_group: dmtf-redfish
+-->
+
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: document
+publisher: DMTF
+title: Redfish Interoperability Profiles 1.10.0
+published_at: 2026-04-03
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.dmtf.org/sites/default/files/standards/documents/DSP0272_1.10.0.html
+locator: sections 1–2 profile purpose、8.3 protocol requirements、8.4 resource／property／action requirements
+limitation: Profile 可固定最低 API 能力並供工具驗證，但不替產品證明電力或液冷的安全 sequence、故障注入、物理狀態、場域驗收或維修結果
+independence_group: dmtf-redfish
+-->
+
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: document
+publisher: DMTF
+title: Redfish Conformance and Test Tools White Paper 1.0.0
+published_at: 2024-01-25
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.dmtf.org/sites/default/files/standards/documents/DSP2068_1.0.0_0.pdf
+locator: pp.5–15；Protocol Validator、Service Validator 與 Interop Validator 的不同測試範圍
+limitation: 這是工具用途與執行方式說明；validator pass 不等於多供應商互通、實體 relay／pump／valve 動作、故障注入、production reliability 或功能安全簽核
+independence_group: dmtf-redfish
+-->
+
+<!-- research_source
+source_id: S11
+role: standard
+source_kind: document
+publisher: DMTF
+title: Redfish for Power Distribution Equipment 1.1.0
+published_at: 2025-02-05
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.dmtf.org/sites/default/files/standards/documents/DSP2056_1.1.0.pdf
+locator: pp.30–38 Circuit；pp.50–56 Outlet；PowerControlLocked、delay、PowerRestorePolicy、PowerStateInTransition、PowerState 與 PowerControl action
+limitation: 白皮書界定資料模型與動作欄位，不證明任何 PDU／busway／outlet 已實作、跨廠 profile 通過、切電時間達標，或與冷卻隔離完成安全協同
+independence_group: dmtf-redfish
+-->
+
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: DMTF
+title: Redfish for Liquid Cooling Equipment 1.1.0
+published_at: 2025-02-05
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.dmtf.org/sites/default/files/standards/documents/DSP2064_1.1.0.pdf
+locator: pp.36–39 CoolingUnit 與 SetMode；pp.58–64 LeakDetection／LeakDetector；pp.70–72 Pump 與 SetMode
+limitation: 白皮書界定 cooling resource、leak state 與 enable／disable action；沒有規定 DSX request mapping、跨電力協同、場域 guardrail、故障注入、復原或維修閉環
+independence_group: dmtf-redfish
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -298,7 +414,7 @@ claim_id: C4
 label: inference
 status: active
 claim: AI 機櫃 telemetry 只有在穩定身分、帶時間與品質的數值、可解讀 metadata、明確 request owner、BMS guardrail／safe default，以及可回查的 isolation state 被串成同一 action contract 時，才足以進入故障隔離與維修決策；資料點數本身不是閉環
-supporting_source_ids: S1,S2,S4,S5,S6
+supporting_source_ids: S1,S2,S4,S5,S6,S8,S9,S10,S11,S12
 contrary_source_ids:
 as_of: 2026-08-07
 basis: S1／S2 具體化 DSX identity、value／metadata、request、authority 與 status，S4／S5 獨立界定 rack manager 的 power／thermal／event／telemetry 與 fault-isolation 管理範圍，S6 固定現行 Redfish 標準邊界
@@ -344,6 +460,159 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C7
+label: verified
+status: active
+claim: Redfish 1.24.0 對長時間動作把 HTTP 202 Accepted、Location 指向的 Task Monitor、持續中的 TaskState 與最終成功或失敗分開；收到 202 只表示服務接受非同步處理，不表示設備動作已完成
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8 section 12.2 逐一規定 202 response、Location／Retry-After、Task Monitor 查詢、TaskState 與完成或失敗回應
+boundary: 只證實 Redfish API 的非同步狀態模型；不證明 DSX isolation request 採用同一 Task、實體接觸器或泵浦已動作、感測結果正確或服務已恢復
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: Redfish 1.24.0 允許客戶端以 ETag 與 If-Match／If-None-Match 帶入先前讀到的資源版本，服務可用 412 或 428 擋下版本衝突或缺少前置條件的更新
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8 section 6.5 說明 ETag、conditional update、412 Precondition Failed 與 428 Precondition Required
+boundary: ETag 只處理資源版本碰撞；不自動提供 request correlation、重送去重、跨電力與冷卻仲裁、場域安全限值或實體結果驗證
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: Redfish 的 ActionInfo 可公開一項 action 的參數需求與允許值，但參數可被機器讀取不等於該 action 在特定機櫃、負載與故障情境下安全
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S8 section 9.9.6 直接把 ActionInfo 定義為 action parameter requirements 與 allowable values 的資源
+boundary: ActionInfo 不提供 DSX request owner、BMS guardrail、設備互鎖、fault injection、物理確認、維修責任或公司財務證據
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: Redfish interoperability profile 可把 schema、property、registry 與 action 的最低要求寫成機器可讀文件；DMTF 又把 protocol、schema payload 與 profile conformance 分成三類 validator
+supporting_source_ids: S9,S10
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 sections 1–2 與 8.4 定義 profile 內容及可供 conformance tool 使用，S10 pp.6–15 分列 Protocol、Service 與 Interop Validator 的測試範圍
+boundary: 三類 validator 只證明各自測到的 API 契約；不等於多供應商完整互通、實體動作、跨域安全 sequence、production reliability 或場域驗收
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: DMTF 電力設備模型把控制鎖定、開關延遲、復電政策、轉換中狀態、最終電力狀態與 PowerControl action 分成不同欄位或動作
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S11 的 Circuit／Outlet 章節直接列出 PowerControlLocked、PowerOff／On／Cycle Delay、PowerRestorePolicy、PowerStateInTransition、PowerState 與 PowerControl
+boundary: 資料模型不證明實體 breaker／contactor 動作、切換時間、故障電流清除、跨廠實作、DSX mapping 或 field outcome
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: DMTF 液冷設備模型把冷卻單元與泵浦的 SetMode、設備狀態、泵速，以及 leak detector 的位置與 DetectorState 分成不同資源與欄位
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S12 的 CoolingUnit、Pump、LeakDetection 與 LeakDetector 章節直接列出 SetMode、Status、PumpSpeedPercent、Location／PhysicalContext 與 DetectorState
+boundary: 資源與欄位存在不證明漏液後的閥件／泵浦／電力 sequence、安全時序、故障注入、復原、維修或具名場域結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 機櫃控制閉環至少要分開五個結果：請求被收到、API 接受並建立任務、邏輯命令完成、設備被觀測到達目標物理狀態，以及服務在復原與維修後恢復；任一前段成功都不能代替後段
+supporting_source_ids: S1,S2,S8,S11,S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S1／S2 分開 request、BMS authority 與 isolation status，S8 分開 202／Task Monitor／TaskState，S11／S12 又分開 action、transition／mode 與 read-only equipment state，因而可建立五層結果階梯
+boundary: 這是跨文件的研究框架，不主張所有平台使用相同五個欄位、同一傳輸協定或相同故障處置；沒有 production log 前不報成功率、延遲或可靠度
+verification_needed: 同一事件的 request ID、Task／command、設備狀態、獨立感測、復原驗證與 service ticket 時序紀錄
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: unverified
+status: active
+claim: 現有公開資料尚未提供一份共同 production record，可把 DSX request、Redfish Task Monitor、電力與液冷設備狀態、獨立物理感測、故障注入、跨域仲裁、復原驗證與維修工單串成同一事件
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S1–S3 是 DSX 平台契約，S8–S10 是通用 API／profile／validator，S11／S12 是各自設備模型；來源沒有共同 site、事件 ID、完整時序與 outcome
+boundary: 缺少公開共同紀錄不是 DSX、Redfish、PDU 或 CDU 無法實作的反證，也不表示私有場域沒有完成；只限制本文不能宣稱閉環已證實
+verification_needed: 具名多供應商場域的 fault-injection report 與去識別化事件紀錄，逐欄對齊 request、Task、commanded／observed state、跨域 sequence、rollback、repair 及 sign-off
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: 驗收 action contract 時應把 schema 支援、profile 要求、protocol／service／interop validator、跨供應商互通、故障注入、場域 commissioning 與 production outcome 分成七級；API validator 通過不能替最後四級背書
+supporting_source_ids: S9,S10,S11,S12
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S9 定義可測的最低 profile，S10 明列三種 validator 的 API 測試邊界，S11／S12 顯示電力與液冷仍有不同物理資源、action 與 state，因而需要額外互通、故障與場域驗證
+boundary: 七級是研究與採購查核順序，不是 DMTF 認證等級、產品排名、功能安全標準或已公布的單一 certification program
+verification_needed: 同一設備組合逐級保存 profile、工具版本、pass／fail、互通矩陣、fault case、commissioning 與 production incident outcome
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 從警報到復原：七個步驟不能少
 
 | 控制步驟 | 這一步要回答什麼 | 公開文件目前支持什麼 | 還缺哪些現場證據 |
@@ -360,28 +629,100 @@ resolution:
 文件已不只是列出感測器，但仍未公開每一個請求是否收到、何時逾時、為何失敗，以及維修後是否
 恢復正常。因此本文建立的是**檢驗流程**，不是在宣稱部署成功或供應商價值已經增加。
 
+## 同一個「成功」其實有五層：API 接受後還有四次核對
+
+控制系統最危險的語意捷徑，是把每一層都顯示成綠色的「成功」。Redfish 1.24.0 明確把長時間
+工作拆成 `202 Accepted`、Task Monitor、持續中的 TaskState 與最後成功或失敗。DMTF 電力與液冷
+模型又另外保留設備狀態與感測欄位。把兩類文件接起來，可得到下面五層；它是查核框架，不是新的
+共同標準。
+
+| 結果層 | 至少要留下什麼 | 這一層能證明什麼 | 還不能代替什麼 |
+|---|---|---|---|
+| 1. 請求已收到 | 關聯編號、目標設備、請求者、時間、動作與參數 | 控制系統知道要處理哪一件事 | 安全判斷、接受、執行或設備結果 |
+| 2. API 已接受 | HTTP 回應、Task Monitor、Task ID 與重查時間 | 服務已建立或接受非同步工作 | 任務成功、命令下達或實體設備已動 |
+| 3. 邏輯任務已完成 | TaskState、完成時間、錯誤訊息與命令結果 | 管理服務認為工作已成功或失敗 | relay／breaker／pump／cooling unit 真的到位 |
+| 4. 物理狀態已確認 | 電力狀態、轉換中旗標、流量、泵速、漏液、壓力或獨立感測 | 設備與環境讀值支持目標狀態 | 工作負載可恢復、根因修復或維修已簽收 |
+| 5. 服務已復原 | 復原測試、維修工單、變更紀錄、人工簽核與重開條件 | 故障處理走完營運閉環 | 長期可靠度、所有場域都可重現或供應商財務受惠 |
+
+Task Monitor 可能在工作結束後被刪除，Redfish 允許較晚查詢回覆 `404 Not Found` 或 `410 Gone`。
+所以場域若要稽核，不能只保存一個之後會失效的網址；仍要把 Task、設備讀值、事件訊息與工單按同一
+關聯編號封存。公開資料尚未證明 DSX 已提供這份跨系統共同紀錄。
+
+## 四種錯誤要用四種機制：版本、重送、仲裁與結果不能混用
+
+ETag 與 `If-Match` 處理的是「我看到的資源版本是否仍是最新版」。ActionInfo 處理的是「這項 action
+允許哪些參數」。兩者都很重要，但都不是危險動作的完整保護。研究或驗收時至少要把四種故障分開：
+
+| 風險 | 典型情境 | 需要的契約 | 現有公開證據邊界 |
+|---|---|---|---|
+| 舊狀態覆寫 | 操作員在舊畫面改值，另一個控制器已先更新 | ETag、條件式更新與衝突回覆 | Redfish 已定義；未證明 DSX 每個隔離 action 都採用 |
+| 逾時重送 | 回覆遺失後重送切電或停泵請求 | 關聯編號、去重範圍、冪等規則與重送窗口 | 本輪沒有找到整條 action 的共同公開欄位 |
+| 跨域衝突 | 液冷要求隔離，電力系統同時要保留泵浦或控制器供電 | 優先序、互鎖、最終裁決者、手動介入與 safe state | DSX 說 BMS 有最後權威，但未公開跨域 sequence |
+| 結果遺失或誤判 | Task 顯示完成，實體設備沒有到位或讀值延遲 | Task 狀態、commanded state、independent observed state 與逾時升級 | DMTF 分開 action 與設備狀態；沒有具名場域共同紀錄 |
+
+因此「支援 Redfish action」不能直接改寫成「動作可安全自動化」。要先知道它解決的是哪一種錯誤，
+再檢查其他三種是否有明確 owner、時間與失效處置。
+
+## 從介面支援到量產閉環：七級驗收不能跳級
+
+DMTF 已把三種 validator 分開：Protocol Validator 看 HTTP 與安全等通訊規則；Service Validator
+看回應是否符合 schema；Interop Validator 再按指定 profile 檢查最低能力。三者都很實用，但它們
+仍在 API 與資料模型層。要證明隔離閉環，還要往物理世界走四步。
+
+| 驗收級別 | 核心問題 | 最低產物 | 不能因此宣稱 |
+|---|---|---|---|
+| 1. Schema 支援 | 有沒有對應資源、欄位與 action？ | 版本化 schema 與實作清單 | 採購需要的欄位都存在 |
+| 2. Profile 要求 | 哪些能力對這類設備是必須？ | 具名 profile、版本與適用設備 | 產品真的符合 profile |
+| 3. Protocol Validator | HTTP、狀態碼、header 與安全行為是否合規？ | 工具版本、測試目標與完整報告 | payload 與設備語意正確 |
+| 4. Service Validator | 回應欄位、型別、URI 與 schema 是否相符？ | pass／fail／skip 明細 | 採購 profile 或跨廠行為一致 |
+| 5. Interop Validator | 產品是否符合指定最低 profile？ | profile、工具版本與逐項結果 | 多供應商在同一 action sequence 已互通 |
+| 6. 互通與故障注入 | 兩個以上實作在失聯、重送、拒絕與設備故障時能否一致處理？ | 互通矩陣、fault case、時間線、rollback 與 physical state | 量產場域的故障率與維護成本 |
+| 7. 場域與營運結果 | 真實負載下是否正確隔離、復原並完成維修？ | commissioning、incident log、工單、SLA 與變更後重驗 | 所有客戶可複製、台灣公司已有收入或獲利 |
+
+如果新聞只說「支援 Redfish」，它只回答第一級的一部分；即使附上 validator pass，也要看是哪一種
+工具、用哪份 profile、測到哪些設備與情境。七級順序只安排證據，不代表產品優劣或公司受惠。
+
+## 同樣叫隔離，電力與液冷是兩套物理動作
+
+DMTF 的電力白皮書把 `PowerControlLocked`、開關延遲、復電政策、轉換中狀態與最終 PowerState
+分開；液冷白皮書則把 CoolingUnit／Pump 的 SetMode、泵速、漏液位置與 DetectorState 分開。這說明
+同一句「隔離機櫃」至少跨兩套設備模型，不能只發一個共通命令就假設完成。
+
+| 物理域 | 公開模型目前能描述什麼 | 動作後應另看什麼 | 仍缺的跨域問題 |
+|---|---|---|---|
+| 電力 | outlet／circuit 的控制鎖定、延遲、PowerControl、轉換中與最終電力狀態 | 目標回路、電壓電流、PowerState、轉換時間及復電政策 | 哪些控制器、泵浦或安全設備必須保留供電 |
+| 液冷 | cooling unit／pump 的 enable／disable、泵速、漏液位置與 detector state | 流量、壓力、溫度、泵速、漏液與設備健康 | 先關閥、停泵、降載還是切電，以及每一步的逾時 |
+| 跨域接力 | DSX 可提出液冷或電力隔離 request，BMS 保有最後裁決 | 同一關聯編號下的兩域 commanded／observed state | 互鎖、優先序、失敗回退、人工介入與安全簽核 |
+| 復原 | 各域都有可讀狀態與可設定模式 | 故障排除、重新加壓／上電、負載驗證與維修工單 | 誰批准重開、哪些測試必須重跑及責任如何交接 |
+
+這些文件支持的是「可以把責任拆細」，不是「某套跨域 sequence 已被證實」。真正的升級證據要在
+同一具名場域公開事件時序、設備版本、故障注入、物理結果與簽核，而且不能只由供應商示範代替客戶
+驗收。
+
 ## 三套規格各管一層：DSX、OpenRMC 與 Redfish
 
 - **DSX 管平台內的資料與動作規則**：它具體說明建築管理系統與 IT 監控系統如何交換資料，並定義液冷與電力隔離的請求和狀態。
 - **OpenRMC 管機櫃管理器的範圍**：它描述管理器如何連接上游與下游設備，以及如何處理電力、散熱、事件、任務、遙測與更新。
-- **Redfish 提供通用設備管理介面**：它持續更新設備資源與動作模型，但產品支援 Redfish，不代表已支援 DSX 專用的隔離欄位或通過共同測試。
+- **Redfish 提供通用設備管理介面**：它持續更新設備資源、動作、事件與非同步任務模型；profile 可固定最低要求，三類 validator 可分開測 protocol、schema 與 profile，但產品支援 Redfish 仍不代表已支援 DSX 專用隔離欄位或通過場域故障測試。
 
 三者可以互補，名稱或功能相近卻不能直接寫成「已互通」。仍要看到欄位對照、共同測試結果，
-以及同一場域從警報到隔離與復原的實際操作紀錄。
+以及同一場域從警報到隔離與復原的實際操作紀錄。尤其要把 API 的 Task 完成與設備的物理狀態分開，
+再把電力與液冷各自的 action 接成有優先序、逾時、回退與人工介入的跨域 sequence。
 
 ## 怎麼用這張表判讀公司新聞
 
 1. **先問新功能會不會改變動作**：如果只有更多感測器或更漂亮的監控畫面，還不能單獨建立商業價值主張。
 2. **沿七個步驟找缺口**：設備身分、資料可信度、含義、控制權、安全限制、結果回報與維修紀錄，任何一項缺失都要保留疑問。
-3. **分開文件與現場成熟度**：公開介面、開放標準、共同測試、現場驗收、實際結果與財務認列，是六個不同階段。
-4. **最後才連到公司**：要由客戶與供應商雙向證明，並說清楚公司負責感測器、控制器、系統整合、整櫃驗收，還是後續維護。
+3. **再拆五層結果**：請求收到、API 接受、Task 完成、物理狀態確認與服務復原不能共用一個「成功」標籤。
+4. **分開文件與現場成熟度**：schema、profile、三類 validator、跨廠互通、故障注入、場域驗收、實際結果與財務認列都要逐級留下證據。
+5. **最後才連到公司**：要由客戶與供應商雙向證明，並說清楚公司負責感測器、控制器、系統整合、整櫃驗收，還是後續維護。
 
 ## 這篇目前能說到哪裡
 
-- **已知道的事**：DSX 已公開比感測欄位清單更完整的控制規則，可以逐項查到設備身分、資料含義、發布責任、液冷與電力隔離請求、結果狀態及安全限制。
-- **為何可信度是中等**：DSX 仍是單一平台規格；OpenRMC 與 Redfish 支持通用管理邊界，但還沒有共同的一致性測試與量產場域結果。
-- **還不能說的事**：不能說跨平台已互通、隔離一定成功、設備價值量增加、台灣公司已供貨，或訂單、收入、毛利已可辨識。
-- **何時可以升級判定**：同一個具名量產場域要公開欄位對照、故障注入、從請求到隔離與復原的時間和結果，以及維修閉環；台灣公司還要以合約責任與財務分母交叉確認。
+- **已知道的事**：DSX 已公開設備身分、資料含義、發布責任、液冷與電力隔離請求、結果狀態及安全限制；Redfish 另提供非同步 Task、版本前置條件、action 參數、profile 與分層 validator，電力／液冷模型也能把命令與設備狀態拆開。
+- **為何可信度是中等**：NVIDIA 與 OCP／DMTF 是獨立文件鏈，能共同界定資料與 API 責任；但仍沒有同一個 profile、跨廠實作、故障注入與量產場域結果把五層狀態接完。
+- **還不能說的事**：不能說 API 接受等於物理隔離、跨平台已互通、電力與液冷 sequence 已安全、設備價值量增加、台灣公司已供貨，或訂單、收入、毛利已可辨識。
+- **何時可以升級判定**：同一具名量產場域要公開 profile 與工具版本、欄位對照、故障注入、request／Task／commanded／observed state、跨域 sequence、復原與維修時間線；台灣公司還要以合約責任與財務分母交叉確認。
 
 ## 來源
 
@@ -391,6 +732,11 @@ resolution:
 - [OCP：OpenRMC Design Specification v1.0.0](https://www.opencompute.org/documents/openrmc-design-specification-v1-0-1-pdf)
 - [OCP：OpenRMC-DM project](https://www.opencompute.org/community/openrmc-dm)
 - [DMTF：Redfish standards](https://www.dmtf.org/standards/redfish)
+- [DMTF：Redfish Specification 1.24.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.24.0.html)
+- [DMTF：Redfish Interoperability Profiles 1.10.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0272_1.10.0.html)
+- [DMTF：Redfish Conformance and Test Tools](https://www.dmtf.org/sites/default/files/standards/documents/DSP2068_1.0.0_0.pdf)
+- [DMTF：Redfish for Power Distribution Equipment](https://www.dmtf.org/sites/default/files/standards/documents/DSP2056_1.1.0.pdf)
+- [DMTF：Redfish for Liquid Cooling Equipment](https://www.dmtf.org/sites/default/files/standards/documents/DSP2064_1.1.0.pdf)
 - [公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
 
 ## 族群影響
@@ -469,8 +815,24 @@ trigger: 客戶與台灣公司一手文件同時確認具名產品／軟體、co
 invalidation: 公司或客戶明示只供應一般硬體、不承擔控制契約或場域驗收，且相關收入無法辨識
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C7,C8,C9,C10,C11,C12,C13,C14,C15
+metric: 同一 incident 的 request correlation、resource version、action parameters、Task state、commanded／observed power／cooling state、fault injection、recovery 與 service sign-off
+source_ids: S8,S9,S10,S11,S12
+watch_source_ids: S1,S2,S6
+frequency: monthly
+next_check: 2026-08-31
+trigger: 具名 profile 或多供應商場域公開同一事件的 profile／validator 版本、request／Task／physical state、fault case、rollback、repair 與 sign-off
+invalidation: 公開測試顯示 API accepted／Task state 無法可靠對應 physical state，或跨域 sequence 缺共同 owner／rollback，則閉環成熟度下修
+-->
+
 ## 還缺哪些證據
 
 - DSX 是單一平台的介面規格，不能直接稱為所有 AI 資料中心的共同標準；Redfish 使用相似資源名稱，也不能證明它和 DSX 已在欄位層互通。
+- `202 Accepted` 與 Task 完成都只到管理軟體層；仍缺同一事件把命令結果、電力／液冷設備狀態、獨立感測、復原測試與維修簽核接起來的量產紀錄。
+- ETag 可攔下舊資源版本覆寫，卻不等於 action 可安全重送；仍要公開共同關聯編號、去重範圍、跨電力／液冷仲裁、逾時與回退規則。
+- Validator 通過必須附工具、版本、profile、測試目標與 pass／fail／skip 明細；它不能替多供應商故障注入、實體動作或場域驗收背書。
 - 隔離請求與狀態欄位存在，不代表隔離速度、成功率、可靠度或維護成本已改善；這些判定都需要量產現場的請求總數與成功、失敗結果。
 - 族群位置、參與 OCP 或產品名稱出現相關關鍵字，都不能直接證明台灣公司取得訂單或增加獲利；目前仍缺具名公司、責任、場域與財務證據。

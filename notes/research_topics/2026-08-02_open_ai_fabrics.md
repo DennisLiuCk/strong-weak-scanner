@@ -1,4 +1,4 @@
-# 資料從一顆運算晶片走到另一顆：先分清機架內外，再判斷跨廠互通
+# 資料從一顆運算晶片走到另一顆：先分清六張網，再判斷跨廠互通
 
 <!-- research_topic
 topic_id: MI-2026-08-02-OPEN-AI-FABRICS
@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-04-07
-last_reviewed_at: 2026-08-02
-review_due: 2026-08-10
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-17
 source_type: mixed
 publisher: UALink Consortium
 publisher_domain: ualinkconsortium.org
@@ -19,9 +19,9 @@ group_ids: serverodm,ipdesign,pcb
 trigger_type: interconnect_specification_and_platform_update
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C9
+thesis_claim_id: C18
 base_confidence: medium
-confidence_basis: UALink、UEC、OCP ESUN／SUE-T、AMD、Arista、Broadcom 與 Oracle 一手來源可交叉確認多條 scale-up／scale-out 路徑；但各規格的 multi-vendor compliance、實際 silicon、客戶部署、相對份額及台灣財務曝險仍待驗證
+confidence_basis: UALink 與 UEC 規格、OCP 現行計畫與參考架構可交叉確認網路工作和平臺契約必須分成兩條軸；UEC 已公開自我聲明與部分層級測試框架，但仍沒有具名產品通過、多供應商互通、系統壓力結果、客戶部署或台灣財務曝險
 cross_company_numbers: false
 -->
 
@@ -66,6 +66,13 @@ from: triaged
 to: triaged
 reason: editorial_plain_language_wave101_data_path_two_network_scopes_roles_and_six_gate_interoperability
 evidence: editorial:reader_layer_only_no_claim_source_monitor_or_impact_change
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: corrected_single_fabric_path_frame_with_network_plane_and_stack_contract
+evidence: sources:S15,S16,S17,S18,S19,S20
 -->
 
 <!-- research_source
@@ -292,6 +299,102 @@ limitation: 新聞索引只用來找到新附件；不證明 ESUN compliance、s
 independence_group: arista
 -->
 
+<!-- research_source
+source_id: S15
+role: standard
+source_kind: living_index
+publisher: Open Compute Project
+title: Open Cluster Designs for AI
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.opencompute.org/index.php/community/cluster-designs-for-ai
+locator: 2026-08-12 查得 Scope and Contribution Overview；明列 scale-up、scale-out、front-end、storage、management networking，以及實體／邏輯拓撲、佈線、電力與散熱
+limitation: 現行計畫範圍與可供採購部署參考的文件入口，不證明特定產品符合規格、具名客戶部署、效能或財務結果
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S16
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: OCP Educational Webinar — New OCP Reference Architectures for AI Networking
+published_at: 2026-06-02
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.opencompute.org/events/past-events/ocp-educational-webinar-new-ocp-reference-architectures-for-ai-networking
+locator: 活動日期與 Overview；明列 front-end ingress／egress、storage、backend scale-out、in-band management、control／data plane、生命週期自動化、configuration drift 與 BOM
+limitation: Webinar 與參考架構摘要提到 production examples，但沒有提供可獨立核對的完整客戶、組態、測試矩陣、失敗、利用率或財務結果
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S17
+role: standard
+source_kind: living_index
+publisher: Ultra Ethernet Consortium
+title: UEC Working Groups
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://ultraethernet.org/working-groups/
+locator: 2026-08-12 查得 Physical、Link、Transport、Software、Storage、Compliance、Management、Performance and Debug 八個工作組及各自範圍
+limitation: 工作組範圍表示規格與工具由哪些層負責，不等於所有輸出已核定、產品已通過、跨廠互通或客戶部署
+independence_group: ultra-ethernet-consortium
+-->
+
+<!-- research_source
+source_id: S18
+role: standard
+source_kind: living_index
+publisher: Ultra Ethernet Consortium
+title: UEC Compliance
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://ultraethernet.org/compliance/
+locator: 2026-08-12 查得合規說明檔、測試床建議、Transport 與 PHY／LL checklist；說明檔明定前三類文件供 implementors 進行 compliance self-attestation，另頁會員聲明實為必要專利權利登錄
+limitation: 自我聲明工具與清單入口不是具名產品聲明／通過結果、第三方認證、多供應商互通矩陣、系統部署或效能；必要專利權利聲明更不是產品合規聲明
+independence_group: ultra-ethernet-consortium
+-->
+
+<!-- research_source
+source_id: S19
+role: standard
+source_kind: document
+publisher: Ultra Ethernet Consortium
+title: UEC Compliance Test Test Bed Recommendations
+published_at: 2025-06-10
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://ultraethernet.org/wp-content/uploads/sites/20/2025/06/UEC-Compliance-Test-Test-Bed-Recommendations.pdf
+locator: page 3 Scope；涵蓋 Link／PHY 與部分 Transport 的 compliance test bed 建議，並明列 interoperation、system stress／scale 與 performance testing 不在本文範圍
+limitation: 測試床建議只涵蓋部分層級且明確排除互通、系統壓力／規模與效能；不提供任何具名產品通過清單
+independence_group: ultra-ethernet-consortium
+-->
+
+<!-- research_source
+source_id: S20
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Open Pod Group for M xPUs System Architecture
+published_at: 2026-01-14
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://www.opencompute.org/documents/opg-m-system-architecture-final-14-january-2026-pdf
+locator: pages 7–10 Network Overview；叢集視角列出 scale-up、scale-out、SO-C、storage、in-band 與 out-of-band management 六張網，OPG-M 參考設計採非匯聚實體資源且五張外部網不要求冗餘
+limitation: 這是一套 air-cooled 400G 參考架構並帶有不要求冗餘等明示假設；不能外推為所有叢集的唯一拓撲、認證、客戶部署或公司收入
+independence_group: open-compute-project
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -408,7 +511,7 @@ resolution:
 <!-- research_claim
 claim_id: C9
 label: inference
-status: active
+status: superseded
 claim: 開放 AI 互連不能再只用「UALink 管 scale-up、UEC 管 scale-out」理解；UALink 是 accelerator scale-up 路徑，OCP ESUN／SUE-T 與具名 Ethernet 平台也直接進入 scale-up，而 UEC 仍聚焦 scale-out ecosystem，研究上必須把每條路徑的規格、endpoint／switch、silicon、互通、系統與部署分開
 supporting_source_ids: S1,S2,S3,S9,S10,S11,S12
 contrary_source_ids:
@@ -418,7 +521,7 @@ boundary: 不推估 UALink、ESUN、SUE-T 或 UEC 的效能勝負、市占、TAM
 verification_needed:
 correction_kind: supersedes
 corrects_claim_id: C5
-corrected_by_claim_id:
+corrected_by_claim_id: C18
 resolution:
 -->
 
@@ -490,6 +593,108 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: OCP 現行 Open Cluster Designs for AI 計畫把 scale-up、scale-out、front-end、storage 與 management networking 分成不同工作範圍，並同時納入實體／邏輯拓撲、佈線、電力與散熱
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S15 的現行 Scope and Contribution Overview 逐項列出五種網路工作與叢集基礎設施設計範圍
+boundary: 計畫範圍不表示每個叢集都用同一拓撲，也不證明具名產品、客戶部署、效能或公司財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: OCP 的 OPG-M 參考架構在叢集視角區分 scale-up、scale-out、SO-C／服務、storage、in-band management 與 out-of-band management 六張網；其中五張外部網採分離實體資源，且該設計明示不假設或要求冗餘
+supporting_source_ids: S20
+contrary_source_ids:
+as_of: 2026-01-14
+basis: S20 pages 7–10 的 Network Overview、non-converged solution、five separate networks 與 redundancy assumption
+boundary: 這是 air-cooled 400G OPG-M 的一套參考設計，不是所有人工智慧叢集的唯一或最佳架構，也不是客戶生產部署證明
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: UALink 2.0 文件把 Common、Data Link／Physical、Manageability 與 Chiplet 分成不同規格，UEC 現行工作組則分開 Physical、Link、Transport、Software、Storage、Compliance、Management、Performance and Debug，顯示「同一互連名稱」仍包含多層契約
+supporting_source_ids: S1,S17
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S1 的 UALink 2.0 規格套件清單與 S17 現行八個工作組及其範圍可逐項核對
+boundary: 規格或組織分層不表示所有層都已完成核定實作、產品通過、多供應商互通或部署
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: UEC 已公開供實作者進行 compliance self-attestation 的說明檔、測試床建議及 Transport、PHY／Link checklist，但測試床文件明確把 interoperation、system stress／scale 與 performance testing 排除在範圍外；同頁會員聲明是必要專利權利登錄，不是產品合規聲明
+supporting_source_ids: S18,S19
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S18 所連說明檔明定文件用於 compliance self-attestation，會員聲明頁則明定必要專利權利登錄；S19 page 3 直接界定已涵蓋層級與三類 out-of-scope 測試
+boundary: 合規框架與自我聲明工具不等於具名產品已提交或通過、第三方認證、多供應商互通、系統壓力、效能或客戶部署；必要專利權利登錄不得混入產品成熟度
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: 開放人工智慧網路研究必須同時固定兩條軸：先問資料正在服務 scale-up、scale-out、服務／CPU、storage、in-band 或 out-of-band management 哪一張網，再問實體／連結、端點／傳輸、交換／壅塞、軟體／控制、管理／遙測、單件合規、多供應商互通、系統壓力與客戶部署走到哪一層；共同使用 Ethernet 不會自動合併網路工作，也不會替尚未驗收的層級補證據
+supporting_source_ids: S1,S2,S9,S13,S15,S16,S17,S18,S19,S20
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C9；S15／S20 把叢集拆成不同網路工作，S1／S9／S13／S17 把規格與管理責任拆成不同層，S18／S19 又證明合規、自我聲明、互通、系統與效能不是同一驗收節點，因此原先只按標準與機架內外分路徑仍過度簡化
+boundary: 兩軸框架不推估規格勝負、共同實體設備的實際匯聚比例、TAM、市占、效能、部署分母、台灣供應鏈份額、估值或市場定價
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C9
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: unverified
+status: active
+claim: 任何具名產品或客戶系統已同時完成相關 UEC 自我聲明、多供應商互通、系統壓力／規模／效能測試，並能在所需網路平面上對上具名部署與供應商財務結果
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S18／S19 只證明合規工具與部分測試床框架；S15／S16／S20 只證明參考架構、範圍與設計假設，沒有本主張要求的完整產品矩陣、系統結果、客戶與財務文件
+boundary: 不以必要專利權利聲明、會員名單、reference architecture、產品支援 Ethernet 或單廠展示替代產品自我聲明、跨廠、系統、部署與財務證據
+verification_needed: 公開具名產品與版本、聲明／測試結果、多供應商組合矩陣、拓撲與錯誤注入、系統壓力／規模／效能、客戶站點與供應商出貨財務的同口徑文件
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -522,7 +727,9 @@ invalidation: Q3 2026 規劃延後、叢集未公開可用或只停在 reference
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
+retired_at: 2026-08-12
+retirement_reason: 同日第一筆到期複核漏看 UEC 公開 Compliance 頁；追加更正確認 S18／S19 只前進到自我聲明與部分測試框架，且 C9 已由 C18 的網路平面 × 驗收契約兩軸框架取代，改由 T4／T5 分開續追
 claim_ids: C1,C2,C9,C10,C11,C12,C13
 metric: UALink、ESUN、SUE-T、UEC 的規格分工、endpoint／switch silicon、compliance、multi-vendor interoperability 與部署
 source_ids: S1,S2,S9,S10,S11,S12
@@ -532,6 +739,34 @@ frequency_detail: 每週檢查四條標準／工作組及 Arista 等產品更新
 next_check: 2026-08-10
 trigger: OCP／UALink／UEC 公布 compliance 或 plugfest，至少兩家 endpoint 與 switch silicon 完成互通，或具名客戶部署 ESUN／SUE-T／UALink／UEC
 invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、互通失敗或客戶仍只採封閉互連，多路徑開放化信心下修
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C1,C2,C10,C12,C13,C16,C17,C19
+metric: UALink、ESUN／SUE-T 與 UEC 各層規格、單件自我聲明／合規、具名產品、多供應商互通、系統壓力／規模與效能結果
+source_ids: S1,S2,S9,S10,S12,S13,S17,S18,S19
+watch_source_ids: S6,S7,S13,S17,S18
+frequency: weekly
+frequency_detail: 每週保存規格、工作組與 compliance 頁差異；把 checklist／declaration、產品 pass、跨廠矩陣、系統壓力與部署分列，不再用「有合規頁」替代後續關卡
+next_check: 2026-08-19
+trigger: 出現具名產品自我聲明或測試結果、至少兩家 endpoint／switch 的版本化互通矩陣、plugfest 結果，或可重現的系統壓力／規模／效能報告
+invalidation: 合規工具長期沒有具名產品結果、產品只通過部分層級、跨廠或系統壓力失敗，則開放標準可部署成熟度下修
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C14,C15,C18,C19
+metric: 人工智慧叢集六張網的實體／邏輯分工、是否匯聚、冗餘、BOM／組態、生命週期管理、系統驗收與具名客戶部署
+source_ids: S15,S16,S20
+watch_source_ids: S15
+frequency: monthly
+frequency_detail: 每月檢查 OCP Open Cluster Designs for AI 新貢獻；只有具名設計固定網路平面、組態、冗餘與驗收結果才升級，不把參考架構摘要當成 production validation
+next_check: 2026-09-12
+trigger: OCP、平台商或客戶公開具名叢集的六張網映射、交換器／NIC／軟體版本、BOM、冗餘、測試矩陣、站點與運轉結果
+invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考架構假設無法通過可靠度／營運驗收，則六張實體網的可泛化程度下修但仍保留邏輯工作分層
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -544,6 +779,18 @@ invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、
 - **機架**：安裝多台運算、網路、電源與散熱設備的櫃體；「同一機架」不代表所有設備都在同一塊電路板上。
 - **機架內擴充（scale-up）**：讓同一運算群組或機架內的多顆加速器高速交換資料，重點是低延遲與彼此如何使用記憶體。
 - **跨機架擴充（scale-out）**：把多個機架或節點連成更大叢集，重點是路由、壅塞、大規模可靠性與故障恢復。
+- **網路平面**：依工作目的分開的一組連線、規則與營運責任；兩個平面可以共用同類設備，卻不一定共用設定與驗收。
+- **前端／服務網路（SO-C）**：讓處理器、服務入口與運算節點交換一般服務資料；它和加速器彼此同步的網路不是同一工作。
+- **儲存網路**：把運算節點連到共享資料與持久儲存；重點包括資料吞吐、完整性、恢復與存取隔離。
+- **帶內管理**：沿著系統正常使用的網路路徑發現、設定或觀察設備；主資料路徑故障時，它也可能受影響。
+- **帶外管理**：使用獨立管理路徑處理開機、重置、維修與故障救援，使主網路失效時仍能接觸設備。
+- **資料平面**：真正搬運工作資料的部分；它回答資料怎麼走，不負責決定所有設定與政策。
+- **控制平面**：計算路徑、下達設定、協調設備狀態與故障處置的部分；控制正確不等於資料搬運已通過壓力測試。
+- **自我聲明（self-attestation）**：供應商依共同清單自行申報產品實作狀態；它需要可核對附件，也不同於第三方認證或跨廠互通。
+- **系統壓力與規模測試**：在高負載、擴大節點數、長時間運轉與故障注入下檢查整套系統，而不只測單一連線。
+- **生命週期自動化**：把設備上線、設定、更新、監控、故障替換與退役變成可重複流程，並追蹤設定是否悄悄偏離。
+- **OPG-M**：OCP 針對多顆加速器開放運算櫃提出的參考架構名稱；本文只把它當成一套可核對設計，不當成所有叢集標準答案。
+- **傳輸層（Transport）**：在實體連線之上規定資料如何分段、送達、排序、重試與回報狀態；它仍需和端點、交換與軟體一起驗收。
 - **乙太網路（Ethernet）**：廣泛使用的網路技術家族；它可以服務跨機架，如今也有直接進入機架內的路徑。
 - **實體層電路（PHY）**：把晶片內的數位資料轉成銅線或光模組能傳送的訊號；它只是完整路徑的一層。
 - **訊號重整晶片（retimer）**：在訊號穿過較長線路後重新整理時序與形狀；信號可重整不等於上層協定已互通。
@@ -573,15 +820,15 @@ invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、
 
 ### 三句話抓重點
 
-- 一條完整資料路徑，要讓運算端點、連接傳輸、交換器、控制軟體與另一個端點接力。
-- 同一機架與跨機架有不同的距離、延遲、記憶體與故障要求；乙太網路現在可能出現在兩種範圍。
-- 共同規則、具名零件與單次展示都不等於跨廠互通；還要檢查版本、組合、錯誤處理、軟體與重現結果。
+- 一座人工智慧叢集同時有運算同步、跨機架傳送、一般服務、儲存與維修管理等不同工作，不能只看成「一張網」。
+- 即使幾張網使用同一類線材或交換設備，也可能有不同的資料、設定、故障與驗收責任。
+- 測試清單或單件聲明只走到中途；還要再看跨廠組合、整套系統壓力、客戶部署與公司財務能否逐層對上。
 
 ### 為什麼重要
 
-人工智慧系統的運算能力會被「資料能否及時到達」限制。同一機架內，多顆
-加速器常要像同一台大機器般協同；跨機架時，網路還要面對更多路徑、壅塞與故障。
-兩邊可能使用相似的乙太網路元件，但驗收目標不相同，不能因名稱相似就當成同一市場。
+人工智慧叢集像一座同時有高速道路、貨運道路、服務道路與救援通道的城市。運算同步、
+跨機架傳送、一般服務、儲存和維修管理搬的是不同資料，也承受不同的延遲、故障與權限要求。
+它們可能共用設備家族，甚至匯聚在同一台設備，卻不能因此共用結論或把需求重複計算。
 
 閱讀新聞時，先把整條路徑展開，找出「資料從哪裡出發、途中經過什麼、由哪個軟體
 控制、最後到哪裡」。再問測試是否同時涵蓋不同廠商、不同版本、正常傳輸、錯誤恢復與
@@ -589,16 +836,49 @@ invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、
 
 ### 接下來怎麼追
 
-- 先找出路徑中的運算端點、連接傳輸、交換器、控制軟體與目的端點，不要只看一顆晶片或一台設備。
-- 再把 UALink、ESUN、SUE-T 與 UEC 放回機架內外的正確位置，分別追規格、實體晶片、符合規格與跨廠互通。
+- 先判斷資料正在服務運算同步、跨機架、一般服務、儲存、帶內或帶外管理哪一張網，再展開端點、連接、交換與軟體。
+- 再把 UALink、ESUN、SUE-T 與 UEC 放回正確網路工作，分別追實體／連結、端點／傳輸、交換／壅塞、軟體／管理與驗收層。
 - 互通報告要列出廠商組合、產品版本、測試拓撲、正常與故障測項、軟體版本、通過條件與重現方法。
 - 最後依序追樣品、出貨、客戶驗收、正式開放、實際部署與利用率；任何一步都不能跳過。
 
 ### 想一想
 
 - 兩家公司的零件已能傳送正常資料，還要故意製造哪些錯誤，才能知道它們真的會一起恢復？
-- 同一網路技術能用在機架內與跨機架時，研究者要如何分開低延遲、記憶體、路由與故障要求？
-- 如果同一台交換器同時服務兩種範圍，如何避免把同一份埠數、出貨或收入計算兩次？
+- 同一類網路技術能服務不同工作時，研究者要如何分開延遲、資料、權限、路由與故障要求？
+- 如果同一台設備同時服務幾張網，如何避免把同一份連接數、出貨或收入計算兩次？
+
+## 先把一座人工智慧叢集拆成六張網
+
+| 本文六張網 | 它搬什麼／做什麼 | OCP 參考架構如何分 | 失效時先看到什麼 | 不能直接推成 |
+|---|---|---|---|---|
+| 1. 加速器機架內擴充 | 讓同一運算群組的加速器快速同步資料與記憶體狀態 | 在叢集視角列為獨立 scale-up network，位於開放運算櫃內部 | 加速器等待、同步停頓、工作無法像單一大系統完成 | 有高速連線不等於端點、記憶體與錯誤恢復已互通 |
+| 2. 跨機架／後端擴充 | 讓多個運算櫃共同完成大型工作 | 列為 scale-out network，使用獨立實體資源 | 集體運算變慢、熱點壅塞、跨櫃工作失敗 | 同為乙太網路不等於它和一般服務或儲存使用同一設定 |
+| 3. 一般服務／處理器網路 | 搬運處理器與服務入口的資料，不負責加速器彼此的最低延遲同步 | OPG-M 稱為 SO-C；OCP 現行計畫以 front-end networking 涵蓋此類入口 | 服務請求、排程或處理器資料路徑受阻 | 有前端連線不等於後端運算網已完成壓力驗收 |
+| 4. 儲存網路 | 讀寫模型、資料集、檢查點與其他持久資料 | 列為獨立 storage network | 讀取等待、檢查點寫入失敗、復原時間拉長 | 儲存吞吐高不等於加速器互連延遲低，也不能把容量重複歸因 |
+| 5. 帶內管理網路 | 沿正常系統路徑發現、設定、觀察與維護設備 | 和 SO-C 一起屬前端工作，但在 OPG-M 中另列獨立網路 | 設定下不去、遙測中斷、軟體與設備狀態漂移 | 管理介面能連不等於資料平面正確或故障時仍可救援 |
+| 6. 帶外管理網路 | 主網失效時仍能開機、重置、診斷與維修 | 列為獨立 out-of-band management network | 無法遠端救援、重置或確認硬體狀態 | 有救援通道不等於生產資料路徑具備冗餘 |
+
+這六項是 S20 參考架構可逐項核對的完整列舉，不是抽樣估計，所以沒有抽樣誤差或標準誤。
+它也不是「所有叢集一定有六套獨立交換器」：S20 特別採五張外部網分離的非匯聚設計，並明示這套
+設計不假設或要求冗餘。其他系統可以在實體上匯聚部分平面，但仍要保留邏輯責任、流量分母、故障
+邊界與驗收條件，否則同一設備的埠數、需求與收入容易被重複計算。
+
+## 再把每張網拆成八層驗收契約
+
+| 本文八層契約 | 要回答的問題 | 本輪一手文件走到哪裡 | 升級所需證據 | 不能直接推成 |
+|---|---|---|---|---|
+| 1. 實體與連結 | 訊號、線材、光電轉換、速度、重試與連線狀態是否正確 | UALink、UEC 與 ESUN 都有相應規格／工作範圍 | 具名產品、版本、測試條件、長時間錯誤與通過結果 | 訊號通過不等於封包、記憶體與軟體相容 |
+| 2. 端點、記憶體與傳輸 | 兩端如何發送、排序、同步、讀寫與回報錯誤 | UALink Common、SUE-T 與 UEC Transport 顯示責任被單獨定義 | 至少兩家端點實作、相同版本與正常／異常結果 | 有端點規格不等於交換器與整個工作已通過 |
+| 3. 交換、路由與壅塞 | 資料如何多跳轉送、排隊、避免熱點並在失敗時改道 | ESUN 與 UEC 工作範圍涵蓋交換、連結及壅塞相關責任 | 具名交換平台、拓撲、負載、緩衝、故障與恢復結果 | 標示人工智慧用途不等於符合指定開放規格 |
+| 4. 軟體與控制 | 驅動、函式庫、網路作業系統與控制平面能否協調版本及路徑 | UALink Manageability、UEC Software 與 OCP 參考架構已有分工 | 軟體版本、設定、設備發現、重啟、升級與重現腳本 | 硬體相連不等於實際工作或升級後仍正確 |
+| 5. 管理、遙測與除錯 | 如何觀察能力、設定漂移、壅塞、故障與生命週期 | UEC Management／Performance and Debug 與 OCP 管理範圍已有入口 | 指標定義、事件時間線、設定差異、告警與修復結果 | 有儀表板不等於資料正確或故障已復原 |
+| 6. 單件合規與自我聲明 | 一件產品是否依共同清單聲明或測試指定功能 | UEC 說明檔明定測試床與兩份 checklist 供實作者自我聲明；另頁會員聲明是必要專利權利登錄，不是產品聲明 | 具名產品、版本、已填清單、測試器、測項與結果 | 工具入口、專利聲明、自我聲明或單件通過都不等於其他廠商能一起工作 |
+| 7. 多供應商互通 | 不同端點、交換器與軟體能否在共同版本下通過正常與故障組合 | S19 明確把 interoperation 排除在該測試床文件範圍外 | 廠商組合矩陣、拓撲、版本、錯誤注入、失敗與重現方法 | 合規頁、會員名單或單廠展示不能替代交叉矩陣 |
+| 8. 系統、部署與財務 | 在壓力、規模與長時間運轉下能否交付，並對上客戶與供應商分母 | S19 也排除 system stress／scale 與 performance；OCP 文件仍是範圍與參考架構 | 具名站點、端點／機架數、期間、工作負載、故障、利用率、出貨與財務 | 參考架構或測試框架不等於客戶已部署、公司已取得收入 |
+
+UEC 現行頁面列出的八個工作組同樣是組織當下範圍的完整列舉，不是成熟產品樣本。最重要的
+閱讀邊界是：第六層現在已有公開工具，不等於第七、八層自動通過。要比較標準、產品或供應商，
+必須先固定「哪一張網」與「哪一層契約」；只寫「支援 Ethernet」少了兩個分母，不能拿來做份額或財務歸因。
 
 ## 先用五個位置看資料怎麼從一顆晶片走到另一顆
 
@@ -633,7 +913,7 @@ invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、
 | 1. UALink | 機架內的加速器擴充 | 加速器端點與交換互連，並包含晶粒規格路徑 | 2.0 系列規格已完成核定；組織表示互通與符合規格計畫將後續導入 | 不能說多廠晶片、交換器與軟體已通過計畫 |
 | 2. ESUN | 乙太網路的機架內擴充 | 交換、封包格式、無損、連結可靠性與多跳網路要求 | 1.0 規格已發布，證明乙太網路也直接進入機架內 | 不能說具名端點與交換器已符合規格或跨廠互通 |
 | 3. SUE-T | 乙太網路的機架內端點與傳輸 | 加速器端點、記憶體使用方式、封包與傳輸，與 ESUN 網路側分工 | OCP 現行工作流已把它列為獨立方向 | 不能說正式規格、實體產品、符合規格與互通已成熟 |
-| 4. UEC | 人工智慧與高效能運算的跨機架乙太網路 | 網路介面卡、交換器、光模組與線材等跨機架生態系 | 現行公開版本為 1.0.3 | 不能說這些元件已完成跨廠互通或具名客戶部署 |
+| 4. UEC | 人工智慧與高效能運算的跨機架乙太網路為主要應用 | 工作組橫跨實體、連結、傳輸、軟體、儲存、合規、管理、效能與除錯 | 現行公開版本為 1.0.3，且有自我聲明與部分測試床工具 | 不能說任何具名元件已通過、完成跨廠互通或客戶部署 |
 | 5. UALoE | 在乙太網路傳輸上承載機架內協定 | 讓 UALink 協定使用乙太網路傳輸路徑，可出現在具名系統設計 | AMD／Oracle 公告中有具名前瞻路徑 | 不能說它與 UEC 是同一標準，也不能說客戶已完成部署 |
 
 這五條路徑有競爭、共存與承載關係，不是五個可直接相加的市場。本篇的修正重點是：不能再用
@@ -657,15 +937,15 @@ invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、
 
 | 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
-| 1. 共同規則可查核 | 規格版本、功能、角色、錯誤行為與測試入口有公開文件 | UALink 2.0、UEC 1.0.3、ESUN 1.0 可查；SUE-T 是獨立工作流 | SUE-T 正式規格，以及四條路徑的合規與互通測試計畫 | 規格發布不等於實體晶片存在或產品已通過測試 |
+| 1. 共同規則可查核 | 規格版本、功能、角色、錯誤行為與測試入口有公開文件 | UALink 2.0、UEC 1.0.3、ESUN 1.0 可查；SUE-T 是獨立工作流；UEC 合規工具已有入口 | SUE-T 正式規格，以及各路徑持續更新的合規與互通方法 | 規格或工具發布不等於實體晶片存在或產品已通過測試 |
 | 2. 路徑各位置有具名實物 | 至少能指出端點、連接傳輸、交換器與所需軟體的產品、版本和功能 | Helios、Marvell UALink 方案與 Arista 7060XE7 證明多個位置有具名開發路徑 | 對應同一規格版本的端點、交換器、韌體、驅動與測試配置 | 不同新聞中有多個產品，不等於它們已在同一路徑上工作 |
-| 3. 單件產品符合指定規格 | 每件產品依共同方法通過實體層、協定、功能、計時與錯誤測項 | UALink 文件表示計畫將後續導入；本輪未找到 ESUN／SUE-T 具名產品通過報告 | 產品名、版本、測試器、測項、通過條件與可查核結果 | 一件產品合格不等於它能和所有其他廠商產品工作 |
-| 4. 不同廠商完成交叉互通 | 至少兩家獨立端點與交換實作，在共同版本與軟體下交叉測試正常與異常情境 | 現有文件沒有讓 ESUN／SUE-T 或 UALink 路徑通過此關的可核對結果 | 參與廠商、組合矩陣、版本、拓撲、測項、錯誤注入、軟體與重現方法 | 單廠端到端展示、會員名單或產品互連宣稱不等於通過 |
-| 5. 整個系統與工作可重現 | 在有壓力、擴容、故障與長時間運轉下，實際工作仍會正確完成 | Helios 是參考設計；Oracle／AMD 是前瞻規畫，都不是公開工作負載驗收結果 | 端點與機架數、軟硬體版本、工作負載、期間、故障、恢復與通過門檻 | 參考設計、預覽或單次最高數字不等於可交付系統 |
+| 3. 單件產品符合指定規格 | 每件產品依共同方法通過實體層、協定、功能、計時與錯誤測項 | UEC 已有自我聲明、測試床與 checklist 工具；本輪仍未找到具名產品已填清單或通過報告 | 產品名、版本、已填清單、測試器、測項、通過條件與可查核結果 | 工具存在或一件產品合格不等於它能和其他廠商產品工作 |
+| 4. 不同廠商完成交叉互通 | 至少兩家獨立端點與交換實作，在共同版本與軟體下交叉測試正常與異常情境 | UEC 測試床文件明示 interoperation 不在範圍；其他現有文件也沒有可核對交叉矩陣 | 參與廠商、組合矩陣、版本、拓撲、測項、錯誤注入、軟體與重現方法 | 單廠端到端展示、會員名單、自我聲明或產品互連宣稱不等於通過 |
+| 5. 整個系統與工作可重現 | 在有壓力、擴容、故障與長時間運轉下，實際工作仍會正確完成 | UEC 文件排除 system stress／scale 與 performance；OCP／Helios 仍是範圍、參考設計或前瞻規畫 | 端點與機架數、軟硬體版本、工作負載、期間、故障、恢復與通過門檻 | 參考設計、預覽、測試清單或單次最高數字不等於可交付系統 |
 | 6. 客戶部署與公司財務對上 | 具名客戶完成驗收與部署，供應商用同一產品、期間與分母提供出貨和財務結果 | Oracle 仍是規劃；台灣三個族群仍只是待驗證搜尋路由 | 出貨、預覽、正式開放、部署數、利用率，以及客戶與供應商雙向財務文件 | 規格、會員、產品用途或客戶規劃不等於台灣公司已獲利 |
 
-本輪可確認第一關有多份規格與工作文件，第二關有分散的具名產品路徑；第三關沒有本輪可核對的完整結果，
-第四關沒有跨廠矩陣，第五關仍停在參考設計與前瞻規畫，第六關也尚未通過。六關是閱讀與證據排序，
+本輪可確認第一關有多份規格、工作文件與合規工具，第二關有分散的具名產品路徑；第三關已有框架但沒有
+本輪可核對的具名產品結果，第四關沒有跨廠矩陣，第五關仍停在參考架構與前瞻規畫，第六關也尚未通過。六關是閱讀與證據排序，
 不是網路效能分數、標準勝負、供應商名單、市場份額或投資排名。
 
 ## 這篇對公司判斷的用處與界線
@@ -688,10 +968,17 @@ invalidation: 規格長期沒有實作、產品宣稱無法對應正式標準、
 - [Arista 7060XE7](https://investors.arista.com/Communications/Press-Releases-and-Events/Press-Release-Detail/2026/Arista-Introduces-Next-Generation-1-6Terabit-Portfolio-for-AI-Fabrics/default.aspx)（具名 scale-up／scale-out 平台，不代表 ESUN compliance）。
 - [Broadcom SUE framework](https://www.broadcom.com/blog/scale-up-is-simple-ethernet-makes-it-smarter)（endpoint／memory model／transport 起點）。
 - [OCP ESUN workstream](https://www.opencompute.org/wiki/Networking/ESUN)（ESUN 與 SUE-T 分工及後續文件入口）。
+- [OCP Open Cluster Designs for AI](https://www.opencompute.org/index.php/community/cluster-designs-for-ai)（scale-up、scale-out、front-end、storage 與 management networking 的現行範圍）。
+- [OCP AI Networking Reference Architectures webinar](https://www.opencompute.org/events/past-events/ocp-educational-webinar-new-ocp-reference-architectures-for-ai-networking)（資料／控制平面、生命週期、BOM 與多張網路的設計範圍）。
+- [UEC Working Groups](https://ultraethernet.org/working-groups/)（八個規格、軟體、管理、合規與除錯工作層）。
+- [UEC Compliance](https://ultraethernet.org/compliance/)（頁面所連說明檔定義自我聲明、測試床與 checklist；會員聲明是必要專利權利登錄，並非產品結果）。
+- [UEC Compliance Test Bed Recommendations](https://ultraethernet.org/wp-content/uploads/sites/20/2025/06/UEC-Compliance-Test-Test-Bed-Recommendations.pdf)（部分層級與明示排除的互通、系統壓力／規模、效能邊界）。
+- [OCP Open Pod Group for M xPUs System Architecture](https://www.opencompute.org/documents/opg-m-system-architecture-final-14-january-2026-pdf)（六張網、非匯聚設計與冗餘假設）。
 
 本篇不使用會員數、宣稱頻寬、GPU 數或公司效能數字做跨公司比較，也不推估 TAM、市占、估值或
-市場預期。ESUN 1.0 發布與 7060XE7 支援 scale-up 是兩個不同事件，尚不能合併成「Arista 已部署
-ESUN」。Oracle 規劃已進入原訂季度，也不代表部署已發生；沒有新一手文件時仍停在 planned。
+市場預期。六張網與八個 UEC 工作組是官方文件的類別列舉，不是產品通過率或市場樣本。ESUN 1.0
+發布與 7060XE7 支援 scale-up 是兩個不同事件，尚不能合併成「Arista 已部署 ESUN」；UEC 公開
+合規工具也不能合併成「已有產品互通」。Oracle 規劃已進入原訂季度，仍不代表部署已發生。
 
 ## 影響路由
 
@@ -730,7 +1017,9 @@ evidence_boundary: 更高頻寬的工程需求不自動對應任一 PCB／CCL �
 
 ## 下一個可證明／否定的節點
 
-- UALink／ESUN／SUE-T／UEC 各自公布 compliance program、plugfest 與可重現的 multi-vendor interoperability 結果。
+- UEC 公開第一批具名產品的已填自我聲明／測試結果，並與 patent declaration 分開；UALink、ESUN／SUE-T 也各自公布可核對的 compliance program。
+- UALink／ESUN／SUE-T／UEC 公布 plugfest 與可重現的 multi-vendor interoperability 組合矩陣，而不是只提供 checklist。
+- 具名人工智慧叢集公開六張網的實體／邏輯映射、是否匯聚、冗餘、BOM、軟體版本、故障與長時間系統驗收。
 - ESUN network side 與 SUE-T endpoint／transport 由至少兩家獨立 silicon 實作互通，而不是只有同一公司端到端展示。
 - Merchant silicon、switch、NIC、retimer 或 chiplet 從 IP／樣品升級為 production，並能對應正式標準與具名客戶。
 - Arista 或客戶確認 7060XE7 實際出貨、部署層級與 scale-up／scale-out 分母。

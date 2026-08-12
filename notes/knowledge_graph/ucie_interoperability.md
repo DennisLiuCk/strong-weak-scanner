@@ -1,14 +1,15 @@
 # UCIe 小晶片互通與量產階梯知識圖譜
 
-本圖把共同規格、介面設計送廠、實體跨廠測試、符合規格測試與客戶量產分開。較低速度的
-跨廠展示是重要進展，但不能替尚未公開的最高速度多廠客戶產品提前畢業。
+本圖把共同規格、介面設計送廠、實體晶片驗證、跨廠測試、符合規格測試與客戶量產分開，
+再用證據物件、測試包絡與供應商獨立性三軸判讀。16G 跨廠、32G 單一供應商實體晶片與
+64G 多家各自送廠都是進展，但不能斜著拼成最高速度多廠客戶產品。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ucie-interoperability
 root_node_id: concept:ucie-interoperability
 label: UCIe 小晶片互通與量產階梯
-summary: 從最高速度規格、介面設計送廠、較低速度跨廠測試追到符合規格測試與客戶量產，避免把不同產品的速度與成熟度拼在一起。
+summary: 以證據物件、測試包絡與供應商獨立性三軸，對齊 16G 跨廠展示、32G 實體晶片與 64G 各家送廠，再追到符合規格測試與客戶量產。
 article_ids: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER
 status: active
 -->
@@ -71,6 +72,26 @@ review_due: 2026-08-17
 status: active
 boundary: Synopsys 已公開 64G UCIe IP tape-out 與工具鏈；不等於回片實測、跨廠 compliance、客戶產品或收入。
 next_trigger: 64G test silicon 回片並與另一家獨立 chiplet 完成實體 interoperability。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-UCI-C04
+view: company
+from_id: company:3443
+to_id: concept:ucie-interoperability
+relation: develops_ip
+claim_refs: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C6,MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C7
+note_refs: 3443#S1
+evidence_state: verified
+commercial_stage: validation
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-04-16
+review_due: 2026-10-15
+status: active
+boundary: 創意已公開 32G UCIe 2.0 test-chip 實體量測與 64G UCIe 3.0 tape-out／2027Q1 silicon-verification schedule；不等於 64G 已回片、跨廠 compliance、客戶產品或 UCIe 專屬收入。
+next_trigger: 創意公布同一顆 3nm 64G test chip 的回片、完整測試包絡、客戶 qualification 與可歸因財務分母。
 -->
 
 <!-- knowledge_edge
@@ -151,6 +172,46 @@ review_due: 2026-08-17
 status: active
 boundary: 已跨過紙上規格，但速度、封裝與協定覆蓋仍有限。
 next_trigger: 64G UCIe 3.0 multi-vendor live demo 與公開測試條件。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-UCI-I11
+view: industry
+from_id: concept:ucie-interoperability
+to_id: stage:silicon-validation
+relation: reaches_stage
+claim_refs: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C6,MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C7
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-04-16
+review_due: 2026-10-15
+status: active
+boundary: 創意 32G UCIe 2.0 已有實體量測，但公告時 full-corner 尚在進行；3nm 64G 則仍是 tape-out，年報把 silicon verification 排在 2027Q1。
+next_trigger: 64G 回片後公開版本、封裝、protocol、錯誤、長時間與 full-corner 結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-UCI-I12
+view: industry
+from_id: concept:ucie-interoperability
+to_id: metric:ucie-evidence-matrix
+relation: measured_by
+claim_refs: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C8,MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C9
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-12
+review_due: 2026-08-17
+status: active
+boundary: 三軸矩陣是研究判讀工具，不是新的標準、認證或成熟度分數；不同速度、test vehicle 與供應商不可相加畢業。
+next_trigger: 同一 64G UCIe 3.0 multi-vendor package 公開共同測試計畫、通過與失敗結果。
 -->
 
 <!-- knowledge_edge
