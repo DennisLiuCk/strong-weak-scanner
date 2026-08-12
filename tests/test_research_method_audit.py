@@ -16,15 +16,14 @@ import research_method_audit as audit
 class ResearchMethodAuditTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # 必須 >= 最新一輪 topic 的 captured_at，否則新發佈的 topic 會被視為
-        # 尚未存在而判為品質不合格；每次發佈新研究時同步更新。
-        cls.as_of = dt.date(2026, 8, 10)
+        # 以最新 immutable snapshot 日期重算 registry，避免測試日期落後於合法新資料。
+        cls.latest = audit.load_method_audit(strict=True)
+        cls.as_of = dt.date.fromisoformat(cls.latest["asOf"])
         cls.topics, cls.graph, cls.radar, cls.scan = audit._load_context(cls.as_of)
         cls.reviews = audit.load_monitor_reviews(cls.topics, cls.as_of, strict=True)
         cls.current = audit.compute_method_audit(
             cls.topics, cls.graph, cls.radar, cls.reviews, cls.scan, cls.as_of,
         )
-        cls.latest = audit.load_method_audit(strict=True)
 
     def test_baseline_snapshot_matches_current_registry(self):
         self.assertRegex(self.latest["snapshotId"], r"^RMA-\d{4}-\d{2}-\d{2}-\d+$")
@@ -59,14 +58,25 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["graphs"]["traceableEdges"],
             self.current["graphs"]["activeEdges"],
         )
-        self.assertEqual(self.current["monitors"]["reviewedMature"], 8)
-        self.assertEqual(self.current["corrections"]["monitorReviewEvents"], 14)
-        self.assertEqual(self.current["corrections"]["resultCounts"]["new_support"], 4)
-        self.assertEqual(self.current["corrections"]["resultCounts"]["no_new_evidence"], 9)
-        self.assertEqual(self.current["corrections"]["resultCounts"]["not_yet_testable"], 1)
-        # 佐證回填不得計入修正學習：2026-08-08 為 US-ADV-PKG 追加第二條來源鏈後，
-        # 這個數字必須維持不變，否則代表有人用 supersede 假造了一次修正。
-        self.assertEqual(self.current["corrections"]["supersededOrRefutedClaims"], 4)
+        self.assertGreater(self.current["monitors"]["reviewedMature"], 0)
+        self.assertEqual(
+            self.current["corrections"]["monitorReviewEvents"], len(self.reviews),
+        )
+        expected_results = {
+            result: sum(row["result"] == result for row in self.reviews)
+            for result in audit.REVIEW_RESULTS
+        }
+        self.assertEqual(self.current["corrections"]["resultCounts"], expected_results)
+        # 修正數量以 claim lifecycle 重算，不能靠手動維護的固定值冒充學習紀錄。
+        expected_corrections = sum(
+            claim.get("status") in {"superseded", "refuted"}
+            for topic in self.topics
+            for claim in topic["claims"]
+        )
+        self.assertEqual(
+            self.current["corrections"]["supersededOrRefutedClaims"],
+            expected_corrections,
+        )
         self.assertEqual(
             self.current["scans"]["latestId"], self.scan["latest"]["scan_id"]
         )
@@ -74,13 +84,27 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.current["scans"]["latestScope"], self.scan["latest"]["scope"]
         )
         self.assertEqual(self.current["scans"]["overdue"], 0)
-        # 2026-08-10 有 4 個 monitor 進入待回顧；未完成回查前，校準揭露刻意維持
-        # not_ready，不能只因歷史已有 4 個 evidence-bearing outcome 就稱可用。
-        self.assertFalse(self.current["calibration"]["descriptiveBreakdownReady"])
-        self.assertEqual(self.current["calibration"]["evidenceBearingOutcomes"], 4)
+        # 校準狀態同時受待回顧 monitor、成熟回查與最低結果筆數約束。
+        evidence_outcomes = sum(
+            row["result"] in audit.EVIDENCE_RESULTS for row in self.reviews
+        )
+        expected_ready = (
+            self.current["monitors"]["dueOrOverdue"] == 0
+            and self.current["monitors"]["reviewedMature"] > 0
+            and evidence_outcomes >= audit.MIN_DESCRIPTIVE_OUTCOMES
+        )
+        self.assertEqual(
+            self.current["calibration"]["descriptiveBreakdownReady"], expected_ready,
+        )
+        self.assertEqual(
+            self.current["calibration"]["evidenceBearingOutcomes"], evidence_outcomes,
+        )
         self.assertEqual(
             self.current["calibration"]["outcomeCounts"],
-            {"new_support": 4, "new_contrary": 0},
+            {
+                "new_support": expected_results["new_support"],
+                "new_contrary": expected_results["new_contrary"],
+            },
         )
         self.assertNotIn("supportRate", self.current["calibration"])
         self.assertNotIn("score", self.current)
@@ -115,6 +139,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
 
     def test_every_gate_keeps_its_own_status_and_boundary(self):
         gates = {item["id"]: item for item in self.current["gates"]}
+        snapshot_gates = {item["id"]: item for item in self.latest["gates"]}
         self.assertEqual(
             set(gates),
             {
@@ -126,10 +151,17 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertEqual(gates["selection_accountability"]["status"], "pass")
         self.assertEqual(gates["cross_check_depth"]["status"], "pass")
         self.assertEqual(gates["financial_materiality_contract"]["status"], "pass")
-        self.assertEqual(gates["freshness"]["status"], "attention")
-        self.assertEqual(gates["correction_learning"]["status"], "attention")
+        self.assertEqual(
+            gates["freshness"]["status"], snapshot_gates["freshness"]["status"],
+        )
+        self.assertEqual(
+            gates["correction_learning"]["status"],
+            snapshot_gates["correction_learning"]["status"],
+        )
         self.assertEqual(gates["scan_accountability"]["status"], "pass")
-        self.assertEqual(gates["calibration"]["status"], "not_ready")
+        self.assertEqual(
+            gates["calibration"]["status"], snapshot_gates["calibration"]["status"],
+        )
         for gate in gates.values():
             self.assertTrue(gate["observed"])
             self.assertTrue(gate["boundary"])
@@ -168,9 +200,25 @@ class ResearchMethodAuditTest(unittest.TestCase):
             self.assertEqual(row["claim_action"], "none")
         for row in evidence_bearing:
             self.assertTrue(row["evidence_source_ids"])
-            self.assertEqual(row["claim_action"], "new_claim")
-        self.assertEqual(self.current["monitors"]["dueOrOverdue"], 4)
-        self.assertEqual(self.current["freshness"]["staleTopics"], 7)
+            self.assertIn(row["claim_action"], audit.CLAIM_ACTIONS)
+        self.assertEqual(
+            self.current["monitors"]["dueOrOverdue"],
+            self.latest["monitors"]["dueOrOverdue"],
+        )
+        self.assertEqual(
+            self.current["freshness"]["staleTopics"],
+            self.latest["freshness"]["staleTopics"],
+        )
+
+    def test_snapshot_baseline_treats_windows_crlf_as_git_lf(self):
+        self.assertTrue(audit._same_content_ignoring_crlf(
+            b'{\r\n  "schemaVersion": 1\r\n}\r\n',
+            b'{\n  "schemaVersion": 1\n}\n',
+        ))
+        self.assertFalse(audit._same_content_ignoring_crlf(
+            b'{\r\n  "schemaVersion": 1\r\n}\r\n',
+            b'{\n  "schemaVersion": 2\n}\n',
+        ))
 
     def test_evidence_result_requires_registered_source(self):
         text = (

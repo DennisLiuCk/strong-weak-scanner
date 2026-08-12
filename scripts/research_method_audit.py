@@ -719,6 +719,11 @@ def load_method_audit(*, strict: bool = True) -> dict:
     return latest
 
 
+def _same_content_ignoring_crlf(left: bytes, right: bytes) -> bool:
+    """Treat Git's LF and a Windows checkout's CRLF as the same content."""
+    return left.replace(b"\r\n", b"\n") == right.replace(b"\r\n", b"\n")
+
+
 def _baseline_errors(baseline_ref: str) -> list[str]:
     errors: list[str] = []
     prefix = "notes/research_method_reviews/"
@@ -733,42 +738,45 @@ def _baseline_errors(baseline_ref: str) -> list[str]:
         if not (relpath.endswith(".json") or relpath.endswith("monitor_reviews.csv")):
             continue
         try:
-            old = subprocess.run(
+            old_bytes = subprocess.run(
                 ["git", "show", f"{baseline_ref}:{relpath}"], cwd=ROOT,
-                text=True, encoding="utf-8", capture_output=True, check=True,
+                capture_output=True, check=True,
             ).stdout
         except subprocess.CalledProcessError as exc:
-            errors.append(f"無法讀取 baseline 檔案 {relpath}:{exc.stderr.strip()}")
+            detail = exc.stderr.decode("utf-8", errors="replace").strip()
+            errors.append(f"無法讀取 baseline 檔案 {relpath}:{detail}")
             continue
         current_path = os.path.join(ROOT, relpath.replace("/", os.sep))
         if not os.path.exists(current_path):
             errors.append(f"歷史 method audit 檔案不可刪除:{relpath}")
             continue
-        with open(current_path, encoding="utf-8-sig", newline="") as handle:
-            current = handle.read()
-        if relpath.endswith(".json") and current != old:
+        with open(current_path, "rb") as handle:
+            current_bytes = handle.read()
+        if relpath.endswith(".json") and not _same_content_ignoring_crlf(
+            current_bytes, old_bytes,
+        ):
             errors.append(f"歷史 method audit snapshot 不可改寫:{relpath}")
         elif relpath.endswith("monitor_reviews.csv"):
-            old_lines = old.splitlines()
-            current_lines = current.splitlines()
+            old_lines = old_bytes.decode("utf-8-sig").splitlines()
+            current_lines = current_bytes.decode("utf-8-sig").splitlines()
             if current_lines[:len(old_lines)] != old_lines:
                 errors.append("monitor_reviews.csv 必須 append-only，既有列不可改寫或刪除")
     selection_relpath = os.path.relpath(SELECTION_LOG, ROOT).replace(os.sep, "/")
     try:
-        old_selection = subprocess.run(
+        old_selection_bytes = subprocess.run(
             ["git", "show", f"{baseline_ref}:{selection_relpath}"], cwd=ROOT,
-            text=True, encoding="utf-8", capture_output=True, check=True,
+            capture_output=True, check=True,
         ).stdout
     except subprocess.CalledProcessError:
-        old_selection = ""
-    if old_selection:
+        old_selection_bytes = b""
+    if old_selection_bytes:
         if not os.path.exists(SELECTION_LOG):
             errors.append("歷史 selection_log.csv 不可刪除")
         else:
-            with open(SELECTION_LOG, encoding="utf-8-sig", newline="") as handle:
-                current_selection = handle.read()
-            old_lines = old_selection.splitlines()
-            current_lines = current_selection.splitlines()
+            with open(SELECTION_LOG, "rb") as handle:
+                current_selection_bytes = handle.read()
+            old_lines = old_selection_bytes.decode("utf-8-sig").splitlines()
+            current_lines = current_selection_bytes.decode("utf-8-sig").splitlines()
             if current_lines[:len(old_lines)] != old_lines:
                 errors.append("selection_log.csv 必須 append-only，研究前凍結列不可改寫或刪除")
     return errors

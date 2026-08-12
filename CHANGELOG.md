@@ -1,5 +1,21 @@
 # Changelog
 
+## 到期監測回查與 Q2 附件索引補齊 — 2026-08-12
+
+**策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、候選雷達排序與知識圖譜零變動**；
+本輪依門檻完成六個到期 monitor 回查，只更新有一手證據的既有研究，不為湊篇數升格新文章。
+
+- Vera Rubin、AI 記憶體階層、開放 AI fabric 與 PCIe 6.0 四項回查沒有達到既定 trigger；
+  帳本記為 `no_new_evidence`，未刷新 evidence clock，下一次檢查為 2026-08-17。
+- MOPS 直接索引新增定位力成與環球晶 115Q2 中文合併財報，六家優先公司附件因此皆可取得；
+  新 claim 明確只證實「檔案可取得」，不把索引存在推成內容、附註或財務影響已完成驗證。
+  原本只涵蓋四家的推論保留為 `superseded`，由涵蓋六家的新 claim 接續，沒有覆寫歷史。
+- 新增 2026-08-12 append-only 方法快照：34 topics、218 active claims、258 sources、
+  77 active monitors、20 review events、21 scan events；本輪後到期 monitor 為 0。
+  具新證據的到期結果累積 6 筆，僅揭露分類筆數，不計算支持率或把它解讀為投資命中率。
+- 修正 Windows checkout 下 Git baseline 為 LF、工作樹為 CRLF 時誤報歷史 snapshot 被改寫的問題；
+  稽核改以 bytes 比對並只正規化換行，另加回歸測試確保真正內容差異仍會被攔截。
+
 ## 雷達先比較問題，線索與產業角色需要時再展開 — 2026-08-12
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、研究 source／claim／confidence／monitor、

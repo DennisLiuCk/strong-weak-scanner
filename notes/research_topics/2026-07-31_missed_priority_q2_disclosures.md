@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-07-31
 source_published_at: 2026-07-07
-last_reviewed_at: 2026-08-05
-review_due: 2026-08-12
+last_reviewed_at: 2026-08-12
+review_due: 2026-08-19
 source_type: mixed
 publisher_domain: mopsov.twse.com.tw
 canonical_url: https://mopsov.twse.com.tw/server-java/FileDownLoad?step=9&filePath=%2Fhome%2Fhtml%2Fnas%2FSTR%2F&fileName=826120260729M002.pdf&functionName=t100sb02_1
@@ -18,9 +18,9 @@ group_ids: power,powersupply,memory,packtest,material
 trigger_type: quarterly_results_and_company_events
 evidence_role: candidate_source
 route: formal_note_candidate
-thesis_claim_id: C10
+thesis_claim_id: C12
 base_confidence: medium
-confidence_basis: 六家公司 Q2 一手揭露與四份 MOPS 正式附件索引已能重估證據強弱；環球晶完整季度數字拆出本業與 Siltronic 評價差異，但索引尚未完成 evidence pack，復工、ASP 與多項市場主張仍未驗證
+confidence_basis: 六家公司 Q2 一手揭露與六份 MOPS 正式附件索引已能重估證據強弱；環球晶完整季度數字拆出本業與 Siltronic 評價差異，但索引尚未完成 evidence pack，復工、ASP 與多項市場主張仍未驗證
 cross_company_numbers: true
 schema_migrated_at: 2026-08-02
 -->
@@ -59,6 +59,13 @@ from: triaged
 to: triaged
 reason: editorial_plain_language_wave8_learning_no_conclusion_change
 evidence: editorial:plain_language_wave8
+-->
+<!-- transition
+date: 2026-08-12
+from: triaged
+to: triaged
+reason: completed_six_company_mops_filing_index_availability_without_content_signoff
+evidence: sources:S19,S20
 -->
 
 <!-- research_source
@@ -320,6 +327,38 @@ locator: 2026-08-04 GWC holds 2026Q2 English Earnings Call，含中英文簡報�
 limitation: 活頁入口會持續更新；入口本身不支持管理層未在可定位文件中揭露的 ASP、復工或財務主張
 -->
 
+<!-- research_source
+source_id: S19
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 力成 115Q2 正式文件查詢
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6239&year=115&seamon=2&mtype=A
+locator: 202602_6239_AI1.pdf；索引列示 115/08/07 18:11:27，1644184 bytes；另有英文版 AIA
+limitation: 活頁索引只證實附件已上線；本輪未下載、封存、重算內容或核對會計師結論，不宣稱季報附註已驗證
+independence_group: twse-mops
+-->
+
+<!-- research_source
+source_id: S20
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 環球晶 115Q2 正式文件查詢
+published_at:
+captured_at: 2026-08-12
+accepted_at: 2026-08-12
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6488&year=115&seamon=2&mtype=A
+locator: 202602_6488_AI1.pdf；索引列示 115/08/07 15:22:28，1338581 bytes
+limitation: 活頁索引只證實附件已上線；本輪未下載、封存、重算內容或核對會計師結論，不支持 Novara 復工、ASP、漲價或財務影響主張
+independence_group: twse-mops
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -452,7 +491,7 @@ resolution:
 <!-- research_claim
 claim_id: C10
 label: inference
-status: active
+status: superseded
 claim: 新增完整季度證據再次顯示六家公司不能用營收或 EPS headline 排名：MOPS 索引能把四家公司送進 evidence pack，但不等於內容已核驗；環球晶更同時出現營收回升、營業利益下滑與 Siltronic 評價推升淨利三種不同方向
 supporting_source_ids: S1,S3,S4,S5,S10,S12,S13,S14,S15,S16,S17
 contrary_source_ids:
@@ -462,6 +501,40 @@ boundary: 這是研究流程與獲利品質分流，不是六家公司估值、�
 verification_needed:
 correction_kind:
 corrects_claim_id:
+corrected_by_claim_id: C12
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: 截至 2026-08-12，MOPS 直接索引可定位六家公司 115Q2 中文合併財報；其中力成與環球晶的附件皆於 2026-08-07 上線，關閉先前「索引尚無附件」的查找缺口
+supporting_source_ids: S12,S13,S14,S15,S19,S20
+contrary_source_ids:
+as_of: 2026-08-12
+basis: 六個逐公司 MOPS t57sb01 索引均列出中文 IFRSs 合併財報的檔名、上傳時間與大小
+boundary: 索引存在只證明檔案可取得；不證明附件內容、會計師核閱結論、附註、產品歸因或研究主張已完成封存、重算與獨立複核
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: inference
+status: active
+claim: 新增完整季度證據再次顯示六家公司不能用營收或 EPS headline 排名：MOPS 索引已能把六家公司送進 evidence pack，但不等於內容已核驗；環球晶更同時出現營收回升、營業利益下滑與 Siltronic 評價推升淨利三種不同方向
+supporting_source_ids: S1,S3,S4,S5,S10,S12,S13,S14,S15,S16,S17,S19,S20
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C10；S12-S15、S19-S20 只建立六份附件的可取得性，S16-S17 則把環球晶 Q2 本業與業外橋接拆開；兩者共同強化事件、附件、內容與財務品質必須分層的判讀
+boundary: 這是研究流程與獲利品質分流，不是六家公司估值、股價、報酬、相對優劣或任何投資建議
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C10
 corrected_by_claim_id:
 resolution:
 -->
@@ -760,7 +833,7 @@ invalidation: 到期仍無一手證據時標記 expired_unresolved，不得硬�
 
 <!-- monitoring_item
 monitor_id: T4
-status: active
+status: retired
 claim_ids: C1,C2,C3,C4,C6,C10
 metric: 六家公司完整 Q2 財報附件、focused evidence pack 與獨立 reviewer 狀態
 source_ids: S1,S2,S3,S4,S5,S10,S11,S12,S13,S14,S15
@@ -770,11 +843,13 @@ frequency_detail: 先查 MOPS 直接索引，再核對附件封存與 reviewer �
 next_check: 2026-08-12
 trigger: 新附件完成同版本封存、SHA 與引用頁規劃，並可由 reviewer 重算期間、單位、數字與附註
 invalidation: 只有 OpenAPI 數值列、檔名或法說摘要時，正式筆記不得升為已獨立驗證；6239／6488 索引仍無附件時保持缺口
+retired_at: 2026-08-12
+retirement_reason: 力成與環球晶附件索引已定位，六家公司檔案可取得性完成；尚未完成的 frozen pack、SHA、引用頁與 reviewer 由 T6 接續
 -->
 
 <!-- monitoring_item
 monitor_id: T5
-status: active
+status: retired
 claim_ids: C5,C8,C9,C10
 metric: 環球晶完整 Q2 核閱財報、Novara 8 吋復工、跨廠轉移、ASP 與漲價橋接
 source_ids: S6,S7,S8,S9,S11,S16,S17,S18
@@ -784,6 +859,36 @@ frequency_detail: 新財報、火災更新、公司法說或價格橋接發布�
 next_check: 2026-08-12
 trigger: 公司提供可定位的完整季報、8 吋復工日期與產能、交付影響，或 ASP／價格對營收與毛利的量化橋接
 invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫，漲價、復工與最終財務影響維持未證，不更新正式公司事實
+retired_at: 2026-08-12
+retirement_reason: 環球晶完整 Q2 附件索引已定位，關閉文件可取得性子問題；內容重算、Novara 復工、ASP 與財務橋接由 T7 接續
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C1,C2,C3,C4,C6,C11,C12
+metric: 六家公司 Q2 財報 frozen evidence pack、SHA、引用頁與獨立 reviewer 狀態
+source_ids: S1,S2,S3,S4,S5,S10,S12,S13,S14,S15,S19,S20
+watch_source_ids: S2,S11,S19,S20
+frequency: weekly
+frequency_detail: 每週核對附件版本、evidence manifest、引用頁規劃與 reviewer 結果；索引異動時提前
+next_check: 2026-08-19
+trigger: 任一新附件完成同版本封存、SHA 與引用頁規劃，並由獨立 reviewer 重算期間、單位、數字、附註與推論邊界
+invalidation: 只有檔名、OpenAPI 數值列、法說摘要或未經獨立重算的 PDF 時，正式筆記不得升為已獨立驗證
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C5,C8,C9,C11,C12
+metric: 環球晶 Q2 核閱財報內容、Novara 8 吋復工、跨廠轉移、ASP 與漲價橋接
+source_ids: S6,S7,S8,S9,S16,S17,S20
+watch_source_ids: S11,S18,S20
+frequency: event_driven
+frequency_detail: evidence pack、火災更新、公司法說或價格橋接發布後；無事件時每週回查
+next_check: 2026-08-19
+trigger: 季報內容完成獨立重算，或公司提供 8 吋復工日期與產能、交付影響、ASP／價格對營收與毛利的量化橋接
+invalidation: 若季報與後續文件仍只有產業復甦、稼動率形容詞或跨廠支援計畫，漲價、復工與最終財務影響維持未證
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -796,6 +901,7 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 - **未核閱**：數字尚未經會計師完成核閱，能提供方向但證據強度低於完整季報。
 - **按市價評價**：持有的股票等金融資產依期末市價重估；它會改變當期損益，但不等於本業同期收到同額現金。
 - **附件索引**：MOPS 列出的檔名、時間與大小，只證明檔案可以取得；內容仍須封存、逐頁重算與獨立複核。
+- **SHA（檔案雜湊）**：把檔案內容算成固定指紋；同一份 PDF 的 SHA 相同，才能確認撰寫者與複核者讀的是同一版本，但 SHA 本身不證明內容正確。
 - **Siltronic**：德國矽晶圓公司。本文只涉及它在環球晶（6488）單季損益中造成的評價差異——**那是按市價評價的業外項目，與環球晶本業表現是兩件事**，不可混談。
 - **Novara**：環球晶位於義大利 Novara 的廠區。本文指該廠火災公告，以及復工時程尚未確定這件事。
 - **HBM2**：HBM 的第二代。文中出現在封測公司的技術能力敘述裡；具備能力不等於已取得 HBM2 客戶、訂單或收入。
@@ -807,7 +913,7 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 
 ### 三句話抓重點
 
-- 六家公司都已有 Q2 一手資料；8 月 5 日再直查 MOPS，台達電、旺宏、欣銓與富鼎的完整附件索引已定位，力成與環球晶仍未在同一索引找到 Q2 附件。
+- 六家公司都已有 Q2 一手資料；8 月 12 日再直查 MOPS，六份中文合併財報索引都已定位，其中力成與環球晶附件在 8 月 7 日上線。
 - 環球晶完整季度數字顯示營收季增、營業利益反而季減，淨利大增則主要來自 Siltronic 評價；只看 EPS 會把本業與業外混在一起。
 - 真正可執行的工作是把已定位附件送進 evidence pack，並繼續追復工、ASP、長供、HBM2 訂單與 AI 組合；索引或產業敘事都不能自行升格。
 
@@ -888,8 +994,9 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 - pp.19–23 只支持 HBM 需求、先進封裝轉型、大尺寸 FC-BGA MCM 能力、FOPLP 客戶
   驗證與 2027 量產目標；全文沒有 HBM2 客戶、訂單、認證完成、產能或收入。原本「已簽
   HBM2 封裝訂單」必須維持未證，8 月 31 日仍沒有直接證據時應轉逾期未決，而不是硬判真。
-- 8 月 5 日以 MOPS 直接索引重查仍未定位 115Q2 正式附件。這是有日期邊界的查找結果，
-  不是未申報或內容不存在的斷言；在附件上線前，法說未核閱數字不能升為完整季報角色。
+- [MOPS 115Q2 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6239&year=115&seamon=2&mtype=A)
+  於 8 月 7 日新增中英文附件；中文版 `202602_6239_AI1.pdf` 上傳時間 18:11:27、大小
+  1,644,184 bytes。這關閉先前的附件查找缺口，但尚未完成 frozen pack、內容重算或獨立複核。
 
 ### 6488 環球晶
 
@@ -909,7 +1016,9 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
   Siltronic 持股按市價評價利益。這使「本業回升」與「EPS 上升」不能畫上等號。
 - 新聞稿把火災範圍縮窄為 8 吋線局部區域，明示 12 吋新廠未受影響，並說已啟動損害評估、
   保險與跨廠支援；但仍沒有 8 吋復工日期、受影響產能、交付量、ASP 或漲價對毛利的橋接。
-  8 月 5 日 MOPS 直接索引也尚未定位 Q2 完整附件，因此正式筆記仍不能以簡報取代核閱季報。
+- [MOPS 115Q2 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6488&year=115&seamon=2&mtype=A)
+  列出 `202602_6488_AI1.pdf`（8 月 7 日 15:22:28，1,338,581 bytes）。它只關閉附件可取得性；
+  本輪未把檔名改寫成季報內容已驗證，也沒有因此證實 Novara 復工、ASP 或漲價。
 
 ### 8261 富鼎
 
@@ -987,8 +1096,8 @@ stock_ids: 6488
 direction: mixed
 hypothesis_refs: 6488:H1,6488:H2
 note_action: update_required
-action_due: 2026-08-12
-rationale: 8 月 4 日公司文件已補 Q2 本業與 Siltronic 評價橋接並縮窄火災範圍；待完整核閱季報上線後建立 focused pack，再更新正式筆記
+action_due: 2026-08-19
+rationale: 8 月 4 日公司文件已補 Q2 本業與 Siltronic 評價橋接，8 月 12 日確認完整季報索引可取得；待建立 focused pack 並完成獨立複核後，再更新正式筆記
 evidence_boundary: 公司簡報與新聞稿仍沒有 8 吋復工日期、ASP／漲價橋接、客戶接受度或方形晶圓可辨識收入，不能先把產業復甦推成財務受惠
 -->
 
@@ -996,10 +1105,10 @@ evidence_boundary: 公司簡報與新聞稿仍沒有 8 吋復工日期、ASP／�
 
 - 富鼎完成不同 reviewer 對同一 frozen pack 的離線重算後，才把正式筆記恢復為
   `independently_verified`；H1／H2 維持 open，到 8 月 31 日依原規格裁決。
-- 8 月 3 日前依序補台達電、旺宏、欣銓與力成的正式筆記／證據包；若完整 Q2 季報尚未
-  上架，可用最新法說加上當下最新完整季報，但必須在正文標清財務口徑與缺口。
-- 台達電、旺宏、欣銓與富鼎已定位的 Q2 附件依序封存，記錄 SHA 與引用頁並交由另一位
-  reviewer 離線重算；力成與環球晶繼續先查 MOPS 直接索引，不能把 `NO_FILE` 當成內容反證。
+- 8 月 19 日前依序盤點台達電、旺宏、欣銓與力成的正式筆記，並以已定位的 Q2 附件建立
+  frozen pack；只有同版本封存、引用頁規劃與獨立重算都完成後，才能更新驗證狀態。
+- 六家公司已定位的 Q2 附件依序封存，記錄 SHA 與引用頁並交由另一位 reviewer 離線重算；
+  索引可取得性已關閉，但尚未完成 evidence pack 的公司仍不能升為內容已驗證。
 - 環球晶下一步只追尚未關閉的變數：完整核閱季報、8 吋復工日期／產能與交付影響、晶圓
   ASP／客戶接受度、方形晶圓驗證及可辨識收入；沒有直接證據就維持 H# open。
 - 所有 H# 均保留原 deadline。市場價格、單日法人或月營收只能觸發搜尋，不得作為生命週期
