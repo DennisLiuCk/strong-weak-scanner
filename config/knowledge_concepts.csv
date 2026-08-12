@@ -120,6 +120,9 @@ process:chip-first-fan-out,process,晶片先放扇出流程（Chip-first）,Chip
 process:chip-last-fan-out,process,線路先做扇出流程（Chip-last）,Chip-last fan-out|RDL first,concept:fan-out-packaging,先形成重佈線再接合晶粒並完成包封的扇出流程
 component:reconstituted-panel,component,重構面板（Reconstituted panel）,Reconfigured panel|Molded panel,concept:panel-level-packaging,把已切割晶粒重新排列並以封裝材料固定後供批次加工的中間載體
 standard:semi-3d20-panel-characteristics,standard,SEMI 3D20 面板物理特性,SEMI 3D20|Panel characteristics standard,concept:panel-level-packaging,界定面板外形 厚度 翹曲 重量及有無製程載體等共同設備條件的標準
+component:panel-foup,component,面板 FOUP 載具,Panel FOUP|Panel carrier pod,concept:panel-level-packaging,以槽位 支撐約束空間 外形與識別條件儲存運送面板並和設備裝卸介面對接的載具
+component:panel-foup-load-port,component,面板 FOUP 裝卸埠,Panel FOUP Load Port|Panel load port,concept:panel-level-packaging,位於製程設備端讓Panel FOUP裝卸並和半自動或自動搬運系統交接的介面
+stage:310mm-panel-interface-standardization,stage,310mm 面板介面標準制定,310mm square Panel FOUP standardization|SEMI Doc 7405,concept:panel-level-packaging,把310mm面板本體FOUP與設備介面逐項制定為共同規格但活動核准不等於標準已發布採用或量產
 concept:ucie-interoperability,concept,UCIe 小晶片互通與量產階梯,UCIe interoperability ladder|開放 chiplet 互通,,把共同規格 介面送廠 實體跨廠測試 客戶驗證與量產分開追蹤的成熟度框架
 stage:specification,stage,共同規格發布,Specification release,concept:ucie-interoperability,介面功能與測試要求已由標準組織發布但尚不代表實體產品
 stage:ip-tapeout,stage,介面設計送廠（IP tape-out）,Silicon IP tapeout,concept:ucie-interoperability,介面智財已完成設計並送交製造但尚待回片與實測

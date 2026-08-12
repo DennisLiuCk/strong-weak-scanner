@@ -184,6 +184,54 @@ limitation: 財務索引只用來定位後續文件；公司總營收、封裝�
 independence_group: ase
 -->
 
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: living_index
+publisher: SEMI
+title: SEMI E181 Specification for Panel FOUP for Panel Level Packaging
+published_at:
+captured_at: 2026-08-13
+accepted_at: 2026-08-13
+status: active
+url: https://store-us.semi.org/products/e18100-semi-e181-specification-for-panel-foup-for-panel-level-packaging
+locator: E181-0526 current revision、Purpose／Scope、510–515mm 與 600mm subordinate standards 清單及 E182 reference
+limitation: 公開頁只提供標準摘要與現行 subordinate-standard 清單，未讀取付費全文、公差與驗收方法；清單沒有 310mm 不代表專有 310mm 載具不存在，也不證明任何具名產線已互通或量產
+independence_group: semi
+-->
+
+<!-- research_source
+source_id: S11
+role: standard
+source_kind: living_index
+publisher: SEMI
+title: SEMI E182 Specification for Panel FOUP Load Port for Panel Level Packaging
+published_at:
+captured_at: 2026-08-13
+accepted_at: 2026-08-13
+status: active
+url: https://store-us.semi.org/products/e18200-semi-e182-specification-for-panel-foup-loadport-for-panel-level-packaging
+locator: E182-0326 current revision、semiconductor manufacturing equipment load-port interface、Panel FOUP loading／unloading 與 semi-automated／automated mode 段落
+limitation: 公開摘要只界定設備端介面角色，未讀取付費全文與各尺寸公差；標準存在不證明 ASE 310x310 line、任一 FOUP 或設備組合已採用、互通或通過產品資格
+independence_group: semi
+-->
+
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: SEMI
+title: SNARF for Doc 7405 — New Standard: Specification for 310mm Square Panel FOUP
+published_at: 2025-09-01
+captured_at: 2026-08-13
+accepted_at: 2026-08-13
+status: active
+url: https://downloads.semi.org/web/wstdsbal.nsf/b8865fa87d9e7b57882579fb005c3cd7/37743881840e595b88258d29001c7d0a%21OpenDocument
+locator: Document 7405 title、310mm rationale／scope、2025-09-26 activity approval、projected 2026-10-01 TC Chapter approval 與 3D20 revision note
+limitation: SNARF 證明新標準活動獲准啟動與當時規劃，不是已完成 ballot、TC approval 或正式發布的標準；時程是 projected timetable，不能當成完成承諾或產線相容證據
+independence_group: semi
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -296,6 +344,76 @@ verification_needed:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: 截至 2026-08-13，SEMI E181 current page 把 Panel FOUP 定義為運送與儲存 panel 的載具，並分開界定內外部尺寸、支撐／約束空間及與 load port 共用的參考平面；公開 subordinate standards 列出 510–515mm 與 600mm panel，未列 310mm
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S10 公開 Purpose／Scope 直接固定 transport／store、reference planes、interoperability、support／restrain volumes 與四個現行尺寸／slot subordinate standards
+boundary: 這是 SEMI 公開商店頁在捕捉日的完整列名，不含付費全文；未列 310mm 不能解讀為專有載具不存在、技術不可行或 ASE 一定延遲，也不證明清單外沒有尚未發布的草案
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: SEMI E182 current page 把 Panel FOUP load port 定義為半導體製造設備上供 FOUP 裝卸的介面，並明示半自動與自動搬運模式，證明 panel 載具與設備端裝卸介面是兩個需另外對齊的規格層
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S11 Purpose 與 Scope 分別固定 equipment-side load port、Panel FOUP loading／unloading、interoperability 目的及 semi-automated／automated mode
+boundary: 標準摘要只證明介面責任分層，不證明任一 310mm FOUP、load port、搬運車或 ASE line 已採用同一版本、完成跨廠互通或通過產品放行
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: SEMI Doc 7405 SNARF 明列建立 310mm square Panel FOUP 新標準的活動，說明既有 E181 已標準化 515x510mm 與 600x600mm 載具、310mm 仍有標準化需求，並把 2026-10-01 列為 projected TC Chapter approval date
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S12 固定 document number、new-standard title、rationale、scope、2025-09-26 SNARF approval 與 projected timetable，並說 panel 本體尺寸另規劃由 3D20 revision 處理
+boundary: SNARF approval 是標準活動獲准啟動，不是 310mm 規格已完成或發布；2026-10-01 是文件中的預定里程碑，不保證 ballot、approval、publication、採用或量產結果
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: inference
+status: active
+claim: 閱讀 310x310mm panel line 時，至少要把 panel 本體物理條件、Panel FOUP 載具、設備端 load port／自動搬運，以及整線與客戶產品放行分成四層；ASE planned line 與 SEMI 310mm 標準活動是互補的準備度訊號，任一層都不能替其他層畢業
+supporting_source_ids: S7,S8,S10,S11,S12
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S7 固定 panel 本體物理特性，S10 固定載具，S11 固定設備介面，S12 顯示 310mm 共通載具仍在制定活動，S8 則只到 ASE 具名 automated line 與 2027 expected production
+boundary: 四層是研究中心整合 SEMI 與 ASE 文件的閱讀框架，不是共同標準；共通標準未完成不代表專有整合線不能先運作，也不能據此判斷 ASE 時程、改機需求、成本或競爭力
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: unverified
+status: active
+claim: ASE 310x310mm line 已符合最終發布的 310mm panel／FOUP／load-port 共通標準，完成跨廠牌自動搬運互通、實際 production release、具名客戶 qualification 與穩定 HVM 經濟性
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S8 只揭露 ASE line 格式、平台、能力與 2027 expected production；S12 仍是標準活動文件，S10／S11 的 current public lists 也沒有提供 ASE 310mm adoption 或互通測試
+boundary: 不把 automated、310x310、planned production、標準活動或 FOUP／load-port 需求改寫成已互通、已投產、客戶採用、設備訂單、收入、毛利或投資結論
+verification_needed: 最終 310mm panel／FOUP／load-port 標準正式發布，ASE 與具名設備／載具對同一版本公布介面採用與互通測試，再由 ASE／客戶揭露 production release、qualification、連續良率、throughput、破損／停機與成本
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -340,6 +458,20 @@ trigger: ASE 或另一具名 OSAT 公布同一 panel platform 的實際 producti
 invalidation: 2027 投產目標後移、共同載體或搬運條件分裂、良率／節拍／成本無法達標，或 planned line 長期沒有客戶產品與實際製造結果
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C9,C10,C11,C12,C13
+metric: 310mm panel 本體×Panel FOUP×load port／自動搬運×整線產品放行四層介面
+source_ids: S7,S8,S10,S11,S12
+watch_source_ids: S7,S9,S10,S11,S12
+frequency: event_driven
+frequency_detail: SEMI 更新 3D20／E181／E182／Doc 7405，或 ASE、載具商、設備商、客戶發布 310mm adoption、interoperability、production release、qualification 與 HVM 結果時逐層重審
+next_check: 2026-09-12
+trigger: 310mm panel、FOUP 與 load-port 標準正式發布，且至少一條具名產線以同一版本公開載具／設備互通、實際投產與客戶產品放行結果
+invalidation: 新資料仍只到標準活動、專有尺寸、設備可處理或 expected production，卻沒有發布版本、adoption、互通測試與產品放行；證據留在原層，不得升級 HVM 或公司財務
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -367,6 +499,13 @@ from: triaged
 to: triaged
 reason: separated_fanout_architecture_panel_carrier_and_ase_310x310_planned_production_evidence
 evidence: sources:S6,S7,S8
+-->
+<!-- transition
+date: 2026-08-13
+from: triaged
+to: triaged
+reason: separated_310mm_panel_foup_loadport_and_line_release_interfaces_without_thesis_clock_refresh
+evidence: sources:S10,S11,S12
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -404,6 +543,13 @@ evidence: sources:S6,S7,S8
 - **設備利用率**：設備可生產時間中實際投入製造的比例；等待、換線、保養與故障都會壓低有效產出。
 - **停機時間**：設備因故障、清潔、保養、調整或等待材料而不能生產的時間。
 - **自動搬運**：用機械與控制系統移動、定位及追蹤大面板；尺寸與翹曲變化會增加破損、卡料與定位風險。
+- **Panel FOUP（面板載具）**：用來支撐、約束、儲存及運送面板的容器；面板長寬相同，不代表載具外形、槽位與支撐方式已相同。
+- **裝卸埠（Load Port）**：製程設備接收 Panel FOUP 並讓面板進出設備的介面；它是設備端規格，不是面板或載具本身。
+- **互通性（Interoperability）**：不同載具、設備與搬運系統依同一版本規則正確對接；一條自動線能運作，不等於跨廠牌組合都互通。
+- **新標準活動表（SNARF）**：SEMI 用來記錄標準制定理由、範圍與預定時程的文件；活動獲准不等於標準已完成、發布或被產線採用。
+- **SEMI E181**：界定 Panel FOUP 基本外形、支撐約束空間與參考平面的標準家族；現行公開尺寸清單不會替未列尺寸證明相容。
+- **SEMI E182**：界定 Panel FOUP 與製程設備 load port 裝卸介面的標準家族；介面標準存在不等於具名設備組合已通過互通。
+- **SEMI Doc 7405**：310 mm square Panel FOUP 新標準活動的文件編號；本輪看到的是制定活動與時程，不是已發布規格。
 - **返工**：產品未一次達標後，仍能重新處理或修復的流程；返工會增加時間、材料與再次失敗的風險。
 - **報廢**：產品或整片面板無法再使用而必須丟棄；一片面板排得越多，整片失敗時可能損失越多產品。
 - **可靠度**：產品經過溫度、濕度、機械與長時間使用後仍能維持功能；短期測試通過不能替代長期驗證。
@@ -469,6 +615,39 @@ evidence: sources:S6,S7,S8
 這三條是依一手來源整理的入門地圖，不是完整製程配方。不同產品還會增加多層重佈線、通孔、
 橋接晶片、基板、散熱與測試步驟；文章只用它來防止「流程名稱、載體尺寸與商用階段」互相冒充。
 
+## 310×310 不是只改一個尺寸：面板、載具、裝卸口與整線是四層
+
+可以把自動化面板線想成行李系統：面板是行李，Panel FOUP 是裝行李的箱子，load port 是設備的
+裝卸口，整條產線則是把箱子送到每一站、完成加工並讓產品放行的系統。行李尺寸相同，不代表箱子、
+裝卸口與整套搬運系統已經通用；同樣地，公司公布 310×310 mm 面板線，也不能自動補成所有設備
+已採用共同載具、跨廠牌互通或客戶產品已量產。
+
+| 本文四層介面 | 它固定什麼 | 本輪一手證據到哪裡 | 尚不能證明什麼 |
+|---|---|---|---|
+| 1. 面板本體 | 長寬、厚度、翹曲、重量及有無製程載體 | SEMI 3D20 公開摘要界定這些物理條件；ASE 公布 310×310 mm planned line | 相同長寬不代表材料、翹曲、公差與各站製程窗口相同 |
+| 2. Panel FOUP 載具 | 槽位、面板位置、支撐／約束空間、載具外形與識別 | E181 current page 定義運送、儲存與共用參考平面；現行公開 subordinate standards 列 510–515 mm 與 600 mm | 清單未列 310 mm 不代表專有載具不存在，也不證明 ASE 使用哪一版載具 |
+| 3. Load Port 與搬運 | FOUP 如何在製程設備上裝卸，以及半自動／自動系統如何交接 | E182 current page 把設備端 load port 與 Panel FOUP 分開，並涵蓋半自動與自動模式 | 標準摘要不證明 310 mm FOUP、設備、機器人或搬運車已完成跨廠牌互通 |
+| 4. 整線與產品放行 | 各站版本、追溯、破損／卡料、停機、製程結果及客戶 qualification | ASE 表示 310×310 mm 自動線預計 2027 上半年投產 | Automated 或 expected production 不等於實際 production release、客戶放行、HVM 良率與成本 |
+
+### 「正在制定」離「整線量產」還有五個動詞
+
+SEMI Doc 7405 的 SNARF 很適合用來辨認標準新聞的動詞。文件顯示 310 mm square Panel FOUP 的
+**標準活動已獲准啟動**，並列出槽數、面板位置、FOUP 外形、支撐空間、機械手臂排除空間、port 與
+識別標籤位置等預定範圍；文件也把 2026-10-01 寫成預定的技術委員會核准日。這些資訊能證明需求
+與制定工作存在，卻不能提前把未來里程碑改寫成完成結果。
+
+| 五個動詞 | 真正完成什麼 | 本輪狀態 | 不能跳到哪裡 |
+|---|---|---|---|
+| 1. 啟動活動 | 技術委員會接受制定問題、範圍與工作小組 | Doc 7405 SNARF 已記錄 2025-09-26 activity approval | 活動獲准不是規格內容已定稿 |
+| 2. 核准草案 | 草案經 ballot 與技術委員會程序取得核准 | 文件只列 2026-10-01 projected date，本輪沒有完成證據 | 預定日期不是核准承諾 |
+| 3. 發布標準 | 可引用的版本正式成為 published standard | 本輪未看到 310 mm Panel FOUP 正式列入 E181 current subordinate standards | 草案或 SNARF 不能當最終尺寸、公差與驗收規則 |
+| 4. 採用與互通 | 載具、load port、設備與搬運系統採用同一版本並通過組合測試 | 本輪未公開 ASE 310 mm 的版本化採用與跨廠牌矩陣 | 標準發布也不保證每一條線立即採用 |
+| 5. 整線產品放行 | 同一產品在實際產線通過製程、搬運、可靠度與客戶資格 | ASE 仍是 2027 expected production；沒有具名客戶放行 | 互通測試不能替代產品良率、產出、成本與收入 |
+
+反過來也不能說「標準尚未完成，所以 ASE 一定無法投產」。公司可用專有 FOUP、load port 與整線
+控制先行，只是公開資料尚不足以判斷是否採用未來共同標準、是否需要改機或是否能跨廠牌互換。
+研究中心因此同時保留兩條可能路徑，不替產線時程、成本與競爭力選邊。
+
 ## 先用四把尺拆開「更便宜」
 
 | 本文四把尺 | 它先回答什麼 | 最簡單的關係 | 容易忽略什麼 | 不能直接推成 |
@@ -518,9 +697,12 @@ evidence: sources:S6,S7,S8
 - [SEMI 3D20：panel characteristics public abstract](https://store-us.semi.org/products/3d02000-semi-3d20-en-specification-for-panel-characteristics-for-panel-level-packaging-plp-applications)
 - [ASE：fan-out、chip-first、chip-last 與 panel test vehicle](https://ase.aseglobal.com/ch/blog/technology/the-opportunities-and-challenges-of-foplp-technology/)
 - [ASE：310×310 mm panel line and first-half 2027 production target](https://www.aseglobal.com/press-room/310x310/)
+- [SEMI E181：Panel FOUP current-standard page](https://store-us.semi.org/products/e18100-semi-e181-specification-for-panel-foup-for-panel-level-packaging)
+- [SEMI E182：Panel FOUP Load Port current-standard page](https://store-us.semi.org/products/e18200-semi-e182-specification-for-panel-foup-loadport-for-panel-level-packaging)
+- [SEMI Doc 7405：310mm Square Panel FOUP 新標準活動表](https://downloads.semi.org/web/wstdsbal.nsf/b8865fa87d9e7b57882579fb005c3cd7/37743881840e595b88258d29001c7d0a%21OpenDocument)
 
-Lam、Applied Materials 與 ASE 對產品優勢與量產準備都有商業立場；SEMI 可補共同載體定義，
-卻不替任何公司驗證產品。本文只把直接揭露的架構、場域、標準範圍、交易
+Lam、Applied Materials 與 ASE 對產品優勢與量產準備都有商業立場；SEMI 可補 panel、FOUP 與
+load port 的共同介面責任，卻不替任何公司驗證產品，SNARF 也只證明標準活動已啟動。本文只把直接揭露的架構、場域、標準範圍、交易
 狀態與前瞻投產目標標成已證實；「面板級封裝已更便宜」、「2027 目標已完成」與「台灣公司已
 取得量產收入」均未被當成事實。
 

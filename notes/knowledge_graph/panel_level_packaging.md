@@ -1,14 +1,15 @@
 # 面板級封裝（PLP）知識圖譜
 
-本圖先把扇出架構、晶片先放／線路先做與方形面板載體拆開，再把面積利用率、planned line、
-客戶資格與穩定量產經濟性接回同一張圖。ASE 的 310×310 mm 線是具名規劃，不是已完成 HVM。
+本圖先把扇出架構、晶片先放／線路先做與方形面板載體拆開，再把面板本體、Panel FOUP、
+load port／自動搬運、planned line、客戶資格與穩定量產經濟性接回同一張圖。ASE 的 310×310 mm
+線是具名規劃；SEMI Doc 7405 是標準制定活動，兩者都不是已完成跨設備互通或 HVM。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: panel-level-packaging
 root_node_id: concept:panel-level-packaging
 label: 面板級封裝（PLP）
-summary: 把 fan-out、chip-first／chip-last、重構面板與 SEMI 3D20 載體條件分開，再連接面積利用率、良率、產出及 ASE 310x310mm planned line，顯示製程能力為何尚不能直接推成 HVM 成本優勢。
+summary: 把 fan-out、chip-first／chip-last、重構面板、SEMI 3D20 面板本體、Panel FOUP 與 load port 分開，再連接 310mm 標準制定、面積利用率、良率、產出及 ASE planned line，顯示尺寸、載具、設備介面與產品量產為何不能互相替代。
 article_ids: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS
 status: active
 -->
@@ -411,4 +412,64 @@ review_due: 2026-09-12
 status: active
 boundary: SEMI 3D20 公開摘要界定外形、厚度、翹曲、重量與有無 process carrier；標準存在不代表單一尺寸已統一、設備互通已驗證或產品已量產。
 next_trigger: OSAT、設備與材料鏈對同一 panel format 公開 carrier spec、FOUP／loadport compatibility 與 production qualification。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PLP-I17
+view: industry
+from_id: concept:panel-level-packaging
+to_id: component:panel-foup
+relation: uses_component
+claim_refs: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C9
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-13
+review_due: 2026-09-12
+status: active
+boundary: E181 公開摘要把 Panel FOUP 定義為運送與儲存載具並列出現行 510–515mm／600mm subordinate standards；未列 310mm 不代表專有載具不存在或產線不可行。
+next_trigger: 正式 310mm FOUP standard 發布，並由具名載具與產線公布版本化採用、槽位、支撐及搬運相容結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PLP-I18
+view: industry
+from_id: concept:panel-level-packaging
+to_id: component:panel-foup-load-port
+relation: requires
+claim_refs: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C10
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-13
+review_due: 2026-09-12
+status: active
+boundary: E182 公開摘要證明 load port 是製程設備端的 FOUP 裝卸介面並涵蓋自動搬運；不證明 ASE 310mm line 或任何跨廠牌組合已互通。
+next_trigger: 具名 310mm FOUP、load port、設備與搬運系統對同一發布版本完成 interoperability test。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PLP-I19
+view: industry
+from_id: concept:panel-level-packaging
+to_id: stage:310mm-panel-interface-standardization
+relation: passes_through
+claim_refs: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C11
+note_refs:
+evidence_state: verified
+commercial_stage: planned
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-13
+review_due: 2026-09-12
+status: active
+boundary: SEMI Doc 7405 只證明 310mm square Panel FOUP 新標準活動與 projected timetable；activity approval 不是 ballot、TC approval、publication、adoption 或 HVM。
+next_trigger: Doc 7405 或後繼編號正式發布，3D20／E181／E182 對應 310mm 版本完成，且具名產線公開採用。
 -->

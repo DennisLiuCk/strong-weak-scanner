@@ -4224,6 +4224,16 @@ class ResearchCenterTest(unittest.TestCase):
             "| 3. 批次載體 |", "| 4. 商用階段 |",
             "### 再用兩條簡化流程看先後順序",
             "**晶片先放**：", "**線路先做**：", "**改用面板**：",
+            "separated_310mm_panel_foup_loadport_and_line_release_interfaces_without_thesis_clock_refresh",
+            "## 310×310 不是只改一個尺寸：面板、載具、裝卸口與整線是四層",
+            "| 本文四層介面 | 它固定什麼 | 本輪一手證據到哪裡 | 尚不能證明什麼 |",
+            "| 1. 面板本體 |", "| 2. Panel FOUP 載具 |",
+            "| 3. Load Port 與搬運 |", "| 4. 整線與產品放行 |",
+            "### 「正在制定」離「整線量產」還有五個動詞",
+            "| 五個動詞 | 真正完成什麼 | 本輪狀態 | 不能跳到哪裡 |",
+            "| 1. 啟動活動 |", "| 2. 核准草案 |", "| 3. 發布標準 |",
+            "| 4. 採用與互通 |", "| 5. 整線產品放行 |",
+            "claim_id: C13", "monitor_id: T4",
             "## 先用四把尺拆開「更便宜」",
             "| 本文四把尺 | 它先回答什麼 | 最簡單的關係 | 容易忽略什麼 | 不能直接推成 |",
             "| 1. 面積利用率 |", "| 2. 合格封裝良率 |",
@@ -4244,7 +4254,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 43
+            sum(line.startswith("- **") for line in glossary.splitlines()), 50
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4262,9 +4272,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 9),
-            ("research_claim", 8), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4292,6 +4302,9 @@ class ResearchCenterTest(unittest.TestCase):
             "process:chip-last-fan-out,process,線路先做扇出流程（Chip-last）",
             "component:reconstituted-panel,component,重構面板（Reconstituted panel）",
             "standard:semi-3d20-panel-characteristics,standard,SEMI 3D20 面板物理特性",
+            "component:panel-foup,component,面板 FOUP 載具",
+            "component:panel-foup-load-port,component,面板 FOUP 裝卸埠",
+            "stage:310mm-panel-interface-standardization,stage,310mm 面板介面標準制定",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 面板級封裝（PLP）", graph)
@@ -4300,8 +4313,10 @@ class ResearchCenterTest(unittest.TestCase):
         for edge_id in (
             "KG-PLP-I11", "KG-PLP-I12", "KG-PLP-I13",
             "KG-PLP-I14", "KG-PLP-I15", "KG-PLP-I16",
+            "KG-PLP-I17", "KG-PLP-I18", "KG-PLP-I19",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
 
     def test_compute_connect_station_one_separates_ai_storage_jobs_positions_and_gates(self):
         topic = (
