@@ -4109,6 +4109,18 @@ class ResearchCenterTest(unittest.TestCase):
             "## 先分清兩種「貼法」的良率分母",
             "| 本文兩條接合路徑 | 怎麼接 | 主要優點 | 主要風險 | 為什麼不能直接比較 |",
             "| 單顆晶粒接晶圓（D2W） |", "| 晶圓接晶圓（W2W） |",
+            "separated_hybrid_bonding_percent_denominators_and_added_quality_passport_without_thesis_clock_refresh",
+            "## 同樣寫 100%，先問分母：量測覆蓋不等於合格產品良率",
+            "| 公開寫法 | 分子與分母要怎麼讀 | 這一層能證明什麼 | 還不能證明什麼 |",
+            "EVG40 D2W 的 100% die overlay measurement",
+            "imec／EVG 200 奈米試驗的所有 die 都低於 40 奈米 overlay",
+            "EVG 開發中心示範的 100% void-free bonding yield",
+            "imec 2 微米試驗的 Kelvin 大於 85%、菊鏈大於 70%",
+            "### 六欄混合接合品質護照",
+            "| 品質護照欄位 | 最少要記什麼 | 缺少時最容易誤判什麼 |",
+            "| 1. 受測物與分母 |", "| 2. 製程身分 |",
+            "| 3. 對準量測 |", "| 4. 介面完整性 |",
+            "| 5. 電性與可靠度 |", "| 6. 產品與量產經濟 |",
             "## 再看五個量產窗口如何接力",
             "| 本文五個量產窗口 | 先回答什麼 | 主要接力角色 | 失敗會怎樣 | 本輪可確認到哪裡 |",
             "| 1. 設計規則與試驗結構 |", "| 2. 表面平坦與銅高度 |",
@@ -4120,14 +4132,15 @@ class ResearchCenterTest(unittest.TestCase):
             "| 3. 整合設備與流程使用 |", "| 4. 具名商用產品 |",
             "| 5. Production 聲明 |", "| 6. 量產經濟與財務歸因 |",
             "claim_id: C8", "correction_kind: supersedes",
-            "corrects_claim_id: C4", "monitor_id: T3",
+            "corrects_claim_id: C4", "claim_id: C14",
+            "monitor_id: T3", "monitor_id: T4",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 40
+            sum(line.startswith("- **") for line in glossary.splitlines()), 46
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4144,9 +4157,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 9),
-            ("research_claim", 8), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 14), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4176,15 +4189,20 @@ class ResearchCenterTest(unittest.TestCase):
             "product:stacked-cmos-image-sensor,product,堆疊式 CMOS 影像感測器",
             "product:tsmc-soic,product,TSMC-SoIC 三維堆疊平台",
             "product:amd-3d-v-cache,product,AMD 3D V-Cache 處理器",
+            "metric:hybrid-bond-overlay-measurement-coverage,metric,混合接合對準量測覆蓋率",
+            "metric:hybrid-bond-interface-integrity-yield,metric,混合接合介面完整率",
+            "metric:hybrid-bond-test-structure-electrical-yield,metric,混合接合測試結構電性良率",
+            "metric:hybrid-bond-final-product-yield,metric,混合接合最終產品合格良率",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 混合接合（Hybrid bonding）", graph)
         for edge_id in (
             "KG-HYB-C03", "KG-HYB-C04", "KG-HYB-C05",
             "KG-HYB-I10", "KG-HYB-I11", "KG-HYB-I12",
+            "KG-HYB-I13", "KG-HYB-I14", "KG-HYB-I15", "KG-HYB-I16",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
 
     def test_ai_memory_station_seven_separates_area_yield_output_and_cost(self):
         topic = (

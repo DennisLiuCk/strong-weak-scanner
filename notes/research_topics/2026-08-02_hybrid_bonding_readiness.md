@@ -191,6 +191,70 @@ limitation: 活頁只用來偵測新一代 SoIC 節點、產品與 production �
 independence_group: tsmc
 -->
 
+<!-- research_source
+source_id: S10
+role: company_release
+source_kind: document
+publisher: EV Group
+title: EV Group Achieves Breakthrough in Hybrid Bonding Overlay Control for Chiplet Integration
+published_at: 2025-09-08
+captured_at: 2026-08-13
+accepted_at: 2026-08-13
+status: active
+url: https://www.evgroup.com/company/news/detail/ev-group-achieves-breakthrough-in-hybrid-bonding-overlay-control-for-chiplet-integration
+locator: EVG40 D2W 的 300mm wafer 全 die overlay measurement、最高 2,800 measurement points／four minutes、customer-site installation 與 HVM production services 段落
+limitation: EVG 產品發布只證明量測覆蓋、設備規格與未具名客戶服務使用；100% 是被量到的 die 覆蓋率，不是位置全數合格、無空洞、電性或最終產品良率，也沒有客戶、產品、批次或財務分母
+independence_group: ev-group
+-->
+
+<!-- research_source
+source_id: S11
+role: company_release
+source_kind: document
+publisher: EV Group
+title: EV Group Achieves Die-to-Wafer Fusion and Hybrid Bonding Milestone with 100-Percent Die Transfer Yield on Multi-Die 3D System-On-A-Chip
+published_at: 2022-07-12
+captured_at: 2026-08-13
+accepted_at: 2026-08-13
+status: active
+url: https://www.evgroup.com/company/news/detail/ev-group-achieves-die-to-wafer-fusion-and-hybrid-bonding-milestone-with-100-percent-die-transfer-yield-on-multi-die-3d-system-on-a-chip/
+locator: HICC 單次 transfer process 的 multiple different-size dies、complete 3D SoC 與 100-percent void-free bonding yield 段落
+limitation: 這是 EVG 開發中心示範；正文的 100% 指指定轉移中的 void-free interface，沒有公開 die 數、電性合格產品、重複 lot、可靠度、throughput、成本或客戶量產
+independence_group: ev-group
+-->
+
+<!-- research_source
+source_id: S12
+role: other_primary
+source_kind: document
+publisher: imec
+title: Imec demonstrates die-to-wafer hybrid bonding with a Cu interconnect pad pitch of 2µm
+published_at: 2024-05-29
+captured_at: 2026-08-13
+accepted_at: 2026-08-13
+status: active
+url: https://www.imec-int.com/en/press/imec-demonstrates-die-wafer-hybrid-bonding-cu-interconnect-pad-pitch-2mm
+locator: 2µm D2W test vehicle、<350nm overlay、Kelvin e-yield >85% 與 daisy-chain e-yield >70% 段落
+limitation: 這是 imec 試驗載具；兩種 e-yield 的受測結構不同，發布頁未提供結構數、chain 長度、die／wafer／lot 數、變異或最終產品良率，不能和其他百分比直接排名
+independence_group: imec
+-->
+
+<!-- research_source
+source_id: S13
+role: other_primary
+source_kind: document
+publisher: imec
+title: Wafer-to-wafer hybrid bonding: pushing the boundaries to 400nm interconnect pitch
+published_at: 2024-02-19
+captured_at: 2026-08-13
+accepted_at: 2026-08-13
+status: active
+url: https://www.imec-int.com/en/articles/wafer-wafer-hybrid-bonding-pushing-boundaries-400nm-interconnect-pitch
+locator: 400nm W2W 的 CMP／void-free 條件、<150nm overlay、low single-contact resistance，以及 overlay 與 dielectric breakdown／yield 關聯段落
+limitation: 這是 imec 研究試驗的特定 400nm pad design；<100nm overlay 需求是該設計對 sufficient HVM yield 的研究結論，不能外推所有 pitch、產品、設備或宣稱已完成客戶 HVM
+independence_group: imec
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -307,6 +371,90 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: EVG 於 2025-09-08 表示 EVG40 D2W 可在 300mm wafer 上量測每一顆 die 的 overlay，最高在四分鐘內取得 2,800 個 measurement points，並稱多台系統已裝在客戶端用於 HVM production services
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2025-09-08
+basis: S10 明列 100 percent die overlay measurement、every die、up to 2,800 points in four minutes 與未具名 customer-site HVM services
+boundary: 100% 的分母是被量測 die，不是 100% die 都在對準規格內，更不是無空洞、電性、可靠度或合格產品良率；HVM services 也沒有客戶、產品、配置、批次或財務分母
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: EVG 於 2022 年在 HICC 以單次轉移示範把完整 3D SoC 的多顆不同尺寸 die 接合，正文把結果描述為 100% void-free bonding yield
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2022-07-12
+basis: S11 直接固定 HICC、single transfer process、multiple dies of different sizes、complete 3D SoC 與 void-free 結果
+boundary: 這個 100% 只支持該次示範的接合介面沒有觀察到空洞；來源未公布 die 數，也沒有證明所有接點導通、最終產品功能、重複 lot、長期可靠度、產能或成本
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: imec 的 2µm D2W 試驗載具同時報告小於 350nm 的 overlay error、Kelvin e-yield 大於 85% 與 daisy-chain e-yield 大於 70%，顯示幾何對準與兩種電性結構各有自己的量測結果
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2024-05-29
+basis: S12 在同一 process-flow 段落逐一列出 overlay、Kelvin e-yield 與 daisy-chain e-yield，且兩個電性比例並不相同
+boundary: Kelvin 與 daisy chain 是不同試驗結構，不是兩個可直接平均的產品良率；來源未提供完整分母、分布、lot 數與最終產品測試，也不能跨接法或 pitch 比排名
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: imec 的 400nm W2W 研究把表面平坦與 void-free bonding、低單接點電阻、overlay，以及 dielectric breakdown／yield 分開評估，並只對該 400nm 設計提出 overlay control 小於 100nm 才能取得 sufficient HVM yield 的結論
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2024-02-19
+basis: S13 分別描述 CMP 與 void-free 條件、<150nm 實測 overlay、low single-contact resistance，及 overlay 與 dielectric breakdown／yield 的研究關係
+boundary: <100nm 是特定 400nm pitch 與 pad design 的研究條件，不是所有 hybrid bonding 的共同規格；sufficient HVM yield 也不是具名客戶產品已量產或公開良率
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 讀取 hybrid bonding 的百分比時，至少要用六欄品質護照固定受測物與分母、接法／pitch／試驗或產品身分、對準量測覆蓋與分布、介面完整性、電性與可靠度、重複批次產能成本與最終合格產品，否則量測覆蓋、門檻通過、無空洞、測試結構良率與產品良率不能互換
+supporting_source_ids: S2,S10,S11,S12,S13
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S10 的 100% measurement coverage、S2 的 all-die overlay threshold、S11 的 void-free interface、S12 的兩種 e-yield 與 S13 的 reliability／yield 關係分屬不同受測物與判定層；六欄是研究中心為防止跨層誤讀所做的整合
+boundary: 六欄護照不是 imec 與 EVG 共同標準，也不能用公開百分比倒推出單接點缺陷率或以良率次方估產品結果；缺陷可能相關且試驗拓樸、產品與製程條件不同
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: unverified
+status: active
+claim: 具名 AI、HBM 或 chiplet 量產產品已公開同一版本的完整六欄品質護照，並以重複 lot 同時證明合格產品良率、可靠度、throughput、成本與台灣供應商財務貢獻
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S2、S10–S13 分別停在試驗載具、設備量測、開發中心示範或未具名 HVM service，沒有同一具名產品的端到端共同分母
+boundary: 不因文件提及 AI、HBM、chiplet、HVM、production tool 或高良率，就建立客戶產品量產、台灣公司訂單、收入、毛利或投資結論
+verification_needed: 產品商、製造端與供應商對同一產品版本、接法、pitch、lot、量測門檻、合格產出、可靠度、產能、成本及財務期間完成雙向核對
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -351,6 +499,20 @@ trigger: 任一既有或新應用同時披露可定位的接法、介面世代�
 invalidation: 新文件只使用 generic hybrid bonding、3D stacking、customer use 或最小 pitch，卻沒有固定應用、接法、產品與階段；該資料不得讓其他矩陣格自動升級
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C9,C10,C11,C12,C13,C14
+metric: Hybrid bonding 百分比六欄品質護照與量測層級
+source_ids: S2,S10,S11,S12,S13
+watch_source_ids: S4,S5,S9
+frequency: event_driven
+frequency_detail: 研究機構、產品商、設備商、晶圓廠或 OSAT 發布 overlay、void、electrical yield、reliability、product yield 或 HVM economics 時，先固定受測物與完整分母再更新
+next_check: 2026-08-19
+trigger: 具名產品以同一版本公開 die／wafer／lot 數、pitch／拓樸、量測覆蓋與分布、介面缺陷、電性／可靠度、合格產品、throughput 與成本，且能與供應商資料雙向核對
+invalidation: 新百分比仍只給 best result、測試結構或不明分母，或把 measurement coverage、void-free、e-yield 與 product yield 混寫；該資料只留在原量測層，不得升級量產經濟與公司歸因
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -371,6 +533,13 @@ from: triaged
 to: triaged
 reason: split_hybrid_bonding_maturity_by_application_process_generation_and_product_stage
 evidence: sources:S6,S7,S8
+-->
+<!-- transition
+date: 2026-08-13
+from: triaged
+to: triaged
+reason: separated_hybrid_bonding_percent_denominators_and_added_quality_passport_without_thesis_clock_refresh
+evidence: sources:S10,S11,S12,S13
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -402,6 +571,10 @@ evidence: sources:S6,S7,S8
 - **已知良品（Known good die）**：在接合前已完成篩選、較有把握正常工作的晶粒；能先挑良品不代表後續接合不會新增缺陷。
 - **合格晶粒良率（Good-die yield）**：經製程與測試後可用晶粒占投入晶粒的比例；必須說清投入、測試與合格定義才能比較。
 - **電性良率（Electrical yield）**：通過指定電性測試的比例；接點對準達標不等於所有電路都能正常工作。
+- **量測覆蓋率（Measurement coverage）**：實際被量測的 die 或位置占目標母體的比例；100% 覆蓋只代表全部量到，不代表全部合格。
+- **無空洞接合（Void-free bonding）**：檢查接合介面是否出現未貼合空洞；看不到空洞不等於所有銅接點都導通或產品功能合格。
+- **Kelvin 測試結構**：用特定四端結構量測單一或少數接點的電阻，降低導線電阻干擾；它不是完整產品電路。
+- **菊鏈測試結構（Daisy chain）**：把許多接點串成一條電性路徑，任一處開路都可能讓整條鏈失敗；鏈長與接點數會改變分母。
 - **線上量測（Inline metrology）**：在製程進行中量測位置、表面或缺陷，及早發現漂移；能量到不等於製程已穩定量產。
 - **客戶資格認證（Qualification）**：客戶依功能、可靠度與製造條件確認產品是否可採用；設備被使用不等於認證已完成。
 - **穩定大量生產（HVM）**：在持續生產中同時守住良率、產能、可靠度與成本，而不是只做出一次試驗結果。
@@ -414,6 +587,8 @@ evidence: sources:S6,S7,S8
 - **Kinex**：Applied Materials 與 Besi 合作的單顆晶粒接晶圓整合設備；多類客戶使用設備，仍不等於具名產品已量產。
 - **imec**：進行半導體研發與試驗線驗證的研究機構；試驗結果可證明技術能力，但不能替代客戶產品量產資料。
 - **EV Group（EVG）**：參與本輪晶圓接晶圓試驗的設備公司；合作試驗證明設備角色，不等於市場份額或台灣供應商受惠。
+- **EVG40 D2W**：EVG 用於逐顆接晶圓後對準量測的設備；可量測每顆 die 不代表每顆都合格。
+- **異質整合能力中心（HICC）**：EVG 用來協助客戶開發與示範製程的中心；中心內成功不等於客戶產品已量產。
 - **堆疊式影像感測器（Stacked CIS）**：把感光像素與邏輯電路分層製作再垂直連接；Sony 的公開技術回顧顯示這條應用早於本輪 200 奈米試驗。
 - **TSMC-SoIC**：台積電的晶圓級三維晶片堆疊平台，包含晶片接晶圓與晶圓接晶圓路徑；平台已有 production 證據，不代表每個節點、pitch 與產品都同時成熟。
 - **AMD 3D V-Cache**：把額外快取晶片垂直疊到處理器上的產品技術；AMD 把 EPYC 7003 的作法明確描述為無凸塊的銅對銅混合接合。
@@ -471,6 +646,43 @@ evidence: sources:S6,S7,S8
 這張表只說明本文為何要把兩條路徑分開閱讀，不是完整製程規格，也不代表其中一條一定更便宜、
 良率更高或更早量產。
 
+## 同樣寫 100%，先問分母：量測覆蓋不等於合格產品良率
+
+新聞稿裡的百分比常被排在同一行，但它們可能根本不是同一張考卷。最容易辨認的方法，是先把每個
+百分比還原成一句完整分數：**誰通過什麼門檻，除以哪一群受測物？** 若這句話填不完整，數字就只能
+留在原本的量測層，不能往下改寫成「產品良率」。
+
+| 公開寫法 | 分子與分母要怎麼讀 | 這一層能證明什麼 | 還不能證明什麼 |
+|---|---|---|---|
+| EVG40 D2W 的 100% die overlay measurement | 被量測的 die／目標量測 die；EVG 並稱最高四分鐘取得 2,800 個量測點 | 量測系統能把抽樣擴成全 die 覆蓋，讓每顆位置都有回饋 | 沒說每顆都落在對準規格，更不是接合、電性或產品良率 100% |
+| imec／EVG 200 奈米試驗的所有 die 都低於 40 奈米 overlay | 低於指定門檻的 die／該 300 毫米試驗晶圓上被判定的 die | 固定試驗載具、修正流程與門檻後，全片幾何對準結果達標 | 沒證明每個接點導通、長期可靠或客戶產品全數合格 |
+| EVG 開發中心示範的 100% void-free bonding yield | 在該次多 die 單次轉移中未觀察到空洞的接合介面／該次示範母體；公開頁沒有列 die 數 | 指定示範的介面完整性結果 | 空洞檢查不是電性終測，也沒有重複 lot、產品功能、產能與成本 |
+| imec 2 微米試驗的 Kelvin 大於 85%、菊鏈大於 70% | 通過各自電性判定的 Kelvin 或菊鏈結構／各自被測結構；公開頁沒有列完整數量 | 單接點型與多接點串鏈型電性成績可以分開觀察 | 兩個比例不能互相平均，也不能直接當最終堆疊產品良率 |
+| 具名產品合格良率 | 通過功能、可靠度與客戶規格的產品／同版本、同製程條件的投入產品 | 若再有重複批次、產能與成本，才開始回答穩定量產經濟 | 本輪來源沒有公開這個共同分母 |
+
+還有一個常見陷阱：不能把菊鏈結果直接套進「單接點良率的接點數次方」。實際缺陷可能群聚或相關，
+Kelvin、菊鏈與產品的接點拓樸、pitch、材料、測試門檻也不同。imec 的 400 奈米研究更把表面平坦、
+無空洞條件、單接點電阻、overlay、介電層擊穿與 yield 分開評估；它對該設計提出的對準需求，不能變成
+所有混合接合產品的共同規格。
+
+### 六欄混合接合品質護照
+
+每遇到新的「高良率」或「100%」主張，可先填完下面六欄。這是研究中心整合公開文件的查核方法，
+不是 imec、EVG 或產業共同制定的標準。
+
+| 品質護照欄位 | 最少要記什麼 | 缺少時最容易誤判什麼 |
+|---|---|---|
+| 1. 受測物與分母 | die、介面、接點、Kelvin、菊鏈、wafer、package 或最終產品；實際數量 | 把「全部量到」讀成「全部合格」 |
+| 2. 製程身分 | W2W／D2W、pitch、pad／鏈路拓樸、材料、試驗載具或具名產品、版本 | 把另一接法或舊世代的成績搬過來 |
+| 3. 對準量測 | 覆蓋率、門檻、全分布與邊緣值、量測方法、die／wafer／lot 數 | 用平均值或單一最佳值遮住尾端失敗 |
+| 4. 介面完整性 | void 的檢查方法與判定、bond strength、表面狀態、抽樣範圍 | 把看不到空洞改寫成所有接點導通 |
+| 5. 電性與可靠度 | Kelvin、菊鏈、開短路、電阻、介電擊穿、溫度循環、時間與樣本 | 把短期測試結構結果改寫成產品壽命 |
+| 6. 產品與量產經濟 | 合格產品、重複 lot、返工／報廢、throughput、成本、客戶 qualification 與財務期間 | 把研究成功或設備上線改寫成量產訂單與獲利 |
+
+六欄的用途不是要求每份研發新聞稿一次交齊所有資料，而是讓讀者知道證據目前停在哪一層。公開文件
+若只完成前三欄，就可以證明量測與製程能力，卻仍應把最終產品良率、量產經濟與台灣公司財務歸因
+留在待驗證。
+
 ## 再看五個量產窗口如何接力
 
 | 本文五個量產窗口 | 先回答什麼 | 主要接力角色 | 失敗會怎樣 | 本輪可確認到哪裡 |
@@ -506,6 +718,10 @@ evidence: sources:S6,S7,S8
 - [Sony：advanced CMOS image sensor 的 3D stacking 與 Cu-Cu hybrid bonding 演進](https://www.sony.com/en/SonyInfo/technology/publications/3d-stacking-process-technologies-for-advanced-cmos-image-sensors/)
 - [TSMC：N7 SoIC CoW／WoW production 與應用](https://pr.tsmc.com/english/news/2939)
 - [AMD：EPYC 7003 3D V-Cache 的銅對銅無凸塊混合接合](https://www.amd.com/ko/solutions/data-center/insights/leadership-performance-for-technical-computing-workloads.html)
+- [EVG：EVG40 D2W 的全 die overlay measurement](https://www.evgroup.com/company/news/detail/ev-group-achieves-breakthrough-in-hybrid-bonding-overlay-control-for-chiplet-integration)
+- [EVG：HICC 多 die 單次轉移的 void-free 示範](https://www.evgroup.com/company/news/detail/ev-group-achieves-die-to-wafer-fusion-and-hybrid-bonding-milestone-with-100-percent-die-transfer-yield-on-multi-die-3d-system-on-a-chip/)
+- [imec：2µm D2W 的 overlay、Kelvin 與菊鏈電性結果](https://www.imec-int.com/en/press/imec-demonstrates-die-wafer-hybrid-bonding-cu-interconnect-pad-pitch-2mm)
+- [imec：400nm W2W 的表面、電性、overlay 與可靠度關係](https://www.imec-int.com/en/articles/wafer-wafer-hybrid-bonding-pushing-boundaries-400nm-interconnect-pitch)
 
 本篇沒有把 imec、TSMC、AMD 或 Applied Materials 的效能與產品優勢拿來做跨公司數字比較；各文件的
 應用、製程、產品與測試分母不同，也沒有 HVM 良率、每小時產能、每片成本與市場份額的共同定義，

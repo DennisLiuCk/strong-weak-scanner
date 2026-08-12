@@ -99,6 +99,10 @@ component:fine-pitch-rdl,component,細間距 RDL,Fine-pitch redistribution layer
 stage:pathfinding-pdk,stage,探索型 PDK,Pathfinding PDK,concept:hybrid-bonding,提供初步設計規則與驗證元件但尚未具備完整 tape-out 能力的設計套件
 stage:test-vehicle,stage,試驗結構,Test vehicle|試驗車,concept:hybrid-bonding,用來驗證製程與電性而非證明客戶量產產品的測試結構
 capability:overlay-control,capability,對準控制（Overlay）,疊對控制|Overlay control,concept:hybrid-bonding,讓上下層銅接點在細間距下保持對準的製程與量測能力
+metric:hybrid-bond-overlay-measurement-coverage,metric,混合接合對準量測覆蓋率,Hybrid bond overlay measurement coverage|die overlay coverage,concept:hybrid-bonding,實際取得對準結果的晶粒或位置占目標量測母體的比例但不代表受測物都通過對準門檻
+metric:hybrid-bond-interface-integrity-yield,metric,混合接合介面完整率,Hybrid bond interface integrity yield|void-free bonding yield,concept:hybrid-bonding,依指定檢查方法未觀察到空洞或未接合區的介面占受檢母體比例但不替代電性與產品功能
+metric:hybrid-bond-test-structure-electrical-yield,metric,混合接合測試結構電性良率,Hybrid bond test-structure electrical yield|Kelvin e-yield|daisy-chain e-yield,concept:hybrid-bonding,分別計算 Kelvin 菊鏈或其他指定測試結構通過電阻開短路等電性門檻的比例並綁定拓樸與分母
+metric:hybrid-bond-final-product-yield,metric,混合接合最終產品合格良率,Hybrid bond final product yield|qualified stack yield,concept:hybrid-bonding,同一版本產品在指定投入與完整功能可靠度客戶規格下成為合格產出的比例並連同重複批次產能與成本解讀
 process:cmp-planarization,process,表面平坦化（CMP）,CMP 平坦化|Chemical mechanical planarization,concept:hybrid-bonding,在接合前把介電層與銅墊表面控制到足夠平坦的製程
 product:stacked-cmos-image-sensor,product,堆疊式 CMOS 影像感測器,Stacked CMOS image sensor|stacked BI-CIS,concept:hybrid-bonding,把感光像素晶片與邏輯晶片垂直整合並可沿產品世代加入異質材料或運算功能的應用家族
 product:tsmc-soic,product,TSMC-SoIC 三維堆疊平台,TSMC SoIC|System on Integrated Chips,concept:hybrid-bonding,包含 chip-on-wafer 與 wafer-on-wafer 的晶圓級三維晶片堆疊平台

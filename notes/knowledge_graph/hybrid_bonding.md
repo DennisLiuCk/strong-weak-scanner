@@ -1,15 +1,16 @@
 # 混合接合（Hybrid bonding）知識圖譜
 
-本圖把成熟度拆成應用、W2W／D2W 接法、介面世代與具名產品階段：Sony 影像感測器、TSMC SoIC
-與 AMD 3D V-Cache 提供已應用或 production 格；200nm 試驗結構與 pathfinding PDK 則保留在各自
-早期格。台灣族群只保留研究路由，沒有公司量產線。
+本圖把成熟度拆成應用、W2W／D2W 接法、介面世代與具名產品階段，也把百分比分成對準量測覆蓋、
+介面完整、測試結構電性與最終產品合格四個分母。Sony 影像感測器、TSMC SoIC 與 AMD 3D V-Cache
+提供已應用或 production 格；200nm 試驗結構與 pathfinding PDK 則保留在各自早期格。台灣族群只
+保留研究路由，沒有公司量產線。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: hybrid-bonding
 root_node_id: concept:hybrid-bonding
 label: 混合接合（Hybrid bonding）
-summary: 連接 Sony 影像感測器、TSMC SoIC 與 AMD 3D V-Cache 的既有應用／production 證據，再分開逐顆接晶圓、晶圓接晶圓、探索型設計規則、200nm 試驗結構、對準控制與平坦化；任何成熟格都不能替其他應用、接法或介面世代繼承資格。
+summary: 連接 Sony 影像感測器、TSMC SoIC 與 AMD 3D V-Cache 的既有應用／production 證據，再分開逐顆接晶圓、晶圓接晶圓、探索型設計規則、200nm 試驗結構、對準量測覆蓋、介面完整、測試結構電性與最終產品合格分母；任何成熟格或百分比都不能替其他應用、接法、介面世代或量測層繼承資格。
 article_ids: MI-2026-08-02-HYBRID-BONDING-READINESS
 status: active
 -->
@@ -352,4 +353,84 @@ review_due: 2026-08-19
 status: active
 boundary: EPYC 7003 3D V-Cache 是具名商用 hybrid-bond product family；不代表其他 CPU、GPU、HBM 或細間距試驗格相同成熟。
 next_trigger: AMD 或製造端對同一產品世代補充接合資格、產量、良率或財務分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I13
+view: industry
+from_id: concept:hybrid-bonding
+to_id: metric:hybrid-bond-overlay-measurement-coverage
+relation: measured_by
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C9
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2025-09-08
+review_due: 2026-08-19
+status: active
+boundary: EVG40 D2W 的 100% 指每顆 die 都有 overlay measurement；不是每顆都通過門檻，更不是 void-free、電性或最終產品良率。
+next_trigger: 具名產品線公開量測覆蓋、門檻、全分布、die／wafer／lot 數與後續產品判定。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I14
+view: industry
+from_id: concept:hybrid-bonding
+to_id: metric:hybrid-bond-interface-integrity-yield
+relation: measured_by
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C10
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-07-12
+review_due: 2026-08-19
+status: active
+boundary: EVG HICC 的 100% void-free 是單次多 die 示範的介面檢查結果且未公布 die 數；不能替代導通、功能、可靠度、重複 lot 或成本。
+next_trigger: 具名產品公開介面檢查方法、受測母體、缺陷分布並和電性及可靠度逐件對上。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I15
+view: industry
+from_id: concept:hybrid-bonding
+to_id: metric:hybrid-bond-test-structure-electrical-yield
+relation: measured_by
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C11,MI-2026-08-02-HYBRID-BONDING-READINESS#C12
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2024-05-29
+review_due: 2026-08-19
+status: active
+boundary: imec 的 Kelvin、daisy-chain、單接點電阻、介電擊穿與 yield 各有指定試驗拓樸；沒有共同產品分母，不能跨 pitch、接法或產品排名。
+next_trigger: 公開 topology、chain／contact 數、門檻、樣本、wafer／lot 分布、可靠度及其和最終產品的對應。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I16
+view: industry
+from_id: concept:hybrid-bonding
+to_id: metric:hybrid-bond-final-product-yield
+relation: measured_by
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C14
+note_refs:
+evidence_state: unverified
+commercial_stage: application_opportunity
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-13
+review_due: 2026-08-19
+status: active
+boundary: 本輪沒有具名 AI、HBM 或 chiplet 產品公開完整投入、合格產出、重複 lot、可靠度、throughput、成本與供應商財務分母。
+next_trigger: 產品商、製造端與供應商對同一版本完成六欄品質護照、qualification 與財務期間雙向核對。
 -->
