@@ -205,6 +205,7 @@ component:facility-bess,component,設施級 BESS,Battery Energy Storage System,c
 capability:buffer-mission-trigger,capability,緩衝任務與觸發邊界,Power-buffer mission and trigger,concept:ai-power-buffering,區分正常尖峰 電源切換 停電 受控停機與設施負載事件並固定啟動及退出條件
 metric:buffer-power-waveform,metric,緩衝功率缺口與波形,Power gap waveform|load step and pulse,concept:ai-power-buffering,以缺口大小 上升斜率 脈衝時間 頻率與波形描述儲能必須補上或吸收的瞬時功率
 metric:buffer-usable-energy-duration,metric,可用能量與持續時間,Usable energy and duration|energy window,concept:ai-power-buffering,在電壓 SOC 損耗 老化與安全餘裕限制下核對指定功率能維持多久的尺度
+metric:buffer-nameplate-delivered-energy-bridge,metric,銘牌到可交付能量橋接,Nameplate-to-delivered-energy bridge|usable energy ledger,concept:ai-power-buffering,先把任務功率與時間換成理想能量 再依 SOC SOH 放電效率 功率限制 輔助負載 冗餘與安全餘裕核對實際可交付量
 metric:buffer-response-handoff,metric,緩衝反應與交接時間,Response and handoff time,concept:ai-power-buffering,從事件偵測到指定輸出並由前一層平順交給下一電源來源的時間契約
 metric:buffer-duty-recharge,metric,緩衝重複與回充節奏,Duty cycle and recharge time,concept:ai-power-buffering,固定事件重複頻率 放電後回充時間 可用率與再次武裝條件的尺度
 metric:buffer-efficiency-thermal,metric,緩衝損耗與熱包絡,Round-trip efficiency and thermal envelope,concept:ai-power-buffering,把儲能 轉換 控制 輔助負載損失與工作溫度冷卻條件一起核對的尺度

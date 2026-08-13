@@ -72,6 +72,14 @@ reason: added_power_energy_response_handoff_recharge_and_life_event_contract_wit
 evidence: sources:S2,S6,S7
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: converted_bbu_power_and_duration_into_conditional_delivered_energy_book_without_refreshing_thesis_clock
+evidence: sources:S2,S8
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -81,6 +89,7 @@ evidence: sources:S2,S6,S7
 - **DC（Direct Current，直流電）**：電流主要往固定方向流動。機架內的高壓直流匯流排，是 CBU 或 BBU 可能連接的電力節點。
 - **PSU（Power Supply Unit，電源供應單元）**：把輸入電力轉成設備需要的電壓與電流；其內建保持能量可先撐過極短交接縫隙。
 - **DOE（U.S. Department of Energy，美國能源部）**：本文引用其通用儲能定義與性能方法，用來拆解規格欄位，不代表 DOE 對 AI 機架架構背書。
+- **NREL（National Renewable Energy Laboratory，美國國家再生能源實驗室）**：本文引用其共同作者的 BESS 模型來拆量綱；grid-scale 模型不等於 AI rack BBU 設計或產品背書。
 - **BBU（Battery Backup Unit）**：以電池在機架或直流匯流排側提供短時 ride-through，目的通常是跨過電源切換或受控停機，不等於設施級儲能。
 - **BESS（Battery Energy Storage System）**：位於設施或公用電網介面側的較大型電池儲能，用來處理較慢、影響範圍更大的負載變化與發電機切換。
 - **時間尺度**：事件從發生到需要被補償的快慢。元件若在錯誤的時間尺度工作，即使都能儲能，也不代表可互相替代。
@@ -101,6 +110,10 @@ evidence: sources:S2,S6,S7
 - **功率容量（power capacity）**：儲能設備當下能以多快的速度輸出或吸收能量，通常以 W、kW 或 MW 表示；它回答「這一刻補得上多少差額」。
 - **能量容量（energy capacity）**：設備能儲存的能量總量，通常以 Wh、kWh 或 MWh 表示；它回答「在指定輸出下能撐多久」。
 - **可用能量（usable energy）**：扣除最低／最高電壓或荷電狀態、安全餘裕、轉換與輔助負載損失後，任務真正能取出的能量；不等於銘牌總容量。
+- **額定／銘牌能量（rated／nameplate energy）**：產品在指定條件下標示的總能量基準；它還沒有扣除任務保留的 SOC 窗口、老化、放電損失、輔助負載與安全餘裕。
+- **健康狀態（SOH）**：儲能目前最大容量相對於全新額定容量的比例；設備老化後，即使顯示相同 SOC，可交付的絕對能量也可能較少。
+- **C-rate**：電池充放電功率相對於能量容量的速率尺度；能量總量足夠，不代表模組能在指定時間內安全輸出所需功率。
+- **交付參考平面（delivery reference plane）**：指定在哪個電氣邊界量功率與能量，例如 BBU 輸出端、匯流排或 IT rack 輸入端；量測位置不同，是否包含轉換、線損、冷卻與控制負載也不同。
 - **反應時間（response time）**：從偵測事件到儲能輸出達到指定功率所需時間。只看能量夠不夠，仍可能因反應太慢而接不上。
 - **交接時間（handoff time）**：主電源、內建保持能量、CBU／BBU 與後續電源之間切換的時間窗口；前一層必須撐到下一層穩定接手。
 - **回充時間（recharge time）**：一次放電後恢復到可再次執行任務所需時間；事件來得比回充快，就可能出現「第一發有用、第二發沒電」。
@@ -262,6 +275,22 @@ limitation: 這是以定置型 ESS 估值與方法為主的政府技術報告，
 independence_group: us-doe
 -->
 
+<!-- research_source
+source_id: S8
+role: other_primary
+source_kind: document
+publisher: National Renewable Energy Laboratory
+title: Validating Performance Models for Hybrid Power Plant Control Assessment
+published_at: 2019-11-13
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://docs.nrel.gov/docs/fy20osti/75364.pdf
+locator: PDF pp.9–11，§2.4.1 Equations (7)–(13)；available discharge power 受 C-rate、SOC window、discharge efficiency 與 SOH 限制
+limitation: 這是為 grid-scale hybrid power plant control 建立並驗證的簡化 BESS 模型，不是 Diablo 400 rack BBU 設計；公式可用來檢查量綱與缺失欄位，不能把模型參數、電池化學、效率、溫度或壽命外推到 AI 機架
+independence_group: nrel-bess-performance-model
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -415,6 +444,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: Diablo 400 0.7.0 要求 BBU option 在 100% loading 支援 45 至 90 秒，Table 5 又把不同 AC input option 的 rack average DC load 分列為 480VAC 下 800kW 至 1.1MW、415VAC 下最高 1.1MW、400VAC 下最高 718kW
+supporting_source_ids: S2
+contrary_source_ids:
+as_of: 2026-03-01
+basis: S2 7.2.1.1 直接給出 full-load backup range，Table 5 直接給出各輸入配置的平均 DC load 能力
+boundary: 規格沒有指定哪個負載與秒數組合已被任何量產平台採用，也沒有給出 BBU 的 SOC、SOH、效率、輔助負載、冗餘、模組數、銘牌 kWh、供應商或價格
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: NREL 共同作者的 BESS performance model 把可放電功率寫成 SOC 可用窗口、最大能量容量、放電效率與時間的函數，另以 SOH 連接最大能量容量與全新額定容量，並以 C-rate 限制最大充放電功率
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2019-11-13
+basis: S8 §2.4.1 Equations (7)–(13) 分別固定 C-rate power limit、SOC window、discharge efficiency、SOH 與 requested output limit
+boundary: 只證實該簡化 grid BESS 模型的變數關係；不表示 rack BBU 遵循同一控制模型、參數、效率、溫度範圍或退化曲線
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: inference
+status: active
+claim: 若只把 Diablo 400 Table 5 的 800kW 或 1.1MW 當作固定滿載情境，45／90 秒對應的理想無損任務能量分別是 10／20kWh 與 13.75／27.5kWh；這些數字是負載端量綱核對，不是 BBU 銘牌容量、模組數或市場需求
+supporting_source_ids: S2,S8
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 依 E=P×t／3600 以 Python Decimal 與 awk 兩條獨立路徑重算四個條件式數值；S8 再說明實際可交付量還受 SOC、SOH、效率與 power limit 約束
+boundary: 800kW 與 1.1MW 是 S2 的規格配置值而非已部署負載；計算未加入波形、轉換與線損、輔助負載、溫度、老化、冗餘、安全餘裕或 qualification，因此不得反推 production BOM、採購金額或公司收入
+verification_needed: 需同一 production rack 公布選定輸入配置、交付參考平面、實際負載波形、要求秒數、SOC limits、end-of-life SOH、效率、輔助負載、冗餘、模組銘牌與 qualification pass／fail
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 三種儲能怎麼接力：先看事件持續多久
 
 | 事件持續多久 | 誰來處理 | 設備在哪裡 | 目前一手證據 | 還不能因此判定 |
@@ -459,6 +539,78 @@ reference plane、可用電壓／SOC 窗口、轉換與輔助損失、最差溫�
 這份流程也解釋為什麼「CBU 很快」不能自動推出「不需要 BBU」，以及「BESS 很大」不能推出
 「機櫃旁不必緩衝」：接力的每一棒都有自己的反應、位置、能量與控制責任。
 
+## 45–90 秒不是銘牌容量：把功率、任務能量與可交付能量拆成三本帳
+
+OCP Diablo 400 0.7.0 同時提供了兩種不同資訊：BBU option 要在 `100% loading` 支援 45 至
+90 秒；Table 5 則按 AC 輸入配置列出 rack average DC load 能力。兩者可以做條件式量綱核對，
+卻不能直接相乘成量產 BBU 的材料清單。第一步只算負載端需要的理想任務能量：
+
+```text
+E_mission = ∫ P_gap(t) dt
+定功率近似：E_mission(kWh) = P_gap(kW) × t(seconds) ÷ 3,600
+```
+
+| 條件式負載情境 | 備援秒數 | 理想無損任務能量 | 這個數字沒有包含什麼 |
+|---|---:|---:|---|
+| 800kW（480VAC option 表列範圍下緣） | 45 秒 | 10.00kWh | SOC 保留、老化、損耗、輔助負載、冗餘與安全餘裕 |
+| 800kW（同一條件式負載） | 90 秒 | 20.00kWh | 同上 |
+| 1.1MW（480／415VAC option 表列上緣） | 45 秒 | 13.75kWh | 同上 |
+| 1.1MW（同一條件式負載） | 90 秒 | 27.50kWh | 同上 |
+
+四個結果由 Python `Decimal` 與 `awk` 獨立重算一致。它們不是四個產品，也不是 OCP 公布的
+BBU kWh；800kW、1.1MW、45 秒與 90 秒只是從同一規格取出的條件式組合。若負載會降載、事件
+是波形而非平臺、或交付參考平面不同，應先重算積分，而不是沿用表格。
+
+第二本帳才問「儲存的能量有多少能送到指定位置」。把 NREL 的 grid BESS 簡化模型只當量綱
+檢查，可以寫成：
+
+```text
+E_deliverable ≈ (SOC_start − SOC_min) × E_rated × SOH × η_discharge
+因此在其他條件固定時：
+E_rated ≥ E_mission ÷ [(SOC_start − SOC_min) × SOH × η_discharge]
+```
+
+這不是 Diablo 的設計公式；它只暴露缺失分母。`E_rated` 是全新額定能量，SOH 把老化後最大
+容量連回額定容量，SOC window 保留不可動用區間，放電效率則處理電池與轉換損失。實際系統還要
+把控制、冷卻、遙測等輔助負載放進功率缺口，並驗證 C-rate、溫度與功率電子能否在整段時間交付。
+
+第三本帳是資格與商業帳，至少要把下列欄位綁到同一量產配置：
+
+| 帳本 | 最小共同鍵 | 沒有共同鍵時不能推什麼 |
+|---|---|---|
+| 任務帳 | platform／rack 版本、reference plane、負載波形、秒數、觸發與退出 | 不能由 rack headline power 推 BBU 能量 |
+| 可交付能量帳 | rated kWh、SOC start／min、EOL SOH、放電效率、輔助負載、最差溫度 | 不能由理想 kWh 推銘牌、電芯或模組數 |
+| 功率與安全帳 | continuous／peak power、C-rate、熱限、冗餘、故障隔離、pass／fail | 不能由能量夠推定瞬時功率與可靠度也合格 |
+| 商業帳 | supplier、production BOM、module count、ASP、出貨、驗收、收入、毛利與現金 | 不能由 OCP option 推台灣公司訂單或獲利 |
+
+### 多方小作文：可以寫到哪裡
+
+若量產機架真的選用較高滿載功率、90 秒 ride-through，且要求在 end-of-life、最差溫度與單一故障
+後仍能完成任務，所需額定能量、功率電子、遙測、保護、冷卻與冗餘可能高於只看理想 kWh 的估算。
+這使 BBU 模組、電源整合與功率元件成為值得追蹤的內容量路由；但還要看到具名 BOM、數量、價格與
+財務認列，才能寫成公司受惠。
+
+### 空方小作文：可以寫到哪裡
+
+BBU 在規格裡仍是 option；不同平台可以選較短秒數、較低實際負載、降載／受控停機，或把部分任務
+交給其他電源層。更高能量密度、較寬可用窗口、較少冗餘或共享架構也可能降低模組數。規格把上限
+做大不等於每一櫃都按最大組合採購，更不代表材料或公司收入線性跟著 MW 增加。
+
+### 多空共同裁決：同一張可交付能量護照
+
+雙方都應交出同一 production rack 的版本、交付參考平面、事件波形、100% load 定義、要求秒數、
+SOC window、EOL SOH、放電效率、輔助負載、C-rate／熱限、冗餘、模組銘牌與 qualification 結果；
+公司層再補 supplier、數量、ASP、驗收、收入、毛利與現金。少任一共同鍵，都只能保留架構方向，
+不能裁定哪個族群或公司拿到多少經濟價值。
+
+### 分母、誤差與限制
+
+本段是 `N=2` 條消息鏈的定向方法核對：一份 OCP 平台規格與一份 NREL 共同作者的 BESS 模型論文，
+不是 AI rack、BBU、供應商、台灣 121 檔或全市場樣本。10、20、13.75、27.5kWh 是指定功率與秒數
+的確定性單位換算，沒有 sampling SE／t；兩條獨立算術路徑只驗證算術一致。主要不確定性是結構性
+缺口——實際配置、波形、SOC、SOH、效率、輔助負載、溫度、冗餘與模組規格都未公開——因此實際
+銘牌容量與採購價值仍不可識別，也不宣稱價格、估值、共識或市場是否反映。
+
 ## 這篇和 800V 電力轉換文章各回答什麼
 
 800V 電力轉換文章回答「電力經過哪些轉換與保護環節，以及不同功率半導體各放在哪裡」；本文
@@ -469,6 +621,7 @@ reference plane、可用電壓／SOC 窗口、轉換與輔助損失、最差溫�
 
 - **目前可保留的結論**：機櫃旁的電容儲能、機櫃電池備援與設施級電池儲能是三個不同任務層；NVIDIA、OCP 與 TI 的公開文件已足以重建角色邊界。
 - **新增的閱讀方法**：先用七欄事件合約固定任務、功率波形、可用能量、交接、回充、損耗與壽命，再比較 CBU／BBU／BESS；這是方法框架，不是新的平台採用證據。
+- **新增的量綱教材**：Diablo 的功率與秒數只能先換成理想任務 kWh，再經 SOC、SOH、效率、功率限制、輔助負載與資格帳轉成可交付能量；本輪沒有刷新 C4 主命題、`last_reviewed_at`、`review_due` 或 base confidence。
 - **可信度為中而不是高**：三份一手來源相互補強，但架構仍在演進，且缺同一量產場域的完整設計與實際運轉資料。
 - **目前不能發布的結論**：被動元件用量倍增、指定台灣公司供貨、訂單、收入、毛利、受惠排名，以及市場是否已反映。
 - **需要看到什麼才能前進**：同一量產機櫃公布電容儲能與電池備援的客戶資格驗證、現場資料及量產材料清單，或買方和供應商雙向確認量產與財務分母。
@@ -482,6 +635,10 @@ reference plane、可用電壓／SOC 窗口、轉換與輔助損失、最差溫�
 - [公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
 - [美國能源部：Solar Energy and Storage Basics](https://www.energy.gov/cmei/systems/solar-integration-solar-energy-and-storage-basics)
 - [美國能源部：Energy Storage Valuation 方法報告](https://www.energy.gov/sites/default/files/2022-06/MSP_Report_2022June_Final_508_v3.pdf)
+- [NREL：BESS performance model 的 SOC／SOH／效率與功率限制](https://docs.nrel.gov/docs/fy20osti/75364.pdf)（PDF pp.9–11，2019-11-13）
+
+8 份來源是定向架構與方法證據，不是產業抽樣。OCP 與 NREL 新增的共同用途是把功率、秒數、
+理想任務能量與可交付能量分開；兩份文件不是同一量產平台，也沒有台灣供應商的 BOM 或財務分母。
 
 ## 族群影響
 

@@ -3,14 +3,15 @@
 本圖把 CBU、BBU 與 BESS 依時間尺度、系統位置及失效任務分層。公司節點只表示公開架構或
 reference design；族群節點仍是待驗證搜尋路由，沒有一條線代表台灣公司已取得量產訂單。
 新增的七欄事件合約把任務、功率波形、可用能量、反應交接、回充、損耗熱與壽命安全連回同一
-根節點，方便讀者看出「時間尺度」只是第一道篩選，不是完整替代性判準。
+根節點；銘牌到可交付能量橋接再把功率與秒數、SOC、SOH、效率、功率限制及資格帳分開，方便
+讀者看出「時間尺度」只是第一道篩選，不是完整替代性或公司受惠判準。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-power-buffering
 root_node_id: concept:ai-power-buffering
 label: AI 功率緩衝時間尺度
-summary: 以機架附近的 CBU、rack ride-through BBU 與設施級 BESS 拆解 AI 負載波動，再以七欄事件合約核對功率 能量 交接 回充 損耗與壽命，並把架構必要性與台灣供應商財務證據分開。
+summary: 以機架附近的 CBU、rack ride-through BBU 與設施級 BESS 拆解 AI 負載波動，再以七欄事件合約及銘牌到可交付能量橋接核對功率 能量 SOC SOH 交接 回充 損耗與壽命，並把架構必要性與台灣供應商財務證據分開。
 article_ids: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY
 status: active
 -->
@@ -353,4 +354,24 @@ review_due: 2026-09-01
 status: active
 boundary: DOE 分列 cycle 與 calendar life；本文再把安全隔離與維修納入事件合約，不能視為已完成 rack qualification。
 next_trigger: 同一 production module 公布 depth-of-discharge、SOC、溫度、cycle／calendar aging、fault containment、maintenance 與 field reliability。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I16
+view: industry
+from_id: concept:ai-power-buffering
+to_id: metric:buffer-nameplate-delivered-energy-bridge
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C10,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C11,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C12
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-01
+status: active
+boundary: OCP 的功率與秒數只支持條件式理想任務能量，NREL grid BESS 模型只提供 SOC／SOH／效率與 power-limit 方法；兩者不是同一 production rack，也不支持實際銘牌、模組數、供應商或財務歸因。
+next_trigger: 同一 production rack 公布 reference plane、負載波形、秒數、SOC limits、EOL SOH、效率、輔助負載、C-rate、熱限、冗餘、模組銘牌與 qualification pass／fail。
 -->

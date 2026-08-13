@@ -6569,6 +6569,68 @@ class ResearchCenterTest(unittest.TestCase):
             route["graphIds"],
         )
 
+    def test_power_buffering_separates_ideal_mission_energy_from_nameplate_and_delivery(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-03_ai_power_buffering_hierarchy.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 三種儲能怎麼接力：先看事件持續多久",
+            "## 「能撐多久」不是完整規格：先寫七欄事件合約",
+            "## 45–90 秒不是銘牌容量：把功率、任務能量與可交付能量拆成三本帳",
+            "## 這篇和 800V 電力轉換文章各回答什麼",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "reason: converted_bbu_power_and_duration_into_conditional_delivered_energy_book_without_refreshing_thesis_clock",
+            "source_id: S8",
+            "claim_id: C10",
+            "claim_id: C11",
+            "claim_id: C12",
+            "800kW（480VAC option 表列範圍下緣）",
+            "10.00kWh",
+            "20.00kWh",
+            "13.75kWh",
+            "27.50kWh",
+            "E_deliverable ≈ (SOC_start − SOC_min) × E_rated × SOH × η_discharge",
+            "Python `Decimal` 與 `awk` 獨立重算一致",
+            "### 多方小作文：可以寫到哪裡",
+            "### 空方小作文：可以寫到哪裡",
+            "### 多空共同裁決：同一張可交付能量護照",
+            "### 分母、誤差與限制",
+            "`N=2` 條消息鏈",
+            "本輪沒有刷新 C4 主命題、`last_reviewed_at`、`review_due` 或 base confidence",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 8),
+            ("research_claim", 12), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        glossary = topic[topic.index("### 名詞小字典"):topic.index("### 三句話抓重點")]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()),
+            38,
+        )
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "metric:buffer-nameplate-delivered-energy-bridge,metric,銘牌到可交付能量橋接",
+            concepts,
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_power_buffering.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("edge_id: KG-APB-I16", graph)
+        self.assertIn(
+            "to_id: metric:buffer-nameplate-delivered-energy-bridge", graph
+        )
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+
     def test_design_test_quality_route_uses_eight_denominators_before_financial_attribution(self):
         topic = (
             ROOT / "notes" / "research_topics"
