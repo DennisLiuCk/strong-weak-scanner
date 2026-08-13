@@ -5421,8 +5421,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 19),
-            ("research_claim", 22), ("metric_comparison", 2),
+            ("research_topic", 1), ("research_source", 24),
+            ("research_claim", 26), ("metric_comparison", 5),
             ("impact", 4), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

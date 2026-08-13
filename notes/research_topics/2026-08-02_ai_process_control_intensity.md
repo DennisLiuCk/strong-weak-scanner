@@ -81,6 +81,13 @@ to: triaged
 reason: camtek_named_orders_and_bounded_advanced_packaging_revenue_mix_plus_nova_category_record_superseded_broad_revenue_only_synthesis
 evidence: sources:S16,S17,S18,S19
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: taiwan_equipment_category_and_product_capability_mapped_without_refreshing_thesis_clock
+evidence: sources:S20,S21,S22,S23,S24
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -113,6 +120,7 @@ evidence: sources:S16,S17,S18,S19
 - **Dragonfly G5**：Onto Innovation 的檢查系統名稱；本文只引用公司揭露的資格節點，不把產品名稱等同 HBM 收入。
 - **Hawk／Eagle G5**：Camtek 的先進封裝檢查與量測平台；具名訂單或公司預期占比不等於已交付、已認列收入或客戶端良率實績。
 - **Sentronics**：Nova 的尺寸量測產品線；本文只引用公司對 advanced-packaging 銷售創高的陳述，不把產品線名稱當成已揭露的題材金額。
+- **AOI（自動光學檢查）**：用相機、光學與演算法自動尋找外觀或幾何異常；產品清單出現 AOI，只證明公司列示該能力，不代表已通過具名客戶量產驗證或已拆出收入。
 - **GAAP**：一般公認會計原則；本文的 `M1` 對齊兩家公司依 GAAP 報告的總營收，但會計口徑一致仍不會自動產生 AP 題材分子。
 - **Financial highlights**：公司結果公告的重點摘要；它可快速定位數字，仍要回到完整財務表、期間、定義與附註確認分子分母。
 - **OSAT／tier-1**：OSAT 是委外半導體封裝測試廠；`tier-1` 是 Camtek 對該客戶層級的匿名描述，不是客戶名稱或第三方排名。
@@ -131,12 +139,14 @@ evidence: sources:S16,S17,S18,S19
 - **營收認列（revenue recognition）**：公司在交付與會計條件成立後列入財報的收入；何時認列、認列多少，可能和接單日不同。
 - **題材分子／公司分母**：題材分子是可歸屬於先進封裝製程控制的收入或訂單，公司分母是同期間公司總收入或總訂單；兩者期間、範圍與會計狀態一致，比例才有意義。
 - **成長指數**：只說未來值相對基期增減多少，例如「Q4 比 Q1 高約 70%」；若沒有基期金額，它能表示方向，不能還原絕對收入。
+- **設備類別比重**：公司自訂的一大類設備收入占總收入比例；即使名稱含「半導體」或「製程」，仍可能混合點膠、搬運、接合、檢查與量測，不能直接當成製程控制題材分子。
+- **產品—商業護照**：把具名產品與任務、客戶階段、會計狀態、同期間分子與分母綁在同一筆證據；少一欄就停在較早的成熟度，不用相鄰名詞補空格。
 
 ### 三句話抓重點
 
 - 五家設備商的一手文件，分別說明需求方向、缺陷為何更昂貴、設備走到客戶驗證／未來交付的哪一步，以及不同寬度的訂單與收入訊號。
 - 真正要查的是：每一代產品的 control plan 是否改變抽樣覆蓋、靈敏度、偽警報、週期時間與圍堵動作，而不只是設備名稱變多。
-- Camtek 已提供較接近題材分子—公司分母的近似收入組合，但期間未標明；Nova 與 Onto 仍只到較寬類別新高，現有資料不能證明全產業設備預算占比上升或台灣公司訂單。
+- Camtek 已提供較接近題材分子—公司分母的近似收入組合，但期間未標明；弘塑、均華與萬潤則示範台廠的廣義設備收入、產品清單與研發計畫仍不能替代具名製程控制分子，現有資料也不能證明全產業設備預算占比上升。
 
 ### 為什麼重要
 
@@ -162,6 +172,7 @@ evidence: sources:S16,S17,S18,S19
 - 如果同一個標準樣品每次都量得很接近、卻全部偏離參考值，這套系統是精密、準確，還是兩者兼具？
 - 設備貼著校正標籤，是否就能證明今天這個產品、這個方法與這次結果都可追溯且適合拿來判定放行？
 - 若公司只說「先進封裝事業創新高」，卻沒有產品分子與公司分母，你能安全地推論到哪一層？
+- 若三家公司都公布「設備占營收九成上下」，但設備定義不同、也沒有檢查／量測分子，能否用百分比排出誰的製程控制曝險較高？
 
 ## 用一條回饋迴路理解製程控制
 
@@ -357,6 +368,41 @@ Onto 的較寬事業組合新高也不能與 Nova 的「record」互相比大小
 數值是精確值、近似值、下限還是預測。只有四道都一致，比例才可比較。本文的 `M1` 只把
 Camtek 與 Nova 同一曆季、同幣別的公司總營收列為「可直接比較」；它的用途是證明分母可以
 對齊，並反過來提醒讀者：沒有同定義的 AP 分子，兩家公司仍不能比較題材強度。
+
+## 台灣映射的三個同名陷阱：先進封裝、設備與製程控制不是同一個分子
+
+海外設備商出現 HBM 訂單後，最容易犯的錯不是算錯，而是把台灣公司的「先進封裝」、
+「半導體設備」或「檢測」三個相鄰名詞當成同一筆收入。弘塑、均華與萬潤的正式文件正好
+提供三個受控案例：都有已認列設備收入，也都能找到與先進封裝、檢查或量測相鄰的產品，
+但沒有一家在所引文件中把具名製程控制產品、客戶階段與同期間題材分子完整接起來。
+
+| 公司 | 已認列的廣義數字 | 產品／計畫層證據 | 目前停在哪一格 | 仍缺什麼 |
+|---|---|---|---|---|
+| 弘塑 | 2025 年機台設備產品收入 45.50881 億元，占公司收入 69.86% | 集團簡報把本業列為濕製程設備，另由集團成員代理 metrology／inspection；2.5D、3D、HBM、CPO 列為 application opportunities | 廣義機台收入＋應用機會＋集團代理能力 | 哪一項檢查／量測產品、哪個客戶階段、實際訂單或驗收收入及同期間分母 |
+| 均華 | 2025 年半導體製程設備及相關精密模具 25.26471 億元，占 93.90% | 年報列 Chip Sorter、Die Bonder、AOI；另把 CPO sorter、1 µm 固晶位移量測與高解析六面檢查列為 2026 開發計畫 | 廣義設備收入＋既有產品清單＋未來研發計畫 | 各機種收入、客戶 qualification、接單／交付／簽收與重複採購 |
+| 萬潤 | 2025 年半導體設備占收入 96.13% | 年報列錫球／六面外觀檢查與厚度量測；官網 CPO 平台描述主動對準、光學驗證與資料回饋 | 廣義設備收入＋公開產品能力 | 各工具收入、具名客戶採用、量產驗收、良率結果與產品毛利 |
+
+這張表刻意不把 69.86%、93.90% 與 96.13% 排名。本文的 `M2` 把它們登錄為
+`heterogeneous_evidence`：三筆都是 2025 年發行人自訂類別占比，卻分別量「機台設備產品」、
+「半導體製程設備及相關精密模具」與「半導體設備」。類別範圍不同，而且三個分子都大於
+製程控制；數字越高只能表示該發行人收入越集中於自己的廣義類別，不能表示檢查、量測或
+良率學習曝險越高。
+
+### 用四欄產品—商業護照停止過度映射
+
+1. **產品與任務**：先寫具名工具到底負責清洗、搬運、接合、AOI、尺寸量測、缺陷複判，
+   還是回饋控制；同一台整合設備也要拆出真正被研究的任務。
+2. **客戶階段**：把研發計畫、樣機、共同開發、qualification、首次訂單與重複採購分開；
+   「應用機會」與產品頁都不能自動跳到量產採用。
+3. **會計狀態**：把預算、訂單、交機、安裝、驗收、已認列收入與收款分開。台灣設備商
+   常受客戶簽收或驗收時點影響，產品已做出來仍不等於收入已成立。
+4. **同期間分子—分母**：最後才要求具名題材收入或訂單，對上同期間公司／部門總額；
+   廣義設備占比只能當搜尋入口，不能替缺少的製程控制分子補值。
+
+這一輪是三家指定台灣公司的五份既有一手文件定向核對，`N=3` 是教材案例母體，不是 121 檔
+universe、台灣設備業或製程控制供應商的抽樣，因此沒有 sampling SE／t，也不能由「尚未拆分」
+推論公司沒有相關收入。它只量到一個可重現的閱讀結論：產品名、收入類別與商業成熟度必須
+逐欄對齊，否則相鄰題材不能升格成受惠或排名。
 
 ## 主張與證據帳本
 
@@ -665,6 +711,86 @@ url: https://www.sec.gov/Archives/edgar/data/1109345/000117891326003892/zk263587
 locator: 2026Q2 Form 6-K 附件的 highlights、GAAP Results (K) 與 Management Comments；列出 254,958 千美元營收、Advanced Packaging solutions record revenue，以及 Sentronics dimensional metrology solutions for advanced packaging 為創高產品線之一
 limitation: 公司只提供總營收與類別／產品線創高方向，沒有 advanced-packaging 金額、占比、HBM／2.5D 分解、客戶、工具數、毛利或可與其他公司 record 口徑比較的基準
 independence_group: nova
+-->
+
+<!-- research_source
+source_id: S20
+role: company_release
+source_kind: document
+publisher: 弘塑科技股份有限公司
+title: Honsu Group 2026Q2 Business Update
+published_at: 2026-05-26
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://mopsov.twse.com.tw/nas/STR/313120260526M001.pdf
+locator: PDF pp.5–6、13；Group Member 分列 wet-process equipment 與代理 metrology／inspection，Demand vs. Capacity 及 Process Application Opp. 把 2.5D、3D、HBM、CPO 列為需求增量或應用機會
+limitation: 這是公司簡報的集團角色、無單位需求／產能指數與應用機會；沒有具名客戶、產品訂單、交付台數、檢查／量測收入、良率或工具毛利，也不能把集團代理能力全歸到弘塑本體
+independence_group: honsu
+-->
+
+<!-- research_source
+source_id: S21
+role: company_filing
+source_kind: document
+publisher: 弘塑科技股份有限公司
+title: 弘塑科技 2025 年度年報
+published_at: 2026-06-17
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?co_id=3131&colorchg=1&filename=2025_3131_20260617F04.pdf&kind=F&step=9
+locator: PDF pp.49、59；主要產品營業比重列機台設備產品 4,550,881 千元／69.86%，客戶說明另把匿名 F 收入增加歸因 CoWoS 市場需求擴張
+limitation: 機台設備產品是含清洗、顯影、蝕刻、去光阻與化學供應等的廣義類別，不是製程控制分子；年報的軟體／設備代理兩列金額與查核財報對調，F 客戶占比也和金額不符，因此本文只使用經既有獨立複核確認的機台設備金額與 69.86%，不採錯欄或替匿名 F 實名化
+independence_group: honsu
+-->
+
+<!-- research_source
+source_id: S22
+role: company_filing
+source_kind: document
+publisher: 均華精密工業股份有限公司
+title: 均華 2025 年度年報
+published_at: 2026-05-19
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.gmmcorp.com.tw/upload-files/investor-zone/shareholder-area/2026/20260519-annual-report-cn.pdf
+locator: PDF pp.5–7、61–62、70；列半導體製程設備及相關精密模具 2,526,471 千元／93.90%、Chip Sorter／Die Bonder／AOI 產品，以及 CPO sorter、1 µm 固晶位移量測與高解析六面檢查等 2026 開發計畫
+limitation: 93.90% 是包含多種製程設備與精密模具的廣義發行人類別；既有產品與計畫開發清單沒有各機種收入、客戶 qualification、訂單、交付、簽收、良率或毛利，2026 開發計畫也不是已完成產品或已認列收入
+independence_group: gallant-micro-machining
+-->
+
+<!-- research_source
+source_id: S23
+role: company_filing
+source_kind: document
+publisher: 萬潤科技股份有限公司
+title: 萬潤科技 2025 年度年報
+published_at: 2026-06-26
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?co_id=6187&colorchg=1&filename=2025_6187_20260626F04.pdf&kind=F&step=9
+locator: PDF pp.62–63、68–69；主要產品營業比重列半導體設備 96.13%，產品表列錫球檢查、六面外觀檢查與厚度量測，研發表列影像辨識、量測及光通／AI 封裝設備方向
+limitation: 96.13% 是同時涵蓋點膠、送收料、耦合、貼合、植球、檢查、量測與自動化的廣義類別；產品與研發表沒有各工具收入、具名客戶、qualification、訂單、驗收、良率或毛利
+independence_group: all-ring-tech
+-->
+
+<!-- research_source
+source_id: S24
+role: company_release
+source_kind: living_index
+publisher: 萬潤科技股份有限公司
+title: 高精度光學耦合技術，驅動新一代光電整合應用
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.allring-tech.com.tw/product-detail20.htm
+locator: 2026-08-14 現行產品頁；高精度主動耦光、精密點膠與固化補償、即時光學驗證與製程閉環控制、整合式光耦合流程小節
+limitation: 這是發行人現行產品行銷頁，能證明公開描述的功能與整合流程，不能證明具名客戶採用、qualification、量產稼動、良率改善、售價、收入、毛利或頁面功能均已由客戶獨立驗證
+independence_group: all-ring-tech
 -->
 
 <!-- research_claim
@@ -1041,13 +1167,83 @@ corrected_by_claim_id:
 resolution: 保留 C9 的工程—資格—量產陳述—較寬收入階梯，新增 Camtek 的具名 Hawk 訂單與近似 AP／公司收入占比，以及 Nova 的獨立產品線銷售訊號；同時維持期間與題材分子尚未對齊的限制
 -->
 
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: 弘塑 2025 年報列機台設備產品收入 4,550,881 千元、占公司收入 69.86%；集團簡報另把濕製程設備、代理 metrology／inspection 與 2.5D／3D／HBM／CPO 應用機會分開呈現
+supporting_source_ids: S20,S21
+contrary_source_ids:
+as_of: 2026-06-17
+basis: S21 的主要產品營業比重提供已認列廣義機台金額與占比，S20 的 Group Member 及 Process Application Opp. 提供集團產品角色與應用機會；兩份文件未把代理檢查／量測收入併入具名製程控制分子
+boundary: 69.86% 含廣義濕製程與化學供應等機台；應用機會、集團代理能力與匿名客戶說明都不能替代具名檢查／量測產品、客戶階段、訂單、驗收收入、良率或毛利，也不得替匿名 F 客戶實名化
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: 均華 2025 年報列半導體製程設備及相關精密模具收入 2,526,471 千元、占公司收入 93.90%，並分開列示既有 Chip Sorter／Die Bonder／AOI 與 2026 年 CPO sorter、1 µm 固晶位移量測、高解析六面檢查等開發計畫
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-05-19
+basis: S22 的營業比重、商品項目及計畫開發新商品表直接提供廣義收入類別、既有產品與未來研發清單
+boundary: 93.90% 沒有拆到任一 AOI／量測工具；產品清單不證明客戶 qualification 或量產採用，開發計畫也不是訂單、交付、簽收、收入、良率或毛利
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: 萬潤 2025 年報列半導體設備占公司收入 96.13%，並列出錫球／六面外觀檢查與厚度量測產品；現行 CPO 產品頁另描述主動對準、即時光學驗證與製程資料回饋能力
+supporting_source_ids: S23,S24
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S23 的主要產品比重與商品表提供廣義設備占比及具名檢查／量測工具，S24 的產品頁提供光耦合平台公開功能描述
+boundary: 96.13% 同時包含多種點膠、搬運、接合、檢查、量測與自動化設備；產品表與行銷頁不證明各工具收入、客戶 qualification、訂單、驗收、量產稼動、良率改善或毛利
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C26
+label: inference
+status: active
+claim: 弘塑、均華與萬潤的正式揭露共同示範：廣義先進封裝／半導體設備收入、具名檢查量測產品與研發計畫是三種不同證據，只有把產品任務、客戶階段、會計狀態及同期間題材分子—公司分母對齊，才能判定製程控制的商業材料性
+supporting_source_ids: S20,S21,S22,S23,S24
+contrary_source_ids:
+as_of: 2026-08-14
+basis: C23～C25 分別建立三家公司廣義收入類別、產品／應用與研發成熟度；M2 又保存三個發行人類別定義不同、不可排名的可比性裁決
+boundary: 這是 N=3 指定案例的一手文件教材，不是 121 檔、台灣設備業或全產業抽樣；沒有 sampling SE／t，也不能由未拆分題材分子推論三家公司沒有相關收入、訂單或技術能力
+verification_needed: 任一公司以同一期間把具名檢查／量測／良率學習產品、客戶 qualification 或量產階段、actual／order／forecast 狀態及公司／部門分母完整接起；跨公司比較另須統一定義
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
 先提供 2.5D logic／HBM 客戶資格節點，再新增較寬事業組合的收入訊號；Camtek 把具名 Hawk
 訂單、交付年度、公司總營收與近似 AP 收入組合分開，Nova 則補上另一條具名量測產品線的
 銷售訊號。SEMI 議程把控制問題落到 TSV、填孔、沉積、翹曲、RDL、切割與相鄰的 CPO
-整合。這些資料讓工程與供應商商業成熟度比單一廠商說法更完整。NIST、Applied 與 KLA 的方法／產品文件又把 control plan
+整合。弘塑、均華與萬潤則把台灣映射落到廣義設備收入、產品清單與研發計畫三個不同層級，
+並顯示其中任何一層都不能單獨替代製程控制題材分子。這些資料讓工程與供應商商業成熟度比
+單一廠商說法更完整。NIST、Applied 與 KLA 的方法／產品文件又把 control plan
 拆成動態抽樣、靈敏度、覆蓋、偽警報、結果時間與不同製程任務；NIST／SEMATECH 的量測
 章節再補上 bias、repeatability、reproducibility、stability、uncertainty 與 traceability 的前置
 契約。本題也不同於 ATE tester TAM：它研究製程中的量測、
@@ -1069,6 +1265,7 @@ KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量�
 | 較寬收入組合 | Camtek 簡報把約 55% HPC／AI 與 20% non-AI AP 合計標為約 75% 公司收入 | 期間未標，不能乘上單季公司營收或拆成 HBM-only 金額 |
 | 較寬收入訊號 | Onto 稱 Specialty Devices and Advanced Packaging 收入創高，支撐含 2.5D／HBM | 類別金額、題材分子、特定工具收入或全產業支出 |
 | 具名產品線銷售訊號 | Nova 稱 Sentronics advanced-packaging dimensional-metrology solutions 是創高產品線之一 | 產品線金額／占比、HBM 分解、工具數或跨公司 record 排名 |
+| 台灣廣義設備收入＋產品能力 | 弘塑、均華、萬潤各自揭露廣義設備比重，並列相鄰的檢查／量測產品、代理能力或研發計畫 | 同定義製程控制分子、具名客戶階段、實際訂單／驗收收入或跨公司排名 |
 
 ## 跨公司數字與可比性
 
@@ -1076,6 +1273,10 @@ KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量�
 與 Nova 都是截至 2026 年 6 月 30 日的三個月、GAAP 公司總營收，幣別與單位也相同。這只
 能比較公司總營收數值，不能比較 advanced-packaging 強度；Camtek 的近似 75% 未標期間，
 Nova 與 Onto 沒有 AP 金額，因此不建立跨公司的 AP 占比、訂單、工具數、市占或排名。
+
+`M2` 則刻意保存相反的裁決：弘塑、均華與萬潤雖然都公布 2025 年百分比，但三個 metric
+是發行人自訂的不同廣義設備類別，不能可靠正規化為同一製程控制曝險。它們只是一組
+異質證據籃子，不提供高低、差距或投資排序。
 
 <!-- metric_comparison
 comparison_id: M1
@@ -1117,6 +1318,66 @@ comparability: directly_comparable
 comparability_reason: 兩筆都是同一曆季、同幣別與同單位的發行人 GAAP 公司總營收；只比較公司分母，不比較 AP 收入、訂單、產品組合、毛利或投資價值
 -->
 
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O1
+claim_id: C26
+entity: 弘塑
+metric: issuer-defined machine equipment product revenue share
+reported_value: 69.86
+value_kind: point
+period_start: 2025-01-01
+period_end: 2025-12-31
+period_basis: fiscal_year
+unit: percent
+definition_key: honsu_machine_equipment_product_revenue_share
+definition: 弘塑 2025 年機台設備產品收入 4,550,881 千元占公司客戶合約收入 6,514,495 千元的發行人產品類別比重；類別含廣義濕製程與化學供應設備，不是製程控制題材分子
+evidence_ids: S21
+comparability: not_comparable
+comparability_reason: 弘塑量的是自訂機台設備產品類別，與均華的半導體製程設備及精密模具、萬潤的半導體設備範圍不同；三者都未拆出同定義檢查／量測收入，只能作異質證據籃子，不能排名
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O2
+claim_id: C26
+entity: 均華
+metric: issuer-defined semiconductor process equipment and precision mold revenue share
+reported_value: 93.90
+value_kind: point
+period_start: 2025-01-01
+period_end: 2025-12-31
+period_basis: fiscal_year
+unit: percent
+definition_key: gmm_semiconductor_process_equipment_and_precision_mold_revenue_share
+definition: 均華 2025 年半導體製程設備及相關精密模具收入 2,526,471 千元占公司收入 2,690,692 千元的發行人類別比重；沒有拆 Chip Sorter、Die Bonder、AOI 或量測工具
+evidence_ids: S22
+comparability: not_comparable
+comparability_reason: 均華分子把製程設備與精密模具合併，與弘塑及萬潤的發行人分類不同；既有工具與研發計畫也不能補成同定義題材收入，只能作異質證據籃子，不能排名
+-->
+
+<!-- metric_comparison
+comparison_id: M2
+comparison_kind: heterogeneous_evidence
+observation_id: M2-O3
+claim_id: C26
+entity: 萬潤
+metric: issuer-defined semiconductor equipment revenue share
+reported_value: 96.13
+value_kind: point
+period_start: 2025-01-01
+period_end: 2025-12-31
+period_basis: fiscal_year
+unit: percent
+definition_key: allring_semiconductor_equipment_revenue_share
+definition: 萬潤 2025 年半導體設備占公司收入的發行人類別比重；類別同時包含點膠、搬運、耦合、貼合、植球、檢查、量測與自動化，不是製程控制題材分子
+evidence_ids: S23
+comparability: not_comparable
+comparability_reason: 萬潤的半導體設備範圍大於檢查／量測，且不等於弘塑或均華的分類；產品頁功能不能正規化出財務分子，只能作異質證據籃子，不能排名
+-->
+
 ## 來源與證據邊界
 
 - [S1：KLA FY26Q4 結果](https://ir.kla.com/news-events/press-releases/detail/518/kla-corporation-reports-fiscal-2026-fourth-quarter-and-full)。
@@ -1133,12 +1394,18 @@ comparability_reason: 兩筆都是同一曆季、同幣別與同單位的發行�
 - [S17：Camtek 2026Q2 結果](https://www.camtek.com/news-and-events/camtek-announces-results-for-the-second-quarter-of-2026/)（公司總營收、跨期接單下限與 AP 成長預期須分開）。
 - [S18：Camtek 2026 年 8 月投資人簡報](https://cdn.camtek.com/wp-content/uploads/IR-Presentation_Aug26.pdf)（近似 AP 收入組合未標期間，全年新產品占比仍是預期）。
 - [S19：Nova 2026Q2 6-K 附件](https://www.sec.gov/Archives/edgar/data/1109345/000117891326003892/zk2635873.htm)（AP／Sentronics 銷售創高但無題材金額）。
+- [S20：弘塑 2026Q2 Business Update](https://mopsov.twse.com.tw/nas/STR/313120260526M001.pdf)（集團角色與 AP 應用機會，不是訂單或題材收入）。
+- [S21：弘塑 2025 年報](https://doc.twse.com.tw/server-java/t57sb01?co_id=3131&colorchg=1&filename=2025_3131_20260617F04.pdf&kind=F&step=9)（廣義機台設備占比；錯欄與匿名客戶限制保留）。
+- [S22：均華 2025 年報](https://www.gmmcorp.com.tw/upload-files/investor-zone/shareholder-area/2026/20260519-annual-report-cn.pdf)（廣義設備／模具收入、既有產品與研發計畫須分開）。
+- [S23：萬潤 2025 年報](https://doc.twse.com.tw/server-java/t57sb01?co_id=6187&colorchg=1&filename=2025_6187_20260626F04.pdf&kind=F&step=9)（廣義半導體設備占比與產品清單，不含工具分子）。
+- [S24：萬潤 CPO 光耦合產品頁](https://www.allring-tech.com.tw/product-detail20.htm)（發行人功能描述，不是客戶採用或財務證明）。
 - 後續入口：[KLA](https://ir.kla.com/financial-information/financial-results)、[Applied](https://ir.appliedmaterials.com/news-releases/)、[Onto](https://investors.ontoinnovation.com/news/default.aspx)、[MOPS](https://mops.twse.com.tw/mops/web/index)。
 - 中立方法入口：[NIST CHIPS Metrology Program](https://www.nist.gov/chips/research-development-programs/metrology-program)。
 
-五家設備商彼此獨立但都有商業動機，其中 Camtek 三份文件只算一條公司消息鏈；SEMI 議程保存多位講者摘要，也不能替代完整簡報、
-客戶端或全產業資本支出證據。本輪沒有一致預期、估值、即時持倉或台灣公司客戶資料，
-因此不談市場是否反映或個股方向。
+海外五家設備商與台灣三家公司彼此獨立但都有商業動機，其中同一公司的多份文件仍只算
+一條公司消息鏈；SEMI 議程保存多位講者摘要，也不能替代完整簡報、客戶端或全產業資本
+支出證據。台灣三家公司是依既有獨立複核筆記選出的定向教材，不是全 universe 抽樣；本輪
+也沒有一致預期、估值、即時持倉或具名客戶雙向資料，因此不談市場是否反映或個股方向。
 
 ## 反方與替代路徑
 
@@ -1148,6 +1415,8 @@ comparability_reason: 兩筆都是同一曆季、同幣別與同單位的發行�
 - **訂單不等於營收**：Camtek 的具名訂單預計 2027 交付，可能受交期、驗收與會計認列影響；不能拿它除以 2026Q2 公司營收製造跨期 book-to-bill。
 - **占比集合重疊**：Camtek 的 AP、HPC／AI 與 Eagle G5／Hawk 不是互斥分類，且近似 AP 圖未標期間；不能相加或套用到單季分母。
 - **公司分母不等於題材分子**：Nova 公司總營收可以和 Camtek 的公司總營收對齊，卻不能在 Nova 未拆 AP 金額時用來比較 AP 強度。
+- **廣義設備比重不等於製程控制曝險**：弘塑、均華、萬潤的發行人類別定義不同，且都大於檢查／量測任務；69.86%、93.90%、96.13% 不能拿來排名。
+- **產品頁與研發計畫不等於客戶採用**：具名 AOI、量測或閉環功能能建立搜尋入口，仍需 qualification、訂單、驗收與收入逐關接續。
 - **替代解法**：設計規則、抽樣或既有光學工具升級，可能降低新增工具需求。
 - **價值沒有外溢**：支出即使增加，也可能集中於海外平台；台灣族群不必然受惠。
 
@@ -1360,6 +1629,7 @@ invalidation: 公司明確否認相關產品／客戶曝險、退出該市場，
 - Onto 能否把較寬事業組合新高拆到 HBM／2.5D、具名工具、客戶數、重複採購或收入分子；「record」沒有金額仍不和 Nova 排名。
 - 客戶或中立研究能否在同一產品／layer 公開 control plan 六欄與結果；若只有速度、解析度或 AI 分類功能，C14 仍只是閱讀框架。
 - 同一產品／layer 能否先公開量測系統六欄，再把結果接到 control-plan 決策與良率、重工、報廢或週期時間；只有校正標籤或工具規格，C17 不升級。
+- 弘塑能否把集團代理檢查／量測能力拆成具名產品收入；均華能否把 AOI／1 µm 量測計畫接到 qualification、簽收與機種收入；萬潤能否把檢查／量測或 CPO 閉環功能接到具名客戶、量產驗收與同期間分母。
 - 台灣公司若沒有產品、客戶階段與財務貢獻，C6 不升級，`stock_ids` 留空。
 
 到期時若沒有被 active thesis claim 引用的新證據，只在 append-only scan log 記錄重查結果，

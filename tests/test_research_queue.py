@@ -1951,6 +1951,36 @@ class ReadabilityGateTest(unittest.TestCase):
         self.assertIn("reported_value: 254.958", text)
         self.assertNotIn("Camtek AP revenue 99.9", text)
 
+    def test_ai_process_control_article_separates_taiwan_product_capability_from_topic_revenue(self):
+        path = Path(
+            rq.TOPICS_DIR
+        ) / "2026-08-02_ai_process_control_intensity.md"
+        text = path.read_text(encoding="utf-8")
+        for token in (
+            "## 台灣映射的三個同名陷阱：先進封裝、設備與製程控制不是同一個分子",
+            "用四欄產品—商業護照停止過度映射",
+            "`M2` 把它們登錄為\n`heterogeneous_evidence`",
+            "不能表示檢查、量測或\n良率學習曝險越高",
+            "`N=3` 是教材案例母體",
+            "source_id: S20",
+            "source_id: S21",
+            "source_id: S22",
+            "source_id: S23",
+            "source_id: S24",
+            "claim_id: C23",
+            "claim_id: C24",
+            "claim_id: C25",
+            "claim_id: C26",
+            "reported_value: 69.86",
+            "reported_value: 93.90",
+            "reported_value: 96.13",
+        ):
+            self.assertIn(token, text)
+        self.assertEqual(text.count("comparison_id: M2"), 3)
+        self.assertEqual(text.count("comparison_kind: heterogeneous_evidence"), 3)
+        self.assertGreaterEqual(text.count("comparability: not_comparable"), 3)
+        self.assertNotIn("製程控制曝險排名", text)
+
     def test_ai_capacitor_article_starts_from_position_and_task(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_capacitor_role_map.md"
         text = path.read_text(encoding="utf-8")
