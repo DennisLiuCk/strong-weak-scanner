@@ -294,3 +294,43 @@ status: active
 boundary: 3.2T CPO 與 ELSFP IA 只固定指定互通邊界，ELSFP 明確排除應用特定 power／noise／wavelength；本輪沒有完整跨廠矩陣、field replacement、可靠度、客戶部署或財務鏈。
 next_trigger: 同一具名產品與版本完成 IA conformity、應用 link budget、跨廠互通、現場更換、長期可靠度與客戶部署分母。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-I12
+view: industry
+from_id: concept:cpo-networking
+to_id: process:cpo-reliability-exposure-passport
+relation: measured_by
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C11,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C13
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: Broadcom／Meta 公布 100 萬 400G-equivalent port-device-hours 與零 link flap，但沒有埠數、各埠時長、共享群組、完整事件、raw log 或比較組；護照是研究中心查核框架，不是兩家公司共同標準。
+next_trigger: 同一產品版本公開受測單元、暴露／設限、環境工作量、完整 failure taxonomy、共同故障、事件日誌及同條件 comparison cohort。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-I13
+view: industry
+from_id: concept:cpo-networking
+to_id: metric:zero-event-reliability-bound
+relation: measured_by
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C12,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C13
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: NIST／SEMATECH 公式只在 HPP／exponential、固定總暴露與相應獨立性等條件下給單側界線；333,808 port-device-hours 是條件式教材，不是 Broadcom／Meta 公布 MTBF、field lifetime 或保固。
+next_trigger: 取得 Meta 完整研究與 raw exposure／event structure 後，先檢查 constant-rate、independence、censoring 與 failure-definition 假設，再決定是否估計及採哪個模型。
+-->

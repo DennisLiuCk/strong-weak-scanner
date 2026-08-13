@@ -471,3 +471,5 @@ capability:large-eut-emc-test-site,capability,大型被測設備 EMC 場地,Larg
 process:emc-test-report-passport,process,EMC 測試報告九欄護照,EMC test report passport|EMC comparability contract,concept:ai-rack-emc-certification,把被測版本負載纜線方法場地儀器結果認可範圍與變更責任綁成逐份報告可查核的可比性契約
 metric:emc-compliance-margin,metric,EMC 合規測試裕量,EMC compliance margin|emission margin,concept:ai-rack-emc-certification,在指定方法偵測器與頻寬下量測排放結果距離限制值的空間且必須連同不確定度與判定規則解讀
 capability:emc-accreditation-scope-check,capability,EMC 認可範圍核對,EMC accreditation scope check|accredited activity boundary,concept:ai-rack-emc-certification,逐項核對實驗室地點產品類別方法測試與未認可資料標示而不把認可標誌改寫成產品背書
+process:cpo-reliability-exposure-passport,process,CPO 可靠度暴露護照,CPO reliability exposure passport|port-device-hour reliability contract,concept:cpo-networking,把受測版本 暴露結構 環境工作量 事件定義 共同故障 比較組與設限綁在同一份可重算可靠度紀錄
+metric:zero-event-reliability-bound,metric,零事件可靠度單側界線,Zero-event reliability one-sided bound|zero-failure MTBF lower bound,process:cpo-reliability-exposure-passport,在明示失效定義 固定失效率 獨立性與總暴露假設下以零事件資料報 MTBF 下限或失效率上限而不是零風險

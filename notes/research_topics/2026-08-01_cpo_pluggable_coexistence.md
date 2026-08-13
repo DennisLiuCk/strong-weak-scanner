@@ -198,6 +198,38 @@ limitation: 活頁列的是 current project scope；linear、retimed、transmit-
 independence_group: oif
 -->
 
+<!-- research_source
+source_id: S12
+role: company_release
+source_kind: document
+publisher: Broadcom Inc.
+title: Broadcom Showcases Industry-Leading Quality and Reliability of Co-Packaged Optics
+published_at: 2025-10-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://investors.broadcom.com/node/63616/pdf
+locator: 1 頁官方新聞稿；標題與正文的 one million cumulative 400G equivalent port device hours／without a single link flap、Meta high-temperature lab characterization、65% optics-power comparison，以及 footnote 指向 Meta ECOC 2025 技術評估
+limitation: 這是 Broadcom 發布、引用 Meta 會議研究的單頁摘要，不含底層埠數、各埠觀察時間、交換器／光引擎／ELS 數、拓撲、軟硬體版本、link-flap 定義、其他故障、比較組樣本、功耗量測邊界或供應商財務；累計 port-device-hours 也不證明觀測彼此獨立
+independence_group: broadcom-meta-cpo
+-->
+
+<!-- research_source
+source_id: S13
+role: other_primary
+source_kind: living_index
+publisher: National Institute of Standards and Technology / SEMATECH
+title: e-Handbook of Statistical Methods — Constant repair rate (HPP/exponential) model
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm
+locator: §8.4.5.1 的 zero-fails case；在 HPP／exponential、固定總測試時間等條件下，零失效只有單側 MTBF 下限，公式 MTBF_lower=T/(-ln alpha)，其他情境為近似；另參 §8.1.7.1 對獨立同分布 interarrival times 與 constant rate 的 HPP 假設
+limitation: 這是通用可靠度統計方法，不是 CPO、光引擎、link flap 或 Meta 測試的模型適配認證；若埠時數相關、失效率隨時間變化、故障定義漏項、觀測期間或單元異質，公式不能無條件套用
+independence_group: nist
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -342,6 +374,48 @@ verification_needed: 公開同一產品與版本的 optical-engine placement、s
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: Broadcom 2025-10-01 官方新聞稿表示，Broadcom CPO 在 Meta 高溫實驗室 characterization 累積 100 萬個 400G-equivalent port-device-hours，期間沒有 single link flap；同稿另稱相較可插拔方案 optics power 降低 65%，但沒有公開底層分母、比較組與方法全文
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2025-10-01
+basis: S12 標題與正文直接列 cumulative port-device-hours、零 link flap、測試環境與 65% headline；同一頁 footnote 把數據來源指向 Meta ECOC 2025 技術評估
+boundary: 這只逐字保存發行人公布的特定 observation 與比較 headline；不等於零故障率、全類型無失效、現場 production deployment、所有 CPO 組態、獨立埠時數、完整 lifetime、跨架構因果比較或任何台灣供應商財務貢獻
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: NIST／SEMATECH 可靠度手冊指出，零失效觀測在 HPP／exponential 模型下只有單側 MTBF 下限；若總 unit test time 為 T、單側顯著水準為 alpha，則 MTBF_lower=T/(-ln alpha)，而模型要求固定失效率及相應獨立同分布失效間隔，其他資料情境的界線可能只是近似
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 §8.4.5.1 直接給 zero-fails 公式、單側下限與適用邊界，§8.1.7.1 另列 HPP 的 constant-rate 及 independent／identically distributed interarrival-time 假設
+boundary: 這是方法主張，不替 S12 判定 port-device-hours 是否獨立、link flap 是否涵蓋所有故障、測試是否 fixed-time／repairable、失效率是否常數，也不證明 CPO 相對可插拔的可靠度或成本
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 若僅作條件式量綱檢查，把 Broadcom 公布的 100 萬 port-device-hours 視為 HPP 可加總總暴露 T、link flap 為唯一且完整的失效、失效率固定且觀測可依模型處理，零事件在單側 95% 下只能支持 MTBF 下限約 333,808 port-device-hours，等價失效率上限約每 port-device-hour 2.996×10^-6；這不是 Broadcom 或 Meta 公布值，也不是產品保固
+supporting_source_ids: S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 依 S13 的 MTBF_lower=T/(-ln alpha)，代入 S12 headline T=1,000,000、alpha=0.05；Python Decimal 與 awk 兩條獨立路徑均重算為 333,808.2007 與 2.995732×10^-6
+boundary: port-device-hours 可能共享交換器、光源、環境、軟體與共同故障，新聞稿也沒有每埠時長、censoring、failure taxonomy 或 raw event log；因此數字只示範零事件不能寫成零失效率，不用來跨產品排名、推估 field MTBF、年故障率、備品、營收或估值
+verification_needed: Meta ECOC 2025 完整論文／資料附錄，含設備與埠數、各自時長、拓撲、版本、環境、failure／flap／UCW 定義、censoring、共同故障、所有事件與 comparison cohort
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -428,6 +502,13 @@ to: triaged
 reason: corrected_binary_optics_frame_with_engine_signal_and_laser_axes
 evidence: sources:S3,S4,S8,S9,S10,S11
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: zero_link_flap_exposure_reframed_as_model_conditional_reliability_bound_without_thesis_clock_refresh
+evidence: sources:S12,S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -471,6 +552,13 @@ evidence: sources:S3,S4,S8,S9,S10,S11
 - **產品組合**：同一世代同時提供哪些形式、型號與速度；支援兩種形式不代表兩者出貨比例相同。
 - **可維修性**：設備故障後能否快速定位、拆換與恢復服務；能拔換通常較直接，共同封裝則要看平台的實際維修設計。
 - **故障範圍**：單一元件故障時會影響一個模組、一個連接埠、整個交換器或更大區域的範圍。
+- **Port-device-hour（埠裝置小時）**：一個連接埠裝置運作一小時形成一個暴露單位；100 個埠各跑 10 小時和 1 個埠跑 1,000 小時都能加成 1,000，但共同交換器、光源、環境與軟體會讓暴露不一定獨立。
+- **Link flap（連線短暫中斷）**：連線狀態短暫掉落再恢復的事件；它是可靠度事件的一類，不等於所有位元錯誤、不可校正碼字、硬體失效、效能退化或維修事件的全集。
+- **右設限（right censoring）**：觀察在產品尚未失效時結束，只知道它至少活到該時點；零失效資料資訊有限，不等於後續永遠不會失效。
+- **HPP（齊次卜瓦松過程）**：把修復型系統事件視為固定失效率、失效間隔獨立同分布的模型；模型可用來做條件式界線，不是資料天然具有的事實。
+- **MTBF（平均故障間隔）**：在指定失效定義與模型下，修復型系統兩次故障間的平均運作時間；沒有失效時不能用「總時數 ÷ 0」得到無限大，只能報有假設的單側下限。
+- **UCW（不可校正碼字）**：forward error correction 已無法修正的資料碼字；沒有 UCW 和沒有 link flap 是不同事件定義，兩者都不能單獨代表所有網路故障。
+- **ECOC（歐洲光通訊會議）**：European Conference on Optical Communication 的縮寫；本文新聞稿把 100 萬埠裝置小時的技術來源指向該會議研究，但新聞稿本身不是完整論文或資料附錄。
 - **生命週期成本**：從購買、耗電、維修、備品、停機到升級的總成本；不能只用單一元件價格比較。
 - **客戶驗收**：營運者依功能、可靠度、維修與系統條件確認產品是否可正式使用。
 - **部署分母**：判斷需求規模的共同基準，例如交換器數、連接埠數、光連線數與兩種形式的使用比例。
@@ -505,6 +593,7 @@ evidence: sources:S3,S4,S8,S9,S10,S11
 
 - 先追平台端是否公布具名產品的光引擎位置、訊號處理方式與雷射位置，而不是只給 CPO、NPO、LPO 或 pluggable 標籤。
 - 再追同一組態的 link budget、跨供應商互通、故障率、現場更換時間、交換器數與連接埠數，並由平台端和供應商端對上同一版本、期間、驗收與出貨。
+- 看到「零 flap」時，先追埠數、每埠時長、交換器／光源共享結構、失效分類、事件日誌、設限與比較組，再決定能否套可靠度模型。
 - 最後追日月光投控是否拆出矽品相關產能、收入、毛利與現金流；其他台灣公司沒有具名文件前，維持研究候選。
 
 ### 想一想
@@ -512,6 +601,7 @@ evidence: sources:S3,S4,S8,S9,S10,S11
 - 如果 CPO 光引擎使用可插拔外部雷射，光源壞掉和光引擎壞掉的更換範圍會一樣嗎？
 - 兩個產品都叫 CPO，但一個完整重定時、另一個走線性介面，它們的功耗與訊號驗收責任能直接比較嗎？
 - IA 已經發布，但廠商沒有公開同一應用的 link budget、互通矩陣與現場結果時，技術信心應該升到哪一層就停？
+- 100 萬 port-device-hours 沒有 link flap，為什麼仍不能寫成「失效率為零」或「MTBF 無限大」？
 
 ## 先用五個位置看資料怎麼從電變成光
 
@@ -556,6 +646,75 @@ OIF 的 current-work 頁把 pluggable、NPO、CPO 與 retimed、transmit-retimed
 OIF framework 支持的是表中的工程方向，不是統計比較。沒有同一產品、條件與樣本的失效次數、
 測試時間和信賴區間，就不能宣稱外部或整合雷射「較可靠」；能說的只有它們把故障、散熱、損耗
 與控制責任放在不同位置。
+
+## 「100 萬小時零 flap」不是零失效率：先拆暴露、事件與模型
+
+Broadcom 的 2025 年 10 月官方新聞稿引用 Meta 的 ECOC 2025 評估，公布 Broadcom CPO 在 Meta
+高溫實驗室 characterization 累積 **100 萬個 400G-equivalent port-device-hours**，期間沒有
+single link flap；同稿另稱相較可插拔方案 optics power 降低 65%。這是比「產品已進入生產」
+更靠近客戶端的可靠度觀測，但仍不是一份可以直接寫成 field failure rate 或 lifetime 的完整資料集。
+
+### 第一步：先問 100 萬究竟由什麼組成
+
+`port-device-hours = 各埠被觀察時間的加總`。若是 100 個埠各 10,000 小時，和 10,000 個埠各
+100 小時，總暴露都等於 100 萬；前者較能看長時間老化，後者較能看單元分散，兩者回答的問題
+不同。若多個埠共用同一台交換器、光引擎、外部雷射、韌體、電源或高溫環境，一次共同原因也可能
+同時影響多個埠，所以「加總暴露」不自動等於「100 萬次獨立觀測」。
+
+| 可靠度護照欄位 | 新聞稿直接給什麼 | 還缺什麼 | 少了會怎麼誤讀 |
+|---|---|---|---|
+| 受測單元與版本 | Broadcom CPO、400G-equivalent port | 交換器、光引擎、雷射、連接器、韌體與軟體版本 | 把不同硬體或版本混成一個產品 lifetime |
+| 暴露結構 | 累計 100 萬 port-device-hours | 埠數、各埠時長、同時運作比例、日曆期間與右設限 | 把很多短觀察當成少數長壽命，或反過來 |
+| 環境與工作量 | Meta 高溫實驗室 characterization | 溫度分布、流量、拓撲、重啟、故障注入與 duty cycle | 把實驗室壓力觀察改寫成現場全年運轉 |
+| 事件定義 | 沒有 single link flap | flap 門檻、UCW／BER、降速、告警、硬體更換與其他 failure taxonomy | 把「沒有這一類事件」寫成「沒有任何故障」 |
+| 依賴與共同故障 | 未揭露 | 共享交換器、光源、電源、散熱、管理與維修群組 | 把相關埠時數當成獨立樣本而高估資訊量 |
+| 比較組 | 同稿稱 optics power 較 pluggable 低 65% | 可插拔型號、埠數、流量、溫度、邊界、重複試驗與可靠度事件 | 把功耗 headline 變成可靠度因果比較 |
+
+### 第二步：零次事件只能做有條件的單側界線
+
+NIST／SEMATECH 手冊提醒，可靠度資料常遇到設限與缺少失效：產品愈可靠，愈難取得足夠失效來
+估計整條分布。若先做一個**明示假設的量綱檢查**——把 100 萬 port-device-hours 當成 HPP 可加總
+總暴露 `T`，把 link flap 當成唯一且完整的失效，並假設固定失效率、模型所需的獨立性與觀察
+設計皆成立——零事件時的單側 MTBF 下限為：
+
+```text
+MTBF_lower = T / (-ln α)
+單側 95%：α = 0.05，T = 1,000,000 port-device-hours
+MTBF_lower ≈ 333,808 port-device-hours
+等價失效率上限 ≈ 2.996 × 10^-6 / port-device-hour
+```
+
+Python `Decimal` 與 `awk` 兩條獨立路徑都得到相同結果。它不是 Broadcom 或 Meta 公布的 MTBF，
+也不是保固承諾；它只示範即使暫時接受強假設，正確寫法仍是「下限／上限」，不是 `0 failures ÷
+1,000,000 hours = 0 risk` 或 `1,000,000 ÷ 0 = infinite MTBF`。若共同故障、事件漏記、失效率隨
+老化改變或每埠暴露異質，這個 HPP 情境甚至不能直接當成產品估計。
+
+### 第三步：把工程結果接回多空共同裁決
+
+**多方小作文可以寫到哪裡：** CPO 已出現客戶高溫實驗室的長累計 link-flap-free 暴露，顯示
+可靠度驗證不再只停在標準與元件頁。若後續公開同版本的 field 埠數、共同故障結構、完整事件
+分類、維修資料與同條件可插拔比較，且可靠度、功耗與恢復時間共同改善，CPO 的營運風險折價可
+下降；再配上量產部署與供應商分子，才可能推向商業價值。
+
+**空方小作文可以寫到哪裡：** 新聞稿只有一個供應商—客戶鏈、單一事件類型與累計暴露，沒有
+raw log、比較組分母、field mix 或全部故障。若埠時數高度共享同一環境，或其他錯誤、重啟、
+更換與效能退化未納入 flap，headline 可能高估可泛化可靠度；即使光學功耗較低，也可能由封裝、
+備品、維修、良率與 vendor lock-in 成本抵銷。
+
+| 共同裁決欄位 | 多方要看到 | 空方要看到 | 本輪狀態 |
+|---|---|---|---|
+| 暴露與獨立性 | 多台、多版本、多站點仍一致，並交代共享群組 | 暴露集中於少數系統或共同原因主導 | 只有累計 port-device-hours |
+| 完整事件集合 | flap、UCW／BER、降速、重啟、更換與維修皆可重算 | headline 事件不涵蓋材料性故障或服務中斷 | 只公開 link flap |
+| 同條件比較 | CPO／pluggable 固定流量、環境、版本與量測邊界 | 65% 由不同型號、流量或功耗邊界解釋 | 比較組分母未揭露 |
+| 營運與財務 | field availability、MTTR、備品、每埠 TCO 與供應商 actual revenue | 封裝／維修／良率成本抵銷功耗或可靠度利益 | 尚無共同財務鍵 |
+
+### 分母、誤差與限制
+
+本節有 `N=2` 條消息鏈：Broadcom／Meta 是一條平台—客戶測試鏈，NIST／SEMATECH 是一條中立
+方法鏈；不是 CPO 廠商、交換器、埠、站點或台灣公司的抽樣。100 萬與零 flap 是發行人公布值，
+不是 repo 從 raw log 重建；333,808 與 `2.996×10^-6` 是在明示 HPP 假設下的條件式單側界線，
+不報一般 sampling SE／t，也不建立 CPO／pluggable performance comparison。65% 只保留原稿
+headline，不納入比較帳本，因型號、功耗邊界、樣本與重複試驗缺失。
 
 ## 再用五把尺比較三種光引擎位置
 
@@ -648,13 +807,17 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 - [OIF：3.2T Co-Packaged Module IA 01.0，2023-03-29](https://www.oiforum.com/wp-content/uploads/OIF-Co-Packaging-3.2T-Module-01.0.pdf)（p. 16：外部光源與 optical loss tolerance）。
 - [OIF：ELSFP IA 02.0，2025-01-08](https://www.oiforum.com/wp-content/uploads/OIF-ELSFP-02.0.pdf)（pp. 3、9、52：field replacement、blindmate 與規格排除項）。
 - [OIF：Current Work，2026-08-12 capture](https://www.oiforum.com/technical-work/current-work/)（pluggable／NPO／CPO、retimed／transmit-retimed／linear 與 AI scale-up photonic interface 工作範圍）。
+- [Broadcom：Meta 測試的 100 萬個 400G-equivalent port-device-hours／零 link flap，2025-10-01](https://investors.broadcom.com/node/63616/pdf)（1 頁官方新聞稿與 ECOC 研究註腳；不是 raw event log 或 field lifetime study）。
+- [NIST／SEMATECH：HPP／exponential zero-fails confidence bound](https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm)（通用可靠度方法與條件，不是 CPO 模型適配認證）。
 
 **已知：** OIF 文件證實光引擎位置、訊號處理與雷射位置必須分開閱讀，且 IA 只覆蓋指定互通
 邊界；NVIDIA 將具名共同封裝產品描述為進入生產並直接列名 SPIL，Spectrum-6 與 Marvell 的
-資料也證明可插拔路徑仍在同代產品與量產生態中。
+資料也證明可插拔路徑仍在同代產品與量產生態中。Broadcom／Meta 另新增一筆客戶高溫實驗室的
+累計 100 萬 port-device-hours／零 link-flap 觀測，但正確統計解讀仍需模型與底層分母。
 
 **還不知道：** 具名產品完整三軸組態、NPO／ELS 實際部署、應用 link budget、跨廠互通、
-field replacement 與長期可靠度結果、各組態出貨配比、每埠成本、台灣供應商收入與毛利，
+field replacement 與完整長期可靠度結果、各埠暴露／共同故障／事件日誌、同條件比較組、
+各組態出貨配比、每埠成本、台灣供應商收入與毛利，
 以及 6147、6451 是否參與上述具名平台。
 
 **不可外推：** NVIDIA、Marvell 與 Lumentum 的效能、角色或成本敘述仍有各自的發行人邊界；
@@ -679,6 +842,7 @@ evidence_boundary: OIF framework／IA、平台 production 與生態系列名都�
 
 - **組態層**：具名產品是否同時公布 optical-engine placement、signal-processing mode 與 laser placement；只有一個 CPO／NPO／LPO 標籤就不算填滿。
 - **互通層**：3.2T CPO module、ELSFP 與應用 link budget 是否由多家產品在同一版本與條件下完成互通、故障注入、field replacement 與長期可靠度。
+- **可靠度層**：Meta ECOC 2025 完整論文或資料附錄能否補上 100 萬 port-device-hours 的埠數、各埠時長、共同故障群組、版本、所有事件與比較組；只有零 link-flap headline 不能估 field lifetime。
 - **平台層**：首批雲端採用者是否公布各三軸組態的交換器數、部署位置、可靠度、修復時間或節能實際值；若只停在 IA、展示或少量部署，量產解讀不升級。
 - **公司層**：3711 是否拆出光電共同封裝的收入／毛利；6147、6451 是否由送樣或小量生產轉為正式量產收入。沒有公司文件，就不把平台證據寫進正式筆記事實。
 - **經濟層**：新增封裝與測試內容量是否高於所需資本支出、良率爬坡與維修成本；若收入增加但毛利、現金流未改善，受惠只停在營收表面。

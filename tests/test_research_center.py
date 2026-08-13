@@ -4740,6 +4740,19 @@ class ResearchCenterTest(unittest.TestCase):
             "| 5. 互通、客戶驗收與部署分母出現 |",
             "| 6. 供應商出貨、份額與價格可辨識 |",
             "| 7. 收入、毛利與現金流留下來 |",
+            "## 「100 萬小時零 flap」不是零失效率：先拆暴露、事件與模型",
+            "### 第一步：先問 100 萬究竟由什麼組成",
+            "| 可靠度護照欄位 | 新聞稿直接給什麼 | 還缺什麼 | 少了會怎麼誤讀 |",
+            "### 第二步：零次事件只能做有條件的單側界線",
+            "MTBF_lower = T / (-ln α)",
+            "MTBF_lower ≈ 333,808 port-device-hours",
+            "等價失效率上限 ≈ 2.996 × 10^-6 / port-device-hour",
+            "### 第三步：把工程結果接回多空共同裁決",
+            "**多方小作文可以寫到哪裡：**",
+            "**空方小作文可以寫到哪裡：**",
+            "本節有 `N=2` 條消息鏈",
+            "source_id: S12", "source_id: S13",
+            "claim_id: C11", "claim_id: C12", "claim_id: C13",
             "claim_id: C9", "correction_kind: supersedes",
             "corrects_claim_id: C2", "monitor_id: T3",
         ):
@@ -4748,7 +4761,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 43
+            sum(line.startswith("- **") for line in glossary.splitlines()), 50
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4763,8 +4776,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 11),
-            ("research_claim", 10), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 13), ("metric_comparison", 0),
             ("impact", 1), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -4796,6 +4809,8 @@ class ResearchCenterTest(unittest.TestCase):
             "component:external-laser-source,component,外部雷射光源（ELS）",
             "metric:optical-loss-budget,metric,光學損耗預算",
             "stage:optics-multivendor-field-validation,stage,光學多供應商與現場驗證",
+            "process:cpo-reliability-exposure-passport,process,CPO 可靠度暴露護照",
+            "metric:zero-event-reliability-bound,metric,零事件可靠度單側界線",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 光學三軸組態與產品證據", graph)
@@ -4806,8 +4821,11 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-CPO-I09", "to_id: component:external-laser-source",
             "edge_id: KG-CPO-I10", "to_id: metric:optical-loss-budget",
             "edge_id: KG-CPO-I11", "to_id: stage:optics-multivendor-field-validation",
+            "edge_id: KG-CPO-I12", "to_id: process:cpo-reliability-exposure-passport",
+            "edge_id: KG-CPO-I13", "to_id: metric:zero-event-reliability-bound",
         ):
             self.assertIn(edge, graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 16)
 
     def test_compute_connect_station_five_separates_exposure_cost_roles_and_company_gates(self):
         topic = (
