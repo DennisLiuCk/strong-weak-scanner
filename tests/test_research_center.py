@@ -6516,6 +6516,7 @@ class ResearchCenterTest(unittest.TestCase):
             "## 為什麼測試時間增加，設備台數仍可能不線性增加",
             "## 五組數字不能直接排高低",
             "## 產業角色不要混在一起",
+            "## 同一個 test cell，會開出三種不同的發票",
             "## 新手最常混淆的八件事",
             "## 在研究中心接著怎麼學",
         )
@@ -6532,8 +6533,11 @@ class ResearchCenterTest(unittest.TestCase):
             "monitor_id: T4",
             "monitor_id: T5",
             "reason: added_test_responsibility_passport_and_change_triggered_regression_without_thesis_upgrade",
+            "reason: separated_test_service_interface_product_and_equipment_revenue_clocks_without_company_beneficiary_upgrade",
             "claim_id: C8",
             "claim_id: C9",
+            "claim_id: C10",
+            "claim_id: C11",
             "| 1. 產品組合與數量 |",
             "| 8. 公司財務歸因 |",
             "| 1. 設計驗證與可測試性設計 |",
@@ -6545,11 +6549,15 @@ class ResearchCenterTest(unittest.TestCase):
             "reported_value: 720",
             "observation_id: M2-O2",
             "reported_value: 15..50",
+            "observation_id: M3-O1",
+            "observation_id: M3-O2",
+            "observation_id: M3-O3",
+            "comparability: not_comparable",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 15),
-            ("research_claim", 9), ("metric_comparison", 5),
+            ("research_topic", 1), ("research_source", 18),
+            ("research_claim", 11), ("metric_comparison", 8),
             ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

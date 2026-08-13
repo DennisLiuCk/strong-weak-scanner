@@ -7,7 +7,7 @@ status: triaged
 priority: p1
 captured_at: 2026-08-01
 source_published_at: 2026-07-29
-last_reviewed_at: 2026-08-12
+last_reviewed_at: 2026-08-14
 review_due: 2026-08-15
 source_type: mixed
 publisher: Advantest
@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C6
 base_confidence: medium
-confidence_basis: 新增 IEEE 測試存取標準與兩家設備商產品資料後，可把需求拆成八個分母；但設備商頁面仍是供應商自述，沒有同產品測試時間、利用率、增量機台與台灣公司財務歸因
+confidence_basis: IEEE、設備商與三家台灣公司正式資料已能把需求拆成八個分母，並分辨測試服務、介面產品及設備收入時鐘；但仍沒有同產品測試時間、利用率、增量機台與台灣公司專案財務歸因
 cross_company_numbers: true
 schema_migrated_at: 2026-08-02
 -->
@@ -77,6 +77,13 @@ to: triaged
 reason: added_test_responsibility_passport_and_change_triggered_regression_without_thesis_upgrade
 evidence: sources:S12,S13,S14,S15
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: separated_test_service_interface_product_and_equipment_revenue_clocks_without_company_beneficiary_upgrade
+evidence: sources:S16,S17,S18
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -103,6 +110,7 @@ evidence: sources:S12,S13,S14,S15
 - **退貨分析（RMA）**：產品在客戶或現場失效後，沿序號、批次與既有測試結果回查、重現並分析根因的流程；單一退貨不等於全體失效率。
 - **已知良品晶粒（known-good die）**：在投入昂貴多晶粒封裝前，已按約定範圍完成篩選的晶粒；「已知良品」仍受測試覆蓋和條件限制。
 - **年化營收規模**：把目前一季或當下速度換算成一年的概略規模，不等於已完成的全年會計收入。
+- **營收時鐘**：同一波測試需求在服務商、介面商與設備商分別跨過可計費機時、產品交付、設備驗收等事件後，才可能進入收入；三者不是同一個時間點。
 - **Trainium**：Amazon（AWS）自行設計的 AI 晶片系列。它是雲端業者自研晶片的代表之一，與外購 GPU 是不同採購路徑。
 - **Maia**：Microsoft 自行設計的 AI 加速晶片系列，角色與 Trainium 類似。
 - **DRAM**：主流的動態隨機存取記憶體。本文提到它，是因為記憶體測試需求也構成測試機市場的一部分，與推論晶片需求要分開看。
@@ -113,7 +121,7 @@ evidence: sources:S12,S13,S14,S15
 
 - Advantest 上修 2026 年 tester TAM，並把推論 ASIC、CPU 與 DRAM 的產量及複雜度列為原因之一。
 - 多晶粒產品與更長測項可能增加測試內容，但多站並行、既有設備升級與程式／載板重用也可能減少新增測試單元；兩邊必須放在同一張表。
-- 公開資料尚不能把全球市場預估拆成實際機台數，更沒有證明任一台灣設計、封測或測試介面公司取得新增訂單與獲利。
+- 三份台灣公司正式資料顯示，同一測試鏈會開出測試服務、介面產品與設備三種不同發票；它們仍沒有證明具名 AI 專案的新增訂單與獲利。
 
 ### 為什麼重要
 
@@ -371,6 +379,54 @@ limitation: 這是 NXP 的通用產品資格方法，不是 AI 加速器或特�
 independence_group: nxp-quality
 -->
 
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: document
+publisher: 京元電子
+title: 2026 年第一季營運報告
+published_at: 2026-05-08
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.kyec.com.tw/Common/Download?faname=CE9C12F9789DF09DB07AD813BD5475688BEAD13771DE3682E1557C949D18AADCBC1CA2FE6409102AE04ABAA1E80DB9551E6AE8CB84DA42B60CA4CFCBFBE8C3C1975FCB01637C8125A0F6E112F17D377B7B9D286F3E2741BDAAEFB35D0B5248527223686E9D7CE1A7
+locator: pp.3–9 的製程收入、營運現金流、公司定義自由現金流與資本支出
+limitation: 這是 Q1 而非 Q2 文件；製程與資料處理分類沒有 AI 專案、測試時間、稼動率、客戶、單價或毛利分子，且公司定義自由現金流不是營運現金流減資本支出
+independence_group: kyec-2026q1-operating-report
+-->
+
+<!-- research_source
+source_id: S17
+role: company_release
+source_kind: document
+publisher: 中華精測
+title: 2026 年第二季營運報告
+published_at: 2026-07-29
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.cht-pt.com.tw/files/file_pool/1/0Q209650487702138855/26Q2%20%E6%B3%95%E8%AA%AA%E6%9C%83_CN.pdf
+locator: pp.3、11–19 的產品收入結構、季度損益、營運現金流、資本支出與自由現金流公式
+limitation: 這是公司法說簡報而非含完整附註的 Q2 會計師核閱財報；產品分類沒有數量、平均售價、客戶、具名產品、插入點、test-cell 利用率或產品別毛利
+independence_group: chpt-2026q2-operating-report
+-->
+
+<!-- research_source
+source_id: S18
+role: company_release
+source_kind: document
+publisher: 旺矽
+title: 2026 First Quarter Results
+published_at: 2026-05-15
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.mpi-corporation.com/wp-content/uploads/2026/05/2026-Q1-Quarter-Result_0515%E5%AF%8C%E9%82%A6_2-page_EN.pdf
+locator: 第 1–3 頁的探針卡、設備與其他收入占比，以及合併營收與損益摘要
+limitation: 這是四頁 Q1 摘要且不是 Q2 文件；沒有兩條產品線各自金額、毛利、訂單、出貨量、平均售價、客戶、稼動率、資本支出或現金流
+independence_group: mpi-2026q1-results
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -501,10 +557,38 @@ verification_needed:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: 本輪可定位的三家台灣公司正式營運資料使用不同收入分母：京元電子 2026Q1 按產品／成品測試、晶圓測試及預燒等服務製程分類，中華精測 2026Q2 按晶圓測試卡、IC 測試板及技術服務與其他分類，旺矽 2026Q1 則同時列探針卡、設備及其他
+supporting_source_ids: S16,S17,S18
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S16 第 5 頁、S17 第 11 頁與 S18 第 1–2 頁直接列示各自季度收入分類；三份原檔已固定 SHA-256，並以全文擷取及引用頁影像交叉核對
+boundary: 三家公司、兩個季度與三套分類只證明收入角色不同，不能比較占比高低、推估市場份額、AI 收入、產品毛利、tester 台數、測試機時或任何公司題材受惠
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: inference
+status: active
+claim: 將 AI 測試需求連到台灣公司財務時，至少要分開建立測試服務的可計費 test-cell 時數、介面產品的合格組態與交付／維修量、設備產品的交機／驗收與升級量三張單位經濟卡；兼營多條產品線的公司還要先拆線，不能把 tester TAM、服務時數與介面銷售額放入同一分母
+supporting_source_ids: S8,S10,S11,S13,S16,S17,S18
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8、S10、S11、S13 界定 test cell、設備、介面與測試服務角色；S16–S18 又以公司實際揭露顯示服務、介面及設備收入分類不同，本文據此建立三卡轉換框架
+boundary: 三卡是研究中心的量綱與證據契約，不是會計準則、產業固定報價公式、收入認列政策、需求預測、估值模型或公司排序；各卡仍缺具名產品的數量、價格、利用率、毛利與現金回收
+verification_needed:
+resolution:
+-->
+
 ## 先把 tester TAM 拆成八個分母
 
 「市場規模上修」是研究起點，不是設備台數答案。以下八層要使用同一產品、同一期間和同一測試
-參考平面才可能相乘；現有 15 份來源只覆蓋部分欄位，空白處不能用產業故事補上。
+參考平面才可能相乘；現有 18 份來源只覆蓋部分欄位，空白處不能用產業故事補上。
 
 | 分母 | 先問什麼 | 現有公開證據 | 還缺什麼才可換算 |
 |---|---|---|---|
@@ -754,6 +838,90 @@ comparability_reason: 這是沒有公開共同基準、產品、程式與客戶�
 | 探針台、分類機、溫控與自動化 | 搬運、定位、接觸、控溫並維持單元可用率 | 追同一測試單元配置與瓶頸，不只看 tester | 任一設備規格不能代表整個 test cell 的吞吐 |
 | 封裝測試服務商 | 執行晶圓針測、成品測試、系統級測試或燒機並承擔良率與交期 | `packtest` 族群追測項、插入點、產能、稼動率、報價與毛利 | 有封測能力不等於已取得特定 AI 專案 |
 
+## 同一個 test cell，會開出三種不同的發票
+
+一個 test cell 在工程上可能同時包含 tester、prober／handler、探針卡／測試板／測試座、溫控與
+自動化；商業上卻不會由一家公司只開一張總發票。三份台灣公司正式資料把差異顯示得很清楚：
+測試服務商按製程呈現收入，介面商按產品呈現收入，兼營探針卡與設備的公司又同時帶著兩個時鐘。
+
+| 證據個案（不是同儕排名） | 正式資料直接揭露什麼 | 研究上要追哪個收入與成本時鐘 | 這份資料仍不能回答什麼 |
+|---|---|---|---|
+| 京元電子：測試服務 | 2026Q1 製程收入為產品／成品測試 58.9%、晶圓測試 32.1%、預燒 7.3%、封裝 1.4%、其他 0.3%；同季營運現金流 37.42 億元、資本支出 67.86 億元，公司自定義自由現金流為負 21.49 億元 | 先重建可計費 test-cell 時數、費率、利用率、折舊、人力、電力與良率；設備先買而需求或認證延後時，現金與折舊可能早於收入 | 「資料處理」或「產品測試」有多少來自 AI、哪個專案用了多少秒、多少站、何種設備、稼動率、單價與產品毛利 |
+| 中華精測：介面產品 | 2026Q2 收入 16.40 億元；晶圓測試卡占 76%、IC 測試板 18%、技術服務與其他 6%；公司定義自由現金流為營運現金流 2.57 億元減資本支出 0.89 億元，得到 1.68 億元 | 先追合格組態數、交付量、平均售價、探針／板／零件自製、良率、維修與更換週期；客戶 tester 忙碌不等於介面商同季等比例認列收入 | 具名晶片、插入點、介面數量與 ASP、客戶、產品別毛利、測試機時；這份法說也不是含完整附註的 Q2 核閱財報 |
+| 旺矽：介面與設備混合 | 2026Q1 合併營收 39.33 億元，探針卡占 71.1%、設備 26.9%、其他 2.0% | 探針卡要走資格、交付、維修與汰換時鐘；設備要另走訂單、製造、交機、安裝、驗收、升級與服務時鐘，先拆線才能談組合 | 兩條產品線各自金額、訂單、數量、ASP、毛利、現金流與客戶，也不能把 26.9% 設備全部視為 ATE tester |
+
+### 先做三張單位經濟卡，再談誰受惠
+
+1. **測試服務卡：** `可計費 test-cell 時數 ≈ 合格測試量 × 實際插入點 × 每站秒數 × 重測係數 ÷（同時站數 × 並行效率）`。再加上計價方式、利用率、停機、折舊、人力與電力，才可能連到服務收入和毛利；公司若按顆、按秒、按專案或混合計價，還要另留契約欄。
+2. **介面產品卡：** `介面收入 ≈ 合格組態的交付量 × 平均售價 + 維修／更換／服務`。針數、功率、間距與散熱可提高難度，卻仍要通過客戶資格、量產良率、交期與壽命；tester 多跑一小時不會自動多賣一張探針卡。
+3. **設備產品卡：** `設備收入 ≈ 新機與升級交付量 × 各自平均售價`。訂單、出貨、安裝、驗收、收入與收款可能在不同季度；已裝機平台也可能用升級及重用吸收新工作，所以 tester TAM 不能直接當設備收入。
+
+兩家公司都寫「自由現金流」，公式卻已不同：中華精測明列營運現金流減資本支出，京元電子則從
+營業利益、折舊攤銷、利息、稅、非控制權益與股利等項目建構公司口徑。負 21.49 億元與正 1.68
+億元因此不能直接排序，更不能拿來推論哪種商業模式較好。三份文件是為辨認角色而定向選取的
+`N=3` 個案，不是台灣測試產業的統計樣本，沒有抽樣標準誤或 t 值。比較帳本 `M3` 因此把三筆
+占比明確裁為 `not_comparable`；它保存公司原始口徑，不建立跨公司排名。
+
+<!-- metric_comparison
+comparison_id: M3
+comparison_kind: heterogeneous_evidence
+observation_id: M3-O1
+claim_id: C10
+entity: 京元電子
+metric: product and final test revenue share
+value_kind: point
+reported_value: 58.9
+period_start: 2026-01-01
+period_end: 2026-03-31
+period_basis: company_reported_2026Q1_process_revenue_mix
+unit: percent_of_company_revenue
+definition_key: kyec_product_final_test_share_of_company_revenue
+definition: 京元電子 2026Q1 營運報告的產品／成品測試製程收入占合併營收比例
+evidence_ids: S16
+comparability: not_comparable
+comparability_reason: 這是測試服務商的製程收入占比，不是介面產品占比、設備占比、AI 收入、test-cell 時數或市場份額
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+comparison_kind: heterogeneous_evidence
+observation_id: M3-O2
+claim_id: C10
+entity: 中華精測
+metric: wafer test card revenue share
+value_kind: point
+reported_value: 76
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: company_reported_2026Q2_product_revenue_mix
+unit: percent_of_company_revenue
+definition_key: chpt_wafer_test_card_share_of_company_revenue
+definition: 中華精測 2026Q2 營運報告的晶圓測試卡收入占合併營收比例
+evidence_ids: S17
+comparability: not_comparable
+comparability_reason: 這是介面產品收入占比且期間為 Q2，不是測試服務製程、設備收入、測試機時或市場份額
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+comparison_kind: heterogeneous_evidence
+observation_id: M3-O3
+claim_id: C10
+entity: 旺矽
+metric: probe card revenue share
+value_kind: point
+reported_value: 71.1
+period_start: 2026-01-01
+period_end: 2026-03-31
+period_basis: company_reported_2026Q1_product_revenue_mix
+unit: percent_of_company_revenue
+definition_key: mpi_probe_card_share_of_company_revenue
+definition: 旺矽 2026Q1 業績摘要的探針卡收入占合併營收比例
+evidence_ids: S18
+comparability: not_comparable
+comparability_reason: 旺矽同時包含探針卡與設備兩條產品線；該占比不是測試服務、純介面同儕比較、AI 收入或市場份額
+-->
+
 ## 新手最常混淆的八件事
 
 1. **市場規模不等於公司收入。** tester TAM 是全球工具市場估計，台灣設計、封測與介面公司的商業模式和分母都不同。
@@ -791,18 +959,22 @@ comparability_reason: 這是沒有公開共同基準、產品、程式與客戶�
 - [Amkor IC test services](https://amkor.com/test-services/)（2026-08-12 捕捉）。
 - [AMD design and development](https://www.amd.com/en/corporate/quality/design-development.html)（2026-08-12 捕捉）。
 - [NXP product qualification](https://www.nxp.com/products/nxp-product-information/quality/product-qualification%3AQUALITY__QUALIF)（2026-08-12 捕捉）。
+- [京元電子 2026Q1 營運報告](https://www.kyec.com.tw/Common/Download?faname=CE9C12F9789DF09DB07AD813BD5475688BEAD13771DE3682E1557C949D18AADCBC1CA2FE6409102AE04ABAA1E80DB9551E6AE8CB84DA42B60CA4CFCBFBE8C3C1975FCB01637C8125A0F6E112F17D377B7B9D286F3E2741BDAAEFB35D0B5248527223686E9D7CE1A7)（pp.3–9，2026-05-08）。
+- [中華精測 2026Q2 營運報告](https://www.cht-pt.com.tw/files/file_pool/1/0Q209650487702138855/26Q2%20%E6%B3%95%E8%AA%AA%E6%9C%83_CN.pdf)（pp.3、11–19，2026-07-29）。
+- [旺矽 2026Q1 業績摘要](https://www.mpi-corporation.com/wp-content/uploads/2026/05/2026-Q1-Quarter-Result_0515%E5%AF%8C%E9%82%A6_2-page_EN.pdf)（第 1–3 頁，2026-05-15）。
 
-15 份來源構成完整列舉，不是抽樣統計，所以本文不計算標準誤；它們只覆蓋市場方向、平台部署、
-測試存取範圍、供應商自述產品能力，以及設計、量產篩選、SLT、burn-in、資格與退貨回饋的通用
-責任邊界。來源沒有共同產品的晶片數、插入點、實際時間、站數效率、利用率、良率、既有裝機餘裕
-或增量採購，也沒有點名 3035、3443、3661、6533 的新 NRE／
+18 份來源是定向證據集合，不是產業抽樣，所以本文不計算標準誤；它們只覆蓋市場方向、平台部署、
+測試存取範圍、供應商自述產品能力、設計／量產／資格責任邊界，以及三家公司不同季度的收入分類。
+來源沒有共同產品的晶片數、插入點、實際時間、站數效率、利用率、良率、既有裝機餘裕或增量採購，
+也沒有點名 3035、3443、3661、6533 的新 NRE／
 tape-out／量產案，或 2449、3264、6257、6223、6510、6515 的訂單、稼動率、平均售價與市占。
 
-IEEE、設備商、封測服務商與晶片公司的方法頁不是十五條完全獨立證據鏈：S8、S9 同屬 Advantest，
+IEEE、設備商、封測服務商與晶片公司的方法頁不是十八條完全獨立證據鏈：S8、S9 同屬 Advantest，
 S10–S12 同屬 Teradyne；S13、S14、S15 分別提供封測、設計生命週期與可靠度資格的另一個角色，
-但都沒有同一具名產品的共同結果。這些來源可用來界定「要量什麼、誰做哪個決定」，不能當成已
-實現的市場平均。由於本輪也沒有一致預期、估值與即時持倉資料，不宣稱這些公司「尚未反映」或
-市場上修必然造成倍數擴張。
+S16–S18 則分屬京元電子、中華精測與旺矽，但期間、格式與收入分類不同，也沒有同一具名產品的共同
+結果。這些來源可用來界定「要量什麼、誰做哪個決定、由哪種收入時鐘收錢」，不能當成已實現的
+市場平均。由於本輪也沒有一致預期、估值與即時持倉資料，不宣稱這些公司「尚未反映」或市場上修
+必然造成倍數擴張。
 
 ## 傳導與投資判讀
 
@@ -909,9 +1081,9 @@ invalidation: 市場區間下修，或更高並行、利用與重用足以吸收
 <!-- monitoring_item
 monitor_id: T4
 status: active
-claim_ids: C3,C6,C7
-metric: 台灣設計、封測與測試介面公司的具名產品、test-cell 角色、資格、利用率及可辨識財務貢獻
-source_ids: S2,S3,S6,S8,S11
+claim_ids: C3,C6,C7,C10,C11
+metric: 台灣設計、封測、測試介面與設備公司的具名產品、收入單位、test-cell 角色、資格、利用率及可辨識財務貢獻
+source_ids: S2,S3,S6,S8,S11,S16,S17,S18
 watch_source_ids: S6
 frequency: quarterly
 frequency_detail: 公司季報、法說或重大訊息發布時，以八分母與買賣雙向文件逐項核對
