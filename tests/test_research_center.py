@@ -5421,9 +5421,9 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 15),
-            ("research_claim", 17), ("metric_comparison", 0),
-            ("impact", 4), ("monitoring_item", 8),
+            ("research_topic", 1), ("research_source", 19),
+            ("research_claim", 22), ("metric_comparison", 2),
+            ("impact", 4), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -5446,9 +5446,10 @@ class ResearchCenterTest(unittest.TestCase):
             / "process_control_measurement_contract.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 製程控制量測系統契約", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 16)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
         for node in (
             "from_id: company:kla",
+            "from_id: company:nova",
             "to_id: metric:measurement-measurand-decision",
             "to_id: capability:measurement-method-context",
             "to_id: capability:measurement-reference-traceability",

@@ -214,6 +214,26 @@ next_trigger: 公司以同期間公司分母拆出 HBM／2.5D 或具名 process-
 -->
 
 <!-- knowledge_edge
+edge_id: KG-HBM-C11
+view: company
+from_id: company:camtek
+to_id: concept:hbm
+relation: provides_tooling
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C18
+note_refs:
+evidence_state: verified
+commercial_stage: planned
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-06-02
+review_due: 2026-08-14
+status: active
+boundary: Camtek 公告證實 leading HBM player 的超過 5,000 萬美元訂單全部為 Hawk 且預計 2027 交付；客戶未具名，訂單不是實際交付或收入，也沒有工具台數、產能分母、良率、毛利或獨家證據。
+next_trigger: Camtek 以公司分母揭露 Hawk／HBM 實際交付、收入、台數及重複採購，並由客戶確認量產用途與結果。
+-->
+
+<!-- knowledge_edge
 edge_id: KG-HBM-I01
 view: industry
 from_id: concept:hbm
@@ -339,7 +359,7 @@ view: industry
 from_id: concept:hbm
 to_id: process:2_5d-3d
 relation: integrated_with
-claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C9
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C22
 note_refs:
 evidence_state: inference
 commercial_stage: concept
@@ -359,7 +379,7 @@ view: industry
 from_id: concept:hbm
 to_id: capability:process-control
 relation: raises_need
-claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C9
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C22
 note_refs:
 evidence_state: inference
 commercial_stage: capability
@@ -379,7 +399,7 @@ view: industry
 from_id: concept:hbm
 to_id: capability:metrology
 relation: raises_need
-claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C9
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C22
 note_refs:
 evidence_state: inference
 commercial_stage: capability
@@ -399,7 +419,7 @@ view: industry
 from_id: concept:hbm
 to_id: capability:inspection
 relation: raises_need
-claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C9
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C22
 note_refs:
 evidence_state: inference
 commercial_stage: capability
@@ -419,7 +439,7 @@ view: industry
 from_id: concept:hbm
 to_id: capability:yield-learning
 relation: raises_need
-claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C9
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C22
 note_refs:
 evidence_state: inference
 commercial_stage: capability

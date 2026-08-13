@@ -34,6 +34,26 @@ next_trigger: KLA 與客戶共同公布同一產品的 measurand method calibrat
 -->
 
 <!-- knowledge_edge
+edge_id: KG-PCMC-C02
+view: company
+from_id: company:nova
+to_id: concept:measurement-system-contract
+relation: reports_financials
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C21
+note_refs:
+evidence_state: verified
+commercial_stage: financial
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-06
+review_due: 2026-08-14
+status: active
+boundary: Nova 只表示 Sentronics advanced-packaging dimensional-metrology solutions 是創高產品線之一，沒有題材金額、占比、HBM 分解，也未公開被測量、校正、不確定度、control plan 或客戶製造結果。
+next_trigger: Nova 與客戶對同一具名產品公開 AP 收入或訂單分子及公司分母，並把 measurement-system contract 接到量產 control-plan decision 與結果。
+-->
+
+<!-- knowledge_edge
 edge_id: KG-PCMC-I01
 view: industry
 from_id: capability:process-control

@@ -1893,8 +1893,8 @@ class ReadabilityGateTest(unittest.TestCase):
             "claim_id: C14",
             "monitor_id: T7",
             "supporting_source_ids: S1,S2,S3,S8",
-            "last_reviewed_at: 2026-08-12",
-            "review_due: 2026-08-14",
+            "last_reviewed_at: 2026-08-14",
+            "review_due: 2026-08-15",
         ):
             self.assertIn(token, text)
 
@@ -1916,6 +1916,40 @@ class ReadabilityGateTest(unittest.TestCase):
             with self.subTest(concept_id=concept_id, edge_id=edge_id):
                 self.assertIn(concept_id, concepts)
                 self.assertIn(edge_id, graph)
+
+    def test_ai_process_control_article_separates_orders_revenue_and_forecasts(self):
+        path = Path(
+            rq.TOPICS_DIR
+        ) / "2026-08-02_ai_process_control_intensity.md"
+        text = path.read_text(encoding="utf-8")
+        for token in (
+            "## 看見金額先問：它是訂單、營收，還是成長指數？",
+            "一筆來自支援 AI 應用的\n"
+            "tier-1 OSAT、多系統合計 5,500 萬美元",
+            "不能把 75% 與 50% 相加",
+            "Nova 的 Q2 6-K 則提供另一個常見句型",
+            "只有四道都一致，比例才可比較",
+            "cross_company_numbers: true",
+            "thesis_claim_id: C22",
+            "source_id: S16",
+            "source_id: S17",
+            "source_id: S18",
+            "source_id: S19",
+            "claim_id: C18",
+            "claim_id: C19",
+            "claim_id: C20",
+            "claim_id: C21",
+            "claim_id: C22",
+            "corrected_by_claim_id: C22",
+            "monitor_id: T9",
+            "monitor_id: T10",
+        ):
+            self.assertIn(token, text)
+        self.assertEqual(text.count("comparison_id: M1"), 2)
+        self.assertEqual(text.count("comparability: directly_comparable"), 2)
+        self.assertIn("reported_value: 133.2", text)
+        self.assertIn("reported_value: 254.958", text)
+        self.assertNotIn("Camtek AP revenue 99.9", text)
 
     def test_ai_capacitor_article_starts_from_position_and_task(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_capacitor_role_map.md"

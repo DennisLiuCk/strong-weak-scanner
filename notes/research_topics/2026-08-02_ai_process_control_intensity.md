@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-07-28
-last_reviewed_at: 2026-08-12
-review_due: 2026-08-14
+last_reviewed_at: 2026-08-14
+review_due: 2026-08-15
 source_type: mixed
 publisher: KLA Corporation
 publisher_domain: ir.kla.com
@@ -19,10 +19,10 @@ group_ids: semiequip,material,pcb,packtest
 trigger_type: industry_results_and_product_qualification
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C9
+thesis_claim_id: C22
 base_confidence: medium
-confidence_basis: KLA、Applied Materials 與 Onto Innovation 三個獨立公司一手來源共同支持複雜度、檢測需求、客戶資格及供應商較寬事業組合的收入訊號，SEMI 官方議程另補充 3DIC 工序與失效模式；但資料仍以供應商陳述及議程摘要為主，Onto 未拆出 HBM／2.5D 或特定工具收入，尚無客戶端或全產業資料證明 wallet share、台灣公司訂單或 KLA 成長來源分解
-cross_company_numbers: false
+confidence_basis: KLA、Applied Materials、Onto Innovation、Camtek 與 Nova 的一手來源共同支持工程需求、客戶資格、供應商量產陳述、具名工具未來訂單與不同寬度的收入訊號；Camtek 又提供先進封裝約占公司收入四分之三的近似公司口徑，但未標明量測期間，且 Nova／Onto 都未拆出題材收入金額。現有資料仍沒有兩條獨立、同期間的題材分子—公司或客戶分母橋接，也沒有全產業 wallet share、台灣公司訂單或良率結果
+cross_company_numbers: true
 -->
 
 <!-- transition
@@ -74,6 +74,13 @@ to: triaged
 reason: added_measurement_system_contract_before_process_control_decisions_without_refreshing_thesis_clock
 evidence: sources:S14,S15
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: camtek_named_orders_and_bounded_advanced_packaging_revenue_mix_plus_nova_category_record_superseded_broad_revenue_only_synthesis
+evidence: sources:S16,S17,S18,S19
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -104,6 +111,12 @@ evidence: sources:S14,S15
 - **SEMVision 電子束系統**：Applied Materials 的缺陷複判產品系列；本文只用公司公告拆解速度、靈敏度、覆蓋與雜訊分類，不採用它推算市場規模。
 - **ICOS**：KLA 的封裝檢查與量測產品系列名稱；不同型號對應切割後裂縫、元件外觀或量測等任務，不能合併成全產線的單一覆蓋率。
 - **Dragonfly G5**：Onto Innovation 的檢查系統名稱；本文只引用公司揭露的資格節點，不把產品名稱等同 HBM 收入。
+- **Hawk／Eagle G5**：Camtek 的先進封裝檢查與量測平台；具名訂單或公司預期占比不等於已交付、已認列收入或客戶端良率實績。
+- **Sentronics**：Nova 的尺寸量測產品線；本文只引用公司對 advanced-packaging 銷售創高的陳述，不把產品線名稱當成已揭露的題材金額。
+- **GAAP**：一般公認會計原則；本文的 `M1` 對齊兩家公司依 GAAP 報告的總營收，但會計口徑一致仍不會自動產生 AP 題材分子。
+- **Financial highlights**：公司結果公告的重點摘要；它可快速定位數字，仍要回到完整財務表、期間、定義與附註確認分子分母。
+- **OSAT／tier-1**：OSAT 是委外半導體封裝測試廠；`tier-1` 是 Camtek 對該客戶層級的匿名描述，不是客戶名稱或第三方排名。
+- **non-AI／non-AI AP**：不以 AI 應用為主要歸類的收入／先進封裝收入；它和 HPC／AI 一起構成 Camtek 簡報的較寬 AP 組合，不能當成 HBM-only 分子。
 - **CPO（Co-Packaged Optics，共同封裝光學）**：把光學引擎放到交換晶片附近的封裝路徑；本文只把它當作對位、污染與跨領域控制的相鄰案例，不推論其工具組合等同 HBM。
 - **Packaging（封裝）**：把晶片接合、互連並保護成可使用元件的製造階段；`advanced packaging` 是較複雜的整合路徑，不是單一產品或單一設備類別。
 - **Specialty Devices and Advanced Packaging**：Onto 使用的較寬事業組合名稱；它同時涵蓋多種應用，不能直接當成 HBM、2.5D 或 Dragonfly 的收入分子。
@@ -114,12 +127,16 @@ evidence: sources:S14,S15
 - **計量可追溯性（metrological traceability）**：特定量測結果可經由有文件紀錄、不中斷的校正鏈連到指定參考，而且每一環都把自己的不確定度納入；它是結果的性質，不是設備或實驗室的永久標籤。
 - **Gauge R＆R（量具重複性與再現性研究）**：用規劃好的重複量測，拆解設備、操作、日期、設定或樣品等來源造成的變異；一次短期研究不能自動代表日後長期穩定，也不能替代偏差與不確定度評估。
 - **公開資訊觀測站（MOPS）**：台灣上市櫃公司的正式申報入口；要用它找具名產品、客戶階段與財務揭露，不能只靠海外設備商說法推導台灣公司受惠。
+- **訂單（order intake）**：客戶已下單、但公司尚未必完成交付或符合營收認列條件的商業承諾；訂單金額不能直接當成同季營收。
+- **營收認列（revenue recognition）**：公司在交付與會計條件成立後列入財報的收入；何時認列、認列多少，可能和接單日不同。
+- **題材分子／公司分母**：題材分子是可歸屬於先進封裝製程控制的收入或訂單，公司分母是同期間公司總收入或總訂單；兩者期間、範圍與會計狀態一致，比例才有意義。
+- **成長指數**：只說未來值相對基期增減多少，例如「Q4 比 Q1 高約 70%」；若沒有基期金額，它能表示方向，不能還原絕對收入。
 
 ### 三句話抓重點
 
-- 三家設備商的一手文件，分別說明需求方向、缺陷為何更昂貴、設備已走到客戶驗證的哪一步，以及一家較寬事業組合已出現收入新高訊號。
+- 五家設備商的一手文件，分別說明需求方向、缺陷為何更昂貴、設備走到客戶驗證／未來交付的哪一步，以及不同寬度的訂單與收入訊號。
 - 真正要查的是：每一代產品的 control plan 是否改變抽樣覆蓋、靈敏度、偽警報、週期時間與圍堵動作，而不只是設備名稱變多。
-- Onto 的新揭露沒有拆出 HBM／2.5D 或特定工具金額；現有資料仍不能證明全產業設備預算占比上升，也沒有台灣公司訂單。
+- Camtek 已提供較接近題材分子—公司分母的近似收入組合，但期間未標明；Nova 與 Onto 仍只到較寬類別新高，現有資料不能證明全產業設備預算占比上升或台灣公司訂單。
 
 ### 為什麼重要
 
@@ -299,6 +316,47 @@ silicon photonics 都列為支撐來源。這比 2026Q1 只揭露 Dragonfly G5 �
 因此證據階梯由「工程機制＋資格節點」升為「工程機制＋資格節點＋較寬收入訊號」，仍未到
 「題材收入分子」「客戶資本支出分母」或「全產業 wallet share」。這一格很重要，因為它
 證明商業訊號開始出現；界線也同樣重要，因為它還不能回答產業獲利池到底擴大多少。
+
+## 看見金額先問：它是訂單、營收，還是成長指數？
+
+工程證據回答「工具能做什麼」，商業證據則要回答「哪一種工具、在哪個期間、占哪個分母
+多少」。2026 年 6～8 月的 Camtek 與 Nova 文件正好示範：同一家公司可以同時公布未來
+訂單、當季公司營收、近似產品組合與未來成長率；它們都是有用資訊，卻不能放進同一個分數
+相加。
+
+Camtek 6 月 2 日隨 6-K 公開的公告把訂單具體到兩組客戶與工具：一筆來自支援 AI 應用的
+tier-1 OSAT、多系統合計 5,500 萬美元；另一組來自 leading HBM player、超過 5,000 萬美元，
+而且全部是 Hawk 系統。公告標題把兩組合稱超過 1.05 億美元，並說預計都在 2027 年交付。
+這是目前最接近「具名產品＋客戶類型＋金額＋交付時點」的一格，但客戶仍匿名，也沒有收入
+認列、毛利、工具台數或客戶產能分母。
+
+8 月資料再提供三種不同口徑。Camtek Q2 結果公布截至 6 月 30 日的公司營收 1.332 億美元，
+並表示年初至發布時累計接單超過 6 億美元、預計在 2026 年剩餘期間至 2027 年交付；同份
+文件預期先進封裝收入從 Q1 到 Q4 約成長 70%。同月投資人簡報另以公司收入組合圖，把約
+55% 的 HPC／AI 與 20% 的 non-AI advanced packaging 合計標為約 75% 的收入，卻沒有在該圖
+標示量測期間；它又把 Eagle G5／Hawk「預期占 2026 年收入 50%」寫成全年預測。這些集合
+彼此重疊，不能把 75% 與 50% 相加，也不能把未標期間的近似占比直接乘上 Q2 的 1.332 億
+美元，製造一個來源沒有公布的假精確題材收入。
+
+Nova 的 Q2 6-K 則提供另一個常見句型：公司 GAAP 營收為 2.54958 億美元，advanced-packaging
+solutions 收入創高，並稱 Sentronics dimensional-metrology solutions for advanced packaging
+是多個創高產品線之一。它證實產品線已產生銷售與方向性新高，但沒有公布 advanced
+packaging 的金額或占公司比例。因此公司總營收只是分母候選，不能替代題材分子；同樣地，
+Onto 的較寬事業組合新高也不能與 Nova 的「record」互相比大小。
+
+| 揭露句型 | 真正的分子／狀態 | 分母與期間 | 目前能說 | 不能換算成 |
+|---|---|---|---|---|
+| Camtek 兩組訂單合計超過 1.05 億美元 | 已接單、預計 2027 交付；其中一組具名 Hawk | 沒有同期間公司總訂單或客戶產能分母 | 具名工具的未來交付需求已出現 | 2026Q2 營收、2027 已認列收入、毛利或工具台數 |
+| Camtek 2026Q2 營收 1.332 億美元 | 公司全部已認列營收 | 2026-04-01～06-30 的公司全集合 | 可當同季公司規模分母 | 先進封裝、HBM 或 Hawk 題材分子 |
+| Camtek 簡報約 75% 公司收入來自 advanced packaging | 約 55% HPC／AI 加 20% non-AI AP 的近似組合 | 圖示未標明量測期間 | 公司收入結構高度曝險於較寬 AP 應用 | 特定季度 AP 金額、HBM 金額或工具毛利 |
+| Camtek 年初至今接單超過 6 億美元 | lower-bound order intake | 2026 年初至 8 月 10 日；跨 2026～2027 交付 | 訂單能見度增加 | 用它除以單季營收得到 book-to-bill |
+| Camtek AP 收入 Q1→Q4 預期約增 70% | 未來相對成長指數 | 基期與終點不同季，未附 AP 絕對金額 | 管理層的方向與幅度預期 | 已實現收入或全年 AP 金額 |
+| Nova AP solutions 收入創高 | 類別序位訊號，沒有數值 | 公司 Q2 營收有分母，AP 分子未揭露 | AP 與 Sentronics 產品線有商業訊號 | AP 占比、HBM 占比、跨公司強弱排名 |
+
+閱讀時可依四道閘門停手：先分訂單與已認列營收，再對齊期間，再確認題材範圍，最後標出
+數值是精確值、近似值、下限還是預測。只有四道都一致，比例才可比較。本文的 `M1` 只把
+Camtek 與 Nova 同一曆季、同幣別的公司總營收列為「可直接比較」；它的用途是證明分母可以
+對齊，並反過來提醒讀者：沒有同定義的 AP 分子，兩家公司仍不能比較題材強度。
 
 ## 主張與證據帳本
 
@@ -545,6 +603,70 @@ limitation: 這是跨領域計量政策與術語文件，不是半導體特定�
 independence_group: nist
 -->
 
+<!-- research_source
+source_id: S16
+role: company_filing
+source_kind: document
+publisher: Camtek Ltd.
+title: Camtek Receives Over $105 Million Multi-System Orders from a Tier-1 OSAT and a Leading HBM Manufacturer
+published_at: 2026-06-02
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1109138/000117891326003033/zk2635474.htm
+locator: 2026 年 6 月 Form 6-K 附件正文；標題及第一段分列 tier-1 OSAT 的 5,500 萬美元 multi-system order、leading HBM player 的超過 5,000 萬美元全 Hawk 訂單與 2027 expected delivery
+limitation: 訂單不是已認列營收；兩名客戶未具名，文件沒有工具台數、認列時點、取消條件、客戶產能分母、產品毛利或台灣供應鏈映射
+independence_group: camtek
+-->
+
+<!-- research_source
+source_id: S17
+role: company_release
+source_kind: document
+publisher: Camtek Ltd.
+title: Camtek Announces Results for the Second Quarter of 2026
+published_at: 2026-08-10
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.camtek.com/news-and-events/camtek-announces-results-for-the-second-quarter-of-2026/
+locator: 2026 Second Quarter Financial Highlights、CEO 評論與 Second Quarter 2026 Financial Results；分別列出截至 2026-06-30 的 1.332 億美元營收、年初至今超過 6 億美元接單、跨 2026 剩餘期間至 2027 交付，以及 Q1 到 Q4 AP revenue expected growth 約 70%
+limitation: 公司總營收沒有拆出 AP／HBM／Hawk 分子；超過 6 億美元是跨期交付的 order intake，下限值不是同季營收；70% 是未附絕對基期的前瞻陳述，不是已實現結果
+independence_group: camtek
+-->
+
+<!-- research_source
+source_id: S18
+role: company_release
+source_kind: document
+publisher: Camtek Ltd.
+title: Camtek Investor Presentation — August 2026
+published_at: 2026-08-12
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://cdn.camtek.com/wp-content/uploads/IR-Presentation_Aug26.pdf
+locator: PDF pp.6、8、17；收入組合圖列約 55% HPC／AI、20% non-AI AP 與約 75% Advanced Packaging，產品頁表示 Eagle G5／Hawk expected to account for 50% of 2026 revenue，Q2 highlights 列 1.332 億美元營收與 2026 年 1～7 月 6 億美元訂單
+limitation: 這是發行人投資人簡報；約 75% 的圖示沒有標明量測期間，50% 是 2026 全年預期，兩個集合可能重疊；簡報沒有 AP 絕對收入、HBM-only 分子、客戶名稱、工具台數、產品毛利或客戶端驗證
+independence_group: camtek
+-->
+
+<!-- research_source
+source_id: S19
+role: company_filing
+source_kind: document
+publisher: Nova Ltd.
+title: Nova Reports Second Quarter 2026 Financial Results
+published_at: 2026-08-06
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1109345/000117891326003892/zk2635873.htm
+locator: 2026Q2 Form 6-K 附件的 highlights、GAAP Results (K) 與 Management Comments；列出 254,958 千美元營收、Advanced Packaging solutions record revenue，以及 Sentronics dimensional metrology solutions for advanced packaging 為創高產品線之一
+limitation: 公司只提供總營收與類別／產品線創高方向，沒有 advanced-packaging 金額、占比、HBM／2.5D 分解、客戶、工具數、毛利或可與其他公司 record 口徑比較的基準
+independence_group: nova
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -684,7 +806,7 @@ resolution:
 <!-- research_claim
 claim_id: C9
 label: inference
-status: active
+status: superseded
 claim: 現有跨公司一手證據支持一個更新後且仍受限的成熟度判讀：HBM、2.5D 與 3D 整合提高製程控制的工程重要性，至少部分供應商產品已走到客戶資格或供應商自述的高量產，而 Onto 較寬事業組合又出現收入訊號
 supporting_source_ids: S1,S2,S3,S8
 contrary_source_ids:
@@ -694,8 +816,8 @@ boundary: 更新後判讀只把證據階梯推到供應商端商業訊號；它�
 verification_needed:
 correction_kind: supersedes
 corrects_claim_id: C4
-corrected_by_claim_id:
-resolution: 保留 C4 的工程機制，但以 S8 新增的較寬收入訊號修正「只到資格節點」的舊成熟度描述
+corrected_by_claim_id: C22
+resolution: 保留 C4 的工程機制與 S8 的較寬收入訊號，但 2026-08-14 新增 Camtek 具名工具訂單、近似 AP／公司收入占比及 Nova 產品線銷售訊號後，C9 已不足以描述目前商業證據階梯；由 C22 接續
 -->
 
 <!-- research_claim
@@ -834,12 +956,98 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: Camtek 2026 年 6 月隨 6-K 公開的公告表示，公司取得 tier-1 OSAT 的 5,500 萬美元 multi-system order，以及 leading HBM player 超過 5,000 萬美元、全部為 Hawk 系統的訂單，兩組都預計在 2027 年交付
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2026-06-02
+basis: S16 標題把兩組訂單合稱超過 1.05 億美元，正文逐組列出客戶類型、金額、Hawk 產品範圍與預計交付年度
+boundary: 證實的是發行人收到訂單的陳述；客戶未具名，訂單不是已認列營收，也沒有工具台數、客戶產能、取消條件、產品毛利、台灣供應鏈或 2027 實際交付結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: Camtek 2026 年 8 月投資人簡報的收入組合圖把約 55% HPC／AI 與 20% non-AI advanced packaging 合計標為約 75% 的公司收入，並表示 Eagle G5 與 Hawk 預期占 2026 年收入 50%
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S18 PDF p.6 的 revenue mix 圖與 p.8 的 new-products 頁分別直接列出上述占比與預期
+boundary: 約 75% 圖示沒有標明量測期間，50% 是全年預期而非實績，且 AP／AI 與產品集合可能重疊；不能反推特定季度 AP 金額、HBM-only 收入、客戶、工具數或毛利
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: Camtek 2026Q2 結果公布公司營收 1.332 億美元，並表示年初至今接單超過 6 億美元、交付橫跨 2026 年剩餘期間至 2027 年，另預期 AP revenue 從 2026Q1 到 Q4 約成長 70%
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-08-10
+basis: S17 的 Financial Highlights、CEO 評論與 Financial Results 直接列出公司營收、order-intake lower bound、交付窗口及 AP 相對成長預期
+boundary: 1.332 億美元是公司全部已認列營收，沒有 AP 分子；超過 6 億美元是跨期訂單下限，70% 是未附絕對基期的前瞻陳述，三者不能互除或相加
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: Nova 2026Q2 6-K 附件列出 GAAP 營收 254,958 千美元，並表示 Advanced Packaging solutions 收入創高，Sentronics dimensional-metrology solutions for advanced packaging 是創高產品線之一
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-08-06
+basis: S19 的 highlights、GAAP Results (K) 與 Management Comments 分別提供公司總營收、AP 類別新高及具名產品線銷售方向
+boundary: 公司沒有公布 AP 金額／占比、HBM／2.5D 分解、客戶、工具數或產品毛利；公司總營收不能替代題材分子，Nova 的 record 也不能和 Onto 的較寬 record 直接排名
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: 現有跨公司一手證據把製程控制的商業成熟度推進到「工程需求—客戶資格／供應商量產陳述—具名工具未來訂單—一家公司較寬 AP 收入占比—兩家供應商較寬類別／產品線收入訊號」，但仍沒有兩條獨立且同期間的題材分子—公司或客戶分母橋接
+supporting_source_ids: S1,S2,S3,S8,S16,S17,S18,S19
+contrary_source_ids:
+as_of: 2026-08-12
+basis: correction_of:C9；S1～S3 建立需求機制、量產陳述與資格節點，S8 建立 Onto 較寬類別收入訊號，S16～S18 同一 Camtek 鏈新增 Hawk 未來訂單、公司總營收、跨期總訂單與未標期間的近似 AP 收入組合，S19 獨立新增 Nova AP／Sentronics 銷售訊號；Camtek 三份文件只算一條公司鏈
+boundary: 這條階梯仍不是全產業 wallet share 證據；Camtek 約 75% 的期間未標，Nova／Onto 無 AP 金額，沒有客戶資本支出或產能分母、同口徑工具數、良率結果、台灣公司訂單、價格、毛利或供應商排名
+verification_needed: 至少再一條獨立公司鏈，以同一期間公開具名 advanced-packaging process-control 產品／類別的已認列收入或已接訂單及公司分母，並分開 actual、order 與 forecast；或一份客戶文件公開每單位產能支出與工具／控制步驟
+correction_kind: supersedes
+corrects_claim_id: C9
+corrected_by_claim_id:
+resolution: 保留 C9 的工程—資格—量產陳述—較寬收入階梯，新增 Camtek 的具名 Hawk 訂單與近似 AP／公司收入占比，以及 Nova 的獨立產品線銷售訊號；同時維持期間與題材分子尚未對齊的限制
+-->
+
 ## 為何值得進佇列
 
 KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
-先提供 2.5D logic／HBM 客戶資格節點，再新增較寬事業組合的收入訊號；SEMI 議程則把控制
-問題落到 TSV、填孔、沉積、翹曲、RDL、切割與相鄰的 CPO 整合。這些資料讓工程與供應商
-商業成熟度比單一廠商說法更完整。NIST、Applied 與 KLA 的方法／產品文件又把 control plan
+先提供 2.5D logic／HBM 客戶資格節點，再新增較寬事業組合的收入訊號；Camtek 把具名 Hawk
+訂單、交付年度、公司總營收與近似 AP 收入組合分開，Nova 則補上另一條具名量測產品線的
+銷售訊號。SEMI 議程把控制問題落到 TSV、填孔、沉積、翹曲、RDL、切割與相鄰的 CPO
+整合。這些資料讓工程與供應商商業成熟度比單一廠商說法更完整。NIST、Applied 與 KLA 的方法／產品文件又把 control plan
 拆成動態抽樣、靈敏度、覆蓋、偽警報、結果時間與不同製程任務；NIST／SEMATECH 的量測
 章節再補上 bias、repeatability、reproducibility、stability、uncertainty 與 traceability 的前置
 契約。本題也不同於 ATE tester TAM：它研究製程中的量測、
@@ -857,13 +1065,57 @@ KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量�
 | Control-plan 方法 | NIST、Applied 與 KLA 分別支持 adaptive sampling、coverage／sensitivity／nuisance 取捨及不同封裝檢查任務 | HBM 客戶 recipe、逃逸／偽警報、整廠 cycle time 或新增工具量 |
 | 採用節點 | Onto 披露 2.5D logic 與 HBM 客戶資格認證 | 大量採購、收入或台灣參與 |
 | 供應商端量產陳述 | Applied 稱特定 eBeam defect-analysis 系統已用於高量產先進封裝 | 客戶端部署數、良率實績或市占 |
+| 具名工具未來訂單 | Camtek 披露 tier-1 OSAT 與 HBM player 合計超過 1.05 億美元的 multi-system orders，其中 HBM 訂單全為 Hawk，預計 2027 交付 | 已認列收入、工具台數、客戶名稱、毛利或客戶產能分母 |
+| 較寬收入組合 | Camtek 簡報把約 55% HPC／AI 與 20% non-AI AP 合計標為約 75% 公司收入 | 期間未標，不能乘上單季公司營收或拆成 HBM-only 金額 |
 | 較寬收入訊號 | Onto 稱 Specialty Devices and Advanced Packaging 收入創高，支撐含 2.5D／HBM | 類別金額、題材分子、特定工具收入或全產業支出 |
+| 具名產品線銷售訊號 | Nova 稱 Sentronics advanced-packaging dimensional-metrology solutions 是創高產品線之一 | 產品線金額／占比、HBM 分解、工具數或跨公司 record 排名 |
 
 ## 跨公司數字與可比性
 
-本篇 `cross_company_numbers: false`：三家公司提供不同類型的證據，本文不比較營收、訂單、
-工具數或市占。Onto 只說較寬類別創高而未提供類別金額，本文也不拿公司總營收替代題材
-分子。KLA 分部屬發行人自身定義，本文不列其數字，也不與同業排名。
+本篇 `cross_company_numbers: true`，但只有 `M1` 的兩筆公司總營收符合直接比較條件：Camtek
+與 Nova 都是截至 2026 年 6 月 30 日的三個月、GAAP 公司總營收，幣別與單位也相同。這只
+能比較公司總營收數值，不能比較 advanced-packaging 強度；Camtek 的近似 75% 未標期間，
+Nova 與 Onto 沒有 AP 金額，因此不建立跨公司的 AP 占比、訂單、工具數、市占或排名。
+
+<!-- metric_comparison
+comparison_id: M1
+comparison_kind: aligned_metric
+observation_id: M1-O1
+claim_id: C22
+entity: Camtek
+metric: GAAP consolidated total revenue
+reported_value: 133.2
+value_kind: point
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar_quarter
+unit: USD_million
+definition_key: gaap_consolidated_total_revenue
+definition: 截至 2026-06-30 三個月的發行人 GAAP 公司總營收；只作公司分母，不是 advanced-packaging 題材分子
+evidence_ids: S17
+comparability: directly_comparable
+comparability_reason: 兩筆都是同一曆季、同幣別與同單位的發行人 GAAP 公司總營收；只比較公司分母，不比較 AP 收入、訂單、產品組合、毛利或投資價值
+-->
+
+<!-- metric_comparison
+comparison_id: M1
+comparison_kind: aligned_metric
+observation_id: M1-O2
+claim_id: C22
+entity: Nova
+metric: GAAP consolidated total revenue
+reported_value: 254.958
+value_kind: point
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: calendar_quarter
+unit: USD_million
+definition_key: gaap_consolidated_total_revenue
+definition: 截至 2026-06-30 三個月的發行人 GAAP 公司總營收；只作公司分母，不是 advanced-packaging 題材分子
+evidence_ids: S19
+comparability: directly_comparable
+comparability_reason: 兩筆都是同一曆季、同幣別與同單位的發行人 GAAP 公司總營收；只比較公司分母，不比較 AP 收入、訂單、產品組合、毛利或投資價值
+-->
 
 ## 來源與證據邊界
 
@@ -877,10 +1129,14 @@ KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量�
 - [S12：KLA advanced-packaging inspection portfolio](https://ir.kla.com/news-events/press-releases/detail/9/kla-announces-enhanced-portfolio-of-systems-for-advanced)（2020 產品任務分工，不是共同 control plan）。
 - [S14：NIST／SEMATECH Measurement Process Characterization](https://www.itl.nist.gov/div898/handbook/mpc/mpc.htm)（通用 bias、變異、Gauge R＆R 與 uncertainty 方法，不是 HBM recipe）。
 - [S15：NIST Technical Note 2156 計量可追溯性政策](https://www.nist.gov/publications/metrological-traceability-frequently-asked-questions-and-nist-policy)（可追溯的是特定量測結果，不是設備品牌背書）。
+- [S16：Camtek 超過 1.05 億美元 multi-system orders 的 6-K 附件](https://www.sec.gov/Archives/edgar/data/1109138/000117891326003033/zk2635474.htm)（預計 2027 交付，不是已認列營收）。
+- [S17：Camtek 2026Q2 結果](https://www.camtek.com/news-and-events/camtek-announces-results-for-the-second-quarter-of-2026/)（公司總營收、跨期接單下限與 AP 成長預期須分開）。
+- [S18：Camtek 2026 年 8 月投資人簡報](https://cdn.camtek.com/wp-content/uploads/IR-Presentation_Aug26.pdf)（近似 AP 收入組合未標期間，全年新產品占比仍是預期）。
+- [S19：Nova 2026Q2 6-K 附件](https://www.sec.gov/Archives/edgar/data/1109345/000117891326003892/zk2635873.htm)（AP／Sentronics 銷售創高但無題材金額）。
 - 後續入口：[KLA](https://ir.kla.com/financial-information/financial-results)、[Applied](https://ir.appliedmaterials.com/news-releases/)、[Onto](https://investors.ontoinnovation.com/news/default.aspx)、[MOPS](https://mops.twse.com.tw/mops/web/index)。
 - 中立方法入口：[NIST CHIPS Metrology Program](https://www.nist.gov/chips/research-development-programs/metrology-program)。
 
-三家設備商彼此獨立但都有商業動機；SEMI 議程保存多位講者摘要，也不能替代完整簡報、
+五家設備商彼此獨立但都有商業動機，其中 Camtek 三份文件只算一條公司消息鏈；SEMI 議程保存多位講者摘要，也不能替代完整簡報、
 客戶端或全產業資本支出證據。本輪沒有一致預期、估值、即時持倉或台灣公司客戶資料，
 因此不談市場是否反映或個股方向。
 
@@ -889,6 +1145,9 @@ KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量�
 - **供應商特有效果**：KLA 成長可能來自市占、ASP、產品組合或服務，而非類別支出增加。
 - **資格不等於規模**：Onto 的 qualification 可能停在單一工具或客戶，未形成跨客戶量產。
 - **較寬收入組合混合**：Onto 的新高可能由 silicon photonics、其他 specialty devices、產品組合或價格帶動，不能全歸因 HBM／2.5D 製程控制。
+- **訂單不等於營收**：Camtek 的具名訂單預計 2027 交付，可能受交期、驗收與會計認列影響；不能拿它除以 2026Q2 公司營收製造跨期 book-to-bill。
+- **占比集合重疊**：Camtek 的 AP、HPC／AI 與 Eagle G5／Hawk 不是互斥分類，且近似 AP 圖未標期間；不能相加或套用到單季分母。
+- **公司分母不等於題材分子**：Nova 公司總營收可以和 Camtek 的公司總營收對齊，卻不能在 Nova 未拆 AP 金額時用來比較 AP 強度。
 - **替代解法**：設計規則、抽樣或既有光學工具升級，可能降低新增工具需求。
 - **價值沒有外溢**：支出即使增加，也可能集中於海外平台；台灣族群不必然受惠。
 
@@ -902,7 +1161,7 @@ hypothesis_refs:
 note_action: watch
 action_due: 2026-08-14
 rationale: 製程量測、缺陷檢查、分析與封裝設備最接近本題，但需逐家公司核對產品、客戶資格與收入
-evidence_boundary: 三份海外設備商文件未點名 universe 公司；族群相近不等於本地工具取得訂單或能取代國際設備
+evidence_boundary: 多份海外設備商文件仍未點名 universe 公司；族群相近不等於本地工具取得訂單或能取代國際設備
 -->
 
 <!-- impact
@@ -943,7 +1202,7 @@ evidence_boundary: 使用端增加檢測不必然改善封測商收入或毛利�
 
 ## 持續驗證清單
 
-`review_due` 為 2026-08-14，等於所有 active monitoring item 中最早的 `next_check`。
+`review_due` 為 2026-08-15，等於所有 active monitoring item 中最早的 `next_check`。
 
 <!-- monitoring_item
 monitor_id: T1
@@ -977,7 +1236,7 @@ invalidation: 客戶或供應商明確揭露 qualification 撤回、量產未採
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
 claim_ids: C6
 metric: 台灣 semiequip／material／pcb／packtest 的具名產品、客戶資格、訂單與財務貢獻
 source_ids: S1,S2,S3
@@ -987,6 +1246,8 @@ frequency_detail: 公開資訊觀測站重大訊息、法說簡報與季度財�
 next_check: 2026-08-14
 trigger: 公司一手文件首次把量測、檢查或良率學習產品連到 HBM／2.5D／3D 客戶階段，並提供可辨識訂單、收入或毛利資訊
 invalidation: 公司明確否認相關產品／客戶曝險、退出該市場，或可定位的採購與供應商資料直接顯示相關資本支出由非 universe 公司取得；到期未見揭露只維持 C6 待驗證
+retired_at: 2026-08-14
+retirement_reason: C22 把商業證據拆成 actual、order、forecast 與同期間分母後，T3 原本只要求「可辨識訂單、收入或毛利」的觸發過寬，容易把跨期訂單或較寬部門收入誤記成台灣公司題材貢獻；由 T10 以產品—客戶階段—會計狀態—同期間分母四段橋接接續，這是新證據驅動的 monitor 規格修正，不表示 C6 已取得支持或反證
 -->
 
 <!-- monitoring_item
@@ -1007,16 +1268,18 @@ invalidation: 可重建分解顯示超過 50% 的同期間成長來自市占、A
 
 <!-- monitoring_item
 monitor_id: T5
-status: active
+status: retired
 claim_ids: C5,C8,C9
 metric: advanced-packaging process control 從工程需求、資格、高量產陳述到題材收入分子及客戶支出分母的逐層橋接
-source_ids: S1,S2,S3,S8
+source_ids: S1,S2,S3,S8,S16,S17,S18,S19
 watch_source_ids: S4,S5,S6
 frequency: quarterly
 frequency_detail: Applied Materials 2026-08-13 結果後先重查；其後按 KLA、Applied Materials、Onto Innovation 季報／法說與客戶端製造文件更新
 next_check: 2026-08-14
 trigger: 至少兩條獨立公司鏈或一份客戶端文件，以同期間揭露 advanced-packaging process-control 的產品／類別收入、工具數、重複採購或每單位產能支出，且能把題材分子對回公司或客戶分母
 invalidation: 客戶端或同口徑供應商資料顯示新增複雜度主要由既有工具、抽樣、軟體或設計規則吸收，連續兩個產品世代的工具量／單位產能支出持平或下降；只有較寬事業組合新高而無分子時不視為 trigger 命中
+retired_at: 2026-08-14
+retirement_reason: Camtek 新增一條具名工具訂單與近似 AP／公司收入組合鏈，Nova 另新增產品線銷售訊號，但 Camtek 約 75% 未標期間、Nova／Onto 無題材金額，仍未完整命中兩條獨立同期間分子—分母 trigger；C9 已由 C22 取代，後續由 T9 把 actual、order 與 forecast 分開續追
 -->
 
 <!-- monitoring_item
@@ -1061,11 +1324,40 @@ trigger: 至少一份客戶端或可重建中立資料，對同一產品與製�
 invalidation: 量產客戶以另一套可稽核且可重現的 measurement-assurance scheme 證明能在省略上述一個或多個欄位時維持同等 decision risk 與製造結果；只有沒有公開完整紀錄時維持 C17 閱讀框架，不視為反證
 -->
 
+<!-- monitoring_item
+monitor_id: T9
+status: active
+claim_ids: C5,C18,C19,C20,C21,C22
+metric: advanced-packaging process-control 的 actual revenue、order intake 與 forecast 是否各自取得同期間題材分子及公司或客戶分母
+source_ids: S1,S2,S3,S8,S16,S17,S18,S19
+watch_source_ids: S4,S5,S6
+frequency: event_driven
+frequency_detail: 先重查台灣時間 2026-08-14 發布的 Applied Materials FY26Q3 結果；其後按 Camtek、Nova、KLA、Applied Materials、Onto Innovation 季報／法說與客戶製造文件更新
+next_check: 2026-08-15
+trigger: 至少兩條獨立公司鏈各以同一期間公開具名 advanced-packaging process-control 產品／類別的 actual revenue 或 order intake 及公司分母，並把 actual、order、forecast 分開；或一份客戶文件公開每單位產能支出與工具／控制步驟
+invalidation: 客戶端或同口徑供應商資料顯示新增複雜度主要由既有工具、抽樣、軟體或設計規則吸收，連續兩個產品世代的工具量或單位產能支出持平／下降；單一公司的未標期間占比、跨期訂單或無金額 record 不算命中或推翻
+-->
+
+<!-- monitoring_item
+monitor_id: T10
+status: active
+claim_ids: C6,C22
+metric: 台灣 semiequip／material／pcb／packtest 的具名產品、HBM／2.5D／3D 客戶階段、actual／order／forecast 狀態與同期間財務分母
+source_ids: S1,S2,S3,S8,S16,S17,S18,S19
+watch_source_ids: S7
+frequency: quarterly
+frequency_detail: 公開資訊觀測站重大訊息、法說簡報與季度財報發布後，按產品—客戶階段—會計狀態—同期間分母逐公司核對
+next_check: 2026-08-21
+trigger: 台灣公司一手文件首次把具名量測、檢查或良率學習產品連到 HBM／2.5D／3D 客戶階段，並提供同期間可辨識的 actual revenue、order intake 或毛利分子及公司／部門分母；actual、order、forecast 必須分開
+invalidation: 公司明確否認相關產品／客戶曝險、退出該市場，或客戶採購與供應商資料直接顯示相關資本支出由非 universe 公司取得；只有到期未揭露、較寬部門收入、跨期訂單或產品名稱時維持 C6 待驗證
+-->
+
 ## 下一個可證明／否定的節點
 
-- Applied Materials 8 月 13 日結果是否提供 advanced-packaging process control 的收入、訂單、工具量或部署口徑；只有公司總額不算。
+- Applied Materials 台灣時間 8 月 14 日發布的 FY26Q3 結果是否提供 advanced-packaging process control 的收入、訂單、工具量或部署口徑；只有公司總額不算。
+- Camtek 能否把約 75% AP 收入組合補上量測期間，並把具名 Hawk 訂單接到實際交付、收入與公司分母；Nova 能否拆出 AP／Sentronics 金額或占比。
 - KLA 能否分解單位出貨、ASP、產品組合、服務與市占；否則 C7 維持待驗證。
-- Onto 能否把較寬事業組合新高拆到 HBM／2.5D、具名工具、客戶數、重複採購或收入分子。
+- Onto 能否把較寬事業組合新高拆到 HBM／2.5D、具名工具、客戶數、重複採購或收入分子；「record」沒有金額仍不和 Nova 排名。
 - 客戶或中立研究能否在同一產品／layer 公開 control plan 六欄與結果；若只有速度、解析度或 AI 分類功能，C14 仍只是閱讀框架。
 - 同一產品／layer 能否先公開量測系統六欄，再把結果接到 control-plan 決策與良率、重工、報廢或週期時間；只有校正標籤或工具規格，C17 不升級。
 - 台灣公司若沒有產品、客戶階段與財務貢獻，C6 不升級，`stock_ids` 留空。
