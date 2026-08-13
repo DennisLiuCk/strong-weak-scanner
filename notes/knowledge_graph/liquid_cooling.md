@@ -665,3 +665,23 @@ status: active
 boundary: 流體專屬重評是跨流體容量可比性的研究閘門；目前沒有 NVIDIA 具名型號公開完整 water／PG25／PG55 三張曲線與 site pass／fail。
 next_trigger: 同一 CDU 硬體版本在固定邊界條件下公開各流體配方的熱性能、兩側水力、重複測試、量測不確定度與客戶驗收。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-LC-I20
+view: industry
+from_id: concept:liquid-cooling
+to_id: metric:cdu-flow-heat-balance-bridge
+relation: measured_by
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C23,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C24,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C25
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 15.19 K 只是在 1890 LPM 與 2MW 同屬一條穩態 standard-water 迴路假設下的條件式量綱核對；不是 Deschutes 實測、3°C ATD、效率、CDU 台數或財務證據。
+next_trigger: 具名 CDU 對同一版本與工作點公開流體、FWS／TCS 四個溫度、兩側流量與壓差、熱負載 reference plane、校正／不確定度、泵浦與備援狀態、原始資料及 site pass／fail。
+-->

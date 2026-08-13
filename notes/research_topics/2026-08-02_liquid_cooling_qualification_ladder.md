@@ -95,6 +95,13 @@ to: triaged
 reason: q2_financial_denominator_evidence_reframed_thesis_from_platform_listing_to_named_model_bridge
 evidence: sources:S14,S15,S16,S17,S18
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_flow_temperature_heat_balance_bridge_without_thesis_clock_refresh
+evidence: sources:S9,S19,S20
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -106,6 +113,14 @@ evidence: sources:S14,S15,S16,S17,S18
 - **MW／kW**：兆瓦／千瓦，都是功率單位；`1MW = 1000kW`。換成同一單位後只能比較數值大小，不能順便比較產品成熟度。
 - **Cooling Capacity @ 4°C ATD**：NVIDIA 清單以這個欄名標示 CDU 的額定排熱能力。MW／kW 是絕對容量，不是效率或產品優劣；同欄數字可在單位換算後比較，但頁面沒有公布完整跨廠測試協定，實際水溫、流量、壓差與備援仍會改變可用能力。
 - **ATD（Approach Temperature Difference）**：熱交換兩側在指定位置的溫差條件。本文只沿用 NVIDIA 欄名中的 `4°C ATD`，不自行補上頁面未公布的完整測試程序。
+- **GPM／LPM**：每分鐘加侖／每分鐘公升，都是體積流量，不是散熱功率。來源若已同時列出兩種單位，研究中心保留原值與換算精度，不把四捨五入後的流量當成更精確的測量。
+- **Deschutes**：OCP 的開放式高容量 CDU 專案／規格名稱。本文用其中一個 OCP 產品頁當量綱教材，不把單一列項外推成所有 CDU 的共同實測條件。
+- **STULZ**：本文 S19 所列 Deschutes CDU 的設備供應商名稱。供應商出現在 OCP 產品頁不等於任一客戶已採購、完成場域驗收或產生財務貢獻。
+- **PSI**：每平方英吋磅力，壓力單位。CDU 的 available pressure 要配合流量與 PQ 曲線閱讀，不能直接當成熱功率或效率。
+- **kJ／kW**：kJ 是能量，kW 是每秒傳遞多少 kJ 的功率；因此 `kJ/(kg·K)` 可表示流體每公斤每升高一度所需的能量，再和質量流量及溫升相乘得到 kW。
+- **Python Decimal／awk**：本文用兩個彼此獨立的算術工具重算同一公式，降低抄寫或浮點顯示錯誤；兩路一致不會補上來源缺失的流體、量測與場域條件。
+- **迴路溫升（loop ΔT）**：同一條水路的回水溫度減供水溫度，表示流體沿途吸收熱量後升高多少。它和熱交換器兩側供水溫度之差 ATD 是兩個不同溫差。
+- **熱平衡 `q = ṁ × cp × ΔT`**：穩態下，流體可攜帶的熱功率取決於質量流量、比熱與同一迴路的溫升。這個式子可做量綱與合理性核對，但前提是流體、量測位置、穩態與熱損失邊界都已固定。
 - **L-L CDU（Liquid-to-Liquid CDU）**：兩側都以液體循環換熱的 CDU；一側接機房設施水路，另一側接伺服器冷卻水路。這個名稱說明架構，不代表已通過哪一套驗證。
 - **L-A／L2A（Liquid-to-Air）**：伺服器端以液體帶熱，再把熱排到空氣側的架構。它和 L-L／L2L 是不同產品分支；公司只說「液冷產品」時，不能自行判定收入來自哪一支。
 - **FWS／TCS**：FWS 是設施水系統，負責把熱送往機房冷源；TCS 是技術冷卻系統，負責把熱從伺服器帶回 CDU。兩側各自的溫度、流量與壓力都會限制實際工作點。
@@ -478,6 +493,38 @@ url: https://library.iccwbo.org/clp/clp-incoterms.htm
 locator: 2026-08-14 capture 的 DDP 條目；賣方在貨物已辦妥進口清關、於約定目的地到達運輸工具上待卸時交付，並承擔送達該地的成本、風險、進出口清關與關稅責任
 limitation: ICC 條目只定義買賣雙方的交貨、成本與風險責任，不解釋台達特定合約的收入總額／淨額判斷、售價、成本、產品毛利或淨利；台達的報表影響仍以 S14 管理層原話為準
 independence_group: international-chamber-of-commerce
+-->
+
+<!-- research_source
+source_id: S19
+role: other_primary
+source_kind: living_index
+publisher: Open Compute Project
+title: STULZ Deschutes CDU – CyberCool Liquid Cooling Distribution Unit
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/products/734/stulz-deschutes-cdu-cybercool-liquid-cooling-distribution-unit
+locator: 2026-08-14 capture 的產品重點；Based on Google Deschutes 5.0 CDU Specification，並列 2MW @ 3°C ATD、500 GPM（1890 LPM）、80 PSI available pressure、N+1 sealless pumps 與 redundant power feeds
+limitation: OCP 動態產品頁是供應商產品與 associated contribution 的公開列項，不是不可變測試報告；沒有完整指定 2MW、500 GPM、80 PSI 與 N+1 的共同測試 reference plane、流體、兩側溫度／流量、重複測試、量測不確定度、原始資料、part-load／故障工作點、site acceptance 或財務結果
+independence_group: opencompute-cdu
+-->
+
+<!-- research_source
+source_id: S20
+role: standard
+source_kind: living_index
+publisher: ASHRAE
+title: Chapter 13 Hydronic Heating and Cooling
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://handbook.ashrae.org/Handbooks/S20/SI/s20_ch13/s20_ch13_si.aspx
+locator: 2026-08-14 capture 的 §2.2 Thermal Components；Equations (7)–(9) 以質量／體積流量、密度、比熱與跨設備水溫差計算熱傳率，並以 1000 kg/m³、4.18 kJ/(kg·K) 作 standard-water 條件；Heat-Carrying Capacity of Piping 段落
+limitation: ASHRAE 頁面提供一般水力熱平衡方法，不是 Deschutes 或任一具名 CDU 的實測結果；standard-water 密度／比熱是假設值，不能替代 PG 配方、實際溫度物性、熱損失、流量分配、量測不確定度、瞬態、備援或場域驗收
+independence_group: ashrae
 -->
 
 <!-- research_claim
@@ -854,6 +901,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: 2026-08-14 捕捉的 OCP STULZ Deschutes CDU 產品頁以 Google Deschutes 5.0 CDU Specification 為基礎，並列 2MW @ 3°C ATD、500 GPM（1890 LPM）、80 PSI available pressure、N+1 sealless pumps 與 redundant power feeds
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S19 產品重點直接列出容量、ATD、流量、可用壓力與備援配置
+boundary: `verified` 只證實捕捉日 OCP 動態產品頁的公開列項；頁面沒有把全部數字接成可重現測試，也不證明任一 NVIDIA Marketplace 型號採相同條件、具名場域能達標、產品效率／可靠度較高，或台灣公司取得訂單與財務貢獻
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: OCP 的 L-L CDU 方法把 ATD 定義為 TCS supply temperature 減 FWS supply temperature；ASHRAE 則以同一水路跨設備的質量流量、比熱與水溫升降計算熱傳率，因此 ATD 與迴路供回水 ΔT 是位置定義不同的兩個溫差
+supporting_source_ids: S9,S20
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S9 PDF p.16 直接定義 ATD，S20 §2.2 Equations (7)–(9) 與 Heat-Carrying Capacity of Piping 直接定義跨設備水溫差、流量與熱傳率的關係
+boundary: 兩份文件共同支持量測位置與物理量必須分開，不表示 OCP 與 ASHRAE 合併發布一套產品認證，也不提供 Deschutes 的實際 TCS／FWS 供回水溫、流體物性、熱損失、量測不確定度或 site pass／fail
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: inference
+status: active
+claim: 若只為量綱教學，假設 S19 並列的 1890 LPM 是承載全部 2MW 的同一穩態標準水迴路，則流量為 31.5 L/s，依 ASHRAE 的 4.18 kJ/(kg·K) 與 1000 kg/m³ 條件反推迴路溫升約 15.19 K；這個條件式 ΔT 不是 S19 公布的產品實測值，也不能改寫成 3°C ATD
+supporting_source_ids: S9,S19,S20
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 以 S19 的四捨五入流量 1890 LPM 與 2MW、S20 standard-water 物性代入 ΔT=q/(ṁ×cp)：1890/60=31.5 L/s，2000/(31.5×4.18)=15.1894888737 K；Python Decimal 與 awk 兩條獨立算術路徑均得 15.19 K，S9 則把 ATD 固定為另一組供水位置差
+boundary: 這是 N=1 headline 工作點的條件式量綱核對，沒有 sampling SE／t；算術一致不消除模型不確定性。頁面未證明 1890 LPM 與 2MW 是同一 reference plane／同時量測，也未固定流體、實際密度／比熱、兩側流量、熱損失、流量分配、穩態區間、感測器不確定度、part-load、污堵、N+1 故障工作點或場域條件，因此不得用 15.19 K 評價產品、估算 CDU 台數、訂單或收入
+verification_needed: 需具名 CDU 的版本化 test matrix 對同一工作點公開流體、FWS／TCS 四個溫度、兩側流量與壓差、熱負載 reference plane、穩態時窗、校正／不確定度、泵浦與備援狀態、原始資料及 pass／fail
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 容量可以換算，商業成熟度不能跟著換算
 
 先只做一件事：把同一天、同一張表、同一欄的容量換成相同單位。2026 年 8 月 2 日保存的
@@ -1124,6 +1222,59 @@ NVIDIA 明示外部設定值與隔離請求要先經 BMS 的最小／最大值�
 曲線，S10 也沒有證明每個場域都發布全部點位；兩份資料只能共同說明，容量與即時資料要怎麼
 被問對問題，不能替任何供應商補上產品通過、客戶部署、訂單或收入。
 
+## 500 GPM 不是 2MW：先把流量、迴路溫升與 3°C ATD 拆開
+
+OCP 的 STULZ Deschutes 產品頁把 `2MW @ 3°C ATD`、`500 GPM（1890 LPM）`、`80 PSI`
+與 `N+1` 泵浦並列。這些數字很適合當讀規格的練習，因為它們分屬四種量綱；把它們排在同一列，
+不代表任何兩個可以直接畫等號。
+
+| Headline | 它量的是什麼 | 正確的下一問 | 不能直接改寫成什麼 |
+|---|---|---|---|
+| 2MW @ 3°C ATD | 指定 approach 條件下的熱負載主張 | 流體、兩側流量與溫度、reference plane、穩態時窗及不確定度是什麼？ | 任何現場都可交付 2MW、設備效率或公司收入 |
+| 500 GPM（1890 LPM） | 單位時間通過的體積流量 | 是 FWS 還是 TCS、哪個位置、使用哪種流體、與 2MW 是否同時量測？ | 500 GPM 就等於 2MW，或流量越大產品越好 |
+| 3°C ATD | `TCS 供水溫度 − FWS 供水溫度` | 兩個感測器的位置、校正與當時熱負載為何？ | TCS 回水減供水的迴路溫升 |
+| 80 PSI available pressure | 頁面並列的 CDU 水力能力 headline | 這個壓力對應哪一側、哪個流量？完整 PQ 曲線、整條 TCS 阻力與單泵失效工作點在哪裡？ | 散熱容量、效率或所有支路實際壓差 |
+| N+1 泵浦 | 正常需求 N 組之外多一組備援的架構 | 故障切換後剩餘流量、壓頭、熱負載與切換時間是否通過？ | 拔掉一泵後仍必然維持全部 headline |
+
+### 用熱平衡做一次條件式量綱核對
+
+ASHRAE 把水側顯熱寫成 `q = ṁ × cp × ΔT_loop`：`q` 是熱功率，`ṁ` 是質量流量，`cp`
+是流體比熱，`ΔT_loop` 是**同一迴路**跨設備的溫升或溫降。為了示範這條式子怎麼抓出錯讀，
+先把假設寫在算式前面：假設產品頁四捨五入後的 1890 LPM 就是承載全部 2MW 的同一迴路流量、
+系統已達穩態、流體採 ASHRAE standard-water 條件 `ρ=1000 kg/m³`、`cp=4.18 kJ/(kg·K)`，
+且暫時不計熱損失與量測誤差。那麼：
+
+1. `1890 LPM ÷ 60 = 31.5 L/s`；在上述密度假設下等於 `31.5 kg/s`。
+2. `ΔT_loop = 2000 kW ÷ (31.5 kg/s × 4.18 kJ/(kg·K)) = 15.19 K`。
+
+Python Decimal 與 awk 兩條獨立算術路徑都得到 `15.1894888737 K`，本文只顯示到 `15.19 K`。
+這個結果的用途不是替產品補規格，而是證明 **15.19 K 的迴路溫升與 3°C ATD 回答不同問題**。
+前者在同一水路看回水與供水；後者在 CDU 熱交換器兩側看 TCS 供水與 FWS 供水。即使兩者同時
+成立，也不應相等，更不能把其中一個當成另一個的換算式。
+
+這不是統計估計：來源只有一個產品 headline 工作點，沒有 rack、CDU 或場域樣本，因此沒有
+sampling SE 或 t 值。兩路算術一致只排除手算錯誤，沒有消除更重要的模型不確定性：S19 沒有
+明示 1890 LPM 與 2MW 是否屬同一 reference plane／同一時刻，也未固定實際流體與物性、兩側
+流量、熱損失、支路分配、感測器誤差、part-load、污堵或 N+1 切換後工作點。若實際使用 PG、
+不同溫度下的水，或頁面流量是另一側 headline，就必須改用相應的密度、比熱與量測位置重算。
+
+### 多空小作文先共用同一張熱工護照
+
+**偏多敘事**可以是：若客戶要求單機在高熱負載、受限流量與高壓頭下工作，熱交換器、泵浦、
+變頻驅動、過濾、感測、備援與整合驗證的內容可能增加，具備完整設計與服務能力的供應商可能
+承接更多價值。但這仍要看到具名 BOM、qualification、量產台數、客戶驗收與收入／毛利，不能
+只把資料中心 MW 除以 2MW 就當成 CDU 訂單數。
+
+**偏空敘事**可以是：2MW 只是指定條件下的 headline；場域水溫、流體、PQ 交點、部分負載、
+污堵裕量與故障備援都可能讓可交付工作點下移。另一方面，更大的迴路溫升、較低阻力冷板、共享
+CDU 或系統控制也可能降低所需設備數。這些同樣不能靠想像定案，仍要回到同一份資料。
+
+多空共同裁決的最小熱工護照應固定：**設備／韌體版本、流體與物性、FWS／TCS 四個供回水
+溫度、兩側流量、兩側壓差或 PQ 曲線、熱負載 reference plane、ATD、迴路 ΔT、泵浦電力、
+N+1 狀態、穩態時窗、感測器校正與不確定度、污堵／過濾狀態、測試通過／失敗及 site
+acceptance**。資料不齊時，研究結論只能停在「可做條件式量綱核對」，不能升成產品排名、
+設備台數、供應商訂單或財務預測。
+
 ## 同樣寫 kW，水基、PG25 與 PG55 仍是三條證據分支
 
 **先辨識名牌數字使用哪一種流體。** 冷卻液不是規格表最後一行的耗材備註，而是熱性能、
@@ -1220,6 +1371,7 @@ ICC 對 DDP 的定義重點是賣方負責送達約定目的地、進口清關�
 ## 什麼情況會讓容量排行榜失真
 
 - **相同 kW 可能落在不同操作包絡線**：客戶必須確認現場 FWS／TCS 的溫度、流量、壓力與冷卻液能否落入設備條件；只知道額定容量，還不知道泵浦負擔、材料相容性或故障時可用能力。
+- **把流量、ATD 與迴路溫升當成同一個數字**：GPM 只描述體積流量，ATD 比較 TCS 與 FWS 供水，迴路 ΔT 則比較同一側供回水；少了流體物性與量測位置，就不能由任一 headline 反推出其餘數字。
 - **客戶可能要的是模組化與維修能力**：客戶可能依機櫃或整排配置採多台設備，而不是選單台最大容量；泵浦備援、占地、隔離、維修時間與服務網路都可能更重要。
 - **平台通過測試不保證快速轉單**：LG 已公告超過 100 項驗證，但公告沒有同欄容量定義、平台供應狀態、客戶或訂單；這不是否定驗證，而是說不同來源的欄位不能互相代填。
 - **價值可能落在整套控制與設施端**：Daikin／NTT DATA 正驗證空調、冰水主機與液冷的整合控制。若節能與可靠度主要來自控制軟體或設施端設備，只看 CDU 容量會錯估價值分配。
@@ -1245,13 +1397,16 @@ ICC 對 DDP 的定義重點是賣方負責送達約定目的地、進口清關�
 - [S16：光寶科 115 年第二季合併財務報告](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=2301&filename=202602_2301_AI1.pdf)（雲端及物聯網涵蓋多種業務，不能直接當液冷收入）。
 - [S17：奇鋐 115 年第二季合併財務報告](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3017&filename=202602_3017_AI1.pdf)（部門按營運／地域性質呈現，沒有具名 CDU 分子）。
 - [S18：ICC Incoterms DDP 定義](https://library.iccwbo.org/clp/clp-incoterms.htm)（2026-08-14 capture；說明交貨、清關、成本與風險責任，不是產品毛利定義）。
+- [S19：OCP STULZ Deschutes CDU 產品頁](https://www.opencompute.org/products/734/stulz-deschutes-cdu-cybercool-liquid-cooling-distribution-unit)（2026-08-14 capture；並列 2MW @ 3°C ATD、500 GPM、80 PSI 與 N+1，沒有完整可重現測試包）。
+- [S20：ASHRAE Chapter 13 Hydronic Heating and Cooling](https://handbook.ashrae.org/Handbooks/S20/SI/s20_ch13/s20_ch13_si.aspx)（2026-08-14 capture；水側熱平衡、standard-water 物性與管路攜熱能力的一般方法，不是具名 CDU 測試結果）。
 
-**可證實：** 同日同欄的容量、平台原始供應標籤、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位與可靠度測試類別。台達管理層也確實做出「2025 年液冷產品約占合併營收 10%、2026 年預期超過 12%」的陳述，但前者是近似產品族占比，後者是預期。
+**可證實：** 同日同欄的容量、平台原始供應標籤、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位、可靠度測試類別及 Deschutes 產品頁的 headline。ASHRAE 可證實水側熱平衡的一般關係；它與 OCP 的 ATD 定義也足以證實「迴路溫升」和「兩側供水 approach」是兩個位置不同的溫差。台達管理層也確實做出「2025 年液冷產品約占合併營收 10%、2026 年預期超過 12%」的陳述，但前者是近似產品族占比，後者是預期。
 
 **待驗證：** 平台狀態的精確判準、具名客戶、部署數、訂單、具名 CDU 收入、產品毛利、
-現金流與實際節能結果。台達產品族占比不能分配給單一 L2A／L2L 或 RDF106CDT5192；OCP
-方法也不能證明某一具名產品已完成相同測試。合作名單、平台列名、額定 kW 或廣泛部門數字
-都不得替代這些產品與公司層級證據。
+現金流與實際節能結果。15.19 K 只是標準水與同一穩態 reference plane 假設下的條件式算術，
+不是 Deschutes 實測、3°C ATD 的另一種寫法或設備效率。台達產品族占比不能分配給單一
+L2A／L2L 或 RDF106CDT5192；OCP 方法也不能證明某一具名產品已完成相同測試。合作名單、
+平台列名、額定 kW、headline 流量／壓力或廣泛部門數字都不得替代這些產品與公司層級證據。
 
 ## 8 月 9 日複核：LG 進入清單，但供應階段仍空白
 
@@ -1288,6 +1443,21 @@ ICC 對 DDP 的定義重點是賣方負責送達約定目的地、進口清關�
 - S11／S12 發布於 C9 主命題之前，S13 雖是本日 living capture，卻只支持新 C17 並作 T7 的
   版本監測入口；三者都沒有追加到 C9。故這次方法補強當時不刷新 `last_reviewed_at`、
   `base_confidence` 與公司／平台結論；後續的 Q2 財務監測再另行留下新期限。
+
+## 8 月 14 日方法補強：把 2MW、500 GPM 與 3°C ATD 放回正確位置
+
+- S19 是一個 OCP 動態產品頁工作點，S9 是 OCP 通用 CDU 測試方法；兩者保守合併只算一條
+  OCP 消息鏈。S20 的 ASHRAE 水側熱平衡是第二條獨立方法鏈。N=2 條消息鏈不是兩台 CDU、
+  兩座場域或全產業樣本，也不增加 comparison ledger。
+- C25 的 `15.19 K` 只在「1890 LPM 與 2MW 同屬一條穩態 standard-water 迴路」的明示假設下
+  成立。Python Decimal 與 awk 重算一致，只有算術誤差檢查功能；沒有 sampling SE／t，且流體、
+  reference plane、熱損失、感測器、部分負載、污堵與備援造成的工程不確定性仍未量化。
+- 本輪提前核對 `T6`，只新增一個可讀的 headline 工作點與量綱橋；沒有具名型號的三張版本化
+  曲線、四個溫度、校正／不確定度、穩態原始資料、故障切換與 site pass／fail，因此未完整命中
+  trigger。`T6` 保持 active，immutable fields 與 2026-08-31 `next_check` 不變。
+- 新證據沒有追加到 C21 的公司財務主命題，也沒有改變 NVIDIA 四個原型號的捕捉狀態；因此
+  保留 `last_reviewed_at: 2026-08-14`、`review_due: 2026-08-16` 與 `base_confidence: medium`，
+  不用熱工教材再刷新一次主命題時鐘。
 
 ## 8 月 14 日監測複核：先有公司液冷分子，仍沒有具名 CDU 橋接
 

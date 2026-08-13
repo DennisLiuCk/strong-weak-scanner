@@ -474,3 +474,4 @@ metric:emc-compliance-margin,metric,EMC 合規測試裕量,EMC compliance margin
 capability:emc-accreditation-scope-check,capability,EMC 認可範圍核對,EMC accreditation scope check|accredited activity boundary,concept:ai-rack-emc-certification,逐項核對實驗室地點產品類別方法測試與未認可資料標示而不把認可標誌改寫成產品背書
 process:cpo-reliability-exposure-passport,process,CPO 可靠度暴露護照,CPO reliability exposure passport|port-device-hour reliability contract,concept:cpo-networking,把受測版本 暴露結構 環境工作量 事件定義 共同故障 比較組與設限綁在同一份可重算可靠度紀錄
 metric:zero-event-reliability-bound,metric,零事件可靠度單側界線,Zero-event reliability one-sided bound|zero-failure MTBF lower bound,process:cpo-reliability-exposure-passport,在明示失效定義 固定失效率 獨立性與總暴露假設下以零事件資料報 MTBF 下限或失效率上限而不是零風險
+metric:cdu-flow-heat-balance-bridge,metric,CDU 流量—熱功率橋接,CDU flow heat-balance bridge|loop delta-T bridge,metric:cdu-operating-envelope,用流體物性與同一迴路溫升把流量接到熱功率並把迴路溫升與熱交換器 ATD 分開的量綱核對框架

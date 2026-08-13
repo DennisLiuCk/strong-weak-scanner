@@ -1282,6 +1282,32 @@ class ResearchTopicSchemaV3ContractTest(unittest.TestCase):
         )
         self.assertIn("full", {row["scope"] for row in scan["rows"]})
 
+    def test_repo_liquid_cooling_flow_heat_bridge_preserves_thesis_clock(self):
+        topics = rq.load_topics(reports=lh.load_reports())
+        topic = next(
+            row for row in topics
+            if row["topic_id"] == "MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER"
+        )
+        self.assertEqual(topic["meta"]["last_reviewed_at"], "2026-08-14")
+        self.assertEqual(topic["meta"]["review_due"], "2026-08-16")
+        self.assertEqual(topic["meta"]["base_confidence"], "medium")
+        self.assertTrue(
+            {"S19", "S20"}.issubset(
+                {source["source_id"] for source in topic["sources"]}
+            )
+        )
+        claim = next(row for row in topic["claims"] if row["claim_id"] == "C25")
+        self.assertEqual(claim["label"], "inference")
+        self.assertEqual(
+            set(claim["supporting_source_ids"]),
+            {"S9", "S19", "S20"},
+        )
+        monitor = next(
+            row for row in topic["monitoring"] if row["monitor_id"] == "T6"
+        )
+        self.assertEqual(monitor["next_check"], "2026-08-31")
+        self.assertFalse(topic["quality_errors"])
+
     def test_repo_ai_power_buffer_event_contract_preserves_thesis_clock(self):
         topics = rq.load_topics(reports=lh.load_reports())
         topic = next(
