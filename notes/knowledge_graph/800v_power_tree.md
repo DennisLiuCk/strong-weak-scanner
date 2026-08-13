@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: 800v-power-tree
 root_node_id: concept:800v-power-tree
 label: 800VDC 功率半導體鏈
-summary: 先分開現行 48V、過渡 sidecar、設施級 800V 與靠近運算的直降 topology，再以工作電壓電流、切換、隔離、保護、熱封裝及 qualification 六軸拆解 SiC、GaN 與 Si，並分開 reference design、系統驗收與財務歸因。
+summary: 先分開現行 48V、過渡 sidecar、設施級 800V 與靠近運算的直降 topology，固定電壓端點、功率邊界與 average／RMS current 後，再以切換、隔離、保護、熱封裝及 qualification 六軸拆解 SiC、GaN 與 Si，並分開條件式 I²R、reference design、系統驗收與財務歸因。
 article_ids: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION
 status: active
 -->
@@ -412,6 +412,46 @@ review_due: 2026-08-19
 status: active
 boundary: 規格支持 72kW、6×12kW、60kW N+1 與 48V 系統要求，不證明共同 qualification、部署量、供應商或財務。
 next_trigger: 具名產品依相同 revision 公開 qualification、production shipment、deployment denominator 與 transition plan。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I16
+view: industry
+from_id: concept:800v-power-tree
+to_id: concept:power-voltage-current-reference-plane
+relation: includes
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C12,MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C13,MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C14,MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C15
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: HPR V2 與 Diablo 400 是同一 OCP 規格鏈內的不同系統契約，NVIDIA 另提供 platform architecture；它們不是同一產品的比較測試。
+as_of: 2026-08-14
+review_due: 2026-08-19
+status: active
+boundary: 參考平面契約只用來防止把 48V 名稱、50V setpoint、400V-to-COM 與 800V differential 混用；不證明任一實作效率、銅用量、安全通過、量產或財務效果。
+next_trigger: 具名 production power path 公開同版本 voltage endpoints、delivered-load waveform、average／RMS／peak current、導體溫升、逐級轉換損耗與 pass-fail。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I20
+view: industry
+from_id: concept:800v-power-tree
+to_id: metric:conditional-i2r-loss-sensitivity
+relation: measured_by
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C15
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-19
+status: active
+boundary: 1／256 只在同一 72kW、50V-to-return 對 800V differential 且 fixed-R 的 N=1 反事實工作點成立；沒有 sampling SE／t，不是系統實測節電、TCO 或供應商營收。
+next_trigger: 在相同 delivered-load profile 下公開可重建的導體幾何、RMS-current waveform、溫升、轉換與輔助負載原始數據、不確定度及比較結果。
 -->
 
 <!-- knowledge_edge

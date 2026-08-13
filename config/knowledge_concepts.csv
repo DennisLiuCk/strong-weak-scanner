@@ -400,6 +400,8 @@ concept:800v-topology-device-selection,concept,800V 拓撲與元件選擇雙層�
 metric:power-stage-selection-envelope,metric,功率級六軸選材包絡線,Power-stage selection envelope|six-axis power device selection,concept:800v-topology-device-selection,以工作電壓電流 切換拓撲 隔離安全 瞬態保護 熱封裝及資格供應六軸比較同一 power stage
 component:direct-hv-bus-converter,component,高壓匯流排直降轉換器,Direct 800V bus converter|800V-to-12V|800V-to-6V,concept:800v-topology-device-selection,把高壓直流直接轉為 12V 或 6V 以減少中間轉換級的架構
 component:48v-power-shelf,component,48V 機架電力架,48V power shelf|HPR V2 power shelf,concept:800v-topology-device-selection,由多顆 PSU 以冗餘方式向 48V 機架匯流排供電的現行電力模組
+concept:power-voltage-current-reference-plane,concept,電力電壓電流參考平面,Power voltage current reference plane|voltage endpoints,concept:800v-topology-device-selection,在換算電流損耗與效率前固定電壓端點 功率邊界 平均與RMS波形 導體與轉換責任的比較契約
+metric:conditional-i2r-loss-sensitivity,metric,條件式 I²R 損耗敏感度,Conditional I2R loss sensitivity|fixed resistance loss ratio,concept:power-voltage-current-reference-plane,在同一 delivered power 與同一導體電阻的明示反事實假設下以RMS電流平方比核對導體發熱 不代表真實系統節能
 standard:hbf-technical-specification,standard,HBF 第一版技術規格,HBF technical specification|HBF first technical specification,concept:hbf-commercialization,由 HBF 工作組對外發布並涵蓋產品包絡 主機電氣介面 封裝可靠度與軟體讀寫的共同框架；規格發布不等於產品互通
 metric:hbf-performance-grade,metric,HBF 容量與頻寬等級,HBF capacity and bandwidth grades,concept:hbf-commercialization,共同規格摘要中的堆疊 容量與頻寬級別包絡；不是實體產品測量或跨產品效能排名
 standard:ucie-interface,standard,UCIe 介面,UCIe host interface,concept:hbf-commercialization,規格摘要中用於處理器與 HBF 連接的封裝內晶粒互連路徑；本文不自行指定版本與層級

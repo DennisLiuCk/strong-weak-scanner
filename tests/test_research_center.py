@@ -5759,9 +5759,20 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C5\nlabel: inference\nstatus: active",
             "claim_id: C7\nlabel: inference\nstatus: active",
             "claim_id: C11\nlabel: unverified\nstatus: active",
+            "claim_id: C12\nlabel: verified\nstatus: active",
+            "claim_id: C13\nlabel: verified\nstatus: active",
+            "claim_id: C14\nlabel: inference\nstatus: active",
+            "claim_id: C15\nlabel: inference\nstatus: active",
             "## 先用四個位置看：拓撲會把元件工作移到哪裡",
             "| 本文四個位置 |",
             "## 為什麼 48V 與 800V 會共存一段時間",
+            "## 48V 不一定是 48.0V，±400V 也不能只除以 400",
+            "`72,000W ÷ 50V = 1,440A`",
+            "`72,000W ÷ 800V = 90A`",
+            "1／256 = 0.390625%",
+            "99.609375% 下降，但這只是 **fixed-R sensitivity**",
+            "多空小作文：升壓是價值搬家",
+            "reason: added_voltage_current_reference_plane_and_fixed_resistance_sensitivity_without_thesis_clock_refresh",
             "## 再用六把尺：同一個 power stage 也不能只看材料",
             "| 本文六把尺 |",
             "| 1. 工作電壓與電流 |",
@@ -5776,10 +5787,10 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 11), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 15), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 4),
-            ("transition", 7),
+            ("transition", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -5791,18 +5802,22 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:power-stage-selection-envelope,metric,功率級六軸選材包絡線",
             "component:direct-hv-bus-converter,component,高壓匯流排直降轉換器",
             "component:48v-power-shelf,component,48V 機架電力架",
+            "concept:power-voltage-current-reference-plane,concept,電力電壓電流參考平面",
+            "metric:conditional-i2r-loss-sensitivity,metric,條件式 I²R 損耗敏感度",
         ):
             self.assertIn(concept, concepts)
 
         graph = (
             ROOT / "notes" / "knowledge_graph" / "800v_power_tree.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 25)
         for target in (
             "to_id: concept:800v-topology-device-selection",
             "to_id: metric:power-stage-selection-envelope",
             "to_id: component:direct-hv-bus-converter",
             "to_id: component:48v-power-shelf",
+            "to_id: concept:power-voltage-current-reference-plane",
+            "to_id: metric:conditional-i2r-loss-sensitivity",
             "to_id: stage:800v-subsystem-qualification",
             "to_id: stage:800v-site-acceptance",
             "to_id: stage:800v-commercial-attribution",

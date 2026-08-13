@@ -232,6 +232,22 @@ limitation: OCP specification 固定一套 48V power-shelf contract 與要求，
 independence_group: open-compute-project
 -->
 
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Diablo 400 Project Rack and Power Specification 0.7.0
+published_at: 2026-03-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/ocp-specification-diablo-400-v0-7-0-final-pdf
+locator: PDF pp.10、14–18、31–32；800kW–1MW+ disaggregated power rack；+400V-to-COM 與 -400V-to-COM 的±400VDC output；±400V／800V busbar；50kW／63A、100kW／125A、400kW／500A、800kW／1000A cable options；average 與 RMS current thermal boundary
+limitation: Diablo 400 是多家參與的 0.7.0 system specification，不指定唯一 topology、實作導體尺寸、完整效率與損耗分解、共同 qualification、客戶場站、production BOM、供應商或財務效果；文件中線纜 kW／A 是規格選項而不是本文 72kW 條件式算例的實測
+independence_group: open-compute-project
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -419,6 +435,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: OCP HPR V2 1.0.0 雖將系統命名為 Narrow Range 48V Architecture，但規格寫明 PSU output 是 50V adjustable；72kW capacity 的 shelf 以 60kW N+1 運作，並因 high-current output 採 bolted connection、引用 2000A DC output connector 且監測 busbar 溫度
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-06-12
+basis: S12 pp.6–8、11、16 直接列出 capacity、N+1 output、50V setpoint、bolted high-current output、2000A connector 與溫度感測
+boundary: `48V` 是架構名稱，不應自行把規格內 50V setpoint 改回 48.0V 重算；72kW capacity、60kW N+1 與 2000A connector rating 也是不同欄位，不代表實測電流、所有負載同時滿載、共同部署或供應商收入
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: OCP Diablo 400 0.7.0 將每極寫成 +400V-to-COM 與 -400V-to-COM，兩極間為 800V differential；其線纜選項列 50kW／63A、100kW／125A、400kW／500A 與 800kW／1000A，並要求線徑依應用的 average power 或 RMS current 決定
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-03-01
+basis: S13 pp.14、18、31 直接定義±400VDC 端點、±400V／800V busbar、3-wire output 及各組 kW／A cable options，Appendix B 另分 average 與 RMS current 的熱影響
+boundary: 電流值必須隨負載實際跨接 +400V、COM、-400V 的方式、正負極平衡、波形、降額與備援重算；規格線纜 rating 不是現場實測、銅用量、損耗、效率或安全驗收結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 若只作量綱教材，固定同一 72kW 穩態負載並假設無轉換或配電損失，則從 HPR 規格內 50V 端點供電的條件式電流為 1440A，改以 +400V-to-(−400V) 的 800V differential 供電則為 90A，前者為後者 16 倍
+supporting_source_ids: S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 以 P=V×I 重算：72000／50=1440A，72000／800=90A，1440／90=16；Python Decimal 與 awk 兩條獨立算術路徑完全一致；S13 另列 100kW／125A 與 50kW／63A，可核對 full-differential 800V 下 100000／800=125A、50000／800=62.5A 的量綱關係
+boundary: 這是 N=1 個人為固定的反事實工作點，沒有 sampling SE／t；不是 HPR 與 Diablo 的實驗比較、實際 output current、相同產品、相同 topology 或量產系統。若負載只跨單極 400V-to-COM，同一 72kW 條件式電流會是 180A，因此不寫清 reference plane 就不能除以 400 或 800
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: 將 C14 再加上「相同導體電阻 R」的反事實假設時，I²R 導體損耗比為 (90／1440)²=1／256=0.390625%；這不是真實系統降低 99.609375% 的證據，實際總效益必須重新固定 RMS 電流與波形、導體材料／長度／截面積與接點、轉換級效率、絕緣與電弧間距、保護斷開、散熱、備援與故障包絡線
+supporting_source_ids: S1,S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 Appendix B 明示導體熱影響要用 RMS current，並寫明 wire gauge 隨 average power 或 RMS current 及應用決定；S12 又以高電流螺栓連接、2000A connector 與溫度感測展示低壓電流的實體代價，S1 同時把 800V 轉換級、過流保護與 serviceability 列為系統問題；Python Decimal 與 awk 均得 0.00390625 比值
+boundary: 1／256 只是 fixed-R sensitivity，沒有實驗樣本、sampling SE／t 或現場不確定度；升壓後若縮小導體截面、增加線路長度／接點或改變 topology，R 就不再相同。配電 I²R、converter loss、銅用量、系統效率、TCO 與供應商財務是不同指標，不得用單一算式互相代填
+verification_needed: 需具名 production topology 與版本，在相同 delivered-load profile 下公開全電力路徑的 voltage／RMS-current waveforms、導體幾何與溫升、各 conversion stage input／output、冷卻與輔助負載、fault／redundancy state、原始數據、量測不確定度、pass-fail 與客戶驗收
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -519,6 +603,14 @@ reason: expanded_functional_partition_to_topology_first_six_axis_and_five_gate_c
 evidence: sources:S9,S10,S11,S12
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_voltage_current_reference_plane_and_fixed_resistance_sensitivity_without_thesis_clock_refresh
+evidence: sources:S1,S12,S13
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -547,6 +639,17 @@ evidence: sources:S9,S10,S11,S12
 - **AC-DC**：把交流電轉成直流電的整流與轉換級；它可放在 rack、side power rack 或設施端。
 - **All-800V**：NVIDIA 所述由設施到 IT 配電更全面採用 800VDC 的未來路徑，不代表今天所有設備都已切換。
 - **LLC**：利用電感與電容共振達成軟切換的一類 DC-DC topology；效率與可用範圍仍取決於實際設計條件。
+- **Reference plane（參考平面）**：數值所屬的量測端點與系統邊界。電壓必須寫明是哪兩個端點之間，功率與效率也必須寫明包含哪些轉換、線路與輔助負載。
+- **Differential voltage（差動電壓）**：兩條帶電導體之間的電壓差。Diablo 的 +400V 與 -400V 相對 COM 各為 400V，但正負端之間是 800V。
+- **COM／return（共同點／回流端）**：電路用來定義電壓與回流路徑的端點；它和機殼或保護接地的關係必須依具體 grounding topology 確認。
+- **RMS current（均方根電流）**：用來反映電流波形造成熱效應的等效值。負載快速變動時，只看平均電流可能低估導體與接點溫升。
+- **`P = V × I`**：在本文條件式 DC 教材中，功率等於電壓乘電流。公式本身不會告訴你實際電壓端點、波形、效率、備援或安全邊界。
+- **`I²R` 導體損耗**：電流通過電阻後轉成熱的功率關係。只有在電阻、電流定義與時間邊界一致時，才能用電流平方比較。
+- **Derating（降額）**：為溫度、海拔、壽命、安全或故障留餘裕，將元件或線纜可用上限設得低於型錄額定值。
+- **Python Decimal／awk**：本文用兩個彼此獨立的算術工具重算同一公式，降低抄寫與顯示錯誤；兩路一致不會補上工程條件或實驗證據。
+- **Fixed-R sensitivity**：刻意假設兩種系統的導體電阻 R 不變，只看電流改變會如何影響 `I²R`；這是敏感度，不是實測節能。
+- **Sampling SE／t**：SE 是抽樣標準誤，t 常用來表示估計與零相對於標準誤的距離；確定性單一算例沒有抽樣分布，因此兩者不適用。
+- **to-COM**：電壓是從某一帶電端量到共同點 COM；`+400V-to-COM` 與 `-400V-to-COM` 各是 400V，不是正負端間的 800V。
 
 ### 三句話抓重點
 
@@ -596,6 +699,63 @@ OCP 在 2026 年 6 月發布的 HPR V2 規格，仍把 72kW power shelf 寫成�
 兩者並不矛盾：規格告訴你「現行系統今天必須怎麼交付」，路線圖告訴你「未來責任可能怎麼搬」。
 因此研究時要同時追兩個母體：新建 800V 架構走到哪一關，以及 48V／54V 過渡產品還有多少實際
 部署。只追其中一邊，容易把未來設計誤當今天 BOM，或把今天規格誤當永遠不變。
+
+## 48V 不一定是 48.0V，±400V 也不能只除以 400
+
+先別急著套 `P = V × I`。第一個問題應該是：**V 是哪兩個端點之間的電壓？**
+OCP HPR V2 把架構叫做 `Narrow Range 48V`，但規格內 PSU output setpoint 寫的是
+`50V adjustable`。Diablo 400 則把端點寫成 +400V、COM 與 -400V：單極對 COM 是
+400V，正負兩極之間才是 800V。只看架構名稱就把除數寫成 48、400 或 800，
+可能在第一行就差一倍。
+
+| 文件欄位 | 端點／運作條件 | 可做的量綱核對 | 不能當成 |
+|---|---|---|---|
+| HPR V2 72kW capacity | PSU output 對 50V return；規格以 60kW N+1 運作 | `72,000／50 = 1,440A`；N+1 output 為 `60,000／50 = 1,200A` | 1,440A 已在某櫃實測，或 2,000A connector 平時就流 2,000A |
+| Diablo 全差動路徑 | +400V 到 -400V，跨 800V | 文件的 `100kW／125A` 符合 `100,000／800=125A`；`50kW／63A` 對應算式 62.5A 與線纜額定整數 | 所有負載都跨全差動、正負極完全平衡，或 rating 是實測平均值 |
+| Diablo 單極路徑 | +400V-to-COM 或 COM-to-(−400V)，跨 400V | 同一 72kW 若真的全由單極承擔，條件式電流是 `72,000／400=180A` | 把 180A 與全差動的 90A 互換，或忽略 midpoint grounding 與負載分配 |
+
+### 同一個 72kW 教材為何從 1,440A 變 90A
+
+現在才做一個刻意簡化的條件式比較：固定同一 72kW 穩態 delivered load，先忽略
+轉換與配電損失，再把一邊定義為 50V-to-return，另一邊定義為 +400V-to-(−400V)
+的 800V differential。這時 `I = P／V`：
+
+1. 50V 路徑：`72,000W ÷ 50V = 1,440A`。
+2. 800V 路徑：`72,000W ÷ 800V = 90A`。
+3. 電流比：`1,440 ÷ 90 = 16`；在這個教材條件下，高壓路徑的電流是低壓路徑的 `1／16`。
+
+Python Decimal 與 awk 兩條獨立算術路徑完全一致。這不是實驗樣本，而是 N=1 個人為工作點；
+沒有 sampling SE 或 t 值。S12 與 S13 也不是同一產品的 A／B test：本文只用兩份規格提供
+低壓與高壓的實體端點定義，不把 90A 寫成 Diablo 公布的 72kW 測量。
+
+### `1／256` 是 fixed-R 敏感度，不是系統節電成績
+
+導體的發熱關係常寫成 `P_loss = I_rms² × R`。若在上述人為工作點之外，再加上一個
+現實中不會自動成立的假設——兩邊導體電阻 R 完全一樣——那麼損耗比是：
+
+`(90／1,440)² = (1／16)² = 1／256 = 0.390625%`。
+
+反過來寫是 99.609375% 下降，但這只是 **fixed-R sensitivity**，不是任何具名資料中心、
+rack 或 power shelf 的節電測量。升壓後設計者可能縮小導體截面，R 會上升；線路長度、
+接點數、降額、備援與 RMS 電流波形也會改變溫升。更重要的是，少掉或新增的
+AC-DC／DC-DC stage、風扇與控制電力屬於 converter 與 end-to-end loss，不是同一個 `I²R`
+分子。
+
+因此，真正可比的「電壓—電流—損耗護照」至少要固定：**源端與負載端 reference plane、
+voltage endpoints、delivered-load waveform、average／RMS／peak current、導體材料與幾何、接點與溫升、
+每一轉換級的 input／output、輔助負載與冷卻、備援／fault state、絕緣／電弧／斷開邊界、
+原始數據、量測不確定度與 pass-fail**。沒有這些欄位，可以教電學，不能排效率或算銅用量。
+
+### 多空小作文：升壓是價值搬家，不是所有元件一起增加
+
+**偏多路徑**是：同功率下的電流大幅下降，可解開低壓母排、接頭、配電空間與溫升的物理限制；
+同時，高壓轉換、SiC／GaN、斷路與 hot-swap、絕緣材料、高壓連接器、感測與安全驗證可能獲得更高的
+系統責任與價值。只有這些節點出現具名資格、量產 BOM、出貨及收入／毛利時，才能從工程路線進到個股。
+
+**偏空路徑**是：高壓配電可能減少 rack-level AC-DC PSU、低壓 power shelf、粗銅母排與某些中間轉換級；
+新增的高壓內容也可能被整合到少數模組，或被絕緣、電弧、保護、commissioning 與 field service 成本抵銷。
+若最終 topology 取消某一 stage，那一層的元件需求可能不是轉移，而是直接消失。多空兩邊都要用同一份
+production power tree、同一負載與故障波形、同一 BOM 及同期財務分母裁決，不能把 16 倍電流比直接畫成銅箔、被動元件或功率元件的營收線。
 
 ## 再用六把尺：同一個 power stage 也不能只看材料
 
@@ -650,12 +810,20 @@ OCP 在 2026 年 6 月發布的 HPR V2 規格，仍把 72kW power shelf 寫成�
 - [ST 800VDC power architectures](https://newsroom.st.com/media-center/press-item.html/t4766.html)（800V→50V／12V／6V paths）。
 - [NVIDIA 800VDC architecture hub](https://www.nvidia.com/en-au/data-center/technologies/800-vdc-architecture/)（分階段過渡、既有資料中心與 all-800V 路徑；含官方 whitepaper 入口）。
 - [OCP Open Rack V3 HPR V2 72kW power shelf specification](https://www.opencompute.org/documents/open-rack-v3-hpr-v2-72kw-power-shelf-spec-v1-0-0-pdf)（現行 48V power-shelf contract）。
+- [OCP Diablo 400 Project Rack and Power Specification 0.7.0](https://www.opencompute.org/documents/ocp-specification-diablo-400-v0-7-0-final-pdf)（±400VDC 端點、差動 800V、線纜 kW／A 選項與 average／RMS current 熱邊界）。
 - [Infineon data-center living index](https://www.infineon.com/applications/ai-data-center/data-center-power-solutions) 與 [onsemi data-center living index](https://www.onsemi.com/solutions/computing/data-center)（後續產品與驗證入口）。
 
 本文刻意不把各供應商的峰值效率、功率密度或面積宣稱排成排行榜，因為 topology、輸入輸出、
 負載範圍、隔離、冷卻與 reference plane 不同。OCP 的 48V contract、ROHM 的 planned PSU
 adoption、供應商 reference architecture 與 NVIDIA 的 2027 full-scale 架構錨點，各自描述不同
 系統與證據階段，不能互相替代。
+
+## 8 月 14 日方法補強：先定義電壓端點，再討論升壓受惠
+
+- S12 與 S13 均來自 OCP，保守算一條規格消息鏈；S1 的 NVIDIA platform architecture 是第二條獨立鏈。N=2 條消息鏈不是兩個 rack、產品、客戶、台灣 121 檔或全產業樣本。
+- C14 的 1,440A、90A 與 16 倍只是同一 72kW 人為 reference plane 下的確定性算術；C15 的 1／256 又加上 fixed-R 假設。兩者沒有 sampling SE／t，Python Decimal 與 awk 一致只排除算錯，不消除 topology、RMS 波形、導體、轉換、保護與量測邊界的不確定性。
+- 本輪提前核對 T3，補上 voltage endpoints、average／RMS current、導體與轉換損耗的讀法；但仍無具名 production topology 在同版本公開全路徑波形、導體溫升、converter raw data、fault／redundancy matrix、customer pass 與 BOM。T3 未完整命中 trigger，保持 active，immutable fields 與 2026-08-19 `next_check` 不變。
+- 新證據沒有證明任一材料已勝出、具名台灣供應商取得訂單或改變 C7 的 topology-first 主命題；因此保留 `last_reviewed_at: 2026-08-12`、`review_due: 2026-08-19` 與 `base_confidence: medium`，不用方法教材刷新 thesis evidence clock。
 
 ## 影響路由
 
@@ -687,4 +855,5 @@ evidence_boundary: 外部 reference design 與 planned adoption 不證明台灣�
 - 同版 converter 公開全負載效率、EMI、thermal、transient、fault 與 change-control 原始資料，再由客戶或第三方重測；不能只補一個峰值數字。
 - 具名 rack／site 公開 as-built configuration、commissioning、fault injection、customer acceptance、operating hours 與 deployment denominator。
 - 實際 topology 若保留或取消不同轉換層，重畫六軸選材包絡線，檢查元件需求是轉移、增加還是直接消失。
+- 同一 production power path 公開清楚的 voltage endpoints、average／RMS／peak-current waveforms、導體幾何與溫升、逐級轉換效率、fault／redundancy state 與量測不確定度，才比較實際銅用量與 end-to-end loss。
 - 台灣公司只有在具名料號、客戶、production BOM、出貨與同產品財務資料能雙向核對時才建立公司線；否則維持族群 watch。
