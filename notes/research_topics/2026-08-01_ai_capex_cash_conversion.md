@@ -150,6 +150,38 @@ limitation: Amazon 的資產增加與履約義務是公司級口徑，沒有把�
 independence_group: amazon
 -->
 
+<!-- research_source
+source_id: S9
+role: other_primary
+source_kind: document
+publisher: Financial Accounting Standards Board
+title: Accounting Standards Update 2016-02 — Leases (Topic 842), Section A
+published_at: 2016-02-25
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://storage.fasb.org/ASU%202016-02_Section%20A.pdf
+locator: PDF pp.8–9、108–114；finance lease 初始 ROU asset／lease liability、後續 liability 衡量、principal／interest cash-flow classification 與 disclosure objective
+limitation: 這是美國 GAAP 租賃會計規範與通用例示，不是 Microsoft、Meta、Amazon 或 AI 資料中心的公司數字，也不定義各公司自訂 CapEx／FCF 指標；後續修訂與公司政策仍須回到當期申報核對
+independence_group: fasb-topic-842
+-->
+
+<!-- research_source
+source_id: S10
+role: other_primary
+source_kind: document
+publisher: Financial Accounting Standards Board
+title: Leases under Topic 842 — 2024 GAAP Taxonomy Implementation Guide
+published_at: 2024-03-26
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://xbrl.fasb.org/ix/?doc=..%2Fimpdocs%2FLE_TIG%2Finline_f2017leasesig.htm
+locator: Illustrative facts L25–L30；分列 finance-lease principal payments、interest payments，以及 ROU assets obtained in exchange for new finance／operating lease liabilities
+limitation: 這是 FASB 為 XBRL taxonomy 提供的虛構揭露範例；L25 的 1,500 與 L29 的 500 不是任何真實公司、資料中心、產業樣本或投資支出，也不能用來估計正常比率
+independence_group: fasb-topic-842
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -273,6 +305,34 @@ as_of: 2026-08-12
 basis: S1 至 S3 已把 headline CapEx cash PP&E 租賃 OCF 與 FCF 分開；S7 再分開未起租承諾 在建工程與待售；S8 又分開資產取得但未付款以及依使用與履約認列收入
 boundary: 四時鐘是跨申報建立的研究對帳框架，不是所有公司的共同會計科目，也不證明任一台灣供應商訂單 收入 毛利 現金或投資報酬
 verification_needed: 需要同一具名資產或平台批次的合約生效 placed-in-service 使用與收入 付款及供應商收款日期才能量出各時鐘的實際落差
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: FASB Topic 842 將 finance lease 起租時認列的 ROU asset／lease liability、後續本金償還與利息分開處理；本金償還列為 financing cash flow，FASB taxonomy 範例也把 principal payments 與新租賃負債換得的 ROU assets 分成兩個事實
+supporting_source_ids: S9,S10
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S9 pp.8、108–114 直接規定初始認列、後續衡量及 principal／interest 現金流分類；S10 L25～L30 以不同標籤與虛構數值分列付款與新增 ROU assets
+boundary: FASB 文件只建立通用會計與揭露契約，不代表任何 hyperscaler 的實際租賃新增額、付款、AI 資產範圍或投資報酬；S10 數值不能當產業基準
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: inference
+status: active
+claim: Microsoft FY2026Q4 揭露的 total finance leases 56 億美元與 Meta 2026Q2 揭露的 finance-lease principal payments 9.62 億美元位於不同租賃時鐘，即使兩家公司都把租賃項目納入 headline CapEx，也不能直接比較、相減或用同一公式與 cash PP&E 加總
+supporting_source_ids: S1,S2,S9,S10
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S1 分列 410 億美元 CapEx、56 億 total finance leases 與 358 億 cash PP&E；S2 明確把 301.16 億 cash PP&E 與 9.62 億 finance-lease principal 相加成 310.78 億、四捨五入為 310.8 億 headline CapEx；C10 則證明新租賃／ROU 與償還本金是不同事實
+boundary: Microsoft 所引法說沒有在同一段提供 finance-lease principal，Meta 所引結果也沒有在同一表提供新 finance-lease ROU additions；因此本判讀只裁決兩個已揭數字不可比，不補算缺值、不做公司 AI 投資強弱或 ROI 排名
+verification_needed: 三家公司在同一單季各自分列 cash PP&E、新 finance-lease ROU／liability additions、finance-lease principal／interest、其他 lease remeasurement 與一致的 headline／FCF reconciliation
 resolution:
 -->
 
@@ -511,6 +571,13 @@ to: triaged
 reason: four_accounting_clocks_added_from_meta_and_amazon_filings_without_refreshing_thesis_clock
 evidence: sources:S7,S8
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: finance_lease_addition_and_principal_clocks_separated_with_fasb_contract_without_refreshing_thesis_clock
+evidence: sources:S1,S2,S9,S10
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -531,6 +598,11 @@ evidence: sources:S7,S8
 - **履約義務（performance obligation）**：公司已承諾未來提供的服務；簽約或客戶預付不等於收入已認列，仍要看客戶使用與公司是否完成約定服務。
 - **非現金資產增加**：資產已取得或記入 PP&E，但付款可能尚未發生，或由租賃等方式取得；它會讓資產時鐘早於現金時鐘。
 - **融資租賃（finance lease）**：先取得資產使用權、分期付款的融資方式；它可能計入 headline CapEx，卻不在當期「cash paid for PP&E」裡一次流出。
+- **使用權資產（ROU asset）**：承租人取得在租期內使用標的資產的權利；起租時可與租賃負債同時認列，不代表當期已支付同額現金。
+- **租賃負債（lease liability）**：承租人尚待支付租賃款的現值；新租賃開始、利息累積、本金償還、修改與重新衡量會沿不同方向改變它。
+- **起租／租賃開始（lease commencement）**：標的資產可供承租人使用、開始認列 ROU asset 與 lease liability 的節點；它不同於簽約日，也不同於日後每期付款日。
+- **租賃新增額／本金償還**：前者描述本期開始使用的新租賃資產與負債，常是非現金事實；後者是償還既有 finance-lease liability 的現金流，兩者不能互換。
+- **FASB／Topic 842**：FASB 是制定美國 GAAP 的 Financial Accounting Standards Board；Topic 842 是租賃會計主題，本文只用它界定認列、付款與揭露時鐘，不把會計規範當公司績效。
 - **耐用年限**：會計上預估資產可使用多久，決定每年折舊速度；改變耐用年限會改變損益與租賃分類，卻不一定改變實際建置計畫。
 - **AWS**：Amazon Web Services，Amazon 的雲端運算事業；其營收成長不能直接分配到任一台灣供應商。
 - **TTM**：Trailing Twelve Months，往回累計十二個月；它不是單季數字，與季度資料不能直接並排比較。
@@ -570,6 +642,49 @@ evidence: sources:S7,S8
 | Amazon 截至 2026 Q2 TTM | PP&E purchases 173.028；扣出售與 incentives 後為 169.007 | 161.403 | -7.604 | Amazon 的 FCF 公式是 TTM OCF 減淨 PP&E；這不是單季，也沒有再扣 finance-lease principal。
 
 三家公司都能由官方表格對回各自公式，但**公式對得上不代表彼此可比**。例如 Meta 的 0.784 = 31.862 - 30.116 - 0.962；Amazon 的 -7.604 = 161.403 - 169.007。這些是會計恆等式，不是 AI 投資報酬率。
+
+## 都寫「含租賃」，仍可能是兩支碼表：新增額不等於本金
+
+Finance lease 至少會走過兩個不同的量測時點。租賃開始時，承租人依 FASB Topic 842 認列
+ROU asset 與 lease liability；這通常是取得使用權並承諾未來付款的資產／負債事實，不要求
+當天一次付清。租期中實際付款時，又要把利息與償還本金分開；finance-lease principal
+repayment 列在 financing cash flow，會降低既有租賃負債。換句話說，「本期新開始多少租賃」
+與「本期替新舊租賃還多少本金」沒有一對一關係。
+
+| 租賃時鐘 | 本期發生什麼 | 常見揭露 | 不能替代 |
+|---|---|---|---|
+| 簽約但尚未起租 | 已有未來承諾，資產尚不可供使用 | lease not yet commenced／future payments | 新增 ROU asset、當期本金或可用容量 |
+| 起租／新增 | 取得使用權，認列 ROU asset 與 lease liability | ROU assets obtained in exchange for new lease liabilities | 當期現金支出或日後本金付款 |
+| 付款 | 支付本期租賃款，拆成利息與本金 | interest payments／principal payments | 本期新租賃規模或新上線容量 |
+| 期末餘額 | 累積新租賃、付款、利息、修改與重新衡量後的存量 | finance-lease assets／liabilities | 本期新增額或本期現金流 |
+
+FASB 的 2024 taxonomy implementation guide 刻意把兩者分成不同標籤：虛構範例的
+`principal payments under finance lease obligations` 是 1,500，`ROU assets obtained in
+exchange for new finance lease liabilities` 是 500。這不是要提供 3 倍的正常比例，而是示範
+同一期間可以同時償還很多既有租賃、只新增少量租賃，兩筆資訊必須分開報。數字屬會計範例，
+不是任何公司、資料中心或產業統計。
+
+### 套回 Microsoft 與 Meta，差別就看得見
+
+| 公司揭露 | 原文口徑 | 位在哪支碼表 | 安全讀法 |
+|---|---|---|---|
+| Microsoft FY2026Q4 | CapEx 410 億美元、`total finance leases` 56 億美元、cash PP&E 358 億美元 | 法說把 finance leases 放進 headline capital metric，卻未在同一段揭露 principal | 能說公司 CapEx 含 finance leases；不能把 56 億和另一公司的本金比較 |
+| Meta 2026Q2 | cash PP&E 301.16 億美元、finance-lease principal 9.62 億美元 | 兩筆都是當期 cash-flow 項目；本金列 financing activities | `301.16 + 9.62 = 310.78` 億，四捨五入為公司 headline CapEx 310.8 億美元 |
+
+Meta 的加法可由同一份結果表逐項重算；Microsoft 的 410 億、56 億與 358 億則分別只報到
+整數或一位小數，公司沒有在該段給精確 reconciliation。不能硬算 `358 + 56 = 414` 億後，
+把 4 億美元差距解讀成漏報、錯誤或另一類資產；它可完全落在揭露精度與口徑差異裡。
+
+更不能把 Microsoft 的 56 億除以 Meta 的 9.62 億，宣稱前者租賃投資約為後者 5.8 倍：
+前者標成 total finance leases，後者明確是償還本金，既不是相同分子，也沒有共同資產範圍。
+要建立可比橋接，三家公司都必須在同一單季分列 cash PP&E、新 finance-lease ROU／liability
+additions、principal、interest、modification／remeasurement，以及各自 headline CapEx 與 FCF
+公式。
+
+本段是 `N=2` 家指定發行人的當期揭露，加上一條 FASB 會計規範／taxonomy 消息鏈；不是
+hyperscaler 或資料中心產業樣本。公司數字是各自報告值，Meta 加法與 FASB 分類是確定性
+核對，沒有 sampling SE／t；FASB 的 1,500／500 是虛構示例，不納入公司比較。這一段只裁決
+口徑，不衡量 AI ROI、供應商訂單、估值或市場是否反映。
 
 ## 需求證據與回收證據要分開
 
@@ -670,8 +785,10 @@ Amazon 的 2026 Q1 申報則把另外兩個時差寫得很清楚：PP&E 淨增�
 - [Amazon 2025 Form 10-K：伺服器／網路設備耐用年限，2026-02-06](https://www.sec.gov/Archives/edgar/data/1018724/000101872426000004/amzn-20251231.htm)
 - [Meta 2026 Q1 Form 10-Q：尚未起租、在建工程與待售資產](https://www.sec.gov/Archives/edgar/data/1326801/000162828026028526/meta-20260331.htm)
 - [Amazon 2026 Q1 Form 10-Q：未付款資產與 AWS 履約義務](https://www.sec.gov/Archives/edgar/data/1018724/000101872426000014/amzn-20260331.htm)
+- [FASB Accounting Standards Update 2016-02：Leases (Topic 842), Section A](https://storage.fasb.org/ASU%202016-02_Section%20A.pdf)（租賃初始認列、後續衡量與 principal／interest 現金流分類）。
+- [FASB 2024 GAAP Taxonomy Implementation Guide：Leases under Topic 842](https://xbrl.fasb.org/ix/?doc=..%2Fimpdocs%2FLE_TIG%2Finline_f2017leasesig.htm)（虛構揭露例，不是公司或產業數據）。
 
-**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。
+**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。FASB 文件再證明新 finance-lease ROU／liability 與償還本金是兩個不同事實。
 
 **還不知道：** CapEx 中每一項 AI 晶片、伺服器、網路、電力與建物的精確拆分，新增容量的上線時間與利用率，以及台灣 universe 個股的訂單與獲利份額。
 
@@ -730,6 +847,7 @@ evidence_boundary: 不由雲端需求直接指認台灣散熱個股受惠，等�
 ## 下一個可證明／否定的節點
 
 - **下一季現金表**：同口徑追 cash PP&E、finance lease、OCF 與 FCF；若支出維持但 OCF／毛利持續惡化，資本回收風險升高。
+- **租賃雙碼表**：要求同季同時揭露新 finance-lease ROU／liability additions、principal、interest 與 modification／remeasurement；只有「含租賃」三個字仍不能跨公司比較。
 - **容量變現**：Azure、AWS 與 Meta AI 產品的使用量、營收與毛利是否跟上資產上線；若容量投入增加卻無法變現，需求故事要降權。
 - **分類調節**：微軟租賃分類改變後，同時看 reported CapEx 與 operating-lease cash payments，避免把分類位移誤讀為採購位移。
 - **台灣公司交叉驗證**：供應商 Q2／Q3 正式文件是否出現客戶認證、出貨、存貨／應收、毛利與 OCF 的同向改善；只有營收、沒有毛利與現金，不算完整受惠。
