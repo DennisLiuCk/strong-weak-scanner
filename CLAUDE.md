@@ -104,11 +104,14 @@ audit_raw_data.py 唯讀稽核 current universe×price∪market 交易日的五�
                  NULL、法人/借券公式、SQLite integrity、market canonical/provenance 與
                  market_index 覆蓋；exit 0/1/2
 fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現金流量表)
-                 → month_revenue/financials/balance_sheet/cash_flow;獨立月/季排程,不掛每日管線
+                 → month_revenue/financials/balance_sheet/cash_flow + fundamental_availability
+                 first-seen 帳本;獨立月/季排程,不掛每日管線
                  範圍 = universe + REF_IDS(2330,供台積電觀察層研究)
                  月營收缺口以 TWSE/TPEx 官方 OpenAPI 補援;12 日首抓、每月 17 日
                  重驗(季報月由全抓順帶),並要求最新應公布月份完整,否則 workflow 標紅
 score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
+ranking_views.py A領先/B風險/C籌碼/D基本面四個 tie-safe 族群內平行排名＋角色同儕、
+                 peer sensitivity、Pareto；Champion 不變,C1/C2 自 2026-08-13 append-only OOS
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
                  archive 同資料日首次建立後不覆寫;本地重跑只更新 index.html
                  台積電事件錨點發布到 research.html 市場議題；主頁不再重複事件 payload
@@ -154,10 +157,13 @@ price_adj/daily_metrics/daily_scores/group_metrics/market_daily(每次重建)。
 (WEEKLY_REVIEW §4-8「正式 as-seen 快照 ≥8 週」;快照自 2026-07-13 起算 →
 約 2026-09-12 後,不是 TDCC 起始日 07-03 + 8 週)。**risk_flags(處置/注意)屬另一類**——
 交易所官方認證的異常價量列管,設計上就是永久顯示用警示(儀表板紅框 badge),
-不進 OOS 排程、不會變成計分項。**month_revenue/financials/balance_sheet/cash_flow
+不進 OOS 排程、不會變成計分項。**month_revenue/financials/balance_sheet/cash_flow/
+fundamental_availability
 (2026-07-09 起,`fetch_financials.py` 獨立填入)也是另一類**——FinMind 官方財報,
-月/季頻、不進 daily_metrics/daily_scores,供 Universe 治理(R1 業務歸屬)等質化查證用;
-financials/balance_sheet/cash_flow 是 FinMind 原生 type/value 窄表(EAV),非寬表。
+月/季頻、不進 daily_metrics/daily_scores,供 Universe 治理(R1 業務歸屬)等質化查證與
+多視角 D 基本面觀察排名用;
+financials/balance_sheet/cash_flow 是 FinMind 原生 type/value 窄表(EAV),非寬表；
+fundamental_availability 只保存各資料期第一次被系統看見的時間,供 D 視角阻擋 look-ahead。
 **`notes/qualitative/*.md`(2026-07-09 起)也是另一類**——年報 MD&A、法說會重點,人工
 撰寫(非 FinMind、零自動抓取),供理解個股業務/商業模式用;`build_dashboard.py` 讀 meta
 區塊把「最後更新/建議複核」狀態顯示成儀表板個股列的筆記 badge,點擊連到 GitHub 全文。

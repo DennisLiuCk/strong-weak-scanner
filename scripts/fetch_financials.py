@@ -14,15 +14,17 @@ format)——各期揭露項目數量不固定(EPS 偶爾缺、資產負債表�
 PRIMARY KEY(date, stock_id, type)。
 
 ⚠ 這批是基本面資料,**不進 daily_metrics/daily_scores 評分管線**,供 Universe 治理
-(R1 業務歸屬)等質化查證用——同 tdcc_holding/sbl 屬「觀察層」,見 CLAUDE.md。
+(R1 業務歸屬)等質化查證與 D 基本面觀察排名用——同 tdcc_holding/sbl 屬「觀察層」,
+見 CLAUDE.md。
 
 用法:
   python scripts/fetch_financials.py                       # 全部四個 dataset
   python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue
   python scripts/fetch_financials.py --stocks 6525,8131 --start 2023-01-01
   python scripts/fetch_financials.py --official-month-revenue-only --stocks 3016,3680
+  python scripts/fetch_financials.py --initialize-availability-only
 """
-import argparse, csv, json, os, sqlite3, sys, time
+import argparse, csv, datetime as dt, json, os, sqlite3, sys, time
 import urllib.request
 from datetime import date, timedelta
 
@@ -49,30 +51,115 @@ CREATE TABLE IF NOT EXISTS balance_sheet(date TEXT, stock_id TEXT, type TEXT, va
   origin_name TEXT, PRIMARY KEY(date, stock_id, type));
 CREATE TABLE IF NOT EXISTS cash_flow(date TEXT, stock_id TEXT, type TEXT, value REAL,
   origin_name TEXT, PRIMARY KEY(date, stock_id, type));
+CREATE TABLE IF NOT EXISTS fundamental_availability(
+  dataset TEXT NOT NULL,
+  data_date TEXT NOT NULL,
+  stock_id TEXT NOT NULL,
+  source_published_at TEXT,
+  first_seen_at TEXT NOT NULL,
+  source TEXT NOT NULL,
+  PRIMARY KEY(dataset, data_date, stock_id));
 """
 
 
-def up_month_revenue(con, data):
-    rows = [(d["date"], d["stock_id"], d.get("revenue"), d.get("revenue_month"),
-             d.get("revenue_year")) for d in data]
-    con.executemany("INSERT OR REPLACE INTO month_revenue VALUES(?,?,?,?,?)", rows)
+def utc_now():
+    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+
+
+def record_availability(con, dataset, data, *, first_seen_at=None, source=None,
+                        source_published_at=None):
+    """以第一次看到的時間建立 point-in-time ledger；重跑不得覆寫。
+
+    ``date`` 是財報期間／月營收 storage date，不等於發布日。FinMind／官方 OpenAPI
+    目前沒有逐列穩定發布 timestamp，故 ``source_published_at`` 保留 NULL，而以
+    ``first_seen_at`` 作保守可用時間下界。之後若來源補發布日可原欄填入，不能倒填成
+    早於 first-seen 後拿去宣稱過去已知。
+    """
+    first_seen_at = first_seen_at or utc_now()
+    source = source or "unknown"
+    rows = sorted({(dataset, str(item["date"]), str(item["stock_id"]),
+                    source_published_at, first_seen_at, source)
+                   for item in data if item.get("date") and item.get("stock_id")})
+    con.executemany(
+        """INSERT OR IGNORE INTO fundamental_availability(
+             dataset,data_date,stock_id,source_published_at,first_seen_at,source)
+           VALUES(?,?,?,?,?,?)""", rows)
     return len(rows)
 
 
-def _up_eav(table):
-    def _up(con, data):
+def initialize_existing_availability(con, *, first_seen_at=None):
+    """將既有 restated rows 只宣告為「從 migration 當下起已知」，不回填歷史發布日。"""
+    first_seen_at = first_seen_at or utc_now()
+    mapping = {
+        "TaiwanStockMonthRevenue": "month_revenue",
+        "TaiwanStockFinancialStatements": "financials",
+        "TaiwanStockBalanceSheet": "balance_sheet",
+        "TaiwanStockCashFlowsStatement": "cash_flow",
+    }
+    inserted = 0
+    for dataset, table in mapping.items():
+        before = con.total_changes
+        con.execute(
+            f"""INSERT OR IGNORE INTO fundamental_availability(
+                   dataset,data_date,stock_id,source_published_at,first_seen_at,source)
+                 SELECT ?,date,stock_id,NULL,?,'migration_existing_rows'
+                 FROM {table} GROUP BY date,stock_id""",
+            (dataset, first_seen_at),
+        )
+        inserted += con.total_changes - before
+    return inserted
+
+
+def ensure_schema(con, *, initialize_existing=False, first_seen_at=None):
+    """建立財務 schema；只有正式抓取入口才初始化既有 rows 的 first-seen ledger。"""
+    con.executescript(SCHEMA)
+    if initialize_existing:
+        return initialize_existing_availability(con, first_seen_at=first_seen_at)
+    return 0
+
+
+def initialize_availability_ledger(db=DB, *, first_seen_at=None):
+    """離線建立 first-seen 帳本；不抓網路、不更動既有財報列。"""
+    os.makedirs(os.path.dirname(os.path.abspath(db)), exist_ok=True)
+    con = sqlite3.connect(db)
+    try:
+        initialized = ensure_schema(
+            con, initialize_existing=True, first_seen_at=first_seen_at)
+        con.commit()
+        return initialized
+    finally:
+        con.close()
+
+
+def up_month_revenue(con, data, *, first_seen_at=None, source="FinMind"):
+    rows = [(d["date"], d["stock_id"], d.get("revenue"), d.get("revenue_month"),
+             d.get("revenue_year")) for d in data]
+    con.executemany("INSERT OR REPLACE INTO month_revenue VALUES(?,?,?,?,?)", rows)
+    record_availability(
+        con, "TaiwanStockMonthRevenue", data,
+        first_seen_at=first_seen_at, source=source)
+    return len(rows)
+
+
+def _up_eav(table, dataset):
+    def _up(con, data, *, first_seen_at=None, source="FinMind"):
         rows = [(d["date"], d["stock_id"], d["type"], d.get("value"), d.get("origin_name"))
                 for d in data]
         con.executemany(f"INSERT OR REPLACE INTO {table} VALUES(?,?,?,?,?)", rows)
+        record_availability(
+            con, dataset, data, first_seen_at=first_seen_at, source=source)
         return len(rows)
     return _up
 
 
 UPSERT = {
     "TaiwanStockMonthRevenue": up_month_revenue,
-    "TaiwanStockFinancialStatements": _up_eav("financials"),
-    "TaiwanStockBalanceSheet": _up_eav("balance_sheet"),
-    "TaiwanStockCashFlowsStatement": _up_eav("cash_flow"),
+    "TaiwanStockFinancialStatements": _up_eav(
+        "financials", "TaiwanStockFinancialStatements"),
+    "TaiwanStockBalanceSheet": _up_eav(
+        "balance_sheet", "TaiwanStockBalanceSheet"),
+    "TaiwanStockCashFlowsStatement": _up_eav(
+        "cash_flow", "TaiwanStockCashFlowsStatement"),
 }
 
 
@@ -156,7 +243,7 @@ def fill_official_month_revenue(con, stock_ids, year, month,
     official = fetcher(before, year, month)
     rows = [official[sid] for sid in before if sid in official]
     if rows:
-        up_month_revenue(con, rows)
+        up_month_revenue(con, rows, source="TWSE_TPEx_official_openapi")
     after = missing_month_revenue(con, stock_ids, year, month)
     return before, [row["stock_id"] for row in rows], after
 
@@ -177,7 +264,25 @@ def main():
     ap.add_argument(
         "--require-latest-month-complete", action="store_true",
         help="最新應公布月份仍有缺口時 exit 1（建議用於每月 17 日重試）")
+    ap.add_argument(
+        "--initialize-availability-only", action="store_true",
+        help="只建立 point-in-time ledger 並把既有列標成此刻才首次可知；不連網")
     args = ap.parse_args()
+
+    if args.initialize_availability_only:
+        conflicting = (
+            args.start or args.end or args.datasets or args.stocks
+            or args.official_month_revenue_only
+            or args.no_official_month_revenue_fallback
+            or args.require_latest_month_complete
+        )
+        if conflicting:
+            sys.exit("--initialize-availability-only 不可與抓取／補援參數併用")
+        initialized = initialize_availability_ledger(DB)
+        print(
+            f"point-in-time ledger 初始化 {initialized} 組既有期間；"
+            "未抓網路，舊資料僅自本次 first-seen 起可用")
+        return
 
     end = args.end or date.today().isoformat()
     start = args.start or (date.today() - timedelta(days=1095)).isoformat()
@@ -202,7 +307,10 @@ def main():
     token = None if args.official_month_revenue_only else get_token()
     os.makedirs(os.path.dirname(DB), exist_ok=True)
     con = sqlite3.connect(DB)
-    con.executescript(SCHEMA)
+    initialized = ensure_schema(con, initialize_existing=True)
+    if initialized:
+        con.commit()
+        print(f"point-in-time ledger 初始化 {initialized} 組既有期間；僅自本次 first-seen 起可用")
     print(f"抓取財報 {start} .. {end} · {len(ids)} 檔 · {len(ds_list)} datasets")
     total = 0
     if not args.official_month_revenue_only:
@@ -211,7 +319,7 @@ def main():
             for ds in ds_list:
                 data = api_get(ds, sid, start, end, token)
                 if data:
-                    got += UPSERT[ds](con, data)
+                    got += UPSERT[ds](con, data, source="FinMind")
                 time.sleep(args.sleep)
             total += got
             con.commit()

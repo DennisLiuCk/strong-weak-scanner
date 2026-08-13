@@ -1,3 +1,4 @@
+import json
 import sqlite3
 import sys
 import tempfile
@@ -98,6 +99,20 @@ class SnapshotSignalsTest(unittest.TestCase):
         self.assertEqual((first["ma5"], first["rsi14"], first["volume"], first["vol_ratio20"]),
                          (1.0, 1.0, 1, 1.0))
         self.assertIn("注意", first["risk_flags_json"])
+        ranking = self.con.execute(
+            """SELECT spec_sha,champion_pct,lens_a,lens_b,lens_c,payload_json
+               FROM oos_ranking_view_snapshots
+               WHERE snapshot_id='run-1' AND stock_id='1001'""").fetchone()
+        self.assertRegex(ranking["spec_sha"], r"^[0-9a-f]{64}$")
+        self.assertIsNotNone(ranking["champion_pct"])
+        self.assertIn("peer_sensitivity", ranking["payload_json"])
+        quality = json.loads(self.con.execute(
+            "SELECT quality_json FROM oos_snapshot_runs WHERE snapshot_id='run-1'"
+        ).fetchone()[0])
+        self.assertEqual(quality["ranking_views"], 2)
+        self.assertRegex(quality["ranking_spec_sha"], r"^[0-9a-f]{64}$")
+        self.assertIn("ranking_lens_d", quality)
+        self.assertIn("ranking_role_rank", quality)
 
         self.con.execute("UPDATE daily_scores SET tier='真弱', composite_s=-4 WHERE stock_id='1001'")
         self.con.commit()
@@ -110,6 +125,9 @@ class SnapshotSignalsTest(unittest.TestCase):
             "WHERE snapshot_id='run-2' AND stock_id='1001'").fetchone()
         self.assertEqual(tuple(original), ("真強", 3.0))
         self.assertEqual(tuple(revision), ("真弱", -4.0))
+        self.assertEqual(self.con.execute(
+            "SELECT COUNT(*) FROM oos_ranking_view_snapshots"
+        ).fetchone()[0], 4)
         canonical = self.con.execute(
             "SELECT snapshot_id FROM oos_snapshot_runs WHERE is_official=1 "
             "ORDER BY data_date, captured_at, snapshot_id LIMIT 1").fetchone()[0]
@@ -121,6 +139,8 @@ class SnapshotSignalsTest(unittest.TestCase):
         self.assertFalse(created)
         self.assertEqual(
             self.con.execute("SELECT COUNT(*) FROM oos_signal_snapshots").fetchone()[0], 2)
+        self.assertEqual(
+            self.con.execute("SELECT COUNT(*) FROM oos_ranking_view_snapshots").fetchone()[0], 2)
 
     def test_identical_holiday_run_does_not_create_revision(self):
         self.capture("run-1", "2026-07-10T14:00:00+00:00")

@@ -341,6 +341,8 @@ svg{display:block;overflow:visible}
 /* ≤360px(iPhone SE 一代／Fold 封面屏)：五元素一列 5 格時每格只剩 42px，
    「投信 -1,807張」這類四位數張數放不下。改成 3+2 換行，不動 375px 以上的一列 5 格 */
 @media (max-width:360px){
+  /* 320px 下 brand/tools/primary nav 會排成三列；138px 的一般手機 anchor 補償不足。 */
+  html{scroll-padding-top:180px}
   .strip{flex-wrap:wrap}
   .tile{flex:1 1 28%}
 }
@@ -369,6 +371,7 @@ svg{display:block;overflow:visible}
           <a href="#grp">族群比較</a>
           <a href="#tier">個股分層</a>
           <a href="research.html" data-research-link>研究中心</a>
+          <a href="#perspectives">多視角排名</a>
           <a href="#diverge">兩視角分歧</a>
           <a href="#lens">時間尺度</a>
           <a href="#stocks">族群內個股</a>
@@ -390,6 +393,7 @@ svg{display:block;overflow:visible}
     <section id="grp" class="blk"></section>
     <section id="tier" class="blk"></section>
     <section id="recent" class="blk"></section>
+    <section id="perspectives" class="blk"></section>
     <section id="diverge" class="blk"></section>
     <section id="lens" class="blk"></section>
     <section id="stocks" class="blk"></section>
@@ -439,7 +443,7 @@ svg{display:block;overflow:visible}
    ============================================================ */
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
-      STRATEGY=__STRATEGY_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__,
+      STRATEGY=__STRATEGY_JSON__, RANKV=__RANKING_VIEWS_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__,
       RECENT=__RECENT_ARTICLES_JSON__, MKT=__MKT_TIP_JSON__,
       DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 const RESEARCH_BASE=location.pathname.includes('/archive/')?'../research.html':'research.html';
@@ -877,6 +881,60 @@ function buildDiverge(){
       +'<br><b style="color:var(--ink)">這是描述,不是買賣訊號</b>——落差有沒有預測力,'
       +'正由事先登錄的假設 H1 檢定中(見週報 ⑪),目前尚無結論。'}),
     grid, rho];
+}
+
+/* 多視角排名：同一檔用不同問題各排一次。四個 lens 都是 observation layer；
+   Champion 的 production 分數／tier 不因本區而改變。 */
+const RV_META={
+  champion_pct:{short:'正式',title:'正式綜合',question:'現行價格／韌性主導的族群內綜合位置',tone:'var(--ink2)'},
+  lens_a:{short:'A',title:'A 領先／進攻',question:'誰在短、波段、趨勢三個價格週期相對領先？',tone:'var(--strong)'},
+  lens_b:{short:'B',title:'B 風險／懷疑',question:'誰目前較抗跌、槓桿與量價過熱較低？',tone:'var(--teal)'},
+  lens_c:{short:'C',title:'C 籌碼／偵察',question:'誰的外資、投信與逆勢買賣相對位置靠前？',tone:'var(--amber)'},
+  lens_d:{short:'D',title:'D 基本面／全局',question:'截至 first-seen 已知資料，誰的成長與營運品質較靠前？',tone:'var(--hypodot)'}
+};
+function rvPct(v){return v==null?'—':v.toFixed(0);}
+function rvBar(key,v){const m=RV_META[key],col=m.tone;return h('div',{style:'display:grid;grid-template-columns:22px 1fr 32px;gap:6px;align-items:center',title:m.title+'：'+m.question},
+  h('span',{style:`font-size:var(--fs-10);font-weight:900;color:${col}`,text:m.short}),
+  h('div',{style:'height:7px;border-radius:4px;background:var(--inset);overflow:hidden'},v==null?null:h('div',{style:`height:100%;width:${Math.max(v,1.5)}%;background:${col};border-radius:4px`})),
+  h('span',{class:'mono',style:`font-size:var(--fs-105);font-weight:800;color:${v==null?'var(--muted)':col};text-align:right`,text:rvPct(v)}));}
+function rvMetricCard(key,rows,singleGroup){const m=RV_META[key],usable=rows.filter(x=>x[key]!=null),best=usable.length?Math.max(...usable.map(x=>x[key])):null,leaders=usable.filter(x=>x[key]===best).sort((a,b)=>a.id.localeCompare(b.id));return h('article',{class:'card',style:`padding:17px 18px;border-top:3px solid ${m.tone}`},
+  h('div',{style:'display:flex;justify-content:space-between;gap:8px;align-items:baseline'},h('b',{style:`font-size:14px;color:${m.tone}`,text:m.title}),h('span',{class:'mono',style:'font-size:var(--fs-10);color:var(--muted)',text:usable.length+'/'+rows.length})),
+  h('p',{style:'margin:6px 0 8px;font-size:var(--fs-115);color:var(--ink2);line-height:1.55',text:m.question}),
+  !usable.length?h('p',{style:'margin:0;font-size:12px;color:var(--muted)',text:'尚無 point-in-time 可用資料'}):singleGroup?h('p',{style:'margin:0;font-size:12px;color:var(--muted)',text:'目前靠前：'+leaders.slice(0,2).map(x=>x.nm).join('、')+(leaders.length>2?' 等 '+leaders.length+' 檔':'')+' · '+rvPct(best)}):h('p',{style:'margin:0;font-size:12px;color:var(--muted)',text:'各族群前 20%：'+usable.filter(x=>x[key]>=80).length+' 檔'}));}
+function buildRankingViews(){
+  const R=RANKV;if(!R)return[];
+  const gsel=h('select',{class:'sel','aria-label':'選擇多視角族群'},h('option',{value:'',text:'全部族群'}));
+  [...new Set(R.rows.map(x=>x.g))].sort().forEach(g=>gsel.appendChild(h('option',{value:g,text:(R.rows.find(x=>x.g===g)||{}).gLabel||g})));
+  const sortSel=h('select',{class:'sel','aria-label':'選擇排序視角'});
+  Object.keys(RV_META).forEach(key=>sortSel.appendChild(h('option',{value:key,text:RV_META[key].title})));
+  sortSel.value='lens_a';
+  const onlyConsensus=h('label',{class:'togglebtn',style:'display:flex;align-items:center;gap:6px;font-size:12px'},h('input',{type:'checkbox'}),'只看 ≥2 視角／Pareto');
+  const cards=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:12px'}),summary=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:14px'}),foot=h('p',{class:'note',style:'margin:11px 2px 0'});
+  let showAll=false;const more=h('button',{class:'lnk',style:'margin-top:12px'});
+  function filtered(){const g=gsel.value,key=sortSel.value;return R.rows.filter(x=>(!g||x.g===g)&&(!onlyConsensus.querySelector('input').checked||x.consensus_count>=2||x.pareto===true)).sort((a,b)=>(b[key]??-1)-(a[key]??-1)||a.id.localeCompare(b.id));}
+  function render(){
+    const rows=filtered(),shown=showAll?rows:rows.slice(0,18);cards.textContent='';summary.textContent='';
+    Object.keys(RV_META).forEach(key=>summary.appendChild(rvMetricCard(key,rows,!!gsel.value)));
+    shown.forEach(x=>{const values=['lens_a','lens_b','lens_c','lens_d'].map(k=>x[k]).filter(v=>v!=null),hi=values.length?Math.max(...values):null,lo=values.length?Math.min(...values):null,focus=sortSel.value,focusVal=x[focus],role=(x.role_label?x.role_label+(x.role_pct!=null?' · 角色 '+rvPct(x.role_pct):' · 樣本 '+x.role_n+'，不硬排'):'');
+      cards.appendChild(h('article',{class:'card clickrow',role:'button',tabindex:'0',style:'padding:15px 17px;cursor:pointer',onclick:()=>openStockDetail(x.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(x.id);}}},
+        h('div',{style:'display:flex;justify-content:space-between;gap:10px;align-items:flex-start'},h('div',{style:'min-width:0'},h('div',{style:'display:flex;align-items:baseline;gap:6px;flex-wrap:wrap'},h('b',{style:'font-size:15px',text:x.nm}),h('span',{class:'mono',style:'font-size:var(--fs-105);color:var(--muted)',text:x.id}),h('span',{style:'font-size:var(--fs-105);color:var(--muted)',text:x.gLabel})),role?h('div',{style:'font-size:var(--fs-10);color:var(--muted);margin-top:2px',text:role}):null),h('div',{class:'mono',style:`font-size:25px;font-weight:800;color:${focusVal==null?'var(--muted)':RV_META[focus].tone}`,text:rvPct(focusVal)})),
+        h('div',{style:'display:grid;gap:4px;margin-top:10px'},rvBar('lens_a',x.lens_a),rvBar('lens_b',x.lens_b),rvBar('lens_c',x.lens_c),rvBar('lens_d',x.lens_d)),
+        h('div',{style:'display:flex;gap:6px;flex-wrap:wrap;margin-top:10px'},
+          h('span',{class:'chip',text:'正式 '+rvPct(x.champion_pct)}),
+          x.consensus_count?h('span',{class:'chip',style:'color:var(--teal);background:var(--tealbg)',text:(x.consensus_count>=2?'前20%共識 ':'前20% ')+x.consensus_count+' 視角'}):null,
+          x.pareto===true?h('span',{class:'chip',style:'color:var(--hypoink);background:var(--hypobg)',text:'Pareto '+x.pareto_dimensions+'D'}):null,
+          x.disagreement!=null?h('span',{class:'chip',text:'分歧 '+x.disagreement.toFixed(0)+'pp'}):null,
+          x.peer_sensitivity!=null?h('span',{class:'chip',style:x.peer_sensitivity>=25?'color:var(--amber);background:var(--amberbg)':'',text:'同儕敏感 '+x.peer_sensitivity.toFixed(0)+'%'}):null,
+          x.champion_tie_n>1?h('span',{class:'chip',style:'color:var(--amber);background:var(--amberbg)',text:'正式同分 '+x.champion_tie_n+' 檔'}):null,
+          x.top_boundary_tied?h('span',{class:'chip',style:'color:var(--amber);background:var(--amberbg)',text:'top-2 邊界同分'}):null),
+        hi!=null&&lo!=null&&hi-lo>=50?h('p',{style:'margin:9px 0 0;font-size:var(--fs-11);color:var(--muted)',text:'這檔是多視角「專才」：最高與最低相差 '+(hi-lo).toFixed(0)+' 個百分位點；不宜只看平均。'}):null));});
+    foot.textContent=`顯示 ${shown.length} / ${rows.length} 檔；依 ${RV_META[sortSel.value].title} 排序`;
+    more.textContent=showAll?'收合名單':`展開全部 ${rows.length} 檔`;more.style.display=rows.length>18?'':'none';
+  }
+  [gsel,sortSel].forEach(el=>el.onchange=()=>{showAll=false;render();});onlyConsensus.querySelector('input').onchange=()=>{showAll=false;render();};more.onclick=()=>{showAll=!showAll;render();};render();
+  const dReady=R.fundamental&&R.fundamental.available,dNote=dReady?`D 視角採 first-seen ledger；月營收到 ${R.fundamental.month_period}、季財報到 ${R.fundamental.quarter_period}，${R.coverage.lensD}/${R.coverage.stocks} 檔可排名。`:'D 視角尚未啟動：既有財務資料不可回填成過去已知；等 first-seen ledger 在下一次財務抓取初始化後，才從當時起排名。';
+  const governance=h('div',{class:'card',style:'padding:18px 22px;margin-top:16px;border-left:3px solid var(--teal)'},h('b',{style:'font-size:15px',text:'同一組股票，四個問題可以有四個答案'}),h('p',{style:'margin:6px 0 0;font-size:13px;line-height:1.7;color:var(--ink)',html:'所有百分位都採<b>平均秩</b>：同分拿相同名次，與資料順序無關。正式 Champion 的權重與分層<b>沒有改動</b>；C1「量能歸零」與 C2「價格降權」只在正式快照內累積 challenger 證據。至少兩個視角同進前 20% 才稱共識；Pareto 與視角數都是摘要，不是第五個預測分數。'}),h('p',{style:'margin:8px 0 0;font-size:12px;line-height:1.65;color:var(--muted)',text:dNote+' 角色 rank 沿用正式綜合顯示秩，僅在同角色至少 4 檔時顯示；其餘只顯示角色標籤。spec '+R.specSha.slice(0,12)+'…'}));
+  return [h('p',{class:'kicker',text:'四個平行視角 · 觀察層'}),h('h2',{class:'sec',text:'多視角排名 · 先選問題，再看名次'}),h('p',{class:'lead',html:'正式綜合分回答的是價格／韌性主導的相對狀態；A、B、C、D 分別回答<b>領先、風險、籌碼與基本面</b>。視角靠前不代表未來會漲，也不代表它在其他視角同樣靠前。'}),h('div',{class:'toolbar'},gsel,sortSel,onlyConsensus),summary,cards,more,foot,governance];
 }
 
 /* 時間尺度視角:整套訊號只有 20 日一個週期,這裡把同一檔放到短(5日)/波段(20日)/
@@ -1575,6 +1633,27 @@ function buildDetail(){
     text:'暫停／未交易 · 訊號截至 '+d.trading.signalDate}));
   (d.risk||[]).forEach(r=>riskW.appendChild(h('span',{style:'font-size:var(--fs-11);font-weight:800;color:#fff;background:var(--strong);border-radius:6px;padding:2px 9px',text:'官方'+r.kind})));
   const compCol=d.comp>=0?'var(--strong)':'var(--weak)';
+  const viewMeta=[
+    ['champion_pct','正式綜合','var(--ink)'],
+    ['lens_a','A 領先','var(--strong)'],
+    ['lens_b','B 風險','var(--teal)'],
+    ['lens_c','C 籌碼','var(--amber)'],
+    ['lens_d','D 基本面','var(--hypodot)']];
+  const viewAvailable=d.views?viewMeta.slice(1).filter(([key])=>d.views[key]!=null).length:0;
+  const multi=d.views&&h('section',{style:'margin-top:18px;background:var(--inset);border:1px solid var(--line2);border-radius:14px;padding:16px 18px'},
+    h('div',{style:'display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap'},
+      h('div',{},h('h3',{style:'margin:0;font-size:14px;font-weight:850',text:'同一檔的多視角位置'}),
+        h('p',{style:'margin:4px 0 0;font-size:var(--fs-11);line-height:1.55;color:var(--muted)',text:'每格都是族群內 tie-safe 百分位；回答不同問題，不是五票多數決，也不預測未來報酬。'})),
+      h('span',{class:'chip',style:'color:var(--ink2);background:var(--card)',text:(d.views.pareto?'Pareto · ':'')+(d.views.consensus_count>=2?'共識 ':'前20%視角 ')+d.views.consensus_count+'/'+viewAvailable})),
+    h('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:9px;margin-top:13px'},
+      ...viewMeta.map(([key,label,col])=>{const value=d.views[key];return h('div',{style:'background:var(--card);border:1px solid var(--line2);border-radius:10px;padding:10px 11px'},
+        h('div',{style:'display:flex;justify-content:space-between;gap:7px;align-items:baseline'},h('span',{style:'font-size:var(--fs-11);color:var(--ink2)',text:label}),
+          h('b',{class:'mono',style:`font-size:14px;color:${value==null?'var(--muted)':col}`,text:value==null?'尚無':value.toFixed(0)})),
+        h('div',{style:'margin-top:6px'},meter((value||0)/100,100,7,value==null?'var(--line)':col)));})),
+    h('p',{style:'margin:11px 0 0;font-size:var(--fs-11);line-height:1.55;color:var(--muted)',text:
+      (d.views.role_label?'角色同儕：'+d.views.role_label+(d.views.role_pct==null?'（樣本 '+d.views.role_n+'，不硬排）':' · '+d.views.role_pct.toFixed(0)+' 百分位')+'；':'')+
+      '移除單一 peer 後跨五分位情境 '+(d.views.peer_sensitivity==null?'尚無':d.views.peer_sensitivity.toFixed(0)+'%')+
+      (d.views.top_boundary_tied?'；正式前二邊界有 tie，名次需保守解讀。':'。')}));
   const card=h('div',{class:'card',style:'padding:30px 32px'},
     h('div',{style:'display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap'},
       h('div',{style:'min-width:0'},h('div',{style:'display:flex;align-items:baseline;gap:10px;flex-wrap:wrap'},
@@ -1583,7 +1662,7 @@ function buildDetail(){
         h('div',{style:'font-size:13.5px;color:var(--muted);margin-top:5px',text:d.biz})),
       h('div',{style:'text-align:right;flex:0 0 auto'},h('div',{class:'mono',style:`font-size:38px;font-weight:600;color:${compCol};line-height:1`,text:(d.comp>=0?'+':'')+d.comp.toFixed(1)}),
         h('div',{style:'font-size:var(--fs-11);color:var(--muted);margin-top:3px',text:'族群內綜合分（±'+COMP_MAX.toFixed(1)+'）'}))),
-    riskW,
+    riskW,multi,
     d.note&&h('div',{style:'margin-top:20px;background:var(--tealbg);border-left:4px solid var(--teal);border-radius:12px;padding:15px 18px'},
       h('div',{style:'font-size:var(--fs-11);font-weight:800;color:var(--teal);letter-spacing:.05em;margin-bottom:5px',text:'一句話結論 · 研究筆記（'+d.note.label+'）'}),
       h('p',{style:'margin:0;font-size:14.5px;line-height:1.7;color:var(--ink2)',text:d.note.summary})),
@@ -1669,6 +1748,7 @@ document.getElementById('ov').append(...buildOverview());
 document.getElementById('grp').append(...buildGroup());
 document.getElementById('tier').append(...buildTier());
 document.getElementById('recent').append(...buildRecentArticles());
+document.getElementById('perspectives').append(...buildRankingViews());
 document.getElementById('diverge').append(...buildDiverge());
 document.getElementById('lens').append(...buildLenses());
 document.getElementById('stocks').append(...buildStocks1c());

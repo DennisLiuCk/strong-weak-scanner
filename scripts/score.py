@@ -66,7 +66,7 @@ WEIGHTS = {"price": 1.4, "resil": 1.0, "vol": 0.3, "foreign": 0.5, "trust": 0.8,
 STEALTH_OFF_HIGH = -0.03
 
 SMOOTH_N    = 3      # composite 平滑天數
-STRONG_MIN  = 2.5    # 真強:族群 comp_s 前 2 名 且 comp_s ≥ 此值(避免「爛族群裡的最好」)
+STRONG_MIN  = 2.5    # 真強:族群 comp_s 前 2 名且達此相對分數；不代表絕對報酬為正
 WEAK_ABS    = -3.5   # 真弱絕對線(或族群倒數 2 名且 comp_s < 0)
 STEALTH_MIN = 1.5    # 蓄勢最低 comp_s
 # ══════════════════════════════════════════════════════════════════

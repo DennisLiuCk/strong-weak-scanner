@@ -2,6 +2,7 @@ import io
 import json
 import sqlite3
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -84,6 +85,84 @@ class OfficialMonthRevenueTest(unittest.TestCase):
             "SELECT revenue FROM month_revenue WHERE stock_id='3016'"
         ).fetchone()[0], 111)
         con.close()
+
+    def test_upsert_records_first_seen_without_overwriting_it(self):
+        con = sqlite3.connect(":memory:")
+        ff.ensure_schema(con)
+        data = [{
+            "date": "2026-08-01", "stock_id": "3016", "revenue": 100,
+            "revenue_month": 7, "revenue_year": 2026,
+        }]
+        ff.up_month_revenue(
+            con, data, first_seen_at="2026-08-13T01:00:00+00:00", source="FinMind")
+        ff.up_month_revenue(
+            con, data, first_seen_at="2026-08-14T01:00:00+00:00", source="FinMind")
+        row = con.execute(
+            "SELECT first_seen_at,source FROM fundamental_availability"
+        ).fetchone()
+        self.assertEqual(row, ("2026-08-13T01:00:00+00:00", "FinMind"))
+        con.close()
+
+    def test_upsert_and_availability_ledger_share_the_callers_transaction(self):
+        con = sqlite3.connect(":memory:")
+        ff.ensure_schema(con)
+        con.commit()
+        con.execute(
+            "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+            ("2026-07-01", "OLD", 1, 6, 2026),
+        )
+        ff.up_month_revenue(con, [{
+            "date": "2026-08-01", "stock_id": "3016", "revenue": 100,
+            "revenue_month": 7, "revenue_year": 2026,
+        }], first_seen_at="2026-08-13T01:00:00+00:00")
+        con.rollback()
+        self.assertEqual(con.execute("SELECT COUNT(*) FROM month_revenue").fetchone()[0], 0)
+        self.assertEqual(con.execute(
+            "SELECT COUNT(*) FROM fundamental_availability").fetchone()[0], 0)
+        con.close()
+
+    def test_existing_history_is_only_available_from_migration_time(self):
+        con = sqlite3.connect(":memory:")
+        ff.ensure_schema(con)
+        con.execute(
+            "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+            ("2026-08-01", "3016", 100, 7, 2026),
+        )
+        inserted = ff.initialize_existing_availability(
+            con, first_seen_at="2026-08-13T01:00:00+00:00")
+        self.assertEqual(inserted, 1)
+        row = con.execute(
+            "SELECT source_published_at,first_seen_at,source FROM fundamental_availability"
+        ).fetchone()
+        self.assertEqual(row, (
+            None, "2026-08-13T01:00:00+00:00", "migration_existing_rows"))
+        con.close()
+
+    def test_offline_ledger_initializer_is_idempotent_and_does_not_change_source_rows(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "financials.db"
+            con = sqlite3.connect(path)
+            ff.ensure_schema(con)
+            con.execute(
+                "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+                ("2026-08-01", "3016", 100, 7, 2026),
+            )
+            con.commit()
+            con.close()
+
+            first = ff.initialize_availability_ledger(
+                str(path), first_seen_at="2026-08-13T01:00:00+00:00")
+            second = ff.initialize_availability_ledger(
+                str(path), first_seen_at="2026-08-14T01:00:00+00:00")
+            con = sqlite3.connect(path)
+            self.assertEqual((first, second), (1, 0))
+            self.assertEqual(
+                con.execute("SELECT COUNT(*),SUM(revenue) FROM month_revenue").fetchone(),
+                (1, 100))
+            self.assertEqual(con.execute(
+                "SELECT first_seen_at FROM fundamental_availability"
+            ).fetchone()[0], "2026-08-13T01:00:00+00:00")
+            con.close()
 
 
 class FinancialWorkflowContractTest(unittest.TestCase):

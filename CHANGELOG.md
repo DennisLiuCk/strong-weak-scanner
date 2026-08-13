@@ -1,5 +1,51 @@
 # Changelog
 
+## 多視角排名上線：四個問題平行呈現，Champion 只接受部署後挑戰 — 2026-08-13
+
+**正式策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次新增的是描述性
+多視角排名、point-in-time 基本面帳本與預登錄 challenger。排名靠前仍只代表在該問題、
+該正式族群內的位置，不宣稱未來報酬、買賣訊號或哪個「分析師」比較準。
+
+- 新增 `scripts/ranking_views.py` 與固定 ranking contract：
+  A 領先（短／波段／趨勢價格位置）、B 風險（抗跌／低槓桿／低過熱，官方風險旗標封頂）、
+  C 籌碼（外資／投信／修正日買賣／融資；TDCC、借券只留旁證）與
+  D 基本面（3 月營收年增／加速度、營益率／年變化）。所有聚合採平均秩百分位，
+  exact tie 同名次且不受 DB 列順序影響；另顯示 top-2 邊界 tie、leave-one-peer-out
+  五分位敏感度、至少 2 個視角同進前 20% 的共識、四維 Pareto 與視角分歧。
+- 新增 `config/ranking_roles.csv`，精確覆蓋 121/121 檔；角色只沿用既有
+  `universe.biz` 做 manual_v1 分組，不新增商業關係。相同角色少於 4 檔只顯示標籤，
+  不硬排名；目前正式綜合角色 rank 覆蓋 77/121 檔。
+- `fetch_financials.py` 新增 append-only `fundamental_availability` first-seen 帳本與
+  `--initialize-availability-only` 離線 migration。正式 DB 在
+  2026-08-12T20:01:55+00:00 精確登錄 8,141 組既有 dataset／期間／股票鍵，未連網、
+  未改原財報列，也未倒填歷史發布日；目前首頁 D 視角覆蓋 121/121 檔。後續重跑採
+  `INSERT OR IGNORE` 保留第一次看到的時間。
+- 正式 Champion 的 production composite／tier 保留原樣，只另產生 tie-safe 顯示秩。
+  C1「量能權重歸零」與 C2「價格權重 1.4→1.0」自 2026-08-13 起才進
+  `oos_ranking_view_snapshots`；spec
+  `e51579e313c6e3fbac9cb180539ce1d0cb4f67f06ee7e56dc5c2756b998a72f9`
+  同時雜湊契約與 evaluator 原始碼，改定義即重啟 OOS 時鐘。正式 DB 副本的整合凍結
+  精確寫入 121 檔 A–D、C1、C2，同一 spec 121/121，quality metadata 同步記錄
+  D 121、角色 rank 77。
+- `validate.py` 新增 §⑫，只讀現行 spec 的 canonical append-only 快照；C1/C2 以同日、
+  同族群、同前瞻窗的「challenger − Champion」配對 Δrank-IC 加 Newey-West SE 評估。
+  有效獨立觀測未達 10 或正向 t 未通過既有分級門檻時不得升格；通過也只取得另開
+  tier／隔日開盤淨成本預登錄測試的資格，不會自動改 production。部署當下現行 spec
+  正式快照 0 日、成熟 0 日，因此沒有新的績效結論。
+- 首頁新增可切族群／排序／共識篩選的多視角區；同一份 A–D 亦進個股詳情抽屜。
+  角色小樣本、D first-seen 期間、tie、敏感度與非預測邊界都在畫面明示。
+  實際 Browser 檢查 1280×720、390×844、320×844：11 個族群可切換、散熱 7/7 檔、
+  共識／Pareto 篩選與抽屜可操作，三個寬度水平溢位皆 0；320px anchor 補償後
+  kicker 位於 sticky header 下方，明暗模式 console warning／error 皆 0。
+- Darwin 25.5.0 arm64、Python 3.11.11、C.UTF-8 執行完整 569 tests 兩次全綠
+  （一般環境及移除 `PYTHONUTF8`／`PYTHONIOENCODING`）；本機沒有 Python 3.12，
+  3.12 仍由 `tests.yml` 的 Actions gate 負責。正式 DB 唯讀稽核
+  `integrity_check=ok`、五張表公式 mismatch 0、errors 0、warnings 1
+  （74 筆不在 price∪market spine 的既有 inst 列，保留但不列完整度）。
+  `build_dashboard.py` 保留既有 `archive/2026-08-12.html`，只更新 current index；連續兩次
+  build SHA-256 一致：`index.html` `dec9234e3efd294be9a1db7b71728b26243e6d95860f0ec9d8ad3b8f06dbc69b`、
+  `research.html` `917973560739db6069a9960a35a81f991b993810fb67b1e94e603f9da11e3cc6`。
+
 ## 到期監測回查與 Q2 附件索引補齊 — 2026-08-12
 
 **策略權重、tier 條件、regime 門檻、`IS_CUTOFF`、候選雷達排序與知識圖譜零變動**；

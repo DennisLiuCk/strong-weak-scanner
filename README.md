@@ -7,7 +7,8 @@
 
 - **儀表板**：<https://dennisliuck.github.io/strong-weak-scanner/>
 - **設定來源**：[`config/groups.csv`](config/groups.csv)、
-  [`config/universe.csv`](config/universe.csv)、[`config/candidates.csv`](config/candidates.csv)
+  [`config/universe.csv`](config/universe.csv)、[`config/candidates.csv`](config/candidates.csv)、
+  [`config/ranking_roles.csv`](config/ranking_roles.csv)
 - **版本沿革與實證依據**：[`CHANGELOG.md`](CHANGELOG.md)
 
 核心每日管線只使用 Python 3.12 標準庫與 SQLite。原始資料、正式 OOS 快照、儀表板歷史頁
@@ -23,12 +24,13 @@
 
 | 層級 | 回答的問題 | 現行訊號 | 輸出 |
 |---|---|---|---|
-| 個股層 | 同族群裡誰強、誰弱 | 七因子分數、3 日平滑、分層確認 | composite 與 tier |
+| 個股層 | 同族群裡誰強、誰弱 | 六個計分因子＋一個分層 gate、3 日平滑、分層確認 | composite 與 tier |
 | 族群層 | 哪個供應鏈正在被佈局或領漲 | 外資廣度、修正日中位買賣、相對動能、距高 | 族群狀態，不改個股分數 |
 | 大盤層 | 目前是否進入修正環境 | 含息報酬指數距 20 日高 | regime，不改個股分數 |
+| 多視角觀察層 | 換一個問題時，族群內名次如何改變 | A 領先、B 風險、C 籌碼、D 基本面、角色同儕與 Pareto | 平行百分位，不改 composite/tier |
 | 觀察與研究層 | 數字如何形成、公司在做什麼、市場在傳什麼 | 官方資料解剖、技術/基本面、TDCC、借券、研究筆記、領先假說、台積電事件 | 閱讀背景，不計分 |
 
-### 個股層：族群內七因子
+### 個股層：六個計分因子＋一個分層 gate
 
 [`scripts/score.py`](scripts/score.py) 的 CONFIG 是個股策略唯一旋鈕來源。價格、抗跌、外資、
 投信與修正日買賣先在同族群內排五分位，得到 −2～+2 分；有效樣本少於 4 檔時不排名。
@@ -47,6 +49,30 @@
 修正日買賣目前不進 composite，但仍參與「相對蓄勢」條件與族群層聚合。每日 composite
 以近 3 個交易日平均形成 `composite_s`；既有股票的 raw tier 需連續 2 日相同才正式轉層，
 降低單日跳動。
+
+### 多視角排名：同一組股票回答四個問題
+
+[`scripts/ranking_views.py`](scripts/ranking_views.py) 是觀察層，不修改 `daily_scores` 或 tier。
+每個視角都在正式族群內使用平均秩百分位：exact tie 拿同一個中點名次，輸入列順序不影響
+結果。畫面同時顯示共識數、視角分歧、Pareto frontier、leave-one-peer-out 敏感度，以及
+[`config/ranking_roles.csv`](config/ranking_roles.csv) 的角色同儕排名；角色樣本少於 4 檔時
+只顯示角色，不硬排小樣本。
+
+| 視角 | 問題 | 原料 | 更新頻率 |
+|---|---|---|---|
+| A 領先／進攻 | 誰在不同價格週期相對領先？ | 收盤/MA5、20 日報酬、MA20/MA60 | 每日 |
+| B 風險／懷疑 | 誰目前較不脆弱？ | 修正日抗跌、低融資水位、低量價過熱；官方風險旗標封頂 | 每日 |
+| C 籌碼／偵察 | 誰的法人相對位置靠前？ | 外資、投信、修正日買賣、融資；TDCC/借券只作未驗證旁證 | 每日／週 |
+| D 基本面／全局 | 截至當時已知資料，誰的成長與營運品質靠前？ | 3 月營收年增與加速度、營益率與年變化 | 月／季 |
+
+D 視角只讀 `fundamental_availability.first_seen_at` 已證明當時可見的資料。既有歷史資料在
+ledger 建立前不回填過去排名；2026-08-13 migration 時的既有資料只從該時點起視為已知，
+後續抓取同樣保留第一次看到的時間。這個保守下界避免用財報期間日冒充發布日造成 look-ahead。
+
+正式 Champion 的 production 權重與 tier 維持不變。兩個 challenger 從 2026-08-13 起
+隨正式快照 append-only 累積：C1 把量能權重設為 0、C2 把價格權重 1.4 降為 1.0；它們只
+比較 tie-safe 族群名次，不重跑或暗改 tier。`spec_sha` 同時覆蓋 ranking contract 與核心
+evaluator；定義一變就必須開新 OOS 時鐘。
 
 分層按下表由上到下判定。括號內是資料庫使用的策略 key；儀表板使用較保守的讀者標籤。
 
@@ -109,9 +135,9 @@
 
 | 層 | 主要內容 | 更新語意 |
 |---|---|---|
-| 原始層 | `price`、`inst`、`margin`、`holding`、`sbl`、`risk_flags`、`market`、`market_provenance`、`market_index`、`tdcc_holding`、財報與 `ref_*` | 依主鍵冪等補缺；成功來源可先 checkpoint；大盤 canonical 保留逐日來源與雙邊原值 |
+| 原始層 | `price`、`inst`、`margin`、`holding`、`sbl`、`risk_flags`、`market`、`market_provenance`、`market_index`、`tdcc_holding`、財報、`fundamental_availability` 與 `ref_*` | 依主鍵冪等補缺；財報 first-seen 不覆寫；大盤 canonical 保留逐日來源與雙邊原值 |
 | 衍生層 | `price_adj`、`daily_metrics`、`observation_metrics`、`daily_scores`、`chip_health`、`group_metrics`、`market_daily` | 依目前規則全量重建，屬 restated history |
-| OOS as-seen 層 | `oos_snapshot_runs`、`oos_signal_snapshots`、`oos_group_snapshots`、`oos_market_snapshots` | append-only，不覆寫舊發布 |
+| OOS as-seen 層 | `oos_snapshot_runs`、`oos_signal_snapshots`、`oos_group_snapshots`、`oos_market_snapshots`、`oos_ranking_view_snapshots` | append-only，不覆寫舊發布；多視角另存 spec hash |
 | 發布層 | `index.html`、`research.html`、`archive/<資料日>.html`、`reports/` | 首頁與研究中心可重建；同日 archive 首次建立後不覆寫 |
 
 衍生表回答「把現行規則套回歷史會得到什麼」；正式 OOS 回答「當天第一次發布時，使用者
@@ -127,7 +153,7 @@
 平日 19:07  再次 checkpoint；若 Actions 延遲到 23:40 後才啟動，直接正式補完
 平日 21:47  提前排隊；23:40 前啟動仍只做 checkpoint，延遲跨過門檻則正式補完
        ↓
-平日 23:47  TDCC → 五表終版補完 → 衍生指標 → score
+平日 23:47  TDCC → 五表終版補完 → 衍生指標 → score → A/B/C/D 與 C1/C2
              → 正式 OOS snapshot → index + immutable archive → commit
 
 週六 09:00  validate.py → reports/validate_<資料日>.md
@@ -527,8 +553,11 @@ Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會
 3. **族群比較**：四象限看價籌位置與 5 日位移，熱圖比較各欄名次，排行榜逐欄排序；三個視圖
    使用同一批資料並聯動高亮。相對最好不等於原始值已轉正。
 4. **個股分層**：可按族群篩選、展開所有成員，並查看近 5 日已確認分層的變化。
-5. **族群內個股**：搜尋或單維排序；七因子列可展開原始值、門檻量尺、權重與加權貢獻。
-6. **個股抽屜**：同一處查看分數驗算、技術/基本面、籌碼健康度、官方數據解剖，以及分頁保存的
+5. **多視角排名**：依 A/B/C/D 或正式綜合排序；同列比較共識、分歧、Pareto、角色 rank、
+   peer sensitivity 與 tie；所有欄位都是描述層。
+6. **族群內個股**：搜尋或單維排序；六個計分因子與一個 gate 可展開原始值、門檻量尺、
+   權重與加權貢獻。
+7. **個股抽屜**：同一處查看分數驗算、技術/基本面、籌碼健康度、官方數據解剖，以及分頁保存的
    正式筆記與領先假說。後四者都不會偷偷改變分數。
 
 歷史日期選單讀的是當日首次建立的 archive，不會拿今天的規則或研究內容回填舊畫面。
@@ -537,10 +566,12 @@ Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會
 
 [`scripts/validate.py`](scripts/validate.py) 預設以 10 個交易日後、相對族群中位報酬驗證：
 
-- 七因子與 composite 的族群內 IC。
+- 六個計分因子、分層 gate 與 composite 的族群內 IC。
 - 各 tier 與 tier 轉移的前瞻超額報酬。
 - 蓄勢條件鏈、族群狀態與 `med_dip` 命中率。
 - 市值公平性，以及 TDCC/借券等未計分觀察因子。
+- §⑫ 只以 2026-08-13 後 append-only 快照比較 Champion、C1/C2，並追蹤 A/B/C/D；未成熟
+  時不報假精確的 SE/t，也不以點估計更換 Champion。
 
 策略判斷只認正式 as-seen 快照的 OOS 欄。完整門檻見
 [`WEEKLY_REVIEW.md`](WEEKLY_REVIEW.md)：不因單日、單週或 in-sample 結果調參；每次最多改

@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import signal_structure as sig   # §⑦:元素邊際貢獻與結構指標(共用 score.WEIGHTS)
 import stats_ci as sci           # §⑨:NW 標準誤 / 有效獨立觀測 / episode 計數
 import hypotheses as hyp         # §⑪:事先登錄、規格雜湊凍結的可證偽假設
+import ranking_views as rv       # §⑫:多視角／challenger append-only OOS 評估
 import db_ro                     # 唯讀開啟(強制 docstring 宣稱的「不寫 db」)
 
 try:
@@ -169,6 +170,22 @@ def main():
     except sqlite3.OperationalError:
         snap_runs = {}
     snap_dates = loaded_snap_dates
+
+    # 多視角與 challenger 從 2026-08-13 起另有自己的 spec_sha／OOS 時鐘；不從
+    # daily_scores restated history 回填。舊快照沒有此表是預期狀態。
+    ranking_snapshots = defaultdict(dict)
+    ranking_specs = set()
+    try:
+        for d, run_id in snap_runs.items():
+            for row in con.execute(
+                    "SELECT * FROM oos_ranking_view_snapshots WHERE snapshot_id=?", (run_id,)):
+                ranking_specs.add(row["spec_sha"])
+                # 規格改版後不可把舊定義與新定義接成同一條績效序列。歷史 spec 只用來
+                # 標示 drift；評估一律只吃目前 evaluator 的精確 spec_sha。
+                if row["spec_sha"] == rv.SPEC_SHA:
+                    ranking_snapshots[d][row["stock_id"]] = row
+    except sqlite3.OperationalError:
+        ranking_snapshots = defaultdict(dict)
 
     def grp_of(d, sid):
         return snap_grp.get(d, {}).get(sid, uni.get(sid))
@@ -909,6 +926,95 @@ def main():
     w("> **紀律**:`spec_sha` 覆蓋規格欄位與評估函式原始碼。要修操作定義就登錄新假設、"
       "OOS 時鐘重新起算——不可原地改規格再引用舊資料。登錄時的 in-sample 值只記錄出身,"
       "**登錄後不得當證據引用**。")
+    w("")
+    # ── ⑫ 多視角與 challenger ────────────────────────────────────
+    w("## ⑫ 多視角排名與 challenger(OOS 時鐘自 2026-08-13 起算)")
+    w("")
+    w("> A/B/C/D 是回答不同問題的觀察層，不比『哪位分析師最準』；只有 C1/C2 與正式"
+      "Champion 在完全相同的 as-seen 日、族群與前瞻窗下比較。共識／Pareto 不作第五個分數。")
+    w("")
+    drift = "" if not ranking_specs or ranking_specs == {rv.SPEC_SHA} else (
+        " ⚠ **快照含不同 spec_sha，必須分版評估**")
+    w(f"- 現行 ranking spec:`{rv.SPEC_SHA}`{drift}")
+    w(f"- tie policy:{rv.RANKING_CONTRACT['tie_policy']}；production 權重／tier 未改。")
+    w(f"- 現行 spec 已有正式快照 {len(ranking_snapshots)} 日；前瞻 {F} 日成熟 "
+      f"{sum(1 for d in ranking_snapshots if d in didx and didx[d] + F < len(dates))} 日。")
+    w("")
+    w("| 排名 | OOS 日聚合 rank-IC ±NW SE (t) | 交易日 | 有效獨立觀測 | 判定 |")
+    w("|---|---|---|---|---|")
+    ranking_columns = [
+        ("champion_pct", "Champion（tie-safe 顯示秩）"),
+        ("lens_a", "A 領先／進攻（觀察）"),
+        ("lens_b", "B 風險／懷疑（觀察）"),
+        ("lens_c", "C 籌碼／偵察（觀察）"),
+        ("lens_d", "D 基本面／全局（觀察）"),
+        ("shadow_vol0", "C1 量能權重歸零"),
+        ("shadow_price10", "C2 價格權重降至1.0"),
+    ]
+    ranking_daily = {}
+    for column, label in ranking_columns:
+        daily_by_date = {}
+        for date_ in sorted(ranking_snapshots):
+            if date_ not in didx or didx[date_] + F >= len(dates):
+                continue
+            group_ics = []
+            for group in grps_on(date_):
+                sids = [sid for sid, row in ranking_snapshots[date_].items()
+                        if row["grp"] == group and row[column] is not None
+                        and fwd(date_, sid) is not None]
+                value = spearman(
+                    [ranking_snapshots[date_][sid][column] for sid in sids],
+                    [fwd(date_, sid) for sid in sids], minn=6)
+                if value is not None:
+                    group_ics.append(value)
+            if group_ics:
+                daily_by_date[date_] = statistics.mean(group_ics)
+        ranking_daily[column] = daily_by_date
+        used_dates = sorted(daily_by_date)
+        daily_values = [daily_by_date[date_] for date_ in used_dates]
+        summary = sci.summarize(
+            daily_values, F, dates_used=used_dates, all_dates=dates)
+        if not summary:
+            w(f"| {label} | – | 0 | 0.0 | 尚無成熟資料 |")
+        else:
+            w(f"| {label} | {sci.fmt(summary)} | {summary['n_days']} | "
+              f"**{summary['eff_obs']:.1f}** | {sci.verdict(summary)} |")
+    w("")
+    w("### Challenger 相對 Champion 的同日配對差")
+    w("")
+    w("> 正值代表 challenger 的日聚合 rank-IC 高於 Champion；只比較兩者都有值的同一批"
+      "交易日，避免拿不同市場區段的兩個點估計相減。")
+    w("")
+    w("| Challenger − Champion | 配對 Δrank-IC ±NW SE (t) | 交易日 | 有效獨立觀測 | 區段 | 治理狀態 |")
+    w("|---|---|---|---|---|---|")
+    champion_daily = ranking_daily.get("champion_pct", {})
+    for column, label in (("shadow_vol0", "C1 量能權重歸零"),
+                          ("shadow_price10", "C2 價格權重降至1.0")):
+        challenger_daily = ranking_daily.get(column, {})
+        common_dates = sorted(set(champion_daily) & set(challenger_daily))
+        delta = [challenger_daily[d] - champion_daily[d] for d in common_dates]
+        summary = sci.summarize(delta, F, dates_used=common_dates, all_dates=dates)
+        if not summary:
+            w(f"| {label} | – | 0 | 0.0 | 0 | 尚無成熟配對資料 |")
+            continue
+        threshold = sci.t_threshold(summary["eff_obs"])
+        if summary["eff_obs"] < 10:
+            status = "累積中（升格 gate:有效觀測 ≥10）"
+        elif summary["t"] is None:
+            status = "樣本不足"
+        elif summary["t"] >= threshold:
+            status = "研究 gate 通過；仍需另驗 tier／成本後才可改 production"
+        elif summary["t"] <= -threshold:
+            status = "顯著落後；放棄此 challenger"
+        else:
+            status = f"與 Champion 無法分辨（門檻 {threshold:.1f}）"
+        w(f"| {label} | {sci.fmt(summary)} | {summary['n_days']} | "
+          f"**{summary['eff_obs']:.1f}** | {summary['episodes']} | {status} |")
+    w("")
+    w("> **裁決規則**:C1/C2 是看過既有資料後才提出，2026-08-13 前一律是 in-sample；"
+      "新 spec 只認此後 append-only 快照。配對差在有效獨立觀測 <10 或未通過分級 t 門檻時，"
+      "不得以點估計大小更換 Champion；即使通過，也只取得進入 tier／成本預登錄驗證的資格，"
+      "不會自動改 production。D 只使用 first-seen ledger 可證明當時已知的資料。")
     w("")
     w("## 判讀警語")
     w("")

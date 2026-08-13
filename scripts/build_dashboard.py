@@ -28,6 +28,7 @@ from fetch_daily import (REGIME_DD, GS_OFF_HIGH, GS_BREADTH_LOW,
 import db_ro                     # 唯讀開啟的唯一入口(鐵律);這支只讀 db,只寫 html
 import trading_status as tstatus
 import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡報、週報 §⑦⑧ 同一組函式)
+import ranking_views as rv       # A/B/C/D 多視角排名；觀察層＋append-only challenger
 import hypotheses as hyp         # 兩視角分歧的籌碼定義 = H1 檢定的同一個定義
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
 from qual_notes import (_extract_sections, load_notes, note_status, note_review_status,
@@ -1852,6 +1853,30 @@ def build_lenses(con, last, names, group_names):
         }
     except sqlite3.Error:
         return None
+
+
+def build_ranking_views(con, last, names, group_names):
+    """統一多視角 payload；不改 production daily_scores/tier。"""
+    payload = rv.build_from_db(con, last, roles_path=rv.ROLES_CONFIG, strict_roles=True)
+    if not payload:
+        return None
+    decorated = []
+    for row in payload["rows"]:
+        item = dict(row)
+        item["id"] = row["stock_id"]
+        item["g"] = row["grp"]
+        item["nm"] = names.get(row["stock_id"], row["stock_id"])
+        item["gLabel"] = group_names.get(row["grp"], row["grp"])
+        decorated.append(item)
+    payload["rows"] = decorated
+    payload["labels"] = {
+        "champion_pct": "正式綜合",
+        "lens_a": "A 領先／進攻",
+        "lens_b": "B 風險／懷疑",
+        "lens_c": "C 籌碼／偵察",
+        "lens_d": "D 基本面／全局",
+    }
+    return payload
 
 
 def _article_date(value):
@@ -4650,6 +4675,10 @@ def main():
     strategy = build_strategy_status(con, last)
     diverge = build_divergence(con, last, _names(con), GROUP_NM)
     lenses = build_lenses(con, last, _names(con), GROUP_NM)
+    ranking_views = build_ranking_views(con, last, _names(con), GROUP_NM)
+    ranking_by_stock = {
+        row["stock_id"]: row for row in (ranking_views or {}).get("rows", [])
+    }
     con.close()
     # 質化筆記(觀察層、AI 協作＋獨立 reviewer,見 notes/qualitative/):無筆記時 load_notes
     # 回傳空 dict,同 fund_map 的「從缺不擋主管線」慣例
@@ -4908,6 +4937,17 @@ def main():
                # 最深一檔 −21.8%。不把絕對值放在同一列,讀者會把「相對強」讀成「在漲」。
                "ret20": round(r["ret20"] * 100, 1) if r["ret20"] is not None else None,
                "cells": build_cells(r, r, mkt20)}
+        view = ranking_by_stock.get(r["stock_id"])
+        if view:
+            obj["views"] = {
+                key: view.get(key) for key in (
+                    "champion_pct", "lens_a", "lens_b", "lens_c", "lens_d",
+                    "consensus_count", "disagreement", "pareto", "pareto_dimensions",
+                    "peer_sensitivity", "champion_tie_n", "top_boundary_tied",
+                    "role", "role_label", "role_n", "role_pct", "d_periods",
+                    "shadow_vol0", "shadow_price10",
+                )
+            }
         if r["stock_id"] in trading_map:
             obj["trading"] = trading_map[r["stock_id"]]
         obj.update(tier_meta)
@@ -5087,6 +5127,7 @@ def main():
     html = html.replace("__STRATEGY_JSON__", json.dumps(strategy, ensure_ascii=False))
     html = html.replace("__DIVERGE_JSON__", json.dumps(diverge, ensure_ascii=False))
     html = html.replace("__LENS_JSON__", json.dumps(lenses, ensure_ascii=False))
+    html = html.replace("__RANKING_VIEWS_JSON__", json.dumps(ranking_views, ensure_ascii=False))
     html = html.replace("__RECENT_ARTICLES_JSON__",
                         json.dumps(recent_articles, ensure_ascii=False))
     # 量尺門檻(②量比/⑤融資水位)——單一事實來源 score.py,調旋鈕量尺刻度自動同步
@@ -5131,6 +5172,7 @@ def main():
     # CI 的 tests.yml 刻意不吃 index.html/data 的路徑(每日 3~4 個資料 commit),
     # 所以產出物契約測試不會在每日管線上跑 → 這行是每日唯一會出聲的地方,務必留著。
     dead = [n for n, v in (("策略狀態", strategy),
+                           ("多視角排名", ranking_views),
                            ("兩視角分歧", diverge), ("時間尺度", lenses)) if not v]
     if dead:
         print(f"⚠ 下列區段沒有 payload,頁面會少掉整塊(導覽連結仍在):{'、'.join(dead)}")

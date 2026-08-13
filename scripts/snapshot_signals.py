@@ -21,6 +21,7 @@ import uuid
 
 import trading_status as tstatus
 import fetch_daily as fd
+import ranking_views as rv
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -115,6 +116,22 @@ CREATE TABLE IF NOT EXISTS oos_market_snapshots(
   taiex REAL, dd20 REAL, regime INTEGER,
   FOREIGN KEY(snapshot_id) REFERENCES oos_snapshot_runs(snapshot_id)
 );
+
+CREATE TABLE IF NOT EXISTS oos_ranking_view_snapshots(
+  snapshot_id TEXT NOT NULL,
+  date TEXT NOT NULL,
+  stock_id TEXT NOT NULL,
+  grp TEXT NOT NULL,
+  spec_sha TEXT NOT NULL,
+  champion_pct REAL,
+  lens_a REAL, lens_b REAL, lens_c REAL, lens_d REAL,
+  shadow_vol0 REAL, shadow_price10 REAL,
+  payload_json TEXT NOT NULL,
+  PRIMARY KEY(snapshot_id, stock_id),
+  FOREIGN KEY(snapshot_id) REFERENCES oos_snapshot_runs(snapshot_id)
+);
+CREATE INDEX IF NOT EXISTS idx_oos_ranking_views_date_stock
+  ON oos_ranking_view_snapshots(date, stock_id, snapshot_id);
 """
 
 
@@ -344,6 +361,22 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
         """SELECT gm.*, g.name group_name, g.tag, g.ord
            FROM group_metrics gm LEFT JOIN groups g USING(grp)
            WHERE gm.date=? ORDER BY COALESCE(g.ord, 999), gm.grp""", (data_date,)).fetchall()
+    ranking_payload = rv.build_from_db(
+        con, data_date, as_of=captured_at,
+        roles_path=os.path.join(root, "config", "ranking_roles.csv"),
+        strict_roles=(os.path.abspath(root) == os.path.abspath(ROOT)),
+    )
+    ranking_rows = rv.snapshot_rows(ranking_payload)
+    if len(ranking_rows) != eligible_n:
+        raise RuntimeError(
+            f"拒絕凍結多視角排名不完整快照 {data_date}:"
+            f"eligible={eligible_n},ranking_views={len(ranking_rows)}")
+    counts.update({
+        "ranking_views": len(ranking_rows),
+        "ranking_spec_sha": ranking_payload["specSha"],
+        "ranking_lens_d": ranking_payload["coverage"]["lensD"],
+        "ranking_role_rank": ranking_payload["coverage"]["roleRank"],
+    })
     # 同一資料日遇台股假日/無新資料時,每日 workflow 不應製造一份完全相同的 revision。
     # fingerprint 含原始值、分數、風險旗標、族群/市場與策略/universe hash；任一修復或
     # 規則改變都會得到新 hash,仍會 append 保存修正版。
@@ -357,6 +390,7 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
                     for r in signals],
         "groups": [list(r) for r in groups],
         "market": list(market) if market else None,
+        "ranking_views": ranking_rows,
     }
     content_hash = hashlib.sha256(
         json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
@@ -404,6 +438,15 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
             (snapshot_id, data_date, market["date"] if market else None,
              market["taiex"] if market else None, market["dd20"] if market else None,
              market["regime"] if market else None))
+        con.executemany(
+            """INSERT INTO oos_ranking_view_snapshots(
+                 snapshot_id,date,stock_id,grp,spec_sha,champion_pct,
+                 lens_a,lens_b,lens_c,lens_d,shadow_vol0,shadow_price10,payload_json)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            [(snapshot_id, row["date"], row["stock_id"], row["grp"], row["spec_sha"],
+              row["champion_pct"], row["lens_a"], row["lens_b"], row["lens_c"],
+              row["lens_d"], row["shadow_vol0"], row["shadow_price10"], row["payload_json"])
+             for row in ranking_rows])
         con.commit()
     except Exception:
         con.rollback()
