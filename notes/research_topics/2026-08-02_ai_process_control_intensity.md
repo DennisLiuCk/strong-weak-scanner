@@ -102,6 +102,13 @@ to: triaged
 reason: applied_fy26q3_company_segment_application_and_two_superset_forecasts_mapped_without_refreshing_thesis_clock
 evidence: sources:S26,S27
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: defect_signal_classification_criticality_containment_and_yield_ladder_added_without_thesis_or_clock_refresh
+evidence: sources:S28,S29,S30
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -121,6 +128,11 @@ evidence: sources:S26,S27
 - **RDL（重佈線層）**：把晶片接點重新拉線到封裝所需位置的細金屬線路；線寬、間距與面板翹曲會影響可製造性。
 - **翹曲（warpage）**：晶圓、面板或封裝受材料與溫度影響而彎曲；它會增加對位、量測與接合難度。
 - **關鍵缺陷／雜訊缺陷（critical／nuisance defect）**：前者會傷害良率或可靠度，後者雖被工具看見卻未必影響產品；分類能力會影響工程師是否把時間用在真正重要的異常。
+- **混淆矩陣（confusion matrix）**：把參考真值的「有／無目標缺陷」和系統判定的「有／無標記」交叉成 TP、FP、FN、TN 四格；四格的分母、真值方法與門檻版本都要固定，不能只報總缺陷數。
+- **Killer defect（致命缺陷）**：在指定產品、結構與位置下足以造成電性失效、可靠度問題或良率損失的缺陷；同一種物理偏差換了產品或位置，影響可能不同。
+- **Fab（製造廠）**：執行晶圓或封裝製造的工廠；本篇出現的 Intelligent Packaging Fab 是台積電對智慧先進封裝廠的命名，不是通用績效認證。
+- **MES（製造執行系統）**：連接工單、設備、材料、製程站點與在製品紀錄的工廠資訊系統，讓派工、追溯與異常處置使用同一批次脈絡。
+- **ADC（自動缺陷分類）**：automated defect classification，以規則或模型把檢查候選分到可處置的缺陷類別；自動分類仍需參考真值與錯誤代價才能評估。
 - **抽樣（sampling）**：只檢查部分晶圓、區域或製程批次，以速度換取資訊；抽樣較少不代表沒有風險，檢查較多也不保證能找到正確根因。
 - **Control plan（製程控制計畫）**：先定義要攔截的失效、在哪一道工序看、抽樣多少、看多細、多久得到結果，以及異常發生後要採取什麼動作的製造規則。
 - **缺陷逃逸（defect escape）**：真正會影響良率或可靠度的缺陷沒有被現行檢查攔截，繼續流到後續製程或客戶端。
@@ -185,6 +197,7 @@ evidence: sources:S26,S27
 - 追設備商是否揭露有期間與定義的訂單、收入、工具數或量產採用。
 - 追客戶端是否公布缺陷攔截、良率學習週期、重工／報廢改善與每單位產能支出。
 - 追同一產品世代的 control plan 是否公開抽樣單位、覆蓋範圍、靈敏度／逃逸、偽警報、結果時間與異常處置，避免把單一設備速度當成完整製程改善。
+- 追客戶端能否把 inspection flag、複判真值、killer／non-killer 分類、圍堵與同一產品的良率／重工／報廢接成一條可重算鏈。
 - 追公開資訊觀測站是否出現台灣公司的具名產品、客戶階段與財務貢獻。
 
 ### 想一想
@@ -192,6 +205,7 @@ evidence: sources:S26,S27
 - 若成長主要來自市占、漲價、產品組合或服務，主命題應如何縮小？
 - 一套工具通過一名客戶認證，還缺哪些證據才能推論成產業錢包占比上升？
 - 如果靈敏度提高卻同時產生大量偽警報、拖長複判時間，這份 control plan 一定更好嗎？
+- 缺陷候選數上升，究竟是製程變差、覆蓋增加、門檻變敏感，還是分類定義改版？沒有四格分母時能分辨嗎？
 - 如果同一個標準樣品每次都量得很接近、卻全部偏離參考值，這套系統是精密、準確，還是兩者兼具？
 - 設備貼著校正標籤，是否就能證明今天這個產品、這個方法與這次結果都可追溯且適合拿來判定放行？
 - 若公司只說「先進封裝事業創新高」，卻沒有產品分子與公司分母，你能安全地推論到哪一層？
@@ -236,6 +250,85 @@ Applied 的文件把高解析 eBeam 量測、缺陷複判與自動分類分成�
 摘要則把 equipment intelligence、data-driven control 與 yield learning 放在製造閉環裡。兩者
 共同提醒讀者：真正的價值不只在「看見」，而在能否把訊號變成製程決策；但公開資料尚未
 提供誤報率、漏報率、抽樣比例或客戶端良率改善，這些欄位不能自行補值。
+
+## 缺陷數不是良率：從「被看到」走到「會殺死產品」的五道閘門
+
+檢查工具輸出的第一個數字通常是候選訊號，不是「已證明會造成報廢的缺陷」。NIST 對 patterned
+wafer 的研究指出，製程圖形偏差可以是不影響產品的變異，也可以是傷害良率的關鍵缺陷；線邊
+粗糙等 wafer noise 又可能遮蔽 killer-defect 訊號，同時製造 false positive 與 overlooked defect。
+因此，候選數增加只證明「在這個 recipe 與門檻下標記得更多」，還沒有回答產品是否變差。
+
+### 先用四格表停止把「工具標記」當成「參考真值」
+
+NIST 的持續研究頁把光學缺陷檢查寫成四種可能結果。以下把目標明確限定為「需要採取行動的
+關鍵缺陷」；參考真值仍要靠複判、破壞分析、電性結果或其他有文件紀錄的方法建立，並不是
+研究者憑空知道的上帝視角。
+
+|  | 參考真值：有目標關鍵缺陷 | 參考真值：沒有目標關鍵缺陷 |
+|---|---|---|
+| **系統有標記** | TP：成功攔截，仍要判斷位置、嚴重度與處置 | FP／nuisance：消耗複判與工程容量，未必傷害產品 |
+| **系統未標記** | FN／escape：缺陷繼續流到後站或客戶，代價可能延後才出現 | TN：正確不標記，但只有在受檢母體與真值抽查已知時才有分母 |
+
+只報「標記 10,000 個候選」其實只給出 `TP + FP`，沒有告訴讀者未標記母體中的 `FN`，也沒有
+說 TP 中哪些真的會殺死產品。就算 capture rate 或 FAR 被公布，仍要核對各公司採用的 actual
+positive、分母與複判真值定義；名字相同不保證公式與母體相同。
+
+### 五道閘門：每往後一關，責任人才不同
+
+| 閘門 | 必須回答的問題 | 需要保留的共同鍵 | 前一關不能代替什麼 |
+|---|---|---|---|
+| 1. 訊號／候選 | 哪個工具、方法、recipe、門檻在何處看見什麼？ | product／layer／station／tool／recipe version | 標記不等於物理缺陷已確認 |
+| 2. 複判／分類 | 參考真值怎麼建立，TP／FP／FN／TN 各是多少？ | truth method／audited sample／class／threshold | 分類不等於已證明會傷害產品 |
+| 3. 關鍵性 | 缺陷的尺寸、位置、拓樸與失效模式是否讓它成為 killer defect？ | design location／failure mode／severity／product revision | killer 分類不等於已找到來源 |
+| 4. 圍堵／根因 | 哪個 lot、wafer、die、tool、材料批次或時間窗要隔離與調整？ | genealogy／timestamp／containment／disposition／retest | 停線或隔離不等於良率已改善 |
+| 5. 製造與經濟結果 | 良率、重工、報廢、可靠度、cycle time 與成本如何改變？ | same cohort／before-after rule／yield／scrap／cost | 工程改善不等於設備商已取得收入 |
+
+台積電的現行 Intelligent Packaging Fab 頁面提供了少見的客戶端方向證據：公司描述先進封裝廠
+使用 die-level MES 提供即時資訊、派工、缺陷攔截與分類，以及自動良率預測與最佳化；ADC 在
+流程中做缺陷攔截與分類，良率分析引擎再偵測缺陷並隔離不良材料。這證明閉環不只存在於設備商
+行銷圖，也不只停在「工具看見訊號」。但頁面沒有公開同一產品／layer 的 sampling universe、
+recipe version、TP／FP／FN／TN、結果延遲、圍堵批數、良率、重工、報廢、工具數或成本。
+
+### 為什麼缺陷數上升至少有四種解釋
+
+1. **製程真的變差**：同一 recipe、覆蓋與分類下，actionable／killer defect 增加。
+2. **覆蓋變大**：多看 wafer、die、site、layer 或產品，候選總數自然增加。
+3. **門檻變敏感**：更低 threshold 找到先前看不到的訊號，也可能同步增加 nuisance。
+4. **分類或產品改版**：原本 non-killer 的偏差在新設計位置變成 critical，或 class definition 改變。
+
+反過來，候選數下降也可能是製程改善、覆蓋縮小、門檻提高或分類改版。沒有同一 product／layer、
+受檢母體、recipe、truth method 與版本，就不能把趨勢命名成 yield improvement，更不能把候選數
+乘上臆測報廢成本或設備 ASP。
+
+### 多方小作文：可以寫到哪裡
+
+製程控制需求的較強多方版本是：若新一代 HBM／2.5D／3D 在更多關鍵位置產生更小、代價更高的
+actionable defect，客戶又必須增加覆蓋、縮短攔截時間並維持可接受的 FP／FN，既有工具與軟體
+無法吸收全部工作量，新增檢查、複判、量測與資料基礎設施才可能轉成工具數、服務與收入。升格
+需要同一產品世代的四格分母、control-plan 變更、工具／支出增加及供應商 actual revenue 雙向證據。
+
+### 空方小作文：可以寫到哪裡
+
+較強的空方版本是：die-level MES、ADC、ML 分類、care-area 設計或動態抽樣可能先移除 nuisance、
+集中複判容量並提高既有 installed base 的利用；候選數增加也可能只是更敏感或更廣的觀察，不是
+良率惡化。若客戶在相同產品世代以軟體、抽樣或既有工具吸收新增複雜度，單位產能工具量與支出
+可能持平，設備供應商的成長則可能主要來自市占、ASP、服務或產品組合，而非產業 wallet 擴張。
+
+| 共同裁決欄位 | 多方要看到 | 空方要看到 | 目前公開狀態 |
+|---|---|---|---|
+| 四格品質 | 同門檻下 FN／escape 風險要求新增能力且 FP 可控 | 軟體／分類降低 FP、既有能力已控制 FN | NIST 只給方法與模擬方向 |
+| 覆蓋與時間 | 同產品增加 station／layer／sample，time-to-result 仍受限 | adaptive sampling／care area 維持或降低工具負荷 | 客戶數值未揭露 |
+| 製造結果 | 同 cohort 良率、重工、報廢或 cycle time 可重算改善 | 新增檢查未帶來材料性結果，或既有流程已足夠 | 台積電只公開功能鏈 |
+| 工具與財務 | 客戶工具數／支出與供應商 actual revenue 同期增加 | 工具密度／單位產能支出持平，成長由其他因素解釋 | 尚無雙向分母 |
+
+### 分母、誤差與限制
+
+本節定向使用 `N=2` 條消息鏈：兩個 NIST 頁面同屬一條中立方法鏈，台積電現行服務頁是另一條
+客戶公司鏈；不是封裝廠、產品世代、製程站點或 121 檔公司的統計樣本。NIST 的 2015 研究是
+patterned-wafer optical inspection，不是 HBM 封裝 production recipe；NIST ongoing project 的
+四格說明與 threshold 研究也沒有公開本篇可用的量產混淆矩陣。台積電頁面沒有數字分母或版本化
+結果，因此沒有 sampling SE／t，也不建立跨公司 performance comparison。五道閘門與共同裁決表
+是研究中心整合三份來源的查核框架，不是 NIST 或台積電發布的共同標準。
 
 ## 「多檢查」不是規格：先拆三種任務與六個 control-plan 欄位
 
@@ -951,6 +1044,54 @@ limitation: 兩個百分比都是管理層對不同廣義集合的 lower-bound f
 independence_group: applied-materials
 -->
 
+<!-- research_source
+source_id: S28
+role: other_primary
+source_kind: document
+publisher: National Institute of Standards and Technology
+title: Effects of Wafer Noise on the Detection of 20 nm Defects Using Optical Volumetric Inspection
+published_at: 2015-02-11
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/publications/effects-wafer-noise-detection-20-nm-defects-using-optical-volumetric-inspection
+locator: NIST publication abstract；分開 noncritical patterning imperfections 與 impact manufacturing yield 的 critical defects，並描述 line-edge roughness wafer noise 降低 signal-to-noise ratio、增加 false positives 與 overlooked defects 的檢查問題
+limitation: 這是 20 nm patterned-wafer optical inspection 的研究摘要與 intentional-defect-array／simulation 脈絡，不是 HBM／2.5D／3D 封裝量產 recipe、客戶 control plan 或任何工具的現行量產績效；critical／noncritical 與 noise 機制不能直接外推成封裝良率或設備需求
+independence_group: nist
+-->
+
+<!-- research_source
+source_id: S29
+role: other_primary
+source_kind: living_index
+publisher: National Institute of Standards and Technology
+title: Quantitative Nanoscale Imaging Through Artificial Intelligence
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/programs-projects/quantitative-nanoscale-imaging-through-artificial-intelligence
+locator: 2026-08-14 現行 ongoing project page；Description 的 defect／defect-free 四種判定結果，以及 2019 accomplishments 對 line-edge roughness、false detection、classification 與調整 decision threshold 的說明；頁面 metadata 為 Created 2019-09-19、Updated 2026-07-08
+limitation: 這是 NIST 持續更新的研究計畫頁，主要使用模擬 patterned-defect images 與 ML 方法；四格結果是一般分類框架，沒有本文可用的 production TP／FP／FN／TN、重複試驗、封裝客戶、良率、工具數或財務資料
+independence_group: nist
+-->
+
+<!-- research_source
+source_id: S30
+role: company_release
+source_kind: living_index
+publisher: Taiwan Semiconductor Manufacturing Company Limited
+title: Intelligent Packaging Fab
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.tsmc.com/english/dedicatedFoundry/services/apm_intelligent_packaging_fab
+locator: 2026-08-14 現行頁面正文；die-level MES 的 instant die information／dispatch／defect interception and classification／yield prediction，ADC 的 defect interception and classification，以及 yield analysis engine 的 defective-material isolation 段落
+limitation: 這是台積電對自家先進封裝智慧製造能力的現行服務頁；沒有固定產品／layer、sampling universe、recipe version、truth method、TP／FP／FN／TN、結果時間、圍堵批數、良率、重工、報廢、工具供應商、工具數、支出或收入，不能量化成效或設備 wallet share
+independence_group: tsmc
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -1461,6 +1602,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C31
+label: verified
+status: active
+claim: NIST 的 2015 patterned-wafer 研究把製程圖形偏差分為 noncritical 與會影響製造良率的 critical defects，並指出 line-edge roughness 形成的 wafer noise 會降低 killer-defect signal-to-noise ratio，使檢查同時面臨 false positives 與 overlooked defects
+supporting_source_ids: S28
+contrary_source_ids:
+as_of: 2015-02-11
+basis: S28 abstract 直接區分 noncritical／critical patterning imperfections，並描述模擬 line-edge roughness 增加時 signal-to-noise ratio 下降及兩類錯誤判定問題
+boundary: 這是 patterned-wafer optical inspection 的 intentional-defect-array／simulation 研究，不是 HBM／先進封裝客戶的 production recipe、混淆矩陣、良率或工具需求，也不能由研究年份推論現行設備仍有相同限制
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C32
+label: verified
+status: active
+claim: NIST 的 ongoing nanoscale-imaging project page 將光學缺陷檢查明列為四種判定結果：defect／defect-free 各自可能被正確判定，也可能把 defect-free 誤判或把 actual defect 誤分；同頁並說明 decision threshold 可依錯誤代價調整，而不是只追求候選數最多
+supporting_source_ids: S29
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S29 Description 直接列四種結果與兩種 false case 的不同 ramifications，2019 accomplishments 另描述針對 defect-inspection challenge 調整 threshold 以減少 wrong detections
+boundary: 這是 NIST 對模擬 patterned-defect images 與 ML metrology 的方法頁，不提供封裝 production 的 TP／FP／FN／TN、樣本分母、confidence interval、良率、工具數或財務成效；threshold 方向不是任何客戶的允收值
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C33
+label: verified
+status: active
+claim: 台積電現行 Intelligent Packaging Fab 頁面表示，先進封裝廠採用 die-level MES 提供即時 die 資訊、派工、缺陷攔截／分類及自動良率預測／最佳化，並以 ADC 在流程中攔截分類缺陷、由良率分析引擎偵測缺陷與隔離不良材料
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S30 現行正文逐項描述 die-level MES、ADC 與 yield analysis engine 在先進封裝廠的公開功能鏈
+boundary: 這是客戶公司對自有能力的功能陳述，沒有產品／layer、受檢母體、recipe version、truth method、四格數據、cycle time、良率、重工／報廢、工具商、工具數、支出或財務分母；不能由 deployed 字樣推論任一外部設備商收入或成效幅度
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C34
+label: inference
+status: active
+claim: 缺陷候選數只有在同一 product／layer、受檢母體、recipe／threshold、參考真值與分類版本下，才能先拆成 TP／FP／FN／TN；之後仍須通過 criticality、圍堵／根因與同 cohort 製造結果，才可連到良率損失。沒有客戶工具／支出與供應商 actual revenue 的共同期間鍵，也不能再跳接成設備 wallet share
+supporting_source_ids: S11,S28,S29,S30
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S28／S29 建立 noncritical／critical、noise 與四格錯誤判定，S30 建立客戶端攔截—分類—良率預測—隔離功能鏈，S11 則顯示供應商工具還必須在 candidate density、throughput、sensitivity、coverage 與 nuisance classification 間取捨；研究端據此整理五道閘門
+boundary: 五道閘門是研究中心查核框架，不是 NIST、台積電或 Applied Materials 共同發布的標準；三條消息鏈沒有公開同一封裝產品的混淆矩陣、因果良率結果、工具數或財務橋接，也不能由缺值推論成效為零或設備需求必然增加
+verification_needed: 同一 production product／layer 的受檢與未檢母體、recipe／threshold version、reference-truth method、TP／FP／FN／TN、killer-defect mapping、containment／root-cause、良率／重工／報廢／cycle-time 結果，以及同期間客戶工具／支出與供應商 actual revenue
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
@@ -1632,13 +1841,17 @@ comparability_reason: 萬潤的半導體設備範圍大於檢查／量測，且�
 - [S25：Applied DRAM／Advanced Packaging Master Class prepared remarks](https://investors.appliedmaterials.com/static-files/e8307fb9-c40b-4fee-abf9-3209c76ab08d)（整體 AP 雙下限預測與具名工具 production 陳述仍未形成 process-control 收入分子）。
 - [S26：Applied FY26Q3 結果公告](https://investors.appliedmaterials.com/news-releases/news-release-details/applied-materials-announces-third-quarter-2026-results)（公司／部門實績、客戶應用與產品名仍不是 AP-specific PDC 分子）。
 - [S27：Applied Q3 FY2026 earnings presentation](https://ir.appliedmaterials.com/static-files/9d5d182d-f060-4b22-a32c-4582257fdc9b)（AP 與 PDC 兩個廣義集合的成長下限及公司定義期間，沒有交集金額）。
+- [S28：NIST 20 nm wafer-noise／defect-detection 研究](https://www.nist.gov/publications/effects-wafer-noise-detection-20-nm-defects-using-optical-volumetric-inspection)（區分 noncritical／critical defect 並說明 false positive／overlooked defect；不是封裝量產 recipe）。
+- [S29：NIST Quantitative Nanoscale Imaging Through AI](https://www.nist.gov/programs-projects/quantitative-nanoscale-imaging-through-artificial-intelligence)（四格判定與 threshold 方法頁，沒有 production confusion matrix）。
+- [S30：台積電 Intelligent Packaging Fab](https://www.tsmc.com/english/dedicatedFoundry/services/apm_intelligent_packaging_fab)（客戶端攔截、分類、良率預測與不良材料隔離功能鏈，沒有同產品數值分母）。
 - 後續入口：[KLA](https://ir.kla.com/financial-information/financial-results)、[Applied](https://ir.appliedmaterials.com/news-releases/)、[Onto](https://investors.ontoinnovation.com/news/default.aspx)、[MOPS](https://mops.twse.com.tw/mops/web/index)。
 - 中立方法入口：[NIST CHIPS Metrology Program](https://www.nist.gov/chips/research-development-programs/metrology-program)。
 
 海外五家設備商與台灣三家公司彼此獨立但都有商業動機，其中同一公司的多份文件仍只算
 一條公司消息鏈；SEMI 議程保存多位講者摘要，也不能替代完整簡報、客戶端或全產業資本
 支出證據。台灣三家公司是依既有獨立複核筆記選出的定向教材，不是全 universe 抽樣；本輪
-也沒有一致預期、估值、即時持倉或具名客戶雙向資料，因此不談市場是否反映或個股方向。
+新增的兩個 NIST 頁面只算一條中立方法鏈，台積電頁面另算一條客戶公司鏈；也沒有一致預期、
+估值、即時持倉或具名客戶—供應商雙向資料，因此不談市場是否反映或個股方向。
 
 ## 反方與替代路徑
 

@@ -5432,11 +5432,25 @@ class ResearchCenterTest(unittest.TestCase):
             "CY26` 明定為 FQ2'26～FQ1'27",
             "不是 2026 年 1 月 1 日到 12 月 31 日",
             "只有公司／部門總額與兩個廣義集合成長率仍不算",
+            "## 缺陷數不是良率：從「被看到」走到「會殺死產品」的五道閘門",
+            "### 先用四格表停止把「工具標記」當成「參考真值」",
+            "| **系統有標記** | TP：成功攔截",
+            "| **系統未標記** | FN／escape",
+            "| 1. 訊號／候選 |",
+            "| 5. 製造與經濟結果 |",
+            "使用 die-level MES 提供即時資訊、派工、缺陷攔截與分類",
+            "### 為什麼缺陷數上升至少有四種解釋",
+            "### 多方小作文：可以寫到哪裡",
+            "### 空方小作文：可以寫到哪裡",
+            "本節定向使用 `N=2` 條消息鏈",
+            "source_id: S28", "source_id: S29", "source_id: S30",
+            "claim_id: C31", "claim_id: C32", "claim_id: C33",
+            "claim_id: C34",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 27),
-            ("research_claim", 30), ("metric_comparison", 5),
+            ("research_topic", 1), ("research_source", 30),
+            ("research_claim", 34), ("metric_comparison", 5),
             ("impact", 4), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
