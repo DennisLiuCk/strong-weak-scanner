@@ -182,6 +182,54 @@ limitation: 這是 FASB 為 XBRL taxonomy 提供的虛構揭露範例；L25 的 
 independence_group: fasb-topic-842
 -->
 
+<!-- research_source
+source_id: S11
+role: company_filing
+source_kind: document
+publisher: Microsoft
+title: Microsoft FY2026 Form 10-K
+published_at: 2026-07-29
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm
+locator: consolidated cash flows；Note 6 Property and Equipment；Note 12 Unearned Revenue；Note 13 Leases；AI infrastructure risk factors
+limitation: 年報把公司總 PP&E、應付未付、折舊、未起租租賃與跨產品履約義務分開，但沒有同一 AI 資產批次的在建轉入、利用率、收入、毛利與現金回收橋接
+independence_group: microsoft
+-->
+
+<!-- research_source
+source_id: S12
+role: company_filing
+source_kind: document
+publisher: Meta Platforms
+title: Meta Platforms 2026 Q2 Form 10-Q
+published_at: 2026-07-30
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1326801/000162828026050705/meta-20260630.htm
+locator: Note 6 Property and Equipment；Note 9 Leases and Contractual Commitments；H1 cash-flow discussion
+limitation: 在建工程、折舊、尚未起租租賃、待售資產與 cash PP&E 的期間及狀態不同；申報未提供在建工程完整 rollforward、逐批 placed-in-service、利用率或 AI 專屬收入
+independence_group: meta
+-->
+
+<!-- research_source
+source_id: S13
+role: company_filing
+source_kind: document
+publisher: Amazon
+title: Amazon 2026 Q2 Form 10-Q
+published_at: 2026-07-31
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1018724/000101872426000026/amzn-20260630.htm
+locator: supplemental cash-flow information；Note 8 Segment Information 的 PP&E net additions 與 depreciation；AWS performance obligations；FCF reconciliation
+limitation: 分部資產與折舊按 usage 分攤不是容量利用率揭露；淨新增含非現金未付款活動，履約義務也沒有與同一資產批次、AI 工作負載或供應商逐筆配對
+independence_group: amazon
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -333,6 +381,62 @@ as_of: 2026-08-14
 basis: S1 分列 410 億美元 CapEx、56 億 total finance leases 與 358 億 cash PP&E；S2 明確把 301.16 億 cash PP&E 與 9.62 億 finance-lease principal 相加成 310.78 億、四捨五入為 310.8 億 headline CapEx；C10 則證明新租賃／ROU 與償還本金是不同事實
 boundary: Microsoft 所引法說沒有在同一段提供 finance-lease principal，Meta 所引結果也沒有在同一表提供新 finance-lease ROU additions；因此本判讀只裁決兩個已揭數字不可比，不補算缺值、不做公司 AI 投資強弱或 ROI 排名
 verification_needed: 三家公司在同一單季各自分列 cash PP&E、新 finance-lease ROU／liability additions、finance-lease principal／interest、其他 lease remeasurement 與一致的 headline／FCF reconciliation
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: Microsoft FY2026 年報分列全年 cash PP&E additions 1,159.48 億美元、期末已購置尚未付款 PP&E 267 億美元、全年折舊 343 億美元、尚未起租租賃 3,291 億美元與公司履約義務 6,840 億美元
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-07-29
+basis: S11 的現金流量表、Note 6、Note 12 與 Note 13 各自直接揭露上述數字與期間
+boundary: 五個數字分屬期間現金流、期末應付存量、成本分攤、未開始合約與跨產品未來收入；不能相加、相除成利用率，也不能改寫為 AI 專屬資產或 ROI
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: Meta 2026 Q2 申報分列 H1 cash PP&E 491.1 億美元、6 月底在建工程 803.45 億美元、H1 折舊 116.7 億美元、尚未起租租賃 2,789.9 億美元與期末待售資產 20.3 億美元
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-07-30
+basis: S12 的 Note 6、Note 9 與現金流討論直接揭露資產存量、期間費用、未來租賃承諾與現金購置
+boundary: 在建工程期末存量不等於 H1 新增，待售重分類也顯示資產狀態會移動；沒有逐批轉入可使用、利用率、AI 收入或現金回收資料
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: Amazon 2026 Q2 申報分列 H1 PP&E 淨新增 1,186.48 億美元、已取得但未付款 PP&E 增加 206.20 億美元、H1 PP&E 折舊攤銷 267.03 億美元，並稱 4,960 億美元 AWS 未來服務承諾的收入時點由客戶使用與公司履約決定
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-07-31
+basis: S13 的 supplemental cash-flow、segment information 與 performance-obligation 段落直接分列非現金資產、分部折舊與未來服務承諾
+boundary: 淨新增含非現金活動，折舊按分部 usage 分攤也不是容量利用率；履約義務不能與本期新增資產、AI 工作負載或台灣供應商一對一
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: 折舊與折舊攤銷是資產成本進入損益的碼表，不是容量利用率、客戶變現或現金回收碼表；三家公司若沒有共同資產批次鍵，就不能用折舊除以 CapEx 或資產新增推算 AI 利用率
+supporting_source_ids: S11,S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 三份申報都把現金或非現金資產新增、資產存量、折舊、合約承諾與收入證據放在不同報表或期間，且沒有逐批 cohort reconciliation
+boundary: 這是報表可識別性判定，不否定管理層內部可能有利用率資料，也不衡量三家公司 AI ROI、估值或任何供應商受惠
+verification_needed: 同一具名資料中心或設備批次的取得方式、在建轉入日、折舊起算、可用容量、客戶使用與收入、付款及收款日期
 resolution:
 -->
 
@@ -578,6 +682,13 @@ to: triaged
 reason: finance_lease_addition_and_principal_clocks_separated_with_fasb_contract_without_refreshing_thesis_clock
 evidence: sources:S1,S2,S9,S10
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: depreciation_cost_clock_separated_from_utilization_and_recovery_with_latest_filings_without_refreshing_thesis_clock
+evidence: sources:S11,S12,S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -596,7 +707,9 @@ evidence: sources:S1,S2,S9,S10
 - **應收帳款**：已認列收入、但客戶尚未付款的金額；收入增加而應收同步拉長，不等於現金已回收。
 - **供應商財務歸因**：用同一平台、產品、期間與公司分母，把客戶需求連到供應商的出貨、收入、毛利與現金；只知道買方 CapEx 不足以完成歸因。
 - **履約義務（performance obligation）**：公司已承諾未來提供的服務；簽約或客戶預付不等於收入已認列，仍要看客戶使用與公司是否完成約定服務。
+- **RPO（remaining performance obligations，剩餘履約義務）**：已簽約但尚待提供產品或服務、未來才可能認列的收入；它是合約存量，不是當期營收、收款或新增資產的回收率。
 - **非現金資產增加**：資產已取得或記入 PP&E，但付款可能尚未發生，或由租賃等方式取得；它會讓資產時鐘早於現金時鐘。
+- **折舊／折舊攤銷**：把已資本化資產的成本，依估計耐用年限分期列入費用；它是成本分攤，不是設備利用率、客戶收入或現金回收率。
 - **融資租賃（finance lease）**：先取得資產使用權、分期付款的融資方式；它可能計入 headline CapEx，卻不在當期「cash paid for PP&E」裡一次流出。
 - **使用權資產（ROU asset）**：承租人取得在租期內使用標的資產的權利；起租時可與租賃負債同時認列，不代表當期已支付同額現金。
 - **租賃負債（lease liability）**：承租人尚待支付租賃款的現值；新租賃開始、利息累積、本金償還、修改與重新衡量會沿不同方向改變它。
@@ -726,6 +839,65 @@ Amazon 的 2026 Q1 申報則把另外兩個時差寫得很清楚：PP&E 淨增�
 
 四個時鐘不是新的一套公司排名。真正可重算的橋接，仍要用同一具名資產或平台批次，把合約生效、轉入可使用、客戶使用與收入、付款與供應商收款日期一一對上；目前公開資料還做不到。
 
+## 折舊是成本碼表，不是利用率碼表
+
+最新申報把四個時鐘再拆細了一步：資產開始分攤成本後，報表會出現折舊；但折舊增加只告訴我們
+有更多或更高成本的資產正在進入損益，也可能受到耐用年限估計影響。它沒有共同的「可用 GPU
+時數」或「已售算力」分母，不能直接回答容量用了幾成、哪一批設備產生多少收入，或現金何時
+回收。
+
+下表單位都是十億美元，但刻意不做加總或跨公司比率。每列同時混有**期間流量、期末存量、
+尚未開始的合約與未來服務承諾**；數字並排只是辨認時鐘，不是比較規模或效率。
+
+| 公司與最新申報 | 資產取得／存量 | 成本分攤 | 尚未開始或尚待履約 | 安全讀法 |
+|---|---|---|---|---|
+| Microsoft FY2026 10-K | 全年 cash PP&E additions 115.948；期末已購置尚未付款 PP&E 26.7 | 全年折舊 34.3 | 尚未起租租賃 329.1；公司 RPO 684 | cash additions 是全年流量，26.7 是期末應付存量；RPO 又涵蓋廣泛商業產品，五數沒有共同 AI 資產分母。 |
+| Meta 2026 Q2 10-Q | H1 cash PP&E 49.11；6 月底 CIP 80.345 | H1 折舊 11.67 | 尚未起租租賃 278.99；期末待售資產 2.03 | CIP 是期末存量，會受轉入可使用、重分類與處分影響；不能把它當 H1 新增或可用容量。 |
+| Amazon 2026 Q2 10-Q | H1 PP&E 淨新增 118.648，其中已取得未付款的增加為 20.620 | H1 PP&E 折舊攤銷 26.703 | AWS 未來服務承諾 496，收入時點由使用與履約決定 | 淨新增含非現金活動；分部成本按 usage 分攤也不是公開的容量利用率。 |
+
+### 先辨認存量、流量與承諾
+
+Meta 的 CIP 從 2025 年底 50.521 增至 2026 年 6 月底 80.345，機械相減是 29.824；這只是一段
+期間的**淨存量變化**。同一期間還可能有新建、設備安裝、轉入可使用資產、轉為待售、處分與
+其他重分類，因此不能把 29.824 改名為 H1 CapEx。S12 沒有提供能把每一項流入、流出逐筆
+對回的完整 CIP rollforward，研究上就應把缺口留白。
+
+Microsoft 的 26.7 也不是 115.948 的子期間流量：前者是 6 月 30 日仍掛在 accounts payable 的
+期末存量，後者是整個財政年度已在投資現金流列出的 PP&E additions。Amazon 更直接提醒，
+segment PP&E net additions 本來就含「已取得但尚未付款」的非現金活動。看到資產增加，不能
+先假設現金已在同一期全數流出。
+
+### 「按使用分攤」不是「公布利用率」
+
+Amazon 表示 technology infrastructure assets、net additions 與折舊攤銷會按 usage 分配到
+各部門，多數落在 AWS；這支持的是**成本與資產的部門歸屬規則**。申報沒有公開總可用算力、
+已用算力、閒置容量、GPU 型號組合或同一時間窗，因此不能把 AWS 折舊除以 AWS 淨新增，命名
+為「利用率」。分子涵蓋不同年份投入的資產，分母又含本期非現金新增，資產批次也不相同。
+
+Microsoft 的 684 RPO 與 Amazon 的 496 AWS 未來服務承諾也不是本期新資產的收入分子。前者
+涵蓋廣泛商業產品與服務；後者的收入時點還要由客戶使用與 Amazon 履約決定。兩者能證明有
+未來合約需求，不能把一份多年期服務承諾逐美元配給本期新建資料中心、AI 晶片或台灣供應商。
+
+### 建一張「資產批次護照」再談回收
+
+若要把 CapEx 接到利用率與現金回收，同一批資產至少要有以下共同鍵；缺一欄就標示未知，
+不要用公司總額代填。
+
+| 護照欄位 | 要回答的問題 | 缺少時不能做的推論 |
+|---|---|---|
+| 資產批次／站點 | 哪座資料中心、哪批伺服器或哪個平台？ | 不能把不同年份與設備世代混成一批。 |
+| 取得方式與日期 | 現金購置、finance lease 或其他融資；何時取得？ | 不能把非現金新增等同當期現金流出。 |
+| 在建、驗收與可使用日 | 何時由 CIP 轉成可按預定用途使用？ | 不能由承諾或在建存量推定容量已上線。 |
+| 折舊分類與起算 | 資產類別、耐用年限與成本何時進入損益？ | 不能把折舊變化全歸因實體容量變化。 |
+| 容量與利用分母 | 可用 GPU 時數、機櫃、MW 或其他共同容量是多少？ | 不能算利用率，也不能跨公司比較。 |
+| 工作負載、收入與毛利 | 哪些客戶使用、何時履約、產生多少收入與成本？ | 不能把 RPO 或雲端總營收配給這一批資產。 |
+| 付款、收款與供應商共同鍵 | 買方何時付款、客戶何時付費、供應商何時出貨與收現？ | 不能重算回收期，也不能建立台灣公司財務歸因。 |
+
+本段是三家指定發行人的最新申報 `N=3` 定向核對，不是全球 hyperscaler、資料中心或台灣
+供應鏈樣本。金額是發行人依各自口徑揭露的報告值，29.824 是兩個期末存量的確定性相減；
+沒有 sampling SE／t，也沒有共同 AI 資產分母。本文只判斷哪些除法與因果橋接目前不可識別，
+不衡量公司 ROI、估值、投資優劣或市場是否反映。
+
 ## 把四道閘門展成七張交接單
 
 四道閘門適合快速閱讀；要把「大買方正在花錢」一路接到「台灣公司真的賺到錢」，則要拆成七張可以逐欄驗收的交接單。這七站是**研究順序**，不是保證每一美元都照同一天發生的物理流水線。
@@ -787,10 +959,13 @@ Amazon 的 2026 Q1 申報則把另外兩個時差寫得很清楚：PP&E 淨增�
 - [Amazon 2026 Q1 Form 10-Q：未付款資產與 AWS 履約義務](https://www.sec.gov/Archives/edgar/data/1018724/000101872426000014/amzn-20260331.htm)
 - [FASB Accounting Standards Update 2016-02：Leases (Topic 842), Section A](https://storage.fasb.org/ASU%202016-02_Section%20A.pdf)（租賃初始認列、後續衡量與 principal／interest 現金流分類）。
 - [FASB 2024 GAAP Taxonomy Implementation Guide：Leases under Topic 842](https://xbrl.fasb.org/ix/?doc=..%2Fimpdocs%2FLE_TIG%2Finline_f2017leasesig.htm)（虛構揭露例，不是公司或產業數據）。
+- [Microsoft FY2026 Form 10-K：PP&E、折舊、未起租租賃與履約義務](https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm)
+- [Meta 2026 Q2 Form 10-Q：CIP、折舊、待售資產與尚未起租租賃](https://www.sec.gov/Archives/edgar/data/1326801/000162828026050705/meta-20260630.htm)
+- [Amazon 2026 Q2 Form 10-Q：非現金 PP&E、分部折舊與 AWS 履約義務](https://www.sec.gov/Archives/edgar/data/1018724/000101872426000026/amzn-20260630.htm)
 
-**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。FASB 文件再證明新 finance-lease ROU／liability 與償還本金是兩個不同事實。
+**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。FASB 文件再證明新 finance-lease ROU／liability 與償還本金是兩個不同事實。最新三份申報還把資產新增或存量、未付款、折舊、未起租租賃與履約義務分列，足以判定折舊不是利用率碼表。
 
-**還不知道：** CapEx 中每一項 AI 晶片、伺服器、網路、電力與建物的精確拆分，新增容量的上線時間與利用率，以及台灣 universe 個股的訂單與獲利份額。
+**還不知道：** CapEx 中每一項 AI 晶片、伺服器、網路、電力與建物的精確拆分，同一資產批次的在建轉入、折舊起算、容量上線、利用率、收入與現金回收，以及台灣 universe 個股的訂單與獲利份額。
 
 **不可外推：** 這不是三家公司 AI ROI 排名；期間與公式不同。買方 CapEx 也不能直接等同任何台灣供應商收入。沒有價格、估值、共識與部位資料，本題不判斷市場是否已反映。
 
@@ -852,3 +1027,4 @@ evidence_boundary: 不由雲端需求直接指認台灣散熱個股受惠，等�
 - **分類調節**：微軟租賃分類改變後，同時看 reported CapEx 與 operating-lease cash payments，避免把分類位移誤讀為採購位移。
 - **台灣公司交叉驗證**：供應商 Q2／Q3 正式文件是否出現客戶認證、出貨、存貨／應收、毛利與 OCF 的同向改善；只有營收、沒有毛利與現金，不算完整受惠。
 - **兩端共同鍵**：買方與供應商能否同時指向同一平台、料號、期間、數量與驗收節點；缺任一端，就只保留需求搜尋路由，不建立題材財務歸因。
+- **資產批次護照**：三家公司後續是否提供站點／設備批次、取得方式、placed-in-service、折舊分類、容量分母、工作負載、收入與現金的共同鍵；沒有共同 cohort，就不以折舊／新增資產比率冒充利用率。
