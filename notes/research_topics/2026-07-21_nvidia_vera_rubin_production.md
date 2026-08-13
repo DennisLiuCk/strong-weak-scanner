@@ -68,6 +68,13 @@ to: triaged
 reason: added_current_platform_system_composition_and_graph_projection_without_changing_financial_boundary
 evidence: sources:S13
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: named_project_capacity_and_benchmark_economics_bridges_added_without_supplier_financial_upgrade
+evidence: sources:S14,S15,S16
+-->
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -98,12 +105,17 @@ evidence: sources:S13
 - **財務歸因**：把某平台帶來的數量、單價、成本與期間，連回特定公司的收入、毛利、存貨或現金流。沒有這座橋，就只能說產業進度，不能說個股已獲利。
 - **POD-scale**：把多個各司其職的機架接成一個可共同運作的系統範圍；它比單一 NVL72 機架更大，也不等於整座資料中心都只有一種配置。
 - **Configuration lock（組態凍結）**：把硬體料表、纜線、韌體、軟體、電力與冷卻版本固定到可重複製造及驗證的狀態；產品頁列出架構，不代表客戶的最終組態已凍結。
+- **Tokens／MW**：每百萬瓦功率能產出的 token 速率，用來描述特定測試邊界內的能源效率；模型、精度、軟體、延遲目標與功率邊界一換，數字就不一定可比。
+- **TPS／user**：每位使用者每秒可取得的 token 數，本文把它當互動速度的約束；總吞吐量提高若以更慢回應換得，不能說是同一種體驗。
+- **資料中心容量**：公告用來描述站點規模的 MW。若文件沒說是公用電力、IT load、設計容量、已通電容量或哪一期，就不能拿來直接除以單櫃功率。
+- **DeepSeek R1**：CoreWeave 本輪用來比較兩代機架的推理模型與工作負載名稱；換成其他模型、輸入／輸出長度或服務目標後，10 倍結果不保證維持。
+- **GB200 NVL72**：CoreWeave benchmark 中作為基準的 Grace Blackwell 機架平台，和本文既有的 GB300 是不同型號；比較結果不能在兩者之間互換。
 
 ### 三句話抓重點
 
 - Vera Rubin 的公開證據已橫跨平台量產、系統型錄、未來工廠、整櫃驗證與雲端供應語言，不能再只用「路線圖／已量產」二分法。
-- 每份文件只跨過七關中的一部分：CoreWeave 的 rack bring-up、Google 的 offer、緯創的未來生產、技嘉的型錄與緯穎的 production-ready 都不是同一張證書。
-- 截至 2026-08-12，仍沒有一手資料把台灣公司實際 Rubin 出貨、客戶驗收、平台收入與獲利完整接起來；平台成熟不等於個股財務受惠已證實。
+- 每份文件只跨過七關中的一部分：Noetra 的規劃容量、CoreWeave 的單一工作負載 benchmark、Google 的 offer、緯創的未來生產與台灣系統廠型錄都不是同一張證書。
+- 截至 2026-08-14，仍沒有一手資料把台灣公司實際 Rubin 出貨、客戶驗收、平台收入與獲利完整接起來；27,500 顆 GPU、140MW 或 10 倍 tokens／MW 都不能單獨證明個股財務受惠。
 
 ### 為什麼重要
 
@@ -114,6 +126,8 @@ evidence: sources:S13
 ### 接下來怎麼追
 
 - 追 NVIDIA 是否公布 Vera Rubin 與 Spectrum-6 的實際部署數量、客戶驗收及量產節奏。
+- 追 Noetra 專案是否公布分期、實際通電／驗收容量、整數機櫃配置與商業上線時點。
+- 追 CoreWeave 的結果能否在其他模型、精度、延遲、營運商與 production SLO 下重現。
 - 追被列名系統廠下一次法說是否出現具名產品階段、出貨、收入、毛利、存貨與現金流足跡。
 - 追散熱、PCB、電源與記憶體公司是否以自身一手文件建立供應關係，而不是沿用平台名單。
 
@@ -196,6 +210,55 @@ bring-up 為何是跨系統工作。反過來，這仍是營運商自己發布�
 文件之間不是互相矛盾，而是觀察單位不同：平台商看世代，系統廠看設計與製造，雲端商看
 可營運能力，投資研究最後還要看上市公司的會計結果。把五句話壓成「已上線」，會把所有
 還沒公開的交接責任一起藏掉。
+
+## 27,500 顆 GPU、140MW 與 10 倍效率，三種分母不能直接變成營收
+
+NVIDIA 7 月 16 日公告與 Noetra 規劃一座 Vera Rubin AI factory，列出 13,750 顆 Vera
+CPU、27,500 顆 Rubin GPU 與 140MW data center capacity；公告使用的是 `working with`、
+`will be architected` 與 `will deliver` 等未來式。CoreWeave 7 月 21 日則公布自家測試：在
+同一 DeepSeek R1 工作負載、相近互動速度下，Vera Rubin NVL72 的 tokens／MW 是 GB200
+NVL72 的 10 倍。前者是**專案規劃容量**，後者是**一個營運商的工作負載效率**；兩者都比
+只有產品型錄更具體，但仍不是上線容量、台灣供應商訂單或財務結果。
+
+### 先做容量護照，再決定能不能除
+
+| 公開數字 | 原始分母／邊界 | 可以做的機械核對 | 不能自行補上的結論 |
+|---|---|---|---|
+| 27,500 顆 Rubin GPU | Noetra 規劃專案的晶片總數 | 依每櫃 72 顆換算為 `27,500 ÷ 72 = 6,875／18 ≈ 381.944` 個配置單位 | 382 櫃確定訂單、交貨或驗收 |
+| 13,750 顆 Vera CPU | 同一專案的 CPU 總數 | 依每櫃 36 顆換算也為 `13,750 ÷ 36 = 6,875／18 ≈ 381.944`；GPU：CPU 剛好 2：1 | 尾差究竟來自備品、分期、四捨五入或其他 BOM；原文沒有說明，不能選定其中一種 |
+| 140MW data center capacity | 公告未拆公用電力、IT load、設計／已通電容量或建置分期 | 只記為一個具名專案的站點容量標籤 | 直接除以技嘉型錄 240kW 得出機櫃數，或把全部 MW 當成 GPU 可用功率 |
+| 80,000 與 800,000 TPS／MW | CoreWeave 頁面：DeepSeek R1、150 TPS／user、GB200 與 Vera Rubin | 在該頁相同口徑下為 10 倍 | 全模型、全延遲、全站點都 10 倍；更不能等同 10 倍收入或 90% 總成本下降 |
+
+兩個除法得到完全相同的非整數，只證明公告中的 CPU／GPU 數量與 72：36 拓撲在比例上
+一致；它反而提醒讀者，文件沒有提供「整數機櫃訂單」這個欄位。尾差可能有多種工程或公告
+原因，任何一種都需要新文件才能選定。140MW 也不能和單一廠商型錄的 240kW rack power
+直接相除：站點容量的量測邊界未揭露，DSX 專案還包含網路、CPU、儲存與其他系統責任。
+
+### 從 benchmark 到財報，還要跨過四座橋
+
+| 橋 | 要回答的問題 | 最低可核對證據 | 少了它會誤讀成什麼 |
+|---|---|---|---|
+| 1. 技術可重現 | 10 倍是否只屬於 DeepSeek R1、NVFP4 與這套最佳化？ | 公開測試方法、不同模型／精度／延遲點、其他營運商或獨立 benchmark | 把單一最佳化案例當成所有工作負載定律 |
+| 2. 營運轉換 | 測試效率能否在長時間服務中保留？ | 上線機櫃數、可用率、利用率、SLO、故障與電力／散熱邊界 | 把短測吞吐量當成可全年計費容量 |
+| 3. 商業變現 | 多出的 token 有沒有需求，售價如何變？ | billable token／instance、價格、合約量、客戶留存與折扣 | 把 10 倍產能直接寫成 10 倍營收；忽略每 token 價格下跌或閒置 |
+| 4. 財務與供應鏈歸因 | 誰付 CapEx、誰認列收入、誰承擔折舊與電力？ | 專案出貨／驗收、供應商數量與 ASP、收入、毛利、存貨、OCF／FCF 對時 | 把平台效率同時算成雲端商與所有台灣供應商的獲利 |
+
+CoreWeave 已明示測試開啟 expert parallelism、NVFP4、multi-token prediction、disaggregated
+prefill／decode、TensorRT-LLM 與 Dynamo，並把目前結果稱為會繼續最佳化的 starting point。
+這使結果更可定位，不使它自動變成跨業者基準。研究上應先保存模型、精度、軟體、TPS／user、
+功率邊界與測試日期，再等下一條獨立消息鏈重做；若只抄「10x」，就遺失了真正能被推翻的條件。
+
+### 多空小作文要共用同一組裁決欄位
+
+| 版本 | 必須同時成立 | 下一份裁決證據 | 何時下修／失效 |
+|---|---|---|---|
+| 多方 | 效率在多種 production workload 與 SLO 下保留；電力確實是瓶頸；新增容量有高利用率與可計費需求；專案按期通電驗收；台灣供應商留下具名出貨與毛利／現金流 | 跨營運商 benchmark、site commissioning、可用容量與利用率、價格／合約、買賣雙方財務橋接 | 只能重現單一測試、站點延後、容量閒置、token 售價降幅吃掉效率，或供應商沒有財務足跡 |
+| 空方 | 10 倍主要來自特定模型／精度／軟體；網路、儲存、散熱或需求成為新瓶頸；價格競爭把效率讓給客戶；專案規劃未轉成驗收與收入 | 同條件重測顯著縮小、長期 SLO／利用率偏弱、延遲或取消、價格與毛利惡化 | 多工作負載與多站點持續重現、利用率高、售價與單位經濟改善，且供應商收入、毛利與現金同步出現 |
+
+本輪觀察單位是 1 個具名規劃專案，以及 1 家營運商對 1 個具名工作負載、2 個平台的自家
+比較；不是 AI factory、雲端業者或台灣供應鏈的抽樣。公告值與兩個除法是確定性核對，沒有
+sampling SE／t；CoreWeave 頁面未披露重複試驗、變異或獨立驗證，不能補造誤差範圍。這段
+新增的是容量與經濟橋接的閱讀方法，不改寫 C11 七關主命題，也不形成價格、估值或投資建議。
 
 ## 從工廠到工作負載的交付順序
 
@@ -318,6 +381,9 @@ limitation: 生態系列名證明合作角色存在，不等於個別公司新�
 - [NAVER／NVIDIA／Brookfield 韓國 AI factory 擴建提案](https://investor.nvidia.com/news/press-release-details/2026/NAVER-NVIDIA-and-Brookfield-to-Expand-Koreas-National-AI-Factory-Infrastructure-Buildout/default.aspx)（NVIDIA，2026-07-24；含非拘束性條款與條件）。
 - [SK Group／NVIDIA AI factory 與 HBM 合作意向](https://investor.nvidia.com/news/press-release-details/2026/SK-Group-and-NVIDIA-Expand-Strategic-Partnership-Across-AI-Factories-and-Next-Generation-Memory/default.aspx)（NVIDIA，2026-07-24；LOI／計畫，不是已交付訂單）。
 - [NVIDIA 先前列名的台灣 Vera 系統廠](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Unveils-Vera-the-CPU-for-Agents/default.aspx)（NVIDIA，2026-05-31）包含 GIGABYTE、QCT、Wistron、Wiwynn。
+- [NVIDIA／Noetra 日本 physical AI 基礎設施公告](https://investor.nvidia.com/news/press-release-details/2026/Japan-Government-Industrial-Leaders-and-NVIDIA-Launch-the-Worlds-First-National-AI-Infrastructure/default.aspx)（NVIDIA，2026-07-16；規劃容量與未來式架構）。
+- [CoreWeave Vera Rubin tokens／MW 測試](https://coreweave.com/blog/nvidia-vera-rubin-nvl72-on-coreweave-10x-more-tokens-per-megawatt-than-blackwell)（CoreWeave，2026-07-21；單一營運商自家測試）。
+- [CoreWeave Vera Rubin 動態產品頁](https://www.coreweave.com/products/nvidia-vera-rubin)（擷取於 2026-08-14；保存 150 TPS／user 下的 80,000／800,000 TPS／MW 口徑）。
 
 上述資料只證實 NVIDIA 平台與其公開列名生態系。它沒有披露技嘉、廣達、緯創或緯穎的
 新增訂單、單價、出貨占比或獲利；也沒有點名本 universe 的散熱、PCB、電源或記憶體個股。
@@ -448,6 +514,54 @@ url: https://www.nvidia.com/en-us/data-center/technologies/rubin/
 locator: 2026-08-12 可見的 POD-scale system、five purpose-built rack-scale systems，以及 Vera Rubin NVL72、NVLink、Spectrum-X／Quantum-X、liquid-cooled Vera CPU 與 BlueField storage 段落
 limitation: 動態產品頁只支持當日平台組成與 NVIDIA 自身架構描述；不證明客戶最終 configuration lock、所有部署採相同選配、orderability、出貨、客戶驗收、台灣供應商分配或財務貢獻
 independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S14
+role: company_release
+source_kind: document
+publisher: NVIDIA / Noetra
+title: Japan Government Industrial Leaders and NVIDIA Launch the World's First National AI Infrastructure
+published_at: 2026-07-16
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://investor.nvidia.com/news/press-release-details/2026/Japan-Government-Industrial-Leaders-and-NVIDIA-Launch-the-Worlds-First-National-AI-Infrastructure/default.aspx
+locator: News Summary 與 AI factory 段落的 13,750 Vera CPUs、27,500 Rubin GPUs、140MW data center capacity、NVL72／DSX／Spectrum-X 與 FRONTia Project 敘述
+limitation: NVIDIA／Noetra 公告以 working with、will be architected 與 will deliver 描述規劃；沒有建置分期、整數機櫃數、電力邊界、通電、驗收、order、台灣供應商或財務橋接，且與 S1／S13 同屬 NVIDIA 消息鏈
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S15
+role: company_release
+source_kind: document
+publisher: CoreWeave
+title: NVIDIA Vera Rubin NVL72 on CoreWeave 10x More Tokens Per Megawatt Than Blackwell
+published_at: 2026-07-21
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://coreweave.com/blog/nvidia-vera-rubin-nvl72-on-coreweave-10x-more-tokens-per-megawatt-than-blackwell
+locator: DeepSeek R1、matched interactivity、10x tokens-per-second per megawatt、已開啟的 inference optimizations 與 starting point 段落
+limitation: 單一營運商自家發布、單一工作負載與未披露重複試驗的測試；沒有獨立重現、完整功率邊界、上線機櫃數、利用率、價格、收入、成本、客戶驗收或台灣供應商歸因；擷取 HTML SHA-256 ef1ca7edeb08edf5b345bc3b23617c7860a9fe122f0c3a208cc6ce966e73910e
+independence_group: coreweave
+-->
+
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: living_index
+publisher: CoreWeave
+title: NVIDIA Vera Rubin on CoreWeave Cloud
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.coreweave.com/products/nvidia-vera-rubin
+locator: 2026-08-14 可見的單櫃 72 Rubin GPUs／36 Vera CPUs，以及 DeepSeek R1、150 TPS／user 下 GB200 80,000 與 Vera Rubin 800,000 TPS／MW 表格
+limitation: 動態產品頁與 S15 同屬 CoreWeave 消息鏈；頁面數值不提供測試樣本、變異、完整方法、獨立驗證、商業價格、利用率或財務結果；擷取 HTML SHA-256 8ec7effe7831d334e07432cc24606a757078544e6c31805e8acdcb960481147b
+independence_group: coreweave
 -->
 
 <!-- research_claim
@@ -619,6 +733,62 @@ as_of: 2026-08-12
 basis: S13 的平台總覽與五套機架級系統段落直接列出上述組成及角色
 boundary: 這是 NVIDIA 的當日架構與產品描述，不是客戶最終 configuration lock、所有站點的共同 BOM、可下單狀態、供應商分配、出貨、客戶驗收、收入或毛利證據
 verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: NVIDIA 於 2026-07-16 宣布正與 Noetra 規劃一座採 Vera Rubin NVL72／DSX 與 Spectrum-X 的 AI factory，公告列出 13,750 顆 Vera CPU、27,500 顆 Rubin GPU 與 140MW data center capacity
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 的 News Summary 與 AI factory 段落直接列出專案、晶片數量、容量及架構
+boundary: 這是 NVIDIA／Noetra 的未來式專案公告，不證明建置分期、已通電容量、整數機櫃訂單、交貨、站點驗收、台灣供應商或收入／毛利
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 將 Noetra 公告的 27,500 顆 GPU 與 13,750 顆 CPU 分別除以 CoreWeave 公開的每櫃 72／36 顆，兩者都得到 6,875／18、約 381.944 個配置單位；這只驗證 2：1 拓撲比例一致，不能把非整數結果四捨五入成 382 櫃確定訂單
+supporting_source_ids: S14,S16
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 提供專案晶片總數，S16 提供單櫃 72 GPU／36 CPU；Python Fraction 與 awk 兩條獨立路徑重算皆得到 6,875／18 及 GPU：CPU 2：1
+boundary: 原文未說非整數尾差是四捨五入、備品、分期或其他 BOM，也未定義 140MW 的設施／IT／分期邊界；不得拿站點 MW 與另一廠商單櫃 kW 直接推估訂單、收入或市占
+verification_needed: Noetra／NVIDIA 提供有版本的 configuration、分期、rack count、order／shipment、commissioning 與 acceptance
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: CoreWeave 於 2026-07-21 自行公布 Vera Rubin NVL72 在相近 interactivity、同一 DeepSeek R1 工作負載下達 GB200 NVL72 的 10 倍 tokens／MW；其動態產品頁於 2026-08-14 列出 150 TPS／user 下 800,000 對 80,000 TPS／MW
+supporting_source_ids: S15,S16
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S15 的 matched interactivity 與 10x 段落，以及 S16 同口徑產品表格直接支持 CoreWeave 公開的比較主張
+boundary: 這是 1 家營運商、1 個具名工作負載、2 平台的自家測試，且開啟多項最佳化；沒有重複試驗、變異、獨立重現、完整功率邊界或跨模型證據，不代表全站點 10 倍、10 倍收入或 90% 總成本下降
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 從 tokens／MW benchmark 推進到供應商獲利，至少要分別跨過技術可重現、長時間營運、商業變現、財務與供應鏈歸因四座橋；任一橋缺失時，10 倍效率都不能直接改寫成 10 倍營收或所有台灣供應商共同受惠
+supporting_source_ids: S14,S15,S16
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 只到未來式專案容量，S15／S16 只到特定測試與動態產品表；三份來源都未提供利用率、價格、供應商出貨、收入、毛利、存貨與現金流，因此必須保留四段橋接
+boundary: 四橋是可證偽的研究責任分類，不主張橋與橋之間固定線性、10 倍結果必然失效或任何公司一定受惠／受害；本文未評估價格、估值、共識、部位或投資報酬
+verification_needed: 其他營運商與工作負載的同條件重測、production SLO／利用率、billable demand／pricing、站點 acceptance，以及台灣買賣雙方同期間財務橋接
 resolution:
 -->
 

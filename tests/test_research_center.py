@@ -6246,6 +6246,7 @@ class ResearchCenterTest(unittest.TestCase):
             "## 看到「量產／就緒／驗證／上線」，先補齊五個欄位",
             "## 一座 AI 機架不是放大的單機：七條責任鏈要同時接上",
             "## 五份一手文件，為什麼不能合併成一句「已上線」",
+            "## 27,500 顆 GPU、140MW 與 10 倍效率，三種分母不能直接變成營收",
             "## 從工廠到工作負載的交付順序",
             "## 用雙向證據把平台進度連回台灣公司",
             "## 新手最常混淆的六件事",
@@ -6266,7 +6267,7 @@ class ResearchCenterTest(unittest.TestCase):
             "| 3. 用什麼動詞 |",
             "| 4. 範圍與日期 |",
             "| 5. 下一份裁決證據 |",
-            "CoreWeave 的 rack bring-up、Google 的 offer、緯創的未來生產",
+            "Noetra 的規劃容量、CoreWeave 的單一工作負載 benchmark",
             "平台／客戶端往回找",
             "台灣公司端往前找",
             "平台 full production ≠ 每家供應商都在量產",
@@ -6280,15 +6281,30 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S13",
             "claim_id: C12",
             "reason: added_current_platform_system_composition_and_graph_projection_without_changing_financial_boundary",
+            "27,500 ÷ 72 = 6,875／18 ≈ 381.944",
+            "13,750 ÷ 36 = 6,875／18 ≈ 381.944",
+            "| 1. 技術可重現 |",
+            "| 2. 營運轉換 |",
+            "| 3. 商業變現 |",
+            "| 4. 財務與供應鏈歸因 |",
+            "10 倍產能直接寫成 10 倍營收",
+            "source_id: S14",
+            "source_id: S15",
+            "source_id: S16",
+            "claim_id: C13",
+            "claim_id: C14",
+            "claim_id: C15",
+            "claim_id: C16",
+            "reason: named_project_capacity_and_benchmark_economics_bridges_added_without_supplier_financial_upgrade",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
-        self.assertGreaterEqual(glossary.count("- **"), 23)
+        self.assertGreaterEqual(glossary.count("- **"), 26)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 12), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 16),
+            ("research_claim", 16), ("metric_comparison", 0),
             ("impact", 6), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
