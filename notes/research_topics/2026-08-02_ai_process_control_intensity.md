@@ -95,6 +95,13 @@ to: triaged
 reason: applied_advanced_packaging_forecast_denominator_separated_from_process_control_numerator_without_refreshing_thesis_clock
 evidence: sources:S25
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: applied_fy26q3_company_segment_application_and_two_superset_forecasts_mapped_without_refreshing_thesis_clock
+evidence: sources:S26,S27
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -151,12 +158,18 @@ evidence: sources:S25
 - **產品—商業護照**：把具名產品與任務、客戶階段、會計狀態、同期間分子與分母綁在同一筆證據；少一欄就停在較早的成熟度，不用相鄰名詞補空格。
 - **Master Class**：Applied 對投資人與產業讀者發布的主題式技術／商業說明會；prepared remarks 是發行人一手資料，但其中的市場、排名、採用與預測仍是公司陳述。
 - **VeritySEM 7AP／SEMVision G7AP**：Applied 分別定位為先進封裝 eBeam 尺寸量測與缺陷複判／分類工具；型號已被公司稱為 production，不代表公開資料已拆出各自收入或客戶端成效。
+- **PDC（Process Diagnostics and Control，製程診斷與控制）**：Applied 使用的較寬產品類別，涵蓋不同晶圓製造與封裝應用；類別成長不等於其中 AP 子集合以相同比率成長。
+- **FY26Q3**：Applied 依自己的財政年度命名、截至 2026 年 7 月 26 日的一季；不是一般曆年第三季，本文只按公司報告期間使用。
+- **AP-specific PDC（先進封裝專屬製程診斷與控制）**：同時可歸屬 advanced packaging 與 PDC 的收入、訂單或工具分子；公司總營收、部門營收、全部 AP 或全部 PDC 都比它寬。
+- **集合與交集**：若 `A` 代表全部 advanced-packaging revenue、`P` 代表全部 PDC revenue，本文真正要找的是同時屬於兩者的 `A ∩ P`；兩個大集合各自成長，仍不能唯一決定交集大小或成長率。
+- **客戶應用組合（customer application mix）**：把部門收入按客戶製造應用分成 foundry／logic／other、DRAM、flash 等類別；它不是產品組合，也沒有把 AP 或 PDC 收入單獨拆出。
+- **Applied 定義的 CY26**：本次簡報明定為 FQ2'26～FQ1'27，且 FQ1'27 是 14 週季度；不是一般 1～12 月曆年，跨公司比較前必須先對齊期間。
 
 ### 三句話抓重點
 
 - 五家設備商的一手文件，分別說明需求方向、缺陷為何更昂貴、設備走到客戶驗證／未來交付的哪一步，以及不同寬度的訂單與收入訊號。
 - 真正要查的是：每一代產品的 control plan 是否改變抽樣覆蓋、靈敏度、偽警報、週期時間與圍堵動作，而不只是設備名稱變多。
-- Camtek 已提供較接近題材分子—公司分母的近似收入組合，但期間未標明；弘塑、均華與萬潤則示範台廠的廣義設備收入、產品清單與研發計畫仍不能替代具名製程控制分子，現有資料也不能證明全產業設備預算占比上升。
+- Camtek 已提供較接近題材分子—公司分母的近似收入組合，但期間未標明；Applied FY26Q3 又證明 AP 與 PDC 兩個廣義集合各自成長仍解不出交集；弘塑、均華與萬潤的廣義設備收入、產品清單與研發計畫也不能替代具名製程控制分子。
 
 ### 為什麼重要
 
@@ -415,6 +428,56 @@ AP 的公司預測，後者是具名製程控制工具的供應商端採用陳�
 actual revenue 或 order intake，不是 Applied 全部沉積、蝕刻、電鍍、CMP、接合與控制工具
 的 AP forecast。`N=1` 是一份指定發行人 prepared remarks 的文件級核對，不是設備商或客戶
 樣本；兩組算例是確定性代數情境，沒有 sampling SE／t，也不衡量預測準確度。
+
+## 8 月 13 日 FY26Q3：兩條成長線仍不是交集
+
+Applied FY26Q3 結果把公司分母補得更完整：截至 2026 年 7 月 26 日的一季，公司實際營收
+91.15 億美元，Semiconductor Systems（半導體系統）部門實際營收 70.40 億美元。該部門再按
+客戶應用列出 foundry／logic／other 67%、DRAM 26%、flash 7%。同一結果公告也重述六項
+DRAM／先進封裝系統，其中包含 VeritySEM 7AP 與 SEMVision G7AP。這些資料依序回答公司
+多大、半導體系統部門多大、客戶應用如何分布，以及哪些產品被公司具名；卻沒有回答 AP
+製程控制收入是多少。
+
+| FY26Q3 新增揭露 | 數字或狀態 | 它的分母 | 不能改寫成 |
+|---|---:|---|---|
+| Applied 公司實際營收 | 91.15 億美元 | 公司全部收入 | AP、PDC 或 AP 製程控制收入 |
+| Semiconductor Systems 實際營收 | 70.40 億美元 | 廣義半導體設備部門 | 製程控制產品收入或 AP 收入 |
+| 部門客戶應用組合 | foundry／logic／other 67%、DRAM 26%、flash 7% | Semiconductor Systems 部門收入 | 產品組合、AP 占比或 PDC 占比 |
+| 六項 DRAM／AP 系統 | 產品已由公司具名；其中兩項為 eBeam PDC | 沒有產品收入分母 | 六項各自收入、工具數、訂單或客戶成效 |
+
+例如把 70.40 億美元乘上 DRAM 的 26%，只能得到公司按客戶應用分類的 DRAM 相關部門收入，
+不能稱為 HBM、advanced packaging 或 eBeam 製程控制收入。反過來，把具名產品放進公告，
+也不能把整個部門收入歸因給那些產品。這是「產品名存在」與「財務分子存在」之間最常見的
+斷橋。
+
+### AP 成長逾 70%、PDC 成長逾 50%，仍解不出 `A ∩ P`
+
+Q3 簡報另給兩條 2026 年管理層預測：advanced-packaging revenues 預期成長超過 70%，
+process diagnostics and control revenue 預期成長超過 50%。前者是包含電鍍、CMP、沉積、
+接合與控制工具的廣義 AP 集合 `A`；後者是跨 leading-edge logic、DRAM 與其他應用的廣義
+PDC 集合 `P`。本文要量的 AP 製程控制收入則是交集 `X = A ∩ P`。
+
+兩個大集合的成長率不會替交集設定成長率。以下只用虛構指數證明不可識別性：假設基期
+`A₀=100`、`P₀=100`，本期 `A₁=180`、`P₁=160`，確實分別滿足成長逾 70% 與逾 50%；若
+基期交集 `X₀=50`，本期交集 `X₁` 可以是 20、50 或 100，分別代表 −60%、0% 或 +100%，
+而三種情境都沒有超過兩個大集合。這些數字不是 Applied 的收入、預測或機率，只是集合
+邊界的確定性教材。
+
+因此不能把 70% 與 50% 平均成 60%、相乘成一個題材放大率，也不能主張 AP 製程控制的
+成長率一定介於兩者之間。要完成交集，至少需要公司在同一期間揭露 AP-specific PDC 的
+actual revenue、order intake、工具數或可重建產品分子，再對回公司／部門分母。
+
+### 期間也不是一般曆年
+
+簡報把 `CY26` 明定為 FQ2'26～FQ1'27，並註明 FQ1'27 是 14 週季度。這個公司定義的窗口
+不是 2026 年 1 月 1 日到 12 月 31 日；也比四個標準 13 週季度多一週。未先取得其他公司相同
+期間或做可稽核的週數／會計期調整前，不能把 Applied 的兩條成長下限直接和 Camtek、Nova
+或台灣公司的曆年／曆季數字排名。
+
+本段的 `N=1` 是同一發行人的一組結果資料（公告與簡報共一條公司消息鏈），不是設備商、
+客戶或產業樣本；91.15 億與 70.40 億美元是該季發行人實際報告值，70% 與 50% 是管理層
+lower-bound forecasts，來源均未提供預測區間。集合算例沒有 sampling SE／t，也不衡量預測
+準確度。新資料沒有價格、估值、共識或持倉，因此不支持「市場已反映」或任何投資方向。
 
 ## 台灣映射的三個同名陷阱：先進封裝、設備與製程控制不是同一個分子
 
@@ -853,6 +916,38 @@ status: active
 url: https://investors.appliedmaterials.com/static-files/e8307fb9-c40b-4fee-abf9-3209c76ab08d
 locator: PDF pp.5、38–42；pp.38–40 列 eBeam process-control 任務、VeritySEM 7AP／SEMVision G7AP 與多家 memory／logic AP 客戶 production 陳述，pp.41–42 列 2020～2024 AP business 成長與 2026 年收入預測
 limitation: 這是發行人 prepared remarks；超過 20 億美元與逾 50% 都是 2026 整體 advanced-packaging revenue 的下限式預測，不是已實現結果，也沒有拆 advanced-packaging process-control、具名工具、客戶、台數、訂單、收入、毛利或客戶端良率；production 是供應商陳述
+independence_group: applied-materials
+-->
+
+<!-- research_source
+source_id: S26
+role: company_release
+source_kind: document
+publisher: Applied Materials
+title: Applied Materials Announces Third Quarter 2026 Results
+published_at: 2026-08-13
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://investors.appliedmaterials.com/news-releases/news-release-details/applied-materials-announces-third-quarter-2026-results
+locator: Quarter ended 2026-07-26 的 Financial Results、Recent Highlights 與 Semiconductor Systems revenue／customer application table；列公司營收 9.115 billion 美元、部門營收 7.040 billion 美元、67%／26%／7% 客戶應用組合及六項 DRAM／AP 系統
+limitation: 公司與部門實際營收、客戶應用組合及具名產品是四種不同分母；公告沒有拆 advanced-packaging、PDC、AP-specific PDC、VeritySEM 7AP 或 SEMVision G7AP 的 actual revenue、order intake、工具數、客戶、毛利或客戶端成效，且產品與需求評論都是發行人陳述
+independence_group: applied-materials
+-->
+
+<!-- research_source
+source_id: S27
+role: company_release
+source_kind: document
+publisher: Applied Materials
+title: Applied Materials Q3 FY2026 Earnings Presentation
+published_at: 2026-08-13
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://ir.appliedmaterials.com/static-files/9d5d182d-f060-4b22-a32c-4582257fdc9b
+locator: PDF pp.5、8–9、15–18；p.5 定義 CY26 為 FQ2'26～FQ1'27 且 FQ1'27 為 14 週，pp.8–9 分列 AP revenues expected to grow over 70% 與 PDC revenue expected to grow over 50%，pp.15–18 列 Q3 公司／部門結果與 Q4 展望
+limitation: 兩個百分比都是管理層對不同廣義集合的 lower-bound forecasts，不是已實現收入，也沒有揭露兩集合交集、基期／終值金額、AP-specific PDC、產品收入、order intake、工具數、客戶成效或預測區間；公司定義 CY26 不是一般 1～12 月曆年
 independence_group: applied-materials
 -->
 
@@ -1315,13 +1410,65 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C28
+label: verified
+status: active
+claim: Applied FY26Q3 截至 2026-07-26 的公司實際營收為 91.15 億美元、Semiconductor Systems 實際營收為 70.40 億美元，部門客戶應用組合為 foundry／logic／other 67%、DRAM 26%、flash 7%；同一公告重述六項 DRAM／AP 系統，但未拆 AP、PDC 或 AP-specific PDC 財務分子
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S26 的 Financial Results、Recent Highlights 與 Semiconductor Systems table 直接列出公司／部門實際營收、客戶應用組合及六項系統；公告沒有把任一數字分解到 AP、PDC 或兩者交集
+boundary: 客戶應用組合不是產品組合，不能把 DRAM 26% 改寫成 HBM／AP／eBeam 收入；具名產品也沒有收入、order intake、工具數、客戶、毛利或成效，單份公告未拆分不代表公司內部沒有資料
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: Applied Q3 FY2026 簡報預期 CY26 advanced-packaging revenues 成長超過 70%、process diagnostics and control revenue 成長超過 50%，並把 CY26 定義為 FQ2'26～FQ1'27、其中 FQ1'27 為 14 週季度
+supporting_source_ids: S27
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S27 pp.5、8–9 分別直接提供公司定義期間與兩項 lower-bound growth forecasts
+boundary: AP 與 PDC 是兩個不同廣義集合；百分比不是 actual、沒有基期／終值金額或預測區間，CY26 也不是一般 1～12 月曆年，不能未對齊期間就和其他公司排名
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: inference
+status: active
+claim: Applied 的 AP 成長逾 70% 與 PDC 成長逾 50% 不能決定 AP-specific PDC 交集的收入或成長率；公司／部門實績、客戶應用組合與產品名也不能替代該交集分子
+supporting_source_ids: S26,S27
+contrary_source_ids:
+as_of: 2026-08-13
+basis: C28 建立公司—部門—客戶應用—產品四層仍無 AP-specific PDC 分解，C29 建立 AP 與 PDC 兩個廣義集合的各自預測；集合的邊際總額／成長率不會唯一決定交集，虛構指數案例只作確定性不可識別證明
+boundary: N=1 是同一發行人的一組結果資料、公告與簡報只算一條公司消息鏈，不是設備商／客戶／產業樣本；集合算例不是公司估計且沒有 sampling SE／t，也不能由未揭露推論交集為零、成長或衰退
+verification_needed: Applied 以同一期間揭露 AP-specific PDC 的 actual revenue、order intake、工具數或可重建產品分子及公司／部門分母；跨公司比較另須對齊會計期間與類別定義
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
 先提供 2.5D logic／HBM 客戶資格節點，再新增較寬事業組合的收入訊號；Camtek 把具名 Hawk
 訂單、交付年度、公司總營收與近似 AP 收入組合分開，Nova 則補上另一條具名量測產品線的
 銷售訊號。Applied 又為整體 AP 提供 2026 年超過 20 億美元、年增逾 50% 的雙下限預測，
-卻沒有拆出 process-control 分子。SEMI 議程把控制問題落到 TSV、填孔、沉積、翹曲、RDL、切割與相鄰的 CPO
+FY26Q3 再補公司／部門實績、客戶應用組合與 AP 逾 70%／PDC 逾 50% 兩條成長預測，
+卻仍沒有拆出兩者交集。SEMI 議程把控制問題落到 TSV、填孔、沉積、翹曲、RDL、切割與相鄰的 CPO
 整合。弘塑、均華與萬潤則把台灣映射落到廣義設備收入、產品清單與研發計畫三個不同層級，
 並顯示其中任何一層都不能單獨替代製程控制題材分子。這些資料讓工程與供應商商業成熟度比
 單一廠商說法更完整。NIST、Applied 與 KLA 的方法／產品文件又把 control plan
@@ -1347,6 +1494,7 @@ KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量�
 | 較寬收入訊號 | Onto 稱 Specialty Devices and Advanced Packaging 收入創高，支撐含 2.5D／HBM | 類別金額、題材分子、特定工具收入或全產業支出 |
 | 具名產品線銷售訊號 | Nova 稱 Sentronics advanced-packaging dimensional-metrology solutions 是創高產品線之一 | 產品線金額／占比、HBM 分解、工具數或跨公司 record 排名 |
 | 較寬 AP 財務預測 | Applied 預期 2026 年整體 AP revenue 年增逾 50%、超過 20 億美元，並另稱兩項 AP eBeam 工具已在多家客戶 production | 兩個下限不是精確基期／終值；整體 AP 不等於 process-control 分子，採用陳述也未接到產品收入 |
+| 公司／部門實績＋兩個廣義集合預測 | Applied FY26Q3 公布公司 91.15 億美元、Semiconductor Systems 70.40 億美元，並預期 CY26 AP revenue 成長逾 70%、PDC revenue 成長逾 50% | 客戶應用組合不是產品組合；兩個集合的成長率不能決定 AP-specific PDC 交集，CY26 也須按公司定義對齊 |
 | 台灣廣義設備收入＋產品能力 | 弘塑、均華、萬潤各自揭露廣義設備比重，並列相鄰的檢查／量測產品、代理能力或研發計畫 | 同定義製程控制分子、具名客戶階段、實際訂單／驗收收入或跨公司排名 |
 
 ## 跨公司數字與可比性
@@ -1482,6 +1630,8 @@ comparability_reason: 萬潤的半導體設備範圍大於檢查／量測，且�
 - [S23：萬潤 2025 年報](https://doc.twse.com.tw/server-java/t57sb01?co_id=6187&colorchg=1&filename=2025_6187_20260626F04.pdf&kind=F&step=9)（廣義半導體設備占比與產品清單，不含工具分子）。
 - [S24：萬潤 CPO 光耦合產品頁](https://www.allring-tech.com.tw/product-detail20.htm)（發行人功能描述，不是客戶採用或財務證明）。
 - [S25：Applied DRAM／Advanced Packaging Master Class prepared remarks](https://investors.appliedmaterials.com/static-files/e8307fb9-c40b-4fee-abf9-3209c76ab08d)（整體 AP 雙下限預測與具名工具 production 陳述仍未形成 process-control 收入分子）。
+- [S26：Applied FY26Q3 結果公告](https://investors.appliedmaterials.com/news-releases/news-release-details/applied-materials-announces-third-quarter-2026-results)（公司／部門實績、客戶應用與產品名仍不是 AP-specific PDC 分子）。
+- [S27：Applied Q3 FY2026 earnings presentation](https://ir.appliedmaterials.com/static-files/9d5d182d-f060-4b22-a32c-4582257fdc9b)（AP 與 PDC 兩個廣義集合的成長下限及公司定義期間，沒有交集金額）。
 - 後續入口：[KLA](https://ir.kla.com/financial-information/financial-results)、[Applied](https://ir.appliedmaterials.com/news-releases/)、[Onto](https://investors.ontoinnovation.com/news/default.aspx)、[MOPS](https://mops.twse.com.tw/mops/web/index)。
 - 中立方法入口：[NIST CHIPS Metrology Program](https://www.nist.gov/chips/research-development-programs/metrology-program)。
 
@@ -1501,6 +1651,7 @@ comparability_reason: 萬潤的半導體設備範圍大於檢查／量測，且�
 - **廣義設備比重不等於製程控制曝險**：弘塑、均華、萬潤的發行人類別定義不同，且都大於檢查／量測任務；69.86%、93.90%、96.13% 不能拿來排名。
 - **產品頁與研發計畫不等於客戶採用**：具名 AOI、量測或閉環功能能建立搜尋入口，仍需 qualification、訂單、驗收與收入逐關接續。
 - **整體 AP 預測不等於製程控制分子**：Applied 的逾 50%／超過 20 億美元是整體 AP forecast；兩個下限不能反推精確基期，也不能歸給 VeritySEM／SEMVision。
+- **兩個大集合不會自動產生交集**：Applied FY26Q3 的 AP 逾 70% 與 PDC 逾 50% 不能平均、相乘或視為 AP-specific PDC 的上下界；公司定義 CY26 也不能未對齊就和曆年數字排名。
 - **替代解法**：設計規則、抽樣或既有光學工具升級，可能降低新增工具需求。
 - **價值沒有外溢**：支出即使增加，也可能集中於海外平台；台灣族群不必然受惠。
 
@@ -1707,7 +1858,7 @@ invalidation: 公司明確否認相關產品／客戶曝險、退出該市場，
 
 ## 下一個可證明／否定的節點
 
-- Applied Materials 台灣時間 8 月 14 日發布的 FY26Q3 結果是否提供 advanced-packaging process control 的收入、訂單、工具量或部署口徑；只有公司總額不算。
+- Applied FY26Q3 公告與簡報仍未提供 AP-specific PDC 分子；下一步核對官方 earnings script、後續 10-Q／IR 是否出現同期間 actual revenue、order intake、工具量或部署口徑，只有公司／部門總額與兩個廣義集合成長率仍不算。
 - Camtek 能否把約 75% AP 收入組合補上量測期間，並把具名 Hawk 訂單接到實際交付、收入與公司分母；Nova 能否拆出 AP／Sentronics 金額或占比。
 - KLA 能否分解單位出貨、ASP、產品組合、服務與市占；否則 C7 維持待驗證。
 - Onto 能否把較寬事業組合新高拆到 HBM／2.5D、具名工具、客戶數、重複採購或收入分子；「record」沒有金額仍不和 Nova 排名。

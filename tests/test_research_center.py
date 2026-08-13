@@ -5422,11 +5422,21 @@ class ResearchCenterTest(unittest.TestCase):
             "`F > 20 億美元` 與 `g > 50%`",
             "這兩組只是\n驗證不可識別性的假設情境",
             "整體 AP 不等於 process-control 分子",
+            "## 8 月 13 日 FY26Q3：兩條成長線仍不是交集",
+            "公司實際營收\n91.15 億美元",
+            "Semiconductor Systems（半導體系統）部門實際營收 70.40 億美元",
+            "AP 成長逾 70%、PDC 成長逾 50%，仍解不出 `A ∩ P`",
+            "`A₀=100`、`P₀=100`",
+            "分別代表 −60%、0% 或 +100%",
+            "不能把 70% 與 50% 平均成 60%、相乘成一個題材放大率",
+            "CY26` 明定為 FQ2'26～FQ1'27",
+            "不是 2026 年 1 月 1 日到 12 月 31 日",
+            "只有公司／部門總額與兩個廣義集合成長率仍不算",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 25),
-            ("research_claim", 27), ("metric_comparison", 5),
+            ("research_topic", 1), ("research_source", 27),
+            ("research_claim", 30), ("metric_comparison", 5),
             ("impact", 4), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
