@@ -503,7 +503,7 @@ claim_id: C6
 label: inference
 status: active
 claim: 推論晶片需求不能按晶片顆數線性換算成 tester 需求；研究上應依序拆成產品組合與數量、測試插入點、內容與覆蓋、單顆時間／功率／接腳／熱、多站與並行效率、良率／重測／漏測、既有設備重用與資本支出時點，最後才做公司財務歸因
-supporting_source_ids: S1,S2,S3,S4,S5,S7,S8,S9,S10,S11
+supporting_source_ids: S1,S2,S3,S4,S5,S7,S8,S9,S10,S11,S16,S17,S18
 contrary_source_ids:
 as_of: 2026-08-12
 basis: correction_of:C2；S1–S5 支持異質算力與市場方向，S7 補多階段測試存取，S8–S11 同時提供內容量壓力與並行／重用抵銷因素，因此縮窄原先把數量和複雜度直接連到需求的粗框架
