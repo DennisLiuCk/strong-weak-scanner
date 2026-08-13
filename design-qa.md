@@ -24,3 +24,58 @@
 - Full suite: 325 tests passed with Python 3.12 and `PYTHONUTF8=1`.
 
 final result: passed
+
+---
+
+# Design QA：平行視角問題導引工作台
+
+## Evidence
+
+- Reference: `/Users/dennisliu/.codex/generated_images/019ff74e-dddf-7360-997d-a652d8623da6/exec-dac1728e-8e53-4d63-be6a-11c4923a4ec3.png`
+- Implementation: `/Users/dennisliu/Code/GitHub/strong-weak-scanner/tmp/uiux_option3/desktop-final.png`
+- Combined comparison: `/Users/dennisliu/Code/GitHub/strong-weak-scanner/tmp/uiux_option3/comparison-final.png`
+- Mobile verification: `/Users/dennisliu/Code/GitHub/strong-weak-scanner/tmp/uiux_option3/mobile-final.png`
+- Viewport: desktop 1487×1058 CSS pixels, DPR 1；reference 與 implementation 都是
+  1487×1058，未做 density normalization。手機為 390×844 CSS pixels。
+- State: light theme、散熱族群、D 基本面改善、排序第一列被選取。reference 使用示意的
+  2026-08-13 資料；implementation 使用本機正式 DB 的 2026-08-12 as-seen payload。
+
+組合圖保留兩張原始桌機截圖的完整像素寬度並上下排列，文字、表格與 detail panel 均可直接
+辨識，因此不需要另以放大 crop 取代 full-view 證據。Browser screenshot、DOM 狀態、水平溢位
+與 console 都另行檢查。
+
+## Fidelity review
+
+- **Typography:** 品牌、標題、表格與說明採既有 Noto Sans TC／IBM Plex Mono；介面圖示使用
+  Material Symbols Rounded，沒有手繪 SVG、文字符號假圖示或低解析替代資產。
+- **Layout and spacing:** 黑色 89px site header、導言、四欄 context strip、五個視角頁籤、
+  左排行／右詳情的比例與留白對齊 reference；390px 改為單欄且 page scroll width 等於 viewport。
+- **Color and surface:** 黑色 header、暖白紙面、紅／青／橙／紫的視角語意、細邊框與小圓角均
+  對齊 reference，並保留既有 dark theme token。
+- **Copy and data truth:** 標籤改為「趨勢領先／防守韌性／籌碼支持／基本面改善」，明示族群內
+  百分位不是機率、預測或投資建議。reference 的時間穩定度圓點改成 payload 真正量測的
+  leave-one-peer-out 結構敏感度，不杜撰 30 日穩定性。
+- **Behavior:** 問題頁籤會重排、點列與方向鍵會更新詳情、詳情中的五視角也可切換、診斷可展開、
+  完整個股 drawer 可開關。quick nav 點選／點外／Escape 均收合。
+- **Accessibility:** 頁籤與表格選取狀態有 ARIA；drawer 背景 inert、Tab／Shift+Tab focus trap、
+  Escape 關閉並還原焦點；主要觸控目標至少 44px，支援 prefers-reduced-motion。
+
+## Comparison history
+
+1. Pass 1 發現 header／標題比例偏小、表格缺欄位副標、桌機名稱與代碼斷行、選中欄位過度框選、
+   metadata 缺少辨識圖示；逐項修正後重建。
+2. Pass 2 使用 `comparison-final.png` 重新把 reference 與 implementation 放在同一輸入中檢查；
+   沒有 P0、P1 或 P2 視覺落差。剩餘差異均是有意且不影響主要任務的 P3：live payload 日期與
+   示意資料不同、結構敏感度取代沒有資料依據的時間穩定度、未顯示沒有實際保存行為的收藏控制。
+
+## Interaction and runtime checks
+
+- Desktop 1487×1058：散熱 7 檔、D 排序、row selection、B 切換、診斷、drawer focus trap 與
+  Escape／焦點還原皆通過；`innerWidth === scrollWidth === 1487`。
+- Mobile 390×844：active D page tab 自動置入可見範圍、quick nav 點選後收合、無水平溢位。
+- Browser console warnings/errors: 0。
+- Generated JavaScript syntax check: passed。
+
+## Final result
+
+passed

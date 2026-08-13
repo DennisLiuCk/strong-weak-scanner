@@ -12,7 +12,10 @@
 
 1. `git pull`;確認 `daily-fetch` 與 `weekly-validate` 兩個 Actions 最近一次都是綠的。
    紅的先修管線(看 stderr 警告:TAIEX 抓空、price_adj 缺列、無事件跳空),當週不做策略判斷。
-2. 打開最新 `reports/validate_*.md`。看第一段「前瞻已成熟的 as-seen OOS」天數:
+2. 執行 `python scripts/audit_ranking_views.py --compact --require-current-snapshot`。
+   `hard_errors` 非空先修正式快照／spec／漏列，當週不判斷多視角；tie、Pareto、peer
+   sensitivity warning 只進結構追蹤，不因單週跨線調 evaluator。
+3. 打開最新 `reports/validate_*.md`。看第一段「前瞻已成熟的 as-seen OOS」天數:
    **< 10 交易日 → 只讀不動**,
    照樣寫週記(見 §3)。
 
@@ -86,6 +89,10 @@ A 領先、B 風險、C 籌碼、D 基本面是在問四個不同的現在式問
 peer sensitivity、共識、分歧與 Pareto，**不比較哪個視角最準，也不合成第五個分數**。
 D 只有 `fundamental_availability.first_seen_at` 在快照當時已知的資料能進排名；沒有 ledger
 就顯示尚無，不用財報期間日回填。
+
+結構與 UX 判斷依 [`PARALLEL_VIEWS_ROADMAP.md`](PARALLEL_VIEWS_ROADMAP.md)：先過每日完整性，
+10 日起讀穩定性，20–40 個完整正式日後才做第一輪差異性／重疊檢視；這些是治理節點，
+不是有效獨立觀測，也不能替代下列 challenger gate。
 
 C1（量能權重歸零）與 C2（價格權重 1.4→1.0）才是正式 Champion 的兩個 challenger。
 每週只讀 §⑫ 的「Challenger 相對 Champion 的同日配對差」：

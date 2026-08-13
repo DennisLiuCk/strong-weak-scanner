@@ -1,5 +1,38 @@
 # Changelog
 
+## 平行視角治理進入每日閘門，問題導引工作台上線 — 2026-08-14
+
+**正式策略權重、tier 條件、regime 門檻、ranking evaluator、Champion、C1/C2 與
+`IS_CUTOFF` 零變動。** 本次把「今日結構是否可靠」「四個問題
+是否真的不同」「使用者是否看得懂」與「challenger 是否有 OOS 證據」拆成獨立工作流，
+避免在正式資料 0 日時用單日畫面或 restated history 調參。
+
+- `scripts/audit_ranking_views.py` 擴充為正式快照 exact-census 結構歷史：按族群等權計算
+  A–D pairwise rank correlation、top-20 Jaccard、各視角獨有 top-20、相鄰快照保留率、tie
+  與 Pareto selectivity；全部明示 `performance_claim=false`，不報 SE/t、不選視角勝負。
+  2026-08-12 現況仍是 121/121 完整覆蓋、A/B/C/D tie 暴露 23/24/20/14、共識 19、
+  Pareto 89、peer sensitivity ≥25 為 36；這些是完整橫斷面計數，不是抽樣、績效或未來
+  報酬證據。現行 spec 正式日 0、成熟日 0，唯一 soft warning 是 Pareto 89/121 選擇力低。
+- `daily-fetch.yml` 在正式 `snapshot_signals.py --publish` 後、重生儀表板前執行
+  `audit_ranking_views.py --require-current-snapshot`。缺當日正式快照、漏列、duplicate、混 spec、
+  JSON 損壞或未強制 query-only 才硬停；單日 tie／Pareto／peer sensitivity 只警告，不會
+  阻斷每日資料。`run_daily.py` 同序；`--preview` 只做結構檢查，不誤要求正式快照。
+- 新增 `PARALLEL_VIEWS_ROADMAP.md`：固定 Champion/A/B/C/D 問題、五層評估矩陣、
+  0／10／20–40 日治理節點、factor 保留／合併／移除／新增條件、哪些變更重啟 spec／
+  `IS_CUTOFF`，以及固定 usability 任務。預設不新增第五視角、不把共識／Pareto 合成分數；
+  未來估值／全球供應鏈視角須先有 point-in-time 契約。
+- 依選定的漸進揭露雙欄稿重做首頁多視角工作台：強制單一族群脈絡、正式綜合與 A–D 直接
+  切換排序、左側 master list 與右側 detail explanation 聯動；手機維持同一閱讀順序並把
+  active lens 自動捲入畫面。共識、Pareto、tie、角色同儕與 peer sensitivity 收進診斷層，
+  不再用預設篩選製造推薦名單。
+- quick nav 選擇後自動收合；個股 drawer 加上背景 inert、Tab focus trap、Escape 關閉與焦點
+  還原。桌機 1487×1058 與手機 390×844 的核心流程、無水平溢位、console 與組合視覺比對
+  均完成驗收；視覺稿的時間穩定度圓點改為資料真正支持的同儕結構敏感度，未實作沒有保存
+  行為的收藏按鈕。
+- Darwin 25.5.0 arm64、Python 3.11.11、UTF-8 執行 579 tests 兩次全綠（一般環境及移除
+  `PYTHONUTF8`／`PYTHONIOENCODING`）；生成頁 JavaScript 語法、`git diff --check` 與
+  `diff AGENTS.md CLAUDE.md` 皆為 exit 0。本機仍無 Python 3.12，3.12 由 Actions gate 驗證。
+
 ## 多視角排名上線：四個問題平行呈現，Champion 只接受部署後挑戰 — 2026-08-13
 
 **正式策略權重、tier 條件、regime 門檻與 `IS_CUTOFF` 零變動**；本次新增的是描述性

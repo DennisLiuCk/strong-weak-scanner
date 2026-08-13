@@ -154,6 +154,12 @@ jobs:
         if: steps.mode.outputs.mode == 'complete'
         run: python scripts/snapshot_signals.py --publish
 
+      # 只驗「這次正式發布是否完整且可重現」；tie、Pareto 過寬等結構訊號只警告，
+      # 不會因單日橫斷面阻擋每日資料。缺當日正式快照、漏列、混 spec 或 JSON 損壞才硬停。
+      - name: 稽核平行視角排名快照
+        if: steps.mode.outputs.mode == 'complete'
+        run: python scripts/audit_ranking_views.py --compact --require-current-snapshot
+
       - name: 重生儀表板 HTML
         if: steps.mode.outputs.mode == 'complete'
         run: python scripts/build_dashboard.py

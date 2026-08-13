@@ -52,6 +52,11 @@ def main():
     if not args.preview:
         snapshot_args.append("--publish")
     run("snapshot_signals.py", *snapshot_args)
+
+    audit_args = ["--compact"]
+    if not args.preview:
+        audit_args.append("--require-current-snapshot")
+    run("audit_ranking_views.py", *audit_args)
     run("build_dashboard.py")
     print("\n本地 daily pipeline 完成；尚未 git commit/push。", flush=True)
 

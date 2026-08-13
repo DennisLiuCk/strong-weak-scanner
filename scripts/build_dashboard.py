@@ -1871,10 +1871,10 @@ def build_ranking_views(con, last, names, group_names):
     payload["rows"] = decorated
     payload["labels"] = {
         "champion_pct": "正式綜合",
-        "lens_a": "A 領先／進攻",
-        "lens_b": "B 風險／懷疑",
-        "lens_c": "C 籌碼／偵察",
-        "lens_d": "D 基本面／全局",
+        "lens_a": "A 趨勢領先",
+        "lens_b": "B 防守韌性",
+        "lens_c": "C 籌碼支持",
+        "lens_d": "D 基本面改善",
     }
     return payload
 

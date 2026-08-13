@@ -27,6 +27,7 @@ import stats_ci
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 VIEW_KEYS = ("champion_pct", "lens_a", "lens_b", "lens_c", "lens_d")
+LENS_KEYS = ("lens_a", "lens_b", "lens_c", "lens_d")
 COMPONENT_KEYS = {
     "lens_a": ("short", "swing", "trend"),
     "lens_b": ("resilience", "leverage_safety", "heat_safety"),
@@ -58,6 +59,121 @@ def _group(row):
 def _median(values):
     values = [value for value in values if value is not None]
     return round(statistics.median(values), 4) if values else None
+
+
+def _summary(values):
+    values = [value for value in values if value is not None]
+    if not values:
+        return {"days": 0, "latest": None, "median": None, "min": None, "max": None}
+    return {
+        "days": len(values),
+        "latest": round(values[-1], 4),
+        "median": round(statistics.median(values), 4),
+        "min": round(min(values), 4),
+        "max": round(max(values), 4),
+    }
+
+
+def _correlation(xs, ys):
+    """平均秩百分位的 Pearson correlation；在單一族群內等同 tie-aware rank corr。"""
+    pairs = [(float(x), float(y)) for x, y in zip(xs, ys)
+             if x is not None and y is not None]
+    if len(pairs) < 3:
+        return None
+    x_values, y_values = zip(*pairs)
+    x_mean = statistics.mean(x_values)
+    y_mean = statistics.mean(y_values)
+    x_var = sum((value - x_mean) ** 2 for value in x_values)
+    y_var = sum((value - y_mean) ** 2 for value in y_values)
+    if x_var == 0 or y_var == 0:
+        return None
+    covariance = sum(
+        (x_value - x_mean) * (y_value - y_mean)
+        for x_value, y_value in pairs
+    )
+    return covariance / (x_var * y_var) ** 0.5
+
+
+def _jaccard(left, right):
+    union = set(left) | set(right)
+    return len(set(left) & set(right)) / len(union) if union else None
+
+
+def _pair_keys():
+    for index, left in enumerate(LENS_KEYS):
+        for right in LENS_KEYS[index + 1:]:
+            yield left, right, f"{left}__{right}"
+
+
+def formal_structure(day_payloads):
+    """正式快照的 exact descriptive history；不提供 SE/t 或績效推論。"""
+    days = sorted((date, [dict(row) for row in rows])
+                  for date, rows in day_payloads.items())
+    rank_corr = collections.defaultdict(list)
+    top20_jaccard = collections.defaultdict(list)
+    unique_top20 = collections.defaultdict(list)
+    tie_rate = collections.defaultdict(list)
+    pareto_rate = []
+    retention = collections.defaultdict(list)
+    previous_top = None
+
+    for _date, rows in days:
+        grouped = collections.defaultdict(list)
+        for row in rows:
+            grouped[_group(row)].append(row)
+        top = {
+            key: {row.get("stock_id") or row.get("id") for row in rows
+                  if row.get(key) is not None and row[key] >= rv.TOP_PCT}
+            for key in LENS_KEYS
+        }
+        for left, right, pair_key in _pair_keys():
+            group_correlations = []
+            for members in grouped.values():
+                correlation = _correlation(
+                    [row.get(left) for row in members],
+                    [row.get(right) for row in members],
+                )
+                if correlation is not None:
+                    group_correlations.append(correlation)
+            rank_corr[pair_key].append(
+                statistics.mean(group_correlations) if group_correlations else None
+            )
+            top20_jaccard[pair_key].append(_jaccard(top[left], top[right]))
+        for key in LENS_KEYS:
+            other = set().union(*(top[other_key] for other_key in LENS_KEYS
+                                  if other_key != key))
+            unique_top20[key].append(len(top[key] - other))
+            if previous_top is not None:
+                retention[key].append(_jaccard(previous_top[key], top[key]))
+        health = analyze_rows(rows)
+        for key in LENS_KEYS:
+            tie_rate[key].append(health["tie_rate"][key])
+        pareto_rate.append(health["pareto_rate"])
+        previous_top = top
+
+    return {
+        "basis": "exact_formal_snapshot_census_no_inference",
+        "performance_claim": False,
+        "days": len(days),
+        "first_date": days[0][0] if days else None,
+        "latest_date": days[-1][0] if days else None,
+        "pairwise_rank_correlation_equal_group_weight": {
+            key: _summary(values) for key, values in sorted(rank_corr.items())
+        },
+        "pairwise_top20_jaccard": {
+            key: _summary(values) for key, values in sorted(top20_jaccard.items())
+        },
+        "unique_top20_count": {
+            key: _summary(values) for key, values in sorted(unique_top20.items())
+        },
+        "adjacent_snapshot_top20_retention": {
+            key: _summary(values) for key, values in sorted(retention.items())
+        },
+        "tie_rate": {
+            key: _summary(values) for key, values in sorted(tie_rate.items())
+        },
+        "pareto_rate": _summary(pareto_rate),
+    }
 
 
 def analyze_rows(rows):
@@ -177,6 +293,7 @@ def formal_progress(con, spec_sha, *, fwd=10):
     invalid_runs = []
     parsed_rows = 0
     latest_snapshot_health = None
+    current_payloads_by_date = {}
 
     if have_views:
         for run in runs:
@@ -203,6 +320,7 @@ def formal_progress(con, spec_sha, *, fwd=10):
                 current_dates.append(run["data_date"])
                 parsed_rows += len(payloads)
                 latest_snapshot_health = analyze_rows(payloads)
+                current_payloads_by_date[run["data_date"]] = payloads
             elif structurally_complete:
                 historical_other_spec_days += 1
             elif rows:
@@ -248,6 +366,7 @@ def formal_progress(con, spec_sha, *, fwd=10):
         "invalid_runs": invalid_runs,
         "parsed_rows": parsed_rows,
         "latest_snapshot_health": latest_snapshot_health,
+        "structural_history": formal_structure(current_payloads_by_date),
     }
 
 
@@ -336,6 +455,7 @@ def compact(audit):
         "pareto": current["pareto"],
         "peer_sensitivity_ge_25": current["peer_sensitivity_ge_25"],
         "formal_days": progress["current_spec_days"],
+        "structural_days": progress["structural_history"]["days"],
         "mature_10d_days": progress["mature_10d_days"],
         "phase": progress["phase"],
         "hard_errors": audit["hard_errors"],

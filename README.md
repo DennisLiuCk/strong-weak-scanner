@@ -27,7 +27,7 @@
 | 個股層 | 同族群裡誰強、誰弱 | 六個計分因子＋一個分層 gate、3 日平滑、分層確認 | composite 與 tier |
 | 族群層 | 哪個供應鏈正在被佈局或領漲 | 外資廣度、修正日中位買賣、相對動能、距高 | 族群狀態，不改個股分數 |
 | 大盤層 | 目前是否進入修正環境 | 含息報酬指數距 20 日高 | regime，不改個股分數 |
-| 多視角觀察層 | 換一個問題時，族群內名次如何改變 | A 領先、B 風險、C 籌碼、D 基本面、角色同儕與 Pareto | 平行百分位，不改 composite/tier |
+| 多視角觀察層 | 換一個問題時，族群內名次如何改變 | A 趨勢領先、B 防守韌性、C 籌碼支持、D 基本面改善、角色同儕與 Pareto | 平行百分位，不改 composite/tier |
 | 觀察與研究層 | 數字如何形成、公司在做什麼、市場在傳什麼 | 官方資料解剖、技術/基本面、TDCC、借券、研究筆記、領先假說、台積電事件 | 閱讀背景，不計分 |
 
 ### 個股層：六個計分因子＋一個分層 gate
@@ -60,10 +60,10 @@
 
 | 視角 | 問題 | 原料 | 更新頻率 |
 |---|---|---|---|
-| A 領先／進攻 | 誰在不同價格週期相對領先？ | 收盤/MA5、20 日報酬、MA20/MA60 | 每日 |
-| B 風險／懷疑 | 誰目前較不脆弱？ | 修正日抗跌、低融資水位、低量價過熱；官方風險旗標封頂 | 每日 |
-| C 籌碼／偵察 | 誰的法人相對位置靠前？ | 外資、投信、修正日買賣、融資；TDCC/借券只作未驗證旁證 | 每日／週 |
-| D 基本面／全局 | 截至當時已知資料，誰的成長與營運品質靠前？ | 3 月營收年增與加速度、營益率與年變化 | 月／季 |
+| A 趨勢領先 | 誰在不同價格週期相對領先？ | 收盤/MA5、20 日報酬、MA20/MA60 | 每日 |
+| B 防守韌性 | 誰目前較不脆弱？ | 修正日抗跌、低融資水位、低量價過熱；官方風險旗標封頂 | 每日 |
+| C 籌碼支持 | 誰的法人相對位置靠前？ | 外資、投信、修正日買賣、融資；TDCC/借券只作未驗證旁證 | 每日／週 |
+| D 基本面改善 | 截至當時已知資料，誰的成長與營運品質靠前？ | 3 月營收年增與加速度、營益率與年變化 | 月／季 |
 
 D 視角只讀 `fundamental_availability.first_seen_at` 已證明當時可見的資料。既有歷史資料在
 ledger 建立前不回填過去排名；2026-08-13 migration 時的既有資料只從該時點起視為已知，
@@ -73,6 +73,18 @@ ledger 建立前不回填過去排名；2026-08-13 migration 時的既有資料�
 隨正式快照 append-only 累積：C1 把量能權重設為 0、C2 把價格權重 1.4 降為 1.0；它們只
 比較 tie-safe 族群名次，不重跑或暗改 tier。`spec_sha` 同時覆蓋 ranking contract 與核心
 evaluator；定義一變就必須開新 OOS 時鐘。
+
+平行視角不以短期勝率互相比賽，也不因單日 tie／Pareto 數量調參。完整的五層評估矩陣、
+分階段門檻、factor 保留／移除／新增條件與 UX 任務見
+[`PARALLEL_VIEWS_ROADMAP.md`](PARALLEL_VIEWS_ROADMAP.md)。
+[`scripts/audit_ranking_views.py`](scripts/audit_ranking_views.py) 每日只讀檢查覆蓋、tie、
+peer sensitivity、component 與 append-only spec 進度；正式 final pipeline 在凍結快照後
+要求當日完整，缺列、混 spec 或 JSON 損壞會先於儀表板發布失敗。
+
+儀表板的多視角工作台固定在單一正式族群內比較。使用者直接點正式綜合或 A–D 問題頁籤，
+左側排行會立即重排，右側同步解釋所選個股為何在不同問題下位置不同；手機依相同順序改成
+單欄。共識、Pareto、tie、角色同儕與 peer sensitivity 都留在按需展開的結構診斷，不作預設
+篩選，也不合成另一個推薦分數。
 
 分層按下表由上到下判定。括號內是資料庫使用的策略 key；儀表板使用較保守的讀者標籤。
 
@@ -553,8 +565,8 @@ Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會
 3. **族群比較**：四象限看價籌位置與 5 日位移，熱圖比較各欄名次，排行榜逐欄排序；三個視圖
    使用同一批資料並聯動高亮。相對最好不等於原始值已轉正。
 4. **個股分層**：可按族群篩選、展開所有成員，並查看近 5 日已確認分層的變化。
-5. **多視角排名**：依 A/B/C/D 或正式綜合排序；同列比較共識、分歧、Pareto、角色 rank、
-   peer sensitivity 與 tie；所有欄位都是描述層。
+5. **多視角排名**：先固定一個族群，再直接點正式綜合或 A/B/C/D 問題重排；左側選股、右側
+   比較五個百分位與差異說明，共識、Pareto、角色 rank、peer sensitivity 與 tie 收在診斷層。
 6. **族群內個股**：搜尋或單維排序；六個計分因子與一個 gate 可展開原始值、門檻量尺、
    權重與加權貢獻。
 7. **個股抽屜**：同一處查看分數驗算、技術/基本面、籌碼健康度、官方數據解剖，以及分頁保存的
@@ -578,6 +590,10 @@ Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會
 1～2 個旋鈕。若更動權重或 tier 條件，必須同時把 `validate.py` 的 `IS_CUTOFF` 更新為當天，
 並在 `CHANGELOG.md` 記錄報告、指標與決策依據。
 
+多視角另以 [`PARALLEL_VIEWS_ROADMAP.md`](PARALLEL_VIEWS_ROADMAP.md) 分開處理操作完整性、
+量測可靠性、視角差異性、使用者效用與 OOS 結果；前四層不等同預測證據，第五層也只有
+C1/C2 能依 §⑫ 取得 challenger 資格。
+
 ## 本地使用與維運
 
 所有 session 先 `git pull`，Python 使用 3.12（python.org 安裝，PSF 簽章）。正式晚場還需要
@@ -592,6 +608,7 @@ python scripts/daily_brief.py
 python scripts/run_daily.py
 
 # 週度驗證、正式 DB 唯讀稽核、完整測試
+python scripts/audit_ranking_views.py --compact
 python scripts/validate.py
 python scripts/audit_raw_data.py
 python -m unittest discover -s tests
@@ -751,6 +768,7 @@ python scripts/qual_notes.py --lint
 | 盤後確認與今日討論 | [`DAILY_CHECK.md`](DAILY_CHECK.md)、`scripts/daily_brief.py` |
 | 原始欄位回補/正式 DB 稽核 | [`RAW_DATA_BACKFILL.md`](RAW_DATA_BACKFILL.md)、`scripts/audit_raw_data.py` |
 | 週六策略檢視 | [`WEEKLY_REVIEW.md`](WEEKLY_REVIEW.md)、`scripts/validate.py` |
+| 平行視角評估／UX 調整 | [`PARALLEL_VIEWS_ROADMAP.md`](PARALLEL_VIEWS_ROADMAP.md)、`scripts/audit_ranking_views.py` |
 | Universe 與候選 | 本頁「Universe 治理」、`scripts/screen.py`、`config/` |
 | 質化筆記 | [`QUALITATIVE_RESEARCH_RUNBOOK.md`](QUALITATIVE_RESEARCH_RUNBOOK.md)、`scripts/qual_notes.py`、`scripts/qual_evidence.py`、`scripts/qual_review.py` |
 | 領先假說 | [`LEADING_HYPOTHESES.md`](LEADING_HYPOTHESES.md)、[`LEADING_HYPOTHESES_PHASE2_RUNBOOK.md`](LEADING_HYPOTHESES_PHASE2_RUNBOOK.md) |

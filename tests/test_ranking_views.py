@@ -202,13 +202,34 @@ class DashboardContractTest(unittest.TestCase):
 
     def test_template_has_multi_view_section_and_disclosures(self):
         for fragment in ('id="perspectives"', 'href="#perspectives"',
-                         "多視角排名 · 先選問題，再看名次", "正式 Champion 的權重與分層",
+                         "同一族群，換個問題會得到不同答案", "正式 Champion 的權重與分層",
                          "至少兩個視角同進前 20% 才稱共識",
                          "不是第五個預測分數"):
             self.assertIn(fragment, self.template)
         for undefined_token in ("var(--purple)", "var(--purplebg)",
                                 "var(--surface)", "var(--neutral-tint)"):
             self.assertNotIn(undefined_token, self.template)
+
+    def test_multi_view_ui_is_single_group_master_detail(self):
+        for fragment in (
+                "class:'rv-context'", "class:'rv-lens-tabs'",
+                "class:'card rv-list-card'", "class:'card rv-detail-card'",
+                "以下數值均為族群內相對名次，非機率、預測或投資建議",
+                "同分以「=」共享名次", "為什麼這個名次可能變動？",
+                "查看完整個股", "localStorage.getItem(key)",
+                "row.id===selectedId?'true':'false'",
+        ):
+            self.assertIn(fragment, self.template)
+        ranking_source = self.template[
+            self.template.index("function buildRankingViews()"):
+            self.template.index("/* 時間尺度視角", self.template.index("function buildRankingViews()"))
+        ]
+        self.assertNotIn("全部族群", ranking_source)
+        self.assertNotIn("onlyConsensus", ranking_source)
+        self.assertIn("R.rows.filter(x=>x.g===groupKey)", ranking_source)
+        self.assertIn("event.key!=='ArrowDown'", ranking_source)
+        self.assertIn("role:'tabpanel'", ranking_source)
+        self.assertIn("tabs.scrollLeft=Math.max", ranking_source)
 
     def test_payload_placeholder_is_built_and_consumed(self):
         self.assertIn("__RANKING_VIEWS_JSON__", self.template)

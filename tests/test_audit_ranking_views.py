@@ -75,6 +75,29 @@ class CurrentCensusTest(unittest.TestCase):
         self.assertEqual(result["peer_sensitivity_ge_25"], 1)
         self.assertEqual(result["role_rank_coverage"], 2)
 
+    def test_formal_structure_keeps_groups_equal_weight_and_tracks_retention(self):
+        day1 = [
+            view_row("A", "g1", 0), view_row("B", "g1", 50),
+            view_row("C", "g1", 100),
+            view_row("D", "g2", 0), view_row("E", "g2", 50),
+            view_row("F", "g2", 100),
+        ]
+        day2 = [dict(row) for row in day1]
+        for row in day2:
+            row["lens_d"] = 100 - row["lens_d"]
+        result = audit.formal_structure({"2026-08-01": day1, "2026-08-02": day2})
+        self.assertEqual(result["days"], 2)
+        self.assertFalse(result["performance_claim"])
+        self.assertEqual(
+            result["pairwise_rank_correlation_equal_group_weight"]
+            ["lens_a__lens_c"]["median"],
+            1.0,
+        )
+        self.assertEqual(
+            result["adjacent_snapshot_top20_retention"]["lens_a"]["days"], 1
+        )
+        self.assertEqual(result["tie_rate"]["lens_a"]["latest"], 0.0)
+
 
 class FormalProgressTest(unittest.TestCase):
     def setUp(self):
@@ -122,6 +145,7 @@ class FormalProgressTest(unittest.TestCase):
         self.assertEqual(result["current_spec_latest_date"], "2026-08-02")
         self.assertEqual(result["mature_10d_days"], 1)
         self.assertEqual(result["invalid_runs"], [])
+        self.assertEqual(result["structural_history"]["days"], 1)
 
     def test_incomplete_snapshot_is_reported_as_invalid(self):
         self.add_run(
@@ -148,6 +172,36 @@ class OutputContractTest(unittest.TestCase):
         source = (SCRIPTS / "audit_ranking_views.py").read_text(encoding="utf-8")
         self.assertIn("db_ro.connect", source)
         self.assertNotIn("sqlite3.connect", source)
+
+
+class PipelineWiringTest(unittest.TestCase):
+    def test_daily_workflow_audits_published_snapshot_before_dashboard(self):
+        workflow = (
+            ROOT / ".github" / "workflows" / "daily-fetch.yml"
+        ).read_text(encoding="utf-8")
+        snapshot_at = workflow.index("python scripts/snapshot_signals.py --publish")
+        audit_at = workflow.index(
+            "python scripts/audit_ranking_views.py --compact "
+            "--require-current-snapshot"
+        )
+        dashboard_at = workflow.index("python scripts/build_dashboard.py")
+        self.assertLess(snapshot_at, audit_at)
+        self.assertLess(audit_at, dashboard_at)
+        audit_block = workflow[
+            workflow.index("- name: 稽核平行視角排名快照"):dashboard_at
+        ]
+        self.assertIn("steps.mode.outputs.mode == 'complete'", audit_block)
+
+    def test_local_pipeline_requires_official_snapshot_except_preview(self):
+        source = (ROOT / "scripts" / "run_daily.py").read_text(encoding="utf-8")
+        snapshot_at = source.index('run("snapshot_signals.py", *snapshot_args)')
+        audit_at = source.index('run("audit_ranking_views.py", *audit_args)')
+        dashboard_at = source.index('run("build_dashboard.py")')
+        self.assertLess(snapshot_at, audit_at)
+        self.assertLess(audit_at, dashboard_at)
+        audit_block = source[source.index('audit_args = ["--compact"]'):audit_at]
+        self.assertIn("if not args.preview:", audit_block)
+        self.assertIn('audit_args.append("--require-current-snapshot")', audit_block)
 
 
 if __name__ == "__main__":

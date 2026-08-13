@@ -63,6 +63,11 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn('aria-current="page">市場掃描</a>', self.template)
         self.assertIn('<span class="brand-scope">__H1__</span>', self.template)
         self.assertIn('<span class="menu-scope">__SCOPE__</span>', self.template)
+        # 選完錨點就收起 utility menu；點外部與 Escape 也都能關閉。
+        self.assertIn("link.closest('.utility-menu')", self.template)
+        self.assertIn("if(menu)menu.open=false", self.template)
+        self.assertIn("if(!menu.contains(event.target))menu.open=false", self.template)
+        self.assertIn("if(event.key==='Escape')", self.template)
 
     def test_daily_workspace_prioritises_scan_then_research_and_trust(self):
         """首頁順序就是產品決策：今日焦點→族群→個股→研究→深層分析→方法證據。"""
@@ -316,7 +321,11 @@ class DashboardUxContractTest(unittest.TestCase):
         for marker in ("lastSheetFocus=document.activeElement",
                        "if(c) c.focus()",
                        "lastSheetFocus.focus()",
-                       "if(e.key==='Escape')closeSheet();",
+                       "if(e.key==='Escape'){e.preventDefault();closeSheet();return;}",
+                       "sheetEl.querySelectorAll('a[href],button:not([disabled])",
+                       "item.el.inert=true",
+                       "item.el.inert=false",
+                       "sheetwrap.setAttribute('aria-hidden','false')",
                        "role:'dialog'", "'aria-modal':'true'"):
             self.assertIn(marker, self.template)
         # 桌機抽屜要夠寬,個股詳情卡才能維持兩欄可讀排版

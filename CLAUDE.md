@@ -112,6 +112,8 @@ fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現
 score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
 ranking_views.py A領先/B風險/C籌碼/D基本面四個 tie-safe 族群內平行排名＋角色同儕、
                  peer sensitivity、Pareto；Champion 不變,C1/C2 自 2026-08-13 append-only OOS
+audit_ranking_views.py 唯讀檢查 A–D 覆蓋/tie/component/Pareto/peer sensitivity 與
+                 append-only spec 進度；final pipeline 缺當日完整正式快照時硬停
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)
                  archive 同資料日首次建立後不覆寫;本地重跑只更新 index.html
                  台積電事件錨點發布到 research.html 市場議題；主頁不再重複事件 payload
