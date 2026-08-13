@@ -7,7 +7,7 @@ status: triaged
 priority: p1
 captured_at: 2026-07-31
 source_published_at: 2026-07-07
-last_reviewed_at: 2026-08-12
+last_reviewed_at: 2026-08-14
 review_due: 2026-08-19
 source_type: mixed
 publisher_domain: mopsov.twse.com.tw
@@ -18,9 +18,9 @@ group_ids: power,powersupply,memory,packtest,material
 trigger_type: quarterly_results_and_company_events
 evidence_role: candidate_source
 route: formal_note_candidate
-thesis_claim_id: C14
+thesis_claim_id: C19
 base_confidence: medium
-confidence_basis: 六家公司 Q2 一手揭露與六份 MOPS 正式附件索引已能重估證據強弱；力成核閱季報再把本業、現金流與產品收入歸因拆開，環球晶完整季度數字則拆出本業與 Siltronic 評價差異，但附件索引仍不等於 evidence pack，復工、ASP、HBM2 訂單與多項市場主張仍未驗證
+confidence_basis: 六家公司 Q2 一手揭露與六份 MOPS 正式附件索引已能重估證據強弱；力成與旺宏核閱季報進一步把本業、存貨會計、現金流、設備承諾及產品收入歸因拆開，環球晶完整季度數字則拆出本業與 Siltronic 評價差異，但研究核對仍不等於正式筆記 evidence pack 與獨立 reviewer，復工、ASP、長供與 HBM2 訂單等市場主張仍未驗證
 cross_company_numbers: true
 schema_migrated_at: 2026-08-02
 -->
@@ -80,6 +80,13 @@ from: triaged
 to: triaged
 reason: reconfirmed_powertech_and_globalwafers_q2_filing_availability_after_parallel_scan_reconciliation
 evidence: sources:S19,S20,S21
+-->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_macronix_q2_filing_inventory_cash_and_commitment_bridges_without_refreshing_customer_contract_claim
+evidence: sources:S22
 -->
 
 <!-- research_source
@@ -388,6 +395,22 @@ locator: pp.3-10、36-38；64 頁 PDF；SHA-256 ad220e9985ca5b1d21b2b299603f9139
 limitation: 會計師因部分非重要子公司及權益法投資未經核閱而出具保留結論；收入附註只拆封裝、測試、模組與其他，不能歸因 HBM2 客戶、訂單或收入
 -->
 
+<!-- research_source
+source_id: S22
+role: company_filing
+source_kind: document
+publisher: Macronix
+title: 旺宏電子 115Q2 合併財務報告暨會計師核閱報告
+published_at: 2026-07-29
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=2337&filename=202602_2337_AI1.pdf
+locator: pp.3-10、16-20、30、44；53 頁 PDF；SHA-256 5f554e96428e6cd607913ad6a5d78508795c828462294066ef269d65b6213ed2
+limitation: 會計師因部分非重要子公司財務報表未經核閱而出具保留結論；Flash 收入沒有再拆 NOR、SLC 或 eMMC，存貨跌價回升利益的機械橋接不是正常化毛利率，設備採購承諾也不等於已安裝產能、具名產品或客戶訂單
+independence_group: twse-mops
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -591,7 +614,7 @@ resolution:
 <!-- research_claim
 claim_id: C14
 label: inference
-status: active
+status: superseded
 claim: 六家公司 Q2 合併財報附件都已可取得，而力成新季報進一步示範研究必須依序分開事件 headline、附件可取得性、核閱財報內容與產品／客戶／收入歸因；較高層證據成立不能自動穿越到下一層
 supporting_source_ids: S1,S3,S4,S5,S10,S12,S13,S14,S15,S16,S17,S19,S20,S21
 contrary_source_ids:
@@ -601,6 +624,91 @@ boundary: 這是研究證據階梯與獲利品質分流，不是六家公司估�
 verification_needed:
 correction_kind: supersedes
 corrects_claim_id: C12
+corrected_by_claim_id: C19
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: 旺宏核閱季報確認 Q2 營收 191.25 億元、營業利益 89.68 億元、稅後淨利 77.36 億元與 EPS 3.91 元，會計師則因部分非重要子公司財務報表未經核閱而出具保留結論
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-07-29
+basis: S22 pp.3-6 的會計師結論與 Q2 損益可逐頁核對；金額由新台幣千元換算為億元並四捨五入至小數點後二位
+boundary: 期中核閱不是年度查核，保留原因必須隨數字揭露；單季損益不證明價格、產品組合或毛利率會延續
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 旺宏 Q2 報表毛利率為 64.42%，同期銷貨成本含 9.61 億元存貨跌價回升利益，相當於營收的 5.02 個百分點；若只機械移除該利益且其餘不變，橋接毛利率為 59.40%
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-07-29
+basis: 以 S22 p.6 未四捨五入的營收 19,124,524 千元、毛利 12,320,018 千元與 p.18 回升利益 960,752 千元重算：12,320,018／19,124,524=64.42%，960,752／19,124,524=5.02 個百分點，兩者相減為 59.40%
+boundary: 這是固定其他項目不變的會計機械橋接，不是公司揭露的正常化毛利率、未來毛利預測，也不能排除價格、組合、稼動率與其他存貨成本同時改變
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: 旺宏 Q2 客戶合約收入中 Flash 為 174.71 億元、占合併營收 91.35%，但收入附註沒有把 Flash 再拆為 NOR、SLC 或 eMMC
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-07-29
+basis: S22 p.30 列示 Q2 Flash 17,471,039 千元與總收入 19,124,524 千元，以未四捨五入數值重算占比 91.35%
+boundary: Flash 大類占比不能把法說簡報的 eMMC 成長率換算成 eMMC 收入、毛利、客戶或持續性，也不能證明長供合約
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: 旺宏 H1 營業現金流 100.34 億元且應收帳款帳面餘額較 2025 年底增加 61.71 億元；同期間不動產、廠房及設備增置 10.17 億元、付現 6.83 億元，而期末未認列設備採購承諾為 153.98 億元
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-07-29
+basis: S22 pp.9、16、19-20、44 分別提供營業現金流、應收帳款期末／期初餘額、設備增置／付現與未認列承諾；金額由新台幣千元換算為億元並四捨五入至小數點後二位
+boundary: 應收增加不自行等同逾期或壞帳，三個設備數字分屬資產認列、現金支付與未來承諾時鐘，不能相加、互相替代或歸因特定產品、客戶與已安裝產能
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: 六家公司 Q2 合併財報附件都已可取得，而力成與旺宏核閱季報進一步示範附件內容仍須分開損益、存貨會計、營運資金、設備三時鐘及產品／客戶／收入歸因；較高層證據成立不能自動穿越到下一層
+supporting_source_ids: S1,S3,S4,S5,S10,S12,S13,S14,S15,S16,S17,S19,S20,S21,S22
+contrary_source_ids:
+as_of: 2026-08-14
+basis: correction_of:C14；六家 MOPS 查詢是附件索引 census，力成與旺宏核閱季報才進入報表內容、收入附註及會計時鐘，環球晶公司文件則拆出本業與 Siltronic 評價；三組證據位於不同層級
+boundary: 這是研究證據階梯與獲利品質分流，不是六家公司估值、股價、報酬、相對優劣或任何投資建議；附件、毛利率、技術能力與產業需求都不能自行變成訂單或可辨識產品收入
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C14
 corrected_by_claim_id:
 resolution:
 -->
@@ -979,7 +1087,9 @@ invalidation: 若季報與後續文件仍只有產業復甦、稼動率形容詞
 
 <!-- monitoring_item
 monitor_id: T9
-status: active
+status: retired
+retired_at: 2026-08-14
+retirement_reason: 旺宏核閱季報內容與存貨、現金及設備三時鐘使原證據集合擴大；正式 frozen pack 與不同 reviewer 由 T11 接續
 claim_ids: C1,C2,C3,C6,C11,C13,C14
 metric: 六份已定位 Q2 財報的 frozen evidence pack、引用頁與獨立 reviewer 狀態
 source_ids: S1,S2,S3,S4,S5,S10,S11,S12,S13,S14,S15,S19,S20,S21
@@ -993,8 +1103,38 @@ invalidation: 只有索引、檔名、簡報摘要或單一 drafter 核對時，
 
 <!-- monitoring_item
 monitor_id: T10
-status: active
+status: retired
+retired_at: 2026-08-14
+retirement_reason: C14 已由加入旺宏會計與設備三時鐘的 C19 取代；環球晶未關閉問題由 T12 以現行跨公司證據框架接續
 claim_ids: C5,C8,C9,C14
+metric: 環球晶完整 Q2 核閱財報、Novara 8 吋復工、跨廠轉移、ASP 與漲價橋接
+source_ids: S6,S7,S8,S9,S11,S16,S17,S18,S20
+watch_source_ids: S11,S18,S20
+frequency: event_driven
+frequency_detail: 新財報、火災更新、公司法說或價格橋接發布後；無事件時每週回查
+next_check: 2026-08-19
+trigger: 季報內容完成獨立重算，或公司提供 8 吋復工日期與產能、交付影響，或 ASP／價格對營收與毛利的量化橋接
+invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫，漲價、復工與最終財務影響維持未證，不更新正式公司事實
+-->
+
+<!-- monitoring_item
+monitor_id: T11
+status: active
+claim_ids: C1,C2,C3,C6,C11,C13,C15,C16,C17,C18,C19
+metric: 六份已定位 Q2 財報的 frozen evidence pack、引用頁與獨立 reviewer 狀態
+source_ids: S1,S2,S3,S4,S5,S10,S11,S12,S13,S14,S15,S19,S20,S21,S22
+watch_source_ids: S2,S11,S13,S18,S20
+frequency: weekly
+frequency_detail: 先保存 MOPS 附件與完整 SHA，再由不同 reviewer 離線重算期間、單位、數字、會計師結論、附註及存貨／現金／設備橋接邊界
+next_check: 2026-08-21
+trigger: 任一附件完成同版本 frozen pack、引用頁規劃及獨立 reviewer 重算
+invalidation: 只有索引、檔名、單一 drafter 研究核對或簡報摘要時，正式筆記不得升為 independently_verified；機械會計橋接與收入大類也不得自行改名為正常化獲利、產品訂單或客戶收入
+-->
+
+<!-- monitoring_item
+monitor_id: T12
+status: active
+claim_ids: C5,C8,C9,C19
 metric: 環球晶完整 Q2 核閱財報、Novara 8 吋復工、跨廠轉移、ASP 與漲價橋接
 source_ids: S6,S7,S8,S9,S11,S16,S17,S18,S20
 watch_source_ids: S11,S18,S20
@@ -1012,6 +1152,9 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 - **本業**：公司日常產品與服務帶來的營業利益，與投資評價、匯兌等業外損益分開看。
 - **EPS**：每股盈餘，把歸屬股東的獲利除以股數；上升不一定代表本業同幅改善。
 - **自由現金流**：營業現金流扣掉設備等資本支出後的現金餘額，可用來檢查成長是否需要大量外部資金。
+- **存貨跌價回升利益**：先前因存貨淨變現價值下降而認列的損失，在條件改善時於準則容許範圍內轉回；它會降低當期銷貨成本，但不是同額現金流入。
+- **應收帳款**：已認列收入、尚待客戶付款的金額；增加可能來自營收成長或收款速度變化，不能只看餘額就判定逾期或壞帳。
+- **設備增置、付現與採購承諾**：分別表示資產已認列、現金已支付與尚未認列的契約承諾，是三個不同時間點，不能互相替代。
 - **未核閱**：數字尚未經會計師完成核閱，能提供方向但證據強度低於完整季報。
 - **核閱與查核**：核閱主要用於期中財報，程序範圍低於年度財報查核；兩者都不是對公司未來營運的保證。
 - **保留結論**：會計師對特定範圍無法取得足夠核閱證據，但除該事項可能影響外，沒有發現財報在所有重大方面未依適用準則編製。讀者仍要看保留原因，不能只看「有會計師」四個字。
@@ -1022,6 +1165,9 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 - **Novara**：環球晶位於義大利 Novara 的廠區。本文指該廠火災公告，以及復工時程尚未確定這件事。
 - **HBM2**：HBM 的第二代。文中出現在封測公司的技術能力敘述裡；具備能力不等於已取得 HBM2 客戶、訂單或收入。
 - **eMMC（嵌入式儲存）**：把快閃記憶體與控制器封裝成標準化元件，常見於消費電子與嵌入式設備；單季成長不能直接外推成長期缺貨或漲價。
+- **Flash（快閃記憶體）**：斷電後仍能保存資料的非揮發性記憶體大類；財報只揭露 Flash 總額時，不能自行拆成各產品收入。
+- **NOR Flash**：適合直接讀取程式碼的快閃記憶體，常用於韌體與嵌入式系統；它只是 Flash 內的一條產品線。
+- **SLC（單層儲存單元）**：每個記憶單元存一個位元的快閃架構，通常重視耐用與可靠度；本文沒有獨立的 SLC 收入欄。
 - **ASIC（客製化晶片）**：為特定工作設計的晶片。公司具備相關測試或封裝能力，不等於已取得具名 AI 客戶或量產收入。
 - **CPO（共同封裝光學）**：把光學元件放到交換晶片附近，縮短高速電訊號路徑；具備設備與流程仍須等待客戶、量產及財務證據。
 - **AI1.pdf**：公開資訊觀測站合併財報附件常見的檔名尾碼；它只協助辨識檔案版本，本身不代表研究者已讀過內容或完成獨立複核。
@@ -1032,7 +1178,7 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 
 - 六家公司都已有 Q2 一手資料；8 月 13 日再次以同一 MOPS 索引核對，六份中文合併財報都可定位，其中力成與環球晶附件皆於 8 月 7 日上線。
 - 環球晶完整季度數字顯示營收季增、營業利益反而季減，淨利大增則主要來自 Siltronic 評價；只看 EPS 會把本業與業外混在一起。
-- 力成新核閱季報能確認損益、現金流與四類收入，卻仍不能證明 HBM2 客戶、訂單或收入；事件、附件、財報內容與產品收入歸因必須逐層過關。
+- 力成季報仍不能證明 HBM2 收入；旺宏季報也顯示 64.4% 毛利率含存貨跌價回升利益，且 Flash 大類不能替代 eMMC 收入，事件、會計與產品歸因都要逐層過關。
 
 ### 為什麼重要
 
@@ -1044,7 +1190,7 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 
 ### 接下來怎麼追
 
-- 追完整 Q2 季報與法說，逐項重算營業利益、業外、現金流、設備支出與負債變化。
+- 追完整 Q2 季報與法說，逐項重算營業利益、存貨評價、業外、營運資金、設備三時鐘與負債變化。
 - 追每家公司是否首次以一手文件證實長供、HBM2、量產收入、漲價、復工與產品組合，而不只延續市場說法。
 
 ### 想一想
@@ -1091,6 +1237,44 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 
 力成文件目前能支持 HBM 需求與先進封裝能力，但收入附註停在封裝／測試／模組分類；因此不能跳過驗證與量產關卡，把 153.14 億元封裝收入整體貼上 HBM2 標籤。
 
+## 旺宏 Q2 四道橋：64.4% 毛利不是一個乾淨的價格訊號
+
+**先把一個漂亮比率拆回四張表。** 旺宏 Q2 的營收、營業利益與現金流都是真實報表數字；問題不在數字「能不能信」，而在每個數字回答的問題不同。毛利率要先拆存貨會計，產品成長要先找收入分母，獲利要再接收款，擴產則要分清資產認列、付現與未來承諾。
+
+| 本文 4 道橋 | 季報直接提供什麼 | 可重算的連接 | 還不能說什麼 |
+|---|---|---|---|
+| 1. 毛利 → 存貨會計 | Q2 營收 191.25 億元、毛利 123.20 億元；銷貨成本含 9.61 億元存貨跌價回升利益 | 報表毛利率 64.42%；回升利益相當於營收 5.02 個百分點。若只移除這一項且其餘不變，機械橋接為 59.40% | 59.40% 不是公司揭露的「正常化毛利率」，也不是下一季預測；價格、產品組合、稼動率與其他成本仍會變 |
+| 2. Flash → eMMC／NOR／SLC | Q2 Flash 收入 174.71 億元，占合併營收 91.35% | 財報只把 Flash、ROM、晶圓代工與其他分開 | 不能把法說的 eMMC 季增／年增直接換算成 eMMC 收入、毛利或客戶，也不能用 Flash 大類證明長供 |
+| 3. 獲利 → 現金與收款 | H1 營業現金流 100.34 億元；應收帳款餘額較 2025 年底增加 61.71 億元 | 現金流量表另列應收帳款增加造成 61.36 億元調整；兩個口徑接近但不是同一欄，不能硬湊成完全調節 | 季報顯示多數應收仍未逾期、平均信用期約 60 天；因此不能只因餘額增加就宣稱收不回，也不能忽略後續收款速度 |
+| 4. 設備 → 三個時間點 | H1 設備增置 10.17 億元、付現 6.83 億元；6 月底未認列設備採購承諾 153.98 億元 | 增置與付現相差 3.34 億元；承諾較 2025 年底增加 145.16 億元，但三者分屬認列、付款與未來承諾 | 承諾不是已安裝產能，文件也沒提供產品、供應商、時程、取消條款或 NOR／eMMC 歸因，不能直接命名為 AI 擴產 |
+
+上表使用 PDF 的新台幣千元原值計算，再把結果四捨五入。第一道橋的算法是
+`123.20018 ÷ 191.24524 = 64.42%`，再扣除 `9.60752 ÷ 191.24524 = 5.02` 個百分點；
+它刻意只做一項變動，目的是讓讀者看見會計項目的量級，不是假設其他營運條件真的不變。
+
+### 多方小作文：可以寫到哪裡
+
+支持面的最強版本是：Q2 營業利益 89.68 億元、H1 營業現金流 100.34 億元，Flash 又占
+Q2 收入 91.35%，表示當期改善不只停在 EPS headline；期末設備採購承諾大增，也提供公司
+準備未來投資的直接契約訊號。但這段話必須同時附上兩道護欄：毛利率含 9.61 億元存貨跌價
+回升利益，Flash 仍是大類而非 eMMC／NOR／SLC 的收入拆分。能支持的是「當期本業與投資準備
+可在報表找到」，不是「每個記憶體產品都已長供、漲價或會維持同一毛利」。
+
+### 空方小作文：可以寫到哪裡
+
+風險面的最強版本是：存貨回升利益機械上貢獻 5.02 個毛利率百分點，應收帳款餘額半年增加
+61.71 億元，未認列設備承諾又由 8.82 億元升至 153.98 億元；若未來回升利益減少、收款變慢
+或需求不如投資計畫，獲利與現金壓力可能放大。但這仍只是待驗證路徑：本期大多數應收未逾期，
+採購承諾也沒有執行時程或產品歸因。本文不能把一個期末餘額直接寫成壞帳、過度投資或下一季
+毛利率下滑。
+
+### 分母、誤差與限制
+
+- **母體**：`N=1` 家發行人、1 份 115Q2 合併財報；Q2 損益與 H1 現金流／設備數字依各表期間使用。這是指定文件的精確核對，不是記憶體產業樣本。
+- **誤差**：公司金額是發行人報告值；比例以未四捨五入的千元數計算，只有顯示時的四捨五入誤差。這不是抽樣估計，因此沒有 sampling SE／t。
+- **核閱邊界**：會計師因部分非重要子公司的財務報表未經核閱而出具保留結論；研究者必須把保留原因和數字一起讀。
+- **外推邊界**：本文沒有價格、估值、部位或投資建議，也不代表同業、下一季、長供合約或市場是否已反映。
+
 ## 為何值得進佇列
 
 這六檔不是因為股價強弱而升為 P1，而是 7 月 24～30 日已有公司 Q2 法說、核閱數或重大
@@ -1099,7 +1283,8 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 但毛利率、營益率季減且兩個事業部虧損；欣銓營收與量產里程碑成立，卻同時出現負自由現金流
 與負債上升。8 月 4 日環球晶完整季度資料又提供反向例子：營業利益季減，但 Siltronic 按
 市價評價利益使淨利季增近一倍；因此 6 月評價損失與 Q2 評價利益都不能冒充本業趨勢。旺宏與力成
-的本業改善較乾淨，但市場流傳的「逐月議價／長供」與「已簽 HBM2 訂單」仍沒有一手證據。
+的本業改善方向成立，但旺宏 64.4% 毛利率含 5.02 個百分點的存貨回升利益機械貢獻，市場流傳的
+「逐月議價／長供」與力成「已簽 HBM2 訂單」仍沒有一手證據。
 跨公司營收觀測對應 `M1`；真正用來辨識本業、業外、現金流與會計差異的異質證據籃子
 對應 `M2`。兩組都明列為不可直接比較，不做公司優劣排名。
 
@@ -1129,7 +1314,18 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
   下半年高毛利保證，64.4% 毛利率也未拆價格、組合、稼動率與存貨評價橋接。
 - [MOPS 115Q2 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=2337&year=115&seamon=2&mtype=A)
   列出中英文附件；中文版 `202602_2337_AI1.pdf` 於 7 月 29 日 14:49:19 上線、大小
-  1,296,184 bytes，後續仍須以 frozen pack 重算附註。
+  1,296,184 bytes。[115Q2 合併財務報告暨會計師核閱報告](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=2337&filename=202602_2337_AI1.pdf)
+  已在本輪固定完整 SHA 並核對第 3–10、16–20、30、44 頁；這是研究文章的 drafter 核對，還不是正式公司筆記的 frozen pack 與獨立 reviewer 簽核。
+- 季報第 18 頁顯示 Q2 銷貨成本含 9.61 億元存貨跌價回升利益；以第 6 頁未四捨五入的營收與
+  毛利重算，報表毛利率 64.42%，回升利益相當於 5.02 個百分點，單獨移除後的機械橋接為
+  59.40%。這不能命名為正常化或未來毛利率。
+- p.30 的 Flash 收入 174.71 億元、占 Q2 合併營收 91.35%，但沒有再拆 NOR、SLC 或
+  eMMC；法說的 eMMC 成長率因此仍沒有可換算收入與毛利的分母。
+- pp.9、16、19–20、44 分別顯示 H1 營業現金流 100.34 億元、應收帳款餘額半年增加
+  61.71 億元、設備增置 10.17 億元、付現 6.83 億元及期末未認列設備採購承諾
+  153.98 億元。三個設備數字處於不同時鐘，承諾也沒有產品、時程或客戶歸因。
+- 核閱報告第 3–4 頁因部分非重要子公司財務報表未經會計師核閱而出具保留結論；有完整季報
+  不代表所有合併範圍都由同一會計師核閱，也不等於正式質化筆記已獨立驗證。
 
 ### 3264 欣銓
 
@@ -1227,7 +1423,7 @@ hypothesis_refs: 2337:H1,2337:H2
 note_action: update_required
 action_due: 2026-08-03
 rationale: Q2 本業與 eMMC 數字大幅改變舊筆記基準，需更新財務品質、產品結構與資本支出
-evidence_boundary: 缺貨與當期價格方向已證，但逐月議價、滿載、長供合約與下半年持續性仍未證
+evidence_boundary: 核閱季報已能拆出存貨回升利益、Flash 大類、營運資金與設備三時鐘；逐月議價、滿載、長供合約、eMMC 收入與下半年持續性仍未證
 -->
 
 <!-- impact
@@ -1268,8 +1464,9 @@ evidence_boundary: 公司簡報與新聞稿仍沒有 8 吋復工日期、ASP／�
 - 富鼎正式筆記已完成 frozen pack 與不同 reviewer 離線重算；H1／H2 維持 open，到
   8 月 31 日仍依原規格裁決，不因本篇更新提前改寫終態。
 - 台達電、旺宏、欣銓與力成已定位的 Q2 附件依序建立 focused_v1 frozen pack，記錄完整
-  SHA、實際引用頁與渲染規劃，再交由不同 reviewer 離線重算；本輪對力成 PDF 的研究核對
-  不是正式筆記的獨立簽核，不能直接把筆記狀態升級。
+  SHA、實際引用頁與渲染規劃，再交由不同 reviewer 離線重算；本輪對力成與旺宏 PDF 的研究
+  核對都不是正式筆記的獨立簽核，不能直接把筆記狀態升級。旺宏 reviewer 還要獨立重算
+  64.42%／5.02 個百分點／59.40%、Flash 91.35%，並核對應收與設備三時鐘的期間及單位。
 - 環球晶附件已可定位；下一步建立同版本 frozen pack，記錄 SHA、引用頁與渲染規劃，再由不同 reviewer 離線重算。附件索引本身不等於財報內容已簽核。
 - 環球晶下一步只追尚未關閉的變數：完整核閱季報、8 吋復工日期／產能與交付影響、晶圓
   ASP／客戶接受度、方形晶圓驗證及可辨識收入；沒有直接證據就維持 H# open。

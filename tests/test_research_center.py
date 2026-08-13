@@ -6714,6 +6714,49 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(node, graph)
 
+    def test_missed_priority_q2_macronix_four_bridges_preserve_denominators(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-31_missed_priority_q2_disclosures.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "thesis_claim_id: C19",
+            "## 旺宏 Q2 四道橋：64.4% 毛利不是一個乾淨的價格訊號",
+            "| 1. 毛利 → 存貨會計 |",
+            "| 2. Flash → eMMC／NOR／SLC |",
+            "| 3. 獲利 → 現金與收款 |",
+            "| 4. 設備 → 三個時間點 |",
+            "報表毛利率 64.42%",
+            "回升利益相當於營收 5.02 個百分點",
+            "機械橋接為 59.40%",
+            "Flash 收入 174.71 億元，占合併營收 91.35%",
+            "H1 營業現金流 100.34 億元",
+            "未認列設備採購承諾 153.98 億元",
+            "### 多方小作文：可以寫到哪裡",
+            "### 空方小作文：可以寫到哪裡",
+            "### 分母、誤差與限制",
+            "`N=1` 家發行人、1 份 115Q2 合併財報",
+            "SHA-256 5f554e96428e6cd607913ad6a5d78508795c828462294066ef269d65b6213ed2",
+            "claim_id: C14\nlabel: inference\nstatus: superseded",
+            "claim_id: C19\nlabel: inference\nstatus: active",
+            "monitor_id: T9\nstatus: retired",
+            "monitor_id: T11\nstatus: active",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 22),
+            ("research_claim", 19), ("metric_comparison", 12),
+            ("impact", 6), ("monitoring_item", 12),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        reviews = (
+            ROOT / "notes" / "research_method_reviews" / "monitor_reviews.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "MR-2026-08-14-MISSED-Q2-T9-MACRONIX-FILING", reviews
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
