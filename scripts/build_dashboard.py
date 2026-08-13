@@ -1652,6 +1652,18 @@ def build_overview(grows):
 #           拿 in-sample 證據在使用者看得到的地方下判斷,正是鐵律禁止的事。
 # tier 的績效數字(超額/勝率/IC)一律不複製到這裡,只連向週報——避免與 validate.py
 # 的 §② 各算一份而漂移。
+def _stable_payload_float(value, digits=12):
+    """固定公開 payload 的浮點精度，避免 Python 小版本讓靜態頁最後一位漂移。
+
+    策略卡最多只顯示到小數 2 位；保留 12 位已遠高於讀者介面需要，又可吸收
+    3.11/3.12 在相同統計運算上約 1e-15 的序列化差異。
+    """
+    if value is None:
+        return None
+    stable = round(float(value), digits)
+    return 0.0 if stable == 0 else stable
+
+
 def build_strategy_status(con, last):
     """回傳首屏「策略狀態」卡片的資料;任何一段算不出來就給 None,前端略過該行。
 
@@ -1683,8 +1695,8 @@ def build_strategy_status(con, last):
         s = sig.summarize(sig.group_rows(con, last))
         if s:
             st["lead"] = s["lead"]
-            st["lead_rho"] = s["lead_rho"]
-            st["eff"] = s["eff_factors"]
+            st["lead_rho"] = _stable_payload_float(s["lead_rho"])
+            st["eff"] = _stable_payload_float(s["eff_factors"])
             st["n_scored"] = len(s["churn"])
     except Exception:
         pass
@@ -1693,10 +1705,10 @@ def build_strategy_status(con, last):
     try:
         ch = sig.churn_summary(sig.tier_sequences(con), dates)
         if ch:
-            st["dwell"] = ch["dwell"].get("真強")
+            st["dwell"] = _stable_payload_float(ch["dwell"].get("真強"))
             tv = ch["turnover"].get("真強") or {}
-            st["turn_days"] = tv.get("full_turn_days")
-            st["round_trip"] = ch["round_trip"][2]
+            st["turn_days"] = _stable_payload_float(tv.get("full_turn_days"))
+            st["round_trip"] = _stable_payload_float(ch["round_trip"][2])
             st["round_trip_window"] = sig.ROUND_TRIP_WINDOW
     except Exception:
         pass

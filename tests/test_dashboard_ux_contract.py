@@ -161,6 +161,17 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("不是買賣指示", card)
         self.assertIn("觀察名單", card)
 
+    def test_strategy_payload_float_is_stable_across_python_minor_versions(self):
+        """3.11/3.12 可能只差約 1e-15；公開靜態頁不得因此產生不同 blob。"""
+        old = 2.815964541124785
+        new = 2.8159645411247847
+        self.assertNotEqual(old, new, "測例必須真的包含兩個不同 binary float")
+        self.assertEqual(bd._stable_payload_float(old),
+                         bd._stable_payload_float(new))
+        self.assertEqual(bd._stable_payload_float(old), 2.815964541125)
+        self.assertEqual(bd._stable_payload_float(-0.0), 0.0,
+                         "JSON 不應因負零再產生無意義的跨版本差異")
+
     def _strategy_card_source(self):
         """取出模板裡 buildStrategyStatus 的函式本體,避免斷言誤中頁面其他區塊。"""
         start = self.template.index("function buildStrategyStatus()")
