@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-07-27
-last_reviewed_at: 2026-08-09
-review_due: 2026-08-14
+last_reviewed_at: 2026-08-14
+review_due: 2026-08-16
 source_type: mixed
 publisher: NVIDIA
 publisher_domain: marketplace.nvidia.com
@@ -19,9 +19,9 @@ group_ids: thermal,powersupply
 trigger_type: qualification_and_supply_stage
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C9
+thesis_claim_id: C21
 base_confidence: medium
-confidence_basis: NVIDIA 動態清單在捕捉日以同一欄標示三個型號的額定容量與供應狀態，容量保留原始 MW／kW 後可正規化比較；另有 LG 與 Daikin 一手文件補充認證、合作及 PoC 階段，但 Marketplace 沒有固定版本與完整跨廠測試協定，台廠訂單、收入與獲利也尚未證實
+confidence_basis: NVIDIA 動態清單在捕捉日以同一欄標示三個型號的額定容量與供應狀態，容量保留原始 MW／kW 後可正規化比較；另有 LG 與 Daikin 一手文件補充認證、合作及 PoC 階段。台達管理層已提供公司液冷產品族約占 2025 年合併營收 10% 的近似分子，但 Marketplace 沒有固定版本與完整跨廠測試協定，三家台廠的具名 CDU 客戶、出貨量、產品收入及毛利仍未證實
 cross_company_numbers: true
 -->
 
@@ -88,6 +88,13 @@ to: triaged
 reason: added_fluid_specific_capacity_and_qualification_branch_without_thesis_clock_refresh
 evidence: sources:S9,S11,S12,S13
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: q2_financial_denominator_evidence_reframed_thesis_from_platform_listing_to_named_model_bridge
+evidence: sources:S14,S15,S16,S17,S18
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -100,6 +107,7 @@ evidence: sources:S9,S11,S12,S13
 - **Cooling Capacity @ 4°C ATD**：NVIDIA 清單以這個欄名標示 CDU 的額定排熱能力。MW／kW 是絕對容量，不是效率或產品優劣；同欄數字可在單位換算後比較，但頁面沒有公布完整跨廠測試協定，實際水溫、流量、壓差與備援仍會改變可用能力。
 - **ATD（Approach Temperature Difference）**：熱交換兩側在指定位置的溫差條件。本文只沿用 NVIDIA 欄名中的 `4°C ATD`，不自行補上頁面未公布的完整測試程序。
 - **L-L CDU（Liquid-to-Liquid CDU）**：兩側都以液體循環換熱的 CDU；一側接機房設施水路，另一側接伺服器冷卻水路。這個名稱說明架構，不代表已通過哪一套驗證。
+- **L-A／L2A（Liquid-to-Air）**：伺服器端以液體帶熱，再把熱排到空氣側的架構。它和 L-L／L2L 是不同產品分支；公司只說「液冷產品」時，不能自行判定收入來自哪一支。
 - **FWS／TCS**：FWS 是設施水系統，負責把熱送往機房冷源；TCS 是技術冷卻系統，負責把熱從伺服器帶回 CDU。兩側各自的溫度、流量與壓力都會限制實際工作點。
 - **操作包絡線（Operating envelope）**：設備可安全、穩定運作的一組條件範圍，例如冷卻液種類、進水溫度、流量、壓力與負載。單一 kW 額定值只是這個範圍中的一個截面。
 - **熱性能曲線（Thermal performance curve）**：在指定流體、FWS／TCS 流量與進水溫度下，把 ATD 和可帶走熱負載畫成曲線。它回答「這組熱條件可支撐多少 kW」，不是供應商總分。
@@ -138,11 +146,16 @@ evidence: sources:S9,S11,S12,S13
 - **量產**：產品以可重複方式持續製造與交付。本文沒有各型號的產量、良率、庫存或交期資料，因此不能替公司判定量產規模。
 - **財務認列**：公司依會計規則把交易記入收入、成本或獲利。產品列名、合作備忘錄與概念驗證都不能直接代替財務認列。
 - **毛利**：收入扣除直接銷售成本後的金額或比率。即使已有收入，仍需產品別或可合理拆分的資料，才能判斷液冷產品的獲利貢獻。
+- **分子／分母**：分子是要衡量的那一塊，例如液冷產品收入；分母是比較基準，例如同期間合併營收。只有分子、分母、期間與合併範圍都對齊，占比才有可查核意義。
+- **產品族（Product family）**：一組相關產品的合計範圍，可能同時含冷板、風扇、泵浦、CDU 或不同 L2A／L2L 架構。產品族占比不能直接分配給其中一個型號。
+- **部門代理（Segment proxy）**：公司只公布大部門數字時，用來框住題材可能落在哪個上限範圍。部門通常還包含許多非液冷產品，因此不是液冷收入分子。
+- **Infrastructure（基礎設施事業）**：台達正式部門之一，範圍包含資通訊基礎設施、能源基礎設施與顯示器等多種業務。法說表示其中含液冷，但不能把整個部門都算成液冷收入。
+- **DDP（Delivered Duty Paid，完稅後交貨）**：ICC Incoterms 規則下，賣方負責把貨物送到約定目的地、辦妥進口清關並承擔到該地點的成本與風險。它是交貨責任，不是產品毛利率；管理層若說 DDP 改變報表毛利呈現，仍要和產品售價、成本及淨利分開讀。
 - **PoC（Proof of Concept，概念驗證）**：在真實或接近真實的環境做小規模試行，用來確認方案可行。**PoC 進行中不等於已交付節電、成本或可靠度數字**，本文多處出現的 PoC 都停在這個階段。
 - **MOU（合作備忘錄）**：合作方對預計合作範圍的書面表達。它不是已完成產品、採購合約、出貨或收入證據。
 - **Portfolio（產品組合）**：一家公司或合作案規劃涵蓋的一組產品。範圍可大於單一型號，不能拿整組規劃覆蓋某台設備的額定數字。
 - **AVC／奇鋐（3017）**：AVC 是 Asia Vital Components 的縮寫；本文用公司官網的 `TSE: 3017` 完成名稱映射。這只確認公司身分，不證明具名客戶或收入。
-- **Delta／台達電（2308）與 LITEON／光寶科（2301）**：本文以英文公司名出現的兩家台灣電源與散熱供應商，都是本 universe 成員。文中提到它們時只涉及產品被列出或通過平台驗證，不含訂單、出貨量或毛利證據。
+- **Delta／台達電（2308）與 LITEON／光寶科（2301）**：本文以英文公司名出現的兩家台灣電源與散熱供應商，都是本 universe 成員。台達另有公司液冷產品族的近似營收占比；這仍不等於 NVIDIA 清單中的具名 CDU 已取得客戶訂單、出貨量或產品毛利，光寶目前也只有平台列名與廣泛部門範圍。
 - **LGE／LG Electronics**：LG 電子的英文縮寫。2026-08-09 的 NVIDIA 清單可定位其 600kW 列項，但供應狀態欄空白，因此不能替它補成任何階段。
 - **CDU1000-LTL-RW／RDF106CDT5192／LC-LL-WCDU-6011(S)**：分別是 AVC、Delta 與 LITEON 在 NVIDIA 清單中的 CDU 型號。型號只是辨識產品的名字；容量、供應狀態與量產證據仍要分欄閱讀。
 - **TSE（Taiwan Stock Exchange，臺灣證券交易所）**：本文只用公司官網的 `TSE: 3017` 把 AVC 對應到臺灣上市公司奇鋐；這個代號本身不證明該 CDU 的客戶或收入。
@@ -152,7 +165,7 @@ evidence: sources:S9,S11,S12,S13
 
 - 2026 年 8 月 2 日保存的 NVIDIA 清單，在同一欄列出三個供應商型號的容量：1.2MW、1MW 與 380kW。把單位都換成 kW 後，這三個數字可以比較。
 - 容量只回答設備在指定條件下設計可帶走多少熱；還要把熱性能曲線、TCS 壓頭、FWS 阻抗，以及每筆讀值的設備、位置、單位、時間與品質接起來，才知道這個數字落在什麼操作包絡線。平台列名與供應標籤也都不等於客戶已部署。
-- 要判斷誰更接近收入，還要看到客戶驗收、量產數量與公司財務揭露。目前這些證據都缺，因此不能用容量大小替公司排行。
+- 台達管理層已把「液冷產品」連到 2025 年約占合併營收 10% 的公司層級分子，但沒有拆成 L2A／L2L、具名 CDU、客戶、數量或產品毛利；其餘兩家季報的部門範圍也更廣。因此仍不能用容量大小替公司排行。
 
 ### 為什麼重要
 
@@ -166,7 +179,7 @@ evidence: sources:S9,S11,S12,S13
 ### 接下來怎麼追
 
 - 每週保存 NVIDIA 清單的型號、額定容量、驗證類別與原始供應標籤；只記錄欄位怎麼變，不自行替空白欄位補答案。
-- 查 3017、2308、2301 的重大訊息、法說與季報，等到公司首次把具名型號連到客戶驗收、量產數量、收入占比與毛利，才把證據往商業結果推進。
+- 查 3017、2308、2301 的重大訊息、法說與季報；對台達先追「液冷產品族」如何拆成 L2A／L2L 與具名 CDU，等公司把型號連到客戶驗收、量產數量、實際收入及毛利，才把證據推進到產品層。
 - 追蹤 Daikin／NTT DATA 的概念驗證是否在 2027 年 3 月前公布可重算的節電、成本或自動化結果，以及 Daikin 對 2027 財政年度的商用目標是否維持。
 
 ### 想一想
@@ -385,6 +398,86 @@ url: https://www.opencompute.org/wiki/Cooling_Environments/Cold_Plate
 locator: 2026-08-14 capture 的 Active Workstreams 與 Accepted Contributions；Coolant Fluids 分列單相 glycol-based、單相 water-based 與 two-phase，頁面另列 July 2024 water draft、November 2025 updated PG draft，以及兩份 2022 accepted contributions
 limitation: 動態工作頁只支持捕捉日的工作流與版本地圖；draft 標題不等於正式發布或已採用，本文沒有讀取 Google Drive 草案內容，也不把工作流存在改寫成產品通過、跨流體等效、場域採用或財務證據
 independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S14
+role: management_commentary
+source_kind: document
+publisher: Delta Electronics
+title: Delta Electronics 2Q 2026 Results Meeting Transcript
+published_at: 2026-07-30
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://filecenter.deltaww.com/IR/download/calendar/2Q26_Transcript.pdf
+locator: PDF pp. 2、4、12；03:06 的事業成長說明、09:48 的 DDP 毛利呈現說明，以及 55:45–56:19 的 liquid-cooling products 約占 2025 年營收 10%／2026 年預期超過 12% 與 L2A／L2L 回答；下載檔 SHA-256 1d3cf7fb34d23713300c694b86e0af732115eb937b24996b649591aad107916b
+limitation: 公司製作的英文逐字稿明示僅供參考、中文原音為準；10% 是管理層對 2025 年液冷產品族的近似說法，超過 12% 是 2026 年預期而非已實現結果，兩者都未拆出 L2A、L2L、具名 CDU、客戶、出貨量、金額或產品毛利。DDP 說明涉及報表呈現且管理層稱不影響淨利，不能改寫成產品毛利改善
+independence_group: delta-electronics
+-->
+
+<!-- research_source
+source_id: S15
+role: company_filing
+source_kind: document
+publisher: Delta Electronics
+title: 115 年第二季合併財務報告
+published_at: 2026-07-29
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=2308&filename=202602_2308_AI1.pdf
+locator: PDF pp. 89–90 的部門資訊與產品範圍；MOPS 索引檔名 202602_2308_AI1.pdf、115/07/29 16:26:39、1,808,979 bytes；下載檔 SHA-256 838b88e3b21639a122a4cdd88d87fe1bb3b185592d603184d65e5a955402ed08
+limitation: 申報附件把電源及零組件、基礎設施等廣泛部門分開，但沒有單列液冷、L2A、L2L 或 RDF106CDT5192 的收入、數量與毛利；MOPS 索引 N=3 全數命中只證明指定三家公司附件可取得，不代表全部公司、全部 IR 文件或產品歸因皆完整
+independence_group: delta-electronics
+-->
+
+<!-- research_source
+source_id: S16
+role: company_filing
+source_kind: document
+publisher: LITE-ON Technology
+title: 115 年第二季合併財務報告
+published_at: 2026-07-31
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=2301&filename=202602_2301_AI1.pdf
+locator: PDF pp. 67–68 的雲端及物聯網部門範圍；MOPS 索引檔名 202602_2301_AI1.pdf、115/07/31 19:27:54、1,868,258 bytes；下載檔 SHA-256 ea26c644fb6e0f5ecc5029fca228c37dd878bf41982d043287ccf5b05f10213e
+limitation: 雲端及物聯網部門同時包含資料中心、伺服器、網通、AI、物聯網、智慧裝置與影像等多種業務，沒有單列 LC-LL-WCDU-6011(S)、液冷收入、出貨量或產品毛利；部門數字不能直接當成液冷分子
+independence_group: liteon-technology
+-->
+
+<!-- research_source
+source_id: S17
+role: company_filing
+source_kind: document
+publisher: Asia Vital Components
+title: 115 年第二季合併財務報告
+published_at: 2026-08-12
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3017&filename=202602_3017_AI1.pdf
+locator: PDF pp. 50–51 的部門資訊；MOPS 索引檔名 202602_3017_AI1.pdf、115/08/12 16:00:26、893,656 bytes；下載檔 SHA-256 418df6e7296a62f0e324fa71ba4325923dc7eba9b08b78250d8f98903f639746
+limitation: 申報附件依海外與綜合管理等營運／地域性質呈現部門，沒有單列 CDU1000-LTL-RW、液冷收入、出貨量或產品毛利；部門分類不能直接當成液冷分子
+independence_group: asia-vital-components
+-->
+
+<!-- research_source
+source_id: S18
+role: standard
+source_kind: living_index
+publisher: International Chamber of Commerce
+title: Incoterms DDP — Delivered Duty Paid
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://library.iccwbo.org/clp/clp-incoterms.htm
+locator: 2026-08-14 capture 的 DDP 條目；賣方在貨物已辦妥進口清關、於約定目的地到達運輸工具上待卸時交付，並承擔送達該地的成本、風險、進出口清關與關稅責任
+limitation: ICC 條目只定義買賣雙方的交貨、成本與風險責任，不解釋台達特定合約的收入總額／淨額判斷、售價、成本、產品毛利或淨利；台達的報表影響仍以 S14 管理層原話為準
+independence_group: international-chamber-of-commerce
 -->
 
 <!-- research_claim
@@ -704,6 +797,57 @@ as_of: 2026-08-14
 basis: S1／S8 只提供動態容量、validation type、wetted materials 與供應狀態欄；S9／S11／S12 是通用方法，S13 是工作流索引，不能替具名產品補上跨流體測試結果
 boundary: 不因公開欄位缺少就推論供應商內部沒有測試；只表示目前列出的公開來源不足以建立跨流體等效、qualification、場域驗收或公司財務事實
 verification_needed: 平台、供應商與客戶需對同型號／同版本公開各流體配方、操作包絡、原始性能曲線、材料清單、變更控制、commissioning 與 acceptance 結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: 台達在 2026Q2 法說逐字稿中表示，液冷產品約占 2025 年合併營收 10%，並預期 2026 年占比將超過 12%；同場也把部分液冷零組件列為電源及零組件事業成長動能，並表示基礎設施事業所含液冷業務在 2026 上半年快速成長
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-07-30
+basis: S14 的事業說明與 Q&A 可直接定位 liquid-cooling components、Infrastructure 所含 liquid cooling，以及管理層對 2025 約 10% 與 2026 預期超過 12% 的回答
+boundary: `verified` 只證實管理層做出這些陳述；10% 是公司產品族的近似歷史占比，沒有底層金額與四捨五入規則，超過 12% 是預期而非已實現結果。兩者都沒有拆成 L2A／L2L、RDF106CDT5192、具名客戶、數量或產品毛利；單一發行人揭露不是統計樣本，沒有 sampling SE／t
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: inference
+status: active
+claim: 液冷財務證據至少要分成「公司液冷產品族占合併營收」、「含液冷的廣泛部門代理」與「具名 CDU 的客戶、數量、收入及毛利」三層；台達的 2025 年約 10% 只讓第一層成立，三家公司 2026Q2 申報附件的部門範圍仍不足以完成第三層型號橋接
+supporting_source_ids: S14,S15,S16,S17
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 提供台達 aggregate liquid-cooling products 的公司占比；S15 把台達揭露在電源及零組件與基礎設施等廣泛部門，S16 的光寶雲端及物聯網涵蓋多類資料中心與裝置業務，S17 的奇鋐部門則依營運／地域性質呈現，三份申報附件都沒有把平台具名 CDU 接到客戶、數量、收入與毛利
+boundary: 三層是研究中心的歸因檢查框架，不是會計準則、公司間成熟度排名或估值模型；它不否定公司可能在內部掌握更細資料，也不把未單列解釋成零收入。台達 10% 不能分配給單一型號，光寶與奇鋐的廣泛部門也不能當成液冷收入上限以外的精確分子
+verification_needed: 三家公司以同期間、同合併範圍把具名 CDU 或可辨識產品族連到客戶驗收、出貨量、實際收入及產品毛利；台達另需把 aggregate liquid-cooling products 拆成 L2A／L2L 或具名型號
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: verified
+status: active
+claim: ICC 的 DDP 規則要求賣方把貨物辦妥進口清關並送到約定目的地、在到達運輸工具上待卸時完成交付，且賣方承擔送達該地的成本與風險
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S18 的 DDP 條目直接列出交貨地點、進口清關，以及賣方承擔成本與風險的責任
+boundary: 交貨條件不等於產品毛利率，也不能單獨決定特定公司應採收入總額或淨額表達；台達本輪只表示部分液冷產品的 DDP 銷售提高報表毛利呈現但不影響淨利，不能據此推論液冷產品經濟性改善
+verification_needed:
 correction_kind:
 corrects_claim_id:
 corrected_by_claim_id:
@@ -1037,11 +1181,41 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
 | 2. 元件、整機與平台測試 | 零件與完整 CDU 是否通過性能、承壓、材料及環境可靠度測試，產品是否被平台列出 | OCP 提出元件層／系統層及多類可靠度方法；NVIDIA 列出 AVC、Delta、LITEON；LG 另稱 600kW 設備通過超過 100 項條件 | 哪些具名型號依哪一版方法通過、完整門檻與 pass／fail，以及各產品是否走相同流程 |
 | 3. 供應準備 | 平台在捕捉日給產品哪一個原始供應標籤 | Delta 為 MP Ready；AVC、LITEON 為 Sample Ready | 標籤對應的產能、良率、庫存、交期與客戶承諾；LG 當時沒有可重現狀態 |
 | 4. 場域整合與客戶部署 | 系統是否在接近真實或真實場域運作，並走向驗收 | Daikin／Delta 規劃 100 至 3000kW 產品範圍；Daikin／NTT DATA 概念驗證預計至 2027 年 3 月 | 節電、成本、可用率、商用接受度，以及具名客戶是否完成驗收 |
-| 5. 公司收入 | 產品是否帶來訂單、收入、毛利與現金流 | 尚無可重算證據 | 3017、2308、2301 的具名設備訂單、收入占比、毛利、現金流與投資回收 |
+| 5. 公司收入 | 產品是否帶來訂單、收入、毛利與現金流 | 台達管理層表示 2025 年液冷產品約占合併營收 10%，但只到公司產品族分子 | 三家公司把具名 CDU 接到客戶驗收、數量、實際收入、產品毛利與現金流；台達另需拆開 L2A／L2L 與型號 |
 
 只有第一關的 `M1` 容量完成「換成相同單位後可比」判定。平台的兩種供應標籤沒有公開的共同
-量產率或財務定義，因此本文不把它們換算成成熟度分數；公司端也沒有同產品、同期間、同會計
-定義的數字，所以不能比較誰更接近收入。
+量產率或財務定義，因此本文不把它們換算成成熟度分數。第五關現在多了一筆台達公司的產品族
+占比，卻仍沒有三家公司同產品、同期間、同會計定義的數字，所以不能比較誰更接近收入。
+
+## 財務分母階梯：10% 已經比部門代理更近，但還不是那台 CDU
+
+讀液冷財務揭露，最重要的不是先問「數字大不大」，而是先問**這個分子究竟裝了什麼**。
+本輪把三種常被混在一起的數字拆開：
+
+| 財務層級 | 分子與分母 | 本輪證據到哪裡 | 不能跨過的界線 |
+|---|---|---|---|
+| 1. 公司液冷產品族 | 所有 liquid-cooling products ÷ 同期間合併營收 | 台達管理層表示 2025 年約 10%，並預期 2026 年超過 12% | `約 10%` 沒有底層金額與四捨五入規則；`超過 12%` 是預期，不是已實現結果；兩者都沒有拆成 L2A、L2L 或 CDU |
+| 2. 廣泛部門代理 | 含有液冷的整個事業部 ÷ 合併營收 | 台達申報附件仍以電源及零組件、基礎設施等部門呈現；光寶雲端及物聯網與奇鋐營運／地域部門範圍也都比液冷大 | 不能把整個部門都算成液冷，也不能拿三種不同部門定義互排 |
+| 3. 具名型號橋接 | 某一 CDU 的客戶驗收、數量、收入與毛利 ÷ 對齊的公司分母 | 尚未完成 | 台達的 10% 不能分配給 RDF106CDT5192；AVC 與 LITEON 的平台型號也沒有公司財務分子 |
+
+這裡的 10% 是**單一發行人對公司全集合的近似陳述**，不是從樣本估計母體；來源沒有提供底層
+產品收入、四捨五入規則或跨期重述，因此沒有可計算的 sampling SE／t，也不宜反推一個看似
+精確的金額。2026 年「超過 12%」更只能放在管理層預期欄，不能先寫進實績。
+
+### 為什麼同一句「液冷」仍可能裝了不同產品
+
+法說提問先談 L2A，管理層回答時使用較廣的 `liquid-cooling products`，並表示 L2A 的生命週期
+可能比市場預期長、公司同時觀察 L2L。這個回答說明產品族可能跨越架構與零組件，卻沒有給出
+各分支占比。研究中心因此保留原詞，不把 10% 偷換成「L2L CDU 占比」，也不把 NVIDIA 上的
+1MW 型號當成這個分子的全部。
+
+### DDP 改變報表呈現，不等於產品毛利變好
+
+台達在同場說明，第一季部分液冷產品採 DDP 銷售，使報表毛利率看起來較高，但對淨利沒有影響。
+ICC 對 DDP 的定義重點是賣方負責送達約定目的地、進口清關並承擔相關成本與風險；它描述的是
+交貨責任，不是產品經濟性。若只看到「毛利率較高」就推論液冷售價、成本結構或產品毛利改善，
+會把交易條件造成的報表呈現和真正的單位經濟混在一起。下一份有用的證據應直接給出同產品、
+同期間的收入、成本或毛利，而不是再次只給公司整體毛利率。
 
 ## 什麼情況會讓容量排行榜失真
 
@@ -1066,12 +1240,18 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
 - [S11：OCP《Guidelines for Using Propylene Glycol-Based Heat Transfer Fluids》](https://www.opencompute.org/documents/guidelines-for-using-propylene-glycol-based-heat-transfer-fluids-in-single-phase-cold-plate-based-liquid-cooled-racks-final-pdf)（2022-10-03；PG25／PG55 配方、腐蝕、啟動與維護指引；不是跨流體性能排名）。
 - [S12：OCP《Guidelines for Using Water-Based Transfer Fluids》](https://www.opencompute.org/documents/guidelines-for-using-water-based-transfer-fluids-in-single-phase-cold-plate-based-liquid-cooled-racks-final-pdf)（2022-10-03；水基 TCS 的水質、啟動與維護指引；門檻不能套到 PG）。
 - [S13：OCP Cold Plate Sub-Project 工作頁](https://www.opencompute.org/wiki/Cooling_Environments/Cold_Plate)（2026-08-14 capture；現行 coolant workstream、draft 與 accepted contribution 版本地圖；不是草案已發布證明）。
+- [S14：台達 2026Q2 法說逐字稿](https://filecenter.deltaww.com/IR/download/calendar/2Q26_Transcript.pdf)（2026-07-30；公司液冷產品族占比、事業成長與 DDP 回答；英文稿僅供參考、中文原音為準）。
+- [S15：台達 115 年第二季合併財務報告](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=2308&filename=202602_2308_AI1.pdf)（部門仍大於液冷產品族，沒有具名 CDU 分子）。
+- [S16：光寶科 115 年第二季合併財務報告](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=2301&filename=202602_2301_AI1.pdf)（雲端及物聯網涵蓋多種業務，不能直接當液冷收入）。
+- [S17：奇鋐 115 年第二季合併財務報告](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3017&filename=202602_3017_AI1.pdf)（部門按營運／地域性質呈現，沒有具名 CDU 分子）。
+- [S18：ICC Incoterms DDP 定義](https://library.iccwbo.org/clp/clp-incoterms.htm)（2026-08-14 capture；說明交貨、清關、成本與風險責任，不是產品毛利定義）。
 
-**可證實：** 同日同欄的容量、平台原始供應標籤、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位與可靠度測試類別。
+**可證實：** 同日同欄的容量、平台原始供應標籤、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位與可靠度測試類別。台達管理層也確實做出「2025 年液冷產品約占合併營收 10%、2026 年預期超過 12%」的陳述，但前者是近似產品族占比，後者是預期。
 
-**待驗證：** 平台狀態的精確判準、具名客戶、部署數、訂單、收入、毛利、現金流與實際
-節能結果。OCP 方法也不能證明某一具名產品已完成相同測試；合作名單、平台列名或額定 kW
-不得替代這些產品與公司層級證據。
+**待驗證：** 平台狀態的精確判準、具名客戶、部署數、訂單、具名 CDU 收入、產品毛利、
+現金流與實際節能結果。台達產品族占比不能分配給單一 L2A／L2L 或 RDF106CDT5192；OCP
+方法也不能證明某一具名產品已完成相同測試。合作名單、平台列名、額定 kW 或廣泛部門數字
+都不得替代這些產品與公司層級證據。
 
 ## 8 月 9 日複核：LG 進入清單，但供應階段仍空白
 
@@ -1106,8 +1286,27 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
 - S13 是 2026-08-14 的現行工作頁，支持的是 workstream 與 draft／accepted 版本地圖；本文未
   讀取 Google Drive 草案內容，也不把 draft 名稱改寫成正式規格或產品採用。
 - S11／S12 發布於 C9 主命題之前，S13 雖是本日 living capture，卻只支持新 C17 並作 T7 的
-  版本監測入口；三者都沒有追加到 C9。故 `last_reviewed_at: 2026-08-09`、`review_due: 2026-08-14`、
-  `base_confidence: medium` 與公司／平台結論都不刷新。
+  版本監測入口；三者都沒有追加到 C9。故這次方法補強當時不刷新 `last_reviewed_at`、
+  `base_confidence` 與公司／平台結論；後續的 Q2 財務監測再另行留下新期限。
+
+## 8 月 14 日監測複核：先有公司液冷分子，仍沒有具名 CDU 橋接
+
+- 本輪依 `T2` 預先登錄範圍，用同一 MOPS 索引查 2301、2308、3017 的 115 年 Q2 中文合併
+  財報；明示母體 N=3、命中 3、缺件 0，並逐頁核對各自部門資訊。這是指定公司母體的精確
+  census，不是抽樣估計，因此沒有 sampling SE／t；它也不代表全 121 檔、所有 IR 附件或
+  液冷相關公司都已掃完。
+- 新支持來自 S14：台達管理層把 aggregate liquid-cooling products 連到 2025 年約 10% 的
+  公司營收分子，並給出 2026 年超過 12% 的預期。這讓「公司液冷產品族」前進到直接財務
+  歸因，但 10% 沒有底層金額與產品拆分，12% 以上也尚未成為實績。
+- S15–S17 的正式財報仍停在廣泛部門：台達同一液冷敘事可能跨電源及零組件與基礎設施，
+  光寶雲端及物聯網涵蓋多類產品，奇鋐則依營運／地域性質呈現。三份附件都沒有把 NVIDIA
+  平台上的具名 CDU 接到客戶驗收、數量、收入與毛利。
+- `T2` 因出現新支持而退役，但原 trigger 沒有完整命中；`T8` 接續追公司產品族到具名型號的
+  最後一段橋。這批新證據把文章核心從 C9 的單次平台列名進展，推進為 C21 的「產品族分子、
+  廣泛部門代理、具名型號橋接」三層主命題；C9 仍保留為歷史有效 claim，不被覆寫。因此
+  `last_reviewed_at` 更新為 2026-08-14、`review_due` 取所有 active monitor 最早的 T4
+  2026-08-16，`base_confidence` 維持 medium；這次時鐘刷新由 S14–S17 的新主命題證據承擔，
+  不是用 DDP 名詞或周邊方法假刷新。
 
 ## 影響路由
 
@@ -1130,7 +1329,7 @@ hypothesis_refs:
 note_action: watch
 action_due: 2026-08-09
 rationale: NVIDIA capture 分別列出 Delta RDF106CDT5192 1MW／MP Ready 與 LITEON LC-LL-WCDU-6011(S) 380kW／Sample Ready，Daikin MOU另提供台達整合範圍
-evidence_boundary: 平台列名、狀態與 MOU 都不證明台達電或光寶科具名客戶、量產出貨、訂單、收入、市占、毛利或現金流
+evidence_boundary: 台達另有 aggregate liquid-cooling products 約占 2025 年合併營收 10% 的管理層陳述，但平台列名、狀態、MOU 與公司產品族占比都不證明 RDF106CDT5192 或光寶 LC-LL-WCDU-6011(S) 的具名客戶、量產出貨、產品收入、市占、毛利或現金流
 -->
 
 ## 持續驗證清單
@@ -1153,7 +1352,7 @@ retirement_reason: 預先登錄的 LGE 可定位列項 trigger 已命中；新�
 
 <!-- monitoring_item
 monitor_id: T2
-status: active
+status: retired
 claim_ids: C6
 metric: 台廠 CDU 客戶驗收、量產出貨與財務認列
 source_ids: S1,S3,S6
@@ -1163,6 +1362,8 @@ frequency_detail: 每季法說、財報與重大訊息發布後逐公司核對
 next_check: 2026-08-14
 trigger: 3017、2308 或 2301 首次把具名 CDU 型號連到客戶驗收、量產數量、收入及毛利
 invalidation: 公司明確表示指定 CDU 專案取消、沒有相關訂單／收入或退出該產品；到期只有平台列名、MOU 或整體液冷敘事時維持 C6 待驗證，不視為反證
+retired_at: 2026-08-14
+retirement_reason: 三家公司 2026Q2 正式財報已完成指定母體複核，台達另出現公司液冷產品族約占 2025 年營收 10% 的新支持；但具名 CDU 客戶、數量、收入與產品毛利 trigger 未完整命中，後續由 T8 追產品族到型號的橋接
 -->
 
 <!-- monitoring_item
@@ -1235,10 +1436,24 @@ trigger: OCP 正式發布新版 water／PG 文件，或平台、供應商與客�
 invalidation: 具名重複測試證明流體或配方版本在本文列出的完整熱、水力、材料與場域條件下不影響工作點，或正式新版方法合併分支並提供等效規則；屆時依新證據修正 C18，不以 draft 標題或單一 kW 欄代替結果
 -->
 
+<!-- monitoring_item
+monitor_id: T8
+status: active
+claim_ids: C6,C20,C21
+metric: 公司液冷產品族占比到具名 CDU 客戶、數量、實際收入與產品毛利的橋接
+source_ids: S14,S15,S16,S17
+watch_source_ids: S5
+frequency: quarterly
+frequency_detail: 每季法說、財報與重大訊息發布後逐公司核對；具名型號、客戶驗收或產品財務出現時提前
+next_check: 2026-11-14
+trigger: 3017、2308 或 2301 把平台具名 CDU 連到客戶驗收、量產數量、實際收入及產品毛利，或台達把 aggregate liquid-cooling products 的實際占比拆成 L2A／L2L／CDU 與具名型號
+invalidation: 公司明確取消或退出具名 CDU、表示沒有相關訂單／收入，或後續正式揭露修正台達 2025 約 10% 的產品族口徑；只有廣泛部門、總體液冷敘事、DDP 報表呈現或年度預期時，C6 仍維持待驗證
+-->
+
 ## 接下來看到什麼，判定才會改變
 
 - **平台欄位改變**：若 NVIDIA 改寫 AVC、LITEON 或 LGE 的原始供應狀態，就追加新快照、來源與觀測；不得修改 `M1` 的 2026 年 8 月 2 日歷史紀錄。
-- **公司補上商業證據**：3017、2308、2301 若在法說或財報同時揭露具名設備的客戶驗收、量產數量、收入占比與毛利，才可從平台列名前進到公司級商業證據。
+- **公司補上商業證據**：台達已有公司液冷產品族的近似歷史占比，但仍須把它拆成 L2A／L2L、CDU 與具名型號；3017、2308、2301 若在法說或財報同時揭露具名設備的客戶驗收、量產數量、實際收入與產品毛利，才可完成產品層商業橋接。
 - **概念驗證交付結果**：Daikin／NTT DATA 若公布結果，需有可重算的節電、成本或可靠度基線；官方宣告失敗、取消或延後超過 2027 年 3 月才構成反證，沒有公開結果只維持待驗證。
 - **容量與收入走出相反順序**：若較高容量型號長期停留送樣，而較低容量型號先取得部署與收入，就會直接否定「容量可代表商業成熟度」的市場捷徑。
 - **容量欄位定義改變**：若 NVIDIA 改變 `Cooling Capacity @ 4°C ATD` 定義，或顯示不同型號不能共用同一欄位，`M1` 的可比結論只保留在 2026 年 8 月 2 日快照，不外推到新版清單。

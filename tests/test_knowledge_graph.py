@@ -121,7 +121,10 @@ class KnowledgeGraphTest(unittest.TestCase):
         ]
         self.assertEqual(
             {item["id"] for item in assessments},
-            {"FM-YQ2-2327-01", "FM-LC-3017-01", "FM-LC-2308-01", "FM-LC-2301-01"},
+            {
+                "FM-YQ2-2327-01", "FM-LC-3017-01", "FM-LC-2308-01",
+                "FM-LC-2308-02", "FM-LC-2301-01",
+            },
         )
         self.assertEqual(
             self.payload["stats"]["financialAssessments"], len(assessments),
@@ -142,10 +145,13 @@ class KnowledgeGraphTest(unittest.TestCase):
         self.assertTrue(all(item["financialScope"] in {"segment", "product"}
                             for item in proxies))
         self.assertTrue(all(item["sharePercent"] for item in proxies))
-        self.assertFalse(any(
-            edge["materiality"] == "financial"
-            for graph in self.payload["graphs"] for edge in graph["edges"]
-        ))
+        direct = [item for item in assessments if item["attributionStatus"] == "direct"]
+        self.assertEqual([item["id"] for item in direct], ["FM-LC-2308-02"])
+        financial_edges = [
+            edge for graph in self.payload["graphs"] for edge in graph["edges"]
+            if edge["materiality"] == "financial"
+        ]
+        self.assertEqual([edge["id"] for edge in financial_edges], ["KG-LC-C08"])
 
     def test_v2_lint_rejects_company_total_as_direct_topic_revenue(self):
         errors = []

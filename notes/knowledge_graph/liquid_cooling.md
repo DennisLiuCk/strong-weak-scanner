@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: liquid-cooling
 root_node_id: concept:liquid-cooling
 label: 液冷 CDU
-summary: 把 CDU 額定能力拆成熱性能、TCS 壓頭、FWS 阻抗與具位置單位時間品質的量測上下文，再把平台資格、系統整合、場域驗證和可辨識財務貢獻分開。
+summary: 把 CDU 額定能力拆成熱性能、TCS 壓頭、FWS 阻抗與具位置單位時間品質的量測上下文，再把平台資格、系統整合、場域驗證、公司液冷產品族占比和具名型號財務橋接分開。
 article_ids: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER
 status: active
 -->
@@ -236,6 +236,54 @@ review_due: 2026-08-16
 status: active
 boundary: Marketplace 在 2026-08-09 提供四個具名列項、比較欄位與原始狀態；動態頁仍沒有完整跨廠測試協定、不可變歷史或公司財務資料。
 next_trigger: Marketplace 更新 validation type、supply status、型號或 4°C ATD 定義。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LC-C08
+view: company
+from_id: company:2308
+to_id: concept:liquid-cooling
+relation: reports_financials
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C20
+note_refs:
+evidence_state: verified
+commercial_stage: financial
+materiality: financial
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-07-30
+review_due: 2026-11-14
+status: active
+boundary: 台達管理層表示 aggregate liquid-cooling products 約占 2025 年合併營收 10%；這是公司產品族的近似歷史占比，不是經查核財報產品附註，也沒有拆成 L2A、L2L、RDF106CDT5192、客戶、數量或產品毛利。2026 年超過 12% 仍是預期，不列為實績。
+next_trigger: 台達以同期間合併分母揭露液冷實際金額與口徑，並把產品族拆成 L2A／L2L／CDU、具名型號、客戶驗收、數量與產品毛利。
+-->
+
+<!-- financial_materiality
+contract_version: 2
+assessment_id: FM-LC-2308-02
+edge_id: KG-LC-C08
+financial_scope: product
+metric: aggregate_liquid_cooling_products_revenue_share
+value_kind: reported
+reported_value: 10
+unit: percentage_points
+period_start: 2025-01-01
+period_end: 2025-12-31
+period_basis: fiscal_year
+denominator_metric: consolidated_revenue_share
+denominator_value: 100
+denominator_unit: percentage_points
+share_percent: 10
+attribution_status: direct
+source_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#S14
+calculation:
+as_of: 2026-07-30
+review_due: 2026-11-14
+status: active
+metric_definition: 台達管理層對 2025 年 aggregate liquid-cooling products 約占合併營收 10% 的近似原始揭露；以 10 個百分點保存，不反推未揭露金額。
+denominator_definition: 同一管理層回答中的公司合併營收占比基準，以 100 個百分點表示；來源未提供底層合併金額與產品收入金額。
+boundary: direct 只表示產品族分子可直接歸因到液冷主題；數字是管理層近似說法、不是經查核產品附註，也不能分配給 L2A、L2L、CDU 或 RDF106CDT5192。2026 年超過 12% 是預期，不納入本筆歷史 assessment；單一發行人揭露沒有 sampling SE／t。
+next_trigger: 公司以正式期間數字重述 2025／2026 液冷產品收入與分母，並拆出 L2A／L2L／CDU、具名型號、客戶、數量與產品毛利。
 -->
 
 <!-- knowledge_edge

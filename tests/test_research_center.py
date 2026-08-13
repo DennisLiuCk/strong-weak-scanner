@@ -3505,7 +3505,7 @@ class ResearchCenterTest(unittest.TestCase):
         for contract in (
             "editorial_plain_language_wave87_capacity_maturity_evidence_ladder",
             "容量只回答設備在指定條件下設計可帶走多少熱",
-            "要判斷誰更接近收入，還要看到客戶驗收、量產數量與公司財務揭露",
+            "台達管理層已把「液冷產品」連到 2025 年約占合併營收 10%",
             "## 容量可以換算，商業成熟度不能跟著換算",
             "| 2026-08-02 清單中的供應商 | 產品型號 | 來源原始容量 | 換算成 kW | 平台原始供應標籤 | 這一列只能證明 |",
             "## 額定容量只是操作包絡線的一個截面",
@@ -3516,6 +3516,10 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 容量規格 |", "| 2. 元件、整機與平台測試 |",
             "| 3. 供應準備 |", "| 4. 場域整合與客戶部署 |",
             "| 5. 公司收入 |",
+            "## 財務分母階梯：10% 已經比部門代理更近，但還不是那台 CDU",
+            "| 1. 公司液冷產品族 |", "| 2. 廣泛部門代理 |",
+            "| 3. 具名型號橋接 |",
+            "### DDP 改變報表呈現，不等於產品毛利變好",
             "## 一個 kW 要同時讀三張性能圖與一張量測身分證",
             "## 8 月 12 日方法補強：三張性能圖與量測身分證補上 kW 背後的問題",
             "## 同樣寫 kW，水基、PG25 與 PG55 仍是三條證據分支",
@@ -3524,6 +3528,8 @@ class ResearchCenterTest(unittest.TestCase):
             "older_ocp_document_added_as_operating_envelope_and_reliability_decoder_no_thesis_clock_refresh",
             "added_three_performance_scorecards_and_typed_telemetry_context_no_thesis_change",
             "added_fluid_specific_capacity_and_qualification_branch_without_thesis_clock_refresh",
+            "q2_financial_denominator_evidence_reframed_thesis_from_platform_listing_to_named_model_bridge",
+            "## 8 月 14 日監測複核：先有公司液冷分子，仍沒有具名 CDU 橋接",
             "## 接下來看到什麼，判定才會改變",
         ):
             self.assertIn(contract, topic)
@@ -3531,7 +3537,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 54
+            sum(line.startswith("- **") for line in glossary.splitlines()), 60
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3539,9 +3545,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("Sample Ready", reflection)
         self.assertNotIn("MP Ready", reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 19), ("metric_comparison", 7),
-            ("impact", 2), ("monitoring_item", 7),
+            ("research_topic", 1), ("research_source", 18),
+            ("research_claim", 22), ("metric_comparison", 7),
+            ("impact", 2), ("monitoring_item", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         graph = (
