@@ -557,3 +557,63 @@ status: active
 boundary: DSX 讓 CDU 值帶設備與位置、單位、時間及 quality，並分開感測與控制請求；資料可解讀不等於感測器已校正、曲線已重現或場域已驗收。
 next_trigger: 具名部署公開點位清單、位置、校正／不確定度、時間同步、quality 規則、穩態資料與控制 guardrail 驗收。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-LC-I17
+view: industry
+from_id: concept:liquid-cooling
+to_id: concept:coolant-formulation-branch
+relation: requires
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C16,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C17,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C18
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 水基、PG25 與 PG55 共用部分生命週期責任，但流體身分、化學欄位與性能證據不可互相代填；這不表示任一分支必然較優或已被具名產品採用。
+next_trigger: OCP 正式新版或具名多流體 CDU 測試公開可重現的等效規則、配方版本、性能資料與場域驗收。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LC-I18
+view: industry
+from_id: concept:liquid-cooling
+to_id: metric:propylene-glycol-concentration-freeze-envelope
+relation: measured_by
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C15
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2022-10-03
+review_due: 2026-08-31
+status: active
+boundary: PG25／PG55 濃度與凝固點是 OCP 2022 指引的規格包絡，不是熱傳效率、泵功、壽命、產品資格、跨廠排名或財務樣本。
+next_trigger: 正式新版方法改寫配方範圍，或具名流體與 CDU 公開濃度、凝固點、分析不確定度及同版本場域結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LC-I19
+view: industry
+from_id: concept:liquid-cooling
+to_id: process:fluid-specific-cdu-rerating
+relation: passes_through
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C18
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 流體專屬重評是跨流體容量可比性的研究閘門；目前沒有 NVIDIA 具名型號公開完整 water／PG25／PG55 三張曲線與 site pass／fail。
+next_trigger: 同一 CDU 硬體版本在固定邊界條件下公開各流體配方的熱性能、兩側水力、重複測試、量測不確定度與客戶驗收。
+-->

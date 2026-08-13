@@ -420,6 +420,9 @@ capability:wetted-material-change-control,capability,浸液材料變更控制,We
 metric:coolant-contamination-budget,metric,冷卻液污染預算,Coolant contamination budget|fluid cleanliness budget,concept:liquid-cooling-loop-boundary,把製造運送施工接管填充與維修各階段可容許的顆粒殘留及微生物負荷固定成可驗證邊界
 stage:tcs-fluid-commissioning,stage,TCS 流體試運轉,TCS fluid commissioning|coolant commissioning,concept:liquid-cooling-loop-boundary,依程序完成清洗沖洗必要鈍化填充排氣取樣留樣及整體運轉基準簽核的場域節點
 metric:coolant-monitoring-action-limits,metric,冷卻液監測與行動門檻,Coolant monitoring and action limits|fluid action limits,concept:liquid-cooling-loop-boundary,把取樣點頻率趨勢複驗隔離換液復原與責任所有權接成異常後可執行的營運尺度
+concept:coolant-formulation-branch,concept,冷卻液配方分支,Coolant formulation branch|water-based versus PG,concept:liquid-cooling-loop-boundary,把水基 PG25 PG55 與其他流體分成不可互相代填的版本化熱化學材料與維護契約
+metric:propylene-glycol-concentration-freeze-envelope,metric,丙二醇濃度與凝固點包絡,Propylene glycol concentration and freeze envelope|PG25 PG55,concept:coolant-formulation-branch,把丙二醇體積濃度配方版本凝固點與分析方法綁成可查核範圍而不是單一名稱
+process:fluid-specific-cdu-rerating,process,CDU 流體專屬重評,Fluid-specific CDU rerating|coolant-specific performance rating,concept:coolant-formulation-branch,在流體或配方版本改變後以該版本重新核對熱性能 TCS壓頭 FWS阻抗 量測不確定度與通過條件
 concept:custom-hbm-workload-contract,concept,Custom HBM 工作負載與功能合約,Custom HBM workload contract|workload handoff,concept:custom-hbm-commercialization,固定輸入資料 搬移功能 正確答案 延遲耗電目標與失效條件的設計交接
 concept:custom-hbm-interface-contract,concept,Custom HBM 介面與電力合約,Custom HBM interface contract|I/O contract,concept:custom-hbm-commercialization,固定容量 通道 腳位速度 功耗包絡 命令資料錯誤規則及版本的介面交接
 concept:custom-hbm-base-die-contract,concept,Custom HBM 底部邏輯與智財合約,Custom HBM base-die contract|logic IP handoff,concept:custom-hbm-commercialization,固定控制器 額外邏輯 智財所有權 製程 面積 時序 功耗及驗證版本的底部晶片交接

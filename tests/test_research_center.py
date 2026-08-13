@@ -3518,8 +3518,12 @@ class ResearchCenterTest(unittest.TestCase):
             "| 5. 公司收入 |",
             "## 一個 kW 要同時讀三張性能圖與一張量測身分證",
             "## 8 月 12 日方法補強：三張性能圖與量測身分證補上 kW 背後的問題",
+            "## 同樣寫 kW，水基、PG25 與 PG55 仍是三條證據分支",
+            "| 查核位置 | 水基路徑要保留什麼 | PG25／PG55 路徑要保留什麼 | 最容易出現的錯讀 |",
+            "## 8 月 14 日方法補強：先固定流體分支，再談容量可比",
             "older_ocp_document_added_as_operating_envelope_and_reliability_decoder_no_thesis_clock_refresh",
             "added_three_performance_scorecards_and_typed_telemetry_context_no_thesis_change",
+            "added_fluid_specific_capacity_and_qualification_branch_without_thesis_clock_refresh",
             "## 接下來看到什麼，判定才會改變",
         ):
             self.assertIn(contract, topic)
@@ -3527,7 +3531,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 47
+            sum(line.startswith("- **") for line in glossary.splitlines()), 54
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3535,9 +3539,9 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("Sample Ready", reflection)
         self.assertNotIn("MP Ready", reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 10),
-            ("research_claim", 14), ("metric_comparison", 7),
-            ("impact", 2), ("monitoring_item", 6),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 19), ("metric_comparison", 7),
+            ("impact", 2), ("monitoring_item", 7),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         graph = (
@@ -3545,7 +3549,8 @@ class ResearchCenterTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         for edge_id in (
             "KG-LC-I10", "KG-LC-I11", "KG-LC-I12", "KG-LC-I13",
-            "KG-LC-I14", "KG-LC-I15", "KG-LC-I16",
+            "KG-LC-I14", "KG-LC-I15", "KG-LC-I16", "KG-LC-I17",
+            "KG-LC-I18", "KG-LC-I19",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -3558,6 +3563,9 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:cdu-fws-impedance-curve",
             "stage:cdu-assembly-qualification",
             "capability:cdu-reliability-validation",
+            "concept:coolant-formulation-branch",
+            "metric:propylene-glycol-concentration-freeze-envelope",
+            "process:fluid-specific-cdu-rerating",
         ):
             self.assertIn(f"{node_id},", concepts)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(

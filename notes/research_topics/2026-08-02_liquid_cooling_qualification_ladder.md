@@ -81,6 +81,13 @@ to: triaged
 reason: added_three_performance_scorecards_and_typed_telemetry_context_no_thesis_change
 evidence: sources:S9,S10
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_fluid_specific_capacity_and_qualification_branch_without_thesis_clock_refresh
+evidence: sources:S9,S11,S12,S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -111,6 +118,13 @@ evidence: sources:S9,S10
 - **壓差**：冷卻液流過管路與元件前後的壓力差。壓差過大可能提高泵浦負擔，因此容量相同的設備仍可能有不同整合條件。
 - **備援**：主要泵浦、電源或控制元件失效時，由另一組元件接手。額定容量沒有說明設備在故障情境下還能維持多少能力。
 - **材料相容性**：冷卻液、金屬、密封件與管路長期接觸時是否會腐蝕、膨潤或產生污染。它是部署條件之一，不會由 kW 數字直接回答。
+- **水基冷卻液（Water-based heat transfer fluid）**：以經處理的水為主要傳熱介質，並依指定材料、化學處理與監測條件使用。它不是「任何自來水都可直接灌入」，也不能把同一組水質門檻套到丙二醇配方。
+- **PG25／PG55**：OCP 2022 丙二醇指引中的兩個配方範圍；PG 是 propylene glycol，數字約指丙二醇體積百分比等級。本文保留文件的合格範圍，不把 `25` 或 `55` 當成所有產品都恰好等於的單點濃度。
+- **體積百分比（vol %）**：某成分體積占混合液總體積的比例。它和重量百分比不是同一單位，不能不經密度與定義核對就互換。
+- **凝固點（Freeze point）**：流體開始結凍的溫度條件。它是配方選擇的一項邊界，不等於冷卻能力、泵浦功耗、腐蝕壽命或設備容量總分。
+- **折射計（Refractometer）**：以折射特性估算丙二醇濃度的現場工具；要使用適合該流體與濃度範圍的量測設定。讀到濃度仍不代表全部抑制劑、污染與材料相容性都合格。
+- **緩蝕劑／儲備鹼度（Corrosion inhibitor／reserve alkalinity）**：緩蝕劑用來降低接液金屬腐蝕；儲備鹼度描述流體抵抗酸化的緩衝能力之一。兩者都要依配方、材料與供應商程序判讀，不能看到單一數字就自行加藥。
+- **抑菌狀態（Biostatic）**：流體條件能抑制微生物增長，不等於無菌。OCP 丙二醇文件只在濃度維持於指定條件時給出這項判讀，不能擴寫成所有 PG 迴路永遠不需微生物監測。
 - **冷板**：貼近 GPU、CPU 或其他發熱元件，把熱傳給冷卻液的金屬元件。冷板位於伺服器端，和負責分配、換熱與控制的 CDU 不同。
 - **Chiller（冰水主機）**：在設施端製造冷水或移走熱量的設備。它和 CDU 可能一起工作，但容量、控制責任與收入來源不能混成同一項產品。
 - **HVAC**：建築或資料中心的暖通空調系統，涵蓋加熱、通風與空調。本文提到的是機房整體冷卻整合，不等於單一 CDU 的表現。
@@ -323,6 +337,54 @@ url: https://docs.nvidia.com/dsx-exchange/bms-integration
 locator: 2026-08-12 Object Types and Point Types、processArea、Metadata／Value Publication、Integration-Published Points 與 FAQ；CDU 可發布 LiquidTemperature、LiquidDifferentialPressure、LiquidFlow、LiquidPressure 等點位，primary／secondary 位置以 processArea 區分，value 帶 timestamp 與 quality，外部 setpoint／action request 由 BMS 套用 guardrails
 limitation: 動態技術頁定義資料與控制交換契約，不要求每個場域發布所有點位，也不證明感測器校正精度、熱平衡、具名 CDU 的性能曲線、site commissioning、field reliability、客戶驗收或財務貢獻
 independence_group: nvidia-dsx-docs
+-->
+
+<!-- research_source
+source_id: S11
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Guidelines for Using Propylene Glycol-Based Heat Transfer Fluids in Single-Phase Cold Plate-Based Liquid Cooled Racks
+published_at: 2022-10-03
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/guidelines-for-using-propylene-glycol-based-heat-transfer-fluids-in-single-phase-cold-plate-based-liquid-cooled-racks-final-pdf
+locator: PDF pp. 6–10 的 TCS scope、PG25／PG55 配方與腐蝕測試；pp. 13–21 的過濾、啟動、濃度／凝固點監測、調整與 records
+limitation: 這是 2022 年丙二醇基單相冷板 TCS 指引；published_at 採共同作者公開 publication listing 的日期，PDF 正文沒有獨立批准日。文件的 PG25／PG55 範圍、測試與維護條件不是水基、介電液、FWS 或所有客戶的通用門檻，也沒有比較熱傳、泵功、成本、產品 qualification 或具名場域結果
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Guidelines for Using Water-Based Transfer Fluids in Single-Phase Cold Plate-Based Liquid-Cooled Racks
+published_at: 2022-10-03
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/guidelines-for-using-water-based-transfer-fluids-in-single-phase-cold-plate-based-liquid-cooled-racks-final-pdf
+locator: PDF pp. 5–9 的 water-based TCS scope、典型水質與微生物欄位；pp. 12–20 的過濾、啟動、監測、調整與 records
+limitation: 這是 2022 年水基、非 PG 單相冷板 TCS 指引；數值需依專案風險與 treatment plan 客製，不能套用到 PG、介電液、FWS 或所有平台。文件沒有比較兩種流體的熱傳效率、泵功、成本、產品 qualification 或具名場域結果
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: living_index
+publisher: Open Compute Project
+title: Cold Plate Sub-Project — Coolant Fluids workstream and accepted contributions
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/wiki/Cooling_Environments/Cold_Plate
+locator: 2026-08-14 capture 的 Active Workstreams 與 Accepted Contributions；Coolant Fluids 分列單相 glycol-based、單相 water-based 與 two-phase，頁面另列 July 2024 water draft、November 2025 updated PG draft，以及兩份 2022 accepted contributions
+limitation: 動態工作頁只支持捕捉日的工作流與版本地圖；draft 標題不等於正式發布或已採用，本文沒有讀取 Google Drive 草案內容，也不把工作流存在改寫成產品通過、跨流體等效、場域採用或財務證據
+independence_group: open-compute-project
 -->
 
 <!-- research_claim
@@ -557,6 +619,91 @@ as_of: 2026-08-12
 basis: S9 把同一 X kW 拆成熱與兩側水力條件，S10 則顯示即時值仍需設備／位置、工程單位、timestamp 與 quality 才能被正確解讀，且控制請求另受 guardrails 裁決；兩份文件共同形成性能與量測的雙層證據契約
 boundary: 這是研究中心的證據檢查框架，不宣稱 OCP 與 NVIDIA 已發布單一共同認證、所有場域採同一點位／頻率／門檻，亦不建立供應商排名、客戶、訂單、收入、毛利或市場是否反映的結論
 verification_needed: 需平台或客戶對具名型號公開版本化三張性能曲線、感測器位置／校正與品質規則、穩態測試原始資料、pass／fail、site commissioning 及驗收結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: OCP 的丙二醇 TCS 指引把 PG25 定義為 24.5–29.5 vol%、凝固點 9–15°F（−13 至 −9°C），PG55 定義為 53.0–57.5 vol%、凝固點 −37 至 −51°F（−38 至 −46°C）；配方還要有針對迴路金屬的緩蝕劑，並以濃度、凝固點、pH、儲備鹼度及溶解金屬等欄位持續核對
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2022-10-03
+basis: S11 PDF pp. 7–9 與 pp. 17–20 直接列出 PG25／PG55 體積濃度、凝固點、緩蝕劑、現場濃度檢查及年度分析欄位
+boundary: 這些是 OCP 2022 PG 指引的配方與維護範圍，不是所有商品配方的保證值，也不提供熱傳效率、黏度、泵功、CDU 容量、跨廠產品優劣、客戶部署或財務結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: OCP 的水基與丙二醇基指引都要求流體、接液材料、接頭、操作條件、啟動與長期紀錄彼此相容，但兩份文件使用不同的流體身分與品質欄位：水基路徑追蹤 TSS／TDS、導電度、硬度與微生物等，PG 路徑另追蹤丙二醇濃度、凝固點、儲備鹼度與配方相關分析
+supporting_source_ids: S11,S12
+contrary_source_ids:
+as_of: 2022-10-03
+basis: S11 與 S12 的 General Overview、Typical Properties、Startup、Monitoring and Maintenance、Submittals 分別列出共同生命週期責任與 fluid-specific 欄位
+boundary: 只證實兩份 OCP 方法的欄位分流；相同欄名也不代表門檻、測法或化學機制相同，更不能由此判定哪種流體熱效率、成本、可靠度或商業價值較高
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: 2026-08-14 的 OCP Cold Plate 工作頁仍把單相 glycol-based、單相 water-based 與 two-phase coolant 分成不同流體工作範圍，並同時列出 2022 accepted contributions 與後續 water／PG drafts
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 Active Workstreams 直接列出三類 coolant scope 與 July 2024 water、November 2025 updated PG draft，Accepted Contributions 另列兩份既有單相指引
+boundary: 動態頁面的 draft 名稱與工作流只代表方法仍在演進，不證明草案已發布、任一產品已採用、不同流體可互換，或市場已形成共同 qualification 與財務結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: 同一個 CDU kW 主張若跨水基、PG25 或 PG55 比較，證據包必須固定實際流體與配方版本，並在該流體條件下重新核對熱性能、TCS 壓頭與 FWS 阻抗；水基水質表或 PG 凝固點／濃度表都不能單獨替另一條流體分支背書
+supporting_source_ids: S9,S11,S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S9 要求容量連同 fluid、溫度、流量、壓力與三張性能圖閱讀；S11／S12 又顯示兩條流體路徑有不同配方、品質與維護契約，因此只換 kW 或 ATD 欄名不足以證明跨流體工作點等效
+boundary: 這是研究中心的跨流體可比性閘門，不宣稱水基或 PG 必然較優，也未計算熱物性、泵功、能耗、成本、壽命或供應商排名；文件閾值是規格條件，不是抽樣績效，沒有 sampling SE／t
+verification_needed: 需具名 CDU 對同一硬體版本、相同邊界條件與各流體配方公開校正後原始資料、三張性能曲線、重複測試、量測不確定度與 pass／fail
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: unverified
+status: active
+claim: NVIDIA Marketplace 的具名 CDU 型號已有可重現、版本化且涵蓋 water-based、PG25 與 PG55 的同條件三張性能曲線、流體分析、材料變更與 site acceptance 證據
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S1／S8 只提供動態容量、validation type、wetted materials 與供應狀態欄；S9／S11／S12 是通用方法，S13 是工作流索引，不能替具名產品補上跨流體測試結果
+boundary: 不因公開欄位缺少就推論供應商內部沒有測試；只表示目前列出的公開來源不足以建立跨流體等效、qualification、場域驗收或公司財務事實
+verification_needed: 平台、供應商與客戶需對同型號／同版本公開各流體配方、操作包絡、原始性能曲線、材料清單、變更控制、commissioning 與 acceptance 結果
 correction_kind:
 corrects_claim_id:
 corrected_by_claim_id:
@@ -833,6 +980,45 @@ NVIDIA 明示外部設定值與隔離請求要先經 BMS 的最小／最大值�
 曲線，S10 也沒有證明每個場域都發布全部點位；兩份資料只能共同說明，容量與即時資料要怎麼
 被問對問題，不能替任何供應商補上產品通過、客戶部署、訂單或收入。
 
+## 同樣寫 kW，水基、PG25 與 PG55 仍是三條證據分支
+
+**先辨識名牌數字使用哪一種流體。** 冷卻液不是規格表最後一行的耗材備註，而是熱性能、
+水力條件、材料與維護共同使用的測試版本。OCP 2022 年把 treated water 與 propylene glycol
+分成兩份指引；丙二醇文件又分 PG25 與 PG55。三者都可用在單相冷板 TCS 的研究問題，卻不是
+三個可直接互換的名稱。若兩台設備都寫 `600kW @ 4°C ATD`，但沒有說明實際流體與配方，讀者
+還不能確定兩個工作點是否使用同一把尺。
+
+**再把共同責任與流體專屬欄位分開。** 兩份 OCP 指引都要求流體、接液材料、接頭、溫度、
+壓力、過濾、啟動樣本與後續紀錄彼此相容；這是共同骨架。專屬欄位則不能混用：水基路徑要
+管理 TSS、TDS、導電度、硬度與微生物等水處理狀態，PG 路徑要另固定丙二醇濃度、凝固點、
+儲備鹼度與配方相關分析。共同骨架回答「每條迴路都要管理什麼責任」，專屬欄位回答「這條
+流體實際要量什麼」。
+
+| 查核位置 | 水基路徑要保留什麼 | PG25／PG55 路徑要保留什麼 | 最容易出現的錯讀 |
+|---|---|---|---|
+| 流體身分 | 水源、處理方案、初始水質與添加物 | 商品／配方版本、丙二醇體積濃度、抑制劑與稀釋水 | 只寫「water」或「glycol」，沒有版本與濃度 |
+| 防凍邊界 | S12 沒有提供 PG 濃度－凝固點表，不能借用 | PG25 為 24.5–29.5 vol%、凝固點 9–15°F（−13 至 −9°C）；PG55 為 53.0–57.5 vol%、−37 至 −51°F（−38 至 −46°C） | 把 `25`／`55` 當成設備容量或所有商品的固定單點 |
+| 微生物控制 | 以填充／運轉微生物量、處理方案與趨勢管理 | S11 只在 glycol 濃度維持高於 25 vol% 時稱流體具抑菌性 | 把「biostatic」誤寫成無菌，或推成永遠不需監測 |
+| 腐蝕與材料 | 水化學、金屬離子、完整接液材料與變更重審 | 針對迴路金屬的緩蝕配方、修訂後 ASTM D8040 腐蝕試驗、溶解金屬與材料變更重審 | 看到一種金屬合格，就外推所有密封、接頭與塗層 |
+| 啟動與換液 | 清潔、沖洗、合格填充、代表樣本與 treatment plan | 新迴路先以選定 PG 流體循環帶出殘留後排放，再正式填充、留樣；既有迴路換液另核對相容性 | 把一次壓測／漏測當成流體 commissioning 完成 |
+| 容量與水力 | 用實際水基配方重建熱性能與兩側 PQ 工作點 | 用實際 PG 配方與濃度重建同一組曲線 | 把另一種流體的 kW、流量或壓差直接貼到本配方 |
+
+表中的 PG 濃度與凝固點是 S11 的**規格範圍**，不是供應商績效樣本；因此沒有抽樣 `n`、
+sampling SE 或 t 值，也不能據此排列熱效率、泵功、成本與壽命。S11 沒有提供黏度、比熱或
+跨流體容量比較，S12 也沒有宣稱 treated water 必然優於 PG。研究中心只量到「兩套文件的
+證據欄位不同」，沒有量到「哪一種流體在所有場域更好」。
+
+**最後才問 kW 能不能搬過去。** S9 的三張性能圖提供一個簡單閘門：先在熱性能圖固定流體、
+兩側流量、進水溫度與 ATD，再用 TCS 壓頭圖確認二次側推得動，用 FWS 阻抗圖確認設施端供得上。
+只要流體或配方版本改變，就要以該版本重新核對這三張圖；不能拿水基的化學合格表替 PG 熱性能
+背書，也不能拿 PG 凝固點合格替水基場域的材料、污染與泵送條件背書。
+
+給初學者的最短讀法是依序問四句：**流體是什麼版本？容量曲線是否真的使用這個版本？所有
+接液材料與啟動程序是否對應同一版本？換件、補液與長期監測後，這個版本是否仍成立？** 四句
+都能由具名資料回答，容量才從名牌值前進到可重現的工作點；再往後仍要另看場域驗收、部署分母
+與公司收入。OCP 現行工作頁還列著 2024 water draft 與 2025 updated PG draft，表示版本地圖
+仍在演進；草案名稱只能成為監測入口，不能回頭改寫 2022 accepted documents 或替產品補證。
+
 ## 為什麼值得持續追蹤
 
 市場現在不只問「有沒有液冷產品」，還問產品走到哪一關。NVIDIA 清單讓不同供應商的容量與
@@ -877,6 +1063,9 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
 - [S8：NVIDIA Marketplace DSX Infrastructure 動態清單](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)（2026-08-09 capture；LGE 已有可定位 600kW 列項，供應狀態欄空白）。
 - [S9：OCP《Liquid to Liquid CDU Test Methodology and Performance Rating》Revision 1.0](https://www.opencompute.org/documents/ocp-wp-l-lcdu-test-methodology-performance-rating-r1-pdf)（元件／整機 qualification、性能條件與可靠度測試的建議方法；不是產品認證名單）。
 - [S10：NVIDIA DSX Exchange BMS Integration Companion Guide](https://docs.nvidia.com/dsx-exchange/bms-integration)（2026-08-12 capture；CDU 點位、位置／單位／時間／品質上下文與 BMS guardrails 的資料契約；不是產品性能或場域驗收結果）。
+- [S11：OCP《Guidelines for Using Propylene Glycol-Based Heat Transfer Fluids》](https://www.opencompute.org/documents/guidelines-for-using-propylene-glycol-based-heat-transfer-fluids-in-single-phase-cold-plate-based-liquid-cooled-racks-final-pdf)（2022-10-03；PG25／PG55 配方、腐蝕、啟動與維護指引；不是跨流體性能排名）。
+- [S12：OCP《Guidelines for Using Water-Based Transfer Fluids》](https://www.opencompute.org/documents/guidelines-for-using-water-based-transfer-fluids-in-single-phase-cold-plate-based-liquid-cooled-racks-final-pdf)（2022-10-03；水基 TCS 的水質、啟動與維護指引；門檻不能套到 PG）。
+- [S13：OCP Cold Plate Sub-Project 工作頁](https://www.opencompute.org/wiki/Cooling_Environments/Cold_Plate)（2026-08-14 capture；現行 coolant workstream、draft 與 accepted contribution 版本地圖；不是草案已發布證明）。
 
 **可證實：** 同日同欄的容量、平台原始供應標籤、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位與可靠度測試類別。
 
@@ -905,6 +1094,20 @@ Daikin／NTT DATA 的概念驗證，則提醒讀者：產業價值不只在一�
   `review_due: 2026-08-14` 與 C9，不用周邊方法或資料契約假刷新證據時鐘。
 - 後續若平台公開同型號、同版本、同測試條件的原始資料與結果，才可把 C10 的通用方法推進
   到特定產品；在那之前，C11／C14 只是避免把 kW 或即時資料當總分的分層框架。
+
+## 8 月 14 日方法補強：先固定流體分支，再談容量可比
+
+- 本輪以 2022 年同日發布的 S11／S12 拆開丙二醇基與水基 TCS；兩份文件有共同的材料、啟動、
+  監測與變更責任，卻使用不同流體身分、化學與維護欄位。PG25／PG55 的濃度與凝固點是規格
+  範圍，不是抽樣績效，也沒有跨流體熱效率、泵功、成本或壽命比較可供外推。
+- S9 已要求容量帶著冷卻液與三張熱／水力曲線；S11／S12 進一步證明「冷卻液」不能只留一個
+  泛稱。C18 因此新增流體版本閘門，但仍是方法推論；S1／S8 沒有具名產品的跨流體曲線與場域
+  驗收，C19 保持待驗證。
+- S13 是 2026-08-14 的現行工作頁，支持的是 workstream 與 draft／accepted 版本地圖；本文未
+  讀取 Google Drive 草案內容，也不把 draft 名稱改寫成正式規格或產品採用。
+- S11／S12 發布於 C9 主命題之前，S13 雖是本日 living capture，卻只支持新 C17 並作 T7 的
+  版本監測入口；三者都沒有追加到 C9。故 `last_reviewed_at: 2026-08-09`、`review_due: 2026-08-14`、
+  `base_confidence: medium` 與公司／平台結論都不刷新。
 
 ## 影響路由
 
@@ -1018,6 +1221,20 @@ trigger: 平台或客戶對同一型號公開版本化三張性能曲線、感�
 invalidation: 新版共同方法證明單一 kW 與既有 Marketplace 欄位已完整固定三張性能圖、量測品質及所有場域驗收條件；屆時縮窄 C14，不把資料契約存在當成公司財務證據
 -->
 
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C15,C16,C17,C18,C19
+metric: 具名 CDU 與 OCP 方法是否把 water-based、PG25、PG55 的配方版本、三張性能曲線、材料變更與場域驗收接成可重現的跨流體證據
+source_ids: S9,S11,S12
+watch_source_ids: S13,S8
+frequency: monthly
+frequency_detail: 每月核對 OCP Coolant Fluids workstream、accepted／draft 版本地圖與 Marketplace 附件；正式新版或具名跨流體結果出現時提前
+next_check: 2026-08-31
+trigger: OCP 正式發布新版 water／PG 文件，或平台、供應商與客戶對同一 CDU 版本公開各流體配方、熱性能、TCS 壓頭、FWS 阻抗、量測不確定度、材料變更、commissioning 與 pass／fail
+invalidation: 具名重複測試證明流體或配方版本在本文列出的完整熱、水力、材料與場域條件下不影響工作點，或正式新版方法合併分支並提供等效規則；屆時依新證據修正 C18，不以 draft 標題或單一 kW 欄代替結果
+-->
+
 ## 接下來看到什麼，判定才會改變
 
 - **平台欄位改變**：若 NVIDIA 改寫 AVC、LITEON 或 LGE 的原始供應狀態，就追加新快照、來源與觀測；不得修改 `M1` 的 2026 年 8 月 2 日歷史紀錄。
@@ -1027,3 +1244,4 @@ invalidation: 新版共同方法證明單一 kW 與既有 Marketplace 欄位已�
 - **容量欄位定義改變**：若 NVIDIA 改變 `Cooling Capacity @ 4°C ATD` 定義，或顯示不同型號不能共用同一欄位，`M1` 的可比結論只保留在 2026 年 8 月 2 日快照，不外推到新版清單。
 - **公開可重現的資格驗證包**：只有平台或客戶把具名型號、版本、冷卻液、溫度、流量、壓力、測試矩陣、原始資料與 pass／fail 接起來，才把「列出測試名稱」升為可對照的產品結果；OCP 通用方法本身不能代替這份證據。
 - **三張曲線與量測品質接到同一型號**：只有熱性能、TCS 壓頭與 FWS 阻抗曲線能對回同一設備版本，且現場資料另揭露感測位置、單位、時間、quality、校正／不確定度與穩態條件，才可判斷名牌工作點是否可在具名場域重現；資料流存在本身仍不是驗收或收入。
+- **流體分支能否對回同一設備版本**：平台若只寫 `water`、`glycol` 或 wetted materials，仍不足以證明跨流體等效；要看到實際配方、濃度、三張性能曲線、材料與換液／變更紀錄、commissioning 及客戶 pass／fail，才可把 water-based、PG25 或 PG55 的結果放進同一比較。
