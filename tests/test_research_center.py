@@ -5418,11 +5418,15 @@ class ResearchCenterTest(unittest.TestCase):
             "**量測系統契約**先證明數字",
             "**Control plan 契約**再決定在哪一站",
             "不能把方法完整\n直接當成財務材料性",
+            "## 兩個「超過」仍拼不出製程控制收入",
+            "`F > 20 億美元` 與 `g > 50%`",
+            "這兩組只是\n驗證不可識別性的假設情境",
+            "整體 AP 不等於 process-control 分子",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 24),
-            ("research_claim", 26), ("metric_comparison", 5),
+            ("research_topic", 1), ("research_source", 25),
+            ("research_claim", 27), ("metric_comparison", 5),
             ("impact", 4), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

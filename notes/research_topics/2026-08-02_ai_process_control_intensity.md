@@ -88,6 +88,13 @@ to: triaged
 reason: taiwan_equipment_category_and_product_capability_mapped_without_refreshing_thesis_clock
 evidence: sources:S20,S21,S22,S23,S24
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: applied_advanced_packaging_forecast_denominator_separated_from_process_control_numerator_without_refreshing_thesis_clock
+evidence: sources:S25
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -95,6 +102,7 @@ evidence: sources:S20,S21,S22,S23,S24
 
 - **製程控制**：在製造途中用量測、檢查與缺陷分析找出偏差，再把結果回饋到製程調整；它不同於封裝完成後才判定成品良否的成品最終測試（ATE final test）。
 - **HBM**：把多層記憶體垂直堆疊的高頻寬記憶體；堆疊越複雜，晚發現缺陷的代價越高。
+- **DRAM**：以電容儲存位元、需持續更新電荷的動態隨機存取記憶體；HBM 使用 DRAM die，但一般 DRAM、HBM 與整體記憶體設備收入不是同一個分子。
 - **2.5D／3D 封裝**：把多顆晶片並排連接或上下堆疊；技術名稱不代表已通過客戶驗證。
 - **量測／檢查**：前者確認尺寸與材料是否合規，後者尋找顆粒、刮傷或接合不良。
 - **良率學習**：把缺陷資料回饋製程、找出報廢原因；不同於成品階段的最終測試。
@@ -141,6 +149,8 @@ evidence: sources:S20,S21,S22,S23,S24
 - **成長指數**：只說未來值相對基期增減多少，例如「Q4 比 Q1 高約 70%」；若沒有基期金額，它能表示方向，不能還原絕對收入。
 - **設備類別比重**：公司自訂的一大類設備收入占總收入比例；即使名稱含「半導體」或「製程」，仍可能混合點膠、搬運、接合、檢查與量測，不能直接當成製程控制題材分子。
 - **產品—商業護照**：把具名產品與任務、客戶階段、會計狀態、同期間分子與分母綁在同一筆證據；少一欄就停在較早的成熟度，不用相鄰名詞補空格。
+- **Master Class**：Applied 對投資人與產業讀者發布的主題式技術／商業說明會；prepared remarks 是發行人一手資料，但其中的市場、排名、採用與預測仍是公司陳述。
+- **VeritySEM 7AP／SEMVision G7AP**：Applied 分別定位為先進封裝 eBeam 尺寸量測與缺陷複判／分類工具；型號已被公司稱為 production，不代表公開資料已拆出各自收入或客戶端成效。
 
 ### 三句話抓重點
 
@@ -368,6 +378,43 @@ Onto 的較寬事業組合新高也不能與 Nova 的「record」互相比大小
 數值是精確值、近似值、下限還是預測。只有四道都一致，比例才可比較。本文的 `M1` 只把
 Camtek 與 Nova 同一曆季、同幣別的公司總營收列為「可直接比較」；它的用途是證明分母可以
 對齊，並反過來提醒讀者：沒有同定義的 AP 分子，兩家公司仍不能比較題材強度。
+
+## 兩個「超過」仍拼不出製程控制收入：讀懂 Applied 的 20 億美元
+
+Applied Materials 2026 年 6 月的 DRAM／Advanced Packaging Master Class 提供了一個比
+「收入創高」更窄、卻仍不是本文題材分子的數字。公司表示，2020～2024 年的 advanced
+packaging business 實際成長超過三倍，並預期 2026 年 advanced-packaging revenue 年增超過
+50%、超過 20 億美元。同份 prepared remarks 又表示 VeritySEM 7AP 與 SEMVision G7AP 已在
+多家 leading memory／logic advanced-packaging customers 的 production 中使用。前者是整體
+AP 的公司預測，後者是具名製程控制工具的供應商端採用陳述；來源沒有把兩者接成同一個
+收入分子。
+
+### 先看兩個大於號，而不是自行補一個點估計
+
+把 2025 年 AP 收入寫成 `B`、2026 年預測寫成 `F`、年增率寫成 `g`，關係是
+`F = B × (1 + g)`。來源只給 `F > 20 億美元` 與 `g > 50%`；`F`、`g` 都不是精確值，
+所以 `B = F ÷ (1 + g)` 沒有唯一答案。舉例來說，`F=21 億、g=60%` 會得到
+`B=13.125 億`，`F=25 億、g=55%` 則會得到約 `16.129 億`，兩組都符合原句。這兩組只是
+驗證不可識別性的假設情境，不是 Applied 的 2025／2026 估計，也沒有任何一組比較接近
+公司實際預測。
+
+因此不能把「超過 20 億」除以 1.5，寫成 2025 年 AP 收入「至少」或「約」13.33 億美元；
+那等於同時把兩個下限偷換成等號。更不能再把該結果乘上任意檢查／量測占比，因為公司沒有
+提供這個占比。
+
+### 再沿著分子樹往下走
+
+| 分子層級 | S25 實際提供 | 可以說 | 還不能說 |
+|---|---|---|---|
+| Applied 整體 advanced packaging | 2026 年收入預期年增逾 50%、超過 20 億美元 | 管理層給出較寬 AP 事業的方向與雙下限預測 | 精確 2025 基期、精確 2026 終值或已實現收入 |
+| AP 製程控制 | 文件列出 eBeam 量測、缺陷複判，並稱另有 optical／x-ray 系統開發中 | 製程控制是 AP 產品組合的一部分 | 它占 AP 收入多少、成長多少或毛利多少 |
+| VeritySEM 7AP／SEMVision G7AP | 供應商稱已在多家 leading memory／logic AP 客戶 production | 具名工具已前進到供應商端量產陳述 | 客戶名稱、部署台數、驗收收入、重複採購與客戶端良率 |
+
+這個案例把「財務成熟度」與「產品成熟度」分開：整體 AP 已有發行人數值預測，具名工具也
+有 production 陳述，但交集仍未量化。本文所需的分子是 advanced-packaging process-control
+actual revenue 或 order intake，不是 Applied 全部沉積、蝕刻、電鍍、CMP、接合與控制工具
+的 AP forecast。`N=1` 是一份指定發行人 prepared remarks 的文件級核對，不是設備商或客戶
+樣本；兩組算例是確定性代數情境，沒有 sampling SE／t，也不衡量預測準確度。
 
 ## 台灣映射的三個同名陷阱：先進封裝、設備與製程控制不是同一個分子
 
@@ -791,6 +838,22 @@ url: https://www.allring-tech.com.tw/product-detail20.htm
 locator: 2026-08-14 現行產品頁；高精度主動耦光、精密點膠與固化補償、即時光學驗證與製程閉環控制、整合式光耦合流程小節
 limitation: 這是發行人現行產品行銷頁，能證明公開描述的功能與整合流程，不能證明具名客戶採用、qualification、量產稼動、良率改善、售價、收入、毛利或頁面功能均已由客戶獨立驗證
 independence_group: all-ring-tech
+-->
+
+<!-- research_source
+source_id: S25
+role: company_release
+source_kind: document
+publisher: Applied Materials
+title: DRAM and Advanced Packaging Master Class — Prepared Remarks
+published_at: 2026-06-25
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://investors.appliedmaterials.com/static-files/e8307fb9-c40b-4fee-abf9-3209c76ab08d
+locator: PDF pp.5、38–42；pp.38–40 列 eBeam process-control 任務、VeritySEM 7AP／SEMVision G7AP 與多家 memory／logic AP 客戶 production 陳述，pp.41–42 列 2020～2024 AP business 成長與 2026 年收入預測
+limitation: 這是發行人 prepared remarks；超過 20 億美元與逾 50% 都是 2026 整體 advanced-packaging revenue 的下限式預測，不是已實現結果，也沒有拆 advanced-packaging process-control、具名工具、客戶、台數、訂單、收入、毛利或客戶端良率；production 是供應商陳述
+independence_group: applied-materials
 -->
 
 <!-- research_claim
@@ -1235,12 +1298,30 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: Applied 2026 DRAM／Advanced Packaging Master Class prepared remarks 表示 2020～2024 年 AP business 成長超過三倍，並預期 2026 年 AP revenue 年增超過 50% 至超過 20 億美元；同份文件稱 VeritySEM 7AP 與 SEMVision G7AP 已在多家 leading memory／logic AP 客戶 production，但未拆出 AP process-control 收入
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-06-25
+basis: S25 pp.38–42 分別直接提供具名 eBeam 工具的 production 陳述與整體 AP 事業的歷史方向及 2026 雙下限預測；完整 prepared remarks 沒有把整體 AP 數值分解到 process-control 或兩項工具
+boundary: 超過 20 億美元與逾 50% 都是 forecast lower bounds，不能反推精確 2025 基期；整體 AP 範圍大於製程控制，production 也沒有客戶名稱、工具數、actual revenue、order intake、毛利或客戶端良率，文件級未拆分不代表公司沒有內部數據
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
 先提供 2.5D logic／HBM 客戶資格節點，再新增較寬事業組合的收入訊號；Camtek 把具名 Hawk
 訂單、交付年度、公司總營收與近似 AP 收入組合分開，Nova 則補上另一條具名量測產品線的
-銷售訊號。SEMI 議程把控制問題落到 TSV、填孔、沉積、翹曲、RDL、切割與相鄰的 CPO
+銷售訊號。Applied 又為整體 AP 提供 2026 年超過 20 億美元、年增逾 50% 的雙下限預測，
+卻沒有拆出 process-control 分子。SEMI 議程把控制問題落到 TSV、填孔、沉積、翹曲、RDL、切割與相鄰的 CPO
 整合。弘塑、均華與萬潤則把台灣映射落到廣義設備收入、產品清單與研發計畫三個不同層級，
 並顯示其中任何一層都不能單獨替代製程控制題材分子。這些資料讓工程與供應商商業成熟度比
 單一廠商說法更完整。NIST、Applied 與 KLA 的方法／產品文件又把 control plan
@@ -1265,6 +1346,7 @@ KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量�
 | 較寬收入組合 | Camtek 簡報把約 55% HPC／AI 與 20% non-AI AP 合計標為約 75% 公司收入 | 期間未標，不能乘上單季公司營收或拆成 HBM-only 金額 |
 | 較寬收入訊號 | Onto 稱 Specialty Devices and Advanced Packaging 收入創高，支撐含 2.5D／HBM | 類別金額、題材分子、特定工具收入或全產業支出 |
 | 具名產品線銷售訊號 | Nova 稱 Sentronics advanced-packaging dimensional-metrology solutions 是創高產品線之一 | 產品線金額／占比、HBM 分解、工具數或跨公司 record 排名 |
+| 較寬 AP 財務預測 | Applied 預期 2026 年整體 AP revenue 年增逾 50%、超過 20 億美元，並另稱兩項 AP eBeam 工具已在多家客戶 production | 兩個下限不是精確基期／終值；整體 AP 不等於 process-control 分子，採用陳述也未接到產品收入 |
 | 台灣廣義設備收入＋產品能力 | 弘塑、均華、萬潤各自揭露廣義設備比重，並列相鄰的檢查／量測產品、代理能力或研發計畫 | 同定義製程控制分子、具名客戶階段、實際訂單／驗收收入或跨公司排名 |
 
 ## 跨公司數字與可比性
@@ -1399,6 +1481,7 @@ comparability_reason: 萬潤的半導體設備範圍大於檢查／量測，且�
 - [S22：均華 2025 年報](https://www.gmmcorp.com.tw/upload-files/investor-zone/shareholder-area/2026/20260519-annual-report-cn.pdf)（廣義設備／模具收入、既有產品與研發計畫須分開）。
 - [S23：萬潤 2025 年報](https://doc.twse.com.tw/server-java/t57sb01?co_id=6187&colorchg=1&filename=2025_6187_20260626F04.pdf&kind=F&step=9)（廣義半導體設備占比與產品清單，不含工具分子）。
 - [S24：萬潤 CPO 光耦合產品頁](https://www.allring-tech.com.tw/product-detail20.htm)（發行人功能描述，不是客戶採用或財務證明）。
+- [S25：Applied DRAM／Advanced Packaging Master Class prepared remarks](https://investors.appliedmaterials.com/static-files/e8307fb9-c40b-4fee-abf9-3209c76ab08d)（整體 AP 雙下限預測與具名工具 production 陳述仍未形成 process-control 收入分子）。
 - 後續入口：[KLA](https://ir.kla.com/financial-information/financial-results)、[Applied](https://ir.appliedmaterials.com/news-releases/)、[Onto](https://investors.ontoinnovation.com/news/default.aspx)、[MOPS](https://mops.twse.com.tw/mops/web/index)。
 - 中立方法入口：[NIST CHIPS Metrology Program](https://www.nist.gov/chips/research-development-programs/metrology-program)。
 
@@ -1417,6 +1500,7 @@ comparability_reason: 萬潤的半導體設備範圍大於檢查／量測，且�
 - **公司分母不等於題材分子**：Nova 公司總營收可以和 Camtek 的公司總營收對齊，卻不能在 Nova 未拆 AP 金額時用來比較 AP 強度。
 - **廣義設備比重不等於製程控制曝險**：弘塑、均華、萬潤的發行人類別定義不同，且都大於檢查／量測任務；69.86%、93.90%、96.13% 不能拿來排名。
 - **產品頁與研發計畫不等於客戶採用**：具名 AOI、量測或閉環功能能建立搜尋入口，仍需 qualification、訂單、驗收與收入逐關接續。
+- **整體 AP 預測不等於製程控制分子**：Applied 的逾 50%／超過 20 億美元是整體 AP forecast；兩個下限不能反推精確基期，也不能歸給 VeritySEM／SEMVision。
 - **替代解法**：設計規則、抽樣或既有光學工具升級，可能降低新增工具需求。
 - **價值沒有外溢**：支出即使增加，也可能集中於海外平台；台灣族群不必然受惠。
 
