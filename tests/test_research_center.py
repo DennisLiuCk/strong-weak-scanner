@@ -6682,6 +6682,7 @@ class ResearchCenterTest(unittest.TestCase):
         headings = (
             "## 先把區域化拆成九個交接關卡",
             "## 四種錢不能放進同一個加總",
+            "## 15 億美元預付款不是免息營收：用六本帳拆開資金、義務與產能",
             "## 為什麼會看見 17 億、約 20 億與 70 億美元",
             "## 產能數字至少有五個分母",
             "## 事件、會計與產能時鐘",
@@ -6696,6 +6697,11 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C5",
             "claim_id: C6",
             "claim_id: C7",
+            "claim_id: C8",
+            "claim_id: C9",
+            "claim_id: C10",
+            "claim_id: C11",
+            "source_id: S10",
             "corrected_by_claim_id: C6",
             "corrects_claim_id: C2",
             "monitor_id: T3",
@@ -6705,11 +6711,25 @@ class ResearchCenterTest(unittest.TestCase):
             "最高 4.07 億美元直接補助",
             "每月 14,500 片晶圓與 370 萬顆 units",
             "project／phase／facility",
+            "合約負債 3.930 億美元",
+            "採購義務 14.652 億美元",
+            "7 月已收到 1 億美元",
+            "公司另行簽訂一份預計 2027 年收到約 15 億美元",
+            "文件沒有說後一份也需要信用狀",
+            "| 1. 協議權利帳 |",
+            "| 6. 履約與經濟帳 |",
+            "### 多方小作文：可以寫到哪裡",
+            "### 空方小作文：可以寫到哪裡",
+            "### 分母、誤差與限制",
+            "`N=1` 家發行人的一份 2026Q2 10-Q",
+            "Python `Decimal` 與 `awk` 兩條獨立路徑",
+            "SHA-256 0fa5f4241d383af7a7ea1ab24b742797c598c7967b133e21e09d9c3d92166848",
+            "不能只看到面額就假定等額現金已被凍結",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 9),
-            ("research_claim", 7), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 10),
+            ("research_claim", 11), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

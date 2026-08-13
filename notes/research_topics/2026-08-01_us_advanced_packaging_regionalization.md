@@ -69,6 +69,13 @@ to: triaged
 reason: reconciled_chips_award_project_scope_with_expanded_campus_and_nine_gate_conversion
 evidence: sources:S4,S8,S9
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: customer_prepayment_contract_liability_and_capacity_cash_ledgers_added_without_project_progress_upgrade
+evidence: sources:S2,S10
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -79,6 +86,10 @@ evidence: sources:S4,S8,S9
 - **CHIPS 直接補助**：美國政府依 CHIPS 獎勵契約提供的專案資金；核定上限不等於一次全額入帳，仍要依契約里程碑撥付。
 - **NIST（美國國家標準與技術研究院）**：美國商務部體系內執行 CHIPS 獎勵計畫的機構；本文引用的是其官方專案頁與 final-award 公告，不是 Amkor 自行編製的財報。
 - **里程碑撥付**：建設、技術、生產或商業條件達成後，才可分段取得資金；「可獲最高金額」和「已收到現金」是兩個欄位。
+- **合約負債（contract liability）**：客戶已付款或款項已到期、公司仍欠未來商品或服務時的負債；它不是收到現金當下就完成的收入，也不能不查條款就當成借款或免費資金。
+- **備用信用狀（standby letter of credit）**：Amkor 為部分客戶預付款開立的信用支持工具；公開申報只揭露面額與關聯，不能只看到面額就假定等額現金已被凍結。
+- **採購義務（purchase obligations）**：公司已承諾的資本支出、長期供應合約或其他契約支出；它和當期已付 CapEx、單一廠房預算及客戶預付款分屬不同帳。
+- **FASB Topic 606（客戶合約收入準則）**：美國財務會計準則委員會對客戶合約收入的通用規範；本文只用它分清付款、履約與資產負債表呈現，不用它猜 Amkor 個別合約條款。
 - **資本支出（CapEx）**：公司為廠房、設備與其他長期資產投入的支出；全公司年度指引不等於單一 Arizona 專案預算。
 - **名目產能／利用率**：名目產能是設計可處理的上限，利用率是實際使用比例；兩者還要再乘上良率，才接近可交付合格產出。
 - **採購框架**：雙方約定未來合作方式與期間的合約骨架，不一定包含保底數量、固定價格或最低利用率。
@@ -99,6 +110,7 @@ evidence: sources:S4,S8,S9
 ### 接下來怎麼追
 
 - 追 2027 年預付款是否如期收到，以及在資產負債表、資本支出與後續收入認列中的處理方式。
+- 每次更新都用 `agreement／cash receipt／credit support／balance sheet／capacity spending／performance` 六欄護照，不把金額相近的項目互相抵銷。
 - 追 CHIPS 資金實際撥付與對應里程碑，不把最高 4.07 億美元核定額視為已收款。
 - 追 Arizona 各期設施的建築完工、工具進場、製程資格、客戶產品認證、合格產出、良率與利用率，並固定每個數字所屬的 project／phase／facility 版本。
 - 追日月光與台灣設備、材料公司是否揭露具名產品、區域訂單、稼動率與毛利，而不是只談政策方向。
@@ -106,6 +118,7 @@ evidence: sources:S4,S8,S9
 ### 想一想
 
 - 客戶先付 15 億美元，為什麼不能立刻把同額金額當成 Amkor 的服務收入與獲利？
+- 14.652 億美元採購義務和另一份約 15 億美元預付款協議只差 3,480 萬美元，為什麼仍不能當成同一專案的自動資金調節表？
 - NIST 頁面的 17 億美元預期資本支出，和 Amkor 後來公布的 70 億美元兩期園區，為什麼不能相加成 87 億美元？
 - 每月 14,500 片晶圓與 370 萬顆 units 為什麼不是可以直接相除、比較或換算成營收的同一種產能？
 - 美國新產能如果只是補充亞洲產能，而 AI 總需求同步成長，台灣供應鏈一定會失去訂單嗎？
@@ -247,6 +260,22 @@ locator: final award、最高 4.07 億美元直接補助、約 20 億美元 gree
 limitation: 這是 2024 年 final-award 公告的約數與當時專案範圍，只用來辨識 award 版本及撥付條件；不是 2026 年新政策、已收現金、最新兩期園區總投資或實際產能證據
 -->
 
+<!-- research_source
+source_id: S10
+role: other_primary
+source_kind: document
+publisher: Financial Accounting Standards Board
+independence_group: fasb-topic-606
+title: Accounting Standards Update 2014-09 Section A — Revenue from Contracts with Customers (Topic 606)
+published_at: 2014-05-28
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://storage.fasb.org/ASU%202014-09_Section%20A.pdf
+locator: PDF p.48（印刷頁 42）paragraphs 606-10-45-1–45-4 與 PDF p.65（印刷頁 59）paragraph 606-10-55-46；付款／履約先後對 contract asset、contract liability、receivable 的呈現，以及預付款於履約時轉收入
+limitation: 這是通用美國 GAAP 呈現與收入認列規範，不證明 Amkor 未來約 15 億美元協議的交易對手、實際收款、信用狀條件、履約義務、認列期間、毛利或專案用途；原始 PDF 156 頁、SHA-256 0fa5f4241d383af7a7ea1ab24b742797c598c7967b133e21e09d9c3d92166848，僅渲染並目視核對實際引用頁及相鄰頁
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -355,6 +384,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: FASB Topic 606 將客戶在商品或服務移轉前支付或到期的對價呈列為合約負債，待履約時才解除負債並認列收入；Amkor 截至 2026-06-30 的合約負債為 3.930 億美元，其中短期部分 9,310 萬美元，其餘預計 2.846 億美元於 1–5 年、1,530 萬美元於 5–10 年認列，2026 上半年由期初合約負債認列的收入為 2,780 萬美元
+supporting_source_ids: S2,S10
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S10 固定付款、履約與資產負債表呈現的一般規則；S2 直接揭露 Amkor 當期合約負債餘額、到期帶與由期初餘額認列的收入
+boundary: 現有 3.930 億美元餘額不能被識別為尚待 2027 年收取的另一份約 15 億美元，預計認列期間也不是收入或毛利保證；FASB 通則不能替未知合約條款下結論
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: Amkor 10-Q 分開揭露兩組客戶預付款：截至 2026-06-30 預計兩年內收到約 3 億美元且收到時全數需要備用信用狀，同段另說 2026 年 7 月已收到 1 億美元並開立相關信用狀；同月公司另行簽訂一份預計 2027 年收到約 15 億美元的協議
+supporting_source_ids: S2
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S2 liquidity 段落先描述約 3 億美元／兩年與 7 月 1 億美元，再以 separately 明示另一份約 15 億美元／2027 年協議
+boundary: 申報沒有點名兩組交易對手，也沒有明說另一份約 15 億美元協議同樣需要備用信用狀；不得把 1 億美元已收款併入、抵減或當成 15 億美元已部分收取
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: Amkor 截至 2026-06-30 的表外採購義務為 14.652 億美元、其中 13.951 億美元於 12 個月內到期；2026 上半年 CapEx 為 6.884 億美元，主要聚焦先進封裝測試設備與 Arizona Facility，同期營業現金流為 3.816 億美元、投資現金流為負 10.077 億美元、融資現金流為正 9.222 億美元，公司定義的自由現金流為負 2.699 億美元
+supporting_source_ids: S2
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S2 purchase obligations、capital resources、cash flows 與 non-GAAP free cash flow 調節表直接列值；本文只將千美元報告值四捨五入到百萬美元
+boundary: 採購義務混合 CapEx、長期供應合約與其他承諾；上半年 CapEx 是全公司且只稱主要聚焦兩類用途，現金流也不是 Arizona 或 NVIDIA 專案分部。14.652 億美元與約 15 億美元相近不代表同一交易對手、專案或一一抵銷
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: inference
+status: active
+claim: 評估客戶預付款是否真正降低 Arizona 的資金風險，至少要把協議權利、現金收取、信用支持、資產負債表分類、產能支出與履約收入拆成六本帳；在共同交易對手、project／phase、期間、資產與履約義務尚未調節前，金額相近不能證明專案自籌、收入已實現或現金缺口已關閉
+supporting_source_ids: S2,S10
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S2 同時存在未來協議、已收預付款與信用狀、合約負債、採購義務、CapEx、營業／投資／融資現金流；S10 又把付款、履約、合約資產／負債與應收款分開，故需逐帳橋接而不能以 headline 金額淨額化
+boundary: 六本帳是研究中心的查核框架，不是 FASB 或 Amkor 宣布的固定表格；現有文件也不足以斷言未來約 15 億美元一定需要等額信用狀、一定完全用於 Arizona，或一定不足以支應建置
+verification_needed: 同一協議的實際收款、信用狀與擔保條件、資產負債表分類、project／phase／asset-class 支出、履約義務、收入、成本、毛利與現金調節
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 美國先進封裝區域化不再只有政策口號：Amkor 與 NVIDIA 7 月 23 日公布約 15 億美元多年期
@@ -395,6 +492,75 @@ resolution:
 另外，70 億美元是兩期園區的**計畫投資總額**，不是第五種當期現金流，也不是在上述四筆
 金額之外可以再次相加的收入。研究時至少要保留 `amount／payer／recipient／project／phase／
 period／accounting treatment` 七個欄位。
+
+## 15 億美元預付款不是免息營收：用六本帳拆開資金、義務與產能
+
+先看一個最容易造成錯覺的畫面：Amkor 預計 2027 年收到的客戶預付款約 **15 億美元**，
+截至 2026 年 6 月底的表外採購義務又是 **14.652 億美元**。兩者只差 3,480 萬美元，但這個
+相近不能拿來做減法，因為申報沒有把它們標成同一交易對手、同一 project／phase、同一期間
+或同一履約義務；採購義務本身還混合資本支出、長期供應合約與其他契約承諾。
+
+同一份 10-Q 另有兩組容易被誤併的預付款。公司先說，預計兩年內收到約 3 億美元，這組款項
+在收到時全數需要備用信用狀；7 月已收到其中 1 億美元並開立相關信用狀。下一句再用
+`separately` 描述另一份預計 2027 年收到約 15 億美元的協議。文件沒有說後一份也需要信用狀，
+所以不能把前一組的條件複製過去，也不能把已收的 1 億美元當成 15 億美元已先到帳。
+
+| 帳本 | 本篇現在能填什麼 | 下一個必須取得的欄位 | 讀錯時會出現的假結論 |
+|---|---|---|---|
+| 1. 協議權利帳 | 已簽多年期協議，另有 2027 年約 15 億美元預期收款 | 交易對手、條件、取消／退款、履約義務與付款節點 | 「簽約金額就是無條件現金」 |
+| 2. 現金收取帳 | 約 3 億美元／兩年披露的同段另列 7 月已收 1 億美元 | 每筆 value date、payer、用途限制及後續收款 | 「1 億美元就是 15 億美元首期款」 |
+| 3. 信用支持帳 | 3 億美元這組收到時需備用信用狀，7 月 1 億美元已配發相關信用狀 | 受益人、到期、費用、擔保品、觸發與可動用現金限制 | 「信用狀面額必然等於凍結現金」或「完全沒有附帶義務」 |
+| 4. 資產負債表帳 | 6 月底合約負債 3.930 億美元；短期 9,310 萬美元 | 未來 15 億美元實收後的科目、流動性與合約別 roll-forward | 「收到預付款當期就全額變收入」 |
+| 5. 產能支出帳 | 採購義務 14.652 億美元；H1 CapEx 6.884 億美元，主要聚焦先進封裝測試設備與 Arizona | project／phase／facility、資產類別、下單／交貨／驗收／付款 | 「採購承諾等於已付 Arizona CapEx」 |
+| 6. 履約與經濟帳 | H1 由期初合約負債認列收入 2,780 萬美元；尚無新設施可歸因毛利 | 服務移轉、產品資格、利用率、收入、成本、毛利、OCF 與回款 | 「合約負債下降多少，專案就賺多少」 |
+
+FASB Topic 606 提供的是方向，不是本案答案：若客戶在商品或服務移轉前付款或款項到期，
+公司呈列合約負債；等履約、把商品或服務移轉後，才解除相應負債並認列收入。Amkor 的現有
+3.930 億美元合約負債正好示範「收錢」與「認列」可以跨很多年：扣除短期部分後，公司預計
+2.846 億美元在 1–5 年、1,530 萬美元在 5–10 年認列。但這些既有餘額不能倒推成尚待 2027 年
+收取的那筆 15 億美元，也不能預告未來合約會用完全相同的分類與速度。
+
+### 現金流也要分三個方向
+
+Amkor 2026 上半年營業現金流為正 3.816 億美元，投資現金流為負 10.077 億美元，融資現金流
+為正 9.222 億美元；公司自己的調節表列 CapEx 現金支付 6.884 億美元、資產出售與補助流入
+3,699 萬美元，自由現金流為負 2.699 億美元。這不是 Arizona 單一專案的現金缺口估計，卻能
+說明「有客戶預付款」和「公司不再需要營運現金、借款或其他融資」不是同一句話。公司也明列
+資本支出來源可包含營業現金、既有現金與短期投資、信用額度及新增債務或股權融資。
+
+### 多方小作文：可以寫到哪裡
+
+較強的多方版本不是「15 億美元等於免費營收」，而是：若 2027 年款項依約收到、沒有超出預期
+的信用支持或用途限制，建築與工具支出又按 project／phase 對上，客戶資格與利用率最後讓合約
+負債轉成具毛利的服務收入，預付款就可能降低建置期外部融資需求與需求不確定性。要升格，至少
+要同時看到收款、資產負債表 roll-forward、設施進度、量產放行、收入、毛利與現金轉換。
+
+### 空方小作文：可以寫到哪裡
+
+較強的空方版本也不是「有合約負債所以交易一定不好」，而是：若收款延後或附帶的退款、信用
+支持與里程碑條件高於市場想像，採購承諾與 CapEx 又先於資金到位，工程超支、資格或利用率落後
+就可能讓收入認列拉長、融資需求上升，最後壓縮專案現金與毛利。信用狀的費用、擔保與現金限制
+尚未披露，現階段不能先寫成等額凍結現金，也不能寫成零成本保障。
+
+| 共同裁決欄位 | 多方要看到 | 空方要看到 | 目前狀態 |
+|---|---|---|---|
+| 收款品質 | 2027 年準時實收、條件與用途清楚 | 延後、退款／取消條件或用途限制擴大 | 待揭露 |
+| 信用支持 | 面額、費用、擔保及期限可管理 | 信用支持或受限資金侵蝕可用現金 | 15 億美元協議條件未知 |
+| 支出配對 | 同 project／phase 的承諾、到貨、驗收與付款可調節 | 承諾與現金支出早於收款、成本超支 | 只有公司級數字 |
+| 履約轉換 | 資格、利用率、收入與毛利按計畫成熟 | 認證／利用落後，合約負債長期不轉或低毛利 | 新設施尚未量產 |
+| 現金閉環 | OCF 與客戶資金支應建置且融資依賴可控 | 投資現金流缺口與債務／股權需求擴大 | 尚無專案級橋接 |
+
+### 分母、誤差與限制
+
+本節是 `N=1` 家發行人的一份 2026Q2 10-Q，加上一條 FASB Topic 606 準則消息鏈；不是美國
+OSAT、預付款協議或先進封裝專案的統計樣本。金額均為申報值，本文只把千美元四捨五入到
+百萬美元；3,480 萬美元差額是兩個 headline 的確定性相減，不是可比性證明，也沒有 sampling
+SE／t。Python `Decimal` 與 `awk` 兩條獨立路徑都重算出合約負債三段合計 3.930 億美元、
+公司 FCF 負 2.6986 億美元及 headline 機械差額 3,480 萬美元；算術相符仍不改變分母不可比。
+FASB PDF 共 156 頁，原檔 SHA-256 為
+`0fa5f4241d383af7a7ea1ab24b742797c598c7967b133e21e09d9c3d92166848`；本輪只渲染實際引用頁
+及相鄰頁並目視核對。沒有共同 contract／project／asset／performance key，就不計算預付款覆蓋率、
+專案資金缺口、收入轉換率或台灣供應商份額。
 
 ## 為什麼會看見 17 億、約 20 億與 70 億美元
 
@@ -455,6 +621,7 @@ NIST 頁面同時列約每月 14,500 片晶圓與 370 萬顆 units，是兩個�
 - [Amkor 2026Q2 結果](https://ir.amkor.com/news-releases/news-release-details/amkor-technology-reports-financial-results-second-quarter-2026)（2026-07-27）。
 - [NIST CHIPS Amkor Arizona 現行專案頁](https://www.nist.gov/chips/amkor-technology-inc-arizona-peoria)（2026-08-12 capture；頁面無版本日期）。
 - [NIST CHIPS final-award 公告](https://www.nist.gov/news-events/news/2024/12/biden-harris-administration-announces-chips-incentives-award-amkor)（2024-12-20）。
+- [FASB Topic 606 Section A](https://storage.fasb.org/ASU%202014-09_Section%20A.pdf)（付款／履約先後、合約資產／負債與應收款呈現；通用準則，不是 Amkor 個別合約條款）。
 
 Amkor 10-Q 把客戶預付款放在 contract liabilities／standby letters of credit 的脈絡；收到
 現金與認列封裝服務收入並非同一件事。公司同時警告，新產能的時程、成本、規格與效益都
