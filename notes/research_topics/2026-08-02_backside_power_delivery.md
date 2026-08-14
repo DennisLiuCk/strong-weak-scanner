@@ -312,6 +312,54 @@ limitation: beyond-7nm circuit-level simulation 的數值只屬該模型與條�
 independence_group: ibm-research
 -->
 
+<!-- research_source
+source_id: S18
+role: standard
+source_kind: document
+publisher: National Institute of Standards and Technology
+title: SI Units – Electric Current
+published_at: 2025-07-29
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/pml/owm/si-units-electric-current
+locator: Electric Current 段落；1 V＝1 W/A 與 1 Ω＝1 V/A 的 SI derived-unit 關係，以及頁面 2025-07-29 更新日
+limitation: 這是通用 SI 量綱與單位關係，不是晶片 PDN 模型、背面供電設計規則、產品電壓／功率、量測方法、允收門檻或量產結果
+independence_group: us-nist-si
+-->
+
+<!-- research_source
+source_id: S19
+role: other_primary
+source_kind: document
+publisher: IBM Research
+title: Analysis and modeling of dc current crowding for TSV-based 3-D connections and power integrity
+published_at: 2014-01-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://research.ibm.com/publications/analysis-and-modeling-of-dc-current-crowding-for-tsv-based-3-d-connections-and-power-integrity
+locator: IEEE Transactions on Components Packaging and Manufacturing Technology paper abstract；TSV／global power-grid connection 的 current-density distribution、local current crowding、single-resistor model 與 hotspot 邊界
+limitation: 公開頁只有摘要；研究對象是 3-D IC TSV 與其線路接點，不是 A16／PowerVia 的 nano-TSV、BPR 或具名產品，也沒有本輪可用的幾何、電流密度分布、溫度、樣本或量產可靠度數字
+independence_group: ibm-research
+-->
+
+<!-- research_source
+source_id: S20
+role: other_primary
+source_kind: document
+publisher: IBM Research
+title: Fast and Accurate Machine Learning Prediction of Back-End-of-Line Thermal Resistances in Backside Power Delivery and Chiplet Architectures
+published_at: 2025-05-27
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://research.ibm.com/publications/fast-and-accurate-machine-learning-prediction-of-back-end-of-line-thermal-resistances-in-backside-power-delivery-and-chiplet-architectures
+locator: ECTC 2025 paper abstract；BSPDN chip-package heat path、BEOL stack thermal resistance、multiscale model 與 maximum-hotspot-temperature sensitivity 段落
+limitation: 公開頁只有摘要；模型誤差是作者特定 finite-element reference 與 dataset 的結果，沒有 package stack、raw prediction distribution、實體產品溫度、冷卻邊界、樣本、可靠度、良率或量產成本，本文不採其誤差百分比做跨方法 benchmark
+independence_group: ibm-research
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -587,6 +635,62 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: NIST 的 SI 關係固定 1 V＝1 W/A 與 1 Ω＝1 V/A；在明示直流、等效集中路徑與負載端功率的條件下，可由量綱一致地重算 P＝V×I、ΔV＝I×R 與路徑焦耳損耗 P_loss＝I²R
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2025-07-29
+basis: S18 直接固定 volt、watt、ampere 與 ohm 的 SI derived-unit 關係，三式是同一組單位關係的代數重排
+boundary: 只證實通用確定性換算；等效 R 不含未列出的 frequency-dependent impedance，固定 load power 不代表 CMOS 真實 P-V-f 關係，也不提供任何 A16／PowerVia rail、via、產品或 signoff 數值
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: IBM 的 3-D IC TSV 研究指出，TSV 與全晶片電源網路的接點可發生 current crowding，局部電流密度可能高於預期平均值，而把 TSV 與線段只簡化成單一電阻會漏掉這類局部 hotspot
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2014-01-01
+basis: S19 abstract 直接區分 average current density、connection-local current crowding、single-resistor approximation 與 finite-element-checked distribution model
+boundary: 這是較大尺度 3-D TSV 的機制與模型證據，不是 A16／PowerVia nano-TSV 或 BPR 的直接量測；不能外推 peak-to-average 倍數、電遷移壽命、產品可靠度或任何供應商規格
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: IBM 的 ECTC 2025 BSPDN 研究把 powered transistors 到 heat sink 的熱路徑連到高熱阻的前側後段金屬堆疊，並顯示 BEOL thermal-resistance model 的選擇會實質改變預測的 maximum chip hotspot temperature
+supporting_source_ids: S20
+contrary_source_ids:
+as_of: 2025-05-27
+basis: S20 abstract 直接固定 BSPDN chip package、transistor-to-heat-sink path、BEOL stack thermal resistance、multiscale model 與 maximum-hotspot-temperature sensitivity
+boundary: 只證實模型與熱路徑需被明示；公開摘要沒有 package stack、冷卻面、實體溫度、樣本或產品資料，不能量化 A16／18A 溫升、冷卻需求、良率、可靠度或成本
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: inference
+status: active
+claim: 背面供電的電力完整性應把 rail／reference voltage、負載功率、總電流、等效路徑、壓降、導體與局部電流密度、焦耳損耗、熱路徑與 hotspot、PVT／工作負載及產品資格財務綁成同一份十欄電力—熱護照；只報 mV、百分比、平均電流或較寬金屬都不足以判斷產品裕量與公司價值
+supporting_source_ids: S3,S14,S15,S18,S19,S20
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S18 固定電壓電流電阻功率量綱，S3／S14 明示 BSPDN 的 IR-drop 與 thermal 邊界，S15 區分靜態／動態，S19 顯示平均值可漏局部 current crowding，S20 顯示 BEOL thermal model 會改變 hotspot prediction；十欄是跨來源研究整合
+boundary: 護照與本文算例不是晶圓廠、NIST 或 IBM 共同標準，也不是電路／熱 signoff；沒有把抽象等效路徑、TSV 模型或 BSPDN 摘要外推成製程規格、產品效能、設備內容量、需求、收入、毛利或投資排序
+verification_needed: 同一具名 frontside／backside 產品版本公開 rail reference、load／activity、chip-package-board current path、distributed RLC、local current-density／thermal distribution、PVT、cooling boundary、reliability、good-product yield、成本與供應商財務共同鍵
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -687,6 +791,13 @@ to: triaged
 reason: added_conditioned_measurement_passport_for_static_dynamic_and_ppa_claims
 evidence: sources:S2,S13,S14,S15,S16,S17
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_voltage_current_resistance_loss_and_hotspot_passport_without_thesis_clock_refresh
+evidence: sources:S18,S19,S20
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -702,6 +813,7 @@ evidence: sources:S2,S13,S14,S15,S16,S17
 - **埋置電源軌（BPR）**：位在電晶體下方的金屬電源軌，讓背面送入的電力能靠近元件。
 - **奈米級背面導通孔（nTSV／nano-TSV）**：穿過薄化矽層、把背面金屬接到埋置電源軌附近的微小導通結構；本文引用的是 imec 的一般流程。
 - **背面金屬**：做在晶圓背面的供電金屬網路；它仍要透過導通結構與前側元件連接。
+- **前側後段金屬（BEOL）**：電晶體完成後疊在晶圓正面的多層金屬與介電層，負責訊號與傳統供電佈線；它也是部分背面供電封裝的散熱路徑。
 - **超級電源軌（Super Power Rail）**：台積電 A16 的背面供電實作名稱；名稱本身不公開完整流程、工具或供應商。
 - **背面供電導通（PowerVia）**：Intel 18A 家族的背面供電實作名稱；不能因名稱相近就假設和台積電採相同結構。
 - **A16／A12**：A16 是台積電規劃結合超級電源軌、並把量產排在 2026 下半年的具名製程；A12 是公司規劃於 2029 年把同一供電方向延伸到 A14 平台的後續節點，不代表 A16 已實際量產。
@@ -727,9 +839,19 @@ evidence: sources:S2,S13,S14,S15,S16,S17
 - **財務足跡**：能在出貨、收入、毛利或現金流中辨識的結果；只看到技術需要或合作公告還不算。
 - **電力完整性**：電力送到各處電晶體時，電壓與電流仍維持在設計可接受範圍的程度。
 - **電壓降（IR drop）**：電流通過有電阻的路徑後造成的電壓損失；線路和接點都會影響它。
+- **毫伏（mV）**：一伏特的千分之一；mV 是絕對壓降，還要除以同一參考點的工作電壓才得到相對百分比。
 - **靜態 IR drop**：在近似固定電流下觀察供電路徑的直流壓降；核心關係是電流乘上電阻。
 - **動態／瞬態電壓下陷**：大量電晶體短時間切換時，供電因電流驟變與路徑阻抗短暫下降；它和靜態 IR drop 不是同一種量測。
 - **工作電壓（Vdd）**：供應給電晶體的正電源電壓；「相同 Vdd」表示比較時先把這個條件固定。
+- **供電參考點**：說清楚電壓是在調壓器、封裝入口、晶片電源軌或電晶體端量到；同一條路不同位置的電壓不能混成一個數字。
+- **等效供電路徑**：把指定參考點之間分散的金屬、接點與導通孔暫時合成一個電阻或阻抗，方便量綱核對；它不是實際只有一條線。
+- **分散式 RLC 路徑**：把金屬網路各處的電阻、電感與電容保留在空間位置與連接關係中；比單一等效電阻更能描述動態下陷與局部差異。
+- **電流密度**：電流除以通過的導體截面積；總電流相同時，截面、分流與局部幾何不同，密度也會不同。
+- **電流擁擠（Current crowding）**：電流在轉角、接點或截面改變處集中，使局部電流密度高於整體平均；平均值過關不代表局部沒有熱點。
+- **焦耳損耗**：電流通過電阻時轉成熱的功率；在本文的直流等效算例中用 I²R 表示，不代表完整晶片只有這一種功耗。
+- **熱阻**：指定兩個熱參考面之間，溫差相對通過熱功率的阻力；必須固定堆疊、面積、邊界與穩態／瞬態方法才能比較。
+- **熱點（Hotspot）**：晶片或封裝局部溫度較高的位置；它受功率分布與多條散熱路徑共同影響，不能由全晶片平均溫度代替。
+- **NIST**：美國國家標準暨技術研究院；本文只引用它的 SI 單位關係，不把通用量綱當成晶片產品標準。
 - **相同速度（iso-speed）**：先讓兩個設計達到同一速度，再比較誰需要較少功耗；不能和相同電壓下的速度增益相加。
 - **標準單元**：用來拼成數位邏輯的基本設計積木；單元高度、供電與訊號佈線會一起影響面積和速度。
 - **單元利用率（cell utilization）**：指定版圖區域中可放入標準單元的比例；不是整顆晶片的電晶體密度、良率或成本同義詞。
@@ -775,6 +897,7 @@ evidence: sources:S2,S13,S14,S15,S16,S17
 - 先問新消息推進哪一個時鐘：設計、製程成形、製程控制、客戶產品量產，還是供應商財務。
 - 再查它量的是哪個失效位置：對準、接觸面積、接點電阻、電力完整性、應力、良率或可靠度。
 - 遇到「提升幾％」時，先填完受測物、基準、固定條件與量測範圍；百分比沒有共同分母就不跨公司排名。
+- 遇到毫伏、安培或瓦特時，再固定供電參考點、負載功率、等效路徑、總電流／局部電流密度及完整散熱邊界。
 - 最後要求晶圓廠端與供應商端雙向核對同一產品與期間，並補上資格、出貨、份額、價格與財務結果。
 
 ### 想一想
@@ -783,6 +906,7 @@ evidence: sources:S2,S13,S14,S15,S16,S17
 - 如果晶圓廠已進入生產，而外部供應商只推出具名量測產品但沒有節點資格，應上調哪一個時鐘？
 - 同一道製程由不同晶圓廠以不同名稱實作時，哪些資料可以比較，哪些必須留在各自的成熟度時鐘？
 - 「動態電壓下陷降低 10 倍」和「電壓下陷改善超過 30%」看似衝突；在知道受測物、基準與活動向量前，為什麼其實不能比較？
+- 同樣少掉 30 毫伏，若原本供電是 0.75 伏或 0.50 伏，留給電晶體的相對裕量為什麼不同？
 
 ## 先用五個時鐘判斷成熟度
 
@@ -844,6 +968,85 @@ evidence: sources:S2,S13,S14,S15,S16,S17
 最後還要把電壓結果接回速度、功耗與可靠度。同一供電改善可以拿來提高頻率，也可以留作
 電壓裕量或降低功耗；文件若寫「或」，讀者就不能改成「且」。這也是為什麼降低接點電阻、
 降低動態下陷與提升產品頻率是三個相接但不可互換的證據節點。
+
+## 同樣少掉 30mV，不同 Vdd 不是同一個風險
+
+壓降一定要有起點與終點。NIST 的 SI 關係給出 1V＝1W/A、1Ω＝1V/A；在直流等效路徑中，
+可把它重排為功率 P＝V×I、壓降 ΔV＝I×R、路徑焦耳損耗 P_loss＝I²R。這些只是量綱一致的
+算術，不會替晶片設計者補出真實工作負載、分散金屬網路或允收門檻。
+
+先只固定相同的 30mV 絕對壓降，分母不同就得到不同相對裕量：
+
+| 假想負載端工作電壓 | 相同絕對壓降 | 壓降÷工作電壓 | 這一列還沒回答什麼 |
+|---:|---:|---:|---|
+| 0.75V | 30mV | 4.000% | 沒有電流、路徑、時間、工作負載與允收門檻 |
+| 0.50V | 30mV | 6.000% | 不能因百分比較高就推產品一定失效 |
+
+所以 mV 與百分比不是兩筆可相加的成績：前者是分子，後者還需要同一參考點的供電電壓。
+若一份文件從調壓器量、另一份從晶片電源軌量，即使都寫 30mV，也不是同一條路。
+
+### 再固定負載功率與路徑，電流才會浮出來
+
+下面再做一個刻意簡化的直流教材：假設負載端都真正收到 100W，指定參考點之間的等效路徑
+電阻固定 0.2mΩ，並把負載端電壓分別設成 0.75V 與 0.50V。先用 I＝P_load÷V_load 求總電流，
+再算路徑壓降與損耗。
+
+| 假想負載端電壓 | 負載端功率 | 等效總電流 | 路徑壓降 | 壓降占負載端電壓 | 路徑焦耳損耗 | 假想來源端電壓 |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0.75V | 100W | 133.333A | 26.667mV | 3.556% | 3.556W | 0.776667V |
+| 0.50V | 100W | 200.000A | 40.000mV | 8.000% | 8.000W | 0.540000V |
+
+在這組固定條件下，電壓由 0.75V 降到 0.50V，總電流與絕對壓降都變成 1.5 倍，I²R 損耗則
+變成 2.25 倍。它不是「低電壓一定更熱」的產品結論：真實 CMOS 的動態功耗、頻率、活動、
+漏電與電容都會隨工作點改變，100W 與 0.2mΩ 也都只是為了看懂量綱而設定的假想輸入。
+
+本節有 N＝2 個固定 30mV 的電壓分母案例，另有 N＝2 個固定負載功率／等效電阻案例。
+Python Fraction 與獨立 awk 在顯示精度內完全一致。這是確定性換算，不是抽樣、電路模擬、
+晶片量測或跨公司 benchmark，因此沒有 sampling SE／t，也沒有 rail、via、die、wafer、lot、
+產品、客戶、可靠度、冷卻、良率、成本、收入、毛利或公司效果。
+
+### 平均電流過關，局部熱點仍可能失敗
+
+等效總電阻適合做第一層核對，卻會抹平空間。IBM 的 3-D IC 研究指出，較大尺度 TSV 與全晶片
+電源網路的接點會出現 current crowding，局部電流密度可能高於預期平均；只把 TSV 與線段當成
+單一電阻，可能漏掉接點附近的 hotspot。這項機制提醒讀者要看分布，但研究對象不是 A16 或
+PowerVia 的 nano-TSV，不能把任何倍數或壽命搬過來。
+
+另一份 IBM ECTC 2025 摘要才直接研究 BSPDN chip package。它把 powered transistors 到 heat
+sink 的路徑連到高熱阻的前側後段金屬堆疊，並指出採用不同 BEOL thermal-resistance model 時，
+預測的 maximum hotspot temperature 會實質不同。兩篇同屬 IBM 研究鏈，回答的是電流分布與熱路徑
+兩個不同問題，不是兩個獨立產品或量產 run。
+
+| 要分開的帳 | 最少要保存什麼 | 只看平均值會漏掉什麼 |
+|---|---|---|
+| 負載與總電流 | 產品版本、rail、電壓、功率定義、頻率、活動與電流波形 | 同一平均功率下的瞬時電流峰值 |
+| 分流與導體 | 金屬層、via／rail 數量、截面、材料、溫度與實際 current path | 少數窄路徑承擔較多電流 |
+| 局部電流密度 | 平均、percentile、peak、位置與量測／模型解析度 | 轉角、接點和截面變化處的 current crowding |
+| 電損地圖 | 各段 R／Z、I²R、動態損耗、空間與時間視窗 | 總損耗相同但熱源位置不同 |
+| 熱路徑與熱點 | 晶片—封裝堆疊、熱參考面、散熱介面、冷卻邊界、熱阻模型與溫度分布 | 平均溫度正常但局部最高溫失敗 |
+
+### 多空小作文共用的電力—熱十欄護照
+
+| 護照欄位 | 必須固定什麼 | 少了最容易誤讀成什麼 |
+|---|---|---|
+| 1. 產品與 rail | 試驗晶片／具名產品、版本、Vdd／Vss rail 與調壓器—封裝—晶片—電晶體參考點 | 不同位置的電壓可以直接比較 |
+| 2. 工作點 | 製程角落、電壓、頻率、溫度、工作負載、活動向量與時間視窗 | 一個典型點代表所有 PVT 與 AI／HPC 負載 |
+| 3. 功率分子 | 負載收到、來源輸入、路徑損耗、dynamic、leakage 或整顆產品功率 | 把 100W 負載和 100W 來源當成同一件事 |
+| 4. 電流分母 | total／rail／branch、平均／RMS／peak、waveform 與量測帶寬 | 平均安培數替瞬時與局部峰值背書 |
+| 5. 路徑模型 | on-die／package／board 邊界、distributed RLC、contact 與去耦電容 | 一個等效 R 代表所有頻率與空間位置 |
+| 6. 導體身分 | 金屬／via／rail 的材料、幾何、截面、長度、溫度與製程分布 | 金屬較寬就自動得到完整產品改善 |
+| 7. 電流密度 | 分流、mean／percentile／peak、current crowding、解析度與位置 | 總電流合格就代表每個接點都安全 |
+| 8. 壓降與電損 | mV 與 rail 百分比、static／dynamic、I²R／其他損耗及最壞位置 | 只報一個百分比就能解釋速度和熱 |
+| 9. 熱與可靠度 | 功率地圖、BEOL／package 熱阻、hotspot、冷卻邊界、時間、電遷移與失效分布 | 平均溫度或模型通過等於產品壽命通過 |
+| 10. 量產與商業 | die／wafer／lot、重複性、good-product yield、throughput、成本、qualification、供應商與財務 | 電力—熱機制直接跳成設備材料訂單與毛利 |
+
+**較強的多方版本**不是「背面金屬較寬，所以功耗和熱一定一起下降」，而是同一具名產品在相同
+工作量下，從來源端到電晶體端都能重建電流、壓降、局部電流密度、損耗與溫度分布，並在重複
+wafer／lot、可靠度與成本下守住較好的產品裕量；供應商還要能對上實際解決的步驟與財務分子。
+
+**較強的空方版本**也不是「IBM 提到 hotspot，所以背面供電不可量產」，而是低阻與釋放正面佈線的
+收益，被局部 current crowding、熱路徑、薄化／接合／量測成本、debug 或可靠度 guard band 吃掉；
+若完整產品只把技術裕量換成更高頻率而未降低每顆合格成本，供應鏈價值量就可能低於題材敘事。
 
 ## 先用五個位置分開「送訊號」和「送電」
 
@@ -956,10 +1159,14 @@ Lam 與 imec 的 nTSV／BPR 研究讓這條診斷鏈變得具體：如果孔和�
 - [Synopsys：What is Voltage Drop?](https://www.synopsys.com/glossary/what-is-voltage-drop.html)（靜態與動態壓降、活動向量及時間域分析方法）。
 - [IBM Research：Methodology Development to Benchmark Power Delivery Designs](https://research.ibm.com/publications/methodology-development-to-benchmark-power-delivery-designs-in-advanced-technology-nodes)（pre／post-PDK 與 reference-design dependence）。
 - [IBM Research：Comprehensive BEOL Performance Assessment](https://research.ibm.com/publications/comprehensive-beol-performance-assessment-interconnects-optimized-for-signal-routing-and-power-delivery-in-advanced-cmos-technology-nodes-invited)（固定接點間距、固定 IR drop、驅動與活動條件的差異）。
+- [NIST：SI Units—Electric Current](https://www.nist.gov/pml/owm/si-units-electric-current)（volt、watt、ampere 與 ohm 的量綱關係）。
+- [IBM Research：DC current crowding in TSV-based 3-D connections](https://research.ibm.com/publications/analysis-and-modeling-of-dc-current-crowding-for-tsv-based-3-d-connections-and-power-integrity)（平均與局部電流密度、單電阻模型及 hotspot 邊界）。
+- [IBM Research：BSPDN 與 chiplet 的 BEOL thermal resistance](https://research.ibm.com/publications/fast-and-accurate-machine-learning-prediction-of-back-end-of-line-thermal-resistances-in-backside-power-delivery-and-chiplet-architectures)（BSPDN chip-package 熱路徑與 maximum-hotspot model sensitivity）。
 
-本輪合計以十五份一手文件或官方頁面，分開建立技術機制、量測比較、設計取捨、製程控制、
-晶圓廠路線圖與外部具名設備產品。它們沒有提供跨公司共同良率、同一客戶產品、設備台數、
-供應商份額、價格或財務分母，也沒有一致預期、估值或即時部位資料，因此本文不判斷題材是否已反映。
+本輪合計以十八份一手文件或官方頁面，分開建立技術機制、量測比較、設計取捨、電力—熱邊界、
+製程控制、晶圓廠路線圖與外部具名設備產品。它們沒有提供跨公司共同良率、同一客戶產品、設備
+台數、供應商份額、價格或財務分母，也沒有一致預期、估值或即時部位資料，因此本文不判斷題材
+是否已反映。
 台積電是觀察層公司；Applied Materials 與 Lam Research 只作外部能力和產品錨點。不能因
 它們出現在技術鏈，就把 universe 內設備、材料或 IP 公司自動連成供應鏈。
 
@@ -1001,6 +1208,7 @@ evidence_boundary: PDK 與 DTCO 需求不等於本地 IP／ASIC 設計服務商�
 ## 下一個可證明／否定的節點
 
 - 同一 frontside／backside 產品版本公開八格比較護照，並同時提供靜態 IR drop、動態下陷、PPA、熱、可靠度與原始分布。
+- 同一產品從調壓器、封裝、晶片 rail 到電晶體端公開電壓／電流參考點、distributed RLC、局部 current-density、loss map、thermal stack 與 hotspot distribution。
 - 同一具名試驗晶片或客戶產品，同時公開設計取捨、接點電阻、電力完整性與可靠度結果。
 - 台積電正式確認 A16 實際進入量產，並提供至少一個客戶產品、爬坡、良率或製造範圍。
 - Intel 將 18A／18A-P 連到具名外部晶圓代工客戶產品與可定位出貨，而不只停在公司製程里程碑。

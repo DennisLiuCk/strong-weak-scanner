@@ -1,16 +1,17 @@
 # 背面供電路徑與製程接力知識圖譜
 
 本圖先把正面訊號與背面送電分開，再沿著設計、製程成形、製程控制、節點產品與供應商財務
-五個時鐘串起證據；效能百分比另經八格比較護照分開靜態壓降、動態下陷與條件式 PPA。
-台灣設備、材料與 IP 只保留成待驗證的搜尋路由；沒有具名資格認證、重複出貨與財務足跡前，
-不建立公司受惠線。
+五個時鐘串起證據；效能百分比另經八格比較護照分開靜態壓降、動態下陷與條件式 PPA，再用
+電力—熱十欄護照接上 rail reference、總／局部電流、焦耳損耗、熱路徑與 hotspot。台灣設備、
+材料與 IP 只保留成待驗證的搜尋路由；沒有具名資格認證、重複出貨與財務足跡前，不建立公司
+受惠線。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: backside-power
 root_node_id: concept:backside-power
 label: 背面供電路徑與製程接力
-summary: 先用背面金屬、奈米級背面導通孔與埋置電源軌讀懂送電路徑，再用八格護照區分靜態壓降、動態下陷與條件式 PPA，最後沿設計、製程控制、節點產品、供應商資格與財務歸因五個時鐘前進。
+summary: 先用背面金屬、奈米級背面導通孔與埋置電源軌讀懂送電路徑，再用八格效能護照區分靜態壓降、動態下陷與條件式 PPA，以十欄電力—熱護照分開參考電壓、總／局部電流、路徑損耗與 hotspot，最後沿設計、製程控制、節點產品、供應商資格與財務歸因五個時鐘前進。
 article_ids: MI-2026-08-02-BACKSIDE-POWER-DELIVERY
 status: active
 -->
@@ -533,4 +534,44 @@ review_due: 2026-09-12
 status: active
 boundary: same-Vdd、same-speed、frequency 或 power 與不同 area 指標各有自己的固定條件；up to 與 or 不能改寫為同時保證或單一結構歸因。
 next_trigger: 同一設計公開 iso-Vdd、iso-speed、iso-power 三種結果、共同面積定義、熱與可靠度代價，並分解 transistor 與 backside rail 貢獻。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-BSP-I23
+view: industry
+from_id: concept:backside-power
+to_id: process:backside-electrothermal-passport
+relation: requires
+claim_refs: MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C21
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 十欄護照是 NIST 量綱、imec／Intel 背面供電邊界與 IBM 電流／熱模型的研究整合，不是晶圓廠共同 signoff 標準、製程規格或投資評分。
+next_trigger: 同一 frontside／backside 產品公開 rail reference、load、current path、distributed RLC、local current-density、loss／thermal maps、PVT、reliability 與產品資格。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-BSP-I24
+view: industry
+from_id: concept:backside-power
+to_id: metric:rail-current-drop-loss-hotspot-boundary
+relation: measured_by
+claim_refs: MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C18,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C19,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C20,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C21
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 本文固定 30mV 或 100W／0.2mΩ 的數值全是假想量綱教材；IBM TSV current-crowding 機制不能直接外推 nano-TSV，BSPDN thermal abstract 也沒有產品溫度與冷卻分布。
+next_trigger: 同一具名產品以可重現方法公開 mV／rail percentage、total／local current-density、path loss、thermal resistance、hotspot distribution 及 die／wafer／lot reliability。
 -->

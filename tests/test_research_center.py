@@ -4937,6 +4937,32 @@ class ResearchCenterTest(unittest.TestCase):
             "| 5. 工作負載與活動 |", "| 7. PDN 與環境邊界 |",
             "### 四組官方數字，應該怎麼讀",
             "### 靜態 IR drop 和動態下陷，差在時間",
+            "added_voltage_current_resistance_loss_and_hotspot_passport_without_thesis_clock_refresh",
+            "## 同樣少掉 30mV，不同 Vdd 不是同一個風險",
+            "| 假想負載端工作電壓 | 相同絕對壓降 | 壓降÷工作電壓 | 這一列還沒回答什麼 |",
+            "| 0.75V | 30mV | 4.000% |",
+            "| 0.50V | 30mV | 6.000% |",
+            "### 再固定負載功率與路徑，電流才會浮出來",
+            "| 假想負載端電壓 | 負載端功率 | 等效總電流 | 路徑壓降 | 壓降占負載端電壓 | 路徑焦耳損耗 | 假想來源端電壓 |",
+            "| 0.75V | 100W | 133.333A | 26.667mV | 3.556% | 3.556W | 0.776667V |",
+            "| 0.50V | 100W | 200.000A | 40.000mV | 8.000% | 8.000W | 0.540000V |",
+            "總電流與絕對壓降都變成 1.5 倍",
+            "I²R 損耗則\n變成 2.25 倍",
+            "N＝2 個固定 30mV 的電壓分母案例，另有 N＝2 個固定負載功率／等效電阻案例",
+            "Python Fraction 與獨立 awk 在顯示精度內完全一致",
+            "沒有 sampling SE／t",
+            "### 平均電流過關，局部熱點仍可能失敗",
+            "單一電阻，可能漏掉接點附近的 hotspot",
+            "預測的 maximum hotspot temperature 會實質不同",
+            "| 要分開的帳 | 最少要保存什麼 | 只看平均值會漏掉什麼 |",
+            "| 負載與總電流 |", "| 分流與導體 |",
+            "| 局部電流密度 |", "| 電損地圖 |", "| 熱路徑與熱點 |",
+            "### 多空小作文共用的電力—熱十欄護照",
+            "| 護照欄位 | 必須固定什麼 | 少了最容易誤讀成什麼 |",
+            "| 1. 產品與 rail |", "| 2. 工作點 |", "| 3. 功率分子 |",
+            "| 4. 電流分母 |", "| 5. 路徑模型 |", "| 6. 導體身分 |",
+            "| 7. 電流密度 |", "| 8. 壓降與電損 |", "| 9. 熱與可靠度 |",
+            "| 10. 量產與商業 |", "**較強的多方版本**", "**較強的空方版本**",
             "## 先用五個位置分開「送訊號」和「送電」",
             "| 本文五個位置 | 它負責什麼 | 和下一位置怎麼接 | 主要工程問題 | 不能直接推成 |",
             "| 1. 正面訊號佈線 |", "| 2. 背面金屬網路 |",
@@ -4959,6 +4985,8 @@ class ResearchCenterTest(unittest.TestCase):
             "| 7. 財務結果可以歸因 |",
             "claim_id: C6", "claim_id: C17", "source_id: S6",
             "source_id: S10", "source_id: S13", "source_id: S17",
+            "source_id: S18", "source_id: S19", "source_id: S20",
+            "claim_id: C18", "claim_id: C19", "claim_id: C20", "claim_id: C21",
             "monitor_id: T4", "monitor_id: T5", "PROVision 10",
         ):
             self.assertIn(contract, topic)
@@ -4966,7 +4994,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 57
+            sum(line.startswith("- **") for line in glossary.splitlines()), 68
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4983,8 +5011,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 17),
-            ("research_claim", 17), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 20),
+            ("research_claim", 21), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5022,6 +5050,8 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:static-ir-drop,metric,靜態電壓降",
             "metric:dynamic-voltage-droop,metric,動態電壓下陷",
             "metric:conditional-ppa-comparison,metric,條件式效能功耗面積比較",
+            "process:backside-electrothermal-passport,process,背面供電電力—熱十欄護照",
+            "metric:rail-current-drop-loss-hotspot-boundary,metric,電壓、電流、壓降、損耗與熱點邊界",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 背面供電路徑與製程接力", graph)
@@ -5038,8 +5068,11 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-BSP-I20", "to_id: metric:static-ir-drop",
             "edge_id: KG-BSP-I21", "to_id: metric:dynamic-voltage-droop",
             "edge_id: KG-BSP-I22", "to_id: metric:conditional-ppa-comparison",
+            "edge_id: KG-BSP-I23", "to_id: process:backside-electrothermal-passport",
+            "edge_id: KG-BSP-I24", "to_id: metric:rail-current-drop-loss-hotspot-boundary",
         ):
             self.assertIn(edge, graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 28)
 
     def test_compute_connect_station_four_separates_three_axis_optics_and_evidence_gates(self):
         topic = (
