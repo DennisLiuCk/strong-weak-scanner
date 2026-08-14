@@ -4281,6 +4281,21 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 啟動活動 |", "| 2. 核准草案 |", "| 3. 發布標準 |",
             "| 4. 採用與互通 |", "| 5. 整線產品放行 |",
             "claim_id: C13", "monitor_id: T4",
+            "added_nominal_carrier_geometry_and_good_output_cost_bridge_without_thesis_or_clock_refresh",
+            "## 96,100 mm² 不等於多 35.9536891656% 合格品",
+            "| 名目幾何步驟 | 重算式 | 結果 | 還沒扣掉什麼 |",
+            "| 310×310 mm 方形 |", "| 直徑 300 mm 圓形 |",
+            "| 名目面積差 |", "| 名目面積比 |", "| 名目增幅 |",
+            "N=1 組名目幾何", "sampling\nSE／t",
+            "### 從名目面積走到每顆合格成本，要過五本帳",
+            "| 本文五本帳 | 同一比較要固定什麼 | 可重算的分子／分母 | 只看上一帳會錯在哪裡 |",
+            "| 1. 載體身分帳 |", "| 2. 可用版圖帳 |",
+            "| 3. 最終合格品帳 |", "| 4. 合格產出帳 |",
+            "| 5. 合格成本帳 |",
+            "### 多空小作文也要共用同一份合格產出護照",
+            "| 同一查核層 | 多頭小作文要成立 | 空頭小作文要成立 | 雙方都要交的共同資料 |",
+            "| 幾何與版圖 |", "| 製造與品質 |", "| 經濟與商用 |",
+            "claim_id: C16",
             "## 先用四把尺拆開「更便宜」",
             "| 本文四把尺 | 它先回答什麼 | 最簡單的關係 | 容易忽略什麼 | 不能直接推成 |",
             "| 1. 面積利用率 |", "| 2. 合格封裝良率 |",
@@ -4301,7 +4316,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 50
+            sum(line.startswith("- **") for line in glossary.splitlines()), 52
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4319,8 +4334,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 13), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 16), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -4352,6 +4367,8 @@ class ResearchCenterTest(unittest.TestCase):
             "component:panel-foup,component,面板 FOUP 載具",
             "component:panel-foup-load-port,component,面板 FOUP 裝卸埠",
             "stage:310mm-panel-interface-standardization,stage,310mm 面板介面標準制定",
+            "process:panel-good-output-cost-passport,process,面板合格產出與成本護照",
+            "metric:gross-carrier-area-to-good-package-contract,metric,名目載體面積到合格品契約",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 面板級封裝（PLP）", graph)
@@ -4361,9 +4378,10 @@ class ResearchCenterTest(unittest.TestCase):
             "KG-PLP-I11", "KG-PLP-I12", "KG-PLP-I13",
             "KG-PLP-I14", "KG-PLP-I15", "KG-PLP-I16",
             "KG-PLP-I17", "KG-PLP-I18", "KG-PLP-I19",
+            "KG-PLP-I20", "KG-PLP-I21",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 25)
 
     def test_compute_connect_station_one_separates_ai_storage_jobs_positions_and_gates(self):
         topic = (

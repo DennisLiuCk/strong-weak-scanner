@@ -1,15 +1,16 @@
 # 面板級封裝（PLP）知識圖譜
 
 本圖先把扇出架構、晶片先放／線路先做與方形面板載體拆開，再把面板本體、Panel FOUP、
-load port／自動搬運、planned line、客戶資格與穩定量產經濟性接回同一張圖。ASE 的 310×310 mm
-線是具名規劃；SEMI Doc 7405 是標準制定活動，兩者都不是已完成跨設備互通或 HVM。
+load port／自動搬運、planned line、名目面積、合格產出、客戶資格與穩定量產經濟性接回同一張圖。
+ASE 的 310×310 mm 線是具名規劃；SEMI Doc 7405 是標準制定活動，而 35.9536891656% 也只是名目
+幾何增幅，三者都不是已完成跨設備互通、HVM 或降本。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: panel-level-packaging
 root_node_id: concept:panel-level-packaging
 label: 面板級封裝（PLP）
-summary: 把 fan-out、chip-first／chip-last、重構面板、SEMI 3D20 面板本體、Panel FOUP 與 load port 分開，再連接 310mm 標準制定、面積利用率、良率、產出及 ASE planned line，顯示尺寸、載具、設備介面與產品量產為何不能互相替代。
+summary: 把 fan-out、chip-first／chip-last、重構面板、SEMI 3D20 面板本體、Panel FOUP 與 load port 分開，再連接 310mm 標準制定、名目面積到合格成本護照、良率、產出及 ASE planned line，顯示尺寸、載具、設備介面、幾何增幅與產品量產為何不能互相替代。
 article_ids: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS
 status: active
 -->
@@ -472,4 +473,44 @@ review_due: 2026-09-12
 status: active
 boundary: SEMI Doc 7405 只證明 310mm square Panel FOUP 新標準活動與 projected timetable；activity approval 不是 ballot、TC approval、publication、adoption 或 HVM。
 next_trigger: Doc 7405 或後繼編號正式發布，3D20／E181／E182 對應 310mm 版本完成，且具名產線公開採用。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PLP-I20
+view: industry
+from_id: concept:panel-level-packaging
+to_id: process:panel-good-output-cost-passport
+relation: requires
+claim_refs: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C14,MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C15,MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C16
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 五本帳是研究中心依 ASE／SEMI 名目尺寸與 Lam 良率／throughput／cost 邊界建立的比較框架，不是共同標準、實測 panel／wafer A/B test 或公司降本證據。
+next_trigger: 同一具名產品與版本公布 carrier identity、usable layout、final good disposition、good units per hour、完整 cost per good package 與連續批次不確定度。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PLP-I21
+view: industry
+from_id: concept:panel-level-packaging
+to_id: metric:gross-carrier-area-to-good-package-contract
+relation: measured_by
+claim_refs: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C15,MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C16
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 310×310 方形對直徑 300mm 圓形的 35.9536891656% 只是不扣邊緣的 N=1 名目幾何；沒有 usable map、site layout、yield、time 或 cost 分母，不能當面積利用率、合格產出或降本效果。
+next_trigger: 同一 package outline 與 revision 在 wafer／panel 路徑提供 usable map、候選位置、final good units、panel／wafer per hour、uptime、scrap、cost scope 與 customer qualification。
 -->

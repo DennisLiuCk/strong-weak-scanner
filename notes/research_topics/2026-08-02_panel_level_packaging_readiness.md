@@ -232,6 +232,22 @@ limitation: SNARF 證明新標準活動獲准啟動與當時規劃，不是已�
 independence_group: semi
 -->
 
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: living_index
+publisher: SEMI
+title: SEMI M1 - Specification for Polished Single Crystal Silicon Wafers
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://store-us.semi.org/products/m00100-semi-m1-specification-for-polished-single-crystal-silicon-wafers
+locator: M1-0924 current revision、公開目的／範圍的 standardized wafer dimensions，以及 300mm diameter prime silicon wafer guide
+limitation: 公開商店頁只固定標準用途、現行版次與 300mm 直徑語境，未讀取付費表格、公差與邊緣規則；prime silicon wafer 也不是特定先進封裝的重構晶圓，不能替同產品 wafer／panel 路徑證明可用面積、可排數、良率、產出或成本
+independence_group: semi
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -414,6 +430,48 @@ verification_needed: 最終 310mm panel／FOUP／load-port 標準正式發布，
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: ASE 的 310x310mm line 公告把方形載體寫為每片最多 96,100mm²，SEMI M1-0924 current page 則另外把 300mm diameter prime silicon wafer 列入標準尺寸語境；兩者只能固定兩個公開的名目幾何身分
+supporting_source_ids: S8,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8 直接列 310mm×310mm 與 up to 96,100mm²，S13 公開目的／範圍固定 standardized wafer dimensions 並明列 300mm diameter prime silicon wafer guide
+boundary: ASE 的 usable-area 用詞是公司對自家 planned line 的描述；SEMI M1 是矽晶圓標準入口，不是同產品封裝比較。尺寸身分不證明兩條路徑使用相同材料、邊緣排除、版圖、製程、產品或量產條件
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: 若只做不扣任何邊緣與製程限制的名目幾何教材，310x310mm 方形面積為 96,100mm²，直徑 300mm 圓形面積為 70,685.8347057703mm²，前者比後者多 25,414.1652942297mm²，面積比 1.359536891656、名目增幅 35.9536891656%
+supporting_source_ids: S8,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 以 area_square=310×310、area_circle=pi×150² 重算；Python Decimal 使用固定 50 位 pi 字串，獨立 awk 使用 atan2(0,-1)，兩路在本文顯示位數一致
+boundary: N=1 組名目尺寸、確定性單位換算，沒有載體、產品、面板、晶圓、lot 或 run 樣本，也沒有 sampling SE／t。35.9536891656% 不是可用面積、面積利用率、可排數、良率、throughput、成本降幅或公司效果
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 把名目載體面積轉成面板級封裝經濟性，至少要依序對上載體身分、可用版圖、最終合格品、單位時間合格產出與每顆合格品總成本五本帳；其中任何一個分母或產品版本不同，都不能把幾何增幅改寫成降本幅度
+supporting_source_ids: S2,S8,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8 提供 planned panel 的尺寸與公司效益敘事，S13 固定 300mm 名目尺寸參照，S2 則把 area efficiency 與 uniformity、yield、throughput、quality、cost 及 HVM proof 分開；本文把三者整理成逐層可核對的合格產出與成本護照
+boundary: 五本帳是研究中心的比較框架，不是 SEMI、ASE 或 Lam 的正式標準，也不是實測經濟模型；沒有同一產品／版次的 usable map、final-test disposition、連續批次產出、完整成本與可靠度資料前，不判定 panel 優於或劣於 wafer
+verification_needed:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -507,6 +565,13 @@ to: triaged
 reason: separated_310mm_panel_foup_loadport_and_line_release_interfaces_without_thesis_clock_refresh
 evidence: sources:S10,S11,S12
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_nominal_carrier_geometry_and_good_output_cost_bridge_without_thesis_or_clock_refresh
+evidence: sources:S2,S8,S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -528,6 +593,7 @@ evidence: sources:S10,S11,S12
 - **線寬／線距（L/S）**：金屬線寬與相鄰線之間的距離；單一最小值只證明圖形能力，不等於整片面板良率或產品已量產。
 - **預計投產**：公司對未來生產開始時間的目標；它比只有概念或設備規格更接近商用，但仍不是實際投產、客戶放行或出貨紀錄。
 - **面板尺寸標準**：設備、材料、載具與自動化共同採用的長寬與厚度規格；單一公司的可處理尺寸不等於全產業共同標準。
+- **名目載體面積**：只依公開長寬或直徑算出的完整幾何面積；尚未扣除邊緣留白、定位標記、切割道、製程載具與不可用區。
 - **面積利用率**：可用來排入產品的面積占載體可用面積的比例；它回答幾何效率，不等於最後合格品比例。
 - **理論可排數**：依產品尺寸與版圖估算一片載體最多能放多少顆；尚未扣除製程缺陷、測試失敗與報廢。
 - **投入數**：進入指定製程或良率計算的面板、封裝或產品數；比較良率前必須先確認分母定義相同。
@@ -554,6 +620,7 @@ evidence: sources:S10,S11,S12
 - **報廢**：產品或整片面板無法再使用而必須丟棄；一片面板排得越多，整片失敗時可能損失越多產品。
 - **可靠度**：產品經過溫度、濕度、機械與長時間使用後仍能維持功能；短期測試通過不能替代長期驗證。
 - **每顆合格品總成本**：把面板、材料、設備折舊、製程時間、返工與報廢等成本，除以最後可交付的合格品數。
+- **合格產出與成本護照**：把載體、可用版圖、最終良率、每小時合格產出與完整成本綁在同一產品版次的比較資料包；缺任一層就不能下經濟結論。
 - **電鍍沉積（ECD）**：用電化學方式形成銅等金屬層；大面積處理時要同時控制厚度與跨面板均勻度。
 - **薄膜沉積（PVD／CVD）**：用物理或化學方式形成薄膜的製程；設備能處理大面板，不等於厚度與缺陷已達量產要求。
 - **蝕刻（Etch）**：選擇性移除材料以形成線路或結構；大面積線寬與深度的一致性會影響後續良率。
@@ -648,6 +715,49 @@ SEMI Doc 7405 的 SNARF 很適合用來辨認標準新聞的動詞。文件顯�
 控制先行，只是公開資料尚不足以判斷是否採用未來共同標準、是否需要改機或是否能跨廠牌互換。
 研究中心因此同時保留兩條可能路徑，不替產線時程、成本與競爭力選邊。
 
+## 96,100 mm² 不等於多 35.9536891656% 合格品
+
+ASE 在自家 310×310 mm planned line 公告中寫出每片最多 96,100 mm²；SEMI M1 的公開頁則把
+300 mm 直徑矽晶圓列入標準尺寸語境。為了讓讀者能重算，本文先把兩者降到最單純的方形與圓形：
+不放產品、不扣邊緣，也不假設兩條封裝路徑真的使用相同材料與製程。
+
+| 名目幾何步驟 | 重算式 | 結果 | 還沒扣掉什麼 |
+|---|---|---:|---|
+| 310×310 mm 方形 | 310×310 | 96,100 mm² | 邊緣留白、定位標記、切割道、夾持、翹曲不可用區與版圖空隙 |
+| 直徑 300 mm 圓形 | π×150² | 70,685.8347057703 mm² | 邊緣排除、缺口、版圖空隙，以及封裝用重構載體和 prime silicon wafer 的差異 |
+| 名目面積差 | 96,100−70,685.8347057703 | 25,414.1652942297 mm² | 差額不代表能多排的完整產品數 |
+| 名目面積比 | 96,100÷70,685.8347057703 | 1.359536891656 | 比值不含任何良率、時間與成本分母 |
+| 名目增幅 | (1.359536891656−1)×100% | 35.9536891656% | 增幅不等於面積利用率、合格產出或降本百分比 |
+
+這是 **N=1 組名目幾何**，不是面板、晶圓、產品、批次或設備樣本，所以沒有可報的 sampling
+SE／t。Python Decimal 以固定 50 位 π 字串重算，另一條 awk 路徑以 `atan2(0,-1)` 產生 π，兩路在
+表中顯示位數一致；多留小數只為方便查算，不代表長寬、公差或製程結果有同等工程精度。
+
+### 從名目面積走到每顆合格成本，要過五本帳
+
+| 本文五本帳 | 同一比較要固定什麼 | 可重算的分子／分母 | 只看上一帳會錯在哪裡 |
+|---|---|---|---|
+| 1. 載體身分帳 | 尺寸、形狀、材料、製程載體、版本與量測定義 | 名目長寬或直徑、完整幾何面積 | 把不同材料與用途的 300 mm 圓形載體當成同一產品對照組 |
+| 2. 可用版圖帳 | 邊緣留白、定位標記、切割道、封裝外形、旋轉與排版版本 | 可用區、候選位置數、每顆面積與未使用區 | 把完整方形面積全部當成可以排產品的面積 |
+| 3. 最終合格品帳 | 投入、各站損失、返工、最終測試、可靠度與報廢處置 | 最終可交付數÷一致定義的投入數 | 把理論候選位置當成最後能賣的合格品 |
+| 4. 合格產出帳 | 每小時面板數、製程週期、停機、換線、搬運、返工與連續批次 | 每小時完成載體×每片候選數×最終良率 | 把單片較大誤寫成整線每小時產出一定較高 |
+| 5. 合格成本帳 | 材料、工具、折舊、人工、能源、返工、報廢、品質逃逸與保固 | 同期完整製造成本÷同期最終合格品 | 把其中一項改善直接改寫成總成本或毛利改善 |
+
+因此真正的橋接順序是：**名目載體面積 → 可用版圖 → 理論候選位置 → 最終合格品 → 每小時
+合格產出 → 每顆合格品總成本**。每一步都要用同一產品、封裝版次、測試與期間；若中途換了產品
+尺寸、測試門檻或成本範圍，最後得到的就不是 wafer／panel 可比結果。
+
+### 多空小作文也要共用同一份合格產出護照
+
+| 同一查核層 | 多頭小作文要成立 | 空頭小作文要成立 | 雙方都要交的共同資料 |
+|---|---|---|---|
+| 幾何與版圖 | 可用位置密度持續高於圓形路徑，且大型封裝邊緣浪費確實下降 | 邊緣、切割道、定位、翹曲與排版空隙吃掉大部分名目優勢 | 同一產品外形／旋轉規則、carrier revision、usable map、候選位置與排除區 |
+| 製造與品質 | 跨面板均勻度與良率守住，panel／hour、uptime 與最終 good units／hour 同時提升 | 面板破損、局部缺陷、返工、停機或整片報廢使合格產出反而下降 | 同期間連續批次、across-panel map、final-test disposition、可靠度、cycle time、停機與返工 |
+| 經濟與商用 | 每顆合格品完整成本下降，客戶資格、重複出貨與財務分子跟著出現 | 新工具、材料、折舊與報廢成本抵消幾何收益，或客戶放行／重複訂單未出現 | 同一成本範圍、產能利用、報廢／保固、具名 qualification、出貨與可辨識財務資料 |
+
+這張表不預設哪一邊正確。多頭不能只交 96,100 mm²，空頭也不能只交翹曲或報廢風險；雙方都要
+把同一產品從可用版圖一路接到合格品、時間、成本與客戶結果，才有可否證的產業小作文。
+
 ## 先用四把尺拆開「更便宜」
 
 | 本文四把尺 | 它先回答什麼 | 最簡單的關係 | 容易忽略什麼 | 不能直接推成 |
@@ -700,9 +810,10 @@ SEMI Doc 7405 的 SNARF 很適合用來辨認標準新聞的動詞。文件顯�
 - [SEMI E181：Panel FOUP current-standard page](https://store-us.semi.org/products/e18100-semi-e181-specification-for-panel-foup-for-panel-level-packaging)
 - [SEMI E182：Panel FOUP Load Port current-standard page](https://store-us.semi.org/products/e18200-semi-e182-specification-for-panel-foup-loadport-for-panel-level-packaging)
 - [SEMI Doc 7405：310mm Square Panel FOUP 新標準活動表](https://downloads.semi.org/web/wstdsbal.nsf/b8865fa87d9e7b57882579fb005c3cd7/37743881840e595b88258d29001c7d0a%21OpenDocument)
+- [SEMI M1：300mm diameter wafer 的標準尺寸語境](https://store-us.semi.org/products/m00100-semi-m1-specification-for-polished-single-crystal-silicon-wafers)
 
 Lam、Applied Materials 與 ASE 對產品優勢與量產準備都有商業立場；SEMI 可補 panel、FOUP 與
-load port 的共同介面責任，卻不替任何公司驗證產品，SNARF 也只證明標準活動已啟動。本文只把直接揭露的架構、場域、標準範圍、交易
+load port 的共同介面責任及 300mm 名目尺寸語境，卻不替任何公司驗證產品，SNARF 也只證明標準活動已啟動。本文只把直接揭露的架構、場域、標準範圍、交易
 狀態與前瞻投產目標標成已證實；「面板級封裝已更便宜」、「2027 目標已完成」與「台灣公司已
 取得量產收入」均未被當成事實。
 
