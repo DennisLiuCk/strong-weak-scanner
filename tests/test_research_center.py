@@ -6951,6 +6951,67 @@ class ResearchCenterTest(unittest.TestCase):
             "MR-2026-08-14-MISSED-Q2-T9-MACRONIX-FILING", reviews
         )
 
+    def test_yageo_q2_separates_profit_fcf_cash_stock_and_working_capital(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-30_yageo_q2_earnings_call.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: profit_free_cash_flow_cash_stock_and_working_capital_ledgers_added_from_existing_deck_without_refreshing_thesis_clock",
+            "## 淨利變好，現金不一定同速進來：三本帳與一張營運資金橋",
+            "### 第一帳：淨利與自由現金流要同期間、同公式對讀",
+            "### 第二帳：期末現金大增，不等於營運現金同額流入",
+            "### 第三帳：營運資金要同時看絕對額與相對強度",
+            "### 多空小作文必須共用同一組現金裁決欄位",
+            "公司簡報所列自由現金流",
+            "`5,783 ÷ 9,455 = 61.2%`",
+            "`7,752 ÷ 8,038 = 96.4%`",
+            "兩個 headline\n機械相減是 890.91 億元",
+            "43,744",
+            "48,274",
+            "絕對額增加 45.30 億元",
+            "應收帳款／營收 | 78.4% | 75.6%",
+            "存貨／銷貨成本 | 139.9% | 130.2%",
+            "應付帳款／銷貨成本 | 82.0% | 76.6%",
+            "沒有 sampling SE／t",
+            "4ace6c4735abd1edfe2b015062bf5b125f741217aac3e9142185f34cbddbcc2c",
+            "Python `Decimal` 與 `awk` 兩條獨立路徑",
+            "claim_id: C6",
+            "claim_id: C7",
+            "claim_id: C8",
+            "claim_id: C9",
+            "monitor_id: T4",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 4),
+            ("research_claim", 9), ("metric_comparison", 0),
+            ("impact", 1), ("monitoring_item", 4),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "concept:profit-fcf-cash-stock-ledgers,concept,淨利、自由現金流與現金存量三本帳",
+            "metric:working-capital-intensity-proxy,metric,營運資金強度代理比率",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "yageo_q2_financial_materiality.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 4)
+        for node in (
+            "edge_id: KG-YQ2-I02",
+            "to_id: concept:profit-fcf-cash-stock-ledgers",
+            "edge_id: KG-YQ2-I03",
+            "to_id: metric:working-capital-intensity-proxy",
+        ):
+            self.assertIn(node, graph)
+
 
 if __name__ == "__main__":
     unittest.main()

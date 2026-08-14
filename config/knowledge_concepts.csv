@@ -227,6 +227,8 @@ component:mlcc-decoupling,component,MLCC 去耦電容,MLCC decoupling|multilayer
 component:silicon-capacitor,component,Silicon capacitor,矽電容|silicon decoupling capacitor,concept:ai-capacitor-role-map,可靠近或嵌入封裝以降低寄生並支援快速瞬態的矽電容
 concept:800v-protection-layers,concept,800VDC 保護責任層,800V protection layers|HVDC fault protection map,concept:800v-power-tree,把人身維修 絕緣接地 故障電流 hot-swap 與備援能量分開追蹤的 800VDC fault framework
 concept:yageo-q2-financial-materiality,concept,國巨 Q2 財務材料性,YAGEO Q2 financial materiality|國巨季度財務橋接,,把公司季度營收交叉驗證與產品 組合 毛利 現金流等尚待補證的層級分開顯示
+concept:profit-fcf-cash-stock-ledgers,concept,淨利、自由現金流與現金存量三本帳,Profit FCF and cash stock ledgers|獲利現金三本帳,concept:yageo-q2-financial-materiality,把權責發生制期間損益 公司定義期間現金流與期末現金時點存量分開以避免跨帳歸因
+metric:working-capital-intensity-proxy,metric,營運資金強度代理比率,Working capital intensity proxy|AR inventory AP intensity,concept:profit-fcf-cash-stock-ledgers,以期末應收 存貨 應付對單季營收或銷貨成本做同公司相鄰期間診斷並明示不是正式周轉天數
 concept:ai-capex-cash-conversion,concept,AI CapEx 到供應商財務七關橋接,AI capital spending to supplier finance|AI CapEx cash conversion,,把資本承諾 現金與租賃支出 資產建置上線 可用容量 工作負載與收入 買方現金回收及供應商財務歸因分開追蹤的研究框架
 concept:capital-asset-revenue-cash-clocks,concept,承諾、資產、收入與現金四個時鐘,capital asset revenue cash clocks,concept:ai-capex-cash-conversion,把合約承諾 資產可用 客戶使用與收入認列 現金支付與回收分成可各自前進的四個時鐘
 stage:capital-commitment,stage,資本計畫與承諾,Capital plan and commitment,concept:ai-capex-cash-conversion,董事會預算 全年指引 合約或租賃承諾等尚未等同當期付款與設備交付的投入意圖
