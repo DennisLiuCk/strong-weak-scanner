@@ -4451,6 +4451,7 @@ class ResearchCenterTest(unittest.TestCase):
             "editorial_plain_language_wave97_helios_six_stage_five_customer_timeline_and_six_gate_ladder",
             "corrected_production_reading_with_reference_design_and_integrated_rack_contract",
             "added_configuration_passport_change_triggered_regression_and_company_stage_refinement_no_thesis_change",
+            "added_orw_base_versus_meta_mechanical_qualification_passport_no_thesis_change",
             "一整櫃還要讓運算、兩類網路、供電、液冷、控制軟體與維修共同通過",
             "定義不同，不能相加或互相比較",
             "## 先看一整櫃有哪些共同責任",
@@ -4459,6 +4460,17 @@ class ResearchCenterTest(unittest.TestCase):
             "| 3. 機架內交換 |", "| 4. 跨機架與前端網路 |",
             "| 5. 集中供電 |", "| 6. 液冷迴路 |",
             "| 7. 控制與軟體 |", "| 8. 可維修與營運 |",
+            "## 相容不等於可搬、可落地：六張機械資格護照",
+            "| 六張機械資格護照 | 受測物／狀態 | 本輪規範能確認 | 品牌系統仍要交付 | 不能跨帳推成 |",
+            "| 1. 共同介面 |", "| 2. 結構載重 |",
+            "| 3. 移動穩定 |", "| 4. 靜態穩定 |",
+            "| 5. 裝箱運輸 |", "| 6. 場站交接 |",
+            "4,700 × 9.80665 = 46,091.255 N ≈ 46.1 kN",
+            "250 ÷ 9.80665 = 25.4929 kgf ≈ 25.5 kgf",
+            "Python `Decimal` 與 `awk` 兩條獨立路徑",
+            "這是 `N=1` 份 Meta 實作規範的確定性單位換算",
+            "### 多空小作文要共用同一份機械資料包",
+            "官方站點本輪拒絕直接 PDF 下載與視覺截圖",
             "## 再分清參考設計、品牌系統與客戶機群",
             "不是 AMD 直接出售的產品",
             "| 本文五種交付物 | 誰要交付 | 必須固定什麼 | 本輪證據 | 不能直接推成 |",
@@ -4490,7 +4502,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 57
+            sum(line.startswith("- **") for line in glossary.splitlines()), 68
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4507,14 +4519,15 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 21),
-            ("research_claim", 21), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 24),
+            ("research_claim", 26), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         for ledger_contract in (
-            "source_id: S12", "source_id: S21", "claim_id: C10",
-            "claim_id: C21", "claim_id: C1\nlabel: inference\nstatus: superseded",
+            "source_id: S12", "source_id: S21", "source_id: S24",
+            "claim_id: C10", "claim_id: C21", "claim_id: C26",
+            "claim_id: C1\nlabel: inference\nstatus: superseded",
             "corrected_by_claim_id: C11", "correction_kind: supersedes",
             "corrects_claim_id: C1", "monitor_id: T6", "monitor_id: T12",
         ):
@@ -4548,6 +4561,8 @@ class ResearchCenterTest(unittest.TestCase):
             "capability:rack-lifecycle-control,capability,機架生命週期控制",
             "capability:rack-configuration-baseline,capability,機櫃配置基準",
             "process:rack-change-triggered-regression,process,機櫃變更觸發回歸測試",
+            "concept:rack-mechanical-qualification-passport,concept,機架機械資格護照",
+            "metric:rack-mass-force-support-reaction,metric,機架質量—重力—支承反力邊界",
             "stage:oem-systemization,stage,整機廠品牌系統化",
             "stage:integrated-rack-qualification,stage,整櫃整合資格驗證",
             "component:efb,component,高架扇出橋接（EFB）",
@@ -4561,7 +4576,8 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-HEL-I19", "edge_id: KG-HEL-I20",
             "edge_id: KG-HEL-I21", "edge_id: KG-HEL-I22",
             "edge_id: KG-HEL-I23", "edge_id: KG-HEL-I24",
-            "edge_id: KG-HEL-I25",
+            "edge_id: KG-HEL-I25", "edge_id: KG-HEL-I26",
+            "edge_id: KG-HEL-I27",
         ):
             self.assertIn(edge, graph)
         self.assertIn(
@@ -4569,7 +4585,7 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: concept:rack-scale",
             graph,
         )
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 39)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 41)
 
     def test_compute_connect_station_three_separates_backside_power_path_process_and_company_gates(self):
         topic = (

@@ -1,15 +1,15 @@
 # AMD Helios 部署階梯知識圖譜
 
 本圖把參考設計、整機廠品牌系統化、整櫃資格、開始生產、預計出貨、客戶測試、正式上線與
-未來部署分開，並將運算、網路、電力、液冷、控制、配置基準、變更重驗與維修責任接回同一
-整櫃；沒有交付與公司財務證據前，線條不升級成客戶機群、訂單或獲利。
+未來部署分開，並將運算、網路、電力、液冷、控制、配置基準、變更重驗、機械資格與維修責任
+接回同一整櫃；沒有交付與公司財務證據前，線條不升級成客戶機群、訂單或獲利。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
 label: AMD Helios 部署階梯
-summary: 以參考設計、品牌系統、整櫃資格與六個部署關卡連結系統責任、具名客戶及台灣夥伴，同時保留交付、財務與多架構競爭的未驗證邊界。
+summary: 以參考設計、品牌系統、整櫃與機械資格及六個部署關卡連結系統責任、具名客戶及台灣夥伴，同時保留交付、場站、財務與多架構競爭的未驗證邊界。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
@@ -792,4 +792,44 @@ review_due: 2026-09-12
 status: active
 boundary: NVIDIA 與 Google／OCP 文件支持變更後重驗及變更紀錄的方法，但不能替 Helios 證明 retest matrix、結果、客戶驗收或生產穩定。
 next_trigger: 具名 Helios 品牌系統公開硬體、韌體、線纜、場站等變更類型與對應必重跑測項、結果及回退條件。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I26
+view: industry
+from_id: product:amd-helios
+to_id: concept:rack-mechanical-qualification-passport
+relation: requires
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C22,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C23,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C24,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C25
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: ORW Base 與 Meta 實作分開介面、payload 及滿載／空櫃／裝箱穩定條件，支持把機械證據分帳；目前沒有具名 Helios 品牌 SKU 的完整 mechanical report、場站簽核、出貨或財務。
+next_trigger: OEM／ODM 或客戶公開同一 Helios 品牌型號與 revision 的質量／重心／支點、結構、relocation、static、shipping、site acceptance 與 change／retest 資料包。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I27
+view: industry
+from_id: product:amd-helios
+to_id: metric:rack-mass-force-support-reaction
+relation: requires
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C23,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C26
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 4,700 kg、46.091255 kN 與 250 N／25.4929053244 kgf 只是在固定標準重力下分開質量與力；未加入 frame、包裝、動態加速度、重心、支點或場站條件，不能形成地板反力或產品 pass。
+next_trigger: 具名機架交付逐項 mass ledger、總質量、重心、輪組／leveler／anchor 幾何、搬運加速度、各支點反力、不確定度與 site pass／fail。
 -->

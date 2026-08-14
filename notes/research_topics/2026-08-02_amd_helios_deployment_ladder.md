@@ -80,6 +80,14 @@ reason: added_configuration_passport_change_triggered_regression_and_company_sta
 evidence: sources:S16,S17,S18,S19,S20,S21
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_orw_base_versus_meta_mechanical_qualification_passport_no_thesis_change
+evidence: sources:S22,S23,S24
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -126,6 +134,17 @@ evidence: sources:S16,S17,S18,S19,S20,S21
 - **機構件**：承載並固定機架、運算托盤與其他零件的結構；參與設計不等於量產數量或收入已確定。
 - **載板**：承接晶片封裝內部電性連接與支撐的基礎材料；廣泛 AMD 合作不等於 Helios 專屬訂單。
 - **資格認證（Qualification）**：客戶或平台確認產品符合規格與可靠度要求的過程；參與認證不等於已通過或已量產。
+- **規格（Specification）**：把適用範圍、要求與介面寫成可核對文件；符合一份基礎規格，只回答該文件範圍內的要求。
+- **文件版本（V1.0.0／V1.0.1）**：同一規格名稱的明確修訂身分；測試結果與主張都要綁回實際使用的版本。
+- **千牛頓（kN）**：力的單位，1 kN＝1,000 N；它不是公斤，也不能在不知道支點分布時直接當成單點地板反力。
+- **NIST**：美國國家標準暨技術研究院；本文只引用其 SI 單位換算，不用它替任何機架或產品背書。
+- **UL 認證**：依適用安全標準與認證程序完成的正式結果；規格要求未來在設計驗證階段做認證，不等於產品已取得認證。
+- **額定載重（Payload rating）**：指定機架配置可承接的安裝物質量上限；要先看是否包含機架本體、支撐件與附件，不能直接當成地板單點受力。
+- **載重分布與重心**：同樣總質量放在不同高度、前後位置或支點上，會產生不同變形、輪載與傾倒風險；總重量相同不代表機械條件相同。
+- **移動穩定（Relocation stability）**：機架在場內搬動或傾斜時不傾倒的能力；空櫃與滿載櫃的最壞情境可能不同，要分開測。
+- **靜態穩定（Static stability）**：機架定位後受到傾斜或水平外力時仍不傾倒的能力；它不是載重額度，也不能替代運輸測試。
+- **裝箱穩定（Crated-rack stability）**：機架連同運輸包裝成為另一個受測物後的抗傾倒條件；包裝通過不等於拆箱後或移動中的機架通過。
+- **工程驗證／設計驗證（EVT／DVT）**：先以工程樣品找設計問題，再以較固定版本做正式設計驗證或認證的階段；進入某階段不等於測試已通過。
 - **配置身分證（Configuration passport）**：本文給「硬體、韌體、軟體、網路、電力、冷卻、場站與測試條件版本清單」的白話名稱；它讓測試結果能對回真正受測的那一櫃。
 - **工廠盤點檔（Factory inventory）**：機櫃離廠時記錄托盤、交換器、電力架、序號與數量的清單；名稱相同但盤點不同，不能直接共用結果。
 - **物料清單（BOM）**：製造某個品牌型號所需的硬體零件與版本清單；參考設計不等於每家整機廠採用相同物料。
@@ -159,6 +178,7 @@ evidence: sources:S16,S17,S18,S19,S20,S21
 
 - 先看製造端是否從「預計出貨」變成有日期、有客戶邊界的實際交付。
 - 要求具名整機廠公開品牌型號、配置身分證，以及運算、網路、供電、液冷和維修共同通過的驗收與變更後重驗範圍。
+- 機械資料要再拆成介面版本、載重構成、重心與支點、空櫃／滿載／裝箱試件、搬運路徑、地板反力及場站簽核，不能只收一個最大公斤數。
 - 再看各客戶是否由產品預告或測試，前進到可用區域、正式上線與可描述的部署範圍。
 - 最後查台灣公司自己的季報、法說與重大訊息，是否同時出現具名產品、量產出貨及財務足跡。
 
@@ -166,6 +186,7 @@ evidence: sources:S16,S17,S18,S19,S20,S21
 
 - 如果工廠已能生產，但客戶仍在測試，哪一個部署關卡尚未完成？
 - 如果平台方只提供藍圖，誰要把零件做成可出貨的品牌系統，並對整櫃結果負責？
+- 如果一份文件只證明托盤能裝進共同介面，為什麼還不能說整櫃一定承得住、搬得動或進得了機房？
 - 產品頁只寫「即將推出」，和「已可使用」之間還差哪些證據？
 - 一家公司被列為合作夥伴後，還要看到哪些公司級資料，才能把「參與」升級成「受惠」？
 - 當客戶同時使用不同運算架構時，單一平台上線是否一定代表整體支出增加？
@@ -188,6 +209,63 @@ evidence: sources:S16,S17,S18,S19,S20,S21
 
 八條責任線只是把整櫃驗收拆成可查問題，不是固定上下游、產品規格比較或供應商排名。AMD 頁面
 上的效能與頻寬數字屬公司設計值；本文不用它們證明客戶實測、競品高低或台灣公司收入。
+
+## 相容不等於可搬、可落地：六張機械資格護照
+
+**第一張只回答「裝不裝得進去」。** OCP 的 ORW Base Specification V1.0.0 把自己定位為
+共同硬體介面的最低要求；第 4.2 節更明文不規定外部深度、高度、底座幾何或最大載重。載重配置、
+包裝、運輸物流、機架移動與基礎設施限制都留給個別實作處理 [S22]。因此「符合 ORW Base」
+可以支持托盤、導軌、匯流排與附件對到共同介面，卻不能單獨支持某一品牌機架的承重、搬運、
+包裝或機房進場資格。
+
+**第二張才開始回答「特定實作承多少」。** Meta 的 ORW Design Specification V1.0.1 是一個
+個別實作，不是 ORW Base 的通用載重保證。它要求含允許支撐／補強件的 frame 最低額定載重為
+4,700 kg，而且不把機架 frame 自身質量算入這個 payload；但匯流排、IT gear、層架、交叉撐、
+分歧管、canister chassis、線纜、門板、側板與其他附件都要占用額度。文件還提醒，載重能力會受
+設備重量分布、交叉撐數量與位置、包裝及測試要求影響，沒有交叉撐的 frame 載重並未由 Meta
+評估，特定配置仍須另行驗證 [S23]。所以看到 4,700 kg，先問「哪一版 frame、用了哪些補強、
+內含哪些附件、重量放在哪裡」，不能把數字貼到所有 ORW 或 Helios 系統上。
+
+| 六張機械資格護照 | 受測物／狀態 | 本輪規範能確認 | 品牌系統仍要交付 | 不能跨帳推成 |
+| --- | --- | --- | --- | --- |
+| 1. 共同介面 | ORW frame 與托盤、導軌、匯流排、附件的接點 | Base 固定關鍵尺寸與公差 [S22] | 品牌型號的介面版本、尺寸報告與互裝結果 | 介面相容等於載重、運輸或客戶驗收通過 |
+| 2. 結構載重 | 固定補強與完整安裝物的特定 frame 配置 | Meta 實作要求最低 4,700 kg payload；frame 自重不計、所有安裝物占額度 [S23] | BOM 質量表、位置、重心、補強、支點、變形與安全係數 | Meta 實作額度等於所有 ORW／Helios 機架額度 |
+| 3. 移動穩定 | 滿載櫃與空櫃兩種 relocation 試件 | Meta 實作要求兩者分別符合 10° 傾斜不傾倒 [S23] | 輪組或搬運器、坡道／門檻、速度、方向、路徑與通過結果 | 滿載通過就代表空櫃也通過，或靜止承重就代表搬得動 |
+| 4. 靜態穩定 | 定位後的滿載櫃 | Meta 實作要求符合 10° 傾斜或 250 N 推力條件 [S23] | 受力方向、高度、leveler／anchor 狀態、最壞重心與正式報告 | 250 N 是 payload、輪載、地板載重或運輸衝擊 |
+| 5. 裝箱運輸 | rack 與 shipping crate 組成的最壞情境試件 | Meta 實作列 17° 前／後／側裝箱穩定條件 [S23] | 包材版本、固定點、總包裝質量、衝擊／振動與到貨檢查 | 17° 比 10° 大，所以拆箱、移動與營運狀態一定更安全 |
+| 6. 場站交接 | 實際機架、搬運路徑與機房支承面 | Base 只提醒 infrastructure constraints 會改變 footprint、height 與 packaged weight [S22] | 月台、門、電梯、坡道、轉彎、地板集中／滾動反力、定位與 site sign-off | 機架實驗室通過等於每個資料中心都可進場與落地 |
+
+Meta 同一張環境測試表還把 preliminary EVT 與 formal UL certification DVT 分開：relocation
+要測滿載與空櫃，static stability 測滿載，crated-rack stability 又換成裝箱後最壞情境 [S23]。
+這些角度與推力不是一條可以互相比大小的排名；試件、支承面、受力方向與失效模式不同，17°
+裝箱條件不能替 10° 空櫃／滿載 relocation 背書，進入 DVT 也不能改寫成已取得認證。
+
+### 兩個單位換算，只用來防止把公斤、牛頓與地板反力混成一帳
+
+NIST 的 SI 指南給定標準自由落體加速度 9.80665 m/s²，且 1 kgf＝9.80665 N [S24]。若只做
+量綱教學，Meta 的 4,700 kg payload 在標準重力下對應
+`4,700 × 9.80665 = 46,091.255 N ≈ 46.1 kN` 的 payload 自身標準重量；250 N 水平推力則約為
+`250 ÷ 9.80665 = 25.4929 kgf ≈ 25.5 kgf`。前者仍不含 frame 自重，後者只是力的另一種表示，
+絕不是「只能承 25.5 kg」。實際地板、輪子、leveler 或 anchor 各自承受多少，還要加回 frame、
+包裝與搬運器質量，再用真正的重心、支點幾何、加速度與路徑求反力；不能把 46.1 kN 平均除以
+一個想像中的四個腳，就宣稱場站已通過。
+
+這是 `N=1` 份 Meta 實作規範的確定性單位換算，不是機架樣本或破壞試驗；沒有 sampling SE／t。
+Python `Decimal` 與 `awk` 兩條獨立路徑均重算為 46.091255 kN 與 25.4929053244 kgf。算術一致
+只證明換算可重現，不消除品牌配置、材料、補強、載重分布、測試、運輸與場站的不確定性，
+因此不進跨產品 comparison ledger。
+
+### 多空小作文要共用同一份機械資料包
+
+- **多方可寫到哪裡**：若具名品牌機架能在固定配置下交付介面、結構、滿載／空櫃移動、
+  裝箱運輸與場站通過資料，價值可能由鈑金製造延伸到結構設計、補強、包裝、搬運工具、路徑／
+  地板工程與驗證服務；能重複交付證據包的整合商，比只有展會展示更接近可規模部署。
+- **空方可寫到哪裡**：開放介面也可能擴大合格供應商，補強與附件會吃掉 payload 並增加包裝
+  與運輸負擔，舊機房的門、電梯、坡道或支承面可能成為部署瓶頸。4,700 kg 是 Meta 特定實作
+  的規範值，不是 Helios 成品、AIC 機架或客戶場站的通過結果，更不是出貨、收入或毛利分母。
+- **共同裁決資料**：品牌 SKU／revision、frame 與完整安裝物質量、逐項 payload ledger、載重
+  位置與重心、補強與支點、空櫃／滿載／裝箱試件、方法與 pass／fail、原始報告、運輸路徑與
+  地板反力、site acceptance、設計變更後重驗、實際出貨及公司財務。少任何一層，就停在該層。
 
 ## 再分清參考設計、品牌系統與客戶機群
 
@@ -591,6 +669,54 @@ limitation: 公司頁只支持機構整合角色與展示，沒有品牌 SKU、�
 independence_group: aic
 -->
 
+<!-- research_source
+source_id: S22
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Open Rack Wide (ORW) Base Specification V1.0.0
+published_at: 2026-04-28
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/open-rack-wide-orw-base-specification-v1-0-0-final-pdf
+locator: p.9 §4.1 Description 與 §4.2 Mechanical Requirements；Base 固定共同硬體關鍵尺寸／公差，明文不規定外部深度、高度、底座幾何或最大載重，並把 payload configuration、packaging、shipping／logistics、rack movement 與 infrastructure constraints 留給個別實作
+limitation: 這是 ORW frame 的最低共同介面規格，不是 Meta 或 Helios 品牌機架的實作設計、載重額度、測試結果、認證、運輸資料、場站驗收或財務證據；官方站點本輪拒絕直接 PDF 下載與視覺截圖，locator 依官方搜尋索引的逐頁全文核對
+independence_group: open-compute-project-orw
+-->
+
+<!-- research_source
+source_id: S23
+role: standard
+source_kind: document
+publisher: Meta / Open Compute Project
+title: Open Rack Wide (ORW) Meta Design Specification V1.0.1
+published_at: 2026-05-05
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/open-rack-wide-orw-meta-design-specification-v1-0-1-final-pdf
+locator: p.8 Overview；p.10 §4.3 Payload Rating；p.25 environmental test table 的 Relocation stability、Static stability 與 Stability test for crated rack；含 4,700 kg minimum、計入附件、無 cross-bracing 未評估、10°／250 N／17° 及 EVT／DVT 邊界
+limitation: 這是 Meta 對 ORW Base 的特定 frame 實作要求與測試計畫，不是所有 ORW 或 Helios 品牌機架的共同額定值，也不是任何具名產品已完成測試、UL 認證、運輸、site acceptance、量產或財務轉換的結果；官方站點本輪拒絕直接 PDF 下載與視覺截圖，locator 依官方搜尋索引的逐頁全文核對
+independence_group: open-compute-project-orw
+-->
+
+<!-- research_source
+source_id: S24
+role: standard
+source_kind: living_index
+publisher: U.S. National Institute of Standards and Technology
+title: NIST Guide to the SI, Appendix B.8 — Factors for Units Listed Alphabetically
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8
+locator: acceleration of free fall, standard (g_n)＝9.80665 m/s²；另以 NIST Guide Chapter 5 的 1 kgf＝9.80665 N 交叉核對
+limitation: 只提供 SI 單位與標準重力換算，不指定機架額定載重、局部重力、支承反力、動態載荷、試驗方法、通過條件或產品資格
+independence_group: nist-si-metrology
+-->
+
 <!-- research_claim
 claim_id: C1
 label: inference
@@ -948,6 +1074,91 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C22
+label: verified
+status: active
+claim: OCP ORW Base Specification V1.0.0 固定整合 IT gear、導軌、匯流排與附件所需的關鍵 frame 介面，但明文不規定外部深度、高度、底座幾何或最大 payload；包裝、運輸物流、機架移動與基礎設施限制屬個別實作責任
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-04-28
+basis: S22 p.9 §4.1／§4.2 逐項區分 critical interface 與 no prescribed requirements，並列出 implementation 應考慮的 payload、packaging、shipping、movement 與 infrastructure factors
+boundary: 只證實 Base 規格自己的 scope；不代表共同介面不重要，也不證明任何 Meta／Helios 品牌機架的尺寸、載重、搬運、運輸、場站或客戶資格
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: Meta ORW Design Specification V1.0.1 要求含允許補強件的 frame 最低 payload rating 為 4,700 kg；此額度不含 frame 自身質量，但所有已安裝匯流排、IT gear、層架、交叉撐、分歧管、canister、線纜、門板、側板與附件都要計入，且無 cross-bracing 的 frame 載重未由 Meta 評估
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-05-05
+basis: S23 p.10 §4.3 直接列出 4,700 kg minimum、frame mass exclusion、installed-item inclusions、重量分布／補強等影響因素及 no-cross-bracing 未評估警語
+boundary: 這是 Meta 的特定 ORW frame 實作要求，不是 ORW Base 通用保證、Helios 品牌機架規格、地板單點／輪載、動態搬運、試驗結果、認證或財務證據
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: Meta ORW 實作把 relocation、static 與 crated-rack stability 分成不同試件與條件：relocation 要分別測滿載及空櫃的 10° 傾斜，static stability 以滿載櫃符合 10° 傾斜或 250 N 推力，裝箱機架則在前／後／側最壞情境符合 17°，並把 preliminary EVT 與 formal UL certification DVT 分開
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-05-05
+basis: S23 p.25 environmental test table 逐列給出三種 stability 名稱、受測狀態、角度／推力與 EVT／DVT 階段
+boundary: 這些是 Meta 設計規格的要求與階段，不是公開 pass report；三列因試件與目的不同不能以角度大小互排強弱，也不證明 Helios、AIC 或任一客戶場站已完成測試或 UL 認證
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: inference
+status: active
+claim: 可信的 Helios 品牌系統機械資格需要把 ORW 介面版本、frame／完整安裝物質量、逐項 payload、載重位置與重心、補強與支點、空櫃／滿載／裝箱試件、測試方法與結果、運輸路徑、地板反力、場站簽核及變更後重驗綁到同一品牌 SKU 與 revision；只有 ORW 相容或一個最大公斤數不能替這份資料包背書
+supporting_source_ids: S12,S22,S23
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S12 把 Helios 定義為交由 OEM／ODM 品牌化的 ORW 參考設計；S22 明示 Base 不包外形、載重、物流、移動與基礎設施實作；S23 又顯示 payload 受配置／補強影響，並按滿載、空櫃與裝箱狀態分測，因此必須保留同版 mechanical evidence boundary
+boundary: 「六張機械資格護照」是研究中心整理出的證據框架，不是 OCP、Meta 或 AMD 同名強制標準；目前沒有具名 Helios 品牌 SKU 的完整機械資料包、site acceptance、出貨或公司財務
+verification_needed: OEM／ODM 品牌 datasheet 與 BOM 質量表、CAD／重心／支點、正式 structural／relocation／static／shipping 報告、路徑與地板反力、site sign-off、change／retest matrix、出貨及財務揭露
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C26
+label: inference
+status: active
+claim: 若只依 NIST 標準重力做確定性單位換算，Meta 的 4,700 kg payload 自身標準重量為 46,091.255 N（46.091255 kN），而 250 N 約為 25.4929053244 kgf；前者不含 frame 自重，後者是水平力的等值表示，兩者都不能直接當成地板各支點反力、動態載荷或 Helios 產品規格
+supporting_source_ids: S23,S24
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 依 S24 的 g_n＝9.80665 m/s² 與 1 kgf＝9.80665 N，Python Decimal 與 awk 兩路獨立重算 4,700×g_n 與 250／g_n，結果一致；S23 固定 payload exclusion 與 250 N 所屬 static stability 條件
+boundary: 這是 N=1 規範工作點的量綱教材，沒有 sampling SE／t；未加入 frame、包裝、搬運器、局部重力、加速度、重心、支點幾何或安全係數，也不是試驗觀測、A／B comparison、產品資格、訂單或財務證據
+verification_needed: 具名品牌機架的總質量、載重／重心圖、輪組與支點、加速度／路徑、支承反力原始計算、測試不確定度及場站 pass／fail
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 再把五組公開節點放回自己的時間線
 
 原始文件出現七個動詞、時程與容量數字，但它們來自平台方及四個不同客戶。正確讀法不是
@@ -995,6 +1206,9 @@ resolution:
 - [Google／OCP：ORV3 實作規格的最壞情境測試與變更紀錄](https://www.opencompute.org/documents/google-implementation-orv3-spec-1-pdf)（S19）。
 - [緯穎：COMPUTEX 2026 Helios 展示與 ODM 量產路徑自述](https://www.wiwynn.com/zh/news/wiwynn-advances-datacenter-design-at-computex-2026-with-high-power-and-optical-interconnect)（S20）。
 - [AIC：COMPUTEX 2026 Helios 機械架構角色與展示](https://www.aicipc.com/resources-detail/358/)（S21）。
+- [OCP：ORW Base Specification V1.0.0](https://www.opencompute.org/documents/open-rack-wide-orw-base-specification-v1-0-0-final-pdf)（S22；共同介面與實作邊界）。
+- [Meta／OCP：ORW Meta Design Specification V1.0.1](https://www.opencompute.org/documents/open-rack-wide-orw-meta-design-specification-v1-0-1-final-pdf)（S23；載重與三種 stability 試件）。
+- [NIST：SI 單位換算](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8)（S24；標準重力 9.80665 m/s²）。
 - 未來重查使用 [AMD IR](https://ir.amd.com/news-events/press-releases)（S6）、[Azure Updates](https://azure.microsoft.com/en-us/updates/)（S7）、[MOPS](https://mops.twse.com.tw/mops/web/index)（S8），以及 [OpenAI](https://openai.com/news/)（S9）、[Meta](https://about.fb.com/news/)（S10）、[Anthropic](https://www.anthropic.com/news)（S11）官方索引；新附件出現時必須另建 document source。
 
 ## 最後用六關把平台進度接回台灣公司
