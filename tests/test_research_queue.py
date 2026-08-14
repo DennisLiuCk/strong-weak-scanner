@@ -2030,8 +2030,20 @@ class ReadabilityGateTest(unittest.TestCase):
         text = path.read_text(encoding="utf-8")
         for token in (
             "reason: added_effective_capacitance_impedance_ripple_heating_and_lifetime_envelope",
+            "reason: added_capacitor_energy_voltage_window_esr_droop_and_target_impedance_passport_without_thesis_clock_refresh",
             "supporting_source_ids: S1,S2,S3,S4,S9,S10,S11",
             "## 同樣的容量，為什麼仍不能互換：四道可用能力檢查",
+            "## 同樣 1,000 µF，為什麼可用能量與瞬態壓降仍不同",
+            "½C×（Vhi²−Vlo²）",
+            "0.352J",
+            "0.022J",
+            "54,347.826 µF",
+            "28,409.091 µF",
+            "ΔV＝I×ESR＋IΔt／C",
+            "Zmax＝ΔV／ΔI＝2.5mΩ",
+            "N＝2 個能量案例",
+            "沒有 sampling SE／t",
+            "### 多空小作文共用的電容能量—瞬態十欄護照",
             "| 本文 4 把尺 |",
             "| 1. 有效容量 |",
             "| 2. 頻率阻抗 |",
@@ -2040,10 +2052,17 @@ class ReadabilityGateTest(unittest.TestCase):
             "source_id: S9",
             "source_id: S10",
             "source_id: S11",
+            "source_id: S12",
+            "source_id: S13",
+            "source_id: S14",
             "claim_id: C6",
             "claim_id: C7",
             "claim_id: C8",
             "claim_id: C9",
+            "claim_id: C10",
+            "claim_id: C11",
+            "claim_id: C12",
+            "claim_id: C13",
             "monitor_id: T3",
         ):
             self.assertIn(token, text)
@@ -2059,6 +2078,8 @@ class ReadabilityGateTest(unittest.TestCase):
             ("metric:capacitor-impedance-spectrum", "KG-ACR-I11"),
             ("metric:capacitor-ripple-temperature-rise", "KG-ACR-I12"),
             ("metric:capacitor-mission-life", "KG-ACR-I13"),
+            ("process:capacitor-energy-transient-passport", "KG-ACR-I14"),
+            ("metric:capacitor-usable-energy-droop-boundary", "KG-ACR-I15"),
         ):
             self.assertIn(metric, concepts)
             self.assertIn(f"to_id: {metric}", graph)

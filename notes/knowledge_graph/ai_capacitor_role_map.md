@@ -1,7 +1,7 @@
 # AI 電容角色知識圖譜
 
 本圖按位置、電壓、頻帶與任務拆分 rack CBU、高壓 DC-link、板級 bulk 與近晶片去耦，
-再以有效容量、頻率阻抗、紋波溫升與任務壽命核對實際可用能力。公司節點只投影其公開產品角色；
+再以有效容量、可用能量、電壓窗、壓降拆解、頻率阻抗、紋波溫升與任務壽命核對實際可用能力。公司節點只投影其公開產品角色；
 族群線仍是搜尋路由，沒有一條線代表台灣公司已供貨。
 
 <!-- knowledge_graph_meta
@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: ai-capacitor-role-map
 root_node_id: concept:ai-capacitor-role-map
 label: AI 電容角色地圖
-summary: 把 rack CBU、高壓 bus／DC-link、板級 bulk 與 package／near-die decoupling 分成不同查核單位，再用四道工作條件區分標稱容量與實際可用能力；產品角色不等於台灣供應商量產或財務曝險。
+summary: 把 rack CBU、高壓 bus／DC-link、板級 bulk 與 package／near-die decoupling 分成不同查核單位，再用四道工作條件與能量—瞬態護照區分標稱容量、可用能量及壓降；產品角色不等於台灣供應商量產或財務曝險。
 article_ids: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP
 status: active
 -->
@@ -332,4 +332,44 @@ review_due: 2026-09-01
 status: active
 boundary: 四道工作條件是研究框架；ESE 壽命公式與 TDK 溫升建議不可跨技術套用，也不等於客戶保固、field reliability 或財務貢獻。
 next_trigger: 具名平台固定 mission profile、加速試驗、failure criteria、field hours、BOM 與 supplier／customer 雙向結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACR-I14
+view: industry
+from_id: concept:ai-capacitor-role-map
+to_id: process:capacitor-energy-transient-passport
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C13
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-01
+status: active
+boundary: 十欄護照是研究中心的比較契約，不是唯一設計流程、客戶 qualification、production BOM、材料排名或財務貢獻。
+next_trigger: 同一 production platform 公布位置、負載、bank、電壓窗、有效容量、能量、阻抗、壓降、熱壽命、qualification 與商業共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACR-I15
+view: industry
+from_id: concept:ai-capacitor-role-map
+to_id: metric:capacitor-usable-energy-droop-boundary
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C10,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C11,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C12,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C13
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-01
+status: active
+boundary: ½CV²、I×ESR、IΔt／C 與 ΔV／ΔI 分屬理想能量、定電流近似及頻帶目標；不能拼成完整 PDN 通過、需求倍數或公司價值。
+next_trigger: 客戶在同一量測參考點公開電壓窗、load waveform、C／ESR／ESL／Z(f)、壓降分解、熱壽命、重複測試與 sign-off。
 -->

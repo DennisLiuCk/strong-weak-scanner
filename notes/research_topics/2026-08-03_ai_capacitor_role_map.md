@@ -72,6 +72,14 @@ reason: added_effective_capacitance_impedance_ripple_heating_and_lifetime_envelo
 evidence: sources:S9,S10,S11
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_capacitor_energy_voltage_window_esr_droop_and_target_impedance_passport_without_thesis_clock_refresh
+evidence: sources:S12,S13,S14
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -96,19 +104,26 @@ evidence: sources:S9,S10,S11
 - **頻帶**：元件能有效處理的一段變化速度或頻率範圍；不同頻帶通常需要不同位置與電容特性。
 - **瞬態**：負載、電壓或電流在很短時間內突然改變的事件。
 - **阻抗**：電路在特定頻率下阻礙電流變化的程度；供電路徑要在目標頻帶維持足夠低的阻抗。
+- **可用能量**：電容從允許的最高工作電壓降到最低工作電壓之間，理想上能交出的能量；不能只看滿電時儲存多少。
+- **Vhi／Vlo**：一段放電任務允許的最高與最低工作電壓；兩者共同決定可用電壓窗。
+- **½CV²**：理想電容在電壓 V 時的儲能關係，其中 C 是電容量；實際系統還要扣掉各種損耗與工作邊界。
+- **Hold-up／ride-through**：主電源短暫掉電或切換時，由儲能維持負載的時間；它先是一筆能量與電壓窗的帳。
+- **負載階躍（load step）**：負載電流在短時間突然改變；最初的壓降會同時受等效串聯電阻、電容量、寄生電感、走線與控制迴路影響。
+- **目標阻抗**：把可容許壓降除以負載電流變化所得的供電路徑阻抗上限；它必須對到指定頻帶，不能只用單一頻率或單一電容判斷。
 - **自共振頻率（SRF）**：電容的容性與寄生電感效應互相抵銷附近的頻率；超過後，阻抗可能重新上升，元件不再像理想電容。
 - **寄生電感**：導線、接點、電路板與封裝自然帶來的額外電感；距離越遠，越可能削弱高頻去耦效果。
 - **任務剖面（mission profile）**：元件在預定使用期間會遭遇的電壓、電流、溫度、頻率、冷卻與運轉時間組合。
 - **電路板大容量電容（board bulk）**：放在電路板供電入口或轉換器附近，處理比晶片旁去耦更慢的電流變化。
 - **封裝／晶片旁（package／near-die）**：非常靠近晶片的供電位置，用來縮短高頻電流路徑並降低寄生影響。
 - **參考設計（reference design）**：供應商公開的可行電路與元件組合，用來示範一種做法；不等於客戶已採用或量產。
+- **Selection／選型**：依工作條件挑選料號與配置的工程過程；文件標題出現 Selection，不代表已通過客戶資格驗證。
 - **料號（part number）**：用來辨認特定產品規格與版本的編號；只有產品類別，還不能確認實際採用哪一顆元件。
 - **客戶資格驗證（qualification）**：客戶依自己的電氣、安全、可靠度與系統條件，確認產品是否可被採用的測試階段。
 
 ### 三句話抓重點
 
 - AI 機櫃裡的電容至少出現在四個不同位置：機櫃旁的電容儲能模組、高壓直流匯流排、電路板，以及封裝或晶片旁；位置不同，處理的電力變化也不同。
-- 分完位置後還要再過四道檢查：工作電壓下的有效容量、目標頻帶的阻抗、紋波造成的溫升，以及整段任務剖面下的壽命；同樣的標稱容量不代表可互換。
+- 分完位置後還要再過四道檢查，並把可用能量、電壓窗、等效串聯電阻壓降與電容量壓降分帳；同樣的標稱容量不代表可互換，也不代表能交出相同能量或瞬態支撐。
 - 因此，現有證據只能用來分清電容放在哪裡、負責什麼，還不能證明台灣被動元件或電源供應公司已進入量產材料清單、取得訂單或形成可辨識獲利。
 
 ### 為什麼重要
@@ -126,12 +141,14 @@ evidence: sources:S9,S10,S11
 - 追 OCP 或平台文件是否公布同一量產機櫃中，電容儲能模組、高壓直流匯流排、電路板與晶片旁供電路徑的介面、額定條件及客戶資格驗證。
 - 追元件供應商是否從產品角色圖推進到具名料號、客戶測試、量產出貨，以及可以重建的替代與用量資料。
 - 追同一具名料號在實際直流電壓、溫度與頻率下的有效容量、阻抗曲線、紋波溫升及壽命計算，避免只比較標稱容量。
+- 追同一平台是否同時公布最高／最低工作電壓、負載波形、hold-up 時間、等效串聯電阻／電感與目標阻抗，才能重建能量及瞬態兩本帳。
 - 追台灣被動元件與電源供應公司的法說、季報及重大訊息，確認客戶與供應商是否能雙向對齊產品位置、規格、量產節點、收入與毛利。
 
 ### 想一想
 
 - 兩顆電容的容量即使相近，一顆放在高壓供電路徑、另一顆放在晶片旁，為什麼不能直接互換？
 - 即使兩顆電容位在同一位置、都標示相同容量，直流偏壓、阻抗曲線與散熱條件不同時，哪一顆才真正能完成任務？
+- 同樣 1,000 µF，若可用電壓窗分別是 48→40V 與 12→10V，為什麼不能用容量相同就推定可用能量相同？
 - 如果某一段供電路徑用了效能更高、但數量更少的元件，只看「規格升級」會不會高估整體價值？
 - 供應商的產品角色圖和客戶實際量產材料清單之間，還缺哪些資格驗證、份額與財務證據？
 
@@ -316,6 +333,54 @@ limitation: 這是 ESE +105°C 徑向鋁電解系列的應用指南；等效電�
 independence_group: yageo-kemet
 -->
 
+<!-- research_source
+source_id: S12
+role: company_release
+source_kind: living_index
+publisher: Eaton
+title: Supercapacitor Modules Frequently Asked Questions
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.eaton.com/sg/en-us/products/electronic-components/faq/supercapacitor-modules-frequently-asked-questions.html
+locator: Energy and Power Calculation、Voltage、State of Charge；儲能以 ½CV² 計，peak power 另含 ESR，state of charge 以量測電壓平方除設計電壓平方表示，工作電壓範圍又會影響壽命
+limitation: 這是 Eaton 現行超級電容模組 FAQ，頁面未標發布日；公式只建立理想能量、功率與電壓平方關係，不是所有電容技術、AI rack、CBU 量產 BOM、效率、可用壽命或財務資料
+independence_group: eaton
+-->
+
+<!-- research_source
+source_id: S13
+role: company_release
+source_kind: living_index
+publisher: Eaton
+title: Supercapacitor Applications Guide
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.eaton.com/us/en-us/products/electronic-components/topics/supercapacitor-applications-guide.html
+locator: Discharge Characteristics、General Application Information、Lifetime；定電流放電把 resistive 與 capacitive drop 分列為 Vdrop＝I×(R＋t／C)，短時間高電流脈衝較受 ESR 主導，較低電流長時間放電較受 capacitance 主導，並另列電壓、溫度、串聯均壓與壽命邊界
+limitation: 這是 Eaton 對自身超級電容產品的現行應用指南，頁面未標發布日；定電流近似不能直接套用定功率轉換器、MLCC、鋁電解、薄膜、含 ESL／控制迴路的完整 PDN 或客戶 qualification
+independence_group: eaton
+-->
+
+<!-- research_source
+source_id: S14
+role: company_release
+source_kind: document
+publisher: Texas Instruments
+title: Input and Output Capacitor Selection
+published_at: 2006-02-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.ti.com/lit/an/slta055/slta055.pdf
+locator: PDF pp.7–10；電容阻抗受 C／ESR／ESL 與自共振限制，多種電容覆蓋不同頻帶；快速負載階躍的立即壓降下限以 ΔI×並聯 ESR 說明，分散式電源匯流排以 Z＝ΔV／ΔI 建立目標阻抗
+limitation: 文件頁首只標 February 2006，本文以 2006-02-01 做月精度正規化且不主張日精度；這是舊式 PTH regulator 應用報告，公式、頻帶與算例不是 AI rack、特定板卡、量產驗收、BOM 或財務證據
+independence_group: texas-instruments
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -469,6 +534,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: Eaton 的超級電容模組 FAQ 以 E＝½CV² 表示理想儲能，並以量測電壓平方除設計電壓平方表示 state of charge；因此容量相同時，工作電壓與可用電壓窗仍會改變可交出的理想能量
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S12 的 Energy and Power Calculation 與 State of Charge 段落直接列出兩個平方關係
+boundary: 只證實 Eaton 超級電容模組的理想計算關係；沒有納入電壓相依容量、ESR／ESL、轉換效率、漏電、熱、老化、保護下限、AI 平台或量產 BOM
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: Eaton 的超級電容應用指南在定電流放電近似下把總壓降分成 I×ESR 與 I×t／C，並指出短時間高電流脈衝較受 ESR 主導，較低電流長時間放電較受 capacitance 主導
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 的 Discharge Characteristics 直接給出 Vdrop＝I×(R＋t／C)，並逐段說明 resistive／capacitive component 與 current／duration 邊界
+boundary: 這是定電流、固定參數的超級電容近似；不含 ESL、走線、控制迴路、定功率負載、非線性容量、熱、老化或其他電容技術，不是完整 AI PDN 通過公式
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: TI 的應用報告以 ΔI×並聯 ESR 說明非常快速負載階躍的最佳情況立即壓降，並以 Zmax＝可容許 ΔV／ΔI 建立分散式供電匯流排的目標阻抗；同一文件亦指出單一電容不能覆蓋全部頻帶
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2006-02-01
+basis: S14 PDF pp.7–10 分列 C／ESR／ESL、自共振、多電容頻帶配置、快速 load transient 與 ΔV／ΔI 目標阻抗
+boundary: 文件算例屬指定 PTH regulator 與元件組合；立即 ESR 壓降不是總壓降，目標阻抗也必須對到頻帶、走線、ESL、控制迴路與量測，不支持 AI rack 的共同數值或材料排名
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 電容研究應把可用能量、hold-up 電壓窗、等效串聯電阻壓降與電容量壓降分成四本帳，再以位置、負載語意、頻帶、熱與壽命組成同一份十欄護照；只有 µF、額定電壓或單點 ESR，均不足以推導替代、系統價值或公司受惠
+supporting_source_ids: S9,S10,S11,S12,S13,S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S12 建立電壓平方能量，S13 分開 ESR 與 capacitance 壓降，S14 建立頻帶與目標阻抗；S9–S11 補上有效容量、熱與任務壽命，研究端將其整理成可重建護照
+boundary: 四本帳與十欄護照是本文的研究框架，不是唯一設計流程、跨材料評分、qualification 規格或需求預測；不支持料號、顆數、平均售價、份額、訂單、收入、毛利或股價尚未反映
+verification_needed: 同一 production platform 的具名位置、拓撲、電壓窗、負載波形、part-specific C／ESR／ESL／Z 曲線、熱與壽命、qualification、BOM 及客戶—供應商財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 四個位置、四種任務：先找電容放在哪裡
 
 | 電容位置 | 它主要處理什麼 | 目前一手證據 | 還不能因此判定 |
@@ -502,16 +635,100 @@ resolution:
 
 **第四道才核對任務壽命。** KEMET／YAGEO 的 ESE 公式只適用指定鋁電解系列，TDK 的溫升建議也只屬其高壓積層陶瓷電容情境。平台要用自己的任務剖面、加速試驗與失效判準完成資格驗證，不能把供應商示例直接當成現場壽命。
 
+## 同樣 1,000 µF，為什麼可用能量與瞬態壓降仍不同
+
+前一節回答「這顆電容在工作條件下還能不能用」；這一節再把兩種常被混在一起的任務拆開：
+hold-up／ride-through 是能量與電壓窗問題，負載階躍是時間、電阻、電感、頻帶與控制問題。
+Eaton 的超級電容資料把理想能量寫成 ½CV²，也把定電流壓降拆成 I×ESR 與 IΔt／C；
+TI 的電源應用報告則用 ΔI×Z 把可容許壓降連回目標阻抗，並提醒單一電容不能覆蓋全部頻帶。
+
+### 第一本帳：可用能量看電壓平方，不只看 µF
+
+電容從 Vhi 降到 Vlo 的理想可用能量是 ½C×（Vhi²−Vlo²）。下面固定 C＝1,000 µF，
+而且兩個案例的 Vlo／Vhi 都是 5／6；只改電壓尺度，結果就不同。
+
+| 假想能量案例 | C | Vhi→Vlo | 理想可用能量 | 能回答什麼 | 仍沒算什麼 |
+|---|---:|---:|---:|---|---|
+| A | 1,000 µF | 48→40V | 0.352J | 指定理想電壓窗內的能量 | 有效容量、ESR／ESL、效率、熱、保護與壽命 |
+| B | 1,000 µF | 12→10V | 0.022J | 同上 | 同上 |
+
+A 是 B 的 16 倍，並不是 48V 系統一定需要更多電容；它只示範能量隨電壓平方改變。
+反過來說，較高匯流排電壓在相同理想能量與電壓窗假設下，也可能減少所需容量或顆數，
+所以「電壓升級」不能直接翻譯成「電容價值量同比增加」。
+
+### 第二本帳：hold-up 要先固定負載語意與最低電壓
+
+若把負載簡化成定功率 P，忽略損耗、轉換器限流、電容量變化與保護動作，維持 Δt 所需的
+理想容量可寫成 C＝2PΔt／（Vhi²−Vlo²）。固定 P＝1kW、Δt＝10ms、Vhi＝48V：
+
+| 假想 hold-up 案例 | 允許電壓窗 | 理想所需容量 | 相對結果 |
+|---|---:|---:|---:|
+| H1 | 48→44V | 54,347.826 µF | 電壓窗較窄，需要較多容量 |
+| H2 | 48→40V | 28,409.091 µF | 電壓窗較寬，需要較少容量 |
+
+H1 是 H2 的 1.913 倍。這個差異來自假想的最低工作電壓，而不是任何 OCP、Eaton、TI
+或 AI 平台規格。真實設計還要加入效率、有效容量、容差、串並聯均壓、老化、最大電流、
+重新充電、故障模式與轉換器可接受的輸入範圍。
+
+### 第三本帳：負載階躍要把 ESR 與電容量壓降分開
+
+在 Eaton 所述的定電流、固定參數近似下，ΔV＝I×ESR＋IΔt／C。固定 C＝0.1F、
+I＝100A、Δt＝1ms，電容量項都是 1.0V；只把 ESR 從 5mΩ 改成 10mΩ：
+
+| 假想脈衝案例 | ESR 壓降 | 電容量壓降 | 兩項合計 | 判讀 |
+|---|---:|---:|---:|---|
+| P1：ESR 5mΩ | 0.5V | 1.0V | 1.5V | 此時間窗內電容量項較大 |
+| P2：ESR 10mΩ | 1.0V | 1.0V | 2.0V | 相同 C 仍因 ESR 不同而多掉 0.5V |
+
+這不是完整 PDN 模擬。更短的前緣還會受 ESL、連接器、母排與走線影響；更長的時間窗則會
+進入控制迴路、上游轉換器、溫升與電壓相依容量。把 ESR 壓降和 IΔt／C 壓降分帳，目的
+是找出瓶頸，不是把兩項相加後就宣布客戶資格驗證通過。
+
+### 第四本帳：目標阻抗是頻帶契約，不是單一料號標籤
+
+假想負載增加 20A、可容許壓降 50mV，Zmax＝ΔV／ΔI＝2.5mΩ。若電容群並聯 ESR
+已是 1.5mΩ，立即電阻壓降是 30mV，占壓降預算 60%，名目只剩 20mV。剩下的 40%
+不能自動全配給電容量：ESL、佈局、供電平面、頻率相依阻抗與控制迴路都要用同一量測
+參考點和頻帶核對。TI 的報告因此用不同類型電容覆蓋不同頻帶，而不是尋找一顆「全頻萬能」電容。
+
+以上共有 N＝2 個能量案例、N＝2 個 hold-up 電壓窗、N＝2 個定電流脈衝案例及 N＝1 個
+目標阻抗算例。Python Fraction 與獨立 awk 在顯示精度內完全一致；這些是固定假想輸入的
+確定性換算，不是抽樣、元件量測、rack 測試或客戶驗收，因此沒有 sampling SE／t，也沒有
+需求、顆數、價格、收入、毛利或公司效果。
+
+### 多空小作文共用的電容能量—瞬態十欄護照
+
+| 護照欄位 | 必須留下什麼 | 缺少時容易犯的錯 |
+|---|---|---|
+| 1. 位置與任務 | CBU、DC-link、board bulk 或 near-die；hold-up、load step、ripple 或 decoupling | 把不同時間尺度重複加總 |
+| 2. 負載語意 | 定功率／定電流、ΔI、Δt、duty cycle、波形與頻譜 | 把定電流公式套到定功率負載 |
+| 3. Bank 拓撲 | 具名料號、串並聯、均壓、冗餘、連接器與 layout | 用單顆規格推整個模組 |
+| 4. 電壓窗 | 額定、derating、Vhi、Vlo、保護與轉換器工作範圍 | 用滿電能量冒充可用能量 |
+| 5. 實際容量 | nominal／effective C、容差、偏壓、溫度與老化 | 用標稱 µF 當全生命週期容量 |
+| 6. 能量交付 | 所需／可交能量、時間、效率、漏電與邊界 | 把理想 ½CV² 當系統可用輸出 |
+| 7. 阻抗頻譜 | ESR、ESL、Z(f)、溫度／老化、SRF 與量測參考點 | 用單點 ESR 宣稱全頻通過 |
+| 8. 壓降拆解 | resistive、capacitive、inductive、layout 與 control response | 只報總壓降，找不到真正瓶頸 |
+| 9. 熱、壽命與故障 | ripple heat、環境／冷卻、mission life、inrush、recharge、fault | 把一次脈衝能力當長期可靠度 |
+| 10. 商業共同鍵 | 客戶 qualification、production BOM、替代顆數、成本、份額與財務分母 | 從公式直接跳到訂單或獲利 |
+
+**多方版本要成立，** 必須看到同一平台的功率波形、電壓窗或瞬態預算更嚴格，且供應商以
+更高可用能量、更低頻帶阻抗、可控溫升與壽命完成 qualification；之後還要證明每系統價值、
+份額、量產與財務貢獻，而不只是規格表變漂亮。
+
+**空方版本要成立，** 可能是較高匯流排電壓讓相同理想能量所需容量下降、主動控制減少
+被動元件、CBU／BBU／上游轉換器重新分工，或更高單價被更少顆數抵銷。只要缺 production
+BOM、替代前後顆數、qualification 與財務分母，就不能把「AI 功率更大」寫成所有電容同步受惠。
+
 ## 怎麼用這張表判讀公司新聞
 
 1. **先找客戶的量產架構**：供應商參考設計只能證明做得到；客戶平台文件才可能固定元件位置與接口。
-2. **再找具名產品與驗證**：料號、電壓、容量、電阻與電感特性、溫度、壽命及失效測試，必須對到同一個應用位置。
+2. **再找具名產品與驗證**：料號、可用電壓窗、負載波形、有效容量、阻抗頻譜、壓降拆解、溫度、壽命及失效測試，必須對到同一個應用位置。
 3. **最後才對回公司財務**：客戶與供應商雙向確認後，再查出貨量、平均售價、份額、收入與毛利；缺一層就維持觀察。
 4. **避免重複計算**：高規格元件可能減少顆數或取代另一層零件，不能直接加總每家供應商的機會地圖。
 
 ## 研究判定
 
-- **目前可保留的結論**：先分機櫃儲能、高壓直流匯流排、電路板與封裝／晶片旁四個位置，再核對有效容量、頻率阻抗、紋波溫升與任務壽命，才能討論元件是否可替換。
+- **目前可保留的結論**：先分機櫃儲能、高壓直流匯流排、電路板與封裝／晶片旁四個位置，再核對有效容量、可用能量、電壓窗、ESR／電容量壓降、頻率阻抗、紋波溫升與任務壽命，才能討論元件是否可替換。
 - **可信度為中而不是高**：OCP 與 TI 支持機櫃架構，TDK、Murata 與 KEMET／YAGEO 支持供應商技術邊界；目前仍缺同一量產平台的完整供電路徑、共同測試與材料清單。
 - **目前不能發布的結論**：所有電容同步增加、指定材料或台灣公司勝出、顆數、平均售價、市占、訂單、獲利，以及市場是否已反映。
 - **需要看到什麼才能前進**：買方量產文件與供應商申報雙向對齊具名產品、客戶資格驗證、實際配置、出貨及財務分母。
@@ -525,6 +742,9 @@ resolution:
 - [TDK：高 dV/dt 電路的 MLCC 選型與實際波形評估](https://product.tdk.com/en/techlibrary/applicationnote/snubber_mlcc.html)
 - [Murata：電容量的直流與交流電壓特性](https://article.murata.com/en-eu/article/voltage-characteristics-of-electrostatic-capacitance)
 - [KEMET／YAGEO：ESE 鋁電解電容應用與操作指南](https://content.kemet.com/datasheets/KEM_A4055_ESE.pdf)
+- [Eaton：超級電容模組常見問題與能量計算](https://www.eaton.com/sg/en-us/products/electronic-components/faq/supercapacitor-modules-frequently-asked-questions.html)
+- [Eaton：超級電容應用指南與放電壓降拆解](https://www.eaton.com/us/en-us/products/electronic-components/topics/supercapacitor-applications-guide.html)
+- [Texas Instruments：Input and Output Capacitor Selection](https://www.ti.com/lit/an/slta055/slta055.pdf)
 - [OCP Open Rack 規格索引](https://www.opencompute.org/wiki/Open_Rack/SpecsAndDesigns)
 - [TDK IR events](https://www.tdk.com/en/ir/ir_events/index.html)
 - [Murata news](https://www.murata.com/news)
