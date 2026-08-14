@@ -1,15 +1,15 @@
 # 製程控制量測系統契約知識圖譜
 
-本圖把「量測結果是否可信」與「產線如何抽樣、警報、攔截及處置」分成前後兩層，再把
-OCAP、實際圍堵、製造履歷與修正後放行接成事件護照。通用方法可建立查核欄位，但不替任何
-HBM 產線、設備商資格、良率改善或台灣公司財務貢獻背書。
+本圖把「量測結果是否可信」與「產線如何抽樣、分類、警報、攔截及處置」分成前後兩層，
+先用 base rate、四格與不對稱錯判成本固定門檻，再把 OCAP、實際圍堵、製造履歷與修正後放行
+接成事件護照。通用方法可建立查核欄位，但不替任何 HBM 產線、設備商資格、良率改善或台灣公司財務貢獻背書。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: process-control-measurement-contract
 root_node_id: concept:measurement-system-contract
 label: 製程控制量測系統契約
-summary: 先固定被測量 方法環境 參考校正 偏差變異與不確定度 再接抽樣 逃逸 偽警報 OCAP 圍堵履歷與放行事件 避免把精細數字或警報速度直接當成可信決策 良率改善或設備收入。
+summary: 先固定被測量 方法環境 參考校正 偏差變異與不確定度 再以base rate 四格 門檻 複判容量與漏失成本接抽樣 逃逸 偽警報 OCAP 圍堵履歷及放行事件 避免把accuracy 精細數字或警報速度直接當成可信決策 良率改善或設備收入。
 article_ids: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY
 status: active
 -->
@@ -452,4 +452,44 @@ review_due: 2026-08-31
 status: active
 boundary: Unique ID 與 traceability 不自動證明根因 受影響範圍完整 圍堵成功 良率改善或工具收入。
 next_trigger: 同一 production cohort 公開 object IDs route tool chamber recipe material time window candidate scope confirmed failures disposition 與 release。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCMC-I20
+view: industry
+from_id: concept:measurement-system-contract
+to_id: process:defect-threshold-cost-passport
+relation: includes
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C39,MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C40
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: limited_source
+exclusivity_scope: NIST 的 wafer defect 與 misclassification 研究同屬一條中立方法鏈 本圖只據此建立可稽核欄位 不把 surrogate datasets 當成客戶量產結果。
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 成本護照是研究中心比較契約 不是 NIST 共同標準 半導體客戶 recipe 固定門檻 錯判成本 工具需求或財務模型。
+next_trigger: 同一 production product layer 公開 base rate truth method TP FP FN TN threshold version review capacity escape consequence cost ratio 與 change control。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCMC-I21
+view: industry
+from_id: concept:measurement-system-contract
+to_id: metric:defect-miss-review-cost-crossover
+relation: measured_by
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C40
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 一百萬個假想單位與 90.91 crossover 只示範量綱 沒有量產樣本 sampling SE t 良率 產能 工具數 公司效果或投資結論。
+next_trigger: 客戶以同一 truth set 公開至少兩個 threshold 的 confusion matrix review time escape consequence 與完整成本分母 並能重算實際決策交叉點。
 -->

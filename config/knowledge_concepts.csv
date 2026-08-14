@@ -420,6 +420,8 @@ concept:inspection-control-plan,concept,檢查製程控制計畫,Inspection cont
 metric:inspection-sampling-coverage,metric,檢查抽樣與覆蓋,Inspection sampling and coverage,concept:inspection-control-plan,按 lot wafer die site 或 package 記錄檢查比例 分布及動態抽樣規則的尺度
 metric:defect-sensitivity-escape,metric,缺陷靈敏度與逃逸,Defect sensitivity and escape,concept:inspection-control-plan,把最小可見缺陷與真正關鍵缺陷漏檢風險及後續失效接起的尺度
 metric:nuisance-false-alarm,metric,雜訊與偽警報,Nuisance and false-alarm rate|FAR,concept:inspection-control-plan,量測候選中非關鍵訊號 分類錯誤及其占用複判能力的尺度
+process:defect-threshold-cost-passport,process,缺陷門檻成本護照,Defect threshold cost passport|misclassification decision passport,concept:inspection-control-plan,把母體基準率 四格分母 門檻版本 複判容量 漏失後果 成本比與變更控制綁在同一份可重算決策紀錄
+metric:defect-miss-review-cost-crossover,metric,漏失與複判成本交叉點,Defect miss review cost crossover|FN review tradeoff,process:defect-threshold-cost-passport,以兩個門檻各自的候選複判量與漏失數求出決策偏好翻轉所需的每漏失相對成本並禁止以accuracy單項替代
 metric:inspection-cycle-time,metric,檢查結果週期時間,Inspection time to result|review cycle time,concept:inspection-control-plan,從檢查 複判 分類到形成可執行決策所需時間的尺度
 capability:excursion-containment,capability,製程異常圍堵,Process excursion containment,concept:inspection-control-plan,在製程漂移或缺陷異常後快速隔離受影響設備 批次與產品並限制後續損失的能力
 metric:coolant-chemistry-baseline,metric,冷卻液化學基準,Coolant chemistry baseline|fluid baseline,concept:liquid-cooling-loop-boundary,在合格填充與啟動條件下固定配方 pH 導電度硬度顆粒抑制劑微生物及代表樣本的比較起點

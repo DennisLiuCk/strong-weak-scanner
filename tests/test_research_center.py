@@ -5604,6 +5604,17 @@ class ResearchCenterTest(unittest.TestCase):
             "### 先用四格表停止把「工具標記」當成「參考真值」",
             "| **系統有標記** | TP：成功攔截",
             "| **系統未標記** | FN／escape",
+            "### 99.8801% accuracy，仍可能讓總錯判成本更高",
+            "reason: added_defect_threshold_base_rate_review_load_and_miss_cost_crossover_without_thesis_or_clock_refresh",
+            "source_id: S34",
+            "claim_id: C39",
+            "claim_id: C40",
+            "Precision＝TP／(TP＋FP)",
+            "8.264462809917%",
+            "44.469149527515%",
+            "83.480257116621%",
+            "C = (10,890 − 1,799) ÷ (200 − 100) = 90.91",
+            "defect-threshold cost passport",
             "| 1. 訊號／候選 |",
             "| 5. 製造與經濟結果 |",
             "使用 die-level MES 提供即時資訊、派工、缺陷攔截與分類",
@@ -5628,8 +5639,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 33),
-            ("research_claim", 38), ("metric_comparison", 5),
+            ("research_topic", 1), ("research_source", 34),
+            ("research_claim", 40), ("metric_comparison", 5),
             ("impact", 4), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5649,6 +5660,8 @@ class ResearchCenterTest(unittest.TestCase):
             "process:excursion-containment-event-passport,process,異常圍堵九事件護照",
             "metric:signal-validation-actuation-latency,metric,訊號—確認—控制動作延遲",
             "capability:manufacturing-genealogy,capability,製造履歷與物件追溯",
+            "process:defect-threshold-cost-passport,process,缺陷門檻成本護照",
+            "metric:defect-miss-review-cost-crossover,metric,漏失與複判成本交叉點",
         ):
             self.assertIn(concept, concepts)
 
@@ -5657,7 +5670,7 @@ class ResearchCenterTest(unittest.TestCase):
             / "process_control_measurement_contract.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 製程控制量測系統契約", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 24)
         for node in (
             "from_id: company:kla",
             "from_id: company:nova",
@@ -5677,6 +5690,8 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: process:excursion-containment-event-passport",
             "to_id: metric:signal-validation-actuation-latency",
             "to_id: capability:manufacturing-genealogy",
+            "to_id: process:defect-threshold-cost-passport",
+            "to_id: metric:defect-miss-review-cost-crossover",
             "to_id: group:semiequip", "to_id: group:packtest",
         ):
             self.assertIn(node, graph)

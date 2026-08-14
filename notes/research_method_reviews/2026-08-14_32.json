@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-08-14",
+  "methodologyVersion": "1.6",
+  "registryFingerprint": "74918b366518711caa060fd37fc7a408d7d2ddd64ed833e551f95b6aff7cc3e0",
+  "scope": {
+    "topics": 39,
+    "activeTopics": 39,
+    "radarCandidates": 8,
+    "promotedCandidates": 7,
+    "radarCycles": 6,
+    "radarHistoryCandidates": 44,
+    "graphs": 37,
+    "financialAssessments": 5,
+    "scanEvents": 90
+  },
+  "selection": {
+    "cycleId": "RS-2026-08-09-01",
+    "candidates": 8,
+    "frozenBeforeResearch": 8,
+    "advanceDecisions": 2,
+    "promotedAfterResearch": 2,
+    "rejectedAfterResearch": 0,
+    "cycles": 6,
+    "accountableCycles": 6,
+    "historicalCandidates": 44,
+    "earlyReselections": 4,
+    "requiredEarlyReselections": 1,
+    "documentedEarlyTriggers": 1,
+    "grandfatheredEarlyReselections": 3,
+    "accountable": true,
+    "boundary": "歷史雷達退役後仍逐輪核對凍結值；未到期重選自 2026-08-07 起必須留下新來源 early trigger。這只能證明選擇可稽核，升格不是選題正確率或投資命中率。"
+  },
+  "claims": {
+    "active": 578,
+    "verified": 374,
+    "inference": 123,
+    "unverified": 81,
+    "withBoundary": 578,
+    "unverifiedWithNextEvidence": 81,
+    "comparisonObservations": 41
+  },
+  "sources": {
+    "active": 562,
+    "withLocatorAndLimitation": 562,
+    "thesesWithTwoIndependentGroups": 39,
+    "activeTheses": 39,
+    "thesesNeedingSecondIndependentGroup": []
+  },
+  "monitors": {
+    "active": 125,
+    "withLivingWatchSource": 125,
+    "dueOrOverdue": 0,
+    "overdue": 0,
+    "reviewedMature": 0
+  },
+  "freshness": {
+    "staleTopics": 0,
+    "staleEdges": 56
+  },
+  "scans": {
+    "events": 90,
+    "full": 2,
+    "partial": 88,
+    "overdue": 0,
+    "latestAt": "2026-08-14",
+    "latestId": "scan-2026-08-14-defect-threshold-base-rate-cost-crossover",
+    "latestScope": "partial"
+  },
+  "corrections": {
+    "supersededOrRefutedClaims": 25,
+    "monitorReviewEvents": 58,
+    "resultCounts": {
+      "new_contrary": 2,
+      "new_support": 39,
+      "no_new_evidence": 16,
+      "not_yet_testable": 1
+    }
+  },
+  "calibration": {
+    "evidenceBearingOutcomes": 41,
+    "minimumOutcomesForDescriptiveBreakdown": 3,
+    "descriptiveBreakdownReady": false,
+    "outcomeCounts": {
+      "new_support": 39,
+      "new_contrary": 2
+    },
+    "boundary": "只列到期 monitor 找到的新支持／反方證據筆數，不計算支持率。new_support 表示找到支持該 monitor 檢查方向的新證據，不等於主命題正確、投資命中、報酬或因果效果。"
+  },
+  "graphs": {
+    "activeEdges": 772,
+    "traceableEdges": 772,
+    "verified": 426,
+    "inference": 206,
+    "unverified": 140,
+    "financialMateriality": 1,
+    "financialAssessments": 5,
+    "financialContractComplete": 5,
+    "directFinancialAttribution": 1,
+    "boundedFinancialProxies": 3,
+    "financialDenominatorsNotDisclosed": 1
+  },
+  "gates": [
+    {
+      "id": "selection_accountability",
+      "label": "選題前承諾",
+      "status": "pass",
+      "observed": "6/6 輪 schema 2 雷達保留凍結值；本輪 8/8 個候選有研究前凍結；2 個 advance 中 2 個完成升格、0 個研究後拒絕；cutover 後 early trigger 1/1，另揭露 3 次舊制未留 trigger",
+      "boundary": "通過只代表歷史初始排名、第一拒絕、下一份證據與未到期重選理由可回查；不能由單輪升格數或 early trigger 判定研究正確。"
+    },
+    {
+      "id": "traceability",
+      "label": "可追溯性",
+      "status": "pass",
+      "observed": "772/772 條圖譜線可回查；578/578 個 active claim 有邊界",
+      "boundary": "通過代表引用完整，不代表主張一定為真。"
+    },
+    {
+      "id": "financial_materiality_contract",
+      "label": "財務材料性 v2",
+      "status": "pass",
+      "observed": "5/5 筆 assessment 有完整分子、分母、期間、來源與邊界；direct 1、bounded_proxy 3、not_disclosed 1",
+      "boundary": "通過只代表財務口徑與歸因狀態可稽核；bounded_proxy 與 not_disclosed 不得被解讀成題材收入，direct 也不等於投資報酬或因果效果。"
+    },
+    {
+      "id": "cross_check_depth",
+      "label": "獨立交叉驗證",
+      "status": "pass",
+      "observed": "39/39 個主命題有至少兩條獨立來源鏈；缺口 無",
+      "boundary": "兩條獨立消息鏈只能降低單一來源偏誤，不代表主張一定為真。"
+    },
+    {
+      "id": "falsifiability",
+      "label": "可證偽性",
+      "status": "pass",
+      "observed": "125/125 個 monitor 有 living watch source；81/81 個待驗證 claim 寫明下一份證據",
+      "boundary": "Monitor 完整不等於結果已成熟。"
+    },
+    {
+      "id": "freshness",
+      "label": "新鮮度",
+      "status": "attention",
+      "observed": "0 篇 topic、56 條 edge 過期；0 個 monitor 逾期",
+      "boundary": "過期會降可信度，但不自動判定主張錯誤。"
+    },
+    {
+      "id": "correction_learning",
+      "label": "修正學習",
+      "status": "not_ready",
+      "observed": "尚無到期 review event；不能把未被檢驗視為成功；累積 25 個已修正 claim",
+      "boundary": "沒有新證據必須留下 no_new_evidence，而不能刷新 evidence clock。"
+    },
+    {
+      "id": "scan_accountability",
+      "label": "掃描覆蓋問責",
+      "status": "pass",
+      "observed": "90 次掃描：2 次 full、88 次 partial；最新 cadence 逾期 0 次；最新 scan-2026-08-14-defect-threshold-base-rate-cost-crossover",
+      "boundary": "Partial 只證明指定來源與題材已查過，不能證明全市場沒有其他重要主題；逾期只檢查最新全域 cadence，尚未量化每個歷史 scope 是否被後續掃描覆蓋；通過也不代表每則公告都被正確解讀。"
+    },
+    {
+      "id": "calibration",
+      "label": "校準可用性",
+      "status": "not_ready",
+      "observed": "41 個具新證據的到期結果：new_support 39、new_contrary 2；最低分類揭露門檻 3",
+      "boundary": "即使達門檻也只報結果分類與 N，不計支持率；review outcome 尚未編碼主命題真假或投資結果。"
+    }
+  ],
+  "caveats": [
+    "選題前凍結與升格結果分開保存；至少累積多輪到期結果前，不計算選題命中率。",
+    "升格候選數是研究流程產出，不是研究正確率。",
+    "退役雷達仍納入 selection fingerprint；cutover 前 3 次未留 early trigger 的重選被保留揭露，不回溯改寫。",
+    "獨立來源鏈覆蓋是交叉檢查深度，不是多數決或真實性分數。",
+    "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
+    "no_new_evidence 是一次有紀錄的檢查，不得刷新 claim 的證據時鐘。",
+    "Partial scan 不等於全 universe 或全市場覆蓋；研究漏網風險必須持續顯示。",
+    "Scan overdue 目前只量最新全域 cadence；尚無 scope lineage 前，不把歷史期限累加成永久逾期。",
+    "Monitor outcome 只描述新證據方向；在 outcome schema 能分辨主命題效應前，不計算 support rate。",
+    "財務材料性 v2 的 company_total 只是分母錨點；bounded_proxy 與 not_disclosed 都不能升級成題材財務貢獻。"
+  ],
+  "snapshotId": "RMA-2026-08-14-32"
+}

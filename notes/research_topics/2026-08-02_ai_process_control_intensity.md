@@ -116,6 +116,13 @@ to: triaged
 reason: alarm_validation_containment_genealogy_disposition_and_release_event_passport_added_without_thesis_or_clock_refresh
 evidence: sources:S31,S32,S33
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_defect_threshold_base_rate_review_load_and_miss_cost_crossover_without_thesis_or_clock_refresh
+evidence: sources:S28,S29,S34
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -136,10 +143,17 @@ evidence: sources:S31,S32,S33
 - **翹曲（warpage）**：晶圓、面板或封裝受材料與溫度影響而彎曲；它會增加對位、量測與接合難度。
 - **關鍵缺陷／雜訊缺陷（critical／nuisance defect）**：前者會傷害良率或可靠度，後者雖被工具看見卻未必影響產品；分類能力會影響工程師是否把時間用在真正重要的異常。
 - **混淆矩陣（confusion matrix）**：把參考真值的「有／無目標缺陷」和系統判定的「有／無標記」交叉成 TP、FP、FN、TN 四格；四格的分母、真值方法與門檻版本都要固定，不能只報總缺陷數。
+- **母體基準率（base rate／prevalence）**：受檢母體中真正有目標關鍵缺陷的比例；當缺陷很少，即使偽警報率看似不高，乾淨單位的龐大分母仍可能產生大量 FP。
+- **召回率（recall／TPR）**：真正有目標缺陷的單位中，被系統標記出的比例，公式為 `TP ÷ (TP + FN)`；高 recall 仍不代表被標記者大多是真的。
+- **偽陽性率（FPR）**：真正沒有目標缺陷的單位中，被錯誤標記的比例，公式為 `FP ÷ (FP + TN)`；它的分母和 precision 不同。
+- **精確率（precision／PPV）**：所有被系統標記的候選中，經參考真值確認為真正目標缺陷的比例，公式為 `TP ÷ (TP + FP)`。
+- **準確率（accuracy）**：全部受檢單位中判對的比例，公式為 `(TP + TN) ÷ 全母體`；在極度不平衡的母體裡可能看起來很高，卻遮住漏失或複判負荷。
+- **錯判成本比**：把一個 FN／escape 的後果換成多少個 FP／複判工作量的假想比較單位；它必須由產品風險與工廠流程定義，不能從模型分數自動得出。
 - **Killer defect（致命缺陷）**：在指定產品、結構與位置下足以造成電性失效、可靠度問題或良率損失的缺陷；同一種物理偏差換了產品或位置，影響可能不同。
 - **Fab（製造廠）**：執行晶圓或封裝製造的工廠；本篇出現的 Intelligent Packaging Fab 是台積電對智慧先進封裝廠的命名，不是通用績效認證。
 - **MES（製造執行系統）**：連接工單、設備、材料、製程站點與在製品紀錄的工廠資訊系統，讓派工、追溯與異常處置使用同一批次脈絡。
 - **ADC（自動缺陷分類）**：automated defect classification，以規則或模型把檢查候選分到可處置的缺陷類別；自動分類仍需參考真值與錯誤代價才能評估。
+- **機器學習（ML）**：讓模型從資料學習分類或預測規則的方法；模型分數、loss function 或離線 accuracy 不會自行決定量產門檻，仍要接參考真值、錯判成本與變更控制。
 - **抽樣（sampling）**：只檢查部分晶圓、區域或製程批次，以速度換取資訊；抽樣較少不代表沒有風險，檢查較多也不保證能找到正確根因。
 - **Control plan（製程控制計畫）**：先定義要攔截的失效、在哪一道工序看、抽樣多少、看多細、多久得到結果，以及異常發生後要採取什麼動作的製造規則。
 - **OCAP（out-of-control action plan，失控處置計畫）**：監控訊號判定製程可能失控後，預先指定確認、責任人、停機／隔離、調查、修正與復機條件的流程；警報本身不是 OCAP 已執行。
@@ -284,6 +298,75 @@ NIST 的持續研究頁把光學缺陷檢查寫成四種可能結果。以下把
 只報「標記 10,000 個候選」其實只給出 `TP + FP`，沒有告訴讀者未標記母體中的 `FN`，也沒有
 說 TP 中哪些真的會殺死產品。就算 capture rate 或 FAR 被公布，仍要核對各公司採用的 actual
 positive、分母與複判真值定義；名字相同不保證公式與母體相同。
+
+### 99.8801% accuracy，仍可能讓總錯判成本更高
+
+NIST 2023 年的 patterning-defect metrology 研究再補上一個常被忽略的分母：把 defect 錯標成
+nominal，與把 nominal 錯標成 defect，後果通常不對稱。研究明說真實量化成本未公開，並以公開
+ML 資料集代替工業影像；所以它報告的 loss function、門檻、cost ratio 與 15%～40% 結果都不能
+搬到 HBM 或先進封裝產線。本文只沿用「門檻必須同時看 base rate、兩種錯誤與成本比」的方法，
+另建一個完全假想、可以手算的四格表。
+
+先固定 **N=1,000,000 個假想受檢單位**，其中真正有目標關鍵缺陷 1,000 個、真正沒有 999,000
+個，base rate 為 0.1%。兩個門檻使用同一母體與參考真值；所有數字都是事先指定的整數，不是
+從任何工廠估計：
+
+| 四格與指標 | 敏感門檻 A | 較嚴門檻 B |
+|---|---:|---:|
+| TP：真正缺陷且有標記 | 900 | 800 |
+| FN：真正缺陷但未標記 | 100 | 200 |
+| FP：乾淨單位卻被標記 | 9,990 | 999 |
+| TN：乾淨單位且未標記 | 989,010 | 998,001 |
+| Recall＝TP／(TP＋FN) | 90.000000000000% | 80.000000000000% |
+| FPR＝FP／(FP＋TN) | 1.000000000000% | 0.100000000000% |
+| Precision＝TP／(TP＋FP) | 8.264462809917% | 44.469149527515% |
+| Accuracy＝(TP＋TN)／N | 98.991000000000% | 99.880100000000% |
+| 需進入複判的 TP＋FP | 10,890 | 1,799 |
+| 候選中的 nuisance share | 91.735537190083% | 55.530850472485% |
+
+門檻 A 的 FPR 看似只有 1%，但它乘在 999,000 個真正乾淨的龐大分母上，就產生 9,990 個 FP，
+是 900 個 TP 的 11.1 倍；因此 accuracy 接近 99%，被標記候選的 precision 卻只有 8.2645%。門檻
+B 把複判量減少 83.480257116621%，accuracy 與 precision 也都更高，看起來全面勝出；代價是
+FN 從 100 個增為 200 個。只看 dashboard 上最漂亮的百分比，會把這 100 個新增 escape 藏掉。
+
+接著把每個被標記候選的複判工作量定為 `R`，每個 FN／escape 的後果定為 `C`；兩者只是同一張
+教材上的「複判等價成本單位」，不是貨幣、報廢金額或生命週期成本：
+
+```text
+門檻 A 的教材總成本 K_A = 10,890R + 100C
+門檻 B 的教材總成本 K_B =  1,799R + 200C
+
+令 R = 1 且 K_A = K_B：
+C = (10,890 − 1,799) ÷ (200 − 100) = 90.91
+```
+
+| 假想 FN 成本 | 門檻 A 的教材總成本 | 門檻 B 的教材總成本 | 這組假設下較低者 |
+|---|---:|---:|---|
+| `C = 50R` | 15,890 | 11,799 | B；複判節省大於新增漏失代價 |
+| `C = 100R` | 20,890 | 21,799 | A；新增漏失代價反超複判節省 |
+
+所以沒有脫離產品風險與工廠容量的「最佳 accuracy」。若一個 escape 的後果高於 90.91 個複判
+單位，這個教材會選 A；若低於 90.91，才選 B。實務上還要納入 defect class、位置、後站損失、
+複判佇列、cycle time、重工／報廢、客戶風險與門檻漂移，不能把所有 FN 或 FP 視為同價。
+
+一份可稽核的 **defect-threshold cost passport** 至少要保存：
+
+| 護照欄位 | 必須固定什麼 | 少了會怎麼誤讀 |
+|---|---|---|
+| 母體與 base rate | product／layer／station、受檢與未檢母體、目標缺陷定義與真值抽查 | 把低 FPR 直接當成少量 FP |
+| 四格與門檻版本 | TP／FP／FN／TN、score threshold、model／recipe／class version | 只報 accuracy 或候選數，看不見錯在哪一格 |
+| 複判容量 | 每候選工時、設備／人員、佇列、time-to-truth 與可用容量 | 把 FP 下降直接寫成整廠 cycle-time 改善 |
+| 漏失後果 | defect class／位置、後站投入、escape、rework／scrap／reliability 與客戶處置 | 用一個平均成本掩蓋高代價尾部 |
+| 決策與變更控制 | cost ratio、選門檻者、核准日、漂移監控、回退與再驗條件 | 把一次離線最佳點當成永久量產設定 |
+
+本例由 Python `Fraction` 與獨立 `awk` 以相同整數四格重算，accuracy、recall、FPR、precision、
+nuisance share、複判量減幅、兩條成本式與 90.91 crossover 在顯示精度內一致。這是確定性教材，
+不是抽樣估計，所以沒有 sampling SE／t；NIST 的論文結果也沒有被當成第三個量產樣本。
+
+多空兩邊必須共用這份護照：偏多情境要證明維持可接受 FN 時，低 base rate 造成的複判負荷已
+超過既有設備、人工與軟體容量，並真的形成新增工具或服務；偏空情境則要證明分類、care area、
+動態抽樣或門檻控制能在不惡化高代價 escape 下，讓既有 installed base 吸收工作量。只有 accuracy
+上升、候選下降或「AI 分類」四個字，都不足以裁決設備需求與財務結果。
 
 ### 五道閘門：每往後一關，責任人才不同
 
@@ -1213,6 +1296,22 @@ limitation: 這是 SEMI 標準入口與活動摘要，不是標準全文，也�
 independence_group: semi
 -->
 
+<!-- research_source
+source_id: S34
+role: other_primary
+source_kind: document
+publisher: National Institute of Standards and Technology
+title: Addressing Misclassification Costs in Machine Learning Through Asymmetric Loss Functions
+published_at: 2023-04-27
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/publications/addressing-misclassification-costs-machine-learning-through-asymmetric-loss-functions
+locator: NIST publication abstract；patterning-defect metrology 的 asymmetric misclassification cost、defect-as-nominal 後果、公開成本缺值、cost ratio／classification threshold 掃描、surrogate public datasets 與 strong class imbalance 段落
+limitation: 這是 SPIE 2023 研究的 NIST 摘要，實驗使用公開 ML 資料集代替工業影像；論文的門檻、cost ratio 與 15%～40% 結果不是 HBM／advanced-packaging production 數據，也不能外推成客戶 recipe、複判產能、良率、設備需求或財務效果
+independence_group: nist
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -1859,6 +1958,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C39
+label: verified
+status: active
+claim: NIST 2023 patterning-defect metrology 研究明確把 defect 誤標為 nominal 與 nominal 誤標為 defect 視為不對稱的錯判成本，指出前者影響較大、真實量化成本未公開，並以公開 ML 資料集作工業影像替代，在強類別不平衡下跨 cost ratio 與 classification threshold 評估總錯判成本
+supporting_source_ids: S34
+contrary_source_ids:
+as_of: 2023-04-27
+basis: S34 官方摘要的 Background、Aim、Approach 與 Conclusions 直接提供錯判不對稱、成本缺值、替代資料、門檻與 cost-ratio 掃描及 class-imbalance 範圍
+boundary: 只驗證該研究的公開方法與資料邊界；摘要中的門檻、cost ratio、loss function 與 15%～40% 結果屬公開 surrogate datasets，不是 HBM／先進封裝量產線、客戶成本、模型績效、設備產能或財務結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C40
+label: inference
+status: active
+claim: 在本文 1,000,000 個假想受檢單位、真正關鍵缺陷 1,000 個的固定母體中，敏感門檻 A 的 accuracy 98.991%、precision 8.264462809917%、複判候選 10,890 個與 FN 100 個；較嚴門檻 B 的 accuracy 99.8801%、precision 44.469149527515%、候選 1,799 個與 FN 200 個。若每個候選複判成本為 1 單位，兩門檻總成本在每個 FN 成本 90.91 單位時相等；因此 accuracy、precision 或複判量任何單項都不能決定門檻
+supporting_source_ids: S28,S29,S34
+contrary_source_ids:
+as_of: 2026-08-14
+basis: Python Fraction 與獨立 awk 兩路用相同 TP／FP／FN／TN 整數表重算 accuracy、recall、FPR、precision、nuisance share、review-load reduction、兩條成本式與 crossover，所有顯示結果一致
+boundary: 這是 N=1,000,000 個假想受檢單位與兩個假想門檻的確定性教材，不是抽樣或量產實驗；0.1% base rate、四格數、1 單位複判成本及 90.91 crossover 都不是任何產品、工廠或 NIST 實測，因此沒有 sampling SE／t，也不提供良率、工具數、收入或投資效果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
@@ -2038,13 +2171,14 @@ comparability_reason: 萬潤的半導體設備範圍大於檢查／量測，且�
 - [S31：NIST／SEMATECH Process Control 與 OCAP](https://www.itl.nist.gov/div898/handbook/pmc/section1/pmc13.htm)（偵測後的處置方法，不是 HBM 量產流程或延遲資料）。
 - [S32：台積電 Automation in Packaging Fab](https://www.tsmc.com/english/dedicatedFoundry/services/apm_intelligent_packaging_fab/intelligentFab_automation)（inline isolate、post-process lot hold 與 per-die impact tracing，沒有完整九事件分母）。
 - [S33：SEMI Traceability Standards and Activities](https://www.semi.org/en/products-services/standards/traceability)（跨製造、測試與組裝的 Unique ID 標準入口，不是採用或圍堵成效證明）。
+- [S34：NIST patterning-defect misclassification-cost 研究](https://www.nist.gov/publications/addressing-misclassification-costs-machine-learning-through-asymmetric-loss-functions)（不對稱錯判成本、門檻與 class imbalance 方法；公開 surrogate datasets 不是量產線）。
 - 後續入口：[KLA](https://ir.kla.com/financial-information/financial-results)、[Applied](https://ir.appliedmaterials.com/news-releases/)、[Onto](https://investors.ontoinnovation.com/news/default.aspx)、[MOPS](https://mops.twse.com.tw/mops/web/index)。
 - 中立方法入口：[NIST CHIPS Metrology Program](https://www.nist.gov/chips/research-development-programs/metrology-program)。
 
 海外五家設備商與台灣三家公司彼此獨立但都有商業動機，其中同一公司的多份文件仍只算
 一條公司消息鏈；SEMI 議程保存多位講者摘要，也不能替代完整簡報、客戶端或全產業資本
 支出證據。台灣三家公司是依既有獨立複核筆記選出的定向教材，不是全 universe 抽樣；本輪
-新增的 NIST 頁面仍只算一條中立方法鏈，兩個台積電頁面仍只算一條客戶公司鏈，SEMI 追溯入口
+新增的 NIST 頁面與論文仍只算一條中立方法鏈，兩個台積電頁面仍只算一條客戶公司鏈，SEMI 追溯入口
 另算一條產業標準消息鏈；也沒有一致預期、
 估值、即時持倉或具名客戶—供應商雙向資料，因此不談市場是否反映或個股方向。
 
