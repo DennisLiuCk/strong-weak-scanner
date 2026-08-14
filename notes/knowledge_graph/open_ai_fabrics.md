@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: open-ai-fabrics
 root_node_id: concept:open-ai-fabrics
 label: AI 資料路徑與跨廠互通
-summary: 先固定加速器機架內、跨機架、服務／處理器、儲存、帶內與帶外管理六種網路工作，再把實體、端點、交換、軟體、管理、單件合規、跨廠互通、系統壓力與客戶部署逐層驗收。
+summary: 先固定加速器機架內、跨機架、服務／處理器、儲存、帶內與帶外管理六種網路工作，再把實體、端點、交換、軟體、管理、單件合規、跨廠互通、系統壓力與客戶部署逐層驗收，並用十欄 collective 效能護照分開 line rate、payload、algbw、busbw 與訓練結果。
 article_ids: MI-2026-08-02-OPEN-AI-FABRICS
 status: active
 -->
@@ -612,4 +612,44 @@ review_due: 2026-09-12
 status: active
 boundary: 管理網路與生命週期責任需要身分、資料語意、動作所有權及維修閉環；這是跨文章推論，不是已部署的共同標準。
 next_trigger: OCP、UEC 或具名平台公開跨設備管理資料、控制動作、安全裁決、隔離與維修結果的共同契約。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I26
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: process:ai-collective-performance-passport
+relation: requires
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C21,MI-2026-08-02-OPEN-AI-FABRICS#C22,MI-2026-08-02-OPEN-AI-FABRICS#C23
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-19
+status: active
+boundary: 十欄護照是研究中心整合 UEC compliance 邊界、NCCL collective microbenchmark 與 MLCommons training outcome 的比較框架，不是共同標準、產品 pass、跨廠互通或客戶部署。
+next_trigger: 同一具名 AI workload 公開完整十欄、collective event 分布、wire counters、故障、wall-clock-to-quality、資源成本與設備版本。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-I27
+view: industry
+from_id: concept:open-ai-fabrics
+to_id: metric:collective-algorithm-bus-bandwidth-contract
+relation: measured_by
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C20,MI-2026-08-02-OPEN-AI-FABRICS#C21,MI-2026-08-02-OPEN-AI-FABRICS#C22
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-19
+status: active
+boundary: algbw 是 S／t，busbw 是依 collective 與 ranks 衍生的正規化；兩者不是獨立 payload、不得相加，也不能在缺 algorithm／topology／offload 條件時冒充 wire bandwidth。
+next_trigger: 具名系統同時公開 message／time、algbw／busbw 公式、實測 port／link counters、algorithm、topology、tail 與 end-to-end step 結果。
 -->

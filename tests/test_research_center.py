@@ -5006,6 +5006,7 @@ class ResearchCenterTest(unittest.TestCase):
         for contract in (
             "editorial_plain_language_wave101_data_path_two_network_scopes_roles_and_six_gate_interoperability",
             "corrected_single_fabric_path_frame_with_network_plane_and_stack_contract",
+            "added_collective_algorithm_bus_bandwidth_and_training_outcome_performance_passport_without_thesis_or_clock_refresh",
             "一座人工智慧叢集同時有運算同步、跨機架傳送、一般服務、"
             "儲存與維修管理等不同工作",
             "## 先把一座人工智慧叢集拆成六張網",
@@ -5019,6 +5020,21 @@ class ResearchCenterTest(unittest.TestCase):
             "| 3. 交換、路由與壅塞 |", "| 4. 軟體與控制 |",
             "| 5. 管理、遙測與除錯 |", "| 6. 單件合規與自我聲明 |",
             "| 7. 多供應商互通 |", "| 8. 系統、部署與財務 |",
+            "## 400G、algbw、busbw 與訓練時間不是同一個數字",
+            "| 效能數字 | 它真正量什麼 | 最少要綁定 | 它不能單獨證明 |",
+            "| Port／lane line rate |", "| Payload goodput |",
+            "| Algorithm bandwidth（algbw） |", "| Bus bandwidth（busbw） |",
+            "### Collective 名稱先固定，頻寬係數才有意義",
+            "| Collective | 每個 rank 最後拿到什麼 | NCCL tests 的 busbw／algbw 係數 | 不能誤讀成 |",
+            "| AllReduce |", "| ReduceScatter |", "| AllGather |", "| AlltoAll |",
+            "### 同一個 20 ms，可以同時產生兩個不同頻寬欄位",
+            "`50 GB/s`", "`1.75`", "`87.5 GB/s`",
+            "N=1 個假想", "### 十欄 AI collective 效能護照",
+            "| 1. 網路工作與量測範圍 |", "| 8. 指標、時間與正確性 |",
+            "| 10. 使用者與商業結果 |",
+            "### 多空小作文要共享同一個 step",
+            "| 偏多：更大 AI 叢集提高網路內容與驗證 |",
+            "| 偏空：軟體與拓撲吸收部分硬體增量 |",
             "## 先用五個位置看資料怎麼從一顆晶片走到另一顆",
             "| 本文五個位置 | 它做什麼 | 代表元件或軟體 | 下一個要驗收 | 不能直接推成 |",
             "| 1. 資料出發的運算端點 |", "| 2. 連接與傳輸 |",
@@ -5051,7 +5067,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 44
+            sum(line.startswith("- **") for line in glossary.splitlines()), 59
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5068,14 +5084,15 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 20),
-            ("research_claim", 19), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 24),
+            ("research_claim", 23), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         for ledger_contract in (
-            "source_id: S15", "source_id: S20", "claim_id: C14",
-            "claim_id: C19", "monitor_id: T4", "monitor_id: T5",
+            "source_id: S15", "source_id: S20", "source_id: S24",
+            "claim_id: C14", "claim_id: C19", "claim_id: C23",
+            "monitor_id: T4", "monitor_id: T5",
             "claim_id: C9\nlabel: inference\nstatus: superseded",
             "claim_id: C18\nlabel: inference\nstatus: active",
             "correction_kind: supersedes\ncorrects_claim_id: C9",
@@ -5116,12 +5133,14 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:compliance-self-attestation,stage,合規自我聲明",
             "stage:system-stress-validation,stage,系統壓力與規模驗收",
             "capability:fabric-lifecycle-management,capability,網路生命週期管理",
+            "process:ai-collective-performance-passport,process,AI 集體通訊十欄效能護照",
+            "metric:collective-algorithm-bus-bandwidth-contract,metric,集體通訊演算法與匯流排頻寬契約",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 資料路徑與跨廠互通", graph)
-        for edge_id in range(15, 26):
+        for edge_id in range(15, 28):
             self.assertIn(f"edge_id: KG-FAB-I{edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 30)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 32)
 
     def test_compute_connect_station_seven_separates_link_test_clocks_roles_and_deployment_gates(self):
         topic = (

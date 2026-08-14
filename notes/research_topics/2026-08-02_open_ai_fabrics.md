@@ -74,6 +74,13 @@ to: triaged
 reason: corrected_single_fabric_path_frame_with_network_plane_and_stack_contract
 evidence: sources:S15,S16,S17,S18,S19,S20
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_collective_algorithm_bus_bandwidth_and_training_outcome_performance_passport_without_thesis_or_clock_refresh
+evidence: sources:S17,S19,S21,S22,S23,S24
+-->
 
 <!-- research_source
 source_id: S1
@@ -395,6 +402,70 @@ limitation: 這是一套 air-cooled 400G 參考架構並帶有不要求冗餘等
 independence_group: open-compute-project
 -->
 
+<!-- research_source
+source_id: S21
+role: other_primary
+source_kind: living_index
+publisher: NVIDIA
+title: Performance reported by NCCL tests
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://github.com/NVIDIA/nccl-tests/blob/master/doc/PERFORMANCE.md
+locator: 2026-08-14 查得 Time、Algorithm bandwidth、Bus bandwidth 與 Summary；定義 algbw=S／t，AllReduce busbw=algbw×2(n−1)／n，ReduceScatter／AllGather／AlltoAll 係數為 (n−1)／n，Broadcast／Reduce 為 1，並明示 AllReduce 推導以 point-to-point send／receive 為條件
+limitation: NCCL tests 的 busbw 是 collective-specific 正規化數，不是實測 wire counter、唯一 payload goodput 或端到端訓練結果；點對點推導不能無條件外推到硬體 offload、階層式演算法、不同拓撲、協定、故障或產品 qualification
+independence_group: nvidia-nccl
+-->
+
+<!-- research_source
+source_id: S22
+role: other_primary
+source_kind: living_index
+publisher: NVIDIA
+title: NCCL Tests
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://github.com/NVIDIA/nccl-tests
+locator: 2026-08-14 查得 Usage 與 Arguments；總 rank=process×thread×GPU、message-size sweep、warm-up／iteration／cycle、rank Avg／Min／Max、per-iteration p99／max、raw JSON、correctness check、blocking mode、parallel group 與每 group bandwidth 邊界
+limitation: 測試參數與輸出欄位只建立 microbenchmark 重現契約，不提供本篇任何具名產品結果、production traffic、跨廠互通、長時間故障、訓練品質、成本或台灣公司財務
+independence_group: nvidia-nccl
+-->
+
+<!-- research_source
+source_id: S23
+role: other_primary
+source_kind: living_index
+publisher: NVIDIA
+title: NCCL Collective Operations
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html
+locator: 2026-08-14 查得 NCCL 2.31.2；collective 必須由每個 rank 以相同 count／datatype 呼叫，並逐一定義 AllReduce、Broadcast、Reduce、AllGather、ReduceScatter、AlltoAll、Gather 與 Scatter 的資料結果
+limitation: API 語意頁定義工作與正確呼叫，不提供 line rate、拓撲、演算法選擇、效能分布、硬體配置、跨廠互通、production deployment 或公司採用
+independence_group: nvidia-nccl
+-->
+
+<!-- research_source
+source_id: S24
+role: standard
+source_kind: living_index
+publisher: MLCommons Association
+title: MLPerf Training Rules
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://github.com/mlcommons/training_policies/blob/master/training_rules.adoc
+locator: 2026-08-14 查得 Definitions、General rules、Run Results 與 Benchmark Results；system 包含硬體／interconnect 與軟體版本，run result 是連續 wall-clock 到品質目標，現行表依 workload 要求至少 3 或 10 runs，benchmark result 去掉最快與最慢後平均其餘時間
+limitation: MLPerf Training 是整套系統到品質目標的 benchmark contract，不是獨立網路或 NCCL 測試，也不能隔離 NIC／switch／optics 因果、代表 production workload、跨廠 qualification、價格或台灣公司財務
+independence_group: mlcommons-training
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -695,6 +766,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: NCCL 現行 collective 語意要求每個 rank 以相同 count 與 datatype 共同呼叫，並把 AllReduce、ReduceScatter、AllGather 與 AlltoAll 定義成不同資料結果；因此 collective 名稱、rank 數、message count／datatype 與 rank-to-device mapping 都是效能數字不可省略的工作身分
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S23 的 Collective Operations 開頭與 AllReduce／ReduceScatter／AllGather／AlltoAll 各節直接列出呼叫約束、輸入、輸出及 rank mapping 責任
+boundary: API 語意只證明工作定義，不提供拓撲、演算法、line rate、效能、正確率、跨廠互通、production deployment 或公司財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: NVIDIA nccl-tests 把 algorithm bandwidth 定義為 message size S／operation time t，另用 collective-specific 係數計算 bus bandwidth；在 point-to-point send／receive 推導下，AllReduce 係數是 2(n−1)／n，ReduceScatter／AllGather／AlltoAll 是 (n−1)／n，而測試工具另提供總 rank、message-size sweep、warm-up、iterations、rank Avg／Min／Max、per-iteration tail 與 correctness 的設定或輸出欄位
+supporting_source_ids: S21,S22
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S21 的 Algorithm bandwidth、Bus bandwidth、各 collective 推導與 Summary 直接提供公式及 point-to-point 條件；S22 的 Usage／Arguments 直接列 rank 組成、size、warm-up、iteration、cycle、rank aggregation、p99／max、raw JSON 與 correctness 參數
+boundary: busbw 是衍生正規化而非 wire counter；工具可保存欄位不等於任何具名測試已正確執行，也不能把點對點公式無條件套到硬體 offload、階層式演算法、不同平行 group 或端到端訓練
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: 在 N=1 個純教材 collective、n=8 ranks、每 rank message S=1,000,000,000 bytes、operation time t=0.020 seconds，且使用 NCCL tests 的 point-to-point AllReduce 正規化時，algbw=50 GB／s、係數 1.75、busbw=87.5 GB／s；兩個頻寬來自同一個時間與 payload，不能相加，也不能把 87.5 GB／s 改寫成應用每秒完成 87.5 GB 唯一資料
+supporting_source_ids: S21
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 依 S21 的 algbw=S／t 與 AllReduce busbw=algbw×2(n−1)／n，以 Python Fraction 及獨立 awk 路徑重算，兩路均得 factor=7／4、algbw=50、busbw=175／2 GB／s
+boundary: 這是 N=1 個假想設定的確定性公式展開，沒有設備、port、topology、algorithm selection、run 或抽樣，故沒有 sampling SE／t；未含協定 overhead、retries、congestion、overlap、correctness、tail、功耗、成本或 training outcome
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: inference
+status: active
+claim: 要宣稱開放人工智慧網路改善訓練，至少要把網路平面／量測範圍、collective 與資料語意、rank／placement、message／datatype、拓撲／link／方向、軟硬體與演算法版本、同時流量與運算重疊、時間／algbw／busbw 定義與正確性、重複 run／完整分布／失敗，以及 wall-clock-to-quality／資源／財務綁成同一份十欄效能護照
+supporting_source_ids: S17,S19,S21,S22,S23,S24
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S17／S19 把 performance 從部分 compliance test bed 分離；S21–S23 顯示 collective、rank、message、時間、正確性、algbw 與 busbw 口徑不同；S24 又要求固定完整 system／software，以連續 wall-clock 跑到品質目標並用多次 run 形成 benchmark result，共同支持 microbenchmark 與訓練結果必須以共同版本鍵橋接
+boundary: 十欄護照是研究中心整合 UEC／NCCL／MLCommons 的檢查框架，不是三方共同標準；欄位齊全仍不隔離單一 NIC／switch／optic 因果、不等於 multi-vendor interoperability、production qualification、部署或台灣公司收入
+verification_needed: 同一具名 AI workload 固定模型、資料、品質門檻與系統版本，同時公開 collective event 分布、網路 counter、故障／重試、overlap、run-level wall-clock-to-quality、資源成本與具名設備配置
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -804,6 +943,21 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 - **連結層重試**：傳輸中發現某段資料出錯時，在連結層重新傳送；有重試機制不等於整個工作負載不會失敗。
 - **多跳網路**：資料到目的地前會經過不只一台交換器；每多一跳都要再處理路由、延遲與故障。
 - **拓撲**：端點、交換器與線路如何連成網路的形狀；同一規格在不同拓撲下可能有不同的瓶頸。
+- **集體通訊（collective communication）**：多個運算 rank 共同參與的一次資料交換，例如把每個 rank 的結果加總後再分發；它不是單一端點傳給另一端點的普通拷貝。
+- **Rank**：參與同一 collective 的一個運算程序／裝置身分；rank 數、所在節點與裝置映射都會改變資料路徑。
+- **AllReduce**：把所有 rank 的輸入依指定運算合併，並讓每個 rank 都取得相同完整結果；常見於同步梯度。
+- **ReduceScatter**：先合併所有 rank 的輸入，再把結果切成不同區塊分給各 rank；它只完成 AllReduce 的其中一段責任。
+- **AllGather**：收集每個 rank 的不同區塊，再讓所有 rank 都取得完整集合；ReduceScatter 後接 AllGather 可構成 AllReduce 的資料語意。
+- **AlltoAll**：每個 rank 都把不同資料區塊送往每一個其他 rank；流量形狀與 AllReduce 不同，不能共用同一個頻寬係數。
+- **線速（line rate）**：連結或埠在指定方向宣告的 bit rate；它不是扣除編碼、協定、重試與壅塞後送達應用的有效資料速度。
+- **Payload goodput（有效資料吞吐）**：在指定起訖點真正完成且可用的 payload bytes／time；失敗、重試與額外標頭要依事先定義決定是否計入。
+- **Algorithm bandwidth（algbw）**：NCCL tests 以 collective 的 message size 除以 operation time 得到的 S／t；它回答指定大小完成多快，不是硬體 wire counter。
+- **Bus bandwidth（busbw）**：NCCL tests 依 collective 類型與 rank 數，把 algbw 乘上理論流量係數的正規化數；它可以協助讀硬體利用，但不是另一份獨立量測 payload。
+- **Bisection／oversubscription（對切頻寬／超額匯聚）**：前者看把拓撲切成兩半時可通過多少流量，後者看端點總注入能力是否大於上游容量；埠速相加不等於所有端點能同時用滿。
+- **運算—通訊重疊**：讓資料傳輸與晶片計算同時進行，試圖把部分通訊時間藏在計算後面；microbenchmark 變快不代表實際 step 一定少等同樣時間。
+- **慢端／step tail**：同一步中最慢 rank 或最慢一次 collective 決定同步等待；平均 operation time 良好，仍可能被尾端延遲、重試或壅塞拖住。
+- **Avg／Min／Max／p99**：Avg 是平均，Min／Max 是指定 rank 或 iteration 集合的最低／最高值，p99 是約 99% 觀測不超過的尾端門檻；必須連同事件數與集合定義閱讀。
+- **JSON**：以固定鍵值結構保存文字、數字與陣列的可機器讀取格式；輸出原始 JSON 有助重算，但不保證量測方法或資料本身正確。
 - **UALink（加速器互連）**：主要服務機架內多顆加速器的開放互連規格路徑。
 - **UEC（超乙太網路聯盟）**：主要改善人工智慧與高效能運算跨機架乙太網路的規格生態系。
 - **ESUN（機架內乙太網路交換）**：OCP 開放規格，處理機架內網路交換、封包格式、無損傳輸與可靠性。
@@ -879,6 +1033,91 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 UEC 現行頁面列出的八個工作組同樣是組織當下範圍的完整列舉，不是成熟產品樣本。最重要的
 閱讀邊界是：第六層現在已有公開工具，不等於第七、八層自動通過。要比較標準、產品或供應商，
 必須先固定「哪一張網」與「哪一層契約」；只寫「支援 Ethernet」少了兩個分母，不能拿來做份額或財務歸因。
+
+## 400G、algbw、busbw 與訓練時間不是同一個數字
+
+看到「400G 網路」、「100 GB/s collective」或「訓練快 20%」，不能先排大小。第一個數字可能是
+單一 port 的 bit rate，第二個可能是 message size／operation time，第三個才是整套系統跑到品質門檻
+的 wall-clock；三者的分子、分母與量測起訖點都不同。[S21][S22][S24]
+
+| 效能數字 | 它真正量什麼 | 最少要綁定 | 它不能單獨證明 |
+|---|---|---|---|
+| Port／lane line rate | 指定方向的名目 bits／second | port、lane、方向、編碼／FEC、線距、介質與版本 | payload bytes、同時可用總頻寬、collective 或訓練速度 |
+| Installed aggregate | 多個 port／link 名目容量的加總 | 端點數、每端 link、雙向是否重複計、拓撲、bisection 與 oversubscription | 所有端點能同時滿載、沒有熱點，或應用可取得同樣吞吐 |
+| Payload goodput | 指定起訖點真正完成且可用的 payload bytes／time | payload／wire 定義、成功、retry、compression、時間窗與並行 | collective 資料語意、尾端延遲、資料正確或訓練到品質目標 |
+| Algorithm bandwidth（algbw） | NCCL tests 的 message size S／operation time t | collective、S、t、rank、datatype、group 與量測同步方式 | 實際 wire traffic、硬體利用率、跨 rank tail 或端到端 training time |
+| Bus bandwidth（busbw） | 依 collective 與 rank 數把 algbw 乘上理論流量係數 | 同一 algbw、正規化公式、point-to-point／offload 假設與硬體 peak 範圍 | 第二份獨立 payload、實測 port counter、bisection，或所有演算法都適用 |
+| Step／wall-clock-to-quality | 模型一步或完整訓練到指定品質所需時間 | 模型、資料、品質、batch、系統／軟體版本、run 分布與失敗 | 單一網路元件就是因果、互通已通過，或改善會變成公司收入 |
+
+### Collective 名稱先固定，頻寬係數才有意義
+
+NCCL 現行語意頁要求每個 rank 用相同 count 與 datatype 共同呼叫，否則可能 hang、crash 或資料
+損壞；AllReduce、ReduceScatter、AllGather 與 AlltoAll 交付的資料結果也不同。[S23] NCCL tests
+的 `busbw` 係數因此依 collective 改變：[S21]
+
+| Collective | 每個 rank 最後拿到什麼 | NCCL tests 的 busbw／algbw 係數 | 不能誤讀成 |
+|---|---|---:|---|
+| AllReduce | 所有 rank 輸入被 reduce 後的同一完整結果 | `2(n−1)／n` | 每 rank 只送一份 S，或 busbw 是額外完成的應用資料 |
+| ReduceScatter | reduce 後結果的一個 rank-specific 區塊 | `(n−1)／n` | 已讓所有 rank 取得完整結果 |
+| AllGather | 所有 rank 原有區塊合併後的完整集合 | `(n−1)／n` | 已執行 reduce，或與 AlltoAll 有相同資料流向 |
+| AlltoAll | 每個 rank 對每個其他 rank 發送不同區塊並收回對應區塊 | `(n−1)／n` | 流量均勻、沒有熱點，或 MoE routing 已獲得同樣結果 |
+| Broadcast／Reduce | 完整資料從 root 分發，或 reduce 結果只回 root | `1` | root 不會成為瓶頸，或 rank mapping 不重要 |
+
+這些是 NCCL tests 為 point-to-point send／receive 模型建立的正規化，不是每條 link 的封包
+計數。若系統使用階層式路徑、硬體 collective offload、多個平行 group 或不同 topology，仍要把
+實際 algorithm／protocol／path 寫入，不能只套係數後宣稱量到 wire bandwidth。
+
+### 同一個 20 ms，可以同時產生兩個不同頻寬欄位
+
+先做一個只教公式、不模擬真實網路的例子。假設 `n=8 ranks`、每個 rank 的 AllReduce message
+`S=1,000,000,000 bytes`、operation time `t=0.020 seconds`，並採 NCCL tests 的 point-to-point
+正規化：
+
+| 步驟 | 確定性計算 | 結果 | 不能外推 |
+|---|---|---:|---|
+| 1. Algorithm bandwidth | `S／t` | `50 GB/s` | 不等於單一 port、wire traffic 或 training goodput |
+| 2. AllReduce 正規化係數 | `2×(8−1)／8` | `1.75` | 不是另一個量測 run，也不是所有 collective 的係數 |
+| 3. Bus bandwidth | `50×1.75` | `87.5 GB/s` | 不表示應用另完成 87.5 GB/s 唯一 payload |
+| 4. 仍缺的共同結果 | step time、stall、正確性、失敗、品質、資源與成本 | 未量測 | 不能宣稱網路讓訓練或公司財務改善 |
+
+`50` 與 `87.5` 都由同一筆 S、t 與 rank 數衍生，不能相加成 `137.5 GB/s`。這是
+**N=1 個假想 collective 設定**的確定性公式展開，沒有 device、port、topology、run 或抽樣，所以沒有 sampling
+SE／t。Python Fraction 與獨立 awk 都得到 factor=`7／4`、algbw=`50`、busbw=`175／2 GB/s`；
+一致只證明公式與算術，沒有驗證 protocol overhead、retry、congestion、overlap、tail、correctness
+或任何產品效能。
+
+### 十欄 AI collective 效能護照
+
+| 護照欄位 | 最少要寫什麼 | 少了最容易誤讀成 |
+|---|---|---|
+| 1. 網路工作與量測範圍 | 六張網中的哪一張；device、node、rack、pod 或 end-to-end 起訖點 | scale-up microbenchmark 直接代表整座 scale-out 叢集 |
+| 2. Collective 與資料語意 | AllReduce／ReduceScatter／AllGather／AlltoAll；reduce op、root、in-place 與 correctness | 不同資料工作的 GB/s 被放進同一排行榜 |
+| 3. Rank 與 placement | total ranks、process×thread×device、每 node／rack 數、rank-to-device mapping 與 group | 8 顆同機與 8 櫃跨網路被視為同一規模 |
+| 4. Message 與 datatype | per-rank／total count、bytes／GB／GiB、dtype、size sweep、alignment 與 compression | message size、單位與資料精度差異被藏起來 |
+| 5. 拓撲、link 與容量 | port／lane、方向、link 數、hop、switch tier、bisection、oversubscription、銅／光與 FEC | 所有 port 名目速率相加就等於可用 collective bandwidth |
+| 6. 軟硬體與演算法版本 | accelerator／NIC／switch／optic／firmware、driver、NCCL、algorithm、protocol、routing | 同時換版本與拓撲，改善卻全歸因一顆晶片 |
+| 7. Demand、並行與重疊 | 同時 collective／flow／tenant、parallel group、compute overlap、background traffic 與 queue | 無競爭 microbenchmark peak 被寫成 production step 效能 |
+| 8. 指標、時間與正確性 | operation time、payload goodput、algbw／busbw 公式、rank Avg／Min／Max、sync、timeout 與 data check | 衍生正規化被當 wire counter，錯誤結果也算進快速度 |
+| 9. 視窗、重複與失敗 | warm-up、iterations、cycles、per-iteration raw、p50／p99／max、run 數、retry／drop／hang 與 SE／t | 單次平均掩蓋慢 rank、尾端壅塞、挑選與不穩定 |
+| 10. 使用者與商業結果 | step／stall、tokens／samples、wall-clock-to-quality、功耗、成本、部署量、價格、收入與毛利 | 網路 benchmark 直接變成訓練效益、TAM、訂單或公司獲利 |
+
+NCCL tests 現行工具已提供 message sweep、warm-up、iterations、cycles、rank Avg／Min／Max、
+per-iteration p99／max、raw JSON 與 correctness 設定，讓第 3、4、8、9 欄可以被保存；工具存在不
+表示任何結果已按正確條件執行。[S22] MLCommons 的另一層要求則是固定完整 system／software，
+以連續 wall-clock 跑到品質目標，並依 workload 使用多次 run 形成 benchmark result。[S24]
+它不是網路測試，但能防止把 microbenchmark 峰值替代真正訓練結果。
+
+### 多空小作文要共享同一個 step
+
+| 敘事 | 合理假說 | 必須再看到的共同證據 | 什麼會讓敘事失效 |
+|---|---|---|---|
+| 偏多：更大 AI 叢集提高網路內容與驗證 | ranks、AlltoAll／AllReduce 流量、tail SLO 與多層拓撲增加，可能增加 switch ASIC、NIC、retimer、optic、cable、PCB、管理與整合驗證 | 同一 workload 的十欄護照、BOM、link／port utilization、故障、qualification、部署量、價格、收入與毛利分母 | 只有 port line rate、algbw／busbw peak、產品頁或會員名單，沒有 step bottleneck、採用與財務共同鍵 |
+| 偏空：軟體與拓撲吸收部分硬體增量 | sharding、compression、overlap、routing、collective algorithm 與更高利用率可能降低每單位 compute 的外部流量或設備數 | 固定模型／品質與系統的 bytes、overlap、step tail、wall-clock、設備數、功耗與成本前後比較 | 只看 network time 下降，卻漏掉品質、計算等待、其他網路平面、重試、冗餘或更大總運算量 |
+| 共同底線 | 高 line rate 不等於高 application goodput，更不等於公司賺到 | 固定 plane／collective／rank／message／topology／version／metric／distribution，再做買方與供應商雙向核對 | 把不同 collective、不同 rank placement 或衍生 busbw 直接相加成 TAM、份額或投資結論 |
+
+本輪新增 N=4 份一手頁面，屬 NVIDIA NCCL 與 MLCommons 兩條獨立方法鏈，不是四個產品、叢集、
+客戶或 run 樣本；再與既有 UEC、OCP 方法鏈交叉，也只建立量測責任。除了 N=1 教材公式，沒有
+新的 effect size、sampling SE／t、價格、估值、共識、部位或投資判斷。
 
 ## 先用五個位置看資料怎麼從一顆晶片走到另一顆
 
@@ -974,6 +1213,10 @@ UEC 現行頁面列出的八個工作組同樣是組織當下範圍的完整列�
 - [UEC Compliance](https://ultraethernet.org/compliance/)（頁面所連說明檔定義自我聲明、測試床與 checklist；會員聲明是必要專利權利登錄，並非產品結果）。
 - [UEC Compliance Test Bed Recommendations](https://ultraethernet.org/wp-content/uploads/sites/20/2025/06/UEC-Compliance-Test-Test-Bed-Recommendations.pdf)（部分層級與明示排除的互通、系統壓力／規模、效能邊界）。
 - [OCP Open Pod Group for M xPUs System Architecture](https://www.opencompute.org/documents/opg-m-system-architecture-final-14-january-2026-pdf)（六張網、非匯聚設計與冗餘假設）。
+- [NCCL tests performance definitions](https://github.com/NVIDIA/nccl-tests/blob/master/doc/PERFORMANCE.md)（operation time、algbw、collective-specific busbw 與 point-to-point 推導邊界）。
+- [NCCL tests usage and arguments](https://github.com/NVIDIA/nccl-tests)（rank、message sweep、warm-up、iterations、tail、raw JSON 與 correctness 設定）。
+- [NCCL collective operations](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html)（各 collective 的 rank、輸入與輸出語意）。
+- [MLPerf Training rules](https://github.com/mlcommons/training_policies/blob/master/training_rules.adoc)（完整 system／software、wall-clock-to-quality 與多次 run 的終端結果契約）。
 
 本篇不使用會員數、宣稱頻寬、GPU 數或公司效能數字做跨公司比較，也不推估 TAM、市占、估值或
 市場預期。六張網與八個 UEC 工作組是官方文件的類別列舉，不是產品通過率或市場樣本。ESUN 1.0
