@@ -6588,20 +6588,29 @@ class ResearchCenterTest(unittest.TestCase):
             "N＝1 組 TI 指定名目條件",
             "真實 rack、capacitor、resistor、switch、temperature run",
             "0fb1a939c277b9efb433764ef8b17ff20d6e40bb3ab2d0a2991157f9f17abcf7",
+            "reason: added_fuse_fault_clearing_evidence_planes_and_i2t_voltage_condition_without_refreshing_thesis_clock",
+            "source_id: S13",
+            "claim_id: C19\nlabel: unverified\nstatus: active",
+            "## 同一顆熔斷器，1,000V 與 1,250V 的 clearing I²t 差 33.3%",
+            "### 相同 100,000A²s，峰值與時間仍可完全不同",
+            "### 一份故障清除—選擇性護照至少要有十一欄",
+            "40,000 ÷ 120,000＝33.333%",
+            "A²s 不是焦耳",
+            "N＝1 個料號與 N＝2 個 published voltage",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 9),
-            ("research_claim", 13), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 4),
-            ("transition", 8),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 19), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 5),
+            ("transition", 9),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 41
         )
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -6615,11 +6624,67 @@ class ResearchCenterTest(unittest.TestCase):
             ROOT / "notes" / "knowledge_graph"
             / "800vdc_protection_layers.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
         self.assertIn("edge_id: KG-8PL-I16", graph)
+        self.assertIn("edge_id: KG-8PL-I17", graph)
+        self.assertIn("edge_id: KG-8PL-I18", graph)
         self.assertIn(
             "to_id: metric:dc-stored-energy-discharge-pulse", graph
         )
+
+    def test_800vdc_protection_separates_fault_clearing_evidence_planes(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-03_800vdc_protection_layers.md"
+        ).read_text(encoding="utf-8")
+        for token in (
+            "source_id: S10",
+            "source_id: S11",
+            "source_id: S12",
+            "source_id: S13",
+            "claim_id: C14\nlabel: verified\nstatus: active",
+            "claim_id: C17\nlabel: inference\nstatus: active",
+            "claim_id: C18\nlabel: inference\nstatus: active",
+            "claim_id: C19\nlabel: unverified\nstatus: active",
+            "monitor_id: T5",
+            "Amp rating | 指定條件下的正常 RMS 載流能力",
+            "Breaking／interrupt rating |",
+            "Pre-arcing／total clearing I²t |",
+            "selectivity 必須按實際上下游裝置與完整 fault range",
+            "| 11. 驗收與商業共同鍵 |",
+            "(10,000A)² × 0.001s＝100,000A²s",
+            "(5,000A)² × 0.004s＝100,000A²s",
+            "沒有 sampling SE／t",
+            "Python Decimal 與獨立 awk",
+        ):
+            self.assertIn(token, topic)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "process:800v-fault-clearing-coordination-passport,process,"
+            "800V 故障清除與選擇性護照",
+            concepts,
+        )
+        self.assertIn(
+            "metric:prospective-let-through-i2t-selectivity-boundary,metric,"
+            "預期電流、let-through、I²t 與選擇性邊界",
+            concepts,
+        )
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "800vdc_protection_layers.md"
+        ).read_text(encoding="utf-8")
+        for token in (
+            "edge_id: KG-8PL-I17",
+            "to_id: process:800v-fault-clearing-coordination-passport",
+            "edge_id: KG-8PL-I18",
+            "to_id: metric:prospective-let-through-i2t-selectivity-boundary",
+            "MI-2026-08-03-800VDC-PROTECTION-LAYERS#C17",
+        ):
+            self.assertIn(token, graph)
 
     def test_800vdc_execution_route_separates_seven_facility_and_financial_gates(self):
         topic = (

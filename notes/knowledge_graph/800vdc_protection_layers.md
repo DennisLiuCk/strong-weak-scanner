@@ -2,15 +2,16 @@
 
 本圖從故障與安全責任出發，分開 interlock、接地／絕緣、overcurrent／ground fault、hot-swap／
 inrush 與 ride-through；hot-swap 再把預充與故障清除的時間欄位分開，維修安全則把機械隔離、
-殘餘電壓與可安全接近狀態接回同一條證據鏈。公司線只到公開 requirement、reference-design 或
-experimental stage，不表示量產訂單。
+殘餘電壓與可安全接近狀態接回同一條證據鏈；熔斷器故障清除另拆 prospective current、interrupt、
+let-through、pre-arcing／total clearing I²t 與 selectivity。公司線只到公開 requirement、
+reference-design、experimental 或 product-spec stage，不表示量產訂單。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: 800vdc-protection-layers
 root_node_id: concept:800v-protection-layers
 label: 800VDC 保護責任層
-summary: 以 fault model 拆分人身維修、絕緣接地、故障電流、帶電連接與備援能量，再分開預充 故障清除 機械隔離 殘餘電壓與安全接近狀態，避免把所有保護需求合成一顆元件或台廠受惠結論。
+summary: 以 fault model 拆分人身維修 絕緣接地 故障電流 帶電連接與備援能量，再分開預充 故障清除 機械隔離 殘餘電壓 安全接近及fuse prospective interrupt let-through I2t selectivity，避免把所有保護需求合成一顆元件或台廠受惠結論。
 article_ids: MI-2026-08-03-800VDC-PROTECTION-LAYERS
 status: active
 -->
@@ -373,4 +374,44 @@ review_due: 2026-09-01
 status: active
 boundary: 理想模型只分開儲能 時間常數 殘壓 瞬時功率與 pulse 能量，不建立通用安全門檻、元件 pass-fail、production BOM、需求、ASP 或公司財務效果。
 next_trigger: 具名 production platform 公布固定 topology reference plane 全部儲能位置 元件 pulse derating 原始電壓電流溫度軌跡 殘壓門檻量測不確定度 fault test qualification 與 field record。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8PL-I17
+view: industry
+from_id: concept:800v-protection-layers
+to_id: process:800v-fault-clearing-coordination-passport
+relation: requires
+claim_refs: MI-2026-08-03-800VDC-PROTECTION-LAYERS#C18
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: Eaton Littelfuse 與 IEC 三條機構消息鏈共同支持故障清除參考面分開，但十一欄護照是研究中心整合方法，不是三方共同標準或 OCP production requirement。
+as_of: 2026-08-14
+review_due: 2026-09-01
+status: active
+boundary: 護照用來綁定 fault location DC回路 prospective current device curves I2t let-through interruption withstand selectivity qualification field與財務；不建立通用pass-fail、唯一拓撲、元件數或供應商價值。
+next_trigger: 具名 production rack 公布同版 one-line DC fault study 原始波形 全fault-range coordination qualification field incidents production BOM與公司財務橋。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8PL-I18
+view: industry
+from_id: concept:800v-protection-layers
+to_id: metric:prospective-let-through-i2t-selectivity-boundary
+relation: measured_by
+claim_refs: MI-2026-08-03-800VDC-PROTECTION-LAYERS#C17,MI-2026-08-03-800VDC-PROTECTION-LAYERS#C18
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope: 170M6190 固定 N等於1料號與兩個產品頁電壓條件，只示範 clearing I2t 條件敏感度；兩個等I2t矩形脈衝只示範峰值與時間不可由積分還原。
+as_of: 2026-08-14
+review_due: 2026-09-01
+status: active
+boundary: 40,000A2s與33.333%是確定性換算，不是800VDC fault test、跨產品排名、I2t焦耳換算、protected-device pass-fail、selectivity或production adoption。
+next_trigger: 固定DC voltage L/R fault location prospective current與料號後公布pre-arcing arcing total clearing peak let-through上下游動作 protected-device結果與量測不確定度。
 -->

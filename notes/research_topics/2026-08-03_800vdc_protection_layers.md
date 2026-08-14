@@ -88,6 +88,14 @@ reason: separated_capacitor_stored_energy_time_constant_residual_voltage_and_dis
 evidence: sources:S1,S8
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_fuse_fault_clearing_evidence_planes_and_i2t_voltage_condition_without_refreshing_thesis_clock
+evidence: sources:S10,S11,S12,S13
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -124,11 +132,20 @@ evidence: sources:S1,S8
 - **RC 時間常數**：電阻乘電容量所得的時間尺度。理想一階放電每經過一個時間常數，電壓降到前一刻的約 36.8%，但真正 pass-fail 仍要看指定殘壓門檻與實測。
 - **瞬時／脈衝功率**：放電剛開始時的功率與整段脈衝能量、持續時間及重複頻率共同決定元件負擔；不能只用一個瓦數標籤替全部工況背書。
 - **殘壓門檻**：在指定量測位置與時間，電壓必須低於的判定值。本文沒有從公開摘要自行指定通用安全門檻。
+- **額定電流（amp rating）**：熔斷器在指定條件下的載流能力，通常以 RMS 安培表示；它不是可安全切斷的最大故障電流。
+- **電壓額定（voltage rating）**：熔斷器可安全切斷過流時允許的最高開路電壓；交流、直流與測試條件不能只看數字相同就互換。
+- **預期短路電流（prospective short-circuit current）**：假設以近乎零阻抗連結取代熔斷器時，故障路徑本來會流過的電流；它是系統條件，不是熔斷器實際放行的峰值。
+- **分斷能力（breaking／interrupt rating）**：保護裝置在指定電壓與測試條件下可安全切斷的最大預期故障電流；它不是額定載流，也不是峰值 let-through。
+- **峰值 let-through current**：保護裝置清除故障期間，實際通過的最大瞬時電流；它和沒有保護時的預期電流、RMS 額定電流是三個參考面。
+- **Pre-arcing／total clearing I²t**：前者把故障開始到熔體熔化的電流平方積分，後者再加上電弧熄滅階段；單位是 A²s，若沒有指定電阻與路徑，不能直接寫成焦耳。
+- **Time-current curve（時間—電流曲線）**：把指定預期電流對到熔體開始熔化所需時間；同樣額定電流的熔斷器可以有不同曲線。
+- **選擇性協調（selective coordination）**：故障時只讓最靠近故障點的保護裝置動作，讓其他支路維持供電；必須核對上下游裝置與完整故障電流範圍，不能由單顆熔斷器推定。
+- **雙路重算（Python Decimal／awk）**：以兩種獨立計算路徑核對同一組確定性算式；兩邊一致只能排除部分算術錯誤，不能消除來源、量測或模型不確定性。
 
 ### 三句話抓重點
 
 - OCP Diablo 400 規格把人員接近高壓、絕緣與接地、過大電流及漏電等風險分開規定，表示 800V 機櫃不能只靠一種保護方式。
-- IEC、TI 與 Infineon 的公開資料顯示，帶電插入時要慢慢限制湧入、故障時要快速切斷，但切斷後仍要建立機械隔離並排掉殘餘電荷；這些時鐘和長時間備援、接地或人員防護又是不同責任。
+- IEC、TI 與 Infineon 的公開資料顯示，帶電插入時要慢慢限制湧入、故障時要快速切斷，但切斷後仍要建立機械隔離並排掉殘餘電荷；熔斷器的載流、分斷、let-through、I²t 與上下游選擇性也要分開查。
 - 目前證據只足以畫出誰負責什麼，尚不能證明台灣功率元件、電源供應或被動元件公司已進入量產材料清單、取得訂單或形成可辨識獲利。
 
 ### 為什麼重要
@@ -147,6 +164,7 @@ evidence: sources:S1,S8
 
 - 追 OCP 或平台規格是否把每種故障、偵測時間、斷電範圍、安全連鎖、接地與維修程序對齊。
 - 追具名平台是否把電流切斷、機械隔離、儲能放電、殘餘電壓確認、維修放行與復歸測試串成同一個可稽核狀態機。
+- 追每個故障位置的直流電壓與 L／R、最大預期故障電流、峰值 let-through、pre-arcing／total clearing I²t、分斷能力及上下游選擇性是否落在同一版測試矩陣。
 - 追 800V 不停機更換與電子保險絲，是否從參考設計推進到具名平台的預充軌跡、故障清除時間、客戶資格驗證、實際量產、現場故障紀錄與維修閉環。
 - 追台灣相關公司是否由客戶文件與公司申報雙向確認具名保護產品、額定規格、測試、量產、收入及毛利。
 
@@ -156,6 +174,8 @@ evidence: sources:S1,S8
 - 不停機更換功能能限制湧入電流，是否就能取代安全連鎖、保護接地或接地故障偵測？
 - 如果監測資料只有數值與故障清單，沒有規定發生事件後要隔離哪裡、怎麼維修，能否成為獨立產品價值？
 - 如果控制器顯示 FET 已關閉，但隔離接點沒有位置回饋、下游電容也沒有殘壓量測，能否允許人員接近？
+- 兩顆熔斷器都寫 400A，是否代表它們的故障清除曲線、峰值 let-through、I²t 與分斷能力相同？
+- 如果下游熔斷器確實切斷故障，但上游也一起跳脫，保護動作成功是否等於整個系統已具選擇性？
 
 ## 主張與證據帳本
 
@@ -304,6 +324,70 @@ url: https://webstore.iec.ch/en/publication/67514
 locator: IEC 公開摘要的適用範圍與 covered types；最高 1,000VAC／1,500VDC，SCCB 與 semiconductor hybrid circuit-breaker 都另列為 isolation function 串聯的 mechanical isolation contacts
 limitation: 公開頁只提供標準範圍、斷路器類型與目標摘要，未提供付費標準 121 頁的完整定義、性能門檻、測試方法或 conformity 結果；不能由摘要外推特定 rack 拓撲、殘餘電壓門檻、量產採用或供應商財務
 independence_group: iec-60947-10
+-->
+
+<!-- research_source
+source_id: S10
+role: other_primary
+source_kind: document
+publisher: Eaton
+title: Bussmann series high speed fuse application guide no. 10507
+published_at: 2016-06-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/fuses/technical-literature/bus-ele-an-10507-hsf.pdf
+locator: PDF 第 3 頁 Fuse operation；第 15–16 頁 internal／external fault coordination；第 33–34 頁 Glossary 的 amp rating、I²t、breaking capacity、prospective short-circuit current、time constant、total clearing 與 voltage rating
+limitation: 這是 Eaton 2016 年 high-speed fuse 應用指南與一般定義，不是 OCP 800V rack 規格、特定直流平台設計、第三方 conformity report、客戶 qualification、production BOM 或台灣供應商財務證據；文件也要求選定產品後由使用者在所有實際應用中測試
+independence_group: eaton-bussmann
+-->
+
+<!-- research_source
+source_id: S11
+role: other_primary
+source_kind: document
+publisher: Littelfuse
+title: Fuseology Design Guide — A guide to selecting the right fuse
+published_at: 2022-01-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.littelfuse.com/assetdocs/fuseology-selection-guide?assetguid=d812dff2-1c47-4dc3-bce7-07a4001ddc32
+locator: PDF 第 5 頁 time-current curve、voltage rating、melting／arcing／clearing I²t 與 peak let-through 圖；第 6–7 頁 selection checklist 的 application voltage、prospective current、maximum fault current／interrupting rating 與 pulse I²t；第 8 頁 common pulse waveforms
+limitation: 文件頁尾只標示 ©2022，published_at 以年度首日作年份錨點而非精確發布日；這是一般 fuse-selection 教材，含小型熔斷器案例，不是 800VDC rack 的產品推薦、DC fault qualification、選擇性完整研究、production BOM 或供應商財務證據
+independence_group: littelfuse
+-->
+
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: International Electrotechnical Commission
+title: IEC 60269-4:2024 Low-voltage fuses — Part 4: Supplementary requirements for fuse-links for the protection of semiconductor devices
+published_at: 2024-08-09
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://webstore.iec.ch/en/publication/66094
+locator: IEC 官方公開頁的 title、scope 與 Product detail；半導體保護用 fuse-links 適用名目電壓最高 1,000VAC／1,500VDC，Edition 6.0、publication date 2024-08-09
+limitation: 公開頁只提供標準名稱、範圍與版本資料，未取得付費 90 頁全文的定義、測試條件、允收門檻或 conformity 結果；不能由範圍外推任何料號已適用 800VDC rack、已通過平台資格或形成財務受惠
+independence_group: iec-60269-4
+-->
+
+<!-- research_source
+source_id: S13
+role: company_release
+source_kind: living_index
+publisher: Eaton
+title: Eaton Bussmann series high speed square body fuse — 170M6190 product specifications
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.eaton.com/ca/en-gb/skuPage.170M6190.html
+locator: 2026-08-14 Product specifications 表；170M6190、400A、rated voltage AC 1250V、voltage type AC／DC、pre arc I²t 19,500A²s、clearing I²t 120,000A²s at 1000V／160,000A²s at 1250V、breaking capacity／interrupt rating 100kA
+limitation: 動態產品頁可能更新，且 clearing 數字明列的是 1,000V／1,250V 產品條件，頁面同時把 current type 列為 AC；本例只示範同一料號的規格欄位與電壓條件敏感度，不證明 800VDC 適用、實際 let-through 波形、rack 選擇性、客戶 qualification、production BOM、需求量或財務貢獻
+independence_group: eaton-bussmann
 -->
 
 <!-- research_claim
@@ -527,6 +611,108 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: Eaton 與 Littelfuse 的官方指南一致把 fuse amp rating、voltage rating、prospective short-circuit current、interrupting／breaking capacity、time-current curve、peak let-through、pre-arcing／melting I²t 與 total clearing I²t 分成不同欄位；total clearing I²t 等於 pre-arcing／melting I²t 加 arcing I²t
+supporting_source_ids: S10,S11
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S10 Glossary 逐項定義 amp rating、prospective current、breaking capacity、I²t 與 total clearing，S11 第 5–7 頁獨立列出 voltage／interrupting rating、time-current curve、peak let-through 與 clearing I²t 關係
+boundary: 只證實兩家熔斷器廠的公開工程定義與選型欄位；不表示不同產品、AC／DC 條件或不同時間—電流特性的數值可直接互換，也不證明任何 800V rack 已通過 qualification
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: IEC 60269-4:2024 的官方公開範圍適用於保護半導體裝置的 fuse-links，名目電壓涵蓋最高 1,000VAC 與 1,500VDC
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2024-08-09
+basis: S12 官方頁的 scope、edition 與 publication detail 直接列出用途與 AC／DC 電壓上限
+boundary: 只證實標準範圍；未取得的完整條文、測試方法、允收門檻、特定料號 conformity、800V rack 拓撲與量產採用均不自行補齊
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: Eaton 170M6190 產品頁在同一料號下分別列出 400A amp rating、100kA breaking／interrupt rating、19,500A²s pre-arc I²t，以及 1,000V 時 120,000A²s、1,250V 時 160,000A²s 的 clearing I²t
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 Product specifications 表在 2026-08-14 逐欄顯示上述料號與數值，並以可見產品頁交叉核對
+boundary: 這是 N＝1 個 living product page 的規格快照；數值屬產品頁明列條件，不能改寫成 800VDC rack 實測、所有故障電流下的 let-through、上下游選擇性、客戶 qualification 或量產採用
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 170M6190 的 clearing I²t 由 1,000V 的 120,000A²s 增至 1,250V 的 160,000A²s，固定以前者為分母相差 40,000A²s、增加 33.333%；另有 10kA 持續 1ms 與 5kA 持續 4ms 兩個理想矩形脈衝都等於 100,000A²s，說明 I²t 相同仍不能抹去電壓條件、峰值、持續時間、波形與電弧階段
+supporting_source_ids: S10,S11,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 固定同一料號與兩個 published voltage conditions；研究中心以 Python Decimal 與獨立 awk 重算差額、百分比及兩個矩形波的電流平方時間積分，結果逐項一致；S10／S11 支持 total clearing 含電弧階段且條件不能只由 amp rating 代替
+boundary: 這是 N＝1 料號、N＝2 個產品頁電壓條件與 N＝2 個人造矩形脈衝的確定性換算，不是隨機樣本、真實 800VDC fault waveform、元件保護 pass-fail 或跨供應商比較；A²s 不是焦耳，沒有共同電阻、拓撲與時間路徑時不換算能量
+verification_needed: 具名 production rack 在固定 DC voltage、L／R、prospective current、fault location、temperature 與元件版本下的原始電流電壓波形、pre-arcing／arcing／total clearing I²t、peak let-through 與 protected-device damage boundary
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: 800VDC 故障清除至少要以同一版本固定故障位置與回路、DC voltage／L／R、最大 prospective current、保護裝置精確料號與降額、time-current curve、pre-arcing／total clearing I²t、peak let-through、interrupt rating、被保護元件耐受邊界、上下游 selective coordination 及 qualification／field record，不能用額定電流或「fast acting」一欄替代
+supporting_source_ids: S10,S11,S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S10／S11 分開定義故障清除各參考面並要求應用測試，S12 固定半導體 fuse-links 的 AC／DC 標準範圍，S13 又以同一料號示範 amp／interrupt／pre-arc／clearing 與 voltage condition 並不相同；十一欄是研究中心整合出的查核護照
+boundary: 護照是研究方法，不是 Eaton、Littelfuse、IEC 或 OCP 共同發布的表單、通用 pass-fail、唯一 protection topology 或供應商評分；selectivity 必須按實際上下游裝置與完整 fault range 驗證
+verification_needed: 平台商或買方以固定版本公布 one-line diagram、fault study、device curves／tables、DC interruption test、selectivity study、protected-device withstand、qualification 與 field incident record
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: unverified
+status: active
+claim: 具名 800VDC production rack 已公開完整十一欄故障清除與選擇性護照，並可由 production BOM、客戶 qualification、現場故障紀錄及供應商財務分母共同核對台灣 power、powersupply 或 passive 族群的實際價值
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 現有來源只到 OCP requirement、IEC 公開標準範圍、供應商 reference design／指南與單一產品頁；尚未找到同一具名量產 rack 同時公開 fault matrix、DC curves、selectivity、BOM、field record 與公司財務橋
+boundary: 不把標準範圍、400A／100kA／I²t 規格、fast acting 標籤、reference design、產品頁應用詞或族群營收改寫成量產採用、元件顆數、供應份額、ASP 或獲利
+verification_needed: 買方／平台與供應商雙向確認的固定版本 one-line、完整十一欄、qualification report、production BOM、出貨與價格，以及公司申報中的收入／毛利分子和總公司分母
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分清楚：保護誰、發生什麼事、誰來處理
 
 | 保護責任 | 主要事件 | 目前證據說了什麼 | 仍需要其他保護處理 |
@@ -666,6 +852,92 @@ production BOM 與公司財務觀測 N＝0，不估失效率、殘壓分布、�
 拓撲、量測與安全門檻的不確定性。S8 官方 PDF 共 9 頁，引用第 4–6 頁並渲染相鄰第 4–7 頁，
 SHA-256 為 0fb1a939c277b9efb433764ef8b17ff20d6e40bb3ab2d0a2991157f9f17abcf7。
 
+## 同一顆熔斷器，1,000V 與 1,250V 的 clearing I²t 差 33.3%
+
+**400A 只回答平常能載多少電流，不回答短路時會發生什麼。** 故障發生後，系統先決定若沒有保護
+裝置會出現多大的 prospective current；熔斷器則要在指定電壓與回路條件下安全分斷，並把實際
+peak let-through、pre-arcing time、arcing time 與 total clearing I²t 限制在被保護元件可承受的
+邊界內。若有上下游多層保護，還要證明只有最靠近故障點的裝置動作。這些問題都不能由額定電流
+或「fast acting」兩個字回答。
+
+| 證據面 | 它真正回答什麼 | 最常見的跨級誤讀 |
+|---|---|---|
+| Amp rating | 指定條件下的正常 RMS 載流能力 | 把 400A 當成可切斷 400A、故障峰值或完整保護能力 |
+| Voltage rating | 在多高的開路電壓下仍可安全切斷過流 | 看到數字高於 800V，就忽略 AC／DC、L／R、極性與測試條件 |
+| Prospective short-circuit current | 如果以近零阻抗連結取代熔斷器，故障點本來會流過多少電流 | 把系統可用故障電流當成熔斷器實際放行峰值 |
+| Breaking／interrupt rating | 裝置在指定條件下可安全切斷的最大 prospective current | 把 100kA 當成每次故障都會出現或通過 100kA |
+| Time-current curve | 某一 prospective current 下，熔體到開始熔化所需的時間 | 把平均 pre-arcing 曲線當成 total clearing、零容差或現場實測 |
+| Peak let-through | 清除期間實際通過的最大瞬時電流 | 只看 RMS 或 I²t，漏掉峰值與機械／電磁負擔 |
+| Pre-arcing／total clearing I²t | 熔化前與熔化加電弧熄滅全程的電流平方積分 | 把兩者互換、把 A²s 直接寫成 J，或忽略 applied voltage |
+| Selective coordination | 上下游誰應先動作、哪些支路應維持供電 | 單顆熔斷器能切斷，就宣布整個系統已有選擇性 |
+
+Eaton 的 170M6190 產品頁把這些分母放在同一張表：同一料號的 amp rating 是 400A，breaking／
+interrupt rating 是 100kA，pre-arc I²t 是 19,500A²s；total clearing I²t 則在 1,000V 列為
+120,000A²s，在 1,250V 列為 160,000A²s。固定以 1,000V 數值為分母，差額與變化率為：
+
+- 差額：160,000 − 120,000＝40,000A²s。
+- 變化率：40,000 ÷ 120,000＝33.333%。
+
+這不是在說電壓增加 25%，所有熔斷器的 clearing I²t 都會增加 33.3%，也不是替 170M6190 做
+800VDC 選型。產品頁同時把 voltage type 列成 AC／DC、current type 列成 AC，而兩個 clearing
+欄位只明列 1,000V 與 1,250V；本文因此只使用它證明「同一料號的 total clearing 數值帶有電壓
+條件」，不把 AC 產品頁數字移植成 DC rack 的 pass-fail。
+
+### 相同 100,000A²s，峰值與時間仍可完全不同
+
+I²t 是電流平方對時間的積分。拿兩個刻意簡化的矩形脈衝做教學對照，10kA 持續 1ms 與 5kA
+持續 4ms 的結果相同：
+
+- 脈衝 A：(10,000A)² × 0.001s＝100,000A²s。
+- 脈衝 B：(5,000A)² × 0.004s＝100,000A²s。
+
+可是第一個脈衝的峰值是第二個的兩倍，第二個的持續時間則是第一個的四倍。兩者可能造成不同的
+機械力、接點應力、半導體瞬態、電弧與熱擴散結果；真實熔斷過程也不是理想矩形。因此，I²t 適合
+當故障護照的一欄，不能當完整故障波形的替身。它的單位雖有時被稱為 Joule integral，仍是 A²s；
+只有再固定電阻與實際電流路徑，才可能把電阻耗散寫成焦耳。
+
+### 一份故障清除—選擇性護照至少要有十一欄
+
+| 欄位 | 最少要固定的內容 | 遺漏後最常見的誤判 |
+|---|---|---|
+| 1. 平台與故障位置 | one-line、rack／tray／branch、故障前狀態、版本與回流路徑 | 把不同 fault location 的可用電流混在一起 |
+| 2. DC 回路條件 | nominal／maximum voltage、reference plane、極性、L／R 與分散儲能 | 直接移植 AC 額定或另一個 time constant 的結果 |
+| 3. Prospective current | 每個故障點的 maximum／minimum、計算方法與誤差 | 只有變壓器或電源總額定，沒有故障點可用電流 |
+| 4. 保護裝置身分 | fuse／breaker／eFuse、完整料號、環溫、冷卻、安裝與降額 | 只寫 400A 或 fast acting，無法重建實物 |
+| 5. Time-current curve | 版本、容差帶、pre-arcing 定義、指定 prospective current 與起算點 | 把平均曲線或單一點當成 total clearing 保證 |
+| 6. I²t 三段帳 | pre-arcing、arcing、total clearing，以及 applied voltage／current 條件 | 拿 pre-arc 保護能力去比較 downstream total clearing |
+| 7. Peak let-through | 峰值、波形、量測頻寬、探棒位置與不確定度 | I²t 相同就假定峰值與元件應力相同 |
+| 8. Interrupt rating | DC／AC、電壓、L／R、test standard 與 maximum prospective current | 只看 kA 數字，忽略能否在指定 DC 條件安全熄弧 |
+| 9. 被保護物耐受 | 半導體、匯流排、線纜與接點的 peak、I²t、時間及損傷門檻 | 裝置成功開路，就推定下游一定沒有受損 |
+| 10. 上下游選擇性 | 全 fault range 的 downstream total 對 upstream pre-arc／trip、備援與失效範圍 | 故障切掉了，就忽略上游是否一起跳脫 |
+| 11. 驗收與商業共同鍵 | fault injection、qualification、field incident、production BOM、出貨與財務分母 | 由工程規格直接跳到元件顆數、供應商受惠或獲利 |
+
+Eaton 指南在半導體裝置協調例中，明確比較 downstream fuse 的 total clearing I²t 與 upstream
+fuse 的 pre-arcing I²t；Littelfuse 也提醒相同 current rating 可以有不同 time-current curve，且
+interrupt rating 必須不低於電路最大 fault current。IEC 60269-4:2024 的公開範圍則確認半導體
+保護用 fuse-links 涵蓋最高 1,500VDC，但公開摘要沒有替任一 800V rack 完成上述十一欄。標準在
+適用範圍內，與某個平台、料號和現場條件已驗收，是兩個不同證據時鐘。
+
+### 多空小作文共用同一份故障底稿
+
+- **多方可以寫到哪裡**：若 800VDC production rack 公布較高 DC 電壓、可用故障電流與儲能讓
+  DC interruption、current limiting、selectivity、感測與 fault qualification 的難度及價值提高，
+  並由買方 BOM／qualification、實際出貨和公司財務雙向核對，相關保護、功率與系統整合者才可能受惠。
+- **空方可以寫到哪裡**：系統也可能以固態斷路器、hybrid breaker、eFuse、架構分區或整合功能
+  改變一次性熔斷器的數量與價值；若新聞只有 800V、400A、100kA 或 fast acting，沒有 DC L／R、
+  let-through、I²t、selectivity 與量產共同鍵，就不能推導內容量、ASP、份額或毛利。
+- **共同裁決資料**：固定 one-line 與 fault location、DC voltage／L／R、prospective current、完整
+  料號及降額、time-current／I²t／let-through 原始資料、interrupt test、protected-device withstand、
+  全 fault range selectivity、qualification、field incidents、production BOM、出貨、價格、收入與毛利。
+
+本段是 N＝4 份官方來源、N＝3 個獨立機構消息鏈、N＝1 個料號與 N＝2 個 published voltage
+conditions 的定向研究；另有 N＝2 個人造矩形脈衝作確定性教學。不是隨機 device、rack、site、
+fault、supplier 或 company 樣本，因此沒有 sampling SE／t。Python Decimal 與獨立 awk 對
+40,000A²s、33.333% 與兩個 100,000A²s 逐項一致；算術一致不消除 AC／DC、L／R、波形、環溫、
+容差、量測與電弧不確定性。具名 800VDC production rack 的十一欄共同觀測 N＝0，台灣三個族群的
+production BOM、qualification、出貨、價格、收入與毛利共同觀測也為 N＝0，不估市場規模、份額、
+故障率、選擇性成功率、ASP 或財務效果。
+
 ## 為什麼監測資料暫時仍屬於保護功能
 
 Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率、故障與異常等即時監測值，
@@ -682,10 +954,10 @@ Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率
 
 ## 研究判定
 
-- **目前可保留的結論**：800V 保護至少包含人身與維修、絕緣與接地、故障電流，以及帶電插拔與湧入電流等不同責任；hot-swap 還要把受控預充與故障清除兩支時鐘分開，維修安全則要再確認電流切斷、機械隔離、儲能放電與安全接近四道狀態。
-- **可信度為中而不是高**：OCP 提供系統規格，TI 與 Infineon 提供供應商架構、樣品與參考設計；TI 實驗架構補上了指定條件的時間尺度，但目前仍缺共用的量產故障處置表與現場資料。
-- **目前不能發布的結論**：保護元件顆數倍增、指定 SiC／Si／被動元件或台灣公司勝出、監測資料已形成獨立商業價值，以及已取得訂單、收入或毛利。
-- **需要看到什麼才能前進**：具名量產平台公布完整保護電路架構、客戶資格驗證、故障紀錄、維修動作與材料清單，再由台灣公司申報交叉確認財務分母。
+- **目前可保留的結論**：800V 保護至少包含人身與維修、絕緣與接地、故障電流，以及帶電插拔與湧入電流等不同責任；hot-swap 要把受控預充與故障清除兩支時鐘分開，維修安全還要確認切斷、隔離、放電與安全接近，熔斷器則須另拆 amp、voltage、prospective current、interrupt、let-through、I²t 與 selectivity。
+- **可信度為中而不是高**：OCP 提供系統規格，IEC 提供標準公開範圍，TI 與 Infineon 提供架構及參考設計，Eaton 與 Littelfuse 補上熔斷器定義與單一料號案例；但目前仍缺同一具名量產平台的完整 fault matrix、DC interruption／selectivity 與現場資料。
+- **目前不能發布的結論**：保護元件顆數倍增、指定 fuse／breaker／SiC／Si／被動元件或台灣公司勝出、監測資料已形成獨立商業價值，以及已取得訂單、收入或毛利。
+- **需要看到什麼才能前進**：具名量產平台公布完整保護電路、十一欄故障清除與選擇性護照、客戶資格、故障與維修紀錄及材料清單，再由台灣公司申報交叉確認財務分母。
 
 ## 來源
 
@@ -694,6 +966,10 @@ Infineon 的 48V 電子保險絲資料已列出電壓、電流、能量、功率
 - [Texas Instruments：800V／±400V floating-ground hot-swap technical white paper](https://www.ti.com/lit/wp/stda029/stda029.pdf)
 - [Infineon：400／800V power-path protection 與 REF_XDP701_4800](https://www.infineon.com/technology-news/2025/INFPSS202510-002)
 - [IEC：IEC 60947-10:2026 半導體斷路器公開摘要](https://webstore.iec.ch/en/publication/67514)
+- [Eaton：Bussmann high speed fuse application guide 10507](https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/fuses/technical-literature/bus-ele-an-10507-hsf.pdf)
+- [Littelfuse：Fuseology Design Guide](https://www.littelfuse.com/assetdocs/fuseology-selection-guide?assetguid=d812dff2-1c47-4dc3-bce7-07a4001ddc32)
+- [IEC：IEC 60269-4:2024 半導體保護用 fuse-links 公開範圍](https://webstore.iec.ch/en/publication/66094)
+- [Eaton：170M6190 product specifications](https://www.eaton.com/ca/en-gb/skuPage.170M6190.html)
 - [OCP Open Rack 規格索引](https://www.opencompute.org/wiki/Open_Rack/SpecsAndDesigns)
 - [TI Data Center Design Resources](https://www.ti.com/applications/data-center/overview.html)
 - [Infineon Protection and Monitoring ICs](https://www.infineon.com/products/power/protection-and-monitoring-ics)
@@ -786,6 +1062,19 @@ frequency: monthly
 next_check: 2026-09-01
 trigger: 平台或買方文件以固定版本公布事件／工況、偵測與計時、切斷結果、隔離接點回饋、放電與殘壓軌跡、獨立安全確認、維修放行及復歸測試
 invalidation: Production architecture 或 field evidence 顯示切斷、隔離、放電與安全確認不需分開，或六欄護照無法辨識實際 service-safe failure
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C14,C15,C16,C17,C18,C19
+metric: 具名 800VDC production platform 是否公開同一版本的十一欄故障清除與選擇性護照，並接到 production BOM、field record 與公司財務分母
+source_ids: S10,S11,S12,S13
+watch_source_ids: S4,S5,S6,S7,S13
+frequency: monthly
+next_check: 2026-09-01
+trigger: 平台、買方或供應商以固定 one-line／fault location 公布 DC voltage／L／R、prospective current、精確料號、time-current／I²t／let-through、interrupt test、protected-device withstand、全 fault range selectivity、qualification、production 與 field results
+invalidation: Production architecture 或 field evidence 顯示 amp／prospective／interrupt／let-through／I²t／selectivity 不需分開，或十一欄無法辨識誤清除、上游同跳、下游損傷與商業歸因
 -->
 
 ## 什麼會推翻這篇
