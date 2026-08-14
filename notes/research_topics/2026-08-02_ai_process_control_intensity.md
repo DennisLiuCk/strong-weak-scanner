@@ -123,6 +123,13 @@ to: triaged
 reason: added_defect_threshold_base_rate_review_load_and_miss_cost_crossover_without_thesis_or_clock_refresh
 evidence: sources:S28,S29,S34
 -->
+<!-- transition
+date: 2026-08-15
+from: triaged
+to: triaged
+reason: added_internal_orders_rpo_contract_balance_and_revenue_clock_boundary_without_thesis_or_clock_refresh
+evidence: sources:S35,S36,S37
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -189,6 +196,10 @@ evidence: sources:S28,S29,S34
 - **Gauge R＆R（量具重複性與再現性研究）**：用規劃好的重複量測，拆解設備、操作、日期、設定或樣品等來源造成的變異；一次短期研究不能自動代表日後長期穩定，也不能替代偏差與不確定度評估。
 - **公開資訊觀測站（MOPS）**：台灣上市櫃公司的正式申報入口；要用它找具名產品、客戶階段與財務揭露，不能只靠海外設備商說法推導台灣公司受惠。
 - **訂單（order intake）**：客戶已下單、但公司尚未必完成交付或符合營收認列條件的商業承諾；訂單金額不能直接當成同季營收。
+- **CODM（最高營運決策者）**：公司內部評估部門績效與分配資源的決策角色；正式文件說 CODM 會看某個指標，不代表外部報表一定公開該指標的金額。
+- **剩餘履約義務（RPO）**：已簽合約中尚未履行的承諾；公司若採用短期合約豁免，公開 RPO 只涵蓋特定期間的子集合，不能直接改名為全部 backlog 或 order intake。
+- **合約負債（contract liability）**：公司已收到預付款或開票超過已認列營收、但仍有履約義務的期末存量；它不是當期新增訂單，也不是未來收入的無條件保證。
+- **合約資產（contract asset）**：公司已移轉商品或服務、但收款權仍受技術簽核等非單純時間條件限制的資產；它不等同「尚未認列營收」，也不能與合約負債相減成訂單。
 - **營收認列（revenue recognition）**：公司在交付與會計條件成立後列入財報的收入；何時認列、認列多少，可能和接單日不同。
 - **題材分子／公司分母**：題材分子是可歸屬於先進封裝製程控制的收入或訂單，公司分母是同期間公司總收入或總訂單；兩者期間、範圍與會計狀態一致，比例才有意義。
 - **成長指數**：只說未來值相對基期增減多少，例如「Q4 比 Q1 高約 70%」；若沒有基期金額，它能表示方向，不能還原絕對收入。
@@ -198,6 +209,9 @@ evidence: sources:S28,S29,S34
 - **VeritySEM 7AP／SEMVision G7AP**：Applied 分別定位為先進封裝 eBeam 尺寸量測與缺陷複判／分類工具；型號已被公司稱為 production，不代表公開資料已拆出各自收入或客戶端成效。
 - **PDC（Process Diagnostics and Control，製程診斷與控制）**：Applied 使用的較寬產品類別，涵蓋不同晶圓製造與封裝應用；類別成長不等於其中 AP 子集合以相同比率成長。
 - **FY26Q3**：Applied 依自己的財政年度命名、截至 2026 年 7 月 26 日的一季；不是一般曆年第三季，本文只按公司報告期間使用。
+- **FY26Q2**：Applied 截至 2026 年 4 月 26 日的財政年度第二季；本文用其正式季度申報拆履約帳本，不把較早季度數字冒充 FY26Q3 現況。
+- **Form 10-Q**：美國上市公司提交給 SEC 的季度正式申報；它提供財務表與附註，但公開到哪一層仍受報導分部、會計規則與公司揭露範圍限制。
+- **Python Decimal**：本文用十進位高精度算術重算指定揭露值，再以獨立 awk 路徑交叉核對；兩路一致只能證明算術可重現，不會把約數變精確，也不是統計抽樣。
 - **AP-specific PDC（先進封裝專屬製程診斷與控制）**：同時可歸屬 advanced packaging 與 PDC 的收入、訂單或工具分子；公司總營收、部門營收、全部 AP 或全部 PDC 都比它寬。
 - **集合與交集**：若 `A` 代表全部 advanced-packaging revenue、`P` 代表全部 PDC revenue，本文真正要找的是同時屬於兩者的 `A ∩ P`；兩個大集合各自成長，仍不能唯一決定交集大小或成長率。
 - **客戶應用組合（customer application mix）**：把部門收入按客戶製造應用分成 foundry／logic／other、DRAM、flash 等類別；它不是產品組合，也沒有把 AP 或 PDC 收入單獨拆出。
@@ -727,6 +741,63 @@ actual revenue、order intake、工具數或可重建產品分子，再對回公
 客戶或產業樣本；91.15 億與 70.40 億美元是該季發行人實際報告值，70% 與 50% 是管理層
 lower-bound forecasts，來源均未提供預測區間。集合算例沒有 sampling SE／t，也不衡量預測
 準確度。新資料沒有價格、估值、共識或持倉，因此不支持「市場已反映」或任何投資方向。
+
+## 內部有 orders，不等於外部拿得到：把五個履約時鐘拆開
+
+Applied 的 FY26Q2 10-Q 提供一個很少被拆清楚的教材。部門附註明確表示，CODM 評估部門
+績效時會看 orders、revenue 與 operating income；但緊接著公開的部門表只列營收、銷貨成本、
+毛利、營業費用、營業利益、折舊攤銷、資本支出、應收帳款、存貨與商譽，沒有列 orders。
+因此「管理層內部有訂單指標」只能證明該指標存在於內部管理資訊，不能替外部讀者產生
+order intake 金額、產品分子或 book-to-bill。
+
+同一份 10-Q 的合約附註又公開另外四種狀態。它們都和未來營收有關，卻不是同一本帳：
+
+| 時鐘／帳本 | FY26Q2 10-Q 公開的狀態 | 正確讀法 | 不能替代 |
+|---|---|---|---|
+| 內部 orders | CODM 會用來評估部門；外部部門表未列金額 | 公司內部追蹤接單 | 公開 order intake、題材訂單或 book-to-bill |
+| 長約剩餘履約義務 | 2026-04-26 約 12 億美元，主要是原始預計期間至少一年的書面採購單；約 77% 預期在 12 個月內認列 | 只是一部分長約尚未履行的存量與管理層時程預期 | 全部 backlog；原始期間一年以下的合約已依豁免排除 |
+| 合約負債 | 2025-10-26 為 25.66 億美元，2026-04-26 為 25.70 億美元 | 預付款或開票超過已認列營收、仍待履約的期末存量 | 當期新增訂單、現金餘額或 AP-specific PDC 分子 |
+| 合約資產 | 同兩個期末由 2.81 億降至 2.21 億美元；主要涉及已移轉商品但收款仍取決於技術簽核 | 有條件收款權的期末存量；技術簽核仍是重要商業節點 | 未認列營收、未交貨設備或客戶已完成最終驗收的同義詞 |
+| 從期初合約負債認列的營收 | 截至 2026-04-26 的六個月約 15 億美元 | 期初預收／超額開票存量在本期轉成營收的流量 | 本期接單、本期新增開票或題材產品營收 |
+
+### 期末幾乎沒變，帳內仍可能有很大的雙向流量
+
+合約負債由 25.66 億升至 25.70 億美元，期末淨增加只有 400 萬美元，機械換算為期初存量的
+0.155885%。若只看兩個期末，很容易寫成「幾乎沒有變化」。但同一附註又表示，六個月內約
+15 億美元的營收來自期初合約負債，相當於期初存量約 58.456742%。公司並說新產品與服務
+開票增加合約負債、期初負債轉營收則反向減少；所以接近不變的期末存量可以同時容納很大的
+流入與流出，不能被翻譯成需求、接單或履約活動停滯。
+
+也不能用期末差額加回 15 億美元，就宣稱精確算出本期新增開票。15 億美元本身是約數，附註
+沒有提供完整逐項 roll-forward，合約資產與負債又按每份合約淨額呈現；匯率、合約修改或其他
+變動若未拆出，研究端就沒有權利自行補成零。安全結論只有「淨存量掩蓋雙向流量」，不是
+「新 billings 等於 15.04 億美元」。
+
+長約剩餘履約義務也只能作時程教材：把約 12 億美元機械乘上約 77%，得到約 9.24 億美元在
+未來 12 個月的預期認列窗口，其餘約 2.76 億美元落在之後 24 個月；兩個輸入都是約數和管理層
+預期，所以換算值同樣只能標「約」。更重要的是，公司排除了原始預計期間一年以下的合約，
+12 億美元不是全部訂單母體，也沒有拆 Semiconductor Systems、advanced packaging、PDC 或
+VeritySEM 7AP／SEMVision G7AP。
+
+### 多空小作文要共用一份履約護照
+
+多方可以提出可驗證的條件：若後續正式文件把具名 AP-specific PDC 產品的接單、長約履約
+義務、技術簽核與已認列收入接在同一期間，並提供公司或部門分母，商業證據就會從產品名與
+預測前進到可重建的 conversion。空方也可以提出可驗證的替代路徑：若 broad orders／RPO
+維持高檔，但具名產品在簽核、收入或重複採購停滯，或短週期訂單與既有工具重用吸收了需求，
+題材強度就可能低於廣義公司指標。
+
+共同裁決不能只看一個大數字。一份最小履約護照至少要固定公司與會計期、具名產品／類別、
+order 定義與接單日、取消條件、合約原始期間與 RPO 是否納入、預收／開票、交付／安裝、
+technical sign-off、收入認列、actual／order／forecast 標籤、題材分子與公司分母，以及收款、
+成本與毛利。缺少共同產品鍵與同期間分母時，RPO 除以單季營收、合約負債除以營收，或把
+管理層預測除以公司實績，都不是可比較的 book-to-bill。
+
+本節是 N＝1 家發行人、N＝1 份截至 2026-04-26 的正式 10-Q；不是 FY26Q3、跨公司、產品、
+客戶或合約樣本。400 萬美元、0.155885%、58.456742%、約 9.24 億與約 2.76 億美元由 Python
+Decimal 與獨立 awk 兩路重算一致；這些是指定揭露值的確定性算術，沒有 sampling SE／t，且
+繼承來源「約 15 億、約 12 億、約 77%」的捨入與前瞻不確定性。本輪仍沒有 AP-specific PDC
+actual revenue、order intake、工具數或客戶單位產能分母，故不改 C22 主命題與信心時鐘。
 
 ## 台灣映射的三個同名陷阱：先進封裝、設備與製程控制不是同一個分子
 
@@ -1310,6 +1381,54 @@ url: https://www.nist.gov/publications/addressing-misclassification-costs-machin
 locator: NIST publication abstract；patterning-defect metrology 的 asymmetric misclassification cost、defect-as-nominal 後果、公開成本缺值、cost ratio／classification threshold 掃描、surrogate public datasets 與 strong class imbalance 段落
 limitation: 這是 SPIE 2023 研究的 NIST 摘要，實驗使用公開 ML 資料集代替工業影像；論文的門檻、cost ratio 與 15%～40% 結果不是 HBM／advanced-packaging production 數據，也不能外推成客戶 recipe、複判產能、良率、設備需求或財務效果
 independence_group: nist
+-->
+
+<!-- research_source
+source_id: S35
+role: company_filing
+source_kind: document
+publisher: Applied Materials
+title: Applied Materials Form 10-Q for the quarterly period ended April 26, 2026
+published_at: 2026-05-21
+captured_at: 2026-08-15
+accepted_at: 2026-08-15
+status: active
+url: https://www.sec.gov/Archives/edgar/data/6951/000162828026037227/amat-20260426.htm
+locator: Note 7 Contract Balances and Performance Obligations pp.16–17，以及 Note 14 Industry Segment Operations pp.28–29；Note 7 列合約資產／負債、期初合約負債轉營收、長約剩餘履約義務與短期合約豁免，Note 14 列 CODM 使用 orders／revenue／operating income 及公開部門表
+limitation: 這是 FY26Q2 單一發行人正式申報，不是 FY26Q3；內部 orders 沒有公開金額，約 12 億美元 RPO 排除原始預計期間一年以下的合約，合約資產／負債與認列流量均未拆 advanced packaging、PDC、AP-specific PDC、具名工具、客戶、取消條件、毛利或客戶端製造成效，77% 也是管理層預期而非保證時程
+independence_group: applied-materials
+-->
+
+<!-- research_source
+source_id: S36
+role: regulator_or_policy
+source_kind: living_index
+publisher: U.S. Securities and Exchange Commission
+title: Applied Materials EDGAR Company Filings
+published_at:
+captured_at: 2026-08-15
+accepted_at: 2026-08-15
+status: active
+url: https://www.sec.gov/edgar/browse/?CIK=6951&owner=exclude&action=getcompany
+locator: 2026-08-15 Latest Filings；最上方為 2026-08-13 Form 8-K earnings release，頁面尚未列 quarter ended 2026-07-26 的 Form 10-Q
+limitation: 這是會持續更新的官方申報索引與指定日期的負面查核，不是 Q3 10-Q 文件；後續申報會改變頁面，當時尚未列出也不表示公司內部沒有訂單、產品或履約資料
+independence_group: applied-materials
+-->
+
+<!-- research_source
+source_id: S37
+role: company_release
+source_kind: living_index
+publisher: Applied Materials
+title: Q3 2026 Applied Materials Earnings Conference Call
+published_at:
+captured_at: 2026-08-15
+accepted_at: 2026-08-15
+status: active
+url: https://investors.appliedmaterials.com/events/event-details/q3-2026-applied-materials-earnings-conference-call
+locator: 2026-08-15 Supporting Materials；列 Q326 News Release 與 Q326 Non-GAAP Reconciliation，尚未列 Earnings Call Published Script
+limitation: 這是會持續更新的公司事件頁與指定日期的負面查核，不是法說逐字稿；後續新增附件會改變頁面，當時尚未列出 script 也不能用來推論管理層沒有更細部產品或訂單資訊
+independence_group: applied-materials
 -->
 
 <!-- research_claim
@@ -1992,6 +2111,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C41
+label: verified
+status: active
+claim: Applied FY26Q2 10-Q 表示 CODM 以 orders、revenue 與 operating income 等指標評估部門，但對外部公開的部門表沒有列 orders 金額，而是列營收、成本、毛利、費用、營業利益及部分資產／資本項目
+supporting_source_ids: S35
+contrary_source_ids:
+as_of: 2026-05-21
+basis: S35 Note 14 先直接列出 CODM 使用的三類指標，後續部門表逐欄列 revenue、cost of products sold、gross profit／margin、operating expenses／income、depreciation and amortization、capital expenditures、accounts receivable、inventories 與 goodwill，未列 orders
+boundary: 只證實內部管理指標與本份外部表的揭露差異；不能由未公開推論 orders 為零、增加或下降，也沒有 AP／PDC／AP-specific PDC、具名工具、客戶、book-to-bill、取消條件或毛利分子
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C42
+label: verified
+status: active
+claim: Applied FY26Q2 10-Q 於 2026-04-26 列合約資產 2.21 億美元、合約負債 25.70 億美元，相較 2025-10-26 的 2.81 億與 25.66 億美元；六個月內約 15 億美元營收來自期初合約負債，另有約 12 億美元原始預計期間至少一年的剩餘履約義務，其中約 77% 預期在 12 個月內認列，且原始預計期間一年以下的合約被排除
+supporting_source_ids: S35
+contrary_source_ids:
+as_of: 2026-05-21
+basis: S35 Note 7 直接定義 contract assets／liabilities，列兩個期末餘額、期初合約負債轉營收金額、長約 remaining unsatisfied performance obligations、預期認列窗口與 practical expedient
+boundary: 合約資產是商品已移轉但收款仍受 technical sign-off 等條件限制，不等於未認列營收；RPO 只涵蓋特定長約子集合，約數與預期時程不是保證，也沒有題材、部門、產品、客戶、取消、毛利或現金分解
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C43
+label: inference
+status: active
+claim: Applied 期末合約負債六個月只淨增 400 萬美元或期初的 0.155885%，仍同時有約 15 億美元、相當於期初約 58.456742% 的存量轉為營收；約 12 億美元長約 RPO 按約 77% 機械拆分為約 9.24 億與 2.76 億美元的兩個預期窗口。這證明期末淨額可掩蓋雙向流量，也證明內部 orders、長約 RPO、合約負債、合約資產與營收不能互相替代或拼成 AP-specific PDC book-to-bill
+supporting_source_ids: S35
+contrary_source_ids:
+as_of: 2026-08-15
+basis: Python Decimal 與獨立 awk 以 2,566、2,570、1,500、1,200 百萬美元及 77% 兩路重算，得到淨增 4、0.155884645362%、期初轉營收比 58.456742010912%、預期窗口 924 與 276 百萬美元，顯示值逐項一致；再依 C41～C42 的公開定義分開五個時鐘
+boundary: N=1 家發行人、N=1 份 FY26Q2 10-Q，不是 FY26Q3、公司、產品、客戶或合約樣本；算術是確定性換算、沒有 sampling SE／t，且 15 億、12 億與 77% 都是約數／預期。沒有完整 roll-forward、短約母體或 AP-specific PDC 分子，故不能精確反推新 billings、總 backlog、轉換率、收入、毛利或投資效果
+verification_needed: Applied 以同一會計期公開具名 AP-specific PDC 的 order definition／金額、取消條件、RPO 納入邊界、交付／technical sign-off、actual revenue 及公司／部門分母；跨公司比較另須統一期間與會計定義
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C44
+label: verified
+status: active
+claim: 截至 2026-08-15 回查時，Applied 官方 Q3 事件頁只列 Q326 News Release 與 Non-GAAP Reconciliation、尚未列 Published Script；SEC 公司申報索引最新結果文件為 2026-08-13 Form 8-K，尚未列截至 2026-07-26 季度的 Form 10-Q
+supporting_source_ids: S36,S37
+contrary_source_ids:
+as_of: 2026-08-15
+basis: S36 官方 EDGAR Latest Filings 與 S37 官方 Q3 event Supporting Materials 在同一查核日逐項核對
+boundary: 這是兩個會更新入口在指定時間的可重現負面查核，不是永久缺件證明；後續頁面可能新增 Q3 10-Q 或 published script，且未公開不能推論公司內部沒有 AP-specific PDC 訂單、工具或收入資料
+verification_needed: 2026-08-21 重新查核 S36／S37，附件出現時另建 document source 並逐項核對 actual、order、forecast 與同期間分母
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
@@ -2028,6 +2215,7 @@ FY26Q3 再補公司／部門實績、客戶應用組合與 AP 逾 70%／PDC 逾 
 | 具名產品線銷售訊號 | Nova 稱 Sentronics advanced-packaging dimensional-metrology solutions 是創高產品線之一 | 產品線金額／占比、HBM 分解、工具數或跨公司 record 排名 |
 | 較寬 AP 財務預測 | Applied 預期 2026 年整體 AP revenue 年增逾 50%、超過 20 億美元，並另稱兩項 AP eBeam 工具已在多家客戶 production | 兩個下限不是精確基期／終值；整體 AP 不等於 process-control 分子，採用陳述也未接到產品收入 |
 | 公司／部門實績＋兩個廣義集合預測 | Applied FY26Q3 公布公司 91.15 億美元、Semiconductor Systems 70.40 億美元，並預期 CY26 AP revenue 成長逾 70%、PDC revenue 成長逾 50% | 客戶應用組合不是產品組合；兩個集合的成長率不能決定 AP-specific PDC 交集，CY26 也須按公司定義對齊 |
+| 內部 orders 與公開履約帳本 | Applied FY26Q2 10-Q 表示 CODM 會看 orders，並另列合約資產／負債及長約 RPO | 外部部門表沒有 orders；長約 RPO 排除一年以下合約，五個時鐘都未拆 AP-specific PDC，不能拼成 book-to-bill |
 | 台灣廣義設備收入＋產品能力 | 弘塑、均華、萬潤各自揭露廣義設備比重，並列相鄰的檢查／量測產品、代理能力或研發計畫 | 同定義製程控制分子、具名客戶階段、實際訂單／驗收收入或跨公司排名 |
 
 ## 跨公司數字與可比性
@@ -2400,7 +2588,7 @@ invalidation: 公司明確否認相關產品／客戶曝險、退出該市場，
 
 ## 下一個可證明／否定的節點
 
-- Applied FY26Q3 公告與簡報仍未提供 AP-specific PDC 分子；下一步核對官方 earnings script、後續 10-Q／IR 是否出現同期間 actual revenue、order intake、工具量或部署口徑，只有公司／部門總額與兩個廣義集合成長率仍不算。
+- Applied FY26Q3 公告與簡報仍未提供 AP-specific PDC 分子；只有公司／部門總額與兩個廣義集合成長率仍不算。截至 2026-08-15，官方事件頁尚未列 published script、SEC 也尚未列 FY26Q3 10-Q。FY26Q2 正式申報雖補出內部 orders、長約 RPO、合約資產／負債與營收的不同帳本，仍沒有題材交集；2026-08-21 再查 Q3 script／10-Q 是否出現同期間 actual revenue、order intake、工具量或部署口徑。
 - Camtek 能否把約 75% AP 收入組合補上量測期間，並把具名 Hawk 訂單接到實際交付、收入與公司分母；Nova 能否拆出 AP／Sentronics 金額或占比。
 - KLA 能否分解單位出貨、ASP、產品組合、服務與市占；否則 C7 維持待驗證。
 - Onto 能否把較寬事業組合新高拆到 HBM／2.5D、具名工具、客戶數、重複採購或收入分子；「record」沒有金額仍不和 Nova 排名。

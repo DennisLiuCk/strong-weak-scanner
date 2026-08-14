@@ -6136,11 +6136,20 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S31", "source_id: S32", "source_id: S33",
             "claim_id: C35", "claim_id: C36", "claim_id: C37",
             "claim_id: C38",
+            "added_internal_orders_rpo_contract_balance_and_revenue_clock_boundary_without_thesis_or_clock_refresh",
+            "## 內部有 orders，不等於外部拿得到：把五個履約時鐘拆開",
+            "### 期末幾乎沒變，帳內仍可能有很大的雙向流量",
+            "### 多空小作文要共用一份履約護照",
+            "0.155885%", "58.456742%",
+            "約 9.24 億美元", "約 2.76 億美元",
+            "source_id: S35", "source_id: S36", "source_id: S37",
+            "claim_id: C41", "claim_id: C42", "claim_id: C43",
+            "claim_id: C44",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 34),
-            ("research_claim", 40), ("metric_comparison", 5),
+            ("research_topic", 1), ("research_source", 37),
+            ("research_claim", 44), ("metric_comparison", 5),
             ("impact", 4), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
