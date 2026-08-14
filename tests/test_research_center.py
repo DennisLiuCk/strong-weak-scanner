@@ -6681,15 +6681,31 @@ class ResearchCenterTest(unittest.TestCase):
             "## 「0 次命中」能說什麼，不能說什麼",
             "## Reference design、adoption、platform qualification 是三張不同證書",
             "## 從元件微秒到整機故障：時間線要閉合",
+            "## 10–40 kA 不是 MOSFET 的測試電流：先對齊四個故障參考面",
+            "### DESAT 不是只把旋鈕轉到「最快」",
+            "### 一張可重算的 fault passport 至少要有四個 reference plane",
+            "| 1. 故障來源 |",
+            "| 2. Converter 路徑 |",
+            "| 3. Device stress |",
+            "| 4. Protection／clearing |",
+            "40 kA 除以 250 A",
+            "Edevice = ∫VDS(t) × ID(t)dt",
+            "N＝0；本節不計算 kA／A 比率",
             "## 用九個欄位建立可重算的 SiC qualification pack",
             "## 誰負責，誰不能替別人背書",
             "## 台達與 power／powersupply 族群應該怎麼讀",
+            "source_id: S13",
+            "source_id: S14",
+            "claim_id: C14",
+            "claim_id: C15",
+            "claim_id: C16",
+            "monitor_id: T4",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 13), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 16), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -6718,6 +6734,7 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:sic-commercial-attribution,stage,SiC AI 電源商業與財務歸因",
             "standard:ipc-9592b,standard,IPC-9592B 電源轉換裝置要求",
             "standard:telcordia-sr332,standard,Telcordia SR-332",
+            "stage:sic-short-circuit-coordination,stage,SiC 短路故障四參考面協同",
         ):
             self.assertIn(concept, concepts)
 
@@ -6726,10 +6743,14 @@ class ResearchCenterTest(unittest.TestCase):
             / "sic_ai_power_qualification.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: SiC 到 AI BBU／PSU 七關資格鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
         self.assertIn("from_id: company:2308", graph)
         self.assertIn("to_id: standard:jep203", graph)
         self.assertIn("to_id: standard:jep204", graph)
+        self.assertIn("to_id: stage:sic-short-circuit-coordination", graph)
+        self.assertIn(
+            "MI-2026-08-12-SIC-AI-POWER-QUALIFICATION#C16", graph
+        )
 
         radar = (
             ROOT / "notes" / "research_candidates"

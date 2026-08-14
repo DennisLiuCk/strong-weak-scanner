@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C11
 base_confidence: medium
-confidence_basis: JEDEC 的文件索引與發布稿直接界定 JEP203／JEP204 的元件級範圍，三份具名 OCP 規格又提供系統故障、derating、DFMEA、MTBF、HALT、mixed-source 與 NPI 驗收條款；Infineon、ROHM 與台達資料補上 reference design、供應商採用及系統產品證據。這些獨立一手鏈足以建立七關資格框架，也一致顯示公開的元件指引尚未和本輪三份平台規格接成同一條可重算驗收鏈
+confidence_basis: JEDEC 的文件索引與發布稿直接界定 JEP203／JEP204 的元件級範圍，三份具名 OCP 規格又提供系統故障、derating、DFMEA、MTBF、HALT、mixed-source 與 NPI 驗收條款；Infineon、ROHM 與台達資料補上 reference design、供應商採用及系統產品證據，onsemi 與 Infineon 的官方應用手冊再把 DESAT 偵測、blanking、soft turn-off、過衝及特定元件實例拆成可定位時鐘。這些獨立一手鏈足以建立七關資格與四參考面框架，也一致顯示公開的元件／驅動資料尚未和本輪三份平台規格接成同一條可重算驗收鏈
 cross_company_numbers: false
 -->
 
@@ -38,6 +38,13 @@ from: inbox
 to: triaged
 reason: separated_device_test_reference_design_system_qualification_and_financial_attribution
 evidence: sources:S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12
+-->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_fault_current_device_waveform_and_protection_timing_reference_plane_crosswalk
+evidence: sources:S13,S14
 -->
 
 <!-- research_source
@@ -230,6 +237,38 @@ url: https://www.opencompute.org/wiki/Data_Center_Facility/Power
 locator: 2026-08-12 的 Power Distribution sub-project；System Architecture、Protection and Safety、Main Components、Codes and Standards、Rack and Power 等 workstream 與公開資料入口
 limitation: 動態工作頁只供追蹤新規格與 revision；workstream 存在不表示 JEP203／JEP204 已被採用、任何元件通過 qualification 或產品已部署
 independence_group: ocp-power-distribution-index
+-->
+
+<!-- research_source
+source_id: S13
+role: competitor_primary
+source_kind: document
+publisher: onsemi
+title: Short-Circuit Protection Circuit Design for High Power Modules — AND90337/D
+published_at: 2025-04-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.onsemi.com/download/application-notes/pdf/and90337-d.pdf
+locator: April 2025 Rev.0（published_at 以文件月份首日正規化）；PDF pp.4–6 的 DESAT threshold／blanking、normal-versus-fault timing、soft turn-off／overvoltage-clamp trade-off
+limitation: 文件以 motor／traction inverter 為應用脈絡，沒有 AI BBU／PSU、JEP203／JEP204、OCP platform、客戶 acceptance、production BOM 或 field result；電路與波形是設計指引，不是本研究的量產樣本
+independence_group: onsemi-gate-driver-protection
+-->
+
+<!-- research_source
+source_id: S14
+role: competitor_primary
+source_kind: document
+publisher: Infineon Technologies
+title: EiceDRIVER F3 — Single-channel enhanced isolated gate driver family with short-circuit protection, AN-2022-03 V1.2
+published_at: 2023-05-08
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.infineon.com/assets/row/public/documents/60/42/infineon-1ed332xmc12n-technical-description-applicationnotes-en.pdf?fileId=8ac78c8c7e7124d1017ef7883db65158
+locator: PDF 第 18–19 頁；Section 5.2 的 400 V、IMW120R045M1、CDESAT 51 pF、約 250 A、約 2 microseconds 與 3 microseconds device capability，以及 Section 5.3 移除外加 DESAT capacitor 後約 1.2 microseconds 的固定實例
+limitation: N＝1 個供應商、具名 driver／device 與固定 lab circuit 的示範；不是跨元件規格、JEP report、AI BBU／PSU system qualification、客戶測試、失效率、production shipment 或財務證據
+independence_group: infineon-eicedriver-short-circuit
 -->
 
 <!-- research_claim
@@ -453,6 +492,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: Infineon AN-2022-03 的固定實例把 400 V DC link、IMW120R045M1、正 15 V／負 2 V gate supply、51 pF 外加 DESAT capacitor、約 250 A 短路電流與約 2 microseconds 關斷放在同一張波形，並將它和該元件 3 microseconds short-circuit withstand capability 對照；同一實例移除外加 capacitor 後約為 1.2 microseconds
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2023-05-08
+basis: S14 第 18–19 頁的 Section 5.2／5.3 逐項列出 device、driver supply、DC link、DESAT capacitor、current、turn-off time 與 device capability
+boundary: 這只是一個供應商 N＝1 固定 lab circuit 的觀測，不是所有 SiC、所有 driver、800 V、AI BBU／PSU、JEP203 pass line、可靠度分布或 production customer 結果；1.2／2／3 microseconds 不能跨 reference plane 排名
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: onsemi AND90337/D 將 SiC DESAT threshold 的高接面溫度驗證、blanking time 的防誤觸發與及時保護、soft turn-off／voltage clamping 的過衝抑制，以及較慢關斷增加 short-circuit energy 的代價放在同一設計取捨中
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2025-04-01
+basis: S13 p.4 的四項 DESAT design considerations、p.5 的 normal／fault timing 與 fast-response-versus-overshoot trade-off、p.6 的 clamping／soft-turn-off circuit
+boundary: 文件是 motor power module 的 supplier application note，證明設計變數互相牽制，不證明任何 AI power platform 已採同一 circuit、threshold、timing、qualification 或 field result
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: Diablo 400 的 10–40 kA available short-circuit fault current 與供應商應用手冊中的單顆 SiC 電流／微秒數位於不同 reference plane；要把系統故障接到元件資格，至少要同時保存故障點與 source impedance、converter 電流路徑、元件 VDS／ID／VGS／Tj 波形，以及 sensing／blanking／driver turn-off／clamp／fuse-breaker clearing 時間
+supporting_source_ids: S4,S13,S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S4 固定 rack-level available fault-current envelope；S13 固定 device／driver detection、blanking、turn-off 與 stray-inductance trade-off；S14 用一個 fixed circuit 示範微秒數如何隨 DESAT capacitance 改變
+boundary: 四參考面是跨文件建立的可重算 crosswalk，不是任何 AI BBU／PSU 已完成的 fault test、JEP adoption、客戶 acceptance 或安全認證；不同地點、阻抗、拓撲與量測邊界的 kA、A 與 microseconds 不可相除、相減或排成材料優劣
+verification_needed: 具名 production BBU／PSU 以固定 platform／board revision 公開 fault location、source impedance、全部 source contribution、device／driver raw waveforms、tolerance、clearing sequence、pass／fail 與 post-fault disposition
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -460,6 +550,7 @@ resolution:
 - **SiC（碳化矽）**：寬能隙半導體材料；在高電壓、高溫或高頻率的電力轉換中可能降低損耗，但價格、驅動、封裝、保護與可靠度仍要一起設計。
 - **功率 MOSFET**：用閘極控制大電流通斷的功率開關；datasheet 耐壓不是系統在所有故障下都安全的保證。
 - **閘極（gate）**：控制 MOSFET 開或關的端點；電壓過高、過低、震盪或長期偏壓都可能影響可靠度，所以要保存 driver 與實際 waveform。
+- **VGS／VDS／ID**：分別是 gate-to-source voltage、drain-to-source voltage 與 drain current；三條帶時間的波形要一起看，不能用其中一個峰值代表完整元件壓力。
 - **短路（short circuit）**：原本應經負載流動的電流遇到極低阻抗路徑，可能在很短時間內產生極大電流與熱。
 - **短路耐受時間**：在指定電壓、閘極、溫度、電流限制與測試電路下，元件尚未失效的時間；離開條件就不能沿用同一數字。
 - **故障能量**：故障期間電壓、電流與時間共同形成的能量；只看峰值電流或只看微秒數都不完整。
@@ -475,7 +566,16 @@ resolution:
 - **Diablo 400 v0.7.0**：OCP 對高功率 sidecar power rack 的公開規格與本文審閱版本；數字是專案名稱或版號，不是單一輸出電壓或元件型號。
 - **Open Rack V3／HPR V2**：OCP 機櫃與高功率 rack 架構的版本名稱；每份文件仍要連同 revision、日期與適用模組閱讀。
 - **DC-DC**：把一個直流電壓轉成另一個直流電壓的轉換級；BBU 可能需要雙向 DC-DC 來充電與放電。
+- **Converter（電力轉換器）**：由功率開關、driver、磁性元件、電容、感測與控制組成，把輸入電力轉成產品所需電壓與電流；元件測過不等於整個 converter 已通過。
+- **pF（皮法拉）**：電容量單位，1 pF 是 10 的負 12 次方法拉；DESAT pin 的外加與寄生電容會影響偵測時間，也會牽動雜訊免疫。
 - **kA**：kiloampere，千安培；在本文是系統可用短路故障電流的單位，不是單顆 MOSFET 自動承受的測試電流。
+- **參考面（reference plane）**：一個電壓、電流、功率或時間究竟在哪個物理位置、哪段電路與哪種量測邊界成立；機架匯流排、轉換器支路與單顆 MOSFET 是三個不同參考面。
+- **Source impedance（電源等效阻抗）**：故障點往上游看見的電阻、電感、導線與供電路徑綜合效果；它會限制電流上升與峰值，因此只有電壓和名目 kA 還不能重建元件波形。
+- **DESAT protection（去飽和／導通壓降偵測保護）**：監看功率開關導通時的 VDS 或 VCE；電壓超過設定門檻後觸發關斷。門檻、溫度、雜訊、blanking 與 driver delay 都會改變結果。
+- **AND90337/D**：onsemi 2025 年 4 月的高功率模組短路保護應用手冊編號；本文只借它拆 DESAT 與關斷取捨，不把 motor 例子當 AI 電源驗收。
+- **Leading-edge blanking（前緣遮蔽時間）**：開關剛導通、波形尚在轉換與振鈴時，暫時不讓 DESAT 判定故障的時間窗；太短可能誤跳，太長又可能讓真短路累積更多能量。
+- **Soft turn-off（緩關斷）**：故障發生後刻意降低關斷速度，以減少寄生電感造成的電壓過衝；代價是元件保持導通更久，可能增加故障能量。
+- **Voltage overshoot（電壓過衝）**：電流快速改變時，寄生電感在穩態母線電壓之上疊出的瞬時尖峰；它不是另一個獨立電源，也不能只靠降低關斷時間同時消除。
 - **800 VDC／±400 VDC**：兩種高壓直流分配方式；兩者的導線、接地、絕緣、保護與元件電壓條件不完全相同。
 - **reference design**：供應商把元件、拓撲與控制組成可評估的設計；它能證明工程可行性，不能代替客戶 platform qualification。
 - **SCT4013DLL**：ROHM 在採用公告中具名的 750 V SiC MOSFET 料號；具名料號仍要對上客戶、平台、測試與出貨。
@@ -665,6 +765,60 @@ percent 是公司所述另一個整體 conversion boundary。兩者電壓、topo
 如果只保存 t3 的 device withstand，卻沒有 t1＋t2 的 detection／shutdown delay，就不能確認保護來得及。
 如果只寫「立即關斷」，卻沒有 waveform 與 tolerance，也不能拿去做 alternate-part qualification。
 
+## 10–40 kA 不是 MOSFET 的測試電流：先對齊四個故障參考面
+
+Diablo 400 寫的 10–40 kA，是依 application 而異的系統 available short-circuit fault current；它描述
+故障點在指定配電架構下可能向上游取得多大的電流。Infineon 應用手冊中的約 250 A、約 2
+microseconds，則屬於一顆 IMW120R045M1、指定 gate supply、400 V DC link、特定 driver 與 51 pF
+DESAT capacitor 的 lab waveform。兩組數字都是真的，卻沒有共同物件、位置、阻抗或電路，不能把
+40 kA 除以 250 A，命名為「元件要承受 160 倍」，也不能把 2 microseconds 寫成整個 rack 的清除時間。
+
+| 公開數字 | 它所在的參考面 | 原文件真正固定 | 尚缺的交接欄位 |
+|---|---|---|---|
+| 10–40 kA | rack／distribution 的故障點 | S4 的 system available-fault-current 範圍，且數值依 application 而異 | fault location、source impedance、哪幾個 source 同時供應、支路限流及元件分流 |
+| 約 250 A、約 2 microseconds | S14 的單顆 device＋driver lab circuit | 400 V、具名 MOSFET、正 15 V／負 2 V gate supply、51 pF 外加 DESAT capacitor | AI BBU／PSU topology、800 V 條件、量測 tolerance、跨 lot／溫度結果與客戶門檻 |
+| 約 1.2 microseconds | 同一供應商實例移除外加 DESAT capacitor | 在該電路內縮短 detection／turn-off time | noise immunity、false trip、layout parasitic 與 production repeatability |
+| 3 microseconds device capability | S14 對同一 MOSFET 的 device capability 陳述 | 供應商拿來判斷該 2-microsecond protection example 是否足夠的上限 | 不同 VDS、ID、VGS、Tj、package、driver、重複故障與 system margin |
+
+### DESAT 不是只把旋鈕轉到「最快」
+
+onsemi 的 AND90337/D 把常被拆開看的兩種失敗放在同一條時間線。Blanking 太長，真短路會在
+判定前繼續累積能量；太短，正常 turn-on 的高 dv/dt、振鈴與 VDS 尚未下降，可能被誤判成短路。
+DESAT threshold 又要在高 Tj 下驗證，因為 RDS(on) 會隨溫度改變。這表示 driver datasheet 上的一個
+nominal threshold，不是跨溫度、跨料號與跨 layout 的永久及格線。
+
+故障一旦被偵測，也不能只追求最快 hard turn-off。寄生電感會把快速電流變化轉成電壓過衝，
+近似關係為 ΔV ≈ Lstray × |dI／dt|；soft turn-off 能壓低 |dI／dt|，卻讓元件維持導通更久。元件在
+故障期間吸收的能量要由 Edevice = ∫VDS(t) × ID(t)dt 的完整波形積分，不能用一個 peak current、
+一個 withstand time 或母線電容焦耳數代替。真正的設計目標是讓 false trip、故障能量與關斷過衝
+同時留在各自門檻內，不是讓其中一個時間最小。
+
+### 一張可重算的 fault passport 至少要有四個 reference plane
+
+| 參考面 | 最低必要欄位 | 這一面回答什麼 | 不能替下一面回答什麼 |
+|---|---|---|---|
+| 1. 故障來源 | fault location、bus voltage、source impedance、upstream source、cap／BBU contribution、temperature | 系統在該點可能提供什麼電流與能量 | 不能直接得到每顆 switch 的 ID／VDS 波形 |
+| 2. Converter 路徑 | topology、導通元件、current split、busbar／loop inductance、限流與 fuse／breaker branch | 故障如何分到 module、leg 與 device | 不能只靠 schematic 宣稱元件沒超限 |
+| 3. Device stress | part／lot／package、VGS、VDS、ID、Tj、waveform bandwidth、energy integral、failure criterion | 單顆元件在指定 circuit 是否留在 qualified envelope | 不能替 sensor、driver 或上游隔離證明及時動作 |
+| 4. Protection／clearing | threshold、blanking、filter、driver delay、soft／two-level turn-off、clamp、fuse／breaker clear、retry／latch、post-fault disposition | 從偵測到安全隔離的責任與總時間是否閉合 | 不能由一次 lab pass 推成 field reliability、mixed-source 或財務 |
+
+這四面必須用同一個 platform／board revision 與事件 ID 接起來。若 fault current 是匯流排模擬值、
+device waveform 來自另一塊 evaluation board、fuse clearing curve 又屬不同溫度與公差，就只能列為三份
+相鄰證據，不能拼成一個「已保護」結果。
+
+### 多空小作文要共用同一張故障護照
+
+| 敘事 | 必須同時看見 | 何時下修或被否定 |
+|---|---|---|
+| 多方：SiC 與新 driver 擴大 AI 高壓電源安全工作窗 | 具名 BBU／PSU 在正常、transient 與 fault corner 下，固定 part／driver／layout 能同時控制 false trip、device energy、overshoot、clearing 與熱，並通過 mixed-source／customer qualification | 只有 supplier demo；800 V 或高溫下 margin 消失；保護必須大幅降額；客戶沒有量產接受與財務足跡 |
+| 空方：保護時鐘太緊，qualification 成本與換料風險吃掉材料優勢 | 同一 system contract 下 SiC 需要更複雜 sensing／clamp、較窄 tolerance、較高降額或更多重驗，且 alternative technology 能以較低全生命週期成本通過 | Production test 顯示跨 lot／溫度仍有充足 margin、alternate-source 可互換、field return 受控，且效率／密度收益留下可重算財務 |
+
+本節的觀察單位是 N＝1 份 OCP system specification、N＝1 份 onsemi application note，以及 N＝1
+個 Infineon 固定 device／driver example；它們不是同一產品的三次試驗，也不是隨機市場樣本，因此不估
+sampling SE／t 或 failure-rate confidence interval。真實 AI BBU／PSU 的同一 fault location、source
+impedance、device waveform、clearing、customer acceptance、production lot、field incident 與財務共同觀測
+N＝0；本節不計算 kA／A 比率、可靠度、SiC 滲透率、供應商份額、ASP、收入、毛利或投資效果。
+
 ## 用九個欄位建立可重算的 SiC qualification pack
 
 | 記錄欄 | 最低必要內容 | 缺少時的風險 |
@@ -720,10 +874,13 @@ wafer／device capability、一般 server exposure 或其他 800 V 假說都不�
 - [ROHM／Delta HVDC dialogue](https://www.rohm.com/ir/dialogue/ai-server)（management planned production／adoption；頁面未標可定位發布日）。
 - [Delta 2025 Chairman Statement](https://www.deltaww.com/en-US/investors/chairman-statement)（公司高壓 power product architecture）。
 - [Delta Chindata／Meituan SST case](https://brandnews.deltaww.com/en/SpecialDetail/12748)（相鄰 SiC system deployment，不是 BBU／PSU JEP qualification）。
+- [onsemi AND90337/D](https://www.onsemi.com/download/application-notes/pdf/and90337-d.pdf)（April 2025 Rev.0；DESAT threshold／blanking、soft turn-off、clamping 與 fault-energy／overshoot trade-off；motor power module 脈絡，不是 AI platform qualification）。
+- [Infineon AN-2022-03 V1.2](https://www.infineon.com/assets/row/public/documents/60/42/infineon-1ed332xmc12n-technical-description-applicationnotes-en.pdf?fileId=8ac78c8c7e7124d1017ef7883db65158)（第 18–19 頁的 N＝1 固定 400 V、具名 device／driver DESAT example；不是跨元件或客戶及格線）。
 
 本輪沒有做跨公司的效率、功率密度、MTBF 或壽命排名。Infineon 與 ROHM 各是 N=1 supplier evidence；
 OCP N=3 是具名文件 census；Delta 數字是不同產品與 reference plane 的公司揭露。這些都不是獨立同分布的
-市場抽樣，故不估 SE／t。OCP 的 90% confidence 是規格文字，不是本文的統計信賴區間。
+市場抽樣，故不估 SE／t。新增 onsemi 應用手冊與 Infineon device／driver example 也只提供不同責任面的
+工程證據，不是同一 AI 產品的重複實驗。OCP 的 90% confidence 是規格文字，不是本文的統計信賴區間。
 
 ## 影響路由
 
@@ -793,6 +950,20 @@ trigger: 買方與台灣公司雙向確認相同 BBU／PSU、SiC part、JEP／sy
 invalidation: 只有 roadmap、reference design、supplier adoption、SST／EV 等相鄰 application，或 production plan 延後且沒有 customer acceptance／financial numerator
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C14,C15,C16
+metric: AI BBU／PSU 同一故障事件的 system available current、source impedance、converter current path、device raw waveform、DESAT／driver timing、clamp／fuse-breaker clearing 與 post-fault disposition crosswalk
+source_ids: S4,S13,S14
+watch_source_ids: S12
+frequency: event_driven
+frequency_detail: OCP、平台商、BBU／PSU integrator 或 device／driver supplier 發布 fault test、qualification report 或規格 revision 時，以同一 platform／board revision 與 event ID 逐面核對
+next_check: 2026-09-15
+trigger: 具名 production AI BBU／PSU 公開 fault location、source impedance、全部 source contribution、VDS／ID／VGS／Tj raw waveform、threshold／blanking／delay、overshoot／energy、clearing sequence、tolerance、pass／fail 與 customer acceptance
+invalidation: 數字仍來自不同 rack、evaluation board、voltage、topology 或 temperature；只有 supplier lab example、simulation 或 generic protection wording時，不建立 system-safe、mixed-source、field reliability 或財務結論
+-->
+
 ## 下一個可證明／否定的節點
 
 - JEP203／JEP204 全文是否提供足以固定 circuit、waveform、sample、failure criterion 與 report field 的可重算契約。
@@ -800,5 +971,6 @@ invalidation: 只有 roadmap、reference design、supplier adoption、SST／EV �
 - 同一高壓 BBU／PSU 是否公開 device raw data、converter fault timeline、derating／DFMEA、mixed-source EVT／DVT／PVT 與 customer acceptance。
 - ROHM 的 adopted SCT4013DLL 是否由具名 BBU maker／customer confirmation，並對上 platform revision、shipment 與 volume。
 - Delta planned Q2–Q3 2026 production 是否轉為具名產品出貨，並把 SiC part、JEP mapping、customer qualification 與 financial denominator 接起。
+- 下一份 AI power fault report 能否把 rack available current、source impedance、converter current path、device raw waveform、DESAT／driver timing、fuse／breaker clearing 與 post-fault disposition 用同一 event ID 接起；缺任一 reference plane 就不把 kA、A 與 microseconds 拼成同一及格線。
 - 若平台長期不引用 JEP，或只把它留在 supplier quality appendix 而不改 system threshold，C12 維持未證實，研究框架應視 JEP 為 device-level harmonization 而非 AI power demand catalyst。
 - 若 mixed-source 結果顯示 Si、SiC、GaN 或不同 SiC supplier 都可在相同 system contract 通過，應下修任何材料獨占、單一供應商份額與 pricing-power 推論。

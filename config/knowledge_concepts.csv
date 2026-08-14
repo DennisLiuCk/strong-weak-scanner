@@ -325,6 +325,7 @@ stage:sic-mixed-source-qualification,stage,SiC 跨來源客戶資格,SiC mixed-s
 stage:sic-commercial-attribution,stage,SiC AI 電源商業與財務歸因,SiC AI power commercial attribution|SiC BBU PSU financial materiality,concept:sic-ai-power-qualification,買方與供應商對上同一元件 模組 平台資格 量產 BOM 出貨期間 收入及毛利分母的節點
 standard:ipc-9592b,standard,IPC-9592B 電源轉換裝置要求,IPC-9592B power conversion reliability,concept:sic-ai-power-qualification,電腦與通訊產業 power conversion device 的設計 derating reliability 與 quality process 參考規格
 standard:telcordia-sr332,standard,Telcordia SR-332,SR-332 reliability prediction,concept:sic-ai-power-qualification,以 parts count 或 parts stress 等方法預測 electronic equipment reliability 的方法文件
+stage:sic-short-circuit-coordination,stage,SiC 短路故障四參考面協同,SiC short-circuit reference-plane coordination|fault event passport,concept:sic-ai-power-qualification,把故障點與 source impedance 轉換器電流路徑 元件 VDS ID VGS Tj 波形及 sensing blanking driver clamp fuse breaker clearing 用同一事件鍵接起的節點
 concept:semiconductor-pfas-exposure,concept,半導體 PFAS 七關曝險鏈,Semiconductor PFAS exposure|PFAS substance process jurisdiction qualification,,把物質身分 製程功能 產品形態 法域義務 豁免過渡 變更資格與公司財務歸因分開追蹤的框架
 process:eu-reach-pfas-restriction,process,歐盟 REACH PFAS 限制程序,EU REACH universal PFAS restriction|ECHA PFAS restriction,concept:semiconductor-pfas-exposure,從 ECHA 科學意見 經執委會提案 會員國表決到正式公布的廣泛 PFAS 限制程序
 process:us-tsca-pfas-reporting,process,美國 TSCA PFAS 歷史申報,US TSCA 8(a)(7) PFAS reporting|EPA PFAS reporting,concept:semiconductor-pfas-exposure,要求特定製造者與進口者回報歷史物質用途數量暴露危害與廢棄資料的聯邦申報程序

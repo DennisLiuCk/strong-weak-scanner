@@ -1,15 +1,16 @@
 # SiC 到 AI BBU／PSU 七關資格鏈知識圖譜
 
 本圖把元件短路／stress evaluation、供應商資料、converter reference design、system reliability、
-mixed-source customer qualification 及商業歸因分開。公開證據已支持相鄰關卡，尚未支持 JEP203／
-JEP204 已改寫本輪平台驗收或台灣公司財務。
+mixed-source customer qualification 及商業歸因分開，並用四個 reference plane 區分 rack available
+fault current、converter 路徑、device waveform 與 protection／clearing。公開證據已支持相鄰關卡，尚未
+支持 JEP203／JEP204 已改寫本輪平台驗收或台灣公司財務。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: sic-ai-power-qualification
 root_node_id: concept:sic-ai-power-qualification
 label: SiC 到 AI BBU／PSU 七關資格鏈
-summary: 從 application stress JEP203 JEP204 supplier data reference design DFMEA derating fault coordination mixed-source qualification 追到 deployment 與財務 避免把 guideline reference design 或單一 adoption 當成 platform acceptance 與收入。
+summary: 從 application stress JEP203 JEP204 supplier data reference design DFMEA derating fault 四參考面 mixed-source qualification 追到 deployment 與財務 避免把 rack kA device ampere microseconds guideline reference design 或單一 adoption 拼成 platform acceptance 與收入。
 article_ids: MI-2026-08-12-SIC-AI-POWER-QUALIFICATION
 status: active
 -->
@@ -412,4 +413,24 @@ review_due: 2026-09-15
 status: active
 boundary: BBU PSU integration mixed-source qualification 與 Delta 具名入口不等於台灣電源公司 JEP adoption production shipment 或可分辨財務。
 next_trigger: Platform customer 與 powersupply 公司對上同一 module revision SiC part qualification BOM 出貨與收入毛利。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-SICQUAL-I19
+view: industry
+from_id: concept:sic-ai-power-qualification
+to_id: stage:sic-short-circuit-coordination
+relation: passes_through
+claim_refs: MI-2026-08-12-SIC-AI-POWER-QUALIFICATION#C14,MI-2026-08-12-SIC-AI-POWER-QUALIFICATION#C15,MI-2026-08-12-SIC-AI-POWER-QUALIFICATION#C16
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: OCP 固定 system available fault-current envelope，onsemi 與 Infineon 固定 device／driver timing trade-off 與一個 lab example；三者不是同一 product、fault event 或 customer report。
+as_of: 2026-08-14
+review_due: 2026-09-15
+status: active
+boundary: 四 reference plane 是跨文件的研究 crosswalk；10–40 kA、約 250 A、1.2／2／3 microseconds 不可相除相減，也不證明 AI BBU／PSU system safety、JEP adoption、mixed-source、field reliability 或財務。
+next_trigger: 具名 production BBU／PSU 用同一 platform／board revision 與 event ID 公開 fault location、source impedance、converter current path、VDS／ID／VGS／Tj raw waveform、DESAT／driver timing、clamp／fuse-breaker clearing、tolerance、pass／fail 與 post-fault disposition。
 -->
