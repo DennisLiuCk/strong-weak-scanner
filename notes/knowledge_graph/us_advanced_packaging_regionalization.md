@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: us-advanced-packaging-regionalization
 root_node_id: concept:us-advanced-packaging-regionalization
 label: 美國先進封裝區域化九關橋接
-summary: 從 CHIPS award scope 與里程碑撥付，經專案資本結構 建築 工具 製程與客戶資格，到量產利用 財務歸因及台美替代驗證，保留 project phase facility 版本與 reference plane。
+summary: 從 CHIPS award scope 與里程碑撥付，經專案資本結構 建築 工具 製程與客戶資格，到量產利用 損平 滿載 財務歸因及台美替代驗證，保留 project phase facility 版本與 reference plane。
 article_ids: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION
 status: active
 -->
@@ -20,18 +20,18 @@ view: company
 from_id: company:amkor
 to_id: concept:us-advanced-packaging-regionalization
 relation: plans_production
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C6
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C12,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C13
 note_refs:
 evidence_state: inference
 commercial_stage: planned
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
+as_of: 2026-08-14
 review_due: 2026-08-15
 status: active
-boundary: Amkor 的兩期 campus 投資與第一座設施時程是具名規劃；NIST award-project 的金額 產出與日期屬另一 scope，兩者都不是完成工具 資格 量產或獲利的證據。
-next_trigger: Amkor 以 project phase facility ID 調節 award scope 擴大 campus 建設 工具 資格 實際產出與財務。
+boundary: Amkor 的兩期 campus 與 2025 至 2030 invest ramp break-even full-utilization 時鐘是管理規劃；Phase 1 full-scale 指標不等於現況，NIST award-project 又屬另一 scope，均不是完成工具 資格 量產或獲利的證據。
+next_trigger: Amkor 以 project phase facility ID 調節 award scope 擴大 campus 建設 工具 資格 實際產出 利用率 損平 滿載與財務。
 -->
 
 <!-- knowledge_edge
@@ -60,7 +60,7 @@ view: company
 from_id: company:tsmc
 to_id: concept:us-advanced-packaging-regionalization
 relation: planned_customer
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C6
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16
 note_refs:
 evidence_state: inference
 commercial_stage: planned
@@ -120,7 +120,7 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: stage:regional-project-capital-stack
 relation: passes_through
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C6
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16
 note_refs:
 evidence_state: inference
 commercial_stage: financial
@@ -140,7 +140,7 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: stage:regional-site-construction
 relation: passes_through
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C6
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16
 note_refs:
 evidence_state: inference
 commercial_stage: deployment
@@ -220,18 +220,18 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: stage:regional-capacity-ramp-utilization
 relation: passes_through
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C7
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C7,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C12
 note_refs:
 evidence_state: unverified
 commercial_stage: production
 materiality: unknown
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
+as_of: 2026-08-14
 review_due: 2026-08-15
 status: active
-boundary: 每月 14,500 片晶圓與 370 萬顆 units 是 award-project 預期產出且 reference plane 不同；沒有 start period product mix utilization yield qualified output 或持續交付。
-next_trigger: 同一 facility 與期間公布名目產能 實際 start 產品組合 投入 合格產出 利用率 良率與客戶放行。
+boundary: 每月 14,500 片晶圓與 370 萬顆 units 是 award-project 預期產出且 reference plane 不同；2028 至 2029 ramp 與 2030 estimated full utilization 也是公司目標，沒有 actual start product mix utilization yield qualified output 或持續交付。
+next_trigger: 同一 facility 與期間公布名目產能 實際 start 產品組合 投入 合格產出 利用率 良率 客戶放行與相對 2030 目標的差異。
 -->
 
 <!-- knowledge_edge
@@ -240,18 +240,18 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: stage:regional-packaging-financial-attribution
 relation: passes_through
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C7
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C7,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C12,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C13
 note_refs:
 evidence_state: unverified
 commercial_stage: financial
 materiality: unknown
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
+as_of: 2026-08-14
 review_due: 2026-08-15
 status: active
-boundary: 補助 預付款 CapEx 與框架不是 Arizona 封裝服務收入 毛利或現金，也沒有台美同產品 客戶 期間的替代或互補調節。
-next_trigger: Amkor 與台灣公司以同一 facility 產品 客戶 期間揭露收入 成本 毛利 現金 訂單與利用率。
+boundary: 補助 預付款 CapEx 框架 Phase 1 full-scale 約 10 億美元收入與超過 30% 毛利目標都不是 Arizona 當期封裝服務收入 毛利或現金，也沒有台美同產品 客戶 期間的替代或互補調節。
+next_trigger: Amkor 與台灣公司以同一 facility 產品 客戶 期間揭露收入 成本 毛利 現金 訂單 利用率 損平與滿載實績。
 -->
 
 <!-- knowledge_edge
@@ -260,18 +260,18 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: group:packtest
 relation: routes_to
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C3
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C3,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C14,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C15
 note_refs:
 evidence_state: unverified
-commercial_stage: financial
+commercial_stage: planned
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-01
+as_of: 2026-08-14
 review_due: 2026-08-15
 status: active
-boundary: 封測族群是比較台美產品 客戶 qualification 訂單 利用率與毛利的研究入口，不是 3711 已取得或失去訂單的證據。
-next_trigger: Amkor／客戶與 3711 文件對上同一產品 客戶 期間及可重算財務影響。
+boundary: Amkor Arizona 與 3711 高雄 FOCoS FC BGA 文件支持兩地同時規劃新增能力；兩份公司規劃不是同產品 qualification 訂單 利用率或毛利，也不證明 3711 已取得 失去或保留訂單。
+next_trigger: Amkor 客戶與 3711 文件對上同一產品 qualification 客戶 期間 合格產出 訂單 利用率 毛利與可重算財務影響。
 -->
 
 <!-- knowledge_edge

@@ -7629,6 +7629,7 @@ class ResearchCenterTest(unittest.TestCase):
             "## 15 億美元預付款不是免息營收：用六本帳拆開資金、義務與產能",
             "## 為什麼會看見 17 億、約 20 億與 70 億美元",
             "## 產能數字至少有五個分母",
+            "## 產能上線、損平與滿載不是同一天：用雙地區成熟度護照拆零和敘事",
             "## 事件、會計與產能時鐘",
             "## 新手最常混淆的六件事",
             "## 在研究中心裡接著怎麼學",
@@ -7636,8 +7637,9 @@ class ResearchCenterTest(unittest.TestCase):
         positions = [topic.index(heading) for heading in headings]
         self.assertEqual(positions, sorted(positions))
         for contract in (
-            "thesis_claim_id: C6",
+            "thesis_claim_id: C16",
             "reason: reconciled_chips_award_project_scope_with_expanded_campus_and_nine_gate_conversion",
+            "reason: arizona_break_even_full_utilization_and_taiwan_concurrent_build_clocks_reconciled",
             "claim_id: C5",
             "claim_id: C6",
             "claim_id: C7",
@@ -7645,7 +7647,14 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C9",
             "claim_id: C10",
             "claim_id: C11",
+            "claim_id: C12",
+            "claim_id: C13",
+            "claim_id: C14",
+            "claim_id: C15",
+            "claim_id: C16",
             "source_id: S10",
+            "source_id: S11",
+            "source_id: S12",
             "corrected_by_claim_id: C6",
             "corrects_claim_id: C2",
             "monitor_id: T3",
@@ -7669,12 +7678,26 @@ class ResearchCenterTest(unittest.TestCase):
             "Python `Decimal` 與 `awk` 兩條獨立路徑",
             "SHA-256 0fa5f4241d383af7a7ea1ab24b742797c598c7967b133e21e09d9c3d92166848",
             "不能只看到面額就假定等額現金已被凍結",
+            "2029 預估損平",
+            "2030 預估滿載",
+            "Phase 2 尚未納入",
+            "約 10 億美元 revenue contribution",
+            "超過 30% gross margin",
+            "FOCoS／FC BGA",
+            "### 跨地區比較要帶十欄成熟度護照",
+            "| 10. 需求反事實 |",
+            "零和與互補都尚未被證明",
+            "N＝2 家 OSAT、N＝2 條公司一手消息鏈",
+            "corrected_by_claim_id: C16",
+            "corrects_claim_id: C6",
+            "monitor_id: T5",
+            "monitor_id: T6",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 10),
-            ("research_claim", 11), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 4),
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 16), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -7720,6 +7743,25 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: group:material",
         ):
             self.assertIn(node, graph)
+        for graph_contract in (
+            "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C12",
+            "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C13",
+            "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C14",
+            "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C15",
+            "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16",
+            "2028 至 2029 ramp 與 2030 estimated full utilization",
+            "兩地同時規劃新增能力",
+        ):
+            self.assertIn(graph_contract, graph)
+
+        reviews = (
+            ROOT / "notes" / "research_method_reviews" / "monitor_reviews.csv"
+        ).read_text(encoding="utf-8")
+        for review_id in (
+            "MR-2026-08-14-US-ADVPKG-T3-MATURITY-CLOCKS",
+            "MR-2026-08-14-US-ADVPKG-T4-TAIWAN-CONCURRENT-BUILD",
+        ):
+            self.assertIn(review_id, reviews)
 
     def test_missed_priority_q2_macronix_four_bridges_preserve_denominators(self):
         topic = (
