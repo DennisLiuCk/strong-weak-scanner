@@ -2085,6 +2085,68 @@ class ReadabilityGateTest(unittest.TestCase):
             self.assertIn(f"to_id: {metric}", graph)
             self.assertIn(f"edge_id: {edge_id}", graph)
 
+    def test_ai_capacitor_ripple_spectrum_separates_total_rms_hotspot_and_life(self):
+        path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_capacitor_role_map.md"
+        text = path.read_text(encoding="utf-8")
+        for token in (
+            "reason: separated_ripple_spectrum_frequency_weighted_loss_hotspot_and_mission_life_without_thesis_clock_refresh",
+            "## 11.6619 Arms 一樣，熱損耗仍可差 50.5%：紋波不是一個數字",
+            "### 第一道：先保存頻率別 RMS，總 RMS 只是一個投影",
+            "| R1：較多電流在低 ESR 頻率 | 10A | 6A | 11.6619A | 3.800W |",
+            "| R2：較多電流在高 ESR 頻率 | 6A | 10A | 11.6619A | 5.720W |",
+            "較 R1 高 50.5263%",
+            "Python Decimal\n與獨立 awk",
+            "### 第二道：環境溫度不是熱點，原廠例題也要重算",
+            "| 熱點 | 40＋13.521 | 53.521°C | 不是原頁的 43.5°C |",
+            "修正算術，不改 pass／fail 方向",
+            "### 第三道：10°C 倍數不是跨材料壽命定律",
+            "### 八欄紋波—熱點—壽命護照",
+            "| 2. 波形與頻譜 |",
+            "| 5. 熱路徑 |",
+            "| 7. 任務時間桶 |",
+            "### 多空小作文共用同一張熱壽命帳",
+            "本輪新增 N＝3 份一手 PDF",
+            "沒有 production\n波形、跨元件壽命效果、sampling SE／t",
+            "source_id: S15",
+            "d51c7f773890a75d111ff94b0927dd5f40488a7d491e73a1ae18108549043532",
+            "source_id: S16",
+            "ec7f6f9d954d10802c97b8c28e56240f69b292b055ed70151b525ef49dbc2879",
+            "source_id: S17",
+            "f4f2fd0b06095e169f4a3f53497a8c31eaabd11e7cb102de9780b0b46e515722",
+            "claim_id: C14\nlabel: verified",
+            "claim_id: C15\nlabel: verified",
+            "claim_id: C16\nlabel: inference",
+            "claim_id: C17\nlabel: inference",
+            "resolution: 原頁最終加法誤植已在本文重算",
+            "monitor_id: T4\nstatus: active",
+        ):
+            self.assertIn(token, text)
+        self.assertEqual(text.count("<!-- research_source"), 17)
+        self.assertEqual(text.count("<!-- research_claim"), 17)
+        self.assertEqual(text.count("<!-- monitoring_item"), 4)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_capacitor_role_map.md"
+        ).read_text(encoding="utf-8")
+        for metric, edge_id in (
+            ("process:capacitor-ripple-thermal-life-passport", "KG-ACR-I16"),
+            ("metric:frequency-weighted-capacitor-loss", "KG-ACR-I17"),
+        ):
+            self.assertIn(metric, concepts)
+            self.assertIn(f"to_id: {metric}", graph)
+            self.assertIn(f"edge_id: {edge_id}", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+
+        scans = (
+            Path(rq.TOPICS_DIR) / "scan_log.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "scan-2026-08-14-capacitor-ripple-hotspot-life-ledger", scans
+        )
+
     def test_ai_power_buffering_article_starts_from_duration_location_and_task(self):
         path = Path(rq.TOPICS_DIR) / "2026-08-03_ai_power_buffering_hierarchy.md"
         text = path.read_text(encoding="utf-8")

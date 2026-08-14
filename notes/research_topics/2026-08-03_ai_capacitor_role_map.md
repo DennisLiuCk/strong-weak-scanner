@@ -80,6 +80,14 @@ reason: added_capacitor_energy_voltage_window_esr_droop_and_target_impedance_pas
 evidence: sources:S12,S13,S14
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: separated_ripple_spectrum_frequency_weighted_loss_hotspot_and_mission_life_without_thesis_clock_refresh
+evidence: sources:S15,S16,S17
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -99,7 +107,17 @@ evidence: sources:S12,S13,S14
 - **直流偏壓**：電容兩端持續存在的直流工作電壓；部分高介電常數積層陶瓷電容的有效容量會隨它改變。
 - **紋波**：電源轉換後仍殘留的週期性電壓或電流起伏；高壓供電路徑的電容會協助平滑這些起伏。
 - **紋波電流**：反覆流入、流出電容的交流電流成分；它流過等效串聯電阻時會產生損耗與熱。
+- **RMS（均方根）電流**：把隨時間改變的電流換成等效發熱尺度；它不是峰值、平均值，也不會自動說明能量落在哪些頻率。
+- **紋波頻譜**：把總波形拆成不同頻率的電流成分；各成分遇到的等效串聯電阻可能不同，不能只留一個總安培數。
+- **參考頻率**：資料表標示額定紋波電流時所使用的頻率；實際波形若在其他頻率，必須依該產品規則換算或直接重算損耗。
+- **頻率係數**：把不同頻率的紋波成分換到資料表參考頻率的產品別係數；它不是跨材料或跨系列共同常數。
 - **自發熱**：元件因內部損耗而升溫；電容的紋波電流、等效串聯電阻、散熱路徑與環境溫度會共同影響它。
+- **熱點溫度（hot spot）**：元件內部最熱區域的溫度；環境溫度只是一個外部參考，還要加上損耗經熱阻形成的溫升。
+- **熱阻（Rth）**：熱點到指定冷卻參考點之間，每一瓦損耗造成多少溫升的尺度；封裝、安裝、風流、底部散熱與量測位置都會改變它。
+- **額定紋波電流**：產品在指定溫度、參考頻率、冷卻與壽命條件下允許的 RMS 電流；不能脫離註腳直接跨料號比較。
+- **有用壽命（useful life）**：產品在指定失效比例與參數漂移界線內的典型壽命概念；供應商計算值通常不是保固，也不等於整機一定失效的時點。
+- **B32377G**：TDK 的一個三相交流薄膜電容系列；本文只用它的資料表例題檢查逐頻率損耗與加法，不把結果外推到其他料號。
+- **Python Decimal**：Python 程式語言中按十進位規則計算的數值工具；本文再用獨立 awk 重算一次，避免只依賴同一條算式實作。
 - **去耦**：把電容放在用電元件附近，短暫補上電流並降低電源雜訊，避免快速變化影響其他電路。
 - **頻帶**：元件能有效處理的一段變化速度或頻率範圍；不同頻帶通常需要不同位置與電容特性。
 - **瞬態**：負載、電壓或電流在很短時間內突然改變的事件。
@@ -123,7 +141,7 @@ evidence: sources:S12,S13,S14
 ### 三句話抓重點
 
 - AI 機櫃裡的電容至少出現在四個不同位置：機櫃旁的電容儲能模組、高壓直流匯流排、電路板，以及封裝或晶片旁；位置不同，處理的電力變化也不同。
-- 分完位置後還要再過四道檢查，並把可用能量、電壓窗、等效串聯電阻壓降與電容量壓降分帳；同樣的標稱容量不代表可互換，也不代表能交出相同能量或瞬態支撐。
+- 分完位置後還要再過四道檢查，把能量、瞬態、頻率別紋波、熱點與任務壽命分帳；同樣的標稱容量或總 RMS 電流，不代表可互換，也不代表能交出相同能量、壓降或壽命。
 - 因此，現有證據只能用來分清電容放在哪裡、負責什麼，還不能證明台灣被動元件或電源供應公司已進入量產材料清單、取得訂單或形成可辨識獲利。
 
 ### 為什麼重要
@@ -134,6 +152,8 @@ evidence: sources:S12,S13,S14
 
 **同一位置也要帶入實際工作條件。** 高介電常數積層陶瓷電容的有效容量可能受直流偏壓影響；電解電容的阻抗、可承受紋波與壽命又會隨頻率、溫度及散熱條件改變。資料表上的容量值不能單獨回答能否替換。
 
+**紋波還要先拆頻率，再接熱點。** 相同總 RMS 電流若落在不同頻率，因 ESR 不同仍可能產生不同損耗；環境溫度也不是熱點溫度。只有把頻率別電流、損耗、冷卻、熱阻與任務時間接起來，才有壽命問題可談。
+
 **最後才談公司與價值。** 先確認產品位置、規格與客戶資格驗證，才能判斷規格升級是增加顆數、提高單價、減少其他元件，還是把價值移到另一種電容。
 
 ### 接下來怎麼追
@@ -141,6 +161,7 @@ evidence: sources:S12,S13,S14
 - 追 OCP 或平台文件是否公布同一量產機櫃中，電容儲能模組、高壓直流匯流排、電路板與晶片旁供電路徑的介面、額定條件及客戶資格驗證。
 - 追元件供應商是否從產品角色圖推進到具名料號、客戶測試、量產出貨，以及可以重建的替代與用量資料。
 - 追同一具名料號在實際直流電壓、溫度與頻率下的有效容量、阻抗曲線、紋波溫升及壽命計算，避免只比較標稱容量。
+- 追同一電容組的完整紋波頻譜、各頻率 ESR、熱點感測位置、冷卻參考面與任務時間桶，避免把總 RMS 或平均環境溫度直接換成壽命。
 - 追同一平台是否同時公布最高／最低工作電壓、負載波形、hold-up 時間、等效串聯電阻／電感與目標阻抗，才能重建能量及瞬態兩本帳。
 - 追台灣被動元件與電源供應公司的法說、季報及重大訊息，確認客戶與供應商是否能雙向對齊產品位置、規格、量產節點、收入與毛利。
 
@@ -149,6 +170,7 @@ evidence: sources:S12,S13,S14
 - 兩顆電容的容量即使相近，一顆放在高壓供電路徑、另一顆放在晶片旁，為什麼不能直接互換？
 - 即使兩顆電容位在同一位置、都標示相同容量，直流偏壓、阻抗曲線與散熱條件不同時，哪一顆才真正能完成任務？
 - 同樣 1,000 µF，若可用電壓窗分別是 48→40V 與 12→10V，為什麼不能用容量相同就推定可用能量相同？
+- 如果兩個波形的總 RMS 電流完全相同，但電流分別集中在不同頻率，為什麼熱點與壽命仍可能不同？
 - 如果某一段供電路徑用了效能更高、但數量更少的元件，只看「規格升級」會不會高估整體價值？
 - 供應商的產品角色圖和客戶實際量產材料清單之間，還缺哪些資格驗證、份額與財務證據？
 
@@ -381,6 +403,54 @@ limitation: 文件頁首只標 February 2006，本文以 2006-02-01 做月精度
 independence_group: texas-instruments
 -->
 
+<!-- research_source
+source_id: S15
+role: company_release
+source_kind: document
+publisher: TDK Electronics AG
+title: Aluminum Electrolytic Capacitors — General technical information
+published_at: 2026-08-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.tdk-electronics.tdk.com/download/185386/5f33d2619fa73419e2a4af562122e90c/pdf-generaltechnicalinformation.pdf
+locator: PDF pp.19–24；紋波是 RMS 交流電流、額定值綁定上限溫度與參考頻率，ESR／允許紋波依頻率，環境、熱阻、冷卻與接點共同決定自發熱；useful life 是典型 guidance、不是 warranty；本地檔 SHA-256 d51c7f773890a75d111ff94b0927dd5f40488a7d491e73a1ae18108549043532
+limitation: 封面只標 August 2026，本帳以月初正規化 published_at、不主張日精度；文件是 TDK 鋁電解通用技術資料，系列曲線、自然／強制風冷與底部散熱不能套到薄膜、MLCC、polymer、EDLC、其他供應商或 AI 量產平台，計算結果亦明示不延長保固
+independence_group: tdk
+-->
+
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: document
+publisher: Nichicon Corporation
+title: General Descriptions of Aluminum Electrolytic Capacitors
+published_at: 2022-03-15
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nichicon.co.jp/english/wp-content/uploads/CAT.8101.pdf
+locator: PDF pp.22–24；I²×ESR 損耗、頻率係數、低頻／高頻成分的合成 RMS、熱電偶量測建議與大型／小型鋁電解預估壽命公式；本地檔 SHA-256 ec7f6f9d954d10802c97b8c28e56240f69b292b055ed70151b525ef49dbc2879
+limitation: PDF 正文未標發布日期，必填 published_at 暫以檔案 metadata 的 2022-03-15 作時間鍵，不主張這是 Nichicon 正式發布日；公式適用類型、環境溫度範圍、頻率換算與係數依 Nichicon 文件，計算壽命只供參考、一般上限十五年且使用前仍要充分測試
+independence_group: nichicon
+-->
+
+<!-- research_source
+source_id: S17
+role: company_release
+source_kind: document
+publisher: TDK Electronics AG
+title: Film Capacitors — Power Electronic Capacitors B32377G
+published_at: 2026-05-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.tdk-electronics.tdk.com/inf/20/50/ds/B32377G_MKD_AC_Gas.pdf
+locator: PDF pp.22–26；逐頻率 P＝I(fi)²×ESR(fi)、總損耗、熱阻與 hot-spot 公式，以及 50Hz／8kHz 三相例題；本地檔 SHA-256 f4f2fd0b06095e169f4a3f53497a8c31eaabd11e7cb102de9780b0b46e515722
+limitation: 封面只標 May 2026，本帳以月初正規化 published_at；這是 B32377G 指定薄膜系列，不是其他材料或 AI rack 的共同模型。p.25 列 P＝9.014W、Rth＝1.5K/W、Tamb＝40°C，卻把最終熱點印成 43.5°C；依同頁數字應為 53.521°C，雖仍低於該例 90°C 界線，但原頁算術不能原樣引用
+independence_group: tdk
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -602,6 +672,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: TDK 的鋁電解通用技術資料把紋波定義為 RMS 交流電流，指出允許紋波同時取決於該頻率的 ESR、環境溫度、熱阻、冷卻與接點；額定紋波通常又綁定上限溫度與參考頻率，不能脫離條件當成單一安培規格
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S15 PDF pp.19–20 的 Ripple current considerations、frequency／temperature dependence 與 useful-life load conditions 逐項列出 RMS、ESR、frequency、ambient、thermal resistance、cooling、contact 與 reference conditions
+boundary: 這是 TDK 鋁電解通用技術說明，不固定任一 AI 平台的波形、料號、冷卻、壽命、顆數、替代率或財務；不同材料及系列仍須回到自己的資料表與 qualification
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: Nichicon 的鋁電解指南要求把疊加的低頻與高頻紋波分成頻率成分，以各自頻率係數換到同一參考頻率後做平方和；文件另建議實際複雜波形以熱電偶量測溫升，壽命公式只供參考並受適用類型、溫度範圍與十五年一般上限約束
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S16 PDF pp.22–24 的 formulas 2-7～2-18、2-19～2-21、Figure 2-17 與限制文字直接支持 I² 損耗、分頻合成、thermocouple 與 life-calculation boundaries
+boundary: Nichicon 的頻率係數、溫升近似、10°C 壽命關係與十五年上限屬其鋁電解分類及指定範圍，不是薄膜、MLCC、polymer、EDLC 或跨供應商共同定律，也不是 field warranty
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: TDK B32377G 例題列出的四項損耗合計 9.014W、熱阻 1.5K/W 與環境 40°C，依其公式應得到溫升 13.521K、熱點 53.521°C，而非原頁最後一行的 43.5°C；修正後仍低於例題的 90°C 界線，因此改正算術但不改 pass／fail 方向
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S17 PDF pp.24–25 的 7.597、0.017、1.04、0.36W、Rth 1.5K/W 與 Tamb 40°C；Python Decimal 與獨立 awk 都重算為 P 9.014W、ΔT 13.521K、THS 53.521°C
+boundary: 輸入項已是文件顯示精度，53.521°C 是確定性算術核對而非額外量測；它只修正文內例題，不能外推 B32377G 實際 field 溫度、其他料號、AI rack qualification、可靠度或財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution: 原頁最終加法誤植已在本文重算並保留不改變 90°C 界線判定的邊界
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 電容紋波與壽命研究必須保存頻率別 RMS 電流、各頻率 ESR／係數、損耗、冷卻參考面、熱阻、熱點、任務時間桶與失效判準；總 RMS、環境溫度、額定壽命或單一 10°C 倍數任一欄都不能單獨推導量產壽命、電容組顆數或公司受惠
+supporting_source_ids: S13,S15,S16,S17
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S15 把 reference frequency、ESR、ambient、cooling、hot spot 與 useful life 分開；S16 建立頻率係數、波形合成及產品別壽命邊界；S17 逐頻率加總損耗再接熱阻與熱點；S13 補上串聯均壓與超級電容技術邊界
+boundary: 八欄熱壽命護照是研究中心整合不同供應商文件的可重建框架，不是共同標準、唯一設計流程、qualification 或需求預測；串並聯實際分流、老化、故障模式與現場任務仍須量測
+verification_needed: 同一 production platform 公開具名料號與 bank 拓撲、頻率別電流／ESR、冷卻參考面、hot-spot 時序、任務時間桶、加速與 field failure、qualification、BOM 及財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 四個位置、四種任務：先找電容放在哪裡
 
 | 電容位置 | 它主要處理什麼 | 目前一手證據 | 還不能因此判定 |
@@ -719,6 +857,94 @@ I＝100A、Δt＝1ms，電容量項都是 1.0V；只把 ESR 從 5mΩ 改成 10m�
 被動元件、CBU／BBU／上游轉換器重新分工，或更高單價被更少顆數抵銷。只要缺 production
 BOM、替代前後顆數、qualification 與財務分母，就不能把「AI 功率更大」寫成所有電容同步受惠。
 
+## 11.6619 Arms 一樣，熱損耗仍可差 50.5%：紋波不是一個數字
+
+資料表上的「額定紋波 20A」少了頻率、溫度與冷卻，就像只說汽車能跑 100 公里卻不說路況。
+TDK 的鋁電解資料先把額定紋波綁在上限溫度與參考頻率，再指出實際上限還取決於該頻率的 ESR、
+環境、熱阻、冷卻與接點。[S15] Nichicon 則示範，低頻與高頻疊加時要先拆成兩個分量，以各自
+頻率係數換到同一參考頻率後做平方和，而不是把兩個安培數直接相加。[S16]
+
+### 第一道：先保存頻率別 RMS，總 RMS 只是一個投影
+
+TDK 的 B32377G 薄膜電容資料把每一頻率的損耗寫成 P(fi)＝I(fi)²×ESR(fi)，最後才把各頻率相加。
+[S17] 下面不是產品資料，而是固定兩個假想頻率、兩個假想 ESR 的單位教材：低頻 ESR＝20mΩ，
+高頻 ESR＝50mΩ，兩個頻率成分彼此正交。
+
+| 假想波形 | 低頻 RMS 電流 | 高頻 RMS 電流 | 總 RMS＝平方和開根號 | 頻率別損耗合計 |
+|---|---:|---:|---:|---:|
+| R1：較多電流在低 ESR 頻率 | 10A | 6A | 11.6619A | 3.800W |
+| R2：較多電流在高 ESR 頻率 | 6A | 10A | 11.6619A | 5.720W |
+
+兩個波形的總 RMS 完全相同，R2 卻多 1.920W，較 R1 高 50.5263%。原因不是總電流變大，而是
+平方後的電流落在不同 ESR。這也說明三種常見捷徑都不成立：不能把 10A＋6A 寫成 16A RMS，
+不能只用一個 ESR 乘總 RMS 平方，也不能把額定參考頻率的安培數直接套到另一個頻率。
+
+算術與誤差邊界：這是 N＝2 個固定輸入的假想波形，不是元件、機櫃或客戶樣本。Python Decimal
+與獨立 awk 都得到總 RMS 11.6619037897A、3.800／5.720W、差 1.920W 與 50.526315789%；
+沒有 sampling SE／t，也沒有把假想 ESR 冒充任何料號的量測值。
+
+### 第二道：環境溫度不是熱點，原廠例題也要重算
+
+穩態近似下，熱點溫度是環境溫度加上損耗乘熱阻；真正的參考點可能是周圍空氣、冷板、底座
+或其他冷卻介面。TDK 同一薄膜電容例題先把 50Hz 與 8kHz 的介質／電阻損耗拆開，列出
+7.597、0.017、1.04、0.36W，合計 9.014W，再給 Rth＝1.5K/W、環境 40°C。[S17]
+
+但原頁最後一行把熱點印成 43.5°C。依同頁數字重算：
+
+| 例題對帳 | 文件輸入／中間值 | 獨立重算 | 判讀 |
+|---|---:|---:|---|
+| 四項損耗合計 | 9.014W | 9.014W | 接回原頁合計 |
+| 溫升 | 9.014×1.5 | 13.521K | 原頁顯示 13.5K，屬四捨五入 |
+| 熱點 | 40＋13.521 | 53.521°C | 不是原頁的 43.5°C |
+| 例題 90°C 界線 | 熱點須不高於 90°C | 53.521°C 仍低於 90°C | 修正算術，不改 pass／fail 方向 |
+
+這不是用一個錯字否定產品，也不是新量測；它只證明公式、輸入、加法與判定要逐欄重建。
+Python Decimal 與獨立 awk 對 9.014W、13.521K、53.521°C 完全一致。N＝1 份供應商例題、
+N＝1 個確定性算術核對，沒有 sampling SE／t；顯示值已四捨五入，不能反推更高精度的實測熱點。
+
+### 第三道：10°C 倍數不是跨材料壽命定律
+
+TDK 把鋁電解 useful life 定義成指定失效比例與參數漂移界線下的典型值，並明示計算結果只供
+guidance、不是 warranty；自然對流、強制風冷、底部散熱、密集排布與絕熱封裝會改變熱路徑。
+[S15] Nichicon 的鋁電解指南雖在指定範圍使用每降 10°C 壽命倍增關係，卻同時限制公式的產品類型、
+40°C 到最高工作溫度範圍、頻率換算與一般十五年上限，並要求實際複雜波形用熱電偶確認溫升。
+[S16]
+
+因此，不能把 80°C 運轉一半時間、40°C 運轉一半時間，先平均成 60°C 再套一個通用倍數；也不能
+把鋁電解模型搬到薄膜、MLCC、polymer 或 EDLC。任務剖面至少要按每段環境、波形、冷卻與熱點
+分桶，再用該料號適用的失效判準與模型評估。沒有產品別模型時，正確答案是「尚不能換算」，
+不是自己補一條 Arrhenius 曲線。
+
+### 八欄紋波—熱點—壽命護照
+
+| 護照欄位 | 必須保存 | 少了會犯的錯 |
+|---|---|---|
+| 1. 元件與失效契約 | 料號、技術、系列、版本、額定條件、endurance／useful-life 定義與參數漂移界線 | 把不同材料的壽命名詞當成同一保固 |
+| 2. 波形與頻譜 | 原始波形、取樣率、觀測窗、頻率別 RMS、峰值、duty cycle 與 transients | 只留總 RMS，遺失熱從哪個頻率來 |
+| 3. 頻率別電性 | ESR(fi,T)、tanδ、頻率係數、C、ESL 與資料表參考頻率 | 用單點 ESR 或額定安培跨頻率 |
+| 4. 損耗帳 | 每個頻率的介質、電阻、漏電、接點與 busbar 損耗及合計 | 把元件內損耗與外部接點熱混成一桶 |
+| 5. 熱路徑 | 環境／冷板參考點、Rth、風速、底部散熱、安裝間距、絕熱材料與感測位置 | 把環境溫度冒充熱點 |
+| 6. 熱點與驗證 | 計算熱點、熱電偶／其他量測、穩態時間、重複測試、最大值與不確定度 | 公式算過就當 qualification pass |
+| 7. 任務時間桶 | 每段電壓、頻譜、環境、冷卻、啟停、充放電、故障與小時數 | 先平均非線性壓力，再產生假壽命 |
+| 8. 電容組與商業鍵 | 串並聯、均壓、分流、容差／老化、冗餘、BOM、qualification、field failure、份額與財務 | 用單顆料號推整組顆數、訂單或毛利 |
+
+並聯理想模型可能平均分流，串聯理想模型可能提高耐壓；真實電容組還有 ESR／ESL、走線、溫度、
+容差、老化與均壓差異。最熱的一顆可能先漂移，再讓分流更不均。沒有每顆電流與熱點，就不能把
+「總 bank RMS 除以顆數」當成壽命證據。[S13][S15][S16]
+
+### 多空小作文共用同一張熱壽命帳
+
+| 敘事 | 合理機制 | 必須看到的共同證據 | 失效條件 |
+|---|---|---|---|
+| 偏多：更高功率密度提高電容規格與熱管理價值 | 紋波頻譜、熱點或壽命目標變嚴，可能需要較低 ESR、較大散熱面、更高額定、底部散熱或更多冗餘 | 同一 production 平台的頻譜、料號、電容組、冷卻、熱點、qualification、BOM、單價、份額、收入與毛利 | 只有 AI 功率、額定安培或供應商計算器，沒有平台共同鍵與量產分母 |
+| 偏空：更好的架構讓被動元件增量被吸收 | 提高匯流排電壓、改善風冷／冷板、降低 ESR、主動控制或重新分配頻譜，可能用更少顆數完成同一任務 | 固定負載與壽命目標的前後 BOM、頻譜、熱點、效率、可靠度、成本與 field 結果 | 只看顆數下降，卻漏掉更高單價、冷卻、控制、冗餘或其他位置的元件 |
+| 共同裁決 | 容量、總 RMS、熱點、壽命與公司收入是五個不同分母 | 八欄護照加客戶／供應商雙向文件 | 從 10°C 倍數、單一額定值或產品頁直接生成需求倍數與投資結論 |
+
+本輪新增 N＝3 份一手 PDF，來自 TDK 與 Nichicon 兩個供應商群；它們不是三個 AI 平台、三顆量產
+電容或三個客戶樣本。只有 N＝2 個假想頻譜案例與 N＝1 份原廠例題的確定性重算，沒有 production
+波形、跨元件壽命效果、sampling SE／t、台灣公司 qualification、BOM、顆數、價格、收入、毛利、
+估值、共識、部位或市場是否反映主張。
+
 ## 怎麼用這張表判讀公司新聞
 
 1. **先找客戶的量產架構**：供應商參考設計只能證明做得到；客戶平台文件才可能固定元件位置與接口。
@@ -813,6 +1039,20 @@ frequency: monthly
 next_check: 2026-09-01
 trigger: 平台與元件供應商公布同一料號、工作點、完整頻譜、熱邊界、任務剖面及客戶 pass／fail，可逐步重建四道可用能力檢查
 invalidation: 量產平台證明本文四道檢查遺漏決定性條件，或實際 qualification 顯示標稱容量已足以在所有相關位置可靠判定互換
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C14,C15,C16,C17
+metric: 同一 production 電容組的頻率別 RMS、ESR／係數、損耗、冷卻參考面、熱阻、hot-spot 時序、任務時間桶、失效判準與 field 結果
+source_ids: S15,S16,S17
+watch_source_ids: S6,S7,S8,S15,S16,S17
+frequency: monthly
+frequency_detail: 每月檢查 OCP／平台、TDK／Nichicon／其他元件供應商與台灣公司文件；具名量產 bank、mission profile、qualification 或 field failure 出現時提前重審
+next_check: 2026-09-01
+trigger: 買方與供應商以同一具名料號／bank 公開完整頻譜、frequency-dependent loss、thermal reference、hot-spot、time buckets、加速／field failure、qualification、BOM 與財務分母
+invalidation: 具名 production evidence 顯示八欄護照遺漏會改變熱點或壽命結論的必要狀態，或本文頻率別平方和與熱路徑邊界無法重建；屆時新增修正 claim，不回寫既有快照
 -->
 
 ## 什麼會推翻這篇

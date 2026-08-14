@@ -1,7 +1,7 @@
 # AI 電容角色知識圖譜
 
 本圖按位置、電壓、頻帶與任務拆分 rack CBU、高壓 DC-link、板級 bulk 與近晶片去耦，
-再以有效容量、可用能量、電壓窗、壓降拆解、頻率阻抗、紋波溫升與任務壽命核對實際可用能力。公司節點只投影其公開產品角色；
+再以有效容量、可用能量、電壓窗、壓降拆解、頻率阻抗、頻率別損耗、熱點與任務壽命核對實際可用能力。公司節點只投影其公開產品角色；
 族群線仍是搜尋路由，沒有一條線代表台灣公司已供貨。
 
 <!-- knowledge_graph_meta
@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: ai-capacitor-role-map
 root_node_id: concept:ai-capacitor-role-map
 label: AI 電容角色地圖
-summary: 把 rack CBU、高壓 bus／DC-link、板級 bulk 與 package／near-die decoupling 分成不同查核單位，再用四道工作條件與能量—瞬態護照區分標稱容量、可用能量及壓降；產品角色不等於台灣供應商量產或財務曝險。
+summary: 把 rack CBU、高壓 bus／DC-link、板級 bulk 與 package／near-die decoupling 分成不同查核單位，再用四道工作條件、能量—瞬態護照與紋波—熱點—壽命護照區分標稱容量、可用能量、壓降及頻率加權損耗；產品角色不等於台灣供應商量產或財務曝險。
 article_ids: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP
 status: active
 -->
@@ -372,4 +372,44 @@ review_due: 2026-09-01
 status: active
 boundary: ½CV²、I×ESR、IΔt／C 與 ΔV／ΔI 分屬理想能量、定電流近似及頻帶目標；不能拼成完整 PDN 通過、需求倍數或公司價值。
 next_trigger: 客戶在同一量測參考點公開電壓窗、load waveform、C／ESR／ESL／Z(f)、壓降分解、熱壽命、重複測試與 sign-off。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACR-I16
+view: industry
+from_id: concept:ai-capacitor-role-map
+to_id: process:capacitor-ripple-thermal-life-passport
+relation: requires
+claim_refs: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C14,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C15,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C16,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C17
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-01
+status: active
+boundary: 八欄護照是研究中心整合TDK Nichicon與Eaton文件的比較契約 不是跨材料共同壽命標準 客戶qualification production BOM或財務證據。
+next_trigger: 同一production bank公開料號拓撲頻率別RMS與ESR損耗冷卻參考面hotspot時間桶失效field結果qualification與商業共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACR-I17
+view: industry
+from_id: concept:ai-capacitor-role-map
+to_id: metric:frequency-weighted-capacitor-loss
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C14,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C15,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C16,MI-2026-08-03-AI-CAPACITOR-ROLE-MAP#C17
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-01
+status: active
+boundary: 逐頻率平方損耗只能在電流頻譜ESR定義溫度與量測參考一致時重算 總RMS相同不保證熱點或壽命相同 也不產生公司需求倍數。
+next_trigger: 客戶發布同一料號的原始波形頻率別電流ESR或frequency coefficient損耗拆解熱阻實測hotspot及不確定度。
 -->
