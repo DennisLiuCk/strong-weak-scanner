@@ -5358,6 +5358,24 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 傳輸率 |", "| 2. 實體路徑 |",
             "| 3. 協定與管理功能 |", "| 4. 廠商獨立性與晶片狀態 |",
             "| 5. 封裝、時間與故障條件 |",
+            "added_ucie_transfer_raw_direction_payload_and_interoperability_performance_contract_without_thesis_or_clock_refresh",
+            "## 先把 64 GT/s、128 GB/s、256 GB/s 與 payload 分開",
+            "| 每 lane 傳輸率 |", "| 單向資料通道算術 |",
+            "| 雙向 aggregate |", "| payload goodput |",
+            "64×16÷8＝128 GB/s／direction",
+            "128×2＝256 GB/s aggregate",
+            "N=1 個假想",
+            "### Raw 之後還有五層，不能只套一個固定效率",
+            "| 1. 實體 module |", "| 2. Link framing 與可靠度 |",
+            "| 3. Protocol 與 payload |", "| 4. 運作狀態 |",
+            "| 5. 應用服務 |",
+            "### 十欄 link-performance passport",
+            "| 1. 物件與版本 |", "| 3. Lane 與方向 |",
+            "| 4. Raw 參考平面 |", "| 5. Protocol 與 payload |",
+            "| 6. 錯誤與恢復 |", "| 9. 互通與判定 |",
+            "| 10. 客戶與財務 |",
+            "### 多空小作文：兩邊都必須交同一份成績單",
+            "| 偏多 |", "| 偏空 |", "| 共同裁決 |",
             "added_taiwan_32g_silicon_and_64g_tapeout_schedule_without_promoting_64g_interoperability",
             "## 先不要只畫一條階梯：三條軸要同時對齊",
             "| 1. 證據物件階段 |", "| 2. 測試包絡 |", "| 3. 供應商獨立性 |",
@@ -5388,7 +5406,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 36
+            sum(line.startswith("- **") for line in glossary.splitlines()), 39
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5406,8 +5424,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 11),
-            ("research_claim", 10), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 14), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5436,6 +5454,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:compliance,stage,正式符合規格測試",
             "stage:customer-qualification,stage,客戶產品資格驗證",
             "metric:ucie-evidence-matrix,metric,UCIe 互通證據矩陣",
+            "process:ucie-link-performance-passport,process,UCIe 連線效能與互通護照",
+            "metric:ucie-transfer-raw-payload-direction-contract,metric,UCIe 傳輸率、raw、payload 與方向契約",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: UCIe 小晶片互通與量產階梯", graph)
@@ -5443,9 +5463,11 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-UCI-C04", "from_id: company:3443",
             "edge_id: KG-UCI-I11", "to_id: stage:silicon-validation",
             "edge_id: KG-UCI-I12", "to_id: metric:ucie-evidence-matrix",
+            "edge_id: KG-UCI-I13", "to_id: process:ucie-link-performance-passport",
+            "edge_id: KG-UCI-I14", "to_id: metric:ucie-transfer-raw-payload-direction-contract",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 16)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
 
     def test_design_test_quality_station_one_separates_chiplet_handoff_contracts_and_conformance_gates(self):
         topic = (

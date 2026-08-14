@@ -216,6 +216,38 @@ limitation: 活頁索引只用來偵測公司後續回片與驗證公告；沒�
 independence_group: guc
 -->
 
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: UCIe Consortium
+title: Introduction to UCIe Webinar: Q&A Recap
+published_at: 2023-05-03
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.uciexpress.org/post/introduction-to-ucie-webinar-q-a-recap
+locator: Physical Questions 的 x16／direction 單位更正、module-width overhead、spare／clock／track／valid／sideband；Compliance Testing 與 Miscellaneous 的 CRC／retry／retrain、latency、link-parameter negotiation 與 68B／256B flit 說明
+limitation: 這是 2023 年針對 UCIe 1.0 的聯盟問答，可用來固定單位、方向與 overhead 邊界；不是 UCIe 3.0 64G 產品測試，也沒有具名 device、run、payload goodput、功耗、長時間錯誤或客戶結果
+independence_group: ucie-consortium
+-->
+
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: document
+publisher: UCIe Consortium
+title: UCIe 1.1 Provides Streaming Protocol Solution for Error Detection and Replay
+published_at: 2023-08-28
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.uciexpress.org/post/ucie-1-1-provides-streaming-protocol-solution-for-error-detection-and-replay
+locator: Raw Mode、streaming flit negotiation、236／250-byte CHI payload，以及 D2D adapter 插入 flit header／CRC 並執行 CRC detection／replay 的段落
+limitation: 文件說明 UCIe 1.1 streaming reliability 與特定 CHI packed-flit payload，不提供 UCIe 3.0 64G 實測 goodput、所有 protocol 的共同效率、延遲分布、錯誤事件分母或客戶 interoperability
+independence_group: ucie-consortium
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -386,6 +418,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: UCIe Consortium 的官方問答明確更正 Gb/s 與 GB/s，並把 x16@4G 寫成 64 Gb/s／direction＝8 GB/s／direction、把 x16@32G 列為 64 GB/s／direction 的一種配置；同頁也說 module width 必須和 clocking、valid、track、sideband overhead 及 lane-to-lane skew 一起讀
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2023-05-03
+basis: S12 Physical Questions 直接列單位更正、兩個 x16 方向性算例，以及 width／overhead／skew 的取捨
+boundary: 這些是聯盟對資料通道單位與模組配置的說明，不是 payload goodput、雙向可互換容量、具名產品量測、64G silicon、延遲、功耗、錯誤率或 compliance result
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: UCIe 1.1 的 streaming flit 會在初始化時協商，CHI packed flit 可提供 236 或 250 bytes payload，D2D adapter 另插入 flit header 與 CRC 並支援 detection／replay；UCIe 問答也把 sideband、spare lane、clock／track／valid、replay、retrain 與 protocol path 分開
+supporting_source_ids: S12,S13
+contrary_source_ids:
+as_of: 2023-08-28
+basis: S13 直接列 payload bytes、header、CRC 與 replay，S12 直接列 physical auxiliary signals、spares、replay／retrain 與 transaction path 邊界
+boundary: 只證實不同層存在不同 overhead 與恢復責任，不代表所有模式都固定損失同一百分比，也不能由 236／250 bytes 外推 UCIe 3.0 所有 protocol、實際 traffic mix、payload goodput 或服務效能
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 在「每個資料 lane 每次 transfer 承載一個 data bit、x16 指 16 條 data lanes、只算單一方向且尚未扣除任何協定與運作損失」的教材條件下，x16@64 GT/s 的資料通道算術是 64×16÷8＝128 GB/s／direction；兩方向同時相加可寫成 256 GB/s aggregate，但不能把 256 GB/s 當成單向 payload
+supporting_source_ids: S1,S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S1 確認 64 GT/s 規格率，S12 的 x16@4G＝8 GB/s／direction 與 x16@32G＝64 GB/s／direction 提供同一換算路徑；Python Fraction 與獨立 awk 均重算得 128 與 256
+boundary: 這是 N=1 個假想 x16@64G link configuration 的確定性單位展開，沒有 device、module、run 或抽樣，故沒有 sampling SE／t；未扣 flit／protocol／CRC／replay／idle／throttle／retrain，也沒有 latency、energy、BER、corner、interoperability 或 application result
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: UCIe 效能與互通不能由最高 GT/s 單欄驗收；至少要把版本／封裝路徑、lane／module／direction、raw 算式、flit／protocol／payload、error／replay／retrain、workload／traffic、latency／energy／corner、兩端晶片與測試機構、客戶 qualification 及財務分母綁成同一份 link-performance passport
+supporting_source_ids: S1,S2,S7,S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S1 只定義最高規格與 package options，S12／S13 把 direction、auxiliary signals、payload、CRC、replay 與 latency 拆層，S2／S7 又顯示跨廠 demo 與單一供應商 silicon measurement 是不同證據物件
+boundary: 護照是研究中心整合標準、官方問答與既有 silicon／demo 證據的查核框架，不是 Consortium compliance template；欄位完整仍不保證 pass、量產、多廠可互換、低成本、低功耗、台灣公司收入或投資報酬
+verification_needed: 同一具名 64G UCIe 3.0 multi-vendor package 的版本、module／lane／direction、protocol／flit、payload workload、error／replay／retrain、latency／energy／corner／duration、通過與失敗結果、客戶 qualification 與供應商財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -460,6 +560,14 @@ reason: added_taiwan_32g_silicon_and_64g_tapeout_schedule_without_promoting_64g_
 evidence: sources:S7,S8,S9,S10
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_ucie_transfer_raw_direction_payload_and_interoperability_performance_contract_without_thesis_or_clock_refresh
+evidence: sources:S1,S12,S13
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -476,6 +584,9 @@ evidence: sources:S7,S8,S9,S10
 - **傳輸通道（lane）**：實體介面中並行傳送資料的一條路；速度、通道數與封裝布線要一起核對。
 - **標準／先進封裝路徑（UCIe-S／UCIe-A）**：分別面向較傳統與更高密度封裝的實體連接方式，兩者不能共用同一筆測試結論。
 - **每秒十億次傳輸（GT/s）**：介面每秒可完成的傳輸次數；它是傳輸率，不是單顆產品的產量、收入或成熟度。
+- **十六條資料通道（x16）**：在指定 module 定義下並行使用 16 條 data lanes；它不是 16 GB，也不是 16 顆晶片，仍要另寫每 lane 速率與方向。
+- **原始資料通道算術（raw data-lane arithmetic）**：依傳輸率、資料通道數與方向換算的條件式理論 bytes／s，尚未扣除 framing、協定、錯誤恢復、閒置或應用等待。
+- **循環冗餘檢查（CRC）**：接收端用來偵測資料傳送錯誤的檢查碼；偵測到錯誤後是否重送、重訓或失敗，要由另一組 counter 與規則判讀。
 - **16、32 與 64 的差別**：本文的 16 是跨廠展示速度，32 是單一供應商實體晶片量測速度，64 是第三代最高傳輸率與各家送廠目標；三筆證據不是同一組產品。
 - **旁帶與管理訊息（sideband／manageability）**：資料之外，用來啟動、監控、回報狀態與處理錯誤的控制訊息。
 - **重新校準（recalibration）**：系統運作時重新調整連線參數，以因應溫度、電壓或訊號狀態改變。
@@ -551,6 +662,85 @@ evidence: sources:S7,S8,S9,S10
 
 五把尺必須落在同一組實體產品上。若速度來自規格、晶片狀態來自送廠聲明、跨廠互通來自
 另一組較低速度測試，就只能得到三筆各自有邊界的證據，不能拼成一項最高速度成果。
+
+## 先把 64 GT/s、128 GB/s、256 GB/s 與 payload 分開
+
+看到「64」時，第一個問題不該是「比上一代快幾倍」，而是「這個 64 的量、寬度、方向與
+資料層是什麼」。GT/s 是每秒傳輸次數的速率口徑；GB/s 是每秒 bytes；payload goodput 則是
+工作真正收到、可用的有效資料。三者之間必須先補 lane 數與方向，後面還有 framing、CRC、
+重送、閒置和上層協定，不能把同一個數字換單位後就宣稱應用程式已經拿到。
+
+| 數字層 | 它回答什麼 | 必須一起保存 | 最常見的誤讀 |
+|---|---|---|---|
+| 每 lane 傳輸率 | 一條資料 lane 每秒有多少次 transfer | 規格版本、UCIe-S／UCIe-A、lane 定義 | 把 GT/s 直接寫成 GB/s |
+| 單向資料通道算術 | 指定 data-lane width 在一個方向的理論 bytes／s | rate、data lanes、每次 transfer 的 data bits、direction | 沒寫 x16 還是 x64，就比較「頻寬」 |
+| 雙向 aggregate | 兩個方向同時各自運作時的數字加總 | 每一方向各自的分母與 traffic | 把兩向相加值當成任一方向都能使用 |
+| payload goodput | 工作在指定時間內真正完成的有效 bytes | protocol／flit、payload 定義、workload、時間、error／replay／idle | 把 raw 算術當成應用吞吐量 |
+
+聯盟問答先提供兩個很好的單位錨：x16@4G 是 64 Gb/s／direction，也就是 8 GB/s／direction；
+x16@32G 則是 64 GB/s／direction 的一種配置。沿用相同的條件式資料通道算式：
+
+> 單向資料通道算術＝每 lane GT/s × data-lane 數 × 每次 transfer 的 data bits ÷ 8。
+
+若教材假設每條 data lane 每次 transfer 承載 1 bit，x16@64 GT/s 就是
+64×16÷8＝128 GB/s／direction；只有在兩個方向同時各跑到該算術值時，才可把兩向相加成
+256 GB/s aggregate。256 不能回頭冒充 256 GB/s 單向，更不能直接冒充 256 GB/s payload。
+
+| 教材配置 | 算式 | 可以說 | 不能說 |
+|---|---:|---|---|
+| x16@4 GT/s | 4×16÷8＝8 GB/s／direction | 與聯盟問答的單向單位例相符 | 某產品已交付 8 GB/s payload |
+| x16@32 GT/s | 32×16÷8＝64 GB/s／direction | 與聯盟問答列出的 x16 配置相符 | 所有封裝、協定與工作都得到 64 GB/s |
+| 假想 x16@64 GT/s | 64×16÷8＝128 GB/s／direction | 在明列假設下的 raw data-lane 算術 | 64G silicon、compliance 或有效吞吐已通過 |
+| 假想 x16@64 GT/s 兩向相加 | 128×2＝256 GB/s aggregate | 兩個方向的會計加總 | 單向工作能讀或寫 256 GB/s |
+
+128 與 256 已用 Python `Fraction` 及獨立 `awk` 兩條路徑重算一致。這是 N=1 個假想
+x16@64G link configuration 的確定性單位展開，不是裝置、模組、測試 run 或抽樣，因此沒有
+sampling SE／t，也不是一筆效能比較。4G 與 32G 是官方問答的參照例，不是新增產品樣本。
+
+### Raw 之後還有五層，不能只套一個固定效率
+
+| 從 raw 到工作結果的層 | 會加入什麼責任 | 本輪官方證據 | 讀者應該索取 |
+|---|---|---|---|
+| 1. 實體 module | data lanes 之外還有 clock、valid、track、sideband 與 spare；寬度越大也增加 clock distribution 與 lane-to-lane skew 挑戰 | 聯盟問答列出 x16 的 overhead 取捨，advanced package 每 32 data lanes 有 2 spare lanes，clock／track／valid 另有 spare | bump map、module 數、data／auxiliary／spare lane mapping、封裝路徑 |
+| 2. Link framing 與可靠度 | header、Ack／Nak、CRC、偵測、重送與重新訓練都不是使用者資料 | 聯盟文件列出 D2D adapter 插入 header／CRC、執行 detection／replay；問答也說 replay／retrain 會擾動延遲 | flit type、header／CRC 定義、error counters、replay bytes／events、retrain 與降速紀錄 |
+| 3. Protocol 與 payload | Raw Mode、streaming、PCIe、CXL 或其他映射的資料單元與有效內容不同 | UCIe 1.1 streaming flit 在初始化協商；特定 CHI packed flit 提供 236 或 250 bytes payload | protocol、flit format、message mix、payload numerator 與 wire／raw denominator |
+| 4. 運作狀態 | 閒置、流量不對稱、throttle、校準、backpressure、錯誤恢復與溫度會改變完成量 | UCIe 3.0 提供 runtime recalibration、power-state 與 manageability 能力，但發布稿沒有具名產品 raw counters | busy／idle 時間、單向／雙向 traffic、duration、temperature／voltage corners、power／energy |
+| 5. 應用服務 | 一筆 memory／coherency transaction 還會走出介面，等待 endpoint、software 與資料 | 聯盟問答明說 transaction latency 超出單一 interconnect 規格範圍，且 replay／retrain 會影響可重複性 | workload、完整 path、latency distribution、tail、完成／失敗與使用者結果 |
+
+所以不能看到「236 bytes」就替所有 UCIe traffic 套 236／某個固定分母，也不能看到 CRC／replay
+就自訂一個全產品通用折扣。不同 protocol、flit、錯誤情境與 traffic mix 的 payload 分子都不同；
+真正可比較的是同一個護照下的原始 counter、公式與工作結果。
+
+### 十欄 link-performance passport
+
+| 護照欄位 | 最低要寫什麼 | 缺欄時最多能說什麼 |
+|---|---|---|
+| 1. 物件與版本 | 兩端 chiplet／revision、UCIe version、test vehicle 或 customer product | 只能說規格或設計存在 |
+| 2. 實體路徑 | UCIe-S／UCIe-A、package、bump／channel、process／voltage／temperature | 不能把結果外推到另一封裝 |
+| 3. Lane 與方向 | data／auxiliary／spare lanes、module 數、rate、單向或雙向 | 不能重算 GB/s，也不能比較 aggregate |
+| 4. Raw 參考平面 | bits／transfer、公式、量測或理論、counter 所在層 | 只能保留 GT/s 規格值 |
+| 5. Protocol 與 payload | protocol、flit／header／CRC、payload 定義、message／read-write mix | 不能把 raw 寫成 goodput |
+| 6. 錯誤與恢復 | exposed bits／flits／time、raw／detected／residual errors、replay、retrain、降速、失敗 | 「零錯誤」沒有事件與暴露分母就不可比較 |
+| 7. Workload 與流量 | message size、concurrency、directionality、busy／idle、backpressure、duration | 只能說特定 link 曾運作 |
+| 8. 服務與資源 | throughput、latency distribution／tail、power／energy、thermal／corner、repeat runs | 不能宣稱系統效能或效率 |
+| 9. 互通與判定 | 兩端是否獨立供應商、test authority、plan／version、pass／fail／retest matrix | 單一 loopback 或展示不等於多廠 compliance |
+| 10. 客戶與財務 | qualification、production quantity／period、shipment、可歸因收入／成本分母與兩端核對 | 不能把技術必要性寫成公司受惠 |
+
+這張護照把「快」和「能一起工作」放進同一份紀錄：只有速度而沒有兩端身分，是介面能力；
+只有兩端互通而沒有 payload、錯誤、延遲與條件，是受限展示；只有客戶名稱而沒有 qualification
+與財務共同鍵，仍不是可歸因營收。
+
+### 多空小作文：兩邊都必須交同一份成績單
+
+| 敘事 | 可以成立的產業機制 | 會證成它的下一份資料 | 會使它失效或降級的資料 |
+|---|---|---|---|
+| 偏多 | 每 lane 速率提高後，同樣封裝 shoreline 可承載更多資料，或以較少 module 完成既定目標；開放介面也可能增加 PHY／controller／verification、封裝共同設計與 system-level test 內容 | 同一 64G multi-vendor package 在固定 workload 下，比 32G baseline 提高單向 payload／area，同時守住 latency tail、energy、error／replay、corner 與長時間結果；再接上客戶 qualification、量產與可歸因財務 | 只有規格、simulation 或各家分開 tape-out；payload、功耗、錯誤、良率或 qualification 沒有共同分母 |
+| 偏空 | 更高資料率可能把難度轉成 clock／skew、signal integrity、power、thermal、replay、known-good-die 與封裝測試；客戶也可能只在自有 captive chiplet 內使用共同介面，沒有可交易多廠市場 | 同一具名 64G product 顯示 raw 增幅被 idle／replay／throttle／latency／energy／yield 吃掉，multi-vendor matrix 長期空白，或客戶退回較低速／專有介面 | 多家獨立晶片在共同測試與客戶工作中持續通過，失敗／重測也公開，且 production 與財務共同鍵可核對 |
+| 共同裁決 | 最高 GT/s 不是裁判，固定的 link-performance passport 才是 | 同版本、同 package、同 lanes／direction、同 protocol／payload、同 workload、同 error／latency／energy／corner、同跨廠與客戶分母 | 任何一邊只換標題、換分母、把雙向加總冒充單向，或把 raw 冒充 payload |
+
+因此，64 GT/s 對矽智財、先進封裝與測試可能是需求起點，卻不是受惠結論。讀者真正要追的是
+128 的單向 raw 算式能否在同一顆實體產品上，依序轉成可重建 payload、可靠度、服務表現、
+跨廠 qualification 與財務；其中任何一層換了晶片、封裝、方向或 workload，就要重新開始對齊。
 
 ## 先不要只畫一條階梯：三條軸要同時對齊
 
@@ -659,6 +849,8 @@ N3P UCIe 2.0 32G 自動合併，因為版本、製程名稱與 test-chip 身分�
 - [創意 2025 年報](https://www.guc-asic.com/upload/2026_04_16/8_202604161551145dnuwxrHk5.pdf)（第 3、61 頁的版本、製程、送廠與實體晶片驗證時程）。
 - [Cadence N3P 64G UCIe 送廠公告](https://community.cadence.com/cadence_blogs_8/b/corporate-news/posts/cadence-tapes-out-ucie-ip-solution-at-64g-speeds-on-tsmc-n3p-technology)（另一家 64G test vehicle，仍不是共同互通結果）。
 - [創意新聞稿持續更新入口](https://www.guc-asic.com/en/news/PressRelease)（後續 32G／64G 回片與驗證公告監測）。
+- [UCIe 入門 webinar 問答](https://www.uciexpress.org/post/introduction-to-ucie-webinar-q-a-recap)（Gb/s／GB/s、x16 單向算例、module overhead、spare／sideband、CRC／retry／retrain 與 latency 邊界）。
+- [UCIe 1.1 streaming error detection／replay](https://www.uciexpress.org/post/ucie-1-1-provides-streaming-protocol-solution-for-error-detection-and-replay)（特定 CHI packed-flit payload、header、CRC 與 replay；不是 64G 實測 goodput）。
 
 本文不把不同速度、封裝或測試型態當成同一指標，也不使用會員數、宣稱市場規模或公司效能
 數字做跨公司比較。規格聯盟對展示的敘述與介面供應商對自身產品的敘述都屬參與者一手資料，

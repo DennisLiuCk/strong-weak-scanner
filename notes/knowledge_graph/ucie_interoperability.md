@@ -2,14 +2,15 @@
 
 本圖把共同規格、介面設計送廠、實體晶片驗證、跨廠測試、符合規格測試與客戶量產分開，
 再用證據物件、測試包絡與供應商獨立性三軸判讀。16G 跨廠、32G 單一供應商實體晶片與
-64G 多家各自送廠都是進展，但不能斜著拼成最高速度多廠客戶產品。
+64G 多家各自送廠都是進展，但不能斜著拼成最高速度多廠客戶產品；GT/s、單向 raw、雙向
+aggregate、payload、錯誤恢復與服務結果也必須落在同一份連線效能護照。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ucie-interoperability
 root_node_id: concept:ucie-interoperability
 label: UCIe 小晶片互通與量產階梯
-summary: 以證據物件、測試包絡與供應商獨立性三軸，對齊 16G 跨廠展示、32G 實體晶片與 64G 各家送廠，再追到符合規格測試與客戶量產。
+summary: 以證據物件、測試包絡與供應商獨立性三軸，對齊 16G 跨廠展示、32G 實體晶片與 64G 各家送廠，再以連線效能護照分開 GT/s、方向、raw、payload、錯誤恢復、服務與客戶量產。
 article_ids: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER
 status: active
 -->
@@ -332,4 +333,44 @@ review_due: 2026-09-02
 status: active
 boundary: Package substrate 與高速 routing 是搜尋入口，不代表任一載板／PCB 公司已獲得 UCIe 訂單。
 next_trigger: 客戶與供應商雙向確認具名 substrate、qualification、出貨與收入。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-UCI-I13
+view: industry
+from_id: concept:ucie-interoperability
+to_id: process:ucie-link-performance-passport
+relation: requires
+claim_refs: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C11,MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C12,MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C14
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-17
+status: active
+boundary: 十欄護照是研究中心整合 UCIe 官方規格、問答、streaming reliability 與既有 silicon／demo 證據的查核框架，不是 Consortium compliance template；欄位完整仍不代表 pass、量產、多廠可互換或財務受惠。
+next_trigger: 同一具名 64G UCIe 3.0 multi-vendor package 公開版本、封裝、lane／direction、protocol／payload、錯誤恢復、latency／energy／corner、pass／fail、客戶 qualification 與財務共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-UCI-I14
+view: industry
+from_id: concept:ucie-interoperability
+to_id: metric:ucie-transfer-raw-payload-direction-contract
+relation: measured_by
+claim_refs: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C11,MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C12,MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C13
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-17
+status: active
+boundary: x16@64 GT/s＝128 GB/s／direction、兩向加總 256 GB/s 是 N=1 假想配置的條件式 raw 算術，沒有 device、run、sampling SE／t；未扣 protocol／flit／CRC／replay／idle，也不是 payload、服務效能或 interoperability result。
+next_trigger: 具名 64G link 同時公開 raw reference plane、單向／雙向 traffic、protocol／flit、payload counters、error／replay／retrain、duration、latency／energy 與 application result。
 -->
