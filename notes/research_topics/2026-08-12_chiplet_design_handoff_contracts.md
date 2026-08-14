@@ -39,6 +39,13 @@ to: triaged
 reason: reproducible_schema_audit_supports_boundary_article_without_company_value_chain
 evidence: sources:S1,S3,S4,S5,S6,S7,S9
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_unit_coordinate_cross_artifact_and_post_assembly_semantic_handoff_passport_without_thesis_clock_refresh
+evidence: sources:S3,S5,S11,S12
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -52,6 +59,7 @@ evidence: sources:S1,S3,S4,S5,S6,S7,S9
 - **XML**：用標籤組織資料的文字格式；格式可讀，不代表內容已符合一套完整設計規則。
 - **XSD**：XML Schema Definition，XML 結構規則檔；工具可用它檢查欄位、型別與層級是否符合約定。
 - **3DK**：3D-IC Design Kits，立體積體電路設計套件的總稱；它不是一份萬用檔案，而是一組不同資料包。
+- **Package**：封裝；把一顆或多顆晶粒、載板與互連組成可測試及裝入系統的實體元件。
 - **CDK**：Chiplet Design Kit，小晶片設計套件；交付單顆小晶片的實體、電氣、功能與模型資料。
 - **ADK**：Assembly Design Kit，組裝設計套件；描述封裝組裝、間距、尺寸與檢查規則。
 - **MDK**：Material Design Kit，材料設計套件；描述介電、熱、膨脹與機械性質。
@@ -63,8 +71,21 @@ evidence: sources:S1,S3,S4,S5,S6,S7,S9
 - **簽核（Sign-off）**：設計進入製造前，確認關鍵電性、熱、機械、測試與製程規則均達標的最後檢查。
 - **工具匯入**：設計軟體真正讀進資料、保留單位與版本，並能執行檢查；檔案存在不等於匯入成功。
 - **機器可讀**：資料有固定結構，程式可解析；它仍要通過語法、欄位、版本與跨工具一致性檢查。
+- **語意驗證（Semantic validation）**：在格式正確之外，再檢查單位、座標、跨檔身分與工程規則是否彼此一致。
+- **單位正規化（Unit normalization）**：先把 mm、µm 等量綱換到共同基準，再做比例、面積或距離運算。
+- **座標系（Coordinate frame）**：定義位置數字相對哪個原點、軸向與尺度；缺一項就可能把接點放到別處。
+- **原點（Origin）**：座標的零點；局部晶粒原點與封裝全域原點不是同一個位置。
+- **旋轉約定（Rotation convention）**：說明角度正方向、旋轉中心與先旋轉或先平移，避免相同數字得到不同位置。
+- **公差（Tolerance）**：尺寸或位置允許偏離名目值的範圍；它要連到單位、量測方法與放行規則。
+- **跨檔身分（Cross-artifact identity）**：同一 pin、net 或 bump 在 LEF、GDS、SPICE、SystemVerilog 與 XML 中可被唯一對回。
+- **往返檢查（Round-trip）**：資料匯入工具後再匯出，逐欄比較單位、座標、身分與版本是否被改寫。
+- **KGD**：Known Good Die，組裝前已通過指定測試的晶粒；它仍可能在封裝組裝中受損。
+- **實體資格驗證（Physical qualification）**：用封裝後樣品完成慢速、全速、可靠度與客戶條件驗收，不由 schema 代替。
+- **W3C**：World Wide Web Consortium，制定 XML 等 Web 技術規範的國際組織；本文引用其 schema 驗證邊界。
 - **CHI C2C**：Arm 的 Chip-to-Chip 連線協定；本文只把它當成架構案例中的連線層，不替設計資料背書。
 - **DRM**：Design Rule Manual，設計規則手冊；記錄封裝或製程限制，PDF 存在不等於工具已能自動檢查。
+- **PDK**：Process Design Kit，製程設計套件；把製造規則、模型與工具設定交給設計端。
+- **SHA**：Secure Hash Algorithm 雜湊值；用固定字串辨識檔案內容是否完全相同，不代表內容本身正確。
 - **DankaChiplet**：Thrace 的 3D-IC 架構工具；本篇只引用其 CDXML 產品自述，不把它當成跨工具測試。
 - **Python**：本輪用來執行唯讀解析檢查的程式語言；版本與套件已記在稽核方法，方便重現結果。
 
@@ -273,6 +294,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: OCP 的 CDX 模型標準化提案把小晶片交接拆成熱、機構、實體、功能、功耗、SI／PI、電氣、測試、安全與文件模型，並建議 Package LEF、GDS、SPICE 與 SystemVerilog 的 pin name 保持一致；機構資料另需表達 x、y、z、tolerance 與單位
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S11 PDF file pp.8–13 列出模型堆疊、Package LEF／GDS／OASIS 實體 pin geometry、跨 LEF／GDS／SPICE／SystemVerilog pin-name 一致性與 JEP30-P101 機構描述；file pp.17–18 說明 XML 可表達自訂 unit／data，機構資料含 x、y、z 與 tolerance
+boundary: 這是 OCP 的 proposed standardization 與建議基線，不是正式 conformance release、工具測試、製造簽核或產品資格結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: W3C 的 XML Schema Requirements 說明 schema validation 只檢查 schema 已表達的語法、結構與值限制；任意或複雜的應用限制仍需額外驗證，版本演進也會增加資料交換複雜度
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 1999-02-15
+basis: S12 的 Abstract、Conformance 與 Requirements 說明 schema 可表達 syntactic、structural、value constraints，應用若需要 arbitrary／complicated constraints 必須再做 additional validation，versioning 會使 data exchange 更複雜
+boundary: 這是通用 XML schema 邊界，不是 CDXML 檔案、EDA 工具、封裝資料或任何小晶片產品的驗證結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: OCP 的 CDX 模型提案明示 pre-tested KGD 仍可能在 assembly 中受損或變成 defective，組裝後仍需對個別小晶片與 die-to-die 介面做 slow-speed 與 at-speed 測試
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S11 PDF file pp.19–23 的 test models 段落說明 KGD 在組裝中仍可能受損，並列出 post-assembly 對 individual chiplets 與 D2D interfaces 的 slow-speed／at-speed test 要求及 machine-readable model 仍需文件與指南
+boundary: 這是一般設計與測試指引，不證明任何具名晶粒、封裝批次、OSAT 流程或客戶產品已通過組裝後測試
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 可交付的小晶片資料包至少需要一份十欄語意交接護照，把 bundle 身分、單位座標、跨檔身分、模式角落、模型邊界、schema 與語意 validator、跨工具往返差異、foundry／OSAT 簽核、組裝後實體測試及商業財務結果分開記錄
+supporting_source_ids: S3,S5,S11,S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S3 顯示 3DK 是多資料包且 TDK 不定義 workflow；S5 顯示 schema 檔存在不保證全部可執行；S11 要求跨模型與跨檔交接且組裝後仍需測試；S12 限定 schema validation 只涵蓋已表達的限制，因此需把語法、工程語意、工具、製造、實體與商業證據分層
+boundary: 十欄是本研究中心的稽核框架，不是 OCP、W3C、foundry、OSAT 或 EDA vendor 已共同採用的正式表單；也不表示任何產品已完成十欄
+verification_needed: 固定版本資料包填滿十欄，由兩套獨立工具、foundry／OSAT 與買方共同公布差異、waiver、實體資格與量產結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分四層契約，才知道問題卡在哪裡
 
 | 契約層 | 它回答什麼 | 本篇例子 | 通過前仍可能失敗 |
@@ -319,6 +408,103 @@ resolution:
 
 這個結果不能推成「CDXML 永遠不可用」。它只證明在指定公開 commit 中，檔案存在與四份
 schema 都可被標準工具執行不是同一件事，也說明正式合規包必須固定版本並跑自動檢查。
+
+## Schema 通過不是幾何正確：先鎖單位、座標與跨檔身分
+
+W3C 對 XML schema 的邊界很清楚：驗證器只檢查 schema 已寫進去的語法、結構與值限制。
+如果工程規則沒有被表達，檔案即使顯示通過，也不會自動證明尺寸、座標或另一份模型一致。
+
+OCP 的 CDX 提案也不是只列 XML 欄位。它把熱、機構、實體、功能、功耗、SI／PI、電氣、
+測試、安全與文件分成多種模型，建議 Package LEF、GDS、SPICE 與 SystemVerilog 的 pin name
+一致，並要求機構資料能表達 x、y、z、公差與單位。這是跨檔語意問題，不是單一 XSD 能
+獨自判定的產品資格。
+
+### 單位不正規化，線性差 1,000 倍、面積差 1,000,000 倍
+
+以下是匿名教學幾何，不對應任何產品。假設小晶片寬 20 mm、高 15 mm，接點 pitch 為
+400 µm。先把長度統一成 µm，寬度才是 20,000 µm，寬度可容納的理想 pitch 間隔為 50。
+
+| 算法 | 運算 | 結果 | 與正確值的差異 |
+|---|---|---:|---:|
+| 正規化後的線性比值 | 20,000 µm ÷ 400 µm | 50 | 基準 |
+| 忽略單位的原始數字 | 20 ÷ 400 | 0.05 | 少 1,000 倍 |
+| 正確面積 | 20,000 µm × 15,000 µm | 300,000,000 µm² | 基準 |
+| 把 20 × 15 誤當 µm² | 20 µm × 15 µm | 300 µm² | 少 1,000,000 倍 |
+
+50 只是理想線性間隔，不是可用 bump 數；邊界禁佈區、排列方向、pad 尺寸、逃線、冗餘與
+良率都還沒進來。這個例子只示範量綱錯誤如何在第一步就放大，不能推成封裝密度。
+
+### 同一座標數字，旋轉原點不同會落在另一處
+
+再看一個匿名座標。局部 bump 位於（2, 3）mm，晶粒放置原點是全域（100, 50）mm。
+若不旋轉，全域位置為（102, 53）mm；若依「繞局部原點逆時針 90°，再平移」約定，
+局部座標先由（x, y）變為（−y, x），全域位置就成為（97, 52）mm。
+
+| 解讀 | 全域 x | 全域 y | 相對不旋轉位置 |
+|---|---:|---:|---:|
+| 不旋轉後平移 | 102 mm | 53 mm | 基準 |
+| 逆時針 90° 後平移 | 97 mm | 52 mm | Δx = −5 mm；Δy = −1 mm |
+
+兩個答案相距 √26 = 5.099019514 mm。兩邊即使都忠實讀到數字 2 與 3，只要沒有共同記錄
+座標系、原點、軸向、旋轉正方向、旋轉中心、鏡射、運算順序與單位，就不是同一個位置。
+
+### XSD pass 檢查已宣告文法，不檢查所有工程語意
+
+一個 validator 可以確認必填欄位存在、數字型別正確、值落在已宣告範圍；但它不會憑空知道
+LEF 的 pin A 是否就是 SPICE 的 A、GDS 幾何原點是否與 XML 放置原點相同，或 400 的單位
+究竟是 mm、µm 還是工具預設 database unit。這些規則必須另寫成語意檢查，並留下跨檔差異。
+
+最基本的往返測試是：固定整包檔案與雜湊，工具 A 匯入再匯出，工具 B 做同樣動作；除了
+比較 pass／fail，還要逐欄比較單位、座標轉換、pin／net／bump 身分、模型版本與 waiver。
+
+### 組裝後仍要重驗，KGD 不是永久證書
+
+OCP 提案明示，組裝前已測過的 KGD 仍可能在 assembly 中受損或變成 defective。完成封裝後，
+個別小晶片與 die-to-die 介面仍要做 slow-speed 與 at-speed test。因此證據鏈不能在「供應者
+交付 KGD」停止，更不能把機器可讀模型當成封裝後實體樣品已通過。
+
+### 一份語意交接護照至少要有十欄
+
+| 欄位 | 最少記錄 | 沒有它會混淆什麼 |
+|---|---|---|
+| 1. Bundle 身分 | release、commit、每檔 SHA、建立者、時間 | 同名不同版 |
+| 2. 單位與座標 | 每量綱單位、database unit、座標系、原點、旋轉、鏡射、公差 | 數字相同就等於位置相同 |
+| 3. 跨檔身分 | pin、net、bump、die 與 model 的唯一鍵及 mapping | 各檔同名或異名無法對回 |
+| 4. 模式與角落 | power state、test mode、PVT、頻率、方向 | 典型值冒充所有條件 |
+| 5. 模型邊界 | fidelity、適用範圍、缺省值、已知限制 | 模型存在冒充物理真實 |
+| 6. Schema 與語意檢查 | XSD 結果、跨欄與跨檔規則、正反案例 | 文法通過冒充工程正確 |
+| 7. 跨工具往返 | 工具版本、匯入匯出差異、診斷、允許偏差 | 單工具開檔冒充互通 |
+| 8. 製造與封測簽核 | PDK／ADK／MDK／TDK 版本、DRC、SI／PI、熱、waiver、簽名 | 模擬通過冒充可製造 |
+| 9. 組裝後實體資格 | 樣品、批次、slow／at-speed test、可靠度、失效與重測 | KGD 冒充封裝後合格 |
+| 10. 商業與財務 | 客戶產品、量產數、價格、收入、成本與毛利分母 | 技術活動冒充材料性 |
+
+十欄不是新的產業標準，而是研究中心把「讀得到、對得上、簽得過、量得出、賣得掉」拆開
+稽核的護照。任何一欄空白都不必否定技術，但必須停止跨越該欄的外推。
+
+### 多空小作文：同一張護照，正反敘事才可比較
+
+**偏多版本。** 固定 bundle 讓供應者與工具共用身分、單位與座標，跨工具往返差異收斂，
+foundry／OSAT 的 waiver 與組裝後測試能沿同一鍵回溯；若重工、驗證週期與客戶導入時間同步
+下降，資料 authoring、validator、封裝整合與測試工作可能形成可收費的產品或服務。
+
+**偏空版本。** Schema 雖發布，各工具仍靠私有 mapping 修正單位與座標，pin 身分需人工
+對照，組裝後失敗無法回連模型版本；共同格式反而只增加轉檔與維護層，生態成員、demo 或
+KGD 數量都無法轉成可重現量產與財務貢獻。
+
+兩個版本共用同一組反證：第二套獨立工具的固定輸入輸出、跨檔差異、foundry／OSAT waiver、
+組裝後 slow／at-speed 測試、客戶資格與財務分母。偏多不能只靠規格發布，偏空也不能只靠
+公開草案尚未完整就宣稱路線失敗。
+
+### 樣本、誤差與可外推範圍
+
+單位案例是 1 組匿名幾何、2 條固定解讀路徑；座標案例也是 1 組匿名位置、2 條固定轉換路徑。
+這些是決定性單位換算與幾何運算，不是抽樣，因此不報抽樣 SE 或 t 值。Python Fraction／math
+與獨立 awk 公式逐項得到相同的 50、0.05、1,000 倍、300,000,000 µm²、1,000,000 倍、
+（102, 53）、（97, 52）與 5.099019514 mm。
+
+本輪具名產品、工具往返、foundry／OSAT sign-off、組裝批次、客戶資格與財務觀測均為 N=0。
+OCP 與 W3C 文件只建立方法與標準邊界，不是產品或量產樣本；上述算術也不能估計實際 bump
+良率、錯位率、測試通過率、重工成本、收入或毛利。
 
 ## 用六關判斷是否真的能跨公司交接
 
@@ -525,6 +711,38 @@ status: active
 url: https://www.opencompute.org/wiki/Server/OpenChipletEconomy
 locator: 2026-08-12 顯示 CDX／3DK／MDK、Chiplet Systems、FCSA、Chiplet PoC 與 Virtual Chiplet Ecosystems 等工作流入口
 limitation: 工作流存在不代表 deliverable、實作、合規或量產已完成；只供後續定位正式附件與錄影
+-->
+
+<!-- research_source
+source_id: S11
+role: standard
+source_kind: document
+publisher: Open Compute Project Foundation
+independence_group: ocp-cdx-model-proposal
+title: OCP ODSA - CDX Proposed Standardization of Chiplet Models for Heterogeneous Integration
+published_at: 2021-11-16
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/ocp-odsa-cdx-proposed-standardization-of-chiplet-models-for-heterogeneous-integration-2-pdf?ga4-reseller=1620
+locator: PDF file pp.8–13 的 model stack、physical pin geometry、跨 LEF／GDS／SPICE／SystemVerilog pin identity 與 JEP30-P101；pp.17–18 的 XML unit／x-y-z／tolerance；pp.19–23 的 KGD 組裝風險與 post-assembly slow／at-speed test
+limitation: OCP PDF 本身未標示發行日，published_at 採同題論文在 IEEE 3DIC 2021 官方 program 的發表日；文件是 proposed standardization 與設計指引，沒有正式 release tag、跨工具 conformance、foundry／OSAT sign-off、具名產品資格或財務結果
+-->
+
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: World Wide Web Consortium
+independence_group: w3c-xml-schema
+title: XML Schema Requirements
+published_at: 1999-02-15
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.w3.org/TR/NOTE-xml-schema-req
+locator: Abstract、Conformance 與 Requirements 對 schema constraint、additional validation 與 versioning 的邊界
+limitation: 通用 XML schema 要求文件不是 CDXML、EDA、封裝或小晶片產品驗證；只用來界定 schema pass 能與不能證明的性質
 -->
 
 ## 族群影響

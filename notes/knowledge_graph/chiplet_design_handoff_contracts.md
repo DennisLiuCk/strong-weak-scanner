@@ -252,3 +252,43 @@ status: active
 boundary: TDK 與共同合規若落地才可能改變量測測試需求 目前沒有設備型號 測項 產能 訂單或收入。
 next_trigger: 公開 test plan 將新測項與具名設備 工時 產能 客戶資格及出貨分母對齊。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I12
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: process:chiplet-semantic-handoff-passport
+relation: requires
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C14
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: unknown
+exclusivity: multi_source
+exclusivity_scope: 十欄護照是研究中心綜合 OCP 3DK CDX 與 W3C schema 邊界的稽核框架 不是任何標準組織或供應商正式共同採用的表單。
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 護照只把證據責任分層 不證明兩套工具 製造封測 客戶或任何具名產品已填滿或通過。
+next_trigger: 兩套獨立工具 foundry OSAT 與買方以同一固定bundle公布十欄資料 差異 waiver 實體資格與量產結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I13
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: metric:chiplet-unit-coordinate-cross-artifact-boundary
+relation: measured_by
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C11,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C12,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C14
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: unknown
+exclusivity: multi_source
+exclusivity_scope: OCP與W3C分別提供模型交接及schema能力邊界 教學算例只示範量綱與座標轉換 不代表產業共同validator或產品數據。
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 單位與座標算術是決定性教學 不估計實際bump數 錯位率 良率 跨工具一致性 實體資格或財務材料性。
+next_trigger: 固定bundle公開unit coordinate origin rotation mirror tolerance及跨檔mapping並由兩套工具重現相同round-trip差異。
+-->

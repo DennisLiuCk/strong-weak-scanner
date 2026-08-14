@@ -5895,6 +5895,20 @@ class ResearchCenterTest(unittest.TestCase):
             "| CDK |", "| ADK |", "| MDK |", "| TDK |",
             "## 公開 schema 的可重現檢查",
             "完整母體四份檔案，`n=4`，不是抽樣，所以沒有抽樣標準誤",
+            "## Schema 通過不是幾何正確：先鎖單位、座標與跨檔身分",
+            "### 單位不正規化，線性差 1,000 倍、面積差 1,000,000 倍",
+            "| 正規化後的線性比值 | 20,000 µm ÷ 400 µm | 50 | 基準 |",
+            "| 把 20 × 15 誤當 µm² | 20 µm × 15 µm | 300 µm² | 少 1,000,000 倍 |",
+            "### 同一座標數字，旋轉原點不同會落在另一處",
+            "兩個答案相距 √26 = 5.099019514 mm",
+            "### XSD pass 檢查已宣告文法，不檢查所有工程語意",
+            "### 組裝後仍要重驗，KGD 不是永久證書",
+            "### 一份語意交接護照至少要有十欄",
+            "| 1. Bundle 身分 |", "| 6. Schema 與語意檢查 |",
+            "| 9. 組裝後實體資格 |", "| 10. 商業與財務 |",
+            "### 多空小作文：同一張護照，正反敘事才可比較",
+            "### 樣本、誤差與可外推範圍",
+            "本輪具名產品、工具往返、foundry／OSAT sign-off、組裝批次、客戶資格與財務觀測均為 N=0",
             "## 用六關判斷是否真的能跨公司交接",
             "| 1. 名詞與規格發布 |", "| 2. schema 可執行 |",
             "| 3. 單工具匯入 |", "| 4. 跨工具重現 |",
@@ -5904,8 +5918,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 10),
-            ("research_claim", 10), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 14), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 2),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5930,6 +5944,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:executable-schema,stage,Schema 可執行驗證",
             "stage:cross-tool-conformance,stage,跨工具符合性重現",
             "stage:foundry-osat-conformance,stage,製造與封測共同簽核",
+            "process:chiplet-semantic-handoff-passport,process,小晶片語意交接十欄護照",
+            "metric:chiplet-unit-coordinate-cross-artifact-boundary,metric,小晶片單位座標與跨檔身分邊界",
         ):
             self.assertIn(concept, concepts)
         graph = (
@@ -5937,7 +5953,14 @@ class ResearchCenterTest(unittest.TestCase):
             / "chiplet_design_handoff_contracts.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 小晶片設計資料交接與合規鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 12)
+        for graph_contract in (
+            "edge_id: KG-CDH-I12",
+            "to_id: process:chiplet-semantic-handoff-passport",
+            "edge_id: KG-CDH-I13",
+            "to_id: metric:chiplet-unit-coordinate-cross-artifact-boundary",
+        ):
+            self.assertIn(graph_contract, graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 14)
 
         route = next(
             row for row in bd.RESEARCH_LEARNING_ROUTES
