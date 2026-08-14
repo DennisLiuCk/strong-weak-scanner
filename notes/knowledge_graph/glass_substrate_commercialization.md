@@ -413,3 +413,43 @@ status: active
 boundary: 局部 TGV 試驗結構的熱循環結果只驗證指定構造與條件；沒有完整客戶 package、qualification、production yield、shipment 或財務證據。
 next_trigger: 把同一結構整合進具名完整封裝，公開客戶資格、壽命條件、量產良率與出貨。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-GLS-I15
+view: industry
+from_id: concept:glass-substrate-commercialization
+to_id: process:glass-substrate-thermomechanical-passport
+relation: requires
+claim_refs: MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION#C13,MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION#C16
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 材料、stack、geometry、process history、measurement contract 與 complete-product qualification 六欄是研究中心依 NIST 方法整理的查核框架，不是產業標準，也不證明任何公司已完成 qualification。
+next_trigger: 同一具名 production package／revision 公開六欄原始資料、客戶 pass／fail、production yield、shipment 與 change-triggered retest。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-GLS-I16
+view: industry
+from_id: concept:glass-substrate-commercialization
+to_id: metric:package-warpage-measurement-contract
+relation: measured_by
+claim_refs: MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION#C14,MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION#C15,MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION#C16
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: CTE、curvature 與 warpage 只有在 specimen、temperature history、support／clamp、reference plane、scan area、method、calibration 與 uncertainty 對齊時才可比較；NIST epoxy／thin-film 範例不是玻璃產品結果。
+next_trigger: 供應商或客戶發布同一 glass-core package 的版本化 local＋global warpage maps、完整 measurement contract、reflow／thermal-cycle pass report 與 uncertainty。
+-->

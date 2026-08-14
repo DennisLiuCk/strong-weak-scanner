@@ -248,6 +248,54 @@ limitation: ECTC 技術論文與試驗結構可靠度支持研發能力，不等
 independence_group: intel
 -->
 
+<!-- research_source
+source_id: S14
+role: other_primary
+source_kind: living_index
+publisher: National Institute of Standards and Technology
+title: Accurate Cure Kinetics, Stress, Mechanical Properties and Warpage
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/programs-projects/accurate-cure-kinetics-stress-mechanical-properties-and-warpage
+locator: Summary、Description 與 Additional Technical Details；process-dependent cure time／temperature／pressure、temperature／humidity exposure、CTE、mechanical properties、residual stress、areal warpage／stress distributions 與 whole-package multiphysics modeling
+limitation: NIST ongoing metrology project 說明封裝熱機械量測與模型所需欄位，不是玻璃基板產品資料、產業標準、客戶 qualification、量產良率或商業化結果
+independence_group: nist-advanced-packaging-thermomechanics
+-->
+
+<!-- research_source
+source_id: S15
+role: other_primary
+source_kind: document
+publisher: National Institute of Standards and Technology
+title: A digital image correlation-based research platform for cure shrinkage and thermal expansion measurements on epoxy test materials
+published_at: 2026-06-17
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/publications/digital-image-correlation-based-research-platform-cure-shrinkage-and-thermal-expansion
+locator: Official PDF pp.1–5；prototype TM01 material、specimen／cure schedule、40–75 °C three-cycle DIC、temperature-probe bias、strain uncertainty、CTE estimate／99% CI 與 future backer／confinement modeling；PDF SHA-256 6ec91c4bfb21958c6798fd935dc3ca61299025677fabdc24684e4ca7aea2349d
+limitation: 單一 prototype unfilled epoxy 的方法開發範例，不是玻璃材料、glass-core stack、量產批次或產品 qualification；其 CTE 數值與信賴區間不得外推成玻璃或完整封裝性能
+independence_group: nist-advanced-packaging-thermomechanics
+-->
+
+<!-- research_source
+source_id: S16
+role: other_primary
+source_kind: document
+publisher: National Institute of Standards and Technology
+title: A Technique for Deducing In-Plane Modulus and Coefficient of Thermal Expansion of a Supported Thin Film
+published_at: 2002-04-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/publications/technique-deducing-plane-modulus-and-coefficient-thermal-expansion-supported-thin-film
+locator: Official PDF pp.1–4；two-substrate curvature／temperature equations、perfect-bond／free-edge／small-deflection assumptions、measurement uncertainty propagation 與 substrate-pair sensitivity；PDF SHA-256 9c9b7bf2c3a255c240ba33145f0fe4fce34c8fd8a42fb04ecf5a3250b27b6472
+limitation: Supported thin-film 反算方法與理想化假設，不是完整 glass-core package 的量測標準、產品 warpage、reflow／thermal-cycle qualification、客戶允收或商業結果
+independence_group: nist-advanced-packaging-thermomechanics
+-->
+
 <!-- research_claim
 claim_id: C1
 label: inference
@@ -452,6 +500,91 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: NIST 的先進封裝熱機械計量計畫把翹曲預測需要的輸入拆成隨製程條件改變的材料性質、服役溫濕度、固化動力學、CTE、機械性質、殘留應力、面積式翹曲／應力分布與完整封裝多物理模型，而不是只讀一個材料 CTE
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 Summary 與 Additional Technical Details 逐項列出 process-dependent material properties、harsh thermal／environmental conditions、areal measurement 與 entire-package FEM
+boundary: 這是 NIST 方法需求與研發方向，不代表任何玻璃配方、公司或完整封裝已完成量測、模型校正、客戶允收或量產
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: NIST 的 DIC 方法論文以 prototype unfilled epoxy TM01 示範：同一範例明列材料配方、120 °C／8 小時固化、40–75 °C 三次循環、區域與應變模型、溫度探頭位置、strain uncertainty，以及 89.9 µstrain/K、99% CI 89.1–90.7 µstrain/K 的 CTE 結果
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-06-17
+basis: S15 PDF pp.1–4 的 Material、Specimen、Oven、Data collection 與 Example CTE results；論文另警告樣品表面溫度比 nominal 高數 °C、探頭約 0.08 °C one-SD noise 且可能有位置 bias
+boundary: 這是論文展示的一個 prototype material／specimen 範例與三次重複溫循，不是三個獨立材料樣本，更不是玻璃、量產批次、跨公司 benchmark 或完整封裝 warpage
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: NIST 的 supported-film 方法以同一薄膜、兩種不同基板與相同溫度歷史的曲率建立聯立反算，且明列 perfect bond、free edges、small deflection、homogeneous／isotropic 等假設；基板組合與量測誤差會影響 CTE 與模數解的穩定性
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2002-04-01
+basis: S16 PDF pp.1–4 的 theoretical assumptions、two-substrate equations、uncertainty propagation、substrate-pair sensitivity 與 conclusions
+boundary: 證明的是材料常數也依附試件、支撐、幾何、溫度歷史、模型假設與不確定度；不能把該方法直接當成 glass-core 產品 pass／fail 或客戶 qualification
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 判讀「玻璃低 CTE／較穩定」必須保存材料、疊構拘束、幾何、製程歷史、量測契約與完整產品資格六欄；材料常數或局部 test vehicle 只能進前段證據，不能單獨推出低翹曲、客戶可靠度、良率或量產
+supporting_source_ids: S9,S13,S14,S15,S16
+contrary_source_ids:
+as_of: 2026-08-14
+basis: Intel 公司資料支持玻璃的設計潛力與局部 TGV 研究；NIST 方法鏈顯示 CTE、cure、residual stress、stack／support、temperature、areal warpage、measurement uncertainty 與 whole-package model 必須保留，合併後形成本文六欄資格護照
+boundary: 六欄是研究中心整理公開方法的查核框架，不是 Intel、NIST 或產業共同標準；不比較跨公司效能、不推估採用率、TAM、成本、台灣受惠公司或財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: unverified
+status: active
+claim: 截至本輪公開一手資料，已有具名 production glass-core AI／HPC package 同時揭露六欄熱機械護照、完整客戶 qualification、production yield 與重複商業出貨
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-14
+basis: Intel 公開資料仍是 company design claims／future development 與局部 TGV 熱循環；NIST 是中立方法鏈，SKC／Samsung 仍在初始測試、原型或 roadmap
+boundary: 未找到不代表不存在；本輪是指定 Intel／NIST／既有供應商來源的 partial scan，不是所有客戶、供應商、論文、專利或非公開 qualification 的全市場普查
+verification_needed: 需同一具名 production package／revision 的玻璃 lot 與材料常數、完整 stack／geometry／process history、版本化 warpage maps 與 uncertainty、reflow／thermal-cycle pass report、customer qualification、yield／throughput、shipment 與 repeat order
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -533,6 +666,13 @@ to: triaged
 reason: separated_glass_roles_and_updated_skc_samsung_intel_commercialization_evidence
 evidence: sources:S10,S11,S12,S13
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: thermomechanical_passport_and_measurement_boundary_added_without_refreshing_thesis_clock
+evidence: sources:S9,S13,S14,S15,S16
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -553,6 +693,13 @@ evidence: sources:S10,S11,S12,S13
 - **翹曲**：基板受熱或應力後彎曲變形；過度翹曲可能造成對位、組裝或接點可靠度問題。
 - **裂損**：玻璃在加工、搬運或組裝中產生裂紋或破損；少量成功樣品不能代表大量製造時也能控制裂損。
 - **熱膨脹係數（CTE）**：材料受溫度變化時尺寸改變的程度；可調整不代表已與所有晶片和封裝結構完成驗證。
+- **殘留應力**：材料成形、固化、鍍銅、貼合或降溫後留在結構裡的內部應力；即使回到室溫也可能繼續影響翹曲。
+- **局部／全域翹曲**：局部翹曲描述一小區域的曲率或高度差，全域翹曲描述整片外形；只報平均值可能藏住晶片角落或導電孔附近的高風險區。
+- **量測契約**：把試件版本、溫度歷史、支撐／夾持、掃描範圍、參考面、正負號、儀器、校正與不確定度一起保存，讓兩張翹曲圖真的可比較。
+- **NIST**：美國國家標準暨技術研究院；本文用其方法文件理解量測條件，不把政府研究頁當成產品背書。
+- **數位影像相關（DIC）**：追蹤試件表面影像圖樣的位移來計算形狀與應變；結果仍依賴相機校正、圖樣、區域、溫度與試件支撐。
+- **信賴區間（CI）**：在指定統計程序與信心水準下呈現估計值不確定範圍；它不表示區間內每個產品都會合格。
+- **單一標準差（one-SD）**：以一個標準差描述量測雜訊的尺度；只涵蓋被估計的隨機變異，不能自動消除探頭位置等系統偏差。
 - **平坦度**：基板表面維持平整的程度；更平有利於細線路與大型封裝，但不是客戶採用的充分條件。
 - **低損耗**：訊號通過材料時能量耗損較少；不同設計與測試條件的數字不能直接跨公司排名。
 - **大型封裝**：整合較多晶片、記憶體或連接線路的較大封裝結構；尺寸增加也會放大翹曲、對準與缺陷管理難度。
@@ -654,6 +801,73 @@ evidence: sources:S10,S11,S12,S13
 可靠度必須帶著測試對象、條件與判定者一起讀。這張表只區分三種常被寫成同一句「通過測試」的
 證據；它不能把元件試驗結果、供應商內部測試與客戶產品資格互相代換。
 
+## 低 CTE 不等於不翹曲：六欄熱機械資格護照
+
+CTE 是材料在指定溫度區間的尺寸變化率，翹曲則是**整個疊構**經歷固化、貼合、鍍銅、回焊、降溫與
+服役環境後的形狀結果。兩者有關，卻不是同一個答案。Intel 公開資料曾把玻璃的熱機械穩定、50% 較少
+pattern distortion 與可能提高 10 倍互連密度列為公司設計主張；原頁沒有讓本文重建這些 headline 的
+試件數、完整 stack、溫度／支撐、量測不確定度或客戶 pass report，因此它們不是「低 CTE 已經使完整
+產品低翹曲」的實證，也不進跨公司 comparison ledger。
+
+讀到低 CTE、尺寸穩定、warpage improved 或 reliability passed 時，先要求同一試件的六欄護照：
+
+| 六欄護照 | 最少保存什麼 | 它回答哪個問題 | 缺欄時不能說什麼 |
+|---|---|---|---|
+| 1. 材料身分與性質 | 玻璃 composition／lot、樹脂／膠／銅材料、厚度、溫度區間內的 CTE 與 modulus、方向性／均勻性、含水狀態 | 每一層自己如何伸縮與承載 | 只寫「玻璃 CTE 低」不能代表所有玻璃、build-up film 或黏著層 |
+| 2. 疊構與拘束 | 玻璃兩側層數與厚度、銅分布、build-up／underfill／mold、介面黏著、對稱性與 neutral axis | 不同材料互相拉扯後會留下什麼應力 | Coupon 或裸玻璃常數不能替代完整 stack 的 residual stress 與形變 |
+| 3. 幾何與支撐 | Panel／package 尺寸、玻璃厚度、TGV／cavity／die map、邊界、支點與夾具 | 大面積、開孔與固定方式是否放大局部或全域曲率 | 小片試件不能自動外推超大封裝；夾平量測也不能當自由狀態 |
+| 4. 製程與環境歷史 | Lamination／cure／plating 的時間、溫度、壓力與順序，moisture conditioning、reflow／thermal-cycle profile、stress-free reference | 試件是如何走到現在的應力狀態 | 同一配方在不同 cure、降溫或吸濕歷史下不能視為同一母體 |
+| 5. 量測契約 | 樣本數與 lot、溫度路徑、support／clamp、reference plane／sign、scan area、local＋global map、儀器／校正／不確定度 | 兩張 warpage／curvature 圖是否真的可比較 | 單一室溫平均、漂亮熱圖或未標正負號不能證明製程窗口 |
+| 6. 完整產品資格 | 具名 package／revision、die／assembly、客戶 workload、方法／cycle count、pass／fail／failure mode、yield／retest、變更後重驗與出貨 | 指定產品是否能進入客戶製造與長期使用 | 材料量測、TGV test vehicle 或供應商內測不能替代 customer qualification、production yield 與訂單 |
+
+這六欄不是產業共同標準，而是把 NIST 方法文件與玻璃公開資料整理成的查核框架。第一欄是材料輸入，
+第五欄是量測是否可比，第六欄才是完整產品判定；任何一欄比較好，都不能直接借給另一欄當結論。
+
+### 一個材料 CTE 範例，為何反而證明條件不能省
+
+NIST 2026 DIC 論文刻意用一個**不是玻璃**的 prototype unfilled epoxy TM01 示範方法：範例試件先在
+120 °C 固化 8 小時，再做三次 40–75 °C 循環；論文報 CTE 89.9 µstrain/K，99% 信賴區間
+89.1–90.7 µstrain/K，並同時報 strain uncertainty ±0.13% strain、測試板溫度探頭 one-SD noise
+約 ±0.08 °C。更重要的是，作者提醒樣品實際表面溫度比 nominal 高數 °C，且探頭位置可能帶來較大的
+bias；backer sheet 與未來 confinement model 也會影響解讀。
+
+這個範例只包含一個論文展示的 prototype material／specimen；三次循環是同一量測內的重複歷史，
+不是三個獨立材料或三個量產 lot。來源已給 99% CI 與儀器不確定度，本文不另造 sampling SE／t，
+也不把 89.9 µstrain/K 外推成玻璃常數。它教的是：連一個材料 CTE 都必須帶著配方、固化、溫度區間、
+backer、探頭、區域與不確定度，完整封裝更不能只剩一個「低 CTE」形容詞。
+
+NIST 另一篇 supported-film 論文則從相反方向示範：同一薄膜要放在兩種不同基板上，量測相同溫度歷史
+下的曲率，再用聯立式反算 CTE 與模數；解還依賴 perfect bond、free edges、small deflection、
+homogeneous／isotropic 等假設，基板組合選不好會放大量測誤差。也就是說，材料數字本身就可能是帶著
+支撐、幾何與模型假設的反問題，更不能直接替完整 glass-core package 簽核。
+
+### 多空小作文必須共用同一張熱機械表
+
+**多方可以寫到哪裡。** 若同一 production package／revision 公開六欄，並在未夾平的完整疊構上跨
+reflow 與 thermal cycle 顯示 local＋global warpage 仍在客戶限值內，變更後可重驗，且 yield、
+throughput 與重複出貨跟上，才可把玻璃的材料優勢接到大型封裝、細互連與商業採用。
+
+**空方可以寫到哪裡。** 若公開資料只有玻璃 coupon CTE、局部 TGV 熱循環、單張室溫熱圖或未說明
+support 的平均翹曲，則銅分布、polymer cure shrinkage、moisture、large-area geometry 與量測 bias
+仍可改變完整產品結果；這支持「資格尚未證明」，不等於技術必然失敗。
+
+**共同裁決欄位。** 多空都必須交付同一 package key、玻璃 lot／材料函數、完整 stack、尺寸／TGV／
+die map、process／moisture history、temperature／support／reference plane、local＋global maps、
+uncertainty、reflow／cycle pass、failure mode、yield／retest、customer acceptance、shipment 與 repeat
+order。只要 package key 或量測契約不同，就先判成兩個案例，不做 headline 勝負。
+
+### 分母、誤差與限制
+
+本節只有 `N=2` 條消息鏈：Intel 是一條公司設計／研發鏈，三份 NIST 文件保守合併成一條中立計量鏈；
+不是玻璃供應商、封裝產品、客戶、量產 lot、台灣 121 檔或全市場樣本。唯一數值範例是 NIST 論文的
+一個 prototype epoxy specimen 與三次溫循，來源已報 99% CI、strain uncertainty 與溫度探頭
+one-SD noise；沒有可估玻璃產業或產品效果的 sampling SE／t。兩份 NIST PDF 的 SHA-256 分別為
+`6ec91c4bfb21958c6798fd935dc3ca61299025677fabdc24684e4ca7aea2349d` 與
+`9c9b7bf2c3a255c240ba33145f0fe4fce34c8fd8a42fb04ecf5a3250b27b6472`，只渲染實際引用頁及相鄰頁並
+逐頁目視核對。本輪另發現 Intel 舊版 Glass-Core Substrate product brief 的官方 URL 已導向 404，
+因此不採用搜尋索引快取中的 pitch、尺寸或 roadmap 數字。本文沒有價格、估值、共識、部位、投資建議
+或市場是否反映的主張。
+
 ## 再把四組公開證據放回正確關卡
 
 同一家公司的證據可能同時出現在不同關，但前一關的工廠、樣品或合作，不能補成後一關的客戶結果、
@@ -696,6 +910,9 @@ evidence: sources:S10,S11,S12,S13
 - [Intel and Lens Technology collaboration](https://newsroom.intel.com/new-technologies/intel-and-lens-technology-collaborate-to-enable-advanced-semiconductor-packaging-for-the-ai-era)（explore／potential cooperation）。
 - [Intel Foundry at ECTC 2026](https://community.intel.com/t5/Blogs/Intel-Foundry/Systems-Foundry-for-the-AI-Era/How-Intel-Foundry-Packaging-Technologies-Redefine-AI-and-HPC/post/1749493)（glass-core TGV 試驗結構與熱循環）。
 - [Intel glass substrate roadmap](https://newsroom.intel.com/artificial-intelligence/intel-unveils-industry-leading-glass-substrates)（材料特性與 2020 年代後半導入時程）。
+- [NIST packaging cure／stress／warpage metrology project](https://www.nist.gov/programs-projects/accurate-cure-kinetics-stress-mechanical-properties-and-warpage)（process-dependent properties、areal warpage／stress 與 whole-package model）。
+- [NIST DIC epoxy CTE／cure-shrinkage platform](https://www.nist.gov/publications/digital-image-correlation-based-research-platform-cure-shrinkage-and-thermal-expansion)（specimen、cure、temperature、probe bias、uncertainty 與 CTE 範例）。
+- [NIST supported-film CTE／modulus technique](https://www.nist.gov/publications/technique-deducing-plane-modulus-and-coefficient-thermal-expansion-supported-thin-film)（two-substrate curvature、assumptions 與 uncertainty propagation）。
 - [Samsung Electro-Mechanics glass substrate roadmap](https://samsungsem.com/global/newsroom/news/view.do?id=8922)（pilot、sample、2027 目標）。
 - [Samsung Electro-Mechanics glass-core JV plan](https://samsungsem.com/global/newsroom/news/view.do?id=9850)（pilot prototypes、合資生產基地與 2027 年後量產規劃）。
 - [Corning Glass Core program](https://www.corning.com/worldwide/en/the-progress-report/crystal-clear/co-packaged-optics-the-future-of-data-centers)（TGV、warpage、CTE 與材料開發）。

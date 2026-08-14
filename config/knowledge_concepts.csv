@@ -481,3 +481,5 @@ metric:zero-event-reliability-bound,metric,零事件可靠度單側界線,Zero-e
 metric:cdu-flow-heat-balance-bridge,metric,CDU 流量—熱功率橋接,CDU flow heat-balance bridge|loop delta-T bridge,metric:cdu-operating-envelope,用流體物性與同一迴路溫升把流量接到熱功率並把迴路溫升與熱交換器 ATD 分開的量綱核對框架
 concept:rack-mechanical-qualification-passport,concept,機架機械資格護照,Rack mechanical qualification passport|mechanical evidence packet,stage:integrated-rack-qualification,把共同介面 結構載重 空櫃與滿載移動 靜態穩定 裝箱運輸及場站交接綁到同一品牌配置的證據框架
 metric:rack-mass-force-support-reaction,metric,機架質量—重力—支承反力邊界,Rack mass force support reaction|payload force reference,concept:rack-mechanical-qualification-passport,分開 payload質量 標準重量 frame與包裝總重 動態載荷 重心支點及地板局部反力以防止公斤與牛頓跨帳
+process:glass-substrate-thermomechanical-passport,process,玻璃基板熱機械六欄資格護照,Glass substrate thermomechanical passport|glass warpage evidence packet,concept:glass-substrate-commercialization,把材料身分 疊構拘束 幾何 製程歷史 量測契約與完整產品資格綁到同一 package revision 的查核框架
+metric:package-warpage-measurement-contract,metric,封裝翹曲量測契約,Package warpage measurement contract|local global warpage comparability,process:glass-substrate-thermomechanical-passport,保存試件 溫度歷史 支撐夾持 參考面正負號 掃描範圍 local與global方法 校正及不確定度以判定兩張翹曲圖能否比較

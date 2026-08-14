@@ -3932,7 +3932,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 42
+            sum(line.startswith("- **") for line in glossary.splitlines()), 49
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -3947,8 +3947,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 12), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 16),
+            ("research_claim", 17), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -7009,6 +7009,71 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: concept:profit-fcf-cash-stock-ledgers",
             "edge_id: KG-YQ2-I03",
             "to_id: metric:working-capital-intensity-proxy",
+        ):
+            self.assertIn(node, graph)
+
+    def test_glass_substrate_thermomechanical_passport_preserves_measurement_boundary(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-02_glass_substrate_commercialization.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: thermomechanical_passport_and_measurement_boundary_added_without_refreshing_thesis_clock",
+            "## 低 CTE 不等於不翹曲：六欄熱機械資格護照",
+            "| 1. 材料身分與性質 |",
+            "| 2. 疊構與拘束 |",
+            "| 3. 幾何與支撐 |",
+            "| 4. 製程與環境歷史 |",
+            "| 5. 量測契約 |",
+            "| 6. 完整產品資格 |",
+            "### 一個材料 CTE 範例，為何反而證明條件不能省",
+            "### 多空小作文必須共用同一張熱機械表",
+            "### 分母、誤差與限制",
+            "120 °C 固化 8 小時",
+            "三次 40–75 °C 循環",
+            "89.9 µstrain/K",
+            "99% 信賴區間",
+            "strain uncertainty ±0.13% strain",
+            "探頭 one-SD noise",
+            "`N=2` 條消息鏈",
+            "三次循環是同一量測內的重複歷史",
+            "沒有可估玻璃產業或產品效果的 sampling SE／t",
+            "6ec91c4bfb21958c6798fd935dc3ca61299025677fabdc24684e4ca7aea2349d",
+            "9c9b7bf2c3a255c240ba33145f0fe4fce34c8fd8a42fb04ecf5a3250b27b6472",
+            "官方 URL 已導向 404",
+            "claim_id: C13",
+            "claim_id: C14",
+            "claim_id: C15",
+            "claim_id: C16",
+            "claim_id: C17",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 16),
+            ("research_claim", 17), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "process:glass-substrate-thermomechanical-passport,process,玻璃基板熱機械六欄資格護照",
+            "metric:package-warpage-measurement-contract,metric,封裝翹曲量測契約",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "glass_substrate_commercialization.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
+        for node in (
+            "edge_id: KG-GLS-I15",
+            "to_id: process:glass-substrate-thermomechanical-passport",
+            "edge_id: KG-GLS-I16",
+            "to_id: metric:package-warpage-measurement-contract",
         ):
             self.assertIn(node, graph)
 
