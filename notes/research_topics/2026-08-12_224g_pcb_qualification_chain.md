@@ -39,6 +39,13 @@ to: triaged
 reason: separated_seven_qualification_gates_and_preserved_same_board_and_commercial_gaps
 evidence: sources:S1,S2,S3,S4,S5,S6,S7,S8,S9
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: db_reference_plane_fixture_removal_and_log_ratio_passport_added_without_thesis_or_clock_refresh
+evidence: sources:S1,S4,S13,S14,S15
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -59,7 +66,15 @@ evidence: sources:S1,S2,S3,S4,S5,S6,S7,S8,S9
 - **銅粗糙度**：銅面不是理想平面；高頻電流集中在表面時，較粗的路徑可能增加導體損耗。
 - **coupon（測試片）**：與正式電路板用相同或相近製程一起製作、專門量測阻抗、損耗或可靠度的結構；測試片合格仍要確認它是否代表正式板的關鍵路徑。
 - **插入損耗（insertion loss）**：訊號通過材料、走線、孔洞、連接器或線材後減少多少，常以 dB 表示；參考平面與去嵌入方式不同，數字不能直接相加比較。
-- **S 參數**：以頻率描述高速通道反射、傳輸與耦合的量測資料；它比一句「低損耗」更接近可重算的通道證據。
+- **S 參數（S-parameter／S-parameters）**：以頻率描述高速通道反射、傳輸與耦合的量測資料；它比一句「低損耗」更接近可重算的通道證據。
+- **分貝（dB）**：用對數表示兩個同類量的比值；波幅類用 `20 log10`、功率類用 `10 log10`，必須交代被比的量與參考值，32 dB 不是 32%。
+- **S21／SDD21**：S21 表示由 port 1 傳到 port 2 的傳輸係數；SDD21 則是差分輸入到差分輸出的 mixed-mode 傳輸係數，兩者不能只因都用 dB 就互換。
+- **參考平面（reference plane）**：量測結果被定義在哪兩個電氣位置之間；平面移到 connector、fixture 或 DUT 端，包含的路徑就會改變。
+- **治具（fixture）**：讓同軸儀器接上 PCB、connector 或元件的轉接結構；它自己也有 loss、phase shift 與 mismatch，可能比受測物更顯著。
+- **校正（calibration）**：在量測前用已知標準修正儀器、線纜與指定參考平面以前的系統誤差；校正到哪裡不等於受測物已去嵌入到哪裡。
+- **時間閘門（gating）**：在時域選出一段反射或不連續點並以數學方式移除／替換，再觀察頻域 S 參數如何改變；選窗本身也要保存。
+- **Port extension**：用理想傳輸線假設把量測平面數學移到另一位置；它假設平坦幅度、線性相位與固定阻抗，不能自動取代完整 fixture model。
+- **去嵌入（de-embedding）**：用量測或模型得到的 fixture S 參數，從「fixture＋DUT」總結果中數學移除 fixture；模型不準，去嵌入結果也會不準。
 - **ISI loss board**：刻意用不同長度與損耗模擬通道衰減的測試板；ISI 是前後符號彼此干擾，板名不會自動揭露材料與疊構。
 - **BGA**：晶片封裝底部以陣列焊球連接電路板的結構；訊號從封裝焊球展開到板內走線的區域叫 BGA breakout。
 - **AIC**：插在主機板插槽上的附加卡；一組 standard AIC stackup 是參考板型，不代表所有伺服器板都採相同疊構。
@@ -336,6 +351,38 @@ limitation: 工具與通道檔存在不表示其包含完整 laminate／stackup�
 independence_group: ieee-p8023dj-tools
 -->
 
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: living_index
+publisher: NIST
+title: NIST Guide to the SI, Chapter 8
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/pml/special-publication-811/nist-guide-si-chapter-8
+locator: §8.7 Logarithmic quantities and units；波幅類 level 為 20 lg(F／F0) dB、功率類為 10 lg(P／P0) dB，且報告時必須給定 quantity nature 與 reference level
+limitation: NIST 只定義對數量與單位，不定義 224G channel、S-parameter port／mode、fixture、reference plane、合規門檻或任何產品結果；本文把公式用於 insertion-loss 教材時仍需額外明示匹配與參考平面條件
+independence_group: nist
+-->
+
+<!-- research_source
+source_id: S15
+role: other_primary
+source_kind: living_index
+publisher: Keysight Technologies
+title: Removing Unwanted Effects from the Measurement
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://helpfiles.keysight.com/csg/N1930xB/ToolsAndUtilities/Removing_Unwanted_Effects_from_the_Measurement.html
+locator: Calibration to the reference plane、Gating、Port Rotation／Extension 與 De-embedding 段落；fixtures／probes 會加入 loss 與 discontinuity，port extension 假設理想傳輸線，de-embedding 以準確線性模型或實測 S 參數移除 fixture 的 loss／phase／mismatch
+limitation: 這是量測儀器供應商對其 PLTS 流程的技術文件，支持方法責任與限制，不是 IPC／IEEE／OIF 共同合規規範，也沒有 224G board、材料、測試不確定度、客戶 qualification 或財務結果
+independence_group: keysight-measurement-method
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -506,6 +553,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: NIST 對 dB 的定義把波幅類量寫成 20 lg(F／F0) dB、功率類量寫成 10 lg(P／P0) dB，並要求報告 logarithmic level 時交代 quantity nature 與 reference level
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 §8.7 直接列出 field quantity、power quantity、bel／decibel 公式與 reference level 報告規則
+boundary: 這只定義 dB 的數學與表達，不替任何 224G S-parameter 選擇 port、mixed mode、頻率、reference plane、fixture removal 或 pass threshold
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: Keysight 的量測文件把 calibration、gating、port extension 與 de-embedding 分成不同操作：fixture／probe 會加入 loss 與 discontinuity；port extension 假設 fixture 是理想傳輸線，de-embedding 則需用準確線性模型或實測 fixture S 參數移除其 loss、phase shift 與 mismatch
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S15 的 opening、Gating、Port Rotation／Extension 與 De-embedding 段落直接列出各方法用途、假設與資料需求
+boundary: 儀器方法文件不證明任一公開 224G demo 已採某方法或去嵌入正確，也不替 board、material、SerDes、BER、客戶 qualification 或財務背書
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 每筆 224G PCB dB 證據應保存 quantity／sign、S-parameter 與 mixed-mode direction、frequency sweep、reference impedance、measurement／device planes、fixture-removal method／model、segment identity／length normalization，以及 raw complex data／重複量測與不確定度；缺任一欄都不能把不同報告的 dB 直接相加、相減或排名
+supporting_source_ids: S1,S3,S4,S13,S14,S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S1 分開材料與成板 loss 方法，S3／S4 的 dB 位於不同 board 與目的，S13 保存 channel／tool data 入口，S14 要求 quantity／reference 明確，S15 顯示 reference plane 與 fixture-removal 操作會改變所報 DUT 範圍；合併形成本文的 dB 參考面護照
+boundary: 護照是研究中心的可比性框架，不是 IPC／IEEE／OIF 新增的共同表單；本輪沒有同一 board 的 raw／de-embedded pair、方法間偏差分布或供應商比較樣本
+verification_needed: 同一 224G board 公開 calibrated raw S-parameters、fixture model／measurement、gating／port-extension／de-embedding settings、reference planes、重複量測、不確定度、COM 與 BER，讓獨立 reviewer 可重建每一步
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 若把 OIF demo 公開的 56 GHz die-to-die insertion loss 32 dB 依標準傳輸係數記成 -32 dB，則 transmitted／incident wave amplitude ratio 為 10^(-32／20)=0.0251188643150958；只在 matched power-wave 條件下，其平方對應 power ratio 10^(-32／10)=0.000630957344480193，即 0.0630957344480193%，而不是 32%
+supporting_source_ids: S4,S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S4 提供 32 dB at 56 GHz 的具名 demo quantity；依 S14 的 20 lg amplitude／10 lg power 定義，以 Python Decimal 50 位精度與獨立 awk 路徑重算，兩路分別一致到顯示精度
+boundary: 這是 N=1 個既有 demo dB 值的條件式確定性單位展開，沒有 sampling SE／t；它不是 PCB efficiency、熱耗散比例、寬頻資料能量、BER、材料貢獻、另一配置比較或公司財務證據，且公開來源沒有足夠欄位重建完整 fixture／reference-plane 處理
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先用七關看懂：一個「低損耗」標籤還缺什麼
 
 | 本文七關 | 這一關真正要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
@@ -563,6 +678,73 @@ IEEE 的 M7N 板、OIF 的 ISI 板與 IPC 的台燿 QPL 料號當成同一塊板
 
 IEEE contribution 的兩條走線 loss 是一組特定設計比較，OIF 的 32 dB 是另一組 die-to-die demo。
 它們的參考平面、材料與目的不同，不能拿來相減後宣稱某一材料節省了多少 dB。
+
+## 32 dB 不是 32%：先建立 dB 與參考面護照
+
+同樣寫「插入損耗 32 dB」，可能是在 connector 外側量完整 link，也可能已把 probe、launch、
+fixture 或 package 移除；可能指單端 S21，也可能指差分 SDD21；可能是 56 GHz 的單一點，
+也可能是整段頻率 sweep 或每 inch 的線性擬合。數字相同，不代表量到同一段路。
+
+### 八欄 dB 護照
+
+| dB 護照欄位 | 每筆結果至少要寫什麼 | 缺少時會誤讀成什麼 |
+|---|---|---|
+| 1. Quantity 與正負號 | 正值 insertion loss 32 dB，或傳輸係數 `SDD21 = -32 dB`；不能混寫成單純 `32 dB` | 把 loss 和 gain／傳輸係數方向顛倒，甚至誤讀為 32% |
+| 2. Port、mode 與方向 | S21、SDD21、SCD21 等；port 1／2 對應哪個物理端，single-ended／differential 如何轉換 | 把差分傳輸、mode conversion、return loss 與串擾當成同一數字 |
+| 3. Frequency contract | 單點 56 GHz、完整 sweep 起訖、frequency grid、IF bandwidth 與平滑／擬合 | 用低頻或單點結果替整個 224G 頻帶背書 |
+| 4. Reference impedance | 每個 port 的阻抗、renormalization 與 mixed-mode convention | 同一 raw network 在不同正規化下被誤當成材料或製程差異 |
+| 5. Measurement／device planes | 儀器校正在哪裡、想報告的 DUT 兩端在哪裡、package／connector／launch 是否包含 | 把 probe-to-probe、die-to-die、package-to-package 與 trace-only 混在一起 |
+| 6. Fixture-removal chain | calibration、gating window、port extension assumptions、fixture model／S-parameter file、de-embedding software／version | 把數學移除的路徑當成從未存在，或把模型誤差歸給 DUT |
+| 7. Segment 與長度 | board ID、route、coupon、via／connector、實際長度；是 total dB、dB/in 還是兩長度差分 | 把完整通道 loss 和單位長度 trace loss直接相加、相減或排名 |
+| 8. Raw data 與量測品質 | complex S-parameters、原始與處理後 pair、repeat count、校正狀態、不確定度與異常處理 | 只剩一張曲線截圖，無法重跑、檢查去嵌入或估計量測變異 |
+
+NIST 要求 dB 報告先說明 quantity nature 與 reference level；對高速板路，這個要求還要延伸到
+port、mode、frequency 與物理 reference plane。研究中心不以 `dB` 這個共同單位替不同量測
+自動建立可比性。[S14]
+
+### 校正、時間閘門、port extension 與去嵌入不是同一個按鈕
+
+| 操作 | 它做什麼 | 它需要／假設什麼 | 不能替代什麼 |
+|---|---|---|---|
+| Calibration | 修正儀器、線纜與已知 standards，把可量測平面固定下來 | 可追溯的 calibration standards、頻率與 port 設定 | 不能自動移除 calibration plane 後方的 PCB launch／fixture |
+| Gating | 在時域選一段不連續點並數學移除或替換，再看頻域 S 參數改變 | 明示 time window、電氣延遲、替換方式及 before／after data | 不能把複雜 fixture 無條件變成理想線，也不能隱藏被裁掉的物理問題 |
+| Port extension | 把 measurement plane 延伸到 DUT 端 | fixture 近似 flat magnitude、linear phase、constant impedance 的理想傳輸線 | 不能處理所有 mismatch、frequency-dependent loss 與 mode conversion |
+| De-embedding | 用模型或實測 fixture S 參數，從 fixture＋DUT 總結果移除 fixture 的 loss、phase 與 mismatch | 準確 fixture model／measurement、正確方向、port／mode 與穩定數學處理 | 不能讓錯誤模型變正確，也不能替代 raw data、repeatability 與 uncertainty |
+
+Keysight 把這四種操作明確分開，並提醒 probe／fixture 本身會加入 loss 與 discontinuity。
+因此一張 `de-embedded` 曲線必須附上「移除了什麼、用哪一份模型、平面從哪裡移到哪裡」；
+只保存處理後圖片，不能讓另一位 reviewer 判斷改善來自 DUT 還是 fixture model。[S15]
+
+### 把 OIF 的 32 dB 展開一次，但不把它改寫成效率
+
+OIF 的 2024 VSR demo 公開一個 `32 dB die-to-die insertion loss at 56 GHz` 配置。[S4]
+若只為教學，把正值 loss 改寫成傳輸係數 `-32 dB`，依 NIST 的對數定義可得：
+
+- transmitted／incident wave amplitude ratio：`10^(-32/20) = 0.0251188643150958`。
+- 只有在 matched power-wave 條件下，power ratio 才可寫成其平方：`10^(-32/10) = 0.000630957344480193 = 0.0630957344480193%`。
+
+這不表示「有 99.9369% 的資料消失」或全部變成 PCB 熱。S 參數是在特定頻率、port、阻抗與
+reference plane 下的線性傳輸比；反射、mode conversion、等化、寬頻波形、FEC 與接收判定
+仍在別的帳。32 dB 也不是 32%，因為 dB 是對數比值。
+
+樣本與誤差邊界：這是 **N=1 個既有 demo dB 值**的確定性條件換算，沒有 sampling SE／t。
+Python Decimal 50 位精度重算的 wave ratio 為
+`0.025118864315095801110850320677993273941585181007825`、matched power ratio 為
+`0.00063095734448019324943436013662234386467294525718823`；獨立 awk 路徑分別為
+`0.025118864315096` 與 `0.000630957344480`。兩路一致只證明代數，沒有補齊 OIF 未公開的
+fixture model、完整 frequency data、BER 分母或材料病歷。
+
+### 多空小作文必須先固定同一個 plane
+
+| 敘事 | 合理假說 | 必須再看到的共同證據 | 什麼會讓敘事失效 |
+|---|---|---|---|
+| 偏多：高頻量測與低損耗內容增加 | 224G loss budget 變緊，可能增加高階 CCL／銅箔／玻纖、coupon、VNA／BERT 與去嵌入驗證的技術與工時需求 | 同一 board／route 的 raw＋de-embedded data、fixture chain、材料 A／B、COM／BER、量產 lot、工具／材料用量、價格與財務分母 | 只有 dB headline 或儀器處理後曲線，沒有新增材料內容、測試工時、qualification、出貨或毛利 |
+| 偏空：看似改善只是邊界或架構轉移 | 平面、fixture、長度正規化、SerDes 等化、較短 electrical reach 或光學化，可能吸收板材升級需求 | 同一 DUT 在固定 planes、同一 Tx／Rx 與同一 fixture model 下的 before／after，以及實際 BOM／reach 變化 | 拿不同 board、不同 planes 或 total dB 對 dB/in 比較，卻把差額全歸因材料 |
+| 共同底線 | dB 可比性與公司獲利是兩個問題 | 量測護照、客戶 pass、具名料號、量產板分母、出貨期間與公司財務雙向核對 | 用單一 32 dB、QPL 或 roadmap 直接替代 224G design win、份額與收入 |
+
+本輪只有 OIF demo、NIST 單位定義與 Keysight 方法文件三條定向消息鏈（N=3），不是 board、
+材料 lot、產品、客戶、供應商或台灣 121 檔樣本；沒有同板 A／B effect size，也沒有可估的
+sampling SE／t。因此這張護照只改善閱讀與查證，不形成公司排名或投資動作。
 
 ## 為什麼 Df 不能直接換算 BER
 
@@ -663,6 +845,8 @@ IPC QPL 對台燿列出 TU-1300N 與 TU-1300E，兩個料號都對應 IPC-4103/1
 - [Panasonic MEGTRON 9 224 Gbps event page](https://na.industrial.panasonic.com/whats-new/panasonic-industry-electronic-materials-enabling-224-gbps-revolution-megtron-9)（公司 roadmap／future design 主張）。
 - [IPC-4103 QPL](https://www.ipc.org/ipc-validation-services-qualified-products-list-qpl-ipc-4103)（台燿 TU-1300N／E 的具名基材資格）。
 - [台燿產品目錄](https://www.tuc.com.tw/products2)（未來追料號更新的 living index）。
+- [NIST Guide to the SI, Chapter 8](https://www.nist.gov/pml/special-publication-811/nist-guide-si-chapter-8)（dB 的 amplitude／power 對數定義與 reference level 規則）。
+- [Keysight：Removing Unwanted Effects from the Measurement](https://helpfiles.keysight.com/csg/N1930xB/ToolsAndUtilities/Removing_Unwanted_Effects_from_the_Measurement.html)（calibration、gating、port extension 與 de-embedding 的責任、假設及 fixture 邊界）。
 
 本文沒有把 IEEE、OIF 或供應商的 dB、Dk／Df、link establishment 與 BER 數字做跨配置比較；
 測法、參考平面、board identity、收發器與分母不同。Plugfest 約 90% 的來源沒有公布 N，故不估計
@@ -729,6 +913,7 @@ invalidation: 只有 roadmap、一般高速／400G 產品、QPL、sample 或產�
 
 - IEEE P802.3dj 完成 D3.2 後的正式程序結果，以及 OIF CEI-224G MR／LR 是否發布正式 IA 與測試附件。
 - 一塊具名 reference board 同時公開 material manifest、stackup、raw S 參數、COM 與 BER／FEC 分母。
+- 同一 board 同時保存 calibrated raw、gated／port-extended／de-embedded S 參數、fixture model、reference planes、重複量測與不確定度，讓第三方能重建 dB 處理鏈。
 - 至少兩個獨立 SerDes／connector／board 組合用同一 test contract 重現，而不是只建立一次連線。
 - 台燿或其他 universe 公司由客戶端與公司端同時對上具名 224G 料號、量產板、出貨與財務分母。
 - 若標準長期修改、ILT／互通失敗未收斂，或收發器／光學路徑縮短板級 reach，使高階材料只限少數拓撲，C4 的適用範圍必須下修。

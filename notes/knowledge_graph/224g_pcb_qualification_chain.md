@@ -8,7 +8,7 @@ schema_version: 1
 graph_id: 224g-pcb-qualification-chain
 root_node_id: concept:224g-pcb-qualification-chain
 label: 224G PCB 材料到 BER 七關資格鏈
-summary: 從 Dk Df 測法 玻纖 銅粗糙度 stackup coupon via connector loss budget COM 追到 BER FEC 跨廠量產與公司歸因 避免把 datasheet QPL 或單次 demo 當成整板資格與收入。
+summary: 從 Dk Df 測法 玻纖 銅粗糙度 stackup coupon via connector loss budget與dB參考面護照 COM 追到 BER FEC 跨廠量產與公司歸因 避免把 datasheet QPL 單次demo或不同fixture處理後曲線當成整板資格與收入。
 article_ids: MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN
 status: active
 -->
@@ -411,4 +411,44 @@ review_due: 2026-09-15
 status: active
 boundary: 只建立 PCB CCL 族群的材料 板路與 qualification 搜尋路由 不建立受惠 份額 價格 訂單或財務方向。
 next_trigger: 平台 客戶與 PCB CCL 公司對上具名產品 同板 BER 量產與財務分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-224GPCB-I19
+view: industry
+from_id: concept:224g-pcb-qualification-chain
+to_id: process:pcb-db-reference-plane-passport
+relation: requires
+claim_refs: MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN#C13,MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN#C14
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-15
+status: active
+boundary: dB 參考面護照是研究中心依單位定義 量測方法與不同公開配置建立的可比性框架 不是 IPC IEEE OIF 新增共同表單或 qualification。
+next_trigger: 同一224G board公開quantity sign port mode frequency impedance planes fixture chain segment raw processed pair repeatability uncertainty COM與BER。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-224GPCB-I20
+view: industry
+from_id: concept:224g-pcb-qualification-chain
+to_id: metric:fixture-deembedded-differential-insertion-loss
+relation: measured_by
+claim_refs: MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN#C12,MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN#C13
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-15
+status: active
+boundary: 去嵌入結果依fixture model與reference plane而變 且不能由單一曲線反推材料貢獻 BER 客戶資格或公司財務。
+next_trigger: 固定DUT與planes公開calibrated raw fixture S-parameters deembedding version processed SDD21及獨立重複量測。
 -->

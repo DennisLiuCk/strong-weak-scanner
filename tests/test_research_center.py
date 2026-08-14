@@ -5710,6 +5710,20 @@ class ResearchCenterTest(unittest.TestCase):
             "| IEEE 2022 PCB contribution |", "| OIF OFC 2024 VSR demo |",
             "| IPC-4103 QPL |",
             "## loss budget 不是把幾個 dB 隨手相加",
+            "db_reference_plane_fixture_removal_and_log_ratio_passport_added_without_thesis_or_clock_refresh",
+            "## 32 dB 不是 32%：先建立 dB 與參考面護照",
+            "### 八欄 dB 護照",
+            "| 1. Quantity 與正負號 |", "| 2. Port、mode 與方向 |",
+            "| 5. Measurement／device planes |", "| 6. Fixture-removal chain |",
+            "| 8. Raw data 與量測品質 |",
+            "### 校正、時間閘門、port extension 與去嵌入不是同一個按鈕",
+            "| Calibration |", "| Gating |", "| Port extension |", "| De-embedding |",
+            "### 把 OIF 的 32 dB 展開一次，但不把它改寫成效率",
+            "0.0251188643150958", "0.0630957344480193%",
+            "N=1 個既有 demo dB 值",
+            "### 多空小作文必須先固定同一個 plane",
+            "| 偏多：高頻量測與低損耗內容增加 |",
+            "| 偏空：看似改善只是邊界或架構轉移 |",
             "## 為什麼 Df 不能直接換算 BER",
             "## 標準、展示與量產各有自己的時鐘",
             "## 台燿的 QPL 應該怎麼讀",
@@ -5719,8 +5733,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 10), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 14), ("metric_comparison", 0),
             ("impact", 1), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5749,6 +5763,8 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:pre-post-fec-ber,metric,FEC 前後 BER",
             "stage:multi-vendor-board-qualification,stage,跨廠同板資格重現",
             "stage:224g-pcb-commercial-attribution,stage,224G PCB 商業與財務歸因",
+            "process:pcb-db-reference-plane-passport,process,PCB dB 與參考面八欄護照",
+            "metric:fixture-deembedded-differential-insertion-loss,metric,去嵌入差分插入損耗",
         ):
             self.assertIn(concept, concepts)
         entities = (ROOT / "config" / "external_entities.csv").read_text(
@@ -5768,9 +5784,13 @@ class ResearchCenterTest(unittest.TestCase):
             / "224g_pcb_qualification_chain.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 224G PCB 材料到 BER 七關資格鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
         self.assertIn("from_id: company:6274", graph)
         self.assertIn("to_id: standard:ipc-4103", graph)
+        self.assertIn("edge_id: KG-224GPCB-I19", graph)
+        self.assertIn("to_id: process:pcb-db-reference-plane-passport", graph)
+        self.assertIn("edge_id: KG-224GPCB-I20", graph)
+        self.assertIn("to_id: metric:fixture-deembedded-differential-insertion-loss", graph)
 
         radar = (
             ROOT / "notes" / "research_candidates"
