@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: ai-storage-data-plane
 root_node_id: concept:ai-storage-data-plane
 label: AI 資料讀取與儲存路徑
-summary: 以最慢讀取時間 checkpoint 完成與復原 以及模型副本位置分開三種人工智慧資料工作 再用八格復原護照把 I/O 模擬 暫存上傳 耐久回載 訓練有效時間與公司能力保持在不同證據層。
+summary: 以最慢讀取時間 checkpoint 完成與復原 以及模型副本位置分開三種人工智慧資料工作 再用十欄效能護照與八格復原護照把 IOPS 吞吐 延遲 併行 裝置狀態 I/O 模擬 暫存上傳 耐久回載 訓練有效時間與公司能力保持在不同證據層。
 article_ids: MI-2026-08-09-AI-STORAGE-DATA-PLANE
 status: active
 -->
@@ -352,4 +352,44 @@ review_due: 2026-08-31
 status: active
 boundary: Google 定義 Runtime Goodput 並公開單一多層 checkpoint 組態結果；沒有 run 數 分布 變異 原始樣本或跨平台複現 因此不能形成一般效果量。
 next_trigger: 具名 operator 以固定模型與 cluster 公開 event level lost steps resume time Runtime Goodput 重複 run 不確定度及完整資源成本。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I14
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: process:ai-storage-performance-passport
+relation: requires
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C15,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C16,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C17
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 十欄效能護照是研究中心整合 SNIA device method Meta pMax mechanism 與 MLCommons reproducibility fields 的可比性框架 不是三方共同標準 benchmark pass 或客戶 qualification。
+next_trigger: 同一 production AI workload 公開 device與end-to-end pair 完整十欄 重複run 失敗操作 分布 goodput 資源成本及具名設備。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I15
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: metric:workload-conditioned-tail-latency
+relation: measured_by
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C14,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C15,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C17
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 工作負載條件化尾端延遲必須固定block mix client thread QD OIO state cache scope completion與事件數；單一average maximum或peak IOPS不能外推AI停算 公司採用或財務。
+next_trigger: 同一cluster同步保存per IO distribution pMax timeout retry accelerator stall device version與多run不確定度。
 -->

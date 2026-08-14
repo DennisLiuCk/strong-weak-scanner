@@ -74,6 +74,13 @@ to: triaged
 reason: expanded_checkpoint_completion_recovery_and_training_goodput_measurement_contract
 evidence: sources:S9,S10,S11,S12,S13
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_workload_concurrency_tail_latency_and_unit_performance_passport_without_thesis_or_clock_refresh
+evidence: sources:S1,S9,S14,S15,S16,S17,S18,S19
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -96,8 +103,21 @@ evidence: sources:S9,S10,S11,S12,S13
 - **機器學習（ML）**：讓系統從資料中建立模型的方法總稱；本文的 ML Goodput 專指訓練有效時間，不是模型品質分數。
 - **隨機存取記憶體（RAM）**：節點工作期間可快速讀寫、但通常不具斷電持久性的記憶體；可當 checkpoint 快速層，仍需要其他層承擔預定故障範圍。
 - **同步訓練**：多顆運算晶片完成同一步後才一起進到下一步；其中一顆落後，其他晶片也可能停下來等。
-- **最慢讀取時間（pMax／尾端延遲）**：一批讀取中最慢端所花的時間；平均速度良好，不代表最慢一次不會拖住整體工作。
-- **讀取／寫入速度**：資料在指定時間內能讀出或寫入多少；峰值速度只描述一項能力，不能替最慢延遲、故障復原與持久性背書。
+- **最慢讀取時間（pMax／尾端延遲／latency）**：一批讀取中最慢端所花的時間；平均速度良好，不代表最慢一次不會拖住整體工作。
+- **讀取／寫入速度（Throughput）**：資料在指定時間內能讀出或寫入多少；峰值速度只描述一項能力，不能替最慢延遲、故障復原與持久性背書。
+- **SNIA／SSS PTS v2.0.2**：SNIA 是制定儲存技術方法的產業組織；SSS PTS v2.0.2 是本文用來辨識 device-level 測試範圍的現行標準入口，方法頁不等於任一產品已通過認證。
+- **IOPS**：每秒完成多少次 I/O 操作；如果沒有同時寫出每次傳多少資料、讀寫比例與併行設定，就不知道每秒搬了多少 bytes，也不能和另一個 IOPS 數字直接排名。
+- **Block size／small-I/O（傳輸大小／小筆 I/O）**：每一次 I/O 指令要求搬運的資料量；small-I/O 常讓操作次數成為重點，大 block 常讓資料吞吐成為重點。
+- **KiB／GiB**：二進位資料單位，`1 KiB = 1024 bytes`、`1 GiB = 1024^3 bytes`；不能和十進位 `KB／GB` 靜默互換。
+- **Queue depth（QD／QD1）**：一個工作執行緒允許同時尚未完成的 I/O 數；QD1 表示每個 thread 只允許一筆 outstanding I/O，QD 增加可能提高併行與 IOPS，也可能讓等待時間分布改變。
+- **Outstanding I/O（OIO）**：主機已送出、仍在等待完成的 I/O；它描述目前有多少工作壓在資料路徑上，不是已完成的操作數。
+- **Thread count（TC）**：同時發出 I/O 的工作執行緒／程序數；`TC × QD` 才接近測試施加的 total outstanding I/O。
+- **Read／write mix**：測試中讀取與寫入的比例；快閃記憶體的背景整理與寫入歷史會讓不同 mix 的結果不可互換。
+- **Random／sequential**：I/O 位址是隨機跳動或連續前進；同一顆裝置在兩種型態下可能呈現完全不同的 IOPS、吞吐與延遲。
+- **Pre-conditioning（預處理）**：正式量測前先用指定寫入與工作負載把裝置帶到可比較狀態，避免只量到剛清空或剛開箱的短暫高點。
+- **Steady state（穩態）**：在指定工作負載下，裝置效能已進入相對穩定的量測區間；它只對該工作負載與方法成立，不代表永遠不變。
+- **Response-time distribution（回應時間分布）**：保留每次 I/O 完成時間的分布、百分位與最大值；平均延遲相同的兩組結果，最慢端仍可能差很多。
+- **量測範圍（measurement scope）**：數字量的是單顆裝置、檔案系統、物件儲存、網路路徑，還是從訓練程式到資料完成使用的端到端時間；範圍不同不能直接相減。
 - **本地儲存**：放在單一伺服器或附近機櫃內的 SSD；距離近、讀取快，但容量、共享與故障保護有不同限制。
 - **共享儲存**：讓多台機器共同存取的儲存系統；方便分享資料，卻也可能受網路與共同佇列影響。
 - **物件儲存**：以物件方式保存大量資料與模型檔案的遠端儲存；適合持久保存，不代表每一步訓練都直接從這裡讀取。
@@ -382,6 +402,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: SNIA 的現行標準入口列出 SSS PTS v2.0.2，而同站方法頁把 IOPS、Throughput 與 Latency 分成不同測試：IOPS 依 random block size 與 read／write mix 展開，Throughput 量 large-block sequential read／write，Latency 在 steady-state 與 total outstanding I/O=1 下保留 average 與 maximum；術語頁另把 queue depth 定義為每 thread 的 outstanding I/O，thread count 與 QD 必須分開保存
+supporting_source_ids: S14,S15,S16,S17,S18,S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 直接列出現行 v2.0.2 與發布日；S15、S16、S18 的 Summary／Test Setup／Benefits 分別列 IOPS、LAT、TP 的 workload shape 與 steady-state 方法；S17 定義 QD／TC／OIO；S19 定義 KiB、random／sequential 與 steady state
+boundary: S15–S19 是 SNIA 的 HTML 方法導讀，頁面沒有版本與發布日，可能保留較早 PTS 的版面或術語，不能替代 v2.0.2 完整 normative PDF；它們是 device-level 測試方法，不驗證 AI 叢集、資料正確性、耐久性、production qualification 或公司採用
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: AI 儲存效能數字只有在同時保存工作與量測範圍、系統與版本、I/O shape、單位、client／thread／queue 併行、裝置狀態與 cache、完成語意、延遲分布與事件數、量測視窗與重複執行，以及訓練使用者結果／資源／財務分母的十欄護照後，才適合做 baseline／treatment 比較
+supporting_source_ids: S1,S9,S14,S15,S16,S17,S18,S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S15–S19 顯示 block size、R／W mix、random／sequential、pre-conditioning、steady state、QD／TC、average／maximum latency 與單位都會改變 device result；S1 顯示同步訓練關心 pMax 與 stall；S9 要求 workload、backend、system description、run configuration 與重跑，合併形成本文十欄可比性框架
+boundary: 十欄護照是研究中心整合不同官方文件的檢查方法，不是 SNIA、Meta 或 MLCommons 共同標準；欄位齊全也不保證隔離單顆 SSD 因果、通過 durability／correctness／qualification，或形成任何台灣公司收入
+verification_needed: 同一 production AI workload 公開端到端與 device-level pair、完整十欄、重複 run、失敗操作、延遲分布、goodput／restore 結果、資源成本與具名設備配置
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 在每次成功操作都精確傳輸指定 payload 的純算術條件下，1,000,000 IOPS × 4 KiB／op 等於 3.814697265625 GiB／s（4.096 GB／s），而 100,000 IOPS × 128 KiB／op 等於 12.20703125 GiB／s（13.1072 GB／s）；後者 IOPS 只有十分之一，payload rate 卻是前者 3.2 倍
+supporting_source_ids: S15,S18,S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S15 要求 IOPS 按 block size 展開，S18 把 throughput 與 large-block sequential workload 分開，S19 定義 KiB=1024 bytes；以 Python Fraction 與獨立 awk 路徑重算，兩路對 3.814697265625、12.20703125 與 3.2 倍完全一致
+boundary: 這是 N=2 個假想 workload 的確定性單位展開，沒有裝置、run 或抽樣，也沒有 sampling SE／t；只有在每個計數操作都成功且 payload size 固定時才成立，未包含協定 overhead、壓縮、cache、failed／retried I/O、latency、durability、application goodput 或功耗
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 高 queue depth／thread count 下的高 IOPS、QD=1 的 baseline latency 與 production AI 同步步驟的尾端延遲回答不同問題；要判斷餵資料是否少停算，必須在實際 client／thread／QD／OIO 下保存完整 response-time distribution、最慢端與 accelerator stall，而不能用 average latency 或單一 peak IOPS 代替
+supporting_source_ids: S1,S15,S16,S17
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S17 把 QD、TC 與 outstanding I/O 分開；S16 明示 QD=1 latency 是無 queue benefit 的 baseline，且更多 outstanding I/O 時 maximum latency 可能不同；S15 顯示 IOPS 依工作負載與穩態而變；S1 則把 storage-fetch pMax 直接接到同步 GPU stall
+boundary: 這是 device method 與單一 operator mechanism 的整合推論，不提供跨 SSD 的 tail-latency effect size，也不證明任何 production bottleneck 位於 SSD、控制器、網路或檔案系統，更不建立供應商採用與財務方向
+verification_needed: 同一 AI cluster 固定 dataset、cache、network、client／thread／QD 與 device state，同時公開 per-I/O distribution、accelerator stall、failed／retried operations、run-level replication 與設備版本
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先把三種「存資料」工作分開
 
 | 本文三種工作 | 何時發生 | 最怕什麼 | 先看哪個結果 | 不能直接推成 |
@@ -393,6 +481,87 @@ resolution:
 三種工作要分開量：餵資料是「能不能持續供應」，保存進度是「壞掉後能不能接著跑」，搬模型
 是「新機器多久能開始服務」。這是本文整理三份平台資料的閱讀框架，不表示三家公司採用同一
 套架構，也不是跨平台速度排名。
+
+## 1M IOPS 不等於固定 GB/s：先建立效能護照
+
+看到 `1M IOPS`、`10 GB/s` 或 `平均延遲 100 µs`，第一個問題不是哪個數字比較大，而是「哪一種
+工作、每次搬多少、同時壓了多少工作、量到哪一層」。SNIA 把 IOPS、Throughput 與 Latency 分成
+不同 device-level 測試，正是因為三個 headline 不能互相代替。[S14][S15][S16][S18]
+
+| Headline 指標 | 分子／分母 | 最少要綁定的條件 | 它不能單獨證明 |
+|---|---|---|---|
+| IOPS | 每秒完成的 I/O 操作數 | block size、read／write mix、random／sequential、client、thread、QD／OIO、device state、cache 與成功／失敗計數 | 每秒搬了多少 bytes、最慢一次等多久、資料是否耐久，或訓練晶片是否少停算 |
+| Throughput | 每秒完成的 payload bytes | bytes 單位、block／object size、read／write、路徑範圍、併行、壓縮、cache、量測視窗與 steady state | 操作次數、small-I/O 能力、尾端延遲、restore 正確性或 production goodput |
+| Latency／tail | 一次 I/O 從送出到完成的時間與分布 | 起訖點、client／thread／QD／OIO、block size、mix、percentile、事件數、timeout／retry、暖機與裝置狀態 | 整體吞吐、耐久完成、故障域，或某一元件就是端到端瓶頸 |
+
+### 同一個 IOPS 數字換 block size，排名就可能反轉
+
+先做一個只教單位、不模擬真實 SSD 的例子。假設每個被計數的 I/O 都成功，而且每次 payload
+大小完全固定，則 `payload rate = IOPS × payload per operation`：
+
+| 假想 workload | 操作速率 | 每次 payload | 條件式 payload rate | 不能外推 |
+|---|---:|---:|---:|---|
+| A：small-block | 1,000,000 IOPS | 4 KiB | 3.814697265625 GiB/s＝4.096 GB/s | 不代表 tail latency、QD=1 效能或應用 goodput |
+| B：large-block | 100,000 IOPS | 128 KiB | 12.20703125 GiB/s＝13.1072 GB/s | 不代表 random small-I/O 能力、持久性或較低成本 |
+
+B 的 IOPS 只有 A 的十分之一，payload rate 卻是 A 的 3.2 倍。這不是哪一個 workload「更好」，
+而是證明少了 block size 與單位，IOPS 排名沒有共同比較基準。SNIA 的 IOPS 頁面因此把多個 block size
+與 read／write mix 分開，而 Throughput 頁面另量 large-block sequential workload；KiB 也明定為
+1024 bytes，不和 KB 靜默互換。[S15][S18][S19]
+
+算術與誤差邊界：這是 **N=2 個假想 workload** 的確定性單位展開，不是裝置或 run 樣本，沒有
+sampling SE／t。Python Fraction 與獨立 awk 兩條路徑都得到 A=`3.814697265625 GiB/s`、
+B=`12.20703125 GiB/s`、B／A=`3.2`。一致只證明乘法與單位換算；protocol overhead、failed／retried
+I/O、compression、cache、latency、durability、power 與 application outcome 全都還沒進來。
+
+### Queue depth 能推高併行，也會換掉延遲問題
+
+SNIA 術語頁把 QD 定義成每個 thread 允許的 outstanding I/O，TC 則是 thread／process 數。[S17]
+因此 `TC=32、QD=32` 與 `TC=1、QD=1` 名目上分別允許最多 1024 與 1 個 total outstanding I/O；
+實際同時未完成數仍要另存，即使最後都報 IOPS，兩者也不是同一種等待條件。
+
+| 量測視角 | 它回答什麼 | 必須保存 | 不能拿來代替 |
+|---|---|---|---|
+| TC1／QD1 baseline latency | 沒有 queue benefit 時，一個指令往返多快 | block size、mix、average、maximum、事件數與 device state | 高併行吞吐、production tail 或整群 accelerator stall |
+| QD／TC sweep | demand 增加時，IOPS、平均／最大回應時間與分布如何一起變 | 每個 TC×QD operating point、total OIO、CPU、histogram 與 steady-state window | 真實 workload 的 client 數、cache、網路與端到端 SLO |
+| AI end-to-end tail | 最慢 dataset fetch 是否拖住同步訓練步驟 | per-I/O distribution、pMax／percentile、stall、timeout／retry 與 accelerator 分母 | SSD 單獨因果、checkpoint durability 或公司 qualification |
+
+SNIA 的 Latency 導讀把 TC1／QD1 當作無 queue benefit 的 baseline，並提醒 outstanding I/O 更多時
+maximum latency 可能不同。[S16] Meta 的 production 說法又把最慢 storage fetch 接到同步 GPU
+step 的停等。[S1] 合起來的讀法是：peak IOPS、QD1 latency 與 production pMax 都要保留，不能互填。
+
+### 十欄 AI 儲存效能護照
+
+| 護照欄位 | 最少要寫什麼 | 少了最容易誤讀成 |
+|---|---|---|
+| 1. 工作與量測範圍 | dataset fetch／checkpoint／model distribution；device、filesystem、object store 或 end-to-end 起訖點 | 把單顆 SSD 數字直接當成訓練 goodput |
+| 2. 系統、版本與路徑 | device／firmware、host、CPU／RAM、NIC／switch、filesystem／client、framework、driver、拓撲與版本 | 同時換了軟硬體，差異卻全算給儲存 |
+| 3. I/O shape | block／object size、read／write mix、random／sequential、sharding、compression 與資料分布 | 不同工作負載的 IOPS／GB/s 被直接排名 |
+| 4. 單位與計數 | bytes／KB／KiB／GB／GiB、成功／失敗／retry、payload 或 wire bytes、ops 定義 | 十進位與二進位、重試與有效資料被重複計算 |
+| 5. 併行與 demand | clients、hosts、threads、QD／OIO、batch、accelerator 數及每層 queue | 用高 QD peak 替代低延遲或真實 client 行為 |
+| 6. 裝置狀態與 cache | purge／pre-conditioning、fresh／warm／steady、active range、cache 容量／命中與 write-cache policy | 把剛清空的短暫高點寫成長期效能 |
+| 7. 完成與正確性 | command completion、staging、upload、durable、restore；checksum、partial、timeout 與 retry | 寫入回報完成被改寫成可復原與正確使用 |
+| 8. 延遲分布與事件數 | average、p50／p90／p99／p99.9／pMax／maximum、每格 I/O 數、censoring 與 outlier policy | 平均掩蓋同步訓練真正會遇到的慢端 |
+| 9. 視窗、重複與不確定度 | warm-up、measurement window、steady-state criterion、run 數、run-level 分布、SE／t 或不能計算原因 | 單次峰值、短窗或挑選結果被寫成穩定能力 |
+| 10. 使用者結果與分母 | stall、lost steps、restore／startup、Runtime Goodput、容量／功耗／成本、部署量與公司財務 | device benchmark 被直接換算成硬體需求、訂單或毛利 |
+
+這張護照是研究中心把 SNIA device method、Meta pMax mechanism 與 MLCommons 的 workload／system
+description／重跑要求合併成的可比性框架，不是三方共同發布的標準。[S1][S9][S14][S15][S16]
+[S17][S18][S19] 它的用途是讓同一問題可重建；填滿十欄仍不代表 durability、correctness、customer
+qualification 或公司財務已成立。
+
+### 多空小作文要共享同一份 workload
+
+| 敘事 | 合理假說 | 必須再看到的共同證據 | 什麼會讓敘事失效 |
+|---|---|---|---|
+| 偏多：AI 讓高階儲存內容與驗證增加 | 更高 concurrency、small-I/O、large checkpoint 與更嚴 tail SLO，可能增加 enterprise SSD、controller、NIC、storage node、韌體與驗證工時 | 同一 production workload 的十欄護照、baseline／treatment、path share、BOM、qualification、部署量、價格、收入與毛利分母 | 只有 peak IOPS／GB/s、產品頁或廣義 AI 占比，沒有 production bottleneck、採用與財務共同鍵 |
+| 偏空：軟體與資料位置吸收硬體增量 | cache、prefetch、peer transfer、compression、較少 checkpoint bytes 或 scale-out 可能讓每單位 compute 的外部 I/O／SSD 容量下降 | 相同 workload 的 cache hit、外部 bytes、device utilization、stall、goodput、設備數與前後期成本 | 只看單一路徑流量下降，卻漏掉副本、RAM、網路、耐久層或整體 compute 增長 |
+| 共同底線 | 快不等於有用，更不等於公司賺到 | 固定 workload／scope／units／QD／state／completion／distribution，再做買方與供應商雙向核對 | 拿不同 block、不同 QD、不同測量層的數字相減，直接生成 TAM、份額或投資結論 |
+
+本輪新增的是 N=6 個 SNIA 官方 HTML 頁面（1 個標準入口、5 個方法／術語頁）的一條
+storage-method 消息鏈，並與既有 Meta、MLCommons 兩條獨立鏈交叉；它們不是六顆 SSD、六個 AI 叢集
+或六家公司樣本。除 N=2 假想 workload 的確定性
+單位換算外，沒有新的 effect size、sampling SE／t、價格、估值、共識或投資判斷。
 
 ## 「存檔完成」其實有六層，不是按下 save 就結束
 
@@ -691,6 +860,102 @@ status: active
 url: https://cloud.google.com/blog/products/ai-machine-learning/goodput-metric-as-measure-of-ml-productivity
 locator: ML Productivity Goodput、Scheduling／Runtime／Program Goodput 定義，以及 Understanding Runtime Goodput 的 useful training steps、time since last checkpoint、reschedule 與 resume time
 limitation: Google 自定義的量測與分析模型，不是跨平台標準或本篇多層 checkpoint 結果的原始資料；不能單憑指標定義歸因 storage、估計硬體需求或證明任何供應商採用與財務貢獻
+-->
+
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: document
+publisher: Storage Networking Industry Association
+independence_group: snia-storage-method
+title: Solid State Storage (SSS) Performance Test Specification (PTS)
+published_at: 2020-10-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.snia.org/solid-state-sss
+locator: 標準入口的 v2.0.2、SNIA Standard、Published October 1 2020，以及 device-level comparative testing for Enterprise and Client systems 說明
+limitation: 入口頁只確認現行版本與範圍，不包含完整 normative 條文；官方 PDF 在本執行環境直接下載與頁面影像快取均遭 HTTP 403／cache miss，故本輪沒有本地 SHA 或逐頁視覺驗證，也不以 PDF 未核頁內容支撐主張
+-->
+
+<!-- research_source
+source_id: S15
+role: other_primary
+source_kind: living_index
+publisher: Storage Networking Industry Association
+independence_group: snia-storage-method
+title: IOPS (I/Os per Second) Test
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.snia.org/forums/sssi/pts/iops
+locator: Summary、Test Setup 與 Benefits；random I/O、7 種 read／write mix、8 種 0.5–1024 KiB block size、WIPC／WDPC、5-round steady-state window 及 box-top up-to IOPS 邊界
+limitation: HTML 方法導讀沒有版本與發布日，可能保留較早 PTS 的測試矩陣或術語，不能替代 v2.0.2 normative specification；device-level synthetic test 也不是 AI production workload、durability、qualification 或財務證據
+-->
+
+<!-- research_source
+source_id: S16
+role: other_primary
+source_kind: living_index
+publisher: Storage Networking Industry Association
+independence_group: snia-storage-method
+title: LAT (Latency) Test
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.snia.org/forums/sssi/pts/lat
+locator: Summary、Test Setup 與 Benefits；steady-state random I/O 的 average／maximum response time、total outstanding I/O=1 baseline，以及更多 outstanding I/O 時 maximum latency 可能不同的限制
+limitation: HTML 方法導讀沒有版本與發布日，QD1 device baseline 不能替代高併行 response-time distribution、filesystem／network／application path、AI accelerator stall、durability 或 customer SLO
+-->
+
+<!-- research_source
+source_id: S17
+role: other_primary
+source_kind: living_index
+publisher: Storage Networking Industry Association
+independence_group: snia-storage-method
+title: Test Terminology
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.snia.org/forums/sssi/pts/testterms
+locator: QD／TC、Preconditioning、Purge、SS Rounds 與 WSAT Steady State；OIO 是 issued and awaiting completion、QD 是每 thread 的 I/O 數、TC 是 stimulus generator process 數
+limitation: 動態術語導讀的例示 test system 與部分 Client／Enterprise 說法可能屬較早 PTS 世代；只用來界定名詞責任，不證明現行產品結果或 AI production 配置
+-->
+
+<!-- research_source
+source_id: S18
+role: other_primary
+source_kind: living_index
+publisher: Storage Networking Industry Association
+independence_group: snia-storage-method
+title: TP (Throughput) Test
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.snia.org/forums/sssi/pts/tp
+locator: Summary、Test Setup 與 Benefits；large-block sequential 100% read／write、WIPC／WDPC、steady-state window、128／1024 KiB 與 up-to MB/s 邊界
+limitation: HTML 方法導讀沒有版本與發布日，synthetic large-block device throughput 不能替代 small-I/O、tail latency、real AI data path、checkpoint correctness、功耗成本或公司採用
+-->
+
+<!-- research_source
+source_id: S19
+role: other_primary
+source_kind: living_index
+publisher: Storage Networking Industry Association
+independence_group: snia-storage-method
+title: Workload Terminology
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.snia.org/forums/sssi/pts/workload
+locator: KiB=1024 bytes 而 KB=1000 bytes、Fresh Out of Box、random／sequential、read／write 與 prescribed-workload steady state 定義
+limitation: 術語頁只建立單位與 workload 名詞，沒有 GB／GiB throughput result、IOPS 算例、device test、AI workload、客戶 qualification 或財務歸因
 -->
 
 ## 族群影響

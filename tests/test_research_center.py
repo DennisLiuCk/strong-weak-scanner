@@ -4355,6 +4355,22 @@ class ResearchCenterTest(unittest.TestCase):
             "| 本文三種工作 | 何時發生 | 最怕什麼 | 先看哪個結果 | 不能直接推成 |",
             "| 1. 訓練時持續餵資料 |", "| 2. 故障前保存進度 |",
             "| 3. 上線或擴充時搬模型 |",
+            "added_workload_concurrency_tail_latency_and_unit_performance_passport_without_thesis_or_clock_refresh",
+            "## 1M IOPS 不等於固定 GB/s：先建立效能護照",
+            "| Headline 指標 | 分子／分母 | 最少要綁定的條件 | 它不能單獨證明 |",
+            "| IOPS |", "| Throughput |", "| Latency／tail |",
+            "### 同一個 IOPS 數字換 block size，排名就可能反轉",
+            "3.814697265625 GiB/s", "12.20703125 GiB/s", "B／A=`3.2`",
+            "N=2 個假想 workload",
+            "### Queue depth 能推高併行，也會換掉延遲問題",
+            "| TC1／QD1 baseline latency |", "| QD／TC sweep |",
+            "| AI end-to-end tail |",
+            "### 十欄 AI 儲存效能護照",
+            "| 1. 工作與量測範圍 |", "| 5. 併行與 demand |",
+            "| 8. 延遲分布與事件數 |", "| 10. 使用者結果與分母 |",
+            "### 多空小作文要共享同一份 workload",
+            "| 偏多：AI 讓高階儲存內容與驗證增加 |",
+            "| 偏空：軟體與資料位置吸收硬體增量 |",
             "expanded_checkpoint_completion_recovery_and_training_goodput_measurement_contract",
             "## 「存檔完成」其實有六層，不是按下 save 就結束",
             "| 完成階梯 | 真正完成了什麼 | 最小證據 | 仍不能證明 |",
@@ -4383,7 +4399,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 42
+            sum(line.startswith("- **") for line in glossary.splitlines()), 55
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4400,8 +4416,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 13), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 19),
+            ("research_claim", 17), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -4430,13 +4446,17 @@ class ResearchCenterTest(unittest.TestCase):
             "process:checkpoint-recovery-measurement-passport,process,Checkpoint 八格復原護照",
             "metric:checkpoint-completion-semantics,metric,Checkpoint 完成語意",
             "metric:training-runtime-goodput,metric,訓練有效時間",
+            "process:ai-storage-performance-passport,process,AI 儲存十欄效能護照",
+            "metric:workload-conditioned-tail-latency,metric,工作負載條件化尾端延遲",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 資料讀取與儲存路徑", graph)
         for edge_id in (
             "KG-ASD-C04", "KG-ASD-I11", "KG-ASD-I12", "KG-ASD-I13",
+            "KG-ASD-I14", "KG-ASD-I15",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
 
     def test_compute_connect_station_two_separates_helios_stages_customers_and_company_gates(self):
         topic = (
