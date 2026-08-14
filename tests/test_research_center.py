@@ -2128,6 +2128,66 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(node, graph)
 
+    def test_ai_rack_attestation_freshness_contract_separates_expiry_replay_and_authorization(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-08_ai_rack_trust_root.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 有簽章的量測報告，為什麼仍不是「可以執行指令」",
+            "## 簽章有效、token 沒過期，為什麼仍可能被拒絕",
+            "### 同一組時間與簽章狀態下的五個命運",
+            "### 多空小作文要共享七欄新鮮度與重播帳",
+            "## 用八欄遠端證明決策護照查一份平台資料",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "reason: added_attestation_token_age_nonce_consumption_and_authorization_boundary_without_thesis_or_clock_refresh",
+            "source_id: S12", "claim_id: C17", "claim_id: C18",
+            "**`iat`（Issued At）**", "**`exp`（Expiration Time）**",
+            "**Nonce 消耗帳／重播快取**",
+            "`max-age=60 秒`", "clock-skew leeway",
+            "`5 秒`", "`N-42`", "至少 64 bits",
+            "| fresh first use | 12:00:40／40 秒 | +80 秒 |",
+            "| stale but unexpired | 12:01:10／70 秒 | +50 秒 |",
+            "| wrong nonce | 12:00:40／40 秒 | +80 秒 |",
+            "| replayed nonce | 12:00:41／41 秒 | +79 秒 |",
+            "| expired beyond skew | 12:02:10／130 秒 | −10 秒",
+            "N=5` 個固定案例", "沒有 sampling SE／t",
+            "| 1. Claim 產生時間與範圍 |",
+            "| 6. Nonce 消耗與重播紀錄 |",
+            "| 7. Gate 輸出與下游決策 |",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 18), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 4),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "process:attestation-freshness-replay-ledger,process,遠端證明新鮮度與重播七欄帳",
+            "metric:attestation-token-age-validity-window,metric,遠端證明token年齡與處理窗口",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_rack_trust_root.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        for contract in (
+            "edge_id: KG-TRT-I16",
+            "to_id: process:attestation-freshness-replay-ledger",
+            "edge_id: KG-TRT-I17",
+            "to_id: metric:attestation-token-age-validity-window",
+        ):
+            self.assertIn(contract, graph)
+
     def test_template_brings_existing_glossary_terms_to_each_reader_section(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (

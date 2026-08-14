@@ -476,6 +476,8 @@ metric:attestation-evidence-freshness,metric,遠端證明證據新鮮度,Attesta
 capability:reference-value-lifecycle,capability,參考值生命週期,Reference value lifecycle|RIM bundle lineage,concept:ai-rack-trust-root,讓製造 整合 維護與更新後的預期量測可由建立者簽署 串接 發布 撤銷並供驗證者取得
 process:attestation-decision-passport,process,遠端證明八欄決策護照,Attestation decision passport|evidence to authorization contract,concept:ai-rack-trust-root,把受測版本 證據涵蓋 新鮮度 參考值 驗證政策 結果語意 依賴方動作與失敗復原綁成可查核決策鏈
 capability:trusted-firmware-recovery,capability,可信韌體復原,Trusted firmware recovery|platform firmware recovery,concept:ai-rack-trust-root,偵測未授權變更後以受信任來源恢復韌體程式與關鍵資料並重新取得可驗證狀態的能力
+process:attestation-freshness-replay-ledger,process,遠端證明新鮮度與重播七欄帳,Attestation freshness and replay ledger|nonce consumption ledger,concept:ai-rack-trust-root,把claim產生時間 token身分與簽章 iat與現在時間 exp與時鐘偏差 nonce綁定 nonce消耗及下游裁決接成可重算紀錄
+metric:attestation-token-age-validity-window,metric,遠端證明token年齡與處理窗口,Attestation token age and validity window|iat exp max age clock skew,process:attestation-freshness-replay-ledger,分開計算token age 名目expiration clock-skew寬限及本地freshness max-age以避免把尚未過期改寫成證據夠新
 capability:large-eut-emc-test-site,capability,大型被測設備 EMC 場地,Large-EUT EMC test site|expanded EMC test volume,concept:ai-rack-emc-certification,以適用距離測試體積承重供電接地與場地等效證據量測大型完整設備的場地能力
 process:emc-test-report-passport,process,EMC 測試報告九欄護照,EMC test report passport|EMC comparability contract,concept:ai-rack-emc-certification,把被測版本負載纜線方法場地儀器結果認可範圍與變更責任綁成逐份報告可查核的可比性契約
 metric:emc-compliance-margin,metric,EMC 合規測試裕量,EMC compliance margin|emission margin,concept:ai-rack-emc-certification,在指定方法偵測器與頻寬下量測排放結果距離限制值的空間且必須連同不確定度與判定規則解讀

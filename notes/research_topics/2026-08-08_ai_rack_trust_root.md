@@ -60,6 +60,13 @@ to: triaged
 reason: expanded_attestation_evidence_policy_decision_and_recovery_contract
 evidence: sources:S8,S9,S10,S11
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_attestation_token_age_nonce_consumption_and_authorization_boundary_without_thesis_or_clock_refresh
+evidence: sources:S8,S9,S12
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -108,6 +115,12 @@ evidence: sources:S8,S9,S10,S11
 - **RFC**：IETF 正式發布並編號保存的技術文件；不同 RFC 可能是標準、最佳實務或資訊性架構，必須看文件狀態，不能一概當成強制認證。
 - **IETF**：制定網際網路協定與共同技術文件的開放標準組織；本文使用它的遠端證明架構與 token 規格。
 - **EAT（Entity Attestation Token）**：用 CWT 或 JWT 承載遠端證明 claim 的格式；token 能被驗簽，不代表驗證者已執行買方期待的全部檢查。
+- **`iat`（Issued At）**：token 建立、claim 被收集並組合簽署的時間；它可用來計算 token 年齡，但被快取的個別 claim 可能比 `iat` 更早。
+- **`exp`（Expiration Time）**：JWT 在此時間點起不應再被接受處理的上限；它不是「內容一定夠新」的保證，也不是所有 EAT 都必須帶的欄位。
+- **時鐘偏差／寬限（clock skew／leeway）**：不同系統時鐘不完全一致時，驗證端事先允許的小幅時間差；寬限值是實作或政策選擇，不是 RFC 統一指定的秒數。
+- **Nonce 消耗帳／重播快取**：記錄哪個挑戰值由誰發出、綁定哪次請求、是否已被使用或失效；只比對 nonce 相同而不記錄狀態，仍可能接受第二次重播。
+- **N-42（本文示例 nonce 代稱）**：下方案例為方便閱讀使用的短標籤；它不是實際挑戰值，案例假設底層 nonce 已符合 EAT 至少 64 bits entropy 的要求。
+- **Token 處理窗口／本地新鮮度上限**：`exp` 管 token 最晚何時可被處理，本地 max-age 管驗證者願意接受多老的證據；前者通過不代表後者一定通過。
 - **TCG**：制定可信運算規格的產業組織；本文使用它的 RIM 資訊模型說明參考值如何隨平台版本與維護變更。
 
 ### 三句話抓重點
@@ -416,6 +429,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: IETF RFC 9334 把 Evidence／Attestation Result 的 freshness 定義為依本地 appraisal policy 的 expiry threshold 判斷，並說明可信同步時鐘、不可預測 nonce 與 epoch ID 三類方法；nonce 比對只能確認 claims 在挑戰值產生後被簽署，仍是粗略 epoch。RFC 9711 另要求所有 EAT use 都提供 freshness mechanism，將 iat 定義為 token 建立、claims 收集與簽署時間，同時提醒個別 cached claim 可能更早；RFC 7519 則把 exp 定義為 token 不應再被接受處理的時間上限、iat 可用來算 token 年齡，並允許實作者為 clock skew 設小幅 leeway
+supporting_source_ids: S8,S9,S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8 §10 直接說明本地 expiry threshold、timestamp／nonce／epoch 三種方法、nonce rough epoch 與每個 nonce 的 state；S9 §§4.1、4.3.1、6.3.11、9.3 直接說明 nonce entropy、iat 與 cached claim 邊界，以及 EAT 必須有 freshness mechanism；S12 §§4.1.4–4.1.6 直接定義 exp、nbf、iat 與 clock-skew leeway
+boundary: 三份 RFC 定義通用架構與 token claim 語意，不替任何 AI 機櫃指定 60 秒 max-age、5 秒 clock skew、nonce 保存期、時間來源、授權動作或 safe default；同屬 IETF 消息鏈，不計成三個獨立平台或實作樣本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: 遠端證明的簽章、token 處理窗口、Evidence 新鮮度、nonce 是否首次使用與最終授權必須分開裁決；本篇七欄新鮮度與重播帳把 claim 產生時間、token 身分與簽章、iat／現在時間、exp／clock skew、nonce 發出者與綁定、nonce 消耗狀態，以及本地 gate 輸出與下游決策接成可重算紀錄。固定教材中只有 fresh first use 通過 freshness／replay gate，stale-but-unexpired、wrong nonce、replayed nonce 與 expired-beyond-skew 都被拒絕，而通過者仍不能直接升格為允許執行
+supporting_source_ids: S8,S9,S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8 把 freshness threshold 留給本地 policy 並說明 nonce state；S9 分開 token iat 與更早的 cached claims，且要求 freshness mechanism；S12 分開 exp 處理窗口與 iat 年齡。把三者轉成七欄帳與五案例 AND gate 是研究中心的責任分解與確定性示例
+boundary: 七欄帳、iat 12:00:00、exp 12:02:00、60 秒 max-age、5 秒 leeway、N-42 代稱、五個到達情境及 AND gate 都是教材假設，不是 RFC 預設、產品測試、攻擊實驗或 AI rack acceptance rule；N=5 是固定案例數，沒有 sampling SE／t、失敗率、可用率、部署或財務效果
+verification_needed: 具名平台公開同一版本的 claim capture time、iat／exp、可信時間源、clock-skew policy、nonce owner／binding／消耗紀錄、replay case、freshness 結果、後續 appraisal／authorization 與 safe-default test
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 高風險指令要過四關：身分、版本、權限與查證
 
 回到前面的場景。一道「關掉這櫃的水電」的指令要能被信任，不能只驗一張電子身分證；系統要依序回答四個不同問題。
@@ -462,6 +509,70 @@ bundle，系統整合商、維護者及後續 patch／upgrade 再追加有簽章
 最後一站借用 NIST 的平台韌體韌性邊界：**保護、偵測、復原是三件事**。[S11] 遠端證明可以
 協助偵測偏離，卻不能自動產生可信映像、恢復韌體、重建服務或決定整櫃水電狀態。NIST 文件也
 只處理韌體程式與關鍵資料；把它延伸成 AI 機櫃級復原，仍需要平台自己的程序與實測。
+
+## 簽章有效、token 沒過期，為什麼仍可能被拒絕
+
+**先把五個判斷拆開。** 驗簽只回答 token 是否來自預期金鑰、內容是否在途中被改動；`exp`
+回答它是否仍在處理窗口；`iat` 可協助計算 token 年齡；nonce 回答這是不是對本次挑戰的回應；
+最後還要由本地 policy 決定多老算 stale，再把合格 Evidence 交給 Reference Value、Appraisal
+Policy 與 Relying Party。五關任一個缺失，都不能用「簽章成功」補過去。
+
+RFC 9334 把 freshness 門檻明確留給本地 appraisal policy，並提供可信同步時鐘、不可預測 nonce
+與 epoch ID 三條路。[S8] Nonce 的用途是讓查驗方知道 claims 在它發出挑戰後才被簽署；它建立的
+只是粗略 epoch，而且通常要為每個 nonce 保存狀態。RFC 9711 再要求 EAT 必須有 freshness
+mechanism、EAT nonce 至少有 64 bits entropy，並提醒 `iat` 是 token 組合簽署時間，個別 cached
+claim 可能早在幾天前產生。[S9] 所以「token 很新」與「裡面每個量測都很新」仍是兩個問題。
+
+JWT 的 `exp` 與 `iat` 又是另一層。RFC 7519 定義 `exp` 為 token 不應再被接受處理的時間上限，
+`iat` 可用來算 token 年齡，並允許實作者為 clock skew 設小幅 leeway。[S12] 但 RFC 沒有規定本文
+下面的 60 秒與 5 秒，也沒有說尚未到 `exp` 就必然符合某個 attestation profile 的 freshness。
+
+### 同一組時間與簽章狀態下的五個命運
+
+以下純為可重算教材，不是 AI 機櫃標準：假設五個訊息都已通過簽章、issuer／audience 與 profile
+檢查，`iat=12:00:00`、`exp=12:02:00`；本地 policy 另設 `max-age=60 秒`、clock-skew leeway
+`5 秒`，預期 nonce 為 `N-42`。`N-42` 只是方便閱讀的代稱，實際挑戰假設符合 EAT 至少 64 bits
+entropy 的要求。為了隔離 token 與 replay 邊界，本例還假設各 claim 都在 `iat` 當下收集；真實
+系統必須逐項記錄更早的 claim capture time。
+
+本文示例 gate 為：`簽章有效 AND 現在時間 < exp+leeway AND token age ≤ max-age AND nonce 相符
+AND nonce 尚未消耗`。這個 AND 式與邊界等號是示例 policy，不是 RFC 強制公式。
+
+| 假想情境 | 到達時間／token age | 距名目 `exp` | Nonce 狀態 | 本地 freshness／replay gate | Gate 後仍要做什麼 |
+|---|---:|---:|---|---|---|
+| fresh first use | 12:00:40／40 秒 | +80 秒 | `N-42` 相符、未消耗 | pass | 查參考值、Appraisal Policy，再由 Relying Party 授權 |
+| stale but unexpired | 12:01:10／70 秒 | +50 秒 | `N-42` 相符、未消耗 | fail：超過 60 秒 max-age | 拒絕作為新鮮證據；不能因尚未到 `exp` 放行 |
+| wrong nonce | 12:00:40／40 秒 | +80 秒 | 非 `N-42` | fail：挑戰不相符 | 拒絕；簽章與時間通過不能替代 request binding |
+| replayed nonce | 12:00:41／41 秒 | +79 秒 | `N-42` 相符、但已消耗 | fail：第二次使用 | 拒絕重播；調查 nonce ledger 與重送原因 |
+| expired beyond skew | 12:02:10／130 秒 | −10 秒，亦超過 5 秒 leeway | `N-42` 相符、未消耗 | fail：處理窗口與 max-age 均失敗 | 拒絕並重新挑戰，不沿用舊 token |
+
+Python `Fraction` 與獨立 `awk` 整數路徑都得到同一組結果：五例的 age 為
+`40／70／40／41／130 秒`、距名目 `exp` 為 `+80／+50／+80／+79／−10 秒`，只有第一例通過
+完整 gate。這是 `N=5` 個固定案例的確定性規則展開，不是抽樣、攻擊測試或 production log，
+沒有 sampling SE／t、拒絕率、延遲、可用率、客戶部署或公司財務。
+
+**第一例也只取得「可繼續判讀」資格。** 它還沒證明 claim 涵蓋完整、參考值正確、
+Verifier policy 通過，更沒有替 Relying Party 決定能否切斷水電。把 freshness pass 直接顯示成
+「已授權」，等於把本篇七站中的第二站跳接到第六站。
+
+### 多空小作文要共享七欄新鮮度與重播帳
+
+| 七欄帳 | 至少保存什麼 | 缺少時多空兩邊都不能說什麼 |
+|---|---|---|
+| 1. Claim 產生時間與範圍 | 每個量測／設定何時取得、是否快取、涵蓋哪個元件與版本 | 不能用 token `iat` 代替所有 claim age |
+| 2. Token 身分與完整性 | issuer、audience、profile、key／algorithm、簽章結果 | 不能只憑「有簽章」判定來自正確角色 |
+| 3. `iat`、現在時間與時間源 | token 建立時間、驗證端現在時間、時鐘來源與同步狀態 | 不能重算 token age，也不能評估時鐘是否可信 |
+| 4. `exp`、`nbf` 與 clock skew | token 處理窗口、leeway 值、邊界比較規則與 policy 版本 | 不能分辨逾期、尚未生效與寬限放行 |
+| 5. Nonce 發出者與綁定 | 誰產生挑戰、entropy、綁定裝置／request／stage 與有效期 | 不能證明回應屬於這一次查驗 |
+| 6. Nonce 消耗與重播紀錄 | issued／consumed／expired 狀態、首次使用時間、重送與衝突 | 不能分辨合法第一次使用與舊 token 重播 |
+| 7. Gate 輸出與下游決策 | 每一 gate pass／fail 原因、Evidence appraisal、授權／隔離／人工覆核與 safe default | 不能把 freshness pass 改寫成最終允許執行 |
+
+偏多小作文會說，版本化 freshness policy、可信時間源與一次性 challenge 能讓大批機櫃在不用人工
+逐台確認的情況下持續驗證，因而提高安全自動化與可管理性；偏空小作文則會說，時鐘同步、nonce
+state、replay cache 與驗證服務本身增加延遲、狀態與故障面，過嚴 max-age 甚至可能讓正常設備被
+隔離。兩邊都要交同一張七欄帳、同一政策版次、accept／stale／replay／service-unavailable 分母、
+決策延遲、safe-default 測試與後續授權結果。少了這些，偏多不能把「支援 EAT」推成可大規模自動
+授權，偏空也不能把一次拒絕推成架構不可用，更不能直接連到 5274 或其他公司的訂單與損益。
 
 ## 用八欄遠端證明決策護照查一份平台資料
 
@@ -677,6 +788,22 @@ status: active
 url: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-193.pdf
 locator: §3.1（PDF pp.17–18、printed pp.10–11）分別定義 Protection、Detection、Recovery，並說明保護機制可能不完美或不適用所有裝置，需由偵測與復原重新取得正常安全運作
 limitation: 指引適用一般平台韌體與關鍵資料，Recovery 範圍亦明示限於兩者；不是 AI rack attestation、機櫃水電隔離、整體服務復原或任何產品／公司的驗收與財務證據
+-->
+
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: Internet Engineering Task Force
+independence_group: ietf-rats
+title: RFC 7519 JSON Web Token (JWT)
+published_at: 2015-05-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.rfc-editor.org/rfc/rfc7519.html
+locator: RFC header 與 §§4.1.4–4.1.6；exp 定義 current time 必須早於 expiration、可為 clock skew 提供小幅 leeway，nbf 定義 not-before，iat 可用來判斷 token age；RFC header 只標 May 2015，帳本日期以 2015-05-01 正規化且不主張日精度
+limitation: JWT 是通用 claims token 規格，exp／nbf／iat 都是 optional，並不指定 EAT profile、attestation freshness max-age、nonce lifecycle、時間可信度、授權或 AI rack safe default；與 S8／S9 同屬 IETF 標準鏈，不另計獨立產品、平台或實作樣本
 -->
 
 ## 族群影響

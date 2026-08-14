@@ -355,3 +355,43 @@ status: active
 boundary: NIST 將 firmware protection detection recovery 分開可支持可信復原是獨立責任；不把 firmware recovery 外推成 AI rack 水電 服務或營運復原。
 next_trigger: 同一平台 fault injection 公開 trusted image restore re-attestation service restoration owner 時間與失敗處置。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-TRT-I16
+view: industry
+from_id: concept:ai-rack-trust-root
+to_id: process:attestation-freshness-replay-ledger
+relation: includes
+claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C18
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-11-14
+status: active
+boundary: 七欄帳是研究中心依 IETF freshness nonce iat exp 與 local policy 邊界整理的查核方法 不是 RFC 共同規定的 AI rack profile 認證或 production adoption 證據。
+next_trigger: 具名平台公開同一版本的 claim time token time nonce owner consumption replay case gate output 與後續授權 safe default。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-TRT-I17
+view: industry
+from_id: concept:ai-rack-trust-root
+to_id: metric:attestation-token-age-validity-window
+relation: measured_by
+claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C17,MI-2026-08-08-AI-RACK-TRUST-ROOT#C18
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-11-14
+status: active
+boundary: RFC 只支持 exp iat clock-skew leeway 與 local freshness threshold 的語意分工；60 秒 max-age 5 秒 leeway 五案例與 AND gate 全為教材假設而非產品門檻或實測。
+next_trigger: 具名 acceptance report 同時揭露 iat exp current-time source skew max-age nonce state 與每一 gate 結果。
+-->
