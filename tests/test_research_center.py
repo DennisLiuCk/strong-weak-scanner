@@ -4067,6 +4067,25 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S9", "source_id: S10", "source_id: S11",
             "source_id: S12", "claim_id: C8", "claim_id: C9",
             "claim_id: C10", "claim_id: C11", "claim_id: C12",
+            "added_affected_fraction_data_movement_and_workload_performance_passport_without_thesis_clock_refresh",
+            "## 七倍不是 base die 快七倍：先拆時間占比與資料搬移",
+            "maximum inference throughput 約七倍",
+            "### 先拆受影響時間：局部變快不會等幅變成整體變快",
+            "整體加速比＝1 ÷〔(1−f)＋f ÷ r〕",
+            "| 甲：一半時間真的命中 | 50% | 4.000000 倍 | 0.625000 | 1.600000 倍 | 2.000000 倍 |",
+            "| 乙：大部分時間真的命中 | 80% | 4.000000 倍 | 0.400000 | 2.500000 倍 | 5.000000 倍 |",
+            "### 再拆資料搬移：少搬 75% bytes 也不等於整體快四倍",
+            "| 搬移前 | 2,000 | 1,000 | 2.000000 FLOP／byte | 200.000000 GFLOP/s | 200.000000 GFLOP/s |",
+            "| 假想搬移後 | 2,000 | 250 | 8.000000 FLOP／byte | 800.000000 GFLOP/s | 600.000000 GFLOP/s |",
+            "### 多空小作文共用的 Custom HBM 工作搬移十欄護照",
+            "| 1. 產品與工作身分 |", "| 4. 資料搬移邊界 |",
+            "| 7. 功耗、能量與熱 |", "| 10. 量產與財務 |",
+            "第一個教材是 N＝2 個匿名時間分解情境",
+            "第二個教材是同一匿名 Roofline 情境的 N＝2 個固定狀態",
+            "Python Fraction 與獨立 awk",
+            "sampling SE／t",
+            "source_id: S13", "source_id: S14", "claim_id: C13",
+            "claim_id: C14", "claim_id: C15", "claim_id: C16",
             "monitor_id: T3",
             "last_reviewed_at: 2026-08-03",
             "review_due: 2026-09-15",
@@ -4076,7 +4095,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 43
+            sum(line.startswith("- **") for line in glossary.splitlines()), 57
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4091,8 +4110,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 12), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 16), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -4111,6 +4130,7 @@ class ResearchCenterTest(unittest.TestCase):
             ROOT / "notes" / "knowledge_graph"
             / "custom_hbm_scope_ladder.md"
         ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
         for concept_id, edge_id in (
             ("concept:custom-hbm-workload-contract", "KG-CHBM-I11"),
             ("concept:custom-hbm-interface-contract", "KG-CHBM-I12"),
@@ -4118,6 +4138,8 @@ class ResearchCenterTest(unittest.TestCase):
             ("concept:custom-hbm-firmware-contract", "KG-CHBM-I14"),
             ("concept:custom-hbm-manufacturing-thermal-contract", "KG-CHBM-I15"),
             ("stage:custom-hbm-handoff-qualification", "KG-CHBM-I16"),
+            ("process:custom-hbm-work-movement-performance-passport", "KG-CHBM-I17"),
+            ("metric:affected-fraction-operational-intensity-boundary", "KG-CHBM-I18"),
         ):
             with self.subTest(concept_id=concept_id, edge_id=edge_id):
                 self.assertIn(concept_id, concepts)

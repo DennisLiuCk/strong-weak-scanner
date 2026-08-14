@@ -232,6 +232,38 @@ limitation: 公司展會技術回顧與前瞻規劃只支持特定 HBM4E／HPB �
 independence_group: samsung-electronics
 -->
 
+<!-- research_source
+source_id: S13
+role: other_primary
+source_kind: document
+publisher: Intel
+title: Use Amdahl's Law and Measure the Program
+published_at: 2022-12-16
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.intel.com/content/www/us/en/docs/advisor/user-guide/2023-0/use-amdahl-law.html
+locator: Amdahl's Law 與 Do Not Guess - Measure；明示加速一部分的整體收益受未加速時間限制，原本占 80% 的部分即使無限加速，整體上限仍為 5 倍
+limitation: 這是 Intel Advisor 對一般程式最佳化的量測方法，不是 Custom HBM、Stream DQ、推論工作負載或任何產品的效能結果；本文只借用時間分解上限，不把平行核心數直接等同 base-die 實作
+independence_group: intel-performance-method
+-->
+
+<!-- research_source
+source_id: S14
+role: other_primary
+source_kind: living_index
+publisher: Lawrence Berkeley National Laboratory
+title: The Roofline Model: Visualizing and Optimizing Performance
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://amcr.lbl.gov/departments/computer-science-department/ppan/roofline-performance-model/
+locator: 2026-08-14 查得 Introduction、Why Your Performance Might Be Below the Roofline 與 Runtime vs. Arithmetic Intensity；定義 arithmetic intensity 為浮點運算量除資料搬移 bytes，並以資料位置、記憶體頻寬與運算吞吐共同形成效能上限
+limitation: 這是通用的效能上限與瓶頸分析框架，不是 Custom HBM benchmark；Roofline 上限不是 achieved performance、端到端等待、能源、正確性、客戶 qualification 或財務結果，且指定資料邊界不同就不能直接比較 intensity
+independence_group: lbnl-roofline-method
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -436,6 +468,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: SK hynix 的 GTC 2026 官方回顧把 Stream DQ 放在 base die、把資料前處理從 GPU 搬到該處，並以「maximum inference throughput 約七倍」表述公司效能主張
+supporting_source_ids: S3
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S3 cHBM 段落直接說明功能位置、工作搬移與 according to SK hynix 的約七倍 maximum inference throughput 說法
+boundary: 這只證實公司公開說過該數字；頁面沒有提供 model、工作負載、batch、sequence length、精度、baseline、硬體／軟體版本、功耗熱條件、run 數或分布，不能把七倍解讀成 base-die 時脈、頻寬、所有推論工作、獨立 benchmark、客戶 qualification 或量產結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: Intel Advisor 的 Amdahl 方法頁指出，只加速程式的一部分時，整體收益會被未加速部分限制；若可加速部分原本占總時間 80%，即使該部分無限加速，整體上限仍是五倍
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 的 Amdahl's Law 與 Do Not Guess - Measure 段落直接給出受未加速時間限制及 80% 對五倍上限的例子
+boundary: 這是固定問題大小下的一階時間分解上限，不是 Custom HBM 產品模型；真實 offload 還會受資料傳輸、佇列、同步、額外工作、輸出品質、功耗與熱影響，且受影響占比必須量測而不能由功能名稱猜測
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: Lawrence Berkeley National Laboratory 的 Roofline 方法把 arithmetic intensity 定義為浮點運算量除資料搬移 bytes，並把資料位置、記憶體頻寬與運算吞吐放進同一效能上限，用來區分 memory-bound 與 compute-bound
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 Introduction 與 bottleneck 段落直接定義 intensity、資料搬移與兩類上限，並明示實際效能可能低於 Roofline
+boundary: 這是通用 bound model，不提供任一 Custom HBM 的 operations、bytes、sustainable bandwidth、compute ceiling 或 achieved result；資料邊界、精度與工作負載不同時不得比較 intensity，也不能把上限冒充實測
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 判讀具名 Custom HBM 的工作搬移效益，應把 baseline 與 offload 的工作語意、原始時間受影響占比、同一資料邊界 bytes、局部與端到端時間、輸出正確性、功耗熱、軟韌體回退、silicon／qualification 及量產財務綁成同一份十欄工作搬移效能護照
+supporting_source_ids: S3,S13,S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S3 提供 base-die preprocessing 搬移與公司最大吞吐主張，S13 固定受影響時間與未加速部分的上限，S14 固定 operations、bytes、bandwidth 與 compute ceiling 的瓶頸邊界；合併後可防止把局部功能、理論上限、maximum headline 與產品商業結果互相替代
+boundary: 十欄護照是本文研究工具，不是 JEDEC、SK hynix、Intel 或 LBNL 的 Custom HBM 標準，也不預設工作搬移一定有利；現有來源沒有同一具名產品公開完整 baseline／treatment raw runs、品質、能源熱、qualification、成本與財務共同鍵
+verification_needed: 供應商與具名客戶公開同一產品、工作負載、資料／精度、baseline／offload build、affected fraction、boundary bytes、local／end-to-end distributions、power／thermal、correctness、failure／fallback、qualification、production 及財務分母
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -506,6 +606,13 @@ to: triaged
 reason: added_workload_interface_base_die_firmware_manufacturing_and_qualification_handoff_contract_without_refreshing_thesis_clock
 evidence: sources:S2,S3,S4,S5,S9,S10,S11,S12
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_affected_fraction_data_movement_and_workload_performance_passport_without_thesis_clock_refresh
+evidence: sources:S3,S13,S14
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -523,6 +630,8 @@ evidence: sources:S2,S3,S4,S5,S9,S10,S11,S12
 - **介面**：記憶體與運算晶片交換資料的連接規則與訊號方式；改介面可能需要雙方共同設計。
 - **堆疊底部邏輯晶片（logic base die）**：位在記憶體堆疊底部，負責介面、資料路徑與控制；能做多少額外運算要看實際設計。
 - **客製高頻寬記憶體（Custom HBM）**：不是已有共同規格的單一產品。公開資料可能指調整產品規格、重做底部邏輯晶片，或把部分工作搬到記憶體附近。
+- **cHBM**：SK 海力士在本輪官方展示中使用的 Custom HBM 縮寫；同一縮寫不會自動讓各供應商的客製範圍或商用階段變成可比。
+- **GTC**：NVIDIA 舉辦的開發者大會；會場展示與公司回顧可證明公開過架構，但不能代替客戶資格認證或量產證據。
 - **工作負載**：一套系統實際要執行的資料與運算任務；不同工作負載的效能數字不能直接放在同一排行榜。
 - **資料前處理（preprocessing）**：正式運算前先整理、轉換或篩選資料。把它移到記憶體旁是工作位置改變，不等於產品已量產。
 - **架構展示**：公司公開說明設計如何運作或展示原型；仍須另外確認樣品、客戶驗證與量產。
@@ -554,6 +663,18 @@ evidence: sources:S2,S3,S4,S5,S9,S10,S11,S12
 - **熱傳路徑塊（HPB）**：三星展示的獨立導熱結構，用來把底部晶片高速介面產生的熱向外傳；仍在驗證不等於已量產採用。
 - **N12／N3P 製程節點**：台積電兩種邏輯製程名稱；本文只用來說明一般 HBM4 與客製 HBM4E 的底部晶片路徑可能不同，不比較製程優劣。
 - **Memory Labs（記憶體實驗室）**：三星官方頁對多個研發團隊的合稱；組織頁列出能力範圍，不代表一個具名產品已完成所有工作。
+- **Intel Advisor**：Intel 的效能分析工具與方法文件；本文只借用其阿姆達爾量測框架，不把它當成客製高頻寬記憶體測試。
+- **LBNL**：Lawrence Berkeley National Laboratory 的英文縮寫；本文引用其 Roofline 方法入口，不把通用模型視為產品實測。
+- **受影響時間占比（affected fraction）**：某項可被加速的工作在原始端到端時間裡占多少；必須用相同工作負載量測，不能由功能名稱猜測。
+- **局部加速比**：只看被改動那一段工作變快多少；它不會自動等於整套推論服務的加速比。
+- **整體加速比**：相同工作從原始端到端時間縮短到新時間的比例；還會包含沒有被搬移的工作與新增開銷。
+- **阿姆達爾上限（Amdahl limit）**：只有部分工作能被加速時，未被加速的時間會限制整體最大收益；它是上限，不是實測結果。
+- **資料搬移邊界**：計算 bytes 時指定的兩個位置，例如記憶體與底部晶片、底部晶片與運算晶片；邊界不同就不能直接比較。
+- **運算強度（arithmetic intensity）**：指定工作完成的浮點運算量除以同一資料邊界搬移的 bytes；分子、精度與邊界都要固定。
+- **屋頂線效能模型（Roofline）**：把運算強度、可持續記憶體頻寬與運算吞吐上限放在同一張瓶頸圖；圖上的屋頂不是實際一定能達到的速度。
+- **記憶體受限／運算受限**：前者主要撞到資料搬移上限，後者主要撞到運算上限；搬走資料後瓶頸可能轉移，而不是消失。
+- **穩態頻寬**：在明示資料模式與持續時間下實際能維持的搬移速率；不能直接用介面腳位峰值代替。
+- **GFLOP/s**：每秒十億次浮點運算；本文只在匿名 Roofline 教材表示上限量綱，不是任何產品測試成績。
 
 ### 三句話抓重點
 
@@ -642,6 +763,87 @@ evidence: sources:S2,S3,S4,S5,S9,S10,S11,S12
 這條連鎖只說明要查哪些責任，不代表改動一定提高效能、成本或毛利。沒有固定版本、測試輸入、
 通過條件、變更紀錄與量產分母時，仍不能把技術相鄰關係寫成 design win 或台灣公司收入。
 
+## 七倍不是 base die 快七倍：先拆時間占比與資料搬移
+
+SK 海力士的官方回顧把 Stream DQ 放在 base die，並轉述公司所稱「maximum inference
+throughput 約七倍」。這能證實公司公開了什麼主張，卻不能反推出 base die 時脈、介面頻寬或
+所有推論工作都變成七倍。公開頁面沒有一起交代 model、batch、sequence length、精度、
+baseline、硬體與軟體版本、功耗熱條件、run 數或結果分布，因此這個數字目前仍是一個待補分母
+的公司 maximum headline。
+
+### 先拆受影響時間：局部變快不會等幅變成整體變快
+
+Intel Advisor 對阿姆達爾上限的白話提醒是：先找出原本最花時間的部分，再量測；只加速其中一段，
+整體收益仍受未加速時間限制。本文把同一概念改寫成 Custom HBM 的匿名教材：令 f 是原始端到端
+時間中真正受工作搬移影響的占比，r 是那一段的假想局部加速比，則
+
+整體加速比＝1 ÷〔(1−f)＋f ÷ r〕。
+
+以下兩列都把局部步驟假設為四倍；這個四倍不是 SK 海力士數字，也不是任何 HBM 規格。
+
+| 匿名工作負載 | 原始受影響時間占比 f | 假想局部加速比 r | 新的正規化總時間 | 整體加速比 | 局部無限快時的整體上限 |
+|---|---:|---:|---:|---:|---:|
+| 甲：一半時間真的命中 | 50% | 4.000000 倍 | 0.625000 | 1.600000 倍 | 2.000000 倍 |
+| 乙：大部分時間真的命中 | 80% | 4.000000 倍 | 0.400000 | 2.500000 倍 | 5.000000 倍 |
+
+同樣的局部四倍，在甲只得到整體 1.6 倍，在乙才得到 2.5 倍。若供應商只給 maximum throughput，
+卻沒有原始 profile、受影響時間占比、未搬移工作與新增開銷，就無法判斷 headline 是來自哪一種
+工作形狀。阿姆達爾上限也只是一階固定問題模型；真實佇列、同步、資料傳輸與回退會讓 achieved
+結果低於這張表，而 workload 或 batch 改變又會讓 f 一起改變。
+
+### 再拆資料搬移：少搬 75% bytes 也不等於整體快四倍
+
+Lawrence Berkeley National Laboratory 的屋頂線效能模型把運算強度定義為浮點運算量除以
+資料搬移 bytes，並把記憶體頻寬與運算吞吐放在同一上限。本文只做一個匿名的量綱教材：固定同一
+資料搬移邊界、2,000 次有用浮點運算、100 GB/s 穩態頻寬與 600 GFLOP/s 運算上限。
+
+運算強度＝有用浮點運算量 ÷ 同一邊界搬移 bytes；
+Roofline 上限＝較小的「運算上限」與「穩態頻寬 × 運算強度」。
+
+| 同一匿名工作 | 有用浮點運算 | 同一邊界 bytes | 運算強度 | 頻寬乘運算強度 | 套用運算上限後的 Roofline 上限 |
+|---|---:|---:|---:|---:|---:|
+| 搬移前 | 2,000 | 1,000 | 2.000000 FLOP／byte | 200.000000 GFLOP/s | 200.000000 GFLOP/s |
+| 假想搬移後 | 2,000 | 250 | 8.000000 FLOP／byte | 800.000000 GFLOP/s | 600.000000 GFLOP/s |
+
+bytes 減少 75%，運算強度提高四倍，但上限只從 200 提高到 600 GFLOP/s，也就是三倍；瓶頸已從
+記憶體受限移到運算受限。這仍不是 achieved performance：base die 額外做的工作、命令與 metadata、
+cache traffic、對齊、重試、佇列等待、資料品質與實體連線 bytes 都可能改變分子或分母。若搬移前
+量 GPU 端 bytes、搬移後卻量堆疊內 bytes，也不能把兩個運算強度放在同一列比較。
+
+### 多空小作文共用的 Custom HBM 工作搬移十欄護照
+
+| 本文十欄 | 至少要固定什麼 | 最常見的跳級 |
+|---|---|---|
+| 1. 產品與工作身分 | memory／base die／accelerator／package 版本，model、資料集、batch、sequence、精度與品質門檻 | 用「人工智慧推論」四個字把不同工作負載合併 |
+| 2. baseline 與 offload 語意 | 原本誰做什麼、搬去哪裡、輸入輸出、數值容許差與錯誤條件 | 有功能方塊就視為與原結果完全等價 |
+| 3. 受影響時間占比 | baseline profile、端到端時間、可搬移段、未搬移段與每段分布 | 把局部加速比當整體加速比 |
+| 4. 資料搬移邊界 | 兩端位置、read／write、payload／metadata、cache／HBM／link bytes 與計數工具 | bytes 變少就宣稱頻寬、等待與能耗等幅改善 |
+| 5. 局部引擎結果 | local latency／throughput、queue depth、資料形狀、warm-up、run 數、p50／p95／p99／max | 只用最好一次或 maximum headline |
+| 6. 端到端與品質 | TTFT、inter-token latency、tokens/s、完整 wall-clock、正確性、精度與失敗率 | microbenchmark 替整套服務與模型品質背書 |
+| 7. 功耗、能量與熱 | GPU／base die／HBM／package／system 邊界，平均與峰值功率、每項工作能量、熱點及冷卻 | GPU burden 降低就宣稱整機一定省電 |
+| 8. 軟韌體與回退 | firmware、runtime、compiler、driver、資料格式、啟用條件、fallback 與 change control | demo build 等於 production software 已穩定 |
+| 9. silicon 與 qualification | sample identity、PVT、die／wafer／lot、可靠度、相容性、pass criteria 與客戶簽核 | 模擬或展場影片等於實體 silicon 已通過 |
+| 10. 量產與財務 | 合格產出、良率、NRE、單位成本、售價、量產數量、客戶收入與公司總分母 | 技術 headline 直接映射供應鏈訂單或毛利 |
+
+較強的多方版本不是「七倍所以所有 HBM 與 ASIC 都受惠」，而是同一具名產品在相同 workload、
+品質與功耗熱條件下，能重現受影響時間、同邊界 bytes、局部與端到端分布，並在 silicon、客戶資格、
+合格產出與財務分母後仍守住收益。較強的空方版本也不是「公司沒公開全部分母，所以功能一定無效」，
+而是後續共同量測顯示可搬移時間太小、bytes 沒有在正確邊界下降、瓶頸轉到運算／同步／熱，或
+software、良率、資格與成本吃掉局部改善。兩邊都必須交同一張護照。
+
+### 分母、誤差與限制
+
+第一個教材是 N＝2 個匿名時間分解情境；第二個教材是同一匿名 Roofline 情境的 N＝2 個固定狀態，
+不是兩個產品或兩次獨立實驗。Python Fraction 與獨立 awk 在顯示精度內完全一致。這些都是
+確定性算術，不是抽樣、profile、silicon、memory benchmark、模型服務或客戶資料，因此沒有
+sampling SE／t，也沒有真實 workload、affected fraction、operations、bytes、bandwidth、compute、
+latency distribution、quality、power、thermal、die／wafer／lot、qualification、良率、成本、需求、
+收入、毛利或公司效果。
+
+SK 海力士、Intel 與 LBNL 是公司產品敘事與兩條通用效能方法鏈，不是三個 Custom HBM 產品、客戶
+或量產 run；Intel／LBNL 方法只提供分母護欄，不替 SK 海力士補 benchmark 條件，也不刷新本文
+主命題的樣品、qualification 或量產證據時鐘。
+
 ## 來源與證據邊界
 
 - [Samsung HBM4／Custom HBM roadmap](https://news.samsung.com/global/samsung-ships-industry-first-commercial-hbm4-with-ultimate-performance-for-ai-computing)（2027 樣品時程）。
@@ -653,6 +855,8 @@ evidence: sources:S2,S3,S4,S5,S9,S10,S11,S12
 - [Samsung Foundry HPC／AI application service](https://semiconductor.samsung.com/foundry/application-specific-service/hpc-ai/)（die-to-die interface、base-die controller 與 additional logic 的供應商架構邊界）。
 - [TSMC OIP Forum：A Shared Commitment to Energy-Efficient AI](https://www.tsmc.com/english/node/233)（HBM4 N12 與 custom HBM4E N3P logic-base-die 路徑）。
 - [Samsung COMPUTEX 2026 HBM4E／HPB 技術頁](https://semiconductor.samsung.com/kr/news-events/tech-blog/samsung-showcases-next-generation-ai-semiconductor-innovations-at-computex-2026/)（D2D PHY 發熱位置、thermal path 驗證與未來採用時鐘）。
+- [Intel Advisor：Use Amdahl's Law and Measure the Program](https://www.intel.com/content/www/us/en/docs/advisor/user-guide/2023-0/use-amdahl-law.html)（受影響時間與未加速部分的整體上限）。
+- [Lawrence Berkeley National Laboratory：The Roofline Model](https://amcr.lbl.gov/departments/computer-science-department/ppan/roofline-performance-model/)（operations、data movement、bandwidth 與 compute ceiling 的通用瓶頸框架）。
 
 本文不採用三家公司自述效能做跨公司比較，也不把客戶數、HBM 總銷售或 HBM4 量產套用到
 custom HBM。現有資料沒有同一產品世代、共同 benchmark、客戶資格、數量與財務定義，因此不報

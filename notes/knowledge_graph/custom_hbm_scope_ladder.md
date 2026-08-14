@@ -5,7 +5,7 @@ schema_version: 1
 graph_id: custom-hbm-scope-ladder
 root_node_id: concept:custom-hbm-commercialization
 label: Custom HBM 客製範圍與商用階梯
-summary: 顯示 Samsung SK hynix 與 Micron 各自揭露的客製入口及 sample qualification production 門檻；不能用來比較領先 市占或台灣公司收入。
+summary: 顯示 Samsung SK hynix 與 Micron 各自揭露的客製入口、工作搬移效能分母及 sample qualification production 門檻；不能用來比較領先 市占或台灣公司收入。
 article_ids: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER
 status: active
 -->
@@ -388,4 +388,44 @@ review_due: 2026-09-15
 status: active
 boundary: 現有公開資料沒有把同一具名客戶的六份交接 版本 責任人 變更控制 pass criteria 與量產財務接起；此節點只保存待驗證條件。
 next_trigger: 客戶與供應商雙向公布同一 custom HBM 的六份 versioned handoff sign-off qualification 與 production outcome。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-I17
+view: industry
+from_id: concept:custom-hbm-commercialization
+to_id: process:custom-hbm-work-movement-performance-passport
+relation: measured_by
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C16
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-15
+status: active
+boundary: 十欄護照把 SK hynix 公司敘事與 Intel LBNL 通用方法對齊成研究工具；不是 JEDEC 規格 公司 benchmark 產品評分 客戶 qualification 或供應鏈訂單。
+next_trigger: 同一具名 custom HBM 與客戶公開 baseline offload raw runs 品質功耗熱 silicon qualification production 及財務共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-I18
+view: industry
+from_id: concept:custom-hbm-commercialization
+to_id: metric:affected-fraction-operational-intensity-boundary
+relation: measured_by
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C13,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C14,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C15,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C16
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-15
+status: active
+boundary: 公司 maximum throughput 不提供 affected fraction local speedup 或同邊界 bytes；Amdahl 與 Roofline 只給理論分母和上限 不能替代 achieved 端到端品質能源熱與客戶結果。
+next_trigger: 具名產品以相同 workload 精度 baseline treatment 公開時間分解 boundary bytes sustainable bandwidth compute ceiling local end-to-end distributions 及 qualification。
 -->
