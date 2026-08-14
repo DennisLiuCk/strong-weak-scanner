@@ -4328,13 +4328,42 @@ class ResearchCenterTest(unittest.TestCase):
             "| 5. 運算晶片與系統整合 |", "| 6. 客戶資格與可靠度通過 |",
             "| 7. 穩定量產與形成收入 |",
             "## 把「標準存在」拆成四條時鐘",
+            "lane_raw_payload_energy_and_phy_measurement_passport_added_without_thesis_clock_refresh",
+            "## 2,048 變 512，只守住 raw throughput 的等式",
+            "2,048×1 與 512×4",
+            "資料訊號數機械上減少 75%",
+            "### 同一個 raw，payload 與每位元能耗仍可分岔",
+            "1,945.6 Gbps",
+            "1,638.4 Gbps",
+            "6.315789",
+            "15.789474%",
+            "58.333333%",
+            "### 延遲與 BER 要先固定量測點",
+            "Serializer → Deserializer",
+            "Packet／FEC／CRC → Packet／FEC／CRC",
+            "### 512 條資料訊號也不能直接算 shoreline density",
+            "### 多空小作文共用的 SPHBM4 PHY 十欄護照",
+            "| 1. 標準與產品身分 |",
+            "| 5. payload 與工作負載 |",
+            "| 7. BER 與恢復 |",
+            "| 10. silicon 到財務 |",
+            "第一個教材是 N＝2 種公開架構映射",
+            "第二個教材是 N＝2 個匿名假想 PHY 實作",
+            "Python Fraction 與獨立 awk",
+            "沒有 sampling SE／t",
+            "OCP 官方 PDF 共 44 頁",
+            "pp.32–42 已由官方瀏覽器 PDF viewer 逐頁渲染目視核對",
+            "claim_id: C10",
+            "claim_id: C11",
+            "claim_id: C12",
+            "claim_id: C13",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+            sum(line.startswith("- **") for line in glossary.splitlines()), 41
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4350,11 +4379,30 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 7),
-            ("research_claim", 9), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 8),
+            ("research_claim", 13), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "process:sphbm4-phy-performance-passport,process,SPHBM4 PHY 效能十欄護照",
+            "metric:sphbm4-lane-raw-payload-energy-boundary,metric,SPHBM4 通道、raw、payload 與能耗邊界",
+        ):
+            self.assertIn(concept, concepts)
+        graph = (ROOT / "notes" / "knowledge_graph" / "hbm.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 40)
+        for node in (
+            "edge_id: KG-HBM-I28",
+            "to_id: process:sphbm4-phy-performance-passport",
+            "edge_id: KG-HBM-I29",
+            "to_id: metric:sphbm4-lane-raw-payload-energy-boundary",
+        ):
+            self.assertIn(node, graph)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )

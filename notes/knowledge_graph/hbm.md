@@ -8,7 +8,7 @@ schema_version: 1
 graph_id: hbm
 root_node_id: concept:hbm
 label: HBM／SPHBM4／製程控制
-summary: 從記憶體產品世代、SPHBM4 四層介面封裝契約與資格節點，延伸到製程控制、control-plan 六欄及具名公司角色；台灣公司能力與財務轉換分開顯示。
+summary: 從記憶體產品世代、SPHBM4 四層介面封裝契約、PHY 效能護照與資格節點，延伸到製程控制、control-plan 六欄及具名公司角色；台灣公司能力與財務轉換分開顯示。
 article_ids: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE,MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY
 status: active
 -->
@@ -771,4 +771,44 @@ review_due: 2026-08-31
 status: active
 boundary: Inline、post-dicing 與 screening 任務說明結果必須連到處置，但沒有客戶端隔離範圍、重工報廢或損失避免資料。
 next_trigger: 客戶公開 excursion trigger、stop／hold／release rule、受影響批次追溯、containment time 與製造結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HBM-I28
+view: industry
+from_id: concept:hbm
+to_id: process:sphbm4-phy-performance-passport
+relation: measured_by
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C13
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: 十欄護照是把 JEDEC 架構、OCP 通用量測方法與供應商自報欄位對齊的研究工具，不是新增標準條文、compliance score、產品排名或供應鏈訂單。
+next_trigger: 同一具名 SPHBM4 memory、base die、host PHY、package 與 system 公開完整十欄、原始結果及客戶 qualification。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HBM-I29
+view: industry
+from_id: concept:hbm
+to_id: metric:sphbm4-lane-raw-payload-energy-boundary
+relation: measured_by
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C10,MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C11,MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C13
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: 2,048×1＝512×4 只固定 raw 算術；沒有共同方向、payload、量測點、BER exposure、power、幾何與產品結果時，不得推延遲、能耗、良率、成本或系統效能。
+next_trigger: 具名 SPHBM4 與可比基準公開同版本 raw／payload、T0／T1、BER／retry、Tx＋Rx＋clock power、shoreline、reach 與產品結果。
 -->

@@ -138,6 +138,22 @@ limitation: 這是供應商社群行銷陳述，不是 JEDEC compliance report�
 independence_group: eliyan
 -->
 
+<!-- research_source
+source_id: S8
+role: other_primary
+source_kind: document
+publisher: Open Compute Project
+title: Electrical Interfaces Performance Metrics
+published_at: 2024-11-19
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/odsa-whitepaper-2024-electrical-interfaces-performance-metrics-nov-19-2024-docx-pdf
+locator: file pp.32–42；BER／latency measurement points、unit bandwidth、power efficiency、edge／area bandwidth density 與 recommended minimum list of parameters
+limitation: 這是 OCP 對一般 electrical D2D PHY 的量測框架，不是 JESD330-4 規格、SPHBM4 compliance plan 或任何產品成績；published_at 取自官方檔名日期，文件正文未另列發布日。命令列與 web screenshot 端點回 403，未建立本地 SHA；官方瀏覽器 PDF viewer 已把實際引用頁及相鄰頁 file pp.32–42 逐頁渲染目視核對
+independence_group: ocp-phy-metrics
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -282,6 +298,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: JEDEC 公開的 2,048 個 HBM4 資料訊號與 512 個 SPHBM4 主機側資料訊號、4 比 1 序列化關係，在把原路徑每線速率正規化為 1 時，分別得到 2,048×1 與 512×4 的相同 raw throughput 指數 2,048；資料訊號數減少 75%，每線速率提高為 4 倍，但這個等式沒有包含 payload、延遲、錯誤、功耗、幾何或良率
+supporting_source_ids: S1,S5
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S1／S5 直接固定資料訊號數與四倍速率映射；Python Fraction 與獨立 awk 對同一固定輸入重算一致
+boundary: 正規化的 1 與 throughput index 不是 JESD330-4 GT/s、GB/s 或產品規格；相同 raw 指數不表示 payload goodput、read／write latency、BER、pJ/bit、shoreline density、成本或系統效能相同
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: OCP Electrical Interfaces Performance Metrics 把 data-lane speed、Rx 加 Tx PHY bandwidth、shoreline bandwidth density、reach、pJ/bit、packaging、minimum bump pitch、BER 與 T0 latency 列為 D2D PHY 最小指標組，並把 serializer-to-deserializer、含 packet／FEC／CRC 與含 retry 的 BER／latency 量測點分開
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8 file pp.32–42 的 measurement-point 表、unit-bandwidth／power-efficiency 定義與 minimum-parameter table 可逐頁定位
+boundary: OCP 白皮書是一般量測方法，不規定 SPHBM4 必須採哪一種 FEC、CRC、retry、方向配置或測試值，也不能替 JEDEC、記憶體供應商、客戶或第三方出具 compliance 結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: Eliyan 現行產品頁把標準有機／laminate package 的 NuLink-SP PHY 產品表分列 process node、data lanes、data rate per lane、beachfront bandwidth、area bandwidth 與 reach，證明一家供應商已用多欄而非只用 aggregate bandwidth 描述其產品家族
+supporting_source_ids: S6
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S6 現行產品表可直接定位標準封裝 PHY 欄位與公司報告值
+boundary: 這仍是單一供應商自報的相鄰 D2D 產品資料，不是每一欄都對應 SPHBM4、JESD330-4 compliance、獨立 benchmark、具名記憶體／主機產品、客戶資格、量產或收入；表格也不能補出未列的同口徑 BER、T0 latency、總 PHY power 與產品級 payload
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 判讀 SPHBM4 的「同頻寬、較少接點、有機基板」敘事，應把標準版本、方向與通道、lane／wire／pin、每線速率與 raw、payload、latency measurement point、BER／recovery exposure、power／energy、shoreline／reach／package，以及 silicon—system—customer—financial evidence 綁成同一份十欄 PHY 效能護照
+supporting_source_ids: S1,S5,S6,S8
+contrary_source_ids:
+as_of: 2026-08-14
+basis: JEDEC 固定 SPHBM4 的通道與序列化架構，OCP 固定一般 D2D PHY 的量測欄位與分層測點，Eliyan 產品表顯示實作者會分列部分 PHY 指標；十欄護照把三種證據物件的共同鍵與缺口顯式化
+boundary: 護照是研究可比性與拒絕過度外推的框架，不是 JEDEC 規格新增條文、OCP compliance score、Eliyan 產品背書、產品效能排名、成本模型、採用率、台灣供應商訂單或投資建議
+verification_needed: 以同一具名 SPHBM4 memory／base die／host PHY／package／system 版本公開 raw 與 payload、方向、量測點、BER exposure、power、reach、silicon／customer qualification、良率成本及財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -366,6 +450,14 @@ reason: corrected_pin_count_frame_with_four_layer_interface_package_and_qualific
 evidence: sources:S5,S6,S7
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: lane_raw_payload_energy_and_phy_measurement_passport_added_without_thesis_clock_refresh
+evidence: sources:S1,S5,S6,S8
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -379,13 +471,22 @@ evidence: sources:S5,S6,S7
 - **序列傳輸**：把資料排成順序，用較少的線以更高速度傳送；線少不代表更容易，因為每條線的速度與訊號品質要求會提高。
 - **四比一序列化與 DDR（4:1 serialization）**：把原本四條資料路徑合併到一條更快的路徑；DDR 表示一個時脈週期的上升與下降邊緣都能搬資料，本文標準用兩者把主機側資料訊號由 2,048 個降為 512 個。
 - **總傳輸量（throughput）**：一段時間內整體可以搬運多少資料；總量相同不代表功耗、等待時間、錯誤率與實作成本相同。
-- **每線速率**：單一資料線每秒要搬運多少資料；資料線變少時，每條線通常要跑得更快，設計與測試難度也會增加。
+- **每線速率／GT/s**：單一資料線每秒要完成多少十億次傳輸；資料線變少時，每條線通常要跑得更快，設計與測試難度也會增加，GT/s 仍不等於有效資料量。
 - **延遲**：送出要求到收到資料之間的等待時間；增加轉換與控制邏輯後，必須用實測確認是否仍符合系統需求。
 - **功耗**：晶片與連線傳送資料所需的電力；接點減少不代表高速介面、時脈與轉換邏輯一定更省電。
 - **熱管理**：把晶片與封裝產生的熱帶走；介面邏輯、記憶體堆疊與運算晶片共存時，要一起檢查熱點與散熱路徑。
 - **較長通道（longer channel）**：訊號可以走更長的實體距離；距離增加可能擴大配置彈性，也會增加損耗、反射與干擾風險。
 - **訊號完整性**：訊號抵達接收端時仍能清楚辨認資料的程度；速度、距離、材料、接點與雜訊都會影響結果。
-- **位元錯誤率（bit error rate）**：傳輸資料中出錯位元的比例；沒有共同條件下的實測，就不能判斷新連線是否足夠可靠。
+- **位元錯誤率（BER／bit error rate）**：傳輸資料中出錯位元的比例；沒有共同條件下的實測，就不能判斷新連線是否足夠可靠。
+- **資料通道與資料導線（data lane／data wire）**：通道是資料傳輸的邏輯或電氣路徑，導線是實際承載訊號的導體；單端、差分、時脈與輔助訊號配置不同時，兩個數不一定相等。
+- **傳送、接收與方向（Tx／Rx）**：Tx 是送出，Rx 是接收；單向、雙向合計、半雙工與同時雙向的頻寬分母不同，不能只看一個總數。
+- **原始頻寬與有效資料吞吐（raw bandwidth／payload goodput）**：前者由通道數與每線速率得到，後者只計真正送達的有效資料，還會受控制資訊、閒置、錯誤處理與重試影響。
+- **序列器與解序列器（serializer／deserializer）**：前者把較寬的平行資料排成高速序列，後者在接收端還原；兩端之間的等待只是整體記憶體延遲的一部分。
+- **FEC、CRC 與重試**：FEC 用冗餘資訊更正部分錯誤，CRC 用校驗值偵測錯誤，重試則重新傳送；可靠度可能改善，但額外資料與處理也要另記延遲及功耗。
+- **T0／T1 量測點**：OCP 白皮書把序列器到解序列器的 PHY 延遲稱為 T0，把含封包、FEC／CRC 區塊的延遲另列為 T1；兩者不能互相替代。
+- **beachfront／shoreline 與頻寬密度**：晶粒邊緣留給互連的線性寬度，以及每毫米能承載的頻寬；需要實際幾何與方向，不能由資料訊號總數單獨反推。
+- **每位元能耗（pJ/bit）**：以同一量測範圍的 PHY 功率除以同口徑頻寬；OCP 指出 mW/Gbps 與 pJ/bit 在量綱上等價，但分子是否含 Tx、Rx、clock 必須說清楚。
+- **reach**：在指定通道、封裝、速率與錯誤條件下可維持目標表現的傳輸距離；「可以走更遠」不等於任何材料、佈線或產品都已通過。
 - **介面基礎晶片（interface base die）**：位在記憶體堆疊底部、管理資料轉換與高速介面的邏輯晶片；換這一層不等於上方記憶體裸晶也換代。
 - **高速序列介面／PHY／D2D 與 NuLink-SP**：PHY 是實體電氣介面，D2D 是同一封裝內的晶粒互連；NuLink-SP 是 Eliyan 的標準封裝 D2D PHY 產品家族，公司把它定位到新標準，但定位不等於通過標準或客戶驗證。
 - **微凸塊**：封裝內連接晶粒的微小金屬接點；接點越密，對準、接合、檢查與良率控制越困難。
@@ -470,6 +571,105 @@ evidence: sources:S5,S6,S7
 測試清單，不升格成已驗證規格。這個停點很重要：研究中心教的是如何辨認缺少哪份證據，不是把
 讀不到的標準內容用看似合理的工程常識補完。
 
+## 2,048 變 512，只守住 raw throughput 的等式
+
+JEDEC 的公開關係可以先做一個不帶產品速率的正規化核對：把 HBM4 對應路徑的每線速率設為
+1 個教學單位，SPHBM4 主機側每線就是 4 個單位。這裡的 1 不是 1 GT/s，也不是任何產品時脈；
+它只用來確認「線數減為四分之一、每線速度變成四倍」在 raw 層是否仍能守住相同乘積。
+
+| 公開架構的正規化讀法 | 主機側資料訊號 | 每線速率指數 | raw throughput 指數 | 這一列沒有回答什麼 |
+|---|---:|---:|---:|---|
+| HBM4 對應資料路徑 | 2,048 | 1 | 2,048 | payload、延遲、錯誤、功耗與封裝幾何 |
+| SPHBM4 主機側映射 | 512 | 4 | 2,048 | 實際 GT/s、控制開銷、良率、成本與產品效能 |
+
+因此資料訊號數機械上減少 75%，每線速率提高為 4 倍，raw throughput 指數比例仍是 1。這個
+等式只證明 JEDEC 公開架構的算術一致，不會自動證明兩條路徑的有效資料吞吐、讀寫等待、功耗、
+可靠度或完整產品成本相同。
+
+### 同一個 raw，payload 與每位元能耗仍可分岔
+
+OCP 的 D2D PHY 指標白皮書把每線速率、Rx 加 Tx 的 PHY bandwidth、PHY power efficiency、
+shoreline density、reach、BER 與 latency 分開。以下再做兩個匿名的假想實作，刻意固定同口徑
+Rx 加 Tx raw bandwidth 為 2,048 Gbps；它們不是 HBM4 與 SPHBM4 的比較，也不是 JEDEC、
+Eliyan 或任何記憶體產品數字。
+
+本文另設一個教學用 payload 保留比例 η，把真正送達的有效資料除以 raw bandwidth；η 會把控制
+資訊、閒置與重試等結果合在一起，只為展示分母，不是 OCP 或 JEDEC 規定的單一標準欄位。
+
+| 匿名假想實作 | 同口徑 Rx＋Tx raw bandwidth | 教學用 η | payload goodput | Tx＋Rx＋clock power | OCP 口徑 pJ／raw bit | pJ／useful bit |
+|---|---:|---:|---:|---:|---:|---:|
+| 甲 | 2,048 Gbps | 95% | 1,945.6 Gbps | 12,288 mW | 6.000000 | 6.315789 |
+| 乙 | 2,048 Gbps | 80% | 1,638.4 Gbps | 16,384 mW | 8.000000 | 10.000000 |
+
+兩列 raw 完全相同，乙的 payload goodput 卻比甲低 15.789474%；以 OCP 的 unit power ÷ unit
+bandwidth 量綱核對，乙的 pJ／raw bit 高 33.333333%，改用有效資料作分母後則高 58.333333%。
+這不表示真實 SPHBM4 會落在任一列；它只說明「同頻寬」至少要追問 raw 還是 payload，以及
+功率分子是否包含相同的 Tx、Rx、clock、工作模式與資料型態。
+
+### 延遲與 BER 要先固定量測點
+
+OCP 白皮書沒有把一個 latency 或 BER 數字用到底。它把資料路徑切成至少三個量測層級；後一層
+可能包含更多錯誤處理，也可能需要不同的測試輸入與曝光時間。
+
+| OCP 量測層 | 起點與終點 | 延遲欄位 | BER 欄位 | 讀者要保留的邊界 |
+|---|---|---|---|---|
+| Serializer → Deserializer | 序列器輸入到解序列器輸出 | T0 | BL0 | 排除 clock-domain crossing elastic buffer，不是完整記憶體存取 |
+| Packet／FEC／CRC → Packet／FEC／CRC | 把封包與錯誤偵測／更正區塊納入 | T1 | BL1 | 要同時固定資料率、FEC／CRC 與處理範圍 |
+| CRC＋Retry | 再把錯誤偵測後的重傳納入 | 白皮書摘要表不給單一 latency 欄 | BL2 | 必須另留 retry policy、事件數、暴露 bit／時間與尾端延遲 |
+
+所以「BER 更低」要先問是 raw error、FEC 後、CRC 未更正錯誤，還是重試後的服務結果；「延遲
+更低」也要先問量到 PHY、packet、memory controller、DRAM core 還是應用。沒有共同起終點、
+資料型態、lane 方向、速率、錯誤機制、測試時間與環境，兩個數字不具可比性。
+
+### 512 條資料訊號也不能直接算 shoreline density
+
+OCP 把 PHY bandwidth per shoreline、packaging type、minimum bump pitch 與 reach 分開列欄。
+這提醒我們：頻寬密度的分母是實際晶粒邊緣寬度，不是資料訊號數；512 也不是總接點數。要重算
+Tbps/mm，還要知道 Tx／Rx 方向、data／clock／sideband／power／ground 配置、bump map、pitch、
+可堆疊單元與占用 beachfront。JEDEC 接點附錄尚未公開時，這些幾何不能用猜的。
+
+Eliyan 現行 NuLink-SP 產品表已把 process node、lane、per-lane rate、beachfront／area bandwidth
+與 reach 分開，這證明實作者知道不能只報 aggregate bandwidth；但它仍是單一供應商對相鄰 D2D
+產品家族的自報表，不能因欄位看起來相似，就改寫成 JESD330-4 compliance、具名 SPHBM4 memory
+或跨廠客戶測試。
+
+### 多空小作文共用的 SPHBM4 PHY 十欄護照
+
+| 護照欄位 | 至少要固定什麼 | 少了最容易誤讀成什麼 |
+|---|---|---|
+| 1. 標準與產品身分 | JESD330-4、JESD330-4-1 版本，memory／base die／host PHY／package／system 版本 | 主標準發布等於接點、產品與客戶都完成 |
+| 2. 方向與通道 | Tx／Rx、單向／半雙工／同時雙向、16-bit channel mapping、同步與排程 | 單向、雙向 aggregate 與讀寫頻寬可以直接互換 |
+| 3. lane、wire 與 pin | data lane、single-ended／differential wire、clock、sideband、command、power、ground 與 spare | 512 data signals 等於整顆只有 512 個接點 |
+| 4. 每線與 raw | data rate per lane、lane 數、方向、raw 計算式與量測速率 | 4 倍每線速率自動得到 4 倍系統效能 |
+| 5. payload 與工作負載 | 有效資料定義、read／write 比、burst、idle、overhead、retry 與 memory pattern | raw bandwidth 等於應用 goodput 或模型加速 |
+| 6. latency measurement point | T0／T1、controller／DRAM／application 起終點、平均與 tail、clock buffer inclusion | 一個 ns 可以替整條記憶體存取路徑背書 |
+| 7. BER 與恢復 | raw／FEC 後／CRC／retry 後、事件與 bit／時間暴露、pattern、溫度、電壓、lane 分布 | 零觀察錯誤等於 BER 為零或可靠度已通過 |
+| 8. power 與 energy | Tx＋Rx＋clock／controller／base die 範圍、工作模式、溫度、raw 或 useful-bit 分母 | 接點少就一定省電、較高 pJ/bit 就一定使產品失敗 |
+| 9. 幾何、封裝與 reach | bump map、pitch、shoreline、area、材料、層疊、路長、損耗、阻抗、電源與熱 | 有機基板一定較便宜、較長通道一定可放更多記憶體 |
+| 10. silicon 到財務 | process、test chip、memory sample、跨廠互通、可靠度、客戶 qualification、良率、成本、量產與收入 | 一家 PHY 供應商頁面等於台灣基板、矽智財或封測訂單 |
+
+較強的多方版本不是「2,048 變 512，所以成本一定大降」，而是同一具名產品在相同版本與工作
+負載下，仍守住 payload、延遲、BER、功耗與熱，並把較鬆接點和有機基板路徑轉成可重複的良率、
+合格產出、成本與客戶資格；供應商還要能對上同一產品與財務分子。
+
+較強的空方版本也不是「每線快四倍，所以 SPHBM4 一定失敗」，而是同一產品的高速通道、較長
+reach、base-die 邏輯、錯誤恢復、供電與熱代價，實測上侵蝕 payload 或產品裕量，且在多片 wafer／
+lot、可靠度與成本後無法守住目標。兩邊都必須交同一張護照，不能一邊只談接點，另一邊只談
+PHY 風險。
+
+### 分母、誤差與限制
+
+第一個教材是 N＝2 種公開架構映射的固定輸入換算；第二個教材是 N＝2 個匿名假想 PHY 實作。
+Python Fraction 與獨立 awk 在顯示精度內完全一致。這些都是確定性算術，不是抽樣、silicon
+量測、JEDEC compliance、封裝實驗、記憶體 benchmark 或客戶資料，因此沒有 sampling SE／t，
+也沒有真實 GT/s、payload、BER exposure、latency distribution、pJ/bit、die／wafer／lot、良率、
+可靠度、成本、需求、收入、毛利或公司效果。
+
+JEDEC、OCP 與 Eliyan 是標準組織、通用量測方法與單一供應商三條不同消息鏈，不是三個獨立
+SPHBM4 產品、客戶或量產 run。OCP 官方 PDF 共 44 頁；實際引用 file pp.33–41，連同相鄰頁
+pp.32–42 已由官方瀏覽器 PDF viewer 逐頁渲染目視核對。命令列與 web screenshot 端點回 403，
+因此不宣稱本地檔案 SHA；published_at 只依官方檔名的 NOV_19_2024 正規化，不主張正文另有日精度。
+
 ## 先看難題從哪裡搬到哪裡
 
 接點變少只回答「主機側要拉多少條資料線」，沒有回答整體產品是否更省電、更可靠、更好製造或
@@ -529,6 +729,7 @@ evidence: sources:S5,S6,S7
 - [JEDEC：JESD330-4 Version 1.0 與 bump-map addendum 現況](https://www.jedec.org/standards-documents/docs/jesd330-4)
 - [Eliyan：NuLink-SP 標準有機封裝 D2D PHY 產品頁](https://eliyan.com/products/)
 - [Eliyan：NuLink-SP 與 SPHBM4 官方公司貼文](https://www.linkedin.com/posts/eliyan-corporation_hbm4-and-sphbm4-scaling-memory-bandwidth-activity-7447249719749156864-xvXH)
+- [Open Compute Project：Electrical Interfaces Performance Metrics](https://www.opencompute.org/documents/odsa-whitepaper-2024-electrical-interfaces-performance-metrics-nov-19-2024-docx-pdf)（一般 D2D PHY 量測方法，不是 SPHBM4 規格或產品成績）。
 - [Micron：2026 財年第三季產品進度，2026-06-24](https://investors.micron.com/node/50671)
 - [SK hynix：12 層 HBM4E 樣品，2026-06-18](https://news.skhynix.com/en/12-layer-hbm4e-sample-1/)
 
