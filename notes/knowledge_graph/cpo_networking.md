@@ -334,3 +334,43 @@ status: active
 boundary: NIST／SEMATECH 公式只在 HPP／exponential、固定總暴露與相應獨立性等條件下給單側界線；333,808 port-device-hours 是條件式教材，不是 Broadcom／Meta 公布 MTBF、field lifetime 或保固。
 next_trigger: 取得 Meta 完整研究與 raw exposure／event structure 後，先檢查 constant-rate、independence、censoring 與 failure-definition 假設，再決定是否估計及採哪個模型。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-I14
+view: industry
+from_id: concept:cpo-networking
+to_id: process:cpo-optical-power-budget-passport
+relation: measured_by
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C14,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C15
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: ITU-T 固定通用 worst-case power-budget 方法，OIF 固定 CPO／ELSFP 的介面與排除邊界；十欄護照是研究中心為具名 CPO 應用建立的查核框架，不是 ITU／OIF 共同發布的 profile 或產品 pass result。
+next_trigger: 同一具名 CPO／ELS／receiver 組合公開 application version、reference points、power quantity、Tx／path／Rx limits、penalty／inclusion map、raw BER、重複與客戶 sign-off。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-I15
+view: industry
+from_id: concept:cpo-networking
+to_id: metric:worst-case-optical-power-margin
+relation: measured_by
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C14,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C15
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: A／B 的 +1.5／−0.5 dB low-power margin 與 +0.5／+2.5 dB overload headroom 是 N=2 個假想光路的確定性教材；不是 CPO、ELSFP、Ethernet、lane、module、switch、run、sampling SE／t 或商業結果。
+next_trigger: 具名產品以共同 reference points、mean／OMA／OSNR 定義、end-of-life corners 與 BER／FEC 契約公開兩端 margin、raw measurements、跨廠矩陣及客戶 qualification。
+-->

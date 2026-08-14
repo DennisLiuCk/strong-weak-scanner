@@ -230,6 +230,22 @@ limitation: 這是通用可靠度統計方法，不是 CPO、光引擎、link fl
 independence_group: nist
 -->
 
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: document
+publisher: ITU-T
+title: G Supplement 39 (10/2025) — Optical system design and engineering considerations
+published_at: 2025-10-24
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.itu.int/ITU-T/recommendations/rec.aspx?lang=en&rec=16678
+locator: 現行 2025-10 版 134 頁官方 PDF，SHA-256 414847951f85143d7802fbbccd50ab52264b81191a66bc9f6c684471b204a49f；PDF p. 23（印刷 p. 15）界定 end-of-life worst-case sensitivity、path effects 另計與 overload，PDF pp. 60–61（印刷 pp. 52–53）列 worst-case power-budget 參數並要求 minimum received power 高於 sensitivity 加 optical path penalty；實際引用頁及前後頁 PDF pp. 22–24、59–62 已逐頁渲染核對
+limitation: 這是 ITU 光傳輸系統的通用設計方法，不是 CPO、ELSFP、Ethernet、1.6T 或任一具名產品的 application specification、量測報告或互通結果；本文教材另加的 1 dB 工程裕量也不是 ITU 預設值
+independence_group: itu-optical-engineering
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -416,6 +432,34 @@ verification_needed: Meta ECOC 2025 完整論文／資料附錄，含設備與�
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: ITU-T G Supplement 39 的 worst-case optical power budget 同時要求最大／最小發射功率、最大／最小 attenuation、最大輸入功率或 overload、minimum receiver sensitivity、optical path penalty 與目標 BER；receiver sensitivity 已按 end-of-life worst-case 納入 ageing、temperature、transmitter eye／extinction、connector degradation 與 measurement tolerance，而 path effects 仍另列，故最低接收功率必須高於 sensitivity 加 path penalty，不能只報一個雷射輸出 headline
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2025-10-24
+basis: S14 PDF p. 23 與 pp. 60–61 直接列出 sensitivity／overload、worst-case power-budget 參數及 minimum received power 相對 sensitivity／path penalty 的關係
+boundary: 這是 ITU 光傳輸方法主張，不表示其 BER、參考點、平均功率、OMA、OSNR、attenuation、penalty 或 margin 數值可直接套到 OIF CPO／ELSFP 或任一 AI 網路產品；各應用仍須使用自己的同版次契約
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: CPO／外部雷射的應用驗收應保存共同 reference points、wavelength／lane、power quantity、Tx min／max、path attenuation min／max、receiver sensitivity／overload、path penalty、BER／FEC、溫度老化與額外工程裕量；本文固定假想 Tx 0 至 +3 dBm、sensitivity −8 dBm、overload +1 dBm、path penalty 1 dB、另列 design margin 1 dB 時，A 的 attenuation 2.5 至 4.5 dB 使 low-power margin +1.5 dB、overload headroom +0.5 dB 而通過，B 的 4.5 至 6.5 dB 雖有 +2.5 dB overload headroom，low-power margin 卻為 −0.5 dB 而失敗，因此相同速率、發射與接收元件不能替端到端 link margin 背書
+supporting_source_ids: S8,S10,S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8／S10 說明 external laser、connector／pigtail 與應用特定 power／noise／wavelength 邊界，S14 提供 two-sided worst-case power-budget 方法；Python Decimal 與獨立 awk 均重算 A／B 的 minimum received power、low-power margin、maximum received power、overload headroom 與 pass／fail
+boundary: A／B 是 N=2 個純假想光路設定，不是 CPO、ELSFP、Ethernet、1.6T、產品、lane、module、switch、run 或 deployment 樣本；0 至 +3、−8、+1、1 dB penalty、1 dB design margin 與 attenuation ranges 都不是任何標準預設，沒有 sampling SE／t、BER 實測、可靠度、功耗、成本、收入或公司效果
+verification_needed: 同一具名 CPO／ELS 組合與版本的 application profile、reference points、wavelength／lane、mean／OMA／OSNR 定義、Tx／Rx limits、逐元件 worst-case loss、path penalty、BER／FEC、溫度／老化、raw measurements、重複／不確定度、跨廠矩陣與客戶 qualification
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -509,6 +553,13 @@ to: triaged
 reason: zero_link_flap_exposure_reframed_as_model_conditional_reliability_bound_without_thesis_clock_refresh
 evidence: sources:S12,S13
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_two_sided_worst_case_optical_power_budget_without_thesis_or_clock_refresh
+evidence: sources:S8,S10,S14
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -529,6 +580,7 @@ evidence: sources:S12,S13
 - **前面板**：交換器機箱面向維修人員、安裝光模組與光纖接頭的位置。
 - **連接埠**：交換器對外收送一條連線的介面；產品開始生產不等於已知部署了多少個連接埠。
 - **高速序列介面（SerDes）**：把資料轉成高速序列電訊號並在另一端還原的電路；速度愈高，傳輸距離、耗電與訊號完整性愈難兼顧。
+- **Tx／Rx**：Tx 是送出光訊號的 transmitter，Rx 是接收並解碼的 receiver；link budget 必須把 Tx 的上下限和 Rx 的太暗、太亮界線成對核對。
 - **光訊號處理晶片（DSP）**：在光模組中處理高速訊號補償與轉換的晶片；晶片大量出貨不等於整體模組市場只剩一種架構。
 - **重定時（retimed）**：在電介面重新判決並整理高速訊號，讓主晶片與光學端較能分開滿足訊號要求，但會增加晶片功能、功耗與驗證項目。
 - **線性光學（linear optics）**：不以完整重定時把主晶片與光學端隔開，而讓兩端共同滿足訊號完整性；「線性」不等於沒有任何晶片或不需系統驗證。
@@ -537,6 +589,19 @@ evidence: sources:S12,S13
 - **1.6T**：每秒 1.6 兆位元的連線容量；它描述速度，不是固定的封裝形式、產品數量或營收。
 - **雷射光源**：提供穩定光能給光引擎調變與傳輸的元件；光源位置與維修方式會影響整體設計。
 - **光學損耗預算（optical loss budget）**：從雷射到接收端沿途可容許的總光功率損失；多一個連接器、分光器或耦合點，都可能吃掉一部分預算。
+- **dBm**：以 1 mW 為參考的對數光功率單位，表示某個參考點上的絕對功率；`0 dBm` 是 1 mW，不是「沒有光」。
+- **dB**：表示兩個功率之比或沿途損耗的對數單位；從 dBm 的發射功率減掉 dB 損耗，結果仍是接收端的 dBm。
+- **光學參考點（reference point）**：指定在哪個連接器、模組端面或光路位置量功率；沒有共同參考點，即使都寫 dBm 也可能量到不同段。
+- **平均光功率／OMA**：平均光功率是資料週期中的平均值；OMA 是邏輯高低光功率的調變幅度。兩者量測定義不同，不能把一個數值直接塞進另一個規格欄。
+- **最小／最大發射功率**：同一發射端在規定環境與壽命條件下必須提供的下限與不得超過的上限；最小值用來防太暗，最大值還要和接收 overload 對帳。
+- **接收靈敏度（receiver sensitivity）**：接收端在指定訊號品質與 BER 條件下仍能正確工作的最低輸入功率；它不是任意低功率都能解碼的承諾。
+- **接收過載（receiver overload）**：接收端仍能達到指定 BER 的最高可接受輸入功率；光太強也可能失敗，因此不能只追求更高雷射輸出。
+- **光路懲罰（optical path penalty）**：色散、抖動、反射等光路效應對接收需求增加的功率代價；它和連接器、光纖等 attenuation 不是同一欄。
+- **光功率裕量（optical power margin）**：在共同參考點與同一功率定義下，規格可用預算扣除 worst-case attenuation、path penalty 與明列工程保留後的餘額；正值也仍要靠量測與 BER 驗收。
+- **FEC（前向錯誤更正）**：接收端用冗餘碼修正部分傳輸錯誤的方法；規格必須說清 BER 是在 FEC 前還是 FEC 後，不能只寫「有 FEC」。
+- **OSNR（光訊號雜訊比）**：光訊號相對光雜訊的比值；含光放大器的系統可能以 OSNR tolerance／penalty 建預算，不能和 mean power 或 OMA 混成同一欄。
+- **ITU-T Supplement**：ITU-T 是國際電信聯盟的電信標準部門，Supplement 是說明設計背景與方法的補充文件；本文用它建立通用讀法，不把它冒充 CPO application profile。
+- **Python Decimal／awk 雙路重算**：先用十進位精確算術、再用獨立文字運算工具重算同一固定小數；一致只證明教材算式可重現，不是兩次光學實驗或兩個樣本。
 - **尾纖（pigtail）**：由元件固定帶出的短光纖；它可少一個可拆連接點，卻也會改變組裝與返修邊界。
 - **盲插（blindmate）**：不用直接看見或手動對準內部接點就能插合的介面；可盲插不等於任意兩家產品已通過互通。
 - **磷化銦雷射（InP laser）**：以磷化銦材料製作的雷射元件；具名角色不等於獨家供應、已知份額或已揭露收入。
@@ -646,6 +711,85 @@ OIF 的 current-work 頁把 pluggable、NPO、CPO 與 retimed、transmit-retimed
 OIF framework 支持的是表中的工程方向，不是統計比較。沒有同一產品、條件與樣本的失效次數、
 測試時間和信賴區間，就不能宣稱外部或整合雷射「較可靠」；能說的只有它們把故障、散熱、損耗
 與控制責任放在不同位置。
+
+## 同樣速率與元件，為什麼一條光路通過、另一條失敗
+
+`1.6T`、CPO、ELSFP 或高功率雷射都不是 link-budget 結論。速率只說每秒傳多少資料，架構名稱
+只說元件大致放在哪裡；真正到接收端時，還要把發射端最弱與最強可能值、每段光路損耗、接收端
+太暗與太亮的界線、path penalty，以及哪些溫度、老化與量測容差已經算過逐欄對齊。
+
+ITU-T G Supplement 39 的 worst-case 方法把 maximum／minimum output power、maximum／minimum
+attenuation、maximum input／overload、receiver sensitivity、optical path penalty 與 BER 分開；
+它也明說 sensitivity 已按 end-of-life worst case 納入部分老化、溫度、發射品質、連接器退化與
+量測容差，而 path effects 仍另計。[S14] 這是通用光傳輸方法，不是 CPO 規格。OIF ELSFP IA
+又刻意把應用特定的 optical power、noise 與 wavelength 留在 IA 之外，所以具名 CPO／ELS 組合
+仍須另外填完整應用帳。[S8][S10]
+
+### 先畫兩道門：不能太暗，也不能太亮
+
+以下是 `N=2` 個純假想光路，不是 CPO、ELSFP、Ethernet 或 1.6T 產品數據。兩案共用同一組
+發射與接收規格，只讓 B 的 attenuation envelope 比 A 多 2 dB。
+
+| 共同假設 | 教材固定值 | 這一欄回答什麼 |
+|---|---:|---|
+| 最小／最大发射平均光功率 | `0 至 +3 dBm` | 最弱與最強發射情境 |
+| Receiver sensitivity | `−8 dBm` | 沒有另加 path effects 時的太暗界線 |
+| Receiver overload | `+1 dBm` | 接收端仍能達指定 BER 的太亮界線 |
+| Optical path penalty | `1 dB` | 另列的色散、反射、抖動等 path-effects 保留 |
+| 額外 design margin | `1 dB` | 本教材明示另留的工程裕量；不是 ITU 預設值 |
+
+在同一 average-power 定義與 reference points 下，dBm 減 dB 仍是 dBm；兩道門可寫成：
+
+```text
+P_rx,low  = P_tx,min − L_max
+M_low     = P_rx,low − (receiver sensitivity + path penalty + design margin)
+P_rx,high = P_tx,max − L_min
+M_high    = receiver overload − P_rx,high
+pass      = M_low ≥ 0 且 M_high ≥ 0
+```
+
+| 假想光路 | Attenuation min／max | 最弱接收功率 | 太暗端 margin | 最強接收功率 | Overload headroom | 結果 |
+|---|---:|---:|---:|---:|---:|---|
+| A | `2.5／4.5 dB` | `0−4.5 = −4.5 dBm` | `−4.5−(−8+1+1) = +1.5 dB` | `3−2.5 = +0.5 dBm` | `1−0.5 = +0.5 dB` | 兩道門皆通過 |
+| B | `4.5／6.5 dB` | `0−6.5 = −6.5 dBm` | `−6.5−(−8+1+1) = −0.5 dB` | `3−4.5 = −1.5 dBm` | `1−(−1.5) = +2.5 dB` | 太暗端失敗 |
+
+從另一種等價讀法看，發射最小值與 sensitivity 之間共有 `0−(−8)=8 dB` 的名目預算；A 的
+maximum attenuation、path penalty 與明列 margin 合計 `4.5+1+1=6.5 dB`，餘 `+1.5 dB`；
+B 合計 `6.5+1+1=8.5 dB`，短缺 `0.5 dB`。增加損耗會讓太亮端更安全，卻可能把太暗端推過線，
+因此不能只看一個「雷射功率更高」或「短距離」標籤。
+
+Python `Decimal` 與獨立 `awk` 浮點路徑均重算出 A 的 low／high margin 為 `+1.5／+0.5 dB`、
+B 為 `−0.5／+2.5 dB`，pass 分別為 true／false。這是固定小數的確定性單位展開，不是抽樣或
+光學實驗，沒有 sampling SE／t、BER observation、lane、module、switch、run、可靠度、功耗、
+成本或財務效果。實際產品若用 OMA、OSNR、不同 BER／FEC 或其他 reference points，就必須換回
+該應用的完整公式，不能沿用本例數字。
+
+### 多空小作文要共用十欄光功率護照
+
+| 十欄光功率護照 | 至少保存什麼 | 少了最容易被誤寫成 |
+|---|---|---|
+| 1. Application 與版本 | CPO／NPO／pluggable 組態、ELS／engine／receiver 型號、IA 與 profile 版次 | 同名架構都能互通 |
+| 2. Reference points 與方向 | 從哪個 connector／module plane 到哪個 receiver plane，單向或雙向 | 不同量測位置的 dBm 可直接相減 |
+| 3. Wavelength、lane 與光路 | 波長、lane 數、fiber／splitter／connector／coupling 路徑及長度 | 總速率自動等於每 lane 餘量 |
+| 4. Power quantity 與單位 | mean power、OMA、OSNR 或其他定義，dBm／dB 的正負號與儀器設定 | 平均功率、調變幅度與訊噪比是同一數字 |
+| 5. Tx min／max | 在指定溫度、電壓、壽命與控制模式下的上下限 | Typical 或 maximum output 能替 weakest case 背書 |
+| 6. Attenuation min／max | 每個 connector、split、coupling、fiber 與污染／插拔條件的 worst-case roll-up | 一次 bench loss 就是全壽命 link loss |
+| 7. Rx sensitivity／overload | 共同 BER／FEC、訊號品質與測試發射端下的太暗／太亮界線 | 靈敏度通過就不可能 overload |
+| 8. Path penalty | dispersion、jitter、reflection、crosstalk、TDECQ／其他 penalty 的定義與分配 | 所有劣化都已含在 attenuation 或 sensitivity |
+| 9. Inclusion map 與 margin | ageing、temperature、connector degradation、measurement tolerance 各算在哪裡，另留多少工程裕量 | 同一風險被重複扣除，或完全漏算 |
+| 10. Qualification result | raw measurements、unit／lot／run、重複、量測不確定度、pass/fail、跨廠組合與客戶 sign-off | 紙上算術已等於產品合格與部署 |
+
+**多方小作文可以寫到哪裡：** 若同一具名版本在 end-of-life／temperature corners 下，太暗與
+overload margin 都為正，raw BER／FEC、跨廠 ELS—engine—receiver 組合與客戶 qualification
+也重複通過，再配上 field 埠數、維修與成本資料，外部雷射或 CPO 的系統風險才真正下降。
+
+**空方小作文可以寫到哪裡：** 若新聞只報 typical output、單一短纖 bench、maximum loss 或
+「符合 IA」，卻沒有 common reference points、minimum Tx、overload、path penalty、inclusion map
+與 raw BER，2 dB 的 connector／split／coupling 差異就可能吃完整個低功率 margin；架構優勢仍
+可能被污染、溫漂、老化、重插與多供應商公差抵銷。
+
+兩方應共用同一份十欄護照。工程 margin 通過仍只到 qualification 層；沒有部署分母、合格品
+良率、維修成本、出貨、收入與毛利共同鍵，不能把正 dB 餘量改寫成任何台灣公司的財務受惠。
 
 ## 「100 萬小時零 flap」不是零失效率：先拆暴露、事件與模型
 
@@ -809,14 +953,18 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 - [OIF：Current Work，2026-08-12 capture](https://www.oiforum.com/technical-work/current-work/)（pluggable／NPO／CPO、retimed／transmit-retimed／linear 與 AI scale-up photonic interface 工作範圍）。
 - [Broadcom：Meta 測試的 100 萬個 400G-equivalent port-device-hours／零 link flap，2025-10-01](https://investors.broadcom.com/node/63616/pdf)（1 頁官方新聞稿與 ECOC 研究註腳；不是 raw event log 或 field lifetime study）。
 - [NIST／SEMATECH：HPP／exponential zero-fails confidence bound](https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm)（通用可靠度方法與條件，不是 CPO 模型適配認證）。
+- [ITU-T：G Supplement 39 (10/2025) Optical system design and engineering considerations，2025-10-24](https://www.itu.int/ITU-T/recommendations/rec.aspx?lang=en&rec=16678)（PDF p. 23、pp. 60–61：end-of-life worst-case sensitivity／overload、power-budget 參數與 path penalty；是通用光傳輸方法，不是 CPO application profile）。
 
 **已知：** OIF 文件證實光引擎位置、訊號處理與雷射位置必須分開閱讀，且 IA 只覆蓋指定互通
 邊界；NVIDIA 將具名共同封裝產品描述為進入生產並直接列名 SPIL，Spectrum-6 與 Marvell 的
 資料也證明可插拔路徑仍在同代產品與量產生態中。Broadcom／Meta 另新增一筆客戶高溫實驗室的
-累計 100 萬 port-device-hours／零 link-flap 觀測，但正確統計解讀仍需模型與底層分母。
+累計 100 萬 port-device-hours／零 link-flap 觀測，但正確統計解讀仍需模型與底層分母。ITU 方法
+再確認 link budget 必須同時保存最小／最大发射、最小／最大 attenuation、sensitivity／overload、
+path penalty 與 BER，而不是用雷射輸出或架構標籤代替端到端驗收。
 
 **還不知道：** 具名產品完整三軸組態、NPO／ELS 實際部署、應用 link budget、跨廠互通、
-field replacement 與完整長期可靠度結果、各埠暴露／共同故障／事件日誌、同條件比較組、
+共同 reference points／power quantity／inclusion map／兩端 margin、field replacement 與完整長期
+可靠度結果、各埠暴露／共同故障／事件日誌、同條件比較組、
 各組態出貨配比、每埠成本、台灣供應商收入與毛利，
 以及 6147、6451 是否參與上述具名平台。
 
@@ -841,7 +989,7 @@ evidence_boundary: OIF framework／IA、平台 production 與生態系列名都�
 ## 下一個可證明／否定的節點
 
 - **組態層**：具名產品是否同時公布 optical-engine placement、signal-processing mode 與 laser placement；只有一個 CPO／NPO／LPO 標籤就不算填滿。
-- **互通層**：3.2T CPO module、ELSFP 與應用 link budget 是否由多家產品在同一版本與條件下完成互通、故障注入、field replacement 與長期可靠度。
+- **互通層**：3.2T CPO module、ELSFP 與應用 link budget 是否由多家產品在同一版本與條件下，以共同 reference points、mean／OMA／OSNR 定義、Tx／Rx limits、逐段 attenuation、path penalty、inclusion map、兩端 margin 與 raw BER 完成互通、故障注入、field replacement 與長期可靠度。
 - **可靠度層**：Meta ECOC 2025 完整論文或資料附錄能否補上 100 萬 port-device-hours 的埠數、各埠時長、共同故障群組、版本、所有事件與比較組；只有零 link-flap headline 不能估 field lifetime。
 - **平台層**：首批雲端採用者是否公布各三軸組態的交換器數、部署位置、可靠度、修復時間或節能實際值；若只停在 IA、展示或少量部署，量產解讀不升級。
 - **公司層**：3711 是否拆出光電共同封裝的收入／毛利；6147、6451 是否由送樣或小量生產轉為正式量產收入。沒有公司文件，就不把平台證據寫進正式筆記事實。

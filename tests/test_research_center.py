@@ -5016,6 +5016,18 @@ class ResearchCenterTest(unittest.TestCase):
             "**多方小作文可以寫到哪裡：**",
             "**空方小作文可以寫到哪裡：**",
             "本節有 `N=2` 條消息鏈",
+            "added_two_sided_worst_case_optical_power_budget_without_thesis_or_clock_refresh",
+            "## 同樣速率與元件，為什麼一條光路通過、另一條失敗",
+            "### 先畫兩道門：不能太暗，也不能太亮",
+            "| 共同假設 | 教材固定值 | 這一欄回答什麼 |",
+            "P_rx,low  = P_tx,min − L_max",
+            "pass      = M_low ≥ 0 且 M_high ≥ 0",
+            "| A | `2.5／4.5 dB` |", "+1.5 dB", "+0.5 dB",
+            "| B | `4.5／6.5 dB` |", "−0.5 dB", "+2.5 dB",
+            "### 多空小作文要共用十欄光功率護照",
+            "| 十欄光功率護照 | 至少保存什麼 | 少了最容易被誤寫成 |",
+            "Python `Decimal` 與獨立 `awk` 浮點路徑",
+            "source_id: S14", "claim_id: C14", "claim_id: C15",
             "source_id: S12", "source_id: S13",
             "claim_id: C11", "claim_id: C12", "claim_id: C13",
             "claim_id: C9", "correction_kind: supersedes",
@@ -5026,7 +5038,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 50
+            sum(line.startswith("- **") for line in glossary.splitlines()), 64
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5041,8 +5053,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 13), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 15), ("metric_comparison", 0),
             ("impact", 1), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5076,6 +5088,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:optics-multivendor-field-validation,stage,光學多供應商與現場驗證",
             "process:cpo-reliability-exposure-passport,process,CPO 可靠度暴露護照",
             "metric:zero-event-reliability-bound,metric,零事件可靠度單側界線",
+            "process:cpo-optical-power-budget-passport,process,CPO 光功率預算十欄護照",
+            "metric:worst-case-optical-power-margin,metric,最差條件光功率兩端裕量",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 光學三軸組態與產品證據", graph)
@@ -5088,9 +5102,11 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-CPO-I11", "to_id: stage:optics-multivendor-field-validation",
             "edge_id: KG-CPO-I12", "to_id: process:cpo-reliability-exposure-passport",
             "edge_id: KG-CPO-I13", "to_id: metric:zero-event-reliability-bound",
+            "edge_id: KG-CPO-I14", "to_id: process:cpo-optical-power-budget-passport",
+            "edge_id: KG-CPO-I15", "to_id: metric:worst-case-optical-power-margin",
         ):
             self.assertIn(edge, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 16)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
 
     def test_compute_connect_station_five_separates_exposure_cost_roles_and_company_gates(self):
         topic = (
