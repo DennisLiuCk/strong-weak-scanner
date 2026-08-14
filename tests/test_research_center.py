@@ -5148,12 +5148,21 @@ class ResearchCenterTest(unittest.TestCase):
             "| 3. 曝光機與光學 |", "| 4. 顯影與圖形轉移 |",
             "| 5. 量測、檢查與下一層 |",
             "added_anamorphic_field_stitching_dose_yield_and_electrical_evidence_ladder_without_hvm_upgrade",
+            "added_na_resolution_depth_of_focus_and_half_field_passport_without_thesis_clock_refresh",
             "## 解析度變好，為什麼反而多出五個新難題",
             "| 本文五個新難題 | 變化從哪裡來 | 本輪一手證據走到哪裡 | 下一個要驗收 | 不能直接推成 |",
             "| 1. 半視場與接縫 |", "| 2. 焦深、薄膜與表面起伏 |",
             "| 3. 劑量、速度與隨機缺陷 |",
             "| 4. 光罩、修正、光阻與烘烤 |",
             "| 5. 圖形轉移與電性 |",
+            "## 0.55 比 0.33 大，為什麼景深反而只剩約三分之一",
+            "CD ＝ k1 × 波長 ÷ NA",
+            "| A：較低 NA | 13.5nm | 0.32 | 0.33 | 13.0909nm |",
+            "| B：較高 NA | 13.5nm | 0.32 | 0.55 | 7.8545nm |",
+            "| 焦深帳 | 受邀摘要報告 0.55 NA 計算值 45nm、約為 0.33 NA 的三分之一 |",
+            "### 多空小作文共用一份十欄光學—製程護照",
+            "| 5. 焦距預算 |", "| 8. 設備生產 |",
+            "| 10. 商業與變更沿革 |",
             "## 再用五把尺比較少做步驟是否真的省錢",
             "| 本文五把尺 | 較高數值孔徑方案 | 現行多步驟方案 | 下一個要量的結果 | 不能直接推成 |",
             "| 1. 曝光與加工次數 |", "| 2. 機器可用時間與每小時產出 |",
@@ -5193,7 +5202,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 44
+            sum(line.startswith("- **") for line in glossary.splitlines()), 48
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5210,8 +5219,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 14), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 17), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5243,6 +5252,8 @@ class ResearchCenterTest(unittest.TestCase):
             "process:high-na-field-stitching,process,High-NA 半視場接縫拼接",
             "metric:high-na-dose-yield-throughput-window,metric,High-NA 劑量缺陷良率產出視窗",
             "process:high-na-electrical-evidence-ladder,process,High-NA 圖形到電性量產證據階梯",
+            "process:high-na-optical-process-window-passport,process,High-NA 光學與製程視窗十欄護照",
+            "metric:resolution-depth-of-focus-field-boundary,metric,解析度焦深與曝光視場邊界",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 晶圓圖形曝光與 High-NA 導入階梯", graph)
@@ -5251,6 +5262,8 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-HNA-I13", "to_id: process:high-na-field-stitching",
             "edge_id: KG-HNA-I14", "to_id: metric:high-na-dose-yield-throughput-window",
             "edge_id: KG-HNA-I15", "to_id: process:high-na-electrical-evidence-ladder",
+            "edge_id: KG-HNA-I16", "to_id: process:high-na-optical-process-window-passport",
+            "edge_id: KG-HNA-I17", "to_id: metric:resolution-depth-of-focus-field-boundary",
         ):
             self.assertIn(edge, graph)
 

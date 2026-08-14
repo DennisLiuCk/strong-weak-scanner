@@ -248,6 +248,38 @@ limitation: Intel 的會議技術摘要支持客戶端研發項目，不提供�
 independence_group: intel
 -->
 
+<!-- research_source
+source_id: S14
+role: company_release
+source_kind: living_index
+publisher: ASML
+title: The Rayleigh criterion for resolution
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.asml.com/en/technology/lithography-principles/rayleigh-criterion
+locator: 現行正文 Rayleigh criterion equation 段落；CD＝k1×波長÷NA，並分別定義 critical dimension、波長、數值孔徑與製程相依的 k1
+limitation: ASML 的教育頁固定光學關係與名詞，不提供 High-NA 產品層的焦深、視場拼接、缺陷、良率、合格產出或成本；頁面沒有可核對的發布日
+independence_group: asml
+-->
+
+<!-- research_source
+source_id: S15
+role: other_primary
+source_kind: document
+publisher: EUV Litho, Inc.
+title: 2023 EUVL Workshop & Supplier Showcase Abstract Book
+published_at: 2023-06-03
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://euvlitho.com/2023/2023%20EUVL%20Workshop%20and%20Supplier%20Showcase%20Abstract%20Book.pdf
+locator: PDF 檔案第36頁（頁尾 program P46）University of Hyogo 受邀摘要；計算 0.55 NA 的 wafer depth of focus 為 45nm、約為 0.33 NA 的三分之一，並指出薄光阻與 line-width roughness 邊界
+limitation: 2023-06-03 是官方 agenda 所列研討會起始日，不主張為摘要集實際上線日；單頁受邀摘要與研究計算不是產品製程視窗、完整論文、客戶 qualification、HVM 良率或成本證據
+independence_group: university-of-hyogo-euvl-workshop
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -486,6 +518,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: ASML 的 Rayleigh 教育頁把臨界尺寸寫成 CD＝k1×波長÷NA，並說明 k1 取決於晶片製造製程；因此只有在波長與 k1 等比較條件固定時，較大 NA 才能單獨換算成較小的理論臨界尺寸
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 正文直接給出公式與 CD、波長、NA、k1 定義，並明示 k1 是製程相依係數
+boundary: Rayleigh 關係是解析度的一階光學框架，不給焦深、視場、光罩、光阻、隨機缺陷、圖形轉移、設備產出、產品良率或成本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: University of Hyogo 在 2023 年極紫外光微影研討會受邀摘要中報告 0.55 NA 的 wafer depth of focus 計算值為 45nm、約為 0.33 NA 的三分之一，並指出因此需要薄光阻，而光阻越薄時 line-width roughness 會惡化
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2023-06-03
+basis: S15 PDF 檔案第36頁（頁尾 program P46）直接列出 45nm、one third、thin resist film 與 thickness thinner 時 LWR worsen
+boundary: 這是研討會受邀摘要中的研究計算與材料問題陳述，不是 EXE 客戶產品層的實測焦深分布、量產 recipe、跨批次重現、良率或成本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: High-NA 比較至少要把解析度、焦深、曝光視場與合格產出分成四本帳，再以同一產品層的光罩、膜堆、光阻、焦距劑量、接縫、缺陷、電性與生產分母接回成本；NA 或理論 CD 任一欄改善，都不能單獨替實際良率與經濟性畢業
+supporting_source_ids: S8,S14,S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 固定 CD 關係，S15 提供焦深與薄光阻粗糙度邊界，S8 另固定半視場、兩倍曝光次數與更快 stage 的產能補償路徑，三者回答不同帳本
+boundary: 這是研究中心的比較方法與證據契約；N＝2 假想光學設定及曝光指數只是確定性教材，不是設備、晶圓、產品、run、抽樣結果、客戶 qualification、財務效果或投資結論
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -560,6 +643,14 @@ reason: added_anamorphic_field_stitching_dose_yield_and_electrical_evidence_ladd
 evidence: sources:S8,S9,S10,S11,S12,S13
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_na_resolution_depth_of_focus_and_half_field_passport_without_thesis_clock_refresh
+evidence: sources:S8,S14,S15
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -577,11 +668,15 @@ evidence: sources:S8,S9,S10,S11,S12,S13
 - **缺陷**：可能讓圖形或晶片功能失敗的異常；缺陷數量要放回晶圓面積、層數與產品良率判讀。
 - **線寬**：晶圓上某條線或間距的尺寸；能印得更細不等於整個產品都會使用相同尺寸。
 - **解析度**：曝光系統分開細小圖形的能力；解析度提升只是製程成立的一項條件。
+- **臨界尺寸**：指定光學與製程條件下可印出的最小圖形尺度，英文常寫 CD；它不是產品節點名稱或最終晶片良率。
+- **Rayleigh 準則**：用波長、數值孔徑與製程係數連接臨界尺寸的一階光學關係；公式結果不是量產實測。
+- **k1 係數**：Rayleigh 關係中的製程相依係數；光罩、照明、材料與圖形化方法不同時，不能假設 k1 相同。
 - **數值孔徑**：描述光學系統收集與聚焦光線能力的指標；提高它可改善解析度，也會改變光罩、光阻與製程整合要求。
 - **非等向縮放光學**：兩個方向使用不同縮小倍率的光學設計，英文常寫 anamorphic optics；High-NA 因此改變單次曝光可覆蓋的面積。
 - **半視場**：單次曝光只覆蓋現行完整視場的一半；較大的產品版圖可能需要把兩個半場接起來。
 - **視場拼接**：把相鄰曝光區域在接縫處正確銜接；拼得出測試線不等於所有產品圖形都通過長期穩定驗證。
 - **焦深**：晶圓高度在多大範圍內仍能保持合格圖形；焦深縮小時，薄膜厚度、表面起伏與設備控制會更敏感。
+- **焦距預算**：把設備控制、晶圓起伏、膜厚、量測誤差與其他高度變動分配到可用焦深內；總和超出視窗時圖形可能失效。
 - **曝光劑量**：光阻接收的曝光能量；劑量較低可能提高速度，卻必須一起檢查隨機缺陷與良率。
 - **EUV**：極紫外光微影，用很短波長的光印製先進晶片圖形；它只是完整製程中的一段。
 - **High-NA**：把極紫外光系統的數值孔徑提高到 0.55 的方案；目標是一次印出更細圖形，但仍要驗證良率、產出與成本。
@@ -665,6 +760,72 @@ High-NA 把數值孔徑由 0.33 提高到 0.55，目標是一次分開更細的�
 這五題也解釋了為什麼「材料需求變難」不等於「材料公司收入必然上升」。新配方可能減少劑量，
 也可能要求更薄膜層、不同烘烤、額外檢查或重做光罩；只有客戶用同一產品層把配方、缺陷、產出與
 成本完整簽核，才知道哪個角色得到多少可持續價值。
+
+## 0.55 比 0.33 大，為什麼景深反而只剩約三分之一
+
+### 先固定波長與 k1，再談解析度
+
+ASML 用 Rayleigh 關係把臨界尺寸寫成：
+
+- CD ＝ k1 × 波長 ÷ NA。
+
+式子看似簡單，真正重要的是比較契約。波長要相同，k1 也要相同，才可以把 CD 的差異只歸給
+NA。k1 不是一顆設備旋鈕，而是會隨光罩、照明、材料、圖形與製程方法改變的係數；因此「NA
+提高 67%」不能直接改寫成「產品線寬縮小 67%」。
+
+下面只做一個固定輸入的教學換算：兩個設定都使用 13.5nm 波長與假想 k1＝0.32，只把 NA 由
+0.33 改為 0.55。
+
+| 本文假想設定 | 波長 | k1 | NA | Rayleigh CD | 只回答什麼 |
+|---|---:|---:|---:|---:|---|
+| A：較低 NA | 13.5nm | 0.32 | 0.33 | 13.0909nm | 固定波長與 k1 時的理論臨界尺寸 |
+| B：較高 NA | 13.5nm | 0.32 | 0.55 | 7.8545nm | 同一簡化公式下，CD 為 A 的 0.60、縮小 40% |
+
+這是 N＝2 個假想光學設定的確定性換算，不是抽樣、曝光實驗或 ASML 產品規格；沒有晶圓、圖形、
+run、sampling SE／t、缺陷、良率、每小時產出或成本。Python Fraction 精確有理數與獨立 awk
+重算一致；13.0909nm 與 7.8545nm 只存在於這組假設，不能拿去替任何產品節點背書。
+
+### 解析度、景深與半視場是三本帳
+
+解析度變好，不代表晶圓高度的容許範圍也一起變大。University of Hyogo 的 2023 受邀摘要把
+0.55 NA 的 wafer depth of focus 計算為 45nm，約是 0.33 NA 的三分之一，並指出因此需要薄光阻；
+光阻越薄，線寬粗糙度反而更難控制。這是研究計算與材料問題，不是客戶產品的實測製程能力。
+
+另外，ASML 的非等向光學讓 EXE 曝光視場只有 NXE 的一半，所以同一晶圓面積需要兩倍曝光次數。
+若把完整視場覆蓋指數設為 100，半視場就是 50；覆蓋同一面積的曝光次數指數會由 100 變成 200，
+增加 100%。這也只是幾何帳。ASML 以更快的 wafer 與 reticle stage 補償，所以不能再假設每片
+時間必然加倍；實際產能要回到同一設備版本的可用率、停機、raw wafers per hour 與合格產出。
+
+| 必須分開的帳 | 一手資料能說什麼 | 還要量什麼 | 不能直接推成 |
+|---|---|---|---|
+| 解析度帳 | 固定波長與 k1 時，NA 進入 CD 的分母；ASML 另報 EXE 約 8nm、NXE 約 13nm 的平台尺度 | 同一產品圖形的 k1、方向、pitch、CD 定義與全晶圓分布 | 理論 CD 變小等於產品節點、良率或密度按平方改善 |
+| 焦深帳 | 受邀摘要報告 0.55 NA 計算值 45nm、約為 0.33 NA 的三分之一 | 同一膜堆的焦距預算、晶圓地形、光阻厚度、劑量—焦距矩陣與轉移後結果 | 研究計算等於客戶產品已保有足夠視窗 |
+| 視場帳 | EXE 半視場使同面積曝光次數幾何上加倍 | 版圖接縫、stage 速度、移動與換場 overhead、raw 及 good throughput | 曝光次數加倍等於晶圓時間或成本加倍 |
+| 生產帳 | 更快 stage 是補償半視場的設備路徑 | 可用率、維護、重工、報廢、每小時合格層數與每顆合格晶片成本 | 最高 wafers per hour 等於持續產品產能或財務受惠 |
+
+### 多空小作文共用一份十欄光學—製程護照
+
+多方版本可以主張：在同一產品層，較小 CD 讓單次曝光替代多重圖形化，且焦距—劑量視窗、接縫、
+缺陷、轉移後電性與每小時合格產出都通過，最後每顆合格晶片成本下降。空方版本可以主張：半視場、
+較窄焦深、薄光阻粗糙度與新增控制吃掉簡化收益。兩邊都不能只挑自己喜歡的單一規格，必須交付
+同一份護照：
+
+| 本文十欄光學—製程護照 | 至少要固定或量測 | 為什麼重要 |
+|---|---|---|
+| 1. 產品與版本 | 客戶、產品、層、版次、晶圓、批次與比較期間 | 測試圖形不能替產品層畢業 |
+| 2. 波長與 NA | 光源波長、NA、光學版本、照明與方向 | 先鎖定 Rayleigh 公式的光學輸入 |
+| 3. k1 與圖形定義 | k1、pitch、線／孔、方向、CD 與通過門檻 | 不同圖形不能共用一個理論縮小比 |
+| 4. 光罩與視場 | 光罩版次、四倍／八倍縮放、全場／半場、接縫與修正 | 半視場幾何與接縫風險要回到產品版圖 |
+| 5. 焦距預算 | 焦深、leveling、晶圓起伏、膜堆、厚度與量測誤差 | 45nm 研究值不是全部高度變動可用額度 |
+| 6. 光阻與劑量 | 配方、批號、厚度、底層、劑量、烘烤、LWR 與隨機缺陷 | 薄膜與速度改善可能交換粗糙度或缺陷 |
+| 7. 轉移與電性 | 顯影、蝕刻、沉積、清洗、線寬、斷路、橋接與功能 | 光阻影像必須穿過後段加工與電性驗收 |
+| 8. 設備生產 | 曝光數、stage 速度、換場 overhead、raw throughput、可用率與停機 | 幾何曝光數與最高機速都不是 good output |
+| 9. 樣本與不確定性 | 晶圓、面積、結構、run、重複、分布、失效與量測不確定度 | 最佳點不能冒充穩定製程能力 |
+| 10. 商業與變更沿革 | 合格產出、返工、報廢、成本、qualification、出貨、收入與重驗 | 技術改善要留下客戶採用與財務共同鍵 |
+
+多方通過條件不是「0.55 大於 0.33」，而是護照第 1 至 10 欄在同一版本留下正的合格產出與成本
+證據；空方也不能只靠 45nm、半視場或薄光阻宣告失敗，而要看到焦距、接縫或缺陷真正侵蝕產品
+視窗與經濟結果。現有公開證據讓四本帳可以被正確提出，仍不足以裁決任何客戶產品或台灣供應商。
 
 ## 再用五把尺比較少做步驟是否真的省錢
 
@@ -778,6 +939,8 @@ High-NA 把數值孔徑由 0.33 提高到 0.55，目標是一次分開更細的�
 - [ASML 2026 年第一季投資人電話會議](https://ourbrand.asml.com/asset/8e1f7393-33dd-4737-a436-cfe1b68cc577/2026_04_15-ASML-Transcript-investor-call-Q1-2026.pdf)（累計晶圓、可用率、產品晶圓與光阻進度）。
 - [Intel 高數值孔徑極紫外光資料](https://newsroom.intel.com/press-kit/intel-high-na-euv)（早期客戶安裝與校準基線）。
 - [ASML：High-NA 的五個重點](https://www.asml.com/en/company/stories/2024/5-things-high-na-euv)（0.55 數值孔徑、非等向光學、半視場與設備速度路線）。
+- [ASML：Rayleigh 解析度準則](https://www.asml.com/en/technology/lithography-principles/rayleigh-criterion)（CD、波長、NA 與製程相依 k1 的一階關係）。
+- [2023 極紫外光微影研討會摘要集](https://euvlitho.com/2023/2023%20EUVL%20Workshop%20and%20Supplier%20Showcase%20Abstract%20Book.pdf)（PDF 檔案第36頁、頁尾 program P46；0.55 NA 的 45nm 計算焦深、薄光阻與線寬粗糙度邊界）。
 - [Imec：High-NA 圖形化生態系準備](https://www.imec-int.com/en/press/imec-demonstrates-readiness-high-na-euv-patterning-ecosystem)（半視場拼接、焦深、材料、劑量與隨機缺陷）。
 - [Imec：20nm pitch 金屬線電性測試](https://www.imec-int.com/en/press/imec-demonstrates-electrical-yield-20nm-pitch-metal-lines-obtained-high-na-euv-single)（金屬化測試結構、斷路／橋接與初步電性良率）。
 - [Imec：氧氣控制的曝光後烘烤研究](https://www.imec-int.com/en/press/imec-unlocks-lever-euv-dose-reduction-oxygen-injection-during-metal-oxide-resist-post)（特定研究條件的感光速度結果與未完成機制）。
@@ -787,6 +950,11 @@ High-NA 把數值孔徑由 0.33 提高到 0.55，目標是一次分開更細的�
 本篇沒有拿 ASML、imec 與 Intel 的數字互相比較：一組是設備商平台、一組是研發機構資格，
 一組是早期客戶安裝事件，期間、單位與定義不同。也不使用設備出貨數推估台灣公司訂單、
 晶圓廠良率、每顆合格晶片成本或市場定價。
+
+該摘要集官方 PDF 共 71 頁，SHA-256 為
+9b506db456f0e6d4863c0ff26c182ba1d9d69c7fb1fd837abde2182e435b8d66；實際引用檔案第36頁，並把
+前後頁第35–37頁逐頁渲染核對。PDF 與 PNG 只留在 tmp、不進版控。摘要集的 2023-06-03 日期以
+官方 agenda 所列研討會起始日正規化，不主張為檔案上線日；45nm 是作者計算，不是本研究重測。
 
 ## 影響路由
 
@@ -818,5 +986,6 @@ evidence_boundary: 光阻 化學品 晶圓或耗材能力是搜尋路由，不�
 - ASML 確認量產準備條件是否如期達成，並提供能分開產品測試與持續生產的指標。
 - Intel 或其他客戶揭露實際節點、使用層數、產品晶圓、製程視窗、缺陷、良率與量產日期。
 - 同一產品層公開十欄製程視窗紀錄，能把半視場拼接、劑量／焦距、材料與烘烤、轉移後電性、產出及變更後重驗接在一起。
+- 同一產品層公開十欄光學—製程護照，把波長、NA、k1、CD、焦距預算、半視場、接縫、光阻、合格產出與成本鎖在同一版本，而不是只報單一解析度或最高機速。
 - 若 2027–2028 客戶導入延後、只停在研發，或現行多重圖形化在成本與良率持續更有利，C5 必須下修。
 - 台灣設備與材料公司只有在客戶具名資格與公司產品、出貨及財務揭露相互吻合後，才從未驗證路由升級。

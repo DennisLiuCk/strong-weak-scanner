@@ -2,15 +2,16 @@
 
 本圖先把圖形如何印上晶圓放回光罩、光阻、曝光、圖形轉移與量測接力，再將設備商、客戶與
 研發機構分開，並把非等向光學、半視場拼接、劑量—缺陷—產出視窗，以及從光阻圖形到電性
-載具、功能元件、客戶產品高量產的證據階梯投影成不同節點。它不以機器數量、單一解析度、
-單次良率或研究元件推估客戶量產、每顆合格晶片成本或台灣公司財務曝險。
+載具、功能元件、客戶產品高量產的證據階梯投影成不同節點；另把 Rayleigh 理論尺寸、焦深、
+半視場與合格產出拆成可重建護照。它不以機器數量、NA、單一解析度、單次良率或研究元件
+推估客戶量產、每顆合格晶片成本或台灣公司財務曝險。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: high-na-euv-readiness
 root_node_id: concept:high-na-euv-readiness
 label: 晶圓圖形曝光與 High-NA 導入階梯
-summary: 追蹤圖形曝光接力、非等向半視場與拼接、劑量缺陷產出視窗，以及 High-NA 從光阻圖形、電性載具、功能元件、機器送達、客戶端運轉、製程資格、實際產品晶圓到高量產導入的證據階梯與生態系依賴。
+summary: 追蹤圖形曝光接力、非等向半視場與拼接、Rayleigh解析度焦深視場邊界、光學製程護照、劑量缺陷產出視窗，以及High-NA從光阻圖形、電性載具、功能元件、機器送達、客戶端運轉、製程資格、實際產品晶圓到高量產導入的證據階梯與生態系依賴。
 article_ids: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER
 status: active
 -->
@@ -353,4 +354,44 @@ review_due: 2026-10-01
 status: active
 boundary: 公開證據已到金屬化電性測試結構與功能性研究元件；仍沒有邏輯／記憶體客戶產品層、HVM 良率、成本或供應商財務足跡。
 next_trigger: 客戶把同一產品層的圖形、轉移、電性、功能、可靠度、合格產出與 HVM 版本接成可重算證據鏈。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HNA-I16
+view: industry
+from_id: concept:high-na-euv-readiness
+to_id: process:high-na-optical-process-window-passport
+relation: measured_by
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C17
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-10-01
+status: active
+boundary: 十欄護照是研究中心的比較契約；它不表示客戶已公開配方、完成qualification、達到HVM或證實公司財務貢獻。
+next_trigger: 同一客戶產品層以同一版本公開光學、焦距、材料、接縫、轉移、電性、合格產出、成本與變更後重驗。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HNA-I17
+view: industry
+from_id: concept:high-na-euv-readiness
+to_id: metric:resolution-depth-of-focus-field-boundary
+relation: measured_by
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C15,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C16,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C17
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-10-01
+status: active
+boundary: Rayleigh公式、45nm研究計算與半視場曝光幾何分屬不同證據；不能拼成產品良率、持續產能或成本結論。
+next_trigger: 客戶在同一產品層公開NA、k1、圖形CD、focus budget、field/stitch、raw與good throughput及成本分母。
 -->
