@@ -69,6 +69,14 @@ reason: added_coolant_lifecycle_contract_and_commissioning_baseline
 evidence: sources:S3,S7,S8
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_liquid_heat_flow_atd_pressure_and_pump_power_passport_without_thesis_clock_refresh
+evidence: sources:S9,S10,S11,S12
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -91,6 +99,17 @@ evidence: sources:S3,S7,S8
 - **Setpoint（設定值）**：控制系統希望設備維持的目標，例如溫度、壓力或流量。設定值不合理或傳到錯誤設備，可能造成控制失效。
 - **Sensor（感測器）**：量測溫度、流量、壓力、漏液或設備狀態的元件。讀數還要有正確位置、單位與品質標記，才能安全使用。
 - **供回水溫／流量／壓差**：供水溫是液體進入設備前的溫度，回水溫是帶熱後的溫度；流量是單位時間通過的液體量，壓差是前後壓力差。三者要一起看，不能只看單一數字。
+- **液體捕熱率（liquid heat capture ratio）**：IT 用電轉成的熱有多少比例真正進入液體迴路；剩餘熱量仍可能由空氣或其他路徑帶走，所以 IT MW 不一定等於液體 MW。
+- **迴路溫升（ΔTloop）**：同一側冷卻液的回水溫減供水溫；它和流體性質、流量共同決定液體帶走多少熱。
+- **接近溫差（ATD）**：液對液 CDU 中，TCS 供水溫減 FWS 供水溫；它描述熱交換器兩側的接近程度，不是 TCS 回水減供水的迴路溫升。
+- **比熱／密度**：比熱表示每單位質量升高一度能吸收多少熱，密度把質量流量連到體積流量；水與不同濃度的乙二醇／丙二醇不能共用同一換算常數。
+- **泵浦揚程／流動阻抗**：泵浦揚程是泵能克服的壓力能力，流動阻抗是管路、接頭、冷板、閥件與濾網造成的壓力損失；兩條曲線交會才是實際工作點。
+- **泵浦／馬達效率**：輸入電力有多少轉成流體的壓力與流量；效率會隨工作點改變，不能只用最高效率或銘牌功率估全年耗能。
+- **LPM／LPM/kW**：LPM 是每分鐘公升的體積流量；LPM/kW 是每一千瓦液體熱負載配置多少流量。兩者都不是散熱功率，必須連同流體與溫差閱讀。
+- **OAI／OAM 與 PG25**：OAI 是 OCP 的 Open Accelerator Infrastructure，OAM 是其中的加速器模組；PG25 是約 25% 體積濃度等級的丙二醇水溶液。本文引用的是這組特定邊界下的指引，不是所有液冷平台通則。
+- **PQ 曲線／dP**：PQ 曲線把壓力與流量連在一起，dP 是兩點間壓差；泵浦曲線與整條流路阻抗的交點才是工作點，單一最大流量或零件壓差都不夠。
+- **PUE／WUE**：PUE 比較資料中心總能源與 IT 能源，WUE 描述用水效率；泵浦或 TCS 的單點效率只是其中一小段，不能直接推成整座場域的 PUE／WUE。
+- **DOE**：本文的 DOE 指美國能源部；引用它的一般泵浦生命週期成本指南來解釋流量、揚程、效率與時間剖面，不代表能源部替任何 CDU 或資料中心背書。
 - **水質／腐蝕／污染**：冷卻液的化學成分、顆粒與微生物會影響金屬、密封件和流道。水質失控可能造成腐蝕、沉積或堵塞，即使設備額定容量沒有改變。
 - **浸液材料（Wetted materials）**：在迴路內會直接接觸冷卻液的金屬、塑膠、彈性體、密封件、接著劑與塗層。只要新增或更換一種材料，就要重新核對它和流體及其他材料是否相容。
 - **冷卻液基準（Coolant baseline）**：系統剛填充、條件合格時留下的流體配方、檢驗值與樣本。之後的讀值要和這個起點比較，才看得出趨勢，而不是只問有沒有超過單一警報值。
@@ -114,7 +133,7 @@ evidence: sources:S3,S7,S8
 
 - 液冷可以先分成三段：機房把熱送走的設施水路、冷卻設備到機櫃的循環水路，以及伺服器內的冷板與管路。OCP 文件只規定其中一段的部分要求，沒有把三段都包進同一份完整規格。
 - Lenovo 的部署指引說明兩條水路如何分開，也要求泵浦備援、溫度與壓力感測、閥件、漏液偵測、材料與水質維護；NVIDIA 文件則定義告警與控制資料如何交換。
-- 所以一台冷卻設備通過平台驗證，只證明一個節點；完整部署還要讓冷源、管路、接頭、分流器、冷板、控制與維護一起通過驗收。
+- 所以一台冷卻設備通過平台驗證，只證明一個節點；完整部署還要讓冷源、管路、接頭、分流器、冷板、控制與維護一起通過驗收，並把液體帶走的熱、流量、壓差與泵功分帳。
 
 ### 為什麼重要
 
@@ -128,12 +147,14 @@ evidence: sources:S3,S7,S8
 - 追蹤 OCP 是否把目前的要求文件補成可重現的冷板、冷卻液、快速接頭與整套迴路測試，並保存每次版本變化。
 - 追蹤 NVIDIA 是否從設備列名，往現場試運轉、資料完整性、漏液隔離與長期可靠度增加公開欄位。
 - 查台灣散熱、電源供應與伺服器代工公司是否說清楚責任範圍：只供元件、供機櫃水路、整合冷卻設備與控制，還是承擔場域驗收和維護；再核對部署規模與財務資料。
+- 追具名 CDU 是否在同一流體、FWS／TCS 溫度、流量、ATD、揚程、阻抗與備援條件下公布容量曲線，而不是只報一個最大 kW。
 
 ### 想一想
 
 - 如果客戶現場出現水質不合、流量不足或告警指向錯誤機櫃，應由設施端、冷卻系統整合者、伺服器供應商還是控制系統負責？現有文件能分清嗎？
 - 快速接頭、分流器、冷板與冷卻液各自通過單件測試，是否足以證明混合多家供應商後仍能長期可靠運作？
 - 同一家公司若同時賣電源、冷卻設備與控制，研究上要看到哪些合約、驗收與收入資料，才能證明它真的承接較多價值？
+- 若兩台 CDU 都標示 1MW，但一台在較寬 ATD、較低流量或較容易的壓差條件下額定，兩個 1MW 還能直接相比嗎？
 
 ## 主張與證據帳本
 
@@ -266,6 +287,70 @@ url: https://www.ashrae.org/technical-resources/ai-data-center-framework/commiss
 locator: 2026-08-12 Discussion and Highlights；L1–L5 commissioning、construction／startup fouling、cleaning／flushing／passivation 與 L4／L5 baseline trending
 limitation: 動態框架頁提供 commissioning 方法與風險邊界，沒有具名場域、冷卻液數值門檻、供應商結果、field failure rate 或財務貢獻
 independence_group: ashrae
+-->
+
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: living_index
+publisher: ASHRAE
+title: ASHRAE Handbook — Hydronic Heating and Cooling, Chapter 13
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://handbook.ashrae.org/Handbooks/S20/SI/s20_ch13/s20_ch13_si.aspx
+locator: 2.2 Thermal Components，Heat Transferred to or from Water；熱傳率由質量流量、比熱與跨設備溫升／溫降相乘，標準條件水的密度 1000kg/m³、比熱 4.18kJ/(kg·K)，並明示可用於單一設備或整段配管的 heat-carrying capacity
+limitation: 這是 ASHRAE 現行線上 Handbook 的一般 hydronic 方法，頁面會更新且不是 AI data center TCS 規格；標準水常數不能套到 PG25、其他濃度／溫度或未量測流體，也不證明 CDU 額定、場域驗收或財務
+independence_group: ashrae
+-->
+
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: OCP OAI System Liquid Cooling Guidelines
+published_at: 2023-03-03
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/oai-system-liquid-cooling-guidelines-in-ocp-template-mar-3-2023-update-pdf
+locator: PDF pp.6–8、11–13；p.7 把 PG25 的 7.5–12°C coolant rise 對應 1.25–2.0LPM/kW，10°C 典型目標對應 1.5LPM/kW；pp.12–13 說明 flow、pressure drop、流體性質、冷板與拓撲的取捨
+limitation: PDF 正文未標日期，published_at 依官方 canonical URL 的 Mar-3-2023 update 正規化且不主張文件批准時刻；本文是 OAI／OAM guideline、明示不是共同 specification，數值與案例不能外推成所有 AI rack、流體、CDU 或客戶 pass line；官方端點對命令列回 403，僅以官方 PDF viewer 逐頁核對，無本地 SHA
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S11
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Liquid to Liquid CDU Test Methodology and Performance Rating Revision 1.0
+published_at: 2024-08-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/ocp-wp-l-lcdu-test-methodology-performance-rating-r1-pdf
+locator: PDF pp.15–21；thermal performance 需綁 heat load、FWS／TCS flow 與 temperature、ATD，TCS head 與 FWS impedance 要用 pressure-versus-flow curve；額定建議另固定 fluid、FWS temperature、1.5LPM/kW、ATD 與 head／impedance
+limitation: 頁尾只標 August 2024，published_at 以 2024-08-01 做月精度正規化且不主張日精度，version table 另有 11/01/2024 記載；這是 Rev 1.0 方法與建議，不是所有 CDU 的強制共同額定、實際場域曲線或財務證據；官方端點對命令列回 403，僅以官方 PDF viewer 逐頁核對，無本地 SHA
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S12
+role: other_primary
+source_kind: document
+publisher: U.S. Department of Energy
+title: Pump Life Cycle Costs — A Guide to LCC Analysis for Pumping Systems, Executive Summary
+published_at: 2001-01-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/pumplcc_1001.pdf
+locator: PDF file pp.7–9，尤其 file p.8（印刷 p.6）Energy Costs；泵浦輸入功率由流量、揚程、比重、泵浦與馬達效率共同決定，變動輸出要按時間建立使用剖面，節流、洩壓或 bypass 會降低效率並增加耗能
+limitation: 文件頁尾只標 January 2001，published_at 以 2001-01-01 做月精度正規化且不主張日精度；這是 DOE、Hydraulic Institute 與 Europump 的一般泵浦 LCC 指南，不是資料中心 CDU 測試、特定泵浦曲線、電價或場域年度耗能
+independence_group: us-department-of-energy
 -->
 
 <!-- research_claim
@@ -472,6 +557,91 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: ASHRAE 的 hydronic 方法把水側熱傳率寫成質量流量、比熱與跨設備溫升／溫降的乘積，並指出同一方法可核對單一設備或整段配管的 heat-carrying capacity
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S9 Chapter 13 的 Heat Transferred to or from Water 直接定義 q、mass flow、specific heat、temperature difference 與標準水條件
+boundary: 只證實一般穩態熱平衡方法；流體性質、感測位置、熱損、未進液體的熱、動態負載與量測不確定度都要另列，不能用標準水常數替 PG25 或直接宣布場域通過
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: OCP OAI 液冷指引在 PG25 與其指定邊界下，把 7.5–12°C 冷卻液溫升對應到 1.25–2.0LPM/kW，並把 10°C、1.5LPM/kW 當典型設計目標；同頁明示較高溫升有利 PUE、但會犧牲 cooling performance，反之亦然
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2023-03-03
+basis: S10 PDF p.7 的 Coolant Flow Rate 直接列出 coolant、溫升、LPM/kW 與 PUE／cooling performance 取捨
+boundary: 這是 OAI／OAM guideline、不是共同規格；PG25、heat-exchanger allowance、平台拓撲與工作點都限定適用範圍，不可外推成純水常數、所有 rack 流量、PUE 實測或固定需求倍數
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: OCP 的液對液 CDU Rev 1.0 方法要求把 cooling capacity 綁到流體、FWS 溫度、FWS／TCS 流量、TCS 揚程、FWS 阻抗與 ATD；TCS head 與 FWS impedance 又必須用 pressure-versus-flow curve 評估
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2024-08-01
+basis: S11 PDF pp.15–20 的 thermal performance、TCS pressure head、FWS flow impedance 與 performance reporting 段落逐一列出額定條件及曲線
+boundary: Rev 1.0 提供方法與建議，不表示所有供應商已採共同額定；單一最大 kW、單點 flow 或單點 dP 都不能替代完整 capacity／PQ curve、part-load、備援與場域驗收
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: DOE／Hydraulic Institute／Europump 的泵浦 LCC 指南把輸入功率連到流量、揚程、流體比重、泵浦效率與馬達效率，並要求變動負載用時間剖面計算能耗；節流、洩壓與 bypass 不能被視為免費控制
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2001-01-01
+basis: S12 file p.8（印刷 p.6）的 Energy Costs 直接給出公式、變動 output profile 與三種控制對效率／耗能的影響
+boundary: 這是一般泵浦方法，不提供 CDU 專用效率、壓差、運轉時數、備援狀態或電價；本文的 Δp×體積流量÷綜合效率是同一功率關係的 SI 換寫，不是來源的 AI 場域實測
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 液冷容量研究應把 IT 用電、進入液體的熱、流體熱運能力、熱交換器 ATD、流路壓差與泵浦輸入功率分帳，再用同一份十欄熱工—水力護照連到備援、全年 duty profile、場域驗收與商業責任；只有最大 kW 或 LPM 不能推導部署價值與公司受惠
+supporting_source_ids: S1,S3,S4,S9,S10,S11,S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S9 建立 heat-flow-temperature balance，S10 建立 coolant／ΔT／flow trade-off，S11 固定 CDU capacity、ATD 與 PQ curves，S12 補上泵功與時間剖面；S1／S3／S4 把算式放回 FWS／TCS／ITE 與控制責任
+boundary: 六本帳與十欄護照是研究框架，不是唯一設計流程、跨 CDU 排名、PUE 或 WUE 計算、客戶 qualification、需求預測或財務歸因；不支持台灣公司訂單、收入、毛利或股價尚未反映
+verification_needed: 同一 production site 的 IT load／liquid heat capture、fluid properties、FWS／TCS temperatures、flow／dP curves、pump efficiency／duty、heat rejection、raw telemetry、commissioning、BOM、合約及財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 冷源到伺服器要交接五次
 
 沿著冷卻液前進的方向讀這張表：先從機房設施把熱交給冷卻設備，再經循環水路、機櫃分流與
@@ -489,6 +659,98 @@ resolution:
 這張表刻意不指定「誰一定是贏家」。同一專案可以由 ODM、冷卻設備商、機電承包商、
 設施營運方與平台商分別負責不同列；真正的商業價值要看合約責任、驗收、維護與收入分母，
 不是產品型錄涵蓋的方框數。
+
+## 同樣 1MW，為什麼還要分熱量、流量、ATD、壓差與泵功
+
+「1MW CDU」看似是一個容易比較的容量，實際上至少藏著六本帳：IT 用電、真正進入液體的熱、
+流體熱運能力、熱交換器兩側的 ATD、整條流路的壓差，以及泵浦輸入功率。OCP 的液對液 CDU
+方法因此要求把流體、FWS／TCS 溫度與流量、ATD、TCS 揚程、FWS 阻抗一起報告；只留下最大
+kW，就無法知道兩台設備是否在同一難度下額定。
+
+### 第一本帳：IT MW 不一定全進液體
+
+先固定量測邊界。假想某機櫃實際 IT 用電 1,000kW，其中 80% 的熱進入 TCS，液體熱負載是
+800kW，另有 200kW 仍由空氣、電源損耗或其他路徑帶走。這個 80% 只是教材輸入，不是任何
+平台的 liquid heat capture ratio。若把 1,000kW 直接當成液體熱負載，後面的流量、CDU 數量、
+FWS 容量與泵功都會從錯的分子出發。
+
+### 第二本帳：帶走相同熱量，溫升越小通常要越多流量
+
+ASHRAE 的穩態水側熱平衡是 qliquid＝質量流量×比熱×ΔTloop。以下固定液體熱負載 800kW，
+先使用 ASHRAE 標準條件的水密度 1,000kg/m³、比熱 4.18kJ/(kg·K)，只改 TCS 回水減供水的
+迴路溫升。
+
+| 假想標準水案例 | 液體熱負載 | ΔTloop | 所需體積流量 | 能回答什麼 | 還不能回答什麼 |
+|---|---:|---:|---:|---|---|
+| W1 | 800kW | 5K | 2,296.651 LPM | 固定水性質與穩態熱量下的流量 | 冷板溫度、壓差、泵功、ATD、動態負載 |
+| W2 | 800kW | 10K | 1,148.325 LPM | 同上 | 同上 |
+| W3 | 800kW | 15K | 765.550 LPM | 同上 | 同上 |
+
+把 ΔTloop 從 5K 放寬到 10K，理想流量減半；放寬到 15K，流量是 5K 案例的三分之一。
+但較高回水溫可能壓縮晶片、冷板與熱交換器的溫度裕量，不能只看泵浦比較省就宣布整體較好。
+
+OCP OAI 指引又提供另一個不能混用的口徑：在其 PG25、熱交換器與 OAI／OAM 邊界下，建議
+7.5–12°C 溫升對應 1.25–2.0LPM/kW，典型 10°C 目標是 1.5LPM/kW。若只做確定性乘法，
+800kW×1.5LPM/kW＝1,200LPM，比 W2 的標準水換算高 4.5%。兩者不是互相推翻，而是在提醒
+讀者：流體性質與工程 allowance 不同，不能把純水公式、PG25 指引與供應商額定混成一條線。
+
+### 第三本帳：迴路溫升與 ATD 是兩個不同溫差
+
+ΔTloop 是 TCS 回水減 TCS 供水，用來核對液體帶熱；OCP CDU 方法定義的 ATD 則是 TCS 供水
+減 FWS 供水，用來描述熱交換器兩側接近程度。下面固定 TCS 30→40°C，只改 FWS 供水：
+
+| 假想溫度案例 | FWS 供水 | TCS 供水 | TCS 回水 | ATD | ΔTloop | 判讀 |
+|---|---:|---:|---:|---:|---:|---|
+| T1 | 25°C | 30°C | 40°C | 5K | 10K | 熱交換器兩側有 5K 接近溫差 |
+| T2 | 27°C | 30°C | 40°C | 3K | 10K | 液體迴路溫升不變，但熱交換器條件更緊 |
+
+若只報「TCS 溫差 10K」，T1 與 T2 會看起來相同；若只報「ATD 5K」，又看不出液體究竟帶走
+多少熱。CDU capacity curve 必須把兩個溫差、兩側流量與流體放在同一工作點。
+
+### 第四本帳：流量不等於泵功，還差壓差與效率
+
+DOE 的泵浦指南把輸入功率連到流量、揚程、比重、泵浦效率與馬達效率。換成一致 SI 單位後，
+可寫成 Pin＝壓差×體積流量÷綜合效率。下面固定 1,200LPM，也就是 0.02m³/s；綜合效率是
+泵浦效率乘馬達效率的假想合併值。
+
+| 假想泵浦案例 | 流量 | 壓差 | 綜合效率 | 輸入功率 | 假想全年滿載 8,760h |
+|---|---:|---:|---:|---:|---:|
+| P1 | 1,200LPM | 200kPa | 70% | 5.714kW | 50.057MWh |
+| P2 | 1,200LPM | 400kPa | 70% | 11.429kW | 100.114MWh |
+| P3 | 1,200LPM | 200kPa | 50% | 8.000kW | 70.080MWh |
+
+P2 與 P1 流量相同，壓差加倍後泵功也加倍；P3 的壓差相同，效率較低仍多用電。真實壓差會
+隨流量、管徑、QD、manifold、冷板、閥件、濾網堵塞與並聯路徑改變，效率也要看 pump curve、
+馬達、VFD、N＋1 切換及 part-load duty。表中的全年 MWh 只是「假設全年都停在同一工作點」的
+上課換算，DOE 明確要求變動負載用時間剖面計算，不能拿來當任何場域實績或 PUE。
+
+以上共有 N＝1 個假想 IT／液體熱量拆分、N＝3 個標準水溫升案例、N＝1 個 PG25 指引乘法、
+N＝2 個 ATD／ΔTloop 案例與 N＝3 個泵浦案例。Python Fraction 與獨立 awk 在顯示精度內完全
+一致；這些都是固定輸入的確定性換算，不是抽樣、CFD、設備試驗或場域量測，因此沒有 sampling
+SE／t，也沒有機櫃、CDU、客戶、部署、需求、價格、收入、毛利或公司效果。
+
+### 多空小作文共用的液冷熱工—水力十欄護照
+
+| 護照欄位 | 必須固定什麼 | 少了最容易誤讀成什麼 |
+|---|---|---|
+| 1. 系統邊界 | IT nameplate／實際 load、哪些元件進液體、liquid capture ratio、時間窗 | 把 IT MW 全當液體熱負載 |
+| 2. 流體身分 | 配方、濃度、溫度、密度、比熱、黏度與老化狀態 | 把水與 PG25 共用同一 LPM/kW |
+| 3. TCS 溫度 | 供水、回水、ΔTloop、感測位置與不確定度 | 只報一個進水溫就推散熱能力 |
+| 4. FWS 與 ATD | FWS 供回水、TCS 供水、ATD、露點與 heat-exchanger curve | 把迴路溫升冒充熱交換器接近溫差 |
+| 5. 熱量帳 | 液體／空氣熱量、穩態或動態、計算／量測方法與 energy balance | 把 TDP、IT load、CDU capacity 當同一 MW |
+| 6. 流量與分配 | FWS／TCS 總流量、支路流量、串並聯、turndown 與 imbalance | 總 LPM 足夠就推每顆冷板都足夠 |
+| 7. 壓差與阻抗 | pump head、FWS impedance、TCS dP、各元件 PQ curve、濾網狀態 | 用零件單點 dP 推整條迴路 |
+| 8. 泵浦與備援 | 泵／馬達／VFD 型號、效率曲線、N／N＋1、切換與 duty profile | 用銘牌 kW 或最高效率推全年耗能 |
+| 9. 熱排與環境 | CDU HX、facility heat rejection、chiller／dry cooler、露點、水與季節 | 從 TCS 效率直接推整座 PUE／WUE |
+| 10. 驗收與商業 | raw telemetry、重複／不確定度、L4／L5、故障演練、BOM、責任與財務分母 | 從更高 rack density 直接跳到公司訂單 |
+
+**較強的多方版本**不是「AI 功率變大，所以所有液冷零件同比增加」，而是同一 production site
+的液體捕熱率、熱密度或可用性門檻提高後，CDU、冷板、QD、manifold、泵浦、感測與控制在共同
+ATD／PQ／part-load／備援條件下仍通過，且合約、部署、維護與財務資料證明每站價值真的增加。
+
+**較強的空方版本**也不是「溫差放大就不需要液冷」，而是平台以較高可接受 ΔTloop、較暖供水、
+較低阻抗冷板、更少接頭、較佳泵效率或更高 liquid capture，降低每 kW 流量、泵功、CDU 台數或
+剩餘空冷設施；若更高規格同時減少數量、整合供應商或把價值移到設施端，族群收入不必同步放大。
 
 ## 水質不是一個數字：先寫六欄流體生命週期合約
 
@@ -543,8 +805,9 @@ OCP 2022 指引的 Table 1 提供一組 **water-based、non-PG TCS 的典型起�
 ## 研究判定
 
 - **目前可以確定**：液冷是跨設施水路、技術冷卻水路、伺服器、控制與維護的介面系統；單一冷卻設備被平台列出，不足以代表整座場域已能穩定部署。
+- **容量也必須同條件比較**：IT 用電、液體捕熱、流體性質、TCS 溫升、ATD、兩側流量、流路壓差、泵效率與備援 duty 少一項，就不能把相同最大 kW 視為相同熱工—水力能力。
 - **仍不能推到公司**：目前高信心只涵蓋架構與證據階梯；公司供貨、訂單、收入、市占、毛利及完整方案責任仍未驗證。
-- **相對第八站新增了什麼**：研究從容量與供應狀態，前進到責任交接、感測、隔離與維護，不是再做另一張設備排名。
+- **相對第八站新增了什麼**：研究從容量與供應狀態，前進到責任交接、感測、隔離、維護，以及熱量—流量—壓差—泵功的可重建護照，不是再做另一張設備排名。
 - **何時才能升為公司研究**：客戶與供應商要能雙向確認責任範圍、場域驗收、部署規模與可辨識財務結果。
 
 ## 來源
@@ -557,6 +820,10 @@ OCP 2022 指引的 Table 1 提供一組 **water-based、non-PG TCS 的典型起�
 - [NVIDIA：DSX Exchange BMS Integration](https://docs.nvidia.com/dsx-exchange/bms-integration)
 - [NVIDIA Marketplace：DSX Infrastructure validated CDU list](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)
 - [公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
+- [ASHRAE Handbook：Hydronic Heating and Cooling](https://handbook.ashrae.org/Handbooks/S20/SI/s20_ch13/s20_ch13_si.aspx)
+- [OCP：OAI System Liquid Cooling Guidelines](https://www.opencompute.org/documents/oai-system-liquid-cooling-guidelines-in-ocp-template-mar-3-2023-update-pdf)
+- [OCP：Liquid to Liquid CDU Test Methodology and Performance Rating](https://www.opencompute.org/documents/ocp-wp-l-lcdu-test-methodology-performance-rating-r1-pdf)
+- [DOE：Pump Life Cycle Costs](https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/pumplcc_1001.pdf)
 
 ## 族群影響
 

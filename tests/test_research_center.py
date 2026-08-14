@@ -3777,6 +3777,7 @@ class ResearchCenterTest(unittest.TestCase):
         ))
         for contract in (
             "editorial_plain_language_wave88_cooling_loop_handoffs_and_evidence_gates",
+            "added_liquid_heat_flow_atd_pressure_and_pump_power_passport_without_thesis_clock_refresh",
             "液冷可以先分成三段：機房把熱送走的設施水路",
             "完整部署還要讓冷源、管路、接頭、分流器、冷板、控制與維護一起通過驗收",
             "## 冷源到伺服器要交接五次",
@@ -3799,13 +3800,26 @@ class ResearchCenterTest(unittest.TestCase):
             "## 四種品質失效不是同一種髒",
             "| 結垢（scaling） |", "| 污堵（fouling） |",
             "| 腐蝕（corrosion） |", "| 微生物生長 |",
+            "## 同樣 1MW，為什麼還要分熱量、流量、ATD、壓差與泵功",
+            "800kW×1.5LPM/kW＝1,200LPM，比 W2 的標準水換算高 4.5%",
+            "| W1 | 800kW | 5K | 2,296.651 LPM |",
+            "| W2 | 800kW | 10K | 1,148.325 LPM |",
+            "| W3 | 800kW | 15K | 765.550 LPM |",
+            "| T1 | 25°C | 30°C | 40°C | 5K | 10K |",
+            "| T2 | 27°C | 30°C | 40°C | 3K | 10K |",
+            "| P1 | 1,200LPM | 200kPa | 70% | 5.714kW | 50.057MWh |",
+            "| P2 | 1,200LPM | 400kPa | 70% | 11.429kW | 100.114MWh |",
+            "| P3 | 1,200LPM | 200kPa | 50% | 8.000kW | 70.080MWh |",
+            "### 多空小作文共用的液冷熱工—水力十欄護照",
+            "Python Fraction 與獨立 awk 在顯示精度內完全",
+            "沒有 sampling\nSE／t",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 36
+            sum(line.startswith("- **") for line in glossary.splitlines()), 47
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3813,11 +3827,29 @@ class ResearchCenterTest(unittest.TestCase):
         for jargon in ("FWS", "TCS", "rackLocationId"):
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 8),
-            ("research_claim", 12), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 17), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for source_id in ("S9", "S10", "S11", "S12"):
+            self.assertIn(f"source_id: {source_id}", topic)
+        for claim_id in ("C13", "C14", "C15", "C16", "C17"):
+            self.assertIn(f"claim_id: {claim_id}", topic)
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "liquid_cooling_loop_boundaries.md"
+        ).read_text(encoding="utf-8")
+        for edge_id in ("KG-LCB-I21", "KG-LCB-I22"):
+            self.assertIn(f"edge_id: {edge_id}", graph)
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for node_id in (
+            "process:liquid-loop-thermal-hydraulic-passport",
+            "metric:liquid-heat-flow-pressure-pump-boundary",
+        ):
+            self.assertIn(f"{node_id},", concepts)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )

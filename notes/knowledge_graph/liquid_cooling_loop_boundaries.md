@@ -1,6 +1,7 @@
 # 液冷迴路責任邊界知識圖譜
 
-本圖把 FWS、TCS、CDU、manifold、cold plate、流體與 BMS 連成同一份介面責任圖。
+本圖把 FWS、TCS、CDU、manifold、cold plate、流體、BMS，以及熱量—流量—壓差—泵功
+連成同一份介面責任圖。
 平台列名只是其中一個成熟度節點；族群線仍不代表具名公司已承擔場域驗收或認列收入。
 
 <!-- knowledge_graph_meta
@@ -8,7 +9,7 @@ schema_version: 1
 graph_id: liquid-cooling-loop-boundaries
 root_node_id: concept:liquid-cooling-loop-boundary
 label: 液冷迴路責任邊界
-summary: 從 FWS／TCS 邊界、液冷元件、材料相容性到 BMS 觀測與隔離，拆解單一 CDU 資格與完整場域部署的差距。
+summary: 從 FWS／TCS 邊界、液冷元件、材料相容性、BMS 觀測與隔離，到熱量、流量、ATD、PQ 與泵功，拆解單一 CDU 資格及最大 kW 與完整場域部署的差距。
 article_ids: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES
 status: active
 -->
@@ -451,4 +452,44 @@ review_due: 2026-09-03
 status: active
 boundary: 文件列出監測、QA 與 trending 方法，沒有替每座場域指定相同採樣頻率、action limit、隔離權限或維修責任。
 next_trigger: 具名場域公開 sampling plan、lab／sensor cross-check、action limits、責任矩陣與異常處置結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I21
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: process:liquid-loop-thermal-hydraulic-passport
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C17
+note_refs:
+evidence_state: inference
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-03
+status: active
+boundary: 十欄護照是跨來源研究框架，不是 OCP、ASHRAE 或 DOE 共同標準，也不證明具名 CDU、場域、供應商或財務結果。
+next_trigger: 具名 production site 以共同時間與設備鍵公布十欄輸入、raw telemetry、commissioning、BOM、責任與財務分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I22
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: metric:liquid-heat-flow-pressure-pump-boundary
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C13,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C14,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C15,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C16,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C17
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-03
+status: active
+boundary: 熱量平衡、PG25 指引、CDU rating 與泵功方法來自不同適用範圍；教材換算不能冒充跨流體額定、場域 PUE／WUE 或公司價值。
+next_trigger: 同一具名 CDU／site 公布流體性質、液體捕熱、FWS／TCS 工作點、ATD、PQ curves、pump efficiency／duty 與重複不確定度。
 -->
