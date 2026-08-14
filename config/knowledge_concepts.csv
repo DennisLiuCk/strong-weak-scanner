@@ -346,6 +346,8 @@ stage:customs-origin-test,stage,海關原產地判定,Customs country of origin 
 stage:shipment-contract-incidence,stage,出貨與交易責任,Shipment importer and contract incidence,concept:section301-taiwan-exposure,固定出貨路徑 importer of record Incoterms 報價與價格調整條款以區分先繳責任的節點
 stage:demand-pass-through-response,stage,需求與成本轉嫁,Demand and tariff pass-through response,concept:section301-taiwan-exposure,觀察供應商 進口商 客戶如何透過價格 數量 替代與供應鏈配置分配關稅成本的節點
 stage:section301-company-financial-attribution,stage,Section 301 公司財務歸因,Section 301 company financial attribution,concept:section301-taiwan-exposure,把同一產品 entry 原產 交易條款 價格數量成本與公司收入毛利現金流分母接起的節點
+process:tariff-to-financial-passport,process,關稅到財務十欄護照,Tariff-to-financial passport|customs-to-margin evidence contract,concept:section301-taiwan-exposure,把政策 產品 HTS原產 豁免 customs value duty entry責任 經濟歸宿 公司橋接與不確定度綁成可重建紀錄
+metric:customs-value-duty-incidence-boundary,metric,報關價值、關稅與成本歸宿邊界,Customs value duty incidence boundary|tariff denominator contract,process:tariff-to-financial-passport,分開報關價值 稅率與逐項duty importer先繳 經濟分攤及公司毛利並禁止以headline rate或歷史pass-through直接估公司效果
 concept:trade-regime-separation,concept,關稅、出口管制、制裁與資格四制度分流,Trade tariff export control sanctions and qualification separation,,把進口關稅 出口管制 制裁交易與技術資格四種制度的判斷單位 責任機關 結果及證據分開記錄的閱讀框架
 stage:tariff-import-entry,stage,進口關稅與報關 entry,Tariff and customs entry,concept:trade-regime-separation,以商品形態 HTS 原產 豁免 估價 進口主體與日期判斷一筆進口 entry 的關稅結果
 stage:ear-export-license-screen,stage,EAR 出口許可判定,EAR export license screen,concept:trade-regime-separation,固定 EAR jurisdiction ECCN或EAR99 管制理由 目的地 交易各方 最終用途 許可與例外的出口管制底稿

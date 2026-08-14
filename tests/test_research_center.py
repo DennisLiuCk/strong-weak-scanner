@@ -6839,6 +6839,13 @@ class ResearchCenterTest(unittest.TestCase):
             "### 關稅由誰先付，和誰最後吸收，是兩個問題",
             "### 新手最常混淆的六件事",
             "### 在研究中心裡接著怎麼學",
+            "## 公告稅率不是毛利率：從 entered value 到成本歸宿的三本帳",
+            "### 先把稅率公式和金額分開",
+            "### 同一筆 10% 關稅，供應商毛利率可能是三個答案",
+            "### 歷史 pass-through 只能當先驗，不能當 2026 台灣係數",
+            "### 一份 tariff-to-financial passport 至少有十欄",
+            "### 多空小作文共用同一張護照",
+            "### 樣本、誤差與可外推範圍",
         )
         positions = [topic.index(heading) for heading in headings]
         self.assertEqual(positions, sorted(positions))
@@ -6866,6 +6873,12 @@ class ResearchCenterTest(unittest.TestCase):
             "| 5. 出貨與交易責任 |",
             "| 6. 需求與成本轉嫁 |",
             "| 7. 公司財務歸因 |",
+            "| 4.5% | 5.5% | 10.0% | 4,500 美元 | 5,500 美元 | 10,000 美元 |",
+            "| 10,000 美元 | 90,000 美元 | 70,000 美元 | 20,000 美元 | 22.222222% |",
+            "| 1. Policy identity |", "| 5. Customs value |",
+            "| 9. Company bridge |", "| 10. Uncertainty and update |",
+            "真實 company、SKU、entry、HTS、origin、importer、contract、shipment、customer 與財務期間",
+            "樣本 N=0",
             "thesis_claim_id: C6",
             "claim_id: C5",
             "claim_id: C6",
@@ -6885,15 +6898,15 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 11),
-            ("research_claim", 10), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 14), ("metric_comparison", 0),
             ("impact", 4), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         glossary = topic[topic.index("### 名詞小字典"):topic.index("### 三句話抓重點")]
         self.assertEqual(
             sum(line.startswith("- **") for line in glossary.splitlines()),
-            21,
+            29,
         )
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -6908,6 +6921,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:shipment-contract-incidence,stage,出貨與交易責任",
             "stage:demand-pass-through-response,stage,需求與成本轉嫁",
             "stage:section301-company-financial-attribution,stage,Section 301 公司財務歸因",
+            "process:tariff-to-financial-passport,process,關稅到財務十欄護照",
+            "metric:customs-value-duty-incidence-boundary,metric,報關價值、關稅與成本歸宿邊界",
             "concept:trade-regime-separation,concept,關稅、出口管制、制裁與資格四制度分流",
             "stage:tariff-import-entry,stage,進口關稅與報關 entry",
             "stage:ear-export-license-screen,stage,EAR 出口許可判定",
@@ -6921,7 +6936,7 @@ class ResearchCenterTest(unittest.TestCase):
             / "section301_taiwan_exposure.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: Section 301 台灣商品七關與四制度分流", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
         for edge_target in (
             "from_id: company:2308",
             "to_id: stage:policy-action-scope",
@@ -6938,6 +6953,8 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: stage:ear-export-license-screen",
             "to_id: stage:ofac-sanctions-transaction-screen",
             "to_id: stage:technical-conformity-assessment",
+            "to_id: process:tariff-to-financial-passport",
+            "to_id: metric:customs-value-duty-incidence-boundary",
         ):
             self.assertIn(edge_target, graph)
 

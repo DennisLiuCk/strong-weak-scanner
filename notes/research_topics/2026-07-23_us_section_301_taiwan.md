@@ -65,18 +65,34 @@ reason: distinguished_tariff_export_control_sanctions_and_conformity_without_cha
 evidence: sources:S7,S8,S9,S10,S11
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_customs_value_duty_incidence_and_tariff_to_financial_passport_without_thesis_clock_refresh
+evidence: sources:S5,S12,S13
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **Section 301**：美國可針對被認定不公平的外國政策或做法採取關稅等措施的貿易法工具，不是所有商品自動套用同一稅率。
+- **CBP**：U.S. Customs and Border Protection，美國海關暨邊境保護局；負責進口申報、分類、估價與稅費執行。
+- **USITC**：U.S. International Trade Commission，美國國際貿易委員會；本文引用其歷史關稅效果回顧，不把它當成未來預測。
 - **HTS code**：美國進口報關使用的商品分類號碼；產品俗稱相同，也可能因規格、組態或用途而落在不同 code。
+- **SKU**：Stock Keeping Unit，企業用來管理可銷售產品版本的料號；同一 SKU 不自動等於一個固定 HTS 或 entry。
 - **MFN 稅率**：美國對一般貿易夥伴適用的基礎關稅；本題的 Section 301 稅要和它一起判讀。
 - **Incoterms**：買賣雙方約定運輸、報關、風險與部分費用由誰負擔的條件，會影響新增關稅最終由誰承受。
 - **Annex（附件）**：正式公告附帶的清單，用來逐項列出適用品目、豁免或條件；它不是另一套獨立關稅。
 - **原產地（country of origin）**：海關依實質轉型等規則認定商品來自哪個經濟體，不一定等於供應商總部、出貨港或最後組裝地。
 - **Importer of record**：向美國海關申報、先負責分類、估價與繳納進口稅費的法律主體；它不必然是最後承擔成本的人。
 - **關稅歸宿／轉嫁（incidence／pass-through）**：關稅由誰先繳，與最後由供應商、進口商、品牌、客戶或需求量吸收，是兩個不同問題。
+- **報關價值（Entered value／customs value）**：海關用來估價與計算從價稅的 entry 金額；本文教學先固定它，實務仍須依適用估價方法判定。
+- **交易價值（Transaction value）**：通常以輸美銷售的實付或應付價格為起點，再納入法定加項；它不是任何情況都必然可用。
+- **法定加項**：在尚未包含且有充分資料時，將 packing、selling commission、assist、特定 royalty／license fee 與回流賣方的後續 proceeds 加入交易價值。
+- **從價稅（Ad valorem duty）**：以報關價值乘稅率計算的關稅；若稅則另採數量、重量等口徑，就不能沿用同一公式。
+- **毛利／毛利率（Gross profit／gross margin）**：收入減銷貨成本，以及該毛利占收入的比例；兩者都不是關稅金額的別名。
 - **Section 232**：美國以國家安全為由採取進口措施的另一套法律工具；同一商品若受 Section 232 管理，必須按 notice 的排除規則另外判讀。
 - **EAR（Export Administration Regulations）**：美國商務部出口管理規則，管理受其管轄項目的出口、再出口與境內轉移；它不是進口關稅表。
 - **ECCN**：美國 Commerce Control List 上用來做出口管制分類的五碼英數代號；BIS 明確說它與 HTS code 不同、彼此無關。
@@ -216,6 +232,102 @@ Importer of record 先向海關負責，不代表它一定獨自承擔經濟成�
 主要沿商品分類、原產地與交易責任傳導；PFAS 則沿物質身分、製程用途、法域義務與變更
 資格傳導。把兩條路放在一起，能看見「政策已發布」和「公司財務已受影響」之間為何總有
 多個不可省略的交接點。
+
+## 公告稅率不是毛利率：從 entered value 到成本歸宿的三本帳
+
+國家 headline rate、單筆 entry duty 與公司毛利是三本不同的帳。第一本只按正式 notice 與
+HTS 規則決定稅率；第二本把稅率乘到可接受的報關價值；第三本才追進口商、供應商與客戶如何
+透過價格、數量、折讓、替代或重新配置分擔。跳過中間一本，就會把百分比相同誤認成分母相同。
+
+### 先把稅率公式和金額分開
+
+S5 對未豁免台灣商品的公式是：MFN 低於 10% 時，Section 301 補足到合計 10%；MFN 已達
+10% 時，本項 Section 301 為零。以下固定報關價值 100,000 美元，只做從價稅教學。
+
+| MFN 稅率 | Section 301 稅率 | 兩者合計 | MFN 金額 | Section 301 金額 | 合計 duty |
+|---:|---:|---:|---:|---:|---:|
+| 0.0% | 10.0% | 10.0% | 0 美元 | 10,000 美元 | 10,000 美元 |
+| 4.5% | 5.5% | 10.0% | 4,500 美元 | 5,500 美元 | 10,000 美元 |
+| 12.5% | 0.0% | 12.5% | 12,500 美元 | 0 美元 | 12,500 美元 |
+
+第三列最能防錯：Section 301 是零，不代表總關稅是零；合計也不是被壓回 10%。反過來，若
+4.5% MFN 的同一商品確認落入本案一般豁免，Section 301 為零，教學中的合計就只剩 4,500
+美元。是否豁免要先由 HTS、商品形態、原產地與 Annex 判定，不能在算式裡自行切換。
+
+CBP 對 commercial invoice 的現行說明也固定另一個分母：通常以美國買方為輸入商品支付的
+價格為起點，不是商品在美國轉售的價格；freight 與 insurance 通常不放入這個 price-paid
+基礎，但 selling commission、assist、royalty、production／packing 與 proceeds 等項目要依
+規則處理。實際 entry 若不符合 transaction value 條件，必須改用適用估價方法，不能拿本表代替。
+
+### 同一筆 10% 關稅，供應商毛利率可能是三個答案
+
+再做一個刻意簡化的商業情境：固定已完成 entry 的 duty 為 10,000 美元，供應商原收入
+100,000 美元、銷貨成本 70,000 美元。以下只把供應商以合約調整吸收 0、5,000、10,000
+美元視為收入減項；不重算 customs value，也不模擬數量、匯率、物流、稅務或會計分類。
+
+| 供應商吸收額 | 調整後收入 | 固定銷貨成本 | 毛利 | 毛利率 |
+|---:|---:|---:|---:|---:|
+| 0 美元 | 100,000 美元 | 70,000 美元 | 30,000 美元 | 30.000000% |
+| 5,000 美元 | 95,000 美元 | 70,000 美元 | 25,000 美元 | 26.315789% |
+| 10,000 美元 | 90,000 美元 | 70,000 美元 | 20,000 美元 | 22.222222% |
+
+即使 entry duty 都是 10,000 美元，供應商毛利率仍可能維持 30%、降至 26.315789%，或降至
+22.222222%。這不是三個預測，而是三種固定分攤假設；也說明 10% tariff 不能直接改寫成毛利率
+少 10 個百分點。若成本、售價、數量或合約處理不同，答案會再變。
+
+### 歷史 pass-through 只能當先驗，不能當 2026 台灣係數
+
+USITC 對 2018–2021 年 Section 232 與中國 Section 301 的回顧，觀察到 importer prices 大致隨
+tariff 一比一上升，並表述美國進口商承擔近乎全部的 border cost。這是重要歷史證據，但同一
+文件也明示：分析聚焦直接且受影響最大的產業，Section 301 下游未完整估計，期間只到短期，
+不是 forward-looking，也不是完整 economy-wide 效果。
+
+因此「歷史約一比一」只能提醒研究者不要先假設外國供應商自動降價，不能直接填成 2026 台灣
+PCB、電源、散熱或被動元件的 100% pass-through。經濟體、產品、稅率、替代性、庫存、合約、
+議價力與時間窗都變了；具名公司仍要回到自己的價格、數量與成本資料。
+
+### 一份 tariff-to-financial passport 至少有十欄
+
+| 欄位 | 最少記錄 | 沒有它會混淆什麼 |
+|---|---|---|
+| 1. Policy identity | 法源、notice、Annex、版本、生效與 entry 日期 | 新聞標題冒充有效規則 |
+| 2. Product identity | SKU、完成度、組態、材質、用途與 shipment 形態 | 整機豁免冒充零件豁免 |
+| 3. HTS 與原產 | classification rationale、origin、ruling／entry 證據 | 公司國籍冒充商品原產 |
+| 4. Exemption stack | 一般豁免、Section 232、其他 Chapter 99 與適用條件 | 只看 headline rate |
+| 5. Customs value | 估價方法、price paid／payable、法定加項、排除與幣別 | 公司營收冒充 duty base |
+| 6. Duty arithmetic | MFN、Section 301、其他 duty、公式與逐項金額 | Section 301 為零冒充總稅為零 |
+| 7. Entry responsibility | importer of record、報關、付款與紀錄責任 | 先繳者冒充最終承擔者 |
+| 8. Economic incidence | Incoterms、調價、折讓、數量、替代與供應鏈改道 | 法律責任冒充成本歸宿 |
+| 9. Company bridge | 具名產品、期間、直出量、收入、成本、毛利與現金流分母 | 單筆 entry 冒充公司材料性 |
+| 10. Uncertainty and update | 情境、範圍、敏感度、修正公告與下一份證據 | 歷史係數冒充未來確定值 |
+
+護照不是報關單、法律意見或財務預測。它只要求每次外推都留下分母與責任人；找不到第 2–5 欄，
+就停在政策／分類研究，找不到第 8–9 欄，就不能升成公司毛利方向。
+
+### 多空小作文共用同一張護照
+
+**偏多版本。** 具名產品落入豁免，或客戶／進口商吸收 duty，供應商未降價且數量穩定；另一條
+路徑是非豁免品相對替代供應縮減，讓有合規原產與供貨能力者取得議價或轉單。要成立，仍需
+entry、價格、數量、客戶與公司分母共同鍵，不能只看 HTS 清單。
+
+**偏空版本。** 具名單獨進口零件未豁免，供應商為維持客戶關係提供折讓，需求又因稅後價格或
+替代品下降，導致收入與毛利同時受壓。要成立，也必須看到相同共同鍵，不能用美國營收占比乘
+headline rate 當損失。
+
+兩個版本的共同反證是：實際 HTS／origin／exemption、customs value 與 duty、importer／Incoterms、
+政策前後成交價與數量、替代路徑、供應商調整及公司財務橋接。只要其中一層不符，敘事就要縮窄。
+
+### 樣本、誤差與可外推範圍
+
+稅率教材是 3 個固定 MFN 情境加 1 個固定豁免情境；毛利教材是同一匿名假想供應商的 3 個固定
+吸收情境。兩組都是決定性算式，不是抽樣，因此不報抽樣 SE 或 t 值。Python Fraction 與獨立
+awk 逐項得到相同的 10%／10%／12.5%、10,000／10,000／12,500／4,500 美元，以及
+30.000000%／26.315789%／22.222222%。
+
+真實 company、SKU、entry、HTS、origin、importer、contract、shipment、customer 與財務期間
+樣本 N=0，因此不能估台灣 121 檔或四個觀察族群的平均 duty、pass-through、需求、收入、毛利、
+股價或投資效果。USITC 的歷史研究是 2018–2021 美國直接受影響產業的回顧，不是本案的產品、
+公司、客戶或預測樣本；CBP 與 USTR 文件也只建立估價與政策規則。
 
 ## 來源與證據邊界
 
@@ -368,6 +480,38 @@ limitation: 這是通用合格評定框架，不指定 AI 硬體產品的實際�
 independence_group: nist-conformity-assessment
 -->
 
+<!-- research_source
+source_id: S12
+role: regulator_or_policy
+source_kind: document
+publisher: U.S. Customs and Border Protection
+title: What value should be on the commercial invoice submitted to U.S. Customs and Border Protection?
+published_at: 2026-07-12
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.help.cbp.gov/s/article/Article-1162?language=en_US
+locator: Date Published 7/12/2026；commercial invoice 採美國買方支付而非美國轉售價、price paid duty base、freight／insurance 排除與 selling commissions／assists／royalties／production／packing／proceeds 等申報項目
+limitation: CBP 客服頁是通用估價入口，不是具名 entry ruling；不替任何產品判定 transaction value 是否可用、關係人價格、法定加項、HTS、原產、豁免或實際 duty
+independence_group: cbp-customs-valuation
+-->
+
+<!-- research_source
+source_id: S13
+role: regulator_or_policy
+source_kind: document
+publisher: U.S. International Trade Commission
+title: Certain Effects of Section 232 and 301 Tariffs Reduced Imports and Increased Prices and Production in Many U.S. Industries
+published_at: 2023-03-15
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.usitc.gov/press_room/news_release/2023/er0315_63679.htm
+locator: 2018–2021 importer prices 約隨 tariff 一比一、U.S. importers 近乎承擔全部成本的結果；以及直接受影響產業、Section 301 下游缺口、短期、非 forward-looking 與非 economy-wide 限制
+limitation: 回顧的是 2018–2021 Section 232 與中國 Section 301，不是 2026 台灣 forced-labor 行動、任何 universe 公司或未來 pass-through 係數
+independence_group: usitc-tariff-incidence
+-->
+
 - [USTR 官方新聞稿](https://ustr.gov/about/policy-offices/press-office/press-releases/2026/july/ustr-takes-action-forced-labor-section-301-investigations)（2026-07-23）。
 - [USTR Federal Register notice／完整 Annex](https://ustr.gov/sites/default/files/files/Press/Releases/2026/FLIP%20301%20Investigation%20Final%20Action%20FRN%207-23-26%20FINAL.pdf)（2026-07-23，431 頁）。
 - [Federal Register／GovInfo 正式刊登 notice](https://www.govinfo.gov/content/pkg/FR-2026-07-28/pdf/2026-15181.pdf)（2026-07-28）。
@@ -378,6 +522,8 @@ independence_group: nist-conformity-assessment
 - [BIS end-user／end-use guidance](https://media.bis.gov/licensing/guidance-on-end-user-and-end-use-controls-and-us-person-controls)（持續更新；交易各方、使用者與用途邊界）。
 - [OFAC FAQ 56](https://ofac.treasury.gov/faqs/56)（2015-01-30；OFAC 與 BIS 名單制度差異）。
 - [NIST「Conformity Assessment Basics」](https://www.nist.gov/standardsgov/conformity-assessment-basics)（2023-02-10；合格評定活動與執行角色）。
+- [CBP commercial invoice value FAQ](https://www.help.cbp.gov/s/article/Article-1162?language=en_US)（2026-07-12；price paid 與申報項目）。
+- [USITC Section 232／301 歷史效果回顧](https://www.usitc.gov/press_room/news_release/2023/er0315_63679.htm)（2023-03-15；border pass-through 與限制）。
 
 Notice 對台灣指定 Annex I 與 Annex II Parts A、K；一般豁免清單至少明列：
 
@@ -546,6 +692,62 @@ as_of: 2026-08-12
 basis: S5 的 Section 301 entry／HTS 規則、S7–S9 的 EAR item／destination／party／end-use 決策、S10 的制裁名單邊界與 S11 的技術合格評定各自使用不同判斷單位與結果
 boundary: 四份底稿是研究防錯框架，不是法律意見、報關決定、出口許可、制裁篩查、產品認證或公司財務模型，也不主張四種制度一定按固定順序發生
 verification_needed: 以同一產品版本與交易固定 entry／HTS／origin、EAR scope／ECCN／destination／parties／end use、OFAC program／ownership／authorization、requirement／test／pass／change control，再由合格法律與技術責任人簽核
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: CBP 的現行 commercial-invoice value 說明以美國買方支付的商品價格而非美國轉售價為申報起點，通常不含 freight／insurance，並要求 selling commissions、assists、royalties、production／packing 與 proceeds 等適用項目納入申報
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-07-12
+basis: S12 逐項說明 invoice value、price paid duty base、freight／insurance 邊界與需申報項目
+boundary: 通用客服說明不判定任何具名 entry 的 transaction value 可用性、關係人交易、加項金額、HTS、原產、豁免或最終 appraised value
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: USITC 對 2018–2021 Section 232 與中國 Section 301 的回顧估計 importer prices 約隨 tariffs 一比一上升且美國進口商近乎承擔全部成本；同一文件明示 Section 301 下游未完整估計、只看短期且不是 forward-looking 或完整 economy-wide 分析
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2023-03-15
+basis: S13 findings 的 importer-cost 與約一比一段落，以及 scope／downstream／short-term／not forward-looking／not economy-wide 限制直接支持
+boundary: 歷史中國與 Section 232 結果不能直接當成 2026 台灣商品、特定公司、客戶、產品或合約的 pass-through 係數
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 在固定非豁免與 100,000 美元報關價值的教學情境中，MFN 0%、4.5%、12.5% 依台灣公式得到 Section 301 10%、5.5%、0%，兩者合計 duty 為 10,000、10,000、12,500 美元；同一 4.5% MFN 情境若適用一般豁免則只剩 4,500 美元
+supporting_source_ids: S5,S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S5 固定台灣 MFN 未滿 10% 補足與已達 10% 時 Section 301 為零的公式；S12 固定 price-paid customs-value 起點；Python Fraction 與獨立 awk 對四個固定情境逐項重算一致
+boundary: 這是決定性假想算式，不判定任何具名 HTS、豁免、原產、entry、appraised value、其他 duty、公司稅負或財務結果
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 從 Section 301 公告走到公司財務至少要用十欄 tariff-to-financial passport，把政策、產品、HTS／原產、豁免、customs value、duty、entry 責任、經濟歸宿、公司橋接與不確定度分開保存
+supporting_source_ids: S5,S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S5 提供 policy／HTS／exemption／duty 公式，S12 提供 customs-value 分母，S13 顯示 border incidence 與下游／長期效果不能混成一層，因此需再分 entry、economic incidence 與 company bridge
+boundary: 十欄是研究中心的防錯框架，不是 CBP 報關表、USTR／USITC 正式標準、法律意見、會計政策或公司財務預測
+verification_needed: 以同一具名 SKU 與 entry 固定十欄，由合格報關／法律責任人及公司／客戶資料共同核對價格、數量、成本與財務分母
 resolution:
 -->
 

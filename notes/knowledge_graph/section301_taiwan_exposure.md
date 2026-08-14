@@ -353,3 +353,43 @@ status: active
 boundary: 通用合格評定角色與活動存在不表示具名 AI 產品已通過第三方認證 平台 qualification 客戶簽收或量產變更重驗。
 next_trigger: 同一產品版本公開 requirement sample test condition executor raw result pass criteria change control 與 customer sign-off。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-S301-I17
+view: industry
+from_id: concept:section301-taiwan-exposure
+to_id: process:tariff-to-financial-passport
+relation: requires
+claim_refs: MI-2026-07-23-US-SECTION301-TAIWAN#C14
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: multi_source
+exclusivity_scope: 十欄護照是研究中心綜合USTR CBP與USITC邊界的稽核框架 不是報關表 法律意見 會計政策或政府正式標準。
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: 護照只分開政策 entry 經濟歸宿與公司財務證據 不判定具名產品適用性 duty pass-through或公司效果。
+next_trigger: 同一具名SKU與entry由報關法律責任人 公司及客戶共同公布十欄資料和價格數量成本財務橋接。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-S301-I18
+view: industry
+from_id: concept:section301-taiwan-exposure
+to_id: metric:customs-value-duty-incidence-boundary
+relation: measured_by
+claim_refs: MI-2026-07-23-US-SECTION301-TAIWAN#C11,MI-2026-07-23-US-SECTION301-TAIWAN#C12,MI-2026-07-23-US-SECTION301-TAIWAN#C13,MI-2026-07-23-US-SECTION301-TAIWAN#C14
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: multi_source
+exclusivity_scope: CBP固定通用customs-value入口 USITC固定歷史border incidence與限制 教學算式不是產品entry公司或未來預測樣本。
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: 固定稅率與毛利情境只防止分母混用 不提供HTS原產豁免appraised value其他duty法律判定或公司估值。
+next_trigger: 具名entry公開customs value稅率逐項duty importer合約價格數量及公司毛利共同鍵並與海關結果核對。
+-->
