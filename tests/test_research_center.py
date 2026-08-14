@@ -4773,7 +4773,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 55
+            sum(line.startswith("- **") for line in glossary.splitlines()), 67
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4790,9 +4790,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 19),
-            ("research_claim", 17), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 23),
+            ("research_claim", 22), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4822,15 +4822,82 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:training-runtime-goodput,metric,訓練有效時間",
             "process:ai-storage-performance-passport,process,AI 儲存十欄效能護照",
             "metric:workload-conditioned-tail-latency,metric,工作負載條件化尾端延遲",
+            "process:ai-storage-endurance-passport,process,AI 儲存十二欄耐久護照",
+            "metric:application-host-nand-write-ledgers,metric,應用、主機與 NAND 三層寫入帳",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 資料讀取與儲存路徑", graph)
         for edge_id in (
             "KG-ASD-C04", "KG-ASD-I11", "KG-ASD-I12", "KG-ASD-I13",
-            "KG-ASD-I14", "KG-ASD-I15",
+            "KG-ASD-I14", "KG-ASD-I15", "KG-ASD-I16", "KG-ASD-I17",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+
+    def test_ai_storage_endurance_separates_application_host_nand_and_rated_life(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-09_ai_storage_data_plane.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "separated_application_host_nand_and_rated_endurance_ledgers_without_thesis_or_clock_refresh",
+            "## GB/s 跑得快，不等於耐久夠：先拆四本寫入帳",
+            "| A：應用邏輯資料 |",
+            "| H：主機寫入 |",
+            "| N：NAND 寫入 |",
+            "| L：額定壽命 |",
+            "N／A＝H／A×N／H",
+            "### DWPD 是壽命分母，不是速度分母",
+            "| D7-PS1010 Standard Endurance | 15.36 TB | 1.0 | 15.36 TB／日 | 28.032 PBW | 28 PBW |",
+            "| D7-PS1030 Mid-Endurance | 12.8 TB | 3.0 | 38.4 TB／日 | 70.080 PBW | 70 PBW |",
+            "可用容量比 PS1010 少 16.6667%",
+            "額定每日寫入與\n五年累計寫入都是 2.5 倍",
+            "Python Decimal 與獨立 awk",
+            "N＝1 個發行人、N＝1 個產品家族、N＝2 個規格組態",
+            "沒有 sampling SE／t",
+            "### Percentage Used 到 100%，也不是「現在立刻壞掉」",
+            "50／50 read／write、4 KiB read、128 KiB write",
+            "100% active range、\n80% full、不可壓縮資料與 35°C 環境",
+            "### 十二欄耐久度護照：先能對帳，再談買多少",
+            "| 1. AI 工作與完成語意 |",
+            "| 4. Host writes H |",
+            "| 5. NAND writes N 與 WAF |",
+            "| 10. 健康與事件 |",
+            "| 12. 商業與財務 |",
+            "### 多空小作文共用同一張耐久帳",
+            "| 偏多：AI 把儲存價值推向高耐久與管理能力 |",
+            "| 偏空：軟體把寫入與磨耗增量吸收 |",
+            "本輪新增 N＝4 份一手文件／頁面",
+            "claim_id: C18\nlabel: verified",
+            "claim_id: C19\nlabel: verified",
+            "claim_id: C20\nlabel: inference",
+            "claim_id: C21\nlabel: verified",
+            "claim_id: C22\nlabel: inference",
+            "source_id: S20",
+            "a06ca25dfb59c59221682937090fb709563622455ebc76640e3aa69e498419ed",
+            "source_id: S21",
+            "ebda7161ea19a616c1386d6bca94fcf0c153d1b563e5f32d7b97ba62392e2a4b",
+            "source_id: S22",
+            "直接 curl 回 HTTP 403",
+            "source_id: S23",
+            "monitor_id: T4\nstatus: active",
+        ):
+            self.assertIn(contract, topic)
+        scans = (
+            ROOT / "notes" / "research_topics" / "scan_log.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "scan-2026-08-14-ai-storage-endurance-ledgers", scans
+        )
+        snapshot = json.loads((
+            ROOT / "notes" / "research_method_reviews"
+            / "2026-08-14_61.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(snapshot["snapshotId"], "RMA-2026-08-14-61")
+        self.assertEqual(snapshot["claims"]["active"], 682)
+        self.assertEqual(snapshot["sources"]["active"], 618)
+        self.assertEqual(snapshot["monitors"]["active"], 127)
+        self.assertEqual(snapshot["graphs"]["activeEdges"], 812)
 
     def test_compute_connect_station_two_separates_helios_stages_customers_and_company_gates(self):
         topic = (

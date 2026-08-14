@@ -81,6 +81,13 @@ to: triaged
 reason: added_workload_concurrency_tail_latency_and_unit_performance_passport_without_thesis_or_clock_refresh
 evidence: sources:S1,S9,S14,S15,S16,S17,S18,S19
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: separated_application_host_nand_and_rated_endurance_ledgers_without_thesis_or_clock_refresh
+evidence: sources:S20,S21,S22,S23
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -106,6 +113,18 @@ evidence: sources:S1,S9,S14,S15,S16,S17,S18,S19
 - **最慢讀取時間（pMax／尾端延遲／latency）**：一批讀取中最慢端所花的時間；平均速度良好，不代表最慢一次不會拖住整體工作。
 - **讀取／寫入速度（Throughput）**：資料在指定時間內能讀出或寫入多少；峰值速度只描述一項能力，不能替最慢延遲、故障復原與持久性背書。
 - **SNIA／SSS PTS v2.0.2**：SNIA 是制定儲存技術方法的產業組織；SSS PTS v2.0.2 是本文用來辨識 device-level 測試範圍的現行標準入口，方法頁不等於任一產品已通過認證。
+- **DWPD（Drive Writes per Day）**：在指定壽命內，每 24 小時可把 SSD 可用容量完整覆寫幾次的耐久度表達；它是壽命口徑，不是當日寫入效能上限。
+- **TBW／PBW（Terabytes／Petabytes Written）**：指定壽命內的累計寫入量口徑；必須連同容量、壽命、測試條件與保固邊界閱讀，不能只拿數字大小跨產品排名。
+- **主機寫入（Host writes）**：主機送到 SSD 的寫入 bytes；副本、檔案系統、壓縮、去重、metadata 與重試都可能讓它不同於應用程式眼中的邏輯資料量。
+- **NAND 實際寫入（NAND writes）**：控制器最後寫進快閃記憶體媒體的 bytes；垃圾回收、資料搬移與媒體管理可能讓它高於主機寫入。
+- **WAF（Write Amplification Factor）**：NAND 寫入除以主機寫入；兩個分子必須屬於同一裝置、時間窗與 workload，不能用產品型錄數字替代實測工作負載。
+- **Overprovisioning（預留空間）**：不開放給使用者、留給控制器做媒體管理的容量；可用來改善壽命或效能，但可用容量減少不等於原始 NAND、成本或毛利已知。
+- **Percentage Used／Available Spare**：NVMe 健康記錄中的耐久使用百分比與可用備援媒體指標；兩者要和 Data Units Written、溫度、媒體錯誤、非安全關機及產品保固共同判讀。
+- **EOL（End of Life）**：規格定義的額定壽命邊界，不等於某一秒必然故障；反過來，尚未到 100% 也不能替其他健康欄位背書。
+- **TLC（Triple-Level Cell）**：每個 NAND cell 儲存三個 bits 的快閃媒體類型；媒體標籤本身不能替代產品容量、耐久、韌體、工作負載與測試結果。
+- **D7-PS1010／D7-PS1030**：Solidigm 同一 PCIe 5.0 產品家族的 standard-endurance 與 mid-endurance 型號；本文只用公開規格示範容量與壽命分母，沒有把它們當產業樣本。
+- **OCP Datacenter NVMe SSD Specification v2.7**：Open Compute Project 的資料中心 NVMe SSD 規格；本文只引用耐久、健康與 EOL 條文，不表示任何型號已完成符合性或客戶資格認證。
+- **Python Decimal／awk 雙路重算**：用十進位精確算術與另一套文字運算工具各算一次同一公式；兩路一致只排除單一路徑算術錯誤，不會把型錄轉成真實部署證據。
 - **IOPS**：每秒完成多少次 I/O 操作；如果沒有同時寫出每次傳多少資料、讀寫比例與併行設定，就不知道每秒搬了多少 bytes，也不能和另一個 IOPS 數字直接排名。
 - **Block size／small-I/O（傳輸大小／小筆 I/O）**：每一次 I/O 指令要求搬運的資料量；small-I/O 常讓操作次數成為重點，大 block 常讓資料吞吐成為重點。
 - **KiB／GiB**：二進位資料單位，`1 KiB = 1024 bytes`、`1 GiB = 1024^3 bytes`；不能和十進位 `KB／GB` 靜默互換。
@@ -146,7 +165,7 @@ evidence: sources:S1,S9,S14,S15,S16,S17,S18,S19
 
 - 人工智慧系統有三種容易混在一起的工作：訓練時持續餵訓練資料、故障前先保存進度，以及服務擴充時把模型檔案送到新機器；三種工作卡住的原因不同。
 - 餵資料怕最慢的一次讀取讓整群運算晶片等待；保存進度要依序證明暫存、上傳、耐久保存、正確回載與故障後接續訓練，不能只報寫入速度；搬模型則取決於副本放在哪裡，以及能否從附近機器直接取得。
-- 所以「資料變多」不能直接換算成更多硬碟或某家公司營收；還要看到哪條路徑被實際使用、哪個元件真的承擔瓶頸，以及客戶認證、部署數量與財務資料。
+- 所以「資料變多」不能直接換算成更多硬碟或某家公司營收；還要分開應用資料、主機送出的寫入、快閃媒體實際寫入與額定壽命，並看到實際路徑、客戶認證、部署數量與財務資料。
 
 ### 為什麼重要
 
@@ -167,6 +186,7 @@ evidence: sources:S1,S9,S14,S15,S16,S17,S18,S19
 - 先辨識新資料談的是餵訓練資料、保存進度或搬模型，並記下最慢讀取、存檔完成、故障復原或新機器啟動時間。
 - 若資料談 checkpoint，先問「完成」是暫存完成、上傳完成、耐久副本完成，還是已實際回載並接續訓練；四者不能互換。
 - 再查同一平台的快取命中、路徑使用比例、機器數、每台容量與設備利用率，避免把三家不同架構直接相加。
+- 寫入型工作還要同時記錄每日邏輯 bytes、host bytes、NAND bytes、WAF、DWPD／TBW、可用容量、保固年限、Percentage Used 與備援媒體，不能用 GB/s 代替耐久度。
 - 最後核對客戶端的具名產品與供應商端的認證、部署、出貨、收入及毛利；兩邊沒有對上，就維持待驗證。
 
 ### 想一想
@@ -174,6 +194,7 @@ evidence: sources:S1,S9,S14,S15,S16,S17,S18,S19
 - 如果軟體已讓附近機器吸收大部分重複搬運，運算量增加時，長期保存設備還會等比例增加嗎？
 - 一顆硬碟的峰值速度很快，但最慢讀取、故障復原與連續運作都沒有通過驗收，它真正解決了哪一種工作？
 - 一個非同步存檔在暫存完成後就讓訓練繼續，但上傳途中節點立刻故障，這份進度紀錄算完成了嗎？
+- 同一份進度存檔若讓應用程式增加 1 TB 邏輯資料，主機與快閃媒體真的都只增加 1 TB 嗎；若沒有三層計數器，能判斷硬碟壽命嗎？
 - 公司公布的人工智慧產品占比同時包含硬碟、個人電腦、網路與伺服器時，能用這個百分比判斷資料中心儲存收入嗎？
 
 ## 主張與證據帳本
@@ -470,6 +491,91 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: KIOXIA 將 DWPD 定義為在指定壽命內每天可覆寫 SSD 可用容量的次數，將 TBW 定義為指定壽命內的累計寫入量，並給出 TBW＝DWPD×SSD 容量×年數×365 的換算；同一文件另將 WAF 定義為 NAND 寫入除以 host 寫入，指出垃圾回收可能使兩者分離
+supporting_source_ids: S20
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S20 PDF pp.2–4 直接界定 DWPD、TBW、換算公式、host／NAND writes、garbage collection、WAF 與 overprovisioning
+boundary: 這是 KIOXIA 的通用技術說明與 predictive model，不是任一 AI workload 的實測 WAF、產品保固裁決、跨供應商共同測試或 universe 公司財務證據
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: Solidigm D7-PS1010／PS1030 產品簡報把同一 PCIe 5.0、176L TLC 3D NAND 家族分成 standard endurance 與 mid-endurance：前者最高 15.36 TB、五年 1 DWPD、28 PBW，後者最高 12.8 TB、五年 3 DWPD、70 PBW
+supporting_source_ids: S21
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S21 PDF p.1 的 Performance and Features at a Glance 逐欄列出 interface、media、user capacity、五年 DWPD 與最高 lifetime PBW
+boundary: 同一產品家族與同一 media 標籤不證明兩型號有相同 raw NAND 容量、controller／firmware 配置、製造成本、售價、需求、qualification 或毛利；型錄也不是 production workload 成效樣本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: inference
+status: active
+claim: 依 KIOXIA 公式重算，D7-PS1010 15.36 TB×1 DWPD×365×5＝28.032 PBW、D7-PS1030 12.8 TB×3 DWPD×365×5＝70.080 PBW，分別接回型錄四捨五入的 28 與 70 PBW；後者可用容量少 16.6667%，但額定每日寫入與五年累計寫入均為前者 2.5 倍，而不是 3 倍
+supporting_source_ids: S20,S21
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S20 提供換算式，S21 提供兩個產品組態的容量、DWPD、年數與 PBW；Python Decimal 與獨立 awk 兩路重算對 15.36、38.4、28.032、70.080、2.5 與負 16.6667% 一致
+boundary: 這是 N＝1 個發行人、N＝1 個產品家族、N＝2 個規格組態的確定性換算，不是隨機產品或 deployment 樣本，沒有 sampling SE／t；2.5 倍只描述額定 writes，不代表效能、使用率、替換率、售價、收入或獲利同倍增加
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: OCP Datacenter NVMe SSD Specification v2.7 要求文件提供 WAF＝1 假設下的可寫 physical bytes，並以固定 read／write mix、block size、位址型態、active range、fullness、compressibility 與溫度預處理 EOL 效能；Percentage Used 要隨 bytes written 線性前進並在額定 EOL 對到 100%，但裝置依規格仍可繼續 read／write，直到備援媒體或其他失效條件觸發模式切換
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S22 pp.33、187–189 的 SMART-25、ENDUD-1～3、EOL-1、EOL-4～7 直接定義 endurance estimate、預處理、Percentage Used、EOL 與 Available Spare／read-only 行為
+boundary: S22 是 datacenter SSD 的 OCP 規格契約，不代表 S21 產品宣告符合全部 v2.7 條文，也不把 Percentage Used＝100% 定義成保固一定延長、資料一定安全或裝置必然立即故障
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: AI 儲存的耐久度應同時保留應用邏輯資料、host writes、NAND writes 與額定壽命四本帳；只有在同一 checkpoint／dataset／model-distribution 工作、裝置、時間窗與副本範圍下量到各層 bytes，才能分開系統放大 H／A、媒體 WAF N／H 與總 NAND 放大 N／A，不能用容量、IOPS、GB/s 或 DWPD 任一單值代替
+supporting_source_ids: S2,S10,S11,S20,S21,S22,S23
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S2、S10、S11 顯示 checkpoint 會跨 staging、upload、replica 與多層路徑；S20 分開 host／NAND writes 與 WAF；S21 分開 user capacity、DWPD、年數與 PBW；S22／S23 提供 endurance estimate、Percentage Used、Data Units Written 與其他健康欄位，共同支持四帳不可互填
+boundary: 四帳與十二欄護照是研究中心整合不同官方文件的量測框架，不是各組織共同標準；H／A 與 N／H 只有在 scope、clock 與 bytes definition 完全一致時才能相乘，也不直接估算 SSD 顆數、NAND bit demand、replacement、客戶 qualification 或公司財務
+verification_needed: 同一具名 production AI workload 公開 application bytes、host Data Units Written、physical NAND bytes、WAF、device health、replication／compression／retry、產品規格、故障重建與部署分母
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先把三種「存資料」工作分開
 
 | 本文三種工作 | 何時發生 | 最怕什麼 | 先看哪個結果 | 不能直接推成 |
@@ -562,6 +668,94 @@ qualification 或公司財務已成立。
 storage-method 消息鏈，並與既有 Meta、MLCommons 兩條獨立鏈交叉；它們不是六顆 SSD、六個 AI 叢集
 或六家公司樣本。除 N=2 假想 workload 的確定性
 單位換算外，沒有新的 effect size、sampling SE／t、價格、估值、共識或投資判斷。
+
+## GB/s 跑得快，不等於耐久夠：先拆四本寫入帳
+
+「每次 checkpoint 是 1 TB」至少可能指四件不同的事。應用程式先產生一份邏輯狀態，框架可能切片、
+壓縮、加 metadata、重送或做多份副本，主機才把 bytes 送進 SSD；控制器又可能為垃圾回收與媒體管理
+重寫 NAND。最後，產品型錄的 DWPD／TBW 只是額定壽命契約，不是上述任一層的即時流量。[S20][S22][S23]
+
+| 寫入帳 | 分母與量測位置 | 可能改變它的機制 | 不能拿哪一本帳代替 |
+|---|---|---|---|
+| A：應用邏輯資料 | 同一 checkpoint、dataset ingest 或 model artifact 的有效 payload bytes | 模型狀態內容、sharding、checkpoint 頻率與保留政策 | 檔案大小不等於 host writes，更不等於 NAND writes |
+| H：主機寫入 | 主機對指定 SSD／namespace 在同一時間窗送出的 bytes | 壓縮、去重、副本、metadata、重試、filesystem 與 tiering | Data Units Written 不知道哪些 bytes 最後形成有效訓練進度 |
+| N：NAND 寫入 | 控制器實際寫入快閃媒體的 bytes | garbage collection、wear leveling、資料搬移、I/O 對齊、active range、fullness 與 overprovisioning | NAND writes 不能反推唯一 workload，也不等於使用者可見容量 |
+| L：額定壽命 | 指定容量、DWPD／TBW、年限、測試條件與保固邊界 | 媒體、控制器、韌體、預留空間、工作負載與環境 | 型錄 3 DWPD 不等於當天一定寫了三次，也不是寫入 GB/s |
+
+在同一裝置、時間窗與 bytes 定義下，H／A 是系統層放大，N／H 才是 WAF，N／A 才是應用到 NAND
+的總放大；此時 N／A＝H／A×N／H 只是對帳恆等式。若 A 是壓縮前 bytes、H 混入副本與重試、N 又取
+另一批 SSD 或另一個時間窗，三個比率即使各自漂亮，也不能相乘。KIOXIA 的文件只把 WAF 定義成
+NAND writes／host writes，沒有替研究者補上 A；A 到 H 必須回到實際框架與部署量測。[S20]
+
+### DWPD 是壽命分母，不是速度分母
+
+KIOXIA 給出的換算是：TBW＝DWPD×SSD 可用容量×指定年數×365。[S20] 套到 Solidigm 同一 D7
+產品家族的最大容量組態，可把型錄四捨五入值接回來：[S21]
+
+| 產品組態 | 使用者可見容量 | 五年 DWPD | 額定每日寫入 | 公式重算五年 PBW | 型錄最高 lifetime PBW |
+|---|---:|---:|---:|---:|---:|
+| D7-PS1010 Standard Endurance | 15.36 TB | 1.0 | 15.36 TB／日 | 28.032 PBW | 28 PBW |
+| D7-PS1030 Mid-Endurance | 12.8 TB | 3.0 | 38.4 TB／日 | 70.080 PBW | 70 PBW |
+
+這個例子最值得注意的不是「3 比 1」。PS1030 的可用容量比 PS1010 少 16.6667%，因此額定每日寫入與
+五年累計寫入都是 2.5 倍，不是 3 倍。兩者同列 PCIe 5.0 與 176L TLC 3D NAND，只能證明型錄把
+capacity 與 endurance 做成不同組態；文件沒有提供 raw NAND、預留比例、控制器差異、售價、訂單、
+deployment mix 或毛利，不能把容量差自行解釋成成本結構。[S21]
+
+算術與誤差邊界：這是 N＝1 個發行人、N＝1 個產品家族、N＝2 個規格組態的確定性換算，不是隨機
+產品、SSD、機架或客戶樣本，沒有 sampling SE／t。Python Decimal 與獨立 awk 兩路都得到每日
+15.36／38.4 TB、五年 28.032／70.080 PBW、比值 2.5 與容量差負 16.6667%；一致只驗證單位與乘法，
+不驗證真實 workload、失效率、替換率或財務效果。
+
+### Percentage Used 到 100%，也不是「現在立刻壞掉」
+
+OCP Datacenter NVMe SSD Specification v2.7 把耐久度寫成一份測試契約，而不是一個孤立數字。
+ENDUD-1 要求文件提供 WAF＝1 假設下可寫入的 physical bytes；ENDUD-2 的 EOL 預處理又固定為
+50／50 read／write、4 KiB read、128 KiB write、random read、sequential write、100% active range、
+80% full、不可壓縮資料與 35°C 環境。[S22] 這些條件少一個，就不能把自己的 AI workload 宣稱為
+「等同規格測試」。
+
+同一規格要求 Percentage Used 隨 bytes written 線性前進，並在額定 EOL 對到 100%；但 EOL-4
+仍要求裝置在後續失效條件到來前維持 read／write，EOL-5 才把 Available Spare 到 0% 接到 read-only
+模式。[S22] 因此 100% 是額定壽命邊界，不是保證下一秒故障；反過來，Percentage Used 低於 100%
+也不能保證健康，還要看 available spare、critical warning、media errors、溫度、unsafe shutdowns、
+firmware 與 self-test。NVMe 官方工具頁把這些欄位放在同一份 SMART log，Data Units Written 則以
+512×1000 bytes 為一個單位再轉成十進位 TB／PB。[S23]
+
+### 十二欄耐久度護照：先能對帳，再談買多少
+
+| 護照欄位 | 最少要保存 | 少了會犯的錯 |
+|---|---|---|
+| 1. AI 工作與完成語意 | dataset fetch／checkpoint／model distribution；staging、upload、durable 或 restore | 把暫存 bytes 當成耐久副本 |
+| 2. 應用邏輯量 A | 每次有效 payload、頻率、保留數、觀測日數與成功／失敗事件 | 用模型大小直接乘 GPU 數 |
+| 3. 系統放大 H／A | compression、dedupe、sharding、replica、metadata、retry 與每層 bytes | 漏掉副本，或把壓縮前後重複計數 |
+| 4. Host writes H | 每顆 SSD／namespace 的 Data Units Written、觀測起訖、counter reset／wrap 與 units | 把 cluster bytes 填進單顆 drive 分母 |
+| 5. NAND writes N 與 WAF | physical NAND bytes、同窗 host bytes、WAF、firmware 與計數來源 | 用廠商通用 WAF 假設取代 production telemetry |
+| 6. 容量契約 | user capacity、raw／reserved 未知邊界、namespace、overprovisioning 與 usable fullness | 把 TB 型號當成全部可寫空間或 raw NAND |
+| 7. 額定壽命 L | DWPD、TBW／PBW、指定年限、保固、EOL 定義與 workload profile | 把 DWPD 當吞吐，或跨年限直接排名 |
+| 8. I/O shape | block size、alignment、read／write mix、random／sequential、QD／TC、active range | 峰值 GB/s 被拿來估耐久消耗 |
+| 9. 裝置狀態與環境 | pre-conditioning、fullness、compressibility、temperature、power state 與 duty cycle | 剛清空或較低溫結果被當長期能力 |
+| 10. 健康與事件 | Percentage Used、Available Spare、critical warning、media errors、unsafe shutdown、thermal time | 單一 100% 或 0 error 被寫成完整健康結論 |
+| 11. 故障與更換 | replica／erasure code、rebuild writes、spare policy、failure domain、restore 與更換門檻 | 只算正常寫入，漏掉重建與營運備援 |
+| 12. 商業與財務 | 具名產品、qualification、部署量、產品組合、ASP、收入、毛利、庫存與現金 | endurance 需求直接變成某公司營收 |
+
+護照填滿後仍要先分「每單位 compute 的寫入」與「整體 compute 數量」。前者可能因 cache、peer path、
+compression、較少 checkpoint、write shaping 或較低 WAF 而下降；後者可能因叢集擴大而上升。兩個方向
+可以同時成立，最後要看 A、H、N 與 drive-days 的總量，而不是挑一個方向寫故事。[S1][S2][S3][S20]
+
+### 多空小作文共用同一張耐久帳
+
+| 敘事 | 合理機制 | 必須看到的共同證據 | 失效條件 |
+|---|---|---|---|
+| 偏多：AI 把儲存價值推向高耐久與管理能力 | checkpoint 更大／更頻繁、更多副本、write-heavy cache、較高 WAF 或更嚴 EOL／recovery SLO，可能提高 mid／high-endurance SSD、controller、firmware、telemetry 與驗證價值 | 同一 production workload 的 A／H／N、WAF、drive-days、產品 endurance mix、qualification、部署量、ASP、收入與毛利 | 只有模型大小、GB/s、產品頁或 broad AI revenue，沒有 host／NAND writes 與產品組合共同鍵 |
+| 偏空：軟體把寫入與磨耗增量吸收 | multi-tier checkpoint、壓縮／去重、peer transfer、write shaping、較低頻率或較大 sequential writes 可降低 H／A 或 N／H | 固定 compute 與 SLO 的 baseline／treatment，公開 bytes、WAF、goodput、restore、設備數、壽命與成本 | 只量單顆 device WAF 下降，卻漏掉更多副本、cluster 擴張、RAM／network 成本或失敗重建 |
+| 共同裁決 | 高容量、高效能、高耐久與低成本是四個不同軸 | 十二欄護照加買方／供應商雙向文件 | 由 1 DWPD／3 DWPD、TLC／QLC 或單一 SMART 欄位直接生成 TAM、份額、訂單或投資結論 |
+
+本輪新增 N＝4 份一手文件／頁面，分屬 KIOXIA、Solidigm、OCP 與 NVM Express 四條消息鏈；它們不是
+四顆 SSD、四個 AI cluster 或四個客戶樣本。只有 N＝2 個同家族型錄組態的確定性換算；沒有 production
+application／host／NAND 三層共同觀測、run-level 變異、sampling SE／t、價格、估值、共識、部位或
+投資建議。對 8299 群聯而言，這張護照只新增企業 SSD／控制器／韌體研究問題，沒有新增具名客戶、
+qualification、出貨、收入或毛利事實。
 
 ## 「存檔完成」其實有六層，不是按下 save 就結束
 
@@ -958,6 +1152,70 @@ locator: KiB=1024 bytes 而 KB=1000 bytes、Fresh Out of Box、random／sequenti
 limitation: 術語頁只建立單位與 workload 名詞，沒有 GB／GiB throughput result、IOPS 算例、device test、AI workload、客戶 qualification 或財務歸因
 -->
 
+<!-- research_source
+source_id: S20
+role: other_primary
+source_kind: document
+publisher: KIOXIA America
+independence_group: kioxia-storage-vendor
+title: How Does Endurance Work in SSDs?
+published_at: 2021-03-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://americas.kioxia.com/content/dam/kioxia/en-us/business/memory/asset/KIOXIA-SSD-NAND-Endurance-Tech-Brief.pdf
+locator: PDF pp.2–4 的 SSD Endurance Overview、DWPD／TBW conversion、Flash Memory Wear-out、WAF 與 overprovisioning；本地檔 SHA-256 a06ca25dfb59c59221682937090fb709563622455ebc76640e3aa69e498419ed
+limitation: KIOXIA 通用技術簡報只在封面標示 March 2021，本 ledger 以月初作 published_at 日期鍵；DWPD／TBW 是 predictive model，產品、保固、workload、WAF 與實際結果仍須逐案核對，不能把媒體類別區間或通用機制當 AI deployment 樣本
+-->
+
+<!-- research_source
+source_id: S21
+role: competitor_primary
+source_kind: document
+publisher: Solidigm
+independence_group: solidigm-storage-vendor
+title: Solidigm D7-PS1010 and D7-PS1030 Product Brief
+published_at: 2024-08-06
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.solidigm.com/content/dam/solidigm/en/site/products/data-center/product-briefs/ps1010-ps1030/solidigm-d7-ps1010-d7-ps1030-product-brief.pdf
+locator: PDF p.1 的 interface、media、user capacity、五年／三年 DWPD 與最大 lifetime PBW；p.7 的測試與產品限制；本地檔 SHA-256 ebda7161ea19a616c1386d6bca94fcf0c153d1b563e5f32d7b97ba62392e2a4b
+limitation: 發布日依 PDF 內 Embargoed until August 6 2024；這是 vendor product brief，不提供 raw NAND、overprovisioning 比例、完整 qualification、production workload、銷量、價格、客戶或財務，效能比較亦有 vendor test 與 estimated／simulated 限制
+-->
+
+<!-- research_source
+source_id: S22
+role: standard
+source_kind: document
+publisher: Open Compute Project
+independence_group: ocp-datacenter-ssd-standard
+title: Datacenter NVMe SSD Specification Version 2.7
+published_at: 2026-01-08
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/datacenter-nvme-ssd-specification-v2-7-final-pdf-1
+locator: cover 的 Version 2.7 01082026；PDF p.33 SMART-25；pp.187–189 ENDUD-1～3、EOL-1、EOL-4～7；revision history 另列 v2.7 2025-10-24
+limitation: 文件封面日期碼與 revision history 日期均原樣保留，不自行判定哪一個是 drafting／publication 時點；官方 PDF 可由研究瀏覽器全文擷取與引用頁檢視，但直接 curl 回 HTTP 403，故本輪沒有本地檔 SHA；規格要求不證明任一產品已符合 v2.7、通過客戶驗證或形成訂單
+-->
+
+<!-- research_source
+source_id: S23
+role: standard
+source_kind: living_index
+publisher: NVM Express
+independence_group: nvme-standard-body
+title: Open Source NVMe SSD Management Utility — NVMe Command Line Interface
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://nvmexpress.org/open-source-nvme-ssd-management-utility-nvme-command-line-interface-nvme-cli/
+locator: Health Monitoring／SMART Log 段落的 Percentage Used、Data Units Written 512×1000 bytes、Available Spare、temperature、unsafe shutdowns、media errors 與 device self-test 欄位
+limitation: 動態工具導讀沒有頁面發布日；命令輸出是官方頁面的單一示例，不是產品 benchmark、跨裝置健康門檻、保固裁決、AI workload、qualification 或供應商財務證據
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -1025,6 +1283,20 @@ trigger: 具名 operator 以同一版本化 production workload 公開 checkpoin
 invalidation: 新版標準、framework 或 production evidence 顯示八格仍遺漏會改變結論的 completion、consistency、failure-domain、convergence、security、endurance 或 economics 欄位；屆時新增修正 claim 縮窄 C12，不回寫既有研究快照
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C18,C19,C20,C21,C22
+metric: 同一 AI workload 的 application logical bytes、host Data Units Written、physical NAND bytes、WAF、DWPD／TBW、Percentage Used、Available Spare、故障重建與產品 endurance mix
+source_ids: S20,S21,S22,S23
+watch_source_ids: S5,S6,S7,S8,S22,S23
+frequency: quarterly
+frequency_detail: 每季檢查 operator storage／checkpoint 架構、OCP／NVMe 規格與 8299 公司文件；具名產品 qualification 或 production telemetry 出現時提前重審
+next_check: 2026-08-28
+trigger: 具名 operator 在同一版本化 AI workload 公開 A／H／N 三層 bytes、WAF、drive-days、EOL／rebuild policy 與產品配置，且買方與供應商文件雙向確認 qualification、部署量及財務分母
+invalidation: 新規格或 production evidence 顯示四帳／十二欄遺漏會改變 endurance、availability 或 economics 結論的必要欄位，或同一組 scope 證明本文的 A／H／N 邊界無法重建；屆時新增修正 claim，不回寫既有研究快照
+-->
+
 ## 目前不能下的結論／待驗證
 
 - 不能把 Meta、AWS 與 NVIDIA 三家的文件拼成同一套正式運作架構；本篇只把三種工作分開比較。
@@ -1033,4 +1305,6 @@ invalidation: 新版標準、framework 或 production evidence 顯示八格仍�
 - 不能由群聯具備控制器、韌體與企業 SSD 能力，推導它已進入 Meta、AWS 或 NVIDIA 的具名設計、訂單、份額或毛利。
 - 不能把伺服器組裝廠的一般整合能力當成 AI 儲存路徑已通過客戶認證；仍需要同一平台的物料清單、服務目標、驗收、部署與出貨文件。
 - 不能把 I/O 模擬跑完、暫存完成或上傳完成改寫成 checkpoint 已跨故障範圍耐久保存、正確回載並改善 Runtime Goodput；六層完成階梯要逐層留證據。
+- 不能把模型或 checkpoint 大小直接當成 host writes，更不能把 host writes 當成 NAND writes；沒有同窗 A／H／N 與 WAF，就不能估 SSD 磨耗、替換或顆數。
+- 不能把 1 DWPD／3 DWPD、Percentage Used＝100% 或 TLC／QLC 單一標籤改寫成效能、立即故障、客戶採用、售價、收入或毛利；容量、壽命、健康與商業是不同證據軸。
 - 不能把 Google 單一 35K-chip TPU v5p 組態報告的 6.59% ML Goodput 改善外推成跨模型、跨平台或產業平均；公開資料沒有 run 數、變異、原始樣本或 SE／t。

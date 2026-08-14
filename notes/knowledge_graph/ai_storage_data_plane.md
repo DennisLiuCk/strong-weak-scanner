@@ -1,7 +1,8 @@
 # AI 資料讀取與儲存路徑知識圖譜
 
 本圖把訓練時餵資料、故障前保存進度與服務擴充時搬模型拆成三種工作，並把 checkpoint 的
-暫存、上傳、耐久、正確回載與訓練有效時間分成不同驗證節點。公司線只表示已核驗的儲存能力
+暫存、上傳、耐久、正確回載與訓練有效時間分成不同驗證節點，再分開應用資料、主機寫入、
+NAND 寫入與額定壽命四本帳。公司線只表示已核驗的儲存能力
 或平台路徑；沒有買方客戶認證、部署分母與財務資料前，不把相鄰能力畫成訂單。
 
 <!-- knowledge_graph_meta
@@ -9,7 +10,7 @@ schema_version: 1
 graph_id: ai-storage-data-plane
 root_node_id: concept:ai-storage-data-plane
 label: AI 資料讀取與儲存路徑
-summary: 以最慢讀取時間 checkpoint 完成與復原 以及模型副本位置分開三種人工智慧資料工作 再用十欄效能護照與八格復原護照把 IOPS 吞吐 延遲 併行 裝置狀態 I/O 模擬 暫存上傳 耐久回載 訓練有效時間與公司能力保持在不同證據層。
+summary: 以最慢讀取時間 checkpoint 完成與復原 以及模型副本位置分開三種人工智慧資料工作 再用十欄效能護照 八格復原護照與十二欄耐久護照把 IOPS 吞吐 延遲 併行 裝置狀態 應用主機NAND寫入 額定壽命 I/O模擬 暫存上傳 耐久回載 訓練有效時間與公司能力保持在不同證據層。
 article_ids: MI-2026-08-09-AI-STORAGE-DATA-PLANE
 status: active
 -->
@@ -392,4 +393,44 @@ review_due: 2026-08-31
 status: active
 boundary: 工作負載條件化尾端延遲必須固定block mix client thread QD OIO state cache scope completion與事件數；單一average maximum或peak IOPS不能外推AI停算 公司採用或財務。
 next_trigger: 同一cluster同步保存per IO distribution pMax timeout retry accelerator stall device version與多run不確定度。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I16
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: process:ai-storage-endurance-passport
+relation: requires
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C18,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C19,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C20,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C21,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C22
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-28
+status: active
+boundary: 十二欄耐久護照是研究中心整合KIOXIA Solidigm OCP與NVM Express官方文件的對帳框架 不是四方共同標準 production qualification 或公司採用證據。
+next_trigger: 同一production AI workload公開應用host與NAND三層bytes WAF drive days健康重建產品配置及買賣雙方財務共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I17
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: metric:application-host-nand-write-ledgers
+relation: measured_by
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C18,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C21,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C22
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-28
+status: active
+boundary: A H N三層帳只有在裝置時間窗bytes定義副本範圍與counter契約一致時才能重算H除A N除H與N除A 任一產品型錄數字都不能替代production telemetry。
+next_trigger: Operator與SSD供應商以同一checkpoint或dataset workload公開application bytes Data Units Written physical NAND bytes counter lineage WAF與失效重建紀錄。
 -->
