@@ -6122,6 +6122,28 @@ class ResearchCenterTest(unittest.TestCase):
             "| 4. 結果品質 |", "| 5. 定位與處置 |", "| 6. 零件病歷 |",
             "## 三套公開做法，各自只看到責任鏈的一個切面",
             "## 為什麼「多跑測試」仍可能抓不到",
+            "added_zero_event_exposure_confidence_and_isolation_evidence_passport_without_thesis_clock_refresh",
+            "## 零次命中不是零風險：先鎖試驗機會、裝置時數與錯判矩陣",
+            "事件率上限＝1−0.05 的 1／N 次方",
+            "| 小型驗證 | 100 | 0 | 2.951304961% | 29,513.049607 ppm |",
+            "| 擴大驗證 | 1,000 | 0 | 0.299124955% | 2,991.249545 ppm |",
+            "| 大型匿名母體 | 1,000,000 | 0 | 0.000299573% | 2.995728 ppm |",
+            "| 百萬裝置時數 | 1,000,000 | 0 | 333,808.200695 小時 | 2,995.732274 FIT |",
+            "| 十億裝置時數 | 1,000,000,000 | 0 | 333,808,200.695334 小時 | 2.995732 FIT |",
+            "| 已知壞 | 90 | 10 | 100 |",
+            "| 已知好 | 50 | 9,950 | 10,000 |",
+            "| 陽性預測值 | 90 ÷ 140 | 64.285714% |",
+            "### 多空小作文共用的 SDC 零事件—隔離十欄護照",
+            "| 1. 事件定義 |", "| 6. 混淆矩陣 |", "| 10. 成本與財務 |",
+            "第一張表是 N＝3 個匿名零事件情境",
+            "第二張表是 N＝2 個匿名總暴露情境",
+            "第三組混淆矩陣是 N＝10,100 筆刻意組成的匿名",
+            "Python math／Fraction 與獨立 awk",
+            "物理樣本 N＝0",
+            "source_id: S11", "source_id: S12", "claim_id: C11",
+            "claim_id: C12", "claim_id: C13", "claim_id: C14",
+            "last_reviewed_at: 2026-08-12",
+            "review_due: 2026-08-31",
             "## 用七關判斷 SDC 需求是否真的形成",
             "| 1. 分類對齊 |", "| 2. 可執行測試 |", "| 3. 品質可量化 |",
             "| 4. 裝置可隔離 |", "| 5. 病歷可回傳 |", "| 6. 跨平台重現 |",
@@ -6130,9 +6152,15 @@ class ResearchCenterTest(unittest.TestCase):
             "## 這篇對個股判斷的用處與界線",
         ):
             self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 39
+        )
         for block, expected in (
-            ("research_topic", 1), ("research_source", 10),
-            ("research_claim", 10), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 14), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -6159,6 +6187,8 @@ class ResearchCenterTest(unittest.TestCase):
             "process:sdc-part-history-feedback,process,SDC 零件病歷回饋",
             "stage:sdc-common-test-format,stage,SDC 共同測試格式跨框架實作",
             "stage:sdc-commercial-attribution,stage,SDC 商業與財務歸因",
+            "process:sdc-zero-event-isolation-evidence-passport,process,SDC 零事件—隔離證據十欄護照",
+            "metric:sdc-exposure-confidence-confusion-boundary,metric,SDC 暴露量、信賴上限與錯判邊界",
         ):
             self.assertIn(concept, concepts)
         entities = (ROOT / "config" / "external_entities.csv").read_text(
@@ -6171,7 +6201,14 @@ class ResearchCenterTest(unittest.TestCase):
             / "ai_hardware_sdc_lifecycle.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: AI 硬體 SDC 生命週期責任鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 16)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+        for graph_contract in (
+            "edge_id: KG-SDC-I13",
+            "to_id: process:sdc-zero-event-isolation-evidence-passport",
+            "edge_id: KG-SDC-I14",
+            "to_id: metric:sdc-exposure-confidence-confusion-boundary",
+        ):
+            self.assertIn(graph_contract, graph)
 
         radar = (
             ROOT / "notes" / "research_candidates"

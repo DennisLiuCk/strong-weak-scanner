@@ -8,7 +8,7 @@ schema_version: 1
 graph_id: ai-hardware-sdc-lifecycle
 root_node_id: concept:ai-hardware-sdc-lifecycle
 label: AI 硬體 SDC 生命週期責任鏈
-summary: 從 benign corrected DUE 與 SDC 分類追到製造篩檢 系統診斷 機群與應用偵測 隔離 part history 及共同測試格式 避免把單站 pass fail 當成完整生命週期與公司收入。
+summary: 從 benign corrected DUE 與 SDC 分類追到製造篩檢 系統診斷 機群與應用偵測 零事件暴露與錯判上限 隔離 part history 及共同測試格式 避免把單站 pass fail 當成完整生命週期與公司收入。
 article_ids: MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE
 status: active
 -->
@@ -331,4 +331,44 @@ review_due: 2026-09-30
 status: active
 boundary: SLT BMC diagnostic integration node isolation repair handoff 只形成 ODM 搜尋路由 不證明平台責任 qualification deployment 或財務貢獻。
 next_trigger: ODM 與客戶共同公布具名 platform SDC acceptance BMC mapping quarantine RMA outcome 部署數與財務分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-SDC-I13
+view: industry
+from_id: concept:ai-hardware-sdc-lifecycle
+to_id: process:sdc-zero-event-isolation-evidence-passport
+relation: measured_by
+claim_refs: MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE#C14
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 十欄護照把 OCP 的 lifecycle test contract 與 NIST 零事件方法對齊成研究工具；不是共同 SDC compliance standard 產品 reliability acceptance RMA 規則或供應鏈訂單。
+next_trigger: 至少兩套 framework 對同一具名 hardware pool 公開完整事件 暴露 分層 detector ground truth confusion matrix confidence quarantine RMA 成本及 field outcome。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-SDC-I14
+view: industry
+from_id: concept:ai-hardware-sdc-lifecycle
+to_id: metric:sdc-exposure-confidence-confusion-boundary
+relation: measured_by
+claim_refs: MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE#C11,MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE#C12,MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE#C13,MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE#C14
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: Binomial 與 HPP confidence bound 只在各自獨立或固定率假設下限制事件機率或速率；混淆矩陣也依 ground-truth pool 組成，不能把零命中 95% 上限或 validation precision 外推產品機群。
+next_trigger: 具名產品公開可審計 raw verdict 與 device test time workload denominators 獨立性分層 detector sensitivity confusion matrix及模型適配檢查。
 -->
