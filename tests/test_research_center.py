@@ -5116,6 +5116,7 @@ class ResearchCenterTest(unittest.TestCase):
             "editorial_plain_language_wave102_complete_link_test_dimensions_roles_and_six_gate_deployment",
             "expanded_single_compliance_ladder_into_link_correctness_and_commercialization_axes",
             "added_test_object_boundary_post_workshop_listing_snapshot_and_listing_lag_contract",
+            "zero_observed_error_exposure_counter_layers_and_conditional_upper_bound_added_without_thesis_or_clock_refresh",
             "一條完整高速連線，要讓主機、板路與線材、必要的訊號或交換元件、"
             "終端裝置，以及低階控制軟體一起工作",
             "## 先看 64 GT/s 為什麼牽動整條連線",
@@ -5138,6 +5139,21 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 註冊產品身分 |", "| 2. 測試角色 |",
             "| 3. 暴露介面與邊界 |", "| 4. 必要測項與互通門檻 |",
             "| 5. 申請、列名與日期 |",
+            "## 跑了很久沒錯，不等於 BER=0：先固定暴露量與錯誤層級",
+            "### 先把六層 counter 分開",
+            "| 1. 接收端原始層 |", "| 2. FEC 修正層 |",
+            "| 3. CRC 殘留層 |", "| 4. 鏈路恢復層 |",
+            "| 5. 連線狀態層 |", "| 6. 交易與應用層 |",
+            "### 再寫一張八欄暴露護照",
+            "| 1. 受測物件與版本 |", "| 5. 有效暴露分母 |",
+            "| 6. Counter 契約 |", "| 8. 退出與缺口 |",
+            "### 零事件仍有上界，而且上界有前提",
+            "lambda_upper = -ln(alpha) / E",
+            "2.995732273553991 × 10^-12 errors/bit",
+            "N=1 個假想暴露量",
+            "### 多空小作文先共用同一張成績單",
+            "| 偏多：測試與訊號內容增加 |",
+            "| 偏空：錯誤控制吸收工程複雜度 |",
             "## 把「連得對」和「賣得出去」分成兩條軸",
             "| 兩條證據軸 | 第一步 | 中間要跨過 | 靠近完成時要看到 | 本輪位置 | 不能互相替代 |",
             "| A. 連線正確性 |", "| B. 商業落地 |",
@@ -5165,7 +5181,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 52
+            sum(line.startswith("- **") for line in glossary.splitlines()), 60
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5182,8 +5198,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 14),
-            ("research_claim", 16), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 19), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5192,6 +5208,8 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C12", "source_id: S13", "claim_id: C13",
             "source_id: S14", "claim_id: C16", "monitor_id: T3",
             "monitor_id: T4", "monitor_id: T5",
+            "source_id: S15", "claim_id: C17", "claim_id: C18",
+            "claim_id: C19",
         ):
             self.assertIn(ledger_contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -5231,6 +5249,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:pcie-component-specific-testing,stage,PCIe 關鍵元件獨立測試",
             "stage:pcie-lane-margining,stage,PCIe 通道餘裕量測",
             "stage:pcie-integrators-eligibility,stage,PCIe 公開列名資格鏈",
+            "process:pcie-zero-error-exposure-passport,process,PCIe 零錯誤暴露護照",
+            "metric:pcie-zero-event-upper-error-rate,metric,PCIe 零事件錯誤率單側上界",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: PCIe 6 高速連線的測試與部署階梯", graph)
@@ -5243,9 +5263,11 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-PCIE6-I23", "to_id: stage:pcie-component-specific-testing",
             "edge_id: KG-PCIE6-I24", "to_id: stage:pcie-lane-margining",
             "edge_id: KG-PCIE6-I25", "to_id: stage:pcie-integrators-eligibility",
+            "edge_id: KG-PCIE6-I26", "to_id: process:pcie-zero-error-exposure-passport",
+            "edge_id: KG-PCIE6-I27", "to_id: metric:pcie-zero-event-upper-error-rate",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 27)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 29)
 
     def test_compute_connect_station_eight_separates_package_positions_test_dimensions_and_ecosystem_gates(self):
         topic = (

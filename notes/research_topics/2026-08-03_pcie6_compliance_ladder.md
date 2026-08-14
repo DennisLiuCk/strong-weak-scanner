@@ -264,6 +264,22 @@ limitation: 工作坊邀請與政策文件只定義測試角色、邊界及列�
 independence_group: pci-sig
 -->
 
+<!-- research_source
+source_id: S15
+role: standard
+source_kind: living_index
+publisher: NIST／SEMATECH
+title: Constant repair rate (HPP/exponential) model
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm
+locator: §8.4.5.1 的 Confidence Interval Equation and zero fails case；零失效時 MTBF 單側下限為 T／(-ln alpha)，取倒數可得固定事件率單側上限 -ln(alpha)／T
+limitation: 這是 HPP／exponential 固定失效率的可靠度方法，不是 PCI-SIG BER 或 compliance 規範；把操作時間 T 改寫成儀器實際計數的 bit／Flit 暴露量 E 是本文的條件式類比，只有事件定義、分母與固定率假設成立時才可使用
+independence_group: nist
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -536,6 +552,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: NIST／SEMATECH 的 HPP／exponential 固定事件率模型指出，零失效時 MTBF 的單側 100(1-alpha)% 下限為 T／(-ln alpha)；等價地，固定事件率的單側上限為 -ln(alpha)／T
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S15 §8.4.5.1 直接列出 zero fails 的 MTBF lower bound；事件率上限是同一式取倒數的代數等價表達
+boundary: 公式依賴固定事件率模型、清楚的失效定義與正確總暴露；它不是 PCIe 6 的 BER 合規門檻，也不能處理未揭露的 burst、跨 lane 共因、計數器漏記或停機暴露
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: PCIe 6 的「零錯誤」報告應把受測物件與版本、協商速度與 lane、通道及環境、實際有效暴露與分母單位、counter 層級與重置規則、raw／FEC corrected／CRC residual／replay／application 結果，以及降速、重訓與停機分開保存；否則不同錯誤層級的 0 不能比較
+supporting_source_ids: S8,S10,S11,S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8／S10／S11 把 PAM4、FBER、FEC、CRC、Flit 與 replay 分成先後不同的錯誤處理層，S11 並指出 burst 與跨 lane 共因；S15 則要求零事件界線必須有清楚事件定義與總暴露，合併後形成本文的暴露護照
+boundary: 暴露護照是研究中心的證據整理框架，不是 PCI-SIG 新增的認證名稱或強制報告格式；本輪沒有任何具名產品的原始 counter、測試分母、通過結果或跨廠比較
+verification_needed: 第一份公開具名 PCIe 6 長時間結果同時揭露完整配置、儀器實際分母、各錯誤層 counter、重置／彙總規則、降速／重訓／停機與應用資料正確性
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: 在純示範情境中，若儀器實際記錄的有效暴露 E 恰為 10^12 bits、事先定義的錯誤事件為 0，且同質 Poisson／固定率假設成立，alpha=0.05 對應的單側 95% 錯誤率上界為 2.995732273553991×10^-12 errors/bit，而不是 0
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 依 C17 的 lambda_upper=-ln(alpha)／E，以 Python Decimal 50 位精度得 2.9957322735539909934352235761425407756766016229890E-12，獨立 awk log 路徑得 2.995732273553991e-12，兩路一致
+boundary: 這是 N=1 個假想暴露量的條件式確定性換算，沒有 sampling SE／t，並非產品樣本、實測 BER、規格 pass、效能比較或投資證據；若錯誤成串、lane 有共因、分母不是儀器實計或 counter 漏記，該上界不適用
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -643,6 +710,13 @@ to: triaged
 reason: added_test_object_boundary_post_workshop_listing_snapshot_and_listing_lag_contract
 evidence: sources:S9,S13,S14
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: zero_observed_error_exposure_counter_layers_and_conditional_upper_bound_added_without_thesis_or_clock_refresh
+evidence: sources:S8,S10,S11,S15
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -689,6 +763,14 @@ evidence: sources:S9,S13,S14
 - **循環冗餘檢查（CRC）**：用檢查碼判斷資料經修正後是否仍有錯；它負責偵測，並不自行把所有錯誤修好。
 - **否定回覆與鏈路重送（NAK／replay）**：接收端發現資料仍有錯時要求發送端重送；成功恢復不等於錯誤從未發生。
 - **位元錯誤率／首個位元錯誤率（BER／FBER）**：描述接收端出現錯誤的頻率或第一個錯誤事件的機率；規格假設不等於每件產品實測。
+- **原始錯誤層**：錯誤修正前，由接收端或儀器看到的 bit、symbol 或 FBER 事件；它和修正後交給上層的資料結果不是同一個 counter。
+- **錯誤修正層**：FEC 已偵測並成功修正的 symbol、group 或 Flit；這個數字大於零時，上層仍可能完全看不到錯誤。
+- **殘留錯誤層**：經 FEC 後仍由 CRC 找到的錯誤資料單元；它可能觸發 NAK 與 replay，不能和原始錯誤直接相加。
+- **應用失敗層**：交易逾時、資料不一致、輸入輸出錯誤或工作中斷等使用者真的感受到的結果；數字為零不表示底層沒有修正或重送。
+- **有效暴露量（valid exposure）**：受測連線在指定速度、lane、方向與狀態下，儀器真正計數的 bits、symbols、Flits、transactions 或時間；不能只用銘牌速度乘牆鐘時間替代。
+- **零事件單側上界**：在事件定義、分母與固定事件率假設都成立時，用零次觀察算出的「真實事件率仍可能有多高」；它不是零風險或零 BER。
+- **同質卜瓦松過程（HPP）**：假設事件以固定平均率、在不重疊暴露區間彼此獨立發生的模型；錯誤成串或共因存在時，這個假設可能失效。
+- **平均失效間隔（MTBF）**：固定失效率模型下，兩次失效之間的平均操作時間；本篇只借用其零事件界線方法，不把 bit 暴露說成設備壽命。
 - **設定空間測試（Configuration Testing）**：檢查裝置設定欄位、能力宣告與存取行為是否符合規則。
 - **鏈路協定測試（Link Protocol Testing）**：檢查裝置在連線建立、狀態轉換、錯誤回報與鏈路層行為上是否符合規則。
 - **交易協定測試（Transaction Protocol Testing）**：檢查讀寫請求、回覆、排序與交易層封包等上層行為是否符合規則。
@@ -724,6 +806,7 @@ evidence: sources:S9,S13,S14
 ### 接下來怎麼追
 
 - 每一筆測試至少保存產品、功能、規格版本、速度、通道數、連接方式、軟體版本、電氣／設定／鏈路／交易測項與結果日期。
+- 看見「零錯誤」時，先問分母是 bits、Flits、transactions 還是時間，再問它指 raw、FEC corrected、CRC residual、replay 或 application 哪一層。
 - 分開記錄「測試可以報名」、「具名產品通過」與「結果進入公開清單」，不要用活動頁替產品背書。
 - 跨廠結果要列出主機、訊號元件、交換器、終端與韌體來自誰，並確認目標速度、錯誤恢復與長時間讀寫能否重現。
 - 量產消息要再分元件出貨、參考架構、客戶驗證與完整平台部署；台灣公司還要補客戶端與公司端的雙向財務證據。
@@ -734,6 +817,7 @@ evidence: sources:S9,S13,S14
 - 主機、訊號元件與儲存裝置各自量產，還要補哪些共同測試，才能說整條連線穩定？
 - 公司客戶驗證先完成、正式測試較晚公布時，研究者該如何分開記錄？
 - 如果整張擴充卡通過，卡上的每一顆訊號元件是否都能沿用同一張成績單？
+- 兩份報告都寫「跑了很久、零錯誤」，若一份沒有暴露分母、另一份只報應用層錯誤，它們能比較嗎？
 
 ## 先看 64 GT/s 為什麼牽動整條連線
 
@@ -795,6 +879,75 @@ evidence: sources:S9,S13,S14
 元件並沒有因此取得自己的完整電氣與功能成績。反過來，工作坊結束後暫未出現在公開清單，
 也只表示公開列名鏈尚未閉合；申請表可稍後提交，所以不能把「未列名」直接翻譯成「測試失敗」。
 這些界線由 PCI-SIG 的 Compliance Program、公開清單與工作坊政策共同支持。[S9][S2][S14]
+
+## 跑了很久沒錯，不等於 BER=0：先固定暴露量與錯誤層級
+
+一份報告若只寫「連續運行、零錯誤」，讀者還不知道它到底觀察了什麼。PCIe 6 的同一筆資料
+可能先在接收端出現原始錯誤，由 FEC 修正；修正後仍有問題才由 CRC 找出，再觸發 NAK／replay；
+重送成功後，應用程式仍可能得到完全正確的資料。因此，同一次測試完全可能同時出現
+「raw error 大於零、FEC correction 大於零、CRC residual 為零、replay 為零、application failure
+為零」。這些數字沒有矛盾，只是在看不同層。[S8][S10][S11]
+
+### 先把六層 counter 分開
+
+| 錯誤與運行層 | 典型事件 | 合理分母 | 這一層為 0 能說什麼 | 仍不能說什麼 |
+|---|---|---|---|---|
+| 1. 接收端原始層 | bit／symbol error 或 FBER event | 實際接收 bits、symbols 或明確 FBER opportunity | 在已揭露的事件定義與暴露內沒有記到該事件 | FEC 沒有工作、其他 lane 沒有共因，或真實 BER 等於零 |
+| 2. FEC 修正層 | corrected symbol、FEC group 或 Flit | 實際解碼 groups／Flits | 沒有被該 counter 記錄的成功修正 | 修正前沒有錯、counter 沒漏記，或 CRC／replay 也為零 |
+| 3. CRC 殘留層 | post-FEC CRC error | 實際檢查 Flits | 沒有 CRC 偵測到的修正後殘留錯誤 | 原始通道零錯誤，或 CRC 絕不會 alias |
+| 4. 鏈路恢復層 | NAK、replay、replay timeout | 實際傳送 Flits／transactions | 沒有符合定義的重送事件 | FEC 沒修過錯、鏈路從未重訓，或延遲完全不受影響 |
+| 5. 連線狀態層 | retrain、lane／speed downshift、link down | active time、state transitions 與 downtime | 指定狀態事件未被記到 | 全部牆鐘時間都在目標速度，或停機期間也算入有效暴露 |
+| 6. 交易與應用層 | I/O error、timeout、資料不一致、工作失敗 | completed transactions、bytes 或 jobs | 使用者結果在該工作負載內沒有出錯 | PHY 零錯誤、沒有修正／重送，或另一種工作負載同樣穩定 |
+
+這張表不是 PCI-SIG 新增的測試分類，而是把既有錯誤處理順序轉成閱讀用 counter 階梯。
+同一層還要保存 counter 寬度、清零時間、overflow、輪詢間隔、每 lane／每 device 彙總規則；
+否則兩個同名 counter 也可能因重置與加總方法不同而不可比。
+
+### 再寫一張八欄暴露護照
+
+| 暴露護照欄位 | 至少要保存什麼 | 為什麼不能省略 |
+|---|---|---|
+| 1. 受測物件與版本 | host、switch／retimer、endpoint、board、硬體修訂、韌體、driver 與測試邊界 | 換一個版本或把板卡結果移植給內部元件，證據範圍就變了 |
+| 2. 協商後連線狀態 | 規格 revision、實際 GT/s、lane width、方向與是否進入 Flit Mode | 銘牌最高速度不等於整段測試都在該速度與 lane 數運作 |
+| 3. 通道與環境 | 拓撲、距離、材料、連接器、loss、供電、溫度與干擾條件 | PAM4 錯誤會受通道與共因雜訊影響，換條件就不能沿用結果 |
+| 4. 流量與壓力 | traffic pattern、讀寫比例、payload、併發、錯誤注入與負載期間 | 閒置連線、單一封包與長時間混合工作負載不是相同刺激 |
+| 5. 有效暴露分母 | 儀器實計 bits、symbols、Flits、transactions 或 active time，並註明每 lane／全 link | 「64 GT/s × 牆鐘時間」會把重訓、降速、idle、編碼與無效期間誤算進去 |
+| 6. Counter 契約 | 事件定義、所在層、單位、清零、飽和／overflow、取樣與彙總規則 | 一個 0 只有在知道什麼會讓它加一時才有意義 |
+| 7. 分層結果 | raw／FBER、FEC corrected、CRC residual、NAK／replay、應用錯誤各自的分子與分母 | 成功修正或重送會讓上層 0 錯，卻不能抹掉底層事件 |
+| 8. 退出與缺口 | retrain、downshift、link down、停機、counter 遺失、提前終止與納入／排除規則 | 只統計 link-up 時間可能把最嚴重的失敗排除在分母外 |
+
+有效暴露應寫成「在聲明配置與 link state 內，由儀器實際計數的分母總和」，而不是從標稱
+64 GT/s、x16 與牆鐘時間自行推算。若測試跨多條 lane、裝置或重複 run，還要先說它們是各自
+報告或共同加總；共同電源、時鐘與環境會讓觀測相關，不能把 lane 數直接當獨立樣本數。
+
+### 零事件仍有上界，而且上界有前提
+
+NIST／SEMATECH 在 HPP／exponential 固定事件率模型下，對零次事件給出 MTBF 單側下限
+`T / (-ln(alpha))`；取倒數後，事件率單側上限可寫成
+`lambda_upper = -ln(alpha) / E`，其中 `E` 必須是和事件定義一致的總暴露。[S15]
+
+只做一個**假想算例**：若儀器實際記錄 `E = 10^12 bits`、事先定義的錯誤為 0，並額外假設
+事件服從同質 Poisson／固定率模型，令 `alpha = 0.05`，單側 95% 上界為
+`2.995732273553991 × 10^-12 errors/bit`，不是 0。Python Decimal 50 位精度重算為
+`2.9957322735539909934352235761425407756766016229890E-12`，獨立 awk `log` 路徑為
+`2.995732273553991e-12`。兩路算術一致，只證明公式代入沒有分歧。
+
+樣本與誤差邊界也要說完整：這是 **N=1 個假想暴露量**的確定性條件換算，沒有 sampling
+SE／t；它不是產品實測、PCI-SIG pass criterion 或公司比較。PCI-SIG 自己指出 PAM4 錯誤
+可能成串，lane 之間也可能受共同雜訊影響；若事件率會隨時間、通道或狀態改變，或 counter
+漏記、分母用名目速率代替實計暴露，固定率上界便不能直接使用。[S11]
+
+### 多空小作文先共用同一張成績單
+
+| 敘事 | 合理假說 | 必須再看到的共同證據 | 什麼會讓敘事失效 |
+|---|---|---|---|
+| 偏多：測試與訊號內容增加 | PAM4、較窄 channel margin 與分層錯誤除錯，可能增加 PHY／controller IP、retimer／switch、PCB／CCL 設計及測試驗證工作 | 同一具名平台的配置、實計暴露、分層 counters、channel／lane margin、qualification、工具或材料用量、出貨與財務分母 | 只有規格複雜度，卻沒有額外元件、測試時間、價格、份額、訂單或毛利證據 |
+| 偏空：錯誤控制吸收工程複雜度 | FEC、CRC 與 replay 可能讓應用結果穩定，不必讓每一層硬體內容或供應商收入等比例上升 | 同一工作負載下的 raw／corrected／residual／replay、延遲、功耗、降速、BOM 與部署數 | 只看到 application error 為零，卻不知道底層修正、重送、降速或停機成本 |
+| 共同底線 | 技術能否運作與哪家公司能獲利是兩個問題 | 產品版本、測試分母、counter 契約、客戶 pass、出貨期間與公司財務雙向核對 | 用 zero error、official test 或一般高速能力直接代替 design win 與財務歸因 |
+
+這兩段都只是可證偽敘事，不是對台灣公司、股價或市場定價的結論。本輪只有一條 PCI-SIG
+錯誤架構鏈與一條 NIST 方法鏈（N=2 條獨立消息鏈），沒有具名產品、平台、客戶、供應商或
+121 檔公司的樣本；因此不做排名，也不把條件式上界寫成任何產品的品質數字。
 
 ## 把「連得對」和「賣得出去」分成兩條軸
 
@@ -889,6 +1042,7 @@ PAM4 channel、材料、板層設計、訊號完整性與量產良率。
 - [PCI Express 6.0 FAQ](https://pcisig.com/faq?field_category_value%5B%5D=pci_express_6.0&keys=PAM4)（四電位訊號、256-Byte Flit 與錯誤控制問答）。
 - [PCI-SIG：The Evolution of the PCI Express Specification](https://pcisig.com/blog/evolution-pci-express-specification-its-sixth-generation-third-decade-and-still-going-strong)（PAM4 error model、FEC／CRC／replay 與 Flit 連動）。
 - [Synopsys：Optimizing PCIe 6.0 Designs at 64GT/s](https://www.synopsys.com/articles/pcie-6-designs.html)（獨立 IP 設計視角的 channel、PHY／controller、Flit 與測試責任）。
+- [NIST／SEMATECH：Constant repair rate (HPP/exponential) model](https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm)（零事件時的單側 MTBF 下限與等價事件率上限方法；不是 PCIe 合規規格）。
 
 本文不比較 Astera、Micron 或 Synopsys 的效能數字，因為元件類型、測試方法與工作負載不同；
 也不以公開清單筆數推估市占。規格機制、正式 test area、工作坊入口、公司互通實驗室、客戶
@@ -936,6 +1090,7 @@ evidence_boundary: 更高速率的物理要求不自動對應任一 PCB／CCL �
 - 首項最高速列項把受測物件、AIC／System／Component 角色、CEM connector 邊界、必要測項、互通分母與 listing form 日期一併保存。
 - 同一具名產品把 Electrical、Configuration、Link Protocol、Transaction Protocol 與 interoperability 的必要結果逐項公開。
 - 至少兩家獨立 host、retimer／switch 與 endpoint 供應商公開可重現的 64 GT/s 拓撲、Flit／錯誤恢復與長時間結果。
+- 第一份具名長時間「零錯誤」結果公開儀器實計暴露、counter 定義／重置／彙總、raw／FEC corrected／CRC residual／replay／application 各層結果，以及降速、重訓與停機缺口。
 - 具名客戶把完整平台從 qualification 升級到 production fleet，並揭露部署量或實際運行指標。
 - 若 Gen6 元件長期只以 gearbox 連 Gen5 生態、64 GT/s listing 延後、必要測項不完整或跨廠互通不穩，兩軸成熟度必須分別下修。
 - 台灣公司由平台端與公司端同時對上具名產品、64 GT/s 測試、客戶資格、出貨及財務後，才建立公司線。

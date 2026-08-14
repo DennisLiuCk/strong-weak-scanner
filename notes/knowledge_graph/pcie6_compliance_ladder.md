@@ -5,7 +5,7 @@ schema_version: 1
 graph_id: pcie6-compliance-ladder
 root_node_id: concept:pcie6-deployment-readiness
 label: PCIe 6 高速連線的測試與部署階梯
-summary: 先把 PAM4 Flit 錯誤控制與四類正式測試放在鏈路正確性軸，再綁定受測物件 角色 CEM connector 邊界與列名程序，最後把互通 列名 量產 完整平台與財務歸因放在商品化軸；不能由任一節點推導整體成熟或台灣公司收入。
+summary: 先把 PAM4 Flit 錯誤控制與四類正式測試放在鏈路正確性軸，再綁定受測物件 角色 CEM connector 邊界 列名程序及零錯誤暴露護照，最後把互通 列名 量產 完整平台與財務歸因放在商品化軸；不能由任一節點推導整體成熟或台灣公司收入。
 article_ids: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER
 status: active
 -->
@@ -548,4 +548,44 @@ review_due: 2026-08-19
 status: active
 boundary: 80% interoperability 所有必要 compliance tests 與 listing form 共同構成公開列名程序；未立即列名不是測試失敗的直接證據。
 next_trigger: 具名產品公開測試日 送表日與 Integrators List date added 並完成 eligibility chain。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCIE6-I26
+view: industry
+from_id: concept:pcie6-deployment-readiness
+to_id: process:pcie-zero-error-exposure-passport
+relation: requires
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C18,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C19
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 暴露護照是研究中心依 PCIe 分層錯誤架構與零事件方法建立的閱讀框架，不是 PCI-SIG 新增認證；本輪沒有具名產品 counter 或長時間結果。
+next_trigger: 具名 PCIe 6 平台公開實計暴露 counter 定義 raw FEC corrected CRC residual replay application 結果及降速重訓停機缺口。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCIE6-I27
+view: industry
+from_id: concept:pcie6-deployment-readiness
+to_id: metric:pcie-zero-event-upper-error-rate
+relation: measured_by
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C17,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C19
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 零事件上界只有在事件定義 實計分母 同質固定率與獨立性成立時適用；假想 10^12 bits 算例不是產品 BER 合規門檻或比較。
+next_trigger: 具名測試同時揭露實計分母 零事件定義 模型適用性與可獨立重算的單側界線。
 -->

@@ -489,3 +489,5 @@ process:out-of-control-action-plan,process,失控處置計畫,Out-of-control act
 process:excursion-containment-event-passport,process,異常圍堵九事件護照,Excursion containment event passport|alarm-to-release passport,concept:measurement-system-contract,把最後在控 製程取樣 警報確認 圍堵指令 實際隔離 影響範圍 處置修正與放行綁到同一事件鏈
 metric:signal-validation-actuation-latency,metric,訊號—確認—控制動作延遲,Signal validation actuation latency|signal-to-hold latency,concept:measurement-system-contract,分開資料運算 確認決策 指令到實際圍堵及修正後放行時間並禁止以單機速度替代完整異常暴露
 capability:manufacturing-genealogy,capability,製造履歷與物件追溯,Manufacturing genealogy|product resume|device traceability,concept:measurement-system-contract,以產品批次晶圓晶粒封裝與站點設備配方材料時間共同鍵重建可疑物件集合而不把可追溯誤寫成已證明根因
+process:pcie-zero-error-exposure-passport,process,PCIe 零錯誤暴露護照,PCIe zero-error exposure passport|error counter contract,concept:pcie6-deployment-readiness,把受測版本連線狀態通道環境流量實計分母counter契約分層結果與退出缺口綁成可重建的長時間測試紀錄
+metric:pcie-zero-event-upper-error-rate,metric,PCIe 零事件錯誤率單側上界,PCIe zero-event upper error-rate bound|zero observed error bound,process:pcie-zero-error-exposure-passport,在明示事件分母同質固定率與獨立性假設下以零事件暴露報錯誤率上限而不是零BER
