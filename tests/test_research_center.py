@@ -7942,8 +7942,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 22),
-            ("research_claim", 19), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 24),
+            ("research_claim", 23), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -7954,6 +7954,40 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(
             "MR-2026-08-14-MISSED-Q2-T9-MACRONIX-FILING", reviews
         )
+
+    def test_missed_priority_q2_ardentec_separates_production_from_capital_absorption(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-31_missed_priority_q2_disclosures.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: added_ardentec_q2_capital_absorption_and_commercial_maturity_bridges_without_refreshing_thesis_clock",
+            "## 7 月量產，為什麼不能倒填 Q2 收入：欣銓七道資本吸收時鐘",
+            "6 月 30 日；隔日才進入第三季",
+            "7 月起正式量產",
+            "| 4. 未完／待驗 |",
+            "Q2＝H1 累計－Q1",
+            "| 營業現金流 | 16.71 億元 | 8.70 億元 |",
+            "| 取得 PP&E 付現 | 13.30 億元 | 56.77 億元 |",
+            "| 自由現金流 | 正 3.41 億元 | 負 48.07 億元 |",
+            "| 銀行借款現金淨流入 | 負 7.43 億元 | 正 40.71 億元 |",
+            "占 86.92%",
+            "期末該欄 64.84 億元",
+            "Q2 總折舊 8.62 億元、季增 4.95%",
+            "EIC／PIC 測試設備逾 150 台",
+            "晶圓測試與成品測試分別季增 16.01% 與 8.45%",
+            "真正廠區×產品×客戶×設備×利用率×收入×毛利×收現共同觀測 N＝0",
+            "Python Decimal 與獨立 awk",
+            "source_id: S23",
+            "source_id: S24",
+            "SHA-256 e787cc74a0df031e86a471721e8fe6a0a8b75e2b6fe9f113ba098ef5089fca80",
+            "SHA-256 905bcda6204f62f7d7d14c5decd79279fe7ddea9d13c1f37d4dce48ba7646ad5",
+            "claim_id: C20\nlabel: verified\nstatus: active",
+            "claim_id: C21\nlabel: inference\nstatus: active",
+            "claim_id: C22\nlabel: verified\nstatus: active",
+            "claim_id: C23\nlabel: inference\nstatus: active",
+        ):
+            self.assertIn(contract, topic)
 
     def test_yageo_q2_reconciles_fcf_ifrs_cash_and_management_cash(self):
         topic = (
