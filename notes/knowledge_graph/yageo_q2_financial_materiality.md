@@ -10,7 +10,7 @@ schema_version: 1
 graph_id: yageo-q2-financial-materiality
 root_node_id: concept:yageo-q2-financial-materiality
 label: 國巨 Q2 公司財務分母
-summary: 以國巨公司簡報與 TWSE 逐月營收交叉重算季度公司總額，再把淨利 公司定義自由現金流 期末現金與營運資金代理分帳，示範 v2 如何保留題材與現金歸因缺口。
+summary: 以國巨公司簡報與 TWSE 逐月營收交叉重算季度公司總額，再用正式季報把 H1 自由現金流與四條現金流接回 IFRS 現金，同時保留管理現金口徑及題材歸因缺口。
 article_ids: MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL
 status: active
 -->
@@ -99,8 +99,8 @@ exclusivity_scope:
 as_of: 2026-08-14
 review_due: 2026-08-15
 status: active
-boundary: 國巨簡報可定位相鄰兩季淨利 公司定義自由現金流與期末現金，但沒有完整自由現金流公式與現金流量表；三本帳是研究中心的對讀框架，不是國巨公布的現金轉換模型。
-next_trigger: 取得完整 Q2 核閱財報與公司自由現金流公式，把營業 投資 融資 匯率 合併範圍 受限現金與金融負債接成可重算橋。
+boundary: 國巨簡報可定位相鄰兩季淨利 自由現金流與管理現金，正式季報可機械調節 H1 自由現金流及 IFRS 現金；公司仍未直接公布永久 FCF 公式或管理現金逐項調節，三本帳不是公司 KPI。
+next_trigger: 公司揭露自由現金流及管理現金公式，並由下一季相同科目重算營業 投資 籌資 匯率 金融資產與金融負債橋。
 -->
 
 <!-- knowledge_edge
@@ -120,5 +120,45 @@ as_of: 2026-08-14
 review_due: 2026-08-15
 status: active
 boundary: 期末應收 存貨 應付除以單季營收或成本只是同公司相鄰季度診斷；未用平均餘額 未納入其他營運項目與合併範圍 不得稱為正式 DSO DIO DPO 或現金流原因。
-next_trigger: 完整季報提供營運資金現金流調節 帳齡 品類 備抵 合併範圍與平均餘額後，再計算正式周轉日並與後續季度同口徑重算。
+next_trigger: 由 focused evidence pack 核對營運資金現金流調節 帳齡 品類 備抵與合併範圍，取得下一季平均餘額後再計算正式周轉日並同口徑重算。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-YQ2-I04
+view: industry
+from_id: concept:yageo-q2-financial-materiality
+to_id: process:ifrs-management-cash-reconciliation-passport
+relation: includes
+claim_refs: MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL#C13
+note_refs:
+evidence_state: inference
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-21
+status: active
+boundary: 正式季報 IFRS 現金與簡報同名管理摘要相差 525.82515 億元；即使加兩類流動金融資產仍差 6.39783 億元，接近不得冒充公司逐項公式或第三方驗證。
+next_trigger: 公司提供同一報導日的科目納入 排除 抵減 分類與受限現金逐項調節，且後續季度能以相同公式重算。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-YQ2-I05
+view: industry
+from_id: concept:yageo-q2-financial-materiality
+to_id: process:operating-investing-financing-cash-bridge
+relation: measured_by
+claim_refs: MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL#C10,MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL#C11,MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL#C12
+note_refs:
+evidence_state: inference
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-21
+status: active
+boundary: H1 四條正式流量可精確接回 IFRS 現金 自由現金流也能接回營業現金減設備購置；這不是 Q2 單季橋 產品現金流 族群平均 投資報酬或融資好壞判斷。
+next_trigger: 下一季用相同期間與分類重算自由現金流 金融資產 借款到期 收購支付與管理現金，並完成 focused evidence pack 獨立 reviewer 簽核。
 -->

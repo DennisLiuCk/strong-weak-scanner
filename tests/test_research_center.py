@@ -7764,22 +7764,31 @@ class ResearchCenterTest(unittest.TestCase):
             "MR-2026-08-14-MISSED-Q2-T9-MACRONIX-FILING", reviews
         )
 
-    def test_yageo_q2_separates_profit_fcf_cash_stock_and_working_capital(self):
+    def test_yageo_q2_reconciles_fcf_ifrs_cash_and_management_cash(self):
         topic = (
             ROOT / "notes" / "research_topics"
             / "2026-07-30_yageo_q2_earnings_call.md"
         ).read_text(encoding="utf-8")
         for contract in (
             "reason: profit_free_cash_flow_cash_stock_and_working_capital_ledgers_added_from_existing_deck_without_refreshing_thesis_clock",
-            "## 淨利變好，現金不一定同速進來：三本帳與一張營運資金橋",
+            "reason: formal_q2_cash_flow_and_cash_definition_boundary_added_without_refreshing_revenue_thesis_clock",
+            "## 淨利變好，現金不一定同速進來：四本帳與兩張現金調節橋",
             "### 第一帳：淨利與自由現金流要同期間、同公式對讀",
             "### 第二帳：期末現金大增，不等於營運現金同額流入",
-            "### 第三帳：營運資金要同時看絕對額與相對強度",
+            "### 第三帳：同一句「現金及約當現金」竟有兩個數字",
+            "### 同一個現金名詞，必須帶十欄護照",
+            "### 第四帳：營運資金要同時看絕對額與相對強度",
             "### 多空小作文必須共用同一組現金裁決欄位",
+            "### 分母、誤差與限制",
             "公司簡報所列自由現金流",
-            "`5,783 ÷ 9,455 = 61.2%`",
-            "`7,752 ÷ 8,038 = 96.4%`",
-            "兩個 headline\n機械相減是 890.91 億元",
+            "H1 自由現金流 135.35521 億元",
+            "四條流量精確相加的結果",
+            "1,474.95485 億元",
+            "2,000.78 億元",
+            "相差 525.82515 億元",
+            "2,007.17783 億元",
+            "仍比\n簡報數字多 6.39783 億元",
+            "投資淨流出的主要部分",
             "43,744",
             "48,274",
             "絕對額增加 45.30 億元",
@@ -7787,19 +7796,23 @@ class ResearchCenterTest(unittest.TestCase):
             "存貨／銷貨成本 | 139.9% | 130.2%",
             "應付帳款／銷貨成本 | 82.0% | 76.6%",
             "沒有 sampling SE／t",
+            "cf0bc1a51edb3fc3fc0160310c7c903b36e3766ce80fb3eaa8d949bc0c4d9561",
             "4ace6c4735abd1edfe2b015062bf5b125f741217aac3e9142185f34cbddbcc2c",
-            "Python `Decimal` 與 `awk` 兩條獨立路徑",
-            "claim_id: C6",
-            "claim_id: C7",
-            "claim_id: C8",
-            "claim_id: C9",
-            "monitor_id: T4",
+            "Python Decimal 與獨立 awk 兩條路徑",
+            "claim_id: C10",
+            "claim_id: C11",
+            "claim_id: C12",
+            "claim_id: C13",
+            "monitor_id: T3\nstatus: retired",
+            "monitor_id: T4\nstatus: retired",
+            "monitor_id: T5\nstatus: active",
+            "monitor_id: T6\nstatus: active",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 4),
-            ("research_claim", 9), ("metric_comparison", 0),
-            ("impact", 1), ("monitoring_item", 4),
+            ("research_topic", 1), ("research_source", 5),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 1), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -7809,6 +7822,8 @@ class ResearchCenterTest(unittest.TestCase):
         for concept in (
             "concept:profit-fcf-cash-stock-ledgers,concept,淨利、自由現金流與現金存量三本帳",
             "metric:working-capital-intensity-proxy,metric,營運資金強度代理比率",
+            "process:ifrs-management-cash-reconciliation-passport,process,IFRS 與管理現金口徑護照",
+            "process:operating-investing-financing-cash-bridge,process,營業投資籌資現金流量橋",
         ):
             self.assertIn(concept, concepts)
 
@@ -7816,14 +7831,24 @@ class ResearchCenterTest(unittest.TestCase):
             ROOT / "notes" / "knowledge_graph"
             / "yageo_q2_financial_materiality.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 4)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 6)
         for node in (
             "edge_id: KG-YQ2-I02",
             "to_id: concept:profit-fcf-cash-stock-ledgers",
             "edge_id: KG-YQ2-I03",
             "to_id: metric:working-capital-intensity-proxy",
+            "edge_id: KG-YQ2-I04",
+            "to_id: process:ifrs-management-cash-reconciliation-passport",
+            "edge_id: KG-YQ2-I05",
+            "to_id: process:operating-investing-financing-cash-bridge",
         ):
             self.assertIn(node, graph)
+
+        reviews = (
+            ROOT / "notes" / "research_method_reviews" / "monitor_reviews.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn("MR-2026-08-14-YAGEO-T3-FORMAL-Q2-FILING", reviews)
+        self.assertIn("MR-2026-08-14-YAGEO-T4-FCF-CASH-BRIDGE", reviews)
 
     def test_glass_substrate_thermomechanical_passport_preserves_measurement_boundary(self):
         topic = (
