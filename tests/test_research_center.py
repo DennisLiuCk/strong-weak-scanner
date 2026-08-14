@@ -5486,11 +5486,22 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S28", "source_id: S29", "source_id: S30",
             "claim_id: C31", "claim_id: C32", "claim_id: C33",
             "claim_id: C34",
+            "## 警報不是處置：用九個事件讀懂異常圍堵",
+            "### 三個時鐘不能合成一個「反應很快」",
+            "| `t0` 最後已證實在控 |",
+            "| `t6` 圍堵生效 |",
+            "`signal-to-hold` 只等於 `t6−t3`",
+            "### 受影響量要從物件集合重建，不能只拿流率乘時間",
+            "### 多空小作文要用同一張事件護照裁決",
+            "本節定向使用 `N=3` 條消息鏈",
+            "source_id: S31", "source_id: S32", "source_id: S33",
+            "claim_id: C35", "claim_id: C36", "claim_id: C37",
+            "claim_id: C38",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 30),
-            ("research_claim", 34), ("metric_comparison", 5),
+            ("research_topic", 1), ("research_source", 33),
+            ("research_claim", 38), ("metric_comparison", 5),
             ("impact", 4), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5506,6 +5517,10 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:measurement-bias-resolution-linearity,metric,量測偏差解析度與線性",
             "metric:measurement-repeatability-reproducibility-stability,metric,量測重複性再現性與穩定性",
             "metric:measurement-uncertainty-decision-rule,metric,量測不確定度與決策規則",
+            "process:out-of-control-action-plan,process,失控處置計畫",
+            "process:excursion-containment-event-passport,process,異常圍堵九事件護照",
+            "metric:signal-validation-actuation-latency,metric,訊號—確認—控制動作延遲",
+            "capability:manufacturing-genealogy,capability,製造履歷與物件追溯",
         ):
             self.assertIn(concept, concepts)
 
@@ -5514,7 +5529,7 @@ class ResearchCenterTest(unittest.TestCase):
             / "process_control_measurement_contract.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 製程控制量測系統契約", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
         for node in (
             "from_id: company:kla",
             "from_id: company:nova",
@@ -5530,6 +5545,10 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: metric:nuisance-false-alarm",
             "to_id: metric:inspection-cycle-time",
             "to_id: capability:excursion-containment",
+            "to_id: process:out-of-control-action-plan",
+            "to_id: process:excursion-containment-event-passport",
+            "to_id: metric:signal-validation-actuation-latency",
+            "to_id: capability:manufacturing-genealogy",
             "to_id: group:semiequip", "to_id: group:packtest",
         ):
             self.assertIn(node, graph)

@@ -485,3 +485,7 @@ process:glass-substrate-thermomechanical-passport,process,玻璃基板熱機械�
 metric:package-warpage-measurement-contract,metric,封裝翹曲量測契約,Package warpage measurement contract|local global warpage comparability,process:glass-substrate-thermomechanical-passport,保存試件 溫度歷史 支撐夾持 參考面正負號 掃描範圍 local與global方法 校正及不確定度以判定兩張翹曲圖能否比較
 process:ai-system-shipment-event-passport,process,AI 系統出貨事件護照,AI system shipment event passport|shipment custody acceptance ledger,concept:rack-scale,為同一產品版本逐筆保存物件數量 business step 時間地點交易雙方淨額調整與控制驗收邊界以避免把完工 出貨 到貨 安裝 驗收 可用 計費 認列及收款重複相加
 metric:installed-available-billable-revenue-boundary,metric,安裝—可用—計費—營收邊界,Installed available billable revenue boundary|capacity event clocks,process:ai-system-shipment-event-passport,把已安裝容量 可服務容量 實際可計費工作量 收入認列 應收與現金回收分成不同事件時鐘並以同一物件鍵回溯
+process:out-of-control-action-plan,process,失控處置計畫,Out-of-control action plan|OCAP,concept:measurement-system-contract,把監控訊號後的確認 責任人 停機隔離 調查修正與復機條件固定成 process-specific 處置流程
+process:excursion-containment-event-passport,process,異常圍堵九事件護照,Excursion containment event passport|alarm-to-release passport,concept:measurement-system-contract,把最後在控 製程取樣 警報確認 圍堵指令 實際隔離 影響範圍 處置修正與放行綁到同一事件鏈
+metric:signal-validation-actuation-latency,metric,訊號—確認—控制動作延遲,Signal validation actuation latency|signal-to-hold latency,concept:measurement-system-contract,分開資料運算 確認決策 指令到實際圍堵及修正後放行時間並禁止以單機速度替代完整異常暴露
+capability:manufacturing-genealogy,capability,製造履歷與物件追溯,Manufacturing genealogy|product resume|device traceability,concept:measurement-system-contract,以產品批次晶圓晶粒封裝與站點設備配方材料時間共同鍵重建可疑物件集合而不把可追溯誤寫成已證明根因

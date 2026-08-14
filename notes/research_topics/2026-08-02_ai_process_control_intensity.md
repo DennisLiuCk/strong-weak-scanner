@@ -109,6 +109,13 @@ to: triaged
 reason: defect_signal_classification_criticality_containment_and_yield_ladder_added_without_thesis_or_clock_refresh
 evidence: sources:S28,S29,S30
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: alarm_validation_containment_genealogy_disposition_and_release_event_passport_added_without_thesis_or_clock_refresh
+evidence: sources:S31,S32,S33
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -135,6 +142,11 @@ evidence: sources:S28,S29,S30
 - **ADC（自動缺陷分類）**：automated defect classification，以規則或模型把檢查候選分到可處置的缺陷類別；自動分類仍需參考真值與錯誤代價才能評估。
 - **抽樣（sampling）**：只檢查部分晶圓、區域或製程批次，以速度換取資訊；抽樣較少不代表沒有風險，檢查較多也不保證能找到正確根因。
 - **Control plan（製程控制計畫）**：先定義要攔截的失效、在哪一道工序看、抽樣多少、看多細、多久得到結果，以及異常發生後要採取什麼動作的製造規則。
+- **OCAP（out-of-control action plan，失控處置計畫）**：監控訊號判定製程可能失控後，預先指定確認、責任人、停機／隔離、調查、修正與復機條件的流程；警報本身不是 OCAP 已執行。
+- **Genealogy（製造履歷／系譜）**：把 lot、wafer、die、package 與經過的站點、機台、recipe、材料批次及時間連起來，供異常時界定可能受影響物件；可追到不等於已證明哪一項是根因。
+- **Containment（圍堵）**：先阻止可疑材料、批次或設備繼續流動或放行，以限制風險擴大；它是暫時風險控制，不等於已完成根因分析、永久修正或良率改善。
+- **`t0`～`t8` 事件時間**：本文為九個查核事件使用的研究標記，從最後已證實在控一路到修正後放行；它不是任何工廠的共同欄位名稱，也不表示九格都已公開。
+- **Unique ID（唯一識別）**：讓同一 die、package 或其他物件在不同站點仍能被辨認的鍵；只有 ID 還不夠，必須再連事件時間、路由、工具、recipe 與材料資料才能重建影響範圍。
 - **缺陷逃逸（defect escape）**：真正會影響良率或可靠度的缺陷沒有被現行檢查攔截，繼續流到後續製程或客戶端。
 - **偽警報／雜訊（false alarm／nuisance）**：工具標記了異常候選，但複判後不屬於會傷害產品的關鍵缺陷；過多會消耗複判時間並延後真正異常的處理。
 - **週期時間（cycle time）**：產品或資料走完指定製造、量測、複判與決策流程所需的時間；結果太慢，前方產線可能已累積更多受影響批次。
@@ -362,6 +374,67 @@ NIST 的 2025 研究用 CMP 公開資料示範：量測昂貴、資料有限且�
 角度說明，光學檢查產生更密集候選後，eBeam review 必須同時維持速度、靈敏度、覆蓋與
 nuisance 分類。兩份文件都沒有公開 HBM 客戶的完整 control plan、逃逸率、偽警報率或整廠
 週期時間，因此本文只建立閱讀框架，不替任何量產線補寫數值。
+
+## 警報不是處置：用九個事件讀懂異常圍堵
+
+控制圖或模型亮紅燈，只代表「依目前規則，這筆資料值得處理」。NIST／SEMATECH 把
+process monitoring 與 process control 分得很清楚：前者偵測 out-of-control 狀態，後者才是
+依監控結果主動改變製程；OCAP 用來規定偵測後的動作，而且不同製程可以有不同流程圖。
+因此，工具較快產生訊號，不等於材料已停住、受影響範圍已找完，也不等於製程已安全復機。
+
+### 三個時鐘不能合成一個「反應很快」
+
+一份可稽核的異常紀錄至少要保存下列九個事件。`t0` 只是最後一次**已證實在控**的界線，
+不保證異常物理原因恰好從那一刻才開始；`t6` 則要記實際執行完成，而不是工程師按下指令的
+時間。若 command 和 enforcement 共用一個時間戳，就無法知道控制系統、設備或物流是否延遲。
+
+| 事件 | 必須保存的內容 | 這一格不能被什麼代替 |
+|---|---|---|
+| `t0` 最後已證實在控 | control limit／check、方法與版本、被接受的最後物件 | 不能當成真實 excursion onset |
+| `t1` 製程／材料事件 | 物件經過的站點、tool／chamber、recipe、材料批次與完成時間 | 不能只留工單日期或整批平均 |
+| `t2` 取樣／影像／量測 | sampling unit、取得時間、佇列入口與資料品質 | 不能用設備 nominal throughput 回填 |
+| `t3` 產生警報 | rule／model／threshold 版本、原始值、limit、event time | 警報數不等於 actionable defect 數 |
+| `t4` 確認／分類 | 自動或人工複判、參考真值、嚴重度、false-alarm 分支 | 分類完成不等於材料已被攔住 |
+| `t5` 下達圍堵 | 決策人／系統、OCAP 版本、stop／hold／isolate 範圍與 command time | 電子指令不等於物理執行完成 |
+| `t6` 圍堵生效 | tool stopped、material isolated 或 lot held 的完成狀態與確認來源 | 不能只看 `t3` 或單機 image time |
+| `t7` 範圍與處置 | genealogy 查得的 lot／wafer／die／package、retest／rework／scrap／release | 可疑集合不等於全部都真正失效 |
+| `t8` 修正後放行 | 根因、永久修正、重驗規則、approver、新基線與 release time | 復機不等於已證明長期良率改善 |
+
+這九格可以拆出三段不同瓶頸：`t2→t3` 是資料／運算延遲，`t3→t5` 是確認與決策延遲，
+`t5→t6` 是控制動作真正落地的延遲；`t6→t8` 則是調查、修正、驗證與復機時間。常見的
+`signal-to-hold` 只等於 `t6−t3`，它沒有涵蓋取樣以前的製程歷史，也不能代表完整
+excursion exposure。把工具「每小時看幾片」直接倒數成 factory containment time，會漏掉
+取樣間隔、資料佇列、複判、權限裁決、設備停機確認與已經流到後站的材料。
+
+### 受影響量要從物件集合重建，不能只拿流率乘時間
+
+SEMI 的 traceability 頁面把 unique device identification 延伸到 IC 製造、測試、組裝乃至
+最終系統，並說明端到端追溯對 performance／failure analysis 的重要性。台積電公開的先進
+封裝自動化頁則提供實作方向：inline ADC 在製程中偵測並隔離受影響材料，offline ADC 在
+製程後偵測並 hold lots；per-die 履歷再把原始 wafer 位置、bin、製程歷史、tool logs、材料與
+yield 接起來，用來界定影響範圍與分析低良率根因。
+
+研究時應把候選受影響範圍寫成一個**物件集合**：同一 product／revision 下，沿著可疑
+tool／chamber、recipe、材料批次與時間窗實際走過的 lot、wafer、die 或 package。流率乘上
+`t6−t3` 最多只是「警報後到圍堵生效間、在固定流率假設下又流過多少」的簡化量；它會漏掉
+警報前已加工的物件、抽樣間隔、不同路由、重工回流、佇列與異常真正起點未知。沒有共同
+identity key、事件時間與 genealogy，就不能把一個 lot hold 推算成受影響 die 數、報廢金額
+或避免損失。
+
+### 多空小作文要用同一張事件護照裁決
+
+| 觀察欄位 | 多方版本需要什麼 | 空方／替代版本需要什麼 | 現有公開狀態 |
+|---|---|---|---|
+| 訊號到圍堵 | 新增感測、複判、控制或資料設備讓同口徑 `t2→t6` 縮短 | edge ADC、軟體與既有設備已吸收負荷，硬體密度未增加 | 沒有產品級時間戳 |
+| 影響範圍 | genealogy 讓同類 excursion 的候選物件、報廢或重工下降 | 只把範圍找得更完整，物理 defect rate 未改善 | 台積電只公開功能鏈 |
+| 修正與復機 | 同根因的 recurrence、`t6→t8`、良率或 cycle time 改善 | hold／複判增加反而拉長週期，或 false alarm 消耗工程容量 | 沒有同 cohort 結果 |
+| 工具與財務 | 客戶新增工具／支出與供應商 actual revenue 同期對回 | 改善主要來自 installed-base 軟體、流程或內部系統 | 沒有雙向財務共同鍵 |
+
+本節定向使用 `N=3` 條消息鏈：NIST／SEMATECH 是通用監控與 OCAP 方法鏈，台積電是一條
+客戶公司功能鏈，SEMI 是追溯標準入口；它們不是三座封裝廠、三個產品或量產事件樣本。
+九事件護照是研究中心把三條來源整合後的查核框架，不是三方共同發布的標準。來源沒有提供
+任何 HBM／2.5D／3D 產品的九個時間戳、受影響物件數、重複事件或對照組，因此沒有可估的
+sampling SE／t，也不建立延遲、良率、損失避免或供應商績效排名。
 
 ## 量得出數字，不代表能拿去控製程：先過量測系統六關
 
@@ -1092,6 +1165,54 @@ limitation: 這是台積電對自家先進封裝智慧製造能力的現行服�
 independence_group: tsmc
 -->
 
+<!-- research_source
+source_id: S31
+role: other_primary
+source_kind: document
+publisher: National Institute of Standards and Technology
+title: NIST／SEMATECH Engineering Statistics Handbook Chapter 6 — Process or Product Monitoring and Control
+published_at: 2003-06-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.itl.nist.gov/div898/handbook/pmc/section1/pmc13.htm
+locator: §§6.1.3–6.1.4；§6.1.3 將 process control 定義為依監控結果主動改變製程，分列 process-specific OCAP 與自動 APC loop；§6.1.4 說明 out-of-control 後依 control-chart OCAP 尋找 assignable cause
+limitation: 這是 NIST／SEMATECH 通用統計工程手冊，不是 HBM／advanced-packaging 客戶 recipe、法規或共同產業標準；沒有固定 sampling unit、警報門檻、時間戳、材料範圍、重工／報廢、良率、成本或財務資料
+independence_group: nist
+-->
+
+<!-- research_source
+source_id: S32
+role: company_release
+source_kind: living_index
+publisher: Taiwan Semiconductor Manufacturing Company Limited
+title: Automation in Packaging Fab
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.tsmc.com/english/dedicatedFoundry/services/apm_intelligent_packaging_fab/intelligentFab_automation
+locator: 2026-08-14 現行頁面 Machine Learning for Quality Management 與 Big Data Analysis for Yield and Quality Defense；inline ADC 的 during-processing detection／affected-material isolation、offline ADC 的 post-process detection／lot hold，以及 per-die 2D barcode、process history、tool logs、material data、yield、impact-scope 與 root-cause 段落
+limitation: 這是台積電對自家先進封裝自動化能力的現行服務頁；沒有 product／revision、tool／recipe、OCAP、完整九事件時間戳、受影響 lot／die 數、false-alarm／escape、重驗／放行規則、良率、損失避免、工具供應商、支出或財務分母；inline／offline 功能不能外推成任一產線延遲或外部設備商收入
+independence_group: tsmc
+-->
+
+<!-- research_source
+source_id: S33
+role: other_primary
+source_kind: living_index
+publisher: SEMI
+title: Traceability Standards and Activities
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.semi.org/en/products-services/standards/traceability
+locator: 2026-08-14 現行頁面 Traceability Standards and Activities 正文；unique device identification 跨 IC manufacturing／test／assembly 至 final system，以及 end-to-end traceability 對 performance／failure analysis 的說明
+limitation: 這是 SEMI 標準入口與活動摘要，不是標準全文，也沒有證明任何 HBM 客戶採用 T23／E142 或特定實作；頁面未提供 event schema、時間戳、OCAP、圍堵、樣本、良率、工具數或財務資料
+independence_group: semi
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -1670,6 +1791,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C35
+label: verified
+status: active
+claim: NIST／SEMATECH 將 process monitoring 偵測失控與 process control 主動改變製程分開，並說明 OCAP 規定失控訊號之後的動作、可按不同製程設計流程，再沿 control-chart OCAP 尋找 assignable cause
+supporting_source_ids: S31
+contrary_source_ids:
+as_of: 2003-06-01
+basis: S31 §§6.1.3–6.1.4 直接定義 monitoring 後的兩種 intervention、OCAP 與 out-of-control 後的 assignable-cause investigation
+boundary: 這是通用方法定義，不表示每個訊號都是真異常、所有工廠使用同一 OCAP，也沒有指定 advanced-packaging 的 sampling、threshold、owner、stop／hold、recovery 或量化延遲
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C36
+label: verified
+status: active
+claim: 台積電現行先進封裝自動化頁面分開描述 inline ADC 在製程中偵測並隔離受影響材料、offline ADC 在製程後偵測並 hold lots；同頁再以 per-die 識別把 wafer 位置、bin、製程歷史、tool logs、材料與 yield 接起來，以界定問題影響範圍並分析低良率根因
+supporting_source_ids: S32
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S32 的兩個正文小節逐項提供 inline／offline 的動作差異與 product-resume 追溯欄位及用途
+boundary: 這是客戶公司對自有功能的公開陳述，沒有 product／recipe／OCAP version、九事件 timestamp、affected count、false alarm／escape、rework／scrap、release、yield effect 或成本；不能推論每個場站均採相同流程或任一供應商財務貢獻
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C37
+label: verified
+status: active
+claim: SEMI 的現行 traceability 入口表示，其標準範圍支援 unique device identification 從 IC 製造、測試與組裝一路到最終系統，並把端到端追溯連到 performance／failure analysis
+supporting_source_ids: S33
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S33 正文直接描述 identification 範圍與 end-to-end traceability 用途
+boundary: 入口摘要不等於標準全文、客戶採用證明或特定事件資料完整；unique ID 也不自動提供時間、工具、recipe、材料、OCAP、根因、圍堵成效或財務歸因
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C38
+label: inference
+status: active
+claim: 研究 advanced-packaging excursion 時，工具訊號、確認、圍堵指令與實際 hold／isolate 必須分時記錄；受影響範圍再用 product／revision、lot／wafer／die／package、tool／chamber、recipe、材料批次與時間窗的 genealogy 重建，最後另記處置、修正、重驗與放行。只有 `signal-to-hold` 或單機 throughput，不能推出完整 excursion exposure、良率改善或避免損失
+supporting_source_ids: S31,S32,S33
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S31 把 detection 與 OCAP intervention 分開，S32 提供 inline isolate、post-process hold 與 per-die impact-scope／root-cause 功能鏈，S33 建立跨製造測試組裝的 Unique ID 追溯邊界；研究端據此整理 t0–t8 九事件與共同識別鍵
+boundary: 九事件護照是研究中心整合框架，不是 NIST、台積電與 SEMI 共同標準；N=3 條消息鏈不是廠、產品或事件樣本，沒有公開 HBM 量產時間戳、受影響量、對照組、sampling SE／t、工具數或財務共同鍵，也不能由缺值推論成效為零
+verification_needed: 同一 production product／layer 的 product／recipe／OCAP version、t0–t8 原始時間戳、command／enforcement acknowledgement、genealogy 物件集合、retest／rework／scrap／release、同 cohort 良率／cycle-time／成本，以及同期間客戶工具／支出與供應商 actual revenue
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 KLA 提供需求方向，Applied Materials 說明缺陷機制與自述的高量產使用，Onto Innovation
@@ -1683,7 +1872,8 @@ FY26Q3 再補公司／部門實績、客戶應用組合與 AP 逾 70%／PDC 逾 
 單一廠商說法更完整。NIST、Applied 與 KLA 的方法／產品文件又把 control plan
 拆成動態抽樣、靈敏度、覆蓋、偽警報、結果時間與不同製程任務；NIST／SEMATECH 的量測
 章節再補上 bias、repeatability、reproducibility、stability、uncertainty 與 traceability 的前置
-契約。本題也不同於 ATE tester TAM：它研究製程中的量測、
+契約；NIST／SEMATECH 的 OCAP、台積電 inline／offline 圍堵與 die-level 履歷、SEMI 的唯一
+識別入口，又把「警報之後」拆成確認、指令、實際隔離、影響範圍、處置與復機。本題也不同於 ATE tester TAM：它研究製程中的量測、
 缺陷定位與良率回饋。尚待證明的是需求有沒有變成更多工具步驟與較高支出占比；未拆出
 產品分子、客戶分母、市占、ASP、產品組合與服務前，不能用發行人結果代表全產業，更不能
 外推台灣公司受惠。
@@ -1696,6 +1886,7 @@ FY26Q3 再補公司／部門實績、客戶應用組合與 AP 逾 70%／PDC 逾 
 | 工程機制 | Applied 描述細小特徵、翹曲與高缺陷代價 | 第三方良率、總市場或排名 |
 | 量測可信度前置關卡 | NIST／SEMATECH 把 bias、短長期變異、不確定度與可追溯鏈分開 | 特定 HBM 客戶方法、允收門檻或設備收入 |
 | Control-plan 方法 | NIST、Applied 與 KLA 分別支持 adaptive sampling、coverage／sensitivity／nuisance 取捨及不同封裝檢查任務 | HBM 客戶 recipe、逃逸／偽警報、整廠 cycle time 或新增工具量 |
+| 警報—圍堵功能鏈 | NIST／SEMATECH 分開 detection 與 OCAP intervention；台積電分開 inline isolate、post-process hold 與 per-die impact tracing；SEMI 建立跨製造／測試／組裝的 Unique ID 方向 | 同產品九事件時間戳、affected objects、處置／復機、良率／成本與工具財務 |
 | 採用節點 | Onto 披露 2.5D logic 與 HBM 客戶資格認證 | 大量採購、收入或台灣參與 |
 | 供應商端量產陳述 | Applied 稱特定 eBeam defect-analysis 系統已用於高量產先進封裝 | 客戶端部署數、良率實績或市占 |
 | 具名工具未來訂單 | Camtek 披露 tier-1 OSAT 與 HBM player 合計超過 1.05 億美元的 multi-system orders，其中 HBM 訂單全為 Hawk，預計 2027 交付 | 已認列收入、工具台數、客戶名稱、毛利或客戶產能分母 |
@@ -1844,13 +2035,17 @@ comparability_reason: 萬潤的半導體設備範圍大於檢查／量測，且�
 - [S28：NIST 20 nm wafer-noise／defect-detection 研究](https://www.nist.gov/publications/effects-wafer-noise-detection-20-nm-defects-using-optical-volumetric-inspection)（區分 noncritical／critical defect 並說明 false positive／overlooked defect；不是封裝量產 recipe）。
 - [S29：NIST Quantitative Nanoscale Imaging Through AI](https://www.nist.gov/programs-projects/quantitative-nanoscale-imaging-through-artificial-intelligence)（四格判定與 threshold 方法頁，沒有 production confusion matrix）。
 - [S30：台積電 Intelligent Packaging Fab](https://www.tsmc.com/english/dedicatedFoundry/services/apm_intelligent_packaging_fab)（客戶端攔截、分類、良率預測與不良材料隔離功能鏈，沒有同產品數值分母）。
+- [S31：NIST／SEMATECH Process Control 與 OCAP](https://www.itl.nist.gov/div898/handbook/pmc/section1/pmc13.htm)（偵測後的處置方法，不是 HBM 量產流程或延遲資料）。
+- [S32：台積電 Automation in Packaging Fab](https://www.tsmc.com/english/dedicatedFoundry/services/apm_intelligent_packaging_fab/intelligentFab_automation)（inline isolate、post-process lot hold 與 per-die impact tracing，沒有完整九事件分母）。
+- [S33：SEMI Traceability Standards and Activities](https://www.semi.org/en/products-services/standards/traceability)（跨製造、測試與組裝的 Unique ID 標準入口，不是採用或圍堵成效證明）。
 - 後續入口：[KLA](https://ir.kla.com/financial-information/financial-results)、[Applied](https://ir.appliedmaterials.com/news-releases/)、[Onto](https://investors.ontoinnovation.com/news/default.aspx)、[MOPS](https://mops.twse.com.tw/mops/web/index)。
 - 中立方法入口：[NIST CHIPS Metrology Program](https://www.nist.gov/chips/research-development-programs/metrology-program)。
 
 海外五家設備商與台灣三家公司彼此獨立但都有商業動機，其中同一公司的多份文件仍只算
 一條公司消息鏈；SEMI 議程保存多位講者摘要，也不能替代完整簡報、客戶端或全產業資本
 支出證據。台灣三家公司是依既有獨立複核筆記選出的定向教材，不是全 universe 抽樣；本輪
-新增的兩個 NIST 頁面只算一條中立方法鏈，台積電頁面另算一條客戶公司鏈；也沒有一致預期、
+新增的 NIST 頁面仍只算一條中立方法鏈，兩個台積電頁面仍只算一條客戶公司鏈，SEMI 追溯入口
+另算一條產業標準消息鏈；也沒有一致預期、
 估值、即時持倉或具名客戶—供應商雙向資料，因此不談市場是否反映或個股方向。
 
 ## 反方與替代路徑

@@ -1,14 +1,15 @@
 # 製程控制量測系統契約知識圖譜
 
-本圖把「量測結果是否可信」與「產線如何抽樣、攔截及處置」分成前後兩層。通用 NIST 方法
-可建立查核欄位，但不替任何 HBM 產線、設備商資格、良率改善或台灣公司財務貢獻背書。
+本圖把「量測結果是否可信」與「產線如何抽樣、警報、攔截及處置」分成前後兩層，再把
+OCAP、實際圍堵、製造履歷與修正後放行接成事件護照。通用方法可建立查核欄位，但不替任何
+HBM 產線、設備商資格、良率改善或台灣公司財務貢獻背書。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: process-control-measurement-contract
 root_node_id: concept:measurement-system-contract
 label: 製程控制量測系統契約
-summary: 先固定被測量 方法環境 參考校正 偏差變異與不確定度 再接抽樣 逃逸 偽警報 結果時間及異常圍堵 避免把精細數字直接當成可信決策或設備收入。
+summary: 先固定被測量 方法環境 參考校正 偏差變異與不確定度 再接抽樣 逃逸 偽警報 OCAP 圍堵履歷與放行事件 避免把精細數字或警報速度直接當成可信決策 良率改善或設備收入。
 article_ids: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY
 status: active
 -->
@@ -351,4 +352,104 @@ review_due: 2026-08-31
 status: active
 boundary: 封測廠是方法使用端不代表增加檢查必然提高收入 毛利或採購台灣設備。
 next_trigger: OSAT 與客戶公開同一產品量測契約 control plan 良率結果 資本支出及財務影響。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCMC-C03
+view: company
+from_id: company:tsmc
+to_id: concept:measurement-system-contract
+relation: has_capability
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C36
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: limited_source
+exclusivity_scope: 台積電現行頁面公開自家先進封裝 per-die identification process history tool logs material data yield impact-scope 與 root-cause 功能 本輪沒有第二家客戶以相同欄位公開量產結果。
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 公司功能頁沒有 product recipe OCAP 九事件時間戳 受影響數 重工報廢 放行 良率成本或外部工具商財務 不能外推成產業共同部署。
+next_trigger: 第二家客戶或台積電版本化量產文件公開同產品事件履歷 affected-object set disposition release 及結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCMC-I16
+view: industry
+from_id: concept:measurement-system-contract
+to_id: process:out-of-control-action-plan
+relation: requires
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C35
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: limited_source
+exclusivity_scope: NIST SEMATECH 手冊直接把 process monitoring 後的 OCAP 與 automated intervention 分開 但未證明半導體客戶採用同一流程。
+as_of: 2003-06-01
+review_due: 2026-08-31
+status: active
+boundary: 通用 OCAP 定義不指定 advanced-packaging alarm threshold owner stop hold recovery latency 或製造結果。
+next_trigger: 具名客戶公開同產品 process-specific OCAP version trigger action owner 與 execution record。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCMC-I17
+view: industry
+from_id: concept:measurement-system-contract
+to_id: process:excursion-containment-event-passport
+relation: includes
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C38
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: t0 至 t8 是研究中心查核框架 不是 NIST 台積電與 SEMI 共同標準 也不表示每座廠使用相同 event names 或 sequencing。
+next_trigger: 客戶版本文件公開 signal validation command enforcement genealogy disposition correction verification release 的原始事件 schema。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCMC-I18
+view: industry
+from_id: concept:measurement-system-contract
+to_id: metric:signal-validation-actuation-latency
+relation: measured_by
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C38
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: signal to hold 只是 t6 減 t3 不涵蓋取樣前歷史 excursion onset 佇列 後站材料或修正後放行 不能改寫成完整 exposure 或 cycle time。
+next_trigger: 同一量產產品公開 t2 至 t6 timestamp distribution queue review decision acknowledgement 與 affected-object count。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCMC-I19
+view: industry
+from_id: concept:measurement-system-contract
+to_id: capability:manufacturing-genealogy
+relation: requires
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C36,MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C37,MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C38
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: 台積電公開 per-die product resume 用途 SEMI 公開跨製造測試組裝 unique identification 方向 但兩者不是同一客戶實作或共同 event schema。
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: Unique ID 與 traceability 不自動證明根因 受影響範圍完整 圍堵成功 良率改善或工具收入。
+next_trigger: 同一 production cohort 公開 object IDs route tool chamber recipe material time window candidate scope confirmed failures disposition 與 release。
 -->
