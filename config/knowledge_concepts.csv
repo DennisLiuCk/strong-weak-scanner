@@ -247,6 +247,7 @@ metric:hot-swap-startup-time,metric,Hot-swap 預充時間,Hot-swap startup time|
 metric:hot-swap-fault-clearing-time,metric,Hot-swap 故障清除時間,Hot-swap fault-clearing time|overcurrent shutdown time,concept:800v-protection-layers,從異常被偵測到電力路徑被限制或切斷的時間欄位 必須連同故障型態 電壓 電流 溫度與功率開關安全工作區判讀
 capability:mechanical-isolation-contact,capability,機械隔離接點,Mechanical isolation contact|series isolation contact,concept:800v-protection-layers,在半導體切換之外以可確認的機械斷開建立維修隔離邊界
 metric:residual-voltage-after-disconnection,metric,斷電後殘餘電壓與時間,Residual voltage after disconnection|discharge time,concept:800v-protection-layers,在指定儲能 初始電壓 放電路徑 量測位置與時間下確認切斷後仍保留的電壓
+metric:dc-stored-energy-discharge-pulse,metric,直流儲能與放電脈衝,DC stored energy and discharge pulse|RC discharge energy passport,concept:800v-protection-layers,固定 voltage reference plane 電容量 初始儲能 放電路徑 時間常數 瞬時電流功率 pulse 能量 殘壓門檻 重複週期與量測不確定度的尺度
 concept:service-safe-state,concept,可安全維修狀態,Service-safe state|safe access state,concept:800v-protection-layers,電流切斷 機械隔離 儲能放電與獨立安全確認都達到規定條件後才允許人員接近的狀態
 concept:ai-rack-action-contract,concept,AI 機櫃控制契約,AI rack action contract|rack telemetry action loop,concept:liquid-cooling-loop-boundary,把機櫃身分 資料語意 動作所有權 安全裁決 隔離狀態與維修結果串成可驗證閉環的研究框架
 capability:rack-identity-coordination,capability,機櫃身分對齊,Rack identity coordination|rackLocationId,concept:ai-rack-action-contract,讓 IT 與 OT 以穩定且一致的識別碼指向同一物理機櫃的能力

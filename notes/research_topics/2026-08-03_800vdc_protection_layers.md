@@ -80,6 +80,14 @@ reason: added_interruption_isolation_discharge_and_safe_access_sequence_with_six
 evidence: sources:S9
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: separated_capacitor_stored_energy_time_constant_residual_voltage_and_discharge_pulse_without_refreshing_thesis_clock
+evidence: sources:S1,S8
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -111,6 +119,11 @@ evidence: sources:S9
 - **IEC 60947-10**：2026 年發布、涵蓋最高 1,500VDC 半導體斷路器的國際標準；本文只使用 IEC 公開摘要，不把未取得的完整條文或測試細節自行補齊。
 - **STDA029**：TI 於 2026 年 3 月發布的 800V／±400V floating-ground hot-swap 技術白皮書代號；它是一組指定實驗架構，不是產業共同標準。
 - **OFF（關閉命令）**：控制器要求電子開關停止導通的狀態；它需要用實際電流、隔離接點與殘餘電壓再確認，不能單獨充當安全證明。
+- **電壓 reference plane**：電壓是在哪兩個節點之間量到。+400V 對 −400V 是 800V 差值；只寫「400V rail」不能判定某顆電容實際跨多少電壓。
+- **電容儲能**：理想電容儲存的能量為二分之一乘電容量再乘電壓平方；它用焦耳表示，和電阻瓦數、放電秒數不是同一種量。
+- **RC 時間常數**：電阻乘電容量所得的時間尺度。理想一階放電每經過一個時間常數，電壓降到前一刻的約 36.8%，但真正 pass-fail 仍要看指定殘壓門檻與實測。
+- **瞬時／脈衝功率**：放電剛開始時的功率與整段脈衝能量、持續時間及重複頻率共同決定元件負擔；不能只用一個瓦數標籤替全部工況背書。
+- **殘壓門檻**：在指定量測位置與時間，電壓必須低於的判定值。本文沒有從公開摘要自行指定通用安全門檻。
 
 ### 三句話抓重點
 
@@ -480,6 +493,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C12
+label: inference
+status: active
+claim: 對 TI STDA029 的固定 100µF、800V、2kΩ 理想放電例重算，電容初始儲能為 32J；相同 100µF 若只跨 400V 則為 8J，顯示電壓加倍時儲能為四倍。2kΩ 路徑的 RC 時間常數為 0.2 秒、初始電流為 0.4A、初始瞬時功率為 320W；理想模型在 1.5 秒後的殘壓為 0.442467496V、剩餘能量占初始值 0.000030590%
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8 第 4–6 頁固定 800V／100µF 系統條件、2kΩ／10W 放電電阻與 1.5 秒設計例；研究中心以 Python Decimal／math 與獨立 awk 分別重算二分之一乘 C 乘 V 平方、RC、V 除以 R、V 平方除以 R 及理想指數放電，逐項一致
+boundary: 這是 N＝1 組固定名目輸入的理想一階確定性換算，不是 TI 公布的殘壓實測、元件容差／溫升／脈衝額定驗證、IEC／OCP 通用門檻、production qualification 或 field result；±400V 跨兩條 rail 的差值仍是 800V，不得把每條 rail 對參考點的 400V 誤當成 full-bus 電容只承受 400V
+verification_needed: 具名 production platform 的實際電容量及容差、rail-to-rail 初始電壓、放電元件 pulse-energy／voltage／temperature capability、量測位置、殘壓曲線、門檻、重複週期、fault injection 與安全放行結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: 放電安全不能只比較電容量、秒數或電阻瓦數其中一欄；至少要共同固定 voltage reference plane、初始與分散電容量、初始儲能、放電路徑與元件容差、瞬時電流／功率與整段脈衝能量、殘壓門檻及量測位置、溫度與重複週期、失效狀態與維修放行
+supporting_source_ids: S1,S8
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8 同時列 800V／100µF、2kΩ／10W 與 1.5 秒卻未把這些不同物理量縮成單一安全分數；S1 又把 live-part accessibility／interlock 與其他安全要求分開，支持計算後仍需實測與安全程序的研究判讀
+boundary: 這份欄位表是研究中心的整合方法，不是 TI、OCP 或 IEC 共同發布的測試表，也不表示 10W 元件不合格；缺少該料號的 pulse-energy curve、電壓額定、溫升、容差、安裝與 duty cycle 時，不判定元件 pass-fail 或供應商價值
+verification_needed: 買方或平台商發布固定 topology 與版本的 discharge design verification，含元件 datasheet／derating、原始電壓電流溫度軌跡、殘壓門檻、量測不確定度、重複與單點失效測試及 service release
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分清楚：保護誰、發生什麼事、誰來處理
 
 | 保護責任 | 主要事件 | 目前證據說了什麼 | 仍需要其他保護處理 |
@@ -546,6 +593,78 @@ OCP Diablo 400 要求高壓帶電部位不可讓人員接近，並以 interlock�
 這六欄是研究中心把 IEC、OCP 與 TI 文件拼成的查核方法，不是三方共同發布的表單，也不是完整的
 lockout／tagout 作業程序。它的用途是攔下最常見的跨級推論：breaker 有動作，不等於隔離接點已
 確認；接點已斷開，不等於電容已放完；電壓下降，也不等於現場已依程序允許接近。
+
+## 100µF、800V、1.5 秒與 10W 不是四個同義規格
+
+這四個數字在 TI 同一個設計例裡出現，卻各自回答不同問題：100µF 是儲存電荷的能力，800V 是
+指定兩點之間的電位差，1.5 秒是目標放電時間，2kΩ／10W 則是文件選用的放電元件標示。若把它們
+壓成一句「800V 放電器是 10W」，就會漏掉真正決定能量、殘壓與元件脈衝負擔的欄位。
+
+### 先固定電壓究竟跨在哪兩點
+
+STDA029 同時寫 800V 與 ±400V，是因為系統可以用不同 reference 表示同一個 rail-to-rail 差值。
+從 +400V 量到 −400V，差值仍是 800V；TI 的測試圖也明確把 100µF 輸出電容由 0V 充到 800V。
+因此，若該電容跨完整正負 rail，儲能就要用 800V；只有另一顆相同 100µF 電容真的只跨 400V，
+才使用 400V 計算。兩者都叫「400／800V 架構」，不代表元件 reference plane 相同。
+
+理想電容的儲能為 E＝½CV²。在相同 100µF 下，跨 800V 是 32J，跨 400V 是 8J；電壓只增加
+一倍，能量卻增加到四倍。這個平方關係能解釋為什麼升高匯流排電壓後，放電、隔離與故障能量
+不能只沿用低壓系統的秒數或瓦數，但它不表示所有電容、放電電阻或保護元件價值也會自動四倍。
+
+| 量 | 固定例子的理想重算 | 它回答什麼 | 它不能替什麼背書 |
+|---|---:|---|---|
+| 初始儲能 | ½ × 100µF × 800V²＝32J | 完整放電最多要移走多少理想電場能量 | 元件已通過 pulse、溫升、壽命或安全資格 |
+| 400V 對照 | ½ × 100µF × 400V²＝8J | 同電容量下的電壓平方敏感度 | ±400V full bus 只剩 400V，或真實架構一定這樣分割 |
+| RC 時間常數 | 2kΩ × 100µF＝0.2 秒 | 理想一階電壓衰減的基本時間尺度 | 0.2 秒後已達安全門檻或允許維修 |
+| 初始電流 | 800V ÷ 2kΩ＝0.4A | 放電剛開始時的理想電流 | 實際開關、配線與電阻都承受相同波形 |
+| 初始瞬時功率 | 800V² ÷ 2kΩ＝320W | 放電起點的理想功率 | 10W 標示的元件一定失敗，或反過來一定足夠 |
+
+### 1.5 秒是 7.5 個時間常數，不是安全結論
+
+理想 RC 模型的電壓為 V(t)＝V0 × e^(−t/RC)。在 800V、2kΩ、100µF 固定條件下，1.5 秒
+等於 7.5 個時間常數，模型殘壓為 0.442467496V；剩餘理想儲能占初始值 0.000030590%，表示
+約 31.999990211J 已經移出電容。這些數字只重建一條理想曲線，沒有替 TI 補出未公開的殘壓
+實測點，也沒有把 1.5 秒升格成 IEC 或 OCP 的通用維修等待時間。
+
+最容易讀錯的是 320W 與 10W 同時出現。320W 是理想放電起點的瞬時值，之後隨電壓平方快速下降；
+10W 是 TI 文件對選用電阻的標示。兩者不互相否定，也不能互相代替。是否承受得住，要回到該料號
+的 pulse-energy／voltage curve、持續時間、封裝熱容量、環境溫度、安裝、容差、重複週期與降額，
+再用實測電壓、電流與溫度軌跡驗證。只看峰值就宣布失敗，或只看 10W 就宣布安全，都是跨級推論。
+
+### 一份儲能—放電護照至少要有九欄
+
+| 欄位 | 最少要固定的內容 | 遺漏後最常見的誤判 |
+|---|---|---|
+| 1. topology／reference plane | 電容與量測端點位在 +400V、−400V、rail-to-rail 或其他節點 | 把 ±400V 的 full-bus 差值誤算成 400V |
+| 2. 初始電壓 | worst-case／nominal、容差、瞬變與開始計時時點 | 用 800V 名稱替代實際初始條件 |
+| 3. 電容量 | 名目、容差、偏壓／溫度／老化與所有分散電容 | 只算主電容，漏掉線纜、濾波與下游儲能 |
+| 4. 初始儲能 | 逐儲能位置計算的焦耳與合計邊界 | 把 µF、W 或秒直接當成能量 |
+| 5. 放電路徑 | 開關、電阻、接點、失效時路徑與單點故障 | 假定 command OFF 後 bleeder 一定接通 |
+| 6. 元件 pulse 能力 | 電阻／開關的峰值、能量、電壓、溫升、降額與重複週期 | 只用連續瓦數或單次峰值裁決 |
+| 7. 殘壓 pass-fail | 指定門檻、時間、量測點、工具精度與不確定度 | 理想曲線低於任意數字就宣布安全 |
+| 8. 失效與冗餘 | 元件 open／short、控制失效、電源回灌與安全預設 | 只測正常關機，沒有故障注入 |
+| 9. 維修與復歸 | 誰獨立確認、何時放行、維修後如何驗證重新上電 | 把一次波形直接當成完整 service-safe state |
+
+### 多空小作文共用同一份能量底稿
+
+- **多方可以寫到哪裡**：若具名 800V production platform 確認較高 rail-to-rail 電壓與分散電容
+  讓儲能、pulse、殘壓監測、隔離與冗餘要求提高，且買方 qualification、production BOM、出貨與
+  公司財務能雙向對上，才可能形成高壓電容、放電元件、感測、開關與系統整合的新增價值。
+- **空方可以寫到哪裡**：32J 只是單一 100µF 例子的物理帳，不是元件顆數或市場規模。系統可以
+  改變電容量、分割 rail、調整放電路徑、整合功能或把價值移到機構與控制；若量產 BOM 沒有增加、
+  供應商仍停在 reference design，或元件 ASP／收入無法辨識，就不能把電壓平方直接寫成獲利平方。
+- **共同裁決資料**：固定 topology 與 reference plane、所有儲能位置、容差後電容量與電壓、原始
+  放電電壓／電流／溫度波形、pulse／降額、殘壓門檻與量測不確定度、fault／redundancy test、客戶
+  qualification、production BOM、出貨、價格、收入與毛利。工程負擔和公司材料性必須各自過關。
+
+本段只有 N＝1 組 TI 指定名目條件與 N＝1 個相同 100µF／400V 的固定敏感度對照，都是確定性
+算式，不是抽樣、標準 conformity test、元件 qualification 或量產實驗，因此沒有 sampling SE／t。
+真實 rack、capacitor、resistor、switch、temperature run、fault injection、service event、customer、
+production BOM 與公司財務觀測 N＝0，不估失效率、殘壓分布、元件需求、ASP、收入、毛利或台灣
+三個族群效果。Python Decimal／math 與獨立 awk 對 32J／8J、四倍、0.2 秒、0.4A、320W、
+0.442467496V、0.000030590% 與 31.999990211J 逐項一致；算術一致不消除容差、溫度、pulse rating、
+拓撲、量測與安全門檻的不確定性。S8 官方 PDF 共 9 頁，引用第 4–6 頁並渲染相鄰第 4–7 頁，
+SHA-256 為 0fb1a939c277b9efb433764ef8b17ff20d6e40bb3ab2d0a2991157f9f17abcf7。
 
 ## 為什麼監測資料暫時仍屬於保護功能
 

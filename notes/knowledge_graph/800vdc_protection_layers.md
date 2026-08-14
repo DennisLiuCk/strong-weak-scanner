@@ -354,3 +354,23 @@ status: active
 boundary: TI 的 2kΩ 10W 100µF 與 1.5 秒只是一組 output-discharge 設計例，不是 IEC OCP 或所有 800V platform 的共同殘餘電壓與等待時間。
 next_trigger: 具名 production rack 公布各儲能位置 初始條件 放電路徑 殘壓量測位置 時間門檻 pass-fail 與 field record。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-8PL-I16
+view: industry
+from_id: concept:800v-protection-layers
+to_id: metric:dc-stored-energy-discharge-pulse
+relation: measured_by
+claim_refs: MI-2026-08-03-800VDC-PROTECTION-LAYERS#C12,MI-2026-08-03-800VDC-PROTECTION-LAYERS#C13
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope: TI STDA029 固定一組 800V 100µF 2kΩ 10W 與 1.5 秒 reference design；32J 與 RC pulse 護照是研究中心的理想換算與查核方法，不是平台共同標準或供應商比較。
+as_of: 2026-08-14
+review_due: 2026-09-01
+status: active
+boundary: 理想模型只分開儲能 時間常數 殘壓 瞬時功率與 pulse 能量，不建立通用安全門檻、元件 pass-fail、production BOM、需求、ASP 或公司財務效果。
+next_trigger: 具名 production platform 公布固定 topology reference plane 全部儲能位置 元件 pulse derating 原始電壓電流溫度軌跡 殘壓門檻量測不確定度 fault test qualification 與 field record。
+-->

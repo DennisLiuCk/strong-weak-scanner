@@ -6473,6 +6473,68 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(target, graph)
 
+    def test_800vdc_protection_separates_stored_energy_discharge_pulse_and_safe_access(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-03_800vdc_protection_layers.md"
+        ).read_text(encoding="utf-8")
+        self.assertTrue(topic.startswith(
+            "# 800VDC 保護不是一顆保險絲：人身、故障電流與 Hot-swap 必須分層\n"
+        ))
+        for contract in (
+            "reason: separated_capacitor_stored_energy_time_constant_residual_voltage_and_discharge_pulse_without_refreshing_thesis_clock",
+            "claim_id: C12\nlabel: inference\nstatus: active",
+            "claim_id: C13\nlabel: inference\nstatus: active",
+            "## 關掉不等於沒電：四道維修安全閘門",
+            "## 100µF、800V、1.5 秒與 10W 不是四個同義規格",
+            "### 先固定電壓究竟跨在哪兩點",
+            "½ × 100µF × 800V²＝32J",
+            "½ × 100µF × 400V²＝8J",
+            "2kΩ × 100µF＝0.2 秒",
+            "800V² ÷ 2kΩ＝320W",
+            "0.442467496V",
+            "0.000030590%",
+            "31.999990211J",
+            "### 一份儲能—放電護照至少要有九欄",
+            "| 1. topology／reference plane |",
+            "| 9. 維修與復歸 |",
+            "### 多空小作文共用同一份能量底稿",
+            "N＝1 組 TI 指定名目條件",
+            "真實 rack、capacitor、resistor、switch、temperature run",
+            "0fb1a939c277b9efb433764ef8b17ff20d6e40bb3ab2d0a2991157f9f17abcf7",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 9),
+            ("research_claim", 13), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
+            ("transition", 8),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 32
+        )
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "metric:dc-stored-energy-discharge-pulse,metric,直流儲能與放電脈衝",
+            concepts,
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "800vdc_protection_layers.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+        self.assertIn("edge_id: KG-8PL-I16", graph)
+        self.assertIn(
+            "to_id: metric:dc-stored-energy-discharge-pulse", graph
+        )
+
     def test_800vdc_execution_route_separates_seven_facility_and_financial_gates(self):
         topic = (
             ROOT / "notes" / "research_topics"
