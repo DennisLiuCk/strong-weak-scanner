@@ -1,14 +1,15 @@
 # AI 機櫃 EMC 驗證知識圖譜
 
-本圖把元件抑制、設備排放／量測程序與完整機櫃實驗室能力分開。公司線只停在具名產品能力；
-沒有 test plan、qualification 與財務分母前，不把 EMI 元件或系統整合能力畫成 AI 機櫃受惠。
+本圖把元件抑制、設備排放／量測程序與完整機櫃實驗室能力分開，再以 TL、AL、量測不確定度、
+guard band 與事前判定規則固定邊界結果。公司線只停在具名產品能力；沒有 test plan、
+qualification 與財務分母前，不把 EMI 元件、量測能力或系統整合能力畫成 AI 機櫃受惠。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-rack-emc-certification
 root_node_id: concept:ai-rack-emc-certification
 label: AI 機櫃 EMC 驗證
-summary: 將局部雜訊抑制 設備合規程序與大型完整配置的可用測試容量拆成不同責任層，避免用元件規格替代整櫃資格。
+summary: 將局部雜訊抑制 設備合規程序 大型完整配置測試容量與TL AL 不確定度 guard band 判定規則拆成不同責任層，避免用元件規格或pass標籤替代整櫃資格與可重算風險配置。
 article_ids: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION
 status: active
 -->
@@ -311,4 +312,44 @@ review_due: 2026-08-31
 status: active
 boundary: scope 核對只確認指定地點 方法 產品與活動是否在認可範圍 不能把 NVLAP mark 讀成產品 certification approval endorsement 或大型設備 capacity。
 next_trigger: 具名 lab scope 與 AI rack report 對上實際地點 方法 產品類別及 accredited unaccredited data 標示。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-EMC-I15
+view: industry
+from_id: concept:ai-rack-emc-certification
+to_id: process:emc-boundary-decision-passport
+relation: includes
+claim_refs: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C15,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C16,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C17
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: limited_source
+exclusivity_scope: ILAC 認可指引與 NIST conformity-risk 研究是兩條獨立方法消息鏈 本圖據此整理七欄讀者契約 不是 AI rack 客戶規格 實驗室 SOP 或產品證書。
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 七欄護照是研究中心把既有九欄報告護照聚焦到邊界決策的工具 不替任何法域 客戶或 lab 指定 guard band 風險門檻或處置。
+next_trigger: 同一具名 rack 版本公開方法 TL y U coverage w AL decision category retest redesign schedule 與財務共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-EMC-I16
+view: industry
+from_id: concept:ai-rack-emc-certification
+to_id: metric:emc-guard-band-acceptance-limit
+relation: measured_by
+claim_refs: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C15,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C17
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 40.0 dBµV/m 38.5 dBµV/m U=3.0 dB 與 AL=37.0 都是假想教材 N=4量測值與N=4設定 沒有sampling SE t 頻率偵測器rack實驗室容量公司效果或投資結論。
+next_trigger: 具名 test report 與事前合約共同揭露 TL AL w U measured value binary或non-binary處置及重複結果 並能跨版本重算。
 -->

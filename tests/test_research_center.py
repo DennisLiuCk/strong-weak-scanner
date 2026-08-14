@@ -2068,6 +2068,66 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("**第三道是 measurement procedure 與責任。**", emc)
         self.assertNotIn("**第四道才是可用 capacity。**", emc)
 
+    def test_ai_rack_emc_guard_band_contract_separates_physics_metrology_and_rule(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-09_ai_rack_emc_certification.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 裕量不是保證：量測不確定度與判定規則要一起看",
+            "## 同一個 38.5，為什麼可以是 pass、conditional pass 或 fail",
+            "### 三條路都能變成 pass，發票卻可能落在不同地方",
+            "### 多空小作文要共用七欄 EMC 邊界判定護照",
+            "## 實驗室有認可標誌，為什麼仍不能替產品背書",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "reason: added_guard_band_decision_rule_and_two_lever_emc_boundary_example_without_thesis_or_clock_refresh",
+            "source_id: S12", "source_id: S13",
+            "claim_id: C15", "claim_id: C16", "claim_id: C17",
+            "**容許限制／規格限制（TL）**",
+            "**接受限制（AL）**", "**Guard band（w）**",
+            "**符合性聲明（statement of conformity）**",
+            "**偽接受／偽拒絕（false accept／false reject）**",
+            "AL=40.0－3.0=37.0 dBµV/m",
+            "| 38.5 dBµV/m | +1.5 dB | pass | fail | conditional pass |",
+            "| 40.5 dBµV/m | −0.5 dB | fail | fail | conditional fail |",
+            "| 排放路徑改善 2.0 dB | 36.5 | 3.0 | 3.0 | 37.0 | pass |",
+            "| 量測不確定度縮小 2.0 dB | 38.5 | 1.0 | 1.0 | 39.0 | pass |",
+            "| 只改成 simple acceptance | 38.5 | 3.0 | 0.0 | 40.0 | pass |",
+            "| 1. 被測物 |", "| 5. 不確定度 |", "| 7. 處置與經濟結果 |",
+            "N=4` 個量測值與 `N=4` 個決策設定",
+            "11e90a6be33eea150b000984320d9f673a327bc8879a2b46615d26734cfa450a",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 17), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 3),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "process:emc-boundary-decision-passport,process,EMC 邊界判定七欄護照",
+            "metric:emc-guard-band-acceptance-limit,metric,EMC guard band 與接受限制",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "ai_rack_emc_certification.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        for node in (
+            "to_id: process:emc-boundary-decision-passport",
+            "to_id: metric:emc-guard-band-acceptance-limit",
+        ):
+            self.assertIn(node, graph)
+
     def test_template_brings_existing_glossary_terms_to_each_reader_section(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (

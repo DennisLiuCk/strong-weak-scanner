@@ -74,6 +74,13 @@ to: triaged
 reason: expanded_large_eut_test_site_report_scope_uncertainty_contract
 evidence: sources:S8,S9,S10,S11
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_guard_band_decision_rule_and_two_lever_emc_boundary_example_without_thesis_or_clock_refresh
+evidence: sources:S9,S12,S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -99,6 +106,7 @@ evidence: sources:S8,S9,S10,S11
 - **FCC**：美國聯邦通信委員會；本文只使用其量測指引與合格測試機構資料入口，不替特定設備判定法律適用性。
 - **ANSI C63.4／C63.4a**：美國非刻意輻射器的量測方法版本；FCC 23-14 保留 2014 版並納入 2017 修訂作替代選項，不能因此推定所有 AI rack 都適用同一路徑。
 - **NIST／NVLAP**：NIST 是美國國家標準與技術研究院；NVLAP 是其實驗室認可計畫。本文引用其 Handbook 與 EMC 計畫頁檢查實驗室能力範圍，不把認可標誌當成產品認證。
+- **ILAC／ILAC G8**：ILAC 是國際實驗室認可合作組織；本文引用的 G8 是符合性聲明與判定規則指引，不是 AI 機櫃排放標準或產品證書。
 - **量測程序**：規定設備如何擺放、運作、接線及量測的步驟；換一套方法或配置，結果可能不能直接比較。
 - **實驗室認可／認可範圍（accreditation／accredited scope）**：認可是對實驗室能力的第三方確認，scope 則列出其特定地點可執行的產品、方法與測試；出現在機構名錄，不等於能測任何尺寸與功率的設備。
 - **大型被測設備／測試體積**：被測物的高度、寬度與旋轉時占用空間都可能改變可用場地、量測距離與程序；「設備放得進去」仍不等於場地與方法適用。
@@ -106,6 +114,13 @@ evidence: sources:S8,S9,S10,S11
 - **測試裕量（margin）**：在指定量測條件下，結果距離限制值還有多少空間；沒有同時列出限制值、偵測器、頻寬與不確定度，單看裕量不能判斷結果是否穩健。
 - **量測不確定度**：儀器、校正、場地、天線、接線與重複量測等誤差來源，合成後表示結果可能落在哪個合理範圍；它不是把不合格數字任意改成合格。
 - **判定規則**：結果靠近限制值時，預先約定如何把量測值與不確定度轉成通過、未通過或需重測的決定；不同規則可能讓同一數字有不同處置。
+- **容許限制／規格限制（TL）**：規格允許的上限或下限；本文的假想例只處理「越低越好」的單一上限，不能直接套到雙邊規格。
+- **接受限制（AL）**：判定規則真正拿來接受量測值的界線；它可以等於容許限制，也可以因 guard band 而比容許限制更保守。
+- **Guard band（w）**：容許限制與接受限制之間的間隔；對本文的單一上限例，`w＝TL－AL`。它是決策風險配置，不是元件自動多出的物理抑制量。
+- **符合性聲明（statement of conformity）**：把指定量測結果依指定規格與判定規則標成 pass、fail 或條件式結果；只寫一個 pass 而沒有適用結果與規則，資訊仍不完整。
+- **條件式通過／條件式未通過**：非二元規則用來標記落在 guard band 內的邊界結果，提醒使用者依事先約定處置；它不等於法規或客戶一定採用四分類。
+- **偽接受／偽拒絕（false accept／false reject）**：前者把實際不符合者判成可接受，後者把實際符合者判成不可接受；縮窄接受區通常會降低前者風險、提高後者與重測成本。
+- **dBµV/m**：常見的電場強度對數單位；本文只用它示範同一參考條件下的限制值與裕量相減，不把 dB 誤寫成百分比或功率效率。
 - **量測溯源**：用不中斷且有文件的校正鏈，把量測結果連回指定參考；有溯源不代表整台產品合格，卻是數字能否被信任與重現的基礎。
 - **測試報告護照**：本文把一份結果要隨身攜帶的配置、方法、場地、量測與認可資訊整理成九欄查核表；這是研究中心的閱讀工具，不是 FCC、NIST 或 IEC 聯合發布的正式表單。
 - **隔離測試室／旋轉台（chamber／turntable）**：隔離外界雜訊的測試空間與旋轉被測設備的平台；機櫃太大、太重時，實驗室硬體可能放不下或帶不動。
@@ -398,6 +413,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: ILAC G8:09/2019 把 guard band 定義為容許限制 TL 與接受限制 AL 的間隔 w，並區分 w=0 的 simple acceptance、帶 guard band 的二元 pass／fail，以及 pass／conditional pass／conditional fail／fail 的非二元聲明；同一量測結果可能因 guard band 不同而由接受變成拒絕，因此規格與判定規則應在量測前清楚定義、協議並於符合性聲明中可回查
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2019-09-04
+basis: S12 PDF 第 4–12 頁的 definitions、ISO/IEC 17025 條款摘錄、§4 guard bands／decision rules 與 §5.2 直接提供 w、TL、AL、simple／binary／non-binary 規則及事前協議與報告責任
+boundary: ILAC G8 是跨測試與校正情境的認可指引，不是 AI rack 排放限制、FCC／CISPR 法律適用判定、特定實驗室 SOP 或客戶規格；本文不能自行指定某 rack 必須採 w=U 或四分類
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: NIST 2014 的符合性評估研究摘要把量測不確定度評估稱為技術活動，把判定規則選擇稱為涉及成本的商業決策，並指出 acceptance zone 的 test limits 要在偽接受與偽拒絕兩類錯誤風險間取捨，而兩者相對後果取決於產品特定的經濟因素
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2014-04-01
+basis: S13 NIST 官方 publication page 的 abstract 直接區分 uncertainty evaluation、decision-rule selection、acceptance zone、false acceptance／rejection 與 product-specific economic factors
+boundary: 官方頁只提供該期刊論文摘要，不量化 AI rack 的偽接受、偽拒絕、重測、召回、延遲或元件成本，也不表示較嚴 guard band 永遠是最佳商業選擇
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 在本文單一上限 TL=40.0 dBµV/m、擴充不確定度 U=3.0 dB 且假想 guard band w=U 的固定教材中，AL=37.0；量測值 38.5 的 simple acceptance 結果為 pass、二元 guarded 結果為 fail、非二元 guarded 結果為 conditional pass。若同一規則下把量測值降至 36.5，或在量測值維持 38.5 時把 U 與 w 降至 1.0，二元 guarded 結果都轉成 pass，但前者是排放路徑改善、後者是量測能力改善；若只把規則改成 w=0，也會 pass，卻沒有改善物理排放或量測品質
+supporting_source_ids: S9,S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: Python Decimal 與獨立 awk 兩路均重算 TL、U、w、AL、四個量測值的裕量與三種分類，以及固定 38.5 時改變量測值、不確定度或規則的結果；所有顯示值與分類一致
+boundary: 這是 N=4 個假想量測值與 N=4 個假想決策設定的確定性算例，不是抽樣、EMC 實驗或任何法域／客戶規則；TL、U、w、量測值與改善幅度均為假想，沒有 sampling SE／t、頻率、偵測器、頻寬、rack 版本、元件需求、lab 產能、收入或公司效果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 整櫃驗證要過四關：零件、配置、量測與實驗室
 
 **第一道是元件與材料。** 共模扼流圈、濾波器、屏蔽結構、導電墊片、吸波材與 PCB 佈局，
@@ -491,6 +557,69 @@ NIST 明確禁止把 NVLAP mark 說成產品認證、核准或背書。少了這
 因此，看到「低於限制值」仍要問判定規則。報告是否直接以量測值判定、是否在靠近界線時納入
 不確定度、何時要求重測或標示風險，都應在測試前固定並在報告中可回查。本文不自行替 FCC、
 IEC、實驗室或客戶發明 guard band，也不拿不同方法下的裕量做公司或機櫃排行。
+
+## 同一個 38.5，為什麼可以是 pass、conditional pass 或 fail
+
+ILAC G8 補上了「判定規則」這一層：容許限制 `TL` 是規格邊界，接受限制 `AL` 才是量測結果
+進入接受區的界線，兩者之差是 guard band `w`。`w=0` 時，`AL=TL`；若事先約定 `w=U`，
+接受區就會因擴充不確定度而縮窄。這不是把同一台機櫃的電磁排放改小，而是先說清楚靠近邊界
+時由誰承擔偽接受與偽拒絕風險。
+
+以下只是一組可重算的假想教材：單一上限 `TL=40.0 dBµV/m`、擴充不確定度 `U=3.0 dB`，
+並在 guarded 規則中假設 `w=U`，所以 `AL=40.0－3.0=37.0 dBµV/m`。四個量測值刻意避開
+邊界點，避免把等號處理混進主要觀念。
+
+| 假想量測值 y | 裕量 TL－y | Simple acceptance（w=0） | 二元 guarded（w=U） | 非二元 guarded（w=U） |
+|---:|---:|---|---|---|
+| 36.5 dBµV/m | +3.5 dB | pass | pass | pass |
+| 38.5 dBµV/m | +1.5 dB | pass | fail | conditional pass |
+| 40.5 dBµV/m | −0.5 dB | fail | fail | conditional fail |
+| 43.5 dBµV/m | −3.5 dB | fail | fail | fail |
+
+38.5 並沒有同時「真的通過」又「真的失敗」。三欄回答的是三份不同決策合約：simple 規則只看
+量測值是否低於 40.0；二元 guarded 規則要求低於 37.0；非二元規則則把 37.0 到 40.0 留在
+conditional pass。ILAC 明確提醒，同一結果使用不同 guard band 可能由接受變成拒絕，所以規則
+應在量測前協議。報告若只留下 pass，不留下 TL、AL、U、w 與規則名稱，讀者無法重建判定。
+
+### 三條路都能變成 pass，發票卻可能落在不同地方
+
+再固定基準為 `y=38.5、U=3.0、w=U、AL=37.0`。下表讓三條路各只改一個核心條件；它們最後
+都可能顯示 pass，產業含義卻完全不同。
+
+| 假想路徑 | y | U | w | AL | 二元結果 | 真正改變的是什麼 | 不能直接寫成 |
+|---|---:|---:|---:|---:|---|---|---|
+| 基準 | 38.5 | 3.0 | 3.0 | 37.0 | fail | 無 | 已確認設計失敗或必須重測 |
+| 排放路徑改善 2.0 dB | 36.5 | 3.0 | 3.0 | 37.0 | pass | 假想量測值降低；可能來自佈局、接地、纜線、屏蔽或濾波改變 | 某一顆元件獨占改善，或公司已取得訂單 |
+| 量測不確定度縮小 2.0 dB | 38.5 | 1.0 | 1.0 | 39.0 | pass | 假想 U 與隨之設定的 w 縮小；物理量測值不變 | 排放變小、產品重新設計，或所有場地都能複現 |
+| 只改成 simple acceptance | 38.5 | 3.0 | 0.0 | 40.0 | pass | 風險配置與接受規則改變；排放與量測能力都不變 | 工程品質提升，或原 guarded 規則「太嚴」 |
+
+這張表也解釋為什麼「EMC 更難」不會自動只利多被動元件。若瓶頸是物理排放，價值可能落在
+濾波、屏蔽、板級佈局、接地、纜線或整櫃重設計；若瓶頸是不確定度，價值可能落在場地、儀器、
+校正、軟體與重複量測能力；若只有判定規則改變，甚至沒有任何硬體內容增加。三條路要用同一
+rack 版本與同一測試合約逐項排除，不能只從最後的 pass 倒推受惠者。
+
+### 多空小作文要共用七欄 EMC 邊界判定護照
+
+| 護照欄位 | 至少要留下什麼 | 多方必須證明 | 空方必須證明 |
+|---|---|---|---|
+| 1. 被測物 | rack、sidecar、纜線、韌體、負載與版本 | 新配置確實讓更多結果靠近邊界 | 既有報告或模組結果可在相同配置沿用 |
+| 2. 方法參考面 | 標準版次、頻率、偵測器、頻寬、距離與場地 | 需求增加不是換方法或換參考面造成 | 可比條件固定後沒有系統性惡化 |
+| 3. 規格限制 | TL、法域／客戶來源及適用類別 | 真正適用的限制收緊或新平台進入範圍 | 限制未變，或原說法混用了不同類別 |
+| 4. 量測結果 | y、裕量、重複結果與原始報告鍵 | 近界線／超界結果在具名版本重複出現 | 問題只是一筆異常，修正後不再重現 |
+| 5. 不確定度 | U、coverage、主要分量、校正與場地證據 | 現有能力無法把 U 降到決策需求 | 改善量測流程即可縮小 U，不需擴大硬體內容 |
+| 6. 判定規則 | w、AL、二元／非二元分類、事前協議與變更紀錄 | 較嚴規則實際提高 conditional／fail／重測量 | 規則沒有改，或較嚴處置未形成新增工作 |
+| 7. 處置與經濟結果 | 重測、重設計、排程、等待、容量、訂單與財務分母 | 既有工程／lab 容量不足並形成可辨識增量 | 既有容量吸收、時程未延長且無新增財務足跡 |
+
+**偏多鏈**要從同一客戶／平台規則，走到具名版本邊界結果增加、重測或重設計量上升、既有工程與
+實驗室容量不足，最後才到新增元件、服務、設備或收入。**偏空鏈**則要證明同一合約下 U 可下降、
+排放路徑可由既有設計修正、模組證書可沿用，或既有容量足以吸收處置。雙方都不能用「pass 家數」
+或單一最大裕量代替七欄分母。
+
+這組算例是固定十進位輸入的確定性換算，Python Decimal 與獨立 awk 對 TL、U、w、AL、四個
+量測值的三種分類及三條改變路徑得到完全相同結果。`N=4` 個量測值與 `N=4` 個決策設定都只是
+假想情境，不是量產樣本，因此沒有 sampling SE 或 t；也沒有頻率、偵測器、頻寬、實際 rack、
+實驗室等待時間、元件用量、營收、毛利或投資效果。ILAC 與 NIST 建立的是方法與風險語言，
+不是特定 AI 機櫃的 pass/fail 證據。
 
 ## 實驗室有認可標誌，為什麼仍不能替產品背書
 
@@ -692,6 +821,38 @@ locator: 2026-08-12 觀察頁面更新日 2025-01-16、Program Description、Acc
 limitation: 動態計畫頁只描述 specific areas、quality assurance 與現行 PT／ILC 政策；不證明任何 lab scope、capacity、report quality、跨 lab 一致性或產品結果
 -->
 
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: document
+publisher: International Laboratory Accreditation Cooperation
+independence_group: ilac-accreditation
+title: ILAC-G8:09/2019 — Guidelines on Decision Rules and Statements of Conformity
+published_at: 2019-09-04
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://ilac.org/?ddownload=122722
+locator: PDF 第 4–13 頁；definitions、ISO/IEC 17025 conformity 條款摘錄、§4 guard bands／binary／non-binary decision rules、§5 uncertainty 與 §6 risk trade-off；原檔 SHA-256 11e90a6be33eea150b000984320d9f673a327bc8879a2b46615d26734cfa450a
+limitation: 跨領域實驗室認可指引，不是 AI rack 排放標準、法規適用意見、特定客戶 decision rule 或具名產品結果；PDF 第 3–13 頁渲染核對，檔案與頁圖只留 tmp、不進版控
+-->
+
+<!-- research_source
+source_id: S13
+role: other_primary
+source_kind: document
+publisher: National Institute of Standards and Technology
+independence_group: us-nist-conformity-metrology
+title: Assessment of Conformity, Decision Rules and Risk Analysis
+published_at: 2014-04-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.nist.gov/publications/assessment-conformity-decision-rules-and-risk-analysis
+locator: NIST 官方 publication page 的 author、published date 與 abstract；uncertainty evaluation、decision-rule business choice、acceptance zone、false accept／reject 與 product-specific economic factors
+limitation: 官方頁只提供期刊論文摘要，沒有 AI rack 量測值、風險分布、guard band、重測量、lab capacity、元件用量、公司訂單或財務效果
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -776,6 +937,8 @@ invalidation: 主管機關或認可機構若正式說明更小的欄位集即可
 - FCC 對大型設備新增替代距離與測試體積，不代表所有 AI rack 都適用該條款，更不證明大型 chamber 或時槽稀缺。
 - 一份報告缺少九欄中的部分資料，只能標成不可比較；九欄護照本身也不是官方標準、法律意見或產品合格證。
 - 測試裕量沒有搭配方法、偵測器、頻寬、不確定度與判定規則時，不能被讀成跨版本安全餘裕或通用 guard band。
+- 同一量測值在 simple、binary guarded 與 non-binary guarded 規則下可有不同處置；不能只比較 pass 家數，也不能把本文 40.0／38.5／3.0 的假想算例改寫成任何 AI rack 的正式限制或結果。
+- 量測值下降、不確定度縮小與接受規則改變都可能讓最後標籤轉成 pass，但三者分別對應物理路徑、量測能力與風險配置；沒有七欄護照前不能倒推出元件、實驗室或 ODM 受惠。
 - 實驗室有 NVLAP 或其他認可標誌，只能回到指定 scope、地點與活動查核，不能說產品獲得 NIST／NVLAP certification、approval 或 endorsement。
 - 元件規格、吸波材料產品頁、模擬、正式送驗前測試或子系統證書，都不能冒充完整機櫃的最終測試結果。
 - 國巨的通用抑制材料能力與廣義 AI 成長敘述，沒有共同產品、客戶或資格驗證，不能拼成 AI 機櫃訂單。
