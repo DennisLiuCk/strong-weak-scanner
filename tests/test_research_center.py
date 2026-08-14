@@ -7942,8 +7942,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 29),
-            ("research_claim", 31), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 30),
+            ("research_claim", 35), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -8023,8 +8023,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 29),
-            ("research_claim", 31), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 30),
+            ("research_claim", 35), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -8071,8 +8071,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 29),
-            ("research_claim", 31), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 30),
+            ("research_claim", 35), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -8082,6 +8082,56 @@ class ResearchCenterTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn(
             "scan-2026-08-14-delta-overlapping-denominators-and-cash-capex-bridges",
+            scans,
+        )
+
+    def test_missed_priority_q2_powertech_separates_dual_marginals_hbm_gates_and_capital_clocks(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-31_missed_priority_q2_disclosures.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: added_powertech_q2_dual_marginal_mix_hbm_evidence_gates_and_cash_capex_bridges_without_refreshing_thesis_clock",
+            "## 兩張 100% 圓餅不能相乘：力成 231.16 億元與 HBM2 的五道證據門",
+            "| 封裝加工 | 153.14 億元／66.25% | Logic | 41% |",
+            "| 測試加工 | 53.72 億元／23.24% | NAND | 29% |",
+            "231.16 億元×66.25%×19% 算成 29.10 億元",
+            "0 到 43.92 億元的最寬代數界線",
+            "| 1. 產業需求 |",
+            "| 3. 客戶資格 |",
+            "| 5. 收入與現金 |",
+            "封裝與測試合計創造 94.69% 的營收增量",
+            "| 毛利率 | 19.44% | 21.76% | ＋2.32 個百分點 |",
+            "| 營業利益率 | 12.95% | 15.27% | ＋2.32 個百分點 |",
+            "營業利益增加 7.70 億元，業外淨額卻減少 2.66 億元",
+            "| 簡單現金差 | 負 24.45 | 正 13.28 |",
+            "分別占當季 PP&E 增添 97.35% 與 91.73%",
+            "簡單現金差由負 24.45 億元改善為正 13.28 億元",
+            "四項淨效果為負 7.57 億元",
+            "真正服務×產品×技術×客戶×訂單×收入×毛利×收現共同觀測 N＝0",
+            "Python Decimal 與獨立 awk",
+            "source_id: S30",
+            "0fdf9f373bde7e7d6659bbd234596fa59ee7ea37b0a1a16a5d24e0665df6d439",
+            "ad220e9985ca5b1d21b2b299603f9139b7be1c5164ce94b81ee48de32d3a950e",
+            "a3fecadec18d7b3657fbbc1c5b046761e7344fd3f44a1de12617394d1e29e4b7",
+            "claim_id: C32\nlabel: verified\nstatus: active",
+            "claim_id: C33\nlabel: verified\nstatus: active",
+            "claim_id: C34\nlabel: verified\nstatus: active",
+            "claim_id: C35\nlabel: inference\nstatus: active",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 30),
+            ("research_claim", 35), ("metric_comparison", 12),
+            ("impact", 6), ("monitoring_item", 12),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        scans = (
+            ROOT / "notes" / "research_topics" / "scan_log.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "scan-2026-08-14-powertech-hbm-evidence-gates-and-capital-clocks",
             scans,
         )
 
