@@ -7942,8 +7942,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 24),
-            ("research_claim", 23), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 26),
+            ("research_claim", 27), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -7988,6 +7988,46 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C23\nlabel: inference\nstatus: active",
         ):
             self.assertIn(contract, topic)
+
+    def test_missed_priority_q2_globalwafers_separates_operating_valuation_cash_and_event_clocks(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-31_missed_priority_q2_disclosures.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: added_globalwafers_q2_operating_valuation_cash_capacity_and_subsequent_event_bridges_without_refreshing_thesis_clock",
+            "## 淨利季增 99.3%，為什麼不能叫晶圓漲價：環球晶三個日期、四本帳",
+            "| 7 月 21 日事件日 |",
+            "| 營業利益 | 14.75 | 14.23 | −0.53 |",
+            "營業利益季減 0.53 億元，業外淨額季增 22.91 億元",
+            "占 Q2 稅前淨利 66.21%",
+            "股份連結選擇權公允價值再衡量損失",
+            "加回選擇權損失後的其餘 FVTPL 機械殘差",
+            "FVTPL 增量占「其他利益及損失」增量 93.22%",
+            "營業現金流為 21.39 億元",
+            "負 0.63 億元",
+            "未完工程及待驗設備轉出 | 418.47",
+            "總折舊 | 24.08",
+            "模擬毛利率 32.4%、營益率 22.6%",
+            "真正產品×晶圓尺寸×廠區×客戶×數量×ASP×利用率×毛利×收現共同觀測 N＝0",
+            "Python Decimal 與獨立 awk",
+            "source_id: S25",
+            "source_id: S26",
+            "SHA-256 30375d8441d746efdb292d41a9354b102bdbbd96a6495dcecf36f477218793ac",
+            "SHA-256 8b23bb27baa389809c0fb27c63fec020cf6af4cb30d302e30a7afae25c3b2819",
+            "公司簡報為 85e1889eb3fabdab34c072b838a543fc7c46f02b946db76e1af171ab54fd0380",
+            "claim_id: C24\nlabel: verified\nstatus: active",
+            "claim_id: C25\nlabel: verified\nstatus: active",
+            "claim_id: C26\nlabel: inference\nstatus: active",
+            "claim_id: C27\nlabel: inference\nstatus: active",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 26),
+            ("research_claim", 27), ("metric_comparison", 12),
+            ("impact", 6), ("monitoring_item", 12),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
     def test_yageo_q2_reconciles_fcf_ifrs_cash_and_management_cash(self):
         topic = (
