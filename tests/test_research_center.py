@@ -7817,8 +7817,54 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 27),
-            ("research_claim", 19), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 29),
+            ("research_claim", 23), ("metric_comparison", 0),
+            ("impact", 7), ("monitoring_item", 10),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+    def test_priority_q2_tong_hsing_separates_product_application_and_capex_clocks(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-29_priority_q2_disclosures.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: tong_hsing_product_application_capex_clock_bridge_added_without_refreshing_thesis_clock",
+            "## 同一個 11.8%，其實是五個收入池在拉扯：同欣電產品、應用與擴產時鐘",
+            "| 影像產品 | 1,391.322 | 1,615.531 | +224.209 | 67.2% |",
+            "| 陶瓷電路板 | 521.287 | 602.603 | +81.316 | 24.4% |",
+            "| 高頻無線通訊模組 | 348.336 | 407.159 | +58.823 | 17.6% |",
+            "| 混合積體電路模組 | 546.587 | 505.265 | −41.322 | −12.4% |",
+            "| 合併營收 | 2,819.237 | 3,152.964 | +333.727 | 100.0% |",
+            "### 產品、應用與客戶是三張不同的表",
+            "車用 60%、工業 15%、通訊 13%、手機 8%、醫療 3%",
+            "45.898%",
+            "產品×應用×客戶交叉表",
+            "### 毛利可以做數學橋，不能做產品因果橋",
+            "| 若新增營收沿用 Q1 毛利率 | +93.344 |",
+            "| Q2 合併毛利率變動殘差 | +98.353 |",
+            "### 擴產至少有五個不同時鐘",
+            "菲律賓廠房工程合約 613.576 百萬元",
+            "尚未到期工程款 490.127 百萬元",
+            "未完工程及待驗設備增置 256.521 百萬元",
+            "購置不動產、廠房及設備付現 396.638 百萬元",
+            "存貨半年增加 288.524 百萬元",
+            "### 多空小作文要共用同一張裁決表",
+            "真正的產品×應用×客戶×毛利共同觀測 N＝0",
+            "Python Decimal 與獨立 awk",
+            "a7a8a414f79098a5af8cef8ec8eb23805ed68b57b64eaaec6c8c4135d7e8c81f",
+            "b169afa31c1884c21d33b29602b3a09bb5dfc863595d058f192e57a00eb4e638",
+            "source_id: S28",
+            "source_id: S29",
+            "claim_id: C20",
+            "claim_id: C21",
+            "claim_id: C22",
+            "claim_id: C23",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 29),
+            ("research_claim", 23), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
