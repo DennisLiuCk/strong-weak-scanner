@@ -237,6 +237,38 @@ limitation: 平台索引與夥伴名單只能用來發現新文件；不能證�
 independence_group: nvidia
 -->
 
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Open Data center Spec Version 0.5.0
+published_at: 2026-02-25
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/documents/open-data-center-spec-version-0-5-0-pdf
+locator: 官方 26 頁 PDF p.9 的 power architecture 表；同頁分列 4 feeds with independent UPS／3+1 與 2N connection，並分別列出 750kW／1MW minimum row-level power 及約 6MW／12MW minimum data-hall power；已由瀏覽器 PDF viewer 逐頁目視核對
+limitation: 這是 OCP Next-Generation ML Infrastructure Design Principles 的特定設計表，不是 N+1、3+1、2N 或 critical IT capacity 的跨場站通用定義，也不是 as-built 單線圖、故障測試、實際負載、能源效率或客戶驗收結果；官方端點對命令列直取回應 403，故本輪不宣稱本地檔案 SHA
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S15
+role: regulator_or_policy
+source_kind: document
+publisher: U.S. Department of Energy Federal Energy Management Program
+title: Best Practices Guide for Energy-Efficient Data Center Design
+published_at: 2024-07-26
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf
+locator: 官方 48 頁 PDF，SHA-256 f4db5c015154933482e84f1946dcafc297d8ad526db90d2985df35232d8ab0c2；PDF p.38（印刷 p.29）§8.1 定義 PUE 為年度 total facility energy／IT equipment energy，說明單位為 annual kWh、只衡量 supporting infrastructure efficiency；實際引用頁及前後頁 PDF pp.37–39 已逐頁渲染核對
+limitation: DOE 文件提供年度能源計量方法與邊界，不提供任一 800VDC 場站的 installed capacity、critical IT capacity、冗餘拓撲、瞬時 peak power、IT 工作產出、commissioning、成本或財務結果；本文教材的 PUE 1.25 不是 DOE 建議值
+independence_group: us-doe-femp
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -443,6 +475,48 @@ corrects_claim_id: C4
 corrected_by_claim_id:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: OCP Open Data center Spec v0.5.0 的同一 power-architecture 表把 4 路獨立 UPS 支援的 3+1 與另一欄 2N connection 分開，並分別列出每列最低 750kW／1MW 及資料廳最低約 6MW／12MW 的設計數值
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-02-25
+basis: S14 PDF p.9 的表格逐欄直接列出 feed redundancy、row-level power、facility-to-load architecture 與 minimum data-hall power
+boundary: 這只證實一份 OCP 設計文件中的兩欄條件與數值，不定義所有場站的 N、N+1、3+1 或 2N，也不能從 12MW headline 判定 installed、fault-tolerant critical、實際 IT 負載、能源或已部署容量
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: DOE FEMP 2024 指南把 PUE 定義為資料中心年度 total facility energy 除以年度 IT equipment energy，使用 annual kWh，並明示 PUE 只描述 supporting infrastructure efficiency、不是整座資料中心的 overall efficiency
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2024-07-26
+basis: S15 PDF p.38（印刷 p.29）§8.1 直接給出公式、年度量測理由與適用邊界
+boundary: 年度能源比不能單獨推出瞬時 facility input、peak demand、installed capacity、critical IT capacity、N+1／2N 拓撲、IT 工作效率或商業利用率；不同 meter boundary 與期間的 PUE 也不能直接比較
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 場站容量判讀應把 installed／nameplate capacity、設計故障後仍可承載的 critical IT capacity、實際 IT load，以及期間 facility／IT energy 與 PUE 分成四本帳；本文固定 200kW 模組時，假想 5+1 N+1 的 installed／critical 為 1.2／1.0MW，假想雙完整路徑 2N 為 2.0／1.0MW，同為 0.8MW 期間平均 IT load 時 critical utilization 都是 80%，但 installed utilization 分別為 66.7%／40%；另以 365 天 IT energy 7,008MWh、facility energy 8,760MWh 得 PUE 1.25 與 supporting energy 1,752MWh，直接用 installed÷PUE 卻得到 0.96／1.60MW，兩者都不是 1.0MW critical capacity
+supporting_source_ids: S7,S14,S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S7／S14 顯示 facility transition 與 redundancy 必須連同特定 topology／design basis 閱讀，S15 固定年度能源分子分母；Python Fraction 與獨立 awk 均重算容量、兩種 utilization、annual energy、PUE、supporting energy 及錯誤 installed÷PUE 結果
+boundary: 這是 N=2 個假想冗餘設計加 N=1 個假想 365 天 meter case 的確定性教材，不是抽樣、OCP reference design、DOE benchmark 或 800VDC 場站測試；200kW、5+1、雙路 2N、0.8MW、1.25 與 8,760 小時均非標準預設，沒有 sampling SE／t、peak distribution、derating、維修併發、故障率、PUE 實測、IT work、rack、site、客戶、部署、收入或公司效果
+verification_needed: 同一具名場站與版本的 single-line diagram、reference boundary、N 的負載定義、模組 rating／derating、設計故障與維修情境、installed／critical capacity、同步 IT／non-IT power trace、meter map、PUE 期間與原始能源讀數、commissioning pass／fail、可用工作量及財務共同鍵
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -510,6 +584,13 @@ to: triaged
 reason: superseded_demo_to_validation_thesis_with_seven_gate_execution_readiness_framework
 evidence: sources:S7,S8,S9,S10,S11
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: separated_installed_critical_actual_load_and_annual_pue_ledgers_without_thesis_or_clock_refresh
+evidence: sources:S7,S14,S15
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -527,6 +608,15 @@ evidence: sources:S7,S8,S9,S10,S11
 - **SST（固態變壓器）**：用功率半導體、磁性元件與數位控制轉換電壓的系統。它可能減少轉換級數，但仍要通過保護、冗餘、熱、控制與場站測試。
 - **Interoperability（互通）**：不同供應商設備在同一電壓範圍、保護邏輯與控制契約下可共同運作；插頭接得上只是起點。
 - **Redundancy（冗餘）**：某一路設備故障或維修時，其他路徑仍能維持服務。改成 DC 後，既有 UPS maintenance bypass 不一定能原樣沿用。
+- **N／N+1／2N**：N 是承擔指定設計負載所需的設備或路徑；N+1 多一個指定單元，2N 則有兩套可各自承擔該負載的完整路徑。字母只在故障、維修與 reference boundary 都說清楚後才有容量意義。
+- **Installed／nameplate capacity（裝置／銘牌容量）**：把已安裝設備在指定額定條件下的容量加總；它包含備援與待命路徑，不等於故障後仍可承載的 IT 負載。
+- **Critical IT capacity（關鍵 IT 可承載容量）**：在明列的設計故障、維修、降額與環境條件下，場站仍承諾供給 IT 的容量；它不是把全部銘牌 MW 相加。
+- **Actual IT load（實際 IT 負載）**：IT 設備在指定時刻或期間真正取用的功率。平均、峰值與百分位是不同時間口徑，不能只寫一個 MW。
+- **kW／MW 與 kWh／MWh**：前者是某時刻或短窗口的功率，後者是功率隨時間累積的能源；容量比較不能把 MW 與年度 MWh 混成同一分母。
+- **PUE（Power Usage Effectiveness）**：同一 meter boundary 與期間內，total facility energy 除以 IT equipment energy；年度 PUE 是能源比，不是 installed MW 的折減係數，也不是 IT 工作效率。
+- **DOE FEMP**：美國能源部 Federal Energy Management Program；本文引用其資料中心節能設計指南來固定 PUE 的年度能源口徑，不把政府指南當成 800V 場站驗收。
+- **Open Data center Spec v0.5.0**：OCP 的 Next-Generation ML Infrastructure Design Principles 文件版本；本文只引用 p.9 的特定設計表，版本號不表示所有資料中心都採同一拓撲。
+- **Sampling SE／t**：用來表達抽樣點估計誤差與相對零值強度的統計量；本文是假想拓撲的確定性算術，沒有可估的抽樣 SE 或 t 值。
 - **Commissioning（場站試運轉／驗收）**：設備安裝完成後，以實際接線、控制、保護、負載與異常情境確認整個場站可安全運作。
 - **AHJ（主管機關）**：對當地電氣、消防與建築安全具有核准權的機關或人員；平台商的技術資格不能取代 AHJ 核准。
 - **MOU（合作備忘錄）**：記錄合作方向與預期範圍，通常比產品展示更接近商業執行，但仍不等於具約束力訂單、完成部署或收入。
@@ -548,6 +638,7 @@ evidence: sources:S7,S8,S9,S10,S11
 ### 接下來怎麼追
 
 - 追 OCP 是否把白皮書推進成固定版本的 voltage band、interoperability、redundancy、protection 與 commissioning 契約。
+- 追具名場站是否把 installed／critical／actual load 與年度 PUE 分成四本帳，公開 single-line、失效假設、同步功率序列與 meter boundary。
 - 追平台或客戶是否公布同一場站的子系統資格、現場驗收、部署容量、故障／維修結果與正式量產日期。
 - 追台達電的 MOU 是否轉為實際部署與出貨，並追光寶科是否揭露 800V 驗證結果；兩家公司都要再對上收入與毛利分母。
 
@@ -605,6 +696,98 @@ commercialization，但都沒有穿過第 6、7 關。因此 2026 仍較像 exec
 位置、電壓範圍、保護、能量儲存或維修程序不同而需要重新驗收；Stage 3 也不天然比 hybrid
 方案更適合每一座既有場站。
 
+## 同樣寫 1MW，為什麼 installed、critical、actual 與 PUE 是四本帳
+
+場站新聞常把「裝了多少 MW」、「故障後能供多少 MW」、「現在用了多少 MW」和「一年用了多少
+MWh」塞進同一段。它們其實回答四個不同問題：installed／nameplate capacity 是設備加總，
+critical IT capacity 是在指定失效情境下仍可承載的 IT 容量，actual IT load 是某時刻或期間真的
+取用多少，PUE 則是同一期間兩顆能源表的比值。任何一項都不能只靠另一項換算。
+
+OCP Open Data center Spec v0.5.0 提供一個很實用的反例：同一張表把 4 路獨立 UPS 的 3+1 與
+另一欄 2N connection 分開，row-level minimum 分別寫 750kW 與 1MW，minimum data-hall power
+又分別寫約 6MW 與 12MW。[S14] 這只能說明該設計表的兩欄條件不同；它不是「2N 一律等於
+12MW」的定義，更不能告訴讀者 12MW 是設備銘牌加總、故障後承載量、實際負載或已部署容量。
+
+### 先固定失效情境，再算 installed 與 critical
+
+以下固定每個模組 200kW，不考慮降額、共因故障與同時維修，只用 N=2 個純假想拓撲教分母：
+
+- **5+1 的 N+1：**承擔設計負載需要 5 個模組，另裝 1 個備援；假設任一模組不可用時，剩下 5 個仍可供電。
+- **雙完整路徑的 2N：**A、B 各有 5 個模組，每一路都能獨立承擔設計負載；假設其中一整條路徑不可用。
+
+| 四本帳中的容量項 | 假想 5+1 N+1 | 假想雙路 2N | 正確讀法 |
+|---|---:|---:|---|
+| Installed／nameplate | 6×200 = 1.20MW | 2×5×200 = 2.00MW | 實際裝了多少額定設備，含備援 |
+| Critical IT capacity | 5×200 = 1.00MW | 1×5×200 = 1.00MW | 指定單元／整路失效後仍能承載多少 |
+| 期間平均 actual IT load | 0.80MW | 0.80MW | 這一期間 IT 真正平均取用多少；不是 peak |
+| Actual ÷ critical | 0.80÷1.00 = 80.0% | 0.80÷1.00 = 80.0% | 對可承載 IT 容量的平均使用比 |
+| Actual ÷ installed | 0.80÷1.20 = 66.7% | 0.80÷2.00 = 40.0% | 對全部銘牌設備的平均使用比；分母含不同備援量 |
+
+所以「2N 裝了 2MW」不表示它能在設計失效後額外承載 2MW IT；這個例子裡，它和 N+1 都只
+承諾 1MW critical capacity。反過來，兩案都有 80% critical utilization，也不表示設備利用率
+相同：若分母改成 installed，數字立刻變成 66.7% 與 40.0%。比較利用率前必須先問分母。
+
+### PUE 是年度能源比，不是容量折扣
+
+DOE FEMP 的 2024 指南把 PUE 定義為年度 total facility energy 除以年度 IT equipment energy，
+並明說它只衡量 supporting infrastructure efficiency，不是整座資料中心的 overall efficiency；
+年度量測能納入 cooling 條件與動態 IT load 的變化。[S15] 因此 PUE 需要 kWh／MWh 能源表與
+共同期間，不能直接拿銘牌 MW 相除。
+
+另設 N=1 個純假想 365 天 meter case：期間平均 IT load 為 0.80MW、平均 total facility
+power 為 1.00MW，兩顆表完整涵蓋同一 8,760 小時：
+
+```text
+IT energy          = 0.80MW × 8,760h = 7,008MWh
+Facility energy    = 1.00MW × 8,760h = 8,760MWh
+Supporting energy  = 8,760 − 7,008   = 1,752MWh
+PUE                = 8,760 ÷ 7,008   = 1.25
+```
+
+1,752MWh 相當於 IT energy 的 25.0%，卻只占 total facility energy 的 20.0%；連「支援耗能
+占比」都要先說分母。更重要的是，若誤把 PUE 當容量折扣，前述 N+1 的 1.20÷1.25 會得到
+0.96MW，2N 的 2.00÷1.25 會得到 1.60MW；兩個答案都不是已由拓撲與失效假設算出的
+1.00MW critical capacity。這個反例直接證明 installed MW ÷ PUE 沒有 critical-capacity 語意。
+
+年度 PUE 也不提供瞬時 peak facility input、哪一條備援路徑在線、IT 做了多少有效工作，或
+同一小時的 cooling 與 compute 關係。要回答那些問題，還要同步功率序列、meter map、工作量、
+環境與故障狀態；不能把一個年度 ratio 當成全場站數位分身。
+
+Python Fraction 與獨立 awk 浮點路徑均重算出 N+1／2N 的 installed utilization
+66.666667%／40.000000%、critical utilization 均為 80.000000%，年度 IT／facility／supporting
+energy 為 7,008／8,760／1,752MWh、PUE 1.250000，以及錯誤的 installed÷PUE
+0.960000／1.600000MW。這是固定整數與有理數的確定性展開，不是兩座場站實驗或抽樣估計，
+沒有 sampling SE／t、peak distribution、derating、maintenance overlap、failure rate、IT work、
+commissioning、成本或財務效果。
+
+### 多空小作文要共用十欄設施容量—能源護照
+
+| 十欄設施容量—能源護照 | 至少保存什麼 | 少了最容易被誤寫成 |
+|---|---|---|
+| 1. 場站、版本與 reference boundary | site／data hall／row／rack、single-line revision、容量從哪個輸入端算到哪個 IT 端 | 不同邊界的 MW 可以相加 |
+| 2. 單位與時間口徑 | kW／MW、kWh／MWh、瞬時／平均／peak／percentile、期間起訖與時區 | 年度 MWh 就是可承載 MW |
+| 3. Topology 與 N 定義 | N+1／3+1／2N、N 代表模組／feed／UPS／generator／path，正常如何分攤負載 | 寫了 2N 就知道容量 |
+| 4. 失效與維修假設 | 單模組、整路、共因、同時維修、切換時間、允許中斷與 safe state | 冗餘銘牌自動等於可用容量 |
+| 5. Rating 與 derating | 每模組額定、溫度／海拔／功率因數／老化降額、可用數量與變更控制 | Datasheet maximum 可全時加總 |
+| 6. Installed／nameplate capacity | 逐設備加總、在役／待命／未啟用狀態及計算式 | 公告 MW 已可供客戶使用 |
+| 7. Critical IT capacity | 指定失效與維修情境後仍能送到 IT reference point 的容量及 pass／fail | Installed、contracted 與 critical 是同一數 |
+| 8. Actual IT load | 同步原始功率序列、平均／peak／percentile、負載品質、IT 工作量與可用性 | 一次 peak 或平均值就是利用率全貌 |
+| 9. Facility energy 與 PUE | facility／IT meter IDs、涵蓋設備、校正、缺值、同一期間能源分子分母及不確定度 | PUE 可把 MW 換成 critical capacity |
+| 10. 驗收與商業交接 | fault／maintenance commissioning、客戶 acceptance、運行時數、可服務工作量、計費、收入與成本共同鍵 | 工程設計容量已等於部署與獲利 |
+
+**多方小作文可以寫到哪裡：** 若同一 as-built 版本在設計故障與維修情境下反覆維持明列的
+critical IT capacity，實際 load distribution 有合理餘量，年度 meter data 又顯示 PUE 與 supporting
+energy 改善，且 commissioning、可服務工作量、客戶 acceptance 與供應商出貨財務都能用共同鍵
+對上，才可說容量、效率與商業交付正在同時成熟。
+
+**空方小作文可以寫到哪裡：** 若新聞只給「12MW、2N、PUE 1.2」三個 headline，沒有 reference
+boundary、N 定義、installed／critical bridge、實際 load trace、meter map 與 fault test，數字可能
+分別來自設備銘牌、設計上限與另一期間的能源比；即使每個數字各自正確，拼在一起仍可能是錯的。
+
+兩方必須共用同一份護照。正的容量裕量與低 PUE 仍只回答場站工程的一部分；沒有 IT 工作分母、
+deployment、availability、計費、收入與毛利共同鍵，不能把 MW 或 PUE 改寫成台達、光寶、朋程
+或任何台灣公司的可辨識財務受惠。
+
 ## 為什麼子系統通過，還不等於場站穩定
 
 NVIDIA BESS 指引是一個很好的邊界教材：它要求供應商交測試與模型資料，但明確把 site
@@ -640,14 +823,17 @@ transformer、switchgear、relay、generator 與 campus control 排除在 BESS q
 - [onsemi：SST early commercialization 與 800V evaluation](https://www.onsemi.com/company/newsroom/featured-stories/data-center/the-emerging-way-to-conquer-power-challenges-in-ai-data-centers)（2026-07-14）。
 - [台達電／X LABS SST 與 800VDC MOU](https://www.delta-americas.com/en-us/news/delta-electronics-americas-and-x-labs-sign-technology-partnership-mou-to-power-next-gen-ai-data-centers)（2026-07-14）。
 - [OCP Power Distribution 持續更新入口](https://www.opencompute.org/community/power-distribution)與 [NVIDIA 800VDC architecture 持續更新入口](https://www.nvidia.com/en-au/data-center/technologies/800-vdc-architecture/)（2026-08-12 捕捉，只供後續重查）。
+- [OCP Open Data center Spec v0.5.0](https://www.opencompute.org/documents/open-data-center-spec-version-0-5-0-pdf)（2026-02-25；PDF p.9 的 3+1／2N、row-level 與 data-hall power 特定設計表，不是通用容量換算式）。
+- [DOE FEMP：Best Practices Guide for Energy-Efficient Data Center Design](https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf)（2024-07-26；PDF p.38／印刷 p.29 的年度 PUE 定義與適用邊界）。
 
 NVIDIA 列名 Delta、LITEON 只證實生態系參與。對 2301 而言，800V 仍停在公司預定的驗證節點；
 對 2308 而言，證據已由展示增加到 MOU planned deployment，但仍沒有完成部署與財務分母；
 對 8255 而言，本輪來源仍未點名。NVIDIA 的效率、減銅、維護與 TCO 數字屬架構模型／目標，
-並非第三方場站實績。OCP、UL 與 BESS 文件也各有不同邊界，不能多數決成「已驗收」。本輪沒有
+並非第三方場站實績。OCP、UL 與 BESS 文件也各有不同邊界，不能多數決成「已驗收」；OCP 的
+3+1／2N 設計表與 DOE 的年度 PUE 方法更不能拼成 installed-to-critical 容量公式。本輪沒有
 一致預期、估值或即時持倉資料，因此不宣稱市場尚未反映、已充分定價或應採取任何股票動作。
 
-## 新手最常混淆的七件事
+## 新手最常混淆的九件事
 
 1. **800V 是電壓名稱，不是完成狀態。** 同樣標示 800V 的元件、rack 與 facility 可能處在完全不同的資格階段。
 2. **OCP Stage 1–3 是改動範圍，不是認證等級。** Stage 1 也要完成自己的安全、介面與場站驗收。
@@ -656,6 +842,8 @@ NVIDIA 列名 Delta、LITEON 只證實生態系參與。對 2301 而言，800V �
 5. **50V 量產不能搬到 800V。** 同一家公司、同一客戶或同一事業群也不能跨產品偷換階段。
 6. **標準工作啟動不等於標準缺口關閉。** 還要看 revision、地方採納、訓練與 commissioning。
 7. **產業方向不能直接分配給台股。** 必須以買方與供應商文件對上具名產品、期間、數量、收入與毛利。
+8. **Installed MW 不等於 critical IT MW。** 前者含備援與待命容量，後者必須先固定 design fault、maintenance、derating 與 reference boundary。
+9. **PUE 不是容量折扣。** 年度 kWh／kWh 不能把 nameplate MW 換成 fault-tolerant MW，也不能代替 peak power 或 IT work efficiency。
 
 ## 在研究中心接著怎麼學
 
@@ -671,7 +859,7 @@ BOM 串起。任何公司結論仍需回到各自正式筆記、買方文件與�
 ## 投資判讀框架
 
 - **架構 KPI**：2027 平台時鐘、具名 facility stage、isolation／SST 路徑與固定 voltage band。
-- **工程 KPI**：redundancy topology、fault matrix、子系統 pass／fail、跨廠互通、as-built commissioning 與運行時數。
+- **工程 KPI**：reference boundary、installed-to-critical capacity bridge、actual load distribution、年度 meter／PUE contract、redundancy topology、fault matrix、子系統 pass／fail、跨廠互通、as-built commissioning 與運行時數。
 - **商業 KPI**：MOU 轉合約、施工與 acceptance，接著才是 production volume、出貨、收入、毛利與現金。
 - **常見假訊號**：合作夥伴 logo、展場 demo、效率目標、MOU 規劃量，或把 50V 過渡產品出貨當成 800V 出貨。
 - **最關鍵分歧**：價值是否由單顆 PSU 擴大到 power rack、保護、備援、控制與 cooling 的可重複交付；若只增加研發與資本投入，卻沒有通過第 6、7 關，題材不能升格成公司獲利。
@@ -717,4 +905,5 @@ evidence_boundary: 來源未點名 universe 內其他散熱廠，也未證實 80
 - 台達電是否把展示規格推進到客戶量產、實際交付與可辨識的電源／散熱財務貢獻。
 - 朋程是否以一手文件證實 800V HVDC 客戶、封裝料號、驗證完成與量產，而不是只保留研究假說。
 - 安全、介面與維修標準若延誤，或客戶延長 50／54V 過渡期，2027 full-scale 時程需下修。
+- 具名場站是否公開同版 single-line、N 定義、installed／critical capacity、實際 load trace、facility／IT meter map、PUE 期間與 fault／maintenance commissioning；只有 MW 與 PUE headline 不算填滿。
 - 若只有合作名單、展場規格或股價反應而沒有公司級收入／毛利證據，維持 `watch`，不得升格。

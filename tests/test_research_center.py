@@ -6235,21 +6235,41 @@ class ResearchCenterTest(unittest.TestCase):
             "| 6. 場站 commissioning 與客戶驗收 |",
             "| 7. 量產與財務歸因 |",
             "## OCP 的三階段不是「成熟度排名」，而是改動範圍",
+            "## 同樣寫 1MW，為什麼 installed、critical、actual 與 PUE 是四本帳",
+            "### 先固定失效情境，再算 installed 與 critical",
+            "### PUE 是年度能源比，不是容量折扣",
+            "### 多空小作文要共用十欄設施容量—能源護照",
+            "5+1 N+1 的 installed／critical 為 1.2／1.0MW",
+            "雙完整路徑 2N 為 2.0／1.0MW",
+            "0.80÷1.20 = 66.7%",
+            "0.80÷2.00 = 40.0%",
+            "IT energy          = 0.80MW × 8,760h = 7,008MWh",
+            "Facility energy    = 1.00MW × 8,760h = 8,760MWh",
+            "PUE                = 8,760 ÷ 7,008   = 1.25",
+            "0.96MW",
+            "1.60MW",
+            "Python Fraction 與獨立 awk",
+            "沒有 sampling SE／t",
+            "f4db5c015154933482e84f1946dcafc297d8ad526db90d2985df35232d8ab0c2",
+            "官方端點對命令列直取回應 403",
             "## 為什麼子系統通過，還不等於場站穩定",
             "## 公司公告要放回正確抽屜",
-            "## 新手最常混淆的七件事",
+            "## 新手最常混淆的九件事",
             "## 在研究中心接著怎麼學",
             "claim_id: C4\nlabel: inference\nstatus: superseded",
             "corrected_by_claim_id: C13",
+            "claim_id: C14\nlabel: verified\nstatus: active",
+            "claim_id: C15\nlabel: verified\nstatus: active",
+            "claim_id: C16\nlabel: inference\nstatus: active",
             "thesis_claim_id: C13",
             "review_due: 2026-09-12",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 13), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 16), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
-            ("transition", 5),
+            ("transition", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -6265,6 +6285,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:800v-subsystem-qualification,stage,800V 子系統資格",
             "stage:800v-site-acceptance,stage,場站試運轉與客戶驗收",
             "stage:800v-commercial-attribution,stage,量產部署與財務歸因",
+            "process:data-center-capacity-energy-passport,process,資料中心容量與能源十欄護照",
+            "metric:installed-critical-load-pue-boundary,metric,裝置、關鍵負載與PUE邊界",
         ):
             self.assertIn(concept, concepts)
 
@@ -6273,7 +6295,7 @@ class ResearchCenterTest(unittest.TestCase):
             / "800vdc_execution_readiness.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 800VDC 七關執行準備度", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
         for edge_target in (
             "from_id: company:2308",
             "from_id: organization:open-compute-project",
@@ -6284,6 +6306,10 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: stage:800v-subsystem-qualification",
             "to_id: stage:800v-site-acceptance",
             "to_id: stage:800v-commercial-attribution",
+            "edge_id: KG-8ER-I15",
+            "to_id: process:data-center-capacity-energy-passport",
+            "edge_id: KG-8ER-I16",
+            "to_id: metric:installed-critical-load-pue-boundary",
             "to_id: group:powersupply", "to_id: group:power",
             "to_id: group:thermal",
         ):
@@ -6307,6 +6333,9 @@ class ResearchCenterTest(unittest.TestCase):
             ROOT / "notes" / "research_method_reviews" / "monitor_reviews.csv"
         ).read_text(encoding="utf-8")
         self.assertIn("MR-2026-08-08-800VDC-T1", reviews)
+        self.assertIn(
+            "MR-2026-08-14-800VDC-T3-CAPACITY-ENERGY-BOUNDARY", reviews
+        )
 
     def test_power_route_sic_chain_separates_device_system_customer_and_financial_gates(self):
         topic = (

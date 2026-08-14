@@ -352,3 +352,43 @@ status: active
 boundary: OCP Stage 2 可把 cooling 納入 DC IT module 只形成 thermal 搜尋路由 不證明 CDU 電壓架構 qualification 台廠內容量或毛利。
 next_trigger: 具名 site 公布 cooling power control boundary qualification deployment 與 universe company financial evidence。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-8ER-I15
+view: industry
+from_id: concept:800vdc-execution-readiness
+to_id: process:data-center-capacity-energy-passport
+relation: measured_by
+claim_refs: MI-2026-08-01-800VDC-EXECUTION-READINESS#C14,MI-2026-08-01-800VDC-EXECUTION-READINESS#C15,MI-2026-08-01-800VDC-EXECUTION-READINESS#C16
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: Facility topology capacity metering commissioning IT operation 與商業交接可由不同 owner equipment provider 與 meter system 共同完成。
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: OCP 固定一份 3+1／2N 設計表且 DOE 固定年度 PUE 方法 十欄護照是研究中心的跨文件查核框架 不是 OCP／DOE 共同 specification 或任何場站 pass result。
+next_trigger: 同一 as built site revision 公開 single line reference boundary N definition fault maintenance rating installed critical actual load meter map annual energy PUE commissioning acceptance 與財務共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8ER-I16
+view: industry
+from_id: concept:800vdc-execution-readiness
+to_id: metric:installed-critical-load-pue-boundary
+relation: measured_by
+claim_refs: MI-2026-08-01-800VDC-EXECUTION-READINESS#C14,MI-2026-08-01-800VDC-EXECUTION-READINESS#C15,MI-2026-08-01-800VDC-EXECUTION-READINESS#C16
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-12
+status: active
+boundary: 1.20／2.00MW installed 1.00MW critical 0.80MW actual 與 PUE 1.25 是 N=2 個假想 topology 加 N=1 個假想年度 meter case 的確定性教材 不是 OCP DOE 800VDC site rack customer deployment 或財務結果。
+next_trigger: 具名場站以共同 reference plane timestamp 與 meter boundary 公開 installed to critical bridge actual load distribution facility／IT energy PUE uncertainty fault test customer acceptance 及 production economics。
+-->
