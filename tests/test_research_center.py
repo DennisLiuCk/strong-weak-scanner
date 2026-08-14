@@ -3778,6 +3778,7 @@ class ResearchCenterTest(unittest.TestCase):
         for contract in (
             "editorial_plain_language_wave88_cooling_loop_handoffs_and_evidence_gates",
             "added_liquid_heat_flow_atd_pressure_and_pump_power_passport_without_thesis_clock_refresh",
+            "added_dew_point_local_surface_and_economizer_passport_without_thesis_clock_refresh",
             "液冷可以先分成三段：機房把熱送走的設施水路",
             "完整部署還要讓冷源、管路、接頭、分流器、冷板、控制與維護一起通過驗收",
             "## 冷源到伺服器要交接五次",
@@ -3813,13 +3814,23 @@ class ResearchCenterTest(unittest.TestCase):
             "### 多空小作文共用的液冷熱工—水力十欄護照",
             "Python Fraction 與獨立 awk 在顯示精度內完全",
             "沒有 sampling\nSE／t",
+            "## 同樣 60% RH，露點可差 7.5°C：防結露要看最冷表面",
+            "**局部露點裕度＝最冷局部表面溫度－同位置露點。**",
+            "| D1 | 27°C | 60% | 18.579°C | 20°C | ＋1.421K |",
+            "| D2 | 35°C | 60% | 26.066°C | 20°C | −6.066K |",
+            "| D3 | 27°C | 40% | 12.271°C | 20°C | ＋7.729K |",
+            "D1 與 D2 都是 60% RH，露點卻相差 7.4867°C",
+            "CAP1 表面約第 6 分鐘落到露點以下",
+            "### 多空小作文共用的防結露—economizer 十欄護照",
+            "Python\nDecimal 與獨立 awk 重算",
+            "production site 的同步表面圖、事件率",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 47
+            sum(line.startswith("- **") for line in glossary.splitlines()), 59
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3827,20 +3838,26 @@ class ResearchCenterTest(unittest.TestCase):
         for jargon in ("FWS", "TCS", "rackLocationId"):
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 17), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 16),
+            ("research_claim", 21), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
-        for source_id in ("S9", "S10", "S11", "S12"):
+        for source_id in (
+            "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16"
+        ):
             self.assertIn(f"source_id: {source_id}", topic)
-        for claim_id in ("C13", "C14", "C15", "C16", "C17"):
+        for claim_id in (
+            "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20", "C21"
+        ):
             self.assertIn(f"claim_id: {claim_id}", topic)
         graph = (
             ROOT / "notes" / "knowledge_graph"
             / "liquid_cooling_loop_boundaries.md"
         ).read_text(encoding="utf-8")
-        for edge_id in ("KG-LCB-I21", "KG-LCB-I22"):
+        for edge_id in (
+            "KG-LCB-I21", "KG-LCB-I22", "KG-LCB-I23", "KG-LCB-I24"
+        ):
             self.assertIn(f"edge_id: {edge_id}", graph)
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"
@@ -3848,6 +3865,8 @@ class ResearchCenterTest(unittest.TestCase):
         for node_id in (
             "process:liquid-loop-thermal-hydraulic-passport",
             "metric:liquid-heat-flow-pressure-pump-boundary",
+            "process:liquid-cooling-dew-point-passport",
+            "metric:local-dew-point-surface-margin",
         ):
             self.assertIn(f"{node_id},", concepts)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(

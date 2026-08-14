@@ -77,6 +77,14 @@ reason: added_liquid_heat_flow_atd_pressure_and_pump_power_passport_without_thes
 evidence: sources:S9,S10,S11,S12
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_dew_point_local_surface_and_economizer_passport_without_thesis_clock_refresh
+evidence: sources:S13,S14,S15,S16
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -110,6 +118,18 @@ evidence: sources:S9,S10,S11,S12
 - **PQ 曲線／dP**：PQ 曲線把壓力與流量連在一起，dP 是兩點間壓差；泵浦曲線與整條流路阻抗的交點才是工作點，單一最大流量或零件壓差都不夠。
 - **PUE／WUE**：PUE 比較資料中心總能源與 IT 能源，WUE 描述用水效率；泵浦或 TCS 的單點效率只是其中一小段，不能直接推成整座場域的 PUE／WUE。
 - **DOE**：本文的 DOE 指美國能源部；引用它的一般泵浦生命週期成本指南來解釋流量、揚程、效率與時間剖面，不代表能源部替任何 CDU 或資料中心背書。
+- **NBS／NIST**：NBS 是美國國家標準局的舊稱，後改組為 NIST。本文用 NBS 1970 論文的公式做露點教材，不表示 NIST 替任何液冷設計背書。
+- **W1／W2／W3／W4／W5**：ASHRAE 液冷設備的供水溫度 classes；數字較高代表可接受更暖供水的不同設計邊界，不是設備品質或供應商排名。
+- **Prineville**：OCP 文章記錄的一座美國資料中心及其 air-side economizer 控制事件；本文只引用局部表面結露機制，不把單一事件外推成液冷故障率。
+- **CAP1／PCB**：CAP1 是 OCP 受控箱體案例中被追蹤表面溫度的一顆電容，PCB 是電路板；兩者同處一台電源內卻位於露點兩側。
+- **Guideline／Guidelines／requirement**：guideline／guidelines 是設計指引，requirement 是必須滿足的要求；兩者都不等於產品已驗收、場域已量產或公司已認列收入。
+- **乾球溫度（Dry-bulb temperature）**：一般溫度感測器讀到的空氣溫度；它要和同一位置、同一時間的相對濕度一起使用，才能換算該處露點。
+- **相對濕度（RH）**：當下水蒸氣分壓相對於同溫度飽和水蒸氣分壓的比例。相同 RH 在不同乾球溫度下不代表相同含水狀態或相同露點。
+- **露點（Dew point）**：在水蒸氣分壓不變下，空氣降溫至飽和時的溫度；表面若低於其周圍空氣的局部露點，就進入可能結露的熱力邊界。
+- **最冷局部表面**：管路、接頭、分流器、冷板、電容、機殼或其他表面中溫度最低的位置。機房平均溫度、供液感測點與最冷表面通常不是同一參考面。
+- **局部露點裕度**：最冷局部表面溫度減同位置、同時間露點。正值表示表面仍高於露點，零附近需納入感測與控制不確定度，負值表示表面已低於露點。
+- **結露／non-condensing**：水蒸氣在較冷表面形成液態水；標示 non-condensing 是操作條件限制，不是只要室內 RH 低於某個百分比就自動成立。
+- **水側 economizer**：在戶外條件合適時，以熱交換器和冷卻塔或乾式冷卻器先帶走熱、降低或繞過冰水主機負載的運轉模式；可用時數取決於氣候、供水設定、熱交換器與控制。
 - **水質／腐蝕／污染**：冷卻液的化學成分、顆粒與微生物會影響金屬、密封件和流道。水質失控可能造成腐蝕、沉積或堵塞，即使設備額定容量沒有改變。
 - **浸液材料（Wetted materials）**：在迴路內會直接接觸冷卻液的金屬、塑膠、彈性體、密封件、接著劑與塗層。只要新增或更換一種材料，就要重新核對它和流體及其他材料是否相容。
 - **冷卻液基準（Coolant baseline）**：系統剛填充、條件合格時留下的流體配方、檢驗值與樣本。之後的讀值要和這個起點比較，才看得出趨勢，而不是只問有沒有超過單一警報值。
@@ -133,7 +153,7 @@ evidence: sources:S9,S10,S11,S12
 
 - 液冷可以先分成三段：機房把熱送走的設施水路、冷卻設備到機櫃的循環水路，以及伺服器內的冷板與管路。OCP 文件只規定其中一段的部分要求，沒有把三段都包進同一份完整規格。
 - Lenovo 的部署指引說明兩條水路如何分開，也要求泵浦備援、溫度與壓力感測、閥件、漏液偵測、材料與水質維護；NVIDIA 文件則定義告警與控制資料如何交換。
-- 所以一台冷卻設備通過平台驗證，只證明一個節點；完整部署還要讓冷源、管路、接頭、分流器、冷板、控制與維護一起通過驗收，並把液體帶走的熱、流量、壓差與泵功分帳。
+- 所以一台冷卻設備通過平台驗證，只證明一個節點；完整部署還要讓冷源、管路、接頭、分流器、冷板、控制與維護一起通過驗收，並把液體帶走的熱、流量、壓差、泵功，以及局部露點裕度分帳。
 
 ### 為什麼重要
 
@@ -142,12 +162,16 @@ evidence: sources:S9,S10,S11,S12
 接頭與分流器會影響漏液和維修，伺服器內部阻力會影響流量分配，控制系統則決定告警能否指向
 正確機櫃、隔離動作能否真的執行。只有把這些責任接起來，才知道問題發生時由誰處理。
 
+同樣地，「機房 60% RH」或「供液 20°C」都不是完整防結露證據：還要知道兩個讀值的時間與
+位置、最冷表面在哪裡、露點裕度多少，以及 economizer／冰水主機切換時控制是否跟得上。
+
 ### 接下來怎麼追
 
 - 追蹤 OCP 是否把目前的要求文件補成可重現的冷板、冷卻液、快速接頭與整套迴路測試，並保存每次版本變化。
 - 追蹤 NVIDIA 是否從設備列名，往現場試運轉、資料完整性、漏液隔離與長期可靠度增加公開欄位。
 - 查台灣散熱、電源供應與伺服器代工公司是否說清楚責任範圍：只供元件、供機櫃水路、整合冷卻設備與控制，還是承擔場域驗收和維護；再核對部署規模與財務資料。
 - 追具名 CDU 是否在同一流體、FWS／TCS 溫度、流量、ATD、揚程、阻抗與備援條件下公布容量曲線，而不是只報一個最大 kW。
+- 追具名量產場域是否以共同時間鍵公開乾球溫度、RH、露點、最冷表面、供回液溫、感測不確定度、控制模式與結露事件，而不是只報機房平均值。
 
 ### 想一想
 
@@ -155,6 +179,7 @@ evidence: sources:S9,S10,S11,S12
 - 快速接頭、分流器、冷板與冷卻液各自通過單件測試，是否足以證明混合多家供應商後仍能長期可靠運作？
 - 同一家公司若同時賣電源、冷卻設備與控制，研究上要看到哪些合約、驗收與收入資料，才能證明它真的承接較多價值？
 - 若兩台 CDU 都標示 1MW，但一台在較寬 ATD、較低流量或較容易的壓差條件下額定，兩個 1MW 還能直接相比嗎？
+- 若室內一直顯示 60% RH，溫度突然升高或某個金屬零件仍很冷，單看牆上的濕度計能排除結露嗎？
 
 ## 主張與證據帳本
 
@@ -350,6 +375,70 @@ status: active
 url: https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/pumplcc_1001.pdf
 locator: PDF file pp.7–9，尤其 file p.8（印刷 p.6）Energy Costs；泵浦輸入功率由流量、揚程、比重、泵浦與馬達效率共同決定，變動輸出要按時間建立使用剖面，節流、洩壓或 bypass 會降低效率並增加耗能
 limitation: 文件頁尾只標 January 2001，published_at 以 2001-01-01 做月精度正規化且不主張日精度；這是 DOE、Hydraulic Institute 與 Europump 的一般泵浦 LCC 指南，不是資料中心 CDU 測試、特定泵浦曲線、電價或場域年度耗能
+independence_group: us-department-of-energy
+-->
+
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: document
+publisher: National Bureau of Standards
+title: The Use of Dew-Point Temperature in Humidity Calculations
+published_at: 1970-08-21
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://nvlpubs.nist.gov/nistpubs/jres/74C/jresv74Cn3-4p117_A1b.pdf
+locator: PDF 印刷 pp.117–120（file pp.1–4）；p.118 定義 RH 與 dew point，p.119 給 Celsius Antoine 常數 A＝8.10765、B＝1750.286、C＝235.0 及由 dry-bulb／RH 推露點的式 (3)
+limitation: 本文使用的是標準大氣壓附近、0–60°C 水蒸氣的工程公式；不能替代現代場域校正、感測誤差、局部氣流、凝結成核或設備 qualification。官方 PDF SHA-256 a76d4d8fbb2fa4bd59336862fea8fbdb43bcf88cdbdbbac1c4b9b01bbcf6ba8e，共 6 頁
+independence_group: nist
+-->
+
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: living_index
+publisher: ASHRAE
+title: ASHRAE Handbook — Data Centers and Telecommunication Facilities, Chapter 19
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://handbook.ashrae.org/Handbooks/A15/SI/a15_ch19/a15_ch19_si.aspx
+locator: Internal Liquid-Cooling Loop 段落指出 rack 內循環液通常維持高於露點；Environmental Guidelines for Liquid-Cooled Equipment 的 W1–W5、Table 2 與其後文字說明供水溫、基礎設施、condensation prevention 及 configuration-specific flow／pressure
+limitation: 這是會更新的 ASHRAE Handbook 一般架構，表內 classes 與原則不是任何具名 AI rack、CDU、場域控制設定、感測精度、可用時數或節能實績
+independence_group: ashrae
+-->
+
+<!-- research_source
+source_id: S15
+role: other_primary
+source_kind: document
+publisher: Open Compute Project
+title: Learning Lessons at the Prineville Data Center
+published_at: 2013-08-07
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.opencompute.org/blog/learning-lessons-at-the-prineville-data-center
+locator: Issue Analysis；控制箱把 RH 拉到 97%、10 分鐘內由 15°C 升至 30°C，CAP1 表面約第 6 分鐘低於露點並再結露約 9 分鐘，而 PCB 全程高於露點且無結露；Corrective Actions 另列控制與監測修正
+limitation: 這是 air-side economizer／蒸發冷卻事件及受控箱體重現，不是液冷管路測試、現代 AI rack、跨場域故障率或供應商比較；本文只用它證明局部表面與時間動態，不能外推發生率、根因分布或財務
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S16
+role: other_primary
+source_kind: document
+publisher: U.S. Department of Energy
+title: Cooling Water Efficiency Opportunities for Federal Data Centers
+published_at: 2019-01-09
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers
+locator: Space Temperature and Humidity Control 與 Use of Water-Side Economizing Strategies；說明過窄設定會增加負荷，water-side economizer 可用串聯熱交換器先冷卻或在適合戶外條件下繞過 chiller
+limitation: 這是以 cooling tower、chilled-water 與 air-cooled IT rack 為主的一般 FEMP 指引；可用時數與節能取決於氣候、設定、控制及系統配置，不能外推特定液冷場域、產品、PUE／WUE、收入或毛利
 independence_group: us-department-of-energy
 -->
 
@@ -642,6 +731,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: NBS／NIST 的 Antoine 關係把同位置乾球溫度與相對濕度轉成露點；因此相同 RH 在不同乾球溫度下可以對應不同露點，RH 本身不是可跨溫度比較的固定含水量
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 1970-08-21
+basis: S13 印刷 pp.118–119 先定義 RH 與 dew point，再以 Celsius 常數 B＝1750.286、C＝235.0 給出 (DP＋C)⁻¹＝(T＋C)⁻¹＋B⁻¹log₁₀(RH⁻¹)
+boundary: 只證實標準大氣壓附近、0–60°C 水蒸氣的工程換算；公式不量測局部表面、感測誤差、氣流、熱慣性、凝結成核、滴水遷移或設備可靠度
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: ASHRAE 的資料中心章指出 rack 內循環液通常維持在露點之上以消除結露疑慮，W1／W2 的設計必須防止結露；較高供水溫可降低設施冷卻成本，但設備端要以增強熱設計守住元件溫度
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S14 Internal Liquid-Cooling Loop 與 Environmental Guidelines for Liquid-Cooled Equipment 直接連接 dew point、W classes、supply water temperature、condensation prevention 與 thermal design
+boundary: 這是一般設計邊界，不提供任何具名場域的最冷表面、控制死帶、感測精度、economizer 可用時數、可靠度或成本；higher supply temperature 也不是無條件較佳
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: OCP 的 Prineville 受控箱體重現中，CAP1 表面約在溫度 ramp 第 6 分鐘低於露點並再結露約 9 分鐘，PCB 則全程高於露點且沒有結露，顯示同一設備內結露取決於局部表面溫度與時間
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2013-08-07
+basis: S15 Issue Analysis 對 Figure 6 的文字說明逐一對應 CAP1、dew point、約 6 分鐘 crossing、後續約 9 分鐘 condensation，以及 PCB 無結露
+boundary: 這是高溫高濕 air-side economizer 事件的受控箱體重現，不是液冷量產場域；不能外推現代 AI rack、冷板／QD 的結露率、故障率、材料效果或任何供應商財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: inference
+status: active
+claim: 液冷防結露與 economizer 研究應以同一時間、位置與運轉模式，把乾球溫度、RH、露點、最冷局部表面、供回液溫、感測與控制不確定度、告警／隔離、可用時數及財務分母綁成一份護照；單一機房 RH 或供液溫不能證明整套系統 non-condensing 或節能
+supporting_source_ids: S3,S4,S13,S14,S15,S16
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 建立 dry-bulb／RH／dew-point 關係，S14 把 rack liquid、dew point、W classes 與設施成本連接，S15 顯示局部表面和控制動態，S16 補上 economizer 系統與氣候依賴；S3／S4 把量測與動作放回液冷責任邊界
+boundary: 十欄護照是跨來源研究框架，不是 ASHRAE／NIST／OCP／DOE 的共同標準，不指定唯一裕度或控制算法，也不證明場域可用性、PUE／WUE、故障率、供應商訂單、收入、毛利或估值
+verification_needed: 需具名 production site 以共同時間鍵公開 zone-level dry-bulb／RH、measured or derived dew point、surface map、FWS／TCS temperatures、sensor uncertainty、control transitions、condensation events、economizer hours、energy／water 及財務責任
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 冷源到伺服器要交接五次
 
 沿著冷卻液前進的方向讀這張表：先從機房設施把熱交給冷卻設備，再經循環水路、機櫃分流與
@@ -752,6 +909,99 @@ ATD／PQ／part-load／備援條件下仍通過，且合約、部署、維護與
 較低阻抗冷板、更少接頭、較佳泵效率或更高 liquid capture，降低每 kW 流量、泵功、CDU 台數或
 剩餘空冷設施；若更高規格同時減少數量、整合供應商或把價值移到設施端，族群收入不必同步放大。
 
+## 同樣 60% RH，露點可差 7.5°C：防結露要看最冷表面
+
+「機房相對濕度 60%」不是固定含水量，也不是 non-condensing 證明；「供液 20°C」同樣不是
+最冷表面實測。防結露真正要守的是同一位置、同一時間的局部露點裕度：
+
+**局部露點裕度＝最冷局部表面溫度－同位置露點。**
+
+裕度為正，只表示該表面在當下仍高於露點；接近零時還要扣除感測準確度、校正漂移、控制死帶、
+位置差與暫態誤差；裕度為負，表示表面已低於周圍空氣的露點，進入可能結露的熱力條件。是否
+真的形成水滴、多久形成、流到哪裡，仍要看表面、氣流、時間與材料，不能從一個負值直接推故障率。
+
+### 第一本帳：RH 不帶乾球溫度，就不能固定露點
+
+NBS／NIST 的 Celsius Antoine 關係在 0–60°C 水蒸氣範圍可寫成：
+
+**露點＝1 ÷〔1 ÷（乾球溫度＋235.0）＋log₁₀（1 ÷ RH）÷ 1750.286〕－235.0**
+
+其中 RH 用 0 至 1 的比例。以下三列都把最冷表面固定為 20°C，只改乾球溫度與 RH；這是公式
+教材，不是任何機房設定或 pass line。
+
+| 假想露點案例 | 乾球溫度 | RH | 換算露點 | 最冷表面 | 局部露點裕度 | 只可怎麼讀 |
+|---|---:|---:|---:|---:|---:|---|
+| D1 | 27°C | 60% | 18.579°C | 20°C | ＋1.421K | 表面高於公式露點，但未扣感測與控制不確定度 |
+| D2 | 35°C | 60% | 26.066°C | 20°C | −6.066K | 同一表面低於公式露點，已進入結露風險邊界 |
+| D3 | 27°C | 40% | 12.271°C | 20°C | ＋7.729K | 降低 RH 擴大此固定案例的公式裕度 |
+
+D1 與 D2 都是 60% RH，露點卻相差 7.4867°C，標題四捨五入為 7.5°C。這不是說室溫升高會在
+封閉空間自動增加水量；它只說「固定 RH」代表水蒸氣分壓隨乾球溫度改變，所以 RH 必須和同時、
+同地的乾球溫度成對保存。若溫度改變但水蒸氣沒有同步增減，RH 本身也會跟著變，不能只固定一欄。
+
+### 第二本帳：供液感測點不是最冷表面
+
+同一個「20°C」可能指 CDU 出口液體、機櫃入口液體、管內流體或金屬表面；四者在穩態與暫態都
+不必相同。研究與驗收至少要分開下列參考面。
+
+| 參考面 | 要保存什麼 | 為什麼不能被供液設定值替代 |
+|---|---|---|
+| 機房／冷通道空氣 | 乾球溫度、RH、露點、位置與時間 | 中央感測器看不到每座機櫃局部混氣與濕氣 |
+| 機櫃入口與內部空氣 | 同步乾球、RH、氣流與區域 ID | 同一房間仍可能有局部溫濕度梯度 |
+| CDU 與機櫃供回液 | 實測溫度、流量、模式與時間戳 | 流體讀值不是外表面溫度，也看不到每條支路 |
+| 管路、QD、manifold 與閥件表面 | 材料、保溫、位置、表面溫度與熱影像最低點 | 金屬、接頭與保溫缺口可能形成不同冷點 |
+| 伺服器與電源內部表面 | 冷板鄰近件、機殼、PCB 與非發熱元件溫度 | 發熱 PCB 與高熱容量或非發熱元件可跨在露點兩側 |
+| 感測與控制邊界 | 準確度、校正、取樣率、延遲、死帶與 alarm margin | 顯示裕度不等於扣除量測與動態不確定度後仍安全 |
+
+OCP 2013 年 Prineville 案例提供一個很具體、但範圍有限的反例：受控箱體把 RH 拉到 97%，並在
+10 分鐘內由 15°C 升至 30°C；CAP1 表面約第 6 分鐘落到露點以下，之後再觀察到約 9 分鐘結露，
+但 PCB 全程高於露點且沒有結露。它證明的不是「液冷一定會結露」，而是**同一設備、同一空間，
+不同表面仍可位於露點兩側**。該案例來自 air-side economizer／蒸發冷卻控制事件，不能當成現代
+AI 液冷 rack 的故障率、冷板測試或供應商排名。
+
+### 第三本帳：暖水與 economizer 是一組交換，不是免費效率
+
+ASHRAE 指出機架內循環液通常維持高於露點，W1／W2 又明確要求防止結露；同一章也指出較高的
+facility supply water temperature 通常可降低設施冷卻成本，但設備端需要更強的熱設計，才能把
+液冷元件維持在目標溫度內。DOE FEMP 則說明水側 economizer 可在戶外條件合適時，透過串聯
+熱交換器先冷卻冰水迴路、降低冰水主機負載，甚至在適當條件下繞過 chiller。
+
+這裡有三個不能省略的交換：
+
+- **結露裕度**：提高供液溫通常讓冷表面更容易高於露點，但仍須量最冷表面與暫態，不能用設定值代替。
+- **晶片熱裕度**：較暖供液可能增加 economizer 可用條件，卻也可能壓縮冷板、晶片與 ATD 的熱設計空間。
+- **財務分母**：economizer 可用時數要按地點氣候、負載、設定、熱交換器、控制與備援逐時重建；節電還要接到實測 chiller／pump kW、能源價格、水、維護與資本支出，不能從「可 bypass」直接推毛利。
+
+### 多空小作文共用的防結露—economizer 十欄護照
+
+| 護照欄位 | 必須固定什麼 | 少了最容易誤讀成什麼 |
+|---|---|---|
+| 1. 場域與區域 | site、氣候、房間、冷通道、機櫃與局部位置 ID | 一個機房平均值代表所有冷點 |
+| 2. 時間與運轉模式 | 時間戳、steady／ramp、chiller／economizer、切換事件 | 穩態讀值代表控制切換暫態 |
+| 3. 空氣狀態 | 同位置 dry-bulb、RH、壓力與 measured／derived dew point | 單一 RH 等於固定含水量或固定露點 |
+| 4. 最冷表面地圖 | 管路、QD、manifold、閥、機殼與內部元件最低溫 | CDU supply sensor 就是整套最低表面 |
+| 5. 液體參考面 | FWS／TCS 供回液溫、流量、ATD、支路與 mixing | 一個供液設定能描述所有液體和表面 |
+| 6. 裕度與不確定度 | 每點表面減露點、感測準確度、校正、位置差與 guard band | 顯示正 0.5K 就必然 non-condensing |
+| 7. 控制與保護 | setpoint、deadband、ramp rate、alarm、隔離、fallback 與責任 | BMS 有讀值就等於動作經過驗證 |
+| 8. 驗收與事件 | 最差氣候、切換、冷啟動、失效注入、結露／滴水與復原 | 一次正常穩態 SAT 等於全年可靠 |
+| 9. 能源與水 | economizer hours、chiller／pump kW、heat rejection、PUE／WUE 邊界 | 可用暖水直接等於固定節能比例 |
+| 10. 商業共同鍵 | BOM、供應商、合約責任、site／rack 分母、收入、毛利與維護 | 技術必要性直接等於公司訂單與獲利 |
+
+**較強的多方版本**是具名量產場域在不同季節與切換情境下，以最冷表面扣除量測不確定度後仍
+維持正裕度，同時增加 economizer 可用時數、降低可重建的 chiller／water 成本，而且合約與財務
+共同鍵顯示控制、保溫、感測、QD、CDU 或整合價值確實由特定供應商承接。
+
+**較強的空方版本**是 headline 只給室內 RH、供液設定或 W-class，最冷表面、控制暫態、感測
+誤差、結露事件與能源基準都缺；或者更暖供水雖降低設施成本，卻減少 CDU／chiller 數量、壓縮
+設備單價、把價值移到別的系統，讓技術採用與台灣公司收入不同步。
+
+本節共有 N＝3 個固定輸入露點案例與 N＝1 個 OCP 受控箱體案例。三個公式案例以 Python
+Decimal 與獨立 awk 重算，露點、裕度及同 RH 的 7.486658697367°C 差異在小數點後 12 位一致；
+它們不是抽樣、場域量測、CFD、可靠度試驗或供應商樣本，因此沒有 sampling SE／t。OCP 案例
+只是一條 air-side 事件／箱體消息鏈，也不能估結露發生率。NIST、ASHRAE、OCP 與 DOE 四份
+官方來源提供方法與邊界，不是四座場域或四家供應商；production site 的同步表面圖、事件率、
+economizer 時數、能源／水成本、BOM、訂單、收入與毛利共同觀測仍是 N＝0。
+
 ## 水質不是一個數字：先寫六欄流體生命週期合約
 
 額定散熱能力回答「設備在指定條件下能帶走多少熱」；流體生命週期合約回答「這些條件能否
@@ -806,6 +1056,7 @@ OCP 2022 指引的 Table 1 提供一組 **water-based、non-PG TCS 的典型起�
 
 - **目前可以確定**：液冷是跨設施水路、技術冷卻水路、伺服器、控制與維護的介面系統；單一冷卻設備被平台列出，不足以代表整座場域已能穩定部署。
 - **容量也必須同條件比較**：IT 用電、液體捕熱、流體性質、TCS 溫升、ATD、兩側流量、流路壓差、泵效率與備援 duty 少一項，就不能把相同最大 kW 視為相同熱工—水力能力。
+- **防結露必須看局部與時間**：同一 RH 可因乾球溫度不同而有不同露點，同一設備內的表面也可跨在露點兩側；供液設定、房間平均 RH 或 W-class 都不能替代最冷表面裕度與控制暫態。
 - **仍不能推到公司**：目前高信心只涵蓋架構與證據階梯；公司供貨、訂單、收入、市占、毛利及完整方案責任仍未驗證。
 - **相對第八站新增了什麼**：研究從容量與供應狀態，前進到責任交接、感測、隔離、維護，以及熱量—流量—壓差—泵功的可重建護照，不是再做另一張設備排名。
 - **何時才能升為公司研究**：客戶與供應商要能雙向確認責任範圍、場域驗收、部署規模與可辨識財務結果。
@@ -824,6 +1075,10 @@ OCP 2022 指引的 Table 1 提供一組 **water-based、non-PG TCS 的典型起�
 - [OCP：OAI System Liquid Cooling Guidelines](https://www.opencompute.org/documents/oai-system-liquid-cooling-guidelines-in-ocp-template-mar-3-2023-update-pdf)
 - [OCP：Liquid to Liquid CDU Test Methodology and Performance Rating](https://www.opencompute.org/documents/ocp-wp-l-lcdu-test-methodology-performance-rating-r1-pdf)
 - [DOE：Pump Life Cycle Costs](https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/pumplcc_1001.pdf)
+- [NIST／NBS：The Use of Dew-Point Temperature in Humidity Calculations](https://nvlpubs.nist.gov/nistpubs/jres/74C/jresv74Cn3-4p117_A1b.pdf)
+- [ASHRAE Handbook：Data Centers and Telecommunication Facilities](https://handbook.ashrae.org/Handbooks/A15/SI/a15_ch19/a15_ch19_si.aspx)
+- [OCP：Learning Lessons at the Prineville Data Center](https://www.opencompute.org/blog/learning-lessons-at-the-prineville-data-center)
+- [DOE FEMP：Cooling Water Efficiency Opportunities for Federal Data Centers](https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers)
 
 ## 族群影響
 
@@ -899,6 +1154,19 @@ frequency: monthly
 next_check: 2026-09-03
 trigger: 具名多供應商量產場域發布 fluid COA／baseline、wetted-material list、cleaning／flushing／passivation、sampling／action limits 與 field trend
 invalidation: 標準化密閉迴路以跨更新週期的長期 field evidence 證明設備 qualification 已固定全部六欄，新增材料或維修變更也不需重新評估
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C18,C19,C20,C21
+metric: 具名量產液冷場域是否以共同時間與位置鍵公開 dry-bulb、RH、dew point、最冷表面、FWS／TCS 供回液溫、感測不確定度、控制模式、結露事件、economizer 時數及能源／水結果
+source_ids: S13,S14,S15,S16
+watch_source_ids: S2,S4,S6,S8
+frequency: monthly
+next_check: 2026-09-03
+trigger: production site 公開跨季 raw telemetry、surface map、control transition／failure injection、condensation incident denominator、economizer duty、energy／water baseline 與責任矩陣
+invalidation: 跨氣候、拓撲與控制模式的量產證據證明單一房間 RH 或單一供液溫在扣除感測誤差後已能完整代表所有局部表面、結露事件與 economizer 成效
 -->
 
 ## 什麼會推翻這篇

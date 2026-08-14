@@ -1,7 +1,7 @@
 # 液冷迴路責任邊界知識圖譜
 
-本圖把 FWS、TCS、CDU、manifold、cold plate、流體、BMS，以及熱量—流量—壓差—泵功
-連成同一份介面責任圖。
+本圖把 FWS、TCS、CDU、manifold、cold plate、流體、BMS，以及熱量—流量—壓差—泵功、
+露點—最冷表面—economizer 連成同一份介面責任圖。
 平台列名只是其中一個成熟度節點；族群線仍不代表具名公司已承擔場域驗收或認列收入。
 
 <!-- knowledge_graph_meta
@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: liquid-cooling-loop-boundaries
 root_node_id: concept:liquid-cooling-loop-boundary
 label: 液冷迴路責任邊界
-summary: 從 FWS／TCS 邊界、液冷元件、材料相容性、BMS 觀測與隔離，到熱量、流量、ATD、PQ 與泵功，拆解單一 CDU 資格及最大 kW 與完整場域部署的差距。
+summary: 從 FWS／TCS 邊界、液冷元件、材料相容性、BMS 觀測與隔離，到熱量、流量、ATD、PQ、泵功、露點與最冷表面，拆解單一 CDU 資格及最大 kW 與完整場域部署的差距。
 article_ids: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES
 status: active
 -->
@@ -492,4 +492,44 @@ review_due: 2026-09-03
 status: active
 boundary: 熱量平衡、PG25 指引、CDU rating 與泵功方法來自不同適用範圍；教材換算不能冒充跨流體額定、場域 PUE／WUE 或公司價值。
 next_trigger: 同一具名 CDU／site 公布流體性質、液體捕熱、FWS／TCS 工作點、ATD、PQ curves、pump efficiency／duty 與重複不確定度。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I23
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: process:liquid-cooling-dew-point-passport
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C21
+note_refs:
+evidence_state: inference
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-03
+status: active
+boundary: 十欄護照是跨 NIST、ASHRAE、OCP、DOE 與既有液冷責任來源的研究框架，不是共同標準、固定安全裕度、site qualification 或財務證據。
+next_trigger: 具名 production site 以共同時間、位置與模式鍵公開空氣、液體、表面、控制、事件、能源／水、BOM、責任及財務分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I24
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: metric:local-dew-point-surface-margin
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C18,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C19,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C20,MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C21
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-03
+status: active
+boundary: 露點公式與局部表面機制有一手支持，但「表面減露點再扣不確定度」的跨系統護照是研究重組；教材數字不代表具名場域 pass line、事件率或 economizer 成效。
+next_trigger: 同一量產場域公開校正後 local surface、dry-bulb／RH／dew-point、guard band、control transitions 與 condensation event denominator。
 -->
