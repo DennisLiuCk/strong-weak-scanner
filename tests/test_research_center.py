@@ -7942,8 +7942,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 26),
-            ("research_claim", 27), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 29),
+            ("research_claim", 31), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -8023,11 +8023,67 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 26),
-            ("research_claim", 27), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 29),
+            ("research_claim", 31), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+    def test_missed_priority_q2_delta_separates_segment_application_product_and_maturity_coordinates(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-31_missed_priority_q2_disclosures.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: added_delta_q2_overlapping_denominator_segment_profit_cash_capex_and_maturity_bridges_without_refreshing_thesis_clock",
+            "## 1,832.56 億元不能拆成 AI＋液冷＋HVDC：台達電六種重疊座標",
+            "| 應報導部門 | Q2 電源及零組件 962.96 億元",
+            "| 資料中心應用 | 管理層稱 H1 相關業務占合併營收逾半",
+            "| AI 相關產品 | 管理層預期 2026 全年占總營收逾 25%",
+            "| 液冷產品族 | 管理層稱 2025 約占營收 10%",
+            "| HVDC 商業時鐘 | 管理層預期正負 400V 與 800V 產品 Q3 起量產",
+            "全公司營收增量的 **93.19%**",
+            "全公司營業利益增量的 **108.95%**",
+            "預期信用減損費用為 10.20 億元",
+            "這一項約占增量的 **23.32%**",
+            "| 合併稅後淨利 | 238.35 | 271.69 | ＋33.35 |",
+            "| 歸屬母公司淨利 | 205.56 | 251.36 | ＋45.80 |",
+            "歸母淨利季增 **22.28%**",
+            "合併淨利季增\n**13.99%**",
+            "| 營業現金流 | 431.69 |",
+            "| PP&E 付現 | 161.61 |",
+            "| 簡單自由現金流 | 270.08 |",
+            "期末短期借款則由 Q1 的 12.18 億元升至\n163.02 億元",
+            "H2 逾 400 億元與全年約 700 億元",
+            "真正產品族×應用×部門×客戶×實際收入共同觀測 N＝0",
+            "Python Decimal 與獨立 awk",
+            "source_id: S27",
+            "source_id: S28",
+            "source_id: S29",
+            "79bc77a81d436331c308264767bf72291a21a9a60bfcd8dd88a0612a2a97924f",
+            "838b88e3b21639a122a4cdd88d87fe1bb3b185592d603184d65e5a955402ed08",
+            "ddc39e8e1387e56d0974ac22a7d2566d91266bd34f178c54c1fae9416dd0d04e",
+            "1d3cf7fb34d23713300c694b86e0af732115eb937b24996b649591aad107916b",
+            "claim_id: C28\nlabel: verified\nstatus: active",
+            "claim_id: C29\nlabel: verified\nstatus: active",
+            "claim_id: C30\nlabel: verified\nstatus: active",
+            "claim_id: C31\nlabel: inference\nstatus: active",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 29),
+            ("research_claim", 31), ("metric_comparison", 12),
+            ("impact", 6), ("monitoring_item", 12),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        scans = (
+            ROOT / "notes" / "research_topics" / "scan_log.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "scan-2026-08-14-delta-overlapping-denominators-and-cash-capex-bridges",
+            scans,
+        )
 
     def test_yageo_q2_reconciles_fcf_ifrs_cash_and_management_cash(self):
         topic = (
