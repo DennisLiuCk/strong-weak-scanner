@@ -2128,6 +2128,64 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(node, graph)
 
+    def test_ai_rack_action_deadline_contract_separates_api_acceptance_from_safe_state(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-07_ai_rack_action_contract.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 同一個「成功」其實有五層：API 接受後還有四次核對",
+            "## 202 Accepted 很快，為什麼安全隔離仍可能逾時",
+            "### 同樣在 2.7 秒收到 202，兩個結局卻不同",
+            "### 多空小作文要共用八欄安全狀態期限護照",
+            "## 四種錯誤要用四種機制：版本、重送、仲裁與結果不能混用",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "reason: added_end_to_end_safe_state_deadline_budget_without_thesis_or_clock_refresh",
+            "source_id: S13", "claim_id: C16", "claim_id: C17",
+            "**安全狀態期限（safe-state deadline）**",
+            "**端到端時間預算（end-to-end time budget）**",
+            "**期限裕量（deadline margin）**",
+            "`D_safe=8.0 秒`", "`3.5 秒`", "`4.8 秒`",
+            "| 4. API 接受／Task 建立 | 0.4 秒 | 2.7 秒 | 2.7 秒 |",
+            "| 5. 實體致動 | A 3.5 秒／B 4.8 秒 | 6.2 秒 | 7.5 秒 |",
+            "| 6. 獨立物理確認 | 1.0 秒 | 7.2 秒 | 8.5 秒 |",
+            "`33.75%`", "`5.3 秒`", "`90.0%`", "`106.25%`",
+            "`+0.8 秒`", "`−0.5 秒`", "N=2` 個固定",
+            "| 1. 事件與受控版本 |", "| 6. API 與 Task 時間 |",
+            "| 8. 裕量、失敗與復原 |", "沒有 sampling SE／t",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 17), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        for concept in (
+            "process:safe-state-deadline-passport,process,安全狀態期限八欄護照",
+            "metric:end-to-end-safe-state-deadline-margin,metric,端到端安全狀態期限裕量",
+        ):
+            self.assertIn(concept, concepts)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_rack_action_contract.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        for contract in (
+            "edge_id: KG-RAC-I17",
+            "to_id: process:safe-state-deadline-passport",
+            "edge_id: KG-RAC-I18",
+            "to_id: metric:end-to-end-safe-state-deadline-margin",
+        ):
+            self.assertIn(contract, graph)
+
     def test_ai_rack_attestation_freshness_contract_separates_expiry_replay_and_authorization(self):
         topic = (
             ROOT / "notes" / "research_topics"

@@ -353,3 +353,43 @@ status: active
 boundary: 把 Task 完成後的設備狀態、獨立感測、復原與維修另列為必要驗收層是跨文件推論；公開資料沒有共同 production record。
 next_trigger: 同一場域公布 request／Task、commanded／observed power／cooling state、fault injection、rollback、repair 與 service sign-off。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-RAC-I17
+view: industry
+from_id: concept:ai-rack-action-contract
+to_id: process:safe-state-deadline-passport
+relation: includes
+claim_refs: MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C17
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 八欄期限護照是研究中心把 DSX timestamp request Redfish asynchronous task 與電力液冷 observed state 接成的查核方法 不是共同功能安全標準 認證或production result。
+next_trigger: 具名場域以同一事件與共同時鐘公開八欄原始時間線 deadline owner safe default recovery 與sign-off。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-RAC-I18
+view: industry
+from_id: concept:ai-rack-action-contract
+to_id: metric:end-to-end-safe-state-deadline-margin
+relation: measured_by
+claim_refs: MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C16,MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C17
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: RFC與Redfish只支持202非完成及後續Task語意 電力液冷文件只支持action與state分離；8秒期限 各段時間 A/B及margin均為假想教材而非產品門檻或實測。
+next_trigger: 同一fault case公開measurement timestamp ingestion decision task commanded observed confirmation與deadline margin分布。
+-->

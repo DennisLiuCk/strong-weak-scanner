@@ -461,6 +461,8 @@ capability:async-action-tracking,capability,非同步動作追蹤,Async action t
 capability:stale-write-protection,capability,舊狀態覆寫保護,Stale write protection|ETag conditional update,concept:ai-rack-action-contract,以資源版本與條件式更新攔下客戶端基於舊狀態提出的衝突變更
 standard:redfish-interop-profile,standard,Redfish 互通 Profile,Redfish interoperability profile|DSP0272,concept:ai-rack-action-contract,把指定設備必須支援的 Redfish 資源 欄位 訊息與動作固定成可供工具查核的最低要求
 capability:physical-state-verification,capability,實際物理狀態驗證,Observed physical state verification|commanded versus observed state,concept:ai-rack-action-contract,在邏輯任務完成後以設備狀態與獨立感測確認電力 液冷與環境真的到達目標狀態
+process:safe-state-deadline-passport,process,安全狀態期限八欄護照,Safe-state deadline passport|end-to-end action timing contract,concept:ai-rack-action-contract,把事件版本 期限定義 時鐘 資料年齡 裁決 API任務 實體致動 獨立確認與失敗復原固定成可重算時間契約
+metric:end-to-end-safe-state-deadline-margin,metric,端到端安全狀態期限裕量,End-to-end safe-state deadline margin|deadline budget utilization,process:safe-state-deadline-passport,以安全狀態期限減去資料年齡 關聯 裁決 任務接受 致動及獨立確認總時間並分開正裕量與deadline miss
 concept:backside-performance-comparison-passport,concept,背面供電效能八格比較護照,Backside power performance comparison passport|BSPDN benchmark passport,concept:backside-power,以受測物 基準 固定條件 指標 活動 時空視窗 PDN環境及共同取捨限制背面供電百分比的比較邊界
 metric:static-ir-drop,metric,靜態電壓降,Static IR drop|DC voltage drop,concept:backside-performance-comparison-passport,在近似固定電流下以直流電阻路徑為核心觀察供電損失的量測
 metric:dynamic-voltage-droop,metric,動態電壓下陷,Dynamic voltage droop|dynamic IR drop,concept:backside-performance-comparison-passport,在電晶體快速切換時依活動向量及時間視窗觀察電阻電感與電容共同造成的瞬態供電下降

@@ -68,6 +68,13 @@ to: triaged
 reason: backfilled_redfish_action_state_conformance_and_physical_verification_evidence
 evidence: sources:S8,S9,S10,S11,S12
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_end_to_end_safe_state_deadline_budget_without_thesis_or_clock_refresh
+evidence: sources:S1,S8,S11,S12,S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -93,6 +100,12 @@ evidence: sources:S8,S9,S10,S11,S12
 - **動作狀態**：告訴外部系統一項請求正在處理、已完成、失敗或已復原的回報。
 - **確認回覆（acknowledgement）**：接收端明確表示已收到請求；收到不等於同意執行，更不等於動作完成。
 - **逾時（timeout）**：超過預定時間仍未收到回覆或結果時的處理規則。
+- **安全狀態期限（safe-state deadline）**：從指定事件起點算起，設備必須被獨立確認到達安全狀態的最晚時間；期限起點、終點與誰批准都要先寫清楚。
+- **端到端時間預算（end-to-end time budget）**：把資料年齡、傳輸、裁決、排隊、致動與確認各自花掉的時間放進同一本帳，而不是只量 API 回應速度。
+- **資料年齡（data age）**：系統開始判讀時，感測值距原始量測時間已經過多久；資料在網路與佇列裡等待的時間也會消耗安全期限。
+- **致動時間（actuation time）**：控制命令交給實體 relay、breaker、valve、pump 或 cooling unit 後，到設備實際改變狀態所需的時間。
+- **獨立確認時間（independent confirmation time）**：致動後用另一個狀態欄位或感測路徑確認目標物理狀態的時間；它不能只重讀命令回覆。
+- **期限裕量（deadline margin）**：安全狀態期限減去端到端實際時間；正值代表尚有餘量，負值代表已逾時，但本文示例數字不是任何產品門檻。
 - **請求關聯編號（correlation ID）**：把告警、請求、非同步任務、設備狀態與維修工單串成同一事件的穩定編號；本文沒有找到公開規格已替整條鏈固定共同欄位。
 - **冪等（idempotency）**：同一請求因逾時而重送時，不會重複執行危險動作的特性。資源版本檢查可以擋舊資料覆寫，卻不自動保證每個 action 都能安全重送。
 - **資源版本標籤（ETag）**：服務替一份資源狀態產生的版本標記；客戶端可用它說明「我是在這個版本上提出更新」。
@@ -103,6 +116,8 @@ evidence: sources:S8,S9,S10,S11,S12
 - **任務監看入口（Task Monitor）**：Redfish 讓客戶端查詢長時間工作進度與最後成功或失敗的網址；任務完成仍需另看設備實際狀態。
 - **任務狀態（TaskState）**：Redfish Task 用來標示工作處於新建、執行中、完成、例外或被取消等階段的欄位；它仍是管理軟體所見狀態。
 - **回查位置（Location）**：HTTP 回應告訴客戶端接下來到哪個網址查詢非同步工作；網址日後可能失效，不能拿它代替長期事件紀錄。
+- **Retry-After**：HTTP 回應用來提示客戶端隔多久再查或再送請求的欄位；它不是工作完成時間，也不是安全狀態期限。
+- **服務水準協議（SLA）**：供應方與使用方約定的可用率、延遲或處理期限；若沒有量測起點、終點、統計窗口與例外條件，就不能把一句「很快」當成可驗收的 SLA。
 - **命令狀態（commanded state）**：控制系統認為自己已發出或完成的邏輯動作，例如要求關閉某個 outlet。
 - **實際觀測狀態（observed physical state）**：由設備狀態與獨立感測確認電力、流量、泵浦或漏液狀態真的改變；它不能只沿用命令回覆。
 - **互通 profile（interoperability profile）**：把必須支援的 Redfish 資源、欄位、訊息與 action 寫成機器可讀的最低要求，供採購與測試工具使用。
@@ -356,6 +371,22 @@ url: https://www.dmtf.org/sites/default/files/standards/documents/DSP2064_1.1.0.
 locator: pp.36–39 CoolingUnit 與 SetMode；pp.58–64 LeakDetection／LeakDetector；pp.70–72 Pump 與 SetMode
 limitation: 白皮書界定 cooling resource、leak state 與 enable／disable action；沒有規定 DSX request mapping、跨電力協同、場域 guardrail、故障注入、復原或維修閉環
 independence_group: dmtf-redfish
+-->
+
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: document
+publisher: Internet Engineering Task Force
+title: RFC 9110 HTTP Semantics
+published_at: 2022-06-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.rfc-editor.org/rfc/rfc9110.html
+locator: §§10.2.3、15.3.3；202 Accepted 只表示請求已接受但處理尚未完成、日後可能執行也可能不執行，HTTP 不會由非同步操作重新送一次狀態碼；response 應描述目前狀態並指向 status monitor；Retry-After 表示後續請求前建議等待時間。RFC header 只標 June 2022，帳本日期以 2022-06-01 正規化且不主張日精度
+limitation: RFC 9110 是通用 HTTP 語意，不定義 Redfish Task、DSX isolation、rack safe-state deadline、實體致動、獨立感測、功能安全或場域驗收；它只界定 202 與 follow-up timing 的協定邊界，不證明任何設備、平台、客戶或 production outcome
+independence_group: ietf-http
 -->
 
 <!-- research_claim
@@ -613,6 +644,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: IETF RFC 9110 將 202 Accepted 定義為請求已被接受處理但尚未完成，後續可能被執行也可能在真正處理時被拒絕，且 HTTP 沒有由非同步操作再次送出狀態碼的機制；回應應描述目前狀態並指向 status monitor。DMTF Redfish 1.24.0 另用 Location、Retry-After、Task Monitor 與 TaskState 補上輪詢路徑，但這些欄位仍只到管理服務狀態
+supporting_source_ids: S8,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S13 §15.3.3 直接說明 202 的 intentionally noncommittal 邊界與 status monitor，§10.2.3 定義 Retry-After；S8 §12.2 直接規定 Redfish 202 response、Location／Retry-After、Task Monitor 與 TaskState
+boundary: 只證實 HTTP 與 Redfish 的非同步狀態語意，不證明 DSX isolation 採同一 Task、Retry-After 是完成承諾、設備已動作、物理狀態已確認、safe-state deadline 已達成或服務已復原；S8 與 S13 是兩條標準鏈，不是兩個產品或場域樣本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: AI 機櫃隔離的時間驗收應把資料年齡、身分／關聯對齊、guardrail 裁決、API 接受與排隊、實體致動、獨立物理確認及 safe-default／復原分開，並以安全狀態期限減去各段總和得到 deadline margin；本文固定 8.0 秒教材中，A 在 2.7 秒收到 202、7.2 秒完成獨立確認而餘 0.8 秒，B 同樣在 2.7 秒收到 202、卻因致動較慢到 8.5 秒才確認而逾時 0.5 秒，因此 API acceptance latency 不能替代 end-to-end safe-state time
+supporting_source_ids: S1,S8,S11,S12,S13
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S1 分開 timestamp／quality、request 與 isolation status，S8／S13 分開 202 與非同步結果，S11／S12 分開 action、transition、設備 state 與感測欄位；把六段時間放進同一期限帳與兩個固定案例，是研究中心依這些責任邊界建立的可重算教材
+boundary: 8.0 秒期限、1.2／0.3／0.8／0.4／3.5或4.8／1.0 秒各段、A／B、90.0%／106.25%預算使用率與 pass／fail 都是假想，不是 DSX、Redfish、電力、液冷、功能安全或 AI rack 的規定與實測；N=2 是固定案例數，沒有 sampling SE／t、故障率、SLA、部署或財務效果
+verification_needed: 具名場域以共同時鐘公開同一事件的原始 sensor timestamp、ingest／correlation、guardrail decision、202／Task、commanded state、observed physical state、independent confirmation、deadline owner、timeout／safe default、recovery 與 service sign-off
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 從警報到復原：七個步驟不能少
 
 | 控制步驟 | 這一步要回答什麼 | 公開文件目前支持什麼 | 還缺哪些現場證據 |
@@ -647,6 +712,69 @@ resolution:
 Task Monitor 可能在工作結束後被刪除，Redfish 允許較晚查詢回覆 `404 Not Found` 或 `410 Gone`。
 所以場域若要稽核，不能只保存一個之後會失效的網址；仍要把 Task、設備讀值、事件訊息與工單按同一
 關聯編號封存。公開資料尚未證明 DSX 已提供這份跨系統共同紀錄。
+
+## 202 Accepted 很快，為什麼安全隔離仍可能逾時
+
+前一節回答「五層成功各代表什麼」，這一節改問「每一層何時發生」。兩者不能互相替代：狀態語意
+完整，仍可能超過安全期限；API 很快，仍可能卡在排隊、致動或物理確認。真正要量的是從指定事件
+起點到**獨立確認安全狀態**的端到端時間，而不是只看 HTTP round trip。
+
+RFC 9110 對 `202 Accepted` 的邊界比「排隊成功」更窄：處理尚未完成，之後可能執行，也可能在
+真正處理時被拒絕；HTTP 不會由非同步操作再主動送一次新的狀態碼，回應因此應指向 status monitor。
+[S13] Redfish 再用 `Location`、`Retry-After`、Task Monitor 與 TaskState 讓客戶端輪詢。[S8]
+但 `Retry-After` 只告訴客戶端何時再查，並不是設備將在該時點前完成的承諾；Task completed 也還要
+接到電力或液冷的 observed state。[S11][S12]
+
+### 同樣在 2.7 秒收到 202，兩個結局卻不同
+
+以下是純教材，不是 AI 機櫃、DSX、Redfish、電力或液冷規格。假設某一事件從原始感測 timestamp
+算起，必須在 `D_safe=8.0 秒` 內完成獨立物理確認；A、B 共用相同資料年齡、關聯、裁決、API
+接受與確認時間，只讓實體致動時間由 `3.5 秒` 變成 `4.8 秒`。所有系統時鐘在本例假設已對齊，
+沒有另加 clock uncertainty；真實驗收必須把同步方法與不確定度寫回帳本。
+
+| 時間段 | 本例花費 | A 累計 | B 累計 | 這一段回答什麼 |
+|---|---:|---:|---:|---|
+| 1. 資料年齡 | 1.2 秒 | 1.2 秒 | 1.2 秒 | 系統開始處理前，感測值已經多舊 |
+| 2. 身分／關聯與傳輸 | 0.3 秒 | 1.5 秒 | 1.5 秒 | 找到正確機櫃並把事件接到同一 request |
+| 3. Guardrail 裁決 | 0.8 秒 | 2.3 秒 | 2.3 秒 | 權限、限值、互鎖與 safe-default policy 是否允許動作 |
+| 4. API 接受／Task 建立 | 0.4 秒 | 2.7 秒 | 2.7 秒 | 服務回覆 `202` 並提供可追蹤工作 |
+| 5. 實體致動 | A 3.5 秒／B 4.8 秒 | 6.2 秒 | 7.5 秒 | relay、breaker、valve、pump 或 cooling unit 是否真的改變 |
+| 6. 獨立物理確認 | 1.0 秒 | 7.2 秒 | 8.5 秒 | 另一狀態或感測路徑是否支持已到安全狀態 |
+
+本例公式把 `T_safe` 定義為 data age、correlation、decision、task acceptance、actuation 與
+independent confirmation 的總和；`deadline margin = D_safe − T_safe`。兩案都在累計 `2.7 秒`
+收到 `202`，此時已用掉
+`33.75%` 的 8 秒預算、還剩 `5.3 秒`。A 在 `7.2 秒` 完成確認，使用 `90.0%` 預算並留下
+`+0.8 秒` 裕量；B 在 `8.5 秒` 才完成，使用 `106.25%` 預算並以 `−0.5 秒` 逾時。相同的 API
+acceptance latency，不能替兩案得到相同的 safe-state 結論。
+
+Python `Fraction` 精確有理數與獨立 `awk` 浮點路徑均得到：acceptance 累計 2.70、剩餘 5.30、
+A 的 7.20／+0.80／90.00%／pass，以及 B 的 8.50／−0.50／106.25%／fail。這是 `N=2` 個固定
+假想案例的確定性加總，不是抽樣、故障注入、設備測試或 production log，沒有 sampling SE／t、
+分位數、SLA、失效率、部署、收入或公司效果。
+
+**逾時後要做什麼也是契約的一部分。** B 的 `−0.5 秒` 不能只在 dashboard 變紅；場域必須事前
+指定是否拒絕後續請求、改走本地保護、切到另一致動路徑、人工介入或保留控制電力。本文沒有取得
+這類具名場域規則，因此示例只判定 deadline miss，不替任何平台選 safe default。
+
+### 多空小作文要共用八欄安全狀態期限護照
+
+| 八欄期限護照 | 至少保存什麼 | 缺少時最容易被誤讀成 |
+|---|---|---|
+| 1. 事件與受控版本 | rack／PDU／CDU／BMC、韌體、設定、負載與 correlation ID | 同系列設備都具有相同時序 |
+| 2. 期限定義與責任人 | hazard、起點、終點、`D_safe`、批准者與適用模式 | 任意 timeout 都等於安全期限 |
+| 3. 時鐘與量測邊界 | timestamp 來源、同步方法、clock uncertainty、解析度與缺值 | 不同系統時間可直接相減 |
+| 4. 資料年齡與關聯 | measurement time、ingest、quality、身分 mapping、傳輸與 queue | API 收到時資料仍是即時狀態 |
+| 5. 裁決時間 | guardrail／權限／互鎖 policy 版本、輸入、accept／reject 與耗時 | 快速決策一定是正確決策 |
+| 6. API 與 Task 時間 | request、`202`、Location、Retry-After、TaskState、錯誤與重查節奏 | `202` 或短 round trip 等於動作快 |
+| 7. 致動與獨立確認 | commanded state、設備 transition、observed state、獨立感測與每段 timeout | Task completed 等於物理安全狀態 |
+| 8. 裕量、失敗與復原 | margin、deadline miss、safe default、rollback、人工介入、recovery、service sign-off | 一次 pass 就代表長期可靠與可量產 |
+
+偏多小作文會說，端到端時間預算讓控制系統在故障擴大前自動隔離，降低人工確認與影響範圍；偏空
+小作文則會說，跨 IT／OT 關聯、非同步 Task、輪詢與多個致動器讓延遲和故障面增加，過短期限還可能
+造成誤隔離。兩邊都必須交同一張八欄護照、完整事件分母、各段原始 timestamp、pass／miss／reject／
+override／rollback 結果、連續運行區段與統計不確定度。只有平均 API latency 或一個成功 demo，既
+不能證明偏多的可靠自動化，也不能證明偏空的架構失效，更不能直接推導台灣公司的訂單與損益。
 
 ## 四種錯誤要用四種機制：版本、重送、仲裁與結果不能混用
 
@@ -832,6 +960,7 @@ invalidation: 公開測試顯示 API accepted／Task state 無法可靠對應 ph
 
 - DSX 是單一平台的介面規格，不能直接稱為所有 AI 資料中心的共同標準；Redfish 使用相似資源名稱，也不能證明它和 DSX 已在欄位層互通。
 - `202 Accepted` 與 Task 完成都只到管理軟體層；仍缺同一事件把命令結果、電力／液冷設備狀態、獨立感測、復原測試與維修簽核接起來的量產紀錄。
+- 安全期限必須固定 hazard、起點、終點、共同時鐘、各段時間與 deadline margin；只報 API 平均延遲或 `Retry-After`，不能證明設備在期限內到達並被獨立確認為安全狀態。
 - ETag 可攔下舊資源版本覆寫，卻不等於 action 可安全重送；仍要公開共同關聯編號、去重範圍、跨電力／液冷仲裁、逾時與回退規則。
 - Validator 通過必須附工具、版本、profile、測試目標與 pass／fail／skip 明細；它不能替多供應商故障注入、實體動作或場域驗收背書。
 - 隔離請求與狀態欄位存在，不代表隔離速度、成功率、可靠度或維護成本已改善；這些判定都需要量產現場的請求總數與成功、失敗結果。
