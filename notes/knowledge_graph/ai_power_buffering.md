@@ -4,14 +4,15 @@
 reference design；族群節點仍是待驗證搜尋路由，沒有一條線代表台灣公司已取得量產訂單。
 新增的七欄事件合約把任務、功率波形、可用能量、反應交接、回充、損耗熱與壽命安全連回同一
 根節點；銘牌到可交付能量橋接再把功率與秒數、SOC、SOH、效率、功率限制及資格帳分開，方便
-讀者看出「時間尺度」只是第一道篩選，不是完整替代性或公司受惠判準。
+讀者看出「時間尺度」只是第一道篩選，不是完整替代性或公司受惠判準。重複事件就緒護照再把
+第一次 EOD、充電延遲、淨回充、聚合排程、rearm 與第二脈衝結果接成另一個可稽核時鐘。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-power-buffering
 root_node_id: concept:ai-power-buffering
 label: AI 功率緩衝時間尺度
-summary: 以機架附近的 CBU、rack ride-through BBU 與設施級 BESS 拆解 AI 負載波動，再以七欄事件合約及銘牌到可交付能量橋接核對功率 能量 SOC SOH 交接 回充 損耗與壽命，並把架構必要性與台灣供應商財務證據分開。
+summary: 以機架附近的 CBU rack ride-through BBU 與設施級 BESS 拆解 AI 負載波動，再以七欄事件合約 銘牌到可交付能量橋接及重複事件就緒護照核對功率 能量 SOC SOH 交接 回充債務 聚合排程 rearm second pulse 損耗與壽命，並把架構必要性與台灣供應商財務證據分開。
 article_ids: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY
 status: active
 -->
@@ -374,4 +375,44 @@ review_due: 2026-09-01
 status: active
 boundary: OCP 的功率與秒數只支持條件式理想任務能量，NREL grid BESS 模型只提供 SOC／SOH／效率與 power-limit 方法；兩者不是同一 production rack，也不支持實際銘牌、模組數、供應商或財務歸因。
 next_trigger: 同一 production rack 公布 reference plane、負載波形、秒數、SOC limits、EOL SOH、效率、輔助負載、C-rate、熱限、冗餘、模組銘牌與 qualification pass／fail。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I17
+view: industry
+from_id: concept:ai-power-buffering
+to_id: process:ai-buffer-repeat-event-readiness-passport
+relation: requires
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C16
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: OCP Open Rack V3 DOE 與 NREL 三條機構消息鏈共同支持把放電 回充 效率 SOC SOH與控制分開，但十一欄護照是研究中心整合方法，不是三方共同標準或800V production requirement。
+as_of: 2026-08-15
+review_due: 2026-09-01
+status: active
+boundary: 護照用來綁定平台 參考平面 第一次EOD 事件後狀態 delay cooldown 淨回充 聚合排程 rearm 第二事件 最差條件與商業共同鍵；不建立通用minimum gap 數值 技術選擇 BOM或公司受惠。
+next_trigger: 同一800V production platform 公布可重建的first-event recharge second-event原始紀錄 qualification field outcome production BOM與財務橋。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-APB-I18
+view: industry
+from_id: concept:ai-power-buffering
+to_id: metric:recharge-debt-inter-event-readiness
+relation: measured_by
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C13,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C14,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C15,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C16
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope: N等於1份48V Open Rack V3規格只示範放電與回充時鐘分離；720kJ 90倍 0.05556kWh及0.78與1.59kW是確定性換算，不是隨機平台或800V實測。
+as_of: 2026-08-15
+review_due: 2026-09-01
+status: active
+boundary: 90倍不代表效率或minimum gap 720kJ不代表pack容量 六模組同時充電不代表OCP排程；沒有共同reference plane與second-pulse結果就不能宣稱再次就緒 availability或財務效果。
+next_trigger: 固定production版本與共同時鐘後公布第一次EOD SOC SOH溫度 delay cooldown charger input 淨補回 聚合限制 rearm門檻 第二事件及pass fail量測不確定度。
 -->

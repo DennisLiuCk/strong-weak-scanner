@@ -80,6 +80,14 @@ reason: converted_bbu_power_and_duration_into_conditional_delivered_energy_book_
 evidence: sources:S2,S8
 -->
 
+<!-- transition
+date: 2026-08-15
+from: triaged
+to: triaged
+reason: added_repeat_event_recharge_debt_and_rearm_passport_without_refreshing_thesis_clock
+evidence: sources:S9
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -90,6 +98,9 @@ evidence: sources:S2,S8
 - **PSU（Power Supply Unit，電源供應單元）**：把輸入電力轉成設備需要的電壓與電流；其內建保持能量可先撐過極短交接縫隙。
 - **DOE（U.S. Department of Energy，美國能源部）**：本文引用其通用儲能定義與性能方法，用來拆解規格欄位，不代表 DOE 對 AI 機架架構背書。
 - **NREL（National Renewable Energy Laboratory，美國國家再生能源實驗室）**：本文引用其共同作者的 BESS 模型來拆量綱；grid-scale 模型不等於 AI rack BBU 設計或產品背書。
+- **Open Rack V3（ORV3）**：OCP 的 48V 開放機架規格家族；本文只用其 BBU 1.4 示範放電、回充與系統排程如何分欄，不把數值套到 800V 架構。
+- **Python**：本文用來進行確定性單位換算的程式語言；執行結果仍需另一條獨立路徑核對，不能因程式跑完就視為工程驗證。
+- **Decimal（十進位精確算術）**：Python 的十進位計算工具，可避免部分二進位浮點顯示誤差；它只改善算術重現性，不處理輸入假設錯誤。
 - **BBU（Battery Backup Unit）**：以電池在機架或直流匯流排側提供短時 ride-through，目的通常是跨過電源切換或受控停機，不等於設施級儲能。
 - **BESS（Battery Energy Storage System）**：位於設施或公用電網介面側的較大型電池儲能，用來處理較慢、影響範圍更大的負載變化與發電機切換。
 - **時間尺度**：事件從發生到需要被補償的快慢。元件若在錯誤的時間尺度工作，即使都能儲能，也不代表可互相替代。
@@ -112,11 +123,16 @@ evidence: sources:S2,S8
 - **可用能量（usable energy）**：扣除最低／最高電壓或荷電狀態、安全餘裕、轉換與輔助負載損失後，任務真正能取出的能量；不等於銘牌總容量。
 - **額定／銘牌能量（rated／nameplate energy）**：產品在指定條件下標示的總能量基準；它還沒有扣除任務保留的 SOC 窗口、老化、放電損失、輔助負載與安全餘裕。
 - **健康狀態（SOH）**：儲能目前最大容量相對於全新額定容量的比例；設備老化後，即使顯示相同 SOC，可交付的絕對能量也可能較少。
+- **EOL（End of Life，規格壽命終點）**：設備達到規格定義的容量、性能或可靠度門檻；不一定代表當下完全不能運作，但不能再用全新狀態替它背書。
 - **C-rate**：電池充放電功率相對於能量容量的速率尺度；能量總量足夠，不代表模組能在指定時間內安全輸出所需功率。
 - **交付參考平面（delivery reference plane）**：指定在哪個電氣邊界量功率與能量，例如 BBU 輸出端、匯流排或 IT rack 輸入端；量測位置不同，是否包含轉換、線損、冷卻與控制負載也不同。
 - **反應時間（response time）**：從偵測事件到儲能輸出達到指定功率所需時間。只看能量夠不夠，仍可能因反應太慢而接不上。
 - **交接時間（handoff time）**：主電源、內建保持能量、CBU／BBU 與後續電源之間切換的時間窗口；前一層必須撐到下一層穩定接手。
 - **回充時間（recharge time）**：一次放電後恢復到可再次執行任務所需時間；事件來得比回充快，就可能出現「第一發有用、第二發沒電」。
+- **放電能量（EOD，Energy of Discharge）**：一次事件中由儲能實際放出的能量；必須固定量測起訖與參考平面，不能只用事件秒數代替。
+- **回充債務（recharge debt）**：前一事件已交付、但在下一事件前尚未補回到指定可用範圍的能量缺口；它不是電費或會計負債。
+- **事件間隔（inter-event interval）**：前一事件結束到下一事件開始的時間；若中間還有控制延遲或冷卻，真正可用來回充的時間會更短。
+- **再次武裝（re-armed）**：儲能已回到規格要求的 SOC、溫度、健康、通訊與無故障狀態，可承接下一個指定事件；只顯示「正在充電」不等於已就緒。
 - **荷電狀態（SOC）**：儲能剩餘能量相對於可用範圍的狀態指標。相同銘牌容量在不同 SOC 下，不代表當下有相同備援能力。
 - **往返效率（round-trip efficiency）**：同一荷電狀態起訖下，放出的淨能量相對於充入能量的比率；充放電、轉換、熱管理與輔助設備都可能造成損失。
 - **循環壽命／日曆壽命**：前者看反覆充放電與放電深度累積後能用幾次，後者看即使不頻繁使用也會隨時間、溫度與 SOC 老化多久。
@@ -147,6 +163,7 @@ evidence: sources:S2,S8
 
 - 追 OCP Open Rack／Diablo 是否把電容儲能、電池備援、高壓直流匯流排、保護與連接器寫成正式規格，並完成互通測試。
 - 追同一平台是否公開事件波形、可用能量窗口、反應／交接時間、回充時間、重複頻率、溫度、效率與壽命，避免只拿一個「備援秒數」比較設備。
+- 追同一平台是否公布第一次事件後的放電能量、充電延遲、充電功率上限、恢復 SOC／溫度、第二次事件間隔與 pass／fail，確認「再次武裝」不是只看充電圖示。
 - 追 NVIDIA 或平台客戶是否公布同一量產機櫃中，三種儲能設備的位置、額定任務、客戶資格驗證與現場部署資料。
 - 追台灣被動元件、電源供應與功率元件公司是否以具名產品、客戶驗收、量產數量及可辨識財務貢獻完成雙向核對。
 
@@ -155,6 +172,7 @@ evidence: sources:S2,S8
 - 機櫃旁的電容儲能模組只能處理毫秒到秒的尖峰，為什麼不能取代能支撐數十秒的電池備援單元？
 - 兩套設備的銘牌能量若一樣，但一套能快速輸出、另一套只能慢慢放電，為什麼不能視為相同備援能力？
 - 一套儲能第一次尖峰能接住，卻來不及在下一次尖峰前回充，這算不算符合任務？還缺哪個規格欄位？
+- 若規格只寫「最長六小時充滿」，卻沒有前一事件消耗、延遲、冷卻與下一事件間隔，為什麼仍無法判定第二次事件是否安全？
 - 設施級電池儲能能平滑秒至分鐘的整體負載，為什麼仍不能取代靠近機櫃的快速緩衝？
 - 一家公司被列在 800V 生態系，和它的具名電容、控制器或電源模組進入量產材料清單，中間還缺哪些驗證？
 
@@ -289,6 +307,22 @@ url: https://docs.nrel.gov/docs/fy20osti/75364.pdf
 locator: PDF pp.9–11，§2.4.1 Equations (7)–(13)；available discharge power 受 C-rate、SOC window、discharge efficiency 與 SOH 限制
 limitation: 這是為 grid-scale hybrid power plant control 建立並驗證的簡化 BESS 模型，不是 Diablo 400 rack BBU 設計；公式可用來檢查量綱與缺失欄位，不能把模型參數、電池化學、效率、溫度或壽命外推到 AI 機架
 independence_group: nrel-bess-performance-model
+-->
+
+<!-- research_source
+source_id: S9
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Open Rack V3 BBU Module Specification 1.4
+published_at: 2023-09-12
+captured_at: 2026-08-14
+accepted_at: 2026-08-15
+status: active
+url: https://www.opencompute.org/documents/open-rack-v3-bbu-module-spec-1-4-pdf
+locator: PDF p.13 Overview；pp.15–16 §4.2.1／§4.3 的 3kW、至少 4 分鐘與 240 秒；pp.19–21 §4.4 Charger 的 130W／265W、最長 6 小時、EOD 充電電流規則、系統 override、1 分鐘延遲與冷卻邊界
+limitation: 這是 narrow-range 48V Open Rack V3 BBU 規格，不是 Diablo 400、800VDC、NVIDIA 下一代 rack 或任何台灣供應商產品；規格值不能跨平台外推，也沒有 second-event field distribution、production BOM、採購量或公司財務資料
+independence_group: open-compute-project
 -->
 
 <!-- research_claim
@@ -495,6 +529,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C13
+label: verified
+status: active
+claim: OCP Open Rack V3 BBU 1.4 在同一 48V 模組規格中要求 3kW 放電至少 4 分鐘，另列每模組 130W@2A／265W@5A 的總充電輸入功率，以及在每個 battery pack 2A 下由 0% 到 100% SOC 最長 6 小時的回充時間
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2023-09-12
+basis: S9 pp.13、15–16、19–20 分別固定平台、模組與 shelf 邊界、3kW／240 秒放電任務、charger input power 及 0% 到 100% SOC 的最大回充時間
+boundary: 只證實 Open Rack V3 narrow-range 48V BBU 規格；不能把 240 秒、130W、265W 或 6 小時套到 Diablo 400、800V CBU／BBU、其他電池化學、量產場域或供應商財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: 同一 Open Rack V3 規格以一次放電能量 200kJ 為 1A／2A 充電電流切點，允許 rack monitor 在 0A 至 5A 間 override，並要求放電後至少延遲 1 分鐘才開始充電；文件明說變動充電電流是為降低大量 BBU 同時要求充電時的資料中心功率
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2023-09-12
+basis: S9 pp.20–21 §4.4.1–4.4.4 直接列出 EOD 門檻、系統 override、0A 延遲、1 分鐘 charge delay、可能更久的 cell cooling 與大量 BBU 同時回充的設計理由
+boundary: 只證實該規格的控制合約；不表示所有六顆模組同時充電、所有站點使用相同 override、任何事件在 1 分鐘後必然恢復，也不提供 800V 平台實測
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: 在 Open Rack V3 這一固定規格案例中，3kW 乘 240 秒只得到 720kJ／0.2000kWh 的理想任務能量；6 小時與 240 秒的時間窗口相差 90 倍，200kJ 等於 0.05556kWh，六模組若同時以表列功率充電則條件式輸入為 0.78／1.59kW，但這些換算都不是效率、電池容量或 800V 需求
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-08-15
+basis: 以 S9 的 3kW、240 秒、6 小時、200kJ、六模組及 130W／265W 固定輸入，使用 Python Decimal 與獨立 awk 重算能量、時間比與條件式 shelf input；兩路結果逐項一致
+boundary: 720kJ 是最低任務輸出積分，不是 pack nameplate；90 倍只比較兩個規格時間窗口，起訖 SOC 與 reference plane 不同，不能當 round-trip efficiency；六模組同時充電是假設情境，不是 OCP 指定排程或 field load
+verification_needed: 需同一 production shelf 的事件前後 SOC／SOH、原始功率波形、charge enable／override、溫度、效率、同步模組數、第二次事件與 pass／fail 才能量化實際回充債務及就緒率
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 重複事件就緒度應把第一次事件的放電能量、事件後 SOC 與溫度、充電延遲、充電功率與效率、場域同時充電限制、恢復門檻、第二次事件間隔及 second-pulse pass／fail 綁在同一參考平面；第一次事件通過或「正在充電」都不足以證明已再次武裝
+supporting_source_ids: S7,S8,S9
+contrary_source_ids:
+as_of: 2026-08-15
+basis: S9 分開 discharge、charge delay、EOD、SOC、charge current override 與 aggregate load；S7 分開效率、反應與壽命，S8 把 SOC／SOH／效率及功率限制連到可交付能量，合併後形成 repeat-event readiness passport
+boundary: 回充債務與十一欄護照是本文的證據整理方法，不是 OCP、DOE 或 NREL 共同頒布的標準；不設定通用 minimum gap、SOC threshold、充電功率、技術路線、供應商或財務結論
+verification_needed: 需同一 800V production platform 在固定 reference plane 公布第一與第二事件原始波形、EOD、SOC、溫度、delay、充電、rearm 判定、EOL／fault 條件及 field outcome
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 三種儲能怎麼接力：先看事件持續多久
 
 | 事件持續多久 | 誰來處理 | 設備在哪裡 | 目前一手證據 | 還不能因此判定 |
@@ -611,6 +713,90 @@ SOC window、EOL SOH、放電效率、輔助負載、C-rate／熱限、冗餘、
 缺口——實際配置、波形、SOC、SOH、效率、輔助負載、溫度、冗餘與模組規格都未公開——因此實際
 銘牌容量與採購價值仍不可識別，也不宣稱價格、估值、共識或市場是否反映。
 
+## 第一次撐住，不等於第二次已就緒：把回充債務放回事件間隔
+
+前一節算的是「一次事件要交付多少能量」，這一節改問「事件結束後，多久才有資格再承接一次」。
+兩者不能共用一個秒數。OCP Open Rack V3 BBU 1.4 提供一個很清楚、但屬於另一代 48V 架構的案例：
+它把放電任務、充電輸入、回充時間、系統排程與冷卻延遲分成不同欄位。這不是 Diablo 400 的 800V
+答案，正因為平台不同，反而可以用來辨認下一份 800V 文件至少還缺哪些欄位。
+
+### 48V BBU 案例：4 分鐘放電與最長 6 小時完整回充是兩個時鐘
+
+| 規格參考面 | Open Rack V3 BBU 1.4 寫了什麼 | 可以算什麼 | 不能因此推什麼 |
+|---|---|---|---|
+| 系統與模組 | narrow-range 48V；每 shelf 六顆 BBU，採 5+1 冗餘 | 固定這一份規格的模組分母 | 不能改寫成 Diablo 400 或 800V rack 配置 |
+| 放電任務 | 每模組 3kW、至少 4 分鐘，並綁定 PCM 電壓門檻與 35°C 壽命條件 | 理想任務輸出至少 720kJ／0.2000kWh | 不是 battery pack 銘牌容量、完整 SOC window 或效率 |
+| 充電輸入 | 每模組總輸入 130W@2A 或 265W@5A，含風扇與控制電路 | 若六顆同時處於表列模式，條件式 shelf input 為 0.78／1.59kW | OCP 沒有要求六顆必須同時充電，也沒有給 field 排程分布 |
+| 完整回充 | 每 pack 2A 時，由 0% 到 100% SOC 最長 6 小時 | 6 小時與 240 秒的時間窗口相差 90 倍 | 90 倍不是能量比、往返效率或第二次事件的 minimum gap |
+| 充電電流控制 | EOD 小於 200kJ 時 1A，達 200kJ 時 2A；rack monitor 可在 0A 至 5A override | 200kJ 等於 0.05556kWh，只是控制切點的單位轉換 | 不能把切點當可用容量、事件保證或 800V 控制規則 |
+| 延遲與聚合 | 放電後至少延遲 1 分鐘，電芯冷卻可能更久；變動電流用來降低大量 BBU 同時回充的設施負載 | 回充可用時間小於事件間隔，回充也是資料中心的新負載 | 不能假定事件一結束就以最大功率充電，或每站點都用相同策略 |
+
+3kW×240 秒＝720kJ＝0.2000kWh，21,600 秒÷240 秒＝90，200kJ÷3,600＝
+0.05556kWh；六顆分別乘 130W／265W 得 0.78／1.59kW。以上由 Python Decimal 與獨立 awk
+逐項重算一致。240 秒是指定輸出任務，6 小時是 0% 到 100% SOC 的最大回充時間，130W／265W
+又量在 busbar 輸入並包含風扇與控制；起訖狀態與 reference plane 都不同，所以不能拿兩邊直接相除
+求效率，也不能由 0.2000kWh 反推電池包容量。
+
+### 回充債務只能在共同參考平面上結清
+
+第一次事件結束時，可先把同一交付端量到的輸出能量記為初始回充債務 D₀。延遲與冷卻結束後，
+才開始累積可補回的能量；若充電功率量在 busbar input，就必須先扣除充電轉換、控制、風扇與熱管理
+損耗，再換到同一儲能可用能量平面。到第二次事件開始 t₂ 時，可以用下列三步檢查：
+
+1. 可補回能量 E_restore(t₂)＝充電啟用後到 t₂ 的淨充電功率積分。
+2. 尚未結清債務 D(t₂)＝max［0，D₀−E_restore(t₂)］。
+3. 再次就緒不只要求可用能量大於第二次任務能量加安全保留，還要同時通過 SOC、SOH、溫度、故障、通訊與控制狀態。
+
+這個式子故意不代入 Open Rack V3 的 130W 或 265W，因為它們是 charger input，不是已補回電池的
+淨能量。若平台只公布「正在充電」、單一 SOC 百分比或最大回充時間，卻沒有時間戳、效率、輔助負載、
+溫度與第二次事件波形，研究者仍無法知道事件到來時債務是否真正結清。
+
+### 一張重複事件就緒護照至少要有十一欄
+
+| 護照欄位 | 同一測試要保存什麼 | 少了會誤判什麼 |
+|---|---|---|
+| 1. 平台與配置 | rack／shelf／module 版本、電壓架構、模組數與冗餘 | 把 48V 六模組規格套到 800V 平台 |
+| 2. 事件與參考平面 | 觸發、退出、輸出量測位置與共同時鐘 | 把 busbar input、battery 與 IT load 能量相減 |
+| 3. 第一次事件 | 原始功率波形、持續時間、EOD 與 pass／fail | 只用 headline 秒數代替實際放電量 |
+| 4. 事件後狀態 | 起訖 SOC、SOH、cell／module 溫度、告警與故障 | 以銘牌或平均溫度假定仍有相同備援能力 |
+| 5. 充電啟用 | 固定延遲、冷卻條件、enable／override 時間戳 | 把全部事件間隔當成可回充時間 |
+| 6. 回充功率橋 | input current／power、轉換效率、風扇、控制與熱管理負載 | 把 charger input 全部當成已恢復可用能量 |
+| 7. 聚合排程 | 同時要求充電的模組／rack 數、設施上限與 scheduler 規則 | 忽略數千顆 BBU 回充形成的新尖峰 |
+| 8. 恢復門檻 | 目標 SOC、可用能量、溫度、健康與 re-armed 訊號定義 | 把「正在充電」誤認成「可以再放電」 |
+| 9. 第二次事件 | inter-event interval、第二波形、任務能量與保留 | 用第一次 pass 替第二次 pass 背書 |
+| 10. 最差條件 | end-of-life、最高溫、單一故障、冗餘與 second-pulse 結果 | 把全新樣品的一次展示當長期可用率 |
+| 11. 商業共同鍵 | supplier、production BOM、module count、ASP、出貨、驗收、收入、毛利與現金 | 由控制複雜度直接推出台灣公司受惠 |
+
+### 多方小作文：短事件間隔可能增加的不只電池
+
+若量產平台要求在更短 inter-event interval、end-of-life、最差溫度與單一故障下仍完成第二脈衝，
+系統可能需要更大的可用能量保留、更高充電功率、更多並聯模組，以及更完整的 BMS、雙向轉換、遙測、
+保護、冷卻與設施排程。這會擴大被動元件、電源整合與功率元件的研究路由；但只有具名 production
+BOM、qualification、模組數、價格與財務認列，才可把「可能增加內容量」升級成公司受惠。
+
+### 空方小作文：軟體與設施排程也能降低硬體峰值
+
+第二次事件不一定要求原負載原封不動重演。平台可在第一次事件後降載或受控停機，也可用 rack monitor
+延遲與錯峰充電、保留較高起始 SOC、讓設施 BESS 接力，或按故障域只恢復部分機架。這些路徑可能
+降低每櫃 charger 與儲能的最壞情境配置；更高 rack power 也不代表回充功率、模組數或台灣供應商收入
+線性增加。Open Rack V3 的 48V 控制方法只說明問題存在，不替 800V 平台選定答案。
+
+### 多空共同裁決：看第二脈衝，不看第一次的宣傳照
+
+雙方都應交出同一 production configuration 的十一欄護照，並在共同 reference plane 比較第一次 EOD、
+實際 delay／cooldown、淨回充能量、第二次事件間隔與 second-pulse pass／fail。只有一次展示、完整回充
+上限或 supplier ecosystem 名單，都不足以裁定 availability、production BOM 或公司財務材料性。
+
+### 分母、誤差與限制
+
+本段是 N＝1 份官方規格、N＝1 個 48V Open Rack V3 平台家族與 N＝1 組六模組 shelf 架構的定向
+案例，不是隨機 BBU、800V rack、站點、事件、供應商、台灣 121 檔或全市場樣本。720kJ、0.2000kWh、
+90 倍、0.05556kWh、0.78kW 與 1.59kW 是固定輸入的確定性換算，沒有 sampling SE／t；兩條獨立
+算術路徑只驗證算術一致。production 800V 平台同時公開第一次與第二次事件、回充、溫度、rearm、
+qualification、BOM 與財務的共同觀測仍為 N＝0。OCP PDF 可由研究瀏覽器全文擷取並逐頁檢視引用頁
+及相鄰頁，但官方端拒絕直接下載，因此本輪不宣稱本地檔案 SHA。本文沒有價格、估值、共識、部位、
+投資建議或市場是否反映主張。
+
 ## 這篇和 800V 電力轉換文章各回答什麼
 
 800V 電力轉換文章回答「電力經過哪些轉換與保護環節，以及不同功率半導體各放在哪裡」；本文
@@ -622,6 +808,7 @@ SOC window、EOL SOH、放電效率、輔助負載、C-rate／熱限、冗餘、
 - **目前可保留的結論**：機櫃旁的電容儲能、機櫃電池備援與設施級電池儲能是三個不同任務層；NVIDIA、OCP 與 TI 的公開文件已足以重建角色邊界。
 - **新增的閱讀方法**：先用七欄事件合約固定任務、功率波形、可用能量、交接、回充、損耗與壽命，再比較 CBU／BBU／BESS；這是方法框架，不是新的平台採用證據。
 - **新增的量綱教材**：Diablo 的功率與秒數只能先換成理想任務 kWh，再經 SOC、SOH、效率、功率限制、輔助負載與資格帳轉成可交付能量；本輪沒有刷新 C4 主命題、`last_reviewed_at`、`review_due` 或 base confidence。
+- **新增的重複事件教材**：Open Rack V3 48V BBU 把第一次放電、回充延遲、充電功率、聚合排程與再次就緒拆開；90 倍時間差只示範兩個時鐘，不是效率，也不會刷新 C4 主命題或證據時鐘。
 - **可信度為中而不是高**：三份一手來源相互補強，但架構仍在演進，且缺同一量產場域的完整設計與實際運轉資料。
 - **目前不能發布的結論**：被動元件用量倍增、指定台灣公司供貨、訂單、收入、毛利、受惠排名，以及市場是否已反映。
 - **需要看到什麼才能前進**：同一量產機櫃公布電容儲能與電池備援的客戶資格驗證、現場資料及量產材料清單，或買方和供應商雙向確認量產與財務分母。
@@ -636,9 +823,11 @@ SOC window、EOL SOH、放電效率、輔助負載、C-rate／熱限、冗餘、
 - [美國能源部：Solar Energy and Storage Basics](https://www.energy.gov/cmei/systems/solar-integration-solar-energy-and-storage-basics)
 - [美國能源部：Energy Storage Valuation 方法報告](https://www.energy.gov/sites/default/files/2022-06/MSP_Report_2022June_Final_508_v3.pdf)
 - [NREL：BESS performance model 的 SOC／SOH／效率與功率限制](https://docs.nrel.gov/docs/fy20osti/75364.pdf)（PDF pp.9–11，2019-11-13）
+- [OCP：Open Rack V3 BBU Module Specification 1.4](https://www.opencompute.org/documents/open-rack-v3-bbu-module-spec-1-4-pdf)（PDF pp.13–21，2023-09-12）
 
-8 份來源是定向架構與方法證據，不是產業抽樣。OCP 與 NREL 新增的共同用途是把功率、秒數、
-理想任務能量與可交付能量分開；兩份文件不是同一量產平台，也沒有台灣供應商的 BOM 或財務分母。
+9 份來源是定向架構與方法證據，不是產業抽樣。Diablo 400、Open Rack V3 與 NREL 模型分屬不同
+平台或用途；共同作用只是把任務功率、理想能量、可交付能量、回充與再次就緒分開，不能互借數值，
+也沒有台灣供應商的 BOM 或財務分母。
 
 ## 族群影響
 
@@ -714,6 +903,19 @@ frequency: monthly
 next_check: 2026-09-01
 trigger: OCP、平台商或客戶文件同時固定 trigger、power waveform、usable energy、response／handoff、repetition／recharge、efficiency／thermal、life／safety 並提供 qualification 或 field data
 invalidation: 實際平台資料證明本文七欄無法區分設備任務，或單一較簡單指標能在相同可靠度條件下完整預測接力與替代
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C13,C14,C15,C16
+metric: 同一 800V production platform 是否以共同 reference plane 公開第一次 EOD、delay／cooldown、淨回充、aggregate charging、rearm 門檻、第二次事件間隔與 second-pulse pass／fail
+source_ids: S9
+watch_source_ids: S4
+frequency: monthly
+next_check: 2026-09-01
+trigger: OCP 或平台商公布可重建的 repeated-event qualification／field record，並固定 rack 版本、事件波形、SOC／SOH／溫度、充電排程、EOL／fault 條件與 production BOM
+invalidation: 同一平台證明第一次 pass 或單一 SOC／recharge-time 指標已能在相同可靠度下完整預測第二次事件結果，或 800V 架構完全移除 rack-level repeated-event requirement
 -->
 
 ## 什麼會推翻這篇

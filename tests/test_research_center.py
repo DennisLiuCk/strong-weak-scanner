@@ -7585,6 +7585,7 @@ class ResearchCenterTest(unittest.TestCase):
             "## 三種儲能怎麼接力：先看事件持續多久",
             "## 「能撐多久」不是完整規格：先寫七欄事件合約",
             "## 45–90 秒不是銘牌容量：把功率、任務能量與可交付能量拆成三本帳",
+            "## 第一次撐住，不等於第二次已就緒：把回充債務放回事件間隔",
             "## 這篇和 800V 電力轉換文章各回答什麼",
         )
         positions = [topic.index(heading) for heading in headings]
@@ -7608,18 +7609,31 @@ class ResearchCenterTest(unittest.TestCase):
             "### 分母、誤差與限制",
             "`N=2` 條消息鏈",
             "本輪沒有刷新 C4 主命題、`last_reviewed_at`、`review_due` 或 base confidence",
+            "reason: added_repeat_event_recharge_debt_and_rearm_passport_without_refreshing_thesis_clock",
+            "source_id: S9",
+            "claim_id: C13",
+            "claim_id: C14",
+            "claim_id: C15",
+            "claim_id: C16",
+            "4 分鐘放電與最長 6 小時完整回充是兩個時鐘",
+            "720kJ＝0.2000kWh",
+            "21,600 秒÷240 秒＝90",
+            "### 一張重複事件就緒護照至少要有十一欄",
+            "### 多空共同裁決：看第二脈衝，不看第一次的宣傳照",
+            "production 800V 平台同時公開第一次與第二次事件",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 8),
-            ("research_claim", 12), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 9),
+            ("research_claim", 16), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
+            ("transition", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         glossary = topic[topic.index("### 名詞小字典"):topic.index("### 三句話抓重點")]
         self.assertEqual(
             sum(line.startswith("- **") for line in glossary.splitlines()),
-            38,
+            46,
         )
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -7629,6 +7643,16 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:buffer-nameplate-delivered-energy-bridge,metric,銘牌到可交付能量橋接",
             concepts,
         )
+        self.assertIn(
+            "process:ai-buffer-repeat-event-readiness-passport,process,"
+            "AI 功率緩衝重複事件就緒護照",
+            concepts,
+        )
+        self.assertIn(
+            "metric:recharge-debt-inter-event-readiness,metric,"
+            "回充債務與事件間隔就緒度",
+            concepts,
+        )
         graph = (
             ROOT / "notes" / "knowledge_graph" / "ai_power_buffering.md"
         ).read_text(encoding="utf-8")
@@ -7636,7 +7660,60 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn(
             "to_id: metric:buffer-nameplate-delivered-energy-bridge", graph
         )
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+        self.assertIn("edge_id: KG-APB-I17", graph)
+        self.assertIn("edge_id: KG-APB-I18", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+
+    def test_power_buffering_tracks_recharge_debt_and_second_event_readiness(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-03_ai_power_buffering_hierarchy.md"
+        ).read_text(encoding="utf-8")
+        for token in (
+            "source_id: S9\nrole: standard",
+            "claim_id: C13\nlabel: verified\nstatus: active",
+            "claim_id: C14\nlabel: verified\nstatus: active",
+            "claim_id: C15\nlabel: inference\nstatus: active",
+            "claim_id: C16\nlabel: inference\nstatus: active",
+            "monitor_id: T4",
+            "| 放電任務 | 每模組 3kW、至少 4 分鐘",
+            "| 完整回充 | 每 pack 2A 時，由 0% 到 100% SOC 最長 6 小時",
+            "| 延遲與聚合 | 放電後至少延遲 1 分鐘",
+            "D(t₂)＝max［0，D₀−E_restore(t₂)］",
+            "| 7. 聚合排程 |",
+            "| 11. 商業共同鍵 |",
+            "90 倍不是能量比、往返效率或第二次事件的 minimum gap",
+            "沒有 sampling SE／t",
+            "Python Decimal 與獨立 awk",
+            "官方端拒絕直接下載，因此本輪不宣稱本地檔案 SHA",
+        ):
+            self.assertIn(token, topic)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "process:ai-buffer-repeat-event-readiness-passport,process,"
+            "AI 功率緩衝重複事件就緒護照",
+            concepts,
+        )
+        self.assertIn(
+            "metric:recharge-debt-inter-event-readiness,metric,"
+            "回充債務與事件間隔就緒度",
+            concepts,
+        )
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_power_buffering.md"
+        ).read_text(encoding="utf-8")
+        for token in (
+            "edge_id: KG-APB-I17",
+            "to_id: process:ai-buffer-repeat-event-readiness-passport",
+            "edge_id: KG-APB-I18",
+            "to_id: metric:recharge-debt-inter-event-readiness",
+            "MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C16",
+        ):
+            self.assertIn(token, graph)
 
     def test_design_test_quality_route_uses_eight_denominators_before_financial_attribution(self):
         topic = (
