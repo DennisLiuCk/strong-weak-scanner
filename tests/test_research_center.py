@@ -7817,8 +7817,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 29),
-            ("research_claim", 23), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 31),
+            ("research_claim", 27), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -7863,8 +7863,51 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 29),
-            ("research_claim", 23), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 31),
+            ("research_claim", 27), ("metric_comparison", 0),
+            ("impact", 7), ("monitoring_item", 10),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
+    def test_priority_q2_eris_separates_segment_end_application_and_cash_sources(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-29_priority_q2_disclosures.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: eris_q2_segment_related_party_and_cash_bridge_added_without_refreshing_thesis_clock",
+            "## 營收季增 17%，為什麼不能直接叫作 AI 晶圓放量：德微三道橋",
+            "| 德微科技及杰成 | 研發、製造及銷售二極體 | 358.452 | 452.781 | +94.329 | 81.1% |",
+            "| 亞昕科技 | 研發、製造及銷售晶圓 | 205.532 | 208.024 | +2.492 | 2.1% |",
+            "| 喜可士 | 研發及銷售二極體、IC、散熱片及晶片 | 120.614 | 140.099 | +19.485 | 16.8% |",
+            "| 合併營收 | 三部門外部收入加總 | 684.598 | 800.904 | +116.306 | 100.0% |",
+            "晶圓部門外部\n收入只較 Q1 增加 1.2125%",
+            "公司總營收增量的 70.3369%",
+            "### 第二道橋：毛利改善可以重算，產品因果仍要留白",
+            "| 新增營收沿用 Q1 毛利率 | +44.503 |",
+            "| Q2 合併毛利率變動殘差 | +20.357 |",
+            "### 第三道橋：正營業現金流與現金大增不是同一件事",
+            "| 營業活動 | +62.542 |",
+            "| 籌資活動 | +300.463 |",
+            "| 現金增加 | +388.237 |",
+            "處分亞昕科技部分股權",
+            "96.10% 降至 76.63%",
+            "800.000 百萬元",
+            "真正的\n部門×料號×AI server／車用×終端客戶×毛利×收現共同觀測 N＝0",
+            "Python Decimal 與獨立 awk",
+            "6b3921dd5445261652daab299bbc987a603c5a8ae633945e8e3ee031c9700add",
+            "4de043ba2038ec55bc76948fd6f9f42eabf8f3280913f43c9b8c7527febbab04",
+            "source_id: S30",
+            "source_id: S31",
+            "claim_id: C24",
+            "claim_id: C25",
+            "claim_id: C26",
+            "claim_id: C27",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 31),
+            ("research_claim", 27), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
