@@ -3973,6 +3973,7 @@ class ResearchCenterTest(unittest.TestCase):
         for contract in (
             "editorial_plain_language_wave92_hbf_system_conditions_roles_and_six_gate_ladder",
             "split_specification_and_product_clocks_after_first_hbf_technical_specification",
+            "added_hbf_nominal_usable_working_set_and_simulation_to_service_evidence_bridge_without_thesis_or_clock_refresh",
             "新的記憶體層不能只提供更大容量",
             "規則前進不等於產品同步前進",
             "## 先判斷它能不能成為新的記憶體層",
@@ -3984,6 +3985,18 @@ class ResearchCenterTest(unittest.TestCase):
             "| 四份共同合約 | 公告摘要對齊什麼 | 初學者要避免的誤讀 | 下一份可升級證據 |",
             "| 1. 產品包絡 |", "| 2. 主機與電氣介面 |",
             "| 3. 堆疊、封裝與可靠度 |", "| 4. 軟體讀寫 |",
+            "## 512GB、1.6TB/s 與「只差 2.2%」是三種不同證據",
+            "| 看到的數字 | 證據層 | 分子與分母至少還要綁定 | 目前不能說 |",
+            "`within 2.2% of unlimited-capacity HBM`",
+            "### 405B×8-bit 只得到純權重 payload，不是整個工作集",
+            "`405GB`", "`79.1015625%`", "`107GB`",
+            "N=1 個假想 weights-only payload",
+            "### 同一顆記憶體要過三張成績單",
+            "| 1. 裝置與規格 |", "| 2. 模型與資料路徑 |",
+            "| 3. 服務與商業結果 |",
+            "### 多空小作文必須共用同一個推論情境",
+            "| 偏多：更大近端非揮發容量減少資料搬移 |",
+            "| 偏空：較高延遲、較大 page 與寫入邊界抵銷容量 |",
             "## 用兩個時鐘避免把規格當產品",
             "| 證據時鐘 | 依序要經過 | 截至本輪的位置 | 還不能說 |",
             "| 規格時鐘 |", "| 產品時鐘 |",
@@ -4003,7 +4016,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 39
+            sum(line.startswith("- **") for line in glossary.splitlines()), 56
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4018,11 +4031,25 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 10),
-            ("research_claim", 13), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 12),
+            ("research_claim", 17), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "hbf_commercialization.md"
+        ).read_text(encoding="utf-8")
+        for concept in (
+            "process:hbf-simulation-to-service-evidence-bridge,process,HBF 模擬到服務三層證據橋",
+            "metric:hbf-nominal-usable-working-set-capacity-contract,metric,HBF 名目可用與工作集容量契約",
+        ):
+            self.assertIn(concept, concepts)
+        for edge_id in range(17, 19):
+            self.assertIn(f"edge_id: KG-HBF-I{edge_id}", graph)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )

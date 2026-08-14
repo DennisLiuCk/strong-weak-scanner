@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: hbf-commercialization
 root_node_id: concept:hbf-commercialization
 label: HBF 商用化
-summary: 以規格時鐘與產品時鐘追蹤 HBF 從 NAND／logic base die 架構、第一版技術規格、合規互通到 memory sample、device sample、客戶資格與量產的證據階梯。
+summary: 以規格時鐘與產品時鐘追蹤 HBF 從 NAND／logic base die 架構、第一版技術規格、合規互通到 memory sample、device sample、客戶資格與量產的證據階梯，並用三張成績單分開名目／可用／工作集容量、內部模擬與固定品質的推論服務結果。
 article_ids: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER
 status: active
 -->
@@ -412,4 +412,44 @@ review_due: 2026-08-26
 status: active
 boundary: 合規與互通是規格時鐘的必要未來節點；本輪沒有可定位方法、具名 pass list 或跨廠矩陣。
 next_trigger: OCP 或參與者公開 compliance checklist、test suite、具名 pass result 或 multi-vendor interoperability matrix。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HBF-I17
+view: industry
+from_id: concept:hbf-commercialization
+to_id: process:hbf-simulation-to-service-evidence-bridge
+relation: requires
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C14,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C16,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C17
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: 三張成績單是研究中心用 Sandisk fact sheet 與 MLCommons inference rules 建立的比較框架，不是 HBF 或 MLPerf 共同標準；內部模擬、方法欄位與規格公告都不等於 sample、qualification 或 deployment。
+next_trigger: 同一具名 HBF sample 公開裝置 raw、完整 memory map 與固定模型／資料／品質／scenario 的 TTFT／TPOT／throughput／tail／failure／power／cost，且由接收方交叉確認。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HBF-I18
+view: industry
+from_id: concept:hbf-commercialization
+to_id: metric:hbf-nominal-usable-working-set-capacity-contract
+relation: measured_by
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C14,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C15,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C17
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-26
+status: active
+boundary: 405B×8-bit＝405GB、405／512＝79.1015625% 與 107GB 是 N=1 weights-only 名目換算；未計可用容量、KV cache、activation、runtime、workspace、冗餘、錯誤管理、分片或 page alignment，不能證明完整工作集放得下。
+next_trigger: 具名 HBF sample 與系統公開 software-visible capacity、完整 weights／KV／activation／workspace memory map、placement、page／alignment 與運行中 peak occupancy。
 -->

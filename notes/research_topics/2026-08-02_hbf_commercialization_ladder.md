@@ -200,6 +200,38 @@ limitation: 簡報在組合層級提到 HBF，沒有揭露 HBF sample、qualific
 independence_group: sandisk
 -->
 
+<!-- research_source
+source_id: S11
+role: company_release
+source_kind: document
+publisher: Sandisk
+title: HBF Fact Sheet
+published_at: 2025-07-29
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://documents.sandisk.com/content/dam/asset-library/en_us/assets/public/sandisk/collateral/company/Sandisk-HBF-Fact-Sheet.pdf
+locator: PDF 第 1 至 3 頁；第 2 頁列 Gen 1 讀取頻寬 1.6 TB／s、256Gb per die 與 16-die stack 512GB，第 3 頁腳註把 2.2% 主張限定為內部測試／模擬、讀取 Llama 3.1 405B 的 8-bit pretrained weights、一次一個 kernel、HBM 容量假設無限，並明示 HBF 較高 latency、較大 page size、actual user capacity less；本地檔案 SHA-256 349f05372fb528702d2fe95ec8f3a9cb9b4dd976c7d115a3db49f26031b10111，3／3 頁已逐頁渲染核對
+limitation: 供應商 fact sheet 的 Gen 1 數字、2.2% 與未來 roadmap 是產品目標及內部模擬，不是實體 HBF sample、公開 raw logs、共同 benchmark、延遲／寫入／耐久結果、客戶 qualification 或量產；文件也明示規格可能變更
+independence_group: sandisk
+-->
+
+<!-- research_source
+source_id: S12
+role: standard
+source_kind: living_index
+publisher: MLCommons Association
+title: MLPerf Inference Rules
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://github.com/mlcommons/inference_policies/blob/master/inference_rules.adoc
+locator: 2026-08-14 查得 Definitions、Scenarios、Benchmarks 與 LoadGen Operation；system under test 綁硬體與軟體，run 包含 queries、pre／post-processing、scenario latency 與 quality，現行 LLM 規則另分 TTFT／TPOT，並列 Llama3.1-405B 的資料集、品質與 scenario-specific latency 契約
+limitation: MLPerf 是推論系統 benchmark contract，不是 HBF 規格或 HBF 實測；它不能證明 Sandisk 模擬符合 MLPerf、隔離單一記憶體因果、代表 production workload，或建立樣品、客戶與財務證據
+independence_group: mlcommons-inference
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -421,6 +453,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: Sandisk 2025 年 7 月 HBF fact sheet 把 Gen 1 描述為 256Gb per die、16-die stack 512GB 與 1.6 TB／s read bandwidth；同一文件把「與無限容量 HBM 的系統效能差在 2.2% 內」限定為讀取 Llama 3.1 405B 之 8-bit pretrained weights、一次執行一個 kernel 的內部測試／模擬，並明示 HBM 容量在模型中假設無限、HBF latency 較高、page size 較大、actual user capacity less
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2025-07-29
+basis: S11 PDF 第 2 頁直接列 Gen 1 容量與讀取頻寬，第 3 頁腳註逐一限定 2.2% 的模型、精度、kernel concurrency、HBM baseline、latency／page-size 差異與容量口徑；本地 SHA-256 及 3／3 頁渲染已核對
+boundary: verified 只指 fact sheet 原文及腳註條件，不證明 512GB 是可用容量、1.6 TB／s 是具名樣品實測、2.2% 可重現、HBF 與 HBM 等速、所有模型都適用，或已完成 sample、qualification、部署與財務轉換
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: 若只依 S11 的教材條件，把 405,000,000,000 個參數各記為 8 bits，並以文件定義的 decimal GB 計算，純權重 payload 是 405GB；相對 512GB 名目 stack 是 405／512＝79.1015625%，名目差額 107GB，但這不能證明整個模型或推論工作集實際放得下
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-08-14
+basis: Python Fraction 與獨立 awk 路徑均由 parameters×bits／8 得 405,000,000,000 bytes，並得到 occupancy 405／512、79.1015625% 與 107GB nominal remainder
+boundary: 這是 N=1 個假想 weights-only payload 的確定性單位展開，沒有裝置、模型檔、run 或抽樣，故沒有 sampling SE／t；未計 actual user capacity、量化 scale／metadata、KV cache、activation、runtime、workspace、冗餘、錯誤管理、分片、壓縮、page alignment 或其他系統記憶體
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: MLPerf Inference 現行規則把 system under test 定義為會影響效能的完整硬體與軟體，run 必須在指定 scenario 下完成 queries、相關 pre／post-processing、latency 與 quality 要求；LLM 又分開 TTFT 與 TPOT，且 Llama3.1-405B 有指定資料集、品質與 scenario-specific latency 契約
+supporting_source_ids: S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S12 的 Definitions、Scenarios、Benchmarks、LoadGen Operation 與 LLM 註腳直接列 SUT、run、scenario、quality、latency、TTFT／TPOT 與 Llama3.1-405B 契約
+boundary: 這只證明一套可重現推論結果要綁哪些系統與工作負載條件，不證明 Sandisk 內部模擬是 MLPerf submission、HBF 已存在，或 MLPerf 能隔離單一 memory tier 的因果效果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: HBF 的容量、頻寬與推論效益必須用三張成績單橋接：先保存 stack／die／名目與可用容量／讀寫／page／latency／耐久／功耗等裝置包絡，再保存模型權重／KV cache／activation／precision／placement／kernel／concurrency 等資料路徑，最後才以固定 scenario、資料、品質、TTFT／TPOT／throughput／tail／失敗／功耗／成本報告服務結果
+supporting_source_ids: S8,S11,S12
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S8 只給規格包絡，S11 同時揭露 nominal capacity、read bandwidth、internal simulation 與較高 latency／較大 page／usable-capacity 邊界，S12 則要求完整 SUT、scenario、quality 與 latency result；三者共同顯示裝置、資料路徑與服務結果不能互相替代
+boundary: 三張成績單是研究中心整合供應商文件與 MLCommons 規則的檢查框架，不是 HBF 或 MLPerf 共同標準；欄位完整仍不證明產品存在、多廠互通、單一記憶體因果、production deployment、成本優勢或台灣公司收入
+verification_needed: 同一具名 HBF sample 與 HBM／其他 baseline 公開裝置 raw、完整工作集 placement、相同模型／資料／品質／scenario 的 run-level TTFT／TPOT／throughput／tail／failures／power／cost，以及接收方 qualification
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -509,6 +609,13 @@ to: triaged
 reason: split_specification_and_product_clocks_after_first_hbf_technical_specification
 evidence: sources:S7,S8,S9,S10
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_hbf_nominal_usable_working_set_and_simulation_to_service_evidence_bridge_without_thesis_or_clock_refresh
+evidence: sources:S8,S11,S12
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -522,8 +629,20 @@ evidence: sources:S7,S8,S9,S10
 - **固態硬碟（SSD）**：以快閃記憶體保存大量資料的儲存裝置；容量大不代表能直接承擔工作記憶體的即時讀寫任務。
 - **鍵值快取（KV cache）**：大型模型推論時保存先前上下文計算結果的資料；容量不足會增加搬移或重算，但實際讀寫模式仍依工作負載而異。
 - **容量**：裝置能保存多少資料；容量變大不代表讀取、寫入、耐久、功耗與成本會同時達標。
+- **名目容量**：依晶粒數與每顆宣告容量加總的理論 bytes；尚未扣除保留空間、錯誤管理、對齊與其他系統用途。
+- **可用容量**：軟體真正能配置給資料的容量；通常小於名目容量，必須由具名產品與介面實際揭露。
+- **模型權重**：模型訓練後保存的參數數值；即使權重本身放得下，推論仍可能需要額外快取、暫存與執行空間。
+- **工作集**：某段運算期間真正需要同時駐留或快速取用的全部資料；可能包含權重、鍵值快取、啟用值、程式與暫存區。
+- **數值精度**：每個參數或運算值使用多少 bits 及何種表示法；寫 8-bit 不等於整個模型檔案剛好每參數只占 1 byte。
 - **頻寬**：一段時間內可搬移多少資料；總量高不代表每次取用的等待時間都短。
 - **延遲**：從提出讀寫要求到取得結果所需的等待時間；平均值不能取代最慢情況與不同存取模式。
+- **頁面大小（page size）**：記憶體一次讀寫或管理的資料粒度；頁面較大時，小而分散的要求可能搬移額外資料。
+- **首詞元延遲（TTFT）**：使用者送出要求後，到收到第一個輸出詞元的時間；它不等於後續每個詞元的生成速度。
+- **每輸出詞元時間（TPOT）**：第一個詞元之後，相鄰輸出詞元的平均時間間隔；它和同時服務多少請求仍是不同問題。
+- **推論情境（scenario）**：請求如何抵達、併行與計時的共同規則，例如單一請求、互動式服務或離線批次；不同情境不能直接排同一名次。
+- **受測系統（SUT）**：實際被計時的完整硬體與軟體範圍；只換記憶體以外的軟體、加速器或互連，也可能改變結果。
+- **品質門檻**：輸出正確性或任務品質至少要達到的標準；更快但品質不相等的結果不能算同一比較。
+- **內部模擬**：公司在自建模型與假設下推演的結果；必須保存模型、工作負載、baseline 與限制，不能冒充實體樣品或第三方 benchmark。
 - **隨機讀取**：從分散位置取資料；它與連續搬移大區塊資料的難度不同，不能只用順序讀取數字代替。
 - **順序讀取**：連續讀出相鄰資料；表現好不代表頻繁跳點、寫入或更新同樣適合。
 - **寫入與更新**：新增資料或改寫既有內容；工作負載若頻繁更新，只有讀取速度不足以證明可用。
@@ -545,6 +664,11 @@ evidence: sources:S7,S8,S9,S10
 - **xPU-HBF 主機介面**：運算處理器與 HBF 系統交換資料、指令及狀態的主機端規則；名稱存在不等於任一處理器已完成整合。
 - **硬軟共同設計**：硬體資料路徑與軟體放置規則一起設計；只有硬體容量或頻寬，不能證明工作負載會自動受益。
 - **未來記憶體與儲存大會（FMS）**：Future of Memory and Storage 的縮寫，是記憶體與儲存技術活動；廠商在活動發表願景或規格摘要，仍不等於產品已完成。
+- **Gen（世代）**：Generation 的縮寫，用來區分產品或技術路線的第幾代；Gen 1 的目標不能自動外推到 Gen 2／3，也不代表已量產。
+- **大型語言模型（LLM）**：以大量文字資料訓練、能處理或產生語言的模型；參數量相同也可能因架構、精度與工作負載而有不同記憶體需求。
+- **推論（inference）**：使用已訓練模型處理新輸入並產生結果；它和訓練的資料流、寫入模式與品質目標不同。
+- **Llama3.1-405B（Llama 3.1 405B）**：Sandisk 模擬與現行 MLPerf 規則都提到的 4050 億參數語言模型；同名模型仍須固定 precision、資料、quality 與 scenario 才能比較。
+- **MLPerf Inference**：MLCommons 維護的推論 benchmark 規則與套件；它要求完整受測系統、情境、品質與延遲口徑，但不是 HBF 規格或 HBF 已通過的測試。
 - **介面**：裝置與系統交換資料、指令與狀態的規則；介面名稱存在不等於多家產品已互通。
 - **合規計畫（compliance）**：用一致方法檢查產品是否符合規格；規劃測試不等於已有通過結果。
 - **記憶體樣品（memory sample）**：可被量測的實體記憶體產品；公布目標日期不等於樣品已交付。
@@ -610,6 +734,71 @@ evidence: sources:S7,S8,S9,S10
 | 3. 堆疊、封裝與可靠度 | 堆疊配置、可靠度與封裝設計指引 | 設計指引等於接合、熱、良率及長期壽命已通過 | 樣品結構、熱／機械條件、可靠度方法、結果與接收方 |
 | 4. 軟體讀寫 | 軟體 read／write user guide 與硬軟共同設計方向 | 有讀寫指引等於驅動、資料放置與目標工作負載已完成 | 公開軟體介面、資料放置策略、具名裝置與端到端工作負載 |
 
+## 512GB、1.6TB/s 與「只差 2.2%」是三種不同證據
+
+Sandisk 的 HBF fact sheet 把三個很容易被接成一句話的數字放在一起：Gen 1 的 `512GB`
+名目 stack、`1.6 TB/s` read bandwidth，以及內部模擬中「相對無限容量 HBM 的系統效能差在
+2.2% 內」。它們分別是容量包絡、資料搬移率與特定模型下的系統推演，不能互相代替。[S11]
+
+| 看到的數字 | 證據層 | 分子與分母至少還要綁定 | 目前不能說 |
+|---|---|---|---|
+| `512GB per 16-die stack` | 廠商描述的 Gen 1 名目容量 | 每 die 容量、die 數、GB 定義、保留空間與 software-visible capacity | 實體 sample 已有 512GB 可用空間，或整個模型一定放得下 |
+| `1.6 TB/s read bandwidth` | 廠商描述的 Gen 1 讀取頻寬 | 連續／隨機、page、request size、concurrency、方向、時間窗、latency、功耗與溫度 | 寫入同速、每次存取很快、所有容量都能持續滿速，或量到的是 production workload |
+| `within 2.2% of unlimited-capacity HBM` | 供應商內部測試／模擬敘事 | baseline 指標、模型、precision、kernel、batch／concurrency、資料放置、quality、run 與分布 | HBF 與 HBM 等速、2.2% 可重現、容量優勢已納入，或任何具名 sample 已完成 benchmark |
+| TTFT／TPOT／throughput／quality | 完整推論服務結果 | 同一受測系統、scenario、模型／資料、品質、請求分布、失敗、功耗、成本與重複 run | 單一記憶體就是因果，或結果自動變成採用、訂單與公司財務 |
+
+關鍵不在主標題，而在 fact sheet 第 3 頁腳註：比較只模擬讀取 `Llama 3.1 405B` 的
+`8-bit pretrained weights`，一次在 xPU performance model 上執行一個 kernel；HBM 容量為建模
+目的被假設成無限，所以比較刻意沒有計入 HBF 的容量優勢。文件還直接承認 HBF 相對 HBM 有
+較高 latency 與較大 page size，並註明實際 user capacity 會小於名目容量。[S11] 因此 2.2%
+不是錯誤數字，但只能在這個被明示的模擬盒子裡閱讀。
+
+### 405B×8-bit 只得到純權重 payload，不是整個工作集
+
+沿用文件自己的 decimal 單位，並把 model name 裡的 `405B` 條件式解讀成
+`405,000,000,000 parameters`，可以做一次量綱核對；這不是把模擬補成實測，也不是主張實際
+模型檔恰有這個精確參數數或 byte 數：
+
+| 步驟 | 確定性計算 | 結果 | 仍未計入 |
+|---|---|---:|---|
+| 1. 純權重 payload | `405,000,000,000 parameters × 8 bits ÷ 8` | `405GB` | 量化 scale／metadata、對齊、壓縮與模型檔格式 |
+| 2. 占 512GB 名目 stack 比例 | `405 ÷ 512` | `79.1015625%` | actual user capacity 與保留空間 |
+| 3. 名目差額 | `512 − 405` | `107GB` | KV cache、activation、runtime、workspace、冗餘與錯誤管理 |
+| 4. 整個服務能否放下 | 需要具名軟硬體的 software-visible memory map | 未量測 | 分片、其他 memory tier、並行請求、page alignment 與失敗恢復 |
+
+Python Fraction 與獨立 awk 路徑都得到 `405GB`、`405／512`、`79.1015625%` 與 `107GB`。
+這是 **N=1 個假想 weights-only payload** 的確定性單位展開，沒有裝置、模型檔、run 或抽樣，
+所以沒有 sampling SE／t。即使名目差額是正的，也不能寫成「Llama 3.1 405B 完整工作集已放進
+一顆 HBF」；fact sheet 自己已提醒 actual user capacity less。
+
+### 同一顆記憶體要過三張成績單
+
+| 成績單 | 最少保存什麼 | 這一層回答 | 少了會怎麼誤讀 |
+|---|---|---|---|
+| 1. 裝置與規格 | sample ID、die／stack、名目／可用容量、read／write、page、latency distribution、endurance／retention、error、power、temperature 與測試方法 | 這顆實體記憶體在什麼操作包絡下能做什麼 | 規格上限或 roadmap 被當成產品實測 |
+| 2. 模型與資料路徑 | weights／KV cache／activation／workspace bytes、precision、placement、sharding、搬移量、kernel、batch、concurrency、軟體與 baseline | 哪些資料真的放在哪一層，瓶頸是否落在 HBF | 純權重或單一 kernel 被當成完整推論服務 |
+| 3. 服務與商業結果 | scenario、資料、quality、TTFT、TPOT、throughput、tail、失敗、run-level distribution、功耗、成本、部署量、價格、收入與毛利 | 使用者是否得到相同品質的可持續改善，以及是否形成可辨識財務 | 內部模擬直接變成客戶採用、TAM 或台灣公司訂單 |
+
+MLPerf Inference 的方法邊界能說明第三張表為何不能省：現行規則把受測系統定義成會影響效能的
+完整硬體與軟體，run 要在指定 scenario 下完成 queries、相關前後處理、latency 與 quality；LLM
+另分 TTFT 與 TPOT，Llama3.1-405B 也有自己的資料集、品質與 scenario-specific latency 契約。
+[S12] 這不表示 HBF 要或已通過 MLPerf，而是提供一個獨立檢查：單一 memory bandwidth 與一次
+內部 kernel 模擬，還不是可比較的推論服務結果。
+
+### 多空小作文必須共用同一個推論情境
+
+| 敘事 | 合理假說 | 必須再看到的共同證據 | 什麼會讓敘事失效 |
+|---|---|---|---|
+| 偏多：更大近端非揮發容量減少資料搬移 | 更多權重或快取留在加速器附近，可能降低跨層搬移、提高可服務模型大小，並增加 NAND、logic base die、堆疊、測試與封裝內容 | 同一模型／precision／quality／scenario 的三張成績單，含 software-visible capacity、placement、bytes moved、TTFT／TPOT／throughput／tail、功耗、成本、qualification、部署與財務分母 | 只有名目 GB、read TB/s、內部模擬或 consortium 名單，沒有實體 sample、完整工作集與接收方結果 |
+| 偏空：較高延遲、較大 page 與寫入邊界抵銷容量 | 小而分散的讀取、KV 更新、尾端等待、耐久或軟體搬移可能讓部分工作仍需 HBM／DRAM，降低 HBF 可承擔的有效比例 | 固定資料放置與並行請求，公開 read／write mix、request／page、latency distribution、stall、endurance、retention、功耗、失敗與服務品質 | 只拿 HBM 名目容量不足或 NAND 一般特性推論，沒有具名 HBF 裝置與相同 workload 比較 |
+| 共同底線 | 大容量、讀取頻寬與端到端推論效益是三個不同分母 | 固定 sample、可用容量、完整工作集、baseline、scenario、quality、run 分布與成本，再由供應商和接收方雙向核對 | 把 `512GB`、`1.6 TB/s` 與 `2.2%` 串成已量產、已採用或已形成台灣公司收入的單一路徑 |
+
+本輪新增 N=2 份一手方法文件：Sandisk fact sheet 是供應商產品／模擬鏈，MLCommons rules 是
+獨立 benchmark-contract 鏈，不是兩顆 HBF、兩個 sample、兩個客戶或兩次 run。PDF 共 3 頁，
+本地 SHA-256 為 `349f05372fb528702d2fe95ec8f3a9cb9b4dd976c7d115a3db49f26031b10111`，
+3／3 頁已逐頁渲染核對；PDF／PNG 只留在 `tmp/`，不進版控。除了 N=1 教材換算，沒有新的
+effect size、sampling SE／t、價格、估值、共識、部位或投資判斷。
+
 ## 用兩個時鐘避免把規格當產品
 
 規格與產品會互相影響，卻不一定同步。把它們拆成兩個時鐘，讀者就能理解「這次真的有進展」
@@ -657,11 +846,14 @@ HBF 若真的成為新記憶體層，不會只由一顆記憶體晶片完成。�
 - [SK hynix FMS 2026 HBF 規格摘要](https://news.skhynix.com/en/hbf-at-fms-2026/)（8／16 層、最高 512GB、三個頻寬等級、UCIe 與軟體 I/O）。
 - [SK hynix FMS 2026 回顧](https://news.skhynix.com/en/fms-2026/)（分層記憶體與硬軟共同設計敘事）。
 - [Sandisk Q4 FY26 Earnings Presentation](https://investor.sandisk.com/static-files/c75d1bee-c5c9-4e5a-8605-302c1aeac59b)（HBF 只在產品組合層級出現，沒有 HBF 獨立財務分子）。
+- [Sandisk HBF Fact Sheet](https://documents.sandisk.com/content/dam/asset-library/en_us/assets/public/sandisk/collateral/company/Sandisk-HBF-Fact-Sheet.pdf)（Gen 1 名目容量／讀取頻寬，以及 2.2% 內部模擬的模型、精度、kernel、baseline、latency、page size 與可用容量腳註邊界）。
+- [MLPerf Inference Rules](https://github.com/mlcommons/inference_policies/blob/master/inference_rules.adoc)（完整受測系統、scenario、quality、TTFT／TPOT 與 Llama3.1-405B 的推論結果契約）。
 
 8 月 3 日與 8 月 4 日兩篇是同一 Sandisk／SK hynix 共同規格消息鏈，不能當成兩份獨立採用證據；
 Google 與 Tenstorrent 也只由這條聯合消息鏈列為 consortium members。本篇只把 512GB 與約 0.4
-至 3.0 TB/s 寫成公告的規格包絡，不採用 Sandisk 模擬來宣稱 HBF 與 HBM 效能相等，也不拿沒有
-共同測試條件的容量、頻寬、成本或良率做跨產品勝負與公司估值。
+至 3.0 TB/s 寫成公告的規格包絡，只使用 Sandisk 模擬已明示的條件與腳註來教讀者辨認證據層，
+不採用它宣稱 HBF 與 HBM 效能相等，也不拿沒有共同測試條件的容量、頻寬、成本或良率做跨產品
+勝負與公司估值。
 
 ## 影響路由
 
