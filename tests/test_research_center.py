@@ -7784,6 +7784,45 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(review_id, reviews)
 
+    def test_priority_q2_faraday_dual_denominator_blocks_false_conversion_rate(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-07-29_priority_q2_disclosures.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "reason: faraday_nre_mp_dual_denominator_and_revenue_recognition_bridge_added_without_refreshing_thesis_clock",
+            "## 35.4% 與 0.4% 不是轉單率：先做 NRE／MP 雙分母矩陣",
+            "NRE AI 的顯示值代理是 159.579306 百萬元",
+            "MP AI 的顯示值代理是 9.720068 百萬元",
+            "169.299374 百萬元",
+            "部分代理占 5.1093296%",
+            "167.858971～170.739777",
+            "5.0658593%～5.1527999%",
+            "### 合約帳與收入時鐘不能替 cohort 補空白",
+            "某一時點／隨時間認列 | 2,573.901／739.633 百萬元",
+            "提供勞務＋IP 尚未履約交易價格 | 3,470.780 百萬元",
+            "委託設計專案履行合約成本 | 555.547 百萬元",
+            "### 轉化率需要一張同批專案護照",
+            "| 8. 分子／分母公式 |",
+            "### 多空小作文必須共用同一個 cohort 裁決",
+            "真正同一 AI 專案的 NRE、tape-out、qualification、MP、毛利與收現共同\n觀測 N＝0",
+            "Python Decimal\n與獨立 awk 兩條路徑",
+            "7ed866b210f9175272ab10e0a106572a69f786d68c16d3dfe3dca009d98e02c9",
+            "source_id: S27",
+            "claim_id: C16",
+            "claim_id: C17",
+            "claim_id: C18",
+            "claim_id: C19",
+            "8 月 15 日依 T10 回查",
+        ):
+            self.assertIn(contract, topic)
+        for block, expected in (
+            ("research_topic", 1), ("research_source", 27),
+            ("research_claim", 19), ("metric_comparison", 0),
+            ("impact", 7), ("monitoring_item", 10),
+        ):
+            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+
     def test_missed_priority_q2_macronix_four_bridges_preserve_denominators(self):
         topic = (
             ROOT / "notes" / "research_topics"
