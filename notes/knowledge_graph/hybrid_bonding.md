@@ -1,16 +1,17 @@
 # 混合接合（Hybrid bonding）知識圖譜
 
 本圖把成熟度拆成應用、W2W／D2W 接法、介面世代與具名產品階段，也把百分比分成對準量測覆蓋、
-介面完整、測試結構電性與最終產品合格四個分母。Sony 影像感測器、TSMC SoIC 與 AMD 3D V-Cache
-提供已應用或 production 格；200nm 試驗結構與 pathfinding PDK 則保留在各自早期格。台灣族群只
-保留研究路由，沒有公司量產線。
+介面完整、測試結構電性與最終產品合格四個分母。Pitch 平方的理想站點密度、overlay 分子角色、pad
+layout、電阻 spread 與良率另由互連縮放護照串接，不能合成一個技術排名。Sony 影像感測器、TSMC
+SoIC 與 AMD 3D V-Cache 提供已應用或 production 格；200nm／140nm 試驗結構與 pathfinding PDK 則
+保留在各自早期格。台灣族群只保留研究路由，沒有公司量產線。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: hybrid-bonding
 root_node_id: concept:hybrid-bonding
 label: 混合接合（Hybrid bonding）
-summary: 連接 Sony 影像感測器、TSMC SoIC 與 AMD 3D V-Cache 的既有應用／production 證據，再分開逐顆接晶圓、晶圓接晶圓、探索型設計規則、200nm 試驗結構、對準量測覆蓋、介面完整、測試結構電性與最終產品合格分母；任何成熟格或百分比都不能替其他應用、接法、介面世代或量測層繼承資格。
+summary: 連接 Sony 影像感測器、TSMC SoIC 與 AMD 3D V-Cache 的既有應用／production 證據，再分開逐顆接晶圓、晶圓接晶圓、探索型設計規則、200nm／140nm 試驗結構、pitch 平方理想密度、overlay 分子、pad layout、電阻分布、介面完整、測試結構電性與最終產品合格分母；任何成熟格、百分比或幾何指數都不能替其他應用、接法、介面世代或量測層繼承資格。
 article_ids: MI-2026-08-02-HYBRID-BONDING-READINESS
 status: active
 -->
@@ -433,4 +434,44 @@ review_due: 2026-08-19
 status: active
 boundary: 本輪沒有具名 AI、HBM 或 chiplet 產品公開完整投入、合格產出、重複 lot、可靠度、throughput、成本與供應商財務分母。
 next_trigger: 產品商、製造端與供應商對同一版本完成六欄品質護照、qualification 與財務期間雙向核對。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I17
+view: industry
+from_id: concept:hybrid-bonding
+to_id: process:hybrid-bond-interconnect-scaling-passport
+relation: measured_by
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C17
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-19
+status: active
+boundary: 十欄護照是跨來源研究整合，不是 IEEE、TEL、IBM、imec、客戶或產業共同標準，也不是量產資格或投資排名。
+next_trigger: 同一具名產品版本同時公開接法網格、pad、overlay、介面、電性、可靠度、製造與商業共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HYB-I18
+view: industry
+from_id: concept:hybrid-bonding
+to_id: metric:hybrid-bond-pitch-overlay-density-boundary
+relation: measured_by
+claim_refs: MI-2026-08-02-HYBRID-BONDING-READINESS#C15,MI-2026-08-02-HYBRID-BONDING-READINESS#C16,MI-2026-08-02-HYBRID-BONDING-READINESS#C17
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-19
+status: active
+boundary: 平方密度與 overlay-to-pitch 只是公開 pitch／bound 的條件化換算；來源的接法、pad layout、分子、樣本與電性母體不同，不能跨試驗排名或推導 usable links、產品良率、成本與公司受惠。
+next_trigger: 同一載具公開 grid、pad geometry、overlay vector distribution、電阻與良率分布，並跨 die、wafer、lot 重複。
 -->

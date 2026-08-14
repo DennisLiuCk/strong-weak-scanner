@@ -4399,6 +4399,29 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 受測物與分母 |", "| 2. 製程身分 |",
             "| 3. 對準量測 |", "| 4. 介面完整性 |",
             "| 5. 電性與可靠度 |", "| 6. 產品與量產經濟 |",
+            "added_pitch_squared_density_overlay_ratio_and_scaling_tradeoff_passport_without_thesis_clock_refresh",
+            "## Pitch 砍半，不等於密度、overlay 裕量與良率一起變好",
+            "| 公開試驗語境 | 接法 | Pitch | 假想方形網格站點密度指數 | 這一欄不能代表什麼 |",
+            "| imec 2µm 試驗載具 | D2W | 2,000nm | 1.000 |",
+            "| TEL 140nm 試驗載具 | W2W | 140nm | 204.082 |",
+            "204.082 只來自（2,000÷140）²",
+            "### Overlay 除以 pitch，先看分子的角色",
+            "| 公開語境 | 分子是什麼 | Pitch | 算術 bound÷pitch | 為什麼不能直接排名 |",
+            "| TEL 140nm W2W | 含 bond-pad layout 的 hybrid-bond residual <50nm | 140nm | <35.714% |",
+            "| TEL fusion diagnostic | 三片 wafer 中 99.5% points residual <40nm | 140nm test context | <28.571% |",
+            "初始電阻與 spread 上升、bonding yield 下降",
+            "N＝4 個跨來源 pitch 幾何案例與 N＝5 個公開 bound",
+            "物理樣本是 N＝3 片 wafer",
+            "Python Fraction 與獨立 awk 在顯示精度內完全一致",
+            "不計\nsampling SE／t",
+            "### 多空小作文共用的互連縮放十欄護照",
+            "| 護照欄位 | 必須固定什麼 | 少了最容易誤讀成什麼 |",
+            "| 1. 應用與產品 |", "| 2. 接法與網格 |",
+            "| 3. Pitch 與 pad |", "| 4. Overlay 定義 |",
+            "| 5. 誤差來源 |", "| 6. 表面與介面 |",
+            "| 7. 電性分布 |", "| 8. 可靠度 |",
+            "| 9. 樣本與製造 |", "| 10. 產品與商業 |",
+            "**較強的多方版本**", "**較強的空方版本**",
             "## 再看五個量產窗口如何接力",
             "| 本文五個量產窗口 | 先回答什麼 | 主要接力角色 | 失敗會怎樣 | 本輪可確認到哪裡 |",
             "| 1. 設計規則與試驗結構 |", "| 2. 表面平坦與銅高度 |",
@@ -4409,8 +4432,10 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 開放設計入口 |", "| 2. 試驗結構成功 |",
             "| 3. 整合設備與流程使用 |", "| 4. 具名商用產品 |",
             "| 5. Production 聲明 |", "| 6. 量產經濟與財務歸因 |",
+            "source_id: S14", "source_id: S15",
             "claim_id: C8", "correction_kind: supersedes",
             "corrects_claim_id: C4", "claim_id: C14",
+            "claim_id: C15", "claim_id: C16", "claim_id: C17",
             "monitor_id: T3", "monitor_id: T4",
         ):
             self.assertIn(contract, topic)
@@ -4418,7 +4443,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 46
+            sum(line.startswith("- **") for line in glossary.splitlines()), 53
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4435,8 +4460,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 14), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 17), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -4471,6 +4496,8 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:hybrid-bond-interface-integrity-yield,metric,混合接合介面完整率",
             "metric:hybrid-bond-test-structure-electrical-yield,metric,混合接合測試結構電性良率",
             "metric:hybrid-bond-final-product-yield,metric,混合接合最終產品合格良率",
+            "process:hybrid-bond-interconnect-scaling-passport,process,混合接合互連縮放十欄護照",
+            "metric:hybrid-bond-pitch-overlay-density-boundary,metric,混合接合 pitch、overlay 與密度邊界",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 混合接合（Hybrid bonding）", graph)
@@ -4478,9 +4505,10 @@ class ResearchCenterTest(unittest.TestCase):
             "KG-HYB-C03", "KG-HYB-C04", "KG-HYB-C05",
             "KG-HYB-I10", "KG-HYB-I11", "KG-HYB-I12",
             "KG-HYB-I13", "KG-HYB-I14", "KG-HYB-I15", "KG-HYB-I16",
+            "KG-HYB-I17", "KG-HYB-I18",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
 
     def test_ai_memory_station_seven_separates_area_yield_output_and_cost(self):
         topic = (

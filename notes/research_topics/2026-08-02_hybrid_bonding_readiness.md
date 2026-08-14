@@ -255,6 +255,38 @@ limitation: 這是 imec 研究試驗的特定 400nm pad design；<100nm overlay 
 independence_group: imec
 -->
 
+<!-- research_source
+source_id: S14
+role: other_primary
+source_kind: document
+publisher: IEEE.tv
+title: Reducing Wafer-to-Wafer Bonding Misalignment to Enable sub 150nm Pitch Hybrid Bonding
+published_at: 2026-01-22
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://ieeetv.ieee.org/hbs/reducing-wafer-to-wafer-bonding-misalignment-to-enable-sub-150nm-pitch-hybrid-bonding
+locator: 2026 IEEE Hybrid Bonding Symposium 的 TEL Technology Center America 技術簡報摘要；140nm W2W test vehicle、hybrid-bond residual misalignment <50nm，以及移除 bond-pad layout 影響的三片 fusion-bond wafer 中 99.5% points residual <40nm 段落
+limitation: IEEE.tv 頁面只公開講者摘要，完整影片／下載需會員；140nm 是 TEL 試驗載具，不是具名客戶產品。三片 wafer 的 <40nm 診斷刻意移除 bond-pad layout，不能冒充同一 140nm hybrid-bond electrical yield、產品良率或量產分布；講者對未來需求的敘述不作需求預測
+independence_group: tokyo-electron
+-->
+
+<!-- research_source
+source_id: S15
+role: other_primary
+source_kind: document
+publisher: IBM Research
+title: Electrical Performance of Hybrid Bonding with Sub-Micron Cu-Cu Bonding Contacts: Effects of Scaling, Microstructure, and Surface Morphology
+published_at: 2025-05-27
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://research.ibm.com/publications/electrical-performance-of-hybrid-bonding-with-sub-micron-cu-cu-bonding-contacts-effects-of-scaling-microstructure-and-surface-morphology
+locator: ECTC 2025 conference-paper abstract；以 Kelvin four-point structures 比較 pad size／pitch scaling，並報告縮小時初始電阻及其 spread 上升、bonding yield 下降，以及高溫測試後電阻與 yield 的方向性變化
+limitation: 公開頁只有摘要，沒有各 pad size／pitch 的數值、結構數、die／wafer／lot 分母、完整分布、門檻或最終產品；高溫與 current stressing 的變化是指定試驗結構結果，不能外推為 field aging、HVM 良率或產品可靠度
+independence_group: ibm-research
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -455,6 +487,48 @@ verification_needed: 產品商、製造端與供應商對同一產品版本、�
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: TEL 在 2026 IEEE Hybrid Bonding Symposium 的 140nm W2W 試驗摘要中，把含 bond-pad layout 的 hybrid-bond residual misalignment <50nm，與移除 pad-layout 影響後三片 fusion-bond wafer 中 99.5% points residual <40nm 分開報告，並據此判斷 pad layout 也是 misalignment contributor
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-01-22
+basis: S14 摘要逐一固定 140nm test vehicle、hybrid-bond high-accuracy recipe 的 <50nm，以及 fusion-bond diagnostic 的三片 wafer／99.5% points／<40nm 與 pad-layout interpretation
+boundary: 兩組數字的結構與分母不同，不能互相平均或當成同一 overlay distribution；三片 fusion wafer 不是三個產品、客戶或量產 lot，摘要也沒有公開 hybrid electrical yield、可靠度、throughput、成本或 good-product yield
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: IBM Research 的 ECTC 2025 摘要報告，在其 sub-micron Cu-Cu Kelvin 試驗結構中，pad size 與 pitch spacing 縮小時初始電阻及其 spread 呈上升、bonding yield 呈下降；高溫測試又使電阻下降、yield 上升
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2025-05-27
+basis: S15 Abstract 直接描述 four-point Kelvin 方法及 scaling、initial resistance／spread、bonding yield 與 high-temperature testing 的方向性結果
+boundary: 只證實 IBM 指定試驗結構的方向性關係；公開摘要沒有各 pitch 數字、樣本與完整分布，不能量化 slope、因果拆分、產品良率、field lifetime、成本或跨公司優劣
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: Hybrid bonding 的 pitch 應先拆成理想站點密度、pad geometry／Cu density、overlay 定義與分布、表面／微結構、電阻與良率，再用同一份十欄互連縮放護照連到重複批次、throughput、可靠度與產品經濟；pitch 平方幾何與 overlay-to-pitch 比只能做條件化教材，不能單獨排名製程成熟度或公司受惠
+supporting_source_ids: S2,S12,S13,S14,S15
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S2／S12／S13／S14 提供不同接法、pitch 與 overlay 角色，S14 額外拆出 pad-layout contributor，S15 證明 pad／pitch scaling 同時牽動電阻 spread 與 yield；十欄護照是跨來源的研究整合
+boundary: 平方密度與 ratio 都是假想方形網格及公開 bound 的確定性換算，不是 routing density、usable link count、overlay budget、產品性能、yield model、TAM、需求、收入、毛利或股價未反映；跨來源數字不構成同條件比較
+verification_needed: 同一具名產品版本公開 grid／pad geometry、overlay vector distribution、surface／microstructure、electrical／reliability、die／wafer／lot、throughput、合格產品、成本、BOM 與財務共同鍵
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -541,6 +615,13 @@ to: triaged
 reason: separated_hybrid_bonding_percent_denominators_and_added_quality_passport_without_thesis_clock_refresh
 evidence: sources:S10,S11,S12,S13
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_pitch_squared_density_overlay_ratio_and_scaling_tradeoff_passport_without_thesis_clock_refresh
+evidence: sources:S14,S15
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -549,6 +630,13 @@ evidence: sources:S10,S11,S12,S13
 - **混合接合（Hybrid bonding）**：不靠凸塊隔開兩層晶片，而讓平坦介電層與細小銅接點直接貼合；連線可更短、更密，表面與對準條件也更嚴格。
 - **凸塊（Bump）**：傳統封裝常用的微小金屬連接點，會在兩層晶片之間留下高度；移除凸塊不代表接合製程就更簡單。
 - **接點間距（Pitch）**：相鄰接點中心之間的距離。間距變小代表接點更密，不等於良率、成本或量產能力已經更好。
+- **理想方形網格站點密度（Square-grid site density）**：假設接點排成相同方形網格時，單位面積可放的理想位置數約和 1÷pitch² 成正比；它還沒扣 pad 尺寸、keep-out、電源／備援、繞線與缺陷。
+- **Overlay-to-pitch ratio**：把某個對準誤差數字除以 pitch 的條件化比值；分子若一個是規格、一個是最大值、一個是 99.5% points，就不能只看比值排高低。
+- **Pad size／Cu density（接點尺寸／銅面積比例）**：Pitch 只說中心距；銅墊多大、上下是否等尺寸、單位區域有多少銅，會改變接觸、空洞、應力與電性，不能由 pitch 自動推出。
+- **Resistance distribution／spread（電阻分布／離散）**：不能只報平均接點電阻；分布尾端與跨 die／wafer／lot 變化，才會顯示是否有局部高阻或製程漂移。
+- **Fusion-bond diagnostic（無金屬接點的融合接合診斷）**：暫時拿掉 bond-pad layout 影響，觀察 wafer deformation、工具與流程本身的對準殘差；這種診斷不能替含銅接點的 hybrid-bond 電性或產品良率背書。
+- **TEL（Tokyo Electron）**：本輪 140 奈米 W2W 試驗摘要的研究團隊所屬設備商；其試驗數字只固定該載具與診斷，不能改寫成客戶產品量產或公司訂單。
+- **HBM（高頻寬記憶體）**：把多顆記憶體晶粒垂直堆疊以提高頻寬的產品類別；本文只把它列為後續應用查核格，沒有用本輪試驗證明具名 HBM 已採同一接法或 pitch。
 - **晶粒（Die）**：晶圓切割後的單顆晶片。晶粒能否先被挑選，會改變後續接合的良率分母。
 - **晶圓（Wafer）**：尚未切成單顆晶粒的圓形半導體基板；整片處理效率高，但也要一起管理全片缺陷與對準。
 - **單顆晶粒接晶圓（D2W）**：先挑選單顆晶粒，再逐顆接到目標晶圓；可混搭不同晶粒，但放置速度與逐顆對準也要計入。
@@ -609,12 +697,14 @@ evidence: sources:S10,S11,S12,S13
 
 - 先替每份新資料填四格：應用、W2W／D2W 接法、介面世代或 pitch、具名產品與資格／生產階段。
 - 再把逐顆接合與整片接合分開，分別核對良率分母、對準分布、每小時產能、返工與長期可靠度。
+- 遇到更小 pitch，另填方形網格假設、pad geometry、Cu density、overlay 定義、電阻分布與 die／wafer／lot 分母；不要讓單一幾何紀錄替整份縮放護照畢業。
 - 公司映射必須同時找到客戶端的具名製程與供應商端的料號、量產及收入，缺一邊就維持待驗證。
 
 ### 想一想
 
 - Sony 影像感測器或 AMD 處理器已有產品證據，為什麼仍不能證明 200 奈米整片貼合已量產？
 - 逐顆挑選後再接合，與兩片晶圓整面接合，為什麼不能只用一個良率分母比較？
+- 若 A 試驗的「對準誤差占間距比例」比 B 小，還要先核對哪些分子定義、接點版圖與電性分布，才知道能不能比較？
 - 公司說晶片已進入生產後，還要看到哪些良率、產能、成本與財務資料，才能比較量產經濟性？
 
 ## 先畫四維地圖：成熟的是哪一格
@@ -683,6 +773,71 @@ Kelvin、菊鏈與產品的接點拓樸、pitch、材料、測試門檻也不同
 若只完成前三欄，就可以證明量測與製程能力，卻仍應把最終產品良率、量產經濟與台灣公司財務歸因
 留在待驗證。
 
+## Pitch 砍半，不等於密度、overlay 裕量與良率一起變好
+
+Pitch 是一個幾何起點，不是一張完整成績單。相同面積、相同方形排列且其他條件完全不變時，理想
+站點密度才會和 1÷pitch² 成正比；真實產品還要扣掉 pad 尺寸、電源與備援接點、keep-out、繞線、
+測試、冗餘與不能使用的位置。下面只把 2µm 當作指數 1，對四個不同來源／接法做純幾何教學。
+
+| 公開試驗語境 | 接法 | Pitch | 假想方形網格站點密度指數 | 這一欄不能代表什麼 |
+|---|---|---:|---:|---|
+| imec 2µm 試驗載具 | D2W | 2,000nm | 1.000 | 不等於合格 Kelvin、菊鏈或產品接點數 |
+| imec 400nm 試驗 | W2W | 400nm | 25.000 | 不等於 25 倍可用 I/O、頻寬、良率或收入 |
+| imec／EVG 200nm 試驗 | W2W | 200nm | 100.000 | 不等於 100 倍 good links 或相同 pad geometry |
+| TEL 140nm 試驗載具 | W2W | 140nm | 204.082 | 不等於 204 倍產品密度、產能或商業價值 |
+
+204.082 只來自（2,000÷140）²。表格把 D2W 與 W2W、不同 pad layout、不同試驗結構故意並排，是為了
+顯示 headline pitch 在理想幾何上的量級，不是把四份結果改造成同條件 benchmark。只要接點排列、pad
+尺寸、Cu density、冗餘或可路由面積不同，實際 usable-link density 就會和這個平方指數分開。
+
+### Overlay 除以 pitch，先看分子的角色
+
+把 overlay 數字除以 pitch，可以提醒讀者「同樣 40nm 在不同 pitch 下占多少比例」，但分子可能是
+實測上界、設計控制條件、全 die 門檻，或刻意移除 pad layout 的診斷結果。以下保留每份來源原來的
+角色；小於號表示公開 bound，不是實際平均值。
+
+| 公開語境 | 分子是什麼 | Pitch | 算術 bound÷pitch | 為什麼不能直接排名 |
+|---|---|---:|---:|---|
+| imec 2µm D2W | 公開的 overlay error <350nm | 2,000nm | <17.500% | 同頁 Kelvin／菊鏈良率另有分母，沒有全分布 |
+| imec 400nm W2W | 該設計對 sufficient HVM yield 提出的 control <100nm | 400nm | <25.000% | 這是設計條件，不是同一列的產品量測 |
+| imec／EVG 200nm W2W | 試驗晶圓所有 die 的 post-bond vector <40nm | 200nm | <20.000% | all die 過幾何門檻不等於接點全導通 |
+| TEL 140nm W2W | 含 bond-pad layout 的 hybrid-bond residual <50nm | 140nm | <35.714% | 摘要沒有 hybrid electrical-yield 分布與產品分母 |
+| TEL fusion diagnostic | 三片 wafer 中 99.5% points residual <40nm | 140nm test context | <28.571% | 診斷刻意移除 pad layout，不能替上一列背書 |
+
+TEL 的兩列尤其重要：同一份摘要先報含 pad layout 的 hybrid-bond 結果，再用三片無 pad-layout 的
+fusion-bond wafer 隔離其他 deformation contributors。這不是兩種誰比較好的產品測試，而是用控制變因
+找出誤差從哪裡進來。IBM Research 又從另一條鏈指出，pad size 與 pitch 繼續縮小時，其 Kelvin 試驗
+結構的初始電阻與 spread 上升、bonding yield 下降；高溫測試後方向又會改變。幾何更密因此必須和
+表面、微結構、電阻分布、熱歷程及良率一起讀。
+
+本節有 N＝4 個跨來源 pitch 幾何案例與 N＝5 個公開 bound 的條件化除法；TEL 另明示 fusion 診斷
+的物理樣本是 N＝3 片 wafer。Python Fraction 與獨立 awk 在顯示精度內完全一致。這些只是固定輸入
+的確定性換算，不是抽樣推論或跨試驗 meta-analysis；公開資料沒有共同 raw distribution，因此不計
+sampling SE／t，也沒有 die、wafer、lot、產品、客戶、throughput、成本、需求、收入、毛利或公司效果。
+
+### 多空小作文共用的互連縮放十欄護照
+
+| 護照欄位 | 必須固定什麼 | 少了最容易誤讀成什麼 |
+|---|---|---|
+| 1. 應用與產品 | CIS、logic、memory、HBM 或 chiplet；試驗載具／具名產品、版本與節點 | 一個應用成熟就代表所有 hybrid bonding 成熟 |
+| 2. 接法與網格 | W2W／D2W、方形／六角／其他 grid、串並聯與功能分配 | 用方形 1÷pitch² 代表真實 usable links |
+| 3. Pitch 與 pad | 中心距、上下 pad size、是否等尺寸、Cu density、keep-out 與冗餘 | Pitch 砍半就等於完整密度四倍 |
+| 4. Overlay 定義 | pre／post-bond、vector／axis、mean／max／percentile／M＋3σ、coverage 與門檻 | 把規格、最大值與 99.5% points 放進同一排名 |
+| 5. 誤差來源 | bonder、wafer distortion、warpage、bond wave、pad layout、熱歷程與 correction | 一個總 overlay 數字就能決定改善哪台工具 |
+| 6. 表面與介面 | CMP、Cu recess／protrusion、roughness、潔淨、void、bond strength 與微結構 | 對準達標就推介面一定完整 |
+| 7. 電性分布 | Kelvin／菊鏈拓樸、接點數、R distribution、open／short、stress 前後 | 平均低電阻就推全部接點與產品都好 |
+| 8. 可靠度 | dielectric breakdown、current／thermal stress、溫循、時間與失效位置 | 初始 e-yield 冒充 field lifetime |
+| 9. 樣本與製造 | die／wafer／lot、重複性、edge exclusion、throughput、停機、返工與 scrap | 一片試驗成功就推 HVM economics |
+| 10. 產品與商業 | 合格產品、功能／效能、qualification、BOM、成本、合約與財務分母 | 更小 pitch 直接跳成台灣公司訂單與毛利 |
+
+**較強的多方版本**不是「pitch 從 2µm 縮到 200nm，所以設備材料價值必然百倍」，而是同一具名
+產品在縮放後仍把 overlay 全分布、介面、電阻尾端、可靠度、usable links、throughput 與成本一起守住，
+並由客戶與供應商雙向證明新增製程步驟、設備時間或耗材價值真的落到可辨識財務。
+
+**較強的空方版本**也不是「IBM 看到 yield 下降，所以 hybrid bonding 不可量產」，而是縮放收益被
+pad geometry、表面缺陷、metrology 時間、scrap、冗餘或返工吃掉；若產品只需要較鬆 pitch，或整合
+改善讓每顆合格成本下降，最小 pitch 的技術紀錄未必轉成設備台數、耗材量或供應商議價。
+
 ## 再看五個量產窗口如何接力
 
 | 本文五個量產窗口 | 先回答什麼 | 主要接力角色 | 失敗會怎樣 | 本輪可確認到哪裡 |
@@ -707,7 +862,7 @@ Kelvin、菊鏈與產品的接點拓樸、pitch、材料、測試門檻也不同
 | 5. Production 聲明 | 製造端確認特定節點與接法已進生產 | TSMC 表示 N7 SoIC CoW 與 WoW chips 已在 production | 逐產品良率、throughput、停機、可靠度、成本與利用率 | production 一詞不等於上述量產經濟分母已公開，亦不證明 200 奈米格已完成 |
 | 6. 量產經濟與財務歸因 | 客戶與供應商對上同一產品、期間、合格產出、成本與收入 | 本輪沒有共同口徑證據 | 客戶與供應商雙向核對料號、合格產出、重複出貨、收入或毛利 | 製程需要某類材料或設備不等於台灣公司已受惠 |
 
-本輪六份文件顯示不同格子散落在第 1～5 關，第 6 關仍缺共同分母。六關是本文的查證順序，
+本輪不同來源顯示各格散落在第 1～5 關，第 6 關仍缺共同分母。六關是本文的查證順序，
 不是共同產業標準；更不是把 Sony、TSMC、AMD、imec 與設備商放在同一條公司排名上。
 
 ## 來源與證據邊界
@@ -722,10 +877,12 @@ Kelvin、菊鏈與產品的接點拓樸、pitch、材料、測試門檻也不同
 - [EVG：HICC 多 die 單次轉移的 void-free 示範](https://www.evgroup.com/company/news/detail/ev-group-achieves-die-to-wafer-fusion-and-hybrid-bonding-milestone-with-100-percent-die-transfer-yield-on-multi-die-3d-system-on-a-chip/)
 - [imec：2µm D2W 的 overlay、Kelvin 與菊鏈電性結果](https://www.imec-int.com/en/press/imec-demonstrates-die-wafer-hybrid-bonding-cu-interconnect-pad-pitch-2mm)
 - [imec：400nm W2W 的表面、電性、overlay 與可靠度關係](https://www.imec-int.com/en/articles/wafer-wafer-hybrid-bonding-pushing-boundaries-400nm-interconnect-pitch)
+- [IEEE.tv／TEL：140nm W2W misalignment 與移除 pad-layout 影響的 fusion 診斷](https://ieeetv.ieee.org/hbs/reducing-wafer-to-wafer-bonding-misalignment-to-enable-sub-150nm-pitch-hybrid-bonding)
+- [IBM Research：sub-micron Cu-Cu 接點縮放、電阻 spread 與 bonding yield](https://research.ibm.com/publications/electrical-performance-of-hybrid-bonding-with-sub-micron-cu-cu-bonding-contacts-effects-of-scaling-microstructure-and-surface-morphology)
 
-本篇沒有把 imec、TSMC、AMD 或 Applied Materials 的效能與產品優勢拿來做跨公司數字比較；各文件的
-應用、製程、產品與測試分母不同，也沒有 HVM 良率、每小時產能、每片成本與市場份額的共同定義，
-因此 `cross_company_numbers` 維持 false。
+本篇沒有把 imec、TEL、IBM、TSMC、AMD 或 Applied Materials 的效能與產品優勢拿來做跨公司數字
+比較；各文件的應用、製程、產品與測試分母不同，也沒有 HVM 良率、每小時產能、每片成本與市場
+份額的共同定義，因此 cross_company_numbers 維持 false。
 
 ## 影響路由
 
