@@ -75,6 +75,13 @@ to: triaged
 reason: named_project_capacity_and_benchmark_economics_bridges_added_without_supplier_financial_upgrade
 evidence: sources:S14,S15,S16
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: shipment_custody_acceptance_and_revenue_event_ledger_added_without_refreshing_thesis_clock
+evidence: sources:S17,S18,S19
+-->
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -110,12 +117,19 @@ evidence: sources:S14,S15,S16
 - **資料中心容量**：公告用來描述站點規模的 MW。若文件沒說是公用電力、IT load、設計容量、已通電容量或哪一期，就不能拿來直接除以單櫃功率。
 - **DeepSeek R1**：CoreWeave 本輪用來比較兩代機架的推理模型與工作負載名稱；換成其他模型、輸入／輸出長度或服務目標後，10 倍結果不保證維持。
 - **GB200 NVL72**：CoreWeave benchmark 中作為基準的 Grace Blackwell 機架平台，和本文既有的 GB300 是不同型號；比較結果不能在兩者之間互換。
+- **Visibility event（供應鏈可視事件）**：記錄某一物件在某時、某地、某個 business step 發生了什麼；同一實體在出貨、收貨與後續處理會留下多筆事件，不代表多出同樣數量的新設備。
+- **EPCIS**：GS1 用來建立與交換供應鏈可視事件資料的標準。本文只借用事件欄位與去重思維，不主張 Rubin 供應鏈已部署這套標準。
+- **Business step（業務步驟）**：事件發生時正在完成的流程，例如 shipping 或 receiving。只寫「已處理」而不寫是哪一步，無法判斷設備究竟離開工廠、抵達站點，還是完成驗收。
+- **eventTime（事件時間）**：EPCIS 用來表示 business step 完成的時點，不是新聞發布日，也不必然等於感測器觀測或資料寫入時間。
+- **控制移轉**：客戶取得主導商品或服務使用、並取得其主要利益的會計邊界。IFRS 15 把收入認列連到履約義務完成與控制移轉，不把新聞中的一般「出貨」字眼自動視為充分證據。
+- **應收款與收款**：應收款是公司已取得無條件收款權利的帳面資產；現金收款是客戶實際付款。兩者可能落在不同日期，收入也不能與現金畫上等號。
+- **存量與流量**：期末已安裝、在途或可用容量是某一時點的存量；本期出貨、驗收、收入與收款是某段期間的流量。不同帳不能直接相加，也不能用其中一個替代另一個。
 
 ### 三句話抓重點
 
 - Vera Rubin 的公開證據已橫跨平台量產、系統型錄、未來工廠、整櫃驗證與雲端供應語言，不能再只用「路線圖／已量產」二分法。
 - 每份文件只跨過七關中的一部分：Noetra 的規劃容量、CoreWeave 的單一工作負載 benchmark、Google 的 offer、緯創的未來生產與台灣系統廠型錄都不是同一張證書。
-- 截至 2026-08-14，仍沒有一手資料把台灣公司實際 Rubin 出貨、客戶驗收、平台收入與獲利完整接起來；27,500 顆 GPU、140MW 或 10 倍 tokens／MW 都不能單獨證明個股財務受惠。
+- 截至 2026-08-14，仍沒有一手資料用同一產品鍵把台灣公司 Rubin 的完工、出貨、到貨、驗收、可用、計費、收入與收款完整接起來；27,500 顆 GPU、140MW 或 10 倍 tokens／MW 都不能單獨證明個股財務受惠。
 
 ### 為什麼重要
 
@@ -129,11 +143,13 @@ evidence: sources:S14,S15,S16
 - 追 Noetra 專案是否公布分期、實際通電／驗收容量、整數機櫃配置與商業上線時點。
 - 追 CoreWeave 的結果能否在其他模型、精度、延遲、營運商與 production SLO 下重現。
 - 追被列名系統廠下一次法說是否出現具名產品階段、出貨、收入、毛利、存貨與現金流足跡。
+- 追每個出貨數字能否附上產品版本、數量單位、business step、完成時間、來源／目的地、交易雙方與驗收／控制移轉條件。
 - 追散熱、PCB、電源與記憶體公司是否以自身一手文件建立供應關係，而不是沿用平台名單。
 
 ### 想一想
 
 - 平台商說「量產」時，哪一個公司級數字才能證明台灣供應商真的取得經濟利益？
+- 同一批 100 櫃若先後被寫成完工、出貨、到貨與驗收，為什麼不能相加成 400 櫃？
 - 若產品如期部署，但供應商毛利與現金流沒有改善，原本的受惠判讀還成立嗎？
 - 韓國 HBM 合作為什麼不能直接證明台灣傳統 DRAM 公司受惠？
 
@@ -275,6 +291,80 @@ sampling SE／t；CoreWeave 頁面未披露重複試驗、變異或獨立驗證�
 順序不是固定會計模板：有些合約可能出貨認列，有些要到驗收或服務期間才認列。研究者不能
 用產業慣例替公司填空，必須回到該公司的合約、會計政策與法說措辭。
 
+## 同一套系統會被數很多次：九事件出貨與會計護照
+
+GS1 的 EPCIS 事件標準提供一個很實用的閱讀方法：每一筆事件都要回答物件、時間、地點、
+business context 與物件狀態，也就是 `what／when／where／why／how`。標準還明確區分
+`shipping` 與 `receiving` 等 business step，並說 `eventTime` 是該步驟**完成**的時間；
+同一實體沿供應鏈移動時會持續產生新的 transaction／visibility event data。本文沒有證據
+顯示 Rubin 相關公司採用 EPCIS，這裡只借用它的事件思維，防止把同一批設備在不同階段
+重複當成新增量。
+
+| 事件鐘 | 最少要留下什麼 | 只看到這一鐘，還不能說什麼 |
+|---|---|---|
+| 1. 廠內完工／測試 | 序號或批次、configuration revision、數量、工廠與完成條件 | 已離廠、已交給客戶或可以認列收入 |
+| 2. 出廠／shipping | 出貨物件、數量、承運交接、起點、完成時間與合約交付條件 | 已到客戶指定地、已安裝或已驗收 |
+| 3. 到站／receiving | 目的地、收貨方、到貨時間、缺損／短少與收貨狀態 | 電力、冷卻、網路與軟體已接通 |
+| 4. 安裝／commissioning | 安裝組態、場站條件、實際測項、重工與通過版本 | 客戶已簽收或服務已可對外承諾 |
+| 5. 客戶驗收 | 合約測項、通過門檻、簽署方、日期、例外與保留事項 | 工作負載已滿載、供應商已收到現金 |
+| 6. 可用容量 | 可服務的 SKU、區域、容量、SLO、維護與故障排除邊界 | 有多少實際需求或計費使用量 |
+| 7. 可計費工作量 | 計費單位、使用量、價格、折扣、期間與取消／退款 | 供應商在同一期間認列多少收入與毛利 |
+| 8. 收入認列／應收 | 履約義務、控制移轉、交易價格、認列期間與無條件收款權 | 現金已入帳、收入等於自由現金流 |
+| 9. 現金回收 | 付款方、金額、幣別、收款日、帳期、融資或扣款 | 毛利品質、專案全生命週期報酬或下一批訂單 |
+
+九鐘不是所有合約都必須照同一順序，也不是把產業流程改成會計規則。它的用途是要求每一個
+headline 先選定事件：同一批 100 櫃若依序完工、出貨、收貨與驗收，仍是 100 櫃經過四個
+事件，不是 400 櫃。只有在同一物件鍵、期間與調整口徑下，才能寫出例如
+`期末在途＝期初在途＋本期出貨－本期收貨±更正` 的存量／流量對帳；若出貨是 GPU 顆數、
+收貨是 compute rack、驗收是整套 POD，公式根本沒有共同單位。
+
+### 七欄事件護照：先對物件，再對數量與控制
+
+| 護照欄位 | 必問問題 | Rubin 文章目前的缺口 |
+|---|---|---|
+| 1. 物件與版本 | 是 GPU、compute tray、compute rack、network／storage rack、POD 還是站點？哪個 revision？ | 多數來源只在平台、機架或專案層敘述，沒有跨公司共用的序號／組態鍵 |
+| 2. 數量與階層 | 單位是顆、板、托盤、櫃、POD、MW 或 token？父子組成與備品怎麼算？ | 27,500 顆 GPU 只能和 72 GPU／rack 做比例核對，不能補出整數交付櫃數或輔助機架 |
+| 3. 事件與判準 | 是 built、tested、shipped、received、installed、accepted、available、billable 還是 recognized？完成條件是什麼？ | 公開文件橫跨多個動詞，但沒有同一批設備逐關對帳 |
+| 4. 時間口徑 | 是事件完成日、資料登錄日或公告日？是本期流量、累計量或期末存量？時區為何？ | 現有公告日期不能替代實際出貨、到貨、驗收與認列日期 |
+| 5. 地點與交易雙方 | 起點、目的地、交付方、收貨方、驗收方與最後責任人是誰？ | 多數文件未把台灣供應商連到具名站點與驗收方 |
+| 6. 淨額調整 | 是否含備品、替換、重工、退貨、取消、短少、跨期或重複登錄？ | 非整數配置尾差沒有分解，不能任選備品或四捨五入解釋 |
+| 7. 控制與財務 | 何時移轉控制、滿足履約義務、形成應收、認列收入、收現與反映毛利？ | 尚無 Rubin 專屬合約與財務分母，不能用產業慣例代填 |
+
+IFRS Foundation 對 IFRS 15 的摘要把收入認列連到履約義務完成與客戶取得承諾商品或服務的
+控制。緯穎 2025 合併財報提供一個**公司層級例子**：KPMG 把收入認列時點列為關鍵查核事項；
+公司商品銷售政策再把控制移轉連到指定地點交付、陳舊／損失風險移轉，以及客戶已驗收、
+驗收條款失效或有客觀證據證明條件完成，並在交付形成無條件收款權時認列應收。這只說明
+「合約條件與控制邊界不能省」，不證明緯穎已有任何 Rubin 出貨或收入，也不能替其他系統廠
+決定會計時點。
+
+### 存量、事件流量、可用容量與金額要分四本帳
+
+| 帳本 | 典型問題 | 可比較的必要條件 | 常見錯誤 |
+|---|---|---|---|
+| 實體存量 | 期末有多少在製、在途、已安裝或已驗收物件？ | 同一產品鍵、地點、截止日與淨額調整 | 把不同位置的同一物件各算一套 |
+| 事件流量 | 本期有多少物件完成 shipping、receiving 或 acceptance？ | 同一事件定義、期間、單位與去重鍵 | 把完工、出貨、到貨、驗收相加成總出貨 |
+| 營運容量／活動 | 多少已安裝容量可用？多少時間真的承載 billable workload？ | 同一 reference plane、SKU、區域、SLO 與時間窗 | 把 installed MW 當平均活躍 MW，或把可用當滿載 |
+| 財務金額 | 哪一方在何期認列收入、應收、毛利與現金？ | 同一合約、控制移轉、幣別、期間與會計主體 | 把供應商收入、雲端計費與客戶 CapEx 當同一筆錢 |
+
+因此 `installed`、`available`、`billable`、`revenue` 與 `cash` 不是五個同義詞。若同一站點
+只有 installed capacity，還要等 commissioning、可用性與工作負載資料；若供應商已認列
+收入，仍要另外檢查毛利、應收與現金。反過來，某些合約的控制移轉可能不等待本文排列的
+所有營運事件，所以研究者也不能武斷要求「一定到第 7 鐘才可認列」；唯一安全做法是保存
+公司自己揭露的政策與具體合約證據。
+
+### 多空小作文共用同一張事件對帳表
+
+| 版本 | 必須看見的共同證據 | 何時下修／失效 |
+|---|---|---|
+| 多方 | 同一產品鍵的完工→出貨→到貨→驗收數量可對帳；等待時間沒有持續拉長；可用與 billable 容量跟上；收入、毛利、應收與現金的跨期差異有合約解釋 | 數量換單位後無法重算、同一物件重複計數、驗收或啟用累積卡住、應收／存貨上升而現金與毛利未跟上 |
+| 空方 | headline 主要停在 built／shipped 或累計 installed，site constraint、重工、替換、退貨、驗收延遲、低利用率或價格壓力使經濟價值落後 | 同一批次快速通過 acceptance、可用與 billable 事件，跨公司財務亦在合理帳期閉合，且反方無法指出重複或停滯 |
+
+本輪是 `N=3` 條定向一手消息鏈：GS1 事件標準、IFRS Foundation 準則頁、緯穎／KPMG 合併
+財報；它們不是 Rubin 機架、客戶、供應商、台灣 121 檔或全市場的抽樣。兩份官方 PDF 的
+實際引用頁及相鄰頁已逐頁目視核對，SHA-256 分別記於 S17、S19；本文沒有新估計值、抽樣
+效果或可報的 sampling SE／t。新增的是事件與會計邊界教材，不改 C11 主命題、T4 到期日、
+`last_reviewed_at`、`review_due` 或 `base_confidence`，也不形成價格、估值、部位或投資建議。
+
 ## 用雙向證據把平台進度連回台灣公司
 
 個股歸因至少要有兩個方向同時閉合：
@@ -384,6 +474,9 @@ limitation: 生態系列名證明合作角色存在，不等於個別公司新�
 - [NVIDIA／Noetra 日本 physical AI 基礎設施公告](https://investor.nvidia.com/news/press-release-details/2026/Japan-Government-Industrial-Leaders-and-NVIDIA-Launch-the-Worlds-First-National-AI-Infrastructure/default.aspx)（NVIDIA，2026-07-16；規劃容量與未來式架構）。
 - [CoreWeave Vera Rubin tokens／MW 測試](https://coreweave.com/blog/nvidia-vera-rubin-nvl72-on-coreweave-10x-more-tokens-per-megawatt-than-blackwell)（CoreWeave，2026-07-21；單一營運商自家測試）。
 - [CoreWeave Vera Rubin 動態產品頁](https://www.coreweave.com/products/nvidia-vera-rubin)（擷取於 2026-08-14；保存 150 TPS／user 下的 80,000／800,000 TPS／MW 口徑）。
+- [GS1 EPCIS Standard 2.0.1](https://ref.gs1.org/standards/epcis/2.0.1/)（GS1，2025-07-01；只借用事件資料的物件、時間、地點、business step 與狀態欄位，不表示本文公司採用 EPCIS）。
+- [IFRS 15 Revenue from Contracts with Customers](https://www.ifrs.org/issued-standards/list-of-standards/ifrs-15-revenue-from-contracts-with-customers/)（IFRS Foundation；現行準則頁，擷取於 2026-08-14）。
+- [緯穎 2025 年合併財務報告](https://www.wiwynn.com/hubfs/Investors/Financial_Report/Wiwynn_2025Q4_Financial.pdf)（緯穎／KPMG，2026-02-26；公司層級收入政策與查核事項，不是 Rubin 交易證據）。
 
 上述資料只證實 NVIDIA 平台與其公開列名生態系。它沒有披露技嘉、廣達、緯創或緯穎的
 新增訂單、單價、出貨占比或獲利；也沒有點名本 universe 的散熱、PCB、電源或記憶體個股。
@@ -562,6 +655,54 @@ url: https://www.coreweave.com/products/nvidia-vera-rubin
 locator: 2026-08-14 可見的單櫃 72 Rubin GPUs／36 Vera CPUs，以及 DeepSeek R1、150 TPS／user 下 GB200 80,000 與 Vera Rubin 800,000 TPS／MW 表格
 limitation: 動態產品頁與 S15 同屬 CoreWeave 消息鏈；頁面數值不提供測試樣本、變異、完整方法、獨立驗證、商業價格、利用率或財務結果；擷取 HTML SHA-256 8ec7effe7831d334e07432cc24606a757078544e6c31805e8acdcb960481147b
 independence_group: coreweave
+-->
+
+<!-- research_source
+source_id: S17
+role: standard
+source_kind: document
+publisher: GS1
+title: EPCIS Standard 2.0.1
+published_at: 2025-07-01
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://ref.gs1.org/standards/epcis/2.0.1/
+locator: PDF pp.24、47、59、67；transaction／visibility event data 隨同一物件移動持續產生、what／when／where／why／how 五維、shipping／receiving business step，以及 eventTime 表示 business step 完成時點
+limitation: GS1 是通用事件資料標準；本文只借用其可稽核欄位設計，不能據此宣稱 NVIDIA、Rubin 客戶或台灣供應商採用 EPCIS，也不提供任何 Rubin 數量、驗收或財務結果；官方 PDF SHA-256 6c9b2b51b41cd2cf169f6723001cac56a31c574e9c79ec8d4d52d2bf505f8eaa
+independence_group: gs1
+-->
+
+<!-- research_source
+source_id: S18
+role: standard
+source_kind: living_index
+publisher: IFRS Foundation
+title: IFRS 15 Revenue from Contracts with Customers
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.ifrs.org/issued-standards/list-of-standards/ifrs-15-revenue-from-contracts-with-customers/
+locator: About 與五步驟摘要；履約義務完成、承諾商品或服務移轉，以及客戶取得控制時認列收入
+limitation: 準則頁提供一般原則，不判定任何具體 Rubin 合約的履約義務、控制移轉時點、交易價格、驗收條款、收入期間或現金回收
+independence_group: ifrs-foundation
+-->
+
+<!-- research_source
+source_id: S19
+role: company_filing
+source_kind: document
+publisher: Wiwynn / KPMG
+title: Wiwynn Corporation and Subsidiaries Consolidated Financial Statements for the Years Ended December 31 2025 and 2024
+published_at: 2026-02-26
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.wiwynn.com/hubfs/Investors/Financial_Report/Wiwynn_2025Q4_Financial.pdf
+locator: auditor report p.4-1（PDF p.5）收入認列時點關鍵查核事項；note 4(n) pp.22–23（PDF pp.25–26）控制移轉、指定地點交付、風險移轉、客戶驗收／條款失效／客觀條件與應收款政策
+limitation: 財報只支持緯穎集團所揭露商品銷售的一般會計政策與 2025 年查核風險；沒有具名 Rubin 合約、機櫃數、出貨、到貨、驗收、收入、毛利或現金，不能外推成其他公司或所有 AI 機架的共同條款；官方 PDF SHA-256 74f781c2f3863c7fb772908f289504cd1c0039ce760fbca922da424c236a101d
+independence_group: wiwynn
 -->
 
 <!-- research_claim
@@ -789,6 +930,62 @@ as_of: 2026-08-14
 basis: S14 只到未來式專案容量，S15／S16 只到特定測試與動態產品表；三份來源都未提供利用率、價格、供應商出貨、收入、毛利、存貨與現金流，因此必須保留四段橋接
 boundary: 四橋是可證偽的研究責任分類，不主張橋與橋之間固定線性、10 倍結果必然失效或任何公司一定受惠／受害；本文未評估價格、估值、共識、部位或投資報酬
 verification_needed: 其他營運商與工作負載的同條件重測、production SLO／利用率、billable demand／pricing、站點 acceptance，以及台灣買賣雙方同期間財務橋接
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: GS1 EPCIS 2.0.1 把供應鏈事件拆成 what、when、where、why、how 五個維度，以 business step 區分 shipping／receiving 等流程，並把 eventTime 定義為該 business step 的完成時點；同一物件沿供應鏈移動會持續產生新的 transaction／visibility event data
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S17 PDF pp.24、47、59、67 直接說明同一實體移動時持續產生事件資料、五個事件維度、business step 與 eventTime 語意
+boundary: 這只證明 GS1 的通用事件資料模型；本文借用欄位做研究護照，不主張 NVIDIA、Rubin 客戶、緯穎或其他台灣公司實際採用 EPCIS，也不提供 Rubin 出貨數量
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: IFRS Foundation 將 IFRS 15 的收入認列連到履約義務完成與客戶取得控制；緯穎 2025 合併財報則把商品收入政策連到指定地點交付、風險移轉與客戶驗收條件，KPMG 並把收入認列時點列為關鍵查核事項
+supporting_source_ids: S18,S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S18 的 IFRS 15 五步驟摘要直接說明控制移轉原則；S19 auditor report p.4-1 與 note 4(n) pp.22–23 直接列出緯穎收入時點查核風險、交付、風險移轉、驗收及應收政策
+boundary: 準則原則與緯穎公司層級政策都不能判定任何 Rubin 合約的控制移轉、驗收、收入或現金；緯穎政策也不是其他系統廠或所有 AI 機架的共同合約
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: Rubin 出貨研究應用同一產品與版本鍵保存物件／數量階層、business step、完成時間、地點與交易雙方、淨額調整及控制／財務七欄，並把完工、出貨、到貨、commissioning、驗收、可用、可計費、收入與收款當成九個不可直接相加的事件鐘
+supporting_source_ids: S17,S18,S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S17 證明同一實體會留下多個供應鏈事件且事件必須有物件、時間、地點與流程語意；S18／S19 證明收入還要另核對控制、合約及驗收，因此需要用共同物件鍵把實體、營運與財務事件逐筆串接
+boundary: 九鐘與七欄是可證偽的研究責任分類，不宣稱所有合約固定依序發生、每家公司採相同術語，或任一 Rubin 事件已實際完成；本文沒有把事件數換算成新增設備或收入
+verification_needed: 具名買賣雙方對同一 Rubin configuration／serial range 公開逐期 built、shipped、received、installed、accepted、available、billable、revenue／receivable 與 cash reconciliation，含更正、備品、替換、退貨及取消
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: unverified
+status: active
+claim: 截至 2026-08-14，公開一手資料尚未以同一產品鍵把任何台灣系統廠 Rubin 的完工、出貨、到貨、驗收、可用／可計費容量、收入、應收與現金回收完整對帳
+supporting_source_ids: S1,S10,S11,S12,S13,S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 平台、工廠、型錄、能力與公司財報分屬不同文件與觀察單位；S19 只有公司一般政策，現有來源沒有 Rubin 專屬序號／版本、交易雙方、事件數量與財務共同鍵
+boundary: 缺乏公開完整帳本不代表沒有實際訂單、出貨或收入，只表示本文不能從現有證據估數量、份額、營收、毛利、現金流或投資報酬
+verification_needed: 台灣公司或具名客戶提供可對時的 Rubin 產品版本、數量單位、shipping／receiving、site acceptance、available／billable capacity、收入／應收與收款，並能排除備品、替換、退貨、取消及重複計數
 resolution:
 -->
 

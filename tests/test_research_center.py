@@ -6317,6 +6317,7 @@ class ResearchCenterTest(unittest.TestCase):
             "## 五份一手文件，為什麼不能合併成一句「已上線」",
             "## 27,500 顆 GPU、140MW 與 10 倍效率，三種分母不能直接變成營收",
             "## 從工廠到工作負載的交付順序",
+            "## 同一套系統會被數很多次：九事件出貨與會計護照",
             "## 用雙向證據把平台進度連回台灣公司",
             "## 新手最常混淆的六件事",
             "## 在研究中心裡接著怎麼學",
@@ -6365,6 +6366,33 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C15",
             "claim_id: C16",
             "reason: named_project_capacity_and_benchmark_economics_bridges_added_without_supplier_financial_upgrade",
+            "reason: shipment_custody_acceptance_and_revenue_event_ledger_added_without_refreshing_thesis_clock",
+            "### 七欄事件護照：先對物件，再對數量與控制",
+            "### 存量、事件流量、可用容量與金額要分四本帳",
+            "### 多空小作文共用同一張事件對帳表",
+            "| 1. 廠內完工／測試 |",
+            "| 2. 出廠／shipping |",
+            "| 3. 到站／receiving |",
+            "| 4. 安裝／commissioning |",
+            "| 5. 客戶驗收 |",
+            "| 6. 可用容量 |",
+            "| 7. 可計費工作量 |",
+            "| 8. 收入認列／應收 |",
+            "| 9. 現金回收 |",
+            "同一批 100 櫃若依序完工、出貨、收貨與驗收",
+            "期末在途＝期初在途＋本期出貨－本期收貨±更正",
+            "`installed`、`available`、`billable`、`revenue` 與 `cash`",
+            "`N=3` 條定向一手消息鏈",
+            "沒有新估計值、抽樣\n效果或可報的 sampling SE／t",
+            "6c9b2b51b41cd2cf169f6723001cac56a31c574e9c79ec8d4d52d2bf505f8eaa",
+            "74f781c2f3863c7fb772908f289504cd1c0039ce760fbca922da424c236a101d",
+            "source_id: S17",
+            "source_id: S18",
+            "source_id: S19",
+            "claim_id: C17",
+            "claim_id: C18",
+            "claim_id: C19",
+            "claim_id: C20",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
@@ -6372,8 +6400,8 @@ class ResearchCenterTest(unittest.TestCase):
         )[0]
         self.assertGreaterEqual(glossary.count("- **"), 26)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 16),
-            ("research_claim", 16), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 19),
+            ("research_claim", 20), ("metric_comparison", 0),
             ("impact", 6), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -6399,6 +6427,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:vera-rubin-site-acceptance,stage,Vera Rubin 站點啟用與客戶驗收",
             "stage:vera-rubin-cloud-workload,stage,Vera Rubin 雲端可用與工作負載",
             "stage:vera-rubin-financial-attribution,stage,Vera Rubin 供應商財務歸因",
+            "process:ai-system-shipment-event-passport,process,AI 系統出貨事件護照",
+            "metric:installed-available-billable-revenue-boundary,metric,安裝—可用—計費—營收邊界",
         ):
             self.assertIn(concept, concepts)
         entities = (ROOT / "config" / "external_entities.csv").read_text(
@@ -6411,7 +6441,7 @@ class ResearchCenterTest(unittest.TestCase):
             / "vera_rubin_delivery_contract.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: Vera Rubin 七關交付與整櫃責任", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 24)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 26)
         for node in (
             "from_id: company:nvidia", "from_id: company:coreweave",
             "from_id: company:google", "from_id: company:2376",
@@ -6432,6 +6462,10 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: group:memory", "to_id: group:pcb",
             "to_id: group:powersupply", "to_id: group:serverodm",
             "to_id: group:thermal",
+            "edge_id: KG-VRD-I18",
+            "to_id: process:ai-system-shipment-event-passport",
+            "edge_id: KG-VRD-I19",
+            "to_id: metric:installed-available-billable-revenue-boundary",
         ):
             self.assertIn(node, graph)
 
@@ -6453,6 +6487,13 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(
             [graph_id for row in route["phases"] for graph_id in row["graphIds"]],
             route["graphIds"],
+        )
+
+        reviews = (
+            ROOT / "notes" / "research_method_reviews" / "monitor_reviews.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "MR-2026-08-14-VERA-RUBIN-T4-SHIPMENT-EVENT-PASSPORT", reviews
         )
 
     def test_company_finance_route_connects_buyer_capex_to_supplier_attribution(self):

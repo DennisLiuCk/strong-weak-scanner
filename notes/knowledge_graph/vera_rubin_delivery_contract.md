@@ -493,3 +493,43 @@ status: active
 boundary: 液冷與 in-row CDU 只形成散熱研究入口；沒有 universe 公司具名冷板 CDU QD 水路資格 出貨或財務分母。
 next_trigger: 平台 客戶與散熱公司用同一冷卻組態 資格 驗收 數量 期間 收入及毛利雙向核對。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-VRD-I18
+view: industry
+from_id: product:nvidia-vera-rubin-nvl72
+to_id: process:ai-system-shipment-event-passport
+relation: requires
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C17,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C19,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C20
+note_refs:
+evidence_state: unverified
+commercial_stage: shipment
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-15
+status: active
+boundary: GS1 只提供通用事件欄位；現有 Rubin 文件沒有以共同物件鍵串起完工 出貨 到貨 安裝 驗收 可用 計費 認列與收款，也沒有證據證明相關公司採用 EPCIS。
+next_trigger: 具名買賣雙方以同一 Rubin configuration或serial range 公開逐期事件數量 時間 地點 交易方 淨額更正與驗收結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-VRD-I19
+view: industry
+from_id: product:nvidia-vera-rubin-nvl72
+to_id: metric:installed-available-billable-revenue-boundary
+relation: measured_by
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C18,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C19,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C20
+note_refs:
+evidence_state: unverified
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-15
+status: active
+boundary: IFRS 原則與緯穎公司層級會計政策證明控制 合約及驗收條件不能省略，但不決定 Rubin 專屬 installed available billable revenue receivable 或 cash 時點。
+next_trigger: 同一 Rubin 批次以一致單位公開 installed與available容量 billable activity 控制移轉 收入 應收 毛利及現金的跨期 reconciliation。
+-->
