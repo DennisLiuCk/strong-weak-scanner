@@ -6888,6 +6888,7 @@ class ResearchCenterTest(unittest.TestCase):
             "## 一份測試責任護照至少有十欄",
             "## 哪些變更要觸發回歸重測",
             "## 為什麼測試時間增加，設備台數仍可能不線性增加",
+            "## 120 秒變 150 秒，不等於多買 25% 測試單元",
             "## 五組數字不能直接排高低",
             "## 產業角色不要混在一起",
             "## 同一個 test cell，會開出三種不同的發票",
@@ -6908,16 +6909,26 @@ class ResearchCenterTest(unittest.TestCase):
             "monitor_id: T5",
             "reason: added_test_responsibility_passport_and_change_triggered_regression_without_thesis_upgrade",
             "reason: separated_test_service_interface_product_and_equipment_revenue_clocks_without_company_beneficiary_upgrade",
+            "reason: added_test_cell_seconds_productive_time_and_capacity_ceiling_passport_without_thesis_or_clock_refresh",
             "claim_id: C8",
             "claim_id: C9",
             "claim_id: C10",
             "claim_id: C11",
+            "claim_id: C12",
+            "claim_id: C13",
+            "claim_id: C14",
             "| 1. 產品組合與數量 |",
             "| 8. 公司財務歸因 |",
             "| 1. 設計驗證與可測試性設計 |",
             "| 10. 變更與回歸條件 |",
             "需求的測試單元時數",
             "同時站數 × 並行效率 × 可用率",
+            "增量實體單元 = ceil[max(0, test-cell 等價數 − 既有未承諾合格單元)]",
+            "9.965934623469",
+            "10.381181899447",
+            "4.166666666667%",
+            "N=2 個假想設定",
+            "多空小作文必須共用同一份護照",
             "observation_id: M2-O1",
             "value_kind: upper_bound",
             "reported_value: 720",
@@ -6930,8 +6941,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 18),
-            ("research_claim", 11), ("metric_comparison", 8),
+            ("research_topic", 1), ("research_source", 21),
+            ("research_claim", 14), ("metric_comparison", 8),
             ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -6952,6 +6963,8 @@ class ResearchCenterTest(unittest.TestCase):
             "concept:test-responsibility-passport,concept,測試責任護照",
             "process:test-change-triggered-regression,process,測試變更觸發回歸重測",
             "process:test-result-lineage-feedback,process,測試結果沿革與現場回饋",
+            "process:test-cell-capacity-passport,process,測試單元產能護照",
+            "metric:test-seconds-to-qualified-cell-equivalents,metric,測試秒數到合格單元等價數",
         ):
             self.assertIn(concept, concepts)
         entities = (ROOT / "config" / "external_entities.csv").read_text(
@@ -6965,7 +6978,7 @@ class ResearchCenterTest(unittest.TestCase):
             / "inference_compute_test_demand.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 推論晶片測試需求八分母", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
         for node in (
             "from_id: company:advantest", "from_id: company:teradyne",
             "from_id: company:amazon", "from_id: company:microsoft",
@@ -6981,6 +6994,8 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: concept:test-responsibility-passport",
             "to_id: process:test-change-triggered-regression",
             "to_id: process:test-result-lineage-feedback",
+            "to_id: process:test-cell-capacity-passport",
+            "to_id: metric:test-seconds-to-qualified-cell-equivalents",
             "to_id: group:ipdesign", "to_id: group:packtest",
             "to_id: group:semiequip",
         ):

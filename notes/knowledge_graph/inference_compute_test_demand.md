@@ -1,15 +1,15 @@
 # 推論晶片測試需求八分母知識圖譜
 
-本圖把晶片產品數量、測試插入點、內容與時間、多站效率、良率重測、既有設備餘裕及
-公司財務歸因分開。公開證據目前只能支持部分工程機制；圖上的族群是後續搜尋路由，
-不是訂單、受惠、獲利或投資排名。
+本圖把晶片產品數量、測試插入點、內容與時間、多站效率、設備狀態、生產結果、合格既有
+容量及公司財務歸因分開，並用產能護照把測試秒數橋接到連續 test-cell 等價數與離散實體缺口。
+公開證據目前只能支持部分工程機制；圖上的族群是後續搜尋路由，不是訂單、受惠、獲利或投資排名。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: inference-compute-test-demand
 root_node_id: concept:inference-compute-test-demand
 label: 推論晶片測試需求八分母
-summary: 從產品組合與數量 插入點 內容時間 並行效率 良率重測 既有設備與增量資本支出 追到公司財務歸因，避免把晶片顆數或 tester TAM 線性換算成設備台數與台股受惠。
+summary: 從產品組合與數量 插入點 內容時間 並行效率 設備狀態 良率重測 合格既有容量與增量資本支出 追到公司財務歸因，並分開連續單元等價數與向上取整的實體缺口，避免把晶片顆數或 tester TAM 線性換算成設備台數與台股受惠。
 article_ids: MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM
 status: active
 -->
@@ -392,4 +392,44 @@ review_due: 2026-09-15
 status: active
 boundary: 串接前後站與 RMA 只建立根因和修正能力 不表示每個現場事件皆為製造缺陷 也不能由單一退貨估算全體 defect rate 或 tester 台數。
 next_trigger: 同一產品以序號 lot wafer package board system identity 串接各站結果 現場條件 根因 corrective action 與新增測項成效。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ITD-I15
+view: industry
+from_id: concept:inference-compute-test-demand
+to_id: process:test-cell-capacity-passport
+relation: requires
+claim_refs: MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C12,MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C13,MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C14
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: SEMI E10 E79 E116 是一條設備時間與生產力方法鏈 Advantest 與 Teradyne 則提供 test cell 產品語境 本圖不把標準摘要改寫成 tester 採購公式。
+as_of: 2026-08-14
+review_due: 2026-10-30
+status: active
+boundary: 產能護照是研究比較契約 不是 SEMI 強制的 tester 欄位 全產業標準 OEE 公式 設備採購門檻 公司訂單或財務歸因。
+next_trigger: 同一具名產品與期間公開 test program 秒數 重測 有效站數 equipment state time in state good output 合格既有容量 阻塞原因與增量交付。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ITD-I16
+view: industry
+from_id: concept:inference-compute-test-demand
+to_id: metric:test-seconds-to-qualified-cell-equivalents
+relation: measured_by
+claim_refs: MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C13,MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C14
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-10-30
+status: active
+boundary: N=2 假想情境只示範量綱與離散取整 沒有產品 設備 工廠 run 抽樣誤差 價格 收入 公司效果或投資結論。
+next_trigger: 同一產品用原始設備狀態時數與 good output 重算連續 cell equivalent 扣除合格未承諾容量後 再對到實際增量採購 安裝 資格與驗收。
 -->

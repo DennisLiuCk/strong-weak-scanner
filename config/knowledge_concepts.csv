@@ -371,6 +371,8 @@ stage:test-company-financial-attribution,stage,測試需求公司財務歸因,Te
 concept:test-responsibility-passport,concept,測試責任護照,Test responsibility passport|test responsibility contract,concept:inference-compute-test-demand,把受測物版本 決策目的 故障類別 插入點 存取組態 刺激環境 抽樣覆蓋 結果責任與重測條件綁在同一筆可回查紀錄
 process:test-change-triggered-regression,process,測試變更觸發回歸重測,Change-triggered test regression|test retest matrix,concept:inference-compute-test-demand,在晶片封裝介面程式製程或工作負載變更後依影響範圍重跑測項並保存新舊版本與結果的流程
 process:test-result-lineage-feedback,process,測試結果沿革與現場回饋,Test result lineage and field feedback|RMA test feedback,concept:inference-compute-test-demand,沿同一產品身分串接晶圓組裝成品系統資格與現場結果並把新失效回饋成圍堵修正及新測項的流程
+process:test-cell-capacity-passport,process,測試單元產能護照,Test-cell capacity passport|test capacity comparability contract,concept:inference-compute-test-demand,把產品期間 秒數重測 有效站數 設備狀態 生產結果 合格既有容量與增量交付綁在同一筆可重算紀錄
+metric:test-seconds-to-qualified-cell-equivalents,metric,測試秒數到合格單元等價數,Test seconds to qualified cell equivalents|test-cell capacity bridge,process:test-cell-capacity-passport,將單DUT工作時數除以有效站數與單一可生產時數後扣除既有合格未承諾容量並分開呈現連續等價數與向上取整實體缺口
 concept:800vdc-execution-readiness,concept,800VDC 七關執行準備度,800VDC execution readiness|800VDC qualification gates,concept:800v-power-tree,把架構時鐘 設施邊界 介面冗餘 安全標準 子系統資格 場站驗收與量產財務分開追蹤的證據框架
 stage:800v-architecture-roadmap,stage,架構需求與平台時鐘,800V architecture roadmap|platform timing,concept:800vdc-execution-readiness,確認高壓直流的需求邊界 目標 rack generation 固定版本與 production 時程
 stage:800v-facility-transition,stage,設施轉換邊界,800V facility transition|AC DC hybrid stage,concept:800vdc-execution-readiness,固定只改 IT rack 連 cooling 與 network 一起改或整座場站轉為直流的架構範圍

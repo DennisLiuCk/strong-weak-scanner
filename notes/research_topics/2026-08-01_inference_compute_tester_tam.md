@@ -84,6 +84,13 @@ to: triaged
 reason: separated_test_service_interface_product_and_equipment_revenue_clocks_without_company_beneficiary_upgrade
 evidence: sources:S16,S17,S18
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_test_cell_seconds_productive_time_and_capacity_ceiling_passport_without_thesis_or_clock_refresh
+evidence: sources:S8,S10,S19,S20,S21
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -106,6 +113,15 @@ evidence: sources:S16,S17,S18
 - **待測元件（DUT）**：正在接受測試的晶片、封裝或模組。
 - **每小時產出（UPH）**：特定設定下每小時可完成的單位數；不同設備、測項與時間不能直接互比。
 - **測試單元（test cell）**：測試機加上探針台或分類機、介面、溫控、自動化與軟體形成的生產單元。
+- **設備狀態（equipment state）**：在固定觀測期間內，設備處於生產、待機、工程、非計畫停機等哪種狀態的時間分類；不同標準與工廠的欄位必須先對齊才能比較。
+- **可生產時間係數（productive-time factor）**：本文把全年日曆時數轉成實際可承接該產品工作量的單一假想比例；它不是把定義不明的 availability、utilization 與 OEE 直接相乘。
+- **測試單元等價數（cell-equivalent）**：總工作量除以每個合格測試單元的可生產時數後得到的連續需求量，可有小數，還不是實體採購台數。
+- **未承諾合格產能**：既有設備中已完成產品、程式、介面與溫控資格，且尚未被其他工作占用的可用時數；帳面裝機數不能直接代替它。
+- **向上取整（ceiling）**：實體設備不能買 0.38 台，因此容量缺口跨過整數邊界時要向上取整；小數等價數與離散增購台數必須分開讀。
+- **SEMI E10-0422**：SEMI 現行設備 RAM 與 utilization 標準版本；公開摘要把觀測期間分成六種互斥設備狀態，付費全文公式不在本文證據範圍。
+- **SEMI E79-0422**：SEMI 現行設備生產力標準版本，範圍包含 OEE 指標；它不是本文假想 70% 可生產時間係數的來源。
+- **SEMI E116-0726**：SEMI 現行設備績效追蹤標準版本，處理設備／模組狀態變化、狀態時間與阻塞原因；狀態紀錄仍不等於產能或採購答案。
+- **製造執行系統（MES）**：連接工單、產品、設備與生產結果的工廠資訊系統；設備狀態資料要和產品及結果接起來，才可形成可用的產能分母。
 - **漏測（test escape）**：未在前一測試階段被攔下、到後續製程或客戶端才暴露的缺陷。
 - **退貨分析（RMA）**：產品在客戶或現場失效後，沿序號、批次與既有測試結果回查、重現並分析根因的流程；單一退貨不等於全體失效率。
 - **已知良品晶粒（known-good die）**：在投入昂貴多晶粒封裝前，已按約定範圍完成篩選的晶粒；「已知良品」仍受測試覆蓋和條件限制。
@@ -427,6 +443,54 @@ limitation: 這是四頁 Q1 摘要且不是 Q2 文件；沒有兩條產品線各
 independence_group: mpi-2026q1-results
 -->
 
+<!-- research_source
+source_id: S19
+role: standard
+source_kind: living_index
+publisher: SEMI
+title: SEMI E10-0422 - Specification for Definition and Measurement of Equipment Reliability, Availability, and Maintainability (RAM) and Utilization
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://store-us.semi.org/products/e01000-semi-e10-specification-for-definition-and-measurement-of-equipment-reliability-availability-and-maintainability-ram-and-utilization
+locator: Current revision、Purpose 與 Summary 段落的六種互斥設備狀態、availability 及 utilization 類別
+limitation: 公開頁只有付費標準的摘要，不含完整定義、公式或資料字典；它是通用設備 RAM 與 utilization 標準，不提供半導體 test-cell 的產品、秒數、站數、產能或公司財務資料
+independence_group: semi-equipment-performance
+-->
+
+<!-- research_source
+source_id: S20
+role: standard
+source_kind: living_index
+publisher: SEMI
+title: SEMI E79-0422 - Specification for Definition and Measurement of Equipment Productivity
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://store-us.semi.org/products/e07900-semi-e79-specification-for-definition-and-measurement-of-equipment-productivity
+locator: Current revision、Purpose 與 Summary 段落的設備生產力指標、計算及 OEE 範圍
+limitation: 公開頁只有付費標準的摘要，不含 OEE 的完整分子、分母、損失分類或計算例；它也不提供具名 tester、產品、工廠或實際產出
+independence_group: semi-equipment-performance
+-->
+
+<!-- research_source
+source_id: S21
+role: standard
+source_kind: living_index
+publisher: SEMI
+title: SEMI E116-0726 - Specification for Equipment Performance Tracking
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://store-us.semi.org/products/e11600-semi-e116-specification-for-equipment-performance-tracking
+locator: Current revision、Purpose 與 Summary 段落的設備／模組狀態變化、time in state、blocked reason 與 MES 結合
+limitation: 公開頁只支持狀態追蹤與資料交換範圍，且明示本標準本身不回報 E10 states；它不證明 productive time、OEE、tester 需求、客戶資格或財務結果
+independence_group: semi-equipment-performance
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -585,10 +649,52 @@ verification_needed:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: SEMI E10-0422 的現行公開摘要以固定觀測期間內六種互斥設備狀態支撐 RAM、availability 與 utilization 分類，E79-0422 另定義設備生產力及 OEE 指標，E116-0726 則追蹤設備／模組狀態變化、time in state 與 blocked reason，並說明可結合 MES 資料形成 E10／E79 所需指標
+supporting_source_ids: S19,S20,S21
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S19–S21 現行官方商品頁的 Purpose 與 Summary 可直接定位各標準的分工、狀態／時間欄位及相互引用
+boundary: 這只驗證三份標準公開摘要的範圍；付費全文公式未納入，三頁同屬 SEMI 一條方法鏈，也沒有任何 test-cell、產品、工廠、產能或市場實測
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C13
+label: inference
+status: active
+claim: test-cell 產能換算至少要固定觀測期間、設備與模組身分、狀態及 time-in-state 分母、可生產時數、合格產品組態、多站並行效率、良品結果、阻塞原因與既有未承諾產能；若 availability、utilization 或 OEE 的分子分母及損失重疊未定義，就不能把三個百分比直接連乘
+supporting_source_ids: S8,S10,S19,S20,S21
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S19–S21 把狀態、時間、RAM／utilization、生產力及設備／MES 追蹤分開，S8、S10 又顯示 test cell 仍受產品、介面與並行條件限制；本文據此建立單一可重算的產能護照
+boundary: 產能護照是研究中心的比較契約，不是 SEMI 規定的 tester 公式、全產業共同欄位、設備報價或採購門檻；若只有百分比而無原始狀態時數，仍不能驗證
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C14
+label: inference
+status: active
+claim: 在本文 N=2 個純假想設定中，年量一千萬顆、一次 insertion、重測係數 1.10、八站、全年單一可生產時間係數 70% 與八個既有未承諾合格單元固定時，測試時間由 120 秒增至 150 秒且並行效率由 75% 升至 90%，連續 test-cell 等價數只由 9.965934623469 增至 10.381181899447（+4.166666666667%），但容量缺口向上取整後的增量實體單元由 2 台跨到 3 台
+supporting_source_ids: S8,S10,S19,S20,S21
+contrary_source_ids:
+as_of: 2026-08-14
+basis: Python Fraction 與獨立 awk 兩路均按相同單位鏈重算，顯示 120 秒情境需 61,111.1111111111 productive cell-hours、150 秒情境需 63,657.4074074074 小時，再各除以 6,132 小時／cell-year 並扣八個既有單元
+boundary: 這是 N=2 個確定性教材情境，沒有產品、設備、工廠、run、抽樣、sampling SE／t、價格、收入或公司效果；70% 是單一假想 aggregate factor，不是 E10 availability、utilization 與 E79 OEE 的乘積，向上取整也不等於訂單已發生
+verification_needed:
+resolution:
+-->
+
 ## 先把 tester TAM 拆成八個分母
 
 「市場規模上修」是研究起點，不是設備台數答案。以下八層要使用同一產品、同一期間和同一測試
-參考平面才可能相乘；現有 18 份來源只覆蓋部分欄位，空白處不能用產業故事補上。
+參考平面才可能相乘；現有 21 份來源只覆蓋部分欄位，空白處不能用產業故事補上。
 
 | 分母 | 先問什麼 | 現有公開證據 | 還缺什麼才可換算 |
 |---|---|---|---|
@@ -699,6 +805,90 @@ verification、post-silicon validation、production exit 與客戶退貨 PPM 回
 
 因此「測試時間變長」與「新增 tester 台數」中間至少隔著並行、利用與裝機餘裕三個分母；
 反過來，「多站並行」也不能證明需求下降，因為產品量、插入點和覆蓋可能同時增加。
+
+## 120 秒變 150 秒，不等於多買 25% 測試單元
+
+### 先把設備時間帳固定下來
+
+SEMI 的三份現行公開摘要提供一個重要的量測順序：E10-0422 先把觀測期間內的設備時間放進
+六種互斥狀態，再分別處理 RAM、availability 與 utilization；E79-0422 另處理設備生產力與
+OEE；E116-0726 則追蹤設備／模組狀態變化、`time in state`、阻塞原因，並讓設備資料能和
+MES 資料接起來。三份付費標準的完整公式並未公開，本文也不把它們改寫成 tester 採購公式。
+
+因此，下方教材只使用一個明示的「可生產時間係數」，不把定義未知、可能重複扣損失的
+availability、utilization 與 OEE 三個百分比盲目相乘。先固定共同假設：
+
+| 輸入 | 教材假設 | 讀者要保留的邊界 |
+|---|---:|---|
+| 年度產品量 | 10,000,000 顆 | 純假想合格投入量，不是市場預測 |
+| 測試 insertion | 1 次／顆 | 不代表多晶粒產品只有一站 |
+| 重測係數 | 1.10 | 等價於總測試工作量為首次投入的 110%，未指定失效原因 |
+| 同時站數 | 8 站 | 只是名目站數，仍要乘並行效率 |
+| 全年日曆時間 | 8,760 小時／cell-year | 教材固定一年，不處理閏年或新機到廠時點 |
+| 單一可生產時間係數 | 70% | 每個合格單元每年 6,132 小時；不是三種設備指標的連乘 |
+| 既有未承諾合格產能 | 8 個完整單元 | 已假設產品、程式、介面、溫控均合格且沒有被別案占用 |
+| 情境 A | 120 秒／顆；並行效率 75% | 有效站數 8 × 75% = 6.0 |
+| 情境 B | 150 秒／顆；並行效率 90% | 有效站數 8 × 90% = 7.2 |
+
+用同一條量綱鏈逐步計算：
+
+```text
+單 DUT 等價工作時數
+= 產品量 × insertion × 每顆測試秒數 × 重測係數 ÷ 3,600
+
+有效站數 = 同時站數 × 並行效率
+所需 productive cell-hours = 單 DUT 等價工作時數 ÷ 有效站數
+test-cell 等價數 = 所需 productive cell-hours ÷（8,760 × 單一可生產時間係數）
+增量實體單元 = ceil[max(0, test-cell 等價數 − 既有未承諾合格單元)]
+```
+
+| 計算結果 | 情境 A：120 秒／75% | 情境 B：150 秒／90% |
+|---|---:|---:|
+| 單 DUT 等價工作時數 | 366,666.6666666667 小時 | 458,333.3333333333 小時 |
+| 有效站數 | 6.0 | 7.2 |
+| 所需 productive cell-hours | 61,111.1111111111 | 63,657.4074074074 |
+| 連續 test-cell 等價數 | 9.965934623469 | 10.381181899447 |
+| 扣除 8 個既有單元後的連續缺口 | 1.965934623469 | 2.381181899447 |
+| 向上取整的增量實體單元 | 2 台 | 3 台 |
+| 若從零開始配置的實體總數 | 10 台 | 11 台 |
+
+測試秒數增加 25%，但有效站數同時增加 20%，所以連續 test-cell 等價需求只增加
+`1.25 ÷ 1.20 − 1 = 4.166666666667%`。然而實體設備不能買小數台：扣除八個既有單元後，
+缺口恰好跨過 2 台的整數邊界，增量數量便由 2 台變 3 台。這個「2→3」的 50% 不能當成
+市場需求成長率；它只是 N 很小的離散取整結果。反過來，若既有未承諾合格產能是 11 個單元，
+兩個情境的增量採購都會是零。
+
+本例只有 **N=2 個假想設定**，不是產品、設備、工廠或 run 樣本。Python `Fraction` 與獨立
+`awk` 路徑對 cell-equivalent、增幅與向上取整結論在顯示精度內一致；循環小數的最末位可能因
+`awk` 二進位浮點表示差 0.0000000001。確定性單位換算沒有 sampling SE／t；小數位只供讀者
+重算，不代表工程量測精度，也不提供價格、收入、毛利、訂單或任何公司效果。
+
+### 同一份 test-cell 產能護照要記什麼
+
+| 護照欄位 | 最低可重算內容 | 若缺少會犯的錯 |
+|---|---|---|
+| 產品與觀測期間 | 產品／版本、lot、起訖日、合格投入與出貨數 | 把不同產品或爬坡期和穩態期混在一起 |
+| insertion 與工作量 | 站點、test program 版本、秒數分布、重測係數 | 只用平均秒數，漏掉長尾、重測與站點移動 |
+| 並行條件 | 名目站數、有效站數、parallel efficiency、功率／熱／接觸限制 | 把八站直接當八倍吞吐 |
+| 設備時間狀態 | observation period、設備／模組 ID、time in state、阻塞原因、換線與維修 | 把 availability、utilization、OEE 或產品頁最高值重複相乘 |
+| 生產結果 | gross starts、good output、false fail、escape、報廢與重跑 | 只算完成次數，不知道是否產出合格品 |
+| 既有容量 | 已裝機、合格、已承諾、未承諾時數、升級與介面重用 | 把帳面機台全部當成可承接新產品 |
+| 增量交付 | 採購數、交期、安裝、程式／介面資格、客戶驗收、收入時鐘 | 把連續 cell-equivalent 直接寫成已下單或已認列收入 |
+
+這張護照還要和前文的「測試責任護照」相接：前者回答工作量能否被現有 test cell 消化，後者
+回答測的是哪個物件、為什麼測、誰負責放行。只有容量護照而沒有責任護照，可能把 validation、
+qualification、量產 screening 與 RMA 時數相加；只有責任護照而沒有容量護照，又無法判斷內容量
+是否真的跨過增量設備門檻。
+
+### 多空小作文必須共用同一份護照
+
+- **偏多情境**：具名產品量與測試秒數上升，功率、溫控或接觸限制讓有效站數下降；新增工作量連續跨過既有合格餘裕，買方再公布增量單元的採購、安裝、資格與驗收。此時才可把「內容變多」逐步推到設備或服務收入。
+- **偏空情境**：程式最佳化、多站效率、換線改善、既有平台升級與未承諾產能吸收新增秒數；即使 tester TAM 或產品複雜度上修，增量實體單元仍可能為零，或只是汰舊換新。
+- **共同裁決資料**：兩邊都必須交出同產品、同期間的秒數分布、有效站數、狀態時數、good output、合格既有容量、實際增量交付與財務共同鍵。缺其中任何一段，就只是方向情境，不是公司結論。
+
+因此，測試秒數、多站效率與設備狀態不是三則可以各自講故事的消息，而是同一條容量等式的
+分子與分母。真正可證偽的問題不是「AI 測試更複雜嗎」，而是「同一產品的新工作量是否超過
+同一期間可動用的合格產能，且超出的實體單元真的完成採購、資格與驗收」。
 
 ## 五組數字不能直接排高低
 
@@ -962,17 +1152,20 @@ comparability_reason: 旺矽同時包含探針卡與設備兩條產品線；該�
 - [京元電子 2026Q1 營運報告](https://www.kyec.com.tw/Common/Download?faname=CE9C12F9789DF09DB07AD813BD5475688BEAD13771DE3682E1557C949D18AADCBC1CA2FE6409102AE04ABAA1E80DB9551E6AE8CB84DA42B60CA4CFCBFBE8C3C1975FCB01637C8125A0F6E112F17D377B7B9D286F3E2741BDAAEFB35D0B5248527223686E9D7CE1A7)（pp.3–9，2026-05-08）。
 - [中華精測 2026Q2 營運報告](https://www.cht-pt.com.tw/files/file_pool/1/0Q209650487702138855/26Q2%20%E6%B3%95%E8%AA%AA%E6%9C%83_CN.pdf)（pp.3、11–19，2026-07-29）。
 - [旺矽 2026Q1 業績摘要](https://www.mpi-corporation.com/wp-content/uploads/2026/05/2026-Q1-Quarter-Result_0515%E5%AF%8C%E9%82%A6_2-page_EN.pdf)（第 1–3 頁，2026-05-15）。
+- [SEMI E10-0422 equipment RAM and utilization](https://store-us.semi.org/products/e01000-semi-e10-specification-for-definition-and-measurement-of-equipment-reliability-availability-and-maintainability-ram-and-utilization)（現行公開摘要，2026-08-14 捕捉）。
+- [SEMI E79-0422 equipment productivity](https://store-us.semi.org/products/e07900-semi-e79-specification-for-definition-and-measurement-of-equipment-productivity)（現行公開摘要，2026-08-14 捕捉）。
+- [SEMI E116-0726 equipment performance tracking](https://store-us.semi.org/products/e11600-semi-e116-specification-for-equipment-performance-tracking)（現行公開摘要，2026-08-14 捕捉）。
 
-18 份來源是定向證據集合，不是產業抽樣，所以本文不計算標準誤；它們只覆蓋市場方向、平台部署、
+21 份來源是定向證據集合，不是產業抽樣，所以本文不計算標準誤；它們只覆蓋市場方向、平台部署、
 測試存取範圍、供應商自述產品能力、設計／量產／資格責任邊界，以及三家公司不同季度的收入分類。
 來源沒有共同產品的晶片數、插入點、實際時間、站數效率、利用率、良率、既有裝機餘裕或增量採購，
 也沒有點名 3035、3443、3661、6533 的新 NRE／
 tape-out／量產案，或 2449、3264、6257、6223、6510、6515 的訂單、稼動率、平均售價與市占。
 
-IEEE、設備商、封測服務商與晶片公司的方法頁不是十八條完全獨立證據鏈：S8、S9 同屬 Advantest，
+IEEE、設備商、封測服務商、晶片公司與 SEMI 的方法頁不是二十一條完全獨立證據鏈：S8、S9 同屬 Advantest，
 S10–S12 同屬 Teradyne；S13、S14、S15 分別提供封測、設計生命週期與可靠度資格的另一個角色，
 S16–S18 則分屬京元電子、中華精測與旺矽，但期間、格式與收入分類不同，也沒有同一具名產品的共同
-結果。這些來源可用來界定「要量什麼、誰做哪個決定、由哪種收入時鐘收錢」，不能當成已實現的
+結果；S19–S21 同屬 SEMI 一條設備時間與生產力方法鏈，而且公開頁只有付費標準摘要。這些來源可用來界定「要量什麼、誰做哪個決定、由哪種收入時鐘收錢」，不能當成已實現的
 市場平均。由於本輪也沒有一致預期、估值與即時持倉資料，不宣稱這些公司「尚未反映」或市場上修
 必然造成倍數擴張。
 
