@@ -6728,14 +6728,26 @@ class ResearchCenterTest(unittest.TestCase):
             "## 同一台蝕刻設備，為什麼可能落進六個法規抽屜",
             "## 「找到替代分子」為什麼離量產還很遠",
             "## 建一份可重算的 PFAS qualification pack",
+            "## 買進 100 公斤，不代表排放 100 公斤：PFAS 的四本帳",
+            "### 先辨認四本帳各自在回答什麼",
+            "### 用一個固定場址年看懂分母差異",
+            "### Treatment input、destroyed amount 與 off-site fate 是三件事",
+            "### 一份 flow-to-financial passport 至少有十欄",
+            "### 多空小作文必須共用同一份流量底稿",
+            "### 樣本、誤差與可外推範圍",
+            "| 現場已驗證破壞 | 45 |",
+            "closure 是 98.333333%",
+            "2 公斤，占 1.666667%",
+            "比例是\n2.5%",
+            "N＝1 個匿名固定 site-year",
             "## 本輪第一拒絕如何裁決",
             "## 上品與三福化應該怎麼讀",
             "## 誰負責，誰不能替別人背書",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 14),
-            ("research_claim", 13), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 16),
+            ("research_claim", 17), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -6762,6 +6774,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:pfas-derogation-transition,stage,PFAS 豁免與過渡條件",
             "stage:pfas-change-qualification,stage,PFAS 替代變更資格驗證",
             "stage:pfas-company-financial-attribution,stage,PFAS 公司與財務歸因",
+            "process:pfas-site-mass-balance,process,PFAS 場址質量平衡",
+            "metric:pfas-use-release-waste-boundary,metric,PFAS 使用、釋放與廢棄物流邊界",
         ):
             self.assertIn(concept, concepts)
 
@@ -6779,11 +6793,13 @@ class ResearchCenterTest(unittest.TestCase):
             / "semiconductor_pfas_exposure.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 半導體 PFAS 七關曝險鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
         for edge_target in (
             "from_id: company:4755", "from_id: company:4770",
             "from_id: organization:echa", "from_id: organization:us-epa",
             "to_id: group:material", "to_id: group:semiequip",
+            "to_id: process:pfas-site-mass-balance",
+            "to_id: metric:pfas-use-release-waste-boundary",
         ):
             self.assertIn(edge_target, graph)
 

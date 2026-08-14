@@ -40,6 +40,14 @@ reason: separated_substance_process_product_form_jurisdiction_derogation_qualifi
 evidence: sources:S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14
 -->
 
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: separated_pfas_manufacture_use_release_waste_fate_and_site_mass_balance_without_thesis_clock_refresh
+evidence: sources:S1,S7,S15,S16
+-->
+
 <!-- research_source
 source_id: S1
 role: regulator_or_policy
@@ -264,6 +272,38 @@ limitation: 首頁只提供產品與更新入口，沒有 PFAS substance invento
 independence_group: san-fu-chemical-4755
 -->
 
+<!-- research_source
+source_id: S15
+role: regulator_or_policy
+source_kind: document
+publisher: United States Environmental Protection Agency
+title: Instructions for Reporting PFAS Under TSCA Section 8(a)(7)
+published_at: 2024-11-25
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.epa.gov/system/files/documents/2024-12/tsca-8a7-reporting-instructions_11-25-24.pdf
+locator: PDF pp.52–53（文件標示 4-28–4-29）分開 disposal method 與 air／water／land release quantity，並要求只報 specific PFAS weight、考慮 treated streams 與未完全破壞；p.65（文件標示 4-41）把 industrial processing／use 按 operation、sector、function 與 production-volume percentage 分開；本地 SHA-256 6c0c5beaa432d7a862f8964c17e5f17bd386459240511c0b884cf7582af37225
+limitation: 這是 2024 EPA reporting guidance，不是通用場址質量平衡或個別公司法律意見；其中 submission dates 已被 2026 action 改變，現行時程必須回到 S7，且 forthcoming scope revision 仍可能改變適用範圍
+independence_group: us-epa-tsca-pfas
+-->
+
+<!-- research_source
+source_id: S16
+role: regulator_or_policy
+source_kind: document
+publisher: United States Environmental Protection Agency
+title: Toxics Release Inventory Reporting Forms and Instructions for Reporting Year 2025
+published_at: 2026-04-14
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www.epa.gov/system/files/documents/2026-04/ry_2025_rfi_final_3.24.26.pdf
+locator: PDF p.72（文件標示 64）Section 5 分列 on-site air／water／land releases；pp.100–105（文件標示 92–97）Section 8 分列 recycling、energy recovery、treatment、disposal／other releases 及 off-site transfers，並要求按 reported chemical weight 與資料精度填報；本地 SHA-256 0f2d11ec24f9bd5699d309b92854ebedd6db9e7157d20cacb63453acff2806e8
+limitation: TRI 只適用符合產業／人員／化學品與 threshold 條件的美國設施及 TRI-listed chemical；Form R 欄位與估計不等於所有 PFAS、所有 fab、台灣場址、最終接收端 fate、風險或公司財務
+independence_group: us-epa-tri
+-->
+
 <!-- research_claim
 claim_id: C1
 label: inference
@@ -485,6 +525,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: EPA 的 TSCA 8(a)(7) PFAS 說明把 manufacture／import、industrial processing／use、disposal method 與 air／water／land release quantity 分開，且 release 只計 specific PFAS weight，處理過的 waste stream 與不完全破壞後的殘留也不能自動消失
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2024-11-25
+basis: S15 PDF pp.52–53 的 disposal／release 欄位與 p.65 的 industrial processing and use contract 直接支持
+boundary: S15 是 2024 申報說明且時程已被 S7 更新；欄位分流不等於所有公司適用、所有採購都須申報、處理效率已知或場址質量平衡已閉合
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: EPA 的 RY2025 TRI Form R 說明把 on-site air／water／land release、off-site transfer、recycling、energy recovery、treatment 與 disposal／other release 分欄，並要求按被申報化學物本身重量及底層資料能支持的精度填報
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2026-04-14
+basis: S16 PDF p.72 Section 5 與 pp.100–105 Section 8 的欄位、aggregation、chemical-weight 與 accuracy instructions 直接支持
+boundary: TRI 欄位只屬符合條件的美國設施與 TRI-listed chemicals；場外轉移量不自動等於接收端實際破壞量，也不能用 TRI 數字代表所有 PFAS、台灣場址、風險或公司財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 半導體 PFAS 的條件續用、替代與排放減量必須另建場址質量平衡，把同一物質、場址與期間的期初、新進料、製程循環、產品帶出、期末、回收、處理、已驗證破壞、場外處置、空水土釋放與殘差放在同一分母，不能以採購量替排放量
+supporting_source_ids: S1,S15,S16
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S1 的 site-specific management／emission direction，加上 S15 與 S16 對 use、release、treatment、recycling and disposal 的明確分欄，顯示單一 throughput 數字不足以支撐場址或財務判斷
+boundary: 場址質量平衡是研究中心的防錯與工程對帳框架，不是 ECHA／EPA 正式申報表、法定破壞效率、風險評估、排放許可或公司財務模型
+verification_needed: 取得同一具名物質、場址與期間的採購／進口、庫存、recipe、產品、回收、處理、破壞、waste manifest、air／water／land monitoring、方法偵測極限與財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 在匿名固定教材中，期初 20 公斤加新進料 100 公斤形成 120 公斤可交代量；九個已知去向共 118 公斤、帳差 2 公斤，closure 為 98.333333%、帳差率 1.666667%，其中 air／water／land on-site release 合計 3 公斤，分別是可交代量的 2.5% 與新進料的 3.0%
+supporting_source_ids: S15,S16
+contrary_source_ids:
+as_of: 2026-08-14
+basis: 依 S15／S16 的 release、treatment、recycling、transfer and disposal 分欄建立固定假想 flow；Python Fraction 與獨立 awk 逐項重算一致
+boundary: 這是 N＝1 個匿名 site-year 的確定性算式，不是真實廠區、PFAS、量測、法規申報或抽樣；2 公斤 residual 只是固定帳差，不是估計的 measurement uncertainty，不能外推排放率、破壞率、成本、收入或公司效果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -511,6 +619,15 @@ resolution:
 - **TSCA**：美國 Toxic Substances Control Act；本文相關條款要求製造者與進口者回報特定歷史資料，不等於全面禁用。
 - **EPA**：United States Environmental Protection Agency，美國環保署；維護本文的聯邦 PFAS 歷史申報規則與修訂時程。
 - **reporting（申報）**：向主管機關提交物質身分、用途、數量、暴露或廢棄等資料；有申報義務不代表該用途同時被禁止。
+- **TRI**：Toxics Release Inventory，美國特定設施對列管化學物的年度釋放與廢棄物管理申報；它和 TSCA 8(a)(7) 的一次性歷史製造／進口資料不是同一張表。
+- **Form R**：TRI 的逐化學物申報表，分列場址活動、現場釋放、場外轉移、回收、處理與其他 waste-management 欄位；有表格不表示所有設施或所有 PFAS 都適用。
+- **場址質量平衡（site mass balance）**：固定物質、場址與期間，把期初加進料和期末、產品、回收、處理、破壞、廢棄與空水土釋放對帳的工程底稿。
+- **期初／期末庫存**：觀測期間開始與結束時仍留在場址內的物質；忽略庫存變動，採購量和使用量就容易被誤當成同一數字。
+- **on-site release（現場釋放）**：物質在場址內進入空氣、水或土地；它不包含仍在產品、庫存或可驗證回收循環中的量。
+- **off-site transfer（場外轉移）**：含該物質的物流離開場址去回收、處理或處置；這是邊界跨越，不自動證明接收端實際回收、破壞或最終排放多少。
+- **treatment／destruction（處理／破壞）**：處理是把 waste stream 交給某種方法，破壞則要求證明特定物質已被轉化；進入處理設備的量不能直接填成已破壞量。
+- **closure residual（帳差）**：總輸入扣除可追溯輸出與期末庫存後的差；它可能來自量測、取樣、濃度、流量、時間或遺漏路徑，不能先改名為排放。
+- **measurement uncertainty（量測不確定度）**：量測方法、校正、取樣、偵測極限與變異造成的數值範圍；帳差存在不等於已經估出這個範圍。
 - **SEMI**：串連半導體設備、材料與製造供應鏈的產業組織；本文只用其資料定位使用點，不把會員立場當成監管結論。
 - **SIA**：Semiconductor Industry Association，美國半導體產業協會；其 consortium 文件可示範技術與驗證流程，但不替主管機關決定最終豁免。
 - **photolithography（微影）**：把電路圖形轉移到晶圓上的製程；光阻配方、曝光、顯影、缺陷與後續蝕刻彼此耦合。
@@ -675,6 +792,108 @@ SIA PAG case study 提供一個很好的反例：替代不是把配方表中的�
 這份 pack 也能處理「豁免後續用」。只是 candidate 由新材料改成 risk-management plan，test matrix 增加
 emission monitoring、waste、supplier communication、maintenance 與替代研發 milestone。
 
+## 買進 100 公斤，不代表排放 100 公斤：PFAS 的四本帳
+
+同一個 PFAS 數字可能來自四本不同的帳：一次性歷史製造／進口申報、年度設施釋放與廢棄物管理、
+未來條件續用的場址風險管理，以及工廠自己的質量平衡。它們可以互相核對，卻不能互相代填。
+
+### 先辨認四本帳各自在回答什麼
+
+| 帳本 | 固定的判斷單位 | 主要欄位 | 不能回答什麼 |
+|---|---|---|---|
+| TSCA 8(a)(7) | 美國 reporting site × PFAS × 歷史年度 × manufacture／import scope | 製造／進口、processing／use、disposal method、air／water／land release | 不是所有場址採購量，也不是全面禁用、當期 TRI 或台灣工廠排放 |
+| TRI Form R | 符合條件的美國 facility × TRI-listed chemical × reporting year | on-site release、off-site transfer、recycling、energy recovery、treatment、disposal | 不是所有 PFAS 或所有 fab；場外轉移也不是接收端實際最終 fate |
+| ECHA 條件續用方向 | 固定用途 × 場址 × 尚待定案的條件 | management plan、供應鏈溝通、emission monitoring／reporting、替代里程碑 | 目前不是 final REACH 條文、濃度門檻、過渡期或公司義務 |
+| 廠內 mass balance | substance × site × period × 明確系統邊界 | 期初、新進料、製程循環、產品、期末、回收、處理、破壞、廢棄、release、residual | 不是法定申報本身，也不能單獨判斷風險、合規或財務材料性 |
+
+S15 的 2024 TSCA 說明仍可用來辨認欄位，但其舊 submission dates 已被 S7 的 2026 action 更新；不能
+因為表格很完整，就把舊時程重新當成現行期限。S16 的 TRI 表則是另一套法源與 reporting population。
+
+### 用一個固定場址年看懂分母差異
+
+以下只做匿名教學。假設同一具名物質在一年初有 20 公斤，全年新進料 100 公斤，因此需要交代的
+總量是 120 公斤。期末盤點與各路徑如下：
+
+| 去向 | 公斤 | 在場址對帳中的角色 | 不能直接寫成 |
+|---|---:|---|---|
+| 期末庫存 | 15 | 留在系統邊界內 | 當年使用或排放 |
+| 產品帶出 | 25 | 隨產品離開場址 | 現場空水土釋放 |
+| 場外回收 | 10 | 送往回收路徑 | 接收端已實際回收 10 公斤 |
+| 場外處理 | 8 | 送往處理路徑 | 已破壞 8 公斤 |
+| 場外處置 | 12 | 送往 disposal 路徑 | 場址內直接排放 12 公斤 |
+| 現場已驗證破壞 | 45 | 依物質前後量證明已轉化 | 只憑設備運轉即視為全數破壞 |
+| 空氣釋放 | 1 | on-site release | 全部廢棄物管理量 |
+| 水中釋放 | 2 | on-site release | 含水 waste stream 的總重量 |
+| 土地釋放 | 0 | on-site release | 沒有其他未知路徑 |
+
+九個已知去向合計 118 公斤，除以 120 公斤，closure 是 98.333333%；尚未解釋的 residual 是
+2 公斤，占 1.666667%。這 2 公斤要回查流量計、濃度、取樣、時間切點、容器 hold-up、未列 byproduct
+或其他路徑，不能先塞進 air、water 或 destroyed 欄讓表面上閉合。
+
+同一教材的 air＋water＋land on-site release 是 3 公斤。若分母用期初加新進料的 120 公斤，比例是
+2.5%；若只除以全年新進料 100 公斤，則是 3.0%。兩個百分比都能算對，回答的問題卻不同。這就是
+為什麼新聞中的「使用量下降 20%」不能直接改寫成「排放下降 20%」。
+
+### Treatment input、destroyed amount 與 off-site fate 是三件事
+
+EPA 的 TRI 說明把 quantity treated on-site 與 treatment method／efficiency 放在不同欄位，並明示並非
+所有 treatment 都導致 destruction。TSCA 說明也提醒，incineration 可能未完全破壞 PFAS，殘留可能
+出現在 stack、ash、scrubber blowdown、filter material 或其他介質。
+
+因此一個 abatement unit 寫著 99% 也還缺至少五個分母：進入的是哪個 parent PFAS 或 byproduct、
+99% 是 removal 還是 destruction、量測在哪兩個 reference points、未破壞的量去了哪裡，以及偵測極限
+與不確定度是多少。處理設備入口量、出口濃度下降和全生命週期破壞率不能畫上等號。
+
+場外路徑也相同。工廠可證明 8 公斤送往 treatment，卻不能在沒有接收端 manifest、方法、efficiency、
+residual and release data 時宣稱 8 公斤都已破壞。對投資研究而言，這會分成分析服務、abatement、
+waste handling、replacement material 與設備改造等多張發票，而不是單一「PFAS 受惠」收入池。
+
+### 一份 flow-to-financial passport 至少有十欄
+
+| 欄位 | 最少記錄 | 沒有它會混淆什麼 |
+|---|---|---|
+| 1. Identity and boundary | 物質、結構／識別碼、牌號、場址、期間、system boundary | 不同 PFAS、site 或年度被加總 |
+| 2. Legal register | 法源、版本、covered entity／chemical／threshold、申報責任 | TSCA、TRI、REACH 與內部帳互相代填 |
+| 3. Opening and inbound | 期初、製造、進口、國內採購、濃度、批次與幣別 | 採購量冒充法定 production volume |
+| 4. Process use and recirculation | recipe input、重複循環、on-site recycle、byproduct | 每次循環都重複算成新物質 |
+| 5. Product and outbound | 產品含量、export、customer／off-site destination | 產品帶出冒充 on-site release |
+| 6. Ending inventory | 容器、管路、槽體、tool hold-up 與期末盤點 | 庫存變動冒充消耗或改善 |
+| 7. On-site release | air、water、land、方法、取樣、偵測極限與期間 | waste stream 總重冒充 PFAS 重量 |
+| 8. Waste route and fate | recycle、treatment、destruction、disposal、manifest、接收端證據 | transfer 冒充最終回收或破壞 |
+| 9. Closure and uncertainty | 每欄 uncertainty、缺測處理、residual、owner、reconciliation | 用調整數硬做 100% closure |
+| 10. Company bridge | 監測／處理／替代 capex、opex、qualification、scrap、volume、price、公司分母 | 公斤數直接變成收入、成本或毛利 |
+
+這份 passport 與前面的 qualification pack 是兩張互補文件：qualification 回答替代或續用能否通過，
+mass balance 回答物質實際從哪裡來、到哪裡去；最後一欄才把工程結果接到財務。
+
+### 多空小作文必須共用同一份流量底稿
+
+**偏多版本。** 若最終規則允許關鍵用途條件續用，場址仍可能增加物質盤點、分析、在線監測、
+abatement、回收、耐蝕流體系統、變更驗證與服務支出；若替代成功，合格的新配方或零件也可能取得
+新訂單。要成立，必須看到具名物質、場址工作包、驗收、採購、價格與供應商財務共同鍵。
+
+**偏空版本。** 若某用途不獲豁免，或條件續用要求昂貴的監測、處理與 waste management，晶圓廠、
+設備商與材料商可能承擔 qualification、停機、報廢、庫存與合規成本。要成立，也要用同一底稿證明
+適用法域、baseline flow、替代結果、場址成本與公司分母，不能用 PFAS 採購公斤數直接估毛利衝擊。
+
+共同反證是：substance identity 不符、場址不在適用路徑、final law 給予廣泛條件續用、實測 release
+很小且控制成本不具材料性，或替代無需重大 requalification。任何一項成立，敘事都要縮窄。
+
+### 樣本、誤差與可外推範圍
+
+質量平衡教材只有 N＝1 個匿名固定 site-year；它的九個已知去向、2 公斤 residual 與三種百分比都是
+確定性算式，不是抽樣。Python Fraction 與獨立 awk 對 120、118、2、98.333333%、1.666667%、
+3、2.5% 與 3.0% 逐項一致，因此不報 sampling SE 或 t 值。Residual 也只是輸入指定的帳差，沒有
+逐流量測模型就不能宣稱是 1.666667% 的 measurement uncertainty。
+
+真實 company、site、substance、batch、recipe、product、waste shipment、air／water／land sample、
+customer、reporting form 與財務期間 N＝0，所以不能估台灣 121 檔、material／semiequip 族群或任何
+公司的平均使用量、排放、破壞效率、替代成本、需求、收入、毛利或股價效果。
+
+S15 共 156 頁，本輪只渲染並核對 PDF pp.51–54、64–66；S16 共 136 頁，只渲染並核對 pp.71–72、
+99–105，兩份 SHA 已固定在 source block。它們是同一 EPA 下不同法源的申報方法，不是兩個工廠、
+產品或獨立量測；ECHA S1 只補條件續用的政策方向，不能替匿名算式變成真實樣本。
+
 ## 本輪第一拒絕如何裁決
 
 候選題在研究前寫下：若關鍵半導體用途得到夠長或廣的豁免、替代不需 qualification，或無法把特定
@@ -737,12 +956,15 @@ mechanical life、software／recipe 及 customer change control。
 - [ECHA use mapping](https://euon.echa.europa.eu/documents/d/guest/pfas_use-mapping_annex_to_guidance_for_respondents_en?t=1765893415372) 與 [updated proposal](https://echa.europa.eu/-/echa-publishes-updated-pfas-restriction-proposal) 用來切 sector 與 restriction options，不自行決定公司適用。
 - [European Commission action plan](https://single-market-economy.ec.europa.eu/document/download/e5006955-dd1c-45bc-8b7a-cfda71c67abf_en?filename=COM_2025_530_1_EN_ACT_part1_v6.pdf) 是 critical-use policy direction，不能當個別 derogation。
 - [EPA TSCA 8(a)(7) page](https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/tsca-section-8a7-reporting-and-recordkeeping) 與 [April 2026 deadline update](https://www.epa.gov/chemicals-under-tsca/update-reporting-deadline-tsca-pfas-reporting-rule) 支持 historical reporting scope 與 contingent start date，不支持使用禁令。
+- [EPA TSCA 8(a)(7) reporting instructions](https://www.epa.gov/system/files/documents/2024-12/tsca-8a7-reporting-instructions_11-25-24.pdf) 只用來分開 manufacture／import、use、disposal 與 release 欄位；其中舊 submission dates 不覆蓋 S7。
+- [EPA RY2025 TRI Form R instructions](https://www.epa.gov/system/files/documents/2026-04/ry_2025_rfi_final_3.24.26.pdf) 用來分開 on-site release、off-site transfer、recycling、treatment 與 disposal；適用母體不能外推所有 PFAS、所有 fab 或台灣場址。
 - [SEMI PFAS explainer](https://www.semi.org/en/EHS_PFAS_Explainer)、[SIA PAG case](https://www.semiconductors.org/wp-content/uploads/2023/06/FINAL-PAG-Case-Study.pdf) 與 [SIA background paper](https://www.semiconductors.org/wp-content/uploads/2023/05/FINAL-PFAS-Consortium-Background-Paper.pdf) 用來定位用途與 qualification；都是產業來源，不能獨立裁決 proportionality 或市場影響。
 - [上品 2025 年報](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=4770&year=115&mtype=F) 與 [官方內襯設備頁](https://www.alliedsupreme.com/tw/product/product_1-7/product_view-sheet_lining) 支持 fluoropolymer product entry；[三福化 2025 年報](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=4755&year=115&mtype=F) 與 [官方首頁](https://www.sfchem.com.tw/zh-hant/) 支持 process-chemistry／R&D entry，都沒有完成法規或財務歸因。
 
-本輪沒有做 PFAS 需求、市占、替代成功率或公司受惠幅度統計，也沒有跨公司數字排名。ECHA 3,511 comments
-是 consultation submission count，不是立場抽樣；SIA 時程是 generic estimate；公司數字是各自 filing 的業務
-描述。這些資料不存在可合理估計的獨立觀測、SE 或 t，故本文只陳述文件支持的範圍。
+本輪沒有做真實 PFAS 需求、市占、替代成功率、排放率或公司受惠幅度統計，也沒有跨公司數字排名。
+唯一數字教材是 N＝1 個匿名固定 site-year 的決定性 mass balance；ECHA 3,511 comments 是 consultation
+submission count，不是立場抽樣；SIA 時程是 generic estimate；公司數字是各自 filing 的業務描述。這些
+資料不存在可合理估計的獨立觀測、sampling SE 或 t，故本文只陳述文件與固定算式支持的範圍。
 
 ## 影響路由
 

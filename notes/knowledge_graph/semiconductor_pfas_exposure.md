@@ -432,3 +432,43 @@ status: active
 boundary: Equipment PFAS use taxonomy exists but no universe semiequip company has a named part fluid law change qualification order or financial line。
 next_trigger: Equipment supplier and customer publish PFAS BOM substitution or conditional-use plan validation service impact production order and financial attribution。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-PFAS-I18
+view: industry
+from_id: concept:semiconductor-pfas-exposure
+to_id: process:pfas-site-mass-balance
+relation: requires
+claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C14,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C15,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C16
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: multi_source
+exclusivity_scope: EPA TSCA 與 TRI 是不同法源的 reporting contracts ECHA 只提供條件續用方向 場址質量平衡是研究中心整合框架不是政府共同申報表。
+as_of: 2026-08-14
+review_due: 2026-09-15
+status: active
+boundary: 質量平衡只把同一 substance site period 的流量及殘差對帳 不判定 final law compliance toxicity risk destruction performance or company effect。
+next_trigger: 具名場址公開期初進料製程循環產品期末回收處理破壞場外 fate 空水土監測不確定度與財務共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PFAS-I19
+view: industry
+from_id: concept:semiconductor-pfas-exposure
+to_id: metric:pfas-use-release-waste-boundary
+relation: measured_by
+claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C14,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C15,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C16,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C17
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: multi_source
+exclusivity_scope: EPA forms prove category separation while 120 kilogram example is one anonymous deterministic teaching ledger not a fab product company or regulatory sample。
+as_of: 2026-08-14
+review_due: 2026-09-15
+status: active
+boundary: Closure release ratios and residual only demonstrate denominator discipline and cannot estimate real emissions measurement uncertainty abatement demand cost revenue margin or valuation。
+next_trigger: 同一具名 substance site period 以校正流量濃度庫存產品waste manifest treatment efficiency final fate and air water land data閉合並由獨立方重算。
+-->
