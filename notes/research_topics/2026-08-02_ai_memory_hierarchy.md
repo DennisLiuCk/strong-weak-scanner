@@ -81,6 +81,13 @@ to: triaged
 reason: added_kv_tiering_measurement_passport_and_refreshed_exact_host_storage_edges
 evidence: sources:S12,S13,S14,S15,S16,S17
 -->
+<!-- transition
+date: 2026-08-14
+from: triaged
+to: triaged
+reason: added_roofline_workload_boundary_and_memory_performance_passport_without_thesis_clock_refresh
+evidence: sources:S18,S19
+-->
 
 <!-- research_source
 source_id: S1
@@ -352,6 +359,38 @@ url: https://github.com/mlcommons/inference_policies/blob/master/inference_rules
 locator: Definitions 的 system under test 與 run；General rules 的 consistent system／framework 與 replicability；datacenter LLM latency／quality／scenario tables
 limitation: master 規則會持續更新；MLPerf 的模型、資料集、cache 限制與 latency target 是特定 benchmark contract，不等於任何私有 agent workload、CMX／KVBM 部署或公司商業結果
 independence_group: mlcommons
+-->
+
+<!-- research_source
+source_id: S18
+role: other_primary
+source_kind: document
+publisher: UC Berkeley EECS
+title: Roofline: An Insightful Visual Performance Model for Floating-Point Programs and Multicore Architectures
+published_at: 2008-10-17
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.pdf
+locator: PDF pp.3–4（印刷 pp.1–2）的 operational intensity 定義、sustainable DRAM bandwidth／pin bandwidth 邊界、Roofline 公式、memory-bound／compute-bound 與 ridge point
+limitation: 這是 2008 年針對浮點 kernel 的 bound-and-bottleneck 模型，不是現代大型語言模型端到端效能預測、HBM 產品 benchmark、客戶部署或公司財務證據；上限成立仍要求工作量、流量參考層與可持續頻寬口徑一致
+independence_group: uc-berkeley
+-->
+
+<!-- research_source
+source_id: S19
+role: company_release
+source_kind: living_index
+publisher: NVIDIA
+title: GPU Performance Background User's Guide
+published_at:
+captured_at: 2026-08-14
+accepted_at: 2026-08-14
+status: active
+url: https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html
+locator: Understanding Performance 的 memory time／math time、arithmetic intensity／ops:byte、memory／math／latency limiter 與 first-order approximation 邊界
+limitation: 這是 NVIDIA 的一般 GPU 教學頁，範例使用 V100／A100 且網頁可持續更新；它不是 Rubin 或任何具名 HBM 的規格保證，也不是私有 AI 服務、客戶採購或公司財務結果
+independence_group: nvidia
 -->
 
 <!-- research_claim
@@ -665,6 +704,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: UC Berkeley 的 Roofline 報告把 operational intensity 定義為每 byte DRAM traffic 的操作數，流量是在 cache hierarchy 過濾後、cache 與 memory 之間量；報告以可持續 DRAM bandwidth 而非 DRAM pin bandwidth 建立斜線上限，並把可達浮點效能上限寫成 peak compute 與 memory bandwidth 乘 operational intensity 兩者的較小值
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2008-10-17
+basis: S18 PDF pp.3–4（印刷 pp.1–2）直接定義分子、分母、流量位置、steady-state bandwidth、公式、memory-bound／compute-bound 與 ridge point
+boundary: Roofline 是上限與瓶頸判讀，不是 achieved performance 或時間保證；原報告處理浮點 kernel 與 DRAM traffic，不能直接替現代 AI 的 HBM、cache、network、storage、request queue 或端到端服務背書
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: verified
+status: active
+claim: NVIDIA 的 GPU 效能指南把 memory time 寫成 bytes 除以 memory bandwidth、math time 寫成 operations 除以 math bandwidth，並以 arithmetic intensity 相對處理器 ops:byte ratio 判斷 memory-limited 或 math-limited；指南同時把 latency 列為第三種限制，且明示這只是需要 profiler 補強的第一階近似
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S19 Understanding Performance 直接列式、定義 arithmetic intensity／ops:byte，並說明不足的工作量或平行度、重複讀取與額外指令會使簡化判讀失準
+boundary: 指南的 V100／A100 範例與一般判讀不能升級成 Rubin、HBM4、特定模型、production trace 或客戶效能；沒有固定精度、工作量、bytes 參考層與 profiler 實測時，不能只靠產品峰值規格分類瓶頸
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: inference
+status: active
+claim: 要把 HBM 頻寬敘事升為可比較的 AI 記憶體效能結論，至少要把 workload／版本與正確性、精度與 operation 定義、工作量分子、固定參考層的 bytes 分母、運算上限、可持續頻寬、operational intensity／ridge point、achieved performance／Roofline efficiency、端到端分布與重複不確定度，以及能源／成本／部署／財務綁成同一份十欄效能護照
+supporting_source_ids: S18,S19
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S18 固定 Roofline 的分子、分母、兩種上限與 ridge point，S19 補上 precision／implementation、latency、parallelism、repeated reads 與 profiler 邊界；共同支持把規格、上限、實測與服務／商業結果分層保存
+boundary: 十欄護照是研究中心整合兩份方法來源後提出的 kernel-local 解碼器，不是產業標準、採購門檻或已完成 benchmark；欄位齊全仍不自動證明因果、production 代表性、能源／成本下降、可靠度、台灣公司訂單或投資報酬
+verification_needed: 具名 production 服務固定硬體／軟體、模型與 trace、精度、輸出正確性、work 與指定 memory interface bytes，公開 compute／sustainable bandwidth ceiling、profiler achieved performance、重複 run、request-level SLO、能源成本及財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -760,6 +850,14 @@ invalidation: 新版工具或 production 證據顯示目前八格仍遺漏會改
 - **圖形運算晶片（GPU）**：負責大量平行運算的晶片。本文把它當成最靠近正在運算資料的位置，不代表所有人工智慧工作都只在這裡完成。
 - **中央處理器（CPU）**：負責一般運算與系統協調的晶片。本文討論的系統記憶體放在它的一側，與 GPU 旁的高速記憶體分工。
 - **頻寬**：單位時間內可以搬動多少資料。頻寬高不代表容量一定大，也不代表產品已量產。
+- **浮點運算（FLOP／FLOPS／TFLOP／TFLOP/s）**：FLOP 是一次浮點加、減、乘或其他約定運算；FLOPS 是每秒速率，T 代表兆，不同精度與操作定義不能直接混比。
+- **操作強度／算術強度（operational／arithmetic intensity）**：工作量除以跨過指定參考層的資料 bytes；它是工作負載與實作共同決定的比率，不是記憶體產品固定規格。
+- **Roofline／效能上限（performance ceiling）**：用運算上限與記憶體頻寬上限夾出效能天花板的瓶頸模型；它給的是上限，不是實際一定達到的速度。
+- **記憶體受限（memory-bound）**：在既定工作量、資料流量與硬體下，記憶體搬運形成較低的效能上限；增加運算峰值未必有用。
+- **運算受限（compute／math-bound）**：運算能力形成較低的效能上限；增加記憶體頻寬未必有用。
+- **轉折點（ridge point）**：運算上限除以記憶體頻寬；工作負載的操作強度落在它左側或右側，決定簡化模型先看到哪個瓶頸。
+- **可持續頻寬（sustainable bandwidth）**：代表性存取模式能持續供應的搬運率，與接腳、匯流排或型錄上的理論峰值不同。
+- **流量參考層（traffic reference level）**：計算 bytes 時指定的介面，例如經快取過濾後跨進 HBM 的流量；換參考層就會換分母，必須明寫。
 - **延遲／等待時間**：提出資料要求到取得資料之間的時間。等待時間短與總容量大是兩個不同問題。
 - **容量**：一個位置能存放多少資料。容量較大不表示存取一定較快。
 - **持久性**：斷電或工作結束後，資料是否仍需保留。需要長期保存的資料通常不必一直占用最靠近晶片的位置。
@@ -932,6 +1030,89 @@ shape、concurrency 與 request count，再另外 sweep concurrency 找飽和點
 SOCAMM、CXL 或其他 host／SSD／remote KV tier 公開完整 baseline／treatment。因此本文只把量測方法
 升為可驗證框架，不把功能 demo、平均 TTFT 或軟體支援升為商用部署、硬體需求與供應商收入。
 
+## HBM 寫著 TB/s，為什麼應用仍可能沒有同幅加速
+
+頻寬是硬體能搬多快，效能還要問工作每搬一 byte 能做多少事。UC Berkeley 的原始 Roofline 報告把
+operational intensity 定義為「操作數 ÷ DRAM traffic bytes」，而且分母是在 cache hierarchy 過濾後、
+cache 與 memory 之間量。報告用可持續、steady-state 的記憶體頻寬，不用 DRAM 接腳的 pin bandwidth，
+再把 kernel 的效能上限寫成兩個天花板中較低的一個：[S18]
+
+- 操作強度 I = 工作量 ÷ 跨過固定參考層的 bytes。
+- Roofline 效能上限 P = min（運算上限，記憶體可持續頻寬 × I）。
+- Roofline 時間下限 T = 工作量 ÷ P。
+
+兩條線相交的位置叫 ridge point，等於「運算上限 ÷ 記憶體頻寬」。操作強度在它左側，簡化模型先看到
+memory-bound；在右側，先看到 compute-bound。NVIDIA 的方法頁用同一邏輯把 memory time 寫成 bytes
+除以 memory bandwidth、math time 寫成 operations 除以 math bandwidth，但也明列第三種限制：工作
+不夠大、平行度不足時，latency 會先卡住；重複讀取、額外指令與實作差異也會降低有效操作強度，因此
+這只能作第一階判讀，精確分析仍要看 profiler。[S19]
+
+### 用三個固定工作負載看懂同一條頻寬規格
+
+下面全部是教材假設，不是任何產品或客戶數據。固定同一精度的運算上限 120 TFLOP/s、可持續 off-chip
+頻寬 3 TB/s，ridge point 因而是 40 FLOP/byte；三個工作負載都做 120 兆次浮點運算，只改跨過同一
+off-chip 參考層的總 bytes。十進位單位下，TFLOP ÷ TB 可直接得到 FLOP/byte。
+
+| 假想工作負載 | 固定總工作量 | off-chip 流量 | 操作強度 | Roofline 效能上限 | Roofline 時間下限與判讀 |
+|---|---:|---:|---:|---:|---|
+| A：大量搬運 | 120 TFLOP | 12 TB | 10 FLOP/byte | 30 TFLOP/s | 4.0000 秒；memory-bound |
+| B：剛好轉折 | 120 TFLOP | 3 TB | 40 FLOP/byte | 120 TFLOP/s | 1.0000 秒；落在 ridge point |
+| C：高度重用 | 120 TFLOP | 1.5 TB | 80 FLOP/byte | 120 TFLOP/s | 1.0000 秒；compute-bound |
+
+A、B、C 用的是同一顆假想加速器，卻不能從 3 TB/s 直接推出同一應用速度。A 的記憶體斜線只有
+30 TFLOP/s；C 即使理論記憶體上限是 240 TFLOP/s，也會先撞到 120 TFLOP/s 的運算平頂。更重要的
+是，表內是效能上限與時間下限，不是實測值；實際 kernel 只會落在 Roofline 上或下方，不會因公式
+存在就自動貼住屋頂。
+
+### 同樣增加 50%，只有對上瓶頸才有效
+
+再保留三個工作負載不變，分別只把可持續頻寬提高 50% 到 4.5 TB/s，或只把同精度運算上限提高 50%
+到 180 TFLOP/s。這是 one-change-at-a-time 的反事實換算：
+
+| 假想方案 | ridge point | A：10 FLOP/byte | B：40 FLOP/byte | C：80 FLOP/byte | 讀法 |
+|---|---:|---|---|---|---|
+| 基準：120 TFLOP/s、3 TB/s | 40 FLOP/byte | 30 TFLOP/s；4.0000 秒 | 120；1.0000 秒 | 120；1.0000 秒 | A 受記憶體限制，C 受運算限制 |
+| 只把可持續頻寬加 50% | 26.6667 FLOP/byte | 45；2.6667 秒 | 120；1.0000 秒 | 120；1.0000 秒 | A 的上限 +50%、時間下限 −33.3333%；B、C 不變 |
+| 只把運算上限加 50% | 60 FLOP/byte | 30；4.0000 秒 | 120；1.0000 秒 | 180；0.6667 秒 | C 的上限 +50%、時間下限 −33.3333%；A、B 不變 |
+
+B 在基準時同時碰到兩個屋頂；只升任一邊，另一邊立刻成為限制，所以結果不變。這也示範一個常見
+誤讀：新 HBM 寫著更高 TB/s，並不表示 compute-bound 的 kernel 會同幅加速；反過來，更多 FLOPS
+也救不了 memory-bound 的 kernel。改善實作、增加資料重用或減少跨介面 bytes，則可能把工作負載往
+右移，這與單純更換頻寬規格又是不同因果路徑。
+
+本例是 N=3 個固定假想工作負載與 N=2 個單項升級情境的確定性換算。Python Fraction 與獨立 awk
+重算在顯示精度內完全一致；沒有抽樣、kernel run、裝置、模型、誤差分布或 production trace，因此
+沒有 sampling SE／t，也不能外推 HBM4、Rubin、TTFT、吞吐、功耗、成本、需求量、收入或股價。
+
+### 多空小作文共用一份十欄記憶體效能護照
+
+前文八格量測護照回答整個 memory／KV tier 服務怎麼比較；下面十欄是嵌在第 1、6、8 格內的
+kernel-local 解碼器，用來阻止「峰值規格 → 應用加速 → 商業受惠」一次跨三層。它補充前文，不取代
+request-level SLO、品質、故障復原與成本欄位。
+
+| 十欄效能護照 | 要固定什麼 | 要保存什麼 | 缺少時不能說 |
+|---|---|---|---|
+| 1. 工作負載、版本與正確性 | 模型／kernel／資料集、shape、batch、sequence、軟體與輸出驗證 | 可重建設定、輸入雜湊、版本與 correctness 結果 | 兩次測的是同一件工作 |
+| 2. 精度與 operation 定義 | FP64／FP32／TF32／FP16／FP8／INT8，FMA 算一次或兩次 | 分精度的有效 operation count 與稀疏／dense 口徑 | 不同 TFLOPS 可以直接相除 |
+| 3. 工作量分子 | 每次 run 真正執行的 operations，以及 padding／recompute 是否納入 | profiler／演算法雙路工作量與差異 | 分子等於型錄峰值或 token 數 |
+| 4. bytes 分母與參考層 | HBM／DRAM／L2／network／storage 哪個介面、讀寫方向與 cache 起點 | 指定介面的 read／write bytes、cache hit／miss 與重複讀取 | 所有層的「頻寬」是同一分母 |
+| 5. 運算上限 | 同一精度、dense／sparse 與時脈條件下的 theoretical 或 measured ceiling | 上限來源、量測方法、降頻與利用條件 | 峰值 FLOPS 就是 achieved performance |
+| 6. 記憶體頻寬上限 | pin／bus 理論值或可持續值、存取 pattern、方向與 topology | 持續頻寬 microbenchmark、時間窗、讀寫 mix 與熱狀態 | 型錄 TB/s 可直接帶入任何 workload |
+| 7. intensity 與 ridge point | 分子、分母、單位與兩個 ceiling 使用同一口徑 | operational intensity、ridge point 與初步 limiter | memory-bound／compute-bound 是產品永久標籤 |
+| 8. achieved 與 Roofline efficiency | 實際 runtime、throughput 與 profiler counters | achieved performance ÷ Roofline 上限、瓶頸與 stall 分解 | 上限已被實作達成 |
+| 9. 端到端、重複與不確定度 | request arrival、concurrency、warm-up、run 數、clock 與量測範圍 | TTFT／ITL／goodput／errors 的分布、重複 run、變異與 profiler overhead | kernel 加速等於使用者服務同幅改善 |
+| 10. 能源、成本、部署與財務 | 功耗邊界、設備數、利用率、採購期、價格與會計期間 | joule／work、總成本、qualification、shipment、revenue numerator／denominator | 技術上限等於訂單、收入、毛利或投資報酬 |
+
+**多方小作文**可以成立的版本是：固定工作負載、精度、軟體與 correctness 後，profiler 顯示指定 HBM
+介面的 bytes 與可持續頻寬真的形成主要上限；升級後 achieved performance、Roofline efficiency 與
+request-level SLO 在重複測試中一起改善，功耗與成本沒有吞掉收益，最後還有具名 qualification、shipment
+與財務共同鍵。這支持「更高可持續頻寬對這個 workload 有價值」，仍不代表所有模型或供應商受惠。
+
+**空方小作文**也要可被推翻：若只有 pin bandwidth、容量或 peak FLOPS，沒有工作量、指定介面 bytes、
+可持續頻寬與 achieved 結果，就只能說規格提高，不能說應用已加速。反之，只要同一版本量測證明 workload
+在代表性負載下 memory-bound，增加頻寬後端到端 SLO、能源與成本都持續改善，空方也不能再用「可能是
+compute-bound」當永久否定。多空共用同一份護照，差別應在證據結果，不在分母選擇。
+
 ## 先問工作負載，再問該買哪一種記憶體
 
 同一份資料在不同使用情境下，合理位置可能不同。下表不是自動配置規則，而是把產品新聞翻譯成可查證
@@ -961,10 +1142,12 @@ SOCAMM、CXL 或其他 host／SSD／remote KV tier 公開完整 baseline／treat
 
 因此「可卸載 KV cache」只證明一條技術路徑；「卸載後整體更划算」仍需客戶工作負載與完整系統結果。
 
-## 新手最常混在一起的六件事
+## 新手最常混在一起的八件事
 
 - **容量與頻寬**：能放更多資料，不代表每秒能搬更多資料。
 - **頻寬與等待時間**：總搬運量高，不代表每一次小請求都更快拿到資料。
+- **峰值與可持續頻寬**：接腳或匯流排理論值，不等於代表性存取能長時間供應的 rate。
+- **Roofline 上限與實測效能**：模型算出的屋頂不是應用一定達到的速度；latency、平行度、額外指令與資料重讀都可能讓結果更低。
 - **規格與互通**：CXL 版本存在，不代表主機、交換器、retimer、記憶體裝置與軟體已一起通過驗證。
 - **支援與部署**：Dynamo／NIXL 支援某種放置或搬移，不代表客戶已在正式服務使用。
 - **釋放空間與取代產品**：把部分可重建資料移出 HBM，可能讓 HBM 留給更急的資料；這不等於 storage 取代 HBM。
@@ -1032,9 +1215,13 @@ SOCAMM2 正好示範為什麼要再拆一層：
 - [NVIDIA AIPerf metrics](https://docs.nvidia.com/aiperf/reference/ai-perf-metrics-reference)（TTFT、ITL、request distribution、throughput、ISL／OSL 與 good-request 分母）。
 - [NVIDIA AIPerf comparison guide](https://docs.nvidia.com/dynamo/dev/cli/operations/benchmarking-with-ai-perf)（一次只改一項、固定 request shape／concurrency／request count 與 saturation sweep）。
 - [MLCommons MLPerf Inference rules](https://github.com/mlcommons/inference_policies/blob/master/inference_rules.adoc)（system under test、scenario、latency／quality、system consistency 與 replicability）。
+- [UC Berkeley Roofline technical report](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.pdf)（operational intensity、可持續 DRAM bandwidth、效能上限與 ridge point；引用 PDF pp.3–4／印刷 pp.1–2）。
+- [NVIDIA GPU Performance Background](https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html)（memory／math time、arithmetic intensity、latency 與 first-order approximation 邊界）。
 
 Micron 的效能、功耗與尺寸數字來自公司內部測試；NVIDIA 的 CMX 效率亦是平台主張。本篇
-不把它們當成跨公司可比 benchmark，也不推估產品 TAM、供應商份額或市場定價。
+不把它們當成跨公司可比 benchmark，也不推估產品 TAM、供應商份額或市場定價。Roofline PDF 的
+SHA-256 為 c92f852eed1070b140302114339271dc1a4d6d665814ac9000be6ce06a7d6bcb；實際引用頁及前後頁
+PDF pp.2–5 已逐頁渲染核對，PDF／PNG 只留 tmp、不進版控。
 
 ## 影響路由
 
@@ -1066,5 +1253,6 @@ evidence_boundary: ODM 能組裝 AI 伺服器不等於已取得 CMX、SOCAMM 或
 - NVIDIA 或客戶公布 CMX 實際上線、KV cache placement、容量與利用率，而非只有參考架構效能主張。
 - NVIDIA 或客戶公布 BlueField-4 STX 的 production data path，將 CPU 端資料處理與 SSD、網路、軟體、GPU 的端到端 SLO 對上。
 - 具名客戶用同一 production trace 與版本化 SUT 公開 memory／KV tier baseline-versus-treatment，固定模型、request shape、load、reuse、cache 冷熱、tier policy 與 data path，並同時交代 request-level TTFT／ITL／goodput／errors、mechanism counters、品質、成本、功耗與 failure recovery。
+- 具名 production workload 固定模型／kernel、精度、correctness、軟硬體版本與流量參考層，公開 operations、interface bytes、compute／sustainable bandwidth ceiling、operational intensity、ridge point、profiler achieved performance、重複 run 與端到端 SLO，才能判斷 HBM 頻寬升級實際命中哪個瓶頸。
 - CXL Consortium 出現 4.0 integrators／compliance 清單，能核對 host、switch、retimer 與 memory device。
 - 台灣公司以具名產品與客戶文件雙向核對量產、收入及毛利；否則公司節點維持待驗證或不入圖。

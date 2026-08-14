@@ -474,3 +474,43 @@ status: active
 boundary: 八格護照是研究中心整合多份一手方法文件後提出的可重建比較框架，不是單一標準，也尚無具名客戶完整公開 CMX／SOCAMM／CXL／KV tier 的 production baseline-versus-treatment。
 next_trigger: 具名 production 服務固定受測系統、工作負載、流量、reuse／cache state、tier policy 與 data path，並公開機制指標、request-level SLO、品質、成本、功耗及 failure recovery。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-MEM-I21
+view: industry
+from_id: concept:ai-memory-hierarchy
+to_id: process:memory-roofline-performance-passport
+relation: requires
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C23
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: 十欄護照是研究中心依 Roofline 原始報告與 NVIDIA GPU 方法頁整合的 kernel-local 解碼器，不是產業標準、production benchmark、採購門檻或公司財務證據；它不能取代前文八格服務量測護照。
+next_trigger: 具名 production workload 固定版本、精度、正確性、work、指定 memory interface bytes、兩個 ceiling、achieved performance、端到端 SLO、重複不確定度、能源成本與商業共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-MEM-I22
+view: industry
+from_id: concept:ai-memory-hierarchy
+to_id: metric:operational-intensity-ridge-point-boundary
+relation: measured_by
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C21,MI-2026-08-02-AI-MEMORY-HIERARCHY#C22,MI-2026-08-02-AI-MEMORY-HIERARCHY#C23
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-08-31
+status: active
+boundary: S18／S19 可界定操作強度、兩個 ceiling、ridge point 與 first-order limitation；把這套 kernel 邊界接到 AI memory hierarchy 是研究推論，且 Roofline 只給上限，不證明 achieved、request-level、成本或商業結果。
+next_trigger: 同一模型／kernel 與軟硬體版本公開 matched-precision operations、固定參考層 bytes、sustainable bandwidth、compute ceiling、profiler achieved、latency／parallelism counters 及多次 run。
+-->

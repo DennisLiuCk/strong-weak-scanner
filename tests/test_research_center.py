@@ -3839,6 +3839,7 @@ class ResearchCenterTest(unittest.TestCase):
         for contract in (
             "editorial_plain_language_wave89_memory_layers_and_maturity",
             "added_kv_tiering_measurement_passport_and_refreshed_exact_host_storage_edges",
+            "added_roofline_workload_boundary_and_memory_performance_passport_without_thesis_clock_refresh",
             "人工智慧系統不會把所有資料都塞在同一個地方",
             "架構、容量型號、樣品、量產與收入必須分開判讀",
             "## 先按資料的急迫程度分四層",
@@ -3863,9 +3864,18 @@ class ResearchCenterTest(unittest.TestCase):
             "## 一個 TTFT 數字不能替整條資料路徑背書",
             "| TTFT | 使用者送出請求後多久看到第一個 token |",
             "| Good-request／errors／quality |",
+            "## HBM 寫著 TB/s，為什麼應用仍可能沒有同幅加速",
+            "Roofline 效能上限 P = min（運算上限，記憶體可持續頻寬 × I）",
+            "| A：大量搬運 | 120 TFLOP | 12 TB | 10 FLOP/byte | 30 TFLOP/s | 4.0000 秒；memory-bound |",
+            "| B：剛好轉折 | 120 TFLOP | 3 TB | 40 FLOP/byte | 120 TFLOP/s | 1.0000 秒；落在 ridge point |",
+            "| C：高度重用 | 120 TFLOP | 1.5 TB | 80 FLOP/byte | 120 TFLOP/s | 1.0000 秒；compute-bound |",
+            "### 多空小作文共用一份十欄記憶體效能護照",
+            "| 4. bytes 分母與參考層 |",
+            "| 8. achieved 與 Roofline efficiency |",
+            "| 10. 能源、成本、部署與財務 |",
             "## 先問工作負載，再問該買哪一種記憶體",
             "## 用一份 KV cache 看懂資料如何旅行",
-            "## 新手最常混在一起的六件事",
+            "## 新手最常混在一起的八件事",
             "## 在研究中心裡接著怎麼學",
             "## 四層互補，不是誰取代誰",
             "## 同一家族也要拆到容量型號：192GB 與 256GB 不是同一個時鐘",
@@ -3886,9 +3896,10 @@ class ResearchCenterTest(unittest.TestCase):
             "## 一個可驗證的資料放置迴路",
             "## 再用八格量測護照判斷「多一層」有沒有真的更好",
             "## 一個 TTFT 數字不能替整條資料路徑背書",
+            "## HBM 寫著 TB/s，為什麼應用仍可能沒有同幅加速",
             "## 先問工作負載，再問該買哪一種記憶體",
             "## 用一份 KV cache 看懂資料如何旅行",
-            "## 新手最常混在一起的六件事",
+            "## 新手最常混在一起的八件事",
             "## 在研究中心裡接著怎麼學",
             "## 四層互補，不是誰取代誰",
             "## 同一家族也要拆到容量型號：192GB 與 256GB 不是同一個時鐘",
@@ -3902,7 +3913,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 53
+            sum(line.startswith("- **") for line in glossary.splitlines()), 61
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -3914,8 +3925,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 17),
-            ("research_claim", 20), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 19),
+            ("research_claim", 23), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -3931,8 +3942,14 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C18\nlabel: verified",
             "claim_id: C19\nlabel: inference",
             "claim_id: C20\nlabel: unverified",
+            "claim_id: C21\nlabel: verified",
+            "claim_id: C22\nlabel: verified",
+            "claim_id: C23\nlabel: inference",
             "只有在 cache reuse 的收益高於資料搬移 overhead 時",
             "同一份 baseline-versus-treatment 量測護照",
+            "可達浮點效能上限寫成 peak compute",
+            "這只是需要 profiler 補強的第一階近似",
+            "同一份十欄效能護照",
         ):
             self.assertIn(evidence_contract, topic)
 
@@ -3950,13 +3967,15 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:kv-cache-reuse-transfer-observability,metric,KV 快取重用與搬移可觀測欄位",
             "metric:ai-inference-service-slo,metric,人工智慧推論服務等待與合格吞吐",
             "process:ai-memory-tier-measurement-passport,process,人工智慧記憶體分層八格量測護照",
+            "process:memory-roofline-performance-passport,process,記憶體Roofline效能十欄護照",
+            "metric:operational-intensity-ridge-point-boundary,metric,操作強度與轉折點瓶頸邊界",
         ):
             self.assertIn(concept, concepts)
 
         graph = (
             ROOT / "notes" / "knowledge_graph" / "ai_memory_hierarchy.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 25)
         for graph_contract in (
             "edge_id: KG-MEM-C03",
             "to_id: product:micron-socamm2-192gb",
@@ -3969,6 +3988,8 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: metric:kv-cache-reuse-transfer-observability",
             "to_id: metric:ai-inference-service-slo",
             "to_id: process:ai-memory-tier-measurement-passport",
+            "to_id: process:memory-roofline-performance-passport",
+            "to_id: metric:operational-intensity-ridge-point-boundary",
         ):
             self.assertIn(graph_contract, graph)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
