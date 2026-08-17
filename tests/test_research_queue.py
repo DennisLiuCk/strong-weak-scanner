@@ -1418,6 +1418,16 @@ class ResearchScheduleTest(unittest.TestCase):
         self.assertEqual(rq.expected_quarter_date(date(2026, 5, 16)), date(2026, 3, 31))
         self.assertEqual(rq.expected_quarter_date(date(2026, 8, 15)), date(2026, 6, 30))
         self.assertEqual(rq.expected_quarter_date(date(2026, 11, 15)), date(2026, 9, 30))
+        self.assertEqual(
+            rq.expected_quarter_date(
+                date(2026, 8, 31), first_listed_foreign=True),
+            date(2026, 3, 31),
+        )
+        self.assertEqual(
+            rq.expected_quarter_date(
+                date(2026, 9, 1), first_listed_foreign=True),
+            date(2026, 6, 30),
+        )
 
     def test_topic_priority_is_not_discarded_before_due_date(self):
         as_of = date(2026, 7, 27)
@@ -1544,6 +1554,66 @@ class ResearchFinancialCoverageTest(unittest.TestCase):
             item["covered"] == 0
             and item["missing"] == ["1234", "5678"]
             for item in result["quarter_tables"].values()))
+
+    def test_first_listed_foreign_q2_uses_two_month_deadline(self):
+        con = sqlite3.connect(":memory:")
+        con.row_factory = sqlite3.Row
+        con.executescript("""
+            CREATE TABLE month_revenue(
+              date TEXT, stock_id TEXT, revenue INTEGER,
+              revenue_month INTEGER, revenue_year INTEGER);
+            CREATE TABLE financials(
+              date TEXT, stock_id TEXT, type TEXT, value REAL, origin_name TEXT);
+            CREATE TABLE balance_sheet(
+              date TEXT, stock_id TEXT, type TEXT, value REAL, origin_name TEXT);
+            CREATE TABLE cash_flow(
+              date TEXT, stock_id TEXT, type TEXT, value REAL, origin_name TEXT);
+        """)
+        con.executemany(
+            "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+            [
+                ("2026-08-01", "1234", 1, 7, 2026),
+                ("2026-08-01", "5678", 1, 7, 2026),
+            ],
+        )
+        for table in ("financials", "balance_sheet", "cash_flow"):
+            con.executemany(
+                f"INSERT INTO {table} VALUES(?,?,?,?,?)",
+                [
+                    ("2026-06-30", "1234", "Revenue", 1.0, "x"),
+                    ("2026-03-31", "5678", "Revenue", 1.0, "x"),
+                ],
+            )
+        con.commit()
+        con.execute("PRAGMA query_only = 1")
+        universe = [
+            {"stock_id": "1234", "name": "甲", "group": "serverodm"},
+            {"stock_id": "5678", "name": "乙-KY", "group": "ipdesign"},
+        ]
+
+        before_deadline = rq.financial_snapshot(
+            con, universe, date(2026, 8, 17))
+        after_deadline = rq.financial_snapshot(
+            con, universe, date(2026, 9, 1))
+        con.close()
+
+        self.assertEqual(
+            before_deadline["quarter_requirements"],
+            {"2026Q1": 1, "2026Q2": 1},
+        )
+        self.assertEqual(
+            before_deadline["quarter_requirement_label"],
+            "2026Q1 1 檔；2026Q2 1 檔",
+        )
+        self.assertEqual(
+            before_deadline["quarter_deferred"][0]["stock_id"], "5678")
+        self.assertTrue(all(
+            item["covered"] == 2 and item["missing"] == []
+            for item in before_deadline["quarter_tables"].values()))
+        self.assertIsNone(before_deadline["common_latest_period"])
+        self.assertTrue(all(
+            item["covered"] == 1 and item["missing"] == ["5678"]
+            for item in after_deadline["quarter_tables"].values()))
 
 
 class ReadabilityGateTest(unittest.TestCase):

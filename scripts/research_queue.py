@@ -1982,12 +1982,20 @@ def _quarter_token(value):
     return f"{period.year}Q{(period.month - 1) // 3 + 1}"
 
 
-def expected_quarter_date(as_of):
+def _is_first_listed_foreign(row):
+    """Universe 以名稱尾碼 -KY 標示第一上市（櫃）外國發行人。"""
+    return (row.get("name") or "").endswith("-KY")
+
+
+def expected_quarter_date(as_of, *, first_listed_foreign=False):
     """依申報截止日推導已應公布的最新季度，避免以 DB MAX(date) 自我證明完整。"""
     year = as_of.year
     if as_of >= dt.date(year, 11, 15):  # Q3 截止 11/14
         return dt.date(year, 9, 30)
-    if as_of >= dt.date(year, 8, 15):   # Q2 截止 8/14
+    # 一般發行人 Q2 截止 8/14；第一上市（櫃）外國發行人自 110 會計年度
+    # 起為第二季終了後二個月。兩者不能共用 8/15 completeness gate。
+    q2_available_from = dt.date(year, 9, 1) if first_listed_foreign else dt.date(year, 8, 15)
+    if as_of >= q2_available_from:
         return dt.date(year, 6, 30)
     if as_of >= dt.date(year, 5, 16):   # Q1 截止 5/15
         return dt.date(year, 3, 31)
@@ -2013,15 +2021,28 @@ def financial_snapshot(con, universe_rows, as_of):
     expected_quarter = expected_quarter_date(as_of)
     expected_quarter_iso = expected_quarter.isoformat()
     expected_quarter_period = _quarter_token(expected_quarter_iso)
+    expected_by_id = {
+        row["stock_id"]: expected_quarter_date(
+            as_of, first_listed_foreign=_is_first_listed_foreign(row)
+        )
+        for row in universe_rows
+    }
+    expected_dates = sorted({value.isoformat() for value in expected_by_id.values()})
+    date_placeholders = ",".join("?" for _ in expected_dates)
     quarter_tables = {}
     for table in ("financials", "balance_sheet", "cash_flow"):
-        covered = {
-            row["stock_id"]
+        available = {
+            (row["stock_id"], row["date"])
             for row in con.execute(
-                f"SELECT DISTINCT stock_id FROM {table} "
-                f"WHERE date=? AND value IS NOT NULL AND stock_id IN ({placeholders})",
-                (expected_quarter_iso, *ids),
+                f"SELECT DISTINCT stock_id,date FROM {table} "
+                f"WHERE date IN ({date_placeholders}) AND value IS NOT NULL "
+                f"AND stock_id IN ({placeholders})",
+                (*expected_dates, *ids),
             )
+        }
+        covered = {
+            sid for sid in ids
+            if (sid, expected_by_id[sid].isoformat()) in available
         }
         quarter_tables[table] = {
             "expected_date": expected_quarter_iso,
@@ -2029,9 +2050,33 @@ def financial_snapshot(con, universe_rows, as_of):
             "covered": len(covered),
             "missing": [sid for sid in ids if sid not in covered],
         }
+    quarter_requirements = dict(sorted(Counter(
+        _quarter_token(value.isoformat()) for value in expected_by_id.values()
+    ).items()))
+    quarter_requirement_label = (
+        next(iter(quarter_requirements))
+        if len(quarter_requirements) == 1
+        else "；".join(
+            f"{period} {count} 檔"
+            for period, count in quarter_requirements.items()
+        )
+    )
+    quarter_deferred = [
+        {
+            "stock_id": row["stock_id"],
+            "name": row.get("name", ""),
+            "current_expected_period": _quarter_token(
+                expected_by_id[row["stock_id"]].isoformat()),
+            "next_expected_period": expected_quarter_period,
+            "next_expected_from": dt.date(as_of.year, 9, 1).isoformat(),
+        }
+        for row in universe_rows
+        if expected_by_id[row["stock_id"]] != expected_quarter
+    ]
     common_latest_period = (
         expected_quarter_period
-        if all(item["covered"] == len(ids) for item in quarter_tables.values())
+        if len(expected_dates) == 1
+        and all(item["covered"] == len(ids) for item in quarter_tables.values())
         else None
     )
     return {
@@ -2040,6 +2085,9 @@ def financial_snapshot(con, universe_rows, as_of):
         "revenue_covered": len(present),
         "revenue_missing": missing_revenue,
         "quarter_tables": quarter_tables,
+        "quarter_requirements": quarter_requirements,
+        "quarter_requirement_label": quarter_requirement_label,
+        "quarter_deferred": quarter_deferred,
         "common_latest_period": common_latest_period,
     }
 
@@ -2169,6 +2217,17 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
                 items, "P0", "quarterly_financial_gap", as_of.isoformat(),
                 f"{table} {result['period']} 缺 {len(result['missing'])} 檔",
             )
+    if financial["quarter_deferred"]:
+        deferred = financial["quarter_deferred"]
+        due = min(item["next_expected_from"] for item in deferred)
+        detail = "、".join(
+            f"{item['stock_id']} {item['name']}".strip() for item in deferred)
+        _append_item(
+            items, "P2", "quarterly_financial_upcoming", due,
+            f"第一上市（櫃）外國發行人 {financial['expected_quarter_period']} "
+            f"期限較晚，{len(deferred)} 檔目前依 "
+            f"{deferred[0]['current_expected_period']} 完整性判定：{detail}",
+        )
 
     latest_period = financial["common_latest_period"]
     financial_note_stale = []
@@ -2333,7 +2392,7 @@ def render_attention(snapshot):
     ]
     for table, result in financial["quarter_tables"].items():
         lines.append(
-            f"| {table} | {result['period'] or '-'} | "
+            f"| {table} | {financial['quarter_requirement_label'] or '-'} | "
             f"{result['covered']}/{snapshot['universe_count']} | {len(result['missing'])} |")
 
     lines += ["", "## 需處理", ""]

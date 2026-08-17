@@ -3713,6 +3713,8 @@ class ResearchCenterTest(unittest.TestCase):
             "q2_financial_denominator_evidence_reframed_thesis_from_platform_listing_to_named_model_bridge",
             "## 8 月 14 日方法補強：把 2MW、500 GPM 與 3°C ATD 放回正確位置",
             "## 8 月 14 日監測複核：先有公司液冷分子，仍沒有具名 CDU 橋接",
+            "## 8 月 17 日監測複核：Delta 多一個型號，不等於多一段收入",
+            "| Delta CDU3000 | 2MW | 2,000kW | 空白（不代填） |",
             "## 接下來看到什麼，判定才會改變",
         ):
             self.assertIn(contract, topic)
@@ -3728,8 +3730,8 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("Sample Ready", reflection)
         self.assertNotIn("MP Ready", reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 20),
-            ("research_claim", 25), ("metric_comparison", 7),
+            ("research_topic", 1), ("research_source", 21),
+            ("research_claim", 26), ("metric_comparison", 12),
             ("impact", 2), ("monitoring_item", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

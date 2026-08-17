@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C21
 base_confidence: medium
-confidence_basis: NVIDIA 動態清單在捕捉日以同一欄標示三個型號的額定容量與供應狀態，容量保留原始 MW／kW 後可正規化比較；另有 LG 與 Daikin 一手文件補充認證、合作及 PoC 階段。台達管理層已提供公司液冷產品族約占 2025 年合併營收 10% 的近似分子，但 Marketplace 沒有固定版本與完整跨廠測試協定，三家台廠的具名 CDU 客戶、出貨量、產品收入及毛利仍未證實
+confidence_basis: NVIDIA 動態清單的 2026-08-02、08-09 與 08-17 快照以同一欄保存三批型號容量與供應狀態，容量保留原始 MW／kW 後可在各自同日快照內正規化比較；最新一批新增 Delta CDU3000，但供應狀態仍空白。另有 LG 與 Daikin 一手文件補充認證、合作及 PoC 階段。台達管理層已提供公司液冷產品族約占 2025 年合併營收 10% 的近似分子，但 Marketplace 沒有固定版本與完整跨廠測試協定，三家台廠的具名 CDU 客戶、出貨量、產品收入及毛利仍未證實
 cross_company_numbers: true
 -->
 
@@ -102,6 +102,13 @@ to: triaged
 reason: added_flow_temperature_heat_balance_bridge_without_thesis_clock_refresh
 evidence: sources:S9,S19,S20
 -->
+<!-- transition
+date: 2026-08-17
+from: triaged
+to: triaged
+reason: weekly_monitor_trigger_delta_cdu3000_added_without_financial_bridge
+evidence: sources:S21
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -172,13 +179,13 @@ evidence: sources:S9,S19,S20
 - **AVC／奇鋐（3017）**：AVC 是 Asia Vital Components 的縮寫；本文用公司官網的 `TSE: 3017` 完成名稱映射。這只確認公司身分，不證明具名客戶或收入。
 - **Delta／台達電（2308）與 LITEON／光寶科（2301）**：本文以英文公司名出現的兩家台灣電源與散熱供應商，都是本 universe 成員。台達另有公司液冷產品族的近似營收占比；這仍不等於 NVIDIA 清單中的具名 CDU 已取得客戶訂單、出貨量或產品毛利，光寶目前也只有平台列名與廣泛部門範圍。
 - **LGE／LG Electronics**：LG 電子的英文縮寫。2026-08-09 的 NVIDIA 清單可定位其 600kW 列項，但供應狀態欄空白，因此不能替它補成任何階段。
-- **CDU1000-LTL-RW／RDF106CDT5192／LC-LL-WCDU-6011(S)**：分別是 AVC、Delta 與 LITEON 在 NVIDIA 清單中的 CDU 型號。型號只是辨識產品的名字；容量、供應狀態與量產證據仍要分欄閱讀。
+- **CDU1000-LTL-RW／RDF106CDT5192／CDU3000／LC-LL-WCDU-6011(S)**：分別是 AVC、Delta 與 LITEON 在 NVIDIA 清單中的 CDU 型號；CDU3000 是 2026 年 8 月 17 日快照中可定位的第二個 Delta 型號。型號只是辨識產品的名字；容量、供應狀態與量產證據仍要分欄閱讀。
 - **TSE（Taiwan Stock Exchange，臺灣證券交易所）**：本文只用公司官網的 `TSE: 3017` 把 AVC 對應到臺灣上市公司奇鋐；這個代號本身不證明該 CDU 的客戶或收入。
 - **FY2027（2027 財政年度）**：公司的 2027 會計年度，起訖日不一定等於 2027 曆年。本文引用的是 Daikin 的商用目標時間，不是目前已完成部署。
 
 ### 三句話抓重點
 
-- 2026 年 8 月 2 日保存的 NVIDIA 清單，在同一欄列出三個供應商型號的容量：1.2MW、1MW 與 380kW。把單位都換成 kW 後，這三個數字可以比較。
+- 2026 年 8 月 2 日保存的 NVIDIA 清單先有三個台廠型號；8 月 9 日加入 LGE，8 月 17 日再出現 Delta CDU3000。每次快照只能在同日同欄換算容量，不能把後來新增的列回填到舊清單。
 - 容量只回答設備在指定條件下設計可帶走多少熱；還要把熱性能曲線、TCS 壓頭、FWS 阻抗，以及每筆讀值的設備、位置、單位、時間與品質接起來，才知道這個數字落在什麼操作包絡線。平台列名與供應標籤也都不等於客戶已部署。
 - 台達管理層已把「液冷產品」連到 2025 年約占合併營收 10% 的公司層級分子，但沒有拆成 L2A／L2L、具名 CDU、客戶、數量或產品毛利；其餘兩家季報的部門範圍也更廣。因此仍不能用容量大小替公司排行。
 
@@ -525,6 +532,22 @@ url: https://handbook.ashrae.org/Handbooks/S20/SI/s20_ch13/s20_ch13_si.aspx
 locator: 2026-08-14 capture 的 §2.2 Thermal Components；Equations (7)–(9) 以質量／體積流量、密度、比熱與跨設備水溫差計算熱傳率，並以 1000 kg/m³、4.18 kJ/(kg·K) 作 standard-water 條件；Heat-Carrying Capacity of Piping 段落
 limitation: ASHRAE 頁面提供一般水力熱平衡方法，不是 Deschutes 或任一具名 CDU 的實測結果；standard-water 密度／比熱是假設值，不能替代 PG 配方、實際溫度物性、熱損失、流量分配、量測不確定度、瞬態、備援或場域驗收
 independence_group: ashrae
+-->
+
+<!-- research_source
+source_id: S21
+role: other_primary
+source_kind: living_index
+publisher: NVIDIA Marketplace
+title: DSX Infrastructure for AI Factory validated CDU list — 2026-08-17 capture
+published_at:
+captured_at: 2026-08-17
+accepted_at: 2026-08-17
+status: active
+url: https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/?category=liquid_to_liquid&page=1&limit=30
+locator: 2026-08-17 以 1–21 of 21 單頁捕捉 Liquid to Liquid CDU 表；可定位 AVC CDU1000-LTL-RW 1.2MW／1600LPM／Sample Ready、Delta RDF106CDT5192 1MW／1500LPM／MP Ready、Delta CDU3000 2MW／3200LPM／供應狀態空白、LITEON LC-LL-WCDU-6011(S) 380kW／600LPM／Sample Ready、LGE LGE 600kW／850LPM／供應狀態空白；CDU3000 另列 Hydraulic Test-Constant DP／Constant Flow、Flow Sensor Accuracy、Thermal Test-Low Load 與 Pumping Capacity 等 validation types
+limitation: 動態頁沒有不可變版本或逐列變更日誌；本 source 只支持 2026-08-17 當下可定位的顯示欄位。空白供應狀態不得補成 Sample Ready、MP Ready、撤銷或量產；Compatible 類顯示、validation type 與平台列名也不提供完整測試數據、客戶、訂單、出貨、收入、毛利或跨廠共同協定
+independence_group: nvidia-marketplace
 -->
 
 <!-- research_claim
@@ -952,6 +975,23 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C26
+label: verified
+status: active
+claim: 2026-08-17 捕捉的 NVIDIA Marketplace 清單可定位新增的 Delta CDU3000 列項，標示 2MW、3200LPM 與多項 hydraulic／flow／thermal／pumping validation types，Supply Chain Status 欄為空白；同次快照另保留 AVC 1.2MW、Delta RDF106CDT5192 1MW、LITEON 380kW 與 LGE 600kW 四個既有型號
+supporting_source_ids: S8,S21
+contrary_source_ids:
+as_of: 2026-08-17
+basis: S8 保存 2026-08-09 四個既有列項，S21 在 2026-08-17 同一動態清單逐頁捕捉時可定位 Delta CDU3000 及五個本研究追蹤型號的欄位
+boundary: `verified` 只證實兩次快照間公開清單的可定位差異與 2026-08-17 顯示值；頁面沒有不可變歷史、完整測試結果、客戶部署、訂單、產量、具名型號收入或毛利。CDU3000 的 2MW 不能覆寫 RDF106CDT5192 的 1MW，也不能把 Delta 公司液冷產品族占比全數歸給任一型號
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 容量可以換算，商業成熟度不能跟著換算
 
 先只做一件事：把同一天、同一張表、同一欄的容量換成相同單位。2026 年 8 月 2 日保存的
@@ -996,6 +1036,18 @@ normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normali
 
 2026 年 8 月 9 日的新快照另建 `M2`，不覆寫 `M1`。`M2` 加入新出現的 LGE 同欄列項，
 並重新保存當日四筆來源值；它仍只表示同日同欄的容量可以換算，不是商業成熟度排名。
+
+2026 年 8 月 17 日再另建 `M3`：Delta 同時有 RDF106CDT5192 與新出現的 CDU3000，
+因此觀測實體改用「供應商＋型號」而不是只寫公司名。這五筆仍只比較快照中的容量欄；同一
+家公司有兩個不同型號，正好說明公司不能被壓成單一容量，也不能用 2MW 直接推成較高收入。
+
+| 2026-08-17 清單列項 | 來源原始容量 | 換算成 kW | 平台原始供應標籤 |
+|---|---:|---:|---|
+| AVC CDU1000-LTL-RW | 1.2MW | 1,200kW | Sample Ready |
+| Delta RDF106CDT5192 | 1MW | 1,000kW | MP Ready |
+| Delta CDU3000 | 2MW | 2,000kW | 空白（不代填） |
+| LITEON LC-LL-WCDU-6011(S) | 380kW | 380kW | Sample Ready |
+| LGE LGE | 600kW | 600kW | 空白（不代填） |
 
 <!-- metric_comparison
 comparison_id: M2
@@ -1153,6 +1205,136 @@ normalized_period_end: 2026-08-02
 normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
 -->
 
+<!-- metric_comparison
+comparison_id: M3
+comparison_kind: aligned_metric
+observation_id: M3-O1
+claim_id: C26
+entity: AVC CDU1000-LTL-RW
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 1.2
+value_kind: point
+period_start: 2026-08-17
+period_end: 2026-08-17
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: MW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-17 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S21
+comparability: normalized_comparable
+comparability_reason: 五筆資料來自同日同表同欄，觀測單位是供應商加型號；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態、公司成熟度或財務
+normalization_method: reported_MW_multiply_by_1000_using_1MW_equals_1000kW
+normalized_value: 1200
+normalized_unit: kW
+normalized_period_start: 2026-08-17
+normalized_period_end: 2026-08-17
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+comparison_kind: aligned_metric
+observation_id: M3-O2
+claim_id: C26
+entity: Delta RDF106CDT5192
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 1
+value_kind: point
+period_start: 2026-08-17
+period_end: 2026-08-17
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: MW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-17 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S21
+comparability: normalized_comparable
+comparability_reason: 五筆資料來自同日同表同欄，觀測單位是供應商加型號；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態、公司成熟度或財務
+normalization_method: reported_MW_multiply_by_1000_using_1MW_equals_1000kW
+normalized_value: 1000
+normalized_unit: kW
+normalized_period_start: 2026-08-17
+normalized_period_end: 2026-08-17
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+comparison_kind: aligned_metric
+observation_id: M3-O3
+claim_id: C26
+entity: Delta CDU3000
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 2
+value_kind: point
+period_start: 2026-08-17
+period_end: 2026-08-17
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: MW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-17 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S21
+comparability: normalized_comparable
+comparability_reason: 五筆資料來自同日同表同欄，觀測單位是供應商加型號；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態、公司成熟度或財務
+normalization_method: reported_MW_multiply_by_1000_using_1MW_equals_1000kW
+normalized_value: 2000
+normalized_unit: kW
+normalized_period_start: 2026-08-17
+normalized_period_end: 2026-08-17
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+comparison_kind: aligned_metric
+observation_id: M3-O4
+claim_id: C26
+entity: LITEON LC-LL-WCDU-6011(S)
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 380
+value_kind: point
+period_start: 2026-08-17
+period_end: 2026-08-17
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: kW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-17 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S21
+comparability: normalized_comparable
+comparability_reason: 五筆資料來自同日同表同欄，觀測單位是供應商加型號；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態、公司成熟度或財務
+normalization_method: identity_conversion_reported_kW_equals_normalized_kW
+normalized_value: 380
+normalized_unit: kW
+normalized_period_start: 2026-08-17
+normalized_period_end: 2026-08-17
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
+<!-- metric_comparison
+comparison_id: M3
+comparison_kind: aligned_metric
+observation_id: M3-O5
+claim_id: C26
+entity: LGE LGE
+metric: NVIDIA Marketplace Cooling Capacity at 4C ATD
+reported_value: 600
+value_kind: point
+period_start: 2026-08-17
+period_end: 2026-08-17
+period_basis: point_in_time_nvidia_marketplace_capture
+unit: kW
+definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd
+definition: NVIDIA Marketplace 同一欄 Cooling Capacity @ 4°C ATD 的 2026-08-17 來源顯示值；只表示捕捉日額定容量，不代表完整跨廠測試協定相同
+evidence_ids: S21
+comparability: normalized_comparable
+comparability_reason: 五筆資料來自同日同表同欄，觀測單位是供應商加型號；只在固定單位換算後比較欄位標示容量，不比較效率、完整工況、供應狀態、公司成熟度或財務
+normalization_method: identity_conversion_reported_kW_equals_normalized_kW
+normalized_value: 600
+normalized_unit: kW
+normalized_period_start: 2026-08-17
+normalized_period_end: 2026-08-17
+normalized_definition_key: nvidia_marketplace_cooling_capacity_at_4c_atd_normalized_kw
+-->
+
 ## 額定容量只是操作包絡線的一個截面
 
 OCP 的 2024 年 L-L CDU 方法補上 NVIDIA 動態清單沒有展開的「讀規格說明書」。它先提醒：
@@ -1162,7 +1344,7 @@ FWS 進水溫度與流量、TCS／FWS 壓力及 ATD 一起報告。換句話說�
 
 這也解釋了為什麼兩台都標 `600kW` 的 CDU，現場整合仍可能不同：一台可能需要較高流量或
 設施壓力，另一台可能只支援特定冷卻液；若沒有相同條件與原始資料，就不能只看 kW 說兩者
-完全等效。本文的 `M1`／`M2` 仍只比較 NVIDIA 同日同欄的**標示值**，不把 OCP 方法倒填成
+完全等效。本文的 `M1`／`M2`／`M3` 仍只比較 NVIDIA 同日同欄的**標示值**，不把 OCP 方法倒填成
 那些產品已實際採用的測試程序。
 
 | 證據包要固定什麼 | 新手可以問的白話問題 | OCP 方法能支持到哪裡 | 還不能因此判定 |
@@ -1399,8 +1581,9 @@ ICC 對 DDP 的定義重點是賣方負責送達約定目的地、進口清關�
 - [S18：ICC Incoterms DDP 定義](https://library.iccwbo.org/clp/clp-incoterms.htm)（2026-08-14 capture；說明交貨、清關、成本與風險責任，不是產品毛利定義）。
 - [S19：OCP STULZ Deschutes CDU 產品頁](https://www.opencompute.org/products/734/stulz-deschutes-cdu-cybercool-liquid-cooling-distribution-unit)（2026-08-14 capture；並列 2MW @ 3°C ATD、500 GPM、80 PSI 與 N+1，沒有完整可重現測試包）。
 - [S20：ASHRAE Chapter 13 Hydronic Heating and Cooling](https://handbook.ashrae.org/Handbooks/S20/SI/s20_ch13/s20_ch13_si.aspx)（2026-08-14 capture；水側熱平衡、standard-water 物性與管路攜熱能力的一般方法，不是具名 CDU 測試結果）。
+- [S21：NVIDIA Marketplace DSX Infrastructure 動態清單](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)（2026-08-17 capture；新增 Delta CDU3000 2MW／3200LPM 列項，供應狀態空白；舊快照不覆寫）。
 
-**可證實：** 同日同欄的容量、平台原始供應標籤、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位、可靠度測試類別及 Deschutes 產品頁的 headline。ASHRAE 可證實水側熱平衡的一般關係；它與 OCP 的 ATD 定義也足以證實「迴路溫升」和「兩側供水 approach」是兩個位置不同的溫差。台達管理層也確實做出「2025 年液冷產品約占合併營收 10%、2026 年預期超過 12%」的陳述，但前者是近似產品族占比，後者是預期。
+**可證實：** 各自快照中同日同欄的容量、平台原始供應標籤、8 月 17 日新出現的 Delta CDU3000 列項、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位、可靠度測試類別及 Deschutes 產品頁的 headline。ASHRAE 可證實水側熱平衡的一般關係；它與 OCP 的 ATD 定義也足以證實「迴路溫升」和「兩側供水 approach」是兩個位置不同的溫差。台達管理層也確實做出「2025 年液冷產品約占合併營收 10%、2026 年預期超過 12%」的陳述，但前者是近似產品族占比，後者是預期。
 
 **待驗證：** 平台狀態的精確判準、具名客戶、部署數、訂單、具名 CDU 收入、產品毛利、
 現金流與實際節能結果。15.19 K 只是標準水與同一穩態 reference plane 假設下的條件式算術，
@@ -1477,6 +1660,16 @@ L2A／L2L 或 RDF106CDT5192；OCP 方法也不能證明某一具名產品已完�
   `last_reviewed_at` 更新為 2026-08-14、`review_due` 取所有 active monitor 最早的 T4
   2026-08-16，`base_confidence` 維持 medium；這次時鐘刷新由 S14–S17 的新主命題證據承擔，
   不是用 DDP 名詞或周邊方法假刷新。
+
+## 8 月 17 日監測複核：Delta 多一個型號，不等於多一段收入
+
+- `T4` 的型號變化 trigger 命中：S21 可定位 Delta CDU3000 的 2MW、3200LPM、validation
+  types 與空白供應狀態；AVC、Delta 原型號、LITEON、LGE 四列的本文追蹤欄位未變。
+- `M3` 以「供應商＋型號」保存五筆容量，讓同一家公司可以同時有 1MW 與 2MW 兩個產品；
+  它不把兩筆加總成公司容量、不判斷哪個型號較成熟，也不把空白狀態補成量產。
+- 新證據只增加平台產品集合與測試類別的可見度，沒有命中 `T8` 所需的客戶驗收、數量、
+  具名型號收入或產品毛利。因此 C21 主命題、`last_reviewed_at`、`review_due` 與
+  `base_confidence` 均不刷新；下一次 T4 實際檢查日由 append-only monitor review 帳本排程。
 
 ## 影響路由
 
@@ -1622,7 +1815,7 @@ invalidation: 公司明確取消或退出具名 CDU、表示沒有相關訂單�
 
 ## 接下來看到什麼，判定才會改變
 
-- **平台欄位改變**：若 NVIDIA 改寫 AVC、LITEON 或 LGE 的原始供應狀態，就追加新快照、來源與觀測；不得修改 `M1` 的 2026 年 8 月 2 日歷史紀錄。
+- **平台欄位改變**：若 NVIDIA 改寫 AVC、Delta、LITEON 或 LGE 的原始供應狀態，就追加新快照、來源與觀測；不得修改 `M1`、`M2` 或 `M3` 的歷史紀錄。
 - **公司補上商業證據**：台達已有公司液冷產品族的近似歷史占比，但仍須把它拆成 L2A／L2L、CDU 與具名型號；3017、2308、2301 若在法說或財報同時揭露具名設備的客戶驗收、量產數量、實際收入與產品毛利，才可完成產品層商業橋接。
 - **概念驗證交付結果**：Daikin／NTT DATA 若公布結果，需有可重算的節電、成本或可靠度基線；官方宣告失敗、取消或延後超過 2027 年 3 月才構成反證，沒有公開結果只維持待驗證。
 - **容量與收入走出相反順序**：若較高容量型號長期停留送樣，而較低容量型號先取得部署與收入，就會直接否定「容量可代表商業成熟度」的市場捷徑。
