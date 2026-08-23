@@ -2102,8 +2102,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 17), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 20), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -2121,12 +2121,60 @@ class ResearchCenterTest(unittest.TestCase):
             ROOT / "notes" / "knowledge_graph"
             / "ai_rack_emc_certification.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
         for node in (
             "to_id: process:emc-boundary-decision-passport",
             "to_id: metric:emc-guard-band-acceptance-limit",
         ):
             self.assertIn(node, graph)
+
+    def test_ai_rack_emc_separates_emissions_and_immunity_results(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-09_ai_rack_emc_certification.md"
+        ).read_text(encoding="utf-8")
+        headings = (
+            "## 整櫃驗證要過四關：零件、配置、量測與實驗室",
+            "## EMC 其實有兩張考卷：不吵到別人，也要扛得住外界干擾",
+            "## 拿到一份測試資料時，照四步判讀",
+        )
+        positions = [topic.index(heading) for heading in headings]
+        self.assertEqual(positions, sorted(positions))
+        for contract in (
+            "reason: added_emissions_immunity_two_exam_reader_contract_without_thesis_or_clock_refresh",
+            "source_id: S14", "source_id: S15",
+            "claim_id: C18", "claim_id: C19", "claim_id: C20",
+            "**排放測試（emissions）**",
+            "**抗擾度／免疫測試（immunity）**",
+            "**試驗等級（test level）**",
+            "**性能判據（performance criterion）**",
+            "**兩張考卷共同鍵**",
+            "兩項測試可在不同日期進行，各自日期要留在各自報告頁",
+            "**正式整櫃 EMC 測試**",
+            "**排放測試把機櫃當成雜訊來源。**",
+            "**抗擾度測試把機櫃當成被干擾的一方。**",
+            "**兩張 pass 不能互相代領。**",
+            "| 排放 | 雜訊來源 |",
+            "| 抗擾度 | 受干擾的一方 |",
+            "兩頁、一個共同鍵",
+        ):
+            self.assertIn(contract, topic)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "process:emc-emissions-immunity-two-exam-contract,process,EMC 排放與抗擾度兩張考卷契約",
+            concepts,
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "ai_rack_emc_certification.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("edge_id: KG-EMC-I17", graph)
+        self.assertIn(
+            "to_id: process:emc-emissions-immunity-two-exam-contract", graph
+        )
 
     def test_ai_rack_action_deadline_contract_separates_api_acceptance_from_safe_state(self):
         topic = (

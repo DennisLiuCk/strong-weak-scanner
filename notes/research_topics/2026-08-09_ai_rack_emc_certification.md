@@ -81,12 +81,24 @@ to: triaged
 reason: added_guard_band_decision_rule_and_two_lever_emc_boundary_example_without_thesis_or_clock_refresh
 evidence: sources:S9,S12,S13
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_emissions_immunity_two_exam_reader_contract_without_thesis_or_clock_refresh
+evidence: sources:S2,S11,S14,S15
+-->
 
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **電磁干擾／電磁相容（EMI／EMC）**：電磁干擾是設備產生或受到的雜訊；電磁相容則是整套設備在限制干擾的同時仍能正常運作。兩者是問題與結果，不是同一種零件。
+- **排放測試（emissions）**：把設備當成雜訊來源，檢查它向外送出的電磁能量；「排放通過」只表示指定配置依指定方法、限制與判定規則得到該結果，不能順便證明設備扛得住外界干擾。
+- **抗擾度／免疫測試（immunity）**：把設備當成受干擾的一方，在指定電磁擾動下觀察它能否按預期運作；「抗擾度通過」只表示指定配置、試驗等級與性能判據得到該結果，不能順便證明設備向外排放合格。
+- **試驗等級（test level）**：抗擾度測試施加多少擾動的指定條件；有測試名稱卻沒有等級，仍不能知道設備承受了什麼。
+- **性能判據（performance criterion）**：抗擾度測試時，事前說清楚哪些短暫現象可接受、哪些功能必須持續，以及測後要恢復到什麼狀態的判定條件；本文只把它列為閱讀報告時要找的欄位，不替任何標準或客戶補寫門檻。
+- **兩張考卷共同鍵**：研究中心用來確認兩份報告是否真的屬於同一套機櫃的穩定識別資料，包括設備與軟硬體版本、工作負載、纜線、側掛設備、供電與接地；兩項測試可在不同日期進行，各自日期要留在各自報告頁。這是閱讀工具，不是 IEC 或 NIST 的正式表單。
 - **雜訊路徑**：電磁雜訊從來源走到其他設備或量測天線的路線；重新接線、增加機構開口或改變接地，都可能形成新路徑。
 - **傳導／輻射排放**：雜訊可能沿電源線或訊號線傳出去，也可能像天線一樣從機構與纜線輻射出去；一種濾波方式不會自動處理所有路徑。
 - **整櫃**：把運算、網路、電源、液冷、機構與外接纜線組成實際運作配置後的完整機櫃系統，不只是其中一台設備。
@@ -101,7 +113,7 @@ evidence: sources:S9,S12,S13
 - **正式送驗前測試（pre-compliance）**：在正式測試前用較小場地、探棒或簡化配置先找出風險，可降低重測機率，但不是最終合格結果。
 - **模擬（simulation）**：以模型預估雜訊與耦合路徑；可協助設計，仍須用實際設備與量測確認模型是否成立。
 - **子系統測試**：只測電源、運算托盤或冷卻設備等一部分；它能定位局部問題，不能自動涵蓋重新組合後的整櫃。
-- **正式整櫃測試**：用最後被測配置、指定程序與具備能力的實驗室，量測完整機櫃的排放結果。
+- **正式整櫃 EMC 測試**：用最後被測配置、各自適用的程序與具備能力的實驗室，量測排放或施加抗擾度擾動，再依該考卷的判定依據保存結果。
 - **CISPR 32**：IEC 體系針對多媒體設備排放與可重複量測所制定的標準；它說明設備層要測什麼，不替特定機櫃出具通過證明。
 - **FCC**：美國聯邦通信委員會；本文只使用其量測指引與合格測試機構資料入口，不替特定設備判定法律適用性。
 - **ANSI C63.4／C63.4a**：美國非刻意輻射器的量測方法版本；FCC 23-14 保留 2014 版並納入 2017 修訂作替代選項，不能因此推定所有 AI rack 都適用同一路徑。
@@ -143,7 +155,7 @@ evidence: sources:S9,S12,S13
 未必放得下、帶得動，也未必供得起完整機櫃。
 
 **別把元件測試當成整櫃合規。** 零件測試回答「這顆零件能降低哪種雜訊」；子系統測試回答「局部
-設計是否有風險」；正式整櫃測試才回答「最後配置同時運作時是否符合要求」。前一層通過，
+設計是否有風險」；正式整櫃 EMC 測試才回答「最後配置在指定考卷下是否符合要求」。前一層通過，
 不能替後一層保證結果。
 
 **再拆開每一層的責任。** 即使已有量測標準，實驗室仍要有足夠空間、承重、供電、
@@ -464,6 +476,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: IEC 的 CISPR 32:2015 與 CISPR 35:2016 publication pages 把同樣是額定 AC 或 DC 供電不超過 600V 的 multimedia equipment 分成兩套目的不同的標準：CISPR 32 處理 9kHz 至 400GHz 的排放與無線電頻譜保護，CISPR 35 處理 0kHz 至 400GHz 的 intrinsic immunity 與設備在環境中按預期運作；NIST NVLAP ECT 計畫也把 electromagnetic emissions 與 electromagnetic immunity 列為可分別申請認可的方法類別
+supporting_source_ids: S2,S11,S14
+contrary_source_ids:
+as_of: 2026-08-12
+basis: S2 與 S14 的 IEC 官方 publication pages 直接列出各自標題、相同 600V MME 範圍及不同 objectives，S11 的 NIST 官方計畫頁再把 emissions 與 immunity 分列為認可類別
+boundary: 三個公開頁只證明標準目的與認可類別不同；不含付費標準完整測法、測試等級或性能判據，也不判定特定 AI rack 是否落入 MME／600V 範圍、依法或依客戶必須做哪一項、已通過哪一項
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: 閱讀 AI rack EMC 證據時，排放與抗擾度應保存為兩份結果契約：兩者可用同一組設備版本、工作負載、纜線、側掛設備、供電與接地作共同識別鍵，但各自仍要保留標準／方法、施測條件、觀測結果與判定依據；其中一張寫 pass，不能代替另一張，也不能直接代替客戶 qualification、部署或財務證據
+supporting_source_ids: S2,S11,S14
+contrary_source_ids:
+as_of: 2026-08-24
+basis: IEC 以兩份不同標準分別定義向外排放與承受外界擾動的目標，NIST 也把兩者列為不同認可方法類別；本文據此把既有九欄報告護照拆成兩張、再以共同配置欄位對齊
+boundary: 兩份結果契約與共同鍵是研究中心的閱讀方法，不是 IEC／NIST 聯合 test-report template；本文沒有證據主張每套 AI rack 都必須做兩份完整系統測試，也沒有具名 rack 的兩份報告、性能判據、重測、客戶驗收或公司財務共同鍵
+verification_needed: 同一具名量產 rack 版本公開排放與抗擾度的適用依據、完整配置、方法、條件、結果、判定、變更與重測紀錄，再由客戶或平台文件確認 qualification 與部署邊界
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: IEC 61000-4-3:2020 是針對非近距離輻射射頻電磁場的基本抗擾度測試方法，官方 publication page 表示它建立 test levels 與 required test procedures，但是否適用、適用時採哪個 test level 與 performance criteria，應由 IEC product committees 決定
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2020-09-08
+basis: S15 官方 publication page 的 scope、objectives 與 notes 直接界定 radiated-RF immunity、basic EMC publication、product-committee applicability、test-level 與 performance-criteria 責任
+boundary: 這是一套基本抗擾度方法的公開摘要，不是 AI rack 產品規範或客戶驗收計畫；它不能證明特定機櫃適用該方法、應採哪個等級與性能判據、已通過測試或必須做完整整櫃測試
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 整櫃驗證要過四關：零件、配置、量測與實驗室
 
 **第一道是元件與材料。** 共模扼流圈、濾波器、屏蔽結構、導電墊片、吸波材與 PCB 佈局，
@@ -486,6 +549,41 @@ resolution:
 四關回答的是不同問題。第一關證明零件能力，第二與第三關定義完整設備如何被測，第四關才
 確認現場是否真的能完成測試。前一關通過，不能替後一關出具結果；這張表建立的是查證順序，
 不是宣稱特定機櫃已合格或特定供應商已受惠。
+
+## EMC 其實有兩張考卷：不吵到別人，也要扛得住外界干擾
+
+**排放測試把機櫃當成雜訊來源。** 它問的是「這套設備向外送出的雜訊，會不會妨礙別人？」
+IEC 的 CISPR 32 官方摘要以保護無線電頻譜及讓量測可重複為目標。這能證明排放是一張獨立考卷，
+卻不能只憑標準名稱判定某套 AI rack 的法規分類、正式被測範圍或合格結果。
+
+**抗擾度測試把機櫃當成被干擾的一方。** 它問的是「外界出現指定電磁擾動時，設備還能不能
+按預期工作？」IEC 的 CISPR 35 官方摘要把 intrinsic immunity 與按預期運作列為目標。公開摘要
+沒有提供完整測試等級與性能判據，所以讀者不能自行補上「沒有重開機」「零封包遺失」或任何
+客戶門檻。IEC 61000-4-3 的輻射射頻抗擾度方法更直接提醒：是否採用、採用哪個試驗等級與
+性能判據，要由產品委員會決定；知道一個方法名稱，不等於知道特定機櫃的考題與及格線。
+
+**兩張 pass 不能互相代領。** NIST 的 EMC 實驗室認可計畫把 emissions 與 immunity 分成不同
+方法類別；這不是說每一套 AI rack 都依法必須做兩項完整整櫃測試，而是提醒研究者：向外少吵
+與受到干擾仍能工作，回答的是兩個方向相反的問題。
+
+| 考卷 | 把設備當成什麼 | 核心問題 | 讀報告至少找什麼 | 這張 pass 不能代替什麼 |
+|---|---|---|---|---|
+| 排放 | 雜訊來源 | 向線路或空間送出的干擾是否符合指定要求？ | 被測配置、標準與方法、量測條件、數值與限制、判定規則 | 抗擾度結果、客戶資格、部署與財務貢獻 |
+| 抗擾度 | 受干擾的一方 | 指定擾動下是否仍符合事前約定的運作要求？ | 被測配置、標準與方法、施加條件、觀察項目、性能判據與結果 | 排放結果、客戶資格、部署與財務貢獻 |
+
+這張表是研究中心的閱讀契約，不是 IEC 或 NIST 發布的正式報告格式。最實用的做法是替同一套
+機櫃保留「兩頁、一個共同鍵」：兩頁共用機櫃型號、硬體與韌體版本、工作負載、纜線、側掛設備、
+供電與接地；排放頁另記量測值、限制與判定，抗擾度頁另記施加條件、觀察功能、性能判據與判定。
+共同鍵對不上，先標成不同配置；只有一頁，就把另一頁標成未知，不能腦補成通過。
+
+用一個假想例子就能看懂：A 機櫃向外排放很低，仍可能在外界干擾下停止服務；B 機櫃在指定
+干擾下維持功能，仍可能向外送出過多雜訊。這只是方向示意，不是兩套真實 rack、測試結果或
+故障率樣本，因此沒有 sampling SE／t，也不能拿來估計實驗室需求或供應商收入。
+
+放進多空小作文時也要保留兩頁。偏多敘事至少要看到具名 rack 版本、分開的排放／抗擾度工作量
+或重測紀錄、真正形成瓶頸的可用量能，再把特定供應商的產品、服務、客戶採用與財務分母接上；
+偏空敘事則要有正式適用或沿用規則、既有容量與時槽能吸收工作的證據。只有「EMC 需求增加」
+或其中一張 pass，兩邊都還不能成立。
 
 ## 拿到一份測試資料時，照四步判讀
 
@@ -853,6 +951,38 @@ locator: NIST 官方 publication page 的 author、published date 與 abstract�
 limitation: 官方頁只提供期刊論文摘要，沒有 AI rack 量測值、風險分布、guard band、重測量、lab capacity、元件用量、公司訂單或財務效果
 -->
 
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: document
+publisher: International Electrotechnical Commission
+independence_group: iec-cispr
+title: CISPR 35:2016 — Electromagnetic compatibility of multimedia equipment - Immunity requirements
+published_at: 2016-08-16
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://webstore.iec.ch/en/publication/25667
+locator: IEC 官方 publication page 的 title、scope、objectives、publication date 與 edition；MME 額定 AC／DC 不超過 600V、0kHz–400GHz intrinsic immunity、operate as intended、test reproducibility／result repeatability
+limitation: publication page 只提供標準摘要，不含付費正文的完整 test phenomena、levels、setups、performance criteria 或 report requirements，也不判定特定 AI rack 的適用性、被測配置或 pass
+-->
+
+<!-- research_source
+source_id: S15
+role: standard
+source_kind: document
+publisher: International Electrotechnical Commission
+independence_group: iec-emc-basic-method
+title: IEC 61000-4-3:2020 — Radiated, radio-frequency, electromagnetic field immunity test
+published_at: 2020-09-08
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://webstore.iec.ch/en/publication/59849
+locator: IEC 官方 publication page 的 scope、objectives、notes、publication date 與 edition；radiated-RF immunity、test levels、required procedures、非近距離 RF source，以及 product committees 對 applicability、levels 與 performance criteria 的責任
+limitation: publication page 只提供 basic EMC method 摘要，不含付費正文全部 setup、level 與 procedure，也不指定 AI rack 的適用性、產品性能判據、客戶門檻或 pass
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -934,6 +1064,7 @@ invalidation: 主管機關或認可機構若正式說明更小的欄位集即可
 
 - OCP 訪談提到「全球一至兩家」，不能直接當成全球實驗室全面盤點；仍要有具名能力、可用時槽與等待時間資料。
 - FCC 或 CISPR 32 提供方法與標準邊界，不代表每一套 AI 機櫃都依法用完整機櫃做同一種測試；適用程序與被測配置必須逐案確認。
+- CISPR 32 的排放 pass 不能代替 CISPR 35 的抗擾度結果，反向也不行；本文同時不主張每套 AI rack 都依法或依客戶必須做兩項完整整櫃測試。
 - FCC 對大型設備新增替代距離與測試體積，不代表所有 AI rack 都適用該條款，更不證明大型 chamber 或時槽稀缺。
 - 一份報告缺少九欄中的部分資料，只能標成不可比較；九欄護照本身也不是官方標準、法律意見或產品合格證。
 - 測試裕量沒有搭配方法、偵測器、頻寬、不確定度與判定規則時，不能被讀成跨版本安全餘裕或通用 guard band。

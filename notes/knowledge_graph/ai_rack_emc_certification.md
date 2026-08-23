@@ -353,3 +353,23 @@ status: active
 boundary: 40.0 dBµV/m 38.5 dBµV/m U=3.0 dB 與 AL=37.0 都是假想教材 N=4量測值與N=4設定 沒有sampling SE t 頻率偵測器rack實驗室容量公司效果或投資結論。
 next_trigger: 具名 test report 與事前合約共同揭露 TL AL w U measured value binary或non-binary處置及重複結果 並能跨版本重算。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-EMC-I17
+view: industry
+from_id: concept:ai-rack-emc-certification
+to_id: process:emc-emissions-immunity-two-exam-contract
+relation: includes
+claim_refs: MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C18,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C19,MI-2026-08-09-AI-RACK-EMC-CERTIFICATION#C20
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: limited_source
+exclusivity_scope: IEC 的排放 抗擾度與輻射射頻基本方法以及 NIST 認可類別是兩條組織消息鏈 本圖據此整理兩頁一共同鍵 不是聯合測試模板或產品證書。
+as_of: 2026-08-24
+review_due: 2026-08-31
+status: active
+boundary: 兩張考卷契約是研究中心閱讀工具 不判定特定 AI rack 的法域 產品分類 600V邊界 適用標準 試驗等級 性能判據 pass 客戶資格 部署或公司財務。
+next_trigger: 同一具名量產 rack 版本公開排放與抗擾度的適用依據 共同配置 各自方法 條件 結果 判定 變更重測及客戶資格共同鍵。
+-->
