@@ -1,6 +1,7 @@
 # 半導體 PFAS 七關曝險鏈知識圖譜
 
 本圖把歐盟限制、美國歷史申報、半導體多用途、替代再驗證及公司財務歸因分開。
+同時把單一法規不適用、intentionally added、free-of 與 non-detect 分成 applicability、法律／配方、行銷與量測四張證明。
 4770、4755 只畫到公開產品／能力入口；最終法規適用、近期成本、中斷與受惠仍未證實。
 
 <!-- knowledge_graph_meta
@@ -8,7 +9,7 @@ schema_version: 1
 graph_id: semiconductor-pfas-exposure
 root_node_id: concept:semiconductor-pfas-exposure
 label: 半導體 PFAS 七關曝險鏈
-summary: 從 substance identity process function product form jurisdiction duty derogation transition change qualification 追到 company site product financial attribution 避免把提案 申報 含氟產品或替代研發直接寫成禁用與獲利。
+summary: 從 substance identity process function product form jurisdiction duty derogation transition change qualification 追到 claim passport 及 company site product financial attribution 避免把提案 申報 含氟產品 free-of 或 non-detect 直接寫成禁用 lab zero 與獲利。
 article_ids: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE
 status: active
 -->
@@ -471,4 +472,24 @@ review_due: 2026-09-15
 status: active
 boundary: Closure release ratios and residual only demonstrate denominator discipline and cannot estimate real emissions measurement uncertainty abatement demand cost revenue margin or valuation。
 next_trigger: 同一具名 substance site period 以校正流量濃度庫存產品waste manifest treatment efficiency final fate and air water land data閉合並由獨立方重算。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PFAS-I20
+view: industry
+from_id: concept:semiconductor-pfas-exposure
+to_id: process:pfas-claim-passport
+relation: requires
+claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C18,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C19,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C20,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C21,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C22
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: unknown
+exclusivity: multi_source
+exclusivity_scope: Maine applicability and intentional-added law FTC free-of marketing guidance and EPA targeted PFAS AOF DL QL non-detect data boundaries are separate official contracts 十欄passport是研究中心整合框架而非三機關共同表單。
+as_of: 2026-08-24
+review_due: 2026-09-15
+status: active
+boundary: Maine本節明文豁免半導體及其製造設備材料 Passport只防止法律配方行銷與量測證明互相代簽 不判定個別產品在其他法域或客戶規範合規 PFAS-free lab zero customer qualification financial materiality or investment effect。
+next_trigger: 同一具名product component version lot以supplier composition exact marketing statement applicable law targeted analytes method matrix limits QC customer acceptance及company financial共同鍵閉合。
 -->

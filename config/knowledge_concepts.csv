@@ -342,6 +342,7 @@ stage:pfas-change-qualification,stage,PFAS 替代變更資格驗證,PFAS substit
 stage:pfas-company-financial-attribution,stage,PFAS 公司與財務歸因,PFAS company financial attribution|PFAS materiality,concept:semiconductor-pfas-exposure,把同一物質 產品 場址 客戶 法規 資格結果 數量價格成本與公司分母接起的節點
 process:pfas-site-mass-balance,process,PFAS 場址質量平衡,PFAS site mass balance|PFAS substance flow ledger,concept:semiconductor-pfas-exposure,固定物質 場址與期間並把期初 進料 產品帶出 期末 回收 處理 破壞 廢棄 空水土釋放與殘差放在同一質量分母對帳
 metric:pfas-use-release-waste-boundary,metric,PFAS 使用、釋放與廢棄物流邊界,PFAS use release waste boundary|PFAS flow denominator contract,process:pfas-site-mass-balance,分開製造進口 使用 現場釋放 場外轉移 回收 處理 破壞 最終處置與殘差並禁止用採購量替排放或公司財務
+process:pfas-claim-passport,process,PFAS 主張十欄護照,PFAS claim passport|outside-one-law intentionally added free-of non-detect contract,concept:semiconductor-pfas-exposure,先分開單一法規不適用 法律配方 行銷或量測證明 再固定statement物件版本物質範圍證據模式方法基質樣本批次分析極限品質決策門檻結果法域受眾責任人與變更觸發 禁止四種證明互相代簽
 component:pfas-process-chemistry,component,PFAS 製程化學品,PFAS process chemistry|photoresist surfactant wet chemistry,concept:semiconductor-pfas-exposure,直接參與微影 濕式清洗 蝕刻 剝離 電鍍或平坦化配方功能的含氟化學品
 component:fluorinated-process-gases,component,含氟製程氣體,Fluorinated process gases|PFC HFC etch chamber clean,concept:semiconductor-pfas-exposure,用於電漿蝕刻 沉積或腔體清潔並需同時追反應選擇性與排放控制的氣體
 component:fluoropolymer-process-components,component,氟聚合物製程零件,Fluoropolymer process components|PTFE PFA liner seal pipe filter,concept:semiconductor-pfas-exposure,以氟聚合物製作或內襯的管件 密封 桶槽 濾材與設備零件

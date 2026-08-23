@@ -7776,6 +7776,17 @@ class ResearchCenterTest(unittest.TestCase):
             "## 同一台蝕刻設備，為什麼可能落進六個法規抽屜",
             "## 「找到替代分子」為什麼離量產還很遠",
             "## 建一份可重算的 PFAS qualification pack",
+            "## 四張看似相同的 PFAS 標籤，其實是四份不同證明",
+            "| `outside Maine §1614 under §4(K)` |",
+            "把 semiconductor（含裝入電子設備者）及其製造",
+            "### 截至 2026-08-24，三條版本線各自停在哪裡",
+            "### ND 的門檻不是實驗室隨手填的一個數字",
+            "7 個 spiked samples 與 7 個 method blanks",
+            "### 一份 claim passport 至少要有十欄",
+            "| 8. Decision rule and result |",
+            "`outside one regulation／exempt`",
+            "只有 ND，不得倒推 intentionally-added status",
+            "sampling SE／t 不適用",
             "## 買進 100 公斤，不代表排放 100 公斤：PFAS 的四本帳",
             "### 先辨認四本帳各自在回答什麼",
             "### 用一個固定場址年看懂分母差異",
@@ -7794,8 +7805,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 16),
-            ("research_claim", 17), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 25),
+            ("research_claim", 22), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -7824,6 +7835,7 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:pfas-company-financial-attribution,stage,PFAS 公司與財務歸因",
             "process:pfas-site-mass-balance,process,PFAS 場址質量平衡",
             "metric:pfas-use-release-waste-boundary,metric,PFAS 使用、釋放與廢棄物流邊界",
+            "process:pfas-claim-passport,process,PFAS 主張十欄護照",
         ):
             self.assertIn(concept, concepts)
 
@@ -7841,13 +7853,14 @@ class ResearchCenterTest(unittest.TestCase):
             / "semiconductor_pfas_exposure.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 半導體 PFAS 七關曝險鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 24)
         for edge_target in (
             "from_id: company:4755", "from_id: company:4770",
             "from_id: organization:echa", "from_id: organization:us-epa",
             "to_id: group:material", "to_id: group:semiequip",
             "to_id: process:pfas-site-mass-balance",
             "to_id: metric:pfas-use-release-waste-boundary",
+            "to_id: process:pfas-claim-passport",
         ):
             self.assertIn(edge_target, graph)
 
@@ -7885,6 +7898,152 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(
             phase["graphIds"],
             ["semiconductor-pfas-exposure"],
+        )
+
+    def test_pfas_claim_passport_separates_applicability_composition_marketing_and_measurement(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-12_semiconductor_pfas_exposure.md"
+        ).read_text(encoding="utf-8")
+
+        meta = topic.split("<!-- research_topic", 1)[1].split("-->", 1)[0]
+        for immutable in (
+            "source_published_at: 2026-06-03",
+            "last_reviewed_at: 2026-08-12",
+            "review_due: 2026-09-15",
+            "thesis_claim_id: C1",
+            "base_confidence: medium",
+        ):
+            self.assertIn(immutable, meta)
+        self.assertIn(
+            "reason: separated_outside_one_regulation_intentionally_added_"
+            "free_of_and_non_detect_claim_passports_without_thesis_clock_refresh",
+            topic,
+        )
+
+        source_contracts = {
+            "S17": (
+                "source_kind: living_index",
+                "subsection 4.K 的 semiconductor／製造設備與材料全節豁免",
+                "section history through PL 2025 c.67",
+                "頁面標示 data extracted 2025-10-20",
+                "legislature.maine.gov/statutes/38/title38sec1614.html",
+            ),
+            "S18": (
+                "source_kind: document",
+                "published_at: 2012-10-11",
+                "file pp.4–5 的 §260.1–.3",
+                "file pp.8–9 的 §260.9(a)–(c)",
+                "bf4c62dc0c089c7aaa86b7e79a8c263ce23349b4331c0de2b5637f6bc27c14d4",
+            ),
+            "S19": (
+                "source_kind: living_index",
+                "Method 1633A 段落的 40 PFAS",
+                "Method 1621 段落的 aqueous AOF",
+            ),
+            "S20": (
+                "source_kind: document",
+                "non-detect 應描述為 not detected 而非 zero／not present",
+                "2ff1c4f8732ce0e6b1958bf89f2832d0200dd6d12c3f87da2006c6d08399a94c",
+            ),
+            "S21": (
+                "source_kind: living_index",
+                "generic DL／QL 的區分",
+                "不是現行 40 CFR Part 136 MDL procedure",
+            ),
+            "S22": (
+                "source_kind: living_index",
+                "Title 16 顯示 up to date as of 2026-08-20",
+                "Part 260 source 仍列 77 FR 62124, Oct. 11, 2012",
+                "ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260",
+            ),
+            "S23": (
+                "source_kind: living_index",
+                "Current Action／Proposed Methods Update Rule 22",
+                "page last updated 2026-02-25",
+                "epa.gov/cwa-methods/methods-update-rules",
+            ),
+            "S24": (
+                "source_kind: document",
+                "published_at: 2024-12-05",
+                "PDF file p.28／document p.20 的 §9.2.2–.3",
+                "afbe5241be2638cc802795871e9fc1d235af271c87cde9d4e206a0e585c4f2ae",
+            ),
+            "S25": (
+                "source_kind: living_index",
+                "99% method-blank distinction",
+                "至少 7 spikes＋7 blanks及至少 3 batches",
+                "在 3 個不同 calendar dates 製備，並在 3 個不同 calendar dates 分析（製備與分析可同日）",
+                "ecfr.gov/current/title-40/chapter-I/subchapter-D/part-136/appendix-Appendix%20B%20to%20Part%20136",
+            ),
+        }
+        for source_id, contracts in source_contracts.items():
+            block = topic.split(f"source_id: {source_id}", 1)[1].split("-->", 1)[0]
+            for contract in contracts:
+                self.assertIn(contract, block)
+
+        for claim_id, label, sources in (
+            ("C18", "verified", "S17"),
+            ("C19", "verified", "S18,S22"),
+            ("C20", "verified", "S19,S23"),
+            ("C21", "verified", "S20,S21,S24,S25"),
+            ("C22", "inference", "S17,S18,S19,S20,S21,S22,S23,S24,S25"),
+        ):
+            block = topic.split(f"claim_id: {claim_id}", 1)[1].split("-->", 1)[0]
+            self.assertIn(f"label: {label}", block)
+            self.assertIn(f"supporting_source_ids: {sources}", block)
+        c18 = topic.split("claim_id: C18", 1)[1].split("-->", 1)[0]
+        self.assertIn("明文排除於整節", c18)
+        self.assertIn("先未受 subsection 4 豁免", c18)
+        self.assertIn("未被 subsection 2.D／3 排除", c18)
+        self.assertIn("產品含 intentionally added PFAS", c18)
+        self.assertIn("免於 Maine §1614，不等於 PFAS-free", c18)
+        c21 = topic.split("claim_id: C21", 1)[1].split("-->", 1)[0]
+        self.assertIn("as_of: 2026-08-24", c21)
+        self.assertIn("取 MDLs 與 MDLb 較大", c21)
+
+        graph = (
+            ROOT / "notes" / "knowledge_graph"
+            / "semiconductor_pfas_exposure.md"
+        ).read_text(encoding="utf-8")
+        edge = graph.split("edge_id: KG-PFAS-I20", 1)[1].split("-->", 1)[0]
+        self.assertIn("to_id: process:pfas-claim-passport", edge)
+        self.assertIn("evidence_state: inference", edge)
+        self.assertIn("Maine本節明文豁免半導體", edge)
+
+        with (ROOT / "notes" / "research_topics" / "scan_log.csv").open(
+            encoding="utf-8", newline=""
+        ) as fh:
+            scan = next(
+                row for row in csv.DictReader(fh)
+                if row["scan_id"] == "scan-2026-08-24-pfas-claim-passport"
+            )
+        self.assertEqual(scan["scope"], "partial")
+        self.assertEqual(
+            scan["source_domains"],
+            "legislature.maine.gov;ftc.gov;epa.gov;ecfr.gov",
+        )
+        for contract in (
+            "§1614(4)(K)",
+            "outside-one-law",
+            "N=9 個正式官方 source objects",
+            "共同 passport N=0",
+            "691 個 active sources",
+        ):
+            self.assertIn(contract, scan["coverage_note"])
+
+        snapshot = json.loads((
+            ROOT / "notes" / "research_method_reviews"
+            / "2026-08-24_12.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(snapshot["snapshotId"], "RMA-2026-08-24-12")
+        self.assertEqual(snapshot["claims"]["active"], 786)
+        self.assertEqual(snapshot["sources"]["active"], 691)
+        self.assertEqual(snapshot["graphs"]["activeEdges"], 854)
+        self.assertEqual(snapshot["scans"]["events"], 149)
+        self.assertEqual(
+            snapshot["scans"]["latestId"],
+            "scan-2026-08-24-pfas-claim-passport",
         )
 
     def test_section301_policy_route_separates_tariff_gates_from_company_finance(self):

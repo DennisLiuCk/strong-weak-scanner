@@ -48,6 +48,14 @@ reason: separated_pfas_manufacture_use_release_waste_fate_and_site_mass_balance_
 evidence: sources:S1,S7,S15,S16
 -->
 
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: separated_outside_one_regulation_intentionally_added_free_of_and_non_detect_claim_passports_without_thesis_clock_refresh
+evidence: sources:S17,S18,S19,S20,S21,S22,S23,S24,S25
+-->
+
 <!-- research_source
 source_id: S1
 role: regulator_or_policy
@@ -302,6 +310,150 @@ url: https://www.epa.gov/system/files/documents/2026-04/ry_2025_rfi_final_3.24.2
 locator: PDF p.72（文件標示 64）Section 5 分列 on-site air／water／land releases；pp.100–105（文件標示 92–97）Section 8 分列 recycling、energy recovery、treatment、disposal／other releases 及 off-site transfers，並要求按 reported chemical weight 與資料精度填報；本地 SHA-256 0f2d11ec24f9bd5699d309b92854ebedd6db9e7157d20cacb63453acff2806e8
 limitation: TRI 只適用符合產業／人員／化學品與 threshold 條件的美國設施及 TRI-listed chemical；Form R 欄位與估計不等於所有 PFAS、所有 fab、台灣場址、最終接收端 fate、風險或公司財務
 independence_group: us-epa-tri
+-->
+
+<!-- research_source
+source_id: S17
+role: regulator_or_policy
+source_kind: living_index
+publisher: Maine Legislature
+title: MRS Title 38, §1614 — Products containing PFAS
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://legislature.maine.gov/statutes/38/title38sec1614.html
+locator: subsection 1.D／1.F–H 的 intentionally-added／PFAS／product／component 定義，subsection 2 開頭及 2.A(2)–(3) 的通知母體與欄位，subsection 2.D／3 的通知排除／waiver，subsection 4.K 的 semiconductor／製造設備與材料全節豁免，subsection 8 的違規疑慮與 30 日 certificate 條件；section history through PL 2025 c.67，頁面標示 data extracted 2025-10-20
+limitation: Maine §1614(4)(K) 已把 semiconductor（含納入電子設備者）及其製造 equipment／materials 排除於本節，因此本來源只能示範 legal applicability／statement contract，不能建立半導體的 Maine 通知義務；本節豁免也不等於 PFAS-free、沒有 intentionally added PFAS、其他法域合規或個別法律意見。2026-08-24 capture 只能證明官方頁面當時顯示的固定文字與 history，不能冒充 2026 legislative session 全法案 census
+independence_group: maine-pfas-products-law
+-->
+
+<!-- research_source
+source_id: S18
+role: regulator_or_policy
+source_kind: document
+publisher: United States Federal Trade Commission
+title: 16 CFR Part 260 — Guides for the Use of Environmental Marketing Claims, Final Guides
+published_at: 2012-10-11
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.ftc.gov/sites/default/files/documents/federal_register_notices/guides-use-environmental-marketing-claims-green-guides/greenguidesfrn.pdf
+locator: Federal Register 77 FR 62122；PDF file pp.4–5 的 §260.1–.3（scope、B2B、net impression、reasonable basis／competent evidence、product／package／portion）及 file pp.8–9 的 §260.9(a)–(c)／examples（direct／implied、qualification、similar risk、product-category association、trace／background、material harm、not intentionally added）；原檔 12 pages，SHA-256 bf4c62dc0c089c7aaa86b7e79a8c263ce23349b4331c0de2b5637f6bc27c14d4，file pp.3–10 已渲染核對
+limitation: Green Guides 表達 FTC 對一般美國環境行銷宣稱的行政指引，§260.1 明示不自行 bind FTC／public；它不是 PFAS-specific composition／test standard、其他法域法律或個案法律意見，§260.9 也不指定某一 PFAS method、matrix 或 universal numerical threshold
+independence_group: us-ftc-green-guides
+-->
+
+<!-- research_source
+source_id: S19
+role: regulator_or_policy
+source_kind: living_index
+publisher: United States Environmental Protection Agency
+title: CWA Analytical Methods for Per- and Polyfluorinated Alkyl Substances (PFAS)
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.epa.gov/cwa-methods/cwa-analytical-methods-and-polyfluorinated-alkyl-substances-pfas
+locator: Method 1633A 段落的 40 PFAS／多種 matrix／QC，以及 Method 1621 段落的 aqueous AOF、method-defined parameter、known interferences、不能辨識 individual organofluorines；頁面 last updated 25 February 2026
+limitation: 這是 CWA environmental-media 方法入口，不是產品 PFAS-free 或 intentionally-added 判定；1633A 只涵蓋列出的 40 analytes，1621 的 AOF 也包含可能來自非 PFAS 的 organofluorines，且兩方法尚未成為全國 CWA compliance monitoring 的強制方法
+independence_group: us-epa-cwa-pfas-methods
+-->
+
+<!-- research_source
+source_id: S20
+role: regulator_or_policy
+source_kind: document
+publisher: United States Environmental Protection Agency
+title: Data Quality Assessment — A Reviewer's Guide, EPA QA/G-9R
+published_at: 2006-02-01
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.epa.gov/sites/default/files/2015-08/documents/g9r-final.pdf
+locator: PDF file p.58／document p.52 的 Values below Detection Limits；non-detect 應描述為 not detected 而非 zero／not present，濃度未知但位於 zero 與 detection limit 間，並須保留適當 DL 與依 non-detect 比例／sample size 選擇方法；原檔 61 pages，SHA-256 2ff1c4f8732ce0e6b1958bf89f2832d0200dd6d12c3f87da2006c6d08399a94c，file pp.57–59 已渲染核對
+limitation: 這是一般 environmental data-quality 指引，並非 PFAS-specific method、產品合規、free-of 行銷標準或個別風險結論；它也明示沒有一套適用所有 non-detect data 的通用處理法
+independence_group: us-epa-data-quality-guidance
+-->
+
+<!-- research_source
+source_id: S21
+role: regulator_or_policy
+source_kind: living_index
+publisher: United States Environmental Protection Agency Region III
+title: Regional Guidance on Handling Chemical Concentration Data Near the Detection Limit in Risk Assessments
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.epa.gov/risk/regional-guidance-handling-chemical-concentration-data-near-detection-limit-risk-assessments
+locator: Reporting DLs 段落對 generic DL／QL 的區分，以及 Non-detection v. zero concentration 與 decision path；頁內轉述的 DURA 1990 IDL／MDL taxonomy 不作本文現行 CWA method definition
+limitation: 這是 EPA Region III 為 risk assessment 提供、用來 augment 而非 replace national guidance 的一般方法文件；不是現行 40 CFR Part 136 MDL procedure、PFAS-specific analytical method、產品 composition／free-of standard、法定／客戶 acceptance limit 或個案風險結論
+independence_group: us-epa-regional-detection-limit-guidance
+-->
+
+<!-- research_source
+source_id: S22
+role: regulator_or_policy
+source_kind: living_index
+publisher: Electronic Code of Federal Regulations / United States Federal Trade Commission
+title: 16 CFR Part 260 — Guides for the Use of Environmental Marketing Claims, current codified view
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260
+locator: Title 16 顯示 up to date as of 2026-08-20；Part 260 source 仍列 77 FR 62124, Oct. 11, 2012；§260.1–.3 的 scope／B2B／net impression／substantiation／object boundary 與 §260.9 free-of current codified text
+limitation: eCFR 是持續更新且 authoritative but unofficial 的 codified view；頁首的 Title 16 last-amended date 不表示該日 Part 260 本身改版，也不替代 Federal Register、個案法律意見或 PFAS-specific method／threshold
+independence_group: us-ftc-green-guides
+-->
+
+<!-- research_source
+source_id: S23
+role: regulator_or_policy
+source_kind: living_index
+publisher: United States Environmental Protection Agency
+title: Methods Update Rules — Proposed Methods Update Rule 22 current action
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.epa.gov/cwa-methods/methods-update-rules
+locator: Current Action／Proposed Methods Update Rule 22；2024-12-06 proposal、2025-03-24 comment close、proposed Method 1633A／1621 additions to 40 CFR Part 136；page last updated 2026-02-25
+limitation: 頁面把 MUR22 標為 proposed current action，不是 final promulgation；它能固定 2026-08-24 本輪可見的 EPA rulemaking posture，不能預測 final date、final text、permit adoption 或產品合規
+independence_group: us-epa-cwa-pfas-methods
+-->
+
+<!-- research_source
+source_id: S24
+role: regulator_or_policy
+source_kind: document
+publisher: United States Environmental Protection Agency
+title: Method 1633A — Analysis of 40 PFAS in Aqueous, Solid, Biosolids, and Tissue Samples by LC-MS/MS
+published_at: 2024-12-05
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.epa.gov/system/files/documents/2024-12/method-1633a-december-5-2024-508-compliant.pdf
+locator: PDF file p.28／document p.20 的 §9.2.2–.3：各 laboratory／target analyte 的 MDL 應依 40 CFR Part 136 Appendix B 建立；LOQ 由各 lab 設於 demonstrated quantitation range 中最低 initial calibration standard 濃度或更高，且 ML／reporting limit／quantitation limit／LOQ 同義只限本 method；原檔 78 pages，SHA-256 afbe5241be2638cc802795871e9fc1d235af271c87cde9d4e206a0e585c4f2ae，file pp.27–29 已渲染核對
+limitation: 這是 environmental matrices 的 Method 1633A，不是 finished-product PFAS-free certificate；pooled example MDLs 不能替個別 lab／analyte／matrix 的值，且 S19／S23 顯示本方法尚未 nationally required for CWA compliance monitoring
+independence_group: us-epa-cwa-pfas-methods
+-->
+
+<!-- research_source
+source_id: S25
+role: regulator_or_policy
+source_kind: living_index
+publisher: Electronic Code of Federal Regulations / United States Environmental Protection Agency
+title: 40 CFR Part 136 Appendix B — Method Detection Limit, Revision 2
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-136/appendix-Appendix%20B%20to%20Part%20136
+locator: Title 40 顯示 up to date as of 2026-08-20；Definition、II(2)(b)／(d)–(e)、II(3)–(4) 與 III：MDL 的 99% method-blank distinction，至少 7 spikes＋7 blanks及至少 3 batches；在 3 個不同 calendar dates 製備，並在 3 個不同 calendar dates 分析（製備與分析可同日），MDLs 與 MDLb 取較大、持續收集／至少每 13 months 重算，以及 method／analyte／matrix／data 可重建紀錄
+limitation: Appendix B 是具名方法的 MDL procedure，不定義 PFAS substance universe、LOQ、產品抽樣、free-of marketing claim 或法律／客戶 decision threshold；eCFR 為 authoritative but unofficial current codified view
+independence_group: us-epa-cwa-mdl-regulation
 -->
 
 <!-- research_claim
@@ -593,11 +745,109 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: Maine 38 M.R.S. §1614 先定義 intentionally added PFAS 與 product／component，再把 semiconductor（含納入電子設備者）及其製造 equipment／materials 明文排除於整節；只有先未受 subsection 4 豁免，且未被 subsection 2.D／3 排除、產品含 intentionally added PFAS，且該 use 已由主管機關依 rule 判定為 currently unavoidable 的通知母體，條文才要求 PFAS purpose、CAS／amount 或指定 fallback，主管機關也只在有理由相信違反 subsection 5／7 時可要求 30 日內提供 no-intentionally-added certificate 或通知停售
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S17 subsections 1.D／1.F–H、2／2.D、3、4／4.K 與 8 直接固定定義、通知母體與排除、整節豁免／半導體豁免及 certificate 觸發條件
+boundary: 半導體與其製造設備／材料免於 Maine §1614，不等於 PFAS-free、沒有 intentionally added PFAS、其他法域或客戶規範合格；本文不是個別產品法律意見，也不由此推論實驗室零含量
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: FTC Green Guides 的 free-of 指引不是「儀器讀值必須等於零」：在 trace／background level、該量不造成消費者通常聯想到的 harm、且未刻意添加三條件同時成立時，產品仍可能使用 free-of claim；若以相似 environmental risk 的替代物取代，或該物質本來就不會出現在該產品類別，宣稱仍可能 deceptive
+supporting_source_ids: S18,S22
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S18 final guide 逐條列出三個條件與兩個 deception boundaries；S22 current eCFR capture 顯示 16 CFR Part 260 up to date as of 2026-08-20，且 Part 260 source 仍列 77 FR 62124, Oct. 11, 2012
+boundary: Green Guides 是一般美國環境行銷指引，不是 PFAS-specific 分析法、全球法律結論或任何產品的現成背書；是否可宣稱仍要由責任人按實際 statement、audience、evidence 與現行法審查
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: EPA CWA 方法頁把兩種測量鏡頭明確分開：Method 1633A 對指定 matrices 測 40 種具名 PFAS；Method 1621 在 aqueous matrix 測 method-defined AOF，可廣泛看 organofluorine presence，卻不能辨識是哪個 individual organofluorine，且可能同時包含非 PFAS 含氟物質
+supporting_source_ids: S19,S23
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S19 的 Method 1633A／1621 sections 直接列出 analyte count、matrix、QC、AOF interpretation 與 known limitations；S23 的 2026-02-25 current-action 頁仍把兩方法列在 Proposed MUR22
+boundary: 兩種方法都不是「所有產品、所有 PFAS、所有法域」的共通零含量證書；截至頁面版本，兩者也尚未透過 rulemaking 成為全國 CWA compliance monitoring 強制方法
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: EPA QA/G-9R 明示 non-detect 應寫成 not detected，而不是 zero 或 not present；Method 1633A 又要求每個 laboratory 為每個 target analyte 依 40 CFR Part 136 Appendix B 建 MDL，並把 LOQ 設在其 demonstrated range 內最低 initial calibration standard 濃度或更高。現行 Appendix B 把 MDL 定義為 99% 信賴下可與 method blank 區分的最低 measured concentration，初始值至少要有 7 個 spikes、7 個 blanks及至少 3 batches；在 3 個不同 calendar dates 製備，並在 3 個不同 calendar dates 分析（製備與分析可同日），取 MDLs 與 MDLb 較大並持續年度驗證
+supporting_source_ids: S20,S21,S24,S25
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S20 PDF file p.58／document p.52 固定 ND 不等於 zero；S21 提供通俗 DL／QL 區分；S24 §9.2.2–.3 直接固定 Method 1633A lab／analyte MDL 與 LOQ；S25 current Appendix B 固定 MDL 定義、初始資料、較大值與年度驗證程序
+boundary: S21 的 regional generic taxonomy 不替 S24／S25；Method 1633A 中 ML／reporting limit／QL／LOQ 的同義只限該方法，也不替 product sampling、PFAS-free 行銷、legal／customer threshold 或未列 analytes 背書；單一 ND 不能推論整批或整產品
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: PFAS 主張應先選證明類型，再用十欄 passport 固定 exact statement、object／version、substance universe、evidence mode、method／matrix、sample／lot／date、analytical limits／QC、legal／contract／marketing decision rule and result、jurisdiction／audience 與 approver／change trigger；「不在單一法規適用範圍」「沒有刻意添加」「PFAS-free」與「指定方法未檢出」任一張證明都不能替其他三張簽名
+supporting_source_ids: S17,S18,S19,S20,S21,S22,S23,S24,S25
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S17 提供 applicability／intentional-addition 法律 contract，S18／S22 提供 final 與 current-codified free-of marketing statement／qualification，S19／S23 固定 targeted PFAS、AOF 與 current proposed-rule posture，S20／S21／S24／S25 固定 non-detect、Method 1633A MDL／LOQ 與 Appendix B 程序邊界；本文據此整合十欄共同鍵與分流拒絕
+boundary: 十欄 passport 是研究中心的防混淆框架，不是 Maine、FTC 與 EPA 的共同表單或法律意見；本輪沒有審核任何 universe 公司、供應商、客戶、產品、批次或 lab report 的真實 PFAS claim
+verification_needed: 取得同一具名產品／component／material version 的 supplier composition、BOM／recipe、適用法律與 marketing statement，再以匹配 matrix／analyte／method 的 batch-level report、DL／QL／reporting limit、QC 與 customer acceptance 交叉核對
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **PFAS**：一大類含碳氟鍵的人造物質；不同法規採用的結構定義、豁免與濃度門檻可能不同，所以不能只看一個總稱。
+- **intentionally added PFAS（刻意添加 PFAS）**：為了讓產品或 component 達成特定功能而有意加入的 PFAS；它是某些法條的配方／用途鍵，不等於實驗室已證明零殘留。
+- **PFAS-free／free-of**：對外表示產品不含某類物質的行銷宣稱；必須寫清物件、物質範圍與例外。FTC §260.9 沒有替 PFAS 定義 universal substance list、method 或數值門檻，也不能只靠一個低於偵測限的樣本替整個產品家族背書。
+- **non-detect／ND（未檢出）**：指定樣本用指定方法測指定 analytes 時，沒有得到高於該方法判定門檻的可報結果；它不是零、也不是「所有 PFAS 都不存在」。
+- **analyte（分析物）**：方法實際要找的具名物質。方法列 40 種 PFAS，只能回答這 40 種的結果，不能自動代表數千種其他 PFAS。
+- **matrix（基質）**：樣本本身的材料或介質，例如水、土壤、污泥、組織、塗層或聚合物；同一方法在不同 matrix 的萃取、干擾與偵測能力可能不同。
+- **DL（偵測極限）**：把低濃度訊號與背景可靠區分的下限；低於它不能把未知濃度填成零。40 CFR Part 136 Appendix B 的 MDL 還明定 99% method-blank distinction、replicates、batches 與年度驗證，其他 method 的近似名稱不能直接沿用。
+- **QL／LOQ（定量極限）**：能以已知 precision／bias 定量的門檻。Method 1633A 要各 lab 設在 demonstrated range 內最低 initial calibration standard 或更高；只有在該方法內，ML、reporting limit、quantitation limit 與 LOQ 才視為同義。
+- **reporting limit／RL（報告限）**：實驗室或專案約定可正式報數值的門檻；它可能受方法、稀釋、樣本量與專案要求影響，所以必須連同 units 與版本一起保存。
+- **AOF（可吸附有機氟）**：EPA Method 1621 的 method-defined aggregate parameter；能作廣泛含氟篩查，但不能指出是哪個 individual PFAS，也可能含非 PFAS 的有機氟來源。
+- **CWA（Clean Water Act）**：美國《清潔水法》；本文談的 1633A、1621 與 Part 136 都在其 environmental monitoring 脈絡，不能直接搬成半導體 finished-product 規格。
+- **QC（品質控制）**：用 blank、spike、recovery、calibration verification 等檢查量測系統是否受污染、偏差或失控；QC pass 仍不等於法律、客戶或行銷主張 pass。
+- **eCFR**：美國現行聯邦法規的持續更新電子彙編，頁面自稱 authoritative but unofficial；應保存 capture date，並在個案需要時回查 Federal Register 與正式法源。
+- **Green Guides**：FTC 對環境行銷宣稱的指引，涵蓋 statement、net impression、substantiation 與 qualification；它不自行定義 PFAS、分析方法或產品數值門檻。
 - **substance（物質）**：具有特定化學身分的單一物質；研究時至少要能對到名稱、結構或可查核識別碼。
 - **CAS**：化學物質常用的登錄識別碼；有號碼能幫助定位，但法規可能用結構定義涵蓋沒有號碼的物質，也可能排除有號碼的物質。
 - **non-polymer（非聚合物）**：不是長鏈重複單元構成的物質；部分小分子含氟製程化學品、氣體與界面活性劑屬於這一類。
@@ -642,7 +892,6 @@ resolution:
 - **POR**：Process of Record，正式量產使用的製程版本；候選材料進入 POR 前通常還要完成整合、良率與文件核准。
 - **yield（良率）**：投入產品中符合規格的比例；替代材料在單項測試通過，仍可能因缺陷或整合互動使良率下降。
 - **SDS**：Safety Data Sheet，安全資料表；能提供危害與部分成分資訊，但商業機密、濃度範圍或未列微量添加物可能使它不足以單獨完成 PFAS inventory。
-- **PFAS-free（不含規則所定 PFAS）**：依指定法規定義與檢測／供應鏈證據判定不含受涵蓋物質；不能只憑產品名稱、行銷文字或「含氟較少」宣稱。
 - **financial attribution（財務歸因）**：把同一物質、產品、客戶、期間、數量、價格與成本接到公司總收入或毛利分母；缺一端就不能把法規題材算成公司貢獻。
 
 ### 三句話抓重點
@@ -791,6 +1040,126 @@ SIA PAG case study 提供一個很好的反例：替代不是把配方表中的�
 
 這份 pack 也能處理「豁免後續用」。只是 candidate 由新材料改成 risk-management plan，test matrix 增加
 emission monitoring、waste、supplier communication、maintenance 與替代研發 milestone。
+
+## 四張看似相同的 PFAS 標籤，其實是四份不同證明
+
+**不在某一法規範圍、配方沒有刻意加入、包裝可以寫 free-of、實驗室報 non-detect，是四個不同單位回答四個不同問題。**
+第一張由法律／合規按 jurisdiction、statute version、產品分類與市場路徑裁決；第二張由供應鏈依
+BOM／recipe 簽 composition；第三張是 marketer 對受眾作出的宣稱；第四張只是某個 sample 在某個
+method、matrix、analyte list 與門檻下的量測結果。把它們壓成一個
+「PFAS-free＝yes」欄位，會讓採購、客戶、實驗室與投資人以為彼此已經背書。
+
+### 先選你要的證明，不要先選聽起來最安心的字
+
+| 看似相近的標籤 | 真正在回答 | 至少要有的底稿 | 絕對不能順手外推 |
+|---|---|---|---|
+| `outside Maine §1614 under §4(K)` | 具名產品在指定日期是否落於這一州、這一節法條的 semiconductor exemption | §4(K) 固定文字、產品／part 角色、market route、法條版本／日期、legal owner 與 review | 不能推成 PFAS composition、沒有刻意添加、PFAS-free、ND、其他州／國家／permit／客戶規範合格 |
+| `does not contain intentionally added PFAS` | 特定產品／component 是否有為功能而刻意加入、且是否符合指定法域文字 | 法條版本、產品與 component、PFAS definition、BOM／recipe、supplier declaration、責任人與日期 | 不能寫成分析上絕對零、其他法域合規或所有 batch 都未受背景污染 |
+| `PFAS-free／free-of` | 對特定 audience 傳達的產品環境屬性是否有足夠 substantiation | exact statement、產品範圍、物質 universe、trace／background 與 intentional-addition 邊界、相似風險替代物、證據與 qualifier | 不能只憑一張 ND 報告宣稱全部 PFAS、全部 component、所有未來版本都 free-of |
+| `non-detect／ND` | 指定 sample 的指定 analytes，是否低於指定方法的 detection／reporting boundary | sample／lot／date、matrix、method revision、analyte list、units、DL／QL／RL、dilution、blank／spike／recovery 與 lab qualifier | 不能寫成濃度等於零、未測 PFAS 不存在、未刻意添加、法規合規、整批或產品家族相同 |
+
+**先看 Maine 對半導體的答案：§1614(4)(K) 把 semiconductor（含裝入電子設備者）及其製造
+equipment／materials 排除於整節。** 所以本文不能用 Maine 的 notification 或 certificate 欄位替半導體
+建立義務；「免於 Maine §1614」也不等於 PFAS-free、沒有 intentionally added PFAS、其他法域或客戶規範合格。
+
+Maine 仍是一個好用的反例教材，因為它先固定 applicability，再定義 product、component、PFAS 與
+`intentionally added`。只有對未被豁免、含 intentionally added PFAS 且已被判定為 currently unavoidable
+use 的產品，subsection 2 才進入 purpose、CAS／amount 或指定 fallback 的通知欄位；主管機關也要先有理由
+相信產品違反 subsection 5／7，才可要求 manufacturer 在 30 日內提供 certificate 或通知停售。每一個條件都
+是 legal decision rule，不能被一張 lab ND 報告抹掉。
+
+FTC Green Guides 則屬第三種，也就是行銷宣稱。其一般 `free-of` 指引允許在三條件同時成立時仍存在 trace／background
+amount：該量不造成消費者通常聯想到的 harm、而且不是刻意加入。反過來，若只是換成帶來相似
+environmental risk 的另一物質，或該物質原本就不會出現在這類產品，free-of 仍可能 misleading。
+因此 free-of 是要被 substantiated 與 qualified 的行銷主張，不是小數點後很多個零的別名。
+
+### 截至 2026-08-24，三條版本線各自停在哪裡
+
+- **Maine：** 官方 §1614 頁面仍顯示 subsection 4.K semiconductor 全節豁免，section history 到
+  PL 2025 c.67；但頁面自己標示資料抽取日為 2025-10-20。因此本文只採「本輪官方頁面顯示的固定
+  文字」，不把它冒充 2026 legislative session 全法案 census 或個案法律意見。
+- **FTC：** current eCFR 的 Title 16 顯示 up to date as of 2026-08-20，Part 260 source 仍列
+  77 FR 62124（2012-10-11），§260.1–.3 與 §260.9 的 codified text 仍可定位。eCFR 是
+  authoritative but unofficial；若個案要出貨或行銷，仍須由責任人核對 Federal Register 與現行法。
+- **EPA CWA methods：** EPA Methods Update Rules 頁在 2026-02-25 更新後，仍把 MUR22 列為
+  `Proposed` current action；PFAS methods 頁也仍明說 1633A／1621 在 rulemaking promulgation 前
+  尚非全國 CWA compliance monitoring 強制方法。可以用於具名 permit 或研究，不等於已完成全國納管。
+
+### Targeted 40 種與 AOF，是兩支鏡頭，不是高低分
+
+EPA 的 CWA 方法頁把實驗室鏡頭再拆成兩種。選哪一種取決於問題，不能把其中一張結果改名為
+「total PFAS」。
+
+| 測量鏡頭 | 能回答 | 看不到的東西 | 報告時一定要說 |
+|---|---|---|---|
+| Method 1633A | 在指定 water／soil／biosolids／tissue 等 matrices 中，逐一量 40 種具名 PFAS | analyte list 外的 PFAS；也不直接回答是否 intentionally added | 40-analyte list、matrix、method revision、sample-specific limits、QC 與 qualifiers |
+| Method 1621 AOF | 在 aqueous matrix 中量 method-defined adsorbable organic fluorine，作較廣的含氟篩查 | 無法指出是哪個 individual organofluorine；訊號也可能含非 PFAS 有機氟 | AOF 不是 individual PFAS、known interference、matrix、method revision、limits 與 QC |
+| Supplier／formulation evidence | 說明哪個物質為何被加入產品、在哪個 component／recipe | 不保證背景污染、extractable、排放或 lab result 等於零 | composition version、supplier、批次、concentration basis、change notification 與法域用途 |
+
+截至 S19 頁面版本，1633A 與 1621 都尚未透過 rulemaking 成為全國 CWA compliance monitoring 的
+強制方法；它們更不是半導體零件可直接貼 PFAS-free 的產品認證。方法能測什麼與法律要求用什麼，仍要
+由具名法源、permit、customer specification 與責任人接起來。
+
+### ND 的門檻不是實驗室隨手填的一個數字
+
+Method 1633A §9.2.2–.3 與 current 40 CFR Part 136 Appendix B 把「未檢出」前面的量測契約再拆開：
+
+1. 每個 laboratory 要為每個 target analyte 建立 MDL；pooled example 不是該 lab 的現成答案。
+2. Appendix B 的初始 MDL 至少要把 7 個 spiked samples 與 7 個 method blanks 跑過完整方法，使用
+   至少 3 個 batches；在 3 個不同 calendar dates 製備，並在 3 個不同 calendar dates 分析（製備與
+   分析可同日）；再計算 spike-based MDLs 與 blank-based MDLb，採較大者。
+3. MDL 不是 LOQ。Method 1633A 的 LOQ 要位於該 lab 已證明 quantitation range 內最低 initial
+   calibration standard 濃度或更高，並保存已知 precision／bias；ML／RL／QL／LOQ 同義只限這個方法。
+4. Appendix B 要持續收資料且至少每 13 個月重算；method、analyte、matrix、units、data 與 calculations
+   必須可重建。即使每一步都完成，結果仍只回答這個 sample／analyte／method，不能替法律或行銷簽名。
+
+### 一份 claim passport 至少要有十欄
+
+| 欄位 | 最少保存 | 缺少時的第一個錯誤 |
+|---|---|---|
+| 1. Exact statement | 原文是 outside／exempt、intentionally-added status、free-of，還是 ND；含 qualifier | 四種證明被縮成同一個 yes／no |
+| 2. Object and version | product、component、material、process stream、part／recipe revision | 零件結果冒充整機，舊版冒充新版本 |
+| 3. Substance universe | 法規結構定義、CAS list、target analytes、polymer／non-polymer 與 exclusions | 測 40 種被寫成所有 PFAS |
+| 4. Evidence mode | BOM／recipe／supplier declaration、targeted analysis、AOF 或其他明示方法 | 配方聲明與實驗室結果互相代簽 |
+| 5. Method and matrix | method／revision、萃取、matrix、instrument、dilution 與 interference | 把水樣能力搬到 coating／polymer／finished product |
+| 6. Sample and population | sample／lot／batch／date、sampling plan、chain of custody、N | 一個 sample 冒充整批與所有供應商 |
+| 7. Limits and QC | units、DL／MDL、QL／LOQ、RL、blank、spike、recovery、qualifier | ND 被改寫成零，estimated value 被當精確值 |
+| 8. Decision rule and result | 法律適用／豁免、contract limit、FTC net statement／qualification、pass／fail／ND 與 reviewer | DL 取代法律或客戶門檻，測量結果沒有決策 |
+| 9. Jurisdiction and audience | 法條／permit／customer spec／marketing channel、版本、地區與有效日 | Maine、FTC、EPA、EU 與客戶條款混用 |
+| 10. Owner and change trigger | supplier、lab、legal／marketing approver、expiry、PCN／recipe／method change | 沒人負責重驗，舊證明永久沿用 |
+
+**第一拒絕必須按證明分流：** 四者共同缺 exact statement、object／version、substance universe、decision rule／
+result、法域或 audience、owner／change trigger，先全部退回；接著只要求各自真正需要的證據。
+
+- `outside one regulation／exempt` 缺 jurisdiction、statute／section version、產品／part classification、market
+  route、as-of 與 legal reviewer 就退件；拿 exemption 改寫成 PFAS-free、零風險或其他制度免責，立即退件。
+- `no intentionally added PFAS` 缺 BOM／recipe、supplier declaration、component scope、applicability／exemption
+  與 change control 就退件；不硬塞一個 lab method 來代替配方歷史。
+- `PFAS-free／free-of` 缺 exact direct／implied statement、清楚 qualifier、reasonable substantiation、trace／
+  background、material-harm、intentional-addition 與 similar-risk substitute 判斷就退件；FTC §260.9 沒有替 PFAS
+  指定萬用 method 或數值門檻。
+- `ND` 缺 analyte list、matrix、method revision、sample／lot／date、逐 analyte DL／QL／RL、units 與 QC 就退件。
+
+若只有 ND，不得倒推 intentionally-added status；只有 supplier declaration，不得倒推 lab zero；只有某州
+exemption／certificate，也不得倒推全球合規。
+
+### 多空小作文共用同一張 passport
+
+| 敘事 | 較強版本 | 第一個反證 | 還缺的商業橋 |
+|---|---|---|---|
+| 偏多 | 供應商用共同 claim passport 降低客戶補件與重測，具名替代版本跨 lot、lab、customer spec 重複通過 | claim scope 不同、matrix 不適用、ND limit 高於客戶門檻，或只通過 BOM 聲明未通過 qualification | 客戶 acceptance、production BOM、採購量價、重測工時、出貨與同期公司收入／毛利分母 |
+| 偏空 | 模糊 PFAS-free 宣稱造成退件、重驗、庫存隔離、換料與聲明風險 | 具名產品根本不在適用法域／物質範圍，或既有 passport 與 change control 已完整 | 實際 affected volume、failure／recall、qualification delay、inventory／lab cost 與財務材料性 |
+| 共同底線 | 四種證明各自有 owner、有效期與第一拒絕，且能以共同 product／version／lot key 對上 | 任一張證明被拿去替另一張簽名 | 技術與合規可追溯仍不等於訂單、議價、收入、毛利或投資報酬 |
+
+本段核對 N＝9 個正式 source objects：Maine 法條、FTC final Green Guides／current eCFR，以及 EPA 的
+PFAS methods／MUR pages、Method 1633A、national data-quality guide、regional DL／QL guidance 與 current
+40 CFR Appendix B；實際仍只有三個機構來源鏈，且角色不同，不是九個獨立產品觀測。真實 universe company、
+supplier、product、component、lot、customer specification、lab report 與 financial 的共同 passport N＝0。
+文件不是隨機抽樣，無法估 PFAS-free 宣稱正確率、ND 比例、重驗成本或公司效果，sampling SE／t 不適用。
+S18 共 12 個 file pages，引用 §260.1–.3／§260.9 file pp.4–5、8–9 及相鄰範圍 file pp.3–10 已渲染；S20 共 61 個 file pages，
+引用 file p.58 及前後 file pp.57、59 已渲染；S24 共 78 個 file pages，引用 §9.2.2–.3 file p.28
+及相鄰 file pp.27、29 已渲染，SHA-256 為 afbe5241be2638cc802795871e9fc1d235af271c87cde9d4e206a0e585c4f2ae。
+三份 PDF 與 PNG 都留在 `tmp/`，不進版控。
 
 ## 買進 100 公斤，不代表排放 100 公斤：PFAS 的四本帳
 
@@ -958,6 +1327,12 @@ mechanical life、software／recipe 及 customer change control。
 - [EPA TSCA 8(a)(7) page](https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/tsca-section-8a7-reporting-and-recordkeeping) 與 [April 2026 deadline update](https://www.epa.gov/chemicals-under-tsca/update-reporting-deadline-tsca-pfas-reporting-rule) 支持 historical reporting scope 與 contingent start date，不支持使用禁令。
 - [EPA TSCA 8(a)(7) reporting instructions](https://www.epa.gov/system/files/documents/2024-12/tsca-8a7-reporting-instructions_11-25-24.pdf) 只用來分開 manufacture／import、use、disposal 與 release 欄位；其中舊 submission dates 不覆蓋 S7。
 - [EPA RY2025 TRI Form R instructions](https://www.epa.gov/system/files/documents/2026-04/ry_2025_rfi_final_3.24.26.pdf) 用來分開 on-site release、off-site transfer、recycling、treatment 與 disposal；適用母體不能外推所有 PFAS、所有 fab 或台灣場址。
+- [Maine 38 M.R.S. §1614](https://legislature.maine.gov/statutes/38/title38sec1614.html) 明文豁免 semiconductor 及其製造 equipment／materials；只用來示範 applicability、intentionally-added、notification 與 certificate 的法律 contract，不建立半導體義務、全球 PFAS-free 或 lab-zero 定義。頁面標示 2025-10-20 抽取與 history through PL 2025 c.67，不冒充 2026 session 全法案 census。
+- [FTC final Green Guides, 16 CFR Part 260](https://www.ftc.gov/sites/default/files/documents/federal_register_notices/guides-use-environmental-marketing-claims-green-guides/greenguidesfrn.pdf) 與 [current eCFR](https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-260) 支持一般 free-of 行銷宣稱的 direct／implied、qualification 與 deception 邊界；不是 PFAS-specific composition／testing standard 或個案法律意見。
+- [EPA CWA PFAS methods page](https://www.epa.gov/cwa-methods/cwa-analytical-methods-and-polyfluorinated-alkyl-substances-pfas) 與 [Methods Update Rules](https://www.epa.gov/cwa-methods/methods-update-rules) 用來分開 1633A 的 40 個 target analytes、1621 的 method-defined AOF 與 Proposed MUR22 posture；兩者都不能單獨簽 PFAS-free、intentional-addition 或全球合規。
+- [EPA Method 1633A](https://www.epa.gov/system/files/documents/2024-12/method-1633a-december-5-2024-508-compliant.pdf) §9.2.2–.3 與 [current 40 CFR Part 136 Appendix B](https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-136/appendix-Appendix%20B%20to%20Part%20136) 固定 method-specific MDL／LOQ、replicates、batches、較大值與年度驗證；不是 finished-product claim、法律門檻或客戶 acceptance。
+- [EPA QA/G-9R](https://www.epa.gov/sites/default/files/2015-08/documents/g9r-final.pdf) 支持 non-detect 不是 zero／not present，以及 DL 與 sample-size boundary；這是一般資料品質指引，不替具名 PFAS method、matrix 或法律門檻背書。
+- [EPA Region III detection-limit guidance](https://www.epa.gov/risk/regional-guidance-handling-chemical-concentration-data-near-detection-limit-risk-assessments) 只用來分開 generic DL、QL 與 non-detection／zero；它明示是 augment 而非 replace national guidance，頁內舊 DURA taxonomy 不作現行 CWA MDL 定義。
 - [SEMI PFAS explainer](https://www.semi.org/en/EHS_PFAS_Explainer)、[SIA PAG case](https://www.semiconductors.org/wp-content/uploads/2023/06/FINAL-PAG-Case-Study.pdf) 與 [SIA background paper](https://www.semiconductors.org/wp-content/uploads/2023/05/FINAL-PFAS-Consortium-Background-Paper.pdf) 用來定位用途與 qualification；都是產業來源，不能獨立裁決 proportionality 或市場影響。
 - [上品 2025 年報](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=4770&year=115&mtype=F) 與 [官方內襯設備頁](https://www.alliedsupreme.com/tw/product/product_1-7/product_view-sheet_lining) 支持 fluoropolymer product entry；[三福化 2025 年報](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=4755&year=115&mtype=F) 與 [官方首頁](https://www.sfchem.com.tw/zh-hant/) 支持 process-chemistry／R&D entry，都沒有完成法規或財務歸因。
 
