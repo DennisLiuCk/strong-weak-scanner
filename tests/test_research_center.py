@@ -5137,6 +5137,7 @@ class ResearchCenterTest(unittest.TestCase):
             "| 3. 製程控制與可靠度 |", "| 4. 晶圓節點與客戶產品 |",
             "| 5. 供應商資格與財務轉換 |",
             "added_named_product_boot_production_availability_and_package_denominator_without_thesis_clock_refresh",
+            "added_a16_direct_contact_and_three_axis_connection_architecture_without_thesis_clock_refresh",
             "thesis_claim_id: C6", "last_reviewed_at: 2026-08-12",
             "review_due: 2026-08-16", "base_confidence: medium",
             "## 從成功開機到買得到產品：把第 4 個時鐘再拆九道門",
@@ -5156,6 +5157,21 @@ class ResearchCenterTest(unittest.TestCase):
             "| OEM system design |", "| Unit／wafer／lot |",
             "17 是 2026-08-23 當日 ARK 完整列示的 SKU census",
             "具名外部 foundry 客戶產品、\nwafer／lot／good-die yield",
+            "## 都叫背面供電，孔卻不一定接到同一站",
+            "| 三軸連接護照 | 先問什麼 | 公開研究中的例子 | 少了最容易誤讀成什麼 |",
+            "| 1. 最後落點 |", "| 2. 穿過什麼 |", "| 3. 何時形成 |",
+            "### 五種公開寫法，哪一格其實還是空白",
+            "| imec BPR＋nTSV |", "| imec TSVM |", "| imec BSC |",
+            "| imec via-first TDV |", "| 台積電 A16 SPR |",
+            "TDV、BPR 和 direct contact 不是三個互斥盒子",
+            "### A16 的官方資料，把哪個時鐘往前推了一格",
+            "量產排定於 2026 年第四季",
+            "相同功耗下速度提高 8%–10%",
+            "不能拆成「直接接觸單獨帶來多少」",
+            "### 20 奈米看起來很具體，卻最容易被搬錯地方",
+            "20nm bottom diameter、120nm pitch",
+            "15nm **layout overlay margin**",
+            "尚無一份公開資料同時提供 A16 的落點、幾何、wafer／lot／die 分布、\n良率、客戶與供應商財務共同鍵",
             "## 看到百分比，先填八格比較護照",
             "| 八格比較護照 | 要記下什麼 | 少了會讀錯什麼 |",
             "| 1. 受測物與成熟度 |", "| 3. 固定條件 |",
@@ -5188,10 +5204,10 @@ class ResearchCenterTest(unittest.TestCase):
             "| 4. 電流分母 |", "| 5. 路徑模型 |", "| 6. 導體身分 |",
             "| 7. 電流密度 |", "| 8. 壓降與電損 |", "| 9. 熱與可靠度 |",
             "| 10. 量產與商業 |", "**較強的多方版本**", "**較強的空方版本**",
-            "## 先用五個位置分開「送訊號」和「送電」",
-            "| 本文五個位置 | 它負責什麼 | 和下一位置怎麼接 | 主要工程問題 | 不能直接推成 |",
+            "## 先用五個位置看 BPR＋nTSV 的「送訊號」和「送電」範例",
+            "| BPR＋nTSV 範例五個位置 | 它負責什麼 | 和下一位置怎麼接 | 主要工程問題 | 不能直接推成 |",
             "| 1. 正面訊號佈線 |", "| 2. 背面金屬網路 |",
-            "| 3. 奈米級背面導通孔 |", "| 4. 埋置電源軌 |",
+            "| 3. imec 範例的 nTSV |", "| 4. 此範例的 BPR |",
             "| 5. 電晶體 |",
             "## 再把背面加工排成六個製程步驟",
             "| 本文六個步驟 | 在做什麼 | 主要接力角色 | 要驗收什麼 | 本輪可確認到哪裡 |",
@@ -5216,14 +5232,17 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S24", "source_id: S25",
             "claim_id: C22", "claim_id: C23", "claim_id: C24",
             "claim_id: C25", "claim_id: C26",
-            "monitor_id: T4", "monitor_id: T5", "monitor_id: T6", "PROVision 10",
+            "source_id: S26", "source_id: S27", "source_id: S28",
+            "claim_id: C27", "claim_id: C28", "claim_id: C29",
+            "monitor_id: T4", "monitor_id: T5", "monitor_id: T6",
+            "monitor_id: T7", "PROVision 10",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 80
+            sum(line.startswith("- **") for line in glossary.splitlines()), 88
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5240,9 +5259,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 25),
-            ("research_claim", 26), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 6),
+            ("research_topic", 1), ("research_source", 28),
+            ("research_claim", 29), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 7),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -5283,6 +5302,8 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:rail-current-drop-loss-hotspot-boundary,metric,電壓、電流、壓降、損耗與熱點邊界",
             "process:backside-product-maturity-passport,process,背面供電具名產品成熟度護照",
             "metric:node-tile-sku-system-volume-boundary,metric,節點、晶粒、SKU、整機與產量分母",
+            "process:backside-connection-architecture-passport,process,背面連接架構三軸護照",
+            "metric:connection-endpoint-medium-integration-boundary,metric,落點、穿越材料與整合時序邊界",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 背面供電路徑與製程接力", graph)
@@ -5303,9 +5324,18 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-BSP-I24", "to_id: metric:rail-current-drop-loss-hotspot-boundary",
             "edge_id: KG-BSP-I25", "to_id: process:backside-product-maturity-passport",
             "edge_id: KG-BSP-I26", "to_id: metric:node-tile-sku-system-volume-boundary",
+            "edge_id: KG-BSP-I27", "to_id: process:backside-connection-architecture-passport",
+            "edge_id: KG-BSP-I28", "to_id: metric:connection-endpoint-medium-integration-boundary",
         ):
             self.assertIn(edge, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 30)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 32)
+        scans = (
+            ROOT / "notes" / "research_topics" / "scan_log.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "scan-2026-08-24-tsmc-a16-direct-contact-architecture-passport",
+            scans,
+        )
 
     def test_compute_connect_station_four_separates_three_axis_optics_and_evidence_gates(self):
         topic = (

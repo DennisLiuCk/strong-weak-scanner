@@ -440,6 +440,54 @@ limitation: ARK 是會更新的產品索引且頁面明示資料可能變更；1
 independence_group: intel
 -->
 
+<!-- research_source
+source_id: S26
+role: company_release
+source_kind: document
+publisher: 2026 IEEE Symposium on VLSI Technology and Circuits
+title: A16 Angstrom-class CMOS Technology featuring Enhanced Nanosheet Transistors with Super-Power Rail
+published_at: 2026-06-16
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://vlsi26.mapyourshow.com/8_0/sessions/session-details.cfm?ScheduleID=246
+locator: 2026-06-16 T1.5 session title、Abstract 與 speaker；TSMC 作者稱 A16 已完成 development／qualification、SPR 採 novel backside direct contact、相對 N2P 的三組平台結果，以及 mass production slated for Q4'26
+limitation: published_at 以 2026-06-16 正式場次日期固定證據時點，不視為網頁發布 timestamp；會議頁轉述 TSMC 作者的 A16 平台主張，qualified 範圍未定義，Q4'26 是未來計畫，且沒有公開直接接觸的 landing target、材料、幾何、wafer／lot／die 樣本、良率、客戶、供應商或財務分母
+independence_group: tsmc
+-->
+
+<!-- research_source
+source_id: S27
+role: company_release
+source_kind: document
+publisher: 2026 IEEE Symposium on VLSI Technology and Circuits
+title: 2026 VLSI Technical Tipsheet - A16 Super Power Rail
+published_at: 2026-04-30
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.vlsisymposium.org/wp-content/uploads/2026/04/2026-VLSI-Technical-Tipsheet-REVISED-FINAL-4.25.26-1-1.pdf
+locator: PDF reader p.4（網頁文字索引 P3），並渲染相鄰 pp.3、5；p.4 列 Device／F-BEoL→Bond→Flip→Si thinning→VB & B-BEoL 流程、A16 SPR 的 backside direct contact（VB）、ARM core benchmark、N2P 比較與 Q4'26 計畫；SHA-256 9e826bdf7bc4d195155796cf427bfafc306dc4d282297b0300c66b48e90c365c
+limitation: published_at 以 PDF creation／modification metadata 2026-04-30 CST 固定版本，不把檔名 4.25.26 當已驗證發布日；這與 S26 同屬 TSMC 消息鏈，圖為高階流程且未公開 bonding 類型、薄化厚度、VB 落點與材料、overlay、分布、良率或 SPR 單獨 PPA 貢獻
+independence_group: tsmc
+-->
+
+<!-- research_source
+source_id: S28
+role: other_primary
+source_kind: document
+publisher: imec
+title: The path to high-density front- and backside wafer connectivity
+published_at: 2025-08-19
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.imec-int.com/en/articles/path-high-density-front-and-backside-wafer-connectivity
+locator: Backside through-dielectric vias with 20nm bottom diameter 段落；via-first TDV 先形成於 frontside STI、薄化超過 STI floor 後從背面露出，並列 20nm bottom diameter、120nm pitch、55nm-wide backside metal line 與 15nm layout overlay margin 的 typical test structure
+limitation: 這是 imec 研究載具與 typical test structure；TDV 名稱說明穿過 STI dielectric，不自動等於背面供電或直接接到電晶體，幾何與 layout margin 也不是 A16／18A 設計規則、across-wafer overlay 分布、量產良率、客戶資格或供應商財務
+independence_group: imec
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -856,6 +904,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: 2026 VLSI 官方資料把台積電 A16 的 Super Power Rail 描述為 novel backside direct contact，並以 Device／F-BEoL、Bond、Flip、Si thinning、VB & B-BEoL 顯示高階流程；TSMC 作者稱平台已完成 development／qualification，量產排定 2026Q4
+supporting_source_ids: S26,S27
+contrary_source_ids:
+as_of: 2026-06-16
+basis: S26 session title／Abstract 直接寫 developed and qualified、backside direct contact 與 mass production slated for Q4'26；S27 p.4 的流程圖與截面示意以 VB 標示直接接觸，兩者屬同一 TSMC 消息鏈
+boundary: qualified 的範圍未公開，不能改寫成客戶認證、量產良率或已量產；Q4'26 在 2026-08-24 仍是未來計畫，公開圖也不足以判定 VB 最後落在 source／drain、特定 contact metal、BPR 或其他端點，更沒有材料、幾何、工具與供應商
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: verified
+status: active
+claim: imec 的公開研究顯示，BPR／nTSV、TSV-middle 與直接 backside connectivity 的差異首先在導通落點；另一路 via-first TDV 則先在 frontside STI 內形成，薄化後因穿過 STI dielectric 而得名，TDV 名稱本身不表示一定直接接到電晶體或只用來送電
+supporting_source_ids: S3,S8,S28
+contrary_source_ids:
+as_of: 2025-08-19
+basis: S3 把 BPR／nTSV 明列為一種 specific implementation，S8 分列 BPR、TSVM、BSC-E／BSC-M／BSC-M* 的不同連接終點，S28 則直接解釋 via-first TDV 在 STI 中形成及穿越 dielectric 的命名
+boundary: 三份 imec 文件涵蓋不同研究載具與年份，不能拼成任何晶圓廠的單一量產流程；S28 的 20nm bottom、120nm pitch、55nm-wide backside metal line 與 15nm layout margin 只屬 typical test structure，不是 A16／18A 規格、across-wafer overlay、良率或供應商資格
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C29
+label: inference
+status: active
+claim: 閱讀背面供電連接時，應至少分開記錄三個可能彼此耦合的面向：最後落點、垂直結構穿過的材料區域、導通結構在正面／接合／薄化流程中的形成時序；direct contact、BPR／nTSV 與 TDV 因而不是三個可直接排序或互斥的世代名稱
+supporting_source_ids: S3,S8,S26,S27,S28
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S3／S8 顯示 BPR、TSVM、BSC 的落點與中繼不同；S28 顯示 TDV 名稱來自穿越 STI dielectric，而該份特定示範另採 via-first 時序；S26／S27 又只把 A16 公開到 backside direct contact 與高階流程。交集支持三面向護照，而不是用一個 via 名稱補完全部結構
+boundary: 三面向護照是研究中心的閱讀框架，不是 TSMC、imec 或產業標準；公開案例只證明部分組態，不表示三個面向可以任意組合、均可製造或具有相同成本與可靠度。不能把 imec test-structure 幾何搬到 A16，也不能把 A16 完整平台相對 N2P 的速度、功耗與密度主張拆成 SPR 單一貢獻或跨廠排名
+verification_needed: 晶圓廠以具名節點公開可追溯剖面、landing target、穿越材料、via-first／middle／last 時序、幾何分布、接點電阻、wafer／lot 良率與客戶產品，並由供應商端核對資格及財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -942,6 +1041,20 @@ trigger: 同一具名外部 foundry 客戶產品公開 tape-out、production、S
 invalidation: 若 18A 只由 Intel 內部產品承接、外部客戶持續不具名或取消，或上市 SKU／OEM designs 無法轉成穩定出貨、良率與 field quality，外部商業成熟度維持未證或下修
 -->
 
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C27,C28,C29
+metric: A16 direct contact 與 BPR／nTSV、TSVM、BSC、TDV 是否以落點、穿越材料、整合時序及研究／量產分母完整公開，而非只靠同一個 backside-via 名稱互相補值
+source_ids: S3,S8,S26,S27,S28
+watch_source_ids: S4
+frequency: monthly
+frequency_detail: 每月核對 TSMC A16 技術頁、VLSI 正式文件與 imec 連接研究；晶圓廠公開剖面、尺寸、量產或客戶資料時立即重審三軸護照
+next_check: 2026-09-30
+trigger: A16 或其他具名量產節點公開 landing target、穿越材料、via 形成時序、幾何與接點電阻分布、wafer／lot 良率及客戶產品，且供應商 qualification 能雙向核對
+invalidation: 若後續正式剖面顯示本文分類漏掉關鍵中繼、同一名詞在不同流程有不同終點，或 TSMC 公開資料否定本文對 A16 未揭露欄位的判斷，就修正相應軸與邊界；未公開前不以 imec 尺寸替 A16 補值
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -984,6 +1097,13 @@ to: triaged
 reason: added_named_product_boot_production_availability_and_package_denominator_without_thesis_clock_refresh
 evidence: sources:S21,S22,S23,S24,S25
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_a16_direct_contact_and_three_axis_connection_architecture_without_thesis_clock_refresh
+evidence: sources:S26,S27,S28
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -1001,6 +1121,14 @@ evidence: sources:S21,S22,S23,S24,S25
 - **背面金屬**：做在晶圓背面的供電金屬網路；它仍要透過導通結構與前側元件連接。
 - **前側後段金屬（BEOL）**：電晶體完成後疊在晶圓正面的多層金屬與介電層，負責訊號與傳統供電佈線；它也是部分背面供電封裝的散熱路徑。
 - **超級電源軌（Super Power Rail）**：台積電 A16 的背面供電實作名稱；名稱本身不公開完整流程、工具或供應商。
+- **背面直接接觸（Direct backside contact）**：從背面建立較直接接觸的架構方向；「直接」仍要說明最後落點，名稱本身不公開 A16 是否含其他中繼、端點、材料或尺寸。
+- **VB**：台積電 2026 VLSI Technical Tipsheet／技術摘要在 A16 SPR 圖中使用的背面直接接觸標籤；公開圖沒有替 VB 展開通用全名，也沒有揭露最後落點。
+- **導通落點**：一條背面垂直連接最後碰到的結構，可能是埋置電源軌、前側金屬、源／汲極外延區或接觸金屬；它比孔的名稱更能說明電力怎麼接近元件。
+- **TSV-middle（TSVM）**：imec 研究中的替代連接路徑，以較高的垂直導通結構接到前側金屬側邊，不使用 BPR 中繼；它不是 A16 已公開的結構名稱。
+- **背面直接連接（BSC）**：imec 研究中把背面連接直接接到源／汲極外延區或其接觸金屬的方案家族；BSC-E、BSC-M 等研究變體不能自動套成台積電 SPR。
+- **穿介電層導通孔（TDV）**：穿過介電材料的垂直連接；imec 的 via-first 研究把它做在淺溝槽隔離區，名稱只告訴讀者穿過什麼，不保證終點或用途。
+- **淺溝槽隔離（STI）**：用介電材料隔開相鄰元件的區域；TDV 可在這個區域形成，和穿過剩餘矽層的 nTSV 是不同命名軸。
+- **Via-first／middle／last**：垂直連接相對元件、前側金屬、接合與薄化流程的形成時序；時序不同，不表示落點或用途必然不同。
 - **背面供電導通（PowerVia）**：Intel 18A 家族的背面供電實作名稱；不能因名稱相近就假設和台積電採相同結構。
 - **A16／A12**：A16 是台積電規劃結合超級電源軌、並把量產排在 2026 下半年的具名製程；A12 是公司規劃於 2029 年把同一供電方向延伸到 A14 平台的後續節點，不代表 A16 已實際量產。
 - **N2P**：台積電 N2 家族的延伸製程，也是公司公開 A16 速度、功耗與密度指標所用的比較基準；比較 A16 和 N2P 不能自動拆出背面電軌的單獨貢獻。
@@ -1093,6 +1221,7 @@ evidence: sources:S21,S22,S23,S24,S25
 ### 接下來怎麼追
 
 - 先問新消息推進哪一個時鐘：設計、製程成形、製程控制、客戶產品量產，還是供應商財務。
+- 再把背面連接拆成三問：最後接到哪裡、穿過什麼材料、在製程哪個時間點形成；孔名相同也不能省略。
 - 再查它量的是哪個失效位置：對準、接觸面積、接點電阻、電力完整性、應力、良率或可靠度。
 - 遇到「提升幾％」時，先填完受測物、基準、固定條件與量測範圍；百分比沒有共同分母就不跨公司排名。
 - 遇到毫伏、安培或瓦特時，再固定供電參考點、負載功率、等效路徑、總電流／局部電流密度及完整散熱邊界。
@@ -1106,6 +1235,7 @@ evidence: sources:S21,S22,S23,S24,S25
 - 「動態電壓下陷降低 10 倍」和「電壓下陷改善超過 30%」看似衝突；在知道受測物、基準與活動向量前，為什麼其實不能比較？
 - 同樣少掉 30 毫伏，若原本供電是 0.75 伏或 0.50 伏，留給電晶體的相對裕量為什麼不同？
 - 公司說平台有 200 多個 design、產品索引有 17 個 SKU 時，為什麼仍不能推出處理器出貨量、良率或外部晶圓代工客戶數？
+- 兩份文件都寫「從背面接上」，若一個先到地下電源軌、另一個直接到元件接點，為什麼不能共用孔徑與製程難度？
 
 ## 先用五個時鐘判斷成熟度
 
@@ -1317,19 +1447,92 @@ wafer／lot、可靠度與成本下守住較好的產品裕量；供應商還要
 收益，被局部 current crowding、熱路徑、薄化／接合／量測成本、debug 或可靠度 guard band 吃掉；
 若完整產品只把技術裕量換成更高頻率而未降低每顆合格成本，供應鏈價值量就可能低於題材敘事。
 
-## 先用五個位置分開「送訊號」和「送電」
+## 先用五個位置看 BPR＋nTSV 的「送訊號」和「送電」範例
 
-| 本文五個位置 | 它負責什麼 | 和下一位置怎麼接 | 主要工程問題 | 不能直接推成 |
+以下只示範 imec 公開的 BPR＋nTSV 路徑，方便先看懂一條電力接力；它不是所有背面供電的共同剖面。
+
+| BPR＋nTSV 範例五個位置 | 它負責什麼 | 和下一位置怎麼接 | 主要工程問題 | 不能直接推成 |
 |---|---|---|---|---|
 | 1. 正面訊號佈線 | 在晶片正面傳送資料與控制指令 | 由前側金屬與接點接近電晶體 | 訊號線仍要守住延遲、干擾與佈線空間 | 正面空間增加，不等於整顆晶片效能一定提升 |
 | 2. 背面金屬網路 | 從晶圓背面分配電力 | 把電力送到背面導通孔 | 要控制金屬電阻、熱、應力與整合一致性 | 有背面金屬需求，不等於具名材料已被採用 |
-| 3. 奈米級背面導通孔 | 穿過薄化後的矽，連接背面與元件附近 | 向下接背面金屬，向上接埋置電源軌 | 孔徑、深度、疊對、圓角、接觸面積與填孔缺陷都要受控 | imec／Lam 的研究結構不等於所有量產流程採同一規格 |
-| 4. 埋置電源軌 | 在電晶體下方接收並分配電力 | 讓背面導通結構更靠近電晶體 | 要和元件、材料、設計規則一起整合 | 電源軌是必要元件，不等於某家 IP 或材料商已有收入 |
+| 3. imec 範例的 nTSV | 穿過薄化後的矽，連接背面與元件附近 | 向下接背面金屬，向上接埋置電源軌 | 孔徑、深度、疊對、圓角、接觸面積與填孔缺陷都要受控 | imec／Lam 的研究結構不等於所有量產流程採同一規格 |
+| 4. 此範例的 BPR | 在電晶體下方接收並分配電力 | 讓背面導通結構更靠近電晶體 | 要和元件、材料、設計規則一起整合 | 只在此路徑中是必要中繼，不等於每一種背面供電都需要 BPR，也不等於某家 IP 或材料商已有收入 |
 | 5. 電晶體 | 接收電力並依訊號執行開關與運算 | 同時接上供電與訊號，但兩者來自不同路徑 | 最後仍要驗證電壓、速度、應力、良率與可靠度 | 單一結構成功，不等於完整產品可穩定量產 |
 
-這五個位置不是一張完整晶片設計圖，而是閱讀背面供電的最短路徑：訊號主要留在正面，
+這五個位置不是一張完整晶片設計圖，而是 BPR＋nTSV 範例的最短路徑：訊號主要留在正面，
 電力則從背面金屬經導通孔與埋置電源軌接近電晶體。實際結構會因晶圓廠而異，不能用 imec
 的一般流程替台積電或 Intel 補上未公開的尺寸、材料、工具與供應商。
+
+## 都叫背面供電，孔卻不一定接到同一站
+
+上表畫的是容易入門的 **BPR＋nTSV 路徑**，不是所有背面供電的共同剖面。可以把晶片想成一棟
+地下室進電的大樓：有一種電梯先停在地下總電源軌，再由短支線送進房間；另一種拉長電梯到
+前側金屬；還有一種直接停在元件端子。它們都從背面進來，卻不是同一個孔、同一個終點或
+同一套施工順序。
+
+最安全的做法，是先分開記錄三個在實際流程中可能彼此耦合的面向，而不是把縮寫排成
+「舊世代→新世代」。公開案例只證明部分組態，不代表三個面向能任意組合、都做得出來，
+或具有相同的成本與可靠度：
+
+| 三軸連接護照 | 先問什麼 | 公開研究中的例子 | 少了最容易誤讀成什麼 |
+|---|---|---|---|
+| 1. 最後落點 | 垂直連接最後碰到 BPR、前側金屬、源／汲極外延區，還是接觸金屬？ | BPR＋nTSV、TSVM、BSC-E、BSC-M 的終點不同 | 都叫 backside via，所以電阻、面積與失效模式相同 |
+| 2. 穿過什麼 | 孔主要穿過薄化後的剩餘矽，還是 STI 介電材料？ | nTSV 以穿矽命名；TDV 以穿介電層命名 | TDV 一定直接接到電晶體，或 nTSV／TDV 必然互相取代 |
+| 3. 何時形成 | via 在元件、前側金屬、接合與薄化流程的哪個時間點做？BPR 是否先從正面形成？ | 公開案例各自呈現特定時序與落點，兩欄都要記 | 看過少數案例，就以為任意時序與落點搭配都可製造 |
+
+### 五種公開寫法，哪一格其實還是空白
+
+| 公開寫法 | 文件直接支持的連接方式 | 可以帶走的知識 | 仍不能替它補什麼 |
+|---|---|---|---|
+| imec BPR＋nTSV | 背面金屬經穿過剩餘矽的 nTSV 落到先做好的埋置電源軌 | BPR 是靠近元件的中繼電力幹線 | 試驗載具尺寸不能變成 A16／18A 規格 |
+| imec TSVM | 較高的垂直連接接到前側 M0A 金屬側邊，不用 BPR 中繼 | 沒有 BPR 仍可形成背面連接研究路徑 | 研究比較不是任何晶圓廠已採用的量產配方 |
+| imec BSC | BSC-E 直接接源／汲極外延區；BSC-M 接其接觸金屬 | 「直接」必須再寫清楚接到元件哪一層 | BSC-E／M／M* 不能因字面相近就改名成 SPR |
+| imec via-first TDV | 先在正面 STI 內形成 via，薄化超過 STI floor 後從背面露出 | 此示範同時公開 TDV 的穿越介質與 via-first 形成時序 | TDV 名稱只說穿過介電層，不保證時序、只送電、直接接電晶體或取代 nTSV／BPR |
+| 台積電 A16 SPR | 官方稱 novel backside direct contact，圖中標 VB；高階流程為 Device／F-BEoL→Bond→Flip→Si thinning→VB & B-BEoL | A16 已公開到「直接接觸」與製程接力層級 | VB 最後落點、BSC 變體、材料、孔徑、節距、電阻與量產窗口都未公開 |
+
+這張表也修正一個常見直覺：**TDV、BPR 和 direct contact 不是三個互斥盒子。** TDV 主要描述
+垂直結構穿過介電層，BPR 描述其中一個中繼落點，direct contact 描述接觸關係或是否省略
+某些中繼節點；實際流程也可能同時含多種垂直連接。但現有公開案例只證明部分組態，沒有
+完整剖面前，不能假設任意組合都可製造，也不能只靠名詞判定誰比較先進。
+
+### A16 的官方資料，把哪個時鐘往前推了一格
+
+2026 VLSI 官方場次摘要中，TSMC 作者表示 A16 平台技術已完成 development 與 qualification；
+Technical Tipsheet／技術摘要則畫出上述接合、翻面、薄化與形成 VB／背面金屬的高階順序。這讓公開證據比「只有
+roadmap 名稱」多了一層，卻仍是公司的平台資格主張：qualification 範圍沒有公開，不能改寫成
+客戶認證、跨 wafer／lot 的量產良率，或截至 2026-08-24 已開始大量生產。兩份資料都使用
+`slated for Q4'26`，所以正確動詞仍是「量產排定於 2026 年第四季」，不是「已量產」。
+
+同一組資料把 A16 相對 N2P 的平台結果寫成：相同功耗下速度提高 8%–10%、功耗改善
+15%–20%，以及額外 8%–10% 晶片密度，圖說把最高約 10% 的密度與速度改善連到某 ARM core
+benchmark；公開資料未揭露該實作或樣本數。這三組百分比的主詞是同時包含 enhanced nanosheet、SPR 與設計共同最佳化的
+**完整 A16 平台**；它們不能相加，也不能拆成「直接接觸單獨帶來多少」。公開資料沒有揭露
+wafer、lot、die、實作數、工作負載明細、PVT、原始分布或量測／模擬分界，因而沒有可報的
+sampling SE／t。
+
+### 20 奈米看起來很具體，卻最容易被搬錯地方
+
+imec 的 2025 via-first TDV 研究列出 20nm bottom diameter、120nm pitch；其 typical test
+structure 又以 55nm 線寬的背面金屬配 20nm TDV bottom，留下 15nm **layout overlay margin**。最後一個
+數字是版圖容許量，不是跨晶圓量到的 3σ 疊對分布。較早的 imec BPR／nTSV 路徑另有約
+320nm 深、200nm pitch 的研究實作；這些數字回答各自 test structure 怎麼做，不回答 A16 的 VB
+多大、落在哪裡或能否穩定量產。看到精確尺寸時，至少把「機構、載具、落點、穿越材料、
+時序、量測定義」一起帶走；少一欄就不搬家。
+
+**較強的多方版本**不是「A16 有 direct contact，所以所有背面設備材料都會受惠」，而是 Q4
+計畫後真的出現具名客戶產品，並能以同一剖面對上落點、材料、幾何與接點電阻分布，再跨
+wafer／lot 公開 good-die yield、可靠度與重複出貨；供應商端還要把同一步驟的 qualification、
+交付與財務分子雙向核對。
+
+**較強的空方版本**也不是「研究尺寸不同，所以 A16 做不出來」，而是市場把 imec 的 BPR／nTSV
+或 TDV 尺寸直接貼到未公開的 A16 VB，並把完整平台 PPA 全歸因給 SPR；之後 Q4 計畫沒有轉成
+可定位的產品、良率與出貨，或供應商只停在廣義能力。第一個反證因此是正式剖面與量產分母，
+不是另一個更漂亮的縮寫。
+
+本輪新增 N＝3 份官方來源紀錄：N＝2 份 VLSI／TSMC 文件屬同一家公司消息鏈，N＝1 份 imec
+研究頁屬另一條研究機構鏈；再回查既有 N＝2 份 imec 機制／DTCO 文件。它們不是五個獨立
+產品或量產實驗。目前尚無一份公開資料同時提供 A16 的落點、幾何、wafer／lot／die 分布、
+良率、客戶與供應商財務共同鍵；本文只建立架構邊界，不做跨廠效能排名、公司受惠推估或投資動作。
 
 ## 再把背面加工排成六個製程步驟
 
@@ -1436,8 +1639,11 @@ Lam 與 imec 的 nTSV／BPR 研究讓這條診斷鏈變得具體：如果孔和�
 - [Intel：Core Ultra Series 3 Debut](https://newsroom.intel.com/client-computing/ces-2026-intel-core-ultra-series-3-debut-first-built-on-intel-18a)（launch、預購、終端系統可供應與 200-plus OEM-design 公司主張）。
 - [Intel：Panther Lake Architecture Recap](https://cdrdv2-public.intel.com/866361/ITT_2025_Panther_Lake_Recap1.pdf)（pp.27–29 的 compute／PCD／GPU tile 製程配置差異）。
 - [Intel ARK：Products formerly Panther Lake](https://www.intel.com/content/www/us/en/ark/products/codename/237132/products-formerly-panther-lake.html)（2026-08-23 查得的 17 個 SKU 與 launch-quarter 索引）。
+- [2026 VLSI Symposium：TSMC A16 session](https://vlsi26.mapyourshow.com/8_0/sessions/session-details.cfm?ScheduleID=246)（backside direct contact、平台 development／qualification、N2P 比較與 Q4'26 計畫）。
+- [2026 VLSI Technical Tipsheet](https://www.vlsisymposium.org/wp-content/uploads/2026/04/2026-VLSI-Technical-Tipsheet-REVISED-FINAL-4.25.26-1-1.pdf)（p.4 的 A16 SPR／VB 高階流程、截面示意與 ARM core benchmark）。
+- [imec：The path to high-density front- and backside wafer connectivity](https://www.imec-int.com/en/articles/path-high-density-front-and-backside-wafer-connectivity)（via-first TDV、STI 介電層、typical test structure 幾何與 layout-margin 邊界）。
 
-本篇明列二十三份一手文件或官方頁面，分開建立技術機制、量測比較、設計取捨、電力—熱邊界、
+本篇明列二十六份一手文件或官方頁面，分開建立技術機制、連接架構、量測比較、設計取捨、電力—熱邊界、
 製程控制、晶圓廠路線圖、外部具名設備產品與 Intel 具名內部產品時鐘。它們沒有提供跨公司共同
 良率、具名外部 foundry 客戶、處理器出貨、設備台數、供應商份額、價格或財務分母，也沒有一致
 預期、估值或即時部位資料，因此本文不判斷題材是否已反映。
@@ -1481,6 +1687,7 @@ evidence_boundary: PDK 與 DTCO 需求不等於本地 IP／ASIC 設計服務商�
 
 ## 下一個可證明／否定的節點
 
+- 台積電正式公開 A16 SPR／VB 剖面，逐欄說明落點、穿越材料、via 形成時序、幾何分布與接點電阻，而不是由 imec BSC／TDV 替它補值。
 - 同一 frontside／backside 產品版本公開八格比較護照，並同時提供靜態 IR drop、動態下陷、PPA、熱、可靠度與原始分布。
 - 同一產品從調壓器、封裝、晶片 rail 到電晶體端公開電壓／電流參考點、distributed RLC、局部 current-density、loss map、thermal stack 與 hotspot distribution。
 - 同一具名試驗晶片或客戶產品，同時公開設計取捨、接點電阻、電力完整性與可靠度結果。

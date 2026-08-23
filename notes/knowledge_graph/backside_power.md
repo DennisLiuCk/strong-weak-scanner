@@ -1,8 +1,8 @@
 # 背面供電路徑與製程接力知識圖譜
 
-本圖先把正面訊號與背面送電分開，再沿著設計、製程成形、製程控制、節點產品與供應商財務
-五個時鐘串起證據；效能百分比另經八格比較護照分開靜態壓降、動態下陷與條件式 PPA，再用
-電力—熱十欄護照接上 rail reference、總／局部電流、焦耳損耗、熱路徑與 hotspot。台灣設備、
+本圖先把正面訊號與背面送電分開，再用三軸連接護照區分落點、穿越材料與形成時序，接著沿著
+設計、製程成形、製程控制、節點產品與供應商財務五個時鐘串起證據；效能百分比另經八格比較
+護照分開靜態壓降、動態下陷與條件式 PPA，再用電力—熱十欄護照接上 rail reference、總／局部電流、焦耳損耗、熱路徑與 hotspot。台灣設備、
 材料與 IP 只保留成待驗證的搜尋路由；沒有具名資格認證、重複出貨與財務足跡前，不建立公司
 受惠線。
 
@@ -11,7 +11,7 @@ schema_version: 1
 graph_id: backside-power
 root_node_id: concept:backside-power
 label: 背面供電路徑與製程接力
-summary: 先用背面金屬、奈米級背面導通孔與埋置電源軌讀懂送電路徑，再用八格效能護照區分靜態壓降、動態下陷與條件式 PPA，以十欄電力—熱護照分開參考電壓、總／局部電流、路徑損耗與 hotspot，最後沿設計、製程控制、節點產品、供應商資格與財務歸因五個時鐘前進。
+summary: 先以落點、穿越材料與形成時序三軸分開 BPR／nTSV、TSVM、BSC、TDV 與未公開落點的 A16 VB，再用八格效能護照區分靜態壓降、動態下陷與條件式 PPA，以十欄電力—熱護照分開參考電壓、總／局部電流、路徑損耗與 hotspot，最後沿設計、製程控制、節點產品、供應商資格與財務歸因五個時鐘前進。
 article_ids: MI-2026-08-02-BACKSIDE-POWER-DELIVERY
 status: active
 -->
@@ -614,4 +614,44 @@ review_due: 2026-09-30
 status: active
 boundary: Panther Lake 的 compute tile、PCD、GPU tile、處理器 SKU 與 OEM design 是不同物件分母；ARK 列示與 design 數不能取代 units、wafer／lot yield、外部客戶或 PowerVia 增量歸因。
 next_trigger: 具名產品公開各 tile／node、package／SKU、OEM system、unit／wafer／lot、quality 與 external-customer 對應，且能跨文件重建。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-BSP-I27
+view: industry
+from_id: concept:backside-power
+to_id: process:backside-connection-architecture-passport
+relation: requires
+claim_refs: MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C27,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C28,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C29
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-09-30
+status: active
+boundary: 三面向護照是把 TSMC A16 direct-contact 公開邊界與 imec BPR、TSVM、BSC、TDV 研究差異整合成閱讀框架；不是產業共同標準。公開案例只證明部分組態，不表示這些面向可任意組合、名稱互斥或能排先進程度。
+next_trigger: 具名量產節點公開可追溯剖面、最後落點、穿越材料、via 形成時序、BPR 中繼與客戶產品共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-BSP-I28
+view: industry
+from_id: concept:backside-power
+to_id: metric:connection-endpoint-medium-integration-boundary
+relation: measured_by
+claim_refs: MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C27,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C28,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C29
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-09-30
+status: active
+boundary: imec TDV 的 20nm bottom、120nm pitch、55nm-wide backside metal line 與 15nm layout margin 只屬 typical test structure；TSMC 未公開 A16 VB 落點與幾何，完整 A16 平台 PPA 也不能歸因給單一接觸。
+next_trigger: 同一節點以 across-wafer／lot 分布公開 geometry、overlay、contact resistance、yield 與 reliability，並標示數字所屬 landing、medium、timing 與 test object。
 -->
