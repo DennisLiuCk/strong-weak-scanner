@@ -6,6 +6,9 @@
 線條較粗只能代表已公開的標準、角色或成熟度；沒有具名組態、部署、出貨、份額與損益證據前，
 不代表某個排列組合已商品化，也不代表供應商已取得重大經濟利益。
 
+新增的 ELS 維修紀錄再把個別發射器控制、八發射器模組替換、系統保持上電與鏈路持續服務
+分開；官方程序能證明可服務的路徑存在，不能替代客戶事件、受影響鏈路與換後錯誤結果。
+
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: cpo-networking
@@ -414,4 +417,24 @@ review_due: 2026-09-30
 status: active
 boundary: 八欄端點配對部署護照是研究中心依 Q3450 拓撲提出的需求分母框架，不是 NVIDIA 標準或市場統計；欄位齊全也不自動證明淨模組減量、成本、供應商份額或財務。
 next_trigger: 同一具名 deployment 以共同版本與期間公開端點、料號、每模組埠數、installed／active／spare、維修、baseline 及採購／shipment／財務對帳。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-I18
+view: industry
+from_id: concept:cpo-networking
+to_id: process:cpo-els-serviceability-passport
+relation: requires
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C20,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C21,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C22,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C23
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-09-30
+status: active
+boundary: 研究中心八欄護照依單一 NVIDIA 手冊消息鏈整理；Q3450 文件只證實目前標為 Prototype 的指定型號具有 18×8 ELS 配置、模組級服務、檢查清潔工具、powered-on 與 30 分鐘條件，不證明 hitless、實際受影響 links、MTTR、備品可得性、換後 BER／FEC／flap、客戶部署或財務。
+next_trigger: 具名客戶以同一系統與程序版本公布 emitter／module 故障、受影響 links、流量切換、授權人員、備品工具、逐階段時間戳、清潔結果、換後錯誤與重複 RMA，並與 SLA 及成本對帳。
 -->

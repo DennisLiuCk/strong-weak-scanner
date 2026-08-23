@@ -278,6 +278,22 @@ limitation: 活頁混合 NVIDIA 產品定位、效益 headline、產品清單與
 independence_group: nvidia
 -->
 
+<!-- research_source
+source_id: S17
+role: company_release
+source_kind: living_index
+publisher: NVIDIA
+title: ELS Replacement Procedure for Q3450-LD Systems
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://networking-docs.nvidia.com/xdrswitcheshw/els-replacement-procedure-for-q3450-ld-systems
+locator: 2026-06-04 Last updated 活頁；Introduction 的 inspection→cleaning→reinspection 與失敗後改用另一 ELS；Required Equipment／MaxInspect Task Configuration；Module Removal 的 running system 30 分鐘限制；New ELS Module Installation 的 powered-on replacement 與 30 分鐘限制
+limitation: 這是 NVIDIA 對單一 Q3450-LD 產品的服務程序；沒有揭露故障偵測準確度、受影響鏈路、流量切換、實際更換時間、第一遍清潔通過率、備品可得性、換後 BER／FEC／link-flap、客戶 field 事件或財務結果，系統可保持上電也不等於資料鏈路不中斷
+independence_group: nvidia
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -548,6 +564,62 @@ verification_needed: 客戶或 NVIDIA 公開同版 endpoint-pair BOM／port cens
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: NVIDIA Q3450 FRU 文件列出 18 個 ELS 模組、每個含 8 個可個別控制的雷射發射器，合計 144 顆；同頁把每顆發射器一對一映射到一個 MPO、每個 MPO 承載 4×200 Gbps 光學 lanes／合計 800 Gbps，並要求 ELS 維修、替換或 RMA 由 NVIDIA 服務代表處理且使用核准模組
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S15 FRU Replacements 頁逐項列出 18×8＝144、individually controlled emitters、emitter-to-MPO 1:1、4×200 Gbps／800 Gbps，以及 approved module 與 NVIDIA service representative 的服務邊界
+boundary: 這只證實指定手冊頁的產品配置與服務單位，不表示單顆發射器可獨立拆換、任一故障只影響一條鏈路、移除模組時八條映射光路必然全斷或全不斷；FRU 頁的一對一 MPO 敘述也沒有消除 C16 保留的 72／144 前面板接頭衝突，更不證明部署量、故障率、備品或財務貢獻
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: NVIDIA Q3450-LD ELS 維修程序要求先檢查、必要時清潔再複檢，視需要重複 2–3 次，仍失敗則改用另一 ELS；程序另列檢查／清潔／抽取工具、軟體 task 與報告保存，並允許替換時系統保持上電，但 ELS 模組不可缺席超過 30 分鐘
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S17 Introduction、Required Equipment、MaxInspect Task Configuration、Module Removal、Cage Inspection／Cleaning、New ELS Module Assembly 與 Installation 直接列出順序、工具、報告、powered-on 與 30-minute constraints
+boundary: 允許系統保持上電不等於受影響資料鏈路、工作負載或整個 fabric 持續服務；30 分鐘是模組缺席上限，不是公開 MTTR、SLA 或建議耗時，文件也沒有給換前流量排空、換後 link／BER／FEC 驗收、客戶事件分母或操作者實績
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: 判讀 CPO 可維修性時，至少要把故障／控制粒度、實際替換單元、受影響光路、系統電源狀態、流量服務狀態、授權人員與備品工具、污染檢查及時間窗、換後功能與錯誤驗收分帳；在 Q3450 上，個別發射器控制、八發射器 ELS 模組替換、系統可保持上電與鏈路是否不中斷是四個不同命題
+supporting_source_ids: S15,S17
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S15 把 18 個 ELS、每模組 8 個 individually controlled emitters 與模組級服務分開，S17 又把 authorized process、inspection／cleaning、30-minute absence 與 powered-on system 寫成獨立條件；因此本研究中心以八欄護照保存不可互換的維修證據
+boundary: 八欄護照是研究中心的證據稽核框架，不是 NVIDIA、OIF 或客戶的正式 SLA／維修標準；它不主張單顆故障一定要換整個模組、替換必然中斷八條鏈路、powered-on 等於 hitless，也不由程序存在推算 MTTR、可靠度、備品、成本或公司財務
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: 截至 2026-08-23 擷取的 NVIDIA Q32xx／Q34xx 手冊 Ordering Information，Q3450-LD 的料號描述帶有 ES，Lifecycle Phase 列為 Prototype
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S15 手冊首頁 Ordering Information 的 Q3450-LD 列直接顯示 SKU 920-9B36M-00MX-8ES、description 結尾 ES 與 Lifecycle Phase Prototype
+boundary: 這是動態手冊對單一 Q3450-LD 型號的現行生命週期標籤，不證明沒有私有評估、試點或後續狀態變更；也不與 C1 的 Spectrum-X Ethernet Photonics full-production 敘述互相替代，因兩者不是同一具名型號與網路產品，維修程序完整更不能被改寫成客戶大量部署
+verification_needed:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -669,6 +741,13 @@ to: triaged
 reason: added_q3450_endpoint_pair_boundary_without_thesis_or_clock_refresh
 evidence: sources:S15,S16
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_q3450_els_control_replacement_and_service_process_boundary_without_thesis_or_clock_refresh
+evidence: sources:S15,S17
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -686,6 +765,13 @@ evidence: sources:S15,S16
 - **近封裝光學（NPO）**：把光引擎靠近交換晶片、但仍保留可分開安裝的封裝安排；OIF 也描述可在組裝或返修時拆裝的 socketed NPO。
 - **外部雷射光源（ELS）**：把連續波雷射留在光引擎之外，再用另一條光路供光；光引擎靠近交換晶片，不代表雷射也必須封在旁邊。
 - **ELSFP**：OIF 定義的前面板可插拔外部雷射形式，以 blindmate 光電連接器讓失效光源可在現場替換；它不是完整資料收發光模組。
+- **FRU（現場可更換單元）**：維修時按指定程序整件抽換的硬體單元；能換 FRU 不代表裡面每個元件都能單獨更換，也不保證服務不中斷。
+- **控制粒度／維修粒度**：控制粒度回答哪個元件可被個別開關或監測，維修粒度回答實際一次要換掉多大的單元；兩者可以不同。
+- **維持上電／維持服務**：維持上電只代表設備不必整機斷電；維持服務還要證明受影響鏈路、流量與工作負載沒有中斷或已成功切換。
+- **Gbps**：每秒十億位元；`4×200 Gbps＝800 Gbps` 是指定光學 lanes 的名目合計，不等於扣除協定與錯誤更正後的有效資料量。
+- **RMA／MTTR／SLA**：RMA 是故障品退回維修或更換流程，MTTR 是從故障到恢復的平均修復時間，SLA 是服務承諾；30 分鐘模組缺席上限不能替代這三本帳。
+- **Ordering Information／Lifecycle Phase／Prototype／ES**：Ordering Information 是官方訂購資訊，Lifecycle Phase 是產品生命週期標籤；Prototype 表示目前仍在原型階段，ES 只保留為該列的料號描述標記，文件未在此頁展開全名，兩者都不能由維修手冊存在推成大量部署。
+- **Installation**：把新模組清潔、檢查並裝回指定位置的安裝步驟；完成 installation 仍要另外確認鏈路、錯誤與工作負載恢復。
 - **前面板**：交換器機箱面向維修人員、安裝光模組與光纖接頭的位置。
 - **連接埠**：交換器對外收送一條連線的介面；產品開始生產不等於已知部署了多少個連接埠。
 - **鏈路端點（link endpoint）**：一條光連線的其中一端；判斷 CPO 是否取代可插拔模組時，必須把交換器端與另一台交換器或運算設備端分開記錄。
@@ -774,12 +860,14 @@ evidence: sources:S15,S16
 
 - 先追平台端是否公布具名產品的光引擎位置、訊號處理方式與雷射位置，而不是只給 CPO、NPO、LPO 或 pluggable 標籤。
 - 再追同一組態的 link budget、跨供應商互通、故障率、現場更換時間、交換器數與連接埠數，並由平台端和供應商端對上同一版本、期間、驗收與出貨。
+- 看到「可在上電時更換」時，再追哪個模組被抽換、多少鏈路受影響、流量如何切換、誰能操作、用了哪些工具、花多久，以及換後 BER／FEC／link-flap 是否重新通過。
 - 看到「零 flap」時，先追埠數、每埠時長、交換器／光源共享結構、失效分類、事件日誌、設限與比較組，再決定能否套可靠度模型。
 - 最後追日月光投控是否拆出矽品相關產能、收入、毛利與現金流；其他台灣公司沒有具名文件前，維持研究候選。
 
 ### 想一想
 
 - 如果 CPO 光引擎使用可插拔外部雷射，光源壞掉和光引擎壞掉的更換範圍會一樣嗎？
+- 一個含八顆發射器的 ELS 模組可在系統上電時更換，是否足以證明八條對應光路與工作負載不中斷？
 - 兩個產品都叫 CPO，但一個完整重定時、另一個走線性介面，它們的功耗與訊號驗收責任能直接比較嗎？
 - IA 已經發布，但廠商沒有公開同一應用的 link budget、互通矩陣與現場結果時，技術信心應該升到哪一層就停？
 - 100 萬 port-device-hours 沒有 link flap，為什麼仍不能寫成「失效率為零」或「MTBF 無限大」？
@@ -877,6 +965,64 @@ OIF 的 current-work 頁把 pluggable、NPO、CPO 與 retimed、transmit-retimed
 OIF framework 支持的是表中的工程方向，不是統計比較。沒有同一產品、條件與樣本的失效次數、
 測試時間和信賴區間，就不能宣稱外部或整合雷射「較可靠」；能說的只有它們把故障、散熱、損耗
 與控制責任放在不同位置。
+
+## 雷射模組可更換，不等於故障只影響一顆、鏈路不中斷
+
+把一個 ELS 想成裝有八盞燈的維修盒：每盞燈可以個別控制，不代表維修人員能逐盞抽換；如果
+實際可拆單元是整個盒子，控制粒度與維修粒度就不同。NVIDIA Q3450 的具名文件正好把這兩層
+分開：平台有 18 個 ELS，每個含 8 個可個別控制的發射器，總數 144；實際服務單元則是整個
+ELS 模組。[S15]
+
+同一 FRU 頁把每顆發射器一對一映射到一個 MPO，並列 4×200 Gbps／800 Gbps；但前文保留的
+72／144 MPO 官方頁面衝突仍未解決，因此這裡只讀模組內部與服務粒度，不拿它重算前面板接頭、
+模組需求或故障範圍。
+
+| 維修問題 | 官方文件可直接證實 | 仍不能推出 |
+|---|---|---|
+| 故障／控制粒度 | 每個 ELS 有 8 個 individually controlled emitters | 可逐顆拆換、故障偵測一定精準，或只影響一條鏈路 |
+| 實際替換單元 | 服務頁以整個 ELS 模組做 replacement／repair／RMA，要求核准模組與服務代表 | 一顆 emitter 失效一定要換整盒，或換盒時八條映射光路一定全斷／全不斷 |
+| 維修前處理 | 先 inspection，必要時 cleaning，再 inspection；可重複 2–3 次，仍失敗改用另一 ELS | 第一次清潔通過率、污染是否為主要故障原因，或備品一定在現場 |
+| 工具與紀錄 | 程序列出抽取、清潔、光學檢查工具、軟體 task，並要求保存 inspection report | 任意工具、任意人員或另一家模組都能得到相同結果 |
+| 電源與時間窗 | 系統可保持 powered-on；移除 ELS 後不可超過 30 分鐘未裝回 | `powered-on` 等於 hitless、30 分鐘就是實際 MTTR，或工作負載不需切換 |
+| 換後驗收 | 公開頁只走到新模組清潔、檢查與裝回 | 受影響 links 已恢復、BER／FEC／flap／溫度通過，或客戶 SLA 已達標 |
+
+這裡最重要的一句是：**維持上電，不等於維持鏈路服務。** 文件沒有說移除一個 ELS 時，對應
+光路如何排空、繞路或恢復，也沒有公開從告警、派工、備品到換後驗收的完整時間。因此
+「field-replaceable」比整機不可修更前進一格，卻不能直接改寫成零停機或低維修成本。
+
+一份可重建的外部雷射維修護照至少保留八欄：
+
+| 維修護照欄位 | 至少保存什麼 | 少了最容易誤寫成 |
+|---|---|---|
+| 1. 系統與版本 | switch、ELS、韌體、手冊與程序 revision | 所有 CPO／ELS 都有相同維修邊界 |
+| 2. 故障與控制定位 | emitter／module ID、告警、診斷與誤報處理 | 個別可控制等於個別可替換 |
+| 3. 替換與映射單元 | 一次抽換的 FRU、內含 emitters、對應 links／MPO | 一顆故障只影響一顆，或整機都受影響 |
+| 4. 電源與流量狀態 | powered state、受影響 traffic、排空、繞路與 workload impact | 上電維修等於服務不中斷 |
+| 5. 人員、備品與工具 | 授權 owner、核准料號、現場庫存、抽取／清潔／檢查工具 | 文件有程序等於任何場站隨時能執行 |
+| 6. 污染與檢查紀錄 | 檢查圖、清潔次數、pass／fail、換用另一模組原因 | 清潔成功等於原始故障已根治 |
+| 7. 事件時間軸 | 告警、隔離、抽出、裝回、重訓練、恢復與 RMA 時間 | 30 分鐘上限等於 MTTR 或 SLA |
+| 8. 換後服務結果 | link、traffic、BER／FEC、flap、溫度、重複故障與客戶簽收 | 模組裝回等於長期可靠度與部署成功 |
+
+還要把「有完整維修手冊」和「已大量部署」分開。截至本輪擷取，NVIDIA 同一手冊的 Ordering
+Information 仍把 Q3450-LD 料號標成 `ES`、Lifecycle Phase 列為 `Prototype`。[S15] 這不否定
+工程樣品、私有試點或日後轉階段，也不能拿來推翻不同具名產品的 production 敘述；它只提醒
+讀者：服務程序能證明平台已設計維修路徑，不能自行補成 installed base、現場維修實績或收入。
+
+### 多空小作文：共用同一份維修事件帳
+
+- **偏多條件**：大量 field 事件顯示故障能穩定定位到單一 ELS，流量先成功切換，核准備品與工具
+  在場，檢查／清潔／換件可在時限內完成；換後 link、BER／FEC 與工作負載連續通過，受影響
+  link-hours 與重複 RMA 都低於同代可比較方案。
+- **偏空條件**：污染與連接問題反覆發生、需要多次清潔或換第二顆模組，服務代表、專用工具或
+  備品造成等待；受影響光路不能無損繞路，換後仍出現 flap／錯誤或再次 RMA，生命週期成本便
+  可能高於單看「可上電更換」的想像。
+
+兩邊共同需要具名客戶的事件分母、受影響 links、流量切換、備品可得性、逐階段時間戳、清潔
+次數、換後錯誤與重複故障；不能用程序頁取代 field outcome。本輪是 N=1 個目前標為 Prototype
+的 Q3450 產品配置、
+N=1 份 NVIDIA 官方手冊消息鏈，不是客戶或維修事件樣本；18×8＝144 是指定配置的完整列舉，
+不是抽樣估計，因此沒有 sampling SE／t。實際維修事件、MTTR、受影響 link-hours、客戶部署與
+財務共同觀測均為 N=0。
 
 ## 同樣速率與元件，為什麼一條光路通過、另一條失敗
 
@@ -1110,7 +1256,8 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 - [NVIDIA：Vera Rubin 與 Spectrum-X Ethernet Photonics 進入生產，2026-05-31](https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory)
 - [NVIDIA GTC Taipei：列名 TSMC、SPIL、TFC、Foxconn 的製造角色，2026-06-01 更新](https://blogs.nvidia.com/blog/nvidia-gtc-taipei-computex-2026-news/)
 - [NVIDIA：Spectrum-6 同時支援可插拔與 CPO，2026-07-21](https://blogs.nvidia.com/blog/nvidia-spectrum-six-arrives-in-gigascale-ai-factories/)
-- [NVIDIA：Q32xx／Q34xx XDR Switch Systems User Manual](https://networking-docs.nvidia.com/xdrswitcheshw/)（同一手冊的佈線頁寫 72 MPO×2 ports，總覽／規格／可更換元件頁指向 144 MPO×1；衝突未裁決。144 XDR data ports、Q3450 本地 XDR data ports 不使用 OSFP cages 與三種端點拓撲仍可確認）。
+- [NVIDIA：Q32xx／Q34xx XDR Switch Systems User Manual](https://networking-docs.nvidia.com/xdrswitcheshw/)（同一手冊的佈線頁寫 72 MPO×2 ports，總覽／規格／可更換元件頁指向 144 MPO×1；衝突未裁決。144 XDR data ports、Q3450 本地 XDR data ports 不使用 OSFP cages、18×8 個可個別控制的發射器與三種端點拓撲仍可確認）。
+- [NVIDIA：Q3450-LD ELS Replacement Procedure，2026-06-04 更新](https://networking-docs.nvidia.com/xdrswitcheshw/els-replacement-procedure-for-q3450-ld-systems)（列出檢查、清潔、再檢查、專用工具與整顆 ELS 更換程序；系統可維持上電不等於受影響鏈路不中斷，30 分鐘限制也不是 MTTR 或 SLA）。
 - [NVIDIA：Silicon Photonics 產品與展示入口，2026-08-23 capture](https://www.nvidia.com/en-us/networking/products/silicon-photonics/)（同頁分開 local CPO replacement 與 Q3450 連 GB300 racks 的 remote OSFP modules；不是 deployment census）。
 - [Marvell：Ara 1.6T 可插拔 DSP 大量出貨，2026-03-12](https://www.marvell.com/company/newsroom/marvell-1-6t-optical-dsp-ai-data-center-connectivity.html)
 - [ASE：SPIL 為日月光投控子公司，2025-01-16](https://www.aseglobal.com/press-room/spil-hosts-nvidia-founder-and-ceo-at-new-factory-site/)
