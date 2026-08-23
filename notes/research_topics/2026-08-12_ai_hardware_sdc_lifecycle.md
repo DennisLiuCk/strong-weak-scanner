@@ -46,6 +46,13 @@ to: triaged
 reason: added_zero_event_exposure_confidence_and_isolation_evidence_passport_without_thesis_clock_refresh
 evidence: sources:S1,S2,S11,S12
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_diagnostic_quarantine_fru_rma_corrective_action_decision_chain_without_thesis_clock_refresh
+evidence: sources:S4,S6,S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -71,12 +78,15 @@ evidence: sources:S1,S2,S11,S12
 - **可現場更換零件（FRU）**：維修人員可直接更換的模組，例如板卡或電源；找出故障晶片不一定就等於知道該換哪個 FRU。
 - **管理控制器（BMC）**：即使主機作業系統異常，仍可從機外收集紀錄、管理電源、重啟與維修資料的控制器。
 - **退回分析（RMA）**：把疑似故障的零件退回供應商重測、分析或更換；診斷工具報錯不會自動決定是否符合 RMA 條件。
+- **找不到故障（No Fault Found，NFF）**：零件退回供應商後，原問題無法在該零件上重現；它可能來自間歇性問題、診斷不足或換錯零件，不等於現場事件從未發生。
+- **矯正措施（corrective action）**：不只處理眼前故障，還要找出原因與漏檢點，對批次、測試、韌體或設計採取改善，再用後續資料確認問題沒有照原速率重演。
 - **DCGM**：NVIDIA Data Center GPU Manager，提供 GPU 監測與主動診斷；本文引用它的公開測試能力與限制，不把它視為所有加速器的共同標準。
 - **OpenDCDiag**：OCP 規格列出的開源資料中心診斷框架之一；被規格列名不等於已遵循共同 SDC 輸入輸出格式。
 - **Server Component Resilience v1.0**：OCP 的伺服器元件韌性規格版本；它定義測試交換與品質欄位，不代表現有工具都已實作。
 - **OCP**：Open Compute Project，開放資料中心硬體規格社群；本文引用其跨公司共同規格，不代表所有成員產品已完成相同實作。
 - **Q-pool**：quarantine pool 的縮寫；OCP 規格用它指含已知壞與疑似壞設備的隔離池，不代表池內每台都已確診或符合 RMA。
 - **v1.1**：本文引用的 OCP Silent Data Corruption in AI 白皮書版本；版本號只固定本次證據內容，不表示它是產品符合性認證。
+- **OCP GPU RAS v1.7**：本文引用的 GPU／加速器可靠度、可用性與可維修性規格版本；它定義分析、緩解與服務需求，不代表任何產品已通過共同認證。
 - **NIST**：美國國家標準與技術研究院；本文只引用其工程統計方法，不把通用公式當成任何加速器的實測結果。
 - **獨立試驗機會**：每一次都能清楚判定有無指定事件，且不受其他次結果影響的觀測單位；同一台設備重跑通常不能直接假設彼此獨立。
 - **二項試驗**：把每個固定機會只分成事件發生或未發生，並假設共同機率與獨立性的模型；現實分層不符合時要先拆開。
@@ -320,6 +330,22 @@ limitation: HPP／exponential 假設固定事件率；SDC 可能依資料、電�
 independence_group: nist-engineering-statistics
 -->
 
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: OCP GPU and Accelerator RAS Requirements Version 1.7
+published_at: 2025-10-23
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.opencompute.org/documents/ocp-gpu-and-accelerators-ras-requirements-v1-7-10-23-2025-pdf
+locator: PDF file pp.9–10 的 FRU isolation、service action 與 NFF replacement 問題，file pp.17–19 的 detected／uncorrected error containment、reset、offline／spare／degraded-resource mitigation，file pp.44–46 的 analyzer input／output、suggested action 與 confidence，file pp.67–69 Appendix F 的 FRU 與 NFF 詞彙
+limitation: 規格把 telemetry、分析建議、緩解與 FRU 服務串起來，但 file pp.17–19 是較廣的 detected／uncorrected error handling，不能當成 SDC-specific outcome；CPAD 仍在定義中，Appendix F 詞彙表明示 reference only／non-normative。文件沒有供應商 RMA 接受條件、同一序號的 disposition、failure-analysis 根因、矯正措施或改善前後場域結果
+independence_group: ocp-gpu-ras
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -558,6 +584,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: NVIDIA 文件明示 DCGM 診斷不修復也不決定 RMA eligibility；Google Cloud 文件列出的 faulty-host 原因可含 vCPU、軟體或核心；OCP v1.7 則分列 analyzer 建議、FRU service action 與 NFF 詞彙，並說 NFF 可能來自難重現、診斷不足或換錯零件
+supporting_source_ids: S4,S6,S13
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S4 明示 DCGM 不修復、不取代 offline field diagnostics、不決定 RMA eligibility，且 fail 可能來自周邊環境；S6 把 SDC reason 與停止／遷移／修復主機列成 operator 流程並列出非硬體可能原因；S13 分列 analyzer suggested action、FRU isolation／service action 與 reference-only／non-normative Appendix F 的 NFF 詞彙
+boundary: 三份文件不是一套共同端到端流程；本輪在這三份文件中未見同一序號從工具判定一路追到 supplier disposition、根因與矯正措施；NFF 不證明現場事件是假的，換件成功也不單獨證明被拆下零件就是根因
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 研究 SDC 維修閉環時，至少應把診斷判定、營運隔離、FRU 換件、供應商 RMA／處置與矯正措施分成五本可回查的決策帳；流程可以因重測放行、軟體緩解或 NFF 而跳站，但任何一站都不能代替下一站的證據
+supporting_source_ids: S4,S6,S13
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S4 固定診斷能力與 RMA 邊界，S6 固定主機停止／遷移／修復的 operator 行動，S13 固定分析建議、緩解、FRU、service action 與 NFF；本文再依每個決策的不同責任人與退出條件整理成五本帳
+boundary: 五本帳是研究中心的證據閱讀工具，不是 NVIDIA、Google Cloud 或 OCP 的共同表單、合約責任或 RMA 標準；本輪核對的三份文件中，same-serial 診斷、換件、供應商處置、矯正措施與改善前後復發率共同觀測 N＝0
+verification_needed: 同一 incident／host／device／FRU／serial 的工具版本與完整結果、隔離與放行、拆裝序號及前後測、RMA ID／供應商 incoming test／disposition、root cause／escape、措施生效日及改善前後 recurrence denominator
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分清四種結果：沒有錯、已修正、停下來與悄悄算錯
 
 | 硬體故障後的結果 | 程式拿到的答案 | 系統有沒有警報 | 營運上通常先做什麼 | 為何不能混稱 SDC |
@@ -722,6 +782,50 @@ SE／t。真實 device、test、device-hour、workload、lot、product、custome
 物理樣本 N＝0，因此本文不估 SDC 盛行率、detector 效果、MTBF、隔離成本、設備需求、收入、毛利
 或公司效果。NIST 與 OCP 是統計方法及產業標準兩條來源鏈，不是兩個產品、客戶或獨立實驗。
 
+## 一個 fail 不能連蓋五個章：診斷、隔離、換件、RMA 與矯正措施
+
+把診斷工具的紅字直接翻成「GPU 壞了，換卡，供應商已承認，問題也永久改善」，就像只憑一次
+快篩陽性，同時替病人填好住院、手術、保險理賠與公共衛生改善報告。五件事彼此相關，卻各有
+不同的決策人、輸入、退出條件與錯判代價。
+
+| 五個決策章 | 最少要留下的證據 | 這一章可以決定什麼 | 不能偷渡成什麼 |
+|---|---|---|---|
+| 1. 診斷判定 | incident、主機／裝置、tool／plugin／driver／firmware 版本、輸入、環境、完整 pass／fail／skip／warning 與 log | 是否重測、縮小範圍或升級調查 | 硬體根因、一定要換件、RMA 已成立 |
+| 2. 營運隔離 | 隔離對象、理由、開始時間、保留證據、工作負載遷移及重測／放行條件 | 暫時停止某 host、node 或 device 承接正式工作 | 永久報廢、被隔離零件已確診 |
+| 3. FRU 換件 | 拆下與裝入的 FRU／serial、換件前後相同測試、服務是否恢復及是否復發 | 以現場可換模組恢復服務並建立定位線索 | 拆下零件必然是根因、供應商已接受責任 |
+| 4. RMA 與處置 | RMA ID、供應商 incoming test、重現／NFF、failure analysis，以及 repair／replace／reject／scrap 等結論 | 供應商是否接受退件，以及退回物最後如何處理 | 一次退件已找到系統性原因、NFF 等於現場沒有事件 |
+| 5. 矯正措施 | cause 與 escape point、批次圍堵、測試／韌體／設計變更、生效序號或日期、改善前後同口徑復發分母 | 是否真的降低同類問題再發，而不只修好眼前一台 | 一次換件或一張 RMA 就代表整個機群／製造流程改善 |
+
+這不是只能一路往右的產線。隔離後可能因環境修正與重測通過而放行；OCP 也允許先把故障資源
+offline、改用 spare、降低資源運行或 reset，未必立即換 FRU。即使真的換件，供應商仍可能因
+問題難重現、診斷不足或換錯零件回報 NFF。換句話說，**跳過一站可以是合理處置，拿前一站
+冒充後一站則不是。**
+
+### 最先要推翻的說法
+
+最先反證「diagnostic fail＝GPU 晶片壞掉」：先固定同一工具、版本、輸入與裝置，把主機權限、
+函式庫、拓撲、散熱、電力及工作負載干擾逐項排除，再看症狀是否隨裝置移動、能否重現。NVIDIA
+明示 DCGM 不修復、不取代離線場域診斷，也不判定 RMA eligibility；Google Cloud 的 SDC 回報
+原因甚至可包含 vCPU、軟體或 kernel。若修正環境後通過，或症狀不隨該 GPU／FRU 移動，至少
+「這顆 GPU／這個 FRU 是根因」的歸因就先失敗，不能靠「曾經紅過一次」挽救；host 端其他硬體
+與間歇性缺陷仍須另行排除。
+
+### 多空小作文怎麼用同一條證據鏈
+
+- **較強的多方版本**：同一 incident／device／FRU／serial 能從固定診斷、隔離、換件、供應商
+  重現與 disposition 追到具名矯正措施；措施生效後，在同一事件定義與暴露分母下，復發率下降，
+  且客戶合約把測試、維修或品質責任明確交給具名供應商。
+- **較強的空方版本**：fail 多數停在環境排除或 host migration，FRU 定位不穩、退件常是 NFF，
+  或換件只恢復服務卻沒有 same-serial root cause、量產 test insertion 與改善後分母；此時增加的是
+  營運摩擦與備品需求，不足以證明某家設備、封測或 ODM 取得可持續收入。
+
+本段使用 NVIDIA、Google Cloud、OCP 各 N＝1 份公開官方文件，共 N＝3 份來源、N＝3 個發布組織；
+其中 OCP 規格可能吸收會員貢獻，不能當成與各會員完全獨立的故障流程。這三份文件不是共同流程、
+產品或故障樣本；在本輪核對範圍內，same-serial 五章閉環、供應商矯正措施與改善前後 recurrence
+的共同觀測 N＝0，所以沒有可報的 sampling SE／t，也不估 RMA 接受率、NFF 率、
+換件成功率、停機成本、設備需求、收入或毛利。OCP v1.7 的 CPAD 仍在定義中，不能把分析工具
+給出的 suggested action 當成已完成跨公司的正式處置契約。
+
 ## 用七關判斷 SDC 需求是否真的形成
 
 | 關卡 | 可觀察證據 | 通過後能說什麼 | 還不能說什麼 |
@@ -734,9 +838,10 @@ SE／t。真實 device、test、device-hour、workload、lot、product、custome
 | 6. 跨平台重現 | 至少兩套獨立框架遵循共同格式，對同一設備池得到可比較結果 | 責任與測試資料可跨公司交接 | 台灣公司已有產品資格或收入 |
 | 7. 客戶與財務 | 具名平台 qualification、部署／測試分母、合約責任、收入與毛利 | 才能建立公司材料性 | 估值、價格已反映程度與投資報酬 |
 
-截至本輪，第一關已有 OCP 共同 taxonomy，第二關有多套可執行工具，第三至第五關已有規格欄位
-但缺完整公開分母，第六關還被 OCP 自身的「框架尚未符合共同格式」卡住，第七關則沒有 universe
-公司的雙向證據。這就是為什麼文章可以升格，受惠線仍不能升格。
+截至本輪，第一關已有 OCP 共同 taxonomy，第二關有多套可執行工具；OCP v1.7 又補強 analyzer
+輸出、FRU isolation、service action、緩解與 NFF 的語意，但本輪三份文件仍缺第三至第五關同一序號的完整
+分母與處置閉環。第六關還被 OCP 自身的「框架尚未符合共同格式」卡住，第七關則沒有 universe
+公司的雙向證據。這就是為什麼讀者可以把責任鏈拆得更清楚，受惠線仍不能升格。
 
 ## 誰負責，誰不能替別人背書
 
@@ -759,8 +864,8 @@ SE／t。真實 device、test、device-hour、workload、lot、product、custome
 
 ## 這篇目前能說到哪裡
 
-- **已知道的事**：跨公司共同分類已存在；測試輸入、輸出、part history 與品質指標也已有公開規格；Meta、NVIDIA 與 Google 分別證明機群偵測、主動診斷及主機／應用處置不是抽象概念。
-- **為何可信度是中等**：證據來自多條獨立一手鏈，但 OCP 也直接揭露現有框架尚未使用共同交換格式，公開資料無法比較誤報、漏報、coverage 與隔離門檻。
+- **已知道的事**：跨公司共同分類已存在；測試輸入、輸出、part history 與品質指標也已有公開規格；Meta、NVIDIA 與 Google 分別證明機群偵測、主動診斷及主機／應用處置不是抽象概念，OCP v1.7 也已把分析建議、FRU 服務與 NFF 語意分開。
+- **為何可信度是中等**：證據來自三個一手發布組織，但 OCP 規格可能吸收會員貢獻，不能把三份文件視為三個完全獨立流程；OCP 也直接揭露現有框架尚未使用共同交換格式，CPAD 仍在定義中。本輪文件無法比較誤報、漏報、coverage、隔離門檻或重建 same-serial RMA／矯正措施閉環。
 - **還不能說的事**：不能說工廠已與機群形成完整 RMA 回饋、所有平台使用同一標準、測試時間必然增加、設備供不應求，或本 universe 公司已有相關收入。
 - **何時可以升級判定**：共同 schema 被至少兩套框架採用，同一設備池公布完整分母與隔離結果，且具名客戶、製造／整機方與供應商能沿同一 part identity 重建 factory-to-fleet-to-RMA 病歷。
 
@@ -778,6 +883,7 @@ SE／t。真實 device、test、device-hour、workload、lot、product、custome
 - [公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
 - [NIST：Exact Binomial Confidence Limits](https://itl.nist.gov/div898/software/dataplot/refman2/auxillar/exacbici.htm)
 - [NIST：Constant repair rate HPP／exponential model](https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm)
+- [OCP：GPU and Accelerator RAS Requirements v1.7](https://www.opencompute.org/documents/ocp-gpu-and-accelerators-ras-requirements-v1-7-10-23-2025-pdf)
 
 ## 族群影響
 

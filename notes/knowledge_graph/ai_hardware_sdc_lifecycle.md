@@ -1,14 +1,15 @@
 # AI 硬體 SDC 生命週期責任鏈知識圖譜
 
-本圖把硬體錯誤分類、製造篩檢、整機診斷、機群與應用偵測、裝置隔離及供應商回饋分開。
-公開證據已支持多個單站能力，尚未支持共同誤報漏報、跨框架格式、完整 RMA 閉環或台灣公司收入。
+本圖把硬體錯誤分類、製造篩檢、整機診斷、機群與應用偵測、裝置隔離、FRU 換件、供應商
+RMA 處置及矯正措施分開。公開證據已支持多個單站能力，尚未支持共同誤報漏報、跨框架格式、
+同一序號完整閉環或台灣公司收入。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-hardware-sdc-lifecycle
 root_node_id: concept:ai-hardware-sdc-lifecycle
 label: AI 硬體 SDC 生命週期責任鏈
-summary: 從 benign corrected DUE 與 SDC 分類追到製造篩檢 系統診斷 機群與應用偵測 零事件暴露與錯判上限 隔離 part history 及共同測試格式 避免把單站 pass fail 當成完整生命週期與公司收入。
+summary: 從 benign corrected DUE 與 SDC 分類追到製造篩檢 系統診斷 機群與應用偵測 零事件暴露與錯判上限 隔離 FRU換件 RMA處置 矯正措施 part history 及共同測試格式 避免把單站 pass fail 當成完整生命週期與公司收入。
 article_ids: MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE
 status: active
 -->
@@ -371,4 +372,24 @@ review_due: 2026-08-31
 status: active
 boundary: Binomial 與 HPP confidence bound 只在各自獨立或固定率假設下限制事件機率或速率；混淆矩陣也依 ground-truth pool 組成，不能把零命中 95% 上限或 validation precision 外推產品機群。
 next_trigger: 具名產品公開可審計 raw verdict 與 device test time workload denominators 獨立性分層 detector sensitivity confusion matrix及模型適配檢查。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-SDC-I15
+view: industry
+from_id: concept:ai-hardware-sdc-lifecycle
+to_id: process:sdc-five-decision-service-ledger
+relation: includes
+claim_refs: MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE#C15,MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE#C16
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: NVIDIA Google Cloud 與 OCP 分別公開工具 operator 與 RAS／service 邊界；五本帳是本文跨來源整理，不是三方共同流程。
+as_of: 2026-08-24
+review_due: 2026-08-31
+status: active
+boundary: 診斷隔離換件RMA與矯正措施可跳站但不可互相替代；本輪三份文件的same-serial五章閉環復發共同觀測為N=0，也沒有universe公司合約與財務證據。
+next_trigger: 同一incident host device FRU serial公開完整診斷隔離放行換件前後測RMA disposition根因措施生效日及改善前後recurrence denominator。
 -->

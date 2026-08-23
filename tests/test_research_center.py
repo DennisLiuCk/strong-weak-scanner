@@ -6699,6 +6699,15 @@ class ResearchCenterTest(unittest.TestCase):
             "物理樣本 N＝0",
             "source_id: S11", "source_id: S12", "claim_id: C11",
             "claim_id: C12", "claim_id: C13", "claim_id: C14",
+            "added_diagnostic_quarantine_fru_rma_corrective_action_decision_chain_without_thesis_clock_refresh",
+            "source_id: S13", "claim_id: C15", "claim_id: C16",
+            "## 一個 fail 不能連蓋五個章：診斷、隔離、換件、RMA 與矯正措施",
+            "| 1. 診斷判定 |", "| 2. 營運隔離 |", "| 3. FRU 換件 |",
+            "| 4. RMA 與處置 |", "| 5. 矯正措施 |",
+            "跳過一站可以是合理處置，拿前一站",
+            "最先反證「diagnostic fail＝GPU 晶片壞掉」",
+            "在本輪核對範圍內，same-serial 五章閉環",
+            "「這顆 GPU／這個 FRU 是根因」的歸因就先失敗",
             "last_reviewed_at: 2026-08-12",
             "review_due: 2026-08-31",
             "## 用七關判斷 SDC 需求是否真的形成",
@@ -6713,14 +6722,63 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 39
+            sum(line.startswith("- **") for line in glossary.splitlines()), 42
         )
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 14), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 16), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        s13 = topic.split("source_id: S13", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "published_at: 2025-10-23",
+            "url: https://www.opencompute.org/documents/ocp-gpu-and-accelerators-ras-requirements-v1-7-10-23-2025-pdf",
+            "PDF file pp.9–10",
+            "file pp.17–19 的 detected／uncorrected error",
+            "reference only／non-normative",
+        ):
+            self.assertIn(contract, s13)
+        c15 = topic.split("claim_id: C15", 1)[1].split("-->", 1)[0]
+        self.assertIn("label: verified", c15)
+        self.assertIn("supporting_source_ids: S4,S6,S13", c15)
+        c16 = topic.split("claim_id: C16", 1)[1].split("-->", 1)[0]
+        self.assertIn("label: inference", c16)
+        self.assertIn("supporting_source_ids: S4,S6,S13", c16)
+        self.assertLess(
+            topic.index("## 一個 fail 不能連蓋五個章"),
+            topic.index("## 用七關判斷 SDC 需求是否真的形成"),
+        )
+
+        with (ROOT / "notes" / "research_topics" / "scan_log.csv").open(
+            encoding="utf-8", newline=""
+        ) as fh:
+            scan = next(
+                row for row in csv.DictReader(fh)
+                if row["scan_id"]
+                == "scan-2026-08-24-ai-hardware-sdc-five-service-decisions"
+            )
+        self.assertEqual(scan["scope"], "partial")
+        self.assertIn(
+            "RMA 案件／退回件可能得到 NFF disposition", scan["coverage_note"]
+        )
+        self.assertIn(
+            "在本輪三份文件內", scan["coverage_note"]
+        )
+
+        snapshot = json.loads((
+            ROOT / "notes" / "research_method_reviews"
+            / "2026-08-24_09.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(snapshot["snapshotId"], "RMA-2026-08-24-09")
+        self.assertEqual(snapshot["claims"]["active"], 773)
+        self.assertEqual(snapshot["sources"]["active"], 676)
+        self.assertEqual(snapshot["graphs"]["activeEdges"], 850)
+        self.assertEqual(snapshot["scans"]["events"], 146)
+        self.assertEqual(
+            snapshot["scans"]["latestId"],
+            "scan-2026-08-24-ai-hardware-sdc-five-service-decisions",
+        )
 
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
@@ -6746,6 +6804,7 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:sdc-commercial-attribution,stage,SDC 商業與財務歸因",
             "process:sdc-zero-event-isolation-evidence-passport,process,SDC 零事件—隔離證據十欄護照",
             "metric:sdc-exposure-confidence-confusion-boundary,metric,SDC 暴露量、信賴上限與錯判邊界",
+            "process:sdc-five-decision-service-ledger,process,SDC 診斷到矯正措施五決策帳",
         ):
             self.assertIn(concept, concepts)
         entities = (ROOT / "config" / "external_entities.csv").read_text(
@@ -6758,12 +6817,14 @@ class ResearchCenterTest(unittest.TestCase):
             / "ai_hardware_sdc_lifecycle.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: AI 硬體 SDC 生命週期責任鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
         for graph_contract in (
             "edge_id: KG-SDC-I13",
             "to_id: process:sdc-zero-event-isolation-evidence-passport",
             "edge_id: KG-SDC-I14",
             "to_id: metric:sdc-exposure-confidence-confusion-boundary",
+            "edge_id: KG-SDC-I15",
+            "to_id: process:sdc-five-decision-service-ledger",
         ):
             self.assertIn(graph_contract, graph)
 
