@@ -231,6 +231,7 @@ concept:profit-fcf-cash-stock-ledgers,concept,淨利、自由現金流與現金�
 metric:working-capital-intensity-proxy,metric,營運資金強度代理比率,Working capital intensity proxy|AR inventory AP intensity,concept:profit-fcf-cash-stock-ledgers,以期末應收 存貨 應付對單季營收或銷貨成本做同公司相鄰期間診斷並明示不是正式周轉天數
 concept:ai-capex-cash-conversion,concept,AI CapEx 到供應商財務七關橋接,AI capital spending to supplier finance|AI CapEx cash conversion,,把資本承諾 現金與租賃支出 資產建置上線 可用容量 工作負載與收入 買方現金回收及供應商財務歸因分開追蹤的研究框架
 concept:capital-asset-revenue-cash-clocks,concept,承諾、資產、收入與現金四個時鐘,capital asset revenue cash clocks,concept:ai-capex-cash-conversion,把合約承諾 資產可用 客戶使用與收入認列 現金支付與回收分成可各自前進的四個時鐘
+process:residual-value-guarantee-cash-waterfall,process,殘值保證或有現金瀑布,Residual value guarantee cash waterfall|guarantee six-clock contract,concept:ai-capex-cash-conversion,把公告揭露額度放在第0層並從ready-for-service 租約起租與保證生效 租戶付款或違約 重租或出售回收 保證人實際補差額到租戶補償分成六個經濟時鐘且禁止把上限當成當期資本支出或預期損失
 stage:capital-commitment,stage,資本計畫與承諾,Capital plan and commitment,concept:ai-capex-cash-conversion,董事會預算 全年指引 合約或租賃承諾等尚未等同當期付款與設備交付的投入意圖
 stage:cash-ppe-and-leases,stage,現金 PP&E 與租賃支出,Cash PP&E and lease bridge,concept:ai-capex-cash-conversion,分開現金購置 新增融資租賃 租賃本金及其他租賃付款以對齊資本投入的實際現金與融資口徑
 stage:asset-construction-commissioning,stage,資產建置與試運轉,Construction in progress and commissioning,concept:ai-capex-cash-conversion,把尚在建工程 設備安裝 通電 測試 驗收與轉入可使用資產的進度分開記錄

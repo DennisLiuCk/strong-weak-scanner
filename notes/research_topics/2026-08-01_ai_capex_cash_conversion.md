@@ -230,6 +230,70 @@ limitation: 分部資產與折舊按 usage 分攤不是容量利用率揭露；�
 independence_group: amazon
 -->
 
+<!-- research_source
+source_id: S14
+role: company_filing
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA 2026-08-17 Form 8-K — PORTS-Pike Residual Value Guaranties
+published_at: 2026-08-17
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm
+locator: 第 1.01 項 Residual Value Guaranties 與第 2.03 項；約 4.25 IT-GW、起租生效、1,050 億美元累計上限、ready-for-service、Trigger Event、重租／出售回收、終止與 OpenAI indemnity 段落
+limitation: 8-K 明示摘要並不完整，完整 Agreements form 預計隨截至 2026-07-26 季度的 10-Q 提交；現有文件沒有逐租約保證最低值曲線、責任排程、折現率、違約機率、回收順位或預期損失
+independence_group: ports-pike-transaction
+-->
+
+<!-- research_source
+source_id: S15
+role: company_release
+source_kind: document
+publisher: NVIDIA / SB Energy
+title: NVIDIA Guarantees SB Energy's PORTS-Pike Technology Campus in Ohio
+published_at: 2026-08-17
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/sbeoainvidia-portsrelease.htm
+locator: SEC Exhibit 99.1；20 年租約、分期自 2028 上線、8 IT-GW 規劃、SB Energy build／own／operate 與 NVIDIA 投資 15 億美元段落
+limitation: 這是 S14 同一交易的公司新聞稿附件，不是第二個獨立專案或獨立合約驗證；規劃容量與投資額也不等於 NVIDIA 保證付款、專案建設總成本或當期 CapEx
+independence_group: ports-pike-transaction
+-->
+
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: document
+publisher: OpenAI
+title: OpenAI joins PORTS-Pike project
+published_at: 2026-08-17
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://openai.com/index/openai-joins-ports-pike-project/
+locator: first 800MW expected in 2028、SB Energy build／own／operate、OpenAI completed-capacity payment、20-year lease、NVIDIA investment／credit support 與 permits／financing dependencies 段落
+limitation: OpenAI 是同一交易的租戶當事人，不是獨立部署樣本；頁面說明付款與開發條件，但沒有完整租約、保證最低值、違約概率、每期租金、回收順位或 NVIDIA 淨損失
+independence_group: ports-pike-transaction
+-->
+
+<!-- research_source
+source_id: S17
+role: regulator_or_policy
+source_kind: living_index
+publisher: U.S. Securities and Exchange Commission
+title: NVIDIA EDGAR Company Filings
+published_at:
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.sec.gov/edgar/browse/?CIK=1045810&owner=exclude&action=getcompany
+locator: 2026-08-23 以 NVIDIA filings index 的 10-Q／8-K 類型重查；可定位 2026-08-17 Form 8-K，本輪未定位到截至 2026-07-26 的 Form 10-Q，後續追蹤 Residual Value Guaranties 完整 form 及修訂
+limitation: 這是會持續更新的申報索引，不是固定證據文件；後續出現任何申報都必須另以 document source 登錄並逐段核對，不能由索引空白推定事件不存在
+independence_group: ports-pike-transaction
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -440,6 +504,62 @@ verification_needed: 同一具名資料中心或設備批次的取得方式、�
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: NVIDIA 2026-08-17 Form 8-K 表示，其為 PORTS-Pike 約 4.25 IT-GW 租賃簽訂多份殘值保證，協議一般在對應租約起租時生效；初始承諾的累計付款義務上限為 1,050 億美元，且 NVIDIA 付款義務另以相關場所滿足預計自 2028 年起達成的 ready-for-service 條件為前提
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-17
+basis: S14 第 1.01 項直接分列租賃容量、Agreement 生效點、aggregate cumulative cap 與 ready-for-service 前提
+boundary: 上限是附條件的累計責任邊界，不是 2026-08-17 已支付現金、當期 CapEx、租賃本金、建設總成本、資產公允價值或預期損失；另約 3.8 IT-GW 的信用支持仍由 NVIDIA 自行選擇是否行使
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: S14 所述保證一般在對應租約起租時生效，但 NVIDIA 的付款與救濟程序只在 OpenAI 因無力償債造成租約違約或未支付租款等 Trigger Event 發生後啟動；NVIDIA 一般補足保證最低值與重租或出售回收額之間的差額，OpenAI 並同意補償 NVIDIA 實際支付給出租人的金額
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-17
+basis: S14 第 1.01 項直接定義兩類 Trigger Event、shortfall 計算、NVIDIA 可選救濟路徑及 OpenAI reimbursement／indemnity
+boundary: 文件沒有公布每份租約的保證最低值、重租或出售可回收多少、OpenAI 補償能力、付款時間或 NVIDIA 最終淨損失；補償承諾也不是已收到現金
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: 閱讀大型 AI 基建信用支持時，應把公告揭露的保證上限放在第 0 層，再分開 ready-for-service、租約起租與保證生效、租戶正常付款或 Trigger Event、重租或出售回收、保證人實際補差額、租戶補償六個經濟時鐘；保證上限、股權投資與 IT-GW 容量分屬不同帳本，不能相加或改寫成同一期 CapEx
+supporting_source_ids: S14,S15,S16
+contrary_source_ids:
+as_of: 2026-08-17
+basis: S14 把保證的 ready-for-service 條件、生效、觸發、回收、補差額與補償分開；S15／S16 又把 NVIDIA 15 億美元股權投資、20 年租賃、分期容量及 OpenAI 在 completed capacity 可租時才開始付款分列
+boundary: 六時鐘是針對這一交易建立的現金責任閱讀框架，不是美國 GAAP 通用科目、違約預測模型或 NVIDIA／OpenAI 信用品質評分，也不衡量台灣供應商訂單、估值或市場是否反映
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: unverified
+status: active
+claim: 現有公開摘要足以重算 PORTS-Pike 各租約的逐期最大曝險、保證最低值折減曲線、違約機率、重租或出售回收率、OpenAI 補償回收率與 NVIDIA 預期損失
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S14 明示現有描述不完整，完整 Agreements form 尚待後續 10-Q exhibit；S14 至 S16 均未提供逐租約現金流、機率、折現與回收分母
+boundary: 找不到完整參數不是保證一定發生損失或一定不會損失；本文只把可公開重算的上限擋在摘要已揭露的條件，並保留缺值
+verification_needed: NVIDIA 後續 10-Q 所附完整 Agreements form、逐租約保證最低值與期限、實際 lease commencement／ready-for-service、任何 Trigger Event、重租或出售回收及 OpenAI reimbursement 結果
+resolution:
+-->
+
 <!-- metric_comparison
 comparison_id: M1
 observation_id: M1-O1
@@ -639,6 +759,20 @@ trigger: 支出增加後出現可核對的容量上線、使用率、營收與�
 invalidation: 若投入未轉為容量、需求與現金回收，或供應商文件無法雙向核對，受惠論維持未證
 -->
 
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C16,C17,C18,C19
+metric: PORTS-Pike 殘值保證由第 0 層上限走到 ready-for-service、租約起租與保證生效、租戶正常付款或 Trigger Event、重租或出售回收、NVIDIA 實際補差額、OpenAI 補償的現金曝險
+source_ids: S14,S15,S16
+watch_source_ids: S17
+frequency: event_driven
+frequency_detail: 2026-08-26 NVIDIA FY2027 Q2 結果後先查下一份 10-Q；其後遇完整 Agreements form、修訂或任何實際觸發事件即重審
+next_check: 2026-08-27
+trigger: 10-Q 提交完整保證 form，或出現逐租約最低值、lease commencement、ready-for-service、Trigger Event、重租／出售回收、NVIDIA 實際付款與 OpenAI reimbursement
+invalidation: 後續正式文件取消或修改保證、上限、生效條件、Trigger Event、回收公式、終止條款或 OpenAI 補償，使現有六時鐘與曝險邊界不再適用
+-->
+
 <!-- transition
 date: 2026-08-01
 from: inbox
@@ -690,6 +824,14 @@ reason: depreciation_cost_clock_separated_from_utilization_and_recovery_with_lat
 evidence: sources:S11,S12,S13
 -->
 
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: residual_value_guarantee_six_clock_cash_waterfall_added_without_refreshing_thesis_clock
+evidence: sources:S14,S15,S16
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -715,6 +857,16 @@ evidence: sources:S11,S12,S13
 - **租賃負債（lease liability）**：承租人尚待支付租賃款的現值；新租賃開始、利息累積、本金償還、修改與重新衡量會沿不同方向改變它。
 - **起租／租賃開始（lease commencement）**：標的資產可供承租人使用、開始認列 ROU asset 與 lease liability 的節點；它不同於簽約日，也不同於日後每期付款日。
 - **租賃新增額／本金償還**：前者描述本期開始使用的新租賃資產與負債，常是非現金事實；後者是償還既有 finance-lease liability 的現金流，兩者不能互換。
+- **IT-GW（IT gigawatt）**：供伺服器、網路與儲存等資訊設備使用的十億瓦負載容量；它不是園區總用電、GPU 數量、美元支出或收入。
+- **PORTS-Pike**：本案位於美國俄亥俄州 Pike County 的大型資料中心園區名稱；本文只用它指向 NVIDIA、SB Energy 與 OpenAI 這一交易，不代表所有 AI 園區都採相同合約。
+- **SEC（美國證券交易委員會）**：美國公開公司提交財務與重大事件申報的監管機關；本文引用向 SEC 提交的 8-K，不代表 SEC 替交易風險背書。
+- **Agreements（本案保證協議）**：NVIDIA 8-K 對多份殘值保證的合稱；目前公開的是摘要，完整 form 尚待後續申報。
+- **殘值保證（residual value guarantee）**：若租賃資產在約定情境下的回收價值不足，由保證人依合約補足部分差額的信用支持；它不是簽約當天就支付全部上限。
+- **保證上限（guarantee cap）**：保證人在指定範圍內最多承擔的累計付款邊界；上限不等於預期損失、當期 CapEx 或已流出的現金。
+- **ready-for-service**：出租人把約定場所完成到租約可開始提供的狀態；本案還要依租約條件逐期判定，不等於整座園區在公告日已上線。
+- **觸發事件（Trigger Event）**：讓保證責任進入處理程序的合約事件；本案列的是 OpenAI 無力償債導致租約違約，或未依租約付款，不是 AI 需求變弱的泛稱。
+- **重租／出售回收**：原租戶違約後，出租人或保證人藉由替換租戶或出售資產收回的金額；它會影響待補差額，不能在估算時當成零。
+- **補償／賠償（reimbursement／indemnity）**：一方承諾對另一方實際支付的指定款項予以補償；它多一層求償權，但不代表對方在壓力情境下必然能立即付清。
 - **FASB／Topic 842**：FASB 是制定美國 GAAP 的 Financial Accounting Standards Board；Topic 842 是租賃會計主題，本文只用它界定認列、付款與揭露時鐘，不把會計規範當公司績效。
 - **耐用年限**：會計上預估資產可使用多久，決定每年折舊速度；改變耐用年限會改變損益與租賃分類，卻不一定改變實際建置計畫。
 - **AWS**：Amazon Web Services，Amazon 的雲端運算事業；其營收成長不能直接分配到任一台灣供應商。
@@ -839,6 +991,84 @@ Amazon 的 2026 Q1 申報則把另外兩個時差寫得很清楚：PP&E 淨增�
 
 四個時鐘不是新的一套公司排名。真正可重算的橋接，仍要用同一具名資產或平台批次，把合約生效、轉入可使用、客戶使用與收入、付款與供應商收款日期一一對上；目前公開資料還做不到。
 
+## 保證上限不是當期支出：1,050 億美元還隔著六個時鐘
+
+2026 年 8 月 17 日，NVIDIA 向 SEC 提交 PORTS-Pike 交易的 Form 8-K，將殘值保證列入
+第 2.03 項的直接財務義務或表外安排。申報中最醒目的數字是 1,050 億美元，但文件寫的
+是**初始保證協議下的累計付款義務上限**，不是 NVIDIA 在公告日已開出同額支票。要讓上限中的
+一部分真的變成現金流出，仍要核對租約、生效條件、違約、資產回收與後續補償。
+
+### 先把三個大數字放回三本帳
+
+| 文件裡的數字 | 它屬於哪本帳 | 目前能說什麼 | 不能改寫成什麼 |
+|---|---|---|---|
+| 1,050 億美元 | NVIDIA 初始殘值保證的累計付款上限 | 保證責任的最外層邊界 | 當期 CapEx、已付款、建設總成本或預期損失 |
+| 15 億美元 | NVIDIA 對 SB Energy 的投資 | 一筆另行揭露的股權投資 | 殘值保證已動用額、租金或整個園區成本 |
+| 初始約 4.25 IT-GW；園區規劃約 8 IT-GW | 資料中心可承載的 IT 負載容量 | 專案範圍與分期建置方向 | 美元支出、收入、GPU 數量或台灣供應商訂單 |
+
+這三列連單位都不同。15 億美元不能和 1,050 億美元相加成「NVIDIA CapEx」，約 8 IT-GW
+也不能乘上一個外部假設的每 GW 成本就冒充公司申報值。SEC 附件說 SB Energy 負責 build、
+own、operate，OpenAI 是 20 年租約的租戶；因此還要先辨認誰擁有資產、誰付租金、誰提供信用
+支持，以及哪一方在什麼條件下才有現金責任。
+
+### 六個時鐘：從第 0 層上限走到可能的淨現金
+
+公告日與 1,050 億美元額度先放在**第 0 層**：它告訴我們合約存在與最大邊界，卻還不是一個
+營運現金事件。之後才有六個經濟時鐘；它們也不是保證每份租約都以完全相同日期嚴格排隊。
+尤其 ready-for-service 與起租是否同日、哪一項是另一項的前提，仍要等完整 Agreements form
+才能逐份確認。第三個時鐘還會分岔：若 OpenAI 正常付款，後面的違約回收、補差額與補償可以
+一直不被啟動。
+
+| 時鐘 | 本案公開文件寫到哪裡 | 這一步能證明什麼 | 還不能證明什麼 |
+|---|---|---|---|
+| 第 0 層：公告與額度 | NVIDIA 在 8 月 17 日簽訂多份殘值保證，初始累計上限 1,050 億美元 | 合約架構與最大邊界已公開 | 每份保證都已生效，或已支付同額現金 |
+| 1. ready-for-service | 出租人須先滿足場所的可服務條件；預計自 2028 年分期開始，OpenAI 也表示 completed capacity 可租時才開始付款 | 完成容量跨過可出租條件 | 所有容量已用滿、租戶已付完整租期款或 NVIDIA 保證已被請求 |
+| 2. 租約起租／保證生效 | Agreement 一般在對應租約 commencement 時生效 | 指定場所的租約與保證進入適用期 | 整個約 8 IT-GW 園區同時完成，或上限成為當期現金流出 |
+| 3. 租戶付款或 Trigger Event | 正常情況由 OpenAI 付租金；無力償債造成租約違約，或未付款，才是文件定義的 Trigger Event | 是否沿正常付款路徑，或進入保證救濟程序 | 一發生事件就必須支付整筆上限，或資產回收必為零 |
+| 4. 重租或出售回收 | NVIDIA 可選擇承接租約、要求重租、啟動出售、允許終止，或在支付指定專案成本下延後處置最多一年 | 計算補差額前要先處理資產與替代租戶回收 | 公開摘要尚未提供實際售價、重租金額、回收時間與順位 |
+| 5. NVIDIA 實際補差額 | NVIDIA 一般補「保證最低值減重租／出售回收」的差額 | 保證何時由或有責任變成實際現金付款 | 單筆付款等於 1,050 億美元上限，或等於最終淨損失 |
+| 6. OpenAI 補償 | OpenAI 承諾補償 NVIDIA 實際付給出租人的金額 | NVIDIA 付款後仍有一層合約求償 | OpenAI 在壓力情境下必能立即全額補償，或 NVIDIA 已收回現金 |
+
+所以最安全的算式不是 `保證上限 = CapEx`，而是先保留未知值。概念上，單一適用責任會先算
+`max（保證最低值 − 合約認列的重租／出售回收，0）`，再受尚餘累計上限與完整合約條款約束；
+這不是可以直接代入 1,050 億美元的完整法律算式。
+
+若 NVIDIA 後來真的付款，研究上還要從實際付款另扣**實際收到**的 OpenAI 補償，才能接近
+最終淨曝險；只有一紙補償承諾，仍不能先當成已回收現金。
+
+這兩層目前都**不能代入完整數字**。8-K 明示現有描述不完整，完整 Agreements form 預計
+隨截至 2026 年 7 月 26 日季度的 10-Q 提交；在逐租約最低值、期限、回收與補償能力尚未公開
+前，只能確認法律摘要中的上限與瀑布，不能重算違約概率或預期損失。
+
+### 多方小作文：信用支持可能先換來可建置的容量
+
+偏多的讀法不是「1,050 億美元已變成營收」，而是信用支持可能幫專案先鎖住土地、電力與
+建物外殼，讓 SB Energy 有條件融資並分期交付。首批 800MW 預計 2028 年可用，OpenAI 只在
+completed capacity 可租時開始付款；若場所如期完成、租戶正常付款且沒有 Trigger Event，
+NVIDIA 可以取得自家運算平台的長期部署機會，而殘值保證未必產生付款。這仍只是合約機制的
+上行情境，公開資料沒有給 NVIDIA 因此新增多少 GPU 銷售、毛利或現金。
+
+### 空方小作文：上限雖非支出，仍是長天期或有風險
+
+偏空也不能只說「表外所以不用管」。8-K 把它列進第 2.03 項，相關租約最長可延續到起租後
+20 年；如果 OpenAI 違約、替代租戶租金或資產售價低於保證最低值，NVIDIA 就可能需要補差額。
+專案還依賴電力、輸電、許可、環境審查與融資，分期延誤也可能改變何時起租與曝險。只是現有
+文件沒有保證最低值曲線、違約概率或回收率，不能把 1,050 億美元直接當成最壞情境的必然損失，
+也不能自行替它估一個看似精確的預期損失。
+
+### 多空共同裁決：每季更新六格，不用一個 headline 代替
+
+真正能讓判斷前進的不是重複引用上限，而是逐租約更新：是否起租、多少容量已
+ready-for-service、OpenAI 是否正常付款、是否發生 Trigger Event、重租或出售回收多少、
+NVIDIA 實付及 OpenAI 補償多少。若第 1、2 格完成且第 3 格維持正常付款，第 4 至 6 格可以
+一直不被啟動，信用支持可能只扮演建置工具。
+若改走違約分支、回收不足且補償無法實現，上限內的或有責任才會逐步變成可觀察的現金風險。
+
+本段核對 `N=3` 份官方文件，但三份都屬 PORTS-Pike 同一交易、`N=1` 條交易消息鏈，不是三個
+獨立專案、三個客戶或三次違約樣本。合約金額與容量是發行人報告值，沒有抽樣母體，因此沒有
+sampling SE／t；逐租約完整 form、實際起租、違約、回收、付款與補償的共同觀測 `N=0`。
+本段不提供法律意見、信用評等、價格、估值、共識、部位、投資建議或市場是否反映的判斷。
+
 ## 折舊是成本碼表，不是利用率碼表
 
 最新申報把四個時鐘再拆細了一步：資產開始分攤成本後，報表會出現折舊；但折舊增加只告訴我們
@@ -962,10 +1192,14 @@ Microsoft 的 684 RPO 與 Amazon 的 496 AWS 未來服務承諾也不是本期�
 - [Microsoft FY2026 Form 10-K：PP&E、折舊、未起租租賃與履約義務](https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm)
 - [Meta 2026 Q2 Form 10-Q：CIP、折舊、待售資產與尚未起租租賃](https://www.sec.gov/Archives/edgar/data/1326801/000162828026050705/meta-20260630.htm)
 - [Amazon 2026 Q2 Form 10-Q：非現金 PP&E、分部折舊與 AWS 履約義務](https://www.sec.gov/Archives/edgar/data/1018724/000101872426000026/amzn-20260630.htm)
+- [NVIDIA 2026-08-17 Form 8-K：PORTS-Pike 殘值保證](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm)（累計上限、生效條件、Trigger Event、回收、補差額、終止與 OpenAI 補償摘要）。
+- [NVIDIA／SB Energy SEC Exhibit 99.1：PORTS-Pike 專案與 15 億美元投資](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/sbeoainvidia-portsrelease.htm)（20 年租約、分期容量與 build／own／operate；屬同一交易附件）。
+- [OpenAI：PORTS-Pike 專案](https://openai.com/index/openai-joins-ports-pike-project/)（首批 800MW、completed-capacity payment 與許可／融資前提；OpenAI 是同一交易當事人）。
+- [SEC：NVIDIA EDGAR Company Filings](https://www.sec.gov/edgar/browse/?CIK=1045810&owner=exclude&action=getcompany)（後續 10-Q 完整 Agreements form 與修訂的 living watch；索引本身不當固定證據）。
 
-**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。FASB 文件再證明新 finance-lease ROU／liability 與償還本金是兩個不同事實。最新三份申報還把資產新增或存量、未付款、折舊、未起租租賃與履約義務分列，足以判定折舊不是利用率碼表。
+**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。FASB 文件再證明新 finance-lease ROU／liability 與償還本金是兩個不同事實。最新三份申報還把資產新增或存量、未付款、折舊、未起租租賃與履約義務分列，足以判定折舊不是利用率碼表。NVIDIA 的 8-K 又把殘值保證的累計上限、生效、ready-for-service、租戶違約、資產回收、保證人補差額與租戶補償分開，證明保證上限不能直接改名為當期 CapEx。
 
-**還不知道：** CapEx 中每一項 AI 晶片、伺服器、網路、電力與建物的精確拆分，同一資產批次的在建轉入、折舊起算、容量上線、利用率、收入與現金回收，以及台灣 universe 個股的訂單與獲利份額。
+**還不知道：** CapEx 中每一項 AI 晶片、伺服器、網路、電力與建物的精確拆分，同一資產批次的在建轉入、折舊起算、容量上線、利用率、收入與現金回收，以及台灣 universe 個股的訂單與獲利份額。PORTS-Pike 也還缺逐租約保證最低值、責任排程、回收順位、違約概率、實際付款與補償結果。
 
 **不可外推：** 這不是三家公司 AI ROI 排名；期間與公式不同。買方 CapEx 也不能直接等同任何台灣供應商收入。沒有價格、估值、共識與部位資料，本題不判斷市場是否已反映。
 
@@ -1028,3 +1262,4 @@ evidence_boundary: 不由雲端需求直接指認台灣散熱個股受惠，等�
 - **台灣公司交叉驗證**：供應商 Q2／Q3 正式文件是否出現客戶認證、出貨、存貨／應收、毛利與 OCF 的同向改善；只有營收、沒有毛利與現金，不算完整受惠。
 - **兩端共同鍵**：買方與供應商能否同時指向同一平台、料號、期間、數量與驗收節點；缺任一端，就只保留需求搜尋路由，不建立題材財務歸因。
 - **資產批次護照**：三家公司後續是否提供站點／設備批次、取得方式、placed-in-service、折舊分類、容量分母、工作負載、收入與現金的共同鍵；沒有共同 cohort，就不以折舊／新增資產比率冒充利用率。
+- **保證六時鐘**：NVIDIA 後續 10-Q 是否提交完整 Agreements form，並逐租約揭露起租、ready-for-service、保證最低值、Trigger Event、重租／出售回收、實際補差額與 OpenAI 補償；缺少這些欄位，就不把 1,050 億美元上限改寫成預期損失。

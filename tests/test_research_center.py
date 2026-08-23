@@ -7486,6 +7486,12 @@ class ResearchCenterTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         headings = (
             "## 同一個資料中心有四個時鐘",
+            "## 保證上限不是當期支出：1,050 億美元還隔著六個時鐘",
+            "### 先把三個大數字放回三本帳",
+            "### 六個時鐘：從第 0 層上限走到可能的淨現金",
+            "### 多方小作文：信用支持可能先換來可建置的容量",
+            "### 空方小作文：上限雖非支出，仍是長天期或有風險",
+            "### 多空共同裁決：每季更新六格，不用一個 headline 代替",
             "## 折舊是成本碼表，不是利用率碼表",
             "### 先辨認存量、流量與承諾",
             "### 「按使用分攤」不是「公布利用率」",
@@ -7511,6 +7517,16 @@ class ResearchCenterTest(unittest.TestCase):
             "**租賃負債（lease liability）**",
             "**起租／租賃開始（lease commencement）**",
             "**租賃新增額／本金償還**",
+            "**IT-GW（IT gigawatt）**",
+            "**PORTS-Pike**",
+            "**SEC（美國證券交易委員會）**",
+            "**Agreements（本案保證協議）**",
+            "**殘值保證（residual value guarantee）**",
+            "**保證上限（guarantee cap）**",
+            "**ready-for-service**",
+            "**觸發事件（Trigger Event）**",
+            "**重租／出售回收**",
+            "**補償／賠償（reimbursement／indemnity）**",
             "**營運資金（working capital）**",
             "## 都寫「含租賃」，仍可能是兩支碼表：新增額不等於本金",
             "| 起租／新增 | 取得使用權",
@@ -7525,6 +7541,20 @@ class ResearchCenterTest(unittest.TestCase):
             "| 資產可用 | 在建工程",
             "| 客戶使用與收入 | 使用量、履約義務",
             "| 現金支付與回收 | cash PP&E",
+            "| 第 0 層：公告與額度 |",
+            "| 1. ready-for-service |",
+            "| 2. 租約起租／保證生效 |",
+            "| 3. 租戶付款或 Trigger Event |",
+            "| 4. 重租或出售回收 |",
+            "| 5. NVIDIA 實際補差額 |",
+            "| 6. OpenAI 補償 |",
+            "1,050 億美元",
+            "15 億美元",
+            "max（保證最低值 − 合約認列的重租／出售回收，0）",
+            "`N=3` 份官方文件",
+            "`N=1` 條交易消息鏈",
+            "共同觀測 `N=0`",
+            "沒有\nsampling SE／t",
             "Microsoft FY2026 10-K | 全年 cash PP&E additions 115.948",
             "Meta 2026 Q2 10-Q | H1 cash PP&E 49.11",
             "Amazon 2026 Q2 10-Q | H1 PP&E 淨新增 118.648",
@@ -7552,20 +7582,31 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C13",
             "claim_id: C14",
             "claim_id: C15",
+            "source_id: S14\nrole: company_filing",
+            "source_id: S17\nrole: regulator_or_policy\nsource_kind: living_index",
+            "claim_id: C16\nlabel: verified\nstatus: active",
+            "claim_id: C17\nlabel: verified\nstatus: active",
+            "claim_id: C18\nlabel: inference\nstatus: active",
+            "claim_id: C19\nlabel: unverified\nstatus: active",
+            "monitor_id: T3",
+            "frequency: event_driven",
+            "next_check: 2026-08-27",
             "reason: capex_to_supplier_financial_bridge_synthesized_from_existing_disclosures",
             "reason: four_accounting_clocks_added_from_meta_and_amazon_filings_without_refreshing_thesis_clock",
             "reason: finance_lease_addition_and_principal_clocks_separated_with_fasb_contract_without_refreshing_thesis_clock",
             "reason: depreciation_cost_clock_separated_from_utilization_and_recovery_with_latest_filings_without_refreshing_thesis_clock",
+            "reason: residual_value_guarantee_six_clock_cash_waterfall_added_without_refreshing_thesis_clock",
             "evidence: sources:S1,S2,S3,S4,S5",
             "evidence: sources:S7,S8",
             "evidence: sources:S1,S2,S9,S10",
             "evidence: sources:S11,S12,S13",
+            "evidence: sources:S14,S15,S16",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 15), ("metric_comparison", 9),
-            ("impact", 4), ("monitoring_item", 2),
+            ("research_topic", 1), ("research_source", 17),
+            ("research_claim", 19), ("metric_comparison", 9),
+            ("impact", 4), ("monitoring_item", 3), ("transition", 9),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -7575,6 +7616,7 @@ class ResearchCenterTest(unittest.TestCase):
         for concept in (
             "concept:ai-capex-cash-conversion,concept,AI CapEx 到供應商財務七關橋接",
             "concept:capital-asset-revenue-cash-clocks,concept,承諾、資產、收入與現金四個時鐘",
+            "process:residual-value-guarantee-cash-waterfall,process,殘值保證或有現金瀑布",
             "stage:capital-commitment,stage,資本計畫與承諾",
             "stage:cash-ppe-and-leases,stage,現金 PP&E 與租賃支出",
             "stage:asset-construction-commissioning,stage,資產建置與試運轉",
@@ -7588,13 +7630,14 @@ class ResearchCenterTest(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("company:amazon,company,Amazon,AMZN", entities)
+        self.assertIn("company:nvidia,company,NVIDIA,NVDA", entities)
 
         graph = (
             ROOT / "notes" / "knowledge_graph"
             / "ai_capex_cash_conversion.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: AI CapEx 到供應商財務七關橋接", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 15)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
         for node in (
             "from_id: company:microsoft", "from_id: company:meta",
             "from_id: company:amazon", "to_id: stage:capital-commitment",
@@ -7602,6 +7645,8 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: group:serverodm", "to_id: group:pcb",
             "to_id: group:powersupply", "to_id: group:thermal",
             "to_id: concept:capital-asset-revenue-cash-clocks",
+            "from_id: company:nvidia",
+            "to_id: process:residual-value-guarantee-cash-waterfall",
         ):
             self.assertIn(node, graph)
 

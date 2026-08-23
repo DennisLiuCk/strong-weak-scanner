@@ -1,8 +1,9 @@
 # AI CapEx 到供應商財務七關橋接知識圖譜
 
-本圖先用承諾、資產、收入與現金四個時鐘拆開同一資料中心專案，再把雲端買方的資本計畫、
-付款、資產上線、容量使用與現金回收，和台灣供應商的產品／公司財務歸因分開。三家公司已
-揭露各自公司級財務結果；七關是研究框架，並不表示每一關都已有資料，更不把族群搜尋路由
+本圖先用承諾、資產、收入與現金四個時鐘拆開同一資料中心專案；遇到殘值保證時，先把揭露上限
+放在第 0 層，再以六個或有現金檢查點分開可服務、起租生效、付款或違約、資產回收、補差額與補償。之後才把雲端買方的資本計畫、
+付款、資產上線、容量使用與現金回收，和台灣供應商的產品／公司財務歸因分開。公司級財務結果
+與單一交易條款已有公開資料；七關仍只是研究框架，不表示每一關都有資料，也不把族群搜尋路由
 當成任何個股的訂單、收入或獲利。
 
 <!-- knowledge_graph_meta
@@ -10,7 +11,7 @@ schema_version: 1
 graph_id: ai-capex-cash-conversion
 root_node_id: concept:ai-capex-cash-conversion
 label: AI CapEx 到供應商財務七關橋接
-summary: 先分開承諾 資產 收入 現金四個時鐘，再從資本承諾 現金與租賃支出 資產建置上線 可用容量 工作負載與收入 買方現金回收追到供應商財務歸因，避免把買方 CapEx 直接換算成台灣公司受惠。
+summary: 先分開承諾 資產 收入 現金四個時鐘，殘值保證另拆生效 違約 回收 補差額與補償，再從資本承諾 現金與租賃支出 資產建置上線 可用容量 工作負載與收入 買方現金回收追到供應商財務歸因，避免把保證上限或買方 CapEx 直接換算成當期支出與台灣公司受惠。
 article_ids: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION
 status: active
 -->
@@ -73,6 +74,26 @@ review_due: 2026-08-15
 status: active
 boundary: Amazon TTM OCF PP&E purchases incentives 與自訂 FCF 可按其公式回溯；TTM 不能和兩家單季直接排名，也沒有台灣供應商財務分子。
 next_trigger: Amazon 提供可對齊的單季資產類別 租賃 上線容量 使用收入與供應商財務橋接。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACC-C04
+view: company
+from_id: company:nvidia
+to_id: concept:ai-capex-cash-conversion
+relation: reports_financials
+claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C16,MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C17
+note_refs:
+evidence_state: verified
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-17
+review_due: 2026-08-27
+status: active
+boundary: NVIDIA 8-K 只證明 PORTS-Pike 初始保證的附條件累計上限與違約後回收／補差額摘要；它不是當期 CapEx、已支付 1,050 億美元、預期損失或台灣供應商財務。
+next_trigger: NVIDIA 在 10-Q 提交完整 Agreements form，或正式揭露逐租約起租 ready-for-service Trigger Event 回收 實際付款與 OpenAI 補償。
 -->
 
 <!-- knowledge_edge
@@ -313,4 +334,24 @@ review_due: 2026-08-15
 status: active
 boundary: Meta 與 Amazon 申報能證明四個時點可分離，但沒有同一具名 AI 資產批次的合約 上線 使用 收入 付款與供應商收款全鏈。
 next_trigger: 買方與供應商用同一平台或資產批次公開合約生效 placed-in-service 客戶使用 收入 付款及收款日期。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACC-I13
+view: industry
+from_id: concept:ai-capex-cash-conversion
+to_id: process:residual-value-guarantee-cash-waterfall
+relation: measured_by
+claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C18
+note_refs:
+evidence_state: inference
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-17
+review_due: 2026-08-27
+status: active
+boundary: PORTS-Pike 三份官方文件只對應同一交易；1,050 億美元是初始保證的累計付款上限，不是當期 CapEx、已付款或預期損失，15 億美元股權投資與 IT-GW 容量另屬不同帳本。
+next_trigger: NVIDIA 後續 10-Q 提交完整 Agreements form，或逐租約出現起租 ready-for-service Trigger Event 重租／出售回收 實際補差額與 OpenAI 補償。
 -->
