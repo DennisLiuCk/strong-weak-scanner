@@ -19,9 +19,9 @@ group_ids: memory,packtest
 trigger_type: memory_standardization_and_sampling_ladder
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C9
+thesis_claim_id: C19
 base_confidence: medium
-confidence_basis: Sandisk 與 SK hynix 的聯合規格公告及 SK hynix 技術摘要可確認第一版 HBF 技術規格已對外發布，並列出介面、堆疊容量、頻寬等級、封裝可靠度與軟體讀寫範圍；但本輪未獨立取得可定位版本的 OCP 規範原文，實體樣品、合規互通、客戶資格、裝置整合、量產及財務貢獻也尚未被證實
+confidence_basis: OCP 官方 HBF High-Level Base Die Specification v0.7.0 已由本輪逐頁核對，能直接定位介面、讀寫、速度等級、電氣、可靠度與封裝要求；但它仍是 pre-1.0 規格，存在 Appendix D 缺頁、TBD、初步 bump map 與單位／表格不一致，且這份規格本身不包含產品合規、跨廠互通、實體樣品、客戶資格、量產或財務貢獻的完成證據
 cross_company_numbers: false
 -->
 
@@ -232,6 +232,22 @@ limitation: MLPerf 是推論系統 benchmark contract，不是 HBF 規格或 HBF
 independence_group: mlcommons-inference
 -->
 
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: High Bandwidth Flash (HBF™) High-Level Base Die Specification Version 0.7.0
+published_at: 2026-08-03
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.opencompute.org/documents/ocp-hbf-architecture-specification-v0-7-0-final-pdf
+locator: PDF 封面與第 10 頁版本／授權；第 14 至 16 頁單位、架構、容量與頻寬；第 25、56 至 58、78 至 80 頁 UCIe／AXI、讀寫與電氣要求；第 86、106、110 至 111 頁測試、可靠度、bump map 與 v1.0 TBD；本地 SHA-256 307531eb8053f00cbeccbc907ddff0a9c4fe6f9d0066a077ce33b0ac99312da3，130／130 頁文字抽取並針對實際引用頁逐頁渲染核對
+limitation: OCP 正式發布的 v0.7.0 規格可證明共同要求已能定位，但文件本身仍有缺失 Appendix D、preliminary／TBD、單位與表格衝突及 product-specific 欄位；v0.7.0 未附相應具名產品的 official test guidelines、共同 test suite、pass result、跨廠互通、樣品交付、客戶資格、量產或財務結果
+independence_group: sandisk-sk-hynix-ocp-hbf-spec
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -371,7 +387,7 @@ resolution:
 <!-- research_claim
 claim_id: C9
 label: inference
-status: active
+status: superseded
 claim: HBF 的成熟度現在必須用兩個時鐘閱讀：共同介面與規則的「規格時鐘」已從工作組前進到第一版技術規格公告發布；可測硬體與客戶導入的「產品時鐘」仍停在公開可驗證的實體 memory sample 之前
 supporting_source_ids: S2,S4,S7,S8
 contrary_source_ids:
@@ -381,8 +397,8 @@ boundary: 規格發布不能外推為規範全文已被本輪獨立核對、sili
 verification_needed:
 correction_kind: supersedes
 corrects_claim_id: C4
-corrected_by_claim_id:
-resolution:
+corrected_by_claim_id: C19
+resolution: S13 讓規格時鐘從「廠商公告第一版發布」前進到「已直接核對 OCP v0.7.0 pre-1.0 規格」；原主張的產品時鐘判讀仍成立，但規格證據邊界已改由 C18／C19 取代
 -->
 
 <!-- research_claim
@@ -439,7 +455,7 @@ resolution:
 <!-- research_claim
 claim_id: C13
 label: unverified
-status: active
+status: superseded
 claim: 本輪可直接取得帶版本與定位條款的 OCP HBF normative specification、公開 compliance 測試方法、具名產品 pass result，或跨廠互通矩陣
 supporting_source_ids:
 contrary_source_ids:
@@ -449,8 +465,8 @@ boundary: 未定位到公開文件不代表 OCP 貢獻者空間內沒有規格�
 verification_needed: OCP 公開且可定位版本的 HBF 規範原文、規範條款對應表、合規測試計畫、具名 pass list 或多供應商互通結果
 correction_kind:
 corrects_claim_id:
-corrected_by_claim_id:
-resolution:
+corrected_by_claim_id: C20
+resolution: S13 已解決「能否直接取得帶版本與條款定位的 OCP HBF 規格」；但 v1.0／errata、完整 HBF Profile、公開 compliance 方法、具名 pass 與跨廠互通仍未驗證，改由 C20 接續
 -->
 
 <!-- research_claim
@@ -521,6 +537,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: OCP 已正式公開 2026-08-03、共 130 頁的 HBF High-Level Base Die Specification v0.7.0；正文可定位最多 16 個獨立 UCIe host channels（每個可配置 1、2 或 4 個 AXI interfaces）、讀 64B 至 4KiB、一般 Core-die 寫入 4KiB（optional、product-specific scratchpad 寫入另為 64B）、三個頻寬等級、電壓、可靠度與封裝要求，但同一文件仍有不存在的 Appendix D、preliminary bump map、待 v1.0 完成的尺寸、product-specific 測試欄位，以及 TiB／TB、45mm／45µm 與頻寬表格不一致
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-08-03
+basis: S13 封面與第 10 頁確認版本、日期、貢獻者與正式規格授權；第 15 至 16、25、56 至 58、78 至 80、86、106、110 至 111 頁直接提供架構、mandatory-form 讀寫規則、速度／容量、電氣、測試、可靠度與封裝內容；本地 SHA-256 及引用頁渲染已核對，全文與目錄都沒有第 78 頁所引用的 Appendix D
+boundary: verified 只指 OCP 已發布文件的身分、可定位內容與文件內部缺口；規格數值是要求、設計包絡或假設，不是具名 silicon 實測；v0.7.0 未附相應具名產品的 official test guidelines、合規通過、跨廠互通、樣品、客戶資格、量產或部署結果；內部不一致支持等待 errata／v1.0，不代表整份規格無效
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: HBF 的規格時鐘已從第一版發布公告前進到可直接稽核的 pre-1.0 公開規格；截至本輪逐頁核對的文件，產品時鐘仍未建立「具名、已交付、可運行，且附產品規格、測試包絡與接收方結果」的完整 HBF memory sample 證據鏈，因此「共同規則更具體」與「尚無公開合規產品證據」可以同時成立
+supporting_source_ids: S4,S10,S13
+contrary_source_ids:
+as_of: 2026-08-24
+basis: correction_of:C9；S13 讓版本、條款與未完成區可直接核對，S4 仍把 memory／device sample 放在未來目標，S10 也沒有把 HBF sample、qualification、shipment 或獨立財務分子串成可核對的產品鏈；規格與產品證據鏈沒有共同 result ID
+boundary: 這是研究中心把規格與產品分開的成熟度推論，不是 OCP 的產品認證結論；公開 no-find 不排除 tape-out、早期 silicon、NDA prototype、私有測試或未公開客戶活動，任何單一早期節點也不能替代具名交付與接收方結果；不能由 v0.7.0 推出產品符合、第二供應商實作、跨廠互通、採用、收入或 HBM 替代
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C9
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: unverified
+status: active
+claim: HBF 已公開 v1.0／完整修訂或勘誤並補齊 HBF Profile、具名產品的 official test guidelines 與一致性測試方法，已有具名產品通過、OCP Accepted recognition、第二個獨立供應商實作、跨廠互通、實體樣品交付、客戶 qualification、量產、部署或可辨識收入
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-24
+basis: correction_of:C13；S13 只發布 v0.7.0 且明示 v1.0 TBD、preliminary bump map、product-specific 欄位，並要求客戶依相應產品的 official test guidelines 驗證但未附具名產品的對應內容；本輪 OCP 公開 contribution／產品入口及 Sandisk／SK hynix 官方材料沒有把同一具名產品、測試版本、pass result、接收方與商業結果串起來
+boundary: 公開入口找不到不是不存在的反證，也不涵蓋 OCP 私有 workstream、NDA 客戶活動或未公開試產；SK hynix 共同撰寫規格、Google／Tenstorrent 提供回饋、一般 AoU RTL、FMS technology demonstration 或 BiCS10 NAND 里程碑都不能替代第二個 HBF 產品、合規 pass、sample shipment 或 qualification
+verification_needed: OCP v1.0／errata 與完整 HBF Profile；固定版本 test suite／pass criteria／product guide；具名 part 與 result ID；至少兩個獨立供應商實作的同版跨廠互通；供應商與接收方雙向 sample／qualification；量產、部署及同產品財務分子
+correction_kind: supersedes
+corrects_claim_id: C13
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -555,7 +622,7 @@ retirement_reason: C5 已拆成規格文件／合規缺口 C13 與產品節點 C
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
 claim_ids: C7,C8,C9,C13
 metric: HBF 直接規範原文、規範層級對應、合規計畫與跨廠互通
 source_ids: S2,S7,S8
@@ -565,11 +632,13 @@ frequency_detail: 週一三五自動研究循環檢查 OCP、Sandisk 與 SK hyni
 next_check: 2026-08-26
 trigger: OCP 公開帶版本與條款定位的 HBF normative specification、xPU-HBF／UCIe 層級對應、合規測試方法、具名 pass list 或 multi-vendor interoperability result
 invalidation: 第一版規格撤回、範圍重大改寫，或後續公開測試顯示介面、封裝可靠度與軟體 I/O 無法共同成立
+retired_at: 2026-08-24
+retirement_reason: S13 命中可定位版本原文，但也把 v1.0／Appendix D／合規與產品結果拆成新的未完成節點；T3 引用的 C9／C13 已被取代，由 T6 接續規格修訂與合規護照
 -->
 
 <!-- monitoring_item
 monitor_id: T4
-status: active
+status: retired
 claim_ids: C3,C9,C10,C11
 metric: HBF memory sample、device sample、測試包絡與客戶 qualification
 source_ids: S4,S7,S8,S10
@@ -579,6 +648,8 @@ frequency_detail: 每週重查 Sandisk／SK hynix 的 sample、FMS 後續附件�
 next_check: 2026-08-26
 trigger: 具名 HBF memory sample 實際交付，且提供堆疊、容量、頻寬、延遲、寫入、耐久、功耗、熱或接收方測試中的可定位資訊；或裝置端確認工作負載及 qualification
 invalidation: 2026 下半年沒有可核對的 memory sample、時程明確延後、接收方未確認，或測試結果無法支持目標工作負載
+retired_at: 2026-08-24
+retirement_reason: C9 的規格公告世代已由 C19 取代；本輪沒有假造一次 T4 到期證據回查，產品樣品與資格節點由只引用 active claims 的 T7 接續
 -->
 
 <!-- monitoring_item
@@ -593,6 +664,34 @@ frequency_detail: 每季檢查具名 inference device、資料放置、部署分
 next_check: 2026-10-15
 trigger: 具名裝置公布 HBF／HBM／DRAM／SSD 分層與工作負載結果，或平台端及台灣公司端同時揭露 qualification、出貨、收入或毛利
 invalidation: HBF 長期只停留在規格與 roadmap，未出現可測硬體、軟體支援與部署；或財務揭露無法隔離 HBF 分子
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C18,C19,C20
+metric: HBF v1.0／errata、HBF Profile、一致性護照、具名產品 pass 與跨廠互通
+source_ids: S2,S7,S8,S13
+watch_source_ids: S2,S5,S6
+frequency: event_driven
+frequency_detail: 每月與事件出現時重查 OCP contribution／產品入口、HBF workstream、AoU profile、Sandisk／SK hynix datasheet；版本、test plan 與 result ID 必須能串成同一受測物
+next_check: 2026-09-30
+trigger: v1.0／errata 解決 Appendix D、單位／表格與 preliminary／TBD；公開具名產品的 official test guidelines、固定 pass criteria、具名合規結果、OCP recognition，或至少兩個獨立供應商實作在同版 profile 下完成跨廠互通
+invalidation: 後續版本仍無法形成完整 profile／test contract、產品 datasheet 無法對應規格等級，或不同實作在共同版本與條件下互通失敗
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C10,C11,C19
+metric: HBF memory sample、device sample、產品測試包絡、客戶 qualification 與量產
+source_ids: S4,S10,S13
+watch_source_ids: S5,S6
+frequency: weekly
+frequency_detail: 每週重查 Sandisk／SK hynix 的具名 part、sample shipment、接收方與 qualification；2026-12-31 另檢查 2026H2 memory-sample 目標，未發布消息本身不當成技術失敗
+next_check: 2026-08-26
+trigger: 具名 HBF part 實際交付並公開版本、容量／grade、功耗或電流、延遲／讀寫／耐久／熱條件、測試方法與接收方；或裝置端雙向確認工作負載、qualification、production／deployment
+invalidation: 供應商正式延後／取消樣品、明示窗口屆滿仍無交付證據，或實體測試無法滿足規格與目標工作負載；第二供應商只在獨立 part／datasheet／sample 出現時成立
 -->
 
 <!-- transition
@@ -616,13 +715,20 @@ to: triaged
 reason: added_hbf_nominal_usable_working_set_and_simulation_to_service_evidence_bridge_without_thesis_or_clock_refresh
 evidence: sources:S8,S11,S12
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_direct_hbf_v0_7_0_requirement_scope_and_conformance_boundary_without_thesis_clock_refresh
+evidence: sources:S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **新記憶體層**：在既有高速工作記憶體與長期儲存之間增加一個資料位置；只有容量還不夠，系統還要知道哪些資料適合放進去。
-- **高頻寬快閃記憶體（HBF）**：嘗試把大量快閃記憶體平行化，再配上底部邏輯晶片，提高容量與讀取能力；第一版共同技術規格已公告發布，但本輪仍沒有可核對的實體樣品交付。
+- **高頻寬快閃記憶體（HBF）**：嘗試把大量快閃記憶體平行化，再配上底部邏輯晶片，提高容量與讀取能力；OCP 已公開 v0.7.0 規格，但本輪仍沒有可核對的合規產品或實體樣品交付。
 - **高頻寬記憶體（HBM）**：把多層動態記憶體疊在一起並放在運算晶片附近；速度高，但容量、成本與封裝空間都有取捨。
 - **快閃記憶體（NAND）**：固態硬碟常用、斷電後仍可保留資料的記憶體；密度高，但讀寫等待、更新與耐久特性不同於工作記憶體。
 - **動態隨機存取記憶體（DRAM）**：需要持續供電、適合快速讀寫的工作記憶體；它與快閃記憶體的速度、成本與資料保留方式不同。
@@ -650,13 +756,29 @@ evidence: sources:S8,S11,S12
 - **功耗**：裝置運作所需電力；每次搬移資料的耗能與整體系統功率都會影響是否可部署。
 - **熱管理**：把晶片與封裝產生的熱帶走；堆疊密度提高後，熱點可能限制速度、壽命與穩定度。
 - **底部邏輯晶片（logic base die）**：位在記憶體堆疊底部、處理資料傳輸與控制功能的邏輯晶片；有此設計方向不等於產品已完成。
+- **核心記憶體堆疊（Core-die／Core die）**：v0.7.0 用來稱位在底部邏輯晶片上方、內含 16 顆 NAND dies 的記憶體堆疊；這裡的 Core 不是處理器核心。
 - **控制器**：安排資料讀寫、錯誤處理與裝置溝通的元件或邏輯；能控制一般固態硬碟不代表已支援 HBF。
 - **堆疊**：把多層晶粒垂直整合，以增加容量或縮短連線；層數增加也會提高接合、測試與散熱難度。
 - **記憶體分層**：依資料的速度、容量、持久性與成本需求，安排不同記憶體或儲存位置；不是越靠近運算晶片就一定越好。
 - **軟體調度**：由系統軟體決定哪些資料何時搬移、放在哪一層；硬體存在不代表應用會自動使用。
 - **標準化**：多方討論共同名稱、介面與測試規則；開始標準化不等於規格完成或產品互通。
 - **工作組（workstream）**：由參與者共同推進特定議題的組織；工作組成立只證明有人開始協作。
-- **公開規格（specification）**：可定位版本與內容的共同技術文件；廠商已公告第一版 HBF 規格發布，但本文仍把公告摘要與可逐條核對的規範原文分開。
+- **公開規格（specification）**：可定位版本與內容的共同技術文件；HBF v0.7.0 已能直接逐頁核對，但公開一份規格不會自動製造出合規產品。
+- **正式發布的 SPEC contribution**：通過 OCP 貢獻流程後公開收錄的規格文件；它不是未核准草稿，但版本仍可能低於 1.0，也不是產品認證。
+- **規範性要求（normative requirement）**：實作者若要宣稱符合規格，原則上必須滿足的要求；本文保守地把正文以 `shall` 寫成的句子稱為 mandatory-form requirement。
+- **shall**：規格常用來表示「必須」的字；看到它只能證明規則寫得較明確，不能證明任何產品已通過。
+- **勘誤（errata）**：發布後用來修正錯字、單位、缺頁或技術矛盾的正式紀錄；讀者不能自行猜一個正確值再當成原規格。
+- **一致性測試（conformance test）**：用固定方法檢查某個具名實作是否符合指定版本與要求；測試介面存在不等於已有共同測法。
+- **通過結果（pass result）**：把產品、規格版本、測試計畫、條件與結果識別碼綁在一起的完成證據；只有「支援」或「展示」兩個字還不夠。
+- **證據護照**：研究中心用來保存版本、條款、角色、條件、測法與結果識別碼的閱讀表；它不是 OCP 官方表單，也不替產品發證書。
+- **二進位與十進位單位**：GiB／TiB 以 2 的次方計算，GB／TB 以 10 的次方計算；名稱只差一個 `i`，數值卻不能直接混用。
+- **v1.0**：通常表示規格進入第一個完整主要版本；v0.7.0 已正式發布，卻仍可明示把部分欄位留待 v1.0，兩者不能視為同版。
+- **pre-1.0 規格**：版本號仍低於 1.0 的公開規格；它可以是正式發布文件，卻常仍保留待補欄位、相容性變更或勘誤空間。
+- **HBF Profile**：HBF 在通用晶粒互連傳輸規則上增加的專用設定集合；v0.7.0 第 78 頁指向 Appendix D，但該附錄不在文件內。
+- **待決定（TBD）**：To Be Determined 的縮寫，表示數值或規則尚未固定；它不是零、沒有限制，也不能由讀者自行填入。
+- **AXI**：運算晶片內常用的資料與控制傳輸介面；HBF 規格描述如何把 AXI 訊息帶過 UCIe，但不證明任何兩顆晶片已互通。
+- **高階規格（High-Level Specification）**：先定義主要架構、角色與包絡的文件；名稱提醒讀者仍可能需要更細的產品參數、測法與實作文件。
+- **SHA-256**：把檔案內容算成固定長度指紋的方法；相同指紋幫助確認核對的是同一份 PDF，卻不保證文件內容正確或產品通過。
 - **規格時鐘**：追蹤工作組、共同文件、規範條款、合規方法與互通結果；它回答「大家是否用同一套規則」。
 - **產品時鐘**：追蹤實體樣品、裝置整合、客戶資格、量產與收入；它回答「規則是否已變成可交付產品」。
 - **頻寬等級**：規格把可提供的資料搬移量分成數個級別；公布等級包絡不等於某顆樣品已在指定條件下量到同樣結果。
@@ -681,8 +803,8 @@ evidence: sources:S8,S11,S12
 ### 三句話抓重點
 
 - 新的記憶體層不能只提供更大容量；它還要在目標工作負載下證明讀取速度、寫入與更新、耐久、功耗和熱管理都能成立。
-- 兩家記憶體公司已公告第一版共同技術框架，涵蓋容量、傳輸級別、主機連接、封裝可靠度與軟體讀寫，規格工作已比只有工作組時更前進一步。
-- 但規則前進不等於產品同步前進；本輪仍不能說實體樣品已交付、裝置已整合、客戶已通過或產品已量產。
+- 開放運算組織已正式公開第 0.7.0 版共同文件，正文能直接找到主機連接、讀寫、速度、電氣、可靠度與封裝要求；但它仍有待 1.0 完成的欄位、缺失附錄與單位矛盾。
+- 有 `shall` 不等於有 `pass`；本輪仍不能說具名產品已合規、跨廠互通、樣品已交付、客戶已通過或產品已量產。
 
 ### 為什麼重要
 
@@ -690,13 +812,13 @@ evidence: sources:S8,S11,S12
 只有在容量、等待時間、讀寫模式、耐久、功耗與成本共同成立，而且系統軟體知道何時搬移資料時，
 才可能真正分擔既有記憶體與儲存裝置的工作。
 
-因此第一版共同規則值得升級，但它只回答「預計如何連接與描述產品」，還沒有回答「哪一顆樣品
-在什麼條件下做到了」。把規格時鐘、產品時鐘、系統條件、角色交接與商用關卡分開，才能避免
-把新名詞或規格包絡直接寫成量產市場與台灣供應商訂單。
+因此 v0.7.0 值得升級：讀者不再只能依賴公告摘要，而能回到原文問「哪一頁要求誰做什麼」。
+但它仍沒有回答「用哪套測法、哪顆產品、在什麼條件下通過」。把規格、測試、產品與商業時鐘
+分開，才能避免把 `shall`、規格包絡或展場展示直接寫成量產市場與台灣供應商訂單。
 
 ### 接下來怎麼追
 
-- 先找開放運算計畫可直接定位的規格版本與條款，確認主機介面、晶粒互連、封裝可靠度及軟體讀寫各在哪一層，再追合規與互通方法。
+- 先追 v1.0／勘誤是否補上缺失的 HBF Profile、初步封裝欄位與不一致單位，再找固定版本的一致性測法、通過標準與結果識別碼。
 - 再找 2026 年下半年實體記憶體樣品的交付日、規格、測試條件與接收方。
 - 2027 年初若出現裝置樣品，要確認它真的完成裝置整合、軟體調度與目標工作負載測試，而非單一展示板。
 - 公司層級必須同時看到平台端具名、客戶資格認證、穩定製造、出貨、重複訂單與可辨識財務資料。
@@ -705,6 +827,7 @@ evidence: sources:S8,S11,S12
 
 - 如果一種裝置容量很大、連續讀取很快，卻無法承受應用所需的頻繁寫入與更新，它應被當成新的工作記憶體層，還是特殊儲存裝置？
 - 公司宣布加入工作組、公開規格完成、中立測試通過與多家產品互通，分別代表哪些不同證據？
+- 如果規格寫了「產品必須做某件事」，還缺哪幾欄才能知道某顆產品真的做到了？
 - 即使裝置樣品能運作，還要看到哪些客戶與製造證據，才能稱為量產市場？
 
 ## 先判斷它能不能成為新的記憶體層
@@ -715,24 +838,81 @@ evidence: sources:S8,S11,S12
 
 | 本文五項系統條件 | 讀者先問 | 沒通過會怎樣 | 主要接力角色 | 本輪可確認到哪裡 |
 |---|---|---|---|---|
-| 1. 容量與資料保留 | 能否保存目標資料量，斷電後是否要保留 | 容量不足會頻繁搬移；保留方式不符則放錯資料層 | 快閃記憶體、堆疊與控制器 | 規格摘要列出 8 層／16 層與最高 512GB 包絡；尚非實體產品量測 |
-| 2. 讀取與等待時間 | 連續與分散讀取能否在工作負載要求內完成 | 總頻寬看似很高，單次取用仍可能等太久 | 底部邏輯晶片、控制器與介面 | 規格摘要列約 0.4 至 3.0 TB/s 三級；沒有延遲、存取型態、測試條件或第三方結果 |
-| 3. 寫入、更新與耐久 | 能否承受應用需要的改寫頻率與服務壽命 | 只能大量讀取時，可能仍較像特殊儲存裝置 | 記憶體元件、控制器與韌體 | 規格公告涵蓋軟體讀寫與可靠度指引；尚無寫入、更新與耐久測試結果 |
-| 4. 功耗、熱與封裝 | 堆疊與底部邏輯晶片能否在系統功率與溫度範圍內穩定運作 | 熱點、功耗或接合問題可能限制速度、壽命與良率 | 封裝、測試、供電與散熱角色 | 規格公告涵蓋封裝與可靠度；尚無實體樣品的功耗、熱、接合或良率結果 |
-| 5. 系統整合與軟體調度 | 裝置、控制器與軟體是否知道哪些資料何時搬移 | 硬體即使可用，也可能沒有應用願意或能夠使用 | 裝置商、系統軟體、應用與客戶 | 公告列 UCIe、主機介面與軟體讀寫；2027 年初裝置樣品仍是目標，尚無具名系統運行結果 |
+| 1. 容量與資料保留 | 能否保存目標資料量，斷電後是否要保留 | 容量不足會頻繁搬移；保留方式不符則放錯資料層 | 快閃記憶體、堆疊與控制器 | v0.7.0 列 16-die、512GiB 與 24 小時／85°C power-on retention；容量表無法由表內輸入獨立重算，endurance 仍是 product-specific，尚非產品量測 |
+| 2. 讀取與等待時間 | 連續與分散讀取能否在工作負載要求內完成 | 總頻寬看似很高，單次取用仍可能等太久 | 底部邏輯晶片、控制器與介面 | v0.7.0 列 0.384／1.536／3.072 TB/s 及讀 64B 至 4KiB；沒有具名產品的延遲分布、持續時間、功耗或第三方結果 |
+| 3. 寫入、更新與耐久 | 能否承受應用需要的改寫頻率與服務壽命 | 只能大量讀取時，可能仍較像特殊儲存裝置 | 記憶體元件、控制器與韌體 | v0.7.0 的一般 Core-die write 粒度為 4KiB，optional、product-specific scratchpad write 另為 64B，並描述 host 管理；endurance、read disturb 與多項門檻仍交給 product spec，沒有測試結果 |
+| 4. 功耗、熱與封裝 | 堆疊與底部邏輯晶片能否在系統功率與溫度範圍內穩定運作 | 熱點、功耗或接合問題可能限制速度、壽命與良率 | 封裝、測試、供電與散熱角色 | v0.7.0 列 voltage rails、0 至 105°C junction range 與初步 bump map；沒有 current／W／energy、具名 sample、熱／接合或良率結果 |
+| 5. 系統整合與軟體調度 | 裝置、控制器與軟體是否知道哪些資料何時搬移 | 硬體即使可用，也可能沒有應用願意或能夠使用 | 裝置商、系統軟體、應用與客戶 | v0.7.0 列 UCIe 3.0、AXI-over-UCIe 0.8 與 host rules，但所引 HBF Profile 附錄缺失；2027 年初裝置樣品仍是目標 |
 
 ## 第一版技術規格先對齊哪四份合約
 
-下表是依 Sandisk／SK hynix 的聯合公告與 SK hynix 技術摘要整理的閱讀地圖，不是本文自行補寫
-的規範條款。本輪沒有從 OCP 公開入口取得可逐條定位的版本化規範原文，所以只能確認「公告說
-規格涵蓋什麼」，不能宣稱每一條 normative requirement、版本號或合規方法已被獨立核對。
+下表已由公告摘要升級成 OCP v0.7.0 原文閱讀地圖。它能告訴讀者共同文件在哪裡寫了什麼，卻
+不能單靠文件判定任何產品已實作、通過或互通。[S13]
 
-| 四份共同合約 | 公告摘要對齊什麼 | 初學者要避免的誤讀 | 下一份可升級證據 |
+| 四份共同合約 | v0.7.0 可定位內容 | 初學者要避免的誤讀 | 下一份可升級證據 |
 |---|---|---|---|
-| 1. 產品包絡 | 8 層／16 層、最高 512GB、約 0.4 至 3.0 TB/s 三個頻寬等級 | 規格上限等於已交付產品實測，或總頻寬等於低延遲 | 可定位規範條款、樣品型號、測試方法與完整操作條件 |
-| 2. 主機與電氣介面 | xPU-HBF 主機介面、電氣連接與 UCIe 路徑 | 寫出介面名稱等於任一運算晶片已接通，或多廠產品已互通 | 版本與層級對應、compliance checklist、具名 silicon 與跨廠結果 |
-| 3. 堆疊、封裝與可靠度 | 堆疊配置、可靠度與封裝設計指引 | 設計指引等於接合、熱、良率及長期壽命已通過 | 樣品結構、熱／機械條件、可靠度方法、結果與接收方 |
-| 4. 軟體讀寫 | 軟體 read／write user guide 與硬軟共同設計方向 | 有讀寫指引等於驅動、資料放置與目標工作負載已完成 | 公開軟體介面、資料放置策略、具名裝置與端到端工作負載 |
+| 1. 產品包絡 | 16-die、512GiB、0.384／1.536／3.072 TB/s 三級，另有讀、寫與可靠度欄位 | 表格數字等於已交付產品實測、可用容量或低延遲 | 具名 part、software-visible capacity、產品 datasheet、測法與完整操作條件 |
+| 2. 主機與電氣介面 | 16 個 x64 UCIe 3.0 channels、Format 6、AXI-over-UCIe 0.8、voltage cases | 介面與 `shall` 已寫出，就等於任一運算晶片已接通或多廠互通 | 補齊 HBF Profile、固定 test suite、具名 endpoints、pass result 與跨廠矩陣 |
+| 3. 堆疊、封裝與可靠度 | 初步 bump map、名目尺寸、retention／UBER／MTBF 與溫度包絡 | 設計值等於接合、熱、良率、耐久及長期壽命已通過 | v1.0／勘誤、樣品結構、功耗／熱／機械／可靠度方法、結果與接收方 |
+| 4. 軟體讀寫 | 64B 至 4KiB reads、一般 Core-die writes 4KiB（optional scratchpad 64B）、host memory mapping／refresh／failure rules | 有 user guide 等於驅動、資料放置與目標工作負載已完成 | 公開驅動與 product parameters、資料放置策略、具名裝置與端到端結果 |
+
+## V0.7.0 能證明規則已可定位，不能證明產品已過關
+
+先把文件身分說準：這份 2026 年 8 月 3 日、130 頁的 v0.7.0 已由 OCP 正式公開收錄，是
+published SPEC contribution，不是「尚未核准的草稿」。但 `0.7.0` 仍低於 `1.0`，而且文件名稱
+就是 High-Level Base Die Specification；OCP 發布規格與 OCP 認可一顆產品，是兩件不同的事。
+[S13]
+
+| 原文能直接證明 | 可以定位的例子 | 還不能證明 |
+|---|---|---|
+| 版本與共同範圍已公開 | 日期、版本、貢獻者、16-channel 架構與多個正文要求 | v1.0 已完成、文件沒有缺口，或產品已獲認可 |
+| 主機與記憶體要遵守的規則較具體 | 讀 64B 至 4KiB、一般 Core-die 寫入 4KiB（optional scratchpad 64B）、UCIe／AXI roles、電壓與可靠度包絡 | 任一具名 base die、stack 或 xPU 已實作並通過 |
+| 測試責任有被提到 | 第 86 頁要求客戶依相應 HBF 產品的 official test guidelines 做 final validation | v0.7.0 已附具名產品 guidelines、pass criteria 已固定，或客戶真的完成驗證 |
+| 未完成區也可被看見 | 第 78 頁引用全文不存在的 Appendix D；第 111 頁把 min／max 尺寸留待 v1.0，bump map 仍是 preliminary | 讀者可以自行補出缺失 profile、猜定最終尺寸或把可能的 typo 靜默修正 |
+
+### 為什麼 `shall` 還不是 `pass`
+
+規格句子回答的是「符合者應做什麼」；通過結果回答的是「哪個受測物、依哪版測法、在什麼條件
+下做到了」。中間至少還有五次交接：
+
+`規格要求 → 測試方法與通過門檻 → 具名產品實作 → 可追溯結果 → 客戶資格 → 量產與財務`
+
+v0.7.0 已把第一格推進，也描述 IEEE 1500、JTAG 與 Direct Access 等 test／debug interfaces；
+但介面是「可以怎麼測」的入口，不是「已通過」的結果。文件要求客戶依相應 HBF 產品的
+official test guidelines 做 final validation；v0.7.0 本身未附這些 guidelines，本輪也沒有具名產品
+的對應 test-plan、result ID、共同 test suite 或 pass。[S13]
+
+為避免把前一格跳成後一格，研究中心用八欄「要求—合規證據護照」閱讀後續消息：
+
+| 護照欄位 | 讀者要保存什麼 | v0.7.0 之後的公開缺口 |
+|---|---|---|
+| 1. 版本與狀態 | 規格名稱、revision、發布／勘誤狀態 | v0.7.0 已有；v1.0／errata 未見 |
+| 2. 要求定位 | section、table、register 或逐條 requirement ID | 多數內容可定位；HBF Profile 指向缺失 Appendix D |
+| 3. 角色與端點 | 誰送、誰收、host／HBF／base die／core die 的責任 | 架構角色已有；沒有具名產品 endpoints |
+| 4. 動詞與義務 | `shall`、optional、targeting 或 product-specific | 用詞可見；文件未定義完整關鍵字規則，須保守閱讀 |
+| 5. 前置與操作條件 | speed grade、request size、電壓、溫度、方向、持續時間 | 部分包絡已有；current／W、完整 endurance／latency 等仍缺 |
+| 6. 可觀測量與輸出 | 實際量什麼、單位、容差、錯誤與失敗如何記 | 有部分 register／reliability 欄位；沒有產品 raw result |
+| 7. 測法與通過門檻 | test-plan version、procedure、coverage 與 pass／fail rule | 公開共同 test suite／product guide／pass criteria 未見 |
+| 8. 實作與結果識別 | part、revision、sample、test lab、result ID、日期與簽核 | 具名 HBF pass、第二實作與跨廠矩陣未見 |
+
+這八欄是研究中心的推論框架，不是 OCP 官方證書。只有欄位齊全也不保證產品好用；它先保證
+讀者不會把不同版本、不同端點或不同測試的片段誤接成同一個 pass。
+
+### 一個 `i` 與三個表格差異，足以改變數字意思
+
+v0.7.0 第 14 頁明定 GiB／TiB 是二進位、GB／TB 是十進位，所以不能把行銷摘要與規格表的單位
+視為同一個字。以下是確定性文件／單位核對，不是裝置效能估計：[S13]
+
+| 原文組合 | 同一單位下的核對 | 正確讀法 |
+|---|---:|---|
+| `512 GiB` 對 `512 GB` | `512 GiB = 549.755813888 GB`，比 `512 GB` 多 `7.3741824%` | 必須保留原單位；兩者都不等於 software-visible capacity，且第 16 頁表內也缺少足以獨立重算 512GiB 的每 die／block 分母 |
+| `3.072 TiB/s` 對 `3072 GB/s` | `3.072 TiB/s = 3377.699720528 GB/s`，比 `3072 GB/s` 高 `9.9511627776%` | 第 16 頁的 `3072 GB/s` 與 `3.072 TB/s` 彼此相容，卻和第 15 頁的 `TiB/s` 不同；等待勘誤前不可靜默合併 |
+| Grade 2／3 分項加總對總表 | 分項為 `1504／3008 GB/s`，各比總表 `1536／3072 GB/s` 低 `2.083333...%` | 文件未解釋差額；不能挑較大的數字當產品實測 |
+| `45mm` 對 `45µm` bump pitch | 相差 `1000×` | 後文多處寫 `45µm`，很像 typo，但研究者只能標示衝突並等待正式修正 |
+
+以上母體是 **N=1 份官方規格文件**，沒有 HBF device、sample、benchmark run 或抽樣；因此
+sampling SE／t 不適用。這些差異不表示整份規格無效，只表示 v0.7.0 仍需要勘誤／v1.0，且任何
+產品主張都必須保留版本、單位、測法與 result ID。
 
 ## 512GB、1.6TB/s 與「只差 2.2%」是三種不同證據
 
@@ -793,11 +973,12 @@ MLPerf Inference 的方法邊界能說明第三張表為何不能省：現行規
 | 偏空：較高延遲、較大 page 與寫入邊界抵銷容量 | 小而分散的讀取、KV 更新、尾端等待、耐久或軟體搬移可能讓部分工作仍需 HBM／DRAM，降低 HBF 可承擔的有效比例 | 固定資料放置與並行請求，公開 read／write mix、request／page、latency distribution、stall、endurance、retention、功耗、失敗與服務品質 | 只拿 HBM 名目容量不足或 NAND 一般特性推論，沒有具名 HBF 裝置與相同 workload 比較 |
 | 共同底線 | 大容量、讀取頻寬與端到端推論效益是三個不同分母 | 固定 sample、可用容量、完整工作集、baseline、scenario、quality、run 分布與成本，再由供應商和接收方雙向核對 | 把 `512GB`、`1.6 TB/s` 與 `2.2%` 串成已量產、已採用或已形成台灣公司收入的單一路徑 |
 
-本輪新增 N=2 份一手方法文件：Sandisk fact sheet 是供應商產品／模擬鏈，MLCommons rules 是
-獨立 benchmark-contract 鏈，不是兩顆 HBF、兩個 sample、兩個客戶或兩次 run。PDF 共 3 頁，
+前一輪新增 N=2 份一手方法文件：Sandisk fact sheet 是供應商產品／模擬鏈，MLCommons rules 是
+獨立 benchmark-contract 鏈，不是兩顆 HBF、兩個 sample、兩個客戶或兩次 run。該 PDF 共 3 頁，
 本地 SHA-256 為 `349f05372fb528702d2fe95ec8f3a9cb9b4dd976c7d115a3db49f26031b10111`，
 3／3 頁已逐頁渲染核對；PDF／PNG 只留在 `tmp/`，不進版控。除了 N=1 教材換算，沒有新的
-effect size、sampling SE／t、價格、估值、共識、部位或投資判斷。
+effect size、sampling SE／t、價格、估值、共識、部位或投資判斷。本輪另新增 N=1 份 OCP
+官方規格 S13；它是文件證據，不是新增一顆產品、一個 sample 或一次 benchmark run。
 
 ## 用兩個時鐘避免把規格當產品
 
@@ -806,7 +987,7 @@ effect size、sampling SE／t、價格、估值、共識、部位或投資判斷
 
 | 證據時鐘 | 依序要經過 | 截至本輪的位置 | 還不能說 |
 |---|---|---|---|
-| 規格時鐘 | 工作組 → 第一版共同文件 → 可定位規範條款 → 合規方法 → 具名通過 → 跨廠互通 | 廠商公告第一版技術規格發布，並摘要四份合約；OCP 仍列工作組 | 本輪已逐條核對規範原文、產品已合規或多廠已互通 |
+| 規格時鐘 | 工作組 → 第一版共同文件 → 可定位規範條款 → 合規方法 → 具名通過 → 跨廠互通 | OCP v0.7.0 已直接核對，規則與未完成區能定位；仍缺 v1.0／勘誤、完整 HBF Profile、共同 test suite 與 pass | 規格已無缺口、產品已合規、第二實作已存在或多廠已互通 |
 | 產品時鐘 | 架構 → 實體記憶體樣品 → 裝置樣品 → 客戶資格 → 穩定量產 → 可辨識收入 | 架構與未來樣品時程已公開；本輪未見具名交付的實體樣品 | 裝置已完成、客戶已採用、量產出貨或供應鏈已有財務貢獻 |
 
 ## 再把商用化拆成六關
@@ -817,7 +998,7 @@ effect size、sampling SE／t、價格、估值、共識、部位或投資判斷
 | 本文六關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
 | 1. 技術位置與工作負載說清楚 | 想處理哪類資料，為何不能由既有記憶體或儲存裝置完成 | SK hynix 描述快閃記憶體、底部邏輯晶片與鍵值快取位置 | 共同工作負載、延遲、寫入、耐久、熱與功耗結果 | 效能已勝過高頻寬記憶體，或所有推論工作負載都適用 |
-| 2. 共同規則公開 | 多家產品要如何交換資料、測試與互通 | 兩家公司已公告第一版技術規格發布，摘要主機／電氣介面、產品包絡、封裝可靠度與軟體讀寫 | OCP 可定位的版本化規範原文、條款對應、合規方法與跨廠結果 | 公告摘要已等同全文核對、多家產品已互通或已有合規結果 |
+| 2. 共同規則公開 | 多家產品要如何交換資料、測試與互通 | OCP 已公開 v0.7.0，可定位主機／電氣介面、產品包絡、封裝可靠度與軟體讀寫要求 | v1.0／勘誤、完整 HBF Profile、共同 test suite、具名 pass 與跨廠結果 | `shall`、test interface 或正式規格發布已等同產品合規、多家產品互通或客戶通過 |
 | 3. 交出可測記憶體樣品 | 實體記憶體是否按規格做出並交給接收方測試 | Sandisk 以 2026 年下半年為首批樣品目標 | 實際交付日、規格、測試條件與接收方 | 樣品已交付、測試已通過或已有客戶訂單 |
 | 4. 完成裝置整合 | 記憶體是否被放入具名裝置，並由軟體安排目標工作負載 | Sandisk 以 2027 年初為首批裝置樣品目標 | 具名裝置、軟體調度、工作負載與運行結果 | 裝置樣品已完成、可大規模部署或已被客戶採用 |
 | 5. 通過客戶資格認證 | 客戶是否依指定產品與條件完成驗證 | 本輪沒有完成證據 | 客戶名稱、測試條件、通過結果與採購節點 | 開始測試就等於通過，或單一客戶可代表整個市場 |
@@ -830,9 +1011,9 @@ HBF 若真的成為新記憶體層，不會只由一顆記憶體晶片完成。�
 
 | 接力角色 | 要交付什麼 | 要和下一角色說清楚 | 本輪證據 | 不能外推 |
 |---|---|---|---|---|
-| 快閃記憶體與堆疊 | 提供容量、資料保留與可製造的記憶體結構 | 晶粒、堆疊、讀寫、耐久與測試規格 | 共同規格摘要列出 8／16 層與容量包絡；尚無具名實體樣品、晶粒細節或量測 | 一般固態硬碟用快閃記憶體可直接替代，或所有記憶體廠都能生產 HBF |
-| 底部邏輯晶片與控制器 | 安排平行資料傳輸、命令與錯誤處理 | 介面、控制協定、製程、功耗與熱邊界 | 技術方向有底部邏輯晶片，規格摘要列主機／電氣介面與 UCIe；沒有具名 silicon 或實測 | 已完成設計、已選定晶圓代工或控制器供應商 |
-| 封裝、測試與熱管理 | 把堆疊與邏輯晶片整合成可測、可散熱的產品 | 接合、互連、測試覆蓋、良率與散熱條件 | 規格公告涵蓋可靠度與封裝指引；沒有具名產品、測試結果或供應商 | 服務高頻寬記憶體的公司必然取得 HBF 訂單 |
+| 快閃記憶體與堆疊 | 提供容量、資料保留與可製造的記憶體結構 | 晶粒、堆疊、讀寫、耐久與測試規格 | v0.7.0 列 16-die／512GiB、讀寫與可靠度包絡；endurance／read disturb 仍 product-specific，沒有具名樣品量測 | 一般固態硬碟用快閃記憶體可直接替代，或所有記憶體廠都能生產 HBF |
+| 底部邏輯晶片與控制器 | 安排平行資料傳輸、命令與錯誤處理 | 介面、控制協定、製程、功耗與熱邊界 | v0.7.0 列 UCIe／AXI、base-die roles 與電壓，但 HBF Profile 附錄缺失；本輪證據未把任何具名 silicon 與規格版本、完整 stack 及測試結果串成一條鏈 | 已完成設計、已選定晶圓代工或控制器供應商 |
+| 封裝、測試與熱管理 | 把堆疊與邏輯晶片整合成可測、可散熱的產品 | 接合、互連、測試覆蓋、良率與散熱條件 | v0.7.0 列初步 bump map、尺寸與 test／debug interfaces；沒有 product guide、具名 pass、功耗、熱、接合或良率結果 | 服務高頻寬記憶體的公司必然取得 HBF 訂單 |
 | 裝置、系統與軟體 | 把記憶體放進具名裝置，安排資料搬移與工作負載 | 裝置介面、驅動、軟體調度與端到端結果 | 規格公告涵蓋軟體讀寫；裝置樣品仍是未來目標，沒有具名運行結果 | 加入規格 consortium 或單一展示板等於可部署產品 |
 | 客戶、製造與財務 | 完成資格認證、穩定製造、持續採購與財務揭露 | 通過條件、良率、出貨、重複訂單與同期間收入 | Google／Tenstorrent 只由聯合公告列為 consortium members；沒有產品通過、量產、訂單或 HBF 財務分子 | 參與技術驗證、規格發布或公司總營收等於 HBF 商業化成功 |
 
@@ -848,12 +1029,19 @@ HBF 若真的成為新記憶體層，不會只由一顆記憶體晶片完成。�
 - [Sandisk Q4 FY26 Earnings Presentation](https://investor.sandisk.com/static-files/c75d1bee-c5c9-4e5a-8605-302c1aeac59b)（HBF 只在產品組合層級出現，沒有 HBF 獨立財務分子）。
 - [Sandisk HBF Fact Sheet](https://documents.sandisk.com/content/dam/asset-library/en_us/assets/public/sandisk/collateral/company/Sandisk-HBF-Fact-Sheet.pdf)（Gen 1 名目容量／讀取頻寬，以及 2.2% 內部模擬的模型、精度、kernel、baseline、latency、page size 與可用容量腳註邊界）。
 - [MLPerf Inference Rules](https://github.com/mlcommons/inference_policies/blob/master/inference_rules.adoc)（完整受測系統、scenario、quality、TTFT／TPOT 與 Llama3.1-405B 的推論結果契約）。
+- [OCP HBF Architecture Specification v0.7.0](https://www.opencompute.org/documents/ocp-hbf-architecture-specification-v0-7-0-final-pdf)（正式公開規格原文、條款定位、pre-1.0 未完成區與文件內單位／表格邊界）。
 
-8 月 3 日與 8 月 4 日兩篇是同一 Sandisk／SK hynix 共同規格消息鏈，不能當成兩份獨立採用證據；
-Google 與 Tenstorrent 也只由這條聯合消息鏈列為 consortium members。本篇只把 512GB 與約 0.4
-至 3.0 TB/s 寫成公告的規格包絡，只使用 Sandisk 模擬已明示的條件與腳註來教讀者辨認證據層，
-不採用它宣稱 HBF 與 HBM 效能相等，也不拿沒有共同測試條件的容量、頻寬、成本或良率做跨產品
-勝負與公司估值。
+8 月 3 日與 8 月 4 日兩篇仍是同一 Sandisk／SK hynix 共同消息鏈；S13 是 OCP 收錄的兩家公司
+共同規格，不是第三個產品供應商或獨立採用樣本。Google 與 Tenstorrent 只被列為提供回饋的
+consortium members，也不是 HBF 產品、客戶資格或部署。本文只把 v0.7.0 數值寫成規格要求、
+包絡或假設，並把 TiB／TB、GiB／GB、分項頻寬與 bump pitch 衝突原樣標出；不自行補出 Appendix D，
+不宣稱 HBF 與 HBM 效能相等，也不拿沒有共同測試條件的容量、頻寬、成本或良率做跨產品勝負與
+公司估值。公開 no-find 不涵蓋 OCP 私有工作組、NDA 客戶活動或未公開試產。
+
+投資層級因此仍只到 **HBF 產業觀察**：規格讓應追的 NAND、底部邏輯晶片、互連、封裝測試與
+軟體角色更清楚，卻沒有任何 universe 公司被雙向具名，也沒有可隔離的產品收入、毛利或資本支出
+分子。本輪未取得價格、估值模型、共識預期或部位資料，不提供公司／證券投資結論，也不判斷市場
+是否已反映這份規格。
 
 ## 影響路由
 
@@ -864,7 +1052,7 @@ direction: uncertain
 hypothesis_refs:
 note_action: watch
 action_due: 2026-08-26
-rationale: 第一版共同規格讓 NAND、controller、logic base die、主機介面與軟體讀寫搜尋路由更具體；但本輪沒有 universe 公司被平台端具名，也沒有樣品、資格與財務雙向核對
+rationale: OCP v0.7.0 讓 NAND、controller、logic base die、主機介面、封裝測試與軟體讀寫搜尋路由可逐條定位；但本輪沒有 universe 公司被平台端具名，也沒有產品 pass、樣品、資格與財務雙向核對
 evidence_boundary: 外部共同規格或一般記憶體／控制器能力，不等於 universe 公司已有 HBF sample、qualification、訂單或收入
 -->
 
@@ -875,14 +1063,14 @@ direction: uncertain
 hypothesis_refs:
 note_action: watch
 action_due: 2026-08-26
-rationale: HBF 規格摘要已涵蓋 8／16 層堆疊、UCIe、封裝與可靠度指引，形成 bonding、TSV、測試與熱管理搜尋入口；但沒有具名封裝產品、樣品結果或 universe 供應商
+rationale: HBF v0.7.0 已列 16-die stack、UCIe、TSV、初步 bump map、test／debug 與可靠度包絡，形成 bonding、測試與熱管理搜尋入口；但沒有具名封裝產品、共同 pass、樣品結果或 universe 供應商
 evidence_boundary: 規格指引、先進封裝能力或服務 HBM 客戶，不等於取得 HBF 客戶 qualification、量產或財務貢獻
 -->
 
 ## 下一個可證明／否定的節點
 
-- OCP 公開可直接定位的 HBF 規範版本與條款，並說清楚 xPU-HBF、UCIe、封裝可靠度及軟體 I/O 的層級與 compliance 路線。
+- OCP 或貢獻者公開 v1.0／勘誤與完整 HBF Profile，解決 Appendix D、單位／表格、初步 bump map 與尺寸 TBD，並給出固定 test suite、pass criteria 與 result ID。
 - Sandisk 或 SK hynix 公告實際 memory sample，並提供可核對的規格、測試條件與接收方。
 - 客戶或裝置端獨立確認 HBF device sample、工作負載、軟體調度與 qualification 結果。
-- 若 2026 下半年沒有樣品證據、時程延後或規格沒有合規／互通路線，C9 的雙時鐘成熟度與信心必須下修。
+- 若 2026 下半年沒有樣品證據、時程正式延後，或 v1.0 仍沒有可操作的合規／互通路線，C19 的雙時鐘成熟度與信心必須下修。
 - 台灣公司只有在平台端與公司端完成具名產品、資格、出貨與財務雙向核對後，才能從搜尋路由升級為公司曝險線。

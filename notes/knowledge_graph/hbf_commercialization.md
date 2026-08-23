@@ -1,15 +1,15 @@
 # HBF 商用化知識圖譜
 
-本圖把 HBF 的規格時鐘與產品時鐘拆開：第一版共同技術規格已由廠商公告發布，但直接規範
-原文、合規互通、實體樣品、裝置整合及客戶資格仍是不同節點，不能跨級變成量產、財務曝險
-或 HBM 的已證實替代品。
+本圖把 HBF 的規格時鐘與產品時鐘拆開：OCP v0.7.0 已能直接逐條核對，但 pre-1.0 缺口、
+合規方法、具名產品 pass、跨廠互通、實體樣品、裝置整合及客戶資格仍是不同節點，不能跨級
+變成量產、財務曝險或 HBM 的已證實替代品。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: hbf-commercialization
 root_node_id: concept:hbf-commercialization
 label: HBF 商用化
-summary: 以規格時鐘與產品時鐘追蹤 HBF 從 NAND／logic base die 架構、第一版技術規格、合規互通到 memory sample、device sample、客戶資格與量產的證據階梯，並用三張成績單分開名目／可用／工作集容量、內部模擬與固定品質的推論服務結果。
+summary: 以規格時鐘與產品時鐘追蹤 HBF 從 NAND／logic base die 架構、OCP v0.7.0、規格到合規八欄護照、具名 pass／互通到 memory sample、device sample、客戶資格與量產的證據階梯，並用三張成績單分開名目／可用／工作集容量、內部模擬與固定品質的推論服務結果。
 article_ids: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER
 status: active
 -->
@@ -180,7 +180,7 @@ view: industry
 from_id: concept:hbf-commercialization
 to_id: concept:ai-memory-hierarchy
 relation: integrated_with
-claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C9,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C12
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C19,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C12
 note_refs:
 evidence_state: inference
 commercial_stage: planned
@@ -189,9 +189,9 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-08-12
 review_due: 2026-10-15
-status: active
-boundary: SK hynix 把 HBF 放入分層記憶體架構，本文據此保留 NAND 型中間層推論；尚未有實體系統證明它與 HBM、DRAM、CXL memory 或 SSD 如何分工。
-next_trigger: 具名 AI 系統公布 HBF memory map、軟體調度、工作負載與端到端結果。
+status: retired
+boundary: 原線條把公告世代 C9 與分層架構放在一起；C9 已由直接規格世代 C19 取代，改由 I19 保留相同應用推論與新的規格／產品時鐘邊界。
+next_trigger: 已由 KG-HBF-I19 接續；本歷史線條不再參與 active graph。
 -->
 
 <!-- knowledge_edge
@@ -310,8 +310,8 @@ exclusivity_scope: Sandisk 與 SK hynix 共同公告第一版規格，Google 與
 as_of: 2026-08-12
 review_due: 2026-08-26
 status: active
-boundary: 已驗證的是第一版技術規格發布公告與摘要範圍；本輪未直接取得可定位版本的 OCP normative document，也沒有合規或產品結果。
-next_trigger: OCP 公開帶版本、條款定位與變更紀錄的 HBF 規範原文。
+boundary: C7／C8 只驗證第一版規格的公告與供應商摘要；直接 OCP v0.7.0 另由 I21／C18 承接。兩層都不等於合規、互通或產品結果。
+next_trigger: OCP 公開 v1.0／勘誤、完整 HBF Profile、條款變更紀錄與合規方法。
 -->
 
 <!-- knowledge_edge
@@ -340,18 +340,18 @@ view: industry
 from_id: concept:hbf-commercialization
 to_id: standard:ucie-interface
 relation: uses_standard
-claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C8
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C8,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C18
 note_refs:
 evidence_state: verified
 commercial_stage: concept
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-04
+as_of: 2026-08-24
 review_due: 2026-08-26
 status: active
-boundary: SK hynix 規格摘要描述 UCIe 連接；本輪未獨立核對 UCIe 版本、協定層、封裝映射、compliance 或具名 silicon。
-next_trigger: 規範原文或具名產品公開 UCIe 版本、層級、通道、封裝與 compliance 結果。
+boundary: S13 已定位 UCIe 3.0、x64 host channel、Format 6 與 AoU 0.8；但第 78 頁引用的 HBF Profile Appendix D 缺失，仍未建立把具名 silicon、共同 compliance 方法、測試條件與跨廠結果串起來的證據鏈。
+next_trigger: OCP 或參與者補齊 HBF Profile 與固定 compliance 方法，並由具名產品公布 UCIe／AoU 版本、端點、封裝、測試條件與結果。
 -->
 
 <!-- knowledge_edge
@@ -360,18 +360,18 @@ view: industry
 from_id: concept:hbf-commercialization
 to_id: component:xpu-hbf-host-interface
 relation: includes
-claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C7
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C7,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C18
 note_refs:
 evidence_state: verified
 commercial_stage: concept
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-03
+as_of: 2026-08-24
 review_due: 2026-08-26
 status: active
-boundary: 聯合公告說規格涵蓋 xPU-HBF host interface；沒有任一 xPU 具名 silicon、指令集、驅動或整合結果。
-next_trigger: 可定位規範條款與具名運算晶片公開主機介面、命令、錯誤處理及實體測試。
+boundary: S13 已定位 host roles、讀寫與錯誤處理要求；仍未建立把具名 xPU／base-die silicon、驅動、系統整合與 result ID 串起來的證據鏈。
+next_trigger: 具名 xPU 與 HBF part 公開介面版本、命令與錯誤處理、驅動、整合條件及實體測試結果。
 -->
 
 <!-- knowledge_edge
@@ -380,18 +380,18 @@ view: industry
 from_id: concept:hbf-commercialization
 to_id: capability:hbf-software-io
 relation: requires
-claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C7,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C8,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C12
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C7,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C8,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C12,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C18
 note_refs:
 evidence_state: verified
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
+as_of: 2026-08-24
 review_due: 2026-10-15
 status: active
-boundary: 公告摘要只證明規格與架構納入 software I/O／co-design；不證明驅動、資料放置、編排或目標工作負載已完成。
-next_trigger: 公開軟體介面、驅動、資料放置策略、具名裝置與端到端工作負載結果。
+boundary: S13 已定位 memory mapping、refresh 與 failure rules；仍無公開驅動、runtime placement、具名裝置或目標工作負載結果。
+next_trigger: 具名裝置公開固定版本的軟體介面、驅動、runtime／資料放置策略與端到端工作負載結果。
 -->
 
 <!-- knowledge_edge
@@ -400,7 +400,7 @@ view: industry
 from_id: concept:hbf-commercialization
 to_id: stage:hbf-compliance
 relation: passes_through
-claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C13
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C20
 note_refs:
 evidence_state: unverified
 commercial_stage: qualification
@@ -409,9 +409,9 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-08-12
 review_due: 2026-08-26
-status: active
-boundary: 合規與互通是規格時鐘的必要未來節點；本輪沒有可定位方法、具名 pass list 或跨廠矩陣。
-next_trigger: OCP 或參與者公開 compliance checklist、test suite、具名 pass result 或 multi-vendor interoperability matrix。
+status: retired
+boundary: C13 曾把直接規格與合規結果混在同一未驗證節點；S13 已解決規格原文，合規、具名 pass 與跨廠矩陣仍由 C20／I20 接續。
+next_trigger: 已由 KG-HBF-I20 接續；本歷史線條不再參與 active graph。
 -->
 
 <!-- knowledge_edge
@@ -452,4 +452,84 @@ review_due: 2026-08-26
 status: active
 boundary: 405B×8-bit＝405GB、405／512＝79.1015625% 與 107GB 是 N=1 weights-only 名目換算；未計可用容量、KV cache、activation、runtime、workspace、冗餘、錯誤管理、分片或 page alignment，不能證明完整工作集放得下。
 next_trigger: 具名 HBF sample 與系統公開 software-visible capacity、完整 weights／KV／activation／workspace memory map、placement、page／alignment 與運行中 peak occupancy。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HBF-I19
+view: industry
+from_id: concept:hbf-commercialization
+to_id: concept:ai-memory-hierarchy
+relation: integrated_with
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C19,MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C12
+note_refs:
+evidence_state: inference
+commercial_stage: planned
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-10-15
+status: active
+boundary: SK hynix 把 HBF 放入分層記憶體架構，OCP v0.7.0 讓共同規則可直接核對；產品時鐘仍未建立具名、已交付、可運行且附規格、測試包絡與接收方結果的完整 sample 證據鏈，也沒有系統證明它與 HBM、DRAM、CXL memory 或 SSD 的實際分工。
+next_trigger: 具名 AI 系統公布 HBF part、memory map、資料放置、軟體調度、固定工作負載與端到端結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HBF-I20
+view: industry
+from_id: concept:hbf-commercialization
+to_id: stage:hbf-compliance
+relation: passes_through
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C20
+note_refs:
+evidence_state: unverified
+commercial_stage: qualification
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-09-30
+status: active
+boundary: v0.7.0 有 mandatory-form requirements 與 test／debug interfaces，並要求客戶依相應產品的 official test guidelines 驗證；但規格未附具名產品 guidelines、共同 test suite、具名 pass、第二供應商產品或跨廠互通矩陣，公開 no-find 也不排除私有測試。
+next_trigger: OCP 或參與者公開 v1.0／errata、完整 HBF Profile、固定 test plan／pass criteria、具名 part／result ID、recognition 或至少兩家獨立供應商的同版互通結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HBF-I21
+view: industry
+from_id: concept:hbf-commercialization
+to_id: standard:hbf-base-die-spec-v0-7-0
+relation: passes_through
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C18
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-03
+review_due: 2026-09-30
+status: active
+boundary: 已驗證 v0.7.0 文件身分、條款與未完成區；它仍有缺失 Appendix D、preliminary／TBD、單位／表格衝突與 product-specific 欄位，且不是具名 silicon、測試、合規或產品 recognition。
+next_trigger: OCP 發布 v1.0／勘誤與完整 HBF Profile，並能把修訂條款對應到共同 test contract。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HBF-I22
+view: industry
+from_id: concept:hbf-commercialization
+to_id: process:hbf-specification-to-conformance-passport
+relation: requires
+claim_refs: MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER#C19
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-09-30
+status: active
+boundary: 八欄護照是研究中心分開規格版本、要求定位、端點、義務、條件、觀測量、測法與結果 ID 的閱讀框架，不是 OCP 官方表單或證書；欄位完整也不自動證明產品適用、可靠或可量產。
+next_trigger: 具名 HBF part 以同一規格、test plan 與 result ID 填滿八欄，並由第二實作或接收方交叉確認。
 -->

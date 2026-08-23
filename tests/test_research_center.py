@@ -4295,17 +4295,30 @@ class ResearchCenterTest(unittest.TestCase):
             "editorial_plain_language_wave92_hbf_system_conditions_roles_and_six_gate_ladder",
             "split_specification_and_product_clocks_after_first_hbf_technical_specification",
             "added_hbf_nominal_usable_working_set_and_simulation_to_service_evidence_bridge_without_thesis_or_clock_refresh",
+            "added_direct_hbf_v0_7_0_requirement_scope_and_conformance_boundary_without_thesis_clock_refresh",
             "新的記憶體層不能只提供更大容量",
-            "規則前進不等於產品同步前進",
+            "有 `shall` 不等於有 `pass`",
             "## 先判斷它能不能成為新的記憶體層",
             "| 本文五項系統條件 | 讀者先問 | 沒通過會怎樣 | 主要接力角色 | 本輪可確認到哪裡 |",
             "| 1. 容量與資料保留 |", "| 2. 讀取與等待時間 |",
             "| 3. 寫入、更新與耐久 |", "| 4. 功耗、熱與封裝 |",
             "| 5. 系統整合與軟體調度 |",
             "## 第一版技術規格先對齊哪四份合約",
-            "| 四份共同合約 | 公告摘要對齊什麼 | 初學者要避免的誤讀 | 下一份可升級證據 |",
+            "| 四份共同合約 | v0.7.0 可定位內容 | 初學者要避免的誤讀 | 下一份可升級證據 |",
             "| 1. 產品包絡 |", "| 2. 主機與電氣介面 |",
             "| 3. 堆疊、封裝與可靠度 |", "| 4. 軟體讀寫 |",
+            "## V0.7.0 能證明規則已可定位，不能證明產品已過關",
+            "### 為什麼 `shall` 還不是 `pass`",
+            "規格要求 → 測試方法與通過門檻 → 具名產品實作 → 可追溯結果 → 客戶資格 → 量產與財務",
+            "| 護照欄位 | 讀者要保存什麼 | v0.7.0 之後的公開缺口 |",
+            "| 1. 版本與狀態 |", "| 2. 要求定位 |",
+            "| 3. 角色與端點 |", "| 4. 動詞與義務 |",
+            "| 5. 前置與操作條件 |", "| 6. 可觀測量與輸出 |",
+            "| 7. 測法與通過門檻 |", "| 8. 實作與結果識別 |",
+            "### 一個 `i` 與三個表格差異，足以改變數字意思",
+            "`512 GiB = 549.755813888 GB`", "`7.3741824%`",
+            "`3.072 TiB/s = 3377.699720528 GB/s`", "`9.9511627776%`",
+            "N=1 份官方規格文件", "sampling SE／t 不適用",
             "## 512GB、1.6TB/s 與「只差 2.2%」是三種不同證據",
             "| 看到的數字 | 證據層 | 分子與分母至少還要綁定 | 目前不能說 |",
             "`within 2.2% of unlimited-capacity HBM`",
@@ -4337,7 +4350,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 56
+            sum(line.startswith("- **") for line in glossary.splitlines()), 72
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4352,9 +4365,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 17), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 5),
+            ("research_topic", 1), ("research_source", 13),
+            ("research_claim", 20), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 7),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -4366,11 +4379,25 @@ class ResearchCenterTest(unittest.TestCase):
         for concept in (
             "process:hbf-simulation-to-service-evidence-bridge,process,HBF 模擬到服務三層證據橋",
             "metric:hbf-nominal-usable-working-set-capacity-contract,metric,HBF 名目可用與工作集容量契約",
+            "standard:hbf-base-die-spec-v0-7-0,standard,HBF Base Die 規格 v0.7.0",
+            "process:hbf-specification-to-conformance-passport,process,HBF 規格到合規八欄護照",
         ):
             self.assertIn(concept, concepts)
-        for edge_id in range(17, 19):
+        for edge_id in range(17, 23):
             self.assertIn(f"edge_id: KG-HBF-I{edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 26)
+        for contract in (
+            "thesis_claim_id: C19",
+            "source_id: S13",
+            "claim_id: C18",
+            "claim_id: C19",
+            "claim_id: C20",
+            "monitor_id: T6",
+            "monitor_id: T7",
+            "corrected_by_claim_id: C19",
+            "corrected_by_claim_id: C20",
+        ):
+            self.assertIn(contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
