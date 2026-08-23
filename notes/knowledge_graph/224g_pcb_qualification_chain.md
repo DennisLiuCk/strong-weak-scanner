@@ -1,14 +1,15 @@
 # 224G PCB 材料到 BER 七關資格鏈知識圖譜
 
-本圖把材料數字、測法、stackup、板級不連續點、通道損耗、BER／FEC、跨廠量產與公司歸因
-分開。公開證據已支持多個相鄰關卡，尚未支持同一塊板的完整鏈或台灣公司 224G 財務價值。
+本圖把材料數字、測法、stackup、板級不連續點、通道損耗、link-up、FEC 前後 counter、
+零事件上界、跨廠量產與公司歸因分開。本輪公開證據已支持多個相鄰關卡，尚未支持同一塊板的
+完整鏈或台灣公司 224G 財務價值。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: 224g-pcb-qualification-chain
 root_node_id: concept:224g-pcb-qualification-chain
 label: 224G PCB 材料到 BER 七關資格鏈
-summary: 從 Dk Df 測法 玻纖 銅粗糙度 stackup coupon via connector loss budget與dB參考面護照 COM 追到 BER FEC 跨廠量產與公司歸因 避免把 datasheet QPL 單次demo或不同fixture處理後曲線當成整板資格與收入。
+summary: 從 Dk Df測法 玻纖 銅粗糙度 stackup coupon via connector loss budget與dB參考面護照 COM追到link-up pre-FEC corrected activity FERC post-FEC zero-event暴露 跨廠量產與公司歸因 避免把datasheet QPL 單次demo 不同fixture曲線或零事件當成整板資格與收入。
 article_ids: MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN
 status: active
 -->
@@ -451,4 +452,44 @@ review_due: 2026-09-15
 status: active
 boundary: 去嵌入結果依fixture model與reference plane而變 且不能由單一曲線反推材料貢獻 BER 客戶資格或公司財務。
 next_trigger: 固定DUT與planes公開calibrated raw fixture S-parameters deembedding version processed SDD21及獨立重複量測。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-224GPCB-I21
+view: industry
+from_id: concept:224g-pcb-qualification-chain
+to_id: process:pcb-link-ber-exposure-passport
+relation: requires
+claim_refs: MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN#C18,MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN#C19
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: OIF Ethernet Alliance 與 NIST 分別固定metric layer link establishment及zero-event模型邊界；十欄護照是本文整合而非共同表單。
+as_of: 2026-08-24
+review_due: 2026-09-15
+status: active
+boundary: 護照只提升量測可重建性；本輪文件中同一224G PCB完整七層與十欄共同觀測N=0 不建立qualification 客戶採用或公司財務。
+next_trigger: 同一DUT board revision公開topology link state pattern environment FEC layer numerator instrument-counted exposure independence exclusions model及七層outcome。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-224GPCB-I22
+view: industry
+from_id: concept:224g-pcb-qualification-chain
+to_id: metric:pcb-zero-event-upper-error-rate
+relation: measured_by
+claim_refs: MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN#C17,MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN#C19
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: NIST提供通用HPP零事件公式 OIF提供212.5Gbps既有demo速率；兩者不是共同CEI測試或產品結果。
+as_of: 2026-08-24
+review_due: 2026-09-15
+status: active
+boundary: 只在事件定義 instrument-counted exposure 固定率與相依性假設明示時報一側上界；不是CEI compliance pass 零風險 材料效果或公司證據。
+next_trigger: 具名224G DUT公開零事件層 raw counter valid exposure excluded intervals burst及lane correlation檢查與預先指定alpha。
 -->

@@ -6899,9 +6899,15 @@ class ResearchCenterTest(unittest.TestCase):
             "## 這篇對公司判斷的用處與界線",
         ):
             self.assertIn(contract, topic)
+        glossary = topic.split("### 名詞小字典", 1)[1].split(
+            "### 三句話抓重點", 1
+        )[0]
+        self.assertEqual(
+            sum(line.startswith("- **") for line in glossary.splitlines()), 60
+        )
         for block, expected in (
-            ("research_topic", 1), ("research_source", 15),
-            ("research_claim", 14), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 19),
+            ("research_claim", 19), ("metric_comparison", 0),
             ("impact", 1), ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -6932,6 +6938,8 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:224g-pcb-commercial-attribution,stage,224G PCB 商業與財務歸因",
             "process:pcb-db-reference-plane-passport,process,PCB dB 與參考面八欄護照",
             "metric:fixture-deembedded-differential-insertion-loss,metric,去嵌入差分插入損耗",
+            "process:pcb-link-ber-exposure-passport,process,224G PCB 連線與 BER 十欄護照",
+            "metric:pcb-zero-event-upper-error-rate,metric,224G PCB 零事件錯誤率單側上界",
         ):
             self.assertIn(concept, concepts)
         entities = (ROOT / "config" / "external_entities.csv").read_text(
@@ -6951,13 +6959,17 @@ class ResearchCenterTest(unittest.TestCase):
             / "224g_pcb_qualification_chain.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 224G PCB 材料到 BER 七關資格鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 24)
         self.assertIn("from_id: company:6274", graph)
         self.assertIn("to_id: standard:ipc-4103", graph)
         self.assertIn("edge_id: KG-224GPCB-I19", graph)
         self.assertIn("to_id: process:pcb-db-reference-plane-passport", graph)
         self.assertIn("edge_id: KG-224GPCB-I20", graph)
         self.assertIn("to_id: metric:fixture-deembedded-differential-insertion-loss", graph)
+        self.assertIn("edge_id: KG-224GPCB-I21", graph)
+        self.assertIn("to_id: process:pcb-link-ber-exposure-passport", graph)
+        self.assertIn("edge_id: KG-224GPCB-I22", graph)
+        self.assertIn("to_id: metric:pcb-zero-event-upper-error-rate", graph)
 
         radar = (
             ROOT / "notes" / "research_candidates"
@@ -6987,6 +6999,136 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(
             phase["graphIds"][0:3],
             ["open-ai-fabrics", "224g-pcb-qualification-chain", "pcie6-compliance-ladder"],
+        )
+
+    def test_224g_pcb_link_fec_layers_and_zero_event_exposure_contract(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-12_224g_pcb_qualification_chain.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "added_link_up_pre_post_fec_counter_and_zero_event_passport_without_thesis_or_clock_refresh",
+            "source_id: S16", "source_id: S17", "source_id: S18",
+            "source_id: S19",
+            "claim_id: C15", "claim_id: C16", "claim_id: C17",
+            "claim_id: C18", "claim_id: C19",
+            "## 連得上，不等於錯得少：把 link-up、FEC 前後與「零錯誤」拆成七張成績單",
+            "第一個退件邊界：任何 224G 結果若沒有同時標明量測層、事件分子與儀器實計的有效分母",
+            "| 1. Link-up |", "| 2. Pre-FEC BER |",
+            "| 3. Corrected activity／SEWmax |", "| 4. FERC |",
+            "| 5. Direct post-FEC BER |", "| 6. Recovery／application |",
+            "| 7. Zero-event bound |",
+            "### 同為 224G，10^-4 與 10^-15 可能不是同一題",
+            "`1e-4` 與 `1e-15` 是不同脈絡的\ntarget／target-style wording，不是兩次實測結果",
+            "RS-equivalent count，**不是原始\nphysical-frame 數，也不是 post-FEC bit BER**",
+            "`sufficient BER` 是定性 outcome，不是數值結果",
+            "### 十欄 BER 暴露護照",
+            "| 1. DUT 與版本 |", "| 2. 拓撲與參考平面 |",
+            "| 3. Link state |", "| 4. 圖樣與環境 |", "| 5. FEC 合約 |",
+            "| 6. 量測層與事件 |", "| 7. 分子與 counter |",
+            "| 8. 有效分母 |", "| 9. 獨立單位與相依性 |",
+            "| 10. 結果與模型 |",
+            "### 零次不是零率：先算單側上界",
+            "Poisson-per-bit 模型",
+            "2.995732273553991×10^-15",
+            "2.995732273553991×10^15 valid bits",
+            "3.91598990007",
+            "N=1 個假想配置的確定性算術",
+            "### 多空小作文先共用同一層與同一分母",
+            "本輪文件中，同一\n224G PCB 的完整七層",
+        ):
+            self.assertIn(contract, topic)
+        self.assertLess(
+            topic.index("## 為什麼 Df 不能直接換算 BER"),
+            topic.index("## 連得上，不等於錯得少"),
+        )
+        self.assertLess(
+            topic.index("## 連得上，不等於錯得少"),
+            topic.index("## 標準、展示與量產各有自己的時鐘"),
+        )
+
+        meta = topic.split("<!-- research_topic", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "thesis_claim_id: C4",
+            "last_reviewed_at: 2026-08-12",
+            "review_due: 2026-09-15",
+            "base_confidence: medium",
+        ):
+            self.assertIn(contract, meta)
+
+        s16 = topic.split("source_id: S16", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "published_at: 2025-10-01",
+            "OIF 官方 ECOC 2025 agenda",
+            "Pre-FEC BER target 1e-4",
+            "target wording，不是觀測 BER",
+            "3ac80130bad5abb12f9d650ff59a1a7a5854f31ba84852b22e2be0be92c61b04",
+        ):
+            self.assertIn(contract, s16)
+        s17 = topic.split("source_id: S17", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "published_at: 2024-09-04",
+            "PDF file pp.97–98",
+            "file p.326",
+            "file p.335",
+            "optional 管理介面 observable",
+            "631c76d0c8292021e61128dd94ed231679ab0703a9070cdd6d125d1f48c00d64",
+        ):
+            self.assertIn(contract, s17)
+        s18 = topic.split("source_id: S18", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "−ln(alpha)／T",
+            "不是 CEI／BER 合格公式",
+            "Poisson-per-bit",
+            "固定 lambda／exponential interarrival",
+        ):
+            self.assertIn(contract, s18)
+        s19 = topic.split("source_id: S19", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "published_at: 2026-03-17",
+            "file p.3",
+            "file p.17",
+            "sufficient BER for the link to close effectively",
+            "未標 metric、pre／post-FEC 或 measurement plane",
+            "3f88266a02787436cc2ac9c00148a7670c3cce7dcfe988e95d6d5bb9bbe2250b",
+        ):
+            self.assertIn(contract, s19)
+        for claim_id, label, sources in (
+            ("C15", "verified", "S4,S16,S19"),
+            ("C16", "verified", "S17"),
+            ("C17", "verified", "S18"),
+            ("C18", "inference", "S4,S7,S16,S17,S18,S19"),
+            ("C19", "inference", "S4,S18"),
+        ):
+            block = topic.split(f"claim_id: {claim_id}", 1)[1].split("-->", 1)[0]
+            self.assertIn(f"label: {label}", block)
+            self.assertIn(f"supporting_source_ids: {sources}", block)
+
+        with (ROOT / "notes" / "research_topics" / "scan_log.csv").open(
+            encoding="utf-8", newline=""
+        ) as fh:
+            scan = next(
+                row for row in csv.DictReader(fh)
+                if row["scan_id"]
+                == "scan-2026-08-24-224g-link-pre-post-fec-zero-event-passport"
+            )
+        self.assertEqual(scan["scope"], "partial")
+        self.assertIn("N=6 份文件／頁面", scan["coverage_note"])
+        self.assertIn("sufficient BER", scan["coverage_note"])
+        self.assertIn("於本輪文件中", scan["coverage_note"])
+
+        snapshot = json.loads((
+            ROOT / "notes" / "research_method_reviews"
+            / "2026-08-24_10.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(snapshot["snapshotId"], "RMA-2026-08-24-10")
+        self.assertEqual(snapshot["claims"]["active"], 778)
+        self.assertEqual(snapshot["sources"]["active"], 680)
+        self.assertEqual(snapshot["graphs"]["activeEdges"], 852)
+        self.assertEqual(snapshot["scans"]["events"], 147)
+        self.assertEqual(
+            snapshot["scans"]["latestId"],
+            "scan-2026-08-24-224g-link-pre-post-fec-zero-event-passport",
         )
 
     def test_800v_power_tree_teaches_topology_before_material_selection(self):

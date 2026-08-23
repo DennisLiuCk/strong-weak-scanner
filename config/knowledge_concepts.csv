@@ -308,7 +308,9 @@ component:low-profile-copper-foil,component,低粗糙度銅箔,Low-profile coppe
 stage:pcb-loss-coupon,stage,板級損耗 coupon,PCB loss coupon|insertion loss coupon,concept:224g-pcb-qualification-chain,與正式板同製程製作並用來量測阻抗 傳播與 S 參數的測試結構節點
 component:pcb-via-connector,component,PCB via 與連接器不連續點,Via stub and connector discontinuity|PCB interconnect discontinuity,concept:224g-pcb-qualification-chain,訊號跨層或跨接頭時因幾何與阻抗改變形成反射 損耗 串擾及共振的通道位置
 stage:channel-loss-budget,stage,完整通道損耗預算,Channel loss budget|package-to-package channel budget,concept:224g-pcb-qualification-chain,在共同參考平面整合封裝 板路 via connector 線材與其他路徑 S 參數及 COM 假設的節點
-metric:pre-post-fec-ber,metric,FEC 前後 BER,Pre-FEC BER|post-FEC BER|bit error ratio,concept:224g-pcb-qualification-chain,以固定收發器 圖樣 總位元 錯誤數 FEC 測試期間與環境描述完整連線錯誤率的欄位
+metric:pre-post-fec-ber,metric,FEC 前後 BER,Pre-FEC BER|post-FEC BER|bit error ratio|FEC corrected count|FERC|uncorrectable FEC frames,concept:224g-pcb-qualification-chain,以固定收發器 圖樣 有效位元 錯誤事件 FEC位置 counter語意 測試期間與環境分開描述解碼前後結果 並明示FERC是frame計數而非post-FEC bit BER
+process:pcb-link-ber-exposure-passport,process,224G PCB 連線與 BER 十欄護照,224G PCB link and BER exposure passport|pre post FEC counter contract,concept:224g-pcb-qualification-chain,把受測板與版本 拓撲連線狀態 圖樣環境 FEC合約 量測層 分子counter 實計分母 獨立樣本 排除時段與信賴模型綁成可重建紀錄
+metric:pcb-zero-event-upper-error-rate,metric,224G PCB 零事件錯誤率單側上界,224G PCB zero-event upper error-rate bound|zero observed BER boundary,process:pcb-link-ber-exposure-passport,在明示事件層 實計暴露 固定率與獨立性假設下以零事件報單側錯誤率上界而不是零BER
 standard:cei-224g,standard,OIF CEI-224G,CEI-224G XSR|CEI-224G VSR|CEI-224G MR|CEI-224G LR,concept:224g-pcb-qualification-chain,OIF 為每通道 224G class 電氣互連推進的多種 reach 介面專案與 Implementation Agreement 路徑
 standard:ieee-p8023dj,standard,IEEE P802.3dj,P802.3dj 200G per lane|1.6TbE amendment,concept:224g-pcb-qualification-chain,IEEE 802.3 對 200 Gb/s lane 及 200G 到 1.6T Ethernet 推進的 amendment 專案
 standard:ipc-4103,standard,IPC-4103 高速高頻基材規格,IPC-4103|IPC-4103 slash sheet,concept:224g-pcb-qualification-chain,IPC 對高速高頻 printed board clad unclad laminate 與 bonding layer 材料的規格及 QPL 路徑

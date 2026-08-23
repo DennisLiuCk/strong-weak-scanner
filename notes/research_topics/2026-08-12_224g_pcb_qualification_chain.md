@@ -46,6 +46,13 @@ to: triaged
 reason: db_reference_plane_fixture_removal_and_log_ratio_passport_added_without_thesis_or_clock_refresh
 evidence: sources:S1,S4,S13,S14,S15
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_link_up_pre_post_fec_counter_and_zero_event_passport_without_thesis_or_clock_refresh
+evidence: sources:S4,S7,S16,S17,S18,S19
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -87,6 +94,14 @@ evidence: sources:S1,S4,S13,S14,S15
 - **PRBS**：用固定規則產生、看似隨機的已知位元序列，供 BERT 重現與比較；PRBS13Q 與 PRBS31Q 等圖樣的壓力條件不同。
 - **BER（位元錯誤率）**：錯誤位元數除以總傳輸位元數；若沒有總位元數、錯誤數、測試期間與信賴界線，就不能把「零錯誤」當成零風險。
 - **FEC（前向錯誤更正）**：接收端用額外編碼修復一定範圍的錯誤；FEC 後通過不代表原始通道沒有錯，也不能和 FEC 前 BER 混為同一指標。
+- **Pre-FEC BER**：FEC 解碼前的錯誤負擔；CMIS 的可選模組觀測值是由解碼器估計被修正的錯誤位元，再除以同一 sampling interval 收到的位元數，特定 histogram 路徑還可能排除不可修正 frame 的未知錯誤。
+- **Post-FEC BER**：FEC 解碼後仍殘留的錯誤位元率；必須在指定解碼後位置直接定義事件與有效位元分母，不能由 FERC 無條件換算。
+- **FERC**：Frame Errors Counted，報告一個 sampling interval 內不可修正 FEC frame 的 RS(544,514) equivalent count；實際 FEC frame 大小不同時會縮放，所以它不是原始 physical-frame 數，也不是 post-FEC bit BER。
+- **SEWmax**：Maximum FEC Symbol Error Weight，表示 sampling interval 內最壞 frame 的可修正 symbol／bit error weight；它不能照 FERC 的 5440-bit equivalent 方法縮放，對部分 FEC 只宜當 relative measure，也不是平均 BER。
+- **Sampling interval**：模組累積一次 BER、FERC 或 SEWmax 樣本的時間窗；CMIS 明示它由供應商定義，實際長度可能略有變動。
+- **有效位元暴露量（valid-bit exposure）**：儀器在指定 link state、rate、lane、方向與量測層真正納入判定的位元總數；標稱速率乘牆上時間不能自動替代它。
+- **零事件單側上界**：沒有觀察到預先定義事件時，在明示固定率與獨立性假設下，替真實事件率報一個仍可能成立的上限；它不是「真實錯誤率等於零」。
+- **Counter semantics（計數器語意）**：計數器究竟累積 bit、symbol、frame、retrain 還是 transaction，何時 reset、是否 overflow、如何跨 lane 聚合；名稱相似不能視為同一分子。
 - **link establishment（建立連線）**：兩端成功協商並開始傳輸；它早於完整 BER、壓力、環境、可靠度與量產資格。
 - **互通展示（interoperability demo）**：多家公司元件在指定組合與條件下共同工作；它只支持公開的那組拓撲、儀器與測項。
 - **資格驗證（qualification）**：客戶或標準組織依明定條件確認材料、電路板或系統可採用；材料合格、板廠製程合格與整機通道合格是三張不同證書。
@@ -383,6 +398,70 @@ limitation: 這是量測儀器供應商對其 PLTS 流程的技術文件，支�
 independence_group: keysight-measurement-method
 -->
 
+<!-- research_source
+source_id: S16
+role: standard
+source_kind: document
+publisher: OIF
+title: 448G Architectures for AI - Addressing the Challenges, Enabling the Future
+published_at: 2025-10-01
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.oiforum.com/wp-content/uploads/OIF_448Gbps_Presentation_MarketFocus_FinalMK.pdf
+locator: PDF file p.6 的 OIF CEI project comparison table；CEI-224G-LR 欄列 224 Gbps PAM4、40 dB at 56 GHz bump-to-bump、1 m copper cable 與 Pre-FEC BER target 1e-4；published_at 取 OIF 官方 ECOC 2025 agenda 的 2025-10-01 session date，原檔 SHA-256 3ac80130bad5abb12f9d650ff59a1a7a5854f31ba84852b22e2be0be92c61b04，引用頁與相鄰 file pp.5–7 已渲染核對
+limitation: 這是 ECOC 2025 market-focus project comparison 的 target wording，不是觀測 BER、正式 CEI-224G-LR IA、產品 pass report 或本題 OIF 2024 demo 的量測附件；沒有 measurement point、FEC／test method、DUT、錯誤事件、有效位元分母、confidence、post-FEC 結果、板材病歷或公司財務
+independence_group: oif-ecoc2025-market-focus
+-->
+
+<!-- research_source
+source_id: S17
+role: standard
+source_kind: document
+publisher: OIF
+title: Common Management Interface Specification Revision 5.3
+published_at: 2024-09-04
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.oiforum.com/wp-content/uploads/OIF-CMIS-05.3.pdf
+locator: PDF file pp.97–98 的 optional VDM、vendor-defined sampling interval／host-defined statistics interval 與 counter saturation 邊界；§7.1.5 file pp.102–103 的 pre-FEC BER、Frame Errors Counted（FERC）、SEWmax 與統計語意；file p.326 的跨 lane 假設／not-supported 選項；file p.335 的 histogram-derived pre-FEC BER 排除不可修正 frame 未知 bit errors；原檔 SHA-256 631c76d0c8292021e61128dd94ed231679ab0703a9070cdd6d125d1f48c00d64，所有引用頁及相鄰 file pp.96–99、101–104、325–327、334–336 已渲染核對
+limitation: CMIS 定義的是模組 optional 管理介面 observable；pre-FEC BER 是解碼器估計，特定 histogram 路徑排除不可修正 frame 的未知 bit errors；FERC 可按 binary frame size／5440 報 RS(544,514) equivalent count，SEWmax 不可同樣縮放。Sampling interval 與 host statistics interval 不同，counter 未規定 saturation，不同長度 sample 也不能無權重平均。跨 lane FEC 還可假設同 data path 各 lane BER 相同或拒絕支援。它不是 CEI-224G 通用 BERT、PCB qualification、直接 post-FEC bit BER 或產品 pass criterion
+independence_group: oif-cmis
+-->
+
+<!-- research_source
+source_id: S18
+role: other_primary
+source_kind: living_index
+publisher: National Institute of Standards and Technology
+title: Constant repair rate HPP exponential model
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm
+locator: §8.4.5.1 Confidence Interval Equation and Zero Fails Case；零事件時一側 MTBF 下限為 T／−ln(alpha)，等價的一側事件率上界為 −ln(alpha)／T，並列 fixed-time repairable system 或失效後替換新單位的 exact 情境
+limitation: 這是通用固定率 HPP／exponential 模型，不是 CEI／BER 合格公式；fixed-time repairable system 或失效後替換單位的 non-repairable test 才是文件所列 exact 情境，其他情境可能只是 approximate。本文把 T 類比成預先定義事件的 bit exposure E，另需 Poisson-per-bit、固定 lambda／exponential interarrival 與相依性假設；burst error、共同 clock／power、lane correlation、狀態切換與變動錯誤率都可能使模型失效
+independence_group: nist-engineering-statistics
+-->
+
+<!-- research_source
+source_id: S19
+role: standard
+source_kind: document
+publisher: OIF
+title: 448G, 224G Common Electrical I/O (CEI) Interoperability Demo - OFC 2026
+published_at: 2026-03-17
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.oiforum.com/wp-content/uploads/CEI-Rolling-Deck.pdf
+locator: PDF file p.3 的 OIF CEI-224G Project Status 仍把 MR／LR draft specifications 標成 OIF member review，並對 XSR／VSR／MR／LR 重複 1e-15 or lower（FEC is allowed），但該欄沒有標 metric 或 measurement plane；file p.17 的 CEI-224G-Linear／EEI-224G-RTLR demo 使用 PRBS13Q PAM4 212 Gbps、BERT，並定性寫 sufficient BER for the link to close effectively。published_at 取 OIF 官方 OFC 2026 展示首日 2026-03-17；原檔 SHA-256 3f88266a02787436cc2ac9c00148a7670c3cce7dcfe988e95d6d5bb9bbe2250b，引用頁與相鄰 file pp.2–4、16–18 已渲染核對
+limitation: Project Status 的 1e-15 or lower 是未標 metric、pre／post-FEC 或 measurement plane 的 threshold／target-style wording，不是可重算量測值；sufficient BER 是定性 demo outcome，沒有 BER 數字、錯誤事件、有效分母、測試時間、confidence 或 pass threshold。Demo 的 multi-vendor 拓撲不能替同板材料病歷、正式 IA、量產資格、可靠度或公司財務背書
+independence_group: oif-ofc2026-cei-demo
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -621,6 +700,91 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: OIF 2025 market-focus 比較頁明標 CEI-224G-LR 的 Pre-FEC BER target 為 1e-4；OIF 2024 New Project Starts 與 2026 Project Status 都只寫 1e-15 or lower 且 FEC is allowed，其中 2026 頁面未標 metric 或 measurement plane。兩年的 demo 頁又只說有 BER measurement 或 sufficient BER，未公布可重算的 BER 數值、錯誤事件與有效位元分母，因此兩個數字是不同脈絡的 target／target-style wording，不是可比較結果
+supporting_source_ids: S4,S16,S19
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S16 PDF file p.6 直接把 1e-4 放在 Pre-FEC BER target 列；S4 file pp.8–9 與 S19 file pp.3、17 的 1e-15 or lower／BER measurement／sufficient BER 均未提供可重算的 BER 數值、pre／post-FEC、counter 與 exposure
+boundary: 三份 OIF 簡報分屬不同年份與目的，不是同一 DUT、board、reach、FEC、量測層或試驗；S19 的 1e-15 頁甚至沒有標 metric 或 plane。不得把 target-style wording 或定性 outcome 當成數值 result、相除成 10^11 倍改善，也不能歸因材料、PCB 或公司
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: CMIS 5.3 把 optional pre-FEC BER、FERC 與 SEWmax 分開：pre-FEC BER 是解碼器估計修正錯誤位元除以同期接收位元，FERC 是 sampling interval 內不可修正 FEC frame 的 RS(544,514) equivalent count，SEWmax 是單一 frame 的最高可修正 symbol／bit error weight
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2024-09-04
+basis: S17 file pp.97–98 與 §7.1.5.1 定義 optional VDM、兩種 interval 及三個 sampled observable；file pp.326、335 再揭露跨 lane 假設與 histogram-derived BER 的排除範圍
+boundary: CMIS observable 不等於通用 224G BERT；FERC 可能是依 frame size 縮放的 equivalent count 而不是 physical-frame count，更不是 post-FEC bit BER；SEWmax 不可同樣縮放。Sampling interval 由供應商定義且實際長度可變，無權重平均、counter saturation、跨 lane 與 uncorrectable-frame unknown bits 都可能影響可比性
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: NIST 的固定率 HPP／exponential 模型在零事件時給出一側 MTBF 下限 T／−ln(alpha)；取倒數後，一側事件率上界為 −ln(alpha)／T
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S18 §8.4.5.1 Zero Fails Case 直接給公式、confidence 解讀與 exact／approximate 適用情境
+boundary: 這是通用模型，不是 OIF／CMIS 的 BER pass rule；套到 bit exposure 前要預先固定事件層與有效分母，並檢查固定率、獨立增量、burst 與共同原因相依性
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: 224G 證據應把 link-up、pre-FEC BER、corrected activity／SEWmax、FERC、直接 post-FEC BER、recovery／application outcome 與 zero-event confidence 分成七張成績單，再以同一 DUT、FEC、counter 與有效暴露護照串接
+supporting_source_ids: S4,S7,S16,S17,S18,S19
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S7 證明 link establishment 是獨立結果且 N 未揭露；S16 固定 pre-FEC target；S17 分開三種 FEC observable；S4／S19 顯示 FEC allowed、BER measurement 或 sufficient BER 卻未公開層與分母；S18 提供零事件模型邊界，本文據此整合七層與十欄護照
+boundary: 七張成績單與十欄護照是研究中心的查核框架，不是 OIF、CMIS、Ethernet Alliance 或 NIST 的共同表單；本輪沒有同一 224G PCB 公開完整七層、材料病歷、客戶資格與財務共同鍵
+verification_needed: 同一 DUT／board revision 固定 topology、link state、rate、lane、direction、pattern、環境、FEC／decoder、counter 語意、有效 exposure、獨立單位、排除時段與所有七層結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: 若零事件且採固定率 HPP 模型，E=10^15 valid bits 的 95% 一側錯誤率上界為 2.995732273553991×10^-15；欲使上界不高於 10^-15，至少需 2.995732273553991×10^15 valid bits，若儀器真的連續以 212.5 Gb/s 累積有效位元，理想下約 3.91598990007 小時
+supporting_source_ids: S4,S18
+contrary_source_ids:
+as_of: 2026-08-24
+basis: 依 S18 的 −ln(alpha)／E，固定 alpha=0.05、E=10^15、target=10^-15 與 S4 的 212.5 Gbps；系統 Python 3.11.11 Decimal 50 位與獨立 awk log 路徑重算，在顯示精度內一致
+boundary: 這是 N=1 個假想配置的確定性算術，不是產品、board、lane 或 run 樣本，沒有 sampling SE／t；牆上時間與標稱線速只有在儀器 valid-bit counter 沒有排除 retrain、idle、downshift 或 invalid interval 時才可作分母，且 burst／共同原因會破壞固定率模型
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先用七關看懂：一個「低損耗」標籤還缺什麼
 
 | 本文七關 | 這一關真正要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
@@ -762,6 +926,89 @@ BER 改變：
 銅箔或 stackup，保存原始 S 參數、COM 與 BER。若沒有這種受控對照，就只能說某個完整配置通過，
 不能把結果全歸功於材料。
 
+## 連得上，不等於錯得少：把 link-up、FEC 前後與「零錯誤」拆成七張成績單
+
+**Link-up 只證明兩端完成這次連線。** Pre-FEC 看解碼前的錯誤負擔，corrected activity 看
+FEC 做了多少工作；FERC、直接 post-FEC BER、recovery 與 application outcome 又是後面的不同層。
+即使最後寫著「zero error」，仍要問零的是哪種事件、儀器真正數了多少有效分母。
+
+**第一個退件邊界：任何 224G 結果若沒有同時標明量測層、事件分子與儀器實計的有效分母，
+第一關就退件，不得稱為 BER 證據。** 只寫 link-up 或 zero error，也不得推論材料、整板
+qualification、量產良率或公司受惠。
+
+| 七張成績單 | 事件分子 | 有效分母 | 可以回答 | 不能回答 |
+|---|---|---|---|---|
+| 1. Link-up | 成功建立連線的組合 | 實際嘗試組合 | 這批組合能否開始傳輸 | BER、量產良率、長時間穩定度 |
+| 2. Pre-FEC BER | 解碼前錯誤位元，或解碼器估計修正的位元 | 同期收到的有效位元 | FEC 前的錯誤負擔 | 解碼後還剩多少錯誤 |
+| 3. Corrected activity／SEWmax | corrected bit／symbol，或最壞 frame 的可修正 symbol 數 | bit、frame 或 sampling interval | 解碼器工作量與最壞可修正 frame | 沒分母時不能稱 rate；SEWmax 也不是平均 BER |
+| 4. FERC | 不可修正 FEC frame 的 reported RS-equivalent count | actual sampling interval 或已解碼 frame | 指定換算口徑的 decoder frame failure count／rate | physical-frame count、post-FEC bit BER |
+| 5. Direct post-FEC BER | 解碼後仍殘留的 bad bit | 解碼後有效位元 | 指定位置的殘餘 bit error rate | 不能由 FERC 無條件換算 |
+| 6. Recovery／application | retrain、link-down、replay、timeout 或 data mismatch | transition、active time、transaction 或 job | 錯誤是否影響服務與答案 | 不能倒推材料是根因 |
+| 7. Zero-event bound | 零個預先定義事件 | 儀器實計 valid exposure `E` | 模型條件下仍可能成立的一側率上界 | 真實錯誤率等於零 |
+
+### 同為 224G，10^-4 與 10^-15 可能不是同一題
+
+OIF 2025 market-focus 表在 CEI-224G-LR 欄明寫 `Pre-FEC BER target 1e-4`；OIF 2024 的
+New Project Starts／拓撲條帶與最新的 OIF OFC 2026 Project Status 都寫
+`1e-15 or lower (FEC is allowed)`；2026 頁面甚至沒有標 metric 或 measurement plane，只能保守
+視為 threshold／target-style wording。2024 demo 頁只補充有 BER measurement；2026 的
+212 Gbps Linear demo 則定性寫 BERT 顯示「足以讓 link 有效閉合的 BER」。兩者都沒有公布
+可重算的 BER 數值、pre／post-FEC、錯誤事件或有效位元分母。**`1e-4` 與 `1e-15` 是不同脈絡的
+target／target-style wording，不是兩次實測結果；`sufficient BER` 是定性 outcome，不是數值結果。**
+兩個數字不能相除後宣稱錯誤率改善 `10^11` 倍，也不能把差額歸功於材料或 PCB。
+
+CMIS 5.3 進一步示範為何要先看名稱後面的定義。它把 optional pre-FEC BER、FERC 與 SEWmax
+分列；FERC 可是 sampling interval 內不可修正 FEC frame 的 RS-equivalent count，**不是原始
+physical-frame 數，也不是 post-FEC bit BER**。同一
+規格還把 vendor-defined sampling interval 與 host-defined statistics interval 分開，沒有規定所有
+counter 都會 saturation；跨 lane 與 histogram-derived BER 另有假設或排除。兩個看似相同的
+counter 仍要先對齊支援範圍、時間窗、unit、equivalent scaling、reset、overflow 與 aggregation；
+不同長度的 sample 也不能直接做無權重平均。
+
+### 十欄 BER 暴露護照
+
+| 護照欄位 | 至少要保存什麼 | 缺少時先拒絕什麼 |
+|---|---|---|
+| 1. DUT 與版本 | device、board ID、revision、part／lot | 不比較不同硬體 |
+| 2. 拓撲與參考平面 | reach、connector、cable、reference planes | 不把局部路徑當整條 link |
+| 3. Link state | 實際 rate、lane、direction、training／downshift 狀態 | 不用標稱線速替真實狀態 |
+| 4. 圖樣與環境 | PRBS／workload、溫度、供電、干擾條件 | 不比較不同壓力題目 |
+| 5. FEC 合約 | scheme、codeword、interleaving、decoder location | 不混 pre／post-FEC |
+| 6. 量測層與事件 | link、bit、symbol、frame、retrain、transaction 或 job | 不讓同名 error 跨層互換 |
+| 7. 分子與 counter | unit、reset、overflow、lane aggregation、raw count | 不把累積值當 rate |
+| 8. 有效分母 | instrument-counted valid bits／frames／intervals 與 window | 不用牆上時間直接代替 exposure |
+| 9. 獨立單位與相依性 | board、lane、lot、run、共同 clock／power | 不把相關重跑當獨立樣本 |
+| 10. 結果與模型 | pass／fail、排除時段、alpha、模型、recovery／application outcome | 不把零事件當零風險 |
+
+### 零次不是零率：先算單側上界
+
+若先把事件層與有效暴露 `E` 固定，並暫時把 NIST 的固定率 HPP／exponential 時間模型類比成
+Poisson-per-bit 模型，零事件的一側事件率上界是 `−ln(alpha)／E`。這不是 NIST 制定的 BER
+合格公式；fixed-time repairable system 或失效後替換單位的試驗才是該文件所列 exact 情境，
+其他情境可能只是 approximate。取 95% 一側界線時，`alpha=0.05`，分子約為 2.995732。
+
+- `E=10^15` valid bits 且零事件，上界是 `2.995732273553991×10^-15`，不是 0。
+- 要讓上界不高於 `10^-15`，至少要有 `2.995732273553991×10^15` valid bits。
+- 若儀器真的連續以 212.5 Gb/s 累積這些有效位元，理想下約需 `3.91598990007` 小時。
+
+最後一行不是拿標稱 lane rate 乘牆上時間就成立。Retrain、idle、downshift、counter reset 或 invalid
+interval 都可能使有效分母變小；burst error、共同 clock／power 與 lane correlation 也可能破壞
+固定 lambda、exponential interarrival 或獨立增量假設。這組計算是 N=1 個假想配置的確定性算術，不是 `10^15` 個獨立產品樣本，沒有可報的
+sampling SE／t。
+
+### 多空小作文先共用同一層與同一分母
+
+| 敘事 | 較強版本 | 第一個反證 | 還缺的商業橋 |
+|---|---|---|---|
+| 偏多 | 更嚴 raw margin、FEC counter 與暴露護照可能增加高階材料、PCB、BERT 與驗證內容 | 固定同一 board／Tx／Rx 後，通道或 BER 沒有可重現差異，或新增工時不形成瓶頸 | 同板材料 A／B、qualification 時間／成本／良率、客戶採用與財務分母 |
+| 偏空 | 更強 SerDes、equalization 與 FEC 可能吸收部分 channel 差異 | 固定相同 FEC 與受控環境後，raw margin／pre-FEC 負擔仍穩定指向材料或板路差異 | 實際 BOM、reach、量產 lot、供應商份額與公司收入／毛利 |
+| 共同底線 | link-up、pre-FEC、FERC、post-FEC 與 zero-event 只能在同層同分母比較 | 任一結果缺量測層、事件分子或 instrument-counted exposure 即退件 | 技術護照完整仍不等於 material identity、客戶 qualification 或公司受惠 |
+
+本段核對 N=6 份公開文件／頁面，來自 OIF、Ethernet Alliance 與 NIST 三個發布組織；其中四份
+OIF 文件不能算四條完全獨立消息鏈。它們不是同一 board、產品或測試 run。本輪文件中，同一
+224G PCB 的完整七層、材料病歷、儀器有效暴露、客戶資格與公司財務共同觀測 N=0；因此不新增
+metric comparison，不估 link-up 到 BER 的轉換率、產品良率、材料效果、收入或毛利。
+
 ## 標準、展示與量產各有自己的時鐘
 
 | 證據時鐘 | 截至 2026-08-12 的公開狀態 | 它能證明什麼 | 它不能證明什麼 |
@@ -847,6 +1094,10 @@ IPC QPL 對台燿列出 TU-1300N 與 TU-1300E，兩個料號都對應 IPC-4103/1
 - [台燿產品目錄](https://www.tuc.com.tw/products2)（未來追料號更新的 living index）。
 - [NIST Guide to the SI, Chapter 8](https://www.nist.gov/pml/special-publication-811/nist-guide-si-chapter-8)（dB 的 amplitude／power 對數定義與 reference level 規則）。
 - [Keysight：Removing Unwanted Effects from the Measurement](https://helpfiles.keysight.com/csg/N1930xB/ToolsAndUtilities/Removing_Unwanted_Effects_from_the_Measurement.html)（calibration、gating、port extension 與 de-embedding 的責任、假設及 fixture 邊界）。
+- [OIF：448G Architectures for AI](https://www.oiforum.com/wp-content/uploads/OIF_448Gbps_Presentation_MarketFocus_FinalMK.pdf)（比較頁明標 CEI-224G-LR 的 pre-FEC BER target）。
+- [OIF：CMIS 5.3](https://www.oiforum.com/wp-content/uploads/OIF-CMIS-05.3.pdf)（optional pre-FEC BER、FERC、SEWmax、sampling／statistics interval 與 counter 邊界）。
+- [NIST：Constant repair rate HPP／exponential model](https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm)（零事件一側 rate bound 的模型與適用限制）。
+- [OIF：448G、224G CEI Interoperability Demo — OFC 2026](https://www.oiforum.com/wp-content/uploads/CEI-Rolling-Deck.pdf)（最新 project target／draft 狀態與只寫 sufficient BER 的 demo 邊界）。
 
 本文沒有把 IEEE、OIF 或供應商的 dB、Dk／Df、link establishment 與 BER 數字做跨配置比較；
 測法、參考平面、board identity、收發器與分母不同。Plugfest 約 90% 的來源沒有公布 N，故不估計
