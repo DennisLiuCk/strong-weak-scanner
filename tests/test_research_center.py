@@ -7524,6 +7524,11 @@ class ResearchCenterTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         headings = (
             "## 同一個資料中心有四個時鐘",
+            "## 100 億美元研究計畫不是 100 億美元晶圓廠：Micron 六本帳",
+            "### 公司公布的是十年 planned investment，不是逐年預算表",
+            "### 公司自己的 10-Q 已把 R&D、PP&E 與 incentive 分開",
+            "### 同樣寫 2027，破土與 wafer output 仍是不同時鐘",
+            "### 多空小作文要共用六本帳",
             "## 保證上限不是當期支出：1,050 億美元還隔著六個時鐘",
             "### 先把三個大數字放回三本帳",
             "### 六個時鐘：從第 0 層上限走到可能的淨現金",
@@ -7544,7 +7549,11 @@ class ResearchCenterTest(unittest.TestCase):
         positions = [topic.index(heading) for heading in headings]
         self.assertEqual(positions, sorted(positions))
         for contract in (
+            "**planned investment（計畫投資）**",
+            "**R&D expense（研發費用）**",
             "**PP&E（不動產、廠房及設備）**",
+            "**研究設施與製造晶圓廠**",
+            "**開發／資格前晶圓（development／pre-qualification wafers）**",
             "**在建工程（CIP）**",
             "**尚未起租的租賃（lease not yet commenced）**",
             "**試運轉／啟用（commissioning／placed in service）**",
@@ -7557,6 +7566,8 @@ class ResearchCenterTest(unittest.TestCase):
             "**租賃新增額／本金償還**",
             "**IT-GW（IT gigawatt）**",
             "**PORTS-Pike**",
+            "**Micron Research Labs**",
+            "**DRAM（動態隨機存取記憶體）**",
             "**SEC（美國證券交易委員會）**",
             "**Agreements（本案保證協議）**",
             "**殘值保證（residual value guarantee）**",
@@ -7579,6 +7590,23 @@ class ResearchCenterTest(unittest.TestCase):
             "| 資產可用 | 在建工程",
             "| 客戶使用與收入 | 使用量、履約義務",
             "| 現金支付與回收 | cash PP&E",
+            "| Micron Research Labs planned envelope | 10 |",
+            "| R&D expense | 1.316 |",
+            "| R&D expense | 3.737 |",
+            "| gross PP&E cash expenditures | 19.60 |",
+            "| government-incentive proceeds | 2.99 |",
+            "| estimated net PP&E CapEx | 約 27 |",
+            "`1,316 ÷ 1,000 = 1.316`",
+            "`3,737 ÷ 1,000 = 3.737`",
+            "| 1. planned research envelope |",
+            "| 2. 期間 R&D expense |",
+            "| 3. PP&E／CapEx 與 incentive cash |",
+            "| 4. research-facility execution |",
+            "| 5. technical transfer／qualification／fab capacity |",
+            "| 6. supplier financial attribution |",
+            "`N=2` 份固定官方文件",
+            "`N=1` 家公司",
+            "`N=1` 個 planned program",
             "| 第 0 層：公告與額度 |",
             "| 1. ready-for-service |",
             "| 2. 租約起租／保證生效 |",
@@ -7622,11 +7650,23 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C15",
             "source_id: S14\nrole: company_filing",
             "source_id: S17\nrole: regulator_or_policy\nsource_kind: living_index",
+            "source_id: S18\nrole: company_release\nsource_kind: document",
+            "source_id: S19\nrole: company_filing\nsource_kind: document",
+            "source_id: S20\nrole: regulator_or_policy\nsource_kind: living_index",
             "claim_id: C16\nlabel: verified\nstatus: active",
             "claim_id: C17\nlabel: verified\nstatus: active",
             "claim_id: C18\nlabel: inference\nstatus: active",
             "claim_id: C19\nlabel: unverified\nstatus: active",
+            "claim_id: C20\nlabel: verified\nstatus: active",
+            "claim_id: C21\nlabel: verified\nstatus: active",
+            "claim_id: C22\nlabel: inference\nstatus: active",
+            "claim_id: C23\nlabel: unverified\nstatus: active",
+            "claim_id: C24\nlabel: verified\nstatus: active",
             "monitor_id: T3",
+            "monitor_id: T4",
+            "claim_ids: C20,C21,C22,C23,C24",
+            "source_ids: S18,S19\nwatch_source_ids: S20\nfrequency: quarterly",
+            "next_check: 2026-09-30",
             "frequency: event_driven",
             "next_check: 2026-08-27",
             "reason: capex_to_supplier_financial_bridge_synthesized_from_existing_disclosures",
@@ -7634,17 +7674,19 @@ class ResearchCenterTest(unittest.TestCase):
             "reason: finance_lease_addition_and_principal_clocks_separated_with_fasb_contract_without_refreshing_thesis_clock",
             "reason: depreciation_cost_clock_separated_from_utilization_and_recovery_with_latest_filings_without_refreshing_thesis_clock",
             "reason: residual_value_guarantee_six_clock_cash_waterfall_added_without_refreshing_thesis_clock",
+            "reason: micron_research_plan_rd_expense_capex_capacity_and_supplier_ledgers_separated_without_refreshing_thesis_clock",
             "evidence: sources:S1,S2,S3,S4,S5",
             "evidence: sources:S7,S8",
             "evidence: sources:S1,S2,S9,S10",
             "evidence: sources:S11,S12,S13",
             "evidence: sources:S14,S15,S16",
+            "evidence: sources:S18,S19",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 17),
-            ("research_claim", 19), ("metric_comparison", 9),
-            ("impact", 4), ("monitoring_item", 3), ("transition", 9),
+            ("research_topic", 1), ("research_source", 20),
+            ("research_claim", 24), ("metric_comparison", 9),
+            ("impact", 4), ("monitoring_item", 4), ("transition", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -7655,6 +7697,7 @@ class ResearchCenterTest(unittest.TestCase):
             "concept:ai-capex-cash-conversion,concept,AI CapEx 到供應商財務七關橋接",
             "concept:capital-asset-revenue-cash-clocks,concept,承諾、資產、收入與現金四個時鐘",
             "process:residual-value-guarantee-cash-waterfall,process,殘值保證或有現金瀑布",
+            "process:rd-plan-expense-capex-execution-capacity-order-passport,process,研發計畫到供應商訂單六本帳護照",
             "stage:capital-commitment,stage,資本計畫與承諾",
             "stage:cash-ppe-and-leases,stage,現金 PP&E 與租賃支出",
             "stage:asset-construction-commissioning,stage,資產建置與試運轉",
@@ -7669,13 +7712,28 @@ class ResearchCenterTest(unittest.TestCase):
         )
         self.assertIn("company:amazon,company,Amazon,AMZN", entities)
         self.assertIn("company:nvidia,company,NVIDIA,NVDA", entities)
+        self.assertIn("company:micron,company,Micron,MU", entities)
 
         graph = (
             ROOT / "notes" / "knowledge_graph"
             / "ai_capex_cash_conversion.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: AI CapEx 到供應商財務七關橋接", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        c05 = graph.split("edge_id: KG-ACC-C05", 1)[1].split("-->", 1)[0]
+        self.assertIn("relation: reports_financials", c05)
+        self.assertIn(
+            "claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C21",
+            c05,
+        )
+        self.assertIn("evidence_state: verified", c05)
+        i14 = graph.split("edge_id: KG-ACC-I14", 1)[1].split("-->", 1)[0]
+        self.assertIn("relation: measured_by", i14)
+        self.assertIn(
+            "claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C22",
+            i14,
+        )
+        self.assertIn("evidence_state: inference", i14)
         for node in (
             "from_id: company:microsoft", "from_id: company:meta",
             "from_id: company:amazon", "to_id: stage:capital-commitment",
@@ -7685,6 +7743,10 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: concept:capital-asset-revenue-cash-clocks",
             "from_id: company:nvidia",
             "to_id: process:residual-value-guarantee-cash-waterfall",
+            "edge_id: KG-ACC-C05",
+            "from_id: company:micron",
+            "edge_id: KG-ACC-I14",
+            "to_id: process:rd-plan-expense-capex-execution-capacity-order-passport",
         ):
             self.assertIn(node, graph)
 

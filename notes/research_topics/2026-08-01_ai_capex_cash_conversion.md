@@ -294,6 +294,54 @@ limitation: 這是會持續更新的申報索引，不是固定證據文件；�
 independence_group: ports-pike-transaction
 -->
 
+<!-- research_source
+source_id: S18
+role: company_release
+source_kind: document
+publisher: Micron Technology
+title: Micron Unveils Micron Research Labs, a U.S.-Based Long-Horizon Innovation Hub to Shape the Future of Memory and AI
+published_at: 2026-08-20
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://investors.micron.com/news/press-release/2026/Micron-Unveils-Micron-Research-Labs-a-U-S--Based-Long-Horizon-Innovation-Hub-to-Shape-the-Future-of-Memory-and-AI/default.aspx
+locator: planned $10 billion investment over the next decade、Boise flagship campus、university collaborations、global satellite labs、research domains 與 calendar 2027 groundbreaking 段落
+limitation: planned investment 是十年期前瞻計畫，沒有逐年 cash schedule、R&D expense／PP&E accounting split、incentive bridge、fab wafer capacity、tool／vendor order、技術 qualification 或財務回收分母；供應商引言不構成採購合約
+independence_group: micron
+-->
+
+<!-- research_source
+source_id: S19
+role: company_filing
+source_kind: document
+publisher: Micron Technology
+title: Micron FY2026 Q3 Form 10-Q
+published_at: 2026-06-25
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm
+locator: Statements of Operations 的 Q3／九個月 R&D expense；MD&A 的 R&D drivers、FY2026 estimated net PP&E CapEx、九個月 PP&E cash expenditures／government incentives 及 Boise／New York fab output timing
+limitation: 申報期間截至 2026-05-28、早於 2026-08-20 Research Labs 公告，且數字皆為 Micron 公司級口徑；不能判定已包含或排除 Labs 十年計畫，也不能把 R&D expense、gross PP&E cash、net CapEx estimate 與 wafer capacity 互換
+independence_group: micron
+-->
+
+<!-- research_source
+source_id: S20
+role: regulator_or_policy
+source_kind: living_index
+publisher: U.S. Securities and Exchange Commission
+title: Micron EDGAR Company Filings
+published_at:
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.sec.gov/edgar/browse/?CIK=723125&owner=exclude&action=getcompany
+locator: 2026-08-23 以 Micron filings index 重查 10-Q／10-K／8-K，追蹤 Research Labs 年度 R&D expense、PP&E、新計畫、incentive、facility 與 capacity 對帳
+limitation: 持續更新索引只供發現新申報；索引本身不證明 Labs 支出、建設、研究產出、fab capacity、供應商訂單或回收
+independence_group: micron
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -560,6 +608,76 @@ verification_needed: NVIDIA 後續 10-Q 所附完整 Agreements form、逐租約
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: Micron 於 2026-08-20 公布 Micron Research Labs，公告的精確措辭是未來十年 planned $10 billion investment；用途包含 Boise flagship campus、大學合作、全球 satellite labs 與生態夥伴，研究範圍涵蓋記憶體技術、memory／compute architecture、packaging 與未來半導體製造
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-08-20
+basis: S18 標題下摘要及正文直接提供金額、十年期間、組織形式與研究領域
+boundary: 公告原文不是 up to，但 planned 仍不保證每年核准、執行或最終花足，也不是公告日現金支出或逐年預算；公司未公布年度排程、R&D expense／PP&E 分拆、政府補助、設備清單、研究產出、wafer capacity、供應商份額或回收
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: Micron FY2026 Q3 10-Q 分列截至 2026-05-28 單季／九個月 R&D expense 13.16／37.37 億美元、九個月 PP&E cash expenditures 196.0 億美元與 government-incentive proceeds 29.9 億美元，另估 FY2026 PP&E CapEx net of incentive proceeds 約 270 億美元
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-06-25
+basis: S19 Statements of Operations 以 USD million 列 1,316／3,737，MD&A 另列 $19.60 billion gross PP&E expenditures、$2.99 billion incentive proceeds 與約 $27 billion full-year net CapEx estimate；只做 million-to-billion 單位正規化
+boundary: 期間 R&D expense、gross PP&E cash outflow、incentive inflow 與 full-year net estimate 是不同帳；申報期又早於 Labs 公告，不能說上述實際數字已包含、排除或等於十年 $10 billion 計畫，也不能跨期相加成 Labs spend
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: 閱讀企業長期研究投資時，應分開保存 planned research envelope、期間 R&D expense、PP&E／CapEx 與 incentive cash、research-facility execution、technical transfer／product qualification／fab capacity，以及 supplier financial attribution 六本帳
+supporting_source_ids: S18,S19
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S18 把十年計畫、合作網路、研究領域與 facility groundbreaking 放在前瞻公告，S19 則把期間費用、PP&E cash、incentive、net CapEx estimate 與 manufacturing wafer-output dates 放在不同報表和段落
+boundary: 六本帳是研究中心建立的可追溯框架，不是 Micron 會計政策或研究成功機率模型；任一欄前進都不能代替產品 qualification、量產容量、設備採購或台灣供應商收入
+verification_needed: 同一 Labs program／facility／project key 的年度核准額、actual R&D expense、capitalized PP&E、cash／incentive、construction／staffing、research output、transfer／qualification、wafer output、vendor 與財務共同鍵
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: unverified
+status: active
+claim: Micron Research Labs 的十年 100 億美元 planned investment 已可直接視為新增晶圓廠 CapEx、年度均勻支出、已增加的 wafer capacity、半導體設備 TAM 或台灣供應商訂單與收入
+supporting_source_ids:
+contrary_source_ids: S18,S19
+as_of: 2026-08-23
+basis: S18 沒有年度 accounting／cash／capacity／vendor bridge，S19 又把 R&D expense、PP&E CapEx 與具名 fab output 時程分開；現有來源不足以完成任一直接換算
+boundary: 不把長期研究計畫貶為零，也不把它提前改名為量產與財務；研究價值、facility execution、technical transfer、production capacity 與 supplier attribution 各需自己的證據
+verification_needed: Micron 逐年 Labs budget／actual、R&D expense 與 PP&E reconciliation、facility tools、具名 research outputs、product／process transfer、qualification、incremental wafer／bit capacity、vendor award、shipment、revenue、cost 與 margin
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: Micron 將 Research Labs 預計 calendar 2027 破土、可容納數百名研究人員的設施節點，與製造 fab 的 wafer-output／supply 節點分開揭露；FY2026 Q3 10-Q 分別把首座 Boise DRAM fab 的 mid-2027 output、第二座 Boise fab 的 late-2028 output 與首座 New York fab 的 2030-and-beyond supply 列為產能時程
+supporting_source_ids: S18,S19
+contrary_source_ids:
+as_of: 2026-08-20
+basis: S18 直接描述 Research Labs facility groundbreaking／researcher capacity，S19 MD&A 直接描述三個 manufacturing fab 的 output／supply milestones
+boundary: 同為 2027 不代表 Labs facility 就是首座 Boise manufacturing fab，也不表示研究設施沒有 PP&E、pilot tools 或未來製造轉移；兩份來源未提供資產、預算、設備或產能共同鍵
+verification_needed:
+resolution:
+-->
+
 <!-- metric_comparison
 comparison_id: M1
 observation_id: M1-O1
@@ -773,6 +891,20 @@ trigger: 10-Q 提交完整保證 form，或出現逐租約最低值、lease comm
 invalidation: 後續正式文件取消或修改保證、上限、生效條件、Trigger Event、回收公式、終止條款或 OpenAI 補償，使現有六時鐘與曝險邊界不再適用
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C20,C21,C22,C23,C24
+metric: Micron Research Labs 十年 planned envelope 到年度 R&D／PP&E cash、facility execution、technical transfer、fab capacity 與 supplier financial attribution 的共同對帳
+source_ids: S18,S19
+watch_source_ids: S20
+frequency: quarterly
+frequency_detail: 每季 10-Q／10-K 回查 R&D expense、PP&E、incentive 與 Labs 計畫更新；若 Micron 提前公布 Labs budget、groundbreaking、facility tools、研究成果、product transfer 或 supplier award 即事件重審
+next_check: 2026-09-30
+trigger: Micron 首次以同一 Labs program／facility key 公布年度 plan-to-actual、R&D／PP&E split、construction、research output、qualification、capacity 或 vendor／financial attribution 中任一可串接欄位
+invalidation: 若後續正式申報重定義 $10 billion 的範圍、期間、與既有 $250 billion 計畫關係或會計分類，六本帳須按新 reconciliation 改畫，不能沿用公告 headline
+-->
+
 <!-- transition
 date: 2026-08-01
 from: inbox
@@ -832,12 +964,24 @@ reason: residual_value_guarantee_six_clock_cash_waterfall_added_without_refreshi
 evidence: sources:S14,S15,S16
 -->
 
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: micron_research_plan_rd_expense_capex_capacity_and_supplier_ledgers_separated_without_refreshing_thesis_clock
+evidence: sources:S18,S19
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **CapEx（資本支出）**：買進或建造可使用多年的資產，例如資料中心、伺服器與網路設備；公司對 CapEx 的揭露可能含現金購置、融資租賃或兩者。
+- **planned investment（計畫投資）**：管理層對未來投入範圍與時間窗的前瞻計畫；若沒有逐年核准額與實際數，它不是公告日已付款、當期費用、已下採購單或平均年度預算。
+- **R&D expense（研發費用）**：一段會計期間內列入損益的研發成本；它可能包含人員、開發／資格前晶圓等項目，卻不等於整份長期研究計畫的現金、資本化資產或未來產能。
 - **PP&E（不動產、廠房及設備）**：資產負債表上的長期實體資產類別；「cash paid for PP&E」是期間現金流，「PP&E 餘額」是某一時點仍留在帳上的資產，兩者不是同一個數字。
+- **研究設施與製造晶圓廠**：研究設施主要承載人員、實驗與長期技術探索；製造晶圓廠則以可量測的 wafer／bit output 供貨。兩者都可能使用建物與設備，但動土、容納研究員與量產不是同一個里程碑。
+- **開發／資格前晶圓（development／pre-qualification wafers）**：產品或製程正式通過內部性能、功能與可靠度資格前，用於研發與測試的晶圓；有這類成本不等於產品已量產。
 - **在建工程（CIP）**：仍在施工、安裝或測試，通常還沒準備好按預定方式使用的資產；預算已花不代表它已能提供雲端容量。
 - **尚未起租的租賃（lease not yet commenced）**：合約已簽，但租期與資產使用權尚未開始；承諾金額不等於當期 CapEx、現金付款或可用容量。
 - **試運轉／啟用（commissioning／placed in service）**：設備完成通電、測試與驗收，轉成可使用資產的交接點；它不自動代表客戶已把容量用滿。
@@ -859,6 +1003,8 @@ evidence: sources:S14,S15,S16
 - **租賃新增額／本金償還**：前者描述本期開始使用的新租賃資產與負債，常是非現金事實；後者是償還既有 finance-lease liability 的現金流，兩者不能互換。
 - **IT-GW（IT gigawatt）**：供伺服器、網路與儲存等資訊設備使用的十億瓦負載容量；它不是園區總用電、GPU 數量、美元支出或收入。
 - **PORTS-Pike**：本案位於美國俄亥俄州 Pike County 的大型資料中心園區名稱；本文只用它指向 NVIDIA、SB Energy 與 OpenAI 這一交易，不代表所有 AI 園區都採相同合約。
+- **Micron Research Labs**：Micron 於 2026-08-20 公布的長期研究平台，預計以 Boise 為總部並連結大學、衛星實驗室與生態夥伴；本文不把它和 Micron 已具名的製造晶圓廠視為同一資產。
+- **DRAM（動態隨機存取記憶體）**：伺服器、個人電腦與其他系統常用的揮發性工作記憶體；本文提到 DRAM fab 時，指製造這類記憶體的晶圓廠，不等於一般研究設施。
 - **SEC（美國證券交易委員會）**：美國公開公司提交財務與重大事件申報的監管機關；本文引用向 SEC 提交的 8-K，不代表 SEC 替交易風險背書。
 - **Agreements（本案保證協議）**：NVIDIA 8-K 對多份殘值保證的合稱；目前公開的是摘要，完整 form 尚待後續申報。
 - **殘值保證（residual value guarantee）**：若租賃資產在約定情境下的回收價值不足，由保證人依合約補足部分差額的信用支持；它不是簽約當天就支付全部上限。
@@ -889,12 +1035,14 @@ evidence: sources:S14,S15,S16
 - 每季同時記錄 cash PP&E、finance lease、OCF 與公司自訂 FCF，不用單一 CapEx headline 跨公司排名。
 - 追新增容量是否轉為 Azure／AWS 等雲端營收、使用率與毛利，而不是只看建置承諾。
 - 追台灣供應商自己的客戶認證、出貨、存貨、應收、毛利與營業現金流；只有買方支出、沒有公司級文件，不建立個股訂單事實。
+- 對 Micron Research Labs 分開追年度 plan-to-actual、R&D／PP&E 與 incentive、研究設施建置與工具、研究產出、技術轉移／資格、製造產能及供應商財務，不讓十年 headline 一次跨完六本帳。
 
 ### 想一想
 
 - 如果公司只把資料中心租賃從融資租賃改成營業租賃，headline CapEx 下降但實際投資期待不變，需求應該被解讀成變弱嗎？
 - 一美元 CapEx 有多少是建物、電力與網路，有多少真的變成 GPU、伺服器或台灣零組件收入？
 - FCF 轉負是暫時把現金換成會產生未來收入的資產，還是需求、利用率與定價不足以回收投資；要看哪些後續數字才能分辨？
+- 為什麼不能把 Micron 的十年 100 億美元研究計畫除以十，當成每年 10 億美元 R&D，再加進 FY2026 CapEx 或設備商訂單？
 
 ## 三家公司要先按各自口徑讀
 
@@ -990,6 +1138,87 @@ Meta 的 2026 Q1 申報提供一個很有用的反例：同一份報表同時列
 Amazon 的 2026 Q1 申報則把另外兩個時差寫得很清楚：PP&E 淨增加可包含資產已取得但尚未付款的非現金活動；AWS 的未來服務承諾則要依客戶使用與公司履約決定收入認列時點。因此資產時鐘可以早於現金時鐘，合約時鐘也可以早於收入時鐘。
 
 四個時鐘不是新的一套公司排名。真正可重算的橋接，仍要用同一具名資產或平台批次，把合約生效、轉入可使用、客戶使用與收入、付款與供應商收款日期一一對上；目前公開資料還做不到。
+
+## 100 億美元研究計畫不是 100 億美元晶圓廠：Micron 六本帳
+
+Micron 在 2026 年 8 月 20 日公布 Micron Research Labs，原文是**計畫於未來十年投入
+100 億美元**。這個研究平台以 Boise 為總部，範圍涵蓋關鍵記憶體技術、先進記憶體與運算
+架構、封裝、未來半導體製造，也會資助大學合作、全球衛星實驗室與生態夥伴。這足以證明公司
+提出一項長期研究計畫，卻還不能證明 100 億美元已成為現金支出、當期研發費用、晶圓廠產能
+或設備供應商訂單。
+
+### 公司公布的是十年 planned investment，不是逐年預算表
+
+公告沒有列出精確的會計年度起訖、每年核准額、實際支出、R&D expense／PP&E 分拆、政府
+incentive 調節或工具清單。因此不能把 `100 億美元 ÷ 10 年` 改寫成「每年固定 10 億美元」，
+也不能把十年總額一次加進 FY2026 CapEx。公告所說的研究將看向超過十年的問題，描述的是
+技術視野；「未來十年」才是 planned investment 的時間窗，兩個十年不是同一欄。
+
+Micron 也說這項新計畫建立在先前超過 2,500 億美元的美國製造與研發規劃之上，但沒有提供
+兩者的 project、期間與會計口徑調節表。讀者可以知道兩個 headline 都存在，不能機械相加成
+一個可稽核的 2,600 億美元支出表。
+
+### 公司自己的 10-Q 已把 R&D、PP&E 與 incentive 分開
+
+以下全部換成十億美元，只為看清不同帳本與期間，不做加總或高低比較：
+
+| 揭露項目 | 金額（USD billion） | 期間／狀態 | 正確讀法 |
+|---|---:|---|---|
+| Micron Research Labs planned envelope | 10 | 2026-08-20 公布；未來十年 | 長期研究計畫，不是公告日 actual |
+| R&D expense | 1.316 | 截至 2026-05-28 的單季 | 公司級當期損益費用，不是 Labs 年度分子 |
+| R&D expense | 3.737 | 截至 2026-05-28 的九個月 | 公司級累計費用，期間不同於十年計畫 |
+| gross PP&E cash expenditures | 19.60 | FY2026 前九個月 | 公司級投資現金流，不是 Labs 或單一 fab 支出 |
+| government-incentive proceeds | 2.99 | FY2026 前九個月 | 另列的現金流入，不能冒充研發收入或產能 |
+| estimated net PP&E CapEx | 約 27 | FY2026 全年估計，已扣 incentive proceeds | 前瞻公司級淨口徑，不是全年 actual |
+
+10-Q 的申報期間截至 2026 年 5 月 28 日，早於 8 月 20 日 Labs 公告。它能教我們 Micron
+本來就把 R&D expense、gross PP&E cash、incentive 與 net CapEx estimate 分開，卻不能
+證明 Labs 已包含在、或排除於其中任一數字。表內 `1,316 ÷ 1,000 = 1.316`、
+`3,737 ÷ 1,000 = 3.737` 只做 USD million 到 billion 的單位正規化，沒有拿它們
+估計 Labs 年支出。
+
+### 同樣寫 2027，破土與 wafer output 仍是不同時鐘
+
+Labs 公告預期在曆年 2027 年為 Boise 研究設施破土，設施可容納數百名研究人員。較早的
+10-Q 則把首座 Boise DRAM fab 的首次 wafer output 放在 2027 年中，第二座 Boise fab
+放在 2028 年底，首座 New York fab 的供貨則在 2030 年及以後。地名或年份接近，不會自動
+產生共同資產鍵：研究設施的 groundbreaking 是建設節點，「數百名研究人員」是人員／空間
+容量；fab output 才是製造產出節點。
+
+所以不能因兩處都出現 Boise 與 2027，就把 Labs 改名為首座 DRAM fab，也不能說研究設施
+完全沒有 PP&E、試驗工具或未來技術轉移。現有兩份文件沒有共同的 project ID、資產清單、
+預算或 wafer／bit 分母，最誠實的答案是先分帳、等待串接。
+
+### 多空小作文要共用六本帳
+
+| 本帳 | 現在已知 | 下一個可驗證節點 |
+|---|---|---|
+| 1. planned research envelope | 未來十年 100 億美元與研究範圍 | 同一 Labs program 的年度核准額、版本與 plan-to-actual |
+| 2. 期間 R&D expense | 公司級單季與九個月費用 | Labs 分子、期間、成本類型與實際發生額 |
+| 3. PP&E／CapEx 與 incentive cash | 公司級 gross cash、incentive 與全年淨估計 | Labs／facility 資產、capitalized PP&E、cash 與補助調節 |
+| 4. research-facility execution | 預期 2027 破土、可容納數百名研究人員 | 許可、施工、工具安裝、啟用、staffing 與研究運作 |
+| 5. technical transfer／qualification／fab capacity | 已具名 fab 各有自己的 output 時程 | 具名研究成果、產品／製程轉移、資格完成與增量 wafer／bit output |
+| 6. supplier financial attribution | 公告中的供應商主管引言只屬支持性評論 | PO、order intake、具名工具出貨／驗收、供應商收入、毛利與現金 |
+
+偏多的合理版本是：長時間窗、跨記憶體／運算／封裝／製造的研究範圍，加上大學、衛星實驗室
+與生態夥伴，可能擴大 Micron 的長期技術選擇權。如果年度資金、設施、研究成果、技術轉移與
+產品資格依序前進，故事會逐步變成可觀察的研發能力。現在能支持的是計畫與組織設計，不是
+成功機率、量產位元或供應商收入。
+
+偏空的合理版本是：十年 headline 尚無年度 schedule、會計分拆、工具、研究產出或
+qualification，未來也可能因執行、資金與技術風險而調整。可是「目前不能分拆」也不等於
+「價值為零」或「不會花錢」；那同樣超出來源。Applied Materials、Lam Research 等主管在
+公告中的引言，也只是對研究合作重要性的評論，不是採購合約、得標、工具數或訂單。
+
+多空共同的裁決方式，是每次只讓有證據的本帳前進：同一 program／facility 的 plan-to-actual
+先接會計與現金，再接建置與研究成果，之後才接產品 qualification、製造 output 與供應商
+財務。前一欄不能替後一欄畢業，但後一欄尚未公開也不能倒推前一欄不存在。
+
+本段核對 `N=2` 份固定官方文件，兩份都屬 Micron 同一公司消息鏈；這是 `N=1` 家公司與
+`N=1` 個 planned program，不是兩家公司的獨立樣本，且 10-Q 早於 Labs 公告。Labs 的
+逐年 plan／actual、R&D／PP&E allocation、facility tools、研究成果、技術轉移、產品資格、
+增量產能、供應商訂單、收入與毛利共同觀測 `N=0`。公司報告值與計畫值不是隨機抽樣，因此
+沒有 sampling SE／t；本段不提供價格、估值、共識、部位、投資建議或市場是否反映的判斷。
 
 ## 保證上限不是當期支出：1,050 億美元還隔著六個時鐘
 
@@ -1196,10 +1425,13 @@ Microsoft 的 684 RPO 與 Amazon 的 496 AWS 未來服務承諾也不是本期�
 - [NVIDIA／SB Energy SEC Exhibit 99.1：PORTS-Pike 專案與 15 億美元投資](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/sbeoainvidia-portsrelease.htm)（20 年租約、分期容量與 build／own／operate；屬同一交易附件）。
 - [OpenAI：PORTS-Pike 專案](https://openai.com/index/openai-joins-ports-pike-project/)（首批 800MW、completed-capacity payment 與許可／融資前提；OpenAI 是同一交易當事人）。
 - [SEC：NVIDIA EDGAR Company Filings](https://www.sec.gov/edgar/browse/?CIK=1045810&owner=exclude&action=getcompany)（後續 10-Q 完整 Agreements form 與修訂的 living watch；索引本身不當固定證據）。
+- [Micron：Micron Research Labs 公告，2026-08-20](https://investors.micron.com/news/press-release/2026/Micron-Unveils-Micron-Research-Labs-a-U-S--Based-Long-Horizon-Innovation-Hub-to-Shape-the-Future-of-Memory-and-AI/default.aspx)（十年 planned investment、研究範圍、合作網路與預期 2027 破土；不是年度 actual 或供應商訂單）。
+- [Micron FY2026 Q3 Form 10-Q，2026-06-25](https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm)（公司級 R&D expense、PP&E cash、incentive、net CapEx estimate 與具名 fab output；申報期早於 Labs 公告）。
+- [SEC：Micron EDGAR Company Filings](https://www.sec.gov/edgar/browse/?CIK=723125&owner=exclude&action=getcompany)（後續 10-Q／10-K 與 8-K 的 living watch；索引本身不證明 Labs 執行）。
 
-**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。FASB 文件再證明新 finance-lease ROU／liability 與償還本金是兩個不同事實。最新三份申報還把資產新增或存量、未付款、折舊、未起租租賃與履約義務分列，足以判定折舊不是利用率碼表。NVIDIA 的 8-K 又把殘值保證的累計上限、生效、ready-for-service、租戶違約、資產回收、保證人補差額與租戶補償分開，證明保證上限不能直接改名為當期 CapEx。
+**已知：** 三家公司各自的 OCF、PP&E／CapEx、租賃與 FCF 可由官方表格或法說對回；Meta 與 Amazon 的申報也直接證明合約承諾、資產狀態、使用／履約與現金時點不能合併成一個數字。FASB 文件再證明新 finance-lease ROU／liability 與償還本金是兩個不同事實。最新三份申報還把資產新增或存量、未付款、折舊、未起租租賃與履約義務分列，足以判定折舊不是利用率碼表。NVIDIA 的 8-K 又把殘值保證的累計上限、生效、ready-for-service、租戶違約、資產回收、保證人補差額與租戶補償分開，證明保證上限不能直接改名為當期 CapEx。Micron 的公告與較早 10-Q 則把十年研究計畫、期間 R&D expense、PP&E／incentive、研究設施破土及製造 fab output 放在不同文件與時鐘。
 
-**還不知道：** CapEx 中每一項 AI 晶片、伺服器、網路、電力與建物的精確拆分，同一資產批次的在建轉入、折舊起算、容量上線、利用率、收入與現金回收，以及台灣 universe 個股的訂單與獲利份額。PORTS-Pike 也還缺逐租約保證最低值、責任排程、回收順位、違約概率、實際付款與補償結果。
+**還不知道：** CapEx 中每一項 AI 晶片、伺服器、網路、電力與建物的精確拆分，同一資產批次的在建轉入、折舊起算、容量上線、利用率、收入與現金回收，以及台灣 universe 個股的訂單與獲利份額。PORTS-Pike 也還缺逐租約保證最低值、責任排程、回收順位、違約概率、實際付款與補償結果。Micron Research Labs 另缺逐年 plan-to-actual、R&D／PP&E 與 incentive 調節、設施工具、研究產出、技術轉移、資格、增量產能及供應商財務共同鍵。
 
 **不可外推：** 這不是三家公司 AI ROI 排名；期間與公式不同。買方 CapEx 也不能直接等同任何台灣供應商收入。沒有價格、估值、共識與部位資料，本題不判斷市場是否已反映。
 
@@ -1263,3 +1495,4 @@ evidence_boundary: 不由雲端需求直接指認台灣散熱個股受惠，等�
 - **兩端共同鍵**：買方與供應商能否同時指向同一平台、料號、期間、數量與驗收節點；缺任一端，就只保留需求搜尋路由，不建立題材財務歸因。
 - **資產批次護照**：三家公司後續是否提供站點／設備批次、取得方式、placed-in-service、折舊分類、容量分母、工作負載、收入與現金的共同鍵；沒有共同 cohort，就不以折舊／新增資產比率冒充利用率。
 - **保證六時鐘**：NVIDIA 後續 10-Q 是否提交完整 Agreements form，並逐租約揭露起租、ready-for-service、保證最低值、Trigger Event、重租／出售回收、實際補差額與 OpenAI 補償；缺少這些欄位，就不把 1,050 億美元上限改寫成預期損失。
+- **Micron 六本帳**：後續 10-Q／10-K 或 Labs 更新能否把同一 program／facility 的年度計畫與實際額，接到 R&D／PP&E／incentive、施工與工具、研究產出、轉移／資格、增量產能及 supplier PO／出貨／驗收／財務；在共同鍵出現前，不把十年 100 億美元除十或改寫成 fab 與設備訂單。

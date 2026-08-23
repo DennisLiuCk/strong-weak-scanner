@@ -1,7 +1,8 @@
 # AI CapEx 到供應商財務七關橋接知識圖譜
 
 本圖先用承諾、資產、收入與現金四個時鐘拆開同一資料中心專案；遇到殘值保證時，先把揭露上限
-放在第 0 層，再以六個或有現金檢查點分開可服務、起租生效、付款或違約、資產回收、補差額與補償。之後才把雲端買方的資本計畫、
+放在第 0 層，再以六個或有現金檢查點分開可服務、起租生效、付款或違約、資產回收、補差額與補償；
+遇到長期研究計畫時，另把 planned envelope、期間 R&D、PP&E／incentive、研究設施、技術轉移／產能與供應商財務分成六本帳。之後才把雲端買方的資本計畫、
 付款、資產上線、容量使用與現金回收，和台灣供應商的產品／公司財務歸因分開。公司級財務結果
 與單一交易條款已有公開資料；七關仍只是研究框架，不表示每一關都有資料，也不把族群搜尋路由
 當成任何個股的訂單、收入或獲利。
@@ -11,7 +12,7 @@ schema_version: 1
 graph_id: ai-capex-cash-conversion
 root_node_id: concept:ai-capex-cash-conversion
 label: AI CapEx 到供應商財務七關橋接
-summary: 先分開承諾 資產 收入 現金四個時鐘，殘值保證另拆生效 違約 回收 補差額與補償，再從資本承諾 現金與租賃支出 資產建置上線 可用容量 工作負載與收入 買方現金回收追到供應商財務歸因，避免把保證上限或買方 CapEx 直接換算成當期支出與台灣公司受惠。
+summary: 先分開承諾 資產 收入 現金四個時鐘，殘值保證另拆生效 違約 回收 補差額與補償，長期研發另拆計畫 費用 PP&E／incentive 設施執行 技術轉移／產能及供應商財務，再從資本承諾追到供應商歸因，避免把 headline 直接換算成當期支出 產能 訂單與台灣公司受惠。
 article_ids: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION
 status: active
 -->
@@ -94,6 +95,26 @@ review_due: 2026-08-27
 status: active
 boundary: NVIDIA 8-K 只證明 PORTS-Pike 初始保證的附條件累計上限與違約後回收／補差額摘要；它不是當期 CapEx、已支付 1,050 億美元、預期損失或台灣供應商財務。
 next_trigger: NVIDIA 在 10-Q 提交完整 Agreements form，或正式揭露逐租約起租 ready-for-service Trigger Event 回收 實際付款與 OpenAI 補償。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACC-C05
+view: company
+from_id: company:micron
+to_id: concept:ai-capex-cash-conversion
+relation: reports_financials
+claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C21
+note_refs:
+evidence_state: verified
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-06-25
+review_due: 2026-09-30
+status: active
+boundary: Micron 較早 10-Q 只證明公司級 R&D expense PP&E cash incentive 與全年 net CapEx estimate 分開揭露；它早於 Labs 公告，不能證明計畫已包含或排除於任一數字，也沒有 Labs 或供應商財務分子。
+next_trigger: Micron 以同一 Labs program 或 facility key 公布年度 plan-to-actual R&D／PP&E／incentive 建置 研究產出 技術轉移 qualification capacity及vendor／financial attribution。
 -->
 
 <!-- knowledge_edge
@@ -354,4 +375,24 @@ review_due: 2026-08-27
 status: active
 boundary: PORTS-Pike 三份官方文件只對應同一交易；1,050 億美元是初始保證的累計付款上限，不是當期 CapEx、已付款或預期損失，15 億美元股權投資與 IT-GW 容量另屬不同帳本。
 next_trigger: NVIDIA 後續 10-Q 提交完整 Agreements form，或逐租約出現起租 ready-for-service Trigger Event 重租／出售回收 實際補差額與 OpenAI 補償。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ACC-I14
+view: industry
+from_id: concept:ai-capex-cash-conversion
+to_id: process:rd-plan-expense-capex-execution-capacity-order-passport
+relation: measured_by
+claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C22
+note_refs:
+evidence_state: inference
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: 六本帳是研究中心的可追溯框架而非 Micron 會計政策；兩份文件屬同一公司鏈且 10-Q 早於 Labs 公告，沒有同一 project 的年度 actual 技術轉移 產能與 supplier order 共同鍵。
+next_trigger: 同一研究 program 或 facility 首次把 planned envelope 接到期間費用與現金 建置啟用 研究成果 qualification 增量產能及 supplier PO／出貨／驗收／財務。
 -->
