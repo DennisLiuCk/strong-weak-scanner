@@ -3893,6 +3893,7 @@ class ResearchCenterTest(unittest.TestCase):
             "editorial_plain_language_wave89_memory_layers_and_maturity",
             "added_kv_tiering_measurement_passport_and_refreshed_exact_host_storage_edges",
             "added_roofline_workload_boundary_and_memory_performance_passport_without_thesis_clock_refresh",
+            "separated_context_window_kv_cache_and_persistent_agent_state_without_thesis_clock_refresh",
             "人工智慧系統不會把所有資料都塞在同一個地方",
             "架構、容量型號、樣品、量產與收入必須分開判讀",
             "## 先按資料的急迫程度分四層",
@@ -3928,6 +3929,14 @@ class ResearchCenterTest(unittest.TestCase):
             "| 10. 能源、成本、部署與財務 |",
             "## 先問工作負載，再問該買哪一種記憶體",
             "## 用一份 KV cache 看懂資料如何旅行",
+            "## KV cache 不是 Agent 的工作紀錄：先分清三種「記得」",
+            "| Context window | 本次模型可直接看見的提示、對話與工具摘要 |",
+            "| KV cache | 已處理 token 的 attention key／value 中間結果 |",
+            "| Persistent shared state | 任務進度、決策、版本、工具產物、所有者與跨 agent 交接 |",
+            "### 可見不等於只做一次",
+            "close-to-open consistency 回答「何時看得到」，不回答",
+            "| 6. Claim、dedupe 與 idempotency |",
+            "### 多空小作文：先量跨 session 的工作量，再談儲存受惠",
             "## 新手最常混在一起的八件事",
             "## 在研究中心裡接著怎麼學",
             "## 四層互補，不是誰取代誰",
@@ -3952,6 +3961,7 @@ class ResearchCenterTest(unittest.TestCase):
             "## HBM 寫著 TB/s，為什麼應用仍可能沒有同幅加速",
             "## 先問工作負載，再問該買哪一種記憶體",
             "## 用一份 KV cache 看懂資料如何旅行",
+            "## KV cache 不是 Agent 的工作紀錄：先分清三種「記得」",
             "## 新手最常混在一起的八件事",
             "## 在研究中心裡接著怎麼學",
             "## 四層互補，不是誰取代誰",
@@ -3966,7 +3976,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 61
+            sum(line.startswith("- **") for line in glossary.splitlines()), 66
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -3978,9 +3988,10 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 19),
-            ("research_claim", 23), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 6),
+            ("research_topic", 1), ("transition", 10),
+            ("research_source", 21), ("research_claim", 26),
+            ("metric_comparison", 0), ("impact", 2),
+            ("monitoring_item", 7),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         for evidence_contract in (
@@ -3998,6 +4009,10 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C21\nlabel: verified",
             "claim_id: C22\nlabel: verified",
             "claim_id: C23\nlabel: inference",
+            "claim_id: C24\nlabel: verified",
+            "claim_id: C25\nlabel: verified",
+            "claim_id: C26\nlabel: inference",
+            "monitor_id: T7",
             "只有在 cache reuse 的收益高於資料搬移 overhead 時",
             "同一份 baseline-versus-treatment 量測護照",
             "可達浮點效能上限寫成 peak compute",
@@ -4022,13 +4037,15 @@ class ResearchCenterTest(unittest.TestCase):
             "process:ai-memory-tier-measurement-passport,process,人工智慧記憶體分層八格量測護照",
             "process:memory-roofline-performance-passport,process,記憶體Roofline效能十欄護照",
             "metric:operational-intensity-ridge-point-boundary,metric,操作強度與轉折點瓶頸邊界",
+            "capability:agent-persistent-shared-state,capability,Agent 持久共享狀態",
+            "metric:agent-state-lifecycle-observability,metric,Agent 狀態生命週期可觀測欄位",
         ):
             self.assertIn(concept, concepts)
 
         graph = (
             ROOT / "notes" / "knowledge_graph" / "ai_memory_hierarchy.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 25)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 27)
         for graph_contract in (
             "edge_id: KG-MEM-C03",
             "to_id: product:micron-socamm2-192gb",
@@ -4043,6 +4060,10 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: process:ai-memory-tier-measurement-passport",
             "to_id: process:memory-roofline-performance-passport",
             "to_id: metric:operational-intensity-ridge-point-boundary",
+            "edge_id: KG-MEM-I23",
+            "to_id: capability:agent-persistent-shared-state",
+            "edge_id: KG-MEM-I24",
+            "to_id: metric:agent-state-lifecycle-observability",
         ):
             self.assertIn(graph_contract, graph)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(

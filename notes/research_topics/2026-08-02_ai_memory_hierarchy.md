@@ -88,6 +88,13 @@ to: triaged
 reason: added_roofline_workload_boundary_and_memory_performance_passport_without_thesis_clock_refresh
 evidence: sources:S18,S19
 -->
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: separated_context_window_kv_cache_and_persistent_agent_state_without_thesis_clock_refresh
+evidence: sources:S20,S21
+-->
 
 <!-- research_source
 source_id: S1
@@ -391,6 +398,38 @@ url: https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-backgro
 locator: Understanding Performance 的 memory time／math time、arithmetic intensity／ops:byte、memory／math／latency limiter 與 first-order approximation 邊界
 limitation: 這是 NVIDIA 的一般 GPU 教學頁，範例使用 V100／A100 且網頁可持續更新；它不是 Rubin 或任何具名 HBM 的規格保證，也不是私有 AI 服務、客戶採購或公司財務結果
 independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S20
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: Six Agent Harness Capabilities for Higher Model Performance
+published_at: 2026-07-27
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://developer.nvidia.com/blog/six-agent-harness-capabilities-for-higher-model-performance/
+locator: Six ideas, one surface 的 Explicit object state；The agent curates its own memory 的跨 session SQLite／共享 ownership；Same performance, half the tokens 的 pass-by-reference 與 context window 邊界
+limitation: NOOA 是 NVIDIA 開源 research preview；架構與 benchmark 都不等於產業標準、客戶 production 部署、一般工作負載效果、新增儲存硬體需求或台灣供應商財務貢獻
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S21
+role: company_release
+source_kind: document
+publisher: Amazon Web Services
+title: Orchestrating multi-agent AI architectures with Amazon S3 Files
+published_at: 2026-08-14
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://aws.amazon.com/blogs/storage/orchestrating-multi-agent-ai-architectures-with-amazon-s3-files/
+locator: 開頭的 finite context／persistent working memory；Solution overview 的 stateless invocation、close-to-open 與 application deduplication；The shared file system 的 atomic claim markers；Considerations 的 consistency／synchronization 邊界
+limitation: 這是 AWS S3 Files 的五階段教學與參考架構，作者刻意把階段分散在五種 compute 以展示可掛載範圍；不是 production 客戶普查、跨產品 benchmark、exactly-once 保證、儲存容量需求或供應商財務證據
+independence_group: aws
 -->
 
 <!-- research_claim
@@ -755,6 +794,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: NVIDIA 的 NOOA research preview 明確把 durable typed agent state 與 conversation history 分開；其 long-term memory 可在 session 間累積於一個可讀 SQLite 檔，亦可由多個 agent 共用 store 而保留各自 ownership，pass-by-reference 則只把 bounded preview 放進 context window、完整值留在 execution environment
+supporting_source_ids: S20
+contrary_source_ids:
+as_of: 2026-07-27
+basis: S20 的 Explicit object state、The agent curates its own memory 與 pass-by-reference 段落直接分開 model-visible context、live execution object 及跨 session persistent store
+boundary: 這只證明一個開源研究預覽採用這種狀態分工，不代表術語已標準化、所有 agent 都需要跨 session memory、共享 SQLite 適合任何規模，或該 benchmark 效果可外推到 production、儲存硬體與公司財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: AWS 的五階段 S3 Files 範例把 finite context window、每次 invocation 無狀態的 Strands agent 與跨階段共享檔案分成不同契約；檔案 close 後可被其他掛載端看見，但輪詢、去重與併發副本的 atomic claim 都由外圍應用程式負責
+supporting_source_ids: S21
+contrary_source_ids:
+as_of: 2026-08-14
+basis: S21 開頭把 files 定義為 session 後仍存在的 working memory；Solution overview 明示 agent stateless per invocation、close-to-open visibility 與 application polling／deduplication；shared filesystem 段另示範 atomic claim markers
+boundary: close-to-open 只回答可見時點，不是 exactly-once 或流程完成保證；這是一個 AWS 參考實作，不能外推為所有 agent 架構、儲存產品選擇、可靠度、成本或硬體需求
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C26
+label: inference
+status: active
+claim: 研究 Agent 的「記憶」時應分開三本帳：context window 記錄本次模型可見 token，KV cache 記錄可重算的 attention 中間結果，persistent shared state 才記錄跨 invocation／session 的進度、決策、工具產物與交接；要推論新增儲存需求，還須共同核對 owner、生命期、可重建性、commit／visibility、版本、claim／dedupe、容量／讀寫量與 recovery，而不能從「需要持久」直接跳到 SSD、NAND 或供應商收入
+supporting_source_ids: S12,S13,S20,S21
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S12／S13 界定 KV block 的 reuse、offload、onboard 與 recompute 路徑；S20 分開 context、execution object 與 persistent store；S21 分開 stateless invocation、persistent files、visibility 及 application coordination，共同支持三帳與狀態生命週期欄位
+boundary: 三帳與八欄是研究中心整合公開架構後提出的比較框架，不是正式標準；目前沒有代表性 production workload 同時公開三層 bytes、生命期、SLO、成本、硬體 BOM 與供應商財務，亦不能排除多數持久狀態很小或由既有資料庫／物件儲存吸收
+verification_needed: 具名 production agent workflow 固定模型、harness 與任務母體，分別公開 context／KV／durable state 的容量、讀寫、reuse、生命期、交接、失敗復原、SLO、成本及 storage BOM；第一個反證是工作不需跨 session 共享，或狀態量可被既有服務吸收且不改 SLO、成本與硬體
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -843,6 +933,20 @@ trigger: 具名客戶以版本化 SUT 與 production trace 公開固定 request 
 invalidation: 新版工具或 production 證據顯示目前八格仍遺漏會改變結論的 cache state、routing、network、quality、power、reliability 或成本欄位；屆時追加新 claim 縮窄 C19，不回寫舊量測護照
 -->
 
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C24,C25,C26
+metric: 具名 production agent workflow 的 context、KV cache 與 persistent shared state 三帳，以及 owner、生命期、commit／visibility、claim／dedupe、bytes、SLO、recovery、成本與 storage BOM
+source_ids: S12,S13,S20,S21
+watch_source_ids: S5,S12,S13
+frequency: monthly
+frequency_detail: 每月檢查 NVIDIA agent／Dynamo 文件與具名 operator 的跨 session handoff、state store、KV reuse、failure recovery 及硬體配置；重大 production deployment 時提前重審
+next_check: 2026-09-30
+trigger: 具名客戶在同一任務母體公開三層資料量與生命期，並把重複工作、衝突、request SLO、failure recovery、storage cost 及 hardware BOM 做 baseline-versus-treatment 對帳
+invalidation: 代表性正式工作不需跨 session 或跨 agent 共享，持久狀態量可由既有資料庫／物件儲存吸收且不改 SLO、成本與硬體，或 coordination／consistency 成本抵銷重用收益時，下修新增資料層與供應鏈映射
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -868,6 +972,9 @@ invalidation: 新版工具或 production 證據顯示目前八格仍遺漏會改
 - **中央處理器記憶體模組（SOCAMM）**：以低功耗 DRAM 做成的可維護模組，放在 CPU 系統記憶體一側，重點偏向容量、功耗與機架密度。
 - **第二代 SOCAMM（SOCAMM2）**：一個包含不同容量型號的產品家族。Micron 明列 192GB 已量產，較早的 256GB 公告則只到客戶送樣；家族名稱本身不能替每個容量決定成熟度。
 - **鍵值快取（KV cache）**：模型推論時保存先前文字片段的中間結果，避免每一步都重新計算全部上下文。
+- **上下文視窗（context window）**：這一次模型呼叫可以直接看見的 token 範圍；把內容放進視窗不代表它會跨 session 永久保存。
+- **Agent 持久／共享狀態（persistent／shared agent state）**：把進度、決策、工具結果或交接產物留在檔案、資料庫或物件中，讓下一次 invocation、下一個 session 或另一個 agent 能接續；它不是 KV cache 的同義詞。
+- **冪等與去重（idempotency／deduplication）**：同一工作被重試或重複看見時，避免產生兩份互相衝突的結果；資料已可見不代表系統自動只處理一次。
 - **前綴重用（prefix reuse）**：不同請求前段有相同 token 時，系統重新使用先前算好的 KV block；沒有足夠重複內容，即使多一層容量也可能只增加搬移。
 - **冷快取／熱快取（cold／warm cache）**：冷快取表示測試開始時沒有可直接重用的內容；熱快取表示先前請求已留下可命中的資料。兩種起點不能混成同一成績。
 - **快取命中率（cache hit rate）**：需要的資料已在可重用位置而不用重新計算的比率；命中高只證明機制有工作，不等於搬回速度與整體服務一定更好。
@@ -883,6 +990,8 @@ invalidation: 新版工具或 production 證據顯示目前八格仍遺漏會改
 - **輸入／輸出序列長度（ISL／OSL）**：一次請求送入與產生的 token 數；長度不同會改變 prompt processing、decode 時間與可重用資料量。
 - **共享上下文層（Context storage／CMX）**：NVIDIA 為可重建、又在意等待時間的鍵值快取設計的共享位置，介於本機記憶體與一般共享儲存之間。
 - **固態硬碟（SSD）**：使用快閃記憶體保存資料的儲存裝置；容量通常比近端記憶體大，但存取較慢。
+- **NAND 快閃記憶體（NAND flash）**：固態硬碟內保存資料的非揮發性晶片；應用寫入量、硬碟容量與實際 NAND 寫入或採購量不是同一個數字。
+- **SQLite**：把結構化資料放在單一本機檔案中的嵌入式資料庫軟體；使用 SQLite 不代表資料量很大，也不指定底層一定新增哪種儲存硬體。
 - **本機儲存（local storage）**：直接放在同一台伺服器內的儲存位置，通常比機房共享儲存更靠近運算。
 - **共享儲存（shared storage）**：可由多台伺服器共同使用的儲存位置；適合共享或長期保存，不等於近端高速記憶體。
 - **Vera Rubin 平台**：NVIDIA 下一代平台名稱；Rubin 是 GPU、Vera 是 CPU。代號只表示產品世代，不表示已量產或已出貨。
@@ -1141,6 +1250,54 @@ compute-bound」當永久否定。多空共用同一份護照，差別應在證�
 5. 只有實際部署揭露命中、搬移、等待與資源利用，才能判斷新增層是在解決瓶頸，還是把瓶頸移到別處。
 
 因此「可卸載 KV cache」只證明一條技術路徑；「卸載後整體更划算」仍需客戶工作負載與完整系統結果。
+
+## KV cache 不是 Agent 的工作紀錄：先分清三種「記得」
+
+把一個 Agent 想成正在寫報告的人：桌面上目前攤開的資料像 **context window**；已算過、不想每次重算的
+草稿索引像 **KV cache**；真正記錄「做到哪裡、採用哪個版本、誰已簽核」的專案簿，才像
+**persistent shared state**。三者都可能被產品叫做 memory，但保存內容、生命期與遺失後果不同。
+
+| 三本帳 | 真正保存什麼 | 典型生命期 | 遺失後最直接的後果 | 優先量什麼 |
+|---|---|---|---|---|
+| Context window | 本次模型可直接看見的提示、對話與工具摘要 | 每次模型呼叫重新組裝；session 可重帶內容但視窗仍有上限 | 模型當下看不到細節，需重新放入、摘要或查找 | visible／input tokens、壓縮／截斷與 prompt 成本 |
+| KV cache | 已處理 token 的 attention key／value 中間結果 | 推論請求、session 或由服務政策延長的重用期 | 前綴通常可從原始 token 重算，但會多花等待與運算 | matched tokens、prefill／tier hit rate、offload／onboard、搬移、淘汰與重算 |
+| Persistent shared state | 任務進度、決策、版本、工具產物、所有者與跨 agent 交接 | 可跨 invocation、session、程序重啟或 agent | 可能重做工作、使用舊版本、互相矛盾，甚至無法安全續跑 | bytes、讀寫率、owner、retention、visibility、dedupe、RPO／RTO |
+
+NVIDIA 的 NOOA research preview 提供一個具體例子：durable typed state 不只放在 conversation history，
+long-term memory 可跨 session 留在 SQLite，完整工具值也可留在 execution environment、只把 bounded preview
+送進 context。這證明三種位置可以分工；它不證明 SQLite 是所有正式系統的答案，也不表示供應商所稱的
+「long-term memory」一定是不可重建資料。分類時應看內容、生命期、可重建性、owner 與誰能看見，而不是只看名稱。
+
+### 可見不等於只做一次
+
+AWS 的五階段範例更清楚地畫出邊界：Strands agent 每次 invocation 仍是 stateless，shared file 在 writer
+close 後可被其他掛載端看見；可是誰去輪詢、哪份工作已做過，以及兩個副本誰先取得工作，仍由應用程式的
+dedupe 或 atomic claim 處理。也就是說，**close-to-open consistency 回答「何時看得到」，不回答
+「是否只處理一次」**。若多副本共用一個沒有 atomic claim 的 read-modify-write 狀態檔，反而可能遺失更新。
+
+一份可重建的狀態生命週期紀錄至少要保留八欄：
+
+| 狀態欄位 | 要回答的問題 | 缺少時最容易誤判成 |
+|---|---|---|
+| 1. 內容與 owner | 保存的是 token、中間張量，還是任務決策；由誰負責 | 所有叫 memory 的資料都相同 |
+| 2. Scope 與 readers | 只供一次呼叫、同一 agent、同一團隊，還是跨服務共享 | 能寫入就代表所有下游都能安全讀取 |
+| 3. 生命期與 retention | 何時建立、何時過期、是否跨 session／重啟 | 暫存資料一定形成長期容量需求 |
+| 4. 可重建性與 source of truth | 遺失後能否重算，哪一份才是正式版本 | KV cache 與工作紀錄同樣不可丟失 |
+| 5. Commit、close 與 version | 何時算寫完，下游讀哪個版本 | 看得到檔名就代表內容完整且最新 |
+| 6. Claim、dedupe 與 idempotency | 重試、多副本與部分失敗如何避免重複工作 | close-to-open 等於 exactly-once |
+| 7. 容量與流量 | 平均／高峰 bytes、讀寫率、物件數與共享者有多少 | 「要持久」就代表大量新增 SSD／NAND |
+| 8. Recovery 與服務結果 | 備份、RPO／RTO、衝突率、重做量、等待與成本 | 有 state store 就代表工作流更可靠、更便宜 |
+
+### 多空小作文：先量跨 session 的工作量，再談儲存受惠
+
+- **偏多條件**：代表性工作會跨 session 或多個 agent，舊做法確實反覆序列化、重算或產生矛盾；新的
+  state store 在固定任務下同時降低重做量與失敗，且公開了新增 bytes、讀寫率、retention、備援與成本。
+- **偏空條件**：多數工作一次完成、狀態只有少量 metadata，或既有資料庫／物件儲存已能吸收；一致性、
+  權限、版本與去重反而增加延遲和營運成本。此時「Agent 要記憶」不會自動轉成新 SSD、NAND 或控制器需求。
+
+本輪只有 NVIDIA 與 AWS 各一份官方文件（N=2 條公司來源鏈），內容分別是 research preview 與
+reference architecture，不是 production workload 隨機樣本；具名客戶同時公開 context、KV、durable state、
+服務結果、儲存 BOM 與供應商財務的共同觀測 N=0，因此沒有可報的 sampling SE／t，也不建立公司受惠結論。
 
 ## 新手最常混在一起的八件事
 

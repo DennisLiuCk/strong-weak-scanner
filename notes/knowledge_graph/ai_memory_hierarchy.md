@@ -1,16 +1,16 @@
 # AI 記憶體分層知識圖譜
 
-本圖將 HBM、SOCAMM、KV cache、context storage 與 CXL 放回各自的系統位置，也把資料處理、
-搬移、放置決策與量測契約拆開。公司線把 Micron 192GB 量產與 256GB 送樣分成兩個容量時鐘；
-機制線另把 cache 命中／搬移與 TTFT／ITL／合格吞吐分開。沒有客戶與財務資料前，仍不把一般
-記憶體能力畫成台灣公司受惠。
+本圖將 HBM、SOCAMM、KV cache、context storage 與 CXL 放回各自的系統位置，也把 model-visible
+context、可重算 KV 中間結果與跨 session Agent 狀態拆開。公司線把 Micron 192GB 量產與 256GB
+送樣分成兩個容量時鐘；機制線另把 cache 命中／搬移、狀態生命週期與使用者服務結果分開。
+沒有客戶與財務資料前，仍不把一般記憶體或持久化需求畫成台灣公司受惠。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: ai-memory-hierarchy
 root_node_id: concept:ai-memory-hierarchy
 label: AI 記憶體分層
-summary: 以介質、處理、連接、搬移、放置決策與量測契約拆開 AI 資料路徑，把 cache 機制與使用者 SLO 分開，並將 SOCAMM2 家族進度拆到容量型號，避免把不同角色、分母或商用時鐘合併成單一記憶體題材。
+summary: 以介質、處理、連接、搬移、放置決策與量測契約拆開 AI 資料路徑，把 context window、可重算 KV cache、跨 session Agent 狀態與使用者 SLO 分開，並將 SOCAMM2 家族進度拆到容量型號，避免把不同角色、分母或商用時鐘合併成單一記憶體題材。
 article_ids: MI-2026-08-02-AI-MEMORY-HIERARCHY
 status: active
 -->
@@ -513,4 +513,44 @@ review_due: 2026-08-31
 status: active
 boundary: S18／S19 可界定操作強度、兩個 ceiling、ridge point 與 first-order limitation；把這套 kernel 邊界接到 AI memory hierarchy 是研究推論，且 Roofline 只給上限，不證明 achieved、request-level、成本或商業結果。
 next_trigger: 同一模型／kernel 與軟硬體版本公開 matched-precision operations、固定參考層 bytes、sustainable bandwidth、compute ceiling、profiler achieved、latency／parallelism counters 及多次 run。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-MEM-I23
+view: industry
+from_id: concept:ai-memory-hierarchy
+to_id: capability:agent-persistent-shared-state
+relation: includes
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C24,MI-2026-08-02-AI-MEMORY-HIERARCHY#C25
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-14
+review_due: 2026-09-30
+status: active
+boundary: NVIDIA research preview 與 AWS 參考架構可直接證明 model context、stateless invocation、execution object 及跨 session／agent persistent state 是不同角色；不證明正式客戶普遍採用、exactly-once、硬體容量或財務需求。
+next_trigger: 具名 production workflow 公開跨 session／agent state 的 owner、bytes、retention、讀寫、衝突、恢復、SLO 與成本。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-MEM-I24
+view: industry
+from_id: concept:ai-memory-hierarchy
+to_id: metric:agent-state-lifecycle-observability
+relation: measured_by
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C26
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: 八欄狀態生命週期紀錄是研究中心整合 NVIDIA／AWS 架構後提出的比較框架，不是產業標準；欄位齊全也不自動證明因果、可靠度、成本下降、新增 SSD／NAND 或公司收入。
+next_trigger: 同一正式任務固定 model／harness／workload，公開 context、KV、durable state 三帳與 baseline-versus-treatment 的重做量、衝突、SLO、recovery、storage cost 及 BOM。
 -->
