@@ -292,3 +292,23 @@ status: active
 boundary: 單位與座標算術是決定性教學 不估計實際bump數 錯位率 良率 跨工具一致性 實體資格或財務材料性。
 next_trigger: 固定bundle公開unit coordinate origin rotation mirror tolerance及跨檔mapping並由兩套工具重現相同round-trip差異。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I14
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: process:chiplet-compositional-trust-passport
+relation: requires
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C16,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C17,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C18,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C19
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: unknown
+exclusivity: limited_source
+exclusivity_scope: 十欄護照是研究中心依FCSA 1.1.0 Alpha 0單一OCP／Arm規格消息鏈整理的安全稽核框架 不是FCSA官方模板或多家供應商共同採用格式。
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: CRoT-A與System RoT的組合證據架構不證明固定release test suite 非Arm實作 客戶qualification production deployment field結果或供應商財務。
+next_trigger: 固定FCSA 1.1 release及test suite下 多家晶粒整合OEM與獨立驗證方公布同一manifest attestation 事件重驗 失敗處置與客戶資格結果。
+-->

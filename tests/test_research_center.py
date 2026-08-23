@@ -6010,6 +6010,23 @@ class ResearchCenterTest(unittest.TestCase):
             "## 先分四層契約，才知道問題卡在哪裡",
             "| 1. 連線介面 |", "| 2. 系統角色 |",
             "| 3. 設計資料 |", "| 4. 符合性流程 |",
+            "## 每顆晶粒都能安全開機，仍不等於整個封裝可信",
+            "### Alpha 有規範性規則，仍不是已發布產品證書",
+            "規格只承諾到 beta 後 content identifier 跨版維持相同",
+            "### 信任要做兩次：先證明每顆，再判斷整組",
+            "| 身分 | 我是哪一顆晶粒、持有哪組受保護憑證 | 現場晶粒是否都在允許名冊 |",
+            "### 開機通過不是永久通行：狀態變了就要重新判定",
+            "| Debug unlock |", "| Firmware update |", "| Chiplet fault |",
+            "### 生命週期不是一條公司內流程，而是六段保管交接",
+            "### 一份組合信任護照至少要有十欄",
+            "| 1. 規格與產物身分 |", "| 6. 證據時效 |",
+            "| 9. 事件與重新驗證 |", "| 10. 保管責任 |",
+            "它也不能替代後文的「語意交接護照」",
+            "### 多空小作文：同一張護照，正反敘事才可比較",
+            "實作、固定測試套件、多供應商資格、production deployment、field 結果與財務共同觀測均為",
+            "claim_id: C15", "claim_id: C16", "claim_id: C17",
+            "claim_id: C18", "claim_id: C19", "claim_id: C20",
+            "monitor_id: T3",
             "## 3DK 不是一個檔案，而是六種交接責任",
             "| CDK |", "| ADK |", "| MDK |", "| TDK |",
             "## 公開 schema 的可重現檢查",
@@ -6037,9 +6054,10 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 14), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 2),
+            ("research_topic", 1), ("transition", 4),
+            ("research_source", 13), ("research_claim", 20),
+            ("metric_comparison", 0), ("impact", 3),
+            ("monitoring_item", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -6065,6 +6083,7 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:foundry-osat-conformance,stage,製造與封測共同簽核",
             "process:chiplet-semantic-handoff-passport,process,小晶片語意交接十欄護照",
             "metric:chiplet-unit-coordinate-cross-artifact-boundary,metric,小晶片單位座標與跨檔身分邊界",
+            "process:chiplet-compositional-trust-passport,process,小晶片組合信任十欄護照",
         ):
             self.assertIn(concept, concepts)
         graph = (
@@ -6077,9 +6096,11 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: process:chiplet-semantic-handoff-passport",
             "edge_id: KG-CDH-I13",
             "to_id: metric:chiplet-unit-coordinate-cross-artifact-boundary",
+            "edge_id: KG-CDH-I14",
+            "to_id: process:chiplet-compositional-trust-passport",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 14)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 15)
 
         route = next(
             row for row in bd.RESEARCH_LEARNING_ROUTES

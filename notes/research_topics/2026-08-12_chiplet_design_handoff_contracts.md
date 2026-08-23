@@ -46,6 +46,13 @@ to: triaged
 reason: added_unit_coordinate_cross_artifact_and_post_assembly_semantic_handoff_passport_without_thesis_clock_refresh
 evidence: sources:S3,S5,S11,S12
 -->
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: added_fcsa_alpha_compositional_trust_and_runtime_revalidation_without_thesis_clock_refresh
+evidence: sources:S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -88,6 +95,16 @@ evidence: sources:S3,S5,S11,S12
 - **SHA**：Secure Hash Algorithm 雜湊值；用固定字串辨識檔案內容是否完全相同，不代表內容本身正確。
 - **DankaChiplet**：Thrace 的 3D-IC 架構工具；本篇只引用其 CDXML 產品自述，不把它當成跨工具測試。
 - **Python**：本輪用來執行唯讀解析檢查的程式語言；版本與套件已記在稽核方法，方便重現結果。
+- **Alpha／Beta／Release**：規格成熟度階段；Alpha 可含明確規則，也可以公開發行，但仍在早期審閱，不能等同正式穩定的合規基線。
+- **信任根（Root of Trust，RoT）**：負責保護身分、量測或安全決策的最小可信基礎；不是一句「有安全功能」的行銷名稱。
+- **CRoT-A**：Chiplet Root of Trust for Attestation；留在每顆小晶片內，保管晶粒身分並產生韌體、生命週期與除錯狀態的可驗證證據。
+- **System RoT**：系統信任根；收齊各顆晶粒證據後，判斷實際組合是否符合允許的清單與政策。
+- **證明（Attestation）**：用受保護的身分與量測，回答「現在這顆晶粒是誰、跑哪版程式、處於什麼狀態」；它不是永久有效的通行證。
+- **系統清單（System Manifest）**：記錄預期晶粒身分、角色、數量、位置、拓撲與系統信任根的受保護名冊。
+- **生命週期（Lifecycle）**：晶粒從製造、寫入安全資料、封裝整合、OEM 佈署、運作到回收／報廢的階段與狀態。
+- **失敗關閉（Fail closed）**：證據缺失、過期或不符時，先拒絕建立高保證信任域；若容許降級，仍要隔離並留下可見狀態。
+- **Security Platform（安全平台）**：System RoT 接受晶粒身分、證據、拓撲與政策綁定後，跨多顆晶粒建立並持續維護的系統安全域。
+- **Declaration（宣告）**：FCSA 規格用來引入概念、術語或資料結構的規範性內容類別；它不描述行為，行為由 Rule 說明。
 
 ### 三句話抓重點
 
@@ -362,6 +379,108 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: FCSA 1.1.0 Alpha 0 的 version history 記錄該版於 2026-07-23 發布；同一文件把 Declaration 與 Rule 定義為規範性內容，但只承諾規格進入 beta 後，同一 content item 的 identifier 才會在後續版本保持相同
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-07-23
+basis: S13 PDF file p.7 的 version history 列出 2026-07-23 Alpha 0，file p.11 說明 Declaration／Rule 為 normative，並只在 reaches beta 後承諾 identifier 跨後續版本維持相同
+boundary: Alpha 文件內可以有規範性規則，不代表 1.1.0 已成為正式穩定 release、每段安全正文都是 Rule、規則編號已鎖定、測試套件完成、產品合規或客戶採用；本輪也沒有觀察到實際 identifier 已變更
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: FCSA 1.1.0 Alpha 0 描述參與 attested composition assurance 的每顆小晶片具有 CRoT-A；開機時 System RoT 挑戰各 CRoT-A，驗證證據新鮮度、簽章、憑證鏈、撤銷、回滾與 manifest binding，並核對實際晶粒集合、角色、位置及拓撲後，才授權建立 Security Platform
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-07-23
+basis: S13 PDF file pp.165–167 的 sections 9.1.4.1–9.1.4.5 定義 Security Platform、System RoT、CRoT-A 的本地證據責任，以及 boot 時的 challenge、evidence validation、authorized composition check 與 platform formation
+boundary: 這是 Alpha 架構描述與資訊內容，不是實作測試、攻擊驗證、產品安全證明、第三方認證或跨廠 interoperability 結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: FCSA 1.1.0 Alpha 0 把組合信任定義為持續狀態，而非只在開機檢查一次；reset、warm reset、晶粒故障、debug unlock、韌體更新、recovery 或其他會影響 Security Platform 的狀態變化，都會觸發 System RoT 重新驗證
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-07-23
+basis: S13 PDF file p.167 section 9.1.4.5 直接列出 runtime 期間 System RoT 維護 system trust model，以及 reset、warm reset、chiplet fault、debug unlock、firmware update、recovery 與其他狀態變化的 revalidation trigger
+boundary: 規格列出重新驗證事件，不提供任何產品的偵測延遲、誤報漏報、恢復時間、效能成本、field incident 或通過率
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: FCSA 1.1.0 Alpha 0 展示的典型小晶片系統生命週期包含 manufacturing、chiplet provisioning、integration provisioning、OEM provisioning、operation 與 disposal 六階段；每顆晶粒各有自己的 lifecycle state，System RoT 再由多顆證據推導產品定義的 system state，兩者不必相同
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-07-23
+basis: S13 PDF file pp.167–168 的 Figure 9.3 與 Table 9.2 列出六階段、stakeholder 與工作；file p.168 說明 per-chiplet lifecycle state 與 product-defined system security state 不需一一相同，並指出 die facility 與 SiP integration facility 的 provisioning 分工形成新攻擊面
+boundary: 六階段是規格展示的 typical activity model，不是不可增減的完整 system security state machine，也不等於六個線性認證閘門或任何 foundry、OSAT、OEM 已佈署的流程
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: 研究小晶片系統安全時，至少需要一份十欄組合信任護照，把規格版本、預期組合、每顆晶粒身分、韌體量測、生命週期與除錯狀態、證據新鮮度、角色位置拓撲、控制平面與政策綁定、執行期重新驗證，以及各階段保管責任分開記錄
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-08-23
+basis: C16 顯示本地證據不能替代系統組合判定；C17 顯示信任會因執行期事件失效而需重驗；C18 顯示晶粒與系統狀態、六個生命週期階段及 stakeholder 不相同，因此本研究中心將必要證據整理為十個不可互換欄位
+boundary: 十欄護照是研究中心依單一 OCP／Arm 規格消息鏈建立的查核框架，不是 FCSA 正式表單、產業標準、測試套件、認證或已被供應商共同採用的產品格式
+verification_needed: 固定 release 與 test suite 下，由多家晶粒、整合、OEM 與獨立驗證方公布同一 manifest、attestation、事件重驗、失敗處置及資格結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: unverified
+status: active
+claim: FCSA 1.1 的組合信任架構已有非 Arm 的獨立產品實作，並以固定版本與測試套件完成跨廠晶粒整合、客戶 qualification、production deployment、field reliability，以及可辨識的台灣供應商訂單、收入或毛利
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S2 於 2026-08-12 登錄的公開 implementation snapshot 只列 Arm Chiplet System Architecture 並明示非 endorsement；scan-2026-08-23-fcsa-alpha-compositional-trust 再查同一 living index 仍未找到第二項列名，S13 也沒有具名晶粒組合、test result、customer acceptance、field data 或財務共同鍵
+boundary: 公開清單未列出不代表私有或未登錄實作不存在；但聯盟參與、規格規則、一般 secure boot／attestation 能力或供應鏈鄰接，都不能替代此主張所需的端到端證據
+verification_needed: 非 Arm 實作者、整合方與買方雙向公布固定 FCSA 1.1 release／level、manifest、CRoT-A／System RoT 測試、runtime revalidation、qualification、部署分母、field 結果及財務對帳
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分四層契約，才知道問題卡在哪裡
 
 | 契約層 | 它回答什麼 | 本篇例子 | 通過前仍可能失敗 |
@@ -376,6 +495,123 @@ resolution:
 
 最後一層才把前三層變成可稽核流程。它需要固定版本、檔案雜湊、正反測試資料、預期錯誤、
 工具版本、結果差異與簽核責任，而不只是規格名稱。
+
+## 每顆晶粒都能安全開機，仍不等於整個封裝可信
+
+安全不是四層之外再加一個口號，而是橫跨「系統角色、交付資料、符合性流程」的組合契約。
+一顆小晶片可以正確驗證自己的開機程式，另一顆也可以；如果系統不知道它們是否是原先允許的
+那兩顆、放在正確位置、扮演正確角色，或其中一顆已進入除錯狀態，就還不能說整套封裝可信。
+
+把它想成飯店入住。每位旅客各有真護照，只回答「這個人是誰」；櫃台還要核對訂房名冊、房號、
+同行者與有效期限，才回答「這一組人能不能進這一層」。房卡被重設、有人換房或開啟維修門後，
+先前的判定也不能永久沿用。FCSA 1.1 Alpha 把這兩段工作分給每顆晶粒的 CRoT-A 與 System RoT。
+
+### Alpha 有規範性規則，仍不是已發布產品證書
+
+新手最容易把「文件內寫了 shall／must」與「版本已穩定、產品已通過」混成同一件事。本輪要同時
+保留四個不同狀態。
+
+| 狀態 | 目前可說什麼 | 目前不能說什麼 |
+|---|---|---|
+| 文件內容 | Declaration 與 Rule 是該規格內的規範性內容 | 每個實作者已遵守 |
+| 版本成熟度 | OCP 於 2026-08-12 的既有快照把 1.1.0 Alpha 0 列為 for review | 1.1.0 已成為正式穩定 release 或已進入 beta |
+| 規則身分 | 規格只承諾到 beta 後 content identifier 跨版維持相同 | Alpha 規則編號與文字已鎖定 |
+| 實作與商用 | 公開清單仍只列 Arm CSA，且列名不是 endorsement | 已有獨立合規、客戶資格或量產收入 |
+
+所以 Alpha 不是「沒有內容」，也不是「已經落地」。它最適合用來提早建立應查欄位與反證，
+不能拿來計算採用率、供應商市占或財務受惠。
+
+### 信任要做兩次：先證明每顆，再判斷整組
+
+第一段是**晶粒本地證據**。每顆參與組合保證的晶粒用 CRoT-A 保管不可偽造的身分，量測或驗證
+開機韌體，並回報 lifecycle、debug、test、scan、manufacturing 與安全關鍵設定。這只證明它
+能為自己的狀態負責，不能替相鄰晶粒或整個封裝作決定。
+
+第二段是**系統組合判定**。System RoT 發出 challenge，檢查回覆是否新鮮、簽章與憑證鏈是否
+有效、有沒有被撤銷或回滾，並把證據綁回受保護的 manifest。接著還要核對實際晶粒集合、數量、
+角色、位置與拓撲。這些條件都接受後，才建立受保護的控制平面並授權 Security Platform 成形。
+
+| 問題 | CRoT-A 主要回答 | System RoT 主要回答 |
+|---|---|---|
+| 身分 | 我是哪一顆晶粒、持有哪組受保護憑證 | 現場晶粒是否都在允許名冊 |
+| 韌體 | 我目前量測到哪一版開機與安全程式 | 版本是否符合政策、是否回滾或已撤銷 |
+| 狀態 | 我處於哪個 lifecycle、debug／test 狀態 | 這組狀態能否形成指定安全域 |
+| 組合 | 不替其他晶粒背書 | 角色、位置、拓撲與 policy binding 是否一致 |
+
+「每顆都有 secure boot」因此只是必要條件，不是充分條件。反過來，System RoT 也不能在沒有
+各顆可驗證證據時憑名單猜測狀態；本地信任與組合信任缺一不可。
+
+### 開機通過不是永久通行：狀態變了就要重新判定
+
+信任會隨狀態改變。FCSA Alpha 明列 reset、warm reset、晶粒故障、debug unlock、韌體更新與
+recovery 等事件會觸發重新驗證；其他足以改變 Security Platform 的狀態變化也同樣適用。
+這表示「開機 attestation pass」不能替代執行期事件帳。
+
+| 事件 | 為什麼舊判定可能失效 | 下一筆最少證據 |
+|---|---|---|
+| Reset／warm reset | 晶粒重新進入初始化或不同韌體路徑 | reset 原因、版本、重新量測與新 verdict |
+| Debug unlock | 原本隔離的觀察或修改能力被打開 | 授權者、範圍、時效、隔離與關閉紀錄 |
+| Firmware update | 被量測程式與 rollback 邊界改變 | image 身分、簽章、版本、成功／回復狀態 |
+| Chiplet fault | 缺席或失效晶粒可能改變角色與拓撲 | 故障身分、隔離、降級模式與重新組合結果 |
+| Recovery | 系統可能以較低保證狀態恢復服務 | 進入條件、可用功能、告警與回到高保證的門檻 |
+
+高保證系統遇到缺席、過期、撤銷或不符證據時，預設做法應是 fail closed；若產品允許 degraded
+mode，也要明示隔離範圍與狀態，不能靜默沿用先前信任。這是規格 implementation note 對高保證
+系統的預設做法，不是所有正文都是 normative Rule，也不是任何產品已達到零攻擊、零誤判或零停機的證明。
+
+### 生命週期不是一條公司內流程，而是六段保管交接
+
+FCSA 展示的典型 lifecycle 包含製造、晶粒 provisioning、整合 provisioning、OEM provisioning、
+運作與 disposal。這是活動模型，不是不可增減的完整安全狀態機。特別之處是安全資料可能先在
+晶粒製造端寫入，再到 SiP 整合端建立組合資料；兩段若由不同 stakeholder 負責，交接本身就是
+新的攻擊面。
+
+每顆晶粒也可以處於不同 lifecycle state。System RoT 要從多顆 attestation 推導產品定義的
+system state，而不是拿某一顆的狀態直接代表全系統。RMA 或報廢時尤其重要：進入診斷／失效分析
+可能開放 debug，但不能讓原先的 operation 權限與密鑰無條件延續。
+
+### 一份組合信任護照至少要有十欄
+
+| 欄位 | 最少記錄 | 沒有它會混淆什麼 |
+|---|---|---|
+| 1. 規格與產物身分 | FCSA maturity／version、profile、文件與測試 SHA | Alpha 冒充固定 release |
+| 2. 預期組合 | manifest version、晶粒集合、數量、角色、位置、拓撲 | 名單中有晶粒就冒充正確組合 |
+| 3. 晶粒本地身分 | CRoT-A、憑證鏈、供應者、唯一晶粒身分 | 同型號冒充同一實體 |
+| 4. 韌體與量測 | boot image、security firmware、measurement、rollback index | secure boot 存在冒充版本合格 |
+| 5. Lifecycle 與 DFX | manufacturing／provisioning／operation／disposal、debug／test／scan | 運作狀態冒充維修狀態 |
+| 6. 證據時效 | challenge／nonce、時間、freshness、revocation | 舊的有效回覆被重播 |
+| 7. 組合核對 | observed set、role、placement、topology 與 manifest 差異 | 每顆各自有效冒充整組有效 |
+| 8. 控制平面與政策 | authenticated path、policy version、domain binding | 資料正確冒充傳遞與授權安全 |
+| 9. 事件與重新驗證 | reset、fault、debug unlock、update、recovery、verdict、處置 | 開機 pass 冒充永久信任 |
+| 10. 保管責任 | 六階段 owner、交接時間、授權、撤銷、RMA／disposal 證據 | 上一手寫入冒充下一手已驗收 |
+
+這十欄是研究中心的查核護照，不是 FCSA 官方模板。它只把「哪顆、哪版、哪個狀態、由誰在何時
+重新接受」變成可追蹤問題；產品 qualification、field reliability、部署量與財務結果仍要另接
+客戶及商業證據，不能塞進技術 pass 後自動變成真。
+
+它也不能替代後文的「語意交接護照」：組合信任護照追的是身分、狀態、政策與保管；語意交接
+護照追的是設計檔版本、單位、座標、跨工具與實體資格。安全判定正確，不代表幾何與模型正確；
+設計資料通過，也不代表現場晶粒與韌體仍是被授權的那一組。
+
+### 多空小作文：同一張護照，正反敘事才可比較
+
+**偏多版本。** 如果多家晶粒都能輸出同版可驗證證據，整合商以固定 manifest 重現組合判定，
+更新、除錯與 RMA 也沿同一鍵重驗，多供應商 chiplet 就可能減少私有安全整合與事故追溯成本；
+可重用的安全 IP、provisioning、驗證工具與封裝整合服務才有形成收費能力的可能。
+
+**偏空版本。** Alpha 規則持續變動，各家憑證、lifecycle 與 debug 模型仍靠私有 mapping，System
+RoT 只能接受同一供應者的封閉組合；新增 manifest、密鑰、provisioning 與事件紀錄反而增加交接
+成本。即使技術可行，也可能沒有第二家實作、客戶採用或可辨識的供應商收入。
+
+兩邊共用同一裁決：固定 release 與 test suite、至少一個非 Arm 實作、具名多供應商組合的 manifest
+與 attestation transcript、六類事件重新驗證、客戶 qualification、field 分母及財務共同鍵。偏多
+不能用 Alpha 發布當落地，偏空也不能因仍是 Alpha 就斷言組合信任無法實現。
+
+本輪是 `N=1` 份 FCSA 1.1.0 Alpha 0 固定文件加 `N=1` 個同一 OCP 工作流 living index，兩者同屬
+一條 OCP／Arm 規格消息鏈，不是兩套獨立實作或兩個產品樣本；沒有 sampling SE 或 t 值。非 Arm
+實作、固定測試套件、多供應商資格、production deployment、field 結果與財務共同觀測均為
+`N=0`。PDF 已固定 SHA-256 並逐頁渲染核對實際引用頁及相鄰頁，但這只能提高文件查核可重現性，
+不能提高商用結論的證據等級。
 
 ## 3DK 不是一個檔案，而是六種交接責任
 
@@ -745,6 +981,22 @@ locator: Abstract、Conformance 與 Requirements 對 schema constraint、additio
 limitation: 通用 XML schema 要求文件不是 CDXML、EDA、封裝或小晶片產品驗證；只用來界定 schema pass 能與不能證明的性質
 -->
 
+<!-- research_source
+source_id: S13
+role: standard
+source_kind: document
+publisher: Open Compute Project Foundation / Arm Ltd.
+independence_group: ocp-fcsa-standard
+title: Foundation Chiplet System Architecture 1.1.0 Alpha 0
+published_at: 2026-07-23
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://drive.google.com/file/d/1AtQF1KovNFulIGcrIMhTwIY0MfEhXNex/view
+locator: PDF file p.7 的 version history；file p.11 的 normative content 與 beta 後 identifier 穩定範圍；file pp.165–168 的 Security Platform、System RoT、CRoT-A、composition assurance 與 typical lifecycle；file pp.197–200 的 manifest、attestation、policy response 與 fail-closed／degraded-mode implementation notes；本輪下載檔 SHA-256 51e37dc30084c14191701a97dc6a1e18e01bd77f3d1a7a8c3820d80a676b14d2
+limitation: 這是 1.1.0 Alpha 0 文件且與 S1／S2 同屬 OCP／Arm 規格消息鏈；部分安全內容為 information 或 implementation note，不是全部皆為 normative Rule，也沒有固定 conformance test suite、獨立實作、攻擊測試、客戶 qualification、production deployment、field 統計或財務結果
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -809,10 +1061,26 @@ trigger: 固定 tag 與 SHA 下四份 XSD 全數可編譯，至少兩套獨立�
 invalidation: 若標準工作流改採另一格式、私有 mapping 成為必要中介，或跨工具差異無法收斂，則 CDXML／3DK 不得被描述為共同 conformance layer
 -->
 
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C15,C16,C17,C18,C19,C20
+metric: FCSA 1.1 組合信任是否由 Alpha 推進 beta／release、固定測試套件、非 Arm 實作、多供應商資格與可重現執行期重新驗證
+source_ids: S13
+watch_source_ids: S2
+frequency: event_driven
+frequency_detail: FCSA 1.1 maturity、security content、test deliverable、implementation 或 customer qualification 更新後複核
+next_check: 2026-09-30
+trigger: 固定 FCSA 1.1 release 與 test suite 下，非 Arm 實作公布具名 CRoT-A／System RoT、manifest、六類事件 revalidation、失敗處置及跨廠 qualification 結果
+invalidation: 若 beta／release 移除或實質改寫組合判定、lifecycle 或 runtime revalidation，則依新固定版本重寫 C15–C19；若只是沒有實作，C20 維持未驗證而不把架構判為失效
+-->
+
 ## 目前不能下的結論／待驗證
 
 - 不能把 FCSA compliance、UCIe interoperability 與 CDXML／3DK conformance 當成同一張證書；三者檢查的對象不同。
 - 不能由 OCP 已公開 schema，推成四份 XSD 都可執行；固定 commit 的完整檢查已顯示兩份解析失敗。
 - 不能由 DankaChiplet 或任何單一工具宣稱支援 CDXML，推成兩套 EDA 工具對同一資料會得到相同結果。
 - 不能把 Arm 多供應商平台的 CSA／CHI C2C 敘述，改寫成已採用 CDXML／3DK 或已通過 foundry／OSAT 共同簽核。
+- 不能把每顆晶粒各自 secure boot／attestation，改寫成整個封裝的晶粒集合、角色、位置、拓撲與執行期狀態已通過組合信任判定。
+- 不能把 FCSA 1.1.0 Alpha 0 的安全框架，改寫成固定 release、conformance test、非 Arm 實作、客戶 qualification、production deployment 或台灣供應商財務受惠。
 - 不能由公司加入聯盟、具備先進封裝、EDA、測試或設備能力，推導具名 design win、訂單、收入、毛利或投資建議。
