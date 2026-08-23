@@ -3781,6 +3781,11 @@ class ResearchCenterTest(unittest.TestCase):
             "editorial_plain_language_wave88_cooling_loop_handoffs_and_evidence_gates",
             "added_liquid_heat_flow_atd_pressure_and_pump_power_passport_without_thesis_clock_refresh",
             "added_dew_point_local_surface_and_economizer_passport_without_thesis_clock_refresh",
+            "added_liquid_leak_blast_radius_and_service_loss_denominator_without_thesis_clock_refresh",
+            "thesis_claim_id: C5",
+            "last_reviewed_at: 2026-08-03",
+            "review_due: 2026-09-03",
+            "base_confidence: high",
             "液冷可以先分成三段：機房把熱送走的設施水路",
             "完整部署還要讓冷源、管路、接頭、分流器、冷板、控制與維護一起通過驗收",
             "## 冷源到伺服器要交接五次",
@@ -3826,13 +3831,28 @@ class ResearchCenterTest(unittest.TestCase):
             "### 多空小作文共用的防結露—economizer 十欄護照",
             "Python\nDecimal 與獨立 awk 重算",
             "production site 的同步表面圖、事件率",
+            "## 漏液告警不是停機答案：先算會停哪裡、停多久",
+            "| 1. 偵測 | 感測器看到 leak、normal 或 fault 嗎 |",
+            "| Rack，由 BCM 偵測 | BCM 建議立即關 power shelf DC output",
+            "只有 switch tray 明寫由 BCM 用 OOB Redfish 關閉漏液 tray",
+            "也沒有寫 row valves",
+            "default heartbeat「預期為 5 秒」",
+            "會把通訊節拍冒充安全 SLA",
+            "0 PSIG 不超過 0.06cm³、75 PSIG 不超過 0.12cm³",
+            "0 與 80 PSIG",
+            "75 PSIG 是 requirement\n列，80 PSIG 是 test condition",
+            "這些 N＝2 或 N＝3 是",
+            "同一對接頭的 1,256 次 mate cycles",
+            "### 多空小作文共用的九欄漏液事件護照",
+            "affected rack-hours＝Σ（受影響機櫃等價數×無法服務時數）",
+            "具名 production leak event、true／false／fault 分母",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 59
+            sum(line.startswith("- **") for line in glossary.splitlines()), 66
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3840,25 +3860,29 @@ class ResearchCenterTest(unittest.TestCase):
         for jargon in ("FWS", "TCS", "rackLocationId"):
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 16),
-            ("research_claim", 21), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 4),
+            ("research_topic", 1), ("research_source", 19),
+            ("research_claim", 25), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         for source_id in (
-            "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16"
+            "S9", "S10", "S11", "S12", "S13", "S14", "S15", "S16",
+            "S17", "S18", "S19"
         ):
             self.assertIn(f"source_id: {source_id}", topic)
         for claim_id in (
-            "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20", "C21"
+            "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20", "C21",
+            "C22", "C23", "C24", "C25"
         ):
             self.assertIn(f"claim_id: {claim_id}", topic)
         graph = (
             ROOT / "notes" / "knowledge_graph"
             / "liquid_cooling_loop_boundaries.md"
         ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 28)
         for edge_id in (
-            "KG-LCB-I21", "KG-LCB-I22", "KG-LCB-I23", "KG-LCB-I24"
+            "KG-LCB-I21", "KG-LCB-I22", "KG-LCB-I23", "KG-LCB-I24",
+            "KG-LCB-I25", "KG-LCB-I26"
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -3869,6 +3893,8 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:liquid-heat-flow-pressure-pump-boundary",
             "process:liquid-cooling-dew-point-passport",
             "metric:local-dew-point-surface-margin",
+            "process:liquid-leak-event-service-passport",
+            "metric:affected-rack-hours",
         ):
             self.assertIn(f"{node_id},", concepts)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(

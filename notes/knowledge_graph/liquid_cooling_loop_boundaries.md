@@ -533,3 +533,43 @@ status: active
 boundary: 露點公式與局部表面機制有一手支持，但「表面減露點再扣不確定度」的跨系統護照是研究重組；教材數字不代表具名場域 pass line、事件率或 economizer 成效。
 next_trigger: 同一量產場域公開校正後 local surface、dry-bulb／RH／dew-point、guard band、control transitions 與 condensation event denominator。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I25
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: process:liquid-leak-event-service-passport
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C25
+note_refs:
+evidence_state: inference
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: 九欄事件護照是把 OCP 感測器／PBMC 與 NVIDIA fault-action scope 接到服務損失的研究重組；它補充而不取代既有 safe-state deadline，也不是共同標準、site qualification 或財務證據。
+next_trigger: 具名 production site 或代表性 fault injection 以共同事件鍵公開 raw signal、四段 timestamp、confirmed action state、blast radius、service loss、復原再驗收與責任。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LCB-I26
+view: industry
+from_id: concept:liquid-cooling-loop-boundary
+to_id: metric:affected-rack-hours
+relation: measured_by
+claim_refs: MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES#C25
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: Affected rack-hours 是逐事件 rack 等價數乘 unavailable time 的服務分母，不是 OCP／NVIDIA 指標，也不能替代 accelerator／node／job-hours、設備損害、重啟再驗收成本、availability 或公司財務。
+next_trigger: 同一場域逐事件公布 rack／node／job blast radius、confirmed isolation、service restoration 與 false-alarm 分母，使不同控制策略可比較。
+-->

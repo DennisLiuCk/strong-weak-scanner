@@ -85,6 +85,14 @@ reason: added_dew_point_local_surface_and_economizer_passport_without_thesis_clo
 evidence: sources:S13,S14,S15,S16
 -->
 
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: added_liquid_leak_blast_radius_and_service_loss_denominator_without_thesis_clock_refresh
+evidence: sources:S17,S18,S19
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -94,8 +102,12 @@ evidence: sources:S13,S14,S15,S16
 - **ITE（Information Technology Equipment）**：伺服器、加速器與內部冷板等 IT 設備。規格若只管 TCS，不代表 ITE 端所有設計與責任都已被涵蓋。
 - **CDU（Coolant Distribution Unit，冷卻液分配單元）**：透過泵浦、熱交換器與控制，把伺服器迴路的熱交給設施水路。它是一個重要節點，不等於整套液冷系統。
 - **BMS（Building Management System）**：建築管理系統，收集溫度、流量、壓差、漏液與設備狀態，並在安全 guardrails 內執行控制或隔離。
+- **BMC／BCM（基板管理控制器／Base Command Manager）**：BMC 位在伺服器或托盤內，處理本機感測與動作；本文 NVIDIA 文件中的 BCM 是較上層的機櫃與叢集管理軟體。兩者名稱相近，但角色不能互換。
+- **MQTT／broker（訊息佇列遙測傳輸／訊息代理服務）**：MQTT 是 BMS 與管理軟體交換事件和狀態的發布／訂閱協定，broker 是轉送訊息的伺服器。固定 heartbeat 只表示通訊節拍，不等於動作完成時間。
 - **DSX**：NVIDIA 用來描述 AI factory 基礎設施資料、控制契約與驗證生態的文件／平台名稱；列入 DSX 不等於場域已完成驗收。
 - **QD／UQD（快速接頭／通用快速接頭）**：QD 是讓液冷管路能快速拆接的連接器；UQD 是 OCP 推動的通用介面方向。單一接頭通過測試，不代表混用不同管路、流體與 manifold 後整套系統仍可靠。
+- **PBMC（Pivoting Blind Mate Coupling，旋轉式盲插接頭）**：一種允許一定偏移、可在模組插入時自動接合液路的快速接頭設計。接頭規格通過不代表整條迴路或場域已驗收。
+- **PSIG（每平方英吋磅力的表壓）**：以當地大氣壓為零點的壓力單位；0 PSIG 不等於絕對真空。比較漏液或接頭測試時，要連同流體、溫度、方向與量測方法一起看。
 - **rackLocationId（機櫃位置識別碼）**：DSX 用來讓設施端與 IT 端指向同一座實體機櫃的穩定 ID。若兩邊映射不同，告警或隔離命令可能落到錯誤機櫃。
 - **Requirement document／specification（要求文件／完整規格）**：要求文件先說明必須滿足哪些條件與範圍；完整規格還需把介面、數值、測試與責任寫到能重現。本文引用的 OCP Rev 2 明說自己是要求文件，不是完整規格。
 - **一次側迴路／二次側迴路**：一次側是設施冷源到 CDU 的水路，二次側是 CDU 到機櫃與伺服器再回來的水路。兩側透過熱交換器傳熱，但水質、壓力與維護責任可以不同。
@@ -140,6 +152,9 @@ evidence: sources:S13,S14,S15,S16
 - **沖洗／鈍化（Flushing／passivation）**：沖洗把施工殘留、顆粒與不合格流體帶出迴路；鈍化是在適用材料表面建立較穩定的保護狀態。它們是試運轉程序，不等於設備出廠時已自動完成。
 - **變更控制／行動門檻**：變更控制要求流體、材料、濾材或程序一有改動就重新評估；行動門檻則預先規定讀值偏離時由誰複驗、隔離、換液或停機，避免告警出現後才臨時決定。
 - **漏液偵測／隔離**：偵測是發現哪裡有液體異常；隔離是關閉正確閥件或設備，限制影響範圍。看得到告警不代表系統一定能安全隔離。
+- **處置影響範圍（blast radius）**：一次告警或安全動作會讓多少托盤、機櫃、整列機櫃或冷卻設備失去電力或冷卻。範圍越大不一定越安全或越差，還要看定位可信度與硬體損害風險。
+- **誤報／漏報**：誤報是沒有真正漏液卻觸發告警或停機；漏報是已漏液卻沒有及時被偵測。兩者代價不同，不能只用「告警有動作」判定系統可靠。
+- **受影響機櫃小時（affected rack-hours）**：每次事件中，受影響的機櫃等價數乘上無法提供服務的時間，再對事件加總。它比只數告警次數更接近容量損失，但仍不能替代 accelerator-hours、job-hours、設備損害與復原成本。
 - **備援**：主要泵浦、電源、感測或控制失效時，由另一組元件接手。備援要經過實際切換測試，不能只靠產品型錄判定。
 - **IT／OT**：IT 是伺服器、叢集與資料處理系統；OT 是建築、機電與現場設備控制。液冷告警常需要兩邊對到同一機櫃與同一事件。
 - **Guardrail／action ownership（安全限制／動作責任）**：安全限制規定控制動作不能超過哪些邊界；動作責任則回答誰有權下令、誰執行、誰確認結果。
@@ -440,6 +455,54 @@ url: https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-fed
 locator: Space Temperature and Humidity Control 與 Use of Water-Side Economizing Strategies；說明過窄設定會增加負荷，water-side economizer 可用串聯熱交換器先冷卻或在適合戶外條件下繞過 chiller
 limitation: 這是以 cooling tower、chilled-water 與 air-cooled IT rack 為主的一般 FEMP 指引；可用時數與節能取決於氣候、設定、控制及系統配置，不能外推特定液冷場域、產品、PUE／WUE、收入或毛利
 independence_group: us-department-of-energy
+-->
+
+<!-- research_source
+source_id: S17
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Rope Leak Sensor Base Specification Revision 1.0.0
+published_at: 2026-02-02
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.opencompute.org/documents/rope-leak-sensor-base-specification-r1-0-0-final-pdf
+locator: PDF 印刷 pp.10–12；Table 5 分開 normal、leak、open-circuit fault 與 power-cable presence，pp.11–12 說明接觸液體即輸出不分量的二元訊號、使用者自定 timer／shutdown／rack-CDU 動作及 false-alarm reduction
+limitation: 這是 16 頁、effective 2026-02-02 的 leak-sensor-rope base specification；只規定感測器特徵、介面與範例處置，不量測漏液量、位置、端到端隔離延遲、場域故障率或停機。官方 PDF 端點可由瀏覽器逐頁核對，但命令列下載回 403，因此本輪無本地 SHA
+independence_group: open-compute-project
+-->
+
+<!-- research_source
+source_id: S18
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA Mission Control Integration with Building Management System, Software Installation Guide 2.1.0
+published_at: 2026-07-16
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://docs.nvidia.com/mission-control/docs/nmc-software-installation-guide/2.1.0/integration-of-bms-with-bcm.html
+locator: Introduction、Prerequisites、Heartbeat、Fault Type and Handling Recommendations 與頁尾 last updated；分列 tray、rack、row、sensor fault 的 BMC／Mission Control／BMS 建議動作，以及 customer-provided BMS／MQTT 與 license 前置條件
+limitation: 這是 NVIDIA GB200／GB300 NVL72 的功能、設定與建議責任矩陣，不是事故紀錄、動作成功率或 SLA；5 秒是 expected heartbeat interval，不是 leak-to-safe-state 上限，row-level 動作也不能外推為整座資料中心停機
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S19
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Pivoting Blind Mate Coupling Specification Revision 1.0
+published_at: 2026-04-15
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.opencompute.org/documents/pbmc-design-specification1-0-final-pdf
+locator: PDF viewer indices 24、40（頁面標示 pp.25、41）的 Table 6.0 與 Table 7.1 tests 7.1-1～7.1-3；spillage 要求在 0／75 PSIG 為 ≤0.06／≤0.12cm³，實測條件則用 water、垂直方向、0／80 PSIG，並分列 pressure-drop、air-inclusion 與 same-supplier／interoperability 最低樣本
+limitation: 這是 PBMC connector conformance specification，不是整條 loop、production site、field leak rate、維修時間或可用率證據；Table 6.0 的 75 PSIG requirement 與 7.1-3 的 80 PSIG test condition 必須原樣分列，重複 mate cycles 也不能當成獨立 fleet samples。官方端點可逐頁核對但命令列下載回 403，本輪無本地 SHA
+independence_group: open-compute-project
 -->
 
 <!-- research_claim
@@ -799,6 +862,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C22
+label: verified
+status: active
+claim: OCP Rope Leak Sensor Base Specification 把正常、漏液、感測器 open-circuit fault 與電源線狀態分開，且明示感測繩接觸液體便輸出不分漏液量的 leak／no-leak 二元訊號；timer、停機及 rack manifold／CDU 中斷則是後續使用者與系統責任
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-02-02
+basis: S17 Table 5 逐一列出四類訊號狀態，印刷 p.11 又明示 regardless of amount、discrete signal，並把 mitigation plan、timer／immediate shutdown 與超出 ITE 的 rack manifold／CDU 動作分開
+boundary: 只證實規格所定義的訊號與責任層；二元告警不能量出漏液量、精確來源、嚴重度、誤報率、漏報率、隔離成功或服務損失
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: NVIDIA Mission Control 2.1.0 的建議矩陣讓 tray、rack 與 row leak 對應不同 power／fluid 動作範圍，sensor fault 則要求現場檢查；整合前置條件包括 Mission Control license、客戶 BMS／MQTT broker 與網路連線
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-07-16
+basis: S18 Introduction／Prerequisites 與 Fault Type and Handling Recommendations 逐列分配 BMC、BCM、BMS 的 tray、rack、row、sensor-fault 動作，並明示 license、customer-provided BMS、MQTT broker 和 TCP/IP
+boundary: 這是具名平台的功能與建議責任矩陣，不證明客戶已部署、每個命令執行成功、5 秒內完成隔離、零誤報、避免停機或產生供應商財務；datacenter-level 感測位置也不能被改寫成整座 datacenter shutdown
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: OCP PBMC Revision 1.0 把快速接頭的 spillage requirement 與 test condition 分開：Table 6.0 在 0／75 PSIG 要求 ≤0.06／≤0.12cm³，而 test 7.1-3 用 water、垂直方向與 0／80 PSIG，same-supplier 及 interoperability 每種組合至少三個樣本
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-04-15
+basis: S19 印刷 p.25 Table 6.0 直接列出兩個壓力與 spillage 上限，印刷 p.41 test 7.1-3 列出 0／80 PSIG、water、vertical graduated-cylinder method、兩壓力結果及 minimum 3 per combination
+boundary: Connector conformance pass 不能外推成零 field leaks、整條 loop 相容、場域可用率或修復時間；75 PSIG requirement 與 80 PSIG test condition 不互相替換，樣本也不是隨機場域或 fleet 分母
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: inference
+status: active
+claim: 漏液研究應把二元偵測、決策與已確認安全狀態分帳，並以同一事件護照保存漏液與流體、sensor fault／debounce、四段時間戳、tray／rack／row／CDU 處置範圍、殘餘冷卻、受影響 rack／node／job、復原再驗收及責任 owner；商業損失至少另算 affected rack-hours，而非只數告警或 connector pass
+supporting_source_ids: S17,S18,S19
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S17 證明 signal 與 mitigation 分層且存在 false-alarm／fault 分支，S18 讓不同偵測層對應不同 power／fluid blast radius，S19 則把 connector requirement、test condition、interoperability 與樣本分母固定；九欄與 rack-hours 是把三者接到 service loss 的研究重組
+boundary: 九欄護照與 affected rack-hours 不是 OCP／NVIDIA 共同標準，也不指定唯一 timer、隔離策略或安全優先序；它們不證明 field incident rate、MTTR、availability、設備損害、價格、部署、收入、毛利或估值
+verification_needed: 需具名 production site 或代表性 fault injection 提供逐事件 raw signal、true／false／fault label、四段 timestamp、confirmed power／valve／CDU state、受影響 rack／node／job、復原再驗收及合約與財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 冷源到伺服器要交接五次
 
 沿著冷卻液前進的方向讀這張表：先從機房設施把熱交給冷卻設備，再經循環水路、機櫃分流與
@@ -816,6 +947,93 @@ resolution:
 這張表刻意不指定「誰一定是贏家」。同一專案可以由 ODM、冷卻設備商、機電承包商、
 設施營運方與平台商分別負責不同列；真正的商業價值要看合約責任、驗收、維護與收入分母，
 不是產品型錄涵蓋的方框數。
+
+## 漏液告警不是停機答案：先算會停哪裡、停多久
+
+漏液繩比較像煙霧警報器，不是漏水流量計。OCP Rope Leak Sensor Base Specification 把
+normal、leak、open-circuit fault 與電源線狀態分開；它又明說感測繩只要接觸液體，就輸出
+不分漏液量的 leak／no-leak 二元訊號。這個訊號沒有自動回答液體從哪裡來、漏了多少、該停哪一段，
+也沒有證明閥件或電源真的完成動作。因此要先拆開三層：
+
+| 層次 | 它真正回答什麼 | 至少要留下什麼 | 不能被什麼替代 |
+|---|---|---|---|
+| 1. 偵測 | 感測器看到 leak、normal 或 fault 嗎 | 原始狀態、sensor／zone ID、時間、閾值、fault 與 debounce | 一個總告警燈 |
+| 2. 決策 | 哪個控制器依哪條規則要求動作 | BMC／BCM／BMS owner、timer、告警可信度、requested action | 「系統會自動處理」 |
+| 3. 執行與確認 | 電源、閥件或 CDU 是否真的到達安全狀態 | 命令、acknowledgement、實際 breaker／valve／flow／power state 與時間 | 已送出命令或 5 秒 heartbeat |
+
+OCP 把 timer、立即停機、BMC／CPLD 動作列為依使用者安全要求而變的後續處置；rack manifold 或
+CDU 中斷更明確在該感測器規格範圍外。規格也另外提醒 condensation、溫度漂移與感測器 fault
+可能造成 false alarm。換句話說，感測器能「喊有水」，控制契約才決定誰相信、誰下令，現場狀態
+又要獨立確認有沒有真的安全。
+
+### 同一個 leak，托盤、機櫃與整列的影響範圍不同
+
+NVIDIA Mission Control 2.1.0 提供一個具體但平台限定的責任矩陣。它不是場域成效，卻很適合
+看懂為什麼「有自動隔離」仍少了一個分母。
+
+| 文件中的偵測層級 | 建議路徑 | 可能失去服務的範圍 | 判讀界線 |
+|---|---|---|---|
+| Tray | compute tray 的 BMC 啟動 shutdown timer、所有 tray 通知 BCM；只有 switch tray 明寫由 BCM 用 OOB Redfish 關閉漏液 tray，另開現場檢查 ticket | 單一托盤或節點 | 不能把 switch-tray 動作外推到所有 compute tray |
+| Rack，由 BCM 偵測 | BCM 建議立即關 power shelf DC output 並通知 BMS；BMS 再關該 rack breakers 與 supply／return valves | 單一機櫃 | 「立即」是建議文字，不是量過的端到端上限 |
+| Rack，由 BMS 偵測 | BMS 關該 rack breakers 與供回液閥，再通知 BCM；Mission Control 欄為 N/A | 單一機櫃 | 執行者與事件來源不同，不能假設都經過同一控制路徑 |
+| Row | BMS 關該 row 全部 rack breakers 與 row CDU，再通知 BCM | 一整列機櫃 | 這不是整座 data center shutdown，也沒有寫 row valves |
+| Sensor fault／misreading | Mission Control 與 BMS 路徑都要求現場檢查 | 視人工處置而定 | 文件沒有說系統已自動辨識或消除誤報 |
+
+這項整合還要求 Mission Control license、客戶提供的 BMS／MQTT broker 與 TCP/IP。頁面所寫的
+default heartbeat「預期為 5 秒」，只說雙方多久交換心跳；它沒有定義 heartbeat timeout，也沒有
+量出 leak detection、決策、命令、breaker／valve 動作與復原各花多久。把 5 秒寫成「五秒完成隔離」
+會把通訊節拍冒充安全 SLA。
+
+### 接頭少漏幾滴，仍不是場域少停幾小時
+
+OCP PBMC Revision 1.0 又示範另一個常見跳躍。Table 6.0 的 connector spillage requirement 是
+0 PSIG 不超過 0.06cm³、75 PSIG 不超過 0.12cm³；test 7.1-3 實際指定的卻是 water、垂直方向、
+0 與 80 PSIG，same-supplier 及 interoperability 每種組合至少三個樣本。75 PSIG 是 requirement
+列，80 PSIG 是 test condition，兩個數字要原樣保存，不能選一個改寫另一個。
+
+| PBMC conformance 項目 | 文件固定的最小分母 | 它能證明什麼 | 它仍不能證明什麼 |
+|---|---:|---|---|
+| Pressure drop | 每個 same-supplier／interop 組合至少 3 個樣本 | 特定 PG25、溫度、mate distance 與 flow points 的壓降要求 | 整條 loop 壓差、流量平衡或場域效率 |
+| Air inclusion | 每個組合至少 2 個樣本 | 特定 fluid 與大氣壓條件的接頭測試 | field leak rate、液體污染或停機 |
+| Spillage | 每個 same-supplier／interop 組合至少 3 個樣本 | 特定壓力、water、方向與量測方法的拆接 spill 上限 | 真實漏液事件、偵測延遲、隔離成功或修復時間 |
+
+這些 N＝2 或 N＝3 是**每種 conformance combination 的零件樣本**，不是資料中心、機櫃或事故樣本。
+同一 serialized valve pair 可被排進多項測試；同一對接頭的 1,256 次 mate cycles 也是 repeated
+cycles，不是 1,256 個獨立接頭。Connector pass 是重要的第一道門，但不能被翻譯成「零 field leak」
+或「不會停機」。
+
+### 多空小作文共用的九欄漏液事件護照
+
+| 護照欄位 | 必須固定什麼 | 少了最容易誤讀成什麼 |
+|---|---|---|
+| 1. 事件與版本 | site、rack／tray、平台、BMS／BMC、韌體、閥件與 connector 版本 | 不同拓撲的事件可以直接合併 |
+| 2. 液體與漏點 | fluid、估計或量測量、來源、位置、pressure／temperature | 二元 leak signal 等於嚴重度 |
+| 3. 感測品質 | sensor／zone、raw state、fault、閾值、debounce、true／false／miss label | 所有告警都是真漏液 |
+| 4. 四段時間戳 | detected、decision、request sent、safe state confirmed | 命令送出時間等於隔離完成時間 |
+| 5. 處置影響範圍 | tray／rack／row／CDU、power 與 fluid 各停哪裡 | 「自動隔離」代表影響很小 |
+| 6. 殘餘冷卻 | 隔離後仍可用的 flow、thermal hold-up、備援與安全倒數 | 關閥後所有設備立刻安全 |
+| 7. 服務分母 | affected racks／nodes／accelerators／jobs 與未完成工作 | 一次告警等於一次相同嚴重度停機 |
+| 8. 復原與再驗收 | dry／repair、flush／refill、restart、recommission 與恢復服務時間 | alarm cleared 等於產能恢復 |
+| 9. 動作責任 | 誰偵測、判定、下令、執行、確認、簽核及承擔成本 | 元件供應商自動承擔整體 SLA |
+
+服務損失至少另算 **affected rack-hours＝Σ（受影響機櫃等價數×無法服務時數）**。在一個假想的
+一小時事件中，若只隔離一座 rack，和關掉整列十座 rack，不應都記成「一件告警」。但 rack-hours 仍要與
+accelerator-hours、job-hours、設備損害、清理成本及 false alarms 分帳：一座 rack 可能只停部分節點，
+工作也可能已被排程器搬走；反過來，短暫告警可能留下較長的 drain、drying 與 recommissioning 尾巴。
+
+**較強的多方版本**是更多、更精準的 sensor zone、閥件與控制能在代表性 fault injection 及真實事件中，
+縮短 detected→confirmed-safe、縮小 tray／rack／row blast radius，並降低 rack-hours、job-hours、設備
+損害與 recommissioning 時間；之後還要有合約責任、單價、部署分母與供應商收入，才可談商業受惠。
+
+**較強的空方版本**是漏點不確定或硬體尾部風險很高時，粗粒度、立即關整列反而更安全；更多感測器、
+閥件、MQTT、BMS 與控制軟體也會增加誤報、通訊、維修與整合失效點。PBMC 等介面標準化還可能讓
+接頭更容易多來源替代。若細粒度自動化沒有降低 rack-hours、損害或復原時間，功能增加不等於價值增加。
+
+本輪有 N＝3 份來源紀錄、N＝2 條組織來源鏈（OCP 與 NVIDIA）；其中 OCP 兩份文件屬同一標準生態，
+不是兩個獨立場域。PBMC 的 N＝2／3 是每個 conformance combination 的最低零件樣本，repeated cycles
+不獨立；具名 production leak event、true／false／fault 分母、端到端隔離延遲、affected rack-hours、
+job-hours、設備損害、復原再驗收與財務共同觀測皆 N＝0。因此本文不估 leak rate、false-positive rate、
+MTTR、availability、收入或毛利，也沒有可報的 sampling SE／t。
 
 ## 同樣 1MW，為什麼還要分熱量、流量、ATD、壓差與泵功
 
@@ -1167,6 +1385,19 @@ frequency: monthly
 next_check: 2026-09-03
 trigger: production site 公開跨季 raw telemetry、surface map、control transition／failure injection、condensation incident denominator、economizer duty、energy／water baseline 與責任矩陣
 invalidation: 跨氣候、拓撲與控制模式的量產證據證明單一房間 RH 或單一供液溫在扣除感測誤差後已能完整代表所有局部表面、結露事件與 economizer 成效
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C22,C23,C24,C25
+metric: 具名 production leak event 是否逐事件公開漏液量與位置、true／false／fault、四段 timestamp、tray／rack／row／CDU 動作與 confirmed state、受影響 rack／node／job、rack-hours／job-hours、損害及復原再驗收
+source_ids: S17,S18,S19
+watch_source_ids: S2,S4
+frequency: monthly
+next_check: 2026-09-30
+trigger: 量產場域或代表性 fault injection 提供可重建事件 log、端到端狀態時間、服務損失分母與偵測／決策／執行責任矩陣
+invalidation: 在按事件嚴重度與拓撲調整後，細粒度或自動隔離沒有降低、甚至因誤報或控制失敗增加 affected rack-hours、job-hours、設備損害或復原時間
 -->
 
 ## 什麼會推翻這篇
