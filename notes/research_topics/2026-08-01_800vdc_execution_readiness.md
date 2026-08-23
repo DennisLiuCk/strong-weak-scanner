@@ -301,6 +301,54 @@ limitation: 這是 250MW-class IT load 的 sizing reference 與 campus context�
 independence_group: nvidia
 -->
 
+<!-- research_source
+source_id: S18
+role: regulator_or_policy
+source_kind: document
+publisher: ERCOT
+title: ERCOT Updates: PUC Open Meeting — Batch Zero Verification and Audit Process
+published_at: 2026-08-20
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.ercot.com/files/docs/2026/08/20/Batch-Zero-Verification-and-Audit-PUCT-Presentation.pdf
+locator: 官方 13 頁 PDF；pp.2、5–7 的 classification／QSA／dynamic-model／energization 邊界，pp.10–12 的 verification 時程、資格要求與 supporting documents
+limitation: ERCOT 特定 Batch Zero 流程不能直接外推所有電網；pause 不等於取消，約 18% 只代表 290 份 dynamic model 的首輪可接受比例、不是最終通過率；官方端點阻擋本機與 in-app browser 下載，故只依 ERCOT 官方逐頁擷取與官方索引核對，不宣稱本地 SHA 或 PDF 視覺渲染
+independence_group: ercot
+-->
+
+<!-- research_source
+source_id: S19
+role: regulator_or_policy
+source_kind: document
+publisher: ERCOT
+title: Data Centers Interim Charge
+published_at: 2026-08-19
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.ercot.com/files/docs/2026/08/19/ERCOTPanel1DataCenters.pdf
+locator: 官方 5 頁 PDF；p.2 的 Batch Study 年度 MW allocation／Load Commissioning Plan，p.3 的 2026-07-28 preliminary Batch Zero eligibility 與 final-determination note
+limitation: 約 205GW 是 Large Load 依既有研究取得的 preliminary eligibility，不是只屬 data center、不是 final inclusion、allocated／authorized／energized capacity、IT load 或供應商 TAM；與 S18 同屬 ERCOT 制度消息鏈，官方端點阻擋本機與 in-app browser 下載，故不宣稱本地 SHA 或 PDF 視覺渲染
+independence_group: ercot
+-->
+
+<!-- research_source
+source_id: S20
+role: regulator_or_policy
+source_kind: living_index
+publisher: ERCOT
+title: Large Load Integration
+published_at:
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.ercot.com/services/rq/large-load-integration
+locator: 2026-08-23 的大型負載整合流程、Batch Zero 表單與後續文件重查入口
+limitation: 持續更新入口只供發現後續 classification、LCP、QSA、energization 與 meter 證據；頁面存在本身不證明任何專案推進或容量實現
+independence_group: ercot
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -591,6 +639,76 @@ verification_needed: 同一具名場站版本的 grid-to-rack single-line、AC�
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: ERCOT 於 2026-08-19 報告截至 2026-07-28 約 205GW 的 Large Load 依既有研究初步具備 Batch Zero inclusion 資格，並明示仍要審查全部 application materials、之後才作 final inclusion determination
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-08-19
+basis: S19 PDF p.3 的 headline、資料日期與 NOTE 直接固定 preliminary eligibility 及待完成的 final determination
+boundary: 205GW 不是全為 data center，也不是已分配年度 MW、QSA、通電核准、已通電或實際 IT load；這是 ERCOT 目前申請母體的狀態 census，不是隨機樣本，沒有 sampling SE／t，也不能當成 GPU、機櫃或台灣供應商 TAM
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: ERCOT 說明大型負載在 applicable QSA 內是通電前置條件，但 QSA inclusion 本身不授權 energization；2026-08-03 起對 75MW 以上 data center／crypto 的通電核准暫停，等待 Batch Zero eligibility verification 完成
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-08-20
+basis: S18 PDF pp.5、7 分別直接寫出 QSA prerequisite／non-authorization 與 energization pause 的適用範圍
+boundary: pause 是等待核驗，不是所有專案取消；QSA 仍是實質穩定度關卡，但不能跨寫成 final classification、approval to energize、實際 meter load、資料中心完工或供應商收入
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: 判讀大型 AI 負載是否實現時，至少要分開保存 request、preliminary eligibility／classification、適用專案的 Batch Study 年度 MW allocation／LCP、QSA inclusion、approval to energize 與 actual metered load 六個狀態欄；Batch Study／LCP 與 QSA 依專案分類可能分支，不能把六欄冒充所有案件的固定線性流程
+supporting_source_ids: S18,S19
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S19 分開 preliminary eligibility、Batch Study allocation 與 LCP，S18 又明確區分 classification、QSA prerequisite、energization approval 及尚未 energize 的負載；六欄是研究中心依兩份制度文件建立的可追溯護照
+boundary: 這不是 ERCOT 發布的單一六步認證，也不能外推其他 ISO／市場；只有通電核准與後續實際 meter 才分別支持獲准取電與已實現負載，仍不能直接換算 facility／IT capacity、rack、chip、BOM、供應商收入或毛利
+verification_needed: 同一具名專案與版本的 classification path、年度 LCP allocation、QSA、approval、meter 時序，再接 facility／IT boundary、PUE、架構 BOM、vendor 與財務共同鍵
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: unverified
+status: active
+claim: ERCOT 約 205GW preliminary eligible Large Load 或某期 QSA scope 已可視為實際通電的 AI data-center load，並可直接換算 GPU、機櫃與台灣供應商收入
+supporting_source_ids:
+contrary_source_ids: S18,S19
+as_of: 2026-08-23
+basis: S19 明示 205GW 只到 preliminary eligibility，S18 明示 QSA inclusion 不授權通電；現有來源也沒有 facility／IT、硬體、供應商與財務共同鍵
+boundary: 不把 queue、eligible、classified、allocated、QSA、authorized、metered、IT capacity 與 supplier financial attribution 混成一個 demand 數字，也不因進度未知就反向宣稱所有申請都是假的
+verification_needed: 同案 final classification、LCP／allocation、QSA、approval to energize、actual meter，另需 facility-to-IT／PUE、rack／chip 架構、BOM／vendor、shipment、revenue、cost 與 margin 對帳
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: ERCOT 已審查 290 份大型負載 dynamic model，約 18% 在 first review 即可接受；其餘有 deficiency notice 與相同 24 天 cure window，因此 18% 只能描述首輪接受、不能改寫為最終 Batch Zero 通過率或 82% 永久失敗率
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-08-20
+basis: S18 PDF p.6 在同一頁並列 290、approximately 18% acceptable on first review 與 24-day cure standard
+boundary: N=290 是當時已審查 dynamic models 的狀態母體，不是隨機專案樣本；model 也不等於 site、data center、最終 inclusion、通電或財務觀測，約數沒有原始分子且不估 sampling SE／t
+verification_needed:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -635,6 +753,20 @@ trigger: 平台或場站公開同一版本的介面、冗餘、標準符合、�
 invalidation: 2027 時程延後、標準與 commissioning 缺口未關閉、MOU 未轉部署，或 50／54V hybrid bridge 長期吸收需求，則全面切換假說下修
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C20,C21,C22,C23,C24
+metric: 大型負載由 request／preliminary eligibility 走到 allocation、QSA、通電核准與 actual metered load 的同案實現狀態
+source_ids: S18,S19
+watch_source_ids: S20
+frequency: event_driven
+frequency_detail: 2026-08-31 conditional classification、2026-12-10 verification report 與 2026-12-17 PUCT meeting 為已公告節點；其間 ERCOT 若發布 final classification、LCP／allocation、QSA、approval 或 meter 證據即提前回查
+next_check: 2026-09-12
+trigger: 同一具名專案公開 final classification path、年度 MW／LCP、QSA、approval to energize 與 actual meter 中任一新欄，並可與既有欄位用相同 project key 串接
+invalidation: ERCOT 若更改 Batch Zero 分類、QSA、verification、energization pause 的適用範圍或時程，六欄護照須依新制度重畫，不能沿用舊順序
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -672,6 +804,13 @@ to: triaged
 reason: separated_hybrid_row_and_facility_scale_800v_onramps_without_thesis_or_clock_refresh
 evidence: sources:S16,S17
 -->
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: added_large_load_request_eligibility_qsa_energization_and_metered_load_gates_without_thesis_clock_refresh
+evidence: sources:S18,S19
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -707,6 +846,14 @@ evidence: sources:S16,S17
 - **DSX**：NVIDIA 用來串接運算、電力、冷卻與場站設計的參考架構；它提供規劃共同語言，不等於圖中的場站已實際建成。
 - **Facilities（設施）**：本文指建築與園區層的電力、冷卻、備援及控制，不是單一 power rack 或伺服器產品。
 - **v1.0／v2.0（文件版本）**：表示文件已形成可引用的版本基線；版本變大不代表涵蓋所有子系統，也不代表任何產品或場站已通過要求。
+- **ERCOT**：管理德州主要電網可靠度與市場運作的獨立系統營運機構；本文只把其大型負載流程當成一個具體案例，不視為全球共通規則。
+- **Large Load（大型負載）**：ERCOT 在 Batch Zero 語境中指 75MW 以上負載；它可以涵蓋資料中心、加密貨幣設施或其他大型用電者，不能把總數全標成 AI data center。
+- **Batch Zero**：ERCOT 依 PGRR 145 對符合條件的大型負載進行的一次性過渡研究；初步具備 inclusion 資格不等於最後納入、分到容量或獲准通電。
+- **Batch Study**：把一批大型負載放在共同電網限制下研究，產出逐案逐年的 MW allocation、財務承諾與輸電升級方案；是否適用及路徑取決於專案分類。
+- **QSA（Quarterly Stability Assessment）**：檢查新發電與大型負載加入後電網是否穩定的季度評估。大型負載需進入適用 QSA 才能通電，但進入 QSA 本身仍不是通電許可。
+- **LCP（Load Commissioning Plan）**：把 Batch Study 對特定專案的逐年 MW allocation 正式化的負載投運計畫；它仍不是實際 meter 讀值。
+- **Approval to energize（通電核准）**：電網營運端允許專案開始取電的獨立狀態；排隊、初步資格、LCP 或 QSA 都不能代替它。
+- **Actual metered load（實際計量負載）**：專案通電後在指定 meter、時刻或期間真正取用的電力；它仍不等於 IT 負載，還要扣回 facility boundary 與 PUE 等口徑。
 
 ### 三句話抓重點
 
@@ -721,6 +868,7 @@ evidence: sources:S16,S17
 ### 接下來怎麼追
 
 - 追 OCP 是否把白皮書推進成固定版本的 voltage band、interoperability、redundancy、protection 與 commissioning 契約。
+- 追同一大型負載專案是否從 request／preliminary eligibility 前進到 LCP／allocation、QSA、approval to energize 與 actual meter，而不是只加總 queue headline。
 - 追具名場站是否把 installed／critical／actual load 與年度 PUE 分成四本帳，公開 single-line、失效假設、同步功率序列與 meter boundary。
 - 追平台或客戶是否公布同一場站的子系統資格、現場驗收、部署容量、故障／維修結果與正式量產日期。
 - 追台達電的 MOU 是否轉為實際部署與出貨，並追光寶科是否揭露 800V 驗證結果；兩家公司都要再對上收入與毛利分母。
@@ -728,6 +876,7 @@ evidence: sources:S16,S17
 ### 想一想
 
 - 一個 BESS 或 power rack 通過自己的測試，為什麼仍不能證明整座資料中心穩定？
+- 為什麼 205GW 的 preliminary eligible Large Load 不能直接除以單櫃 MW，換算成 GPU、機櫃或供應商營收？
 - 若 50V 過渡產品持續成長，但互通標準或地方 commissioning 延後，供應商短期收入與長期技術方向可能如何分化？
 - MOU 從「規劃 100MW」走到「已交付 100MW」，中間至少還缺哪些可核對文件？
 
@@ -797,6 +946,69 @@ commercialization，但都沒有穿過第 6、7 關。因此 2026 仍較像 exec
 這三段描述「哪裡改成 DC」，不是「產品已通過第幾級認證」。同一 Stage 1 仍可能因 isolation
 位置、電壓範圍、保護、能量儲存或維修程序不同而需要重新驗收；Stage 3 也不天然比 hybrid
 方案更適合每一座既有場站。
+
+## 申請的 GW 不是已通電的 GW：先拆 ERCOT 六個狀態欄
+
+800V 七關回答「電力進入場站後，架構、設備與商業交付是否成熟」；在它們之前，還有一個更
+上游的問題：這座大型負載到底有沒有從電網端取得可實現的容量。以下六欄是研究中心用 ERCOT
+Batch Zero 案例建立的**併網實現護照**，不是第八個 800V 技術關卡，也不是 ERCOT 發布的六步
+認證。不同 classification path 可能讓 Batch Study／LCP 與 QSA 分支，不能硬畫成每案都按同一
+順序通過的直線。
+
+ERCOT 8 月 19 日文件寫的是：截至 7 月 28 日，約 205GW 的 **Large Load** 依既有研究初步具備
+Batch Zero inclusion 資格；同一頁也明示仍要審查全部申請材料，之後才決定哪些負載最後納入。
+[S19] 因此這不是「205GW 資料中心已獲准通電」，更不是 205GW IT load。母體還包含不同類型
+Large Load，且 eligible、included、allocated、authorized 與 metered 各是不同狀態。
+
+| 六個獨立狀態欄 | 它真正回答什麼 | 至少要保存什麼 | 不能冒充什麼 |
+|---|---|---|---|
+| 1. Request | 開發商向電網提出多少負載需求？ | project key、地點、MW、提出日、重複／替代申請關係 | 已有可用電力、已下硬體訂單 |
+| 2. Preliminary eligibility／classification | 既有研究、dynamic model 與規則是否讓專案取得初步資格；最後被分為哪條處理路徑？ | 規則版本、base／studied／not qualified、conditional／final、爭議與補件 | final inclusion、年度容量或通電 |
+| 3. Batch Study allocation／LCP（適用案型） | 可靠度約束下，專案在哪一年可取得多少 MW？ | 2028–2032 等逐年 MW、LCP 版本、成本／財務承諾、輸電升級依賴 | QSA、通電核准或實際用電 |
+| 4. QSA inclusion（適用案型／季度） | 該季度把負載加入模型後，電網穩定度是否可接受？ | QSA 日期、專案／MW、模型版本、限制與待辦 | approval to energize；ERCOT 明說不能單靠 QSA 授權 |
+| 5. Approval to energize | 電網營運端是否正式允許專案開始取電？ | 核准機關、日期、條件、初始上限、telemetry／model 狀態 | 已達公告 MW、穩定營運或 IT 容量 |
+| 6. Actual metered load | 通電後真正取用多少電？ | meter ID／boundary、時間序列、平均／峰值／percentile、缺值與限制 | facility 內的 IT load、rack／GPU 數、BOM 或供應商財務 |
+
+### QSA 是必要條件，不是通電許可
+
+ERCOT 8 月 20 日簡報一方面說，大型負載必須進入適用的 QSA 才能 energize；另一方面又逐字
+劃清「進入 QSA 本身不授權通電」。同一份簡報也把 8 月 3 日起對 75MW 以上 data center／crypto
+的通電核准暫停，限定為等待 Batch Zero eligibility verification 完成。[S18] 這兩句必須一起讀：
+QSA 不是沒意義的 paperwork，它是電網穩定度的必要關卡；但把 QSA 名單改寫成「已通電專案」
+仍然跨掉了獨立核准欄。反過來，pause 也只是待核驗，不等於所有專案已取消。
+
+資格核驗看的也不只是開發商填一個 MW。ERCOT 列出的材料可包含 CIAC／financial security、
+long-lead equipment、notice to proceed、end-use customer confirmation、site approvals、具約束力的
+總包與變電站承包合約、site control，部分案件還可能做 site inspection。[S18] 這些證據能提高專案
+「正在執行」的可信度，但仍要回到 final classification、適用的 allocation／QSA、通電核准與 meter。
+
+### 18% 是首輪接受，不是最終通過率
+
+ERCOT 同頁報告已審查 290 份大型負載 dynamic model，其中約 18% 在 **first review** 即可接受；
+若有 deficiency，開發商仍有相同 24 天 cure window。[S18] 正確標題只能寫「首輪模型接受率約
+18%」。不能把其餘部分寫成永久失敗，也不能把 18% 寫成 final Batch Zero inclusion、專案通電率
+或資料中心完工率；一個 model 也不必然等於一座 site。
+
+這是 N=290 份當時已審查模型的狀態母體，不是從全球資料中心隨機抽樣；18% 又是近似值、沒有
+原始分子，因此不另估 sampling SE／t。兩份固定來源都是 ERCOT 同一制度消息鏈，不是兩個獨立
+市場案例。具名專案從 final classification 一路到 actual meter、IT boundary、硬體 BOM 與供應商
+財務的完整共同觀測仍為 N=0。
+
+### 多空小作文要共用六欄併網實現護照
+
+**多方可以寫到哪裡：** raw request 若進一步通過文件核驗，並能在同一 project key 下看到 final
+classification、適用的逐年 LCP allocation／QSA、通電核准，最後出現持續的 actual meter，需求就
+比單純 queue 更接近可交付。若 site control、長交期設備、NTP、end-use customer、承包合約與
+financial security 也能雙向核對，專案執行可信度會再提高。
+
+**空方可以寫到哪裡：** preliminary eligible 母體仍可能因材料、模型、分類、可靠度、輸電工程、
+財務承諾或時程而縮減與遞延；沒有 approval 與 meter，就不能把 205GW 當成已實現負載。但證據
+不足也不等於能宣稱所有申請都是重複、虛假或終將取消；那同樣需要逐案 project key 與處置結果。
+
+**共同裁決點：** 先逐欄保存狀態與日期，再用同案 ID 去重；只有通電核准可支持「獲准取電」，
+actual meter 才支持「已實現電網負載」。要從 meter 再走到 800V、IT capacity、rack／chip 與台灣
+供應商收入，還要補 facility-to-IT boundary／PUE、架構版本、BOM／vendor、shipment、revenue、
+cost 與 margin。任何一個 headline GW 都不能跳完這兩段橋。
 
 ## 同樣寫 1MW，為什麼 installed、critical、actual 與 PUE 是四本帳
 
@@ -929,6 +1141,9 @@ transformer、switchgear、relay、generator 與 campus control 排除在 BESS q
 - [DOE FEMP：Best Practices Guide for Energy-Efficient Data Center Design](https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf)（2024-07-26；PDF p.38／印刷 p.29 的年度 PUE 定義與適用邊界）。
 - [NVIDIA：Why Scaling AI Compute Performance Requires a New Power Architecture](https://blogs.nvidia.com/blog/800-vdc-power-architecture-ai-factory/)（2026-08-11；分開 2026H2 hybrid power rack、2027 row power center 與較後期 DC power block）。
 - [NVIDIA DSX Facilities Infrastructure Reference Design Overview v2.0](https://docs.nvidia.com/dsx/facilities-infra/reference-design-overview)（2026-08-19；100kV+／34.5kV／4.16kV／480V 多電壓參考園區與 sizing boundary）。
+- [ERCOT：Batch Zero Verification and Audit Process](https://www.ercot.com/files/docs/2026/08/20/Batch-Zero-Verification-and-Audit-PUCT-Presentation.pdf)（2026-08-20；PDF pp.2、5–7、10–12 的 classification、QSA、energization、model cure 與 supporting-document 邊界）。
+- [ERCOT：Data Centers Interim Charge](https://www.ercot.com/files/docs/2026/08/19/ERCOTPanel1DataCenters.pdf)（2026-08-19；PDF pp.2–3 的 Batch Study／LCP 與約 205GW preliminary Large Load eligibility）。
+- [ERCOT Large Load Integration 持續更新入口](https://www.ercot.com/services/rq/large-load-integration)（2026-08-23 捕捉，只供後續重查 classification、LCP、QSA、energization 與 meter 證據）。
 
 NVIDIA 列名 Delta、LITEON 只證實生態系參與。對 2301 而言，800V 仍停在公司預定的驗證節點；
 對 2308 而言，證據已由展示增加到 MOU planned deployment，但仍沒有完成部署與財務分母；
@@ -936,8 +1151,10 @@ NVIDIA 列名 Delta、LITEON 只證實生態系參與。對 2301 而言，800V �
 並非第三方場站實績。OCP、UL 與 BESS 文件也各有不同邊界，不能多數決成「已驗收」；OCP 的
 3+1／2N 設計表與 DOE 的年度 PUE 方法更不能拼成 installed-to-critical 容量公式。本輪沒有
 一致預期、估值或即時持倉資料，因此不宣稱市場尚未反映、已充分定價或應採取任何股票動作。
+ERCOT 兩份固定 PDF 又同屬單一制度消息鏈；官方端點阻擋本機與 in-app browser 下載，本輪依
+ERCOT 官方逐頁擷取及官方索引交叉核對，不宣稱本地檔案 SHA 或 PDF 視覺渲染。
 
-## 新手最常混淆的九件事
+## 新手最常混淆的十二件事
 
 1. **800V 是電壓名稱，不是完成狀態。** 同樣標示 800V 的元件、rack 與 facility 可能處在完全不同的資格階段。
 2. **OCP Stage 1–3 是改動範圍，不是認證等級。** Stage 1 也要完成自己的安全、介面與場站驗收。
@@ -948,6 +1165,9 @@ NVIDIA 列名 Delta、LITEON 只證實生態系參與。對 2301 而言，800V �
 7. **產業方向不能直接分配給台股。** 必須以買方與供應商文件對上具名產品、期間、數量、收入與毛利。
 8. **Installed MW 不等於 critical IT MW。** 前者含備援與待命容量，後者必須先固定 design fault、maintenance、derating 與 reference boundary。
 9. **PUE 不是容量折扣。** 年度 kWh／kWh 不能把 nameplate MW 換成 fault-tolerant MW，也不能代替 peak power 或 IT work efficiency。
+10. **Eligible／requested GW 不等於 authorized／energized GW。** 初步資格、final inclusion、年度 allocation、QSA、核准與 meter 必須逐欄保存。
+11. **QSA 是前置關卡，不是通電許可。** 進入穩定度評估能代表流程前進，但 ERCOT 明示仍需獨立 energization approval。
+12. **18% 是模型首輪接受，不是最終通過率。** 其餘 model 仍有 cure window，也不能把 model 直接當作 site 或完工專案。
 
 ## 在研究中心接著怎麼學
 
@@ -963,9 +1183,10 @@ BOM 串起。任何公司結論仍需回到各自正式筆記、買方文件與�
 ## 投資判讀框架
 
 - **架構 KPI**：2027 平台時鐘、具名 facility stage、isolation／SST 路徑與固定 voltage band。
+- **電網實現 KPI**：同案 request 去重、final classification、適用的 LCP／逐年 allocation、QSA、approval to energize 與 actual meter；路徑可分支，不以 queue GW 代替實現量。
 - **工程 KPI**：reference boundary、installed-to-critical capacity bridge、actual load distribution、年度 meter／PUE contract、redundancy topology、fault matrix、子系統 pass／fail、跨廠互通、as-built commissioning 與運行時數。
 - **商業 KPI**：MOU 轉合約、施工與 acceptance，接著才是 production volume、出貨、收入、毛利與現金。
-- **常見假訊號**：合作夥伴 logo、展場 demo、效率目標、MOU 規劃量，或把 50V 過渡產品出貨當成 800V 出貨。
+- **常見假訊號**：合作夥伴 logo、展場 demo、效率目標、MOU 規劃量、preliminary eligible／QSA headline、模型首輪接受率，或把 50V 過渡產品出貨當成 800V 出貨。
 - **最關鍵分歧**：價值是否由單顆 PSU 擴大到 power rack、保護、備援、控制與 cooling 的可重複交付；若只增加研發與資本投入，卻沒有通過第 6、7 關，題材不能升格成公司獲利。
 
 ## 影響路由
@@ -1009,5 +1230,6 @@ evidence_boundary: 來源未點名 universe 內其他散熱廠，也未證實 80
 - 台達電是否把展示規格推進到客戶量產、實際交付與可辨識的電源／散熱財務貢獻。
 - 朋程是否以一手文件證實 800V HVDC 客戶、封裝料號、驗證完成與量產，而不是只保留研究假說。
 - 安全、介面與維修標準若延誤，或客戶延長 50／54V 過渡期，2027 full-scale 時程需下修。
+- ERCOT 2026-08-31 conditional classification 與 2026-12-10 verification report 是否讓同案由 preliminary eligibility 前進到 final path；沒有 LCP／QSA／approval／meter 共同鍵時，不把 queue GW 改寫成已通電 AI demand。
 - 具名場站是否公開同版 single-line、N 定義、installed／critical capacity、實際 load trace、facility／IT meter map、PUE 期間與 fault／maintenance commissioning；只有 MW 與 PUE headline 不算填滿。
 - 若只有合作名單、展場規格或股價反應而沒有公司級收入／毛利證據，維持 `watch`，不得升格。

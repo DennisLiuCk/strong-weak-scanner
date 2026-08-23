@@ -6754,6 +6754,19 @@ class ResearchCenterTest(unittest.TestCase):
             "既有建築維持 AC；在列內轉成 800V",
             "utility input 100kV+、campus backbone 34.5kV",
             "## OCP 的三階段不是「成熟度排名」，而是改動範圍",
+            "## 申請的 GW 不是已通電的 GW：先拆 ERCOT 六個狀態欄",
+            "| 1. Request |",
+            "| 2. Preliminary eligibility／classification |",
+            "| 3. Batch Study allocation／LCP（適用案型） |",
+            "| 4. QSA inclusion（適用案型／季度） |",
+            "| 5. Approval to energize |",
+            "| 6. Actual metered load |",
+            "### QSA 是必要條件，不是通電許可",
+            "### 18% 是首輪接受，不是最終通過率",
+            "### 多空小作文要共用六欄併網實現護照",
+            "約 205GW 的 **Large Load**",
+            "已審查 290 份大型負載 dynamic model",
+            "完整共同觀測仍為 N=0",
             "## 同樣寫 1MW，為什麼 installed、critical、actual 與 PUE 是四本帳",
             "### 先固定失效情境，再算 installed 與 critical",
             "### PUE 是年度能源比，不是容量折扣",
@@ -6773,7 +6786,7 @@ class ResearchCenterTest(unittest.TestCase):
             "官方端點對命令列直取回應 403",
             "## 為什麼子系統通過，還不等於場站穩定",
             "## 公司公告要放回正確抽屜",
-            "## 新手最常混淆的九件事",
+            "## 新手最常混淆的十二件事",
             "## 在研究中心接著怎麼學",
             "claim_id: C4\nlabel: inference\nstatus: superseded",
             "corrected_by_claim_id: C13",
@@ -6785,15 +6798,27 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C17\nlabel: verified\nstatus: active",
             "claim_id: C18\nlabel: verified\nstatus: active",
             "claim_id: C19\nlabel: inference\nstatus: active",
+            "source_id: S18\nrole: regulator_or_policy\nsource_kind: document",
+            "source_id: S19\nrole: regulator_or_policy\nsource_kind: document",
+            "source_id: S20\nrole: regulator_or_policy\nsource_kind: living_index",
+            "claim_id: C20\nlabel: verified\nstatus: active",
+            "claim_id: C21\nlabel: verified\nstatus: active",
+            "claim_id: C22\nlabel: inference\nstatus: active",
+            "claim_id: C23\nlabel: unverified\nstatus: active",
+            "claim_id: C24\nlabel: verified\nstatus: active",
+            "monitor_id: T4\nstatus: active",
+            "claim_ids: C20,C21,C22,C23,C24",
+            "watch_source_ids: S20\nfrequency: event_driven",
+            "reason: added_large_load_request_eligibility_qsa_energization_and_metered_load_gates_without_thesis_clock_refresh",
             "thesis_claim_id: C13",
             "review_due: 2026-09-12",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 17),
-            ("research_claim", 19), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 3),
-            ("transition", 7),
+            ("research_topic", 1), ("research_source", 20),
+            ("research_claim", 24), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
+            ("transition", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -6811,15 +6836,24 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:800v-commercial-attribution,stage,量產部署與財務歸因",
             "process:data-center-capacity-energy-passport,process,資料中心容量與能源十欄護照",
             "metric:installed-critical-load-pue-boundary,metric,裝置、關鍵負載與PUE邊界",
+            "process:large-load-grid-realization-passport,process,大型負載併網實現護照",
         ):
             self.assertIn(concept, concepts)
+
+        entities = (ROOT / "config" / "external_entities.csv").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "organization:ercot,organization,Electric Reliability Council of Texas",
+            entities,
+        )
 
         graph = (
             ROOT / "notes" / "knowledge_graph"
             / "800vdc_execution_readiness.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 800VDC 七關執行準備度", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
         for edge_target in (
             "from_id: company:2308",
             "from_id: organization:open-compute-project",
@@ -6834,6 +6868,10 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: process:data-center-capacity-energy-passport",
             "edge_id: KG-8ER-I16",
             "to_id: metric:installed-critical-load-pue-boundary",
+            "edge_id: KG-8ER-I17",
+            "from_id: organization:ercot",
+            "edge_id: KG-8ER-I18",
+            "to_id: process:large-load-grid-realization-passport",
             "to_id: group:powersupply", "to_id: group:power",
             "to_id: group:thermal",
         ):

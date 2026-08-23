@@ -1,14 +1,15 @@
 # 800VDC 七關執行準備度知識圖譜
 
-本圖把平台路線圖、設施轉換、介面與冗餘、安全標準、子系統資格、場站驗收及量產財務分開。
+本圖先把大型負載從 request／preliminary eligibility 拆到通電核准與 actual meter，再把場站內的平台路線圖、設施轉換、介面與冗餘、安全標準、子系統資格、場站驗收及量產財務分開。
 七關是研究端的證據分類，不是單一標準或認證；任何一條公司線都不代表已取得訂單或獲利。
+上游併網護照也允許 Batch Study／LCP 與 QSA 依專案路徑分支，不是 ERCOT 發布的固定六步認證。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: 800vdc-execution-readiness
 root_node_id: concept:800vdc-execution-readiness
 label: 800VDC 七關執行準備度
-summary: 從 architecture timing facility boundary interoperability redundancy codes subsystem qualification site commissioning 追到 production deployment 與財務 避免把 logo demo qualification 或 MOU 當成 full-scale 商用。
+summary: 先分開大型負載 request eligibility classification allocation LCP QSA energization approval 與 actual meter 再從 architecture timing facility boundary interoperability redundancy codes subsystem qualification site commissioning 追到 production deployment 與財務 避免把 queue logo demo qualification 或 MOU 當成 full-scale 商用。
 article_ids: MI-2026-08-01-800VDC-EXECUTION-READINESS
 status: active
 -->
@@ -391,4 +392,44 @@ review_due: 2026-09-12
 status: active
 boundary: 1.20／2.00MW installed 1.00MW critical 0.80MW actual 與 PUE 1.25 是 N=2 個假想 topology 加 N=1 個假想年度 meter case 的確定性教材 不是 OCP DOE 800VDC site rack customer deployment 或財務結果。
 next_trigger: 具名場站以共同 reference plane timestamp 與 meter boundary 公開 installed to critical bridge actual load distribution facility／IT energy PUE uncertainty fault test customer acceptance 及 production economics。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8ER-I17
+view: industry
+from_id: organization:ercot
+to_id: concept:800vdc-execution-readiness
+relation: tests
+claim_refs: MI-2026-08-01-800VDC-EXECUTION-READINESS#C20,MI-2026-08-01-800VDC-EXECUTION-READINESS#C21,MI-2026-08-01-800VDC-EXECUTION-READINESS#C24
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-20
+review_due: 2026-09-12
+status: active
+boundary: ERCOT 的 Batch Zero classification dynamic-model review QSA 與 energization 流程只描述 ERCOT 大型負載邊界 不等於全美共同標準 任一專案已通電 800VDC 已採用 或供應商訂單收入；18% 只代表 N=290 份 model 的首輪接受而非最終通過。
+next_trigger: ERCOT 公布具名 project 的 final classification annual MW allocation／LCP QSA result approval to energize 與 actual metered load。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-8ER-I18
+view: industry
+from_id: concept:800vdc-execution-readiness
+to_id: process:large-load-grid-realization-passport
+relation: measured_by
+claim_refs: MI-2026-08-01-800VDC-EXECUTION-READINESS#C22
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: 大型負載實現要由 grid operator TSP／DSP developer site contractor financial security transmission plan energization approval 與 meter 等多個責任域接成同一 project 時鐘。
+as_of: 2026-08-23
+review_due: 2026-09-12
+status: active
+boundary: 這份 passport 是研究中心依 ERCOT 兩份文件建立的跨階段查核框架 不是 ERCOT 標準或通用併網法規；六欄可依 classification path 分支 且 205GW eligibility 或任一 QSA 都不能單獨證明已通電 800V site deployment rack volume 或公司財務。
+next_trigger: 同一具名 project 公開 request final classification 適用的 allocation／LCP QSA approval to energize 與 actual metered MW 再以 site revision 對上 installed critical load PUE commissioning 及供應商財務共同鍵。
 -->
