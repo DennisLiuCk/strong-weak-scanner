@@ -360,6 +360,86 @@ limitation: 公開頁只有摘要；模型誤差是作者特定 finite-element r
 independence_group: ibm-research
 -->
 
+<!-- research_source
+source_id: S21
+role: competitor_primary
+source_kind: document
+publisher: Intel Foundry
+title: Intel Foundry Achieves Major Milestones
+published_at: 2024-08-06
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://newsroom.intel.com/intel-foundry/intel-foundry-achieves-major-milestones
+locator: What’s New、More on Intel 18A 與 How It Works 段落；Panther Lake／Clearwater Forest 流片後 powered-on／booted、PDK 1.0 與外部客戶預期流片的不同里程碑
+limitation: 這是 Intel 在 2024-08-06 的時點公告；powered-on／booted 只證實具名內部產品的早期功能里程碑，外部客戶於 2025 上半年流片是當時前瞻預期，不是已發生的客戶採用、出貨、良率或營收
+independence_group: intel
+-->
+
+<!-- research_source
+source_id: S22
+role: competitor_primary
+source_kind: document
+publisher: Intel
+title: Intel Unveils Panther Lake Architecture: First AI PC Platform Built on 18A
+published_at: 2025-10-09
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://newsroom.intel.com/client-computing/intel-unveils-panther-lake-architecture-first-ai-pc-platform-built-on-18a
+locator: News Highlights、Panther Lake 與 Intel 18A 段落；first client SoC／first product、already in production、Fab 52 ramp、multi-chiplet architecture 與當時預計出貨／上市時程
+limitation: 公司公告把 Panther Lake、18A、RibbonFET、PowerVia 與 Foveros 放在同一平台敘事；不能把整體產品效能歸因給 PowerVia，也不能把 Intel 內部產品、production 或預計上市改寫成外部晶圓代工客戶、實際出貨量、良率或市占
+independence_group: intel
+-->
+
+<!-- research_source
+source_id: S23
+role: competitor_primary
+source_kind: document
+publisher: Intel
+title: CES 2026: Intel Core Ultra Series 3 Debut as First Built on Intel 18A
+published_at: 2026-01-05
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://newsroom.intel.com/client-computing/ces-2026-intel-core-ultra-series-3-debut-first-built-on-intel-18a
+locator: News Highlights 與 Availability 段落；Series 3 launch、200-plus design company claim、2026-01-06 preorder、2026-01-27 global system availability 及 edge Q1 2026
+limitation: 這是 Intel 的產品上市公告；design 數不是已售系統、處理器出貨、晶圓量、良率或 sell-through，預購與可供應日期也不證明所有地區、OEM、SKU 或通路都有相同庫存
+independence_group: intel
+-->
+
+<!-- research_source
+source_id: S24
+role: competitor_primary
+source_kind: document
+publisher: Intel
+title: Intel Technology Tour 2025 Summary - Panther Lake
+published_at: 2025-10-16
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://cdrdv2-public.intel.com/866361/ITT_2025_Panther_Lake_Recap1.pdf
+locator: PDF pp.26–29；p.26 列 compute／PCD／GPU 分工與 Foveros 2.5D，pp.27–29 三種配置皆把 Compute tile 標為 Intel 18A、PCD 標為 External；8-core 與 16-core／4Xe 的 GPU tile 標 Intel 3，16-core／12Xe 的 GPU tile 標 External；SHA-256 7ed40a155d887af40b65657efaafd3c22cdb290247c4c6643bd3e746bf160864
+limitation: 文件沒有可見發布日，published_at 以官方端點 HTTP Last-Modified 2025-10-16 為固定版本錨點；簡報沒有列出 External 的晶圓廠／節點、各 tile 面積與成本、封裝良率、PowerVia 實際覆蓋、產品出貨或 unit mix，GPU 製程又依配置而變，不能以單一 SKU 概括整個家族
+independence_group: intel
+-->
+
+<!-- research_source
+source_id: S25
+role: competitor_primary
+source_kind: living_index
+publisher: Intel
+title: Products formerly Panther Lake
+published_at:
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.intel.com/content/www/us/en/ark/products/codename/237132/products-formerly-panther-lake.html
+locator: 2026-08-23 查得 17 Products；15 個產品列示 Q1'26、2 個產品列示 Q2'26，並逐列提供產品名稱、核心、頻率、快取與 GPU
+limitation: ARK 是會更新的產品索引且頁面明示資料可能變更；17 是當日列示的 SKU census，不是 shipped units、可買到的 OEM systems、晶圓／封裝良率、退貨率、外部 foundry 客戶或 PowerVia 單獨貢獻
+independence_group: intel
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -691,6 +771,91 @@ verification_needed: 同一具名 frontside／backside 產品版本公開 rail r
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C22
+label: verified
+status: active
+claim: Intel 在 2024-08-06 表示 Panther Lake 與 Clearwater Forest 已於流片後 powered-on 並啟動作業系統，且 18A PDK 1.0 已提供；同篇所稱首位外部客戶預計於 2025 上半年流片，當時仍是前瞻里程碑
+supporting_source_ids: S21
+contrary_source_ids:
+as_of: 2024-08-06
+basis: S21 What’s New 直接把兩個內部產品的流片、powered-on／booted 與預計 2025 生產分列，More on Intel 18A 則另列 PDK 1.0；外部客戶使用 expected 語氣
+boundary: 開機證明該批早期矽可執行作業系統，不等於產品生產、上市、出貨、穩定良率或 field reliability；外部客戶預期不能回填成已完成 tape-out 或採用
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: Intel 於 2025-10-09 將 Panther Lake／Core Ultra Series 3 定位為第一個採用 18A 的 client 產品與 SoC，並表示它已進入生產；同篇把首批 SKU 出貨與 2026 年 1 月廣泛上市仍列為後續時程
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2025-10-09
+basis: S22 News Highlights 與 Panther Lake 段落直接分列 first client SoC／first product、already in production、first SKU slated to ship 與 broad market availability starting January 2026
+boundary: 這證實具名 Intel 內部產品已由開機走到生產，但當時的 slated／starting 仍是前瞻文字；production 不提供 wafer start、good die、yield、shipment 或外部 foundry customer 分母
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: Intel 於 2026-01-05 正式推出 Core Ultra Series 3，公告首批消費型筆電 2026-01-06 開放預購、2026-01-27 起全球供應，並稱該平台將驅動超過 200 個設計
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-01-05
+basis: S23 News Highlights 直接標示 launched 與 over 200 designs，Availability 段落列出 preorder、global systems available 與 edge Q1 2026 日期
+boundary: 上市與系統可供應讓產品時鐘再前進，但 200-plus designs 是公司所報設計數，不是已出貨／已售系統、處理器顆數、良率、退貨率或 field reliability；也不是外部 foundry 客戶數
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: Intel 的 Panther Lake 架構簡報把三種配置的 compute tile 都標為 Intel 18A、PCD 都標為 External；GPU tile 則依配置標 Intel 3 或 External。截至 2026-08-23，ARK 在同一代號下列出 17 個產品，其中 15 個列 Q1'26、2 個列 Q2'26
+supporting_source_ids: S24,S25
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S24 pp.27–29 對 8-core、16-core／4Xe、16-core／12Xe 逐 tile 標示製造來源，S25 當日索引列出 17 Products 及逐項 Launch Date；15／2 是對完整可見列的確定性計數
+boundary: 17 是可變動索引的 SKU census，不是隨機樣本、出貨量或供應狀態；External 沒有公開晶圓廠與節點，GPU 來源又隨配置改變，不能由品牌產品反推整顆封裝每一 tile 都採 18A／PowerVia，或把平台效能歸因給 PowerVia
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C26
+label: inference
+status: active
+claim: 背面供電的具名產品時鐘至少要把 PDK、內部設計流片、首次開機、生產／量產爬坡、處理器 SKU 上市、終端系統可供應、重複出貨與良率／field quality、外部 foundry 客戶採用、供應商財務九道門分開，並逐一固定 node、tile、package、SKU、OEM system 與 unit／wafer／lot 分母
+supporting_source_ids: S21,S22,S23,S24,S25
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S21 把 PDK、流片、開機與外部客戶預期分列，S22 讓同一內部產品前進至 production，S23 再提供 launch、preorder 與 system availability，S24／S25 顯示同一產品名下仍有 tile 與 SKU 分母；交集支持九門而非單一 production 標籤
+boundary: 九道門與產品證據護照是研究中心的閱讀框架，不是 Intel 或晶圓代工業共同認證；同一 Intel 產品時間序列不能替代獨立客戶、良率、field reliability、外部 foundry 採用、供應商資格或財務證據
+verification_needed: 同一具名產品以可重建共同鍵公開每個 tile／node、內外部客戶身分、tape-out／production／availability、wafer／lot／good-die yield、unit shipment／returns、field reliability、供應商 qualification／出貨與收入
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -763,6 +928,20 @@ trigger: 同一 frontside／backside 產品版本公開共同工作負載與 PVT
 invalidation: 若後續數字持續來自不同節點、試驗晶片、baseline 或只給 up to／or 的宣傳百分比，跨廠比較與單一技術歸因維持不可判定
 -->
 
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C22,C23,C24,C25,C26
+metric: 具名背面供電產品是否由內部開機、production、SKU／system availability 進一步走到可核對的重複出貨、良率、field quality、外部 foundry 客戶與供應商財務
+source_ids: S21,S22,S23,S24,S25
+watch_source_ids: S5,S25
+frequency: monthly
+frequency_detail: 每月核對 Intel Foundry 公告與 Panther Lake ARK；具名外部客戶 tape-out、產品、出貨、良率／可靠度或供應商財務出現時立即重審
+next_check: 2026-09-30
+trigger: 同一具名外部 foundry 客戶產品公開 tape-out、production、SKU／system availability、wafer／lot yield、unit shipment／field quality，並能接到供應商 qualification 與財務共同鍵
+invalidation: 若 18A 只由 Intel 內部產品承接、外部客戶持續不具名或取消，或上市 SKU／OEM designs 無法轉成穩定出貨、良率與 field quality，外部商業成熟度維持未證或下修
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -798,6 +977,13 @@ to: triaged
 reason: added_voltage_current_resistance_loss_and_hotspot_passport_without_thesis_clock_refresh
 evidence: sources:S18,S19,S20
 -->
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: added_named_product_boot_production_availability_and_package_denominator_without_thesis_clock_refresh
+evidence: sources:S21,S22,S23,S24,S25
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -820,6 +1006,10 @@ evidence: sources:S18,S19,S20
 - **N2P**：台積電 N2 家族的延伸製程，也是公司公開 A16 速度、功耗與密度指標所用的比較基準；比較 A16 和 N2P 不能自動拆出背面電軌的單獨貢獻。
 - **Intel 18A**：Intel 表示已於 2025 年進入生產的製程；本文不把這個里程碑與其他晶圓廠的量產用語直接排名。
 - **Intel 18A-P**：Intel 18A 家族的延伸製程；Intel 於 2026 年 6 月表示它已進入風險生產。
+- **Panther Lake／Core Ultra Series 3**：Panther Lake 是 Intel 客戶端處理器平台代號，上市名稱包含 Core Ultra Series 3；本文把它當成一個具名產品家族，不把平台名當成單一晶粒。
+- **Intel ARK**：Intel 的公開產品規格與型號索引；可用來核對當下列示的 SKU，但頁面會更新，listing 也不等於庫存、出貨或銷量。
+- **PCD／External**：PCD 是 Panther Lake 的 platform-controller tile；官方簡報把它標為 External，表示不是 Intel 18A compute tile，但沒有在該文件公布外部晶圓廠與節點。
+- **RibbonFET**：Intel 18A 的環繞閘極電晶體架構名稱；Panther Lake 同時使用 RibbonFET、PowerVia、Foveros 與多個 tile，不能把平台結果只歸因給其中一項。
 - **晶圓接合**：把製程晶圓固定到支撐載體，讓原本朝下的背面可以安全加工。
 - **支撐載體**：在晶圓變薄後提供機械支撐的暫時載體；有載體不等於整條製程已可量產。
 - **晶圓薄化**：從背面移除大量矽，使後續導通孔能在更短距離內接近前側電源軌。
@@ -830,6 +1020,14 @@ evidence: sources:S18,S19,S20
 - **背面對準**：晶圓接合、薄化甚至變形後，仍要從背面找到前側目標位置的製程能力。
 - **製程整合**：把元件、接合、薄化、對準、開孔、金屬與檢查串成可重複製造的完整流程。
 - **製程設計套件（PDK）**：晶圓廠提供給設計端的規則、模型與驗證資料；有新套件需求不等於本地 IP 公司已有授權收入。
+- **流片（Tape-out）**：設計資料完成並交給晶圓廠進入製造的里程碑；流片不表示晶片已做完、可開機、良率穩定或上市。
+- **Powered-on／booted（上電／開機）**：首次矽能通電，甚至啟動作業系統；它比流片多一層功能證據，但仍不是量產、出貨或長期可靠度。
+- **大量生產爬坡（High-volume production ramp）**：產線把產量逐步拉高的過程；公司說已開始爬坡，不等於公開了 wafer starts、良率或 good units。
+- **SKU（庫存單位）**：用型號區分可銷售產品的單位；同一架構可有多個 SKU，列出 17 個 SKU 不等於賣出 17 顆，也不代表 17 個獨立客戶。
+- **OEM design（品牌整機設計）**：筆電或系統品牌規劃採用某處理器的機種設計；design 數可能包含尚未上市或不同配置，不能直接當成已售系統。
+- **終端系統可供應**：消費者或企業可透過通路取得搭載該處理器的完整系統；公告供應日期仍要和地區、SKU、庫存及實際出貨分開。
+- **多晶粒產品（Multi-chiplet product）**：把運算、繪圖、I/O 等不同 tile 放進同一封裝；產品使用某先進節點，不表示封裝內每個 tile 都用同一節點或同一背面供電。
+- **內部產品／外部晶圓代工客戶**：內部產品由同一家公司設計並使用自己的製程；外部客戶則把第三方設計交給晶圓廠製造。前者成功不能自動證明後者已採用。
 - **設計技術共同最佳化（DTCO）**：設計與製程一起調整，讓電源、訊號、面積與製造限制能相互配合。
 - **風險生產**：製程已進入早期製造驗證，但仍不是成熟大量生產、外部客戶採用或穩定良率的同義詞。
 - **量產計畫**：公司對未來進入大量生產的時程安排；計畫不等於截至目前已完成量產。
@@ -907,6 +1105,7 @@ evidence: sources:S18,S19,S20
 - 同一道製程由不同晶圓廠以不同名稱實作時，哪些資料可以比較，哪些必須留在各自的成熟度時鐘？
 - 「動態電壓下陷降低 10 倍」和「電壓下陷改善超過 30%」看似衝突；在知道受測物、基準與活動向量前，為什麼其實不能比較？
 - 同樣少掉 30 毫伏，若原本供電是 0.75 伏或 0.50 伏，留給電晶體的相對裕量為什麼不同？
+- 公司說平台有 200 多個 design、產品索引有 17 個 SKU 時，為什麼仍不能推出處理器出貨量、良率或外部晶圓代工客戶數？
 
 ## 先用五個時鐘判斷成熟度
 
@@ -923,6 +1122,76 @@ evidence: sources:S18,S19,S20
 
 五個時鐘不是五個分數。設計研究可能領先，製程控制仍在收斂；晶圓廠可能公布量產計畫，
 供應商財務卻還沒有足夠證據。閱讀時只升級被新文件直接支持的那一格，其他格維持原狀。
+
+## 從成功開機到買得到產品：把第 4 個時鐘再拆九道門
+
+產品時鐘很像新餐廳開幕：廚房圖紙完成、第一次試菜、開始備料、正式開門、每天穩定出餐，
+是五件不同的事。半導體新聞裡的 PDK、tape-out、powered-on、production、launch 與
+availability 也不能壓成一句「已量產」。Panther Lake 正好提供一條具名、可按日期回查的例子：
+
+| 公告日期 | 文件直接支持的里程碑 | 當時仍不能推出 |
+|---|---|---|
+| 2024-08-06 | Intel 18A PDK 1.0 已釋出；Panther Lake 與 Clearwater Forest 已在流片後上電並啟動作業系統 | 2025 生產與首位外部客戶流片仍是預期，不是已發生結果 |
+| 2025-10-09 | Intel 把 Panther Lake／Core Ultra Series 3 稱為首個 18A client 產品，並表示已在 production | 首批 SKU 出貨與 2026 年 1 月廣泛上市在該公告仍是後續時程，沒有 wafer、yield 或 unit 分母 |
+| 2026-01-05 | Intel 正式 launch Series 3，列出 1 月 6 日預購、1 月 27 日起全球系統供應，並稱有 200-plus designs | design 是品牌整機規劃，不是已售系統、處理器出貨或外部 foundry 客戶數 |
+| 2026-08-23 查得 | Intel ARK 在 Panther Lake 代號下列 17 個產品：15 個標 Q1'26、2 個標 Q2'26 | 這是當日 SKU 索引，不是 17 個獨立客戶、17 顆銷量或通路庫存 |
+
+這條時間線證明的進步很具體：同一具名內部產品已從早期矽開機，走到 production、處理器上市
+與終端系統可供應。它沒有證明的也同樣重要：2024 年文件只說首位外部客戶「預計」流片；後三份
+產品資料都在談 Intel 自己的產品。因此，**Intel 內部產品跨過產品門，不等於外部晶圓代工客戶已跨過
+採用門**。
+
+### 九道門逐一蓋章，缺的不要替公司補
+
+| 產品時鐘的九道門 | 它回答什麼 | Panther Lake 本輪位置 | 下一份能升級的證據 |
+|---|---|---|---|
+| 1. PDK 可用 | 設計端是否拿得到規則、模型與流程 | PDK 1.0 已公布 | 外部設計完成 signoff 的版本與日期 |
+| 2. 設計流片 | 設計資料是否已送入製造 | 兩個 Intel 內部 lead products 已流片 | 具名外部客戶與產品 tape-out |
+| 3. 首次上電／開機 | 首批矽能否通電並執行基本功能 | 2024 年已 powered-on／booted | 多顆、跨 lot 的功能與 qualification 分布 |
+| 4. Production／爬坡 | 產線是否開始製造並提高產量 | Intel 2025 年稱 Panther Lake 已在 production | wafer starts、good die、yield 與爬坡曲線 |
+| 5. 處理器 SKU 上市 | 是否有具名可銷售處理器 | 2026 年正式 launch；ARK 有具名 SKU | 持續供貨、產品組合與實際 unit shipment |
+| 6. 終端系統可供應 | OEM 整機是否能讓客戶取得 | 公告 1 月 27 日起全球供應 | 地區／通路庫存、sell-through 與重複訂單 |
+| 7. 穩定量與品質 | 重複生產是否維持良率與 field quality | 公開資料不足 | wafer／lot／unit、returns、failure-rate 與 reliability |
+| 8. 外部 foundry 客戶 | 第三方設計是否真的採用同一製程 | 2024 年只有未具名、前瞻的 tape-out 預期 | 具名客戶、產品、production 與出貨共同鍵 |
+| 9. 供應商與財務 | 哪個工具／材料通過資格並形成多少生意 | 台灣公司仍未證 | 雙向 qualification、出貨、價格、收入與毛利 |
+
+這九道門不是規定每家公司只能依固定順序公告；它們是防止讀者把不同動詞混用的查核表。
+例如 production 可以早於公開 SKU，OEM design 也可能在處理器上市前啟動；但後一格的新聞不能
+回頭替前一格補出沒公布的 yield、units 或客戶身分。
+
+### 同一個 Panther Lake，還要分 tile、SKU 與 OEM system
+
+Intel 的架構簡報把三種 Panther Lake 配置的 compute tile 都標為 Intel 18A，PCD 都標為 External；
+GPU tile 則分成兩條路：8-core 與 16-core／4Xe 版本標 Intel 3，16-core／12Xe 版本標 External。
+這代表「一款 18A 產品」是封裝／平台層描述，不是「封裝內每片矽都由 18A 製造」；文件也沒有說
+External tile 的晶圓廠與節點。再往市場走，ARK 的 17 個 SKU 是處理器型號，Intel 所稱
+200-plus designs 是品牌整機設計，最後消費者買到的才是筆電或 edge system。三個分母不能互換：
+
+| 物件分母 | 最少要記什麼 | 最常見的錯譯 |
+|---|---|---|
+| Tile／製程 | compute、GPU、controller 各用什麼節點與供電架構 | 一個產品用 18A＝每個 tile 都用 PowerVia |
+| Package／處理器 SKU | 哪些 tile 組合、封裝、型號與 launch date | 17 個 SKU＝17 個客戶或 17 顆出貨 |
+| OEM system design | 品牌、機種、地區、上市／取消狀態 | 200-plus designs＝200 多台已售系統 |
+| Unit／wafer／lot | 生產、出貨、銷售、退貨與良率的數量及期間 | available／production＝高良率且大量 sell-through |
+
+因此讀具名產品時，至少保存八欄產品證據護照：**node 與版本、tile 身分、package／SKU、內部或
+外部客戶、里程碑動詞與日期、availability／地區、unit／wafer／lot 與品質分母、技術歸因及供應商
+財務共同鍵**。最後一欄要把 RibbonFET、PowerVia、Foveros、其他 tile、軟體與系統設計分開；
+平台效能再好，也不能在沒有共同對照時全算給 PowerVia。
+
+**較強的多方版本**是 Intel 內部產品之後，至少一個具名外部 foundry 客戶也能從 tape-out 走到
+production、SKU／system availability，並公開跨 wafer／lot 的 good-die yield、unit shipment、
+returns／field quality；同一期間又能由設備或材料商雙向核對 qualification、出貨與財務分母。
+
+**較強的空方版本**是 18A 主要由 Intel 內部產品承接，外部客戶長期停在未具名或 tape-out 階段；
+同時 SKU 與 OEM design 很多，卻沒有穩定 units、yield、sell-through 或 field-quality 證據。多晶粒
+產品還會讓 platform 成果混合 18A compute tile、外部 tiles、封裝與系統設計，削弱 PowerVia 單一歸因。
+
+本輪有 N＝5 份 Intel 官方來源紀錄，但全屬 N＝1 條公司消息鏈與 N＝1 個具名 client 產品家族，
+不是五個獨立客戶或五次獨立量產實驗。17 是 2026-08-23 當日 ARK 完整列示的 SKU census，
+200-plus 是 Intel 公告的 design 數；兩者都不是抽樣，也不是出貨。具名外部 foundry 客戶產品、
+wafer／lot／good-die yield、unit shipment、sell-through、returns／field quality、PowerVia 增量貢獻與
+供應商財務共同觀測皆 N＝0，因此沒有可報的 sampling SE／t，也不判斷估值、價格或市場是否反映。
 
 ## 看到百分比，先填八格比較護照
 
@@ -1162,11 +1431,16 @@ Lam 與 imec 的 nTSV／BPR 研究讓這條診斷鏈變得具體：如果孔和�
 - [NIST：SI Units—Electric Current](https://www.nist.gov/pml/owm/si-units-electric-current)（volt、watt、ampere 與 ohm 的量綱關係）。
 - [IBM Research：DC current crowding in TSV-based 3-D connections](https://research.ibm.com/publications/analysis-and-modeling-of-dc-current-crowding-for-tsv-based-3-d-connections-and-power-integrity)（平均與局部電流密度、單電阻模型及 hotspot 邊界）。
 - [IBM Research：BSPDN 與 chiplet 的 BEOL thermal resistance](https://research.ibm.com/publications/fast-and-accurate-machine-learning-prediction-of-back-end-of-line-thermal-resistances-in-backside-power-delivery-and-chiplet-architectures)（BSPDN chip-package 熱路徑與 maximum-hotspot model sensitivity）。
+- [Intel Foundry：Intel Foundry Achieves Major Milestones](https://newsroom.intel.com/intel-foundry/intel-foundry-achieves-major-milestones)（PDK 1.0、內部產品流片後開機與當時仍屬前瞻的外部客戶里程碑）。
+- [Intel：First AI PC Platform Built on 18A](https://newsroom.intel.com/client-computing/intel-unveils-panther-lake-architecture-first-ai-pc-platform-built-on-18a)（Panther Lake 由開機走到 production，以及當時尚待發生的 SKU 出貨／上市時程）。
+- [Intel：Core Ultra Series 3 Debut](https://newsroom.intel.com/client-computing/ces-2026-intel-core-ultra-series-3-debut-first-built-on-intel-18a)（launch、預購、終端系統可供應與 200-plus OEM-design 公司主張）。
+- [Intel：Panther Lake Architecture Recap](https://cdrdv2-public.intel.com/866361/ITT_2025_Panther_Lake_Recap1.pdf)（pp.27–29 的 compute／PCD／GPU tile 製程配置差異）。
+- [Intel ARK：Products formerly Panther Lake](https://www.intel.com/content/www/us/en/ark/products/codename/237132/products-formerly-panther-lake.html)（2026-08-23 查得的 17 個 SKU 與 launch-quarter 索引）。
 
-本輪合計以十八份一手文件或官方頁面，分開建立技術機制、量測比較、設計取捨、電力—熱邊界、
-製程控制、晶圓廠路線圖與外部具名設備產品。它們沒有提供跨公司共同良率、同一客戶產品、設備
-台數、供應商份額、價格或財務分母，也沒有一致預期、估值或即時部位資料，因此本文不判斷題材
-是否已反映。
+本篇明列二十三份一手文件或官方頁面，分開建立技術機制、量測比較、設計取捨、電力—熱邊界、
+製程控制、晶圓廠路線圖、外部具名設備產品與 Intel 具名內部產品時鐘。它們沒有提供跨公司共同
+良率、具名外部 foundry 客戶、處理器出貨、設備台數、供應商份額、價格或財務分母，也沒有一致
+預期、估值或即時部位資料，因此本文不判斷題材是否已反映。
 台積電是觀察層公司；Applied Materials 與 Lam Research 只作外部能力和產品錨點。不能因
 它們出現在技術鏈，就把 universe 內設備、材料或 IP 公司自動連成供應鏈。
 

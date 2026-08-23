@@ -575,3 +575,43 @@ status: active
 boundary: 本文固定 30mV 或 100W／0.2mΩ 的數值全是假想量綱教材；IBM TSV current-crowding 機制不能直接外推 nano-TSV，BSPDN thermal abstract 也沒有產品溫度與冷卻分布。
 next_trigger: 同一具名產品以可重現方法公開 mV／rail percentage、total／local current-density、path loss、thermal resistance、hotspot distribution 及 die／wafer／lot reliability。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-BSP-I25
+view: industry
+from_id: concept:backside-power
+to_id: process:backside-product-maturity-passport
+relation: requires
+claim_refs: MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C22,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C23,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C24,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C26
+note_refs:
+evidence_state: inference
+commercial_stage: production
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: 九道門是把 Intel 同一內部產品的 PDK、流片、開機、production、上市與供應時點拆開的研究框架；不是產業共同認證，也不證明重複出貨、良率、外部 foundry 客戶或供應商財務。
+next_trigger: 同一具名外部 foundry 客戶產品逐門公開 tape-out、production、SKU／system availability、wafer／lot yield、unit shipment／field quality 及供應商財務共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-BSP-I26
+view: industry
+from_id: concept:backside-power
+to_id: metric:node-tile-sku-system-volume-boundary
+relation: measured_by
+claim_refs: MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C25,MI-2026-08-02-BACKSIDE-POWER-DELIVERY#C26
+note_refs:
+evidence_state: inference
+commercial_stage: production
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: Panther Lake 的 compute tile、PCD、GPU tile、處理器 SKU 與 OEM design 是不同物件分母；ARK 列示與 design 數不能取代 units、wafer／lot yield、外部客戶或 PowerVia 增量歸因。
+next_trigger: 具名產品公開各 tile／node、package／SKU、OEM system、unit／wafer／lot、quality 與 external-customer 對應，且能跨文件重建。
+-->

@@ -5136,6 +5136,26 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 設計與電力完整性 |", "| 2. 背面製程成形 |",
             "| 3. 製程控制與可靠度 |", "| 4. 晶圓節點與客戶產品 |",
             "| 5. 供應商資格與財務轉換 |",
+            "added_named_product_boot_production_availability_and_package_denominator_without_thesis_clock_refresh",
+            "thesis_claim_id: C6", "last_reviewed_at: 2026-08-12",
+            "review_due: 2026-08-16", "base_confidence: medium",
+            "## 從成功開機到買得到產品：把第 4 個時鐘再拆九道門",
+            "| 2024-08-06 | Intel 18A PDK 1.0 已釋出",
+            "| 2026-01-05 | Intel 正式 launch Series 3",
+            "15 個標 Q1'26、2 個標 Q2'26",
+            "Intel 內部產品跨過產品門，不等於外部晶圓代工客戶已跨過\n採用門",
+            "### 九道門逐一蓋章，缺的不要替公司補",
+            "| 1. PDK 可用 |", "| 2. 設計流片 |", "| 3. 首次上電／開機 |",
+            "| 4. Production／爬坡 |", "| 5. 處理器 SKU 上市 |",
+            "| 6. 終端系統可供應 |", "| 7. 穩定量與品質 |",
+            "| 8. 外部 foundry 客戶 |", "| 9. 供應商與財務 |",
+            "### 同一個 Panther Lake，還要分 tile、SKU 與 OEM system",
+            "8-core 與 16-core／4Xe 版本標 Intel 3",
+            "16-core／12Xe 版本標 External",
+            "| Tile／製程 |", "| Package／處理器 SKU |",
+            "| OEM system design |", "| Unit／wafer／lot |",
+            "17 是 2026-08-23 當日 ARK 完整列示的 SKU census",
+            "具名外部 foundry 客戶產品、\nwafer／lot／good-die yield",
             "## 看到百分比，先填八格比較護照",
             "| 八格比較護照 | 要記下什麼 | 少了會讀錯什麼 |",
             "| 1. 受測物與成熟度 |", "| 3. 固定條件 |",
@@ -5192,14 +5212,18 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S10", "source_id: S13", "source_id: S17",
             "source_id: S18", "source_id: S19", "source_id: S20",
             "claim_id: C18", "claim_id: C19", "claim_id: C20", "claim_id: C21",
-            "monitor_id: T4", "monitor_id: T5", "PROVision 10",
+            "source_id: S21", "source_id: S22", "source_id: S23",
+            "source_id: S24", "source_id: S25",
+            "claim_id: C22", "claim_id: C23", "claim_id: C24",
+            "claim_id: C25", "claim_id: C26",
+            "monitor_id: T4", "monitor_id: T5", "monitor_id: T6", "PROVision 10",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 68
+            sum(line.startswith("- **") for line in glossary.splitlines()), 80
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5216,9 +5240,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 20),
-            ("research_claim", 21), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 5),
+            ("research_topic", 1), ("research_source", 25),
+            ("research_claim", 26), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -5257,6 +5281,8 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:conditional-ppa-comparison,metric,條件式效能功耗面積比較",
             "process:backside-electrothermal-passport,process,背面供電電力—熱十欄護照",
             "metric:rail-current-drop-loss-hotspot-boundary,metric,電壓、電流、壓降、損耗與熱點邊界",
+            "process:backside-product-maturity-passport,process,背面供電具名產品成熟度護照",
+            "metric:node-tile-sku-system-volume-boundary,metric,節點、晶粒、SKU、整機與產量分母",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 背面供電路徑與製程接力", graph)
@@ -5275,9 +5301,11 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-BSP-I22", "to_id: metric:conditional-ppa-comparison",
             "edge_id: KG-BSP-I23", "to_id: process:backside-electrothermal-passport",
             "edge_id: KG-BSP-I24", "to_id: metric:rail-current-drop-loss-hotspot-boundary",
+            "edge_id: KG-BSP-I25", "to_id: process:backside-product-maturity-passport",
+            "edge_id: KG-BSP-I26", "to_id: metric:node-tile-sku-system-volume-boundary",
         ):
             self.assertIn(edge, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 28)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 30)
 
     def test_compute_connect_station_four_separates_three_axis_optics_and_evidence_gates(self):
         topic = (
