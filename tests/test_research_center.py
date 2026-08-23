@@ -5272,6 +5272,18 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 交換晶片內部 |", "| 2. 晶片到轉換器的高速電路 |",
             "| 3. 電光轉換位置 |", "| 4. 雷射與光纖耦合 |",
             "| 5. 光纖與下一台設備 |",
+            "added_q3450_endpoint_pair_boundary_without_thesis_or_clock_refresh",
+            "## 一個 CPO 連接埠，不等於光纖兩端都沒有可插拔模組",
+            "| CPO ↔ CPO | MPO 直接連到本地 CPO data port |",
+            "| CPO ↔ pluggable switch | 本地 CPO | 1.6T dual-port XDR transceiver",
+            "| CPO ↔ pluggable compute | 本地 CPO | 800G single-port XDR transceiver",
+            "這是同一份官方手冊尚未解決的衝突",
+            "72 個 MPO、每個承接兩個",
+            "144 個 MPO、一對一承接",
+            "因此 144 CPO data ports 不是 144 顆模組被取代",
+            "| 4. 料號與 ports per module |",
+            "| 8. 商業共同鍵 |",
+            "### 多空小作文：同一份 endpoint mix，兩邊才有共同分母",
             "## 不要把架構畫成一條線：先拆三個獨立決策軸",
             "| 1. 光引擎位置 |", "| 2. 電介面訊號處理 |",
             "| 3. 雷射位置 |", "CPO 光引擎 + 外部 ELSFP 雷射",
@@ -5321,6 +5333,9 @@ class ResearchCenterTest(unittest.TestCase):
             "| 十欄光功率護照 | 至少保存什麼 | 少了最容易被誤寫成 |",
             "Python `Decimal` 與獨立 `awk` 浮點路徑",
             "source_id: S14", "claim_id: C14", "claim_id: C15",
+            "source_id: S15", "source_id: S16",
+            "claim_id: C16", "claim_id: C17",
+            "claim_id: C18", "claim_id: C19", "monitor_id: T4",
             "source_id: S12", "source_id: S13",
             "claim_id: C11", "claim_id: C12", "claim_id: C13",
             "claim_id: C9", "correction_kind: supersedes",
@@ -5331,7 +5346,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 64
+            sum(line.startswith("- **") for line in glossary.splitlines()), 71
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5346,9 +5361,10 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 14),
-            ("research_claim", 15), ("metric_comparison", 0),
-            ("impact", 1), ("monitoring_item", 3),
+            ("research_topic", 1), ("transition", 10),
+            ("research_source", 16), ("research_claim", 19),
+            ("metric_comparison", 0), ("impact", 1),
+            ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -5383,6 +5399,8 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:zero-event-reliability-bound,metric,零事件可靠度單側界線",
             "process:cpo-optical-power-budget-passport,process,CPO 光功率預算十欄護照",
             "metric:worst-case-optical-power-margin,metric,最差條件光功率兩端裕量",
+            "concept:optical-link-endpoint-pairing,concept,光鏈路端點配對",
+            "process:cpo-endpoint-pair-deployment-passport,process,CPO 端點配對部署護照",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 光學三軸組態與產品證據", graph)
@@ -5397,9 +5415,11 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-CPO-I13", "to_id: metric:zero-event-reliability-bound",
             "edge_id: KG-CPO-I14", "to_id: process:cpo-optical-power-budget-passport",
             "edge_id: KG-CPO-I15", "to_id: metric:worst-case-optical-power-margin",
+            "edge_id: KG-CPO-I16", "to_id: concept:optical-link-endpoint-pairing",
+            "edge_id: KG-CPO-I17", "to_id: process:cpo-endpoint-pair-deployment-passport",
         ):
             self.assertIn(edge, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
 
     def test_compute_connect_station_five_separates_exposure_cost_roles_and_company_gates(self):
         topic = (

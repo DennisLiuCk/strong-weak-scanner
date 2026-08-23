@@ -1,7 +1,8 @@
 # AI 光學三軸組態與產品證據知識圖譜
 
-本圖先把交換晶片、電光轉換與光纖路徑串起來，再把光引擎位置、電介面訊號處理與雷射位置
-拆成三個可獨立核對的軸，最後連回平台產品、具名生態系角色、互通／現場驗證與公司財務。
+本圖先把交換晶片、電光轉換與光纖路徑串起來，把一條鏈路的近端／遠端配對與 port／module
+分母固定，再把光引擎位置、電介面訊號處理與雷射位置拆成三個可獨立核對的軸，最後連回平台
+產品、具名生態系角色、互通／現場驗證與公司財務。
 線條較粗只能代表已公開的標準、角色或成熟度；沒有具名組態、部署、出貨、份額與損益證據前，
 不代表某個排列組合已商品化，也不代表供應商已取得重大經濟利益。
 
@@ -10,7 +11,7 @@ schema_version: 1
 graph_id: cpo-networking
 root_node_id: concept:cpo-networking
 label: AI 光學三軸組態與產品證據
-summary: 以交換晶片到光纖的五個位置，拆開光引擎 placement、retimed／linear 訊號處理與 integrated／external laser，再連接 Spectrum-X、可插拔產品、NVIDIA、SPIL、Lumentum、互通部署分母與財務證據。
+summary: 以交換晶片到光纖的五個位置，先拆 endpoint pairing、官方 connector 衝突與 port／module 分母，再拆光引擎 placement、retimed／linear 訊號處理與 integrated／external laser，連接 Q3450、Spectrum-X、可插拔產品、NVIDIA、SPIL、Lumentum、互通部署分母與財務證據。
 article_ids: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
 status: active
 -->
@@ -373,4 +374,44 @@ review_due: 2026-08-26
 status: active
 boundary: A／B 的 +1.5／−0.5 dB low-power margin 與 +0.5／+2.5 dB overload headroom 是 N=2 個假想光路的確定性教材；不是 CPO、ELSFP、Ethernet、lane、module、switch、run、sampling SE／t 或商業結果。
 next_trigger: 具名產品以共同 reference points、mean／OMA／OSNR 定義、end-of-life corners 與 BER／FEC 契約公開兩端 margin、raw measurements、跨廠矩陣及客戶 qualification。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-I16
+view: industry
+from_id: concept:cpo-networking
+to_id: concept:optical-link-endpoint-pairing
+relation: includes
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C16,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C17
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: NVIDIA Q3450 正式手冊直接列出 CPO↔CPO、CPO↔pluggable switch 與 CPO↔pluggable compute 的支援拓撲；同一手冊對 72／144 MPO connectors 尚有衝突，兩個數都不得做 module 算術，且不證明三種配對的客戶 deployed mix、模組數、出貨或財務。
+next_trigger: NVIDIA 先在同一 revision 裁決 72／144 MPO 與一對一／一對二 port mapping；客戶或平台再公開逐鏈路 endpoint-pair BOM、part number、ports per module 與 installed／active／spare census。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-I17
+view: industry
+from_id: concept:cpo-networking
+to_id: process:cpo-endpoint-pair-deployment-passport
+relation: requires
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C18
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-30
+status: active
+boundary: 八欄端點配對部署護照是研究中心依 Q3450 拓撲提出的需求分母框架，不是 NVIDIA 標準或市場統計；欄位齊全也不自動證明淨模組減量、成本、供應商份額或財務。
+next_trigger: 同一具名 deployment 以共同版本與期間公開端點、料號、每模組埠數、installed／active／spare、維修、baseline 及採購／shipment／財務對帳。
 -->

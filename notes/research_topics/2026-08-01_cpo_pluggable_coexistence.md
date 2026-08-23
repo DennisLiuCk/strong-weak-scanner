@@ -246,6 +246,38 @@ limitation: 這是 ITU 光傳輸系統的通用設計方法，不是 CPO、ELSFP
 independence_group: itu-optical-engineering
 -->
 
+<!-- research_source
+source_id: S15
+role: company_release
+source_kind: living_index
+publisher: NVIDIA
+title: Q32xx and Q34xx XDR 800Gb/s InfiniBand Switch Systems User Manual
+published_at:
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://networking-docs.nvidia.com/xdrswitcheshw/
+locator: Cable Installation（2026-05-14）Splitting Options 的 72 MPO／每接頭兩個 ports／144 XDR data ports／no OSFP cages 與 Q3450 CPO topology；Overview Ordering Information 的 144 XDR ports over 144 MPO connectors；Specifications（2026-08-21）的 144 MPO connectors；FRU Replacements 的 144 lasers 與一顆 laser 對一個 MPO；Introduction 的獨立 OSFP in-band management port
+limitation: 同一 NVIDIA 手冊對 Q3450 前面板 MPO connectors 有未解衝突：Cable Installation 寫 72×2 ports，Overview／Specifications／FRU 指向 144×1；因此只能鎖定 144 XDR data ports、Q3450 本地 XDR data ports 不使用 OSFP cages 與支援拓撲，不能選一個 connector 數做 BOM／module 算術，也不是客戶 installed-base、實際端點配比、transceiver shipment 或財務資料
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: living_index
+publisher: NVIDIA
+title: NVIDIA Silicon Photonics
+published_at:
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.nvidia.com/en-us/networking/products/silicon-photonics/
+locator: Introduction／Lower TCO 的 CPO switch-side pluggable replacement；Products 的 Q3450 144-port listing；Powering on NVIDIA Quantum-X InfiniBand Photonics Switch 的 GB300 racks with OSFP pluggable optical modules
+limitation: 活頁混合 NVIDIA 產品定位、效益 headline、產品清單與展示影片說明；只能用來追現行架構與遠端可插拔共存，不證明客戶部署占比、淨模組減量、跨架構效益、成本或財務結果
+independence_group: nvidia
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -460,6 +492,62 @@ verification_needed: 同一具名 CPO／ELS 組合與版本的 application profi
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: NVIDIA Q3450-LD 手冊可確認 144 個 fixed four-lane XDR data ports 直接以 MPO 接單模光纖，且這些本地 XDR data ports 不使用 OSFP cages；但同一手冊對前面板是 72 個 MPO、每個承接兩個 ports，或 144 個 MPO、一對一承接，存在尚未解決的官方頁面衝突
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S15 Cable Installation 直接寫 72 MPO×每接頭兩個 ports＝144 ports，Overview／2026-08-21 Specifications 則寫 144 MPO，FRU 又寫 144 lasers 與一顆 laser 一對一映射一個 MPO；各頁對 144 XDR ports 並不衝突，且 Cable Installation 明列 Q3450 本地 XDR data ports 不使用 OSFP cages
+boundary: 72／144 MPO 都不能當已裁決分母，也不能由任一版本推 module 數；no OSFP cages 只指 Q3450 的 XDR data ports，Introduction 明列全系列另有獨立 OSFP InfiniBand in-band management port，手冊亦未提供客戶安裝或出貨分母
+verification_needed: NVIDIA 在同一 revision 公開一致的前面板圖、cabling／port notation、Specifications 與 FRU mapping，明確裁決每個 MPO 承接一個或兩個 XDR ports
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: NVIDIA 的 Q3450 正式拓撲同時列出 CPO switch 直連另一台 CPO switch、透過 1.6T dual-port XDR transceiver 連 pluggable XDR switch，以及透過 800G single-port XDR transceiver 連 pluggable XDR HCA／compute side；因此一個 switch-side CPO data port 不代表鏈路遠端也沒有可插拔模組
+supporting_source_ids: S15,S16
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S15 Q3450 CPO topology table 直接列兩個 transceiver 料號、遠端 switch／HCA 角色與可連 transceiver 或 CPO switch 的 MPO cable；S16 現行產品頁另描述 Q3450 連 GB300 racks 使用 OSFP pluggable optical modules
+boundary: 這只證明 NVIDIA 支援的端點組合與展示，不證明三種路徑的客戶實際占比、每顆 dual-port 模組利用率、installed ports、出貨量、故障備品或供應商財務
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: CPO 與可插拔的需求或替代分析必須以逐條鏈路的 endpoint pair、transceiver part number、ports per module 與 deployed-link mix 為共同分母；不能把 Q3450 的 144 個 CPO data ports 機械換成 144、288 或零顆被取代／保留的 pluggable modules
+supporting_source_ids: S15,S16
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S15 同一具名 switch 同時容許 CPO／CPO、CPO／dual-port pluggable switch 與 CPO／single-port pluggable compute 三種端點配對，且 port 與 module 分母不固定一對一；S16 同頁並列 local CPO replacement 與 remote OSFP demonstration
+boundary: 逐鏈路端點護照是研究中心推論，不是 NVIDIA 標準或市場統計；目前沒有 deployed-link census、備品率、模組共用、價格、跨世代比較或供應商 shipment／財務共同鍵
+verification_needed: 具名客戶以同一版本與期間公開 switch／compute topology、每條鏈路兩端、part number、ports per module、installed／active／spare counts、故障替換及採購／出貨／財務對帳
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: unverified
+status: active
+claim: Q3450 客戶部署的 CPO↔CPO、CPO↔pluggable switch 與 CPO↔pluggable compute 實際配比、遠端 OSFP 數量、dual-port 使用率、淨模組減量與供應商財務貢獻已公開
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S15／S16 只提供支援拓撲、料號、產品定位與展示文字，沒有 installed-link census、客戶 BOM、採購、shipment 或財務分子
+boundary: 未公開不等於遠端模組一定多或一定少；不以 144 ports、產品頁的 eliminate 用語、單支展示影片或 topology support 機械推估市場占比、TAM、營收或估值
+verification_needed: 客戶或 NVIDIA 公開同版 endpoint-pair BOM／port census，並由 transceiver 供應商以相同期間的出貨、價格、收入與毛利雙向核對
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -502,6 +590,20 @@ frequency_detail: 每兩週核對 OIF current work、平台產品與公司正式
 next_check: 2026-08-26
 trigger: 同一具名產品首次公開三軸組態，並至少提供跨廠互通、應用 link budget、現場更換／可靠度或客戶部署分母之一
 invalidation: 若後續多個產品世代仍把位置、訊號處理與雷射固定成不可拆的單一組合，且 NPO／ELS 長期沒有具名實作或互通結果，三軸作為商用產品組合框架的信心下修
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C16,C17,C18,C19
+metric: Q3450／後續 CPO 部署的 CPO↔CPO、pluggable switch、pluggable compute endpoint mix，以及 part number、ports per module、installed／active／spare modules 與供應商財務共同鍵
+source_ids: S15,S16
+watch_source_ids: S15,S16
+frequency: event_driven
+frequency_detail: NVIDIA 手冊、產品頁或客戶拓撲更新時重審；首份具名 endpoint-pair BOM／port census 出現即提前核對
+next_check: 2026-09-30
+trigger: 客戶或平台公開逐鏈路兩端、transceiver 料號、每模組埠數、installed／active／spare counts，並能與供應商 shipment／財務同期間對帳
+invalidation: 主要部署轉成 CPO↔CPO、compute side 也整合光學而使遠端 OSFP 接近零，或正式手冊移除 remote-transceiver 路徑時，下修可插拔共存與需求邊界
 -->
 
 <!-- transition
@@ -560,6 +662,13 @@ to: triaged
 reason: added_two_sided_worst_case_optical_power_budget_without_thesis_or_clock_refresh
 evidence: sources:S8,S10,S14
 -->
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: added_q3450_endpoint_pair_boundary_without_thesis_or_clock_refresh
+evidence: sources:S15,S16
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -579,6 +688,13 @@ evidence: sources:S8,S10,S14
 - **ELSFP**：OIF 定義的前面板可插拔外部雷射形式，以 blindmate 光電連接器讓失效光源可在現場替換；它不是完整資料收發光模組。
 - **前面板**：交換器機箱面向維修人員、安裝光模組與光纖接頭的位置。
 - **連接埠**：交換器對外收送一條連線的介面；產品開始生產不等於已知部署了多少個連接埠。
+- **鏈路端點（link endpoint）**：一條光連線的其中一端；判斷 CPO 是否取代可插拔模組時，必須把交換器端與另一台交換器或運算設備端分開記錄。
+- **OSFP**：可插拔高速光收發器使用的一種實體外形與插槽；本文的 1.6T dual-port 與 800G single-port 是不同料號，不能把 port 數直接當 module 數。
+- **MPO connector**：一次接合多芯光纖的前面板接頭；它負責把光纖接到設備，不等於接頭本身就是可插拔收發模組。
+- **Q3450-LD**：NVIDIA Quantum-X800 系列的具名共同封裝光學交換器；本文只用它示範正式支援的端點配對，不把單一型號當成全市場部署樣本。
+- **XDR port**：NVIDIA Q3450 手冊對其 800Gb/s InfiniBand 資料介面使用的產品語彙；XDR port 數不等於 OSFP module 數。
+- **HCA（Host Channel Adapter）**：運算設備連接 InfiniBand 網路的介面卡；本文的 pluggable compute endpoint 指光纖另一端接到這類介面。
+- **GB300 rack**：NVIDIA 的具名運算機櫃世代；產品頁展示它以 OSFP modules 連 Q3450，只能證明可支援／展示的遠端形式，不是客戶 installed-base。
 - **高速序列介面（SerDes）**：把資料轉成高速序列電訊號並在另一端還原的電路；速度愈高，傳輸距離、耗電與訊號完整性愈難兼顧。
 - **Tx／Rx**：Tx 是送出光訊號的 transmitter，Rx 是接收並解碼的 receiver；link budget 必須把 Tx 的上下限和 Rx 的太暗、太亮界線成對核對。
 - **光訊號處理晶片（DSP）**：在光模組中處理高速訊號補償與轉換的晶片；晶片大量出貨不等於整體模組市場只剩一種架構。
@@ -681,6 +797,56 @@ evidence: sources:S8,S10,S14
 五個位置是閱讀資料流的最短路徑，不是完整交換器設計圖。真正要記住的是：第三格的光引擎
 可以在前面板、板上／近封裝或共同封裝；第四格的雷射又可以留在光引擎內或移到外部。只寫
 「CPO」仍沒有說完訊號如何處理、光從哪裡來，以及哪個單元能在現場更換。
+
+## 一個 CPO 連接埠，不等於光纖兩端都沒有可插拔模組
+
+一條光鏈路像一座橋，左右兩端各有自己的電光轉換方式。看到交換器這一端使用 CPO，只能說
+**本地 data port** 不再把離散收發器插進前面板；還要再看光纖另一端接的是另一台 CPO switch、
+傳統可插拔 switch，還是運算設備的可插拔網路介面。少看一端，就會把「本地少一顆模組」誤寫成
+「整條鏈路兩端都沒有模組」。
+
+NVIDIA Q3450 手冊提供一個具名例子：144 個 XDR data ports 直接以 MPO 出纖，本地 data ports
+沒有 OSFP cages；但精確接頭數不能直接抄表。佈線頁寫 72 個 MPO、每個承接兩個 ports，
+總覽、2026-08-21 規格頁與可更換元件對照卻指向 144 個 MPO、一對一承接。
+這是同一份官方手冊尚未解決的衝突，所以本文只鎖定 144 data ports 與端點拓撲，不用 72 或
+144 MPO 做模組算術。[S15] NVIDIA 現行產品頁
+也一面說 CPO switch-side 取代 pluggable transceiver，一面展示 Q3450 連接使用 OSFP pluggable
+optical modules 的 GB300 racks。[S16]
+
+| 一條鏈路的端點配對 | Q3450 近端 | 光纖遠端 | 正確讀法 |
+|---|---|---|---|
+| CPO ↔ CPO | MPO 直接連到本地 CPO data port | 另一台 CPO switch | 這條 switch-to-switch data link 的兩端都可不放離散 data transceiver；不能外推整台設備沒有獨立管理用 OSFP |
+| CPO ↔ pluggable switch | 本地 CPO | 1.6T dual-port XDR transceiver，接 pluggable XDR switch | 本地模組消失、遠端仍保留；一顆 dual-port part 可承接兩個 ports，module 與 port 不是一比一 |
+| CPO ↔ pluggable compute | 本地 CPO | 800G single-port XDR transceiver，接 pluggable XDR HCA／運算端 | switch-side CPO 與 compute-side pluggable 可以同時存在；支援拓撲不等於已知部署占比 |
+
+因此 144 CPO data ports 不是 144 顆模組被取代，也不是 288 顆兩端模組全部消失，更不是
+整個網路保留零顆可插拔模組。正確分母必須落到逐條鏈路：兩端各是什麼、使用哪個料號、一顆
+module 承接幾個 ports，以及三種 endpoint pairs 實際部署多少條。
+
+一份可重建的端點配對部署護照至少要保留八欄：
+
+| 端點護照欄位 | 要保存什麼 | 少了最容易誤判成 |
+|---|---|---|
+| 1. 系統與文件版本 | switch／HCA 型號、硬體與手冊 revision | 所有 CPO 世代都支援同一拓撲 |
+| 2. 近端角色 | CPO、pluggable 或其他 optical-engine placement | 看到產品名就知道本地 module 數 |
+| 3. 遠端角色 | CPO switch、pluggable switch 或 pluggable compute | 一端 CPO 等於兩端都 CPO |
+| 4. 料號與 ports per module | transceiver、cable、connector part number 與單顆承接埠數 | port 數可以直接當 module 數 |
+| 5. Installed／active links | 已安裝、實際啟用與預留鏈路各多少 | 支援一條路徑等於客戶主要採用 |
+| 6. 備品與維修邊界 | spare modules、失效替換單元與修復時間 | installed 淨減量等於採購淨減量 |
+| 7. 同期比較組 | 同一網路層級、速率、拓撲與世代的 baseline | 把不同 radix／架構的 module 數硬比 |
+| 8. 商業共同鍵 | 客戶期間、採購、shipment、價格、收入與毛利 | 拓撲表可以直接推 TAM 或供應商獲利 |
+
+### 多空小作文：同一份 endpoint mix，兩邊才有共同分母
+
+- **偏多可插拔的條件**：具名客戶的鏈路多數是 CPO ↔ pluggable switch／compute，遠端料號、每模組
+  埠數、installed／spare counts 與供應商 shipment 能對上；此時 CPO 改的是其中一端，不是整條鏈路歸零。
+- **偏空可插拔的條件**：實際部署轉向 CPO ↔ CPO，或 compute side 也把光學整合進系統，使遠端
+  OSFP 接近零；後續正式拓撲若移除 remote transceiver 路徑，也會削弱共存敘事。
+
+本輪登錄 N=2 個 NVIDIA 官方來源紀錄（S15 是一份跨頁 living manual bundle，S16 是產品活頁），
+但只有 N=1 條公司消息鏈、N=1 個 Q3450 支援拓撲，不是兩個獨立客戶或 deployment 樣本；
+具名客戶 endpoint mix、installed modules、shipments 與財務
+共同觀測 N=0，因此沒有 sampling SE／t，也不由支援拓撲推估模組需求、公司收入或投資結論。
 
 ## 不要把架構畫成一條線：先拆三個獨立決策軸
 
@@ -944,6 +1110,8 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 - [NVIDIA：Vera Rubin 與 Spectrum-X Ethernet Photonics 進入生產，2026-05-31](https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory)
 - [NVIDIA GTC Taipei：列名 TSMC、SPIL、TFC、Foxconn 的製造角色，2026-06-01 更新](https://blogs.nvidia.com/blog/nvidia-gtc-taipei-computex-2026-news/)
 - [NVIDIA：Spectrum-6 同時支援可插拔與 CPO，2026-07-21](https://blogs.nvidia.com/blog/nvidia-spectrum-six-arrives-in-gigascale-ai-factories/)
+- [NVIDIA：Q32xx／Q34xx XDR Switch Systems User Manual](https://networking-docs.nvidia.com/xdrswitcheshw/)（同一手冊的佈線頁寫 72 MPO×2 ports，總覽／規格／可更換元件頁指向 144 MPO×1；衝突未裁決。144 XDR data ports、Q3450 本地 XDR data ports 不使用 OSFP cages 與三種端點拓撲仍可確認）。
+- [NVIDIA：Silicon Photonics 產品與展示入口，2026-08-23 capture](https://www.nvidia.com/en-us/networking/products/silicon-photonics/)（同頁分開 local CPO replacement 與 Q3450 連 GB300 racks 的 remote OSFP modules；不是 deployment census）。
 - [Marvell：Ara 1.6T 可插拔 DSP 大量出貨，2026-03-12](https://www.marvell.com/company/newsroom/marvell-1-6t-optical-dsp-ai-data-center-connectivity.html)
 - [ASE：SPIL 為日月光投控子公司，2025-01-16](https://www.aseglobal.com/press-room/spil-hosts-nvidia-founder-and-ceo-at-new-factory-site/)
 - [Lumentum：Spectrum-X Photonics 的具名 InP laser 生態系角色，2025-03-18](https://investor.lumentum.com/financial-news-releases/news-details/2025/Lumentum-Selected-as-an-NVIDIA-Silicon-Photonics-Ecosystem-Partner-to-Advance-AI-Networking-at-Scale/default.aspx)
@@ -957,7 +1125,9 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 
 **已知：** OIF 文件證實光引擎位置、訊號處理與雷射位置必須分開閱讀，且 IA 只覆蓋指定互通
 邊界；NVIDIA 將具名共同封裝產品描述為進入生產並直接列名 SPIL，Spectrum-6 與 Marvell 的
-資料也證明可插拔路徑仍在同代產品與量產生態中。Broadcom／Meta 另新增一筆客戶高溫實驗室的
+資料也證明可插拔路徑仍在同代產品與量產生態中。Q3450 正式手冊再證明本地 CPO data port
+可連另一台 CPO switch，也可連遠端 pluggable switch／compute，且 dual-port／single-port part
+讓 port 與 module 分母不同。Broadcom／Meta 另新增一筆客戶高溫實驗室的
 累計 100 萬 port-device-hours／零 link-flap 觀測，但正確統計解讀仍需模型與底層分母。ITU 方法
 再確認 link budget 必須同時保存最小／最大发射、最小／最大 attenuation、sensitivity／overload、
 path penalty 與 BER，而不是用雷射輸出或架構標籤代替端到端驗收。
@@ -965,7 +1135,9 @@ path penalty 與 BER，而不是用雷射輸出或架構標籤代替端到端驗
 **還不知道：** 具名產品完整三軸組態、NPO／ELS 實際部署、應用 link budget、跨廠互通、
 共同 reference points／power quantity／inclusion map／兩端 margin、field replacement 與完整長期
 可靠度結果、各埠暴露／共同故障／事件日誌、同條件比較組、
-各組態出貨配比、每埠成本、台灣供應商收入與毛利，
+Q3450 前面板究竟是 72 MPO×2 ports 或 144 MPO×1 port、Q3450／後續 CPO 的 endpoint-pair mix、
+遠端 OSFP installed／active／spare counts、dual-port 利用率、
+淨模組減量、各組態出貨配比、每埠成本、台灣供應商收入與毛利，
 以及 6147、6451 是否參與上述具名平台。
 
 **不可外推：** NVIDIA、Marvell 與 Lumentum 的效能、角色或成本敘述仍有各自的發行人邊界；
@@ -988,6 +1160,7 @@ evidence_boundary: OIF framework／IA、平台 production 與生態系列名都�
 
 ## 下一個可證明／否定的節點
 
+- **端點層**：NVIDIA 是否先在同一 revision 裁決 Q3450 的 72／144 MPO 衝突；客戶或平台是否再公布每條鏈路的近端／遠端角色、transceiver 料號、ports per module、installed／active／spare counts。只公布 CPO port 數仍不能估算淨模組變化。
 - **組態層**：具名產品是否同時公布 optical-engine placement、signal-processing mode 與 laser placement；只有一個 CPO／NPO／LPO 標籤就不算填滿。
 - **互通層**：3.2T CPO module、ELSFP 與應用 link budget 是否由多家產品在同一版本與條件下，以共同 reference points、mean／OMA／OSNR 定義、Tx／Rx limits、逐段 attenuation、path penalty、inclusion map、兩端 margin 與 raw BER 完成互通、故障注入、field replacement 與長期可靠度。
 - **可靠度層**：Meta ECOC 2025 完整論文或資料附錄能否補上 100 萬 port-device-hours 的埠數、各埠時長、共同故障群組、版本、所有事件與比較組；只有零 link-flap headline 不能估 field lifetime。
