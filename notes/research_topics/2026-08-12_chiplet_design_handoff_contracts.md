@@ -60,6 +60,13 @@ to: triaged
 reason: added_pre_and_post_silicon_interoperability_scope_passport_without_thesis_clock_refresh
 evidence: sources:S14,S15
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_fcsa_cumulative_compliance_claim_passport_without_thesis_or_clock_refresh
+evidence: sources:S1,S2
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -82,6 +89,13 @@ evidence: sources:S14,S15
 - **晶圓代工廠（Foundry）**：依設計製造晶圓的工廠；它提供製程規則，不替系統商決定所有小晶片角色。
 - **封測廠（OSAT）**：Outsourced Semiconductor Assembly and Test，承接封裝與測試的外部服務商。
 - **符合性（Conformance）**：依指定版本、輸入與測試程序確認實作符合規格；有規格名稱不等於已通過。
+- **合規等級（Compliance level）**：把同一份規格的規則分成可累積的範圍；它回答聲明涵蓋哪些規則，不是產品成熟度或商業排名。
+- **Level 0**：FCSA 對指定小晶片或系統類型的基本功能與介面規則；聲明時仍要說清楚物件、類型與版本。
+- **Level 1**：在 Level 0 全部規則之上，再加入適用於該小晶片或系統的額外規則；不是另一條可跳過 Level 0 的路。
+- **Full Compliance**：對指定小晶片或系統完整符合 FCSA 要求，包含 Full 與未標等級的規則；不等於 UCIe、設計資料、製造或客戶資格也全數通過。
+- **規則識別碼（Rule ID）**：FCSA 給每條規範性規則的固定代碼，用來精確記錄聲明實際涵蓋哪些要求。
+- **實作清單（Implementation list）**：工作組彙整「引用或聲稱實作」規格的文件或產品入口；被列名不等於取得 endorsement 或通過共同測試。
+- **合規聲明護照**：研究中心用來把受測物、版本、類型、等級、規則、測試、複核者與下游邊界綁在一起的八欄查核表，不是 FCSA 官方模板。
 - **簽核（Sign-off）**：設計進入製造前，確認關鍵電性、熱、機械、測試與製程規則均達標的最後檢查。
 - **工具匯入**：設計軟體真正讀進資料、保留單位與版本，並能執行檢查；檔案存在不等於匯入成功。
 - **機器可讀**：資料有固定結構，程式可解析；它仍要通過語法、欄位、版本與跨工具一致性檢查。
@@ -553,6 +567,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: FCSA 1.0.0 的合規等級採累積規則：小晶片或系統只有遵守聲明等級及全部較低等級規則時，才能聲明該等級；Level 0 涵蓋指定類型的基本功能與介面，Level 1 在其上增加適用要求，Full Compliance 則要求指定小晶片或系統完整對齊，且未標等級的規則也必須納入 Full
+supporting_source_ids: S1
+contrary_source_ids:
+as_of: 2026-02-12
+basis: S1 PDF file p.20 section 2.1 逐項定義等級累積、聲明條件、未標等級規則、Level 0、Level 1 與 Full Compliance；file pp.21–26 的 Tables 2.1–2.3 再分別列出 Level 0、Level 1 與 Level FULL 的規則識別碼
+boundary: 這只定義 FCSA 規則聲明的範圍，不提供固定 compliance test suite、實作輸入輸出、獨立證書，也不替 UCIe、CDXML／3DK、實體矽、foundry／OSAT、客戶產品或財務結果背書
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: inference
+status: active
+claim: 研究 FCSA 合規聲明時，至少應用一份八欄護照分開記錄受測物件、規格與上層版本、聲明的 system／chiplet type、合規等級與規則識別碼、介面設定、測試輸入輸出、聲明與獨立複核者，以及下游設計資料／製造封測／客戶資格；實作清單列名、Level 0／1／Full 聲明與端到端產品通過不能共用一個合格標記
+supporting_source_ids: S1,S2
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S1 把等級綁在指定 chiplet／system type、累積 rule set 與分層架構；S2 則把 implementation 區描述為 reference or claim to implement 並明示列名不構成 endorsement，因此本研究中心把規格聲明、可重現測試與下游產品資格拆成八個不可互換欄位
+boundary: 八欄護照是研究中心的證據稽核框架，不是 OCP／Arm 的正式 conformance form；欄位完整不會自動證明實作正確，欄位空白也不等於技術失敗，只會阻止超過現有證據的外推
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分四層契約，才知道問題卡在哪裡
 
 | 契約層 | 它回答什麼 | 本篇例子 | 通過前仍可能失敗 |
@@ -567,6 +615,66 @@ resolution:
 
 最後一層才把前三層變成可稽核流程。它需要固定版本、檔案雜湊、正反測試資料、預期錯誤、
 工具版本、結果差異與簽核責任，而不只是規格名稱。
+
+## FCSA 等級不是銅銀金牌：先問聲明範圍
+
+FCSA 的 Level 0、Level 1 與 Full Compliance 容易被讀成產品成熟度的銅、銀、金牌。規格實際
+描述的是另一件事：某一個指定小晶片或系統，對某一組逐層累積的規則，聲明自己走到哪裡。
+所以第一個問題不是「拿到最高級了嗎」，而是「哪個物件、哪種 type、哪一版、哪些 rule」。
+
+**Level 0 是底座。** 它要求指定 chiplet／system type 符合基本功能與介面規則。聲明者不能只說
+「支援 FCSA」，還要指出被聲明的是哪顆小晶片、哪套系統，以及它被分類成哪一種 type。
+
+**Level 1 是累積，不是另一條路。** 規格要求先滿足 Level 0，再加入適用於該類型的 Level 1
+規則。不能挑一條較高級規則通過，就略過底層要求或把兩個不同 type 的結果拼成同一張證明。
+
+**Full 仍有物件邊界。** 它表示指定小晶片或系統完整對齊 FCSA 要求，並納入 Full 與未標等級
+的規則；「完整」修飾的是這個 FCSA 聲明範圍，不是 UCIe、CDXML／3DK、實體矽、製造、客戶
+資格與量產財務全部完成。
+
+| 合規等級 | 規格要求怎麼累積 | 白話怎麼讀 | 仍不能替代 |
+|---|---|---|---|
+| Level 0 | 指定 chiplet／system type 的基本功能與介面規則 | 先確認角色與最低共同要求 | 實體互通、設計資料與產品資格 |
+| Level 1 | Level 0 全部規則＋適用的額外 Level 1 規則 | 在同一物件與 type 上加深要求 | 跳過底層規則或跨 type 拼接結果 |
+| Full Compliance | Level 0＋Level 1＋Full／未標等級規則 | 對指定物件完整符合 FCSA | 全標準、全工具、全工廠與全客戶通過 |
+
+### 被列在 implementation 清單，仍不是共同測試證書
+
+OCP 的 FCSA 頁面把 implementation 區定義為「引用或聲稱實作 FCSA」的文件或產品，並明示
+列名不構成 endorsement。本輪 2026-08-24 回查時，清單仍只列 Arm Chiplet System Architecture，
+也沒有在同一入口附上固定 test suite、正反輸入、預期輸出、聲明等級或獨立結果。這個清單很適合
+找下一個查核對象，不能直接回答對方是否通過 Level 0、Level 1 或 Full。
+
+### 一份 FCSA 合規聲明護照至少要有八欄
+
+| 欄位 | 最少記錄 | 沒有它會混淆什麼 |
+|---|---|---|
+| 1. 受測物件 | chiplet／system 名稱、revision、樣品與唯一 result ID | 文件或系列名稱冒充實際受測物 |
+| 2. 規格與上層 | FCSA version、Design／Profile、文件與測試 SHA | Foundation 規格冒充特定產品 profile |
+| 3. 聲明 type | system type、chiplet type、角色與適用選項 | 不同角色的規則被拼成一套結果 |
+| 4. 等級與規則 | Level 0／1／Full、全部規則識別碼、例外與 waiver | 高等級字樣冒充完整累積規則 |
+| 5. 介面設定 | protocol、transport、方向、必要功能與組態 | 架構角色冒充特定介面已接通 |
+| 6. 測試輸入輸出 | suite version、正反案例、預期與實際結果、錯誤位置 | 自我聲明冒充可重現測試 |
+| 7. 聲明與複核者 | 供應者、測試者、獨立 reviewer、日期與簽名 | 同源列名冒充第三方證書 |
+| 8. 下游資格 | UCIe、CDXML／3DK、foundry／OSAT、客戶與財務共同鍵 | FCSA 合規冒充可製造、可交付與有收入 |
+
+護照不是把每個空格都判成失敗。它只讓讀者知道目前是規格聲明、供應者測試、獨立合規，還是
+客戶產品資格；證據走到哪一欄，就只把結論寫到哪一欄。
+
+### 多空小作文共用同一張合規聲明
+
+**偏多版本。** 若兩家以上獨立供應者對同版 FCSA、同一 type 與同一等級公開完整規則識別碼，
+再用共同正反案例得到可重現結果，並一路接到設計資料、foundry／OSAT 與客戶資格，開放小晶片
+才可能減少重複定義角色與驗收的整合成本。
+
+**偏空版本。** 若生態只增加 implementation 列名與行銷聲明，各家仍用不同版本、type、私有
+mapping 與不可重現測試，Level 0／1／Full 就無法形成跨供應者採購契約；共同規格反而可能多出
+一層轉譯與維護成本。
+
+兩邊共用的裁決不是列名數，而是同一張八欄護照。本輪可直接核對的是 `N=1` 份 FCSA 1.0.0
+正式規格與 `N=1` 個同一 OCP／Arm 消息鏈的 living index；它們不是兩個獨立實作、產品或測試
+樣本。非 Arm 具名實作、固定 compliance suite、公開 Level 結果、foundry／OSAT 與客戶資格仍為
+`N=0`，沒有抽樣 SE 或 t 值，也不能估計採用率、訂單、收入或毛利。
 
 ## 同樣叫互通，模擬與實體上電不是同一張證書
 

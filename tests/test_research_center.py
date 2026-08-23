@@ -6294,6 +6294,21 @@ class ResearchCenterTest(unittest.TestCase):
             "## 先分四層契約，才知道問題卡在哪裡",
             "| 1. 連線介面 |", "| 2. 系統角色 |",
             "| 3. 設計資料 |", "| 4. 符合性流程 |",
+            "added_fcsa_cumulative_compliance_claim_passport_without_thesis_or_clock_refresh",
+            "## FCSA 等級不是銅銀金牌：先問聲明範圍",
+            "**Level 0 是底座。**",
+            "**Level 1 是累積，不是另一條路。**",
+            "**Full 仍有物件邊界。**",
+            "| Level 0 | 指定 chiplet／system type 的基本功能與介面規則 |",
+            "| Level 1 | Level 0 全部規則＋適用的額外 Level 1 規則 |",
+            "| Full Compliance | Level 0＋Level 1＋Full／未標等級規則 |",
+            "### 被列在 implementation 清單，仍不是共同測試證書",
+            "### 一份 FCSA 合規聲明護照至少要有八欄",
+            "| 1. 受測物件 |", "| 4. 等級與規則 |",
+            "| 6. 測試輸入輸出 |", "| 8. 下游資格 |",
+            "### 多空小作文共用同一張合規聲明",
+            "非 Arm 具名實作、固定 compliance suite、公開 Level 結果",
+            "claim_id: C24", "claim_id: C25",
             "## 同樣叫互通，模擬與實體上電不是同一張證書",
             "| 2. 前矽模擬 |", "| 3. 實體 PHY 連線 |",
             "| 4. Adapter／protocol／traffic |",
@@ -6355,8 +6370,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("transition", 5),
-            ("research_source", 16), ("research_claim", 23),
+            ("research_topic", 1), ("transition", 6),
+            ("research_source", 16), ("research_claim", 25),
             ("metric_comparison", 0), ("impact", 3),
             ("monitoring_item", 4),
         ):
@@ -6387,6 +6402,7 @@ class ResearchCenterTest(unittest.TestCase):
             "process:chiplet-compositional-trust-passport,process,小晶片組合信任十欄護照",
             "stage:cross-vendor-demo,stage,跨廠測試晶片互通",
             "process:chiplet-interoperability-scope-passport,process,小晶片互通範圍八欄護照",
+            "process:fcsa-compliance-claim-passport,process,FCSA 合規聲明八欄護照",
         ):
             self.assertIn(concept, concepts)
         graph = (
@@ -6405,15 +6421,21 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: stage:cross-vendor-demo",
             "edge_id: KG-CDH-I16",
             "to_id: process:chiplet-interoperability-scope-passport",
+            "edge_id: KG-CDH-I17",
+            "to_id: process:fcsa-compliance-claim-passport",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
 
         scans = (
             ROOT / "notes" / "research_topics" / "scan_log.csv"
         ).read_text(encoding="utf-8")
         self.assertIn(
             "scan-2026-08-24-ucie-pre-post-silicon-scope-passport",
+            scans,
+        )
+        self.assertIn(
+            "scan-2026-08-24-fcsa-cumulative-compliance-claim-passport",
             scans,
         )
 

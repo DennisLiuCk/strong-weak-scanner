@@ -355,3 +355,23 @@ status: active
 boundary: 護照只固定每筆互通證據的層級與缺欄 本身不證明full-stack CDXML 3DK foundry OSAT customer qualification production或財務材料性。
 next_trigger: 另一組獨立供應商或同一Intel Cadence組合公布可重現的八欄資料並串接設計資料 製造封測與客戶結果。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I17
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: process:fcsa-compliance-claim-passport
+relation: requires
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C24,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C25
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: unknown
+exclusivity: limited_source
+exclusivity_scope: 八欄護照是研究中心依FCSA 1.0.0與OCP工作流同一條OCP／Arm消息鏈整理的稽核框架 不是FCSA官方表單或多家獨立實作共同採用的證書。
+as_of: 2026-08-24
+review_due: 2026-08-25
+status: active
+boundary: Level 0 Level 1與Full只界定指定chiplet或system的累積FCSA規則範圍 護照不證明固定test suite 非Arm實作 UCIe或CDXML互通 foundry OSAT客戶資格量產或財務材料性。
+next_trigger: 非Arm具名實作以固定FCSA版本 type level 規則識別碼與共同正反測試公開可重現結果 並由獨立方及下游製造封測或買方複核。
+-->
