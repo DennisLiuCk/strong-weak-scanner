@@ -5400,6 +5400,20 @@ class ResearchCenterTest(unittest.TestCase):
             "| 5. 量測、檢查與下一層 |",
             "added_anamorphic_field_stitching_dose_yield_and_electrical_evidence_ladder_without_hvm_upgrade",
             "added_na_resolution_depth_of_focus_and_half_field_passport_without_thesis_clock_refresh",
+            "corrected_pre_hvm_ladder_after_intel_partial_layer_product_hvm_evidence",
+            "thesis_claim_id: C20",
+            "claim_id: C5\nlabel: inference\nstatus: superseded",
+            "corrected_by_claim_id: C20",
+            "claim_id: C6\nlabel: unverified\nstatus: superseded",
+            "corrected_by_claim_id: C19",
+            "source_id: S16\nrole: company_release",
+            "source_id: S17\nrole: company_filing",
+            "claim_id: C18\nlabel: verified\nstatus: active",
+            "claim_id: C19\nlabel: unverified\nstatus: active",
+            "claim_id: C20\nlabel: inference\nstatus: active",
+            "monitor_id: T4",
+            "monitor_id: T5",
+            "monitor_id: T6",
             "## 解析度變好，為什麼反而多出五個新難題",
             "| 本文五個新難題 | 變化從哪裡來 | 本輪一手證據走到哪裡 | 下一個要驗收 | 不能直接推成 |",
             "| 1. 半視場與接縫 |", "| 2. 焦深、薄膜與表面起伏 |",
@@ -5429,6 +5443,15 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 機器送達 |", "| 2. 開始運轉與校準 |",
             "| 3. 研發資格與共同整合 |", "| 4. 實際產品晶圓測試 |",
             "| 5. 穩定量產導入 |",
+            "## 第一個量產產品出現，不等於整個節點全面換機",
+            "| 本文四本量產帳 | 目前公開證據 | 還缺的分母 | 最常見的誤讀 |",
+            "| 1. 產品範圍 |", "| 2. 層與合格路徑 |",
+            "| 3. 產能與穩定性 |", "| 4. 經濟與擴散 |",
+            "Panther Lake 的一個產品子集",
+            "特定 18A 層完成 High-NA／NXE 雙路資格",
+            "N＝2 份官方",
+            "N＝1 個 Intel／Panther Lake 事件",
+            "沒有 sampling SE／t",
             "## 再用六級證據分清印得出來與產品能量產",
             "| 本文六級圖形證據 | 這一級回答什麼 | 本輪可確認 | 還缺什麼 | 不能替代 |",
             "| 1. 光學或材料單項結果 |", "| 2. 顯影後光阻圖形 |",
@@ -5453,7 +5476,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 48
+            sum(line.startswith("- **") for line in glossary.splitlines()), 54
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5470,9 +5493,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 15),
-            ("research_claim", 17), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 17),
+            ("research_claim", 20), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 6), ("transition", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -5505,6 +5528,7 @@ class ResearchCenterTest(unittest.TestCase):
             "process:high-na-electrical-evidence-ladder,process,High-NA 圖形到電性量產證據階梯",
             "process:high-na-optical-process-window-passport,process,High-NA 光學與製程視窗十欄護照",
             "metric:resolution-depth-of-focus-field-boundary,metric,解析度焦深與曝光視場邊界",
+            "process:high-na-layer-scoped-hvm-passport,process,High-NA 部分層量產護照",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: 晶圓圖形曝光與 High-NA 導入階梯", graph)
@@ -5515,8 +5539,15 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-HNA-I15", "to_id: process:high-na-electrical-evidence-ladder",
             "edge_id: KG-HNA-I16", "to_id: process:high-na-optical-process-window-passport",
             "edge_id: KG-HNA-I17", "to_id: metric:resolution-depth-of-focus-field-boundary",
+            "edge_id: KG-HNA-I18", "to_id: process:high-na-layer-scoped-hvm-passport",
         ):
             self.assertIn(edge, graph)
+        self.assertIn(
+            "edge_id: KG-HNA-I07\nview: industry\nfrom_id: concept:high-na-euv-readiness\n"
+            "to_id: stage:high-na-hvm-insertion",
+            graph,
+        )
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
 
     def test_compute_connect_station_six_separates_data_path_scopes_roles_and_interoperability_gates(self):
         topic = (

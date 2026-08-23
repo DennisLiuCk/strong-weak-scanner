@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-02
 source_published_at: 2026-04-22
-last_reviewed_at: 2026-08-12
-review_due: 2026-10-01
+last_reviewed_at: 2026-08-23
+review_due: 2026-09-15
 source_type: mixed
 publisher: ASML
 publisher_domain: asml.com
@@ -19,9 +19,9 @@ group_ids: semiequip,material
 trigger_type: lithography_tool_process_and_hvm_insertion
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C5
+thesis_claim_id: C20
 base_confidence: medium
-confidence_basis: ASML、imec 與 Intel 一手來源可交叉確認工具出貨、客戶端運轉、半視場與拼接、測試結構電性結果、整合元件展示、產品晶圓測試與資格／插入時程；但完整產品層製程視窗、2026 年底 HVM readiness、2027 至 2028 客戶節點插入、台灣供應商角色與財務貢獻仍待驗證
+confidence_basis: ASML 與 Intel 兩份一手文件已共同確認 Intel 18A 特定層用 EXE High-NA EUV 生產 Panther Lake 產品子集並進入 HVM，使成熟度不能再停在客戶量產前；但這是同一客戶與同一產品家族事件，ASML 全平台 HVM requirements、層名與層數、High-NA 產出占比、良率方法、成本、其他客戶擴散及台灣供應商財務貢獻仍待驗證
 cross_company_numbers: false
 -->
 
@@ -280,6 +280,38 @@ limitation: 2023-06-03 是官方 agenda 所列研討會起始日，不主張為�
 independence_group: university-of-hyogo-euvl-workshop
 -->
 
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: document
+publisher: ASML
+title: High NA EUV reaches new readiness milestone with first high-volume Logic product
+published_at: 2026-07-15
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.asml.com/en/news/press-releases/2026/high-na-euv-reaches-new-readiness-milestone
+locator: 開頭三個重點與正文 Panther Lake、specific Intel 18A layers、dual-qualified、yield matched to NXE、product shipping、broader adoption 段落
+limitation: 這是 ASML 與 Intel 的共同里程碑公告；沒有公開層名、層數、High-NA 占產品或產能比例、lot／wafer 分母、良率數值與方法、uptime、每小時合格產出、成本、其他客戶結果或台灣供應商財務
+independence_group: asml
+-->
+
+<!-- research_source
+source_id: S17
+role: company_filing
+source_kind: document
+publisher: Intel
+title: Intel Reports Second-Quarter 2026 Financial Results Exhibit 99.1
+published_at: 2026-07-23
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.sec.gov/Archives/edgar/data/50863/000005086326000155/q226earningsrelease.htm
+locator: SEC Exhibit 99.1 pp.2–3 Foundry Momentum；Intel Foundry 已以 ASML EXE High-NA EUV 讓 Panther Lake 產品子集進入 high-volume manufacturing
+limitation: Intel 文件交叉確認 HVM、產品家族與 High-NA 平台，但沒有重複 ASML 的 dual-qualified／yield-matched 細節，也沒有層名、層數、產量、良率、成本、外部 foundry 客戶或供應商財務
+independence_group: intel
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -351,7 +383,7 @@ resolution:
 <!-- research_claim
 claim_id: C5
 label: inference
-status: active
+status: superseded
 claim: High-NA EUV 已跨過只有單機 prototype 的階段，進入多台客戶端運轉、研發資格與 product-wafer testing；但在證據階梯上仍位於客戶 HVM insertion 之前，不能用八台出貨、50 萬片處理量或 imec 到廠替 2027–2028 量產節點提前畢業
 supporting_source_ids: S1,S2,S3,S4,S12
 contrary_source_ids:
@@ -361,14 +393,14 @@ boundary: 不推估 ASML 訂單、客戶節點份額、每片成本、台灣設�
 verification_needed:
 correction_kind:
 corrects_claim_id:
-corrected_by_claim_id:
-resolution:
+corrected_by_claim_id: C20
+resolution: S16／S17 已證明至少一個具名客戶產品子集以特定 18A 層進入 High-NA HVM，原本把整個產業階梯停在客戶 HVM insertion 前已不準確；改由 C20 的分層量產框架取代
 -->
 
 <!-- research_claim
 claim_id: C6
 label: unverified
-status: active
+status: superseded
 claim: ASML 已在 2026 年底達成全部 High-NA HVM requirements，或任一客戶已完成 2027–2028 量產節點 insertion
 supporting_source_ids:
 contrary_source_ids:
@@ -378,8 +410,8 @@ boundary: 未到目標日期與沒有完成證據不是反證，但成熟度只�
 verification_needed: ASML、imec 與客戶端發布 qualification、HVM readiness、實際節點／層數、良率及量產產品證據
 correction_kind:
 corrects_claim_id:
-corrected_by_claim_id:
-resolution:
+corrected_by_claim_id: C19
+resolution: 原句把「ASML 全部 HVM requirements」與「任一客戶完成 HVM insertion」混成一個待驗證命題；S16／S17 已證明後者的 Intel 特定層案例，尚未證實的其餘範圍改由 C19 單獨追蹤
 -->
 
 <!-- research_claim
@@ -569,9 +601,62 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: ASML 與 Intel 分別在 2026-07-15 與 2026-07-23 確認，Intel Foundry 已使用 ASML EXE High-NA EUV 讓 Panther Lake 產品子集進入 high-volume manufacturing；ASML 進一步表示特定 Intel 18A 層已在 Oregon 對 High-NA 與 NXE 完成雙路資格，產品已出貨，且良率與 NXE 平台相當
+supporting_source_ids: S16,S17
+contrary_source_ids:
+as_of: 2026-07-23
+basis: S16 直接列出產品子集、specific 18A layers、dual qualification、shipping 與 yield-matched 敘述；S17 的 SEC Exhibit 99.1 由 Intel 自身交叉確認產品子集、EXE High-NA EUV 與 HVM，但不獨立支持 yield-matched 細節
+boundary: 兩份文件只對應 N＝1 個 Intel／Panther Lake 產品事件，不是兩個獨立量產案例；沒有層名或層數、High-NA 產出比例、lot／wafer 分母、良率數值與方法、uptime、成本、其他客戶結果、全面 NXE 替代或台灣供應商財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: unverified
+status: active
+claim: ASML 已完成全平台全部 High-NA HVM requirements，Intel 18A 已在所有相關產品與層全面採用 High-NA，或其他客戶與未來節點已形成可重算的廣泛 HVM insertion
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-23
+basis: correction_of:C6；S16／S17 只把證據推進到 Intel Panther Lake 產品子集與特定 18A 層，S16 同時把 broader adoption 與 future nodes 留在後續路徑，不能用第一個部分層案例替其餘範圍畢業
+boundary: 找不到全面完成文件不是反證；本文只把公開成熟度上限鎖在已具名的產品子集與特定層，不推定其他內部量產、客戶計畫或專有製程不存在
+verification_needed: ASML 的全平台 HVM requirements 完成文件，以及客戶逐產品與逐層的 High-NA 配置、產能占比、良率方法、產出、成本與未來節點 HVM 結果
+correction_kind: supersedes
+corrects_claim_id: C6
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: inference
+status: active
+claim: High-NA 的證據階梯已跨入第一個具名客戶產品的部分層 HVM，不能再概括為「仍在客戶量產前」；但研究單位必須拆成產品範圍、層與合格路徑、實際產能占比、良率與成本四本帳，部分層雙路資格不能外推成全節點、全產能或多客戶全面替代
+supporting_source_ids: S1,S3,S16,S17
+contrary_source_ids:
+as_of: 2026-08-23
+basis: correction_of:C5；S1／S3 保存先前 fleet 與 product-wafer 基線，S16／S17 把其中一個 Intel 產品子集推進 HVM；S16 又明示 specific layers、dual-qualified 與 broader adoption 尚在後續，因而要把第一個產品事件與廣泛插入分開
+boundary: 這是成熟度與分母框架，不推估 High-NA 層數、wafer share、ASML 訂單、設備需求、良率優勢、每顆合格晶片成本、台灣設備／材料內容量、公司收入或市場是否已反映
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C5
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
-status: active
+status: retired
+retired_at: 2026-08-23
+retirement_reason: C5／C6 的量產前框架已被 Intel Panther Lake 特定 18A 層 HVM 證據取代；由 T4 追蹤部分層到廣泛插入的新時鐘
 claim_ids: C1,C2,C3,C5,C6,C8
 metric: EXE:5200 qualification、availability、product wafer、HVM requirements 與 ecosystem readiness
 source_ids: S1,S2,S3
@@ -585,7 +670,9 @@ invalidation: qualification 延後、availability／throughput 未達客戶要�
 
 <!-- monitoring_item
 monitor_id: T2
-status: active
+status: retired
+retired_at: 2026-08-23
+retirement_reason: 原監測器同時引用已取代的 C5／C6；由 T4 追產品與層範圍、T6 追公司財務雙向證據
 claim_ids: C4,C5,C6,C7
 metric: 客戶節點 insertion、量產產品與台灣設備／材料財務映射
 source_ids: S1,S4
@@ -599,7 +686,9 @@ invalidation: 客戶 insertion 延至 2029 以後、只在 R&D 使用，或 Low-
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
+retired_at: 2026-08-23
+retirement_reason: 原監測器引用已取代的 C5 且把產品 HVM 當成未來節點；由 T5 以部分層量產後的製程視窗與擴張條件接續
 claim_ids: C5,C8,C9,C10,C11,C12,C13,C14
 metric: 同一產品層的半視場拼接、劑量／焦距視窗、隨機缺陷、圖形轉移、電性良率、產出與變更後重驗
 source_ids: S8,S9,S10,S11,S12,S13
@@ -609,6 +698,48 @@ frequency_detail: 每月檢查 ASML、imec 與 Intel；出現客戶產品層或 
 next_check: 2026-10-01
 trigger: 同一客戶產品層公開版本化的 field／stitch、dose／focus、材料與烘烤、缺陷與電性、throughput／availability、變更沿革及 HVM 結果
 invalidation: 拼接或焦深使產品視窗不足、降劑量放大隨機缺陷、圖形轉移後電性失敗、變更後無法重現，或客戶延後／縮減插入層
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C18,C19,C20
+metric: Intel 部分層 HVM 的產品範圍、High-NA 層、雙路資格、產能占比、良率與廣泛插入
+source_ids: S16,S17
+watch_source_ids: S5,S7
+frequency: monthly
+frequency_detail: 每月檢查 ASML 與 Intel；任何新產品、層數、High-NA 產能占比或未來節點 HVM 文件立即重審
+next_check: 2026-09-15
+trigger: ASML／Intel 公開層名或層數、High-NA 與 NXE 配置、lot／wafer 分母、良率方法、uptime、合格產出、成本或第二個客戶 HVM
+invalidation: Intel／ASML 撤回 HVM 或 yield-matched 敘述、相關產品停止出貨、High-NA 層退回驗證，或後續文件顯示本次只屬非量產展示
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C8,C9,C10,C11,C12,C13,C14,C15,C16,C17,C18,C20
+metric: 部分層 HVM 後同一產品版本的半視場、焦距劑量、材料、轉移、電性、良率、產出與變更重驗
+source_ids: S8,S9,S10,S11,S12,S13,S14,S15,S16,S17
+watch_source_ids: S5,S6,S7
+frequency: monthly
+frequency_detail: 每月檢查 ASML、imec 與 Intel；公開 production layer 製程視窗、重驗或限制時立即重審
+next_check: 2026-10-01
+trigger: 同一 HVM 產品層公開版本化 field／stitch、dose／focus、材料／烘烤、轉移後電性、樣本分布、throughput、availability、成本與變更後重驗
+invalidation: 已量產層無法維持製程視窗、良率或產出，雙路資格被取消，或 High-NA 導入層因成本／穩定度縮減
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C7,C18,C19,C20
+metric: High-NA 擴散到客戶節點、量產容量與台灣設備／材料的可辨識財務足跡
+source_ids: S16,S17
+watch_source_ids: S5,S7
+frequency: quarterly
+frequency_detail: 追蹤 ASML 季報、Intel／其他客戶節點與 MOPS；公司線必須由平台端與供應商端雙向核對
+next_check: 2026-10-15
+trigger: 第二個客戶或節點確認 HVM，並有 universe 公司具名 qualification、出貨、收入、毛利或現金流分母
+invalidation: High-NA 長期只維持單一產品少數層、其他客戶延後，或 Low-NA 多重圖形化持續保有較佳經濟性
 -->
 
 <!-- transition
@@ -651,6 +782,14 @@ reason: added_na_resolution_depth_of_focus_and_half_field_passport_without_thesi
 evidence: sources:S8,S14,S15
 -->
 
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: corrected_pre_hvm_ladder_after_intel_partial_layer_product_hvm_evidence
+evidence: sources:S16,S17
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -681,6 +820,7 @@ evidence: sources:S8,S14,S15
 - **EUV**：極紫外光微影，用很短波長的光印製先進晶片圖形；它只是完整製程中的一段。
 - **High-NA**：把極紫外光系統的數值孔徑提高到 0.55 的方案；目標是一次印出更細圖形，但仍要驗證良率、產出與成本。
 - **Low-NA**：目前較低數值孔徑的極紫外光平台；部分細圖形會搭配多重圖形化完成。
+- **NXE**：ASML 對現行較低數值孔徑極紫外光曝光機使用的產品平台前綴；同一層同時保留 NXE 與 EXE 合格路徑，代表兩條製造方法都可用，不代表 NXE 已退役。
 - **金屬氧化物光阻**：以金屬氧化物為核心的感光材料路徑，英文常寫 MOR；材料名稱本身不代表特定配方已通過量產資格。
 - **曝光後烘烤**：曝光後用受控溫度與氣氛推動光阻反應的步驟；條件改變可能同時影響感光速度、圖形與缺陷。
 - **隨機缺陷**：由少量光子、材料反應或局部波動造成的偶發圖形失敗；平均線寬合格仍可能出現斷路或橋接。
@@ -700,34 +840,40 @@ evidence: sources:S8,S14,S15
 - **產品晶圓**：使用實際產品設計而非只有測試圖形的晶圓，英文常寫 product wafer；仍可能停在驗證階段。
 - **校準**：調整設備與量測基準，使結果落在預定範圍；校準完成不等於製程資格或量產完成。
 - **資格驗證**：依指定條件確認設備、材料與製程能否被採用，英文常寫 qualification；範圍可能只涵蓋部分圖形或條件。
+- **雙路資格**：同一產品層有兩條製造路徑通過指定驗證；它提供排程與風險彈性，不表示兩條路的產量、成本或長期良率相同。
 - **高量產導入**：把設備與製程放進持續生產的產品節點，英文常寫 HVM insertion；需要穩定良率、產出、成本與客戶產品共同成立。
 - **EXE**：ASML 對高數值孔徑極紫外光曝光機使用的產品平台前綴，例如 EXE:5200；型號到廠不等於量產導入。
+- **Panther Lake**：Intel Core Ultra Series 3 處理器的開發代號；本文只用來定位第一個公開的 High-NA 量產產品事件。
+- **產品子集**：同一產品家族中的一部分型號、版本或批次；子集進入量產不表示整個家族都使用相同製程。
+- **產能占比**：總產出中實際使用某條設備或製程路徑的比例；產品已出貨仍不會自動揭露這個分母。
+- **SEC**：美國證券交易委員會；本文引用 Intel 向其提交的正式附件，代表公司公開申報，不代表監管機關替技術或良率背書。
 - **每顆合格晶片成本**：把設備、材料、加工、維護、返工與報廢分攤到最後合格晶片的成本；它比只算曝光次數更接近經濟結果。
 
 ### 三句話抓重點
 
 - 先在晶圓表面塗上光阻，再用光罩控制光線落在哪裡；這一步像替下一道加工留下底稿。
 - 新設備可能一次印出更細的底稿，因而少做重複對準與加工；但停機、材料缺陷和做壞的比例也會改變。
-- 因此不能只看機器送到或累計處理多少片；要看到實際產品通過驗證、穩定生產，以及每顆合格晶片的總成本。
+- 已有客戶把新方法用在一個產品子集的特定層並進入量產；但部分層量產不等於整顆晶片、所有產能或所有客戶都已全面換機。
 
 ### 為什麼重要
 
-曝光設備的新聞很容易把「機器送到」誤讀成「新製程已經大量生產」。真正的問題不是圖形能否
-在一次展示中印得更細，而是光罩、材料、後續加工、量測與產品設計能否一起穩定運作。少做幾個
-步驟可能省時間，也可能因設備昂貴、停機、缺陷或做壞更多而失去節省；最後要看的是每顆合格
-晶片，而不是單一設備的最高紀錄。
+第一個具名量產產品已經出現，現在更容易發生的誤讀，是把「一個產品子集的特定層」放大成
+「整個節點已全面切換」。真正的問題仍是光罩、材料、後續加工、量測與產品設計能否一起穩定
+運作。少做幾個步驟可能省時間，也可能因設備昂貴、停機、缺陷或做壞更多而失去節省；最後要
+看每顆合格晶片的總成本與實際產能占比，而不是單一里程碑。
 
 ### 接下來怎麼追
 
-- 先看研發機構是否完成資格驗證，並說清楚測了哪些圖形、材料與製程條件。
-- 再看設備商是否宣布量產準備條件達成，而不是只更新累計處理片數或單機最高紀錄。
-- 客戶端要揭露實際產品、使用層數、缺陷、良率、每小時產出與量產日期。
+- 先確認第一個量產案例究竟涵蓋哪些產品、哪些層，以及 High-NA 與 NXE 各自負責多少產出。
+- 再看設備商是否完成全平台量產準備條件，而不是用單一客戶的部分層替整個生態系畢業。
+- 客戶端要揭露層數、晶圓或批次分母、良率方法、每小時合格產出、成本與下一個節點。
 - 材料與設備公司只有在客戶具名驗證、公司出貨及財務貢獻能相互核對時才升級。
 
 ### 想一想
 
 - 如果新設備少做兩次加工，卻更常停機或做壞更多晶片，最後每顆合格晶片會更便宜嗎？
 - 八台機器送到不同場所，只回答了設備商哪一段進度，還缺哪些客戶產品與穩定生產證據？
+- 一個產品子集的特定層已量產，為什麼仍不能推論整顆晶片或所有產能都使用新方法？
 - 如果客戶只在少數最難的圖形使用新設備，材料、量測與後續加工需求會全部一起增加嗎？
 
 ## 先用五個位置看圖形怎麼印到晶圓
@@ -847,13 +993,13 @@ run、sampling SE／t、缺陷、良率、每小時產出或成本。Python Frac
 |---|---|---|---|---|
 | 1. 曝光設備與平台 | 提供高數值孔徑曝光機、安裝、運轉與平台改進 | ASML 的 EXE 平台 | 截至 2025 年底八台出貨、六台運轉；平台累計處理逾 50 萬片 | 出貨、運轉與累計片數不等於客戶完成量產導入 |
 | 2. 研發與資格整合 | 把設備、光罩、光阻、量測與圖形轉移放進共同測試環境 | imec 的 EXE:5200 | 設備已到研發環境，公開目標是在 2026 年第四季完成資格驗證 | 研發機構資格不等於晶圓製造客戶的產品節點量產 |
-| 3. 晶圓製造客戶 | 安裝設備、校準並用實際產品圖形驗證製程 | Intel 的早期安裝；其他客戶產品晶圓測試 | Intel 公開完成安裝並開始校準；ASML 表示客戶已開始產品晶圓測試 | 沒有客戶、節點、層數、良率與量產日期，不能宣告導入完成 |
+| 3. 晶圓製造客戶 | 安裝設備、校準並用實際產品圖形驗證製程 | Intel 18A 的 Panther Lake 產品子集 | 特定層已完成雙路資格並進入 HVM；Intel 與 ASML 都確認量產事件 | 一個產品子集不能代表整個節點、所有層、全部產能或其他客戶 |
 | 4. 光罩、材料與圖形轉移 | 讓曝光圖形能被顯影、蝕刻並保留在晶圓上 | 本輪只確認這些是共同成熟條件 | ASML 與 imec 文件支持光阻、光罩與圖形化依賴 | 沒有具名供應商資格、出貨、份額或台灣公司財務證據 |
 | 5. 量測、檢查與生產經濟 | 找缺陷、量尺寸、追良率，並把結果接回產出與成本 | 本輪沒有具名台灣供應商 | 量測、檢查與製程穩定度是成熟條件；公司映射仍未證實 | 一般先進製程能力不能改寫成高數值孔徑訂單或獲利 |
 
 角色表回答「誰負責哪一段」，不是完整供應商名單。ASML、imec 與 Intel 的公開資料分屬
-設備商、研發整合與早期客戶時鐘；它們能共同支持產業路徑，卻不能替任何台灣設備或材料公司
-補上具名資格、出貨與財務結果。
+設備商、研發整合與量產客戶時鐘；Intel 的部分層 HVM 把客戶端證據向前推了一級，仍不能替
+任何台灣設備或材料公司補上具名資格、出貨與財務結果。
 
 ## 把五個里程碑排成同一條導入階梯
 
@@ -863,10 +1009,38 @@ run、sampling SE／t、缺陷、良率、每小時產出或成本。Python Frac
 | 2. 開始運轉與校準 | 設備安裝後能啟動、調整並處理晶圓 | 六台運轉；Intel 早期系統完成安裝並開始校準 | 長期可用率、每小時產出、維護與客戶驗收 | 能運轉不等於製程資格、產品良率或量產 |
 | 3. 研發資格與共同整合 | 光罩、材料、圖形轉移與量測在指定範圍通過測試 | imec 設備到廠，目標在 2026 年第四季完成資格驗證 | 完成文件、測試範圍、限制與未成熟項目 | 目標日期不是已完成結果；研發資格也不是客戶量產 |
 | 4. 實際產品晶圓測試 | 用真實產品圖形而非只有測試圖形驗證 | ASML 表示客戶已開始測試；平台累計處理逾 50 萬片、可用率逾 80% | 客戶、產品、層數、視窗、缺陷與良率分母 | 聚合片數與可用率不能指定到某個客戶節點 |
-| 5. 穩定量產導入 | 客戶把具名層放進持續生產，產出、良率與成本可重算 | ASML 把量產準備條件與客戶導入放在未來目標 | 2026 年底準備結果與 2027–2028 客戶產品量產文件 | 未來目標不能提前寫成已量產或已形成供應鏈收入 |
+| 5. 穩定量產導入 | 客戶把具名層放進持續生產，產出、良率與成本可重算 | Intel 已讓 Panther Lake 產品子集的特定 18A 層進入 HVM，並保留 High-NA／NXE 雙路資格 | 層名與層數、實際產能占比、lot／wafer、良率方法、uptime、成本與第二個客戶 | 第一個部分層案例不能合併成全節點、全產能、全面 NXE 替代或供應鏈收入 |
 
-五個里程碑使用不同單位、期間與責任人。研究中心保留八台、六台、五十萬片、逾八成可用率
-與未來時程，卻不把它們相加或正規化成一個假精確的「完成率」。
+五個里程碑使用不同單位、期間與責任人。研究中心現在把第一個部分層 HVM 放在第五級，也保留
+八台、六台、五十萬片與逾八成可用率等早期分母；這些數字不能相加或正規化成一個假精確的
+「完成率」，更不能用單一產品事件替多客戶擴散畢業。
+
+## 第一個量產產品出現，不等於整個節點全面換機
+
+2026 年 7 月，ASML 與 Intel 先後確認同一件事：Intel Foundry 已用 EXE High-NA EUV 生產
+Panther Lake 的一個產品子集。ASML 進一步說明，特定 Intel 18A 層在 Oregon 同時完成 High-NA
+與 NXE 資格，產品已出貨，並稱良率與 NXE 平台相當；Intel 的 SEC 附件則由製造商自身確認產品子集、
+EXE 與 HVM，但沒有重複良率比較。這足以修正本文原先「仍在客戶 HVM 之前」的判讀，卻只固定
+一個客戶、一個產品家族與未揭名的部分層。
+
+新手可以把「已量產」拆成四本帳。任何一欄空白，都不能拿其餘三欄替它補數字：
+
+| 本文四本量產帳 | 目前公開證據 | 還缺的分母 | 最常見的誤讀 |
+|---|---|---|---|
+| 1. 產品範圍 | Panther Lake 的一個產品子集 | 型號、版本、批次與該子集占整個家族的比例 | 子集出貨等於整個產品家族全面採用 |
+| 2. 層與合格路徑 | 特定 18A 層完成 High-NA／NXE 雙路資格 | 層名、層數、各路徑的使用條件與轉換規則 | 有 High-NA 路徑等於 NXE 已被替換 |
+| 3. 產能與穩定性 | 已進入 HVM；ASML 稱良率與 NXE 相當 | lot／wafer、High-NA 產出占比、良率定義與方法、uptime、合格產出分布 | 一句 yield matched 等於所有產能與期間都相同 |
+| 4. 經濟與擴散 | 兩家公司確認同一具名量產事件 | 每顆合格晶片成本、設備與材料用量、第二個客戶／產品／節點、供應商財務 | 第一個案例等於全產業需求與公司收入已可估算 |
+
+**多方小作文的上限**是：High-NA 已跨過只有設備到廠、測試圖形與產品晶圓驗證的階段，至少
+有一個具名產品子集在量產環境使用，這會讓後續平台、材料與製程控制的學習更接近真實生產。
+**空方小作文的上限**是：雙路資格本身表示 NXE 仍是合格路徑；如果 High-NA 只用在少數最難層，
+或其產能占比、良率穩定性與成本沒有公開，第一個事件仍可能長期停在有限範圍。
+
+共同裁決不是爭論「量產是真是假」，而是要求同一產品版本補齊四本帳。這一輪有 N＝2 份官方
+文件，但它們描述 N＝1 個 Intel／Panther Lake 事件，不是兩個客戶、兩座晶圓廠或兩次獨立部署；
+也沒有可抽樣的 lot、wafer、run 或良率分布，因此沒有 sampling SE／t。公開證據仍不足以估算
+High-NA 產能占比、全面替代、台灣供應商訂單、收入、毛利或市場是否已反映。
 
 ## 再用六級證據分清印得出來與產品能量產
 
@@ -880,11 +1054,11 @@ run、sampling SE／t、缺陷、良率、每小時產出或成本。Python Frac
 | 3. 蝕刻或金屬化測試結構 | 暫時圖形經後續加工後能否變成實體結構 | imec 公布 20nm pitch 金屬化結構 | 足夠面積、圖形族、跨晶圓與跨批次分布 | 完整產品功能與量產良率 |
 | 4. 電性測試載具 | 指定結構是否通過導通、短路等電性判定 | serpentine 與 fork-fork 結構報告超過九成電性良率 | 樣本分布、製程能力、更多失效模式與長期穩定 | 實際產品的所有電路與使用條件 |
 | 5. 功能性整合元件 | 多道製程組成的元件能否執行目標功能 | imec 公布功能性量子點量子位元網路 | 客戶產品類型、完整層級、可靠度、產出與長期良率 | 邏輯或記憶體客戶產品 HVM |
-| 6. 客戶產品層與高量產 | 具名產品層能否持續以可接受良率、產出與成本生產 | 本輪只有 product-wafer testing 與未來 insertion 目標 | 客戶、產品、層數、版本、視窗分布、量產日期及成本 | 供應商訂單、收入與毛利；這仍要再做財務雙向核對 |
+| 6. 客戶產品層與高量產 | 具名產品層能否持續以可接受良率、產出與成本生產 | Intel Panther Lake 產品子集的特定 18A 層已進入 HVM；ASML 稱良率與 NXE 相當 | 層名與層數、lot／wafer、良率方法、產能占比、視窗分布、成本與多客戶重現 | 一個部分層案例仍不能替供應商訂單、收入與毛利完成財務雙向核對 |
 
-目前公開證據已從光阻圖形走到電性測試結構與功能性研究元件，這是實質進步；但第六級仍缺同一
-客戶產品層的完整分母。因此本文更新主命題的複核日期，卻不提高信心水位，也不把研究元件改寫成
-邏輯或記憶體量產。
+目前公開證據不只走到電性測試結構與功能性研究元件，也已抵達一個客戶產品子集的特定層 HVM。
+第六級因此從「未到達」改成「部分到達」；仍缺同一事件的層、產能、良率方法與成本分母，也缺
+第二個客戶重現。本文修正主命題並刷新複核日期，但 medium 信心水位不變。
 
 ## 一份可重驗的製程視窗紀錄至少有十欄
 
@@ -915,12 +1089,13 @@ run、sampling SE／t、缺陷、良率、每小時產出或成本。Python Frac
 | 1. 目標圖形可以印出 | 高數值孔徑設備能處理指定圖形與晶圓 | 多台設備已出貨與運轉，平台有累計處理量 | 第二個獨立環境重現實際產品圖形與限制 | 技術可行不等於量產穩定或成本較低 |
 | 2. 多台設備能持續運轉 | 客戶端設備有可重算的可用率、產出與維護結果 | 六台運轉；平台聚合可用率逾 80% | 逐台、逐客戶、同期間的停機、維護與合格產出 | 聚合平均不能代替每台設備與客戶驗收 |
 | 3. 共同製程通過資格 | 光罩、光阻、圖形轉移、量測與檢查在指定範圍完成驗證 | imec 公開的是 2026 年第四季目標，尚非完成結果 | 資格文件、測試範圍、材料、缺陷與未達項目 | 設備到廠或目標日期不能改寫成共同製程已成熟 |
-| 4. 實際產品達成視窗與良率 | 客戶以具名產品與層數證明圖形、缺陷與良率 | 已開始產品晶圓測試，但沒有客戶與結果分母 | 產品、節點、層數、製程視窗、缺陷與良率 | 開始測試不等於完成驗證或進入大量生產 |
-| 5. 量產層數、產出與成本可重算 | 客戶持續生產，能比較少做步驟後的每顆合格晶片成本 | 客戶導入仍是 2027–2028 目標 | 量產日期、層數、台數、產出、良率、設備與材料成本 | 未來導入目標不能換算市場規模、材料用量或公司營收 |
+| 4. 實際產品達成視窗與良率 | 客戶以具名產品與層數證明圖形、缺陷與良率 | Panther Lake 子集已有特定層完成雙路資格；ASML 稱良率與 NXE 相當 | 層名／層數、比較方法、lot／wafer、製程視窗與良率分布 | 單一供應商的 yield-matched 敘述不等於完整產品分母公開 |
+| 5. 量產層數、產出與成本可重算 | 客戶持續生產，能比較少做步驟後的每顆合格晶片成本 | Intel 與 ASML 已共同確認一個產品子集進入 HVM | High-NA 產能占比、uptime、合格產出、成本與第二個客戶／節點 | 第一個部分層 HVM 不能換算全市場規模、材料用量或公司營收 |
 | 6. 供應商財務足跡出現 | 具名設備或材料通過客戶資格並留下出貨、收入、毛利與現金流 | 沒有任何 universe 公司完成雙向核對 | 客戶具名資格加上公司產品、出貨、份額與財務分母 | 服務先進製程或極紫外光不等於已取得高數值孔徑訂單 |
 
-本輪設備與平台可走到第二關，第三關仍是待完成目標，第四關只有「開始測試」而沒有產品結果，
-第五、六關尚未通過。六關是證據排序，不是技術分數、供應商名單、營收預測或投資排名。
+本輪第三關的全生態系資格仍未完成，但 Intel 產品子集已讓第四、五關部分通過；缺的正是層名、
+層數、產能、良率方法與成本分母。第六關仍未通過。六關是證據排序，不是技術分數、供應商名單、
+營收預測或投資排名。
 
 ## 這篇對公司判斷的用處與界線
 
@@ -946,10 +1121,13 @@ run、sampling SE／t、缺陷、良率、每小時產出或成本。Python Frac
 - [Imec：氧氣控制的曝光後烘烤研究](https://www.imec-int.com/en/press/imec-unlocks-lever-euv-dose-reduction-oxygen-injection-during-metal-oxide-resist-post)（特定研究條件的感光速度結果與未完成機制）。
 - [Imec：High-NA 製作的功能性量子點元件](https://www.imec-int.com/en/press/world-first-imec-presents-quantum-dot-qubit-device-using-high-na-euv-lithography)（整合研究裝置證據及產品量產邊界）。
 - [Intel Foundry：SPIE 2026 技術更新](https://community.intel.com/t5/Blogs/Intel-Foundry/Systems-Foundry-for-the-AI-Era/Delivering-Technologies-to-Power-the-AI-Era-Intel-Foundry-at/post/1737961/jump-to/first-unread-message)（客戶端半視場接縫、21nm pitch 與光阻／光罩共同最佳化）。
+- [ASML：首個 High-NA 高量產邏輯產品里程碑](https://www.asml.com/en/news/press-releases/2026/high-na-euv-reaches-new-readiness-milestone)（Panther Lake 產品子集、特定 18A 層、雙路資格、產品出貨與 ASML 的良率比較敘述）。
+- [Intel 2026 年第二季 SEC Exhibit 99.1](https://www.sec.gov/Archives/edgar/data/50863/000005086326000155/q226earningsrelease.htm)（Intel 自身交叉確認 Panther Lake 產品子集以 EXE High-NA EUV 進入 HVM）。
 
-本篇沒有拿 ASML、imec 與 Intel 的數字互相比較：一組是設備商平台、一組是研發機構資格，
-一組是早期客戶安裝事件，期間、單位與定義不同。也不使用設備出貨數推估台灣公司訂單、
-晶圓廠良率、每顆合格晶片成本或市場定價。
+本篇沒有拿 ASML、imec 與 Intel 的異質數字互相比較：設備商平台、研發機構資格與客戶產品事件
+的期間、單位與定義不同。S16／S17 是兩家公司對同一 HVM 事件的雙邊確認，不是兩個獨立部署；
+ASML 的 yield-matched 敘述也沒有 Intel 同口徑數字可供重算。本文不使用設備出貨數或第一個 HVM
+事件推估台灣公司訂單、晶圓廠良率、每顆合格晶片成本或市場定價。
 
 該摘要集官方 PDF 共 71 頁，SHA-256 為
 9b506db456f0e6d4863c0ff26c182ba1d9d69c7fb1fd837abde2182e435b8d66；實際引用檔案第36頁，並把
@@ -983,9 +1161,10 @@ evidence_boundary: 光阻 化學品 晶圓或耗材能力是搜尋路由，不�
 ## 下一個可證明／否定的節點
 
 - Imec 在 2026 年第四季公開 EXE:5200 資格驗證結果、測試範圍與仍未達成項目。
-- ASML 確認量產準備條件是否如期達成，並提供能分開產品測試與持續生產的指標。
-- Intel 或其他客戶揭露實際節點、使用層數、產品晶圓、製程視窗、缺陷、良率與量產日期。
+- ASML 確認全平台量產準備條件是否如期達成，並分開單一產品事件與廣泛客戶採用。
+- Intel 揭露 Panther Lake 子集的層名／層數、High-NA 產能占比、lot／wafer、良率方法、uptime、合格產出與成本。
+- 第二個客戶或未來節點揭露實際產品、使用層數、製程視窗、缺陷、良率與 HVM 日期。
 - 同一產品層公開十欄製程視窗紀錄，能把半視場拼接、劑量／焦距、材料與烘烤、轉移後電性、產出及變更後重驗接在一起。
 - 同一產品層公開十欄光學—製程護照，把波長、NA、k1、CD、焦距預算、半視場、接縫、光阻、合格產出與成本鎖在同一版本，而不是只報單一解析度或最高機速。
-- 若 2027–2028 客戶導入延後、只停在研發，或現行多重圖形化在成本與良率持續更有利，C5 必須下修。
+- 若 Intel／ASML 撤回量產或良率敘述、已量產層退回驗證、其他客戶長期不擴散，或現行多重圖形化在成本與良率持續更有利，C20 必須下修。
 - 台灣設備與材料公司只有在客戶具名資格與公司產品、出貨及財務揭露相互吻合後，才從未驗證路由升級。

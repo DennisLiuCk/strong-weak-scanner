@@ -11,7 +11,7 @@ schema_version: 1
 graph_id: high-na-euv-readiness
 root_node_id: concept:high-na-euv-readiness
 label: 晶圓圖形曝光與 High-NA 導入階梯
-summary: 追蹤圖形曝光接力、非等向半視場與拼接、Rayleigh解析度焦深視場邊界、光學製程護照、劑量缺陷產出視窗，以及High-NA從光阻圖形、電性載具、功能元件、機器送達、客戶端運轉、製程資格、實際產品晶圓到高量產導入的證據階梯與生態系依賴。
+summary: 追蹤圖形曝光接力、非等向半視場與拼接、Rayleigh解析度焦深視場邊界、光學製程護照、劑量缺陷產出視窗，以及High-NA從光阻圖形、電性載具、功能元件、機器送達、客戶端運轉、製程資格、實際產品晶圓到Intel部分層高量產與多客戶擴散的證據階梯及生態系依賴。
 article_ids: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER
 status: active
 -->
@@ -182,18 +182,18 @@ view: industry
 from_id: concept:high-na-euv-readiness
 to_id: stage:high-na-hvm-insertion
 relation: passes_through
-claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C5
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C18,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C20
 note_refs:
 evidence_state: inference
-commercial_stage: planned
-materiality: adjacent
+commercial_stage: production
+materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-02
-review_due: 2026-10-01
+as_of: 2026-08-23
+review_due: 2026-09-15
 status: active
-boundary: HVM insertion 是 2027–2028 待完成節點；工具 fleet 與 product-wafer testing 不能替它提前畢業。
-next_trigger: 客戶確認節點、產品、High-NA 層數、穩定良率與量產日期。
+boundary: Intel Panther Lake產品子集的特定18A層已證實進入HVM 但層名層數產能占比良率方法成本與第二客戶未知；部分層不能外推全節點或全面NXE替代。
+next_trigger: Intel公開層名層數lot與wafer分母High-NA產能占比良率方法uptime合格產出成本或第二客戶HVM。
 -->
 
 <!-- knowledge_edge
@@ -394,4 +394,24 @@ review_due: 2026-10-01
 status: active
 boundary: Rayleigh公式、45nm研究計算與半視場曝光幾何分屬不同證據；不能拼成產品良率、持續產能或成本結論。
 next_trigger: 客戶在同一產品層公開NA、k1、圖形CD、focus budget、field/stitch、raw與good throughput及成本分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HNA-I18
+view: industry
+from_id: concept:high-na-euv-readiness
+to_id: process:high-na-layer-scoped-hvm-passport
+relation: requires
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C18,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C20
+note_refs:
+evidence_state: inference
+commercial_stage: production
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-15
+status: active
+boundary: ASML與Intel兩份文件只描述同一個Intel Panther Lake部分層事件；四本帳護照是研究中心的分母框架 不是共同產業標準 第二個客戶或財務受惠仍未證實。
+next_trigger: 同一產品版本公開產品子集層名層數雙路配置lot與wafer分母產能占比良率方法uptime合格產出成本第二客戶與供應商財務共同鍵。
 -->
