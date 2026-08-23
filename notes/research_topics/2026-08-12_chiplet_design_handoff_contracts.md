@@ -53,6 +53,13 @@ to: triaged
 reason: added_fcsa_alpha_compositional_trust_and_runtime_revalidation_without_thesis_clock_refresh
 evidence: sources:S13
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_pre_and_post_silicon_interoperability_scope_passport_without_thesis_clock_refresh
+evidence: sources:S14,S15
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -105,6 +112,20 @@ evidence: sources:S13
 - **失敗關閉（Fail closed）**：證據缺失、過期或不符時，先拒絕建立高保證信任域；若容許降級，仍要隔離並留下可見狀態。
 - **Security Platform（安全平台）**：System RoT 接受晶粒身分、證據、拓撲與政策綁定後，跨多顆晶粒建立並持續維護的系統安全域。
 - **Declaration（宣告）**：FCSA 規格用來引入概念、術語或資料結構的規範性內容類別；它不描述行為，行為由 Rule 說明。
+- **前矽模擬（Pre-silicon simulation）**：晶片製造前，用數位模型、向量與驗證環境檢查狀態機、介面和協定；它看不到完整實體通道與製程變異。
+- **實體上電（Live／post-silicon）**：晶片製造並封裝後，以真實矽晶粒建立連線；它比純模擬多跨過實體存在，但通過範圍仍取決於公開測項。
+- **PHY**：Physical Layer，實體層；把邏輯資料轉成晶粒間可傳送的電氣訊號，包含數位邏輯與需真實矽驗證的電氣／類比前端。
+- **Adapter Layer**：介接層；位於 PHY 與上層協定之間，處理封包格式、CRC、重送、電源與錯誤訊息等功能。
+- **RDI**：Raw Die-to-Die Interface，PHY 與 Adapter Layer 之間的標準介面；到 RDI 只代表測試邊界抵達 PHY 上緣。
+- **FDI**：Flit Die-to-Die Interface，Adapter Layer 與主機側協定邏輯之間的介面；抵達 FDI 才把 Adapter Layer 納入同一測試範圍。
+- **DUT**：Device Under Test，受測裝置；測試報告若不說哪一端是 DUT、另一端是參考模型或晶粒，就很難重現結果。
+- **Golden die（黃金晶粒）**：符合性測試用的參考晶粒；若要讓結果可重現，報告需記錄其版本、封裝、功能與測試方法，不能只靠「標準晶粒」名稱背書。
+- **ACTIVE**：UCIe 連線訓練完成、可開始傳資料的狀態；進入 ACTIVE 是一個必要里程碑，不等於所有協定、錯誤情境與長時間可靠度都通過。
+- **UCIe-S**：UCIe standard package 的實體路徑；本篇 16G 現場展示只直接證實這一種路徑，不替 advanced package 背書。
+- **BER**：Bit Error Rate，位元錯誤率；要連同測試位元數、時間、條件與零錯誤時的信賴上限閱讀，不能只寫「無錯」。
+- **Cameron Creek**：Intel／Cadence 於 2026 Chiplet Summit 展示所用的名稱；活動頁只稱 test chip，未識別為客戶產品或量產平台。
+- **Gbps／GT/s**：Gbps 是每秒十億位元，GT/s 是每秒十億次傳輸；兩者都要搭配 lanes、方向與編碼，不能只看數字比較完整系統吞吐。
+- **x64**：本文 Cadence 模型的 64-lane 寬度標記；它描述模型配置，不等於活動回顧已公開 live demo 的 lane count。
 
 ### 三句話抓重點
 
@@ -481,6 +502,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: Cadence 2024 白皮書記錄一組 Intel 向量與 Cadence UCIe advanced-package PHY 模型的前矽互通：環境使用 x64 lanes、在 16 Gbps 操作，找出 lane check 順序、狀態跳過、PLL 等待時間與 eye-sweep 次數不一致，調整向量與環境後兩端建立連線並進入 ACTIVE
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2024-08-02
+basis: S15 的 UCIe Verification Challenges、Simulation Logistics、Simulation - Interoperability over UCIe 與 Conclusion 逐項記錄 x64 model、16 Gbps、四類不一致、修正及 ACTIVE 結果
+boundary: 這是 Cadence 撰寫的前矽案例，不是獨立 benchmark；向量曾加入 delay／response、修正 state sequence 與 eye-sweep 次數，D2C point test 也曾暫時關閉，初始範圍只到 RDI 且沒有公開完成 controller／Adapter／FDI／protocol 下一步、真實類比前端、封裝通道、BER、溫壓角落、產品 qualification、部署或財務結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: verified
+status: active
+claim: UCIe Consortium 2026 Chiplet Summit 紀錄顯示，Cameron Creek 現場展示以獨立設計的 Intel 與 Cadence 晶粒、16G UCIe-S PHY 完成跨供應商實體互通測試
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-03-05
+basis: S14 的 live demonstration 段落直接列出 Cameron Creek、independently designed Intel and Cadence chiplets、16G UCIe-S PHY IP 與 successful UCIe Interoperability Testing
+boundary: 活動回顧沒有揭露 UCIe revision、lane count、封裝與通道、traffic／protocol、運作時間、錯誤或 BER、電壓溫度、樣品與批次、Adapter Layer 覆蓋、CDXML／3DK、foundry／OSAT、客戶 qualification、量產或財務結果；同頁的 UCIe 3.0 48／64 GT/s 是另一段規格敘述，不能補成展示版本
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: inference
+status: active
+claim: 研究小晶片互通時，應用一份八欄「互通範圍護照」分開記錄受測物件與版本、證據階段、參與角色、層與介面邊界、速率與實體路徑、刺激與協定、樣本環境及錯誤覆蓋、下游交付與資格；前矽模擬、實體 PHY 連線、完整 Adapter／protocol、設計資料交接及客戶 qualification 不能共用一個 pass 標記
+supporting_source_ids: S14,S15
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S15 把 electrical／mechanical、PHY、RDI、Adapter、FDI、protocol 與 golden-die compliance 拆開，並顯示前矽向量能找出數位狀態與時序差異但類比前端需實體矽；S14 又只直接證實 16G UCIe-S 的現場實體連線，因此本研究中心把每筆互通證據整理為八個不可互換欄位
+boundary: 八欄護照是研究中心的證據稽核框架，不是 UCIe、OCP、Intel 或 Cadence 的官方表單；它不否定未公開測試，也不因欄位完整就自動證明 CDXML／3DK、foundry／OSAT、產品量產或財務材料性
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分四層契約，才知道問題卡在哪裡
 
 | 契約層 | 它回答什麼 | 本篇例子 | 通過前仍可能失敗 |
@@ -495,6 +567,99 @@ resolution:
 
 最後一層才把前三層變成可稽核流程。它需要固定版本、檔案雜湊、正反測試資料、預期錯誤、
 工具版本、結果差異與簽核責任，而不只是規格名稱。
+
+## 同樣叫互通，模擬與實體上電不是同一張證書
+
+把小晶片互通想成兩家公司通電話。模擬可以先檢查雙方是否依正確順序問候、等待與回覆；實體
+上電則證明真的有兩支電話、線路接得起來。但一通電話接通，不代表兩家公司接著交換的施工圖、
+材料表、驗收表與付款資料也相容。UCIe 連線、FCSA 系統角色、CDXML／3DK 設計資料與產品資格
+就是不同張證書。
+
+### 先問證據在哪一層，不要先問有沒有 pass
+
+| 證據層 | 白話問題 | 可能暴露的失敗 | 還不能替代 |
+|---|---|---|---|
+| 1. 規格與解讀 | 兩邊讀的是哪一版、同一條規則嗎？ | 名詞、狀態與欄位理解不同 | 任何實作已通過 |
+| 2. 前矽模擬 | 數位模型按共同刺激能走完狀態嗎？ | 順序、握手、等待、通道檢查與錯誤處理差異 | 真實電壓、通道、封裝與製程變異 |
+| 3. 實體 PHY 連線 | 真實晶粒能訓練並建立電氣連線嗎？ | 類比前端、實體通道與封裝才會出現的問題 | Adapter、所有 protocol、長時間與故障覆蓋 |
+| 4. Adapter／protocol／traffic | CRC、重送、傳輸單元（flit）、協定與工作負載是否一起通？ | 上層格式、錯誤注入與服務行為差異 | 設計資料、製造與封測簽核 |
+| 5. 設計資料與製造交接 | 同一 bundle 能被工具、foundry 與 OSAT 重現嗎？ | 單位、座標、模型、版本、waiver 與測試接取差異 | 客戶產品已接受與量產 |
+| 6. 客戶資格與商業化 | 具名產品在共同條件下能否持續交付？ | 可靠度、良率、供應、成本與實際服務問題 | 其他產品或全產業等比例受惠 |
+
+前四層拆的是介面測試範圍，後兩層是設計交付與商業門檻，不是 UCIe protocol stack。這六層是
+研究中心的閱讀順序，也不是 UCIe 官方成熟度等級。前一層通常能降低下一層風險，卻不會自動讓
+下一層畢業；同一個「interoperability」字樣也可能只覆蓋其中一格。
+
+### Cadence 案例：模擬最有價值的地方，是提早看見不一致
+
+Cadence 2024 白皮書回顧 Intel 與 Cadence 的前矽合作。測試使用 Cadence advanced-package PHY
+的 x64 model、Intel 提供的向量與 16 Gbps 操作；向量推進過快時，Cadence 端還沒完成目前狀態，
+兩邊便失去同步。實際找到的問題包括通道檢查（lane check）順序、非法跳過狀態、鎖相迴路
+（PLL）鎖定等待不足、眼圖掃描（eye-sweep）步數及重複次數不同。
+
+團隊加入等待與必要回覆、修正向量及檢查順序後，兩端能建立連線並進入 `ACTIVE`。這是有用的
+工程證據，因為問題在晶片製造前就被看見；它也不是一張無條件證書。白皮書同時記錄資料相對
+時鐘（D2C）取樣點測試曾暫時關閉，而且初始 PHY interop 的邊界只到 RDI。文件把加入 controller
+寫成下一步；若完成，測試範圍才會經過 Adapter Layer 的側帶控制（sideband）、主資料通道
+（mainband）、CRC 與重送，延伸到主機側 FDI，但頁面沒有公開這一步的完成結果。
+
+來源還特別把矽的角色說清楚：PHY 的數位邏輯、Adapter 與 protocol 可以在前矽階段先測，
+電氣／類比前端才依賴真實矽。換句話說，模擬通過能提高數位實作信心，不能量到
+真實封裝通道的 BER、電壓／溫度角落或長時間可靠度。
+
+### 現場 demo 前進一格，仍要打開測試包絡
+
+另一份同樣由 Intel／Cadence 參與的 UCIe Consortium 2026 活動回顧，則把公開證據帶到實體層：
+Cameron Creek 現場連接獨立設計的
+Intel 與 Cadence chiplet，使用 16G UCIe-S PHY 完成跨供應商互通測試。這比紙上規格、模擬或
+tape-out 多證明一件事——真實晶粒確實建立過指定實體連線。
+
+兩份來源沒有共同的 chip／IP revision、輸入、test-plan version 或結果 ID，因此不能把 2024
+模型與向量案例、2026 test chip 自動串成同一受測物或一條連續驗證計畫。
+
+但短篇活動回顧沒有列 UCIe revision、lane count、package／channel、traffic／protocol、運作
+時間、錯誤與 BER、電壓溫度、晶粒或批次分母，以及 Adapter／FDI 覆蓋。頁面另一段提到 UCIe
+3.0 的 48／64 GT/s，也不能倒填成這個 16G demo 使用 UCIe 3.0。更不能因為兩顆晶粒會連線，
+就補上 CDXML／3DK、跨工具、foundry／OSAT、客戶 qualification 或量產收入。
+
+這也說明「較晚、較實體」不等於每個維度都更完整。現場 demo 在物件成熟度上領先模擬，
+白皮書卻在測項、失敗與修正細節上揭露更多；研究時要同時保存物件階段與測試覆蓋，不能只排
+一條高低階梯。
+
+### 一份互通範圍護照至少要有八欄
+
+| 欄位 | 最少記錄 | 沒有它會混淆什麼 |
+|---|---|---|
+| 1. 受測物件與版本 | 晶粒／model／向量／spec／test plan 身分與 SHA | 同名不同版 |
+| 2. 證據階段 | 模擬、tape-out、回片、live demo、compliance、qualification | 設計存在冒充實體通過 |
+| 3. 參與角色 | 兩端供應者、DUT、reference／golden die、測試與簽核者 | 同源自測冒充獨立互通 |
+| 4. 層與介面邊界 | 類比前端、PHY logic、RDI、Adapter、FDI、protocol | 進入 ACTIVE 冒充全 stack 通過 |
+| 5. 速率與實體路徑 | data rate、lanes、UCIe-S／A、package、channel、電壓／溫度極端條件 | 16G 特定路徑冒充 64G 或所有封裝 |
+| 6. 刺激與服務 | 向量、state、traffic、protocol、CRC／retry、error injection | 單一握手冒充工作負載與故障覆蓋 |
+| 7. 樣本與結果 | die／package／lot、時間、環境、pass／fail、BER、coverage、例外放行 | 一次展示冒充分布與可靠度 |
+| 8. 下游交付 | CDXML／3DK、cross-tool、foundry／OSAT sign-off、客戶與財務共同鍵 | 介面互通冒充可製造、可賣與有收入 |
+
+八欄護照是研究中心的查核工具，不是產業共同表格。用途是讓下一位讀者知道這個 pass 真正停在
+哪裡；空白欄位不必推翻已量到的結果，但必須阻止跨層外推。
+
+### 多空小作文：兩邊共用同一份互通成績單
+
+本輪只支持第 2、3 層各一筆公開紀錄；第 4–6 層以及財務共同觀測仍是 `N=0`。
+
+**偏多版本。** 如果同一對多供應商晶粒能把前矽發現的差異一路關閉，實體測試再公開
+固定測試計畫（fixed test plan）、層級覆蓋、錯誤、長時間與多顆分布；若同一 bundle 還能跨工具、foundry／OSAT 與客戶
+資格回溯，標準化才可能降低重工與整合週期，讓 IP、驗證、封裝與測試服務形成可重複交付。
+
+**偏空版本。** 每次 demo 都更換版本、封裝與測試方法，只公布進入 ACTIVE，向量與私有對照
+規則（mapping）仍靠雙方人工調整；公開名稱看似相容，設計資料、完整 protocol、故障覆蓋與客戶產品卻無法接成
+同一條證據鏈。這時聯盟動能可能主要停在整合活動，不能換算成開放市場或供應商財務。
+
+兩邊共用的裁決，是同一受測物件沿八欄留下可重現的前後紀錄，而不是 demo 次數或最高 data
+rate。本輪是 `N=2` 份官方紀錄、`N=2` 條發布消息鏈，兩份都涉及 Intel／Cadence 這組供應商
+配對，卻不足以證明同一受測物或連續測試計畫，也不是兩組獨立產品、客戶或 deployment 樣本；
+具名 CDXML／3DK handoff、foundry／OSAT sign-off、
+產品 qualification、production 與財務共同觀測均為 `N=0`。這些是文件紀錄而非抽樣估計，
+因此 sampling SE／t 不適用。
 
 ## 每顆晶粒都能安全開機，仍不等於整個封裝可信
 
@@ -997,6 +1162,54 @@ locator: PDF file p.7 的 version history；file p.11 的 normative content 與 
 limitation: 這是 1.1.0 Alpha 0 文件且與 S1／S2 同屬 OCP／Arm 規格消息鏈；部分安全內容為 information 或 implementation note，不是全部皆為 normative Rule，也沒有固定 conformance test suite、獨立實作、攻擊測試、客戶 qualification、production deployment、field 統計或財務結果
 -->
 
+<!-- research_source
+source_id: S14
+role: other_primary
+source_kind: document
+publisher: UCIe Consortium
+independence_group: ucie-consortium
+title: Chiplet Summit 2026: UCIe Momentum Across a Growing Ecosystem
+published_at: 2026-03-05
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.uciexpress.org/post/chiplet-summit-2026-ucie-momentum-across-a-growing-ecosystem
+locator: first live UCIe-S interoperability demonstration 段落的 Cameron Creek、Intel／Cadence independently designed chiplets、16G PHY 與 successful UCIe Interoperability Testing；UCIe 3.0 48／64 GT/s 是後續另一段
+limitation: Consortium 活動回顧只直接證實一組 16G UCIe-S 現場展示；沒有 revision、lane count、package／channel、traffic／protocol、duration、error／BER、voltage／temperature、sample／lot、Adapter／FDI、CDXML／3DK、foundry／OSAT、customer qualification、production 或 financial result
+-->
+
+<!-- research_source
+source_id: S15
+role: competitor_primary
+source_kind: document
+publisher: Cadence Design Systems
+independence_group: cadence-eda-vendor
+title: Intel and Cadence Collaboration on UCIe: Demonstration of Simulation Interoperability
+published_at: 2024-08-02
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.cadence.com/en_US/home/resources/white-papers/intel-and-cadence-collaboration-on-ucie-wp.html
+locator: UCIe Compliance Challenges、Role of Pre-Silicon Interoperability、Verification Challenges、Simulation Logistics、Initial Interop、Simulation - Interoperability over UCIe、Controller Simulation Interop 與 Conclusion
+limitation: Cadence 撰寫的供應商案例使用 model、partner vectors 與可調整 test environment；沒有獨立第三方 benchmark、完整 analog／package path、公開 golden-die compliance report、BER／corner／duration／sample distribution、customer qualification、production deployment 或 financial result
+-->
+
+<!-- research_source
+source_id: S16
+role: other_primary
+source_kind: living_index
+publisher: UCIe Consortium
+independence_group: ucie-consortium
+title: UCIe Consortium Events Index
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.uciexpress.org/events
+locator: 2026-08-24 的 upcoming／past events 與 Chiplet Summit 2026 Cameron Creek recap 入口，供後續尋找新的 live demonstration、test report 或公開活動附件
+limitation: 動態活動頁會變動，且活動列名、攤位或 recap 不是固定 test plan、raw result、conformance certificate、customer deployment 或 financial evidence
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -1075,9 +1288,25 @@ trigger: 固定 FCSA 1.1 release 與 test suite 下，非 Arm 實作公布具名
 invalidation: 若 beta／release 移除或實質改寫組合判定、lifecycle 或 runtime revalidation，則依新固定版本重寫 C15–C19；若只是沒有實作，C20 維持未驗證而不把架構判為失效
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C21,C22,C23
+metric: 同一具名 UCIe 跨廠組合的互通範圍，是否能由前矽模擬一路對齊實體 PHY、Adapter／protocol、固定測試包絡及下游設計資料與產品資格
+source_ids: S14,S15
+watch_source_ids: S16
+frequency: event_driven
+frequency_detail: UCIe Consortium 或 Intel／Cadence 公布新 live demo、compliance report、test plan、customer qualification 或 production evidence 後複核
+next_check: 2026-09-30
+trigger: 同一受測組合公開 spec／IP／test-plan version、兩端角色、Analog／PHY／RDI／Adapter／FDI／protocol scope、rate／lanes／package／traffic、duration／error／BER／corner／sample 分母，並可連回 CDXML／3DK、foundry／OSAT 或客戶 qualification
+invalidation: 若後續固定報告顯示前矽與實體結果不能對回同一物件、必要 test 被 workaround 排除、或 interface pass 無法延伸到宣稱層級，則依實際邊界修正 C21–C23，不以新 demo 數量補齊缺欄
+-->
+
 ## 目前不能下的結論／待驗證
 
 - 不能把 FCSA compliance、UCIe interoperability 與 CDXML／3DK conformance 當成同一張證書；三者檢查的對象不同。
+- 不能把前矽模擬進入 ACTIVE，改寫成真實類比前端、封裝通道、BER、電壓溫度、長時間與客戶產品已通過。
+- 不能把 16G UCIe-S 現場 demo 的成功，倒填成 UCIe 3.0 48／64 GT/s、完整 Adapter／protocol、設計資料交接或量產資格。
 - 不能由 OCP 已公開 schema，推成四份 XSD 都可執行；固定 commit 的完整檢查已顯示兩份解析失敗。
 - 不能由 DankaChiplet 或任何單一工具宣稱支援 CDXML，推成兩套 EDA 工具對同一資料會得到相同結果。
 - 不能把 Arm 多供應商平台的 CSA／CHI C2C 敘述，改寫成已採用 CDXML／3DK 或已通過 foundry／OSAT 共同簽核。

@@ -3,6 +3,9 @@
 本圖把封裝內連線、系統角色、機器可讀設計資料與端到端符合性流程分開。公開證據目前只到
 正式架構、部分可執行 schema 與單工具自述，不把它畫成跨工具、封測量產或公司訂單。
 
+新增的 Intel／Cadence 紀錄把介面層拆成前矽模擬與跨廠實體連線：後者跨過真實晶粒存在，
+仍沒有補齊 Adapter／protocol 測試包絡、CDXML／3DK 交接、foundry／OSAT 簽核或客戶資格。
+
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: chiplet-design-handoff-contracts
@@ -311,4 +314,44 @@ review_due: 2026-09-30
 status: active
 boundary: CRoT-A與System RoT的組合證據架構不證明固定release test suite 非Arm實作 客戶qualification production deployment field結果或供應商財務。
 next_trigger: 固定FCSA 1.1 release及test suite下 多家晶粒整合OEM與獨立驗證方公布同一manifest attestation 事件重驗 失敗處置與客戶資格結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I15
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: stage:cross-vendor-demo
+relation: reaches_stage
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C22
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: adjacent
+exclusivity: limited_source
+exclusivity_scope: 本輪只有UCIe Consortium對Intel與Cadence Cameron Creek同一組16G UCIe-S現場展示的活動回顧 不是第二組產品 客戶或獨立部署。
+as_of: 2026-03-05
+review_due: 2026-09-30
+status: active
+boundary: 跨廠實體PHY連線不證明UCIe revision lane package traffic duration BER Adapter protocol CDXML 3DK foundry OSAT qualification production或財務。
+next_trigger: 同一受測組合公開固定版本與test plan並補齊PHY到Adapter protocol的測項 錯誤 長時間 環境及樣本結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I16
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: process:chiplet-interoperability-scope-passport
+relation: requires
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C21,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C22,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C23
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: unknown
+exclusivity: limited_source
+exclusivity_scope: 八欄護照是研究中心依Cadence前矽案例與UCIe Consortium同一Intel Cadence合作實體展示整理的稽核框架 不是聯盟標準或多個獨立產品共同採用的表單。
+as_of: 2026-08-24
+review_due: 2026-09-30
+status: active
+boundary: 護照只固定每筆互通證據的層級與缺欄 本身不證明full-stack CDXML 3DK foundry OSAT customer qualification production或財務材料性。
+next_trigger: 另一組獨立供應商或同一Intel Cadence組合公布可重現的八欄資料並串接設計資料 製造封測與客戶結果。
 -->

@@ -6156,6 +6156,23 @@ class ResearchCenterTest(unittest.TestCase):
             "## 先分四層契約，才知道問題卡在哪裡",
             "| 1. 連線介面 |", "| 2. 系統角色 |",
             "| 3. 設計資料 |", "| 4. 符合性流程 |",
+            "## 同樣叫互通，模擬與實體上電不是同一張證書",
+            "| 2. 前矽模擬 |", "| 3. 實體 PHY 連線 |",
+            "| 4. Adapter／protocol／traffic |",
+            "Cadence advanced-package PHY",
+            "時鐘（D2C）取樣點測試曾暫時關閉",
+            "初始 PHY interop 的邊界只到 RDI",
+            "Cameron Creek 現場連接獨立設計的",
+            "不能把 2024",
+            "模型與向量案例、2026 test chip 自動串成同一受測物",
+            "同頁的 UCIe 3.0 48／64 GT/s 是另一段規格敘述",
+            "### 一份互通範圍護照至少要有八欄",
+            "| 1. 受測物件與版本 |", "| 4. 層與介面邊界 |",
+            "| 7. 樣本與結果 |", "| 8. 下游交付 |",
+            "兩邊共用的裁決，是同一受測物件沿八欄留下可重現的前後紀錄",
+            "不是兩組獨立產品、客戶或 deployment 樣本",
+            "claim_id: C21", "claim_id: C22", "claim_id: C23",
+            "monitor_id: T4",
             "## 每顆晶粒都能安全開機，仍不等於整個封裝可信",
             "### Alpha 有規範性規則，仍不是已發布產品證書",
             "規格只承諾到 beta 後 content identifier 跨版維持相同",
@@ -6200,10 +6217,10 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("transition", 4),
-            ("research_source", 13), ("research_claim", 20),
+            ("research_topic", 1), ("transition", 5),
+            ("research_source", 16), ("research_claim", 23),
             ("metric_comparison", 0), ("impact", 3),
-            ("monitoring_item", 3),
+            ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -6230,6 +6247,8 @@ class ResearchCenterTest(unittest.TestCase):
             "process:chiplet-semantic-handoff-passport,process,小晶片語意交接十欄護照",
             "metric:chiplet-unit-coordinate-cross-artifact-boundary,metric,小晶片單位座標與跨檔身分邊界",
             "process:chiplet-compositional-trust-passport,process,小晶片組合信任十欄護照",
+            "stage:cross-vendor-demo,stage,跨廠測試晶片互通",
+            "process:chiplet-interoperability-scope-passport,process,小晶片互通範圍八欄護照",
         ):
             self.assertIn(concept, concepts)
         graph = (
@@ -6244,9 +6263,21 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: metric:chiplet-unit-coordinate-cross-artifact-boundary",
             "edge_id: KG-CDH-I14",
             "to_id: process:chiplet-compositional-trust-passport",
+            "edge_id: KG-CDH-I15",
+            "to_id: stage:cross-vendor-demo",
+            "edge_id: KG-CDH-I16",
+            "to_id: process:chiplet-interoperability-scope-passport",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 15)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 17)
+
+        scans = (
+            ROOT / "notes" / "research_topics" / "scan_log.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "scan-2026-08-24-ucie-pre-post-silicon-scope-passport",
+            scans,
+        )
 
         route = next(
             row for row in bd.RESEARCH_LEARNING_ROUTES
