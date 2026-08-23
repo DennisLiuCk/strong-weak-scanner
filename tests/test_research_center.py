@@ -4868,7 +4868,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 67
+            sum(line.startswith("- **") for line in glossary.splitlines()), 75
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4885,8 +4885,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 23),
-            ("research_claim", 22), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 24),
+            ("research_claim", 26), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -4919,15 +4919,17 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:workload-conditioned-tail-latency,metric,工作負載條件化尾端延遲",
             "process:ai-storage-endurance-passport,process,AI 儲存十二欄耐久護照",
             "metric:application-host-nand-write-ledgers,metric,應用、主機與 NAND 三層寫入帳",
+            "process:ai-ssd-commercial-five-ledger-passport,process,AI SSD 商業五帳護照",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: AI 資料讀取與儲存路徑", graph)
         for edge_id in (
-            "KG-ASD-C04", "KG-ASD-I11", "KG-ASD-I12", "KG-ASD-I13",
+            "KG-ASD-C04", "KG-ASD-C05", "KG-ASD-I11", "KG-ASD-I12", "KG-ASD-I13",
             "KG-ASD-I14", "KG-ASD-I15", "KG-ASD-I16", "KG-ASD-I17",
+            "KG-ASD-I18",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
 
     def test_ai_storage_endurance_separates_application_host_nand_and_rated_life(self):
         topic = (
@@ -4993,6 +4995,89 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertEqual(snapshot["sources"]["active"], 618)
         self.assertEqual(snapshot["monitors"]["active"], 127)
         self.assertEqual(snapshot["graphs"]["activeEdges"], 812)
+
+    def test_ai_storage_commercial_five_ledgers_separate_volume_price_contract_rpo_and_revenue(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-09_ai_storage_data_plane.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "separated_datacenter_volume_unit_revenue_recognized_revenue_nbm_and_rpo_ledgers_without_thesis_or_clock_refresh",
+            "## AI SSD 需求不是一個數字：先拆量、價、長約、RPO 與營收",
+            "| 五本商業帳 | Sandisk 本輪可確認的數字或條件 | 它回答什麼 | 還不能回答什麼 |",
+            "| 1. 容量出貨帳 |",
+            "| 2. 每單位營收帳 |",
+            "| 3. 已認列營收帳 |",
+            "| 4. NBM 長約帳 |",
+            "| 5. RPO 未履約帳 |",
+            "598 億美元",
+            "全部屬 NBM",
+            "約 19% 預期十二個月內認列",
+            "### 量價乘法只能做量級檢查，不能冒充精確橋接",
+            "2.2 × 2.5 = 5.50",
+            "51.53 ÷ 9.60 = 5.367708",
+            "N＝1 個發行人、N＝1 組公司年度比較",
+            "沒有抽樣、sampling\nSE／t",
+            "### 多空小作文共用同一套五本帳",
+            "| 偏多：容量、變現與合約能見度一起延續 |",
+            "| 偏空：價格、組合或履約時程回落 |",
+            "沒有共同鍵就維持 unverified",
+            "claim_id: C23\nlabel: verified",
+            "claim_id: C24\nlabel: verified",
+            "claim_id: C25\nlabel: inference",
+            "claim_id: C26\nlabel: unverified",
+            "source_id: S24\nrole: company_filing",
+            "published_at: 2026-08-17",
+            "SEC Accession No. 0001628280-26-057406",
+        ):
+            self.assertIn(contract, topic)
+        meta = topic.split("<!-- research_topic", 1)[1].split("-->", 1)[0]
+        self.assertIn("thesis_claim_id: C5", meta)
+        self.assertIn("last_reviewed_at: 2026-08-12", meta)
+        self.assertIn("review_due: 2026-08-28", meta)
+        self.assertIn("base_confidence: medium", meta)
+        self.assertNotIn("monitor_id: T5", topic)
+
+        concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
+            encoding="utf-8"
+        )
+        graph = (
+            ROOT / "notes" / "knowledge_graph" / "ai_storage_data_plane.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "process:ai-ssd-commercial-five-ledger-passport,process,"
+            "AI SSD 商業五帳護照",
+            concepts,
+        )
+        for contract in (
+            "edge_id: KG-ASD-C05",
+            "from_id: company:sandisk",
+            "relation: reports_financials",
+            "edge_id: KG-ASD-I18",
+            "to_id: process:ai-ssd-commercial-five-ledger-passport",
+            "relation: requires",
+        ):
+            self.assertIn(contract, graph)
+        scans = (
+            ROOT / "notes" / "research_topics" / "scan_log.csv"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "scan-2026-08-24-ai-storage-commercial-five-ledgers", scans
+        )
+        snapshot = json.loads((
+            ROOT / "notes" / "research_method_reviews"
+            / "2026-08-24_05.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(snapshot["snapshotId"], "RMA-2026-08-24-05")
+        self.assertEqual(snapshot["claims"]["active"], 762)
+        self.assertEqual(snapshot["sources"]["active"], 672)
+        self.assertEqual(snapshot["monitors"]["active"], 142)
+        self.assertEqual(snapshot["graphs"]["activeEdges"], 846)
+        self.assertEqual(snapshot["scans"]["events"], 142)
+        self.assertEqual(
+            snapshot["scans"]["latestId"],
+            "scan-2026-08-24-ai-storage-commercial-five-ledgers",
+        )
 
     def test_compute_connect_station_two_separates_helios_stages_customers_and_company_gates(self):
         topic = (

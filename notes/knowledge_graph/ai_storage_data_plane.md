@@ -2,7 +2,8 @@
 
 本圖把訓練時餵資料、故障前保存進度與服務擴充時搬模型拆成三種工作，並把 checkpoint 的
 暫存、上傳、耐久、正確回載與訓練有效時間分成不同驗證節點，再分開應用資料、主機寫入、
-NAND 寫入與額定壽命四本帳。公司線只表示已核驗的儲存能力
+NAND 寫入與額定壽命四本帳，最後再把容量出貨、每單位營收、長約、RPO 與已認列財務拆成
+五本商業帳。公司線只表示已核驗的儲存能力或財務揭露
 或平台路徑；沒有買方客戶認證、部署分母與財務資料前，不把相鄰能力畫成訂單。
 
 <!-- knowledge_graph_meta
@@ -10,7 +11,7 @@ schema_version: 1
 graph_id: ai-storage-data-plane
 root_node_id: concept:ai-storage-data-plane
 label: AI 資料讀取與儲存路徑
-summary: 以最慢讀取時間 checkpoint 完成與復原 以及模型副本位置分開三種人工智慧資料工作 再用十欄效能護照 八格復原護照與十二欄耐久護照把 IOPS 吞吐 延遲 併行 裝置狀態 應用主機NAND寫入 額定壽命 I/O模擬 暫存上傳 耐久回載 訓練有效時間與公司能力保持在不同證據層。
+summary: 以最慢讀取時間 checkpoint 完成與復原 以及模型副本位置分開三種人工智慧資料工作 再用十欄效能護照 八格復原護照 十二欄耐久護照與AI SSD商業五帳護照 把IOPS吞吐延遲併行裝置狀態 應用主機NAND寫入額定壽命 I/O模擬暫存上傳耐久回載訓練有效時間 容量出貨每單位營收長約RPO已認列財務與公司能力保持在不同證據層。
 article_ids: MI-2026-08-09-AI-STORAGE-DATA-PLANE
 status: active
 -->
@@ -93,6 +94,26 @@ review_due: 2026-08-31
 status: active
 boundary: Google Cloud 文件證實自身多層 checkpoint 路徑與單一具名工作負載組態的 vendor-reported Goodput 結果；沒有公開重複 run 變異原始資料完整 baseline 設備 BOM 或台灣供應商映射。
 next_trigger: Google 或客戶公開版本化受測系統 重複 run fault injection restore correctness Runtime Goodput 資源成本與具名設備配置。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-C05
+view: company
+from_id: company:sandisk
+to_id: concept:ai-storage-data-plane
+relation: reports_financials
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C23,MI-2026-08-09-AI-STORAGE-DATA-PLANE#C24
+note_refs:
+evidence_state: verified
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-17
+review_due: 2026-08-28
+status: active
+boundary: Sandisk 10-K 證實廣義 Datacenter 已認列營收的量價變化以及跨 Datacenter 與 Edge 的 NBM／RPO 存量；它沒有拆出 AI workload、enterprise SSD、客戶、產品、毛利或台灣供應商，也不能把 RPO 當成當期營收、出貨或收款。
+next_trigger: Sandisk 以同一產品 客戶 合約與期間公開絕對exabytes 每GB營收 NBM／RPO變動 實際交付 已認列營收 毛利與現金 並由買方文件雙向核對用途及產品。
 -->
 
 <!-- knowledge_edge
@@ -433,4 +454,24 @@ review_due: 2026-08-28
 status: active
 boundary: A H N三層帳只有在裝置時間窗bytes定義副本範圍與counter契約一致時才能重算H除A N除H與N除A 任一產品型錄數字都不能替代production telemetry。
 next_trigger: Operator與SSD供應商以同一checkpoint或dataset workload公開application bytes Data Units Written physical NAND bytes counter lineage WAF與失效重建紀錄。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I18
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: process:ai-ssd-commercial-five-ledger-passport
+relation: requires
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C25
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-17
+review_due: 2026-08-28
+status: active
+boundary: 五帳護照是研究中心用Sandisk單一10-K建立的對帳框架 不是Sandisk或產業共同標準；量價方向與營收量級相符不等於精確因果橋接 更不能把長約或RPO指定為AI SSD 台灣公司訂單或財務貢獻。
+next_trigger: 具名供應商以同一產品 end market 客戶 合約與期間公開絕對容量 單位營收 長約條款 RPO期初新增認列修改取消 已認列營收 毛利現金與買方用途。
 -->

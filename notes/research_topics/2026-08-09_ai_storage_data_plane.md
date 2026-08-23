@@ -88,6 +88,13 @@ to: triaged
 reason: separated_application_host_nand_and_rated_endurance_ledgers_without_thesis_or_clock_refresh
 evidence: sources:S20,S21,S22,S23
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: separated_datacenter_volume_unit_revenue_recognized_revenue_nbm_and_rpo_ledgers_without_thesis_or_clock_refresh
+evidence: sources:S24
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -160,12 +167,20 @@ evidence: sources:S20,S21,S22,S23
 - **客戶資格認證（Qualification）**：客戶依功能、效能、可靠度與製造條件確認產品是否可採用；產品存在不等於已通過認證。
 - **部署分母**：用來判斷需求規模的共同基準，例如機器數、每台容量、路徑使用比例、存檔頻率與設備利用率。
 - **廣義 AI 產品組合（AI Ecosystem）**：公司把企業 SSD、AI PC、網路、伺服器與其他產品合併計算的分類；不能直接當成資料中心儲存收入。
+- **Exabyte（EB）出貨量**：用容量而不是顆數表示售出的資料儲存量；它能回答總共賣出多少容量，不能單獨回答 SSD 顆數、平均容量、產品組合或終端實際使用量。
+- **每 GB 營收（Revenue per gigabyte）**：已認列營收除以同口徑售出容量的平均值；它可能同時反映價格、產品與客戶組合、容量規格及銷售折讓，不是 NAND 現貨價、單一 SSD 售價、成本或毛利。
+- **已認列營收**：公司已履行收入認列條件、列入該期損益的金額；產品銷售通常要等控制權依交貨條件移轉，不能由簽約額或未履約承諾直接代替。
+- **新商業模式長約（New Business Models，NBM）**：Sandisk 對一類多年期客戶協議的正式名稱；雙方一般承諾特定產品量，但價格含固定與變動部分，仍有供應、規格、違約、終止與轉售風險。
+- **剩餘履約義務（Remaining performance obligations，RPO）**：已簽合約中分配給尚未履行承諾的交易價格；它是未履約合約存量，不是當期營收、出貨、開票、收款、毛利或自由現金流。
+- **Edge（終端市場分類）**：Sandisk 用來合併個人電腦、行動裝置、遊戲、汽車、實體人工智慧、家庭娛樂與工業產品的廣義市場分類；它不是單一邊緣人工智慧產品或工作負載。
+- **FY2026**：Sandisk 截至 2026-07-03 的 53 週會計年度；比 52 週的前一年度多一週，年度成長率不能假裝已做同週數調整。
+- **FY2025**：Sandisk 截至 2025-06-27 的 52 週會計年度；本文只把它當同公司比較期，不把單一年度差異外推成產業樣本。
 
 ### 三句話抓重點
 
 - 人工智慧系統有三種容易混在一起的工作：訓練時持續餵訓練資料、故障前先保存進度，以及服務擴充時把模型檔案送到新機器；三種工作卡住的原因不同。
 - 餵資料怕最慢的一次讀取讓整群運算晶片等待；保存進度要依序證明暫存、上傳、耐久保存、正確回載與故障後接續訓練，不能只報寫入速度；搬模型則取決於副本放在哪裡，以及能否從附近機器直接取得。
-- 所以「資料變多」不能直接換算成更多硬碟或某家公司營收；還要分開應用資料、主機送出的寫入、快閃媒體實際寫入與額定壽命，並看到實際路徑、客戶認證、部署數量與財務資料。
+- 所以「資料變多」不能直接換算成更多硬碟或某家公司營收；除了分開應用資料、主機寫入、快閃媒體寫入與額定壽命，還要把售出容量、每單位營收、已認列營收、長約與未履約承諾分帳，再核對實際路徑、客戶認證與部署數量。
 
 ### 為什麼重要
 
@@ -187,6 +202,7 @@ evidence: sources:S20,S21,S22,S23
 - 若資料談 checkpoint，先問「完成」是暫存完成、上傳完成、耐久副本完成，還是已實際回載並接續訓練；四者不能互換。
 - 再查同一平台的快取命中、路徑使用比例、機器數、每台容量與設備利用率，避免把三家不同架構直接相加。
 - 寫入型工作還要同時記錄每日邏輯 bytes、host bytes、NAND bytes、WAF、DWPD／TBW、可用容量、保固年限、Percentage Used 與備援媒體，不能用 GB/s 代替耐久度。
+- 看到供應商財報時，另把容量出貨、每單位營收、當期已認列營收、長約承諾與剩餘履約義務分成五本帳；同一數字沒有產品、客戶與期間分母，就不歸到人工智慧儲存。
 - 最後核對客戶端的具名產品與供應商端的認證、部署、出貨、收入及毛利；兩邊沒有對上，就維持待驗證。
 
 ### 想一想
@@ -196,6 +212,7 @@ evidence: sources:S20,S21,S22,S23
 - 一個非同步存檔在暫存完成後就讓訓練繼續，但上傳途中節點立刻故障，這份進度紀錄算完成了嗎？
 - 同一份進度存檔若讓應用程式增加 1 TB 邏輯資料，主機與快閃媒體真的都只增加 1 TB 嗎；若沒有三層計數器，能判斷硬碟壽命嗎？
 - 公司公布的人工智慧產品占比同時包含硬碟、個人電腦、網路與伺服器時，能用這個百分比判斷資料中心儲存收入嗎？
+- 公司同時公布容量出貨上升、每單位營收上升與多年合約時，哪一個已進入本期損益，哪一個仍只是未履約承諾？
 
 ## 主張與證據帳本
 
@@ -576,6 +593,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: Sandisk FY2026 是截至 2026-07-03 的 53 週年度，FY2025 是 52 週；FY2026 Datacenter 已認列營收為 51.53 億美元，FY2025 為 9.60 億美元，增加 41.93 億美元或 437%，同時以 exabyte 計的產品銷售量增加接近 120%、每 GB 營收增加接近 150%
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-08-17
+basis: S24 封面與 Note 1 Fiscal Year 固定年度截止日及 53／52 週差異；Item 7 disaggregated revenue table 與 Net Revenue 段落直接列出 Datacenter 51.53／9.60 億美元、41.93 億美元、437%、exabyte volume 接近 120%及 revenue per gigabyte 接近 150%
+boundary: Datacenter 同時涵蓋 public／private cloud 與 enterprise customers，不等於全部 AI、hyperscaler、NBM 或單一 SSD；沒有絕對 exabytes、平均容量、顆數、客戶、產品、Datacenter 毛利或同週數標準化，revenue per GB 也不是純售價、成本或毛利
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: Sandisk 自 FY2026 起與數家 Datacenter 與 Edge 客戶簽訂 New Business Models 長約，協議一般由 Sandisk 交付、客戶購買特定產品量，多為多年期且價格含固定與變動部分並有財務保證；截至 2026-07-03，全部與 NBM 有關的剩餘履約義務交易價格為 598 億美元，其中 587 億美元尚未開票、11 億美元列為合約負債，約 19% 預期在未來十二個月認列營收
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-08-17
+basis: S24 Item 7 Operational Update 直接界定 NBM 客戶範圍、產品量、期間、定價與財務保證；Revenue Recognition 說明產品大多在依交貨條件移轉控制權時認列；Note 4 Revenue 列出 598／587／11 億美元、約 19% 與全部 RPO 屬 NBM
+boundary: NBM 不是無條件 take-or-pay 或完全保證收入；申報沒有把 RPO 拆成 Datacenter／Edge、AI／非 AI、enterprise SSD／其他產品、客戶、價格、數量或毛利，19% 是預期認列而非保證出貨或收款，RPO 也不是當期營收、開票、現金、應收或自由現金流
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: inference
+status: active
+claim: 若只把 Sandisk 所稱 Datacenter exabyte volume 接近增加 120% 暫記為 2.2 倍、每 GB 營收接近增加 150% 暫記為 2.5 倍，兩者相乘為 5.50 倍或增加 450%；表列營收 51.53／9.60＝5.367708 倍或增加 436.7708%，與公司整數報告的 437% 一致，兩組結果方向與量級相符但不是精確量價橋接
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-08-17
+basis: S24 提供兩個以接近描述的量價成長率及表列營收；Python Decimal 與獨立 awk 均重算 2.2×2.5＝5.50、51.53／9.60＝5.367708、後者成長 436.7708%及相對整數 437%的量級關係
+boundary: 這是 N＝1 個發行人、N＝1 個 53 週對 52 週公司年度的確定性量級檢查，沒有抽樣、sampling SE／t 或因果識別；兩個輸入都是未揭露精確值的約數，revenue per GB 混合價格、產品／客戶組合與淨額收入因素，不能反推真實 exabytes、純 ASP、SSD 顆數、AI 占比或公司獲利
+verification_needed: Sandisk 以同一 Datacenter end-market、同期間與同一淨營收範圍公開絕對 exabytes、精確 revenue per GB、產品與客戶組合、sales incentives、週數正規化及可重算量價橋接
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C26
+label: unverified
+status: active
+claim: Sandisk 的 598 億美元 NBM 剩餘履約義務中有多少屬於 Datacenter、AI workload、enterprise SSD、特定容量／控制器或可映射到台灣供應商，目前無法由公開 10-K 分配
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-17
+basis: S24 只說 NBM 橫跨數家 Datacenter 與 Edge 客戶，沒有客戶、產品、end-market 金額、exabytes、價格、毛利或供應商共同鍵
+boundary: 查無分拆是證據缺口，不是相關需求不存在；也不能用 Datacenter 已認列營收、公司 AI 敘事或 RPO 總額按比例自行分配
+verification_needed: 同一 NBM／客戶／產品鍵的 Datacenter 與 Edge 分拆、AI workload、產品料號與容量、約定／實際 exabytes、價格、交付、收入、毛利及買方與台灣供應商雙向 qualification／出貨文件
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先把三種「存資料」工作分開
 
 | 本文三種工作 | 何時發生 | 最怕什麼 | 先看哪個結果 | 不能直接推成 |
@@ -818,6 +903,51 @@ Storage，並在一個具名 35K-chip TPU v5p 工作負載組態報告 ML Goodpu
 同一份資料可能依當下位置走不同路徑：先從遠端取得，之後留在本機或快取，新增機器時再從
 附近節點複製。因此軟體、記憶體、SSD、網路與伺服器整合是接力關係，不是固定由某一層獨占
 價值；這張表也不是供應商名單或需求量估算。
+
+## AI SSD 需求不是一個數字：先拆量、價、長約、RPO 與營收
+
+同一頁上的容量出貨、每單位營收、長約、剩餘履約義務與已認列營收，常被一起叫作「需求」，
+但五個數字沒有同一個動詞：容量是賣了多少儲存空間，每單位營收是每 GB 如何變現，長約是雙方
+承諾，RPO 是分配給尚未履約承諾的交易價格，營收才是當期已完成認列的結果。讀者應先問數字住在
+哪一本帳，再問它能不能接到下一本；不能從前一本直接跳到最後一本。
+
+Sandisk FY2026 10-K 正好示範這個差別。公司把 Datacenter 定義為主要供 public／private cloud 與
+enterprise customers 的產品集合，而不是單一 AI SSD 產品；FY2026 又比比較期多一週。因此下表只在
+同一發行人已揭露範圍內對帳，不把它改寫成產業平均、AI 純量或台灣供應商訂單。[S24]
+
+| 五本商業帳 | Sandisk 本輪可確認的數字或條件 | 它回答什麼 | 還不能回答什麼 |
+|---|---|---|---|
+| 1. 容量出貨帳 | FY2026 Datacenter 產品銷售量以 exabyte 計，較 FY2025 增加接近 120% | 同一 end market 售出的儲存容量量級 | 絕對 exabytes、SSD 顆數、平均容量、installed base、AI 占比或終端實際使用量 |
+| 2. 每單位營收帳 | Datacenter 每 GB 營收增加接近 150% | 每單位已售容量帶回多少淨營收 | 純 NAND 價格、單一 SSD ASP、產品／客戶組合、銷售折讓、成本或毛利 |
+| 3. 已認列營收帳 | Datacenter 由 9.60 億美元增至 51.53 億美元，增加 41.93 億美元或 437% | 該會計年度已符合認列條件的 end-market 淨營收 | 全部是 AI、NBM、enterprise SSD、具名客戶，或同額現金與毛利 |
+| 4. NBM 長約帳 | 自 FY2026 起與數家 Datacenter 與 Edge 客戶簽約；多為多年期特定產品量，定價含固定與變動部分並有財務保證 | 已存在什麼交付、購買、定價與保障承諾 | 已出貨、無條件 take-or-pay、價格不會重設、履約不會中斷，或營收已認列 |
+| 5. RPO 未履約帳 | 2026-07-03 為 598 億美元，全部屬 NBM；587 億尚未開票、11 億列合約負債，約 19% 預期十二個月內認列 | 資產負債表日尚待履行的 NBM 交易價格與預期時程 | 全屬 Datacenter／AI／SSD、當期營收、開票、收款、應收、毛利、自由現金流，或認列一定如期發生 |
+
+### 量價乘法只能做量級檢查，不能冒充精確橋接
+
+把 FY2025 的 Datacenter 容量與每 GB 營收都設為 1，容量「接近增加 120%」可暫記為約 2.2，
+每 GB 營收「接近增加 150%」可暫記為約 2.5；兩者相乘約為 `2.2 × 2.5 = 5.50`，也就是增加
+450%。表列營收則為 `51.53 ÷ 9.60 = 5.367708` 倍，增加 436.7708%，與公司報告的整數 437%
+一致。兩個結果方向與量級相符，能提醒讀者這一年不是只有「量增」或只有「單位營收增」。[S24]
+
+這不是精確營收橋接。兩個輸入都只寫「接近」，公司沒有公布絕對 exabytes、每 GB 營收絕對值或
+KPI 方法；FY2026 又是 53 週、比較期是 52 週。每 GB 營收也會混合定價、產品與客戶組合、容量規格
+及淨額收入因素，不能被改名為純 ASP。Python Decimal 與獨立 awk 對 5.50、5.367708 與 436.7708%
+得到相同結果；這是 **N＝1 個發行人、N＝1 組公司年度比較**的確定性算術，沒有抽樣、sampling
+SE／t、裝置或客戶樣本，也沒有因果識別。
+
+### 多空小作文共用同一套五本帳
+
+| 敘事 | 合理機制 | 必須看到的共同證據 | 第一個失效或升格條件 |
+|---|---|---|---|
+| 偏多：容量、變現與合約能見度一起延續 | 售出容量與每 GB 營收同步增加，NBM 再按原時程轉為已認列營收，可能提高生產規劃與收入可見度 | 至少連續兩個正式報告期，以同一 end market 公開絕對 exabytes、每 GB 營收、NBM／RPO 期初新增認列修改取消、已認列營收、毛利與營業現金流 | 正式申報顯示同範圍 NBM 縮量／取消、價格重設或認列延後，而實際出貨與營收沒有補上 |
+| 偏空：價格、組合或履約時程回落 | 每 GB 營收可能正常化，Edge／Datacenter 組合可能改變，長約也有供應、規格、違約、終止與轉售風險 | 與偏多完全相同的產品、客戶、期間與會計欄位；另看存貨、應收、合約／退款負債及 RPO 認列差異 | 只有「AI 占比沒有揭露」不是反證；若量價、合約轉收入、毛利與現金同時按原口徑改善，偏空敘事才被削弱 |
+| 共同裁決 | 前一本帳只能成為下一本的搜尋起點 | 公司＋產品／end market＋客戶／合約＋期間＋履約狀態共同鍵 | 沒有共同鍵就維持 unverified，不以 598 億美元、437% 或單一季度 headline 直接生成 TAM、台廠訂單或投資結論 |
+
+第一個真正能打臉錯誤多方敘事的，不是「公司沒有拆 AI 占比」，而是正式 filing 明載 NBM 縮量、
+取消、價格重設或認列延後，且同一範圍的實際出貨與已認列營收沒有補上。反過來，即使 RPO 很大，
+沒有 Datacenter／Edge、AI／非 AI、產品、客戶、價格與毛利分拆，也只能說 Sandisk 有一組跨兩個
+end markets 的長約存量，不能把它指定給 AI SSD、8299 群聯或任何台灣供應商。[S24]
 
 ## 最後用六關把平台需求接回公司
 
@@ -1216,6 +1346,22 @@ locator: Health Monitoring／SMART Log 段落的 Percentage Used、Data Units Wr
 limitation: 動態工具導讀沒有頁面發布日；命令輸出是官方頁面的單一示例，不是產品 benchmark、跨裝置健康門檻、保固裁決、AI workload、qualification 或供應商財務證據
 -->
 
+<!-- research_source
+source_id: S24
+role: company_filing
+source_kind: document
+publisher: Sandisk Corporation
+independence_group: sandisk-issuer
+title: Annual Report on Form 10-K for the fiscal year ended July 3 2026
+published_at: 2026-08-17
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.sec.gov/Archives/edgar/data/2023554/000162828026057406/sndk-20260703.htm
+locator: EDGAR filing index 的 SEC Accession No. 0001628280-26-057406、filing／accepted date 與 period；cover；Item 7 pp.43–47 的 Fiscal Year、Operational Update、disaggregated revenue 與 Net Revenue；Item 1A p.23 的 NBM risk factor；Item 8 Revenue Recognition pp.67–68 與 Note 4 Revenue pp.74–75
+limitation: N＝1 個發行人與 N＝1 組年度比較；FY2026 是 53 週、FY2025 是 52 週且未作同週數正規化。Datacenter 是 public／private cloud 與 enterprise 的廣義 end market，NBM 又橫跨 Datacenter 與 Edge；申報沒有絕對 exabytes、KPI 計算定義、客戶／產品／AI／SSD／毛利分拆或台灣供應商共同鍵，RPO 不是當期營收、出貨、開票或收款
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -1308,3 +1454,4 @@ invalidation: 新規格或 production evidence 顯示四帳／十二欄遺漏會
 - 不能把模型或 checkpoint 大小直接當成 host writes，更不能把 host writes 當成 NAND writes；沒有同窗 A／H／N 與 WAF，就不能估 SSD 磨耗、替換或顆數。
 - 不能把 1 DWPD／3 DWPD、Percentage Used＝100% 或 TLC／QLC 單一標籤改寫成效能、立即故障、客戶採用、售價、收入或毛利；容量、壽命、健康與商業是不同證據軸。
 - 不能把 Google 單一 35K-chip TPU v5p 組態報告的 6.59% ML Goodput 改善外推成跨模型、跨平台或產業平均；公開資料沒有 run 數、變異、原始樣本或 SE／t。
+- 不能把 Sandisk 598 億美元 NBM RPO 全歸 AI、Datacenter、enterprise SSD 或近十二個月營收；它橫跨 Datacenter 與 Edge，只有約 19% 預期在未來十二個月認列，且沒有產品、客戶、價格、毛利或台灣供應商分拆。
