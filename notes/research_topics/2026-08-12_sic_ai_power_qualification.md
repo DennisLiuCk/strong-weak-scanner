@@ -46,6 +46,13 @@ to: triaged
 reason: added_fault_current_device_waveform_and_protection_timing_reference_plane_crosswalk
 evidence: sources:S13,S14
 -->
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_same_package_pinout_to_customer_acceptance_mixed_source_passport_without_thesis_clock_refresh
+evidence: sources:S5,S13,S14,S15,S16
+-->
 
 <!-- research_source
 source_id: S1
@@ -269,6 +276,38 @@ url: https://www.infineon.com/assets/row/public/documents/60/42/infineon-1ed332x
 locator: PDF 第 18–19 頁；Section 5.2 的 400 V、IMW120R045M1、CDESAT 51 pF、約 250 A、約 2 microseconds 與 3 microseconds device capability，以及 Section 5.3 移除外加 DESAT capacitor 後約 1.2 microseconds 的固定實例
 limitation: N＝1 個供應商、具名 driver／device 與固定 lab circuit 的示範；不是跨元件規格、JEP report、AI BBU／PSU system qualification、客戶測試、失效率、production shipment 或財務證據
 independence_group: infineon-eicedriver-short-circuit
+-->
+
+<!-- research_source
+source_id: S15
+role: competitor_primary
+source_kind: document
+publisher: onsemi
+title: M1 1200 V SiC MOSFETs & Modules — Characteristics and Driving Recommendations, AND90103/D Rev.3
+published_at: 2022-06-01
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.onsemi.com/download/application-notes/pdf/and90103-d.pdf
+locator: June 2022 Rev.3（published_at 以文件月份首日正規化）；PDF file pp.2–4 的 VDS／VGS／VTH、跨供應商 RDS(on) 應在 application temperature 比較，file pp.7–12 的 switching loss、RG、EMI、SCWT 與 package／PCB parasitic，file p.26 的 dynamic measurement boundary；原檔 SHA-256 3d26f07426fa8c906e9178ec6cf9628d14a58395facfa716a3f5b8fae352dbee，引用頁與相鄰 file pp.1–13、25–26 已渲染核對
+limitation: 文件只涵蓋 onsemi M1 1200 V 家族與典型 reference values；vendor 曲線沒有完整原始分布，也不是兩家 SiC alternate part、AI BBU／PSU 同板 qualification、客戶 acceptance、production BOM、field reliability 或財務證據
+independence_group: onsemi-sic-engineering-guidance
+-->
+
+<!-- research_source
+source_id: S16
+role: competitor_primary
+source_kind: document
+publisher: onsemi
+title: Performance Comparison of 1200 V SiC MOSFET and Si IGBT Used in Power Integrated Module for 1100 V Solar Boost Stage, AND90082/D Rev.0
+published_at: 2020-12-01
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.onsemi.com/pub/Collateral/AND90082-D.PDF
+locator: December 2020 Rev.0（published_at 以文件月份首日正規化）；PDF file pp.2–6／文件 pp.1–5 的同一 Q0 package、pin-to-pin compatible PIM-IGBT／PIM-SiC，以及不同 rated current、Qg、gate voltage、RthJC、gate driver、PCB layout、EMI、thermal 與 high-bandwidth measurement 要求；原檔 SHA-256 cec7fe152ed03de0681f5fa618048c553983c399f220d93545ee22602745b4fe，全 6 個 file pages 已渲染核對
+limitation: N＝1 組同供應商、Si IGBT 對 SiC、solar boost 的跨技術案例；它證明相同 package／pinout 不保證相同電氣與熱行為，但不是兩家 SiC、AI BBU／PSU mixed-source、客戶資格、量產或財務比較
+independence_group: onsemi-sic-engineering-guidance
 -->
 
 <!-- research_claim
@@ -543,14 +582,73 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: onsemi AND90103/D 明示跨供應商比較 SiC MOSFET 時，RDS(on) 不能只看行銷常用的 25°C，而要對齊目標 application temperature；同一文件又把 VGS／VTH、RG、VDS／Tj、package／PCB parasitic 分別接到導通、切換、EMI、短路耐受與過衝
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2022-06-01
+basis: S15 file pp.2–4 直接要求 different vendors 的 RDS(on) 在 target application temperature 比較，file pp.7–12 逐項展示 switching loss、RG／dv/dt、EMI、SCWT 與 critical-loop parasitic 的條件依賴
+boundary: 這是 onsemi M1 1200 V 家族的供應商技術指引與 typical reference values，不是跨廠隨機樣本、共同 acceptance limit、兩顆 AI 電源替代料的實測或公司財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: onsemi AND90082/D 的兩個 power integrated modules 雖使用同一 Q0 package 且 pin-to-pin compatible，PIM-IGBT 與 PIM-SiC 仍有不同 rated current、Qg、gate voltage 與 RthJC，換成快速 SiC 後還要重新處理 gate driver、PCB layout、EMI、thermal 與量測方法
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2020-12-01
+basis: S16 file p.2／文件 p.1 直接列出 Q0 package、pin-to-pin compatible 及 Table 1 的差異；file pp.3–6 再說明 switching、driver、layout、EMI、junction temperature 與 probe bandwidth／loop 的重新設計責任
+boundary: 這是 N＝1 組同供應商、Si IGBT 對 SiC 的 solar boost 跨技術反例，不是兩家 SiC supplier、AI BBU／PSU 同板 A／B、客戶 qualification 或量產 field result
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: SiC mixed-source 應以共同版本鍵分開九關：封裝腳位、靜態、動態、gate、保護、熱、EMI／控制、同板 A／B 與客戶驗收；通過前一關不能替下一關簽名，若 B 料必須調整 RG、VGS、dead time、DESAT、firmware、散熱或濾波後才通過，只能稱受控變更後的 alternate candidate，不是 production-config drop-in
+supporting_source_ids: S5,S13,S14,S15,S16
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S15／S16 顯示相同或相鄰額定／封裝仍會在靜動態、driver、寄生、EMI 與熱分岔；S13／S14 固定 protection timing 取捨；S5 則把 mixed-source build、EVT／DVT／PVT、PCN 與客戶流程放進 system qualification，本文據此整合九關與 A-production／B-drop-in／B-tuned 護照
+boundary: 九關與三版本護照是研究中心的可互換性框架，不是 OCP／onsemi／Infineon 的共同表單；本輪實際兩家 SiC、同一 AI BBU／PSU、同板客戶 acceptance／production／field／financial 的共同觀測 N＝0
+verification_needed: 同一 platform／module／board revision，以凍結的 A-production 設定測 A 與 B-drop-in，再把任何 B-tuned 變更另立 revision，逐關保存 raw data、acceptance limit、sample／lot、customer sign-off、production BOM 與 field／financial 分母
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
 - **SiC（碳化矽）**：寬能隙半導體材料；在高電壓、高溫或高頻率的電力轉換中可能降低損耗，但價格、驅動、封裝、保護與可靠度仍要一起設計。
 - **功率 MOSFET**：用閘極控制大電流通斷的功率開關；datasheet 耐壓不是系統在所有故障下都安全的保證。
+- **RDS(on)**：MOSFET 導通時 drain 到 source 的等效電阻；它會隨 VGS、電流與接面溫度改變，所以不同料件不能只比 25°C 的 typical 值。
+- **RG／RGon／RGoff**：gate 回路電阻及分開控制開啟／關閉的電阻；它會改變切換速度、損耗、振鈴、EMI 與故障關斷過衝。
+- **Qg／Miller 區**：把 gate 從關閉推到開啟所需的電荷，以及 drain voltage 轉換時的關鍵平台區；Qg 不同會改變 driver current 與 switching timing。
+- **RthJC／RthCS**：熱由 junction 到 case、再由 case 到 heatsink 的熱阻；同封裝不代表這兩段熱路徑與安裝壓力相同。
+- **SCWT**：Short-Circuit Withstand Time，元件在指定電壓、VGS、Tj、電路與 failure criterion 下可承受短路的時間；不能跨條件直接搬用。
+- **Q0 package**：AND90082/D 兩個 power integrated module 共用的封裝家族；同封裝與 pin-to-pin compatible 只描述機械／腳位入口，不保證驅動、熱或動態行為一致。
+- **AND90103/D／AND90082/D**：本文新增核對的兩份 onsemi 應用手冊；前者拆 SiC 靜動態與驅動條件，後者提供同封裝、同腳位仍需重設計的跨技術反例。
 - **閘極（gate）**：控制 MOSFET 開或關的端點；電壓過高、過低、震盪或長期偏壓都可能影響可靠度，所以要保存 driver 與實際 waveform。
 - **VGS／VDS／ID**：分別是 gate-to-source voltage、drain-to-source voltage 與 drain current；三條帶時間的波形要一起看，不能用其中一個峰值代表完整元件壓力。
+- **Vbus（直流匯流排電壓）**：轉換器功率級兩端的主要 DC 電壓；同一顆料在不同 Vbus 下的切換、短路能量與安全餘裕會不同。
 - **短路（short circuit）**：原本應經負載流動的電流遇到極低阻抗路徑，可能在很短時間內產生極大電流與熱。
 - **短路耐受時間**：在指定電壓、閘極、溫度、電流限制與測試電路下，元件尚未失效的時間；離開條件就不能沿用同一數字。
 - **故障能量**：故障期間電壓、電流與時間共同形成的能量；只看峰值電流或只看微秒數都不完整。
@@ -594,6 +692,8 @@ resolution:
 - **NPI**：New Product Introduction，新產品從工程設計走到量產導入的流程；不同階段要重跑相應的可靠度與製程測試。
 - **MCU**：Microcontroller Unit，執行感測、控制、保護狀態與通訊的微控制器；它的軟體與延遲也可能影響故障回應。
 - **mixed-source build**：把主料與第二來源／替代料放進同一批測試，檢查換料後的功能、環境與可靠度；不是只比較兩張 datasheet。
+- **Drop-in alternate（直接可換替代料）**：在凍結的量產設定下換入 B 料，不改 gate、保護、韌體、散熱、濾波或其他設計，仍逐項通過原 acceptance limits。
+- **A-production／B-drop-in／B-tuned**：A-production 是量產基準；B-drop-in 是 B 料直接換入；B-tuned 是為 B 料調過設定後的新版本。B-tuned 通過不會倒推 B-drop-in 也通過。
 - **PCN**：Product Change Notice，料件、材料、製程、軟硬體或測試改變時的正式通知與重新 qualification 入口。
 - **ride-through／hold-up**：主電力短暫異常時，PSU、電容或 BBU 讓系統繼續供電的能力；它和切斷短路是不同任務。
 - **interoperability**：不同供應商模組或料件在固定介面與條件下共同工作；能互換不代表每個元件用相同技術或同一家供應商。
@@ -749,6 +849,61 @@ Infineon 的 greater-than-99-percent 是指定 DC-DC stage／reference design �
 percent 是公司所述另一個整體 conversion boundary。兩者電壓、topology、冷卻、reference plane 與產品不同，
 本文不相減、不排名，也不從差值推估 SiC 貢獻。
 
+## 同耐壓、同電流、同封裝／腳位，只是 mixed-source 的入場券
+
+**同插頭只代表插得進去，不代表開關速度、發熱、雜訊與保護時鐘相同。** onsemi 的
+AND90082/D 提供一個很直觀的反例：兩個模組採同一 Q0 package、pin-to-pin compatible，換入 SiC
+後，rated current、Qg、gate voltage、RthJC、driver、layout、EMI、熱與量測要求仍不同。這是 Si IGBT
+對 SiC、同一供應商的 N＝1 跨技術案例，不是兩家 SiC alternate part 的成績；它只足以否定
+「腳位相同就可直接互換」這個捷徑。
+
+AND90103/D 再把原因拆開：跨供應商不能只比 25°C 的 RDS(on)，而要看目標溫度；VGS、VTH、RG、
+VDS、Tj、封裝與 PCB 寄生也會分別改變導通、切換、EMI、短路耐受與過衝。因此一顆替代料要進
+AI BBU／PSU，至少要逐關留下以下九張證書。
+
+| mixed-source 九關 | 同一題要固定什麼 | 第一個拒絕點 |
+|---|---|---|
+| 1. 封裝／腳位 | footprint、pin map、Kelvin source、creepage／clearance、固定方式、TIM | 裝不下、pin role 不同或安全距離不合 |
+| 2. 靜態 | BVDSS、leakage、RDS(on)、body-diode Vf，並對齊 VGS／ID／hot-cold Tj | 只拿 25°C typical 值跨料排名 |
+| 3. 動態 | Qg／Miller、Coss／Qoss／Qrr、Eon／Eoff／Err、dv/dt、di/dt、overshoot／ringing | 測試 circuit、RG、Vbus、current 或 probe 不同 |
+| 4. Gate | 正負 VGS、RGon／RGoff、source／sink current、UVLO、dead time、Miller clamp | 必須改 driver 或 gate setting 才能工作 |
+| 5. 保護 | threshold、blanking／filter、delay、soft turn-off／clamp、SCWT、fuse／breaker | 偵測太慢、誤跳、energy 或 overshoot 超限 |
+| 6. 熱 | RthJC／RthCS、TIM／壓力、Tc／Tj hotspot、steady／transient mission profile | 只看晶片損耗，沒有完整 thermal path |
+| 7. EMI／控制 | conducted／radiated、false trigger、control loop、transient、telemetry | 換料後 EMI、穩定度或告警語意失敗 |
+| 8. 同板 A／B | 相同 board／revision、量測鏈、環境與 limits，比較 A-production、B-drop-in、必要時 B-tuned | 把不同設定的 pass 說成直接可換 |
+| 9. 客戶驗收 | sample／lot、EVT／DVT／PVT、mixed-source build、HALT／ORT／burn-in、PCN／requalification、production BOM | 工程通過但沒有客戶 acceptance |
+
+### 同板 A／B 要保留三個版本：A-production、B-drop-in、B-tuned
+
+`A-production` 是已凍結的量產基準；`B-drop-in` 是不改任何設定直接換入 B 料；`B-tuned` 則把為
+B 料修改的 RG、VGS、dead time、DESAT、firmware、heatsink／TIM 或 EMI filter 全部另立 revision。
+三者不能共用一個籠統的 pass。共同 header 至少要保存：
+
+`comparison_id、platform／module／board revision、A／B vendor-part-lot-package、driver／sensor／`
+`protection／firmware revision、topology、Vbus／load／fsw／temperature／cooling、instrument／probe／`
+`bandwidth、test-plan／acceptance revision、sample／lot、raw-file IDs`。
+
+**第一個拒絕邊界**如下：
+
+- B 在凍結的 A-production 設定下任一關失敗，或必須改 gate、保護、韌體、散熱或濾波，就拒絕
+  `drop-in interchangeable`；B-tuned 後通過，只能升為「受控設計變更的 alternate candidate」。
+- B-tuned 必須使用新 revision 重跑完整矩陣；不能把調校後結果回填到 B-drop-in。
+- 前八個工程關卡全過但沒有第九關客戶 mixed-source acceptance，只能稱 engineering-qualified candidate。
+- 沒有 production BOM、出貨、field return 與財務分母，不推論供應韌性、議價、份額、收入或毛利。
+
+### 多空小作文先問替代料真正停在哪一關
+
+| 敘事 | 較強版本 | 第一個反證 | 還缺的商業橋 |
+|---|---|---|---|
+| 偏多 | 同板 B-drop-in 跨 lot 通過九關，讓第二來源能在不改產品設定下進 production BOM | B 只能 B-tuned 才過，或客戶拒絕 mixed-source build | 客戶 sign-off、量產配比、缺料期間供貨、field return 與同期財務 |
+| 偏空 | SiC 跨來源差異讓重驗、雙版本 BOM 與 field support 成本吃掉供應韌性 | 凍結設定下跨 lot 結果可重現，PCN／requalification 與 field 指標受控 | 實際 qualification 工時、延誤、失效率、成本與產品毛利分母 |
+| 共同底線 | 相同耐壓、電流、封裝或 pinout 只允許進入測試 | 任一九關缺 raw data、共同版本鍵或 acceptance limit 即退件 | 工程可互換仍不等於採購、出貨、供應韌性或財務貢獻 |
+
+本段新增核對 N＝2 份 onsemi 文件，但它們同屬一家公司消息鏈；S16 只是 N＝1 組跨技術
+pin-compatible module 案例。實際兩家 SiC、同板 AI BBU／PSU、客戶 acceptance、production、field
+與 financial 共同觀測 N＝0。文件不是隨機抽樣，sampling SE／t 不適用；本文不計算換料成功率、
+可靠度、SiC 滲透率、供應商份額或投資效果。
+
 ## 從元件微秒到整機故障：時間線要閉合
 
 一份可審查的 short-circuit qualification 至少要把以下事件放在同一時間軸：
@@ -876,6 +1031,8 @@ wafer／device capability、一般 server exposure 或其他 800 V 假說都不�
 - [Delta Chindata／Meituan SST case](https://brandnews.deltaww.com/en/SpecialDetail/12748)（相鄰 SiC system deployment，不是 BBU／PSU JEP qualification）。
 - [onsemi AND90337/D](https://www.onsemi.com/download/application-notes/pdf/and90337-d.pdf)（April 2025 Rev.0；DESAT threshold／blanking、soft turn-off、clamping 與 fault-energy／overshoot trade-off；motor power module 脈絡，不是 AI platform qualification）。
 - [Infineon AN-2022-03 V1.2](https://www.infineon.com/assets/row/public/documents/60/42/infineon-1ed332xmc12n-technical-description-applicationnotes-en.pdf?fileId=8ac78c8c7e7124d1017ef7883db65158)（第 18–19 頁的 N＝1 固定 400 V、具名 device／driver DESAT example；不是跨元件或客戶及格線）。
+- [onsemi AND90103/D Rev.3](https://www.onsemi.com/download/application-notes/pdf/and90103-d.pdf)（跨供應商 hot RDS(on)、gate、動態、EMI、SCWT 與 package／PCB 寄生邊界）。
+- [onsemi AND90082/D Rev.0](https://www.onsemi.com/pub/Collateral/AND90082-D.PDF)（同 Q0 package、pin-to-pin compatible 仍須重做 driver、layout、EMI、thermal 與量測的反例）。
 
 本輪沒有做跨公司的效率、功率密度、MTBF 或壽命排名。Infineon 與 ROHM 各是 N=1 supplier evidence；
 OCP N=3 是具名文件 census；Delta 數字是不同產品與 reference plane 的公司揭露。這些都不是獨立同分布的

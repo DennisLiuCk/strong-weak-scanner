@@ -1,7 +1,8 @@
 # SiC 到 AI BBU／PSU 七關資格鏈知識圖譜
 
 本圖把元件短路／stress evaluation、供應商資料、converter reference design、system reliability、
-mixed-source customer qualification 及商業歸因分開，並用四個 reference plane 區分 rack available
+mixed-source customer qualification 及商業歸因分開，並以九關同板 A／B 護照判斷替代料是否真的
+drop-in interchangeable，再用四個 reference plane 區分 rack available
 fault current、converter 路徑、device waveform 與 protection／clearing。公開證據已支持相鄰關卡，尚未
 支持 JEP203／JEP204 已改寫本輪平台驗收或台灣公司財務。
 
@@ -10,7 +11,7 @@ schema_version: 1
 graph_id: sic-ai-power-qualification
 root_node_id: concept:sic-ai-power-qualification
 label: SiC 到 AI BBU／PSU 七關資格鏈
-summary: 從 application stress JEP203 JEP204 supplier data reference design DFMEA derating fault 四參考面 mixed-source qualification 追到 deployment 與財務 避免把 rack kA device ampere microseconds guideline reference design 或單一 adoption 拼成 platform acceptance 與收入。
+summary: 從 application stress JEP203 JEP204 supplier data reference design DFMEA derating fault 四參考面與mixed-source九關同板A/B護照 追到 deployment 與財務 避免把同封裝pinout rack kA device ampere microseconds guideline reference design 或單一 adoption 拼成drop-in platform acceptance與收入。
 article_ids: MI-2026-08-12-SIC-AI-POWER-QUALIFICATION
 status: active
 -->
@@ -433,4 +434,24 @@ review_due: 2026-09-15
 status: active
 boundary: 四 reference plane 是跨文件的研究 crosswalk；10–40 kA、約 250 A、1.2／2／3 microseconds 不可相除相減，也不證明 AI BBU／PSU system safety、JEP adoption、mixed-source、field reliability 或財務。
 next_trigger: 具名 production BBU／PSU 用同一 platform／board revision 與 event ID 公開 fault location、source impedance、converter current path、VDS／ID／VGS／Tj raw waveform、DESAT／driver timing、clamp／fuse-breaker clearing、tolerance、pass／fail 與 post-fault disposition。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-SICQUAL-I20
+view: industry
+from_id: concept:sic-ai-power-qualification
+to_id: process:sic-mixed-source-interchangeability-passport
+relation: requires
+claim_refs: MI-2026-08-12-SIC-AI-POWER-QUALIFICATION#C17,MI-2026-08-12-SIC-AI-POWER-QUALIFICATION#C18,MI-2026-08-12-SIC-AI-POWER-QUALIFICATION#C19
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: onsemi 兩份文件同屬一家公司工程消息鏈，OCP 與 Infineon 另提供 system process 與 protection timing 邊界；九關及 A-production／B-drop-in／B-tuned 是本文整合而非共同表單。
+as_of: 2026-08-24
+review_due: 2026-09-15
+status: active
+boundary: 相同耐壓 電流 package 或 pinout 只允許進入測試；沒有凍結設定 同板 raw data 客戶 acceptance production BOM field return 與財務分母 不得稱直接可換 供應韌性 份額或受惠。
+next_trigger: 具名 AI BBU／PSU 以同一 platform module board revision 比較 A-production B-drop-in 與另立 revision 的 B-tuned 並公開九關 pass fail sample lot customer sign-off production BOM field 及財務共同鍵。
 -->

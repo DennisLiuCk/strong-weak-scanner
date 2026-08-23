@@ -7568,8 +7568,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 14),
-            ("research_claim", 16), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 16),
+            ("research_claim", 19), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -7600,6 +7600,7 @@ class ResearchCenterTest(unittest.TestCase):
             "standard:ipc-9592b,standard,IPC-9592B 電源轉換裝置要求",
             "standard:telcordia-sr332,standard,Telcordia SR-332",
             "stage:sic-short-circuit-coordination,stage,SiC 短路故障四參考面協同",
+            "process:sic-mixed-source-interchangeability-passport,process,SiC 替代料九關可互換護照",
         ):
             self.assertIn(concept, concepts)
 
@@ -7608,13 +7609,18 @@ class ResearchCenterTest(unittest.TestCase):
             / "sic_ai_power_qualification.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: SiC 到 AI BBU／PSU 七關資格鏈", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
         self.assertIn("from_id: company:2308", graph)
         self.assertIn("to_id: standard:jep203", graph)
         self.assertIn("to_id: standard:jep204", graph)
         self.assertIn("to_id: stage:sic-short-circuit-coordination", graph)
         self.assertIn(
             "MI-2026-08-12-SIC-AI-POWER-QUALIFICATION#C16", graph
+        )
+        self.assertIn("edge_id: KG-SICQUAL-I20", graph)
+        self.assertIn(
+            "to_id: process:sic-mixed-source-interchangeability-passport",
+            graph,
         )
 
         radar = (
@@ -7651,6 +7657,100 @@ class ResearchCenterTest(unittest.TestCase):
                 "800vdc-protection-layers",
                 "ai-capacitor-role-map", "sic-ai-power-qualification",
             ],
+        )
+
+    def test_sic_mixed_source_interchangeability_passport_contract(self):
+        topic = (
+            ROOT / "notes" / "research_topics"
+            / "2026-08-12_sic_ai_power_qualification.md"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "added_same_package_pinout_to_customer_acceptance_mixed_source_passport_without_thesis_clock_refresh",
+            "source_id: S15", "source_id: S16",
+            "claim_id: C17", "claim_id: C18", "claim_id: C19",
+            "## 同耐壓、同電流、同封裝／腳位，只是 mixed-source 的入場券",
+            "同插頭只代表插得進去，不代表開關速度、發熱、雜訊與保護時鐘相同",
+            "| 1. 封裝／腳位 |", "| 2. 靜態 |", "| 3. 動態 |",
+            "| 4. Gate |", "| 5. 保護 |", "| 6. 熱 |",
+            "| 7. EMI／控制 |", "| 8. 同板 A／B |", "| 9. 客戶驗收 |",
+            "### 同板 A／B 要保留三個版本：A-production、B-drop-in、B-tuned",
+            "comparison_id、platform／module／board revision",
+            "第一個拒絕邊界",
+            "拒絕\n  `drop-in interchangeable`",
+            "engineering-qualified candidate",
+            "### 多空小作文先問替代料真正停在哪一關",
+            "實際兩家 SiC、同板 AI BBU／PSU",
+            "sampling SE／t 不適用",
+        ):
+            self.assertIn(contract, topic)
+        self.assertLess(
+            topic.index("## Reference design、adoption、platform qualification"),
+            topic.index("## 同耐壓、同電流、同封裝／腳位"),
+        )
+        self.assertLess(
+            topic.index("## 同耐壓、同電流、同封裝／腳位"),
+            topic.index("## 從元件微秒到整機故障"),
+        )
+
+        meta = topic.split("<!-- research_topic", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "thesis_claim_id: C11",
+            "source_published_at: 2026-06-03",
+            "last_reviewed_at: 2026-08-12",
+            "review_due: 2026-09-15",
+            "base_confidence: medium",
+        ):
+            self.assertIn(contract, meta)
+
+        s15 = topic.split("source_id: S15", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "published_at: 2022-06-01",
+            "跨供應商 RDS(on)",
+            "application temperature",
+            "3d26f07426fa8c906e9178ec6cf9628d14a58395facfa716a3f5b8fae352dbee",
+        ):
+            self.assertIn(contract, s15)
+        s16 = topic.split("source_id: S16", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "published_at: 2020-12-01",
+            "pin-to-pin compatible",
+            "file pp.2–6",
+            "cec7fe152ed03de0681f5fa618048c553983c399f220d93545ee22602745b4fe",
+        ):
+            self.assertIn(contract, s16)
+        for claim_id, label, sources in (
+            ("C17", "verified", "S15"),
+            ("C18", "verified", "S16"),
+            ("C19", "inference", "S5,S13,S14,S15,S16"),
+        ):
+            block = topic.split(f"claim_id: {claim_id}", 1)[1].split("-->", 1)[0]
+            self.assertIn(f"label: {label}", block)
+            self.assertIn(f"supporting_source_ids: {sources}", block)
+
+        with (ROOT / "notes" / "research_topics" / "scan_log.csv").open(
+            encoding="utf-8", newline=""
+        ) as fh:
+            scan = next(
+                row for row in csv.DictReader(fh)
+                if row["scan_id"]
+                == "scan-2026-08-24-sic-mixed-source-interchangeability-passport"
+            )
+        self.assertEqual(scan["scope"], "partial")
+        self.assertIn("N=2 份 onsemi 文件", scan["coverage_note"])
+        self.assertIn("共同觀測 N=0", scan["coverage_note"])
+
+        snapshot = json.loads((
+            ROOT / "notes" / "research_method_reviews"
+            / "2026-08-24_11.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(snapshot["snapshotId"], "RMA-2026-08-24-11")
+        self.assertEqual(snapshot["claims"]["active"], 781)
+        self.assertEqual(snapshot["sources"]["active"], 682)
+        self.assertEqual(snapshot["graphs"]["activeEdges"], 853)
+        self.assertEqual(snapshot["scans"]["events"], 148)
+        self.assertEqual(
+            snapshot["scans"]["latestId"],
+            "scan-2026-08-24-sic-mixed-source-interchangeability-passport",
         )
 
     def test_policy_route_pfas_chain_separates_substance_law_qualification_and_finance(self):
