@@ -269,6 +269,38 @@ limitation: DOE 文件提供年度能源計量方法與邊界，不提供任一 
 independence_group: us-doe-femp
 -->
 
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: Why Scaling AI Compute Performance Requires a New Power Architecture
+published_at: 2026-08-11
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://blogs.nvidia.com/blog/800-vdc-power-architecture-ai-factory/
+locator: Existing Facilities Don't Have to Wait 與 A Roadmap for Every Stage of Growth；分列 2026H2 hybrid power rack、2027 row power center 及較後期 facility-scale DC power block
+limitation: arriving／expected availability 是 NVIDIA 供貨與架構路線圖，不是具名場站已安裝、commissioning、production volume、供應商收入或毛利；80+ 生態系公司也不提供個別供應深度
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S17
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: DSX Facilities Infrastructure Reference Design Overview
+published_at: 2026-08-19
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://docs.nvidia.com/dsx/facilities-infra/reference-design-overview
+locator: NVIDIA DSX Facilities Infrastructure Design Guide v2.0；Grid Substation、Dry Coolers、BESS & Backup Generation、Central Utility Building 與 250 MW / 96 SU Example Site Figures
+limitation: 這是 250MW-class IT load 的 sizing reference 與 campus context，不是圖示場址或任何具名客戶的 as-built 配置；實際容量與布局逐案不同，也未提供 800V production BOM、驗收、部署量或財務歸因
+independence_group: nvidia
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -517,6 +549,48 @@ verification_needed: 同一具名場站與版本的 single-line diagram、refere
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: NVIDIA 2026-08-11 路線圖把 800VDC 部署分成三種 on-ramp：預定 2026H2 可裝入既有 AC 設施、在列內送 800V 到運算機櫃的 hybrid power rack；預期 2027 提供、以 overhead 800V busway 支援最高 2MW／row 的 row power center；以及未給明確供貨日、面向未來新設施的 facility-scale DC power block
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S16 的 Existing Facilities 與 Roadmap 兩節直接分開三種設施邊界與時間語言
+boundary: 2026H2 與 2027 都是 NVIDIA 的 arriving／expected availability，不是已部署或穩定量產觀測；2MW／row 是 up to 設計能力、N＝1 條公司路線圖，沒有抽樣 SE／t、具名客戶、commissioning、出貨分母或財務貢獻
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: NVIDIA DSX Facilities Infrastructure Design Guide v2.0 的參考園區仍同時使用 100kV 以上 utility input、34.5kV campus backbone、4.16kV chiller bus 與 480V pumps／coolers／controls，並要求 BESS 適用性與容量逐案評估
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S17 的 Grid Substation、Dry Coolers、BESS 與 Central Utility Building 欄位直接列出各責任域及電壓
+boundary: 這只證實一份 NVIDIA sizing reference 的多電壓設施樹，不是 as-built 場站、跨市場採用率或未來 native 800V 設施的唯一拓撲；100kV+、34.5kV、4.16kV、480V 是同一參考設計的確定性欄位，沒有抽樣 SE／t
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: inference
+status: active
+claim: 判讀「800V 已採用」時至少要同時記錄 conversion boundary 與 deployment boundary；現有證據只足以分開既有 AC 建築中的列內 800V、整列 800V busway 與更後期 facility-scale DC power block，不能用單一採用年份或單一 800V 標籤代表整座園區所有設備都已轉為 800V
+supporting_source_ids: S7,S16,S17
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S16 把三種 on-ramp 分開，S17 顯示現行 DSX 參考園區仍是多電壓責任域，S7 又把 LVDC facility transition 拆成三種改動範圍
+boundary: 這是研究端跨 NVIDIA 與 OCP 架構文件建立的分類，不是標準定義、採用率統計或場站驗收；S16／S17 同屬 NVIDIA 消息鏈，仍缺具名 as-built 場站、production volume、客戶 acceptance 與公司財務共同鍵
+verification_needed: 同一具名場站版本的 grid-to-rack single-line、AC／DC conversion boundary、各電壓域、實際部署日、commissioning、運行分母及供應商出貨財務
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -591,6 +665,13 @@ to: triaged
 reason: separated_installed_critical_actual_load_and_annual_pue_ledgers_without_thesis_or_clock_refresh
 evidence: sources:S7,S14,S15
 -->
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: separated_hybrid_row_and_facility_scale_800v_onramps_without_thesis_or_clock_refresh
+evidence: sources:S16,S17
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -623,7 +704,9 @@ evidence: sources:S7,S14,S15
 - **BESS（電池儲能系統）**：位在場站或電網端、由電池、雙向轉換、控制與保護組成的儲能資產；它與機櫃內 BBU 的位置、時間尺度和驗收邊界不同。
 - **Stage（階段）**：OCP 用來區分資料中心哪些區域改採直流的架構範圍，不是產品認證分數。
 - **HVDC（高壓直流）**：在本文指約 800V 的直流配電架構；不同機構的電壓分類語境可能不同，不能只看縮寫判定適用標準。
-- **v1.0（第一個正式版本）**：表示文件已形成可引用的版本基線，不代表涵蓋所有子系統，也不代表任何產品已通過該文件要求。
+- **DSX**：NVIDIA 用來串接運算、電力、冷卻與場站設計的參考架構；它提供規劃共同語言，不等於圖中的場站已實際建成。
+- **Facilities（設施）**：本文指建築與園區層的電力、冷卻、備援及控制，不是單一 power rack 或伺服器產品。
+- **v1.0／v2.0（文件版本）**：表示文件已形成可引用的版本基線；版本變大不代表涵蓋所有子系統，也不代表任何產品或場站已通過要求。
 
 ### 三句話抓重點
 
@@ -662,6 +745,25 @@ evidence: sources:S7,S14,S15
 | 5. 子系統資格 | BESS、power rack、BBU、保護與控制是否各自按固定邊界通過？ | NVIDIA BESS v1.0 示範 evidence packet、test、owner review 與明確排除範圍 | 800V 各子系統的固定版本、原始測試、pass／fail、變更控制與多來源重現 |
 | 6. 場站 commissioning 與客戶驗收 | 子系統接在一起後，實際負載、保護、控制與公用電網是否仍穩定？ | 台達已有展示，台達／X LABS 又進入 MOU 規劃部署 | as-built 模型、現場全負載／故障測試、客戶 acceptance、運行時數與缺陷處置 |
 | 7. 量產與財務歸因 | 規劃如何變成可重複交付、production volume 與供應商損益？ | 光寶 50V 已量產但 800V 原定 2026H2 驗證；台達 MOU 規劃量仍未交付 | 具名產品、出貨期間／數量、收入、成本、毛利與現金流的買賣雙向對帳 |
+
+## 8 月新路線圖：同樣叫 800V，邊界其實分三層
+
+先問「800V 從哪裡開始、到哪裡結束」，會比只問採用年份更接近真實工程。NVIDIA 8 月 11 日
+把路徑拆成三個 on-ramp；8 月 19 日 DSX v2.0 的參考園區又顯示，AI 工廠上游電力與冷卻仍由
+多個電壓域共同工作。兩份資料應這樣合讀，而不是把三個時間點壓成一次全場切換：
+
+| 路徑／證據 | 800V 的實際邊界 | 時間語言 | 能證明什麼 | 仍不能證明什麼 |
+|---|---|---|---|---|
+| Hybrid 800V power rack | 既有建築維持 AC；在列內轉成 800V 送到運算機櫃 | 預定 2026H2 arriving | 既有機房有不改建築電力系統的升級入口 | 已安裝、通過 commissioning、穩定量產或供應商獲利 |
+| Row power center | 以 overhead 800V busway 供應完整機櫃列，公告能力最高 2MW／row | 預期 2027 availability | 800V 邊界可由單一 power rack 擴到整列 | 整座園區、冷卻與所有輔助設備都改成 800V |
+| Facility-scale DC power block | 從 grid 端直接轉成 800V，供新設施採更原生的 DC 架構 | 定位為 decade ahead，未給供貨日 | 平台商已畫出更後期的設施級方向 | 已有具名 as-built 場站、production volume 或客戶驗收 |
+| DSX v2.0 參考園區 | utility input 100kV+、campus backbone 34.5kV、chiller 4.16kV、pumps／coolers／controls 480V | 2026-08-19 參考設計 | 一座 AI 工廠可以同時保留多個電壓與責任域 | 未來 native 800V 設施只能照此拓撲，或圖中容量已實際部署 |
+
+因此，多方可以說 2026 的 hybrid 入口降低既有機房導入摩擦、2027 又有擴到整列的路徑；空方
+也可以說分階段導入延長 AC 資產壽命，設施級 DC 仍沒有明確供貨日。兩方都不能跳到「整座 AI
+工廠已全面 800V」或「台灣供應商已認列獲利」。下一份真正會改變判讀的證據，必須把同一具名
+場站的 single-line、conversion boundary、各電壓域、commissioning、運行分母與供應商出貨財務
+用同一版本鍵對起來。
 
 ## 為何值得持續追
 
@@ -825,6 +927,8 @@ transformer、switchgear、relay、generator 與 campus control 排除在 BESS q
 - [OCP Power Distribution 持續更新入口](https://www.opencompute.org/community/power-distribution)與 [NVIDIA 800VDC architecture 持續更新入口](https://www.nvidia.com/en-au/data-center/technologies/800-vdc-architecture/)（2026-08-12 捕捉，只供後續重查）。
 - [OCP Open Data center Spec v0.5.0](https://www.opencompute.org/documents/open-data-center-spec-version-0-5-0-pdf)（2026-02-25；PDF p.9 的 3+1／2N、row-level 與 data-hall power 特定設計表，不是通用容量換算式）。
 - [DOE FEMP：Best Practices Guide for Energy-Efficient Data Center Design](https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf)（2024-07-26；PDF p.38／印刷 p.29 的年度 PUE 定義與適用邊界）。
+- [NVIDIA：Why Scaling AI Compute Performance Requires a New Power Architecture](https://blogs.nvidia.com/blog/800-vdc-power-architecture-ai-factory/)（2026-08-11；分開 2026H2 hybrid power rack、2027 row power center 與較後期 DC power block）。
+- [NVIDIA DSX Facilities Infrastructure Reference Design Overview v2.0](https://docs.nvidia.com/dsx/facilities-infra/reference-design-overview)（2026-08-19；100kV+／34.5kV／4.16kV／480V 多電壓參考園區與 sizing boundary）。
 
 NVIDIA 列名 Delta、LITEON 只證實生態系參與。對 2301 而言，800V 仍停在公司預定的驗證節點；
 對 2308 而言，證據已由展示增加到 MOU planned deployment，但仍沒有完成部署與財務分母；

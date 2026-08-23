@@ -6715,6 +6715,13 @@ class ResearchCenterTest(unittest.TestCase):
             "| 5. 子系統資格 |",
             "| 6. 場站 commissioning 與客戶驗收 |",
             "| 7. 量產與財務歸因 |",
+            "## 8 月新路線圖：同樣叫 800V，邊界其實分三層",
+            "| Hybrid 800V power rack |",
+            "| Row power center |",
+            "| Facility-scale DC power block |",
+            "| DSX v2.0 參考園區 |",
+            "既有建築維持 AC；在列內轉成 800V",
+            "utility input 100kV+、campus backbone 34.5kV",
             "## OCP 的三階段不是「成熟度排名」，而是改動範圍",
             "## 同樣寫 1MW，為什麼 installed、critical、actual 與 PUE 是四本帳",
             "### 先固定失效情境，再算 installed 與 critical",
@@ -6742,15 +6749,20 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C14\nlabel: verified\nstatus: active",
             "claim_id: C15\nlabel: verified\nstatus: active",
             "claim_id: C16\nlabel: inference\nstatus: active",
+            "source_id: S16\nrole: company_release",
+            "source_id: S17\nrole: company_release",
+            "claim_id: C17\nlabel: verified\nstatus: active",
+            "claim_id: C18\nlabel: verified\nstatus: active",
+            "claim_id: C19\nlabel: inference\nstatus: active",
             "thesis_claim_id: C13",
             "review_due: 2026-09-12",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 15),
-            ("research_claim", 16), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 17),
+            ("research_claim", 19), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
-            ("transition", 6),
+            ("transition", 7),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
