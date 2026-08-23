@@ -6765,9 +6765,19 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C13\nlabel: verified\nstatus: active",
             "claim_id: C14\nlabel: inference\nstatus: active",
             "claim_id: C15\nlabel: inference\nstatus: active",
+            "claim_id: C16\nlabel: verified\nstatus: active",
+            "claim_id: C17\nlabel: inference\nstatus: active",
+            "claim_id: C18\nlabel: unverified\nstatus: active",
             "## 先用四個位置看：拓撲會把元件工作移到哪裡",
             "| 本文四個位置 |",
             "## 為什麼 48V 與 800V 會共存一段時間",
+            "## 同樣叫 800V，機房到底改的是哪一段？",
+            "| A. 既有場站旁路升級 |",
+            "| B. 新場站直接轉換 |",
+            "v0.3 是要求時鐘，不是產品通過時鐘",
+            "S14 是 N＝1 條 OCP",
+            "三本帳不能因為\n都寫著 800V 就把設備數、功率容量或營收加在一起",
+            "共同要求不是共同 pass",
             "## 48V 不一定是 48.0V，±400V 也不能只除以 400",
             "`72,000W ÷ 50V = 1,440A`",
             "`72,000W ÷ 800V = 90A`",
@@ -6786,13 +6796,14 @@ class ResearchCenterTest(unittest.TestCase):
             "reason: expanded_functional_partition_to_topology_first_six_axis_and_five_gate_contract",
             "monitor_id: T1\nstatus: retired",
             "monitor_id: T3\nstatus: active",
+            "reason: separated_side_power_rack_and_direct_mvac_conversion_clocks_without_refreshing_thesis_clock",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 15), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 18), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 4),
-            ("transition", 8),
+            ("transition", 9),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -6812,7 +6823,7 @@ class ResearchCenterTest(unittest.TestCase):
         graph = (
             ROOT / "notes" / "knowledge_graph" / "800v_power_tree.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 25)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 26)
         for target in (
             "to_id: concept:800v-topology-device-selection",
             "to_id: metric:power-stage-selection-envelope",
@@ -6823,6 +6834,8 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: stage:800v-subsystem-qualification",
             "to_id: stage:800v-site-acceptance",
             "to_id: stage:800v-commercial-attribution",
+            "edge_id: KG-8VP-I21",
+            "to_id: stage:800v-facility-transition",
         ):
             self.assertIn(target, graph)
 

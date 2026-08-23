@@ -248,6 +248,22 @@ limitation: Diablo 400 是多家參與的 0.7.0 system specification，不指定
 independence_group: open-compute-project
 -->
 
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Powering the Next Era of AI: How Google, Microsoft and Nvidia Are Standardizing and Accelerating the Industry Transition to LVDC
+published_at: 2026-08-11
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://www.opencompute.org/index.php/blog/powering-the-next-era-of-ai-how-google-microsoft-and-nvidia-are-standardizing-and-accelerating-the-industry-transition-to-lvdc
+locator: HTML「A Shared Problem Demands a Shared Standard」「What We Are Building Together at OCP」「A Flexible Path Forward for Every Data Center」與「An Ecosystem Aligned to Build」段落；common requirements、SST Specification v0.3、安全／法規前置、480VAC side power rack、direct MVAC-to-800V 及 rack-level DC-DC 角色
+limitation: 這是 Google、Microsoft、NVIDIA 透過 OCP 發布的共同要求與路徑說明，不是任一具名 SST／transformer rectifier 的 conformance test、產品 pass、場站部署或財務揭露；本輪只以官方 HTML 支持主張，連結的 v0.3 PDF 因端點阻擋本地下載而未用其內文、頁碼或 SHA 補強細節
+independence_group: open-compute-project
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -503,6 +519,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: OCP 的 2026-08-11 聯合說明把 800VDC 分成兩條設施部署路徑：既有場站可由相鄰 side power rack 把 480VAC 轉成 ±400V 或 0–800VDC；長期路徑則由 transformer rectifier 或 SST skid 把 MVAC 直接轉成 800VDC 供應整個 data hall，且 800VDC 被定位為可與既有 AC 共存的新增選項而非一律取代 AC
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-11
+basis: S14 直接列出 800VDC 不是既有 AC 的 replacement、兩個 deployment options、各自 input／conversion location／output 與適用場站條件
+boundary: 這證明共同要求明確分開兩條 architecture path，不證明任何場站已部署、SST 比 transformer rectifier 更優、兩條路徑的效率／成本可直接比較，或 Mt Diablo 2.0／任一 v0.3 產品已通過資格
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 研究 800V adoption 至少要分開三本時鐘：既有 480VAC 場站的 side-power-rack 改造、direct-MVAC 場站的設施級轉換，以及進入機架後的 DC-DC／保護／備援資格；三者都可出現 800V 標籤，卻不代表相同設備、BOM、責任邊界或商業成熟度
+supporting_source_ids: S14,S2,S3,S9,S10
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S14 分開兩種 facility conversion path，並把 facility-level transformer rectifier／SST 與 rack-level DC-DC 供應角色分列；S2／S3／S9／S10 又顯示 rack 端仍可有多種 IBC、BBU、hot-swap 與直降路徑
+boundary: 三本時鐘是研究中心用來避免混用分母的 inference，不是 OCP 固定成熟度模型，也不表示三條路一定依序發生、內容量可以相加，或共同要求已變成 production BOM
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: unverified
+status: active
+claim: SST Specification v0.3 與共同 800V requirements 已足以證明具名 transformer rectifier／SST 完成介面與安全符合、產品量產、場站 commissioning、field reliability，或 universe 內功率／電源公司已取得可辨識訂單與財務貢獻
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S14 只把 v0.3 稱為 broader journey 的起點，並明示安全 certification 與 regulatory framework 仍是全球部署的 prerequisites；本輪沒有具名產品 test plan／result、認證、as-built site、客戶 acceptance、deployment denominator 或買賣雙方財務共同鍵
+boundary: 公開規範、共同要求、partner count、產品開發或 architecture alignment 都不能替具名產品與場站的 pass-fail、出貨、運行時數、收入、成本與毛利背書
+verification_needed: 需同一 product／revision 固定 MVAC input、800V output、interface、protection 與 cooling，取得標準／法規符合結果、原始 test matrix、客戶 qualification、site commissioning、operating hours、deployment denominator，以及買賣雙方同期間 production BOM／shipment／revenue／cost／margin
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -611,6 +678,14 @@ reason: added_voltage_current_reference_plane_and_fixed_resistance_sensitivity_w
 evidence: sources:S1,S12,S13
 -->
 
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: separated_side_power_rack_and_direct_mvac_conversion_clocks_without_refreshing_thesis_clock
+evidence: sources:S14
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -618,6 +693,8 @@ evidence: sources:S1,S12,S13
 - **Si／SiC／GaN**：矽、碳化矽與氮化鎵三種功率元件材料；耐壓、切換速度、成本與成熟度各不相同。
 - **交流電／直流電（AC／DC）**：交流電會週期性改變方向，直流電則維持固定方向；資料中心會在不同環節轉換兩者與電壓高低。
 - **SST**：固態變壓器，用功率電子元件處理中壓 AC 到 DC，可減少傳統轉換層級。
+- **MVAC／direct MVAC／direct-MVAC**：中壓交流電；`direct MVAC` 路徑是在設施端直接把它轉成 800VDC，而不是先降到 480VAC 再由旁路電力櫃轉換；`direct-MVAC` 是本文為同一路徑使用的短標籤。
+- **Specification／v0.3**：技術要求文件與它的版本標籤；公開 v0.3 代表要求已可討論，不自動等於最終版、產品合規或部署完成。
 - **IBC**：中間匯流排轉換器，把 800V 高壓 DC 降成 50V、12V 等較低電壓供伺服器板使用。
 - **HV（High Voltage）**：高壓。本文用來標示數百伏的輸入或轉換節點，不是特定公司或單一產品名。
 - **POL（Point of Load，負載點轉換）**：靠近 CPU、GPU 或其他晶片的最後一段電壓轉換，把較低電壓變成晶片直接使用的電壓。
@@ -699,6 +776,46 @@ OCP 在 2026 年 6 月發布的 HPR V2 規格，仍把 72kW power shelf 寫成�
 兩者並不矛盾：規格告訴你「現行系統今天必須怎麼交付」，路線圖告訴你「未來責任可能怎麼搬」。
 因此研究時要同時追兩個母體：新建 800V 架構走到哪一關，以及 48V／54V 過渡產品還有多少實際
 部署。只追其中一邊，容易把未來設計誤當今天 BOM，或把今天規格誤當永遠不變。
+
+## 同樣叫 800V，機房到底改的是哪一段？
+
+OCP 在 2026 年 8 月 11 日由 Google、Microsoft、NVIDIA 共同發布的說明，把答案拆成兩條
+設施路徑。這個拆法很重要：**800V 是輸出電壓標籤，不是設備名稱，也不是單一改造方案。**
+
+| 路徑 | 電從哪裡來、在哪裡轉 | 官方文件支持到哪裡 | 還不能知道什麼 |
+|---|---|---|---|
+| A. 既有場站旁路升級 | 保留既有上游架構，在 compute rack 旁用 side power rack 把 480VAC 轉成 ±400V 或 0–800VDC | 若既有 AC 容量與 row space 足夠，可不改上游電力設施；OCP 把它稱為當前場站最快的 800V capability 路徑 | 哪個場站已採用、Mt Diablo 2.0 何時定版、設備資格、效率、部署量與成本 |
+| B. 新場站直接轉換 | 在設施端以 MW 級 transformer rectifier 或 SST skid 把 MVAC 直接轉成 800VDC，再向整個 data hall 配電 | 這是官方列出的長期架構，可把部分中間 AC conversion stage 移除 | SST 與 transformer rectifier 的實際配比、具名產品 pass、法規核准、commissioning 與 field reliability |
+| 兩條路徑之後的 rack | 800V 進入機架後，仍要依平台把電壓送到 50V、12V、6V 或其他中間站，再處理 BBU、hot-swap、保護與晶片 POL | OCP 分開 facility-level equipment 與 rack-level DC-DC 角色；既有供應商設計也顯示多種直降／中間轉換路徑 | 哪一級會被保留或取消、production BOM、具名 device、客戶 acceptance 與台灣公司財務 |
+
+因此，「800V 採用率上升」至少要拆成三本帳：既有 480VAC 場站改造、direct-MVAC 新場站，
+以及 rack 內轉換與保護。第一本帳可能增加 side power rack，第二本帳可能增加 transformer
+rectifier／SST，第三本帳則取決於 compute platform 最終保留哪些 power stage。三本帳不能因為
+都寫著 800V 就把設備數、功率容量或營收加在一起。
+
+### v0.3 是要求時鐘，不是產品通過時鐘
+
+同一篇 OCP 說明公開 SST Specification v0.3，卻也把這個里程碑稱為 broader journey 的起點，
+並把 UL、NFPA、IEEE、IEC 的安全認證與法規框架列為全球部署前置工作。最安全的讀法是：
+共同 operator requirements 已經往前走，但具名產品仍要另外交出 conformance、qualification、
+場站驗收與長時間運行證據。
+
+本輪只以官方 HTML 支持兩條路徑與證據階段；連結的 v0.3 PDF 因端點阻擋本地下載，沒有用
+PDF 內文、頁碼或 SHA 宣稱更細的電壓範圍與 `shall` requirements。S14 是 N＝1 條 OCP
+共同發布消息鏈，不是 Google、Microsoft、NVIDIA 三個獨立部署樣本；本文沒有抽樣估計，
+sampling SE／t 不適用。
+
+### 多空小作文：共同要求會加速什麼，也可能卡在哪裡？
+
+**偏多路徑**是三家大型基礎設施建設者先對齊共同介面與系統要求，供應商不用為每個客戶重做
+完全不同的架構，可能縮短設計、認證與 production-readiness 的來回；同時，side power rack、
+transformer rectifier／SST、斷路與保護、busbar／connector、rack-level DC-DC 都形成更清楚的
+產品責任。這是價值搜尋地圖，不是任何公司已拿到訂單的證據。
+
+**偏空路徑**是兩條架構會與 AC 長期共存，安全與法規仍是前置條件，v0.3 也不是產品 pass。
+若既有場站優先走旁路升級，direct-MVAC 設備的部署時鐘可能較慢；若新場站直接整合設施級
+轉換，一些 rack-level AC-DC 或中間 power stage 又可能縮小或消失。真正裁決多空，要在同一
+場站版本對上設備 pass、commissioning、運行分母、production BOM 與買賣雙方財務。
 
 ## 48V 不一定是 48.0V，±400V 也不能只除以 400
 
@@ -811,6 +928,7 @@ production power tree、同一負載與故障波形、同一 BOM 及同期財務
 - [NVIDIA 800VDC architecture hub](https://www.nvidia.com/en-au/data-center/technologies/800-vdc-architecture/)（分階段過渡、既有資料中心與 all-800V 路徑；含官方 whitepaper 入口）。
 - [OCP Open Rack V3 HPR V2 72kW power shelf specification](https://www.opencompute.org/documents/open-rack-v3-hpr-v2-72kw-power-shelf-spec-v1-0-0-pdf)（現行 48V power-shelf contract）。
 - [OCP Diablo 400 Project Rack and Power Specification 0.7.0](https://www.opencompute.org/documents/ocp-specification-diablo-400-v0-7-0-final-pdf)（±400VDC 端點、差動 800V、線纜 kW／A 選項與 average／RMS current 熱邊界）。
+- [OCP／Google／Microsoft／NVIDIA LVDC deployment paths](https://www.opencompute.org/index.php/blog/powering-the-next-era-of-ai-how-google-microsoft-and-nvidia-are-standardizing-and-accelerating-the-industry-transition-to-lvdc)（共同要求、SST v0.3 里程碑、side power rack 與 direct-MVAC 兩條路徑，以及安全／法規前置邊界）。
 - [Infineon data-center living index](https://www.infineon.com/applications/ai-data-center/data-center-power-solutions) 與 [onsemi data-center living index](https://www.onsemi.com/solutions/computing/data-center)（後續產品與驗證入口）。
 
 本文刻意不把各供應商的峰值效率、功率密度或面積宣稱排成排行榜，因為 topology、輸入輸出、
@@ -824,6 +942,12 @@ adoption、供應商 reference architecture 與 NVIDIA 的 2027 full-scale 架�
 - C14 的 1,440A、90A 與 16 倍只是同一 72kW 人為 reference plane 下的確定性算術；C15 的 1／256 又加上 fixed-R 假設。兩者沒有 sampling SE／t，Python Decimal 與 awk 一致只排除算錯，不消除 topology、RMS 波形、導體、轉換、保護與量測邊界的不確定性。
 - 本輪提前核對 T3，補上 voltage endpoints、average／RMS current、導體與轉換損耗的讀法；但仍無具名 production topology 在同版本公開全路徑波形、導體溫升、converter raw data、fault／redundancy matrix、customer pass 與 BOM。T3 未完整命中 trigger，保持 active，immutable fields 與 2026-08-19 `next_check` 不變。
 - 新證據沒有證明任一材料已勝出、具名台灣供應商取得訂單或改變 C7 的 topology-first 主命題；因此保留 `last_reviewed_at: 2026-08-12`、`review_due: 2026-08-19` 與 `base_confidence: medium`，不用方法教材刷新 thesis evidence clock。
+
+## 8 月 24 日路徑補強：共同要求不是共同 pass
+
+- S14 發布於 2026-08-11，晚於多數元件來源，但早於主命題已引用、於 2026-08-12 捕捉的 S11 living index；因此它能新增 C16–C18 與兩條 facility path，不能只因 8 月 24 日才收錄就刷新 C7 的 evidence clock。
+- T3 的 production topology、具名 device 與 converter pass-fail trigger 仍未命中，保持 active 且 immutable fields／2026-08-19 `next_check` 不變；後續仍沿這一道關卡分開追 side-power-rack 與 direct-MVAC 的設備符合、場站驗收及 rack handoff，避免開一個只改名稱的重複 monitor。
+- 這是 N＝1 條 OCP 共同發布消息鏈；具名產品 conformance、場站 commissioning、operating hours、部署分母與可雙向核對的供應商財務共同觀測 N＝0，沒有 sampling SE／t，也不提供價格、估值、共識、部位或市場是否反映的主張。
 
 ## 影響路由
 

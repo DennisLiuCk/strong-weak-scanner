@@ -513,3 +513,23 @@ status: active
 boundary: 本輪沒有買方與供應商對上同一 800V product／site／period 的 production BOM、shipment、revenue、cost、margin 與 cash。
 next_trigger: 雙方揭露可核對的 product revision、deployed volume、shipment、收入成本毛利與分母，且排除 48V／54V 過渡產品混入。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I21
+view: industry
+from_id: concept:800v-power-tree
+to_id: stage:800v-facility-transition
+relation: reaches_stage
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C16,MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C17
+note_refs:
+evidence_state: inference
+commercial_stage: planned
+materiality: adjacent
+exclusivity: multi_source
+exclusivity_scope: OCP 的共同要求同時保留 side power rack 與 direct-MVAC 兩條部署選項，並分開 facility-level 與 rack-level 供應角色；不是單一 operator、topology 或設備的排他設計。
+as_of: 2026-08-24
+review_due: 2026-09-15
+status: active
+boundary: 兩條 facility path 已被官方說明固定為研究邊界，但 v0.3／共同要求不證明具名設備符合、安全認證、場站 commissioning、deployment denominator、production BOM 或財務貢獻。
+next_trigger: 同一場站與 revision 公開 480VAC／MVAC input、800V endpoint、transformer rectifier／SST／side power rack、rack converter、protection、conformance、customer acceptance、運行分母與財務交接。
+-->
