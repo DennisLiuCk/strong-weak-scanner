@@ -589,3 +589,23 @@ status: active
 boundary: 零事件上界只有在事件定義 實計分母 同質固定率與獨立性成立時適用；假想 10^12 bits 算例不是產品 BER 合規門檻或比較。
 next_trigger: 具名測試同時揭露實計分母 零事件定義 模型適用性與可獨立重算的單側界線。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-PCIE6-I28
+view: industry
+from_id: concept:pcie6-deployment-readiness
+to_id: metric:pcie-lane-margining-evidence-contract
+relation: measured_by
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C20,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C21,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C22
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-23
+review_due: 2026-09-23
+status: active
+boundary: PCI-SIG 與 Keysight 文件只支持功能語意 測項與角色程序分界；PHY2-7／PHY2-8 的 traceable-metric 文字不能外推到 75-22，本輪也沒有具名 64 GT/s DUT 原始值 共同門檻 field reliability 或公司財務。
+next_trigger: 具名 64 GT/s DUT 把角色 port方向 test ID 規格MOI工具 approved system 原始時間電壓 margin 可追溯校正 預先門檻 unit lane環境分母與運行 field結果共同公開。
+-->

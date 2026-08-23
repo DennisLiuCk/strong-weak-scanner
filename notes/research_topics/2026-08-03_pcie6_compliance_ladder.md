@@ -280,6 +280,38 @@ limitation: 這是 HPP／exponential 固定失效率的可靠度方法，不是 
 independence_group: nist
 -->
 
+<!-- research_source
+source_id: S16
+role: standard
+source_kind: document
+publisher: PCI-SIG
+title: PCI Express 5.0 Compliance Testing
+published_at: 2023-01-25
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://pcisig.com/sites/default/files/files/PCI-SIG%20PCIe%205.0%20Compliance%20Webinar_1.25.23_FINAL.pdf
+locator: 封面為 January 25 2023 webinar；所下載版本引用頁頁尾為 2023-04-27、PDF metadata creation 為 2023-04-28；投影片 28–29 的接收端 lane margining 在 16.0 GT/s 以上含 retimer 的必要性、L0 狀態、時間／電壓方向、software step、hardware error report，以及 AIC／System 測試角色
+limitation: PCIe 5.0 教材定義功能與測試分工，不提供 PCIe 6.0 test ID、共同可追溯的數值及格線、具名 DUT 結果、跨環境重現、field reliability 或公司財務
+independence_group: pci-sig
+-->
+
+<!-- research_source
+source_id: S17
+role: other_primary
+source_kind: document
+publisher: Keysight
+title: Keysight P5578CTSA PCIe 6.0 Protocol Compliance Test Application User Guide
+published_at: 2026-07-01
+captured_at: 2026-08-23
+accepted_at: 2026-08-23
+status: active
+url: https://www.keysight.com/lb/en/assets/9926-01135/user-manuals/Keysight-P5578CTSA-PCIe-6.0-Protocol-Compliance-Test-App-UserGuide.pdf
+locator: Edition 1.1 July 2026（published_at 以文件月份首日正規化），pp.108、110–111；AIC 75-20／75-21／75-22 測項、PHY2-7／PHY2-8 capability 說明，以及 retimer 使用 PCI-SIG tool 與 approved system 的程序分界
+limitation: 測試工具供應商手冊不是 PCI-SIG 規格或 MOI；PHY2-7／PHY2-8 的 capability／traceability 說明不能外推成 75-22 或全部 64 GT/s 測試都沒有數值門檻，也沒有提供任何具名 DUT 的 pass、量測分布或可靠度
+independence_group: keysight
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -603,6 +635,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: PCI-SIG 的 PCIe 5.0 教材把接收端 lane margining 定義為 16.0 GT/s 以上所有 port（含 retimer）的必要功能；link 在 L0 active 時，由系統軟體逐步移動接收端取樣點，取得時間與電壓方向的 margin，硬體回報錯誤，而且這不是 Recovery.Equalization 的硬體程序
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S16 投影片 28–29 直接列出適用速度與角色、L0 狀態、時間／電壓、software step、hardware error report，以及 AIC／System 三種測試分工
+boundary: 這只證實 PCIe 5.0 的功能語意與必要性；不提供 PCIe 6.0 test ID、共同可追溯及格線、具名產品 pass、跨環境重現或量產可靠度
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: Keysight 2026 年 7 月指南把 PCIe 6.0 AIC 的 16、32、64 GT/s lane-margining 測項分別列為 75-20、75-21、75-22，且 75-22 只列 FLIT Mode；同一指南在 PHY2-7／PHY2-8 的具名說明中要求檢查 AIC 是否實作能力，並明說該段回報值不對任何 traceable metric 檢查，另把 retimer 程序分開，建議以 PCI-SIG Lane Margining tool 搭配 approved PCIe system 執行
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S17 p.108 的 PCIe 6.0 Table 7 列出 75-20／75-21／75-22 與 supported mode，pp.110–111 分別列 PHY2-7／PHY2-8 及其 capability／traceability 文字，並在下一段另寫 retimer 路徑
+boundary: traceable-metric 句只明確指向 PHY2-7／PHY2-8，不能套到 75-22 或全部 64 GT/s 測試；指南使用 should 而非 must，也沒有證明 P5578 本身是 PCI-SIG approved tool／system、任何具名產品已通過，或不同角色與工具的數值可直接比較
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: 通道餘裕證據至少要綁定 DUT 角色、實際 port／方向、速度／lane 數、test ID、規格／MOI／工具版本、approved system、取樣擾動方法、原始時間／電壓回報、校正／traceability／acceptance rule、溫度／電壓／unit／lot／lane 分母，以及同時間的 raw error、FEC、replay、retrain、downshift 與應用結果；「功能必測」「有 margin 數字」或「某項 pass」都不能單獨改寫成共同品質分數或 field reliability
+supporting_source_ids: S8,S10,S11,S16,S17
+contrary_source_ids:
+as_of: 2026-08-23
+basis: S16 定義量測如何在 L0 由軟體移動 timing／voltage sampling point 並分開 AIC／System，S17 又顯示 test ID、mode、PHY2 capability check、traceability 與 retimer tool／approved-system 路徑會隨測項和角色改變；S8／S10／S11 則分開 raw、FEC、CRC／replay 與 link state，合併後形成可比較證據所需欄位
+boundary: 這是研究中心的證據合約，不是 PCI-SIG 或 Keysight 的新認證模板；本輪沒有 64 GT/s 具名 DUT 原始量測、共同門檻、跨 unit／lot／環境分布、qualification、field failure 或公司財務，產品與部署共同觀測 N=0，沒有 sampling SE／t
+verification_needed: 第一份具名 64 GT/s 結果把 DUT 角色、port／方向、75-22 或後繼 test ID、規格／MOI／工具、approved system、原始 timing／voltage margin、可追溯校正、預先門檻、unit×lane×環境分母及錯誤／重訓／降速／應用結果共同公開
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -675,6 +758,20 @@ trigger: 首項具名 PCIe 6.x 64 GT/s 公開列名可把受測物件、角色�
 invalidation: 公開資料只有較低速率、部分測項、模糊物件或板卡／系統結果被錯接到未另測元件；若 form 延後才列名，維持流程時間差而不回寫成測試失敗
 -->
 
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C20,C21,C22
+metric: 首份具名 64 GT/s lane-margining 結果是否把 DUT 角色、port／方向、75-22 或後繼 test ID、規格／MOI／工具版本、approved system、原始 timing／voltage margin、traceable calibration、預先 acceptance threshold、unit×lane×環境分母及 raw error／FEC／replay／retrain／downshift／application 結果綁在一起
+source_ids: S16,S17
+watch_source_ids: S1,S2,S9,S14
+frequency: monthly
+frequency_detail: 每月核對 PCI-SIG workshop／Compliance Program／Integrators List 與測試工具指南；只在同一具名 DUT 的角色、測項、原始 margin、校正、門檻、重現分布及運行結果可共同重建時升級
+next_check: 2026-09-23
+trigger: PCI-SIG、approved lab 或具名供應商公開可重現的 64 GT/s 結果，且跨 unit／環境重複性與 qualification 或 field outcome 的關聯可核對
+invalidation: 新 PCI-SIG 6.x MOI 定義跨角色通用且可追溯的共同品質門檻，並由多 unit／lot／環境的 production 樣本穩定預測故障；若仍只驗 capability／response、角色與工具不可比或沒有 field correlation，維持本文界線
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -716,6 +813,13 @@ from: triaged
 to: triaged
 reason: zero_observed_error_exposure_counter_layers_and_conditional_upper_bound_added_without_thesis_or_clock_refresh
 evidence: sources:S8,S10,S11,S15
+-->
+<!-- transition
+date: 2026-08-23
+from: triaged
+to: triaged
+reason: clarified_lane_margining_functional_check_and_numeric_quality_boundary_without_thesis_or_clock_refresh
+evidence: sources:S16,S17
 -->
 
 ## 新手先讀：這篇在講什麼
@@ -779,6 +883,11 @@ evidence: sources:S8,S10,S11,S15
 - **擴充卡機電連接器（CEM connector）**：擴充卡與系統板相接的共同電氣與機構介面；工作坊政策以它界定板卡／系統測試和內部關鍵元件的證據範圍。
 - **擴充卡（Add-In Card／AIC）**：插入系統插槽、承載終端或其他功能的完整板卡；它可以是一個受測角色，但不等於板上每顆元件都被單獨測過。
 - **通道餘裕量測（lane margining）**：由系統讀取接收端可用電壓與時間餘裕的標準化檢查；必要性不等於結果已通過或長期工作負載穩定。
+- **功能檢查與品質門檻**：功能檢查回答裝置會不會依程序回報，品質門檻還要用可追溯校正、共同條件與預先及格線判斷數字好不好；會顯示數字不等於已有共同健康分數。
+- **連線正常工作狀態（L0／L0 active）**：連線已完成訓練、可以正常傳送資料的狀態；在這個狀態量餘裕，不等於故意進入重新等化或故障恢復程序。
+- **測試程序文件（MOI）**：把規格要求轉成儀器接法、操作步驟與判定方式的實作方法；版本不同時，結果可能不能直接比較。
+- **PHY2-7／PHY2-8 測項**：Keysight 指南逐名提到的 16／32 GT/s lane-margining 測試編號；它們不是 64 GT/s 的 75-22，也不能互相替代證據。
+- **統計標準誤（SE）**：描述樣本估計值因抽樣而可能波動多少；本輪沒有產品樣本分布，因此不能計算這個誤差。
 - **產品列名申請表（Product Listing Request Form）**：完成門檻後仍要提交的公開列名程序文件；可在工作坊後另行送出，因此列名時間不必等於測試日期。
 - **系統測試角色（System）**：以主機板、插槽與必要平台元件組成的系統身分受測；系統結果只涵蓋當次配置與測試邊界。
 - **Credo**：公開清單中的一家高速連接元件供應商；本文只引用其具名產品列的規格版本與速度，不比較公司能力或投資價值。
@@ -879,6 +988,42 @@ evidence: sources:S8,S10,S11,S15
 元件並沒有因此取得自己的完整電氣與功能成績。反過來，工作坊結束後暫未出現在公開清單，
 也只表示公開列名鏈尚未閉合；申請表可稍後提交，所以不能把「未列名」直接翻譯成「測試失敗」。
 這些界線由 PCI-SIG 的 Compliance Program、公開清單與工作坊政策共同支持。[S9][S2][S14]
+
+## 通道餘裕有數字，不等於有共同及格線
+
+把 lane margining 想成量體溫：溫度計的數字會跟著冷熱改變，先證明感測與回報功能在工作；
+要再判斷是否發燒，還要有校正過的量尺、共同量測位置、預先定義的界線，以及它和實際健康
+結果的關聯。通道餘裕也是如此，**會回報數字**、**數字怎麼產生**、**數字能否預測品質**是
+三層不同證據。
+
+PCI-SIG 的官方教材把接收端 lane margining 定義得很具體：支援 16.0 GT/s 以上的 port（包括
+retimer）要有這項功能；link 在 L0 active 時，系統軟體逐步移動接收端的時間與電壓取樣位置，
+硬體回報錯誤。它不是連線進入 Recovery.Equalization 後由硬體自行重新等化的同一件事；教材
+也把 AIC 與 System 的執行方式分開。[S16]
+
+Keysight 2026 年 7 月指南則顯示，讀數必須和測項一起讀。PCIe 6.0 AIC 的 16、32、64 GT/s
+測項分別列為 `75-20`、`75-21`、`75-22`，其中 `75-22` 只列 FLIT 模式；但指南所說
+「回報值不對 traceable metric 檢查」的段落，只明確點名 `PHY2-7`／`PHY2-8`。同一頁還把
+retimer 的程序另行分開，寫成應以 PCI-SIG Lane Margining tool 搭配 approved PCIe system
+執行。[S17] 因此不能把 `PHY2-7`／`PHY2-8` 的限制搬到 `75-22`，也不能由一張 pass 成績單
+推論不同角色、工具與 port 的 margin 數字已有共同及格線。
+
+| 三層判讀 | 最少要保存什麼 | 這一層能證明 | 還不能越過的界線 |
+|---|---|---|---|
+| 1. 功能有實作 | DUT 角色、實際 port／方向、link state、速度／lane、test ID 與回報是否依程序改變 | 受測物件在該角色與程序下能執行 margining | 數值準確、不同工具可比、64 GT/s 全測項通過或長期可靠 |
+| 2. 數字如何產生 | 規格／MOI／工具版本、approved system、取樣擾動、原始 timing／voltage 回報、校正與 traceability | 在同一合約內重建這個數字的來源 | 把不同 receiver 演算法、角色、方向或環境的數字排成共同品質榜 |
+| 3. 數字是否預測品質 | 預先 acceptance rule、unit／lot／lane／溫度／電壓分母，以及同時段 raw error、FEC、replay、retrain、downshift、應用與 field outcome | 驗證門檻能否跨樣本重現並預測 qualification 或實際故障 | 用一次功能 pass、單 lane 讀值或最好樣本宣稱量產可靠度與公司受惠 |
+
+這張表是研究中心的證據合約，不是 PCI-SIG 或 Keysight 新增的認證。這一輪只有 **N=2 份
+官方文件、N=2 個發布者**，而且都在同一相容性測試生態裡；它們不是兩個產品重複實驗。
+具名 64 GT/s DUT 原始結果、跨 unit／lot／環境分布、qualification、field deployment 與台灣
+公司財務的共同觀測全部 **N=0**，沒有 sampling SE／t；三個 test ID 也不能算成三個獨立樣本。
+
+| 多空敘事 | 合理假說 | 必須再看到 | 最強反方 |
+|---|---|---|---|
+| 偏多：量測與除錯內容增加 | 更細的 timing／voltage 診斷可能增加驗證工具、工程時數，並協助定位板路、receiver 或 retimer 問題 | 具名平台的測試時間、工具／BOM、qualification、出貨、價格與財務共同鍵 | 若主要只是既有硬體的軟體 capability／設定檢查，測項增加不等於新增元件或供應商收入 |
+| 偏空：數字是 receiver 自己回報 | 演算法、port、方向、角色與工具不同時，margin 值可能只適合本機除錯，不能形成跨產品健康分數 | 可追溯校正、共同門檻、跨 unit／環境重現，以及與 field failure 的關聯 | 若新 MOI 定義跨角色共同門檻，且量產樣本穩定預測故障，這個不可比界線就要下修 |
+| 共同底線 | 功能、量測值、品質預測與商業受惠各有自己的分母 | 同一具名 DUT 的完整證據合約，再接到部署與財務 | 用 mandatory、pass 或一個 margin 數字一次跨過後面三層 |
 
 ## 跑了很久沒錯，不等於 BER=0：先固定暴露量與錯誤層級
 
@@ -1039,6 +1184,8 @@ PAM4 channel、材料、板層設計、訊號完整性與量產良率。
 - [PCI-SIG PCI Express 6.0 Specification](https://pcisig.com/pci-express-6.0-specification)（PAM4、Flit、FEC、CRC 與相容性機制）。
 - [PCI-SIG Compliance Program](https://pcisig.com/developers/compliance-program)（interop／compliance 分工、正式門檻與四類 test areas）。
 - [PCI-SIG 第 140 次工作坊邀請與測試政策](https://pcisig.com/sites/default/files/2026-05/PCIWorkshop140%20Invitation%20Draft.pdf)（受測角色、CEM connector 邊界、必要測項與列名申請程序）。
+- [PCI-SIG：PCI Express 5.0 Compliance Testing](https://pcisig.com/sites/default/files/files/PCI-SIG%20PCIe%205.0%20Compliance%20Webinar_1.25.23_FINAL.pdf)（投影片 28–29 的接收端 lane margining 功能、L0 狀態及 AIC／System 分工）。
+- [Keysight P5578CTSA PCIe 6.0 Protocol Compliance Test Application User Guide](https://www.keysight.com/lb/en/assets/9926-01135/user-manuals/Keysight-P5578CTSA-PCIe-6.0-Protocol-Compliance-Test-App-UserGuide.pdf)（Edition 1.1，pp.108、110–111 的 75-22、PHY2-7／PHY2-8 與 retimer 程序邊界）。
 - [PCI Express 6.0 FAQ](https://pcisig.com/faq?field_category_value%5B%5D=pci_express_6.0&keys=PAM4)（四電位訊號、256-Byte Flit 與錯誤控制問答）。
 - [PCI-SIG：The Evolution of the PCI Express Specification](https://pcisig.com/blog/evolution-pci-express-specification-its-sixth-generation-third-decade-and-still-going-strong)（PAM4 error model、FEC／CRC／replay 與 Flit 連動）。
 - [Synopsys：Optimizing PCIe 6.0 Designs at 64GT/s](https://www.synopsys.com/articles/pcie-6-designs.html)（獨立 IP 設計視角的 channel、PHY／controller、Flit 與測試責任）。
@@ -1091,6 +1238,7 @@ evidence_boundary: 更高速率的物理要求不自動對應任一 PCB／CCL �
 - 同一具名產品把 Electrical、Configuration、Link Protocol、Transaction Protocol 與 interoperability 的必要結果逐項公開。
 - 至少兩家獨立 host、retimer／switch 與 endpoint 供應商公開可重現的 64 GT/s 拓撲、Flit／錯誤恢復與長時間結果。
 - 第一份具名長時間「零錯誤」結果公開儀器實計暴露、counter 定義／重置／彙總、raw／FEC corrected／CRC residual／replay／application 各層結果，以及降速、重訓與停機缺口。
+- 第一份具名 64 GT/s lane-margining 結果同時公開 DUT 角色、port／方向、75-22 或後繼測項、規格／MOI／工具／approved system、原始 timing／voltage 值、traceable calibration、預先門檻、unit×lane×環境分母及 field correlation。
 - 具名客戶把完整平台從 qualification 升級到 production fleet，並揭露部署量或實際運行指標。
 - 若 Gen6 元件長期只以 gearbox 連 Gen5 生態、64 GT/s listing 延後、必要測項不完整或跨廠互通不穩，兩軸成熟度必須分別下修。
 - 台灣公司由平台端與公司端同時對上具名產品、64 GT/s 測試、客戶資格、出貨及財務後，才建立公司線。

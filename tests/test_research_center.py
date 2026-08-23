@@ -5752,6 +5752,7 @@ class ResearchCenterTest(unittest.TestCase):
             "expanded_single_compliance_ladder_into_link_correctness_and_commercialization_axes",
             "added_test_object_boundary_post_workshop_listing_snapshot_and_listing_lag_contract",
             "zero_observed_error_exposure_counter_layers_and_conditional_upper_bound_added_without_thesis_or_clock_refresh",
+            "clarified_lane_margining_functional_check_and_numeric_quality_boundary_without_thesis_or_clock_refresh",
             "一條完整高速連線，要讓主機、板路與線材、必要的訊號或交換元件、"
             "終端裝置，以及低階控制軟體一起工作",
             "## 先看 64 GT/s 為什麼牽動整條連線",
@@ -5774,6 +5775,16 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 註冊產品身分 |", "| 2. 測試角色 |",
             "| 3. 暴露介面與邊界 |", "| 4. 必要測項與互通門檻 |",
             "| 5. 申請、列名與日期 |",
+            "## 通道餘裕有數字，不等於有共同及格線",
+            "會回報數字**、**數字怎麼產生**、**數字能否預測品質",
+            "75-20", "75-21", "75-22", "PHY2-7", "PHY2-8",
+            "| 三層判讀 | 最少要保存什麼 | 這一層能證明 | 還不能越過的界線 |",
+            "| 1. 功能有實作 |", "| 2. 數字如何產生 |",
+            "| 3. 數字是否預測品質 |",
+            "N=2 份\n官方文件、N=2 個發布者",
+            "具名 64 GT/s DUT 原始結果", "全部 **N=0**",
+            "| 偏多：量測與除錯內容增加 |",
+            "| 偏空：數字是 receiver 自己回報 |",
             "## 跑了很久沒錯，不等於 BER=0：先固定暴露量與錯誤層級",
             "### 先把六層 counter 分開",
             "| 1. 接收端原始層 |", "| 2. FEC 修正層 |",
@@ -5816,7 +5827,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 60
+            sum(line.startswith("- **") for line in glossary.splitlines()), 65
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5833,9 +5844,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 15),
-            ("research_claim", 19), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 5),
+            ("research_topic", 1), ("research_source", 17),
+            ("research_claim", 22), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         for ledger_contract in (
@@ -5844,7 +5855,15 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S14", "claim_id: C16", "monitor_id: T3",
             "monitor_id: T4", "monitor_id: T5",
             "source_id: S15", "claim_id: C17", "claim_id: C18",
-            "claim_id: C19",
+            "claim_id: C19", "source_id: S16", "source_id: S17",
+            "claim_id: C20", "claim_id: C21", "claim_id: C22",
+            "monitor_id: T6", "thesis_claim_id: C10",
+            "last_reviewed_at: 2026-08-12", "review_due: 2026-08-19",
+            "base_confidence: medium",
+            "published_at: 2023-01-25",
+            "traceable-metric 句只明確指向 PHY2-7／PHY2-8，不能套到 75-22 或全部 64 GT/s 測試",
+            "指南使用 should 而非 must",
+            "supporting_source_ids: S8,S10,S11,S16,S17",
         ):
             self.assertIn(ledger_contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -5886,6 +5905,7 @@ class ResearchCenterTest(unittest.TestCase):
             "stage:pcie-integrators-eligibility,stage,PCIe 公開列名資格鏈",
             "process:pcie-zero-error-exposure-passport,process,PCIe 零錯誤暴露護照",
             "metric:pcie-zero-event-upper-error-rate,metric,PCIe 零事件錯誤率單側上界",
+            "metric:pcie-lane-margining-evidence-contract,metric,PCIe 通道餘裕證據合約",
         ):
             self.assertIn(concept, concepts)
         self.assertIn("label: PCIe 6 高速連線的測試與部署階梯", graph)
@@ -5900,9 +5920,10 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-PCIE6-I25", "to_id: stage:pcie-integrators-eligibility",
             "edge_id: KG-PCIE6-I26", "to_id: process:pcie-zero-error-exposure-passport",
             "edge_id: KG-PCIE6-I27", "to_id: metric:pcie-zero-event-upper-error-rate",
+            "edge_id: KG-PCIE6-I28", "to_id: metric:pcie-lane-margining-evidence-contract",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 29)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 30)
 
     def test_compute_connect_station_eight_separates_package_positions_test_dimensions_and_ecosystem_gates(self):
         topic = (
