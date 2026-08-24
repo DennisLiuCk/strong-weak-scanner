@@ -5,7 +5,7 @@ schema_version: 1
 graph_id: pcie6-compliance-ladder
 root_node_id: concept:pcie6-deployment-readiness
 label: PCIe 6 高速連線的測試與部署階梯
-summary: 先把 PAM4 Flit 錯誤控制與四類正式測試放在鏈路正確性軸，再綁定受測物件 角色 CEM connector 邊界 列名程序及零錯誤暴露護照，最後把互通 列名 量產 完整平台與財務歸因放在商品化軸；不能由任一節點推導整體成熟或台灣公司收入。
+summary: 先把 PAM4 Flit 錯誤控制與四類正式測試放在鏈路正確性軸，再綁定受測物件 角色 CEM connector 邊界 列名程序及零錯誤暴露護照；2026-08-24 已有 19 筆 64 GT/s 公開列名與群聯兩項具名產品，但完整跨廠 topology、production fleet 與財務仍是不同時鐘。
 article_ids: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER
 status: active
 -->
@@ -16,18 +16,18 @@ view: industry
 from_id: organization:pci-sig
 to_id: concept:pcie6-deployment-readiness
 relation: owns_platform
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C13,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C14,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C16
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C14,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C16,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
 note_refs:
 evidence_state: verified
 commercial_stage: ecosystem
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-19
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: PCI-SIG 維護測試角色 必要項 互通門檻與 Integrators List；公開清單捕捉未見 64 GT/s 列不表示測試失敗或產品不具能力。
-next_trigger: 具名 64 GT/s 結果把受測物件 邊界 必要測項 listing form 與列表更新接起來。
+boundary: PCI-SIG 維護測試角色 必要項 互通門檻與 Integrators List；2026-08-24 清單已有 19 筆 64 GT/s 列項，但沒有逐項原始結果、完整互通矩陣、production fleet 或財務。
+next_trigger: 把具名 64 GT/s 列項接到受測邊界 必要測項 interop 對手 有效分母與客戶部署。
 -->
 
 <!-- knowledge_edge
@@ -56,18 +56,18 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: stage:official-compliance
 relation: passes_through
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C14,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C16
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C14,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C16,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
 note_refs:
 evidence_state: verified
 commercial_stage: validation
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-19
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: Workshop 提供 64 GT/s official testing，且制度要求互通門檻與必要測項；尚未由公開資料得知哪些具名產品完成全套程序。
-next_trigger: PCI-SIG 公開具名 64 GT/s official result 與必要測項範圍。
+boundary: Workshop 提供 64 GT/s official testing，且清單已列出具名產品；公開資料仍未提供每列的原始 test-area 結果與互通分母。
+next_trigger: PCI-SIG 或 lab 公開具名 64 GT/s 原始結果 必要測項與互通對手。
 -->
 
 <!-- knowledge_edge
@@ -76,18 +76,18 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: stage:integrators-listing
 relation: passes_through
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C13,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C16
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C13,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C16,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
 note_refs:
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-19
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: 2026-08-12 清單捕捉仍支援部分 Gen6 功能產品在 PCIe 5.0 32 GT/s 的列項；未見最高速列不表示能力不足或測試失敗，listing form 也可能稍後提交。
-next_trigger: 同一或新產品新增 PCIe 6.x 64 GT/s listing 並可核對測試日 送表日與列名日。
+boundary: 2026-08-24 清單已有 19 筆 PCIe 6.x 64 GT/s 列項；這只前進官方列名時鐘，不把不同列拼成同一 platform，也不等於客戶部署或財務。
+next_trigger: 每列補齊測試日 送表日 列名日 必要測項 interop 對手與 production platform。
 -->
 
 <!-- knowledge_edge
@@ -96,18 +96,18 @@ view: company
 from_id: company:astera-labs
 to_id: concept:pcie6-deployment-readiness
 relation: produces
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C3
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C3,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2025-05-01
-review_due: 2026-09-15
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: 公司宣稱 portfolio ramp production 與客戶 qualification；不等於 PCI-SIG 64 GT/s pass 或具名 fleet 部署。
-next_trigger: Official listing 與客戶端 production deployment 的雙向證據。
+boundary: 公司宣稱 portfolio ramp production；2026-08-24 清單另有 Astera retimer 與 switch 的 64 GT/s 列項，但不等於同一具名 fleet 部署或公司財務。
+next_trigger: Official listing 與客戶端 production topology 部署的雙向證據。
 -->
 
 <!-- knowledge_edge
@@ -116,18 +116,38 @@ view: company
 from_id: company:micron
 to_id: concept:pcie6-deployment-readiness
 relation: produces
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C4
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C4,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-03-16
-review_due: 2026-09-15
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: Micron 宣稱 9650 SSD high-volume production；不等於 official listing 或具名客戶 fleet 分母。
-next_trigger: PCI-SIG 結果與客戶平台實際部署 利用率或數量。
+boundary: Micron 宣稱 9650 SSD high-volume production，2026-08-24 清單另列 9650 Max／Pro；仍沒有具名客戶 fleet 分母、利用率或財務拆分。
+next_trigger: 客戶平台實際部署 利用率 數量與財務共同鍵。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCIE6-C03
+view: company
+from_id: company:8299
+to_id: concept:pcie6-deployment-readiness
+relation: reaches_stage
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
+note_refs:
+evidence_state: verified
+commercial_stage: platform_listing
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-08-31
+status: active
+boundary: PCI-SIG 清單可定位 Phison PS7161 x16 linear redriver 與 PS5303 x4 SSD controller 的 64 GT/s 列項；沒有具名客戶 topology、production fleet、出貨、收入、毛利或現金流，不得由列名推成受惠。
+next_trigger: 群聯與平台或客戶雙向公布 PS7161／PS5303 qualification、部署量、出貨與同期間財務。
 -->
 
 <!-- knowledge_edge
@@ -136,18 +156,18 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: component:pcie-retimer
 relation: includes
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C3
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C3,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2025-05-01
-review_due: 2026-09-15
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: Astera portfolio 包含 retimer；不表示所有 retimer 已通過 64 GT/s official testing。
-next_trigger: Retimer 具名 64 GT/s listing 與 multi-vendor production topology。
+boundary: 64 GT/s 清單已有三筆 retimer；列名不提供完整 interop 對手或 multi-vendor production topology。
+next_trigger: Retimer 列項與 host switch endpoint 的同一 production topology。
 -->
 
 <!-- knowledge_edge
@@ -156,17 +176,17 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: component:pcie-fabric-switch
 relation: includes
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C3
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C3,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2025-05-01
-review_due: 2026-09-15
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: Astera portfolio 包含 fabric switch；不證明完整 host endpoint 組合已部署。
+boundary: 64 GT/s 清單已有四筆 switch／bridge；不證明它們與具名 host endpoint retimer 組合已部署。
 next_trigger: Switch 與獨立 host endpoint retimer 的 64 GT/s 測試及客戶部署。
 -->
 
@@ -176,18 +196,18 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: product:micron-9650
 relation: includes
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C4
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C4,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C23
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-03-16
-review_due: 2026-09-15
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: 9650 是量產 endpoint 證據；不代表完整 PCIe 6 生態系或客戶部署完成。
-next_trigger: 9650 的 official listing 與具名 production host switch retimer 組合。
+boundary: 9650 同時有公司量產聲明與 64 GT/s 公開列項；不代表完整 PCIe 6 生態系或客戶部署完成。
+next_trigger: 9650 與具名 production host switch retimer 組合。
 -->
 
 <!-- knowledge_edge
@@ -216,14 +236,14 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: stage:pcie6-platform-deployment
 relation: passes_through
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C6
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C24
 note_refs:
 evidence_state: unverified
 commercial_stage: deployment
 materiality: unknown
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-03
+as_of: 2026-08-24
 review_due: 2026-09-15
 status: active
 boundary: 完整 production fleet 是尚未由現有來源證實的未來節點。
@@ -376,7 +396,7 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: stage:pcie-electrical-testing
 relation: passes_through
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C9,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C10
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C9,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C25
 note_refs:
 evidence_state: inference
 commercial_stage: validation
@@ -396,7 +416,7 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: stage:pcie-configuration-testing
 relation: passes_through
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C9,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C10
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C9,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C25
 note_refs:
 evidence_state: inference
 commercial_stage: validation
@@ -416,7 +436,7 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: stage:pcie-link-protocol-testing
 relation: passes_through
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C9,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C10
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C9,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C25
 note_refs:
 evidence_state: inference
 commercial_stage: validation
@@ -436,7 +456,7 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: stage:pcie-transaction-protocol-testing
 relation: passes_through
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C9,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C10
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C9,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C25
 note_refs:
 evidence_state: inference
 commercial_stage: validation
@@ -456,7 +476,7 @@ view: industry
 from_id: concept:pcie6-deployment-readiness
 to_id: stage:pcie6-financial-attribution
 relation: passes_through
-claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C7,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C10
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C7,MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C25
 note_refs:
 evidence_state: unverified
 commercial_stage: financial

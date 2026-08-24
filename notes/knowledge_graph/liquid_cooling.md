@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: liquid-cooling
 root_node_id: concept:liquid-cooling
 label: 液冷 CDU
-summary: 把 CDU 額定能力拆成熱性能、TCS 壓頭、FWS 阻抗與具位置單位時間品質的量測上下文，再把平台資格、系統整合、場域驗證、公司液冷產品族占比和具名型號財務橋接分開。
+summary: 把 CDU 額定能力拆成熱性能、TCS 壓頭、FWS 阻抗與具位置單位時間品質的量測上下文，再把平台資格、供應狀態、系統整合、場域驗證與財務分開；2026-08-24 Marketplace 已改用 NVIDIA Product Qualified，不能與舊 Sample Ready／MP Ready 一對一換算。
 article_ids: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER
 status: active
 -->
@@ -20,17 +20,17 @@ view: company
 from_id: company:3017
 to_id: concept:liquid-cooling
 relation: platform_lists
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C7,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C7,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27
 note_refs: 3017#S1
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-17
-review_due: 2026-08-24
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: AVC 與 3017 的實體映射、CDU 型號、1.2MW 與 Sample Ready 在 2026-08-17 捕捉仍可定位；這不證明客戶、訂單、收入、市占或毛利。
+boundary: AVC 與 3017 的映射、CDU1000-LTL-RW、1.2MW 與現行 NVIDIA Product Qualified 可定位；舊 Sample Ready 只保留在 2026-08-17 快照，兩種標籤不可直接換算，也不證明客戶、訂單、收入、市占或毛利。
 next_trigger: 3017 將具名 CDU 型號連到客戶驗收、量產數量、收入占比與毛利。
 -->
 
@@ -68,17 +68,17 @@ view: company
 from_id: company:2308
 to_id: concept:liquid-cooling
 relation: platform_lists
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27
 note_refs: 2308#S4
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-17
-review_due: 2026-08-24
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: 2026-08-17 Marketplace 同時列出 Delta RDF106CDT5192 1MW／MP Ready 與 CDU3000 2MW／供應狀態空白；兩個型號不能合併成公司容量，也不等於具名客戶、大量訂單、收入、市占、毛利或現金流。
+boundary: 現行 Marketplace 同時列出 Delta RDF106CDT5192 1MW 與 CDU3000 2MW，兩列皆顯示 NVIDIA Product Qualified；舊 MP Ready／空白只屬 2026-08-17 schema，不能合併容量或推成客戶、訂單、收入、市占、毛利或現金流。
 next_trigger: 2308 揭露具名 CDU 客戶驗收、量產數量與可辨識財務貢獻。
 -->
 
@@ -116,17 +116,17 @@ view: company
 from_id: company:2301
 to_id: concept:liquid-cooling
 relation: platform_lists
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C1,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27
 note_refs: 2301#S3
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-17
-review_due: 2026-08-24
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: LITEON 型號、380kW 與 Sample Ready 在 2026-08-17 捕捉仍可定位；不證明量產規模、訂單、收入或產品優劣。
+boundary: LITEON LC-LL-WCDU-6011(S)、380kW 與現行 NVIDIA Product Qualified 可定位；舊 Sample Ready 不可直接換算，也不證明量產規模、訂單、收入或產品優劣。
 next_trigger: 2301 將具名 CDU 型號連到客戶驗收、出貨、收入與毛利。
 -->
 
@@ -164,18 +164,18 @@ view: company
 from_id: company:lg-electronics
 to_id: concept:liquid-cooling
 relation: validated_for
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C2,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C2,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27
 note_refs:
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-17
-review_due: 2026-08-24
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: LGE 600kW／850LPM 與 validation type 在 2026-08-17 Marketplace 捕捉仍可定位，但供應狀態欄空白；不能代填為 Sample Ready、MP Ready、客戶或訂單。
-next_trigger: Marketplace 明示 LGE 原始供應狀態，或公司揭露客戶部署、採購與財務結果。
+boundary: LGE LCD060 600kW 與現行 NVIDIA Product Qualified 可定位；新版不顯示舊 850LPM／供應狀態欄，不能由資格代填 Sample Ready、MP Ready、客戶或訂單。
+next_trigger: Marketplace 發布 schema mapping，或公司揭露客戶部署、採購與財務結果。
 -->
 
 <!-- knowledge_edge
@@ -224,18 +224,18 @@ view: company
 from_id: company:nvidia
 to_id: concept:liquid-cooling
 relation: owns_platform
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27
 note_refs:
 evidence_state: verified
 commercial_stage: platform_listing
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-17
-review_due: 2026-08-24
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: Marketplace 在 2026-08-17 的 21 列清單中可定位本文追蹤的五個型號、比較欄位與原始狀態；新增 Delta CDU3000 不代表完整跨廠測試協定、不可變歷史、客戶部署或公司財務資料已出現。
-next_trigger: Marketplace 更新 validation type、supply status、型號或 4°C ATD 定義。
+boundary: Marketplace 現行 denominator 為 28；本輪捕捉第一頁 15 筆及五個追蹤型號，不能外推未捕捉 13 筆個別狀態，也不代表原始測試、客戶部署或公司財務已出現。
+next_trigger: Marketplace 發布版本化 schema、完整頁面快照、原始 qualification 結果或供應狀態 mapping。
 -->
 
 <!-- knowledge_edge
@@ -312,17 +312,17 @@ view: industry
 from_id: concept:liquid-cooling
 to_id: metric:cooling-capacity-4c-atd
 relation: measured_by
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C11,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C14,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C11,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C14,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27
 note_refs:
 evidence_state: inference
 commercial_stage: capability
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-17
-review_due: 2026-08-24
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: 4°C ATD 同日同欄容量可按型號正規化比較標示值；Delta 同時有 1MW 與 2MW 兩列，正好不能壓成公司單值。仍缺同型號三張性能曲線、量測位置與校正；MW／kW 不是效率、成熟度或財務排名。
+boundary: 現行 4°C ATD 同欄容量仍可按型號正規化；Delta 同時有 1MW 與 2MW，不能壓成公司單值。新版移除流量欄，仍缺三張曲線、量測位置與校正；MW／kW 不是效率、成熟度或財務排名。
 next_trigger: 平台對具名型號公布熱性能、TCS 壓頭、FWS 阻抗、量測品質、備援與 pass／fail。
 -->
 
@@ -332,18 +332,18 @@ view: industry
 from_id: concept:liquid-cooling
 to_id: stage:platform-validation
 relation: passes_through
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C2,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C2,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C8,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C26,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27
 note_refs:
 evidence_state: verified
 commercial_stage: qualification
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-17
-review_due: 2026-08-24
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: 平台 validation types 與 2026-08-17 列名只顯示測試類別及產品集合；沒有完整分數、共同測試條件、客戶下單、完成部署或供應商認列收入。
-next_trigger: 驗證條件與供應狀態以相同定義重現，並出現具名客戶驗收。
+boundary: 平台目前明示 validation types 與 NVIDIA Product Qualified；沒有完整分數、共同測試條件、客戶下單、完成部署或供應商認列收入。
+next_trigger: 驗證條件與 schema 以相同定義重現，並出現具名客戶驗收。
 -->
 
 <!-- knowledge_edge
@@ -361,9 +361,49 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-08-17
 review_due: 2026-08-24
+status: retired
+boundary: Sample Ready、MP Ready 與空白欄是 2026-08-17 schema 的歷史狀態；2026-08-24 現行頁不再顯示 Supply Chain Status，故本線退役並由 I21／I22 以新版資格與 schema version 接續。
+next_trigger: 已由 KG-LC-I21／I22 接續；舊狀態只保留為歷史 capture，不再參與 active current-state graph。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LC-I21
+view: industry
+from_id: concept:liquid-cooling
+to_id: stage:nvidia-product-qualified
+relation: passes_through
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27
+note_refs:
+evidence_state: verified
+commercial_stage: qualification
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-08-31
 status: active
-boundary: Sample Ready、MP Ready 與空白欄都是 2026-08-17 平台原始狀態；CDU3000 與 LGE 的空白不能自行補階段，所有狀態也不能換算成產能、良率、訂單或收入。
-next_trigger: 型號狀態換階段，或平台正式定義各狀態與空白欄位的供應及量產門檻。
+boundary: 本輪逐列捕捉第一頁 15／28 筆，15 筆皆顯示 NVIDIA Product Qualified；未捕捉的 13 筆不外推個別狀態，資格也不等於供應、客戶部署或財務。
+next_trigger: NVIDIA 公開 qualification 定義、原始 test package、完整 28 筆 snapshot 與具名客戶 acceptance。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LC-I22
+view: industry
+from_id: concept:liquid-cooling
+to_id: process:versioned-platform-qualification-schema
+relation: requires
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C27,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C28
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-24
+review_due: 2026-08-31
+status: active
+boundary: 版本分帳是研究中心為避免把 Product Qualified 與舊 Sample Ready／MP Ready 硬接而提出的治理規則，不是 NVIDIA 發布的 taxonomy mapping。
+next_trigger: NVIDIA 發布欄位版本、transition date、舊新 taxonomy mapping 與逐產品 change log。
 -->
 
 <!-- knowledge_edge

@@ -17,6 +17,8 @@ component:cdu,component,CDU,Coolant Distribution Unit,concept:liquid-cooling,透
 metric:cooling-capacity-4c-atd,metric,Cooling Capacity @ 4°C ATD,4C ATD cooling capacity,component:cdu,NVIDIA Marketplace 使用的 CDU 額定排熱能力欄位
 stage:platform-validation,stage,平台驗證,Platform validation,component:cdu,通過平台商指定測試或進入合格清單的節點
 stage:supply-status,stage,供應狀態,Supply Chain Status,component:cdu,平台標示的 Sample Ready 或 MP Ready 等供應類別
+stage:nvidia-product-qualified,stage,NVIDIA Product Qualified,平台產品資格,component:cdu,NVIDIA Marketplace 現行 Validation Status 的產品資格標籤 不等於供應階段 客戶部署或財務
+process:versioned-platform-qualification-schema,process,平台資格欄位版本分帳,Versioned platform qualification schema,concept:liquid-cooling,將動態清單不同時間的欄位 taxonomy 與狀態分版保存 避免把 Product Qualified 與舊 Sample Ready 或 MP Ready 直接換算
 process:system-integration,process,系統整合,System integration,concept:liquid-cooling,把 CDU、設施冷卻與控制系統整合成可運行方案
 process:field-poc,process,場域 PoC,Proof of Concept,process:system-integration,在實際或近實際場域驗證節能、可靠度與控制效果
 component:chiller-hvac,component,Chiller／HVAC,冰水主機|空調系統,concept:liquid-cooling,資料中心設施端產生與管理冷源的設備及控制系統

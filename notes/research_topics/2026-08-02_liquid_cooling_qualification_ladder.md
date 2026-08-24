@@ -161,6 +161,7 @@ evidence: sources:S21
 - **平台列名**：產品被平台清單列出，表示至少能在指定日期找到該產品資料；它不等於客戶已驗收、已下單或公司已認列收入。
 - **Sample Ready／MP Ready**：NVIDIA Marketplace 的供應狀態標籤。本文保留原文，不自行把 `MP Ready` 解釋成已有大量客戶訂單，也不把 `Sample Ready` 解釋成產品不成熟。
 - **平台驗證**：產品通過平台商指定測試或被列進合格清單；它降低部分技術採購風險，仍不等於客戶已下單、完成部署或供應商已認列收入。
+- **NVIDIA Product Qualified**：NVIDIA Marketplace 現行 `Validation Status` 的資格標籤。它回答平台是否列為 qualified，不等於舊版 `Sample Ready／MP Ready`、客戶 site acceptance、量產或財務，跨版本前要先取得欄位 mapping。
 - **Validation type**：平台列出的驗證類別。它能說明產品接受哪一類平台測試，不能代替完整測試分數、客戶現場驗收或量產訂單。
 - **Supply Chain Status**：NVIDIA 清單中的供應狀態欄。本文只保存來源原文；平台沒有公布足以換算成產能、良率、交期或收入的共同尺度。
 - **客戶部署**：設備進入客戶場域，完成安裝、整合並開始運作。平台列名與送樣都不能自動證明已完成部署。
@@ -547,6 +548,22 @@ status: active
 url: https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/?category=liquid_to_liquid&page=1&limit=30
 locator: 2026-08-17 以 1–21 of 21 單頁捕捉 Liquid to Liquid CDU 表；可定位 AVC CDU1000-LTL-RW 1.2MW／1600LPM／Sample Ready、Delta RDF106CDT5192 1MW／1500LPM／MP Ready、Delta CDU3000 2MW／3200LPM／供應狀態空白、LITEON LC-LL-WCDU-6011(S) 380kW／600LPM／Sample Ready、LGE LGE 600kW／850LPM／供應狀態空白；CDU3000 另列 Hydraulic Test-Constant DP／Constant Flow、Flow Sensor Accuracy、Thermal Test-Low Load 與 Pumping Capacity 等 validation types
 limitation: 動態頁沒有不可變版本或逐列變更日誌；本 source 只支持 2026-08-17 當下可定位的顯示欄位。空白供應狀態不得補成 Sample Ready、MP Ready、撤銷或量產；Compatible 類顯示、validation type 與平台列名也不提供完整測試數據、客戶、訂單、出貨、收入、毛利或跨廠共同協定
+independence_group: nvidia-marketplace
+-->
+
+<!-- research_source
+source_id: S22
+role: other_primary
+source_kind: living_index
+publisher: NVIDIA Marketplace
+title: DSX Infrastructure for AI Factory CDU list — 2026-08-24 schema and status capture
+published_at:
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/?category=liquid_to_liquid&page=1&limit=28
+locator: 2026-08-24 live DOM 的 CDU category 顯示 1–15 of 28 items；目前欄位為 Vendor、CDU Model、CDU Type、Cooling Capacity @ 4°C ATD、Wetted Materials Compatibility、Validation Type、Validation Status。第一頁 15 筆可見列的 Validation Status 全為 NVIDIA Product Qualified；可定位 AVC CDU1000-LTL-RW 1.2MW、Delta RDF106CDT5192 1MW、Delta CDU3000 2MW、LITEON LC-LL-WCDU-6011(S) 380kW 與 LGE LCD060 600kW
+limitation: 本次只成功逐列捕捉第一頁 15／28 筆，沒有把未捕捉的第二頁個別狀態外推；動態頁缺不可變版本與變更日，現行 schema 不再顯示先前的流量與 Supply Chain Status，不能把 Product Qualified 一對一換算為 Sample Ready／MP Ready 或判定切換日期。列表也沒有原始測試、客戶部署、訂單、出貨、收入或毛利
 independence_group: nvidia-marketplace
 -->
 
@@ -990,6 +1007,48 @@ correction_kind:
 corrects_claim_id:
 corrected_by_claim_id:
 resolution:
+-->
+
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: 2026-08-24 的 NVIDIA Marketplace CDU category 顯示 28 個 items，成功捕捉的第一頁 15 筆可見列全數標示 Validation Status 為 NVIDIA Product Qualified；現行欄位已改成含 Wetted Materials Compatibility 與 Validation Status，並不再顯示 2026-08-17 快照中的流量及 Supply Chain Status
+supporting_source_ids: S21,S22
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S22 的 live DOM 可直接核對目前 denominator、七個欄位、第一頁 15 筆狀態及五個追蹤型號；S21 保存前一版 21 筆、流量與 Supply Chain Status 欄位，因此可證實兩次 capture 的 schema 與顯示值不同
+boundary: 28 是當日頁面 item denominator，15 是本輪逐列捕捉母體；本文不聲稱未捕捉的 13 筆個別狀態。動態頁沒有正式 change log，不能判定欄位切換日、歷史產品換階段、qualification 判準、客戶 acceptance、產量或財務；15／15 也不是產業成功率，沒有 sampling SE／t
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: inference
+status: active
+claim: NVIDIA Product Qualified 是目前平台明示的資格標籤，但不能與舊快照的 Sample Ready、MP Ready 或空白 Supply Chain Status 做一對一成熟度換算；研究中心應將 2026-08-17 與 2026-08-24 視為兩個 schema version，分別保留平台資格與供應／量產時鐘
+supporting_source_ids: S21,S22
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S21 的舊版欄位同時保存 validation type、流量與 supply-chain labels，S22 的新版只顯示 validation type／status 與 wetted-material compatibility；缺共同定義、transition timestamp 與逐產品 change log，故不能在不同 schema 間直接排序
+boundary: 兩版本分帳是研究中心的資料治理推論，不是 NVIDIA 發布的 taxonomy mapping；Product Qualified 仍不等於 sample availability、mass production、客戶部署、訂單、具名型號收入或毛利，也不改寫 C21 的三層財務歸因主命題
+verification_needed: NVIDIA 發布版本化欄位定義與遷移規則，或同型號供應商／客戶文件把 Product Qualified、供應狀態、量產、site acceptance、出貨與財務共同鍵接起來
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: marketplace_schema_and_product_qualified_status_versioned_without_financial_thesis_clock_refresh
+evidence: sources:S22
 -->
 
 ## 容量可以換算，商業成熟度不能跟著換算
@@ -1582,6 +1641,7 @@ ICC 對 DDP 的定義重點是賣方負責送達約定目的地、進口清關�
 - [S19：OCP STULZ Deschutes CDU 產品頁](https://www.opencompute.org/products/734/stulz-deschutes-cdu-cybercool-liquid-cooling-distribution-unit)（2026-08-14 capture；並列 2MW @ 3°C ATD、500 GPM、80 PSI 與 N+1，沒有完整可重現測試包）。
 - [S20：ASHRAE Chapter 13 Hydronic Heating and Cooling](https://handbook.ashrae.org/Handbooks/S20/SI/s20_ch13/s20_ch13_si.aspx)（2026-08-14 capture；水側熱平衡、standard-water 物性與管路攜熱能力的一般方法，不是具名 CDU 測試結果）。
 - [S21：NVIDIA Marketplace DSX Infrastructure 動態清單](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)（2026-08-17 capture；新增 Delta CDU3000 2MW／3200LPM 列項，供應狀態空白；舊快照不覆寫）。
+- [S22：NVIDIA Marketplace CDU schema／status capture](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)（2026-08-24 live DOM；category denominator 28、第一頁逐列捕捉 15 筆且皆顯示 NVIDIA Product Qualified；新版不再顯示舊流量／Supply Chain Status，未捕捉第二頁個別狀態）。
 
 **可證實：** 各自快照中同日同欄的容量、平台原始供應標籤、8 月 17 日新出現的 Delta CDU3000 列項、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位、可靠度測試類別及 Deschutes 產品頁的 headline。ASHRAE 可證實水側熱平衡的一般關係；它與 OCP 的 ATD 定義也足以證實「迴路溫升」和「兩側供水 approach」是兩個位置不同的溫差。台達管理層也確實做出「2025 年液冷產品約占合併營收 10%、2026 年預期超過 12%」的陳述，但前者是近似產品族占比，後者是預期。
 
@@ -1670,6 +1730,21 @@ L2A／L2L 或 RDF106CDT5192；OCP 方法也不能證明某一具名產品已完�
 - 新證據只增加平台產品集合與測試類別的可見度，沒有命中 `T8` 所需的客戶驗收、數量、
   具名型號收入或產品毛利。因此 C21 主命題、`last_reviewed_at`、`review_due` 與
   `base_confidence` 均不刷新；下一次 T4 實際檢查日由 append-only monitor review 帳本排程。
+
+## 8 月 24 日監測複核：平台改了考卷欄位，不能硬接舊成績
+
+- 目前 CDU category 顯示 28 個 items；本輪成功逐列捕捉第一頁 15 筆，這 15 筆的
+  `Validation Status` 全為 `NVIDIA Product Qualified`。未捕捉的另外 13 筆不外推個別狀態，
+  因此不能寫成「28 筆全數 qualified」。[S22]
+- AVC、Delta、LITEON 與 LGE 的追蹤型號仍可定位，LGE model 顯示為 `LCD060`；但新版頁面不再
+  顯示舊版的流量與 `Supply Chain Status`，改以 `Wetted Materials Compatibility` 與
+  `Validation Status` 呈現。這命中 T4 的 schema／status trigger。[S21][S22]
+- 新手最重要的讀法是：`Product Qualified` 回答平台資格，`Sample Ready／MP Ready` 原本回答供應
+  階段；沒有 NVIDIA 的版本遷移規則，就不能說前者「高於」或「等於」後者。研究中心保留兩份快照，
+  不覆寫歷史，也不把資格標籤推成客戶驗收、量產、收入或毛利。[S21][S22]
+- C21 的公司產品族、廣泛部門與具名 CDU 財務橋接沒有新證據，所以 `last_reviewed_at`、
+  `review_due`、`base_confidence` 與主命題 evidence clock 不刷新；T4 的實際下次檢查日只寫入
+  append-only monitor review 帳本。
 
 ## 影響路由
 

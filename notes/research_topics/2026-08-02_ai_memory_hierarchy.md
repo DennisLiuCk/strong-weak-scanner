@@ -432,6 +432,22 @@ limitation: 這是 AWS S3 Files 的五階段教學與參考架構，作者刻意
 independence_group: aws
 -->
 
+<!-- research_source
+source_id: S22
+role: competitor_primary
+source_kind: document
+publisher: SK hynix
+title: SK hynix Begins Mass Production of Industry's Highest-Capacity 192GB SOCAMM2
+published_at: 2026-04-19
+captured_at: 2026-08-24
+accepted_at: 2026-08-24
+status: active
+url: https://news.skhynix.com/en/mass-production-socamm2-192gb/
+locator: 頁面顯示 Published 2026-04-19，內文 dateline 為 Seoul, April 20；標題、開頭與產品段落明列 1cnm LPDDR5X、192GB SOCAMM2、mass production、為 NVIDIA Vera Rubin 設計，以及公司稱已建立穩定量產體系
+limitation: 本文保留頁面日期與 dateline 差異，不自行判定時區；公司新聞稿只證實 SK hynix 對具名容量與階段的陳述，沒有客戶數、qualification 分母、出貨量、產能、供應份額、互換性、收入或毛利
+independence_group: sk-hynix
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -845,6 +861,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: SK hynix 於頁面日期 2026-04-19 宣布以 1cnm LPDDR5X 製作的 192GB SOCAMM2 已開始量產，並明列產品為 NVIDIA Vera Rubin 設計；這使 192GB 容量同時有 Micron 與 SK hynix 兩條獨立供應商量產聲明
+supporting_source_ids: S9,S22
+contrary_source_ids:
+as_of: 2026-04-19
+basis: S22 對 SK hynix 的容量、製程、平台與量產階段逐項具名，S9 則獨立對 Micron 192GB SOCAMM2 使用 high-volume production；兩條公司消息鏈可分別回查
+boundary: `verified` 只證實兩家公司各自做出 192GB 量產聲明，不表示兩款模組可互換、客戶 qualification 相同、實際供應量相等、Vera Rubin 已部署、形成雙供應採購，或任何台灣公司取得訂單；兩家公司不是市場份額樣本，沒有 sampling SE／t
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: inference
+status: active
+claim: 在 192GB 這個明確容量層級，SOCAMM2 已從單一供應商聲明前進到兩條獨立供應商量產聲明；這提高供應來源多樣性的可見度，但不能由「兩家都稱量產」推論模組可互換、qualification 完成、產能充足、份額、客戶採購或整個 SOCAMM2 家族的容量時鐘一致
+supporting_source_ids: S9,S22
+contrary_source_ids:
+as_of: 2026-08-24
+basis: S9 與 S22 的共同鍵只有 SOCAMM2、192GB、量產階段及 Vera Rubin 設計方向；記憶體規格、驗證配置、客戶與商業分母仍未共同公開，因此只能更新供應商數，不能合併效能或商業結論
+boundary: 兩條供應商聲明是具名來源 census，不是隨機樣本或供應份額估計；本文不把 SK hynix 收錄日當成新發布日，也不刷新 C8 的五角色資料路徑主命題時鐘
+verification_needed: 平台或客戶以同一模組規格、容量、韌體、系統版本與測試契約公布 Micron／SK hynix qualification、mixed-source acceptance、採購量、部署分母與財務共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -947,6 +997,14 @@ trigger: 具名客戶在同一任務母體公開三層資料量與生命期，�
 invalidation: 代表性正式工作不需跨 session 或跨 agent 共享，持久狀態量可由既有資料庫／物件儲存吸收且不改 SLO、成本與硬體，或 coordination／consistency 成本抵銷重用收益時，下修新增資料層與供應鏈映射
 -->
 
+<!-- transition
+date: 2026-08-24
+from: triaged
+to: triaged
+reason: added_second_independent_192gb_socamm2_supplier_statement_without_main_thesis_clock_refresh
+evidence: sources:S22
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -969,6 +1027,7 @@ invalidation: 代表性正式工作不需跨 session 或跨 agent 共享，持�
 - **近端高速記憶體（HBM）**：貼近 GPU、以高頻寬服務正在運算的資料；速度高，但容量與成本受到封裝位置限制。
 - **第四代高頻寬記憶體（HBM4）**：HBM 的下一個世代，本文指 Vera Rubin 平台在 Rubin GPU 旁配置的版本。
 - **系統記憶體（system memory／RAM）**：CPU 可直接使用的工作空間，容量角色與 GPU 旁的高速記憶體不同。
+- **LPDDR5X**：低功耗 DRAM 的一個世代規格；本文只用它辨認 SOCAMM2 的記憶體技術，不把規格名稱當成客戶 qualification、可互換性或財務證據。
 - **中央處理器記憶體模組（SOCAMM）**：以低功耗 DRAM 做成的可維護模組，放在 CPU 系統記憶體一側，重點偏向容量、功耗與機架密度。
 - **第二代 SOCAMM（SOCAMM2）**：一個包含不同容量型號的產品家族。Micron 明列 192GB 已量產，較早的 256GB 公告則只到客戶送樣；家族名稱本身不能替每個容量決定成熟度。
 - **鍵值快取（KV cache）**：模型推論時保存先前文字片段的中間結果，避免每一步都重新計算全部上下文。
@@ -1337,7 +1396,7 @@ SOCAMM2 正好示範為什麼要再拆一層：
 
 | 文件層級 | 文件實際說了什麼 | 可以寫成 | 不能順手升級成 |
 |---|---|---|---|
-| 具名容量：192GB | Micron 3 月 16 日明列 high-volume production | Micron 表示 192GB SOCAMM2 已量產 | 48GB–256GB 每個容量都已量產 |
+| 具名容量：192GB | Micron 3 月 16 日明列 high-volume production；SK hynix 頁面日期 4 月 19 日另明列 192GB mass production | 兩家獨立供應商都表示 192GB SOCAMM2 已量產 | 兩款模組可互換、供應量相等、客戶已雙供或 48GB–256GB 每個容量都已量產 |
 | 具名容量：256GB | Micron 3 月 5 日明列 customer sampling | 當時 256GB 已送樣 | 256GB 已通過資格認證、量產或形成收入 |
 | 產品家族 | Micron 6 月 24 日表示 LP5X SOCAMM2 products 已量產，並擴展多個容量點 | 產品家族已有量產進展與多容量選項 | 未被逐一點名的容量都處在同一階段 |
 | 客戶與財務 | 三份文件沒有 SOCAMM2 的客戶分母、容量別出貨、收入或毛利 | 保留為下一份證據 | 用公司總營收或平台名稱估算 SOCAMM2 貢獻 |
@@ -1346,12 +1405,23 @@ SOCAMM2 正好示範為什麼要再拆一層：
 特定容量與日期。研究帳本要保存兩句話的主詞、時間與成熟度，而不是用較新的家族敘述覆寫較精確的
 容量記錄。下一次若文件明列 256GB qualification 或 production，再只更新 256GB 的時鐘。
 
+### 8 月 24 日監測複核：兩家供應商，不等於兩家都已被同一客戶採用
+
+SK hynix 的 S22 讓 192GB 這一格新增第二條獨立供應商量產聲明；這是明確的來源增量，卻不是
+市占或供應量樣本。兩家公司雖共享 `SOCAMM2＋192GB＋Vera Rubin＋production` 四個文字共同鍵，
+仍未共同公開模組版本、qualification、mixed-source acceptance、客戶數、採購量與財務。因此讀者
+可以說「供應來源多樣性更可見」，不能說「雙供已完成」或把其他容量一起升級。[S9][S22]
+
+S22 的頁面日期早於 C8 所依據的 2026-08-12 五角色資料路徑證據，且只補充 SOCAMM2 供應商；
+本輪新增 C27／C28 與圖譜公司線，但不刷新主命題 `last_reviewed_at`、`review_due`、`base_confidence`
+或 evidence clock。查到舊而重要的證據，應補帳而不是把收錄日冒充發布日。
+
 ## 每一層的商業進度要各自驗證
 
 | 資料層或連接路徑 | 已看到的一手證據 | 目前走到哪一步 | 還缺哪些商業證據 |
 |---|---|---|---|
 | 圖形運算晶片旁的高速層（HBM4） | Vera Rubin 平台明列 GPU 使用 HBM4 | 平台規格 | 各供應商份額、採購量與台灣公司收入 |
-| 中央處理器旁的系統記憶體（SOCAMM） | 平台明列系統記憶體；Micron 明列 192GB 量產、256GB 較早送樣，另稱產品家族已有多容量量產進展 | 容量型號分別位於量產與送樣；家族層已有量產 | 逐容量資格／出貨、客戶數、供應份額與財務貢獻 |
+| 中央處理器旁的系統記憶體（SOCAMM） | 平台明列系統記憶體；Micron 與 SK hynix 分別明列 192GB 量產，Micron 256GB 較早送樣，另稱產品家族已有多容量量產進展 | 192GB 有兩條供應商量產聲明；256GB 與家族容量仍要分開 | 逐容量資格／互換、出貨、客戶數、供應份額與財務貢獻 |
 | 共享上下文層（CMX） | NVIDIA 提出 G3.5 架構與資料放置軟體 | 架構與軟體設計 | 具名客戶上線、實際利用率與獨立成本效益 |
 | CPU 端儲存資料處理 | NVIDIA 以 Vera／BlueField-4 STX 測量壓縮、加密、完整性、復原與組合路徑 | 公司架構與記憶體內 microbenchmark | 含檔案 I/O、SSD、網路、軟體、GPU 的端到端結果與具名客戶部署 |
 | 記憶體擴充連接（CXL 4.0） | 公開規格已發布 | 公開標準 | Vera Rubin 是否採用 4.0、互通裝置與量產收入 |
@@ -1362,6 +1432,7 @@ SOCAMM2 正好示範為什麼要再拆一層：
 - [NVIDIA CMX context memory](https://developer.nvidia.com/blog/introducing-nvidia-bluefield-4-powered-inference-context-memory-storage-platform-for-the-next-frontier-of-ai/)（G1–G4／G3.5 分層）。
 - [Micron 256GB SOCAMM2](https://investors.micron.com/news-releases/news-release-details/meiguangtuichuquanqiushoukuangaorongliang256gb-lpdram)（customer sampling 與內部測試邊界）。
 - [Micron 192GB SOCAMM2 production](https://investors.micron.com/news-releases/news-release-details/micron-high-volume-production-hbm4-designed-nvidia-vera-rubin)（192GB high-volume production 與 48GB–256GB 產品組合邊界）。
+- [SK hynix 192GB SOCAMM2 mass production](https://news.skhynix.com/en/mass-production-socamm2-192gb/)（頁面日期 2026-04-19、內文 dateline 4 月 20；1cnm LPDDR5X、192GB 與 Vera Rubin 設計方向；不提供客戶、供應量或財務）。
 - [Micron fiscal 2026 Q3 product highlights](https://investors.micron.com/news-releases/news-release-details/micron-technology-inc-reports-record-results-third-quarter)（SOCAMM2 產品家族量產與多容量選項，但未逐容量列示）。
 - [CXL 4.0 specification release](https://computeexpresslink.org/wp-content/uploads/2025/11/CXL_4.0-Specification-Release_FINAL_Website-Copy.pdf)（規格與功能範圍）。
 - [NVIDIA BlueField data path](https://developer.nvidia.com/blog/scaling-agentic-ai-factories-through-extreme-co-design-with-nvidia-bluefield/)（KV I/O、metadata、placement、security、control 與資料搬移角色）。
@@ -1406,6 +1477,7 @@ evidence_boundary: ODM 能組裝 AI 伺服器不等於已取得 CMX、SOCAMM 或
 
 ## 下一個可證明／否定的節點
 
+- 平台或客戶用同一版本與測試契約公布 Micron／SK hynix 192GB qualification、mixed-source acceptance、採購量與部署分母；在此之前，「兩家量產聲明」不等於「客戶雙供」。
 - Micron 或其他供應商逐一公布 256GB 與其他 SOCAMM2 容量的 qualification／production、平台與出貨邊界，不再只用產品家族總稱。
 - NVIDIA 或客戶公布 CMX 實際上線、KV cache placement、容量與利用率，而非只有參考架構效能主張。
 - NVIDIA 或客戶公布 BlueField-4 STX 的 production data path，將 CPU 端資料處理與 SSD、網路、軟體、GPU 的端到端 SLO 對上。

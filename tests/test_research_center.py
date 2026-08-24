@@ -3763,6 +3763,13 @@ class ResearchCenterTest(unittest.TestCase):
             "## 8 月 14 日監測複核：先有公司液冷分子，仍沒有具名 CDU 橋接",
             "## 8 月 17 日監測複核：Delta 多一個型號，不等於多一段收入",
             "| Delta CDU3000 | 2MW | 2,000kW | 空白（不代填） |",
+            "## 8 月 24 日監測複核：平台改了考卷欄位，不能硬接舊成績",
+            "第一頁 15 筆，這 15 筆的",
+            "`Product Qualified` 回答平台資格",
+            "marketplace_schema_and_product_qualified_status_versioned_without_financial_thesis_clock_refresh",
+            "source_id: S22",
+            "claim_id: C27\nlabel: verified",
+            "claim_id: C28\nlabel: inference",
             "## 接下來看到什麼，判定才會改變",
         ):
             self.assertIn(contract, topic)
@@ -3770,7 +3777,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 68
+            sum(line.startswith("- **") for line in glossary.splitlines()), 69
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3778,18 +3785,20 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("Sample Ready", reflection)
         self.assertNotIn("MP Ready", reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 21),
-            ("research_claim", 26), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 22),
+            ("research_claim", 28), ("metric_comparison", 12),
             ("impact", 2), ("monitoring_item", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         graph = (
             ROOT / "notes" / "knowledge_graph" / "liquid_cooling.md"
         ).read_text(encoding="utf-8")
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 30)
         for edge_id in (
             "KG-LC-I10", "KG-LC-I11", "KG-LC-I12", "KG-LC-I13",
             "KG-LC-I14", "KG-LC-I15", "KG-LC-I16", "KG-LC-I17",
             "KG-LC-I18", "KG-LC-I19", "KG-LC-I20",
+            "KG-LC-I21", "KG-LC-I22",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -3806,6 +3815,8 @@ class ResearchCenterTest(unittest.TestCase):
             "metric:propylene-glycol-concentration-freeze-envelope",
             "process:fluid-specific-cdu-rerating",
             "metric:cdu-flow-heat-balance-bridge",
+            "stage:nvidia-product-qualified",
+            "process:versioned-platform-qualification-schema",
         ):
             self.assertIn(f"{node_id},", concepts)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4015,9 +4026,11 @@ class ResearchCenterTest(unittest.TestCase):
             "## 在研究中心裡接著怎麼學",
             "## 四層互補，不是誰取代誰",
             "## 同一家族也要拆到容量型號：192GB 與 256GB 不是同一個時鐘",
-            "| 具名容量：192GB | Micron 3 月 16 日明列 high-volume production |",
+            "| 具名容量：192GB | Micron 3 月 16 日明列 high-volume production；SK hynix 頁面日期 4 月 19 日另明列 192GB mass production |",
             "| 具名容量：256GB | Micron 3 月 5 日明列 customer sampling |",
             "| 產品家族 | Micron 6 月 24 日表示 LP5X SOCAMM2 products 已量產",
+            "### 8 月 24 日監測複核：兩家供應商，不等於兩家都已被同一客戶採用",
+            "供應來源多樣性更可見",
             "## 每一層的商業進度要各自驗證",
             "| 資料層或連接路徑 | 已看到的一手證據 | 目前走到哪一步 | 還缺哪些商業證據 |",
             "| 圖形運算晶片旁的高速層（HBM4） |",
@@ -4050,7 +4063,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 66
+            sum(line.startswith("- **") for line in glossary.splitlines()), 67
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4062,8 +4075,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("transition", 10),
-            ("research_source", 21), ("research_claim", 26),
+            ("research_topic", 1), ("transition", 11),
+            ("research_source", 22), ("research_claim", 28),
             ("metric_comparison", 0), ("impact", 2),
             ("monitoring_item", 7),
         ):
@@ -4086,6 +4099,10 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C24\nlabel: verified",
             "claim_id: C25\nlabel: verified",
             "claim_id: C26\nlabel: inference",
+            "source_id: S22",
+            "claim_id: C27\nlabel: verified",
+            "claim_id: C28\nlabel: inference",
+            "added_second_independent_192gb_socamm2_supplier_statement_without_main_thesis_clock_refresh",
             "monitor_id: T7",
             "只有在 cache reuse 的收益高於資料搬移 overhead 時",
             "同一份 baseline-versus-treatment 量測護照",
@@ -4119,9 +4136,11 @@ class ResearchCenterTest(unittest.TestCase):
         graph = (
             ROOT / "notes" / "knowledge_graph" / "ai_memory_hierarchy.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 27)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 28)
         for graph_contract in (
             "edge_id: KG-MEM-C03",
+            "edge_id: KG-MEM-C04",
+            "from_id: company:sk-hynix",
             "to_id: product:micron-socamm2-192gb",
             "to_id: product:micron-socamm2-256gb",
             "to_id: product:nvidia-bluefield4-stx",
@@ -6078,7 +6097,10 @@ class ResearchCenterTest(unittest.TestCase):
             "| 1. 規格與測試入口存在 |", "| 2. 具名產品宣稱支援 |",
             "| 3. 供應商或客戶完成互通 |", "| 4. 具名產品正式通過並列名 |",
             "| 5. 單一元件進入量產 |", "| 6. 完整平台進入客戶部署 |",
-            "## 8 月 12 日複核：考場已開，最高速度公開列名仍未見",
+            "## 8 月 12 日複核：考場已開，最高速度公開列名當時仍未見",
+            "## 8 月 24 日監測複核：最高速列名出現，但只前進一個時鐘",
+            "10 筆 CEM add-in card、3 筆 retimer、4 筆 switch／bridge 與 2 筆 system",
+            "8299 群聯的 PS7161 x16 linear redriver 與 PS5303 x4 SSD controller",
             "## 把六類角色放回同一套平台",
             "| 本文六類角色 | 它負責什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |",
             "| 1. 規格與正式測試組織 |", "| 2. 主機、控制器與平台 |",
@@ -6097,7 +6119,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 65
+            sum(line.startswith("- **") for line in glossary.splitlines()), 66
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -6114,9 +6136,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 17),
-            ("research_claim", 22), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 6),
+            ("research_topic", 1), ("research_source", 18),
+            ("research_claim", 25), ("metric_comparison", 0),
+            ("impact", 4), ("monitoring_item", 9),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         for ledger_contract in (
@@ -6127,13 +6149,16 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S15", "claim_id: C17", "claim_id: C18",
             "claim_id: C19", "source_id: S16", "source_id: S17",
             "claim_id: C20", "claim_id: C21", "claim_id: C22",
-            "monitor_id: T6", "thesis_claim_id: C10",
-            "last_reviewed_at: 2026-08-12", "review_due: 2026-08-19",
+            "monitor_id: T6",
             "base_confidence: medium",
             "published_at: 2023-01-25",
             "traceable-metric 句只明確指向 PHY2-7／PHY2-8，不能套到 75-22 或全部 64 GT/s 測試",
             "指南使用 should 而非 must",
             "supporting_source_ids: S8,S10,S11,S16,S17",
+            "source_id: S18", "claim_id: C23", "claim_id: C24",
+            "claim_id: C25", "monitor_id: T7", "monitor_id: T8",
+            "monitor_id: T9", "thesis_claim_id: C25",
+            "last_reviewed_at: 2026-08-24", "review_due: 2026-08-31",
         ):
             self.assertIn(ledger_contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -6191,9 +6216,10 @@ class ResearchCenterTest(unittest.TestCase):
             "edge_id: KG-PCIE6-I26", "to_id: process:pcie-zero-error-exposure-passport",
             "edge_id: KG-PCIE6-I27", "to_id: metric:pcie-zero-event-upper-error-rate",
             "edge_id: KG-PCIE6-I28", "to_id: metric:pcie-lane-margining-evidence-contract",
+            "edge_id: KG-PCIE6-C03", "from_id: company:8299",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 30)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 31)
 
     def test_compute_connect_station_eight_separates_package_positions_test_dimensions_and_ecosystem_gates(self):
         topic = (

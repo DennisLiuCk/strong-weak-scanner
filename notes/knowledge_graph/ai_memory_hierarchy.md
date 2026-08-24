@@ -1,8 +1,8 @@
 # AI 記憶體分層知識圖譜
 
 本圖將 HBM、SOCAMM、KV cache、context storage 與 CXL 放回各自的系統位置，也把 model-visible
-context、可重算 KV 中間結果與跨 session Agent 狀態拆開。公司線把 Micron 192GB 量產與 256GB
-送樣分成兩個容量時鐘；機制線另把 cache 命中／搬移、狀態生命週期與使用者服務結果分開。
+context、可重算 KV 中間結果與跨 session Agent 狀態拆開。公司線把 Micron／SK hynix 的 192GB
+量產聲明與 Micron 256GB 送樣分成容量與供應商時鐘；機制線另把 cache 命中／搬移、狀態生命週期與使用者服務結果分開。
 沒有客戶與財務資料前，仍不把一般記憶體或持久化需求畫成台灣公司受惠。
 
 <!-- knowledge_graph_meta
@@ -10,7 +10,7 @@ schema_version: 1
 graph_id: ai-memory-hierarchy
 root_node_id: concept:ai-memory-hierarchy
 label: AI 記憶體分層
-summary: 以介質、處理、連接、搬移、放置決策與量測契約拆開 AI 資料路徑，把 context window、可重算 KV cache、跨 session Agent 狀態與使用者 SLO 分開，並將 SOCAMM2 家族進度拆到容量型號，避免把不同角色、分母或商用時鐘合併成單一記憶體題材。
+summary: 以介質、處理、連接、搬移、放置決策與量測契約拆開 AI 資料路徑，把 context window、可重算 KV cache、跨 session Agent 狀態與使用者 SLO 分開；192GB 已有 Micron 與 SK hynix 兩條供應商量產聲明，但 mixed-source qualification、採購量與財務仍未證實。
 article_ids: MI-2026-08-02-AI-MEMORY-HIERARCHY
 status: active
 -->
@@ -73,6 +73,26 @@ review_due: 2026-08-17
 status: active
 boundary: Micron 明列 192GB SOCAMM2 量產，並在後續產品更新表示 SOCAMM2 家族已有多容量量產進展；沒有逐容量清單、客戶分母、供應份額或 SOCAMM2 財務貢獻。
 next_trigger: Micron 逐一公布 256GB 與其他容量的 qualification／production、平台、出貨與財務邊界。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-MEM-C04
+view: company
+from_id: company:sk-hynix
+to_id: concept:ai-memory-hierarchy
+relation: produces
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C27
+note_refs:
+evidence_state: verified
+commercial_stage: production
+materiality: named_product
+exclusivity: multi_source
+exclusivity_scope: 192GB SOCAMM2 量產聲明另有 Micron 一條獨立公司來源；不表示客戶已採雙供或份額相等
+as_of: 2026-04-19
+review_due: 2026-08-31
+status: active
+boundary: SK hynix 明列 1cnm LPDDR5X 192GB SOCAMM2 mass production 與 Vera Rubin 設計方向；沒有模組互換、客戶 qualification、採購量、供應份額、收入或毛利。
+next_trigger: 平台或客戶以同一版本與測試契約公布 Micron／SK hynix mixed-source qualification、採購量與部署分母。
 -->
 
 <!-- knowledge_edge
