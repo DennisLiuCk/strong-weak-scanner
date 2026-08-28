@@ -219,7 +219,8 @@ review_due: 2026-08-31
                 date TEXT, stock_id TEXT, close REAL, ret20 REAL, rs20 REAL,
                 foreign_pct REAL, fpct_chg20 REAL, sbl_pct REAL, sbl_chg20 REAL,
                 margin_util_pct REAL, margin_chg20 REAL,
-                tdcc_big400_pct REAL, tdcc_big400_chg REAL, tdcc_date TEXT
+                tdcc_big400_pct REAL, tdcc_big400_chg REAL, tdcc_date TEXT,
+                close_adj REAL
             );
             CREATE TABLE daily_scores(
                 date TEXT, stock_id TEXT, composite_s REAL, tier TEXT
@@ -235,13 +236,28 @@ review_due: 2026-08-31
         con.execute("INSERT INTO universe VALUES ('1234','測試','test')")
         con.execute("""INSERT INTO daily_metrics VALUES
             ('2026-07-28','1234',185.5,-0.1188,-0.0291,
-             12.87,0.06,4.72,-1.85,4.37,-0.10,NULL,NULL,NULL)""")
+             12.87,0.06,4.72,-1.85,4.37,-0.10,NULL,NULL,NULL,185.5)""")
+        con.executemany(
+            "INSERT INTO daily_metrics(date,stock_id,close,close_adj) VALUES(?,?,?,?)",
+            [(date.fromordinal(date(2026, 7, 28).toordinal() - offset).isoformat(),
+              "1234", 200.0, 175.0) for offset in range(1, 61)])
         con.execute("INSERT INTO daily_scores VALUES ('2026-07-28','1234',0.4,'潛在/中性')")
         with mock.patch.object(lh.db_ro, "connect", return_value=con):
             block = lh.quant_context("1234", "test.db")
         self.assertIn("20 日 -11.9%", block)
         self.assertIn("族群相對強弱 rs20 -2.9pp", block)
         self.assertNotIn("20 日 -0.1%", block)
+        self.assertIn("還原價報酬 20 日 -11.9%、60 日 6.0%", block)
+        self.assertIn("20 日餘額變化 -10.00%", block)
+        self.assertNotIn("20 日增減 -0.10pp", block)
+        con.execute("UPDATE daily_metrics SET margin_chg20=NULL WHERE date='2026-07-28'")
+        oldest = date.fromordinal(date(2026, 7, 28).toordinal() - 60).isoformat()
+        con.execute("UPDATE daily_metrics SET close=250,close_adj=NULL WHERE date=?", (oldest,))
+        with mock.patch.object(lh.db_ro, "connect", return_value=con):
+            missing = lh.quant_context("1234", "test.db")
+        self.assertIn("60 日 -25.8%", missing)
+        self.assertIn("20 日餘額變化 -。[DB]", missing)
+        con.close()
 
     def test_all_verified_notes_have_valid_reports_and_hypotheses(self):
         reports = lh.load_reports()

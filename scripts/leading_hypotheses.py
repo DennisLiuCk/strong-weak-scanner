@@ -699,7 +699,8 @@ def quant_context(stock_id, db_path=None):
         raise SystemExit(f"daily_metrics 沒有 {stock_id}")
     as_of = metric["date"]
     closes = [row["close"] for row in con.execute(
-        "SELECT close FROM daily_metrics WHERE stock_id=? AND date<=? ORDER BY date DESC LIMIT 61",
+        "SELECT COALESCE(close_adj,close) AS close FROM daily_metrics "
+        "WHERE stock_id=? AND date<=? ORDER BY date DESC LIMIT 61",
         (stock_id, as_of))]
     ret60 = (closes[0] / closes[60] - 1) * 100 if len(closes) == 61 and closes[60] else None
 
@@ -754,7 +755,7 @@ def quant_context(stock_id, db_path=None):
         f"## 量化背景（截至 {as_of}）",
         "",
         f"- **月營收路徑：** {'、'.join(revenue_lines) or '-'}。[DB]",
-        f"- **價格動能：** 收盤 {_fmt(metric['close'])} 元;20 日 "
+        f"- **價格動能：** 收盤 {_fmt(metric['close'])} 元;還原價報酬 20 日 "
         f"{_fmt(metric['ret20'] * 100, 1, '%') if metric['ret20'] is not None else '-'}、60 日 "
         f"{_fmt(ret60, 1, '%')};族群相對強弱 rs20 "
         f"{_fmt(metric['rs20'] * 100, 1, 'pp') if metric['rs20'] is not None else '-'}。[DB]",
@@ -763,10 +764,10 @@ def quant_context(stock_id, db_path=None):
         f"(平滑綜合分 {_fmt(score['composite_s'] if score else None, 2)})。[DB]",
         f"- **外資持股：** {_fmt(metric['foreign_pct'], 2, '%')};20 日變化 "
         f"{_fmt(metric['fpct_chg20'], 2, 'pp')}。[DB]",
-        f"- **借券餘額：** 流通比 {_fmt(metric['sbl_pct'], 2, '%')};20 日變化 "
+        f"- **借券餘額：** 占股本 {_fmt(metric['sbl_pct'], 2, '%')};20 日變化 "
         f"{_fmt(metric['sbl_chg20'], 2, 'pp')}。[DB]",
-        f"- **融資：** 使用率 {_fmt(metric['margin_util_pct'], 2, '%')};20 日增減 "
-        f"{_fmt(metric['margin_chg20'], 2, 'pp')}。[DB]",
+        f"- **融資：** 餘額占股本 {_fmt(metric['margin_util_pct'], 2, '%')};20 日餘額變化 "
+        f"{_fmt(metric['margin_chg20'] * 100, 2, '%') if metric['margin_chg20'] is not None else '-'}。[DB]",
         f"- **TDCC 大戶(>400 張)：** {tdcc_line}。[DB]",
         f"- **處置/注意(近 30 日)：** "
         + ("、".join(f"{row['date']} {row['kind']}({row['reason']})" for row in flags)
