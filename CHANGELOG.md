@@ -1,5 +1,19 @@
 # Changelog
 
+## 固定版本 DB artifact 與隔離復原演練 — 2026-08-29
+
+- 新增純 stdlib `db_artifact.py`，從完整 commit 的 DB blob 建立 gzip／SHA manifest，
+  停用 Git replace refs；復原須同時提供可信 commit 與 manifest pin，驗證完整後才切換
+  離線副本。禁止正式 `data/`、別名、WAL 與 sidecar，不提供 live restore。
+- 新增 `check_db_artifact.py`，對復原副本執行 raw／ranking OOS／validate、完整 unittest，
+  並比對兩份 HTML 與原 DB／archive SHA；不修改正式資料或策略。
+- 新增只有手動觸發、`contents: read` 的 `db-artifact-smoke`，固定 SHA 在兩個 runner
+  發布／下載並驗證，artifact 保留一天；尚未切換儲存後端或 writer。
+- 在 macOS 26.5.2 arm64、Python 3.11.11 預設 UTF-8 下，22 項新測試與完整 642 項測試
+  通過；58,114,048 bytes 的固定 DB 無損復原，正式 DB／archive 不變。獨立 reviewer
+  發現並重現的 Git replacement 問題已修正；原始範圍、警告與待辦見
+  [復原演練紀錄](reports/db_artifact_rehearsal_2026-08-29.md)。
+
 ## 智原 Q2 聚焦研究、來源更正與假說複核 — 2026-08-29
 
 **正式策略、tier、權重、`IS_CUTOFF`、資料庫與歷史儀表板快照不變。**

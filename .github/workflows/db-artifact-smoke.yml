@@ -1,0 +1,80 @@
+name: db-artifact-smoke
+
+# 手動隔離演練：無排程、無 repo writer、無正式 DB/Pages 切換。
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      manifest_sha256: ${{ steps.bundle.outputs.manifest_sha256 }}
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: 固定 commit 壓縮並先完成本地復原驗證
+        id: bundle
+        env:
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          python scripts/db_artifact.py create --source-commit "$SOURCE_COMMIT" --output-dir tmp/db-artifact
+          python - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          digest = hashlib.sha256(Path("tmp/db-artifact/manifest.json").read_bytes()).hexdigest()
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8", newline="\n") as stream:
+              stream.write("manifest_sha256=" + digest + "\n")
+          PY
+      - uses: actions/upload-artifact@v7
+        id: upload
+        with:
+          name: db-prototype-${{ github.sha }}-${{ github.run_attempt }}
+          path: tmp/db-artifact/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+          overwrite: false
+
+  restore:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ needs.publish.outputs.artifact_id }}
+          path: tmp/downloaded-db-artifact
+          digest-mismatch: error
+      - name: 全新 runner 復原與 raw／OOS／完整測試／HTML 比對
+        env:
+          SOURCE_COMMIT: ${{ github.sha }}
+          MANIFEST_SHA: ${{ needs.publish.outputs.manifest_sha256 }}
+        run: |
+          python scripts/check_db_artifact.py --manifest tmp/downloaded-db-artifact/manifest.json --expected-commit "$SOURCE_COMMIT" --expected-manifest-sha256 "$MANIFEST_SHA" --output-dir tmp/db-artifact-check
+      - name: 保留演練紀錄（不重複上傳解壓 DB 或 HTML）
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: db-prototype-check-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            tmp/db-artifact-check/verification.json
+            tmp/db-artifact-check/*.log
+          if-no-files-found: error
+          retention-days: 1
