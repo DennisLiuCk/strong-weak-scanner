@@ -9161,12 +9161,38 @@ class ResearchCenterTest(unittest.TestCase):
             "8 月 15 日依 T10 回查",
             "source_id: S32",
             "本輪只核對實際取件、PDF身分、比較期間與報告日期",
+            "8 月 29 日弘塑與智原各自完成四份核心文件的證據包與獨立複核。其餘四檔仍待完整複核",
         ):
             self.assertIn(contract, topic)
+        claims = {}
+        for body in re.findall(r"<!-- research_claim\s*\n(.*?)-->", topic, re.S):
+            fields = dict(line.split(":", 1) for line in body.splitlines() if ":" in line)
+            fields = {key.strip(): value.strip() for key, value in fields.items()}
+            claims[fields["claim_id"]] = fields
+        for original, correction in (("C7", "C30"), ("C17", "C31")):
+            self.assertEqual(claims[original]["status"], "superseded")
+            self.assertEqual(claims[original]["corrected_by_claim_id"], correction)
+            self.assertEqual(claims[correction]["status"], "active")
+            self.assertEqual(claims[correction]["corrects_claim_id"], original)
+        self.assertEqual(claims["C31"]["supporting_source_ids"], "S16,S27")
+        self.assertIn("公司新聞稿的一位小數應用占比", claims["C31"]["claim"])
+        self.assertIn("S15 p8只標NRE AI 35%", claims["C30"]["basis"])
+
+        monitors = {}
+        for body in re.findall(r"<!-- monitoring_item\s*\n(.*?)-->", topic, re.S):
+            fields = dict(line.split(":", 1) for line in body.splitlines() if ":" in line)
+            fields = {key.strip(): value.strip() for key, value in fields.items()}
+            monitors[fields["monitor_id"]] = fields
+        self.assertEqual(monitors["T10"]["status"], "retired")
+        self.assertEqual(monitors["T11"]["status"], "active")
+        self.assertEqual(monitors["T11"]["claim_ids"], "C5,C6,C30,C15")
+        for field in ("metric", "source_ids", "watch_source_ids", "frequency",
+                      "frequency_detail", "next_check", "trigger", "invalidation"):
+            self.assertEqual(monitors["T11"][field], monitors["T10"][field], field)
         for block, expected in (
             ("research_topic", 1), ("research_source", 33),
-            ("research_claim", 29), ("metric_comparison", 0),
-            ("impact", 7), ("monitoring_item", 10),
+            ("research_claim", 31), ("metric_comparison", 0),
+            ("impact", 7), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -9211,8 +9237,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, topic)
         for block, expected in (
             ("research_topic", 1), ("research_source", 33),
-            ("research_claim", 29), ("metric_comparison", 0),
-            ("impact", 7), ("monitoring_item", 10),
+            ("research_claim", 31), ("metric_comparison", 0),
+            ("impact", 7), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -9254,8 +9280,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, topic)
         for block, expected in (
             ("research_topic", 1), ("research_source", 33),
-            ("research_claim", 29), ("metric_comparison", 0),
-            ("impact", 7), ("monitoring_item", 10),
+            ("research_claim", 31), ("metric_comparison", 0),
+            ("impact", 7), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 

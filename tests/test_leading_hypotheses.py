@@ -271,8 +271,21 @@ review_due: 2026-08-31
         self.assertEqual(modes.count("retrospective"), 196)
         self.assertEqual(modes.count("prospective"), 23)
         self.assertEqual(sum(int(item["meta"]["independent_chain_count"])
-                             for item in hypotheses), 239)
+                             for item in hypotheses), 240)
         self.assertTrue(all(item["transitions"] for item in hypotheses))
+
+        faraday = {item["id"]: item for item in reports["3035"]["hypotheses"]}
+        self.assertEqual(faraday["H1"]["meta"]["lifecycle"], "open")
+        self.assertEqual(faraday["H1"]["meta"]["review_due"], "2026-08-31")
+        h2 = faraday["H2"]
+        self.assertEqual(h2["meta"]["lifecycle"], "refuted")
+        self.assertEqual(h2["meta"]["source_chain_ids"], "3035-H2-C1,3035-H2-C2")
+        self.assertEqual(h2["meta"]["source_accessed_at"], "2026-07-12")
+        self.assertEqual(h2["transitions"][0]["review_due"], "2026-08-31")
+        self.assertEqual(h2["transitions"][-1]["evidence_published_at"], "2026-07-28")
+        self.assertEqual(h2["transitions"][-1]["review_due"], "none")
+        self.assertIn("或 AI MP 占比未回升", h2["fields"]["可證偽條件"])
+        self.assertIn("不能據此斷言 14nm 專案取消", h2["fields"]["研究判讀"])
 
 
 NARRATIVE_BLOCK = """## 多空觀點（小作文）

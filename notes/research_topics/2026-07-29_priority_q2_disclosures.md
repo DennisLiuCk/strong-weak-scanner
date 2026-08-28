@@ -631,7 +631,7 @@ resolution:
 <!-- research_claim
 claim_id: C7
 label: verified
-status: active
+status: superseded
 claim: 智原 2026Q2 委託設計（NRE）收入中 AI 應用佔 35.4%，同季量產（MP）收入中 AI 應用僅佔 0.4%
 supporting_source_ids: S15,S16
 contrary_source_ids:
@@ -639,6 +639,7 @@ as_of: 2026-07-28
 basis: S15 page 8 與 S16 page 3 的同季應用別表格可直接交叉核對
 boundary: 兩個百分比的分母分別是 NRE 與 MP 收入，不能相加、相減、當成 AI 專案轉單率，也不證明未來量產或台股供應鏈受惠
 verification_needed:
+corrected_by_claim_id: C30
 resolution:
 -->
 
@@ -782,7 +783,7 @@ resolution:
 <!-- research_claim
 claim_id: C17
 label: inference
-status: active
+status: superseded
 claim: 以正式季報的精確收入池乘上公司簡報的一位小數應用占比，NRE AI 顯示值代理為 159.579306 百萬元、MP AI 顯示值代理為 9.720068 百萬元；兩者同期間同幣別可加成 169.299374 百萬元的已揭露兩池部分代理，約占公司營收 5.1093296%，但不是公司直接揭露的 AI 總營收或 NRE→MP 轉化率
 supporting_source_ids: S15,S16,S27
 contrary_source_ids:
@@ -790,6 +791,7 @@ as_of: 2026-08-14
 basis: 450.789×35.4% 與 2,430.017×0.4% 由 Python Decimal 與獨立 awk 兩路重算一致；三個正式收入池亦精確接回 3,313.534 百萬元
 boundary: 這是依顯示百分比計算的 deterministic partial proxy，不是發行人報導值；IP 432.728 百萬元沒有 AI 應用分拆，百分比的原始未四捨五入值與是否做加總調整亦未揭露，因此不能補成完整 AI 分子、專案轉化、客戶需求、毛利或現金
 verification_needed: 公司用同一期間公開 NRE、MP、IP 的未四捨五入 AI 金額與分類政策，並提供同 cohort 的專案階段、取消／重投片、量產數量、單價、毛利及收現橋接
+corrected_by_claim_id: C31
 resolution:
 -->
 
@@ -967,6 +969,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: 智原2026Q2公司財務新聞稿第3頁列AI占委託設計（NRE）收入35.4%、占量產（MP）收入0.4%；這兩個一位小數值由新聞稿表格直接支持，不能歸給僅呈整數圖的同季法說簡報
+supporting_source_ids: S16,S15
+contrary_source_ids:
+as_of: 2026-08-29
+basis: correction_of:C7；S16 p3分別定位委託設計營收（應用別）與量產營收（應用別）的2026年第二季AI列；S15 p8只標NRE AI 35%，MP AI小區塊未標數值，不能聲稱兩份文件均可直接核對相同小數精度。
+boundary: 更正的是精度來源而非數值或商業結果；N=1發行人、1季度、2個不同分母的顯示占比，非獨立統計樣本，SE／t不適用；未揭露原始未四捨五入值，不能相加為總營收占比、當成專案轉單率或證明未來量產。
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C7
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C31
+label: inference
+status: active
+claim: 以正式季報的精確收入池乘上公司新聞稿的一位小數應用占比，NRE AI顯示值代理為159.579306百萬元、MP AI顯示值代理為9.720068百萬元；兩者同期間同幣別可加成169.299374百萬元的已揭露兩池部分代理，約占公司營收5.1093296%，但不是公司直接揭露的AI總營收或NRE→MP轉化率
+supporting_source_ids: S16,S27
+contrary_source_ids:
+as_of: 2026-08-29
+basis: correction_of:C17；S27 p26提供NRE 450.789、MP 2430.017、IP 432.728與總營收3313.534百萬元，應用占比35.4%／0.4%取自S16 p3；逐池相乘後相加及除以總營收，僅修正原句的文件歸屬，不另增量產或客戶推論。
+boundary: N=1發行人、1季度、3個收入池及2個顯示占比，非獨立統計樣本，SE／t不適用；IP沒有AI分拆。若各占比獨立按最近0.1pp四捨五入且無尾差調整，兩池部分代理條件區間為167.858971～170.739777百萬元、占總營收5.0658593%～5.1527999%；這只是顯示精度敏感度，不是信賴區間，不能補成完整AI收入、同批專案轉化、客戶需求、毛利或現金。
+verification_needed: 公司用同一期間公開NRE、MP、IP的未四捨五入AI金額與分類政策，並提供同cohort的專案階段、取消／重投片、量產數量、單價、毛利及收現橋接
+correction_kind: supersedes
+corrects_claim_id: C17
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -1111,8 +1147,24 @@ invalidation: 索引命中、同一研究者內容檢查或公司摘要都不能
 
 <!-- monitoring_item
 monitor_id: T10
-status: active
+status: retired
+retired_at: 2026-08-29
+retirement_reason: C7的精度來源更正由C30接續；T11只替換該claim引用並逐字保留原檢查條件與next_check，不重設預登記任務或延後主命題時鐘
 claim_ids: C5,C6,C7,C15
+metric: Q2 文件中從 NRE 開發到 MP 量產的可比口徑、合約、具名客戶、量產收入、現金流、存貨與負債 proof points
+source_ids: S2,S3,S5,S6,S7,S8,S12,S13,S14,S15,S16,S17,S18,S19,S20,S21,S22,S23,S24,S25,S26
+watch_source_ids: S4,S6,S7,S8,S17,S18,S19,S20,S21,S22
+frequency: event_driven
+frequency_detail: 每份新一手文件、法說後與每個 H# 到期日
+next_check: 2026-08-15
+trigger: 文件首次以同一 cohort 或具名專案提供 NRE→MP 轉化、時程與可辨識財務貢獻
+invalidation: NRE 佔比上升但長期無量產證據，或 MP 應用口徑無法與前期專案對齊時，不宣稱 AI 轉量產或財務受惠
+-->
+
+<!-- monitoring_item
+monitor_id: T11
+status: active
+claim_ids: C5,C6,C30,C15
 metric: Q2 文件中從 NRE 開發到 MP 量產的可比口徑、合約、具名客戶、量產收入、現金流、存貨與負債 proof points
 source_ids: S2,S3,S5,S6,S7,S8,S12,S13,S14,S15,S16,S17,S18,S19,S20,S21,S22,S23,S24,S25,S26
 watch_source_ids: S4,S6,S7,S8,S17,S18,S19,S20,S21,S22
@@ -1182,6 +1234,22 @@ reason: added_gptc_august_conference_and_updated_q2_evidence_workflow_without_re
 evidence: sources:S32,S33
 -->
 
+<!-- transition
+date: 2026-08-29
+from: triaged
+to: triaged
+reason: corrected_faraday_source_precision_and_preserved_monitor_contract_without_refreshing_thesis_clock
+evidence: sources:S15,S16,S27
+-->
+
+<!-- transition
+date: 2026-08-29
+from: triaged
+to: triaged
+reason: completed_faraday_focused_q2_independent_review_without_refreshing_thesis_clock
+evidence: sources:S15,S16,S27
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -1225,7 +1293,7 @@ evidence: sources:S32,S33
 
 ### 三句話抓重點
 
-- 8 月 12 日同參數重查時，六檔中已有五檔 Q2 完整附件；8 月 28 日另取得弘塑完整季報，8 月 29 日弘塑完成四份核心文件的證據包與獨立複核。其餘五檔仍待完整複核，不能把附件取得或單篇完成當成整批完成。
+- 8 月 12 日同參數重查時，六檔中已有五檔 Q2 完整附件；8 月 28 日另取得弘塑完整季報，8 月 29 日弘塑與智原各自完成四份核心文件的證據包與獨立複核。其餘四檔仍待完整複核，不能把附件取得或單篇完成當成整批完成。
 - 智原要分 NRE 與 MP，同欣電要分產品、應用與擴產時鐘，德微要分部門、關係人、終端應用與持股處分現金，威剛要把獲利與營運資金一起讀，日月光投控則要拆封裝、測試與電子組裝；這些公司不能共用一個「AI 收入」分母。
 - 文件上線只解決「能不能讀」，不會自動解決「哪個商業階段、哪個財務分母、AI 分子是多少」；季報沒有揭露的 AI 收入必須留白。
 
@@ -1308,10 +1376,10 @@ AI 先進封裝。這次漏掃也提醒我們：公司投資人關係頁面不�
 
 **先把兩個百分比放回各自的母池。** 智原 Q2 合併財報列出銷售商品 2,430.017 百萬元、提供
 勞務 450.789 百萬元與矽智財授權 432.728 百萬元；三項精確接回合併營收 3,313.534 百萬元。
-同季公司簡報把相同金額稱為 MP、NRE 與 IP，並另揭露 AI 占 NRE 35.4%、占 MP 0.4%。因此，
+同季公司簡報把相同金額稱為 MP、NRE 與 IP；公司財務新聞稿第3頁另列 AI 占 NRE 35.4%、占 MP 0.4%。因此，
 35.4% 的分母是 450.789 百萬元，0.4% 的分母則是 2,430.017 百萬元。
 
-**百分比不能相加，但同期間、同幣別的金額可以在保留缺口後相加。** 以正式收入池乘上簡報
+**百分比不能相加，但同期間、同幣別的金額可以在保留缺口後相加。** 以正式收入池乘上新聞稿
 顯示值，NRE AI 的顯示值代理是 159.579306 百萬元，MP AI 的顯示值代理是 9.720068 百萬元。
 這兩筆同屬 2026Q2、都是新台幣收入，故可加成 169.299374 百萬元；直接把 35.4% 加 0.4% 得到
 35.8%，則沒有任何共同分母，完全沒有財務意義。
@@ -1333,6 +1401,7 @@ AI 先進封裝。這次漏掃也提醒我們：公司投資人關係頁面不�
 個百分點顯示，而且沒有為了讓五類合計等於 100% 做尾差調整：35.4% 對應 35.35% 以上、
 35.45% 以下；0.4% 對應 0.35% 以上、0.45% 以下。若公司採其他分配或調整方法，這個區間就
 不成立。它是顯示精度敏感度，不是統計信賴區間，也不是收入預測誤差。
+表中的區間端點也經顯示取位；個別池的六位小數不是刻意向外捨入的嚴格包絡。
 
 ### 合約帳與收入時鐘不能替 cohort 補空白
 
@@ -1393,6 +1462,14 @@ fd15408cbeb21f4bd499fe1f099f6fb67ac637bdb83025e102ab062cc17b436c、
 642271790c5da19b9878570c853b1434bf8529ce7cb93c736d80272a00f02a92 與
 7ed866b210f9175272ab10e0a106572a69f786d68c16d3dfe3dca009d98e02c9；引用頁及前後相鄰頁已逐頁
 渲染核對，檔案與影像只留在暫存區，不進版本控制。
+
+**8/29 精度來源更正：** 簡報第8頁是整數圖，NRE AI標35%，MP AI的細小區塊沒有標數值；
+35.4%／0.4%及本節一位小數條件區間應歸給新聞稿第3頁。C7與C17的舊文字保留為歷史，
+由C30與C31接續；代理數值和「沒有同批專案轉化證據」的邊界不變。T10因引用更正而由T11
+接續，原指標、來源、觸發條件及原定檢查日逐字保留；C15主命題、信心與證據時鐘均未刷新。
+本輪另由不同研究者以同季報原頁及同新聞稿，分別用Decimal與精確分數重算，點值及條件區間
+一致；沒有用這個算術一致性推成外部客戶驗證。環境為macOS 26.5.2 arm64、Python 3.11.11、
+預設UTF-8；僅讀原PDF與研究檔，未存取DB。
 
 ## 同一個 11.8%，其實是五個收入池在拉扯：同欣電產品、應用與擴產時鐘
 
@@ -1691,6 +1768,10 @@ AI 收入、具名客戶、量產轉化與專案毛利。本文的內容級逐�
 智原、同欣電、德微、威剛及日月光投控仍待各自完成，不能把同一研究者的閱讀升格為
 `independently_verified`。
 
+**8/29 本輪後續：** 智原也已完成四份核心文件的凍結證據包與不同 reviewer 離線重算，
+正式筆記及 manifest 已單獨提交。此刻尚待各自完成正式 Q2 複核的是同欣電、德微、威剛與
+日月光投控；不因智原完成而關閉其他公司的待辦，也不刷新 C15 主命題時鐘。
+
 同欣電的 Q2 法說與核閱季報再補上一種常見錯位：產品別、應用別與客戶別是不同維度；設備
 增置、現金付現、工程承諾、完工驗收與量產收入也不是同一個擴產日期。公開數字可以各自重算，
 但沒有交叉鍵時不能替公司補出車用影像、光通訊、AI 收入或新廠財務貢獻。
@@ -1716,14 +1797,23 @@ AI 收入、具名客戶、量產轉化與專案毛利。本文的內容級逐�
 - [智原官方法說頁](https://www.faraday-tech.com/tw/html/IR/QuarterlyResults.html)、
   [2026Q2 簡報](https://www.faraday-tech.com/resources/PDFFile/IR/QuarterlyResultsFiles/2026Q2_IRConferencePresentation_CH.pdf)與
   [財務新聞稿](https://www.faraday-tech.com/resources/PDFFile/IR/QuarterlyResultsFiles/2Q26FaradayReport_CH.pdf)
-  （2026-07-28）。兩份文件可交叉核對 Q2 營收 3,314 百萬元及 NRE／MP 應用結構；AI
-  分別占 NRE 35.4% 與 MP 0.4%。這兩個百分比的分母不同，不能相加、相減或改寫為轉單率。
+  （2026-07-28）。兩份文件可核對 Q2 營收與 NRE／MP 應用結構，但顯示精度不同：
+  新聞稿第3頁列 AI 分別占 NRE 35.4% 與 MP 0.4%，簡報第8頁只有整數圖，不能當成相同
+  小數精度的第二份驗證。這兩個百分比的分母不同，不能相加、相減或改寫為轉單率。
   [MOPS 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3035&year=115&seamon=2&mtype=A)
   另顯示 202602_3035_AI1.pdf 於 7 月 28 日 16:07:02 上線；本文已取得
   [實際合併財報](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3035&filename=202602_3035_AI1.pdf)，
   逐頁核對第 26～28 頁的三個收入池、認列時點、合約負債、尚未履約義務與履行合約成本。
   這仍是同一研究者的內容級檢查，不是 frozen evidence pack 的獨立 reviewer 簽核；所有合約
   存量亦未拆 AI 或專案 cohort。
+  **8/29 後續完成：** 以上保留的是 8/14 內容級檢查的範圍。本輪已用年報、年度查核財報、
+  Q2 核閱季報與 7/28 法說完成智原 focused_v1，32 個重要主張由不同 reviewer 使用同一
+  pack 離線複核；40 個引用頁、69 張引用／相鄰頁圖與 125 項獨立重算是工作覆蓋計數，
+  不是統計樣本。內容 SHA 為 2837cc899796cd526bd0cc380675e30dd712e7db06305232420e5a869be3cb5b，
+  pack 為 f2ed3de7e4ea431e46b5f80c1177bafb59793c7a8775d4ac722c43a6ffde6d49，筆記與 manifest
+  已獨立提交。保留簡報／財報數字差異、核閱範圍與各收入池分母，不替未揭露的專案填入
+  量產收入。另在 H# 以新聞稿同表的 Q1／Q2 AI 占 MP 比例裁決 H2 原代理條件不成立；
+  這不代表 14nm 專案取消，也不是 T11 所需的同批專案轉化證據。
 - [同欣電 8 月 5 日 Q2 法說預告](https://www.theil.com/zh-tw/information.php?act=view&id=246)、
   [Q2 董事會預告](https://www.theil.com/zh-tw/information.php?act=view&id=245)與
   [公司財報頁](https://www.theil.com/zh-tw/financial_report.php)。7 月 29 日首次掃描時，公司頁
@@ -1781,9 +1871,9 @@ group_id: ipdesign
 stock_ids: 3035
 direction: uncertain
 hypothesis_refs: 3035:H1,3035:H2
-note_action: update_required
-action_due: 2026-08-19
-rationale: Q2 簡報、新聞稿與 MOPS 完整附件均已定位；下一步是封存完整季報並重算專案組合、毛利、現金流與 NRE 到 MP 的可比路徑
+note_action: done
+action_due:
+rationale: 8/29已完成智原四核心文件focused_v1，同一pack由不同reviewer離線核對32個重要主張並簽核；正式筆記與manifest獨立提交，只關閉3035正式Q2更新，不代表NRE已轉MP或其他四檔完成
 evidence_boundary: AI 占 NRE 35.4% 與占 MP 0.4% 是兩個不同收入池的應用占比，不是專案轉單率，也不支持未揭露的客戶、投片時程或量產收入
 -->
 
