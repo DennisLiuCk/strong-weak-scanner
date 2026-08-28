@@ -1,0 +1,177 @@
+{
+  "content_as_of": "2026-08-28",
+  "documents": [
+    {
+      "cited_pages": [
+        123,
+        130,
+        135,
+        138,
+        141,
+        142
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 166,
+      "rendered_pages": [
+        122,
+        123,
+        124,
+        129,
+        130,
+        131,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "69f63486bfe526af0749394eef7e56b50f443da5539fa9cda120b6d1d74c639e",
+      "size_bytes": 4822429,
+      "url": "https://www.phison.com/wp-content/uploads/2026/06/Phison_Electronic_Corporation_2025_Annual_Report.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 85,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "b66bd4f75e42144664c87af3692bd9db83fc78047a7030ec4575bb1554a93e46",
+      "size_bytes": 531067,
+      "url": "https://www.phison.com/wp-content/uploads/2025/11/2025.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        18,
+        22,
+        24,
+        25,
+        26,
+        28,
+        33,
+        34,
+        35
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 62,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        17,
+        18,
+        19,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "f7301b7d8aa2c50996a189450f4fdff0be4c53e407542824188a14ce5405e431",
+      "size_bytes": 450492,
+      "url": "https://www.phison.com/wp-content/uploads/2026/08/2026-Six-Months_EN.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        5,
+        10,
+        11,
+        12,
+        22,
+        23,
+        30,
+        32,
+        35,
+        36,
+        37
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 40,
+      "rendered_pages": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12,
+        13,
+        21,
+        22,
+        23,
+        24,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "e7cb0f9a27d39aa2cfb449bdc8ddee5fee1bfac353f1a68b2a39f1ce42aeca60",
+      "size_bytes": 5582097,
+      "url": "https://www.phison.com/wp-content/uploads/2026/08/2Q26_Phison-Earnings-Call_EN_Official_uploaded-version.pdf"
+    }
+  ],
+  "pack_sha256": "28440cb2907b96ee44c7faafccb8c9e634c7373d0b6d2f71a3e97e021945c5fb",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "8299",
+  "unverified_claims_removed": true
+}
