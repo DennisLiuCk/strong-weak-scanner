@@ -526,6 +526,22 @@ limitation: 本輪只核對實際取件、PDF身分、比較期間與報告日�
 independence_group: twse-mops
 -->
 
+<!-- research_source
+source_id: S33
+role: company_filing
+source_kind: living_index
+publisher: 公開資訊觀測站／弘塑科技
+title: 弘塑115年8月法說會一覽：8/29擷取之場次與中文檔案欄定位快照
+published_at:
+captured_at: 2026-08-29
+accepted_at: 2026-08-29
+status: active
+url: https://mopsov.twse.com.tw/mops/web/ajax_t100sb02_1?step=1&firstin=1&off=1&TYPEK=otc&year=115&month=08&co_id=3131
+locator: 指定公司及月份的官方列表列出115/08/25 13:30國泰證券2026第三季產業論壇，中文檔案313120260821M001.pdf；索引原HTML SHA-256 0ed73558c330e887ec058d64bc826755b68b441bce5ecf79211e826298e5cdb8。實際取得所連https://mopsov.twse.com.tw/nas/STR/313120260821M001.pdf，共17頁、1,471,787 bytes，SHA-256 1aa35b5e3cb140e908c3a5d4e2886ddd0c74366a57edb284aa89f6964d52c874；PDF p1封面、p5集團股號與p7–8財務期間核對，亦為正式筆記當前證據包S4。
+limitation: 此來源是指定月份索引的當日觀察與附件定位，不宣稱全網最新或全事件普查；索引未給附件發布／上傳時間，故published_at留空，不把檔名8/21、HTTP Last-Modified或PDF metadata當發布日。公司自述與核閱財報仍屬同一發行人消息鏈，檔案存在與場次日期不代表客戶驗證、CoWoS具名急單、量產收入或全年財測。
+independence_group: twse-mops
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -934,6 +950,23 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: 8/29取得的弘塑115年8月MOPS法說列表將8/25國泰證券第三季產業論壇連到313120260821M001.pdf；中文檔案欄所連17頁附件封面為Honsu Group 2026Q3 Business Update，但財務頁明示的是2026Q2單季及H1累計資料
+supporting_source_ids: S33
+contrary_source_ids:
+as_of: 2026-08-29
+basis: 官方索引公司3131、115/08/25、13:30與中文檔案欄逐一對齊；實際PDF SHA固定後核對p1、p5、p7–8及相鄰頁，沒有以檔名中的8/21取代活動日期，也沒有把封面Q3當成Q3已公布實績。
+boundary: N=1指定場次／附件的精確身分核對，非抽樣估計，SE／t不適用；此claim只關閉8/25簡報的取件與期間辨識缺口，不宣稱已見具名客戶、同批急單驗收、AI收入或全年營收指引，也不刷新C15主命題時鐘。
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -1141,6 +1174,14 @@ reason: registered_gmec_q2_filing_availability_without_upgrading_pack_or_thesis_
 evidence: sources:S32
 -->
 
+<!-- transition
+date: 2026-08-29
+from: triaged
+to: triaged
+reason: added_gptc_august_conference_and_updated_q2_evidence_workflow_without_refreshing_thesis_clock
+evidence: sources:S32,S33
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -1184,7 +1225,7 @@ evidence: sources:S32
 
 ### 三句話抓重點
 
-- 8 月 12 日同參數重查時，六檔中已有五檔 Q2 完整附件；8 月 28 日另取得弘塑完整季報，六檔現均有可定位的附件，但文件取得不等於已完成各公司的獨立複核。
+- 8 月 12 日同參數重查時，六檔中已有五檔 Q2 完整附件；8 月 28 日另取得弘塑完整季報，8 月 29 日弘塑完成四份核心文件的證據包與獨立複核。其餘五檔仍待完整複核，不能把附件取得或單篇完成當成整批完成。
 - 智原要分 NRE 與 MP，同欣電要分產品、應用與擴產時鐘，德微要分部門、關係人、終端應用與持股處分現金，威剛要把獲利與營運資金一起讀，日月光投控則要拆封裝、測試與電子組裝；這些公司不能共用一個「AI 收入」分母。
 - 文件上線只解決「能不能讀」，不會自動解決「哪個商業階段、哪個財務分母、AI 分子是多少」；季報沒有揭露的 AI 收入必須留白。
 
@@ -1645,8 +1686,9 @@ SE／t 值。
 新文件也把研究方法從兩條軸擴成三條：先走「事件→附件→證據包」的證據成熟度，再辨識
 「NRE 開發→MP 量產」等商業階段，最後找對「獲利→營運資金→現金」或「封裝／測試／
 電子組裝→內部銷除」的財務分母。這樣才能知道文件真正回答了什麼，也能清楚標出沒有回答的
-AI 收入、具名客戶、量產轉化與專案毛利。本文完成的是研究中心的內容級逐頁核對；正式公司
-筆記仍須用 frozen evidence pack 交給不同 reviewer 離線重算，不能把同一研究者的閱讀升格為
+AI 收入、具名客戶、量產轉化與專案毛利。本文的內容級逐頁核對不替代正式筆記的獨立複核。
+8/29 弘塑另以四份核心文件完成 frozen evidence pack 與不同 reviewer 離線重算；其餘
+智原、同欣電、德微、威剛及日月光投控仍待各自完成，不能把同一研究者的閱讀升格為
 `independently_verified`。
 
 同欣電的 Q2 法說與核閱季報再補上一種常見錯位：產品別、應用別與客戶別是不同維度；設備
@@ -1723,6 +1765,14 @@ AI 收入、具名客戶、量產轉化與專案毛利。本文完成的是研�
   **8/28附件進度：**已從官方入口實際下載202602_3131_AI1.pdf，共68頁、2,146,416bytes，
   並核對封面公司、第二季期間及8/4核閱報告日期。這關閉附件取得缺口；正式筆記仍以Q1
   為完整財報基準，尚待用現有PDF建立focused evidence pack並由不同reviewer離線重算。[S32]
+  **8/29後續完成：**另取得官方8/25論壇清單所連的實際簡報，檔名8/21並非活動日期，
+  封面Q3 Business Update中的財務數仍為Q2／H1。[S33][C29]
+  弘塑正式筆記（可由本文的個股連結開啟）現已使用修訂年報、更正年度查核財報、Q2核閱
+  季報及本次簡報完成focused_v1，32個重要主張由不同reviewer使用同一凍結pack離線重算。
+  內容SHA為c28b435aa236922dfd830d59744c2460dfceb5656d8737451f3f8ce7cf74b02a，pack為
+  e6e41ba1739a8b2cf59137a4800cab514115bbe5ae461ca6a72c0e9915f24e5e。S32／C28仍保留
+  8/28的取件與身分核對範圍；這次關閉的是弘塑正式Q2筆記更新，不是具名CoWoS急單或
+  全年營收目標的證真，也不改C15主命題時鐘。
 
 ## 影響路由
 
@@ -1797,10 +1847,10 @@ group_id: semiequip
 stock_ids: 3131
 direction: uncertain
 hypothesis_refs: 3131:H1,3131:H2
-note_action: update_required
-action_due: 2026-08-19
-rationale: 8/28已實際取得MOPS 115Q2完整PDF，核對公司、期間、報告日期及SHA；下一步依focused_v1重算設備收入、合約負債、在製與毛利並完成證據包和獨立複核，原8/12未定位快照保留
-evidence_boundary: 產業 CoWoS 需求不能替代弘塑具名急單或全年營收大於 80 億元的公司證據
+note_action: done
+action_due:
+rationale: 8/29以修訂年報、更正年度查核財報、Q2核閱季報與8/25法說完成四文件focused_v1 pack，32個重要主張已由不同reviewer離線重算並簽核；原8/12未定位及8/28僅身分核對的source／claim保留，其他五檔不隨本篇結案
+evidence_boundary: 合併層的部分合約負債轉收入不是具名CoWoS急單驗收，HBM／CPO應用頁也不是量產收入；H1資料不能裁決全年80億元目標，H1／H2維持待驗及原8/31期限，主命題時鐘不刷新
 -->
 
 ## 下一個可證明／否定的節點

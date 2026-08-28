@@ -9164,8 +9164,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 32),
-            ("research_claim", 28), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 33),
+            ("research_claim", 29), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9210,8 +9210,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 32),
-            ("research_claim", 28), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 33),
+            ("research_claim", 29), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9253,8 +9253,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 32),
-            ("research_claim", 28), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 33),
+            ("research_claim", 29), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

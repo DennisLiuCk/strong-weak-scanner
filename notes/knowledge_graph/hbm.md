@@ -160,16 +160,16 @@ from_id: company:3131
 to_id: concept:hbm
 relation: names_application
 claim_refs:
-note_refs: 3131#S1,3131#S2
+note_refs: 3131#S4
 evidence_state: verified
 commercial_stage: application_opportunity
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-11
-review_due: 2026-08-20
+as_of: 2026-08-29
+review_due: 2026-08-31
 status: active
-boundary: 公司把 HBM 列為應用機會只證明產品布局，不能改寫成具名客戶、訂單、交付台數或已認列營收。
+boundary: 本次引用正式筆記 S4 的 8/25 法說 PDF p13；HBM 仍只列為應用機會，不能改寫成具名客戶、訂單、交付台數或已認列營收，也不把合併設備收入全數歸給 HBM。
 next_trigger: 新機種、客戶驗證與設備產品收入能以公司文件連到 HBM 量產專案。
 -->
 
