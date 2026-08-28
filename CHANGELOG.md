@@ -1,5 +1,21 @@
 # Changelog
 
+## SQLite 容量普查與可逆儲存方案 — 2026-08-29
+
+**DB、正式策略、OOS 快照與 Actions 寫入流程不變；未遷移、重寫 Git 歷史或開啟付費額度。**
+
+- 新增純 stdlib `audit_storage.py`，以 `db_ro.connect()` 普查實體大小、表／索引配置與
+  GitHub 50／100 MiB 單檔門檻；可選記憶體 gzip 復原 SHA-256 檢查，不產生備份檔。
+- 獨立 review 重現並修正 DB 原子替換後還原原 bytes 仍誤報一致、普通同名
+  `dbstat` 表冒充配置資料兩種情境；加入檔案狀態及 SQL 頁數核對，保留合法尾端
+  bytes 的明示警告，WAL 主檔不宣稱為完整備份。
+- 以排程最新 `57936fa` 的單一完整 DB 普查：58,114,048 bytes（55.4219 MiB），
+  gzip level 6 為 19,462,262 bytes（18.5607 MiB），逐 byte 復原與 SHA 一致。
+  原始檔頭、另一條 SQL 與 gzip／zlib 路徑獨立核對；這是精確容量 census，SE／t
+  不適用，不推估達限日期。方案比較與切換前驗收見 `reports/storage_audit_2026-08-29.md`。
+- macOS 26.5.2 arm64、pyenv Python 3.11.11、SQLite 3.51.0、預設 UTF-8 下，
+  12 項 storage 測試與獨立 fixtures 通過；DB 量測前後 SHA 不變。
+
 ## 弘塑 Q2 聚焦研究與獨立複核 — 2026-08-29
 
 **正式策略、tier、權重、`IS_CUTOFF`、資料庫與歷史儀表板快照不變。**

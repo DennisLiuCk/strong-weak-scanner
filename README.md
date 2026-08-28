@@ -611,11 +611,17 @@ python scripts/run_daily.py
 python scripts/audit_ranking_views.py --compact
 python scripts/validate.py
 python scripts/audit_raw_data.py
+python scripts/audit_storage.py
 python -m unittest discover -s tests
 ```
 
 `run_daily.py` 可安全重跑，只補缺口；上游未齊時會拒絕正式發布。它不會替你 review、commit
 或 push。
+
+`audit_storage.py` 只讀取 DB 容量、表／索引配置與 GitHub 單檔門檻；可加
+`--gzip-probe --json` 在記憶體測試壓縮及 SHA-256 復原，不改資料或產生備份檔。
+超過 50 MiB 只警告，超過 100 MiB 或量測不一致才回傳錯誤；退出碼與後續方案見
+[SQLite 儲存評估](reports/storage_audit_2026-08-29.md)。
 
 ### Daily Fetch 日誌判讀與續跑語意
 
@@ -767,6 +773,7 @@ python scripts/qual_notes.py --lint
 |---|---|
 | 盤後確認與今日討論 | [`DAILY_CHECK.md`](DAILY_CHECK.md)、`scripts/daily_brief.py` |
 | 原始欄位回補/正式 DB 稽核 | [`RAW_DATA_BACKFILL.md`](RAW_DATA_BACKFILL.md)、`scripts/audit_raw_data.py` |
+| DB 容量／壓縮復原檢查 | [SQLite 儲存評估](reports/storage_audit_2026-08-29.md)、`scripts/audit_storage.py` |
 | 週六策略檢視 | [`WEEKLY_REVIEW.md`](WEEKLY_REVIEW.md)、`scripts/validate.py` |
 | 平行視角評估／UX 調整 | [`PARALLEL_VIEWS_ROADMAP.md`](PARALLEL_VIEWS_ROADMAP.md)、`scripts/audit_ranking_views.py` |
 | Universe 與候選 | 本頁「Universe 治理」、`scripts/screen.py`、`config/` |
