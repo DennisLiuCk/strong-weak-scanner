@@ -510,6 +510,22 @@ limitation: 本輪以 48 頁全文文字擷取、關鍵詞檢索與引用頁及�
 independence_group: eris.com.tw
 -->
 
+<!-- research_source
+source_id: S32
+role: company_filing
+source_kind: document
+publisher: 弘塑科技
+title: 弘塑科技及子公司115Q2合併財報暨核閱報告（MOPS正式附件）
+published_at: 2026-08-13
+captured_at: 2026-08-28
+accepted_at: 2026-08-28
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3131&filename=202602_3131_AI1.pdf
+locator: 202602_3131_AI1.pdf，68頁；實體p1封面股號3131與115/114年第二季，p4–5公司、期間及核閱報告，p5簽署日115/8/4。8/28正常從官方document landing取得PDF，2,146,416 bytes，SHA-256 94c37872389c0ca55e01b05756e0db0dac53d0f2488e5003fbab0d75c25fd043；published_at依本輪另存官方索引115/8/13上傳日，不以PDF metadata或簽署日代替
+limitation: 本輪只核對實際取件、PDF身分、比較期間與報告日期，未全篇重算三表及附註、未建同版本focused pack或完成不同reviewer簽核；不以檔案存在性支持具名急單、AI收入或全年營收。舊S22的8/12未定位快照保留。
+independence_group: twse-mops
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -901,6 +917,23 @@ verification_needed: 公司提供部門／產品毛利橋、AI server 與小訊�
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C28
+label: verified
+status: active
+claim: 2026-08-28已從MOPS正式document入口實際取得弘塑202602_3131_AI1.pdf，共68頁、2,146,416 bytes；封面明示弘塑科技及子公司115/114年第二季合併財報，核閱報告簽署日為115/8/4
+supporting_source_ids: S32
+contrary_source_ids:
+as_of: 2026-08-28
+basis: 正常讀取官方document landing及其返回PDF後核SHA與大小；實體p1及p4–5核對公司、股號、季度和報告日期，引用頁及相鄰頁已渲染；8/12索引未定位仍保留為當時觀察，沒有把後來文件取得當成舊快照錯誤。
+boundary: N=1是指定發行人文件的精確取件及身分核對，不是抽樣估計，sampling SE/t不適用；沒有完成三表附註重算、focused evidence pack或獨立reviewer簽核，也不支持具名急單、AI收入或全年營收目標。
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -1100,6 +1133,14 @@ reason: eris_q2_segment_related_party_and_cash_bridge_added_without_refreshing_t
 evidence: sources:S30,S31
 -->
 
+<!-- transition
+date: 2026-08-28
+from: triaged
+to: triaged
+reason: registered_gmec_q2_filing_availability_without_upgrading_pack_or_thesis_clock
+evidence: sources:S32
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -1107,6 +1148,7 @@ evidence: sources:S30,S31
 - **法說簡報**：公司向投資人說明營運的簡報；可引用明示內容，但通常不等於含會計師核閱報告與附註的完整季報。
 - **核閱季報**：會計師依核閱程序出具報告的季度財務文件，通常比簡報摘要有更完整的報表與附註。
 - **證據包（evidence pack）**：把實際引用的文件、頁碼與檔案指紋固定下來，交給另一位查核者離線重算；它避免大家只看同一份摘要就互相確認。
+- **focused_v1（聚焦研究第一版）**：正式筆記的研究規範；用少量核心一手文件回答重要問題，再由另一位查核者使用同一證據包重算，不能只憑文件已下載就簽核。
 - **事件預告**：只證明某場法說或董事會預計發生；它本身不證明營收、毛利、訂單或量產結果。
 - **開發收入／量產收入（NRE／MP）**：NRE 是委託設計等開發階段收入，MP 是量產收入。兩者分母不同，不能把應用占比直接當成專案轉量產率。
 - **收入池**：先按產品或服務切開的收入分母；同一家公司可以同時有 NRE、MP 與 IP 三個收入池，應用占比只對自己的池有效。
@@ -1142,7 +1184,7 @@ evidence: sources:S30,S31
 
 ### 三句話抓重點
 
-- 截至 8 月 12 日，同參數重查的六檔中已有五檔 Q2 完整附件；威剛與日月光投控是本輪新增，弘塑仍只有有日期邊界的「尚未定位」。
+- 8 月 12 日同參數重查時，六檔中已有五檔 Q2 完整附件；8 月 28 日另取得弘塑完整季報，六檔現均有可定位的附件，但文件取得不等於已完成各公司的獨立複核。
 - 智原要分 NRE 與 MP，同欣電要分產品、應用與擴產時鐘，德微要分部門、關係人、終端應用與持股處分現金，威剛要把獲利與營運資金一起讀，日月光投控則要拆封裝、測試與電子組裝；這些公司不能共用一個「AI 收入」分母。
 - 文件上線只解決「能不能讀」，不會自動解決「哪個商業階段、哪個財務分母、AI 分子是多少」；季報沒有揭露的 AI 收入必須留白。
 
@@ -1678,6 +1720,9 @@ AI 收入、具名客戶、量產轉化與專案毛利。本文完成的是研�
 - [弘塑 MOPS 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3131&year=115&seamon=2&mtype=A)
   截至 8 月 12 日仍未回傳可定位的 115Q2 附件。這是有檢查時間與固定參數的未定位結果，
   不代表逾期、未通過董事會或公司營運轉弱，也不能用 CoWoS 產業需求代替具名急單與財報。
+  **8/28附件進度：**已從官方入口實際下載202602_3131_AI1.pdf，共68頁、2,146,416bytes，
+  並核對封面公司、第二季期間及8/4核閱報告日期。這關閉附件取得缺口；正式筆記仍以Q1
+  為完整財報基準，尚待用現有PDF建立focused evidence pack並由不同reviewer離線重算。[S32]
 
 ## 影響路由
 
@@ -1752,9 +1797,9 @@ group_id: semiequip
 stock_ids: 3131
 direction: uncertain
 hypothesis_refs: 3131:H1,3131:H2
-note_action: watch
+note_action: update_required
 action_due: 2026-08-19
-rationale: 8 月 12 日以相同參數重查 MOPS 仍未定位到 115Q2 附件；持續等正式文件後再檢查設備收入、合約負債、在製與毛利
+rationale: 8/28已實際取得MOPS 115Q2完整PDF，核對公司、期間、報告日期及SHA；下一步依focused_v1重算設備收入、合約負債、在製與毛利並完成證據包和獨立複核，原8/12未定位快照保留
 evidence_boundary: 產業 CoWoS 需求不能替代弘塑具名急單或全年營收大於 80 億元的公司證據
 -->
 
@@ -1769,13 +1814,13 @@ evidence_boundary: 產業 CoWoS 需求不能替代弘塑具名急單或全年營
 - 德微下一季繼續用 H1／九個月累計減前期重建三部門單季外部收入，並分開追 Diodes 關係人
   銷售與應收、存貨、營業現金流及借款；AI server 晶圓與小訊號新品則要求料號、終端客戶、
   量產數量、價格、毛利與重複訂單，不用部門名稱、合併毛利或持股處分現金代替。
-- 智原、同欣電、德微、威剛與日月光投控均已有完整附件，後續按公司逐一建立 focused_v1
+- 智原、同欣電、德微、威剛、日月光投控及8/28新定位的弘塑均已有可定位的完整附件，後續按公司逐一建立 focused_v1
   frozen evidence pack，由不同 reviewer 離線重算；每篇 `independently_verified` 筆記獨立提交，
   不把本文的同一研究者閱讀當成簽核。
 - 威剛下一輪追存貨週轉／跌價、應收回款、產品價格與數量、營業現金流及借款；日月光投控
   下一輪追封裝／測試的 AI 分子、先進封裝產能投產時點、具名客戶與可對應收入，而不是拿
   全集團收入或資本支出代替。
-- 弘塑繼續以 MOPS 直接索引優先於事件與媒體說法追蹤；正式附件未出現前保持 `watch`，不以
-  CoWoS 需求、股價或同業數字補設備收入、急單與全年營收空白。
+- 弘塑已轉入完整Q2筆記待更新；先用現有PDF建立證據包並重算，再追8/25法說正文。附件取得
+  不補成具名急單、AI收入或全年營收證據；主命題與H#仍按原條件判定。
 - 任一更新都不轉移 H# 生命週期、不改量化分數；只有預登錄 trigger 命中並通過相應證據角色，
   才升級主張。

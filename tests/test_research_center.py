@@ -4363,6 +4363,8 @@ class ResearchCenterTest(unittest.TestCase):
             "split_specification_and_product_clocks_after_first_hbf_technical_specification",
             "added_hbf_nominal_usable_working_set_and_simulation_to_service_evidence_bridge_without_thesis_or_clock_refresh",
             "added_direct_hbf_v0_7_0_requirement_scope_and_conformance_boundary_without_thesis_clock_refresh",
+            "thesis_claim_id: C19",
+            "首批HBF inference product samples列為2027年的未來進度",
             "新的記憶體層不能只提供更大容量",
             "有 `shall` 不等於有 `pass`",
             "## 先判斷它能不能成為新的記憶體層",
@@ -4417,7 +4419,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 72
+            sum(line.startswith("- **") for line in glossary.splitlines()), 73
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4432,8 +4434,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 20), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 21), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 7),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -4537,6 +4539,11 @@ class ResearchCenterTest(unittest.TestCase):
             "沒有 sampling SE／t",
             "OCP 官方 PDF 共 44 頁",
             "pp.32–42 已由官方瀏覽器 PDF viewer 逐頁渲染目視核對",
+            "thesis_claim_id: C15",
+            "claim_id: C6\nlabel: verified\nstatus: superseded",
+            "本輪尚未取得試算表",
+            "封裝接點附錄已有公開目錄，但本輪尚未取得完整內容",
+            "先取得並核對接點附錄的完整試算表",
             "claim_id: C10",
             "claim_id: C11",
             "claim_id: C12",
@@ -4547,7 +4554,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 41
+            sum(line.startswith("- **") for line in glossary.splitlines()), 43
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4563,9 +4570,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 8),
-            ("research_claim", 13), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 9),
+            ("research_claim", 15), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
@@ -4908,6 +4915,7 @@ class ResearchCenterTest(unittest.TestCase):
             "| 偏多：AI 讓高階儲存內容與驗證增加 |",
             "| 偏空：軟體與資料位置吸收硬體增量 |",
             "expanded_checkpoint_completion_recovery_and_training_goodput_measurement_contract",
+            "並非三條AI儲存I/O契約的拆分收入",
             "## 「存檔完成」其實有六層，不是按下 save 就結束",
             "| 完成階梯 | 真正完成了什麼 | 最小證據 | 仍不能證明 |",
             "| 1. I/O 模擬跑完 |", "| 2. 暫存完成 |",
@@ -4935,7 +4943,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 75
+            sum(line.startswith("- **") for line in glossary.splitlines()), 77
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4952,8 +4960,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 24),
-            ("research_claim", 26), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 25),
+            ("research_claim", 28), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -8527,7 +8535,7 @@ class ResearchCenterTest(unittest.TestCase):
             "`N=3` 份官方文件",
             "`N=1` 條交易消息鏈",
             "共同觀測 `N=0`",
-            "沒有\nsampling SE／t",
+            "不是隨機抽樣，sampling SE／t 不適用",
             "Microsoft FY2026 10-K | 全年 cash PP&E additions 115.948",
             "Meta 2026 Q2 10-Q | H1 cash PP&E 49.11",
             "Amazon 2026 Q2 10-Q | H1 PP&E 淨新增 118.648",
@@ -8563,7 +8571,10 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C16\nlabel: verified\nstatus: active",
             "claim_id: C17\nlabel: verified\nstatus: active",
             "claim_id: C18\nlabel: inference\nstatus: active",
-            "claim_id: C19\nlabel: unverified\nstatus: active",
+            "claim_id: C19\nlabel: unverified\nstatus: superseded",
+            "claim_id: C25\nlabel: verified\nstatus: active",
+            "claim_id: C26\nlabel: verified\nstatus: active",
+            "claim_id: C27\nlabel: unverified\nstatus: active",
             "claim_id: C20\nlabel: verified\nstatus: active",
             "claim_id: C21\nlabel: verified\nstatus: active",
             "claim_id: C22\nlabel: inference\nstatus: active",
@@ -8591,9 +8602,9 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 20),
-            ("research_claim", 24), ("metric_comparison", 9),
-            ("impact", 4), ("monitoring_item", 4), ("transition", 10),
+            ("research_topic", 1), ("research_source", 22),
+            ("research_claim", 27), ("metric_comparison", 9),
+            ("impact", 4), ("monitoring_item", 5), ("transition", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -9148,11 +9159,13 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C18",
             "claim_id: C19",
             "8 月 15 日依 T10 回查",
+            "source_id: S32",
+            "本輪只核對實際取件、PDF身分、比較期間與報告日期",
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 31),
-            ("research_claim", 27), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 32),
+            ("research_claim", 28), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9197,8 +9210,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 31),
-            ("research_claim", 27), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 32),
+            ("research_claim", 28), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9240,8 +9253,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 31),
-            ("research_claim", 27), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 32),
+            ("research_claim", 28), ("metric_comparison", 0),
             ("impact", 7), ("monitoring_item", 10),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

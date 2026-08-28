@@ -279,18 +279,18 @@ view: industry
 from_id: concept:hbm
 to_id: standard:sphbm4
 relation: alternative_standard
-claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C7
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C15
 note_refs:
 evidence_state: inference
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-26
+as_of: 2026-08-28
+review_due: 2026-09-04
 status: active
 boundary: SPHBM4 必須分開核對 DRAM 堆疊、base die、分散式主機通道與接點封裝；四層框架不是已採用產品、CoWoS 立即替代或供應鏈訂單。
-next_trigger: JESD330-4-1 公開，或任一記憶體與加速器公司以相同版本具名採用 SPHBM4。
+next_trigger: 取得實際JESD330-4-1試算表，或記憶體與加速器公司以相同版本具名採用SPHBM4。
 -->
 
 <!-- knowledge_edge
@@ -339,15 +339,15 @@ view: industry
 from_id: concept:hbm
 to_id: component:organic-substrate
 relation: enables_substrate_path
-claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C1,MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C6
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C1,MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C14
 note_refs:
 evidence_state: verified
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-26
+as_of: 2026-08-28
+review_due: 2026-09-04
 status: active
 boundary: 標準有機基板不能自動等同 ABF 或 BT，也未指定台灣載板公司。
 next_trigger: 具名產品揭露材料規格、基板供應商與可靠度認證。
@@ -459,15 +459,15 @@ view: industry
 from_id: concept:hbm
 to_id: group:pcb
 relation: routes_to
-claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C7
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C15
 note_refs:
 evidence_state: inference
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-26
+as_of: 2026-08-28
+review_due: 2026-09-04
 status: active
 boundary: 只構成高階基板搜尋路由；沒有材料規格、供應商、客戶或量產，不得列個股受惠。
 next_trigger: 基板供應商被具名並完成材料、可靠度與客戶量產認證。
@@ -479,15 +479,15 @@ view: industry
 from_id: concept:hbm
 to_id: group:ipdesign
 relation: routes_to
-claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C7
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C15
 note_refs:
 evidence_state: inference
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-26
+as_of: 2026-08-28
+review_due: 2026-09-04
 status: active
 boundary: base die 與序列化提高設計問題的重要性，但尚無 IP 供應商、商業模式或訂單。
 next_trigger: 具名 base-die 或高速介面 IP 完成客戶導入及量產收入。
@@ -499,15 +499,15 @@ view: industry
 from_id: concept:hbm
 to_id: group:packtest
 relation: routes_to
-claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C7
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C15
 note_refs:
 evidence_state: inference
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-26
+as_of: 2026-08-28
+review_due: 2026-09-04
 status: active
 boundary: 標準可能改變組裝與測試流程，但記憶體廠自有封裝能力使外部 OSAT 角色仍未知。
 next_trigger: 記憶體與封裝商文件可雙向核對相同產品、製程、量產與財務貢獻。
@@ -519,15 +519,15 @@ view: industry
 from_id: concept:hbm
 to_id: concept:sphbm4-four-layer-contract
 relation: includes
-claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C7
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C15
 note_refs:
 evidence_state: inference
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-26
+as_of: 2026-08-28
+review_due: 2026-09-04
 status: active
 boundary: 四層框架只防止把記憶體、介面、通道與封裝證據混用，不判斷技術勝負、產品採用、供應商份額或財務貢獻。
 next_trigger: 同一具名 SPHBM4 產品公開四層版本、責任邊界與 qualification 結果。
@@ -539,15 +539,15 @@ view: industry
 from_id: concept:hbm
 to_id: component:sphbm4-dram-stack
 relation: uses_component
-claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C7
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C15
 note_refs:
 evidence_state: inference
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-26
+as_of: 2026-08-28
+review_due: 2026-09-04
 status: active
 boundary: 沿用 HBM4 記憶體裸晶與容量能力不代表具名 SPHBM4 堆疊已完成、良率相同、供應充足或價格較低。
 next_trigger: 記憶體供應商公開具名 SPHBM4 stack、容量、層數、良率、熱與量產時程。
@@ -579,18 +579,18 @@ view: industry
 from_id: concept:hbm
 to_id: stage:sphbm4-bump-map-publication
 relation: moves_to
-claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C6
+claim_refs: MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE#C14
 note_refs:
 evidence_state: verified
 commercial_stage: concept
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-26
+as_of: 2026-08-28
+review_due: 2026-09-04
 status: active
-boundary: Addendum 只供會員且待核准公開是文件治理狀態，不代表技術失敗、產品延期或任一供應商已取得量產規格。
-next_trigger: JEDEC 公開董事會核准的 JESD330-4-1 版本與變更紀錄。
+boundary: 8/28公開catalog與版本月份已取得，但未取得試算表；文件可見度不是完整規格、silicon互通、客戶資格或量產證據。
+next_trigger: 取得可離線核對的JESD330-4-1實際試算表、版本與變更紀錄。
 -->
 
 <!-- knowledge_edge

@@ -25,6 +25,20 @@ cross_company_numbers: true
 schema_migrated_at: 2026-08-02
 -->
 
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C16,C17,C18,C25,C26,C27
+metric: PORTS-Pike公開保證範本後續修訂、逐租約參數及ready-for-service／起租／觸發／回收／實際付款與補償共同鍵
+source_ids: S14,S15,S16,S21,S22
+watch_source_ids: S17
+frequency: event_driven
+frequency_detail: 下次工作回查2026-09-04；遇後續10-Q／8-K、未遮蔽參數、修訂、起租或實際觸發事件即重審
+next_check: 2026-09-04
+trigger: 後續正式文件提供可重算逐租約條件，或具體ready-for-service、lease commencement、Trigger Event、重租／出售回收、NVIDIA付款與OpenAI reimbursement
+invalidation: 新正式文件改變保證範圍、上限、條件、損失公式、終止或補償責任，使既有六時鐘或可重算邊界不適用
+-->
+
 <!-- transition
 date: 2026-08-01
 from: initial
@@ -342,6 +356,38 @@ limitation: 持續更新索引只供發現新申報；索引本身不證明 Labs
 independence_group: micron
 -->
 
+<!-- research_source
+source_id: S21
+role: company_filing
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA FY2027 Q2 Form 10-Q：PORTS-Pike分期保證及回收風險
+published_at: 2026-08-26
+captured_at: 2026-08-28
+accepted_at: 2026-08-28
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm
+locator: Note10 p.19、MD&A p.26、Risk Factors pp.34–35及Exhibits p.42；官方web正文L873–876、L1140–1143、L1461–1467、L1638與L1652
+limitation: 截至7/26的10-Q在期後事件段揭露8月保證；直接HTML HTTP回403，留存的是SEC官方頁web渲染文字截取而非原始HTML。分期、上限與回收風險不等於實際觸發或已付款，不能推算逐期淨損失
+independence_group: ports-pike-transaction
+-->
+
+<!-- research_source
+source_id: S22
+role: company_filing
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA FY2027 Q2 Form 10-Q Exhibit10.1：Form of Residual Value Guaranty
+published_at: 2026-08-26
+captured_at: 2026-08-28
+accepted_at: 2026-08-28
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda2027q2ex101.htm
+locator: 封面遮蔽聲明、§1(b)Covered Loss Amount、§1(c)Discount Rate、§1(d)GMV／ScheduleII、§1(h)pre-RFS payment、§2生效與支付、§8 cap、§12 remedies及§13 termination
+limitation: 公開的是有空格和遮蔽的form，不是完整未遮蔽逐租約合約；公式、折現率、GMV附表和部分支付／救濟／終止條件不足。直接HTTP回403，只留SEC官方web正文截取，SHA固定截取而非原檔
+independence_group: ports-pike-transaction
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -597,7 +643,7 @@ resolution:
 <!-- research_claim
 claim_id: C19
 label: unverified
-status: active
+status: superseded
 claim: 現有公開摘要足以重算 PORTS-Pike 各租約的逐期最大曝險、保證最低值折減曲線、違約機率、重租或出售回收率、OpenAI 補償回收率與 NVIDIA 預期損失
 supporting_source_ids:
 contrary_source_ids:
@@ -606,6 +652,7 @@ basis: S14 明示現有描述不完整，完整 Agreements form 尚待後續 10-
 boundary: 找不到完整參數不是保證一定發生損失或一定不會損失；本文只把可公開重算的上限擋在摘要已揭露的條件，並保留缺值
 verification_needed: NVIDIA 後續 10-Q 所附完整 Agreements form、逐租約保證最低值與期限、實際 lease commencement／ready-for-service、任何 Trigger Event、重租或出售回收及 OpenAI reimbursement 結果
 resolution:
+corrected_by_claim_id: C27
 -->
 
 <!-- research_claim
@@ -849,6 +896,51 @@ comparability: not_comparable
 comparability_reason: Amazon 是 TTM 且公式不同，不能和 Microsoft、Meta 的單季公司定義 FCF 排名
 -->
 
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: NVIDIA在2026-08-26的10-Q補充，PORTS-Pike保證對應九期建設，首期預計FY2029；各保證通常在對應租約起租時生效，金額隨各期完成增加，預期再隨各期20年租約履行下降，且只涵蓋特定租賃與電力支付部分
+supporting_source_ids: S21
+contrary_source_ids:
+as_of: 2026-08-26
+basis: S21 Note10與MD&A直接分列phase、起租、生效、金額增減和定義範圍；風險章另明示OpenAI補償不一定能即時或全額回收
+boundary: 九期和FY2029是公司預期而非已交付；保證金額不是全部場地成本、租戶全部義務、已支付現金或預期損失，不外推任何台灣供應商訂單
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C26
+label: verified
+status: active
+claim: NVIDIA已隨8/26的10-Q公開Exhibit10.1保證範本，但該form有遮蔽與未附參數；Covered Loss Amount公式、Discount Rate、ScheduleII逐租約GMV及部分救濟與終止條件仍無法從本輪公開正文取得
+supporting_source_ids: S21,S22
+contrary_source_ids:
+as_of: 2026-08-26
+basis: S21 Exhibits明示條款遮蔽及附表省略，S22封面與§1、§12、§13對應[***]及ScheduleII引用可直接定位
+boundary: 不能把範本已公開寫成完整未遮蔽契約已取得、逐期最大曝險已重算、已觸發或已付款；RFS對特定Covered Loss Amount的條件也不可泛化為所有遮蔽付款路徑
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C27
+label: unverified
+status: active
+claim: 現有公開的8/26 10-Q與保證範本足以重算PORTS-Pike逐租約最大曝險、保證最低值折減曲線、違約機率、重租或出售回收、OpenAI補償回收與NVIDIA預期損失
+supporting_source_ids:
+contrary_source_ids: S21,S22
+as_of: 2026-08-28
+basis: correction_of:C19；範本已公開，不能再說等待首次form，但S22的損失公式、折現率、逐租約GMV附表和部分條件仍缺；S21也未提供上述機率及現金回收分母，所以本命題仍未驗證
+boundary: 未能公開重算不是保證一定損失或一定不損失，也不構成NVIDIA／OpenAI信用或法律判斷；只確認公開證據仍不足以完成該計算
+verification_needed: 可取得的完整逐租約參數與現金流、實際lease commencement／ready-for-service、Trigger Event、重租或出售回收、NVIDIA實際支付及OpenAI reimbursement結果
+correction_kind: supersedes
+corrects_claim_id: C19
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -879,7 +971,7 @@ invalidation: 若投入未轉為容量、需求與現金回收，或供應商文
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
 claim_ids: C16,C17,C18,C19
 metric: PORTS-Pike 殘值保證由第 0 層上限走到 ready-for-service、租約起租與保證生效、租戶正常付款或 Trigger Event、重租或出售回收、NVIDIA 實際補差額、OpenAI 補償的現金曝險
 source_ids: S14,S15,S16
@@ -889,6 +981,8 @@ frequency_detail: 2026-08-26 NVIDIA FY2027 Q2 結果後先查下一份 10-Q；�
 next_check: 2026-08-27
 trigger: 10-Q 提交完整保證 form，或出現逐租約最低值、lease commencement、ready-for-service、Trigger Event、重租／出售回收、NVIDIA 實際付款與 OpenAI reimbursement
 invalidation: 後續正式文件取消或修改保證、上限、生效條件、Trigger Event、回收公式、終止條款或 OpenAI 補償，使現有六時鐘與曝險邊界不再適用
+retired_at: 2026-08-28
+retirement_reason: 8/26已申報首次公開form但仍遮蔽；保留8/23歷史判讀，C19由C27接續；T5改追可重算參數及實際履約事件
 -->
 
 <!-- monitoring_item
@@ -972,10 +1066,23 @@ reason: micron_research_plan_rd_expense_capex_capacity_and_supplier_ledgers_sepa
 evidence: sources:S18,S19
 -->
 
+<!-- transition
+date: 2026-08-28
+from: triaged
+to: triaged
+reason: filed_redacted_guaranty_form_and_phase_boundaries_added_without_refreshing_thesis_clock
+evidence: sources:S21,S22
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **MD&A（管理階層討論與分析）**：申報文件中由管理層解釋營運、財務與風險的章節，仍應與報表附註及契約條文對照。
+- **FY2027／FY2029（公司會計年度）**：申報公司的財年名稱，不直接等於相同數字的日曆年度；本文不自行換算確定啟用日。
+- **Exhibit10.1（申報附件10.1）**：本次10-Q所附的保證範本，仍有遮蔽條款及省略附表。
+- **Covered Loss Amount（合約定義的損失金額）**：依保證條款計算的特定付款項目；公開公式有遮蔽，不等於所有可能付款。
+- **GMV（Guaranteed Minimum Value，保證最低值）**：逐租約附表定義的最低值及其變動曲線，不能直接用總上限代替。
 - **CapEx（資本支出）**：買進或建造可使用多年的資產，例如資料中心、伺服器與網路設備；公司對 CapEx 的揭露可能含現金購置、融資租賃或兩者。
 - **planned investment（計畫投資）**：管理層對未來投入範圍與時間窗的前瞻計畫；若沒有逐年核准額與實際數，它不是公告日已付款、當期費用、已下採購單或平均年度預算。
 - **R&D expense（研發費用）**：一段會計期間內列入損益的研發成本；它可能包含人員、開發／資格前晶圓等項目，卻不等於整份長期研究計畫的現金、資本化資產或未來產能。
@@ -1244,9 +1351,10 @@ own、operate，OpenAI 是 20 年租約的租戶；因此還要先辨認誰擁�
 
 公告日與 1,050 億美元額度先放在**第 0 層**：它告訴我們合約存在與最大邊界，卻還不是一個
 營運現金事件。之後才有六個經濟時鐘；它們也不是保證每份租約都以完全相同日期嚴格排隊。
-尤其 ready-for-service 與起租是否同日、哪一項是另一項的前提，仍要等完整 Agreements form
-才能逐份確認。第三個時鐘還會分岔：若 OpenAI 正常付款，後面的違約回收、補差額與補償可以
-一直不被啟動。
+尤其 ready-for-service 與起租是否同日、哪一項是另一項的前提，不能只靠摘要排成單一路徑。
+8/26已申報的範本對特定Covered Loss Amount設RFS條件，另有遮蔽的pre-RFS termination payment；
+不能把前一條件泛化為所有付款路徑。第三個時鐘還會分岔：若OpenAI正常付款，違約回收、補差額
+與補償分支可能不被啟動。[S21][S22]
 
 | 時鐘 | 本案公開文件寫到哪裡 | 這一步能證明什麼 | 還不能證明什麼 |
 |---|---|---|---|
@@ -1265,9 +1373,13 @@ own、operate，OpenAI 是 20 年租約的租戶；因此還要先辨認誰擁�
 若 NVIDIA 後來真的付款，研究上還要從實際付款另扣**實際收到**的 OpenAI 補償，才能接近
 最終淨曝險；只有一紙補償承諾，仍不能先當成已回收現金。
 
-這兩層目前都**不能代入完整數字**。8-K 明示現有描述不完整，完整 Agreements form 預計
-隨截至 2026 年 7 月 26 日季度的 10-Q 提交；在逐租約最低值、期限、回收與補償能力尚未公開
-前，只能確認法律摘要中的上限與瀑布，不能重算違約概率或預期損失。
+這兩層目前仍**不能代入完整數字**。8/23研究曾依8-K等待首次form；8/28回查確認，8/26的
+10-Q及Exhibit10.1已公開，這是文件節點的實質前進。10-Q把建設拆為九期，首期預計FY2029，
+保證金額隨各期完成增加，再隨租約履行下降；FY2029不是本輪已驗證的日曆啟用日。[S21]
+
+公開範本的Covered Loss Amount公式、Discount Rate、逐租約GMV附表及部分救濟／終止條件
+仍有遮蔽或未附。10-Q也明示OpenAI補償可能無法即時或全額回收。因此C19接續為C27，
+不是宣稱8/23當時的取件結果錯誤，也不把範本公開等同完整曝險已重算、實際觸發或已付款。[S21][S22]
 
 ### 多方小作文：信用支持可能先換來可建置的容量
 
@@ -1293,9 +1405,10 @@ NVIDIA 實付及 OpenAI 補償多少。若第 1、2 格完成且第 3 格維持�
 一直不被啟動，信用支持可能只扮演建置工具。
 若改走違約分支、回收不足且補償無法實現，上限內的或有責任才會逐步變成可觀察的現金風險。
 
-本段核對 `N=3` 份官方文件，但三份都屬 PORTS-Pike 同一交易、`N=1` 條交易消息鏈，不是三個
-獨立專案、三個客戶或三次違約樣本。合約金額與容量是發行人報告值，沒有抽樣母體，因此沒有
-sampling SE／t；逐租約完整 form、實際起租、違約、回收、付款與補償的共同觀測 `N=0`。
+8/23 的原段落核對 `N=3` 份官方文件；8/28 另核對 `N=2` 份正式申報物件（10-Q 與 Exhibit10.1），
+合計仍屬 PORTS-Pike 同一交易、`N=1` 條交易消息鏈，不是五個獨立專案或違約樣本。報告值
+不是隨機抽樣，sampling SE／t 不適用；逐租約完整參數、實際起租、違約、回收、付款與
+補償的共同觀測 `N=0`。本輪保留 SEC 官方頁的 web 文字截取；直接 HTTP 回 403，截取 SHA 不冒充原 HTML SHA。
 本段不提供法律意見、信用評等、價格、估值、共識、部位、投資建議或市場是否反映的判斷。
 
 ## 折舊是成本碼表，不是利用率碼表
@@ -1421,6 +1534,8 @@ Microsoft 的 684 RPO 與 Amazon 的 496 AWS 未來服務承諾也不是本期�
 - [Microsoft FY2026 Form 10-K：PP&E、折舊、未起租租賃與履約義務](https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm)
 - [Meta 2026 Q2 Form 10-Q：CIP、折舊、待售資產與尚未起租租賃](https://www.sec.gov/Archives/edgar/data/1326801/000162828026050705/meta-20260630.htm)
 - [Amazon 2026 Q2 Form 10-Q：非現金 PP&E、分部折舊與 AWS 履約義務](https://www.sec.gov/Archives/edgar/data/1018724/000101872426000026/amzn-20260630.htm)
+- [NVIDIA FY2027 Q2 Form 10-Q，2026-08-26](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm)（九期建設、FY2029預期、保證範圍與補償回收風險）。
+- [NVIDIA Exhibit10.1：保證範本](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda2027q2ex101.htm)（含遮蔽與省略參數；非完整逐租約可重算合約）。
 - [NVIDIA 2026-08-17 Form 8-K：PORTS-Pike 殘值保證](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm)（累計上限、生效條件、Trigger Event、回收、補差額、終止與 OpenAI 補償摘要）。
 - [NVIDIA／SB Energy SEC Exhibit 99.1：PORTS-Pike 專案與 15 億美元投資](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/sbeoainvidia-portsrelease.htm)（20 年租約、分期容量與 build／own／operate；屬同一交易附件）。
 - [OpenAI：PORTS-Pike 專案](https://openai.com/index/openai-joins-ports-pike-project/)（首批 800MW、completed-capacity payment 與許可／融資前提；OpenAI 是同一交易當事人）。

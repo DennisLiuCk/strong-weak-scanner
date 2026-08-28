@@ -248,6 +248,22 @@ limitation: OCP 正式發布的 v0.7.0 規格可證明共同要求已能定位�
 independence_group: sandisk-sk-hynix-ocp-hbf-spec
 -->
 
+<!-- research_source
+source_id: S14
+role: company_release
+source_kind: document
+publisher: Sandisk
+title: Sandisk Investor Day 2026 Presentation：HBF roadmap
+published_at: 2026-08-13
+captured_at: 2026-08-28
+accepted_at: 2026-08-28
+status: active
+url: https://investor.sandisk.com/static-files/c050c0a0-91fe-4186-bb34-3b331378060f
+locator: file p.96左欄memory die taped out／actual die picture及右欄inference product samples 2027；pp.83、87–89、94用於分清示意圖、模擬、共同開發與相鄰Tenstorrent產品。98頁PDF SHA-256 762d56ea3c25e3c8ca1c4e2ee23bdf80ae24af918b443ca292c2d683f336a5d6
+limitation: 本輪使用已存在Downloads檔，不是本輪新下載；WhereFroms同列官方PDF與event URL，大小與既有官方端點回應一致，但沒有發行方SHA可比對。tape-out和公司標示的die picture不是完整memory sample已交付、接收方測試、qualification或量產；模擬與匿名共同開發也不能補足產品共同鍵
+independence_group: sandisk
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -588,6 +604,20 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: Sandisk在2026-08-13 Investor Day簡報宣稱首顆HBF memory die已tape-out，並展示標示為實際裸晶的圖片；同頁仍把首批HBF inference product samples列為2027年的未來進度
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S14 file p.96左右兩欄與標籤已逐頁視覺核對，驗證的是公司披露內容及其已完成／規劃分層
+boundary: 不獨立認證照片或晶片功能，不證明完整HBF stack、具名part、對外收樣、客戶測試、qualification、量產、HBF替代HBM或任何台灣公司財務受惠；2027沒有足夠精度判定相對既有2027年初目標已延後
+verification_needed:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -723,10 +753,19 @@ reason: added_direct_hbf_v0_7_0_requirement_scope_and_conformance_boundary_witho
 evidence: sources:S13
 -->
 
+<!-- transition
+date: 2026-08-28
+from: triaged
+to: triaged
+reason: early_die_tapeout_disclosure_added_without_sample_delivery_or_thesis_clock_refresh
+evidence: sources:S14
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **Investor Day（投資人日）**：公司集中說明策略、產品與財務方向的活動；簡報中的已完成里程碑和未來規劃需分開核對。
 - **新記憶體層**：在既有高速工作記憶體與長期儲存之間增加一個資料位置；只有容量還不夠，系統還要知道哪些資料適合放進去。
 - **高頻寬快閃記憶體（HBF）**：嘗試把大量快閃記憶體平行化，再配上底部邏輯晶片，提高容量與讀取能力；OCP 已公開 v0.7.0 規格，但本輪仍沒有可核對的合規產品或實體樣品交付。
 - **高頻寬記憶體（HBM）**：把多層動態記憶體疊在一起並放在運算晶片附近；速度高，但容量、成本與封裝空間都有取捨。
@@ -1017,8 +1056,19 @@ HBF 若真的成為新記憶體層，不會只由一顆記憶體晶片完成。�
 | 裝置、系統與軟體 | 把記憶體放進具名裝置，安排資料搬移與工作負載 | 裝置介面、驅動、軟體調度與端到端結果 | 規格公告涵蓋軟體讀寫；裝置樣品仍是未來目標，沒有具名運行結果 | 加入規格 consortium 或單一展示板等於可部署產品 |
 | 客戶、製造與財務 | 完成資格認證、穩定製造、持續採購與財務揭露 | 通過條件、良率、出貨、重複訂單與同期間收入 | Google／Tenstorrent 只由聯合公告列為 consortium members；沒有產品通過、量產、訂單或 HBF 財務分子 | 參與技術驗證、規格發布或公司總營收等於 HBF 商業化成功 |
 
+### 8/28補查：裸晶tape-out和交付樣品仍是兩個節點
+
+Sandisk的8/13 Investor Day簡報第96頁，左欄宣稱首顆HBF memory die已tape-out並展示公司標為
+實際裸晶的圖；右欄則把首批HBF inference product samples列為2027年。已完成的裸晶節點
+不能跨欄借給未來產品樣品，更不能借用相鄰Tenstorrent系統頁的生產狀態。[S14]
+
+本輪用已存在的官方來源下載檔補足正文取件，對照下載來源metadata、官方連結、大小與活動日期，
+並目視引用頁。這是`N=1`公司簡報的披露核對，不是晶片功能或產品測試的獨立認證，SE/t不適用；
+沒有具名part、交付／接收方、版本化測試與財務共同鍵，T7仍未達送樣／資格門檻，C19與主命題時鐘不變。
+
 ## 來源與證據邊界
 
+- [Sandisk Investor Day 2026簡報](https://investor.sandisk.com/static-files/c050c0a0-91fe-4186-bb34-3b331378060f)（第96頁分列memory die tape-out與2027 inference產品樣品；公司陳述不等於交付／資格）。
 - [Sandisk／SK hynix HBF 標準化公告](https://www.sandisk.com/company/newsroom/press-releases/2026/2026-02-25-sandisk-and-sk-hynix-begin-global-standardization-of-next-generation-memory-solution-high-bandwidth-flash-hbf)（合作與 OCP workstream）。
 - [OCP Semi-Private Workstreams](https://www.opencompute.org/community/semi-private-workstreams)（HBF 工作組的獨立索引）。
 - [SK hynix TSMC Symposium 2026](https://news.skhynix.com/en/tsmc-technology-symposium-2026/)（NAND、KV cache 與 logic base die 技術位置）。

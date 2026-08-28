@@ -96,10 +96,20 @@ reason: separated_datacenter_volume_unit_revenue_recognized_revenue_nbm_and_rpo_
 evidence: sources:S24
 -->
 
+<!-- transition
+date: 2026-08-28
+from: triaged
+to: triaged
+reason: phison_q2_product_and_application_disclosures_added_without_operator_thesis_upgrade
+evidence: sources:S25
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **aiDAPTIV**：群聯的AI解決方案名稱；本文只沿用公司分類，不預設其對應特定operator、客戶或收入。
+- **Boot Drive（開機碟）**：儲存作業系統與啟動資料的裝置；其收入不能自動歸到訓練資料讀取或checkpoint。
 - **訓練資料**：用來讓模型學習的文字、圖片、聲音或其他樣本；訓練期間必須持續送到運算晶片。
 - **餵資料（Dataset fetch）**：在每一步運算前，把下一批訓練資料讀出並送到運算晶片；任何一台機器讀得太慢，都可能讓整群一起等待。
 - **保存進度（Checkpoint）**：定期把模型狀態與訓練進度存下來，故障後才能從最近一次紀錄接著跑，而不是全部重來。
@@ -218,6 +228,34 @@ evidence: sources:S24
 
 `證實` 只代表指定 operator／公司文件直接支持精確措辭；它不代表三家採用同一架構，
 也不代表任何台灣產品已進入其 BOM、通過 qualification 或產生可辨識收入。
+
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: 群聯8/13的Q2法說圖表仍把AI Ecosystem模組列為營收38%，範圍包括企業級SSD、aiDAPTIV、AI PC、AI網通、AI伺服器與Boot Drive，並非三條AI儲存I/O契約的拆分收入
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S25實體p5列圖表比例與Included Categories；本輪直接讀原PDF及引用頁render，沒有以Q1百分比代填Q2
+boundary: 38%為公司廣義應用分類的報告值，沒有抽樣誤差SE/t；不能當成純企業級SSD、訓練儲存、具名客戶或新訂單收入
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: verified
+status: active
+claim: 群聯Q2法說展示D206V Gen5企業級SSD及X3 Gen6控制器，海外拓展頁對台灣使用已在生產環境驗證的說法，AI Data Platform頁仍以未來演進描述平台方向
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-08-13
+basis: S25實體p22–23提供具名產品、p30提供公司部署階段陳述、p35–36區分平台組件與下一步；這些是公司披露本身的核對
+boundary: 海外拓展頁未列具名產品或客戶，不能把區域階段逕自歸給aiDAPTIV；沒有取得具名接收方的qualification、裝機或重複訂單分母、operator買方佐證、三條I/O契約收入或毛利；公司自述不升格為獨立客戶驗證，C7維持待驗
+verification_needed:
+resolution:
+-->
 
 <!-- research_claim
 claim_id: C1
@@ -976,7 +1014,33 @@ end markets 的長約存量，不能把它指定給 AI SSD、8299 群聯或任�
 因此個股研究的下一步不是估算受惠比例，而是依六關找出具名料號、客戶認證、正式部署分母、
 出貨與財務貢獻。在這些資料出現前，本文不支持個股排序、營收預測或投資動作。
 
+### 8/28回查：產品更具體，買方與收入仍未接上
+
+8/13的Q2法說仍把AI Ecosystem列為38%，涵蓋企業級SSD、aiDAPTIV、AI PC、AI網通、
+AI伺服器及Boot Drive。這是新的季度披露，並未把餵資料、保存進度與搬模型分成收入。[S25]
+
+法說展示D206V與X3，海外拓展頁對台灣使用已在生產環境驗證的說法，但沒有具名產品或客戶；
+AI Data Platform仍有下一步演進的語氣。產品與區域階段不能互相代填，仍缺具名operator、客戶驗證、
+付費部署、收入及毛利的共同鍵。這份法說是`N=1`公司文件，不是獨立客戶樣本，SE/t不適用；
+不改C5的三條I/O契約框架或C7的待驗證狀態，也不把本輪回查刷新成主命題已獲新驗證。[S25]
+
 ## 來源
+
+<!-- research_source
+source_id: S25
+role: company_release
+source_kind: document
+publisher: Phison Electronics
+independence_group: phison-issuer
+title: 群聯2026Q2法說會英文簡報：AI Ecosystem、Pascari與平台階段
+published_at: 2026-08-13
+captured_at: 2026-08-28
+accepted_at: 2026-08-28
+status: active
+url: https://www.phison.com/wp-content/uploads/2026/08/2Q26_Phison-Earnings-Call_EN_Official_uploaded-version.pdf
+locator: PDF實體第1、5、22–23、30、35–36頁；40頁原PDF SHA-256 e7cb0f9a27d39aa2cfb449bdc8ddee5fee1bfac353f1a68b2a39f1ce42aeca60；相同原檔封存於8299/28440cb2907b96ee44c7faafccb8c9e634c7373d0b6d2f71a3e97e021945c5fb的S4
+limitation: 公司對產品、部署階段及路線圖的陳述；沒有具名operator三條I/O契約、同一workload、客戶資格、訂單與可辨識財務分母；不拿展示效能與容量當外部benchmark
+-->
 
 <!-- research_source
 source_id: S1

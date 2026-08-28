@@ -7,8 +7,8 @@ status: triaged
 priority: p2
 captured_at: 2026-08-01
 source_published_at: 2026-07-13
-last_reviewed_at: 2026-08-12
-review_due: 2026-08-26
+last_reviewed_at: 2026-08-28
+review_due: 2026-09-04
 source_type: mixed
 publisher_domain: jedec.org
 canonical_url: https://www.jedec.org/news/pressreleases/new-jedec%C2%AE-sphbm4-standard-enables-hbm4-class-bandwidth-organic-substrates
@@ -18,11 +18,25 @@ group_ids: pcb,ipdesign,packtest
 trigger_type: industry_standard
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C7
+thesis_claim_id: C15
 base_confidence: medium
-confidence_basis: JEDEC 現行標準頁可確認 DRAM 堆疊、base die、分散式獨立通道與封裝路徑必須分層閱讀，Eliyan 也已提出具名 PHY 路徑；但 bump-map addendum 尚未公開、且沒有記憶體產品、跨廠互通、客戶資格或財務分子
+confidence_basis: JEDEC公開摘要仍支持DRAM堆疊、base die、分散式通道與封裝路徑分層閱讀；8/28已取得bump-map附錄公開catalog，關閉原文件可見度缺口，但未取得試算表內文，也沒有同版本產品互通、客戶資格或財務分子；Eliyan具名PHY仍限供應商陳述
 cross_company_numbers: false
 schema_migrated_at: 2026-08-02
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C1,C3,C5,C8,C9,C14,C15
+metric: JESD330-4-1實際版本檔、memory／base-die／host-PHY共同鍵及跨廠互通、封裝可靠度、系統資格與量產證據
+source_ids: S1,S2,S3,S6,S7,S10
+watch_source_ids: S10,S6,S7
+frequency: weekly
+frequency_detail: 每週檢查公開文件與具名實作者；取得實際試算表或任何記憶體／運算平台發布同版本產品證據即提前重審
+next_check: 2026-09-04
+trigger: 取得可核對版本及實際內容的bump-map試算表，或具名memory、base die與host PHY首次形成同版本silicon／互通／qualification共同鍵
+invalidation: 若完整接點圖、通道功耗延遲、封裝可靠度或系統工作負載無法閉合，或產品改用其他介面，快速產品化基準下修；文件可取得性不得替代產品結果
 -->
 
 <!-- transition
@@ -154,6 +168,22 @@ limitation: 這是 OCP 對一般 electrical D2D PHY 的量測框架，不是 JES
 independence_group: ocp-phy-metrics
 -->
 
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: living_index
+publisher: JEDEC
+title: JESD330-4-1 Addendum No. 1 to JESD330-4 SPHBM4 for Bump Map 公開catalog
+published_at:
+captured_at: 2026-08-28
+accepted_at: 2026-08-28
+status: active
+url: https://www.jedec.org/standards-documents/docs/jesd330-4-1
+locator: Release Number Rev 1.00、Published Aug 2026、device dimensions／bump map摘要與Free download／Registration or login required；jedec_addendum文字148–156行；原HTML SHA-256 dae77ff363b6d953bb602e2f29b2bfe383e32d69f0624732fc29984c8754e8ff
+limitation: 頁面只有發布月份，沒有精確發布日；只核對公開catalog，未取得實際試算表，不證明任一產品採用、互通、資格或量產
+independence_group: jedec
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -233,7 +263,7 @@ resolution:
 <!-- research_claim
 claim_id: C6
 label: verified
-status: active
+status: superseded
 claim: JESD330-4 Version 1.0 主標準已於 2026 年 6 月發布，但截至 2026-08-12，JESD330-4-1 bump-map addendum 仍只供 JC-42 會員，JEDEC 表示待董事會核准後才會把公開連結放上標準頁
 supporting_source_ids: S5
 contrary_source_ids:
@@ -243,14 +273,14 @@ boundary: 這只表示公開文件鏈仍有後續治理節點；不能推論 add
 verification_needed:
 correction_kind:
 corrects_claim_id:
-corrected_by_claim_id:
+corrected_by_claim_id: C14
 resolution:
 -->
 
 <!-- research_claim
 claim_id: C7
 label: inference
-status: active
+status: superseded
 claim: SPHBM4 不應只讀成「把 2,048 條資料線縮成 512 條」；研究上必須把 HBM4 DRAM 堆疊、interface base die 的通道轉換、分散式高速主機通道、bump map 與有機封裝路徑四層分開，並再逐關核對元件、封裝、系統、客戶與財務，任何一層成立都不能替其餘層補證據
 supporting_source_ids: S1,S2,S3,S5,S6,S7
 contrary_source_ids:
@@ -260,7 +290,7 @@ boundary: 四層框架不判斷 SPHBM4 與傳統 HBM4 的成本、功耗、延�
 verification_needed:
 correction_kind: supersedes
 corrects_claim_id: C2
-corrected_by_claim_id:
+corrected_by_claim_id: C15
 resolution:
 -->
 
@@ -366,6 +396,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: 截至2026-08-28，已可定位JEDEC的JESD330-4-1 bump-map附錄公開catalog；附錄頁列Rev 1.00及2026年8月發布，並提供要求註冊或登入的下載入口
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-08-28
+basis: correction_of:C6；S10公開catalog的版本、月份、摘要和下載條件已取得HTML並核對；這是8/12歷史觀察之後的文件可見度進展，未宣稱舊日快照錯誤
+boundary: 未取得試算表本體，不能宣稱已核對尺寸、接點圖、完整電氣規格或測試；公開catalog不等於記憶體、base die或host PHY已互通、通過資格或量產
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C6
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: inference
+status: active
+claim: SPHBM4仍須把HBM4 DRAM堆疊、interface base die通道轉換、分散式高速主機通道、bump map與有機封裝路徑四層分開驗證；bump-map附錄的公開catalog節點已前進，但本輪尚未取得試算表，也沒有把同版本memory、base die與host PHY接到跨廠互通、封裝可靠度、客戶資格和財務結果
+supporting_source_ids: S1,S2,S3,S5,S6,S7,S10
+contrary_source_ids:
+as_of: 2026-08-28
+basis: correction_of:C7；S10更新C7原basis的公開文件節點，其餘四層及供應商陳述邊界延續既有來源；文件公開進展只關閉可見度缺口，不替代實際規格內容或產品共同鍵
+boundary: 不比較SPHBM4與傳統HBM4的成本、功耗、延遲、可靠度或滲透率；不把Eliyan或台灣PCB、矽智財與封測公司升格為已採用、已量產或有新增財務貢獻的供應商
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C7
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -398,7 +462,7 @@ invalidation: 若只有產業標準推導而沒有公司級產品與財務證據
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
 claim_ids: C1,C3,C5,C6,C7,C8,C9
 metric: JESD330-4 公開文件鏈、具名記憶體／base-die／host PHY、跨廠互通、封裝可靠度、系統資格與量產證據
 source_ids: S1,S2,S3,S5,S6,S7
@@ -408,6 +472,8 @@ frequency_detail: 每兩週檢查 JEDEC 標準頁與具名實作者；記憶體�
 next_check: 2026-08-26
 trigger: JESD330-4-1 公開，或任一記憶體／運算平台以同一版本列名 SPHBM4 memory、base die、host PHY、silicon 或 qualification
 invalidation: 若完整 bump map、通道功耗延遲、封裝可靠度或系統工作負載長期無法閉合，或產品改採其他介面路徑，SPHBM4 快速產品化基準下修
+retired_at: 2026-08-28
+retirement_reason: 公開附錄catalog節點已到；保留8/12歷史觀察，C6/C7由C14/C15接續；新T4改追實際試算表與同版本產品證據
 -->
 
 <!-- transition
@@ -458,10 +524,20 @@ reason: lane_raw_payload_energy_and_phy_measurement_passport_added_without_thesi
 evidence: sources:S1,S5,S6,S8
 -->
 
+<!-- transition
+date: 2026-08-28
+from: triaged
+to: triaged
+reason: public_bump_map_catalog_added_with_workbook_and_product_qualification_boundaries_preserved
+evidence: sources:S10
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **Rev（版本修訂）**：文件發行方的版本標記；公開版本目錄不代表已取得或核對內文。
+- **host-PHY（主機端實體介面）**：運算晶片端負責電氣訊號收發的介面，仍須和記憶體、底部介面晶片及封裝以同一版本驗證。
 - **記憶體堆疊**：把多層記憶體裸晶垂直整合，以增加容量與資料傳輸量；層數增加也會提高接合、測試、供電與散熱難度。
 - **記憶體裸晶（memory die／DRAM die）**：尚未完成封裝的單片動態記憶體晶片；上方裸晶沿用同一世代，不代表底部介面與封裝路徑也相同。
 - **運算晶片／主機端**：接收記憶體資料並執行運算的一側；本文的「主機側訊號」是連到這一側的資料線，不是整個封裝的全部接點。
@@ -508,7 +584,7 @@ evidence: sources:S1,S5,S6,S8
 
 - 記憶體可以用很多條較慢的資料線，也可以用較少但更快的資料線；後者減少接點，卻把壓力移到每線速度、訊號品質、功耗與測試。
 - 新路徑不只把四條資料合成一條更快的線；每條主機通道可以獨立工作、彼此不必同步，因此控制、時序與驗證也要逐通道閉合。
-- 主標準與一家供應商的對應介面路徑已出現，但封裝接點附錄仍未公開，也沒有具名記憶體、系統整合、客戶認證、量產產品或可辨識收入。
+- 主標準與一家供應商的對應介面路徑已出現；封裝接點附錄已有公開目錄，但本輪尚未取得完整內容，也沒有具名記憶體、系統整合、客戶認證、量產產品或可辨識收入。
 
 ### 為什麼重要
 
@@ -522,14 +598,14 @@ evidence: sources:S1,S5,S6,S8
 
 ### 接下來怎麼追
 
-- 先等封裝接點附錄公開，固定主標準、附錄與實作者各自使用的版本，避免把同名介面當成同一實作。
+- 先取得並核對接點附錄的完整試算表，固定主標準、附錄與實作者各自使用的版本，避免把公開目錄當成已讀完內容，或把同名介面當成同一實作。
 - 再找具名底部介面晶片、主機端介面與完整記憶體，核對通道、時脈、功耗、延遲、錯誤處理、基板、熱與可靠度。
 - 最後找運算晶片或系統端的跨廠測試、客戶認證、量產出貨與可辨識收入；沒有雙向文件前，不建立台灣公司訂單。
 
 ### 想一想
 
 - 把四條資料線合成一條更快的線後，哪些難題會從封裝接點移到晶片、基板、供電與測試？
-- 一份主標準、尚未公開的接點附錄、一顆供應商介面晶片與一套可出貨系統，分別證明了什麼？
+- 一份主標準、只核對目錄而未讀到內容的接點附錄、一顆供應商介面晶片與一套可出貨系統，分別證明了什麼？
 - 如果總搬運量相同，卻讓等待時間、錯誤率或良率變差，這條路徑應全面替代、只做補充，還是暫時不被採用？
 
 ## 先把一顆 SPHBM4 拆成四層
@@ -626,7 +702,7 @@ OCP 白皮書沒有把一個 latency 或 BER 數字用到底。它把資料路�
 OCP 把 PHY bandwidth per shoreline、packaging type、minimum bump pitch 與 reach 分開列欄。
 這提醒我們：頻寬密度的分母是實際晶粒邊緣寬度，不是資料訊號數；512 也不是總接點數。要重算
 Tbps/mm，還要知道 Tx／Rx 方向、data／clock／sideband／power／ground 配置、bump map、pitch、
-可堆疊單元與占用 beachfront。JEDEC 接點附錄尚未公開時，這些幾何不能用猜的。
+可堆疊單元與占用 beachfront。本輪只核對 JEDEC 接點附錄的公開目錄，還未取得試算表，這些幾何仍不能用猜的。
 
 Eliyan 現行 NuLink-SP 產品表已把 process node、lane、per-lane rate、beachfront／area bandwidth
 與 reach 分開，這證明實作者知道不能只報 aggregate bandwidth；但它仍是單一供應商對相鄰 D2D
@@ -705,7 +781,7 @@ pp.32–42 已由官方瀏覽器 PDF viewer 逐頁渲染目視核對。命令列
 | 本文七關 | 這一關要證明 | 本輪已有證據 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
 | 1. 主標準發布 | 多方已有共同的記憶體、base die 與主機通道規則 | JESD330-4 Version 1.0 已發布，公開摘要列出四比一通道轉換與有機基板路徑 | 完整規格的公開可定位條文或正式版本變更 | 已有封裝接點圖、產品、互通、成本優勢或供應商訂單 |
-| 2. 封裝接點契約公開 | 實作者可以對上同一版接點、命令、時脈、電源與接地配置 | JEDEC 頁面列出 JESD330-4-1 bump-map addendum，但仍只供會員 | 董事會核准後的公開 addendum、版本與變更紀錄 | addendum 尚未公開等於技術失敗，或任一基板商已取得量產規格 |
+| 2. 封裝接點契約公開 | 實作者可以對上同一版接點、命令、時脈、電源與接地配置 | 8/28已取得JESD330-4-1公開catalog，列Rev 1.00及2026年8月發布；下載仍要求註冊或登入 | 實際試算表內容、版本、尺寸與接點圖核對 | 公開目錄等於已核對完整規格、產品互通或量產資格 |
 | 3. 介面晶片與主機 PHY 完成 | 轉換與主機端邏輯已被設計、製造並可測 | Eliyan 宣稱 NuLink-SP 對應 SPHBM4；尚無本輪可核對的 compliance 或 silicon 結果 | 具名 base die／host PHY、製程、datasheet、功耗、延遲、錯誤率與版本 | 一家供應商的產品定位等於記憶體廠採用、跨廠互通或任一台灣設計服務公司得單 |
 | 4. 記憶體與封裝樣品完成 | 裸晶、介面晶片、基板與封裝能組成可測產品 | 本輪沒有完成證據 | 具名樣品、容量、速度、材料、熱、良率與可靠度結果 | 路線可行就等於樣品已交付或成本較低 |
 | 5. 運算晶片與系統整合 | 主機端能控制新記憶體並完成目標工作負載 | 本輪沒有完成證據 | 具名運算晶片、控制器、系統、配置與端到端實測 | 單一展示板等於可部署產品或所有平台都適用 |
@@ -716,7 +792,7 @@ pp.32–42 已由官方瀏覽器 PDF viewer 逐頁渲染目視核對。命令列
 
 - **既有第四代高頻寬記憶體**：Micron 2026-06-24 表示產品已對主力客戶平台大量出貨，並向多個終端客戶提供認證樣品；這是公司對既有路徑的正式披露，不證明採用新標準。
 - **既有強化版本**：Micron 把 HBM4E 量產預期放在 2027 年；SK hynix 2026-06-18 宣布送出 12 層 HBM4E 樣品。前者是未來時程，後者是樣品，兩者都不等於 SPHBM4。
-- **SPHBM4 公開文件**：JESD330-4 Version 1.0 已發布，公開摘要足以確認四層架構；但 JESD330-4-1 bump-map addendum 截至 2026-08-12 仍只供 JC-42 會員，等待董事會核准後公開。
+- **SPHBM4 公開文件**：JESD330-4 Version 1.0 已發布，公開摘要足以確認四層架構。8/12快照中的附錄仍只供會員；8/28已可定位JESD330-4-1公開catalog，列Rev 1.00及2026年8月發布。這是後來的文件進展，不是把8/12的歷史觀察判成錯誤；本輪未登入下載試算表，仍未核對完整接點與尺寸。[S5][S10]
 - **介面供應商與完整產品**：Eliyan 已把 NuLink-SP 定位為 SPHBM4 PHY 路徑，但本輪沒有 compliance report、具名 memory／base-die／host-PHY silicon 組合、跨廠互通、記憶體樣品或運算平台採用。
 
 因此不能用「新標準已發布」覆蓋「既有產品已在出貨」的現實。較合理的基準情境是：既有路徑
@@ -727,15 +803,16 @@ pp.32–42 已由官方瀏覽器 PDF viewer 逐頁渲染目視核對。命令列
 
 - [JEDEC：JESD330-4 SPHBM4 標準，2026-07-13](https://www.jedec.org/news/pressreleases/new-jedec%C2%AE-sphbm4-standard-enables-hbm4-class-bandwidth-organic-substrates)
 - [JEDEC：JESD330-4 Version 1.0 與 bump-map addendum 現況](https://www.jedec.org/standards-documents/docs/jesd330-4)
+- [JEDEC：JESD330-4-1 Rev 1.00公開catalog](https://www.jedec.org/standards-documents/docs/jesd330-4-1)（8/28取得；只列2026年8月，沒有精確發布日；試算表尚未取得）。
 - [Eliyan：NuLink-SP 標準有機封裝 D2D PHY 產品頁](https://eliyan.com/products/)
 - [Eliyan：NuLink-SP 與 SPHBM4 官方公司貼文](https://www.linkedin.com/posts/eliyan-corporation_hbm4-and-sphbm4-scaling-memory-bandwidth-activity-7447249719749156864-xvXH)
 - [Open Compute Project：Electrical Interfaces Performance Metrics](https://www.opencompute.org/documents/odsa-whitepaper-2024-electrical-interfaces-performance-metrics-nov-19-2024-docx-pdf)（一般 D2D PHY 量測方法，不是 SPHBM4 規格或產品成績）。
 - [Micron：2026 財年第三季產品進度，2026-06-24](https://investors.micron.com/node/50671)
 - [SK hynix：12 層 HBM4E 樣品，2026-06-18](https://news.skhynix.com/en/12-layer-hbm4e-sample-1/)
 
-**已知：** SPHBM4 的 DRAM 堆疊、base die、獨立分散式通道與有機封裝方向已成為 JEDEC 標準；bump-map addendum 尚待公開核准；Eliyan 已宣稱具名 PHY 路徑；傳統 HBM4 已有記憶體供應商宣稱大量出貨。
+**已知：** SPHBM4 的 DRAM 堆疊、base die、獨立分散式通道與有機封裝方向已成為 JEDEC 標準；8/28已取得bump-map附錄的公開catalog與版本月份，尚未取得實際試算表。Eliyan 已宣稱具名 PHY 路徑；傳統 HBM4 已有記憶體供應商宣稱大量出貨。
 
-**還不知道：** 公開核准 bump map、第一個符合相同版本的 SPHBM4 記憶體產品、加速器客戶、base-die 與 host-PHY 組合、跨廠互通、封裝商、基板材料、認證時程，以及相對傳統 HBM4 的成本、功耗、延遲、良率與可靠度。
+**還不知道：** 實際bump-map試算表的尺寸與接點細節、第一個符合相同版本的 SPHBM4 記憶體產品、加速器客戶、base-die 與 host-PHY 組合、跨廠互通、封裝商、基板材料、認證時程，以及相對傳統 HBM4 的成本、功耗、延遲、良率與可靠度。
 
 **不可外推：** 「標準有機基板」不能直接等同 ABF 或 BT，也不能指定欣興、景碩、南電；「HBM4 級頻寬」是 JEDEC 的架構敘述，不是公開系統 benchmark。沒有價格、估值、共識與部位資料，本題不判斷市場是否已反映。
 
@@ -749,8 +826,8 @@ stock_ids:
 direction: uncertain
 hypothesis_refs:
 note_action: watch
-action_due: 2026-08-26
-rationale: SPHBM4 明確把介面導向標準有機基板，可能改變高階基板需求；但 bump-map addendum 尚未公開，也沒有材料規格、供應商、客戶或量產。
+action_due: 2026-09-04
+rationale: SPHBM4把介面導向標準有機基板，可能改變高階基板需求；8/28附錄公開catalog已到，但本輪未取得實際試算表，也沒有材料、供應商、客戶或量產共同鍵。
 evidence_boundary: JEDEC 未指定 ABF或BT，也未列名3037、3189、8046；只構成族群搜尋觸發。
 -->
 
@@ -760,7 +837,7 @@ stock_ids:
 direction: uncertain
 hypothesis_refs:
 note_action: watch
-action_due: 2026-08-26
+action_due: 2026-09-04
 rationale: 新 interface base die、獨立主機通道與高速序列化提高邏輯設計重要性；Eliyan 已提出具名 PHY 路徑，但沒有 compliance、記憶體採用或台灣公司商業角色。
 evidence_boundary: 不能把需要base die或單一海外供應商產品定位自動映射成任一台灣ASIC設計服務或高速介面公司訂單。
 -->
@@ -771,14 +848,14 @@ stock_ids:
 direction: uncertain
 hypothesis_refs:
 note_action: watch
-action_due: 2026-08-26
-rationale: 從矽基高密度路徑轉向有機基板可能改變接點圖、組裝與測試流程，但公開 addendum、封裝商、良率與量產線證據仍未閉合。
+action_due: 2026-09-04
+rationale: 從矽基高密度路徑轉向有機基板可能改變接點圖、組裝與測試流程；公開catalog已到，實際試算表、封裝商、良率與量產線仍未閉合。
 evidence_boundary: 記憶體供應商具自有封裝能力，標準發布不等於外部OSAT承接；不列個股。
 -->
 
 ## 下一個可證明／否定的節點
 
-- **公開實作契約**：JEDEC 公開董事會核准的 JESD330-4-1 bump-map addendum，並可核對版本與變更；未公開前，不把資料訊號數轉成完整接點與基板規格。
+- **公開實作契約**：下一步取得JESD330-4-1的實際試算表，核對尺寸、接點、版本與變更；目前只取得公開catalog，不把資料訊號數轉成完整接點與基板規格。
 - **產品化**：任一記憶體廠公布符合具名 JESD330-4／addendum 版本的 SPHBM4 樣品、base die、host PHY、容量、速度與量產時程；若未出現，維持標準與供應商路徑觀察。
 - **客戶採用**：任一加速器或系統廠具名採用 JESD330-4，並說明傳統 HBM4 與 SPHBM4 的使用場景；沒有具名客戶，不談滲透率。
 - **工程裁決**：公開功耗、延遲、bit error rate、封裝面積、良率與可靠度。若序列化與長通道代價抵銷基板優勢，快速採用假說被否定。
