@@ -1,0 +1,181 @@
+{
+  "content_as_of": "2026-08-29",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        4,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 59,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "1b5a81a0c9ddca3451296897eded9c24fe3aed3faa5571bcbd85b05b8e634a38",
+      "size_bytes": 7619379,
+      "url": "https://www.faraday-tech.com/resources/PDFFile/IR/AnnualReport/Faraday_AnnualReport_2026_A4_cht.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        4,
+        5,
+        7,
+        10,
+        47
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 94,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        46,
+        47,
+        48
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "3d8b7095c98c0a8b4643b1018e33ab15676a13b6775dcfdf31b71839c51cb748",
+      "size_bytes": 1005648,
+      "url": "https://www.faraday-tech.com/resources/PDFFile/IR/FiancalReport/25Q4.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        15,
+        16,
+        17,
+        25,
+        26,
+        27,
+        28,
+        35,
+        38,
+        39,
+        41,
+        42,
+        43
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 75,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        14,
+        15,
+        16,
+        17,
+        18,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "7ed866b210f9175272ab10e0a106572a69f786d68c16d3dfe3dca009d98e02c9",
+      "size_bytes": 801396,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3035&year=115&seamon=&mtype=A"
+    },
+    {
+      "cited_pages": [
+        1,
+        4,
+        5,
+        7,
+        8,
+        9
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 11,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "fd15408cbeb21f4bd499fe1f099f6fb67ac637bdb83025e102ab062cc17b436c",
+      "size_bytes": 702596,
+      "url": "https://www.faraday-tech.com/resources/PDFFile/IR/QuarterlyResultsFiles/2026Q2_IRConferencePresentation_CH.pdf"
+    }
+  ],
+  "pack_sha256": "f2ed3de7e4ea431e46b5f80c1177bafb59793c7a8775d4ac722c43a6ffde6d49",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3035",
+  "unverified_claims_removed": true
+}
