@@ -57,6 +57,17 @@
 runner，依固定 commit、不可變 artifact ID 與另一通道傳遞的 manifest pin 驗證。
 原型 artifact 只保留一天，不是長期備份政策。遠端結果須以實際 Actions run 補記。
 
+`2a58412b08616efd69ad22b52ba47f83d38b9521` 推送後，
+[一般 tests CI](https://github.com/DennisLiuCk/strong-weak-scanner/actions/runs/33215566627)
+在 Ubuntu 24、CPython 3.12.14 執行 642 項測試並成功；
+[qualitative-quality](https://github.com/DennisLiuCk/strong-weak-scanner/actions/runs/33215566654)
+與 [Pages](https://github.com/DennisLiuCk/strong-weak-scanner/actions/runs/33215564131) 也成功。
+這些不等於完整 DB artifact 遠端復原通過。
+
+**真實 DB 的手動演練尚未執行**：將整份 SQLite 壓縮包上傳到本 repo 的 GitHub Actions
+artifact（保留一天）需要使用者明確同意，執行授權審查未放行；沒有改走其他上傳途徑。
+完成這個授權與兩個 runner 的實際驗收前，遠端復原維持待辦。
+
 正式切換前仍需決定長期後端、保留／離線災難復原政策、權限與配額費用，並整合
 checkpoint／final／財報／週報的共同版本契約。所有 main writer 的排隊與衝突標紅、
 final commit 與 Pages SHA 一致性仍是必驗條件；這次沒有改動它們。

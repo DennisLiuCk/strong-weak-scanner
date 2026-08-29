@@ -542,6 +542,21 @@ limitation: 此來源是指定月份索引的當日觀察與附件定位，不�
 independence_group: twse-mops
 -->
 
+<!-- research_source
+source_id: S34
+role: company_filing
+source_kind: document
+publisher: ASE Technology Holding
+title: 日月光投控2026Q2法說簡報（2026-07-30）
+published_at: 2026-07-30
+captured_at: 2026-08-29
+accepted_at: 2026-08-29
+status: active
+url: https://mopsov.twse.com.tw/nas/STR/371120260730M001.pdf
+locator: 本輪取得17頁、704206 bytes的MOPS官方PDF，SHA-256 2cb26bc6f977c4fe48323ec1f1ea6aea2085ae2297f8566ba46ae88f1abfa524；第2頁前瞻性聲明、第3頁美元口徑2026年展望與H1投入、第4頁市場動態與定位。此為本輪核心7/30法說；公司IR回403，未成功讀到115年8月法說場次清單，不宣稱截至8/29最新。
+limitation: 公司全年LEAP展望與資本投入不是全年實績、同口徑CoWoS月產能、四家具名客戶訂單或CPO收入；中文簡報與同場英文SEC附件屬同一發行人消息鏈，不是外部獨立驗證。
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -1003,6 +1018,23 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C32
+label: verified
+status: active
+claim: 日月光投控7/30法說以美元口徑表示，2026全年LEAP營收預期超過先前35億美元的展望；這是公司當時的前瞻性披露，不是已實現全年收入
+supporting_source_ids: S34
+contrary_source_ids:
+as_of: 2026-07-30
+basis: 實際取得S34並固定PDF指紋後，逐頁影像核對第3頁的美元口徑、LEAP全年展望與第2頁前瞻性聲明；8/29是本輪捕捉與核對日，不回填成7/30已由本研究系統看見。
+boundary: N=1發行人、1場法說的精確披露核對，不是抽樣估計，SE／t不適用；LEAP美元營收展望不能換算成CoWoS每月2萬片、四家各自外溢訂單或CPO財務分子，也不刷新C15主命題時鐘。
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -1250,6 +1282,22 @@ reason: completed_faraday_focused_q2_independent_review_without_refreshing_thesi
 evidence: sources:S15,S16,S27
 -->
 
+<!-- transition
+date: 2026-08-29
+from: triaged
+to: triaged
+reason: registered_aseh_q2_usd_guidance_with_bounded_freshness_without_refreshing_thesis_clock
+evidence: sources:S34
+-->
+
+<!-- transition
+date: 2026-08-29
+from: triaged
+to: triaged
+reason: completed_aseh_focused_q2_independent_review_without_refreshing_thesis_clock
+evidence: sources:S24,S34
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -1288,12 +1336,14 @@ evidence: sources:S15,S16,S27
 - **電子組裝（EMS）**：替客戶設計、組裝與製造電子或通訊產品的服務；它和晶片封裝、晶片測試是不同商業活動。
 - **部門稅前淨利**：公司用來衡量部門績效的一種口徑；若報表沒有稱為營業利益，就不能拿它直接計算或命名為部門營益率。
 - **CoWoS**：台積電的先進封裝平台名稱；產業需求上升不代表每一家封測或設備公司的具名訂單、收入與毛利已經成立。
+- **CPO（共同封裝光學）**：把光學元件與交換晶片更靠近整合的架構；供應鏈角色公告不等於具名訂單、公司收入或毛利已經成立。
+- **LEAP（公司收入分類）**：日月光投控法說使用的收入分類名稱；這次引述的是公司全年美元展望，不能用它代替 CoWoS 月產能或具名客戶收入。[S34]
 - **DRAM／SSD**：DRAM 是運算時暫存資料的動態記憶體；SSD 是以 NAND Flash 儲存資料的固態硬碟。兩者價格、庫存與需求週期不同。
 - **HARD finding**：證據包複核時的硬性缺口，例如引用頁缺失、檔案不一致或數字無法重算；未清除前不能簽核正式筆記。
 
 ### 三句話抓重點
 
-- 8 月 12 日同參數重查時，六檔中已有五檔 Q2 完整附件；8 月 28 日另取得弘塑完整季報，8 月 29 日弘塑與智原各自完成四份核心文件的證據包與獨立複核。其餘四檔仍待完整複核，不能把附件取得或單篇完成當成整批完成。
+- 8 月 12 日同參數重查時，六檔中已有五檔 Q2 完整附件；8 月 28 日另取得弘塑完整季報，8 月 29 日弘塑、智原與日月光投控各自完成四份核心文件的證據包與獨立複核。其餘三檔仍待完整複核，不能把附件取得或單篇完成當成整批完成。
 - 智原要分 NRE 與 MP，同欣電要分產品、應用與擴產時鐘，德微要分部門、關係人、終端應用與持股處分現金，威剛要把獲利與營運資金一起讀，日月光投控則要拆封裝、測試與電子組裝；這些公司不能共用一個「AI 收入」分母。
 - 文件上線只解決「能不能讀」，不會自動解決「哪個商業階段、哪個財務分母、AI 分子是多少」；季報沒有揭露的 AI 收入必須留白。
 
@@ -1743,6 +1793,11 @@ SE／t 值。
 定義為稅前淨利，本文也不拿它計算或命名為「部門營益率」。同理，2026H1 購置不動產、廠房
 及設備支付的 `127,470,420` 千元是全集團數字，財報沒有把它拆成 AI 或先進封裝資本支出。
 
+本輪另取得的 7/30 法說以美元口徑表示，2026 全年 LEAP 服務營收
+預期超過先前的 35 億美元展望。[S34][C32] 這能確認公司的指引，不能當作全年實績，
+也不能換算為 CoWoS 月產能或特定客戶收入。部門收入、LEAP 展望與晶圓片數各有不同
+分母，不能互相補空缺；本輪也未完成 8 月所有法說場次查詢，不稱這份簡報為最新文件。
+
 公司 3 月公告的高雄新廠投資額為新台幣 178 億元，規劃高階封裝、測試與系統驗證，預計到
 2028Q2 完工。這是理解技術方向與未來產能節點的材料，不能倒填成 2026H1 已投產、已產生收入
 或已取得具名客戶。季報告訴我們「集團今天的財務分母」，建廠公告告訴我們「未來想增加哪種
@@ -1764,13 +1819,22 @@ SE／t 值。
 「NRE 開發→MP 量產」等商業階段，最後找對「獲利→營運資金→現金」或「封裝／測試／
 電子組裝→內部銷除」的財務分母。這樣才能知道文件真正回答了什麼，也能清楚標出沒有回答的
 AI 收入、具名客戶、量產轉化與專案毛利。本文的內容級逐頁核對不替代正式筆記的獨立複核。
-8/29 弘塑另以四份核心文件完成 frozen evidence pack 與不同 reviewer 離線重算；其餘
-智原、同欣電、德微、威剛及日月光投控仍待各自完成，不能把同一研究者的閱讀升格為
-`independently_verified`。
+8/29 弘塑另以四份核心文件完成 frozen evidence pack 與不同 reviewer 離線重算；在該
+里程碑當下，其餘智原、同欣電、德微、威剛及日月光投控仍待各自完成，不能把同一研究者
+的閱讀升格為 `independently_verified`。
 
 **8/29 本輪後續：** 智原也已完成四份核心文件的凍結證據包與不同 reviewer 離線重算，
 正式筆記及 manifest 已單獨提交。此刻尚待各自完成正式 Q2 複核的是同欣電、德微、威剛與
 日月光投控；不因智原完成而關閉其他公司的待辦，也不刷新 C15 主命題時鐘。
+
+**8/29 本輪再完成：** 日月光投控也以四份核心文件完成 focused_v1 與不同 reviewer 的
+同 pack 離線複核。33 個重要主張、43 個引用頁、83 張引用／相鄰頁圖與 141 項獨立重算
+是工作覆蓋計數，不是統計樣本；內容 SHA 為
+`0729fb271afb35e726d31434f0cbf9e166b94612922d9fb858ef16e3ca56648a`，pack 為
+`847eee6fa37cca78ff5dc35e6753d3dc9e284c9cb1d12981ef8c930d7bb8df3d`，筆記與 manifest
+已在 `0f1b571` 獨立提交。這次更正舊筆記把 Q1 EBITDA 誤作設備支出的圖例錯誤，並保留
+合併／ATM／EMS、季度／H1、美元／台幣與查核／核閱的分母邊界；只關閉 3711 正式筆記，
+同欣電、德微與威剛仍待完成，也不刷新 C15 主命題時鐘。
 
 同欣電的 Q2 法說與核閱季報再補上一種常見錯位：產品別、應用別與客戶別是不同維度；設備
 增置、現金付現、工程承諾、完工驗收與量產收入也不是同一個擴產日期。公開數字可以各自重算，
@@ -1849,6 +1913,15 @@ AI 收入、具名客戶、量產轉化與專案毛利。本文的內容級逐�
   稅前淨利，但沒有 AI 或先進封裝收入。[高雄新廠公告](https://www.aseglobal.com/press-room/ase-breaks-ground-on-new-high-tech-facility-in-kaohsiung/)
   可定位 178 億元投資、高階封裝測試用途與 2028Q2 預計完工，不能倒填成 2026H1 已投產或
   已產生財務貢獻。
+  **8/29 後續完成：** 本輪再以中文年報、年度查核財報、Q2 核閱季報與 7/30 核心法說
+  建立同一凍結 pack，由不同 reviewer 逐項離線核對 33 個重要主張、43 個引用頁、83 張
+  引用／相鄰頁圖及 141 項獨立公式／直接值，HARD 0。內容 SHA 為
+  `0729fb271afb35e726d31434f0cbf9e166b94612922d9fb858ef16e3ca56648a`，pack 為
+  `847eee6fa37cca78ff5dc35e6753d3dc9e284c9cb1d12981ef8c930d7bb8df3d`，正式筆記與
+  manifest 已在 `0f1b571` 獨立提交。S24 原本只證明 8/12 可定位附件的歷史邊界仍保留；
+  新 S34／C32 只支持公司全年 LEAP 美元展望，不證實 2 萬片月產能、四家訂單、CPO 收入
+  或全年實績。舊 Q1 設備支出與 EBITDA 圖例已更正，來源間 1 千元／72 千元末位差保留在
+  正式筆記衝突摘要；不因此改寫 H1／H2 原反證條件、8/31 期限或 C15 主命題時鐘。
 - [弘塑 MOPS 文件索引](https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3131&year=115&seamon=2&mtype=A)
   截至 8 月 12 日仍未回傳可定位的 115Q2 附件。這是有檢查時間與固定參數的未定位結果，
   不代表逾期、未通過董事會或公司營運轉弱，也不能用 CoWoS 產業需求代替具名急單與財報。
@@ -1912,13 +1985,24 @@ evidence_boundary: 財報可證實獲利、存貨／應收現金占用與融資�
 
 <!-- impact
 group_id: packtest
-stock_ids: 6271,3711
+stock_ids: 6271
 direction: uncertain
-hypothesis_refs: 6271:H1,6271:H2,3711:H1,3711:H2
+hypothesis_refs: 6271:H1,6271:H2
 note_action: update_required
 action_due: 2026-08-19
-rationale: 同欣電與日月光投控的 MOPS 完整附件均已定位；本文已分別拆出同欣電產品／應用／擴產時鐘，以及日月光投控封裝／測試／電子組裝與內部銷除，兩家公司仍各自等待 frozen pack 與獨立 reviewer
-evidence_boundary: 日月光投控部門收入與全集團資本支出不能改寫成 AI／先進封裝收入、CoWoS 分子或部門營益率；同欣電產品池、應用占比、設備增置、付現與工程承諾也不能交叉補成車用影像、光通訊／AI 收入或新廠已量產
+rationale: 同欣電 MOPS 完整附件已定位，本文已拆出產品／應用／擴產時鐘；下一步仍是建立 frozen pack 並由不同 reviewer 離線重算後更新正式筆記
+evidence_boundary: 同欣電產品池、應用占比、設備增置、付現與工程承諾不能交叉補成車用影像、光通訊／AI 收入或新廠已量產
+-->
+
+<!-- impact
+group_id: packtest
+stock_ids: 3711
+direction: uncertain
+hypothesis_refs: 3711:H1,3711:H2
+note_action: done
+action_due:
+rationale: 8/29以年報、年度查核財報、Q2核閱季報與7/30核心法說完成四文件focused_v1；33個重要主張由不同reviewer在同一pack逐項複核，正式筆記與manifest已獨立提交，只關閉3711正式Q2更新
+evidence_boundary: LEAP全年美元展望不是全年實績、2萬片月產能或四家具名訂單；部門收入、全集團資本支出與CPO角色也不能改寫成AI／先進封裝收入或部門營益率，H1／H2維持open／weak及原8/31期限
 -->
 
 <!-- impact
@@ -1954,13 +2038,13 @@ evidence_boundary: 合併層的部分合約負債轉收入不是具名CoWoS急�
 - 德微下一季繼續用 H1／九個月累計減前期重建三部門單季外部收入，並分開追 Diodes 關係人
   銷售與應收、存貨、營業現金流及借款；AI server 晶圓與小訊號新品則要求料號、終端客戶、
   量產數量、價格、毛利與重複訂單，不用部門名稱、合併毛利或持股處分現金代替。
-- 智原、同欣電、德微、威剛、日月光投控及8/28新定位的弘塑均已有可定位的完整附件，後續按公司逐一建立 focused_v1
-  frozen evidence pack，由不同 reviewer 離線重算；每篇 `independently_verified` 筆記獨立提交，
-  不把本文的同一研究者閱讀當成簽核。
-- 威剛下一輪追存貨週轉／跌價、應收回款、產品價格與數量、營業現金流及借款；日月光投控
-  下一輪追封裝／測試的 AI 分子、先進封裝產能投產時點、具名客戶與可對應收入，而不是拿
-  全集團收入或資本支出代替。
-- 弘塑已轉入完整Q2筆記待更新；先用現有PDF建立證據包並重算，再追8/25法說正文。附件取得
-  不補成具名急單、AI收入或全年營收證據；主命題與H#仍按原條件判定。
+- 六家公司均已有可定位的完整附件；弘塑、智原與日月光投控已各自完成 focused_v1 frozen
+  evidence pack、不同 reviewer 離線重算與獨立提交。同欣電、德微與威剛仍須按同一規格逐篇
+  完成；不把本文的內容級閱讀或前三篇完成當成整批簽核。
+- 威剛下一輪追存貨週轉／跌價、應收回款、產品價格與數量、營業現金流及借款。日月光投控
+  正式 Q2 筆記已完成，但 H1／H2 仍按原 8/31 期限追同口徑片數、LEAP 實績、具名客戶與
+  可辨收入／毛利；不能拿全集團收入、資本支出或合作公告代替。
+- 弘塑正式 Q2 筆記已完成；後續仍按原 H# 條件追具名急單、AI 收入與全年營收證據，不因
+  附件取得或筆記簽核自動裁決主張。
 - 任一更新都不轉移 H# 生命週期、不改量化分數；只有預登錄 trigger 命中並通過相應證據角色，
   才升級主張。

@@ -271,7 +271,7 @@ review_due: 2026-08-31
         self.assertEqual(modes.count("retrospective"), 196)
         self.assertEqual(modes.count("prospective"), 23)
         self.assertEqual(sum(int(item["meta"]["independent_chain_count"])
-                             for item in hypotheses), 240)
+                             for item in hypotheses), 243)
         self.assertTrue(all(item["transitions"] for item in hypotheses))
 
         faraday = {item["id"]: item for item in reports["3035"]["hypotheses"]}
@@ -286,6 +286,19 @@ review_due: 2026-08-31
         self.assertEqual(h2["transitions"][-1]["review_due"], "none")
         self.assertIn("或 AI MP 占比未回升", h2["fields"]["可證偽條件"])
         self.assertIn("不能據此斷言 14nm 專案取消", h2["fields"]["研究判讀"])
+
+        # 補到公司原稿／合作事件，不能自動證實精確片數或四家訂單，亦不可重設期限。
+        aseh = {item["id"]: item for item in reports["3711"]["hypotheses"]}
+        for hypothesis in aseh.values():
+            self.assertEqual(hypothesis["meta"]["lifecycle"], "open")
+            self.assertEqual(hypothesis["meta"]["evidence_strength"], "weak")
+            self.assertEqual(hypothesis["meta"]["review_due"], "2026-08-31")
+            self.assertEqual(hypothesis["meta"]["source_accessed_at"], "2026-07-12")
+            self.assertEqual(hypothesis["meta"]["evidence_flags"], "unsupported_specificity")
+            self.assertEqual(len(hypothesis["transitions"]), 1)
+            self.assertEqual(hypothesis["transitions"][0]["review_due"], "2026-08-31")
+        self.assertIn("片數仍是 C1 媒體獨鏈", aseh["H1"]["fields"]["研究判讀"])
+        self.assertIn("不是三條鏈都證實四家訂單", aseh["H2"]["fields"]["研究判讀"])
 
 
 NARRATIVE_BLOCK = """## 多空觀點（小作文）

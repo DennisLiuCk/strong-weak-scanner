@@ -1,5 +1,47 @@
 # Changelog
 
+## 日月光投控 Q2 聚焦研究與假說複核 — 2026-08-29
+
+**正式策略、tier、權重、`IS_CUTOFF`、資料庫與歷史儀表板快照不變。**
+
+- 日月光投控正式筆記以中文年報、年度查核財報、Q2 核閱季報與 7/30 核心法說
+  完成 `focused_v1`；33 個重要主張由不同 reviewer 使用同一凍結證據包離線複核，
+  筆記與 manifest 已在 `0f1b571` 做成獨立 commit，PDF／PNG 留在 `tmp/`。
+- 獨立複核涵蓋 43 個引用頁、83 張引用／相鄰頁圖與 141 項自行重算，HARD 0；
+  root 另核對內容 SHA、全部 PDF／PNG 指紋、唯讀權限、頁面映射、品質 lint 與
+  machine triage。這些是工作覆蓋計數，不是獨立統計樣本，SE／t 不適用。
+- 更正舊筆記將 Q1 EBITDA 12.10 億美元誤記為設備資本支出；正確設備支出是
+  10.03 億美元，Q2 為 16.95 億美元，H1 合計 26.98 億美元。來源間去年 Q2
+  稅前／所得稅各 1 千元，以及年度營收 72 千元的末位差均留在衝突摘要；年度採
+  查核財報、Q2 採核閱財報，不混用 ATM／EMS／合併表分母、PPA 調整 EPS 與帳列 EPS。
+- H1／H2 補到公司 LEAP 指引、SPIL／NVIDIA 合作與 CPO 製造角色，但 2 萬片月產能、
+  四家各自外溢訂單與可辨收入／毛利仍未證；兩則維持 `open`／`weak`、原反證條件、
+  7/12 捕捉日期、唯一初始 transition 與 8/31 期限，不因新文件重設時鐘。
+- Q2 研究議題新增 S34／C32，只記公司全年 LEAP 美元展望，不改寫成全年實績；
+  3711 impact 改為完成，剩餘 3260／3675／6271 仍待各自完成。三筆 monitor 回查、
+  一筆 partial scan 與方法快照 `RMA-2026-08-29-04` 以 append-only 方式新增，舊位元不變。
+- H# 描述性背景更新至 8/28，使用 `db_ro` 與獨立 SQL／Decimal 核對；母體只有單一
+  公司、4 個月份、61 個有效價格日、14 個當期同儕，重疊視窗不是獨立績效樣本，
+  SE／t 不適用。環境為 macOS 26.5.2 arm64、Python 3.11.11、預設 UTF-8，DB SHA 不變。
+- 同環境完整 642 項測試、隔離輸出的 `validate.py`、品質、H#、議題、方法、圖譜、
+  雷達、raw、ranking 與 storage 稽核均通過；保留 23 項既有議題警告、原始法人表
+  74 筆 grid 外歷史列警告，以及 D 視角 117／121 的覆蓋警告，不把警告消失當作完成。
+- 連續兩次建置的 `index.html`／`research.html` SHA 分別為
+  `f002627cd79aad5e67c8018f608921872c0e278f5c6acec376c4e6929536022f`／
+  `35584b00a28a462378675f68897fa8fcc4fdd131a0e608716a7b63f212a99319`；正式 DB 與
+  全部既有 archive SHA 前後不變，`AGENTS.md`／`CLAUDE.md` 仍完全相同。
+
+## 週檢視：OOS 證據仍不足，不調策略 — 2026-08-29
+
+- 排程 `weekly-validate` run `33225575012` 在台灣 09:08 以 `2a58412` 成功完成，並由
+  `309c442` 新增 `reports/validate_2026-08-28.md`；daily-fetch 與最近一般 CI 亦為綠燈。
+- 報告有 24 個成熟 as-seen OOS 日，約 2.4 個有效獨立觀測；`composite_s` OOS
+  尚不報 SE／t，不能用點估計正負判讀。扣 0.585% 來回成本後，各固定持有期亦無一格
+  通過分級門檻，因此本週不改權重、tier、Champion、challenger 或 `IS_CUTOFF`。
+- 當日多視角快照稽核 `hard_errors=[]`，121 檔 Champion／A／B／C 完整；D 視角
+  117／121 的部分覆蓋保留為結構警告。正式 spec 累積 11 日、10 日前瞻成熟 2 日，
+  尚未達 challenger 行動 gate，不以單週排名替換 production。
+
 ## 固定版本 DB artifact 與隔離復原演練 — 2026-08-29
 
 - 新增純 stdlib `db_artifact.py`，從完整 commit 的 DB blob 建立 gzip／SHA manifest，

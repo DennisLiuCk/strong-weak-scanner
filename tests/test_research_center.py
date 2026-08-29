@@ -9161,7 +9161,7 @@ class ResearchCenterTest(unittest.TestCase):
             "8 月 15 日依 T10 回查",
             "source_id: S32",
             "本輪只核對實際取件、PDF身分、比較期間與報告日期",
-            "8 月 29 日弘塑與智原各自完成四份核心文件的證據包與獨立複核。其餘四檔仍待完整複核",
+            "8 月 29 日弘塑、智原與日月光投控各自完成四份核心文件的證據包與獨立複核。其餘三檔仍待完整複核",
         ):
             self.assertIn(contract, topic)
         claims = {}
@@ -9190,9 +9190,9 @@ class ResearchCenterTest(unittest.TestCase):
                       "frequency_detail", "next_check", "trigger", "invalidation"):
             self.assertEqual(monitors["T11"][field], monitors["T10"][field], field)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 33),
-            ("research_claim", 31), ("metric_comparison", 0),
-            ("impact", 7), ("monitoring_item", 11),
+            ("research_topic", 1), ("research_source", 34),
+            ("research_claim", 32), ("metric_comparison", 0),
+            ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -9236,9 +9236,9 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 33),
-            ("research_claim", 31), ("metric_comparison", 0),
-            ("impact", 7), ("monitoring_item", 11),
+            ("research_topic", 1), ("research_source", 34),
+            ("research_claim", 32), ("metric_comparison", 0),
+            ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -9279,9 +9279,9 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 33),
-            ("research_claim", 31), ("metric_comparison", 0),
-            ("impact", 7), ("monitoring_item", 11),
+            ("research_topic", 1), ("research_source", 34),
+            ("research_claim", 32), ("metric_comparison", 0),
+            ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
