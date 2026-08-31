@@ -448,6 +448,22 @@ limitation: 本文保留頁面日期與 dateline 差異，不自行判定時區�
 independence_group: sk-hynix
 -->
 
+<!-- research_source
+source_id: S23
+role: company_release
+source_kind: living_index
+publisher: NVIDIA
+title: Qwen3.6 Frontend and Cache Benchmark
+published_at:
+captured_at: 2026-08-31
+accepted_at: 2026-08-31
+status: active
+url: https://docs.nvidia.com/dynamo/dev/recipes/benchmarks/qwen3-6-35b-feature-stack
+locator: Benchmark Setup、Dataset Structure、Hardware、Results 與 Run benchmark；Qwen3.6-35B-A3B-FP8、30 users × 8 turns、5 images 每輪重用 4 張、8,000 text tokens、max_tokens 1,024、concurrency 30，以及 H100／GB200 的 RPS、ITL、TTFT avg／p50／p90／p99 表
+limitation: NVIDIA dev／Beta 動態文件的單一 vendor-run 合成 benchmark；每種硬體與配置只公布一組結果表，重用率刻意偏高，沒有具名 production trace、獨立重現、重複 run 變異、品質、錯誤、功耗、成本或 failure recovery，也不測 CMX／SOCAMM／CXL 或任何特定 SSD／NAND 供應商
+independence_group: nvidia
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -895,6 +911,34 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: NVIDIA Dynamo 的 Qwen3.6 benchmark 以同一硬體內的 vanilla vLLM、frontend decoding、frontend decoding 加 8 GiB embedding cache 三組配置，比較 30 users × 8 turns、每輪共用 5 張圖片中的 4 張、8,000 text tokens、max_tokens 1,024 與 concurrency 30；H100 表中加 cache 相較 frontend decoding 使 TTFT average 由 7,193 降至 6,101 ms、p50 由 3,567 降至 2,369 ms，但 p90 由 10,991 升至 22,869 ms
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-08-31
+basis: S23 的 Benchmark Setup、Dataset Structure 與 H100 Results 同頁固定模型、資料集、request count、concurrency、cache size 及各分位數；所有數字保留原表毫秒單位，沒有跨硬體混比
+boundary: 這是 NVIDIA 在合成、高重用多模態資料集上的單一公開結果表；不能由平均與 p50 改善推論所有請求、所有工作負載或 production 服務都改善，也不能把 p90 變差直接歸因為 cache 普遍有害
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: inference
+status: active
+claim: S23 已填入量測護照的部分 SUT、模型、資料形狀、重用、cache 容量、請求數、concurrency 與 request-level latency／throughput 欄位，且 H100 的 average／p50 與 p90 方向不一致，直接顯示只保存 headline 平均值不足；但缺乏 production trace、重複 run、品質、錯誤、功耗、成本與 failure recovery，所以 C20 的具名客戶 production 淨改善仍未證實
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-08-31
+basis: C29 的同表分位數分歧證明摘要平均值不能代表尾端請求；S23 的公開設定與結果欄位又未提供 C19／T6 預先要求的 production、quality、errors、cost、power 與 recovery 欄位
+boundary: 這是量測完整度與讀表方法推論，不宣稱 cache 造成 p90 惡化、任何記憶體硬體需求改變、客戶已採用或台灣供應商形成收入；本次新增不刷新 C8 主命題時鐘
+verification_needed: 具名 operator 以版本化 production trace 重複 baseline／treatment，固定 route、cache cold／warm 與 load，公開 TTFT／ITL／goodput／errors 全分布、機制 counters、品質、功耗、成本與故障恢復
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -1004,6 +1048,13 @@ to: triaged
 reason: added_second_independent_192gb_socamm2_supplier_statement_without_main_thesis_clock_refresh
 evidence: sources:S22
 -->
+<!-- transition
+date: 2026-08-31
+from: triaged
+to: triaged
+reason: added_controlled_multimodal_cache_benchmark_and_tail_latency_boundary_without_main_thesis_clock_refresh
+evidence: sources:S23
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -1039,6 +1090,8 @@ evidence: sources:S22
 - **快取命中率（cache hit rate）**：需要的資料已在可重用位置而不用重新計算的比率；命中高只證明機制有工作，不等於搬回速度與整體服務一定更好。
 - **首字等待時間（TTFT）**：請求送出到收到第一個 token 的時間，會同時包含網路、排隊、prompt processing 與第一個 token 生成，不是單獨的記憶體速度。
 - **逐字等待時間（ITL）**：第一個 token 之後，連續生成 token 的平均間隔；它把初始 TTFT 排除，因此不能和 TTFT 或總 request latency 混用。
+- **p50／p90／p99（延遲分位數）**：把請求由快到慢排列後的第 50%、90% 與 99% 位置；p50 接近典型請求，p90／p99 更容易看出少數很慢的尾端請求，三者都不是平均值。
+- **Qwen3.6**：S23 benchmark 使用的具名模型家族；固定模型是比較契約的一部分，不表示同一結果可外推到其他模型、版本或正式客戶流量。
 - **合格吞吐（goodput）**：在預先定義的等待、錯誤與品質門檻內完成的工作量；若只算成功留下來的快請求、把逾時或錯誤丟掉，吞吐會看起來過度樂觀。
 - **基準組／處理組（baseline／treatment）**：基準組保留原配置，處理組只改一個待驗因素；若模型、負載、快取狀態與硬體同時變動，就無法知道差異來自哪裡。
 - **鍵值區塊管理器（KVBM）**：NVIDIA Dynamo 用來管理、重用及在 GPU、主機記憶體與儲存間搬移 KV block 的軟體元件；軟體支援不等於客戶已部署。
@@ -1181,6 +1234,24 @@ shape、concurrency 與 request count，再另外 sweep concurrency 找飽和點
 同時滿足 scenario 的 latency 與 quality，且可重現。[S17] 兩套方法的用途不同，但共同提醒：
 「測了哪套系統、用什麼負載、什麼算通過」必須先固定，才有資格比較。
 
+### 同一張結果表，平均變好也可能尾端變差
+
+NVIDIA Dynamo 新增一份可重跑的 Qwen3.6 合成 benchmark：同一種硬體內比較 vanilla vLLM、
+frontend decoding，以及 frontend decoding 加 8 GiB embedding cache；資料集固定 30 位使用者、
+每人 8 輪，共 240 個請求，每輪 5 張圖片會重用其中 4 張，另有 8,000 個文字 token，
+`max_tokens=1024`、concurrency 30。[S23]
+
+H100 表中，加入 cache 相較只開 frontend decoding，平均 TTFT 從 7,193 降到 6,101 毫秒，
+p50 從 3,567 降到 2,369 毫秒；但 p90 同時從 10,991 升到 22,869 毫秒。這不是證明 cache
+一定傷害尾端延遲，也不能排除單次 run、routing、排隊或合成資料的影響；它真正教讀者的是：
+**平均值只回答典型總體方向，p50／p90／p99 才能看見不同位置的請求是否一起改善。**
+
+這份文件已填入模型、請求數、併發、重用、cache 容量、TTFT／ITL 與 RPS 等部分護照欄位，
+比只報一個倍數更可檢查；但它仍是 NVIDIA 的 Beta 動態文件與高重用合成負載，每個硬體／配置
+只公布一組結果表，沒有具名 production trace、重複 run 變異、品質、錯誤、功耗、成本或故障
+復原。因此它更新量測方法與尾端風險，不把 C20 升為「客戶 production 已證實」，也不形成
+CMX、SOCAMM、CXL、SSD／NAND 或台灣公司收入的證據。
+
 ## 一個 TTFT 數字不能替整條資料路徑背書
 
 同一個服務可以首字更快、後續逐字更慢，也可以總吞吐提高但尾端請求逾時更多。AIPerf 把這些欄位
@@ -1194,9 +1265,11 @@ shape、concurrency 與 request count，再另外 sweep concurrency 找飽和點
 | Matched／hit／offload／onboard | 可重用資料是否被找到，以及 block 是否真的搬出、搬回 | 這是機制證據，要和 TTFT／ITL／errors 同一時間窗對帳 | 搬移收益大於成本、服務品質改善或客戶願意採用 |
 | Good-request／errors／quality | 有多少嘗試請求在預定 SLO 與品質內完成 | 錯誤與逾時要留在分母，避免只看存活的快請求；品質也不能為速度讓路 | TCO、可靠度、電力與所有 production workload 都改善 |
 
-截至本輪，公開文件足以建立這張護照與觀測欄位，卻沒有具名客戶以同一 production trace 對 CMX、
-SOCAMM、CXL 或其他 host／SSD／remote KV tier 公開完整 baseline／treatment。因此本文只把量測方法
-升為可驗證框架，不把功能 demo、平均 TTFT 或軟體支援升為商用部署、硬體需求與供應商收入。
+截至本輪，S23 已提供一個固定合成資料、請求量、併發、cache 配置及 latency／throughput 分布的
+受控案例；它也以 H100 p90 與平均／p50 的方向分歧，證明只保存 headline 平均值不足。公開文件
+仍沒有具名客戶以同一 production trace 對 CMX、SOCAMM、CXL 或其他 host／SSD／remote KV tier
+公開完整 baseline／treatment。因此本文只把量測方法升為可驗證框架，不把合成 benchmark、功能
+demo、平均 TTFT 或軟體支援升為商用部署、硬體需求與供應商收入。
 
 ## HBM 寫著 TB/s，為什麼應用仍可能沒有同幅加速
 
@@ -1442,6 +1515,7 @@ S22 的頁面日期早於 C8 所依據的 2026-08-12 五角色資料路徑證據
 - [NVIDIA KV cache offloading verification](https://docs.nvidia.com/dynamo/dev/kubernetes/kv-cache-offloading/overview)（共享長 prefix、第二次 TTFT 與 hit-rate 的最小功能檢查）。
 - [NVIDIA AIPerf metrics](https://docs.nvidia.com/aiperf/reference/ai-perf-metrics-reference)（TTFT、ITL、request distribution、throughput、ISL／OSL 與 good-request 分母）。
 - [NVIDIA AIPerf comparison guide](https://docs.nvidia.com/dynamo/dev/cli/operations/benchmarking-with-ai-perf)（一次只改一項、固定 request shape／concurrency／request count 與 saturation sweep）。
+- [NVIDIA Qwen3.6 frontend and cache benchmark](https://docs.nvidia.com/dynamo/dev/recipes/benchmarks/qwen3-6-35b-feature-stack)（固定合成多模態重用負載與 H100／GB200 結果；Beta 動態文件、單組公開結果，不是 production 客戶 benchmark）。
 - [MLCommons MLPerf Inference rules](https://github.com/mlcommons/inference_policies/blob/master/inference_rules.adoc)（system under test、scenario、latency／quality、system consistency 與 replicability）。
 - [UC Berkeley Roofline technical report](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.pdf)（operational intensity、可持續 DRAM bandwidth、效能上限與 ridge point；引用 PDF pp.3–4／印刷 pp.1–2）。
 - [NVIDIA GPU Performance Background](https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html)（memory／math time、arithmetic intensity、latency 與 first-order approximation 邊界）。

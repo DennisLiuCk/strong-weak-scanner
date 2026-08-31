@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C11
 base_confidence: medium
-confidence_basis: NVIDIA、CoreWeave、Google 與三家台灣系統廠一手文件已能把平台、型錄、未來工廠、整櫃驗證與雲端供應語言拆成不同成熟度關卡；但台灣公司實際 Rubin 出貨、客戶驗收、收入與獲利橋接仍無可重算證據
+confidence_basis: NVIDIA 8 月 26 日財報與法說已把 Vera Rubin 推進到公司所稱的 full production、8 月開始 production shipments 與主要客戶類別皆有採購單；CoreWeave、Google 與三家台灣系統廠一手文件另可拆分型錄、未來工廠、整櫃驗證與雲端供應語言，但公開資料仍未給出出貨物件與數量、具名 ODM、客戶驗收或台灣公司收入與獲利橋接
 cross_company_numbers: false
 schema_migrated_at: 2026-08-02
 -->
@@ -82,6 +82,13 @@ to: triaged
 reason: shipment_custody_acceptance_and_revenue_event_ledger_added_without_refreshing_thesis_clock
 evidence: sources:S17,S18,S19
 -->
+<!-- transition
+date: 2026-08-31
+from: triaged
+to: triaged
+reason: added_platform_production_shipment_and_purchase_order_evidence_without_supplier_financial_attribution
+evidence: sources:S20,S21
+-->
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -129,7 +136,7 @@ evidence: sources:S17,S18,S19
 
 - Vera Rubin 的公開證據已橫跨平台量產、系統型錄、未來工廠、整櫃驗證與雲端供應語言，不能再只用「路線圖／已量產」二分法。
 - 每份文件只跨過七關中的一部分：Noetra 的規劃容量、CoreWeave 的單一工作負載 benchmark、Google 的 offer、緯創的未來生產與台灣系統廠型錄都不是同一張證書。
-- 截至 2026-08-14，仍沒有一手資料用同一產品鍵把台灣公司 Rubin 的完工、出貨、到貨、驗收、可用、計費、收入與收款完整接起來；27,500 顆 GPU、140MW 或 10 倍 tokens／MW 都不能單獨證明個股財務受惠。
+- 8 月 26 日新增的 NVIDIA 財報與法說已把平台時鐘推進到 full production、production shipments 與採購單；但仍沒有一手資料用同一產品鍵把台灣公司 Rubin 的完工、出貨、到貨、驗收、可用、計費、收入與收款完整接起來。
 
 ### 為什麼重要
 
@@ -140,6 +147,7 @@ evidence: sources:S17,S18,S19
 ### 接下來怎麼追
 
 - 追 NVIDIA 是否公布 Vera Rubin 與 Spectrum-6 的實際部署數量、客戶驗收及量產節奏。
+- 看到 `production shipments` 時，先追問出貨物件、數量單位、交易對手、完成日期、驗收／控制條件與收入歸屬；六欄缺一，就不要把平台出貨改寫成特定供應商收入。
 - 追 Noetra 專案是否公布分期、實際通電／驗收容量、整數機櫃配置與商業上線時點。
 - 追 CoreWeave 的結果能否在其他模型、精度、延遲、營運商與 production SLO 下重現。
 - 追被列名系統廠下一次法說是否出現具名產品階段、出貨、收入、毛利、存貨與現金流足跡。
@@ -167,7 +175,7 @@ gigascale AI factories。這是供應鏈時程的重要變化，值得檢查現�
 
 | 關卡 | 真正回答的問題 | 本輪可見證據 | 還不能回答什麼 |
 |---|---|---|---|
-| 1. 平台進入生產 | 平台商是否已把設計推進持續製造與供應鏈爬坡？ | NVIDIA 稱 Vera Rubin 進入 full production／ramp | 個別系統廠拿到多少量、良率或收入 |
+| 1. 平台進入生產 | 平台商是否已把設計推進持續製造與供應鏈爬坡？ | NVIDIA 稱 Vera Rubin 進入 full production，並稱 8 月開始 production shipments | 出貨物件、數量、具名客戶／ODM、個別系統廠良率或收入 |
 | 2. 設計／型錄就緒 | 系統廠是否公開可辨識的機架、配置與整合角色？ | 技嘉列出 Vera Rubin NVL72 機架配置；緯穎稱 production-ready | 可立即下單、交期、客戶或出貨量 |
 | 3. 工廠實際生產 | 哪一座工廠現在正做哪個世代？ | 緯創稱 Texas D1 現在生產 GB300，Rubin 將接續 | Rubin 已在該廠量產或已形成收入 |
 | 4. 整櫃 bring-up／驗證 | 把整個機架帶起後，系統級路徑能否運作？ | CoreWeave 稱完成 NVL72 整櫃 bring-up 與 system-level validation | 測試母體、長時間負載、客戶驗收與廣泛複製 |
@@ -178,6 +186,20 @@ gigascale AI factories。這是供應鏈時程的重要變化，值得檢查現�
 這張表不是要求所有公司使用相同術語，而是把研究的「停止線」畫清楚。例如，Google 的
 `offer` 比單純列名更接近服務端，但若沒有產品代碼、地區、容量與取得方式，就不能自行寫成
 全球全面 GA；緯創說「soon」也只能放在未來生產關，不得改寫成當期 Rubin 產量。
+
+### 8 月 26 日新增證據：出貨時鐘前進，台灣公司財務時鐘沒有跟著跳
+
+NVIDIA 在 2026Q2 財報新聞稿稱 Vera Rubin 已進入 full production；同日法說逐字稿再稱公司
+於 8 月開始 `production shipments`，並已收到各主要 hyperscaler、AI cloud 與 system OEM
+類別的採購單。這比只有路線圖、型錄或未來式工廠計畫更接近實際供應，因此第 1 關的證據
+確實前進。
+
+但這兩份文件都來自 NVIDIA 同一消息鏈，也沒有公開出貨的是晶片、托盤、單機、整櫃或其他
+組件，沒有數量、具名買方、具名 ODM、站點到貨／驗收、控制移轉或 Rubin 專屬財務分母。
+所以它不能替緯創的「未來生產」改成「已生產」，也不能替任何台灣公司補出訂單、營收或
+毛利。新手可以把每一則「出貨」公告先拆成六問：**什麼物件、多少單位、交給誰、何時完成、
+誰驗收／何時移轉控制、最後在哪一家公司入帳**。目前只有平台商、月份與廣義客戶類別較清楚，
+其餘欄位仍待驗證。
 
 ## 看到「量產／就緒／驗證／上線」，先補齊五個欄位
 
@@ -477,8 +499,11 @@ limitation: 生態系列名證明合作角色存在，不等於個別公司新�
 - [GS1 EPCIS Standard 2.0.1](https://ref.gs1.org/standards/epcis/2.0.1/)（GS1，2025-07-01；只借用事件資料的物件、時間、地點、business step 與狀態欄位，不表示本文公司採用 EPCIS）。
 - [IFRS 15 Revenue from Contracts with Customers](https://www.ifrs.org/issued-standards/list-of-standards/ifrs-15-revenue-from-contracts-with-customers/)（IFRS Foundation；現行準則頁，擷取於 2026-08-14）。
 - [緯穎 2025 年合併財務報告](https://www.wiwynn.com/hubfs/Investors/Financial_Report/Wiwynn_2025Q4_Financial.pdf)（緯穎／KPMG，2026-02-26；公司層級收入政策與查核事項，不是 Rubin 交易證據）。
+- [NVIDIA 2027 財年第二季財務結果](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/default.aspx)（NVIDIA，2026-08-26；full production 與運行地點，不含台灣供應商財務歸因）。
+- [NVIDIA 2027 財年第二季法說逐字稿](https://investor.nvidia.com/files/content_files/TRANSCRIPT_-NVIDIA-Corp-NVDA-US-Q2-2027-Earnings-Call-26-August-2026-5_00-PM-ET.pdf)（NVIDIA，2026-08-26；production shipments 與廣義 PO 類別，不含物件、數量、驗收或 ODM 分配）。
 
-上述資料只證實 NVIDIA 平台與其公開列名生態系。它沒有披露技嘉、廣達、緯創或緯穎的
+上述資料已把 NVIDIA 平台證據推進到管理層所稱的 production shipments，但仍只證實平台商
+與其公開列名生態系。它沒有披露技嘉、廣達、緯創或緯穎的
 新增訂單、單價、出貨占比或獲利；也沒有點名本 universe 的散熱、PCB、電源或記憶體個股。
 SK hynix 的 HBM 合作尤其不能外推為台灣傳統 DRAM 廠的直接受惠證據。
 
@@ -703,6 +728,38 @@ url: https://www.wiwynn.com/hubfs/Investors/Financial_Report/Wiwynn_2025Q4_Finan
 locator: auditor report p.4-1（PDF p.5）收入認列時點關鍵查核事項；note 4(n) pp.22–23（PDF pp.25–26）控制移轉、指定地點交付、風險移轉、客戶驗收／條款失效／客觀條件與應收款政策
 limitation: 財報只支持緯穎集團所揭露商品銷售的一般會計政策與 2025 年查核風險；沒有具名 Rubin 合約、機櫃數、出貨、到貨、驗收、收入、毛利或現金，不能外推成其他公司或所有 AI 機架的共同條款；官方 PDF SHA-256 74f781c2f3863c7fb772908f289504cd1c0039ce760fbca922da424c236a101d
 independence_group: wiwynn
+-->
+
+<!-- research_source
+source_id: S20
+role: company_filing
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA Announces Financial Results for Second Quarter Fiscal 2027
+published_at: 2026-08-26
+captured_at: 2026-08-31
+accepted_at: 2026-08-31
+status: active
+url: https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/default.aspx
+locator: Data Center highlights 的 Vera Rubin ramping into full production，以及 racks running at CoreWeave、Google Cloud、Microsoft Azure、OCI 與 Nebius
+limitation: NVIDIA 財報新聞稿只支持公司對平台生產階段與具名運行地點的陳述；未披露 production shipment 的物件、數量、具名 ODM、站點驗收、Rubin 專屬收入或台灣供應商財務歸因，且與 S21 同屬 NVIDIA 消息鏈
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S21
+role: company_filing
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA Corporation Q2 Fiscal 2027 Earnings Call Corrected Transcript
+published_at: 2026-08-26
+captured_at: 2026-08-31
+accepted_at: 2026-08-31
+status: active
+url: https://investor.nvidia.com/files/content_files/TRANSCRIPT_-NVIDIA-Corp-NVDA-US-Q2-2027-Earnings-Call-26-August-2026-5_00-PM-ET.pdf
+locator: prepared remarks 的 commenced production shipments of Vera Rubin earlier this month，以及 purchase orders from every major hyperscaler、AI cloud and system OEM
+limitation: 公司法說逐字稿支持管理層對 8 月 production shipments 與廣義採購單類別的陳述；沒有物件、數量、具名交易對手、ODM 分配、客戶 acceptance、控制移轉或供應商財務共同鍵，也不能把 PO 當成已驗收或已認列收入
+independence_group: nvidia
 -->
 
 <!-- research_claim
@@ -986,6 +1043,34 @@ as_of: 2026-08-14
 basis: 平台、工廠、型錄、能力與公司財報分屬不同文件與觀察單位；S19 只有公司一般政策，現有來源沒有 Rubin 專屬序號／版本、交易雙方、事件數量與財務共同鍵
 boundary: 缺乏公開完整帳本不代表沒有實際訂單、出貨或收入，只表示本文不能從現有證據估數量、份額、營收、毛利、現金流或投資報酬
 verification_needed: 台灣公司或具名客戶提供可對時的 Rubin 產品版本、數量單位、shipping／receiving、site acceptance、available／billable capacity、收入／應收與收款，並能排除備品、替換、退貨、取消及重複計數
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: NVIDIA 於 2026-08-26 的 2027 財年第二季財報稱 Vera Rubin 正進入 full production；同日法說管理層稱 8 月較早時已開始 production shipments，並已收到各主要 hyperscaler、AI cloud 與 system OEM 類別的採購單
+supporting_source_ids: S20,S21
+contrary_source_ids:
+as_of: 2026-08-26
+basis: S20 的 Data Center highlights 與 S21 的 prepared remarks 分別直接提供 full production、production shipments 月份及採購單對手類別；兩份文件屬同一 NVIDIA 消息鏈，不當作兩條獨立市場觀測
+boundary: 文件未定義出貨物件、數量、具名買方、具名 ODM、站點收貨／驗收、控制移轉或 Rubin 專屬收入；PO 也不等於已出貨、已驗收或供應商已認列收入
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: NVIDIA 的 8 月 production shipment 與採購單陳述使七關中的平台生產證據前進，但在出貨物件、數量、具名交易雙方、ODM 工廠、site acceptance、service workload 與台灣公司財務共同鍵缺失時，不能據此關閉工廠生產、站點驗收、工作負載或供應商財務歸因關卡
+supporting_source_ids: S20,S21
+contrary_source_ids:
+as_of: 2026-08-31
+basis: S20／S21 明確提供平台階段、出貨月份與廣義 PO 類別，也同時缺少 C11 七關後段與 C19 七欄事件護照所需的物件、交易、驗收及財務欄位
+boundary: 這是研究成熟度分類，不否定實際供應鏈可能已有未公開生產或收入；也不估台灣公司的份額、營收、毛利、現金流、價格或投資報酬
+verification_needed: NVIDIA、具名客戶與 ODM 對同一 Rubin configuration 公開可對時的 shipment object／quantity、factory build、received／accepted、service SKU／workload，以及台灣公司收入、毛利、存貨或現金流共同鍵
 resolution:
 -->
 

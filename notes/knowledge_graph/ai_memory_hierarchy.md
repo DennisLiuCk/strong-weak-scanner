@@ -461,17 +461,17 @@ view: industry
 from_id: concept:ai-memory-hierarchy
 to_id: metric:ai-inference-service-slo
 relation: measured_by
-claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C16,MI-2026-08-02-AI-MEMORY-HIERARCHY#C17,MI-2026-08-02-AI-MEMORY-HIERARCHY#C18
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C16,MI-2026-08-02-AI-MEMORY-HIERARCHY#C17,MI-2026-08-02-AI-MEMORY-HIERARCHY#C18,MI-2026-08-02-AI-MEMORY-HIERARCHY#C29
 note_refs:
 evidence_state: verified
 commercial_stage: capability
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-31
+as_of: 2026-08-31
+review_due: 2026-09-30
 status: active
-boundary: AIPerf 與 MLPerf 文件可直接界定 TTFT、ITL、throughput、SUT、load、quality 與可重現性；它們不指定哪個記憶體層是瓶頸，也不證明任何私有 workload 的商業結果。
+boundary: AIPerf與MLPerf界定TTFT ITL throughput SUT load quality與可重現性；S23另提供合成高重用benchmark且H100平均/p50與p90方向分歧，但仍不是具名production trace或完整商業結果。
 next_trigger: 具名客戶在固定 SUT、model／trace、request shape、load 與 quality 下公開 request-level latency／goodput／errors 及重複結果。
 -->
 
@@ -481,17 +481,17 @@ view: industry
 from_id: concept:ai-memory-hierarchy
 to_id: process:ai-memory-tier-measurement-passport
 relation: requires
-claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C19
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C19,MI-2026-08-02-AI-MEMORY-HIERARCHY#C30
 note_refs:
 evidence_state: inference
 commercial_stage: capability
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-31
+as_of: 2026-08-31
+review_due: 2026-09-30
 status: active
-boundary: 八格護照是研究中心整合多份一手方法文件後提出的可重建比較框架，不是單一標準，也尚無具名客戶完整公開 CMX／SOCAMM／CXL／KV tier 的 production baseline-versus-treatment。
+boundary: S23填入部分SUT 負載 重用 cache容量與延遲分布並顯示只看平均不足；八格護照仍非單一標準，也尚無具名客戶完整公開production品質 錯誤 成本 功耗與failure recovery。
 next_trigger: 具名 production 服務固定受測系統、工作負載、流量、reuse／cache state、tier policy 與 data path，並公開機制指標、request-level SLO、品質、成本、功耗及 failure recovery。
 -->
 

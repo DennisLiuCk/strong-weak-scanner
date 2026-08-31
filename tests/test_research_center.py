@@ -4063,7 +4063,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 67
+            sum(line.startswith("- **") for line in glossary.splitlines()), 69
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4075,8 +4075,8 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("transition", 11),
-            ("research_source", 22), ("research_claim", 28),
+            ("research_topic", 1), ("transition", 12),
+            ("research_source", 23), ("research_claim", 30),
             ("metric_comparison", 0), ("impact", 2),
             ("monitoring_item", 7),
         ):
@@ -4093,6 +4093,11 @@ class ResearchCenterTest(unittest.TestCase):
             "claim_id: C18\nlabel: verified",
             "claim_id: C19\nlabel: inference",
             "claim_id: C20\nlabel: unverified",
+            "claim_id: C29\nlabel: verified",
+            "claim_id: C30\nlabel: inference",
+            "source_id: S23",
+            "### 同一張結果表，平均變好也可能尾端變差",
+            "H100 表中，加入 cache 相較只開 frontend decoding",
             "claim_id: C21\nlabel: verified",
             "claim_id: C22\nlabel: verified",
             "claim_id: C23\nlabel: inference",
@@ -8325,10 +8330,16 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S17",
             "source_id: S18",
             "source_id: S19",
+            "source_id: S20",
+            "source_id: S21",
             "claim_id: C17",
             "claim_id: C18",
             "claim_id: C19",
             "claim_id: C20",
+            "claim_id: C21",
+            "claim_id: C22",
+            "reason: added_platform_production_shipment_and_purchase_order_evidence_without_supplier_financial_attribution",
+            "### 8 月 26 日新增證據：出貨時鐘前進，台灣公司財務時鐘沒有跟著跳",
         ):
             self.assertIn(contract, topic)
         glossary = topic.split("### 名詞小字典", 1)[1].split(
@@ -8336,8 +8347,8 @@ class ResearchCenterTest(unittest.TestCase):
         )[0]
         self.assertGreaterEqual(glossary.count("- **"), 26)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 19),
-            ("research_claim", 20), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 21),
+            ("research_claim", 22), ("metric_comparison", 0),
             ("impact", 6), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

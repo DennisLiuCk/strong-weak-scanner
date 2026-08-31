@@ -20,18 +20,18 @@ view: company
 from_id: company:nvidia
 to_id: product:nvidia-vera-rubin-nvl72
 relation: owns_platform
-claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C1,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C12
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C1,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C12,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C21
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-15
+as_of: 2026-08-31
+review_due: 2026-09-07
 status: active
-boundary: NVIDIA 的量產與平台組成敘述只證明自身產品階段，不證明每家系統廠已生產 客戶已驗收或台灣供應商已有財務貢獻。
-next_trigger: NVIDIA 公布有版本的 configuration matrix 實際出貨 客戶站點驗收與可對時部署量。
+boundary: NVIDIA 的 full production 8月production shipments與廣義PO類別只證明平台商自身階段；沒有出貨物件 數量 具名ODM acceptance或台灣供應商財務共同鍵。
+next_trigger: NVIDIA與具名客戶公布有版本的 configuration matrix shipment object與quantity ODM factory 客戶站點驗收及可對時部署量。
 -->
 
 <!-- knowledge_edge
@@ -160,18 +160,18 @@ view: industry
 from_id: product:nvidia-vera-rubin-nvl72
 to_id: stage:vera-rubin-platform-production
 relation: reaches_stage
-claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C1
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C1,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C21
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-27
-review_due: 2026-08-15
+as_of: 2026-08-31
+review_due: 2026-09-07
 status: active
-boundary: 平台商的 production 或 ramp 不提供各 ODM 工廠數量 良率 出貨與收入。
-next_trigger: 平台與系統廠以同一配置及期間公布實際生產和出貨分母。
+boundary: 平台商的 production shipments使平台生產證據前進，但不提供出貨物件 數量 具名ODM工廠 良率 acceptance或收入。
+next_trigger: 平台 客戶與系統廠以同一配置及期間公布實際生產 出貨物件 數量 收貨與驗收分母。
 -->
 
 <!-- knowledge_edge
