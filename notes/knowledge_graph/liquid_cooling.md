@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: liquid-cooling
 root_node_id: concept:liquid-cooling
 label: 液冷 CDU
-summary: 把 CDU 額定能力拆成熱性能、TCS 壓頭、FWS 阻抗與具位置單位時間品質的量測上下文，再把平台資格、供應狀態、系統整合、場域驗證與財務分開；2026-08-24 Marketplace 已改用 NVIDIA Product Qualified，不能與舊 Sample Ready／MP Ready 一對一換算。
+summary: 把 CDU 額定能力拆成熱性能、TCS 壓頭、FWS 阻抗與具位置單位時間品質的量測上下文，再把平台資格、供應狀態、系統整合、場域驗證與財務分開；2026-08-24 Marketplace 已改用 NVIDIA Product Qualified，不能與舊 Sample Ready／MP Ready 一對一換算。2026-09-03 光寶擬投資 DCX 約 25% 新增策略整合路徑，但交割、共同產品、具名客戶與財務橋接尚未完成。
 article_ids: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER
 status: active
 -->
@@ -284,6 +284,26 @@ metric_definition: 台達管理層對 2025 年 aggregate liquid-cooling products
 denominator_definition: 同一管理層回答中的公司合併營收占比基準，以 100 個百分點表示；來源未提供底層合併金額與產品收入金額。
 boundary: direct 只表示產品族分子可直接歸因到液冷主題；數字是管理層近似說法、不是經查核產品附註，也不能分配給 L2A、L2L、CDU 或 RDF106CDT5192。2026 年超過 12% 是預期，不納入本筆歷史 assessment；單一發行人揭露沒有 sampling SE／t。
 next_trigger: 公司以正式期間數字重述 2025／2026 液冷產品收入與分母，並拆出 L2A／L2L／CDU、具名型號、客戶、數量與產品毛利。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LC-C09
+view: company
+from_id: company:2301
+to_id: concept:liquid-cooling
+relation: integrates
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C29,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C30
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-04
+review_due: 2026-11-14
+status: active
+boundary: 光寶公告擬以 1.76 億美元取得 DCX 約 25% 股權並規劃共同開發、製造擴充與市場推廣；交易仍待交割，三家前十大 operator 未具名，也沒有共同型號、場域驗收、出貨、收入或毛利。不得把 DCX 產品與 LITEON LC-LL-WCDU-6011(S) 合併成同一證據。
+next_trigger: 交割完成公告，以及雙方或具名客戶把共同產品 ID、場域驗收、出貨數量與同期間財務分子接起來。
 -->
 
 <!-- knowledge_edge

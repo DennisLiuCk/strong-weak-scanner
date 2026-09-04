@@ -168,6 +168,8 @@ evidence: sources:S21
 - **客戶驗收**：客戶依約定條件確認設備或系統可接受。驗收比平台列名更接近商業結果，但仍須看是否產生訂單、交付與收入。
 - **量產**：產品以可重複方式持續製造與交付。本文沒有各型號的產量、良率、庫存或交期資料，因此不能替公司判定量產規模。
 - **財務認列**：公司依會計規則把交易記入收入、成本或獲利。產品列名、合作備忘錄與概念驗證都不能直接代替財務認列。
+- **策略投資**：公司用資金取得另一家公司部分股權，以建立長期合作或能力組合。宣布投資不等於已完成交割，也不等於被投資公司的全部產品、客戶與收入已屬於投資方。
+- **交割（Closing）**：交易條件完成後，股權、價款與權利義務正式移轉的時點。公告寫「交割完成後持有 25%」時，在交割前只能確認交易安排，不能先把 25% 當成已持有。
 - **毛利**：收入扣除直接銷售成本後的金額或比率。即使已有收入，仍需產品別或可合理拆分的資料，才能判斷液冷產品的獲利貢獻。
 - **分子／分母**：分子是要衡量的那一塊，例如液冷產品收入；分母是比較基準，例如同期間合併營收。只有分子、分母、期間與合併範圍都對齊，占比才有可查核意義。
 - **產品族（Product family）**：一組相關產品的合計範圍，可能同時含冷板、風扇、泵浦、CDU 或不同 L2A／L2L 架構。產品族占比不能直接分配給其中一個型號。
@@ -178,7 +180,7 @@ evidence: sources:S21
 - **MOU（合作備忘錄）**：合作方對預計合作範圍的書面表達。它不是已完成產品、採購合約、出貨或收入證據。
 - **Portfolio（產品組合）**：一家公司或合作案規劃涵蓋的一組產品。範圍可大於單一型號，不能拿整組規劃覆蓋某台設備的額定數字。
 - **AVC／奇鋐（3017）**：AVC 是 Asia Vital Components 的縮寫；本文用公司官網的 `TSE: 3017` 完成名稱映射。這只確認公司身分，不證明具名客戶或收入。
-- **Delta／台達電（2308）與 LITEON／光寶科（2301）**：本文以英文公司名出現的兩家台灣電源與散熱供應商，都是本 universe 成員。台達另有公司液冷產品族的近似營收占比；這仍不等於 NVIDIA 清單中的具名 CDU 已取得客戶訂單、出貨量或產品毛利，光寶目前也只有平台列名與廣泛部門範圍。
+- **Delta／台達電（2308）與 LITEON／光寶科（2301）**：本文以英文公司名出現的兩家台灣電源與散熱供應商，都是本 universe 成員。台達另有公司液冷產品族的近似營收占比；光寶則在 2026 年 9 月宣布擬投資 DCX 約 25% 股權。產品族占比或策略投資都不等於 NVIDIA 清單中的具名 CDU 已取得客戶訂單、出貨量或產品毛利。
 - **LGE／LG Electronics**：LG 電子的英文縮寫。2026-08-09 的 NVIDIA 清單可定位其 600kW 列項，但供應狀態欄空白，因此不能替它補成任何階段。
 - **CDU1000-LTL-RW／RDF106CDT5192／CDU3000／LC-LL-WCDU-6011(S)**：分別是 AVC、Delta 與 LITEON 在 NVIDIA 清單中的 CDU 型號；CDU3000 是 2026 年 8 月 17 日快照中可定位的第二個 Delta 型號。型號只是辨識產品的名字；容量、供應狀態與量產證據仍要分欄閱讀。
 - **TSE（Taiwan Stock Exchange，臺灣證券交易所）**：本文只用公司官網的 `TSE: 3017` 把 AVC 對應到臺灣上市公司奇鋐；這個代號本身不證明該 CDU 的客戶或收入。
@@ -188,7 +190,7 @@ evidence: sources:S21
 
 - 2026 年 8 月 2 日保存的 NVIDIA 清單先有三個台廠型號；8 月 9 日加入 LGE，8 月 17 日再出現 Delta CDU3000。每次快照只能在同日同欄換算容量，不能把後來新增的列回填到舊清單。
 - 容量只回答設備在指定條件下設計可帶走多少熱；還要把熱性能曲線、TCS 壓頭、FWS 阻抗，以及每筆讀值的設備、位置、單位、時間與品質接起來，才知道這個數字落在什麼操作包絡線。平台列名與供應標籤也都不等於客戶已部署。
-- 台達管理層已把「液冷產品」連到 2025 年約占合併營收 10% 的公司層級分子，但沒有拆成 L2A／L2L、具名 CDU、客戶、數量或產品毛利；其餘兩家季報的部門範圍也更廣。因此仍不能用容量大小替公司排行。
+- 台達管理層已把「液冷產品」連到 2025 年約占合併營收 10% 的公司層級分子，但沒有拆成 L2A／L2L、具名 CDU、客戶、數量或產品毛利；光寶 9 月 3 日公告擬以約 1.76 億美元取得 DCX 約 25% 股權，也只讓整合路徑更具體，交割、共同產品鍵、具名客戶驗收與財務貢獻仍未完成。因此不能用容量或持股比例替公司排行。
 
 ### 為什麼重要
 
@@ -203,6 +205,7 @@ evidence: sources:S21
 
 - 每週保存 NVIDIA 清單的型號、額定容量、驗證類別與原始供應標籤；只記錄欄位怎麼變，不自行替空白欄位補答案。
 - 查 3017、2308、2301 的重大訊息、法說與季報；對台達先追「液冷產品族」如何拆成 L2A／L2L 與具名 CDU，等公司把型號連到客戶驗收、量產數量、實際收入及毛利，才把證據推進到產品層。
+- 對光寶／DCX 先追交易是否完成交割，再追雙方是否公布共同型號、具名場域驗收、出貨量與同期間財務分子；「持股 25%」不能替代這四個節點。
 - 追蹤 Daikin／NTT DATA 的概念驗證是否在 2027 年 3 月前公布可重算的節電、成本或自動化結果，以及 Daikin 對 2027 財政年度的商用目標是否維持。
 
 ### 想一想
@@ -210,6 +213,7 @@ evidence: sources:S21
 - 如果一個型號容量較大，另一個型號的供應標籤看起來更往前，只靠這兩欄能判斷誰更接近客戶訂單與收入嗎？
 - 客戶選擇冷卻設備時，除了容量，是否還會同時檢查流量、壓差、故障備援、材料相容性、維修網路與整套控制整合？
 - 如果後續收入來自冰水主機、冷板或控制軟體，而不是冷卻液分配單元，研究中心應如何重新判斷價值落在哪一層？
+- 如果一筆策略投資最後完成，但始終沒有共同型號、具名客戶驗收或產品財務分子，應把它留在「能力整合」還是升到「商業落地」？為什麼？
 
 ## 主張與證據帳本
 
@@ -565,6 +569,38 @@ url: https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/?categor
 locator: 2026-08-24 live DOM 的 CDU category 顯示 1–15 of 28 items；目前欄位為 Vendor、CDU Model、CDU Type、Cooling Capacity @ 4°C ATD、Wetted Materials Compatibility、Validation Type、Validation Status。第一頁 15 筆可見列的 Validation Status 全為 NVIDIA Product Qualified；可定位 AVC CDU1000-LTL-RW 1.2MW、Delta RDF106CDT5192 1MW、Delta CDU3000 2MW、LITEON LC-LL-WCDU-6011(S) 380kW 與 LGE LCD060 600kW
 limitation: 本次只成功逐列捕捉第一頁 15／28 筆，沒有把未捕捉的第二頁個別狀態外推；動態頁缺不可變版本與變更日，現行 schema 不再顯示先前的流量與 Supply Chain Status，不能把 Product Qualified 一對一換算為 Sample Ready／MP Ready 或判定切換日期。列表也沒有原始測試、客戶部署、訂單、出貨、收入或毛利
 independence_group: nvidia-marketplace
+-->
+
+<!-- research_source
+source_id: S23
+role: exchange
+source_kind: living_index
+publisher: Taiwan Stock Exchange
+title: 光寶科技取得或處分資產重大訊息（2026-09-03）
+published_at:
+captured_at: 2026-09-04
+accepted_at: 2026-09-04
+status: active
+url: https://openapi.twse.com.tw/v1/opendata/t187ap04_L
+locator: 2026-09-04 捕捉的上市公司重大訊息日端點；公司代號 2301、發言日期 2026-09-03、發言時間 16:07:29。董事會決議對 DCX Liquid Cooling Systems Inc. 進行 176,000,000 美元策略投資，交割完成後持股 25%，價款於交割日支付、自有資金支應；交易金額占總資產 5.98%、占歸屬母公司業主權益 10.63%
+limitation: 動態日端點不是不可變附件，且內容只支持董事會決議、交易條件與公司自報比率；尚未證明交割已完成、DCX 客戶與產品可歸屬光寶、共同型號通過驗收，或交易帶來收入、毛利與現金流
+independence_group: liteon-technology
+-->
+
+<!-- research_source
+source_id: S24
+role: company_release
+source_kind: document
+publisher: LITE-ON Technology
+title: LITEON to Invest in DCX Liquid Cooling Systems to Accelerate Global AI Data Center Growth
+published_at: 2026-09-03
+captured_at: 2026-09-04
+accepted_at: 2026-09-04
+status: active
+url: https://www.liteon.com/en/news/press-center/content/liteon-dcx-liquid-cooling-systems-strategic-investment-2026
+locator: Transaction Overview、About DCX 與合作說明；光寶表示交割完成後將持有 DCX 約 25%、投資金額約 176,000,000 美元。公告列出 DCX enterprise CDU 600kW–2.6MW、facility CDU 最高 16MW、cold plates、rack manifolds、immersion 與 modular systems，並稱雙方將共同開發產品、擴充工程／製造與市場推廣；另稱 DCX 已部署於全球前十大 AI data center operators 中的三家並出貨 75 國
+limitation: 這是投資方公司公告；三家 operator 未具名，也沒有場域、型號、台數、測試版本、驗收條件、營收或毛利。公告沒有證明 DCX 產品與 NVIDIA 列名的 LITEON LC-LL-WCDU-6011(S) 是同一產品，也沒有證明交易已交割
+independence_group: liteon-technology
 -->
 
 <!-- research_claim
@@ -1043,6 +1079,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: 光寶董事會於 2026-09-03 決議以 176,000,000 美元策略投資 DCX Liquid Cooling Systems；公司表示交割完成後將持有約 25% 股權，價款於交割日支付並以自有資金支應
+supporting_source_ids: S23,S24
+contrary_source_ids:
+as_of: 2026-09-04
+basis: S23 的交易所重大訊息直接列出董事會決議、金額、預定持股、付款時點與資金來源；S24 的公司公告提供相同交易金額與交割後持股安排
+boundary: `verified` 只表示公司已公告交易安排；「交割完成後」不是已交割，25% 不是控制權，也不能把 DCX 的全部產品、客戶、收入、毛利或現金流先行歸入光寶
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: 光寶 2026-09-03 公告把 DCX 的產品範圍描述為 600kW–2.6MW enterprise CDU、最高 16MW facility CDU、cold plates、rack manifolds、immersion 與 modular systems，並表示雙方規劃共同開發、工程與製造擴充及市場推廣；同一公告稱 DCX 已部署於全球前十大 AI data center operators 中的三家並出貨 75 國
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-09-03
+basis: S24 的 About DCX、合作說明與交易新聞稿直接列出產品組合、合作範圍及公司對部署／出貨版圖的陳述
+boundary: `verified` 只證實光寶做出上述公開陳述；operator 未具名，沒有安裝母體、型號、台數、資格測試、客戶驗收或財務分子，也沒有把 DCX 產品與 LC-LL-WCDU-6011(S) 建立共同鍵
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C31
+label: inference
+status: active
+claim: 光寶對 DCX 的擬議持股與共同開發／製造／市場推廣計畫，為 2301 的液冷關聯新增一條策略整合路徑；但這條路徑不能與 NVIDIA 列名的 LC-LL-WCDU-6011(S) 合併成同一產品證據，也不足以升格為客戶資格、訂單、收入或毛利
+supporting_source_ids: S1,S22,S23,S24
+contrary_source_ids:
+as_of: 2026-09-04
+basis: S1／S22 保存光寶具名 CDU 的平台列項，S23／S24 則提供另一條 DCX 股權與整合計畫；四份來源缺少共同產品 ID、具名客戶、交割完成與財務歸因，因此只能並列兩條路徑，不能相互代填
+boundary: 這是研究中心對證據路徑的分層推論，不表示交易必然完成、DCX operator 就是光寶客戶、兩家公司產品已合併，或供應鏈鄰接已轉成 2301 的營收受惠
+verification_needed: 交易完成公告，以及雙方或具名客戶把共同型號、場域驗收、出貨數量、收入與產品毛利接到同一期間與合併範圍
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- transition
 date: 2026-08-24
 from: triaged
@@ -1050,6 +1137,33 @@ to: triaged
 reason: marketplace_schema_and_product_qualified_status_versioned_without_financial_thesis_clock_refresh
 evidence: sources:S22
 -->
+
+<!-- transition
+date: 2026-09-04
+from: triaged
+to: triaged
+reason: liteon_dcx_strategic_investment_added_without_financial_thesis_clock_refresh
+evidence: sources:S23,S24
+-->
+
+## 9 月 3 日更新：25% 投資把哪一關往前推？
+
+這次新證據推進的是「公司如何補齊能力」而不是「具名 CDU 已經賺多少錢」。光寶擬以
+1.76 億美元取得 DCX 約 25% 股權，並公開共同開發、擴產與市場推廣方向；這比單純平台列名
+多了一條可追蹤的整合路徑。公告同時使用「交割完成後」，所以目前仍不能把交易寫成已完成。
+
+| 問題 | 現在可回答 | 還不能回答 |
+|---|---|---|
+| 交易 | 董事會決議、1.76 億美元、交割後約 25% | 是否已交割、最終條件是否改變 |
+| 能力範圍 | DCX 的 CDU、冷板、manifold、浸沒式與模組化產品，以及共同開發／擴產計畫 | 哪些產品將由光寶製造、何時量產、雙方責任與產能 |
+| 客戶部署 | 光寶公告稱 DCX 服務三家全球前十大 AI data center operators、出貨 75 國 | operator 名稱、型號、台數、場域驗收、重複採購 |
+| 平台產品橋接 | 光寶與 DCX 都有可辨識的液冷產品路徑 | DCX 產品是否等同 NVIDIA 列名的 `LC-LL-WCDU-6011(S)` |
+| 財務 | 投資金額與公司自報資產／權益比率可定位 | DCX 或共同產品收入、毛利、現金流，以及對 2301 的認列方式與金額 |
+
+新手可以把這件事拆成四個後續問題：交易有沒有交割？共同產品有沒有名稱？具名客戶有沒有
+驗收？公司有沒有用同期間、同合併範圍公布收入與毛利？四個答案未接起來以前，25% 是
+股權與合作強度的資訊，不是訂單或獲利的替代值。因此 C21 的財務橋接主命題與 evidence clock
+都不刷新。
 
 ## 容量可以換算，商業成熟度不能跟著換算
 
@@ -1642,14 +1756,18 @@ ICC 對 DDP 的定義重點是賣方負責送達約定目的地、進口清關�
 - [S20：ASHRAE Chapter 13 Hydronic Heating and Cooling](https://handbook.ashrae.org/Handbooks/S20/SI/s20_ch13/s20_ch13_si.aspx)（2026-08-14 capture；水側熱平衡、standard-water 物性與管路攜熱能力的一般方法，不是具名 CDU 測試結果）。
 - [S21：NVIDIA Marketplace DSX Infrastructure 動態清單](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)（2026-08-17 capture；新增 Delta CDU3000 2MW／3200LPM 列項，供應狀態空白；舊快照不覆寫）。
 - [S22：NVIDIA Marketplace CDU schema／status capture](https://marketplace.nvidia.com/en-us/enterprise/dsx-infrastructure/)（2026-08-24 live DOM；category denominator 28、第一頁逐列捕捉 15 筆且皆顯示 NVIDIA Product Qualified；新版不再顯示舊流量／Supply Chain Status，未捕捉第二頁個別狀態）。
+- [S23：TWSE 上市公司重大訊息日端點](https://openapi.twse.com.tw/v1/opendata/t187ap04_L)（2026-09-04 capture；光寶 9 月 3 日董事會決議對 DCX 投資 1.76 億美元、交割後持股約 25%；動態端點不證明交易已交割）。
+- [S24：光寶投資 DCX 公司公告](https://www.liteon.com/en/news/press-center/content/liteon-dcx-liquid-cooling-systems-strategic-investment-2026)（2026-09-03；產品與共同開發／擴產／市場推廣範圍，以及三家前十大 operator／75 國的公司陳述；operator、型號、台數與財務均未揭露）。
 
-**可證實：** 各自快照中同日同欄的容量、平台原始供應標籤、8 月 17 日新出現的 Delta CDU3000 列項、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位、可靠度測試類別及 Deschutes 產品頁的 headline。ASHRAE 可證實水側熱平衡的一般關係；它與 OCP 的 ATD 定義也足以證實「迴路溫升」和「兩側供水 approach」是兩個位置不同的溫差。台達管理層也確實做出「2025 年液冷產品約占合併營收 10%、2026 年預期超過 12%」的陳述，但前者是近似產品族占比，後者是預期。
+**可證實：** 各自快照中同日同欄的容量、平台原始供應標籤、8 月 17 日新出現的 Delta CDU3000 列項、LG 自述驗證、合作備忘錄範圍與概念驗證時程；OCP 文件另可證實其建議的性能報告欄位、可靠度測試類別及 Deschutes 產品頁的 headline。ASHRAE 可證實水側熱平衡的一般關係；它與 OCP 的 ATD 定義也足以證實「迴路溫升」和「兩側供水 approach」是兩個位置不同的溫差。台達管理層也確實做出「2025 年液冷產品約占合併營收 10%、2026 年預期超過 12%」的陳述，但前者是近似產品族占比，後者是預期。光寶已公告擬以 1.76 億美元取得 DCX 約 25% 股權與雙方整合計畫；這證實的是交易安排與公司陳述，不是已交割或已實現財務。
 
 **待驗證：** 平台狀態的精確判準、具名客戶、部署數、訂單、具名 CDU 收入、產品毛利、
 現金流與實際節能結果。15.19 K 只是標準水與同一穩態 reference plane 假設下的條件式算術，
 不是 Deschutes 實測、3°C ATD 的另一種寫法或設備效率。台達產品族占比不能分配給單一
 L2A／L2L 或 RDF106CDT5192；OCP 方法也不能證明某一具名產品已完成相同測試。合作名單、
 平台列名、額定 kW、headline 流量／壓力或廣泛部門數字都不得替代這些產品與公司層級證據。
+光寶／DCX 還要等待交割完成、共同產品 ID、具名 operator／場域驗收，以及可對回 2301 的
+出貨與財務分子；持股比例不能替這些欄位代填答案。
 
 ## 8 月 9 日複核：LG 進入清單，但供應階段仍空白
 
@@ -1766,8 +1884,8 @@ direction: uncertain
 hypothesis_refs:
 note_action: watch
 action_due: 2026-08-09
-rationale: NVIDIA capture 分別列出 Delta RDF106CDT5192 1MW／MP Ready 與 LITEON LC-LL-WCDU-6011(S) 380kW／Sample Ready，Daikin MOU另提供台達整合範圍
-evidence_boundary: 台達另有 aggregate liquid-cooling products 約占 2025 年合併營收 10% 的管理層陳述，但平台列名、狀態、MOU 與公司產品族占比都不證明 RDF106CDT5192 或光寶 LC-LL-WCDU-6011(S) 的具名客戶、量產出貨、產品收入、市占、毛利或現金流
+rationale: NVIDIA capture 分別列出 Delta RDF106CDT5192 1MW／MP Ready 與 LITEON LC-LL-WCDU-6011(S) 380kW／Sample Ready，Daikin MOU提供台達整合範圍；光寶2026-09-03公告擬取得DCX約25%股權並規劃共同開發、製造擴充及市場推廣，新增可追蹤的策略整合路徑
+evidence_boundary: 台達另有 aggregate liquid-cooling products 約占 2025 年合併營收 10% 的管理層陳述；光寶／DCX交易仍待交割，operator未具名且DCX產品未與LC-LL-WCDU-6011(S)建立共同鍵。平台列名、狀態、MOU、持股安排與公司產品族占比都不證明具名客戶、量產出貨、產品收入、市占、毛利或現金流
 -->
 
 ## 持續驗證清單

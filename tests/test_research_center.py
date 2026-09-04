@@ -3770,6 +3770,12 @@ class ResearchCenterTest(unittest.TestCase):
             "source_id: S22",
             "claim_id: C27\nlabel: verified",
             "claim_id: C28\nlabel: inference",
+            "## 9 月 3 日更新：25% 投資把哪一關往前推？",
+            "光寶董事會於 2026-09-03 決議以 176,000,000 美元策略投資",
+            "claim_id: C29\nlabel: verified",
+            "claim_id: C30\nlabel: verified",
+            "claim_id: C31\nlabel: inference",
+            "liteon_dcx_strategic_investment_added_without_financial_thesis_clock_refresh",
             "## 接下來看到什麼，判定才會改變",
         ):
             self.assertIn(contract, topic)
@@ -3777,7 +3783,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 69
+            sum(line.startswith("- **") for line in glossary.splitlines()), 71
         )
         reflection = topic.split("### 想一想", 1)[1].split(
             "## 主張與證據帳本", 1
@@ -3785,16 +3791,17 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn("Sample Ready", reflection)
         self.assertNotIn("MP Ready", reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 22),
-            ("research_claim", 28), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 24),
+            ("research_claim", 31), ("metric_comparison", 12),
             ("impact", 2), ("monitoring_item", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         graph = (
             ROOT / "notes" / "knowledge_graph" / "liquid_cooling.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 30)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 31)
         for edge_id in (
+            "KG-LC-C09",
             "KG-LC-I10", "KG-LC-I11", "KG-LC-I12", "KG-LC-I13",
             "KG-LC-I14", "KG-LC-I15", "KG-LC-I16", "KG-LC-I17",
             "KG-LC-I18", "KG-LC-I19", "KG-LC-I20",

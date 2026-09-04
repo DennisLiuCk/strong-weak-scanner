@@ -153,6 +153,36 @@ class RecentResearchArticlesTest(unittest.TestCase):
             [("2026-07-21", "topic"), ("2026-07-20", "topic")],
         )
 
+    def test_topic_transition_advances_content_date_without_refreshing_evidence_clock(self):
+        topic = {
+            "topic_id": "MI-2026-07-29-CONTENT-UPDATE",
+            "meta": {"last_reviewed_at": "2026-07-29"},
+            "captured_at": "2026-07-28",
+            "transitions": [{
+                "date": "2026-08-01", "from": "triaged", "to": "triaged",
+                "reason": "method_update_without_thesis_clock_refresh",
+                "evidence": "sources:S2",
+            }],
+            "last_evidence_at": "2026-07-29",
+            "stock_ids": [], "group_ids": ["thermal"],
+            "title": "方法補強仍應出現在最新內容",
+            "relpath": "notes/research_topics/content-update.md",
+            "quality_invalid": False, "quality_errors": [],
+        }
+
+        feed = bd.build_recent_articles(
+            "2026-07-31", {}, {}, {"all": []}, [topic], {},
+        )
+
+        self.assertEqual(feed["anchor"], "2026-08-01")
+        self.assertEqual(feed["items"][0]["date"], "2026-08-01")
+        self.assertEqual(topic["meta"]["last_reviewed_at"], "2026-07-29")
+        self.assertEqual(topic["last_evidence_at"], "2026-07-29")
+        self.assertIn(
+            "topic_date = _topic_content_date(topic)",
+            inspect.getsource(bd.build_research_library),
+        )
+
     def test_feed_has_no_wall_clock_or_file_mtime_dependency(self):
         source = inspect.getsource(bd.build_recent_articles)
         self.assertNotIn("today", source)

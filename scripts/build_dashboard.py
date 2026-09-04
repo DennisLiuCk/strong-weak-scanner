@@ -1917,6 +1917,27 @@ def _article_metadata_usable(info):
     return bool(info) and not info.get("quality_invalid") and not info.get("quality_errors")
 
 
+def _topic_content_date(topic):
+    """題材文章的內容更新日；與主命題 evidence clock 分開。
+
+    `last_reviewed_at` 只在主命題取得合格新證據時前進。方法補強、反證邊界或公司支線
+    仍會實際改動文章，因此首頁與研究中心改以 append-only transition 的最晚日期標示
+    「內容更新」。可信度仍讀 claim ledger 的 last_evidence_at，不被這個日期刷新。
+    """
+    meta = (topic or {}).get("meta") or {}
+    candidates = [
+        _article_date(meta.get("last_reviewed_at")),
+        _article_date((topic or {}).get("captured_at")),
+    ]
+    candidates.extend(
+        _article_date(item.get("date"))
+        for item in ((topic or {}).get("transitions") or [])
+        if isinstance(item, dict)
+    )
+    valid = [value for value in candidates if value is not None]
+    return max(valid).isoformat() if valid else None
+
+
 def _event_research_id(event):
     """事件錨點在研究中心的穩定深連結；不依檔名語系或排序位置。"""
     subject = re.sub(r"[^a-z0-9]+", "-", (event.get("subject") or "market").lower()).strip("-")
@@ -2005,10 +2026,7 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
     for topic in topics or []:
         if not _article_metadata_usable(topic):
             continue
-        meta = topic.get("meta") or {}
-        topic_date = (meta.get("last_reviewed_at")
-                      if _article_date(meta.get("last_reviewed_at"))
-                      else topic.get("captured_at"))
+        topic_date = _topic_content_date(topic)
         stock_ids = topic.get("stock_ids") or []
         if stock_ids:
             subject = "、".join(stock_subject(sid) for sid in stock_ids)
@@ -2943,9 +2961,7 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
         if not _article_metadata_usable(topic):
             continue
         meta = topic.get("meta") or {}
-        topic_date = (meta.get("last_reviewed_at")
-                      if _article_date(meta.get("last_reviewed_at"))
-                      else topic.get("captured_at"))
+        topic_date = _topic_content_date(topic)
         stock_ids = topic.get("stock_ids") or []
         if stock_ids:
             subject = "、".join(stock_subject(stock_id) for stock_id in stock_ids)
