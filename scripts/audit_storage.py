@@ -173,11 +173,13 @@ def main(argv=None):
         print(json.dumps(report, indent=2, ensure_ascii=True))
     else:
         print(f"SQLite: {report['mib']:.2f} MiB ({report['bytes']} bytes); {report['size_status']}")
+        print(f"SHA-256: {report['db_sha256']}")
         print(f"Freelist: {report['sqlite']['freelist_bytes']} bytes")
         for row in (report["tables"] or [])[:10]:
             print(f"  {row['name']}: {row['total_bytes'] / MIB:.2f} MiB including indexes")
         if "gzip" in report:
             print(f"Gzip: {report['gzip']['compressed_bytes'] / MIB:.2f} MiB; "
+                  f"{report['gzip']['compressed_bytes']} bytes; "
                   f"round_trip_ok={report['gzip']['round_trip_ok']}")
         for kind in ("warnings", "errors"):
             for message in report[kind]:

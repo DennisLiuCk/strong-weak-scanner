@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 每週容量與壓縮回復普查
+        run: python scripts/audit_storage.py --gzip-probe >> "$GITHUB_STEP_SUMMARY"
+
       - name: 產生週度驗證報告(reports/validate_<資料迄日>.md)
         run: python scripts/validate.py
 

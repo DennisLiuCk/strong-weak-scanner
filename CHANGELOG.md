@@ -1,5 +1,19 @@
 # Changelog
 
+## 每週容量稽核與儲存遷移門檻 — 2026-09-07
+
+- 週報 workflow 執行 `audit_storage.py --gzip-probe`，job summary 留下容量、SHA 與
+  gzip 回復結果；CLI 顯示完整 DB SHA 及壓縮後 bytes。
+- 本機 Windows 11／Python 3.12.10／SQLite 3.49.1、預設編碼下，DB 為 60,551,168
+  bytes（57.75 MiB），頁數×頁大小獨立吻合；gzip level 6 為 20,387,195 bytes，
+  解壓與原檔逐 byte 一致。50 MiB 警告及本機 dbstat 不可用均保留，不把 exit 0 當零警告。
+  這是完整檔案量測，SE／t 不適用，不外推達上限日期。
+- Runbook 明訂 75／90 MiB 的準備與遷移優先門檻，並列出 final／checkpoint 保留、
+  可信 pin、離線副本、定期還原及舊版回退需求；這些保留需求尚未啟用，不刪 DB、
+  不改正式儲存來源、不裁切 OOS 或 archive。
+- 遠端 `db-artifact-smoke` 因完整 DB artifact 上傳的自動授權審核未通過，仍待使用者
+  確認；尚無本輪 runner 復原驗收，不宣稱完成儲存遷移。詳見容量報告與 DB artifact runbook。
+
 ## 整合健康摘要與共同發布前檢查 — 2026-09-07
 
 - `daily_brief.py` 與每日 complete workflow 加入 `operational_health.py`，分別顯示
