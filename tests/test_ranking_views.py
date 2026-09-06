@@ -182,6 +182,83 @@ class FundamentalPointInTimeTest(unittest.TestCase):
         self.assertAlmostEqual(values["A"]["operating_margin_yoy_delta"], 0.05)
         self.assertIsNotNone(values["A"]["revenue_3m_yoy"])
 
+    def add_month(self, sid, year, month, seen="2026-09-04T12:00:00+00:00"):
+        storage = f"{year + (month == 12)}-{month % 12 + 1:02d}-01"
+        self.con.execute("INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+                         (storage, sid, 150, month, year))
+        self.con.execute("INSERT INTO fundamental_availability VALUES(?,?,?,?,?,?)",
+                         ("TaiwanStockMonthRevenue", storage, sid, None, seen, "test"))
+
+    def test_early_reporter_does_not_move_common_month_and_rest_comparison(self):
+        before, _ = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
+        self.add_month("A", 2026, 8)
+        after, meta = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
+        self.assertEqual(after, before)
+        self.assertEqual(meta["month_period"], "2026-07")
+        self.assertEqual(meta["latest_month_period"], "2026-08")
+        self.assertEqual(meta["latest_month_coverage"], 1)
+        self.assertEqual(meta["latest_month_missing"], ["B"])
+        self.assertEqual(meta["period_status"], "pending_new_period")
+
+    def test_common_month_moves_only_after_both_reports_are_known(self):
+        self.add_month("A", 2026, 8)
+        self.add_month("B", 2026, 8, seen="2026-09-05T12:00:00+00:00")
+        _, before = rv.load_fundamental_inputs(
+            self.con, as_of="2026-09-04T23:59:59+00:00", stock_ids=["A", "B"])
+        _, after = rv.load_fundamental_inputs(
+            self.con, as_of="2026-09-05T12:00:00+00:00", stock_ids=["B", "A"])
+        self.assertEqual(before["month_period"], "2026-07")
+        self.assertEqual(after["month_period"], "2026-08")
+        self.assertEqual(after["period_status"], "complete")
+
+    def test_reference_company_cannot_choose_period_or_block_universe(self):
+        before, _ = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
+        self.add_month("REF", 2027, 1)
+        after, meta = rv.load_fundamental_inputs(self.con, stock_ids=["B", "A"])
+        self.assertEqual(after, before)
+        self.assertEqual(meta["latest_month_period"], "2026-07")
+        self.assertEqual(meta["scope_stocks"], 2)
+
+    def test_missing_scope_member_does_not_silently_shrink_comparison(self):
+        values, meta = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B", "C"])
+        self.assertEqual(values, {})
+        self.assertFalse(meta["available"])
+        self.assertEqual(meta["period_status"], "no_common_period")
+        self.assertIn("C", meta["latest_month_missing"])
+
+    def test_partial_quarter_including_incomplete_income_statement_waits(self):
+        before, _ = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
+        for sid, kinds in (("A", ("Revenue", "OperatingIncome")), ("B", ("Revenue",))):
+            for kind in kinds:
+                self.con.execute("INSERT INTO financials VALUES(?,?,?,?,?)",
+                                 ("2026-06-30", sid, kind, 180 if kind == "Revenue" else 20, None))
+            self.con.execute("INSERT INTO fundamental_availability VALUES(?,?,?,?,?,?)",
+                             ("TaiwanStockFinancialStatements", "2026-06-30", sid, None,
+                              "2026-08-14T12:00:00+00:00", "test"))
+        values, meta = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
+        self.assertEqual(values, before)
+        self.assertEqual(meta["quarter_period"], "2026-03-31")
+        self.assertEqual(meta["latest_quarter_period"], "2026-06-30")
+        self.assertEqual(meta["latest_quarter_missing"], ["B"])
+        self.con.execute("INSERT INTO financials VALUES(?,?,?,?,?)",
+                         ("2026-06-30", "B", "OperatingIncome", 22, None))
+        _, meta = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
+        self.assertEqual(meta["quarter_period"], "2026-06-30")
+
+    def test_missing_comparison_history_stays_null_instead_of_zero(self):
+        self.con.execute("DELETE FROM month_revenue WHERE stock_id='B' AND revenue_year=2025")
+        values, meta = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
+        self.assertEqual(meta["month_period"], "2026-07")
+        self.assertIsNone(values["B"]["revenue_3m_yoy"])
+        self.assertEqual(values["B"]["operating_margin"], 0.15)
+
+    def test_first_seen_includes_historical_inputs_used_by_growth(self):
+        self.con.execute("UPDATE fundamental_availability SET first_seen_at=? "
+                         "WHERE stock_id='A' AND dataset='TaiwanStockMonthRevenue' AND data_date='2025-06-01'",
+                         ("2026-09-03T12:00:00+00:00",))
+        values, _ = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
+        self.assertEqual(values["A"]["first_seen_at"], "2026-09-03T12:00:00+00:00")
+
 
 class RolesConfigTest(unittest.TestCase):
     def test_role_config_exactly_covers_universe(self):

@@ -69,6 +69,12 @@ D 視角只讀 `fundamental_availability.first_seen_at` 已證明當時可見的
 ledger 建立前不回填過去排名；2026-08-13 migration 時的既有資料只從該時點起視為已知，
 後續抓取同樣保留第一次看到的時間。這個保守下界避免用財報期間日冒充發布日造成 look-ahead。
 
+D 的月、季比較期間分別採「正式 universe 當期原始值 100% 到齊」的最新共同月份／季度，
+參考股票不參與選期；季度須同時有營收與營業利益。少數早報者只更新新期間覆蓋提示，
+不推動整體切期。前年比較或必要 component 缺失仍保留空值；共同期間到齊不保證每檔都有
+足夠 component 可排名。沒有共同期間時暫停 D，並以品質警告顯示，不補 0。
+每次新期間資料不齊，頁面與 ranking audit 都顯示已收檔數、比較期與待切換期。
+
 正式 Champion 的 production 權重與 tier 維持不變。兩個 challenger 從 2026-08-13 起
 隨正式快照 append-only 累積：C1 把量能權重設為 0、C2 把價格權重 1.4 降為 1.0；它們只
 比較 tie-safe 族群名次，不重跑或暗改 tier。`spec_sha` 同時覆蓋 ranking contract 與核心

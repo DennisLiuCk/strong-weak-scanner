@@ -406,6 +406,20 @@ def build_audit(con, *, date=None, fwd=10, require_current_snapshot=False):
     if progress["invalid_runs"]:
         hard_errors.append("invalid_or_mixed_spec_snapshot")
 
+    fundamental = (payload or {}).get("fundamental") or {}
+    if fundamental.get("period_status") == "no_common_period":
+        warnings.append("fundamental_common_period_unavailable")
+    elif fundamental.get("period_status") == "pending_new_period":
+        warnings.append(
+            "fundamental_new_period_pending:"
+            f"month={fundamental.get('latest_month_period')}:"
+            f"{fundamental.get('latest_month_coverage')}/{fundamental.get('scope_stocks')},"
+            f"comparison={fundamental.get('month_period')};"
+            f"quarter={fundamental.get('latest_quarter_period')}:"
+            f"{fundamental.get('latest_quarter_coverage')}/{fundamental.get('scope_stocks')},"
+            f"comparison={fundamental.get('quarter_period')}"
+        )
+
     stock_count = current["stocks"] or 1
     for key in ("lens_a", "lens_b", "lens_c", "lens_d"):
         if current["coverage"].get(key, 0) < current["stocks"]:
@@ -458,6 +472,7 @@ def compact(audit):
         "structural_days": progress["structural_history"]["days"],
         "mature_10d_days": progress["mature_10d_days"],
         "phase": progress["phase"],
+        "fundamental": audit.get("fundamental"),
         "hard_errors": audit["hard_errors"],
         "warnings": audit["warnings"],
     }

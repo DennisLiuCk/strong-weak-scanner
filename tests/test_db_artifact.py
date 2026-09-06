@@ -263,18 +263,29 @@ class DbArtifactTest(unittest.TestCase):
             artifact.create_artifact(commit, output, repo=self.repo)
         self.assertFalse(output.exists())
 
-    def test_production_paths_symlinks_and_hardlinks_are_blocked(self):
-        alias = self.root / "alias.db"
-        alias.symlink_to(self.db)
+    def test_production_paths_and_hardlinks_are_blocked(self):
         hardlink = self.root / "linked.db"
         os.link(self.db, hardlink)
         with mock.patch.object(artifact, "ROOT", self.repo):
-            for path in (self.db, self.db.parent / "new.db", alias, hardlink):
+            for path in (self.db, self.db.parent / "new.db", hardlink):
                 with self.subTest(path=path):
                     with self.assertRaises(artifact.ArtifactError):
                         self.restore(destination=path)
             with self.assertRaises(artifact.ArtifactError):
                 artifact.create_artifact(self.commit, self.db.parent / "bundle", repo=self.repo)
+        self.assertEqual(self.db.read_bytes(), self.original)
+
+    def test_production_symlink_is_blocked(self):
+        alias = self.root / "alias.db"
+        try:
+            alias.symlink_to(self.db)
+        except OSError as exc:
+            if os.name == "nt" and getattr(exc, "winerror", None) == 1314:
+                self.skipTest("Windows account lacks symlink privilege; exercised on Linux CI")
+            raise
+        with mock.patch.object(artifact, "ROOT", self.repo):
+            with self.assertRaises(artifact.ArtifactError):
+                self.restore(destination=alias)
         self.assertEqual(self.db.read_bytes(), self.original)
 
     def test_artifact_and_manifest_cannot_be_restore_destinations(self):

@@ -32,8 +32,9 @@ from score import VOL_OVERHEAT, VOLR_OVERHEAT, WEIGHTS
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROLES_CONFIG = os.path.join(ROOT, "config", "ranking_roles.csv")
-SCHEMA_VERSION = 1
-REGISTERED_AT = "2026-08-13T00:00:00+08:00"
+SCHEMA_VERSION = 2
+REGISTERED_AT = "2026-09-07T00:00:00+08:00"
+CHALLENGER_REGISTERED_AT = "2026-08-13T00:00:00+08:00"
 MIN_ROLE_N = 4
 TOP_PCT = 80.0
 RISK_FLAG_CAP = 10.0
@@ -43,14 +44,14 @@ CHALLENGERS = {
         "label": "C1 量能移出綜合分",
         "purpose": "測試量能只保留為過熱 gate，是否降低無效自由度",
         "weights": {**WEIGHTS, "vol": 0.0},
-        "registered_at": REGISTERED_AT,
+        "registered_at": CHALLENGER_REGISTERED_AT,
         "oos_start": "2026-08-13",
     },
     "price_1_0": {
         "label": "C2 降低價格集中度",
         "purpose": "測試價格權重 1.4→1.0，其他條件不變",
         "weights": {**WEIGHTS, "price": 1.0},
-        "registered_at": REGISTERED_AT,
+        "registered_at": CHALLENGER_REGISTERED_AT,
         "oos_start": "2026-08-13",
     },
 }
@@ -95,6 +96,9 @@ RANKING_CONTRACT = {
                            "operating margin", "operating margin yoy delta"],
             "minimum": "growth and operating margin present; at least 3/4 components",
             "point_in_time": "fundamental_availability.first_seen_at <= as_of",
+            "comparison_period": "latest common month and quarter across current universe",
+            "period_coverage": "100% have non-null revenue; quarter also requires operating income",
+            "early_reporters": "disclose newer partial periods; do not move the comparison cohort",
         },
     },
     "champion": {
@@ -298,7 +302,18 @@ def _quarter_last_year(date_text):
         return None
 
 
-def load_fundamental_inputs(con, *, as_of=None):
+def _common_period(period_members, stock_ids):
+    """選當期原始值全母體齊備的最新期間；不把參考股票或早報者當切期依據。"""
+    required = set(stock_ids)
+    periods = sorted(period_members, reverse=True)
+    latest = periods[0] if periods else None
+    selected = next((period for period in periods
+                     if required and required <= period_members[period]), None)
+    present = period_members.get(latest, set()) & required
+    return selected, latest, len(present), sorted(required - present)
+
+
+def load_fundamental_inputs(con, *, as_of=None, stock_ids=None):
     """只讀 first-seen ledger 已證明當時可見的基本面資料。
 
     既有歷史資料在 baseline 前不會被冒充為過去已知；初始化只證明「從 baseline 起已知」。
@@ -332,26 +347,59 @@ def load_fundamental_inputs(con, *, as_of=None):
         meta["reason"] = "point-in-time rows not yet available"
         return {}, meta
 
-    latest_month = max(_month_index(row["revenue_year"], row["revenue_month"])
-                       for row in revenue_rows)
+    scope = (set(stock_ids) if stock_ids is not None else
+             {row["stock_id"] for row in revenue_rows + financial_rows})
+    revenue_rows = [row for row in revenue_rows if row["stock_id"] in scope]
+    financial_rows = [row for row in financial_rows if row["stock_id"] in scope]
     revenues = defaultdict(dict)
     month_seen = {}
+    month_members = defaultdict(set)
     for row in revenue_rows:
         idx = _month_index(row["revenue_year"], row["revenue_month"])
         revenues[row["stock_id"]][idx] = row["revenue"]
         month_seen[(row["stock_id"], idx)] = row["first_seen_at"]
+        month_members[idx].add(row["stock_id"])
 
-    latest_quarter = max(row["date"] for row in financial_rows)
     financials = defaultdict(dict)
     quarter_seen = {}
     for row in financial_rows:
         financials[(row["stock_id"], row["date"])][row["type"]] = row["value"]
         quarter_seen[(row["stock_id"], row["date"])] = row["first_seen_at"]
 
+    quarter_members = defaultdict(set)
+    for (stock_id, period), values in financials.items():
+        if all(key in values for key in ("Revenue", "OperatingIncome")):
+            quarter_members[period].add(stock_id)
+        else:
+            # 有 Revenue 但缺 OperatingIncome 也必須披露為該季尚未到齊。
+            quarter_members[period]
+    latest_month, observed_month, month_n, month_missing = _common_period(month_members, scope)
+    latest_quarter, observed_quarter, quarter_n, quarter_missing = _common_period(
+        quarter_members, scope)
+
+    def month_label(period):
+        return f"{period // 12:04d}-{period % 12 + 1:02d}" if period is not None else None
+
+    meta.update({
+        "scope_stocks": len(scope),
+        "month_period": month_label(latest_month),
+        "quarter_period": latest_quarter,
+        "latest_month_period": month_label(observed_month),
+        "latest_month_coverage": month_n,
+        "latest_month_missing": month_missing,
+        "latest_quarter_period": observed_quarter,
+        "latest_quarter_coverage": quarter_n,
+        "latest_quarter_missing": quarter_missing,
+        "period_status": "complete",
+    })
+    if latest_month is None or latest_quarter is None:
+        meta.update(reason="common comparison period unavailable", period_status="no_common_period")
+        return {}, meta
+    if latest_month != observed_month or latest_quarter != observed_quarter:
+        meta["period_status"] = "pending_new_period"
+
     out = {}
-    stock_ids = sorted({row["stock_id"] for row in revenue_rows}
-                       | {row["stock_id"] for row in financial_rows})
-    for stock_id in stock_ids:
+    for stock_id in sorted(scope):
         series = revenues.get(stock_id, {})
         current_idx = [latest_month - offset for offset in (2, 1, 0)]
         prior_idx = [idx - 12 for idx in current_idx]
@@ -381,21 +429,23 @@ def load_fundamental_inputs(con, *, as_of=None):
         prior_margin = margin(prior_fin)
         margin_delta = (op_margin - prior_margin
                         if op_margin is not None and prior_margin is not None else None)
-        first_seen = [month_seen.get((stock_id, latest_month)),
-                      quarter_seen.get((stock_id, latest_quarter))]
+        first_seen = [month_seen.get((stock_id, period)) for period in
+                      set(current_idx + prior_idx + earlier_idx + earlier_prior_idx)]
+        first_seen += [quarter_seen.get((stock_id, period))
+                       for period in (latest_quarter, prior_date)]
         first_seen = [value for value in first_seen if value]
         out[stock_id] = {
             "revenue_3m_yoy": growth_3m,
             "revenue_accel": acceleration,
             "operating_margin": op_margin,
             "operating_margin_yoy_delta": margin_delta,
-            "month_period": f"{latest_month // 12:04d}-{latest_month % 12 + 1:02d}",
+            "month_period": month_label(latest_month),
             "quarter_period": latest_quarter,
             "first_seen_at": max(first_seen) if first_seen else None,
         }
     meta.update({
         "available": True,
-        "month_period": f"{latest_month // 12:04d}-{latest_month % 12 + 1:02d}",
+        "month_period": month_label(latest_month),
         "quarter_period": latest_quarter,
         "reason": "point-in-time ledger",
     })
@@ -615,7 +665,7 @@ def spec_digest():
     evaluators = {
         function.__name__: inspect.getsource(function)
         for function in (
-            rank_percentiles, peer_sensitivity, load_fundamental_inputs,
+            rank_percentiles, peer_sensitivity, _common_period, load_fundamental_inputs,
             shadow_composites, compute_group_views,
         )
     }
@@ -638,7 +688,9 @@ def build_from_db(con, date, *, as_of=None, roles_path=ROLES_CONFIG, strict_role
         return None
     risk_ids = {row["stock_id"] for row in con.execute(
         "SELECT stock_id FROM risk_flags WHERE date=?", (date,))}
-    fundamentals, fundamental_meta = load_fundamental_inputs(con, as_of=as_of)
+    universe_ids = [row[0] for row in con.execute("SELECT stock_id FROM universe")]
+    fundamentals, fundamental_meta = load_fundamental_inputs(
+        con, as_of=as_of, stock_ids=universe_ids)
     roles = load_roles(roles_path, rows, strict=strict_roles)
     challengers = shadow_composites(con, date)
     grouped = defaultdict(list)

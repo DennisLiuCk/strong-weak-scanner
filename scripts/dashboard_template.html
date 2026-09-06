@@ -1110,7 +1110,11 @@ function buildRankingViews(){
     if(restoreRowFocus){const target=tableBody.querySelector('[data-rv-stock="'+selectedId+'"]');if(target)target.focus();}
   }
   gsel.onchange=()=>{groupKey=gsel.value;selectedId=null;rvRemember('rankingGroup',groupKey);render(false);};render(false);
-  const dReady=R.fundamental&&R.fundamental.available,dNote=dReady?`D 視角採 first-seen ledger；月營收到 ${R.fundamental.month_period}、季財報到 ${R.fundamental.quarter_period}，${R.coverage.lensD}/${R.coverage.stocks} 檔可排名。`:'D 視角尚未啟動：既有財務資料不可回填成過去已知；等 first-seen ledger 在下一次財務抓取初始化後，才從當時起排名。';
+  const F=R.fundamental||{},dReady=F.available;
+  let dNote=dReady?`D 共同比較期間：月營收 ${F.month_period}、季財報 ${F.quarter_period}；${R.coverage.lensD}/${R.coverage.stocks} 檔可排名。`:
+    F.period_status==='no_common_period'?'D 暫無共同到齊的比較期間；缺資料維持尚無排名。':'D 尚無可追溯取得時間的財務資料，暫不排名。';
+  if(F.latest_month_period&&F.latest_month_period!==F.month_period)dNote+=` 新月份 ${F.latest_month_period} 已收 ${F.latest_month_coverage}/${F.scope_stocks} 檔，待名單到齊再切換。`;
+  if(F.latest_quarter_period&&F.latest_quarter_period!==F.quarter_period)dNote+=` 新季度 ${F.latest_quarter_period} 已收 ${F.latest_quarter_coverage}/${F.scope_stocks} 檔，待名單到齊再切換。`;
   const governance=h('details',{class:'card rv-method'},h('summary',{text:'方法、範圍與限制'}),h('div',{class:'rv-method-body'},h('p',{html:'所有百分位都採<b>平均秩</b>：同分拿相同名次，與資料順序無關。正式 Champion 的權重與分層<b>沒有改動</b>；C1「量能歸零」與 C2「價格降權」只在正式快照內累積 challenger 證據。至少兩個視角同進前 20% 才稱共識；Pareto 與視角數都是摘要，不是第五個預測分數。'}),h('p',{text:dNote+' 角色 rank 沿用正式綜合顯示秩，僅在同角色至少 4 檔時顯示；其餘只顯示角色標籤。spec '+R.specSha.slice(0,12)+'…'})));
   return [h('p',{class:'kicker',text:'四個平行視角 · 觀察層'}),h('h2',{class:'sec',text:'同一族群，換個問題會得到不同答案'}),h('p',{class:'lead',html:'正式綜合回答價格／韌性主導的相對狀態；A、B、C、D 分別回答<b>趨勢領先、防守韌性、籌碼支持與基本面改善</b>。視角靠前不代表未來會漲，也不代表它在其他視角同樣靠前。'}),context,tabs,workspace,governance];
 }
