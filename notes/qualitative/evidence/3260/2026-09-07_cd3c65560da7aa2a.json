@@ -1,0 +1,159 @@
+{
+  "content_as_of": "2026-09-07",
+  "documents": [
+    {
+      "cited_pages": [
+        83,
+        89,
+        94,
+        95,
+        96
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 115,
+      "rendered_pages": [
+        82,
+        83,
+        84,
+        88,
+        89,
+        90,
+        93,
+        94,
+        95,
+        96,
+        97
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "27ff257cc6c823aa045c3a94aa22cc65bc21b84e218b65e8021cf25bcccfa809",
+      "size_bytes": 4113605,
+      "url": "https://nexus-api.adata.com/storage/ir/1150415%E5%A8%81%E5%89%9B%E5%B9%B4%E5%A0%B1.pdf"
+    },
+    {
+      "cited_pages": [
+        5,
+        7,
+        108
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 124,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        107,
+        108,
+        109
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "0881eb25538e5675368106c8a5e7a75cb3c1b1310c72404d889b15b635fcf14b",
+      "size_bytes": 3049481,
+      "url": "https://webapi3.adata.com/storage/ir/202504_3260_ai1_20260327_142226.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        29,
+        30,
+        58,
+        80,
+        95
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 112,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        28,
+        29,
+        30,
+        31,
+        57,
+        58,
+        59,
+        79,
+        80,
+        81,
+        94,
+        95,
+        96
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "1f4c55a39a46b3476aace313de9259dbec146e221ceb2628c309ff4d17f871bf",
+      "size_bytes": 1699020,
+      "url": "https://assets.adata.com/storage/ir/202602_3260_ai1_20260818_110900.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        6,
+        10,
+        11,
+        13,
+        14,
+        17
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 19,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "cd523cb87f43dee1d3171b4a9ad922e5f5275921a8930460589d5835447c0595",
+      "size_bytes": 2619170,
+      "url": "https://assets.adata.com/storage/ir/20260806_%E5%A8%81%E5%89%9B%E6%B3%95%E8%AA%AA%E6%9C%83%E7%B0%A1%E5%A0%B1_f.pdf"
+    }
+  ],
+  "pack_sha256": "cd3c65560da7aa2aab8dc32bf97f613cc2610e8d0d55febb7761b46e0869873f",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3260",
+  "unverified_claims_removed": true
+}
