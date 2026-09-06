@@ -30,11 +30,16 @@ jobs:
       - name: 產生週度驗證報告(reports/validate_<資料迄日>.md)
         run: python scripts/validate.py
 
+      - name: 同步首頁的證據狀態與最新週報連結
+        run: |
+          python scripts/build_dashboard.py
+          python -m unittest -v tests.test_dashboard_sections_present.DashboardSectionsPresentTest
+
       - name: commit 報告(有變動才提交)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/
+          git add reports/ index.html research.html
           if git diff --staged --quiet; then
             echo "無新報告,略過 commit"
           else

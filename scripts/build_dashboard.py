@@ -30,6 +30,7 @@ import trading_status as tstatus
 import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡報、週報 §⑦⑧ 同一組函式)
 import ranking_views as rv       # A/B/C/D 多視角排名；觀察層＋append-only challenger
 import hypotheses as hyp         # 兩視角分歧的籌碼定義 = H1 檢定的同一個定義
+import evidence_status
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
 from qual_notes import (_extract_sections, load_notes, note_status, note_review_status,
                         load_events, EVENT_KPI_KEYS,
@@ -1678,15 +1679,17 @@ def build_strategy_status(con, last):
     st = {"is_start": dates[0] if dates else None, "is_cutoff": IS_CUTOFF,
           "fwd": sig.EVAL_HORIZON_DAYS, "report_url": None}
 
-    # OOS:as-seen 快照日數,以及其中前瞻窗已走完(可判讀)的日數
+    # 與週報採同一交易日 spine、首次正式且非空快照與有效觀測門檻。
     try:
-        snap = [r[0] for r in con.execute(
-            """SELECT DISTINCT data_date FROM oos_snapshot_runs
-               WHERE is_official=1 ORDER BY data_date""")]
-        didx = {d: i for i, d in enumerate(dates)}
-        oos = [d for d in snap if IS_CUTOFF and d > IS_CUTOFF and d in didx]
-        st["oos_days"] = len(oos)
-        st["oos_mature"] = sum(1 for d in oos if didx[d] + st["fwd"] < len(dates))
+        spine = [r[0] for r in con.execute(
+            "SELECT DISTINCT date FROM daily_metrics WHERE date<=? ORDER BY date", (last,))]
+        runs = evidence_status.first_official_runs(con)
+        snap = [d for d, r in runs.items() if con.execute(
+            "SELECT 1 FROM oos_signal_snapshots WHERE snapshot_id=? LIMIT 1",
+            (r["snapshot_id"],)).fetchone()]
+        st["evidence"] = evidence_status.maturity(snap, spine, IS_CUTOFF, st["fwd"])
+        st["oos_days"] = st["evidence"]["oos_days"]
+        st["oos_mature"] = st["evidence"]["oos_mature"]
     except sqlite3.OperationalError:
         st["oos_days"] = st["oos_mature"] = None
 
@@ -1719,8 +1722,10 @@ def build_strategy_status(con, last):
     try:
         rdir = os.path.join(ROOT, "reports")
         rep = sorted(f for f in os.listdir(rdir)
-                     if f.startswith("validate_") and f.endswith(".md"))
+                     if re.fullmatch(r"validate_\d{4}-\d{2}-\d{2}\.md", f)
+                     and f[9:19] <= last)
         if rep:
+            st["report_date"] = rep[-1][9:19]
             st["report_url"] = NOTE_REPO_BLOB + "reports/" + rep[-1]
             with open(os.path.join(rdir, rep[-1]), encoding="utf-8") as fh:
                 for i, line in enumerate(fh, 1):

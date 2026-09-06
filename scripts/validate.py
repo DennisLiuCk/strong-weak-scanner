@@ -31,6 +31,7 @@ import stats_ci as sci           # §⑨:NW 標準誤 / 有效獨立觀測 / epi
 import hypotheses as hyp         # §⑪:事先登錄、規格雜湊凍結的可證偽假設
 import ranking_views as rv       # §⑫:多視角／challenger append-only OOS 評估
 import db_ro                     # 唯讀開啟(強制 docstring 宣稱的「不寫 db」)
+import evidence_status
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -143,9 +144,7 @@ def main():
     snap_runs, snap_grp, snap_grps, snap_quality = {}, defaultdict(dict), {}, {}
     loaded_snap_dates = set()
     try:
-        for r in con.execute("""SELECT * FROM oos_snapshot_runs
-                                WHERE is_official=1
-                                ORDER BY data_date, captured_at, snapshot_id"""):
+        for r in evidence_status.first_official_runs(con).values():
             if r["data_date"] not in snap_runs:
                 snap_runs[r["data_date"]] = r["snapshot_id"]
                 snap_quality[r["data_date"]] = r["quality_json"]
@@ -452,6 +451,7 @@ def main():
     mature_oos_dates = [d for d in oos_dates if didx[d] + F < len(dates)]
     restated_post_dates = [d for d in dates if d > IS_CUTOFF and d not in snap_dates]
     n_oos, n_oos_mature = len(oos_dates), len(mature_oos_dates)
+    evidence = evidence_status.maturity(snap_dates, dates, IS_CUTOFF, F)
     snapshot_quality_issues = []
     for d in oos_dates:
         try:
@@ -480,7 +480,9 @@ def main():
       f"多頭 {sum(1 for v in regime.values() if v == 0)} 日、冷啟動 {sum(1 for v in regime.values() if v is None)} 日")
     w(f"- **IS/OOS 分界 {IS_CUTOFF}**(v2.1 權重校準日);正式 as-seen OOS 快照 "
       f"{n_oos} 日、其中前瞻 {F} 日已成熟 {n_oos_mature} 日"
-      + ("——**尚不足以下結論,勿據此調旋鈕**" if n_oos_mature < 10 else ""))
+      + f"；**{evidence['label']}**")
+    w(f"- 樣本狀態：有效獨立觀測約 {evidence['eff_obs']:.1f}、"
+      f"連續區段 {evidence['episodes']}；{evidence['reason']}")
     if restated_post_dates:
         w(f"- cutoff 後另有 {len(restated_post_dates)} 日僅存最新規則重算歷史"
           f"({restated_post_dates[0]}~{restated_post_dates[-1]}),**不計入 OOS**。")
@@ -541,9 +543,9 @@ def main():
     w("## ④ 族群層")
     w("")
     hit_all, hit_oos = dip_hit.get("全期", []), dip_hit.get("OOS", [])
-    base = round(100 * mean(dip_base.get("全期", []))) if dip_base.get("全期") else 0
+    dip_baseline_pct = round(100 * mean(dip_base.get("全期", []))) if dip_base.get("全期") else 0
     w(f"- **med_dip 最高者領漲**命中率:全期 "
-      + (f"{100*statistics.mean(hit_all):.0f}%(n={len(hit_all)},基準 {base}%)" if hit_all else "–")
+      + (f"{100*statistics.mean(hit_all):.0f}%(n={len(hit_all)},基準 {dip_baseline_pct}%)" if hit_all else "–")
       + ";OOS " + (f"{100*statistics.mean(hit_oos):.0f}%(n={len(hit_oos)})" if hit_oos else "–"))
     w("- 各 state 的族群前瞻超額(vs 全體中位):")
     w("")
@@ -1036,7 +1038,7 @@ def main():
     if v1:
         print(f"v1 composite 族群內 IC:全期 {fmt_ic(mean(wg['v1_composite'].get('全期')))}")
     if hit_all:
-        print(f"med_dip 領漲命中:全期 {100*statistics.mean(hit_all):.0f}%(基準{base}%)")
+        print(f"med_dip 領漲命中:全期 {100*statistics.mean(hit_all):.0f}%(基準{dip_baseline_pct}%)")
     ca, cb = cohort["抗跌≥0(放行)"].get("全期", []), cohort["領跌<0(擋下)"].get("全期", [])
     if ca and cb:
         print(f"蓄勢濾網 cohort:放行 {mean(ca)*100:+.2f}%(n={len(ca)}) vs 擋下 {mean(cb)*100:+.2f}%(n={len(cb)})")

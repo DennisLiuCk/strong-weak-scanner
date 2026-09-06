@@ -147,7 +147,8 @@ class DashboardUxContractTest(unittest.TestCase):
         # 績效數字不可複製到儀表板,只能連向週報(避免與 validate.py §② 各算一份而漂移)。
         # 卡片可以「提到」超額/勝率並指路,但 builder 必須連算不出來:禁止在此碰前瞻報酬。
         src = self._builder_strategy_source()
-        for banned in ("close_adj", "spearman", "daily_metrics"):
+        # 與週報共用 daily_metrics 的交易日 spine 是成熟度所需，不能誤禁日期查詢。
+        for banned in ("close_adj", "spearman", "SELECT * FROM daily_metrics"):
             self.assertNotIn(banned, src,
                              f"build_strategy_status 不得計算績效({banned})——只放證據狀態與結構")
         self.assertIn("report_url", self.builder)

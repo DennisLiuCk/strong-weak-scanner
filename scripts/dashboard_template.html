@@ -901,14 +901,14 @@ function buildOverview(){
    績效數字(超額/勝率/IC)一律不複製到這裡,只連向週報,避免與 validate.py 各算一份。 */
 function buildStrategyStatus(){
   const S=STRATEGY; if(!S) return h('div');
+  const E=S.evidence;
   const pct=v=>v==null?null:(v*100).toFixed(0)+'%';
   const rows=[];
   if(S.is_start&&S.is_cutoff) rows.push(['權重校準窗',
     `${S.is_start} ~ ${S.is_cutoff}`,'此窗內的數字必然好看——權重是看著它調出來的']);
-  if(S.oos_days!=null) rows.push(['樣本外驗證',
-    `快照 ${S.oos_days} 日,前瞻 ${S.fwd} 日已成熟 ${S.oos_mature} 日`,
-    S.oos_mature>=10?'已達可判讀門檻,見週報 ①②'
-      :'尚未達可判讀門檻(需 10 日)——分層的預測力目前無獨立驗證']);
+  if(E) rows.push(['樣本外驗證',
+    `快照 ${E.oos_days} 日，前瞻 ${E.fwd} 日已成熟 ${E.oos_mature} 日；約 ${E.eff_obs.toFixed(1)} 個有效獨立觀測、${E.episodes} 個連續區段`,
+    E.label+'。'+E.reason]);
   if(S.lead_rho!=null&&S.eff!=null) rows.push(['訊號集中度',
     `綜合分排名 ≈ ${S.lead==='price'?'相對強弱':'s_'+S.lead}排名（ρ ${S.lead_rho>=0?'+':''}${S.lead_rho.toFixed(2)}）；有效因子數 ${S.eff.toFixed(1)} / ${S.n_scored}`,
     `七因子中實際主導排名的僅一項;其餘在加權和裡貢獻有限`]);
@@ -919,19 +919,18 @@ function buildStrategyStatus(){
   // 卡片沒有空間寫清楚。這一列只負責指路 + 說明現在能不能判讀。
   if(S.report_tier_url) rows.push(['分層實證表現',
     '各層前瞻超額與勝率',
-    S.oos_mature>=10 ? 'OOS 欄已可判讀,依 WEEKLY_REVIEW 的連 N 週門檻判斷'
-      : `所有 tier 的 OOS 欄目前為空(成熟 ${S.oos_mature==null?'—':S.oos_mature} 日);全期欄以校準窗為主、前瞻窗重疊會高估顯著性——OOS 欄有值前不下結論`,
+    'OOS 點估計有值不等於可判讀；先讀週報 §⑨ 的誤差、有效觀測與分級門檻，再讀 §⑩ 成本。',
     S.report_tier_url, '週報 ② →']);
   if(!rows.length) return h('div');
   const box=h('details',{class:'card strategy-disclosure',id:'strategy-status'});
   box.appendChild(h('summary',{},h('span',{class:'strategy-summary-copy'},
     h('b',{text:'策略狀態 · 證據強度'}),
-    h('span',{text:'方法與可信度資訊；需要時再展開查看'}))));
+    h('span',{text:E?E.label:'證據狀態尚未取得；請查閱週報'}))));
   const body=h('div',{class:'strategy-body'});
   const head=h('div',{style:'display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:8px'},
     h('b',{style:'font-size:12px;color:var(--muted)',text:'方法與證據'}));
   if(S.report_url) head.appendChild(h('a',{href:S.report_url,target:'_blank',rel:'noopener',
-    style:'font-size:12px;font-weight:700;color:var(--teal)',text:'完整週度驗證報告 →'}));
+    style:'font-size:12px;font-weight:700;color:var(--teal)',text:`完整週度驗證報告${S.report_date?' · '+S.report_date:''} →`}));
   body.appendChild(head);
   body.appendChild(h('p',{style:'margin:0 0 14px;font-size:12.5px;color:var(--ink2);line-height:1.6',
     text:'下列全部是「證據狀態」與「結構」的事實,不是對個別因子有效性的判斷。分層本身描述相對位置,不是買賣指示。'}));

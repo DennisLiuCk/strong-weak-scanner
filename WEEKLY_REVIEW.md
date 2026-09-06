@@ -16,7 +16,8 @@
    `hard_errors` 非空先修正式快照／spec／漏列，當週不判斷多視角；tie、Pareto、peer
    sensitivity warning 只進結構追蹤，不因單週跨線調 evaluator。
 3. 打開最新 `reports/validate_*.md`。看第一段「前瞻已成熟的 as-seen OOS」天數:
-   **< 10 交易日 → 只讀不動**,
+   **有效獨立觀測 < `stats_ci.MIN_EFF_OBS`（目前 3）→ 只讀不動**；
+   成熟交易日不是獨立樣本，達最低樣本數後仍須逐指標通過 §⑨ 與行動門檻。
    照樣寫週記(見 §3)。
 
 ## 1. 讀報告的順序與行動判準
