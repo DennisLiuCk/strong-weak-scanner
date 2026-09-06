@@ -2121,8 +2121,11 @@ def _current_hypothesis_transition(hypothesis, as_of):
     return visible[-1] if visible else None
 
 
-def _append_item(items, priority, kind, due, detail):
-    items.append({"priority": priority, "kind": kind, "due": due, "detail": detail})
+def _append_item(items, priority, kind, due, detail, *, target=None):
+    item = {"priority": priority, "kind": kind, "due": due, "detail": detail}
+    if target:
+        item["target"] = target
+    items.append(item)
 
 
 def _topic_queue_priority(priority, due_date, as_of):
@@ -2158,15 +2161,16 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
                 items, "P0", "formal_note_quality", as_of.isoformat(),
                 f"{sid} {names[sid]}：{verification}"
                 + ("，品質契約 invalid" if info and info.get("quality_invalid") else ""),
+                target=f"stock:{sid}",
             )
         due = (info or {}).get("next_review")
         if _valid_date(due):
             due_date = dt.date.fromisoformat(due)
             note_deadlines[due] += 1
             if due_date <= as_of:
-                _append_item(items, "P1", "formal_note_due", due, f"{sid} {names[sid]}")
+                _append_item(items, "P1", "formal_note_due", due, f"{sid} {names[sid]}", target=f"stock:{sid}")
             elif due_date <= end:
-                _append_item(items, "P2", "formal_note_upcoming", due, f"{sid} {names[sid]}")
+                _append_item(items, "P2", "formal_note_upcoming", due, f"{sid} {names[sid]}", target=f"stock:{sid}")
 
     hypothesis_deadlines = Counter()
     for sid, report in reports.items():
@@ -2181,9 +2185,9 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
             hypothesis_deadlines[due] += 1
             detail = f"{sid}:{hypothesis['id']} {hypothesis['title']}"
             if due_date <= as_of:
-                _append_item(items, "P1", "hypothesis_due", due, detail)
+                _append_item(items, "P1", "hypothesis_due", due, detail, target=f"stock:{sid}")
             elif due_date <= end:
-                _append_item(items, "P2", "hypothesis_upcoming", due, detail)
+                _append_item(items, "P2", "hypothesis_upcoming", due, detail, target=f"stock:{sid}")
 
     event_deadlines = Counter()
     events = load_events()
@@ -2240,6 +2244,7 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
                     items, "P2", "formal_note_financial_period", as_of.isoformat(),
                     f"{sid} {names.get(sid, '')} 仍標 {info.get('latest_financial_period') or '-'}；"
                     f"DB 已有 {latest_period}",
+                    target=f"stock:{sid}",
                 )
 
     for topic in topics:
@@ -2247,6 +2252,7 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
             _append_item(
                 items, "P0", "topic_contract", as_of.isoformat(),
                 f"{topic['relpath']}：{'; '.join(topic['quality_errors'])}",
+                target=f"topic:{topic['topic_id']}",
             )
             continue
         if topic["status"] in {"dismissed", "resolved"}:
@@ -2257,7 +2263,7 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
             priority = _topic_queue_priority(topic.get("priority"), due_date, as_of)
             if due_date <= end or priority in {"P0", "P1"}:
                 kind = "topic_due" if due_date <= as_of else "topic_upcoming"
-                _append_item(items, priority, kind, due, topic["topic_id"])
+                _append_item(items, priority, kind, due, topic["topic_id"], target=f"topic:{topic['topic_id']}")
         for impact in topic["impacts"]:
             action = impact.get("note_action")
             due = impact.get("action_due")
@@ -2270,9 +2276,9 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
                 + f"：{action}"
             )
             if due_date <= as_of:
-                _append_item(items, "P1", "topic_action_due", due, detail)
+                _append_item(items, "P1", "topic_action_due", due, detail, target=f"topic:{topic['topic_id']}")
             elif due_date <= end:
-                _append_item(items, "P2", "topic_action_upcoming", due, detail)
+                _append_item(items, "P2", "topic_action_upcoming", due, detail, target=f"topic:{topic['topic_id']}")
 
         for sid in topic["stock_ids"]:
             report = reports.get(sid)
@@ -2286,6 +2292,7 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
                     f"{sid} {names.get(sid, '')} 小作文 {narrative['updated']} 早於"
                     f"議題 {topic['topic_id']} 的捕捉日 {topic['captured_at']}；只需判斷是否相關，"
                     "不可自動改寫",
+                    target=f"stock:{sid}",
                 )
 
     if scan["errors"]:
@@ -2326,6 +2333,9 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
         "hypothesis_count": sum(
             len(report.get("hypotheses", [])) for report in reports.values()),
         "topic_count": len(topics),
+        "active_topic_count": sum(t["status"] not in {"dismissed", "resolved"} for t in topics),
+        "stale_topic_count": sum(bool((t.get("confidence") or {}).get("stale"))
+                                 for t in topics if t["status"] not in {"dismissed", "resolved"}),
         "items": items,
         "financial": financial,
         "financial_note_stale": financial_note_stale,

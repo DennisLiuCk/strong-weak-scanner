@@ -10,12 +10,18 @@
 
 ```powershell
 python scripts/research_queue.py --attention
+python scripts/research_worklist.py --limit 5
 python scripts/research_queue.py --calendar --weeks 8 --output tmp/research_calendar.md
 python scripts/research_queue.py --lint
 python scripts/research_radar.py --lint
 python scripts/research_method_audit.py --lint --baseline-ref HEAD
 python -m unittest discover -s tests -q
 ```
+
+`research_worklist.py` 將同一公司／議題的到期、財務與假說警示合併成工作；P0 全列，
+其餘依原優先級、新季報、到期假說數及最早期限排序。完整佇列與原期限不變，不以工作
+數冒充獨立樣本；目前沒有使用頻率量測，不以主觀熱門程度加分。先完成清單中的少數
+核心複核，再追加下一批；已查無新證據仍依既有 monitor review／scan log 留痕，不重設文章時鐘。
 
 最後一行不可省。lint 只驗當前 register 的結構與引用；契約測試另外綁了幾個必須隨每輪
 發佈同步的常數（audit `as_of`、最新 `scan_id`、帳本累計數），只跑 lint 就 push，
