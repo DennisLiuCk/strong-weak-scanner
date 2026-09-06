@@ -231,10 +231,13 @@ def main():
     for j in jumps:
         issues.append(f"{j['stock_id']} {uni.get(j['stock_id'], ('?',))[0]} 還原後日變動 "
                       f"{j['ret1']*100:+.1f}%(>漲跌停,疑缺除權息/減資事件)")
-    print("\n■ 資料品質:" + ("無異常" if not issues else ""))
+    print("\n■ 基礎資料快檢:" + ("此範圍未發現異常" if not issues else ""))
     for i in issues:
         print(f"   ⚠ {i}")
     con.close()
+    # 原始表完整不能代表排名、週資料與研究皆正常。
+    import operational_health
+    print("\n" + operational_health.render(operational_health.build_health(DB)))
 
 
 if __name__ == "__main__":

@@ -258,7 +258,7 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertIn("research_event_scan.py", maintenance)
         self.assertIn("不計算支持率", method)
         self.assertIn("選題前承諾", maintenance)
-        self.assertIn("python scripts/research_method_audit.py --lint", workflow)
+        self.assertIn("python scripts/prepublish_check.py --baseline-ref", workflow)
 
 
 if __name__ == "__main__":

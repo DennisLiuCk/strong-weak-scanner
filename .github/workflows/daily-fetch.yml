@@ -180,6 +180,10 @@ jobs:
         if: steps.mode.outputs.mode == 'complete'
         run: python -m unittest -v tests.test_dashboard_sections_present.DashboardSectionsPresentTest
 
+      - name: 彙整資料、排名、TDCC 與研究健康
+        if: steps.mode.outputs.mode == 'complete'
+        run: python scripts/operational_health.py >> "$GITHUB_STEP_SUMMARY"
+
       - name: commit 回 repo(有變動才提交)
         id: commit_push
         env:

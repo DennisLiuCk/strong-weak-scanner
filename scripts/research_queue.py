@@ -2174,6 +2174,10 @@ def build_attention(as_of, db_path=DB, horizon=30, topics_dir=TOPICS_DIR,
 
     hypothesis_deadlines = Counter()
     for sid, report in reports.items():
+        if report.get("quality_invalid"):
+            _append_item(items, "P0", "hypothesis_report_quality", as_of.isoformat(),
+                         f"{sid} {names.get(sid, '')}：" + "; ".join(report.get("quality_errors", [])),
+                         target=f"stock:{sid}")
         for hypothesis in report.get("hypotheses", []):
             current = _current_hypothesis_transition(hypothesis, as_of)
             if not current or current.get("to") != "open":

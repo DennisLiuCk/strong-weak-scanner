@@ -25,6 +25,10 @@ on:
       - "scripts/qual_evidence.py"
       - "scripts/leading_hypotheses.py"
       - "scripts/research_queue.py"
+      - "scripts/research_worklist.py"
+      - "scripts/prepublish_check.py"
+      - "scripts/operational_health.py"
+      - "scripts/daily_brief.py"
       - "scripts/research_radar.py"
       - "scripts/research_method_audit.py"
       - "scripts/knowledge_graph.py"
@@ -32,6 +36,9 @@ on:
       - "scripts/dashboard_template.html"
       - "scripts/research_template.html"
       - "tests/test_qual_notes_quality.py"
+      - "tests/test_prepublish_check.py"
+      - "tests/test_operational_health.py"
+      - "tests/test_research_worklist.py"
       - "tests/test_qual_evidence.py"
       - "tests/test_leading_hypotheses.py"
       - "tests/test_research_queue.py"
@@ -72,6 +79,10 @@ on:
       - "scripts/qual_evidence.py"
       - "scripts/leading_hypotheses.py"
       - "scripts/research_queue.py"
+      - "scripts/research_worklist.py"
+      - "scripts/prepublish_check.py"
+      - "scripts/operational_health.py"
+      - "scripts/daily_brief.py"
       - "scripts/research_radar.py"
       - "scripts/research_method_audit.py"
       - "scripts/knowledge_graph.py"
@@ -79,6 +90,9 @@ on:
       - "scripts/dashboard_template.html"
       - "scripts/research_template.html"
       - "tests/test_qual_notes_quality.py"
+      - "tests/test_prepublish_check.py"
+      - "tests/test_operational_health.py"
+      - "tests/test_research_worklist.py"
       - "tests/test_qual_evidence.py"
       - "tests/test_leading_hypotheses.py"
       - "tests/test_research_queue.py"
@@ -112,13 +126,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: 稽核質化研究品質契約
-        run: python scripts/qual_notes.py --lint
-
-      - name: 稽核領先假說格式與正式筆記錨定
-        run: python scripts/leading_hypotheses.py --lint
-
-      - name: 稽核研究議題與掃描紀錄
+      - name: 共用研究發布前檢查（基準、歷史、測試與隔離重建）
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -131,31 +139,11 @@ jobs:
           elif [[ "$EVENT_NAME" == "push" && ! "$PUSH_BEFORE" =~ ^0+$ ]]; then
             baseline="$PUSH_BEFORE"
           fi
-          python scripts/research_queue.py --lint --baseline-ref "$baseline"
+          python scripts/prepublish_check.py --baseline-ref "$baseline" --output-dir tmp/prepublish-ci
 
-      - name: 稽核研究中心知識圖譜與證據引用
-        run: python scripts/knowledge_graph.py --lint
-
-      - name: 稽核候選雷達與研究方法歷史
-        shell: bash
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PUSH_BEFORE: ${{ github.event.before }}
-          PR_BASE: ${{ github.event.pull_request.base.sha }}
+      - name: 檢查失敗時列出原始紀錄
+        if: failure()
         run: |
-          baseline="HEAD^"
-          if [[ "$EVENT_NAME" == "pull_request" ]]; then
-            baseline="$PR_BASE"
-          elif [[ "$EVENT_NAME" == "push" && ! "$PUSH_BEFORE" =~ ^0+$ ]]; then
-            baseline="$PUSH_BEFORE"
+          if [ -d tmp/prepublish-ci ]; then
+            find tmp/prepublish-ci -maxdepth 1 -name '*.log' -print -exec tail -n 60 {} \;
           fi
-          python scripts/research_radar.py --lint
-          python scripts/research_method_audit.py --lint --baseline-ref "$baseline"
-
-      - name: 執行質化品質、dashboard 與入口文件契約測試
-        run: python -m unittest tests.test_qual_notes_quality tests.test_qual_evidence tests.test_leading_hypotheses tests.test_research_queue tests.test_research_radar tests.test_research_method_audit tests.test_recent_research_articles tests.test_dashboard_ux_contract tests.test_research_center tests.test_knowledge_graph tests.test_entry_docs_sync
-
-      - name: 重建並驗證研究中心讀者介面
-        run: |
-          python scripts/build_dashboard.py
-          git diff --exit-code -- index.html research.html

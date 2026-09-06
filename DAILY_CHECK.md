@@ -10,6 +10,15 @@
 
 ## 步驟
 
+日常簡報現包含 `operational_health.py` 的整合摘要：原始表、正式訊號、A–D、TDCC
+完整級距與研究時效分項顯示。新月份營收待收齊列為資訊，不能誤報抓取失敗；正式資料或
+發布缺口 exit 1，研究過期／部分觀察層降級保留警示、不阻擋完整日資料落地。
+要連遠端 Pages 一起確認，執行 `python scripts/operational_health.py --check-pages`；
+省略時明示 Pages 未查詢，不能把本機資料完整當作部署成功。
+整合檢查以 universe 價格／大盤／評分的最新日期為準；若只落地較新的 checkpoint，
+會如實顯示該日原始表或正式發布尚未完整。盤中／早場的未完整不等於 final pass 已失敗，
+需配合執行模式與時間判讀，不能退回前一個完整評分日宣稱最新資料正常。
+
 1. **`git pull`**(最重要的一步:db 在 git 裡,不 pull 就是在看舊資料)。
 2. **Actions 狀態**:`gh run list --workflow daily-fetch.yml -L 4`。正常每個交易日有三筆
    提前排隊/checkpoint 與一筆 `complete` 終版安全網；手動 Run workflow 預設是 `complete`，

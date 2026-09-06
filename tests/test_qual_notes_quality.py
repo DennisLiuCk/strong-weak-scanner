@@ -777,8 +777,7 @@ next_review: 2026-10-01
         with open(os.path.join(ROOT, ".github", "workflows", "qualitative-quality.yml"),
                   encoding="utf-8") as handle:
             quality_action = handle.read()
-        self.assertIn("python scripts/qual_notes.py --lint", quality_action)
-        self.assertIn("python -m unittest tests.test_qual_notes_quality", quality_action)
+        self.assertIn("python scripts/prepublish_check.py --baseline-ref", quality_action)
         self.assertGreaterEqual(quality_action.count('"config/universe.csv"'), 2)
         self.assertGreaterEqual(quality_action.count('"tests/test_dashboard_ux_contract.py"'), 2)
 

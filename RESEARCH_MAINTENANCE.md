@@ -23,6 +23,11 @@ python -m unittest discover -s tests -q
 數冒充獨立樣本；目前沒有使用頻率量測，不以主觀熱門程度加分。先完成清單中的少數
 核心複核，再追加下一批；已查無新證據仍依既有 monitor review／scan log 留痕，不重設文章時鐘。
 
+發布前執行 `python scripts/prepublish_check.py --baseline-ref <本輪開始前的完整commit>`。
+它與品質 CI 共用：基準必須存在且是 HEAD 祖先；歷史、筆記、假說、圖譜、雷達、完整測試
+通過後，在 `tmp/` 以 archive 副本重建並比對首頁／研究中心，核對正式 DB／archive 雜湊未變。
+找不到舊 baseline 時先取回正確 commit，禁止改用 HEAD 或空樹掩蓋歷史變更。
+
 最後一行不可省。lint 只驗當前 register 的結構與引用；契約測試另外綁了幾個必須隨每輪
 發佈同步的常數（audit `as_of`、最新 `scan_id`、帳本累計數），只跑 lint 就 push，
 CI 會在推上去之後才轉紅。詳見 `MARKET_RESEARCH_METHOD.md` 發布前檢查第 12 項。

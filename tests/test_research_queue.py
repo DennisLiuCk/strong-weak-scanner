@@ -1451,13 +1451,12 @@ class ResearchScheduleTest(unittest.TestCase):
         quality = (
             ROOT / ".github" / "workflows" / "qualitative-quality.yml"
         ).read_text(encoding="utf-8")
-        self.assertIn("python scripts/research_queue.py --lint", quality)
+        self.assertIn("python scripts/prepublish_check.py --baseline-ref", quality)
         self.assertIn("fetch-depth: 0", quality)
         self.assertIn("PUSH_BEFORE: ${{ github.event.before }}", quality)
         self.assertIn("PR_BASE: ${{ github.event.pull_request.base.sha }}", quality)
         self.assertIn('--baseline-ref "$baseline"', quality)
-        self.assertIn("python scripts/build_dashboard.py", quality)
-        self.assertIn("git diff --exit-code -- index.html research.html", quality)
+        self.assertIn("--output-dir tmp/prepublish-ci", quality)
         self.assertGreaterEqual(quality.count('"notes/research_topics/**"'), 2)
         self.assertGreaterEqual(quality.count('"tests/test_research_queue.py"'), 2)
         self.assertGreaterEqual(quality.count('"research.html"'), 2)
