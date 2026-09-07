@@ -1,0 +1,49 @@
+{
+  "python": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite": "3.45.1",
+  "stdout_encoding": "utf-8",
+  "utf8_mode": 0,
+  "PYTHONUTF8": null,
+  "source_commit": "fd4a4ab2b9741b895483675d6be917f05eb3f1a1",
+  "checks": {
+    "raw": 0,
+    "ranking_oos": 0,
+    "validate": 0,
+    "tests": 0
+  },
+  "restore": {
+    "destination": "/home/runner/work/strong-weak-scanner/strong-weak-scanner/tmp/db-artifact-check/restored.db",
+    "source_commit": "fd4a4ab2b9741b895483675d6be917f05eb3f1a1",
+    "database_sha256": "ca7e8fc90305b648838d75843df729e0d7006f7734fb9ecfb77668a5652823e1",
+    "bytes": 60551168,
+    "sqlite": {
+      "application_id": 0,
+      "journal_mode": "delete",
+      "latest_dates": {
+        "daily_scores": "2026-09-04",
+        "market": "2026-09-04",
+        "price": "2026-09-04"
+      },
+      "page_count": 14783,
+      "page_size": 4096,
+      "schema_sha256": "2bb4f3c7948f4db74fda812c15ab5bbf0ef5e20c49e867dd80cebbc36aef7c76",
+      "schema_version": 1573,
+      "user_version": 0
+    }
+  },
+  "byte_equal": true,
+  "dashboard_equal": true,
+  "dashboard_sha256": [
+    {
+      "index.html": "270763cc37558c3b21497c67f2d76ae8a4d3a065aa56d68f459fa62994e4fcc6",
+      "research.html": "8b62a5be0ec4e00a8890f153b52639afd9dd633e9c0a06b056e566df991aff2d"
+    },
+    {
+      "index.html": "270763cc37558c3b21497c67f2d76ae8a4d3a065aa56d68f459fa62994e4fcc6",
+      "research.html": "8b62a5be0ec4e00a8890f153b52639afd9dd633e9c0a06b056e566df991aff2d"
+    }
+  ],
+  "ok": true,
+  "protected_unchanged": true
+}

@@ -11,8 +11,12 @@
 - Runbook 明訂 75／90 MiB 的準備與遷移優先門檻，並列出 final／checkpoint 保留、
   可信 pin、離線副本、定期還原及舊版回退需求；這些保留需求尚未啟用，不刪 DB、
   不改正式儲存來源、不裁切 OOS 或 archive。
-- 遠端 `db-artifact-smoke` 因完整 DB artifact 上傳的自動授權審核未通過，仍待使用者
-  確認；尚無本輪 runner 復原驗收，不宣稱完成儲存遷移。詳見容量報告與 DB artifact runbook。
+- 使用者同意後，遠端 `db-artifact-smoke` run `34072575089` 以固定 `fd4a4ab` 完成
+  publish／restore 兩個 runner 驗收。Ubuntu 24.04.4／Python 3.12.14／SQLite 3.45.1
+  下逐 byte、raw、既有 ranking/OOS、validate、643 項測試與 HTML 比對通過；正式 DB
+  與 43 份 archive 未變。原始表 74 筆 grid 外資料及舊 D 16/121 警告保留，新 spec
+  未借用此次 OOS。一天 artifact 的 ID、可信 pin 與原始驗收 JSON 已記錄於容量報告；
+  僅完成固定版本復原，未切換正式儲存後端或啟用長期備份。
 
 ## 整合健康摘要與共同發布前檢查 — 2026-09-07
 

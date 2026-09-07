@@ -66,6 +66,11 @@ check 的輸出目錄也必須不存在。它不修改來源 DB／archive，會�
 retention、digest 檢查契約。一般 Actions artifact 有保留期限與帳號配額，
 **這不是已選定的長期 DB 分發或備份後端**；本演練未更改付費額度。
 
+2026-09-07 已完成 `fd4a4ab` 的跨 runner 固定版本復原；run、可信 pin、artifact ID、
+環境與原始驗收 JSON 見 [容量與復原報告](reports/storage_capacity_2026-09-07.md)。
+該結果涵蓋原檔／副本 bytes、raw、既有 OOS、測試與 HTML 一致性；舊版回退與正式遷移
+仍須各自完成驗收，不因一次成功復原而視為已具備長期備份。
+
 ## 離線回退與正式遷移前待辦
 
 ### 容量與保留的執行門檻
