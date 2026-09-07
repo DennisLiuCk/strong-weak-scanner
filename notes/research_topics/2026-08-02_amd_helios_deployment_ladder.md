@@ -88,10 +88,19 @@ reason: added_orw_base_versus_meta_mechanical_qualification_passport_no_thesis_c
 evidence: sources:S22,S23,S24
 -->
 
+<!-- transition
+date: 2026-09-07
+from: triaged
+to: triaged
+reason: separated_humain_mi355x_live_announcement_from_mi400_plan_without_refreshing_helios_thesis_clock
+evidence: sources:S25
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **MI355X／MI400／MI450**：本文出現的 AMD Instinct 產品型號或系列名稱；先辨識是哪一代、哪一個具名系統，再讀出貨及上線進度，不能只因品牌相同就共用驗收結果。[S12][S25]
 - **機架級系統（Rack-scale）**：把運算晶片、網路、電力、散熱與軟體整合成一整櫃交付；它比單顆晶片更接近可用設備，但不代表客戶已正式上線。
 - **參考設計（Reference design）**：平台方公開的整體藍圖與共同介面，讓製造夥伴能做自己的品牌系統；藍圖本身不一定是平台方直接出售的成品。
 - **品牌系統**：整機廠依參考設計選定零件、韌體與製造版本後，以自己的產品名稱交付；它仍要另做資格驗證與客戶驗收。
@@ -330,6 +339,24 @@ Redfish 把軟硬體盤點與更新服務、遙測服務做成不同的機器可
 
 這六關是本文整理資訊的閱讀順序，不是所有平台都會依同一節奏前進，也不是公司排名、
 訂單推估或投資建議。
+
+## 9/7 案例補充：同一家公司的兩代產品，不能共用「已上線」
+
+8/31 AMD、Cisco、HUMAIN 的聯合公告，正好示範為什麼讀標題還不夠：[S25][C27]
+
+| 公告中的產品 | 公告說到哪一步 | 不可借用的進度 |
+| --- | --- | --- |
+| MI355X | 公司表示已在沙烏地阿拉伯投入運行、服務 HUMAIN 客戶 | 不等於 MI400、MI450 或 Helios 也已上線 |
+| MI400 系列 | 後續部署計畫預計 2027 年開始、下半年起有容量上線 | 不是當下已驗收的設備、已實現容量或台灣供應商收入 |
+
+**證實**的是聯合公告的產品身分與已發生／前瞻語氣；不是我們取得了機群原始紀錄。
+**推論**是追蹤部署前必須鎖定「產品代別＋品牌系統＋場站＋日期」，不能把同一品牌的舊代
+實績挪給新代。[C28] **待驗證**的仍是具名 MI400／Helios 系統的實際交付、驗收與財務。
+本輪不新增 HUMAIN→Helios 公司線，也不延後 C11 主命題的原到期日。
+
+新手可以問自己三件事：標題的 AMD Instinct 到底是哪一代？文中動詞是「已運行」還是
+「預計」？下次能否取得相同型號與場站的客戶確認，而非另一份轉載？T13 將在 9/30
+回查；若計畫明確取消／延後或產品改版，就保留舊紀錄、另開版本，不偷換原驗證對象。
 
 ## 主張與證據帳本
 
@@ -715,6 +742,22 @@ url: https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-c
 locator: acceleration of free fall, standard (g_n)＝9.80665 m/s²；另以 NIST Guide Chapter 5 的 1 kgf＝9.80665 N 交叉核對
 limitation: 只提供 SI 單位與標準重力換算，不指定機架額定載重、局部重力、支承反力、動態載荷、試驗方法、通過條件或產品資格
 independence_group: nist-si-metrology
+-->
+
+<!-- research_source
+source_id: S25
+role: company_release
+source_kind: document
+publisher: AMD / Cisco / HUMAIN
+title: AMD, Cisco and HUMAIN Expand Saudi Arabia’s AI Infrastructure as AMD Instinct Systems Go Live
+published_at: 2026-08-31
+captured_at: 2026-09-07
+accepted_at: 2026-09-07
+status: active
+url: https://ir.amd.com/news-events/press-releases/detail/1298/amd-cisco-and-humain-expand-saudi-arabias-ai-infrastructure-as-amd-instinct-systems-go-live
+locator: News Highlights、首段及Expanding on this foundation段；已運行MI355X與後續MI400 Series計畫分開，後者預計2027開始部署並在下半年起上線
+limitation: 聯合新聞稿是一條消息鏈，不因三家公司名稱或轉載而成三份獨立驗收；沒有機群原始遙測、具名Helios品牌SKU、台灣供應商交付或財務分母，規劃不是實績
+independence_group: amd-cisco-humain-joint-announcement-20260831
 -->
 
 <!-- research_claim
@@ -1159,6 +1202,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: AMD／Cisco／HUMAIN的8/31聯合公告將已服務客戶的MI355X部署與後續MI400系列計畫分開；後者預計2027年開始部署並於下半年起有容量上線，不是公告日已上線的產品
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-08-31
+basis: 同一公告首段直接指定已live的是MI355X，後續段落對MI400使用plan與expected時程；逐段核對型號及動詞，不將品牌標題當作產品身分
+boundary: 證實的是公司公告內容，不是獨立場站驗收或production trace；一條聯合消息鏈，沒有具名Helios品牌SKU、交付數量或台灣收入，不能用MI355X更新C11的Helios證據時鐘
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: inference
+status: active
+claim: 判讀Helios部署必須先固定產品代別、品牌系統、場站及日期；MI355X的已運行公告不能代填MI400或Helios的交付與驗收，MI400系列名稱也不能直接替代具名Helios品牌SKU
+supporting_source_ids: S12,S25
+contrary_source_ids:
+as_of: 2026-09-07
+basis: S12把Helios定義為OEM／ODM品牌化的參考設計，S25把當期MI355X與後續MI400計畫分開；因此需要產品身分共同鍵才能把不同文件中的進度接起來
+boundary: 這是研究中心的證據連接規則，不是AMD官方同名標準，也不是新產品延誤、取消、技術失敗或台灣公司受惠的判定；單一公告不提供獨立部署樣本，SE／t不適用
+verification_needed: 相同代別、品牌SKU、場站、日期的供應商交付與客戶驗收，另以同期間具名公司財務文件建立收入橋接
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 再把五組公開節點放回自己的時間線
 
 原始文件出現七個動詞、時程與容量數字，但它們來自平台方及四個不同客戶。正確讀法不是
@@ -1209,6 +1286,7 @@ resolution:
 - [OCP：ORW Base Specification V1.0.0](https://www.opencompute.org/documents/open-rack-wide-orw-base-specification-v1-0-0-final-pdf)（S22；共同介面與實作邊界）。
 - [Meta／OCP：ORW Meta Design Specification V1.0.1](https://www.opencompute.org/documents/open-rack-wide-orw-meta-design-specification-v1-0-1-final-pdf)（S23；載重與三種 stability 試件）。
 - [NIST：SI 單位換算](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8)（S24；標準重力 9.80665 m/s²）。
+- [AMD／Cisco／HUMAIN：MI355X 已運行、MI400 為後續計畫](https://ir.amd.com/news-events/press-releases/detail/1298/amd-cisco-and-humain-expand-saudi-arabias-ai-infrastructure-as-amd-instinct-systems-go-live)（S25；一條聯合消息鏈，非Helios驗收報告）。
 - 未來重查使用 [AMD IR](https://ir.amd.com/news-events/press-releases)（S6）、[Azure Updates](https://azure.microsoft.com/en-us/updates/)（S7）、[MOPS](https://mops.twse.com.tw/mops/web/index)（S8），以及 [OpenAI](https://openai.com/news/)（S9）、[Meta](https://about.fb.com/news/)（S10）、[Anthropic](https://www.anthropic.com/news)（S11）官方索引；新附件出現時必須另建 document source。
 
 ## 最後用六關把平台進度接回台灣公司
@@ -1433,6 +1511,19 @@ frequency: quarterly
 next_check: 2026-08-15
 trigger: 任一公司正式產品、法說、季報或重大訊息公開 Helios 品牌型號與版本，並提供 qualification、客戶／出貨分母或可定位的收入、毛利與現金流
 invalidation: 公司明示取消 Helios 計畫、未取得資格、沒有出貨或沒有財務貢獻；單純展會後未再揭露只維持現有階段並觸發 freshness downgrade
+-->
+
+<!-- monitoring_item
+monitor_id: T13
+status: active
+claim_ids: C27,C28
+metric: HUMAIN後續MI400部署是否公布具名品牌SKU、場站與日期，並與既有MI355X實績及Helios身分分開
+source_ids: S12,S25
+watch_source_ids: S6,S12
+frequency: monthly
+next_check: 2026-09-30
+trigger: AMD或具名客戶的新文件把MI400品牌系統、場站、日期、實際交付及驗收接成同一對象；若宣稱Helios則需另有明示身分橋接，不以系列或品牌相同代替
+invalidation: 官方明確取消或延後原2027年部署／下半年上線計畫，或截至2027-12-31仍未開始所述上線；產品或場站變更另留版本，不用MI355X或其他客戶的進度替代，僅未查得新公告不當成失敗
 -->
 
 ## 下一個可證明／否定的節點

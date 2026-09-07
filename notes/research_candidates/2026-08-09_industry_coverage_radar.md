@@ -224,3 +224,14 @@ sources: OCP two-phase pool boiling webinar => https://www.opencompute.org/event
 - SiC qualification 題把 JEDEC 元件方法與三份 OCP system contract 分開；三份文件的 JEP203／JEP204／SiC exact-token census 都是 0，觸發 first rejection。台達只升為 planned／capability 具名入口，沒有 JEP-qualified、量產 BBU／PSU 或財務線。
 - PFAS 題把 EU 限制程序、美國歷史申報、半導體多用途與替代 qualification 分成七關；上品與三福化只補上 material 的具名產品／能力入口。最終條文與 substance×site×product×financial 鏈仍缺，事先第一拒絕對近期成本、中斷與受惠主張已觸發；semiequip 仍沒有具名公司橋。
 - 其餘題目保留明示 first rejection 與 next evidence，不因雷達換輪而消耗或重排。
+
+## 2026-09-07 定向回查：沿用凍結排序，不另開選題輪
+
+- 本輪優先補既有到期追蹤。AMD／Cisco／HUMAIN 8/31聯合公告提供產品代別判讀教材：
+  已運行的是MI355X，後續MI400仍屬計畫。它能補Helios文章C27／C28與產品身分圖譜節點，
+  但只有一條聯合消息鏈且未具名Helios品牌SKU，不升格成新文章、客戶部署線或台灣收入線。
+  [一手公告](https://ir.amd.com/news-events/press-releases/detail/1298/amd-cisco-and-humain-expand-saudi-arabias-ai-infrastructure-as-amd-instinct-systems-go-live)
+- 威剛Q2正式筆記已於9/7獨立簽核並提交；只同步既有Q2市場議題工作進度，不以流程完成
+  重排候選或刷新主命題。同欣電、德微的完整複核仍待完成。
+- 本次不是八題完整再評估，保留雷達as_of、逾期顯示、凍結排名與各題next evidence。
+  9/9先接續未完成公司附件語意查核；新候選若要深研，必須另開完整凍結selection cycle。

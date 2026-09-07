@@ -5230,7 +5230,7 @@ class ResearchCenterTest(unittest.TestCase):
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 68
+            sum(line.startswith("- **") for line in glossary.splitlines()), 69
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -5247,9 +5247,9 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 24),
-            ("research_claim", 26), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 12),
+            ("research_topic", 1), ("research_source", 25),
+            ("research_claim", 28), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 13),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         for ledger_contract in (
@@ -5313,7 +5313,71 @@ class ResearchCenterTest(unittest.TestCase):
             "to_id: concept:rack-scale",
             graph,
         )
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 41)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 42)
+
+    def test_september_product_identity_update_reaches_feed_without_refreshing_thesis(self):
+        # Reproduce the recorded update with its old thesis clock. Do not load
+        # the whole live registry at a frozen date: later scan rows are valid.
+        selected = []
+        for filename, topic_id, reason in (
+            ("2026-08-02_amd_helios_deployment_ladder.md",
+             "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+             "separated_humain_mi355x_live_announcement_from_mi400_plan_without_refreshing_helios_thesis_clock"),
+            ("2026-07-29_priority_q2_disclosures.md",
+             "MI-2026-07-29-PRIORITY-Q2-DISCLOSURES",
+             "completed_adata_focused_q2_review_synced_without_refreshing_thesis_clock"),
+        ):
+            text = (ROOT / "notes/research_topics" / filename).read_text(encoding="utf-8")
+            bodies = re.findall(r"<!-- transition\s*\n(.*?)-->", text, re.S)
+            body = next(body for body in bodies if f"reason: {reason}\n" in body)
+            transition = {key.strip(): value.strip() for key, value in
+                          (line.split(":", 1) for line in body.splitlines() if ":" in line)}
+            self.assertEqual(transition["date"], "2026-09-07")
+            selected.append({
+                "topic_id": topic_id, "title": topic_id,
+                "relpath": "notes/research_topics/" + filename,
+                "meta": {"last_reviewed_at": "2026-08-12", "review_due": "2026-08-15"},
+                "transitions": [transition],
+            })
+        self.assertEqual(len(selected), 2)
+        for topic in selected:
+            self.assertEqual(bd._topic_content_date(topic), "2026-09-07")
+            self.assertEqual(topic["meta"]["last_reviewed_at"], "2026-08-12")
+            self.assertEqual(topic["meta"]["review_due"], "2026-08-15")
+        recent = bd.build_recent_articles("2026-09-04", {}, {}, topics=selected)
+        self.assertEqual(recent["anchor"], "2026-09-07")
+        self.assertEqual({item["researchId"] for item in recent["items"]}, {
+            "topic-" + topic["topic_id"] for topic in selected
+        })
+        helios = (ROOT / "notes/knowledge_graph/amd_helios.md").read_text(encoding="utf-8")
+        edges = [dict(line.split(":", 1) for line in body.splitlines() if ":" in line)
+                 for body in re.findall(r"<!-- knowledge_edge\s*\n(.*?)-->", helios, re.S)]
+        edges = [{key.strip(): value.strip() for key, value in edge.items()} for edge in edges]
+        identity = next(edge for edge in edges if edge["edge_id"] == "KG-HEL-I28")
+        self.assertEqual(identity["view"], "industry")
+        self.assertEqual(identity["evidence_state"], "inference")
+        self.assertEqual(identity["materiality"], "unknown")
+        for edge in edges:
+            if edge["view"] == "company":
+                self.assertNotIn("#C27", edge["claim_refs"])
+                self.assertNotIn("#C28", edge["claim_refs"])
+                self.assertNotIn("humain", edge["from_id"])
+
+    def test_priority_q2_adata_completed_action_matches_signed_note(self):
+        topic = (ROOT / "notes/research_topics/2026-07-29_priority_q2_disclosures.md").read_text(
+            encoding="utf-8")
+        impacts = [dict(line.split(":", 1) for line in body.splitlines() if ":" in line)
+                   for body in re.findall(r"<!-- impact\s*\n(.*?)-->", topic, re.S)]
+        impacts = [{key.strip(): value.strip() for key, value in item.items()} for item in impacts]
+        adata = next(item for item in impacts if item["stock_ids"] == "3260")
+        self.assertEqual(adata["note_action"], "done")
+        self.assertEqual(adata["action_due"], "")
+        note = (ROOT / "notes/qualitative/3260_威剛.md").read_text(encoding="utf-8")
+        self.assertIn("verification_status: independently_verified", note)
+        period = re.search(r"^latest_financial_period: (\d{4}Q[1-4])$", note, re.M).group(1)
+        self.assertGreaterEqual(period, "2026Q2")
+        self.assertIn("review_method: offline_evidence_pack_independent_recalculation", note)
+        self.assertIn("thesis_claim_id: C15", topic)
 
     def test_compute_connect_station_three_separates_backside_power_path_process_and_company_gates(self):
         topic = (
@@ -9179,7 +9243,7 @@ class ResearchCenterTest(unittest.TestCase):
             "8 月 15 日依 T10 回查",
             "source_id: S32",
             "本輪只核對實際取件、PDF身分、比較期間與報告日期",
-            "8 月 29 日弘塑、智原與日月光投控各自完成四份核心文件的證據包與獨立複核。其餘三檔仍待完整複核",
+            "9 月 7 日威剛也完成。剩餘同欣電與德微仍待完整複核",
         ):
             self.assertIn(contract, topic)
         claims = {}

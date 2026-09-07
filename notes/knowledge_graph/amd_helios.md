@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
 label: AMD Helios 部署階梯
-summary: 以參考設計、品牌系統、整櫃與機械資格及六個部署關卡連結系統責任、具名客戶及台灣夥伴，同時保留交付、場站、財務與多架構競爭的未驗證邊界。
+summary: 以參考設計、品牌系統、整櫃與機械資格及六個部署關卡連結系統責任、具名客戶及台灣夥伴；新增產品代別與場站共同鍵，MI355X實績不代填MI400或Helios，交付及財務仍須獨立驗證。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
@@ -832,4 +832,24 @@ review_due: 2026-09-12
 status: active
 boundary: 4,700 kg、46.091255 kN 與 250 N／25.4929053244 kgf 只是在固定標準重力下分開質量與力；未加入 frame、包裝、動態加速度、重心、支點或場站條件，不能形成地板反力或產品 pass。
 next_trigger: 具名機架交付逐項 mass ledger、總質量、重心、輪組／leveler／anchor 幾何、搬運加速度、各支點反力、不確定度與 site pass／fail。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-I28
+view: industry
+from_id: product:amd-helios
+to_id: concept:deployment-product-identity
+relation: requires
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C28
+note_refs:
+evidence_state: inference
+commercial_stage: qualification
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-07
+review_due: 2026-09-30
+status: active
+boundary: 這條線只表示部署證據需要產品身分共同鍵，不是產品已通過qualification。HUMAIN公告已上線的是MI355X，MI400仍為後續計畫且未定位Helios品牌SKU；不建立HUMAIN客戶線、不升級既有公司曝險或C11時鐘。
+next_trigger: 相同代別、品牌SKU、場站、日期的供應商交付與客戶驗收；如要連財務，另需同期間具名公司收入分母。
 -->
