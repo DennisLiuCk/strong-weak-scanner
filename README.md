@@ -769,6 +769,9 @@ active radar，優先級、知識價值、反證與下次證據都要可機讀�
 才可標為升格。完整節奏、SLA 與路由規則見
 [`RESEARCH_MAINTENANCE.md`](RESEARCH_MAINTENANCE.md)。
 
+機構公開研究的來源選擇、基本驗證與人工試作流程見
+[`MARKET_INTELLIGENCE_SOURCING.md`](MARKET_INTELLIGENCE_SOURCING.md)。
+
 ## 事件錨點與研究中心的台積電法說
 
 台積電 2330 是觀察層參考股，不在 universe，也不參與 `daily_metrics`、`daily_scores` 或任何
