@@ -8692,7 +8692,11 @@ class ResearchCenterTest(unittest.TestCase):
             ("research_claim", 27), ("metric_comparison", 9),
             ("impact", 4), ("monitoring_item", 5), ("transition", 11),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in {"research_source", "research_claim", "monitoring_item", "transition"}:
+                # Keep historical evidence while allowing later append-only research.
+                self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"

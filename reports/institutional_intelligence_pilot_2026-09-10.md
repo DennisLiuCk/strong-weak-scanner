@@ -26,3 +26,24 @@
   headless Chrome實開1440、390與320px，無頁面JS錯誤或水平溢出；已檢視桌機與手機畫面。
   原液冷內容測試將來源／claim／monitor的固定總數改為保留歷史下限，允許合法追加；
   舊內容逐項斷言與append-only baseline檢查仍完整保留。
+
+## 第二段：AI支出、融資義務與現金回收
+
+- 對應：`MI-2026-08-01-AI-CAPEX-CASH-CONVERSION` 新S23/S24、C28–C31、T6；重讀既有S1。
+- S&P8/27官方發布稿列出六家指定公司（包含SpaceX）；核對FOCF預測期限、2028一般模型
+  假設及文末非rating action說明。原HTML `sp_ratings_20260827.html` SHA256
+  `9a267232a275876dec107603cd57879ed1b6588eabe32662c061215721524fd4`。
+- Microsoft7/29法說核對useful-life update、finance/operating leases、FY27 FCF指引；
+  當日IR索引可回到同一S1，後續法說日期尚未公布。沒有把S&P年度自行改成相同CY，
+  也沒有把公司FCF和機構FOCF當成同一公式。保留兩份展望及待對帳缺口。
+- 本次官方web工具文字截取（非原始HTML）`finance-critical-extract.json` SHA256
+  `3a851e73bd9e3f89e8bcc1b1daf0bcbb51b346baf9146e57dbbabc265b08d166`；
+  `finance-web-extract.json` SHA256
+  `5f66dc7629b0664c007477f169d58c67029cf0c47076329db66849cdb3ae6f93`，payload均mode唯讀。
+- C28為機構情境推論，C29/C30只證實公司公開說法；未新增跨公司總額或抽樣估計，
+  SE/t不適用，公開稿沒有預測誤差帶。T6的10/31是人工工作回查日。
+- 液冷commit整合期間遠端新增閱讀UI變更，保留雙方後重跑prepublish及三視口QA通過。
+  此時預設macOS26.6.2／Python3.11.11測試數為685；融資段同環境執行，內容測試同樣
+  保留原來源/主張/監看/transition下限及逐項歷史斷言，允許追加，不減弱baseline閘門。
+- 融資段`finance-check-fixed`：685項測試、六lint、隔離重建及保護檔雜湊通過；
+  Chrome1440/390/320px無JS錯誤與水平溢出，已目視1440與390畫面。

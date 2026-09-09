@@ -388,6 +388,38 @@ limitation: 公開的是有空格和遮蔽的form，不是完整未遮蔽逐租�
 independence_group: ports-pike-transaction
 -->
 
+<!-- research_source
+source_id: S23
+role: market_estimate
+source_kind: document
+publisher: S&P Global Ratings
+title: AI Infrastructure Investment To Exceed $1.3 Trillion By 2027, S&P Global Ratings Says
+published_at: 2026-08-27
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://press.spglobal.com/2026-08-27-AI-Infrastructure-Investment-To-Exceed-1-3-Trillion-By-2027,-S-P-Global-Ratings-Says
+locator: 六家公司名單與 Additional findings 的 FOCF、融資結構及2028模型假設；文末明示不構成rating action
+limitation: 已讀官方公開發布稿，非逐家公司完整模型；FOCF與公司FCF調節、年度涵蓋月份、預測誤差帶未取得。負現金流與2029恢復均為預測，不能寫成實績或2029必定全部轉正
+independence_group: spglobal-ratings
+-->
+
+<!-- research_source
+source_id: S24
+role: company_release
+source_kind: living_index
+publisher: Microsoft
+title: Microsoft Investor Relations 官方首頁
+published_at:
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://www.microsoft.com/en-us/investor/default
+locator: 當日首頁列7/29 FY26 Q4 earnings及9/2 FY2027 Segments and Investor Metrics；下次earnings日期尚待公布
+limitation: 動態索引只供發現後續文件，無單一發布日；不能代替具體申報或由未列結果推定事件不存在。既有S1為同場法說，不重複建document source
+independence_group: microsoft
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -941,6 +973,76 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C28
+label: inference
+status: active
+claim: S&P針對指定六家公司的負FOCF與恢復情境，支持將AI支出研究延伸至融資義務和變現條件，不能當成現金缺口已發生
+supporting_source_ids: S23
+contrary_source_ids: S1
+as_of: 2026-09-10
+basis: S23點名Alphabet、Amazon、Microsoft、Meta、Oracle與SpaceX，預測2026/2027負FOCF、2029才恢復，並以2028變現改善作一般模型假設；S1另有公司正FCF指引
+boundary: 機構情境不是實績；母體包含SpaceX，非五大雲端或全產業；未取得逐家公司模型、FOCF調節、年度月份及誤差帶，2029也非必定全部轉正
+verification_needed: 後續相同公司和期間的現金流、租賃及變現資料與機構模型調節
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: Microsoft法說說明耐用年限更新使更多未來資料中心租約由finance轉為operating leases；前者納入公司CapEx而後者不納入，排除該影響後其calendar2026投資期待不變
+supporting_source_ids: S1
+contrary_source_ids:
+as_of: 2026-07-29
+basis: S1 Amy Hood在outlook前的useful-life update段直接說明分類及CapEx口徑
+boundary: 只確認公司對會計呈現及當時展望的說明，不代表所有租約已重分類、現金支付不變、建設已完成或供應商已有訂單
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: Microsoft於7/29法說預期FY2027 CapEx年增並維持正自由現金流
+supporting_source_ids: S1
+contrary_source_ids:
+as_of: 2026-07-29
+basis: S1 Amy Hood的FY27 full-year commentary直接提供CapEx與free cash flow positive指引
+boundary: 證實公司曾提供前瞻指引，非全年實績；未與S23 FOCF模型、月份及後續假設逐項對帳，不能認定S&P已被證偽
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C31
+label: inference
+status: active
+claim: S&P指定六家公司的FOCF展望與Microsoft FY2027 FCF指引應保留為待對帳分歧，按版本、期間、現金與租賃公式、義務履行及變現進度追蹤
+supporting_source_ids: S1,S23
+contrary_source_ids:
+as_of: 2026-09-10
+basis: 8月機構發布稿與7月公司法說使用不同現金流名稱及年度標示；缺乏相同期間和定義的調節，正負號不足以證明同口徑矛盾
+boundary: 不認定差異全由會計造成或風險不真實；不估計信用評級、違約、AI ROI、估值或台廠財務。兩份前瞻資訊皆可能需要修正，不刷新C2時鐘
+verification_needed: 相同公司與期間的FOCF/FCF調節、OCF、cash PP&E、租賃新增及付款、義務到期與履行，另需供應商文件才能連到訂單與收款
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C28,C29,C30,C31
+metric: Microsoft FCF指引與S&P指定公司FOCF情境的期間、版本、現金、租賃、義務及變現對帳
+source_ids: S1,S23
+watch_source_ids: S24
+frequency: quarterly
+frequency_detail: 每季人工由Microsoft IR取得新文件；機構模型、重大融資或分類更新時提前查。10/31為工作回查日，非已公布法說日期
+next_check: 2026-10-31
+trigger: 新文件提供可比FOCF/FCF調節，或可核對的現金購置、租賃新增與付款、未起租義務、保證履行及收入回收變動
+invalidation: 相同公司、月份、定義與版本已有可重算調節時，必須依結果更新預測偏差，不得持續以口徑不同迴避裁決
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -1074,10 +1176,20 @@ reason: filed_redacted_guaranty_form_and_phase_boundaries_added_without_refreshi
 evidence: sources:S21,S22
 -->
 
+<!-- transition
+date: 2026-09-10
+from: triaged
+to: triaged
+reason: institutional_funding_forecast_cross_checked_with_microsoft_guidance_without_main_thesis_clock_refresh
+evidence: sources:S1,S23,S24
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **FOCF（自由營運現金流）**：S&P本次展望使用的現金流指標；本輪公開稿沒有逐家公司調節表，不能直接等同公司自訂FCF。
+- **SpaceX**：S&P本次研究列入的第六家公司；本篇保留原名單，不以常見的五大雲端名單替代。
 - **MD&A（管理階層討論與分析）**：申報文件中由管理層解釋營運、財務與風險的章節，仍應與報表附註及契約條文對照。
 - **FY2027／FY2029（公司會計年度）**：申報公司的財年名稱，不直接等於相同數字的日曆年度；本文不自行換算確定啟用日。
 - **Exhibit10.1（申報附件10.1）**：本次10-Q所附的保證範本，仍有遮蔽條款及省略附表。
@@ -1150,6 +1262,23 @@ evidence: sources:S21,S22
 - 一美元 CapEx 有多少是建物、電力與網路，有多少真的變成 GPU、伺服器或台灣零組件收入？
 - FCF 轉負是暫時把現金換成會產生未來收入的資產，還是需求、利用率與定價不足以回收投資；要看哪些後續數字才能分辨？
 - 為什麼不能把 Micron 的十年 100 億美元研究計畫除以十，當成每年 10 億美元 R&D，再加進 FY2026 CapEx 或設備商訂單？
+
+## 9 月 10 日機構情報：融資要追付款與變現，不能只看支出總額
+
+S&P Global Ratings 在 8 月 27 日提出一項需要核對的預測：Alphabet、Amazon、Microsoft、Meta、Oracle 與 SpaceX 六家公司，2026、2027 年都可能產生負的自由營運現金流（FOCF），預計到 2029 年才恢復。模型一般假設 2028 年變現改善、收入加速且資本支出成長放緩；這些條件未實現，恢復時點也不能照表認定。**這是指定公司的機構情境，公開稿沒有可重算的逐家公司模型或預測誤差帶。**〔C28；[S23](https://press.spglobal.com/2026-08-27-AI-Infrastructure-Investment-To-Exceed-1-3-Trillion-By-2027,-S-P-Global-Ratings-Says)〕
+
+微軟 7 月 29 日法說提供另一把尺：延長資料中心與辦公建物的估計耐用年限後，更多未來資料中心租約會轉為營業租賃；融資租賃納入公司 CapEx，營業租賃則不納入。排除該影響，公司對 2026 曆年的投資期待不變。因此，CapEx 標題調整時，應先查分類與現金支付，再判斷建設需求是否縮減。〔C29；[S1](https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q4)〕
+
+微軟同場也預期 FY2027 CapEx 年增，且 FCF 仍為正。**這是待對帳的分歧**：公司 FCF 與機構 FOCF 沒有逐項調節，財政年度與 S&P 年度標示未對齊，發布日期也不同。兩份展望都應保留，待可比資料判斷；不能認定正負號差異全由會計造成。〔C30、C31；S1、S23〕
+
+S&P 也關注債務、租賃、合資及殘值保證。對 ODM、PCB、電源與散熱研究，這讓追蹤重點延伸到付款義務、到期與收入回收。融資完成距離設備驗收還有步驟，保證上限亦非當期支出；供應商訂單、毛利與收款仍須公司文件。下次人工回查日是 **10 月 31 日**，由 [Microsoft IR](https://www.microsoft.com/en-us/investor/default) 找新法說與申報；這不是已公布的法說日期。〔C31；既有C5、C6、C18；T6〕
+
+| 每季檢查 | 至少保留什麼 |
+|---|---|
+| 期間與版本 | 發布日、涵蓋月份、FY／CY／TTM，及實績／公司指引／機構預測 |
+| 現金與租賃 | OCF、現金購置PP&E、租賃新增與本金支付、CapEx／FCF／FOCF公式及分類變動 |
+| 承諾與履行 | 債務、未起租租約與保證的到期、觸發及實付；同一義務不要重複加總 |
+| 變現與歸因 | 相同期間的收入與回收；台廠的具名產品、出貨、毛利及收款證據 |
 
 ## 三家公司要先按各自口徑讀
 
