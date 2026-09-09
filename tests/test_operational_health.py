@@ -1,13 +1,50 @@
 import sqlite3
+import subprocess
 import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from types import SimpleNamespace
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import operational_health as health
 
 
 class HealthTest(unittest.TestCase):
+    def test_pages_errors_preserve_local_health_and_never_report_deployed(self):
+        baseline = health.build_health()
+        for error in (FileNotFoundError("gh"), subprocess.TimeoutExpired("gh", 45)):
+            with self.subTest(error=type(error).__name__), \
+                    patch.object(health.subprocess, "check_output", return_value="abc\n"), \
+                    patch.object(health.subprocess, "run", side_effect=error):
+                result = health.build_health(check_pages=True)
+            self.assertEqual(result["checks"]["pages"]["status"], "unknown")
+            self.assertIn("未確認", result["checks"]["pages"]["note"])
+            self.assertEqual({k: v for k, v in result["checks"].items() if k != "pages"}, baseline["checks"])
+            self.assertIn("原始資料：", health.render(result))
+
+    def test_pages_requires_successful_matching_build_and_handles_bad_responses(self):
+        cases = [
+            (0, '{"status":"built","commit":"abc"}', "complete"),
+            (0, '{"status":"built","commit":"old"}', "unknown"),
+            (0, '{"status":"building","commit":"abc"}', "unknown"),
+            (0, '{"status":"errored","commit":"abc"}', "failed"),
+            (1, 'unauthorized', "unknown"),
+            (0, 'bad json', "unknown"),
+            (0, '[]', "unknown"),
+            (0, '{}', "unknown"),
+        ]
+        for code, payload, expected in cases:
+            with self.subTest(payload=payload), \
+                    patch.object(health.subprocess, "check_output", return_value="abc\n"), \
+                    patch.object(health.subprocess, "run", return_value=SimpleNamespace(
+                        returncode=code, stdout=payload)) as probe:
+                result = health.pages_status()
+            self.assertEqual(result["status"], expected)
+            self.assertEqual(result["expected_commit"], "abc")
+            self.assertEqual(probe.call_args.kwargs["cwd"], health.rq.ROOT)
+            if expected == "unknown":
+                self.assertTrue(result["note"])
+
     def test_invalid_hypothesis_anchor_remains_a_p0_work_item(self):
         rq = health.rq
         reports = rq.load_reports(notes=rq.load_notes())

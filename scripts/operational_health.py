@@ -67,6 +67,38 @@ def publication_status(con, data_date, progress, registration_date):
             "ranking_phase": progress["phase"]}
 
 
+def pages_status():
+    """Optional remote probe: failure must not discard completed local diagnostics."""
+    result = {"status": "unknown", "build_status": None, "commit": None,
+              "expected_commit": None}
+    try:
+        result["expected_commit"] = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True, cwd=rq.ROOT, stderr=subprocess.PIPE).strip()
+        process = subprocess.run(
+            ["gh", "api", "repos/DennisLiuCk/strong-weak-scanner/pages/builds/latest"],
+            cwd=rq.ROOT, capture_output=True, text=True, encoding="utf-8", timeout=45)
+        if process.returncode:
+            result["note"] = f"Pages 查詢失敗（gh exit {process.returncode}）；請確認連線與 GitHub 登入。"
+            return result
+        page = json.loads(process.stdout)
+        if not isinstance(page, dict) or not isinstance(page.get("status"), str):
+            raise ValueError("invalid Pages response")
+        result.update(build_status=page["status"], commit=page.get("commit"))
+        if page["status"] == "errored":
+            result.update(status="failed", note="Pages build 回報失敗。")
+        elif page["status"] == "built" and page.get("commit") == result["expected_commit"]:
+            result["status"] = "complete"
+        else:
+            result["note"] = "尚未確認 Pages 已部署目前 HEAD；請回查建置進度與 commit。"
+    except subprocess.TimeoutExpired:
+        result["note"] = "Pages 查詢逾時；本機檢查已保留，部署狀態未確認。"
+    except (OSError, subprocess.SubprocessError):
+        result["note"] = "無法執行 Git／GitHub CLI；本機檢查已保留，部署狀態未確認。"
+    except (ValueError, UnicodeError):
+        result["note"] = "Pages 回應格式無法判讀；部署狀態未確認。"
+    return result
+
+
 def build_health(db_path=rq.DB, *, as_of=None, check_pages=False):
     as_of = as_of or rq.taipei_today()
     checks = {}
@@ -102,14 +134,7 @@ def build_health(db_path=rq.DB, *, as_of=None, check_pages=False):
     checks["freshness"] = {"status": "degraded" if lag > 3 else "complete", "lag_calendar_days": lag,
                            "note": "超過三個日曆日只提示回查；此處未連線查交易所休市日。"}
     if check_pages:
-        process = subprocess.run(["gh", "api", "repos/DennisLiuCk/strong-weak-scanner/pages/builds/latest"],
-                                 capture_output=True, text=True, encoding="utf-8", timeout=45)
-        page = json.loads(process.stdout) if process.returncode == 0 else {}
-        head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, cwd=rq.ROOT).strip()
-        state = ("failed" if page.get("status") == "errored" else
-                 "complete" if page.get("status") == "built" and page.get("commit") == head else "unknown")
-        checks["pages"] = {"status": state, "build_status": page.get("status"),
-                           "commit": page.get("commit"), "expected_commit": head}
+        checks["pages"] = pages_status()
     return {"as_of": as_of.isoformat(), "data_date": last, "status": overall_status(checks),
             "scope": "本機資料與研究；Pages " + ("已查詢" if check_pages else "未查詢"), "checks": checks}
 
@@ -139,6 +164,8 @@ def render(health):
             lines.append(f"  ERROR {key}: {error}")
     if "pages" in c:
         lines.append(f"  Pages：{labels[c['pages']['status']]}，commit {c['pages']['commit']}")
+        if c["pages"].get("note"):
+            lines.append("  " + c["pages"]["note"])
     return "\n".join(lines) + "\n"
 
 
