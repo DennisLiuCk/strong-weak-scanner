@@ -643,6 +643,9 @@ let catalogReturnPosition=null;
 function h(tag,attrs,...children){const el=document.createElement(tag);Object.entries(attrs||{}).forEach(([key,value])=>{
   if(key==='class')el.className=value;else if(key==='text')el.textContent=value==null?'':String(value);else if(key==='html')el.innerHTML=value;else if(key.startsWith('on'))el.addEventListener(key.slice(2),value);else if(value!==false&&value!=null)el.setAttribute(key,value===true?'':String(value));
 });children.flat().forEach(child=>{if(child==null)return;el.appendChild(typeof child==='string'?document.createTextNode(child):child)});return el}
+// 偏好儲存可能被瀏覽器拒絕；閱讀與切換功能仍須在本次頁面正常運作。
+function readPreference(key){try{return localStorage.getItem(key)||''}catch(_){return''}}
+function writePreference(key,value){try{localStorage.setItem(key,value)}catch(_){}}
 function fmtDate(value){return String(value||'').replaceAll('-','/')}
 function flatText(value){if(typeof value==='string')return value;if(Array.isArray(value))return value.map(flatText).join(' ');if(value&&typeof value==='object')return Object.values(value).map(flatText).join(' ');return ''}
 function taipeiDate(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()),values={};parts.forEach(part=>{if(part.type!=='literal')values[part.type]=part.value});return values.year+'-'+values.month+'-'+values.day}
@@ -1234,7 +1237,7 @@ function renderAll(){if(state.surface==='graph'){renderGraph();return}if(state.s
 
 /* 首次進入先展開問題式導覽；讀者明確收合後才在同一瀏覽器記住選擇。
    這是純顯示偏好，不寫入文章、路線或研究 payload，也不由 resize 覆寫。 */
-(function restoreCatalogGuidePreference(){const guide=document.getElementById('entryGuide');if(!guide)return;const key='researchEntryGuideStateV1';let saved='';try{saved=localStorage.getItem(key)||''}catch(_){}guide.open=saved!=='closed';guide.addEventListener('toggle',()=>{if(guide.hidden)return;try{localStorage.setItem(key,guide.open?'open':'closed')}catch(_){}})})();
+(function restoreCatalogGuidePreference(){const guide=document.getElementById('entryGuide');if(!guide)return;const key='researchEntryGuideStateV1';guide.open=readPreference(key)!=='closed';guide.addEventListener('toggle',()=>{if(guide.hidden)return;writePreference(key,guide.open?'open':'closed')})})();
 /* 手機先顯示「讀法」與「目前位置」摘要，完整步驟和篩選仍可原位展開。
    和圖形檢視相同，只在載入時收起一次，不覆寫使用者之後的手動狀態。 */
 (function foldGraphGuidesOnNarrow(){if(!window.matchMedia('(max-width:780px)').matches)return;
@@ -1274,10 +1277,10 @@ filterToggleButton.addEventListener('click',()=>filtersPanel.classList.contains(
 filterCloseButton.addEventListener('click',()=>closeFilters());
 filterMedia.addEventListener('change',()=>{filtersPanel.classList.remove('open');syncFilterAccess()});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&filtersPanel.classList.contains('open'))closeFilters()});
-const focusToggleButton=document.getElementById('focusToggle'),focusMedia=matchMedia('(min-width:781px)');let focusModeRequested=localStorage.getItem('researchFocusMode')!=='0';
+const focusToggleButton=document.getElementById('focusToggle'),focusMedia=matchMedia('(min-width:781px)');let focusModeRequested=readPreference('researchFocusMode')!=='0';
 function applyFocusMode(){const articleOpen=state.surface==='library'&&document.body.classList.contains('article-open'),active=articleOpen&&focusModeRequested&&focusMedia.matches;document.body.classList.toggle('focus-mode',active);focusToggleButton.hidden=!articleOpen;focusToggleButton.setAttribute('aria-pressed',active?'true':'false');focusToggleButton.textContent=active?'文章清單':'專注閱讀';focusToggleButton.setAttribute('aria-label',active?'返回研究文章清單':'進入專注閱讀');if(active&&filtersPanel.classList.contains('open'))closeFilters(false);requestAnimationFrame(()=>{outlineSpyRefresh();markScrollableTables(document.getElementById('reader'))})}
-focusToggleButton.addEventListener('click',()=>{focusModeRequested=!focusModeRequested;localStorage.setItem('researchFocusMode',focusModeRequested?'1':'0');applyFocusMode()});focusMedia.addEventListener('change',applyFocusMode);applyFocusMode();
-const root=document.documentElement;const saved=localStorage.getItem('dashTheme');if(saved)root.dataset.theme=saved;document.getElementById('themeBtn').addEventListener('click',()=>{const current=root.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');root.dataset.theme=current==='dark'?'light':'dark';localStorage.setItem('dashTheme',root.dataset.theme)});
+focusToggleButton.addEventListener('click',()=>{focusModeRequested=!focusModeRequested;writePreference('researchFocusMode',focusModeRequested?'1':'0');applyFocusMode()});focusMedia.addEventListener('change',applyFocusMode);applyFocusMode();
+const root=document.documentElement;const saved=readPreference('dashTheme');if(saved==='light'||saved==='dark')root.dataset.theme=saved;document.getElementById('themeBtn').addEventListener('click',()=>{const current=root.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');root.dataset.theme=current==='dark'?'light':'dark';writePreference('dashTheme',root.dataset.theme)});
 function hashArticleId(){try{return decodeURIComponent(location.hash.slice(1))}catch(_){return''}}
 window.addEventListener('hashchange',()=>{const value=hashArticleId(),route=graphHashRoute(value);if(value==='radar')selectSurface('radar',false);else if(value==='maturity')selectSurface('maturity',false);else if(route){state.graphId=route.graphId;state.graphRoute=graphRouteId(route.graphId);state.graphView=route.view;state.graphSelection=null;state.graphOrigin=null;selectSurface('graph',false)}else if(byId.has(value))selectArticle(value,false,null);else{state.articleOrigin=null;state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}});
 const deepLink=hashArticleId(),deepGraph=graphHashRoute(deepLink);if(deepLink==='radar')state.surface='radar';else if(deepLink==='maturity')state.surface='maturity';else if(deepGraph){state.surface='graph';state.graphId=deepGraph.graphId;state.graphRoute=graphRouteId(deepGraph.graphId);state.graphView=deepGraph.view}else{state.selected=byId.has(deepLink)?deepLink:null;if(byId.has(deepLink))document.body.classList.add('article-open')}renderEntryGuideRoutes();renderGroupFilters();renderTypeTabs();syncFilterAccess();syncSurface();applyFocusMode();if(state.surface==='graph')renderGraphControls();renderAll();if(byId.has(deepLink))focusArticleHeading(deepLink);

@@ -1920,13 +1920,13 @@ function buildRecentArticles(){
 
 /* ---------- 主題切換 ---------- */
 const _html=document.documentElement;
-{ const saved=localStorage.getItem('dashTheme'); if(saved)_html.dataset.theme=saved; }
+{ const saved=rvStored('dashTheme'); if(saved==='light'||saved==='dark')_html.dataset.theme=saved; }
 document.querySelectorAll('.quicknav a').forEach(link=>link.addEventListener('click',()=>{const menu=link.closest('.utility-menu');if(menu)menu.open=false;}));
 document.addEventListener('click',event=>document.querySelectorAll('.utility-menu[open]').forEach(menu=>{if(!menu.contains(event.target))menu.open=false;}));
 document.addEventListener('keydown',event=>{if(event.key==='Escape')document.querySelectorAll('.utility-menu[open]').forEach(menu=>{menu.open=false;menu.querySelector('summary').focus();});});
 document.getElementById('themeBtn').addEventListener('click',()=>{
   const cur=_html.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  _html.dataset.theme=(cur==='dark'?'light':'dark'); localStorage.setItem('dashTheme',_html.dataset.theme);
+  _html.dataset.theme=(cur==='dark'?'light':'dark'); rvRemember('dashTheme',_html.dataset.theme);
 });
 /* ---------- 詳情面板（桌機右側抽屜／手機底部 sheet）---------- */
 let sheetEl; const sheetwrap=h('div',{id:'sheetwrap','aria-hidden':'true'},h('div',{id:'backdrop','aria-hidden':'true',onclick:closeSheet}),(sheetEl=h('div',{id:'sheet',role:'dialog','aria-modal':'true','aria-label':'詳情面板'})));

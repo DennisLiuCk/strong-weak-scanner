@@ -1,5 +1,16 @@
 # Changelog
 
+## 服務與 UX 審查：偏好儲存失敗不再阻斷頁面 — 2026-09-10
+
+- P1：瀏覽器拒絕 localStorage 讀取時，首頁掃描與研究中心原本會在掛載前中斷。
+  深淺色、閱讀模式與入口偏好統一經容錯讀寫，儲存被拒仍可操作當次頁面；
+  深淺色只接受 light／dark，保留既有偏好鍵。
+- 驗證環境：macOS 26.6.2 arm64、預設 Python 3.11.11（UTF-8 mode 0、stdout UTF-8，
+  未設 PYTHONUTF8／PYTHONIOENCODING）、Node 22.14.0。新增 JS 執行測試覆蓋儲存
+  讀取遭拒、寫入額度錯誤及正常儲存，並同步舊契約測試。
+- Codex in-app browser 以 sandbox iframe 重現受限儲存，修正後首頁標題可見且能切換
+  主題，研究中心可搜尋 3260。正常本機預覽亦可載入；正式 DB 與歷史 archive 不改寫。
+
 ## 研究循環：逐日掃描覆蓋、產品主詞勘誤與公司分母 — 2026-09-09
 
 - 修正 `research_event_scan` 多日窗口只命中一天即可 `full` 的漏洞。逐市場列出
