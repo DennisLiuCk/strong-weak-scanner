@@ -20,6 +20,27 @@ class ResearchNavigationTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)
 
+    def test_company_heading_identifies_the_document_without_repeating_the_mission(self):
+        result = self.run_helper('articleReaderHeading', """
+function h(tag,attrs,...children){return {tag,attrs,children}}
+function catalogReaderQuestion(article){return article.question||''}
+function articleReaderTitleLabel(){return '研究題名：'}
+const TYPE_INFO={formal_note:{label:'正式筆記'},narrative:{label:'多空小作文'}};
+function headings(node){if(typeof node!=='object')return[];return node.tag==='h1'?[node.attrs]:node.children.flatMap(headings)}
+const rows=['formal_note','narrative','topic','unknown'].map(type=>({
+  id:type,type,readerTitle:'3260 威剛 — '+type,
+  question:type==='unknown'?'':'這家公司做什麼？'
+}));
+console.log(JSON.stringify(rows.map(article=>headings(articleReaderHeading(article)))));
+""")
+        self.assertEqual([row[0]['text'] for row in result], [
+            '3260 威剛 — formal_note', '3260 威剛 — narrative',
+            '這家公司做什麼？', '3260 威剛 — unknown',
+        ])
+        self.assertEqual([row[0]['data-reader-heading-focus'] for row in result],
+                         ['formal_note', 'narrative', 'topic', 'unknown'])
+        self.assertTrue(all(row[0]['tabindex'] == '-1' for row in result))
+
     def test_filter_tab_order_keeps_only_the_selected_radio_in_each_group(self):
         result = self.run_helper('filterTabStops', """
 const controls=[

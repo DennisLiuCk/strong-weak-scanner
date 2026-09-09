@@ -2806,7 +2806,7 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, template)
         self.assertNotIn("h('h2',{text:'來源與證據摘要'})", template)
 
-    def test_article_heading_continues_the_catalog_reader_question(self):
+    def test_article_heading_preserves_question_and_focus_contracts(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
             "function articleReaderTitleLabel(article)",
