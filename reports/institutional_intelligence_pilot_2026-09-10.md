@@ -47,3 +47,25 @@
   保留原來源/主張/監看/transition下限及逐項歷史斷言，允許追加，不減弱baseline閘門。
 - 融資段`finance-check-fixed`：685項測試、六lint、隔離重建及保護檔雜湊通過；
   Chrome1440/390/320px無JS錯誤與水平溢出，已目視1440與390畫面。
+
+## 第三段：記憶體買方的供應、定價及利潤率
+
+- 對應：`MI-2026-08-02-AI-MEMORY-HIERARCHY` 新S24–S27、C31–C35、T8。
+- 核對Morgan Stanley6/8 Shawn Kim逐字稿中的分層採購框架；舊文明示作背景，
+  不採缺口與需求占比預測數字。`ms_memory_20260608.html`原HTML SHA256
+  `d0d377f02a6b7c1fa6cc8b2c9e1c427147d8383b634d23d684b2fbb289929e7a`。
+- S&P MI7/28 Chris Rogers原文的壓縮／架構替代屬未來風險，未當成當期採購下降。
+  直接HTTP403但官方web正文可讀；與Ratings同集團，不增加獨立消息鏈。
+- HP10-Q的SEC index明列filing date8/27、accepted8/26 19:04:12及period7/31；
+  MD&A頁40/45核對成本、季度同比及管理層歸因。獨立複核將草稿「毛利」改為
+  「毛利率」，補上「去年同期」；與8/26公司稿的供應改善並存，沒有抹去反方。
+  HP兩份文件屬同一公司/季度，不是兩個獨立買方；沒有隔離記憶體成本因果。
+- 官方web文字截取（非原HTML）`memory-critical-extract.json` SHA256
+  `9d29cd90043f3f03041c489660983601eab3746050a32a29c7c560c19d260dab`；
+  `memory-web-extract.json` SHA256
+  `fdb82425153b11d64e5907e9692676b0bf7430c4081ffa0751a671b6c02edc4a`，payload mode唯讀。
+- 未新增財務點估計或抽樣统计，SE/t不適用。T8按買方壓力與賣方格式需求分別裁決，
+  不把供應改善一概推成所有記憶體公司不受惠；C8及舊時鐘未刷新。
+- macOS26.6.2／預設Python3.11.11：685項測試、六lint、隔離build及保護檔雜湊通過。
+  Chrome1440/390/320px無JS錯誤與水平溢出，已目視桌機與手機。內容測試允許追加，
+  思考問題測試以該節真正邊界取文，保留原白話與歷史證據斷言。

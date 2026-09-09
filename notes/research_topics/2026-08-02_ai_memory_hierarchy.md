@@ -464,6 +464,70 @@ limitation: NVIDIA dev／Beta 動態文件的單一 vendor-run 合成 benchmark�
 independence_group: nvidia
 -->
 
+<!-- research_source
+source_id: S24
+role: market_estimate
+source_kind: document
+publisher: Morgan Stanley
+title: The High Cost of AI Memory
+published_at: 2026-06-08
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://www.morganstanley.com/insights/podcasts/thoughts-on-the-market/high-cost-of-AI-memory-shawn-kim
+locator: Shawn Kim逐字稿；two-tier market的長約、預付款與傳統硬體買方段落
+limitation: 官方公開研究框架；缺口與需求占比是機構預測，底層模型、誤差與台灣公司曝險未公開，本次不採預測數值。6月文章作背景，不包裝為9月新報告
+independence_group: morgan-stanley
+-->
+
+<!-- research_source
+source_id: S25
+role: market_estimate
+source_kind: document
+publisher: S&P Global Market Intelligence
+title: Behind the AI boom: The electronics supply-side constraints
+published_at: 2026-07-28
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://www.spglobal.com/market-intelligence/en/news-insights/research/2026/07/behind-ai-boom-electronics-supply-side-constraints
+locator: Chris Rogers；Processors and memory段的Compression techniques及future oversupply risk
+limitation: Market Intelligence分析，非Ratings報告，但兩者同集團不計為獨立兩鏈；替代與過剩是情境，無可重算需求模型，不證明當期HBM/SOCAMM/storage採購下降。直接HTTP403，核對官方web正文
+independence_group: sp-global-market-intelligence
+-->
+
+<!-- research_source
+source_id: S26
+role: company_filing
+source_kind: document
+publisher: HP Inc.
+title: Form 10-Q for the quarter ended July 31, 2026
+published_at: 2026-08-27
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://www.sec.gov/Archives/edgar/data/47217/000004721726000051/hpq-20260731.htm
+locator: MD&A印刷頁40成本與供應挑戰、頁45截至7/31的三個月對去年同期分析；SEC index filing date8/27，accepted8/26 19:04:12
+limitation: 單一公司申報及管理層歸因；ASP含定價、匯率與mix，成本不限記憶體，margin是率而非金額；不能隔離記憶體因果或外推台廠獲利。本次不新增數值估計
+independence_group: hp-inc
+-->
+
+<!-- research_source
+source_id: S27
+role: company_release
+source_kind: document
+publisher: HP Inc.
+title: HP Inc. Reports Fiscal 2026 Third Quarter Results
+published_at: 2026-08-26
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://www.hp.com/us-en/newsroom/press-releases/2026/hp-inc-reports-fiscal-2026-third-quarter-results.html
+locator: Net revenue and EPS results；Bruce Broussard對memory supply及fulfillment rates的說法
+limitation: 管理層稱供應改善但未量化程度；與S26同一公司消息鏈，非第二家買方，不表示供給充分或成本壓力消失
+independence_group: hp-inc
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -939,6 +1003,90 @@ verification_needed: 具名 operator 以版本化 production trace 重複 baseli
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C31
+label: inference
+status: active
+claim: Morgan Stanley的長約及預付款分析可用來區分大型AI/雲端買方與傳統硬體買方的取得供應能力
+supporting_source_ids: S24
+contrary_source_ids: S27
+as_of: 2026-09-10
+basis: S24提出分層市場框架，S27後續披露單一PC買方的供應改善
+boundary: 機構框架不代表所有買方缺貨、未來缺口已發生或台灣公司受惠
+verification_needed: 多家買方同產品與期間的取得量、合約及成本
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C32
+label: verified
+status: active
+claim: HP申報截至7/31的三個月相較去年同期，Personal Systems營收增、PC台數減、ASP升；公司稱定價等因素只部分抵銷零件成本，毛利率仍降
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-08-27
+basis: S26頁40及45的成本挑戰、季度同比及管理層對margin變動的歸因
+boundary: 證實申報內容，非季增比較；ASP含匯率與mix，成本不限記憶體，不能隔離因果或外推全產業
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C33
+label: verified
+status: active
+claim: HP8/26財報稿表示當季記憶體供應及訂單履行率已有改善
+supporting_source_ids: S27
+contrary_source_ids:
+as_of: 2026-08-26
+basis: S27管理層直接說法
+boundary: 只證實公司說法，無改善幅度；不表示供給充分或成本壓力消失
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C34
+label: inference
+status: active
+claim: S&P Market Intelligence的壓縮與替代架構分析提醒，現有記憶體格式的短缺不能自動外推為長期需求保證
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-07-28
+basis: S25提出降低現有格式依賴及未來過剩的風險情境
+boundary: 未附可重算模型，不證實HBM/SOCAMM/storage當期採購已下降
+verification_needed: 同工作負載的採購量、壓縮成本及實際產品組合前後證據
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C35
+label: inference
+status: active
+claim: 記憶體研究應按晶片、模組/控制IC與系統買方拆開取得供應和轉嫁成本能力，同看售價、出貨與利潤
+supporting_source_ids: S24,S25,S26,S27
+contrary_source_ids:
+as_of: 2026-09-10
+basis: 機構框架與買方申報提供不同層次的供應、成本及需求限制
+boundary: 本次只增加檢查問題，不建立台灣公司受惠映射或刷新C8架構主命題時鐘
+verification_needed: 台廠與客戶具名產品、交付、定價和財務的雙向證據
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T8
+status: active
+claim_ids: C31,C32,C33,C34,C35
+metric: 同產品與期間的記憶體取得量、成本、售價、出貨、利潤，及替代架構是否改變採購
+source_ids: S24,S25,S26,S27
+watch_source_ids: S6,S24,S25,S26,S27
+frequency: monthly
+frequency_detail: 人工查買方與記憶體公司新財報；10/1為工作回查日，非已知財報日，本輪不建立自動抓取或排程
+next_check: 2026-10-01
+trigger: 新財報分開揭露採購、定價、出貨與利潤，或具名架構更新改變同工作負載的硬體需求
+invalidation: 供應和轉嫁改善時縮窄買方承壓判讀；具名替代方案使原格式採購下降時，縮窄該格式需求與受惠說法，不一概推及所有記憶體公司
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -1056,10 +1204,21 @@ reason: added_controlled_multimodal_cache_benchmark_and_tail_latency_boundary_wi
 evidence: sources:S23
 -->
 
+<!-- transition
+date: 2026-09-10
+from: triaged
+to: triaged
+reason: added_institutional_memory_buyer_cost_framework_and_hp_filing_counterchecks_without_main_thesis_clock_refresh
+evidence: sources:S24,S25,S26,S27
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **HP／Personal Systems**：HP Inc.是本段用來觀察買方成本的公司；Personal Systems是其個人運算事業，不能代表所有伺服器或記憶體買方。
+- **ASP（平均售價）**：收入與銷售量對應的平均價格；變化也可能來自產品組合或匯率，未必只是同一產品漲價。
+- **PC（個人電腦）**：本段HP揭露的台數範圍；不能把PC出貨減少直接當成AI伺服器需求減少。
 - **圖形運算晶片（GPU）**：負責大量平行運算的晶片。本文把它當成最靠近正在運算資料的位置，不代表所有人工智慧工作都只在這裡完成。
 - **中央處理器（CPU）**：負責一般運算與系統協調的晶片。本文討論的系統記憶體放在它的一側，與 GPU 旁的高速記憶體分工。
 - **頻寬**：單位時間內可以搬動多少資料。頻寬高不代表容量一定大，也不代表產品已量產。
@@ -1154,6 +1313,22 @@ evidence: sources:S23
 
 - 如果把一份可以重新建立的暫存資料移到較遠的位置，省下的會是近端空間、設備成本，還是運算等待時間？需要哪些不同數據驗證？
 - 如果中央處理器旁的系統記憶體出貨成長，圖形運算晶片旁的高速記憶體也同步成長，這代表互相替代，還是平台把資料分配到不同位置？
+
+## 9 月 10 日機構情報：記憶體漲價，誰拿得到貨、誰能轉嫁成本
+
+**AI記憶體需求增加，仍要分開看買方採購能力與賣方獲利。** Morgan Stanley 的6月8日公開逐字稿提出：大型AI與雲端買方能靠長約、預付款取得優先供應，電腦、手機與工業設備買方則可能受排擠。這份較早的分析作為框架；未來缺口仍屬機構預測，沒有公開底層模型可重算，不能當成出貨實績。〔C31；[S24](https://www.morganstanley.com/insights/podcasts/thoughts-on-the-market/high-cost-of-AI-memory-shawn-kim)〕
+
+HP最新季報提供買方端的對照：**截至7月31日的三個月，相較去年同期，個人運算事業營收增加、PC台數減少、平均售價上升。** 公司將售價變化歸因於定價、匯率與產品組合；定價等因素只抵銷部分零件成本壓力，毛利率仍下降。因此，營收成長未必代表賣出更多台電腦，漲價也未必足以守住利潤率。這是單一公司申報，尚未隔離記憶體成本的因果效果。〔C32；[S26](https://www.sec.gov/Archives/edgar/data/47217/000004721726000051/hpq-20260731.htm)〕
+
+反方也要保留：HP在8月26日財報稿表示，記憶體供應與訂單履行已有改善，不能寫成所有電腦廠都拿不到貨。較長期的風險則來自 S&P Global Market Intelligence：壓縮技術與替代架構可能降低對現有記憶體格式的依賴，讓短缺轉成未來過剩。後者仍是情境，沒有證明本篇追蹤的HBM、SOCAMM或儲存需求已下降。〔C33、C34；[S27](https://www.hp.com/us-en/newsroom/press-releases/2026/hp-inc-reports-fiscal-2026-third-quarter-results.html)、[S25](https://www.spglobal.com/market-intelligence/en/news-insights/research/2026/07/behind-ai-boom-electronics-supply-side-constraints)〕
+
+套回台股時，先確認公司賣什麼、客戶是誰，以及成本能否轉嫁。下表新增的是公司查核問題；本次尚未取得台廠訂單與財務的雙向證據。**10月1日人工回查**買方及記憶體公司的新財報，將售價、台數與利潤放在同一期間閱讀；供應改善應先修正買方壓力判讀，不能一概解讀成晶片賣方不再受惠。〔C35；T8〕
+
+| 研究對象 | 公司資料要查什麼 | 什麼結果會削弱受惠說法 |
+|---|---|---|
+| 記憶體晶片 | 具名產品、用途、長約條件、售價與出貨 | 售價回升但出貨、產品組合或利潤沒有跟上 |
+| 模組與控制IC | 客戶用途、採購成本、庫存與售價調整時差 | 營收增主要來自成本轉嫁，毛利率反而承壓 |
+| 伺服器組裝／機構 | 客戶配置、零件供應、交付與收入認列 | 有訂單卻缺料延遲交付，或漲價無法補回成本 |
 
 ## 先按資料的急迫程度分四層
 
