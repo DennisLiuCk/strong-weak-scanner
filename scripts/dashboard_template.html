@@ -100,10 +100,14 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .utility-menu>summary::after{content:'▾';margin-left:6px;color:var(--muted)}
 .utility-menu[open]>summary{color:#fff;border-color:#f7f5ef}
 .utility-menu[open]>summary::after{transform:rotate(180deg)}
-.quicknav{position:absolute;right:0;top:calc(100% + 9px);width:230px;display:grid;gap:3px;padding:9px;background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:0 16px 38px rgba(26,23,18,.14)}
+.quicknav{position:absolute;right:0;top:calc(100% + 9px);width:230px;display:grid;gap:3px;padding:9px;background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:0 16px 38px rgba(26,23,18,.14);max-height:calc(100dvh - 110px);overflow-y:auto;overscroll-behavior:contain}
 .quicknav a{display:flex;align-items:center;min-height:38px;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;color:var(--ink2)}
 .quicknav a:hover{color:var(--ink);background:var(--inset);text-decoration:none}
 .quicknav .menu-scope{padding:8px 10px 3px;border-top:1px solid var(--line2);font-size:var(--fs-10);color:var(--muted);line-height:1.5}
+.archive-picker{grid-column:1/-1;display:grid;gap:6px;padding:10px;border-top:1px solid var(--line2)}
+.archive-picker label{font-size:12px;font-weight:700;color:var(--ink2)}
+.archive-picker select{width:100%;min-width:0;min-height:44px}
+.archive-picker a{justify-content:center;border:1px solid var(--line);min-height:44px}
 .themebtn{width:44px;height:44px;padding:0;justify-content:center;font-size:0;background:transparent;border-color:rgba(255,255,255,.18);color:#f7f5ef}
 .themebtn::before{content:'◐';font-size:16px}
 #ov{margin-top:0}
@@ -586,6 +590,7 @@ const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLO
       RECENT=__RECENT_ARTICLES_JSON__, MKT=__MKT_TIP_JSON__,
       DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 const RESEARCH_BASE=location.pathname.includes('/archive/')?'../research.html':'research.html';
+const ARCHIVE_DATES=__DATES_JSON__;
 document.querySelectorAll('[data-research-link]').forEach(link=>link.href=RESEARCH_BASE);
 function _slim(s){ return {g:s.g,id:s.id,nm:s.nm,biz:s.biz,comp:s.comp,r20:s.ret20,tier:s.tier_confirmed,
   tierLabel:s.tier_label,waiting:s.tier_waiting,
@@ -1959,6 +1964,25 @@ function buildRecentArticles(){
 }
 
 /* ---------- 主題切換 ---------- */
+function archiveSnapshotHref(date,pathname){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return null;
+  return (pathname.includes('/archive/')?'':'archive/')+date+'.html';
+}
+function buildArchiveNavigation(){
+  const dates=[...new Set(ARCHIVE_DATES)].filter(date=>archiveSnapshotHref(date,location.pathname)).sort().reverse();
+  const box=h('div',{class:'archive-picker'},h('label',{for:'archive-date',text:'歷史快照日期'}));
+  if(!dates.length){box.appendChild(h('span',{class:'note',text:'尚無可用快照'}));return box;}
+  const select=h('select',{id:'archive-date',class:'sortbtn'});
+  dates.forEach(date=>select.appendChild(h('option',{value:date,text:date})));
+  if(dates.includes(DATE_ISO))select.value=DATE_ISO;
+  const link=h('a',{target:'_blank',rel:'noopener noreferrer',text:'開啟當日快照 ↗'});
+  const update=()=>{link.href=archiveSnapshotHref(select.value,location.pathname);link.setAttribute('aria-label','開啟 '+select.value+' 歷史快照（另開分頁）');};
+  select.addEventListener('change',update);update();
+  box.append(select,link,h('span',{class:'note',text:'另開分頁；保留當日首次發布的原始畫面。'}));
+  if(location.pathname.includes('/archive/'))box.appendChild(h('a',{href:'../index.html',text:'返回最新掃描'}));
+  return box;
+}
+document.querySelector('.quicknav').appendChild(buildArchiveNavigation());
 const _html=document.documentElement;
 { const saved=rvStored('dashTheme'); if(saved==='light'||saved==='dark')_html.dataset.theme=saved; }
 document.querySelectorAll('.quicknav a').forEach(link=>link.addEventListener('click',()=>{const menu=link.closest('.utility-menu');if(menu)menu.open=false;}));

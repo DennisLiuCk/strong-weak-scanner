@@ -70,6 +70,14 @@ class DashboardJsBehaviourTest(unittest.TestCase):
 
     # ---------- fmtPct:唯一的百分比格式化入口 ----------
 
+    def test_archive_links_resolve_from_live_and_historical_pages(self):
+        got = self.run_js(extract('archiveSnapshotHref'), [
+            ('首頁', "archiveSnapshotHref('2026-09-08','/strong-weak-scanner/index.html')"),
+            ('歷史頁', "archiveSnapshotHref('2026-09-08','/strong-weak-scanner/archive/2026-09-09.html')"),
+            ('非法路徑', "archiveSnapshotHref('../index','/strong-weak-scanner/')"),
+        ])
+        self.assertEqual(got, ['archive/2026-09-08.html', '2026-09-08.html', None])
+
     def test_stock_search_groups_preserve_scope_rank_and_suspended_order(self):
         pre = extract('stockSearchGroups') + """
 const groups=[{g:'memory'},{g:'ip'}];
