@@ -48,6 +48,14 @@ a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
 .focusbtn,.themebtn{border:1px solid var(--line);background:var(--card);color:var(--ink2);border-radius:100px;padding:7px 13px;cursor:pointer;font-size:12.5px;font-weight:700;white-space:nowrap}.focusbtn{color:var(--teal)}.focusbtn[aria-pressed="true"]{border-color:var(--teal);background:var(--tealbg);color:var(--teal)}
 .shell{height:calc(100vh - 66px);height:calc(100dvh - 66px);min-height:640px;display:grid;grid-template-columns:220px minmax(0,1fr)}
 .filters{grid-row:1;background:var(--card);border-right:1px solid var(--line);overflow-y:auto;padding:24px 18px 40px;scrollbar-width:thin}
+.filter-backdrop{position:fixed;inset:0;z-index:49;background:rgba(8,7,4,.5)}
+.filter-done{display:none}
+@media(max-width:1180px){
+  .filters.open{z-index:50;overscroll-behavior:contain;padding-top:0;padding-bottom:0}
+  .filters.open .filter-head{position:sticky;top:0;z-index:2;margin:0 -18px 18px;padding:12px 18px;background:var(--card);border-bottom:1px solid var(--line)}
+  .filters.open .clearbtn,.filters.open .filter-close{min-height:44px}
+  .filter-done{display:block;position:sticky;bottom:0;width:calc(100% + 36px);margin:16px -18px 0;padding:14px 18px;border:0;border-top:1px solid var(--line);background:var(--teal);color:var(--card);font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+}
 .filter-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .filter-head h2{margin:0;font-size:14px;font-weight:900}.clearbtn,.filter-close{border:0;background:none;color:var(--muted);font-size:var(--fs-115);cursor:pointer;padding:6px}.clearbtn:hover,.filter-close:hover{color:var(--teal)}.clearbtn{margin-left:auto}.filter-close{display:none;margin-left:6px;font-weight:800;color:var(--teal)}
 .filter-group{padding:17px 0;border-top:1px solid var(--line2)}.filter-group:first-of-type{border-top:0;padding-top:0}
@@ -356,6 +364,7 @@ body.graph-mode .shell{grid-template-columns:minmax(0,1fr)}body.graph-mode .filt
   </div>
 </header>
 <div class="shell">
+  <div class="filter-backdrop" id="filterBackdrop" hidden aria-hidden="true"></div>
   <aside class="filters" id="filters" aria-label="研究篩選條件">
     <div class="filter-head"><h2>篩選條件</h2><button class="clearbtn" id="clearFilters" type="button">清除全部</button><button class="filter-close" id="filterClose" type="button">關閉</button></div>
     <div id="groupFilters"></div>
@@ -372,6 +381,7 @@ body.graph-mode .shell{grid-template-columns:minmax(0,1fr)}body.graph-mode .filt
       <label class="filter-option"><input type="radio" name="date" value="7"><span>近 7 天</span></label>
       <label class="filter-option"><input type="radio" name="date" value="30"><span>近 30 天</span></label>
     </div>
+    <button class="filter-done" id="filterDone" type="button">完成篩選，查看文章</button>
   </aside>
   <main class="content">
     <section class="tools" aria-label="搜尋與文章類型">
@@ -1275,12 +1285,41 @@ document.querySelectorAll('input[name="graphEvidence"]').forEach(input=>input.ad
 document.getElementById('graphUniverseOnly').addEventListener('change',event=>{state.graphUniverseOnly=event.target.checked;state.graphSelection=null;renderGraph()});
 document.getElementById('clearFilters').addEventListener('click',()=>{state.groups.clear();state.statuses=new Set(['verified','review','observational']);state.date='all';state.type='all';state.search='';document.getElementById('search').value='';document.querySelectorAll('input[name="status"]').forEach(input=>input.checked=true);document.querySelector('input[name="date"][value="all"]').checked=true;renderGroupFilters();renderTypeTabs();renderAll()});
 const filtersPanel=document.getElementById('filters'),filterToggleButton=document.getElementById('filterToggle'),filterCloseButton=document.getElementById('filterClose'),filterMedia=matchMedia('(max-width:1180px)');
-function syncFilterAccess(){const overlay=filterMedia.matches,open=overlay&&filtersPanel.classList.contains('open');filtersPanel.inert=overlay&&!open;if(overlay)filtersPanel.setAttribute('aria-hidden',open?'false':'true');else filtersPanel.removeAttribute('aria-hidden');filterToggleButton.setAttribute('aria-expanded',open?'true':'false')}
+const filterBackdrop=document.getElementById('filterBackdrop');let filterBackground=[],filterBodyOverflow='';
+function syncFilterAccess(){
+  const overlay=filterMedia.matches,open=overlay&&filtersPanel.classList.contains('open');
+  filtersPanel.inert=overlay&&!open;
+  if(overlay)filtersPanel.setAttribute('aria-hidden',open?'false':'true');else filtersPanel.removeAttribute('aria-hidden');
+  if(open){filtersPanel.setAttribute('role','dialog');filtersPanel.setAttribute('aria-modal','true')}
+  else{filtersPanel.removeAttribute('role');filtersPanel.removeAttribute('aria-modal')}
+  filterToggleButton.setAttribute('aria-expanded',open?'true':'false');filterBackdrop.hidden=!open;
+  if(open&&!filterBackground.length){
+    filterBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+    const shell=filtersPanel.parentElement;
+    filterBackground=[...document.body.children,...shell.children].filter(el=>el!==shell&&el!==filtersPanel&&el!==filterBackdrop&&el.tagName!=='SCRIPT').map(el=>({el,inert:el.inert,aria:el.getAttribute('aria-hidden')}));
+    filterBackground.forEach(({el})=>{el.inert=true;el.setAttribute('aria-hidden','true')});
+  }else if(!open&&filterBackground.length){
+    document.body.style.overflow=filterBodyOverflow;
+    filterBackground.forEach(({el,inert,aria})=>{el.inert=inert;if(aria==null)el.removeAttribute('aria-hidden');else el.setAttribute('aria-hidden',aria)});filterBackground=[];
+  }
+}
+function filterTabStops(panel){
+  const controls=[...panel.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),a[href]')].filter(el=>el.offsetParent!==null);
+  return controls.filter(el=>el.type!=='radio'||!el.name||el.checked||!controls.some(other=>other.type==='radio'&&other.name===el.name&&other.checked));
+}
 function openFilters(){filtersPanel.classList.add('open');syncFilterAccess();filterCloseButton.focus()}
 function closeFilters(restoreFocus=true){filtersPanel.classList.remove('open');syncFilterAccess();if(restoreFocus)filterToggleButton.focus()}
 filterToggleButton.addEventListener('click',()=>filtersPanel.classList.contains('open')?closeFilters():openFilters());
 filterCloseButton.addEventListener('click',()=>closeFilters());
-filterMedia.addEventListener('change',()=>{filtersPanel.classList.remove('open');syncFilterAccess()});
+filterBackdrop.addEventListener('click',()=>closeFilters());
+document.getElementById('filterDone').addEventListener('click',()=>closeFilters());
+filtersPanel.addEventListener('keydown',event=>{
+  if(event.key!=='Tab'||!filterMedia.matches||!filtersPanel.classList.contains('open'))return;
+  const controls=filterTabStops(filtersPanel),first=controls[0],last=controls[controls.length-1];
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+});
+filterMedia.addEventListener('change',()=>{const focusWasInside=filtersPanel.contains(document.activeElement);filtersPanel.classList.remove('open');syncFilterAccess();if(focusWasInside)(filterMedia.matches?filterToggleButton:filterTabStops(filtersPanel)[0])?.focus()});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&filtersPanel.classList.contains('open'))closeFilters()});
 const focusToggleButton=document.getElementById('focusToggle'),focusMedia=matchMedia('(min-width:781px)');let focusModeRequested=readPreference('researchFocusMode')!=='0';
 function applyFocusMode(){const articleOpen=state.surface==='library'&&document.body.classList.contains('article-open'),active=articleOpen&&focusModeRequested&&focusMedia.matches;document.body.classList.toggle('focus-mode',active);focusToggleButton.hidden=!articleOpen;focusToggleButton.setAttribute('aria-pressed',active?'true':'false');focusToggleButton.textContent=active?'文章清單':'專注閱讀';focusToggleButton.setAttribute('aria-label',active?'返回研究文章清單':'進入專注閱讀');if(active&&filtersPanel.classList.contains('open'))closeFilters(false);requestAnimationFrame(()=>{outlineSpyRefresh();markScrollableTables(document.getElementById('reader'))})}
