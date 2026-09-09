@@ -969,7 +969,7 @@ function buildDiverge(){
     if(!list.length){ box.appendChild(h('p',{style:'margin:0;font-size:13px;color:var(--muted)',
       text:`今日沒有落差達 ${D2.threshold} 個百分位點的個股。`})); return box; }
     const tb=h('div',{style:'display:grid;gap:7px'});
-    list.forEach(x=>tb.appendChild(h('div',{style:'display:grid;grid-template-columns:1fr auto;gap:10px;align-items:baseline;font-size:13px'},
+    list.forEach(x=>tb.appendChild(h('div',{class:'clickrow',role:'button',tabindex:'0','aria-label':'查看 '+x.nm+' '+x.id+' 的完整個股明細',onclick:()=>openStockDetail(x.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(x.id);}},style:'display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 10px;align-items:baseline;font-size:13px;min-height:44px;padding:6px 0'},
       h('div',{}, h('b',{text:x.nm}), h('span',{class:'mono',style:'margin-left:6px;font-size:var(--fs-115);color:var(--muted)',text:x.id}),
         h('span',{style:'margin-left:8px;font-size:var(--fs-115);color:var(--muted)',text:x.g})),
       h('div',{class:'mono',style:'font-size:12px;color:var(--ink2);white-space:nowrap'},
@@ -1479,13 +1479,14 @@ function showSheet(){ const wasOpen=sheetwrap.classList.contains('on');
     sheetInerted=[...document.body.children].filter(el=>el!==sheetwrap&&el.tagName!=='SCRIPT').map(el=>({el,aria:el.getAttribute('aria-hidden')}));
     sheetInerted.forEach(item=>{item.el.inert=true;item.el.setAttribute('aria-hidden','true');});}
   sheetwrap.classList.add('on');sheetwrap.setAttribute('aria-hidden','false');
+  sheetEl.scrollTop=0;
   const c=sheetEl.querySelector('.sheetclose'); if(c) c.focus();
   window.requestAnimationFrame(function(){ const c2=sheetEl.querySelector('.sheetclose'); if(c2&&document.activeElement!==c2) c2.focus(); }); }
 function closeSheet(){ if(!sheetwrap.classList.contains('on'))return;sheetwrap.classList.remove('on');sheetwrap.setAttribute('aria-hidden','true');document.body.style.overflow=sheetBodyOverflow;
   sheetInerted.forEach(item=>{item.el.inert=false;if(item.aria==null)item.el.removeAttribute('aria-hidden');else item.el.setAttribute('aria-hidden',item.aria);});sheetInerted=[];
   if(lastSheetFocus&&lastSheetFocus.focus) lastSheetFocus.focus();
   lastSheetFocus=null; }
-function openStockDetail(id){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
+function openStockDetail(id,groupContext=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
   const card=buildDetail(); if(!card)return;
   card.style.marginTop='12px';
   // 同族群、依綜合分排序的前後檔
@@ -1494,12 +1495,13 @@ function openStockDetail(id){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail
   const prev=idx>0?sibs[idx-1]:null, next=(idx>=0&&idx<sibs.length-1)?sibs[idx+1]:null;
   const navBtn=(o,label)=>h('button',{class:'togglebtn',
     style:'padding:6px 12px;font-size:12px'+(o?'':';visibility:hidden'),
-    onclick:o?()=>openStockDetail(o.id):null, text:label+(o?' '+o.nm:'')});
+    onclick:o?()=>openStockDetail(o.id,groupContext):null, text:label+(o?' '+o.nm:'')});
   const jump=h('div',{style:'display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px'});
   const nav=h('div',{style:'display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:2px 60px 0 0'},
     navBtn(prev,'‹ 上一檔'),
     h('span',{class:'mono',style:'font-size:var(--fs-115);color:var(--muted)',text:(idx+1)+' / '+sibs.length+' · '+grp(s.g).nm}),
     navBtn(next,'下一檔 ›'));
+  if(groupContext)nav.prepend(h('button',{class:'togglebtn',type:'button',text:'返回'+grp(groupContext.g).nm+'族群',onclick:()=>openGroupSheet(groupContext)}));
   sheetEl.replaceChildren(h('button',{class:'sheetclose','aria-label':'關閉',onclick:closeSheet},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:'close'})),nav,jump,card);
   // 跳段：依 card 內的 h3 標題自動生成（在 #sheet 內捲動，不動全頁）
   [...card.querySelectorAll('h3')].forEach(hd=>{
@@ -1511,6 +1513,13 @@ function openStockDetail(id){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail
   showSheet(); }
 function openGroupSheet(g){
   const st=stateStyle(g.state),statList=h('div',{});
+  const members=stockSearchGroups(D.stocks,D.groups,g.g,'','comp',true)[0];
+  const memberLinks=h('section',{'aria-label':grp(g.g).nm+'成分股',style:'margin:16px 0'},
+    h('h3',{class:'sub3',text:'成分股 · '+(members?members.total:0)+' 檔'}),
+    h('p',{class:'note',text:'依族群內綜合分排序；點個股看明細，可返回本族群。'}));
+  const memberList=h('div',{style:'display:flex;flex-wrap:wrap;gap:8px'});
+  if(members)members.rows.forEach(({stock:s})=>memberList.appendChild(h('button',{class:'togglebtn',type:'button',text:s.nm+' '+s.id+(s.trading?' · 暫停／未交易':''),onclick:()=>openStockDetail(s.id,g)})));
+  memberLinks.appendChild(memberList);
   g.stats.forEach(row=>{ const dl=deltaTxt(row[3]);
     statList.appendChild(h('div',{style:'padding:11px 0;border-top:1px solid var(--line2)'},
       h('div',{style:'display:flex;align-items:baseline;justify-content:space-between;gap:10px'},
@@ -1525,7 +1534,7 @@ function openGroupSheet(g){
       h('b',{style:'font-size:22px;font-weight:900',text:grp(g.g).nm}),
       h('span',{class:'chip',style:`color:${st.col};background:${st.bg}`,text:g.state})),
     h('div',{style:'font-size:12px;color:var(--muted);margin-bottom:10px',text:grp(g.g).tag||''}),
-    h('p',{style:'margin:0 0 12px;font-size:13.5px;color:var(--ink2);line-height:1.6',text:g.note}),
+    h('p',{style:'margin:0 0 12px;font-size:13.5px;color:var(--ink2);line-height:1.6',text:g.note}),memberLinks,
     h('div',{style:'display:flex;gap:16px;flex-wrap:wrap;font-size:var(--fs-115);color:var(--muted);font-weight:600;background:var(--inset);border-radius:10px;padding:10px 14px'},
       h('span',{text:g.dur}),h('span',{style:'color:var(--teal)',text:'籌碼健 '+g.chip.health}),h('span',{text:'中性 '+g.chip.neutral}),h('span',{style:'color:var(--amber)',text:'待觀察 '+g.chip.warn})),
     h('div',{style:'margin:14px 0 2px'},h('div',{style:'font-size:var(--fs-11);color:var(--muted);margin-bottom:4px',text:'20日動能 vs 全體 · 近 30 個交易日（高＝跑贏）'}),spark(g.trend.rel,300,42,'var(--ink)',0)),
