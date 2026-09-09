@@ -37,9 +37,10 @@ evidence pack 與獨立 reviewer 治理；可證偽 H# 仍由
 回填或改寫初始理由。
 
 Active radar 使用 schema 2 並以 `selection_cycle_id` 指向該輪凍結記錄。雷達可以另記深研後
-的 `promoted／watch／deferred` 與 evidence posture，但初始 rank、priority、knowledge value、
+的 `promoted／expand_existing／watch／deferred` 與 evidence posture，但初始 rank、priority、knowledge value、
 第一拒絕和下一份證據必須逐字等於 selection log。`advance → promoted` 只表示完成本輪研究產物；
-`advance → watch/deferred` 是研究後拒絕，也同樣是有效方法結果。兩者都不能稱為題材、投資或
+`advance → expand_existing` 表示完成既有文章擴充，單獨計數，不算升格或拒絕；
+`advance → watch/deferred` 是研究後拒絕，也同樣是有效方法結果。這些結果都不能稱為題材、投資或
 報酬命中。首個 cycle 以獨立 Git commit 先凍結，再提交文章與圖譜；後續每輪沿用同一順序。
 
 Active 候選的讀者卡必須在 `reader_question` 與 `reader_next_step` 之間提供

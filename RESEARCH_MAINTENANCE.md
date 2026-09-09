@@ -2,6 +2,10 @@
 
 本文件管理「什麼時候該看、先看什麼、看完留下什麼紀錄」。來源取得、claim ledger、
 跨公司可比性、monitor、可信度與修正規則統一由 `MARKET_RESEARCH_METHOD.md` 定義。
+
+全球金融機構公開研究的選題、來源角色與基本驗證，使用
+[`MARKET_INTELLIGENCE_SOURCING.md`](MARKET_INTELLIGENCE_SOURCING.md)。機構框架先與公司或
+其他原始文件對照，再補入既有topic；預測、公司計畫及已發生事實分開記錄。
 正式公司事實仍由
 `QUALITATIVE_RESEARCH_RUNBOOK.md` 的 evidence pack／獨立 reviewer 契約治理；
 可證偽市場主張仍由 `LEADING_HYPOTHESES_PHASE2_RUNBOOK.md` 治理。本流程不改量化分數。

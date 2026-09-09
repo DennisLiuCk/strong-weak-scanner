@@ -13,7 +13,7 @@ schema_version: 2
 radar_id: RADAR-2026-08-09-01
 as_of: 2026-08-12
 next_review: 2026-08-16
-status: active
+status: retired
 method: 先以 universe 族群規模 研究文章路由 知識圖譜及具名公司邊做覆蓋盤點，再廣搜 operator 標準組織 監管機關與公司一手來源；依可證偽性 至少兩條獨立一手鏈 能否補現有知識缺口 公司映射風險及後續維護成本排序。候選先寫入 append-only selection log 並獨立 commit；深研後只更新 evidence posture route 與結果，不改凍結排名 第一拒絕與下一份證據
 selection_cycle_id: RS-2026-08-09-01
 -->

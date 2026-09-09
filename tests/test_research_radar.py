@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """候選研究雷達的排序、升格路由與證據契約。"""
+import csv
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -28,6 +30,7 @@ class ResearchRadarTest(unittest.TestCase):
         expected_stats = {
             "candidates": len(candidates),
             "promoted": sum(row["status"] == "promoted" for row in candidates),
+            "expanded": sum(row["status"] == "expand_existing" for row in candidates),
             "highKnowledge": sum(
                 row["knowledgeValue"] == "high" for row in candidates
             ),
@@ -63,12 +66,11 @@ class ResearchRadarTest(unittest.TestCase):
         promoted = [
             row for row in self.payload["candidates"] if row["status"] == "promoted"
         ]
-        self.assertGreaterEqual(len(promoted), 1)
-        self.assertLess(len(promoted), len(self.payload["candidates"]))
         for row in promoted:
             self.assertEqual(row["route"], "article_and_graph")
             self.assertTrue(row["articleId"])
             self.assertTrue(row["graphId"])
+            self.assertEqual(row["evidencePosture"], "research_grade")
             self.assertGreaterEqual(len(row["sources"]), 2)
         advance = [
             row for row in self.payload["candidates"]
@@ -77,7 +79,8 @@ class ResearchRadarTest(unittest.TestCase):
         for row in advance:
             self.assertIn(
                 row["selectionOutcome"],
-                {"promoted_after_research", "rejected_after_research"},
+                {"promoted_after_research", "expanded_after_research",
+                 "rejected_after_research"},
             )
 
     def test_watch_and_deferred_candidates_are_not_forced_into_articles_or_graphs(self):
@@ -88,10 +91,10 @@ class ResearchRadarTest(unittest.TestCase):
             if row["status"] == "expand_existing":
                 self.assertEqual(row["route"], "expand_existing_article")
                 self.assertTrue(row["articleId"])
-                self.assertTrue(row["graphId"])
             else:
+                self.assertIn(row["route"], {"watch_only", "fold_into_graph"})
                 self.assertFalse(row["articleId"])
-                self.assertFalse(row["graphId"])
+                self.assertEqual(bool(row["graphId"]), row["route"] == "fold_into_graph")
 
     def test_frozen_selection_fields_are_exposed_without_rewriting(self):
         frozen = {row["candidate_id"]: row for row in self.payload["selectionLog"]}
@@ -232,6 +235,18 @@ class ResearchRadarTest(unittest.TestCase):
             if item["schemaVersion"] == 2:
                 self.assertTrue(item["accountable"], item["id"])
 
+    def test_historical_watch_expansion_is_not_reported_as_unchanged(self):
+        cycle = next(item for item in self.payload["history"]
+                     if item["cycleId"] == "RS-2026-08-03-03")
+        candidate = next(row for row in cycle["candidates"]
+                         if row["id"] == "RC-AI-POWER-TELEMETRY")
+        self.assertEqual(candidate["selectionDecision"], "watch")
+        self.assertEqual(candidate["selectionOutcome"], "expanded_from_watch")
+        self.assertEqual(candidate["evidencePosture"], "preliminary")
+        frozen = next(row for row in cycle["selectionLog"]
+                      if row["candidate_id"] == candidate["id"])
+        self.assertEqual(frozen["selection_decision"], "watch")
+
     def test_early_reselection_requires_a_new_frozen_source_after_cutover(self):
         required = [
             row for row in self.payload["earlyReselections"] if row["required"]
@@ -257,6 +272,112 @@ class ResearchRadarTest(unittest.TestCase):
         )
         self.assertTrue(valid["valid"])
         self.assertFalse(repeated["valid"])
+
+
+class ResearchRadarOutcomeTest(unittest.TestCase):
+    def load_cases(self, cases, *, overrides=None, strict=True):
+        """Exercise outcome classification through the real frozen-ledger loader."""
+        cycle = "RS-2026-09-10-99"
+        meta = {
+            "schema_version": "2", "radar_id": "RADAR-2026-09-10-99",
+            "as_of": "2026-09-10", "next_review": "2026-10-01",
+            "status": "active", "method": "檢驗凍結選擇與研究結果的對應",
+            "selection_cycle_id": cycle,
+        }
+        blocks = ["<!-- research_radar\n" + "\n".join(
+            f"{key}: {value}" for key, value in meta.items()) + "\n-->"]
+        selections = []
+        for rank, (decision, status) in enumerate(cases, 1):
+            fields = {
+                "candidate_id": f"RC-OUTCOME-{rank}", "rank": str(rank),
+                "title": "同一問題的研究結果", "priority": "p1",
+                "knowledge_value": "high", "status": status,
+                "evidence_posture": "research_grade" if status == "promoted" else "preliminary",
+                "why_now": "已有一手文件可回查，仍需核對採用範圍。",
+                "knowledge_gain": "分開公開規格與量產部署",
+                "first_rejection": "沒有共同量測分母就不外推",
+                "next_evidence": "下一季公司公開資料", "next_check": "2026-10-01",
+                "route": {"promoted": "article_and_graph",
+                          "expand_existing": "expand_existing_article"}.get(status, "watch_only"),
+                "sources": "公司文件 => https://example.com/company | 規格 => https://example.org/spec",
+                "reader_question": "公開規格能說明部署嗎？",
+                "reader_starting_point": "一手文件已經說明公開規格，可以先確認系統的位置。目前還缺同一場址的部署與量測分母。",
+                "reader_terms": "規格 => 公開要求 | 部署 => 實際投入使用",
+                "reader_next_step": "比對公司文件與公開規格",
+                "group_ids": "passive", "reader_group_questions": "passive => 元件在哪個位置？",
+            }
+            if status in {"promoted", "expand_existing"}:
+                fields["article_topic_id"] = "MI-2026-09-10-OUTCOME"
+            if status == "promoted":
+                fields["graph_id"] = "outcome"
+            fields.update(overrides or {})
+            blocks.append("<!-- research_candidate\n" + "\n".join(
+                f"{key}: {value}" for key, value in fields.items()) + "\n-->")
+            selections.append({
+                "selection_id": f"{cycle}-{rank}", "cycle_id": cycle,
+                "selected_at": "2026-09-10T09:00:00+08:00",
+                "candidate_id": fields["candidate_id"], "rank": rank,
+                "priority": fields["priority"], "knowledge_value": fields["knowledge_value"],
+                "evidence_posture": "preliminary", "selection_decision": decision,
+                "selection_reason": "研究前已凍結的選擇理由",
+                "first_rejection": fields["first_rejection"], "next_evidence": fields["next_evidence"],
+            })
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            (path / "radar.md").write_text("\n".join(blocks) + "\n", encoding="utf-8")
+            with (path / "selection_log.csv").open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=research_radar.SELECTION_HEADER,
+                                        lineterminator="\n")
+                writer.writeheader()
+                writer.writerows(selections)
+            return research_radar.load_research_radar(
+                str(path), topic_ids={"MI-2026-09-10-OUTCOME"}, graph_ids={"outcome"},
+                strict=strict,
+            )
+
+    def test_completed_and_uncompleted_outcomes_keep_the_frozen_decision(self):
+        cases = [
+            ("advance", "promoted", "promoted_after_research"),
+            ("advance", "expand_existing", "expanded_after_research"),
+            ("advance", "watch", "rejected_after_research"),
+            ("advance", "deferred", "rejected_after_research"),
+            ("watch", "promoted", "promoted_from_watch"),
+            ("watch", "expand_existing", "expanded_from_watch"),
+            ("watch", "watch", "remained_watch"),
+            ("watch", "deferred", "deferred_from_watch"),
+            ("defer", "promoted", "promoted_from_defer"),
+            ("defer", "expand_existing", "expanded_from_defer"),
+            ("defer", "watch", "watched_from_defer"),
+            ("defer", "deferred", "remained_deferred"),
+        ]
+        payload = self.load_cases([(decision, status) for decision, status, _ in cases])
+        for row, (decision, status, expected) in zip(payload["candidates"], cases):
+            with self.subTest(decision=decision, status=status):
+                self.assertEqual(row["selectionOutcome"], expected)
+                self.assertEqual(row["selectionDecision"], decision)
+                self.assertEqual(row["initialEvidencePosture"], "preliminary")
+        self.assertTrue(payload["history"][0]["accountable"])
+
+    def test_a_whole_cycle_can_expand_without_new_articles_or_graphs(self):
+        payload = self.load_cases([("advance", "expand_existing")] * 3)
+        self.assertEqual(payload["stats"]["expanded"], 3)
+        self.assertEqual(payload["stats"]["promoted"], 0)
+        for row in payload["candidates"]:
+            self.assertEqual(row["selectionOutcome"], "expanded_after_research")
+            self.assertTrue(row["articleId"])
+            self.assertFalse(row["graphId"])
+            self.assertEqual(row["evidencePosture"], "preliminary")
+
+    def test_result_routes_still_require_their_references_and_sources(self):
+        for status, overrides, error in (
+            ("expand_existing", {"article_topic_id": ""}, "必須提供 article_topic_id"),
+            ("promoted", {"graph_id": ""}, "promoted 必須同時連到文章與圖譜"),
+            ("watch", {"route": "fold_into_graph"}, "必須提供 graph_id"),
+            ("deferred", {"sources": "一份文件 => https://example.com/only"}, "至少需要兩個"),
+        ):
+            with self.subTest(status=status):
+                payload = self.load_cases([("advance", status)], overrides=overrides, strict=False)
+                self.assertTrue(any(error in item for item in payload["errors"]))
 
 
 if __name__ == "__main__":

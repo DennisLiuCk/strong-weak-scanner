@@ -44,6 +44,26 @@ STATUSES = {"promoted", "expand_existing", "watch", "deferred"}
 EVIDENCE_POSTURES = {"research_grade", "preliminary", "assumption_led"}
 ROUTES = {"article_and_graph", "fold_into_graph", "expand_existing_article", "watch_only"}
 SELECTION_DECISIONS = {"advance", "watch", "defer"}
+SELECTION_OUTCOMES = {
+    "advance": {
+        "promoted": "promoted_after_research",
+        "expand_existing": "expanded_after_research",
+        "watch": "rejected_after_research",
+        "deferred": "rejected_after_research",
+    },
+    "watch": {
+        "promoted": "promoted_from_watch",
+        "expand_existing": "expanded_from_watch",
+        "watch": "remained_watch",
+        "deferred": "deferred_from_watch",
+    },
+    "defer": {
+        "promoted": "promoted_from_defer",
+        "expand_existing": "expanded_from_defer",
+        "watch": "watched_from_defer",
+        "deferred": "remained_deferred",
+    },
+}
 SELECTION_HEADER = (
     "selection_id", "cycle_id", "selected_at", "candidate_id", "rank",
     "priority", "knowledge_value", "evidence_posture", "selection_decision",
@@ -565,21 +585,11 @@ def load_research_radar(
                 candidate["selectionDecision"] = frozen["selection_decision"]
                 candidate["selectionReason"] = frozen["selection_reason"]
                 candidate["initialEvidencePosture"] = frozen["evidence_posture"]
-                if frozen["selection_decision"] == "advance":
-                    candidate["selectionOutcome"] = (
-                        "promoted_after_research" if candidate["status"] == "promoted"
-                        else "rejected_after_research"
-                    )
-                elif frozen["selection_decision"] == "watch":
-                    candidate["selectionOutcome"] = (
-                        "promoted_from_watch" if candidate["status"] == "promoted"
-                        else "remained_watch"
-                    )
-                else:
-                    candidate["selectionOutcome"] = (
-                        "promoted_from_defer" if candidate["status"] == "promoted"
-                        else "remained_deferred"
-                    )
+                # 擴充既有研究是獨立產物；只有 advance 後回到 watch/deferred
+                # 才沿用方法契約的「研究後拒絕」。原始凍結列與快照均不改寫。
+                candidate["selectionOutcome"] = SELECTION_OUTCOMES.get(
+                    frozen["selection_decision"], {},
+                ).get(candidate["status"], "")
         history.append({
             "id": radar_meta.get("radar_id", ""),
             "schemaVersion": int(radar_meta.get("schema_version") or 1),
@@ -659,6 +669,7 @@ def load_research_radar(
         "stats": {
             "candidates": len(candidates),
             "promoted": sum(row["status"] == "promoted" for row in candidates),
+            "expanded": sum(row["status"] == "expand_existing" for row in candidates),
             "highKnowledge": sum(row["knowledgeValue"] == "high" for row in candidates),
             "selectionFrozen": len(selected),
             "selectedAdvance": sum(row["selection_decision"] == "advance" for row in selected),
@@ -714,7 +725,8 @@ def main(argv: list[str] | None = None) -> int:
         stats = payload["stats"]
         print(
             f"research radar：{stats['candidates']} 候選，"
-            f"{stats['promoted']} 已升格，{stats['highKnowledge']} 個高知識價值，"
+            f"{stats['promoted']} 已升格，{stats['expanded']} 擴充既有研究，"
+            f"{stats['highKnowledge']} 個高知識價值，"
             f"{stats['selectionFrozen']} 個研究前凍結"
         )
         for error in payload["errors"]:

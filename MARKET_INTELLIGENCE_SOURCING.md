@@ -54,3 +54,17 @@
 review 時看資訊是否有增量、原文是否能定位、事實與預測是否分清，以及下一步是否真的
 能执行。後續若要自動化，可先自動發現官方新文件與做去重，保留人工作主張裁決；
 是否值得採用，由這輪網站內容的實際品質決定。
+
+## 已發布的試讀入口
+
+從[研究雷達](https://dennisliuck.github.io/strong-weak-scanner/research.html#radar)可依凍結順序
+進入三篇既有文章；各篇新增「9月10日機構情報」段。下次日期是人工查核待辦，不是排程。
+
+| 問題與文章 | 本輪查核重點 | 後續文件／人工回查日 |
+|---|---|---|
+| [場址與液冷](https://dennisliuck.github.io/strong-weak-scanner/research.html#topic-MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER) | 高盛框架對照Microsoft場址計畫，分清計畫與實績 | Microsoft Texas／Pecos營運更新；10/10 |
+| [AI支出與融資](https://dennisliuck.github.io/strong-weak-scanner/research.html#topic-MI-2026-08-01-AI-CAPEX-CASH-CONVERSION) | S&P預測與公司指引的期間、定義及版本分歧 | Microsoft IR新法說與財報；10/31 |
+| [記憶體成本](https://dennisliuck.github.io/strong-weak-scanner/research.html#topic-MI-2026-08-02-AI-MEMORY-HIERARCHY) | 機構供需框架對照HP買方申報，保留供應改善反方 | 買方及記憶體公司新財報；10/1 |
+
+來源取得方式、SHA、期間核對、失敗記錄及網站驗收見
+[`reports/institutional_intelligence_pilot_2026-09-10.md`](reports/institutional_intelligence_pilot_2026-09-10.md)。

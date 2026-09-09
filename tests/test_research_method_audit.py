@@ -127,6 +127,13 @@ class ResearchMethodAuditTest(unittest.TestCase):
             row["selectionOutcome"] == "promoted_after_research"
             for row in self.radar["candidates"]
         ))
+        self.assertEqual(selection["expandedAfterResearch"], sum(
+            row["selectionOutcome"] == "expanded_after_research"
+            for row in self.radar["candidates"]
+        ))
+        self.assertEqual(self.current["scope"]["expandedCandidates"], sum(
+            row["status"] == "expand_existing" for row in self.radar["candidates"]
+        ))
         self.assertEqual(selection["rejectedAfterResearch"], sum(
             row["selectionOutcome"] == "rejected_after_research"
             for row in self.radar["candidates"]
@@ -259,6 +266,64 @@ class ResearchMethodAuditTest(unittest.TestCase):
         self.assertIn("不計算支持率", method)
         self.assertIn("選題前承諾", maintenance)
         self.assertIn("python scripts/prepublish_check.py --baseline-ref", workflow)
+
+
+class ResearchSelectionAuditTest(unittest.TestCase):
+    def compute_selection(self, candidates):
+        radar = {
+            "schemaVersion": 2, "selectionCycleId": "RS-2026-09-10-99",
+            "candidates": candidates,
+            "stats": {
+                "candidates": len(candidates), "selectionFrozen": len(candidates),
+                "selectedAdvance": sum(row["selectionDecision"] == "advance" for row in candidates),
+                "promoted": sum(row["status"] == "promoted" for row in candidates),
+                "expanded": sum(row["status"] == "expand_existing" for row in candidates),
+            },
+            "historyStats": {"schema2Cycles": 1, "accountableSchema2Cycles": 1},
+        }
+        return audit.compute_method_audit([], {}, radar, [], {}, dt.date(2026, 9, 10))
+
+    def test_all_expanded_cycle_has_no_rejections_or_promotion_quota(self):
+        current = self.compute_selection([
+            {"selectionDecision": "advance", "status": "expand_existing",
+             "selectionOutcome": "expanded_after_research"}
+            for _ in range(3)
+        ])
+        selection = current["selection"]
+        self.assertEqual(selection["advanceDecisions"], 3)
+        self.assertEqual(selection["promotedAfterResearch"], 0)
+        self.assertEqual(selection["expandedAfterResearch"], 3)
+        self.assertEqual(selection["rejectedAfterResearch"], 0)
+        self.assertEqual(current["scope"]["expandedCandidates"], 3)
+        gate = next(row for row in current["gates"] if row["id"] == "selection_accountability")
+        self.assertEqual(gate["status"], "pass")
+        self.assertIn("3 個擴充既有研究、0 個研究後拒絕", gate["observed"])
+
+    def test_mixed_results_only_count_actual_advance_rejections(self):
+        cases = [
+            ("advance", "promoted", "promoted_after_research"),
+            ("advance", "expand_existing", "expanded_after_research"),
+            ("advance", "watch", "rejected_after_research"),
+            ("advance", "deferred", "rejected_after_research"),
+            ("watch", "expand_existing", "expanded_from_watch"),
+            ("defer", "expand_existing", "expanded_from_defer"),
+            ("watch", "deferred", "deferred_from_watch"),
+            ("defer", "watch", "watched_from_defer"),
+        ]
+        current = self.compute_selection([
+            {"selectionDecision": decision, "status": status, "selectionOutcome": outcome}
+            for decision, status, outcome in cases
+        ])
+        selection = current["selection"]
+        self.assertEqual(selection["advanceDecisions"], 4)
+        self.assertEqual(selection["promotedAfterResearch"], 1)
+        self.assertEqual(selection["expandedAfterResearch"], 1)
+        self.assertEqual(selection["rejectedAfterResearch"], 2)
+        self.assertEqual(current["scope"]["expandedCandidates"], 3)
+        self.assertEqual(
+            selection["promotedAfterResearch"] + selection["expandedAfterResearch"]
+            + selection["rejectedAfterResearch"], selection["advanceDecisions"],
+        )
 
 
 if __name__ == "__main__":

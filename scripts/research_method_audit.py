@@ -423,6 +423,10 @@ def compute_method_audit(
         row.get("selectionOutcome") == "promoted_after_research"
         for row in radar.get("candidates", [])
     )
+    expanded_after_research = sum(
+        row.get("selectionOutcome") == "expanded_after_research"
+        for row in radar.get("candidates", [])
+    )
     rejected_after_research = sum(
         row.get("selectionOutcome") == "rejected_after_research"
         for row in radar.get("candidates", [])
@@ -481,6 +485,7 @@ def compute_method_audit(
             "activeTopics": len(active_topics),
             "radarCandidates": radar.get("stats", {}).get("candidates", 0),
             "promotedCandidates": radar.get("stats", {}).get("promoted", 0),
+            "expandedCandidates": radar.get("stats", {}).get("expanded", 0),
             "radarCycles": schema2_cycles,
             "radarHistoryCandidates": history_stats.get("candidates", 0),
             "graphs": graph.get("stats", {}).get("graphs", 0),
@@ -493,6 +498,7 @@ def compute_method_audit(
             "frozenBeforeResearch": frozen_selections,
             "advanceDecisions": selection_advance,
             "promotedAfterResearch": promoted_after_research,
+            "expandedAfterResearch": expanded_after_research,
             "rejectedAfterResearch": rejected_after_research,
             "cycles": schema2_cycles,
             "accountableCycles": accountable_cycles,
@@ -577,6 +583,7 @@ def compute_method_audit(
                     f"{accountable_cycles}/{schema2_cycles} 輪 schema 2 雷達保留凍結值；"
                     f"本輪 {frozen_selections}/{radar_candidates} 個候選有研究前凍結；"
                     f"{selection_advance} 個 advance 中 {promoted_after_research} 個完成升格、"
+                    f"{expanded_after_research} 個擴充既有研究、"
                     f"{rejected_after_research} 個研究後拒絕；"
                     f"cutover 後 early trigger {len(valid_required_early)}/{len(required_early)}，"
                     f"另揭露 {history_stats.get('grandfatheredEarlyReselections', 0)} 次舊制未留 trigger"

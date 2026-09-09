@@ -5,6 +5,8 @@ import csv
 import inspect
 import json
 import re
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -3527,6 +3529,53 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("body.append(audit,mapReturn)", radar_card)
         self.assertNotIn("body.append(head,readerStatus,reader)", radar_card)
         self.assertNotIn("body.append(head,reader,groups,actions,audit", radar_card)
+
+    @unittest.skipUnless(shutil.which("node"), "入口文案行為回歸需要 Node.js")
+    def test_radar_article_origin_distinguishes_expansions_from_promotions(self):
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        start = template.index("function articleOriginContext()")
+        end = template.index("\nfunction ", start + 1)
+        function = template[start:end]
+        harness = """
+const state={articleOrigin:null};
+const radarById=new Map();
+const MATURITY={rows:[{id:'passive',label:'被動元件'}]};
+const results=[];
+for(const status of ['promoted','expand_existing','watch','deferred']){
+  radarById.set('RC-TEST',{id:'RC-TEST',rank:7,status,
+    readerQuestion:'公開規格能說明部署嗎？',
+    readerGroupQuestions:[{groupId:'passive',question:'元件在哪個位置？'}]});
+  for(const kind of ['radar','maturity-radar']){
+    state.articleOrigin={kind,candidateId:'RC-TEST',groupId:'passive'};
+    results.push({status,...articleOriginContext()});
+  }
+}
+process.stdout.write(JSON.stringify(results));
+"""
+        completed = subprocess.run(
+            [shutil.which("node")], input=function + "\n" + harness,
+            text=True, encoding="utf-8", capture_output=True, check=True, timeout=10,
+        )
+        results = json.loads(completed.stdout)
+        self.assertEqual(len(results), 8)
+        for context in results:
+            with self.subTest(status=context["status"], kind=context["kind"]):
+                description = context["description"]
+                if context["status"] == "expand_existing":
+                    self.assertIn("新資料", description)
+                    self.assertIn("既有文章", description)
+                    self.assertNotIn("升格", description)
+                elif context["status"] == "promoted":
+                    self.assertIn("升格", description)
+                else:
+                    self.assertNotIn("升格", description)
+                    self.assertNotIn("已補進", description)
+                self.assertIn("第 7 題", context["title"])
+                self.assertTrue(context["mobileBackLabel"].startswith("返回"))
+                self.assertTrue(context["buttonLabel"].startswith("回到"))
+                self.assertIn("返回會保留", description)
+                if context["kind"] == "maturity-radar":
+                    self.assertIn("元件在哪個位置？", description)
 
     def test_radar_group_matrix_keeps_promoted_question_article_and_return_path(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
