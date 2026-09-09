@@ -12,6 +12,24 @@ NODE = shutil.which("node")
 
 @unittest.skipUnless(NODE, "node 不在 PATH")
 class BrowserPreferencesTest(unittest.TestCase):
+    def test_radar_review_deadline_distinguishes_past_today_future_and_missing(self):
+        source = (ROOT / 'scripts/research_template.html').read_text(encoding='utf-8')
+        start = source.index('function fmtDate(')
+        end = source.index('\nfunction ', source.index('function radarReviewDeadline(') + 10)
+        script = source[start:end] + """
+console.log(JSON.stringify(['2026-08-16','2026-09-10','2026-09-11',''].map(
+  date=>radarReviewDeadline(date,'2026-09-10'))));
+"""
+        result = subprocess.run([NODE, '-e', script], capture_output=True,
+                                text=True, encoding='utf-8', timeout=15)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), [
+            {'text':'總檢查已到期 2026/08/16','overdue':True},
+            {'text':'總檢查今日到期 2026/09/10','overdue':False},
+            {'text':'下次總檢查 2026/09/11','overdue':False},
+            {'text':'總檢查日期未設定','overdue':False},
+        ])
+
     def test_storage_failure_does_not_interrupt_theme_or_reading_mode(self):
         for template, read, write in (
             ("dashboard_template.html", "rvStored", "rvRemember"),
