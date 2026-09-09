@@ -211,8 +211,17 @@ svg{display:block;overflow:visible}
 #sheetwrap.on #backdrop{opacity:1}
 #sheet{position:relative;width:min(880px,100%);height:100%;overflow-y:auto;background:var(--card);border-left:1px solid var(--line);box-shadow:-8px 0 40px rgba(0,0,0,.2);padding:22px 26px 40px;transform:translateX(100%);transition:transform .28s cubic-bezier(.32,.72,0,1)}
 #sheetwrap.on #sheet{transform:translateX(0)}
-.sheetclose{position:absolute;top:14px;right:16px;width:38px;height:38px;border-radius:100px;background:var(--inset);border:1px solid var(--line);color:var(--ink2);cursor:pointer;font-size:15px}
+.sheetheader{position:sticky;top:-22px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-22px -26px 16px;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+.sheettitle{min-width:0;margin:0;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.sheetclose{flex:0 0 44px;width:44px;height:44px;border-radius:100px;background:var(--inset);border:1px solid var(--line);color:var(--ink2);cursor:pointer;font-size:15px}
 .sheetclose:hover{color:var(--ink)}
+.stocknav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.stocknav-status{flex:1 0 100%;font-size:var(--fs-115);color:var(--muted)}
+.stocknav-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+.stocknav-pair .togglebtn{min-width:0;padding:6px 10px;font-size:12px;overflow-wrap:anywhere}
+.sheetjumps{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.sheetjump-select{display:none}
+@media(max-width:680px){.sheetjumps{display:none}.sheetjump-select{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--muted)}.sheetjump-select select{flex:1;min-width:0;min-height:44px}}
 @media(max-width:680px){#sheetwrap{align-items:flex-end}#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%)}#sheetwrap.on #sheet{transform:translateY(0)}}
 /* ---------- 多視角探索：方案 3，單一族群主從式比較 ---------- */
 #perspectives{width:min(1400px,calc(100vw - 80px));max-width:none;margin-left:50%;padding:7px 11px 0 0;transform:translateX(-50%)}
@@ -1452,6 +1461,10 @@ function buildStocks1c(){
     h('p',{class:'lead',html:'選定族群後依<b style="color:var(--ink)">族群內綜合分</b>排序，可搜尋／切換排序；暫停／未交易股票置底且不列名次，數值是標示日期的前次訊號。<b style="color:var(--ink)">點任一列</b>看該檔完整研究與近期數據。注意：五面向是族群內相對排名——相對分靠前不保證原始值為正，▲ 也不代表原始值為正或股價會漲；本頁不宣稱法人一定買進或賣出，請以明細內原始數字為準。'}),
     toolbar,h('p',{id:'stock-search-help',class:'lead',style:'font-size:12px;margin:0 0 12px',text:'搜尋依族群選單範圍；不知道所屬族群時可選「全部族群」。各族群分開排序，搜尋保留原排序位置。'}),cont];
 }
+function sheetHeader(title){
+  return h('header',{class:'sheetheader'},h('h2',{id:'sheet-title',class:'sheettitle',text:title}),
+    h('button',{class:'sheetclose',type:'button','aria-label':'關閉',onclick:closeSheet},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:'close'})));
+}
 function openSheet(s){
   const ts=tierStyle(s.tier),compCol=s.comp>=0?'var(--strong)':'var(--weak)',labels=['① 價（相對強弱＋抗跌）','② 量','③ 外資','④ 投信','⑤ 融資券'];
   const list=h('div',{});
@@ -1462,7 +1475,7 @@ function openSheet(s){
         h('span',{class:'mono',style:`font-size:13px;font-weight:700;color:${si.col}`,text:si.g+' '+s.cv[i]})),
       h('div',{style:'font-size:12px;color:var(--ink2);line-height:1.55;margin-top:3px',text:s.cr[i]})));});
   const body=[
-    h('button',{class:'sheetclose','aria-label':'關閉',onclick:closeSheet},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:'close'})),
+    sheetHeader(s.nm+' '+s.id+' · 個股明細'),
     h('div',{style:'display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 34px 2px 0'},
       h('b',{style:'font-size:22px;font-weight:900',text:s.nm}),h('span',{class:'mono',style:'font-size:13px;color:var(--muted)',text:s.id}),
       h('span',{class:'chip',style:`color:${ts.col};background:${ts.bg}`,text:s.tierLabel})),
@@ -1484,6 +1497,7 @@ function showSheet(){ const wasOpen=sheetwrap.classList.contains('on');
     sheetInerted=[...document.body.children].filter(el=>el!==sheetwrap&&el.tagName!=='SCRIPT').map(el=>({el,aria:el.getAttribute('aria-hidden')}));
     sheetInerted.forEach(item=>{item.el.inert=true;item.el.setAttribute('aria-hidden','true');});}
   sheetwrap.classList.add('on');sheetwrap.setAttribute('aria-hidden','false');
+  sheetEl.setAttribute('aria-labelledby','sheet-title');
   sheetEl.scrollTop=0;
   const c=sheetEl.querySelector('.sheetclose'); if(c) c.focus();
   window.requestAnimationFrame(function(){ const c2=sheetEl.querySelector('.sheetclose'); if(c2&&document.activeElement!==c2) c2.focus(); }); }
@@ -1498,23 +1512,31 @@ function openStockDetail(id,groupContext=null){ const s=D.byId&&D.byId[id]; if(!
   const sibs=(D.stocks||[]).filter(x=>x.g===s.g).sort((a,b)=>b.comp-a.comp);
   const idx=sibs.findIndex(x=>x.id===s.id);
   const prev=idx>0?sibs[idx-1]:null, next=(idx>=0&&idx<sibs.length-1)?sibs[idx+1]:null;
-  const navBtn=(o,label)=>h('button',{class:'togglebtn',
-    style:'padding:6px 12px;font-size:12px'+(o?'':';visibility:hidden'),
+  const navBtn=(o,label)=>h('button',{class:'togglebtn',type:'button',disabled:o?null:true,
     onclick:o?()=>openStockDetail(o.id,groupContext):null, text:label+(o?' '+o.nm:'')});
-  const jump=h('div',{style:'display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px'});
-  const nav=h('div',{style:'display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:2px 60px 0 0'},
-    navBtn(prev,'‹ 上一檔'),
-    h('span',{class:'mono',style:'font-size:var(--fs-115);color:var(--muted)',text:(idx+1)+' / '+sibs.length+' · '+grp(s.g).nm}),
-    navBtn(next,'下一檔 ›'));
+  const jump=h('nav',{class:'sheetjumps','aria-label':'個股明細段落'});
+  const jumpSelect=h('select',{class:'sortbtn','aria-label':'跳到個股明細段落'},h('option',{value:'',text:'選擇段落…'}));
+  const mobileJump=h('label',{class:'sheetjump-select'},'跳到',jumpSelect);
+  const nav=h('nav',{class:'stocknav','aria-label':'同族群個股導覽'},
+    h('span',{class:'mono stocknav-status',text:(idx+1)+' / '+sibs.length+' · '+grp(s.g).nm}),
+    h('div',{class:'stocknav-pair'},navBtn(prev,'‹ 上一檔'),navBtn(next,'下一檔 ›')));
   if(groupContext)nav.prepend(h('button',{class:'togglebtn',type:'button',text:'返回'+grp(groupContext.g).nm+'族群',onclick:()=>openGroupSheet(groupContext)}));
-  sheetEl.replaceChildren(h('button',{class:'sheetclose','aria-label':'關閉',onclick:closeSheet},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:'close'})),nav,jump,card);
+  sheetEl.replaceChildren(sheetHeader(s.nm+' '+s.id+' · 個股明細'),nav,jump,mobileJump,card);
   // 跳段：依 card 內的 h3 標題自動生成（在 #sheet 內捲動，不動全頁）
-  [...card.querySelectorAll('h3')].forEach(hd=>{
-    const label=(hd.textContent||'').replace(/ · .*/,'').trim().slice(0,7);
+  const headings=[...card.querySelectorAll('h3')];
+  const goToHeading=hd=>{
+    const headerHeight=sheetEl.querySelector('.sheetheader').getBoundingClientRect().height;
+    const top=hd.getBoundingClientRect().top-sheetEl.getBoundingClientRect().top+sheetEl.scrollTop-headerHeight-8;
+    hd.tabIndex=-1;hd.focus({preventScroll:true});
+    sheetEl.scrollTo({top,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+  };
+  headings.forEach((hd,index)=>{
+    const label=(hd.textContent||'').replace(/ · .*/,'').trim();
     if(!label)return;
     jump.appendChild(h('button',{class:'togglebtn',style:'padding:5px 11px;font-size:12px',
-      onclick:()=>{const top=hd.getBoundingClientRect().top-sheetEl.getBoundingClientRect().top+sheetEl.scrollTop-8;
-        sheetEl.scrollTo({top,behavior:'smooth'});}, text:label}));});
+      onclick:()=>goToHeading(hd), text:label}));
+    jumpSelect.appendChild(h('option',{value:String(index),text:label}));});
+  jumpSelect.addEventListener('change',()=>{if(jumpSelect.value==='')return;goToHeading(headings[Number(jumpSelect.value)]);jumpSelect.value='';});
   showSheet(); }
 function openGroupSheet(g){
   const st=stateStyle(g.state),statList=h('div',{});
@@ -1534,7 +1556,7 @@ function openGroupSheet(g){
           h('span',{style:`font-size:var(--fs-105);font-weight:700;color:${dl.c}`,text:dl.t}))),
       h('div',{style:'font-size:var(--fs-115);color:var(--ink2);line-height:1.5;margin-top:3px',text:row[2]})));});
   const body=[
-    h('button',{class:'sheetclose','aria-label':'關閉',onclick:closeSheet},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:'close'})),
+    sheetHeader(grp(g.g).nm+' · 族群明細'),
     h('div',{style:'display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 34px 2px 0'},
       h('b',{style:'font-size:22px;font-weight:900',text:grp(g.g).nm}),
       h('span',{class:'chip',style:`color:${st.col};background:${st.bg}`,text:g.state})),
