@@ -1368,6 +1368,18 @@ function stripEl(s,short5){ const strip=h('div',{class:'strip'});
       raw?h('div',{style:'font-size:var(--fs-8);color:var(--muted);margin-top:1px;line-height:1',text:'ⓘ'}):null));});
   return strip; }
 
+function stockSearchGroups(stocks,groups,group,query,sortKey,descending){
+  const q=String(query||'').trim().toLowerCase();
+  return groups.filter(g=>!group||g.g===group).map(g=>{
+    const all=stocks.filter(s=>s.g===g.g).sort((a,b)=>{
+      if(!!a.trading!==!!b.trading)return a.trading?1:-1;
+      const value=s=>sortKey==='comp'?s.comp:(s.cs[+sortKey]||0);
+      return (descending?value(b)-value(a):value(a)-value(b))||(b.comp-a.comp)||a.id.localeCompare(b.id);
+    });
+    return {g:g.g,total:all.length,rows:all.map((stock,index)=>({stock,rank:stock.trading?null:index+1}))
+      .filter(({stock})=>!q||(stock.nm+' '+stock.id).toLowerCase().includes(q))};
+  });
+}
 function buildStocks1c(){
   let curG=(D.groups[0]&&D.groups[0].g)||(D.stocks[0]&&D.stocks[0].g);
   const short5=['價','量','外資','投信','融資'];
@@ -1379,11 +1391,11 @@ function buildStocks1c(){
     h('div',{style:'font-size:var(--fs-105);color:var(--muted);font-weight:700',text:'觀察標記 · 綜合分'})));
   const rows=h('div',{}); cont.appendChild(rows);
   let sortDesc=true,q='',sortKey='comp';
-  const count=h('span',{class:'mcount'});
-  function row(s,i){ const ts=tierStyle(s.tier),compCol=s.comp>=0?'var(--strong)':'var(--weak)';
+  const count=h('span',{class:'mcount',role:'status','aria-live':'polite'});
+  function row(s,rank){ const ts=tierStyle(s.tier),compCol=s.comp>=0?'var(--strong)':'var(--weak)';
     return h('div',{class:'clickrow srow',role:'button',tabindex:'0',style:'padding:16px 6px;border-top:1px solid var(--line2)',
       onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}}},
-      h('div',{class:'mono',style:'text-align:center;font-size:16px;font-weight:600;color:var(--ink2)',text:s.trading?'—':i+1}),
+      h('div',{class:'mono',style:'text-align:center;font-size:16px;font-weight:600;color:var(--ink2)',text:rank==null?'—':rank}),
       h('div',{style:'min-width:0'},
         h('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap'},h('b',{style:'font-size:16px;font-weight:800',text:s.nm}),
           h('span',{class:'mono',style:'font-size:var(--fs-115);color:var(--muted)',text:s.id}),h('span',{class:'chip',style:`color:${ts.col};background:${ts.bg}`,text:s.tierLabel})),
@@ -1399,13 +1411,29 @@ function buildStocks1c(){
           h('div',{style:'flex:1'}),
           h('span',{class:'mono',style:`font-size:var(--fs-115);font-weight:600;color:${pctCol(s.r20)}`,
             title:'20 日絕對報酬（綜合分是族群內相對排名，與漲跌是兩件事）',text:fmtPct(s.r20,1)})))); }
-  function apply(){ const all=D.stocks.filter(s=>s.g===curG);
-    const f=all.filter(s=>{const t=(s.nm+' '+s.id).toLowerCase();return !q||t.includes(q);}).sort((a,b)=>{if(!!a.trading!==!!b.trading)return a.trading?1:-1;const av=sortKey==='comp'?a.comp:(a.cs[+sortKey]||0),bv=sortKey==='comp'?b.comp:(b.cs[+sortKey]||0),d=sortDesc?bv-av:av-bv;return d||(b.comp-a.comp);});
-    rows.replaceChildren(...f.map((s,i)=>row(s,i))); count.textContent=grp(curG).nm+' '+f.length+' / '+all.length+' 檔'; }
+  function apply(){
+    const groups=stockSearchGroups(D.stocks,D.groups,curG,q,sortKey,sortDesc);
+    const shown=groups.reduce((n,g)=>n+g.rows.length,0),total=groups.reduce((n,g)=>n+g.total,0);
+    const children=[];
+    groups.filter(g=>g.rows.length).forEach(g=>{
+      if(!curG)children.push(h('h3',{class:'sub3',text:grp(g.g).nm+' · '+g.rows.length+' / '+g.total+' 檔'}));
+      children.push(...g.rows.map(({stock,rank})=>row(stock,rank)));
+    });
+    if(!shown){
+      const empty=h('div',{style:'padding:24px 6px'},h('p',{text:q?'找不到符合「'+q+'」的個股。':'此族群目前沒有可顯示的個股。'}));
+      const other=curG&&q?D.stocks.filter(s=>s.g!==curG&&(s.nm+' '+s.id).toLowerCase().includes(q)).length:0;
+      if(other)empty.appendChild(h('button',{class:'togglebtn',type:'button',text:'搜尋全部族群（另有 '+other+' 檔）',onclick:()=>{curG='';gsel.value='';apply();search.focus();}}));
+      if(q)empty.appendChild(h('button',{class:'togglebtn',type:'button',text:'清除搜尋',onclick:()=>{q='';search.value='';apply();search.focus();}}));
+      children.push(empty);
+    }
+    rows.replaceChildren(...children);
+    count.textContent=(curG?grp(curG).nm:'全部族群（各族群分開排序）')+' '+shown+' / '+total+' 檔';
+  }
   const gsel=h('select',{class:'sortbtn','aria-label':'選擇族群',onchange:e=>{curG=e.target.value;apply();}});
+  gsel.appendChild(h('option',{value:'',text:'全部族群（分組顯示）'}));
   D.groups.forEach(g=>gsel.appendChild(h('option',{value:g.g,text:grp(g.g).nm})));
   gsel.value=curG;
-  const search=h('input',{class:'msearch',type:'search',placeholder:'搜尋股號或名稱…',oninput:e=>{q=e.target.value.toLowerCase();apply();}});
+  const search=h('input',{class:'msearch',type:'search','aria-label':'搜尋股號或名稱','aria-describedby':'stock-search-help',placeholder:'搜尋股號或名稱…',oninput:e=>{q=e.target.value.trim().toLowerCase();apply();}});
   const sortBtn=h('button',{class:'sortbtn'});
   const upd=()=>{sortBtn.textContent=sortDesc?'↓ 由高到低':'↑ 由低到高';};
   sortBtn.addEventListener('click',()=>{sortDesc=!sortDesc;upd();apply();}); upd(); apply();
@@ -1414,7 +1442,7 @@ function buildStocks1c(){
   const toolbar=h('div',{class:'toolbar'},gsel,dimSel,search,sortBtn,count);
   return [h('p',{class:'kicker',text:'個股層'}),h('h2',{class:'sec',text:'族群內個股比較 · 同一族群誰強誰弱'}),
     h('p',{class:'lead',html:'選定族群後依<b style="color:var(--ink)">族群內綜合分</b>排序，可搜尋／切換排序；暫停／未交易股票置底且不列名次，數值是標示日期的前次訊號。<b style="color:var(--ink)">點任一列</b>看該檔完整研究與近期數據。注意：五面向是族群內相對排名——相對分靠前不保證原始值為正，▲ 也不代表原始值為正或股價會漲；本頁不宣稱法人一定買進或賣出，請以明細內原始數字為準。'}),
-    toolbar,cont];
+    toolbar,h('p',{id:'stock-search-help',class:'lead',style:'font-size:12px;margin:0 0 12px',text:'搜尋依族群選單範圍；不知道所屬族群時可選「全部族群」。各族群分開排序，搜尋保留原排序位置。'}),cont];
 }
 function openSheet(s){
   const ts=tierStyle(s.tier),compCol=s.comp>=0?'var(--strong)':'var(--weak)',labels=['① 價（相對強弱＋抗跌）','② 量','③ 外資','④ 投信','⑤ 融資券'];

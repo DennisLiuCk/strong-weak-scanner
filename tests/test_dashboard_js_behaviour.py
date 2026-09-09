@@ -70,6 +70,31 @@ class DashboardJsBehaviourTest(unittest.TestCase):
 
     # ---------- fmtPct:唯一的百分比格式化入口 ----------
 
+    def test_stock_search_groups_preserve_scope_rank_and_suspended_order(self):
+        pre = extract('stockSearchGroups') + """
+const groups=[{g:'memory'},{g:'ip'}];
+const stocks=[
+ {g:'memory',id:'3260',nm:'威剛',comp:3,cs:[1]},
+ {g:'memory',id:'2344',nm:'華邦電',comp:5,cs:[2]},
+ {g:'memory',id:'9999',nm:'暫停',comp:9,cs:[2],trading:{}},
+ {g:'ip',id:'6643',nm:'M31',comp:2,cs:[1]}];
+const search=(g,q,desc=true)=>stockSearchGroups(stocks,groups,g,q,'comp',desc);
+"""
+        got = self.run_js(pre, [
+            ('跨族群保留原位置', "search('', ' 3260 ')") ,
+            ('不區分大小寫', "search('', 'm31')"),
+            ('尊重明確族群篩選', "search('ip', '3260')"),
+            ('反向排序暫停仍置底', "search('memory', '', false)"),
+            ('無結果', "search('', '不存在')"),
+        ])
+        self.assertEqual(got[0][0]['rows'][0]['rank'], 2)
+        self.assertEqual(got[0][0]['total'], 3)
+        self.assertEqual(got[1][1]['rows'][0]['stock']['id'], '6643')
+        self.assertEqual(got[2][0]['rows'], [])
+        self.assertEqual([r['stock']['id'] for r in got[3][0]['rows']], ['3260', '2344', '9999'])
+        self.assertIsNone(got[3][0]['rows'][-1]['rank'])
+        self.assertTrue(all(not g['rows'] for g in got[4]))
+
     def test_fmtPct_behaviour(self):
         pre = extract("fmtPct")
         cases = [
