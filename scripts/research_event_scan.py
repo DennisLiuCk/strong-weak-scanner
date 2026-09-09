@@ -11,8 +11,9 @@ That bound alone is not sufficient. The daily batch is non-retentive: it carries
 a single speech date and is replaced when the output date rolls forward, so date
 arithmetic would certify a window using a batch that never contained any of its
 days. A requested window is therefore full only when, for both markets, the
-derived boundary reaches the window end AND the batch actually read carries a
-speech date inside the window. Once a batch has rolled past a window, the gap
+derived boundary reaches the window end AND every requested calendar day occurs
+in the batch actually read. A missing day is unknown, not a zero-announcement
+day (including weekends). Once a batch has rolled past a window, the gap
 cannot be closed by re-running; only the scan row that truly read that day counts.
 """
 from __future__ import annotations
@@ -129,6 +130,12 @@ def compute_census(
     coverage_through: dict[str, str] = {}
     observed_speech: dict[str, list[str]] = {}
     batch_covers_window: dict[str, bool] = {}
+    missing_dates: dict[str, list[str]] = {}
+    has_window_content: dict[str, bool] = {}
+    requested_dates = {
+        window_start + dt.timedelta(days=offset)
+        for offset in range((window_end - window_start).days + 1)
+    }
     announcement_rows: list[dict] = []
     market_source_rows: dict[str, int] = {}
     for market, rows in announcements_by_market.items():
@@ -146,12 +153,14 @@ def compute_census(
         # The daily batch is non-retentive: it carries a single speech date and is
         # replaced when the output date rolls forward. Date arithmetic alone would
         # certify a window using a batch that never contained any of its days, so
-        # coverage also requires that the batch actually carries in-window content.
+        # each market must carry EVERY requested day, not merely one in-window day.
         speech_dates = sorted({_speech_date(row) for row in rows})
         observed_speech[market] = [item.isoformat() for item in speech_dates]
-        batch_covers_window[market] = any(
-            window_start <= item <= window_end for item in speech_dates
-        )
+        missing_dates[market] = [
+            item.isoformat() for item in sorted(requested_dates - set(speech_dates))
+        ]
+        batch_covers_window[market] = not missing_dates[market]
+        has_window_content[market] = bool(requested_dates & set(speech_dates))
         for row in rows:
             stock_id = _stock_id(row)
             speech = _speech_date(row)
@@ -185,10 +194,15 @@ def compute_census(
         limitation = (
             "重大訊息日批次尚未覆蓋 window_end；不得把目前 0 列或最新發言日當成最終結果"
         )
+    elif not all(has_window_content.values()):
+        limitation = (
+            "至少一個市場的重大訊息日批次不含窗內任何一天，非留存端點不能回補歷史；"
+            "缺口不能由這次重跑關閉，必須沿用當時真的讀到該日的既有 scan row"
+        )
     elif not carries_window:
         limitation = (
-            "重大訊息日批次已滾過本窗口且不保留舊發言日，本次讀到的批次不含窗內任何一天；"
-            "缺口不能由這次重跑關閉，必須沿用當時真的讀到該日的既有 scan row"
+            "重大訊息日批次只含窗口部分日期，兩市場均須逐日覆蓋才可 full；"
+            "未讀到的日期（含週末）是未知而非零公告，不能以最後一天或跨市場聯集補齊"
         )
     else:
         limitation = (
@@ -209,12 +223,13 @@ def compute_census(
             "complete": complete,
             "rule": (
                 "each_market_output_date_minus_one_day_reaches_window_end"
-                "_and_batch_speech_dates_fall_inside_window"
+                "_and_every_requested_date_is_observed_in_each_market"
             ),
             "announcementOutputDates": output_dates,
             "announcementCoverageThrough": coverage_through,
             "observedSpeechDatesByMarket": observed_speech,
             "batchCoversWindowByMarket": batch_covers_window,
+            "missingSpeechDatesByMarket": missing_dates,
             "limitation": limitation,
         },
         "announcements": {
@@ -292,12 +307,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.output:
         output = Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(text, encoding="utf-8")
+        output.write_bytes(text.encode("utf-8"))
         print(f"已寫入 {output}")
     else:
         print(text, end="")
     if args.require_full and not payload["coverage"]["complete"]:
-        print("ERROR：來源批次尚未覆蓋 window_end，scope 必須維持 partial")
+        print("ERROR：來源批次未逐日覆蓋兩市場的完整窗口，scope 必須維持 partial")
         return 2
     return 0
 

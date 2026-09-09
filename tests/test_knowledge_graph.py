@@ -123,7 +123,7 @@ class KnowledgeGraphTest(unittest.TestCase):
             {item["id"] for item in assessments},
             {
                 "FM-YQ2-2327-01", "FM-LC-3017-01", "FM-LC-2308-01",
-                "FM-LC-2308-02", "FM-LC-2301-01",
+                "FM-LC-2308-02", "FM-LC-2301-01", "FM-ITD-6223-01",
             },
         )
         self.assertEqual(

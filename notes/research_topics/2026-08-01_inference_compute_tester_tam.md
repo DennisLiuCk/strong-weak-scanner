@@ -1040,6 +1040,29 @@ comparability_reason: 這是沒有公開共同基準、產品、程式與客戶�
 | 中華精測：介面產品 | 2026Q2 收入 16.40 億元；晶圓測試卡占 76%、IC 測試板 18%、技術服務與其他 6%；公司定義自由現金流為營運現金流 2.57 億元減資本支出 0.89 億元，得到 1.68 億元 | 先追合格組態數、交付量、平均售價、探針／板／零件自製、良率、維修與更換週期；客戶 tester 忙碌不等於介面商同季等比例認列收入 | 具名晶片、插入點、介面數量與 ASP、客戶、產品別毛利、測試機時；這份法說也不是含完整附註的 Q2 核閱財報 |
 | 旺矽：介面與設備混合 | 2026Q1 合併營收 39.33 億元，探針卡占 71.1%、設備 26.9%、其他 2.0% | 探針卡要走資格、交付、維修與汰換時鐘；設備要另走訂單、製造、交機、安裝、驗收、升級與服務時鐘，先拆線才能談組合 | 兩條產品線各自金額、訂單、數量、ASP、毛利、現金流與客戶，也不能把 26.9% 設備全部視為 ATE tester |
 
+### 新手更新：旺矽 Q2 補到了產品組合，還沒補到 AI 收入
+
+**證實（C15）：** 本輪從旺矽官方法說入口取得九月活動簡報，2026Q2 的探針卡、設備、其他
+收入占比分別為 74.7%、23.3%、2.0%，合計 100.0%；同季營收為新台幣 5,233,387 千元。
+財報附註可重算為 `5,237,160 + 36 - 3,809 = 5,233,387` 千元，最後一项是扣除停業單位收入。
+這補上旺矽的 Q2 對照，但不改寫上表的 Q1 歷史個案。
+來源：[法說入口及九月附件](https://www.mpi-corporation.com/investors-relationship/shareholder-services/)、
+[財報入口及 2026H1 英文附件](https://www.mpi-corporation.com/investors-relationship/financial-statements/)。
+
+**為什麼重要？** 「分母」是拿來對照的總額；這裡能確認產品組合與同季公司總收入。
+「AI 分子」則要知道哪些具名產品、客戶及收入真的屬於 AI。探針卡不只服務一種應用，設備
+也不等於全部都是 ATE。74.7% 不是 AI 占比，更不能拿它和精測 76% 直接比較誰更受惠；
+比較帳本 M4 保存兩者的同季期間、不同產品定義與不可比判定。
+
+**推論與待驗證（C16）：** 產品組合可幫忙選追蹤方向，但不能算出 AI 收入或產品毛利。
+核閱財報只列單一營運部門，且因部分非重要子公司未核閱而保留結論；英文版以中文原文為準。
+九月活動日、8/12 核閱日與附件首次上線日不同，本輪未確認後者，不能回填首次可得時間。
+
+讀完請問自己三件事：這筆占比的期間與分母是什麼？探針卡增加，是否一定要新增 tester？
+若要證明 AI 獲利，還缺客戶、料號、交付數量、ASP（平均售價）還是哪一項成本？
+接下來沿 T4 查同產品的客戶驗收、出貨與毛利；若只有產品分類或擴產，受惠命題仍不成立。
+本例只有一家公司兩份同源文件，不是產業抽樣或兩條獨立消息鏈，沒有支持率、SE 或 t 值。
+
 ### 先做三張單位經濟卡，再談誰受惠
 
 1. **測試服務卡：** `可計費 test-cell 時數 ≈ 合格測試量 × 實際插入點 × 每站秒數 × 重測係數 ÷（同時站數 × 並行效率）`。再加上計價方式、利用率、停機、折舊、人力與電力，才可能連到服務收入和毛利；公司若按顆、按秒、按專案或混合計價，還要另留契約欄。
@@ -1307,3 +1330,111 @@ invalidation: 供應商通用流程無法對到實際產品，或新增 insertio
 - 封測與測試介面公司是否對上同一產品、插入點、設備／介面、稼動率、平均售價、收入與毛利；若只有擴產或全球市場上修，證據不足。
 - 任一具名產品能否第一次公開同一份測試責任護照與變更重測結果；只有 test 名稱、設備能力或 qualification 宣稱，仍不能把不同目的的時數加總。
 - 若市場下修、平台延期，或並行與重用吸收新增內容量，應下修增量設備假說；不得只用股價反應續留。
+
+<!-- research_source
+source_id: S22
+role: company_release
+source_kind: living_index
+publisher: 旺矽
+title: 官方法說入口及九月活動簡報的 Q2 產品組合
+published_at:
+captured_at: 2026-09-09
+accepted_at: 2026-09-09
+status: active
+url: https://www.mpi-corporation.com/investors-relationship/shareholder-services/
+locator: 2026 Semiconductor Summit Forum 附件 https://www.mpi-corporation.com/wp-content/uploads/2026/08/MPI_2026_Sep-1_%E6%AB%83%E8%B2%B7x%E6%B0%B8%E8%B1%90%E9%87%91_2026%E5%B9%B4%E5%8D%8A%E5%B0%8E%E9%AB%94%E5%B1%95%E9%AB%98%E5%B3%B0%E8%AB%96%E5%A3%87_2pages_EN.pdf 物理13頁slide26產品組合、15頁slide30損益；SHA256 b1f47e7470f47f243a5d1d8e049d4f3dea9affcdc2229d38c8211d435997f59c；已目視引用頁及相鄰頁
+limitation: 以入口捕捉日期保存附件觀察；9/1是活動日期，不冒充PDF首次發布日。占比四捨五入至0.1百分點，不是AI占比、具名客戶、產品毛利、tester數量或財務受惠；與S23同一發行人鏈
+independence_group: mpi-2026q1-results
+-->
+
+<!-- research_source
+source_id: S23
+role: company_release
+source_kind: living_index
+publisher: 旺矽
+title: 官方財報入口及 2026H1 英文核閱財報的 Q2 收入範圍
+published_at:
+captured_at: 2026-09-09
+accepted_at: 2026-09-09
+status: active
+url: https://www.mpi-corporation.com/investors-relationship/financial-statements/
+locator: 2026H1英文附件 https://www.mpi-corporation.com/wp-content/uploads/2026/09/%E6%97%BA%E7%9F%BD115.06%E5%90%88%E4%BD%B5%E8%B2%A1%E7%B0%BD-IFRS%E8%8B%B1%E6%96%87.pdf 物理62頁印刷60頁附註6(19)、物理102頁印刷100頁部門、物理3至5頁核閱結論及翻譯限制；SHA256 ed3c614b548c943474fa39034d2a02925e66ca35ff22461939c5dfb305d56d25；已目視引用頁及相鄰頁
+limitation: 以入口捕捉日期保存附件觀察；8/12是核閱日，首次上線日未確認。部分非重要子公司未核閱致保留結論，非查核意見；英文以中文原文為準。單一營運部門不提供產品毛利或AI分子；同一發行人兩文件不算獨立驗證來源群
+independence_group: mpi-2026q1-results
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: 旺矽九月活動簡報列2026Q2探針卡74.7%、設備23.3%、其他2.0%及同季營收5,233,387千元；英文H1財報附註同季收入可由5,237,160加36減停業單位3,809重算為同額
+supporting_source_ids: S22,S23
+contrary_source_ids:
+as_of: 2026-09-09
+basis: 原頁目視與同一離線PDF獨立重算：三類占比合計100.0%；同季附註加總5,233,387千元。財務期間2026-04-01至2026-06-30，金額單位新台幣千元；as_of為本輪捕捉，不是財務期或首次發布日
+boundary: 僅證實公司披露的Q2產品分類及同季公司分母；占比為四捨五入值，不反算假精確產品收入，不當成AI分子、份額、產品毛利或跨公司受惠比較
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: 旺矽Q2產品組合與總收入補上分類對照，但單一營運部門及較廣產品類別仍不足以建立AI測試收入或產品毛利的財務歸因
+supporting_source_ids: S17,S22,S23
+contrary_source_ids:
+as_of: 2026-09-09
+basis: S22分類是Probe Card／Equipment／Other而非AI客戶；S23部門附註只有一個operating segment，不能拆出產品成本或毛利
+boundary: 未披露不等於零AI業務；仍缺同產品客戶、數量、ASP、插入點、test-cell時數、利用率與毛利共同鍵，C3與C6主命題不升格且原時鐘不變
+verification_needed: 同產品及同季具名客戶驗收、出貨、ASP、收入與成本分母
+resolution:
+-->
+
+<!-- metric_comparison
+comparison_id: M4
+comparison_kind: heterogeneous_evidence
+observation_id: M4-O1
+claim_id: C16
+entity: 旺矽
+metric: probe card revenue share
+value_kind: point
+reported_value: 74.7
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: company_reported_2026Q2_product_revenue_mix
+unit: percent_of_company_revenue
+definition_key: mpi_probe_card_share_of_company_revenue
+definition: 旺矽九月活動簡報的Q2探針卡收入占公司營收比例，四捨五入至0.1百分點；同季營收5,233,387千元
+evidence_ids: S22,S23
+comparability: not_comparable
+comparability_reason: 與精測的晶圓測試卡及京元電子的服務製程分類不同；即使同季也不是同產品、AI占比、tester時數、份額或財務受惠排行，保留M3-O3的Q1歷史值
+-->
+
+<!-- metric_comparison
+comparison_id: M4
+comparison_kind: heterogeneous_evidence
+observation_id: M4-O2
+claim_id: C16
+entity: 中華精測
+metric: wafer test card revenue share
+value_kind: point
+reported_value: 76
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: company_reported_2026Q2_product_revenue_mix
+unit: percent_of_company_revenue
+definition_key: chpt_wafer_test_card_share_of_company_revenue
+definition: 既有S17的2026Q2晶圓測試卡收入占比，重列僅作不同產品分類的對照
+evidence_ids: S17
+comparability: not_comparable
+comparability_reason: 與旺矽Probe Card的產品範圍及公司分母不同；同季不代表同產品、AI收入或tester需求，不重算同儕排名
+-->
+
+<!-- transition
+date: 2026-09-09
+from: triaged
+to: triaged
+reason: add_mpi_q2_product_mix_and_same_period_denominator_without_ai_attribution_or_clock_refresh
+evidence: sources:S22,S23
+-->

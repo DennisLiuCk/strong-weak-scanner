@@ -235,3 +235,30 @@ sources: OCP two-phase pool boiling webinar => https://www.opencompute.org/event
   重排候選或刷新主命題。同欣電、德微的完整複核仍待完成。
 - 本次不是八題完整再評估，保留雷達as_of、逾期顯示、凍結排名與各題next evidence。
   9/9先接續未完成公司附件語意查核；新候選若要深研，必須另開完整凍結selection cycle。
+
+## 2026-09-09 定向證據增量：先修錯，再補公司分母
+
+以下是既有題目的本輪處理順序，不是新一輪凍結排名，也不是投資建議。原八題評估日與
+逾期提示不變；没有完成全雷達重評估，不因新增兩份同公司文件提高來源獨立性。
+
+| 處理次序 | 主題／線索 | 證據與知識增量 | 本輪決定／下一節點 |
+|---|---|---|---|
+| 1 | CPO 生產用語 | 原稿可直接否定舊 C1 的動詞歸屬；教讀者逐一對照產品主詞 | 更新既有文章 C24、四條圖譜引用；不改 C9 時鐘，9/16追同產品三軸實作 |
+| 2 | 旺矽 Q2 產品分類與公司分母 | 官方簡報＋財報附註可重算；能教會讀者分開產品占比、AI分子及毛利 | 更新測試需求文章及相鄰財務分母線；兩份同發行人只算一鏈，9/16查客戶／料號／出貨及成本 |
+| 3 | 欣銓／SPIL 具名設備採購 | 官方公告提供買方、賣方及累計期間；比產業鄰接更具体，但沒有AI機型、台數或賣方收入期間 | 保留原題追蹤，不另開受惠文章；9/16對照公司附件与具名設備／客戶 |
+| 4 | OIF OFC26 實際展示附件 | 文字定位到LPO鏈路與另一个ELSFP管理展示；不可拼為同產品CPO三軸 | 引用頁影像核驗仍未完成，不接受新claim；9/16先補驗而非重讀current-work入口 |
+| 5 | 弘塑董事及委員會異動 | 9/8一手公告是治理查核trigger，不是訂單或獲利資料 | 9/11查公告更正、11/4生效與補選後續；不由辭任推論舞弊或營運損失 |
+
+回查入口：[旺矽法說](https://www.mpi-corporation.com/investors-relationship/shareholder-services/)、
+[旺矽財報](https://www.mpi-corporation.com/investors-relationship/financial-statements/)、
+[NVIDIA 原稿](https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory)、
+[TWSE 公告日批次](https://openapi.twse.com.tw/v1/opendata/t187ap04_L)、
+[TPEx 公告日批次](https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap04_O)、
+[OIF EEI 展示附件](https://www.oiforum.com/wp-content/uploads/26-12.1-OIF-OFC26-EEI-Interop-1.pdf)、
+[OIF CMIS 展示附件](https://www.oiforum.com/wp-content/uploads/OIF_OFC_2026_CMIS_Demo_final.pdf)。
+公告定位鍵：3711／1150907／173132、3264／1150908／144607、3131／1150908／171201與171241；
+日端點不留歷史，重查應以這些鍵查MOPS原公告，不能用下一個日批次反證前日紀錄。
+
+晚間提交前再查六家MOPS直接索引，發現同欣電9/9 14:48:06新增英文Q2附件；更新原Q2文章
+S35/C33及T9附件進度，不增設新題。其他五家公司和同欣電中文列未變；附件語言增加仍非
+營運支持，9/11優先接續同欣電／德微的同包独立複核，不重複既有四篇正式簽核。

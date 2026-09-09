@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,6 +34,64 @@ def quarter_row(code, *, tpex=False, year="115", quarter="2"):
 
 
 class ResearchEventScanTest(unittest.TestCase):
+    def census_dates(self, twse, tpex, start="2026-09-07", end="2026-09-08"):
+        return res.compute_census(
+            {"1111"},
+            {
+                "twse": [announcement("1111", speech=d, output="1150909") for d in twse],
+                "tpex": [announcement("9999", speech=d, output="1150909", tpex=True) for d in tpex],
+            }, [], [], window_start=dt.date.fromisoformat(start),
+            window_end=dt.date.fromisoformat(end), quarter_year="115", quarter="2",
+        )
+
+    def test_last_day_does_not_cover_multiday_window(self):
+        coverage = self.census_dates(["1150908"], ["1150908"])["coverage"]
+        self.assertFalse(coverage["complete"])
+        self.assertEqual(coverage["missingSpeechDatesByMarket"],
+                         {"twse": ["2026-09-07"], "tpex": ["2026-09-07"]})
+        self.assertIn("部分日期", coverage["limitation"])
+
+    def test_endpoints_do_not_cover_missing_interior_day(self):
+        coverage = self.census_dates(["1150906", "1150908"], ["1150906", "1150908"],
+                                     start="2026-09-06")["coverage"]
+        self.assertFalse(coverage["complete"])
+        self.assertEqual(coverage["missingSpeechDatesByMarket"]["twse"], ["2026-09-07"])
+
+    def test_market_union_cannot_fill_another_markets_gap(self):
+        coverage = self.census_dates(["1150907"], ["1150908"])["coverage"]
+        self.assertFalse(coverage["complete"])
+        self.assertEqual(coverage["missingSpeechDatesByMarket"],
+                         {"twse": ["2026-09-08"], "tpex": ["2026-09-07"]})
+
+    def test_all_requested_dates_in_both_markets_can_cover_window(self):
+        coverage = self.census_dates(["1150907", "1150908"], ["1150907", "1150908"])["coverage"]
+        self.assertTrue(coverage["complete"])
+        self.assertEqual(coverage["missingSpeechDatesByMarket"], {"twse": [], "tpex": []})
+
+    def test_rolled_past_window_does_not_close_historical_gap(self):
+        coverage = self.census_dates(["1150908"], ["1150908"], end="2026-09-07")["coverage"]
+        self.assertFalse(coverage["complete"])
+        self.assertIn("不含窗內任何一天", coverage["limitation"])
+
+    def test_missing_weekend_is_unknown_not_zero(self):
+        coverage = self.census_dates(["1150907", "1150908"], ["1150907", "1150908"],
+                                     start="2026-09-06")["coverage"]
+        self.assertFalse(coverage["complete"])
+        self.assertEqual(coverage["missingSpeechDatesByMarket"]["twse"], ["2026-09-06"])
+
+    def test_require_full_rejects_date_gap_and_output_is_utf8_lf(self):
+        payload = self.census_dates(["1150908"], ["1150908"])
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "scan.json"
+            with patch.object(res, "run_scan", return_value=payload):
+                result = res.main(["--window-start", "2026-09-07", "--window-end", "2026-09-08",
+                                   "--quarter-year", "115", "--quarter", "2", "--require-full",
+                                   "--output", str(output)])
+            self.assertEqual(result, 2)
+            raw = output.read_bytes()
+            self.assertNotIn(b"\r\n", raw)
+            self.assertIn("部分日期", raw.decode("utf-8"))
+
     def test_current_output_batch_cannot_cover_same_day_window_end(self):
         payload = res.compute_census(
             {"1111", "2222"},

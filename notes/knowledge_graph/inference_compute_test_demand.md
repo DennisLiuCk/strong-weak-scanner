@@ -433,3 +433,51 @@ status: active
 boundary: N=2 假想情境只示範量綱與離散取整 沒有產品 設備 工廠 run 抽樣誤差 價格 收入 公司效果或投資結論。
 next_trigger: 同一產品用原始設備狀態時數與 good output 重算連續 cell equivalent 扣除合格未承諾容量後 再對到實際增量採購 安裝 資格與驗收。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-ITD-C06
+view: company
+from_id: company:6223
+to_id: concept:inference-compute-test-demand
+relation: reports_financials
+claim_refs: MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C15
+note_refs:
+evidence_state: verified
+commercial_stage: financial
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-09
+review_due: 2026-09-16
+status: active
+boundary: 只建立旺矽2026Q2產品分類與公司收入分母的搜尋路由，不是AI收入、客戶訂單或產品毛利；74.7%探針卡占比不可當AI材料性，財務內圈維持空缺。
+next_trigger: 公司與客戶對上同產品、期間、插入點、交付量、ASP、收入及成本；只有產品分類、TAM或擴產不升格。
+-->
+
+<!-- financial_materiality
+contract_version: 2
+assessment_id: FM-ITD-6223-01
+edge_id: KG-ITD-C06
+financial_scope: company_total
+metric: consolidated_revenue
+value_kind: reported
+reported_value: 5233387
+unit: TWD_thousand
+period_start: 2026-04-01
+period_end: 2026-06-30
+period_basis: quarter
+denominator_metric: consolidated_revenue
+denominator_value: 5233387
+denominator_unit: TWD_thousand
+share_percent:
+attribution_status: not_disclosed
+source_refs: MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#S22,MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#S23
+calculation:
+as_of: 2026-09-09
+review_due: 2026-09-16
+status: active
+metric_definition: 旺矽2026Q2合併營收新台幣千元；附註5,237,160加36減停業單位3,809等於5,233,387，與簡報同季總額吻合。
+denominator_definition: 同期間同合併範圍且已扣停業單位的公司營收；不是完整test-cell產值或AI市場分母。
+boundary: AI收入及毛利分子未披露，不填題材占比；產品分類四捨五入值不反算假精確產品收入。兩份文件同一公司來源鏈，核閱保留結論及英文翻譯限制保留。
+next_trigger: 取得同季同產品可辨AI收入及成本分子，並由客戶或另一獨立來源核對交付及應用。
+-->

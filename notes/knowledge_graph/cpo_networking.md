@@ -25,7 +25,7 @@ view: company
 from_id: company:nvidia
 to_id: concept:cpo-networking
 relation: owns_platform
-claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C1
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C24
 note_refs:
 evidence_state: verified
 commercial_stage: production
@@ -85,7 +85,7 @@ view: industry
 from_id: product:spectrum-x-ethernet-photonics
 to_id: concept:cpo-networking
 relation: generation_of
-claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C1
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C24
 note_refs:
 evidence_state: verified
 commercial_stage: production
@@ -105,7 +105,7 @@ view: industry
 from_id: concept:cpo-networking
 to_id: component:co-packaged-optics
 relation: includes
-claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C1
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C24
 note_refs:
 evidence_state: verified
 commercial_stage: production
@@ -145,7 +145,7 @@ view: industry
 from_id: concept:cpo-networking
 to_id: stage:product-production
 relation: reaches_stage
-claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C1
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C24
 note_refs:
 evidence_state: verified
 commercial_stage: production

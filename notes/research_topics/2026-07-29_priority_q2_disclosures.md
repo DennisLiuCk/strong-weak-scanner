@@ -1351,6 +1351,16 @@ evidence: sources:S20,S23
 
 ### 三句話抓重點
 
+**9/9 附件進度：** 同欣電的英文 Q2 合併財報在 MOPS 索引新增，登錄上傳時間為
+115/09/09 14:48:06、檔案大小 417,028 位元組；凌晨檢查時仍只有中文檔，晚間續跑才看到英文檔。
+
+這是新附件里程碑，不代表財報內容改版、營運轉強或已完成獨立複核。
+[官方下載入口](https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=6271&filename=202602_6271_AIA.pdf)
+對應 C33；中文原檔、其他五家公司附件及既有四篇簽核進度不因此改寫。
+
+下一步仍是同一證據包的頁碼、數字與推論核對；若只是翻譯新增而沒有新的營運內容，
+不能把「多了一個檔案」算成「命題多了一份支持」。
+
 - 六檔 Q2 完整附件均已定位。8 月 29 日弘塑、智原與日月光投控各自完成四份核心文件的證據包與獨立複核；9 月 7 日威剛也完成。剩餘同欣電與德微仍待完整複核，不能把附件取得或單篇完成當成整批完成。
 - 智原要分 NRE 與 MP，同欣電要分產品、應用與擴產時鐘，德微要分部門、關係人、終端應用與持股處分現金，威剛要把獲利與營運資金一起讀，日月光投控則要拆封裝、測試與電子組裝；這些公司不能共用一個「AI 收入」分母。
 - 文件上線只解決「能不能讀」，不會自動解決「哪個商業階段、哪個財務分母、AI 分子是多少」；季報沒有揭露的 AI 收入必須留白。
@@ -2068,3 +2078,41 @@ evidence_boundary: 合併層的部分合約負債轉收入不是具名CoWoS急�
   附件取得或筆記簽核自動裁決主張。
 - 任一更新都不轉移 H# 生命週期、不改量化分數；只有預登錄 trigger 命中並通過相應證據角色，
   才升級主張。
+
+<!-- research_source
+source_id: S35
+role: company_release
+source_kind: document
+publisher: 同欣電／MOPS
+title: 202602_6271_AIA.pdf 英文Q2合併財報新增附件紀錄
+published_at: 2026-09-09
+captured_at: 2026-09-09
+accepted_at: 2026-09-09
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=6271&filename=202602_6271_AIA.pdf
+locator: 115Q2直接索引https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6271&year=115&seamon=2&mtype=A；英文合併列上傳115/09/09 14:48:06、417028 bytes、無更補正，與本日凌晨僅中文列對照；published_at取索引上傳日，下載入口先回傳HTML再指向PDF
+limitation: 只驗附件登錄與取得，不聲稱翻譯或財務內容已完整核對，也不判定原中文財報修正；不是frozen pack、獨立簽核、產品收入或主命題新支持
+independence_group: theil.com
+-->
+
+<!-- research_claim
+claim_id: C33
+label: verified
+status: active
+claim: 同欣電115Q2直接MOPS索引於9/9晚間可見新增英文合併附件202602_6271_AIA.pdf，索引上傳日為115/09/09 14:48:06、大小417028 bytes；同日凌晨本輪索引尚只有中文檔
+supporting_source_ids: S35
+contrary_source_ids:
+as_of: 2026-09-09
+basis: 兩次固定公司/年度/季度查詢的JSON逐欄差異只有6271新增英文列；其他五家公司及6271中文列的檔名、上傳時刻、大小和更補正狀態相同
+boundary: 只關閉T9新附件子條件，內容與正式筆記獨立複核仍未完成；不可據此推營運、NRE轉量產或財務結果，也不刷新C15主命題時鐘
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-09-09
+from: triaged
+to: triaged
+reason: recorded_tonghsing_english_q2_attachment_delta_without_claiming_content_verification
+evidence: sources:S35
+-->

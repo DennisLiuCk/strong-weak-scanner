@@ -41,7 +41,7 @@ title: Vera Rubin 與 Spectrum-X Ethernet Photonics full production 公告
 published_at: 2026-05-31
 captured_at: 2026-08-01
 accepted_at: 2026-08-01
-status: active
+status: superseded
 url: https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory
 locator: Spectrum-X Ethernet Photonics 與 full production 段落
 limitation: 只能證實 NVIDIA 的產品階段，未揭露 CPO 出貨占比或客戶部署數
@@ -297,7 +297,7 @@ independence_group: nvidia
 <!-- research_claim
 claim_id: C1
 label: verified
-status: active
+status: superseded
 claim: NVIDIA 已將 Spectrum-X Ethernet Photonics 描述為進入 full production
 supporting_source_ids: S1
 contrary_source_ids:
@@ -305,7 +305,8 @@ as_of: 2026-05-31
 basis: 指定來源直接使用 full production 描述產品階段
 boundary: 證實的是 NVIDIA 的公開產品階段，不代表已知出貨占比、市占或供應商損益
 verification_needed:
-resolution:
+resolution: 2026-09-09 按原文主詞縮窄措辭；Spectrum-X 是 now in production，full production 指 Vera Rubin，見 C24；不是產品未生產的反證
+corrected_by_claim_id: C24
 -->
 
 <!-- research_claim
@@ -652,7 +653,7 @@ invalidation: 若公司持續只被生態系列名而沒有量產或財務證據
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
 claim_ids: C1,C6,C7,C8,C9,C10
 metric: 具名 AI 光學產品的 optical-engine placement、signal-processing mode、laser placement、標準版本、跨廠互通、field replacement、可靠度與部署分母
 source_ids: S1,S3,S4,S8,S9,S10,S11
@@ -662,6 +663,8 @@ frequency_detail: 每兩週核對 OIF current work、平台產品與公司正式
 next_check: 2026-08-26
 trigger: 同一具名產品首次公開三軸組態，並至少提供跨廠互通、應用 link budget、現場更換／可靠度或客戶部署分母之一
 invalidation: 若後續多個產品世代仍把位置、訊號處理與雷射固定成不可拆的單一組合，且 NPO／ELS 長期沒有具名實作或互通結果，三軸作為商用產品組合框架的信心下修
+retired_at: 2026-09-09
+retirement_reason: C1及S1措辭勘誤後由C24及S18接替；T5原樣保留T3的觸發、失效及2026-08-26期限，不藉修正延後條件
 -->
 
 <!-- monitoring_item
@@ -1253,6 +1256,17 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 
 ## 來源與證據邊界
 
+### 新手查核：同一篇公告，不能共用一個「量產」主詞
+
+**證實：** NVIDIA 原稿對 Spectrum-X Ethernet Photonics 寫的是「已投入生產」；
+「全面量產」描述的對象是同文的運算平台，不是這台交換器。本文保留舊 C1 並由 C24 接替，不把措辭修正說成
+產品停止生產，也不把任何一種 production 宣稱直接當成客戶已收到多少交換器。
+來源是 [NVIDIA 原稿的 News Summary 與網路段落](https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory)。
+
+**推論與待驗證：** 生產、出貨、驗收是不同關卡。下次讀公告先問：「這個動詞的主詞是整個
+平台、交換器還是光元件？實際交付何種型號、多少台、何時、由誰驗收？」沒有這些共同欄位，
+供應商份額與收入仍待驗證；本次勘誤不刷新 C9 主命題及原到期日。
+
 - [NVIDIA：Vera Rubin 與 Spectrum-X Ethernet Photonics 進入生產，2026-05-31](https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory)
 - [NVIDIA GTC Taipei：列名 TSMC、SPIL、TFC、Foxconn 的製造角色，2026-06-01 更新](https://blogs.nvidia.com/blog/nvidia-gtc-taipei-computex-2026-news/)
 - [NVIDIA：Spectrum-6 同時支援可插拔與 CPO，2026-07-21](https://blogs.nvidia.com/blog/nvidia-spectrum-six-arrives-in-gigascale-ai-factories/)
@@ -1314,3 +1328,58 @@ evidence_boundary: OIF framework／IA、平台 production 與生態系列名都�
 - **平台層**：首批雲端採用者是否公布各三軸組態的交換器數、部署位置、可靠度、修復時間或節能實際值；若只停在 IA、展示或少量部署，量產解讀不升級。
 - **公司層**：3711 是否拆出光電共同封裝的收入／毛利；6147、6451 是否由送樣或小量生產轉為正式量產收入。沒有公司文件，就不把平台證據寫進正式筆記事實。
 - **經濟層**：新增封裝與測試內容量是否高於所需資本支出、良率爬坡與維修成本；若收入增加但毛利、現金流未改善，受惠只停在營收表面。
+
+<!-- research_source
+source_id: S18
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: Vera Rubin Ramps Into Full Production 原稿的產品主詞複核
+published_at: 2026-05-31
+captured_at: 2026-09-09
+accepted_at: 2026-09-09
+status: active
+url: https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory
+locator: News Summary 第四點及 Building the Fabric for Million-GPU AI Factories 首段；Spectrum-X 的動詞是 now in production，非標題的 Vera Rubin full production
+limitation: S1 同一原稿的精確定位修正，不是第二個獨立來源或九月新量產里程碑；沒有出貨數、客戶驗收及財務歸因
+independence_group: nvidia
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: NVIDIA 2026-05-31 原稿將 Spectrum-X Ethernet Photonics 描述為 now in production；同文 full production 的主詞是 Vera Rubin
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-05-31
+basis: correction_of:C1；依 S18 兩處完整產品名與動詞核對，縮窄舊 C1 的 full production 歸屬
+boundary: 只證實發行人原文的產品階段用詞，不代表停止生產、部署數量、份額或台灣公司收入；較早原稿不刷新 C9 主命題時鐘
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C1
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- transition
+date: 2026-09-09
+from: triaged
+to: triaged
+reason: narrow_spectrum_x_production_wording_to_original_subject_without_refreshing_thesis_clock
+evidence: sources:S18
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C24,C6,C7,C8,C9,C10
+metric: 具名 AI 光學產品的 optical-engine placement、signal-processing mode、laser placement、標準版本、跨廠互通、field replacement、可靠度與部署分母
+source_ids: S18,S3,S4,S8,S9,S10,S11
+watch_source_ids: S6,S11
+frequency: event_driven
+frequency_detail: 每兩週核對 OIF current work、平台產品與公司正式文件；出現新 IA、具名 NPO／ELS 組態、互通矩陣或客戶部署即重審
+next_check: 2026-08-26
+trigger: 同一具名產品首次公開三軸組態，並至少提供跨廠互通、應用 link budget、現場更換／可靠度或客戶部署分母之一
+invalidation: 若後續多個產品世代仍把位置、訊號處理與雷射固定成不可拆的單一組合，且 NPO／ELS 長期沒有具名實作或互通結果，三軸作為商用產品組合框架的信心下修
+-->

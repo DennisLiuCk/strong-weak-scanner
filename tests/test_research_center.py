@@ -5718,10 +5718,10 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("transition", 11),
-            ("research_source", 17), ("research_claim", 23),
+            ("research_topic", 1), ("transition", 12),
+            ("research_source", 18), ("research_claim", 24),
             ("metric_comparison", 0), ("impact", 1),
-            ("monitoring_item", 4),
+            ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -8979,8 +8979,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 21),
-            ("research_claim", 14), ("metric_comparison", 8),
+            ("research_topic", 1), ("research_source", 23),
+            ("research_claim", 16), ("metric_comparison", 10),
             ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9016,7 +9016,7 @@ class ResearchCenterTest(unittest.TestCase):
             / "inference_compute_test_demand.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 推論晶片測試需求八分母", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
         for node in (
             "from_id: company:advantest", "from_id: company:teradyne",
             "from_id: company:amazon", "from_id: company:microsoft",
@@ -9272,8 +9272,8 @@ class ResearchCenterTest(unittest.TestCase):
                       "frequency_detail", "next_check", "trigger", "invalidation"):
             self.assertEqual(monitors["T11"][field], monitors["T10"][field], field)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 34),
-            ("research_claim", 32), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 35),
+            ("research_claim", 33), ("metric_comparison", 0),
             ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9318,8 +9318,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 34),
-            ("research_claim", 32), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 35),
+            ("research_claim", 33), ("metric_comparison", 0),
             ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9361,8 +9361,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 34),
-            ("research_claim", 32), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 35),
+            ("research_claim", 33), ("metric_comparison", 0),
             ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
