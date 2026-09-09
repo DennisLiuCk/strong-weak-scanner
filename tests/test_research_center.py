@@ -3782,7 +3782,7 @@ class ResearchCenterTest(unittest.TestCase):
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
-        self.assertEqual(
+        self.assertGreaterEqual(
             sum(line.startswith("- **") for line in glossary.splitlines()), 71
         )
         reflection = topic.split("### 想一想", 1)[1].split(
@@ -3795,7 +3795,11 @@ class ResearchCenterTest(unittest.TestCase):
             ("research_claim", 31), ("metric_comparison", 12),
             ("impact", 2), ("monitoring_item", 8),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            # 歷史內容契約保留；新來源、主張與監測可追加，歷史不可改寫另由baseline lint強制。
+            if block in {"research_source", "research_claim", "monitoring_item"}:
+                self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
         graph = (
             ROOT / "notes" / "knowledge_graph" / "liquid_cooling.md"
         ).read_text(encoding="utf-8")

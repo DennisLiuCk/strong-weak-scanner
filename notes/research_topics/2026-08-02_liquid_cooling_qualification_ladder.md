@@ -114,6 +114,8 @@ evidence: sources:S21
 
 ### 名詞小字典
 
+- **Pecos**：美國德州的一個場址；本文指Microsoft公布的資料中心建設計畫，不能與其其他德州園區的營運成績混用。
+
 - **液冷**：用液體把伺服器產生的熱帶走。它是一整套散熱方式，可能包含冷板、管路、泵浦、熱交換器、控制系統與機房冷卻設備，不等於只買一台 CDU。
 - **CDU（Coolant Distribution Unit）**：冷卻液分配單元，透過泵浦、熱交換器與控制系統，把伺服器迴路的熱帶走。它不是 GPU 上的冷板，也不等於機房產生冷水的 chiller。
 - **額定容量**：設備在指定測試條件下，設計上可帶走的熱量。它回答「能處理多少熱」，不回答效率、可靠度、客戶採用或公司收入。
@@ -1145,6 +1147,151 @@ to: triaged
 reason: liteon_dcx_strategic_investment_added_without_financial_thesis_clock_refresh
 evidence: sources:S23,S24
 -->
+
+<!-- transition
+date: 2026-09-10
+from: triaged
+to: triaged
+reason: institutional_power_water_constraints_cross_checked_with_pecos_plan_without_product_revenue_clock_refresh
+evidence: sources:S25,S26
+-->
+
+<!-- research_source
+source_id: S25
+role: market_estimate
+source_kind: document
+publisher: Goldman Sachs Research
+title: The Outlook for Data Center Power Demand as AI Token Use Grows — Exchanges transcript
+published_at: 2026-09-01
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://www.goldmansachs.com/insights/goldman-sachs-exchanges/the-outlook-for-data-center-power-demand-as-ai-token-use-grows
+locator: Brian Singer 的第七個P physical environment段、Carly Davenport 的 nationwide power shortage及behind-the-meter bridge段；官方逐字稿
+limitation: 機構分析及預測，不是場址性能測試；其區域供需判讀不能推成全美缺電或台廠訂單。原始HTML已保存於tmp，SHA256 775fab4de50852a456300078c02afc90d2fcfb902d6e13c2321edb28d2ab24b1
+-->
+
+<!-- research_source
+source_id: S26
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: Powering the next wave of AI: Expanding capacity with our new datacenter in Pecos
+published_at: 2026-06-22
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://blogs.microsoft.com/blog/2026/06/22/powering-the-next-wave-of-ai-expanding-capacity-with-our-new-datacenter-in-pecos/
+locator: Noelle Walsh署名與日期；Advancing sustainability through innovation之Energy and emissions、Water stewardship段
+limitation: will／anticipate／plan／expected均為公司計畫，沒有已營運的水電基線、冷卻系統用電、維修補水或供應商；初次充填後穩態不另耗水不等於整座園區全生命週期零用水。直接HTTP403，已讀官方web全文並保存工具文字截取而非原始HTML
+-->
+
+<!-- research_source
+source_id: S27
+role: company_release
+source_kind: living_index
+publisher: Microsoft
+title: Microsoft Local — Texas community updates
+published_at:
+captured_at: 2026-09-10
+accepted_at: 2026-09-10
+status: active
+url: https://local.microsoft.com/communities/americas/greater-san-antonio/
+locator: 當日Local updates可見Open letter to Pecos and Reeves County；該公開信明示此Texas頁為後續進度入口
+limitation: 索引含多個Texas場址，頁面會改變；僅作未來查找Pecos具名進度的入口，不能把San Antonio施工進度代填Pecos，也不證明本輪完成全部更新普查
+-->
+
+<!-- research_claim
+claim_id: C32
+label: inference
+status: active
+claim: 高盛2026-09-01所述的場址氣候、水電取捨與表後供電橋接，應解讀為需逐區域檢查的部署條件，不能擴張成全美普遍缺電或所有省水設計必然更耗電
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-09-10
+basis: 逐字稿同時提出physical environment及bridge solution，並明說不預測全美普遍短缺；研究端據此把總量敘事縮到區域與方案條件
+boundary: 這是對機構論述適用範圍的研究判讀；沒有實測冷卻效能、區域缺電機率或表後方案按期接網的驗證
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C33
+label: verified
+status: active
+claim: Microsoft在2026-06-22的Pecos公告規劃啟用時以同址天然氣表後供電、未來預期接網，並計畫閉式冷卻於初次充填後穩態運作不額外耗水
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-09-10
+basis: S26的能源與用水段直接交代各項計畫與expected邊界；正式日期早於本輪捕捉日
+boundary: 公司計畫不是竣工或實測；沒有公開Pecos的冷卻用電、全年取水、維修補水、供應商與實際營運日期，不能由此證明全園區零用水或低耗電
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C34
+label: inference
+status: active
+claim: 液冷研究應把場址供電、冷卻水與電耗、設備驗收分開追蹤；機構的總需求論述與Pecos計畫提供研究線索，尚不能合併成台廠具名CDU的商業證據
+supporting_source_ids: S25,S26
+contrary_source_ids:
+as_of: 2026-09-10
+basis: S25指出總需求與場址限制可同時存在，S26提供買方計畫案例但未列設備與實績，因此新增場址檢查而非修改原產品財務判定
+boundary: 兩條獨立發布鏈不是同場址的預測驗證；本輪未估CDU台數、電力缺口、節水率、台廠訂單或投資報酬，也不刷新C21主命題
+verification_needed: 同一場址公布通電與營運日期、相同工作負載及氣候下的水電指標、具名設備驗收和供應商財務
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T9
+status: active
+claim_ids: C32,C33,C34
+metric: Pecos供電階段、閉式冷卻實績與具名場址驗收
+source_ids: S25,S26
+watch_source_ids: S27
+frequency: monthly
+next_check: 2026-10-10
+trigger: Microsoft或具名合作方公布Pecos啟用、接網、同工作負載水電實測及設備驗收，足以區分建設計畫與營運結果
+invalidation: 官方取消或延後Pecos供電／冷卻方案，或實測顯示穩態補水及用電條件不同於原計畫；未披露不是零耗水或計畫失敗
+-->
+
+## 9 月 10 日機構情報：省水、接電與液冷，開始決定資料中心怎麼蓋
+
+**新的研究重點，是設備放在哪裡運轉。** 高盛9月1日的公開研究談話把高溫、濕度及乾旱
+納入資料中心限制：某些場址必須在少用水與少耗電之間取捨。分析師同時明說沒有預測全美
+普遍缺電。因此「AI需要更多電」應接著問哪個地區、哪種供電方式及何時可用，不能一概
+當成散熱設備需求增加。[S25](https://www.goldmansachs.com/insights/goldman-sachs-exchanges/the-outlook-for-data-center-power-demand-as-ai-token-use-grows)
+
+**客戶已提出對應做法，但尚未交出運轉成績。** Microsoft 6月22日公布的Pecos計畫預期
+初期用園區旁的天然氣設施直接供電，未來再接公共電網；冷卻系統則計畫於初次充填後，在
+穩態運作中不額外耗水。這是本輪補讀的較早公司公告，不是9月新開幕。閉式循環也不能
+被改寫成整座園區全生命週期零用水，公告並未提供可比較的冷卻用電實績。
+[S26](https://blogs.microsoft.com/blog/2026/06/22/powering-the-next-wave-of-ai-expanding-capacity-with-our-new-datacenter-in-pecos/)
+
+**對台股的價值，在於把待查問題問得更精確。** 以下是研究端由兩份原文推導的檢查方向
+（C34），不是Pecos供應商名單，也沒有把場址規劃換算成台廠訂單。
+
+| 研究環節 | 接下來應查什麼 | 什麼情況會縮窄判讀 |
+|---|---|---|
+| 散熱 | 目標場址的環境溫度、取水條件與冷卻用電，能否對回同一套設備驗收 | 只報省水，未交代增加的用電或維修條件 |
+| 電源供應 | 初期供電與未來接網的時程、備援要求是否已落到客戶規格 | 用電計畫改期，設備仍在準備或驗證階段 |
+| 個股研究 | 先沿本文3017、2308、2301既有產品證據，查具名客戶驗收與收入 | 只有平台列名、總體液冷占比或同業新聞，仍無本公司產品對應 |
+
+機會與風險可能同時增加：需要更完整的場址整合，並不保證建設或收入認列更快。
+下一次人工查核訂在**10月10日**，從Microsoft的
+[Texas進度入口](https://local.microsoft.com/communities/americas/greater-san-antonio/)找Pecos的
+具名更新；若仍只有計畫，就保留待驗證。這次增加場址支線，原有產品財務主命題及逾期
+提示照常保留。
 
 ## 9 月 3 日更新：25% 投資把哪一關往前推？
 
