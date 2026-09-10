@@ -10,7 +10,7 @@ schema_version: 2
 radar_id: RADAR-2026-09-10-01
 as_of: 2026-09-10
 next_review: 2026-09-17
-status: active
+status: retired
 method: 先由高盛、Morgan Stanley與S&P官方公開研究提出問題，再用公司原始文件核對事實與反方。三題均補進既有文章，分清預測、公司計畫與實績；本輪為定向抽樣，不代表全站已更新或台灣公司已受惠。排序只決定本輪研究順序
 selection_cycle_id: RS-2026-09-10-01
 -->

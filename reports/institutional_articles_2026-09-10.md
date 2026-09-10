@@ -103,3 +103,23 @@
   PYTHONUTF8）下692項測試、六lint及隔離build通過，正式DB與既有archive雜湊不變。
   最終文章與四條圖譜再次離線快查無阻擋；Chrome1440／390／320px實開正文及表格，
   無JS錯誤或水平溢出，已目視桌機、手機導讀與窄幅深色表格。
+
+## 逐篇發布與雷達驗收
+
+| 段落 | 獨立commit | 推送及部署核對 |
+|---|---|---|
+| 研究前固定三題取捨 | `31ce132` | 已先於三篇研究提交及推送 |
+| Beacon Point分期交付 | `a027263` | GitHub檢查成功，Pages built為同一commit |
+| GE Vernova設備轉單 | `966b58a` | GitHub檢查成功，Pages built為同一commit |
+| 鎵與基板出口許可 | `bdb0e54` | GitHub檢查成功，Pages built為同一commit |
+
+- 新現行雷達`RADAR-2026-09-10-02`逐一連到三篇新文章及各自圖譜；兩題為
+  `promoted_after_research`，材料題為`promoted_from_watch`。研究前priority、rank、
+  first rejection及next evidence與凍結列逐字一致，前一輪退役後仍保留全部候選。
+- 方法文件加入交易參與角色、模型日期及六篇試讀入口。人工回查日期不等於排程，
+  本次沒有新增自動化，也未刷新舊議題主命題的到期時鐘。
+- `radar-publish-check`在macOS26.6.2 arm64／預設Python3.11.11（UTF-8 mode0，
+  PYTHONUTF8未設定）下692項測試、六lint及隔離build通過；正式DB與46份既有archive
+  雜湊不變。`radar_qa.mjs`於Chrome1440／390／320px逐題開文、定位新段落再返回同一
+  雷達，全部無JS錯誤及水平溢出；已目視桌機與手機頁面。測試與payload檢查都是
+  本輪內容／流程驗收，不能作為投資命中率或來源絕對正確的證明。

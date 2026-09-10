@@ -11,6 +11,8 @@
 | 全球投行研究 | [Goldman Sachs Exchanges，2026-09-01](https://www.goldmansachs.com/insights/goldman-sachs-exchanges/the-outlook-for-data-center-power-demand-as-ai-token-use-grows)；[Morgan Stanley，2026-06-08](https://www.morganstanley.com/insights/podcasts/thoughts-on-the-market/high-cost-of-AI-memory-shawn-kim) | 找需求、成本與瓶頸的機制，以及研究者的分歧 | 官方逐字稿證明研究者說了什麼；預測不等於實績。公開稿通常不足以重算完整模型 |
 | 評級機構的產業分析 | [S&P Global Ratings，2026-08-27 研究發布稿](https://press.spglobal.com/2026-08-27-AI-Infrastructure-Investment-To-Exceed-1-3-Trillion-By-2027,-S-P-Global-Ratings-Says) | 找現金流、契約義務、資本支出與融資風險 | 發布稿不是完整報告；信用風險觀點不能當成股票估值或買賣結論 |
 | 供應鏈研究 | [S&P Global Market Intelligence，2026-07-28](https://www.spglobal.com/market-intelligence/en/news-insights/research/2026/07/behind-ai-boom-electronics-supply-side-constraints) | 找跨產品供需、材料成本與替代技術的反方 | Market Intelligence 與 Ratings 分開標示；同集團觀點不算兩條獨立消息鏈 |
+| 機構交易案例 | [J.P. Morgan，2026-08-10](https://www.jpmorgan.com/insights/banking/capital-markets/financing-ai-infrastructure-data-centers) | 找具名專案，再按期別回查租約、融資、工程與交付 | 發布者可能參與融資交易；應揭露角色，不能當同案獨立信用背書 |
+| 金融資料機構分析 | [MSCI，2026-07-16](https://www.msci.com/research-and-insights/quick-take/critical-mineral-restrictions-reveal-hidden-risk) | 找供應鏈間接依賴，沿產品與目的地查公司證據 | 模型資料截點與文章日期分開；自家資料產品有商業利益，模型依賴不能換成已發生缺貨 |
 | 公司、客戶與電網原始文件 | 公司 IR／監管申報／電網正式公告，依每篇主張另查 | 核對產品、支出、合約、時程及實際營運指標 | 管理層計畫仍是計畫；產品能力不能直接當成具名訂單或題材獲利 |
 
 機構可靠度與主張證據力分開看。沒有作者、正式日期、可讀正文或清楚口徑的內容，
@@ -45,20 +47,31 @@
 「記憶體漲價」不能省略下游客戶成本，「資料中心需求成長」不能省略接電與驗收，
 「資本支出增加」不能省略現金支出、租賃與收入回收之間的差別。
 
-## 本輪試作與後續判斷
+## 人工試作與後續判斷
 
-2026-09-10 的選題凍結為 `RS-2026-09-10-01`：依序補液冷／場址限制、AI 支出／融資、
-記憶體／上下游成本三篇既有研究。這是定向抽樣；不代表重查了全站公司筆記或全部舊候選。
-本輪先人工執行，不新增排程。
+2026-09-10先以`RS-2026-09-10-01`依序補液冷／場址限制、AI支出／融資、記憶體／
+上下游成本三篇既有研究；`RS-2026-09-10-02`再以具名案例新建分期交付、設備轉單與
+材料許可三篇文章。每題研究前均固定取捨，各篇分開commit及push。材料題先列watch，
+取得可核實日期的另一機構原文後才升格，初始紀錄不回寫。
+
+這些是定向抽樣；不代表重查了全站公司筆記或全部舊候選。目前人工執行，不新增排程。
 
 review 時看資訊是否有增量、原文是否能定位、事實與預測是否分清，以及下一步是否真的
-能执行。後續若要自動化，可先自動發現官方新文件與做去重，保留人工作主張裁決；
-是否值得採用，由這輪網站內容的實際品質決定。
+能執行。後續若要自動化，可先自動發現官方新文件與做去重，保留人工作主張裁決；
+是否值得採用，由網站內容的實際品質決定。
 
 ## 已發布的試讀入口
 
 從[研究雷達](https://dennisliuck.github.io/strong-weak-scanner/research.html#radar)可依凍結順序
-進入三篇既有文章；各篇新增「9月10日機構情報」段。下次日期是人工查核待辦，不是排程。
+進入第二輪三篇案例；第一輪的既有文章增量仍保留。下次日期是人工查核待辦，不是排程。
+
+| 新案例與文章 | 查核重點 | 後續文件／人工回查日 |
+|---|---|---|
+| [機房分期交付](https://dennisliuck.github.io/strong-weak-scanner/research.html#topic-MI-2026-09-10-DC-PHASE-DELIVERY) | J.P. Morgan案例對照Hut 8逐期融資、通電及資料廳目標 | Hut 8官方公告及新季報；10/10 |
+| [電力設備轉單](https://dennisliuck.github.io/strong-weak-scanner/research.html#topic-MI-2026-09-10-POWER-EQUIPMENT-CONVERSION) | S&P MI背景對照GE Vernova預約、訂單、出貨、施工條件與預付款 | GE Vernova第三季附件；10/31 |
+| [材料許可與交付](https://dennisliuck.github.io/strong-weak-scanner/research.html#topic-MI-2026-09-10-GALLIUM-PERMIT-DELIVERY) | MSCI上游依賴對照AXT基板種類及目的地差異 | AXT申報的許可與同產品交付；10/1 |
+
+第一輪增量的直接入口：
 
 | 問題與文章 | 本輪查核重點 | 後續文件／人工回查日 |
 |---|---|---|
@@ -67,4 +80,5 @@ review 時看資訊是否有增量、原文是否能定位、事實與預測是�
 | [記憶體成本](https://dennisliuck.github.io/strong-weak-scanner/research.html#topic-MI-2026-08-02-AI-MEMORY-HIERARCHY) | 機構供需框架對照HP買方申報，保留供應改善反方 | 買方及記憶體公司新財報；10/1 |
 
 來源取得方式、SHA、期間核對、失敗記錄及網站驗收見
-[`reports/institutional_intelligence_pilot_2026-09-10.md`](reports/institutional_intelligence_pilot_2026-09-10.md)。
+[`第一輪檢查報告`](reports/institutional_intelligence_pilot_2026-09-10.md)及
+[`第二輪檢查報告`](reports/institutional_articles_2026-09-10.md)。
