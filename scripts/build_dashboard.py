@@ -487,12 +487,13 @@ RESEARCH_LEARNING_ROUTES = [
         "id": "company-finance", "label": "資本投入與公司財務",
         "question": "買方支出如何穿過資產上線與使用，最後落到供應商收入、毛利與現金流？",
         "description": (
-            "建議讀法：先拆開買方 CapEx、上線、利用與現金回收，用機房分期案例對照融資與交付，再把同一方法套到"
+            "建議讀法：先拆開買方 CapEx、上線、利用與現金回收，用機房分期和電力設備案例對照融資、轉單與交付，再把同一方法套到"
             "美國先進封裝的補助、預付款、建設、資格與量產，最後用國巨 Q2 案例練習"
             "把公司總額與題材可歸因貢獻分開。"
         ),
         "graphIds": [
-            "ai-capex-cash-conversion", "dc-phase-delivery", "us-advanced-packaging-regionalization",
+            "ai-capex-cash-conversion", "dc-phase-delivery", "power-equipment-conversion",
+            "us-advanced-packaging-regionalization",
             "yageo-q2-financial-materiality",
         ],
         "phases": [
@@ -500,7 +501,7 @@ RESEARCH_LEARNING_ROUTES = [
                 "id": "buyer-capex-conversion",
                 "label": "買方投入與現金回收",
                 "purpose": "把資本承諾、付款、資產上線、容量使用、收入與買方現金回收分開。",
-                "graphIds": ["ai-capex-cash-conversion", "dc-phase-delivery"],
+                "graphIds": ["ai-capex-cash-conversion", "dc-phase-delivery", "power-equipment-conversion"],
             },
             {
                 "id": "regional-capacity-conversion",

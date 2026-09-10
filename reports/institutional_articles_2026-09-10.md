@@ -36,3 +36,35 @@
   並繼續要求全部現行圖譜只在正式路線出現一次、全部文章都有精確問題入口。
 - Headless Chrome 1440／390／320px實開文章及表格，無JS錯誤或水平溢出；已目視
   桌機與手機，手機表格依現有樣式逐列呈現。最後依複核將第二期時程標明來自8/4季報。
+
+## 第二篇：燃氣設備預約與交付
+
+- 文章：`MI-2026-09-10-POWER-EQUIPMENT-CONVERSION`，7 claims、4 documents及1 living
+  index；圖譜`power-equipment-conversion`含公司出貨及四項查核欄位，沒有台廠收益線。
+- S&P Global Market Intelligence 7/28官方文章提供電力設備交期背景，核對發行部門為
+  MI而非Ratings。GE Vernova的7/22新聞稿、同日10-Q、官方逐字稿為同一公司消息鏈；
+  10-Q報告期6/30，SEC filing index核對7/22及CIK 1996810，排除搜尋中的GE Aerospace。
+  公司披露日與9/10核對日分開；10/28法說為當日IR索引可見的未來安排。
+- 直接核對Q2新增18 GW預約與2 GW訂單、10 GW既有預約轉單、3 GW出貨及季末53/63 GW
+  分列存量。116 GW是公司原文含預約合計，並非全部確定訂單；沒有逐批相除或補出取消量。
+  RPO美元金額含設備服務；現金流為半年口徑。GW沿用公司約數，未附量測誤差，單公司
+  單季不是估計產業轉換率的樣本；SE/t不適用於本文直接摘錄。
+- 管線與EPC承諾是管理層所述轉單流程；未驗證各專案工程。Q3起每季5 GW及年化20 GW
+  為未來預期，沒有寫成已完成年度產量。預付款、交付及收入認列分時，未歸因全部現金流。
+- 核心web工具實際輸出SHA256：S1/S2的`turbine-web-05.json`為
+  `d1c545a167dc493e93c252691fa58ea9f7519124ab822decb1f7a35eeed7ed2a`；
+  S3及S5的`03.json`為`a5fee93495a0c2dddca4980f020e59e9e0c9b530ed8c7aea9e126db06560fe21`；
+  SEC日期索引`07.json`為`a13ee82c1b256340c614a68b8eb01d9de2e199866d9ef8bcd58622b3ba6b678f`。
+  這些是當次工具提取，不宣稱完整原始HTML。公開PDF則取得HTTP200，SHA256為
+  `3e2125dc07790ecf638b321afc900707aded25c808127b7a6cb1186eec8bbc94`。
+- `turbine_evidence/manifest.json` SHA256：
+  `1d3adef614f660491dfec0cf60c0ce14b217299efd9b0ec43267dc05b5417c93`。
+  第二位研究者自行重算22個payload的SHA、大小與0444模式，全部相符；沒有重下載。
+  引用逐字稿p.9、10、14–16已看圖，前後頁8–11、13–16全存；Quartz確認原PDF總共16頁。
+  `tmp/institutional-articles-20260910/turbine_independent_qc.md`記錄裁決與限制。
+  封存用於偵測更動，不是不可繞過的ACL邊界；整合稿另採納GW定義與披露日期兩項小修。
+- `turbine-final-check`：macOS26.6.2 arm64、預設Python3.11.11（UTF-8 mode0，未設
+  PYTHONUTF8）下692項測試、六lint及隔離build通過，正式DB與既有archive雜湊不變。
+  圖譜另經離線快查，五條邊未超出所引主張；Chrome1440／390／320px文章與表格
+  無JS錯誤及水平溢出，已目視桌機、手機與窄幅深色表格。正文來源編號改為可點擊原文，
+  PDF頁碼保留於連結文字；來源及主張帳本內容不變。
