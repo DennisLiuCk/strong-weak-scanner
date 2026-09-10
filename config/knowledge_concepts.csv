@@ -586,3 +586,7 @@ process:ai-ssd-commercial-five-ledger-passport,process,AI SSD 商業五帳護照
 process:cpo-els-serviceability-passport,process,CPO 外部雷射維修八欄護照,CPO ELS serviceability passport|external laser replacement contract,concept:cpo-networking,把系統版本 故障控制定位 替換與映射單元 電源流量狀態 人員備品工具 污染檢查 事件時間軸及換後服務結果綁成可重建維修紀錄 並禁止以個別可控或powered-on替代個別可換hitless與field outcome
 process:emc-emissions-immunity-two-exam-contract,process,EMC 排放與抗擾度兩張考卷契約,EMC emissions immunity two-exam contract|two-page EMC evidence contract,concept:ai-rack-emc-certification,以同一設備版本負載纜線側掛供電接地作共同鍵 並將排放的量測限制判定與抗擾度的施加條件性能判據結果分頁保存 禁止以一張pass代替另一張或客戶與財務證據
 concept:deployment-product-identity,concept,部署產品身分共同鍵,Deployment product identity|產品代別與場站,product:amd-helios,先固定產品代別 品牌系統 場站與日期 再連接交付與驗收 不把同品牌舊代實績挪給新代或以系列名稱代替具名產品
+concept:dc-phase-delivery,concept,資料中心分期交付,Data center phase delivery,,按同一園區的工程期別分開追蹤簽租 融資 通電與資料廳交付
+stage:dc-phase-financing,stage,該期融資完成,Phase financing close,concept:dc-phase-delivery,核對融資是否完成及涵蓋哪一期工程與資金用途
+stage:dc-initial-energization,stage,初次通電,Initial energization,concept:dc-phase-delivery,電力設施開始送電的工程節點 仍須分開核對資料廳交付
+stage:dc-data-hall-delivery,stage,資料廳交付,Data hall delivery,concept:dc-phase-delivery,向客戶交付約定資料廳及設施的節點 不等同整個園區一次完工
