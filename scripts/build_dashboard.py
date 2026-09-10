@@ -462,18 +462,18 @@ RESEARCH_LEARNING_ROUTES = [
         "id": "policy-compliance", "label": "政策與合規",
         "question": "政策與法規如何穿過商品分類、法域與資格驗證，最後才可能影響公司財務？",
         "description": (
-            "建議讀法：先看跨境關稅如何按商品、原產地與交易責任分流，再看化學物質"
+            "建議讀法：先看跨境關稅如何按商品、原產地與交易責任分流，用基板出口案例分清產品與目的地許可，再看化學物質"
             "法規如何按用途、法域與變更資格逐關落地。"
         ),
         "graphIds": [
-            "section301-taiwan-exposure", "semiconductor-pfas-exposure",
+            "section301-taiwan-exposure", "gallium-permit-delivery", "semiconductor-pfas-exposure",
         ],
         "phases": [
             {
                 "id": "trade-border-policy",
-                "label": "跨境關稅與交易責任",
-                "purpose": "先把國家稅率拆成 HTS、豁免、原產、進口責任、成本轉嫁與公司財務七關。",
-                "graphIds": ["section301-taiwan-exposure"],
+                "label": "跨境交易與出口許可",
+                "purpose": "先分清商品分類、原產地與交易責任，再用公司案例核對產品、目的地、出口許可與交付。",
+                "graphIds": ["section301-taiwan-exposure", "gallium-permit-delivery"],
             },
             {
                 "id": "substance-regulation",

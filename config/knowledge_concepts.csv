@@ -595,3 +595,7 @@ metric:gas-backlog-and-reservations,metric,分列預約與訂單,Gas backlog and
 capability:gas-project-construction-readiness,capability,管線與施工準備,Gas project construction readiness,product:gas-power-equipment,核對管線 工程總包及設備安排是否有明確相容時程
 metric:equipment-prepayments-and-obligations,metric,預付款與履約義務,Equipment prepayments and obligations,product:gas-power-equipment,收到客戶款項時仍須分開看設備服務義務 交付與收入時點
 stage:gas-equipment-commissioning,stage,客戶現場投運,Gas equipment commissioning,product:gas-power-equipment,設備出貨後的安裝 測試與投入運轉 依機型及專案分別核對
+product:gaas-substrate,product,砷化鎵基板,GaAs substrate,,由鎵和砷形成的化合物半導體基板 應與磷化銦分開核對用途與業務
+capability:gallium-refining-recovery,capability,鎵回收與提純能力,Gallium refining and recovery,product:gaas-substrate,從原料走到合格鎵材料的回收與提純能力 不等同即時可交付產量
+metric:destination-export-permit,metric,目的地分列的出口許可,Destination export permit,product:gaas-substrate,依公司 產品 目的地與日期分列批准狀態 不把單一路線擴成全面斷供
+stage:substrate-delivery-verification,stage,同產品交付查核,Substrate delivery verification,product:gaas-substrate,將同種基板的許可 出貨 客戶收貨與收入分別核對 不用其他產品需求代證

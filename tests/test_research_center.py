@@ -8055,7 +8055,7 @@ process.stdout.write(JSON.stringify(results));
         )
         self.assertEqual(
             route["graphIds"],
-            ["section301-taiwan-exposure", "semiconductor-pfas-exposure"],
+            ["section301-taiwan-exposure", "gallium-permit-delivery", "semiconductor-pfas-exposure"],
         )
         phase = next(
             row for row in route["phases"]
@@ -8353,7 +8353,7 @@ process.stdout.write(JSON.stringify(results));
         )
         self.assertEqual(
             route["graphIds"],
-            ["section301-taiwan-exposure", "semiconductor-pfas-exposure"],
+            ["section301-taiwan-exposure", "gallium-permit-delivery", "semiconductor-pfas-exposure"],
         )
         self.assertEqual(
             [phase["id"] for phase in route["phases"]],
