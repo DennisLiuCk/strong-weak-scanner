@@ -842,7 +842,9 @@ invalidation: 新正式文件撤回或實質改變本文所用的 10% 合計公�
 
 <!-- monitoring_item
 monitor_id: T4
-status: active
+status: retired
+retired_at: 2026-09-13
+retirement_reason: 原監看入口只有USTR，未覆蓋trigger具名的BIS／OFAC／NIST；T5接續並保留原條件與期限，修補來源路由而非重設證據時鐘
 claim_ids: C7,C8,C9,C10
 metric: 關稅、EAR 出口管制、OFAC 制裁與技術合格評定四份底稿的制度欄位及具名產品閉合度
 source_ids: S7,S8,S9,S10,S11
@@ -860,3 +862,162 @@ invalidation: 新正式規則使本文四分法的適用範圍或結果需要重
   猜 HTS code。
 - 只對有一手資料可重建美國出貨與關稅承擔的公司建立 impact；其餘保持政策觀察。
 - 若產品被豁免或公司不是台灣原產直出，不應留下公司層級負面主張。
+
+## 9 月補充：查到名字、取得申請編號，都還不是交易許可
+
+**先分辨警報來自哪一套制度。** OFAC 9/9 更新的 FAQ 5 明說，查核工具可以同時
+搜尋不同機關的名單；名字或地址相似，仍須比對完整身分與適用制度，再判斷授權及處理方式。
+本文舊 C8 引用 FAQ 56 的「不能合併」是法律要求不能混為一套，不能讀成搜尋工具不能整合。
+舊來源與主張保留，這裡補清工具層與法律層的差別。[S9][S10][S14]
+
+**分開看授權文件與申請進度。** 一般授權公開列出適用条件；符合條件時不需另求授權。
+個別授權則是給特定申請人與交易的非公開文件。因此，公開網站找不到某公司的許可，
+不足以判定它沒有許可。Case ID 與 Reference ID 用來追蹤申請，不能當成已批准。[S15][S16]
+
+**把問題帶回同一笔交易。** 新手先記住：搜尋警報、確認身分、適用授權與最後處理是不同
+步驟。想一想：看到「已提出申請」後，你還需要哪份文件，才能知道授權涵蓋的對象、交易、
+條件與期限？接下來追 OFAC 更新入口及實際適用文件；沒有同一產品和交易底稿，仍是待驗證。
+本段不是法律意見或任何公司的合規判定，也不改變台灣關稅公式、公司曝險或 C6 的舊時鐘。
+
+<!-- research_source
+source_id: S14
+role: regulator_or_policy
+source_kind: document
+publisher: OFAC
+title: FAQ 5 制裁警報與有效身分命中的查核步驟（9/9更新版）
+published_at: 2026-09-09
+captured_at: 2026-09-13
+accepted_at: 2026-09-13
+status: active
+url: https://ofac.treasury.gov/faqs/5
+locator: Date Updated September 9 2026（非原始2015-01-30）；Steps1–6，尤以Step1多機關screening、Step3身分比對、Steps4–6授權處理及紀錄；更新公告https://ofac.treasury.gov/recent-actions/20260909
+limitation: 更新後通用指引，不是本輪逐條法律修訂對照或任一公司交易的制裁認定；不得把工具彙整名單讀成法律效果統一
+independence_group: ofac-sanctions
+-->
+
+<!-- research_source
+source_id: S15
+role: regulator_or_policy
+source_kind: document
+publisher: OFAC
+title: FAQ 74 一般與個別授權（9/9更新版）
+published_at: 2026-09-09
+captured_at: 2026-09-13
+accepted_at: 2026-09-13
+status: active
+url: https://ofac.treasury.gov/faqs/74
+locator: Date Updated September 9 2026（非原始2016-06-16）；General License、Specific License與全部條件／紀錄／報告段
+limitation: 通用定義不證明任何具名公司持有許可或交易符合條件；個別授權非公開，不能以公開索引未列判定不存在
+independence_group: ofac-sanctions
+-->
+
+<!-- research_source
+source_id: S16
+role: regulator_or_policy
+source_kind: document
+publisher: OFAC
+title: FAQ 1269 個別授權申請的Case ID與Reference ID
+published_at: 2026-09-09
+captured_at: 2026-09-13
+accepted_at: 2026-09-13
+status: active
+url: https://ofac.treasury.gov/faqs/1269
+locator: 2026-09-09；Case Identification Number、Reference ID及Application Alias定義與狀態追蹤段
+limitation: 申請追蹤識別不是已發個別授權；未登入或取得任何私人申請資料
+independence_group: ofac-sanctions
+-->
+
+<!-- research_source
+source_id: S17
+role: regulator_or_policy
+source_kind: living_index
+publisher: OFAC
+title: Recent Actions 更新入口
+published_at:
+captured_at: 2026-09-13
+accepted_at: 2026-09-13
+status: active
+url: https://ofac.treasury.gov/recent-actions
+locator: 日期、FAQ修訂、授權與法規更新鏈；本輪由9/9項目定位S14–S16
+limitation: 入口本身不判定制裁命中、公司許可或交易是否合法；不同公告不能任意套到台灣公司
+independence_group: ofac-sanctions
+-->
+
+<!-- research_source
+source_id: S18
+role: regulator_or_policy
+source_kind: living_index
+publisher: NIST
+title: Standards.gov What We Do 合格評定入口
+published_at:
+captured_at: 2026-09-13
+accepted_at: 2026-09-13
+status: active
+url: https://www.nist.gov/standardsgov/what-we-do
+locator: Conformity Assessment及resources、NVCASE、NVLAP、MRAs後續文件入口；頁尾更新2023-07-13，非9月新標準
+limitation: 只補監測路由，不是具名產品測試、客戶資格、簽收或財務證據
+independence_group: nist-conformity-assessment
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: OFAC 9/9更新FAQ5明載screening可整合其他機關名單，但須辨明警報的制度、完整身分、授權與後續處理；BIS的CSL入口也彙整多機關名單，工具整合不表示法律要求相同
+supporting_source_ids: S14,S9,S10
+contrary_source_ids:
+as_of: 2026-09-09
+basis: S14 Step1與Steps3–6，S9 CSL段及S10制度差異共同區分搜尋工具與法律結果；澄清C8可能的工具層誤讀，並非宣稱FAQ56被撤回
+boundary: 不能據此判定任一具名公司命中、未命中、所有權、封鎖、拒絕或可出貨；沒有改動關稅公式
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: verified
+status: active
+claim: OFAC FAQ74把一般授權界定為公開且符合條件時不需另求授權，把個別授權界定為針對特定申請人及交易的非公開文件，兩者仍须符合各自條件
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-09-09
+basis: S15 General License、Specific License與最後條件段直接支持
+boundary: 公開查無個別授權不能證明不存在；本文沒有取得任何公司的實際授權或法律適用判定
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: inference
+status: active
+claim: 申請Reference ID或受理後Case ID只能證明申請追蹤階段，不能替代已發個別授權及同一交易的適用條件核對
+supporting_source_ids: S15,S16
+contrary_source_ids:
+as_of: 2026-09-09
+basis: S16分開提交識別與開始處理後的案件識別，S15另定義實際發給申請人的交易授權文件，因此不能跨階段代換
+boundary: 研究證據門檻不是OFAC個案決定或法律意見，也不能由申請未公开推未獲批准
+verification_needed: 同一申請人與交易的實際授權文件、條件、期限及負責人核對
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C7,C8,C9,C10,C15,C16,C17
+metric: 關稅、EAR 出口管制、OFAC 制裁與技術合格評定四份底稿的制度欄位及具名產品閉合度
+source_ids: S7,S8,S9,S10,S11,S14,S15,S16
+watch_source_ids: S4,S6,S7,S8,S9,S17,S18
+frequency: event_driven
+next_check: 2026-08-26
+trigger: BIS／OFAC／NIST 更新通用判斷架構，或公司與交易對手首次對同一具名產品公開 HTS／origin、ECCN／destination／parties／end use、制裁授權及 qualification pass／change control
+invalidation: 新正式規則使本文四分法的適用範圍或結果需要重畫，或產品個案證明本文把不同制度的責任與授權錯接
+-->
+
+<!-- transition
+date: 2026-09-13
+from: triaged
+to: triaged
+reason: add_ofac_screening_authorization_boundaries_and_repair_monitor_source_routing_without_thesis_clock_refresh
+evidence: sources:S14,S15,S16,S17,S18
+-->

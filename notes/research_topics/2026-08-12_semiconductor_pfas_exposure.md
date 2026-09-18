@@ -56,6 +56,14 @@ reason: separated_outside_one_regulation_intentionally_added_free_of_and_non_det
 evidence: sources:S17,S18,S19,S20,S21,S22,S23,S24,S25
 -->
 
+<!-- transition
+date: 2026-09-18
+from: triaged
+to: triaged
+reason: corrected_omitted_tsca_reporting_backstop_from_existing_april_rule_without_thesis_clock_refresh
+evidence: sources:S26,S27
+-->
+
 <!-- research_source
 source_id: S1
 role: regulator_or_policy
@@ -527,18 +535,18 @@ resolution:
 <!-- research_claim
 claim_id: C5
 label: verified
-status: active
+status: superseded
 claim: 美國 TSCA section 8(a)(7) 是對 2011 年以來製造或進口 PFAS／含 PFAS articles 的一次性歷史資料申報與保存義務，不是 PFAS 使用禁令；2025 proposed exemptions 尚未定案，2026 final action 又把申報起點移到 scope revision 生效後 60 日
 supporting_source_ids: S6,S7
-contrary_source_ids:
+contrary_source_ids: S26
 as_of: 2026-08-12
 basis: S6 rule scope／updates 與 S7 finalized start-date change
 boundary: EPA rule definition、covered persons、reasonable-known-or-ascertainable information 與最終 exemptions 仍需依正式 revision 判定；本文不提供個別企業法律建議
 verification_needed:
 correction_kind:
 corrects_claim_id:
-corrected_by_claim_id:
-resolution:
+corrected_by_claim_id: C23
+resolution: 2026-09-18 回查 2026-04-13 正式規則發現原句漏掉 2027-01-31 backstop 與取較早者；S26 縮窄的是申報起點表述，不推翻歷史申報不是使用禁令，C23 保留正確範圍並補齊條件
 -->
 
 <!-- research_claim
@@ -830,6 +838,55 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_source
+source_id: S26
+role: regulator_or_policy
+source_kind: document
+publisher: United States Environmental Protection Agency / Federal Register
+title: Modification to the Start of the Submission Period for PFAS Reporting and Recordkeeping Under TSCA 8(a)(7), 91 FR 18786–18789
+published_at: 2026-04-13
+captured_at: 2026-09-18
+accepted_at: 2026-09-18
+status: active
+url: https://www.govinfo.gov/content/pkg/FR-2026-04-13/pdf/2026-07062.pdf
+locator: PDF file p.2／FR p.18787 §I.C 與 file p.4／FR p.18789 §705.20(a)–(c)；2027-01-31 或 paragraph(c)日期後60日取較早、一般6個月及符合條件之小型article importers 12個月；全4頁為引用頁及相鄰頁已渲染核對，SHA-256 7cbe381d27d5b30b85efe97987bd289f1792762ef65d7b898d565eb7803bfba0
+limitation: 這是4月既有規則於9月補讀，不是新政策；paragraph(c)仍待後續Federal Register action給定日期，最終scope／exemptions／後續時程修訂與個別公司適用性不能由本文件推定
+independence_group: us-epa-tsca-pfas
+-->
+
+<!-- research_source
+source_id: S27
+role: regulator_or_policy
+source_kind: living_index
+publisher: Electronic Code of Federal Regulations / United States Environmental Protection Agency
+title: 40 CFR 705.20 — When to report
+published_at:
+captured_at: 2026-09-18
+accepted_at: 2026-09-18
+status: active
+url: https://www.ecfr.gov/current/title-40/chapter-I/subchapter-R/part-705/section-705.20
+locator: 2026-09-18 查閱，Title40顯示up to date as of 2026-09-15；§705.20(a)–(c)仍列2027-01-31或paragraph(c)日期後60日取較早，來源註記91 FR18789／2026-04-13
+limitation: authoritative but unofficial的持續更新彙編；本次只作current-text交叉核對與後續watch，不是新法規、CDX已開放、個別公司法律意見或第二條獨立政策消息鏈
+independence_group: us-epa-tsca-pfas
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: 美國TSCA section8(a)(7)歷史申報義務不是PFAS使用禁令；2026-04-13規則把§705.20的申報起點定為2027-01-31或paragraph(c)所定日期後60日取較早者，§I.C說明後者預定對應forthcoming substantive revision的生效日。一般申報期間6個月；僅依article-importer途徑申報且符合small-manufacturer定義者為12個月。4月規則未定案2025 proposed scope exemptions
+supporting_source_ids: S6,S26
+contrary_source_ids:
+as_of: 2026-09-18
+basis: correction_of:C5；原句只採EPA摘要的60日條件而漏掉正式§705.20(a)–(c)的2027-01-31 backstop及取較早者；S26的§I.C與正式條文直接補足，這是修正既有閱讀缺漏而非9月新政策
+boundary: 本claim只重述4月已發布規則；後續Federal Register action仍可調整時程及適用範圍，未判定任何公司／物質／產品的申報義務、CDX狀態、替代材料需求或財務效果，也不刷新C1主命題時鐘
+verification_needed:
+correction_kind: supersedes
+corrects_claim_id: C5
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -953,7 +1010,27 @@ resolution:
 |---|---|---|---|
 | ECHA 科學評估 | RAC final、SEAC draft consultation 已結束；SEAC 仍評估意見 | SEAC final opinion | 「歐盟已公布最終禁用日」 |
 | 歐盟法律決策 | Commission 尚待兩份 final opinions 後提出 restriction，Member States 再討論表決 | 固定版 Commission text、REACH Committee vote、Official Journal | 「所有半導體 PFAS 同日全面禁止」 |
-| 美國 TSCA 歷史申報 | 2023 rule 存在，2025 scope exemptions 尚為 proposed；2026 action 把起點改為 revision 生效後 60 日 | final scope revision、effective date、submission window | 「EPA 已禁止 2011–2022 使用過的 PFAS」 |
+| 美國 TSCA 歷史申報 | 2023 rule 存在，2025 scope exemptions 尚為 proposed；2026 action 的申報起點含 2027-01-31 與後續指定日後60日取較早條件，詳見下方9月18日補漏 | final scope revision、effective date、submission window | 「EPA 已禁止 2011–2022 使用過的 PFAS」 |
+
+### 9月18日更正：相對日期之外，還有一個最晚起點
+
+原 C5 只寫「revision 生效後60日」，漏讀了正式條文的另一半。9月18日回查
+[4月13日 Federal Register 正式規則](https://www.govinfo.gov/content/pkg/FR-2026-04-13/pdf/2026-07062.pdf)
+file p.2 §I.C 和 file p.4 §705.20，確認申報起點是「2027年1月31日」或後續 paragraph(c)
+所指定日期後60日，**取較早者**；說明段預期該指定日是後續實質修訂的生效日。C5保留為歷史，
+由C23接續。這是讀者現在可見的錯誤修正，不是9月突然發布新政策；4月文件的補讀也沒有使
+8月12日主命題重新變新。
+
+白話說，backstop 是「最晚啟動日」，不是「最晚繳交日」。申報開始後還有申報期間；4月條文
+對一般申報者列6個月，對**只因進口articles而申報、且符合small manufacturer定義**者列12個月。
+不能把後者寫成所有小公司都有12個月，也不能拿4月規則生效日直接加60日當成新起點。
+後續規則仍可能改變這些條件，本段不替個別企業判定適用性。
+
+接下來查[EPA更新入口](https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/tsca-section-8a7-reporting-and-recordkeeping)
+及[§705.20現行文字](https://www.ecfr.gov/current/title-40/chapter-I/subchapter-R/part-705/section-705.20)，
+再開正式Federal Register附件核對。可以問自己：看到的日期是發布日、生效日、申報起點還是截止日？
+兩個起算條件是取較早還是較晚？我的公司屬於哪一種申報身分？只要其中一個問題沒有證據，
+就不能從一則延期標題推算公司成本或換料需求。
 
 ECHA 的 2026 公告也顯示，若 decision makers 保留特定用途，風險管理可能不是「什麼都不做」，而是
 site-specific management plan、supply-chain communication、emission monitoring and reporting。對研究者而言，
@@ -1383,7 +1460,9 @@ invalidation: 最終條文明示 relevant semiconductor／sealing／machinery us
 
 <!-- monitoring_item
 monitor_id: T2
-status: active
+status: retired
+retired_at: 2026-09-18
+retirement_reason: C5因漏列4月正式規則的backstop而由C23接續；T4保留原metric／trigger／invalidation／frequency／next_check並增加現行法條watch
 claim_ids: C5,C11,C12
 metric: US TSCA 8(a)(7) final scope revision、exemptions、effective date、submission window、covered importer／article and data fields
 source_ids: S6,S7
@@ -1407,6 +1486,20 @@ frequency_detail: 每季查公司年報／季報／法說／產品與永續更�
 next_check: 2026-10-15
 trigger: 4755、4770 或 universe semiequip 公司公布具名 PFAS／PFAS-free material、law／customer driver、qualification result、production cutover、volume or financial impact
 invalidation: 公司明示 relevant products do not contain covered PFAS、不進 applicable jurisdiction，或替代不需 product／process requalification 且無材料性成本／收入
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C23,C11,C12
+metric: US TSCA 8(a)(7) final scope revision、exemptions、effective date、submission window、covered importer／article and data fields
+source_ids: S6,S7,S26
+watch_source_ids: S6,S27
+frequency: monthly
+frequency_detail: 每月查 EPA rule-updates page and Federal Register links；舊 May 2025 dates 不得覆蓋 April 2026 contingent-start action
+next_check: 2026-09-15
+trigger: EPA 發布 final scope revision、effective date、CDX opening、new guidance or definitive exemptions
+invalidation: Final revision substantially removes the product／article paths relevant to semiconductor suppliers，或把 current reporting interpretation 改為不同 covered period／entity contract
 -->
 
 ## 下一個可證明／否定的節點

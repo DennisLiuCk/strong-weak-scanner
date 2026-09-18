@@ -372,6 +372,28 @@ topic 的 `review_due` 必須等於所有 active monitoring item 最早的 `next
 `watch_source_ids`。影響路由的
 `action_due` 可以不同，因為它管理的是公司筆記／H# 動作，不是 topic 新鮮度。
 
+### 監測入口要能找到觸發條件
+
+檢查 monitor 時，逐一把 trigger 中具名的主管機關、標準組織、公司與要找的文件，對到
+實際 `watch_source_ids`。只有「至少一個 living index」通過，不等於來源路由完整。
+例如關稅、BIS、OFAC、NIST 四制度不能只監看 USTR；活動日也要先核對該活動的測試
+範圍，不能把下一場編號較大的工作坊預設為下一世代結果。
+
+路由缺漏採 retired／successor，保留原 metric、trigger、invalidation、frequency 與
+next_check。舊項的新證據及接續項的行政複核可分列，但同一公告不能因此計成兩次獨立
+支持；新文件只支持程序旁支時，須明列尚未閉合的產品、驗收與財務條件，不刷新主命題。
+迄今此項是人工語意核對與具名回歸測試，不宣稱所有 monitor 的路由已經自動驗證。
+
+同一 URL 由「只驗附件取得」前進到「指定頁內容核對」時，保留舊 source 與 claim，
+以新 source／successor claim 記錄閱讀範圍；不得繞過 URL 去重或回改舊 limitation。
+這類 `supersedes` 是範圍擴展，若原事實未被推翻，必須明說不是錯誤更正、反證或新增
+獨立消息鏈。統計不能把所有 revision 當作查錯成功。
+
+政策時程另核對「哪一天開始、持續多久、適用誰」，以及條文的 `whichever is earlier`、
+`not later than`、例外與 fallback date。主管機關摘要不足時須下鑽正式條文；舊法規
+漏讀的上限以 correction chain 更正，不改成今日新政策，也不重啟主命題時鐘。
+本輪 PFAS 為具名回歸案例，不代表所有法律文件已完成全文法律審查。
+
 ## 五、可信度與到期降級
 
 meta 必填：

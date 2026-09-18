@@ -1268,3 +1268,18 @@ evidence_boundary: 更高頻寬的工程需求不自動對應任一 PCB／CCL �
 - Arista 或客戶確認 7060XE7 實際出貨、部署層級與 scale-up／scale-out 分母。
 - Oracle 或 AMD 確認 MI450／Helios shipment、preview 或 GA，而不是沿用 2025 年的前瞻規劃。
 - 台灣公司用具名產品、qualification、出貨與財務資料完成雙向核對；否則只保留產業節點，不畫公司受惠線。
+
+## 引用定位補充：冗餘假設在哪一頁
+
+9/13 回查 OPG-M 1.0 時，確認 S20 所說「五張外部網不要求冗餘」的明文在
+PDF 第 11 頁 §6.1 第 6 項；原定位 pp.7–10 涵蓋網路概覽，未涵蓋這一項假設。
+讀者應連同第 11 頁閱讀。[S20] 這只補足舊結論的查找位置，沒有新架構或部署證據；
+原來源、主張、日期與到期狀態不改。該假設仍只屬這套參考設計，不是所有客戶的冗餘要求。
+
+<!-- transition
+date: 2026-09-13
+from: triaged
+to: triaged
+reason: editorial_clarify_opg_m_existing_redundancy_assumption_page_locator
+evidence: editorial:opg_m_page_11_locator
+-->

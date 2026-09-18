@@ -816,6 +816,7 @@ evidence: sources:S18,S19
 
 ### 名詞小字典
 
+- **RFI（Request for Information，資料要求）**：電網營運方要求申請者補交資料的程序；個案有自己的截止日，收到或回覆 RFI 都不等於獲准通電。
 - **800VDC**：以約 800 伏特直流電在資料中心傳送電力，目的是降低超高功率機櫃的電流、線材與轉換損耗。
 - **Power rack**：集中把資料中心電力轉換、分配給多個運算機櫃的電源系統，不等於伺服器本身。
 - **BBU**：電池備援單元，停電或負載突升時短暫供電，避免高功率 AI 機櫃中斷。
@@ -968,6 +969,21 @@ Large Load，且 eligible、included、allocated、authorized 與 metered 各是
 | 4. QSA inclusion（適用案型／季度） | 該季度把負載加入模型後，電網穩定度是否可接受？ | QSA 日期、專案／MW、模型版本、限制與待辦 | approval to energize；ERCOT 明說不能單靠 QSA 授權 |
 | 5. Approval to energize | 電網營運端是否正式允許專案開始取電？ | 核准機關、日期、條件、初始上限、telemetry／model 狀態 | 已達公告 MW、穩定營運或 IT 容量 |
 | 6. Actual metered load | 通電後真正取用多少電？ | meter ID／boundary、時間序列、平均／峰值／percentile、缺值與限制 | facility 內的 IT load、rack／GPU 數、BOM 或供應商財務 |
+
+### 9/9 核驗已開始：每個案子的補件期限各自計時
+
+**收到資料要求，代表進入查核，不代表已通電。** ERCOT 9/9 公告已開始對多數有條件
+列入 Batch Zero 的大型負載發出資料要求（RFI），其餘會持續發到月底。每案的輸電業者、
+用電申請人及適用的配電業者，要各自提交負責的答案、附件與公證聲明。[S21]
+
+**期限從每案發出日算，不是從新聞日一起倒數。** 初次完整回覆限發出後 10 個工作日；
+用電申請人可以申請最多 5 個工作日延長，但不是自動取得 15 日。追加問題另訂期限。
+未及時完整回覆或未滿足核驗要求，會被排除；完成核驗才有納入資格。[S21]
+
+**下一步追案件結果，不把行政進展換算成容量。** 想一想：你讀到的日期是公告日、該案
+收件日，還是核驗結果日？先取得同案 RFI 發出日與結果，再接前述分類、配額、QSA、
+通電許可和電表。這份新公告沒有提供具名專案已通電或已採用 800V 的證據；C13 與舊圖譜
+的到期狀態不因此延後。
 
 ### QSA 是必要條件，不是通電許可
 
@@ -1233,3 +1249,41 @@ evidence_boundary: 來源未點名 universe 內其他散熱廠，也未證實 80
 - ERCOT 2026-08-31 conditional classification 與 2026-12-10 verification report 是否讓同案由 preliminary eligibility 前進到 final path；沒有 LCP／QSA／approval／meter 共同鍵時，不把 queue GW 改寫成已通電 AI demand。
 - 具名場站是否公開同版 single-line、N 定義、installed／critical capacity、實際 load trace、facility／IT meter map、PUE 期間與 fault／maintenance commissioning；只有 MW 與 PUE headline 不算填滿。
 - 若只有合作名單、展場規格或股價反應而沒有公司級收入／毛利證據，維持 `watch`，不得升格。
+
+<!-- research_source
+source_id: S21
+role: regulator_or_policy
+source_kind: document
+publisher: ERCOT
+title: M-A090926-01 Issuance of Batch Zero Verification Requests for Information
+published_at: 2026-09-09
+captured_at: 2026-09-13
+accepted_at: 2026-09-13
+status: active
+url: https://www.ercot.com/services/comm/mkt_notices/M-A090926-01
+locator: LONG DESCRIPTION的已開始／持續至月底、逐案RFI、各方文件責任、10 Business Days／可申請最多5 Business Days延長、追加RFI與未滿足則排除段；state/community impacts另發RFI
+limitation: 程序公告不是同案final classification、年度MW、QSA、通電核准或actual meter；沒有逐案發出日，不能推共同deadline；9/11 guide v1.1附件未完整取得，不引用其內容
+independence_group: ercot
+-->
+
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: ERCOT 9/9已開始對多數conditional Batch Zero大型負載發逐案核驗RFI；首輪須於發出後10個工作日內完整回覆，ILLE可申請最多5個工作日延長，追加RFI另定期限，未及時完整回覆或未滿足核驗會被排除
+supporting_source_ids: S21
+contrary_source_ids:
+as_of: 2026-09-09
+basis: S21逐項明列發出進度、按案責任、首次和追加期限及納入必要條件
+boundary: 僅支持核驗程序啟動；不代表具名專案final inclusion、allocated MW、QSA、approval、meter、800V採用或台灣供應商財務，也不是10加5的自動寬限
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-09-13
+from: triaged
+to: triaged
+reason: add_ercot_batch_zero_rfi_case_specific_deadlines_without_claiming_energization
+evidence: sources:S21
+-->

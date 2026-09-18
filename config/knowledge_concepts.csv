@@ -599,3 +599,6 @@ product:gaas-substrate,product,砷化鎵基板,GaAs substrate,,由鎵和砷形�
 capability:gallium-refining-recovery,capability,鎵回收與提純能力,Gallium refining and recovery,product:gaas-substrate,從原料走到合格鎵材料的回收與提純能力 不等同即時可交付產量
 metric:destination-export-permit,metric,目的地分列的出口許可,Destination export permit,product:gaas-substrate,依公司 產品 目的地與日期分列批准狀態 不把單一路線擴成全面斷供
 stage:substrate-delivery-verification,stage,同產品交付查核,Substrate delivery verification,product:gaas-substrate,將同種基板的許可 出貨 客戶收貨與收入分別核對 不用其他產品需求代證
+process:ofac-alert-authorization-boundary,process,制裁警報與授權查核,OFAC alert identity authorization boundary,concept:trade-regime-separation,查核工具可整合名單 但身分命中 申請追蹤 授權條件與法律處理須分開 不是個案合規判定
+metric:high-na-cumulative-wafer-scope,metric,High-NA 累計處理量口徑,High-NA cumulative wafer scope,concept:high-na-euv-readiness,按設備資格 測試 研發 量產與產品層別拆開累計晶圓處理量 不把總處理量當合格出貨分母
+process:ercot-case-rfi-verification,process,逐案用電核驗與補件期限,ERCOT case-specific RFI verification,concept:800vdc-execution-readiness,每案資料要求的發出日 完整回覆 公證聲明與核验結果是不同欄位 不等於通電或800V部署

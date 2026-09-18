@@ -415,3 +415,23 @@ status: active
 boundary: ASML與Intel兩份文件只描述同一個Intel Panther Lake部分層事件；四本帳護照是研究中心的分母框架 不是共同產業標準 第二個客戶或財務受惠仍未證實。
 next_trigger: 同一產品版本公開產品子集層名層數雙路配置lot與wafer分母產能占比良率方法uptime合格產出成本第二客戶與供應商財務共同鍵。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-HNA-I19
+view: industry
+from_id: concept:high-na-euv-readiness
+to_id: metric:high-na-cumulative-wafer-scope
+relation: measured_by
+claim_refs: MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C21,MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER#C22
+note_refs:
+evidence_state: inference
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-18
+review_due: 2026-10-15
+status: active
+boundary: 口徑節點只限制總量與子集的換算，不提高公司曝險或判定量產成本。
+next_trigger: 公開同期間按用途拆分的投入與合格產出。
+-->

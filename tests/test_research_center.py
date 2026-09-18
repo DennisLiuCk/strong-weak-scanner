@@ -5963,9 +5963,9 @@ process.stdout.write(JSON.stringify(results));
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 17),
-            ("research_claim", 20), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 6), ("transition", 8),
+            ("research_topic", 1), ("research_source", 18),
+            ("research_claim", 22), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 6), ("transition", 9),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -6017,7 +6017,7 @@ process.stdout.write(JSON.stringify(results));
             "to_id: stage:high-na-hvm-insertion",
             graph,
         )
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
 
     def test_compute_connect_station_six_separates_data_path_scopes_roles_and_interoperability_gates(self):
         topic = (
@@ -6276,8 +6276,8 @@ process.stdout.write(JSON.stringify(results));
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 18),
-            ("research_claim", 25), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 19),
+            ("research_claim", 26), ("metric_comparison", 0),
             ("impact", 4), ("monitoring_item", 9),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -6359,7 +6359,7 @@ process.stdout.write(JSON.stringify(results));
             "edge_id: KG-PCIE6-C03", "from_id: company:8299",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 31)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 32)
 
     def test_compute_connect_station_eight_separates_package_positions_test_dimensions_and_ecosystem_gates(self):
         topic = (
@@ -7603,10 +7603,10 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 20),
-            ("research_claim", 24), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 21),
+            ("research_claim", 25), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 4),
-            ("transition", 8),
+            ("transition", 9),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -7641,7 +7641,7 @@ process.stdout.write(JSON.stringify(results));
             / "800vdc_execution_readiness.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 800VDC 七關執行準備度", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
         for edge_target in (
             "from_id: company:2308",
             "from_id: organization:open-compute-project",
@@ -7971,9 +7971,9 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 25),
-            ("research_claim", 22), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 27),
+            ("research_claim", 23), ("metric_comparison", 0),
+            ("impact", 2), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -8287,9 +8287,9 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 14), ("metric_comparison", 0),
-            ("impact", 4), ("monitoring_item", 4),
+            ("research_topic", 1), ("research_source", 18),
+            ("research_claim", 17), ("metric_comparison", 0),
+            ("impact", 4), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         glossary = topic[topic.index("### 名詞小字典"):topic.index("### 三句話抓重點")]
@@ -8325,7 +8325,7 @@ process.stdout.write(JSON.stringify(results));
             / "section301_taiwan_exposure.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: Section 301 台灣商品七關與四制度分流", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
         for edge_target in (
             "from_id: company:2308",
             "to_id: stage:policy-action-scope",
@@ -8474,8 +8474,8 @@ process.stdout.write(JSON.stringify(results));
         )[0]
         self.assertGreaterEqual(glossary.count("- **"), 26)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 21),
-            ("research_claim", 22), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 24),
+            ("research_claim", 25), ("metric_comparison", 0),
             ("impact", 6), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -8515,7 +8515,7 @@ process.stdout.write(JSON.stringify(results));
             / "vera_rubin_delivery_contract.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: Vera Rubin 七關交付與整櫃責任", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 26)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 27)
         for node in (
             "from_id: company:nvidia", "from_id: company:coreweave",
             "from_id: company:google", "from_id: company:2376",
@@ -9335,8 +9335,8 @@ process.stdout.write(JSON.stringify(results));
                       "frequency_detail", "next_check", "trigger", "invalidation"):
             self.assertEqual(monitors["T11"][field], monitors["T10"][field], field)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 35),
-            ("research_claim", 33), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 36),
+            ("research_claim", 35), ("metric_comparison", 0),
             ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9381,8 +9381,8 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 35),
-            ("research_claim", 33), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 36),
+            ("research_claim", 35), ("metric_comparison", 0),
             ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9424,8 +9424,8 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 35),
-            ("research_claim", 33), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 36),
+            ("research_claim", 35), ("metric_comparison", 0),
             ("impact", 8), ("monitoring_item", 11),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

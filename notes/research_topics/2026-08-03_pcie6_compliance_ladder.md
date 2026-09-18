@@ -1393,3 +1393,52 @@ evidence_boundary: 更高速率的物理要求不自動對應任一 PCB／CCL �
 - 具名客戶把完整平台從 qualification 升級到 production fleet，並揭露部署量或實際運行指標。
 - 若 Gen6 元件長期只以 gearbox 連 Gen5 生態、64 GT/s listing 延後、必要測項不完整或跨廠互通不穩，兩軸成熟度必須分別下修。
 - 台灣公司由平台端與公司端同時對上具名產品、64 GT/s 測試、客戶資格、出貨及財務後，才建立公司線。
+
+## 下一場活動要先核對測試範圍
+
+**活動編號變大，不代表測試世代也變新。** 9/13 查得 PCI-SIG #141 官方頁將
+9/22–25 的活動明定為 PCIe 5.0 產品與 retimer 正式測試，最高列到 32 GT/s。[S19]
+因此不能預先把活動結束當作 PCIe 6 新列名的保證；這也不撤回 #140 的歷史或已存在的
+64 GT/s 列項。
+
+新手把 **活動範圍**（準備測什麼）、**列名結果**（哪個產品通過哪一範圍）和
+**客戶平台驗收**（實際系統能否運轉）分開追。想一想：一張活動海報能回答後兩題嗎？
+9/30 再查正式清單與具名平台文件，若先有 6.x 結果則提前；不以查核日延長原證據時鐘。
+
+<!-- research_source
+source_id: S19
+role: standard
+source_kind: living_index
+publisher: PCI-SIG
+title: Compliance Workshop 141 官方活動範圍
+published_at:
+captured_at: 2026-09-13
+accepted_at: 2026-09-13
+status: active
+url: https://pcisig.com/events/pci-sig-compliance-workshop-141
+locator: 開頭9/22–25活動日期、PCIe5.0 products only與最高32GT/s；Testing Includes兩列PCIe5.0及PCIe5.0 Retimer
+limitation: 發布日未知，9/13只是擷取日；活動預告不是實際結果，也不代表本輪重新普查完整Integrators List或否定既有64GT/s列名
+independence_group: pci-sig
+-->
+
+<!-- research_claim
+claim_id: C26
+label: verified
+status: active
+claim: 9/13查得PCI-SIG第141場9/22–25活動的公開測試範圍只有PCIe5.0產品與retimer，列出的最高速率是32GT/s
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-09-13
+basis: 官方活動開頭及Testing Includes兩處一致；published_at未知，未把擷取日或活動日當發布日
+boundary: 只界定本次活動，不能推其他6.x活動不存在、既有列項失效或台灣公司平台驗收；不刷新主命題時鐘
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-09-13
+from: triaged
+to: triaged
+reason: clarify_workshop_141_gen5_scope_without_erasing_existing_gen6_results
+evidence: sources:S19
+-->

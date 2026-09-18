@@ -393,3 +393,23 @@ status: active
 boundary: 固定稅率與毛利情境只防止分母混用 不提供HTS原產豁免appraised value其他duty法律判定或公司估值。
 next_trigger: 具名entry公開customs value稅率逐項duty importer合約價格數量及公司毛利共同鍵並與海關結果核對。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-S301-I19
+view: industry
+from_id: concept:section301-taiwan-exposure
+to_id: process:ofac-alert-authorization-boundary
+relation: requires
+claim_refs: MI-2026-07-23-US-SECTION301-TAIWAN#C15,MI-2026-07-23-US-SECTION301-TAIWAN#C16,MI-2026-07-23-US-SECTION301-TAIWAN#C17
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-09
+review_due: 2026-09-18
+status: active
+boundary: 新FAQ補足通用查核分工 不是關稅變更 公司命中或許可判定 申請編號不等於已批准 公開查無個別授權不能證明不存在；多份OFAC來源仍為同一消息鏈。
+next_trigger: 主管機關後續指引或同一產品與交易的身分 授權條件 期限和責任人底稿可回查 原七關與公司曝險時鐘不由此邊刷新。
+-->

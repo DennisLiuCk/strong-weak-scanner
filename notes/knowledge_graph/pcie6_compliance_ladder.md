@@ -629,3 +629,23 @@ status: active
 boundary: PCI-SIG 與 Keysight 文件只支持功能語意 測項與角色程序分界；PHY2-7／PHY2-8 的 traceable-metric 文字不能外推到 75-22，本輪也沒有具名 64 GT/s DUT 原始值 共同門檻 field reliability 或公司財務。
 next_trigger: 具名 64 GT/s DUT 把角色 port方向 test ID 規格MOI工具 approved system 原始時間電壓 margin 可追溯校正 預先門檻 unit lane環境分母與運行 field結果共同公開。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-PCIE6-I29
+view: industry
+from_id: concept:pcie6-deployment-readiness
+to_id: concept:pcie-test-object-contract
+relation: requires
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C26
+note_refs:
+evidence_state: inference
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-13
+review_due: 2026-09-30
+status: active
+boundary: 第141場只列5.0產品及retimer測試 不能把活動序號當作世代或客戶平台驗收的進度；這不撤回第140場歷史 64GT/s既有列項或改變公司曝險。
+next_trigger: 追活動自己的正式測試範圍與後續列名 並另取得同一6.x平台版本的資格與部署結果。
+-->

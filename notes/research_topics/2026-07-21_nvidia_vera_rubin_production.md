@@ -89,6 +89,13 @@ to: triaged
 reason: added_platform_production_shipment_and_purchase_order_evidence_without_supplier_financial_attribution
 evidence: sources:S20,S21
 -->
+<!-- transition
+date: 2026-09-18
+from: triaged
+to: triaged
+reason: added_coreweave_multi_rack_bringup_and_preview_benchmark_boundaries_without_thesis_clock_or_supplier_financial_upgrade
+evidence: sources:S22,S23,S24
+-->
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -407,6 +414,32 @@ IFRS Foundation 對 IFRS 15 的摘要把收入認列連到履約義務完成與�
 4. **Bring-up／validation ≠ customer acceptance**：營運商或工程團隊測過，不代表客戶已簽收。
 5. **雲端 offer ≠ 全面 GA 與滿載**：區域、配額、預覽／一般可用、利用率是不同欄位。
 6. **營收成長 ≠ Rubin 財務歸因**：還要排除其他平台、價格、匯率、併購與產能變動。
+
+## 9 月 18 日補課：一櫃能跑，為什麼還要測多櫃？
+
+把一群各自很快的跑者組成接力隊，不代表交棒也會很快。**多櫃叢集**就是讓數台機架共同
+完成工作；此時慢點可能從晶片移到機架之間的網路。CoreWeave 在 9 月 16 日公告已帶起
+Vera Rubin NVL72 多櫃叢集，將數百顆 Rubin GPU 接成同一個向外擴展的運算群組。這是
+營運商側的新整合進度，和先前單櫃驗證有別。[S22]
+
+同日技術文把驗證拆成單節點、整櫃與跨櫃：低於預期表現的系統先排查，再進入後續流程；
+還要讓運算、網路、供電與冷卻一起承受負載。[S23] **Bring-up** 回答能否啟動並測試，
+**壓力驗證**回答哪些條件下能共同運作，**一般可用（GA）**則回答客戶在哪裡、用什麼
+條款取得服務。三個問題不同，不能拿「接上更多機架」代替後兩張成績單。
+
+另一則 9 月 16 日 NVIDIA 公告把 Rubin 的 MLPerf Inference v6.1 成績稱為首度
+**preview submission**，也就是預覽類別的基準測試提交。[S24] 本文只接受這個類別標示，
+沒有重算原始測試，因此不採其性能倍數，也不把測試成績當成 CoreWeave 的客戶實際工作
+或台灣供應商營收。
+
+讀完先記三件事：**整合範圍前進了、公開測試報告仍有缺口、財務歸因尚未接上。**
+下一次 T3 回查先找同一版本的機架數、場站、測試時間、工作負載、通過門檻與失敗處置，
+再核對可訂用產品、區域、配額和客戶驗收。技術文公開的是營運商流程自述，並未提供足以
+重算長期可靠度的原始紀錄；兩篇 CoreWeave 文件也只算同一消息鏈。[S22][S23]
+
+可以自問：如果每顆 GPU 都正常，為什麼整個工作仍可能變慢？若有多櫃驗證卻沒有客戶
+可取得的區域與容量，七關交接表應該前進哪一格、又有哪些格不能一起打勾？即使之後
+服務上線，還要取得哪一家台灣公司的什麼文件，才能討論收入與毛利？
 
 ## 在研究中心裡接著怎麼學
 
@@ -762,6 +795,54 @@ limitation: 公司法說逐字稿支持管理層對 8 月 production shipments �
 independence_group: nvidia
 -->
 
+<!-- research_source
+source_id: S22
+role: company_release
+source_kind: document
+publisher: CoreWeave
+title: CoreWeave Brings Up Multi-Rack NVIDIA Vera Rubin NVL72 Cluster
+published_at: 2026-09-16
+captured_at: 2026-09-18
+accepted_at: 2026-09-18
+status: active
+url: https://coreweave.com/news/coreweave-brings-up-multi-rack-nvidia-vera-rubin-nvl72-cluster
+locator: 首段與 Scaling agentic AI with multi-rack NVIDIA Vera Rubin NVL72；多櫃 bring-up 及 single scale-out cluster
+limitation: 公司公開宣稱不是獨立驗收；沒有精確機架數、具名 Rubin 區域、可訂用 SKU、原始工作紀錄或台灣供應商財務；文中的跨區域儲存功能不能轉成 Rubin 已在兩區部署
+independence_group: coreweave
+-->
+
+<!-- research_source
+source_id: S23
+role: company_release
+source_kind: document
+publisher: CoreWeave
+title: What It Takes to Bring Up a Multi-Rack NVIDIA Vera Rubin NVL72 Cluster
+published_at: 2026-09-16
+captured_at: 2026-09-18
+accepted_at: 2026-09-18
+status: active
+url: https://www.coreweave.com/blog/what-it-takes-to-bring-up-a-multi-rack-nvidia-vera-rubin-nvl72-cluster
+locator: Finding performance outliers before they become stragglers；Keeping compute networking power and liquid cooling synchronized under load
+limitation: 營運商描述測試流程，未附原始 logs、固定版本測試矩陣、精確母體、測試時長或客戶驗收結果；與 S22 同一消息鏈，不提供跨營運商重現或財務證據
+independence_group: coreweave
+-->
+
+<!-- research_source
+source_id: S24
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA Vera Rubin NVL72 Delivers Leading Performance in MLPerf Inference v6.1 Debut
+published_at: 2026-09-16
+captured_at: 2026-09-18
+accepted_at: 2026-09-18
+status: active
+url: https://blogs.nvidia.com/blog/vera-rubin-nvl72-mlperf-inference/
+locator: 標題下副標首句的 first preview submission 與發布日期
+limitation: 本輪只接受公司對 preview submission 類別的表述，未重算 MLCommons 原始結果；不採性能倍數、不判定雲端 GA、客戶工作負載或供應商財務
+independence_group: nvidia
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -1071,6 +1152,48 @@ as_of: 2026-08-31
 basis: S20／S21 明確提供平台階段、出貨月份與廣義 PO 類別，也同時缺少 C11 七關後段與 C19 七欄事件護照所需的物件、交易、驗收及財務欄位
 boundary: 這是研究成熟度分類，不否定實際供應鏈可能已有未公開生產或收入；也不估台灣公司的份額、營收、毛利、現金流、價格或投資報酬
 verification_needed: NVIDIA、具名客戶與 ODM 對同一 Rubin configuration 公開可對時的 shipment object／quantity、factory build、received／accepted、service SKU／workload，以及台灣公司收入、毛利、存貨或現金流共同鍵
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: CoreWeave 於 2026-09-16 公告已完成 Vera Rubin NVL72 多櫃 bring-up，並稱數百顆 Rubin GPU 已被接成同一 scale-out cluster
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-09-18
+basis: S22 首段直接描述營運商本身的多櫃整合進度；只採原文粒度，不把數百顆改成精確機架數或特定區域數
+boundary: 公司宣稱不是獨立驗收；未證明可訂用 SKU、區域、配額、長時間客戶工作或台灣供應商收入，儲存服務跨區域與 Rubin 部署範圍不可混用
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: CoreWeave 同日技術文描述 Rubin 驗證從單節點擴展至整櫃與跨櫃，將表現低於預期的系統送入排查，並聯合施壓運算、網路、電力與冷卻
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-09-18
+basis: S23 的性能異常排查與聯合負載章節直接交代分層測試及未達預期時的處置
+boundary: 只證明營運商公開說明這套流程；沒有足供離線重算的 raw logs、版本母體與時間分母，不宣稱全部場站長期可靠或任何台灣零組件已取得資格
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: NVIDIA 於 2026-09-16 將 Vera Rubin NVL72 的 MLPerf Inference v6.1 首次提交明示為 preview submission
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-09-18
+basis: S24 副標直接使用 preview submission，本文接受的是公司表述的測試類別而非效能數值
+boundary: 未重算測試原始資料；預覽基準測試不是 CoreWeave 客戶實際工作、商業 GA、跨區域可用或供應商財務證據
+verification_needed:
 resolution:
 -->
 

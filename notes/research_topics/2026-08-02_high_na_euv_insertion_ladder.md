@@ -312,6 +312,22 @@ limitation: Intel 文件交叉確認 HVM、產品家族與 High-NA 平台，但�
 independence_group: intel
 -->
 
+<!-- research_source
+source_id: S18
+role: company_release
+source_kind: document
+publisher: ASML and Intel Foundry
+title: Intel Foundry and ASML Collaborate to Accelerate Industry Readiness for High-NA EUV
+published_at: 2026-09-08
+captured_at: 2026-09-18
+accepted_at: 2026-09-18
+status: active
+url: https://www.asml.com/en/news/press-releases/2026/intel-foundry-and-asml-collaborate-to-accelerate-industry-readiness-for-high-na-euv
+locator: 開頭更新清單第一點的累計 wafer 範圍
+limitation: 共同新聞稿不是第二個獨立客戶；累計期間起點及各用途占比未披露，不是合格量產晶圓、良率或成本分母
+independence_group: asml
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -652,6 +668,40 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: ASML與Intel在9月8日表示，High-NA累計處理逾一百萬片晶圓，範圍同含設備認證測試、研發及Panther Lake部分產品特定層量產
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-09-08
+basis: S18更新清單第一點直接限定統計範圍
+boundary: 累計不等於同期合格出貨；未公開用途拆分或去重方法
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: inference
+status: active
+claim: 混合用途的累計處理量，不能直接作為量產占比、合格產出或成本的分母
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-09-18
+basis: C21的集合包含不同成熟階段；缺拆分時不能由總量反推其中任一子集
+boundary: 這是統計口徑限制，不否定既有部分層HVM，也不判斷其他客戶或供應商業績
+verification_needed: 同期間、同產品層、按用途拆分的投入及合格產出
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: retired
@@ -790,7 +840,23 @@ reason: corrected_pre_hvm_ladder_after_intel_partial_layer_product_hvm_evidence
 evidence: sources:S16,S17
 -->
 
+<!-- transition
+date: 2026-09-18
+from: triaged
+to: triaged
+reason: separate_cumulative_wafer_scope_from_qualified_production_without_thesis_clock_refresh
+evidence: sources:S18
+-->
+
 ## 新手先讀：這篇在講什麼
+
+### 9月18日補充：看到「處理很多片」，先問算的是什麼
+
+「累計」是跨一段時間加總；「合格產出」則還要通過同一產品的判定。兩者不能互換。
+本次[官方更新](https://www.asml.com/en/news/press-releases/2026/intel-foundry-and-asml-collaborate-to-accelerate-industry-readiness-for-high-na-euv)的統計混合不同用途（C21），所以只補充口徑，不刷新主命題。
+
+讀者可以問：哪些片用來試機，哪些是產品？分母期間相同嗎？失敗與重工怎麼算？
+接下來依T4找用途拆分，再核對合格產出；缺拆分就保留待驗證，不能推成供應商收入。
 
 ### 名詞小字典
 

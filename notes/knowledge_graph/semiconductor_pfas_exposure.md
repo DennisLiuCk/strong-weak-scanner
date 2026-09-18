@@ -120,7 +120,7 @@ view: industry
 from_id: organization:us-epa
 to_id: concept:semiconductor-pfas-exposure
 relation: raises_need
-claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C5
+claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C23
 note_refs:
 evidence_state: verified
 commercial_stage: concept
@@ -130,7 +130,7 @@ exclusivity_scope: EPA 維護聯邦 TSCA reporting rule 但 covered entities 包
 as_of: 2026-08-12
 review_due: 2026-09-15
 status: active
-boundary: Historical reporting requirement 不是 use prohibition and current start date depends on forthcoming revision effective date。
+boundary: Historical reporting不是use prohibition；2026-09-18依C23補正4月既有規則為2027-01-31或paragraph(c)指定日後60日取較早，非新政策，保留原as_of／review_due且不推定公司適用性。
 next_trigger: EPA final scope revision effective date submission window exemptions and updated guidance。
 -->
 
@@ -160,7 +160,7 @@ view: industry
 from_id: process:us-tsca-pfas-reporting
 to_id: concept:semiconductor-pfas-exposure
 relation: raises_need
-claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C5
+claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C23
 note_refs:
 evidence_state: verified
 commercial_stage: concept
@@ -240,7 +240,7 @@ view: industry
 from_id: concept:semiconductor-pfas-exposure
 to_id: stage:pfas-jurisdiction-duty
 relation: passes_through
-claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C2,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C5,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C12
+claim_refs: MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C2,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C23,MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE#C12
 note_refs:
 evidence_state: unverified
 commercial_stage: qualification

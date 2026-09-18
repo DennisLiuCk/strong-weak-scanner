@@ -9,7 +9,7 @@ schema_version: 2
 radar_id: RADAR-2026-09-10-02
 as_of: 2026-09-10
 next_review: 2026-09-17
-status: active
+status: retired
 method: 由J.P. Morgan、S&P MI及MSCI公開原文提出研究問題，再回查Hut 8、GE Vernova及AXT公司申報與公告。按工程期別、訂單階段、材料種類與出口目的地核對；排序只安排本輪研究，未建立台廠受惠或股票排名
 selection_cycle_id: RS-2026-09-10-02
 -->

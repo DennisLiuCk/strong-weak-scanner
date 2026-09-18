@@ -1425,6 +1425,39 @@ AI 先進封裝。這次漏掃也提醒我們：公司投資人關係頁面不�
 三道門不能跳級。事件預告不能替代文件，文件存在不能替代重算，重算完成也不能把開發階段
 自動改寫成量產。照這個順序閱讀，八家公司看似混雜的更新就會變成一張清楚的等待清單。
 
+## 同欣電英文季報：上架日、報表期間與核閱層級分開看
+
+**9/9 是附件上架，不是九月新獲利。** 這份英文檔仍報截至 6/30 的 Q2／H1，會計師
+核閱日期為 7/29；英文是翻譯，解釋有差異時以中文為準。核閱的程序範圍小於年度查核，
+不能改稱完整查核意見。[S35][S36]
+
+**產品表加總要對淨營收。** 下表只列同欣電合併範圍，單位均為新台幣仟元。
+產品表的五類加總，對應已扣退回折讓的營收；不是損益表第一行未扣折讓的金額。[S36]
+
+| 核對項目 | Q2：2026/4/1–6/30 | H1：2026/1/1–6/30 |
+|---|---:|---:|
+| 五產品淨額加總 | 3,152,964 | 5,972,201 |
+| 未扣折讓銷售額 | 3,208,504 | 6,051,570 |
+| 減：退回與折讓 | 55,540 | 79,369 |
+| 重算淨營收 | 3,152,964 | 5,972,201 |
+| 本表勾稽差額 | 0 | 0 |
+
+**半年現金流不能當單季，也不能分配給單一產品。** H1 營業現金流為 898,165，來源表
+只列六個月。若要算 Q2，還需同口徑 Q1 再相減；本文不做年化或用它除以單季毛利。
+報告的分部說明採單一營運單位；本次產品表没有提供各產品毛利或可辨識的 AI 收入。[S36]
+
+新手先記住「何時上架、數字涵蓋多久、數字代表什麼」三件事。想一想：拿到產品收入
+後，你還缺什麼資料才能說它提高獲利？下一步追同產品的成本／毛利與同期間現金流；
+地理市場的美國收入也不能代替 HTS、原產或關稅承擔。
+
+本輪以同一 PDF 的六個引用頁及相鄰頁渲染，兩位研究者各看引用頁，並用系統
+Python 3.12.10／Windows PowerShell 獨立重算。這是同一來源、兩個期間的確定性勾稽，
+不是兩條獨立消息鏈或統計抽樣；差額為零不表示全部會計估計沒有誤差。
+只完成指定頁面內容核對，未完成雙語全文比對或正式 focused 筆記簽核，C15 舊時鐘不刷新。
+
+來源沿革：9/9 的 S35／C33 只驗附件新增；9/13 以同一 URL 的 S36／C34 接續指定頁內容
+核對，保留舊記錄。這是閱讀範圍擴展，不是撤回原附件事件，也不算新增獨立消息鏈。
+
 ## 同一個「AI 供應鏈」，財務分母為什麼不同
 
 **AI 供應鏈是題材分類，不是會計科目。** 公司在產業鏈中扮演的角色不同，季報真正能回答的
@@ -2088,7 +2121,7 @@ title: 202602_6271_AIA.pdf 英文Q2合併財報新增附件紀錄
 published_at: 2026-09-09
 captured_at: 2026-09-09
 accepted_at: 2026-09-09
-status: active
+status: superseded
 url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=6271&filename=202602_6271_AIA.pdf
 locator: 115Q2直接索引https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=6271&year=115&seamon=2&mtype=A；英文合併列上傳115/09/09 14:48:06、417028 bytes、無更補正，與本日凌晨僅中文列對照；published_at取索引上傳日，下載入口先回傳HTML再指向PDF
 limitation: 只驗附件登錄與取得，不聲稱翻譯或財務內容已完整核對，也不判定原中文財報修正；不是frozen pack、獨立簽核、產品收入或主命題新支持
@@ -2098,7 +2131,8 @@ independence_group: theil.com
 <!-- research_claim
 claim_id: C33
 label: verified
-status: active
+status: superseded
+corrected_by_claim_id: C34
 claim: 同欣電115Q2直接MOPS索引於9/9晚間可見新增英文合併附件202602_6271_AIA.pdf，索引上傳日為115/09/09 14:48:06、大小417028 bytes；同日凌晨本輪索引尚只有中文檔
 supporting_source_ids: S35
 contrary_source_ids:
@@ -2115,4 +2149,58 @@ from: triaged
 to: triaged
 reason: recorded_tonghsing_english_q2_attachment_delta_without_claiming_content_verification
 evidence: sources:S35
+-->
+
+<!-- research_source
+source_id: S36
+role: company_filing
+source_kind: document
+publisher: 同欣電／MOPS
+title: Tong Hsing 2026Q2英文合併核閱財報指定頁面內容核對
+published_at: 2026-09-09
+captured_at: 2026-09-13
+accepted_at: 2026-09-13
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=6271&filename=202602_6271_AIA.pdf
+locator: published_at取MOPS9/9上傳日，報告7/29、營運期末6/30；physical3/4/6/8/30/49（印刷3/3-1/5/7/29/48），核閱及中文優先、Q2/H1損益、H1現金流、Note6(t)產品淨額、Note14單一單位；417028 bytes、49頁、SHA256 114904b9b32065b98a61d7ad223603ff49e172363e79c3d0727202967dca39c0
+limitation: 與S35及中文版屬同一公司消息鏈，只核對六個引用頁而非雙語全文或全部附註；非完整focused pack簽核，不是九月營運更新、產品毛利、AI收入或台灣原產直接輸美分母
+independence_group: theil.com
+-->
+
+<!-- research_claim
+claim_id: C34
+label: verified
+status: active
+claim: 同欣電115Q2索引9/9晚間比凌晨新增417028 bytes英文檔202602_6271_AIA.pdf，上傳為115/09/09 14:48:06；指定頁面核對確認報表期末仍6/30、核閱日期7/29及英文解釋差異以中文為準，本檔不表達年度查核意見
+supporting_source_ids: S36
+contrary_source_ids:
+as_of: 2026-09-09
+basis: correction_of:C33；保留原附件新增事實並把僅取得的來源版本接到指定頁內容核對，不是認定原附件事件錯誤。S36 physical3/4明載範圍、日期與翻譯優先序；9/13固定六家公司MOPS結果與9/9晚間相同
+boundary: 不宣稱中英文逐字一致、整份報告從未重編或9月獲利改善；只關閉本附件指定頁閱讀，正式公司簽核仍待完成
+verification_needed:
+resolution:
+correction_kind: supersedes
+corrects_claim_id: C33
+-->
+
+<!-- research_claim
+claim_id: C35
+label: verified
+status: active
+claim: 同欣電2026Q2及H1五產品淨營收分別加總為3152964與5972201新台幣仟元，等於同期未扣折讓銷售額減退回折讓；898165營業現金流是H1而非Q2，分部附註採單一營運單位
+supporting_source_ids: S36
+contrary_source_ids:
+as_of: 2026-09-09
+basis: physical30五類逐項加總並對physical6；Q2 3208504−55540=3152964，H1 6051570−79369=5972201；physical8的945932+81854−34916−94705=898165；physical49單一單位。Windows系統Python3.12.10及獨立PowerShell路徑一致，N=同一文件兩個產品期間及一個H1現金流算式，無抽樣SE/t
+boundary: 同期公司總額勾稽不是產品毛利、AI收入或同批NRE轉量產率；不能把半年OCF當單季、與Q2毛利混算或推台灣原產輸美比例
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-09-13
+from: triaged
+to: triaged
+reason: verify_tonghsing_english_q2_period_net_revenue_and_review_boundaries_without_formal_signoff
+evidence: sources:S36
 -->

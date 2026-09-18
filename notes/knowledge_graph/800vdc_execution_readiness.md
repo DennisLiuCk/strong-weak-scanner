@@ -433,3 +433,23 @@ status: active
 boundary: 這份 passport 是研究中心依 ERCOT 兩份文件建立的跨階段查核框架 不是 ERCOT 標準或通用併網法規；六欄可依 classification path 分支 且 205GW eligibility 或任一 QSA 都不能單獨證明已通電 800V site deployment rack volume 或公司財務。
 next_trigger: 同一具名 project 公開 request final classification 適用的 allocation／LCP QSA approval to energize 與 actual metered MW 再以 site revision 對上 installed critical load PUE commissioning 及供應商財務共同鍵。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-8ER-I19
+view: industry
+from_id: concept:800vdc-execution-readiness
+to_id: process:ercot-case-rfi-verification
+relation: passes_through
+claim_refs: MI-2026-08-01-800VDC-EXECUTION-READINESS#C25
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-09
+review_due: 2026-09-18
+status: active
+boundary: ERCOT逐案核驗開始與補件責任不是同案最終納入 容量配額 QSA 通電許可 電表 800V採用或供應商財務；10個工作日從每案RFI發出時計 可申請延長不是自動加5日。
+next_trigger: 同案公開RFI發出日 完整回覆與核验結果 再接後續分類配額通電與電表 不能只憑行政進展更新舊部署邊。
+-->

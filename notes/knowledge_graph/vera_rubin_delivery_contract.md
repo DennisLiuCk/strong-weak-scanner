@@ -533,3 +533,23 @@ status: active
 boundary: IFRS 原則與緯穎公司層級會計政策證明控制 合約及驗收條件不能省略，但不決定 Rubin 專屬 installed available billable revenue receivable 或 cash 時點。
 next_trigger: 同一 Rubin 批次以一致單位公開 installed與available容量 billable activity 控制移轉 收入 應收 毛利及現金的跨期 reconciliation。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-VRD-I20
+view: industry
+from_id: product:nvidia-vera-rubin-nvl72
+to_id: stage:system-stress-validation
+relation: tests
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C23,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C24
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-18
+review_due: 2026-09-25
+status: active
+boundary: CoreWeave 自述多櫃帶起與聯合負載驗證流程；沒有原始測試紀錄 母體 時間分母 客戶驗收 商業GA或台灣供應商財務，不能把系統壓力測試路由看成已完成全面驗收。
+next_trigger: 同一版本與場站公開機架母體 工作負載 測試時間 通過門檻 失敗處置及客戶驗收，再另核可訂用區域 配額與財務。
+-->
