@@ -1021,7 +1021,7 @@ evidence: sources:S18
 
 - 一條完整高速連線，要讓主機、板路與線材、必要的訊號或交換元件、終端裝置，以及低階控制軟體一起工作。
 - 產品名稱寫著「第六代」、實際連線跑到哪一代、通過哪一項正式測試，以及是否進入客戶系統，是四件不同的事。
-- 截至本輪，公開清單仍未出現最高速度列項；而且整張卡或系統板通過，也不能自動替藏在連接器後面的訊號元件背書。
+- 2026 年 8 月已出現最高速度的公開列項（詳見 C25）；列名仍不等於完整客戶部署，整張卡或系統板通過，也不能自動替藏在連接器後面的訊號元件背書。
 
 ### 為什麼重要
 
@@ -1441,4 +1441,12 @@ from: triaged
 to: triaged
 reason: clarify_workshop_141_gen5_scope_without_erasing_existing_gen6_results
 evidence: sources:S19
+-->
+
+<!-- transition
+date: 2026-10-04
+from: triaged
+to: triaged
+reason: editorial_summary_aligned_with_existing_c25_64gtps_listing_no_evidence_clock_change
+evidence: editorial:summary_sync_c25
 -->

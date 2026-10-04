@@ -264,6 +264,22 @@ limitation: 這是通用的效能上限與瓶頸分析框架，不是 Custom HBM
 independence_group: lbnl-roofline-method
 -->
 
+<!-- research_source
+source_id: S15
+role: competitor_primary
+source_kind: document
+publisher: Micron
+title: Fiscal Q4 2026 Earnings Call Prepared Remarks
+published_at: 2026-09-30
+captured_at: 2026-10-04
+accepted_at: 2026-10-04
+status: active
+url: https://s25.q4cdn.com/621799436/files/doc_financials/2026/q4/Q4-FY26-Prepared-Remarks.pdf
+locator: p.4 Data center 的 HBM 段落末；具名 NVIDIA 合作與 NVHBM custom-HBM4E，採用時點仍屬未來
+limitation: 公司法說只支持具名開發合作；未給實體樣品、客戶資格、量產、客製財務或完整六份交接。PDF SHA256 2821d4ccaae50b40dcd28cd4e766c69c509e73d666e4109d5907c7205a03b700；只核對引用 p.4 及相鄰 p.3、p.5，不將 HBM 整體營收歸給 NVHBM
+independence_group: micron
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -536,6 +552,23 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: Micron 於 2026-09-30 法說具名表示正與 NVIDIA 合作開發稱為 NVHBM 的 custom-HBM4E，並將其下一代 GPU 與 NVLink Fusion 採用描述為未來用途
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-09-30
+basis: S15 p.4 HBM 段末同時提供合作對象、客製世代與名稱；證實的是公司已公開這項開發合作，不是客戶端獨立簽核
+boundary: 不把未來用途寫成已採用；不承接舊 HBM4E 選項的製程、base-die 功能或毛利預期，也不證明已送樣、qualification、量產、獨家、NRE、收入或台灣供應商受惠。這是具名旁支增量，未閉合 T1／T2／T3 觸發條件，不刷新主命題 C5 的證據時鐘
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -578,6 +611,20 @@ trigger: 同一具名產品與客戶公開可對齊的 workload target、interfa
 invalidation: 後續一手資料顯示部分欄位由共同標準完整固定、某些客製路徑不需要 firmware 或 workload offload，或責任分界與本文六欄不同，則重畫合約而不是保留固定六欄
 -->
 
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C17
+metric: NVHBM 具名開發合作是否取得同產品實體樣品、客戶資格、量產與財務證據
+source_ids: S15
+watch_source_ids: S8
+frequency: event_driven
+frequency_detail: Micron 或 NVIDIA 發布 NVHBM 樣品、資格或採用文件即查；2026-10-18 先核對有無同名產品的客戶端佐證
+next_check: 2026-10-18
+trigger: 同一 NVHBM 產品身分揭露客製欄位、實體樣品接收方、測試版本與客戶資格結果，商業升級另須量產及可辨識財務分母
+invalidation: 任一方更正合作、取消或改採標準產品，或客戶資格失敗；只有名稱重複與未來採用敘事不能延長可信度
+-->
+
 <!-- transition
 date: 2026-08-09
 from: triaged
@@ -614,9 +661,32 @@ reason: added_affected_fraction_data_movement_and_workload_performance_passport_
 evidence: sources:S3,S13,S14
 -->
 
+<!-- transition
+date: 2026-10-04
+from: triaged
+to: triaged
+reason: named_nv_hbm_development_branch_without_sample_qualification_financial_or_thesis_clock_upgrade
+evidence: sources:S15
+-->
+
 ## 新手先讀：這篇在講什麼
 
+### 10 月 4 日更新：名字出現了，但交貨證明還沒出現
+
+美光 9 月 30 日法說首次被本文收錄的增量，是把 NVIDIA 與 NVHBM 客製第四代強化版
+記憶體放在同一項開發合作中。[S15][C17] 白話說，現在知道「誰和誰做、專案叫什麼」，
+仍不知道「哪個樣品交到誰手上、哪些測試過關、交了多少、賺了多少」。NVLink Fusion 是
+文件列出的未來平台用途，不是本文已驗證的出貨地點；開發合作也不是獨家供應證明。
+
+**已證實**的是公司公開了具名合作；**推論**是追蹤可從泛稱客製記憶體縮小到該專案；
+**待驗證**仍是實體樣品、客戶資格與商業結果。想一想：若下一份新聞只重複合作名稱，
+是否真的前進？應該等到產品身分、測試條件與客戶簽核能對上，才移動商用階梯。
+本次只更新這條旁支，沒有替仍逾期的整體主命題延長可信度。
+
 ### 名詞小字典
+
+- **NVHBM**：美光本次法說對與 NVIDIA 合作之客製 HBM4E 的稱呼；名稱不是交付或驗收證明。
+- **NVLink Fusion**：美光文件列為 NVHBM 未來用途的平台名稱；本文不藉此推定已採用或實際配置。
 
 - **高頻寬記憶體（HBM）**：把多層動態隨機存取記憶體垂直堆疊，放在運算晶片附近，用較寬的連接介面搬動大量資料。
 - **動態隨機存取記憶體（DRAM）**：需要持續供電才能保存資料的工作記憶體；本文只把它當成高頻寬記憶體的堆疊材料，不據此推定供應商份額。
@@ -726,7 +796,7 @@ evidence: sources:S3,S13,S14
 |---|---|---|---|---|
 | 三星（Samsung） | 依客戶架構調整容量、速度、耗電與介面 | 官方定義列出客製欄位，並把一般第四代強化版樣品與客製版本時程分開 | 客製版本規劃於 2027 年提供客戶樣品；一般版本另有樣品 | 客製樣品已交付、客戶驗證完成或已量產 |
 | SK 海力士（SK hynix） | 把部分資料前處理移到堆疊底部邏輯晶片 | 公司展示底部晶片資料流架構 | 架構展示 | 共同基準測試、具名客戶、客戶驗證或量產 |
-| 美光（Micron） | 提供客製底部邏輯晶片，並揭露晶圓製造分工 | 公司說明產品選項、客戶討論與較高毛利預期 | 產品選項與管理層預期 | 已實現較高毛利、客戶驗證或量產數量 |
+| 美光（Micron） | 舊資料提供客製底部邏輯選項；新資料具名 NVHBM 客製 HBM4E 合作 | 9 月 30 日公司法說具名 NVIDIA；尚未把新專案設計細節與舊選項逐一對齊 | 具名開發合作，未來平台用途 | 樣品已交付、客戶驗證、量產數量、獨家或已實現毛利 |
 
 第一張表回答「改了哪裡」，第二張表回答「公開證據走到哪一步」。一般版本的樣品、客製版本的
 樣品規劃與底部晶片架構展示，不是同一個完成節點。三家公司也沒有共同產品定義、測試條件、
@@ -850,6 +920,7 @@ SK 海力士、Intel 與 LBNL 是公司產品敘事與兩條通用效能方法�
 - [Samsung 韓文官方定義](https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-%EC%84%B8%EA%B3%84-%EC%B5%9C%EC%B4%88-%EC%97%85%EA%B3%84-%EC%B5%9C%EA%B3%A0-%EC%84%B1%EB%8A%A5%EC%9D%98-hbm4-%EC%96%91%EC%82%B0-%EC%B6%9C%ED%95%98)（客製欄位）。
 - [SK hynix GTC 2026 review](https://news.skhynix.com/gtc-2026-review/)（Stream DQ 與 base die）。
 - [Micron FY2025 Q4 slides](https://investors.micron.com/static-files/5fb98d73-2134-4446-8d1b-0f90285f6c02)（p.13，標準／客製 base logic die 與管理層毛利預期）。
+- [Micron FY2026 Q4 prepared remarks](https://s25.q4cdn.com/621799436/files/doc_financials/2026/q4/Q4-FY26-Prepared-Remarks.pdf)（9 月 30 日 p.4；NVHBM 具名開發合作，非樣品、資格或量產簽核）。
 - [Samsung HBM4E sample shipment](https://news.samsung.com/global/samsung-electronics-begins-shipment-of-industry-first-hbm4e-samples)（標準 HBM4E 樣品與 custom 時鐘的分界）。
 - [Samsung Memory Labs](https://semiconductor.samsung.com/about-us/locations/us-rnd-labs/memory-labs/)（I/O architecture／IP、firmware、base die、customer engagement 與 workload／software 分工）。
 - [Samsung Foundry HPC／AI application service](https://semiconductor.samsung.com/foundry/application-specific-service/hpc-ai/)（die-to-die interface、base-die controller 與 additional logic 的供應商架構邊界）。

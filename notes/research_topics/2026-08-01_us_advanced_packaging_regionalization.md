@@ -1,4 +1,4 @@
-# NVIDIA–Amkor 約 15 億美元協議推進美國先進封裝；量產仍待 2028
+# Amkor Arizona 擴至 120 億美元計畫：Phase 2 時程不等於量產與收入
 
 <!-- research_topic
 topic_id: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION
@@ -7,8 +7,8 @@ status: triaged
 priority: p1
 captured_at: 2026-08-01
 source_published_at: 2026-07-28
-last_reviewed_at: 2026-08-14
-review_due: 2026-09-15
+last_reviewed_at: 2026-10-04
+review_due: 2026-10-31
 source_type: mixed
 publisher: Amkor Technology
 publisher_domain: amkor.com
@@ -19,9 +19,9 @@ group_ids: packtest,semiequip,material
 trigger_type: capacity_funding_and_regionalization
 evidence_role: candidate_source
 route: market_issue_watch
-thesis_claim_id: C16
+thesis_claim_id: C18
 base_confidence: medium
-confidence_basis: NIST 現行 CHIPS 專案頁、Amkor SEC 投資人簡報與後續擴建公告可交叉確認政策資金、兩期範圍及 2025–2030 投資／爬坡／損平／滿載規劃；日月光高雄公告只證明台灣也在規劃新增先進封裝能力，兩地工具進場、資格、實際產出、利用率、獲利與訂單替代仍待同產品同期間驗證
+confidence_basis: Amkor 9/8 官方公告更新 Phase 2 範圍與建設時鐘，NIST award-project、5/21 管理簡報和日月光高雄公告保留各自版本；新文件仍屬同一 Amkor 公司鏈，並非客戶獨立確認。主命題只更新區域化計畫階段，兩地工具、資格、實際產出、利用率、獲利及訂單替代仍待同產品同期間驗證，基準可信度不升級
 cross_company_numbers: false
 schema_migrated_at: 2026-08-02
 -->
@@ -83,6 +83,13 @@ to: triaged
 reason: arizona_break_even_full_utilization_and_taiwan_concurrent_build_clocks_reconciled
 evidence: sources:S11,S12
 -->
+<!-- transition
+date: 2026-10-04
+from: triaged
+to: triaged
+reason: phase2_scope_and_construction_clock_updated_without_production_or_financial_upgrade
+evidence: sources:S13
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -108,13 +115,26 @@ evidence: sources:S11,S12
 - **採購框架**：雙方約定未來合作方式與期間的合約骨架，不一定包含保底數量、固定價格或最低利用率。
 - **區域化**：把部分產能移到接近客戶或政策需求的地區，以降低地理集中風險；它可能補充亞洲產能，也可能重新分配訂單。
 - **Arizona（亞利桑那州）**：本篇 Amkor 與台積電美國先進封裝計畫所在州；地點被具名不代表廠房已完工或產能已投產。
+- **Phase1／Phase2（第一期／第二期）**：同一園區分期建設的範圍；各期有自己的預算、建築、客戶資格與財務目標，不能自動共用一個日期或毛利率。
+- **Campus（園區）／cleanroom（無塵室）**：前者是整體廠區範圍，後者是控制潔淨度的生產空間；平方公尺描述面積，不描述已交付的合格產品數。
 - **OSAT（委外封裝與測試廠）**：替晶片公司承接封裝與測試的專業廠商。Amkor 與台灣的日月光投控都屬這一類，但美國擴產不自動等於台灣訂單流失。
 
 ### 三句話抓重點
 
 - Amkor 與 NVIDIA 公布約 15 億美元多年期先進封裝與開發協議，Amkor 並預計 2027 年收到約 15 億美元客戶預付款。
-- NIST 現行 CHIPS 專案頁列的是最高 4.07 億美元、里程碑撥付與 2027 年底量產的 award-project 口徑；Amkor 後續擴建公告則列 70 億美元兩期園區與第一座設施 2028 年初投產，兩者不可當成同一版計畫相加或互相覆蓋。
-- Amkor 自己另把 2028–2029 定義為爬坡、2029 定義為預估損平、2030 定義為預估滿載；日月光同時仍在高雄規劃 FOCoS／FC BGA 新設施，因此目前只能證明兩地都在建能力，不能證明補助已撥、產能已成熟，或台灣訂單已流失。
+- Amkor 2026 年 9 月 8 日把 Arizona 兩期園區計畫投資改列約 120 億美元，Phase 2 預計 2027 年底開工、2029 年底完工；這是計畫版本，不是已花出去的錢，更不是收入或實際產出。
+- NIST 的 CHIPS award-project 與 Amkor 5 月的 Phase 1 損平／滿載目標各有自己的範圍；新公告未把後者重發給 Phase 2。日月光高雄也有建設計畫，但兩地資格、合格產出、獲利及台灣轉單仍未閉合。
+
+### 本輪新增：120 億美元與 9.3 萬平方公尺，分別在回答什麼？
+
+120 億美元是**整個兩期園區的計畫投資**；約 9.3 萬平方公尺是新公告的規劃無塵室空間，
+不是每月晶圓數、合格封裝顆數或服務收入。就像擴大廚房，先增加的是空間與預算，還需要
+設備、人員、菜單、品質驗證及真正訂單，才知道每天能穩定交付多少餐。
+
+新稿沒有說 Phase 2 已取得客戶產品放行，也沒有把 5 月 Phase 1 的收入、毛利、損平或滿載
+目標套給第二期。讀者下一步應找「哪一期實際開工／完工、哪個產品通過資格、多少合格品
+被交付」，而不是把更大的預算直接當成更高獲利。若空間增加但良率、利用率或客戶放行
+沒有跟上，這筆投資能否形成回報？這才是下一個需要證據的問題。
 
 ### 為什麼重要
 
@@ -126,14 +146,14 @@ evidence: sources:S11,S12
 - 每次更新都用 `agreement／cash receipt／credit support／balance sheet／capacity spending／performance` 六欄護照，不把金額相近的項目互相抵銷。
 - 追 CHIPS 資金實際撥付與對應里程碑，不把最高 4.07 億美元核定額視為已收款。
 - 追 Arizona 各期設施的建築完工、工具進場、製程資格、客戶產品認證、合格產出、良率與利用率，並固定每個數字所屬的 project／phase／facility 版本。
-- 追 Phase 1 的產能上線、資格、損平與滿載是否依 Amkor 自己的 2025–2030 時鐘交付；Phase 2 未納入現行財務目標，不能用 Phase 1 數字代填。
+- 追 Phase 1 是否實現 5/21 公布的損平與滿載目標；另追 Phase 2 的 9/8 建設時程及是否有新的財務目標。新稿沒有重發 Phase 1 財務目標，也沒說 Phase 2 已納入，不能代填。
 - 追日月光與台灣設備、材料公司是否揭露具名產品、區域訂單、稼動率與毛利，而不是只談政策方向。
 
 ### 想一想
 
 - 客戶先付 15 億美元，為什麼不能立刻把同額金額當成 Amkor 的服務收入與獲利？
 - 14.652 億美元採購義務和另一份約 15 億美元預付款協議只差 3,480 萬美元，為什麼仍不能當成同一專案的自動資金調節表？
-- NIST 頁面的 17 億美元預期資本支出，和 Amkor 後來公布的 70 億美元兩期園區，為什麼不能相加成 87 億美元？
+- NIST 頁面的 17 億美元預期資本支出、舊版 70 億與新版 120 億美元園區計畫，為什麼不能相加？
 - 每月 14,500 片晶圓與 370 萬顆 units 為什麼不是可以直接相除、比較或換算成營收的同一種產能？
 - 美國新產能如果只是補充亞洲產能，而 AI 總需求同步成長，台灣供應鏈一定會失去訂單嗎？
 - Amkor 說 2029 預估損平、2030 預估滿載，為什麼 2027／2028 的「量產」仍不能直接當成熟獲利？
@@ -320,6 +340,38 @@ status: active
 url: https://ase.aseglobal.com/press-room/ase-and-wus-announce-strategic-expansion/
 locator: Kaohsiung／Nanzih Technology Industrial Park、planned completion September 2029、over 113,000 square meters，以及 FOCoS／FC BGA advanced-packaging focus 段落
 limitation: 這是日月光與 WUS 的公司規劃公告，只證明台灣端也有具名先進封裝建置方向；未揭露同一客戶、產品資格、名目或合格產出、利用率、收入、毛利、現金，也不能與 Arizona 的投資、空間、產能或日期直接加總比較
+-->
+
+<!-- research_source
+source_id: S13
+role: company_release
+source_kind: document
+publisher: Amkor Technology
+independence_group: amkor.com
+title: Amkor Technology Announces Phase 2 of Arizona Advanced Packaging and Test Campus; Expands Investment to $12 Billion
+published_at: 2026-09-08
+captured_at: 2026-10-04
+accepted_at: 2026-10-04
+status: active
+url: https://ir.amkor.com/news-releases/news-release-details/amkor-technology-announces-phase-2-arizona-advanced-packaging
+locator: 正文第1–6段的 phase2新增60,000平方公尺、campus約93,000平方公尺、planned investment約120億美元與construction late2027/completion end2029；Forward-Looking Statement Disclaimer 明示計畫性質
+limitation: 只證明公司公布新範圍與目標，不證明客戶承諾已兌現、資金已撥、資本已花、完工、資格、實際產出或財務；與既有Amkor文件屬同公司消息鏈，並未更新5/21 Phase1收入毛利/損平滿載目標，或明說Phase2已納入財務目標
+-->
+
+<!-- research_source
+source_id: S14
+role: company_release
+source_kind: living_index
+publisher: Amkor Technology
+independence_group: amkor.com
+title: Amkor Investor Relations Press Releases
+published_at:
+captured_at: 2026-10-04
+accepted_at: 2026-10-04
+status: active
+url: https://ir.amkor.com/press-releases
+locator: Date/Title列表；本輪可定位9/8 Phase2公告及較早季報、合作、活動附件；從S13頁Press Releases連結解析所得
+limitation: 只作未來附件查找路由，不支持公司事實或刷新主命題clock；news-releases舊路由本輪404，不把索引空白當無新消息，進入附件後須另建document source
 -->
 
 <!-- research_claim
@@ -569,7 +621,7 @@ resolution:
 <!-- research_claim
 claim_id: C16
 label: inference
-status: active
+status: superseded
 claim: 截至 2026-08-14，美國先進封裝區域化已進入有條件政策資金、客戶承諾與 Phase 1 建設的階段，但 Amkor 自己仍把 2028–2029 列為爬坡、2029 列為預估損平、2030 列為預估滿載，Phase 2 尚未納入現行財務目標；日月光同時在高雄規劃 FOCoS／FC BGA 新能力，因此不能合併不同專案金額與日期後宣稱美國已成熟，也不能由兩地建設公告判定台灣被取代或兩地必然互補
 supporting_source_ids: S3,S4,S8,S9,S11,S12
 contrary_source_ids:
@@ -579,6 +631,40 @@ boundary: 這是 project-version、maturity-clock 與 cross-region denominator �
 verification_needed: NIST／Amkor 以共同 project／phase／facility 公布實際撥款、工程、工具、資格、產出、利用率、損平與滿載，並由客戶與 3711 以同產品同期間資料核對台美訂單與財務
 correction_kind: supersedes
 corrects_claim_id: C6
+corrected_by_claim_id: C18
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: Amkor 2026-09-08 公告 Phase 2 預期新增60,000平方公尺無塵室，兩期campus合計約93,000平方公尺、計畫投資約120億美元；Phase 2預計2027年底開工、2029年底完工
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-10-04
+basis: S13開頭phase scope與投資段，以及施工時程段直接列示公司當時規劃
+boundary: 金額為兩期園區planned investment、空間為cleanroom，不是已支出CapEx、合格產出、服務收入或補助額；日期是construction/completion，不是customer qualification、HVM、損平或滿載，沒有估算達成機率
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: inference
+status: active
+claim: 美國先進封裝區域化的公司計畫已由5月Phase1財務目標與客戶驅動的Phase2範圍，推進到9月明列Phase2擴建規模及2027年底至2029年底建設時程；NIST award-project、5月Phase1財務目標與9月兩期campus新版本仍須分開，沒有因此證實資金實收、客戶資格、量產經濟或台美訂單替代
+supporting_source_ids: S3,S4,S8,S9,S11,S12,S13
+contrary_source_ids:
+as_of: 2026-10-04
+basis: correction_of:C16；S13新增既有主命題中的phase scope與construction clock，讓8/14整合判讀需要版本接續；S11保留5月Phase1財務口徑，S8/S9保留award-project，S12保留台灣建設規劃。這是計畫範圍更新，不是原歷史事實被證偽
+boundary: 新稿沒有把Phase1收入毛利/損平滿載目標重發給Phase2；不同版本cleanroom數值尚無同範圍調節，不能算產能增幅。S13仍是Amkor公司鏈，不是獨立客戶驗證；供應商收入及台灣轉單不因campus預算擴大而成立
+verification_needed: 同一project/phase/facility的award調節、實際支出與撥款、工程/工具、客戶產品資格、合格產出、利用率、收入毛利，以及台美同產品同期間訂單共同鍵
+correction_kind: supersedes
+corrects_claim_id: C16
 corrected_by_claim_id:
 resolution:
 -->
@@ -601,7 +687,7 @@ resolution:
 | 1. 政策獎勵與專案範圍 | 哪個 project／phase／facility 可獲多少支持？ | CHIPS final award 與現行專案頁列最高 4.07 億美元直接補助 | 可追溯的專案版本、契約範圍與後續修訂 |
 | 2. 里程碑撥付 | 補助是核定、可請領，還是已收到？ | NIST 明示依建設、技術、生產與商業里程碑分段撥付 | 各期已達里程碑、請領、核准與現金收到額 |
 | 3. 專案資本結構 | 政府、客戶與公司各自提供哪一筆錢？ | 有 CHIPS 上限、約 15 億美元客戶預付款預期與公司級 CapEx 指引 | 同一專案的政府補助、預付款、自有資金、債務與稅務抵減調節表 |
-| 4. 土地與建築完成 | 哪一期、哪一棟、何時可交付工具安裝？ | Amkor 已動土並規劃第一座設施 2027 年中完成 | 工程完工、驗收、供電／水／無塵室 ready 與實際日期 |
+| 4. 土地與建築完成 | 哪一期、哪一棟、何時可交付工具安裝？ | 舊版第一座設施預計2027年中完成；9/8新增Phase2預計2027年底開工、2029年底完工 | 各期工程完工、驗收、供電／水／無塵室 ready 與實際日期 |
 | 5. 工具進場與製程 enablement | 設備是否安裝、連線並能跑指定封裝流程？ | 尚無同一 facility 的完整公開證據 | 具名工具、move-in、hook-up、工程批次與製程整合結果 |
 | 6. 製程資格 | 製程是否達到良率、可靠度與重複性門檻？ | NIST 只把 technology milestone 列為撥付類別 | 固定產品／製程、樣本、良率、可靠度、失效與放行標準 |
 | 7. 客戶產品資格 | NVIDIA、TSMC 或其他客戶是否核准具名產品？ | 有多年期協議與十年採購框架 | 產品／封裝身分、qualification 完成、變更核准與量產 release |
@@ -615,12 +701,12 @@ resolution:
 
 | 金流 | 誰付給誰 | 本篇可確認的口徑 | 不能直接推論 |
 |---|---|---|---|
-| CHIPS 直接補助 | 美國政府 → Amkor 專案 | 最高 4.07 億美元，依里程碑撥付 | 已全數收到、已成營收，或可任意用於整個 70 億美元園區 |
+| CHIPS 直接補助 | 美國政府 → Amkor 專案 | 最高 4.07 億美元，依里程碑撥付 | 已全數收到、已成營收，或可任意用於新版120億美元兩期園區 |
 | 客戶預付款 | 客戶 → Amkor | 約 15 億美元，10-Q 預計 2027 年收到；收到時通常先進 contract liability 脈絡 | 同額服務已交付、當期收入與獲利已完成 |
 | 公司資本支出 | Amkor → 建築、設備及其他資產供應方 | 2026 全公司指引約 25–30 億美元 | 全部都在 Arizona、全是設備，或可分配給任何未具名台灣供應商 |
 | 封裝測試服務收入 | 客戶 → Amkor，對應已履約服務 | 本批文件沒有 Arizona facility 的可歸因金額 | 用補助、預付款、CapEx 或十年期直接代替收入與毛利 |
 
-另外，70 億美元是兩期園區的**計畫投資總額**，不是第五種當期現金流，也不是在上述四筆
+另外，9/8 新版約120億美元（舊版70億美元）是兩期園區的**計畫投資總額**，不是第五種當期現金流，也不是在上述四筆
 金額之外可以再次相加的收入。研究時至少要保留 `amount／payer／recipient／project／phase／
 period／accounting treatment` 七個欄位。
 
@@ -693,17 +779,33 @@ FASB PDF 共 156 頁，原檔 SHA-256 為
 及相鄰頁並目視核對。沒有共同 contract／project／asset／performance key，就不計算預付款覆蓋率、
 專案資金缺口、收入轉換率或台灣供應商份額。
 
-## 為什麼會看見 17 億、約 20 億與 70 億美元
+## 為什麼會看見 17 億、約 20 億、70 億與 120 億美元
 
 | 文件版本 | 它描述的範圍 | 金額與時程 | 正確讀法 |
 |---|---|---|---|
 | 2024 CHIPS final award 公告 | 當時的 greenfield award 專案 | 約 20 億美元專案、最高 4.07 億美元直接補助 | 固定 award 決策與撥付機制，不是後來所有擴建的永久總額 |
 | 2026-08-12 觀察的 NIST 專案頁 | 現行頁面所列 award-project 欄位 | 預期 CapEx 17 億美元、2027 年底量產、兩種預期產出 | 頁面沒有版本日期；應保存 capture，不能假定等於整個擴大園區 |
 | 2025 Amkor 擴建公告 | 擴大後兩期 Arizona campus | 計畫總投資 70 億美元；第一座設施預計 2027 年中完成、2028 年初投產 | 是更大 campus 的公司規劃，不是 award 已同步改成 70 億美元，也不是已完成支出 |
+| 2026-09-08 Amkor Phase 2 公告 | 新版兩期campus及Phase2擴建 | 計畫總投資約120億美元；Phase2預計2027年底開工、2029年底完工 | 更新公司計畫版本，不回寫舊award、舊財務目標或已實現支出；完工不等於產品放行 |
 
-三個數字可能同時為真，因為它們的時間、範圍、約數與設施層級不同。現有文件沒有一張
-官方 reconciliation 表，因此本篇不選一個數字覆蓋其他數字，也不把 17、20、70 億美元
+這些數字是不同時間與範圍的紀錄，不是四筆可以相加的資金。現有文件沒有一張
+官方 reconciliation 表，因此本篇以120億美元標示新的campus計畫、保留舊版，而不把17、20、70、120億美元
 相加。若未來 NIST 或 Amkor 用共同 project／phase／facility ID 發布調節表，再更新版本關係。
+
+### 10/4 修正紀錄：更新的是計畫版本，不是量產進度
+
+原 C16 以 8/14 當時已讀的5月簡報，將 Phase 1 建設與財務成熟時鐘整合成主命題。此次讀到
+[Amkor 9/8 Phase 2 正式公告](https://ir.amkor.com/news-releases/news-release-details/amkor-technology-announces-phase-2-arizona-advanced-packaging)，
+明列第二期規模與建設時程，因此以 C17 登錄公司計畫、C18 接續 C16。C12/C13 的5月歷史
+證實保留原日期；這不是把舊文件判錯，也不是宣稱量產或財務門檻已跨過。
+
+新稿的 Phase 1 規劃無塵室為33,000平方公尺、Phase 2 新增60,000平方公尺、campus合計
+約93,000平方公尺。5月簡報另列 Phase 1 full-scale 的75萬平方英尺；文件未提供兩版空間
+範圍調節，不能換算後就宣稱縮減、擴產倍數或產出增幅。面積是空間分母，不是晶圓或合格品。
+
+本輪新增文件數為1、發行人為1家，仍屬既有Amkor公司鏈，不是新增獨立客戶、工程批次或
+統計樣本；不計算成長率、達成機率或sampling SE/t。只有主命題中的計畫範圍取得新證據，
+撥款、預付款、實際產出、財務與台灣轉單的個別claim及圖譜期限均不因此一併刷新。
 
 ## 產能數字至少有五個分母
 
@@ -729,11 +831,12 @@ Amkor 於 2026 年 5 月提交 SEC 的投資人簡報，提供了一條比「202
 | Ramp | 2028–2029：utilization、mix、productivity compound | 產能上線後仍要靠使用率、產品組合與生產力把固定成本吸收 | 「有量產」就等於穩定毛利，或 headline 產能就是合格出貨 |
 | Leverage | 2030 以後：sustained utilization and absorption | 公司規劃以持續利用、較高價值組合與自動化形成營運槓桿 | 目標必然達成，或 2030 前沒有收入與毛利貢獻 |
 
-同一張簡報另把 **2029** 標為預估損平、**2030** 標為預估滿載；Phase 1 納入現行財務目標，
+同一張**5月歷史簡報**另把 **2029** 標為預估損平、**2030** 標為預估滿載；當時Phase 1納入財務目標，
 Phase 2 尚未納入，時程由客戶承諾驅動。Phase 1 在 full-scale 欄位的前瞻目標是約 10 億美元
 收入貢獻、超過 30% 毛利率與 75 萬平方英尺無塵室，兩期總投資則是 70 億美元。這些數字的
 共同主詞不是「Amkor 現在」，而是「Phase 1 達到 full scale 時」；因此不能拿來填 2026 年
-收入、把 75 萬平方英尺換成 NIST 的 wafer／unit，或替未納入財務目標的 Phase 2 背書。
+收入、把 75 萬平方英尺換成 NIST 的 wafer／unit，或替 Phase 2 背書。9/8新稿更新campus
+預算及第二期建設時鐘，但未重發上述財務目標；未取得新財務版本前，只能保留5月目標的日期與範圍。
 
 台灣端也不是靜止的反事實。日月光與 WUS 於 2026 年 5 月公告高雄楠梓的先進 AI 封裝 hub，
 規劃 2029 年 9 月完工、樓地板面積超過 11.3 萬平方公尺，並具名 FOCoS 與 FC BGA。這只能
@@ -785,9 +888,10 @@ Phase 2 尚未納入，時程由客戶承諾驅動。Phase 1 在 full-scale 欄�
 |---|---|---|
 | 2026-07-23 NVIDIA–Amkor | 新聞稿標題為 15 億美元多年期 advanced packaging and development agreement；正文說 NVIDIA 將提供預付款支持美國產能擴充 | NVIDIA 已付款、Amkor 已收款，或 15 億美元已成收入／獲利 |
 | 2026-07-28 Amkor 10-Q | 公司預計 2027 年從一名客戶收到約 15 億美元預付款；結合 7/23 公告判斷兩者高度相符，但 10-Q 該段未點名 NVIDIA | 把 7 月已收到的另一筆 1 億美元客戶預付款混入本案，或把未來收款當成已履約收入 |
-| CHIPS award-project | NIST 列最高 4.07 億美元、四類撥付里程碑、預期產出與 2027 年底量產 | 補助已全數撥付、預期產出已達成，或頁面範圍等於後來 70 億美元兩期 campus |
+| CHIPS award-project | NIST 列最高 4.07 億美元、四類撥付里程碑、預期產出與 2027 年底量產 | 補助已全數撥付、預期產出已達成，或頁面範圍等於後來兩期 campus |
 | 2026-06-16 TSMC–Amkor | 雙方簽十年框架，由 TSMC 向 Amkor 採購 Arizona advanced packaging／test services | 保底採購量、價格、利用率、排他性、產品組合或毛利 |
-| 擴大 campus 時鐘 | Amkor 規劃第一座設施 2027 年中完工、2028 年初投產，兩期園區總投資 70 億美元 | 美國先進封裝已營運、兩期同時完成，或新增產能必然取代台灣 |
+| 舊版 campus 時鐘 | 2025公告規劃第一座設施2027年中完工、2028年初投產，兩期園區70億美元 | 不可當成9/8新版總預算，也不代表已營運 |
+| 2026-09-08 Phase 2 | 新版兩期campus計畫120億美元；Phase2預計2027年底開工、2029年底完工 | 不是已完成支出、Phase2已量產、原Phase1損平/滿載已達成或台灣訂單流失 |
 
 ## 新手最常混淆的六件事
 
@@ -816,6 +920,7 @@ Phase 2 尚未納入，時程由客戶承諾驅動。Phase 1 在 full-scale 欄�
 - [FASB Topic 606 Section A](https://storage.fasb.org/ASU%202014-09_Section%20A.pdf)（付款／履約先後、合約資產／負債與應收款呈現；通用準則，不是 Amkor 個別合約條款）。
 - [Amkor 2026 Investor Day 簡報（SEC Exhibit 99.1）](https://www.sec.gov/Archives/edgar/data/1047127/000104712726000036/ex-991amkorinvestorprese.htm)（2026-05-21；Phase 1／2、損平與滿載為公司前瞻目標）。
 - [日月光—WUS 高雄先進 AI 封裝 hub 公告](https://ase.aseglobal.com/press-room/ase-and-wus-announce-strategic-expansion/)（2026-05-08；建設與製程規劃，不是已量產實績）。
+- [Amkor Phase 2 與120億美元新版園區計畫](https://ir.amkor.com/news-releases/news-release-details/amkor-technology-announces-phase-2-arizona-advanced-packaging)（2026-09-08；計畫、空間與建設時程，不是實際產出或財務目標更新）。
 
 Amkor 10-Q 把客戶預付款放在 contract liabilities／standby letters of credit 的脈絡；收到
 現金與認列封裝服務收入並非同一件事。公司同時警告，新產能的時程、成本、規格與效益都
@@ -871,12 +976,15 @@ evidence_boundary: 來源未點名 universe 材料商、料號、認證進度或
 
 ## 持續驗證清單
 
-topic 的主命題由 C16 接續 C6，`review_due` 更新為 2026-09-15；這只表示新 phase／成熟
-時鐘已被主命題吸收，不表示工具、資格、實際產出與財務缺口已補齊。T1 的
+topic 的主命題先由 C16 接續 C6，本輪再由 C18 吸收9/8新Phase2範圍與建設時鐘；
+`review_due` 為2026-10-31。這不是工具、資格、實際產出或財務缺口補齊。T1 的
 MOPS watch source 無法直接觀察 Amkor／CHIPS 專案，T2 又依賴已被 C6 取代的粗粒度 C2；
 兩者先保留歷史後退役。2026-08-14 的新 phase／成熟時鐘命中 T3，原訂隔日的台灣端季度
 回查也完成 T4；兩者同樣保留後退役，由 T5 在 2026-09-15 固定美國實際進度、T6 在
-2026-11-14 固定台美雙地區證據接續。
+2026-11-14 固定台美雙地區證據接續。本輪T5命中phase scope後保留退役，由T7接續；
+另新增可實際定位附件的Amkor Press Releases入口S14，避免僅NIST頁漏掉公司擴建。
+T6未到期且沒有台灣轉單新證據，只因引用的C16已被接續而保留退役，由T8原樣保留
+11/14期限與原trigger/invalidation；不計作本輪已完成回查或新支持。
 
 <!-- monitoring_item
 monitor_id: T1
@@ -942,7 +1050,7 @@ retirement_reason: 原訂 2026-08-15 的季度回查提前完成；S12 只新增
 
 <!-- monitoring_item
 monitor_id: T5
-status: active
+status: retired
 claim_ids: C1,C4,C5,C7,C12,C13,C16
 metric: CHIPS award-project、Phase 1／2、預付款、實際撥款及建設到損平／滿載的可重算進度
 source_ids: S1,S2,S4,S5,S8,S9,S11
@@ -952,12 +1060,44 @@ frequency_detail: 每月保存 NIST 專案頁欄位，事件發生時同步回�
 next_check: 2026-09-15
 trigger: NIST 或 Amkor 首次更新實際補助撥付、phase scope、設施完工、工具進場、製程／客戶資格、實際量產產出、利用率、損平、滿載或可歸因財務
 invalidation: award 條件、Phase 1／2、投資或成熟時鐘被正式修改，預付款／工程延後，或實際產出、利用率、損平與財務結果不支持現行規劃
+retired_at: 2026-10-04
+retirement_reason: S13命中phase scope更新且C18接續C16；保留原T5全部監測契約和原到期日，以T7加入新版本基線及Amkor公告索引接續，不將計畫升級為實際量產或財務
 -->
 
 <!-- monitoring_item
 monitor_id: T6
-status: active
+status: retired
 claim_ids: C3,C7,C14,C15,C16
+metric: 美國與台灣先進封裝是否形成同產品具名訂單移轉、互補產出及財務影響
+source_ids: S3,S4,S6,S8,S11,S12
+watch_source_ids: S6
+frequency: quarterly
+frequency_detail: 以 MOPS 公司 filing／法說為台灣端 living index，只有台美 project／phase／facility、產品、qualification、期間、reference plane 與財務雙向對上才升格
+next_check: 2026-11-14
+trigger: Amkor、客戶或台灣公司首次揭露同一產品的 qualification、區域訂單、合格產出、利用率、毛利或現金，足以跨公司核對替代或互補
+invalidation: 框架未轉成量產服務，台灣產能與毛利維持強勁而無轉單證據，或兩地只提供建設／一般 AI 敘事，零和與互補均維持未證
+retired_at: 2026-10-04
+retirement_reason: 所引用C16已由C18接續，T8只接續主張引用，保留原11/14期限與原metric/trigger/invalidation/frequency；本輪未完成台灣公司同產品財務回查，不計新增支持
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C1,C4,C5,C7,C12,C13,C17,C18
+metric: CHIPS award-project、Phase 1／2、預付款、實際撥款及建設到損平／滿載的可重算進度
+source_ids: S1,S2,S4,S5,S8,S9,S11,S13
+watch_source_ids: S8,S14
+frequency: event_driven
+frequency_detail: 每月保存NIST專案頁，並循Amkor Press Releases取得實際公告/filing附件；固定project/phase/facility、actual/target及版本，新附件另建document source
+next_check: 2026-10-31
+trigger: NIST 或 Amkor 首次更新實際補助撥付、phase scope、設施完工、工具進場、製程／客戶資格、實際量產產出、利用率、損平、滿載或可歸因財務
+invalidation: award 條件、Phase 1／2、投資或成熟時鐘被正式修改，預付款／工程延後，或實際產出、利用率、損平與財務結果不支持現行規劃
+-->
+
+<!-- monitoring_item
+monitor_id: T8
+status: active
+claim_ids: C3,C7,C14,C15,C18
 metric: 美國與台灣先進封裝是否形成同產品具名訂單移轉、互補產出及財務影響
 source_ids: S3,S4,S6,S8,S11,S12
 watch_source_ids: S6
@@ -976,5 +1116,5 @@ invalidation: 框架未轉成量產服務，台灣產能與毛利維持強勁而
 - NIST 的 2027 年底與 Amkor 的 2028 年初時程能否由共同專案版本調節；若不能，研究中心持續並列而不擇一。
 - TSMC–Amkor 是否披露實際封裝技術、產品資格、最低量、價格、合格產出或利用率；框架本身不夠。
 - 日月光及台灣先進封裝設備／材料公司是否揭露美國或台灣的新增訂單、產能利用率與毛利，而非只談政策方向。
-- Amkor Phase 1 是否依公司自己的 2029 損平、2030 滿載規劃交付；Phase 2 何時取得足以納入財務目標的客戶承諾。
+- Amkor Phase 1 是否實現5月的2029損平、2030滿載目標；Phase 2是否依9/8版在2027年底開工、2029年底完工，何時另行公布具名產品資格與財務目標。
 - 若 Arizona 良率／成本不具競爭力，或 AI 需求讓台灣產能同步維持高稼動，不能再使用「美國擴產＝台灣流失」的單向敘事。

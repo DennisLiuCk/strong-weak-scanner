@@ -2209,9 +2209,9 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 17), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 4),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 18), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -2227,7 +2227,7 @@ class ResearchCenterTest(unittest.TestCase):
         graph = (
             ROOT / "notes" / "knowledge_graph" / "ai_rack_action_contract.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 19)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
         for contract in (
             "edge_id: KG-RAC-I17",
             "to_id: process:safe-state-deadline-passport",
@@ -4298,7 +4298,7 @@ process.stdout.write(JSON.stringify(results));
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 57
+            sum(line.startswith("- **") for line in glossary.splitlines()), 59
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4313,9 +4313,9 @@ process.stdout.write(JSON.stringify(results));
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 14),
-            ("research_claim", 16), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 3),
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 17), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4333,7 +4333,7 @@ process.stdout.write(JSON.stringify(results));
             ROOT / "notes" / "knowledge_graph"
             / "custom_hbm_scope_ladder.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
         for concept_id, edge_id in (
             ("concept:custom-hbm-workload-contract", "KG-CHBM-I11"),
             ("concept:custom-hbm-interface-contract", "KG-CHBM-I12"),
@@ -8474,9 +8474,9 @@ process.stdout.write(JSON.stringify(results));
         )[0]
         self.assertGreaterEqual(glossary.count("- **"), 26)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 24),
-            ("research_claim", 25), ("metric_comparison", 0),
-            ("impact", 6), ("monitoring_item", 5),
+            ("research_topic", 1), ("research_source", 26),
+            ("research_claim", 26), ("metric_comparison", 0),
+            ("impact", 6), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -9138,7 +9138,7 @@ process.stdout.write(JSON.stringify(results));
             "## 先把區域化拆成九個交接關卡",
             "## 四種錢不能放進同一個加總",
             "## 15 億美元預付款不是免息營收：用六本帳拆開資金、義務與產能",
-            "## 為什麼會看見 17 億、約 20 億與 70 億美元",
+            "## 為什麼會看見 17 億、約 20 億、70 億與 120 億美元",
             "## 產能數字至少有五個分母",
             "## 產能上線、損平與滿載不是同一天：用雙地區成熟度護照拆零和敘事",
             "## 事件、會計與產能時鐘",
@@ -9148,7 +9148,7 @@ process.stdout.write(JSON.stringify(results));
         positions = [topic.index(heading) for heading in headings]
         self.assertEqual(positions, sorted(positions))
         for contract in (
-            "thesis_claim_id: C16",
+            "thesis_claim_id: C18",
             "reason: reconciled_chips_award_project_scope_with_expanded_campus_and_nine_gate_conversion",
             "reason: arizona_break_even_full_utilization_and_taiwan_concurrent_build_clocks_reconciled",
             "claim_id: C5",
@@ -9206,9 +9206,9 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 16), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 6),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 18), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 8),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -9259,7 +9259,7 @@ process.stdout.write(JSON.stringify(results));
             "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C13",
             "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C14",
             "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C15",
-            "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16",
+            "MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C18",
             "2028 至 2029 ramp 與 2030 estimated full utilization",
             "兩地同時規劃新增能力",
         ):
@@ -9273,6 +9273,61 @@ process.stdout.write(JSON.stringify(results));
             "MR-2026-08-14-US-ADVPKG-T4-TAIWAN-CONCURRENT-BUILD",
         ):
             self.assertIn(review_id, reviews)
+
+    def test_october_evidence_branches_preserve_maturity_clocks_and_review_gaps(self):
+        def blocks(text, kind, key):
+            result = {}
+            for body in re.findall(r"<!-- " + kind + r"\s*\n(.*?)-->", text, re.S):
+                fields = dict(line.split(":", 1) for line in body.splitlines() if ":" in line)
+                fields = {k.strip(): v.strip() for k, v in fields.items()}
+                result[fields[key]] = fields
+            return result
+
+        topics = ROOT / "notes" / "research_topics"
+        for filename, claim_id, source_id, thesis_id, old_due in (
+            ("2026-07-21_nvidia_vera_rubin_production.md", "C26", "S25", "C11", "2026-08-15"),
+            ("2026-08-03_custom_hbm_scope_ladder.md", "C17", "S15", "C5", "2026-09-15"),
+            ("2026-08-07_ai_rack_action_contract.md", "C18", "S14", "C4", "2026-08-31"),
+        ):
+            with self.subTest(filename=filename):
+                text = (topics / filename).read_text(encoding="utf-8")
+                meta = next(iter(blocks(text, "research_topic", "topic_id").values()))
+                self.assertEqual(meta["thesis_claim_id"], thesis_id)
+                self.assertEqual(meta["review_due"], old_due)
+                claims = blocks(text, "research_claim", "claim_id")
+                self.assertEqual(claims[claim_id]["label"], "verified")
+                self.assertIn(source_id, claims[claim_id]["supporting_source_ids"].split(","))
+                self.assertTrue(claims[claim_id]["boundary"])
+
+        rubin = (topics / "2026-07-21_nvidia_vera_rubin_production.md").read_text(encoding="utf-8")
+        sources = blocks(rubin, "research_source", "source_id")
+        self.assertEqual(sources["S25"]["independence_group"], sources["S26"]["independence_group"])
+        self.assertIn("limited availability", blocks(rubin, "research_claim", "claim_id")["C26"]["claim"])
+
+        amkor = (topics / "2026-08-01_us_advanced_packaging_regionalization.md").read_text(encoding="utf-8")
+        claims = blocks(amkor, "research_claim", "claim_id")
+        self.assertEqual(claims["C16"]["status"], "superseded")
+        self.assertEqual(claims["C16"]["corrected_by_claim_id"], "C18")
+        self.assertEqual(claims["C18"]["corrects_claim_id"], "C16")
+        self.assertEqual(claims["C18"]["label"], "inference")
+        monitors = blocks(amkor, "monitoring_item", "monitor_id")
+        self.assertEqual(monitors["T6"]["status"], "retired")
+        for field in ("metric", "trigger", "invalidation", "frequency", "next_check"):
+            self.assertEqual(monitors["T6"][field], monitors["T8"][field])
+        self.assertEqual(monitors["T8"]["next_check"], "2026-11-14")
+
+        path = ROOT / "notes" / "research_method_reviews" / "monitor_reviews.csv"
+        with path.open(encoding="utf-8", newline="") as stream:
+            reviews = [r for r in csv.DictReader(stream) if r["checked_at"] == "2026-10-04"]
+        self.assertEqual(len(reviews), 89)
+        self.assertEqual(len({(r["topic_id"], r["monitor_id"]) for r in reviews}), 89)
+        for review in reviews:
+            if review["result"] in ("no_new_evidence", "not_yet_testable"):
+                self.assertEqual(review["evidence_source_ids"], "")
+                self.assertEqual(review["claim_action"], "none")
+        self.assertFalse(any(r["topic_id"].endswith("GALLIUM-PERMIT-DELIVERY") for r in reviews))
+        self.assertFalse(any(r["topic_id"].endswith("AMD-HELIOS-DEPLOYMENT-LADDER")
+                             and r["monitor_id"] in ("T5", "T8", "T12") for r in reviews))
 
     def test_priority_q2_faraday_dual_denominator_blocks_false_conversion_rate(self):
         topic = (

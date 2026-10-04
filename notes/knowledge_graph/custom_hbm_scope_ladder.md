@@ -56,18 +56,38 @@ view: company
 from_id: company:micron
 to_id: concept:custom-hbm-commercialization
 relation: develops_ip
-claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C4
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C4,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C17
 note_refs:
 evidence_state: verified
 commercial_stage: planned
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2025-09-23
-review_due: 2026-09-23
+as_of: 2026-09-30
+review_due: 2026-10-18
 status: active
-boundary: Micron 揭露 HBM4E 客製 base logic die 選項與 TSMC 分工；較高毛利仍是預期而非已實現結果。
+boundary: Micron 新增具名 NVIDIA NVHBM 開發合作；未來採用不是已交貨。舊 base-die 選項與 TSMC 分工不自動套到新專案；樣品 資格 量產 客製毛利與獨家仍未證。
 next_trigger: Micron 公布具名客戶 qualification 量產與可核對的 NRE 售價 良率或毛利。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CHBM-C04
+view: company
+from_id: company:nvidia
+to_id: concept:custom-hbm-commercialization
+relation: develops_ip
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C17
+note_refs:
+evidence_state: verified
+commercial_stage: planned
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-09-30
+review_due: 2026-10-18
+status: active
+boundary: 只證實 Micron 法說具名 NVIDIA 參與 NVHBM 開發；不是 NVIDIA 獨立確認 客戶資格 已採用 獨家 量產或台灣供應鏈收入。
+next_trigger: 雙方以同一 NVHBM 產品身分公開實體樣品 接收方 測試條件與 qualification 結果。
 -->
 
 <!-- knowledge_edge

@@ -96,9 +96,33 @@ to: triaged
 reason: added_coreweave_multi_rack_bringup_and_preview_benchmark_boundaries_without_thesis_clock_or_supplier_financial_upgrade
 evidence: sources:S22,S23,S24
 -->
+<!-- transition
+date: 2026-10-04
+from: triaged
+to: triaged
+reason: named_coreweave_cognition_production_workload_branch_without_financial_or_thesis_clock_upgrade
+evidence: sources:S25,S26
+-->
+
 ## 新手先讀：這篇在講什麼
 
+### 10 月 4 日更新：已有具名客戶在跑，不等於所有地方都買得到
+
+CoreWeave 9 月 30 日公告，Cognition 已在 Vera Rubin NVL72 上執行正式工作負載；同日技術文章
+限定供應仍是「有限度開放」。[S25][S26][C26] 對新手來說，這比「機架開機通過」多了一層證據：
+已經有人拿它做實際工作。但有限度開放不是全面可租用，客戶上線也不是台灣製造商已認列收入。
+
+**已證實**的是營運商公開具名客戶與正式工作；**推論**是交付階梯的雲端工作一關有新進度；
+**待驗證**的是精確站點、機架數、固定版本、驗收分母與台灣公司財務。客戶引述、新聞稿與同日
+部落格都來自 CoreWeave 消息鏈，不能計作三份獨立確認。本輪不引用其效能倍率，因未取得原始
+逐次測試、誤差與共同工作負載分母。
+
+接下來問兩件事：這一名客戶的成功能不能在其他站點重現？新增容量是否能與同一批產品的
+供應商交貨、客戶驗收及財務認列對上？本文只推進具名工作旁支，不刷新主命題 C11 的時鐘。
+
 ### 名詞小字典
+
+- **Cognition**：本次被 CoreWeave 具名的軟體開發 AI 客戶；客戶引述仍是營運商消息鏈，不是第二份獨立發布。
 
 - **量產爬坡**：產品已從設計或樣品走向持續製造，但產量、良率、收入與毛利仍可能逐步增加，不代表一開始就滿載。
 - **AI factory**：把大量運算、網路、儲存、電力與散熱設備整合成 AI 基礎設施的資料中心，不是傳統製造工廠。
@@ -843,6 +867,38 @@ limitation: 本輪只接受公司對 preview submission 類別的表述，未重
 independence_group: nvidia
 -->
 
+<!-- research_source
+source_id: S25
+role: other_primary
+source_kind: document
+publisher: CoreWeave
+title: CoreWeave Delivers NVIDIA Vera Rubin NVL72 Performance at Production Scale, Starting With Cognition
+published_at: 2026-09-30
+captured_at: 2026-10-04
+accepted_at: 2026-10-04
+status: active
+url: https://investors.coreweave.com/news/news-details/2026/CoreWeave-Delivers-NVIDIA-Vera-Rubin-NVL72-Performance-at-Production-Scale-Starting-With-Cognition/default.aspx
+locator: 開頭 availability 與 Cognition production workloads；Cognition is the first customer in production 段落
+limitation: 營運商自述並引述客戶，非客戶另行發布的獨立證據；沒有精確機架數、站點、完整版本、原始重複測試或台灣供應商財務，本文不採效能倍率
+independence_group: coreweave
+-->
+
+<!-- research_source
+source_id: S26
+role: other_primary
+source_kind: document
+publisher: CoreWeave
+title: Cognition Becomes First Customer for NVIDIA Vera Rubin NVL72 on CoreWeave Cloud
+published_at: 2026-09-30
+captured_at: 2026-10-04
+accepted_at: 2026-10-04
+status: active
+url: https://www.coreweave.com/blog/cognition-becomes-first-customer-for-nvidia-vera-rubin-nvl72-on-coreweave-cloud
+locator: 開頭 limited availability 與多區域供應；Cognition advances autonomous software engineering 段
+limitation: 與 S25 同一消息鏈，只補供應範圍而不是第二條獨立確認；不把有限度供應視為全面 GA，不採缺原始 run／誤差的效能倍率
+independence_group: coreweave
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -1197,6 +1253,20 @@ verification_needed:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C26
+label: verified
+status: active
+claim: CoreWeave 於 2026-09-30 公告 Cognition 已在 Vera Rubin NVL72 執行正式工作負載，同日文章將該平台供應範圍限定為 limited availability
+supporting_source_ids: S25,S26
+contrary_source_ids:
+as_of: 2026-09-30
+basis: S25 開頭具名 production workload；S26 開頭界定有限度供應。只採營運商對當前用途與範圍的可定位揭露，不採未重算的效能結果
+boundary: 同公司稿件及客戶引述仍是一條消息鏈；不證明全面 GA、精確機架數、具名站點、完整版本／驗收分母、重複部署或台灣 ODM 訂單收入。主命題 C11 財務橋接與其他關卡不因此刷新
+verification_needed:
+resolution:
+-->
+
 ## 影響路由
 
 <!-- impact
@@ -1340,6 +1410,20 @@ invalidation: 動態頁撤除或改寫既有系統組成，或後續客戶文件
 -->
 
 ## 下一個可證明／否定的節點
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C26
+metric: CoreWeave 有限度供應與 Cognition 正式工作是否可接上固定版本、具名站點、機架數及驗收分母
+source_ids: S25,S26
+watch_source_ids: S16
+frequency: event_driven
+frequency_detail: 營運商或客戶發布可用性、部署、運行及驗收更新即查；2026-10-18 先核對供應範圍與同名客戶交付結果
+next_check: 2026-10-18
+trigger: 同一具名客戶與 NVL72 配置提供站點、機架數、軟硬體版本、工作持續時間及驗收分母，或另有客戶證實同條件可重現
+invalidation: 供應撤回、客戶更正用途、持續運行或驗收失敗；只有既有新聞稿重刊不得刷新時鐘
+-->
 
 - 技嘉下一份公司 IR 是否把 Rubin 從生態系／開發名單推進到可量化的驗證、量產出貨、
   客戶驗收或收入認列；正式筆記仍保留 5/15 當時的公司揭露，不以 NVIDIA 公告覆寫。

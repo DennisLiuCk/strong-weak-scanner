@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-09-25
+next_review: 2026-10-07
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -35,7 +35,7 @@ why_now: 到期追蹤初查發現Infineon9/9與SolarEdge合作把SSCB故障隔�
 knowledge_gain: 區分電力轉換、故障隔離與末端降壓，建立可重用的保護責任及測試邊界；合作稿與引述公司同一消息鏈，不計為兩份獨立驗收。
 first_rejection: 若仍只有合作稿或微秒級設計目標而沒有具名型號與可回查測試，就不另寫重複文章或新增公司受惠線。
 next_evidence: 取得同一SSCB型號與版本的電壓故障包絡及選擇性保護實測，核對客戶驗收與可比器件或替代拓撲；之後才追部署分母和收入。
-next_check: 2026-09-30
+next_check: 2026-10-07
 route: watch_only
 article_topic_id:
 graph_id:
@@ -85,7 +85,7 @@ why_now: Samsung Electro-Mechanics9/10展稿新增玻璃核心與導孔加工展
 knowledge_gain: 只有新客戶或製造共同鍵才會超越既有玻璃角色地圖；公司展稿與材料供應商用途說明不是互相替客戶資格背書。
 first_rejection: 若仍只有展品或單站加工能力，未有同一封裝產品的客戶資格及量產结果，就不另立文章或將carrier出貨算成glass-core採用。
 next_evidence: 取得同一glass-core封裝產品與版本的客戶資格及製造結果，逐項分開carrier與interposer角色，核對連續批次良率及量產時間而非展會日期。
-next_check: 2026-09-30
+next_check: 2026-10-11
 route: watch_only
 article_topic_id:
 graph_id:
@@ -99,3 +99,11 @@ sources: Samsung Electro-Mechanics9/10展稿 => https://samsungsem.com/global/ne
 核對過算式不代表模型已被外部驗證，更不代表實體 HBF 樣品表現，所以繼續觀察，
 9/25 再找原始運行紀錄或勘誤。SSCB 和玻璃核心仍依原定 9/30 找具名產品測試與客戶資格，
 未取得新證据便不新增公司受惠線。原選題理由及來源發布日保留。
+
+## 10月4日回查：維持原排序，區分未成熟與未完成
+
+- **SSCB，順位1維持 watch**：重讀 Infineon 9/9 合作稿，仍未取得同型號故障包絡、原始波形與客戶驗收。另見 [9/29 Eaton SST 公告](https://www.infineon.com/press-release/2026/infpr202609-146)，它是電力轉換旁支，不替固態斷路器的選擇性保護背書。10/7 先找同型號測試與買方附件，不新增受惠公司線。
+- **HBFSim，順位2維持 watch 且逾期**：本輪未完成作者原始運行紀錄與勘誤回查，保留9/25期限，不用重開論文入口當成完成複核。下一工作優先補作者版本、倍率與秒數共同鍵，再決定是否具備外部驗證；不採效能點估計。
+- **玻璃核心，順位3維持 watch**：重讀 Samsung 展示與 Corning 角色說明，另查 [SKC 新聞室9/22資金及工程狀態](https://www.skc.kr/m/eng/Conmmunication/newsroom/system.do?menuCd=006001)。資金、展示、可靠度測試及概念驗證準備，不是同一客戶產品資格與連續批次製造結果。10/11 再查具名 qualification、良率與出貨分母。
+
+三題原選題理由、第一拒絕、順位與知識價值均保留，不用本輪發現重排凍結歷史。雷達下次工作日10/7只是排程，不代表HBFSim已完成回查或任何來源變新。

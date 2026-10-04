@@ -75,6 +75,13 @@ to: triaged
 reason: added_end_to_end_safe_state_deadline_budget_without_thesis_or_clock_refresh
 evidence: sources:S1,S8,S11,S12,S13
 -->
+<!-- transition
+date: 2026-10-04
+from: triaged
+to: triaged
+reason: added_redfish_125_temporary_unavailability_contract_without_refreshing_existing_claim_clocks
+evidence: sources:S14
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -117,6 +124,7 @@ evidence: sources:S1,S8,S11,S12,S13
 - **任務狀態（TaskState）**：Redfish Task 用來標示工作處於新建、執行中、完成、例外或被取消等階段的欄位；它仍是管理軟體所見狀態。
 - **回查位置（Location）**：HTTP 回應告訴客戶端接下來到哪個網址查詢非同步工作；網址日後可能失效，不能拿它代替長期事件紀錄。
 - **Retry-After**：HTTP 回應用來提示客戶端隔多久再查或再送請求的欄位；它不是工作完成時間，也不是安全狀態期限。
+- **預告暫時離線（temporarily offline）**：管理服務可能因更新或重啟而暫時不能回答。Redfish 1.25.0 要求在相關長動作中先通知客戶端並提供預期離線時間；這不表示設備已安全隔離，也不准把任意失聯解釋成正常維護。[S14]
 - **服務水準協議（SLA）**：供應方與使用方約定的可用率、延遲或處理期限；若沒有量測起點、終點、統計窗口與例外條件，就不能把一句「很快」當成可驗收的 SLA。
 - **命令狀態（commanded state）**：控制系統認為自己已發出或完成的邏輯動作，例如要求關閉某個 outlet。
 - **實際觀測狀態（observed physical state）**：由設備狀態與獨立感測確認電力、流量、泵浦或漏液狀態真的改變；它不能只沿用命令回覆。
@@ -137,6 +145,8 @@ evidence: sources:S1,S8,S11,S12,S13
 - **DSX**：NVIDIA 的 AI 基礎設施資料與控制規格；本篇引用其中的 BMS Event Bus，不代表所有資料中心都已部署。
 - **OpenRMC**：OCP 的開放機櫃管理控制器專案，界定機櫃管理器的硬體、軟體與介面範圍。
 - **Redfish**：DMTF 制定的通用設備管理介面標準；產品支援 Redfish，不等於已實作 DSX 的隔離流程。
+- **規格（specification）**：描述協定或產品應如何運作的規範文件；規格的要求與產品實際測試結果是兩種不同證據。
+- **附錄（annex）**：正文後的補充章節；本次引用的 Annex A 是版本修訂紀錄，用來定位哪一版增加了暫時離線規則。
 
 ### 三句話抓重點
 
@@ -387,6 +397,22 @@ url: https://www.rfc-editor.org/rfc/rfc9110.html
 locator: §§10.2.3、15.3.3；202 Accepted 只表示請求已接受但處理尚未完成、日後可能執行也可能不執行，HTTP 不會由非同步操作重新送一次狀態碼；response 應描述目前狀態並指向 status monitor；Retry-After 表示後續請求前建議等待時間。RFC header 只標 June 2022，帳本日期以 2022-06-01 正規化且不主張日精度
 limitation: RFC 9110 是通用 HTTP 語意，不定義 Redfish Task、DSX isolation、rack safe-state deadline、實體致動、獨立感測、功能安全或場域驗收；它只界定 202 與 follow-up timing 的協定邊界，不證明任何設備、平台、客戶或 production outcome
 independence_group: ietf-http
+-->
+
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: document
+publisher: DMTF
+title: Redfish Specification 1.25.0 — temporary service unavailability during asynchronous operations
+published_at: 2026-08-07
+captured_at: 2026-10-04
+accepted_at: 2026-10-04
+status: active
+url: https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.25.0.pdf
+locator: 封面及 Annex A p.216 的文件日期為 2026-08-07；DMTF Redfish release index 對應列為 2026-09-14，兩日期不是同一欄；§12.2 pp.162–164 尤其 p.163 暫時離線通知與 p.164 適用操作、Task 最終結果；Annex A p.216 列出本版新增離線說明。已渲染引用頁及相鄰頁並視讀 pp.163–164、216，未宣稱全文差異稽核
+limitation: 規格要求不是產品實作、DSX 映射、故障注入或 production incident 證據；Retry-After 指預期離線時間而不是機櫃安全期限，規格建議限於更新、reset、還原出廠等操作。相同 DMTF 文件鏈不增加獨立場域樣本
+independence_group: dmtf-redfish
 -->
 
 <!-- research_claim
@@ -678,6 +704,35 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: Redfish Specification 1.25.0 對長動作中服務預計暫時離線的情境，要求先在 Task 的 Messages 放入 ManagerGoingOfflineTemporarily，並用 Retry-After 表達預期離線時間；客戶端應等待該時間再查詢，服務恢復後可能要求重新認證。規格建議此行為限於更新、reset 或還原出廠等操作，操作完成後仍須回報 TaskState 與最終結果
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-10-04
+basis: S14 §12.2 pp.162–164 直接區分執行中、預告離線與最終結果；Annex A p.216 明列 1.25.0 新增長動作離線說明。文件日期 2026-08-07，release index 日期 2026-09-14，本研究取得日 2026-10-04
+boundary: 只證實版本化管理協定的要求，不證明任何機櫃、BMC、DSX isolation 或台灣公司已實作；沒有預告的失聯不能被當成符合本條款，預期離線時間不等於安全狀態期限、完成承諾、物理隔離或維修簽收；既有 C4、C14、C15 與其他 claims 的 evidence clock 不因本旁支更新
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 2026-10-04 核實更新：管理服務暫時失聯，不能直接判成完成或失敗
+
+**證實的是規則，待驗證的是現場。** 本次新增的 Redfish 1.25.0 在 §12.2 加入「執行長動作時，管理服務自己可能暫時離線」的通知要求。[S14] 例如控制器更新韌體時先告知暫停回答，和毫無預警地斷線，是兩種需要分開記錄的情境。
+
+用新手角度看，這像維修人員先說「我需要暫停通話，預計稍後回覆」。這句話只解釋為什麼暫時聽不到回應，不等於他已修好設備。`Retry-After` 也只是這次預期多久不能查詢，不會自動延長原本的安全期限，更不保證閥門、斷路器或泵浦已到位。
+
+研究上應把三個問題分開：有沒有事前預告與同一 Task？等候後能否重新認證並取回真正結果？另外的設備狀態與獨立感測是否支持安全、復原及維修簽收？最後兩步仍需具名實作與事件紀錄，不能由規格發布推導已部署。
+
+**讀完可以自己追問：** 如果離線時間超過原定安全期限，誰負責本地保護？若通知遺失，怎麼分辨預期維護與故障？恢復連線後看到 Task 完成，要再拿哪一筆物理讀值和維修紀錄核對？這些問題目前未取得同一量產事件的完整答案，既有閉環與台股財務判定不升級。
+
+日期也分開保存：PDF 封面與 Annex A 的文件日期是 **2026-08-07**，DMTF 發布索引列的是 **2026-09-14**，本次取得與核實是 **2026-10-04**。本文只新增 C18，不把這次讀取日回填成舊主張的新證據日。[S14]
+
 ## 從警報到復原：七個步驟不能少
 
 | 控制步驟 | 這一步要回答什麼 | 公開文件目前支持什麼 | 還缺哪些現場證據 |
@@ -861,6 +916,7 @@ DMTF 的電力白皮書把 `PowerControlLocked`、開關延遲、復電政策、
 - [OCP：OpenRMC-DM project](https://www.opencompute.org/community/openrmc-dm)
 - [DMTF：Redfish standards](https://www.dmtf.org/standards/redfish)
 - [DMTF：Redfish Specification 1.24.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.24.0.html)
+- [DMTF：Redfish Specification 1.25.0，§12.2 與 Annex A](https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.25.0.pdf)
 - [DMTF：Redfish Interoperability Profiles 1.10.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0272_1.10.0.html)
 - [DMTF：Redfish Conformance and Test Tools](https://www.dmtf.org/sites/default/files/standards/documents/DSP2068_1.0.0_0.pdf)
 - [DMTF：Redfish for Power Distribution Equipment](https://www.dmtf.org/sites/default/files/standards/documents/DSP2056_1.1.0.pdf)
@@ -954,6 +1010,19 @@ frequency: monthly
 next_check: 2026-08-31
 trigger: 具名 profile 或多供應商場域公開同一事件的 profile／validator 版本、request／Task／physical state、fault case、rollback、repair 與 sign-off
 invalidation: 公開測試顯示 API accepted／Task state 無法可靠對應 physical state，或跨域 sequence 缺共同 owner／rollback，則閉環成熟度下修
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C18
+metric: Redfish 暫時離線條款的正式版本與具名實作通知、重認證、Task 結果及物理確認
+source_ids: S14
+watch_source_ids: S6
+frequency: monthly
+next_check: 2026-11-04
+trigger: DMTF 正式修訂 §12.2 暫時離線要求，或具名實作公開同一 Task 的離線預告、Retry-After、恢復查詢／認證、最終結果及另行物理確認的完整測試
+invalidation: 正式新版撤回或修改適用範圍、通知／等待語意，則重畫本程序；若實作紀錄顯示未預告失聯、逾時或結果不一致，不能把規格要求當成實作通過
 -->
 
 ## 還缺哪些證據

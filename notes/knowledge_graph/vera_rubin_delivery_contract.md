@@ -39,19 +39,19 @@ edge_id: KG-VRD-C02
 view: company
 from_id: company:coreweave
 to_id: product:nvidia-vera-rubin-nvl72
-relation: tests
-claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C6
+relation: owns_platform
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C26
 note_refs:
 evidence_state: verified
-commercial_stage: validation
+commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-06-01
-review_due: 2026-08-15
+as_of: 2026-09-30
+review_due: 2026-10-18
 status: active
-boundary: CoreWeave 自述完成單一整櫃 bring-up 與 system-level validation，沒有測試母體 長時間 workload 跨站點複製或客戶 acceptance。
-next_trigger: CoreWeave 公布固定組態 測項 測試時間 機架數 站點與 production workload 結果。
+boundary: CoreWeave 具名 Cognition production workloads 但限 limited availability；單一公司消息鏈 無精確站點 機架數 版本 驗收分母 或台灣供應商收入，不能當全面 GA。
+next_trigger: 同一具名客戶與產品補固定組態 站點 機架數 持續運行與驗收分母；財務映射另需雙向公司證據。
 -->
 
 <!-- knowledge_edge

@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: us-advanced-packaging-regionalization
 root_node_id: concept:us-advanced-packaging-regionalization
 label: 美國先進封裝區域化九關橋接
-summary: 從 CHIPS award scope 與里程碑撥付，經專案資本結構 建築 工具 製程與客戶資格，到量產利用 損平 滿載 財務歸因及台美替代驗證，保留 project phase facility 版本與 reference plane。
+summary: 9月Phase2擴建只更新campus計畫與建設時鐘；CHIPS撥款 客戶預付款 工具 資格 量產利用 損平 滿載 財務及台美替代仍分關驗證，保留project phase facility版本與reference plane。
 article_ids: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION
 status: active
 -->
@@ -20,17 +20,17 @@ view: company
 from_id: company:amkor
 to_id: concept:us-advanced-packaging-regionalization
 relation: plans_production
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C12,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C13
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C18,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C17,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C12,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C13
 note_refs:
 evidence_state: inference
 commercial_stage: planned
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-14
-review_due: 2026-08-15
+as_of: 2026-10-04
+review_due: 2026-10-31
 status: active
-boundary: Amkor 的兩期 campus 與 2025 至 2030 invest ramp break-even full-utilization 時鐘是管理規劃；Phase 1 full-scale 指標不等於現況，NIST award-project 又屬另一 scope，均不是完成工具 資格 量產或獲利的證據。
+boundary: 9/8新版120億美元是两期campus計畫；Phase2預計2027年底開工 2029年底完工，不是工具 資格 量產或獲利。5月Phase1財務目標保留歷史版本，不延伸Phase2；NIST award又屬另一scope，面積不是合格產出。
 next_trigger: Amkor 以 project phase facility ID 調節 award scope 擴大 campus 建設 工具 資格 實際產出 利用率 損平 滿載與財務。
 -->
 
@@ -60,7 +60,7 @@ view: company
 from_id: company:tsmc
 to_id: concept:us-advanced-packaging-regionalization
 relation: planned_customer
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C18
 note_refs:
 evidence_state: inference
 commercial_stage: planned
@@ -70,7 +70,7 @@ exclusivity_scope:
 as_of: 2026-08-12
 review_due: 2026-08-15
 status: active
-boundary: 十年採購框架只證明規劃合作，沒有最低量 價格 排他性 產品資格 利用率或毛利；也不能用框架替 NIST 與 Amkor 的 project-version 差異背書。
+boundary: 十年採購框架只證明規劃合作，沒有最低量 價格 排他性 產品資格 利用率或毛利；9/8擴建未新增TSMC產品資格證據，本線維持原期限，不以C18版本接續刷新客戶證據。
 next_trigger: TSMC 與 Amkor 公布具名封裝技術 產品資格 最低量 facility release 及可核對量產服務。
 -->
 
@@ -90,7 +90,7 @@ exclusivity_scope:
 as_of: 2026-08-12
 review_due: 2026-08-15
 status: active
-boundary: NIST 現行頁與 final award 固定最高 4.07 億美元及當時 project 口徑；不等於擴大後 70 億美元兩期 campus 全部符合 award 或已撥款。
+boundary: NIST 現行頁與 final award 固定最高 4.07 億美元及當時project口徑；不等於後續擴大campus全部符合award或已撥款。本線沒有新award文件，保留原期限。
 next_trigger: NIST 公布 versioned award amendment 並對上 Amkor 的 project phase facility。
 -->
 
@@ -120,17 +120,17 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: stage:regional-project-capital-stack
 relation: passes_through
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C18,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C17
 note_refs:
 evidence_state: inference
 commercial_stage: financial
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-15
+as_of: 2026-10-04
+review_due: 2026-10-31
 status: active
-boundary: 4.07 億美元補助上限 15 億美元預付款 25 至 30 億美元公司級年度 CapEx 與 70 億美元 campus 計畫分屬不同 payer recipient period scope 及會計欄位，不能加總或互相代替。
+boundary: 9/8新版120億美元為两期campus計畫，不是已支出；與補助上限 客戶預付款 公司級年度CapEx分屬不同payer recipient period scope與會計欄位，不能加總。新scope不補齊資金實收或財務轉換。
 next_trigger: Amkor 發布同一 project phase period 的 grant prepayment own funds debt tax credit CapEx 與 contract-liability reconciliation。
 -->
 
@@ -140,17 +140,17 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: stage:regional-site-construction
 relation: passes_through
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C16
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C18,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C17
 note_refs:
 evidence_state: inference
 commercial_stage: deployment
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-15
+as_of: 2026-10-04
+review_due: 2026-10-31
 status: active
-boundary: 動土與 2027 年中第一座設施完成規劃不等於建築 水電 無塵室已驗收，也不等於工具已可安裝或製程已啟用。
+boundary: 9/8新Phase2建設規劃為2027年底開工 2029年底完工；舊版第一座設施目標另列。均不等於建築 水電 無塵室已驗收，亦不等於工具可用 製程資格或客戶放行。
 next_trigger: 公司或政府固定 facility ID 公布 construction completion utilities cleanroom ready 與正式驗收日期。
 -->
 

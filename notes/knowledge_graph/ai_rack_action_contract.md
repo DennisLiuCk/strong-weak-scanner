@@ -393,3 +393,23 @@ status: active
 boundary: RFC與Redfish只支持202非完成及後續Task語意 電力液冷文件只支持action與state分離；8秒期限 各段時間 A/B及margin均為假想教材而非產品門檻或實測。
 next_trigger: 同一fault case公開measurement timestamp ingestion decision task commanded observed confirmation與deadline margin分布。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-RAC-I19
+view: industry
+from_id: concept:ai-rack-action-contract
+to_id: process:redfish-temporary-unavailability
+relation: includes
+claim_refs: MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C18
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-04
+review_due: 2026-11-04
+status: active
+boundary: 只呈現 Redfish 1.25.0 的暫時離線預告與後續查詢程序；不證明 DSX 映射、產品實作、同一 incident 的物理隔離、故障復原、維修簽收或公司財務，原有閉環關係的期限不更新。
+next_trigger: 正式版本修改離線語意或具名實作公開同一 Task 的通知、等待、重認證、最終結果及獨立物理確認。
+-->
