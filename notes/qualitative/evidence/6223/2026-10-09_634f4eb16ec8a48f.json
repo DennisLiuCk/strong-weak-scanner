@@ -1,0 +1,191 @@
+{
+  "content_as_of": "2026-10-09",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        6,
+        82,
+        94,
+        97,
+        100,
+        120
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 129,
+      "rendered_pages": [
+        1,
+        2,
+        5,
+        6,
+        7,
+        81,
+        82,
+        83,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        119,
+        120,
+        121
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "b657ab0a236cfb5f37e9d49c635279ae6150a994ae9fa822a62eb9f09e7aa962",
+      "size_bytes": 2291013,
+      "url": "https://www.mpi-corporation.com/wp-content/uploads/2026/05/04_%E6%97%BA%E7%9F%BD1150617%E8%82%A1%E6%9D%B1%E6%9C%83-114%E5%B9%B4%E5%A0%B1-EN.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        10,
+        13
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 105,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "26f55dccdece3ef0a8253f7687c0221b6a534b92a3caa83c6eaabdb5483590b1",
+      "size_bytes": 3476642,
+      "url": "https://www.mpi-corporation.com/wp-content/uploads/2026/05/%E6%97%BA%E7%9F%BD114%E5%B9%B4%E5%BA%A6%E8%8B%B1%E6%96%87%E8%B2%A1%E7%B0%BD%E5%90%88%E4%BD%B5%E6%AD%A3%E7%A8%BF.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11,
+        16,
+        34,
+        35,
+        45,
+        46,
+        47,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        60,
+        81
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 81,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        15,
+        16,
+        17,
+        33,
+        34,
+        35,
+        36,
+        44,
+        45,
+        46,
+        47,
+        48,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        80,
+        81
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "cfd86c5ae1061b0406c87c95b63ff4e3fe9b0fb53ae95a9f857e41c88f57d265",
+      "size_bytes": 1661519,
+      "url": "https://www.mpi.com.tw/wp-content/uploads/2026/08/%E6%97%BA%E7%9F%BD115.06%E5%90%88%E4%BD%B5%E8%B2%A1%E7%B0%BDIFRS%E4%B8%8A%E5%82%B3%E6%9C%AC.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        4,
+        7,
+        8,
+        13,
+        15
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 16,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "b1f47e7470f47f243a5d1d8e049d4f3dea9affcdc2229d38c8211d435997f59c",
+      "size_bytes": 2816769,
+      "url": "https://www.mpi-corporation.com/wp-content/uploads/2026/09/MPI_BofA-2026-Asia-Pacific-Conference-Sep-22-_2pages_EN.pdf"
+    }
+  ],
+  "pack_sha256": "634f4eb16ec8a48fd547f924da85fd33c751ecf3e691c633adb70dacd7d74353",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "6223",
+  "unverified_claims_removed": true
+}
