@@ -1,0 +1,196 @@
+{
+  "content_as_of": "2026-10-09",
+  "documents": [
+    {
+      "cited_pages": [
+        98,
+        101,
+        110,
+        112,
+        126
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 163,
+      "rendered_pages": [
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        109,
+        110,
+        111,
+        112,
+        113,
+        125,
+        126,
+        127
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "6ba00cce14d1616b04e51f23f5814ac6f3a2ed418350fa568f9ad81eca1b0e43",
+      "size_bytes": 7797685,
+      "url": "https://www.alchip.com/upload/2026_08_18/3_202608181730045l64sc83t0.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        6,
+        9,
+        47
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 77,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        46,
+        47,
+        48
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "b0784b2648da8c5e4f2ec416ec29c486c4b57f65df0d6e3dcc440aaa94266875",
+      "size_bytes": 1730740,
+      "url": "https://www.alchip.com/upload/2026_03_13/3_20260313132602g9r1x7xce0.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        6,
+        7,
+        9,
+        11,
+        15,
+        16,
+        27,
+        28,
+        29,
+        35,
+        36,
+        37,
+        41,
+        48,
+        60
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 71,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        26,
+        27,
+        28,
+        29,
+        30,
+        34,
+        35,
+        36,
+        37,
+        38,
+        40,
+        41,
+        42,
+        47,
+        48,
+        49,
+        59,
+        60,
+        61
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "d0976c44e297956464a0038b419de10257686c1299751255fd07397e41c436bc",
+      "size_bytes": 1818966,
+      "url": "https://www.alchip.com/upload/2026_08_20/3_20260820142747byzwj5qm60.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        2,
+        5,
+        9
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 10,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "1025e1c67ef48a3aeaedb1226fd8428b7fe87b9bce9a563aaefbd5d116f43e86",
+      "size_bytes": 459552,
+      "url": "https://www.alchip.com/upload/2026_08_14/3_20260814141602cp238o1pY1.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        3,
+        4,
+        5
+      ],
+      "file": "documents/S5.pdf",
+      "id": "S5",
+      "page_count": 61,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "roles": [
+        "shareholder_meeting"
+      ],
+      "sha256": "484c0091209b8a878a7be2dd5fc413947c4c2e19dc12993024d261edebfa6c14",
+      "size_bytes": 2934032,
+      "url": "https://www.alchip.com/upload/2026_06_08/3_202606081436377p6n0jHlO0.pdf"
+    }
+  ],
+  "pack_sha256": "ea00a68b238104f5946779c82ad6736d0e3a46fd7cca02fd2dfddc2bd1fb8c27",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3661",
+  "unverified_claims_removed": true
+}
