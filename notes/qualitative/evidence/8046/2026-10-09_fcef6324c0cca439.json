@@ -1,0 +1,183 @@
+{
+  "content_as_of": "2026-10-09",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 138,
+      "rendered_pages": [
+        1,
+        2,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "27a83725b81f3187f82781f020fb6620e3359b79696eefb577a6691c63c62b1d",
+      "size_bytes": 1814407,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=8046&year=115&seamon=&mtype=F"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        6,
+        8,
+        10,
+        11,
+        51
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 52,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        50,
+        51,
+        52
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "b78c73982b24c5ba46b91ae2800a2c848698abe537544803483ebe4e6db7a56e",
+      "size_bytes": 1644608,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=8046&year=114&seamon=4&mtype=A"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        19,
+        20,
+        21,
+        22,
+        23,
+        30,
+        35
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 36,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        29,
+        30,
+        31,
+        34,
+        35,
+        36
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "d91bd0cec85b1731002de5e63c5a40f70f4be9015e3e30cc333ca3cab64913b1",
+      "size_bytes": 1110698,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=8046&year=115&seamon=2&mtype=A"
+    },
+    {
+      "cited_pages": [
+        1,
+        2,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 14,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "41e3540db0a50da875542163b6f9495b5d5c3cb6e5c5927f4fa5f8a36add03f8",
+      "size_bytes": 302400,
+      "url": "https://www.nanyapcb.com.tw/nypcb/images/InvestorRelations/FinancialReport/NYPCBCH20260506.pdf"
+    }
+  ],
+  "pack_sha256": "fcef6324c0cca439f7153f79a194bd06fce12fe6fcca29374b1eaccfefec82b2",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "8046",
+  "unverified_claims_removed": true
+}
