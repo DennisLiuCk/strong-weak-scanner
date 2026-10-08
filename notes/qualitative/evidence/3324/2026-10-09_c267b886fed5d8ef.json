@@ -1,0 +1,183 @@
+{
+  "content_as_of": "2026-10-09",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        5,
+        6,
+        7,
+        8,
+        9,
+        72,
+        76,
+        77,
+        78,
+        88
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 101,
+      "rendered_pages": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        71,
+        72,
+        73,
+        75,
+        76,
+        77,
+        78,
+        79,
+        87,
+        88,
+        89
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "1ca4a9bfdd3c15af7d568ad1e6deb32774e2c5ac8ebe245f1f77d8334bc39e8f",
+      "size_bytes": 1746125,
+      "url": "https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id=3324&year=115&seamon=&mtype=F"
+    },
+    {
+      "cited_pages": [
+        5,
+        6,
+        7,
+        10,
+        13,
+        15,
+        63,
+        64
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 74,
+      "rendered_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        62,
+        63,
+        64,
+        65
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "e706e71c6ab5d436ee3e64c0e59af7e730c4c756007b0351470a879c715edb04",
+      "size_bytes": 2801166,
+      "url": "https://www.auras.com.tw/CMSFS/FinancialReports/Season4/3d762837-cea7-433c-8089-cc2c3c260d8b.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        30,
+        31,
+        40,
+        41,
+        70
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 79,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        29,
+        30,
+        31,
+        32,
+        39,
+        40,
+        41,
+        42,
+        69,
+        70,
+        71
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "0b1a2ea4a13f78a83f30d326a584fec8becee490126c6a8427d58c00ad56f823",
+      "size_bytes": 7384748,
+      "url": "https://www.auras.com.tw/CMSFS/FinancialReports/Season2/ada990ea-86e1-470a-9afb-e4f17804efde.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        5,
+        7,
+        8,
+        10,
+        12
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 15,
+      "rendered_pages": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "3f0919d05136256627516dc80ac65824b39e10995a32bc5f139f2eff505de377",
+      "size_bytes": 1494404,
+      "url": "https://mopsov.twse.com.tw/nas/STR/332420260818M001.pdf"
+    }
+  ],
+  "pack_sha256": "c267b886fed5d8ef44611c88a7b7ea308679e2efb997ddcd727f41e6bf601f56",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3324",
+  "unverified_claims_removed": true
+}
