@@ -1,0 +1,191 @@
+{
+  "content_as_of": "2026-10-09",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        72,
+        73,
+        80,
+        98,
+        99
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 102,
+      "rendered_pages": [
+        1,
+        2,
+        71,
+        72,
+        73,
+        74,
+        79,
+        80,
+        81,
+        97,
+        98,
+        99,
+        100
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "69a0700d64e7f6afa1c6aa6f9857c2cd50faa86b1cbf60193f3bbdf200afb63a",
+      "size_bytes": 2696940,
+      "url": "https://www.pti.com.tw/Handlers/CompanyAnnualReportDownload.ashx?lang=zh&id=e76204b6-f4bd-4549-8abe-d6f37f7a0261"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        9,
+        12,
+        13,
+        79
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 79,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        78,
+        79
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "4414035fc39be22e732b3788c985280618ace3bb4d4b0a0665953c87ca1dd514",
+      "size_bytes": 1709585,
+      "url": "https://www.pti.com.tw/Handlers/QuarterlyReportDownload.ashx?lang=zh&id=0d2408e7-985e-42fd-8a5d-048e9785c521"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        20,
+        21,
+        26,
+        51,
+        52,
+        55,
+        56,
+        64
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 64,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        19,
+        20,
+        21,
+        22,
+        25,
+        26,
+        27,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        63,
+        64
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "ad220e9985ca5b1d21b2b299603f9139b7be1c5164ce94b81ee48de32d3a950e",
+      "size_bytes": 1644184,
+      "url": "https://www.pti.com.tw/Handlers/QuarterlyReportDownload.ashx?lang=zh&id=09d863c1-0218-4186-ba9b-ffbd3dfbdf28"
+    },
+    {
+      "cited_pages": [
+        1,
+        2,
+        5,
+        7,
+        12,
+        14,
+        16,
+        17,
+        20,
+        21,
+        22,
+        23,
+        24,
+        26
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 29,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "a3fecadec18d7b3657fbbc1c5b046761e7344fd3f44a1de12617394d1e29e4b7",
+      "size_bytes": 3970193,
+      "url": "https://www.pti.com.tw/Handlers/ConferenceDownload.ashx?col=briefing&lang=zh&id=a9c72472-574a-49a7-ab9c-f5b553a7df29"
+    }
+  ],
+  "pack_sha256": "4944f4deb594157a785db9ee7be51d34fb28fcbcbe82bedf010aaa001a4a0b0d",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "6239",
+  "unverified_claims_removed": true
+}
