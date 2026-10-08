@@ -408,6 +408,108 @@ review_due: none
         self.assertTrue(any("可證偽條件" in error for error in info["quality_errors"]))
 
 
+class ConflictedHoldContractTest(unittest.TestCase):
+    setUp = ConflictedHistoryContractTest.setUp
+    _analyse = ConflictedHistoryContractTest._analyse
+    _closed_report = ConflictedHistoryContractTest._closed_report
+    _assert_formal_note_rejected = ConflictedHistoryContractTest._assert_formal_note_rejected
+
+    def _hold_report(self):
+        text = report_text().replace("status: active_monitoring", "status: source_conflict_hold")
+        text = text.replace("last_updated: 2026-07-12", "last_updated: 2026-10-09")
+        text = text.replace("content_as_of: 2026-07-12", "content_as_of: 2026-10-09")
+        text = text.replace("formal_note_content_sha256:",
+                            "conflict_detected_at: 2026-10-09\n"
+                            "conflict_hold_baseline_ref: " + "b" * 40 + "\nformal_note_content_sha256:")
+        return text.replace("## H1｜", lh.CONFLICT_HOLD_CAUTION + "\n\n## H1｜")
+
+    def test_hold_preserves_open_lifecycle_deadline_and_due_queue(self):
+        info = self._analyse(self._hold_report())
+        self.assertFalse(info["quality_invalid"], info["quality_errors"])
+        self.assertEqual(info["status"], "source_conflict_hold")
+        self.assertIn(lh.CONFLICT_HOLD_CAUTION, info["quality_warnings"])
+        self.assertEqual(info["hypotheses"][0]["meta"]["lifecycle"], "open")
+        self.assertEqual(lh.due_hypotheses({"1234": info}, "2026-10-09")[0][1:3], ("1234", "H1"))
+        self.assertEqual(lh.prospective_metrics({"1234": info}, "2026-10-09")["cohort"], 1)
+
+    def test_hold_requires_dated_baseline_and_reader_caution(self):
+        for old, new in (("2026-10-09\nconflict_hold_baseline_ref", "2026-10-10\nconflict_hold_baseline_ref"),
+                         ("conflict_detected_at: 2026-10-09", "conflict_detected_at: unknown"),
+                         ("b" * 40, "HEAD"), (lh.CONFLICT_HOLD_CAUTION, "")):
+            with self.subTest(old=old):
+                self._assert_formal_note_rejected(self._analyse(self._hold_report().replace(old, new)))
+
+    def test_hypothesis_captured_on_or_after_conflict_is_rejected(self):
+        for captured in ("2026-10-09", "2026-10-10"):
+            with self.subTest(captured=captured):
+                text = self._hold_report().replace("research_captured_at: 2026-07-12",
+                                                   "research_captured_at: " + captured)
+                self._assert_formal_note_rejected(self._analyse(text))
+
+    def test_hold_cannot_be_used_on_verified_draft_or_invalid_formal_note(self):
+        for state in ("independently_verified", "ai_draft", "partially_verified"):
+            with self.subTest(state=state):
+                self.notes["1234"]["verification"] = state
+                info = self._analyse(self._hold_report())
+                self.assertTrue(any("source_conflict_hold 必須" in e for e in info["quality_errors"]))
+        self.notes["1234"]["verification"] = "conflicted"
+        self.notes["1234"]["quality_invalid"] = True
+        self._assert_formal_note_rejected(self._analyse(self._hold_report()))
+
+    def test_hold_still_checks_anchor_next_review_and_initial_capture(self):
+        for old, new, error in (("a" * 64, "c" * 64, "重新對照"),
+                               ("next_review: 2026-08-31", "next_review: 2026-09-01", "最早"),
+                               ("date: 2026-07-12", "date: 2026-07-13", "source_conflict_hold 必須")):
+            with self.subTest(old=old):
+                info = self._analyse(self._hold_report().replace(old, new))
+                self.assertTrue(any(error in e for e in info["quality_errors"]), info["quality_errors"])
+
+    def test_hold_allows_due_unresolved_closure_but_no_new_truth_judgment(self):
+        for lifecycle in sorted(lh.TERMINAL_LIFECYCLES):
+            with self.subTest(lifecycle=lifecycle):
+                extra = "## H1｜" + self._closed_report(lifecycle).split("## H1｜", 1)[1]
+                text = self._hold_report() + extra.replace("H1", "H2")
+                info = self._analyse(text)
+                if lifecycle == "expired_unresolved":
+                    self.assertFalse(info["quality_invalid"], info["quality_errors"])
+                else:
+                    self._assert_formal_note_rejected(info)
+
+    def test_all_terminal_report_must_leave_hold_and_close(self):
+        text = self._closed_report().replace("status: closed", "status: source_conflict_hold")
+        self._assert_formal_note_rejected(self._analyse(text))
+
+    def test_hold_rejects_deadline_extensions_and_premature_expiry(self):
+        extra = "## H1｜" + self._closed_report().split("## H1｜", 1)[1]
+        premature = extra.replace("review_due: 2026-08-31", "review_due: 2026-11-20")
+        self._assert_formal_note_rejected(self._analyse(self._hold_report() + premature.replace("H1", "H2")))
+        extension = """<!-- transition
+date: 2026-10-09
+from: open
+to: open
+reason: extend_review
+evidence: https://example.com/update
+evidence_published_at: 2026-10-09
+review_due: 2026-11-20
+-->
+"""
+        text = self._hold_report().replace("- **市場主張：**", extension + "- **市場主張：**")
+        self._assert_formal_note_rejected(self._analyse(text))
+
+    def test_closed_exit_retains_conflict_restrictions(self):
+        marker = ("conflict_detected_at: 2026-10-09\nconflict_hold_baseline_ref: " + "b" * 40 + "\n")
+        for lifecycle in sorted(lh.TERMINAL_LIFECYCLES):
+            with self.subTest(lifecycle=lifecycle):
+                text = self._closed_report(lifecycle).replace("formal_note_content_sha256:", marker + "formal_note_content_sha256:")
+                text = text.replace("## H1｜", lh.CONFLICT_HOLD_CAUTION + "\n\n## H1｜")
+                if lifecycle == "expired_unresolved":
+                    self.assertFalse(self._analyse(text)["quality_invalid"])
+                    premature = text.replace("review_due: 2026-08-31", "review_due: 2026-11-20")
+                    self._assert_formal_note_rejected(self._analyse(premature))
+                else:
+                    self._assert_formal_note_rejected(self._analyse(text))
+
+
 NARRATIVE_BLOCK = """## 多空觀點（小作文）
 
 <!-- narrative_meta

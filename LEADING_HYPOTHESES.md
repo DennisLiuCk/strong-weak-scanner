@@ -22,10 +22,21 @@
 `initial → open` 及其後的終態 transition；正式筆記不得有 quality errors／invalid，
 報告仍須與目前筆記的完整簽核 SHA-256 一致，且其他日期、來源與狀態機檢查照常執行。
 lint 會保留 `conflicted` 警語；通過只代表歷史可保留，不代表假說已成立、已否定或來源衝突已解決。
-活躍追蹤與建立新假說仍要求有效 `independently_verified` 筆記，不能借結案格式繞過。
+若既有假說尚未到期，不得為通過 lint 提前結案。報告改為 `source_conflict_hold`，
+保留各 H 原有 lifecycle、期限及 transition；`next_review` 仍為最早未決期限。
+此模式須有 `conflict_detected_at` 實際發現日、`conflict_hold_baseline_ref` 完整 Git commit SHA，
+所有 H 的收錄與 initial→open 均須早於衝突日，且正文保留警語：
+「正式來源衝突待釐清；既有假說保留原期限，暫不新增或判定成立／不成立。」
+衝突日起不得新增 confirmed／refuted 裁決或 open 轉移來延長期限，原期限已過才可依證據判為 expired_unresolved；
+全部終態後回到上述 closed 模式，仍保留衝突日、baseline 與警語，轉移限制照常檢查，
+不能改標 closed 來繞過。恢復有效 independently_verified 後才可恢復一般追蹤。
+研究頁會顯示來源衝突警示；這不是延長期限、暫停成效時鐘或驗證市場主張。
+建立新假說仍要求有效 `independently_verified` 筆記，不能借保留歷史格式繞過。
 離線 lint 無法證明日期未被回填，也無法單憑初始 transition 證明曾經存在；既有 H 不可改寫、
 不得冒充新前瞻的要求，仍由 baseline 歷史稽核與研究流程約束。此模式不新增股票白名單、
-可信身分台帳或執行時 Git 歷史依賴。
+可信身分台帳或執行時 Git 歷史依賴。`source_conflict_hold` 的 baseline ref 由發布前研究稽核
+逐項比對原始主張、可證偽條件、收錄資料及既有 transition；lint 只檢查格式，不能證明
+該 commit 真實存在或內容未改寫，發布報告必須保存實際比對結果。
 
 ## v2 時間與證據資料
 

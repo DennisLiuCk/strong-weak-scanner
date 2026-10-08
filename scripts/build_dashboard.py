@@ -2027,7 +2027,9 @@ def build_recent_articles(market_date, notes, reports, events=None, topics=None,
         add(
             narrative.get("updated"), "narrative", stock_id,
             stock_subject(stock_id, report.get("relpath", "")),
-            title, report.get("relpath"), "觀察層・不等於事實認證", "observational",
+            title, report.get("relpath"),
+            "來源衝突・既有假說待釐清" if report.get("status") == "source_conflict_hold" else "觀察層・不等於事實認證",
+            "warning" if report.get("status") == "source_conflict_hold" else "observational",
             f"narrative-{stock_id}",
         )
 
@@ -2948,13 +2950,15 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
         ]
         title = "／".join(hypothesis_titles[:2]) or "看多、看空觀點與勝負手"
         sections = report.get("sections") or []
+        conflict_hold = report.get("status") == "source_conflict_hold"
         add({
             "id": f"narrative-{stock_id}", "type": "narrative", "typeLabel": "多空小作文",
             "date": report.get("narrative", {}).get("updated"), "stockIds": [stock_id],
             "subject": subject, "readerTitle": f"{subject} — 領先假說報告",
             "title": title, "summary": "看多、看空兩篇對立敘事與可觀測勝負手。",
-            "status": "觀察層・不等於事實認證", "statusTone": "observational",
-            "statusKey": "observational", "groups": stock_groups([stock_id]),
+            "status": "來源衝突・既有假說待釐清" if conflict_hold else "觀察層・不等於事實認證",
+            "statusTone": "warning" if conflict_hold else "observational",
+            "statusKey": "conflicted" if conflict_hold else "observational", "groups": stock_groups([stock_id]),
             "sections": sections, "sources": [],
             "sourceUrl": NOTE_REPO_BLOB + report["relpath"],
             "meta": {

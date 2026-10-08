@@ -46,6 +46,19 @@ def report(date, stock_id, **overrides):
 
 
 class RecentResearchArticlesTest(unittest.TestCase):
+    def test_source_conflict_hold_warns_in_feed_and_library(self):
+        sections = [{"h": "多空觀點（小作文）", "blocks": [
+            {"t": "h3", "runs": [{"s": "勝負手"}]},
+            {"t": "ul", "items": [[{"s": "等待公司發布更正文件。"}]]},
+        ]}]
+        reports = {"1234": report("2026-10-09", "1234", status="source_conflict_hold", sections=sections)}
+        feed = bd.build_recent_articles("2026-10-09", {}, reports, {}, [], {"1234": "測試"})
+        library = bd.build_research_library({}, reports)
+        for item in (feed["items"][0], library["articles"][0]):
+            self.assertEqual(item["status"], "來源衝突・既有假說待釐清")
+            self.assertEqual(item["statusTone"], "warning")
+        self.assertEqual(library["articles"][0]["meta"]["reportStatus"], "source_conflict_hold")
+
     def test_article_date_can_advance_market_anchor_and_same_day_types_both_survive(self):
         notes = {
             "1111": note("2026-07-29", "1111", verification="ai_draft"),

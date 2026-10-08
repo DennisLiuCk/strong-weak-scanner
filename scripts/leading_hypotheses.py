@@ -17,7 +17,8 @@ REPORTS_DIR = os.path.join(ROOT, "notes", "leading_hypotheses")
 NOTES_DIR = os.path.join(ROOT, "notes", "qualitative")
 REPORT_VERSION = 2
 RETROSPECTIVE_BASELINE_CUTOFF = "2026-07-12"
-REPORT_STATUSES = {"active_monitoring", "closed"}
+REPORT_STATUSES = {"active_monitoring", "source_conflict_hold", "closed"}
+CONFLICT_HOLD_CAUTION = "正式來源衝突待釐清；既有假說保留原期限，暫不新增或判定成立／不成立。"
 CAPTURE_MODES = {"retrospective", "prospective"}
 LIFECYCLES = {"open", "confirmed", "refuted", "expired_unresolved"}
 TERMINAL_LIFECYCLES = {"confirmed", "refuted", "expired_unresolved"}
@@ -169,6 +170,37 @@ def _closed_history(meta, hypotheses):
     return True
 
 
+def _conflict_history(meta, hypotheses, text, today):
+    """保留衝突前的未結案歷史；baseline 是否真實仍須另作歷史稽核。"""
+    detected = meta.get("conflict_detected_at", "")
+    baseline = meta.get("conflict_hold_baseline_ref", "")
+    if (not hypotheses
+            or not _valid_date(detected) or detected > today
+            or detected > meta.get("last_updated", "")
+            or not re.fullmatch(r"[0-9a-f]{40}", baseline)
+            or CONFLICT_HOLD_CAUTION not in text):
+        return False
+    for hypothesis in hypotheses:
+        captured = hypothesis["meta"].get("research_captured_at", "")
+        transitions = hypothesis["transitions"]
+        if (not _valid_date(captured) or captured >= detected or not transitions
+                or transitions[0].get("from") != "initial"
+                or transitions[0].get("to") != "open"
+                or transitions[0].get("date") != captured):
+            return False
+        # 到期未決可結案；來源衝突期間不作新的成立／不成立裁決。
+        if any(t.get("date", "") >= detected and t.get("to") in {"open", "confirmed", "refuted"}
+               for t in transitions):
+            return False
+        for previous, current in zip(transitions, transitions[1:]):
+            if (current.get("date", "") >= detected
+                    and current.get("to") == "expired_unresolved"
+                    and (not _valid_date(previous.get("review_due"))
+                         or current.get("date", "") <= previous["review_due"])):
+                return False
+    return True
+
+
 def _h3_section(text, title):
     match = re.search(rf"^###\s+{re.escape(title)}\s*$(.*?)(?=^###\s|^##\s|\Z)",
                       text, re.S | re.M)
@@ -254,8 +286,8 @@ def analyse_report(path, text, notes=None, today=None):
         if not _valid_date(value):
             errors.append(f"{field} 缺少合法 YYYY-MM-DD 日期")
     next_review = meta.get("next_review", "")
-    if meta.get("status") == "active_monitoring" and not _valid_date(next_review):
-        errors.append("active_monitoring 的 next_review 必須是 YYYY-MM-DD")
+    if meta.get("status") in {"active_monitoring", "source_conflict_hold"} and not _valid_date(next_review):
+        errors.append("active_monitoring／source_conflict_hold 的 next_review 必須是 YYYY-MM-DD")
     if meta.get("status") == "closed" and next_review != "none":
         errors.append("closed 的 next_review 必須是 none")
     for field in ("last_updated", "content_as_of"):
@@ -268,12 +300,25 @@ def analyse_report(path, text, notes=None, today=None):
     note_status = note_review_status(note) if note else None
     note_valid = bool(note and not note.get("quality_invalid")
                       and not note.get("quality_errors"))
+    conflict_marked = bool(meta.get("conflict_detected_at") or meta.get("conflict_hold_baseline_ref"))
+    conflict_history_valid = _conflict_history(meta, hypotheses, text, today)
+    if note_status == "conflicted" and conflict_marked and not conflict_history_valid:
+        errors.append("衝突標記報告即使 closed 也須保留衝突前歷史；不可新增真偽裁決、延期或提前到期結案")
     conflicted_history = (note_valid and note_status == "conflicted"
-                          and _closed_history(meta, hypotheses))
-    if not note_valid or (note_status != "independently_verified" and not conflicted_history):
+                          and _closed_history(meta, hypotheses)
+                          and (not conflict_marked or conflict_history_valid))
+    conflicted_hold = (note_valid and note_status == "conflicted"
+                       and meta.get("status") == "source_conflict_hold"
+                       and any(h["meta"].get("lifecycle") == "open" for h in hypotheses)
+                       and conflict_history_valid)
+    if meta.get("status") == "source_conflict_hold" and not conflicted_hold:
+        errors.append("source_conflict_hold 必須錨定有效 conflicted 筆記、衝突日、完整 baseline ref 與警語；"
+                      "僅保留衝突前 initial→open 歷史，不得於衝突日起新增或判定成立／不成立")
+    if not note_valid or (note_status != "independently_verified"
+                          and not conflicted_history and not conflicted_hold):
         errors.append(
             "領先假說只可建立於有效 independently_verified 正式筆記；"
-            "有效 conflicted 僅可保留 closed、全部由 initial→open 後結案的歷史"
+            "有效 conflicted 僅可保留 closed 結案歷史或 source_conflict_hold 既有未決歷史"
         )
     else:
         expected = note.get("reviewed_content_sha256") or ""
@@ -285,6 +330,8 @@ def analyse_report(path, text, notes=None, today=None):
             errors.append("formal_note_content_sha256 與目前正式筆記不一致，必須重新對照")
         if conflicted_history:
             warnings.append("正式筆記為 conflicted；本報告僅保留已結案歷史，不代表假說已獲驗證")
+        if conflicted_hold:
+            warnings.append(CONFLICT_HOLD_CAUTION)
 
     if not hypotheses:
         errors.append("至少需要一則 H# 領先假說")
@@ -461,6 +508,8 @@ def analyse_report(path, text, notes=None, today=None):
         lifecycles = [item["meta"].get("lifecycle") for item in hypotheses]
         expected_report_status = "closed" if all(value in TERMINAL_LIFECYCLES
                                                   for value in lifecycles) else "active_monitoring"
+        if expected_report_status == "active_monitoring" and conflicted_hold:
+            expected_report_status = "source_conflict_hold"
         if meta.get("status") != expected_report_status:
             errors.append(f"report status 應為 {expected_report_status}")
 
@@ -474,6 +523,8 @@ def analyse_report(path, text, notes=None, today=None):
         "content_as_of": meta.get("content_as_of"),
         "next_review": meta.get("next_review"),
         "formal_note_content_sha256": meta.get("formal_note_content_sha256"),
+        "conflict_detected_at": meta.get("conflict_detected_at"),
+        "conflict_hold_baseline_ref": meta.get("conflict_hold_baseline_ref"),
         "hypotheses": hypotheses,
         "hypothesis_count": len(hypotheses),
         "narrative": narrative,

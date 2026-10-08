@@ -1,5 +1,23 @@
 # Changelog
 
+## 散熱與被動元件 Q2 研究、來源衝突期間的原假說 — 2026-10-09
+
+- 更新建準、興勤、立隆電、大毅各四份核心文件的 focused_v1 正式研究與多空小作文。
+  四篇離線複核分別找到 EPS、淨利率、OCI 符號、營益率的來源內部衝突，均保留
+  conflicted，不把方向未變當作四捨五入例外，也不把來源矛盾當作營運利空。
+  分析逐項區分本業、業外與半年回款，未改評分策略；來源、精確原值及誤差見
+  `notes/research_method_reviews/2026-10-09_cooling_passives_q2_review.md`。
+- 十一則原 H 保留主張、來源、日期、可證偽條件及既有 transition；八則已到期者
+  僅在實際 10/9 追加 expired_unresolved，立隆電三則未到期者保留原 open 與期限。
+  新增報告 source_conflict_hold，要求衝突日、完整 baseline ref、當前正式 SHA
+  與警語，禁止新增、延期、衝突後真偽裁決或提前到期結案；全終態轉 closed 也
+  不可繞過。網站小作文顯示衝突待釐清，既有到期佇列照常。
+- 離線 lint 只驗資料契約，不宣稱能證明 Git 歷史；發布前另對 `6412f8b` 稽核
+  原假說。獨立 reviewer 找到 closed 出口可繞過的問題後已修正，新增邊界測試。
+  四篇 note／manifest 各自獨立提交；最終 prepublish 完整 850 項測試通過、略過 1，
+  Windows 11／python.org 3.12.10、utf8_mode=0、stdout cp950、未設 PYTHONUTF8。
+  隔離網站重建相同，正式 DB／65份archive 共66檔 SHA 未變；完整收據見研究紀錄。
+
 ## 測試介面、矽智財與載板 Q2 研究同步 — 2026-10-09
 
 - 更新穎崴、晶心科、M31、南電各四份核心文件的 focused_v1 研究及多空小作文；
