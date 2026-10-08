@@ -154,6 +154,21 @@ def _valid_https_url(url):
     return parsed.scheme == "https" and bool(parsed.hostname) and "." in parsed.hostname
 
 
+def _closed_history(meta, hypotheses):
+    """只識別完整結案歷程；日期及內容是否曾存在仍須由歷史稽核確認。"""
+    if meta.get("status") != "closed" or not hypotheses:
+        return False
+    for hypothesis in hypotheses:
+        transitions = hypothesis["transitions"]
+        if (hypothesis["meta"].get("lifecycle") not in TERMINAL_LIFECYCLES
+                or len(transitions) < 2
+                or transitions[0].get("from") != "initial"
+                or transitions[0].get("to") != "open"
+                or transitions[-1].get("to") not in TERMINAL_LIFECYCLES):
+            return False
+    return True
+
+
 def _h3_section(text, title):
     match = re.search(rf"^###\s+{re.escape(title)}\s*$(.*?)(?=^###\s|^##\s|\Z)",
                       text, re.S | re.M)
@@ -247,17 +262,30 @@ def analyse_report(path, text, notes=None, today=None):
         if _valid_date(meta.get(field, "")) and meta[field] > today:
             errors.append(f"{field} 不可晚於今天 {today}")
 
+    hypotheses = _hypotheses(text)
     notes = notes if notes is not None else load_notes(NOTES_DIR)
     note = notes.get(sid)
-    if not note or note_review_status(note) != "independently_verified":
-        errors.append("領先假說只可建立於有效 independently_verified 正式筆記")
+    note_status = note_review_status(note) if note else None
+    note_valid = bool(note and not note.get("quality_invalid")
+                      and not note.get("quality_errors"))
+    conflicted_history = (note_valid and note_status == "conflicted"
+                          and _closed_history(meta, hypotheses))
+    if not note_valid or (note_status != "independently_verified" and not conflicted_history):
+        errors.append(
+            "領先假說只可建立於有效 independently_verified 正式筆記；"
+            "有效 conflicted 僅可保留 closed、全部由 initial→open 後結案的歷史"
+        )
     else:
         expected = note.get("reviewed_content_sha256") or ""
         anchored = meta.get("formal_note_content_sha256", "").lower()
-        if anchored != expected:
+        if (not re.fullmatch(r"[0-9a-f]{64}", expected)
+                or not re.fullmatch(r"[0-9a-f]{64}", anchored)):
+            errors.append("formal_note_content_sha256 與正式筆記簽核均須為完整 SHA-256")
+        elif anchored != expected:
             errors.append("formal_note_content_sha256 與目前正式筆記不一致，必須重新對照")
+        if conflicted_history:
+            warnings.append("正式筆記為 conflicted；本報告僅保留已結案歷史，不代表假說已獲驗證")
 
-    hypotheses = _hypotheses(text)
     if not hypotheses:
         errors.append("至少需要一則 H# 領先假說")
     ids = [hypothesis["id"] for hypothesis in hypotheses]

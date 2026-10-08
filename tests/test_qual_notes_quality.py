@@ -204,7 +204,91 @@ def analyse_focused(text, manifest=None):
             return qual_notes._analyse_note(note_path, text)
 
 
+def source_internal_fixture():
+    manifest = focused_manifest()
+    manifest["documents"][1]["cited_pages"] = [10, 12]
+    manifest["documents"][1]["rendered_pages"] = [9, 10, 11, 12, 13]
+    manifest["pack_sha256"] = qual_evidence.manifest_digest(manifest)
+    text = focused_note(manifest["pack_sha256"]).replace(
+        "verification_status: independently_verified",
+        "verification_status: conflicted\nconflict_kind: source_internal\n"
+        "conflict_pages: S2:10,12\nconflict_summary: 報列數字與同文件運算元重算不一致",
+    ).replace(
+        "## 證據索引與資料來源",
+        "## 未決衝突\n財報 p.10 報列 EPS 與 p.12 運算元重算結果不同，"
+        "保留雙方，等待公司釐清。[S2]\n\n## 證據索引與資料來源",
+    )
+    return resign(text), manifest
+
+
 class QualitativeNoteQualityTests(unittest.TestCase):
+    def test_source_internal_conflict_remains_conflicted_with_bound_pack(self):
+        text, manifest = source_internal_fixture()
+        note = analyse_focused(text, manifest)
+        self.assertEqual("conflicted", note["verification"])
+        self.assertEqual([], note["quality_errors"])
+
+    def test_source_internal_requires_distinct_cited_pages(self):
+        for location in ("", "S2:10", "S2:10,10", "S2:0,12", "S2:10,11",
+                         "S2:" + "9" * 4301 + ",12"):
+            with self.subTest(location=location):
+                text, manifest = source_internal_fixture()
+                text = resign(text.replace("conflict_pages: S2:10,12",
+                                           "conflict_pages: " + location))
+                note = analyse_focused(text, manifest)
+                self.assertTrue(any("conflict_pages" in issue for issue in note["quality_errors"]))
+                self.assertEqual("conflicted", note["verification"])
+
+    def test_source_internal_cannot_be_promoted_without_resolving_conflict(self):
+        text, manifest = source_internal_fixture()
+        text = resign(text.replace("verification_status: conflicted",
+                                   "verification_status: independently_verified"))
+        note = analyse_focused(text, manifest)
+        self.assertEqual("ai_draft", note["verification"])
+        self.assertTrue(any("verification_status 必須是 conflicted" in issue
+                            for issue in note["quality_errors"]))
+
+    def test_source_internal_requires_matching_primary_source_in_conflict_body(self):
+        for change in ("secondary", "wrong_reference", "hidden_reference"):
+            with self.subTest(change=change):
+                text, manifest = source_internal_fixture()
+                if change == "secondary":
+                    text = text.replace(FOCUSED_QUARTERLY,
+                                        FOCUSED_QUARTERLY.replace("一手", "二手"))
+                elif change == "wrong_reference":
+                    text = text.replace("等待公司釐清。[S2]", "等待公司釐清。[S1]")
+                else:
+                    text = text.replace("等待公司釐清。[S2]", "等待公司釐清。<!-- [S2] -->")
+                note = analyse_focused(resign(text), manifest)
+                self.assertTrue(any("同一份一手來源" in issue for issue in note["quality_errors"]))
+
+    def test_source_internal_requires_focused_profile_and_manifest_binding(self):
+        for field, value, expected in (
+            ("research_profile", "", "focused_v1"),
+            ("evidence_pack_sha256", "a" * 64, "與 manifest 不一致"),
+            ("content_as_of", "2026-07-10", "content_as_of 與筆記不一致"),
+            ("review_method", "manual", "review_method"),
+        ):
+            with self.subTest(field=field):
+                text, manifest = source_internal_fixture()
+                text = re.sub(r"^" + field + r":.*$", field + ": " + value, text, flags=re.M)
+                note = analyse_focused(resign(text), manifest)
+                self.assertTrue(any(expected in issue for issue in note["quality_errors"]))
+        text, manifest = source_internal_fixture()
+        self.assertTrue(analyse_focused(text)["quality_errors"])
+        manifest["documents"][1]["url"] = "https://example.com/replaced.pdf"
+        manifest["pack_sha256"] = qual_evidence.manifest_digest(manifest)
+        text = re.sub(r"^evidence_pack_sha256:.*$", "evidence_pack_sha256: " + manifest["pack_sha256"], text, flags=re.M)
+        note = analyse_focused(resign(text), manifest)
+        self.assertTrue(any("URL 與 evidence manifest 不一致" in issue for issue in note["quality_errors"]))
+
+    def test_unknown_conflict_kind_does_not_bypass_cross_source_contract(self):
+        text, manifest = source_internal_fixture()
+        text = resign(text.replace("conflict_kind: source_internal", "conflict_kind: other"))
+        note = analyse_focused(text, manifest)
+        self.assertTrue(any("conflict_kind" in issue for issue in note["quality_errors"]))
+        self.assertTrue(any("至少必須並列兩個來源" in issue for issue in note["quality_errors"]))
+
     def test_legacy_v1_never_auto_upgrades_from_date_or_citations(self):
         text = f"""# 1234 測試
 <!-- meta

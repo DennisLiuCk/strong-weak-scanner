@@ -301,6 +301,113 @@ review_due: 2026-08-31
         self.assertIn("不是三條鏈都證實四家訂單", aseh["H2"]["fields"]["研究判讀"])
 
 
+class ConflictedHistoryContractTest(unittest.TestCase):
+    """正式來源降級時保留結案歷史，不能放寬活躍報告或略過既有檢查。"""
+
+    def setUp(self):
+        self.notes = {"1234": {
+            "verification": "conflicted",
+            "quality_invalid": False,
+            "quality_errors": [],
+            "reviewed_content_sha256": "a" * 64,
+        }}
+
+    def _closed_report(self, lifecycle="expired_unresolved", digest="a" * 64):
+        statuses = {
+            "expired_unresolved": "到期仍無法判定（`expired_unresolved`）",
+            "confirmed": "已驗證成立（`resolved`）",
+            "refuted": "已驗證不成立（`contradicted`）",
+        }
+        text = report_text(digest).replace("status: active_monitoring", "status: closed")
+        text = text.replace("last_updated: 2026-07-12", "last_updated: 2026-10-09")
+        text = text.replace("content_as_of: 2026-07-12", "content_as_of: 2026-10-09")
+        text = text.replace("next_review: 2026-08-31", "next_review: none")
+        text = text.replace("lifecycle: open", "lifecycle: " + lifecycle)
+        text = text.replace("review_due: 2026-08-31", "review_due: none", 1)
+        text = text.replace("合理線索・證據不足（`plausible_lead`）", statuses[lifecycle])
+        text = text.replace("- **驗證期限：** 2026-08-31。", "- **驗證期限：** none。")
+        if lifecycle in {"confirmed", "refuted"}:
+            text = text.replace("evidence_strength: weak", "evidence_strength: strong")
+        transition = f"""<!-- transition
+date: 2026-10-09
+from: open
+to: {lifecycle}
+reason: reviewed_against_formal_evidence
+evidence: https://example.com/quarterly-report
+evidence_published_at: 2026-08-14
+review_due: none
+-->
+"""
+        return text.replace("- **市場主張：**", transition + "\n- **市場主張：**")
+
+    def _analyse(self, text):
+        return lh.analyse_report("1234_測試.md", text, notes=self.notes, today="2026-10-09")
+
+    def _assert_formal_note_rejected(self, info):
+        self.assertTrue(info["quality_invalid"])
+        self.assertTrue(any("只可建立於有效 independently_verified" in error
+                            for error in info["quality_errors"]), info["quality_errors"])
+
+    def test_valid_conflicted_note_preserves_each_terminal_history_without_relabeling(self):
+        for lifecycle in sorted(lh.TERMINAL_LIFECYCLES):
+            with self.subTest(lifecycle=lifecycle):
+                info = self._analyse(self._closed_report(lifecycle))
+                self.assertFalse(info["quality_invalid"], info["quality_errors"])
+                self.assertTrue(any("僅保留已結案歷史" in warning
+                                    for warning in info["quality_warnings"]))
+                self.assertEqual(info["hypotheses"][0]["meta"]["lifecycle"], lifecycle)
+                self.assertEqual(info["hypotheses"][0]["transitions"][0]["review_due"],
+                                 "2026-08-31")
+
+    def test_active_or_empty_report_cannot_use_conflicted_note(self):
+        self._assert_formal_note_rejected(self._analyse(report_text()))
+        active = self._closed_report().replace("status: closed", "status: active_monitoring")
+        self._assert_formal_note_rejected(self._analyse(active))
+        empty = self._closed_report().split("## H1｜", 1)[0]
+        self._assert_formal_note_rejected(self._analyse(empty))
+
+    def test_closed_label_does_not_allow_one_remaining_open_hypothesis(self):
+        extra = "## H1｜" + report_text().split("## H1｜", 1)[1]
+        extra = extra.replace("H1", "H2")
+        self._assert_formal_note_rejected(self._analyse(self._closed_report() + extra))
+
+    def test_initial_terminal_without_open_history_is_not_an_archive(self):
+        text = self._closed_report()
+        first = lh.TRANSITION_RE.search(text).group(0)
+        text = text.replace(first, "", 1).replace("from: open", "from: initial", 1)
+        self._assert_formal_note_rejected(self._analyse(text))
+
+    def test_conflicted_note_quality_errors_or_invalid_flag_are_not_bypassed(self):
+        for key, value in (("quality_errors", ["signature mismatch"]), ("quality_invalid", True)):
+            with self.subTest(key=key):
+                self.notes["1234"][key] = value
+                self._assert_formal_note_rejected(self._analyse(self._closed_report()))
+                self.notes["1234"][key] = [] if key == "quality_errors" else False
+
+    def test_other_unverified_formal_states_do_not_gain_the_archive_exception(self):
+        for status in ("ai_draft", "partially_verified", "unverified"):
+            with self.subTest(status=status):
+                self.notes["1234"]["verification"] = status
+                self._assert_formal_note_rejected(self._analyse(self._closed_report()))
+
+    def test_archive_still_requires_current_full_sha_not_old_or_equal_empty_values(self):
+        stale = self._analyse(self._closed_report(digest="b" * 64))
+        self.assertTrue(any("重新對照" in error for error in stale["quality_errors"]))
+        for digest in ("", "a" * 63, "z" * 64):
+            with self.subTest(digest=digest):
+                self.notes["1234"]["reviewed_content_sha256"] = digest
+                info = self._analyse(self._closed_report(digest=digest))
+                self.assertTrue(any("完整 SHA-256" in error for error in info["quality_errors"]))
+
+    def test_archive_still_validates_transition_chain_and_falsifier(self):
+        broken = self._closed_report().replace("from: open", "from: refuted", 1)
+        info = self._analyse(broken)
+        self.assertTrue(any("未銜接上一狀態" in error for error in info["quality_errors"]))
+        missing = self._closed_report().replace("- **可證偽條件：** 下季仍未量產。\n", "")
+        info = self._analyse(missing)
+        self.assertTrue(any("可證偽條件" in error for error in info["quality_errors"]))
+
+
 NARRATIVE_BLOCK = """## 多空觀點（小作文）
 
 <!-- narrative_meta

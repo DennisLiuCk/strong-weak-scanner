@@ -406,6 +406,9 @@ TDCC 只提供最新一週，新成員加入前的週資料無法補回。Univer
 
 筆記品質狀態分為 `ai_draft`、`partially_verified`、`independently_verified`、`conflicted`；
 內容時效與查核品質是兩條獨立軸，儀表板會分開顯示。
+同一份一手文件內的數字矛盾可標 `conflict_kind: source_internal`，但須由完整
+focused_v1 pack 綁定至少兩個已引用 PDF 頁碼，仍維持 `conflicted`；跨來源衝突
+仍須並列兩份一手來源。
 
 ```powershell
 python scripts/qual_notes.py --needs-review
@@ -423,6 +426,8 @@ python scripts/qual_review.py <股號>
 但尚未被正式一手文件完整覆蓋的主張。它不是事實認證，也不進分數。
 
 - 只為有效 `independently_verified` 正式筆記建立，並以內容 SHA 錨定當時比較的正式版本。
+- 正式筆記後續降為有效 `conflicted` 時，只允許全終態的 closed 報告保存歷史，
+  仍綁定當前完整 SHA 並顯示衝突警語；不據此建立新的活躍假說。
 - 每則保留消息發布日、實際研究收錄日、前瞻/回溯、獨立消息鏈、證據警示、生命週期、
   可證偽條件與期限；轉載同一原始事件不算多條獨立證據。
 - 狀態只能由正式文件、可重算實績或事前里程碑轉移；股價與觀察層數據只可當捕捉觸發器。

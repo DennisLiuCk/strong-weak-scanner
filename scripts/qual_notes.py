@@ -578,10 +578,17 @@ def _focused_manifest_path(relative_path):
     return candidate
 
 
-def _focused_contract(meta, sid, sources, body_refs, claim_count, declared):
+def _focused_contract(meta, sid, sources, body_refs, claim_count, declared,
+                      conflict_refs=()):
     """驗證 focused_v1；未標 profile 的既有 v2 筆記維持原契約。"""
     errors, warnings = [], []
     profile = meta.get("research_profile", "").strip()
+    if meta.get("conflict_kind") == "source_internal" and declared != "conflicted":
+        errors.append("source_internal 未決衝突的 verification_status 必須是 conflicted")
+    internal_conflict = (declared == "conflicted"
+                         and meta.get("conflict_kind") == "source_internal")
+    if internal_conflict and profile != FOCUSED_RESEARCH_PROFILE:
+        errors.append("source_internal 衝突必須使用 focused_v1 evidence pack")
     if profile and profile != FOCUSED_RESEARCH_PROFILE:
         errors.append(f"未知 research_profile：{profile}")
         return errors, warnings
@@ -595,9 +602,22 @@ def _focused_contract(meta, sid, sources, body_refs, claim_count, declared):
             f"{FOCUSED_MIN_CLAIMS}–{FOCUSED_MAX_CLAIMS} 個真正重要主張"
         )
 
-    # 草稿允許逐步填寫；完整門檻在宣告獨立核驗時一次收緊。
-    if declared != "independently_verified":
+    # 草稿允許逐步填寫；源內衝突也必須綁定完整 pack，不能冒充已核驗。
+    if declared != "independently_verified" and not internal_conflict:
         return errors, warnings
+
+    conflict_source, conflict_pages = None, []
+    if internal_conflict:
+        location = re.fullmatch(r"(S[1-9]\d*):([1-9]\d{0,5}(?:,[1-9]\d{0,5})+)",
+                                meta.get("conflict_pages", ""))
+        if location:
+            conflict_source = location.group(1)
+            conflict_pages = [int(value) for value in location.group(2).split(",")]
+        if not location or len(set(conflict_pages)) != len(conflict_pages):
+            errors.append("source_internal 的 conflict_pages 必須是同一 S# 的至少兩個不同正整數 PDF 頁碼")
+        if (conflict_source is None or set(conflict_refs) != {conflict_source}
+                or sources.get(conflict_source, {}).get("type") != "一手"):
+            errors.append("source_internal 未決衝突須引用 conflict_pages 指定的同一份一手來源")
 
     if meta.get("review_method", "").strip() != FOCUSED_REVIEW_METHOD:
         errors.append(
@@ -672,6 +692,14 @@ def _focused_contract(meta, sid, sources, body_refs, claim_count, declared):
         source_id = document.get("id")
         if source_id in sources and document.get("url") != sources[source_id]["url"]:
             errors.append(f"{source_id} 的筆記 URL 與 evidence manifest 不一致")
+    if internal_conflict and conflict_source is not None:
+        document = next((item for item in documents if isinstance(item, dict)
+                         and item.get("id") == conflict_source), {})
+        cited_pages = document.get("cited_pages", [])
+        if (not isinstance(cited_pages, list)
+                or any(type(page) is not int for page in cited_pages)
+                or not set(conflict_pages).issubset(cited_pages)):
+            errors.append("source_internal 的所有 conflict_pages 必須列入同一 evidence manifest 的 cited_pages")
     return errors, warnings
 
 
@@ -829,6 +857,7 @@ def _analyse_note(path, text):
                 f"仍有 {len(missing_primary)}/{len(units)} 個 claim block 沒有一手來源"
             )
 
+    conflict_refs = []
     if declared == "conflicted":
         conflict_summary = meta.get("conflict_summary") or meta.get("open_questions") or ""
         conflict_body = _section_raw(text, "未決衝突")
@@ -837,16 +866,20 @@ def _analyse_note(path, text):
             errors.append("conflicted 缺少 conflict_summary")
         if not _plain_text(conflict_body):
             errors.append("conflicted 缺少「未決衝突」章節")
-        if len(conflict_refs) < 2:
-            errors.append("未決衝突至少必須並列兩個來源")
-        primary_conflict_refs = {
-            ref for ref in conflict_refs if sources.get(ref, {}).get("type") == "一手"
-        }
-        if len(primary_conflict_refs) < 2:
-            errors.append("未決衝突的雙方主張都必須實際指向一手來源")
+        conflict_kind = meta.get("conflict_kind", "cross_source")
+        if conflict_kind not in {"cross_source", "source_internal"}:
+            errors.append("conflict_kind 必須是 cross_source 或 source_internal")
+        if conflict_kind != "source_internal":
+            if len(conflict_refs) < 2:
+                errors.append("未決衝突至少必須並列兩個來源")
+            primary_conflict_refs = {
+                ref for ref in conflict_refs if sources.get(ref, {}).get("type") == "一手"
+            }
+            if len(primary_conflict_refs) < 2:
+                errors.append("未決衝突的雙方主張都必須實際指向一手來源")
 
     focused_errors, focused_warnings = _focused_contract(
-        meta, sid, sources, body_refs, len(units), declared
+        meta, sid, sources, body_refs, len(units), declared, conflict_refs
     )
     errors.extend(focused_errors)
     warnings.extend(focused_warnings)

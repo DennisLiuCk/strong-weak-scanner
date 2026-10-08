@@ -119,6 +119,13 @@ python scripts/qual_review.py <股號>
 - [ ] 小額差異若不改變四捨五入數字與研究結論，可保留雙方數字於 `conflict_summary` 並完成
   簽核；若可信來源對重要結論實質衝突，狀態改為 `conflicted`，不可自行挑有利版本。
 - [ ] 找不到證據不是來源衝突：刪除 claim，或依下一節退回重建 pack。
+- [ ] 同一份一手 PDF 內的矛盾使用 `verification_status: conflicted`、
+  `conflict_kind: source_internal` 與 `conflict_pages: S3:5,28`（範例）。
+  至少兩個不同 PDF 實體頁均須列在同一完整 focused_v1 manifest 的 `cited_pages`；
+  「未決衝突」章節引用該一手來源，並列公司報值、運算元、重算結果及未決原因。
+  Reviewer、內容 SHA、pack SHA、公司、日期、URL 及核心文件角色均照常驗證。
+  不為通過舊雙來源規則而加入無關文件，也不把已完成查核改稱矛盾已解決。
+  省略 `conflict_kind` 或填 `cross_source` 時，仍須並列兩份一手來源。
 
 ### 6. 缺頁／錯頁：停止簽核，退回重建
 
