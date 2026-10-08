@@ -8633,11 +8633,21 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 23),
-            ("research_claim", 16), ("metric_comparison", 10),
-            ("impact", 3), ("monitoring_item", 5),
+            ("research_topic", 1), ("metric_comparison", 10), ("impact", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        # Later research may append records; keep checking this route's records.
+        for block, id_key, prefix, count in (
+            ("research_source", "source_id", "S", 23),
+            ("research_claim", "claim_id", "C", 16),
+            ("monitoring_item", "monitor_id", "T", 5),
+        ):
+            ids = re.findall(
+                rf"<!-- {block}\s*\n.*?^{id_key}:\s*(\S+)",
+                topic, re.MULTILINE | re.DOTALL,
+            )
+            self.assertTrue({f"{prefix}{i}" for i in range(1, count + 1)} <= set(ids))
+            self.assertEqual(len(ids), len(set(ids)))
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"

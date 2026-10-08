@@ -42,11 +42,16 @@ class OctoberVersionFollowupTest(unittest.TestCase):
         for field in ('metric', 'trigger', 'invalidation', 'frequency', 'frequency_detail', 'next_check'):
             self.assertEqual(monitors['T3'][field], monitors['T5'][field])
         self.assertEqual(monitors['T5']['watch_source_ids'], 'S18')
+        expected_ids = {
+            'MR-2026-10-08-' + suffix for suffix in
+            ('FCSA-T3', 'FCSA-T5', 'TRUST-T1', '800VDC-T3', 'PROTECTION-T1', 'CPO-T4', 'CPO-T5')
+        }
         with (ROOT / 'notes/research_method_reviews/monitor_reviews.csv').open(encoding='utf8', newline='') as f:
-            rows = [r for r in csv.DictReader(f) if r['checked_at'] == '2026-10-08'
-                    and not r['review_id'].startswith('MR-2026-10-08-EVENING-')]
-        self.assertEqual(len(rows), 7)
+            rows = [r for r in csv.DictReader(f) if r['review_id'] in expected_ids]
+        self.assertEqual({r['review_id'] for r in rows}, expected_ids)
+        self.assertEqual(len(rows), len(expected_ids))
         for row in rows:
+            self.assertEqual(row['checked_at'], '2026-10-08')
             self.assertEqual(row['result'], 'not_yet_testable')
             self.assertEqual(row['evidence_source_ids'], '')
             self.assertEqual(row['claim_action'], 'none')
