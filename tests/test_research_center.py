@@ -1404,344 +1404,43 @@ class ResearchCenterTest(unittest.TestCase):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         builder = (SCRIPTS / "build_dashboard.py").read_text(encoding="utf-8")
         for marker in (
-            "const LIB=__RESEARCH_JSON__", "研究中心", "搜尋公司、產業、主題",
-            "function filteredArticles()", "function selectArticle(", "function renderReader(",
-            "正式筆記", "多空小作文", "市場議題", "返回研究清單",
-            "事件錨點整理法說脈絡與族群方向",
-            "function confidenceBadge(", "function confidencePanel(",
+            "const LIB=__RESEARCH_JSON__", "function filteredArticles()",
+            "function selectArticle(", "function renderReader(", "function renderArticleBody(",
+            'aria-label="搜尋研究文章"', 'aria-label="研究文章清單"',
+            "filtersPanel.inert", "filterTabStops", ":focus-visible",
+            "function restoreNavigation(", "history.pushState(", "popstate",
+            "function openReaderPanel(", "'aria-haspopup':'dialog'",
+            "id:'readerPanel'", "'aria-labelledby':'readerPanelTitle'", "dialog.showModal()",
+            "back.addEventListener('click',clearArticleRoute)",
+            "button.addEventListener('click',returnArticleOrigin)",
             "function liveConfidence(", "Asia/Taipei", "confidenceAsOf()",
-            "證據可信度", "主命題最後有效證據", "可信度判定",
-            "文章查核資料", "研究欄位與來源", "mobile-evidence", "可水平捲動的研究資料表",
-            "function articleReaderHeading(", "article.readerQuestion",
-            "先知道一件事", "讀完能回答", "目前怎麼看：", "這篇先弄懂",
-            "研究題名：", "研究範圍：",
-            ".result-reader-question", ".article-reader-heading",
-            "aria-label=\"搜尋研究文章\"", "filtersPanel.inert", "clearArticleRoute",
-            "aria-label=\"研究文章清單\"", ":focus-visible", "@media(max-width:780px)",
-            "研究摘要：已知、未知與下一步", "function resetReaderScroll()",
-            "ARTICLE_AUDIT_HEADINGS", "function renderResearchAppendix(",
-            "研究查核附錄：來源、主張與追蹤", "function renderLearningPath(",
-            "function focusReadingTarget(", "function focusBeginnerHighlights(",
-            "function focusReadingMissionSource(", "function renderReadingMission(",
-            "function readingMissionStartsWithRole(", "function focusArticleRoleContext(",
-            "function focusReadingMissionStart(", "function focusTopicMainStart(",
-            "reading-mission-grid", "'data-testid':'reading-mission-start'",
-            "'data-reading-start':roleFirst?'role':'source'", "先看產業角色",
-            "開始讀三句重點", "先抓住一個重點，再帶著問題讀",
-            "'data-testid':'reading-mission-main-start'",
-            "'data-reading-main-section':firstMain.index", "直接讀第一節",
-            "first=topicReaderSectionItems(article)[0]",
-            "section?.querySelector('[data-main-question-anchor]')",
-            "section?.querySelector(':scope > h2')||section",
-            "if(target)focusReadingTarget(target)",
-            ".reading-mission-start.secondary{background:var(--card);color:var(--teal)}",
-            "先抓住這個重點", "讀完能回答", "為什麼值得讀",
-            "rawLead=(mission.keyPoints||[]).find(Boolean)||mission.orientation",
-            "lead=readerLeadParts(article,rawLead)",
-            "function readerMissionLeadNodes(", "reading-mission-clause-break",
-            "function readingMissionNotationGuide(article,mission)",
-            "mission?.readerNotations||[]",
-            "data-reading-mission-notation-count", "先解碼這段的 ",
-            "const notationGuide=readingMissionNotationGuide(article,mission)",
-            "class:'reading-mission-citations'", "原文來源標記：",
-            "正文與來源區完整保留",
-            ".reading-mission-notation>summary{min-height:44px;",
-            "event.preventDefault();fold.open=!fold.open});return fold",
-            "reading-mission-why", "需要更多脈絡時再展開",
-            "三句重點之後，再比較本文族群角色與所在學習階段。",
-            ".reading-mission-start{width:100%;min-height:44px}",
-            ".article-learning-origin{display:none}",
-            "body.article-open .reader-tabs{display:none}",
-            ".mobile-origin-context{display:block",
-            ".mobile-origin-context:not([open]) strong{white-space:nowrap",
-            "@media(max-width:340px){.mobile-origin-context{margin-bottom:8px}",
-            "function articleGroupGuideRows(", "function renderArticleRoleContext(",
-            "'data-testid':'article-role-context'", "article-role-context",
-            "'data-testid':'article-role-next'", "article-role-next",
-            "function articleRoleCard(", "function articleRoleGrid(",
-            "'data-testid':'article-role-card-'", "article-role-grid",
-            "'aria-labelledby':titleId", "角色說明",
-            "if(radarContext)section.append(articleRoleQuestionGrid(rows,radarContext),articleRoleGuideFold(rows))",
-            "else if(rows.length<=4)section.appendChild(articleRoleGrid(rows))",
-            "再比較其餘 ", "一次展開全部角色說明，不必逐一切換",
-            ".article-role-more[open]",
-            "並列只表示本文同時討論這些族群，不代表上下游、受惠、訂單或投資排序。",
-            "function orderedBeginnerGroups(", "BEGINNER_BLOCK_ORDER",
-            "function beginnerGlossary(", "beginner-glossary-state",
-            "function beginnerGlossaryTerms(", "function articleGlossaryTerms(",
-            "function glossaryTokenPosition(", "function beginnerKeyPointMatches(",
-            "const READER_TERMS=LIB.readerTerms||[]", "function sharedReaderTermMatches(",
-            "function beginnerKeyPointBoundary(",
-            "function readerTermDefinitionList(", "function beginnerKeyPoints(",
-            "article=byId.get(state.selected)",
-            "第 1 句 · 先看資料", "第 2 句 · 再補脈絡", "第 3 句 · 最後看邊界",
-            "topicGuide?topicRoles[index]:null",
-            "function readingMissionTermGuide(", "data-reading-mission-term-count",
-            "data-reading-mission-article-term-count", "先認得這兩句的 ",
-            "const termGuide=readingMissionTermGuide(lead.text,mission.question,glossaryTerms)",
-            ".reading-mission-terms>summary{min-height:44px;",
-            "class:'beginner-keypoints'", "data-keypoint-term-count",
-            "data-keypoint-shared-term-count", "研究中心共通語",
-            "先看懂這句的 ", "解釋逐字取自本篇「名詞小字典」；不另外改寫。",
-            "共通語只解釋研究流程與常見指標的字面",
-            ".beginner-keypoint-terms>summary{min-height:44px}",
-            "articleSections(article,'beginner-highlights',glossaryTerms)",
-            "articleSections(article,'beginner-followup',glossaryTerms)",
-            "beginnerHighlights&&group.heading!=='三句話抓重點'",
-            "beginnerFollowup&&group.heading==='三句話抓重點'",
-            "beginner-followup", "再看為什麼重要、名詞與後續問題",
-            "function appendBeginnerWhy(parent,items)",
-            "beginnerFollowup&&group.heading==='為什麼重要'",
-            "rendered.dataset.readerLead='true'",
-            ".beginner-why-paragraph.has-reader-lead>strong:first-child",
-            ".beginner-highlights+.article-role-context{margin-top:12px}",
-            "名詞小字典'+(termCount?'（'+termCount+' 個）':'')",
-            "遇到陌生詞再展開，不用一次背完",
-            "function renderGlossaryQuickView(", "articleGlossaryDialog",
-            "function setupGlossaryQuickAction(", "glossaryQuickReturnFocus",
-            "內容逐字取自本篇「新手先讀」名詞小字典；不新增解釋。",
-            "id:'glossaryQuickStatus','aria-live':'polite'",
-            "'aria-haspopup':'dialog'", "floating-glossary-action",
-            "outline-glossary-action", "placeholder:'例如：CXL、HBM'",
-            "function researchSummaryEntries(", "function articleResearchSummary(",
-            "function researchSummaryGrid(", "RESEARCH_SUMMARY_KINDS",
-            "research-summary-grid", "data-summary-kind",
-            "role:'list','aria-label':'研究摘要重點'",
-            "function evidenceReadingGuide(section,article)",
-            "新手證據讀法", "先分清兩把尺",
-            "data-claim-key", "data-confidence-key",
-            "主張類型與證據可信度", ".evidence-reading-guide",
-            ".evidence-reading-scales{grid-template-columns:1fr}",
-            "confidence?.effective||guide.confidenceKey",
-            "降級只表示證據需要更新，不代表主張已被推翻",
-            "從這篇接著學", "function openLearningGroups(",
-            "function openLearningCollection(", "learning-path-grid",
-            ".learning-path{container-type:inline-size",
-            "@container (max-width:620px){.learning-handoff,.learning-path-grid{grid-template-columns:1fr}",
-            "function learningCheckpoint(", "function learningCard(",
-            "function learningRouteBridge(", "learning-route-bridge",
-            "本篇與下一站的閱讀順序", "data-route-from-graph",
-            "learning-route-bridge-takeaway", "本篇替整條問題先補上",
-            "takeaway=String((mission.keyPoints||[])[0]||'').trim()",
-            "'data-source-key-point-index':'0'",
-            "這一站 → 下一站", "data-route-context-collapsed",
-            "只表示學習次序，不代表供應鏈、受惠或因果關係。",
-            "function learningRelationPreview(", "一條既有關係示範",
-            "先看一條既有關係", "先別外推到哪裡",
-            "data-graph-view", "data-guided-edge",
-            "card.graphView,card.guidedRelation?.edgeId",
-            "查看'+(card.graphViewLabel||'產業關聯')+'圖",
-            "function articleRouteGraphView(article)",
-            ".learning-route-action{min-height:44px",
-            "roleCount>1&&hasIndustry", "!hasCompany&&hasIndustry",
-            "'data-graph-view':view", "'data-role-count':roleCount",
-            "text:'看這站證據關係 · '+viewLabel",
-            "openRadarGraph(route.graphId,view,'',graphLearningOrigin('route-context'))",
-            "本入口先開「產業依賴」", "要查具名公司時可在圖內切換「公司曝險」",
-            ".graph-origin-roles{grid-column:1/-1",
-            ".graph-origin button.graph-origin-role{display:grid",
-            "function graphArticleRoleMatches(graph,nodeMap,groupId)",
-            "function graphArticleRoleEntries(graph,nodeMap,article)",
-            "function graphArticleRoleNavigator(currentEdge)",
-            "function revealGraphArticleRole(edge)",
-            "function renderGraphArticleRoles(graph,nodeMap)",
-            "state.graphView!=='industry'",
-            "(graph.articleIds||[]).includes(article.id)",
-            "'data-testid':'graph-origin-role-'+group.id",
-            "'data-edge-count':matches.length",
-            "把剛才文章的 '+entries.length+' 個角色放回圖上",
-            "先選一個剛讀過的角色",
-            "state.graphEvidence.add(edge.evidenceState)",
-            "renderGraphArticleRoles(graph,nodeMap)",
-            ".graph-reader-role-nav{padding:10px 11px",
-            ".graph-reader-role-switch{display:grid",
-            "'data-testid':'graph-reader-role-nav'",
-            "'data-testid':'graph-reader-role-'+entry.group.id",
-            "'aria-current':current?'step':null",
-            "button.addEventListener('keydown',graphKeyboard(activate))",
-            "留在圖內比較本文 '+entries.length+' 個角色",
-            "切換只比較本文角色",
-            "roleNavigator=graphArticleRoleNavigator(edge)",
-            "if(roleNavigator)panel.appendChild(roleNavigator)",
-            ".learning-relation-boundary>summary{min-height:44px}",
-            "你能用自己的話回答嗎？", "sourceLabel=mission.sourceLabel||'三句重點'",
-            "text:'需要提示？查看本文'+sourceLabel",
-            "text:'提示逐字取自本篇「'+sourceHeading+'」；不新增或改寫結論。'",
-            "繼續第 '+card.routeStep+'/'+card.routeTotal+' 站",
-            "text:'回看本篇'+sourceLabel",
-            "review.addEventListener('click',()=>focusReadingMissionSource(article,'review'))",
-            "start.addEventListener('click',()=>focusReadingMissionStart(article))",
-            "target.focus();requestAnimationFrame",
-            "window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-120",
-            ".learning-checkpoint-hints>summary{min-height:44px}",
-            "articleOrigin:null", "function graphArticleSelectedRelation(graph,origin)",
-            "selection?.type!=='edge'", "(graph?.edges||[]).find(item=>item.id===selection.id)",
-            "subject=(from?.label||edge.from)+' → '+(to?.label||edge.to)",
-            "title:subject+' · '+edge.relationLabel",
-            "function articleOriginContext(", "edgeId:relation?.edge.id||''",
-            "mobileMeta:relation?.meta||''", "關係類型「'+relation.edge.relationLabel",
-            "routeId:route.id", "originQuestion=question?'整條路線要回答：'+question:''",
-            "originQuestion,mobileMeta:originQuestion",
-            "function returnArticleOrigin(", "function renderArticleLearningOrigin(",
-            "function renderLearningOriginReturn(",
-            "'data-testid':'article-origin-top'",
-            "'data-testid':'article-origin-back-top'",
-            "'data-testid':'article-origin-back-bottom'",
-            "originContext?.mobileBackLabel||'返回研究清單'",
-            "function renderMobileArticleOrigin(context)",
-            "'data-testid':'mobile-origin-context'",
-            "'data-origin-edge-id':context.edgeId||null",
-            "'data-origin-route-id':context.routeId||null",
-            "article-learning-origin-question", "learning-origin-return-question",
-            "context.edgeId?'你剛才查這條關係':'你從這個位置進來'",
-            "open:!matchMedia('(max-width:340px)').matches",
-            "root=h('details',{class:'mobile-origin-context'",
-            "h('strong',{text:context.title})",
-            "class:'mobile-origin-context-meta',text:context.mobileMeta",
-            ".mobile-origin-context-meta{margin:0;padding:8px 9px 9px",
-            "const mobileOrigin=renderMobileArticleOrigin(originContext)",
-            "if(mobileOrigin)body.appendChild(mobileOrigin)",
-            "selectArticle(value,false,null)",
-            ".article-learning-origin", ".learning-origin-return",
-            "origin.kind==='radar'", "研究雷達第 '+candidate.rank+' 題",
-            "只表示研究資源安排",
-            "該題已升格為文章",
-            "返回會保留同一張候選卡與閱讀位置",
-            "radarPage?.scrollTo({top:Math.max(0,origin.radarScrollTop||0)",
-            "只表示路線收錄，不代表上下游或受惠排序",
-            "maturity-reading-key", "先選一個想弄懂的問題",
-            "這頁的「完成度」怎麼看？", "maturityRouteCards",
-            "function renderMaturityLearningRoute(",
-            "entry-guide", "第一次來？先從問題開始",
-            'id="entryMatrix"', 'id="entryTopics"', 'id="entryGraph"',
-            "function showEntryGuide()", "function resetEntryScroll()",
-            "function openEntrySurface(", "function openEntryTopics()",
-            "function renderReaderWelcome(", "reader-welcome-maturity",
-            "先選一個系統問題，再打開文章",
-            'id="maturityIntroTitle" tabindex="-1"',
-            "heading?.focus({preventScroll:true})",
-            "text:'延伸學習'",
-            "document.body.classList.remove('article-open');selectSurface('library',true)",
+            "confidenceBadge(article)", "article.status", "研究欄位與來源",
+            "renderResearchAppendix(article)", "renderLearningPath(article)",
+            "articleSections(article,'beginner',terms)", "articleSections(article,'analyst',terms)",
+            "markScrollableTables(root)", "可水平捲動的研究資料表",
+            "navigator.clipboard.writeText(url.href)",
+            "state.selected=byId.has(deepLink)?deepLink:null",
         ):
-            self.assertIn(marker, template)
-        self.assertIn("RESEARCH_TEMPLATE", builder)
-        self.assertIn("RESEARCH_OUT", builder)
-        self.assertIn("def _research_reading_mission_notations(", builder)
-        self.assertIn('reading_mission["readerNotations"] = notations', builder)
-        self.assertIn('beginner-section', template)
-        self.assertIn("h('details',{class:'beginner-glossary','data-term-count':termCount}", template)
-        self.assertIn("if(group.heading==='名詞小字典')sectionEl.appendChild(beginnerGlossary(group))", template)
-        self.assertIn("terms.forEach(term=>list.appendChild", template)
-        self.assertIn("...runs(term)", template)
-        self.assertIn("if(glossaryTerms.length)body.append(renderGlossaryQuickView(glossaryTerms)", template)
-        self.assertIn("if(glossaryTerms.length)sticky.appendChild(glossaryQuickAction", template)
-        self.assertIn("if(target?.isConnected)target.focus({preventScroll:true})", template)
-        self.assertIn("search?.focus({preventScroll:true});restorePosition()", template)
-        self.assertIn("if(event.target===dialog)dialog.close()", template)
-        self.assertIn("readerTermDefinitionList(matches,'beginner-keypoint-term-list')", template)
-        self.assertIn("readerTermDefinitionList(matches,'reading-mission-term-list')", template)
-        self.assertIn("if(!matches.length)return null;const articleCount=", template)
-        self.assertLess(
-            template.index("const notationGuide=readingMissionNotationGuide(article,mission)"),
-            template.index("const termGuide=readingMissionTermGuide(lead.text,mission.question,glossaryTerms)"),
-        )
-        self.assertLess(
-            template.index("const termGuide=readingMissionTermGuide(lead.text,mission.question,glossaryTerms)"),
-            template.index("if(mission.orientation&&mission.orientation!==rawLead)"),
-        )
-        self.assertLess(
-            template.index("section=h('section',{class:'reading-mission','aria-labelledby':'readingMissionTitle'},head,grid,actions)"),
-            template.index("const notationGuide=readingMissionNotationGuide(article,mission)"),
-        )
-        self.assertNotIn("orderedBeginnerBlocks", template)
-        self.assertIn("else if(analyst){let guideInserted=false;", template)
-        self.assertIn("researchSummaryGrid(item)||block(item)", template)
-        self.assertIn("entry.label!==expected[index]", template)
-        for label in ("一句話結論", "目前已知", "尚未知道", "對哪些族群有意義", "下一步看什麼"):
-            self.assertIn(label, template)
-        self.assertIn('新手先讀：這篇在講什麼', template)
-        self.assertIn('beginner-toc', template)
-        self.assertIn('_article_excerpt(topic.get("summary"))', builder)
-        self.assertIn('_research_article_reading_mission(article)', builder)
-        self.assertIn('_topic_structured_sections(topic, sections or [], group_names)', builder)
-        self.assertIn('"asOf": library_as_of.isoformat()', builder)
-        self.assertIn('as_of=research_as_of', builder)
-        self.assertIn('taipei_today as research_today', builder)
-        self.assertIn('research_html.replace(', builder)
-        self.assertIn('research_library["knowledgeGraph"] = build_knowledge_graph(', builder)
-        self.assertIn('attach_research_learning_paths(', builder)
-        self.assertIn('research_library["candidateRadar"] = load_research_radar(', builder)
-        self.assertIn(
-            "body.appendChild(mobileBack);const mobileOrigin="
-            "renderMobileArticleOrigin(originContext);if(mobileOrigin)body.appendChild(mobileOrigin);"
-            "const originBar="
-            "renderArticleLearningOrigin();if(originBar)body.appendChild(originBar);"
-            "const routeTransition=renderRouteTransitionBridge(article);"
-            "if(routeTransition)body.appendChild(routeTransition);"
-            "const stationTransition=renderStationTransitionBridge(article);"
-            "if(stationTransition)body.appendChild(stationTransition);"
-            "body.appendChild(articleReaderHeading(article))",
-            template,
-        )
-        self.assertIn(
-            "body.appendChild(verification);const topicPosition=renderTopicLearningPosition(article);"
-            "if(topicPosition)body.appendChild(topicPosition);const readingMission="
-            "renderReadingMission(article,glossaryTerms);if(readingMission)body.appendChild(readingMission);"
-            "const boundaryBrief=renderReaderBoundaryBrief(article,glossaryTerms);"
-            "if(boundaryBrief)body.appendChild(boundaryBrief);"
-            "const roleContext=renderArticleRoleContext(article);",
-            template,
-        )
-        self.assertLess(
-            template.index("const readingMission=renderReadingMission(article,glossaryTerms)"),
-            template.index("const meta=h('div',{class:'article-meta'}"),
-        )
-        # 未編固定路線的位置提示先接在查核狀態後；三句重點後再建立族群角色與正式路線位置。
-        self.assertIn(
-            "const routeContext=renderLearningRouteContext(article),mobileProgress="
-            "renderMobileReadingProgress(article);body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms));"
-            "if(roleContext)body.appendChild(roleContext);if(routeContext)body.appendChild(routeContext);"
-            "body.appendChild(meta);body.appendChild(articleSections(article,'beginner-followup',glossaryTerms));"
-            "if(mobileProgress)body.appendChild(mobileProgress);"
-            "body.appendChild(articleSections(article,'analyst'))",
-            template,
-        )
-        self.assertLess(
-            template.index("body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms))"),
-            template.index("if(roleContext)body.appendChild(roleContext)"),
-        )
-        self.assertLess(
-            template.index("if(roleContext)body.appendChild(roleContext)"),
-            template.index("body.appendChild(articleSections(article,'beginner-followup',glossaryTerms))"),
-        )
-        self.assertNotIn("先別急著記名詞，先掌握問題", template)
-        self.assertNotIn("article-role-choice", template)
-        self.assertNotIn("article-role-preview", template)
-        self.assertIn(
-            "body.appendChild(articleSections(article,'reader',glossaryTerms))", template)
-        self.assertIn("body.appendChild(appendix)", template)
-        self.assertIn("schedule();requestAnimationFrame(()=>requestAnimationFrame(schedule))", template)
-        self.assertLess(template.index('id="entryGuide"'), template.index('id="results"'))
-        self.assertIn("!document.body.classList.contains('article-open')", template)
-        self.assertIn("document.getElementById('entryMatrix').addEventListener", template)
-        self.assertIn("document.getElementById('entryTopics').addEventListener", template)
-        self.assertIn("document.getElementById('entryGraph').addEventListener", template)
-        self.assertIn("window.scrollTo({top:0,left:0,behavior:'instant'})", template)
-        self.assertIn("body.append(mobileEvidence,h('p'", template)
-        self.assertIn("'aria-selected':state.type===type?'true':'false'", template)
-        self.assertIn("'data-testid':'article-'+article.id", template)
-        self.assertIn("@media(max-width:1180px){\n  .shell{display:block}", template)
-        self.assertIn('id="filterClose"', template)
-        self.assertIn("if(byId.has(deepLink))document.body.classList.add('article-open')", template)
-        self.assertIn("state.selected=byId.has(deepLink)?deepLink:null", template)
-        self.assertIn("renderAll();if(byId.has(deepLink))focusArticleHeading(deepLink)", template)
-        self.assertIn("if(!open){state.selected=null;return null}", template)
-        self.assertNotIn("if(!state.selected||!rows.some(article=>article.id===state.selected)){state.selected=rows[0].id", template)
-        self.assertIn("function hashArticleId()", template)
-        self.assertIn("url.hash=article.id", template)
-        self.assertNotIn("github.com/DennisLiuCk/strong-weak-scanner/blob/main/notes/qualitative/8261", template)
+            self.assertIn(marker, template, marker)
+        for marker in (
+            "RESEARCH_TEMPLATE", "RESEARCH_OUT", "_article_excerpt(topic.get",
+            "_research_article_reading_mission(article)",
+            "_topic_structured_sections(topic, sections or [], group_names)",
+            'research_library["knowledgeGraph"] = build_knowledge_graph(',
+            "attach_research_learning_paths(",
+            'research_library["candidateRadar"] = load_research_radar(',
+        ):
+            self.assertIn(marker, builder, marker)
+        reader = template.split("function renderReader(article,", 1)[1].split("function renderAll(", 1)[0]
+        self.assertIn("body.append(meta,renderArticleBody(article))", reader)
+        for helper in ("renderReadingMission(", "renderReaderBoundaryBrief(",
+                       "articleSections(", "renderOutline(", "readerArticleFrameMap("):
+            self.assertNotIn(helper, reader, helper)
+        self.assertIn('grid-template-columns:minmax(320px,31%) minmax(0,1fr)', template)
+        self.assertIn(".reader-toolbar{position:sticky", template)
+        self.assertIn("root.dataset.articleId", template)
 
-    def test_first_visit_guide_opens_with_direct_registered_route_starts(self):
+    def test_optional_guide_retains_direct_registered_route_starts(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
             'id="entryGuideRoutes"', "可直接開始的六條學習路線",
@@ -1750,7 +1449,7 @@ class ResearchCenterTest(unittest.TestCase):
             "root.appendChild(h('div',{role:'listitem'},button))",
             "openMaturityRouteArticle(route,route.firstArticleId)",
             "renderEntryGuideRoutes();renderGroupFilters()",
-            "researchEntryGuideStateV1", "guide.open=readPreference(key)!=='closed'",
+            "researchEntryGuideStateV2", "guide.open=readPreference(key)==='open'",
             "guide.addEventListener('toggle'",
             "writePreference(key,guide.open?'open':'closed')",
             ".entry-guide-routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))",
@@ -1784,40 +1483,18 @@ class ResearchCenterTest(unittest.TestCase):
             template,
         )
 
-    def test_reader_surfaces_existing_conclusion_boundary_before_technical_detail(self):
+    def test_reader_moves_context_to_optional_panel_and_keeps_authored_boundaries(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
-        for contract in (
-            "function researchSummaryEntries(node)",
-            "function articleResearchSummary(article)",
-            "function focusResearchSummary(sectionIndex)",
-            "function renderReaderBoundaryBrief(article,glossaryTerms=[])",
-            "'data-testid':'reader-boundary-brief'",
-            "'data-testid':'reader-boundary-summary-action'",
-            "'data-testid':'reader-boundary-glossary-action'",
-            "'aria-controls':'articleGlossaryDialog'",
-            "查本文名詞（'+glossaryTerms.length+'）",
-            "openGlossaryQuickView(glossaryAction)",
-            "plain=article.readerBoundaryBrief",
-            "['thesis','先知道',plain.known]",
-            "['unknown','先別下結論',plain.unknown]",
-            "['next','接著怎麼查',plain.next]",
-            "'data-boundary-source':hasPlain?'beginner':'summary'",
-            "'data-reader-chars':value.length",
-            "這篇目前能說到哪裡",
-            "先用白話抓住已知、界線與查證方向；需要精確措辭時，再看完整研究摘要。",
-            "白話卡逐字重用同篇「三句話抓重點」與「接下來怎麼追」；完整研究摘要保留原始主張與追蹤文字。",
-            "body:not(.focus-mode) .reader-boundary-grid{grid-template-columns:1fr}",
-            ".reader-boundary-grid{grid-template-columns:1fr}",
-            ".reader-boundary-buttons{grid-template-columns:1fr}",
-            "heading.focus({preventScroll:true})",
-        ):
-            self.assertIn(contract, template)
-        self.assertLess(
-            template.index("const boundaryBrief=renderReaderBoundaryBrief(article,glossaryTerms)"),
-            template.index("body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms))"),
-        )
-        self.assertIn("const parsed=researchSummaryEntries(node)", template)
-        self.assertNotIn("text:'現在能說到哪裡？'", template)
+        reader = template.split("function renderReader(article,", 1)[1].split("function renderAll(", 1)[0]
+        panel = template.split("function openReaderPanel(", 1)[1].split("function renderReader(", 1)[0]
+        body = template.split("function renderArticleBody(", 1)[1].split("function openReaderPanel(", 1)[0]
+        self.assertNotIn("renderReaderBoundaryBrief(", reader)
+        self.assertIn("articleSections(article,'beginner',terms)", panel)
+        self.assertIn("articleSections(article,'analyst',terms)", panel)
+        self.assertIn("isArticleAuditSection(article,section)", body)
+        self.assertIn("appendBlocks(el,section.blocks", body)
+        self.assertNotIn("readerSectionPurposeNote", body)
+        self.assertNotIn("readerMainQuestionAnchor", body)
 
     def test_topic_reader_maps_authored_section_leads_before_dense_prose(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -1927,7 +1604,7 @@ class ResearchCenterTest(unittest.TestCase):
             "text:labels+'各自回答不同問題。先分清每一種讀法，再逐段深入。'",
             "focusReadingTarget(document.getElementById(sectionId(item.index)))",
             "按鈕只沿用本文既有表頭與章節順序；用途文案只說怎麼讀，不改寫研究內容。順序不代表上下游、因果、成熟度或投資排序。",
-            "const frameMap=readerArticleFrameMap(article);if(frameMap)body.appendChild(frameMap)",
+            "const frameMap=readerArticleFrameMap(article);if(frameMap)content.appendChild(frameMap)",
             ".reader-article-frame-map{margin:18px 0 20px",
             ".reader-article-frame-button{width:100%;min-height:112px",
             ".reader-article-frame-button:focus-visible{outline:3px solid",
@@ -1937,12 +1614,10 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, template)
         render_reader = template[
             template.index("function renderReader(article,hasRows=true)"):
-            template.index("function renderAll()")
+            template.index("function renderAll(forceReader=false)")
         ]
-        self.assertLess(
-            render_reader.index("const frameMap=readerArticleFrameMap(article)"),
-            render_reader.index("body.appendChild(articleSections(article,'reader',glossaryTerms))"),
-        )
+        self.assertNotIn("readerArticleFrameMap(article)", render_reader)
+        self.assertIn("body.append(meta,renderArticleBody(article))", render_reader)
         self.assertNotIn("article.readerArticleFrames", template)
 
         pcie = (ROOT / "notes" / "research_topics" /
@@ -2310,7 +1985,7 @@ class ResearchCenterTest(unittest.TestCase):
             "'aria-label':'查看本文名詞定義：'+entry.fullLabel",
             "openGlossaryQuickView(button,entry.fullLabel)",
             "詞名與解釋只取自同篇「名詞小字典」；這裡不新增第二套定義。",
-            "articleSections(article,'reader',glossaryTerms)",
+            "root.appendChild(renderGlossaryQuickView(terms))",
             ".section-glossary-term{min-height:38px",
             ".section-glossary-term{min-height:44px",
             "search.value=query;search.dispatchEvent",
@@ -2448,45 +2123,32 @@ class ResearchCenterTest(unittest.TestCase):
             "function confidenceAsOf()",
             "RESEARCH_TODAY>(LIB.asOf||'')",
             "const confidence=liveConfidence(article)",
-            "RESEARCH_TODAY=current;renderAll()",
+            "RESEARCH_TODAY=current;renderAll(true)",
         ):
             self.assertIn(contract, template)
         self.assertRegex(
             template,
             r"setInterval\(\(\)=>\{const current=taipeiDate\(\);"
-            r"if\(current!==RESEARCH_TODAY\)\{RESEARCH_TODAY=current;renderAll\(\)\}\},60000\)",
+            r"if\(current!==RESEARCH_TODAY\)\{RESEARCH_TODAY=current;renderAll\(true\)\}\},60000\)",
         )
 
     def test_template_mobile_route_keeps_list_hash_and_learning_origin_consistent(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
-            "function setArticleHash(id)",
-            "function clearArticleRoute()",
-            "setArticleHash('')",
-            "mobileBack.addEventListener('click',originContext?returnArticleOrigin:clearArticleRoute)",
-            "state.selected=rows[0].id;setArticleHash(state.selected)",
-            "if(!rows.length){state.selected=null;if(open)clearArticleRoute();return null}",
-            "function graphHashRoute(value)",
-            "selectSurface('graph',false)",
-            "else{state.articleOrigin=null;state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}",
-            "if(guide)guide.hidden=!showEntryGuide()",
-            "button.dataset.testid==='article-'+state.selected",
-            "let catalogReturnPosition=null",
+            "function clearArticleRoute()", "setArticleHash('')",
+            "back.addEventListener('click',clearArticleRoute)",
+            "button.addEventListener('click',returnArticleOrigin)",
             "catalogReturnPosition={windowTop:window.scrollY,catalogTop:",
-            "articleId:id",
-            "if(position?.articleId&&byId.has(position.articleId))state.selected=position.articleId",
-            "const open=document.body.classList.contains('article-open')",
-            "if(open&&state.selected&&byId.has(state.selected))return byId.get(state.selected)",
-            "renderAll();const target=",
-            "catalog-reader-detached",
-            "目前閱讀不在左側結果",
-            "這篇由延伸學習開啟；原搜尋與篩選仍保留。",
-            "target.scrollIntoView({block:'center',behavior:'instant'})",
-            "target.focus({preventScroll:true})",
+            "articleId:id", "target.focus({preventScroll:true})",
+            "function restoreNavigation(", "new Set(snapshot.view.groups)",
+            "new Map(snapshot.view.radarContextStates)",
+            "window.addEventListener('popstate'",
+            "document.getElementById('search').value=state.search",
+            "history.scrollRestoration='manual'",
+            "catalog-reader-detached", "目前閱讀不在左側結果",
         ):
-            self.assertIn(contract, template)
-        self.assertNotIn(
-            "history.replaceState(null,'','#'+encodeURIComponent(state.selected))", template)
+            self.assertIn(contract, template, contract)
+        self.assertNotIn("history.replaceState(null,", template)
 
     def test_template_offcanvas_filters_manage_inert_focus_and_escape(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2510,31 +2172,19 @@ class ResearchCenterTest(unittest.TestCase):
             template,
         )
 
-    def test_template_focus_mode_reclaims_left_and_top_navigation_space(self):
+    def test_template_focus_mode_requires_explicit_opt_in(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
             'id="focusToggle"', 'aria-pressed="false"',
-            "body.focus-mode .filters,body.focus-mode .tools{display:none}",
-            "body.focus-mode .catalog{display:none}",
-            "body.focus-mode .reader-inner{max-width:1180px",
-            "body.focus-mode .reader-inner{grid-template-columns:minmax(0,1fr);max-width:720px;gap:0}",
-            "readPreference('researchFocusMode')",
-            "writePreference('researchFocusMode'",
-            "focusToggleButton.setAttribute('aria-pressed'",
-            "readPreference('researchFocusMode')!=='0'",
+            "readPreference('researchFocusModeV2')==='1'",
+            "writePreference('researchFocusModeV2'",
             "articleOpen&&focusModeRequested&&focusMedia.matches",
-            "focusToggleButton.textContent=active?'文章清單':'專注閱讀'",
+            "active?'退出專注':'專注閱讀'",
+            "focusToggleButton.setAttribute('aria-pressed'",
             "focusMedia.addEventListener('change',applyFocusMode)",
         ):
-            self.assertIn(contract, template)
-        self.assertIn("@media(min-width:781px){", template)
-        self.assertIn(".focusbtn{display:none}", template)
-        self.assertGreater(
-            template.index(
-                "body.focus-mode .reader-inner{grid-template-columns:minmax(0,1fr);max-width:720px;gap:0}"
-            ),
-            template.index("body.focus-mode .reader-inner{max-width:1180px"),
-        )
+            self.assertIn(contract, template, contract)
+        self.assertNotIn("readPreference('researchFocusMode')!=='0'", template)
 
     def test_template_outline_scroll_spy_tracks_reader_and_window_scroll(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2683,8 +2333,8 @@ class ResearchCenterTest(unittest.TestCase):
             "article.type!=='formal_note'||item.kind!=='internal_taxonomy'",
             "rendered=takeaway||block(item,{readableProse:mode==='reader',readerProseProfile:showReaderAids?'topic':'default',textTransform,readerTablePositions})",
             "normalizedReaderRunTexts(source).map(text=>textTransform?textTransform(text):text)",
-            "查核狀態沿用原始正式筆記；本頁只改善導覽，不改動原始證據邊界。",
-            "研究內容以原始 Markdown 與查核資料為準",
+            "text:article.status",
+            "研究內容依原始來源與查核狀態判讀",
         ):
             self.assertIn(contract, template)
         # 只轉換實際建立 DOM 的文字；原始 run、文章 sections 與 payload 都不回寫。
@@ -2716,76 +2366,25 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertNotIn('section["readerPurpose"]', template)
         self.assertNotIn("section.readerPurpose=", template)
 
-    def test_catalog_leads_every_research_article_type_with_a_reader_question(self):
+    def test_catalog_identifies_articles_and_reuses_existing_preview(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
-        for contract in (
-            "function catalogReaderQuestion(article)",
-            "article.type==='topic'",
-            "article.readerQuestion||''",
-            "article.type==='formal_note'||article.type==='narrative'",
-            "article.readingMission?.question||''",
-            "function catalogSourceLabel(article)",
-            "article.type==='formal_note'?'原始摘要：'",
-            "article.type==='narrative'?'待驗命題：':'研究題名：'",
-            "readerQuestion=catalogReaderQuestion(article)",
-            "function catalogLearningLead(article)",
-            "(mission.keyPoints||[]).find(Boolean)||mission.orientation||''",
-            "function catalogLearningLabel(article)",
-            "article.type==='formal_note'?'先認識公司'",
-            "article.type==='narrative'?'先看要驗證的說法':'先知道一件事'",
-            "function catalogLearningPreview(article,readerQuestion)",
-            "function catalogComparableText(value)",
-            "function catalogTechnicalTitle(article,lead)",
-            "titleKey.includes(leadKey)||leadKey.includes(titleKey)",
-            "lead=readerLeadParts(article,rawLead)",
-            "class:'result-learning-source'",
-            "原文來源標記：",
-            "if(technicalTitle)button.appendChild",
-            "'data-catalog-learning-id':article.id",
-            "text:catalogLearningLabel(article)",
-            "text:'讀完能回答'",
-            "'data-reader-question-type':article.type",
-            "'data-reader-question-id':article.id",
-        ):
-            self.assertIn(contract, template)
-        preview_source = template[
-            template.index("function catalogLearningPreview(article,readerQuestion)"):
-            template.index("function resultItem(article)")
-        ]
-        self.assertLess(
-            preview_source.index("'data-catalog-learning':'question'"),
-            preview_source.index("'data-catalog-learning':'lead'"),
-        )
-        # 清單只讀取既有導讀欄位，沒有從正文或題名生成新的研究問題。
-        self.assertNotIn("article.catalogQuestion=", template)
+        card = template.split("function resultItem(article)", 1)[1].split("function showEntryGuide(", 1)[0]
+        self.assertIn("text:article.readerTitle||article.title", card)
+        self.assertIn("readerLeadParts(article,catalogLearningLead(article))", card)
+        self.assertIn("lead.text||catalogReaderQuestion(article)||article.subject", card)
+        self.assertIn("selectArticle(article.id)", card)
+        self.assertNotIn("catalogLearningPreview(", card)
         self.assertNotIn("article.readingMission.question=", template)
 
-    def test_catalog_cards_explain_evidence_position_and_mobile_preserves_first_screen(self):
+    def test_catalog_preserves_status_without_stacking_explanatory_cards(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
-        for contract in (
-            "function catalogEvidencePosition(article)",
-            "(article.sections||[]).map(section=>section.readerEvidenceGuide).find(Boolean)",
-            "parts=[String(article.status||'').trim()].filter(Boolean)",
-            "guide?.claimLabel",
-            "confidenceText(confidence)",
-            "Number.isInteger(guide.sourceCount)",
-            "guide.sourceCount+' 份有效來源'",
-            "'data-catalog-evidence-id':article.id",
-            "text:'目前怎麼看：'",
-            ".result-learning-preview{display:grid",
-            ".result-evidence{display:grid",
-            "function restoreCatalogGuidePreference()",
-            "const guide=document.getElementById('entryGuide')",
-            "guide.open=readPreference(key)!=='closed'",
-            "guide.addEventListener('toggle'",
-            "if(guide.hidden)return",
-            "也不由 resize 覆寫",
-        ):
-            self.assertIn(contract, template)
-        # 卡片只重排已發布的導讀、狀態與 readerEvidenceGuide，不回寫研究 payload。
-        self.assertNotIn("article.readingMission=", template)
-        self.assertNotIn("section.readerEvidenceGuide=", template)
+        card = template.split("function resultItem(article)", 1)[1].split("function showEntryGuide(", 1)[0]
+        for contract in ("text:article.typeLabel", "text:article.status", "datetime:article.date",
+                         "'aria-current':selected?'true':null", "class:'result-preview'"):
+            self.assertIn(contract, card, contract)
+        self.assertNotIn("catalogEvidencePosition(", card)
         self.assertNotIn("article.status=", template)
+        self.assertIn("guide.open=readPreference(key)==='open'", template)
 
     def test_article_check_data_is_collapsed_and_translates_research_operations(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -2808,27 +2407,15 @@ class ResearchCenterTest(unittest.TestCase):
             self.assertIn(contract, template)
         self.assertNotIn("h('h2',{text:'來源與證據摘要'})", template)
 
-    def test_article_heading_preserves_question_and_focus_contracts(self):
+    def test_article_heading_identifies_document_and_keeps_focus_contract(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
-        for contract in (
-            "function articleReaderTitleLabel(article)",
-            "article.type==='topic'?'研究題名：':'原研究頁名：'",
-            "function articleReaderHeading(article)",
-            "const readerQuestion=catalogReaderQuestion(article)",
-            "'data-reader-heading-type':article.type",
-            "'data-reader-heading-id':article.id",
-            "tabindex:'-1'",
-            "'data-reader-heading-focus':article.id",
-            "h('h1',{...headingAttrs,text:readerQuestion})",
-            "h('strong',{text:articleReaderTitleLabel(article)})",
-            "article.readerTitle",
-            "function focusArticleHeading(articleId)",
-            "heading.focus({preventScroll:true})",
-            "resetReaderScroll();focusArticleHeading(id)",
-            ".article h1[data-reader-heading-focus]:focus-visible",
-        ):
-            self.assertIn(contract, template)
-        self.assertNotIn("article.type==='topic'&&article.readerQuestion", template)
+        heading = template.split("function articleReaderHeading(article)", 1)[1].split("function renderReaderWelcome(", 1)[0]
+        for contract in ("'data-reader-heading-type':article.type", "'data-reader-heading-id':article.id",
+                         "tabindex:'-1'", "'data-reader-heading-focus':article.id", "text:article.readerTitle"):
+            self.assertIn(contract, heading, contract)
+        self.assertNotIn("這篇先弄懂", heading)
+        self.assertIn("resetReaderScroll();focusArticleHeading(id)", template)
+        self.assertIn("heading.focus({preventScroll:true})", template)
 
     def test_template_explains_why_generic_article_recommendations_connect(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
@@ -3268,7 +2855,7 @@ class ResearchCenterTest(unittest.TestCase):
             "'data-testid':'topic-learning-position-jump'",
             "focusReadingTarget(document.getElementById('learningPathTitle'))",
             "const topicPosition=renderTopicLearningPosition(article)",
-            "if(topicPosition)body.appendChild(topicPosition)",
+            "if(topicPosition)content.appendChild(topicPosition)",
             ".learning-position-context{",
         ):
             self.assertIn(contract, template)
@@ -3302,7 +2889,7 @@ class ResearchCenterTest(unittest.TestCase):
     def test_template_graph_entry_progressively_discloses_controls(self):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         for contract in (
-            'details class="graph-learning-key" id="graphLearningKey" open',
+            'details class="graph-learning-key" id="graphLearningKey">',
             'details class="graph-control-fold" id="graphControlFold">',
             '<span class="graph-control-summary-label">目前這張圖</span>',
             'class="graph-learning-body" aria-labelledby="graphLearningTitle"',
@@ -3647,7 +3234,7 @@ process.stdout.write(JSON.stringify(results));
             "function openGroupResearch(", "deepLink==='maturity'",
             "把一個產業問題拆成角色與文章", "族群起點", "開始學這個族群",
             "第一次來只看上半部", "下半部的完成度是研究資料是否齊全",
-            "先選問題，再讀主題，最後追關係", "先選一個系統問題",
+            "依產業問題找閱讀路線", "先選一個系統問題",
             "從 6 條既有學習路線，看每個問題會用到哪些族群",
             "function renderMaturityGroupStart(", "groupsWithLearningStart",
             "row.readerRole", "row.readerBoundary", "研究中心怎麼分",

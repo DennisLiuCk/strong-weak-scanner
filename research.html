@@ -352,12 +352,51 @@ body.graph-mode .shell{grid-template-columns:minmax(0,1fr)}body.graph-mode .filt
 @media(max-width:780px){.maturity-origin-wide{display:grid;grid-template-columns:1fr;margin:10px 10px 0;padding:12px}.maturity-origin-wide .maturity-origin-reader{padding:10px 0 0;border-top:1px solid color-mix(in srgb,var(--purple) 22%,var(--line));border-left:0}.maturity-origin-actions{display:grid;grid-template-columns:1fr}.maturity-origin-wide .maturity-origin-start,.maturity-origin-back{min-height:44px}}
 @media(max-width:780px){.maturity-origin-wide.maturity-origin-pending{grid-template-columns:1fr}}
 @media(max-width:780px){.reader-table-system-steps{grid-template-columns:1fr}.article-section .reader-table-system-step{padding:8px 9px}.article-section .reader-table-system-intro,.article-section .reader-table-system-reading{font-size:12px;line-height:1.6}}
+/* 閱讀優先：固定清單與正文，所有輔助工具按需開啟。 */
+.topbar{height:72px;display:flex;gap:36px;padding:0 32px;background:var(--paper)}
+.topbar::after{display:none}.brand{font-size:21px;white-space:nowrap}.backlink{font-size:13px}.top-actions{margin-left:auto;gap:12px}.themebtn,.focusbtn{border:0;background:transparent;font-size:12px}
+.research-nav{display:flex;align-items:center;gap:24px;height:100%}.research-nav .surface-tab{border:0;border-radius:0;background:transparent;padding:12px 2px;font-size:14px;color:var(--muted)}.research-nav .surface-tab[aria-current=page]{color:var(--teal);box-shadow:inset 0 -2px var(--teal)}
+.explore-menu{position:relative;font-size:14px;color:var(--muted)}.explore-menu summary{cursor:pointer;padding:14px 0}.explore-options{position:absolute;top:46px;left:-16px;min-width:150px;display:grid;padding:12px 16px;background:var(--card);border:1px solid var(--line);box-shadow:0 8px 30px #0002}.explore-options .surface-tab{text-align:left}
+.shell{display:block;height:calc(100dvh - 72px);min-height:0}.content{height:100%;display:grid;grid-template-columns:minmax(320px,31%) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);overflow:hidden}.tools{grid-column:1;grid-row:1;padding:24px 24px 12px;border-right:1px solid var(--line);border-bottom:0;background:var(--paper)}
+.searchrow{display:flex;gap:10px;flex-direction:row-reverse}.search{width:100%;min-width:0;padding:11px 12px;font-size:14px;border-radius:5px;background:var(--card)}.filter-toggle{display:block;flex-shrink:0;border-radius:5px;font-size:13px;padding:9px 12px}.toolrow{gap:8px;flex-wrap:wrap;margin-top:14px}.type-tabs{width:100%;gap:16px}.type-tab{padding:8px 0;border:0;border-radius:0;background:transparent;font-size:12px;white-space:nowrap}.type-tab[aria-selected=true]{color:var(--teal);background:transparent;box-shadow:inset 0 -2px var(--teal)}.type-tab .count{display:none}.result-total{margin:6px 0 0;font-size:11px}.sort{margin-left:auto;font-size:11px;border:0;background:transparent}
+.workarea{display:contents}.catalog{grid-column:1;grid-row:2;min-width:0;overflow:auto;border-right:1px solid var(--line);background:var(--paper);padding:0 0 40px;scrollbar-width:thin}.catalog-head{padding:6px 24px 12px;display:block}.catalog-head h2{font-size:14px}.catalog-head>span{display:none}.entry-guide{margin:0 24px 14px;border:0;background:transparent}.entry-guide summary{padding:9px 0}.entry-guide-title strong{font-size:12px;font-weight:400}.entry-guide[hidden]{display:none}
+.result{display:block;width:100%;border:0;border-bottom:1px solid var(--line);border-left:3px solid transparent;border-radius:0;margin:0;padding:21px 24px;text-align:left;background:transparent}.result:hover{background:var(--inset)}.result.selected{background:var(--tealbg);border-left-color:var(--teal);box-shadow:none}.result h3{font-size:17px;line-height:1.55;margin:0 0 9px;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.result-preview{font-size:13px;line-height:1.8;color:var(--ink2);margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.result-meta{display:flex;flex-wrap:wrap;gap:5px 10px;font-size:10px;color:var(--muted)}.result-meta .status{font-size:10px;font-weight:400}.result-meta time{margin-left:auto}.catalog-reader-detached{margin:8px 24px;font-size:12px}
+.reader{grid-column:2;grid-row:1 / 3;min-width:0;min-height:0;background:var(--card);overflow:hidden}.reader-scroll{height:100%;overflow:auto;scrollbar-width:thin}.reader-inner,body.focus-mode .reader-inner{display:block;max-width:860px;margin:0 auto;padding:40px 48px 90px}.reader-toolbar{position:sticky;top:0;z-index:12;min-height:58px;display:flex;align-items:center;gap:8px;padding:8px 28px;background:var(--card);border-bottom:1px solid var(--line)}.reader-breadcrumb{font-size:12px;color:var(--muted);margin-right:auto}.reader-toolbar button{border:0;background:transparent;color:var(--ink2);padding:10px 9px;font-size:12px;cursor:pointer}.reader-toolbar button:hover{color:var(--teal);background:var(--tealbg)}.reader-back{display:none}.article-reader-heading{margin:0}.article h1{font-size:32px;line-height:1.5;letter-spacing:.01em;margin:0 0 20px}.article-meta{display:flex;align-items:center;gap:8px 15px;flex-wrap:wrap;padding:0 0 26px;margin:0 0 30px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}.article-meta .status,.article-meta .confidence-badge{font-size:11px}.article-meta .copybtn{margin-left:auto;font-size:11px;border:0;background:transparent;padding:6px}.article-section{margin:0 0 38px;scroll-margin-top:82px}.article-section h2{font-size:23px;line-height:1.6;margin:0 0 18px;padding:0;border:0}.article-section p,.article-section li{font-size:16px;line-height:1.95}.article-section p{margin:0 0 20px}.article-section h3{font-size:18px;margin:28px 0 14px}.reader-sentence-break{display:inline}.reader-sentence-break::after{content:' '}.article-section .table-wrap{margin:24px 0}.article-section table{font-size:13px}.reader-placeholder{min-height:65vh;text-align:left;padding:48px}.reader-placeholder strong{font-size:26px;margin-bottom:15px}.reader-placeholder span{font-size:14px;line-height:1.9}.reader-placeholder>div{max-width:430px}
+.reader-panel{position:fixed;inset:0 0 0 auto;margin:0;width:min(640px,100%);max-width:100%;height:100dvh;max-height:100dvh;border:0;border-left:1px solid var(--line);padding:0;background:var(--card);color:var(--ink)}.reader-panel::backdrop{background:#10182066}.reader-panel-head{position:sticky;top:0;z-index:2;background:var(--card);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:18px 28px}.reader-panel-head h2{font-size:20px;margin:0}.reader-panel-head button{font-size:13px;padding:9px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:4px}.reader-panel-content{padding:24px 28px 60px;overflow-wrap:anywhere}.reader-panel .toc button{font-size:14px;line-height:1.7;min-height:44px;padding:12px 8px}.reader-panel .evidence{margin:0}.reader-panel .evidence-body{font-size:13px}.reader-panel .article-section h2{font-size:19px}.reader-panel .article-section p,.reader-panel .article-section li{font-size:14px}.reader-panel .research-appendix{margin-top:24px}.reader-panel .learning-path{margin-top:24px}.reader-panel .confidence-panel{margin:0 0 24px}.reader-panel .article-role-context{margin:24px 0}.reader-panel .source-link{overflow-wrap:anywhere}
+.filters{display:block;position:fixed;z-index:60;inset:0 auto 0 0;width:min(360px,100%);height:100dvh;max-height:100dvh;transform:translateX(-100%);visibility:hidden;transition:transform .15s,visibility .15s;border:0;background:var(--card);padding:24px;overflow:auto}.filters.open{transform:none;visibility:visible}.filter-close,.filter-done{display:block}.filter-backdrop{position:fixed;inset:0;z-index:59;background:#10182066}
+body.focus-mode .content{grid-template-columns:minmax(0,1fr)}body.focus-mode .reader{grid-column:1}body.focus-mode .tools,body.focus-mode .catalog{display:none}body.focus-mode .reader-back{display:inline-flex}
+body.graph-mode .content{display:block;overflow:auto}body.graph-mode .tools{display:block;border:0;padding:20px 32px 0}body.graph-mode .shell{display:block}.graph-learning-key{margin-bottom:12px}.graph-reading-mission{margin-top:12px}.graph-page,.maturity-page,.radar-page{max-width:1440px;margin:0 auto}
+@media(max-width:1180px) and (min-width:781px){.topbar{gap:24px;padding:0 24px}.research-nav{gap:18px}.reader-inner{padding:32px}.reader-toolbar{padding:8px 18px}.article h1{font-size:28px}.content{grid-template-columns:340px minmax(0,1fr)}}
+@media(max-width:780px){.topbar{height:auto;min-height:60px;padding:12px 18px;gap:16px;flex-wrap:wrap}.brand{font-size:18px}.backlink{font-size:12px}.top-actions{margin-left:auto}.focusbtn{display:none}.themebtn{font-size:11px;padding:4px}.research-nav{order:4;width:100%;gap:26px;height:34px}.research-nav .surface-tab,.explore-menu{font-size:13px}.explore-menu summary{padding:8px 0}.explore-options{top:32px}.shell{height:auto;min-height:calc(100dvh - 110px)}.content{display:block;height:auto;overflow:visible}.tools{padding:20px 18px 12px;border:0}.catalog{padding-bottom:32px;border:0;overflow:visible}.catalog-head{padding:4px 18px 12px}.result{padding:20px 18px}.result h3{font-size:17px}.result-meta,.result-meta .status{font-size:11px}.reader{display:none;overflow:visible}.reader-scroll{height:auto;overflow:visible}.reader-inner,body.focus-mode .reader-inner{padding:26px 22px 60px}.reader-toolbar{position:sticky;top:110px;min-height:52px;padding:5px 12px;gap:2px;flex-wrap:wrap}.reader-toolbar button{font-size:12px;padding:10px 8px;min-height:40px}.reader-breadcrumb{display:none}.reader-back{display:inline-flex!important;margin-right:auto}.article h1{font-size:25px;line-height:1.55;margin-bottom:18px}.article-meta{font-size:11px;gap:8px 12px;padding-bottom:20px;margin-bottom:25px}.article-section h2{font-size:21px}.article-section p,.article-section li{font-size:16px;line-height:1.95}.article-section{scroll-margin-top:180px}.entry-guide{margin:0 18px 12px}.reader-panel-head{padding:16px 20px}.reader-panel-content{padding:22px 20px 50px}body.article-open .tools,body.article-open .catalog{display:none}body.article-open .reader{display:block}body.graph-mode .tools{padding:16px 18px 0}body.graph-mode .content{overflow:visible}.reader-placeholder{display:none}.to-top{bottom:20px}.reader-panel .article-role-grid,.reader-panel .article-role-question-grid{grid-template-columns:1fr}}
+.article-reader-heading{padding:0;border:0;border-radius:0;background:transparent}.article-reader-heading h1{font-size:34px;line-height:1.5;font-weight:700;margin:0 0 22px}.reader-inner,body.focus-mode .reader-inner{max-width:1040px;padding-left:42px;padding-right:42px}.article .reader-prose-dense .reader-sentence-break{display:none}.article-section p,.article-section li{font-size:18px;line-height:1.9;color:var(--ink)}.type-tabs{border:0;border-radius:0;background:transparent;overflow:visible;display:flex;justify-content:space-between;gap:10px}.type-tab{font-weight:500}.catalog-head{position:static;background:transparent;border:0}.article-meta .status{font-weight:400}.result-meta .status{color:var(--muted)}
+@media(max-width:1180px) and (min-width:781px){.reader-inner{padding:30px}.article-reader-heading h1{font-size:28px}.article-section p,.article-section li{font-size:17px}.type-tabs{gap:8px}.type-tab{font-size:11px}}
+@media(max-width:780px){.reader-inner,body.focus-mode .reader-inner{padding:26px 22px 60px}.article-reader-heading h1{font-size:25px}.article-section p,.article-section li{font-size:16px}.type-tabs{display:flex}.topbar{height:110px}.filters{top:0}.reader-toolbar{top:110px}.type-tab{font-size:12px}.result-meta .status{font-size:11px}}
+.article h1[data-reader-heading-focus]:focus-visible{outline:none}.article-section{padding-top:0}.reader-panel .reader-tabs{display:flex;position:static;background:transparent}.reader-panel .article-section{scroll-margin-top:90px}.filters.open{z-index:60}.filters{transition:none}
+.ui-icon{display:inline-block;width:20px;height:20px;flex:none;vertical-align:middle}html[data-theme=dark] .ui-icon{filter:invert(1)}
+.backlink,.filter-toggle,.reader-toolbar button,.research-nav .surface-tab,.explore-menu summary{align-items:center;gap:9px}.backlink,.filter-toggle,.reader-toolbar button,.research-nav .surface-tab{display:inline-flex}.explore-menu summary{display:flex;list-style:none}.explore-menu summary::-webkit-details-marker{display:none}.explore-menu summary .ui-icon{width:15px;height:15px}
+.searchfield{min-width:0;flex:1;display:flex;align-items:center;gap:10px;padding-left:12px;border:1px solid var(--line);border-radius:5px;background:var(--card)}.searchfield .search{border:0;background:transparent;padding-left:0}.searchfield:focus-within{outline:2px solid var(--teal);outline-offset:2px}
+.reader-toolbar .reader-back{display:none}
+@media(min-width:1181px){.topbar{display:flex;gap:30px}.brand{position:absolute;left:50%;transform:translateX(-50%);font-size:26px}.research-nav{margin-left:auto;gap:32px}.research-nav .surface-tab,.explore-menu{font-size:16px}.top-actions{margin-left:4px;gap:12px}.backlink{font-size:15px}.article-reader-heading h1{font-size:40px;line-height:1.45}.article-section h2{font-size:28px;line-height:1.6}.article-section p,.article-section li{font-size:22px;line-height:1.75}.reader-toolbar{padding-left:42px;padding-right:30px}.reader-toolbar button,.reader-breadcrumb{font-size:15px}.reader-toolbar button+button{margin-left:9px}.article-meta,.article-meta .status,.article-meta .confidence-badge,.article-meta .copybtn{font-size:13px}.result h3{font-size:18px}.result-preview{font-size:15px;line-height:1.7}.result-meta,.result-meta .status{font-size:12px}.type-tab{font-size:13px}.search{font-size:16px}.filter-toggle{font-size:14px}.catalog-head h2{font-size:16px}.result-total,.sort{font-size:12px}}
+@media(max-width:1180px) and (min-width:781px){.article-section p,.article-section li{font-size:19px;line-height:1.8}.reader-toolbar .ui-icon{width:16px;height:16px}.reader-toolbar button{gap:5px}.searchfield{gap:6px}.filter-toggle{gap:5px}.filter-toggle .ui-icon{width:16px;height:16px}}
+@media(max-width:780px){.reader-toolbar .ui-icon,.backlink .ui-icon{display:none}.reader-toolbar .reader-back{display:inline-flex}.searchfield{gap:7px}.filter-toggle{gap:6px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.filters{transition:none}}
 </style>
 </head>
 <body>
 <header class="topbar">
-  <a class="backlink" href="index.html"><span aria-hidden="true">←</span><span class="backlink-full">返回掃描儀表板</span><span class="backlink-short">掃描儀表板</span></a>
-  <h1 class="brand">研究中心</h1>
+  <a class="backlink" href="index.html"><img class="ui-icon" src="assets/heroicons/arrow-left.svg" alt=""><span class="backlink-full">返回掃描儀表板</span><span class="backlink-short">儀表板</span></a>
+  <span class="brand">研究中心</span>
+  <nav class="research-nav" aria-label="研究中心導覽">
+    <button class="surface-tab" id="surfaceLibrary" type="button" aria-current="page">文章</button>
+    <details class="explore-menu" id="exploreMenu">
+      <summary>產業探索<img class="ui-icon" src="assets/heroicons/chevron-down.svg" alt=""></summary>
+      <div class="explore-options">
+        <button class="surface-tab" id="surfaceMaturity" type="button">族群矩陣</button>
+        <button class="surface-tab" id="surfaceGraph" type="button">知識圖譜</button>
+      </div>
+    </details>
+    <button class="surface-tab" id="surfaceRadar" type="button">研究追蹤</button>
+  </nav>
   <div class="top-actions">
     <button class="focusbtn" id="focusToggle" type="button" aria-pressed="false" aria-label="進入專注閱讀" hidden>專注閱讀</button>
     <button class="themebtn" id="themeBtn" type="button" aria-label="切換深淺色">深／淺色</button>
@@ -385,19 +424,10 @@ body.graph-mode .shell{grid-template-columns:minmax(0,1fr)}body.graph-mode .filt
   </aside>
   <main class="content">
     <section class="tools" aria-label="搜尋與文章類型">
-      <div class="surface-row">
-        <div class="surface-tabs" role="tablist" aria-label="研究中心檢視">
-          <button class="surface-tab" id="surfaceLibrary" type="button" role="tab" aria-selected="true">研究文章</button>
-          <button class="surface-tab" id="surfaceRadar" type="button" role="tab" aria-selected="false">研究雷達</button>
-          <button class="surface-tab" id="surfaceMaturity" type="button" role="tab" aria-selected="false">族群矩陣</button>
-          <button class="surface-tab" id="surfaceGraph" type="button" role="tab" aria-selected="false">知識圖譜</button>
-        </div>
-        <span class="surface-note">找現有答案看研究文章；想知道還沒回答完整的問題看研究雷達；不熟產業分工先走族群矩陣；要核對公司與製程關係再開知識圖譜。</span>
-      </div>
       <div id="libraryControls">
         <div class="searchrow">
-          <button class="filter-toggle" id="filterToggle" type="button" aria-controls="filters" aria-expanded="false">篩選</button>
-          <input class="search" id="search" type="search" aria-label="搜尋研究文章" placeholder="搜尋公司、產業、主題、關鍵字或內文…" autocomplete="off">
+          <button class="filter-toggle" id="filterToggle" type="button" aria-controls="filters" aria-expanded="false"><img class="ui-icon" src="assets/heroicons/adjustments-horizontal.svg" alt="">篩選</button>
+          <div class="searchfield"><img class="ui-icon" src="assets/heroicons/magnifying-glass.svg" alt=""><input class="search" id="search" type="search" aria-label="搜尋研究文章" placeholder="搜尋公司、產業或主題" autocomplete="off"></div>
         </div>
         <div class="toolrow">
           <div class="type-tabs" id="typeTabs" role="tablist" aria-label="文章類型"></div>
@@ -407,7 +437,7 @@ body.graph-mode .shell{grid-template-columns:minmax(0,1fr)}body.graph-mode .filt
       </div>
       <div class="graph-controls" id="graphControls" hidden>
         <nav class="graph-origin graph-route-complete-origin" id="graphRouteComplete" aria-labelledby="graphRouteCompleteTitle" hidden></nav>
-        <details class="graph-learning-key" id="graphLearningKey" open>
+        <details class="graph-learning-key" id="graphLearningKey">
           <summary class="graph-learning-head"><span class="graph-learning-summary-copy"><strong id="graphLearningTitle">新手讀圖</strong><span>把圖譜當成可回查的產業關係索引，不是供應鏈名單或受惠排名。</span></span><span class="graph-fold-state" aria-hidden="true"></span></summary>
           <div class="graph-learning-body" aria-labelledby="graphLearningTitle">
             <div class="graph-learning-steps">
@@ -459,8 +489,8 @@ body.graph-mode .shell{grid-template-columns:minmax(0,1fr)}body.graph-mode .filt
     <div class="workarea" id="libraryPage">
       <section class="catalog" aria-label="研究文章清單">
         <div class="catalog-head"><h2 id="catalogTitle">研究文章</h2><span id="catalogHint"></span></div>
-        <details class="entry-guide" id="entryGuide" open>
-          <summary><span class="entry-guide-title"><strong id="entryGuideTitle">第一次來？先從問題開始</strong><small>最新文章不是推薦順序；先選問題，再讀主題，最後追關係</small></span></summary>
+        <details class="entry-guide" id="entryGuide">
+          <summary><span class="entry-guide-title"><strong id="entryGuideTitle">依產業問題找閱讀路線</strong></span></summary>
           <div class="entry-guide-steps" aria-labelledby="entryGuideTitle">
             <div class="entry-step-group">
               <button class="entry-step" id="entryMatrix" type="button"><span class="entry-step-index">1</span><span class="entry-step-copy"><strong>先選一個系統問題</strong><small>從 6 條既有學習路線，看每個問題會用到哪些族群。</small></span><span class="entry-step-action">看完整路線</span></button>
@@ -649,6 +679,7 @@ const groupById=new Map((LIB.groups||[]).map(group=>[group.id,group]));
 const state={surface:'library',type:'all',groups:new Set(),statuses:new Set(['verified','review','observational']),date:'all',search:'',sort:'latest',selected:null,graphId:(KG.graphs||[])[0]?.id||'',graphRoute:graphRouteId((KG.graphs||[])[0]?.id||''),graphView:'company',graphEvidence:new Set(['verified','inference','unverified']),graphUniverseOnly:false,graphSelection:null,graphOrigin:null,maturityOrigin:null,maturityGuideGroupId:'',maturityEntry:'routes',articleOrigin:null,radarContextStates:new Map()};
 const byId=new Map(LIB.articles.map(article=>[article.id,article]));
 let catalogReturnPosition=null;
+const initialNavigation=history.state;
 
 function h(tag,attrs,...children){const el=document.createElement(tag);Object.entries(attrs||{}).forEach(([key,value])=>{
   if(key==='class')el.className=value;else if(key==='text')el.textContent=value==null?'':String(value);else if(key==='html')el.innerHTML=value;else if(key.startsWith('on'))el.addEventListener(key.slice(2),value);else if(value!==false&&value!=null)el.setAttribute(key,value===true?'':String(value));
@@ -671,11 +702,23 @@ LIB.articles.forEach(article=>article._search=(article.searchText+' '+flatText(a
 
 function svgEl(tag,attrs,...children){const el=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs||{}).forEach(([key,value])=>{if(key==='class')el.setAttribute('class',value);else if(key==='text')el.textContent=value==null?'':String(value);else if(key.startsWith('on'))el.addEventListener(key.slice(2),value);else if(value!==false&&value!=null)el.setAttribute(key,value===true?'':String(value))});children.flat().forEach(child=>{if(child!=null)el.appendChild(child)});return el}
 function graphHashRoute(value){const match=/^graph:([^:]+):(company|industry)$/.exec(value||'');return match&&graphById.has(match[1])?{graphId:match[1],view:match[2]}:null}
-function setGraphHash(){const url=new URL(location.href);url.hash='graph:'+state.graphId+':'+state.graphView;history.replaceState(null,'',url.pathname+url.search+url.hash)}
-function setRadarHash(){const url=new URL(location.href);url.hash='radar';history.replaceState(null,'',url.pathname+url.search+url.hash)}
-function setMaturityHash(){const url=new URL(location.href);url.hash='maturity';history.replaceState(null,'',url.pathname+url.search+url.hash)}
-function syncSurface(){const graphMode=state.surface==='graph',radarMode=state.surface==='radar',maturityMode=state.surface==='maturity',libraryMode=!graphMode&&!radarMode&&!maturityMode;document.body.classList.toggle('graph-mode',!libraryMode);document.getElementById('surfaceLibrary').setAttribute('aria-selected',libraryMode?'true':'false');document.getElementById('surfaceRadar').setAttribute('aria-selected',radarMode?'true':'false');document.getElementById('surfaceMaturity').setAttribute('aria-selected',maturityMode?'true':'false');document.getElementById('surfaceGraph').setAttribute('aria-selected',graphMode?'true':'false');document.getElementById('libraryControls').hidden=!libraryMode;document.getElementById('graphControls').hidden=!graphMode;document.getElementById('libraryPage').hidden=!libraryMode;document.getElementById('graphPage').hidden=!graphMode;document.getElementById('radarPage').hidden=!radarMode;document.getElementById('maturityPage').hidden=!maturityMode;if(!libraryMode){outlineSpyCleanup();glossaryQuickCleanup()}}
-function selectSurface(surface,updateHash=true){if(surface==='graph'&&!graphById.size)return;if(surface==='radar'&&!(RADAR.candidates||[]).length)return;if(surface==='maturity'&&!(MATURITY.rows||[]).length)return;state.surface=surface;syncSurface();if(surface==='graph'){document.body.classList.remove('article-open');if(updateHash)setGraphHash();renderGraphControls();renderGraph()}else if(surface==='radar'){document.body.classList.remove('article-open');if(updateHash)setRadarHash();renderRadar()}else if(surface==='maturity'){document.body.classList.remove('article-open');if(updateHash)setMaturityHash();renderMaturity()}else{if(updateHash)setArticleHash('');renderAll()}applyFocusMode()}
+function setGraphHash(){setRouteHash('graph:'+state.graphId+':'+state.graphView)}
+function setRadarHash(){setRouteHash('radar')}
+function setMaturityHash(){setRouteHash('maturity')}
+function syncSurface(){
+  document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
+  const graphMode=state.surface==='graph',radarMode=state.surface==='radar',maturityMode=state.surface==='maturity',libraryMode=state.surface==='library';
+  document.body.classList.toggle('graph-mode',!libraryMode);
+  for(const [id,active] of [['surfaceLibrary',libraryMode],['surfaceRadar',radarMode],['surfaceMaturity',maturityMode],['surfaceGraph',graphMode]]){
+    const button=document.getElementById(id);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+  }
+  document.getElementById('exploreMenu').open=false;
+  document.getElementById('libraryControls').hidden=!libraryMode;document.getElementById('graphControls').hidden=!graphMode;
+  document.getElementById('libraryPage').hidden=!libraryMode;document.getElementById('graphPage').hidden=!graphMode;
+  document.getElementById('radarPage').hidden=!radarMode;document.getElementById('maturityPage').hidden=!maturityMode;
+  if(!libraryMode){outlineSpyCleanup();glossaryQuickCleanup()}
+}
+function selectSurface(surface,updateHash=true){if(surface==='graph'&&!graphById.size)return;if(surface==='radar'&&!(RADAR.candidates||[]).length)return;if(surface==='maturity'&&!(MATURITY.rows||[]).length)return;state.surface=surface;syncSurface();if(surface==='graph'){document.body.classList.remove('article-open');if(updateHash)setGraphHash();renderGraphControls();renderGraph()}else if(surface==='radar'){document.body.classList.remove('article-open');if(updateHash)setRadarHash();renderRadar()}else if(surface==='maturity'){document.body.classList.remove('article-open');if(updateHash)setMaturityHash();renderMaturity()}else{document.body.classList.remove('article-open');if(updateHash)setArticleHash('');renderAll()}applyFocusMode()}
 function graphNodeMap(graph){return new Map((graph?.nodes||[]).map(node=>[node.id,node]))}
 function activeGraph(){return graphById.get(state.graphId)||(KG.graphs||[])[0]||null}
 function edgeIsStale(edge){return /^\d{4}-\d{2}-\d{2}$/.test(edge.reviewDue||'')&&confidenceAsOf()>edge.reviewDue}
@@ -976,9 +1019,20 @@ function filteredArticles(){let rows=LIB.articles.filter(article=>{
   return true;
 });
   rows=rows.slice().sort((a,b)=>state.sort==='subject'?a.subject.localeCompare(b.subject,'zh-Hant-TW'):(state.sort==='oldest'?a.date.localeCompare(b.date):b.date.localeCompare(a.date))||(TYPE_ORDER[a.type]-TYPE_ORDER[b.type])||a.subject.localeCompare(b.subject,'zh-Hant-TW'));return rows}
-function setArticleHash(id){const url=new URL(location.href);url.hash=id||'';history.replaceState(null,'',url.pathname+url.search+url.hash)}
+function navigationSnapshot(){
+  return {research:true,hash:location.hash,view:{...state,groups:[...state.groups],statuses:[...state.statuses],graphEvidence:[...state.graphEvidence],radarContextStates:[...state.radarContextStates]},
+    articleOpen:document.body.classList.contains('article-open'),catalogReturnPosition,
+    scroll:{window:window.scrollY,catalog:document.querySelector('.catalog')?.scrollTop||0,reader:document.getElementById('readerScroll')?.scrollTop||0,content:document.querySelector('.content')?.scrollTop||0}};
+}
+function rememberNavigation(){history.replaceState(navigationSnapshot(),'',location.href)}
+function setRouteHash(value){
+  const url=new URL(location.href);url.hash=value||'';
+  if(url.hash!==location.hash)history.pushState({research:true,hash:url.hash},'',url.pathname+url.search+url.hash);
+  queueMicrotask(rememberNavigation);
+}
+function setArticleHash(id){setRouteHash(id)}
 function clearArticleRoute(){state.articleOrigin=null;const position=catalogReturnPosition;if(position?.articleId&&byId.has(position.articleId))state.selected=position.articleId;document.body.classList.remove('article-open');glossaryQuickCleanup();setArticleHash('');const guide=document.getElementById('entryGuide');if(guide)guide.hidden=!showEntryGuide();applyFocusMode();renderAll();const target=[...document.querySelectorAll('.result')].find(button=>button.dataset.testid==='article-'+state.selected);catalogReturnPosition=null;requestAnimationFrame(()=>{if(position){window.scrollTo({top:position.windowTop,left:0,behavior:'instant'});document.querySelector('.catalog')?.scrollTo({top:position.catalogTop,left:0,behavior:'instant'})}if(target){const rect=target.getBoundingClientRect();if(rect.bottom<58||rect.top>window.innerHeight)target.scrollIntoView({block:'center',behavior:'instant'});target.focus({preventScroll:true})}})}
-function ensureSelected(rows){const open=document.body.classList.contains('article-open');if(open&&state.selected&&byId.has(state.selected))return byId.get(state.selected);if(!rows.length){state.selected=null;if(open)clearArticleRoute();return null}if(state.selected&&rows.some(article=>article.id===state.selected))return byId.get(state.selected);if(!open){state.selected=null;return null}state.selected=rows[0].id;setArticleHash(state.selected);return byId.get(state.selected)}
+function ensureSelected(rows){return document.body.classList.contains('article-open')?byId.get(state.selected)||null:null}
 function resetReaderScroll(){const scroll=document.getElementById('readerScroll');if(!scroll)return;
   // ≤780px 時 .reader-scroll 是 height:auto、真正捲動的是 window，只重設它會讓
   // 「從清單中段點開文章」直接落在文章中段；桌機 shell 固定 100vh，這行是 no-op
@@ -988,7 +1042,7 @@ function resetReaderScroll(){const scroll=document.getElementById('readerScroll'
   // scroll container，手機版 sticky 的「返回研究清單」從此失效
   requestAnimationFrame(()=>{if(!scroll.isConnected)return;scroll.scrollTop=0;scroll.style.overflowY='';requestAnimationFrame(()=>{if(!scroll.isConnected)return;scroll.scrollTop=0;scroll.style.scrollBehavior=''})})}
 function focusArticleHeading(articleId){requestAnimationFrame(()=>requestAnimationFrame(()=>{const heading=[...document.querySelectorAll('[data-reader-heading-focus]')].find(node=>node.dataset.readerHeadingFocus===articleId);if(heading)heading.focus({preventScroll:true})}))}
-function selectArticle(id,updateHash=true,origin=undefined){if(!byId.has(id))return;const opening=!document.body.classList.contains('article-open'),fromCatalog=state.surface==='library'&&opening;if(fromCatalog)catalogReturnPosition={windowTop:window.scrollY,catalogTop:document.querySelector('.catalog')?.scrollTop||0,articleId:id};else if(opening)catalogReturnPosition=null;if(origin!==undefined)state.articleOrigin=origin;else if(opening)state.articleOrigin=null;else if((state.articleOrigin?.kind==='radar'||state.articleOrigin?.kind==='maturity-radar')&&radarById.get(state.articleOrigin.candidateId)?.articleId!==id){if(state.articleOrigin.kind==='maturity-radar')state.maturityOrigin=null;state.articleOrigin=null}else if(state.articleOrigin?.kind==='route-transition'&&state.articleOrigin.firstArticleId!==id)state.articleOrigin=null;else if(state.articleOrigin?.kind==='station-transition'&&state.articleOrigin.toArticleId!==id)state.articleOrigin=null;state.surface='library';syncSurface();state.selected=id;if(updateHash)setArticleHash(id);document.body.classList.add('article-open');applyFocusMode();renderAll();resetReaderScroll();focusArticleHeading(id)}
+function selectArticle(id,updateHash=true,origin=undefined){if(!byId.has(id))return;const opening=!document.body.classList.contains('article-open'),fromCatalog=state.surface==='library'&&opening;if(fromCatalog)catalogReturnPosition={windowTop:window.scrollY,catalogTop:document.querySelector('.catalog')?.scrollTop||0,articleId:id};else if(opening)catalogReturnPosition=null;if(origin!==undefined)state.articleOrigin=origin;else if(opening)state.articleOrigin=null;else if((state.articleOrigin?.kind==='radar'||state.articleOrigin?.kind==='maturity-radar')&&radarById.get(state.articleOrigin.candidateId)?.articleId!==id){if(state.articleOrigin.kind==='maturity-radar')state.maturityOrigin=null;state.articleOrigin=null}else if(state.articleOrigin?.kind==='route-transition'&&state.articleOrigin.firstArticleId!==id)state.articleOrigin=null;else if(state.articleOrigin?.kind==='station-transition'&&state.articleOrigin.toArticleId!==id)state.articleOrigin=null;state.surface='library';syncSurface();state.selected=id;if(updateHash)setArticleHash(id);document.body.classList.add('article-open');applyFocusMode();renderAll(true);resetReaderScroll();focusArticleHeading(id)}
 
 function confidenceText(confidence){if(!confidence)return'';const effective=confidence.effective_label||'未評級',declared=confidence.declared_label||effective;if(confidence.stale&&declared!==effective)return'可信度 '+declared+'→'+effective+'・已到期';if(confidence.stale)return'可信度 '+effective+'・已到期';return'可信度 '+effective}
 function confidenceBadge(article){const confidence=liveConfidence(article);if(!confidence)return null;return h('span',{class:'confidence-badge '+(confidence.effective||'unstructured')+(confidence.stale?' stale':''),text:confidenceText(confidence)})}
@@ -1000,10 +1054,14 @@ function catalogComparableText(value){return String(value||'').replace(/\[S\d+\]
 function catalogTechnicalTitle(article,lead){const title=String(article.title||'').trim();if(article.type!=='formal_note')return title;const titleKey=catalogComparableText(title),leadKey=catalogComparableText(lead);if(titleKey&&leadKey&&(titleKey.includes(leadKey)||leadKey.includes(titleKey)))return'';return formalReaderDisplayText(article,title)}
 function catalogEvidencePosition(article){const guide=(article.sections||[]).map(section=>section.readerEvidenceGuide).find(Boolean),confidence=liveConfidence(article),parts=[String(article.status||'').trim()].filter(Boolean);if(guide?.claimLabel)parts.push('主張「'+guide.claimLabel+'」');if(confidence)parts.push(confidenceText(confidence));if(guide&&Number.isInteger(guide.sourceCount))parts.push(guide.sourceCount+' 份有效來源');return parts.join(' · ')}
 function catalogLearningPreview(article,readerQuestion){const rawLead=catalogLearningLead(article),lead=readerLeadParts(article,rawLead),preview=h('div',{class:'result-learning-preview'+(lead.text?' has-lead':''),'data-catalog-learning-id':article.id});preview.appendChild(h('div',{class:'result-learning-line','data-catalog-learning':'question'},h('span',{class:'result-learning-label',text:'讀完能回答'}),h('h3',{class:'result-reader-question','data-reader-question-type':article.type,'data-reader-question-id':article.id,text:readerQuestion})));if(lead.text){const copy=h('div',{class:'result-learning-copy'},h('p',{class:'result-learning-lead',text:lead.text}));if(lead.sourceRefs.length)copy.appendChild(h('small',{class:'result-learning-source',text:'原文來源標記：'+lead.sourceRefs.join('、')+'；文章內可逐句核對'}));preview.appendChild(h('div',{class:'result-learning-line','data-catalog-learning':'lead'},h('span',{class:'result-learning-label',text:catalogLearningLabel(article)}),copy))}return preview}
-function resultItem(article){const selected=article.id===state.selected,readerQuestion=catalogReaderQuestion(article),rawLead=catalogLearningLead(article),technicalTitle=catalogTechnicalTitle(article,rawLead);const button=h('button',{class:'result'+(selected?' selected':''),type:'button','aria-current':selected?'true':null,'data-testid':'article-'+article.id});
-  button.appendChild(h('div',{class:'result-top'},h('span',{class:'type-label '+article.type,text:article.typeLabel}),confidenceBadge(article),h('time',{class:'result-date mono',datetime:article.date,text:fmtDate(article.date)})));
-  if(readerQuestion){if(article.type!=='topic')button.appendChild(h('div',{class:'result-subject',text:article.subject}));button.appendChild(catalogLearningPreview(article,readerQuestion));if(technicalTitle)button.appendChild(h('p',{class:'result-technical-title'},h('strong',{text:catalogSourceLabel(article)}),technicalTitle));if(article.type==='topic')button.appendChild(h('p',{class:'result-topic-scope',text:'研究範圍：'+article.subject}))}else button.append(h('div',{class:'result-subject',text:article.subject}),h('p',{class:'result-title',text:article.title}));
-  button.appendChild(h('div',{class:'result-bottom'},h('p',{class:'result-evidence','data-catalog-evidence-id':article.id},h('strong',{text:'目前怎麼看：'}),h('span',{class:'status '+article.statusTone,text:catalogEvidencePosition(article)})),h('span',{class:'reading-time',text:'閱讀約 '+article.readingMinutes+' 分鐘'})));button.addEventListener('click',()=>selectArticle(article.id));return button}
+function resultItem(article){
+  const selected=article.id===state.selected,lead=readerLeadParts(article,catalogLearningLead(article));
+  const button=h('button',{class:'result'+(selected?' selected':''),type:'button','aria-current':selected?'true':null,'data-testid':'article-'+article.id},
+    h('h3',{text:article.readerTitle||article.title}),
+    h('p',{class:'result-preview',text:lead.text||catalogReaderQuestion(article)||article.subject}),
+    h('div',{class:'result-meta'},h('span',{text:article.typeLabel}),h('span',{class:'status '+article.statusTone,text:article.status}),h('time',{datetime:article.date,text:fmtDate(article.date)})));
+  button.addEventListener('click',()=>selectArticle(article.id));return button;
+}
 function showEntryGuide(){return state.surface==='library'&&!document.body.classList.contains('article-open')&&!state.search&&state.type==='all'&&!state.groups.size&&state.statuses.size===3&&state.date==='all'&&state.sort==='latest'}
 function resetEntryScroll(){requestAnimationFrame(()=>{window.scrollTo({top:0,left:0,behavior:'instant'});document.querySelector('.catalog')?.scrollTo({top:0,left:0,behavior:'instant'})})}
 function openEntrySurface(surface){if(surface==='maturity')state.maturityEntry='routes';if(surface==='graph')state.graphOrigin=null;selectSurface(surface);resetEntryScroll();const heading=surface==='maturity'?document.getElementById('maturityIntroTitle'):surface==='graph'?document.getElementById('graphTitle'):null;requestAnimationFrame(()=>requestAnimationFrame(()=>heading?.focus({preventScroll:true})))}
@@ -1169,7 +1227,7 @@ function renderStationTransitionBridge(article){
 function renderArticleLearningOrigin(){const context=articleOriginContext();if(!context||context.kind==='route-transition'||context.kind==='station-transition')return null;const back=h('button',{type:'button','data-testid':'article-origin-back-top',text:context.buttonLabel});back.addEventListener('click',returnArticleOrigin);return h('nav',{class:'article-learning-origin','aria-label':'本次學習起點','data-testid':'article-origin-top','data-origin-kind':context.kind,'data-origin-edge-id':context.edgeId||null,'data-origin-route-id':context.routeId||null},h('div',{},h('span',{class:'article-learning-origin-kicker',text:context.edgeId?'剛才查核的關係':'本次學習起點'}),h('strong',{text:context.title})),back,context.originQuestion?h('p',{class:'article-learning-origin-question',text:context.originQuestion}):null,h('p',{text:context.description}))}
 function renderMobileArticleOrigin(context){if(!context||context.kind==='route-transition'||context.kind==='station-transition')return null;const fromQuestion=context.kind==='radar'||context.kind==='maturity-radar',root=h('details',{class:'mobile-origin-context','aria-label':'本次學習起點摘要','data-testid':'mobile-origin-context','data-origin-kind':context.kind,'data-origin-edge-id':context.edgeId||null,'data-origin-route-id':context.routeId||null,open:!matchMedia('(max-width:340px)').matches},h('summary',{},h('span',{text:fromQuestion?'你從這題進來':context.edgeId?'你剛才查這條關係':'你從這個位置進來'}),h('strong',{text:context.title})));if(context.mobileMeta)root.appendChild(h('p',{class:'mobile-origin-context-meta',text:context.mobileMeta}));return root}
 function renderLearningOriginReturn(){const context=articleOriginContext();if(!context)return null;const back=h('button',{type:'button','data-testid':'article-origin-back-bottom',text:context.buttonLabel});back.addEventListener('click',returnArticleOrigin);return h('aside',{class:'learning-origin-return','aria-label':'回到本次學習起點','data-origin-kind':context.kind,'data-origin-route-id':context.routeId||null},h('div',{},h('span',{class:'learning-origin-return-kicker',text:'完成這篇後'}),h('strong',{text:context.returnTitle})),back,context.originQuestion?h('p',{class:'learning-origin-return-question',text:context.originQuestion}):null,h('p',{text:context.description}))}
-function focusReadingTarget(target){if(!target)return;target.tabIndex=-1;target.focus();requestAnimationFrame(()=>{if(matchMedia('(max-width:780px)').matches)window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-120,behavior:'instant'});else{const scroll=document.getElementById('readerScroll');if(scroll)scroll.scrollTo({top:scroll.scrollTop+target.getBoundingClientRect().top-scroll.getBoundingClientRect().top-76,behavior:'instant'})}})}
+function focusReadingTarget(target){if(!target)return;const panel=document.getElementById('readerPanel');if(panel?.open&&!panel.contains(target))panel.close();target.tabIndex=-1;target.scrollIntoView({block:'start',behavior:'instant'});target.focus({preventScroll:true})}
 function focusBeginnerHighlights(){const section=document.querySelector('.beginner-section'),target=[...(section?.querySelectorAll('h3')||[])].find(heading=>heading.textContent.trim()==='三句話抓重點')||section?.querySelector('h2');focusReadingTarget(target)}
 function focusReadingMissionSource(article,mode='review'){const mission=article?.readingMission||{},sectionLabel=mission.sourceSection;if(!sectionLabel){focusBeginnerHighlights();return}const section=[...document.querySelectorAll('.article-section')].find(item=>item.querySelector(':scope>h2')?.textContent.trim()===sectionLabel),headingLabel=mode==='start'?mission.startHeading:mission.sourceHeading,target=headingLabel?[...(section?.querySelectorAll('h3')||[])].find(heading=>heading.textContent.trim()===headingLabel):section?.querySelector(':scope>h2');if(target)focusReadingTarget(target);else focusBeginnerHighlights()}
 function articleGroupGuideRows(article){return(article.groups||[]).map(groupId=>maturityRowById.get(groupId)).filter(row=>row&&(row.readerRole||row.readerBoundary))}
@@ -1214,7 +1272,7 @@ function evidencePanel(article){const meta=article.meta||{},confidence=liveConfi
     h('span',{class:'evidence-id',text:meta.eventKind?'K'+(index+1):String(index+1)}),
     h('span',{class:'evidence-name',text:key+'：'+(value??'—')})
   )));
-  if(sources.length){body.appendChild(h('h3',{class:'evidence-subhead',text:'可回查來源'}));sources.slice(0,4).forEach(source=>{const sourceId=source.source_id||source.id||'S',sourceName=source.title||source.document||source.publisher||'未命名來源',statusLabel=source.status?({'active':'有效','superseded':'已取代','rejected':'已排除'}[source.status]||source.status):'',name=source.url?h('a',{class:'evidence-name',href:source.url,target:'_blank',rel:'noopener noreferrer',text:sourceName}):h('span',{class:'evidence-name',text:sourceName});body.appendChild(h('div',{class:'evidence-row'},h('span',{class:'evidence-id',text:sourceId+(statusLabel?' · '+statusLabel:'')}),name))});if(sources.length>4)body.appendChild(h('div',{class:'evidence-row'},h('span',{class:'evidence-name',text:'另有 '+(sources.length-4)+' 份來源，請至原始文件查看。'})));}
+  if(sources.length){body.appendChild(h('h3',{class:'evidence-subhead',text:'可回查來源'}));sources.forEach(source=>{const sourceId=source.source_id||source.id||'S',sourceName=source.title||source.document||source.publisher||'未命名來源',statusLabel=source.status?({'active':'有效','superseded':'已取代','rejected':'已排除'}[source.status]||source.status):'',name=source.url?h('a',{class:'evidence-name',href:source.url,target:'_blank',rel:'noopener noreferrer',text:sourceName}):h('span',{class:'evidence-name',text:sourceName});body.appendChild(h('div',{class:'evidence-row'},h('span',{class:'evidence-id',text:sourceId+(statusLabel?' · '+statusLabel:'')}),name))});;}
   body.appendChild(h('a',{class:'source-link',href:article.sourceUrl,target:'_blank',rel:'noopener noreferrer',text:'開啟 GitHub 原始文件'}));wrap.appendChild(body);return wrap}
 function confidencePanel(article){const confidence=liveConfidence(article);if(!confidence)return null;const panel=h('section',{class:'confidence-panel '+(confidence.effective||'unstructured')+(confidence.stale?' stale':''),'aria-label':'研究可信度'}),declared=confidence.declared_label||'未評級',effective=confidence.effective_label||'未評級';panel.appendChild(h('strong',{text:confidence.stale&&declared!==effective?'證據可信度 '+declared+' → '+effective:'證據可信度 '+effective}));let message;if(confidence.reason==='legacy_schema')message='這是舊制文章，尚未建立可逐項重算的主張—證據帳本，因此不自動推定可信度。';else if(confidence.stale)message='複核期限已逾 '+confidence.days_overdue+' 天；截至判定日主命題尚未納入較新的有效證據，系統自動降一級。這表示證據已過期，不代表主張已被推翻。';else message='目前仍在複核期限內；可信度以主命題實際引用且已接受的有效證據為基礎。';panel.appendChild(h('p',{text:message}));if(confidence.basis)panel.appendChild(h('p',{text:'判定基礎：'+confidence.basis}));panel.appendChild(h('div',{class:'confidence-facts'},h('span',{text:'主命題最後有效證據 '+fmtDate(confidence.last_evidence_at)}),h('span',{text:'複核期限 '+fmtDate(confidence.review_due)}),h('span',{text:'判定截至 '+fmtDate(confidence.as_of)})));return panel}
 /* ≤1180px 時桌機側欄大綱隱藏；這裡逐字重用相同 section labels，把原本只出現一次的
@@ -1240,30 +1298,104 @@ function setupOutlineScrollSpy(root){outlineSpyCleanup();const scroll=document.g
 function renderOutline(article,glossaryTerms=[]){const aside=h('aside',{class:'outline'},h('div',{class:'outline-sticky'},h('h2',{text:'本頁大綱'})));const sticky=aside.firstChild;const toc=h('nav',{class:'toc','aria-label':'文章大綱'});articleOutlineSections(article).forEach(({section,index})=>{const beginner=section.h==='新手先讀：這篇在講什麼';const button=h('button',{class:beginner?'beginner-toc':'',type:'button','data-section-index':index,text:section.h});button.addEventListener('click',()=>document.getElementById(sectionId(index))?.scrollIntoView({behavior:'smooth',block:'start'}));toc.appendChild(button)});if((article.learningPath?.cards||[]).length||state.articleOrigin){const button=h('button',{class:'learning-toc',type:'button','data-section-index':'learning',text:'從這篇接著學'});button.addEventListener('click',()=>document.getElementById('learningPath')?.scrollIntoView({behavior:'smooth',block:'start'}));toc.appendChild(button)}const audit=articleAuditSections(article);if(audit.length){const button=h('button',{class:'appendix-toc',type:'button','data-section-index':'appendix',text:'研究查核附錄（'+audit.length+' 節）'});button.addEventListener('click',openResearchAppendix);toc.appendChild(button)}sticky.appendChild(toc);if(glossaryTerms.length)sticky.appendChild(glossaryQuickAction('outline-glossary-action',glossaryTerms.length));sticky.appendChild(evidencePanel(article));return aside}
 function articleReaderTitleLabel(article){return article.type==='topic'?'研究題名：':'原研究頁名：'}
 function articleReaderHeading(article){
-  const readerQuestion=catalogReaderQuestion(article),headingAttrs={text:'',tabindex:'-1','data-reader-heading-focus':article.id};
-  const headerAttrs={class:'article-reader-heading','data-reader-heading-type':article.type,'data-reader-heading-id':article.id};
-  // 公司頁先辨識公司與文章類型；完整讀後問題保留在下方閱讀任務，避免重複大標。
-  if(article.type==='formal_note'||article.type==='narrative')return h('header',headerAttrs,
-    h('span',{class:'article-reader-heading-kicker',text:TYPE_INFO[article.type].label}),
-    h('h1',{...headingAttrs,text:article.readerTitle}));
-  if(readerQuestion)return h('header',headerAttrs,
-    h('span',{class:'article-reader-heading-kicker',text:'這篇先弄懂'}),h('h1',{...headingAttrs,text:readerQuestion}),
-    h('p',{class:'article-technical-title'},h('strong',{text:articleReaderTitleLabel(article)}),article.readerTitle));
-  return h('h1',{...headingAttrs,text:article.readerTitle});
+  return h('header',{class:'article-reader-heading','data-reader-heading-type':article.type,'data-reader-heading-id':article.id},
+    h('h1',{text:article.readerTitle,tabindex:'-1','data-reader-heading-focus':article.id}));
 }
-function renderReaderWelcome(hasRows){if(!hasRows)return h('div',{class:'reader-placeholder'},h('div',{},h('strong',{text:'目前沒有符合條件的文章'}),h('span',{text:'調整左側搜尋或篩選後，再選擇想讀的文章。'})));if(!showEntryGuide())return h('div',{class:'reader-placeholder'},h('div',{},h('strong',{text:'從左側選擇一篇文章'}),h('span',{text:'清單依目前的搜尋、篩選與排序顯示；選文後才會在這裡開啟全文。'})));const start=h('button',{class:'reader-welcome-start',type:'button','data-testid':'reader-welcome-maturity',text:'先看族群矩陣'});start.addEventListener('click',()=>openEntrySurface('maturity'));return h('section',{class:'reader-welcome','aria-labelledby':'readerWelcomeTitle'},h('div',{class:'reader-welcome-card'},h('span',{class:'reader-welcome-kicker',text:'第一次進研究中心'}),h('h2',{id:'readerWelcomeTitle',text:'先選一個系統問題，再打開文章'}),h('p',{class:'reader-welcome-intro',text:'研究文章清單按更新時間排列，不代表推薦閱讀順序。先從族群矩陣選問題，會更容易知道每篇文章在整體產業裡的位置。'}),h('ol',{class:'reader-welcome-route'},h('li',{class:'reader-welcome-step'},h('b',{text:'01'}),h('strong',{text:'選系統問題'}),h('span',{text:'族群矩陣'})),h('li',{class:'reader-welcome-step'},h('b',{text:'02'}),h('strong',{text:'建立共同語言'}),h('span',{text:'市場議題'})),h('li',{class:'reader-welcome-step'},h('b',{text:'03'}),h('strong',{text:'回查產業關係'}),h('span',{text:'知識圖譜'}))),h('div',{class:'reader-welcome-actions'},start,h('p',{class:'reader-welcome-note',text:'已經知道想讀什麼？直接從左側點文章。'}))))}
-function renderReader(article,hasRows=true){const root=document.getElementById('reader'),previousDialog=document.getElementById('articleGlossaryDialog');if(previousDialog?.open)previousDialog.close();glossaryQuickCleanup();glossaryQuickReturnFocus=null;root.replaceChildren();outlineSpyCleanup();if(!article){root.appendChild(renderReaderWelcome(hasRows));return}
-  const glossaryTerms=articleGlossaryTerms(article);
-  const body=h('article',{class:'article'}),originContext=articleOriginContext();body.appendChild(readerTabs(article));const mobileBack=h('button',{class:'mobile-back',type:'button',text:originContext?.mobileBackLabel||'返回研究清單'});mobileBack.addEventListener('click',originContext?returnArticleOrigin:clearArticleRoute);body.appendChild(mobileBack);const mobileOrigin=renderMobileArticleOrigin(originContext);if(mobileOrigin)body.appendChild(mobileOrigin);const originBar=renderArticleLearningOrigin();if(originBar)body.appendChild(originBar);const routeTransition=renderRouteTransitionBridge(article);if(routeTransition)body.appendChild(routeTransition);const stationTransition=renderStationTransitionBridge(article);if(stationTransition)body.appendChild(stationTransition);body.appendChild(articleReaderHeading(article));
-  const verification=h('div',{class:'verify '+article.statusTone},h('div',{},h('strong',{text:article.status}),h('p',{text:article.type==='formal_note'?'查核狀態沿用原始正式筆記；本頁只改善導覽，不改動原始證據邊界。':article.meta?.eventKind?'事件錨點整理法說脈絡與族群方向；屬觀察層、不進評分，也不等於報酬預測。':'觀察層內容用於追蹤與驗證，不等於已認證的公司事實。'})),h('div',{class:'verify-date',text:'內容更新 '+fmtDate(article.date)}));body.appendChild(verification);const topicPosition=renderTopicLearningPosition(article);if(topicPosition)body.appendChild(topicPosition);const readingMission=renderReadingMission(article,glossaryTerms);if(readingMission)body.appendChild(readingMission);const boundaryBrief=renderReaderBoundaryBrief(article,glossaryTerms);if(boundaryBrief)body.appendChild(boundaryBrief);const roleContext=renderArticleRoleContext(article);
-  const meta=h('div',{class:'article-meta'},h('span',{class:'meta-item mono',text:fmtDate(article.date)}),h('span',{class:'meta-item',text:(article.groupLabels.join('、')||'跨市場研究')}),h('span',{class:'meta-item',text:'閱讀約 '+article.readingMinutes+' 分鐘'}));const copy=h('button',{class:'copybtn',type:'button',text:'複製連結'});copy.addEventListener('click',async()=>{try{const url=new URL(location.href);url.hash=article.id;await navigator.clipboard.writeText(url.href);copy.textContent='已複製';setTimeout(()=>copy.textContent='複製連結',1500)}catch(_){copy.textContent='請從網址列複製'}});meta.appendChild(copy);const routeContext=renderLearningRouteContext(article),mobileProgress=renderMobileReadingProgress(article);body.appendChild(articleSections(article,'beginner-highlights',glossaryTerms));if(roleContext)body.appendChild(roleContext);if(routeContext)body.appendChild(routeContext);body.appendChild(meta);body.appendChild(articleSections(article,'beginner-followup',glossaryTerms));if(mobileProgress)body.appendChild(mobileProgress);body.appendChild(articleSections(article,'analyst'));
-  const confidence=confidencePanel(article);if(confidence)body.appendChild(confidence);const frameMap=readerArticleFrameMap(article);if(frameMap)body.appendChild(frameMap);body.appendChild(articleSections(article,'reader',glossaryTerms));const learning=renderLearningPath(article);if(learning)body.appendChild(learning);const appendix=renderResearchAppendix(article);if(appendix)body.appendChild(appendix);const mobileEvidence=evidencePanel(article);mobileEvidence.classList.add('mobile-evidence');body.append(mobileEvidence,h('p',{class:'footer-note',text:'研究內容以原始 Markdown 與查核資料為準；研究中心只改善導覽與閱讀，不改變查核狀態、證據層級或投資警語。'}));if(glossaryTerms.length)body.append(renderGlossaryQuickView(glossaryTerms),glossaryQuickAction('floating-glossary-action',glossaryTerms.length));
-  root.appendChild(h('div',{class:'reader-inner'},body,renderOutline(article,glossaryTerms)));markScrollableTables(root);setupOutlineScrollSpy(root);setupGlossaryQuickAction(root,root.querySelector('.beginner-glossary'),root.querySelector('.floating-glossary-action'))}
-function renderAll(){if(state.surface==='graph'){renderGraph();return}if(state.surface==='radar'){renderRadar();return}if(state.surface==='maturity'){renderMaturity();return}const rows=filteredArticles();const article=ensureSelected(rows);renderCatalog(rows);renderReader(article,rows.length>0)}
+function renderReaderWelcome(hasRows){
+  return h('div',{class:'reader-placeholder'},h('div',{},
+    h('strong',{text:hasRows?'選一篇文章，開始閱讀':'沒有符合條件的文章'}),
+    h('span',{text:hasRows?'從左側選擇主題，全文會在這裡展開。需要背景或查證時，再開啟閱讀輔助與來源。':'試著縮短關鍵字，或清除部分篩選。'})));
+}
+function renderArticleBody(article){
+  const fragment=document.createDocumentFragment();
+  (article.sections||[]).forEach((section,index)=>{
+    if(section.h==='新手先讀：這篇在講什麼'||ANALYST_HEADINGS.has(section.h)||isArticleAuditSection(article,section))return;
+    const el=h('section',{class:'article-section',id:sectionId(index),'data-section-index':index},h('h2',{text:section.h}));
+    appendBlocks(el,section.blocks,{readableProse:true,readerProseProfile:article.type==='topic'?'topic':'default',textTransform:article.type==='formal_note'?value=>formalReaderDisplayText(article,value):null});
+    if(article.type==='topic')el.querySelectorAll('.table-wrap').forEach(wrap=>wrap.classList.add('reader-table'));
+    fragment.appendChild(el);
+  });
+  return fragment;
+}
+function openReaderPanel(kind,article,trigger){
+  const dialog=document.getElementById('readerPanel'),content=dialog.querySelector('.reader-panel-content');
+  document.getElementById('readerPanelTitle').textContent={outline:'文章目錄',evidence:'查核資料',aids:'閱讀輔助'}[kind];
+  content.replaceChildren();
+  if(kind==='outline'){
+    const nav=h('nav',{class:'toc','aria-label':'文章目錄'});
+    document.querySelectorAll('.article > .article-section').forEach(section=>{
+      const button=h('button',{type:'button',text:section.querySelector('h2').textContent});
+      button.addEventListener('click',()=>{dialog.close();section.scrollIntoView({behavior:'instant',block:'start'});section.setAttribute('tabindex','-1');section.focus({preventScroll:true})});
+      nav.appendChild(button);
+    });
+    content.appendChild(nav);
+  }else if(kind==='evidence'){
+    const confidence=confidencePanel(article);if(confidence)content.appendChild(confidence);
+    const evidence=evidencePanel(article);evidence.open=true;content.appendChild(evidence);
+    const appendix=renderResearchAppendix(article);if(appendix){appendix.open=true;content.appendChild(appendix)}
+  }else{
+    const terms=articleGlossaryTerms(article);
+    content.appendChild(articleSections(article,'beginner',terms));
+    content.appendChild(articleSections(article,'analyst',terms));
+    const frameMap=readerArticleFrameMap(article);if(frameMap)content.appendChild(frameMap);
+    const roles=renderArticleRoleContext(article);if(roles)content.appendChild(roles);
+    const topicPosition=renderTopicLearningPosition(article);if(topicPosition)content.appendChild(topicPosition);
+    const route=renderLearningRouteContext(article);if(route)content.appendChild(route);
+    const learning=renderLearningPath(article);if(learning)content.appendChild(learning);
+    content.appendChild(readerTabs(article));
+    if(!content.childElementCount)content.appendChild(h('p',{text:'這篇沒有額外導讀，請直接閱讀正文。'}));
+  }
+  dialog.dataset.panel=kind;dialog.showModal();dialog.scrollTop=0;markScrollableTables(content);
+}
+function renderReader(article,hasRows=true){
+  const root=document.getElementById('reader');
+  root.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
+  glossaryQuickCleanup();glossaryQuickReturnFocus=null;outlineSpyCleanup();root.replaceChildren();
+  root.dataset.articleId=article?.id||'';
+  if(!article){root.appendChild(renderReaderWelcome(hasRows));return}
+  const toolbar=h('nav',{class:'reader-toolbar','aria-label':'閱讀工具'});
+  const back=h('button',{class:'reader-back',type:'button',text:'返回清單'});
+  back.addEventListener('click',clearArticleRoute);
+  toolbar.append(back,h('span',{class:'reader-breadcrumb',text:'文章 / '+article.typeLabel}));
+  const origin=articleOriginContext();
+  if(origin){const button=h('button',{type:'button',text:'返回來源','aria-label':origin.mobileBackLabel||'返回來源'});button.addEventListener('click',returnArticleOrigin);toolbar.appendChild(button)}
+  for(const [kind,label] of [['outline','目錄'],['evidence','查核資料'],['aids','閱讀輔助']]){
+    const button=h('button',{type:'button',text:label,'aria-haspopup':'dialog','data-reader-panel':kind});
+    const icon=h('img',{class:'ui-icon',src:'assets/heroicons/'+({outline:'list-bullet',evidence:'document-text',aids:'chevron-down'}[kind])+'.svg',alt:''});
+    if(kind==='aids')button.appendChild(icon);else button.prepend(icon);
+    button.addEventListener('click',()=>openReaderPanel(kind,article,button));toolbar.appendChild(button);
+  }
+  const body=h('article',{class:'article'},articleReaderHeading(article));
+  const meta=h('div',{class:'article-meta'},
+    h('time',{datetime:article.date,text:fmtDate(article.date)}),
+    h('span',{class:'status '+article.statusTone,text:article.status}),
+    confidenceBadge(article),
+    h('span',{text:'約 '+article.readingMinutes+' 分鐘'}));
+  const copy=h('button',{class:'copybtn',type:'button',text:'複製連結'});
+  copy.addEventListener('click',async()=>{try{const url=new URL(location.href);url.hash=article.id;await navigator.clipboard.writeText(url.href);copy.textContent='已複製';setTimeout(()=>copy.textContent='複製連結',1500)}catch(_){copy.textContent='請從網址列複製'}});
+  meta.appendChild(copy);body.append(meta,renderArticleBody(article));
+  body.appendChild(h('p',{class:'footer-note',text:'研究內容依原始來源與查核狀態判讀；觀察與推論不等於已證實的公司事實或投資建議。'}));
+  const close=h('button',{type:'button',text:'關閉',autofocus:true,'aria-label':'關閉閱讀面板'});
+  const dialog=h('dialog',{class:'reader-panel',id:'readerPanel','aria-labelledby':'readerPanelTitle'},
+    h('header',{class:'reader-panel-head'},h('h2',{id:'readerPanelTitle'}),close),h('div',{class:'reader-panel-content'}));
+  close.addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('click',event=>{if(event.target===dialog&&event.clientX<dialog.getBoundingClientRect().left)dialog.close()});
+  root.append(toolbar,h('div',{class:'reader-inner'},body),dialog);
+  const terms=articleGlossaryTerms(article);if(terms.length)root.appendChild(renderGlossaryQuickView(terms));
+  markScrollableTables(root);
+}
+function renderAll(forceReader=false){
+  if(state.surface==='graph'){renderGraph();return}
+  if(state.surface==='radar'){renderRadar();return}
+  if(state.surface==='maturity'){renderMaturity();return}
+  const rows=filteredArticles(),article=ensureSelected(rows),root=document.getElementById('reader');
+  renderCatalog(rows);
+  if(forceReader||root.dataset.articleId!==(article?.id||'')||!article)renderReader(article,rows.length>0);
+}
 
-/* 首次進入先展開問題式導覽；讀者明確收合後才在同一瀏覽器記住選擇。
+/* 問題式導覽預設收合；讀者主動展開後在同一瀏覽器記住選擇。
    這是純顯示偏好，不寫入文章、路線或研究 payload，也不由 resize 覆寫。 */
-(function restoreCatalogGuidePreference(){const guide=document.getElementById('entryGuide');if(!guide)return;const key='researchEntryGuideStateV1';guide.open=readPreference(key)!=='closed';guide.addEventListener('toggle',()=>{if(guide.hidden)return;writePreference(key,guide.open?'open':'closed')})})();
+(function restoreCatalogGuidePreference(){const guide=document.getElementById('entryGuide');if(!guide)return;const key='researchEntryGuideStateV2';guide.open=readPreference(key)==='open';guide.addEventListener('toggle',()=>{if(guide.hidden)return;writePreference(key,guide.open?'open':'closed')})})();
 /* 手機先顯示「讀法」與「目前位置」摘要，完整步驟和篩選仍可原位展開。
    和圖形檢視相同，只在載入時收起一次，不覆寫使用者之後的手動狀態。 */
 (function foldGraphGuidesOnNarrow(){if(!window.matchMedia('(max-width:780px)').matches)return;
@@ -1295,7 +1427,7 @@ document.querySelectorAll('input[name="date"]').forEach(input=>input.addEventLis
 document.querySelectorAll('input[name="graphEvidence"]').forEach(input=>input.addEventListener('change',()=>{input.checked?state.graphEvidence.add(input.value):state.graphEvidence.delete(input.value);state.graphSelection=null;renderGraph()}));
 document.getElementById('graphUniverseOnly').addEventListener('change',event=>{state.graphUniverseOnly=event.target.checked;state.graphSelection=null;renderGraph()});
 document.getElementById('clearFilters').addEventListener('click',()=>{state.groups.clear();state.statuses=new Set(['verified','review','observational']);state.date='all';state.type='all';state.search='';document.getElementById('search').value='';document.querySelectorAll('input[name="status"]').forEach(input=>input.checked=true);document.querySelector('input[name="date"][value="all"]').checked=true;renderGroupFilters();renderTypeTabs();renderAll()});
-const filtersPanel=document.getElementById('filters'),filterToggleButton=document.getElementById('filterToggle'),filterCloseButton=document.getElementById('filterClose'),filterMedia=matchMedia('(max-width:1180px)');
+const filtersPanel=document.getElementById('filters'),filterToggleButton=document.getElementById('filterToggle'),filterCloseButton=document.getElementById('filterClose'),filterMedia=matchMedia('(min-width:0px)');
 const filterBackdrop=document.getElementById('filterBackdrop');let filterBackground=[],filterBodyOverflow='';
 function syncFilterAccess(){
   const overlay=filterMedia.matches,open=overlay&&filtersPanel.classList.contains('open');
@@ -1332,14 +1464,47 @@ filtersPanel.addEventListener('keydown',event=>{
 });
 filterMedia.addEventListener('change',()=>{const focusWasInside=filtersPanel.contains(document.activeElement);filtersPanel.classList.remove('open');syncFilterAccess();if(focusWasInside)(filterMedia.matches?filterToggleButton:filterTabStops(filtersPanel)[0])?.focus()});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&filtersPanel.classList.contains('open'))closeFilters()});
-const focusToggleButton=document.getElementById('focusToggle'),focusMedia=matchMedia('(min-width:781px)');let focusModeRequested=readPreference('researchFocusMode')!=='0';
-function applyFocusMode(){const articleOpen=state.surface==='library'&&document.body.classList.contains('article-open'),active=articleOpen&&focusModeRequested&&focusMedia.matches;document.body.classList.toggle('focus-mode',active);focusToggleButton.hidden=!articleOpen;focusToggleButton.setAttribute('aria-pressed',active?'true':'false');focusToggleButton.textContent=active?'文章清單':'專注閱讀';focusToggleButton.setAttribute('aria-label',active?'返回研究文章清單':'進入專注閱讀');if(active&&filtersPanel.classList.contains('open'))closeFilters(false);requestAnimationFrame(()=>{outlineSpyRefresh();markScrollableTables(document.getElementById('reader'))})}
-focusToggleButton.addEventListener('click',()=>{focusModeRequested=!focusModeRequested;writePreference('researchFocusMode',focusModeRequested?'1':'0');applyFocusMode()});focusMedia.addEventListener('change',applyFocusMode);applyFocusMode();
+const focusToggleButton=document.getElementById('focusToggle'),focusMedia=matchMedia('(min-width:781px)');let focusModeRequested=readPreference('researchFocusModeV2')==='1';
+function applyFocusMode(){const articleOpen=state.surface==='library'&&document.body.classList.contains('article-open'),active=articleOpen&&focusModeRequested&&focusMedia.matches;document.body.classList.toggle('focus-mode',active);focusToggleButton.hidden=!articleOpen;focusToggleButton.setAttribute('aria-pressed',active?'true':'false');focusToggleButton.textContent=active?'退出專注':'專注閱讀';focusToggleButton.setAttribute('aria-label',active?'退出專注閱讀':'進入專注閱讀');if(active&&filtersPanel.classList.contains('open'))closeFilters(false);requestAnimationFrame(()=>{outlineSpyRefresh();markScrollableTables(document.getElementById('reader'))})}
+focusToggleButton.addEventListener('click',()=>{focusModeRequested=!focusModeRequested;writePreference('researchFocusModeV2',focusModeRequested?'1':'0');applyFocusMode()});focusMedia.addEventListener('change',applyFocusMode);applyFocusMode();
 const root=document.documentElement;const saved=readPreference('dashTheme');if(saved==='light'||saved==='dark')root.dataset.theme=saved;document.getElementById('themeBtn').addEventListener('click',()=>{const current=root.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');root.dataset.theme=current==='dark'?'light':'dark';writePreference('dashTheme',root.dataset.theme)});
 function hashArticleId(){try{return decodeURIComponent(location.hash.slice(1))}catch(_){return''}}
-window.addEventListener('hashchange',()=>{const value=hashArticleId(),route=graphHashRoute(value);if(value==='radar')selectSurface('radar',false);else if(value==='maturity')selectSurface('maturity',false);else if(route){state.graphId=route.graphId;state.graphRoute=graphRouteId(route.graphId);state.graphView=route.view;state.graphSelection=null;state.graphOrigin=null;selectSurface('graph',false)}else if(byId.has(value))selectArticle(value,false,null);else{state.articleOrigin=null;state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}});
+function restoreHashRoute(){const value=hashArticleId(),route=graphHashRoute(value);if(value==='radar')selectSurface('radar',false);else if(value==='maturity')selectSurface('maturity',false);else if(route){state.graphId=route.graphId;state.graphRoute=graphRouteId(route.graphId);state.graphView=route.view;state.graphSelection=null;state.graphOrigin=null;selectSurface('graph',false)}else if(byId.has(value))selectArticle(value,false,null);else{state.articleOrigin=null;state.surface='library';syncSurface();document.body.classList.remove('article-open');applyFocusMode();renderAll()}}
+function restoreNavigation(snapshot){
+  if(!snapshot?.research||!snapshot.view){restoreHashRoute();return}
+  document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());closeFilters(false);
+  Object.assign(state,snapshot.view,{groups:new Set(snapshot.view.groups),statuses:new Set(snapshot.view.statuses),graphEvidence:new Set(snapshot.view.graphEvidence),radarContextStates:new Map(snapshot.view.radarContextStates)});
+  catalogReturnPosition=snapshot.catalogReturnPosition;
+  document.body.classList.toggle('article-open',snapshot.articleOpen);
+  document.getElementById('search').value=state.search;document.getElementById('sort').value=state.sort;
+  for(const [name,values] of [['status',state.statuses],['date',new Set([state.date])],['graphEvidence',state.graphEvidence]])document.querySelectorAll('input[name="'+name+'"]').forEach(input=>input.checked=values.has(input.value));
+  document.getElementById('graphUniverseOnly').checked=state.graphUniverseOnly;
+  renderGroupFilters();renderTypeTabs();syncSurface();applyFocusMode();if(state.surface==='graph')renderGraphControls();renderAll(true);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const positions=snapshot.scroll||{};window.scrollTo({top:positions.window||0,behavior:'instant'});
+    for(const [selector,key] of [['.catalog','catalog'],['#readerScroll','reader'],['.content','content']])document.querySelector(selector)?.scrollTo({top:positions[key]||0,behavior:'instant'});
+    const focus=snapshot.articleOpen?document.querySelector('[data-reader-heading-focus]'):document.querySelector('.result.selected');focus?.focus({preventScroll:true});
+  }));
+}
+history.scrollRestoration='manual';
+document.addEventListener('click',rememberNavigation,true);
+let navigationSaveTimer=0;
+window.addEventListener('scroll',()=>{clearTimeout(navigationSaveTimer);navigationSaveTimer=setTimeout(rememberNavigation,100)},{capture:true,passive:true});
+document.addEventListener('input',()=>queueMicrotask(rememberNavigation));
+document.addEventListener('change',()=>queueMicrotask(rememberNavigation));
+window.addEventListener('pagehide',rememberNavigation);
+window.addEventListener('popstate',event=>restoreNavigation(event.state));
+window.addEventListener('hashchange',()=>{if(history.state?.research&&history.state.hash===location.hash)return;restoreHashRoute();rememberNavigation()});
+document.addEventListener('click',event=>{
+  const link=event.target.closest?.('a[href]');if(!link||link.classList.contains('source-link')||event.defaultPrevented||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;
+  const url=new URL(link.href,location.href);let id='';try{id=decodeURIComponent(url.hash.slice(1))}catch(_){return}
+  const local=url.origin===location.origin&&url.pathname===location.pathname;
+  const article=(local?byId.get(id):null)||LIB.articles.find(item=>item.sourceUrl===url.href);
+  if(article){event.preventDefault();selectArticle(article.id)}
+});
 const deepLink=hashArticleId(),deepGraph=graphHashRoute(deepLink);if(deepLink==='radar')state.surface='radar';else if(deepLink==='maturity')state.surface='maturity';else if(deepGraph){state.surface='graph';state.graphId=deepGraph.graphId;state.graphRoute=graphRouteId(deepGraph.graphId);state.graphView=deepGraph.view}else{state.selected=byId.has(deepLink)?deepLink:null;if(byId.has(deepLink))document.body.classList.add('article-open')}renderEntryGuideRoutes();renderGroupFilters();renderTypeTabs();syncFilterAccess();syncSurface();applyFocusMode();if(state.surface==='graph')renderGraphControls();renderAll();if(byId.has(deepLink))focusArticleHeading(deepLink);
-setInterval(()=>{const current=taipeiDate();if(current!==RESEARCH_TODAY){RESEARCH_TODAY=current;renderAll()}},60000);
+if(initialNavigation?.research&&initialNavigation.view&&initialNavigation.hash===location.hash)restoreNavigation(initialNavigation);else rememberNavigation();
+setInterval(()=>{const current=taipeiDate();if(current!==RESEARCH_TODAY){RESEARCH_TODAY=current;renderAll(true)}},60000);
 </script>
 </body>
 </html>

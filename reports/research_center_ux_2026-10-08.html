@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>研究中心 UI UX 審查與改版方案 2026年10月8日</title>
+<style>
+:root{color-scheme:light;--paper:#f4f2ec;--ink:#1a1712;--muted:#625e54;--line:#d4d0c6;--teal:#0f6d82}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,"Microsoft JhengHei",sans-serif;font-size:17px;line-height:1.8}main{max-width:1020px;margin:auto;padding:52px 32px 100px}h1{font-size:36px;line-height:1.35;margin:8px 0 20px}h2{margin:52px 0 18px;font-size:26px}h3{font-size:20px;margin:28px 0 10px}p{margin:12px 0}a{color:var(--teal);text-underline-offset:4px}header{border-bottom:1px solid var(--line);padding-bottom:26px}.meta,figcaption{font-size:14px;color:var(--muted)}.lead{font-size:21px;line-height:1.65}.summary{padding:12px 22px;border-left:4px solid var(--teal)}nav{display:flex;gap:22px;flex-wrap:wrap;margin-top:26px}table{width:100%;border-collapse:collapse;font-size:15px}th,td{padding:14px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}ul,ol{padding-left:25px}li{margin:10px 0}.table-wrap{overflow-x:auto}.tag{font-size:12px;display:inline-block;padding:1px 7px;background:#e4eced;color:#0f596a;border-radius:3px}figure{margin:18px 0 26px}figure img{display:block;width:100%;height:auto;border:1px solid var(--line)}figure.phone img{max-width:390px}figcaption{margin-top:8px}.flow{font-size:18px;padding:20px 0;border-block:1px solid var(--line)}details{border-top:1px solid var(--line);padding:18px 0}summary{cursor:pointer;font-weight:650;min-height:44px}summary:focus-visible,a:focus-visible{outline:3px solid var(--teal);outline-offset:4px}code{font-size:14px;background:#e9e6de;padding:2px 5px;overflow-wrap:anywhere}.muted{color:var(--muted)}.severity{white-space:nowrap;font-weight:700;color:#85491b}@media(max-width:620px){main{padding:28px 18px 60px}h1{font-size:28px}h2{font-size:23px}.lead{font-size:19px}th,td{min-width:120px;padding:10px 8px}}@media print{main{max-width:none;padding:15px}details{break-inside:avoid}a{color:inherit}img{max-height:650px;object-fit:contain;object-position:left}nav{display:none}}
+th:first-child{min-width:80px;white-space:nowrap}
+</style>
+<main>
+<header>
+<p class="meta">2026年10月8日 · 正式網站實測 · 設計提案，尚未套用到正式介面</p>
+<h1>研究中心 UI UX 審查與改版方案</h1>
+<p class="lead">閱讀器能顯示文章，但入口、版面切換與大量導讀內容，讓使用者難以快速讀到正文並保持方向感。</p>
+<p>建議以「文章清單＋站內閱讀」作為預設體驗。主閱讀區先呈現文章，輔助工具由讀者自行開啟；保留證據狀態與來源，移除重複的介面說明。</p>
+<nav aria-label="報告目錄"><a href="#findings">主要問題</a><a href="#evidence">實測流程與截圖</a><a href="#proposal">新方案</a><a href="#acceptance">驗收條件</a><a href="#scope">範圍與限制</a></nav>
+</header>
+
+<section id="findings">
+<h2>主要問題</h2>
+<div class="summary"><p><strong>使用者描述的「跳頁」有兩個不同來源。</strong>一般文章卡片在同一個 <code>research.html</code> 內開啟，首次使用時預設切成專注模式，隱藏清單與主導覽；來源和 GitHub 原始文件則確實設定為另開分頁。不能將兩種情況混為一談。</p><p>實測從儀表板進研究中心、選文，再按瀏覽器上一頁，會直接回到儀表板。手機上的站內「返回研究清單」則正常可用，所以問題是返回方式與模式不一致，不能宣稱所有路徑都無法返回。</p></div>
+<div class="table-wrap"><table>
+<thead><tr><th>優先級</th><th>問題與影響</th><th>證據</th><th>改版決策</th></tr></thead>
+<tbody>
+<tr><td class="severity">P1</td><td><strong>點文章後，清單和主要導覽消失。</strong>版面從文庫變成獨立閱讀畫面，使用者失去原來的搜尋與選文位置；「文章清單」實際是版面模式切換。</td><td>步驟 2、3；<code>applyFocusMode()</code> 預設啟用。</td><td>預設保留文庫與研究中心導覽。專注閱讀改為明確的自選模式；返回目的地保持固定。</td></tr>
+<tr><td class="severity">P1</td><td><strong>瀏覽器上一頁跳過清單。</strong>選文章替換目前歷史項目，無法照「清單 → 文章」的順序回去。</td><td>步驟 4；<code>setArticleHash()</code> 使用 <code>history.replaceState</code>。</td><td>文章導航建立歷史項目，支援上一頁／下一頁與深連結；保存篩選、選取列及捲動位置。</td></tr>
+<tr><td class="severity">P1</td><td><strong>輔助內容成為閱讀的必經路徑。</strong>標題與查核狀態之後，接連出現閱讀任務、結論邊界、新手摘要、角色、學習路線、後續問題與研究摘要，正文被推到下方。</td><td>步驟 2、5、6；<code>renderReader()</code> 的附加順序。</td><td>標題、精簡 metadata 後直接呈現主正文。導讀與術語改成可選工具；重要限制保留在相關論述旁。</td></tr>
+<tr><td class="severity">P1</td><td><strong>同時顯示篩選、文章清單、正文、大綱，壓縮閱讀欄。</strong>使用者在「看得到清單但正文擁擠」與「正文較寬但導覽消失」之間選擇。</td><td>步驟 3 桌面分欄畫面。</td><td>常駐兩欄：精簡文章清單＋舒適閱讀欄。篩選、大綱與查核資料以抽屜或浮層開啟。</td></tr>
+<tr><td class="severity">P2</td><td><strong>文章入口被大型新手路線遮住。</strong>清單與中央空白閱讀區同時介紹如何開始學習；進文庫後仍要先找文章在哪裡。</td><td>步驟 1。</td><td>首頁直接提供搜尋與文章清單。新手路線移至「產業探索」；入口只保留一個低調連結。</td></tr>
+<tr><td class="severity">P2</td><td><strong>同一觀念反覆包成不同卡片。</strong>範例中的「一條會切斷整櫃水電的指令」在閱讀任務、結論邊界與三句重點重複出現。各卡片同時強調「先讀」，缺少真正的主次。</td><td>步驟 2 的畫面與 DOM 內容。</td><td>每項內容只保留一個主要位置。不再疊加另一個「先看重點」卡片；以字級、段距與章節結構建立層次。</td></tr>
+<tr><td class="severity">P2</td><td><strong>功能名稱偏向內部研究架構。</strong>「族群矩陣」首屏主要是學習路線；雷達與圖譜也各自重複教學、任務與證據警語。讀者先理解工具分類，才能讀文章。</td><td>步驟 8、9、10。</td><td>上層以「文章」「產業探索」區分工作；「研究追蹤」降為次要入口。保留原工具但收斂各自首屏。</td></tr>
+<tr><td class="severity">P2</td><td><strong>跨文章與外部來源的行為不夠清楚。</strong>閱讀器上的類型分頁會切換相關文章；正文連結及來源統一另開分頁，與文庫卡片的站內選文方式不同。</td><td>閱讀器分頁、來源 DOM 與 <code>readerTabs()</code>、<code>readerRunNode()</code>。</td><td>改成帶文章標題的「相關閱讀」連結。站內研究統一站內打開，外部來源明示「↗ 外部來源／新分頁」。</td></tr>
+<tr><td class="severity">P2</td><td><strong>小字與冗長控制名稱增加辨識負擔。</strong>清單按鈕的可存取名稱含整張卡片文案，畫面內又充滿小字、巢狀卡片與淡色說明。</td><td>步驟 1、3、8、10 的截圖與 DOM。</td><td>文章以簡短標題連結作為主操作，metadata 不塞入按鈕名稱；提高基礎字級並減少非必要說明。</td></tr>
+</tbody></table></div>
+<p class="meta">P1＝直接妨礙選文、閱讀或返回；P2＝持續增加理解與操作負擔。優先級是本次設計判斷，並非使用者研究量化評分。</p>
+</section>
+
+<section id="evidence">
+<h2>實測流程與截圖</h2>
+<p>以下均為本次正式網站擷取。點開各步驟可查看完整證據。截圖中的研究內容只用於檢查介面，不在本報告重新驗證其投資或技術主張。</p>
+<details open><summary>1　進入研究文章　｜　需要改善</summary><p>文章清單上方放了完整新手路線，中央閱讀區再次要求先選系統問題。搜尋與分類本身可用，但主要的選文工作被教學入口延後。</p><figure><a href="assets/research_center_ux_2026-10-08/01-desktop-entry.jpg"><img src="assets/research_center_ux_2026-10-08/01-desktop-entry.jpg" alt="桌面研究中心首頁，左側大型學習路線與中央歡迎教學佔據首屏"></a><figcaption>桌面入口；文章清單與閱讀區同時展示新手引導。</figcaption></figure></details>
+<details open><summary>2　點開市場議題　｜　主要問題</summary><p>卡片在同頁開啟；預設專注閱讀隱藏清單及主導覽。首屏呈現閱讀任務與結論邊界，尚未出現主正文。右上方「文章清單」可以恢復分欄，但按鈕名稱沒有交代這是模式切換。</p><figure><a href="assets/research_center_ux_2026-10-08/02-desktop-article.jpg"><img src="assets/research_center_ux_2026-10-08/02-desktop-article.jpg" alt="文章開啟後清單消失，首屏是導讀任務和結論邊界"></a><figcaption>範例：AI 機櫃信任根市場議題。</figcaption></figure></details>
+<details><summary>3　按文章清單恢復分欄　｜　需要改善</summary><p>同一篇文章仍在閱讀器內，但篩選、清單、正文與大綱同時佔用橫向空間。恢復清單並沒有消除正文前的輔助內容。</p><figure><img src="assets/research_center_ux_2026-10-08/03-desktop-split.jpg" alt="恢復清單後形成篩選、清單、正文、大綱多欄，正文偏窄"><figcaption>閱讀空間與導覽不應互相交換。</figcaption></figure></details>
+<details><summary>4　用瀏覽器上一頁返回　｜　主要問題</summary><p>重現順序：儀表板 → 研究中心 → 搜尋 → 開文章 → 瀏覽器上一頁。結果回到儀表板，並未回到研究清單。這是實測行為，與程式使用 replaceState 的結果一致。</p><figure><img src="assets/research_center_ux_2026-10-08/04-browser-back.jpg" alt="從研究文章按上一頁後返回掃描儀表板"><figcaption>返回目的地為 index.html；並非文章清單。</figcaption></figure></details>
+<details><summary>5　手機開文章　｜　需要改善</summary><p>手機已有可見的「返回研究清單」，這項設計值得保留。但閱讀任務仍佔據首屏，「開始讀三句重點」比「直接讀第一節」更突出，正文需要額外找尋。</p><figure class="phone"><img src="assets/research_center_ux_2026-10-08/05-mobile-article.jpg" alt="手機文章首屏包含返回按鈕、標題、驗證區及新手閱讀任務"><figcaption>390 × 844 CSS viewport；為桌面瀏覽器響應式檢查，非實機。</figcaption></figure></details>
+<details><summary>6　直接讀第一節　｜　功能可用，路徑需縮短</summary><p>按鈕能捲到正文，證明文章並未缺失。正文前仍插入問題定位與名詞區；手機頂端同時存在網站標頭、返回列與閱讀位置列。</p><figure class="phone"><img src="assets/research_center_ux_2026-10-08/06-mobile-body.jpg" alt="手機跳到正文第一節，正文可以顯示但仍有導讀與固定工具列"><figcaption>改版應讓這個閱讀狀態成為預設開文結果。</figcaption></figure></details>
+<details><summary>7　手機返回研究清單　｜　可用</summary><p>站內返回鍵可回到已選文章附近，並顯示選取狀態。這是應保留的優點；本次路徑不代表重整、外部深連結或所有來源路徑都已測過。</p><figure class="phone"><img src="assets/research_center_ux_2026-10-08/07-mobile-return.jpg" alt="手機返回清單後原文章列高亮"><figcaption>站內返回與瀏覽器上一頁目前行為不同。</figcaption></figure></details>
+<details><summary>8　研究雷達首屏　｜　需要改善</summary><p>清楚區分待驗證問題與已有文章是優點，但候選題地圖、全部候選、單題卡片及讀法說明重複包裹相同問題。應以簡潔追蹤清單呈現問題、狀態與下一個事件。</p><figure><img src="assets/research_center_ux_2026-10-08/08-radar.jpg" alt="研究雷達包含多層卡片及重複候選導覽"><figcaption>沒有文章的候選仍須明示狀態，避免做出可閱讀的假入口。</figcaption></figure></details>
+<details><summary>9　族群矩陣首屏　｜　需要改善</summary><p>頁面主要入口是學習路線，與「矩陣」的名稱不相符。每條路線又帶第一站導讀、角色按鈕和預覽，單個選擇負擔偏大。可將路線作為產業探索中的自選入口。</p><figure><img src="assets/research_center_ux_2026-10-08/09-matrix.jpg" alt="族群矩陣首屏是密集學習路線卡片"><figcaption>保留路線內容，簡化路線選擇畫面。</figcaption></figure></details>
+<details><summary>10　知識圖譜首屏　｜　需要改善</summary><p>圖譜有證據層級、到期狀態及可回查關係，應保留。但新手讀圖、目前選圖、目前讀圖任務與各項警語把圖推到下方。改為先顯示圖與核心圖例，選中關係後再顯示證據。</p><figure><img src="assets/research_center_ux_2026-10-08/10-graph.jpg" alt="知識圖譜上方有多層讀圖任務和說明，實際圖形位於首屏下緣"><figcaption>本步只審查首屏與入口，未完整驗證所有圖譜互動。</figcaption></figure></details>
+</section>
+
+<section id="proposal">
+<h2>新方案的共同結構</h2>
+<p class="flow">搜尋或瀏覽文章 → 點選後直接讀正文 → 遇到問題才查名詞或證據 → 返回原清單或接讀相關文章</p>
+<div class="table-wrap"><table><thead><tr><th>層級</th><th>預設呈現</th><th>需要時才開啟</th></tr></thead><tbody>
+<tr><td>整個研究中心</td><td>文章；產業探索；返回掃描儀表板</td><td>研究追蹤（現有雷達）；工具內的研究覆蓋盤點</td></tr>
+<tr><td>文章清單</td><td>搜尋、精簡類型切換；標題、簡短摘要、日期與必要狀態</td><td>族群、時間、查核狀態篩選；保留目前條件提示</td></tr>
+<tr><td>文章閱讀</td><td>文章標題、日期、簡短證據狀態、主正文、段落旁引用</td><td>目錄、閱讀輔助、查核資料；專注閱讀</td></tr>
+<tr><td>閱讀輔助</td><td>一個低干擾入口</td><td>三句摘要、名詞、角色與學習路線；同一內容不重複呈現</td></tr>
+<tr><td>產業探索</td><td>以族群或問題找內容</td><td>學習路線、關係圖、研究覆蓋；從文章進來時保留返回該篇的位置</td></tr>
+</tbody></table></div>
+<p><strong>證據邊界仍然必須可見。</strong>文章的「推論」「證據待複核」等關鍵狀態保留在標題旁，會改變結論的限制保留在相應正文。收合的是重複導讀、完整查核記錄與操作解說，不是隱藏對研究主張的限定。</p>
+<h3>三個視覺方向</h3>
+<p>三個方向共用上述內容規則，差別在選文與閱讀如何共存。以下編號依本次對話中概念圖的實際出現順序。圖中的文章段落與日期為排版示意，實作須回接現有原文，不得拿示意文字覆蓋研究內容。</p>
+<div class="table-wrap"><table><thead><tr><th>方向</th><th>互動方式</th><th>適用與取捨</th></tr></thead><tbody>
+<tr><td><strong>文庫雙欄（建議）</strong></td><td>左側精簡清單，中央／右側主閱讀；點文不改變整體結構。篩選與大綱按需開啟。</td><td>最符合「留在研究中心閱讀」的需求，便於連續換文。窄螢幕改成單欄與固定返回清單。</td></tr>
+<tr><td><strong>閱讀優先</strong></td><td>使用清楚的文章詳情路由，保留全站導覽、麵包屑及明確返回文章清單；正文居中，清單透過入口召回。</td><td>長文最舒適；切換文章多一道動作。必須修好瀏覽歷史與清單還原，不能重現目前無預警隱藏導覽的模式。</td></tr>
+<tr><td><strong>快速預覽文庫</strong></td><td>文庫列表作為主畫面；選文打開寬閱讀側板，背景保留原清單，關閉即回原位置。</td><td>適合大量瀏覽與快速判斷。長文需要「展開閱讀」選項，側板的焦點、捲動與手機行為更需仔細驗證。</td></tr>
+</tbody></table></div>
+<details><summary>圖 1　文庫雙欄</summary><figure><a href="assets/research_center_ux_2026-10-08/design-library.png"><img loading="lazy" src="assets/research_center_ux_2026-10-08/design-library.png" alt="概念圖1，精簡文章清單與正文並排，輔助功能收在工具列"></a><figcaption>概念圖；尚未實作互動。正式分類沿用原始資料類型，不採用圖中的示意標籤替換資料契約。</figcaption></figure></details>
+<details><summary>圖 2　閱讀優先</summary><figure><a href="assets/research_center_ux_2026-10-08/design-editorial.png"><img loading="lazy" src="assets/research_center_ux_2026-10-08/design-editorial.png" alt="概念圖2，正文居中並保留清楚的返回文章清單入口"></a><figcaption>概念圖；強化長文排版，返回須保留原清單狀態。</figcaption></figure></details>
+<details><summary>圖 3　快速預覽文庫</summary><figure><a href="assets/research_center_ux_2026-10-08/design-preview.png"><img loading="lazy" src="assets/research_center_ux_2026-10-08/design-preview.png" alt="概念圖3，文章在寬側板中顯示，後方保留文庫"></a><figcaption>概念圖；「展開閱讀」必須在站內展開，正式按鈕應使用放大圖示，避免圖中外開箭頭的歧義。</figcaption></figure></details>
+<p class="meta">概念圖以內建 ImageGen 生成，使用本次實測截圖為參考。<a href="assets/research_center_ux_2026-10-08/design-prompts.json">完整提示詞與參考圖清單</a>。</p>
+<h3>文章內容的去留</h3>
+<ul>
+<li>「這篇先弄懂」：移除框架性 kicker；以文章題名為唯一主要標題，問題式副標只有真正補充意義時才保留。</li>
+<li>「新手閱讀任務」「新手先讀」：整合到閱讀輔助，不在每次開文時強制展開。</li>
+<li>「先看結論邊界」「完整研究摘要」：去除重複卡片，完整摘要作為可選導讀；關鍵限制就地保留。</li>
+<li>「角色定位」「學習路線」「想一想」：搬到閱讀輔助或文末延伸，避免阻擋原文。</li>
+<li>「章節接力」「新手讀表」「標題逐字沿用原文」等系統解說：預設移除，用正文標題、表頭與正常排版完成同一工作。</li>
+<li>名詞：以就地開啟、可關閉的解釋呈現；完整字典保留入口。</li>
+<li>來源：就地引用開啟查核面板，原始文件連結清楚標示外開。</li>
+</ul>
+<h3>互動契約</h3>
+<ul>
+<li>站內文章使用正常連結語意，支援複製網址、鍵盤開啟及使用者自行開新分頁。網站自行處理站內閱讀時仍保留可用的深連結。</li>
+<li>清單 → 文章 A → 文章 B 的導航建立對應歷史項目；瀏覽器上一頁回 A，再回清單，下一頁也可還原。搜尋輸入可替換同一狀態，避免每個字造成歷史項目。</li>
+<li>點選文章保留搜尋、篩選、排序、清單捲動與選取列。返回以目前來源為準；直接開文章深連結則有「所有文章」保底入口。</li>
+<li>手機頂端只保留必要的研究中心身份與「返回文章」；目錄以單一按鈕開啟，避免多層固定列壓住正文。</li>
+<li>來源、名詞與篩選面板可用 Escape 關閉，關閉後焦點回觸發按鈕；文章切換後焦點到標題，回清單時回原列。</li>
+<li>載入、無結果及錯誤要明確顯示，不能以空白閱讀區代替。研究內容可信度與資料載入失敗須分開呈現。</li>
+</ul>
+</section>
+
+<section id="acceptance">
+<h2>實作順序與驗收條件</h2>
+<p>先完成文庫與閱讀器的整體替換，再整理探索工具。避免保留所有舊卡片，只在外面多包一層新版外殼。</p>
+<ol>
+<li><strong>導覽與歷史。</strong>統一文章路由與返回規則，保留既有 hash 深連結相容性。補上瀏覽器層的前進、後退與清單狀態驗證。</li>
+<li><strong>閱讀主體。</strong>重排 <code>scripts/research_template.html</code>；縮減常駐欄位與正文前輔助內容，保留原文章與證據契約。</li>
+<li><strong>探索工具。</strong>整合雷達、矩陣與圖譜的上層導覽；在各工具內保留必要的資料與可回查證據。</li>
+<li><strong>使用者走查。</strong>用找指定公司文章、讀最新一節、查引用、返回原結果、換下一篇的任務檢查。先收集實測再宣稱閱讀速度或成功率改善。</li>
+</ol>
+<ul>
+<li>桌面開文後第一屏可見文章標題與第一段主正文；手機在標題與必要狀態之後立即進入正文，不要求先看導讀。</li>
+<li>預設桌面狀態保留研究中心主要導覽與選文入口；專注模式只能由使用者主動開啟。</li>
+<li>研究中心清單、文章、相關文章之間的上一頁／下一頁可逆；重整與分享深連結可直接定位文章。</li>
+<li>正文、查核狀態、來源、證據期限與個股對應沿用原始資料；不能因精簡介面而改寫成更強的研究結論。</li>
+<li>以桌面 1440 × 1000、筆電寬度、手機 390 × 844、放大文字與鍵盤流程驗證；正常閱讀不出現整頁水平溢出，必要寬表格獨立捲動。</li>
+<li>以正式筆記、多空小作文、市場議題／事件、無結果、過期證據、長標題與長表格作代表樣本。</li>
+<li>既有測試中固定舊導讀標籤或結構的斷言應改為新的行為契約；研究內容與證據完整性測試必須保留。</li>
+</ul>
+<p>實作與回歸入口：<code>scripts/research_template.html</code>、<code>scripts/build_dashboard.py</code>、<code>tests/test_research_navigation.py</code>、<code>tests/test_research_center.py</code>。本輪僅審查與方案設計，未修改這些生產檔案，也未宣稱回歸測試通過。</p>
+</section>
+
+<section id="scope">
+<h2>範圍與限制</h2>
+<p>本輪使用 Windows、Codex 內建瀏覽器，在正式網站 <a href="https://dennisliuck.github.io/strong-weak-scanner/research.html">研究中心</a> 操作。桌面與手機為 CSS viewport 模擬；主要完整閱讀樣本是「AI 機櫃如何判斷控制指令可信」市場議題，其餘工具審查首屏與入口。程式對照來自 git pull 後的本機 <code>1c82e03</code>，未核實正式部署 commit 與其完全一致。</p>
+<p>已確認的優點包括：全文可以站內呈現、搜尋可找到目標、跳到第一節有效、手機站內返回能定位原文章、證據狀態與來源有保留。改版應延續這些能力。</p>
+<p>可及性方面，本次只查看可見畫面、DOM 標籤及焦點結果。小字、多層捲動、冗長按鈕名稱與固定列構成風險；未完整測試螢幕閱讀器、所有鍵盤流程、深色模式或色彩對比，不宣稱符合完整 WCAG 要求。</p>
+<p>初次導覽曾超時，稍後完成載入；沒有做網路與效能基準測試，因此不將這次暫時空白直接定性為產品故障。本文沒有使用者樣本的速度、完成率或滿意度統計，也不估算改善百分比。</p>
+<p class="meta">截圖資產位於 reports/assets/research_center_ux_2026-10-08/。本報告與概念圖是本次設計交付；正式網站尚未變更。</p>
+</section>
+</main>
+</html>

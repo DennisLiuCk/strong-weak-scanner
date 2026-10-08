@@ -1,0 +1,49 @@
+{
+  "tests": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "utf8_mode": 0,
+    "stdout_encoding": "utf-8",
+    "PYTHONUTF8": null,
+    "PYTHONIOENCODING": null,
+    "tests": 735,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "duration_seconds": 30.69,
+    "failed_tests": []
+  },
+  "article_count": 282,
+  "published_payload_equal": true,
+  "serialized_payload_equal": true,
+  "payload_sha256": "582f91d3ee11f91d44380a3ef6d55d94cf5e7730f9969e662a190acba3113a84",
+  "source_png_dimensions": [
+    1487,
+    1058
+  ],
+  "prepublish": {
+    "baseline": "1c82e03ad09f3bbf9c73ee64a05e944c7f5724e9",
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "utf8_mode": 0,
+    "PYTHONUTF8": null,
+    "checks": {
+      "notes": 0,
+      "hypotheses": 0,
+      "topic_history": 0,
+      "graph": 0,
+      "radar": 0,
+      "method_history": 0,
+      "tests": 0,
+      "isolated_build": 0
+    },
+    "ok": true,
+    "protected_unchanged": true
+  },
+  "prepublish_first_attempt": {
+    "ok": false,
+    "reason": "research.html used LF, while the Windows builder emits CRLF",
+    "resolved": "confirmed normalized bytes identical; copied isolated builder output; full gate rerun passed",
+    "protected_unchanged": true
+  }
+}

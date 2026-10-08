@@ -1,81 +1,70 @@
-# Research Center Design QA
-
-- Visual target: `C:\Users\nossi\.codex\generated_images\019fb96b-3cd3-7862-a486-ae86f9b2c88f\exec-57bbbd43-c35c-4f98-a523-3fca7f96712b.png`
-- Target pixels: 1487 × 1058; evaluated at a normalized 1440 × 1024 viewport
-- Final implementation: `tmp/research-center-qa/implementation-final.png`
-- Same-input comparison: `tmp/research-center-qa/comparison-final.png`
-- Mobile evidence: `tmp/research-center-qa/mobile-list-v2.png`, `tmp/research-center-qa/mobile-reader.png` at 390 × 844
-- Tested state: light theme, all article types, `formal-8261` selected
-
-## Comparison history
-
-1. Initial desktop render found a P0 content failure: the title and article sections were not attached because multiple nodes were passed to `appendChild`. Replaced those calls with `append` and added contract tests.
-2. Second desktop render found P1 horizontal overflow and a selection/list-order mismatch. Added long-text wrapping and stable type ordering so the selected article is visible at the top of the catalog.
-3. Initial mobile render found a P1 collapsed content column below 1180 px. Removed the zero-width grid placement at that breakpoint and added an in-panel close action for the mobile filter drawer.
-4. Final side-by-side comparison confirms the intended warm off-white palette, thin dividers, compact teal/purple/amber type system, 220 px filter rail, 400 px catalog, independent reader, right-side outline/evidence rail, typography hierarchy, and content density. No visible P0, P1, or P2 differences remain that block the selected direction.
-
-## Functional verification
-
-- 244 real articles render: 121 formal notes, 118 long/short narratives, and 5 market topics.
-- Search, article-type tabs, selected-card state, deep links, related-content tabs, copy-link feedback, theme toggle, dashboard gateway, and sorting work.
-- Mobile catalog → reader → back flow and filter drawer open → close flow work at 390 × 844.
-- Desktop and mobile have zero horizontal page overflow.
-- Browser console errors/warnings: 0.
-- Full suite: 325 tests passed with Python 3.12 and `PYTHONUTF8=1`.
+# 研究中心：概念圖 1 實作驗收
 
 final result: passed
 
----
+驗收日期：2026-10-08。範圍是現有研究中心的閱讀流程、導覽、版型與回歸；本檔記錄部署前驗收，部署狀態以 GitHub Pages 建置 commit 為準。
 
-# Design QA：平行視角問題導引工作台
+## 比對基準與證據
 
-## Evidence
+- Source visual truth：`reports/assets/research_center_ux_2026-10-08/design-library.png`。
+- Implementation：`http://127.0.0.1:8767/research.html#topic-MI-2026-08-08-AI-RACK-TRUST-ROOT`。
+- 最終實作截圖：`reports/assets/research_center_ux_2026-10-08/implementation-desktop-final.jpg`。
+- 原圖實際尺寸為 **1487 × 1058 px**；最終瀏覽器 viewport 與截圖同為 **1487 × 1058**，devicePixelRatio=1。無裝置外框、無密度縮放。前期 1488 × 1056 的近似比對已在最後一輪改為精確原尺寸。
+- 狀態：淺色、文章庫、全部類型、最新排序，開啟「AI 機櫃如何判斷控制指令可信」同篇文章，面板關閉、正文頂端。
+- 完整原圖與最終截圖已放在同一次影像輸入中檢視；另有可開啟的[並排比對頁](reports/research_center_design_comparison_2026-10-08.html)。
+- 細節比對：閱讀標題／metadata／正文起始（原圖及實作 x≈490、y≈150），導覽／閱讀工具（x≈675、y=0）。[全景](reports/assets/research_center_ux_2026-10-08/comparison-full.jpg)與[局部](reports/assets/research_center_ux_2026-10-08/comparison-detail.jpg)記錄最後字級修正後的並排檢視；這兩張比較頁截圖採展示寬度，精確尺寸判定以最終獨立截圖為準。
 
-- Reference: `/Users/dennisliu/.codex/generated_images/019ff74e-dddf-7360-997d-a652d8623da6/exec-dac1728e-8e53-4d63-be6a-11c4923a4ec3.png`
-- Implementation: `/Users/dennisliu/Code/GitHub/strong-weak-scanner/tmp/uiux_option3/desktop-final.png`
-- Combined comparison: `/Users/dennisliu/Code/GitHub/strong-weak-scanner/tmp/uiux_option3/comparison-final.png`
-- Mobile verification: `/Users/dennisliu/Code/GitHub/strong-weak-scanner/tmp/uiux_option3/mobile-final.png`
-- Viewport: desktop 1487×1058 CSS pixels, DPR 1；reference 與 implementation 都是
-  1487×1058，未做 density normalization。手機為 390×844 CSS pixels。
-- State: light theme、散熱族群、D 基本面改善、排序第一列被選取。reference 使用示意的
-  2026-08-13 資料；implementation 使用本機正式 DB 的 2026-08-12 as-seen payload。
+概念圖採縮寫文章與示意清單；正式實作沿用目前已發布全文、原排序與原查核狀態。標題保持原句、內容更長、選中文章是清單第二篇，皆屬資料差異；未為追求相同換行而改寫研究。mock 沒有描述的手機、空結果及深色模式，依現有網站模式補齊。
 
-組合圖保留兩張原始桌機截圖的完整像素寬度並上下排列，文字、表格與 detail panel 均可直接
-辨識，因此不需要另以放大 crop 取代 full-view 證據。Browser screenshot、DOM 狀態、水平溢位
-與 console 都另行檢查。
+## Findings 與修正歷程
 
-## Fidelity review
+| 輪次 | 問題與影響 | 修正與複驗 |
+| --- | --- | --- |
+| 初版 | P1：舊標題底色卡片與窄閱讀欄仍搶走正文空間 | 移除題名前框、加寬正文，清單固定在左；證據為 `implementation-desktop-v1.jpg` → `implementation-desktop-v2.jpg`。 |
+| 操作驗收 | P1：篩選抽屜層級低於遮罩，點擊無法操作 | `.filters.open` 設為 z-index 60，遮罩 59；實際清除、勾選散熱、完成後得到 23 篇；320px 抽屜、Escape 與焦點返回通過。 |
+| 操作驗收 | P2：目錄關閉時的額外焦點回送，讓章節被工具列遮住 | 使用原生 dialog 關閉，章節捲動後 `focus({preventScroll:true})`；手機跳到四關章節時標題在工具列下方，焦點落在該 section。 |
+| 全景比對 | P2：桌面字級偏小、品牌偏右，工具缺少概念圖的視覺辨識 | 桌面正文 22px／1.75、標題 40px、章節 28px；品牌置中、閱讀工具 15px，加入正式 Heroicons。最終全景及局部比對無剩餘 P0／P1／P2。 |
 
-- **Typography:** 品牌、標題、表格與說明採既有 Noto Sans TC／IBM Plex Mono；介面圖示使用
-  Material Symbols Rounded，沒有手繪 SVG、文字符號假圖示或低解析替代資產。
-- **Layout and spacing:** 黑色 89px site header、導言、四欄 context strip、五個視角頁籤、
-  左排行／右詳情的比例與留白對齊 reference；390px 改為單欄且 page scroll width 等於 viewport。
-- **Color and surface:** 黑色 header、暖白紙面、紅／青／橙／紫的視角語意、細邊框與小圓角均
-  對齊 reference，並保留既有 dark theme token。
-- **Copy and data truth:** 標籤改為「趨勢領先／防守韌性／籌碼支持／基本面改善」，明示族群內
-  百分位不是機率、預測或投資建議。reference 的時間穩定度圓點改成 payload 真正量測的
-  leave-one-peer-out 結構敏感度，不杜撰 30 日穩定性。
-- **Behavior:** 問題頁籤會重排、點列與方向鍵會更新詳情、詳情中的五視角也可切換、診斷可展開、
-  完整個股 drawer 可開關。quick nav 點選／點外／Escape 均收合。
-- **Accessibility:** 頁籤與表格選取狀態有 ARIA；drawer 背景 inert、Tab／Shift+Tab focus trap、
-  Escape 關閉並還原焦點；主要觸控目標至少 44px，支援 prefers-reduced-motion。
+## 必要視覺檢查
 
-## Comparison history
+| 面向 | 結果與保留差異 |
+| --- | --- |
+| 字體與階層 | 沿用 Noto Sans TC 與系統後備字體；主標 700、正文正常字重。桌面主文接近原圖的閱讀密度；手機 25px 標題／16px 正文。完整原題較示意題長，保留自然換行，沒有縮寫或截斷正文。 |
+| 間距與版型 | 左欄約 31%，主文左右 42px；平面清單、細分隔線、選中列淡青底。標題後直接接日期與查核狀態、正文，沒有額外導讀牆。桌面第一個正文 section 位於 y=396.5px；這是單一固定版型量測，非使用者成效統計。 |
+| 色彩 | 沿用米白背景、近黑正文、青色導覽及選中狀態。可信度到期警示保留語意色與文字；深色模式圖示反白、選中狀態可辨認。沒有用陰影卡片取代原圖的平面閱讀區。 |
+| 圖像與圖示 | 原圖沒有照片／插圖資產。箭頭、搜尋、篩選、目錄、文件與展開使用未改寫的 Heroicons 2.2.0 outline SVG，存於 `assets/heroicons/`，附 MIT 授權；未用自畫 SVG／CSS 圖案替代。最終頁面圖示均載入。 |
+| 文案與研究內容 | 保留既有文章類型名稱與研究邊界，不把示意圖的「公司／產業」硬套成新的分類。新手、研究摘要、角色與學習路線移至閱讀輔助；原本文內的限制與反證仍在正文。來源、查核附錄與過期警示完整保留。 |
 
-1. Pass 1 發現 header／標題比例偏小、表格缺欄位副標、桌機名稱與代碼斷行、選中欄位過度框選、
-   metadata 缺少辨識圖示；逐項修正後重建。
-2. Pass 2 使用 `comparison-final.png` 重新把 reference 與 implementation 放在同一輸入中檢查；
-   沒有 P0、P1 或 P2 視覺落差。剩餘差異均是有意且不影響主要任務的 P3：live payload 日期與
-   示意資料不同、結構敏感度取代沒有資料依據的時間穩定度、未顯示沒有實際保存行為的收藏控制。
+## 操作與響應式驗收
 
-## Interaction and runtime checks
+- 桌面清單開文、換文、搜尋、類型切換、族群篩選、清除篩選、零結果皆可操作；搜尋不重建同篇正文。
+- 手機清單 → 文章 → 返回清單，瀏覽器上一頁／下一頁、重新整理會還原搜尋及閱讀位置；曾以 windowY=1402 的實際狀態驗證重新整理與前進還原。
+- 深連結直接載入同篇文章；「專注閱讀」可進入與退出，預設保留清單。
+- 目錄可跳正文；查核資料與閱讀輔助按需開啟，Escape 關閉。篩選面板鍵盤焦點留在抽屜內，日期 radio 保留原生群組操作。
+- 族群矩陣開文仍進同一閱讀器，可返回原學習路線；知識圖譜、研究追蹤入口正常。原文檔及外部一手來源保留外開用途。
+- 1487×1058 桌面、1024×900 平板、390×844 手機與 320×740 窄手機檢查；已測頁面沒有 document 水平溢出，固定返回與閱讀工具可用。
+- [手機正文](reports/assets/research_center_ux_2026-10-08/implementation-mobile-final.jpg)、[平板深色](reports/assets/research_center_ux_2026-10-08/implementation-tablet-dark.jpg)、[查核面板](reports/assets/research_center_ux_2026-10-08/implementation-evidence-final.jpg)為實際瀏覽器截圖。
+- 使用 Codex in-app browser；檢查已操作流程的 console error 為空。語意按鈕、輸入 label、dialog 名稱與鍵盤焦點有人工檢查；未宣稱完整 WCAG 認證。
 
-- Desktop 1487×1058：散熱 7 檔、D 排序、row selection、B 切換、診斷、drawer focus trap 與
-  Escape／焦點還原皆通過；`innerWidth === scrollWidth === 1487`。
-- Mobile 390×844：active D page tab 自動置入可見範圍、quick nav 點選後收合、無水平溢位。
-- Browser console warnings/errors: 0。
-- Generated JavaScript syntax check: passed。
+## 程式與資料檢查
 
-## Final result
+- 系統 `python` 3.12.10、Windows 11 10.0.26200；`PYTHONUTF8`／`PYTHONIOENCODING` 未設定，`utf8_mode=0`，工具管線 `stdout_encoding=utf-8`。不能將此 stdout 宣稱為 cp950。
+- `unittest` 完整探索：735 tests，0 failures，0 errors，1 skipped。Node JavaScript 語法檢查通過。新增 history 序列化、路由去重、原段落／邊界保留的執行式回歸；移除強制舊導讀卡存在的過時 UI 斷言。
+- 全部 282 篇文章的完整序列化 `LIB` 與 HEAD 逐字相同，並非只比文章數；[驗證紀錄](reports/research_center_implementation_validation_2026-10-08.json)附 SHA-256 與執行環境。
+- 發布前另執行 `prepublish_check.py --baseline-ref origin/main`：六項研究 lint／歷史檢查、完整測試及隔離重建全部通過，DB／archive 前後 SHA-256 相同。首次隔離重建只因研究頁 LF／Windows CRLF 差異失敗；確認正規化後逐字相同並同步建置產物，再完整重跑通過。基準為 `1c82e03ad09f3bbf9c73ee64a05e944c7f5724e9`。
+- 本次從已發布 payload 套入新模板更新 `research.html`；沒有執行資料抓取、評分或 DB 寫入。正式 DB、archive、研究帳本與策略檔案均不在變更清單中。
+- 上述數量與座標是確定性檢查／固定條件量測，不是抽樣統計，SE／t 不適用；也不代表已驗證閱讀速度或理解率改善。
 
-passed
+## Follow-up Polish 與限制
+
+- P3：若後續有編輯需求，可另行制定長研究標題的短題名與副標；此版保留正式原題，不自動改寫。
+- 尚未做真實讀者可用性訪談、螢幕閱讀器全流程、Safari／Firefox 或實體手機驗收；此次成果是瀏覽器操作與設計比對，不是使用者成效實驗。
+- 本地預覽用於版面驗收；正式部署另核對 GitHub Pages 的建置 commit。
+
+## Implementation Checklist
+
+- [x] 全景與局部來源比對，修正 P0／P1／P2。
+- [x] 清單、正文、面板、返回與 history 核心流程。
+- [x] 桌面／平板／手機、深色、空結果與焦點。
+- [x] 測試、資料一致性、README 與 CHANGELOG。
+- [x] 保留可操作的本地預覽與實際畫面證據。
