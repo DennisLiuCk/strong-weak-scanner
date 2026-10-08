@@ -117,7 +117,7 @@ transition 也逐項相同。正式 DB 與 65 份 archive 共 66 檔 SHA 及 arc
 `scan-2026-10-09-cooling-passives-q2` partial 紀錄，方法快照另存
 `2026-10-09_09.json`，兩者均以 UTF-8 LF 寫入。
 
-最終 `prepublish_check.py --baseline-ref 6412f8b` 全部通過，完整測試 850 項、
+首輪 `prepublish_check.py --baseline-ref 6412f8b` 全部通過，完整測試 850 項、
 略過 1 項，耗時 32.987 秒，環境同上述 Windows 預設編碼。正式筆記、假說、
 議題 append-only 歷史、圖譜、雷達、方法帳本及隔離網站重建皆通過；隔離產出
 index／research 與待發布檔案 SHA 相同，DB／archive 雜湊未變。收據保存於
@@ -131,6 +131,16 @@ index／research 與待發布檔案 SHA 相同，DB／archive 雜湊未變。收
 Q3 限定。Reviewer 曾起草立隆電並複核興勤，本次是對本篇整合分析及 H 報告
 的交叉檢查，未冒稱重新全量視讀四家公司 PDF 或認證最終部署完成。收據為
 本批 `market_cross_review_receipt.json`。
+
+首輪 `4dafef8` 的 tests、qualitative-quality 與 Pages 都成功且部署同一 commit，
+但線上驗收發現立隆電小作文的分類值不在清單預設勾選集合：直接連結能讀，
+全部文章清單卻漏一篇。修正為既有 review 分類，保留衝突警示及原 H 狀態，
+並從實際 HTML 篩選選項建立回歸檢查；沒有以首輪 CI 綠燈代替介面驗收。
+修復經獨立程式審查及 11 項相關測試通過；記憶體中還原舊分類值時，新測試
+確實失敗。收據為 `source_hold_ui_fix_review.json`。修復後完整發布檢查再通過
+850 項測試、略過 1 項，耗時 32.801 秒，Windows／Python／編碼環境同上；
+歷史、隔離重建與 DB／archive 不變檢查全部通過，保存在 `prepublish_ui_fix/`。
+最終部署 commit 與 Pages 同步結果另存本批部署 receipt。
 
 ## 後續研究
 

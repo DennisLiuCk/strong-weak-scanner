@@ -58,6 +58,13 @@ class RecentResearchArticlesTest(unittest.TestCase):
             self.assertEqual(item["status"], "來源衝突・既有假說待釐清")
             self.assertEqual(item["statusTone"], "warning")
         self.assertEqual(library["articles"][0]["meta"]["reportStatus"], "source_conflict_hold")
+        # 警示文字可自訂，但文章分類必須能由實際頁面的勾選篩選器選到。
+        template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
+        checked_statuses = set(re.findall(
+            r'<input\b[^>]*name="status"[^>]*value="([^"]+)"[^>]*\bchecked\b', template))
+        held_status = library["articles"][0]["statusKey"]
+        self.assertEqual(held_status, "review")
+        self.assertIn(held_status, checked_statuses)
 
     def test_article_date_can_advance_market_anchor_and_same_day_types_both_survive(self):
         notes = {

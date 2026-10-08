@@ -2958,7 +2958,7 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
             "title": title, "summary": "看多、看空兩篇對立敘事與可觀測勝負手。",
             "status": "來源衝突・既有假說待釐清" if conflict_hold else "觀察層・不等於事實認證",
             "statusTone": "warning" if conflict_hold else "observational",
-            "statusKey": "conflicted" if conflict_hold else "observational", "groups": stock_groups([stock_id]),
+            "statusKey": "review" if conflict_hold else "observational", "groups": stock_groups([stock_id]),
             "sections": sections, "sources": [],
             "sourceUrl": NOTE_REPO_BLOB + report["relpath"],
             "meta": {
