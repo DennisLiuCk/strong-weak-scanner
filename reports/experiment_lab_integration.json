@@ -1,0 +1,55 @@
+{
+  "prepublish": {
+    "baseline": "914e1a608b84bd2eb6b56244332c2fcdc088e597",
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "utf8_mode": 0,
+    "PYTHONUTF8": null,
+    "checks": {
+      "notes": 0,
+      "hypotheses": 0,
+      "topic_history": 0,
+      "graph": 0,
+      "radar": 0,
+      "method_history": 0,
+      "tests": 0,
+      "isolated_build": 0
+    },
+    "ok": true,
+    "protected_unchanged": true
+  },
+  "tests": {
+    "ran": 815,
+    "skipped": 1,
+    "passed": 814
+  },
+  "numerical_report": "reports/experiment_lab_acceptance.json",
+  "browser": {
+    "combinations_checked": 9,
+    "strategies_per_table": 9,
+    "structural_rows": 9,
+    "console_errors": 0,
+    "forward_empty_state_verified": true
+  },
+  "executable_config_equal_to_isolated_checkout": true,
+  "db_sha256": "1eaf40357565dcf085abbc21e8cba61741c97ab7b3f4c786466617e6f0554b69",
+  "source_sha256": {
+    ".github/workflows/weekly-validate.yml": "1a0454fcc51025878f2d95faa5c136cc4c8f9494ad3a1d12ae01627ce7b5c33c",
+    "AGENTS.md": "011c7b6bf7fac78b6aa3a17d1cd801b91735e6d0cab9057d0d1ec0df1af62b15",
+    "ANALYSIS_DISCIPLINE.md": "4cb045d553e518ff56b512649a16deb329b1796cd6923aa3ffcaa46abd36d485",
+    "CHANGELOG.md": "67faf182436ec16b0a6f4827fe6c395765330502bc4284b2212bf3e25fd29b8c",
+    "CLAUDE.md": "011c7b6bf7fac78b6aa3a17d1cd801b91735e6d0cab9057d0d1ec0df1af62b15",
+    "README.md": "04e041487658a20a44a7215c7bce64382ab82dbf23a2f6f3df9b51cbd66f89f1",
+    "STRATEGY_VALIDATION_PROTOCOL.md": "00b47d9102d64e0769b7dc8f9c1c5ae7cb94f2080d96568355551a4d4e6d260c",
+    "WEEKLY_REVIEW.md": "f75fa615782641bd0b823aa22b1308ef138818d618eb9a8a862b61adfe6acae0",
+    "EXPERIMENT_LAB.md": "bc3fed153310e939b8be098faf18debffb45b324a0e6f07594d98027e17ed7fd",
+    "config/experiment_lab.json": "de3e09f5b0921e4a6f636462cf2f3c8e7c865a8f4db7f4f193a81ded724854f8",
+    "config/experiment_registry/fast-lab-v1-20261009.json": "9058608265b2abf78685007077290a745d6715cd15a2976ffd027b43336b038b",
+    "scripts/experiment_lab.py": "6c81fa96a10b602fa2f8789cfb9c0964689e55c80f9d5b48ae9be4d68b0f8cbd",
+    "scripts/audit_experiment_lab.py": "c580ba52d9c75f6c9881ca82f269dbbc0b2e6c68951c9aad778065a99e64b87d",
+    "tests/test_experiment_lab.py": "47b8876c550bc74bbf921099a61afaab936a42e9cbfb07fbbed370676fc0a517",
+    "reports/experiment_lab.json": "b12e03cdc3180f654e4af25ddee640b92867efce4572669ab88cbaa3cba9af28",
+    "reports/experiment_lab.html": "2be5849f44ffe11c44940b42d7f166cd3815175d6a35c870d8dd497d50f7597a",
+    "reports/experiment_lab_acceptance.json": "99fb4a6f6e35c52782c9f486ccf052f5ba0ffbaafd3ff6c5f854dc279c0cd697"
+  }
+}

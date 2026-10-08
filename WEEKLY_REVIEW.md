@@ -1,5 +1,10 @@
 # 每週檢視 Runbook(給下一個 session 的 Claude / 或人工執行)
 
+> **實驗專案的快速迭代先讀 [EXPERIMENT_LAB.md](EXPERIMENT_LAB.md)。**
+> `reports/experiment_lab.html` 可立即比較歷史重播，前瞻在 5／10／20 個成熟日安排下一輪。
+> 本文件的「只讀不動」、100／200／300 日與正式採用條件適用主策略，**不阻擋實驗候選的
+> 新增、淘汰或改版**。實驗改版另登錄 round、保留所有結果，不將探索升級為效力宣稱。
+
 > 報告本身每週六 09:00 已由 Actions 自動產生並 commit(`reports/validate_<資料迄日>.md`)。
 > 本文件是「讀報告 → 判斷 → 行動」的標準程序。**判斷依據一律用報告的 OOS 欄**；
 > OOS 只認每日正式發布時 append-only 留下的 as-seen 快照,最新規則回算的 restated

@@ -10,6 +10,9 @@
   [`config/universe.csv`](config/universe.csv)、[`config/candidates.csv`](config/candidates.csv)、
   [`config/ranking_roles.csv`](config/ranking_roles.csv)
 - **版本沿革與實證依據**：[`CHANGELOG.md`](CHANGELOG.md)
+- **短週期策略實驗**：[`reports/experiment_lab.html`](reports/experiment_lab.html)，
+  [實驗規格與操作](EXPERIMENT_LAB.md)。以歷史重播及 1／3／5 日前瞻，在約 2～5 週內安排
+  下一輪保留／簡化／重設；專案用於實驗，不用於真實交易。
 
 核心每日管線只使用 Python 3.12 標準庫與 SQLite。原始資料、正式 OOS 快照、儀表板歷史頁
 與驗證報告都保留在 repo，讓每次發布可以追溯。質化證據包的 PDF 驗證與轉圖另需 Poppler。
@@ -32,7 +35,9 @@
 
 ### 個股層：六個計分因子＋一個分層 gate
 
-[`scripts/score.py`](scripts/score.py) 的 CONFIG 是個股策略唯一旋鈕來源。價格、抗跌、外資、
+[`scripts/score.py`](scripts/score.py) 的 CONFIG 是正式個股策略唯一旋鈕來源。
+實驗候選另集中在 [`config/experiment_lab.json`](config/experiment_lab.json)，採獨立 round，
+不受正式 F10 長期升格門檻限制，也不改正式分數。價格、抗跌、外資、
 投信與修正日買賣先在同族群內排五分位，得到 −2～+2 分；有效樣本少於 4 檔時不排名。
 外資、投信、修正日買賣另有雜訊死區，避免全族群都接近零時仍被硬分高低。
 相同原始值採平均序位後映射分數；`composite`與三日平滑值均round到小數2位。

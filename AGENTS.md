@@ -31,6 +31,7 @@
 | 原始表 schema 新欄回補、正式 DB 全期稽核 | `RAW_DATA_BACKFILL.md` + `scripts/audit_raw_data.py`(唯讀) + `fetch_daily.py --backfill-expanded-fields` |
 | 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
 | 策略計算驗收、C1/C2/C3前瞻觀測與固定檢視 | `STRATEGY_VALIDATION_PROTOCOL.md` + `scripts/validation_progress.py` |
+| 實驗性策略快速比較、增刪與短週期迭代 | `EXPERIMENT_LAB.md` + `scripts/experiment_lab.py` + `scripts/audit_experiment_lab.py`；5／10／20 日可安排下一輪，不等正式 F10 長期門檻 |
 | **算任何新的統計量、或要對使用者宣稱一個結果** | `ANALYSIS_DISCIPLINE.md`(起飛前檢查表 + 宣稱時要附什麼 + 唯讀怎麼強制) |
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
 | 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` + `scripts/qual_review.py`(複核 triage) |
@@ -42,6 +43,9 @@
 
 - **勿憑 in-sample 或單日/單週數據調策略**——一律走 `WEEKLY_REVIEW.md` 的 OOS 行動門檻;
   每次最多動 1~2 個旋鈕。
+- 上述正式策略門檻不阻擋實驗候選迭代：專案不實盤，實驗旋鈕集中在
+  `config/experiment_lab.json`，可用歷史重播與短期前瞻安排保留／簡化／重設。
+  每輪另登錄 config／source SHA，完整保留候選與結果；不把探索稱為已證明效力。
 - 改了權重或 tier 條件,**必須同步把 `scripts/validate.py` 的 `IS_CUTOFF` 改成當天**
   (否則舊 OOS 會被新規則重複當證據)。
 - **數字必附誤差與樣本規模**(`±SE (t=…)`、有效獨立觀測、連續區段);只寫點估計等於

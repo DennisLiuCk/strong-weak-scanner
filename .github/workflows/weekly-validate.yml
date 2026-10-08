@@ -36,6 +36,12 @@ jobs:
       - name: 更新新版策略的固定樣本驗證進度
         run: python scripts/validation_progress.py
 
+      - name: 更新短週期實驗比較與固定檢視
+        run: python scripts/experiment_lab.py
+
+      - name: 獨立核對短週期實驗數值
+        run: python scripts/audit_experiment_lab.py
+
       - name: 同步首頁的證據狀態與最新週報連結
         run: |
           python scripts/build_dashboard.py
