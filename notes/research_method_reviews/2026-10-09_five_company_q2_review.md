@@ -96,5 +96,11 @@ append-only 歷史、知識圖譜、雷達、方法帳本、完整測試及隔�
 `next_five/prepublish/verification.json` 的 `ok`、`protected_unchanged` 均為 true；
 隔離重建的 index／research 與待發布檔案逐位元相同。
 
+公開站桌面抽查確認譜瑞新版正式筆記及小作文可讀；同時發現正文相對 Markdown
+連結被呈現為純文字，因此本批五篇均改用研究中心正式筆記的完整網址。這是導覽
+修正，沒有更動正式內容 SHA 或假說歷史；未宣稱完成全站或所有裝置的視覺檢查。
+連結修正後同環境重跑發布閘門亦全部通過，815 項測試略過 1 項；最終 receipt
+另存 `next_five/prepublish_links/verification.json`，未覆寫修正前紀錄。
+
 本批僅更新五家公司；既有市場 topic、monitor、active radar 仍依原期限及各自證據
 處理。10/12 是人工工作佇列點，未新增自動排程。完整研究計畫繼續進行。
