@@ -1,0 +1,186 @@
+{
+  "content_as_of": "2026-10-09",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        57,
+        65,
+        69,
+        70,
+        78,
+        80,
+        81
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 98,
+      "rendered_pages": [
+        1,
+        2,
+        56,
+        57,
+        58,
+        64,
+        65,
+        66,
+        68,
+        69,
+        70,
+        71,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "0d88309e1ed9a341f57f5b489b32f50a06b074dda16a73a690d76b3a997cb0b3",
+      "size_bytes": 1089541,
+      "url": "https://www.m31tech.com/wp-content/uploads/2026/08/M31%E8%82%A1%E6%9D%B1%E6%9C%83%E5%B9%B4%E5%A0%B1_202608%E4%BF%AE%E6%94%B9%E7%89%88.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        7,
+        9,
+        10,
+        12,
+        13,
+        37,
+        39,
+        58
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 63,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        36,
+        37,
+        38,
+        39,
+        40,
+        57,
+        58,
+        59
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "febf914e4baca58e370f0b9d328ff68cca0d5456c50ef407bb9264796aae21c3",
+      "size_bytes": 1332062,
+      "url": "https://www.m31tech.com/wp-content/uploads/2026/03/%E5%86%86%E6%98%9F114Q4%E5%90%88%E4%BD%B5%E9%9B%BB%E5%AD%90%E6%9B%B8final.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        13,
+        14,
+        15,
+        16,
+        21,
+        23,
+        24,
+        25,
+        28,
+        31,
+        45
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 50,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        44,
+        45,
+        46
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "89926c0d17ccb8a1147b1e14221fb98a11bffa6805902fcd4a1f21a60df17898",
+      "size_bytes": 1462880,
+      "url": "https://www.m31tech.com/wp-content/uploads/2026/09/%E5%86%86%E6%98%9F115Q2%E8%B2%A1%E5%A0%B1%E9%9B%BB%E5%AD%90%E6%9B%B8.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 5,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "d1a9f5809d229a1fc29e0bef849ac37e6d33b3ec257f1807a608d8f347670bce",
+      "size_bytes": 304666,
+      "url": "https://www.m31tech.com/wp-content/uploads/2026/08/%E7%B9%81%E4%B8%AD_%E5%86%86%E6%98%9F%E7%A7%91%E6%8A%802026%E5%B9%B4%E7%AC%AC%E4%BA%8C%E5%AD%A3%E6%B3%95%E8%AA%AA%E6%9C%83QA.pdf"
+    }
+  ],
+  "pack_sha256": "7a91e76991547efb4fe03ac27d9e0ab6fc7b94d95a17fc76128d974f5520eff0",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "6643",
+  "unverified_claims_removed": true
+}
