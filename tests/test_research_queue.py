@@ -2372,8 +2372,8 @@ class ReadabilityGateTest(unittest.TestCase):
             "reason: expanded_attestation_evidence_policy_decision_and_recovery_contract",
             text,
         )
-        self.assertEqual(text.count("<!-- research_claim\n"), 18)
-        self.assertEqual(text.count("<!-- research_source\n"), 12)
+        self.assertEqual(text.count("<!-- research_claim\n"), 20)
+        self.assertEqual(text.count("<!-- research_source\n"), 14)
         self.assertEqual(text.count("<!-- monitoring_item\n"), 4)
 
     def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):

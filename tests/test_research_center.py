@@ -2269,8 +2269,8 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 12),
-            ("research_claim", 18), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 14),
+            ("research_claim", 20), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9519,8 +9519,8 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 30),
-            ("research_claim", 35), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 32),
+            ("research_claim", 36), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9600,8 +9600,8 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 30),
-            ("research_claim", 35), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 32),
+            ("research_claim", 36), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9648,8 +9648,8 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 30),
-            ("research_claim", 35), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 32),
+            ("research_claim", 36), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -9698,8 +9698,8 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 30),
-            ("research_claim", 35), ("metric_comparison", 12),
+            ("research_topic", 1), ("research_source", 32),
+            ("research_claim", 36), ("metric_comparison", 12),
             ("impact", 6), ("monitoring_item", 12),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)

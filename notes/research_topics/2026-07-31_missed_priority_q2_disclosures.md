@@ -20,7 +20,7 @@ evidence_role: candidate_source
 route: formal_note_candidate
 thesis_claim_id: C19
 base_confidence: medium
-confidence_basis: 六家公司 Q2 一手揭露與六份 MOPS 正式附件索引已能重估證據強弱；力成、旺宏、欣銓、環球晶與台達電核閱季報進一步把本業、存貨會計、金融工具、現金流、資產轉列、重疊分母、量產時鐘及產品收入歸因拆開，但研究核對仍不等於正式筆記 evidence pack 與獨立 reviewer，復工、ASP、長供與 HBM2 訂單等市場主張仍未驗證
+confidence_basis: 六家公司 Q2 一手揭露與六份 MOPS 正式附件索引已能重估證據強弱；力成、旺宏、欣銓、環球晶與台達電核閱季報進一步把本業、存貨會計、金融工具、現金流、資產轉列、重疊分母、量產時鐘及產品收入歸因拆開，但研究核對仍不等於正式筆記 evidence pack 與獨立 reviewer；Novara 部分復工已有後續公司公告，完整恢復與財務影響、ASP、長供及 HBM2 訂單仍未驗證，此旁支不刷新 Q2 主命題
 cross_company_numbers: true
 schema_migrated_at: 2026-08-02
 -->
@@ -115,6 +115,14 @@ from: triaged
 to: triaged
 reason: added_powertech_q2_dual_marginal_mix_hbm_evidence_gates_and_cash_capex_bridges_without_refreshing_thesis_clock
 evidence: sources:S5,S21,S30
+-->
+
+<!-- transition
+date: 2026-10-08
+from: triaged
+to: triaged
+reason: added_novara_partial_restart_and_october_followup_without_claiming_full_recovery_or_refreshing_q2_thesis
+evidence: sources:S31,S32
 -->
 
 <!-- research_source
@@ -565,6 +573,38 @@ url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=6239&filena
 locator: pp.3-10、24、34-36；62 頁 PDF；SHA-256 0fdf9f373bde7e7d6659bbd234596fa59ee7ea37b0a1a16a5d24e0665df6d439
 limitation: 會計師因部分非重要子公司及權益法投資未經核閱而出具保留結論；這是同一發行人的 Q1 比較基準，不是獨立消息鏈，服務別收入、產品別占比、技術、客戶與訂單也沒有共同鍵
 independence_group: powertech-financial-report
+-->
+
+<!-- research_source
+source_id: S31
+role: company_release
+source_kind: document
+publisher: GlobalWafers
+title: 環球晶圓義大利諾瓦拉廠部分復工：磊晶製程恢復運作，首批產品開始出貨
+published_at: 2026-09-14
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://www.sas-globalwafers.com/gwc_news_20260914/
+locator: 正文第 1、4、5 段；HTML SHA-256 c89cd099d909894f80b61dcb612bddeb3e2682500d6776689c022d7644016c7c
+limitation: 公司自述部分前段及磊晶恢復、首批出貨；沒有量化完整產能、客戶收貨、復原收入或毛利，不能推成整廠完全恢復
+independence_group: globalwafers
+-->
+
+<!-- research_source
+source_id: S32
+role: company_release
+source_kind: document
+publisher: GlobalWafers
+title: SAS & GWC September 2026 Revenue Report
+published_at: 2026-10-07
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://www.sas-globalwafers.com/en/gwc_news_en_20261007/
+locator: 正文第 3 個非空段落，自 Although the impact of the fire 至 resilience 的 Novara 子段；HTML SHA-256 1fed5ce0a4914f746240a4dae2375cdca12bcbbc4ebd006fa4e99cd8ed7573d5
+limitation: 同一發行人再次說明 9/14 部分復工，並列後段重建、設備交期及驗證限制；不是第二條獨立驗證，也沒有廠區收入、ASP 或損失橋接，本篇不以月營收升級主命題
+independence_group: globalwafers
 -->
 
 <!-- research_claim
@@ -1141,6 +1181,23 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C36
+label: verified
+status: active
+claim: 環球晶在 9/14 公告 Novara 部分復工及首批出貨，10/7 續報確認磊晶先於 wafering 恢復；後段重建、支援廠產能及新設備驗證仍限制完整產能與營收恢復
+supporting_source_ids: S31,S32
+contrary_source_ids:
+as_of: 2026-10-07
+basis: 9/14 中文公告的部分復工與未完全恢復段落，對照 10/7 英文續報的 September 14、EPI、wafering 及重建／驗證限制
+boundary: verified 指公司確有此揭露，非獨立現場驗收；兩份稿件屬同一消息鏈，不支持全廠滿載、交付量、ASP、漲價、保險回收或可辨識廠區收入，也不改寫 6 月底的 Q2 事實
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- metric_comparison
 comparison_id: M1
 observation_id: M1-O1
@@ -1595,7 +1652,7 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 - **SHA（檔案雜湊）**：把檔案內容算成固定指紋；同一份 PDF 的 SHA 相同，才能確認撰寫者與複核者讀的是同一版本，但 SHA 本身不證明內容正確。
 - **p.／pp.（頁碼縮寫）**：p. 表示單一頁，pp. 表示連續或多個頁面；例如 p.36 是第 36 頁，pp.6–10 是第 6 至 10 頁。
 - **Siltronic**：德國矽晶圓公司。本文只涉及它在環球晶（6488）單季損益中造成的評價差異——**那是按市價評價的業外項目，與環球晶本業表現是兩件事**，不可混談。
-- **Novara**：環球晶位於義大利 Novara 的廠區。本文指該廠火災公告，以及復工時程尚未確定這件事。
+- **Novara**：環球晶位於義大利的廠區。9 月 14 日已公告部分復工；部分製程恢復不等於整廠產能與收入完全回復。
 - **HBM2**：HBM 的第二代。文中出現在封測公司的技術能力敘述裡；具備能力不等於已取得 HBM2 客戶、訂單或收入。
 - **DRAM（動態隨機存取記憶體）**：需要持續更新資料的揮發性記憶體大類；HBM 是其中強調高頻寬與堆疊的一支，不能把全部 DRAM 收入都叫作 HBM。
 - **Logic（邏輯晶片）**：執行運算、控制或介面功能的非記憶體晶片類別；力成簡報的 Logic 占比是產品分類，不是 AI、客戶或單一封裝技術占比。
@@ -1633,7 +1690,7 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 
 - 六家公司都已有 Q2 一手資料；8 月 13 日再次以同一 MOPS 索引核對，六份中文合併財報都可定位，其中力成與環球晶附件皆於 8 月 7 日上線。
 - 台達電 Q2 電源及零組件與基礎設施合計貢獻 93.19% 營收增量，但資料中心、AI、液冷與 HVDC 分屬重疊應用、產品與量產時鐘，不能相加為另一個合併營收。
-- 環球晶淨利要拆 Siltronic 評價，旺宏毛利率要拆存貨回升，欣銓量產要對齊日期，力成收入附註仍不能證明 HBM2；headline、會計與產品歸因都要逐層過關。
+- 環球晶淨利要拆 Siltronic 評價，Novara 後續部分復工也要與完全恢復分開；旺宏存貨回升、欣銓量產日期與力成 HBM2 歸因，同樣不能跳過證據層級。
 
 ### 為什麼重要
 
@@ -1653,7 +1710,7 @@ invalidation: 若仍只有產業復甦、稼動率形容詞或跨廠支援計畫
 
 - 以已取得的完整 Q2 季報逐項重算營業利益、存貨評價、金融工具、營運資金、資產轉列、折舊與現金時鐘，並送正式筆記 frozen pack 獨立複核。
 - 對台達電固定要求部門×應用×產品族×客戶×實際收入的同期間交叉表；未揭露前，不把資料中心、AI、液冷與 HVDC 比例相加。
-- 追每家公司是否首次以一手文件證實長供、HBM2、量產收入、漲價、復工與產品組合，而不只延續市場說法。
+- 追每家公司是否首次以一手文件證實長供、HBM2、量產收入、漲價與產品組合；Novara 已有部分復工公告，接著查完整恢復、交付量與財務影響。
 - 對資本密集公司固定追蹤設備承諾、會計增添、付現、未完工程、折舊、借款、服務別收入與營業現金流，避免只看一個「量產」字樣。
 
 ### 想一想
@@ -1950,19 +2007,19 @@ Q2 現金流量表只有 H1 累計欄，本文以 H1 減 Q1 重建單季。Q2 �
 
 風險面的最強版本是：營收成長時毛利率與營益率仍下降，總折舊季增 9.49%，而新投入幾乎都
 先進未完工程及待驗設備；若新產能利用、價格或需求追不上成本吸收，本業壓力可能延續。7 月
-Novara 8 吋線停產又新增 Q3 復工、交付與損失的不確定性。但這仍是待驗證路徑：火災不能倒填
+Novara 8 吋線火災又新增 Q3 交付與損失的不確定性；9/14 部分復工與 10/7 續報已縮小「尚未復工」的疑問，完整恢復仍待驗。火災不能倒填
 Q2，合併表也沒有證明特定廠過度投資、客戶取消、保險不足或下季毛利必然惡化。
 
 ### 多空共同裁決：下一季固定追七個共同欄位
 
-先追 Novara 8 吋線的復工日期、受影響產能與交付，再追同期間的晶圓尺寸／產品數量、ASP、
+Novara 已有 9/14 部分復工的公司揭露，接著追受影響產能、完整恢復與交付量，再追同期間的晶圓尺寸／產品數量、ASP、
 利用率、折舊與營業現金流；最後才把保險或跨廠支援接入。只有產品×廠區×數量×售價×利用率
 ×毛利×收現落在同一期間，才能把本業回升升級成價格或新產能受惠。Siltronic 股價與選擇權
 則要另開金融工具帳，不再拿來代替晶圓景氣。
 
 ### 分母、誤差與限制
 
-- **母體**：N＝1 家發行人、N＝2 份相鄰季度核閱財報、N＝1 份 Q2 公司簡報與 N＝1 條同公司火災消息鏈；它們不是四個獨立樣本。真正產品×晶圓尺寸×廠區×客戶×數量×ASP×利用率×毛利×收現共同觀測 N＝0，Novara 復工與實際財務影響觀測亦 N＝0。
+- **母體**：N＝1 家發行人、N＝2 份相鄰季度核閱財報、N＝1 份 Q2 公司簡報與 N＝1 條同公司火災消息鏈；它們不是四個獨立樣本。10/8 補讀的兩份復工公告仍屬該公司消息鏈；真正產品×晶圓尺寸×廠區×客戶×數量×ASP×利用率×毛利×收現共同觀測 N＝0，沒有獨立現場驗收或可重算廠區財務影響。
 - **重算**：Q2 損益採季報直接單季欄；Q2 現金流、PP&E 與折舊採 H1 減 Q1。所有金額以新台幣千元原值運算，Python Decimal 與獨立 awk 對期間差、比率、損益橋、現金橋、資產轉列與金融工具殘差逐項一致。
 - **誤差**：這是指定文件的確定性重算，只有文章顯示四捨五入誤差，不是抽樣估計，因此沒有 sampling SE／t；公司模擬數是管理層反事實口徑，也不是信賴區間。
 - **核閱邊界**：Q1、Q2 會計師核閱結論皆未發現財報在所有重大方面未依準則編製；期中核閱仍不是年度查核。本輪文章核對也不是正式 6488 筆記的 focused_v1 frozen pack 與不同 reviewer 簽核。
@@ -2399,6 +2456,14 @@ HBM 業務為零或公司沒有客戶合作。
 
 ### 6488 環球晶
 
+**10/8 複核更新：部分復工已發生，完整恢復仍未證。** 公司在
+[9/14 公告](https://www.sas-globalwafers.com/gwc_news_20260914/)部分前段與磊晶恢復，首批產品開始出貨；
+[10/7 續報](https://www.sas-globalwafers.com/en/gwc_news_en_20261007/)再確認磊晶先於 wafering 恢復，
+但後段重建、支援廠產能、新設備交期與客戶驗證仍限制復原。原文所述「尚無復工日期」是
+7～8 月文件的當時邊界，本次由 C36 補上後續事件，不能繼續當作目前狀態。
+兩份同公司稿件沒有提供完整產能、交付量或廠區收入橋接，亦未完成正式公司筆記的獨立簽核；
+Q2 主命題 C19、原證據時鐘及既有會計數字保持不變。
+
 - [公司 Q2 營收公告](https://www.sas-globalwafers.com/en/gwc_news_en_20260707/)顯示 Q2
   營收 152 億元、季增 8.79%／年減 4.96%，H1 營收 292 億元、年減 7.6%；營收回升
   不能自行歸因於漲價。
@@ -2507,7 +2572,7 @@ hypothesis_refs: 6488:H1,6488:H2
 note_action: update_required
 action_due: 2026-08-19
 rationale: Q1／Q2 核閱季報已固定版本並補齊本業、金融工具、現金、資產轉列、折舊與期後事件橋；文章 drafter 核對不等於正式 focused pack，仍需不同 reviewer 離線重算後再更新正式筆記
-evidence_boundary: 季報與簡報仍沒有 8 吋復工日期、ASP／漲價橋接、客戶接受度、廠區利用率或方形晶圓可辨識收入；Siltronic 評價與 PP&E 轉列也不能先把產業復甦推成財務受惠
+evidence_boundary: 9/14 與 10/7 公司公告已補部分復工及首批出貨；完整產能、交付量、ASP／漲價橋接、客戶接受度、廠區利用率與方形晶圓可辨識收入仍缺，Siltronic 評價與 PP&E 轉列不能替代這些分母
 -->
 
 ## 下一個可證明／否定的節點
@@ -2527,7 +2592,7 @@ evidence_boundary: 季報與簡報仍沒有 8 吋復工日期、ASP／漲價橋�
 - 環球晶 Q1／Q2 財報已由文章 drafter 固定 SHA、擷取全文並核對引用頁；下一步用同版本建立
   focused_v1 frozen pack，由不同 reviewer 重算營業利益／業外／淨利橋、FVTPL／選擇權、
   Q2 營業現金流 21.39 億元、設備付現 22.02 億元、未完待驗轉出 418.47 億元與日期邊界。
-- 環球晶只追尚未關閉的變數：8 吋復工日期／產能與交付影響、晶圓 ASP／客戶接受度、
+- 環球晶已確認部分復工的公司揭露，接著追尚未關閉的變數：完整產能恢復／交付量及財務影響、晶圓 ASP／客戶接受度、
   廠區利用率、方形晶圓驗證及可辨識收入；沒有直接證據就維持 H# open。
 - 台達電只追尚未關閉的產品×應用×部門×客戶×實際收入交叉表、HVDC 實際出貨／收入、
   減損案回收或判決、部門利益率、折舊與 H2 CapEx 實績；沒有共同分母就不估 AI、液冷與

@@ -43,7 +43,8 @@ class OctoberVersionFollowupTest(unittest.TestCase):
             self.assertEqual(monitors['T3'][field], monitors['T5'][field])
         self.assertEqual(monitors['T5']['watch_source_ids'], 'S18')
         with (ROOT / 'notes/research_method_reviews/monitor_reviews.csv').open(encoding='utf8', newline='') as f:
-            rows = [r for r in csv.DictReader(f) if r['checked_at'] == '2026-10-08']
+            rows = [r for r in csv.DictReader(f) if r['checked_at'] == '2026-10-08'
+                    and not r['review_id'].startswith('MR-2026-10-08-EVENING-')]
         self.assertEqual(len(rows), 7)
         for row in rows:
             self.assertEqual(row['result'], 'not_yet_testable')

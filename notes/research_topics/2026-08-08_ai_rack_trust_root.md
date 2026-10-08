@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C7
 base_confidence: medium
-confidence_basis: 規格層由 OCP Caliptra 與 DMTF SPDM 兩條獨立標準鏈各自公開可定位文件，保證層的不對稱也直接來自兩邊自己的公開狀態標示；但本輪只核對規格與索引頁的版本、範圍與狀態，沒有任何實作稽核結果、場域證據或台灣公司財務足跡
+confidence_basis: 8月原主命題以 OCP Caliptra 與 DMTF SPDM 兩條獨立標準鏈的規格、索引版本及狀態判讀保證層差異；10月新辨識的具名 BMC 韌體短式稽核報告補上限定版本的實作稽核範圍，但仍不足以證明整櫃信任與授權鏈、場域驗收或台灣公司財務，故維持原信心水準與主命題證據時鐘
 cross_company_numbers: false
 -->
 
@@ -67,6 +67,13 @@ to: triaged
 reason: added_attestation_token_age_nonce_consumption_and_authorization_boundary_without_thesis_or_clock_refresh
 evidence: sources:S8,S9,S12
 -->
+<!-- transition
+date: 2026-10-08
+from: triaged
+to: triaged
+reason: identified_existing_bmc_safe_report_and_current_solid_reporting_requirement_without_thesis_or_clock_refresh
+evidence: sources:S13,S14
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -87,6 +94,9 @@ evidence: sources:S8,S9,S12
 - **一致性測試（conformance test）**：用共同測試題目檢查產品是否照規格回應；通過的範圍仍要看版本、測試項目與被測配置。
 - **第三方稽核**：由賣方與買方以外的合格機構檢查實作與證據，讓買方不必只相信廠商自述。
 - **OCP S.A.F.E.**：OCP 推動的安全稽核制度，由核可機構檢查裝置硬體與韌體並出具報告；制度存在不等於每一款產品都已送審或通過。
+- **S.O.L.I.D.**：OCP 按產品類型整理的安全要求；S.A.F.E. 稽核用它檢查缺口。要求清單本身不是產品測試結果。
+- **AMI／MegaRAC**：AMI 是本輪短式稽核報告列出的韌體供應商，MegaRAC Community Edition 是受測 BMC 韌體名稱；不代表報告涵蓋 AMI 所有版本或所有使用它的伺服器。
+- **Scope（稽核範圍）**：說明稽核檢查哪些層次與活動；本次 AMI 報告的 scope 1 是程式碼與架構檢查，不能擴大解讀為完整機櫃驗收。
 - **草稿／WIP**：尚未正式定稿的工作版本，英文為 work in progress；它可能繼續修改，不能當成正式測試結果。
 - **OCP**：開放運算計畫，由雲端業者與硬體商共同制定資料中心硬體規格與驗證制度的組織。
 - **DMTF**：制定資料中心管理與裝置互通標準的組織；本文使用它發布的 SPDM 與授權規格。
@@ -127,7 +137,7 @@ evidence: sources:S8,S9,S12
 
 - 一條會切斷整櫃水電的指令，不能只看誰送出；系統還要確認送出者真實身分、目前執行的程式版本，以及它是否有權做這件事。
 - 前三件事都有公開規格，但規格寫好不等於產品真的照做；買方還需要第四關，由共同測試或第三方稽核來查證實作。
-- 晶片側已有第三方稽核制度，零件互驗的共同測試指引卻仍停在草稿；因此產品頁寫「支援 Caliptra／SPDM」，目前不能直接讀成已通過獨立查證，更不能讀成 5274 信驊已有相關訂單或收入。
+- 本輪已找到具名 BMC 韌體的第三方稽核短報告，但它只覆蓋指定版本與範圍，仍列有風險項目；產品頁寫「支援 Caliptra／SPDM」，不能直接讀成整櫃授權鏈已通過查證，更不能讀成 5274 信驊已有相關訂單或收入。[S13]
 
 ### 為什麼重要
 
@@ -142,7 +152,7 @@ evidence: sources:S8,S9,S12
 ### 接下來怎麼追
 
 - 先看零件互驗的共同測試指引（DSP-IS0023）是否由草稿轉成正式版本，以及授權白皮書是否如期發布；這會直接改變「規格比查證制度成熟」的判斷。
-- 再看 OCP 是否公布新的 S.A.F.E. 稽核報告或新增稽核機構，稽核範圍有沒有從單一晶片延伸到 BMC 或完整機櫃。
+- 接著核對已找到的 BMC 稽核長報告、被測韌體版本及缺口處置，再找完整機櫃的驗收鏈；另追蹤自 2026 年 10 月 1 日起，S.A.F.E. 長報告必須列出 S.O.L.I.D. 要求缺口的實際落地情況。[S13][S14]
 - 若平台開始談遠端證明，要求它同時公開證據涵蓋範圍、新鮮度、參考值版本、驗證政策、結果效期、授權後果與失敗復原，不接受只有一張「簽章成功」截圖。
 - 最後看 5274 信驊是否首次在季報、法說或重大訊息中，揭露 AST2700 的客戶驗證階段、量產出貨與可辨識收入或毛利。
 
@@ -463,6 +473,60 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: OCP S.A.F.E. 官方儲存庫保存一份 AMI MegaRAC Community Edition 的短式 JSON 稽核報告，device.category 為 BMC Firmware、repo_tag 為 CE-AMI202510、fw_version 為 2.1-dev；audit 記載 Tetrel Security Inc. 白箱稽核、scope 1、2025-10-09 完成、report_version 2.0，且 issues 陣列列有四項風險，包括 IPMI 密碼管理及服務中的密碼學使用問題
+supporting_source_ids: S13
+contrary_source_ids:
+as_of: 2026-10-08
+basis: 固定 commit 的 JSON device 與 audit 欄位可直接核對上述版本、範圍、日期及四個 issues 列項；四項是單份文件的精確列項計數，不是風險發生率或抽樣統計
+boundary: 這是本研究於2026-10-08新辨識的2025年報告，不是本日新發布或新部署；本輪未讀長式報告，短表不證明目前實際部署版本、缺口已修補、整櫃授權鏈安全或任何台灣公司的產品、客戶與財務；不得把 BMC Firmware 稽核外推成 AST2700 通過稽核
+verification_needed: 對照長式報告的實際受測功能、排除項與缺口處置，並由具名部署文件確認採用的韌體版本與機櫃授權及復原驗收
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: OCP S.A.F.E. Review Scope 在2026-10-08取得的固定版本要求稽核檢查是否符合按產品類型定義的 S.O.L.I.D. 要求，並明示自2026-10-01起，長式報告必須列出這些要求的缺口；將缺口列為短式報告 issues 則仍描述為未來要求
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-10-08
+basis: S14 Review Scope 開頭區分產品安全要求與稽核檢查領域，並直接列出 long-form gaps 的2026-10-01起始日，以及 short-form issues 尚待未來強制的差別
+boundary: 2026-10-01是文件明示的要求生效日，並非本輪查得的發布日；制度要求不證明任何特定長報告已遵守、任何缺口已修補或所有產品已通過，亦不能據此要求較早的S13短報告包含新制全部欄位
+verification_needed: 取得2026-10-01後出具的具名長式報告，核對產品類型、適用要求、缺口與處置，再判斷制度要求是否落地
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 10 月 8 日複核：BMC 已有具名稽核，仍要對準版本與範圍
+
+這次新增的是一份先前未納入本文的舊報告。OCP 官方儲存庫中的 AMI MegaRAC Community
+Edition 短報告，明列被測對象為 BMC 韌體 `2.1-dev`、版本標籤 `CE-AMI202510`，由 Tetrel
+執行 scope 1 白箱稽核，完成日為 2025 年 10 月 9 日。這讓查核從「有一套稽核制度」前進到
+「有具名 BMC 韌體報告」，但不是 2026 年 10 月才開始稽核 BMC。[S13]
+
+報告仍列四項風險，且本輪只核對公開短表，未讀長報告；因此不能把報告存在讀成沒有漏洞，
+也不能判定現有部署是否使用同一版本、相關問題是否已處置，或它能否安全完成整櫃授權與復原。
+AMI 報告也沒有替信驊 AST2700 或台灣公司出具產品與財務證明。[S13]
+
+另一項更新是報告要求。SAFE 現行 Review Scope 明示，自 2026 年 10 月 1 日起，長式報告
+必須列出對 S.O.L.I.D. 產品安全要求的缺口；短式報告必須把這些缺口列成 issues，仍是未來安排。
+要判斷制度是否真的落地，下一步須取得新制後的具名長報告，不能只看規則文字。[S14]
+
+本輪只有一份 BMC 短報告與一份制度文件，均由 OCP SAFE 儲存庫發布，不算兩個獨立安全
+驗證樣本。SAFE 官網與儲存庫的稽核機構名錄另有差異，尚未核實加入日期，不宣稱新增機構。
+以上新增 C19／C20 旁支；C7 的完整信任與授權鏈、SPDM 查證、場域驗收及公司財務仍需各自
+補證，因此 C7、主題 `last_reviewed_at`、`review_due` 與 `base_confidence` 保留原值。
+
 ## 高風險指令要過四關：身分、版本、權限與查證
 
 回到前面的場景。一道「關掉這櫃的水電」的指令要能被信任，不能只驗一張電子身分證；系統要依序回答四個不同問題。
@@ -472,7 +536,7 @@ resolution:
 | 1. 確認身分 | 誰在發出或回應這道指令？ | Caliptra 規定晶片內的信任根如何建立身分起點，SPDM 規定零件如何交換身分憑證 | 某一款產品已正確實作、啟用並通過查證 |
 | 2. 確認版本 | 現在執行的程式與設定是不是預期版本？ | Caliptra 可量測晶片內程式，SPDM 可把量測結果交給另一端查驗 | 簽章正確的版本一定安全，或驗證失敗後系統一定會停止動作 |
 | 3. 核對權限 | 確認身分後，它可不可以切斷水電或隔離設備？ | SPDM 體系另有正式授權規格，專門處理允許哪些動作 | 任一 AI 機櫃已把這套授權規格接進實際控制流程 |
-| 4. 查證是否照做 | 買方憑什麼相信廠商的實作符合規格？ | 晶片側已有 OCP S.A.F.E. 第三方稽核制度 | 所有相關產品都已通過稽核；零件互驗的共同測試指引目前仍停在草稿 |
+| 4. 查證是否照做 | 買方憑什麼相信廠商的實作符合規格？ | OCP S.A.F.E. 已有具名 BMC 韌體短報告，需按被測版本與範圍閱讀 [S13] | 報告存在不代表沒有風險、目前部署版本相同或整櫃授權鏈已驗收 |
 
 四關有先後順序，也有不同責任。第一與第二關建立「這是誰、現在跑什麼」，第三關才決定「能做什麼」，第四關則讓買方不用只相信廠商自述。前一關通過，不能替後一關出具結果。
 
@@ -804,6 +868,38 @@ status: active
 url: https://www.rfc-editor.org/rfc/rfc7519.html
 locator: RFC header 與 §§4.1.4–4.1.6；exp 定義 current time 必須早於 expiration、可為 clock skew 提供小幅 leeway，nbf 定義 not-before，iat 可用來判斷 token age；RFC header 只標 May 2015，帳本日期以 2015-05-01 正規化且不主張日精度
 limitation: JWT 是通用 claims token 規格，exp／nbf／iat 都是 optional，並不指定 EAT profile、attestation freshness max-age、nonce lifecycle、時間可信度、授權或 AI rack safe default；與 S8／S9 同屬 IETF 標準鏈，不另計獨立產品、平台或實作樣本
+-->
+
+<!-- research_source
+source_id: S13
+role: other_primary
+source_kind: document
+publisher: Open Compute Project / Tetrel Security Inc.
+independence_group: ocp-safe-audit
+title: AMI MegaRAC Community Edition 2.1-dev — OCP SAFE short-form report 2.0
+published_at: 2025-10-10
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://raw.githubusercontent.com/opencomputeproject/OCP-Security-SAFE/ce04fca4d27510024366eca5951d3462d60280de/Reports/AMI/2025/MegaRAC%20Community%20Edition/2025-10-10_AMI-US-Holdings-Inc_AMI-2025-%28OpenBMC-v21%29_Final-Report.json
+locator: 固定commit ce04fca4d27510024366eca5951d3462d60280de 的 JSON review_framework_version、device.vendor/product/category/repo_tag/fw_version，以及audit.srp/methodology/completion_date/report_version/scope_number/issues；本地SHA-256 d1819587cfe29b93761c3711385ef69dd1af55c6ecb112e447691a3898134844
+limitation: published_at採官方檔名日期2025-10-10，audit完成日另為2025-10-09，不主張檔案首次上網時刻；這是本輪新辨識的舊短報告，未核長式報告、部署版本或修補狀態。device.manifest為檔案雜湊清單，不是額外安全測試；不能把單份BMC韌體scope1報告推成整櫃、AST2700、量產部署、客戶驗收或財務證據
+-->
+
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: living_index
+publisher: Open Compute Project
+independence_group: ocp-safe-audit
+title: OCP S.A.F.E. Review Scope — 2026-10-08 capture
+published_at:
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://raw.githubusercontent.com/opencomputeproject/OCP-Security-SAFE/ce04fca4d27510024366eca5951d3462d60280de/Documentation/review_scope.md
+locator: 固定commit ce04fca4d27510024366eca5951d3462d60280de 的Review Scope開頭產品安全要求段與scope1–3定義；原文明列long-form reports自2026-10-01起須列S.O.L.I.D. gaps，short-form issues則為未來要求；本地SHA-256 a604f68db9236264780a999e1912831772a035ebb18a8e17eed7380f076a7846
+limitation: 現行制度文件的固定版本capture，未取得單一發布日；2026-10-01是文內要求生效日而非本輪證實的發布日。文件要求不證明特定報告已符合、產品已通過或缺口已修補；與S13共用OCP SAFE發布鏈，不能計成兩個獨立產品安全樣本
 -->
 
 ## 族群影響
