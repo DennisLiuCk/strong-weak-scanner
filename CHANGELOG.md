@@ -1,5 +1,17 @@
 # Changelog
 
+## 四家公司 Q2 正式研究與多空小作文同步 — 2026-10-09
+
+- 欣銓、雙鴻、創意及力旺各以四份核心一手文件完成 focused_v1 研究，同 pack 由另一
+  reviewer 離線核對 SHA、數字、期間、單位及推論；各篇 note 與 manifest 分別提交。
+- 四篇小作文對齊新正式內容，補擴產現金需求、預收款與交付、毛利及匯稅酬勞等分歧；
+  八則原假說的主張、日期與 transition 不變，仍到期未決。新增 partial 掃描及方法快照，
+  不刷新市場主命題、monitor 或雷達時鐘。範圍與後續見
+  `notes/research_method_reviews/2026-10-09_four_company_q2_review.md`。
+- Windows／系統 Python 3.12.10、utf8_mode=0、預設 cp950：正式 lint、證據包驗證及
+  整合後完整測試通過（793 項、略過 1 項）；前期權限與依賴失敗紀錄保留。研究提交
+  未改策略、DB 或歷史快照；發布共同閘門與部署確認另存本輪 receipt。
+
 ## 驗證方法、同分計算與前瞻觀測契約 — 2026-10-09
 
 - 修正 `stats_ci` 的交易日距離 HAC：缺值與 regime 缺口不再壓縮；補日期對齊、
