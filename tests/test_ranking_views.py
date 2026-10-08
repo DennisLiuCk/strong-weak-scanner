@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,7 +57,7 @@ class RankingMathTest(unittest.TestCase):
         first = rv.compute_group_views(rows, fundamentals=fundamentals)
         second = rv.compute_group_views(list(reversed(rows)), fundamentals=fundamentals)
         keys = ("champion_pct", "lens_a", "lens_b", "lens_c", "lens_d",
-                "peer_sensitivity", "shadow_vol0", "shadow_price10")
+                "peer_sensitivity", "shadow_vol0", "shadow_price10", "shadow_resil05")
         by_id = {row["stock_id"]: row for row in second}
         for row in first:
             self.assertIsNotNone(row["lens_d"])
@@ -123,12 +124,41 @@ class RankingMathTest(unittest.TestCase):
         })
         self.assertEqual(rv.CHALLENGERS["vol_zero"]["weights"]["vol"], 0.0)
         self.assertEqual(rv.CHALLENGERS["price_1_0"]["weights"]["price"], 1.0)
+        self.assertEqual(rv.CHALLENGERS["resil_0_5"]["weights"]["resil"], 0.5)
         self.assertIn("unchanged", rv.RANKING_CONTRACT["champion"]["status"])
 
     def test_spec_sha_covers_contract_and_evaluators(self):
         self.assertRegex(rv.SPEC_SHA, r"^[0-9a-f]{64}$")
         self.assertEqual(rv.SPEC_SHA, rv.spec_digest())
-        self.assertEqual(rv.CHALLENGERS["vol_zero"]["oos_start"], "2026-08-13")
+        self.assertEqual(rv.CHALLENGERS["vol_zero"]["oos_start"], "2026-10-09")
+        self.assertEqual(rv.CHALLENGERS["vol_zero"]["original_registered_at"], "2026-08-13T00:00:00+08:00")
+        self.assertEqual(rv.PREVIOUS_SPECS[0]["registered_at"], "2026-09-07T00:00:00+08:00")
+
+    def test_spec_covers_every_helper_and_score_dependency(self):
+        baseline = rv.spec_digest()
+        for helper in ("rankdata", "_aggregate_component_percentiles", "_overheat_ratio", "_pareto"):
+            with mock.patch.object(rv, helper, lambda *args, **kwargs: None):
+                self.assertNotEqual(rv.spec_digest(), baseline, helper)
+        with mock.patch.object(score, "average_ranks", lambda values: [1] * len(values)):
+            self.assertNotEqual(rv.spec_digest(), baseline)
+        with mock.patch.dict(score.WEIGHTS, {"resil": .5}):
+            self.assertNotEqual(rv.spec_digest(), baseline)
+        self.assertEqual(rv.spec_digest(), baseline)
+
+    def test_c3_uses_three_effective_days_round2_and_never_backfills(self):
+        con = sqlite3.connect(":memory:")
+        con.row_factory = sqlite3.Row
+        columns = ",".join(f"s_{key} REAL" for key in score.WEIGHTS)
+        con.execute(f"CREATE TABLE daily_scores(date,stock_id,{columns})")
+        for day, price, resil in (("2026-10-08", 1, 2), ("2026-10-12", 2, 1), ("2026-10-13", 0, -2)):
+            values = {key: 0 for key in score.WEIGHTS}
+            values.update(price=price, resil=resil)
+            con.execute("INSERT INTO daily_scores VALUES(" + ",".join("?" for _ in range(2 + len(values))) + ")",
+                        (day, "A", *(values[key] for key in score.WEIGHTS)))
+        self.assertEqual(rv.shadow_composites(con, "2026-10-08")["resil_0_5"], {})
+        self.assertEqual(rv.shadow_composites(con, "2026-10-13")["resil_0_5"]["A"], 1.57)
+        self.assertEqual(con.execute("SELECT s_resil FROM daily_scores WHERE date='2026-10-13'").fetchone()[0], -2)
+        con.close()
 
 
 class FundamentalPointInTimeTest(unittest.TestCase):
@@ -325,7 +355,11 @@ class DashboardContractTest(unittest.TestCase):
         payload = json.JSONDecoder().raw_decode(
             text, text.index("RANKV=") + len("RANKV="))[0]
         self.assertEqual(len({row["g"] for row in payload["rows"]}), 11)
-        self.assertEqual(payload["specSha"], rv.SPEC_SHA)
+        if payload["date"] < rv.EFFECTIVE_FROM:
+            known_specs = {rv.SPEC_SHA, *(item["spec_sha"] for item in rv.PREVIOUS_SPECS)}
+            self.assertIn(payload["specSha"], known_specs)
+        else:
+            self.assertEqual(payload["specSha"], rv.SPEC_SHA)
         data = json.JSONDecoder().raw_decode(
             text, text.index("DATA=") + len("DATA="))[0]
         with (ROOT / "config" / "universe.csv").open(encoding="utf-8", newline="") as handle:
@@ -345,9 +379,11 @@ class DashboardContractTest(unittest.TestCase):
         source = (SCRIPTS / "validate.py").read_text(encoding="utf-8")
         for fragment in (
                 "Challenger 相對 Champion 的同日配對差",
-                "challenger_daily[d] - champion_daily[d]",
+                "vm.paired_rank_ics(",
+                "group_deltas.append(pair[1] - pair[0])",
                 'summary["eff_obs"] < 10',
-                "仍需另驗 tier／成本後才可改 production",
+                "多重比較校準及 tier／成本驗證前不得採用",
+                "shadow_resil05",
                 'row["spec_sha"] == rv.SPEC_SHA'):
             self.assertIn(fragment, source)
 

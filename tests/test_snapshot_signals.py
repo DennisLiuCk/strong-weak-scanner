@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import snapshot_signals as ss
+import score
 from test_suspension_events import add_evidence
 
 
@@ -77,6 +78,7 @@ class SnapshotSignalsTest(unittest.TestCase):
             (self.date, "TWSE_MI_INDEX", 100.0, 100.0, 0.0, "now"))
         self.con.execute("INSERT INTO risk_flags VALUES(?,?,?,?,?)",
                          (self.date, "1001", "注意", "test", None))
+        score.record_score_build(self.con)
         self.con.commit()
 
     def tearDown(self):
@@ -161,6 +163,8 @@ class SnapshotSignalsTest(unittest.TestCase):
         self.assertRegex(quality["ranking_spec_sha"], r"^[0-9a-f]{64}$")
         self.assertIn("ranking_lens_d", quality)
         self.assertIn("ranking_role_rank", quality)
+        self.assertEqual(quality["score_version"], score.SCORE_VERSION)
+        self.assertEqual(quality["score_spec_sha"], score.score_spec_digest())
 
         self.con.execute("UPDATE daily_scores SET tier='真弱', composite_s=-4 WHERE stock_id='1001'")
         self.con.commit()
@@ -180,6 +184,58 @@ class SnapshotSignalsTest(unittest.TestCase):
             "SELECT snapshot_id FROM oos_snapshot_runs WHERE is_official=1 "
             "ORDER BY data_date, captured_at, snapshot_id LIMIT 1").fetchone()[0]
         self.assertEqual(canonical, "run-1")
+
+    def test_missing_or_stale_score_build_cannot_be_published_as_new_rules(self):
+        self.con.execute("DELETE FROM score_build_metadata")
+        with self.assertRaisesRegex(RuntimeError, "score 規則版本"):
+            self.capture("missing-build", "2026-07-10T14:00:00+00:00")
+        score.record_score_build(self.con)
+        self.con.execute("UPDATE score_build_metadata SET score_spec_sha='old'")
+        with self.assertRaisesRegex(RuntimeError, "score 規則版本"):
+            self.capture("stale-build", "2026-07-10T14:00:00+00:00")
+
+    def test_pre_effective_rebuild_is_not_new_rule_oos(self):
+        self.capture("before-effective", "2026-07-10T14:00:00+00:00")
+        quality = json.loads(self.con.execute(
+            "SELECT quality_json FROM oos_snapshot_runs WHERE snapshot_id='before-effective'"
+        ).fetchone()[0])
+        self.assertFalse(quality["score_rules_effective"])
+        self.assertFalse(quality["oos_eligible"])
+        self.assertEqual(quality["publication_timing"], "before_score_rule_effective_date")
+
+    def test_c3_snapshot_roundtrip_and_original_values_are_immutable(self):
+        new_date = "2026-10-12"
+        for table in ("daily_metrics", "daily_scores", "chip_health", "price", "inst", "margin",
+                      "holding", "sbl", "group_metrics", "market_daily", "market_provenance", "risk_flags"):
+            self.con.execute(f"UPDATE {table} SET date=?", (new_date,))
+        self.capture("c3-first", "2026-10-12T15:50:00+00:00")
+        before = tuple(self.con.execute(
+            "SELECT shadow_resil05,payload_json FROM oos_ranking_view_snapshots "
+            "WHERE snapshot_id='c3-first' AND stock_id='1001'").fetchone())
+        self.assertEqual(before[0], 50.0)
+        self.assertEqual(json.loads(before[1])["shadow_resil05"], before[0])
+        self.con.execute("UPDATE daily_scores SET s_resil=2 WHERE stock_id='1001'")
+        self.capture("c3-revision", "2026-10-12T15:55:00+00:00")
+        after = tuple(self.con.execute(
+            "SELECT shadow_resil05,payload_json FROM oos_ranking_view_snapshots "
+            "WHERE snapshot_id='c3-first' AND stock_id='1001'").fetchone())
+        changed = self.con.execute(
+            "SELECT shadow_resil05 FROM oos_ranking_view_snapshots "
+            "WHERE snapshot_id='c3-revision' AND stock_id='1001'").fetchone()[0]
+        self.assertEqual(before, after)
+        self.assertEqual(changed, 100.0)
+
+    def test_c3_schema_migration_does_not_backfill_or_rewrite_old_rows(self):
+        legacy_schema = ss.SCHEMA.replace("shadow_price10 REAL, shadow_resil05 REAL", "shadow_price10 REAL")
+        self.con.executescript(legacy_schema)
+        self.con.execute("""INSERT INTO oos_ranking_view_snapshots
+            (snapshot_id,date,stock_id,grp,spec_sha,payload_json)
+            VALUES('legacy','2026-09-07','1001','g','old-spec','{"legacy":true}')""")
+        before = tuple(self.con.execute("SELECT * FROM oos_ranking_view_snapshots").fetchone())
+        ss.ensure_schema(self.con)
+        after = tuple(self.con.execute("SELECT * FROM oos_ranking_view_snapshots").fetchone())
+        self.assertEqual(after[:-1], before)
+        self.assertIsNone(after[-1])
 
     def test_same_run_is_idempotent(self):
         self.capture("run-1", "2026-07-10T14:00:00+00:00")

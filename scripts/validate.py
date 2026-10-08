@@ -13,7 +13,7 @@ validate.py — 週度驗證報告。讀 db 不寫 db,輸出 reports/validate_<�
   ⑥ 觀察因子(Phase 4a:TDCC 大戶/借券賣出餘額——未計分,IC 追蹤等 OOS 裁決歸宿)
 
 判讀紀律:
-  * IS_CUTOFF(2026-07-05)前屬 in-sample —— v2.1 權重在該窗校準,數字必然好看。
+  * IS_CUTOFF 前只作歷史診斷；現行規則與舊版快照不得接成同一條 OOS。
   * OOS 只認 `oos_*_snapshots` 的 as-seen 首次正式發布快照；cutoff 後但沒有快照的
     restated history 不得進 OOS。前瞻成熟仍需 2~4 週累積。
   * 前瞻視窗重疊 → 顯著性高估;30 檔小樣本 → 每次檢視最多調 1~2 個旋鈕。
@@ -22,7 +22,7 @@ validate.py — 週度驗證報告。讀 db 不寫 db,輸出 reports/validate_<�
   python scripts/validate.py           # 預設 10 日前瞻
   python scripts/validate.py --fwd 5
 """
-import argparse, json, os, sqlite3, statistics, sys
+import argparse, hashlib, json, os, sqlite3, statistics, sys
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -32,6 +32,8 @@ import hypotheses as hyp         # §⑪:事先登錄、規格雜湊凍結的可
 import ranking_views as rv       # §⑫:多視角／challenger append-only OOS 評估
 import db_ro                     # 唯讀開啟(強制 docstring 宣稱的「不寫 db」)
 import evidence_status
+import validation_metrics as vm
+import validation_progress as vp
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -41,13 +43,13 @@ except Exception:
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
 REPORTS = os.path.join(ROOT, "reports")
-IS_CUTOFF = "2026-07-05"      # v2.1 權重校準日:此日(含)之前 = in-sample
+IS_CUTOFF = "2026-10-09"      # 同分規則修正；舊版快照只供歷史診斷，新規則另起 OOS
 
 # ── §⑩ 淨成本下限的市場參數(不是策略旋鈕,是台股交易事實)────────────────
 # 訊號在台北 18:07 之後才算出來 → close(d) 買不到。可成交的最早進場是隔日開盤。
 COST_ROUND_TRIP = 0.1425 * 2 + 0.3    # 手續費 0.1425%×2 + 證交稅 0.3%(賣出)= 0.585%
 COST_DISCOUNTED = 0.1425 * 0.6 * 2 + 0.3   # 手續費 6 折 = 0.471%
-NET_HOLD_DAYS = (3, 5, 10, 20)        # 固定持有期對照(3 日 ≈ 照 tier 進出的實際持有)
+NET_HOLD_DAYS = (3, 5, 10, 20)        # 固定持有期敏感度，不等於依 tier 進出
 NET_TIERS = ("真強", "蓄勢·外資佈局")   # 只算「可能被當進場訊號」的層
 ELEMENTS = ["s_price", "s_resil", "s_vol", "s_foreign", "s_trust", "s_dip", "s_margin",
             "composite", "composite_s"]
@@ -97,6 +99,8 @@ def main():
     ap.add_argument("--reports", default=REPORTS, help="報告輸出目錄")
     args = ap.parse_args()
     F = args.fwd
+    if F <= 0:
+        ap.error("--fwd 必須大於 0")
 
     # docstring 寫「讀 db 不寫 db」——用 db_ro 讓那句話被強制,而不只是意圖
     # (2026-07-26 檢討:當天宣稱「全程唯讀」但 15 支腳本有 11 支沒真的唯讀開啟)
@@ -168,7 +172,8 @@ def main():
                 regime[d] = mr["regime"]
     except sqlite3.OperationalError:
         snap_runs = {}
-    snap_dates = loaded_snap_dates
+    legacy_snap_dates = loaded_snap_dates
+    snap_dates = loaded_snap_dates & set(evidence_status.current_score_runs(con, IS_CUTOFF))
 
     # 多視角與 challenger 從 2026-08-13 起另有自己的 spec_sha／OOS 時鐘；不從
     # daily_scores restated history 回填。舊快照沒有此表是預期狀態。
@@ -176,6 +181,8 @@ def main():
     ranking_specs = set()
     try:
         for d, run_id in snap_runs.items():
+            if d not in snap_dates or d <= IS_CUTOFF:
+                continue
             for row in con.execute(
                     "SELECT * FROM oos_ranking_view_snapshots WHERE snapshot_id=?", (run_id,)):
                 ranking_specs.add(row["spec_sha"])
@@ -269,6 +276,7 @@ def main():
         return statistics.median(v) if v else None
 
     tier_x = defaultdict(lambda: defaultdict(list))   # tier -> bucket -> [excess]
+    tier_daily = defaultdict(lambda: defaultdict(list))
     for d in dates:
         if d not in v2:
             continue
@@ -280,6 +288,7 @@ def main():
                 continue
             for b in bs:
                 tier_x[r["tier"]][b].append(f - gv)
+            tier_daily[r["tier"]][d].append(100 * (f - gv))
 
     trans = defaultdict(lambda: defaultdict(list))   # (from,to) -> bucket -> [excess]
     for sid in all_sids:
@@ -304,6 +313,7 @@ def main():
     # 若 OOS 顯示該組不再落後(20 日視窗本就會收斂)→ 考慮放寬 STEALTH 的抗跌條件。
     OFF_HIGH = -0.03   # 同 score.py STEALTH_OFF_HIGH
     cohort = defaultdict(lambda: defaultdict(list))   # 分組 -> bucket -> [excess]
+    cohort_daily = defaultdict(lambda: defaultdict(list))
     for d in dates:
         if d not in v2:
             continue
@@ -321,10 +331,12 @@ def main():
                 if m["down_rs20"] is not None else "抗跌缺值"
             for b in bs:
                 cohort[key][b].append(f - gv)
+            cohort_daily[key][d].append(100 * (f - gv))
 
     # ── ④ 族群層 ──────────────────────────────────────────────
     dip_hit = defaultdict(list)   # bucket -> [1/0]
     dip_base = defaultdict(list)  # bucket -> [隨當日族群數變動的隨機基準]
+    dip_delta_daily = {}
     state_x = defaultdict(lambda: defaultdict(list))  # state -> bucket -> [group excess]
     for d in dates:
         if d not in gm:
@@ -341,11 +353,11 @@ def main():
             dips = {g: gm[d][g]["med_dip"] for g in day_grps
                     if g in gm[d] and gm[d][g]["med_dip"] is not None}
             if len(dips) == len(day_grps):
-                leader = max(dips, key=dips.get)
-                hit = 1 if gf[leader] == max(gf.values()) else 0
+                hit, baseline = vm.leader_hit(dips, gf)
+                dip_delta_daily[d] = 100 * (hit - baseline)
                 for b in bs:
                     dip_hit[b].append(hit)
-                    dip_base[b].append(1 / len(day_grps))
+                    dip_base[b].append(baseline)
             for g in day_grps:
                 if g in gm[d]:
                     for b in bs:
@@ -472,17 +484,20 @@ def main():
         except (KeyError, TypeError, ValueError):
             snapshot_quality_issues.append(f"{d} quality_json 無法解析")
     L = []
+    review_integrity_errors = []
     w = L.append
     w(f"# 驗證報告 · 資料至 {last}(前瞻 {F} 日,還原價)")
     w("")
     w(f"- 覆蓋:{dates[0]} ~ {last},共 {len(dates)} 交易日;"
       f"修正 regime {sum(1 for v in regime.values() if v == 1)} 日、"
       f"多頭 {sum(1 for v in regime.values() if v == 0)} 日、冷啟動 {sum(1 for v in regime.values() if v is None)} 日")
-    w(f"- **IS/OOS 分界 {IS_CUTOFF}**(v2.1 權重校準日);正式 as-seen OOS 快照 "
+    w(f"- **IS/OOS 分界 {IS_CUTOFF}**(現行同分規則生效日);同 score spec 的正式 as-seen OOS 快照 "
       f"{n_oos} 日、其中前瞻 {F} 日已成熟 {n_oos_mature} 日"
       + f"；**{evidence['label']}**")
-    w(f"- 樣本狀態：有效獨立觀測約 {evidence['eff_obs']:.1f}、"
+    w(f"- 樣本狀態：重疊窗有效樣本尺度 n/F={evidence['eff_obs']:.1f}(啟發式)、"
       f"連續區段 {evidence['episodes']}；{evidence['reason']}")
+    w(f"- 歷史正式快照另有 {len(legacy_snap_dates - snap_dates)} 日；保留舊版訊號，"
+      "不算新規則 OOS。全期／IS／市值切片只供歷史診斷，可能混合規則版本。")
     if restated_post_dates:
         w(f"- cutoff 後另有 {len(restated_post_dates)} 日僅存最新規則重算歷史"
           f"({restated_post_dates[0]}~{restated_post_dates[-1]}),**不計入 OOS**。")
@@ -492,7 +507,7 @@ def main():
     w("")
     w("## ① 元素 rank-IC(族群內 = 汰弱留強的正確量尺)")
     w("")
-    w("> 下表只有點估計與格數。**格數不是獨立樣本**——證據強度(標準誤、有效獨立觀測、連續區段)見 §⑨,t<2 時大小順序沒有意義。")
+    w("> 下表只有點估計與格數。**格數不是獨立樣本**——標準誤、n/F樣本尺度與連續區段見 §⑨，未過分級門檻不依大小排名決策。")
     w("")
     w("| 因子 | 族群內·全期 | 族群內·OOS | 族群內·修正 | 族群內·多頭 | 混池·全期 |")
     w("|---|---|---|---|---|---|")
@@ -622,40 +637,44 @@ def main():
     lo_shares = sig.variance_shares([[v2[d][s] for s in v2[d] if grp_of(d, s) == g]
                                      for d in dates if d in v2 for g in grps_on(d)]) or {}
 
-    def comp_ic(weights, bucket_name):
-        acc = []
+    def comp_pair(weights, bucket_name):
+        original_daily, alternative_daily, cells = {}, {}, 0
         for d in dates:
             if d not in v2 or bucket_name not in bucket(d):
                 continue
+            pairs = []
             for g in grps_on(d):
                 sids = [s for s in v2[d] if grp_of(d, s) == g and fwd(d, s) is not None]
-                ic = spearman([sig.composite_of(v2[d][s], weights) for s in sids],
-                              [fwd(d, s) for s in sids])
-                if ic is not None:
-                    acc.append(ic)
-        return (mean(acc), len(acc))
+                pair = vm.paired_rank_ics(
+                    {s: sig.composite_of(v2[d][s]) for s in sids},
+                    {s: sig.composite_of(v2[d][s], weights) for s in sids},
+                    {s: fwd(d, s) for s in sids})
+                if pair is not None:
+                    pairs.append(pair)
+            if pairs:
+                original_daily[d] = mean([p[0] for p in pairs])
+                alternative_daily[d] = mean([p[1] for p in pairs])
+                cells += len(pairs)
+        delta = sci.paired_daily_difference(alternative_daily, original_daily, all_dates=dates)
+        ds = sorted(delta)
+        return sci.summarize([delta[d] for d in ds], F, ds, dates), cells
 
-    base = {b: comp_ic(sig.WEIGHTS, b) for b in ("全期", "OOS")}
-    w("| 移除的元素 | 權重 | 變異貢獻·全期 | IC·全期 | Δ | IC·OOS | Δ |")
-    w("|---|---|---|---|---|---|---|")
-    w(f"| (現行 {len([k for k, v in sig.WEIGHTS.items() if v])} 個計分元素) | – | – | "
-      f"{fmt_ic(base['全期'][0], base['全期'][1])} | — | "
-      f"{fmt_ic(base['OOS'][0], base['OOS'][1])} | — |")
+    w("| 移除的元素 | 權重 | 變異貢獻·全期 | 桶 | 配對 ΔIC ±SE (t) | 日數 | n/F | 區段 | 配對族群格 |")
+    w("|---|---|---|---|---|---|---|---|---|")
     for el, wt in sorted(sig.WEIGHTS.items(), key=lambda kv: -kv[1]):
         if not wt:
             continue
         dropped = {k: (0.0 if k == el else v) for k, v in sig.WEIGHTS.items()}
-        cells = []
         for b in ("全期", "OOS"):
-            v, n = comp_ic(dropped, b)
-            cells.append(fmt_ic(v, n))
-            cells.append(f"{v - base[b][0]:+.3f}" if (v is not None and base[b][0] is not None) else "–")
-        share = lo_shares.get(el)
-        w(f"| s_{el} | {wt:.1f} | " + (f"{share:.0%}" if share is not None else "–")
-          + " | " + " | ".join(cells) + " |")
+            s, cells = comp_pair(dropped, b)
+            share = lo_shares.get(el)
+            prefix = f"| s_{el} | {wt:.1f} | " + (f"{share:.0%}" if share is not None else "–")
+            w(prefix + f" | {b} | " + (f"{sci.fmt(s)} | {s['n_days']} | {s['eff_obs']:.1f} | {s['episodes']} | {cells} |"
+                                       if s else "– | 0 | 0 | 0 | 0 |"))
     w("")
     w("> Δ 為正 = 移除該元素後 composite 變準,即它在加權和裡是淨負貢獻。"
-      "全期欄大部分落在 IS 窗,只能當假說;動權重一律等 OOS 欄達 §① 的連 N 週門檻。")
+      "兩邊 composite 都 round(…,2)，配對同日、同族群、同股票；任一邊零變異就整對剔除。"
+      "這是未平滑的回溯消融診斷；即使輸入來自 OOS，也不是新權重策略的前瞻驗證，不能直接調權重。")
     w("")
     lead = max(lo_shares, key=lambda k: lo_shares[k]) if lo_shares else None
     if lead:
@@ -723,9 +742,9 @@ def main():
       f"下表先把同一天各族群的 IC 收斂成「每日一個數」,再用 Newey-West"
       f"(lag={sci.overlap_lag(F)})估標準誤。")
     w("")
-    w("| 因子 | 桶 | 日均 IC ±NW SE (t) | 交易日 | 有效獨立觀測 | 連續區段 | 判讀 |")
+    w("| 因子 | 桶 | 日均 IC ±NW SE (t) | 交易日 | n/F（啟發式） | 連續區段 | 判讀 |")
     w("|---|---|---|---|---|---|---|")
-    for el in ("composite_s", "s_price", "s_resil", "s_foreign", "s_dip", "s_trust", "s_margin"):
+    for el in ELEMENTS:
         for b in ("全期", "OOS", "修正", "多頭"):
             by_d = wg_by_date[el].get(b) or {}
             if not by_d:
@@ -736,17 +755,41 @@ def main():
                 continue
             w(f"| {el} | {b} | {sci.fmt(s)} | {s['n_days']} | **{s['eff_obs']:.1f}** | "
               f"{s['episodes']} | {sci.verdict(s)} |")
-    ac = sci.autocorr1([mean(v) for _, v in sorted((wg_by_date['composite_s'].get('全期') or {}).items())])
+    ac_days = sorted(wg_by_date['composite_s'].get('全期') or {})
+    ac = sci.autocorr1([mean(wg_by_date['composite_s']['全期'][d]) for d in ac_days],
+                      dates_used=ac_days, all_dates=dates)
     if ac is not None:
         w("")
         w(f"- 日 IC 序列 lag-1 自相關 = **{ac:+.2f}**——這就是不能用一般標準誤的原因。")
-    w(f"- 有效獨立觀測 = 交易日數 ÷ {F}。{n_oos_mature} 個成熟 OOS 日 ≈ "
-      f"**{sci.effective_obs(n_oos_mature, F):.1f} 個獨立觀測**。")
+    w(f"- 重疊窗有效樣本尺度 n/F = 交易日數 ÷ {F}。{n_oos_mature} 個成熟 OOS 日，"
+      f"n/F={sci.effective_obs(n_oos_mature, F):.1f}；這是啟發式，沒有證明樣本獨立。"
+      "HAC 依完整交易日距離加權，缺值／regime 缺口不壓縮成相鄰日。")
     w("- 連續區段 = 該桶的交易日切成幾段連續期間。修正桶若只來自少數幾段大跌,"
       "「修正期有效」講的是那幾個事件,不是規律。")
     w("")
     w("> **規矩**:沒有標準誤與區段數的數字,不得作為調旋鈕的依據——"
-      "點估計的大小順序在 t<2 時沒有意義。§①②③ 的點估計請一律回到本節查證據強度。")
+      "未通過分級門檻不判定方向；分級門檻也不等於多重比較或連續檢視的錯誤率保證。")
+    w("")
+    w("### tier、cohort 與族群命中的日聚合不確定性")
+    w("")
+    w("| 指標（百分點） | 桶 | 日均值／配對差 ±SE (t) | 日數 | n/F | 區段 | 判讀 |")
+    w("|---|---|---|---|---|---|---|")
+    inference_series = {f"tier {k}": {d: mean(v) for d, v in by_day.items()}
+                        for k, by_day in tier_daily.items()}
+    pass_daily = {d: mean(v) for d, v in cohort_daily["抗跌≥0(放行)"].items()}
+    blocked_daily = {d: mean(v) for d, v in cohort_daily["領跌<0(擋下)"].items()}
+    inference_series["cohort 擋下−放行"] = sci.paired_daily_difference(
+        blocked_daily, pass_daily, all_dates=dates)
+    inference_series["med_dip 命中−當日隨機基準"] = dip_delta_daily
+    for label, series in inference_series.items():
+        for b in ("全期", "OOS"):
+            ds = sorted(d for d in series if b in bucket(d))
+            s = sci.summarize([series[d] for d in ds], F, ds, dates)
+            w(f"| {label} | {b} | " + (f"{sci.fmt(s)} | {s['n_days']} | {s['eff_obs']:.1f} | {s['episodes']} | {sci.verdict(s)} |"
+                                       if s else "– | 0 | 0 | 0 | 尚無成熟資料 |"))
+    w("> 每日先等權聚合股票，再跨日估 SE；與 §②③ 股票日加權的描述均值不同。"
+      "cohort 只配對兩邊皆有值的同日，沒有控制組別組成，不是濾網因果效果。"
+      "med_dip 同分領先族群等權分配；報酬領先平手的隨機基準 = 領先族群數／當日族群數。")
     w("")
     # ── ⑩ 淨成本下限 ──────────────────────────────────────────────
     # §①~⑨ 量的全是「毛」訊號品質,且用 close(d) → close(d+F)。但訊號在台北 18:07
@@ -759,6 +802,8 @@ def main():
       f"(還原開盤 = 原始開盤 × 還原收盤/原始收盤)。"
       f"來回成本 **{COST_ROUND_TRIP:.3f}%**(手續費 0.1425%×2 + 證交稅 0.3%);"
       f"6 折手續費為 {COST_DISCOUNTED:.3f}%。")
+    w("OOS 只含現行 score spec 的首次、及時正式快照；IS 包含舊版快照，重算桶沒有可用的"
+      "現行正式快照，兩者只供歷史診斷。價格使用目前還原歷史，未建模滑價、成交容量或漲跌停無法成交。")
     w("")
     # 還原開盤(price_adj 只存 close,係數逐日逐股相同)
     adj_o = {}
@@ -779,8 +824,8 @@ def main():
     # (A) 執行時差:同一個 composite_s,只換報酬定義
     w("### A 執行時差:換成可成交的報酬定義後,毛 IC 變多少")
     w("")
-    w("| 報酬定義 | 日均 IC ±NW SE (t) | 交易日 | 有效獨立觀測 |")
-    w("|---|---|---|---|")
+    w("| 報酬定義 | 桶 | 日均 IC ±NW SE (t) | 交易日 | n/F | 區段 |")
+    w("|---|---|---|---|---|---|")
     for label, n0, n1, use_open in (
             (f"close(d) → close(d+{F})  §① 現行定義(**買不到**)", 0, F, False),
             (f"open(d+1) → open(d+1+{F})  隔日開盤進出(可成交)", 1, 1 + F, True)):
@@ -806,10 +851,11 @@ def main():
                     v.append(ic)
             if v:
                 by_d[d] = mean(v)
-        ds = sorted(by_d)
-        s = sci.summarize([by_d[d] for d in ds], F, ds, dates)
-        if s:
-            w(f"| {label} | {sci.fmt(s)} | {s['n_days']} | {s['eff_obs']:.1f} |")
+        for b in ("OOS", "IS", "重算"):
+            ds = sorted(d for d in by_d if b in bucket(d))
+            s = sci.summarize([by_d[d] for d in ds], F, ds, dates)
+            w(f"| {label} | {b} | " + (f"{sci.fmt(s)} | {s['n_days']} | {s['eff_obs']:.1f} | {s['episodes']} |"
+                                       if s else "– | 0 | 0 | 0 |"))
     w("")
 
     # (B) 優勢是否藏在買不到的隔夜跳空
@@ -832,58 +878,38 @@ def main():
                 v.append(ic)
         if v:
             gp[d] = mean(v)
-    ds = sorted(gp)
-    sg = sci.summarize([gp[d] for d in ds], 1, ds, dates)   # 跳空不重疊 → lag 0
-    if sg:
-        w(f"- **B 隔夜跳空**:composite_s 對「當日收盤 → 隔日開盤」的族群內 IC "
-          f"**{sci.fmt(sg)}**——若接近 0,代表優勢不是集中在買不到的那一刻。")
-        w("")
+    for b in ("OOS", "IS", "重算"):
+        ds = sorted(d for d in gp if b in bucket(d))
+        # One-day returns may still be serially correlated; retain the primary
+        # validation bandwidth instead of assuming lag zero implies independence.
+        sg = sci.summarize([gp[d] for d in ds], F, ds, dates)
+        if sg:
+            w(f"- **B 隔夜跳空·{b}**:族群內 IC {sci.fmt(sg)}；日數 {sg['n_days']}，"
+              f"n/F={sg['eff_obs']:.1f}，區段 {sg['episodes']}；HAC lag={sci.overlap_lag(F)}。")
+    w("")
 
     # (C) 固定持有期的淨超額(先按日聚合再 NW,避免同股連續日重複計入)
     w(f"### C 固定持有期的淨超額(vs 族群中位,已扣 {COST_ROUND_TRIP:.3f}%)")
     w("")
-    w("| 進場層 | 固定持有 | 交易日 | 有效獨立觀測 | 淨超額 ±NW SE (t) | 判讀 |")
-    w("|---|---|---|---|---|---|")
+    w("| 進場層 | 固定持有 | 桶 | 交易日 | n/H | 區段 | 淨超額 ±NW SE (t) | 排除股票日／選中股票日 |")
+    w("|---|---|---|---|---|---|---|---|")
     for tier_name in NET_TIERS:
         for H in NET_HOLD_DAYS:
-            daily = {}
-            for d in dates:
-                if d not in v2:
-                    continue
-                d0, d1 = shift(d, 1), shift(d, 1 + H)
-                if not d0 or not d1:
-                    continue
-                # 每個族群的報酬只算一次
-                gret = {}
-                for g in grps_on(d):
-                    gr = {s: oret(s, d0, d1) for s in v2[d] if grp_of(d, s) == g}
-                    gr = {k: x for k, x in gr.items() if x is not None}
-                    if len(gr) >= 6:
-                        gret[g] = gr
-                vals = []
-                for s, row in v2[d].items():
-                    if row["tier"] != tier_name:
-                        continue
-                    g = grp_of(d, s)
-                    gr = gret.get(g)
-                    if not gr or s not in gr:
-                        continue
-                    peers = [x for k, x in gr.items() if k != s]
-                    if len(peers) < 5:
-                        continue
-                    vals.append((gr[s] - statistics.median(peers)) * 100 - COST_ROUND_TRIP)
-                if vals:
-                    daily[d] = mean(vals)
-            ds = sorted(daily)
-            s = sci.summarize([daily[d] for d in ds], H, ds, dates)
-            if s:
-                w(f"| {tier_name} | {H} 日 | {s['n_days']} | **{s['eff_obs']:.1f}** | "
-                  f"{sci.fmt(s)} | {sci.verdict(s)} |")
+            daily, coverage = vm.fixed_hold_net_series(v2, dates, adj_o, grp_of,
+                                                       tier_name, H, COST_ROUND_TRIP)
+            for b in ("OOS", "IS", "重算"):
+                ds = sorted(d for d in daily if b in bucket(d))
+                s = sci.summarize([daily[d] for d in ds], H, ds, dates)
+                selected = sum(v['selected'] for d, v in coverage.items() if b in bucket(d))
+                excluded = sum(v['excluded'] for d, v in coverage.items() if b in bucket(d))
+                w(f"| {tier_name} | {H} 日 | {b} | "
+                  + (f"{s['n_days']} | {s['eff_obs']:.1f} | {s['episodes']} | {sci.fmt(s)} | " if s
+                     else "0 | 0 | 0 | – | ") + f"{excluded}/{selected} |")
     w("")
-    w(f"> **怎麼讀**:`{NET_HOLD_DAYS[0]} 日`約等於「照 tier 進出」的實際持有"
-      f"(§⑧ 顯示真強中位停留 4~5 日,進出各延一天後約 3 日)。持有期越長,"
-      f"固定成本被攤薄、點估計越好——但有效獨立觀測同時變少,長持有反而更難判讀。"
-      f"**沒有一格達到 |t|>2 之前,不可宣稱這套訊號在扣成本後仍有效。**")
+    w("> **怎麼讀**:進出各延一天不會縮短持有期。3／5／10／20 日是固定持有的敏感度，"
+      "都不等於依 tier 進出的策略。這是每日股票 cohort 的淨超額，基準為未扣成本的"
+      "排除自身族群中位數；中位數不是可持有投組，本表也不是 NAV。"
+      "正點估計或單一 t 門檻不證明可交易獲利；升格仍需預登錄換手、容量、滑價與成本驗證。")
     w("")
     # ── ⑪ 事先登錄的假設 ──────────────────────────────────────────
     # 「多分析師比勝率」在統計上做不到:依實測變異外推,分辨兩個正交策略真差 ΔIC=0.02
@@ -892,12 +918,15 @@ def main():
     w("## ⑪ 事先登錄的假設(OOS 時鐘自登錄日起算)")
     w("")
     hctx = {
-        "dates": dates, "scores": {d: v2[d] for d in v2}, "groups": GRPS,
+        "dates": dates, "scores": {d: v2[d] for d in v2},
+        "groups": tuple(sorted(set(GRPS) | {g for gs in snap_grps.values() for g in gs})),
         "grp_of": grp_of, "shift": shift, "oret": oret,
     }
     for h in hyp.REGISTRY:
         digest = hyp.spec_digest(h)
         drift = "" if digest == h["spec_sha"] else f" ⚠ **規格已被改動**(現 `{digest}`)"
+        if drift:
+            review_integrity_errors.append(f"{h['id']} spec mismatch: {digest} != {h['spec_sha']}")
         w(f"### {h['id']} {h['name']}(登錄 {h['registered']},`spec_sha` `{h['spec_sha']}`){drift}")
         w("")
         w(f"- **白話**:{h['plain']}")
@@ -909,7 +938,7 @@ def main():
         w(f"- **登錄時的 in-sample 值**:{pr['value_pct']:+.3f}% ±{pr['se_pct']:.3f}% "
           f"(t={pr['t']:+.1f})——{pr['note']}")
         w("")
-        w("| 樣本 | 日聚合差 ±NW SE (t) | 交易日 | 有效獨立觀測 | 依宣告條件的狀態 |")
+        w("| 樣本 | 日聚合差 ±NW SE (t) | 交易日 | n/H（啟發式） | 依宣告條件的狀態 |")
         w("|---|---|---|---|---|")
         for label, flt in (("OOS(as-seen 快照日,登錄後)",
                             {d for d in snap_dates if d >= h["registered"]}),
@@ -918,7 +947,8 @@ def main():
             if not s:
                 w(f"| {label} | – | 0 | 0.0 | 尚無資料 |")
                 continue
-            st = hyp.status(h, s) if flt is not None else "(背景值,不判定)"
+            st = ("規格漂移，不判定" if drift else
+                  hyp.status(h, s) if flt is not None else "(背景值,不判定)")
             w(f"| {label} | {sci.fmt(s)} | {s['n_days']} | **{s['eff_obs']:.1f}** | {st} |")
         w("")
     w("> **為什麼登錄假設而不是登錄策略名單**:依實測變異外推,要分辨兩個正交策略的真實"
@@ -932,17 +962,17 @@ def main():
     # ── ⑫ 多視角與 challenger ────────────────────────────────────
     w(f"## ⑫ 多視角排名與 challenger(現行 spec 登錄 {rv.REGISTERED_AT[:10]})")
     w("")
-    w("> A/B/C/D 是回答不同問題的觀察層，不比『哪位分析師最準』；只有 C1/C2 與正式"
+    w("> A/B/C/D 是回答不同問題的觀察層，不比『哪位分析師最準』；只有 C1/C2/C3 與正式"
       "Champion 在完全相同的 as-seen 日、族群與前瞻窗下比較。共識／Pareto 不作第五個分數。")
     w("")
     drift = "" if not ranking_specs or ranking_specs == {rv.SPEC_SHA} else (
         " ⚠ **快照含不同 spec_sha，必須分版評估**")
     w(f"- 現行 ranking spec:`{rv.SPEC_SHA}`{drift}")
-    w(f"- tie policy:{rv.RANKING_CONTRACT['tie_policy']}；production 權重／tier 未改。")
+    w(f"- tie policy:{rv.RANKING_CONTRACT['tie_policy']}；production 權重維持，tier 同分邊界規則另版。")
     w(f"- 現行 spec 已有正式快照 {len(ranking_snapshots)} 日；前瞻 {F} 日成熟 "
       f"{sum(1 for d in ranking_snapshots if d in didx and didx[d] + F < len(dates))} 日。")
     w("")
-    w("| 排名 | OOS 日聚合 rank-IC ±NW SE (t) | 交易日 | 有效獨立觀測 | 判定 |")
+    w("| 排名 | OOS 日聚合 rank-IC ±NW SE (t) | 交易日 | n/F（啟發式） | 判定 |")
     w("|---|---|---|---|---|")
     ranking_columns = [
         ("champion_pct", "Champion（tie-safe 顯示秩）"),
@@ -952,6 +982,7 @@ def main():
         ("lens_d", "D 基本面／全局（觀察）"),
         ("shadow_vol0", "C1 量能權重歸零"),
         ("shadow_price10", "C2 價格權重降至1.0"),
+        ("shadow_resil05", "C3 抗跌權重降至0.5"),
     ]
     ranking_daily = {}
     for column, label in ranking_columns:
@@ -984,39 +1015,76 @@ def main():
     w("")
     w("### Challenger 相對 Champion 的同日配對差")
     w("")
-    w("> 正值代表 challenger 的日聚合 rank-IC 高於 Champion；只比較兩者都有值的同一批"
-      "交易日，避免拿不同市場區段的兩個點估計相減。")
+    w("> 正值代表 challenger 的日聚合 rank-IC 高於 Champion；在每一天先配對同族群、"
+      "同股票集合，雙邊皆有變異才納入，再等權聚合族群；不能僅配對日期。")
     w("")
-    w("| Challenger − Champion | 配對 Δrank-IC ±NW SE (t) | 交易日 | 有效獨立觀測 | 區段 | 治理狀態 |")
+    w("| Challenger − Champion | 配對 Δrank-IC ±NW SE (t) | 交易日 | n/F（啟發式） | 區段 | 治理狀態 |")
     w("|---|---|---|---|---|---|")
-    champion_daily = ranking_daily.get("champion_pct", {})
     for column, label in (("shadow_vol0", "C1 量能權重歸零"),
-                          ("shadow_price10", "C2 價格權重降至1.0")):
-        challenger_daily = ranking_daily.get(column, {})
-        common_dates = sorted(set(champion_daily) & set(challenger_daily))
-        delta = [challenger_daily[d] - champion_daily[d] for d in common_dates]
+                          ("shadow_price10", "C2 價格權重降至1.0"),
+                          ("shadow_resil05", "C3 抗跌權重降至0.5")):
+        paired_daily = {}
+        for d, rows in sorted(ranking_snapshots.items()):
+            group_deltas = []
+            for group in sorted({r['grp'] for r in rows.values()}):
+                group_rows = {s: r for s, r in rows.items() if r['grp'] == group}
+                pair = vm.paired_rank_ics(
+                    {s: r['champion_pct'] for s, r in group_rows.items()},
+                    {s: r[column] for s, r in group_rows.items()},
+                    {s: fwd(d, s) for s in group_rows})
+                if pair is not None:
+                    group_deltas.append(pair[1] - pair[0])
+            if group_deltas:
+                paired_daily[d] = mean(group_deltas)
+        common_dates = sorted(paired_daily)
+        delta = [paired_daily[d] for d in common_dates]
         summary = sci.summarize(delta, F, dates_used=common_dates, all_dates=dates)
         if not summary:
             w(f"| {label} | – | 0 | 0.0 | 0 | 尚無成熟配對資料 |")
-            continue
-        threshold = sci.t_threshold(summary["eff_obs"])
-        if summary["eff_obs"] < 10:
-            status = "累積中（升格 gate:有效觀測 ≥10）"
-        elif summary["t"] is None:
-            status = "樣本不足"
-        elif summary["t"] >= threshold:
-            status = "研究 gate 通過；仍需另驗 tier／成本後才可改 production"
-        elif summary["t"] <= -threshold:
-            status = "顯著落後；放棄此 challenger"
         else:
-            status = f"與 Champion 無法分辨（門檻 {threshold:.1f}）"
-        w(f"| {label} | {sci.fmt(summary)} | {summary['n_days']} | "
-          f"**{summary['eff_obs']:.1f}** | {summary['episodes']} | {status} |")
+            threshold = sci.t_threshold(summary["eff_obs"])
+            if summary["eff_obs"] < 10:
+                status = "累積中（研究門檻 n/F ≥10）"
+            elif summary["t"] is None:
+                status = "樣本不足"
+            elif summary["t"] >= threshold:
+                status = "達探索門檻；固定檢視、多重比較校準及 tier／成本驗證前不得採用"
+            elif summary["t"] <= -threshold:
+                status = "探索性反向；於預定檢視點複核，不按每週偷看裁決"
+            else:
+                status = f"與 Champion 無法分辨（門檻 {threshold:.1f}）"
+            w(f"| {label} | {sci.fmt(summary)} | {summary['n_days']} | "
+              f"**{summary['eff_obs']:.1f}** | {summary['episodes']} | {status} |")
+        fixed_reviews = {}
+        if F == vp.HORIZON:
+            sources = hashlib.sha256()
+            for source_path in (__file__, sci.__file__, sig.__file__, vm.__file__, vp.__file__):
+                with open(source_path, 'rb') as source_file:
+                    sources.update(os.path.basename(source_path).encode('ascii'))
+                    sources.update(source_file.read().replace(b'\r\n', b'\n'))
+            import score
+            context = {'series_id': column, 'score_spec_sha': score.score_spec_digest(),
+                       'ranking_spec_sha': rv.SPEC_SHA, 'protocol_version': vp.PROTOCOL_VERSION,
+                       'source_sha': sources.hexdigest(), 'snapshot_ids': snap_runs}
+            fixed_reviews = vp.fixed_review_records(
+                paired_daily, dates, F, context,
+                os.path.join(args.reports, 'validation_reviews', vp.PROTOCOL_VERSION))
+        for n, record in fixed_reviews.items():
+            if record['drift'] or not record['integrity_ok']:
+                review_integrity_errors.append(f"{column}/{n}: {record['drift_reasons']}")
+                w(f"| {label} 固定前 {n} 配對日 | ⚠ 封存輸入漂移／完整性錯誤 | – | – | – | 停止裁決，保留原帳本 |")
+                continue
+            fixed = record['summary']
+            w(f"| {label} 固定前 {n} 配對日 | {sci.fmt(fixed)} | {n} | "
+              f"{fixed['eff_obs']:.1f} | {fixed['episodes']} | 封存 {record['first_date']}～{record['last_date']}；不能自動採用 |")
+    if F != vp.HORIZON:
+        w(f"> 本次 F={F} 為視窗敏感度；不產生固定主檢視，不能替代 F={vp.HORIZON} 的預登錄研究。")
     w("")
-    w("> **裁決規則**:C1/C2 是看過既有資料後才提出，2026-08-13 前一律是 in-sample；"
-      "新 spec 只認此後 append-only 快照。配對差在有效獨立觀測 <10 或未通過分級 t 門檻時，"
+    w("> **裁決規則**:C1/C2/C3 均為看過既有資料後提出；本版只認 2026-10-09 後同 spec 的"
+      "append-only 快照。配對差在 n/F <10 或未通過分級 t 門檻時，"
       "不得以點估計大小更換 Champion；即使通過，也只取得進入 tier／成本預登錄驗證的資格，"
-      "不會自動改 production。D 只使用 first-seen ledger 可證明當時已知的資料。")
+      "不會自動改 production。正式檢視依 STRATEGY_VALIDATION_PROTOCOL.md 的固定樣本節點，"
+      "週度數字不視為新的一次獨立驗證。D 只使用 first-seen ledger 可證明當時已知的資料。")
     w("")
     w("## 判讀警語")
     w("")
@@ -1027,8 +1095,10 @@ def main():
 
     os.makedirs(args.reports, exist_ok=True)
     path = os.path.join(args.reports, f"validate_{last}.md")
-    with open(path, "w", encoding="utf-8") as fh:
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(L) + "\n")
+    if review_integrity_errors:
+        raise RuntimeError("驗證規格或固定檢視帳本不可靜默改寫：" + '; '.join(review_integrity_errors))
 
     # console 摘要
     print(f"報告已寫入 {path}\n")

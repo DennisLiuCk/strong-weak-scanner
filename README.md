@@ -35,6 +35,8 @@
 [`scripts/score.py`](scripts/score.py) 的 CONFIG 是個股策略唯一旋鈕來源。價格、抗跌、外資、
 投信與修正日買賣先在同族群內排五分位，得到 −2～+2 分；有效樣本少於 4 檔時不排名。
 外資、投信、修正日買賣另有雜訊死區，避免全族群都接近零時仍被硬分高低。
+相同原始值採平均序位後映射分數；`composite`與三日平滑值均round到小數2位。
+tier前2／倒2的同分邊界也採平均名次，同分者一同納入或排除，結果不依輸入列順序。
 
 | 因子 | 原始量與規則 | 權重 |
 |---|---|---:|
@@ -75,10 +77,11 @@ D 的月、季比較期間分別採「正式 universe 當期原始值 100% 到�
 足夠 component 可排名。沒有共同期間時暫停 D，並以品質警告顯示，不補 0。
 每次新期間資料不齊，頁面與 ranking audit 都顯示已收檔數、比較期與待切換期。
 
-正式 Champion 的 production 權重與 tier 維持不變。兩個 challenger 從 2026-08-13 起
-隨正式快照 append-only 累積：C1 把量能權重設為 0、C2 把價格權重 1.4 降為 1.0；它們只
-比較 tie-safe 族群名次，不重跑或暗改 tier。`spec_sha` 同時覆蓋 ranking contract 與核心
-evaluator；定義一變就必須開新 OOS 時鐘。
+正式 Champion 權重維持上表。三個影子 challenger 隨正式快照 append-only 累積：
+C1 把量能權重設為0、C2 把價格權重降為1.0、C3 把抗跌權重降為0.5；它們只比較族群名次，
+不改正式tier。`spec_sha`覆蓋ranking contract、會影響計算的helper與score規則依賴；
+score也有自己的spec與建置metadata。定義一變就開新OOS時鐘，只有同spec的首次及時正式
+快照可進成效样本，後來修正版不能代替首次發布。
 
 平行視角不以短期勝率互相比賽，也不因單日 tie／Pareto 數量調參。完整的五層評估矩陣、
 分階段門檻、factor 保留／移除／新增條件與 UX 任務見
@@ -171,7 +174,7 @@ peer sensitivity、component 與 append-only spec 進度；正式 final pipeline
 平日 19:07  再次 checkpoint；若 Actions 延遲到 23:40 後才啟動，直接正式補完
 平日 21:47  提前排隊；23:40 前啟動仍只做 checkpoint，延遲跨過門檻則正式補完
        ↓
-平日 23:47  TDCC → 五表終版補完 → 衍生指標 → score → A/B/C/D 與 C1/C2
+平日 23:47  TDCC → 五表終版補完 → 衍生指標 → score → A/B/C/D 與 C1/C2/C3
              → 正式 OOS snapshot → index + immutable archive → commit
 
 週六 09:00  validate.py → reports/validate_<資料日>.md
@@ -256,7 +259,7 @@ Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會
 - 各 tier 與 tier 轉移的前瞻超額報酬。
 - 蓄勢條件鏈、族群狀態與 `med_dip` 命中率。
 - 市值公平性，以及 TDCC/借券等未計分觀察因子。
-- §⑫ 只以 2026-08-13 後 append-only 快照比較 Champion、C1/C2，並追蹤 A/B/C/D；未成熟
+- §⑫ 只以現行spec的 append-only 快照比較 Champion、C1/C2/C3，並追蹤 A/B/C/D；未成熟
   時不報假精確的 SE/t，也不以點估計更換 Champion。
 
 策略判斷只認正式 as-seen 快照的 OOS 欄。完整門檻見
@@ -266,7 +269,10 @@ Pages latest build 確認已部署同一 commit，失敗或 5 分鐘逾時都會
 
 多視角另以 [`PARALLEL_VIEWS_ROADMAP.md`](PARALLEL_VIEWS_ROADMAP.md) 分開處理操作完整性、
 量測可靠性、視角差異性、使用者效用與 OOS 結果；前四層不等同預測證據，第五層也只有
-C1/C2 能依 §⑫ 取得 challenger 資格。
+C1/C2/C3 能依 §⑫ 取得進一步研究資格。現行驗收、固定首100／200／300個成熟配對日的
+檢視與前瞻成本研究，依[策略驗證契約](STRATEGY_VALIDATION_PROTOCOL.md)；每週
+`reports/validation_progress.json`顯示樣本進度。分級t只是探索門檻，不保證多重比較錯誤率，
+沒有自動更換正式策略的路徑。
 
 ## 本地使用與維運
 

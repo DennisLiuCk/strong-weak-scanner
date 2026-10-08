@@ -67,7 +67,7 @@ def _get(row, col):
 def composite_of(row, weights=None):
     """由元素重算 composite;缺值以 0 計(同 score.py 對無訊號元素的處理)。"""
     weights = WEIGHTS if weights is None else weights
-    return sum(w * _get(row, ELEMENT_COLS[k]) for k, w in weights.items())
+    return round(sum(w * _get(row, ELEMENT_COLS[k]) for k, w in weights.items()), 2)
 
 
 def variance_shares(groups, weights=None):
@@ -128,8 +128,9 @@ def top_n_churn(groups, element, weights=None, n=STRONG_TOP_N):
         if len(rows) <= n:
             continue
         def topn(wt):
-            ranked = sorted(rows, key=lambda r: composite_of(r, wt), reverse=True)
-            return {r["stock_id"] for r in ranked[:n]}
+            values = [composite_of(r, wt) for r in rows]
+            ranks = rankdata([-v for v in values])
+            return {r["stock_id"] for r, rank in zip(rows, ranks) if rank <= n}
         churn += len(topn(dropped) - topn(weights))
     return churn
 

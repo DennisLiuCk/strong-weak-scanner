@@ -74,7 +74,25 @@ class EvidenceStatusTest(unittest.TestCase):
                 (reports / name).write_text("title\n## ② Tier\n", encoding="utf-8")
             with patch.object(bd, "ROOT", folder):
                 result = bd.build_strategy_status(con, "2026-08-20")
-        self.assertEqual(result["oos_days"], 1)
-        self.assertEqual(result["evidence"]["oos_mature"], 1)
+        # Legacy snapshots are preserved but cannot count toward a new score spec.
+        self.assertEqual(result["oos_days"], 0)
+        self.assertEqual(result["evidence"]["oos_mature"], 0)
         self.assertEqual(result["report_date"], "2026-08-14")
         self.assertTrue(result["report_tier_url"].endswith("validate_2026-08-14.md#L2"))
+
+    def test_current_score_requires_exact_first_eligible_spec_after_cutoff(self):
+        import score
+        con = sqlite3.connect(":memory:")
+        con.row_factory = sqlite3.Row
+        self.addCleanup(con.close)
+        con.execute("CREATE TABLE oos_snapshot_runs(data_date,captured_at,snapshot_id,is_official,quality_json)")
+        quality = json.dumps({"score_spec_sha": score.score_spec_digest(), "oos_eligible": True})
+        con.executemany("INSERT INTO oos_snapshot_runs VALUES(?,?,?,?,?)", [
+            ("2026-10-09", "01", "cutoff", 1, quality),
+            ("2026-10-12", "01", "wrong", 1, '{}'),
+            ("2026-10-12", "02", "corrected", 1, quality),
+            ("2026-10-13", "01", "ok", 1, quality),
+            ("2026-10-14", "01", "late", 1, json.dumps({"score_spec_sha": score.score_spec_digest(), "oos_eligible": False})),
+            ("2026-10-14", "02", "late_revision", 1, quality),
+        ])
+        self.assertEqual(set(es.current_score_runs(con, "2026-10-09")), {"2026-10-13"})

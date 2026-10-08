@@ -1,0 +1,68 @@
+{
+  "confirmed_tier_changed_dates": 31,
+  "latest_changed_by_column": {
+    "composite": 0,
+    "composite_s": 0,
+    "pending": 0,
+    "s_dip": 0,
+    "s_foreign": 0,
+    "s_margin": 0,
+    "s_price": 0,
+    "s_resil": 0,
+    "s_trust": 0,
+    "s_vol": 0,
+    "tier": 0,
+    "tier_raw": 0,
+    "warn": 0
+  },
+  "method": "SQL bidirectional EXCEPT and aggregate IS NOT comparisons; all DB connections mode=ro/query_only",
+  "score_changed_by_column": {
+    "composite": 19,
+    "composite_s": 57,
+    "pending": 12,
+    "s_dip": 0,
+    "s_foreign": 19,
+    "s_margin": 0,
+    "s_price": 0,
+    "s_resil": 0,
+    "s_trust": 0,
+    "s_vol": 0,
+    "tier": 37,
+    "tier_raw": 38,
+    "warn": 1
+  },
+  "snapshot_inventory": {
+    "oos_group_snapshots": {
+      "new_minus_old": 0,
+      "new_rows": 11,
+      "old_minus_new": 0,
+      "old_rows": 652
+    },
+    "oos_market_snapshots": {
+      "new_minus_old": 0,
+      "new_rows": 1,
+      "old_minus_new": 0,
+      "old_rows": 60
+    },
+    "oos_ranking_view_snapshots": {
+      "new_minus_old": 0,
+      "new_rows": 120,
+      "old_minus_new": 0,
+      "old_rows": 4596
+    },
+    "oos_signal_snapshots": {
+      "new_minus_old": 0,
+      "new_rows": 120,
+      "old_minus_new": 0,
+      "old_rows": 7165
+    },
+    "oos_snapshot_runs": {
+      "new_minus_old": 0,
+      "new_rows": 1,
+      "old_minus_new": 0,
+      "old_rows": 60
+    }
+  },
+  "source_db_sha256": "1eaf40357565dcf085abbc21e8cba61741c97ab7b3f4c786466617e6f0554b69",
+  "status": "pass"
+}

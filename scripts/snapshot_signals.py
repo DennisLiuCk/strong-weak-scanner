@@ -22,6 +22,7 @@ import uuid
 import trading_status as tstatus
 import fetch_daily as fd
 import ranking_views as rv
+import score
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -125,7 +126,7 @@ CREATE TABLE IF NOT EXISTS oos_ranking_view_snapshots(
   spec_sha TEXT NOT NULL,
   champion_pct REAL,
   lens_a REAL, lens_b REAL, lens_c REAL, lens_d REAL,
-  shadow_vol0 REAL, shadow_price10 REAL,
+  shadow_vol0 REAL, shadow_price10 REAL, shadow_resil05 REAL,
   payload_json TEXT NOT NULL,
   PRIMARY KEY(snapshot_id, stock_id),
   FOREIGN KEY(snapshot_id) REFERENCES oos_snapshot_runs(snapshot_id)
@@ -195,6 +196,10 @@ def ensure_schema(con):
         if name not in signal_cols:
             con.execute(
                 f"ALTER TABLE oos_signal_snapshots ADD COLUMN {name} {signal_types.get(name, 'REAL')}")
+    ranking_cols = {r[1] for r in con.execute("PRAGMA table_info(oos_ranking_view_snapshots)")}
+    if "shadow_resil05" not in ranking_cols:
+        # Append-only migration: every historical row remains NULL; never backfill C3.
+        con.execute("ALTER TABLE oos_ranking_view_snapshots ADD COLUMN shadow_resil05 REAL")
     con.execute("""CREATE INDEX IF NOT EXISTS idx_oos_runs_official ON oos_snapshot_runs(
                    data_date, is_official, captured_at, snapshot_id)""")
     con.commit()
@@ -208,6 +213,21 @@ def _universe_table_count(con, table, data_date):
     return con.execute(
         f"""SELECT COUNT(DISTINCT t.stock_id) FROM {table} t
             JOIN universe u ON u.stock_id=t.stock_id WHERE t.date=?""", (data_date,)).fetchone()[0]
+
+
+def _score_build_quality(con, *, official, data_date):
+    """A code hash alone cannot prove daily_scores was rebuilt with those rules."""
+    expected = {"score_version": score.SCORE_VERSION,
+                "score_effective_from": score.SCORE_EFFECTIVE_FROM,
+                "score_spec_sha": score.score_spec_digest()}
+    have = con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='score_build_metadata'").fetchone()
+    row = con.execute("SELECT * FROM score_build_metadata WHERE id=1").fetchone() if have else None
+    matches = row is not None and all(row[key] == value for key, value in expected.items())
+    if official and not matches:
+        raise RuntimeError("拒絕發布 score 規則版本未重建或不一致快照；請先執行 score.py")
+    return {**(expected if matches else {key: None for key in expected}),
+            "score_build_verified": matches,
+            "score_rules_effective": matches and data_date >= score.SCORE_EFFECTIVE_FROM}
 
 
 def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
@@ -232,6 +252,7 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
     data_date = score_date
     if min_data_date and data_date < min_data_date:
         return None, data_date, False
+    score_quality = _score_build_quality(con, official=is_official, data_date=data_date)
     universe_ids = [r[0] for r in con.execute("SELECT stock_id FROM universe ORDER BY stock_id")]
     universe_n = len(universe_ids)
     excluded_rows = tstatus.verified_exclusions(con, data_date, universe_ids)
@@ -324,6 +345,7 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
                                             if market_provenance else None),
                    "market_abs_diff": (market_provenance["abs_diff"]
                                        if market_provenance else None)})
+    counts.update(score_quality)
 
     # 空事件/空風險名單在事件表本身看不出「已檢查」；fetch_daily 以 coverage 保存負面
     # 證據。升級前 db 沒有此表時維持相容，升級後正式發布必須全部檢查到資料日。
@@ -389,6 +411,8 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
     counts.update({
         "ranking_views": len(ranking_rows),
         "ranking_spec_sha": ranking_payload["specSha"],
+        "ranking_registered_at": rv.REGISTERED_AT,
+        "ranking_schema_version": rv.SCHEMA_VERSION,
         "ranking_lens_d": ranking_payload["coverage"]["lensD"],
         "ranking_role_rank": ranking_payload["coverage"]["roleRank"],
     })
@@ -421,6 +445,8 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
 
     # 時效不進 content_hash，假日／重跑相同內容仍返回首次快照；每筆新版本記真實發布時間。
     counts.update(publication_timing(data_date, captured_at))
+    if not counts["score_rules_effective"] and counts["oos_eligible"]:
+        counts.update(oos_eligible=False, publication_timing="before_score_rule_effective_date")
     con.execute("BEGIN IMMEDIATE")
     try:
         con.execute(
@@ -458,11 +484,12 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
         con.executemany(
             """INSERT INTO oos_ranking_view_snapshots(
                  snapshot_id,date,stock_id,grp,spec_sha,champion_pct,
-                 lens_a,lens_b,lens_c,lens_d,shadow_vol0,shadow_price10,payload_json)
-               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                 lens_a,lens_b,lens_c,lens_d,shadow_vol0,shadow_price10,shadow_resil05,payload_json)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             [(snapshot_id, row["date"], row["stock_id"], row["grp"], row["spec_sha"],
               row["champion_pct"], row["lens_a"], row["lens_b"], row["lens_c"],
-              row["lens_d"], row["shadow_vol0"], row["shadow_price10"], row["payload_json"])
+              row["lens_d"], row["shadow_vol0"], row["shadow_price10"], row["shadow_resil05"],
+              row["payload_json"])
              for row in ranking_rows])
         con.commit()
     except Exception:

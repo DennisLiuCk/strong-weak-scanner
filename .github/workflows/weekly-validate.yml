@@ -33,6 +33,9 @@ jobs:
       - name: 產生週度驗證報告(reports/validate_<資料迄日>.md)
         run: python scripts/validate.py
 
+      - name: 更新新版策略的固定樣本驗證進度
+        run: python scripts/validation_progress.py
+
       - name: 同步首頁的證據狀態與最新週報連結
         run: |
           python scripts/build_dashboard.py
@@ -46,6 +49,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "無新報告,略過 commit"
           else
-            git commit -m "report: 週度驗證 $(date -u +%Y-%m-%d) [skip ci]"
+            git commit -m "報告：週度驗證 $(date -u +%Y-%m-%d) [skip ci]"
             git push
           fi

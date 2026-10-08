@@ -5,6 +5,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -14,6 +15,7 @@ sys.path.insert(0, str(SCRIPTS))
 
 import audit_ranking_views as audit
 import ranking_views as rv
+import score
 
 
 def view_row(stock_id, grp, value, *, pareto=False, sensitivity=0, role=False):
@@ -106,7 +108,7 @@ class FormalProgressTest(unittest.TestCase):
         self.con.executescript("""
           CREATE TABLE oos_snapshot_runs(
             snapshot_id TEXT PRIMARY KEY,data_date TEXT,captured_at TEXT,
-            stock_count INTEGER,is_official INTEGER);
+            stock_count INTEGER,is_official INTEGER,quality_json TEXT);
           CREATE TABLE oos_ranking_view_snapshots(
             snapshot_id TEXT,date TEXT,stock_id TEXT,grp TEXT,spec_sha TEXT,
             payload_json TEXT);
@@ -114,16 +116,19 @@ class FormalProgressTest(unittest.TestCase):
         """)
         for day in range(1, 8):
             self.con.execute(
-                "INSERT INTO price_adj VALUES(?,?,?)", (f"2026-08-{day:02d}", "A", 10)
+                "INSERT INTO price_adj VALUES(?,?,?)", (f"2026-10-{day + 11:02d}", "A", 10)
             )
 
     def tearDown(self):
         self.con.close()
 
-    def add_run(self, run_id, date, captured, spec, *, expected=2, actual=2):
+    def add_run(self, run_id, date, captured, spec, *, expected=2, actual=2,
+                quality=None):
+        if quality is None:
+            quality = {"oos_eligible": True, "score_spec_sha": score.score_spec_digest()}
         self.con.execute(
-            "INSERT INTO oos_snapshot_runs VALUES(?,?,?,?,1)",
-            (run_id, date, captured, expected),
+            "INSERT INTO oos_snapshot_runs VALUES(?,?,?,?,1,?)",
+            (run_id, date, captured, expected, json.dumps(quality)),
         )
         for index in range(actual):
             row = view_row(chr(65 + index), "g", index * 100)
@@ -134,22 +139,22 @@ class FormalProgressTest(unittest.TestCase):
             )
 
     def test_progress_keeps_old_spec_separate_and_uses_earliest_run(self):
-        self.add_run("old", "2026-08-01", "2026-08-01T12:00:00Z", "old-spec")
-        self.add_run("current", "2026-08-02", "2026-08-02T12:00:00Z", rv.SPEC_SHA)
+        self.add_run("old", "2026-10-12", "2026-10-12T12:00:00Z", "old-spec")
+        self.add_run("current", "2026-10-13", "2026-10-13T12:00:00Z", rv.SPEC_SHA)
         # 同日較晚 revision 不可取代 validate.py 認定的首次正式發布。
-        self.add_run("later", "2026-08-02", "2026-08-02T13:00:00Z", "other-spec")
+        self.add_run("later", "2026-10-13", "2026-10-13T13:00:00Z", "other-spec")
         result = audit.formal_progress(self.con, rv.SPEC_SHA, fwd=2)
         self.assertEqual(result["canonical_official_days"], 2)
         self.assertEqual(result["historical_other_spec_days"], 1)
         self.assertEqual(result["current_spec_days"], 1)
-        self.assertEqual(result["current_spec_latest_date"], "2026-08-02")
+        self.assertEqual(result["current_spec_latest_date"], "2026-10-13")
         self.assertEqual(result["mature_10d_days"], 1)
         self.assertEqual(result["invalid_runs"], [])
         self.assertEqual(result["structural_history"]["days"], 1)
 
     def test_incomplete_snapshot_is_reported_as_invalid(self):
         self.add_run(
-            "broken", "2026-08-03", "2026-08-03T12:00:00Z", rv.SPEC_SHA,
+            "broken", "2026-10-14", "2026-10-14T12:00:00Z", rv.SPEC_SHA,
             expected=2, actual=1,
         )
         result = audit.formal_progress(self.con, rv.SPEC_SHA, fwd=2)
@@ -158,15 +163,65 @@ class FormalProgressTest(unittest.TestCase):
         self.assertEqual(result["invalid_runs"][0]["actual_rows"], 1)
 
     def test_late_recovery_is_complete_but_not_a_mature_oos_day(self):
-        self.add_run("late", "2026-08-02", "2026-08-03T12:00:00Z", rv.SPEC_SHA)
-        self.con.execute("ALTER TABLE oos_snapshot_runs ADD COLUMN quality_json TEXT")
+        self.add_run("late", "2026-10-13", "2026-10-14T12:00:00Z", rv.SPEC_SHA)
         self.con.execute("UPDATE oos_snapshot_runs SET quality_json=?",
                          (json.dumps({"oos_eligible": False}),))
         result = audit.formal_progress(self.con, rv.SPEC_SHA, fwd=2)
-        self.assertEqual(result["current_spec_latest_date"], "2026-08-02")
+        self.assertEqual(result["current_spec_latest_date"], "2026-10-13")
         self.assertEqual(result["current_spec_days"], 1)
         self.assertEqual(result["current_spec_oos_days"], 0)
         self.assertEqual(result["mature_10d_days"], 0)
+
+    def test_new_spec_cannot_claim_pre_registration_history(self):
+        self.add_run("restated", "2026-10-08", "2026-10-09T00:00:00Z", rv.SPEC_SHA)
+        result = audit.formal_progress(self.con, rv.SPEC_SHA)
+        self.assertEqual(result["current_spec_days"], 0)
+        self.assertEqual(result["pre_effective_current_spec_days"], 1)
+        self.assertEqual(result["phase"], "await_first_snapshot")
+
+    def test_effective_date_is_structural_only_not_new_oos(self):
+        self.add_run("same-day", score.SCORE_EFFECTIVE_FROM,
+                     "2026-10-09T12:00:00Z", rv.SPEC_SHA)
+        result = audit.formal_progress(self.con, rv.SPEC_SHA)
+        self.assertEqual(result["current_spec_days"], 1)
+        self.assertEqual(result["current_spec_oos_days"], 0)
+        self.assertEqual(result["current_spec_oos_excluded_days"], 1)
+        self.assertEqual(result["mature_10d_days"], 0)
+
+    def test_current_ranking_requires_first_run_exact_current_score_spec(self):
+        self.add_run("missing-score", "2026-10-12", "2026-10-12T12:00:00Z",
+                     rv.SPEC_SHA, quality={"oos_eligible": True})
+        self.add_run("old-score", "2026-10-13", "2026-10-13T12:00:00Z",
+                     rv.SPEC_SHA, quality={"oos_eligible": True, "score_spec_sha": "old"})
+        self.add_run("late-fix", "2026-10-13", "2026-10-13T13:00:00Z", rv.SPEC_SHA)
+        self.add_run("current-score", "2026-10-14", "2026-10-14T12:00:00Z", rv.SPEC_SHA)
+        result = audit.formal_progress(self.con, rv.SPEC_SHA, fwd=2)
+        self.assertEqual(result["current_spec_days"], 3)
+        self.assertEqual(result["current_spec_oos_days"], 1)
+        self.assertEqual(result["current_spec_oos_excluded_days"], 2)
+        self.assertEqual(result["mature_10d_days"], 1)
+        self.assertEqual(result["structural_history"]["days"], 3)
+        self.assertEqual(result["late_publication_days"], 0)
+
+    def test_pending_new_version_never_weakens_daily_snapshot_gate(self):
+        self.con.executescript("""
+            CREATE TABLE daily_scores(date,stock_id);
+            CREATE TABLE daily_metrics(date,stock_id);
+            CREATE TABLE universe(stock_id);
+            INSERT INTO daily_scores VALUES('2026-10-08','A'),('2026-10-08','B');
+            INSERT INTO daily_metrics VALUES('2026-10-08','A'),('2026-10-08','B');
+            INSERT INTO universe VALUES('A'),('B');
+        """)
+        self.add_run("old", "2026-10-08", "2026-10-08T16:00:00Z", "old-spec")
+        self.con.execute("PRAGMA query_only=1")
+        payload = {"rows": [view_row("A", "g", 0), view_row("B", "g", 100)]}
+        with mock.patch.object(rv, "build_from_db", return_value=payload):
+            pending = audit.build_audit(self.con, date="2026-10-08")
+            strict = audit.build_audit(self.con, date="2026-10-08", require_current_snapshot=True)
+        self.assertEqual(pending["status"], "pending")
+        self.assertEqual(pending["hard_errors"], [])
+        self.assertEqual(strict["status"], "fail")
+        self.assertTrue(any("current_formal_snapshot_missing" in error for error in strict["hard_errors"]))
 
 
 class OutputContractTest(unittest.TestCase):

@@ -1686,7 +1686,7 @@ def build_strategy_status(con, last):
             "SELECT DISTINCT date FROM daily_metrics WHERE date<=? ORDER BY date", (last,))]
         published = evidence_status.first_official_runs(con)
         st["publication"] = {"oos_eligible": evidence_status.oos_eligible(published[last])} if last in published else None
-        runs = {day: run for day, run in published.items() if evidence_status.oos_eligible(run)}
+        runs = evidence_status.current_score_runs(con, IS_CUTOFF) if IS_CUTOFF else {}
         snap = [d for d, r in runs.items() if con.execute(
             "SELECT 1 FROM oos_signal_snapshots WHERE snapshot_id=? LIMIT 1",
             (r["snapshot_id"],)).fetchone()]

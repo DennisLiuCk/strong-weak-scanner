@@ -1,0 +1,110 @@
+{
+  "protocol": "validation-v2-20261009",
+  "registered": "2026-10-09",
+  "as_of": "2026-10-08",
+  "score_version": "v2.2-midrank-20261009",
+  "score_spec_sha": "cb6f4f352986b00dd57bccc1916a0176a5c414184f5efb3e7d23848d64e41b69",
+  "ranking_spec_sha": "78c66c2e85caf7021ab49d75261ddda808f3d33c49adbe87a146289d78181217",
+  "score_evidence": {
+    "oos_days": 0,
+    "oos_mature": 0,
+    "fwd": 10,
+    "eff_obs": 0.0,
+    "episodes": 0,
+    "min_eff_obs": 3.0,
+    "se_blocked": true,
+    "status": "insufficient_independent_observations",
+    "label": "獨立觀測不足，暫不判讀",
+    "reason": "重疊窗樣本尺度 n/F 未達 3，SE／t 暫不可估；n/F不是量得獨立性。"
+  },
+  "ranking": {
+    "ranking_snapshot_table": true,
+    "registered_at": "2026-10-09T00:00:00+08:00",
+    "effective_from": "2026-10-09",
+    "oos_cutoff": "2026-10-09",
+    "score_spec_sha": "cb6f4f352986b00dd57bccc1916a0176a5c414184f5efb3e7d23848d64e41b69",
+    "previous_specs": [
+      {
+        "spec_sha": "b9076628ddb7c9ddd76c5d4934a5f6c3d8e8bbb75c56d1b3bce9c60f8e23bd4e",
+        "schema_version": 2,
+        "registered_at": "2026-09-07T00:00:00+08:00",
+        "challenger_original_registered_at": "2026-08-13T00:00:00+08:00",
+        "score_version": "v2.1-ordinal",
+        "status": "retained as historical evidence; never pooled with the current spec"
+      }
+    ],
+    "canonical_official_days": 60,
+    "current_spec_days": 0,
+    "current_spec_oos_days": 0,
+    "current_spec_oos_excluded_days": 0,
+    "late_publication_days": 0,
+    "current_spec_first_date": null,
+    "current_spec_latest_date": null,
+    "mature_10d_days": 0,
+    "effective_independent_obs_approx": 0.0,
+    "phase": "await_first_snapshot",
+    "specs_seen": [
+      "b9076628ddb7c9ddd76c5d4934a5f6c3d8e8bbb75c56d1b3bce9c60f8e23bd4e",
+      "e51579e313c6e3fbac9cb180539ce1d0cb4f67f06ee7e56dc5c2756b998a72f9"
+    ],
+    "historical_other_spec_days": 38,
+    "pre_effective_current_spec_days": 0,
+    "invalid_runs": [],
+    "parsed_rows": 0,
+    "latest_snapshot_health": null,
+    "structural_history": {
+      "basis": "exact_formal_snapshot_census_no_inference",
+      "performance_claim": false,
+      "days": 0,
+      "first_date": null,
+      "latest_date": null,
+      "pairwise_rank_correlation_equal_group_weight": {},
+      "pairwise_top20_jaccard": {},
+      "unique_top20_count": {},
+      "adjacent_snapshot_top20_retention": {},
+      "tie_rate": {},
+      "pareto_rate": {
+        "days": 0,
+        "latest": null,
+        "median": null,
+        "min": null,
+        "max": null
+      }
+    }
+  },
+  "structural_reviews": [
+    {
+      "formal_days": 10,
+      "remaining": 10
+    },
+    {
+      "formal_days": 20,
+      "remaining": 20
+    },
+    {
+      "formal_days": 40,
+      "remaining": 40
+    }
+  ],
+  "outcome_reviews": [
+    {
+      "paired_mature_days": 100,
+      "remaining_at_least": 100
+    },
+    {
+      "paired_mature_days": 200,
+      "remaining_at_least": 200
+    },
+    {
+      "paired_mature_days": 300,
+      "remaining_at_least": 300
+    }
+  ],
+  "limitations": [
+    "Ranking maturity is an upper bound; each challenger needs N valid paired days.",
+    "n/F is a heuristic overlap scale, not measured independence.",
+    "Weekly reports are monitoring; only fixed first-N samples trigger research review.",
+    "Multiple-testing/sequential calibration and prospective tier/cost study are required before adoption."
+  ],
+  "automatic_promotion": false
+}

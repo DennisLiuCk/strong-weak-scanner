@@ -1,0 +1,2117 @@
+{
+  "environment": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "executable": "C:\\Users\\nossi\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "PYTHONUTF8": null,
+    "PYTHONIOENCODING": null,
+    "db_open": "db_ro.connect, mode=ro, PRAGMA query_only=1"
+  },
+  "scope": {
+    "min_date": "2026-03-02",
+    "max_date": "2026-10-08",
+    "rows": 18389,
+    "dates": 152,
+    "stocks": 121,
+    "inference": "Exact finite-database structural census; no SE/t or performance/OOS inference."
+  },
+  "independent_recalculation_mismatches": {
+    "s_price": 0,
+    "s_resil": 0,
+    "s_vol": 0,
+    "s_foreign": 0,
+    "s_trust": 0,
+    "s_dip": 0,
+    "s_margin": 0,
+    "composite": 0,
+    "composite_s": 0,
+    "tier_raw": 0,
+    "tier": 0
+  },
+  "synthetic_tie": {
+    "input": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "actual_scores": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ]
+  },
+  "scenarios": {
+    "factors_only": {
+      "all_restated": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 38,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 38,
+        "composite_s": 114,
+        "tier_raw": 12,
+        "tier": 12,
+        "rows": 18389,
+        "dates": 152,
+        "tier_changed_days": 9,
+        "tier_changed_range": [
+          "2026-04-02",
+          "2026-10-05"
+        ],
+        "tier_examples": [
+          {
+            "date": "2026-10-05",
+            "stock_id": "5328",
+            "base": {
+              "s_price": -2,
+              "s_resil": -2,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": -2,
+              "composite": -5.6,
+              "composite_s": -3.9,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 11,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": -2,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": -2,
+              "composite": -5.6,
+              "composite_s": -4.07,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 12,
+              "grp": "passive"
+            }
+          },
+          {
+            "date": "2026-07-01",
+            "stock_id": "1785",
+            "base": {
+              "s_price": 0,
+              "s_resil": 1,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": 1.5,
+              "composite_s": -1.07,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 7,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": 1,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": 1.5,
+              "composite_s": -1.07,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 7,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-06-30",
+            "stock_id": "6488",
+            "base": {
+              "s_price": 1,
+              "s_resil": -2,
+              "s_foreign": 2,
+              "s_trust": -2,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 1,
+              "composite": -1.1,
+              "composite_s": -2.2,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 10,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": 1,
+              "s_resil": -2,
+              "s_foreign": 2,
+              "s_trust": -2,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 1,
+              "composite": -1.1,
+              "composite_s": -2.2,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 10,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-06-30",
+            "stock_id": "1785",
+            "base": {
+              "s_price": -1,
+              "s_resil": 0,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": -2,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -0.9,
+              "composite_s": -1.9,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 9,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 0,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": -2,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -0.9,
+              "composite_s": -1.9,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 9,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-06-02",
+            "stock_id": "6173",
+            "base": {
+              "s_price": 2,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 1.7,
+              "composite_s": 3.37,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 4,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 1.7,
+              "composite_s": 3.37,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 4,
+              "grp": "passive"
+            }
+          },
+          {
+            "date": "2026-06-02",
+            "stock_id": "3236",
+            "base": {
+              "s_price": -1,
+              "s_resil": -2,
+              "s_foreign": 2,
+              "s_trust": 0,
+              "s_dip": -2,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": -2.0,
+              "composite_s": -2.33,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 9,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": -2,
+              "s_foreign": 2,
+              "s_trust": 0,
+              "s_dip": -2,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": -2.0,
+              "composite_s": -2.33,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 9,
+              "grp": "passive"
+            }
+          },
+          {
+            "date": "2026-06-01",
+            "stock_id": "3236",
+            "base": {
+              "s_price": -1,
+              "s_resil": -2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": -2,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": -2.5,
+              "composite_s": -2.57,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 11,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": -2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": -2,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": -2.5,
+              "composite_s": -2.4,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 11,
+              "grp": "passive"
+            }
+          },
+          {
+            "date": "2026-06-01",
+            "stock_id": "2375",
+            "base": {
+              "s_price": -1,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": -1.9,
+              "composite_s": -1.97,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 9,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": -1.9,
+              "composite_s": -1.97,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 9,
+              "grp": "passive"
+            }
+          },
+          {
+            "date": "2026-05-29",
+            "stock_id": "3026",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 1,
+              "composite": 6.0,
+              "composite_s": 4.87,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 1,
+              "composite": 6.0,
+              "composite_s": 4.87,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "passive"
+            }
+          },
+          {
+            "date": "2026-05-28",
+            "stock_id": "3026",
+            "base": {
+              "s_price": 2,
+              "s_resil": 0,
+              "s_foreign": -2,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 3.8,
+              "composite_s": 4.47,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 3,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 0,
+              "s_foreign": -2,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 3.8,
+              "composite_s": 4.47,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "passive"
+            }
+          }
+        ]
+      },
+      "since_20260710_restated_not_OOS": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 12,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 12,
+        "composite_s": 38,
+        "tier_raw": 1,
+        "tier": 1,
+        "rows": 7499,
+        "dates": 62,
+        "tier_changed_days": 1,
+        "tier_changed_range": [
+          "2026-10-05",
+          "2026-10-05"
+        ],
+        "tier_examples": [
+          {
+            "date": "2026-10-05",
+            "stock_id": "5328",
+            "base": {
+              "s_price": -2,
+              "s_resil": -2,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": -2,
+              "composite": -5.6,
+              "composite_s": -3.9,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 11,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": -2,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": -2,
+              "composite": -5.6,
+              "composite_s": -4.07,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 12,
+              "grp": "passive"
+            }
+          }
+        ]
+      },
+      "latest": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 0,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 0,
+        "composite_s": 0,
+        "tier_raw": 0,
+        "tier": 0,
+        "rows": 120,
+        "dates": 1,
+        "tier_changed_days": 0,
+        "tier_changed_range": [],
+        "tier_examples": []
+      }
+    },
+    "group_ranks_only": {
+      "all_restated": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 0,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 0,
+        "composite_s": 0,
+        "tier_raw": 65,
+        "tier": 67,
+        "rows": 18389,
+        "dates": 152,
+        "tier_changed_days": 39,
+        "tier_changed_range": [
+          "2026-03-02",
+          "2026-10-01"
+        ],
+        "tier_examples": [
+          {
+            "date": "2026-10-01",
+            "stock_id": "5234",
+            "base": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": -2.6,
+              "composite_s": -1.77,
+              "tier_raw": "真弱·陷阱",
+              "tier": "真弱",
+              "grank": 8,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": -2.6,
+              "composite_s": -1.77,
+              "tier_raw": "真弱·陷阱",
+              "tier": "潛在/中性",
+              "grank": 8,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "stock_id": "5234",
+            "base": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.1,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 8,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.1,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 8,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "stock_id": "1785",
+            "base": {
+              "s_price": -2,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.13,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 9,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.13,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 9,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-15",
+            "stock_id": "6640",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 6.3,
+              "composite_s": 4.53,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 1,
+              "grp": "semiequip"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 6.3,
+              "composite_s": 4.53,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 1,
+              "grp": "semiequip"
+            }
+          },
+          {
+            "date": "2026-09-10",
+            "stock_id": "6640",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": 5.4,
+              "composite_s": 4.37,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 3,
+              "grp": "semiequip"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": 5.4,
+              "composite_s": 4.37,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 3,
+              "grp": "semiequip"
+            }
+          },
+          {
+            "date": "2026-08-31",
+            "stock_id": "2449",
+            "base": {
+              "s_price": 0,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": 0.0,
+              "composite_s": -0.67,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 6,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": 0.0,
+              "composite_s": -0.67,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 6,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-31",
+            "stock_id": "2369",
+            "base": {
+              "s_price": -2,
+              "s_resil": -1,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 0,
+              "composite": -4.1,
+              "composite_s": -3.67,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 14,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": -1,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 0,
+              "composite": -4.1,
+              "composite_s": -3.67,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 14,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-07",
+            "stock_id": "2329",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 5.8,
+              "composite_s": 4.4,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 5.8,
+              "composite_s": 4.4,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-06",
+            "stock_id": "2329",
+            "base": {
+              "s_price": 0,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 3.0,
+              "composite_s": 3.93,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 3.0,
+              "composite_s": 3.93,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-05",
+            "stock_id": "3711",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 1,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": 6.4,
+              "composite_s": 5.6,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 1,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 1,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": 6.4,
+              "composite_s": 5.6,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 1,
+              "grp": "packtest"
+            }
+          }
+        ]
+      },
+      "since_20260710_restated_not_OOS": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 0,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 0,
+        "composite_s": 0,
+        "tier_raw": 21,
+        "tier": 22,
+        "rows": 7499,
+        "dates": 62,
+        "tier_changed_days": 15,
+        "tier_changed_range": [
+          "2026-07-15",
+          "2026-10-01"
+        ],
+        "tier_examples": [
+          {
+            "date": "2026-10-01",
+            "stock_id": "5234",
+            "base": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": -2.6,
+              "composite_s": -1.77,
+              "tier_raw": "真弱·陷阱",
+              "tier": "真弱",
+              "grank": 8,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": -2.6,
+              "composite_s": -1.77,
+              "tier_raw": "真弱·陷阱",
+              "tier": "潛在/中性",
+              "grank": 8,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "stock_id": "5234",
+            "base": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.1,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 8,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.1,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 8,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "stock_id": "1785",
+            "base": {
+              "s_price": -2,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.13,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 9,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.13,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 9,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-15",
+            "stock_id": "6640",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 6.3,
+              "composite_s": 4.53,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 1,
+              "grp": "semiequip"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 6.3,
+              "composite_s": 4.53,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 1,
+              "grp": "semiequip"
+            }
+          },
+          {
+            "date": "2026-09-10",
+            "stock_id": "6640",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": 5.4,
+              "composite_s": 4.37,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 3,
+              "grp": "semiequip"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": 5.4,
+              "composite_s": 4.37,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 3,
+              "grp": "semiequip"
+            }
+          },
+          {
+            "date": "2026-08-31",
+            "stock_id": "2449",
+            "base": {
+              "s_price": 0,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": 0.0,
+              "composite_s": -0.67,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 6,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": 0.0,
+              "composite_s": -0.67,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 6,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-31",
+            "stock_id": "2369",
+            "base": {
+              "s_price": -2,
+              "s_resil": -1,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 0,
+              "composite": -4.1,
+              "composite_s": -3.67,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 14,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": -1,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 0,
+              "composite": -4.1,
+              "composite_s": -3.67,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 14,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-07",
+            "stock_id": "2329",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 5.8,
+              "composite_s": 4.4,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 5.8,
+              "composite_s": 4.4,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-06",
+            "stock_id": "2329",
+            "base": {
+              "s_price": 0,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 3.0,
+              "composite_s": 3.93,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 3.0,
+              "composite_s": 3.93,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-05",
+            "stock_id": "3711",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 1,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": 6.4,
+              "composite_s": 5.6,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 1,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 1,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": 6.4,
+              "composite_s": 5.6,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 1,
+              "grp": "packtest"
+            }
+          }
+        ]
+      },
+      "latest": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 0,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 0,
+        "composite_s": 0,
+        "tier_raw": 0,
+        "tier": 0,
+        "rows": 120,
+        "dates": 1,
+        "tier_changed_days": 0,
+        "tier_changed_range": [],
+        "tier_examples": []
+      }
+    },
+    "both": {
+      "all_restated": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 38,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 38,
+        "composite_s": 114,
+        "tier_raw": 74,
+        "tier": 75,
+        "rows": 18389,
+        "dates": 152,
+        "tier_changed_days": 44,
+        "tier_changed_range": [
+          "2026-03-02",
+          "2026-10-05"
+        ],
+        "tier_examples": [
+          {
+            "date": "2026-10-05",
+            "stock_id": "5328",
+            "base": {
+              "s_price": -2,
+              "s_resil": -2,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": -2,
+              "composite": -5.6,
+              "composite_s": -3.9,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 11,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": -2,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": -2,
+              "composite": -5.6,
+              "composite_s": -4.07,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 12,
+              "grp": "passive"
+            }
+          },
+          {
+            "date": "2026-10-01",
+            "stock_id": "5234",
+            "base": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": -2.6,
+              "composite_s": -1.77,
+              "tier_raw": "真弱·陷阱",
+              "tier": "真弱",
+              "grank": 8,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": -2.6,
+              "composite_s": -1.77,
+              "tier_raw": "真弱·陷阱",
+              "tier": "潛在/中性",
+              "grank": 8,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "stock_id": "5234",
+            "base": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.1,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 8,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.1,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 8,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "stock_id": "1785",
+            "base": {
+              "s_price": -2,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.13,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 9,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.13,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 9,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-15",
+            "stock_id": "6640",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 6.3,
+              "composite_s": 4.53,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 1,
+              "grp": "semiequip"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 6.3,
+              "composite_s": 4.53,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 1,
+              "grp": "semiequip"
+            }
+          },
+          {
+            "date": "2026-09-10",
+            "stock_id": "6640",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": 5.4,
+              "composite_s": 4.37,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 3,
+              "grp": "semiequip"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": 5.4,
+              "composite_s": 4.37,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 3,
+              "grp": "semiequip"
+            }
+          },
+          {
+            "date": "2026-08-31",
+            "stock_id": "2449",
+            "base": {
+              "s_price": 0,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": 0.0,
+              "composite_s": -0.67,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 6,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": 0.0,
+              "composite_s": -0.67,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 6,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-31",
+            "stock_id": "2369",
+            "base": {
+              "s_price": -2,
+              "s_resil": -1,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 0,
+              "composite": -4.1,
+              "composite_s": -3.67,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 14,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": -1,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 0,
+              "composite": -4.1,
+              "composite_s": -3.67,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 14,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-07",
+            "stock_id": "2329",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 5.8,
+              "composite_s": 4.4,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 5.8,
+              "composite_s": 4.4,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-06",
+            "stock_id": "2329",
+            "base": {
+              "s_price": 0,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 3.0,
+              "composite_s": 3.93,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 3.0,
+              "composite_s": 3.93,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "packtest"
+            }
+          }
+        ]
+      },
+      "since_20260710_restated_not_OOS": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 12,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 12,
+        "composite_s": 38,
+        "tier_raw": 22,
+        "tier": 23,
+        "rows": 7499,
+        "dates": 62,
+        "tier_changed_days": 16,
+        "tier_changed_range": [
+          "2026-07-15",
+          "2026-10-05"
+        ],
+        "tier_examples": [
+          {
+            "date": "2026-10-05",
+            "stock_id": "5328",
+            "base": {
+              "s_price": -2,
+              "s_resil": -2,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": -2,
+              "composite": -5.6,
+              "composite_s": -3.9,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 11,
+              "grp": "passive"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": -2,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 2,
+              "s_vol": 0,
+              "s_margin": -2,
+              "composite": -5.6,
+              "composite_s": -4.07,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 12,
+              "grp": "passive"
+            }
+          },
+          {
+            "date": "2026-10-01",
+            "stock_id": "5234",
+            "base": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": -2.6,
+              "composite_s": -1.77,
+              "tier_raw": "真弱·陷阱",
+              "tier": "真弱",
+              "grank": 8,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": -2.6,
+              "composite_s": -1.77,
+              "tier_raw": "真弱·陷阱",
+              "tier": "潛在/中性",
+              "grank": 8,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "stock_id": "5234",
+            "base": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.1,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 8,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -1,
+              "s_resil": 1,
+              "s_foreign": -1,
+              "s_trust": -2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.1,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 8,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-30",
+            "stock_id": "1785",
+            "base": {
+              "s_price": -2,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.13,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 9,
+              "grp": "material"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": 0,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 0,
+              "s_vol": 1,
+              "s_margin": 0,
+              "composite": -2.5,
+              "composite_s": -2.13,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 9,
+              "grp": "material"
+            }
+          },
+          {
+            "date": "2026-09-15",
+            "stock_id": "6640",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 6.3,
+              "composite_s": 4.53,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 1,
+              "grp": "semiequip"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 0,
+              "s_vol": 0,
+              "s_margin": 1,
+              "composite": 6.3,
+              "composite_s": 4.53,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 1,
+              "grp": "semiequip"
+            }
+          },
+          {
+            "date": "2026-09-10",
+            "stock_id": "6640",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": 5.4,
+              "composite_s": 4.37,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 3,
+              "grp": "semiequip"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": 1,
+              "s_vol": 1,
+              "s_margin": -2,
+              "composite": 5.4,
+              "composite_s": 4.37,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 3,
+              "grp": "semiequip"
+            }
+          },
+          {
+            "date": "2026-08-31",
+            "stock_id": "2449",
+            "base": {
+              "s_price": 0,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": 0.0,
+              "composite_s": -0.67,
+              "tier_raw": "潛在/中性",
+              "tier": "真弱",
+              "grank": 6,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": -1,
+              "s_foreign": -1,
+              "s_trust": 2,
+              "s_dip": -2,
+              "s_vol": 1,
+              "s_margin": -1,
+              "composite": 0.0,
+              "composite_s": -0.67,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 6,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-31",
+            "stock_id": "2369",
+            "base": {
+              "s_price": -2,
+              "s_resil": -1,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 0,
+              "composite": -4.1,
+              "composite_s": -3.67,
+              "tier_raw": "真弱",
+              "tier": "潛在/中性",
+              "grank": 14,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": -2,
+              "s_resil": -1,
+              "s_foreign": 0,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 0,
+              "composite": -4.1,
+              "composite_s": -3.67,
+              "tier_raw": "真弱",
+              "tier": "真弱",
+              "grank": 14,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-07",
+            "stock_id": "2329",
+            "base": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 5.8,
+              "composite_s": 4.4,
+              "tier_raw": "真強",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 2,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 5.8,
+              "composite_s": 4.4,
+              "tier_raw": "真強",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "packtest"
+            }
+          },
+          {
+            "date": "2026-08-06",
+            "stock_id": "2329",
+            "base": {
+              "s_price": 0,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 3.0,
+              "composite_s": 3.93,
+              "tier_raw": "潛在/中性",
+              "tier": "真強",
+              "grank": 2,
+              "grp": "packtest"
+            },
+            "reverse": {
+              "s_price": 0,
+              "s_resil": 2,
+              "s_foreign": 1,
+              "s_trust": 0,
+              "s_dip": 1,
+              "s_vol": -1,
+              "s_margin": 2,
+              "composite": 3.0,
+              "composite_s": 3.93,
+              "tier_raw": "潛在/中性",
+              "tier": "潛在/中性",
+              "grank": 2,
+              "grp": "packtest"
+            }
+          }
+        ]
+      },
+      "latest": {
+        "s_price": 0,
+        "s_resil": 0,
+        "s_vol": 0,
+        "s_foreign": 0,
+        "s_trust": 0,
+        "s_dip": 0,
+        "s_margin": 0,
+        "composite": 0,
+        "composite_s": 0,
+        "tier_raw": 0,
+        "tier": 0,
+        "rows": 120,
+        "dates": 1,
+        "tier_changed_days": 0,
+        "tier_changed_range": [],
+        "tier_examples": []
+      }
+    }
+  },
+  "factor_tie_census": {
+    "rs20": {
+      "group_dates": 0,
+      "changed_rows": 0,
+      "latest_examples": []
+    },
+    "down_rs20": {
+      "group_dates": 0,
+      "changed_rows": 0,
+      "latest_examples": []
+    },
+    "fpct_chg20": {
+      "group_dates": 19,
+      "changed_rows": 38,
+      "latest_examples": [
+        {
+          "date": "2026-10-02",
+          "group": "passive",
+          "changed_rows": 2,
+          "stocks": [
+            {
+              "stock_id": "2478",
+              "value": 0.7200000000000006,
+              "forward": -1,
+              "reverse": 0
+            },
+            {
+              "stock_id": "5328",
+              "value": 0.7200000000000006,
+              "forward": 0,
+              "reverse": -1
+            }
+          ]
+        },
+        {
+          "date": "2026-09-17",
+          "group": "semiequip",
+          "changed_rows": 2,
+          "stocks": [
+            {
+              "stock_id": "3413",
+              "value": -2.1000000000000014,
+              "forward": -2,
+              "reverse": -1
+            },
+            {
+              "stock_id": "6515",
+              "value": -2.1000000000000014,
+              "forward": -1,
+              "reverse": -2
+            }
+          ]
+        },
+        {
+          "date": "2026-09-04",
+          "group": "material",
+          "changed_rows": 2,
+          "stocks": [
+            {
+              "stock_id": "5234",
+              "value": -0.8900000000000006,
+              "forward": -2,
+              "reverse": -1
+            },
+            {
+              "stock_id": "6488",
+              "value": -0.8900000000000006,
+              "forward": -1,
+              "reverse": -2
+            }
+          ]
+        },
+        {
+          "date": "2026-08-26",
+          "group": "serverodm",
+          "changed_rows": 2,
+          "stocks": [
+            {
+              "stock_id": "2059",
+              "value": -0.6999999999999993,
+              "forward": -2,
+              "reverse": -1
+            },
+            {
+              "stock_id": "6669",
+              "value": -0.6999999999999993,
+              "forward": -1,
+              "reverse": -2
+            }
+          ]
+        },
+        {
+          "date": "2026-08-18",
+          "group": "material",
+          "changed_rows": 2,
+          "stocks": [
+            {
+              "stock_id": "1560",
+              "value": -1.1199999999999974,
+              "forward": -2,
+              "reverse": -1
+            },
+            {
+              "stock_id": "8028",
+              "value": -1.1199999999999974,
+              "forward": -1,
+              "reverse": -2
+            }
+          ]
+        }
+      ]
+    },
+    "trust5_pct": {
+      "group_dates": 0,
+      "changed_rows": 0,
+      "latest_examples": []
+    },
+    "dipbuy20": {
+      "group_dates": 0,
+      "changed_rows": 0,
+      "latest_examples": []
+    }
+  },
+  "zero_margin": {
+    "rows": 0,
+    "stocks": 0,
+    "dates": 0,
+    "latest_rows": [],
+    "examples": []
+  },
+  "latest_missing": {
+    "rs20": 0,
+    "down_rs20": 0,
+    "fpct_chg20": 0,
+    "trust5_pct": 0,
+    "dipbuy20": 0,
+    "margin_util_pct": 0,
+    "vol_ratio60": 0
+  },
+  "shares_first_value_backfill": [],
+  "price_with_missing_inst": 0,
+  "latest_ranking_view_order_invariant": true
+}

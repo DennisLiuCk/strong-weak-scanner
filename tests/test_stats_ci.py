@@ -77,6 +77,118 @@ class StatsCiTest(unittest.TestCase):
         self.assertEqual(s["episodes"], 1)
         self.assertAlmostEqual(s["mean"], statistics.mean(x))
         self.assertAlmostEqual(s["t"], s["mean"] / s["se"])
+        self.assertIn("啟發式", s["eff_obs_method"])
+        self.assertIn("非量得獨立性", s["eff_obs_method"])
+        self.assertEqual(s["calendar_span_days"], 40)
+        self.assertEqual(s["observed_lag_pairs"][1], 39)
+
+    def test_sparse_calendar_preserves_real_lags_with_hand_calculated_variance(self):
+        xs = [-3, -2, -1, 1, 2, 3]
+        calendar = [f"d{i:02d}" for i in range(9)]
+        days = [calendar[i] for i in (0, 1, 2, 6, 7, 8)]
+        # Mean 0, diagonal sum 28, real lag-one products 6+2+2+6=16.
+        # Bartlett lag-one weight is 1/2: variance(mean)=(28+16)/36.
+        se = sci.nw_se(xs, 1, dates_used=days, all_dates=calendar)
+        self.assertAlmostEqual(se, math.sqrt(44 / 36), places=12)
+        self.assertNotAlmostEqual(se, sci.nw_se(xs, 1), places=12)
+
+    def test_none_and_omitted_dates_are_equivalent_without_compression(self):
+        padded = [-3, -2, -1, None, None, None, 1, 2, 3]
+        calendar = [f"d{i:02d}" for i in range(len(padded))]
+        days = [day for day, value in zip(calendar, padded) if value is not None]
+        compact = [value for value in padded if value is not None]
+        expected = math.sqrt(44 / 36)
+        self.assertAlmostEqual(sci.nw_se(padded, 1), expected, places=12)
+        full = sci.summarize(padded, 2, calendar, calendar)
+        sparse = sci.summarize(compact, 2, days, calendar)
+        self.assertEqual(full, sparse)
+        self.assertEqual(full["n_days"], 6)
+        self.assertEqual(full["calendar_span_days"], 9)
+        self.assertEqual(full["episodes"], 2)
+        self.assertEqual(full["observed_lag_pairs"], {0: 6, 1: 4})
+        self.assertAlmostEqual(full["ac1"], 16 / 28, places=12)
+        self.assertAlmostEqual(full["se"], expected, places=12)
+
+    def test_pairwise_kernel_oracle_checks_sparse_high_lags(self):
+        positions = [0, 4, 9, 10, 17]
+        values = [-3.0, 2.0, 1.0, -1.0, 4.0]
+        lag = 12  # Larger than n-1: real calendar distances must still count.
+        center = statistics.mean(values)
+        expected_variance = sum(
+            max(0.0, 1 - abs(p - q) / (lag + 1)) * (x - center) * (y - center)
+            for p, x in zip(positions, values) for q, y in zip(positions, values)
+        ) / len(values) ** 2
+        calendar = [f"d{i:02d}" for i in range(18)]
+        days = [calendar[i] for i in positions]
+        self.assertAlmostEqual(sci.nw_se(values, lag, dates_used=days, all_dates=calendar),
+                               math.sqrt(expected_variance), places=12)
+
+    def test_contiguous_results_match_legacy_formula(self):
+        values = [math.sin(i / 3) + i / 40 for i in range(50)]
+        mean = statistics.mean(values)
+        errors = [value - mean for value in values]
+        for lag in (0, 1, 9, 60):
+            legacy = sum(value * value for value in errors) / len(errors)
+            for distance in range(1, min(lag, len(errors) - 1) + 1):
+                covariance = sum(errors[i] * errors[i - distance]
+                                 for i in range(distance, len(errors))) / len(errors)
+                legacy += 2 * (1 - distance / (lag + 1)) * covariance
+            expected = math.sqrt(max(legacy, 0) / len(errors))
+            self.assertAlmostEqual(sci.nw_se(values, lag), expected, places=12)
+
+    def test_alignment_errors_are_rejected_not_silently_repaired(self):
+        calendar = ["d00", "d01", "d02"]
+        invalid = [
+            {"dates_used": calendar},
+            {"all_dates": calendar},
+            {"dates_used": calendar[:2], "all_dates": calendar},
+            {"dates_used": ["d00", "d00", "d02"], "all_dates": calendar},
+            {"dates_used": ["d00", "d01", "d03"], "all_dates": calendar},
+            {"dates_used": ["d01", "d00", "d02"], "all_dates": calendar},
+            {"dates_used": calendar, "all_dates": ["d00", "d01", "d01", "d02"]},
+            {"dates_used": calendar, "all_dates": ["d00", "d02", "d01"]},
+        ]
+        for kwargs in invalid:
+            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
+                sci.summarize([1, 2, 3], 1, **kwargs)
+            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
+                sci.nw_se([1, 2, 3], 1, **kwargs)
+
+    def test_nonfinite_values_and_invalid_windows_are_rejected(self):
+        for value in (float("nan"), float("inf"), -float("inf"), "not a number"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                sci.summarize([1, value, 3], 1)
+        for horizon in (0, -1, 1.5):
+            with self.subTest(horizon=horizon), self.assertRaises(ValueError):
+                sci.summarize([1, 2, 3], horizon)
+        for lag in (-1, 1.5):
+            with self.subTest(lag=lag), self.assertRaises(ValueError):
+                sci.nw_se([1, 2, 3], lag)
+
+    def test_zero_standard_error_is_reported_without_a_spurious_t(self):
+        for level in (0, 1):
+            result = sci.summarize([level] * 30, 10)
+            self.assertEqual(result["se"], 0)
+            self.assertTrue(result["zero_se"])
+            self.assertIsNone(result["t"])
+            self.assertIn("t 不可估", sci.fmt(result))
+            self.assertIn("不判讀", sci.verdict(result))
+
+    def test_autocorrelation_does_not_create_pairs_across_missing_days(self):
+        self.assertIsNone(sci.autocorr1([1, None, 2, None, 3]))
+
+    def test_daily_pairing_is_symmetric_about_missingness_and_input_order(self):
+        calendar = ["d00", "d01", "d02", "d03"]
+        left = {"d03": 20, "d02": None, "d01": 5, "d00": 1000}
+        right = {"d01": 2, "d02": 3, "d03": 7}
+        self.assertEqual(sci.paired_daily_difference(left, right, all_dates=calendar),
+                         {"d01": 3, "d03": 13})
+        self.assertEqual(sci.paired_daily_difference(right, left, all_dates=calendar),
+                         {"d01": -3, "d03": -13})
+        with self.assertRaises(ValueError):
+            sci.paired_daily_difference({"unknown": 1}, {}, all_dates=calendar)
+        with self.assertRaises(ValueError):
+            sci.paired_daily_difference({"d00": float("nan")}, {}, all_dates=calendar)
 
     def test_verdict_wording_never_claims_effectiveness(self):
         """判讀只說「能不能分辨」,不得說「有效/無效」——未過門檻不代表為 0。"""

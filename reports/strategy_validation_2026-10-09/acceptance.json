@@ -1,0 +1,140 @@
+{
+  "status": "local_implementation_accepted_pending_publication",
+  "environment": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "executable": "C:\\Users\\nossi\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "utf8_mode": 0,
+    "PYTHONUTF8": null,
+    "PYTHONIOENCODING": null
+  },
+  "complete_suite": {
+    "count": 793,
+    "skipped": 1,
+    "exit_code": 0,
+    "base_commit": "ff82e2b7101029a110f49d7b9a0a9db3f52ce73f",
+    "log_sha256": "25951af7a309fb554aa56d23b7d691f920abe9296afc8f995bbf94208bd63b45",
+    "basis": "Committed research notes plus this task code/docs/tests; live unrelated research excluded",
+    "original_shared_workspace_failure": "Research notes were being independently edited; quality-contract test failed",
+    "post_suite_changes": "Report wording clarified n/F and historical cutoff; targeted suite and report smoke rerun"
+  },
+  "final_commands": [
+    {
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "tests.test_validation_metrics",
+        "tests.test_validation_progress",
+        "tests.test_net_cost_contract",
+        "tests.test_evidence_status",
+        "tests.test_strategy_review",
+        "tests.test_ranking_views",
+        "tests.test_entry_docs_sync"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "9d884b807946442b8b00fc92ade1ea89187c2ac6b694ba48bf14b7eaa315e407",
+      "test_summary": [
+        "Ran 66 tests in 0.462s\r",
+        "OK\r"
+      ]
+    },
+    {
+      "command": [
+        "python",
+        "scripts/validate.py",
+        "--reports",
+        "C:\\Users\\nossi\\code\\findmind\\reports\\strategy_validation_2026-10-09\\smoke_report"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "d5e156904ffce14569ce825d7b52d2cbd66cc9b99a3f164b45b5100cfe560863",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_summary": []
+    },
+    {
+      "command": [
+        "python",
+        "scripts/validation_progress.py",
+        "--out",
+        "reports/validation_progress.json"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "6ac7ae95cde8c5dcd14847de2f7a48b16d9192741746988e06f3e45aba154da5",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_summary": []
+    },
+    {
+      "command": [
+        "python",
+        "scripts/audit_raw_data.py",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "b00d3973f9d0205d5b9b2e13e494208132a65236299802d4a4ae16d0bd1b30c0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_summary": []
+    },
+    {
+      "command": [
+        "python",
+        "scripts/audit_ranking_views.py",
+        "--compact"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "1cefe031011a7dbc255be382be374a3c2768ab392ac989b96119da8555fb2bbc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_summary": []
+    }
+  ],
+  "database_sha256_before": "1eaf40357565dcf085abbc21e8cba61741c97ab7b3f4c786466617e6f0554b69",
+  "database_sha256_after": "1eaf40357565dcf085abbc21e8cba61741c97ab7b3f4c786466617e6f0554b69",
+  "database_unchanged": true,
+  "entry_documents_equal": true,
+  "mechanical_evidence": [
+    "formula_acceptance.json",
+    "formula_independent.json",
+    "calendar_hac_acceptance.json"
+  ],
+  "deployment": {
+    "published": false,
+    "production_database_rebuilt": false,
+    "new_score_oos_days": 0,
+    "automatic_promotion": false
+  },
+  "final_source_sha256": {
+    ".github/workflows/weekly-validate.yml": "a19f87a5dc446af8ad3676068af2347d779338dee8efbdc499c8dcdcc784c1a2",
+    "AGENTS.md": "9073031cfbe50e86f465b1ce4b047a7b1a6b9ae2b5fbad72c07580453be489a3",
+    "ANALYSIS_DISCIPLINE.md": "9389843e4966e14cc211ea93b0fbf57c22cbbe7eb4dad59eb9840965ab9fe43f",
+    "CLAUDE.md": "9073031cfbe50e86f465b1ce4b047a7b1a6b9ae2b5fbad72c07580453be489a3",
+    "README.md": "07706dc341f1a7af10eebf69c7fa1260eee0aa9a938d228920afd0c488eb3fd5",
+    "STRATEGY_VALIDATION_PROTOCOL.md": "0a4092cfdf02cc18868bc88ff6af1fd38e09bb30c82e31f14fed3f64620d53c5",
+    "WEEKLY_REVIEW.md": "875196bae9aa8aa5ddc51666bb3a4cedf93768c4f5a65fd1928404b20962e242",
+    "scripts/audit_ranking_views.py": "85f5ac4a2cdb1c50550e9604623a8887c432eaf3c5f56c925b222357b6d027d4",
+    "scripts/build_dashboard.py": "e2f09d07881223dee2f0835fa2f08404d01af5c8a43bd3bd8a0e1e8e52b003b3",
+    "scripts/evidence_status.py": "01885ae64ceba2a2c6a554136ca99815cf007804f4b355ab3a4fbbf6575ed30c",
+    "scripts/hypotheses.py": "a52ddb10863ff8aafaf6b341f798da2e0ee1847cd32c0fcb3f6bae9aa0517a4a",
+    "scripts/hypotheses_legacy/H1_20260726.json": "61ad920883d914d240359f0b8518f4155c0c7cdb8e3e4c8d5916c815f91cd9c4",
+    "scripts/ranking_views.py": "927b21868760957f4ed7fd4f4bfb48e61503f2e7b672a68729e9eb2730abd82c",
+    "scripts/score.py": "297d5c053d12f3f1b3f6fc134891c2a6b24f636fb10dd2cd9c599115536aee27",
+    "scripts/signal_structure.py": "886397e0aad968aa160cb77db42e028fe2d6edffdb9398ea0dbc81b7c26d9f6f",
+    "scripts/snapshot_signals.py": "c8f6a30d690b70ff53d001c2e657f0d5e465fa7e0192dd45a090d46cd349a077",
+    "scripts/stats_ci.py": "cb80cdd28998be44ca1840f5c564d987156f0fc9898bc1636460609852d4856a",
+    "scripts/strategy_review.py": "1d1b6c61d1fb3363ed12ed8783b53b52debc6e5b9bcf063732d3245d00759f8a",
+    "scripts/validate.py": "f374cc7d087bc1f873a852d0530deea0a857e03ab03c164cd4896ac107d90c6d",
+    "scripts/validation_metrics.py": "3f114243950701199eadb50b574fe16d45a5bb991344d9f18813a0bec0764103",
+    "scripts/validation_progress.py": "434d30b44be7bdd19b05ed10c26420eeab55927234978983c4576e8d11d71d63",
+    "tests/test_audit_ranking_views.py": "6b85385d3fef986c13622c0b1b74db51141f0df034b8dc0ddefb5b5990f3438a",
+    "tests/test_dashboard_ux_contract.py": "b172358fec645bc217e6241386d33ece532b9c014c26f6fd568bfecd8f5b3394",
+    "tests/test_evidence_status.py": "696f20126241efed12eb01644958d8d13d84a0bfcbd2f15e21c7db871c180acb",
+    "tests/test_hypotheses.py": "981d18503ff83e5e869f5eb8eb02893f513c548dbe43607f5cfbd5a0cdb66258",
+    "tests/test_net_cost_contract.py": "4ee76d6365ebe6cd53da39e92e1f52dd1d9a156824b04fadfa204da4b30fd4ad",
+    "tests/test_ranking_views.py": "3f4ca308f1fab105f8bfab514f33ca129b51e698a83114cbc5e9a417212f93da",
+    "tests/test_score_midrank.py": "795c2a58e7b3f24b1d4150c1391f358f21ae617253329d68c1b0487b85c96741",
+    "tests/test_snapshot_signals.py": "821bb6592fa84c9a98e28918c67780f3036d8205ef137bbf0a127873de5a401b",
+    "tests/test_stats_ci.py": "7ce98005a0f6bc6fa2377cac9db28040acb02bd373ea98d7b4c0f05f915e4013",
+    "tests/test_strategy_review.py": "a234038685e7b57ce6d34da826915698db6e37a2466ee6295ab51dba631861a6",
+    "tests/test_validation_metrics.py": "816de76ef1afd667778f567d0014fd748ca2faa9ce72eafdd5aed63aac4c3786",
+    "tests/test_validation_progress.py": "d5e60a8d07451746705ac56cf0f7ef4d6f60b37fb8aa3bce7d388cc111dde2a0"
+  }
+}

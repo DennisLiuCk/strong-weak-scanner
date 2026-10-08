@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>汰弱留強策略稽核｜2026-10-09</title>
+<style>
+:root{--ink:#172b36;--muted:#526774;--line:#dce4e5;--green:#135b51;--paper:#fff;--bg:#f3f6f5;--amber:#886018}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:80px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 'Segoe UI','Microsoft JhengHei',sans-serif}a{color:var(--green);text-underline-offset:3px}main{max-width:1140px;margin:auto;padding:36px 36px 80px}header{padding:28px 0 20px}.eyebrow{font-size:13px;letter-spacing:2px;color:var(--green);font-weight:700}h1{font-size:40px;line-height:1.35;letter-spacing:-1px;margin:12px 0 18px}h2{font-size:26px;margin:0 0 16px;line-height:1.5}h3{font-size:19px;margin:24px 0 8px}p{margin:12px 0}.lead{font-size:20px;max-width:910px}.muted,small{color:var(--muted)}small{font-size:13px;display:block;font-weight:400}.source{font-size:13px;color:var(--muted)}nav{position:sticky;top:0;z-index:2;display:flex;gap:22px;overflow:auto;white-space:nowrap;padding:14px 20px;background:#fffffff5;border:1px solid var(--line);border-radius:8px;font-size:14px}nav a{text-decoration:none}section{padding:32px;margin-top:24px;background:white;border:1px solid var(--line);border-radius:12px}.verdict{border-left:5px solid var(--green);padding:18px 24px;background:#e6f0ed;border-radius:6px;margin:22px 0}.verdict strong{font-size:21px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}.stat{border-top:2px solid var(--green);padding:14px 0}.stat strong{display:block;font-size:30px;line-height:1.5}.stat span{font-size:14px;color:var(--muted)}.table{overflow:auto}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.65}th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}thead th{background:#eef3f2;font-size:13px;color:var(--muted)}th{font-weight:600}.num{font-variant-numeric:tabular-nums;white-space:nowrap}.callout{padding:16px 20px;background:#f7f2e8;border-left:3px solid #b58840;margin:20px 0}.formula{background:#f1f5f5;padding:18px 22px;font-family:Consolas,'Microsoft JhengHei',monospace;font-size:16px;overflow:auto;white-space:nowrap}ul,ol{padding-left:24px}li{margin:9px 0}.tag{display:inline-block;background:#e7efed;color:var(--green);font-size:12px;padding:2px 8px;border-radius:4px;white-space:nowrap}.priority{color:#8e5028;font-weight:700;white-space:nowrap}code{font-family:Consolas,monospace;font-size:.91em;background:#f1f4f4;padding:2px 4px;overflow-wrap:anywhere}details{border-top:1px solid var(--line);padding-top:16px;margin-top:18px}summary{cursor:pointer;font-weight:600}footer{padding-top:25px;font-size:13px;color:var(--muted)}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:28px}.sources li{font-size:14px;margin-bottom:15px}.hash{word-break:break-all;font-size:12px}
+@media(max-width:700px){main{padding:20px 16px 48px}h1{font-size:31px}h2{font-size:23px}section{padding:22px 18px}.lead{font-size:18px}.twocol{grid-template-columns:1fr;gap:4px}.stats{gap:10px}.stat strong{font-size:26px}.stat span{font-size:12px}nav{gap:18px;padding:12px}th,td{padding:10px}}
+@media print{body{background:white}main{padding:0;max-width:none}nav{display:none}section{break-inside:avoid;border:0;border-top:1px solid #bbb;border-radius:0;padding:20px 0}details{display:block}a{text-decoration:none}}
+</style></head><body><main>
+<header><div class="eyebrow">STRONG–WEAK SCANNER · STRATEGY REVIEW</div><h1>先補強驗證，再調整因子</h1>
+<p class="lead">目前適合繼續作為<strong>同族群相對強弱研究工具</strong>。現有證據不足以支持立即改權重、移除或新增計分指標，也不足以把分層直接當作可獲利的進出場訊號。</p>
+<p class="muted">稽核日 2026-10-09（台灣）｜資料截至 2026-10-08｜涵蓋個股層、族群層、分層、成本與 OOS 治理</p>
+<div class="verdict"><strong>建議：保留正式策略；優先修驗證器與版本護欄。</strong><br>下一個值得預先登錄的研究是「抗跌因子是否應降權」，尚未取得直接採用的證據。<a href="#evidence">查看依據 ↓</a></div>
+<div class="stats"><div class="stat"><strong>59 日</strong><span>有效首次正式快照</span></div><div class="stat"><strong>50 日</strong><span>10 日前瞻已成熟</span></div><div class="stat"><strong>≈ 5.0</strong><span>有效觀測近似值／3 段</span></div></div>
+<p class="source">成熟訊號期間 2026-07-13～09-22；資料日 10-07 因首次發布延遲不計入。有效觀測＝日數÷前瞻窗，是專案治理用近似，非量得的獨立樣本數。<a href="#s1">[1]</a></p></header>
+<nav aria-label="報告章節"><a href="#mechanics">計算方式</a><a href="#evidence">樣本外證據</a><a href="#cost">交易成本</a><a href="#findings">優先改善</a><a href="#indicators">增刪指標</a><a href="#next">後續順序</a><a href="#sources">查核依據</a></nav>
+
+<section id="mechanics"><h2>目前到底算了什麼</h2>
+<p>這是六個計分元素加上一個分層條件。先在正式族群內把原始指標轉成 −2～+2，再加權、平滑、分層；量能和融資使用另訂規則。族群與大盤狀態不會自動調整個股權重。<a href="#s2">[2]</a></p>
+<div class="formula">綜合分 = 1.4×價格 + 1.0×抗跌 + 0.8×投信 + 0.5×外資 + 0.4×融資 + 0.3×量能</div>
+<div class="table"><table><thead><tr><th>元素</th><th>實際原料／計算</th><th>解讀邊界</th></tr></thead><tbody>
+<tr><th>價格 1.4</th><td>20 日還原報酬減同族群中位數，再做族群內五分位。</td><td>族群內排序時，共同減去中位数不改變排序；主要仍是 20 日動能。</td></tr>
+<tr><th>抗跌 1.0</th><td>近 20 日中，族群下跌日的個股報酬減族群中位報酬，取平均；至少 3 個有效下跌日。</td><td>量測的是條件式防守表現，不等於未来上漲能力；與價格可能共同反映市場風格。</td></tr>
+<tr><th>投信 0.8／外資 0.5</th><td>投信 5 日淨買占股本；外資持股率 20 日變化。五分位後以死區歸零。</td><td>高相對分可能只是賣得較少；不是原值一定買超。</td></tr>
+<tr><th>融資 0.4</th><td>20 日價格方向 × 10 日融資增減（不足退回 5 日），再以融資占股本 6%／9% 封頂。</td><td>「價跌融資減＝洗盤」是經濟假說，不是公式算對就成立。</td></tr>
+<tr><th>量能 0.3</th><td>當日周轉率÷自身近 60 日中位；1.2～3 倍 +1，低於 0.5 倍 −1，其餘 0。</td><td>不是單調越多越好。周轉率≥20%／量比≥5另作過熱警示。</td></tr>
+<tr><th>修正日買賣 0.0</th><td>近 20 日族群下跌日外資淨買累積占股本；只進分層 gate、族群 med_dip 與顯示。</td><td>其零權重已有明確分工，沒有必要為了「補齊指標」恢復計分。</td></tr>
+</tbody></table></div>
+<p>綜合分取近 3 個有效交易日平均。raw tier 依「槓桿風險→過熱→相對蓄勢→相對強勢→相對弱勢→中性」順序判定；既有股票需連續 2 日相同 raw tier 才轉層。相對強勢還須族群前 2、平滑分≥2.5、價格分≥1、至少一項法人分≥1，因此不能只看總分理解名單。</p>
+<div class="callout">獨立重算 152 個交易日、121 檔、18,389 列：七個分項、綜合分、平滑、raw／confirmed tier 全部與現庫吻合。這是完整資料盤點，沒有抽樣 SE；只確認實作可重現。<a href="#s3">[3]</a></div>
+<p>目前畫面已使用「相對強勢／相對蓄勢／相對弱勢」等保守名稱。正式快照中，673 個 raw 蓄勢列有 49 列的外資持股變化與修正日淨買同為負；這是相對策略的既有性質，不能誤報為新 UI 缺陷。<a href="#s3">[3]</a></p>
+</section>
+
+<section id="evidence"><h2>樣本外證據尚未支持調整</h2>
+<p>主表使用各族群 rank-IC 先聚合成「每日一個數」，再以 Newey–West（lag=9）估標準誤。下列各格均為 50 日、有效觀測近似 5.0、3 段；治理門檻為 <strong>|t| ≥ 4</strong>。± 顯示一個標準誤，並非 95% 信賴區間。<a href="#s1">[1]</a></p>
+<div class="table"><table><thead><tr><th>訊號</th><th>日均 rank-IC ±SE（t）</th><th>目前判斷</th></tr></thead><tbody><tr><th>平滑綜合分<small>composite_s</small></th><td class='num'>-0.069 ±0.045（t=-1.54）</td><td>未過 |t| ≥ 4</td></tr><tr><th>價格相對強弱<small>s_price</small></th><td class='num'>-0.031 ±0.053（t=-0.58）</td><td>未過 |t| ≥ 4</td></tr><tr><th>修正日抗跌<small>s_resil</small></th><td class='num'>-0.121 ±0.044（t=-2.77）</td><td>未過 |t| ≥ 4</td></tr><tr><th>量能<small>s_vol</small></th><td class='num'>+0.038 ±0.026（t=+1.46）</td><td>未過 |t| ≥ 4</td></tr><tr><th>外資<small>s_foreign</small></th><td class='num'>-0.029 ±0.021（t=-1.39）</td><td>未過 |t| ≥ 4</td></tr><tr><th>投信<small>s_trust</small></th><td class='num'>-0.022 ±0.018（t=-1.21）</td><td>未過 |t| ≥ 4</td></tr><tr><th>融資<small>s_margin</small></th><td class='num'>+0.001 ±0.015（t=+0.07）</td><td>未過 |t| ≥ 4</td></tr><tr><th>修正日買賣（gate）<small>s_dip</small></th><td class='num'>-0.030 ±0.019（t=-1.54）</td><td>未過 |t| ≥ 4</td></tr></tbody></table></div>
+<h3>抗跌因子是優先研究對象，尚不能直接拔掉</h3>
+<p>移除抗跌後，未平滑綜合分的同日同族群配對 ΔIC 為 <strong>+0.040 ±0.017（t=+2.39）</strong>（50 日／5.0／3 段）。方向值得關注，但未過門檻 4。這是看過資料後的事後移除診斷，沒有重跑分層、持有或成本，不能當成新策略已通過 OOS。雙邊都依 production 捨入到兩位，避免浮點誤差拆散平手。<a href="#s1">[1]</a></p>
+<p>最近三份既有週報的抗跌 OOS t 值分別是 −1.9、−2.1、−2.4（09-18／09-24／10-02），均未過各自門檻 4；10-08 的 −2.77 仍未達標。累積週報互相重疊，不能把連三週負值當成三份獨立證據。各週完整誤差與樣本列於下方。<a href="#s4">[4]</a></p>
+<details><summary>近三週抗跌證據（完整口徑）</summary><div class="table"><table><thead><tr><th>資料迄日</th><th>日均 IC ±SE（t）</th><th>成熟日／有效觀測／區段</th></tr></thead><tbody><tr><td>09-18</td><td>−0.100 ±0.053（−1.9）</td><td>38／3.8／3</td></tr><tr><td>09-24</td><td>−0.099 ±0.048（−2.1）</td><td>42／4.2／3</td></tr><tr><td>10-02</td><td>−0.109 ±0.045（−2.4）</td><td>46／4.6／3</td></tr></tbody></table></div></details>
+<h3>三個不能只看點估計的比較</h3><div class="table"><table><thead><tr><th>比較</th><th>配對差 ±SE（t）</th><th>含義</th></tr></thead><tbody>
+<tr><th>抗跌濾網：擋下−放行</th><td class="num">+1.349 ±1.051（t=+1.28） pp</td><td>不能因擋下者點估計較好就移除濾網。</td></tr>
+<tr><th>相對強勢−相對弱勢</th><td class="num">-0.886 ±1.026（t=-0.86） pp</td><td>尚無證據確認強弱名單帶來正的前瞻排序差。</td></tr>
+<tr><th>med_dip 領漲命中−隨機基準</th><td class="num">-1.25 ±6.29（t=-0.20） pp</td><td>未證實其領漲辨識優勢；也未證實顯著劣於基準。</td></tr>
+</tbody></table></div><p class="source">全部為 10 日前瞻、50 日／5.0／3 段；前兩項為報酬百分點，第三項為命中率百分點。med_dip 命中 4/50＝8%，當日族群數變動下的平均隨機基準 9.25%，不是 runbook 舊文的 33%。<a href="#s1">[1]</a></p>
+<p>C1（量能歸零）／C2（價格降至1.0）現行 spec 起於 09-07，只有 12 個成熟日、有效觀測 1.2、1 段；配對 ΔIC −0.0027／−0.0249，SE／t 不可估。未達有效觀測≥10的研究門檻。舊版與新版快照不能串接補樣本。<a href="#s1">[1]</a></p>
+</section>
+
+<section id="cost"><h2>扣成本後，尚不能當作交易策略</h2>
+<p>只取有效正式快照，訊號翌日開盤進場，持有 H 個交易日後開盤離場。下表為相對「同族群其他股票中位數」的超額，扣專案假設的單次來回成本 0.585%；每日先平均，再估 SE。<a href="#s1">[1]</a></p>
+<div class="table"><table><thead><tr><th>分層</th><th>持有</th><th>淨超額 ±SE（t），pp</th><th>日／有效觀測／段</th><th>訊號末日</th></tr></thead><tbody><tr><th>相對強勢</th><td>3 日</td><td class='num'>-0.363 ±0.350（t=-1.04）</td><td>56／18.67／3</td><td>10-02</td></tr><tr><th>相對強勢</th><td>5 日</td><td class='num'>-0.461 ±0.533（t=-0.87）</td><td>54／10.80／3</td><td>09-30</td></tr><tr><th>相對強勢</th><td>10 日</td><td class='num'>+0.237 ±0.808（t=+0.29）</td><td>49／4.90／3</td><td>09-21</td></tr><tr><th>相對蓄勢</th><td>3 日</td><td class='num'>-0.439 ±0.330（t=-1.33）</td><td>56／18.67／3</td><td>10-02</td></tr><tr><th>相對蓄勢</th><td>5 日</td><td class='num'>-0.369 ±0.518（t=-0.71）</td><td>54／10.80／3</td><td>09-30</td></tr><tr><th>相對蓄勢</th><td>10 日</td><td class='num'>+0.571 ±1.073（t=+0.53）</td><td>49／4.90／3</td><td>09-21</td></tr></tbody></table></div>
+<p class="source">訊號起日皆 2026-07-13。3／5／10 日的分級 t 門檻分別為 2.5／3.0／4.0，全部未通過。此表為重疊固定持有 cohort 診斷，沒有資金配置、重複持倉合併或實際淨值；不能換算成年化績效。</p>
+<div class="twocol"><div><h3>成本假設需要明示</h3><p>0.585%＝0.1425%手續費×2＋0.3%賣出稅，是本專案的基準情境。官方規範允許券商自行訂定手續費；不是每位投資人的固定成本。此處未含滑價、價差、市場衝擊、最低費用或無法成交。<a href="#s6">[6]</a></p></div><div><h3>分層停留 ≠ 固定持有績效</h3><p>現有週報以重算歷史估得相對強勢中位停留 4 日（244 完整段）、相對蓄勢 4 日（191 段），排除尾段有截尾偏誤，並非 OOS 持有期估計。进出都延一天，不會自動讓持有期少一天；應直接模擬實際 tier 轉入／轉出。<a href="#s4">[4]</a></p></div></div>
+<p>族群中位數是研究基準，不是可買入的等權投資組合；報酬分布右偏時，多個 tier 的平均超額都可能為正。未來應並列同口徑等權同儕基準、強弱配對差與實際持有組合，避免把「高於中位數」解讀成可交易 alpha。</p>
+</section>
+
+<section id="findings"><h2>應優先改善的地方</h2>
+<p>以下是驗證與計算治理問題。它們值得修正，但不等於目前 DB 的全部訊號失真，也不構成任何新因子已證明有用。<a href="#s2">[2]</a> <a href="#s3">[3]</a> <a href="#s5">[5]</a></p>
+<div class="table"><table><thead><tr><th>優先序</th><th>發現與位置</th><th>具體處理</th></tr></thead><tbody>
+<tr><td class="priority">P1</td><th>成本節混用全歷史<small>validate.py:790、850</small></th><td>§⑩没有 OOS 篩選。增加明確的 IS／restated／首次正式 OOS 分欄；主判斷採 OOS。此次獨立工具已補算，既有週報尚未修改。</td></tr>
+<tr><td class="priority">P1</td><th>缺日被壓縮成相鄰日<small>stats_ci.py:26、85</small></th><td>HAC 應保留完整交易日距離；以分段／日曆間隔測試做穩健性檢查，再重新校準治理門檻。此次只提供敏感度，不改現行門檻。</td></tr>
+<tr><td class="priority">P1</td><th>spec hash 未涵蓋實際影響結果的 helper<small>ranking_views.py:663</small></th><td>rankdata 等 helper 改變仍可能沿用舊 SHA。補完整計算依賴的雜湊與回歸測試，明確版本遷移；尚無證據顯示舊快照已混規則。</td></tr>
+<tr><td class="priority">P2</td><th>Champion 平手依賴輸入次序<small>score.py:84、244</small></th><td>因子用平均秩；前2／後2的邊界須事先定義如何處理同分。這會改分數／tier，必須受治理地開新版，不重寫舊 OOS。</td></tr>
+<tr><td class="priority">P2</td><th>決策所需的誤差缺項<small>validate.py:625、728</small></th><td>補 s_vol、tier、濾網、族群命中與配對 ablation 的 SE／有效觀測／區段；目前叫讀者回§⑨查，但部分數字實際未列。</td></tr>
+<tr><td class="priority">P2</td><th>邊際貢獻沒有完全依 production 捨入<small>signal_structure.py:67</small></th><td>加權和應同 score.py 的 round2／明確精確權重處理，並以同日同群同股配對；不要让浮點尾數拆散平手。</td></tr>
+<tr><td class="priority">P2</td><th>治理文字和測試含舊假設<small>WEEKLY_REVIEW.md §④；validate.py §⑩；test_net_cost_contract.py</small></th><td>將33%改為當日1/G（並列領漲時調整）；成本門檻統一分級 t；移除「進出各延一天＝持有少一天」推論。期末市值分組只可描述，不可當歷史同尺證據。</td></tr>
+</tbody></table></div>
+<h3>可重現的例子</h3>
+<p><strong>平手：</strong>僅把輸入順序反轉，07-10 起現規則重算歷史 7,499 列中有 23 個 confirmed tier 改變，涉及 16 日；10-08 當日沒有改變。這是完整資料結構盤點，非成效抽樣，不應据此宣稱改成平均秩能提高報酬。<a href="#s3">[3]</a></p>
+<p><strong>缺日：</strong>「相對弱勢·槓桿風險」10日超額 +3.108±0.769 pp（t=4.04；44日／4.4／5段）；以實際交易日間隔估 HAC 後變為 +3.108±1.012 pp（t=3.07）。同一格從勉強過4變成未通過，因此不能把它挑出來主張應反向買進。<a href="#s1">[1]</a></p>
+<p><strong>版本：</strong>記憶體內將平均秩 helper 換成 dense rank，測試值 [1,1,2] 的百分位由 [25,25,100] 變成 [0,0,50]，spec SHA 卻相同。正式檔案未修改；這證明護欄有未覆蓋的路徑，不是在宣稱歷史已被污染。<a href="#s3">[3]</a></p>
+</section>
+
+<section id="indicators"><h2>哪些保留、哪些候選調整</h2>
+<div class="table"><table><thead><tr><th>項目</th><th>目前建議</th><th>要增加的證據</th></tr></thead><tbody>
+<tr><th>價格相對強弱</th><td><span class="tag">保留1.4</span> 結構集中值得監控；不能因集中就認定它無效。</td><td>C2 同版正式快照持續累積；用同日配對增量與成本判斷。</td></tr>
+<tr><th>修正日抗跌</th><td><span class="tag">優先新假說</span> 建議下一個單一候選測試為1.0→0.5，仍保留 B 防守視角。</td><td>先凍結 C3 定義、未來發布日起收快照。0.5 是實驗選項，不是估出來的最適值。</td></tr>
+<tr><th>量能</th><td><span class="tag">保留0.3</span> 暫不採用 C1；過熱警示保留。</td><td>已有 C1 可用，避免再新增一堆近似版本；達門檻後仍須另驗 tier／成本。</td></tr>
+<tr><th>外資／投信／融資</th><td><span class="tag">保留現制</span> 無足夠證據升降權或全部改 gate。</td><td>使用配對邊際貢獻與 H1 已登錄的籌碼支持假說，不拿單因子IC排序定權重。</td></tr>
+<tr><th>抗跌蓄勢濾網</th><td><span class="tag">另期檢驗</span> 目前不移除，避免與抗跌權重同時變動。</td><td>事前定義放寬版本与等效／非劣界線。「未顯著較差」不等於已證明不差。</td></tr>
+<tr><th>med_dip 族群訊號</th><td><span class="tag">維持候選</span> 可描述资金狀態，尚不能視為領漲預測已驗證。</td><td>動態基準、日聚合命中差誤差、連續檢視，勿用舊33%門檻。</td></tr>
+<tr><th>TDCC／借券／D基本面</th><td><span class="tag">留觀察層</span> 不加入綜合分，也不刪除資料。</td><td>TDCC 按新週快照取樣；基本面按 first-seen、共同期別；增量信息与前瞻／成本皆需驗證。</td></tr>
+<tr><th>RSI／MACD／更多動能視窗</th><td><span class="tag">暫不新增計分</span> 現已有價格、抗跌及 A 的多週期價格視角。</td><td>先提出新機制和獨立增量假說，再談加入。多加一個相似價格指標可能只增加自由度。</td></tr>
+</tbody></table></div>
+<p>比新增 alpha 指標更有用的，是補<strong>執行可行性與模型品質資訊</strong>：成交額與可能參與率、缺值與有效下跌日數、同分邊界、資料發布時間、實際持有換手与成本。它們可先作研究診斷；若用來篩股票，仍須另開有版本的策略測試。</p>
+<p class="source">上表是根據本次稽核的研究建議，尚未新增正式假說／修改任何 production 參數。大量因子與反覆試驗需要控制多重檢驗；本專案的分級門檻不是對所有搜尋與每週窺看均有效的5%錯誤率保證。<a href="#s7">[7]</a></p>
+</section>
+
+<section id="next"><h2>建議執行順序</h2><ol>
+<li><strong>先把裁判補齊：</strong>把此次唯讀 OOS 計算納入正式週報，修缺日 HAC、成本分桶、同分計算與 spec 依賴覆蓋。維持既有正式快照與 archive。</li>
+<li><strong>再規劃 Champion 同分改版：</strong>凍結因子平均秩與邊界平手政策，做輸入排列不變測試，將變更作為新 production 版本。不要與權重調整混成一次實驗。</li>
+<li><strong>只登錄一個新權重候選：</strong>C3 抗跌1.0→0.5，其餘不動；維持3日平滑與原tier，先看同日同群配對 rank-IC。新資料起算，主要門檻有效觀測≥10且正向t過分級門檻；成功只進下一階段。負向通過則放棄；累積到預先設定的最終檢視點仍無訊號便停止，不臨場挑窗。</li>
+<li><strong>另開實際交易規則的驗證：</strong>先定義名單、進出、權重、訊號重複、停牌與不可成交處理，再用首次發布後的隔日開盤、成本与滑價計算淨值、換手与下行風險。固定持有10日的IC不等於照tier交易。</li>
+<li><strong>最後才評估升格：</strong>依 WEEKLY_REVIEW 的連續檢視與樣本條件，最多1～2個旋鈕；真正改權重或 tier 時重設 IS_CUTOFF，保留舊版證據與新 OOS 時鐘。</li>
+</ol><p>以上是後續工作順序，不是自動部署或排程。本次只新增稽核工具、測試與報告；正式計分、資料庫與 OOS 帳本沒有由本次分析改寫。</p></section>
+
+<section id="sources"><h2>查核依據與可重現性</h2>
+<p>原始五表稽核 PASS，SQLite integrity 正常；120／120 有效股票的當日多視角覆蓋完整。Universe 仍為121，差一檔由6173官方減資停牌證據解釋；不能把120／121直接當資料遺失。最近daily與weekly Actions均成功，Pages部署本次未另行查核。</p>
+<p>環境：Windows 11、python.org Python 3.12.10、<code>utf8_mode=0</code>、未設定 <code>PYTHONUTF8</code>／<code>PYTHONIOENCODING</code>。既有模組可自行將 stdout 設為UTF-8。新增7項、統計13項、入口文件同步1項，共21項針對性測試通過；未重跑整個研究／網站測試套件。測試在一般Windows暫存環境執行，沙箱暫存權限失敗不當作測試通過。</p>
+<p>主要量測由兩條独立匯總路徑逐日核對：<strong>32 條序列、1,788 個標量</strong>一致（容許差1e−11，最大差 8.9e-16）。獨立路徑未 import validate／evidence_status／signal_structure，另以 covariance 公式核對 NW。這些是完整數值核對次數，非績效樣本。</p>
+<p>所有分析 DB 入口都由 <code>db_ro.connect()</code> 的 mode=ro + query_only 強制；計算前後 DB SHA一致。</p><p class="hash">DB SHA256：1eaf40357565dcf085abbc21e8cba61741c97ab7b3f4c786466617e6f0554b69</p>
+<div class="formula">python scripts/strategy_review.py --out tmp/strategy_review.json</div>
+<p class="source">以本次相同DB版本重跑可復現；<code>--as-of</code>只限結果日期，不重建舊版DB原貌。正式生效日與截止日切分由既有契約決定。</p>
+<ol class="sources">
+<li id="s1"><strong>本次 OOS 重算。</strong> <a href="strategy_review_2026-10-09/strategy_review.json">完整數值、每日序列與方法</a>；<a href="strategy_review_2026-10-09/verification.json">雙路徑核對</a>；<a href="../scripts/strategy_review.py">唯讀計算器</a>；<a href="../tests/test_strategy_review.py">邊界測試</a>。信號取首次正式eligible快照，前瞻結果用目前還原價，不回填訊號。</li>
+<li id="s2"><strong>現行公式与解釋。</strong> <a href="../README.md">README</a>；<a href="../scripts/score.py">score.py</a>；<a href="../scripts/fetch_daily.py">fetch_daily.py:1989–2026、2050–2121</a>。此次獨立scorer核對從3月2日開始，並未延長正式DB歷史。</li>
+<li id="s3"><strong>計算與版本實驗。</strong> <a href="strategy_review_2026-10-09/formula_audit.json">獨立scorer與排列測試</a>；<a href="strategy_review_2026-10-09/spec_guard_audit.json">spec依賴覆蓋測試</a>；<a href="strategy_review_2026-10-09/sign_semantics_audit.json">相對分數／原值方向盤點</a>。皆為確定性結構檢查，不是報酬有效性推論。</li>
+<li id="s4"><strong>週報與紀律。</strong> <a href="validate_2026-09-18.md">09-18週報</a>／<a href="validate_2026-09-24.md">09-24週報</a>／<a href="validate_2026-10-02.md">10-02週報</a>；本次重跑至10-08（暫存於tmp/strategy_audit_20261009/validate_2026-10-08.md）；<a href="../WEEKLY_REVIEW.md">WEEKLY_REVIEW</a>／<a href="../ANALYSIS_DISCIPLINE.md">ANALYSIS_DISCIPLINE</a>。</li>
+<li id="s5"><strong>統計与治理實作。</strong> <a href="../scripts/validate.py">validate.py</a>；<a href="../scripts/stats_ci.py">stats_ci.py</a>；<a href="../scripts/ranking_views.py">ranking_views.py</a>。未因本次稽核修改其公式、門檻或spec。</li>
+<li id="s6"><strong>交易制度與成本來源。</strong> <a href="https://www.twse.com.tw/zh/about/company/guide.html">臺灣證交所投資指南：手續費與交易稅表</a>、<a href="https://twse-regulation.twse.com.tw/TW/law/DOC01_print.aspx?FLCODE=fl007304&amp;FLNO=94">營業細則第94條</a>；2026-10-09查詢。0.1425%為專案佣金假設，0.3%為一般股票賣出稅率；本文持有跨日，沒有套當沖稅率。</li>
+<li id="s7"><strong>多重檢驗的方法背景。</strong> Harvey、Liu、Zhu，<a href="https://www.nber.org/papers/w20592">…and the Cross-Section of Expected Returns</a>（NBER，2014／期刊2016）。用來支持控制因子搜尋與反覆檢驗的必要，不把文中t門檻直接當本資料的臨界值。</li>
+</ol><details><summary>仍有限制，不能從本報告推出的結論</summary><ul><li>前瞻10日高度重疊；跨股與跨族群也可能共振。日聚合與HAC減輕問題，不能保證已精確控制全部錯誤率。</li><li>既有t分級以特定模擬校準；多重比較、選擇最佳版本與每週反覆檢查仍須另外治理。</li><li>最新還原價可能因公司行動或資料修正而重述；正式信號採as-seen保存，但本文不是逐版本回放全部上游資料的審計。</li><li>研究期間、universe与市場情境有限，不能外推至所有台股或完整多空循環。</li><li>新假說使用此次資料形成，只能從未來新快照開始驗證；本報告沒有找到「最佳權重」。</li></ul></details>
+</section><footer>完成於2026-10-09（台灣）。這是專案方法與證據的稽核，不包含個股目標價、部位建議或交易委託。</footer>
+</main></body></html>

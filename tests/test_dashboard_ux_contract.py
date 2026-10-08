@@ -387,7 +387,7 @@ class DashboardUxContractTest(unittest.TestCase):
              fd.GS_BREADTH_LOW, fd.TDCC_LAG_DAYS),
             (-0.03, 10, 6, -0.05, 0.4, 3),
         )
-        self.assertEqual(validate.IS_CUTOFF, "2026-07-05")
+        self.assertEqual(validate.IS_CUTOFF, score.SCORE_EFFECTIVE_FROM)
 
     # ---------- 台積電法說:搬到研究中心，族群指引與觀察層鐵律保留 ----------
 

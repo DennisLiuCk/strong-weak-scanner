@@ -1,0 +1,16 @@
+{
+  "spec_digest_source": "def spec_digest():\n    \"\"\"規格＋核心 evaluator 原始碼雜湊；改定義即得到新 spec、OOS 時鐘重啟。\"\"\"\n    evaluators = {\n        function.__name__: inspect.getsource(function)\n        for function in (\n            rank_percentiles, peer_sensitivity, _common_period, load_fundamental_inputs,\n            shadow_composites, compute_group_views,\n        )\n    }\n    payload = {\"contract\": RANKING_CONTRACT, \"evaluators\": evaluators}\n    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(\",\", \":\"))\n    return hashlib.sha256(raw.encode(\"utf-8\")).hexdigest()\n",
+  "before_sha": "b9076628ddb7c9ddd76c5d4934a5f6c3d8e8bbb75c56d1b3bce9c60f8e23bd4e",
+  "after_sha": "b9076628ddb7c9ddd76c5d4934a5f6c3d8e8bbb75c56d1b3bce9c60f8e23bd4e",
+  "before_percentiles": {
+    "A": 25.0,
+    "B": 25.0,
+    "C": 100.0
+  },
+  "changed_helper_percentiles": {
+    "A": 0.0,
+    "B": 0.0,
+    "C": 50.0
+  },
+  "interpretation": "Helper semantics can change without spec hash change. This does not show historical snapshots actually changed evaluator."
+}

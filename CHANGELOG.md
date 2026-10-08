@@ -1,5 +1,50 @@
 # Changelog
 
+## 驗證方法、同分計算與前瞻觀測契約 — 2026-10-09
+
+- 修正 `stats_ci` 的交易日距離 HAC：缺值與 regime 缺口不再壓縮；補日期對齊、
+  非有限值與 SE=0 護欄。40 條既有日序列對獨立 Bartlett 二次型的 SE 最大差
+  8.88e−16；`n/F` 明確改稱啟發式樣本尺度。分級門檻維持，沒有宣稱完成多重比較校準。
+- 週報成本節分開現行 OOS／IS／重算，披露價格缺失與同業不足排除數；修正隔日進出
+  不會縮短持有期的口徑。§⑨ 補量能、tier、cohort與逐日族群命中差的誤差；消融與
+  C1/C2/C3 逐日逐族群逐股票配對，雙邊 round2，零變異整對排除。
+- 正式因子與 tier 邊界改平均序位；權重未變。隔離副本18,389列全數重建與置換檢查
+  一致，對舊算式的精確庫存差為19列外資分、57列平滑分、37列確認tier（31個日期）；
+  最新10/08各欄差異均0。這是計算正確性修正的全量盤點，非抽樣效果或報酬提升證據。
+  `IS_CUTOFF`移至2026-10-09；score建置metadata及snapshot exact spec防舊分數冒充新版。
+- ranking hash涵蓋所有本模組helper與score依賴；C3抗跌權重0.5只登錄影子候選。
+  舊ranking spec及H1保留，H1v2重新起算。舊快照原欄位雙向SQL EXCEPT均0；C3舊列
+  維持NULL，生效日前preview不算OOS，錯score metadata的正式capture硬停。
+- 新增 `STRATEGY_VALIDATION_PROTOCOL.md` 與每週 `validation_progress.py`：10／20／40
+  正式日先驗結構；各候選首100／200／300成熟配對日才作固定研究複核。帳本保存輸入、
+  日曆、快照ID、source SHA及receipt，晚補／修价／規格漂移標紅，不靜默覆寫。
+  採用前仍需多重／序列校準及另行前瞻tier、換手、滑價與成本驗證，不新增正式指標。
+- 驗收在Windows 11／python.org 3.12.10、utf8_mode=0、未設PYTHONUTF8／PYTHONIOENCODING：
+  已提交研究內容＋本次程式的隔離完整套件793項通過（略過1），最終66項針對性測試通過。
+  共享工作區的研究筆記另在編輯，曾造成質化品質測試失敗，未為此改動研究內容。
+  raw audit、新版週報與進度工具通過；正式DB SHA維持`1eaf4035…0554b69`，archive未改。
+  驗收證據在`reports/strategy_validation_2026-10-09/acceptance.json`。本輪提交程式與驗收
+  紀錄；正式DB重建沿日常final管線執行。日期表以10/12開始新版正式發布為條件，
+  驗收時新spec正式OOS為0。
+
+## 汰弱留強策略唯讀稽核 — 2026-10-09
+
+- 新增 `scripts/strategy_review.py` 與 `reports/strategy_review_2026-10-09.html`：
+  只讀首次正式且 eligible 的 as-seen 訊號，補齊因子、tier、濾網、配對邊際貢獻、
+  族群命中、challenger 與隔日開盤成本的日聚合誤差。事後 ablation 不冒充新策略 OOS；
+  新增按完整交易日間距估 HAC 的敏感度，未修改既有統計門檻。
+- 2026-07-13～09-22 的 50 個成熟 OOS 日，有效觀測近似 5.0、3 段：
+  composite_s IC −0.068809 ±0.044563（t=−1.544）、抗跌 IC −0.121464 ±0.043781
+  （t=−2.774）；移除抗跌的未平滑配對 ΔIC +0.040294 ±0.016841（t=+2.393），
+  均未過現行門檻 4。此次未改權重、tier、IS_CUTOFF 或正式 DB。
+- 稽核指出既有成本節混用全期、HAC 壓縮缺日、部分決策缺誤差、Champion 同分
+  順序依賴及 ranking spec 未涵蓋部分 helper；列入後續改善，未暗改正式計算。
+  同分問題為結構缺陷，不宣稱修正即可提高報酬；spec 缺口不等於歷史已混規則。
+- Windows 11／python.org 3.12.10，未設 PYTHONUTF8／PYTHONIOENCODING、utf8_mode=0：
+  新增 7 項、統計 13 項、入口同步 1 項針對性測試通過。32 條序列／1,788 個標量與
+  獨立 SQL／統計路徑核對，最大差 8.88e−16；db_ro 強制唯讀，DB SHA 前後一致。
+  HTML 桌機 1440×1000 與手機 390×844 已檢查；沒有發布網站或重寫 archive。
+
 ## 景碩 Q2 正式研究、五家公司小作文與液冷場址分析 — 2026-10-09
 
 - 景碩依 focused_v1 重研，使用四份核心一手文件與同一 evidence pack 離線獨立重算；

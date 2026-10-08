@@ -8,10 +8,13 @@
 分不出高下的名次,不如驗一個方向、門檻、放棄條件都事先寫死的假設。
 """
 import datetime
+import hashlib
 import inspect
+import json
 import re
 import sys
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -61,7 +64,7 @@ class HypothesisRegistryTest(unittest.TestCase):
         self.assertIn("累積中", hyp.status(h, early))
         blocked = {"t": None, "se": None, "mean": 1.0, "eff_obs": 1.0, "se_blocked": True}
         self.assertIn("累積中", hyp.status(h, blocked))
-        self.assertEqual(hyp.status(h, None), "尚無資料")
+        self.assertIn("累積中", hyp.status(h, None))
 
     def test_status_honours_declared_direction(self):
         """宣告方向為正時,強烈的反向結果必須判成「依宣告放棄」,不能改口說也算成功。"""
@@ -69,16 +72,93 @@ class HypothesisRegistryTest(unittest.TestCase):
         # 門檻隨 eff_obs 分級(eff=40 → 2.4),故用 t=±3.0 才確定過門檻
         ok = {"t": 3.0, "se": 0.1, "mean": 0.3, "eff_obs": 40.0, "se_blocked": False}
         bad = {"t": -3.0, "se": 0.1, "mean": -0.3, "eff_obs": 40.0, "se_blocked": False}
-        self.assertIn("達成", hyp.status(h, ok))
-        self.assertIn("放棄", hyp.status(h, bad))
+        self.assertIn("達探索門檻", hyp.status(h, ok))
+        self.assertIn("探索性反向", hyp.status(h, bad))
+        self.assertIn("待固定樣本", hyp.status(h, ok))
+        self.assertIn("多重序列校準複核", hyp.status(h, bad))
         h["direction"] = "negative"
-        self.assertIn("放棄", hyp.status(h, ok))
-        self.assertIn("達成", hyp.status(h, bad))
+        self.assertIn("探索性反向", hyp.status(h, ok))
+        self.assertIn("達探索門檻", hyp.status(h, bad))
 
     def test_no_signal_after_long_window_triggers_abandonment(self):
         h = hyp.REGISTRY[0]
         flat = {"t": 0.3, "se": 0.1, "mean": 0.03, "eff_obs": 31.0, "se_blocked": False}
-        self.assertIn("放棄", hyp.status(h, flat))
+        self.assertIn("探索性無訊號", hyp.status(h, flat))
+        self.assertIn("待固定樣本", hyp.status(h, flat))
+
+    def test_zero_se_does_not_mean_success_or_no_signal(self):
+        h = hyp.REGISTRY[0]
+        invalid = {"t": None, "se": 0.0, "mean": 1.0, "eff_obs": 31.0, "se_blocked": False}
+        self.assertIn("累積中", hyp.status(h, invalid))
+        self.assertNotIn("放棄", hyp.status(h, invalid))
+        self.assertNotIn("達成", hyp.status(h, invalid))
+
+    def test_calendar_hac_change_is_new_registration_with_frozen_legacy(self):
+        current, legacy = hyp.REGISTRY[0], hyp.LEGACY_REGISTRY[0]
+        self.assertEqual(current["id"], "H1v2")
+        self.assertEqual(current["registered"], "2026-10-09")
+        self.assertEqual(current["oos_start_after"], "2026-10-09")
+        self.assertEqual(current["planned_review_days"], [100, 200, 300])
+        self.assertEqual(current["supersedes_spec_sha"], legacy["spec_sha"])
+        self.assertEqual(legacy["id"], "H1")
+        self.assertEqual(legacy["registered"], "2026-07-26")
+        self.assertEqual(legacy["spec_sha"], "562d0d24199e7561")
+        self.assertNotEqual(current["spec_sha"], legacy["spec_sha"])
+        self.assertEqual(hyp.legacy_spec_digest(legacy), legacy["spec_sha"])
+        entry = hyp.LEGACY_ARCHIVES[legacy["id"]]
+        blob = Path(entry["path"]).read_bytes()
+        self.assertEqual(hashlib.sha256(blob.replace(b"\r\n", b"\n")).hexdigest(), entry["sha256_lf"])
+        archive = json.loads(blob)
+        original = hashlib.sha256("\n".join(archive["spec_digest_parts"]).encode("utf8")).hexdigest()[:16]
+        self.assertEqual(original, legacy["spec_sha"])
+        self.assertIn("scripts/stats_ci.py", archive["source_files"])
+        self.assertIn("scripts/hypotheses.py", archive["source_files"])
+        with self.assertRaises(ValueError):
+            hyp.legacy_spec_digest({**legacy, "registered": "2026-10-09"})
+        with mock.patch("builtins.open", mock.mock_open(read_data=blob.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))):
+            self.assertEqual(hyp.legacy_spec_digest(legacy), legacy["spec_sha"])
+        with mock.patch("builtins.open", mock.mock_open(read_data=blob + b" ")):
+            with self.assertRaises(ValueError):
+                hyp.legacy_spec_digest(legacy)
+
+    def test_evaluation_enforces_new_clock_even_with_overbroad_snapshot_filter(self):
+        current = hyp.REGISTRY[0]
+        calendar = ["2026-07-26", "2026-10-08", "2026-10-09", "2026-10-12", "2026-10-13"]
+        series = dict(zip(calendar, (999.0, 999.0, 999.0, 1.0, 3.0)))
+        with mock.patch.dict(hyp.EVALUATORS, {current["evaluator"]: lambda ctx, hold: series}):
+            result = hyp.evaluate(current, {"dates": calendar}, set(calendar))
+            self.assertEqual(result["n_days"], 2)
+            self.assertEqual(result["mean"], 2.0)
+            self.assertTrue(result["se_blocked"])
+            self.assertIsNone(hyp.evaluate(current, {"dates": calendar}, set(calendar[:3])))
+            background = hyp.evaluate(current, {"dates": calendar})
+            self.assertEqual(background["n_days"], 5)
+            with self.assertRaises(ValueError):
+                hyp.evaluate(hyp.LEGACY_REGISTRY[0], {"dates": calendar}, set(calendar))
+
+    def test_digest_covers_alignment_helpers_and_registration_filter(self):
+        source = inspect.getsource(hyp.spec_digest)
+        for required in ("sci._calendar_positions", "sci._aligned_values", "sci._lag_products",
+                         "sci.effective_obs", "evaluate", "oos_start_after", "statistics_contract"):
+            self.assertIn(required, source)
+        current = hyp.REGISTRY[0]
+        changed = {**current, "oos_start_after": "2026-10-08"}
+        self.assertNotEqual(hyp.spec_digest(changed), hyp.spec_digest(current))
+
+    def test_runtime_statistics_helper_or_constant_changes_the_digest(self):
+        current = hyp.REGISTRY[0]
+        before = hyp.spec_digest(current)
+
+        def altered_lag_products(observed, lag):
+            return {0: 999.0}, {0: len(observed)}
+
+        with mock.patch.object(hyp.sci, "_lag_products", altered_lag_products):
+            self.assertNotEqual(hyp.spec_digest(current), before)
+        with mock.patch.object(hyp.sci, "MIN_EFF_OBS", 3.5):
+            self.assertNotEqual(hyp.spec_digest(current), before)
+        with mock.patch.object(hyp.sci, "T_THRESHOLD", ((6.0, 3.9), (12.0, 3.0), (30.0, 2.5))):
+            self.assertNotEqual(hyp.spec_digest(current), before)
+        self.assertEqual(hyp.spec_digest(current), before)
 
     def test_chip_weights_exclude_price_and_are_frozen(self):
         """籌碼分數不得含價格因子(否則假設就不是「價 vs 籌碼」了),

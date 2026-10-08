@@ -24,17 +24,28 @@ import inspect
 import json
 import os
 import statistics
+import sys
 from collections import defaultdict, deque
 
 from hypotheses import CHIP_WEIGHTS
+import score
 from score import VOL_OVERHEAT, VOLR_OVERHEAT, WEIGHTS
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROLES_CONFIG = os.path.join(ROOT, "config", "ranking_roles.csv")
-SCHEMA_VERSION = 2
-REGISTERED_AT = "2026-09-07T00:00:00+08:00"
-CHALLENGER_REGISTERED_AT = "2026-08-13T00:00:00+08:00"
+SCHEMA_VERSION = 3
+REGISTERED_AT = "2026-10-09T00:00:00+08:00"
+EFFECTIVE_FROM = "2026-10-09"
+CHALLENGER_REGISTERED_AT = REGISTERED_AT
+PREVIOUS_SPECS = ({
+    "spec_sha": "b9076628ddb7c9ddd76c5d4934a5f6c3d8e8bbb75c56d1b3bce9c60f8e23bd4e",
+    "schema_version": 2,
+    "registered_at": "2026-09-07T00:00:00+08:00",
+    "challenger_original_registered_at": "2026-08-13T00:00:00+08:00",
+    "score_version": score.SCORE_PREVIOUS_VERSION,
+    "status": "retained as historical evidence; never pooled with the current spec",
+},)
 MIN_ROLE_N = 4
 TOP_PCT = 80.0
 RISK_FLAG_CAP = 10.0
@@ -45,20 +56,36 @@ CHALLENGERS = {
         "purpose": "測試量能只保留為過熱 gate，是否降低無效自由度",
         "weights": {**WEIGHTS, "vol": 0.0},
         "registered_at": CHALLENGER_REGISTERED_AT,
-        "oos_start": "2026-08-13",
+        "oos_start": EFFECTIVE_FROM,
+        "original_registered_at": "2026-08-13T00:00:00+08:00",
     },
     "price_1_0": {
         "label": "C2 降低價格集中度",
         "purpose": "測試價格權重 1.4→1.0，其他條件不變",
         "weights": {**WEIGHTS, "price": 1.0},
         "registered_at": CHALLENGER_REGISTERED_AT,
-        "oos_start": "2026-08-13",
+        "oos_start": EFFECTIVE_FROM,
+        "original_registered_at": "2026-08-13T00:00:00+08:00",
     },
+    "resil_0_5": {
+        "label": "C3 抗跌權重減半",
+        "purpose": "前瞻檢驗抗跌權重 1.0→0.5；僅影子排名，不改正式 tier",
+        "weights": {**WEIGHTS, "resil": 0.5},
+        "registered_at": CHALLENGER_REGISTERED_AT,
+        "oos_start": EFFECTIVE_FROM,
+    },
+}
+CHALLENGER_FIELDS = {
+    "vol_zero": "shadow_vol0",
+    "price_1_0": "shadow_price10",
+    "resil_0_5": "shadow_resil05",
 }
 
 RANKING_CONTRACT = {
     "schema_version": SCHEMA_VERSION,
     "registered_at": REGISTERED_AT,
+    "effective_from": EFFECTIVE_FROM,
+    "previous_specs": PREVIOUS_SPECS,
     "universe": "current universe, ranked only within formal group",
     "rank_method": "average-rank percentile (0..100)",
     "tie_policy": "exact ties receive the same midpoint rank",
@@ -102,11 +129,15 @@ RANKING_CONTRACT = {
         },
     },
     "champion": {
-        "status": "unchanged production composite/tier",
+        "status": "production weights unchanged; governed midrank composite/tier version",
+        "score_version": score.SCORE_VERSION,
+        "score_effective_from": score.SCORE_EFFECTIVE_FROM,
         "display_rank": "average-rank percentile of composite_s",
-        "legacy_factor_ties": "kept unchanged until a separately governed production reset",
+        "factor_and_tier_ties": score.SCORE_TIE_POLICY,
     },
     "challengers": CHALLENGERS,
+    "challenger_fields": CHALLENGER_FIELDS,
+    "challenger_smoothing": "round daily weighted sum to 2 decimals, mean last 3 effective trading days, round to 2 decimals",
     "usage": "descriptive comparison, research triage, hypothesis registration",
     "forbidden_claims": [
         "future return forecast", "buy/sell signal", "tradable edge", "analyst accuracy winner",
@@ -463,11 +494,12 @@ def shadow_composites(con, date):
     }
     for row in rows:
         for challenger, spec in CHALLENGERS.items():
-            value = sum(spec["weights"][key] * _score(row, f"s_{key}") for key in WEIGHTS)
+            value = round(sum(spec["weights"][key] * _score(row, f"s_{key}") for key in WEIGHTS), 2)
             history[challenger][row["stock_id"]].append(value)
     return {
-        challenger: {stock_id: round(statistics.mean(values), 4)
-                     for stock_id, values in by_stock.items() if values}
+        challenger: ({stock_id: round(statistics.mean(values), 2)
+                      for stock_id, values in by_stock.items() if values}
+                     if date >= CHALLENGERS[challenger]["oos_start"] else {})
         for challenger, by_stock in history.items()
     }
 
@@ -605,6 +637,7 @@ def compute_group_views(rows, *, fundamentals=None, risk_ids=None,
             "role_pct": role_pct.get(stock_id),
             "shadow_vol0": challenger_pct.get("vol_zero", {}).get(stock_id),
             "shadow_price10": challenger_pct.get("price_1_0", {}).get(stock_id),
+            "shadow_resil05": challenger_pct.get("resil_0_5", {}).get(stock_id),
         })
 
     common_dimensions = [key for key in ("lens_a", "lens_b", "lens_c", "lens_d")
@@ -661,20 +694,21 @@ def _group_summary(rows):
 
 
 def spec_digest():
-    """規格＋核心 evaluator 原始碼雜湊；改定義即得到新 spec、OOS 時鐘重啟。"""
-    evaluators = {
-        function.__name__: inspect.getsource(function)
-        for function in (
-            rank_percentiles, peer_sensitivity, _common_period, load_fundamental_inputs,
-            shadow_composites, compute_group_views,
-        )
+    """Contract, every local helper, runtime constants and production score rules."""
+    payload = {
+        "contract": RANKING_CONTRACT,
+        "evaluators": score.function_sources(sys.modules[__name__]),
+        "score_spec_sha": score.score_spec_digest(),
+        "dependencies": {
+            "CHIP_WEIGHTS": CHIP_WEIGHTS, "WEIGHTS": WEIGHTS,
+            "VOL_OVERHEAT": VOL_OVERHEAT, "VOLR_OVERHEAT": VOLR_OVERHEAT,
+            "MIN_ROLE_N": MIN_ROLE_N, "TOP_PCT": TOP_PCT,
+            "RISK_FLAG_CAP": RISK_FLAG_CAP, "CHALLENGERS": CHALLENGERS,
+            "CHALLENGER_FIELDS": CHALLENGER_FIELDS,
+        },
     }
-    payload = {"contract": RANKING_CONTRACT, "evaluators": evaluators}
     raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
-
-
-SPEC_SHA = spec_digest()
 
 
 def build_from_db(con, date, *, as_of=None, roles_path=ROLES_CONFIG, strict_roles=False):
@@ -747,7 +781,12 @@ def snapshot_rows(payload):
             "lens_d": row["lens_d"],
             "shadow_vol0": row["shadow_vol0"],
             "shadow_price10": row["shadow_price10"],
+            "shadow_resil05": row["shadow_resil05"],
             "payload_json": json.dumps(row, ensure_ascii=False, sort_keys=True,
                                        separators=(",", ":")),
         })
     return out
+
+
+# All local functions must exist before collecting their implementation sources.
+SPEC_SHA = spec_digest()

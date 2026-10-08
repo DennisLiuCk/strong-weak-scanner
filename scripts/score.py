@@ -23,7 +23,7 @@ v2.1 權重再校準(族群內 IC 診斷,2026-07-05):
 
 ★ 策略優化調下面 CONFIG;validate.py(Phase 3)會告訴你哪個元素/權重最準。
 """
-import argparse, os, sqlite3, statistics, sys
+import argparse, ast, hashlib, inspect, json, os, sqlite3, statistics, sys
 from collections import defaultdict, deque
 
 try:                       # 讓輸出在任何 console(含 Windows cp950)都不會因中文/⚠ 崩潰
@@ -33,6 +33,14 @@ except Exception:
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
+SCORE_VERSION = "v2.2-midrank-20261009"
+SCORE_EFFECTIVE_FROM = "2026-10-09"
+SCORE_PREVIOUS_VERSION = "v2.1-ordinal"
+SCORE_TIE_POLICY = (
+    "exact factor ties share their average position before quintile mapping; "
+    "composite ties share 1-based descending midrank; top midrank<=2, "
+    "bottom midrank>=n-1; never break economic ties with stock_id"
+)
 
 # ══════════════════════════════════════════════════════════════════
 # CONFIG ── 策略旋鈕(調這裡)
@@ -72,17 +80,34 @@ STEALTH_MIN = 1.5    # 蓄勢最低 comp_s
 # ══════════════════════════════════════════════════════════════════
 
 
+def average_ranks(values):
+    """1-based average ranks; exact ties have one rank, independent of input order."""
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    ranks = [0.0] * len(values)
+    start = 0
+    while start < len(order):
+        end = start + 1
+        while end < len(order) and values[order[end]] == values[order[start]]:
+            end += 1
+        midpoint = (start + end - 1) / 2 + 1
+        for index in order[start:end]:
+            ranks[index] = midpoint
+        start = end
+    return ranks
+
+
 def rank_scores(vals, deadzone=None):
     """族群內橫斷面:原始值 list → −2..+2 分數 list(五分位)。
-    None 不參與排名、給 0;參與檔數 <4 全給 0;死區內強制 0。"""
+    None 不參與排名、給 0;參與檔數 <4 全給 0;死區內強制 0。
+    同值先取平均序位再映射五分位；同值不得因輸入順序獲得不同分數。"""
     out = [0] * len(vals)
     idx = [i for i, v in enumerate(vals) if v is not None]
     m = len(idx)
     if m < 4:
         return out
-    order = sorted(idx, key=lambda i: vals[i])
-    for pos, i in enumerate(order):
-        pct = pos / (m - 1)
+    ranks = average_ranks([vals[i] for i in idx])
+    for i, rank in zip(idx, ranks):
+        pct = (rank - 1) / (m - 1)
         s = -2
         for thr, sc in RANK_MAP:
             if pct >= thr:
@@ -197,24 +222,13 @@ def build_chip_health(con):
     con.commit()
 
 
-def main():
-    ap = argparse.ArgumentParser(description="v2 排名制評分(永遠重算全歷史)")
-    # 與 fetch_daily/validate/audit_raw_data 同慣例:歷史延伸(pre-IS 檢定場)要能整條鏈
-    # 指向別的 db,不碰正在累積 as-seen 證據的正式庫。
-    ap.add_argument("--db", default=DB, help="SQLite 路徑(預設正式 db);歷史延伸/實驗指向別的檔案")
-    args = ap.parse_args()
-    con = sqlite3.connect(args.db)
-    con.row_factory = sqlite3.Row
-    con.execute("DROP TABLE IF EXISTS daily_scores")
-    con.execute("""CREATE TABLE daily_scores(
-        date TEXT, stock_id TEXT,
-        s_price INT, s_resil INT, s_vol INT, s_foreign INT, s_trust INT, s_dip INT, s_margin INT,
-        composite REAL, composite_s REAL, tier_raw TEXT, tier TEXT, warn INT,
-        pending TEXT,   -- 蓄勢候補:籌碼條件已符、尚差哪些蓄勢條件(顯示用,不影響 tier)
-        PRIMARY KEY(date, stock_id))""")
+def calculate_scores(rows):
+    """Pure current-rule rebuild; returns daily_scores tuples without writing a DB.
 
-    rows = con.execute("""SELECT m.*, u.grp FROM daily_metrics m
-                          JOIN universe u USING(stock_id) ORDER BY m.date""").fetchall()
+    Midrank applies at both top and bottom tier boundaries. A tie spanning ranks
+    2 and 3 has rank 2.5, so neither is in top-2. A tie spanning 1..3 has rank 2,
+    so all three qualify before the other tier gates. Bottom ranks are symmetric.
+    """
     by_date = defaultdict(lambda: defaultdict(list))   # date -> grp -> [row]
     for r in rows:
         by_date[r["date"]][r["grp"]].append(r)
@@ -239,9 +253,9 @@ def main():
                 comp_hist[m["stock_id"]].append(comp)
                 comp_s = round(sum(comp_hist[m["stock_id"]]) / len(comp_hist[m["stock_id"]]), 2)
                 scored.append((m, s, vwarn, mwarn, comp, comp_s))
-            # 族群內以平滑綜合分排名(1=最強)
-            grank = {id(t): rk + 1 for rk, t in
-                     enumerate(sorted(scored, key=lambda t: -t[5]))}
+            # 同分共用平均序位；名额边界同时纳入或排除，不依資料列序挑勝者。
+            grank = {id(t): rank for t, rank in zip(
+                scored, average_ranks([-t[5] for t in scored]))}
             n = len(scored)
             for t in scored:
                 m, s, vwarn, mwarn, comp, comp_s = t
@@ -288,7 +302,80 @@ def main():
                         pending = "蓄勢候補·差:" + "、".join(miss)
                 out.append((d, sid, s["price"], s["resil"], s["vol"], s["foreign"], s["trust"],
                             s["dip"], s["margin"], comp, comp_s, tier_raw, tier, warn, pending))
+    return sorted(out, key=lambda row: (row[0], row[1]))
+
+
+def function_sources(module):
+    """Cover every local helper plus runtime replacements, not a hand-picked list.
+
+    Module source covers new helper definitions; resolving each definition from
+    the live module also detects monkeypatches. Source text uses LF on all hosts.
+    """
+    module_source = inspect.getsource(module).replace("\r\n", "\n")
+    sources = {"__module__": module_source}
+    for node in ast.parse(module_source).body:
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        function = getattr(module, node.name)
+        try:
+            source = inspect.getsource(function)
+        except (OSError, TypeError):
+            code = getattr(function, "__code__", None)
+            source = (f"{type(function).__module__}.{type(function).__qualname__}:"
+                      f"{getattr(function, '__module__', '')}:"
+                      f"{getattr(function, '__qualname__', '')}")
+            if code is not None:
+                source += f":{code.co_code.hex()}:{code.co_consts!r}"
+        sources[node.name] = source.replace("\r\n", "\n")
+    return sources
+
+
+def score_spec_digest():
+    """Version + CONFIG + all scoring/tier helpers; a changed rule starts new evidence."""
+    config_names = (
+        "RANK_MAP", "DZ_FOREIGN", "DZ_TRUST", "DZ_DIP", "VOLR_ACTIVE", "VOLR_DRY",
+        "VOL_OVERHEAT", "VOLR_OVERHEAT", "MARGIN_DOWN_BIG", "MARGIN_UP_MID",
+        "MARGIN_UP_BIG", "MARGIN_UTIL_HOT", "MARGIN_UTIL_MID", "WEIGHTS",
+        "STEALTH_OFF_HIGH", "SMOOTH_N", "STRONG_MIN", "WEAK_ABS", "STEALTH_MIN",
+    )
+    payload = {
+        "version": SCORE_VERSION, "effective_from": SCORE_EFFECTIVE_FROM,
+        "tie_policy": SCORE_TIE_POLICY,
+        "config": {name: globals()[name] for name in config_names},
+        "evaluators": function_sources(sys.modules[__name__]),
+    }
+    return hashlib.sha256(json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")).hexdigest()
+
+
+def record_score_build(con):
+    """Stamp the rules actually used for this rebuild, without modifying OOS tables."""
+    con.execute("""CREATE TABLE IF NOT EXISTS score_build_metadata(
+        id INTEGER PRIMARY KEY CHECK(id=1), score_version TEXT NOT NULL,
+        score_effective_from TEXT NOT NULL, score_spec_sha TEXT NOT NULL)""")
+    con.execute("INSERT OR REPLACE INTO score_build_metadata VALUES(1,?,?,?)",
+                (SCORE_VERSION, SCORE_EFFECTIVE_FROM, score_spec_digest()))
+
+
+def main():
+    ap = argparse.ArgumentParser(description="v2 排名制評分(永遠重算全歷史)")
+    ap.add_argument("--db", default=DB, help="SQLite 路徑(預設正式 db);歷史延伸/實驗指向別的檔案")
+    args = ap.parse_args()
+    con = sqlite3.connect(args.db)
+    con.row_factory = sqlite3.Row
+    con.execute("DROP TABLE IF EXISTS daily_scores")
+    con.execute("""CREATE TABLE daily_scores(
+        date TEXT, stock_id TEXT,
+        s_price INT, s_resil INT, s_vol INT, s_foreign INT, s_trust INT, s_dip INT, s_margin INT,
+        composite REAL, composite_s REAL, tier_raw TEXT, tier TEXT, warn INT,
+        pending TEXT,
+        PRIMARY KEY(date, stock_id))""")
+    rows = con.execute("""SELECT m.*, u.grp FROM daily_metrics m
+                          JOIN universe u USING(stock_id) ORDER BY m.date""").fetchall()
+    out = calculate_scores(rows)
     con.executemany("INSERT OR REPLACE INTO daily_scores VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
+    record_score_build(con)
     con.commit()
     build_chip_health(con)
 

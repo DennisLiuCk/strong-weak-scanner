@@ -1,0 +1,493 @@
+{
+  "environment": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "executable": "C:\\Users\\nossi\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "stdout_encoding": "cp950",
+    "PYTHONUTF8": null,
+    "PYTHONIOENCODING": null
+  },
+  "read_only": "db_ro.connect; PRAGMA query_only verified; DB SHA256 unchanged",
+  "db_sha256": "1eaf40357565dcf085abbc21e8cba61741c97ab7b3f4c786466617e6f0554b69",
+  "independent_basis_sha256": "7bd15e4d4db7fda7855dda10bf9e19c5814ec19e5f0dd6f5afe682d41f6b8a18",
+  "oracle": "independent all-pairs Bartlett kernel quadratic form; actual calendar distances",
+  "matched_real_series": 40,
+  "max_abs_se_error": 8.881784197001252e-16,
+  "series_comparisons": [
+    {
+      "path": "root.ic.s_price",
+      "n_days": 50,
+      "se": 0.05302922645001299,
+      "independent_se": 0.053029226450012984,
+      "abs_error": 6.938893903907228e-18
+    },
+    {
+      "path": "root.ic.s_resil",
+      "n_days": 50,
+      "se": 0.04442391256348914,
+      "independent_se": 0.04442391256348913,
+      "abs_error": 6.938893903907228e-18
+    },
+    {
+      "path": "root.ic.s_vol",
+      "n_days": 50,
+      "se": 0.02681432561054142,
+      "independent_se": 0.026814325610541413,
+      "abs_error": 6.938893903907228e-18
+    },
+    {
+      "path": "root.ic.s_foreign",
+      "n_days": 50,
+      "se": 0.020699540338863117,
+      "independent_se": 0.02069954033886312,
+      "abs_error": 3.469446951953614e-18
+    },
+    {
+      "path": "root.ic.s_trust",
+      "n_days": 50,
+      "se": 0.018355681346512255,
+      "independent_se": 0.018355681346512255,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.ic.s_dip",
+      "n_days": 50,
+      "se": 0.019079346483102663,
+      "independent_se": 0.019079346483102666,
+      "abs_error": 3.469446951953614e-18
+    },
+    {
+      "path": "root.ic.s_margin",
+      "n_days": 50,
+      "se": 0.015360144142094074,
+      "independent_se": 0.015360144142094074,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.ic.composite",
+      "n_days": 50,
+      "se": 0.041620816064472266,
+      "independent_se": 0.041620816064472266,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.ic.composite_s",
+      "n_days": 50,
+      "se": 0.045062892929032504,
+      "independent_se": 0.04506289292903251,
+      "abs_error": 6.938893903907228e-18
+    },
+    {
+      "path": "root.tier_excess_10d_pct.潛在/中性",
+      "n_days": 50,
+      "se": 0.187570224304286,
+      "independent_se": 0.18757022430428594,
+      "abs_error": 5.551115123125783e-17
+    },
+    {
+      "path": "root.tier_excess_10d_pct.強但過熱",
+      "n_days": 50,
+      "se": 4.038099694461096,
+      "independent_se": 4.038099694461095,
+      "abs_error": 8.881784197001252e-16
+    },
+    {
+      "path": "root.tier_excess_10d_pct.真弱·陷阱",
+      "n_days": 44,
+      "se": 1.012365668729539,
+      "independent_se": 1.0123656687295393,
+      "abs_error": 2.220446049250313e-16
+    },
+    {
+      "path": "root.tier_excess_10d_pct.真弱",
+      "n_days": 50,
+      "se": 0.6358917171802465,
+      "independent_se": 0.6358917171802465,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.tier_excess_10d_pct.真強",
+      "n_days": 50,
+      "se": 0.7943544926516555,
+      "independent_se": 0.7943544926516556,
+      "abs_error": 1.1102230246251565e-16
+    },
+    {
+      "path": "root.tier_excess_10d_pct.蓄勢·外資佈局",
+      "n_days": 50,
+      "se": 1.0602511096265095,
+      "independent_se": 1.0602511096265095,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.net_open_excess_pct.真強.3",
+      "n_days": 56,
+      "se": 0.3468033338724177,
+      "independent_se": 0.3468033338724177,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.net_open_excess_pct.真強.5",
+      "n_days": 54,
+      "se": 0.5426904074187774,
+      "independent_se": 0.5426904074187774,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.net_open_excess_pct.真強.10",
+      "n_days": 49,
+      "se": 0.8180664623709566,
+      "independent_se": 0.8180664623709565,
+      "abs_error": 1.1102230246251565e-16
+    },
+    {
+      "path": "root.net_open_excess_pct.蓄勢·外資佈局.3",
+      "n_days": 56,
+      "se": 0.3288243907808301,
+      "independent_se": 0.32882439078083003,
+      "abs_error": 5.551115123125783e-17
+    },
+    {
+      "path": "root.net_open_excess_pct.蓄勢·外資佈局.5",
+      "n_days": 54,
+      "se": 0.5068180067840876,
+      "independent_se": 0.5068180067840876,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.net_open_excess_pct.蓄勢·外資佈局.10",
+      "n_days": 49,
+      "se": 1.0786648933405945,
+      "independent_se": 1.0786648933405945,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.oos_regime_ic.composite_s.0",
+      "n_days": 31,
+      "se": 0.03705247928286379,
+      "independent_se": 0.03705247928286379,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.oos_regime_ic.s_price.0",
+      "n_days": 31,
+      "se": 0.03301521678633713,
+      "independent_se": 0.033015216786337134,
+      "abs_error": 6.938893903907228e-18
+    },
+    {
+      "path": "root.oos_regime_ic.s_resil.0",
+      "n_days": 31,
+      "se": 0.028394145353857512,
+      "independent_se": 0.028394145353857515,
+      "abs_error": 3.469446951953614e-18
+    },
+    {
+      "path": "root.oos_regime_ic.s_vol.0",
+      "n_days": 31,
+      "se": 0.03668337520142731,
+      "independent_se": 0.036683375201427317,
+      "abs_error": 6.938893903907228e-18
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.drop_resil_unsmoothed_paired_delta_raw_float",
+      "n_days": 50,
+      "se": 0.01686012190975125,
+      "independent_se": 0.01686012190975125,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.drop_resil_unsmoothed_paired_delta_exact_ties",
+      "n_days": 50,
+      "se": 0.017068367222223234,
+      "independent_se": 0.017068367222223234,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.ablation_all_exact_ties.price",
+      "n_days": 50,
+      "se": 0.02910545854670582,
+      "independent_se": 0.029105458546705817,
+      "abs_error": 3.469446951953614e-18
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.ablation_all_exact_ties.resil",
+      "n_days": 50,
+      "se": 0.017068367222223234,
+      "independent_se": 0.017068367222223234,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.ablation_all_exact_ties.vol",
+      "n_days": 50,
+      "se": 0.0015284254841234335,
+      "independent_se": 0.0015284254841234338,
+      "abs_error": 2.168404344971009e-19
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.ablation_all_exact_ties.foreign",
+      "n_days": 50,
+      "se": 0.00798373963758679,
+      "independent_se": 0.007983739637586789,
+      "abs_error": 1.734723475976807e-18
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.ablation_all_exact_ties.trust",
+      "n_days": 50,
+      "se": 0.008075100341954028,
+      "independent_se": 0.008075100341954028,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.ablation_all_exact_ties.margin",
+      "n_days": 50,
+      "se": 0.0033136062300631207,
+      "independent_se": 0.0033136062300631207,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.ablation_base_raw_float_ic",
+      "n_days": 50,
+      "se": 0.041740022220539574,
+      "independent_se": 0.041740022220539574,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.ablation_base_exact_ties_ic",
+      "n_days": 50,
+      "se": 0.041620816064472266,
+      "independent_se": 0.041620816064472266,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.cohort_summaries_pct.pass",
+      "n_days": 50,
+      "se": 0.9766459278065064,
+      "independent_se": 0.9766459278065064,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.cohort_summaries_pct.blocked",
+      "n_days": 50,
+      "se": 0.5566805260508454,
+      "independent_se": 0.5566805260508453,
+      "abs_error": 1.1102230246251565e-16
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.cohort_blocked_minus_pass_paired_pct",
+      "n_days": 50,
+      "se": 1.0491449562244863,
+      "independent_se": 1.0491449562244863,
+      "abs_error": 0.0
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.strong_minus_weak_paired_pct",
+      "n_days": 50,
+      "se": 1.0410573581809328,
+      "independent_se": 1.0410573581809326,
+      "abs_error": 2.220446049250313e-16
+    },
+    {
+      "path": "root.posthoc_diagnostics_not_registered_oos.med_dip_hit_minus_variable_baseline_pct",
+      "n_days": 50,
+      "se": 6.295485544012788,
+      "independent_se": 6.295485544012788,
+      "abs_error": 0.0
+    }
+  ],
+  "simulation": [
+    {
+      "model": "stationary AR(1) mean-zero Gaussian null",
+      "rho": 0.0,
+      "seed": 20261009,
+      "sampling_plan": "contiguous_50_of_50",
+      "observed_days": 50,
+      "calendar_days": 50,
+      "episodes": 1,
+      "n_over_f": 5.0,
+      "horizon": 10,
+      "threshold": 4.0,
+      "results": {
+        "calendar_hac_current_gate": {
+          "rejections": 19,
+          "replications": 5000,
+          "rate": 0.0038,
+          "binomial_se": 0.0008701218305501822
+        },
+        "compressed_hac_current_gate": {
+          "rejections": 19,
+          "replications": 5000,
+          "rate": 0.0038,
+          "binomial_se": 0.0008701218305501822
+        },
+        "calendar_hac_1_96": {
+          "rejections": 538,
+          "replications": 5000,
+          "rate": 0.1076,
+          "binomial_se": 0.00438228798688539
+        }
+      }
+    },
+    {
+      "model": "stationary AR(1) mean-zero Gaussian null",
+      "rho": 0.63,
+      "seed": 20261109,
+      "sampling_plan": "contiguous_50_of_50",
+      "observed_days": 50,
+      "calendar_days": 50,
+      "episodes": 1,
+      "n_over_f": 5.0,
+      "horizon": 10,
+      "threshold": 4.0,
+      "results": {
+        "calendar_hac_current_gate": {
+          "rejections": 116,
+          "replications": 5000,
+          "rate": 0.0232,
+          "binomial_se": 0.0021289321266775977
+        },
+        "compressed_hac_current_gate": {
+          "rejections": 116,
+          "replications": 5000,
+          "rate": 0.0232,
+          "binomial_se": 0.0021289321266775977
+        },
+        "calendar_hac_1_96": {
+          "rejections": 938,
+          "replications": 5000,
+          "rate": 0.1876,
+          "binomial_se": 0.0055209825212547085
+        }
+      }
+    },
+    {
+      "model": "stationary AR(1) mean-zero Gaussian null",
+      "rho": 0.82,
+      "seed": 20261209,
+      "sampling_plan": "contiguous_50_of_50",
+      "observed_days": 50,
+      "calendar_days": 50,
+      "episodes": 1,
+      "n_over_f": 5.0,
+      "horizon": 10,
+      "threshold": 4.0,
+      "results": {
+        "calendar_hac_current_gate": {
+          "rejections": 277,
+          "replications": 5000,
+          "rate": 0.0554,
+          "binomial_se": 0.0032351457463304493
+        },
+        "compressed_hac_current_gate": {
+          "rejections": 277,
+          "replications": 5000,
+          "rate": 0.0554,
+          "binomial_se": 0.0032351457463304493
+        },
+        "calendar_hac_1_96": {
+          "rejections": 1313,
+          "replications": 5000,
+          "rate": 0.2626,
+          "binomial_se": 0.006223202391052376
+        }
+      }
+    },
+    {
+      "model": "stationary AR(1) mean-zero Gaussian null",
+      "rho": 0.0,
+      "seed": 20271009,
+      "sampling_plan": "sparse_50_of_65",
+      "observed_days": 50,
+      "calendar_days": 65,
+      "episodes": 3,
+      "n_over_f": 5.0,
+      "horizon": 10,
+      "threshold": 4.0,
+      "results": {
+        "calendar_hac_current_gate": {
+          "rejections": 27,
+          "replications": 5000,
+          "rate": 0.0054,
+          "binomial_se": 0.001036420763975713
+        },
+        "compressed_hac_current_gate": {
+          "rejections": 32,
+          "replications": 5000,
+          "rate": 0.0064,
+          "binomial_se": 0.0011277446519491901
+        },
+        "calendar_hac_1_96": {
+          "rejections": 550,
+          "replications": 5000,
+          "rate": 0.11,
+          "binomial_se": 0.004424929377967517
+        }
+      }
+    },
+    {
+      "model": "stationary AR(1) mean-zero Gaussian null",
+      "rho": 0.63,
+      "seed": 20271109,
+      "sampling_plan": "sparse_50_of_65",
+      "observed_days": 50,
+      "calendar_days": 65,
+      "episodes": 3,
+      "n_over_f": 5.0,
+      "horizon": 10,
+      "threshold": 4.0,
+      "results": {
+        "calendar_hac_current_gate": {
+          "rejections": 68,
+          "replications": 5000,
+          "rate": 0.0136,
+          "binomial_se": 0.0016379890109521492
+        },
+        "compressed_hac_current_gate": {
+          "rejections": 76,
+          "replications": 5000,
+          "rate": 0.0152,
+          "binomial_se": 0.001730257784262218
+        },
+        "calendar_hac_1_96": {
+          "rejections": 880,
+          "replications": 5000,
+          "rate": 0.176,
+          "binomial_se": 0.005385610457506187
+        }
+      }
+    },
+    {
+      "model": "stationary AR(1) mean-zero Gaussian null",
+      "rho": 0.82,
+      "seed": 20271209,
+      "sampling_plan": "sparse_50_of_65",
+      "observed_days": 50,
+      "calendar_days": 65,
+      "episodes": 3,
+      "n_over_f": 5.0,
+      "horizon": 10,
+      "threshold": 4.0,
+      "results": {
+        "calendar_hac_current_gate": {
+          "rejections": 214,
+          "replications": 5000,
+          "rate": 0.0428,
+          "binomial_se": 0.0028624520956690267
+        },
+        "compressed_hac_current_gate": {
+          "rejections": 230,
+          "replications": 5000,
+          "rate": 0.046,
+          "binomial_se": 0.002962566454950842
+        },
+        "calendar_hac_1_96": {
+          "rejections": 1170,
+          "replications": 5000,
+          "rate": 0.234,
+          "binomial_se": 0.005987386742143855
+        }
+      }
+    }
+  ],
+  "scope": "single-test sensitivity only; fixed seed and fixed missingness masks; no threshold changes; not familywise or repeated-week calibration"
+}

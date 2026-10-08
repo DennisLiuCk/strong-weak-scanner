@@ -1,0 +1,8 @@
+{
+  "independent_series": 32,
+  "scalar_checks": 1788,
+  "tolerance": 1e-11,
+  "max_absolute_difference": 8.881784197001252e-16,
+  "matched": true,
+  "db_hash_match": true
+}

@@ -30,6 +30,7 @@
 | 盤後確認執行狀況、討論今日資料 | `DAILY_CHECK.md`;核心工具 `scripts/daily_brief.py`(唯讀) |
 | 原始表 schema 新欄回補、正式 DB 全期稽核 | `RAW_DATA_BACKFILL.md` + `scripts/audit_raw_data.py`(唯讀) + `fetch_daily.py --backfill-expanded-fields` |
 | 週六策略檢視(報告已自動產生) | `WEEKLY_REVIEW.md`(行動門檻表,照走) |
+| 策略計算驗收、C1/C2/C3前瞻觀測與固定檢視 | `STRATEGY_VALIDATION_PROTOCOL.md` + `scripts/validation_progress.py` |
 | **算任何新的統計量、或要對使用者宣稱一個結果** | `ANALYSIS_DISCIPLINE.md`(起飛前檢查表 + 宣稱時要附什麼 + 唯讀怎麼強制) |
 | 季度 universe 調整、新增族群 | README「Universe 治理」+ `scripts/screen.py` |
 | 個股質化筆記建立/維護、biz 對齊複核 | `QUALITATIVE_RESEARCH_RUNBOOK.md` + `QUALITATIVE_SOURCE_ACQUISITION.md` + README「質化研究筆記」+ `scripts/qual_notes.py` + `scripts/qual_evidence.py` + `scripts/qual_review.py`(複核 triage) |
@@ -114,9 +115,9 @@ fetch_financials.py 財報四表(FinMind,月營收+損益表+資產負債表+現
                  範圍 = universe + REF_IDS(2330,供台積電觀察層研究)
                  月營收缺口以 TWSE/TPEx 官方 OpenAPI 補援;12 日首抓、每月 17 日
                  重驗(季報月由全抓順帶),並要求最新應公布月份完整,否則 workflow 標紅
-score.py         族群內分位數排名(−2..+2)→ 綜合分(3日平滑)→ tier(連2日確認)
+score.py         族群內分位數排名(−2..+2,同分平均序位)→ 綜合分(3日平滑)→ tier(連2日確認)
 ranking_views.py A領先/B風險/C籌碼/D基本面四個 tie-safe 族群內平行排名＋角色同儕、
-                 peer sensitivity、Pareto；Champion 不變,C1/C2 自 2026-08-13 append-only OOS
+                 peer sensitivity、Pareto；觀察層不改 Champion；C1/C2/C3 以同 spec 快照前瞻驗證
 audit_ranking_views.py 唯讀檢查 A–D 覆蓋/tie/component/Pareto/peer sensitivity 與
                  append-only spec 進度；final pipeline 缺當日完整正式快照時硬停
 build_dashboard.py → index.html + archive/日期.html(as-seen 快照,勿從 db 回填)

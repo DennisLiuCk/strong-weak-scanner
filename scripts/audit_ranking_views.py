@@ -287,11 +287,17 @@ def canonical_official_runs(con):
 def formal_progress(con, spec_sha, *, fwd=10):
     runs = canonical_official_runs(con)
     import evidence_status
+    import score
+    oos_cutoff = max(rv.EFFECTIVE_FROM, score.SCORE_EFFECTIVE_FROM)
     eligible_dates = {run["data_date"] for run in runs if evidence_status.oos_eligible(run)}
+    # Same canonical first run and exact score-rule hash as validate.py. A
+    # structurally valid view alone cannot establish current production OOS.
+    current_score_dates = set(evidence_status.current_score_runs(con, oos_cutoff))
     have_views = _table_exists(con, "oos_ranking_view_snapshots")
     specs_seen = set()
     current_dates = []
     historical_other_spec_days = 0
+    pre_effective_current_spec_days = 0
     invalid_runs = []
     parsed_rows = 0
     latest_snapshot_health = None
@@ -318,7 +324,9 @@ def formal_progress(con, spec_sha, *, fwd=10):
                 and not json_error
                 and len(payloads) == len(rows)
             )
-            if structurally_complete and specs == {spec_sha}:
+            if structurally_complete and specs == {spec_sha} and run["data_date"] < rv.EFFECTIVE_FROM:
+                pre_effective_current_spec_days += 1
+            elif structurally_complete and specs == {spec_sha}:
                 current_dates.append(run["data_date"])
                 parsed_rows += len(payloads)
                 latest_snapshot_health = analyze_rows(payloads)
@@ -341,7 +349,7 @@ def formal_progress(con, spec_sha, *, fwd=10):
     date_index = {date: index for index, date in enumerate(price_dates)}
     mature_dates = [
         date for date in current_dates
-        if date in eligible_dates and date in date_index and date_index[date] + fwd < len(price_dates)
+        if date in current_score_dates and date in date_index and date_index[date] + fwd < len(price_dates)
     ]
     eff_obs = stats_ci.effective_obs(len(mature_dates), fwd)
     if not current_dates:
@@ -356,9 +364,15 @@ def formal_progress(con, spec_sha, *, fwd=10):
         phase = "challenger_gate_readable_in_validate"
     return {
         "ranking_snapshot_table": have_views,
+        "registered_at": rv.REGISTERED_AT,
+        "effective_from": rv.EFFECTIVE_FROM,
+        "oos_cutoff": oos_cutoff,
+        "score_spec_sha": score.score_spec_digest(),
+        "previous_specs": rv.PREVIOUS_SPECS,
         "canonical_official_days": len(runs),
         "current_spec_days": len(current_dates),
-        "current_spec_oos_days": len(set(current_dates) & eligible_dates),
+        "current_spec_oos_days": len(set(current_dates) & current_score_dates),
+        "current_spec_oos_excluded_days": len(set(current_dates) - current_score_dates),
         "late_publication_days": len(set(current_dates) - eligible_dates),
         "current_spec_first_date": current_dates[0] if current_dates else None,
         "current_spec_latest_date": current_dates[-1] if current_dates else None,
@@ -367,6 +381,7 @@ def formal_progress(con, spec_sha, *, fwd=10):
         "phase": phase,
         "specs_seen": sorted(specs_seen),
         "historical_other_spec_days": historical_other_spec_days,
+        "pre_effective_current_spec_days": pre_effective_current_spec_days,
         "invalid_runs": invalid_runs,
         "parsed_rows": parsed_rows,
         "latest_snapshot_health": latest_snapshot_health,
@@ -409,6 +424,11 @@ def build_audit(con, *, date=None, fwd=10, require_current_snapshot=False):
         )
     if progress["invalid_runs"]:
         hard_errors.append("invalid_or_mixed_spec_snapshot")
+    if not progress["current_spec_days"]:
+        warnings.append(
+            "new_spec_awaiting_first_official_snapshot:"
+            f"effective_from={rv.EFFECTIVE_FROM},latest_data={date}"
+        )
 
     fundamental = (payload or {}).get("fundamental") or {}
     if fundamental.get("period_status") == "no_common_period":
@@ -445,7 +465,8 @@ def build_audit(con, *, date=None, fwd=10, require_current_snapshot=False):
         )
 
     return {
-        "status": "fail" if hard_errors else "ok",
+        "status": ("fail" if hard_errors else "pending"
+                   if not progress["current_spec_days"] else "ok"),
         "basis": "current_restated_census_plus_append_only_progress",
         "performance_claim": False,
         "date": date,

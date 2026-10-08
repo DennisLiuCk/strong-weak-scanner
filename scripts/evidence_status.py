@@ -20,6 +20,19 @@ def first_official_runs(con, *, eligible_only=False):
             if not eligible_only or oos_eligible(run)}
 
 
+def current_score_runs(con, cutoff):
+    """Current production evidence: exact semantic score spec, first eligible run.
+
+    Old snapshots stay available for historical diagnostics. A later corrected
+    publication may never replace an incompatible/late first official run.
+    """
+    import score
+    expected = score.score_spec_digest()
+    return {day: run for day, run in first_official_runs(con, eligible_only=True).items()
+            if day > cutoff and "quality_json" in run.keys()
+            and json.loads(run["quality_json"]).get("score_spec_sha") == expected}
+
+
 def maturity(snapshot_dates, trading_dates, cutoff, fwd):
     """交易日成熟度是樣本上限；各指標仍須依自己的有效日數估 SE / t。"""
     if fwd <= 0:
@@ -32,10 +45,10 @@ def maturity(snapshot_dates, trading_dates, cutoff, fwd):
     eff = sci.effective_obs(len(mature), fwd)
     blocked = eff < sci.MIN_EFF_OBS
     label = "獨立觀測不足，暫不判讀" if blocked else "逐指標檢查證據，尚非策略通過"
-    reason = (f"有效獨立觀測未達 {sci.MIN_EFF_OBS:g}，SE／t 暫不可估；不據此調整策略。"
+    reason = (f"重疊窗樣本尺度 n/F 未達 {sci.MIN_EFF_OBS:g}，SE／t 暫不可估；n/F不是量得獨立性。"
               if blocked else
               "僅達估計 SE 的最低樣本要求；各指標須通過週報 §⑨ 的分級 t 門檻，"
-              "再依 WEEKLY_REVIEW 的連續週數與成本條件判斷。")
+              "再依固定樣本檢視與前瞻成本契約研究；每週重疊數字不算獨立確認。")
     return {"oos_days": len(oos), "oos_mature": len(mature), "fwd": fwd,
             "eff_obs": eff, "episodes": sci.episodes(mature, dates),
             "min_eff_obs": sci.MIN_EFF_OBS, "se_blocked": blocked,
