@@ -99,6 +99,8 @@ evidence: sources:S8,S10,S19,S20,S21
 - **推論算力**：AI 模型回答問題時使用的運算資源；它可以由 GPU、自研 ASIC 與 CPU 等不同晶片共同提供。
 - **Tester TAM**：測試設備商估計某一期間整體測試機市場的金額，不等於任何一家台灣供應商已取得的訂單。
 - **自動測試設備（ATE）**：用測試程式、儀器與介面對晶圓或封裝後晶片施加訊號，再判定是否符合規格的設備。
+- **UltraFLEXplus**：Teradyne 的測試平台名稱；平台新增儀器不表示每位客戶都必須換購整套設備。
+- **FY2026**：本文 Advantest 的 2026 財政年度，涵蓋 2026 年 4 月至 2027 年 3 月；與曆年期間不同。
 - **晶圓針測（wafer sort／probe）**：封裝前，用探針卡接觸晶圓上的晶粒，先篩出可繼續投入封裝的晶粒。
 - **成品測試（final test）**：封裝完成後，以測試機、載板與測試座確認電性和功能。
 - **系統級測試（SLT）**：把晶片放進較接近實際系統的環境，執行較長或較貼近應用的測試；它不等於成品測試的重複版。
@@ -691,10 +693,27 @@ verification_needed:
 resolution:
 -->
 
+## 十月更新：測試變難，也可能把設備用得更有效率
+
+**本輪新增的是產品能力與效率路徑，還不是台廠訂單。** Teradyne 九月至十月的公告，同時把高功率、記憶體介面和可靠度測試放進新產品，也說明如何延用設備或整合測試工作。這使多空雙方必須使用同一把尺：先量同產品的工作量，再扣掉效率與重用能吸收的部分，最後才查服務商增加多少可計費產能。以下產品能力皆為供應商自述，沒有買方同案驗收或量產分母；C6 主命題與原到期警示維持不變。（C17–C23）
+
+| 新來源 | 本輪能確認的範圍 | 下一份需要的證據 |
+|---|---|---|
+| Teradyne 9/1 UltraFLEXplus 公告（S24） | 公司新增數位、協定與供電儀器，並主張可改善測試效率及保留既有投資 | 同一晶片與覆蓋條件下，升級前後的完整測試時間、產出與新增設備數 |
+| Teradyne 9/29 Magnum E2 公告（S25） | 公司提出共用平台支援記憶體及邏輯測試、整合插入點的路徑 | 同產品實際流程有沒有減站，以及省下的時數是否被新增測項抵銷 |
+| Teradyne 10/6 Titan HP 公告（S26） | 公司稱燒機功能已用於生產，並能在平台執行可靠度或系統級測試 | 具名客戶、產品版本、獨立驗收與同口徑產能紀錄；不能由「已生產」猜客戶 |
+| Advantest 9/15 展會公告（S29） | 公司預告展示可擴充平台與測試程式開發工具，強調工程生產力 | 工程開發加速是否轉成量產機時改善；預告不證明活動已發生，更不是出貨或收入 |
+
+**看多小作文：能力門檻可能比機台數更重要。** C17、C19 顯示設備商正處理較複雜的測試與可靠度工作；若服務商能完成相應產品資格並取得可計費工作，需求可能轉為較高價值的服務。然而目前只看到供應端產品說法，還沒有同一台灣公司、產品與客戶的產能及財務對照。最脆弱處：新能力若主要透過既有平台升級取得，新增設備與服務收入可能低於題材敘事暗示的幅度。（C21、C22）
+
+**看空小作文：新增工作不必全部變成新增設備。** C17、C18 的效率、相容與整合路徑，給「測得更多卻不同比例添購」一個可查的機制；工程效率與量產吞吐也必須分開。這仍不是需求萎縮證據，更不能認定某家台廠客戶流失。最脆弱處：若客戶新增的測試內容與量產數量超過所有效率改善，而且合格閒置產能不足，多方的增量需求仍可能成立。（C20–C22）
+
+**勝負手是同產品的前後對照。** 下一輪先取具名產品的流程、測試秒數、站數、可用時數、既有餘裕及實際驗收，再對服務收入、折舊和成本。資本預算、設備下單、到廠驗收與可計費產能分開記錄；總營收不能替未公開的客戶與專案作證。Advantest 官方日曆目前安排 10/28 公布 FY2026 第二季，研究工作排在 10/29 回查；這是未來事件，不是已讀的新季報。（C22、C23；T6）
+
 ## 先把 tester TAM 拆成八個分母
 
 「市場規模上修」是研究起點，不是設備台數答案。以下八層要使用同一產品、同一期間和同一測試
-參考平面才可能相乘；現有 21 份來源只覆蓋部分欄位，空白處不能用產業故事補上。
+參考平面才可能相乘；現有來源只覆蓋部分欄位，空白處不能用產業故事補上。
 
 | 分母 | 先問什麼 | 現有公開證據 | 還缺什麼才可換算 |
 |---|---|---|---|
@@ -1437,4 +1456,207 @@ from: triaged
 to: triaged
 reason: add_mpi_q2_product_mix_and_same_period_denominator_without_ai_attribution_or_clock_refresh
 evidence: sources:S22,S23
+-->
+
+<!-- research_source
+source_id: S24
+role: company_release
+source_kind: document
+publisher: Teradyne
+title: UltraFLEXplus instruments for AI and data center computing devices
+published_at: 2026-09-01
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://investors.teradyne.com/news-events/press-releases/detail/447/teradyne-launches-advanced-ultraflexplus-instruments-engineered-for-ai-and-data-center-computing-devices
+locator: UltraPin5000-EM、UltraPort-PCIe6及UltraVS64-HP段；原始HTML SHA256 042765c71f679effade8a5e21c835d3e5cda083ce503428532406f18c9d96a2f
+limitation: 供應商產品能力與相容性自述，沒有客戶同產品成對測試資料；不採用宣傳倍數作產能模型，不是台灣服務商訂單
+-->
+
+<!-- research_source
+source_id: S25
+role: company_release
+source_kind: document
+publisher: Teradyne
+title: Magnum E2 next-generation memory test announcement
+published_at: 2026-09-29
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://investors.teradyne.com/news-events/press-releases/detail/451/teradyne-announces-magnum-e2-to-address-next-generation-memory-test-demands-driven-by-ai-and-high-performance-computing
+locator: Key Features and Benefits之協定覆蓋及Memory and Logic Test on a Single Platform；原始HTML SHA256 428071a8b4b3bbcbf887b9942edb30c10d83fe91ba42a0e15c017972536a6b56
+limitation: 整合插入點是供應商提出的能力，不證實特定客戶已減少測站或支出；與S24/S26同一Teradyne來源鏈
+-->
+
+<!-- research_source
+source_id: S26
+role: company_release
+source_kind: document
+publisher: Teradyne
+title: Titan HP platform with burn-in capabilities
+published_at: 2026-10-06
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://investors.teradyne.com/news-events/press-releases/detail/452/teradyne-introduces-titan-hp-platform-with-burn-in-capabilities-for-advanced-ai-data-center-devices
+locator: 平台用途、per-device stress-and-test history、asynchronous slot及deployed in production段；原始HTML SHA256 034bcf63a769a17b95b1ee6235a1a572519d3267a13a713409f33e02bc56a848
+limitation: production為公司自述，沒有具名客戶、產品版本或部署數；共同平台用途不表示SLT與可靠度測項相同或可重複計量
+-->
+
+<!-- research_source
+source_id: S27
+role: company_release
+source_kind: living_index
+publisher: Advantest
+title: Official IR calendar observed on October 8
+published_at:
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://www.advantest.com/en/investors/ir-calendar/
+locator: Yearly Calendar及FY2026表的October 28第二季結果安排；原始HTML SHA256 578ac1bdeb72583f3d272f0d2d055492f2e0e598876811d765a71c9f88bd1b64
+limitation: 活頁可能更改；排程不是財報內容、出貨或TAM修訂，不以捕捉日冒充正式文件發布日
+-->
+
+<!-- research_source
+source_id: S28
+role: company_release
+source_kind: living_index
+publisher: Teradyne
+title: Official press releases index observed on October 8
+published_at:
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://investors.teradyne.com/news-events/press-releases
+locator: 索引可連至9/1、9/29與10/6產品公告及7/28季報；原始HTML SHA256 8446a6ece7719f4e5cae8410f9abe68e4c62e9bcae38f4704a56404683ba58da
+limitation: 只作後續回查入口，未讀其餘頁及所有申報，不代表全公司來源普查；不刷新主命題時鐘
+-->
+
+<!-- research_source
+source_id: S29
+role: competitor_primary
+source_kind: document
+publisher: Advantest
+title: SEMICON India 2026 test platforms and engineering productivity
+published_at: 2026-09-15
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://www.advantest.com/en/news/2026/20260915.html
+locator: Product Display的V93000及SmarTest 8段；原始HTML SHA256 6d3df77c54a78249b5f84765430c6d8ca3b084c19d4b8fe9bb4f04521ad2e23a
+limitation: 獨立發行人展示工程工具，不是對Teradyne效能的交叉驗證，亦不是實際出貨或台灣公司採用
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: Teradyne於9/1公告新增UltraFLEXplus儀器，並主張數位測試效率、相容升級及供電能力可應對AI元件需求
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-10-08
+basis: S24逐一描述數位、協定與供電儀器及既有投資相容性
+boundary: 證實公司公告說法，不認證效能、量產採用、台灣公司或財務效果
+verification_needed: 同一DUT及測試覆蓋的升級前後實測
+-->
+
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: Teradyne於9/29表示Magnum E2可在共用平台整合記憶體與邏輯測試插入點並支援介面演進
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-10-08
+basis: S25平台功能清單直接提出插入點整合與硬體延用路徑
+boundary: 未證明某客戶實際減站、增產或減少設備採購
+verification_needed: 同產品流程、測時與產能前後比較
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: Teradyne於10/6稱Titan HP新增燒機功能已用於生產，並可用於SLT或可靠度測試及保存逐元件壓力與測試沿革
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-10-08
+basis: S26平台用途及結尾availability段直接記錄此公司說法
+boundary: production宣稱無具名客戶或部署分母；不表示兩種測試目的相同，也不證實台灣採用
+verification_needed: 客戶同案驗收及產品版本、良率、時數和部署資料
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: Advantest於9/15展會公告把可擴充測試平台與SmarTest 8的工程生產力工具並列
+supporting_source_ids: S29
+contrary_source_ids:
+as_of: 2026-10-08
+basis: S29 Product Display列出V93000與測試程式開發工具
+boundary: 工程開發效率不等於量產吞吐；展會公告不是訂單實績
+verification_needed: 具名量產產品可重現工作量與產能紀錄
+-->
+
+<!-- research_claim
+claim_id: C21
+label: inference
+status: active
+claim: 最新供應端材料同時提供能力擴充及效率吸收的路徑，仍須按同產品工作量、既有合格餘裕與可計費產能裁決新增設備需求
+supporting_source_ids: S24,S25,S26,S29
+contrary_source_ids:
+as_of: 2026-10-08
+basis: C17至C20分別描述儀器升級、測站整合、共用平台與工程效率；沿C6八分母框架，需求端與效率端可同時變動，不能只數新增功能
+boundary: 這是條件式研究判讀，不是淨需求增減或兩家公司實績互證；新增旁支不替C6主命題刷新時鐘
+verification_needed: 同產品具備時間、站數、利用率、既有餘裕及新增設備的共同分母
+-->
+
+<!-- research_claim
+claim_id: C22
+label: unverified
+status: active
+claim: 上述平台更新是否轉成京元電子或其他本universe公司的新增可計費產能與專案獲利仍待驗證
+supporting_source_ids:
+contrary_source_ids:
+as_of: 2026-10-08
+basis: 本輪產品公告未提供台廠同案關聯，原C3與C6邊界仍在
+boundary: 未證實不等於沒有業務；資本預算、採購、驗收及收入不可混用，亦不能據此推定Google等具名客戶
+verification_needed: 台灣公司及客戶同產品驗收、設備用途、可計費時數、收入成本與期間一致的對照
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: 10/8讀取的Advantest官方IR日曆把FY2026第二季結果安排於10/28公布
+supporting_source_ids: S27
+contrary_source_ids:
+as_of: 2026-10-08
+basis: 活頁Yearly Calendar與年度表的日期相符
+boundary: 僅證實當時排程，未來可改；不是結果已公布或全球tester預測已修訂
+verification_needed: 活動後取得實際新附件及版本
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C17,C18,C19,C20,C21,C22,C23
+metric: 新平台及升級方案的同產品工作量、效率、客戶驗收與可計費產能
+source_ids: S24,S25,S26,S29
+watch_source_ids: S27,S28,S6
+frequency: event_driven
+frequency_detail: Advantest預定10/28結果公布後回查；產品公告先出現具名客戶成對實測則提前查核
+next_check: 2026-10-29
+trigger: 同一產品版本與測試覆蓋可對齊測時、站數、合格餘裕、新增設備及客戶驗收，台廠映射另需可計費時數與財務證據
+invalidation: 設備升級、測站整合或既有餘裕已吸收新增工作，或新功能未能通過相同產品驗收；只有行銷能力時仍維持未可測
+-->
+
+<!-- transition
+date: 2026-10-08
+from: triaged
+to: triaged
+reason: append_vendor_platform_and_efficiency_paths_without_taiwan_attribution_or_thesis_clock_refresh
+evidence: sources:S24,S25,S26,S27,S28,S29
 -->
