@@ -115,6 +115,10 @@ evidence: sources:S21
 ### 名詞小字典
 
 - **Pecos**：美國德州的一個場址；本文指Microsoft公布的資料中心建設計畫，不能與其其他德州園區的營運成績混用。
+- **Hyderabad／India South Central**：Microsoft 新印度雲端區域所在城市與區域名稱；啟用公告和分階段開放的服務要分開讀，亦不能把它的冷卻說法套到 Pecos。
+- **機械冷卻**：用機械設備移走熱量的方式。公告使用這個詞，不代表已披露完整水路、設備型號或供應商。
+- **取水量／冷卻用水**：場址取水可能用於冷卻與其他用途；「冷卻幾乎不用水」不能改寫成整個園區取水為零。
+- **FY25／試運轉**：本文 Microsoft FY25 指截至 2025 年 6 月 30 日的會計年度；試運轉是正式營運前的調試階段，該公司地區用水用電表排除此階段。
 
 - **液冷**：用液體把伺服器產生的熱帶走。它是一整套散熱方式，可能包含冷板、管路、泵浦、熱交換器、控制系統與機房冷卻設備，不等於只買一台 CDU。
 - **CDU（Coolant Distribution Unit）**：冷卻液分配單元，透過泵浦、熱交換器與控制系統，把伺服器迴路的熱帶走。它不是 GPU 上的冷板，也不等於機房產生冷水的 chiller。
@@ -1264,6 +1268,241 @@ next_check: 2026-10-10
 trigger: Microsoft或具名合作方公布Pecos啟用、接網、同工作負載水電實測及設備驗收，足以區分建設計畫與營運結果
 invalidation: 官方取消或延後Pecos供電／冷卻方案，或實測顯示穩態補水及用電條件不同於原計畫；未披露不是零耗水或計畫失敗
 -->
+
+<!-- transition
+date: 2026-10-09
+from: triaged
+to: triaged
+reason: hyderabad_operating_announcement_and_fy25_reporting_boundaries_added_without_product_revenue_clock_refresh
+evidence: sources:S28,S29,S30,S31,S32,S33
+-->
+
+<!-- research_source
+source_id: S28
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: AI Ambition into Action: Microsoft brings AI-ready capabilities across its India cloud infrastructure, establishes India South Central region as a strategic hub for Asia and Global South
+published_at: 2026-09-21
+captured_at: 2026-10-09
+accepted_at: 2026-10-09
+status: active
+url: https://news.microsoft.com/source/asia/2026/09/21/ai-ambition-into-action-microsoft-brings-ai-ready-capabilities-across-its-india-cloud-infrastructure-establishes-india-south-central-region-as-a-strategic-hub-for-asia-and-global-south/
+locator: India South Central now live、services rollout及high-efficiency mechanical cooling段；可見日期與HTML發表metadata一致
+limitation: 公司啟用與冷卻陳述，不是第三方性能測試；額外服務仍分階段開放，未交代同場址設備版本、水電實測與台廠供應商。原始HTML SHA256 c3a667bf6328b8d5ca8a25e2689f5357058e7e354d428bee7cddf405ce434864
+-->
+
+<!-- research_source
+source_id: S29
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: Understanding water use at Microsoft datacenters
+published_at: 2026-03-30
+captured_at: 2026-10-09
+accepted_at: 2026-10-09
+status: active
+url: https://local.microsoft.com/blog/understanding-water-use-at-microsoft-datacenters/
+locator: 三種冷卻方式與chip-level closed-loop段；HTML datePublished為3/30，dateModified為8/14
+limitation: 一般機制說明，沒有指定Hyderabad的完整架構；較早文件本次補讀，不視為十月新公告，亦不把修改日當首次發表日。原始HTML SHA256 4dd947dbccc0274a213d78fbd5b680a7ddd00a0cd84841d6fe0510c1a1976da7
+-->
+
+<!-- research_source
+source_id: S30
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: Open letter to Pecos and Reeves County
+published_at: 2026-06-22
+captured_at: 2026-10-09
+accepted_at: 2026-10-09
+status: active
+url: https://local.microsoft.com/blog/open-letter-to-pecos-and-reeves-county/
+locator: 從Texas社區入口連至公開信；planning new datacenters與closed-loop cooling段；HTML發表／修改metadata同為6/22
+limitation: 仍屬建設與冷卻計畫，不能當十月新進度；本輪只查指定入口及其公開信，不代表普查全部公司更新。原始HTML SHA256 db527f4bf251d946fbf7858b78825904da6dbd73881613bba207029dfa0243b6
+-->
+
+<!-- research_source
+source_id: S31
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: 2026 Environmental Sustainability Report — Data Fact Sheet
+published_at: 2026-07-09
+captured_at: 2026-10-09
+accepted_at: 2026-10-09
+status: active
+url: https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/msc/documents/presentations/CSR/2026-Microsoft-Environmental-Data-Fact-Sheet-PDF.pdf
+locator: PDF第2頁核閱邊界、第25頁Table15、第26頁註腳；發布日期來自S32官方報告發布文及其同檔連結
+limitation: 取件時PDF不證明歷史位元組未改；表15是FY25自有且營運控制場址，不含試運轉；第2節不在Deloitte核閱範圍。只渲染引用頁與相鄰頁，PDF SHA256 0fd180837df00b3427c3eae484a492224b8f18c381e82a2aed98b04553a197f6
+-->
+
+<!-- research_source
+source_id: S32
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: Responsibly building the AI future
+published_at: 2026-07-09
+captured_at: 2026-10-09
+accepted_at: 2026-10-09
+status: active
+url: https://blogs.microsoft.com/on-the-issues/2026/07/09/responsibly-building-the-ai-future/
+locator: 可見日期、當日發布2026環境報告的首段與註4 SustainabilityFactsheet2026連結；該連結解析至S31的CDN檔案
+limitation: 只用於發布日期與報告範圍；直接HTTP403，保存web工具文字摘取而非完整HTML。與S28至S31皆同發行人，不能當獨立驗證。摘取SHA256 db1f353d83499103bd3e430ba9d7d87213f0bafc779f29c1b4c5fee2d43044bd
+-->
+
+<!-- research_source
+source_id: S33
+role: company_release
+source_kind: living_index
+publisher: Microsoft
+title: Source Asia — India
+published_at:
+captured_at: 2026-10-09
+accepted_at: 2026-10-09
+status: active
+url: https://news.microsoft.com/source/asia/region/india/
+locator: India地區新聞索引，可見S28啟用公告連結
+limitation: 動態地區入口，非全部場址或設備披露普查；直接HTTP403，已讀web工具頁並保存文字摘取，不是原始HTML。只作T10後續查找入口
+-->
+
+<!-- research_claim
+claim_id: C35
+label: verified
+status: active
+claim: Microsoft 9月21日宣布Hyderabad的India South Central區域啟用，額外Azure與AI服務將分階段開放，並稱高效率機械冷卻幾乎不使用冷卻水
+supporting_source_ids: S28
+contrary_source_ids:
+as_of: 2026-10-09
+basis: 官方公告同時載明now live、後續服務rollout與冷卻陳述
+boundary: verified限於公司做出上述陳述；不表示全部服務或AI容量已可用，不證明全園區零取水、同場址實測或任何台廠訂單
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C36
+label: verified
+status: active
+claim: Microsoft的一般用水說明區分外氣、蒸發式與氣冷冰水主機等設施冷卻方式，並說明晶片端閉式液冷可與這些方式搭配
+supporting_source_ids: S29
+contrary_source_ids:
+as_of: 2026-10-09
+basis: S29逐項說明環境與冷卻方式，以及chip-level closed-loop的相容關係
+boundary: 一般技術說明不是Hyderabad設備清單，不能由低冷卻用水辨認CDU型號、驗收、效率或供應商
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C37
+label: verified
+status: active
+claim: Microsoft在7月9日發布涵蓋FY25的2026環境報告；資料表的地區用水用電明細屬未經Deloitte核閱的第2節，期間截至2025年6月30日，限自有且營運控制場址並排除試運轉，其取水與用電均為整體場址口徑
+supporting_source_ids: S31,S32
+contrary_source_ids:
+as_of: 2026-10-09
+basis: S32發布文連至S31；PDF第2頁界定只有第1節受核閱，第25至26頁Table15與註腳界定期間和範圍
+boundary: 第2節未受核閱不等於整份報告未受核閱；帳單不可得時含估計。表15無Hyderabad或Pecos列項，不能用其他城市代填，也不能以整體場址取水除整體用電冒充IT用水效率
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C38
+label: inference
+status: active
+claim: Hyderabad啟用新增可追蹤的營運場址，但不同冷卻方式、服務開放進度及既有設備效率改善，可能改變新增設備需求；較早年度的其他場址數據不能驗證該區域冷卻宣稱或台廠收入
+supporting_source_ids: S25,S28,S29,S31
+contrary_source_ids:
+as_of: 2026-10-09
+basis: 公司營運公告與一般冷卻技術說明的設備鍵缺失，FY25場址表的地點和期間也不相同；配合S25場址水電取捨框架，將多空路徑保留為待查條件
+boundary: 研究端推論，不判定實際需求增減、節水率或用電代價；未估計設備台數、台廠訂單或投資報酬，C21與主命題時鐘不變
+verification_needed: 同場址服務與負載、設備版本、連續營運水電紀錄，以及具名供應商驗收和同期間財務
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C39
+label: unverified
+status: active
+claim: Hyderabad同場址冷卻的實測水電效能、具名CDU驗收及對本文台灣公司的收入貢獻仍待驗證
+supporting_source_ids: S28,S29,S31
+contrary_source_ids:
+as_of: 2026-10-09
+basis: 本輪已讀公告、一般技術說明與FY25地區表未提供同地點同期間設備及財務共同鍵
+boundary: 已讀來源的缺口不代表設備未交付、表現不佳或公司沒有收入；不擴張為所有公開資訊均無披露
+verification_needed: 場址及設備版本、工作負載與氣候條件、冷卻水電原始量測和維修補水、供應商驗收與收入毛利
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T10
+status: active
+claim_ids: C35,C36,C37,C38,C39
+metric: Hyderabad服務開放、同場址冷卻配置與水電實績、具名設備財務
+source_ids: S28,S29,S31,S32
+watch_source_ids: S33
+frequency: monthly
+next_check: 2026-11-02
+trigger: 公司或具名客戶提供Hyderabad同場址設備版本、連續營運期間冷卻水電、驗收及供應商財務共同鍵
+invalidation: 公司修正啟用或冷卻陳述、同場址實測不符合冷卻用水宣稱，或設備與供應商歸屬不同；未披露不視為反證
+-->
+
+## 10 月 9 日更新：雲端區域啟用，距離液冷收入還差哪幾張證明？
+
+**營運有進展，設備收入仍要另外查。** Microsoft 9 月 21 日宣布印度 Hyderabad 的
+India South Central 雲端區域已啟用；部分額外 Azure 與 AI 服務仍待後續開放。
+
+公司稱其高效率機械冷卻幾乎不使用冷卻水。這是公司對營運與冷卻設計的陳述，未附本文可核對的
+同場址水電實測，也未列台灣設備供應商。[S28](https://news.microsoft.com/source/asia/2026/09/21/ai-ambition-into-action-microsoft-brings-ai-ready-capabilities-across-its-india-cloud-infrastructure-establishes-india-south-central-region-as-a-strategic-hub-for-asia-and-global-south/)
+
+**少用冷卻水，不能直接推出哪一種設備賣得更多。** Microsoft 的一般技術說明列出外氣、
+蒸發式與氣冷冰水主機等方式；晶片端閉式液冷可與不同設施冷卻方式搭配。這份背景文件
+沒有指定 Hyderabad 的完整設備配置。高盛先前提醒的場址氣候與水電取捨，仍須按地點驗證。
+[S29](https://local.microsoft.com/blog/understanding-water-use-at-microsoft-datacenters/)
+[S25](https://www.goldmansachs.com/insights/goldman-sachs-exchanges/the-outlook-for-data-center-power-demand-as-ai-token-use-grows)
+
+**已有數據，仍要對上地點、期間與核閱範圍。** Microsoft 7 月發布的環境報告資料表涵蓋
+截至 2025 年 6 月 30 日的 FY25；地區明細表不在會計師核閱範圍內，亦沒有 Hyderabad 或
+Pecos 列項。
+
+其取水量含場址各用途，用電量涵蓋整體營運，不能把兩者相除當成 IT 設備的
+用水效率。這份較早資料無法驗證 2026 年 9 月啟用區域的用水宣稱。
+[S31，PDF 第 2、25、26 頁](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/msc/documents/presentations/CSR/2026-Microsoft-Environmental-Data-Fact-Sheet-PDF.pdf)
+[S32，發布日期](https://blogs.microsoft.com/on-the-issues/2026/07/09/responsibly-building-the-ai-future/)
+
+| 要判斷的事情 | 現有證據 | 還缺什麼 |
+|---|---|---|
+| 客戶是否開始服務 | Hyderabad 區域已宣布啟用，部分服務分階段開放 | 同場址負載、設備版本與運轉期間 |
+| 冷卻是否省水且有效率 | 公司有冷卻陳述與較早年度的場址數據 | 同場址同期間冷卻水電、維修與試運轉範圍 |
+| 台廠是否增加收入 | 本次來源沒有設備到台廠財務的共同對應 | 具名型號、客戶驗收、交付數量、同期間收入與毛利 |
+
+研究端的多方路徑是：已啟用的區域讓設備整合與後續營運更容易追蹤。反方路徑是：服務逐步
+開放、設備配置差異與既有系統效率提升，都可能使需求增量無法等比例變成新設備收入。
+目前不足以選定其中一條為結果，也沒有據此增加任何台廠的客戶關係線。
+
+Hyderabad 的下次人工查核排在 **11 月 2 日**，這是研究工作日期，並非公司預告。
+
+Pecos 另在本次提前回查其 Texas 入口與 6 月公開信，取得的內容仍是建設計畫，未補齊 T9
+所需實績；原 **10 月 10 日**期限保留。兩個場址各自追蹤，原 C21 產品財務主命題與逾期
+提示均不刷新。[S30](https://local.microsoft.com/blog/open-letter-to-pecos-and-reeves-county/)
 
 ## 9 月 10 日機構情報：省水、接電與液冷，開始決定資料中心怎麼蓋
 
