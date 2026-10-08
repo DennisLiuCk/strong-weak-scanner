@@ -44,7 +44,6 @@ def quadratic_se(series, horizon, calendar):
 
 def audit(con, report):
     cfg = report["config"]
-    reference = cfg.get('comparison_reference', 'BASE')
     calendar, rows, frozen, _, _, _ = lab.load_inputs(con, report['as_of'])
     prices = {(r[0],r[1]):r[2] for r in con.execute("""SELECT p.date,p.stock_id,p.open*a.close/p.close
         FROM price p JOIN price_adj a USING(date,stock_id)
@@ -66,38 +65,9 @@ def audit(con, report):
         if difference>1e-10:
             raise AssertionError((label,actual,expected))
 
-    # Separately rebuild continuous rank/mix/smoothing values from raw rows.
-    signal_comparisons = 0
-    for dataset, raw_rows in (('replay', rows), ('frozen_replay', frozen)):
-        grouped_raw = defaultdict(list)
-        for row in raw_rows:
-            grouped_raw[row['date'], row['grp']].append(row)
-        history = defaultdict(list)
-        for (day, group), items in sorted(grouped_raw.items()):
-            for spec in cfg['strategies']:
-                if 'weights' in spec:
-                    continue
-                terms = spec.get('raw_mix', [{'field': spec.get('raw_rank'), 'direction': spec.get('direction'), 'weight': 1}])
-                ranks = {}
-                for term in terms:
-                    valid = [r for r in items if r.get(term['field']) is not None and math.isfinite(r[term['field']])]
-                    ranks[term['field']] = {r['stock_id']: 2*(v-1)/(len(valid)-1)-1
-                        for r, v in zip(valid, rank([r[term['field']] for r in valid]))} if len(valid)>1 else {}
-                for row in items:
-                    sid = row['stock_id']
-                    value = sum(t['weight']*t['direction']*ranks[t['field']][sid] for t in terms) if all(
-                        sid in ranks[t['field']] for t in terms) else None
-                    history[sid,spec['id']].append(value)
-                    if sid in sources[dataset].get(day,{}).get(group,{}):
-                        last = history[sid,spec['id']][-spec['smooth']:]
-                        expected = round(st.mean(last),2)
-                        check(sources[dataset][day][group][sid][spec['id']],expected,'raw rank/mix/smoothing')
-                        signal_comparisons += 1
-
     for dataset, data in report["datasets"].items():
         allowed=set(data['eligible_signal_dates'])
         structural={c:defaultdict(dict) for c in data['structure']}
-        structural_cells={c:defaultdict(dict) for c in data['structure']}
         old={}
         for index,day in enumerate(calendar):
             if day not in allowed or day not in sources[dataset]:
@@ -107,12 +77,8 @@ def audit(con, report):
                 names=sorted(stocks)
                 if len(names)<cfg['min_group']:
                     continue
-                base_values=[stocks[s][reference] for s in names]
+                base_values=[stocks[s]['BASE'] for s in names]
                 base_top={s for s,r in zip(names,rank(base_values)) if (r-1)/(len(names)-1)>=.75}
-                prior_reference = old.get((reference,group))
-                reference_change = None
-                if prior_reference and prior_reference[0]+1==index and base_top and prior_reference[1]:
-                    reference_change = 1-len(base_top & prior_reference[1])/len(base_top | prior_reference[1])
                 for candidate in structural:
                     values=[stocks[s][candidate] for s in names]
                     top={s for s,r in zip(names,rank(values)) if (r-1)/(len(names)-1)>=.75}
@@ -121,18 +87,13 @@ def audit(con, report):
                         grouped[candidate]['top_jaccard'].append(len(top & base_top)/len(top | base_top))
                     previous=old.get((candidate,group))
                     if previous and previous[0]+1==index and top and previous[1]:
-                        change = 1-len(top & previous[1])/len(top | previous[1])
-                        grouped[candidate]['list_change'].append(change)
-                        if reference_change is not None:
-                            reduction = reference_change-change
-                            grouped[candidate]['list_change_reduction'].append(reduction)
-                            structural_cells[candidate][day][group] = reduction
+                        grouped[candidate]['list_change'].append(1-len(top & previous[1])/len(top | previous[1]))
                     old[candidate,group]=(index,top)
             for candidate, metrics in grouped.items():
                 for metric, values in metrics.items():
                     structural[candidate][metric][day]=st.mean(values)
         for candidate,result in data['structure'].items():
-            for metric in ('tie_fraction','top_jaccard','list_change','list_change_reduction'):
+            for metric in ('tie_fraction','top_jaccard','list_change'):
                 expected=structural[candidate][metric]
                 actual=result['daily'].get(metric,{})
                 if set(expected)!=set(actual):
@@ -151,7 +112,7 @@ def audit(con, report):
                 if day not in allowed or day not in sources[dataset] or index+horizon+1>=len(calendar):
                     continue
                 by_metric={c:defaultdict(list) for c in candidates}
-                for group,stocks in sources[dataset][day].items():
+                for stocks in sources[dataset][day].values():
                     names=sorted(stocks)
                     if len(names)<cfg['min_group']:
                         continue
@@ -159,17 +120,14 @@ def audit(con, report):
                     if any((entry,s) not in prices or (exit_day,s) not in prices for s in names):
                         continue
                     future=[prices[exit_day,s]/prices[entry,s]-1 for s in names]
-                    base=[stocks[s][reference] for s in names]
+                    base=[stocks[s]['BASE'] for s in names]
                     base_ic=rho(base,future)
                     for candidate in candidates:
                         values=[stocks[s][candidate] for s in names]
                         candidate_ic=rho(values,future)
                         if candidate_ic is None or base_ic is None:
                             continue
-                        metrics={'ic':candidate_ic,'reference_ic':base_ic,'delta_ic':candidate_ic-base_ic}
-                        if group in structural_cells[candidate].get(day,{}):
-                            metrics.update(joint_ic=candidate_ic,joint_delta_ic=candidate_ic-base_ic,
-                                           list_change_reduction=structural_cells[candidate][day][group])
+                        metrics={'ic':candidate_ic,'base_ic':base_ic,'delta_ic':candidate_ic-base_ic}
                         ranks=rank(values)
                         top=[i for i,v in enumerate(ranks) if (v-1)/(len(names)-1)>=.75]
                         bottom=[i for i,v in enumerate(ranks) if (v-1)/(len(names)-1)<=.25]
@@ -183,8 +141,7 @@ def audit(con, report):
                     for metric, values in metrics.items():
                         independent[candidate][metric][day]=st.mean(values)
             for candidate, result in candidates.items():
-                for metric in ('ic','reference_ic','delta_ic','spread_pp','top_excess_gross_pp','top_excess_cost_pp',
-                               'joint_ic','joint_delta_ic','list_change_reduction'):
+                for metric in ('ic','base_ic','delta_ic','spread_pp','top_excess_gross_pp','top_excess_cost_pp'):
                     expected=independent[candidate][metric]
                     actual=result['daily'].get(metric,{})
                     if set(expected)!=set(actual):
@@ -203,9 +160,8 @@ def audit(con, report):
                     segments=1+sum(position[b]-position[a]!=1 for a,b in zip(ordered,ordered[1:]))
                     check(summary['episodes'],segments,'episodes')
                     series_count+=1
-    return {'ok':True,'comparisons':comparisons,'signal_comparisons':signal_comparisons,
-            'series':series_count,'max_absolute_error':max_error,
-            'scope':'Independent raw-rank/mix/smoothing, next-open returns, midranks, paired daily means, cohort spreads/cost, paired structural lists, calendar HAC; shared signal inclusion and BASE scorer',
+    return {'ok':True,'comparisons':comparisons,'series':series_count,'max_absolute_error':max_error,
+            'scope':'Independent next-open returns, midranks, paired daily means, cohort spreads/cost, structural lists, calendar HAC; shared signal builder',
             'db_query_only':con.execute('PRAGMA query_only').fetchone()[0]}
 
 

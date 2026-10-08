@@ -43,8 +43,7 @@ def independent_correlation(x, y):
 
 class ExperimentLabTests(unittest.TestCase):
     def setUp(self):
-        # Keep first-round contracts while active rounds evolve.
-        self.cfg = json.loads((lab.REGISTRY_DIR/'fast-lab-v1-20261009.json').read_text(encoding='utf-8'))['config']
+        self.cfg = lab.load_config()
 
     def test_registered_roster_has_distinct_mechanisms_and_primary_three_days(self):
         self.assertEqual(self.cfg["primary_horizon"], 3)
@@ -120,7 +119,7 @@ class ExperimentLabTests(unittest.TestCase):
         reverse = result["REV1"]["cells"][days[0]]["G"]
         target = [i*.02 for i in range(8)]
         self.assertAlmostEqual(reverse["ic"], independent_correlation(list(range(0,-8,-1)), target))
-        self.assertAlmostEqual(reverse["reference_ic"], 1)
+        self.assertAlmostEqual(reverse["base_ic"], 1)
         self.assertAlmostEqual(reverse["delta_ic"], -2)
         self.assertAlmostEqual(reverse["spread_pp"], -12)
         self.assertAlmostEqual(reverse["top_excess_gross_pp"], -6)
@@ -327,7 +326,7 @@ class ExperimentLabTests(unittest.TestCase):
             lab.freeze_reviews(Path(folder)/'reviews',report,days)
             lab.freeze_reviews(Path(folder)/'reviews',report,days)
             files=list((Path(folder)/'reviews'/cfg['protocol']).glob('*.json'))
-            self.assertEqual(len(files),(len(report['forward_looks'])-1)*3)
+            self.assertEqual(len(files),8*3)
 
 
 if __name__ == '__main__':

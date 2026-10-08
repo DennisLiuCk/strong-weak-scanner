@@ -56,40 +56,15 @@ def load_config(path=CONFIG_PATH):
         raise ValueError("invalid horizons")
     if cfg["gap_days"] < max(cfg["horizons"]) + 1:
         raise ValueError("gap must exclude all next-open outcome windows")
-    if cfg.get("comparison_reference", "BASE") not in ids:
-        raise ValueError("unknown comparison reference")
-    if any(c not in ids for c in cfg.get("selection_candidates", ids)):
-        raise ValueError("unknown selection candidate")
-    if 'stability_objective' in cfg:
-        policy = cfg['stability_objective']
-        if cfg.get('comparison_reference', 'BASE') not in cfg.get('selection_candidates', []):
-            raise ValueError('selection must include its reference')
-        if not (0 <= policy['ic_loss_tolerance'] <= 2 and 0 < policy['min_list_change_reduction'] <= 1):
-            raise ValueError('invalid stability objective')
     for s in cfg["strategies"]:
-        if s["smooth"] < 1 or sum(k in s for k in ("weights", "raw_rank", "raw_mix")) != 1:
+        if s["smooth"] < 1 or ("weights" in s) == ("raw_rank" in s):
             raise ValueError("each strategy needs positive smoothing and exactly one rule")
         if any(k not in FACTORS for k in s.get("weights", {})):
             raise ValueError("unknown factor")
-        terms = raw_terms(s)
-        if 'raw_mix' in s and not terms:
-            raise ValueError('raw mix cannot be empty')
-        if terms and (any(t["field"] not in REQUIRED or t["direction"] not in (-1, 1)
-                          or not finite(t["weight"]) or t["weight"] < 0 for t in terms)
-                      or not math.isclose(sum(t["weight"] for t in terms), 1.0)):
-            raise ValueError("raw mix requires known fields, directions and weights summing to one")
     registered = dt.datetime.fromisoformat(cfg["registered_at"])
     if registered.tzinfo is None:
         raise ValueError("registration must include timezone")
     return cfg
-
-
-def raw_terms(spec):
-    if "raw_mix" in spec:
-        return spec["raw_mix"]
-    if "raw_rank" in spec:
-        return [{"field": spec["raw_rank"], "direction": spec["direction"], "weight": 1.0}]
-    return []
 
 
 def source_fingerprint(cfg):
@@ -179,7 +154,7 @@ def build_signals(rows, cfg, calendar=None):
     signals, excluded = {}, Counter()
     for (day, grp), items in sorted(grouped.items()):
         raw_ranks = {}
-        for field in {t["field"] for s in cfg["strategies"] for t in raw_terms(s)}:
+        for field in {s["raw_rank"] for s in cfg["strategies"] if "raw_rank" in s}:
             valid = [r for r in items if finite(r.get(field))]
             rr = score.average_ranks([r[field] for r in valid])
             raw_ranks[field] = {r["stock_id"]: (2 * (rank - 1) / (len(valid) - 1) - 1)
@@ -198,10 +173,9 @@ def build_signals(rows, cfg, calendar=None):
                 if "weights" in spec:
                     raw = round(sum(w * factors[k] for k, w in spec["weights"].items()), 2)
                 else:
-                    terms = raw_terms(spec)
-                    parts = [raw_ranks[t["field"]].get(sid) for t in terms]
-                    raw = sum(v * t["direction"] * t["weight"] for v, t in zip(parts, terms)) if (
-                        parts and all(finite(v) for v in parts)) else None
+                    raw = raw_ranks[spec["raw_rank"]].get(sid)
+                    if raw is not None:
+                        raw *= spec["direction"]
                 hist = history[sid, spec["id"]]
                 hist.append(raw)
                 while len(hist) > spec["smooth"]:
@@ -247,50 +221,37 @@ def structural_report(signals, calendar, cfg, allowed):
     """Outcome-free list differences; Jaccard distance is NOT portfolio turnover."""
     positions = {d: i for i, d in enumerate(calendar)}
     prior = {}
-    reference = cfg.get('comparison_reference', 'BASE')
     series = {s['id']: defaultdict(dict) for s in cfg['strategies']}
-    cells = {s['id']: defaultdict(dict) for s in cfg['strategies']}
     for day in sorted(set(allowed) & signals.keys()):
         values = {s['id']: defaultdict(list) for s in cfg['strategies']}
         for group, population in signals[day].items():
             if len(population) < cfg['min_group']:
                 continue
-            base_top, _ = tails({s: r[reference] for s, r in population.items()})
-            prior_reference = prior.get((reference, group))
-            ref_change = None
-            if prior_reference and prior_reference[0]+1 == positions[day] and base_top and prior_reference[1]:
-                old_ref = prior_reference[1]
-                ref_change = 1-len(base_top & old_ref)/len(base_top | old_ref)
+            base_top, _ = tails({s: r['BASE'] for s, r in population.items()})
             for spec in cfg['strategies']:
                 candidate=spec['id']
                 ranks={s: r[candidate] for s, r in population.items()}
                 top, _ = tails(ranks)
-                cell = {'tie_fraction': 1-len(set(ranks.values()))/len(ranks)}
+                values[candidate]['tie_fraction'].append(1-len(set(ranks.values()))/len(ranks))
                 if top and base_top:
-                    cell['top_jaccard'] = len(top & base_top)/len(top | base_top)
+                    values[candidate]['top_jaccard'].append(len(top & base_top)/len(top | base_top))
                 previous=prior.get((candidate,group))
                 if previous and previous[0]+1==positions[day] and top and previous[1]:
                     old=previous[1]
-                    cell['list_change'] = 1-len(top & old)/len(top | old)
-                    if ref_change is not None:
-                        cell['list_change_reduction'] = ref_change-cell['list_change']
-                cells[candidate][day][group] = cell
-                for metric, value in cell.items():
-                    values[candidate][metric].append(value)
+                    values[candidate]['list_change'].append(1-len(top & old)/len(top | old))
                 prior[candidate,group]=(positions[day],top)
         for candidate, metrics in values.items():
             for metric, items in metrics.items():
                 if items:
                     series[candidate][metric][day]=st.mean(items)
     return {candidate:{'summary':{k:pack(v,1,calendar) for k,v in metrics.items()},
-                       'daily':dict(metrics), 'cells':dict(cells[candidate])} for candidate,metrics in series.items()}
+                       'daily':dict(metrics)} for candidate,metrics in series.items()}
 
 
-def evaluate(signals, calendar, opening, cfg, horizon, eligible_days=None, structure=None):
+def evaluate(signals, calendar, opening, cfg, horizon, eligible_days=None):
     allowed = set(signals if eligible_days is None else eligible_days)
     position = {d: i for i, d in enumerate(calendar)}
     ids = [s["id"] for s in cfg["strategies"]]
-    reference = cfg.get("comparison_reference", "BASE")
     cell = {sid: defaultdict(dict) for sid in ids}
     coverage = {sid: Counter() for sid in ids}
     for day in sorted(signals):
@@ -317,7 +278,7 @@ def evaluate(signals, calendar, opening, cfg, horizon, eligible_days=None, struc
                 if reason:
                     coverage[candidate][reason] += 1
                     continue
-                base = {s: population[s][reference] for s in stocks}
+                base = {s: population[s]["BASE"] for s in stocks}
                 alternative = {s: population[s][candidate] for s in stocks}
                 future = [rr[s] for s in stocks]
                 a = spearman(list(base.values()), future)
@@ -327,14 +288,8 @@ def evaluate(signals, calendar, opening, cfg, horizon, eligible_days=None, struc
                     continue
                 top, bottom = tails(alternative)
                 base_top, _ = tails(base)
-                row = {"ic": b, "reference_ic": a, "delta_ic": b - a,
+                row = {"ic": b, "base_ic": a, "delta_ic": b - a,
                        "n_stocks": len(stocks)}
-                if structure is not None:
-                    structural_cell = structure[candidate]['cells'].get(day, {}).get(grp, {})
-                    if 'list_change_reduction' in structural_cell:
-                        # All three decision metrics share the exact group/date/stock comparison.
-                        row.update(joint_delta_ic=b-a, joint_ic=b,
-                                   list_change_reduction=structural_cell['list_change_reduction'])
                 if top and bottom:
                     row["spread_pp"] = 100 * (st.mean(rr[s] for s in top) - st.mean(rr[s] for s in bottom))
                     row["top_excess_gross_pp"] = 100 * (st.mean(rr[s] for s in top) - st.mean(rr.values()))
@@ -367,43 +322,6 @@ def evaluate(signals, calendar, opening, cfg, horizon, eligible_days=None, struc
     return results
 
 
-def assess_tradeoff(result, cfg, calendar, days=None, min_days=20):
-    """Exploratory tolerance, NOT a noninferiority test or a portfolio objective."""
-    metrics = ('joint_delta_ic', 'joint_ic', 'list_change_reduction')
-    daily = result['daily']
-    common = set.intersection(*(set(daily.get(k, {})) for k in metrics))
-    if days is not None:
-        common &= set(days)
-    summaries = {k: pack({d: daily[k][d] for d in sorted(common)}, cfg['primary_horizon'], calendar)
-                 for k in metrics}
-    policy = cfg['stability_objective']
-    checks = {'enough_days': len(common) >= min_days,
-              'ic_loss_within_tolerance': bool(common) and summaries['joint_delta_ic']['mean'] >= -policy['ic_loss_tolerance'],
-              'positive_ic': bool(common) and summaries['joint_ic']['mean'] > 0,
-              'list_change_reduced': bool(common) and summaries['list_change_reduction']['mean'] >= policy['min_list_change_reduction']}
-    return {'qualified': all(checks.values()), 'checks': checks, 'summary': summaries,
-            'dates': sorted(common), 'minimum_days': min_days}
-
-
-def iteration_decision(datasets, cfg, calendar):
-    """Use both overlapping historical views to allocate research, never call them independent."""
-    reference = cfg.get('comparison_reference', 'BASE')
-    candidates = cfg.get('selection_candidates', [s['id'] for s in cfg['strategies']])
-    if 'stability_objective' not in cfg:
-        return None
-    h = str(cfg['primary_horizon'])
-    assessments = {c: {name: assess_tradeoff(datasets[name]['horizons'][h][c], cfg, calendar)
-                       for name in ('replay', 'frozen_replay')} for c in candidates}
-    eligible = [c for c in candidates if c != reference and
-                all(v['qualified'] for v in assessments[c].values())]
-    selected = max(eligible, key=lambda c: assessments[c]['replay']['summary']['joint_delta_ic']['mean']) if eligible else reference
-    return {'selected': selected, 'eligible': eligible, 'assessments': assessments,
-            'action': 'continue_selected_experiment' if eligible else 'retain_reference',
-            'reason': ('候選符合預先固定的效果／穩定度取捨，優先續測。' if eligible else
-                       '新候選未同時通過兩種重播的固定取捨，保留原版反轉；新候選降為對照。'),
-            'label': '探索資源配置；兩種重播重疊，非獨立證據或正式策略升格'}
-
-
 def walk_forward(results, calendar, cfg):
     """Purged expanding training window; fixed candidate set, no random splitting.
 
@@ -426,16 +344,8 @@ def walk_forward(results, calendar, cfg):
             train_summary[candidate] = pack(vals, horizon, calendar)
             if len(vals) >= cfg["train_days"]:
                 means[candidate] = st.mean(vals.values())
-        reference = cfg.get('comparison_reference', 'BASE')
-        assessments = {}
-        if 'stability_objective' in cfg:
-            assessments = {c: assess_tradeoff(results[c], cfg, calendar, train_days, cfg['train_days'])
-                           for c in cfg['selection_candidates']}
-            eligible = [c for c, a in assessments.items() if c != reference and a['qualified']]
-            selected = max(eligible, key=lambda c: assessments[c]['summary']['joint_delta_ic']['mean']) if eligible else (
-                reference if reference in means else None)
-        else:
-            selected = max(means, key=lambda k: (means[k], k == reference, -list(results).index(k))) if means else None
+        # A tie chooses BASE first, then stable protocol order; never look at test outcomes.
+        selected = max(means, key=lambda k: (means[k], k == "BASE", -list(results).index(k))) if means else None
         fold_results = {c: pack({d: v for d, v in r["daily"].get("delta_ic", {}).items()
                                if d in test_days}, horizon, calendar) for c, r in results.items()}
         if selected:
@@ -444,10 +354,7 @@ def walk_forward(results, calendar, cfg):
                       "train_last_outcome": calendar[i - cfg["gap_days"] - 1 + horizon + 1],
                       "test_first": test_days[0], "test_last": test_days[-1],
                       "gap_days": cfg["gap_days"], "selected": selected,
-                      "train": train_summary, "train_tradeoff": assessments,
-                      "all_test_candidates": fold_results,
-                      "all_test_tradeoffs": {c: assess_tradeoff(r, cfg, calendar, test_days, cfg['test_days'])
-                                             for c, r in results.items()} if assessments else {}})
+                      "train": train_summary, "all_test_candidates": fold_results})
     return {"folds": folds, "selected_process_delta": pack(combined, horizon, calendar),
             "label": "歷史選擇流程重播；策略設計已看過歷史，非真正未見 OOS"}
 
@@ -459,8 +366,7 @@ def negative_controls(signals, calendar, opening, cfg, allowed):
         for grp, stocks in day.items():
             members[grp].update(stocks)
     output = []
-    reference = cfg.get('comparison_reference', 'BASE')
-    small_cfg = {**cfg, "strategies": [{"id": reference}, {"id": "SHUFFLE"}]}
+    small_cfg = {**cfg, "strategies": [cfg["strategies"][0], {"id": "SHUFFLE"}]}
     for seed in cfg["shuffle_seeds"]:
         mapping = {}
         for grp, stocks in sorted(members.items()):
@@ -475,8 +381,8 @@ def negative_controls(signals, calendar, opening, cfg, allowed):
                 # Membership changes cannot silently substitute a different permutation.
                 if not all(mapping[grp][s] in stocks for s in stocks):
                     continue
-                fake.setdefault(day, {})[grp] = {s: {reference: row[reference],
-                    "SHUFFLE": stocks[mapping[grp][s]][reference]} for s, row in stocks.items()}
+                fake.setdefault(day, {})[grp] = {s: {"BASE": row["BASE"],
+                    "SHUFFLE": stocks[mapping[grp][s]]["BASE"]} for s, row in stocks.items()}
         result = evaluate(fake, calendar, opening, small_cfg, cfg["primary_horizon"], allowed)["SHUFFLE"]
         output.append({"seed": seed, "ic": result["summary"].get("ic"),
                        "coverage": result["coverage"]})
@@ -501,31 +407,16 @@ def lab_action(series, cfg):
 
 
 def fixed_looks(result, calendar, cfg):
-    stability = 'stability_objective' in cfg
-    series = result["daily"].get("joint_delta_ic" if stability else "delta_ic", {})
+    series = result["daily"].get("delta_ic", {})
     days = sorted(series)
     output = []
     for n in cfg["looks"]:
         subset = {d: series[d] for d in days[:n]}
         ready = len(days) >= n
         action, reason = lab_action(subset, cfg) if ready else ("pending", "尚未成熟")
-        assessment = None
-        joint_daily = {}
-        if stability and ready:
-            assessment = assess_tradeoff(result, cfg, calendar, subset, n)
-            joint_daily = {k: {d: result['daily'][k][d] for d in subset}
-                           for k in ('joint_delta_ic', 'joint_ic', 'list_change_reduction')}
-            if n >= 20 and action != 'redesign':
-                halves = [assess_tradeoff(result, cfg, calendar, sorted(subset)[i:i+10], 10)
-                          for i in (0, 10)]
-                assessment['halves'] = halves
-                qualifies = assessment['qualified'] and all(a['qualified'] for a in halves)
-                action = 'retain' if qualifies else 'simplify_or_extend'
-                reason = '固定效果／名單取捨及兩個十日段均達條件，保留續測。' if qualifies else '未達固定效果／穩定度取捨，保留原版或另開一輪。'
         output.append({"n": n, "ready": ready, "remaining": max(0, n - len(days)),
                        "summary": pack(subset, cfg["primary_horizon"], calendar) if ready else None,
-                       "daily": subset if ready else {}, "action": action, "reason": reason,
-                       "tradeoff": assessment, "joint_daily": joint_daily})
+                       "daily": subset if ready else {}, "action": action, "reason": reason})
     return output
 
 
@@ -534,7 +425,7 @@ def freeze_reviews(path, report, calendar):
     folder = Path(path) / report["protocol"]
     active = set()
     for candidate, looks in report["forward_looks"].items():
-        if candidate == report['config'].get('comparison_reference', 'BASE'):
+        if candidate == "BASE":
             continue
         for look in looks:
             if not look["ready"]:
@@ -586,10 +477,9 @@ def analyze(con, cfg, fingerprint, as_of=None):
                    ("frozen_replay", observed, [d for d in observed if d < registration_day]),
                    ("forward", observed, forward))
     for name, signals, allowed in definitions:
-        structure = structural_report(signals, calendar, cfg, allowed)
         datasets[name] = {"label": DATASET_LABELS[name], "eligible_signal_dates": sorted(allowed),
-            "structure": structure,
-            "horizons": {str(h): evaluate(signals, calendar, opening, cfg, h, allowed, structure) for h in cfg["horizons"]}}
+            "structure": structural_report(signals, calendar, cfg, allowed),
+            "horizons": {str(h): evaluate(signals, calendar, opening, cfg, h, allowed) for h in cfg["horizons"]}}
     primary = str(cfg["primary_horizon"])
     report = {"protocol": cfg["protocol"], "as_of": calendar[-1] if calendar else None,
               "config": cfg, "fingerprint": fingerprint, "calendar": calendar,
@@ -597,10 +487,8 @@ def analyze(con, cfg, fingerprint, as_of=None):
               "datasets": datasets, "input_exclusions": {"replay": restated_excluded,
               "frozen": observed_excluded, "first_official": rejected},
               "walk_forward": walk_forward(datasets["replay"]["horizons"][primary], calendar, cfg),
-              "iteration_decision": iteration_decision(datasets, cfg, calendar),
               "negative_controls": negative_controls(restated, calendar, opening, cfg, set(replay_days)),
-              "forward_looks": {c: fixed_looks(r, calendar, cfg) for c, r in datasets["forward"]["horizons"][primary].items()
-                                if c in cfg.get('selection_candidates', [s['id'] for s in cfg['strategies']])},
+              "forward_looks": {c: fixed_looks(r, calendar, cfg) for c, r in datasets["forward"]["horizons"][primary].items()},
               "snapshot_receipts": {d: {"snapshot_id": r["snapshot_id"], "captured_at": r["captured_at"],
                   "content_hash": r["content_hash"], "actual_rows_sha256": digest([x for x in frozen if x["date"] == d])}
                   for d, r in sorted(runs.items())},
@@ -621,9 +509,7 @@ def public_report(report, *, browser=False):
     trimmed["snapshot_receipts"] = report["snapshot_receipts"] if not browser else {}
     trimmed["datasets"] = {}
     for name, dataset in report["datasets"].items():
-        trimmed["datasets"][name] = {**dataset,
-            "structure": {c: {k: v for k, v in r.items() if k != 'cells' and (not browser or k != 'daily')}
-                          for c, r in dataset['structure'].items()}, "horizons": {
+        trimmed["datasets"][name] = {**dataset, "horizons": {
             h: {s: {k: v for k, v in result.items()
                     if k != "cells" and (not browser or k != "daily")}
                 for s, result in candidates.items()}
@@ -639,28 +525,20 @@ def render_html(report):
 <style>body{font:16px/1.65 system-ui,sans-serif;background:#f4f6fa;color:#16243b;margin:0}main{max-width:1180px;margin:auto;padding:32px 22px}h1{font-size:32px;margin:8px 0}h2{margin-top:32px}a{color:#07599f}section,.card{background:white;border:1px solid #dce3ed;border-radius:12px;padding:20px;margin:18px 0}.muted{color:#526477}.badge{display:inline-block;background:#e4eef9;padding:3px 10px;border-radius:30px;font-size:13px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:14px}.grid .card{margin:0}label{display:inline-flex;gap:10px;align-items:center;margin:8px 22px 8px 0}select{font:inherit;padding:8px;border:1px solid #9aabc0;border-radius:6px}.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;border-bottom:1px solid #e0e6ef;padding:12px 10px;vertical-align:top}th{background:#edf2f9;white-space:nowrap}.number{white-space:nowrap;font-variant-numeric:tabular-nums}.good{color:#136542}.warn{color:#943d13}summary{cursor:pointer;font-weight:600}code{font-size:13px}footer{margin:25px 0;color:#526477}button{font:inherit}small{font-size:12px}</style>
 <main><a href="../index.html">← 汰弱留強</a><p class="badge">研究用實驗 · 可快速迭代</p>
 <h1>先得到回饋，再決定下一輪</h1><p>現在可用歷史重播找出值得繼續研究的方向；前瞻實驗在 5／10／20 個成熟日檢視。主要目標是學習與簡化，不用等到 2027 年才動手。</p>
-<p id="meta" class="muted"></p><div class="grid"><div class="card"><b>立即：歷史重播</b><br>共同母體比較所有版本，保留全部結果。</div><div class="card"><b>約兩週：短期回饋</b><br>3 日結果 × 5 個成熟日，先查邏輯與缺值。</div><div class="card"><b>約三至五週：迭代候選</b><br>10／20 日按固定規則保留、重設或簡化。</div></div>
-<section id="decision-section"><h2>本輪實際調整</h2><p id="decision"></p><p id="policy" class="muted"></p><p id="previous"></p></section>
+<p id="meta" class="muted"></p><div class="grid"><div class="card"><b>立即：歷史重播</b><br>共同母體比較九個版本，保留全部結果。</div><div class="card"><b>約兩週：第一輪短期回饋</b><br>3 日結果 × 5 個成熟日，先查邏輯與缺值。</div><div class="card"><b>約三至五週：迭代候選</b><br>10／20 日按固定規則保留、重設或簡化。</div></div>
 <section><h2>策略比較</h2><label>資料<select id="dataset"><option value="replay">歷史重播</option><option value="frozen_replay">舊快照重播</option><option value="forward">登錄後前瞻</option></select></label><label>持有視窗<select id="horizon"><option value="1">1 日（敏感度）</option><option value="3" selected>3 日（主要）</option><option value="5">5 日（敏感度）</option></select></label>
 <p id="context" class="muted"></p><div class="scroll"><table><thead><tr><th>版本／研究問題</th><th>相對基準 ΔIC ±SE</th><th>候選 IC ±SE</th><th>前四分位－後四分位</th><th>覆蓋／排除</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted">訊號日 d → d+1 開盤 → d+1+H 開盤。每日先等權聚合族群，HAC 保留完整交易日距離。n/H 只代表重疊尺度；短窗仍可能有自相關。SE 尚不可估會明示，沒有把未成熟結果補成 0。</p></section>
 <section><h2>不等報酬：名單是否真的不同？</h2><div id="structure" class="scroll"></div><p class="muted">同分比例＝1−不同分數數量／股票數；相似度＝與基準前四分位名單的 Jaccard；日變動＝相鄰市場日前四分位名單的 Jaccard 距離。這些是名單結構，日變動不是投組換手率。單位為比例，附跨日 SE。</p></section>
-<section><h2>效果與穩定度的共同樣本取捨</h2><p class="muted">固定 3 日主視窗；下表隨資料選單切換。只比較同一天、同一族群、同一股票集合且雙邊名單變動均可計算的配對。降低量＝基準日變動－候選日變動，正值表示較穩定。門檻只用於探索，不是統計上的非劣性檢定。</p><div id="tradeoff" class="scroll"></div></section>
 <section><h2>如何快一點，而且知道自己在測什麼</h2><div class="scroll"><table><tr><th>方法</th><th>能回答</th><th>下一個動作</th></tr><tr><td>歷史／舊快照重播</td><td>策略是否有變異？哪個元素看起來冗餘？</td><td>立即設計下一輪；不稱為新策略 OOS。</td></tr><tr><td>時間分段走動驗證</td><td>前段選中的版本，後段是否崩壞？</td><td>固定 30 日起始訓練、6 日隔離、15 日測試。</td></tr><tr><td>短期前瞻 1／3／5 日</td><td>名單能否辨認短期強弱？</td><td>固定 3 日為主，不事後挑最好視窗。</td></tr><tr><td>移除族群／不重疊起點／置換</td><td>結果是否依賴一個族群、一個起點或任意配對？</td><td>優先淘汰脆弱設計；這些不是額外獨立樣本。</td></tr></table></div></section>
-<section><h2>固定短期檢視</h2><p>5 日查計算與差異；10 日 ΔIC ≤−0.05 可重設；20 日按本輪固定取捨規則檢視，並要求首／後十日各自達條件。這是實驗資源分配，未校準顯著性，也不自動改主頁策略。</p><div id="looks"></div></section>
+<section><h2>固定短期檢視</h2><p>5 日查計算與差異；10 日明顯偏負可重設；20 日 ΔIC ≥0.02 且前後兩段方向皆正，保留到下一輪。這是實驗資源分配規則，未校準顯著性，也不自動改主頁策略。</p><div id="looks"></div></section>
 <section><details><summary>時間分段重播、壓力測試與完整證據</summary><div id="folds"></div><div id="sensitivity"></div><p>成本觀察：前四分位相對全組等權毛報酬，再扣固定 0.585 個百分點；只是 cohort 敏感度，沒有資金投組，也不當成實驗准入門檻。</p><p><a href="experiment_lab.json">下載全部日序列、樣本、缺失與規格 JSON</a> · <a href="../EXPERIMENT_LAB.md">實驗規格</a></p><ul id="limits"></ul></details></section>
 <footer>日期估計假設資料及時完整；缺值、休市或零變異會延後。所有策略都保留於表中，不只展示勝者。</footer></main>
 <script>const R=__PAYLOAD__;const $=id=>document.getElementById(id);const esc=x=>String(x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
 const f=(v,n=3)=>v==null?'—':v.toFixed(n);function stat(s){if(!s)return '尚無成熟配對';return `${f(s.mean)} ± ${s.se==null?'尚不可估':f(s.se)}<br><small>t=${f(s.t,2)}；n=${s.n_days}；n/H=${f(s.eff_obs,1)}；${s.episodes} 區段</small>`;}
-const reference=R.config.comparison_reference||'BASE';
-$('meta').textContent=`資料截至 ${R.as_of} · ${R.protocol} · DB 唯讀 · ${R.config.strategies.length} 個版本 · 比較基準 ${reference} · 主視窗 3 日`;
-if(R.iteration_decision){let d=R.iteration_decision,p=R.config.stability_objective;$('decision').textContent=`優先續測：${d.selected}。${d.reason} ${d.label}`;$('policy').textContent=`本輪只改兩個機制：反轉兩日平滑、25% 趨勢搭配。相對 ${reference}，平均 IC 損失不超過 ${p.ic_loss_tolerance}、候選 IC 為正，且名單變動至少降低 ${p.min_list_change_reduction}；兩種重播各至少 20 個共同成熟日並同時通過。若有多個符合者，取歷史重播 IC 較高者，平手按登錄順序。BASE、純價格與移除量能只作對照。`;}else{$('decision-section').hidden=true;}
-if(R.config.previous_round)$('previous').innerHTML=`<a href="experiment_rounds/${encodeURIComponent(R.config.previous_round)}/experiment_lab.html">上一輪完整結果</a>（程式、設定、核對報告一併封存）`;
-function draw(){let ds=$('dataset').value,h=$('horizon').value,data=R.datasets[ds].horizons[h];$('context').textContent=R.datasets[ds].label+`，比較基準 ${reference}`+(ds==='forward'?'：只認登錄後及時的首次正式快照。':'：探索與設計用，結果不是新策略的前瞻證明。');$('rows').innerHTML=R.config.strategies.map(s=>{let r=data[s.id],c=r.coverage;return `<tr><td><b>${esc(s.name)}</b><br><small>${esc(s.question)}</small></td><td class="number">${stat(r.summary.delta_ic)}</td><td class="number">${stat(r.summary.ic)}</td><td class="number">${stat(r.summary.spread_pp)}<small>單位：百分點</small></td><td>${c.paired_group_days||0} 組日<br><small>${(c.attempted_group_days||0)-(c.paired_group_days||0)} 組日未納入；組日不是獨立樣本</small></td></tr>`}).join('');$('sensitivity').innerHTML='<h3>目前選定視窗的穩健性</h3>'+R.config.strategies.filter(s=>s.id!==reference).map(s=>{let r=data[s.id];return `<p><b>${esc(s.name)}</b>：移除一族群後 ΔIC ${Object.entries(r.leave_one_group_out).map(([g,v])=>`${esc(g)} ${v?f(v.mean):'—'}`).join('；')}<br><small>不重疊起點：${Object.entries(r.nonoverlap_offsets).map(([k,v])=>`${k}: ${v?f(v.mean)+' (n='+v.n_days+')':'—'}`).join('；')}。完整 SE／t、帶寬與成本讀 JSON。</small></p>`}).join('');}
-function drawStructure(){let data=R.datasets[$('dataset').value].structure;$('structure').innerHTML='<table><thead><tr><th>版本</th><th>同分比例</th><th>與基準名單相似度</th><th>名單日變動</th></tr></thead><tbody>'+R.config.strategies.map(s=>{let r=data[s.id].summary;return `<tr><td>${esc(s.name)}</td><td>${stat(r.tie_fraction)}</td><td>${stat(r.top_jaccard)}</td><td>${stat(r.list_change)}</td></tr>`}).join('')+'</tbody></table>';let paired=R.datasets[$('dataset').value].horizons[String(R.config.primary_horizon)];$('tradeoff').innerHTML='<table><thead><tr><th>反轉候選</th><th>相对 '+esc(reference)+' ΔIC</th><th>候選 IC</th><th>名單變動降低量</th></tr></thead><tbody>'+(R.config.selection_candidates||[]).map(c=>{let r=paired[c].summary;return `<tr><td>${esc(c)}</td><td>${stat(r.joint_delta_ic)}</td><td>${stat(r.joint_ic)}</td><td>${stat(r.list_change_reduction)}</td></tr>`}).join('')+'</tbody></table>';}
-$('dataset').onchange=()=>{draw();drawStructure();};$('horizon').onchange=draw;draw();drawStructure();
-$('looks').innerHTML=R.config.strategies.filter(s=>s.id!==reference&&R.forward_looks[s.id]).map(s=>`<p><b>${esc(s.name)}</b>：${R.forward_looks[s.id].map(l=>`${l.n}日 ${l.ready?esc(l.reason):'還需 '+l.remaining+' 個成熟日'}`).join(' ／ ')}</p>`).join('');
-$('folds').innerHTML='<h3>歷史分段結果</h3>'+R.walk_forward.folds.map(fold=>`<p>訓練截至 ${fold.train_last}（最後標籤 ${fold.train_last_outcome}），測試 ${fold.test_first}～${fold.test_last}，選中 ${esc(fold.selected||'無足夠資料')}：${stat(fold.selected?fold.all_test_candidates[fold.selected]:null)}</p>`).join('')+'<p>置換對照使用 16 個固定 seed；完整個別 IC ±SE 見 JSON，不將置換分布當成通過門檻。</p>';
-$('limits').innerHTML=R.limitations.map(x=>`<li>${esc(x)}</li>`).join('');</script></html>""".replace("__PAYLOAD__", payload)
+$('meta').textContent=`資料截至 ${R.as_of} · ${R.protocol} · DB 唯讀 · 九個版本 · 主視窗 3 日`;
+function draw(){let ds=$('dataset').value,h=$('horizon').value,data=R.datasets[ds].horizons[h];$('context').textContent=R.datasets[ds].label+(ds==='forward'?'：只認登錄後及時的首次正式快照。':'：探索與設計用，結果不是新策略的前瞻證明。');$('rows').innerHTML=R.config.strategies.map(s=>{let r=data[s.id],c=r.coverage;return `<tr><td><b>${esc(s.name)}</b><br><small>${esc(s.question)}</small></td><td class="number">${stat(r.summary.delta_ic)}</td><td class="number">${stat(r.summary.ic)}</td><td class="number">${stat(r.summary.spread_pp)}<small>單位：百分點</small></td><td>${c.paired_group_days||0} 組日<br><small>${(c.attempted_group_days||0)-(c.paired_group_days||0)} 組日未納入；組日不是獨立樣本</small></td></tr>`}).join('');$('sensitivity').innerHTML='<h3>目前選定視窗的穩健性</h3>'+R.config.strategies.filter(s=>s.id!=='BASE').map(s=>{let r=data[s.id];return `<p><b>${esc(s.name)}</b>：移除一族群後 ΔIC ${Object.entries(r.leave_one_group_out).map(([g,v])=>`${esc(g)} ${v?f(v.mean):'—'}`).join('；')}<br><small>不重疊起點：${Object.entries(r.nonoverlap_offsets).map(([k,v])=>`${k}: ${v?f(v.mean)+' (n='+v.n_days+')':'—'}`).join('；')}。完整 SE／t、帶寬與成本讀 JSON。</small></p>`}).join('');}
+function drawStructure(){let data=R.datasets[$('dataset').value].structure;$('structure').innerHTML='<table><thead><tr><th>版本</th><th>同分比例</th><th>與基準名單相似度</th><th>名單日變動</th></tr></thead><tbody>'+R.config.strategies.map(s=>{let r=data[s.id].summary;return `<tr><td>${esc(s.name)}</td><td>${stat(r.tie_fraction)}</td><td>${stat(r.top_jaccard)}</td><td>${stat(r.list_change)}</td></tr>`}).join('')+'</tbody></table>';}
+$('dataset').onchange=()=>{draw();drawStructure();};$('horizon').onchange=draw;draw();drawStructure();$('looks').innerHTML=R.config.strategies.filter(s=>s.id!=='BASE').map(s=>`<p><b>${esc(s.name)}</b>：${R.forward_looks[s.id].map(l=>`${l.n}日 ${l.ready?esc(l.reason):'還需 '+l.remaining+' 個成熟日'}`).join(' ／ ')}</p>`).join('');$('folds').innerHTML='<h3>歷史分段結果</h3>'+R.walk_forward.folds.map(fold=>`<p>訓練截至 ${fold.train_last}（最後標籤 ${fold.train_last_outcome}），測試 ${fold.test_first}～${fold.test_last}，選中 ${esc(fold.selected||'無足夠資料')}：${stat(fold.selected?fold.all_test_candidates[fold.selected]:null)}</p>`).join('')+'<p>置換對照使用 16 個固定 seed；完整個別 IC ±SE 見 JSON，不將置換分布當成通過門檻。</p>';$('limits').innerHTML=R.limitations.map(x=>`<li>${esc(x)}</li>`).join('');</script></html>""".replace("__PAYLOAD__", payload)
 
 
 def validate_output_paths(db, output_dir, review_dir):

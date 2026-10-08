@@ -1,7 +1,20 @@
 {
-  "protocol": "fast-lab-v1-20261009",
-  "registered_at": "2026-10-09T02:41:50+08:00",
-  "purpose": "experimental learning, no real trading",
+  "protocol": "fast-lab-v2-20261009",
+  "registered_at": "2026-10-09T04:07:13+08:00",
+  "purpose": "experimental learning only; no real trading",
+  "previous_round": "fast-lab-v1-20261009",
+  "comparison_reference": "REV1",
+  "selection_candidates": [
+    "REV1",
+    "REV1_S2",
+    "REV1_TREND25",
+    "REV1_S2_TREND25"
+  ],
+  "stability_objective": {
+    "ic_loss_tolerance": 0.02,
+    "min_list_change_reduction": 0.1,
+    "interpretation": "Exploratory mean tolerance, not statistical noninferiority; list distance is not portfolio turnover"
+  },
   "horizons": [
     1,
     3,
@@ -53,7 +66,7 @@
         "dip": 0.0,
         "margin": 0.4
       },
-      "question": "共同對照組；比較排名，不模擬正式 tier 進出"
+      "question": "正式計分對照，不參加本輪反轉候選選拔"
     },
     {
       "id": "MOM20",
@@ -62,17 +75,7 @@
       "weights": {
         "price": 1.0
       },
-      "question": "其他元素是否值得保留？"
-    },
-    {
-      "id": "PRICE_TRUST",
-      "name": "價格＋投信",
-      "smooth": 3,
-      "weights": {
-        "price": 1.4,
-        "trust": 0.8
-      },
-      "question": "兩個元素能否保留主要資訊？"
+      "question": "簡化對照：只保留價格元素"
     },
     {
       "id": "NO_VOL",
@@ -86,68 +89,59 @@
         "dip": 0.0,
         "margin": 0.4
       },
-      "question": "量能是否適合只當警示？對應 C1"
-    },
-    {
-      "id": "LOW_PRICE",
-      "name": "降低價格權重",
-      "smooth": 3,
-      "weights": {
-        "price": 1.0,
-        "resil": 1.0,
-        "vol": 0.3,
-        "foreign": 0.5,
-        "trust": 0.8,
-        "dip": 0.0,
-        "margin": 0.4
-      },
-      "question": "降低動能主導是否有幫助？對應 C2"
-    },
-    {
-      "id": "HALF_RESIL",
-      "name": "抗跌權重減半",
-      "smooth": 3,
-      "weights": {
-        "price": 1.4,
-        "resil": 0.5,
-        "vol": 0.3,
-        "foreign": 0.5,
-        "trust": 0.8,
-        "dip": 0.0,
-        "margin": 0.4
-      },
-      "question": "抗跌條件是否稀釋短週期訊號？對應 C3"
-    },
-    {
-      "id": "FAST",
-      "name": "取消三日平滑",
-      "smooth": 1,
-      "weights": {
-        "price": 1.4,
-        "resil": 1.0,
-        "vol": 0.3,
-        "foreign": 0.5,
-        "trust": 0.8,
-        "dip": 0.0,
-        "margin": 0.4
-      },
-      "question": "回應速度與名單穩定性的取捨"
+      "question": "簡化對照：檢查量能的額外價值"
     },
     {
       "id": "REV1",
-      "name": "短線反轉",
+      "name": "短線反轉（比較基準）",
       "smooth": 1,
       "raw_rank": "ret1",
       "direction": -1,
-      "question": "前一天跌得多的股票是否短暫回補？"
+      "question": "沿用第一輪機制；新候選直接與它比較"
     },
     {
-      "id": "BREAKOUT20",
-      "name": "接近二十日高點",
+      "id": "REV1_S2",
+      "name": "反轉兩日平滑",
+      "smooth": 2,
+      "raw_rank": "ret1",
+      "direction": -1,
+      "question": "降低名單變動，是否犧牲太多短期 IC？"
+    },
+    {
+      "id": "REV1_TREND25",
+      "name": "反轉＋25% 趨勢",
       "smooth": 1,
-      "raw_rank": "dist_hi20",
-      "direction": 1,
-      "question": "距近期高點是否比多元素綜合分更直觀？"
+      "raw_mix": [
+        {
+          "field": "ret1",
+          "direction": -1,
+          "weight": 0.75
+        },
+        {
+          "field": "rs20",
+          "direction": 1,
+          "weight": 0.25
+        }
+      ],
+      "question": "在相對強勢股中找短暫回落，能否兼顧 IC 與穩定度？"
+    },
+    {
+      "id": "REV1_S2_TREND25",
+      "name": "趨勢搭配＋兩日平滑",
+      "smooth": 2,
+      "raw_mix": [
+        {
+          "field": "ret1",
+          "direction": -1,
+          "weight": 0.75
+        },
+        {
+          "field": "rs20",
+          "direction": 1,
+          "weight": 0.25
+        }
+      ],
+      "question": "同時開啟兩個機制，完整保留 2×2 組合的失敗結果"
     }
   ]
 }

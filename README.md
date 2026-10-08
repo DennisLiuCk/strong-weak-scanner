@@ -12,7 +12,8 @@
 - **版本沿革與實證依據**：[`CHANGELOG.md`](CHANGELOG.md)
 - **短週期策略實驗**：[`reports/experiment_lab.html`](reports/experiment_lab.html)，
   [實驗規格與操作](EXPERIMENT_LAB.md)。以歷史重播及 1／3／5 日前瞻，在約 2～5 週內安排
-  下一輪保留／簡化／重設；專案用於實驗，不用於真實交易。
+  下一輪保留／簡化／重設；目前比較短線反轉的兩日平滑與 25% 趨勢搭配，
+  同時檢查 IC 與名單穩定度。專案用於實驗，不用於真實交易。
 
 核心每日管線只使用 Python 3.12 標準庫與 SQLite。原始資料、正式 OOS 快照、儀表板歷史頁
 與驗證報告都保留在 repo，讓每次發布可以追溯。質化證據包的 PDF 驗證與轉圖另需 Poppler。
