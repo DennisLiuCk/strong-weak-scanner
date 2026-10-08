@@ -603,3 +603,5 @@ stage:substrate-delivery-verification,stage,同產品交付查核,Substrate deli
 process:ofac-alert-authorization-boundary,process,制裁警報與授權查核,OFAC alert identity authorization boundary,concept:trade-regime-separation,查核工具可整合名單 但身分命中 申請追蹤 授權條件與法律處理須分開 不是個案合規判定
 metric:high-na-cumulative-wafer-scope,metric,High-NA 累計處理量口徑,High-NA cumulative wafer scope,concept:high-na-euv-readiness,按設備資格 測試 研發 量產與產品層別拆開累計晶圓處理量 不把總處理量當合格出貨分母
 process:ercot-case-rfi-verification,process,逐案用電核驗與補件期限,ERCOT case-specific RFI verification,concept:800vdc-execution-readiness,每案資料要求的發出日 完整回覆 公證聲明與核验結果是不同欄位 不等於通電或800V部署
+process:chiplet-restricted-bootstrap,process,小晶片受限啟動,Chiplet restricted bootstrap,concept:chiplet-design-handoff,必要外部安全評估在早期啟動不可用時保留有限功能 待評估成功才放行 不等於特定產品已通過測試
+process:chiplet-rma-authority-boundary,process,小晶片維修權限交接,Chiplet RMA authority boundary,concept:chiplet-design-handoff,診斷與除錯前處理舊使用者資料憑證和安全綁定 製造商根權限例外不可恢復舊使用者情境

@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-10-07
+next_review: 2026-10-11
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -35,7 +35,7 @@ why_now: 到期追蹤初查發現Infineon9/9與SolarEdge合作把SSCB故障隔�
 knowledge_gain: 區分電力轉換、故障隔離與末端降壓，建立可重用的保護責任及測試邊界；合作稿與引述公司同一消息鏈，不計為兩份獨立驗收。
 first_rejection: 若仍只有合作稿或微秒級設計目標而沒有具名型號與可回查測試，就不另寫重複文章或新增公司受惠線。
 next_evidence: 取得同一SSCB型號與版本的電壓故障包絡及選擇性保護實測，核對客戶驗收與可比器件或替代拓撲；之後才追部署分母和收入。
-next_check: 2026-10-07
+next_check: 2026-10-15
 route: watch_only
 article_topic_id:
 graph_id:
@@ -49,7 +49,7 @@ title: HBFSim的模擬、校準與外部驗證邊界
 group_ids: memory,ipdesign
 reader_group_questions: memory => 文中的真實裝置是一般儲存裝置還是已交付的HBF樣品？ | ipdesign => 控制器與模型的參數如何由未參與擬合的工作負載驗證？
 reader_question: 模擬器的結果，要補哪些驗證才能用來理解真實記憶體？
-reader_starting_point: HBF追蹤初查找到研究者發布的HBFSim模型，模擬與校準值得分開理解。目前還有摘要倍率待核，且沒有實體HBF樣品與外部驗證結果。
+reader_starting_point: HBF追蹤已找到HBFSim新版與部分作者原始紀錄，模擬與校準可以分開核對。目前還缺可配對的完整運行紀錄，倍率未對齊，也沒有實體HBF樣品與獨立外部驗證結果。
 reader_terms: 模擬 => 用模型與假設重現部分系統行為 | 校準 => 用已知資料調整模型參數 | 外部驗證 => 用未參與調整的資料檢查模型能否成立
 reader_next_step: 先對齊作者原始紀錄與倍率，再查未參與擬合的工作負載；不把NVMe校準當成HBF樣品測試。
 priority: p2
@@ -57,10 +57,10 @@ knowledge_value: high
 status: watch
 evidence_posture: preliminary
 why_now: 到期HBF追蹤初查找到9/9研究者HBFSim v1；模擬與校準的學習增量高，但摘要倍率有待核差異且沒有實體HBF樣品，先保留方法候選。
-knowledge_gain: 把研究者方法、模型擬合、可重現運行與真實晶片分層；9/18已核對v1 PDF引用頁與README，但摘要倍率和正文秒數仍未對齊，未取得完整原始run或重跑程式，不採效能點估計。
+knowledge_gain: 把研究者方法、模型擬合、可重現運行與真實晶片分層；10/8已核v3、v0.1.1與固定proof及reference原始紀錄，仍缺相同共同鍵的fast原始run，舊倍率與秒數未對齊，沒有重跑或外部驗證，不採效能點估計。
 first_rejection: 若未取得原始run或作者勘誤便無法對齊秒數與倍率，或只有擬合點沒有外部驗證，就不發布效能點估計或HBF硬體受惠結論。
 next_evidence: 先核對版本化PDF與作者原始run及勘誤，再分開NVMe校準與HBF模型參數，要求未參與擬合的驗證工作負載和實體裝置邊界。
-next_check: 2026-09-25
+next_check: 2026-10-15
 route: watch_only
 article_topic_id:
 graph_id:
@@ -107,3 +107,24 @@ sources: Samsung Electro-Mechanics9/10展稿 => https://samsungsem.com/global/ne
 - **玻璃核心，順位3維持 watch**：重讀 Samsung 展示與 Corning 角色說明，另查 [SKC 新聞室9/22資金及工程狀態](https://www.skc.kr/m/eng/Conmmunication/newsroom/system.do?menuCd=006001)。資金、展示、可靠度測試及概念驗證準備，不是同一客戶產品資格與連續批次製造結果。10/11 再查具名 qualification、良率與出貨分母。
 
 三題原選題理由、第一拒絕、順位與知識價值均保留，不用本輪發現重排凍結歷史。雷達下次工作日10/7只是排程，不代表HBFSim已完成回查或任何來源變新。
+
+## 10月8日回查
+
+**SSCB 維持順位1及觀察狀態。** 已回查 Infineon 與 SolarEdge 的合作稿，並讀到
+[SolarEdge 9/10官方框架說明](https://corporate.solaredge.com/en/news-and-media/local-announcements/dc-powertrain-ai-data-centers)。
+它區分實驗室轉換級帶載與完整系統驗證，SSCB 只是候選保護方案，不是通用強制要求。
+[白皮書入口](https://marketing.solaredge.com/800-vdc-protection-and-grounding-white-paper)只有摘要，
+[平台頁](https://www.solaredge.com/us/data-centers)另把完整規格及保護圖列為 NDA 取得資料。
+未取得同型號故障包絡、原始波形或買方驗收，不能把取件不足記成查無新文件；10/15 再查公開附件，不申請或繞過限制。
+
+**HBFSim 維持順位2及觀察狀態。** 本輪核對 [9/30 v3](https://arxiv.org/html/2609.09800v3)、
+[10/6 v0.1.1](https://github.com/SlugLab/HBFSim/releases/tag/v0.1.1) 與
+[固定版本作者紀錄](https://github.com/SlugLab/HBFSim/blob/d2e6ce239c117c640fe68c8b5b2a7c77cf184da6/docs/proofs/2026-08-11-hybrid-complete.md)。
+新版把延遲注入誤差限於指定增量測試；舊摘要與作者紀錄的秒數、倍率仍未對齊。
+雖已取得 [reference 原始紀錄](https://github.com/SlugLab/HBFSim/blob/d2e6ce239c117c640fe68c8b5b2a7c77cf184da6/docs/proofs/artifacts/2026-08-11-vllm-exact/result.json)，
+仍缺可逐欄配對的 fast 紀錄，不能自行把算術商數當成實測性能。
+[CPU 複核紀錄](https://github.com/SlugLab/HBFSim/blob/d2e6ce239c117c640fe68c8b5b2a7c77cf184da6/docs/proofs/2026-10-06-ucie-release-cpu.md)
+也不能代替獨立 GPU 工作負載驗證或實體 HBF 測量。10/15 優先追倍率勘誤、配對運行紀錄與未參與擬合的驗證資料。
+
+**玻璃核心本輪未重查。** 保留10/11期限、順位3與原拒絕條件，不把另外兩題的回查當成三題全數完成。
+三題都沒有升格文章或新增受惠公司線；凍結排序、選題理由及第一拒絕不變。

@@ -67,6 +67,13 @@ to: triaged
 reason: added_fcsa_cumulative_compliance_claim_passport_without_thesis_or_clock_refresh
 evidence: sources:S1,S2
 -->
+<!-- transition
+date: 2026-10-08
+from: triaged
+to: triaged
+reason: added_rc0_restricted_bootstrap_and_rma_boundaries_and_repaired_fcsa_watch_route_without_thesis_clock_refresh
+evidence: sources:S17,S18
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -117,6 +124,9 @@ evidence: sources:S1,S2
 - **DankaChiplet**：Thrace 的 3D-IC 架構工具；本篇只引用其 CDXML 產品自述，不把它當成跨工具測試。
 - **Python**：本輪用來執行唯讀解析檢查的程式語言；版本與套件已記在稽核方法，方便重現結果。
 - **Alpha／Beta／Release**：規格成熟度階段；Alpha 可含明確規則，也可以公開發行，但仍在早期審閱，不能等同正式穩定的合規基線。
+- **候選版（RC）**：準備定稿但仍待審閱的版本；本文取得的是 FCSA 1.1.0 RC0，不能省略後綴當成已定稿的 1.1.0。
+- **受限啟動**：系統先留在政策允許的有限功能狀態，等必要的安全評估成功後，才建立完整信任域。
+- **維修退回（RMA）**：把產品退回診斷或處理；開放除錯前，仍須處理上一位使用者的資料、憑證與權限。
 - **信任根（Root of Trust，RoT）**：負責保護身分、量測或安全決策的最小可信基礎；不是一句「有安全功能」的行銷名稱。
 - **CRoT-A**：Chiplet Root of Trust for Attestation；留在每顆小晶片內，保管晶粒身分並產生韌體、生命週期與除錯狀態的可驗證證據。
 - **System RoT**：系統信任根；收齊各顆晶粒證據後，判斷實際組合是否符合允許的清單與政策。
@@ -144,7 +154,7 @@ evidence: sources:S1,S2
 ### 三句話抓重點
 
 - 小晶片能用共同介面傳資料，只證明連線契約的一部分；系統角色、設計資料與合規流程仍要另外交接。
-- FCSA 已有正式架構與分級，OCP 也公開 CDXML 與 3DK 資料；但 TDK 明寫不定義工作流程，公開 XSD 也未全數通過解析。
+- FCSA 1.0 已有正式架構與分級，1.1 則進入候選版；規格、安全程序、設計資料與客戶驗收仍是不同關卡。
 - 所以目前可建立責任與驗證階梯，不能直接推成跨廠隨插即用、封測訂單、設備需求或任何台灣公司的收入。
 
 ### 為什麼重要
@@ -161,6 +171,7 @@ evidence: sources:S1,S2
 ### 接下來怎麼追
 
 - 先追 FCSA 新版本、實作清單與公開測試套件，確認符合性等級是否有獨立產品通過。
+- 對照候選版的受限啟動與維修退回條件，找同一產品的失敗測試、隔離紀錄及重新授權結果，不能只看正常開機成功。
 - 再追 CDXML／3DK 是否發布固定版本、完整範例與可執行 validator，四份 XSD 都要能解析與編譯。
 - 接著找兩套獨立 EDA 工具匯入同一資料包，核對單位、版本、錯誤位置與通過結果是否一致。
 - 最後查 foundry、OSAT、系統整合商與買方共同揭露的 tape-out、封裝簽核、測試與量產資格。
@@ -170,6 +181,7 @@ evidence: sources:S1,S2
 - 如果兩顆小晶片能互相傳資料，但散熱模型與測試接點資料不同，這能叫做隨插即用嗎？
 - 同一份檔案能在一套工具開啟，另一套工具卻讀不到，問題在格式、版本、資料或工具哪一層？
 - 聯盟成員很多，卻沒有共同測試輸入與通過紀錄時，能用成員數判斷商業成熟度嗎？
+- 如果外部驗證服務尚未就緒，或產品正交給維修人員，之前的安全通過結果還能授權哪些動作？
 
 ## 主張與證據帳本
 
@@ -601,6 +613,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C26
+label: verified
+status: active
+claim: 本輪取得的 FCSA 固定文件封面為 1.1.0 RC0，版本表記錄該候選版日期為 2026-09-01；RC0 後綴不能省略而視為已定稿的 1.1.0，也不是具名產品通過測試的證明
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-10-08
+basis: 固定 PDF 封面與版本表分別核對版本後綴及文件日期；不把檔案發行與產品合格混為一件事
+boundary: N=1 份候選規格，不代表完整 Alpha 到 RC0 差異審查、獨立實作、客戶 qualification、量產或財務結果
+verification_needed: 正式定稿版本與具名產品的固定測試套件及可重現通過結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: FCSA 1.1.0 RC0 描述 System RoT 建立 Security Platform 時不能依賴平台成立後才可用的服務；若完整評估需要外部驗證者且早期啟動不可用，安全政策必須讓系統留在受限啟動狀態直到外部評估成功；重設、故障、除錯解鎖、更新與復原等相關狀態改變另觸發重新驗證
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-10-08
+basis: PDF p.168（印刷154）§9.1.4.5，保留外部評估的條件句及事件觸發範圍
+boundary: 抽象系統設計層安全分析，不是特定產品的完整安全要求或實測；不宣稱相較 Alpha 新增，不把事件重驗寫成持續輪詢，不證明零停機或部署
+verification_needed: 同一固定產品版本公開外部驗證不可用時的功能限制、狀態轉移與恢復測試
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: verified
+status: active
+claim: FCSA 1.1.0 RC0 的系統安全政策討論指出，若支援降級運作，須隔離受影響晶粒或路徑並停止續用依賴前一安全狀態的金鑰與聲明；授權 RMA 診斷或除錯前，須撤銷或使前任使用者的資料、憑證及安全綁定不可存取，僅可按政策保留退回驗證或另行授權重配置所需的製造商根資產，且不得藉此恢復舊擁有者情境
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-10-08
+basis: PDF pp.201–202（印刷187–188）M.SystemSecurityPolicy，保留降級條件與製造商根資產的窄例外
+boundary: 抽象安全分析不取代產品風險評估；不是所有舊金鑰均須銷毀，不證明資料實際刪除成功、維修流程合格、客戶驗收或台灣公司收入
+verification_needed: 同一具名產品的降級隔離、權限失效、RMA 存取拒絕與重新授權測試紀錄
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 先分四層契約，才知道問題卡在哪裡
 
 | 契約層 | 它回答什麼 | 本篇例子 | 通過前仍可能失敗 |
@@ -768,6 +831,31 @@ rate。本輪是 `N=2` 份官方紀錄、`N=2` 條發布消息鏈，兩份都涉
 具名 CDXML／3DK handoff、foundry／OSAT sign-off、
 產品 qualification、production 與財務共同觀測均為 `N=0`。這些是文件紀錄而非抽樣估計，
 因此 sampling SE／t 不適用。
+
+## 候選版要追兩個失敗場景
+
+**先辨認版本，再談通過。** 10/8 取得的固定文件是 FCSA 1.1.0 RC0，版本表日期為
+9/1。本節補上該版的安全設計條件；後面保留的 Alpha 分析是當時版本的歷史判讀，
+不代表 1.1 目前仍停在 Alpha。這次未做整份版本差異審查，也不宣稱下列條件首次出現於 RC0。
+
+**驗證服務不能形成循環依賴。** 假設某項外部驗證服務必須等整個安全平台建立後才可用，
+就不能再依靠它決定平台能否建立。候選版要求系統信任根先在本地接受足夠證據；
+若完整評估仍需要早期不可用的外部驗證者，系統須留在受限啟動狀態，直到評估成功。
+這不等於整台產品一定關機，可用功能與放行條件仍須由產品政策說清楚。（C26、C27）
+
+**維修交接也要終止舊授權。** 產品若支援降級運作，不能一邊隔離故障晶粒，一邊沿用
+依賴原安全狀態的金鑰與聲明。開放維修診斷或除錯前，還須讓前任使用者的資料、憑證及
+安全綁定失效或不可存取；保留製造商根資產的例外，不能用來恢復舊使用者情境。（C28）
+
+| 要測的情境 | 讀者應找的紀錄 | 現在的證據邊界 |
+|---|---|---|
+| 外部驗證者不可用 | 受限功能、進入條件、等待與成功後放行 | 候選版設計條件，不是產品測試通過 |
+| 晶粒故障後降級 | 隔離對象、哪些舊金鑰與聲明不再有效、對外回報狀態 | 不可把正常啟動結果代替故障注入測試 |
+| 維修退回 | 舊使用者存取遭拒、製造商權限例外、重新授權 | 不可由流程文字推成實際資料清除或客戶驗收 |
+
+對矽智財、封測與設備研究而言，這些條件讓「誰交付證據、誰授權放行」更具體；
+但仍要取得具名產品、買方測試和合約，才能討論收費或收入。規格文件是一個設計樣本，
+不是公司或現場故障的抽樣，沒有可報的標準誤或支持率。主命題 C7 的原證據時鐘不變。
 
 ## 每顆晶粒都能安全開機，仍不等於整個封裝可信
 
@@ -1318,6 +1406,38 @@ locator: 2026-08-24 的 upcoming／past events 與 Chiplet Summit 2026 Cameron C
 limitation: 動態活動頁會變動，且活動列名、攤位或 recap 不是固定 test plan、raw result、conformance certificate、customer deployment 或 financial evidence
 -->
 
+<!-- research_source
+source_id: S17
+role: standard
+source_kind: document
+publisher: Open Compute Project Foundation / Arm Ltd. / Secure-IC
+independence_group: ocp-fcsa-standard
+title: Foundation Chiplet System Architecture 1.1.0 RC0
+published_at: 2026-09-01
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://drive.google.com/file/d/1lc0gxIaf_Ij-ivRvAIoNthA0WdpG8S06/view?usp=sharing
+locator: PDF 205頁；封面p.1及版本表p.7（日期9/1，與工作流索引9/14分開）；安全章範圍pp.159–160；§9.1.4.5 p.168（印刷154）；M.SystemSecurityPolicy pp.201–202（印刷187–188）；SHA-256 369e4355c4529ac8bbabf130c956f589106ef46ab2e5daf21e8d660b0ec0470e；引用頁及相鄰頁目視核對，另一位reviewer以同一檔案離線重算SHA並核對條件句，未重下載
+limitation: 候選版的抽象系統安全分析，不構成任何特定產品的完整安全要求；未完成全篇Alpha差異、共同測試套件、非Arm實作或客戶驗收；與舊版同一OCP規格鏈，不新增獨立實作樣本
+-->
+
+<!-- research_source
+source_id: S18
+role: standard
+source_kind: living_index
+publisher: Open Compute Project Foundation
+independence_group: ocp-fcsa-standard
+title: FCSA 遷址後工作流與版本索引
+published_at:
+captured_at: 2026-10-08
+accepted_at: 2026-10-08
+status: active
+url: https://www.opencompute.org/projects/server/open-chiplet-economy/foundation-chiplet-system-architecture/
+locator: 10/8搜尋服務可讀的官方頁索引仍列1.1.0 RC0為For review、發布欄9/14；原wiki與index.php入口均轉向Server總頁，新的具名工作流URL已定位
+limitation: 本輪新頁直接讀取失敗且HTTP為403，版本表僅見搜尋索引，不聲稱完整即時頁已核驗；用作下輪取件入口，文件內容以S17固定PDF為準，頁面會變動且不證明產品合格
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -1384,7 +1504,9 @@ invalidation: 若標準工作流改採另一格式、私有 mapping 成為必要
 
 <!-- monitoring_item
 monitor_id: T3
-status: active
+status: retired
+retired_at: 2026-10-08
+retirement_reason: 已取得RC0安全條件但完整產品trigger仍未滿足；原FCSA wiki轉向Server總頁，由T5保留原裁決條件與期限並接續具名新入口，不把取件進展當作量產支持
 claim_ids: C15,C16,C17,C18,C19,C20
 metric: FCSA 1.1 組合信任是否由 Alpha 推進 beta／release、固定測試套件、非 Arm 實作、多供應商資格與可重現執行期重新驗證
 source_ids: S13
@@ -1408,6 +1530,20 @@ frequency_detail: UCIe Consortium 或 Intel／Cadence 公布新 live demo、comp
 next_check: 2026-09-30
 trigger: 同一受測組合公開 spec／IP／test-plan version、兩端角色、Analog／PHY／RDI／Adapter／FDI／protocol scope、rate／lanes／package／traffic、duration／error／BER／corner／sample 分母，並可連回 CDXML／3DK、foundry／OSAT 或客戶 qualification
 invalidation: 若後續固定報告顯示前矽與實體結果不能對回同一物件、必要 test 被 workaround 排除、或 interface pass 無法延伸到宣稱層級，則依實際邊界修正 C21–C23，不以新 demo 數量補齊缺欄
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C15,C16,C17,C18,C19,C20,C26,C27,C28
+metric: FCSA 1.1 組合信任是否由 Alpha 推進 beta／release、固定測試套件、非 Arm 實作、多供應商資格與可重現執行期重新驗證
+source_ids: S13,S17
+watch_source_ids: S18
+frequency: event_driven
+frequency_detail: FCSA 1.1 maturity、security content、test deliverable、implementation 或 customer qualification 更新後複核
+next_check: 2026-09-30
+trigger: 固定 FCSA 1.1 release 與 test suite 下，非 Arm 實作公布具名 CRoT-A／System RoT、manifest、六類事件 revalidation、失敗處置及跨廠 qualification 結果
+invalidation: 若 beta／release 移除或實質改寫組合判定、lifecycle 或 runtime revalidation，則依新固定版本重寫 C15–C19；若只是沒有實作，C20 維持未驗證而不把架構判為失效
 -->
 
 ## 目前不能下的結論／待驗證

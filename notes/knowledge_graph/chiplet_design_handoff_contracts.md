@@ -6,6 +6,9 @@
 新增的 Intel／Cadence 紀錄把介面層拆成前矽模擬與跨廠實體連線：後者跨過真實晶粒存在，
 仍沒有補齊 Adapter／protocol 測試包絡、CDXML／3DK 交接、foundry／OSAT 簽核或客戶資格。
 
+10/8 依 FCSA 1.1.0 RC0 增加受限啟動與維修權限交接兩條產業關係，只表示候選規格
+描述的設計條件；原 Alpha 關係保留其版本與到期狀態，不升格公司曝險或財務材料性。
+
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: chiplet-design-handoff-contracts
@@ -374,4 +377,44 @@ review_due: 2026-08-25
 status: active
 boundary: Level 0 Level 1與Full只界定指定chiplet或system的累積FCSA規則範圍 護照不證明固定test suite 非Arm實作 UCIe或CDXML互通 foundry OSAT客戶資格量產或財務材料性。
 next_trigger: 非Arm具名實作以固定FCSA版本 type level 規則識別碼與共同正反測試公開可重現結果 並由獨立方及下游製造封測或買方複核。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I18
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: process:chiplet-restricted-bootstrap
+relation: requires
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C26,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C27
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-08
+review_due: 2026-10-22
+status: active
+boundary: 只證實RC0對必要外部驗證早期不可用的條件式設計要求 不是持續輪詢 實作通過 零停機 量產或財務結果。
+next_trigger: 同一具名產品公開固定版本的外部驗證不可用測試 受限功能與恢復放行紀錄 並由買方核對。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I19
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: process:chiplet-rma-authority-boundary
+relation: requires
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C28
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-08
+review_due: 2026-10-22
+status: active
+boundary: RC0抽象安全分析不等於資料刪除成功或產品資格 降級條件不要求銷毀全部舊key 製造商根資產例外不能恢復前任擁有者情境。
+next_trigger: 具名產品提供降級隔離 舊權限失效 RMA存取拒絕 製造商例外與重新授權的同版本測試結果。
 -->

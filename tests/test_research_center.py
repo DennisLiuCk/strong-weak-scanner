@@ -6584,10 +6584,10 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("transition", 6),
-            ("research_source", 16), ("research_claim", 25),
+            ("research_topic", 1), ("transition", 7),
+            ("research_source", 18), ("research_claim", 28),
             ("metric_comparison", 0), ("impact", 3),
-            ("monitoring_item", 4),
+            ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -6637,9 +6637,13 @@ process.stdout.write(JSON.stringify(results));
             "to_id: process:chiplet-interoperability-scope-passport",
             "edge_id: KG-CDH-I17",
             "to_id: process:fcsa-compliance-claim-passport",
+            "edge_id: KG-CDH-I18",
+            "to_id: process:chiplet-restricted-bootstrap",
+            "edge_id: KG-CDH-I19",
+            "to_id: process:chiplet-rma-authority-boundary",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
 
         scans = (
             ROOT / "notes" / "research_topics" / "scan_log.csv"
