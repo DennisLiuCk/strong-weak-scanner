@@ -169,7 +169,7 @@ def main():
             issues.append(f"market {mk['date']} 來源狀態異常:{market_source}")
     for tbl in ("price", "inst", "margin", "holding", "sbl"):
         n = con.execute(f"SELECT COUNT(*) FROM {tbl} WHERE date=?", (last,)).fetchone()[0]
-        expected_n = eligible_n if tbl == "inst" else len(uni)
+        expected_n = len(tstatus.expected_ids(con, tbl, uni, last))
         if n < expected_n:
             issues.append(f"{tbl} 最新日僅 {n}/{expected_n} 列")
     # 正式 OOS 只認 append-only 正式快照(可由 Actions 或本地 runner 發布)。表不存在/

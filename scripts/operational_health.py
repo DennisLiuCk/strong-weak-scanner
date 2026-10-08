@@ -61,6 +61,7 @@ def publication_status(con, data_date, progress, registration_date):
     if data_date >= registration_date and progress["current_spec_latest_date"] != data_date:
         complete = False
     return {"status": "complete" if complete else "failed", "snapshot_id": snapshot_id,
+            "oos_eligible": evidence_status.oos_eligible(first) if first else False,
             "signals": signals, "expected": first["stock_count"] if first else None,
             "groups": groups, "expected_groups": first["group_count"] if first else None,
             "market_rows": market, "current_ranking_spec_latest": progress["current_spec_latest_date"],
@@ -152,6 +153,8 @@ def render(health):
         p = c["publication"]
         lines.append(f"  發布缺口：評分日 {p['latest_score_date']}；首次正式訊號 {p['signals']}/{p['expected']}，"
                      f"族群 {p['groups']}/{p['expected_groups']}，大盤 {p['market_rows']}/1。")
+    elif c["publication"].get("oos_eligible") is False:
+        lines.append("  本日為延遲補發布：資料完整，但未趕上次日 09:00 保守期限，不計入 OOS 成效樣本。")
     f = c["ranking"].get("fundamental") or {}
     if f.get("period_status") == "pending_new_period":
         lines.append(f"  基本面共同月份 {f.get('month_period')}；新月份 {f.get('latest_month_period')} 已收 {f.get('latest_month_coverage')}/{f.get('scope_stocks')} 檔（待到齊，不屬抓取失敗）")

@@ -276,7 +276,7 @@ def canonical_official_runs(con):
         return []
     out = {}
     for row in con.execute(
-        """SELECT snapshot_id,data_date,captured_at,stock_count
+        """SELECT *
            FROM oos_snapshot_runs WHERE is_official=1
            ORDER BY data_date,captured_at,snapshot_id"""
     ):
@@ -286,6 +286,8 @@ def canonical_official_runs(con):
 
 def formal_progress(con, spec_sha, *, fwd=10):
     runs = canonical_official_runs(con)
+    import evidence_status
+    eligible_dates = {run["data_date"] for run in runs if evidence_status.oos_eligible(run)}
     have_views = _table_exists(con, "oos_ranking_view_snapshots")
     specs_seen = set()
     current_dates = []
@@ -339,7 +341,7 @@ def formal_progress(con, spec_sha, *, fwd=10):
     date_index = {date: index for index, date in enumerate(price_dates)}
     mature_dates = [
         date for date in current_dates
-        if date in date_index and date_index[date] + fwd < len(price_dates)
+        if date in eligible_dates and date in date_index and date_index[date] + fwd < len(price_dates)
     ]
     eff_obs = stats_ci.effective_obs(len(mature_dates), fwd)
     if not current_dates:
@@ -356,6 +358,8 @@ def formal_progress(con, spec_sha, *, fwd=10):
         "ranking_snapshot_table": have_views,
         "canonical_official_days": len(runs),
         "current_spec_days": len(current_dates),
+        "current_spec_oos_days": len(set(current_dates) & eligible_dates),
+        "late_publication_days": len(set(current_dates) - eligible_dates),
         "current_spec_first_date": current_dates[0] if current_dates else None,
         "current_spec_latest_date": current_dates[-1] if current_dates else None,
         "mature_10d_days": len(mature_dates),

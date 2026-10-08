@@ -66,6 +66,19 @@
 接續。audit PASS 後才重建 metrics／score／首頁，且不得重發既有 OOS snapshot 或 archive。
 完整指令、退出碼、請求量與分段方式見 [RAW_DATA_BACKFILL.md](RAW_DATA_BACKFILL.md)。
 
+## 停牌整列缺席與延遲補發布
+
+價格缺列時，管線會自動查兩市場的官方減資預告，保存日期限定的 `suspension_evidence`。
+只對已核對起訖的股票豁免 price／inst；三張餘額表仍須完整。若仍標紅，先看缺股與公告
+查核日誌：來源失敗可續跑；無公告、無復牌日或日期／成交衝突要補來源查證，不能人工標
+`no_trade`、移除 universe 或補零放行。一般臨時停牌未納入此自動減資契約。
+
+補過去交易日使用 `python scripts/run_daily.py --end YYYY-MM-DD`，避免意外抓到今日尚未
+終版的資料。管線先稽核原始五表，再評分與快照；發布後執行
+`python scripts/operational_health.py --check-pages`，核對部署 SHA。新快照如晚於資料日
+次日台北 09:00，會保留真實時間並明示延遲補發布，不進 OOS 成效樣本；既有 archive／OOS
+不改寫。此門檻對假日採保守處理。
+
 ## 環境備忘
 
 - Python 一律 `python ...`(python.org 3.12,PSF 簽章;勿改用 uv 自帶的未簽章 Python,

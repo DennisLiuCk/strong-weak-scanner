@@ -5,9 +5,11 @@
 交易所日成交表會為暫停交易等「當日沒有形成交易」的股票保留一列：OHLC 空白，
 成交量、成交金額與成交筆數皆為 0。這種列不是價格漏抓；而法人日報通常不會列出該股。
 
-本模組只承認上述可由官方 price 原始列重算的嚴格條件。`trading_status` 是衍生的
+另接受可離線重算 SHA／起訖的官方減資公告，僅豁免該日缺席的 price 與 inst。
+`trading_status` 是衍生的
 稽核索引，不取代或補造任何原始表資料；若條件不完整，股票仍視為應有完整資料。
 """
+import suspension_events
 
 NO_TRADE = "no_trade"
 OFFICIAL_PRICE_SOURCE = "official_price_zero_trade"
@@ -104,7 +106,7 @@ def verified_exclusions(con, day, stock_ids=None):
     if ids:
         where_ids = f" AND t.stock_id IN ({_marks(ids)})"
         params.extend(ids)
-    return con.execute(
+    rows = con.execute(
         f"""SELECT t.stock_id,t.status,t.source,t.reason
             FROM trading_status t
             JOIN price p ON p.date=t.date AND p.stock_id=t.stock_id
@@ -114,6 +116,7 @@ def verified_exclusions(con, day, stock_ids=None):
             ORDER BY t.stock_id""",
         params,
     ).fetchall()
+    return sorted([*rows, *suspension_events.verified(con, day, stock_ids)], key=lambda r: r[0])
 
 
 def verified_exclusion_ids(con, day, stock_ids=None):
@@ -123,9 +126,12 @@ def verified_exclusion_ids(con, day, stock_ids=None):
 def expected_ids(con, table, stock_ids, day):
     """各原始表當日應出現的股票。
 
-    僅法人日報可排除官方零交易股票；價格、融資券、外資持股、借券仍要求完整 universe。
+    法人可排除兩類非交易股；價格僅可排除有日期限定官方公告的缺席股。
+    融資券、外資持股、借券仍要求完整 universe。
     """
     wanted = set(stock_ids)
     if table == "inst":
         wanted -= verified_exclusion_ids(con, day, wanted)
+    elif table == "price":
+        wanted -= {r[0] for r in suspension_events.verified(con, day, wanted)}
     return wanted

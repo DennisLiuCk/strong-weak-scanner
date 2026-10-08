@@ -1,14 +1,23 @@
 """首頁與週報共用的 OOS 樣本狀態；不判定任何因子或策略有效。"""
 import stats_ci as sci
+import json
 
 
-def first_official_runs(con):
+def oos_eligible(run):
+    """舊快照沿用原契約；新快照明示延遲時不得當成事前訊號。"""
+    quality = json.loads(run["quality_json"]) if "quality_json" in run.keys() else {}
+    return quality.get("oos_eligible", True) is True
+
+
+def first_official_runs(con, *, eligible_only=False):
     """同資料日採首次正式發布；空快照不得用後來修正版冒充。"""
     runs = {}
     for row in con.execute("""SELECT * FROM oos_snapshot_runs WHERE is_official=1
                               ORDER BY data_date, captured_at, snapshot_id"""):
         runs.setdefault(row["data_date"], row)
-    return runs
+    # 必須先選首次，再篩 eligibility；不能用後來修正版替換首次延遲發布。
+    return {day: run for day, run in runs.items()
+            if not eligible_only or oos_eligible(run)}
 
 
 def maturity(snapshot_dates, trading_dates, cutoff, fwd):

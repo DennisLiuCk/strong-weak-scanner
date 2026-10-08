@@ -80,7 +80,9 @@ python scripts/audit_raw_data.py --json
 audit 的硬性條件是 current universe × `price ∪ market` 交易日的五表完整 grid、core／
 expanded 必備欄非空、SQLite integrity，以及法人、融資、融券與借券公式一致。唯一例外是
 官方 price 列可嚴格重算的零交易 pair：price 的 OHLC 可空、inst 可不列；margin／holding／
-sbl 仍須完整。`market_index` 維持
+sbl 仍須完整。另有日期限定、SHA 可離線核驗的官方減資公告時，允許 price／inst 整列
+缺席；原始列不補造，三張餘額表仍完整。公告原文、日期或實際成交衝突都拒絕豁免。
+`market_index` 維持
 非阻斷觀察層，因此缺口列為 warning；TPEx 公開端點只驗最新月份可再取得的交易日。
 不在交易日 spine 的 legacy row 也只列 warning：它不會灌大完整度，且未經來源查證不要刪除。
 

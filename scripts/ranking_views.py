@@ -691,7 +691,9 @@ def build_from_db(con, date, *, as_of=None, roles_path=ROLES_CONFIG, strict_role
     universe_ids = [row[0] for row in con.execute("SELECT stock_id FROM universe")]
     fundamentals, fundamental_meta = load_fundamental_inputs(
         con, as_of=as_of, stock_ids=universe_ids)
-    roles = load_roles(roles_path, rows, strict=strict_roles)
+    # role 設定覆蓋完整 universe；停牌只縮小當日排名母體，不是多出一檔設定。
+    universe_rows = [dict(row) for row in con.execute("SELECT stock_id,grp FROM universe")]
+    roles = load_roles(roles_path, universe_rows, strict=strict_roles)
     challengers = shadow_composites(con, date)
     grouped = defaultdict(list)
     for row in rows:

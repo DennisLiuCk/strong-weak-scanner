@@ -144,7 +144,7 @@ def main():
     snap_runs, snap_grp, snap_grps, snap_quality = {}, defaultdict(dict), {}, {}
     loaded_snap_dates = set()
     try:
-        for r in evidence_status.first_official_runs(con).values():
+        for r in evidence_status.first_official_runs(con, eligible_only=True).values():
             if r["data_date"] not in snap_runs:
                 snap_runs[r["data_date"]] = r["snapshot_id"]
                 snap_quality[r["data_date"]] = r["quality_json"]

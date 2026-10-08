@@ -35,6 +35,7 @@ from datetime import date, datetime, timedelta, timezone
 
 from observation_metrics import build_observation_metrics
 import trading_status as tstatus
+import suspension_events
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -1188,7 +1189,8 @@ def _missing_price_dates(con, ids, dates):
     return _missing_dataset_dates(con, "price", ids, dates)
 
 
-def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None, required_columns=()):
+def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None, required_columns=(),
+                          suspension_resolver=None):
     """TWSE+TPEx 各日全市場批次。
 
     任一來源失敗時仍先 commit 另一來源已取得的 rows，讓 GitHub Action checkpoint
@@ -1196,7 +1198,7 @@ def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None, required_co
     """
     fetcher = fetcher or fetch_exchange_price_source
     wanted = set(ids)
-    total_rows = market_index_rows = requests = 0
+    total_rows = market_index_rows = requests = suspension_requests = 0
     found_dates, written_dates = set(), set()
     for day in sorted(set(dates)):
         availability, errors = {}, []
@@ -1235,14 +1237,25 @@ def fetch_exchange_prices(con, ids, dates, write=True, fetcher=None, required_co
                 con.commit()
                 missing_ids = _missing_dataset_ids(
                     con, "price", wanted, day, required_columns=required_columns)
+                if missing_ids and suspension_resolver:
+                    # 僅處理完全缺列；NULL 欄位不能用公告掩蓋。解析／查核失敗仍硬停。
+                    absent = {sid for sid in missing_ids if not con.execute(
+                        "SELECT 1 FROM price WHERE date=? AND stock_id=?", (day, sid)).fetchone()}
+                    if absent:
+                        resolved = suspension_resolver(con, day, absent)
+                        suspension_requests += resolved["requests"]
+                        missing_ids = _missing_dataset_ids(
+                            con, "price", wanted, day, required_columns=required_columns)
                 if missing_ids:
                     raise ExchangePriceFetchError(
                         f"拒絕完成價格不完整資料日／欄位 {day}:"
                         f"price={len(wanted) - len(missing_ids)}/{len(wanted)};"
-                        f"缺 {','.join(sorted(missing_ids))}")
+                        f"缺 {','.join(sorted(missing_ids))}；"
+                        "查核官方停復牌公告，未取得日期限定證據不得跳過或補零")
     return {
         "rows": total_rows,
         "market_index_rows": market_index_rows,
+        "suspension_requests": suspension_requests,
         "requests": requests,
         "found_dates": found_dates,
         "written_dates": written_dates,
@@ -1310,7 +1323,7 @@ def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, f
 
 def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
                       force=False, fetcher=None, price_fetcher=None, final_pass=False,
-                      backfill_expanded_fields=False):
+                      backfill_expanded_fields=False, suspension_resolver=None):
     """五張原始表皆走交易所按日批次，只補 SQLite 尚缺的 dataset×日期。
 
     交易日以 price∪market 為準。未知尾端逐日用 TWSE+TPEx 批次探測；找到新交易日後，
@@ -1325,7 +1338,7 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
         raise ValueError("final_pass 與 backfill_expanded_fields 不可同時使用")
     known_before = _trading_dates(con, start, end)
     expected = set(known_before)
-    exchange_requests = probe_requests = skipped = rows = market_index_rows = 0
+    exchange_requests = probe_requests = skipped = rows = market_index_rows = suspension_requests = 0
     want_price = "TaiwanStockPrice" in ds_list
     exchange_ds = [ds for ds in ds_list if ds != "TaiwanStockPrice"]
     probe_start = None
@@ -1359,10 +1372,12 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
     if price_fetch_dates:
         price_stats = fetch_exchange_prices(
             con, ids, price_fetch_dates, write=want_price, fetcher=price_fetcher,
+            suspension_resolver=suspension_resolver,
             required_columns=(RAW_EXPANDED_COLUMNS["price"]
                               if backfill_expanded_fields else ()))
         rows += price_stats["rows"]
         market_index_rows += price_stats["market_index_rows"]
+        suspension_requests += price_stats["suspension_requests"]
         exchange_requests += price_stats["requests"]
         probe_requests += len(PRICE_SOURCES) * len(probe_dates & price_fetch_dates)
         expected.update(price_stats["found_dates"])
@@ -1377,7 +1392,7 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
         excluded = sorted(tstatus.verified_exclusion_ids(con, latest_status, ids))
         if excluded:
             print(f"trading_status: {latest_status} 非交易 {len(excluded)} 檔 "
-                  f"({','.join(excluded)})；法人表改驗有效母體")
+                  f"({','.join(excluded)})；價格／法人依各表證據驗有效母體")
 
     final_holding_day = None
     for ds in exchange_ds:
@@ -1429,6 +1444,7 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
     return {
         "rows": rows,
         "market_index_rows": market_index_rows,
+        "suspension_requests": suspension_requests,
         "requests": exchange_requests,
         "finmind_requests": 0,
         "exchange_requests": exchange_requests,
@@ -2195,7 +2211,8 @@ def main():
     stats = fetch_missing_raw(
         con, ids, ds_list, start, end, token, args.sleep, force=args.force,
         final_pass=args.final_pass,
-        backfill_expanded_fields=args.backfill_expanded_fields)
+        backfill_expanded_fields=args.backfill_expanded_fields,
+        suspension_resolver=suspension_events.resolve_missing_prices)
     total = stats["rows"]
     market_index_rows = stats.get("market_index_rows", 0)
     index_stats = {"rows": 0, "requests": 0, "errors": []}
@@ -2212,6 +2229,7 @@ def main():
     print(f"market_index:upsert {market_index_rows} rows · "
           f"額外官方 requests {index_stats['requests']}"
           f" · errors {len(index_stats['errors'])}")
+    print(f"停牌證據:額外官方 requests {stats.get('suspension_requests', 0)}")
     if total:
         con.execute('INSERT INTO fetch_log VALUES(datetime("now"),?,?,?)', (start, end, total))
         con.commit()

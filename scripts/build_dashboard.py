@@ -1684,7 +1684,9 @@ def build_strategy_status(con, last):
     try:
         spine = [r[0] for r in con.execute(
             "SELECT DISTINCT date FROM daily_metrics WHERE date<=? ORDER BY date", (last,))]
-        runs = evidence_status.first_official_runs(con)
+        published = evidence_status.first_official_runs(con)
+        st["publication"] = {"oos_eligible": evidence_status.oos_eligible(published[last])} if last in published else None
+        runs = {day: run for day, run in published.items() if evidence_status.oos_eligible(run)}
         snap = [d for d, r in runs.items() if con.execute(
             "SELECT 1 FROM oos_signal_snapshots WHERE snapshot_id=? LIMIT 1",
             (r["snapshot_id"],)).fetchone()]
@@ -5174,6 +5176,8 @@ def main():
     scope = f"{len(GROUP_ORDER)} 族群 · 有效評分 {active_n}/{eligible_n} 檔"
     if status_rows:
         scope += f" · 暫停／未交易 {len(status_rows)} 檔（完整名單 {universe_n}）"
+    if (strategy.get("publication") or {}).get("oos_eligible") is False:
+        scope += " · 延遲補發布（不計入 OOS）"
     html = html.replace("__SCOPE__", scope)
     html = html.replace("__MKT_TIP_JSON__", json.dumps(mtip, ensure_ascii=False))
     html = html.replace("__GROUP_HOW_JSON__", json.dumps({"how": GROUP_HOW, "src": GROUP_SRC},

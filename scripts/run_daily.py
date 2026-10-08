@@ -13,6 +13,9 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 
 def run(script, *args):
     cmd = [sys.executable, os.path.join(ROOT, "scripts", script), *args]
@@ -46,6 +49,7 @@ def main():
     if args.force:
         fetch_args.append("--force")
     run("fetch_daily.py", *fetch_args)
+    run("audit_raw_data.py")
     run("score.py")
 
     snapshot_args = ["--source", "local"]

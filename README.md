@@ -626,6 +626,10 @@ python -m unittest discover -s tests
 
 `run_daily.py` 可安全重跑，只補缺口；上游未齊時會拒絕正式發布。它不會替你 review、commit
 或 push。
+補過去資料日請明確指定 `--end YYYY-MM-DD`；本地與 Actions 在評分前都先執行五表稽核。
+正式快照保留實際 `captured_at`；新快照若晚於資料日次日台北 09:00 的保守期限，標為
+`late_recovery`／`oos_eligible=false`，可發布完整資料，但不計入週報及首頁的 OOS 成效樣本。
+此期限不推定休市日，可能保守排除假日延遲；不回填或改寫舊快照的判定。
 
 `audit_storage.py` 只讀取 DB 容量、表／索引配置與 GitHub 單檔門檻；可加
 `--gzip-probe --json` 在記憶體測試壓縮及 SHA-256 復原，不改資料或產生備份檔。
@@ -652,6 +656,14 @@ python -m unittest discover -s tests
   `trading_status=no_trade`。這類股票當日不在法人日報的有效母體內，但 price、margin、
   holding、sbl 仍須有官方列；未知或未被原始價格列驗證的缺口照常標紅。停牌日不產生
   `daily_metrics`／`daily_scores`，不推進平滑分數或 tier，復牌後的技術視窗接續前一有效交易日。
+- 若價格整列缺席，先查 TWSE／TPEx 官方減資預告表。只有明確「停止日 ≤ 資料日 < 復牌日」
+  的公告可豁免該股的 price／inst；margin／holding／sbl 仍須完整，不補零、不沿用昨日價格。
+  `suspension_evidence` 保存該資料日的完整 JSON、官方 URL、取件時間與 SHA256；抓取、
+  稽核、快照與儀表板都離線重算原文與日期。舊日查核不能授權新日，復牌日自動恢復必填；
+  未知／無復牌日停牌、來源失敗、缺欄或公告與成交衝突仍標紅。只在缺價時額外查兩市場，
+  同日成功續跑不再重打。SHA 是完整性檢查，不是來源簽章或 ACL。
+- 角色設定仍驗完整 universe；當日排名只使用有效交易母體。停牌股保留在畫面，顯示前次
+  訊號日期及停牌來源，不產生新的分數或排名。
 - `holding` 日內初版不視為正式終版；`--final-pass` 對當日資料有台北 23:40 硬門檻，
   23:47 排程會刷新 holding，上游資料未齊時不發布，同日重跑維持冪等。
 - 完整場的 TAIEX canonical 必須精確到最新交易日：優先採 TWSE 官方含息報酬指數；

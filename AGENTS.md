@@ -95,6 +95,11 @@ fetch_daily.py   TWSE/TPEx 全市場批次五張原始表；FinMind 留事件/TA
                  ⚠ 官方 price 列若 OHLC 全空且量/額/筆數皆 0，衍生 trading_status=no_trade：
                    inst 只驗有效母體，其餘四表仍驗全 universe；該日不進 metrics/score/tier，
                    復牌後接續前一有效交易日，未被 price 嚴格驗證的缺口仍標紅
+                 ⚠ 減資停牌整列缺席另查 TWSE/TPEx 官方預告：suspension_evidence 保存
+                   日期限定 JSON/URL/取件時間/SHA，離線重算後只豁免 price/inst，三張
+                   餘額表仍完整；無證據/無復牌日/衝突仍硬停，復牌日恢復必填。不可補零
+                 ⚠ 本地與 Actions 評分前先 audit_raw_data；延遲補發布快照保留真實時間，
+                   新快照晚於資料日次日台北09:00標 oos_eligible=false，不入成效樣本
                  ⚠ 當日 final pass 有台北 23:40 硬門檻；提前觸發不得凍結 OOS 或發布
                  ⚠ Actions 以 UTC 日期鎖定原交易日；延遲跨過台北午夜仍補原交易日
                  ⚠ 另直抓 TWSE/TPEx 處置/注意股票旗標；日誌批次 0 次=缺口已完整、非失敗

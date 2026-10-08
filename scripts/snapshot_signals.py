@@ -147,6 +147,18 @@ def _utc_now():
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
+def publication_timing(data_date, captured_at):
+    """保守以資料日次日台北 09:00 為事前訊號期限；不猜測交易所休市日。"""
+    captured = dt.datetime.fromisoformat(captured_at)
+    if captured.tzinfo is None:
+        raise ValueError("captured_at 必須有時區")
+    deadline = dt.datetime.combine(dt.date.fromisoformat(data_date) + dt.timedelta(days=1),
+                                   dt.time(9), tzinfo=fd.TAIPEI_TZ)
+    eligible = captured < deadline
+    return {"oos_eligible": eligible, "oos_deadline": deadline.isoformat(),
+            "publication_timing": "before_deadline" if eligible else "late_recovery"}
+
+
 def _default_snapshot_id(captured_at):
     run = os.environ.get("GITHUB_RUN_ID")
     if run:
@@ -249,13 +261,15 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
     raw_tables = ("price", "inst", "margin", "holding", "sbl")
     counts = {t: _universe_table_count(con, t, data_date) for t in raw_tables}
     counts["risk_flags"] = _table_count(con, "risk_flags", data_date)
+    expected_raw = {t: tstatus.expected_ids(con, t, universe_ids, data_date) for t in raw_tables}
     if is_official:
-        expected_raw = {t: (eligible_n if t == "inst" else universe_n) for t in raw_tables}
-        missing = {t: expected_raw[t] - counts[t] for t in raw_tables
-                   if counts[t] != expected_raw[t]}
+        actual_raw = {t: {r[0] for r in con.execute(
+            f"SELECT stock_id FROM {t} WHERE date=?", (data_date,))} for t in raw_tables}
+        missing = {t: expected_raw[t] - actual_raw[t] for t in raw_tables
+                   if expected_raw[t] - actual_raw[t]}
         if missing:
             detail = ",".join(
-                f"{t}={counts[t]}/{eligible_n if t == 'inst' else universe_n}"
+                f"{t}={counts[t]}/{len(expected_raw[t])};缺 {','.join(sorted(missing[t]))}"
                 for t in missing)
             raise RuntimeError(f"拒絕發布原始資料不完整快照 {data_date}:{detail}")
     market = con.execute(
@@ -298,6 +312,7 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
                     f"拒絕發布大盤來源／canonical 不一致快照 "
                     f"{data_date}:source={market_source}")
     counts.update({"universe": universe_n, "eligible": eligible_n,
+                   "raw_expected": {t: len(ids) for t, ids in expected_raw.items()},
                    "excluded_count": len(excluded), "excluded": excluded,
                    "daily_scores": score_n, "daily_metrics": metric_n,
                    "group_metrics": gm_n, "market_date": market["date"] if market else None,
@@ -404,6 +419,8 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
         if duplicate:
             return duplicate["snapshot_id"], data_date, False
 
+    # 時效不進 content_hash，假日／重跑相同內容仍返回首次快照；每筆新版本記真實發布時間。
+    counts.update(publication_timing(data_date, captured_at))
     con.execute("BEGIN IMMEDIATE")
     try:
         con.execute(

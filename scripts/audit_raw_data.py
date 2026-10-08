@@ -15,6 +15,7 @@ from pathlib import Path
 
 import fetch_daily as fd
 import trading_status as tstatus
+import db_ro
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,9 +36,7 @@ def open_readonly(path):
     db_path = Path(path).resolve()
     if not db_path.is_file():
         raise FileNotFoundError(db_path)
-    con = sqlite3.connect(f"{db_path.as_uri()}?mode=ro", uri=True)
-    con.execute("PRAGMA query_only=ON")
-    return con
+    return db_ro.connect(db_path, row=False)
 
 
 def _table_exists(con, table):
@@ -282,8 +281,9 @@ def audit_connection(con, stock_ids, start=None, end=None):
                 continue
             in_scope[pair] = dict(zip(columns, row[2:]))
         raw_maps[table] = in_scope
-        table_expected_pairs = (expected_pairs - excluded_pairs
-                                if table == "inst" else expected_pairs)
+        table_expected_pairs = {(day, sid) for day in dates
+                                for sid in tstatus.expected_ids(con, table, stock_ids, day)}
+        table_excluded = expected_pairs - table_expected_pairs
         missing_pairs = sorted(table_expected_pairs - set(in_scope))
         allowed_nulls = {"open", "high", "low", "close"} if table == "price" else set()
 
@@ -309,9 +309,8 @@ def audit_connection(con, stock_ids, start=None, end=None):
             "rows": len(in_scope), "expected_rows": len(table_expected_pairs),
             "required_complete_rows": required_complete,
             "expanded_complete_rows": expanded_complete,
-            "excluded_pairs": len(excluded_pairs) if table == "inst" else 0,
-            "excluded_samples": ([_pair_text(pair) for pair in sorted(excluded_pairs)[:MAX_SAMPLES]]
-                                 if table == "inst" else []),
+            "excluded_pairs": len(table_excluded),
+            "excluded_samples": [_pair_text(pair) for pair in sorted(table_excluded)[:MAX_SAMPLES]],
             "missing_pairs": len(missing_pairs),
             "missing_samples": [_pair_text(pair) for pair in missing_pairs[:MAX_SAMPLES]],
             "null_by_column": null_by_column,

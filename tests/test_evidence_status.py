@@ -9,9 +9,22 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import evidence_status as es
 import build_dashboard as bd
+import json
 
 
 class EvidenceStatusTest(unittest.TestCase):
+    def test_first_late_publication_cannot_be_replaced_by_later_eligible_revision(self):
+        con = sqlite3.connect(":memory:")
+        con.row_factory = sqlite3.Row
+        self.addCleanup(con.close)
+        con.execute("CREATE TABLE oos_snapshot_runs(data_date,captured_at,snapshot_id,is_official,quality_json)")
+        con.executemany("INSERT INTO oos_snapshot_runs VALUES(?,?,?,?,?)", [
+            ("2026-10-07", "01", "first", 1, json.dumps({"oos_eligible": False})),
+            ("2026-10-07", "02", "revision", 1, json.dumps({"oos_eligible": True})),
+            ("2026-10-06", "01", "legacy", 1, "{}"),
+        ])
+        self.assertEqual(set(es.first_official_runs(con, eligible_only=True)), {"2026-10-06"})
+
     def test_28_days_do_not_pass_and_disjoint_spans_are_counted(self):
         spine = [f"2026-{i:04d}" for i in range(60)]
         snap = spine[2:12] + spine[16:24] + spine[28:38]

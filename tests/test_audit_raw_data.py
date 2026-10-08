@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import audit_raw_data as audit
 import fetch_daily as fd
+from test_suspension_events import add_evidence
 
 
 class RawDataAuditTest(unittest.TestCase):
@@ -179,6 +180,19 @@ class RawDataAuditTest(unittest.TestCase):
         self.assertEqual(report["invariants"]["margin.balance"]["mismatches"], 1)
         self.assertEqual(report["invariants"]["short.balance"]["mismatches"], 1)
         self.assertEqual(report["invariants"]["sbl.balance"]["mismatches"], 1)
+
+    def test_official_missing_price_exemption_keeps_balance_tables_required(self):
+        for table in ("price", "inst"):
+            self.con.execute(f"DELETE FROM {table} WHERE date='2026-07-10' AND stock_id='2454'")
+        add_evidence(self.con, "2454", "2026-07-10", "1150710", "1150720")
+        report = audit.audit_connection(self.con, self.ids)
+        self.assertTrue(report["ok"], report["errors"])
+        self.assertEqual(report["tables"]["price"]["excluded_pairs"], 1)
+        self.assertEqual(report["tables"]["inst"]["excluded_pairs"], 1)
+        self.con.execute("DELETE FROM margin WHERE date='2026-07-10' AND stock_id='2454'")
+        report = audit.audit_connection(self.con, self.ids)
+        self.assertFalse(report["ok"])
+        self.assertEqual(report["tables"]["margin"]["missing_pairs"], 1)
 
     def test_off_spine_rows_warn_but_do_not_fake_completeness(self):
         fd.up_inst(self.con, [{

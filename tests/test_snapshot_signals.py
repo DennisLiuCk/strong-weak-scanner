@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import snapshot_signals as ss
+from test_suspension_events import add_evidence
 
 
 class SnapshotSignalsTest(unittest.TestCase):
@@ -86,6 +87,53 @@ class SnapshotSignalsTest(unittest.TestCase):
         return ss.capture_snapshot(
             self.con, root=str(self.root), snapshot_id=run_id, captured_at=captured_at,
             source="github-actions", publish=True, git_sha="deadbeef")
+
+    def test_official_reduction_absence_is_captured_with_evidence(self):
+        for table in ("price", "inst", "daily_metrics", "daily_scores", "chip_health"):
+            self.con.execute(f"DELETE FROM {table} WHERE stock_id='1002'")
+        add_evidence(self.con, "1002", self.date, "1150710", "1150720")
+        self.capture("reduction", "2026-07-10T16:00:00+00:00")
+        quality = json.loads(self.con.execute(
+            "SELECT quality_json FROM oos_snapshot_runs WHERE snapshot_id='reduction'").fetchone()[0])
+        self.assertEqual(quality["eligible"], 1)
+        self.assertEqual(quality["raw_expected"], {"price": 1, "inst": 1, "margin": 2,
+                                                   "holding": 2, "sbl": 2})
+        self.assertIn("SHA256=", quality["excluded"][0]["reason"])
+        self.con.execute("DELETE FROM holding WHERE stock_id='1002'")
+        with self.assertRaisesRegex(RuntimeError, "holding"):
+            self.capture("still-missing", "2026-07-10T16:10:00+00:00")
+
+    def test_strict_ranking_roles_cover_full_universe_when_one_stock_is_suspended(self):
+        import ranking_views as rv
+        roles = self.root / "config" / "ranking_roles.csv"
+        roles.write_text("stock_id,group,role,role_label,basis\n"
+                         "1001,g,test,Test,basis\n1002,g,test,Test,basis\n", encoding="utf-8")
+        self.con.execute("DELETE FROM daily_scores WHERE stock_id='1002'")
+        self.con.execute("DELETE FROM daily_metrics WHERE stock_id='1002'")
+        payload = rv.build_from_db(self.con, self.date, roles_path=str(roles), strict_roles=True)
+        self.assertEqual([r["stock_id"] for r in payload["rows"]], ["1001"])
+        roles.write_text(roles.read_text(encoding="utf-8") + "9999,g,test,Test,basis\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "extra"):
+            rv.build_from_db(self.con, self.date, roles_path=str(roles), strict_roles=True)
+
+    def test_late_recovery_keeps_actual_time_and_is_not_oos_evidence(self):
+        self.capture("late", "2026-07-11T01:00:00+00:00")
+        row = self.con.execute("SELECT * FROM oos_snapshot_runs WHERE snapshot_id='late'").fetchone()
+        self.assertEqual(row["captured_at"], "2026-07-11T01:00:00+00:00")
+        quality = json.loads(row["quality_json"])
+        self.assertFalse(quality["oos_eligible"])
+        self.assertEqual(quality["publication_timing"], "late_recovery")
+        import evidence_status
+        self.assertEqual(list(evidence_status.first_official_runs(self.con)), [self.date])
+        self.assertEqual(evidence_status.first_official_runs(self.con, eligible_only=True), {})
+        duplicate = self.capture("repeat", "2026-07-12T12:00:00+00:00")
+        self.assertEqual(duplicate, ("late", self.date, False))
+
+    def test_timing_boundary_and_timezone_are_explicit(self):
+        self.assertTrue(ss.publication_timing(self.date, "2026-07-11T00:59:59+00:00")["oos_eligible"])
+        self.assertFalse(ss.publication_timing(self.date, "2026-07-11T09:00:00+08:00")["oos_eligible"])
+        with self.assertRaisesRegex(ValueError, "時區"):
+            ss.publication_timing(self.date, "2026-07-11T09:00:00")
 
     def test_append_only_runs_keep_original_and_revision(self):
         sid, date_, created = self.capture("run-1", "2026-07-10T14:00:00+00:00")

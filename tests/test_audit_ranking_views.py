@@ -157,6 +157,17 @@ class FormalProgressTest(unittest.TestCase):
         self.assertEqual(len(result["invalid_runs"]), 1)
         self.assertEqual(result["invalid_runs"][0]["actual_rows"], 1)
 
+    def test_late_recovery_is_complete_but_not_a_mature_oos_day(self):
+        self.add_run("late", "2026-08-02", "2026-08-03T12:00:00Z", rv.SPEC_SHA)
+        self.con.execute("ALTER TABLE oos_snapshot_runs ADD COLUMN quality_json TEXT")
+        self.con.execute("UPDATE oos_snapshot_runs SET quality_json=?",
+                         (json.dumps({"oos_eligible": False}),))
+        result = audit.formal_progress(self.con, rv.SPEC_SHA, fwd=2)
+        self.assertEqual(result["current_spec_latest_date"], "2026-08-02")
+        self.assertEqual(result["current_spec_days"], 1)
+        self.assertEqual(result["current_spec_oos_days"], 0)
+        self.assertEqual(result["mature_10d_days"], 0)
+
 
 class OutputContractTest(unittest.TestCase):
     def test_json_writer_uses_utf8_lf(self):
@@ -175,6 +186,14 @@ class OutputContractTest(unittest.TestCase):
 
 
 class PipelineWiringTest(unittest.TestCase):
+    def test_raw_audit_precedes_scoring_and_early_stage_uses_locked_date(self):
+        workflow = (ROOT / ".github/workflows/daily-fetch.yml").read_text(encoding="utf-8")
+        self.assertLess(workflow.index("python scripts/audit_raw_data.py"),
+                        workflow.index("python scripts/score.py"))
+        self.assertIn('--raw-only --end "$TARGET_DATE"', workflow)
+        local = (ROOT / "scripts/run_daily.py").read_text(encoding="utf-8")
+        self.assertLess(local.index('run("audit_raw_data.py")'), local.index('run("score.py")'))
+
     def test_daily_workflow_audits_published_snapshot_before_dashboard(self):
         workflow = (
             ROOT / ".github" / "workflows" / "daily-fetch.yml"

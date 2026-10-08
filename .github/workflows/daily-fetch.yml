@@ -97,7 +97,7 @@ jobs:
           if [ "$FETCH_MODE" = "early" ]; then
             python scripts/fetch_daily.py \
               --datasets TaiwanStockPrice,TaiwanStockInstitutionalInvestorsBuySell \
-              --raw-only
+              --raw-only --end "$TARGET_DATE"
           else
             python scripts/fetch_daily.py --final-pass --end "$TARGET_DATE"
           fi
@@ -143,6 +143,10 @@ jobs:
         run: |
           echo "::error::每日抓取未完成；已嘗試保存部分進度，停止評分、OOS 快照與儀表板發布"
           exit 1
+
+      - name: 稽核原始五表與停牌證據
+        if: steps.mode.outputs.mode == 'complete'
+        run: python scripts/audit_raw_data.py
 
       - name: 計算五元素分數與 tier
         if: steps.mode.outputs.mode == 'complete'

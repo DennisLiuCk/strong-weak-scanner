@@ -324,14 +324,22 @@ class DashboardContractTest(unittest.TestCase):
         self.assertNotIn("__RANKING_VIEWS_JSON__", text)
         payload = json.JSONDecoder().raw_decode(
             text, text.index("RANKV=") + len("RANKV="))[0]
-        self.assertEqual(payload["coverage"]["stocks"], 121)
-        self.assertEqual(len(payload["rows"]), 121)
         self.assertEqual(len({row["g"] for row in payload["rows"]}), 11)
         self.assertEqual(payload["specSha"], rv.SPEC_SHA)
         data = json.JSONDecoder().raw_decode(
             text, text.index("DATA=") + len("DATA="))[0]
-        self.assertEqual(len(data), 121)
-        self.assertTrue(all("views" in row for row in data))
+        with (ROOT / "config" / "universe.csv").open(encoding="utf-8", newline="") as handle:
+            universe_ids = {row["stock_id"] for row in csv.DictReader(handle)}
+        self.assertEqual({row["id"] for row in data}, universe_ids)
+        active = [row for row in data if not row.get("trading")]
+        self.assertEqual(payload["coverage"]["stocks"], len(active))
+        self.assertEqual({row["id"] for row in payload["rows"]}, {row["id"] for row in active})
+        self.assertTrue(all("views" in row for row in active))
+        for row in data:
+            if row.get("trading"):
+                self.assertLess(row["trading"]["signalDate"], row["trading"]["date"])
+                self.assertIn(row["trading"]["source"],
+                              {"official_price_zero_trade", "official_capital_reduction"})
 
     def test_validate_uses_same_day_paired_challenger_gate(self):
         source = (SCRIPTS / "validate.py").read_text(encoding="utf-8")
