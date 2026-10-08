@@ -1,0 +1,163 @@
+{
+  "content_as_of": "2026-10-09",
+  "documents": [
+    {
+      "cited_pages": [
+        1,
+        5,
+        37,
+        40,
+        43,
+        44,
+        54
+      ],
+      "file": "documents/S1.pdf",
+      "id": "S1",
+      "page_count": 60,
+      "rendered_pages": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        53,
+        54,
+        55
+      ],
+      "roles": [
+        "annual_report"
+      ],
+      "sha256": "713703a297afdf6cb158cf635b598e8a38defed91a2d2243eeb188c9d04c04fe",
+      "size_bytes": 3350134,
+      "url": "https://www.guc-asic.com/upload/2026_04_16/8_202604161551139wh9p72Aj4.pdf"
+    },
+    {
+      "cited_pages": [
+        4,
+        5,
+        7,
+        9,
+        11,
+        22,
+        37,
+        53
+      ],
+      "file": "documents/S2.pdf",
+      "id": "S2",
+      "page_count": 56,
+      "rendered_pages": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        21,
+        22,
+        23,
+        36,
+        37,
+        38,
+        52,
+        53,
+        54
+      ],
+      "roles": [
+        "annual_financials"
+      ],
+      "sha256": "bac44910e0463d2a6bc8e0c24e96efd88d876448bd6db2394a9b8c18bb1ad11d",
+      "size_bytes": 1406796,
+      "url": "https://www.guc-asic.com/upload/2026_01_29/8_202601291615027o1sya8Yc3.pdf"
+    },
+    {
+      "cited_pages": [
+        3,
+        4,
+        5,
+        7,
+        8,
+        13,
+        21,
+        22,
+        30,
+        32
+      ],
+      "file": "documents/S3.pdf",
+      "id": "S3",
+      "page_count": 39,
+      "rendered_pages": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        12,
+        13,
+        14,
+        20,
+        21,
+        22,
+        23,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "roles": [
+        "latest_quarterly_report"
+      ],
+      "sha256": "3c5d681307f46ab6fd0958f050bf4482e02e990f544c1bec1ef58f68eb0c6afa",
+      "size_bytes": 1524457,
+      "url": "https://www.guc-asic.com/upload/2026_07_30/8_2026073015050346zx5wGWu0.pdf"
+    },
+    {
+      "cited_pages": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "file": "documents/S4.pdf",
+      "id": "S4",
+      "page_count": 5,
+      "rendered_pages": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "roles": [
+        "latest_investor_conference"
+      ],
+      "sha256": "b1cc67c428a19bd7830b420246efc02c46f44bec93d372059dc5c5f6c5f5cc53",
+      "size_bytes": 1548094,
+      "url": "https://www.guc-asic.com/upload/2026_07_30/8_20260730150614srxuwnBHf5.pdf"
+    }
+  ],
+  "pack_sha256": "8d155013bc4de00bc47dbb61e5306a42b94d7d87c8c4bfa9cc60b4a57da23d9b",
+  "research_profile": "focused_v1",
+  "schema": "findmind.qual-evidence-pack",
+  "schema_version": 1,
+  "source_search_timeout_minutes": 10,
+  "stock_id": "3443",
+  "unverified_claims_removed": true
+}
