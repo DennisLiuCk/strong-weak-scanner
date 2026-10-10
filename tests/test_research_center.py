@@ -4417,7 +4417,7 @@ process.stdout.write(JSON.stringify(results));
             "editorial_plain_language_wave95_panel_cost_four_measures_production_chain_and_six_gate_ladder",
             "separated_fanout_architecture_panel_carrier_and_ase_310x310_planned_production_evidence",
             "三個詞不能混成同一個成熟度",
-            "公司同一頁仍寫成預計 2027 年投產",
+            "8/27文章將投產目標縮到2027第一季",
             "## 先把兩條軸拆開：封裝做法不等於面板載體",
             "| 本文兩軸地圖 | 它回答什麼 | 例子 | 本輪可確認 | 不能直接推成 |",
             "| 1. 封裝架構 |", "| 2. 製程先後 |",
@@ -4431,7 +4431,7 @@ process.stdout.write(JSON.stringify(results));
             "| 3. Load Port 與搬運 |", "| 4. 整線與產品放行 |",
             "### 「正在制定」離「整線量產」還有五個動詞",
             "| 五個動詞 | 真正完成什麼 | 本輪狀態 | 不能跳到哪裡 |",
-            "| 1. 啟動活動 |", "| 2. 核准草案 |", "| 3. 發布標準 |",
+            "| 1. 啟動活動 |", "| 2. 表決／委員會結果 |", "| 3. 發布標準 |",
             "| 4. 採用與互通 |", "| 5. 整線產品放行 |",
             "claim_id: C13", "monitor_id: T4",
             "added_nominal_carrier_geometry_and_good_output_cost_bridge_without_thesis_or_clock_refresh",
@@ -4469,7 +4469,7 @@ process.stdout.write(JSON.stringify(results));
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 52
+            sum(line.startswith("- **") for line in glossary.splitlines()), 55
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
@@ -4487,9 +4487,9 @@ process.stdout.write(JSON.stringify(results));
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 13),
-            ("research_claim", 16), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 4),
+            ("research_topic", 1), ("research_source", 18),
+            ("research_claim", 20), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 5),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -4534,7 +4534,7 @@ process.stdout.write(JSON.stringify(results));
             "KG-PLP-I20", "KG-PLP-I21",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 25)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 27)
 
     def test_compute_connect_station_one_separates_ai_storage_jobs_positions_and_gates(self):
         topic = (

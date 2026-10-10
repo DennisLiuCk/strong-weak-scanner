@@ -2,15 +2,15 @@
 
 本圖先把扇出架構、晶片先放／線路先做與方形面板載體拆開，再把面板本體、Panel FOUP、
 load port／自動搬運、planned line、名目面積、合格產出、客戶資格與穩定量產經濟性接回同一張圖。
-ASE 的 310×310 mm 線是具名規劃；SEMI Doc 7405 是標準制定活動，而 35.9536891656% 也只是名目
-幾何增幅，三者都不是已完成跨設備互通、HVM 或降本。
+ASE 的 310×310 mm 線仍是具名規劃；SEMI Doc7453已有CER程序通過，Doc7498則是另一交接介面的制定活動。
+35.9536891656% 也只是名目幾何增幅，三者都不是已完成跨設備互通、HVM或降本。
 
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: panel-level-packaging
 root_node_id: concept:panel-level-packaging
 label: 面板級封裝（PLP）
-summary: 把 fan-out、chip-first／chip-last、重構面板、SEMI 3D20 面板本體、Panel FOUP 與 load port 分開，再連接 310mm 標準制定、名目面積到合格成本護照、良率、產出及 ASE planned line，顯示尺寸、載具、設備介面、幾何增幅與產品量產為何不能互相替代。
+summary: 分開fan-out流程、panel本體、FOUP與loadport；7453程序通過不等於出版或設備互通，7498另有交接範圍。ASE第一季目標仍是planned，幾何增幅不能替代良率、合格產出及成本。
 article_ids: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS
 status: active
 -->
@@ -90,7 +90,7 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-08-12
 review_due: 2026-09-12
-status: active
+status: retired
 boundary: ASE 公開 310x310mm automated line、FOCoS／FOCoS-Bridge compatibility 與 2027 expected production；不證明截至 2026-08-12 已 production release、客戶 qualification、HVM yield、出貨或財務貢獻。
 next_trigger: ASE 公布同一 310x310mm platform 的實際 production release、具名客戶產品、qualification、連續良率／throughput 與可辨識財務結果。
 -->
@@ -470,7 +470,7 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-08-13
 review_due: 2026-09-12
-status: active
+status: retired
 boundary: SEMI Doc 7405 只證明 310mm square Panel FOUP 新標準活動與 projected timetable；activity approval 不是 ballot、TC approval、publication、adoption 或 HVM。
 next_trigger: Doc 7405 或後繼編號正式發布，3D20／E181／E182 對應 310mm 版本完成，且具名產線公開採用。
 -->
@@ -513,4 +513,44 @@ review_due: 2026-09-12
 status: active
 boundary: 310×310 方形對直徑 300mm 圓形的 35.9536891656% 只是不扣邊緣的 N=1 名目幾何；沒有 usable map、site layout、yield、time 或 cost 分母，不能當面積利用率、合格產出或降本效果。
 next_trigger: 同一 package outline 與 revision 在 wafer／panel 路徑提供 usable map、候選位置、final good units、panel／wafer per hour、uptime、scrap、cost scope 與 customer qualification。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PLP-C05
+view: company
+from_id: company:3711
+to_id: concept:panel-level-packaging
+relation: develops_packaging
+claim_refs: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C20
+note_refs:
+evidence_state: verified
+commercial_stage: planned
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-08-27
+review_due: 2026-10-23
+status: active
+boundary: 接續C04：ASE舊文章的2027第一季投產目標，不是10/10實際投產、客戶放行或收入；不升級commercial_stage或獨佔性。
+next_trigger: 同一310x310平台的實際production release、具名客戶qualification、連續良率與throughput；前瞻日期不自動過關。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PLP-I22
+view: industry
+from_id: concept:panel-level-packaging
+to_id: stage:310mm-panel-interface-standardization
+relation: passes_through
+claim_refs: MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C17,MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C18,MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS#C19
+note_refs:
+evidence_state: verified
+commercial_stage: planned
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-10
+review_due: 2026-10-23
+status: active
+boundary: 接續I19：7453的CER列Passed，7498僅啟動另一panel交接介面活動；同SEMI群組不算獨立產品驗收。未核正式出版版號、具名設備採用、互通或客戶放行。
+next_trigger: 7453正式出版及程序結果、7498後續與scope配對，再核同版本產線互通和產品放行，不把Loadport同名當同介面。
 -->

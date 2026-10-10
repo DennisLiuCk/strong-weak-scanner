@@ -8,7 +8,7 @@ schema_version: 1
 graph_id: dc-phase-delivery
 root_node_id: concept:dc-phase-delivery
 label: 資料中心分期交付
-summary: Beacon Point兩期租約對應不同融資與交付進度；按期別查看資金、通電和資料廳，不把園區全數簽租寫成已上線算力。
+summary: Beacon Point兩期租約對應不同融資與交付進度；公司循環額度、實際動用與各期專案資金分開，不把全數簽租或母公司融資寫成已交付算力。
 article_ids: MI-2026-09-10-DC-PHASE-DELIVERY
 status: active
 -->
@@ -48,7 +48,7 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-09-10
 review_due: 2026-10-10
-status: active
+status: retired
 boundary: 此為逐期查證框架，第一期已融資不能證明第二期同樣完成；不作全產業信用結論。
 next_trigger: 第二期融資完成公告及明確資金用途。
 -->
@@ -91,4 +91,24 @@ review_due: 2026-10-10
 status: active
 boundary: 各期初次資料廳交付目標不等於全期容量交付或租金已開始收取。
 next_trigger: 客戶驗收、實際交付規模與起租條件。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-DCP-I04
+view: industry
+from_id: concept:dc-phase-delivery
+to_id: stage:dc-phase-financing
+relation: passes_through
+claim_refs: MI-2026-09-10-DC-PHASE-DELIVERY#C9
+note_refs:
+evidence_state: inference
+commercial_stage: planned
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-10
+review_due: 2026-11-05
+status: active
+boundary: 接續I01的查證框架：母公司revolver、實際動用與第二期專案資金不同；新額度不證明第二期融資或交付完成，未新增公司受惠線。
+next_trigger: 11/4預告Q3結果後核對第二期具名資金與交付，或提前出現同一期別公告；未取得仍保持待證。
 -->

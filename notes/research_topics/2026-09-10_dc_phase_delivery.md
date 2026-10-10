@@ -51,6 +51,8 @@ evidence: sources:S1,S2,S3,S4,S5,S6
 - **通電與資料廳交付**：前者是電力設施開始送電，後者是向客戶交付機房空間與約定設施，時間可以不同。
 - **三淨租約（triple-net）**：通常由租客承擔約定的稅費、保險與維護支出，實際責任仍以合約為準。
 - **無追索融資（non-recourse）**：本案債務由專案公司承擔，不能因此省略專案資產、限制用途資金與履約風險。
+- **循環額度（revolver）**：在條件與總額限制內可借、還、再借的融資安排；承諾額度不是已到帳現金。
+- **信用狀子限額（L/C sublimit）**：信用狀可占用總額度中的一部分；本案同額子限額不能再加一次當成雙倍資金。
 
 ### 三句話抓重點
 
@@ -67,7 +69,7 @@ evidence: sources:S1,S2,S3,S4,S5,S6
 
 ### 接下來怎麼追
 
-- 10月10日人工回查公司公告，先找第二期融資是否完成，再核對公告涵蓋的建設範圍。
+- 10/10已回查公司公告及9/28的8-K；新母公司額度不是第二期專案融資證明。公司預告11/4公布Q3，11/5再核結果；若之前有具名工程公告則提前。
 - 按公司最新文件分別追蹤初次通電、第一期資料廳與第二期資料廳；取得租金起算及交付條款後再往現金流延伸。
 
 ### 想一想
@@ -114,6 +116,29 @@ J.P. Morgan在8月10日的公開文章把專案融資與供電限制放在一起
 
 ## 有哪些證據支持繼續追蹤
 
+### 10/10補充：母公司多了額度，不能替第二期打勾
+
+[9/28公告](https://www.hut8.com/news-insights/press-releases/hut-8-expands-corporate-liquidity-with-usd1-07-billion-senior-secured-revolving-credit-facility)
+與[同日8-K的Item 1.01](https://cdn.kscope.io/d64496239aecaff7139dd1adb2137d00.html)顯示，
+Hut 8於9/24簽訂四年期、10.70億美元的母公司有擔保循環額度；信用狀子限額包含在這個
+總額內。8-K只說交割日尚未動用，不能延伸成10/10的餘額確認。
+
+| 要分開的四件事 | 本次文件能證明什麼 | 還需要什麼 |
+|---|---|---|
+| 承諾額度 | 公司取得可在條件下使用的融資安排 | 動用條件及餘額的後續披露 |
+| 實際動用 | 9/24尚無outstanding，不是已有同額現金 | 新日期的實際借款、信用狀及現金資料 |
+| 專案資金 | 用途是公司一般用途及營運資金 | Beacon Point第二期的具名資金、用途及條件 |
+| 工程交付 | 本次融資稿沒有代替現場結果 | 該期送電、資料廳、客戶驗收及起租紀錄 |
+
+這筆額度可能提供開發期的財務彈性，但本文不以「母公司有錢可借」推成「第二期資金已足額
+且工程會準時」。它與第一期專案債也有不同的債務承擔者和擔保範圍，不能相加成同一專案
+可用現金。這是單一借款安排的揭露值，不是跨公司融資能力比較或投資判定。
+
+接著問自己：借款人是誰？錢實際動用了嗎？用途能否對到同一期工程？誰提供交付驗收？
+四個答案都對齊，才可能把融資訊息接到供應鏈需求。
+[Q3日程公告](https://www.hut8.com/news-insights/press-releases/hut-8-schedules-third-quarter-2026-earnings-release-and-conference-call)
+預告11/4美股開盤前公布結果、當日08:30 ET法說；這是下一取證節點，不是履約完成日。
+
 目前的進度並非只剩規模宣傳。7月公司公告稱，園區完整電力容量已有AEP Texas的
 電力輸送互聯協議，場地準備進行中，長交期關鍵設備也已採購。8月財報稿再列出第一期
 及變電站施工。這些公司披露支持繼續追工程進度，也縮小了「只有意向、尚未執行」的疑慮。
@@ -135,7 +160,8 @@ J.P. Morgan在8月10日的公開文章把專案融資與供電限制放在一起
 台灣公司的證據，因此文章保留族群觀察，沒有填入個股受惠名單。若之後公司公布具名
 產品或客戶，應先對上期別，再接出貨與財務資料。
 
-10月的人工回查會先問：第二期是否取得確定融資？兩期交付目標有無調整？已採購設備
+10/10在上述已讀公告與8-K範圍內，沒有取得第二期融資完成或新交付時點的證明；未全面查核
+電網、地方建照與承包商，不能宣稱第二期至今必然未融資。下一次仍先問：第二期是否取得確定融資？兩期交付目標有無調整？已採購設備
 是否開始到貨、通電或驗收？若融資與交付條件已有實質進展，研究重心應隨之移動；若
 日期延後或新增成本，則追延後的原因與責任。重複公告園區總規模，本身不增加交付證據。
 
@@ -235,6 +261,52 @@ limitation: 持續變動索引只作回查入口；當日未見新融資稿不�
 independence_group: hut8-beacon-point
 -->
 
+<!-- research_source
+source_id: S7
+role: company_release
+source_kind: document
+publisher: Hut 8
+title: Hut 8 Expands Corporate Liquidity with $1.07 Billion Senior Secured Revolving Credit Facility
+published_at: 2026-09-28
+captured_at: 2026-10-10
+accepted_at: 2026-10-10
+status: active
+url: https://www.hut8.com/news-insights/press-releases/hut-8-expands-corporate-liquidity-with-usd1-07-billion-senior-secured-revolving-credit-facility
+locator: 公開HTML Nuxt正文的parent-level liquidity、four-year facility及letter-of-credit sublimit；原檔SHA256 f13edd31170f0ef44cb36ba70eb4d7b2f8fb9af6300868fcd77a511de8f50a9c
+limitation: 公司母體額度公告，不是Beacon Point第二期融資完成或工程交付；未建立各專案實際分配表
+independence_group: hut8-beacon-point
+-->
+<!-- research_source
+source_id: S8
+role: company_filing
+source_kind: document
+publisher: Hut 8
+title: Form 8-K — September 28, 2026 corporate Credit Agreement
+published_at: 2026-09-28
+captured_at: 2026-10-10
+accepted_at: 2026-10-10
+status: active
+url: https://cdn.kscope.io/d64496239aecaff7139dd1adb2137d00.html
+locator: 公司IR直接連結；Item1.01、7.01及簽署日期；9/24 Closing Date；解壓HTML SHA256 3d6e1140dacab8d69dfc69b8433a0266c36db50c0a2fea520ff64e3516ddfe3e
+limitation: 本輪核對8-K摘要，未完成Exhibit10.1整份條款法律審查；no outstanding只適用9/24，不可填10/10餘額，不是獨立信用背書
+independence_group: hut8-beacon-point
+-->
+<!-- research_source
+source_id: S9
+role: company_release
+source_kind: document
+publisher: Hut 8
+title: Hut 8 Schedules Third Quarter 2026 Earnings Release and Conference Call
+published_at: 2026-10-08
+captured_at: 2026-10-10
+accepted_at: 2026-10-10
+status: active
+url: https://www.hut8.com/news-insights/press-releases/hut-8-schedules-third-quarter-2026-earnings-release-and-conference-call
+locator: 頁首Posted10/8；Nuxt正文dateline10/7，日程11/4盤前及08:30ET；原檔SHA256 3103cd58cd23f1bc3b0389e18a184c4a64d84b95b48f4a89e0852bda74bc7651
+limitation: 保留頁首與正文日期差異，不自行消除；只證明預定財報活動，不是Q3結果、第二期融資或交付更新
+independence_group: hut8-beacon-point
+-->
+
 <!-- research_claim
 claim_id: C1
 label: inference
@@ -318,6 +390,51 @@ as_of: 2026-09-10
 basis: 現有文件尚不能完成這些逐期及供應商層級判斷
 boundary: 不由長約、客戶評級或園區容量推台廠訂單與收益
 verification_needed: 合約起租及延遲條款、具名供應商公告和同一期別的驗收收款資料
+-->
+
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: Hut 8於9/24簽約並於9/28公告10.70億美元四年期母公司有擔保循環額度，包含同額信用狀子限額，8-K列交割日尚無outstanding
+supporting_source_ids: S7,S8
+contrary_source_ids:
+as_of: 2026-09-28
+basis: 公告與Item1.01核對借款人、Closing Date、aggregate principal、included sublimit、期限、用途及交割日動用狀態
+boundary: 額度不等於現金，子限額不可重複相加；9/24狀態不填10/10，母公司擔保不能套用第一期專案債無追索描述
+verification_needed:
+-->
+<!-- research_claim
+claim_id: C9
+label: inference
+status: active
+claim: 公司級承諾額度、實際動用、逐期專案融資與工程交付必須分開核對；本次母公司循環額度未提供Beacon Point第二期融資完成的共同鍵
+supporting_source_ids: S4,S5,S7,S8
+contrary_source_ids:
+as_of: 2026-10-10
+basis: S8限定一般用途與營運資金，S4／S5是一個指定期別的專案結構；借款人、用途及時點不同，不能混成第二期可用現金
+boundary: 只裁決已讀材料的證據效力，不宣稱第二期至今仍未融資或全市場沒有工程新進度，不估台廠收入
+verification_needed:
+-->
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: 公司預告2026-11-04美股開盤前發布第三季結果，當日08:30ET舉行法說
+supporting_source_ids: S9
+contrary_source_ids:
+as_of: 2026-10-08
+basis: 原HTML公開Nuxt正文與活動表日期一致；頁面Posted10/8及正文dateline10/7分列保留
+boundary: 日程不是財報結果或融資完成；11/5為研究中心人工回查日，不是公司承諾發布另一份文件
+verification_needed:
+-->
+
+<!-- transition
+date: 2026-10-10
+from: triaged
+to: triaged
+reason: separated_parent_revolver_drawn_cash_and_phase_financing_without_thesis_clock_refresh
+evidence: sources:S7,S8,S9
 -->
 
 ## 來源與證據邊界
