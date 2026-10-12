@@ -181,6 +181,20 @@ limitation: 此表是 TTM，不能直接與另一公司的單季數字排名
 由 `captured_at` 表示實際觀察日，locator 必須寫明當日看到或沒看到什麼，limitation 必須
 說明頁面之後可能改變。不得把掃描日冒充發布日；living index 也不能替代已發布附件。
 
+同一動態網址重新取得實質不同的觀察時，可追加不同 source ID：必須都是 `living_index`、
+具有不同 `captured_at` 及具體 locator，且填相同明確 `independence_group`。舊 source 與
+claim 不改寫；同網址各次捕捉仍只是一個 URL／獨立來源群組，不滿足第二來源門檻。
+全局及被 active claim 實際引用的來源都按 canonical URL 去重；未被主張引用的其他網址
+不能補足實引來源門檻。
+單純重開入口或沒有新證據不得追加捕捉以刷新時計。不同取件管道、快取或缺原始 payload
+造成差異時，保留管道限制，不能用網址排序參數偽裝獨立來源。
+
+**動態清單的計數必須可重算。** 先按受測角色、revision、速率與欄位逐列盤點；列數不等於
+獨立產品、公司或部署樣本。當前總數減歷史總數不自動等於本期新增：要逐列比較穩定鍵及
+Date Added，分開新列、回補、重複列和捕捉差異。沒有舊 payload 就揭露限制、不補寫歷史。
+名單列入日、測試日、送表日、發布日與捕捉日各自保存。標準投票截止日已過，同樣不等於
+投票通過或正式發布，必須另查正式結果及版本。
+
 `status` 值域為 `active`、`superseded`、`rejected`。只有 `active` source 可以被 active
 claim 或 monitor 引用。若來源後來失效，不刪除原 block；依「八、修正採追加保存」處理。
 

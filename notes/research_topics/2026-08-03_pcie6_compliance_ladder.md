@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C25
 base_confidence: medium
-confidence_basis: PCI-SIG 的規格、FAQ、Compliance Program、Workshop #140 與 2026-08-24 Integrators List 可把 PAM4／FLIT／錯誤控制、四類合規測試、跨廠互通及 64 GT/s 公開列名分開；清單已出現 19 筆 PCIe 6.x at 64GT/s 列項，並具名群聯 PS7161／PS5303，但個別原始測試、完整跨廠矩陣、具名客戶 production fleet 與台灣公司財務仍未完成
+confidence_basis: PCI-SIG 的規格、FAQ、Compliance Program、Workshop #140 與 2026-08-24 Integrators List 支持 C25 的兩軸框架；該日保存 19 筆列項與群聯 PS7161／PS5303。2026-10-12 另捕捉 21 列及 AMD EPYC 9006 系統角色列名，但個別原始測試、完整跨廠矩陣、具名客戶 production fleet 與台灣公司財務仍未完成；新列名不刷新 C25 主時鐘
 cross_company_numbers: false
 -->
 
@@ -956,6 +956,8 @@ evidence: sources:S18
 - **終端裝置（endpoint）**：連線另一端真正收發資料的裝置，例如固態硬碟、網路介面卡或加速器。
 - **固態硬碟（SSD）**：用快閃記憶體儲存資料的終端裝置；硬碟量產不等於主機、訊號元件與軟體已一起通過。
 - **PS7161／PS5303**：群聯在 2026-08-24 PCI-SIG 清單可定位的兩個具名產品 identifier；前者列為 x16 linear redriver，後者列為 x4 SSD controller。identifier 能辨認受測物件，不等於客戶採用、出貨或收入。
+- **EPYC**：AMD 的伺服器處理器產品家族名稱；清單中的 EPYC 9006 仍須連回實際受測系統，不能替每個型號或客戶配置背書。
+- **清單欄位（Date Added／Identifier／Function）**：分別是加入清單的日期、辨認受測物件的識別碼，以及物件的功能。加入清單不等於當天測試或出貨；欄位空白也不能自行補成整個產品家族都通過。
 - **運算加速器**：專門加快人工智慧或高效能運算的晶片或裝置；它也可以是高速連線的終端。
 - **高速訊號重整器（retimer）**：重新整理衰減或變形的高速電訊號，讓資料能穿過較長板路或線材；它不負責證明整套協定已互通。
 - **高速連線交換器（switch）**：讓一個主機端連向多個終端，並把資料送往正確裝置；不是每條連線都需要交換器。
@@ -1021,7 +1023,7 @@ evidence: sources:S18
 
 - 一條完整高速連線，要讓主機、板路與線材、必要的訊號或交換元件、終端裝置，以及低階控制軟體一起工作。
 - 產品名稱寫著「第六代」、實際連線跑到哪一代、通過哪一項正式測試，以及是否進入客戶系統，是四件不同的事。
-- 2026 年 8 月已出現最高速度的公開列項（詳見 C25）；列名仍不等於完整客戶部署，整張卡或系統板通過，也不能自動替藏在連接器後面的訊號元件背書。
+- 2026 年 8 月已出現最高速度的公開列項；10 月清單又能定位 AMD EPYC 9006 的系統角色，但「系統列名」仍不等於客戶整套設備已部署，也不能替未列出的型號與元件背書。[S20]
 
 ### 為什麼重要
 
@@ -1042,6 +1044,7 @@ evidence: sources:S18
 - 每一筆測試至少保存產品、功能、規格版本、速度、通道數、連接方式、軟體版本、電氣／設定／鏈路／交易測項與結果日期。
 - 看見「零錯誤」時，先問分母是 bits、Flits、transactions 還是時間，再問它指 raw、FEC corrected、CRC residual、replay 或 application 哪一層。
 - 分開記錄「測試可以報名」、「具名產品通過」與「結果進入公開清單」，不要用活動頁替產品背書。
+- 對新增 AMD 列，下一步先補受測主機板、韌體、實際測試日期與互通對手；清單的 10 月 5 日是列名日期，不是出貨日。[S20]
 - 跨廠結果要列出主機、訊號元件、交換器、終端與韌體來自誰，並確認目標速度、錯誤恢復與長時間讀寫能否重現。
 - 量產消息要再分元件出貨、參考架構、客戶驗證與完整平台部署；台灣公司還要補客戶端與公司端的雙向財務證據。
 
@@ -1051,6 +1054,7 @@ evidence: sources:S18
 - 主機、訊號元件與儲存裝置各自量產，還要補哪些共同測試，才能說整條連線穩定？
 - 公司客戶驗證先完成、正式測試較晚公布時，研究者該如何分開記錄？
 - 如果整張擴充卡通過，卡上的每一顆訊號元件是否都能沿用同一張成績單？
+- 一筆處理器家族名稱出現在「帶插槽的系統」分類時，你知道實際測了哪張板、哪版韌體及哪個客戶配置嗎？
 - 兩份報告都寫「跑了很久、零錯誤」，若一份沒有暴露分母、另一份只報應用層錯誤，它們能比較嗎？
 
 ## 先看 64 GT/s 為什麼牽動整條連線
@@ -1227,7 +1231,7 @@ SE／t；它不是產品實測、PCI-SIG pass criterion 或公司比較。PCI-SI
 | 兩條證據軸 | 第一步 | 中間要跨過 | 靠近完成時要看到 | 本輪位置 | 不能互相替代 |
 |---|---|---|---|---|---|
 | A. 連線正確性 | 電氣與通道：PAM4 訊號、封裝、板路、接收端 | Flit、錯誤修正／偵測／重送；設定、鏈路與交易協定 | 不同公司的主機、訊號元件、交換器與終端在同一條件下重現正常及錯誤恢復 | 規格與測試分類已明確；部分產品有公司互通主張，完整公開矩陣未見 | 元件量產不能替電氣或協定測試；一次連上不能替長時間互通 |
-| B. 商業落地 | 具名產品宣稱支援、樣品或公司 qualification | PCI-SIG official testing、公開列名、客戶平台驗收 | 具名 production fleet、重複出貨、份額、價格與財務歸因 | 連接元件與儲存終端已有量產主張；19 筆 64 GT/s 列項已出現，完整客戶部署與台灣財務仍未證 | 正式測試不能替客戶採用；客戶驗證也不能替公開合規或財務分母 |
+| B. 商業落地 | 具名產品宣稱支援、樣品或公司 qualification | PCI-SIG official testing、公開列名、客戶平台驗收 | 具名 production fleet、重複出貨、份額、價格與財務歸因 | 連接元件與儲存終端已有量產主張；10/12 捕捉 21 筆 64 GT/s 列項，完整客戶部署與台灣財務仍未證 [S20] | 正式測試不能替客戶採用；客戶驗證也不能替公開合規或財務分母 |
 
 兩軸不是成熟度分數。新聞若只推進一格，就只更新那一格；缺少現價、共識、估值與部位資料時，
 本文也不把技術或公司成熟度轉成股票動作。
@@ -1239,7 +1243,7 @@ SE／t；它不是產品實測、PCI-SIG pass criterion 或公司比較。PCI-SI
 | 1. 規格與測試入口存在 | 標準組織發布規格，並定義電氣、設定、鏈路、交易與跨廠測試 | PCIe 6.x 規格、Compliance Program 與第 140 次工作坊已提供制度和最高 64 GT/s 測試入口 | 活動後具名產品在每個必要 test area 的版本、速度與結果 | 有考場和考科不等於任何考生通過，也不等於產品已量產 |
 | 2. 具名產品宣稱支援 | 供應商交代產品名稱、功能、速度目標與可用階段 | Astera Labs 有連接產品組合；Micron 有 9650 Gen6 固態硬碟 | 每項產品的硬體版本、韌體、正式結果與客戶平台 | 產品名稱中的 Gen6 不等於所有測試都在 64 GT/s 完成 |
 | 3. 供應商或客戶完成互通 | 供應商實驗室或客戶平台把不同裝置接在一起驗證 | Astera Labs 宣稱已完成實驗室與客戶驗證，但參與者與矩陣未完整公開 | 不同公司主機、交換器、訊號元件與終端的組合及重現結果 | 公司或客戶自訂驗證不等於標準組織正式測試 |
-| 4. 具名產品正式通過並列名 | 產品完成必要 compliance test areas 與跨廠門檻，公開列表記下產品與條件 | 現行清單已有 19 筆具名 PCIe 6.x、64 GT/s 列項；仍缺逐列原始 test-area 結果與 interop 分母 | 把每列受測邊界、四類測項、interop 對手與測試／列名時間接成可重建護照 | 一筆列名不能替其他測項、其他產品、完整拓撲或客戶部署背書 |
+| 4. 具名產品正式通過並列名 | 產品完成必要 compliance test areas 與跨廠門檻，公開列表記下產品與條件 | 10/12 清單捕捉 21 筆 64 GT/s 列項；仍缺逐列原始 test-area 結果與 interop 分母 [S20] | 把每列受測邊界、四類測項、interop 對手與測試／列名時間接成可重建護照 | 一筆列名不能替其他測項、其他產品、完整拓撲或客戶部署背書 |
 | 5. 單一元件進入量產 | 供應商確認能穩定製造、出貨或提高產量 | Astera Labs 宣稱連接產品增產；Micron 宣稱 9650 大量生產 | 出貨產品、期間、客戶資格與裝入系統的分母 | 一顆元件量產不等於同一路徑的其他元件或軟體已準備完成 |
 | 6. 完整平台進入客戶部署 | 具名客戶用完整組合持續運作，交代規模、期間與利用結果 | 本輪沒有完整主機、交換器、訊號元件與終端的具名生產系統 | 客戶平台、元件表、軟硬體版本、部署數、期間與可重現運行結果 | 參考架構、未具名驗證或元件出貨不等於生產環境已部署 |
 
@@ -1248,7 +1252,7 @@ SE／t；它不是產品實測、PCI-SIG pass criterion 或公司比較。PCI-SI
 
 ## 8 月 12 日複核：考場已開，最高速度公開列名當時仍未見
 
-**公開清單只證明它寫出的條件。** 本輪完整頁面捕捉仍把 Cadence、Synopsys、Credo 與
+**公開清單只證明它寫出的條件。** 當時完整頁面捕捉仍把 Cadence、Synopsys、Credo 與
 Astera 等功能名稱含 Gen6 或 64GT/s 的產品列在 PCIe 5.0 at 32GT/s，沒有捕捉到
 Spec Revision 為 PCIe 6.x at 64GT/s 的列。[S2]
 
@@ -1261,7 +1265,7 @@ Product Listing Request Form；表單可在工作坊後任何時間送出，沒�
 
 ## 8 月 24 日監測複核：最高速列名出現，但只前進一個時鐘
 
-**可證實：** PCI-SIG live list 目前有 19 筆 `PCIe 6.x at 64GT/s` 列項，依公開產品角色分為
+**當時保存的結果：** 8/24 的 PCI-SIG live list 紀錄有 19 筆 `PCIe 6.x at 64GT/s` 列項，依公開產品角色分為
 10 筆 CEM add-in card、3 筆 retimer、4 筆 switch／bridge 與 2 筆 system；這是捕捉日清單的完整
 列數，不是抽樣，也不是 19 套 production system。[S18]
 
@@ -1277,8 +1281,8 @@ Samsung、Astera、Credo、Broadcom、群聯等不同列自動接成同一客戶
 
 | 本文六類角色 | 它負責什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |
 |---|---|---|---|---|
-| 1. 規格與正式測試組織 | 維護共同規則、測試程序、工作坊與公開清單 | PCI-SIG | 工作坊可測到 64 GT/s，現行清單可核對 19 列的產品、角色、版本與速度 | 公開列名不等於逐項原始測試已公開、量產或部署 |
-| 2. 主機、控制器與平台 | 發起連線，整合處理器、主機控制、韌體、驅動與板路 | Micron 公告提到 NVIDIA BlueField-4 STX 參考架構 | 只確認一條具名參考架構路徑，沒有完整客戶部署結果 | 被終端供應商提及不等於主機平台已完成正式最高速測試 |
+| 1. 規格與正式測試組織 | 維護共同規則、測試程序、工作坊與公開清單 | PCI-SIG | 工作坊可測到 64 GT/s；10/12 清單捕捉 21 列 [S20] | 公開列名不等於逐項原始測試已公開、量產或部署 |
+| 2. 主機、控制器與平台 | 發起連線，整合處理器、主機控制、韌體、驅動與板路 | AMD EPYC 9006 系統角色列項；另有 BlueField-4 STX 參考架構 | AMD 列項界定 64 GT/s、x16，沒有公開受測板／韌體與完整客戶配置 [S20] | 系統角色列名與參考架構都不等於客戶平台驗收或部署 |
 | 3. 連接與訊號元件 | 提供訊號重整器、交換器、速率轉換器與主動電纜 | Astera Labs PCIe 6 連接產品組合；群聯 PS7161 linear redriver | Astera 有公司增產主張與部分 64 GT/s 列項；PS7161 有具名列項 | 個別列名不等於完整 host-to-endpoint 拓撲已互通或部署 |
 | 4. 終端與儲存裝置 | 接收資料並完成儲存、網路或運算工作 | Micron 9650 資料中心固態硬碟；群聯 PS5303 SSD controller | Micron 9650 有公司量產聲明與 64 GT/s 列項；PS5303 有具名列項 | 終端或控制器列名／量產不等於完整路徑已互通或部署 |
 | 5. 系統整合、雲端客戶與營運者 | 組合所有位置，完成驗收、上線、監控與實際工作 | Astera Labs 提到未具名人工智慧與雲端客戶 | 只確認公司自述的客戶驗證，沒有客戶名、平台矩陣與部署分母 | 未具名客戶驗證不等於正式生產系統、訂單或利用率 |
@@ -1293,7 +1297,7 @@ Samsung、Astera、Credo、Broadcom、群聯等不同列自動接成同一客戶
 |---|---|---|---|---|
 | 1. 完整連線的位置與責任可辨認 | 主機、板路、必要訊號元件、交換器、終端與軟體都有具名角色 | 本輪來源分別出現連接產品、儲存終端與參考架構，但不在同一公開配置 | 同一測試中的產品表、接線圖與每個位置的負責者 | 不同新聞各有一個產品，不等於它們在同一系統裡工作 |
 | 2. 測試合約寫完整 | 規格版本、速度、通道、拓撲、軟硬體版本、四類 compliance、interop 與通過條件可重現 | Compliance Program 定義 Electrical、Configuration、Link Protocol、Transaction Protocol 及跨廠測試；工作坊給出最高速度 | 具名 64 GT/s 組合在各必要 test area 的版本、錯誤情境、結果與重現方法 | 只有活動名稱、最高速度、單一測項或單一截圖不等於完整測試 |
-| 3. 具名產品在目標速度正式通過 | 標準組織把產品、功能、規格版本、必要測項與 64 GT/s 結果連在一起 | 本輪捕捉到 19 筆具名 64 GT/s 列項，但公開頁沒有逐項原始結果、全部必要測項與 interop 分母 | 每筆列項的受測角色、connector 邊界、四類測項、互通對手與可重現結果 | 公開列名不能替未公開測項、完整跨廠拓撲或客戶部署背書 |
+| 3. 具名產品在目標速度正式通過 | 標準組織把產品、功能、規格版本、必要測項與 64 GT/s 結果連在一起 | 10/12 捕捉到 21 筆具名 64 GT/s 列項，但公開頁沒有逐項原始結果、全部必要測項與 interop 分母 [S20] | 每筆列項的受測角色、connector 邊界、四類測項、互通對手與可重現結果 | 公開列名不能替未公開測項、完整跨廠拓撲或客戶部署背書 |
 | 4. 不同廠商的完整路徑互通 | 至少兩家獨立供應商的主機、訊號元件、交換器與終端，在共同軟體下重現正常與錯誤結果 | Astera Labs 有實驗室與客戶驗證主張，但沒有完整參與者與測試矩陣 | 廠商組合、拓撲、速度、通道、韌體、錯誤注入、期間與重現方法 | 單廠端到端展示或未具名客戶驗證不等於跨廠通過 |
 | 5. 具名客戶的完整平台穩定部署 | 客戶把同一組合放進生產環境，交代部署量、期間、工作負載、故障與利用率 | 只有元件增產、固態硬碟大量生產與參考架構，沒有完整客戶生產系統 | 客戶平台、元件與版本表、驗收結果、部署分母及實際運行指標 | 元件量產、參考架構或客戶驗證不等於生產環境已上線 |
 | 6. 台灣公司財務足跡可雙向核對 | 平台或客戶文件與公司文件對上同一產品、測試、資格、出貨、期間與財務分母 | 8299 已對上 PS7161／PS5303 的官方列名；客戶、出貨與財務尚未對上 | 群聯與客戶雙向公布具名導入、訂單或出貨，以及營收、毛利或利用率的可辨識貢獻 | 產品列名、技術能力、會員或一般人工智慧伺服器收入不等於本題受惠 |
@@ -1316,7 +1320,7 @@ PAM4 channel、材料、板層設計、訊號完整性與量產良率。
 ## 來源與證據邊界
 
 - [PCI-SIG 第 140 次相容性工作坊](https://pcisig.com/events/pci-sig-compliance-workshop-140)（64 GT/s 與訊號重整器正式測試選項）。
-- [PCI-SIG 合格產品清單](https://pcisig.com/developers/integrators-list)（動態列表，本輪再捕捉至 2026-08-12）。
+- [PCI-SIG 合格產品清單](https://pcisig.com/developers/integrators-list)（動態列表，最新捕捉 2026-10-12；歷史捕捉另留原紀錄）。
 - [Astera Labs 第六代 PCIe 連接產品增產公告](https://ir.asteralabs.com/news-releases/news-release-details/astera-labs-ramps-production-pcie-6-connectivity-portfolio)（公司客戶驗證與量產主張）。
 - [Micron 9650 第六代 PCIe 固態硬碟](https://investors.micron.com/news-releases/news-release-details/micron-high-volume-production-hbm4-designed-nvidia-vera-rubin)（終端大量生產與參考架構）。
 - [PCI Express 基礎規格索引](https://pcisig.com/specification-overview/pci-express-base)（規格版本入口）。
@@ -1449,4 +1453,80 @@ from: triaged
 to: triaged
 reason: editorial_summary_aligned_with_existing_c25_64gtps_listing_no_evidence_clock_change
 evidence: editorial:summary_sync_c25
+-->
+
+## 10 月 12 日更新 AMD 系統角色列名仍不是整套部署
+
+**證實：** 最新完整 PCIe 6.x 區段有 21 列：系統 3、擴充卡 11、retimer 3、switch／bridge 4。
+AMD EPYC 9006 被放在帶 CEM 插槽的系統類別，列示 64 GT/s、x16，列名日期為 10/5；
+識別碼與功能兩個欄位留白。[S20]
+
+**推論：** 主機端多了一個具名查證入口，但不是所有 EPYC 9006 型號、主機板及韌體都取得
+同一結果，更不是它已和清單中的 SSD、retimer、switch 組成客戶上線的伺服器。[S9][S20]
+對新手而言，這就像多拿到一張有姓名的成績單；還要知道考的是哪一份試卷，才知道能拿來回答什麼。
+
+**計數界線：** 21 是這次公開頁的列數，不是 21 個獨立產品或部署樣本。8/24 的 19 列紀錄
+保持原樣；目前另可見 Samsung 1763 E3 的列名日期是 8/13。沒有舊頁完整原始內容可重新
+核對，因此不能把 21 減 19 寫成「10 月新增兩個產品」，也不能倒寫 Samsung 當時已被看到。[S18][S20]
+
+**待驗證與下一步：** 10/19 工作回查先追 AMD 列項的受測板、韌體、必要測項、互通對手及
+實際測試日期；若先公開完整結果則提前。接著才追同一跨廠配置的客戶驗收、運行期間與財務。
+若結果只涵蓋較窄配置，應縮小映射；若列項撤回，應新增修正，不把舊記錄抹除。
+
+<!-- research_source
+source_id: S20
+role: standard
+source_kind: living_index
+publisher: PCI-SIG
+title: PCI-SIG Integrators List PCIe 6.x complete section captured 2026-10-12
+published_at:
+captured_at: 2026-10-12
+accepted_at: 2026-10-12
+status: active
+url: https://pcisig.com/developers/integrators-list
+locator: 完整 PCI Express 6.x 區段逐列核對，Systems with CEM Slot(s) 3列、CEM Add-in Cards 11列、Components Retimers 3列、Components Switches/Bridges 4列；AMD EPYC 9006 Series Processors 在System類別，PCIe 6.x at 64GT/s、x16、Date Added Oct 5 2026，Identifier與Function空白；Samsung 1763 E3列Date Added Aug 13 2026
+limitation: 以公開web文字完整區段兩條獨立人工計數路徑交叉核對，非本地DOM或不可變payload；系統直接取件HTTP403，沒有原始HTML SHA。捕捉日不是發布日或測試日；21是當次可見列數而非獨立產品、供應商或客戶分母，舊19列原始payload未重建，不能推算本月新增兩產品。缺逐項測試、互通對手、受測板及韌體、客戶部署和財務
+independence_group: pci-sig
+-->
+
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: 2026-10-12公開PCI-SIG清單的PCIe6.x區段有21列64GT/s結果，分為System 3、AIC 11、retimer 3及switch/bridge 4；AMD EPYC 9006 Series Processors位於System類別，x16、Date Added 2026-10-05，Identifier及Function空白
+supporting_source_ids: S20
+contrary_source_ids:
+as_of: 2026-10-12
+basis: 同一次web文字完整6.x區段逐列核對；第二代理獨立重數3+11+3+4=21，與第一條計數一致。這是可見列數的精確盤點，沒有抽樣SE/t；系統直接取件403而不聲稱已保存原始HTML
+boundary: 只支持捕捉時可見欄位；Date Added不是測試日或出貨日，System分類不是所有CPU型號與客戶配置認證，重複產品或不同lane可分列，不能推成獨立產品數、市占、部署或台灣公司受惠
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: inference
+status: active
+claim: AMD具名System列名增加主機端的查證入口，但尚不能把不同公司的公開列項接成同一可重建production topology；當前21與歷史19的差額也不能等同本月新產品數
+supporting_source_ids: S9,S18,S20
+contrary_source_ids:
+as_of: 2026-10-12
+basis: S20提供AMD受測角色、revision、lane和列名日期，但板、韌體與互通矩陣未公開；當前Samsung1763 E3標示8/13，S18歷史捕捉原始payload未能重建，因此不能把計數差異全部歸因於10月
+boundary: 不否認已有列名，也不以公開資訊不足判定產品失敗；只拒絕把單列擴張到全家族、跨廠部署與財務，C25主命題與原evidence clock不變
+verification_needed: 同一AMD受測配置公開板與韌體、測試日期、必要測項、互通對手及客戶驗收，另取得可回放的歷史與當前清單以區分新增列、回補和捕捉差異
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- transition
+date: 2026-10-12
+from: triaged
+to: triaged
+reason: append_amd_system_listing_and_current_21_row_capture_without_rewriting_historical_19_or_advancing_deployment_clock
+evidence: sources:S20
 -->

@@ -5,7 +5,7 @@ schema_version: 1
 graph_id: pcie6-compliance-ladder
 root_node_id: concept:pcie6-deployment-readiness
 label: PCIe 6 高速連線的測試與部署階梯
-summary: 先把 PAM4 Flit 錯誤控制與四類正式測試放在鏈路正確性軸，再綁定受測物件 角色 CEM connector 邊界 列名程序及零錯誤暴露護照；2026-08-24 已有 19 筆 64 GT/s 公開列名與群聯兩項具名產品，但完整跨廠 topology、production fleet 與財務仍是不同時鐘。
+summary: 先把鏈路正確性與商業落地分開；2026-10-12清單捕捉21筆64GT/s列項及AMD EPYC 9006系統角色，8/24的19列紀錄保留。公開列名仍不等於完整跨廠拓撲、客戶部署或財務，群聯原資格線不隨AMD新列名升級。
 article_ids: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER
 status: active
 -->
@@ -85,7 +85,7 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-08-24
 review_due: 2026-08-31
-status: active
+status: retired
 boundary: 2026-08-24 清單已有 19 筆 PCIe 6.x 64 GT/s 列項；這只前進官方列名時鐘，不把不同列拼成同一 platform，也不等於客戶部署或財務。
 next_trigger: 每列補齊測試日 送表日 列名日 必要測項 interop 對手與 production platform。
 -->
@@ -648,4 +648,44 @@ review_due: 2026-09-30
 status: active
 boundary: 第141場只列5.0產品及retimer測試 不能把活動序號當作世代或客戶平台驗收的進度；這不撤回第140場歷史 64GT/s既有列項或改變公司曝險。
 next_trigger: 追活動自己的正式測試範圍與後續列名 並另取得同一6.x平台版本的資格與部署結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCIE6-I30
+view: industry
+from_id: concept:pcie6-deployment-readiness
+to_id: stage:integrators-listing
+relation: passes_through
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C27
+note_refs:
+evidence_state: verified
+commercial_stage: platform_listing
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-12
+review_due: 2026-10-19
+status: active
+boundary: 本輪公開清單21列是3系統11擴充卡3retimer4switch/bridge的可見列數，不是獨立產品或客戶數；歷史19列未重建，不能將差2當作本月新增，也不能將AMD系統角色擴成完整跨廠部署。
+next_trigger: 新列名補齊受測物件 版本 必要測試 原始結果 interop對手 測試及送表日期，再另追同一客戶部署。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-PCIE6-C04
+view: company
+from_id: company:amd
+to_id: concept:pcie6-deployment-readiness
+relation: reaches_stage
+claim_refs: MI-2026-08-03-PCIE6-COMPLIANCE-LADDER#C27
+note_refs:
+evidence_state: verified
+commercial_stage: platform_listing
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-12
+review_due: 2026-10-19
+status: active
+boundary: AMD EPYC 9006在帶CEM插槽的System類別列64GT/s x16及10/5列名日，Identifier與Function空白；只到該公開受測角色，不代表全CPU家族 每張主板 所有韌體或Helios部署，亦無收入或台股財務橋接。
+next_trigger: AMD與測試方公開同一板 韌體 版本 互通對手及客戶配置，再核對驗收 出貨與財務；列名撤回或邊界縮窄時追加修正。
 -->

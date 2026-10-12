@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-10-11
+next_review: 2026-10-15
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -85,7 +85,7 @@ why_now: Samsung Electro-Mechanics9/10展稿新增玻璃核心與導孔加工展
 knowledge_gain: 只有新客戶或製造共同鍵才會超越既有玻璃角色地圖；公司展稿與材料供應商用途說明不是互相替客戶資格背書。
 first_rejection: 若仍只有展品或單站加工能力，未有同一封裝產品的客戶資格及量產结果，就不另立文章或將carrier出貨算成glass-core採用。
 next_evidence: 取得同一glass-core封裝產品與版本的客戶資格及製造結果，逐項分開carrier與interposer角色，核對連續批次良率及量產時間而非展會日期。
-next_check: 2026-10-11
+next_check: 2026-10-19
 route: watch_only
 article_topic_id:
 graph_id:
@@ -139,3 +139,20 @@ SSCB與HBFSim本輪未重查，保留10/15節點。三題凍結排序、第一�
 本輪可發布增量來自既有PLP到期追蹤：補齊SEMI後繼文件／CER，更新原文章與圖譜，不新增
 重複候選。光寶10/9美國建廠契約公告另路由到2301正式筆記複核；只是工程承諾，不是客戶訂單，
 不得把它與Microsoft Pecos場址或其他公司的AI機房計畫拼接。
+
+## 10月12日到期回查與旁支發現
+
+玻璃核心維持順位3／medium／watch。SKC索引直取成功，最新可見9/22；重讀其
+[同日公告](https://www.skc.kr/m/eng/Conmmunication/newsroom/newsDetail.do?gubun=006005&seq=1746)，
+embedding初步評估後進可靠度測試，nonembedding則準備年底前概念驗證，與10/4已讀範圍
+相同。Absolics用途宣傳沒有同一客戶／版本／連續批次良率。Samsung新聞列表未完整取得，
+不宣稱全產業沒有新消息。10/19再找客戶資格、製造與交付共同鍵；原選題理由和第一拒絕不變。
+
+SSCB與HBFSim本輪未重新裁決，仍保留順位1、2及10/15節點。兩個800V既有monitor共用
+OCP附件缺口，不能當成SSCB具名故障测试已完成；NVIDIA公開白皮書示意也不是客戶驗收。
+
+既有PCIe文章已接續本次完整名單捕捉，沒有另建重複候選。另讀到
+[Astera 10/8 Aries 7公告](https://ir.asteralabs.com/news-releases/news-release-details/astera-labs-announces-aries-7-industrys-first-pcie-7-signal)：
+Q4 2026是對選定客戶的預計送樣，銅／光連接產品組合不等於已量產或已具名部署。這只是
+下一輪初查線索，尚未升為新凍結候選或改動三題排名；10/16先查OCP10/12–15具名展示及
+產品測試，再追實際送樣與qualification。不得從合作或展示新增台灣公司收入線。

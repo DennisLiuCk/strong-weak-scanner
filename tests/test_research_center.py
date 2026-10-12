@@ -5846,8 +5846,10 @@ process.stdout.write(JSON.stringify(results));
             "### 三句話抓重點", 1
         )[0]
         self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 66
+            sum(line.startswith("- **") for line in glossary.splitlines()), 68
         )
+        self.assertIn("**EPYC**", glossary)
+        self.assertIn("**清單欄位（Date Added／Identifier／Function）**", glossary)
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
@@ -5863,8 +5865,8 @@ process.stdout.write(JSON.stringify(results));
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 19),
-            ("research_claim", 26), ("metric_comparison", 0),
+            ("research_topic", 1), ("research_source", 20),
+            ("research_claim", 28), ("metric_comparison", 0),
             ("impact", 4), ("monitoring_item", 9),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
@@ -5946,7 +5948,7 @@ process.stdout.write(JSON.stringify(results));
             "edge_id: KG-PCIE6-C03", "from_id: company:8299",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 32)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 34)
 
     def test_compute_connect_station_eight_separates_package_positions_test_dimensions_and_ecosystem_gates(self):
         topic = (

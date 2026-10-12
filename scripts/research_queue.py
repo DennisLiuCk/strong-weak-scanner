@@ -429,8 +429,26 @@ def _analyse_v3_contract(text, meta, errors, warnings, as_of):
             f"schema v3 至少需要 {minimum_active_sources} 個 active research_source")
     active_urls = [source.get("url") for source in active_sources if source.get("url")]
     active_url_keys = [_canonical_source_url(url) for url in active_urls]
-    if len(active_url_keys) != len(set(active_url_keys)):
-        errors.append("schema v3 active research_source 不可重複使用同一 URL")
+    captures_by_url = defaultdict(list)
+    for source in active_sources:
+        if source.get("url"):
+            captures_by_url[_canonical_source_url(source["url"])].append(source)
+    for captures in captures_by_url.values():
+        if len(captures) < 2:
+            continue
+        # A living index may be observed again; it remains ONE source group/URL.
+        # Require distinct observation dates and locators, not cosmetic URL copies.
+        groups = {s.get("independence_group", "").strip().lower() for s in captures}
+        repeated_capture = (
+            all(s.get("source_kind") == "living_index" for s in captures)
+            and all(_valid_date(s.get("captured_at")) for s in captures)
+            and len({s.get("captured_at") for s in captures}) == len(captures)
+            and len({s.get("locator", "").strip() for s in captures}) == len(captures)
+            and len(groups) == 1 and "" not in groups
+        )
+        if not repeated_capture:
+            errors.append("schema v3 active research_source 不可重複使用同一 URL；"
+                          "living_index 僅允許不同捕捉日及 locator、相同明確 independence_group")
     if len(set(active_url_keys)) < minimum_active_sources:
         errors.append(
             f"schema v3 至少需要 {minimum_active_sources} 個不同 URL 的 active research_source")
@@ -544,9 +562,14 @@ def _analyse_v3_contract(text, meta, errors, warnings, as_of):
         if (source_by_id.get(source_id) or {}).get("status") == "active"
     }
     minimum_claim_sources = 1 if is_closed else 2
-    if len(active_claim_source_ids) < minimum_claim_sources:
+    active_claim_url_keys = {
+        _canonical_source_url(source_by_id[source_id]["url"])
+        for source_id in active_claim_source_ids if source_by_id[source_id].get("url")
+    }
+    if len(active_claim_url_keys) < minimum_claim_sources:
         errors.append(
-            f"schema v3 至少需要 {minimum_claim_sources} 個被 active claim 實際引用的來源")
+            f"schema v3 至少需要 {minimum_claim_sources} 個被 active claim 實際引用的來源"
+            "（按不同 URL 計，不重複計捕捉）")
     thesis_claim_id = meta.get("thesis_claim_id")
     if thesis_claim_id not in claim_by_id:
         errors.append(f"schema v3 thesis_claim_id 找不到:{thesis_claim_id or '-'}")

@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+import re
 import unittest
 from datetime import date
 from pathlib import Path
@@ -515,6 +516,49 @@ class ResearchTopicSchemaV3ContractTest(unittest.TestCase):
         )
         self.assert_error_contains(
             self.analyse(dated_index), "living_index 的 published_at 必須留空")
+
+    def test_living_index_recaptures_keep_identity_and_independence(self):
+        text = topic_text_v3().replace(
+            "locator: 公司季報與重大訊息入口", "independence_group: exchange\nlocator: 公司季報與重大訊息入口")
+        capture = _contract_block("research_source", [
+            ("source_id", "S10"), ("role", "exchange"), ("source_kind", "living_index"),
+            ("publisher", "公開資訊站"), ("title", "第二次觀察"), ("published_at", ""),
+            ("captured_at", "2026-07-28"), ("accepted_at", "2026-07-28"),
+            ("status", "active"), ("url", "https://exchange.example.net/search"),
+            ("locator", "7/28具名申報列"), ("limitation", "不是独立來源或新訂單"),
+            ("independence_group", "exchange"),
+        ])
+        info = self.analyse(text + capture)
+        self.assertFalse(info["quality_invalid"], info["quality_errors"])
+        self.assertEqual(rq.audit_topic_history(text, text + capture), [])
+        sources = {s["source_id"]: s for s in info["sources"]}
+        self.assertEqual(rq._source_independence_key(sources["S9"]),
+                         rq._source_independence_key(sources["S10"]))
+        for bad in (
+            capture.replace("captured_at: 2026-07-28", "captured_at: 2026-07-27"),
+            capture.replace("7/28具名申報列", "公司季報與重大訊息入口"),
+            capture.replace("independence_group: exchange", "independence_group: other"),
+            capture.replace("independence_group: exchange", "independence_group:"),
+            capture.replace("source_kind: living_index", "source_kind: document"),
+        ):
+            self.assert_error_contains(self.analyse(text + bad), "不可重複使用同一 URL")
+
+        # A spare, unreferenced URL must not let two captures count as two
+        # sources actually used by claims. All dates/locators remain valid.
+        def recapture(match):
+            block = match.group(0)
+            if "source_id: S1\n" not in block and "source_id: S2\n" not in block:
+                return block
+            block = block.replace("publisher:", "source_kind: living_index\nindependence_group: platform\npublisher:", 1)
+            block = re.sub(r"published_at: [0-9-]+", "published_at:", block)
+            if "source_id: S1\n" in block:
+                block = block.replace("captured_at: 2026-07-27", "captured_at: 2026-07-26")
+            return block.replace("https://competitor.example.org/release", "https://ir.example.com/news")
+
+        one_url = re.sub(r"<!-- research_source\s*\n.*?-->", recapture, topic_text_v3(), flags=re.S)
+        info = self.analyse(one_url)
+        self.assertEqual(len(info["quality_errors"]), 1, info["quality_errors"])
+        self.assert_error_contains(info, "按不同 URL 計，不重複計捕捉")
 
     def test_historical_dates_cannot_be_in_the_future(self):
         cases = [
