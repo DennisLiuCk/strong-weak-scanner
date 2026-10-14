@@ -20,7 +20,9 @@ from __future__ import annotations
 
 import argparse
 import csv
+import copy
 import datetime as dt
+import hashlib
 import json
 import os
 import sys
@@ -110,6 +112,14 @@ def fetch_json(url: str, timeout: float = 30.0) -> list[dict]:
     return payload
 
 
+def canonical_row_sha256(row: dict) -> str:
+    """Hash parsed field values, NOT the original HTTP response bytes."""
+    canonical = json.dumps(
+        row, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
 def compute_census(
     universe_ids: set[str],
     announcements_by_market: dict[str, list[dict]],
@@ -170,6 +180,9 @@ def compute_census(
                     "stockId": stock_id,
                     "speechDate": speech.isoformat(),
                     "outputDate": output_date.isoformat(),
+                    "sourceUrl": ENDPOINTS[f"{market}_announcements"],
+                    "sourceRowSha256": canonical_row_sha256(row),
+                    "sourceRow": copy.deepcopy(row),
                 })
 
     def quarterly_ids(rows: list[dict]) -> set[str]:
@@ -237,6 +250,13 @@ def compute_census(
             "stockIds": sorted({row["stockId"] for row in announcement_rows}),
             "speechDates": speech_dates,
             "sourceRowsByMarket": market_source_rows,
+            "matchedRows": announcement_rows,
+            "rowEvidenceBoundary": (
+                "保留每個命中列的解析後原始欄位與 canonical JSON SHA256；"
+                "不是 HTTP 原始位元組雜湊，也不是不可竄改簽章。"
+                "同公司同日不同公告及重複列均不合併，列數不等於獨立事件。"
+                "這不是全端點歷史封存，不能補回未觀測日期或替代附件驗證。"
+            ),
         },
         "quarterlyGrid": {
             "year": quarter_year,

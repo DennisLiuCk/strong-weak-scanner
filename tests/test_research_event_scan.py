@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
+import hashlib
+import json
 import sys
 import tempfile
 import unittest
@@ -34,6 +36,45 @@ def quarter_row(code, *, tpex=False, year="115", quarter="2"):
 
 
 class ResearchEventScanTest(unittest.TestCase):
+    def test_matched_rows_preserve_source_fields_and_separate_announcements(self):
+        first = dict(announcement("1111"), **{"主旨 ": "預付款", "說明": "甲\r\n乙"})
+        second = dict(first, **{"主旨 ": "取消保證"})
+        payload = res.compute_census(
+            {"1111"}, {"twse": [first, second, first],
+                       "tpex": [announcement("9999", tpex=True)]}, [], [],
+            window_start=dt.date(2026, 8, 6), window_end=dt.date(2026, 8, 7),
+            quarter_year="115", quarter="2",
+        )
+        rows = payload["announcements"]["matchedRows"]
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(rows[0]["sourceRow"], first)
+        self.assertEqual(rows[0]["sourceRowSha256"], rows[2]["sourceRowSha256"])
+        self.assertNotEqual(rows[0]["sourceRowSha256"], rows[1]["sourceRowSha256"])
+        self.assertEqual(rows[0]["sourceUrl"], res.ENDPOINTS["twse_announcements"])
+        expected = hashlib.sha256(json.dumps(
+            first, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8")).hexdigest()
+        self.assertEqual(rows[0]["sourceRowSha256"], expected)
+        self.assertFalse(payload["coverage"]["complete"])
+        first["說明"] = "later mutation"
+        self.assertEqual(rows[0]["sourceRow"]["說明"], "甲\r\n乙")
+
+    def test_row_hash_ignores_key_order_but_not_content_or_line_endings(self):
+        self.assertEqual(res.canonical_row_sha256({"b": 2, "a": 1}),
+                         res.canonical_row_sha256({"a": 1, "b": 2}))
+        self.assertNotEqual(res.canonical_row_sha256({"說明": "甲\r\n乙"}),
+                            res.canonical_row_sha256({"說明": "甲\n乙"}))
+
+    def test_matched_rows_exclude_outside_window_and_universe(self):
+        payload = res.compute_census(
+            {"1111"}, {"twse": [announcement("1111", speech="1150805")],
+                       "tpex": [announcement("9999", tpex=True)]}, [], [],
+            window_start=dt.date(2026, 8, 6), window_end=dt.date(2026, 8, 7),
+            quarter_year="115", quarter="2",
+        )
+        self.assertEqual(payload["announcements"]["matchedRows"], [])
+        self.assertEqual(payload["announcements"]["rowsInUniverseWindow"], 0)
+
     def census_dates(self, twse, tpex, start="2026-09-07", end="2026-09-08"):
         return res.compute_census(
             {"1111"},

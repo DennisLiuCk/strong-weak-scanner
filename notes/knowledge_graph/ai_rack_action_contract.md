@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: ai-rack-action-contract
 root_node_id: concept:ai-rack-action-contract
 label: AI 機櫃控制契約
-summary: 從穩定身分與具語意 telemetry 走到 request owner、安全裁決、隔離狀態及維修結果，拆開資料點存在與營運閉環的差距。
+summary: 從設備身分與訊息送達走到安全裁決、實體隔離及維修結果；本地通訊延遲不等於設備到位時間，也不證明營運閉環。
 article_ids: MI-2026-08-07-AI-RACK-ACTION-CONTRACT
 status: active
 -->
@@ -32,6 +32,26 @@ review_due: 2026-08-31
 status: active
 boundary: NVIDIA 公開 DSX BMS Event Bus 與 integration guidance，只證明平台契約；不證明 production site、跨平台互通、field outcome、排他供應或台灣公司財務曝險。
 next_trigger: 具名 production site 公布 DSX commissioning、故障注入、隔離與復原結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-RAC-I20
+view: industry
+from_id: concept:ai-rack-action-contract
+to_id: metric:dsx-message-delivery-latency
+relation: measured_by
+claim_refs: MI-2026-08-07-AI-RACK-ACTION-CONTRACT#C19
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-14
+review_due: 2026-11-14
+status: active
+boundary: 官方本地測試定義發布至代理確認及訂閱端收件，不是實測數值、產品承諾或閥門電力設備到位時間；不支持具名部署、供貨及財務歸因。
+next_trigger: 同版本運行結果公開訊息、控制決策、物理隔離、獨立感測與復原的共同事件時間線。
 -->
 
 <!-- knowledge_edge

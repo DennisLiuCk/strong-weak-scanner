@@ -1884,9 +1884,9 @@ class ResearchCenterTest(unittest.TestCase):
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 14),
-            ("research_claim", 18), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 5),
+            ("research_topic", 1), ("research_source", 15),
+            ("research_claim", 19), ("metric_comparison", 0),
+            ("impact", 3), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
@@ -1902,7 +1902,7 @@ class ResearchCenterTest(unittest.TestCase):
         graph = (
             ROOT / "notes" / "knowledge_graph" / "ai_rack_action_contract.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+        self.assertEqual(graph.count("<!-- knowledge_edge"), 21)
         for contract in (
             "edge_id: KG-RAC-I17",
             "to_id: process:safe-state-deadline-passport",

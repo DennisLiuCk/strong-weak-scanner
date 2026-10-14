@@ -83,6 +83,14 @@ reason: added_redfish_125_temporary_unavailability_contract_without_refreshing_e
 evidence: sources:S14
 -->
 
+<!-- transition
+date: 2026-10-14
+from: triaged
+to: triaged
+reason: separated_dsx_local_message_benchmark_endpoints_from_physical_isolation_without_thesis_clock_refresh
+evidence: sources:S15
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -147,12 +155,17 @@ evidence: sources:S14
 - **Redfish**：DMTF 制定的通用設備管理介面標準；產品支援 Redfish，不等於已實作 DSX 的隔離流程。
 - **規格（specification）**：描述協定或產品應如何運作的規範文件；規格的要求與產品實際測試結果是兩種不同證據。
 - **附錄（annex）**：正文後的補充章節；本次引用的 Annex A 是版本修訂紀錄，用來定位哪一版增加了暫時離線規則。
+- **訊息代理（broker）**：接收並轉送訊息的軟體。它確認收到訊息，不表示現場設備已執行動作。
+- **訂閱端（subscriber）**：接收指定主題訊息的程式；收到隔離訊息與完成實體隔離是不同終點。
+- **MQTT**：依主題發布及訂閱訊息的通訊協定；傳遞功能通過不代表設備安全動作已通過。
+- **Kind 本地環境**：在本機容器中運行 Kubernetes 的測試環境；結果會受本機資源限制，不是量產機房驗收。
+- **效能基準測試（benchmark）**：在固定環境與工作負載下量測表現；比較前先核對計時起點、終點、配置與錯誤。
 
 ### 三句話抓重點
 
 - 機櫃收到溫度、功率或漏液資料後，不能立刻切電；系統要先確認資料屬於哪一座機櫃、何時量到，以及讀數是否可靠。
 - 外部監控系統可以提出隔離請求，但建築管理系統仍要檢查安全限制，才決定是否執行；告警、請求與真正命令是三件不同的事。
-- DSX 已把設備身分、感測資料、隔離請求與狀態寫進契約；Redfish 又把「接受非同步工作」與「工作完成」分開，但兩者都不能單獨證明設備真的隔離、服務已恢復或台灣供應商已有收入。
+- DSX 的訊息測試量到「收到訊息」，Redfish 的任務狀態量到「軟體工作結果」；設備真正隔離、服務恢復與公司收入，都還要各自的證據。[S15]
 
 ### 為什麼重要
 
@@ -176,6 +189,7 @@ evidence: sources:S14
 - 先追一個隔離請求的共同關聯編號：是否收到、接受或拒絕，建立哪個 Task、多久完成，以及重送時有沒有重複動作。
 - 再核對命令狀態與實際觀測狀態：電力是否真的斷開、泵浦或冷卻單元是否到達目標模式、獨立感測是否支持同一結果。
 - 查看 OpenRMC／Redfish 是否有具名 profile 與版本化測試報告，並分清 protocol、schema 與 interoperability validator 各自測了什麼。
+- 看到端到端延遲時，先找計時終點是代理確認、訂閱端收件還是設備實際到位，再核對本地配置與錯誤紀錄。
 - 最後找具名量產場域的故障注入、跨電力／液冷 sequence、復原與維修紀錄，再由客戶和台灣公司一手申報交叉確認責任、部署量與財務貢獻。
 
 ### 想一想
@@ -183,6 +197,7 @@ evidence: sources:S14
 - 溫度與漏液警報都出現時，若監控畫面和設備控制系統使用不同的機櫃編號，系統要怎麼確定該隔離哪一座？
 - 告警只是提醒、請求可以被拒絕、命令才會驅動設備；誰負責攔下危險請求，失聯時又由誰讓設備回到安全狀態？
 - 一項非同步任務顯示完成後，要再看哪些獨立讀值，才能證明電力或冷卻設備真的到達安全狀態？
+- 如果訊息很快送到控制程式，但閥門卡住，哪一段量測會發現這個差異？
 - 一份公開介面規格，能不能直接證明不同廠牌已互通，或台灣機櫃供應商已因此取得收入？
 
 ## 主張與證據帳本
@@ -721,6 +736,53 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_source
+source_id: S15
+role: company_release
+source_kind: living_index
+publisher: NVIDIA
+title: DSX Exchange Validation
+published_at:
+captured_at: 2026-10-14
+accepted_at: 2026-10-14
+status: active
+url: https://docs.nvidia.com/dsx-exchange/validated-capabilities
+locator: 10/14實讀Functional Validation、Local Benchmark Tooling及Reported Metrics全文；本地Kind範圍及publish／end-to-end latency兩種終點
+limitation: 無獨立發布日或文件版號，不能借用BMS 1.0.0；頁面列測法與指標而非具名產品實測值或機房驗收，動態內容日後可能改變
+independence_group: nvidia-dsx
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: NVIDIA將此頁功能測試限於本地Kind環境的訊息、故障切換與權限行為；本地效能測試描述當次部署觀察而不定義產品目標。發布延遲量到broker確認，端到端延遲量到subscriber收件
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-10-14
+basis: Functional Validation明示local Kind；Local Benchmark Tooling明示非產品目標；Reported Metrics逐項定義量測終點
+boundary: 只證實文件規定的測試範圍，沒有實測延遲、閥門或斷路器動作、現場復原與維修簽核，不支持公司供貨或財務結果
+verification_needed: 同版本運行資料及同一事件的訊息接收與獨立物理確認時間線
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 2026-10-14 更新：訊息送達與設備到位是不同終點
+
+**先問時鐘停在哪裡。** 寄件系統顯示「已送達」，不能證明收件人已完成工作。
+DSX 的公開測試也有這個差別：發布延遲在訊息代理確認時停止，端到端延遲在訂閱端
+收到訊息時停止。兩者都沒有直接量到閥門關閉或電力隔離。[S15，C19]
+
+**再問在哪裡測。** 這份文件談本地 Kind 環境。測到的當次表現不是產品承諾值，
+不能直接拿來填量產機房的安全期限。要評估現場隔離，仍須把同一事件的收件、
+控制決策、實體動作與獨立感測串起來；即使收件很快，設備卡住仍可能錯過期限。
+
+讀者下一步可以拿一份測試報告，圈出「起點、終點、環境」三欄：報告若只到收件，
+就向後追設備到位及失敗復原紀錄。這次補充的是量測邊界，既有量產閉環主張仍待驗證，
+主命題日期與原到期警示保留。
+
 ## 2026-10-04 核實更新：管理服務暫時失聯，不能直接判成完成或失敗
 
 **證實的是規則，待驗證的是現場。** 本次新增的 Redfish 1.25.0 在 §12.2 加入「執行長動作時，管理服務自己可能暫時離線」的通知要求。[S14] 例如控制器更新韌體時先告知暫停回答，和毫無預警地斷線，是兩種需要分開記錄的情境。
@@ -902,8 +964,8 @@ DMTF 的電力白皮書把 `PowerControlLocked`、開關延遲、復電政策、
 
 ## 這篇目前能說到哪裡
 
-- **已知道的事**：DSX 已公開設備身分、資料含義、發布責任、液冷與電力隔離請求、結果狀態及安全限制；Redfish 另提供非同步 Task、版本前置條件、action 參數、profile 與分層 validator，電力／液冷模型也能把命令與設備狀態拆開。
-- **為何可信度是中等**：NVIDIA 與 OCP／DMTF 是獨立文件鏈，能共同界定資料與 API 責任；但仍沒有同一個 profile、跨廠實作、故障注入與量產場域結果把五層狀態接完。
+- **已知道的事**：DSX 已公開設備身分、資料含義、發布責任、隔離請求與安全限制；其本地訊息測試分開代理確認與訂閱端收件，不能代替實體隔離。[S15] Redfish 另把非同步任務與電力／液冷設備狀態拆開。
+- **基準信心與目前狀態**：初始基準是中等，因 NVIDIA 與 OCP／DMTF 可共同界定資料與 API 責任；但主命題自8/31到期後仍缺新證據，10/14的有效可信度已降為低。這次訊息測法補充不恢復主命題信心；仍缺同一個 profile、跨廠實作、故障注入與量產場域結果把五層狀態接完，之後以頁面到期狀態為準。
 - **還不能說的事**：不能說 API 接受等於物理隔離、跨平台已互通、電力與液冷 sequence 已安全、設備價值量增加、台灣公司已供貨，或訂單、收入、毛利已可辨識。
 - **何時可以升級判定**：同一具名量產場域要公開 profile 與工具版本、欄位對照、故障注入、request／Task／commanded／observed state、跨域 sequence、復原與維修時間線；台灣公司還要以合約責任與財務分母交叉確認。
 
@@ -911,6 +973,7 @@ DMTF 的電力白皮書把 `PowerControlLocked`、開關延遲、復電政策、
 
 - [NVIDIA：DSX BMS Event Bus 1.0.0](https://docs.nvidia.com/dsx-exchange/schema/bms-event-bus/overview)
 - [NVIDIA：BMS Integration Companion Guide](https://docs.nvidia.com/dsx-exchange/bms-integration)
+- [NVIDIA：Validation 的本地測試範圍與計時終點](https://docs.nvidia.com/dsx-exchange/validated-capabilities)
 - [NVIDIA：Mission Control to BMS Data Catalog](https://docs.nvidia.com/datacenter/dsx/bms-datacatalog-interactive.html)
 - [OCP：OpenRMC Design Specification v1.0.0](https://www.opencompute.org/documents/openrmc-design-specification-v1-0-1-pdf)
 - [OCP：OpenRMC-DM project](https://www.opencompute.org/community/openrmc-dm)
@@ -1023,6 +1086,19 @@ frequency: monthly
 next_check: 2026-11-04
 trigger: DMTF 正式修訂 §12.2 暫時離線要求，或具名實作公開同一 Task 的離線預告、Retry-After、恢復查詢／認證、最終結果及另行物理確認的完整測試
 invalidation: 正式新版撤回或修改適用範圍、通知／等待語意，則重畫本程序；若實作紀錄顯示未預告失聯、逾時或結果不一致，不能把規格要求當成實作通過
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C19
+metric: DSX本地訊息測試到同一事件物理隔離的量測終點及版本化結果
+source_ids: S15
+watch_source_ids: S15,S2
+frequency: monthly
+next_check: 2026-11-14
+trigger: 官方公布具名配置及版本的運行資料，串接broker確認、subscriber收件、控制決策、設備到位與獨立感測時間，並含故障與復原結果
+invalidation: 新版重新定義量測終點或測試範圍，則修正C19的適用版本；若實測訊息送達但設備未到位，不得把訊息層成功算成隔離成功
 -->
 
 ## 還缺哪些證據
