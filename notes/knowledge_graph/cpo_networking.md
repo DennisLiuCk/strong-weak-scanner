@@ -14,9 +14,49 @@ schema_version: 1
 graph_id: cpo-networking
 root_node_id: concept:cpo-networking
 label: AI 光學三軸組態與產品證據
-summary: 以交換晶片到光纖的五個位置，先拆 endpoint pairing、官方 connector 衝突與 port／module 分母，再拆光引擎 placement、retimed／linear 訊號處理與 integrated／external laser，連接 Q3450、Spectrum-X、可插拔產品、NVIDIA、SPIL、Lumentum、互通部署分母與財務證據。
+summary: 拆開光引擎、訊號處理與雷射三軸，以及鏈路兩端和埠數分母；新增緯穎／Ayar／GUC 具名系統展示，但仍缺完整訊號模式、客戶資格與財務橋接。
 article_ids: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
 status: active
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-C04
+view: company
+from_id: company:6669
+to_id: concept:cpo-networking
+relation: integrates
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C25
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-13
+review_due: 2026-10-23
+status: active
+boundary: 緯穎與 Ayar／GUC 聯合公告描述 MCP、光引擎、外部光源接入運算系統的展會運作展示；是一條消息鏈，沒有完整訊號處理模式、客戶資格、出貨量或收入，不能升格量產受惠。
+next_trigger: 同版系統的測試條件、原始結果、客戶資格與實際交付，收入另需同期間具名財務。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-I19
+view: industry
+from_id: concept:cpo-networking
+to_id: component:external-laser-source
+relation: integrated_with
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C25
+note_refs:
+evidence_state: verified
+commercial_stage: integration
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-13
+review_due: 2026-10-23
+status: active
+boundary: 只指聯合公告中 TeraPHY 光引擎與 ELSFP SuperNova 外部光源的同一系統展示；可拆光纖組件與遙測不等於無中斷維修、長期可靠度或所有 CPO 採同一訊號模式。
+next_trigger: 固定配置、訊號處理模式、完整光路條件及可重算的資格／維修結果。
 -->
 
 <!-- knowledge_edge

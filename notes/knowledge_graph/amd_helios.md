@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
 label: AMD Helios 部署階梯
-summary: 以參考設計、品牌系統、整櫃與機械資格及六個部署關卡連結系統責任、具名客戶及台灣夥伴；新增產品代別與場站共同鍵，MI355X實績不代填MI400或Helios，交付及財務仍須獨立驗證。
+summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD 10/12 自述四家初始系統已運行，仍與獨立驗收、雲端正式開放及台灣供應商財務分開。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
@@ -39,19 +39,19 @@ edge_id: KG-HEL-C02
 view: company
 from_id: company:microsoft
 to_id: product:amd-helios
-relation: planned_customer
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C3,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C7
+relation: tests
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C7,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29
 note_refs:
 evidence_state: verified
-commercial_stage: planned
+commercial_stage: validation
 materiality: named_product
 exclusivity: multi_source
 exclusivity_scope: Azure AI 基礎設施同時使用外部方案與 purpose-built silicon，不是 Helios 排他採用。
-as_of: 2026-07-20
-review_due: 2026-08-09
+as_of: 2026-10-12
+review_due: 2026-10-23
 status: active
-boundary: 2026 下半年出貨規劃與 upcoming Azure SKU 不等於已出貨、preview、GA、區域、利用率或雲端收入。
-next_trigger: Azure 將 ND MI455X v7 列為 preview／launched，或 AMD 確認向 Microsoft 實際出貨。
+boundary: AMD 10/12 稱 Microsoft 初始 Helios 系統已安裝並運行且驗證進行中；這是供應商自述，不是 Microsoft 獨立驗收，沒有 Azure GA、區域、利用率、容量或收入分母。
+next_trigger: Microsoft 公開同一品牌配置、場站及驗收，並另列 Azure 產品開放狀態與區域。
 -->
 
 <!-- knowledge_edge
@@ -59,19 +59,19 @@ edge_id: KG-HEL-C03
 view: company
 from_id: company:openai
 to_id: product:amd-helios
-relation: planned_customer
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C4
+relation: tests
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29
 note_refs:
 evidence_state: verified
-commercial_stage: planned
+commercial_stage: validation
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-23
-review_due: 2026-08-09
+as_of: 2026-10-12
+review_due: 2026-10-23
 status: active
-boundary: 證實的是 AMD 轉述 OpenAI 預期 2026Q4 online，不是已上線、對外商用、利用率或收入。
-next_trigger: OpenAI 自有文件或 AMD 新文件確認 Helios 已 online 並提供日期與部署範圍。
+boundary: AMD 10/12 稱 OpenAI 初始 Helios 系統已安裝並運行；不是 OpenAI 自有驗收、正式服務、規模部署或收入，未給固定配置與場站分母。
+next_trigger: OpenAI 確認同一品牌配置、場站、日期與驗收範圍，再分開追正式服務與使用量。
 -->
 
 <!-- knowledge_edge
@@ -80,18 +80,18 @@ view: company
 from_id: company:meta
 to_id: product:amd-helios
 relation: tests
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C4
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29
 note_refs:
 evidence_state: verified
 commercial_stage: validation
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-23
-review_due: 2026-08-09
+as_of: 2026-10-12
+review_due: 2026-10-23
 status: active
-boundary: 測試與 validation 不等於通過驗證、採購量、部署日期或排他採用。
-next_trigger: Meta 或 AMD 確認 validation 完成並開始實際部署。
+boundary: AMD 10/12 稱 Meta 初始 Helios 系統已安裝並運行、驗證進行中；不是完整品牌配置驗證通過或 Meta 獨立驗收，採購量與排他性仍未知。
+next_trigger: Meta 公開同一品牌配置與場站的驗收結果、日期及部署分母。
 -->
 
 <!-- knowledge_edge
@@ -160,17 +160,17 @@ view: company
 from_id: company:6669
 to_id: product:amd-helios
 relation: builds_systems
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C6,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C19
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C19,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C30
 note_refs:
 evidence_state: verified
 commercial_stage: integration
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-05-26
-review_due: 2026-09-15
+as_of: 2026-10-12
+review_due: 2026-10-23
 status: active
-boundary: 緯穎公司頁直接展示 Helios 整合方案並自述把參考設計推向量產；仍沒有品牌 SKU、固定 BOM、完整資格、具名客戶、已發生出貨、收入、毛利或營運資金分母。
+boundary: 緯穎 10/12 再列 Helios 主要元件與整合角色；沒有固定品牌 SKU、完整資格、出貨或財務分母，不能把 AMD 所列四家客戶接成緯穎供貨。
 next_trigger: 6669 公開版本化品牌產品、整櫃 qualification、客戶／實際出貨與可辨識財務足跡。
 -->
 
@@ -360,18 +360,18 @@ view: industry
 from_id: product:amd-helios
 to_id: stage:cloud-deployment
 relation: moves_to
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C3,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C4,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C5
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29
 note_refs:
 evidence_state: verified
-commercial_stage: planned
+commercial_stage: deployment
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-23
-review_due: 2026-08-09
+as_of: 2026-10-12
+review_due: 2026-10-23
 status: active
-boundary: Azure upcoming、OpenAI Q4 online 與 Anthropic 2027H1 首個 GW 是不同客戶與完成度，不能相加成已部署容量。
-next_trigger: 各客戶依各自期限確認 preview、online 或部署開始，並提供範圍。
+boundary: 這條線只表示 AMD 公告的四家初始系統已安裝並運行，不是獨立驗收、雲端 GA 或已知容量；Anthropic 的未來時程不包含在這次初始運行名單，亦不刷新 C11 主時鐘。
+next_trigger: 同一品牌配置與場站的客戶確認、部署分母及正式服務狀態。
 -->
 
 <!-- knowledge_edge
@@ -852,4 +852,24 @@ review_due: 2026-09-30
 status: active
 boundary: 這條線只表示部署證據需要產品身分共同鍵，不是產品已通過qualification。HUMAIN公告已上線的是MI355X，MI400仍為後續計畫且未定位Helios品牌SKU；不建立HUMAIN客戶線、不升級既有公司曝險或C11時鐘。
 next_trigger: 相同代別、品牌SKU、場站、日期的供應商交付與客戶驗收；如要連財務，另需同期間具名公司收入分母。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-C15
+view: company
+from_id: company:oracle
+to_id: product:amd-helios
+relation: tests
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-12
+review_due: 2026-10-23
+status: active
+boundary: AMD 單方公告稱 Oracle 初始 Helios 系統已安裝並運行；缺 Oracle 自有場站、品牌配置及驗收，不代表 GA、部署容量、排他採用或收入。
+next_trigger: Oracle 自有文件給出同一系統配置、場站、日期、驗收與服務開放狀態。
 -->

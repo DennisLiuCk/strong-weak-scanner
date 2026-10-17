@@ -252,12 +252,14 @@ class ResearchCycleOctober12Test(unittest.TestCase):
         self.assertEqual(pcie["result"], "not_yet_testable")
         self.assertIn("不計原T9完整trigger新支持", pcie["notes"])
 
-    def test_radar_keeps_three_watch_candidates_and_dates(self):
+    def test_radar_keeps_three_watch_candidates_and_followup_contract(self):
         candidates = records(RADAR, "research_candidate")
         self.assertEqual(len(candidates), 3)
         self.assertEqual([r["rank"] for r in candidates], ["1", "2", "3"])
-        self.assertEqual([r["next_check"] for r in candidates],
-                         ["2026-10-15", "2026-10-15", "2026-10-19"])
+        # Work dates can move after a documented review; frozen selection ranks cannot.
+        for row, original_due in zip(candidates, ["2026-10-15", "2026-10-15", "2026-10-19"]):
+            self.assertGreaterEqual(row["next_check"], original_due)
+            self.assertTrue(row["next_evidence"])
         for row in candidates:
             self.assertEqual(row["status"], "watch")
             self.assertEqual(row["route"], "watch_only")

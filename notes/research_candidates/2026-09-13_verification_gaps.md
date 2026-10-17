@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-10-15
+next_review: 2026-10-19
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -35,7 +35,7 @@ why_now: 到期追蹤初查發現Infineon9/9與SolarEdge合作把SSCB故障隔�
 knowledge_gain: 區分電力轉換、故障隔離與末端降壓，建立可重用的保護責任及測試邊界；合作稿與引述公司同一消息鏈，不計為兩份獨立驗收。
 first_rejection: 若仍只有合作稿或微秒級設計目標而沒有具名型號與可回查測試，就不另寫重複文章或新增公司受惠線。
 next_evidence: 取得同一SSCB型號與版本的電壓故障包絡及選擇性保護實測，核對客戶驗收與可比器件或替代拓撲；之後才追部署分母和收入。
-next_check: 2026-10-15
+next_check: 2026-10-21
 route: watch_only
 article_topic_id:
 graph_id:
@@ -60,7 +60,7 @@ why_now: 到期HBF追蹤初查找到9/9研究者HBFSim v1；模擬與校準的�
 knowledge_gain: 把研究者方法、模型擬合、可重現運行與真實晶片分層；10/8已核v3、v0.1.1與固定proof及reference原始紀錄，仍缺相同共同鍵的fast原始run，舊倍率與秒數未對齊，沒有重跑或外部驗證，不採效能點估計。
 first_rejection: 若未取得原始run或作者勘誤便無法對齊秒數與倍率，或只有擬合點沒有外部驗證，就不發布效能點估計或HBF硬體受惠結論。
 next_evidence: 先核對版本化PDF與作者原始run及勘誤，再分開NVMe校準與HBF模型參數，要求未參與擬合的驗證工作負載和實體裝置邊界。
-next_check: 2026-10-15
+next_check: 2026-10-21
 route: watch_only
 article_topic_id:
 graph_id:
@@ -183,3 +183,25 @@ Q4 2026是對選定客戶的預計送樣，銅／光連接產品組合不等於�
 其餘設備交易、資本及人事公告保留逐列語境；原始解析欄位與雜湊供本地回查，不取代附件。
 光寶既有美國工程契約線索的核心財報複核尚未完成，留在待辦而非宣稱已驗證。上述各題
 尚未具備足夠獨立文件與可比結果，故本輪只更新既有機櫃動作文章的量測邊界。
+
+## 10月17日回查
+
+SSCB與HBFSim已做有界回查，仍維持順位1、2及watch，10/21補下一份證據。
+SSCB重讀Infineon與SolarEdge合作／平台及白皮書入口，仍未取得同型號故障波形、
+選擇性保護及買方驗收；實驗室轉換級帶載不等完整斷路器驗證，NDA附件不申請也不繞過。
+Mt. Diablo v1.0.0已定位但原件403、未取得可檢視頁，本輪不接受其新技術數字。
+
+HBFSim實讀[v0.1.1發布列表](https://github.com/SlugLab/HBFSim/releases)、
+[v3版本紀錄](https://arxiv.org/abs/2609.09800)及
+[CPU複核紀錄](https://github.com/SlugLab/HBFSim/blob/v0.1.1/docs/proofs/2026-10-06-ucie-release-cpu.md)。
+原固定版本fast/reference配對證據本輪兩路取件失敗；CPU測試不能代GPU工作負載或
+實體HBF測試，不發布倍率。玻璃本輪未查，維持順位3與10/19期限。
+
+既有Aries7線索重讀[供應商產品介紹](https://www.asteralabs.com/resources/blog/nothing-out-of-reach-the-aries-pcie-7-family-delivers-copper-and-optical-signal-conditioning-for-ais-next-chapter/)，
+尚缺同產品原始測試、送樣及買方資格，10/23接續，不改凍結名單。10/14留下的京元電子
+預付款、欣興復工及光寶工程契約後續，本輪尚未完成雙端附件核對，不延後原期限或宣稱結案。
+
+本輪文章增量回到既有Helios、CPO與液冷資格主題：公司自述初始系統運行、系統整合展示、
+不同設備的規格比較，各自保留商業成熟度限制。公告另留下8358投資更正、6213集團內股利
+與3211季度自結線索；這些不是新凍結候選，也不由合併數字推AI／BBU收入。
+三題原始選擇理由、priority、knowledge value、第一拒絕與歷史選擇帳本均不改寫。

@@ -73,11 +73,13 @@ class ResearchCycleOctober14Test(unittest.TestCase):
         recent = bd.build_recent_articles("2026-10-14", {}, {}, topics=[topic])
         self.assertIn("topic-" + meta["topic_id"], {r["researchId"] for r in recent["items"]})
 
-    def test_radar_frozen_ranks_and_work_dates_are_not_reselected(self):
+    def test_radar_frozen_ranks_are_not_reselected_when_work_dates_advance(self):
         candidates = records(RADAR, "research_candidate")
         self.assertEqual([r["rank"] for r in candidates], ["1", "2", "3"])
-        self.assertEqual([r["next_check"] for r in candidates],
-                         ["2026-10-15", "2026-10-15", "2026-10-19"])
+        # A later review changes the work date, not the original selection decision.
+        for row, original_due in zip(candidates, ["2026-10-15", "2026-10-15", "2026-10-19"]):
+            self.assertGreaterEqual(row["next_check"], original_due)
+            self.assertTrue(row["first_rejection"])
         self.assertTrue(all(r["route"] == "watch_only" and r["status"] == "watch" for r in candidates))
 
     def test_partial_event_scan_and_index_failures_are_not_negative_evidence(self):

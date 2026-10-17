@@ -13,8 +13,8 @@ source_type: mixed
 publisher_domain: nvidia.com
 canonical_url: https://nvidianews.nvidia.com/news/vera-rubin-full-production-agentic-ai-factory
 source_chain_id: nvidia-cpo-production-marvell-1p6t-20260312-20260721
-stock_ids: 3711
-group_ids: packtest
+stock_ids: 3711,6669
+group_ids: packtest,serverodm
 trigger_type: product_ramp
 evidence_role: candidate_source
 route: market_issue_watch
@@ -754,7 +754,11 @@ evidence: sources:S15,S17
 
 ## 新手先讀：這篇在講什麼
 
+**10 月的新案例：** 緯穎、Ayar Labs 與 GUC 的展會公告已把共同封裝光引擎、外部雷射與系統整合接到同一個具名展示；這比只有架構圖更具體，但尚不足以回答訊號處理模式、客戶資格與收入。[S19][C25]
+
 ### 名詞小字典
+
+- **TeraPHY／SuperNova**：這次合作展示中 Ayar 的光引擎與外部光源名稱；名稱可以鎖定零組件角色，不能代替客戶資格、測試結果或出貨數量。[S19]
 
 - **交換晶片**：接收多台設備的資料並決定下一站要從哪個連接埠送出；光學方案改變的是資料離開晶片後的轉換位置。
 - **電訊號**：以電壓或電流變化承載資料的訊號；它在晶片與電路板上傳送，距離愈長、速度愈高，耗電與訊號損失愈難控制。
@@ -874,6 +878,16 @@ evidence: sources:S15,S17
 - 兩個產品都叫 CPO，但一個完整重定時、另一個走線性介面，它們的功耗與訊號驗收責任能直接比較嗎？
 - IA 已經發布，但廠商沒有公開同一應用的 link budget、互通矩陣與現場結果時，技術信心應該升到哪一層就停？
 - 100 萬 port-device-hours 沒有 link flap，為什麼仍不能寫成「失效率為零」或「MTBF 無限大」？
+
+## 一個新案例把光引擎和外部雷射接進系統
+
+**證實：** 10/13 緯穎、Ayar Labs 與 GUC 的聯合公告描述一個現場運作展示：GUC 的多晶片封裝整合 Ayar 的 TeraPHY 光引擎，採用 ELSFP 形式的 SuperNova 外部光源，並接入相容 ORV3 機架的緯穎運算系統。[S19][C25] 這是一條合作公告鏈，不是三份獨立資格報告。
+
+給新手的讀法是先分工：**多晶片封裝（MCP）**把不同功能晶片整合；**TeraPHY**是這個案例的光引擎名稱；**SuperNova**是光源名稱；**可插拔外部光源形式（ELSFP）**描述光源的模組安排；**可拆光纖陣列單元（FAU）**則是接光纖的組件，不等於現場維修已合格。元件名稱能幫我們追責任，不能代替受測版本與測試結果。
+
+公告也描述遙測、光路建立及熱調諧展示，但沒有原始測試時長、錯誤率與工作負載資料。**推論：** 它可放在「系統整合展示」階段，不應直接跨到客戶資格或長期可靠度；可拆的機構也不能直接當成無中斷更換。**待驗證：** 同一配置的訊號處理究竟採重定時還是線性、完整光路條件、可重算測試結果，以及客戶與供應商的交付／財務共同鍵。
+
+想一想：現場能連線，和高負載下長時間不出錯差在哪裡？為什麼雷射可插拔，仍不能說整套系統容易維修？下一次應索取的是另一篇合作新聞，還是固定配置的測試和客戶驗收？T6 會沿後一條路追查；本案例不刷新三軸主命題 C9 的原期限。
 
 ## 先用五個位置看資料怎麼從電變成光
 
@@ -1256,6 +1270,8 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 
 ## 來源與證據邊界
 
+- [緯穎、Ayar Labs 與 GUC：光學運算系統現場展示](https://www.wiwynn.com/news/wiwynn-ayar-labs-and-guc-advance-co-packaged-optics-with-live-demonstration-of-integrated-optical-compute-system-at-ocp-global-summit-2026)（S19；10/13 同一條合作公告鏈，非獨立驗收）。
+
 ### 新手查核：同一篇公告，不能共用一個「量產」主詞
 
 **證實：** NVIDIA 原稿對 Spectrum-X Ethernet Photonics 寫的是「已投入生產」；
@@ -1317,6 +1333,20 @@ note_action: review_due
 action_due: 2026-08-26
 rationale: SPIL 被 NVIDIA 直接列為 CPO 封裝組裝測試夥伴；新 OIF 三軸框架要求再固定具名產品組態、互通與部署，並由日月光投控正式文件裁決量產收入與獲利。
 evidence_boundary: OIF framework／IA、平台 production 與生態系列名都不等於 3711 已有可量化新增訂單；不建立收入、市占或毛利事實，6147與6451僅保留在正文的既有 H# 複核清單。
+-->
+
+對 `serverodm` 僅新增具名系統整合的追蹤入口：緯穎參與聯合展示，沒有由展會角色推成
+客戶資格、量產或收入。文章與圖譜都可從緯穎篩選進入，並共用 T6 的下一證據節點。[S19][C25]
+
+<!-- impact
+group_id: serverodm
+stock_ids: 6669
+direction: uncertain
+hypothesis_refs:
+note_action: watch
+action_due: 2026-10-23
+rationale: 緯穎與 Ayar Labs、GUC 的聯合公告列出具名光學運算系統整合展示；依 T6 追同版配置、測試條件及客戶資格。
+evidence_boundary: 一條聯合消息鏈只支持具名整合角色，不是獨立量測、量產出貨、訂單、營收、毛利或排他性。
 -->
 
 ## 下一個可證明／否定的節點
@@ -1382,4 +1412,71 @@ frequency_detail: 每兩週核對 OIF current work、平台產品與公司正式
 next_check: 2026-08-26
 trigger: 同一具名產品首次公開三軸組態，並至少提供跨廠互通、應用 link budget、現場更換／可靠度或客戶部署分母之一
 invalidation: 若後續多個產品世代仍把位置、訊號處理與雷射固定成不可拆的單一組合，且 NPO／ELS 長期沒有具名實作或互通結果，三軸作為商用產品組合框架的信心下修
+-->
+
+<!-- research_source
+source_id: S19
+role: company_release
+source_kind: document
+publisher: Wiwynn / Ayar Labs / GUC
+title: Wiwynn, Ayar Labs, and GUC Advance Co-Packaged Optics with Live Demonstration of Integrated Optical Compute System at OCP Global Summit 2026
+published_at: 2026-10-13
+captured_at: 2026-10-17
+accepted_at: 2026-10-17
+status: active
+url: https://www.wiwynn.com/news/wiwynn-ayar-labs-and-guc-advance-co-packaged-optics-with-live-demonstration-of-integrated-optical-compute-system-at-ocp-global-summit-2026
+locator: 正文 October 13；GUC MCP、Ayar TeraPHY、ELSFP-based SuperNova、ORV3-ready system，以及 telemetry、thermal tuning、detachable FAU 段
+limitation: 單一三方公告鏈，描述展會系統整合與運作展示；沒有明確訊號處理模式、原始錯誤率／時長／負載、跨供應商資格矩陣、現場維修事件、客戶部署或台廠收入；不能把宣傳的可量產定位當驗收
+independence_group: wiwynn-ayar-guc-joint-demo-20261013
+-->
+
+<!-- research_source
+source_id: S20
+role: company_release
+source_kind: living_index
+publisher: Wiwynn
+title: Wiwynn News
+published_at:
+captured_at: 2026-10-17
+accepted_at: 2026-10-17
+status: active
+url: https://www.wiwynn.com/news
+locator: OCP 2026 展示新聞與後續正式產品、資格、交付公告的重查入口
+limitation: 活頁索引只負責發現新文件，不替代 S19 內文或未來客戶資格及財務附件，也不是第二個獨立驗證者
+independence_group: wiwynn-ayar-guc-joint-demo-20261013
+-->
+
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: 緯穎、Ayar Labs 與 GUC 的 2026-10-13 聯合公告描述現場光學運算展示：GUC 多晶片封裝整合 TeraPHY 光引擎、搭配 ELSFP SuperNova 外部光源，並接入相容 ORV3 的緯穎系統
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-10-13
+basis: 公告直接給出各元件及公司在同一展示的角色，另描述遙測、熱調諧與可拆光纖陣列單元；只採具名整合事實，不採未附原始數據的效能或可靠度形容
+boundary: 證實公司聯合公告中的展示組態，不是獨立現場量測、完整三軸資格或客戶驗收；未列訊號處理模式，不能補成線性或重定時；可拆組件也不證明無中斷更換、量產出貨或任何公司的收入
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-10-17
+from: triaged
+to: triaged
+reason: added_named_optical_compute_integration_demo_without_qualification_or_financial_promotion
+evidence: sources:S19
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C25
+metric: 緯穎／Ayar／GUC 展示是否補齊同版本訊號處理模式、可重算測試、客戶資格與實際交付
+source_ids: S19
+watch_source_ids: S20
+frequency: weekly
+next_check: 2026-10-23
+trigger: 同一展示後續公開固定系統與元件版本、訊號處理模式、測試條件及原始錯誤／可靠度結果，或客戶對應配置的資格與交付；收入另需同期具名財務橋接
+invalidation: 合作方撤回整合、客戶資格失敗或公開測試否定原配置可運作；別的型號、只改宣傳文案或未見新資訊都不代替原測試對象
 -->

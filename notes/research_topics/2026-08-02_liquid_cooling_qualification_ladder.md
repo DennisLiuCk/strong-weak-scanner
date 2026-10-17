@@ -122,6 +122,7 @@ evidence: sources:S21
 
 - **液冷**：用液體把伺服器產生的熱帶走。它是一整套散熱方式，可能包含冷板、管路、泵浦、熱交換器、控制系統與機房冷卻設備，不等於只買一台 CDU。
 - **CDU（Coolant Distribution Unit）**：冷卻液分配單元，透過泵浦、熱交換器與控制系統，把伺服器迴路的熱帶走。它不是 GPU 上的冷板，也不等於機房產生冷水的 chiller。
+- **In-Row／In-Rack**：分別指配置在機櫃列中、機櫃內的設備形式；位置名稱不代表容量、資格或商業成熟度較高。
 - **額定容量**：設備在指定測試條件下，設計上可帶走的熱量。它回答「能處理多少熱」，不回答效率、可靠度、客戶採用或公司收入。
 - **MW／kW**：兆瓦／千瓦，都是功率單位；`1MW = 1000kW`。換成同一單位後只能比較數值大小，不能順便比較產品成熟度。
 - **Cooling Capacity @ 4°C ATD**：NVIDIA 清單以這個欄名標示 CDU 的額定排熱能力。MW／kW 是絕對容量，不是效率或產品優劣；同欄數字可在單位換算後比較，但頁面沒有公布完整跨廠測試協定，實際水溫、流量、壓差與備援仍會改變可用能力。
@@ -1465,6 +1466,115 @@ trigger: 公司或具名客戶提供Hyderabad同場址設備版本、連續營�
 invalidation: 公司修正啟用或冷卻陳述、同場址實測不符合冷卻用水宣稱，或設備與供應商歸屬不同；未披露不視為反證
 -->
 
+<!-- research_source
+source_id: S34
+role: company_release
+source_kind: document
+publisher: Delta Electronics
+independence_group: delta-electronics
+title: Delta to Showcase Energy-Saving Grid-to-Chip Infrastructure Solutions for Sustainable AI at OCP Global Summit 2026
+published_at: 2026-10-08
+captured_at: 2026-10-17
+accepted_at: 2026-10-17
+status: active
+url: https://www.delta-americas.com/en-US/news/40271
+locator: 可見日期與 Advanced Liquid Cooling Across Row, Rack, Board and Chip 段落；Project Deschutes 與另列的 800VDC CDU
+limitation: 公司展前產品陳述及量產計畫，非平台資格或客戶驗收；不同產品未提供共同料號、版本與完整測試條件；與S35同一發行人，不能當兩條獨立驗證
+-->
+
+<!-- research_source
+source_id: S35
+role: company_release
+source_kind: document
+publisher: Delta Electronics
+independence_group: delta-electronics
+title: Delta Highlights Collaboration with NVIDIA in Advancing Energy-efficient 800 VDC Power and Cooling Solutions for AI Data Centers at OCP Global Summit 2026
+published_at: 2026-10-15
+captured_at: 2026-10-17
+accepted_at: 2026-10-17
+status: active
+url: https://www.delta-americas.com/en-US/news/40272
+locator: 可見日期、800 VDC 2.5MW L2L CDU 展示及液冷產品段落
+limitation: 同一公司另一場展會陳述，不是NVIDIA獨立測試報告；未將2.5MW設備對回S34的3.6MW共同料號或版本，不可推為同款降規、撤回資格或實際收入
+-->
+
+<!-- research_claim
+claim_id: C40
+label: verified
+status: active
+claim: 台達10月8日分別介紹Project Deschutes Open In-Row CDU與800VDC 3.6MW LTL CDU；前者宣稱最高2MW且approach temperature為3°C，量產目標為2027年第一季
+supporting_source_ids: S34
+contrary_source_ids:
+as_of: 2026-10-17
+basis: 公司同一公告將兩項產品分段列示，且明示Project Deschutes的plans to begin mass production
+boundary: 證實公司有此產品與計畫陳述，不把計畫當已量產；3°C條件只屬該Project Deschutes陳述，不移植到3.6MW或NVIDIA的4°C欄位
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C41
+label: verified
+status: active
+claim: 台達10月15日另公布800VDC 2.5MW L2L CDU展會產品陳述
+supporting_source_ids: S35
+contrary_source_ids:
+as_of: 2026-10-17
+basis: 公司新聞稿的具名電壓與容量敘述
+boundary: 未提供與S34的3.6MW設備共同料號及版本，不能稱為同款降規；公司合作敘述不等於NVIDIA已為該設備發布平台資格或客戶驗收
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C42
+label: inference
+status: active
+claim: 同一家公司在不同日期公布的MW數值，也要先對齊產品身分與測試條件，才能判定性能變化；目前這三項產品陳述不可排成同款設備的升降級序列
+supporting_source_ids: S34,S35
+contrary_source_ids:
+as_of: 2026-10-17
+basis: 來源分列產品，且未給共同料號、版本、流體與完整ATD測試矩陣
+boundary: 不否定公司宣稱數值，也不判定產品較差；不是同條件性能比較或市場份額估計，不追加NVIDIA歷史comparison，不刷新C21主命題時鐘
+verification_needed: 同一料號版本、冷卻液與FWS/TCS操作條件、測試協定、原始結果及客戶驗收；商業貢獻另需交付數量與同期間收入毛利
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 10 月 17 日更新 台達的新 CDU 數字該怎麼比較
+
+台達兩篇10月公告增加了產品線索，卻不能排成同款設備的升降級序列。
+**已證實的是公司公告了以下規格與計畫，不是客戶驗收結果。**
+
+| 公告日期 | 設備身分與公司陳述 | 可比性判定 |
+|---|---|---|
+| 2026-10-08 | Project Deschutes Open In-Row CDU，最高2MW、approach temperature 3°C；目標2027年第一季量產 | 指定溫差下的產品陳述；未來量產是計畫 |
+| 2026-10-08 | 另列800VDC 3.6MW LTL CDU | 不可套用上一列的3°C條件 |
+| 2026-10-15 | 800VDC 2.5MW L2L CDU | 與3.6MW沒有共同料號及版本，不能稱為降規 |
+
+來源：[S34，10月8日公告](https://www.delta-americas.com/en-US/news/40271)、
+[S35，10月15日公告](https://www.delta-americas.com/en-US/news/40272)。兩份均來自台達，屬同一消息鏈。
+
+### 新手讀法 先認設備再比數字
+
+**800VDC**是供電電壓，**MW**是冷卻功率，**ATD**是熱交換的溫差條件；它們回答不同問題。
+就像不能只因兩台車都使用同一種燃料，就把不同車型的馬力當成改款前後比較，
+兩台CDU都寫800VDC也不代表是同款。先找到料號、版本、冷卻液與測試條件，才有性能比較的起點。
+
+**推論**是這些公告值得追蹤產品開發；**待驗證**的是同條件性能、平台資格、客戶驗收和收入。
+接下來沿既有T5、T6查測試與量測，沿T8查具名設備的交付及財務；不改寫歷史平台快照或主命題期限。
+
+想一想：如果較高MW的設備使用不同流體或溫差，它一定比較好嗎？
+若量產日期仍是計畫，還要看見哪份客戶或出貨證據，才能把技術進展連到公司收入？
+
 ## 10 月 9 日更新：雲端區域啟用，距離液冷收入還差哪幾張證明？
 
 **營運有進展，設備收入仍要另外查。** Microsoft 9 月 21 日宣布印度 Hyderabad 的
@@ -2402,3 +2512,11 @@ invalidation: 公司明確取消或退出具名 CDU、表示沒有相關訂單�
 - **公開可重現的資格驗證包**：只有平台或客戶把具名型號、版本、冷卻液、溫度、流量、壓力、測試矩陣、原始資料與 pass／fail 接起來，才把「列出測試名稱」升為可對照的產品結果；OCP 通用方法本身不能代替這份證據。
 - **三張曲線與量測品質接到同一型號**：只有熱性能、TCS 壓頭與 FWS 阻抗曲線能對回同一設備版本，且現場資料另揭露感測位置、單位、時間、quality、校正／不確定度與穩態條件，才可判斷名牌工作點是否可在具名場域重現；資料流存在本身仍不是驗收或收入。
 - **流體分支能否對回同一設備版本**：平台若只寫 `water`、`glycol` 或 wetted materials，仍不足以證明跨流體等效；要看到實際配方、濃度、三張性能曲線、材料與換液／變更紀錄、commissioning 及客戶 pass／fail，才可把 water-based、PG25 或 PG55 的結果放進同一比較。
+
+<!-- transition
+date: 2026-10-17
+from: triaged
+to: triaged
+reason: added_delta_cdu_product_announcements_and_comparability_boundaries_without_thesis_clock_refresh
+evidence: sources:S34,S35
+-->

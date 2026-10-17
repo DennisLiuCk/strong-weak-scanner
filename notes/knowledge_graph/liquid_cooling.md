@@ -307,6 +307,26 @@ next_trigger: 交割完成公告，以及雙方或具名客戶把共同產品 ID
 -->
 
 <!-- knowledge_edge
+edge_id: KG-LC-C10
+view: company
+from_id: company:2308
+to_id: concept:liquid-cooling
+relation: has_capability
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C40,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C41
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-17
+review_due: 2026-10-21
+status: active
+boundary: 只表示台達10月展會公告Project Deschutes與800VDC CDU產品；Project Deschutes目標2027年第一季量產，不能改為已量產。兩篇稿的3.6MW與2.5MW沒有共同料號及版本，不可叫同款降規，也不更新既有Marketplace資格、客戶部署或財務線。
+next_trigger: 公司公布共同料號、版本與完整流體和測試條件，再由平台或客戶驗收、實際交付及同期間財務逐關核對。
+-->
+
+<!-- knowledge_edge
 edge_id: KG-LC-I01
 view: industry
 from_id: concept:liquid-cooling

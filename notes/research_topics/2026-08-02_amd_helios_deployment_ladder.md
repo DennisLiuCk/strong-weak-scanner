@@ -96,10 +96,21 @@ reason: separated_humain_mi355x_live_announcement_from_mi400_plan_without_refres
 evidence: sources:S25
 -->
 
+<!-- transition
+date: 2026-10-17
+from: triaged
+to: triaged
+reason: added_issuer_reported_initial_helios_operation_and_wiwynn_demo_without_refreshing_thesis_clock
+evidence: sources:S26,S27
+-->
+
 ## 新手先讀：這篇在講什麼
+
+**10 月的新進度：** AMD 已表示四家客戶有初始 Helios 系統安裝並運行；這比「預計上線」多了一步，但仍是供應商自述，不是四份獨立客戶驗收，也不等於雲端客戶現在就能購買使用。[S26][C29]
 
 ### 名詞小字典
 
+- **EPYC／Pensando**：AMD 的伺服器處理器與網路產品家族名稱；出現在 Helios 組成表可協助分工，不能只靠家族名判定固定料號、版本或整櫃資格。[S27]
 - **MI355X／MI400／MI450**：本文出現的 AMD Instinct 產品型號或系列名稱；先辨識是哪一代、哪一個具名系統，再讀出貨及上線進度，不能只因品牌相同就共用驗收結果。[S12][S25]
 - **機架級系統（Rack-scale）**：把運算晶片、網路、電力、散熱與軟體整合成一整櫃交付；它比單顆晶片更接近可用設備，但不代表客戶已正式上線。
 - **參考設計（Reference design）**：平台方公開的整體藍圖與共同介面，讓製造夥伴能做自己的品牌系統；藍圖本身不一定是平台方直接出售的成品。
@@ -287,8 +298,8 @@ Python `Decimal` 與 `awk` 兩條獨立路徑均重算為 46.091255 kN 與 25.49
 | 1. 開放標準與參考設計 | 標準組織與平台設計方 | 機架介面、元件角色、網路、電力、液冷與軟體藍圖 | OCP 已列 ORW 規格；AMD 把 Helios 定義為 ORW 參考設計 [S12][S14] | 市場上已有可採購的單一 AMD 成品 |
 | 2. 整機廠品牌系統 | OEM／ODM 與供應鏈 | 品牌型號、BOM、板卡、托盤、韌體、冷卻與製造版本 | AMD 稱藍圖正與夥伴分享，品牌配置與完整 BOM 未公開 [S12] | 所有夥伴使用同一配置、已量產或已有訂單 |
 | 3. 整櫃資格與驗收資料包 | 整機廠、平台方與客戶工程團隊 | 八條責任線的測試條件、版本、結果、變更與回退 | 目前沒有捕捉到一套具名品牌系統的完整公開資料包 | 單一托盤、網路、電力或液冷測試能替整櫃背書 |
-| 4. 出貨與現場接收 | 製造商、物流、資料中心與客戶 | 序號、數量、日期、場址、安裝、機房介面與接收結果 | 仍只有 2026 下半年 shipment／volume deployment 的前瞻時程 [S2][S12] | 生產宣稱等於已交貨、已安裝或已驗收 |
-| 5. 生產機群與財務 | 客戶營運、平台與供應商財務團隊 | 上線規模、工作負載、可用率、重複出貨、收入、毛利與現金流 | 客戶節點仍分散在預告、驗證與未來部署；台灣公司財務未證 | 合作名單、容量上限或單次上線等於持續獲利 |
+| 4. 出貨與現場接收 | 製造商、物流、資料中心與客戶 | 序號、數量、日期、場址、安裝、機房介面與接收結果 | AMD 10/12 稱交付與部署進行中，並稱四家初始系統已安裝運行；未列固定品牌配置、數量或客戶接收文件 [S26] | 供應商進度自述等於每家客戶獨立驗收 |
+| 5. 生產機群與財務 | 客戶營運、平台與供應商財務團隊 | 上線規模、工作負載、可用率、重複出貨、收入、毛利與現金流 | 初始運行與驗證進度已有 AMD 自述；規模、利用率及台灣公司財務仍未證 [S26] | 合作名單、容量上限或單次上線等於持續獲利 |
 
 這五種交付物可以由不同公司負責，也可能部分並行；它們不是一條所有系統必然同速通過的直線。
 參考設計的價值是讓介面與責任更容易共用，不是把資格、互通、量產與客戶營運自動完成。
@@ -332,9 +343,9 @@ Redfish 把軟硬體盤點與更新服務、遙測服務做成不同的機器可
 | --- | --- | --- | --- | --- |
 | 1. 方案成形 | 整櫃架構、主要元件與合作角色已被公開 | 具名參考設計、標準、元件表與合作文件 | AMD 公開 Helios 架構並明示它是供 OEM／ODM 使用的參考設計 [S12] | 市場上已有可採購的單一 AMD 成品或所有夥伴配置相同 |
 | 2. 開始生產 | 製造端把參考設計做成可重複組裝的系統 | 整機廠品牌型號、BOM、版本與製造狀態 | AMD 曾稱平台 now in production，但現行常見問答仍把它定義為參考設計 [S4][S12] | 品牌系統已出貨、整櫃已驗收或已有收入 |
-| 3. 實際出貨 | 產品真的離開供應端並交到客戶 | 已發生的出貨日期、客戶與範圍 | 目前只有 2026 下半年開始出貨的規劃 [S2] | 規劃已如期完成或數量已確定 |
-| 4. 客戶測試與產品開放 | 客戶測試自己的工作，或雲端規格開始可用 | 驗證完成、測試開放、正式推出與可用區域 | Meta 仍在測試；Azure 規格仍是預告 [S1][S4] | 已通過驗證、已普遍可用或已有利用率 |
-| 5. 正式上線 | 客戶把系統接通並投入實際運行 | 客戶或供應商確認上線日期與部署範圍 | OpenAI 只有 2026 年第四季預計上線 [S4] | 截至資料日已上線、已對外商用或已有收入 |
+| 3. 實際出貨 | 產品真的離開供應端並交到客戶 | 已發生的出貨日期、客戶與範圍 | AMD 10/12 稱交付與部署正在進行；未列每家品牌型號、日期或數量 [S26] | 每家出貨分母已確定或台廠已認列收入 |
+| 4. 客戶測試與產品開放 | 客戶測試自己的工作，或雲端規格開始可用 | 驗證完成、測試開放、正式推出與可用區域 | AMD 稱工作負載驗證進行中，含 Meta 的初始系統已運行；Azure 正式開放仍須另查 [S26] | 已通過驗證、已普遍可用或已有利用率 |
+| 5. 初始系統上線 | 客戶把系統接通並投入運行 | 客戶或供應商確認已運行與部署範圍 | AMD 10/12 列名 OpenAI、Meta、Microsoft、Oracle 的初始系統已安裝並運行 [S26] | 四家已獨立驗收、已規模部署、已對外商用或已有收入 |
 | 6. 規模部署與財務轉換 | 小批上線持續擴張，並落到供應商財務 | 已部署容量、重複出貨、收入、毛利與現金流 | 只有廣義容量目標與未來首批規劃 [S3][S5] | 容量上限已落地或台灣公司已受惠 |
 
 這六關是本文整理資訊的閱讀順序，不是所有平台都會依同一節奏前進，也不是公司排名、
@@ -357,6 +368,16 @@ Redfish 把軟硬體盤點與更新服務、遙測服務做成不同的機器可
 新手可以問自己三件事：標題的 AMD Instinct 到底是哪一代？文中動詞是「已運行」還是
 「預計」？下次能否取得相同型號與場站的客戶確認，而非另一份轉載？T13 將在 9/30
 回查；若計畫明確取消／延後或產品改版，就保留舊紀錄、另開版本，不偷換原驗證對象。
+
+## 10 月初始系統運行和展會整合要分開讀
+
+**證實：** AMD 10/12 的 OCP 演講摘要稱，OpenAI、Meta、Microsoft、Oracle 已有初始 Helios 系統安裝並運行，交付、部署與工作負載驗證正在進行。[S26][C29] 這修正了只停留在「未來出貨／上線規劃」的讀法，但公告沒有列每家系統的品牌型號、場站、數量或驗收結果。
+
+緯穎同日的展會公告則列出 Helios 的 ORW 架構、MI450 系列、EPYC、Pensando 與 ROCm 整合角色。[S27][C30] 這是具名整合展示，不能把 AMD 所列客戶直接接成緯穎的客戶，也不能把同文另一平台的試產進度移給 Helios。
+
+**推論：** 「能在客戶端運行」回答是否開始實作；「完成驗收」回答固定版本是否符合約定；「正式可用」回答外部使用者是否能買到服務。三題需要不同的證據。**待驗證：** 同一品牌型號與場站的客戶確認、測試結果、部署分母，以及台灣供應商同期間的出貨和財務。
+
+新手接下來可以問：四家公司被點名，為何仍只有一條 AMD 消息鏈？如果只有一小批試用機，和雲端產品正式開放差在哪裡？下一份文件能否對上相同配置、客戶與日期，而不只再列一次合作名單？新 T14 追這條橋接；主命題 C11 的原到期日不因新聞發布而延後。
 
 ## 主張與證據帳本
 
@@ -1236,18 +1257,85 @@ corrected_by_claim_id:
 resolution:
 -->
 
-## 再把五組公開節點放回自己的時間線
+<!-- research_source
+source_id: S26
+role: company_release
+source_kind: document
+publisher: AMD
+title: OCP 2026 AMD CEO Lisa Su Keynote Takeaways
+published_at: 2026-10-12
+captured_at: 2026-10-17
+accepted_at: 2026-10-17
+status: active
+url: https://newsroom.amd.com/news/ocp-2026-amd-ceo-lisa-su-keynote-takeaways/
+locator: Helios production、customer deliveries/deployments/workload validations underway 段，及 initial systems installed and running at OpenAI, Meta, Microsoft, Oracle 段
+limitation: AMD 單方演講摘要，不是四家客戶各自驗收；未列品牌 SKU、配置版本、場站、容量、個別運行日期、GA、利用率或台灣供應商財務；另列 Helion 未來計畫不與 Helios 共用進度
+independence_group: amd
+-->
 
-原始文件出現七個動詞、時程與容量數字，但它們來自平台方及四個不同客戶。正確讀法不是
+<!-- research_source
+source_id: S27
+role: company_release
+source_kind: document
+publisher: Wiwynn
+title: Wiwynn Showcases Next-Gen AI Platforms, Thermal Engineering, and Optical Interconnect Technologies at 2026 OCP Global Summit
+published_at: 2026-10-12
+captured_at: 2026-10-17
+accepted_at: 2026-10-17
+status: active
+url: https://www.wiwynn.com/news/wiwynn-showcases-next-gen-ai-platforms-thermal-engineering-and-optical-interconnect-technologies-at-2026-ocp-global-summit
+locator: 正文日期 October 12 與 Helios 段；ORW、MI450 Series、6th Gen EPYC、Pensando、ROCm；頁面更新標記 October 13
+limitation: 公司展會整合自述，無正式品牌 SKU、固定 BOM、客戶驗收、出貨或財務分母；同文 Vera Rubin pilot build 屬別的平台，不能移植到 Helios；不是 S26 客戶名單的供貨橋接
+independence_group: wiwynn
+-->
+
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: AMD 2026-10-12 公告稱 OpenAI、Meta、Microsoft、Oracle 已有初始 Helios 系統安裝並運行，且客戶交付、部署與工作負載驗證正在進行
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-10-12
+basis: 公告對 initial systems 使用已安裝且運行的語氣，對交付與驗證使用進行中；逐段區別 Helios 與另一 Helion 未來計畫
+boundary: 只證實 AMD 的具名自述；四個名稱仍是一條供應商消息鏈，不是四個獨立驗收樣本，沒有固定品牌配置、個別日期、場站、容量、GA、利用率或台灣供應商收入；不能判定所有驗證已完成
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: 緯穎 2026-10-12 OCP 展會公告直接描述 Helios 的 ORW 架構與 MI450、EPYC、Pensando、ROCm 整合角色
+supporting_source_ids: S27
+contrary_source_ids:
+as_of: 2026-10-12
+basis: Helios 專段列出平台及主要元件，證實具名整合展示而非由一般 AI 需求推估角色
+boundary: 展示與整合能力不是品牌 SKU 定版、整櫃資格或客戶出貨；不能把 AMD 四家初始系統接成緯穎供貨，也不能用同文 Vera Rubin 試產或整家公司營收替代 Helios 財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 再把各組公開節點放回自己的時間線
+
+原始文件與 10 月更新中的動詞、時程與容量數字，分別來自平台方及不同客戶。正確讀法不是
 把所有節點排成一條直線，而是先問「這是誰的時間線」，再檢查下一個可驗收結果。
 
-| 本文五條時間線 | 已公開到哪一步 | 時間或上限 | 下一個可驗收節點 | 不能混成 |
+| 各自的時間線 | 已公開到哪一步 | 時間或上限 | 下一個可驗收節點 | 不能混成 |
 | --- | --- | --- | --- | --- |
-| 1. AMD 整體平台 | 參考設計由靜態展示前進到 AMD 所稱 production 與夥伴品牌系統化，但仍不是 AMD 直接出售的產品 [S4][S12][S13] | 夥伴系統預計 2026 下半年開始大量部署 | 具名品牌型號、完整配置、整櫃資格、已發生出貨與部署容量 | AMD 已出售單一 Helios 成品、所有客戶都已部署或台灣公司已有分配 |
-| 2. Microsoft／Azure | AMD 規劃向 Microsoft 出貨；Azure 預告 ND MI455X v7 [S1][S2] | 出貨規劃在 2026 下半年，雲端規格未給上線日 | 實際出貨、測試開放或正式推出，以及可用區域 | 雲端規格已可使用、已有利用率或收入 |
-| 3. OpenAI | AMD 表示客戶預計讓系統上線 [S4] | 預計自 2026 年第四季開始 | 客戶或 AMD 確認實際上線日期與部署範圍 | 截至資料日已上線或已對外商用 |
-| 4. Meta | 已開始測試與驗證自己的工作 [S4] | 沒有公開完成日期 | 驗證完成、開始部署或改採其他平台 | 已通過驗證、已有採購量或部署日期 |
+| 1. AMD 整體平台 | AMD 10/12 稱交付、部署與工作負載驗證進行中，並列四家初始系統已運行；平台仍屬夥伴品牌系統化路徑 [S12][S26] | 未提供每家場站日期、完整配置及部署容量 | 具名品牌型號、完整配置、整櫃資格、客戶接收與部署容量 | AMD 已出售單一 Helios 成品、所有客戶都已部署或台灣公司已有分配 |
+| 2. Microsoft／Azure | AMD 10/12 稱初始 Helios 系統已安裝並運行 [S26] | 沒有個別場站日期或規模 | 客戶確認、Azure 規格、正式推出與可用區域 | 雲端規格已可使用、已有利用率或收入 |
+| 3. OpenAI | AMD 10/12 稱初始 Helios 系統已安裝並運行 [S26] | 原第四季計畫已有供應商進度自述 | 客戶確認、固定配置、個別日期與部署分母 | 已獨立驗收、規模部署或已對外商用 |
+| 4. Meta | AMD 10/12 稱初始 Helios 系統已運行，工作負載驗證仍在進行 [S26] | 沒有公開驗證完成日期 | 品牌配置、客戶確認與驗證結果 | 已通過全部驗證或已有採購量 |
 | 5. Anthropic | 公布未來合作上限與首批部署規劃 [S3] | 最高 2 GW；首個 GW 預計 2027 上半年開始 | 首批實際部署日期、容量與後續擴張 | 2 GW 已全部啟用或 AMD 已認列收入 |
+| 6. Oracle | AMD 10/12 稱初始 Helios 系統已安裝並運行 [S26] | 未列 Oracle 場站或容量 | Oracle 自有產品、區域、配置與驗收文件 | Oracle GA 或台灣供應商出貨已證實 |
 
 本文沒有用上述數字做跨公司排名；2 GW、第一個 GW 與最高 50 億美元分別是容量上限、
 首批部署節點與股權投資，定義不同，不能相加或互相比較。
@@ -1268,6 +1356,8 @@ resolution:
 
 ## 來源與證據邊界
 
+- [AMD：OCP 2026 演講摘要](https://newsroom.amd.com/news/ocp-2026-amd-ceo-lisa-su-keynote-takeaways/)（S26；四家初始系統運行是 AMD 自述，不是四份客戶驗收）。
+- [緯穎：OCP 2026 平台與整合展示](https://www.wiwynn.com/news/wiwynn-showcases-next-gen-ai-platforms-thermal-engineering-and-optical-interconnect-technologies-at-2026-ocp-global-summit)（S27；Helios 與另一平台的試產段落分開）。
 - [Microsoft：Azure 與 AMD 基礎設施擴展](https://blogs.microsoft.com/blog/2026/07/20/microsoft-expands-azure-ai-and-hpc-infrastructure-with-amd/)（S1）。
 - [AMD／Microsoft：Helios 2026 下半年出貨規劃](https://ir.amd.com/news-events/press-releases/detail/1291/microsoft-to-deploy-next-gen-amd-instinct-and-amd-epyc-processors-as-the-companies-expand-their-long-term-strategic-partnership)（S2）。
 - [AMD／Anthropic：最高 2 GW 與首個 GW 時程](https://ir.amd.com/news-events/press-releases/detail/1292/amd-and-anthropic-announce-strategic-partnership-to-deploy-up-to-2-gigawatts-of-amd-instinct-mi450-series-gpus)（S3）。
@@ -1526,11 +1616,24 @@ trigger: AMD或具名客戶的新文件把MI400品牌系統、場站、日期、
 invalidation: 官方明確取消或延後原2027年部署／下半年上線計畫，或截至2027-12-31仍未開始所述上線；產品或場站變更另留版本，不用MI355X或其他客戶的進度替代，僅未查得新公告不當成失敗
 -->
 
+<!-- monitoring_item
+monitor_id: T14
+status: active
+claim_ids: C29,C30
+metric: AMD 所列四家初始 Helios 系統是否取得同品牌配置與場站的客戶確認，以及緯穎具名系統與出貨是否能接上
+source_ids: S26,S27
+watch_source_ids: S6,S7,S9,S10,S27
+frequency: weekly
+next_check: 2026-10-23
+trigger: 客戶或具名整機廠公布與初始 Helios 系統可對上的品牌型號、配置版本、場站、日期及驗收範圍；公司受惠另須同期間交付與財務橋接
+invalidation: AMD 或被列名客戶更正初始系統未運行、取消或撤回具名配置；只未公開細節不當成失敗，別的平台或新版本不能替代原對象
+-->
+
 ## 下一個可證明／否定的節點
 
-最先到期的是 2026-08-15 的台灣公司財務檢查，其後是 2026-08-19 的品牌系統出貨、
-multi-GW 與 Azure 狀態重查，以及 2026-09-12 的整櫃配置身分證、變更重驗與資格資料包檢查。
-沒有新文件時，只在
-append-only scan log 記錄「未見新證據」，不能刷新主命題的 evidence clock。只有新增且被
-active claim 引用的正式文件，才可更新里程碑與可信度；台灣公司映射仍須依各公司一手文件
-重做，不能從本篇直接升格為正式公司事實。
+10/17 本輪回查後，新增 T14 的下一節點是 2026-10-23：客戶或整機廠能否把初始運行
+對到同一品牌配置、場站及驗收範圍？原有 T5–T13 的有效工作日須讀 append-only
+monitor review 帳本，不能把原始 8、9 月 next_check 誤當最新安排，也不能改寫它們。
+查無新證據、取件失敗與未達門檻須分別記錄，不刷新主命題的 evidence clock。
+本輪新增的初始運行旁支證據沒有重驗 C11，故主命題仍保留原日期與到期降級。
+台灣公司專屬結論依各公司下一份季報與正式筆記為準，不把平台進度當成供貨或財務事實。
