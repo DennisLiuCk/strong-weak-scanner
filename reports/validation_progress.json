@@ -1,12 +1,12 @@
 {
   "protocol": "validation-v2-20261009",
   "registered": "2026-10-09",
-  "as_of": "2026-10-08",
+  "as_of": "2026-10-16",
   "score_version": "v2.2-midrank-20261009",
   "score_spec_sha": "cb6f4f352986b00dd57bccc1916a0176a5c414184f5efb3e7d23848d64e41b69",
   "ranking_spec_sha": "78c66c2e85caf7021ab49d75261ddda808f3d33c49adbe87a146289d78181217",
   "score_evidence": {
-    "oos_days": 0,
+    "oos_days": 5,
     "oos_mature": 0,
     "fwd": 10,
     "eff_obs": 0.0,
@@ -33,57 +33,610 @@
         "status": "retained as historical evidence; never pooled with the current spec"
       }
     ],
-    "canonical_official_days": 60,
-    "current_spec_days": 0,
-    "current_spec_oos_days": 0,
+    "canonical_official_days": 65,
+    "current_spec_days": 5,
+    "current_spec_oos_days": 5,
     "current_spec_oos_excluded_days": 0,
     "late_publication_days": 0,
-    "current_spec_first_date": null,
-    "current_spec_latest_date": null,
+    "current_spec_first_date": "2026-10-12",
+    "current_spec_latest_date": "2026-10-16",
     "mature_10d_days": 0,
     "effective_independent_obs_approx": 0.0,
-    "phase": "await_first_snapshot",
+    "phase": "collecting_operational_history",
     "specs_seen": [
+      "78c66c2e85caf7021ab49d75261ddda808f3d33c49adbe87a146289d78181217",
       "b9076628ddb7c9ddd76c5d4934a5f6c3d8e8bbb75c56d1b3bce9c60f8e23bd4e",
       "e51579e313c6e3fbac9cb180539ce1d0cb4f67f06ee7e56dc5c2756b998a72f9"
     ],
     "historical_other_spec_days": 38,
     "pre_effective_current_spec_days": 0,
     "invalid_runs": [],
-    "parsed_rows": 0,
-    "latest_snapshot_health": null,
+    "parsed_rows": 600,
+    "latest_snapshot_health": {
+      "stocks": 120,
+      "groups": 11,
+      "duplicate_stock_ids": [],
+      "coverage": {
+        "champion_pct": 120,
+        "lens_a": 120,
+        "lens_b": 120,
+        "lens_c": 120,
+        "lens_d": 120
+      },
+      "component_coverage": {
+        "lens_a": {
+          "short": 120,
+          "swing": 120,
+          "trend": 120
+        },
+        "lens_b": {
+          "resilience": 120,
+          "leverage_safety": 120,
+          "heat_safety": 120
+        },
+        "lens_c": {
+          "core": 120,
+          "tdcc": 120,
+          "sbl_relief": 120
+        },
+        "lens_d": {
+          "revenue_3m_yoy": 120,
+          "revenue_accel": 120,
+          "operating_margin": 120,
+          "operating_margin_yoy_delta": 120
+        }
+      },
+      "role_rank_coverage": 73,
+      "tie_exposed": {
+        "champion_pct": 4,
+        "lens_a": 26,
+        "lens_b": 26,
+        "lens_c": 11,
+        "lens_d": 18
+      },
+      "tie_rate": {
+        "champion_pct": 0.0333,
+        "lens_a": 0.2167,
+        "lens_b": 0.2167,
+        "lens_c": 0.0917,
+        "lens_d": 0.15
+      },
+      "median_unique_share_by_group": {
+        "champion_pct": 1.0,
+        "lens_a": 0.9,
+        "lens_b": 0.9,
+        "lens_c": 1.0,
+        "lens_d": 0.9167
+      },
+      "top_20": {
+        "champion_pct": 28,
+        "lens_a": 28,
+        "lens_b": 26,
+        "lens_c": 28,
+        "lens_d": 28
+      },
+      "consensus2": 31,
+      "consensus2_rate": 0.2583,
+      "pareto": 63,
+      "pareto_rate": 0.525,
+      "peer_sensitivity_ge_25": 34,
+      "peer_sensitivity_ge_25_rate": 0.2833,
+      "group_detail": [
+        {
+          "grp": "ipdesign",
+          "stocks": 9,
+          "coverage": {
+            "champion_pct": 9,
+            "lens_a": 9,
+            "lens_b": 9,
+            "lens_c": 9,
+            "lens_d": 9
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 5,
+            "lens_b": 4,
+            "lens_c": 0,
+            "lens_d": 4
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 0.6667,
+            "lens_b": 0.7778,
+            "lens_c": 1.0,
+            "lens_d": 0.7778
+          },
+          "consensus2": 2,
+          "pareto": 7,
+          "peer_sensitivity_ge_25": 4
+        },
+        {
+          "grp": "material",
+          "stocks": 10,
+          "coverage": {
+            "champion_pct": 10,
+            "lens_a": 10,
+            "lens_b": 10,
+            "lens_c": 10,
+            "lens_d": 10
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 2,
+            "lens_b": 4,
+            "lens_c": 2,
+            "lens_d": 2
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 0.9,
+            "lens_b": 0.8,
+            "lens_c": 0.9,
+            "lens_d": 0.9
+          },
+          "consensus2": 3,
+          "pareto": 3,
+          "peer_sensitivity_ge_25": 2
+        },
+        {
+          "grp": "memory",
+          "stocks": 12,
+          "coverage": {
+            "champion_pct": 12,
+            "lens_a": 12,
+            "lens_b": 12,
+            "lens_c": 12,
+            "lens_d": 12
+          },
+          "tie_exposed": {
+            "champion_pct": 2,
+            "lens_a": 2,
+            "lens_b": 2,
+            "lens_c": 2,
+            "lens_d": 0
+          },
+          "unique_share": {
+            "champion_pct": 0.9167,
+            "lens_a": 0.9167,
+            "lens_b": 0.9167,
+            "lens_c": 0.9167,
+            "lens_d": 1.0
+          },
+          "consensus2": 3,
+          "pareto": 6,
+          "peer_sensitivity_ge_25": 3
+        },
+        {
+          "grp": "packtest",
+          "stocks": 14,
+          "coverage": {
+            "champion_pct": 14,
+            "lens_a": 14,
+            "lens_b": 14,
+            "lens_c": 14,
+            "lens_d": 14
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 4,
+            "lens_b": 0,
+            "lens_c": 3,
+            "lens_d": 2
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 0.8571,
+            "lens_b": 1.0,
+            "lens_c": 0.8571,
+            "lens_d": 0.9286
+          },
+          "consensus2": 2,
+          "pareto": 9,
+          "peer_sensitivity_ge_25": 2
+        },
+        {
+          "grp": "passive",
+          "stocks": 11,
+          "coverage": {
+            "champion_pct": 11,
+            "lens_a": 11,
+            "lens_b": 11,
+            "lens_c": 11,
+            "lens_d": 11
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 2,
+            "lens_b": 4,
+            "lens_c": 0,
+            "lens_d": 4
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 0.9091,
+            "lens_b": 0.8182,
+            "lens_c": 1.0,
+            "lens_d": 0.8182
+          },
+          "consensus2": 4,
+          "pareto": 5,
+          "peer_sensitivity_ge_25": 3
+        },
+        {
+          "grp": "pcb",
+          "stocks": 12,
+          "coverage": {
+            "champion_pct": 12,
+            "lens_a": 12,
+            "lens_b": 12,
+            "lens_c": 12,
+            "lens_d": 12
+          },
+          "tie_exposed": {
+            "champion_pct": 2,
+            "lens_a": 2,
+            "lens_b": 4,
+            "lens_c": 0,
+            "lens_d": 2
+          },
+          "unique_share": {
+            "champion_pct": 0.9167,
+            "lens_a": 0.9167,
+            "lens_b": 0.8333,
+            "lens_c": 1.0,
+            "lens_d": 0.9167
+          },
+          "consensus2": 4,
+          "pareto": 8,
+          "peer_sensitivity_ge_25": 4
+        },
+        {
+          "grp": "power",
+          "stocks": 13,
+          "coverage": {
+            "champion_pct": 13,
+            "lens_a": 13,
+            "lens_b": 13,
+            "lens_c": 13,
+            "lens_d": 13
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 3,
+            "lens_b": 4,
+            "lens_c": 0,
+            "lens_d": 0
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 0.8462,
+            "lens_b": 0.8462,
+            "lens_c": 1.0,
+            "lens_d": 1.0
+          },
+          "consensus2": 4,
+          "pareto": 8,
+          "peer_sensitivity_ge_25": 4
+        },
+        {
+          "grp": "powersupply",
+          "stocks": 10,
+          "coverage": {
+            "champion_pct": 10,
+            "lens_a": 10,
+            "lens_b": 10,
+            "lens_c": 10,
+            "lens_d": 10
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 2,
+            "lens_b": 2,
+            "lens_c": 2,
+            "lens_d": 0
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 0.9,
+            "lens_b": 0.9,
+            "lens_c": 0.9,
+            "lens_d": 1.0
+          },
+          "consensus2": 2,
+          "pareto": 1,
+          "peer_sensitivity_ge_25": 2
+        },
+        {
+          "grp": "semiequip",
+          "stocks": 12,
+          "coverage": {
+            "champion_pct": 12,
+            "lens_a": 12,
+            "lens_b": 12,
+            "lens_c": 12,
+            "lens_d": 12
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 2,
+            "lens_b": 2,
+            "lens_c": 2,
+            "lens_d": 2
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 0.9167,
+            "lens_b": 0.9167,
+            "lens_c": 0.9167,
+            "lens_d": 0.9167
+          },
+          "consensus2": 3,
+          "pareto": 3,
+          "peer_sensitivity_ge_25": 4
+        },
+        {
+          "grp": "serverodm",
+          "stocks": 10,
+          "coverage": {
+            "champion_pct": 10,
+            "lens_a": 10,
+            "lens_b": 10,
+            "lens_c": 10,
+            "lens_d": 10
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 0,
+            "lens_b": 0,
+            "lens_c": 0,
+            "lens_d": 2
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 1.0,
+            "lens_b": 1.0,
+            "lens_c": 1.0,
+            "lens_d": 0.9
+          },
+          "consensus2": 2,
+          "pareto": 7,
+          "peer_sensitivity_ge_25": 2
+        },
+        {
+          "grp": "thermal",
+          "stocks": 7,
+          "coverage": {
+            "champion_pct": 7,
+            "lens_a": 7,
+            "lens_b": 7,
+            "lens_c": 7,
+            "lens_d": 7
+          },
+          "tie_exposed": {
+            "champion_pct": 0,
+            "lens_a": 2,
+            "lens_b": 0,
+            "lens_c": 0,
+            "lens_d": 0
+          },
+          "unique_share": {
+            "champion_pct": 1.0,
+            "lens_a": 0.8571,
+            "lens_b": 1.0,
+            "lens_c": 1.0,
+            "lens_d": 1.0
+          },
+          "consensus2": 2,
+          "pareto": 6,
+          "peer_sensitivity_ge_25": 4
+        }
+      ]
+    },
     "structural_history": {
       "basis": "exact_formal_snapshot_census_no_inference",
       "performance_claim": false,
-      "days": 0,
-      "first_date": null,
-      "latest_date": null,
-      "pairwise_rank_correlation_equal_group_weight": {},
-      "pairwise_top20_jaccard": {},
-      "unique_top20_count": {},
-      "adjacent_snapshot_top20_retention": {},
-      "tie_rate": {},
+      "days": 5,
+      "first_date": "2026-10-12",
+      "latest_date": "2026-10-16",
+      "pairwise_rank_correlation_equal_group_weight": {
+        "lens_a__lens_b": {
+          "days": 5,
+          "latest": -0.037,
+          "median": -0.0009,
+          "min": -0.0371,
+          "max": 0.1995
+        },
+        "lens_a__lens_c": {
+          "days": 5,
+          "latest": 0.2307,
+          "median": 0.2996,
+          "min": 0.1446,
+          "max": 0.3461
+        },
+        "lens_a__lens_d": {
+          "days": 5,
+          "latest": 0.0413,
+          "median": 0.1171,
+          "min": 0.0365,
+          "max": 0.2438
+        },
+        "lens_b__lens_c": {
+          "days": 5,
+          "latest": 0.3894,
+          "median": 0.4069,
+          "min": 0.3894,
+          "max": 0.4471
+        },
+        "lens_b__lens_d": {
+          "days": 5,
+          "latest": -0.1772,
+          "median": -0.1194,
+          "min": -0.1772,
+          "max": -0.0245
+        },
+        "lens_c__lens_d": {
+          "days": 5,
+          "latest": -0.0919,
+          "median": -0.0602,
+          "min": -0.0919,
+          "max": 0.0161
+        }
+      },
+      "pairwise_top20_jaccard": {
+        "lens_a__lens_b": {
+          "days": 5,
+          "latest": 0.102,
+          "median": 0.1304,
+          "min": 0.102,
+          "max": 0.186
+        },
+        "lens_a__lens_c": {
+          "days": 5,
+          "latest": 0.2444,
+          "median": 0.2444,
+          "min": 0.1489,
+          "max": 0.4
+        },
+        "lens_a__lens_d": {
+          "days": 5,
+          "latest": 0.1915,
+          "median": 0.1957,
+          "min": 0.1739,
+          "max": 0.25
+        },
+        "lens_b__lens_c": {
+          "days": 5,
+          "latest": 0.2558,
+          "median": 0.2558,
+          "min": 0.2222,
+          "max": 0.3947
+        },
+        "lens_b__lens_d": {
+          "days": 5,
+          "latest": 0.08,
+          "median": 0.1224,
+          "min": 0.08,
+          "max": 0.1778
+        },
+        "lens_c__lens_d": {
+          "days": 5,
+          "latest": 0.1667,
+          "median": 0.1667,
+          "min": 0.1429,
+          "max": 0.1915
+        }
+      },
+      "unique_top20_count": {
+        "lens_a": {
+          "days": 5,
+          "latest": 10,
+          "median": 10,
+          "min": 7,
+          "max": 13
+        },
+        "lens_b": {
+          "days": 5,
+          "latest": 12,
+          "median": 11,
+          "min": 8,
+          "max": 12
+        },
+        "lens_c": {
+          "days": 5,
+          "latest": 6,
+          "median": 6,
+          "min": 5,
+          "max": 10
+        },
+        "lens_d": {
+          "days": 5,
+          "latest": 12,
+          "median": 12,
+          "min": 12,
+          "max": 15
+        }
+      },
+      "adjacent_snapshot_top20_retention": {
+        "lens_a": {
+          "days": 4,
+          "latest": 0.5429,
+          "median": 0.5508,
+          "min": 0.4474,
+          "max": 0.5714
+        },
+        "lens_b": {
+          "days": 4,
+          "latest": 0.5938,
+          "median": 0.5433,
+          "min": 0.4857,
+          "max": 0.5938
+        },
+        "lens_c": {
+          "days": 4,
+          "latest": 0.75,
+          "median": 0.6485,
+          "min": 0.5278,
+          "max": 0.75
+        },
+        "lens_d": {
+          "days": 4,
+          "latest": 1.0,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        }
+      },
+      "tie_rate": {
+        "lens_a": {
+          "days": 5,
+          "latest": 0.2167,
+          "median": 0.1833,
+          "min": 0.1333,
+          "max": 0.25
+        },
+        "lens_b": {
+          "days": 5,
+          "latest": 0.2167,
+          "median": 0.2167,
+          "min": 0.15,
+          "max": 0.3167
+        },
+        "lens_c": {
+          "days": 5,
+          "latest": 0.0917,
+          "median": 0.0917,
+          "min": 0.0667,
+          "max": 0.1083
+        },
+        "lens_d": {
+          "days": 5,
+          "latest": 0.15,
+          "median": 0.15,
+          "min": 0.15,
+          "max": 0.15
+        }
+      },
       "pareto_rate": {
-        "days": 0,
-        "latest": null,
-        "median": null,
-        "min": null,
-        "max": null
+        "days": 5,
+        "latest": 0.525,
+        "median": 0.5083,
+        "min": 0.4833,
+        "max": 0.525
       }
     }
   },
   "structural_reviews": [
     {
       "formal_days": 10,
-      "remaining": 10
+      "remaining": 5
     },
     {
       "formal_days": 20,
-      "remaining": 20
+      "remaining": 15
     },
     {
       "formal_days": 40,
-      "remaining": 40
+      "remaining": 35
     }
   ],
   "outcome_reviews": [
