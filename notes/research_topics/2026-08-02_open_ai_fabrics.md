@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C18
 base_confidence: medium
-confidence_basis: UALink 與 UEC 規格、OCP 現行計畫與參考架構可交叉確認網路工作和平臺契約必須分成兩條軸；UEC 已公開自我聲明與部分層級測試框架，但仍沒有具名產品通過、多供應商互通、系統壓力結果、客戶部署或台灣財務曝險
+confidence_basis: UALink 與 UEC 規格、OCP 計畫與參考架構支持網路工作與驗收契約兩條軸；10/19另確認UEC索引列1.1於10/12發布及Meta自述Tahan正在出貨，但不等於客戶交付完成、UEC／ESUN產品通過、跨廠矩陣或台灣財務歸因；旁支進度不刷新C18主時鐘
 cross_company_numbers: false
 -->
 
@@ -961,6 +961,7 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 - **UALink（加速器互連）**：主要服務機架內多顆加速器的開放互連規格路徑。
 - **UEC（超乙太網路聯盟）**：主要改善人工智慧與高效能運算跨機架乙太網路的規格生態系。
 - **ESUN（機架內乙太網路交換）**：OCP 開放規格，處理機架內網路交換、封包格式、無損傳輸與可靠性。
+- **Tahan**：Meta 為 MTIA 300 加速器設計的乙太網路交換器；它正在出貨的說法，和後續設計預計採用 ESUN 是兩件事。[S26]
 - **SUE-T（機架內乙太傳輸）**：偏向定義加速器端點、記憶體使用方式與傳輸；它與 ESUN 分工。
 - **UALoE（用乙太網路承載 UALink）**：把 UALink 協定放在乙太網路傳輸路徑上；不表示 UALink 與 UEC 是同一個標準。
 - **規格文件（specification）**：描述參與者要遵守的共同語言與最低要求；發布只代表規則存在。
@@ -976,7 +977,7 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 
 - 一座人工智慧叢集同時有運算同步、跨機架傳送、一般服務、儲存與維修管理等不同工作，不能只看成「一張網」。
 - 即使幾張網使用同一類線材或交換設備，也可能有不同的資料、設定、故障與驗收責任。
-- 測試清單或單件聲明只走到中途；還要再看跨廠組合、整套系統壓力、客戶部署與公司財務能否逐層對上。
+- 規格發布、產品出貨與跨廠通過是不同進度：業者稱一代交換器正在出貨，卻把新標準留給後續設計；不能把兩個時態拼成「新標準已量產」。[S26]
 
 ### 為什麼重要
 
@@ -994,12 +995,28 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 - 再把 UALink、ESUN、SUE-T 與 UEC 放回正確網路工作，分別追實體／連結、端點／傳輸、交換／壅塞、軟體／管理與驗收層。
 - 互通報告要列出廠商組合、產品版本、測試拓撲、正常與故障測項、軟體版本、通過條件與重現方法。
 - 最後依序追樣品、出貨、客戶驗收、正式開放、實際部署與利用率；任何一步都不能跳過。
+- UEC 先核對 1.1 的完整版本差異與適用測試；Tahan 則另追具名配置與出貨範圍，客戶交付完成及後續 ESUN 設計要再找自己的驗收報告。[S25][S26]
 
 ### 想一想
 
 - 兩家公司的零件已能傳送正常資料，還要故意製造哪些錯誤，才能知道它們真的會一起恢復？
 - 同一類網路技術能服務不同工作時，研究者要如何分開延遲、資料、權限、路由與故障要求？
 - 如果同一台設備同時服務幾張網，如何避免把同一份連接數、出貨或收入計算兩次？
+- 一則公告同時說「目前正在出貨」和「未來將採用新規格」，哪個產品、哪個版本才是這兩句各自的主詞？
+
+## 10 月更新：規格換版和產品出貨分開看
+
+**證實：UEC 的發布索引已列出 1.1。** 官方版本歷史把 2026 年 10 月 12 日列為發布日；
+本文先前的 1.0.3 是當時記錄，不再代表現行版本。本輪未取得可核對的 1.1 全文，
+不能據此改寫測試要求，更不能宣稱產品已通過新版。[S25]
+
+**證實的是 Meta 正在出貨的自述，不是客戶交付完成或 ESUN 驗收。** Meta 10 月 12 日說 Tahan 正在出貨，
+對象是 MTIA 300，採用 Tomahawk 5 與既有 RoCE 傳輸；同文另把下一代設計稱為預覽，
+把 ESUN 資料平面放在未來世代。[S26]
+
+**推論：每個版本要有自己的證據。** 正在出貨的 Tahan 不能替未來 ESUN 設計取得資格，
+規格升版也不能替廠商補上互通結果。接下來分開追版本差異、具名配置的測試、出貨範圍與客戶驗收，
+再看台灣公司是否有同產品的出貨與財務資料；目前仍不能畫成營收受惠線。[S25][S26]
 
 ## 先把一座人工智慧叢集拆成六張網
 
@@ -1152,7 +1169,7 @@ per-iteration p99／max、raw JSON 與 correctness 設定，讓第 3、4、8、9
 | 1. UALink | 機架內的加速器擴充 | 加速器端點與交換互連，並包含晶粒規格路徑 | 2.0 系列規格已完成核定；組織表示互通與符合規格計畫將後續導入 | 不能說多廠晶片、交換器與軟體已通過計畫 |
 | 2. ESUN | 乙太網路的機架內擴充 | 交換、封包格式、無損、連結可靠性與多跳網路要求 | 1.0 規格已發布，證明乙太網路也直接進入機架內 | 不能說具名端點與交換器已符合規格或跨廠互通 |
 | 3. SUE-T | 乙太網路的機架內端點與傳輸 | 加速器端點、記憶體使用方式、封包與傳輸，與 ESUN 網路側分工 | OCP 現行工作流已把它列為獨立方向 | 不能說正式規格、實體產品、符合規格與互通已成熟 |
-| 4. UEC | 人工智慧與高效能運算的跨機架乙太網路為主要應用 | 工作組橫跨實體、連結、傳輸、軟體、儲存、合規、管理、效能與除錯 | 現行公開版本為 1.0.3，且有自我聲明與部分測試床工具 | 不能說任何具名元件已通過、完成跨廠互通或客戶部署 |
+| 4. UEC | 人工智慧與高效能運算的跨機架乙太網路為主要應用 | 工作組橫跨實體、連結、傳輸、軟體、儲存、合規、管理、效能與除錯 | 10/19 官方索引列 1.1 於 10/12 發布；全文差異待核，舊測試床工具不自動覆蓋新版 [S25] | 不能說任何具名元件已通過、完成跨廠互通或客戶部署 |
 | 5. UALoE | 在乙太網路傳輸上承載機架內協定 | 讓 UALink 協定使用乙太網路傳輸路徑，可出現在具名系統設計 | AMD／Oracle 公告中有具名前瞻路徑 | 不能說它與 UEC 是同一標準，也不能說客戶已完成部署 |
 
 這五條路徑有競爭、共存與承載關係，不是五個可直接相加的市場。本篇的修正重點是：不能再用
@@ -1162,7 +1179,7 @@ per-iteration p99／max、raw JSON 與 correctness 設定，讓第 3、4、8、9
 
 | 本文六類角色 | 它交付什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |
 |---|---|---|---|---|
-| 1. 規格與開放工作組 | 定義端點、傳輸、交換、測試與版本要求 | UALink Consortium、Ultra Ethernet Consortium、Open Compute Project | UALink 2.0、UEC 1.0.3 與 ESUN 1.0 有公開文件；SUE-T 有獨立工作流 | 參與組織或規格發布不等於產品已符合規格與互通 |
+| 1. 規格與開放工作組 | 定義端點、傳輸、交換、測試與版本要求 | UALink Consortium、Ultra Ethernet Consortium、Open Compute Project | UALink 2.0、UEC 1.0.3 與 ESUN 1.0 是已查文件；UEC 索引現列 1.1，全文差異待核 [S25] | 參與組織或規格發布不等於產品已符合規格與互通 |
 | 2. 加速器、端點與晶片智財 | 實作記憶體、傳輸、實體層與控制功能 | AMD Helios 端點路徑、Broadcom SUE 架構、Marvell custom UALink 方案 | 公開產品與架構說明證明開發路徑存在 | 公司自述可互通不等於第三方跨廠測試、客戶採用或收入 |
 | 3. 交換器專用晶片與平台 | 實作封包轉送、緩衝、壅塞與網路管理 | Arista 7060XE7 以及 Broadcom 對機架內乙太網路的架構說明 | 7060XE7 被定位為同時服務機架內外的具名平台 | 產品用途不等於已對應 ESUN／SUE-T、已出貨或已部署 |
 | 4. 機架與系統整合 | 把運算、機架內外網路、軟體、電源與散熱整合成可驗收系統 | AMD Helios 參考設計 | 公開架構同時列出 UALink／UALoE 機架內與 UEC-ready 跨機架路徑 | 參考設計不等於整機廠已量產、客戶已驗收或所有組件已互通 |
@@ -1176,15 +1193,15 @@ per-iteration p99／max、raw JSON 與 correctness 設定，讓第 3、4、8、9
 
 | 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
-| 1. 共同規則可查核 | 規格版本、功能、角色、錯誤行為與測試入口有公開文件 | UALink 2.0、UEC 1.0.3、ESUN 1.0 可查；SUE-T 是獨立工作流；UEC 合規工具已有入口 | SUE-T 正式規格，以及各路徑持續更新的合規與互通方法 | 規格或工具發布不等於實體晶片存在或產品已通過測試 |
+| 1. 共同規則可查核 | 規格版本、功能、角色、錯誤行為與測試入口有公開文件 | 已查 UALink 2.0、UEC 1.0.3、ESUN 1.0；UEC 1.1 已列發布，不能由舊版補齊新版內容 [S25] | UEC 1.1 全文與測試版本對照、SUE-T 正式規格及各路徑互通方法 | 規格或工具發布不等於實體晶片存在或產品已通過測試 |
 | 2. 路徑各位置有具名實物 | 至少能指出端點、連接傳輸、交換器與所需軟體的產品、版本和功能 | Helios、Marvell UALink 方案與 Arista 7060XE7 證明多個位置有具名開發路徑 | 對應同一規格版本的端點、交換器、韌體、驅動與測試配置 | 不同新聞中有多個產品，不等於它們已在同一路徑上工作 |
 | 3. 單件產品符合指定規格 | 每件產品依共同方法通過實體層、協定、功能、計時與錯誤測項 | UEC 已有自我聲明、測試床與 checklist 工具；本輪仍未找到具名產品已填清單或通過報告 | 產品名、版本、已填清單、測試器、測項、通過條件與可查核結果 | 工具存在或一件產品合格不等於它能和其他廠商產品工作 |
 | 4. 不同廠商完成交叉互通 | 至少兩家獨立端點與交換實作，在共同版本與軟體下交叉測試正常與異常情境 | UEC 測試床文件明示 interoperation 不在範圍；其他現有文件也沒有可核對交叉矩陣 | 參與廠商、組合矩陣、版本、拓撲、測項、錯誤注入、軟體與重現方法 | 單廠端到端展示、會員名單、自我聲明或產品互連宣稱不等於通過 |
 | 5. 整個系統與工作可重現 | 在有壓力、擴容、故障與長時間運轉下，實際工作仍會正確完成 | UEC 文件排除 system stress／scale 與 performance；OCP／Helios 仍是範圍、參考設計或前瞻規畫 | 端點與機架數、軟硬體版本、工作負載、期間、故障、恢復與通過門檻 | 參考設計、預覽、測試清單或單次最高數字不等於可交付系統 |
 | 6. 客戶部署與公司財務對上 | 具名客戶完成驗收與部署，供應商用同一產品、期間與分母提供出貨和財務結果 | Oracle 仍是規劃；台灣三個族群仍只是待驗證搜尋路由 | 出貨、預覽、正式開放、部署數、利用率，以及客戶與供應商雙向財務文件 | 規格、會員、產品用途或客戶規劃不等於台灣公司已獲利 |
 
-本輪可確認第一關有多份規格、工作文件與合規工具，第二關有分散的具名產品路徑；第三關已有框架但沒有
-本輪可核對的具名產品結果，第四關沒有跨廠矩陣，第五關仍停在參考架構與前瞻規畫，第六關也尚未通過。六關是閱讀與證據排序，
+既有標準證據在第一關有規格與合規工具，第二關有具名產品路徑；第三至第六關仍缺能把同一版本的
+產品測試、跨廠矩陣、客戶與財務接起來的完整證據。10月新增的Tahan正在出貨自述只限該產品，不能證明客戶交付完成或替未來ESUN版本通過後續關卡。[S26] 六關是閱讀與證據排序，
 不是網路效能分數、標準勝負、供應商名單、市場份額或投資排名。
 
 ## 這篇對公司判斷的用處與界線
@@ -1217,6 +1234,8 @@ per-iteration p99／max、raw JSON 與 correctness 設定，讓第 3、4、8、9
 - [NCCL tests usage and arguments](https://github.com/NVIDIA/nccl-tests)（rank、message sweep、warm-up、iterations、tail、raw JSON 與 correctness 設定）。
 - [NCCL collective operations](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html)（各 collective 的 rank、輸入與輸出語意）。
 - [MLPerf Training rules](https://github.com/mlcommons/training_policies/blob/master/training_rules.adoc)（完整 system／software、wall-clock-to-quality 與多次 run 的終端結果契約）。
+- [UEC 版本歷史](https://ultraethernet.org/specification-history/)（10/19索引列1.1於10/12發布，並非全文差異已核對）。
+- [Meta OCP 2026 網路更新](https://engineering.fb.com/2026/10/12/open-source/ocp-summit-2026-powering-ai-with-open-innovations-in-scale-up-scale-out-and-scale-across-networks/)（Tahan正在出貨的自述與後續ESUN設計分開）。
 
 本篇不使用會員數、宣稱頻寬、GPU 數或公司效能數字做跨公司比較，也不推估 TAM、市占、估值或
 市場預期。六張網與八個 UEC 工作組是官方文件的類別列舉，不是產品通過率或市場樣本。ESUN 1.0
@@ -1282,4 +1301,139 @@ from: triaged
 to: triaged
 reason: editorial_clarify_opg_m_existing_redundancy_assumption_page_locator
 evidence: editorial:opg_m_page_11_locator
+-->
+
+<!-- transition
+date: 2026-10-19
+from: triaged
+to: triaged
+reason: separated_uec_1_1_release_index_and_meta_tahan_shipping_from_future_esun_qualification_without_main_clock_refresh
+evidence: sources:S25,S26,S27
+-->
+
+<!-- research_source
+source_id: S25
+role: standard
+source_kind: living_index
+publisher: Ultra Ethernet Consortium
+title: UEC Specification History captured 2026-10-19
+published_at:
+captured_at: 2026-10-19
+accepted_at: 2026-10-19
+status: active
+url: https://ultraethernet.org/specification-history/
+locator: Version 1.1列的Release Date為October 12 2026、Description為Current published version；1.0.3列改為Previous published version；下載指向2026/10/UE-Specification-1.1.pdf
+limitation: 只核對動態版本歷史表；web下載因文件17.6MB超出工具大小限制而未取得可讀全文，不證明1.1條文差異、與舊測試床相容、實作或產品通過
+independence_group: ultra-ethernet-consortium
+-->
+
+<!-- research_source
+source_id: S26
+role: other_primary
+source_kind: document
+publisher: Meta Engineering
+title: OCP Summit 2026 Powering AI with Open Innovations in Scale-Up Scale-Out and Scale-Across Networks
+published_at: 2026-10-12
+captured_at: 2026-10-19
+accepted_at: 2026-10-19
+status: active
+url: https://engineering.fb.com/2026/10/12/open-source/ocp-summit-2026-powering-ai-with-open-innovations-in-scale-up-scale-out-and-scale-across-networks/
+locator: Ethernet for Scale-Up的Tahan、Next-Generation Scale-Up與ESUN Evolving三節；Tahan對應MTIA 300、Tomahawk 5和RoCE，同段shipping today；下一代另標preview且future generation planned to adopt ESUN
+limitation: Meta自身工程敘述，只支持其具名配置與正在出貨的說法；無出貨數、期間分母、客戶交付完成、獨立驗收、原始跨廠矩陣、ESUN conformance或台灣公司財務，不能把未來世代接成當期出貨
+independence_group: meta-operator
+-->
+
+<!-- research_source
+source_id: S27
+role: other_primary
+source_kind: living_index
+publisher: Meta Engineering
+title: Meta Engineering Data Infrastructure index captured 2026-10-19
+published_at:
+captured_at: 2026-10-19
+accepted_at: 2026-10-19
+status: active
+url: https://engineering.fb.com/category/data-infrastructure/
+locator: 索引可定位OCP Summit 2026網路文章；後續追具名scale-up平台、ESUN實作與客戶測試的官方入口
+limitation: 索引只用來定位文章，不替代固定產品文件、版本化測試矩陣、原始資料或財務歸因；與S26同一消息鏈
+independence_group: meta-operator
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: 2026-10-19擷取的UEC版本歷史將1.1列為現行發布版本，發布日為2026-10-12，1.0.3列為前一版本
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-10-19
+basis: 官方版本歷史表的Version、Release Date、Description三欄可逐列核對；只接受索引發布事實
+boundary: 未取得1.1全文，不推論條文差異、舊測試床對新版的有效性、產品合規、跨廠互通或部署
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: Meta於2026-10-12自述Tahan正在出貨，對應MTIA 300、Tomahawk 5與既有RoCE傳輸；同文把下一代設計稱為預覽，並把ESUN資料平面留給未來世代
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-10-12
+basis: 同一文章Tahan配置段與ESUN Evolving結尾的shipping today措辭，和Next-Generation段的preview／future generation逐項對照
+boundary: 證實的是Meta公開自述；不能當成客戶交付完成、獨立交付驗收、出貨量、ESUN產品通過、完整跨廠原始測試或供應商營收
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C26
+label: inference
+status: active
+claim: UEC規格換版、Tahan當期出貨與未來ESUN設計必須以各自產品和版本追蹤；不能以同一公告或同屬Ethernet把三者合成已通過ESUN／UEC的商用平台
+supporting_source_ids: S25,S26
+contrary_source_ids:
+as_of: 2026-10-19
+basis: S25只提供規格發布鍵，S26把當期產品與未來世代分開；兩份資料沒有共同的產品版本、測試包絡與通過結果
+boundary: 只限定證據接合，不判斷規格勝負、實際失敗、供應商份額、台灣財務受惠或投資報酬；C18主時鐘不變
+verification_needed: 同一產品版本的規格實作範圍、已填測試清單、跨廠矩陣、客戶驗收與供應商財務
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C24,C26
+metric: UEC 1.1完整版本、與1.0.3差異及對應合規測試範圍
+source_ids: S25
+watch_source_ids: S7,S18,S25
+frequency: weekly
+frequency_detail: 先取回完整1.1文件並固定版本與雜湊，再逐項對照合規方法；規格發布不代替產品結果
+next_check: 2026-10-21
+trigger: 取得1.1完整版本與可定位差異，或官方公開對應新版的測試床及具名產品結果
+invalidation: 官方更正或撤回1.1、既有工具不適用新版或關鍵要求變更時，下修舊工具可以直接延用的假設，不把取件失敗當產品不合格
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C25,C26
+metric: Tahan出貨的產品配置與客戶驗收分母，及後續ESUN世代的實作、測試和交付階段
+source_ids: S26
+watch_source_ids: S13,S27
+frequency: weekly
+frequency_detail: 分別追當期Tahan與後續ESUN產品，不以preview、規格索引或共同供應商名稱跨版本補證
+next_check: 2026-10-23
+trigger: 同一具名產品公開版本化BOM、實作規格、跨廠測試與驗收範圍；財務升級另須供應商同產品出貨及期間分母
+invalidation: Meta更正出貨說法、取消後續設計或資格失敗時，依該產品下修，不以另一世代進度抵銷
 -->

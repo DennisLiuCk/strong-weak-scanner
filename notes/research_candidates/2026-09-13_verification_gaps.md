@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-10-19
+next_review: 2026-10-21
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -85,7 +85,7 @@ why_now: Samsung Electro-Mechanics9/10展稿新增玻璃核心與導孔加工展
 knowledge_gain: 只有新客戶或製造共同鍵才會超越既有玻璃角色地圖；公司展稿與材料供應商用途說明不是互相替客戶資格背書。
 first_rejection: 若仍只有展品或單站加工能力，未有同一封裝產品的客戶資格及量產结果，就不另立文章或將carrier出貨算成glass-core採用。
 next_evidence: 取得同一glass-core封裝產品與版本的客戶資格及製造結果，逐項分開carrier與interposer角色，核對連續批次良率及量產時間而非展會日期。
-next_check: 2026-10-19
+next_check: 2026-10-26
 route: watch_only
 article_topic_id:
 graph_id:
@@ -205,3 +205,15 @@ HBFSim實讀[v0.1.1發布列表](https://github.com/SlugLab/HBFSim/releases)、
 不同設備的規格比較，各自保留商業成熟度限制。公告另留下8358投資更正、6213集團內股利
 與3211季度自結線索；這些不是新凍結候選，也不由合併數字推AI／BBU收入。
 三題原始選擇理由、priority、knowledge value、第一拒絕與歷史選擇帳本均不改寫。
+
+## 10月19日回查
+
+玻璃核心仍是順位3、medium、watch。重讀[SKC新聞入口](https://www.skc.kr/m/eng/Conmmunication/newsroom/system.do?menuCd=006001)
+的9/22敘述、[Samsung 9/10展稿](https://samsungsem.com/global/newsroom/news/view.do?id=10522)
+與[Corning玻璃用途](https://www.corning.com/worldwide/en/products/advanced-optics/product-materials/semiconductor-laser-optic-components/semiconductor-glass-wafers.html)：
+可靠度測試、概念驗證準備與加工展示仍不能替同產品的客戶資格、連續批次良率及量產結果。
+Samsung最新新聞列表本輪只回空殼，不能說沒有新消息。10/26補客戶與製造資料；
+這與glass T3共用來源，不算另一個獨立驗證。SSCB與HBFSim本輪未重裁決，保留10/21。
+
+研究增量放回既有液冷與開放互連文章：PG25指南的材料相容與追溯要求，及互連規格發布、
+公司自述正在出貨系統與未來預覽的區隔；正在出貨不等客戶收貨完成。沒有新增凍結候選、投資順位或台廠財務受惠線。

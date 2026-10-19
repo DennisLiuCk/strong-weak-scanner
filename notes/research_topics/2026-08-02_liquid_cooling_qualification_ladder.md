@@ -156,7 +156,8 @@ evidence: sources:S21
 - **備援**：主要泵浦、電源或控制元件失效時，由另一組元件接手。額定容量沒有說明設備在故障情境下還能維持多少能力。
 - **材料相容性**：冷卻液、金屬、密封件與管路長期接觸時是否會腐蝕、膨潤或產生污染。它是部署條件之一，不會由 kW 數字直接回答。
 - **水基冷卻液（Water-based heat transfer fluid）**：以經處理的水為主要傳熱介質，並依指定材料、化學處理與監測條件使用。它不是「任何自來水都可直接灌入」，也不能把同一組水質門檻套到丙二醇配方。
-- **PG25／PG55**：OCP 2022 丙二醇指引中的兩個配方範圍；PG 是 propylene glycol，數字約指丙二醇體積百分比等級。本文保留文件的合格範圍，不把 `25` 或 `55` 當成所有產品都恰好等於的單點濃度。
+- **PG25／PG55**：PG 是 propylene glycol，數字約指丙二醇體積百分比等級。本文的舊濃度表保留 2022 年來源，不把 `25` 或 `55` 當成所有產品都恰好等於的單點濃度；2026 年新版另有版本與代表值說明，不能混成所有產品的合格門檻。
+- **COA（Certificate of Analysis，批次分析證明）**：對應特定批次冷卻液的分析文件；要與供應商、批號及交貨日一起讀。它不是整台 CDU 的效能或客戶驗收證書。
 - **體積百分比（vol %）**：某成分體積占混合液總體積的比例。它和重量百分比不是同一單位，不能不經密度與定義核對就互換。
 - **凝固點（Freeze point）**：流體開始結凍的溫度條件。它是配方選擇的一項邊界，不等於冷卻能力、泵浦功耗、腐蝕壽命或設備容量總分。
 - **折射計（Refractometer）**：以折射特性估算丙二醇濃度的現場工具；要使用適合該流體與濃度範圍的量測設定。讀到濃度仍不代表全部抑制劑、污染與材料相容性都合格。
@@ -2149,10 +2150,13 @@ acceptance**。資料不齊時，研究結論只能停在「可做條件式量�
 | 啟動與換液 | 清潔、沖洗、合格填充、代表樣本與 treatment plan | 新迴路先以選定 PG 流體循環帶出殘留後排放，再正式填充、留樣；既有迴路換液另核對相容性 | 把一次壓測／漏測當成流體 commissioning 完成 |
 | 容量與水力 | 用實際水基配方重建熱性能與兩側 PQ 工作點 | 用實際 PG 配方與濃度重建同一組曲線 | 把另一種流體的 kW、流量或壓差直接貼到本配方 |
 
-表中的 PG 濃度與凝固點是 S11 的**規格範圍**，不是供應商績效樣本；因此沒有抽樣 `n`、
+表中的 PG 濃度與凝固點保留 **2022 年 S11 的歷史範圍**，不是現行全部產品的門檻，也不是供應商績效樣本；因此沒有抽樣 `n`、
 sampling SE 或 t 值，也不能據此排列熱效率、泵功、成本與壽命。S11 沒有提供黏度、比熱或
 跨流體容量比較，S12 也沒有宣稱 treated water 必然優於 PG。研究中心只量到「兩套文件的
 證據欄位不同」，沒有量到「哪一種流體在所有場域更好」。
+
+2026 年新版 S36 的 Table 1 明示其中數值是代表值，不應當成規格使用。本表不把新版數字覆蓋
+舊版；實際採購仍須固定文件版本、商品配方與專案驗收條件。[C45]
 
 **最後才問 kW 能不能搬過去。** S9 的三張性能圖提供一個簡單閘門：先在熱性能圖固定流體、
 兩側流量、進水溫度與 ATD，再用 TCS 壓頭圖確認二次側推得動，用 FWS 阻抗圖確認設施端供得上。
@@ -2519,4 +2523,101 @@ from: triaged
 to: triaged
 reason: added_delta_cdu_product_announcements_and_comparability_boundaries_without_thesis_clock_refresh
 evidence: sources:S34,S35
+-->
+
+<!-- research_source
+source_id: S36
+role: standard
+source_kind: document
+publisher: Open Compute Project / PG fluid contributors
+independence_group: open-compute-project
+title: Guidelines for Using Propylene Glycol-Based Heat Transfer Fluids in Liquid Cooled Racks — Revision 2.0, Version 1.0.0
+published_at: 2026-09-15
+captured_at: 2026-10-19
+accepted_at: 2026-10-19
+status: active
+url: https://www.opencompute.org/wp-content/uploads/2026/10/OCP-PG25-Guidelines-V1.0.0.pdf
+locator: PDF 95頁；p1封面版次及9/15日期、p2版本歷史；pp9–10閉式TCS範圍；p16 Table1腳註；pp17–18 Table2追溯記錄；pp19–20 §6.1–6.2濕接材料兼容與變更再驗。原檔SHA256 5731d7036848e15612229a33b65d2af948b68477a6359e256f198885037a7f43；引用頁及相鄰頁已渲染，第二位reviewer使用同一下載檔離線重算SHA並核對日期、條文、表格腳註及像素，未重下載
+limitation: 建議性指引非具名產品認證；本輪核指定條款，不宣稱完成全95頁新舊差異。封面日、版本歷史June2026及URL上傳路徑October分開；不含FWS，也無同款CDU跨流體曲線、場域驗收或公司財務。與S11同屬OCP消息鏈，不新增獨立實作樣本
+-->
+
+<!-- research_claim
+claim_id: C43
+label: verified
+status: active
+claim: OCP新版丙二醇流體指引封面列Revision 2.0、Version 1.0.0及2026年9月15日；適用範圍為CDU到冷板IT設備之間的閉式TCS，不涵蓋FWS，內容定位為需按專案調整的建議性基線
+supporting_source_ids: S36
+contrary_source_ids:
+as_of: 2026-10-19
+basis: S36 p1封面及pp9–10 Introduction直接列出文件身分、閉式次迴路、FWS排除及建議性質
+boundary: 只證實文件與適用範圍；本輪接受日不是發布日，不將June版本歷史或October上傳路徑當發布日；不是具名CDU客戶資格、法規強制條件或投運結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C44
+label: verified
+status: active
+claim: 新版指引Table2把流體來源與批次、交貨日及COA、分析報告、元件更換、系統液量與處理紀錄列入追溯；§6.2並建議在系統最高操作溫度核對濕接材料兼容性，未來更換材料或設計也要再次驗證
+supporting_source_ids: S36
+contrary_source_ids:
+as_of: 2026-10-19
+basis: S36 pp17–18 Table2及p19 §6.2，p20接續說明材料配方差異與清單非完備
+boundary: 條文存在不等於供應商已執行；COA是批次分析文件，不代替CDU性能曲線、場域運行／故障紀錄、客戶簽核或營收；不把建議性指引外推為法規義務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C45
+label: verified
+status: active
+claim: 新版PG指引Table1的腳註明示表中數值為代表值，不應解讀為規格
+supporting_source_ids: S36
+contrary_source_ids:
+as_of: 2026-10-19
+basis: S36 p16 Table1末尾腳註直接區分representative values與specifications
+boundary: 只描述新版表格的使用界線，不回寫2022年S11及C15，也不替任何商品建立或撤銷合格門檻；本輪沒有發布新舊數值的統計比較
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 10 月 19 日更新 PG 流體指引能回答哪些驗收問題
+
+**新版指引提供一張可追問的清單，仍不是任何一台 CDU 的合格證。** OCP 文件封面標示
+2026 年 9 月 15 日、Revision 2.0、Version 1.0.0。它處理的是 CDU 通往晶片冷板的閉式
+TCS；建築端的 FWS 不在這份指引範圍內。文件建議使用者依材料、配方與專案條件調整做法，
+不是拿到規格書就完成設備或整座場址驗收。[C43]
+
+新手可以先記住兩個詞：**COA 是某一批冷卻液的分析證明；濕接材料是實際碰到冷卻液的
+金屬、塑膠與密封件等。** 新版把批次、分析報告、元件更換、液量與處理紀錄連在一起，
+並建議最高工作溫度下的相容性確認；更換材料或設計後，也建議重新驗證。[C44]
+
+讀公司產品說明時，可以依序問：用的是哪個批次？密封件或管材換過嗎？最高工作溫度下
+重新驗過嗎？如果答案只是一張通用材料清單，就還不能對回那台設備的實際狀態。
+下一份值得追的文件，是**同一設備或場址的批次、變更、測試與客戶簽核紀錄**。
+
+也別把通用數值表當成全部商品的合格線：新版 Table 1 明確標為代表值而非規格；本文前面
+保留的濃度與凝固點表則來自 2022 年舊版。兩版應分開讀，不能把不同版本的欄位拼成新的
+驗收標準。[C45] 這次增加的是方法條款；C19 的具名跨流體證據與 C21 的主命題仍需各自
+接受實際產品、場域及商業證據檢驗。
+
+來源：[S36 新版 PG 流體指引](https://www.opencompute.org/wp-content/uploads/2026/10/OCP-PG25-Guidelines-V1.0.0.pdf)。
+
+<!-- transition
+date: 2026-10-19
+from: triaged
+to: triaged
+reason: added_pg_guideline_scope_and_material_traceability_without_thesis_clock_refresh
+evidence: sources:S36
 -->

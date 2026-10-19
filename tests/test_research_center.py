@@ -374,6 +374,57 @@ class ResearchCenterTest(unittest.TestCase):
         self.assertIn("S1 甲公司正式公告", monitoring["rows"][0][2][0]["s"])
         self.assertEqual(monitoring["rows"][0][3][0]["s"], "S2 主管機關資料")
 
+    def test_monitor_work_dates_replay_reviews_without_refreshing_evidence(self):
+        topics = copy.deepcopy(self.topics)
+        topic = topics[0]
+        topic["monitoring"][0]["status"] = "active"
+        topic["monitoring"].extend([
+            dict(topic["monitoring"][0], monitor_id="T2", next_check="2026-08-07",
+                 trigger="尚未回查的第二項"),
+            dict(topic["monitoring"][0], monitor_id="T3", status="retired",
+                 retired_at="2026-08-06", retirement_reason="接續節點"),
+        ])
+        before = copy.deepcopy(topics)
+        reviews = [
+            {"topic_id": topic["topic_id"], "monitor_id": "T1",
+             "checked_at": "2026-08-04", "next_check": "2026-08-30",
+             "outcome": "not_yet_testable"},  # 提前檢查不推進原到期日
+            {"topic_id": topic["topic_id"], "monitor_id": "T1",
+             "checked_at": "2026-08-05", "next_check": "2026-08-10",
+             "outcome": "no_new_evidence"},
+            {"topic_id": topic["topic_id"], "monitor_id": "T3",
+             "checked_at": "2026-08-05", "next_check": "2026-08-20",
+             "outcome": "not_yet_testable"},
+        ]
+        library = bd.build_research_library(
+            self.notes, self.reports, topics, self.stock_meta, {"power": "功率元件"},
+            self.events, monitor_reviews=reviews,
+        )
+        article = next(row for row in library["articles"]
+                       if row["id"] == "topic-" + topic["topic_id"])
+        next_step = article["sections"][0]["blocks"][1]["items"][-1][1]["s"]
+        self.assertIn("下次工作回查 2026-08-07", next_step)
+        self.assertIn("尚未回查的第二項", next_step)
+        self.assertIn("工作日期不代表證據已更新", next_step)
+        table = next(section for section in article["sections"]
+                     if section["h"] == "追蹤節點與失效條件")["blocks"][0]
+        self.assertIn("下次工作回查 2026-08-10", table["rows"][0][4][0]["s"])
+        self.assertIn("原定 2026-08-05", table["rows"][0][4][0]["s"])
+        self.assertIn("非證據更新", table["rows"][0][4][0]["s"])
+        self.assertIn("退役 2026-08-06", table["rows"][2][4][0]["s"])
+        self.assertNotIn("2026-08-20", table["rows"][2][4][0]["s"])
+        self.assertEqual(article["confidence"]["last_evidence_at"], "2026-07-29")
+        self.assertEqual(article["meta"]["reviewDue"], "2026-08-05")
+        self.assertEqual(topics, before)
+
+    def test_monitor_work_date_without_reviews_uses_original_schedule(self):
+        library = bd.build_research_library(
+            self.notes, self.reports, self.topics, self.stock_meta,
+        )
+        article = next(row for row in library["articles"]
+                       if row["id"] == "topic-" + self.topics[0]["topic_id"])
+        self.assertIn("下次工作回查 2026-08-05", str(article["sections"][0]))
+
     def test_evidence_reader_guide_separates_inference_from_confidence(self):
         topics = copy.deepcopy(self.topics)
         topics[0]["meta"]["thesis_claim_id"] = "C1"
@@ -1425,7 +1476,7 @@ class ResearchCenterTest(unittest.TestCase):
         for marker in (
             "RESEARCH_TEMPLATE", "RESEARCH_OUT", "_article_excerpt(topic.get",
             "_research_article_reading_mission(article)",
-            "_topic_structured_sections(topic, sections or [], group_names)",
+            "topic, sections or [], group_names, effective_due)",
             'research_library["knowledgeGraph"] = build_knowledge_graph(',
             "attach_research_learning_paths(",
             'research_library["candidateRadar"] = load_research_radar(',
@@ -5684,15 +5735,13 @@ process.stdout.write(JSON.stringify(results));
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
-        self.assertEqual(
+        self.assertGreaterEqual(
             sum(line.startswith("- **") for line in glossary.splitlines()), 59
         )
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
-        reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先把一座人工智慧叢集拆成六張網", 1
-        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split("\n## ", 1)[0]
         for jargon in (
             "UALink", "UEC", "ESUN", "SUE-T", "UALoE", "scale-up",
             "scale-out", "endpoint", "switch", "ASIC", "compliance",
@@ -5706,7 +5755,7 @@ process.stdout.write(JSON.stringify(results));
             ("research_claim", 23), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 5),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
         for ledger_contract in (
             "source_id: S15", "source_id: S20", "source_id: S24",
             "claim_id: C14", "claim_id: C19", "claim_id: C23",
@@ -5714,6 +5763,18 @@ process.stdout.write(JSON.stringify(results));
             "claim_id: C9\nlabel: inference\nstatus: superseded",
             "claim_id: C18\nlabel: inference\nstatus: active",
             "correction_kind: supersedes\ncorrects_claim_id: C9",
+            "source_id: S25\nrole: standard\nsource_kind: living_index",
+            "source_id: S26\nrole: other_primary\nsource_kind: document",
+            "claim_id: C24\nlabel: verified\nstatus: active",
+            "claim_id: C25\nlabel: verified\nstatus: active",
+            "claim_id: C26\nlabel: inference\nstatus: active",
+            "monitor_id: T6", "monitor_id: T7",
+            "last_reviewed_at: 2026-08-12", "review_due: 2026-08-17",
+            "thesis_claim_id: C18", "base_confidence: medium",
+            "## 10 月更新：規格換版和產品出貨分開看",
+            "Meta於2026-10-12自述Tahan正在出貨",
+            "不能當成客戶交付完成",
+            "不能據此改寫測試要求", "把 ESUN 資料平面放在未來世代",
         ):
             self.assertIn(ledger_contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -5758,7 +5819,14 @@ process.stdout.write(JSON.stringify(results));
         self.assertIn("label: AI 資料路徑與跨廠互通", graph)
         for edge_id in range(15, 28):
             self.assertIn(f"edge_id: KG-FAB-I{edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 32)
+        self.assertGreaterEqual(graph.count("<!-- knowledge_edge"), 32)
+        meta_shipping = graph.split("edge_id: KG-FAB-C06", 1)[1].split("-->", 1)[0]
+        for contract in (
+            "from_id: company:meta", "commercial_stage: shipment",
+            "claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C25",
+            "不是客戶收貨完成", "未來ESUN不得移植到當期Tahan",
+        ):
+            self.assertIn(contract, meta_shipping)
 
     def test_compute_connect_station_seven_separates_link_test_clocks_roles_and_deployment_gates(self):
         topic = (

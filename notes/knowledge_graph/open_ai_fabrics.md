@@ -100,18 +100,18 @@ view: industry
 from_id: concept:open-ai-fabrics
 to_id: standard:uec
 relation: includes
-claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C2
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C2,MI-2026-08-02-OPEN-AI-FABRICS#C24
 note_refs:
 evidence_state: verified
 commercial_stage: concept
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-02
-review_due: 2026-08-10
+as_of: 2026-10-19
+review_due: 2026-10-21
 status: active
-boundary: UEC 現行公開版本為 1.0.3；版本發布不證明 NIC、switch、optics、cable 已互通或部署。
-next_trigger: UEC 公布 compliance、互通結果與商用產品清單。
+boundary: 10/19官方歷史索引將1.1列為現行、發布日10/12，1.0.3為歷史版本；本輪未核1.1全文，發布不證明舊測試床適用、新版條文或具名產品合規、互通與部署。
+next_trigger: 取得1.1固定全文及差異，再追新版compliance、互通矩陣與具名產品結果；兩關不得互代。
 -->
 
 <!-- knowledge_edge
@@ -652,4 +652,24 @@ review_due: 2026-08-19
 status: active
 boundary: algbw 是 S／t，busbw 是依 collective 與 ranks 衍生的正規化；兩者不是獨立 payload、不得相加，也不能在缺 algorithm／topology／offload 條件時冒充 wire bandwidth。
 next_trigger: 具名系統同時公開 message／time、algbw／busbw 公式、實測 port／link counters、algorithm、topology、tail 與 end-to-end step 結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-FAB-C06
+view: company
+from_id: company:meta
+to_id: concept:open-ai-fabrics
+relation: integrates
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C25
+note_refs:
+evidence_state: verified
+commercial_stage: shipment
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-12
+review_due: 2026-10-23
+status: active
+boundary: 出貨階段僅指Meta自述Tahan與MTIA 300既有RoCE配置正在出貨，不是客戶收貨完成、獨立驗收、出貨量、ESUN合規或台廠營收；同文下一代preview與未來ESUN不得移植到當期Tahan。
+next_trigger: 同一Tahan版本的具名交付與驗收範圍；未來ESUN另追實作、測試及交付，不由共同供應商補接。
 -->

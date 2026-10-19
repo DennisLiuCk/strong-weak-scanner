@@ -2173,7 +2173,7 @@ def _research_source_refs(source_ids, source_by_id):
     return "、".join(labels) or "—"
 
 
-def _topic_analyst_section(topic, source_by_id, group_names=None):
+def _topic_analyst_section(topic, source_by_id, group_names=None, effective_due=None):
     """由 v3 register 合成首屏重點；只摘要既有結論、證據與追蹤項目。"""
     group_names = group_names or {}
     claims = [
@@ -2237,12 +2237,17 @@ def _topic_analyst_section(topic, source_by_id, group_names=None):
         item for item in (topic.get("monitoring") or [])
         if item.get("status", "active") == "active"
     ]
-    active_monitors.sort(key=lambda item: item.get("next_check") or "9999-12-31")
+    def work_due(item):
+        return (effective_due or {}).get(
+            (topic.get("topic_id"), item.get("monitor_id")), item.get("next_check"))
+
+    active_monitors.sort(key=lambda item: work_due(item) or "9999-12-31")
     if active_monitors:
         first_monitor = active_monitors[0]
         next_check = (
-            f"{first_monitor.get('next_check') or '—'}："
+            f"下次工作回查 {work_due(first_monitor) or '—'}："
             f"{first_monitor.get('trigger') or first_monitor.get('metric') or '—'}"
+            "（工作日期不代表證據已更新）"
         )
     else:
         next_check = "目前沒有安排下一次檢查；本文不應被當成永久有效的結論。"
@@ -2304,7 +2309,7 @@ def _topic_analyst_section(topic, source_by_id, group_names=None):
     }
 
 
-def _topic_structured_sections(topic, sections, group_names=None):
+def _topic_structured_sections(topic, sections, group_names=None, effective_due=None):
     """把 v3 ledger 轉成讀者可見段落；原始 Markdown blocks 仍是唯一事實來源。"""
     sections = [section for section in (sections or []) if section.get("blocks")]
     source_by_id = {
@@ -2472,7 +2477,12 @@ def _topic_structured_sections(topic, sections, group_names=None):
                     f"；退役 {item.get('retired_at') or '—'}；"
                     f"原因：{item.get('retirement_reason') or '—'}")
             else:
-                schedule += f"；下次 {item.get('next_check') or '—'}"
+                original_due = item.get("next_check") or "—"
+                work_due = (effective_due or {}).get(
+                    (topic.get("topic_id"), item.get("monitor_id")), original_due)
+                schedule += f"；下次工作回查 {work_due}"
+                if work_due != original_due:
+                    schedule += f"；原定 {original_due}（回查帳本接續，非證據更新）"
             rows.append([
                 _research_run(
                     f"{item.get('monitor_id') or '—'}｜"
@@ -2496,7 +2506,7 @@ def _topic_structured_sections(topic, sections, group_names=None):
             ], "rows": rows}],
         })
 
-    analyst = _topic_analyst_section(topic, source_by_id, group_names)
+    analyst = _topic_analyst_section(topic, source_by_id, group_names, effective_due)
     if not generated:
         return ([analyst] if analyst else []) + sections
 
@@ -2856,10 +2866,11 @@ def _research_reading_mission_notations(article, mission, group_names=None):
 
 
 def build_research_library(notes, reports, topics=None, stock_meta=None, group_names=None,
-                           events=None, as_of=None, reader_terms=None):
+                           events=None, as_of=None, reader_terms=None, monitor_reviews=None):
     """建立獨立研究中心 payload；事件錨點歸入市場議題，不另造第四種閱讀模式。"""
     stock_meta = stock_meta or {}
     group_names = group_names or {}
+    effective_due = effective_monitor_schedule(topics or [], monitor_reviews or [])
     articles = []
     topic_by_article_id = {}
     type_order = {"formal_note": 0, "narrative": 1, "topic": 2}
@@ -2987,7 +2998,8 @@ def build_research_library(notes, reports, topics=None, stock_meta=None, group_n
         if sections is None and topic.get("path") and os.path.exists(topic["path"]):
             with open(topic["path"], encoding="utf-8") as handle:
                 sections = _extract_sections(handle.read())
-        sections = _topic_structured_sections(topic, sections or [], group_names)
+        sections = _topic_structured_sections(
+            topic, sections or [], group_names, effective_due)
         sections = _reader_group_labels_in_sections(sections, group_names)
         article_id = (
             f"topic-{topic.get('topic_id') or os.path.basename(topic.get('relpath', 'topic'))}"
@@ -4731,6 +4743,9 @@ def main():
     research_as_of = research_today()
     research_topics = load_research_topics(
         TOPICS_DIR, reports=hypotheses_map, as_of=research_as_of)
+    research_reviews = load_monitor_reviews(
+        research_topics, research_as_of, strict=True,
+    )
     stock_names = {r["stock_id"]: r["name"] for r in rows}
     stock_meta = {
         r["stock_id"]: {"name": r["name"], "group": r["grp"], "biz": r["biz"] or ""}
@@ -4746,6 +4761,7 @@ def main():
         notes_map, hypotheses_map, research_topics, stock_meta, GROUP_NM, events,
         as_of=research_as_of,
         reader_terms=research_reader_terms,
+        monitor_reviews=research_reviews,
     )
     attach_research_topic_guide(
         research_library, research_topic_guide, strict=True,
@@ -4783,9 +4799,6 @@ def main():
     # 族群成熟度不是 article count 排名：公司筆記、題材、具名公司橋接、材料性、
     # 證據層級與維護期限分軸顯示。到期狀態重播 append-only monitor review ledger，
     # 避免已檢查但沒有新 evidence 的 stale topic 被誤標成「從未處理」。
-    research_reviews = load_monitor_reviews(
-        research_topics, research_as_of, strict=True,
-    )
     research_library["groupMaturity"] = build_group_maturity(
         notes_map, research_topics, stock_meta, GROUP_NM,
         research_library["knowledgeGraph"], research_reviews,

@@ -765,3 +765,23 @@ status: active
 boundary: 15.19 K 只是在 1890 LPM 與 2MW 同屬一條穩態 standard-water 迴路假設下的條件式量綱核對；不是 Deschutes 實測、3°C ATD、效率、CDU 台數或財務證據。
 next_trigger: 具名 CDU 對同一版本與工作點公開流體、FWS／TCS 四個溫度、兩側流量與壓差、熱負載 reference plane、校正／不確定度、泵浦與備援狀態、原始資料及 site pass／fail。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-LC-I23
+view: industry
+from_id: concept:liquid-cooling
+to_id: capability:coolant-compatibility
+relation: requires
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C43,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C44,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C45
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-19
+review_due: 2026-10-23
+status: active
+boundary: 只投影9/15版PG指南的閉式TCS材料相容、批次追溯及變更再驗條款；不含FWS，代表值不是通用商品規格，條文不等具名CDU資格、場址通過或公司收入。
+next_trigger: 同設備版本的流體批次、COA、濕接材料變更、最高操作溫度相容測試及客戶簽核；沒有實測不升級公司成熟度。
+-->

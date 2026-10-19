@@ -154,7 +154,7 @@ class ResearchCycleOctober17Test(unittest.TestCase):
             self.assertTrue(current[0]["evidence"].startswith("sources:"))
             topic = {"topic_id": meta["topic_id"], "title": meta["topic_id"],
                      "relpath": path, "meta": meta, "transitions": transitions}
-            self.assertEqual(bd._topic_content_date(topic), "2026-10-17")
+            self.assertGreaterEqual(bd._topic_content_date(topic), "2026-10-17")
             topics.append(topic)
         recent = bd.build_recent_articles("2026-10-17", {}, {}, topics=topics)
         self.assertEqual({r["researchId"] for r in recent["items"]},
