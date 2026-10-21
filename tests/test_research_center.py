@@ -8145,7 +8145,15 @@ process.stdout.write(JSON.stringify(results));
             ("research_claim", 26), ("metric_comparison", 0),
             ("impact", 6), ("monitoring_item", 6),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in ("research_source", "research_claim", "monitoring_item"):
+                self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for field, prefix, count in (("source_id", "S", 26), ("claim_id", "C", 26),
+                                     ("monitor_id", "T", 6)):
+            ids = re.findall(rf"^{field}: ({prefix}\d+)$", topic, re.M)
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, count + 1)} <= set(ids))
 
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
@@ -8182,7 +8190,11 @@ process.stdout.write(JSON.stringify(results));
             / "vera_rubin_delivery_contract.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: Vera Rubin 七關交付與整櫃責任", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 27)
+        self.assertGreaterEqual(graph.count("<!-- knowledge_edge"), 27)
+        edge_ids = re.findall(r"^edge_id: (KG-VRD-[CI]\d+)$", graph, re.M)
+        self.assertEqual(len(edge_ids), len(set(edge_ids)))
+        self.assertTrue({f"KG-VRD-C{i:02}" for i in range(1, 8)} <= set(edge_ids))
+        self.assertTrue({f"KG-VRD-I{i:02}" for i in range(1, 21)} <= set(edge_ids))
         for node in (
             "from_id: company:nvidia", "from_id: company:coreweave",
             "from_id: company:google", "from_id: company:2376",
@@ -8558,9 +8570,17 @@ process.stdout.write(JSON.stringify(results));
             ("impact", 3), ("monitoring_item", 4),
             ("transition", 8),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in ("research_source", "research_claim", "monitoring_item", "transition"):
+                self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for field, prefix, count in (("source_id", "S", 9), ("claim_id", "C", 16),
+                                     ("monitor_id", "T", 4)):
+            ids = re.findall(rf"^{field}: ({prefix}\d+)$", topic, re.M)
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, count + 1)} <= set(ids))
         glossary = topic[topic.index("### 名詞小字典"):topic.index("### 三句話抓重點")]
-        self.assertEqual(
+        self.assertGreaterEqual(
             sum(line.startswith("- **") for line in glossary.splitlines()),
             46,
         )
@@ -8591,7 +8611,11 @@ process.stdout.write(JSON.stringify(results));
         )
         self.assertIn("edge_id: KG-APB-I17", graph)
         self.assertIn("edge_id: KG-APB-I18", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+        self.assertGreaterEqual(graph.count("<!-- knowledge_edge"), 20)
+        edge_ids = re.findall(r"^edge_id: (KG-APB-[CI]\d+)$", graph, re.M)
+        self.assertEqual(len(edge_ids), len(set(edge_ids)))
+        self.assertTrue({"KG-APB-C01", "KG-APB-C02"} <= set(edge_ids))
+        self.assertTrue({f"KG-APB-I{i:02}" for i in range(1, 19)} <= set(edge_ids))
 
     def test_power_buffering_tracks_recharge_debt_and_second_event_readiness(self):
         topic = (

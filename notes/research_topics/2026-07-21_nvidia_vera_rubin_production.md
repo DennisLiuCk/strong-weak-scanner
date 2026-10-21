@@ -104,7 +104,32 @@ reason: named_coreweave_cognition_production_workload_branch_without_financial_o
 evidence: sources:S25,S26
 -->
 
+<!-- transition
+date: 2026-10-21
+from: triaged
+to: triaged
+reason: added_dsx_pod_factory_transport_site_validation_boundaries_without_thesis_clock_or_financial_upgrade
+evidence: sources:S27
+-->
+
 ## 新手先讀：這篇在講什麼
+
+### 10 月 21 日補課：工廠先測好，現場還要驗什麼？
+
+NVIDIA 的 **DSX POD** 是把 AI 基礎設施預先裝進貨櫃的參考設計。其公開說明把驗證拆成
+工廠整合、運輸後重驗、現場啟用三段：工廠可以檢查組態與內部水路，運抵後重做指定檢查，
+現場仍須接上供電、用水及排熱設施並測試。[S27][C27]
+
+**已證實**的是官方提出這些設計與交接要求；**推論**是驗收紀錄必須能對上同一套設備與版本；
+**待驗證**的是具名客戶真的完成哪些測試。[C28] 參考設計描述「應怎麼做」，不是某座機房的
+「已做完清單」。工廠驗收也不會自動變成客戶簽收或台灣公司的收入。
+
+**Commissioning（現場啟用調校）**就是設備接到當地設施後，確認整套系統在實際條件下能運作。
+例如這份設計把標準 800VDC 輸入界面放在貨櫃邊界，上游發電、轉換及當地電氣方案仍由夥伴
+工程處理；不能因此推成每個站點都使用同一種轉換器。[S27][C27]
+
+下次看到「出廠已測試」，可以問：運到哪個站點？途中組態是否改過？現場水路與排熱測了嗎？
+有沒有同版本測試紀錄、失敗處置與客戶簽收？T7 追這些共同欄位，主命題 C11 的舊時鐘不變。
 
 ### 10 月 4 日更新：已有具名客戶在跑，不等於所有地方都買得到
 
@@ -121,6 +146,8 @@ CoreWeave 9 月 30 日公告，Cognition 已在 Vera Rubin NVL72 上執行正式
 供應商交貨、客戶驗收及財務認列對上？本文只推進具名工作旁支，不刷新主命題 C11 的時鐘。
 
 ### 名詞小字典
+
+- **DSX／DSX POD**：NVIDIA 的 AI 基礎設施設計框架，以及其中把系統預先整合進貨櫃的參考設計；設計方案不是具名場站的實際驗收結果。
 
 - **Cognition**：本次被 CoreWeave 具名的軟體開發 AI 客戶；客戶引述仍是營運商消息鏈，不是第二份獨立發布。
 
@@ -1267,6 +1294,50 @@ verification_needed:
 resolution:
 -->
 
+<!-- research_source
+source_id: S27
+role: other_primary
+source_kind: document
+publisher: NVIDIA
+title: Achieve Productive AI Capacity Faster and More Predictably with NVIDIA DSX POD
+published_at: 2026-10-21
+captured_at: 2026-10-21
+accepted_at: 2026-10-21
+status: active
+url: https://developer.nvidia.com/blog/achieve-productive-ai-capacity-faster-and-more-predictably-with-nvidia-dsx-pod/
+locator: Compute integration、Power delivery、Liquid cooling、Mechanical design and transportation、Parallelizing factory integration and site preparation；原HTML SHA256 40fff1e11beb9fb33e38726d5b6b476409a65ecc7e88efbdb3db13e040520513
+limitation: 平台商參考設計與可涵蓋的驗證計畫，不是具名客戶已完成測試的報告；沒有站點、機架數、版本、通過分母或供應商產品財務
+independence_group: nvidia
+-->
+
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: NVIDIA 10/21 DSX POD參考設計說明工廠整合驗證、運抵後指定重驗與現場commissioning分工；800VDC輸入界面位於核心貨櫃，上游供電轉換及區域方案由夥伴工程處理
+supporting_source_ids: S27
+contrary_source_ids:
+as_of: 2026-10-21
+basis: 原文Compute integration使用validation plan can cover，Liquid cooling及運輸段保留現場完整水路驗證與運抵重驗；Power delivery明示container interface與upstream分工
+boundary: 只證明官方設計要求，沒有具名場站已通過測試或客戶驗收；不等全面GA、通用供電拓撲、特定台廠訂單或財務
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: inference
+status: active
+claim: DSX POD的工廠測試、運輸後重驗及現場啟用紀錄應以同一設備和組態版本對接，才能判斷交付時是否仍是出廠驗證的系統
+supporting_source_ids: S27
+contrary_source_ids:
+as_of: 2026-10-21
+basis: 由原文出貨前記錄configuration與test status、運抵重做指定檢查及場站連接後commissioning的先後關係推導
+boundary: 研究使用的核對方法，不宣稱取得客戶實際紀錄或統一合格標準；不能把工廠測試日期當收入認列日期
+verification_needed: 同名設備批次、組態與版本、工廠及現場測試、運輸變更、失敗處置及客戶簽收
+resolution:
+-->
+
 ## 影響路由
 
 <!-- impact
@@ -1423,6 +1494,20 @@ frequency_detail: 營運商或客戶發布可用性、部署、運行及驗收�
 next_check: 2026-10-18
 trigger: 同一具名客戶與 NVL72 配置提供站點、機架數、軟硬體版本、工作持續時間及驗收分母，或另有客戶證實同條件可重現
 invalidation: 供應撤回、客戶更正用途、持續運行或驗收失敗；只有既有新聞稿重刊不得刷新時鐘
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C27,C28
+metric: DSX POD同一配置的工廠測試、運抵重驗與現場啟用紀錄是否能逐段對接
+source_ids: S27
+watch_source_ids: S13
+frequency: event_driven
+frequency_detail: 平台商、整合商或客戶發布實作及驗收附件即查；10/26先找具名系統與測試文件
+next_check: 2026-10-26
+trigger: 具名客戶以同設備批次與版本公開工廠測試範圍、運抵重驗、場站電力及水路條件、失敗處置與驗收分母
+invalidation: 運輸或配置變更使出廠測試不再適用、現場測試失敗或驗收撤回；只有參考設計重刊不得視為部署成功
 -->
 
 - 技嘉下一份公司 IR 是否把 Rubin 從生態系／開發名單推進到可量化的驗證、量產出貨、

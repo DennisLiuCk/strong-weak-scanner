@@ -6,6 +6,27 @@ reference design；族群節點仍是待驗證搜尋路由，沒有一條線代�
 根節點；銘牌到可交付能量橋接再把功率與秒數、SOC、SOH、效率、功率限制及資格帳分開，方便
 讀者看出「時間尺度」只是第一道篩選，不是完整替代性或公司受惠判準。重複事件就緒護照再把
 第一次 EOD、充電延遲、淨回充、聚合排程、rearm 與第二脈衝結果接成另一個可稽核時鐘。
+Mt. Diablo 新版規格另接一條文件線，把正常脈衝與交流輸入中斷的測試任務分開。
+
+<!-- knowledge_edge
+edge_id: KG-APB-I19
+view: industry
+from_id: concept:ai-power-buffering
+to_id: standard:mt-diablo-power-rack
+relation: requires
+claim_refs: MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C17,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C18,MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY#C19
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-21
+review_due: 2026-10-23
+status: active
+boundary: 只確認Mt. Diablo v1.0.0文件身分與特定條款；BBU選用時45至90秒綁定100%負載，動態電壓在PSU或power shelf輸出量測，無產品實測或台廠財務，也非所有平台通用標準。
+next_trigger: 同一產品revision公布正常pulse不觸發BBU與AC-loss平順交接的原始波形 量測平面 失敗處置及客戶pass/fail。
+-->
 
 <!-- knowledge_graph_meta
 schema_version: 1

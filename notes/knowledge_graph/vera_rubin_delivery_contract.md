@@ -3,6 +3,27 @@
 本圖把 NVIDIA 平台、營運商驗證、雲端供應語言與三家台灣系統廠的公開角色接回同一張圖，
 再把平台生產、系統就緒、工廠生產、整櫃驗證、站點驗收、工作負載與財務歸因逐關分開。
 圖中的族群線是下一份證據的搜尋入口；除具名系統廠角色外，不代表台灣供應商已取得訂單或獲利。
+DSX POD 的工廠／運輸／現場交接另以方法線呈現，不提高原部署與公司財務線的成熟度。
+
+<!-- knowledge_edge
+edge_id: KG-VRD-I21
+view: industry
+from_id: product:nvidia-vera-rubin-nvl72
+to_id: process:ai-system-shipment-event-passport
+relation: requires
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C27,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C28
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-21
+review_due: 2026-10-26
+status: active
+boundary: 本線把DSX POD參考方法用於Rubin研究，原文只稱Vera Rubin平台而未指名NVL72，並非NVL72專用DSX配置或驗收已證實；工廠 運輸 現場共同鍵是研究方法，不是客戶紀錄或EPCIS採用證據，無台廠財務歸因。
+next_trigger: 同一設備批次與版本公布三段測試及運輸變更 失敗處置 現場水電條件與客戶簽收分母。
+-->
 
 <!-- knowledge_graph_meta
 schema_version: 1

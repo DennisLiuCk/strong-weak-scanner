@@ -606,3 +606,4 @@ process:ercot-case-rfi-verification,process,逐案用電核驗與補件期限,ER
 process:chiplet-restricted-bootstrap,process,小晶片受限啟動,Chiplet restricted bootstrap,concept:chiplet-design-handoff,必要外部安全評估在早期啟動不可用時保留有限功能 待評估成功才放行 不等於特定產品已通過測試
 process:chiplet-rma-authority-boundary,process,小晶片維修權限交接,Chiplet RMA authority boundary,concept:chiplet-design-handoff,診斷與除錯前處理舊使用者資料憑證和安全綁定 製造商根權限例外不可恢復舊使用者情境
 metric:dsx-message-delivery-latency,metric,DSX 訊息送達延遲,DSX message delivery latency|broker acknowledgement|subscriber receipt,concept:ai-rack-action-contract,分開發布至訊息代理確認及發布至訂閱端收件的時間 本地通訊測試不代表實體設備隔離或場域驗收
+standard:mt-diablo-power-rack,standard,Mt. Diablo 分離式電源機櫃規格,Mt. Diablo Disaggregated Power Rack Specification,concept:ai-power-buffering,以固定版本分開PSU正常峰值及動態負載與AC中斷時BBU備援交接 規格要求不等實際產品通過

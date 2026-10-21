@@ -88,7 +88,18 @@ reason: added_repeat_event_recharge_debt_and_rearm_passport_without_refreshing_t
 evidence: sources:S9
 -->
 
+<!-- transition
+date: 2026-10-21
+from: triaged
+to: triaged
+reason: accepted_mt_diablo_v1_document_and_psu_bbu_event_boundaries_without_refreshing_thesis_clock
+evidence: sources:S10
+-->
+
 ## 新手先讀：這篇在講什麼
+
+停電與正常用電尖峰是兩個不同事件：備用電池能撐多久，不代表每次負載突然升高都該啟動它。
+閱讀新版機櫃規格時，先問「誰接住哪一種事件、在哪裡量測」，再看容量與秒數。
 
 ### 名詞小字典
 
@@ -105,6 +116,9 @@ evidence: sources:S9
 - **BESS（Battery Energy Storage System）**：位於設施或公用電網介面側的較大型電池儲能，用來處理較慢、影響範圍更大的負載變化與發電機切換。
 - **時間尺度**：事件從發生到需要被補償的快慢。元件若在錯誤的時間尺度工作，即使都能儲能，也不代表可互相替代。
 - **Diablo 400**：OCP 的機架與電源規格專案，分別列出 BBU 與 capacitor bank 選項；規格選項不等於所有平台都採用。
+- **Mt. Diablo**：接續Diablo 400的分離式電源機櫃規格名稱；本文的 **v1.0.0** 是版本識別，不代表產品成熟度或測試通過。
+- **AC-loss（交流輸入中斷）**：主要交流輸入消失的事件，與正常運算負載的短暫尖峰不同。
+- **Specification（規格）**：寫明設計應滿足哪些條件；是否真的滿足，仍要看測試結果。
 - **EDLC（電雙層電容）**：可快速反覆充放電的超級電容；TI 用它示範 CBU，但 reference design 不等於量產 BOM。
 - **功率尖峰／低谷**：用電量在很短時間內突然升高或降低；緩衝設備要快速補上或吸收這段差額，避免供電系統失穩。
 - **儲能**：先把能量存起來，再在需要時釋放；電容與電池都能儲能，但反應速度、可支撐時間、位置與維護條件不同。
@@ -597,6 +611,92 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_source
+source_id: S10
+role: standard
+source_kind: document
+publisher: Open Compute Project
+title: Mt. Diablo Disaggregated Power Rack Specification v1.0.0
+published_at: 2026-10-08
+captured_at: 2026-10-21
+accepted_at: 2026-10-21
+status: active
+url: https://www.opencompute.org/wp-content/uploads/2026/10/OCP-Specification-Mt.-Diablo-Disaggregated-Power-Rack-Specification-v1.0.0.pdf
+locator: PDF file pp.1–3 封面與版本史；pp.14–17 §7.1.3、§7.2、§7.3.2–3 及 Tables 4–8。37頁原檔5134260 bytes，SHA-256 87aa3f2df88ca7b3e01bc6a9a499779970662e5c9f7b0f18a19a9e95b0bea2a4；封面Effective October 8, 2026，URL十月上傳不作另一發布日；引用頁及前後頁已渲染供同檔覆核
+limitation: 規格條款與示例負載不是產品測試結果；只核對指定頁，未完成全篇新舊版本diff，不聲稱這些條款均為1.0新增；與既有Diablo 400屬同OCP規格演進鏈，不是新增獨立場域實驗，也未指名台灣供應商BOM或財務
+independence_group: open-compute-project
+-->
+
+<!-- research_claim
+claim_id: C17
+label: verified
+status: active
+claim: OCP Mt. Diablo Disaggregated Power Rack v1.0.0封面生效日為2026年10月8日，版本史將它接續到Diablo 400的0.7.0；版本發布不代表任何產品或場域已完成驗收
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-10-21
+basis: 原PDF封面與版本史file pp.1–3逐頁核對，原檔SHA保存在S10；本輪補足先前僅能讀取文字而缺原件像素的取件缺口
+boundary: 只確認文件身分與沿革，不追認先前已驗、不把共同作者視為三個獨立實驗、不改寫舊0.7.0來源與claim
+verification_needed: 後續勘誤與固定產品revision仍須另核；完整新舊差異尚未完成
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: Mt. Diablo v1.0.0分開PSU保持能量、儲能接手與正常峰值/動態負載；規格要求PSU到儲能平順交接，並明示峰值及動態負載不應觸發BBU備援
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-10-21
+basis: PDF file p.14 §7.1.3.2將保持時間綁定最壞工況交接，pp.15–16 §7.3.2–3明文區分peak/dynamic loading與BBU啟動
+boundary: 這是該版本規格要求，不是裝置已滿足要求或通用控制策略；不由此推電池減量、電容增量或任何公司收入
+verification_needed: 同一production平台需公開正常pulse與AC-loss兩類事件原始波形、BBU啟動狀態、交接電壓及pass/fail
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: Mt. Diablo v1.0.0在選用BBU時要求100%負載下45至90秒保持時間，CBU功率與時間則依應用；動態電壓量測位於AC/DC PSU模組或power shelf輸出端，不能直接當IT負載端可交付能量
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-10-21
+basis: PDF file p.15 §7.2.1.1及§7.2.2條件與p.16 §7.3.3量測平面；p.17 Tables7–8為示例測試負載，不是觀測事件分布
+boundary: N=1份規格的條件要求，沒有隨機樣本或sampling SE/t；不把秒數乘任意峰值當電池容量，不與48V ORv3或其他公司產品直接比較
+verification_needed: 要比較產品需同一revision、量測平面、負載波形、溫度、SOC/SOH與轉換損失，並保留客戶驗收結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 新版Mt. Diablo把正常尖峰與備援啟動分開
+
+**證實的是規格要求，不是產品已通過。** 2026年10月8日生效的Mt. Diablo v1.0.0接續
+Diablo 400規格；它要求PSU內建保持能量先撐過交接，並讓儲能在最壞工況下平順接手。
+但正常峰值或動態負載不應因此啟動BBU。換句話說，「電池能撐多久」與「電源能不能接住
+正常尖峰」要分開驗，不能互相代替。[OCP規格pp.14–16](https://www.opencompute.org/wp-content/uploads/2026/10/OCP-Specification-Mt.-Diablo-Disaggregated-Power-Rack-Specification-v1.0.0.pdf)
+
+選用BBU時，45至90秒綁定100%負載；CBU的功率與持續時間則依應用選擇。動態電壓規格又
+量在PSU模組或電源架輸出端，與電池內部、IT設備端不是同一個位置。因此**推論**仍應從
+事件、位置與波形開始，而不是拿峰值瓦數乘備援秒數估算電池用量。
+
+接下來應追同一版本的兩組實測：正常脈衝是否誤觸BBU，以及AC中斷時能否順利交接。
+**待驗證**的是原始輸入/輸出波形、BBU狀態、測量位置、溫度與客戶pass/fail；若正常
+尖峰也使BBU啟動，或交接時電壓越界，就要回頭檢查控制與配置，不以規格已發布為由跳過。
+讀者可以問：供應商展示的是哪一種事件？兩條波形是否量在同一位置？通過一次後是否已恢復到能再接手？
+
+這次只接受新版指定條款，沒有宣稱全篇差異已核，也沒有把同一OCP規格鏈新增為獨立驗收。
+主命題C4與其2026年8月3日證據日期、原期限及可信度維持不變。
+
 ## 三種儲能怎麼接力：先看事件持續多久
 
 | 事件持續多久 | 誰來處理 | 設備在哪裡 | 目前一手證據 | 還不能因此判定 |
@@ -824,8 +924,9 @@ qualification、BOM 與財務的共同觀測仍為 N＝0。OCP PDF 可由研究�
 - [美國能源部：Energy Storage Valuation 方法報告](https://www.energy.gov/sites/default/files/2022-06/MSP_Report_2022June_Final_508_v3.pdf)
 - [NREL：BESS performance model 的 SOC／SOH／效率與功率限制](https://docs.nrel.gov/docs/fy20osti/75364.pdf)（PDF pp.9–11，2019-11-13）
 - [OCP：Open Rack V3 BBU Module Specification 1.4](https://www.opencompute.org/documents/open-rack-v3-bbu-module-spec-1-4-pdf)（PDF pp.13–21，2023-09-12）
+- [OCP：Mt. Diablo Disaggregated Power Rack Specification v1.0.0](https://www.opencompute.org/wp-content/uploads/2026/10/OCP-Specification-Mt.-Diablo-Disaggregated-Power-Rack-Specification-v1.0.0.pdf)（PDF pp.1–3、14–17，2026-10-08生效）
 
-9 份來源是定向架構與方法證據，不是產業抽樣。Diablo 400、Open Rack V3 與 NREL 模型分屬不同
+10 份來源是定向架構與方法證據，不是產業抽樣。Diablo 400與Mt. Diablo屬同一規格演進鏈；它們、Open Rack V3 與 NREL 模型分屬不同
 平台或用途；共同作用只是把任務功率、理想能量、可交付能量、回充與再次就緒分開，不能互借數值，
 也沒有台灣供應商的 BOM 或財務分母。
 
@@ -916,6 +1017,19 @@ frequency: monthly
 next_check: 2026-09-01
 trigger: OCP 或平台商公布可重建的 repeated-event qualification／field record，並固定 rack 版本、事件波形、SOC／SOH／溫度、充電排程、EOL／fault 條件與 production BOM
 invalidation: 同一平台證明第一次 pass 或單一 SOC／recharge-time 指標已能在相同可靠度下完整預測第二次事件結果，或 800V 架構完全移除 rack-level repeated-event requirement
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C17,C18,C19
+metric: Mt. Diablo固定版本產品能否分別通過正常pulse不觸發BBU與AC-loss平順交接的測試
+source_ids: S10
+watch_source_ids: S4
+frequency: weekly
+next_check: 2026-10-23
+trigger: OCP、平台或客戶提供相同revision下輸入/輸出波形、量測平面、溫度、BBU狀態與兩類事件pass/fail，或公布改變相關條款的勘誤
+invalidation: 正常pulse誤觸BBU、AC-loss交接電壓越界，或新版移除/改寫分工要求時，須下修相應產品或版本判定；不得僅由規格存在維持通過結論
 -->
 
 ## 什麼會推翻這篇

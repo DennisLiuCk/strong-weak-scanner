@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-10-21
+next_review: 2026-10-26
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -35,7 +35,7 @@ why_now: 到期追蹤初查發現Infineon9/9與SolarEdge合作把SSCB故障隔�
 knowledge_gain: 區分電力轉換、故障隔離與末端降壓，建立可重用的保護責任及測試邊界；合作稿與引述公司同一消息鏈，不計為兩份獨立驗收。
 first_rejection: 若仍只有合作稿或微秒級設計目標而沒有具名型號與可回查測試，就不另寫重複文章或新增公司受惠線。
 next_evidence: 取得同一SSCB型號與版本的電壓故障包絡及選擇性保護實測，核對客戶驗收與可比器件或替代拓撲；之後才追部署分母和收入。
-next_check: 2026-10-21
+next_check: 2026-10-26
 route: watch_only
 article_topic_id:
 graph_id:
@@ -60,7 +60,7 @@ why_now: 到期HBF追蹤初查找到9/9研究者HBFSim v1；模擬與校準的�
 knowledge_gain: 把研究者方法、模型擬合、可重現運行與真實晶片分層；10/8已核v3、v0.1.1與固定proof及reference原始紀錄，仍缺相同共同鍵的fast原始run，舊倍率與秒數未對齊，沒有重跑或外部驗證，不採效能點估計。
 first_rejection: 若未取得原始run或作者勘誤便無法對齊秒數與倍率，或只有擬合點沒有外部驗證，就不發布效能點估計或HBF硬體受惠結論。
 next_evidence: 先核對版本化PDF與作者原始run及勘誤，再分開NVMe校準與HBF模型參數，要求未參與擬合的驗證工作負載和實體裝置邊界。
-next_check: 2026-10-21
+next_check: 2026-10-26
 route: watch_only
 article_topic_id:
 graph_id:
@@ -217,3 +217,24 @@ Samsung最新新聞列表本輪只回空殼，不能說沒有新消息。10/26�
 
 研究增量放回既有液冷與開放互連文章：PG25指南的材料相容與追溯要求，及互連規格發布、
 公司自述正在出貨系統與未來預覽的區隔；正在出貨不等客戶收貨完成。沒有新增凍結候選、投資順位或台廠財務受惠線。
+
+## 10月21日回查
+
+SSCB仍是順位1、high、watch。重讀[Infineon合作原稿](https://www.infineon.com/press-release/2026/infpr202609-138)、
+[IEC 60947-10範圍摘要](https://webstore.iec.ch/en/publication/67514)及OCP配電入口，
+仍缺同型號故障包絡、選擇性保護原始波形與客戶驗收；IEC全文未取得。
+本輪取得的Mt. Diablo原PDF只補規格文件，不是SSCB產品測試。10/26補具名測試與買方附件。
+
+HBFSim仍是順位2、high、watch。[版本列表](https://arxiv.org/abs/2609.09800)仍列v3，
+[發布頁](https://github.com/SlugLab/HBFSim/releases)仍列v0.1.1；
+[CPU紀錄](https://github.com/SlugLab/HBFSim/blob/v0.1.1/docs/proofs/2026-10-06-ucie-release-cpu.md)
+保留失敗與未執行範圍，不是完整GPU重跑。缺同工作負載的可配對原始run、倍率勘誤及實體HBF外部驗證，
+10/26續查，不採性能點估計。玻璃本輪未重查，維持順位3、medium、watch與10/26節點。
+
+新知識放回Rubin交付與AI功率緩衝兩篇既有文章：DSX POD工廠／運輸／現場交接，
+Mt. Diablo正常脈衝與停電備援分工。兩者有可回查原文、可證偽測試與知識增量，但沒有
+台灣公司產品財務共同鍵；不另造重複候選、不重排凍結歷史、不新增公司受惠線。
+
+10/20公告另留下華邦、環球晶11/3法說與弘塑10/29活動的事件節點，預告不是已公布結果。
+高力CB收款、光洋科聯貸、日月光子公司買設備與未執行股份處分分開保留，不能拼成AI收入。
+既有京元電子預付款、欣興復工與光寶工程後續仍未完成雙端核對，不追認結案。
