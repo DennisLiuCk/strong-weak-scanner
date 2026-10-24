@@ -574,3 +574,23 @@ status: active
 boundary: 八欄狀態生命週期紀錄是研究中心整合 NVIDIA／AWS 架構後提出的比較框架，不是產業標準；欄位齊全也不自動證明因果、可靠度、成本下降、新增 SSD／NAND 或公司收入。
 next_trigger: 同一正式任務固定 model／harness／workload，公開 context、KV、durable state 三帳與 baseline-versus-treatment 的重做量、衝突、SLO、recovery、storage cost 及 BOM。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-MEM-I25
+view: industry
+from_id: concept:ai-memory-hierarchy
+to_id: process:kv-backend-version-contract
+relation: requires
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C38
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-24
+review_due: 2026-10-28
+status: active
+boundary: 固定backend／engine／runtime／connector及三種功能責任是研究比較方法，不是production效能、硬體採購或公司財務；dev導覽版本不能代本文固定版次。
+next_trigger: 同版本manifest與代表性長重複前綴baseline/treatment對上使用者SLO、成本與復原紀錄。
+-->

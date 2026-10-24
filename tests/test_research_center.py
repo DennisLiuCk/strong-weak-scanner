@@ -3842,7 +3842,12 @@ process.stdout.write(JSON.stringify(results));
         graph = (
             ROOT / "notes" / "knowledge_graph" / "ai_memory_hierarchy.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 28)
+        edge_ids = re.findall(r"^edge_id: (KG-MEM-[CI]\d+)$", graph, re.M)
+        self.assertEqual(len(edge_ids), len(set(edge_ids)))
+        self.assertTrue(
+            {f"KG-MEM-C{i:02}" for i in range(1, 5)}
+            | {f"KG-MEM-I{i:02}" for i in range(1, 25)} <= set(edge_ids)
+        )
         for graph_contract in (
             "edge_id: KG-MEM-C03",
             "edge_id: KG-MEM-C04",
@@ -7022,7 +7027,15 @@ process.stdout.write(JSON.stringify(results));
             ("impact", 2), ("monitoring_item", 4),
             ("transition", 9),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in ("research_source", "research_claim", "monitoring_item", "transition"):
+                self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for field, prefix, count in (("source_id", "S", 14), ("claim_id", "C", 18),
+                                     ("monitor_id", "T", 4)):
+            ids = re.findall(rf"^{field}: ({prefix}\d+)$", topic, re.M)
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, count + 1)} <= set(ids))
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"
@@ -7040,7 +7053,12 @@ process.stdout.write(JSON.stringify(results));
         graph = (
             ROOT / "notes" / "knowledge_graph" / "800v_power_tree.md"
         ).read_text(encoding="utf-8")
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 26)
+        edge_ids = re.findall(r"^edge_id: (KG-8VP-[CI]\d+)$", graph, re.M)
+        self.assertEqual(len(edge_ids), len(set(edge_ids)))
+        self.assertTrue(
+            {f"KG-8VP-C{i:02}" for i in range(1, 6)}
+            | {f"KG-8VP-I{i:02}" for i in range(1, 22)} <= set(edge_ids)
+        )
         for target in (
             "to_id: concept:800v-topology-device-selection",
             "to_id: metric:power-stage-selection-envelope",

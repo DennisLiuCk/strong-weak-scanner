@@ -607,3 +607,5 @@ process:chiplet-restricted-bootstrap,process,小晶片受限啟動,Chiplet restr
 process:chiplet-rma-authority-boundary,process,小晶片維修權限交接,Chiplet RMA authority boundary,concept:chiplet-design-handoff,診斷與除錯前處理舊使用者資料憑證和安全綁定 製造商根權限例外不可恢復舊使用者情境
 metric:dsx-message-delivery-latency,metric,DSX 訊息送達延遲,DSX message delivery latency|broker acknowledgement|subscriber receipt,concept:ai-rack-action-contract,分開發布至訊息代理確認及發布至訂閱端收件的時間 本地通訊測試不代表實體設備隔離或場域驗收
 standard:mt-diablo-power-rack,standard,Mt. Diablo 分離式電源機櫃規格,Mt. Diablo Disaggregated Power Rack Specification,concept:ai-power-buffering,以固定版本分開PSU正常峰值及動態負載與AC中斷時BBU備援交接 規格要求不等實際產品通過
+process:kv-backend-version-contract,process,快取後端與版本契約,KV backend version contract,concept:ai-memory-hierarchy,固定軟體後端引擎部署映像與連接器版本 分開卸載路由與跨工作程序搬移 不把軟體工具當硬體層
+process:hv-ibc-operating-point-contract,process,高壓IBC工作條件契約,HV IBC operating point contract,concept:800v-power-tree,依序核對配電端點轉換級器件應力與實測條件 系統電壓與最高頻率不替具名產品驗收

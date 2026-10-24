@@ -533,3 +533,23 @@ status: active
 boundary: 兩條 facility path 已被官方說明固定為研究邊界，但 v0.3／共同要求不證明具名設備符合、安全認證、場站 commissioning、deployment denominator、production BOM 或財務貢獻。
 next_trigger: 同一場站與 revision 公開 480VAC／MVAC input、800V endpoint、transformer rectifier／SST／side power rack、rack converter、protection、conformance、customer acceptance、運行分母與財務交接。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-8VP-I22
+view: industry
+from_id: concept:800v-power-tree
+to_id: process:hv-ibc-operating-point-contract
+relation: requires
+claim_refs: MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION#C20
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-24
+review_due: 2026-10-26
+status: active
+boundary: 供應商的800V及最高頻率說明不能決定每顆器件應力或全系統材料；本線只表閱讀與驗證次序，不是同型號實測、客戶驗收、獨佔或財務。
+next_trigger: 同版IBC輸入輸出、料號、拓撲、負載與冷卻條件及原始效率／瞬態／故障測試。
+-->

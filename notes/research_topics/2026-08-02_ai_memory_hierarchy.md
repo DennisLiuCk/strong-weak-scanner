@@ -1212,6 +1212,102 @@ reason: added_institutional_memory_buyer_cost_framework_and_hp_filing_counterche
 evidence: sources:S24,S25,S26,S27
 -->
 
+<!-- research_source
+source_id: S28
+role: other_primary
+source_kind: living_index
+publisher: NVIDIA
+title: Offload KV Cache Locally — NVIDIA Dynamo dev documentation
+published_at:
+captured_at: 2026-10-24
+accepted_at: 2026-10-24
+status: active
+url: https://docs.nvidia.com/dynamo/dev/cli/kv-cache-offloading/overview
+locator: 2026-10-24 dev 擷取；Choose a Backend、Start Offloading、Send a Request 與 Next Steps；原站 Markdown 9285 bytes，SHA256 9929eadfcc0b2dd92e99b77df7b05f079979264a1ace21aaddb5447abc2a8805
+limitation: 持續更新的開發文件，非固定 release 或客戶部署報告；導航 latest 版本與快取可能不同，不用它決定本文版本；本輪未執行範例、量測效能或證明舊 KVBM 功能移除
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S29
+role: other_primary
+source_kind: living_index
+publisher: NVIDIA
+title: Set up KV Cache Offloading — NVIDIA Dynamo dev documentation
+published_at:
+captured_at: 2026-10-24
+accepted_at: 2026-10-24
+status: active
+url: https://docs.nvidia.com/dynamo/dev/kubernetes/kv-cache-offloading/overview
+locator: 2026-10-24 dev 擷取；The pattern、Choose a connector、Configure LMCache on a vLLM worker、Verify；原站 Markdown 7143 bytes，SHA256 1b74ee4610c1b7125d7af8e26afa6d7603be8970c5ddd645e71c8a66f87c2321
+limitation: how-to 文件內示範 runtime image 標籤1.3.0，不是文件release版本，也非本輪實測；指令、記憶體設定與長前綴驗證步驟不代表具名客戶的SLO、成本、部署或財務；與S28同消息鏈
+independence_group: nvidia
+-->
+
+<!-- research_claim
+claim_id: C36
+label: verified
+status: active
+claim: NVIDIA 在本輪擷取的 Dynamo dev 文件中，要求每個 worker 選一個 offloading backend；LMCache、FlexKV與HiCache是替代實作，不是依序堆疊的記憶體層；KV-aware routing及NIXL prefill/decode transfer另有分工
+supporting_source_ids: S28,S29
+contrary_source_ids:
+as_of: 2026-10-24
+basis: S28 Choose a Backend與Next Steps直接區分替代後端、路由及搬移；S29 Choose a connector列不同引擎的設定方法，並明示SGLang HiCache不走vLLM的connector介面
+boundary: 證實這份dev文件的軟體分工，不代表所有版本、所有引擎或正式客戶相同；後端能使用host/SSD等層，也不能由後端名稱反推硬體採購或供應商
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C37
+label: verified
+status: active
+claim: 本輪Dynamo dev教學把執行成功與效能改善分開：短請求只確認部署路徑，要用有代表性的長且重複前綴，觀察首字等待與cache hit；套件也需與選定runtime image和平台相容
+supporting_source_ids: S28,S29
+contrary_source_ids:
+as_of: 2026-10-24
+basis: S28 Send a Request明示短請求不能建立performance improvement，LMCache段要求相容性檢查；S29 Verify要求重複long prefix，比較TTFT與LMCache hit metrics
+boundary: 這是驗證方法，不是本輪實驗；hit或成功啟動不證明SLO、goodput、成本或故障復原改善，亦不提供CMX/STX客戶採用或公司財務證據
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C38
+label: inference
+status: active
+claim: 記憶體分層的比較契約應另固定backend、engine、runtime image與connector版本，並將offloading、KV-aware routing和prefill/decode transfer分開記錄，才能避免把不同功能或不相容配置的結果混為一談
+supporting_source_ids: S28,S29
+contrary_source_ids:
+as_of: 2026-10-24
+basis: 文件區分替代backend與相容性條件；同名KV功能也有路由、儲存與跨worker搬移三種責任，因此對既有量測護照補充實作與版本欄位
+boundary: 方法推論，不宣稱某後端較好、某套件新增硬體需求或台灣公司受惠；沒有同工作負載對照不能改C8主命題的商業成熟度
+verification_needed: 同版本部署manifest、固定請求負載與重用率、baseline/treatment、使用者SLO、成本及可靠度原始紀錄
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T9
+status: active
+claim_ids: C36,C37,C38
+metric: 固定backend/engine/image/connector的配置，能否在同工作負載下分離offloading、routing與prefill/decode transfer，並連到使用者SLO與可靠度
+source_ids: S28,S29
+watch_source_ids: S28,S29
+frequency: monthly
+frequency_detail: 下次工作回查為10/28，非已知產品或文件發布日；新正式release或具名operator測試出現時提前核對
+next_check: 2026-10-28
+trigger: 固定版本文件或具名部署公布完整manifest、相容性、資料路徑與代表性長重複前綴的baseline/treatment，且同時提供TTFT/ITL/goodput/errors及成本或復原記錄
+invalidation: 新版明確改變後端可組合性、引擎/connector責任或相容條件，或同條件測試顯示hit增加但使用者SLO惡化時，縮窄本分工與量測建議；單純網址轉址不證明功能移除
+-->
+
+<!-- transition
+date: 2026-10-24
+from: triaged
+to: triaged
+reason: separated_offloading_backend_from_storage_tier_and_runtime_version
+evidence: sources:S28,S29
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -1289,6 +1385,9 @@ evidence: sources:S24,S25,S26,S27
 - **Dynamo**：NVIDIA 開源的推論服務軟體；它可協調模型運算，但軟體存在不等於 CMX 已被客戶部署。
 - **NIXL**：協助不同記憶體與儲存位置搬移資料的軟體函式庫；它回答「資料怎麼移動」，不直接回答哪一層會形成收入。
 
+- **LMCache／FlexKV／HiCache**：管理鍵值快取卸載與重用的不同軟體實作；在本輪Dynamo文件中是替代後端，不是三層硬體。
+- **vLLM／SGLang**：執行模型推論的不同軟體引擎；後端介面與設定不能直接跨引擎套用。
+
 ### 三句話抓重點
 
 - 人工智慧系統不會把所有資料都塞在同一個地方：正在運算、最怕等待的資料放近晶片，容量較大或可以重新建立的資料則放遠一些。
@@ -1313,6 +1412,27 @@ evidence: sources:S24,S25,S26,S27
 
 - 如果把一份可以重新建立的暫存資料移到較遠的位置，省下的會是近端空間、設備成本，還是運算等待時間？需要哪些不同數據驗證？
 - 如果中央處理器旁的系統記憶體出貨成長，圖形運算晶片旁的高速記憶體也同步成長，這代表互相替代，還是平台把資料分配到不同位置？
+
+## 新手旁欄：軟體工具不是另一層記憶體
+
+**先分清「放在哪裡」和「誰負責搬」。** GPU記憶體、主機記憶體與SSD，是資料可以存放的地方；後端（backend）則是管理重用與搬移的軟體實作。NVIDIA這次的開發文件要求每個工作程序選一個後端，不是把三個工具依序疊成三層硬體。[C36]
+
+**跑得起來，只過了第一關。** 短請求成功能確認設定路徑，但還不知道是否省下等待。下一關要讓相同長前綴重複出現，固定負載及版本，同看快取命中和首字等待；最後才問成本與故障時會不會退步。[C37][C38]
+
+- **工作程序（worker）**：實際執行模型請求的程序；不是一台伺服器或一個機櫃的同義詞。
+- **後端（backend）**：負責某項功能的軟體實作；可用多種儲存層，但本身不是新記憶體。
+- **連接器（connector）**：讓引擎接上特定功能的介面；名稱相似不代表跨版本相容。
+- **執行映像（runtime image）**：包含程式與套件版本的部署環境；文件版本與範例映像版本要分開。
+
+可以問自己：這項改善換了「存放位置」，還是換了「搬運軟體」？命中變多時，使用者真的更快收到第一個字嗎？若同時改路由、後端與硬體，還能知道改善來自哪裡嗎？
+
+本輪只確認開發文件的分工與驗證方法；沒有執行教學、測量效能或取得客戶驗收。
+舊KVBM來源保留為當時的文件紀錄，網址轉址不證明功能已移除。導覽的latest版本與
+本文dev標記、範例runtime image版本也不是同一件事。T9追固定版本的部署與量測；
+C8主命題、原證據日及到期降級不變。兩份新文件同屬NVIDIA，不算兩個獨立驗證。
+
+來源：[本機卸載教學](https://docs.nvidia.com/dynamo/dev/cli/kv-cache-offloading/overview)、
+[Kubernetes設定教學](https://docs.nvidia.com/dynamo/dev/kubernetes/kv-cache-offloading/overview)。
 
 ## 9 月 10 日機構情報：記憶體漲價，誰拿得到貨、誰能轉嫁成本
 
@@ -1383,7 +1503,7 @@ CXL 是連接處理器、記憶體擴充裝置與加速器的路徑，不是第�
 ## 再用八格量測護照判斷「多一層」有沒有真的更好
 
 新增一層記憶體或儲存空間，只證明容量與路徑存在；要說它改善服務，還要證明可重用資料真的命中、
-搬移沒有吃掉收益，而且使用者端結果在相同負載下變好。NVIDIA 現行 KVBM 文件直接把適用條件寫成
+搬移沒有吃掉收益，而且使用者端結果在相同負載下變好。NVIDIA 8月擷取的 KVBM 文件直接把適用條件寫成
 「重用收益要大於搬移成本」，也警告下層容量太小可能反覆搬出、造成 churn 與效能下降。[S12][S13]
 因此每一個百分比或倍數，至少先補齊下面八格：
 

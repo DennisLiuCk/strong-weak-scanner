@@ -686,6 +686,77 @@ reason: separated_side_power_rack_and_direct_mvac_conversion_clocks_without_refr
 evidence: sources:S14
 -->
 
+<!-- research_source
+source_id: S15
+role: company_release
+source_kind: document
+publisher: Infineon Technologies
+title: Infineon collaborates with NVIDIA on gallium nitride-based power conversion systems for 800 VDC AI data centers
+published_at: 2026-10-21
+captured_at: 2026-10-24
+accepted_at: 2026-10-24
+status: active
+url: https://www.infineon.com/press-release/2026/infpr202610-012
+locator: 官方正文的HV IBC合作、up to 1 MHz、800 V至50/12/6 V、additional distribution option及跨Si/GaN/SiC產品組合；原HTML SHA-256 be55cd376bcf784ab82ccd374af303ba543c3522de977acca8e4ce1315a30995，1,528,110 bytes
+limitation: 單一供應商對合作與產品定位的主張，與既有Infineon來源同鏈；沒有具名器件、完整測試條件或原始曲線、客戶驗收、出貨與產品財務，up to不是持續工作值或跨廠實測優勢
+independence_group: infineon
+-->
+
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: Infineon於10/21表示與NVIDIA合作聚焦高壓IBC，列出GaN方案的800V至50V、12V或6V路徑及最高1MHz切換頻率主張；同稿將800V稱為既有AC和低壓DC之外的新增配電選項，並保留Si、GaN與SiC的IBC產品組合
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-10-21
+basis: 官方正文直接表述上述合作、端點、up to頻率與共存範圍
+boundary: verified只確認公司如此揭露，不是同產品測試或獨立性能驗證；未提供料號、完整波形、工作點與客戶pass，不可讀成GaN獨佔800V、所有IBC都跑1MHz或台廠財務受惠
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: inference
+status: active
+claim: 判讀材料優勢前應依序核對配電端點、轉換級、器件應力與實測條件；800V系統名稱及供應商對GaN的定位不能單獨決定器件額定、全系統材料組合或量產採用
+supporting_source_ids: S15,S2,S9,S10
+contrary_source_ids:
+as_of: 2026-10-24
+basis: S15描述多種IBC輸出及材料共存，既有reference architecture則把高壓配電和各降壓級分開
+boundary: 這是閱讀與驗證次序，不是自行設計電路、測得器件電壓或證明哪種材料較佳；最終仍須同revision拓撲、器件與客戶測試
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C19,C20
+metric: 10/21所述HV IBC路徑能否對齊具名器件、拓撲、工作點與可重算的converter測試
+source_ids: S15
+watch_source_ids: S7,S11
+frequency: weekly
+next_check: 2026-10-26
+trigger: 供應商或平台公開同一IBC版次的輸入輸出、device型號與應力、切換條件、負載和冷卻、效率/瞬態/故障原始曲線及pass-fail
+invalidation: 正式勘誤或同型號測試縮窄所列路徑/頻率適用範圍，或固定條件下不符合聲稱性能，則追加修正而不維持通用最優材料解讀
+-->
+
+<!-- transition
+date: 2026-10-24
+from: triaged
+to: triaged
+reason: added_vendor_hv_ibc_positioning_with_operating_point_and_adoption_boundaries
+evidence: sources:S15
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -816,6 +887,25 @@ transformer rectifier／SST、斷路與保護、busbar／connector、rack-level 
 若既有場站優先走旁路升級，direct-MVAC 設備的部署時鐘可能較慢；若新場站直接整合設施級
 轉換，一些 rack-level AC-DC 或中間 power stage 又可能縮小或消失。真正裁決多空，要在同一
 場站版本對上設備 pass、commissioning、運行分母、production BOM 與買賣雙方財務。
+
+## 10月24日補充：看到800V與GaN，先分開四個問題
+
+[Infineon 10/21公告](https://www.infineon.com/press-release/2026/infpr202610-012)
+補上與NVIDIA合作的高壓IBC線索：800V降到50V、12V或6V，以及最高1MHz的供應商
+主張。這不是同一型號在所有負載下的保證；原稿也將800V列為既有AC及低壓DC之外的
+新增選項，保留Si、GaN與SiC產品組合。[C19]
+
+**先看位置，再看條件。** 800V配電、IBC降壓、GaN器件與客戶採用是四個問題。
+先找轉換級，再核同一料號實際承受的電壓、負載與冷卻，最後才讀效率、瞬態及故障測試。
+系統名稱不決定每顆元件額定，最高頻率也不能替整機驗收背書。[C20]
+
+**切換頻率**是功率開關每秒切換的次數，不是資料傳輸速度，也不是單獨的效率指標。
+想一想：如果兩家只列最高頻率，卻沒有負載、控制與冷卻條件，你還缺什麼才能比較？
+下一步沿T5追同版拓撲、料號、原始曲線與客戶結果，不從材料名稱跳到訂單。
+
+本輪S15是一條Infineon公司消息鏈，不是獨立性能試驗。C19證實公司如此揭露，C20是
+閱讀次序的推論；具名產品驗收與財務仍待驗。保留C7、8/12主證據日及8/19到期日，
+不以旁支更新刷新信心，也不建立台灣公司收入或材料獨佔線。
 
 ## 48V 不一定是 48.0V，±400V 也不能只除以 400
 
