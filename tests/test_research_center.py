@@ -4653,15 +4653,13 @@ process.stdout.write(JSON.stringify(results));
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
-        self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 77
-        )
+        terms = re.findall(r"^- \*\*(.+?)\*\*", glossary, re.MULTILINE)
+        self.assertGreaterEqual(len(terms), 77)
+        self.assertEqual(len(terms), len(set(terms)))
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
-        reflection = topic.split("### 想一想", 1)[1].split(
-            "## 主張與證據帳本", 1
-        )[0]
+        reflection = topic.split("### 想一想", 1)[1].split("\n## ", 1)[0]
         for jargon in (
             "pMax", "checkpoint", "dataset", "fetch", "object storage",
             "local storage", "peer", "GPUDirect", "RDMA", "NIC", "SLO",
@@ -4671,11 +4669,18 @@ process.stdout.write(JSON.stringify(results));
             self.assertNotIn(jargon, lead)
             self.assertNotIn(jargon, reflection)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 25),
-            ("research_claim", 28), ("metric_comparison", 0),
-            ("impact", 2), ("monitoring_item", 4),
+            ("research_topic", 1), ("metric_comparison", 0), ("impact", 2),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for block, key, prefix, historical_count in (
+            ("research_source", "source_id", "S", 25),
+            ("research_claim", "claim_id", "C", 28),
+            ("monitoring_item", "monitor_id", "T", 4),
+        ):
+            blocks = re.findall(r"<!-- " + block + r"\s+(.*?)-->", topic, re.DOTALL)
+            ids = [re.search(r"^" + key + r":\s*(\S+)", b, re.MULTILINE).group(1) for b in blocks]
+            self.assertTrue({f"{prefix}{i}" for i in range(1, historical_count + 1)} <= set(ids))
+            self.assertEqual(len(ids), len(set(ids)))
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
@@ -4715,7 +4720,11 @@ process.stdout.write(JSON.stringify(results));
             "KG-ASD-I18",
         ):
             self.assertIn(f"edge_id: {edge_id}", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 23)
+        edge_ids = re.findall(r"^edge_id:\s*(\S+)", graph, re.MULTILINE)
+        historical_ids = {f"KG-ASD-C{i:02d}" for i in range(1, 6)}
+        historical_ids.update(f"KG-ASD-I{i:02d}" for i in range(1, 19))
+        self.assertTrue(historical_ids <= set(edge_ids))
+        self.assertEqual(len(edge_ids), len(set(edge_ids)))
 
     def test_ai_storage_endurance_separates_application_host_nand_and_rated_life(self):
         topic = (
@@ -4822,7 +4831,12 @@ process.stdout.write(JSON.stringify(results));
         self.assertIn("last_reviewed_at: 2026-08-12", meta)
         self.assertIn("review_due: 2026-08-28", meta)
         self.assertIn("base_confidence: medium", meta)
-        self.assertNotIn("monitor_id: T5", topic)
+        # The commercial-ledger increment reused existing monitors; unrelated
+        # future research may append monitors without duplicating these claims.
+        monitor_blocks = re.findall(r"<!-- monitoring_item\s+(.*?)-->", topic, re.DOTALL)
+        for block in monitor_blocks:
+            claim_ids = re.search(r"^claim_ids:\s*(.+)$", block, re.MULTILINE).group(1).split(",")
+            self.assertTrue({"C23", "C24", "C25", "C26"}.isdisjoint(claim_ids))
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"

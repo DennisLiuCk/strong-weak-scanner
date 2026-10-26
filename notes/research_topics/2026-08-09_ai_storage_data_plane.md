@@ -104,9 +104,103 @@ reason: phison_q2_product_and_application_disclosures_added_without_operator_the
 evidence: sources:S25
 -->
 
+<!-- research_source
+source_id: S26
+role: competitor_primary
+source_kind: document
+publisher: NVIDIA
+independence_group: nvidia-platform
+title: How to Read Data into GPU Memory in Python with NVIDIA GPUDirect Storage
+published_at: 2026-10-22
+captured_at: 2026-10-26
+accepted_at: 2026-10-26
+status: active
+url: https://developer.nvidia.com/blog/how-to-read-data-into-gpu-memory-in-python-with-nvidia-gpudirect-storage/
+locator: How does NVIDIA KvikIO leverage GDS?；Tutorial system；第4節 Determine the data path；第5節 Compare the available paths；A 1 GiB read step by step。擷取原網頁 356–387、421–446、587–672、700–712 行。原件 SHA256 790bc78011b593d3cafed11f11613664c661caa5df9a1f80ea3324cac1b6ef23；263890 bytes。
+limitation: NVIDIA 官方教學的成功讀取流程與限定 H100／本機 NVMe／ext4 環境，圖省略錯誤與不支援情境；不是第三方 production benchmark、Rubin／CMX／STX 驗收或台灣供應商財務證據。本輪未執行教材或變更任何安全設定。
+-->
+
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: NVIDIA 的 KvikIO／GDS 教材把成功讀取的選路分成兩層：KvikIO 可呼叫 cuFile 或走自己的 CPU 暫存 POSIX 路徑；cuFile 又可採加速 GDS 或自身 CPU 暫存相容路徑，因此呼叫 cuFile 或讀取成功不足以證明實際使用加速路徑
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-10-26
+basis: S26 的 How does NVIDIA KvikIO leverage GDS? 與第5節 Compare the available paths；同原網頁 356–387、638–672 行。
+boundary: 這是官方教材版本與受測環境的路徑說明，圖省略初始化失敗、不支援組態及錯誤處理；不代表所有版本、儲存 backend 或 production 部署，也不等同 CMX／STX 驗收。
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: 教材的 cuFile 每程序統計以 nvfs 記錄 nvidia-fs 路徑操作、posix 記錄 cuFile 相容路徑操作；KvikIO 直接採用自身 POSIX 路徑時不由 cuFile 記錄，因此 cuFile 的零 posix 計數不足以證明整個應用沒有 CPU 暫存流量
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-10-26
+basis: S26 第4節 Determine the data path、第5節 Compare the available paths 及 A 1 GiB read step by step；同原網頁 595–611、663–672、712 行。
+boundary: nvfs／posix 是操作數，不是直接 bytes 占比、吞吐或端到端改善；必須限定同 process／GPU／run／時間窗。未註冊的目的 GPU buffer 可先經已註冊的 GPU bounce buffer 再複製，故 nvfs 亦不等於全程零拷貝。
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C31
+label: inference
+status: active
+claim: 評估 GDS 效益應把同一次執行的版本／組態、應用請求與資料路徑觀測範圍，連到端到端延遲、吞吐及成本結果；只證明 API 可呼叫或部分操作採 nvidia-fs，不足以判定整個工作負載受益
+supporting_source_ids: S26
+contrary_source_ids:
+as_of: 2026-10-26
+basis: 由 S26 限定受測系統、兩層選路與計數器盲點，推導本研究採用的同 run 機制／結果對齊檢核；不是來源直接提出的產業標準。
+boundary: 研究判讀框架，不是認證規則、實測結論或採用率；本輪未重跑教材，未證明效能提升、硬體新增需求、供應商收入或毛利。
+verification_needed: 具名 production workload 的同版本／同 run 設定、路徑與流量覆蓋、baseline／treatment、重複結果與不確定度，以及端到端 SLO／成本；新版本計數語義或反例若改變判讀，需修正此框架。
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C29,C30,C31
+metric: 同 run 的 KvikIO／cuFile 版本與設定、路徑覆蓋及計數語義，能否對齊端到端 SLO／吞吐／成本與 production workload
+source_ids: S26
+watch_source_ids: S7
+frequency: weekly
+frequency_detail: 先於 2026-11-02 檢查教材更正、新版路徑與計數語義或同 run production 案例；後續依實際發布事件調整，查無新證據不刷新舊主張時鐘。
+next_check: 2026-11-02
+trigger: 具名 production workload 公開可對齊版本／組態、應用請求／bytes、路徑及計數覆蓋、baseline／treatment、重複結果與不確定度，並揭露端到端 SLO／成本。
+invalidation: 官方新版改變 KvikIO bypass、cuFile fallback 或計數語義，或同 run 反例顯示現有觀測框架遺漏足以改變效益判讀的路徑；以新增修正 claim 縮窄 C29–C31，不回寫 C5 或舊快照。
+-->
+
+<!-- transition
+date: 2026-10-26
+from: triaged
+to: triaged
+reason: separated_api_success_data_path_visibility_and_end_to_end_outcome
+evidence: sources:S26
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
+
+- **KvikIO**：供應用程式讀檔的軟體介面，會決定是否呼叫下一層cuFile。
+- **cuFile**：可使用GDS的讀寫介面，呼叫成功仍可能走相容路徑。
+- **POSIX相容路徑**：本文指經CPU暫存的讀取方式；KvikIO及cuFile各有自己的路徑。
+- **nvfs操作數**：cuFile統計中經nvidia-fs的操作計數，不直接代表資料量占比或效能改善。
 
 - **aiDAPTIV**：群聯的AI解決方案名稱；本文只沿用公司分類，不預設其對應特定operator、客戶或收入。
 - **Boot Drive（開機碟）**：儲存作業系統與啟動資料的裝置；其收入不能自動歸到訓練資料讀取或checkpoint。
@@ -190,7 +284,7 @@ evidence: sources:S25
 
 - 人工智慧系統有三種容易混在一起的工作：訓練時持續餵訓練資料、故障前先保存進度，以及服務擴充時把模型檔案送到新機器；三種工作卡住的原因不同。
 - 餵資料怕最慢的一次讀取讓整群運算晶片等待；保存進度要依序證明暫存、上傳、耐久保存、正確回載與故障後接續訓練，不能只報寫入速度；搬模型則取決於副本放在哪裡，以及能否從附近機器直接取得。
-- 所以「資料變多」不能直接換算成更多硬碟或某家公司營收；除了分開應用資料、主機寫入、快閃媒體寫入與額定壽命，還要把售出容量、每單位營收、已認列營收、長約與未履約承諾分帳，再核對實際路徑、客戶認證與部署數量。
+- 所以「資料變多」不能直接換算成更多硬碟或某家公司營收；除了分開應用資料、主機寫入、快閃媒體寫入與額定壽命，還須分開讀取成功、實際加速路徑與端到端收益；再把售出容量、每單位營收、已認列營收、長約與未履約承諾分帳，再核對實際路徑、客戶認證與部署數量。
 
 ### 為什麼重要
 
@@ -217,12 +311,33 @@ evidence: sources:S25
 
 ### 想一想
 
+- 如果部分讀取繞過cuFile，看到cuFile的相容路徑計數為零，足以說整個應用都走捷徑嗎？
+
 - 如果軟體已讓附近機器吸收大部分重複搬運，運算量增加時，長期保存設備還會等比例增加嗎？
 - 一顆硬碟的峰值速度很快，但最慢讀取、故障復原與連續運作都沒有通過驗收，它真正解決了哪一種工作？
 - 一個非同步存檔在暫存完成後就讓訓練繼續，但上傳途中節點立刻故障，這份進度紀錄算完成了嗎？
 - 同一份進度存檔若讓應用程式增加 1 TB 邏輯資料，主機與快閃媒體真的都只增加 1 TB 嗎；若沒有三層計數器，能判斷硬碟壽命嗎？
 - 公司公布的人工智慧產品占比同時包含硬碟、個人電腦、網路與伺服器時，能用這個百分比判斷資料中心儲存收入嗎？
 - 公司同時公布容量出貨上升、每單位營收上升與多年合約時，哪一個已進入本期損益，哪一個仍只是未履約承諾？
+
+## 新手補充：呼叫 GDS，不代表資料真的走加速路徑
+
+把 KvikIO 想成讀檔窗口，cuFile 是下一層搬運介面，GDS 則是可能採用的加速資料路徑。NVIDIA 新教材顯示，選路有兩關：KvikIO 可直接走自己的 POSIX 路徑；即使呼叫 cuFile，仍可能走 CPU 暫存相容路徑。因此「讀取成功」與「使用加速路徑」是不同證據。[S26；C29]
+
+cuFile 的 nvfs／posix 計數是操作數，不是資料量占比；KvikIO 自行繞過 cuFile 的流量也不在其中。nvfs 仍可能經 GPU 暫存區再複製，不能等同全程零拷貝。[C30]
+
+接下來應追問：同一次執行用了哪個版本與設定？計數器涵蓋哪些流量？端到端延遲、吞吐與成本是否改善？我們要求路徑證據與結果一起出現，才討論效益；這是研究判讀框架，不是產業認證，也不證明設備需求或公司受惠。[C31，推論]
+
+| 教材中的路徑 | cuFile 可見訊號 | 不能直接推論 |
+|---|---|---|
+| KvikIO → cuFile → nvidia-fs | nvfs 操作數 | 端到端零拷貝或效能提升 |
+| KvikIO → cuFile → CPU 暫存相容路徑 | posix 操作數 | 呼叫 cuFile 就代表已加速 |
+| KvikIO → 自有 POSIX 路徑 | cuFile 不記錄該操作 | cuFile 的零計數代表沒有流量 |
+
+本文僅核對[NVIDIA 10/22原教學](https://developer.nvidia.com/blog/how-to-read-data-into-gpu-memory-in-python-with-nvidia-gpudirect-storage/)，
+未重跑實驗。作者配置是H100、CUDA 13.3、cuFile 1.18、本機NVMe／ext4及PIX拓撲，
+並列IOMMU／ACS關閉；這是受測前提，不是要求讀者關閉隔離功能。T5追同版本原始結果，
+不是由教材證明CMX／STX或任何客戶已驗收。原主命題C5與到期降級維持不變。
 
 ## 主張與證據帳本
 

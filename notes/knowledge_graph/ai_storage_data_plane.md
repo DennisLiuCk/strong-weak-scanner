@@ -475,3 +475,23 @@ status: active
 boundary: 五帳護照是研究中心用Sandisk單一10-K建立的對帳框架 不是Sandisk或產業共同標準；量價方向與營收量級相符不等於精確因果橋接 更不能把長約或RPO指定為AI SSD 台灣公司訂單或財務貢獻。
 next_trigger: 具名供應商以同一產品 end market 客戶 合約與期間公開絕對容量 單位營收 長約條款 RPO期初新增認列修改取消 已認列營收 毛利現金與買方用途。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-ASD-I19
+view: industry
+from_id: concept:ai-storage-data-plane
+to_id: process:gds-path-observation-contract
+relation: requires
+claim_refs: MI-2026-08-09-AI-STORAGE-DATA-PLANE#C31
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-26
+review_due: 2026-11-02
+status: active
+boundary: 同run路徑觀測與結果對齊是本研究方法，不是產業認證或實測。cuFile計數不含KvikIO bypass，operation不直接等bytes占比，nvfs不等端到端零拷貝；不推部署或公司財務。
+next_trigger: 固定版本設定及應用請求bytes對齊cuFile可見範圍與bypass，另附baseline/treatment重複結果及SLO成本。
+-->

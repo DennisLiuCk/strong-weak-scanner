@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-10-26
+next_review: 2026-11-02
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -35,7 +35,7 @@ why_now: 到期追蹤初查發現Infineon9/9與SolarEdge合作把SSCB故障隔�
 knowledge_gain: 區分電力轉換、故障隔離與末端降壓，建立可重用的保護責任及測試邊界；合作稿與引述公司同一消息鏈，不計為兩份獨立驗收。
 first_rejection: 若仍只有合作稿或微秒級設計目標而沒有具名型號與可回查測試，就不另寫重複文章或新增公司受惠線。
 next_evidence: 取得同一SSCB型號與版本的電壓故障包絡及選擇性保護實測，核對客戶驗收與可比器件或替代拓撲；之後才追部署分母和收入。
-next_check: 2026-10-26
+next_check: 2026-11-05
 route: watch_only
 article_topic_id:
 graph_id:
@@ -60,7 +60,7 @@ why_now: 到期HBF追蹤初查找到9/9研究者HBFSim v1；模擬與校準的�
 knowledge_gain: 把研究者方法、模型擬合、可重現運行與真實晶片分層；10/8已核v3、v0.1.1與固定proof及reference原始紀錄，仍缺相同共同鍵的fast原始run，舊倍率與秒數未對齊，沒有重跑或外部驗證，不採效能點估計。
 first_rejection: 若未取得原始run或作者勘誤便無法對齊秒數與倍率，或只有擬合點沒有外部驗證，就不發布效能點估計或HBF硬體受惠結論。
 next_evidence: 先核對版本化PDF與作者原始run及勘誤，再分開NVMe校準與HBF模型參數，要求未參與擬合的驗證工作負載和實體裝置邊界。
-next_check: 2026-10-26
+next_check: 2026-11-02
 route: watch_only
 article_topic_id:
 graph_id:
@@ -85,7 +85,7 @@ why_now: Samsung Electro-Mechanics9/10展稿新增玻璃核心與導孔加工展
 knowledge_gain: 只有新客戶或製造共同鍵才會超越既有玻璃角色地圖；公司展稿與材料供應商用途說明不是互相替客戶資格背書。
 first_rejection: 若仍只有展品或單站加工能力，未有同一封裝產品的客戶資格及量產结果，就不另立文章或將carrier出貨算成glass-core採用。
 next_evidence: 取得同一glass-core封裝產品與版本的客戶資格及製造結果，逐項分開carrier與interposer角色，核對連續批次良率及量產時間而非展會日期。
-next_check: 2026-10-26
+next_check: 2026-11-02
 route: watch_only
 article_topic_id:
 graph_id:
@@ -265,3 +265,29 @@ Mt. Diablo正常脈衝與停電備援分工。兩者有可回查原文、可證�
 
 公告旁支另留5299 Q3董事會結果、6182資本規劃、8155租約與6488子公司增資。
 下一步先找正確期間附件、實收與資產口徑，不由資本交易、使用權資產或集團內增資推AI收入。
+
+
+## 10月26日回查與下一份文件
+
+三題維持凍結順位、知識價值及watch，沒有升格新文章或新增公司受惠關係。
+下一次自動化執行不等於每題都有新文件；回查日改依公開事件或週期安排，證據日不延長。
+
+**SSCB，順位1。** [SolarEdge 10/13展示稿](https://investors.solaredge.com/news-releases/news-release-details/solaredge-showcases-mvac-800-vdc-ai-factory-power-technology)
+仍是SST cell及架構模型、轉換級實驗室帶載與完整路徑驗證進行中，沒有同SSCB型號故障波形或客戶pass。
+[10/15法說預告](https://investors.solaredge.com/news-releases/news-release-details/solaredge-announce-financial-results-third-quarter-ended-1)
+列11/4美東08:00（台灣當晚21:00），安排11/5取得會後附件。需核的仍是斷路器型號、故障包絡、
+選擇性保護與買方驗收，不是綜合營收、SST展示或GaN IBC合作。
+
+**HBFSim，順位2。** [發布頁](https://github.com/SlugLab/HBFSim/releases/tag/v0.1.2)仍為v0.1.2，
+程式tag仍是`ed6f5559673767bd620eb8174fdf61bdc7aa3639`；文件更名與校驗整理不算新GPU實驗。
+公開包未補齊大型raw／SHM／模型原件，完整GPU乾淨重建、跨機重現及實體HBF外部校準仍缺。
+11/2再查固定release與原始紀錄，不發性能倍率；若先有可回查原件則提前處理。
+
+**玻璃核心，順位3。** [SKC新聞室](https://www.skc.kr/m/eng/Conmmunication/newsroom/system.do?menuCd=006001)
+可讀的玻璃進度仍是embedding可靠度測試、non-embedding年底前PoC準備；10/20銅箔消息不挪作玻璃證據。
+另讀Samsung展示及Corning用途頁，仍缺同產品客戶資格與連續批次製造結果。11/2續查，
+年底尚未到，不把尚未公布結果判為計畫失敗。
+
+本輪的新教材放回既有AI儲存文章：讀取成功、實際加速路徑與端到端收益分開驗證，
+不因新增軟體方法而推台灣SSD訂單。家登10/25公告另提醒每股配息率的分母變化：
+CB轉換增加股數，但兩類配發總額不變；這是公告判讀線索，不另立市場文章或更動正式筆記。
