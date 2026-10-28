@@ -594,3 +594,23 @@ status: active
 boundary: 固定backend／engine／runtime／connector及三種功能責任是研究比較方法，不是production效能、硬體採購或公司財務；dev導覽版本不能代本文固定版次。
 next_trigger: 同版本manifest與代表性長重複前綴baseline/treatment對上使用者SLO、成本與復原紀錄。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-MEM-I26
+view: industry
+from_id: concept:ai-memory-hierarchy
+to_id: process:memory-commercial-evidence-ledgers
+relation: requires
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C42
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-28
+review_due: 2026-11-25
+status: active
+boundary: 出貨、預期、總產能LTA與HBF路線圖分帳是研究方法，不是客戶驗收、產品收入、台灣公司曝險或獨佔性證明；不能刷新其他產品線。
+next_trigger: 同產品、期間、容量單位、合約條款、客戶交付與認列資料可對帳，或公司修正既有說法。
+-->

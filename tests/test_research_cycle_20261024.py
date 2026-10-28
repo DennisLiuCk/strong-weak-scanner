@@ -60,6 +60,8 @@ class ResearchCycleOctober24Test(unittest.TestCase):
             self.assertEqual(tuple(meta[k] for k in ('thesis_claim_id','last_reviewed_at','review_due')),clock)
             transitions=records(path,'transition')
             self.assertTrue(any(t['date']=='2026-10-24' and t['evidence'].startswith('sources:') for t in transitions))
+            # Freeze this historical fixture; later valid revisions must not break it.
+            transitions=[t for t in transitions if t['date']<='2026-10-24']
             topics.append(dict(topic_id=meta['topic_id'],title=meta['topic_id'],relpath=path,meta=meta,transitions=transitions))
         recent=bd.build_recent_articles('2026-10-24',{},{},topics=topics)
         self.assertEqual({r['researchId'] for r in recent['items']},{'topic-'+t['topic_id'] for t in topics})

@@ -610,3 +610,4 @@ standard:mt-diablo-power-rack,standard,Mt. Diablo 分離式電源機櫃規格,Mt
 process:kv-backend-version-contract,process,快取後端與版本契約,KV backend version contract,concept:ai-memory-hierarchy,固定軟體後端引擎部署映像與連接器版本 分開卸載路由與跨工作程序搬移 不把軟體工具當硬體層
 process:hv-ibc-operating-point-contract,process,高壓IBC工作條件契約,HV IBC operating point contract,concept:800v-power-tree,依序核對配電端點轉換級器件應力與實測條件 系統電壓與最高頻率不替具名產品驗收
 process:gds-path-observation-contract,process,GDS資料路徑觀測,GDS path observation|KvikIO|cuFile|nvfs|POSIX,concept:ai-storage-data-plane,分開API成功 實際選路 計數器可見範圍與端到端結果 不由部分操作計數推全應用效益或公司收入
+process:memory-commercial-evidence-ledgers,process,記憶體商用證據分帳,Memory shipment forecast LTA roadmap,concept:ai-memory-hierarchy,分開當季出貨 下一季展望 未來產能長約及中長期產品計畫 不由總產能比例推特定產品收入

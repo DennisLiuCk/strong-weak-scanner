@@ -1308,10 +1308,137 @@ reason: separated_offloading_backend_from_storage_tier_and_runtime_version
 evidence: sources:S28,S29
 -->
 
+<!-- research_source
+source_id: S30
+role: company_release
+source_kind: document
+publisher: SK hynix
+title: SK hynix Announces 3Q26 Financial Results
+published_at: 2026-10-28
+captured_at: 2026-10-28
+accepted_at: 2026-10-28
+status: active
+url: https://news.skhynix.com/en/q3-2026-business-results/
+locator: By product、HBM4/HBF展望、Long-term agreements及Disclaimer段；同份原HTML 162735 bytes，SHA256 417d1b8e3350c1908632e780891a4b3811cf0e638051965fd154f3890592d777
+limitation: 公司自述，不是獨立客戶驗收；財報為preliminary且審核未完成，未取得完整法說QA或LTA契約；不引用公司總財務數字、不由產能長約推產品收入
+independence_group: sk-hynix
+-->
+
+<!-- research_source
+source_id: S31
+role: company_release
+source_kind: living_index
+publisher: SK hynix
+title: SK hynix Press newsroom
+published_at:
+captured_at: 2026-10-28
+accepted_at: 2026-10-28
+status: active
+url: https://news.skhynix.com/en/category/press/
+locator: 英文PRESS首屏與3Q26財報連結
+limitation: 持續更新的發現入口，列表不等逐份合約或附件已驗證，不支持產品收入或實現展望
+independence_group: sk-hynix
+-->
+
+<!-- research_claim
+claim_id: C39
+label: verified
+status: active
+claim: SK hynix在3Q26新聞稿表示HBM4出貨已展開
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-10-28
+basis: By product段直接描述本季HBM4 shipments
+boundary: 證實公司已作此陳述，不是具名客戶驗收、custom HBM或HBF出貨，也未提供產品級收入分母
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C40
+label: verified
+status: active
+claim: 同稿預期4Q26 HBM4的出貨量與營收超過HBM3E，HBF則仍列中長期NAND與系統優化方向
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-10-28
+basis: 產能與產品競爭力段使用預期及意圖語氣
+boundary: 證實管理層展望的內容而非結果已實現；HBF意圖不代表具名樣品、量產或替代HBM
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C41
+label: verified
+status: active
+claim: 公司稱已取得LTA涵蓋2027及2028年總產能逾50%，此處分母是總產能而非HBM或HBF收入
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-10-28
+basis: Long-term agreements段明列total production capacity、期間2027與2028，比例單位為百分比
+boundary: 公司口徑，未提供產品分配、容量換算或公開完整合約；不能轉為收入占比、固定獲利、實收款或特定買方成本改善，亦非跨公司可比指標
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C42
+label: inference
+status: active
+claim: 研究記憶體商用進展時，應把當季出貨、下一季展望、未來產能長約與中長期產品計畫分帳
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-10-28
+basis: 同一新聞稿包含不同期間、產品範圍與完成狀態，須逐項對齊才能追蹤
+boundary: 研究方法推論，不是新增訂單或財務預測；不刷新C8或任何台廠公司線
+verification_needed: 同產品、期間、客戶與條款的交付及財務資料
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T10
+status: active
+claim_ids: C39,C40,C42
+metric: HBM4與HBM3E在4Q26同期間的實際出貨及營收比較，並分開HBF樣品與客戶驗收
+source_ids: S30
+watch_source_ids: S30,S31
+frequency: monthly
+frequency_detail: 11/25為中間工作回查，不是已知財報日；4Q實績要等季末及會後正式文件，事件或更正先出則提前處理
+next_check: 2026-11-25
+trigger: 正式文件提供同產品期間的實績或修正展望，或具名HBF樣品與接收方測試條件
+invalidation: 公司撤回展望或4Q實績未跨越兩項比較時修正該展望；沒有HBF公開樣品不當取消，不能以HBM4結果代填HBF驗收
+-->
+
+<!-- monitoring_item
+monitor_id: T11
+status: active
+claim_ids: C41,C42
+metric: LTA總產能的產品、年份、容量單位、定價調整及取消條件，對照實際交付與認列
+source_ids: S30
+watch_source_ids: S30,S31
+frequency: monthly
+frequency_detail: 11/25工作回查原稿更正或合約/申報附件；沒有新條款或實際交付不得刷新證據日
+next_check: 2026-11-25
+trigger: 取得可定位產品分配、計量單位及契約條款，且可與同期間交付/收入對帳
+invalidation: 取消、延期、產能分母或定價條件變更時重估涵蓋範圍；未有拆分不把總產能比例推成特定產品收入或台廠受惠
+-->
+
+<!-- transition
+date: 2026-10-28
+from: triaged
+to: triaged
+reason: separated_reported_shipments_forecasts_capacity_lta_and_hbf_roadmap_without_thesis_clock_refresh
+evidence: sources:S30
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **HBF（高頻寬快閃記憶體）**：以快閃記憶體為基礎的高頻寬方向，與HBM不是同一產品；計畫不等樣品或量產。
+- **LTA（長期供應協議）**：約定較長期間供應的合約；要另外核產品、數量、定價及取消條件，不能直接當已認列收入。
+- **HBM3E**：HBM的一個產品世代；與HBM4比較時仍需固定期間、出貨與收入口徑。
 - **HP／Personal Systems**：HP Inc.是本段用來觀察買方成本的公司；Personal Systems是其個人運算事業，不能代表所有伺服器或記憶體買方。
 - **ASP（平均售價）**：收入與銷售量對應的平均價格；變化也可能來自產品組合或匯率，未必只是同一產品漲價。
 - **PC（個人電腦）**：本段HP揭露的台數範圍；不能把PC出貨減少直接當成AI伺服器需求減少。
@@ -1736,6 +1863,25 @@ reference architecture，不是 production workload 隨機樣本；具名客戶�
 - **支援與部署**：Dynamo／NIXL 支援某種放置或搬移，不代表客戶已在正式服務使用。
 - **釋放空間與取代產品**：把部分可重建資料移出 HBM，可能讓 HBM 留給更急的資料；這不等於 storage 取代 HBM。
 - **元件測試與整體結果**：處理器在記憶體內完成資料服務的測試，不等於含 SSD、網路、軟體與 GPU 的端到端路徑已驗證。
+
+## 讀財報新聞的四本帳：出貨、預期、長約與路線圖
+
+同一篇新聞可以同時談已發生與未發生的事。[SK hynix 10/28公告](https://news.skhynix.com/en/q3-2026-business-results/)
+正好可用來練習：HBM是高頻寬記憶體；HBF是不同的快閃記憶體方向；LTA是長期供應協議。
+
+| 這次說法 | 證據標籤 | 下一步怎麼驗 |
+|---|---|---|
+| 3Q26 HBM4出貨展開 | 證實：公司已公告 | 找同產品的客戶、交付及財務資料 |
+| 4Q26 HBM4出貨量與營收預期超過HBM3E | 證實：管理層提出展望；實現待驗證 | 等4Q同期間兩項實績，不能只看其中一項 |
+| 2027及2028總產能逾50%由LTA涵蓋 | 證實：公司口徑 | 核產品、容量單位、條款及實際認列；不是收入占比 |
+| HBF中長期發展方向 | 證實：公司計畫；商用待驗證 | 查具名樣品、接收方、驗收及部署 |
+
+**推論重點：**「有長約」與「本季已賺到」回答不同問題。原稿財務仍屬初步結果且審核未完成，
+本段沒有藉公司總額推估HBM、HBF或台廠收入。比例是公告口徑，不是抽樣估計，SE／t不適用。
+
+閱讀時問自己：句子的主詞是哪個產品？描述哪一季？是在說已完成、預期還是合約？
+若拿不出同一產品與期間的證據，就先停在原來那一格。T10追出貨與展望，T11追長約拆分；
+新增教材不解除既有分層主命題的過期狀態。
 
 ## 在研究中心裡接著怎麼學
 
