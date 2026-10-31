@@ -1,16 +1,16 @@
 {
   "protocol": "validation-v2-20261009",
   "registered": "2026-10-09",
-  "as_of": "2026-10-22",
+  "as_of": "2026-10-30",
   "score_version": "v2.2-midrank-20261009",
   "score_spec_sha": "cb6f4f352986b00dd57bccc1916a0176a5c414184f5efb3e7d23848d64e41b69",
   "ranking_spec_sha": "78c66c2e85caf7021ab49d75261ddda808f3d33c49adbe87a146289d78181217",
   "score_evidence": {
-    "oos_days": 9,
-    "oos_mature": 0,
+    "oos_days": 13,
+    "oos_mature": 3,
     "fwd": 10,
-    "eff_obs": 0.0,
-    "episodes": 0,
+    "eff_obs": 0.3,
+    "episodes": 1,
     "min_eff_obs": 3.0,
     "se_blocked": true,
     "status": "insufficient_independent_observations",
@@ -33,16 +33,16 @@
         "status": "retained as historical evidence; never pooled with the current spec"
       }
     ],
-    "canonical_official_days": 69,
-    "current_spec_days": 9,
-    "current_spec_oos_days": 9,
+    "canonical_official_days": 73,
+    "current_spec_days": 13,
+    "current_spec_oos_days": 13,
     "current_spec_oos_excluded_days": 0,
     "late_publication_days": 0,
     "current_spec_first_date": "2026-10-12",
-    "current_spec_latest_date": "2026-10-22",
-    "mature_10d_days": 0,
-    "effective_independent_obs_approx": 0.0,
-    "phase": "collecting_operational_history",
+    "current_spec_latest_date": "2026-10-30",
+    "mature_10d_days": 3,
+    "effective_independent_obs_approx": 0.3,
+    "phase": "outcome_diagnostics_accumulating",
     "specs_seen": [
       "78c66c2e85caf7021ab49d75261ddda808f3d33c49adbe87a146289d78181217",
       "b9076628ddb7c9ddd76c5d4934a5f6c3d8e8bbb75c56d1b3bce9c60f8e23bd4e",
@@ -51,7 +51,7 @@
     "historical_other_spec_days": 38,
     "pre_effective_current_spec_days": 0,
     "invalid_runs": [],
-    "parsed_rows": 1084,
+    "parsed_rows": 1568,
     "latest_snapshot_health": {
       "stocks": 121,
       "groups": 11,
@@ -88,39 +88,39 @@
       },
       "role_rank_coverage": 77,
       "tie_exposed": {
-        "champion_pct": 6,
-        "lens_a": 14,
-        "lens_b": 23,
-        "lens_c": 17,
+        "champion_pct": 2,
+        "lens_a": 20,
+        "lens_b": 18,
+        "lens_c": 9,
         "lens_d": 15
       },
       "tie_rate": {
-        "champion_pct": 0.0496,
-        "lens_a": 0.1157,
-        "lens_b": 0.1901,
-        "lens_c": 0.1405,
+        "champion_pct": 0.0165,
+        "lens_a": 0.1653,
+        "lens_b": 0.1488,
+        "lens_c": 0.0744,
         "lens_d": 0.124
       },
       "median_unique_share_by_group": {
         "champion_pct": 1.0,
-        "lens_a": 1.0,
-        "lens_b": 0.9167,
-        "lens_c": 0.9167,
+        "lens_a": 0.9167,
+        "lens_b": 0.9231,
+        "lens_c": 1.0,
         "lens_d": 0.9167
       },
       "top_20": {
         "champion_pct": 28,
-        "lens_a": 27,
-        "lens_b": 26,
+        "lens_a": 30,
+        "lens_b": 29,
         "lens_c": 28,
         "lens_d": 27
       },
-      "consensus2": 30,
-      "consensus2_rate": 0.2479,
-      "pareto": 62,
-      "pareto_rate": 0.5124,
-      "peer_sensitivity_ge_25": 36,
-      "peer_sensitivity_ge_25_rate": 0.2975,
+      "consensus2": 35,
+      "consensus2_rate": 0.2893,
+      "pareto": 63,
+      "pareto_rate": 0.5207,
+      "peer_sensitivity_ge_25": 37,
+      "peer_sensitivity_ge_25_rate": 0.3058,
       "group_detail": [
         {
           "grp": "ipdesign",
@@ -134,19 +134,19 @@
           },
           "tie_exposed": {
             "champion_pct": 0,
-            "lens_a": 0,
-            "lens_b": 2,
-            "lens_c": 2,
+            "lens_a": 4,
+            "lens_b": 6,
+            "lens_c": 0,
             "lens_d": 2
           },
           "unique_share": {
             "champion_pct": 1.0,
-            "lens_a": 1.0,
-            "lens_b": 0.8889,
-            "lens_c": 0.8889,
+            "lens_a": 0.7778,
+            "lens_b": 0.6667,
+            "lens_c": 1.0,
             "lens_d": 0.8889
           },
-          "consensus2": 2,
+          "consensus2": 3,
           "pareto": 5,
           "peer_sensitivity_ge_25": 4
         },
@@ -161,17 +161,17 @@
             "lens_d": 10
           },
           "tie_exposed": {
-            "champion_pct": 2,
+            "champion_pct": 0,
             "lens_a": 2,
             "lens_b": 0,
-            "lens_c": 2,
+            "lens_c": 0,
             "lens_d": 0
           },
           "unique_share": {
-            "champion_pct": 0.9,
+            "champion_pct": 1.0,
             "lens_a": 0.9,
             "lens_b": 1.0,
-            "lens_c": 0.9,
+            "lens_c": 1.0,
             "lens_d": 1.0
           },
           "consensus2": 3,
@@ -190,20 +190,20 @@
           },
           "tie_exposed": {
             "champion_pct": 0,
-            "lens_a": 0,
+            "lens_a": 2,
             "lens_b": 2,
-            "lens_c": 2,
+            "lens_c": 0,
             "lens_d": 3
           },
           "unique_share": {
             "champion_pct": 1.0,
-            "lens_a": 1.0,
+            "lens_a": 0.9167,
             "lens_b": 0.9167,
-            "lens_c": 0.9167,
+            "lens_c": 1.0,
             "lens_d": 0.8333
           },
-          "consensus2": 3,
-          "pareto": 5,
+          "consensus2": 4,
+          "pareto": 6,
           "peer_sensitivity_ge_25": 4
         },
         {
@@ -218,20 +218,20 @@
           },
           "tie_exposed": {
             "champion_pct": 0,
-            "lens_a": 5,
+            "lens_a": 2,
             "lens_b": 2,
-            "lens_c": 3,
+            "lens_c": 2,
             "lens_d": 2
           },
           "unique_share": {
             "champion_pct": 1.0,
-            "lens_a": 0.7857,
+            "lens_a": 0.9286,
             "lens_b": 0.9286,
-            "lens_c": 0.8571,
+            "lens_c": 0.9286,
             "lens_d": 0.9286
           },
-          "consensus2": 2,
-          "pareto": 7,
+          "consensus2": 4,
+          "pareto": 6,
           "peer_sensitivity_ge_25": 2
         },
         {
@@ -246,19 +246,19 @@
           },
           "tie_exposed": {
             "champion_pct": 0,
-            "lens_a": 0,
+            "lens_a": 2,
             "lens_b": 2,
-            "lens_c": 0,
+            "lens_c": 3,
             "lens_d": 0
           },
           "unique_share": {
             "champion_pct": 1.0,
-            "lens_a": 1.0,
+            "lens_a": 0.9167,
             "lens_b": 0.9167,
-            "lens_c": 1.0,
+            "lens_c": 0.8333,
             "lens_d": 1.0
           },
-          "consensus2": 4,
+          "consensus2": 5,
           "pareto": 9,
           "peer_sensitivity_ge_25": 4
         },
@@ -275,19 +275,19 @@
           "tie_exposed": {
             "champion_pct": 0,
             "lens_a": 0,
-            "lens_b": 2,
+            "lens_b": 0,
             "lens_c": 0,
             "lens_d": 0
           },
           "unique_share": {
             "champion_pct": 1.0,
             "lens_a": 1.0,
-            "lens_b": 0.9167,
+            "lens_b": 1.0,
             "lens_c": 1.0,
             "lens_d": 1.0
           },
           "consensus2": 4,
-          "pareto": 5,
+          "pareto": 6,
           "peer_sensitivity_ge_25": 4
         },
         {
@@ -301,22 +301,22 @@
             "lens_d": 13
           },
           "tie_exposed": {
-            "champion_pct": 2,
-            "lens_a": 0,
-            "lens_b": 4,
+            "champion_pct": 0,
+            "lens_a": 2,
+            "lens_b": 2,
             "lens_c": 2,
             "lens_d": 0
           },
           "unique_share": {
-            "champion_pct": 0.9231,
-            "lens_a": 1.0,
-            "lens_b": 0.8462,
+            "champion_pct": 1.0,
+            "lens_a": 0.9231,
+            "lens_b": 0.9231,
             "lens_c": 0.9231,
             "lens_d": 1.0
           },
-          "consensus2": 4,
-          "pareto": 6,
-          "peer_sensitivity_ge_25": 3
+          "consensus2": 2,
+          "pareto": 5,
+          "peer_sensitivity_ge_25": 4
         },
         {
           "grp": "powersupply",
@@ -330,19 +330,19 @@
           },
           "tie_exposed": {
             "champion_pct": 0,
-            "lens_a": 3,
-            "lens_b": 4,
+            "lens_a": 4,
+            "lens_b": 0,
             "lens_c": 2,
             "lens_d": 2
           },
           "unique_share": {
             "champion_pct": 1.0,
             "lens_a": 0.8,
-            "lens_b": 0.8,
+            "lens_b": 1.0,
             "lens_c": 0.9,
             "lens_d": 0.9
           },
-          "consensus2": 1,
+          "consensus2": 2,
           "pareto": 3,
           "peer_sensitivity_ge_25": 2
         },
@@ -357,22 +357,22 @@
             "lens_d": 12
           },
           "tie_exposed": {
-            "champion_pct": 0,
+            "champion_pct": 2,
             "lens_a": 0,
-            "lens_b": 3,
-            "lens_c": 2,
+            "lens_b": 2,
+            "lens_c": 0,
             "lens_d": 2
           },
           "unique_share": {
-            "champion_pct": 1.0,
+            "champion_pct": 0.9167,
             "lens_a": 1.0,
-            "lens_b": 0.8333,
-            "lens_c": 0.9167,
+            "lens_b": 0.9167,
+            "lens_c": 1.0,
             "lens_d": 0.9167
           },
-          "consensus2": 5,
-          "pareto": 7,
-          "peer_sensitivity_ge_25": 4
+          "consensus2": 4,
+          "pareto": 6,
+          "peer_sensitivity_ge_25": 5
         },
         {
           "grp": "serverodm",
@@ -385,22 +385,22 @@
             "lens_d": 10
           },
           "tie_exposed": {
-            "champion_pct": 2,
+            "champion_pct": 0,
             "lens_a": 2,
-            "lens_b": 0,
-            "lens_c": 2,
+            "lens_b": 2,
+            "lens_c": 0,
             "lens_d": 2
           },
           "unique_share": {
-            "champion_pct": 0.9,
+            "champion_pct": 1.0,
             "lens_a": 0.9,
-            "lens_b": 1.0,
-            "lens_c": 0.9,
+            "lens_b": 0.9,
+            "lens_c": 1.0,
             "lens_d": 0.9
           },
-          "consensus2": 1,
-          "pareto": 6,
-          "peer_sensitivity_ge_25": 3
+          "consensus2": 2,
+          "pareto": 7,
+          "peer_sensitivity_ge_25": 2
         },
         {
           "grp": "thermal",
@@ -414,20 +414,20 @@
           },
           "tie_exposed": {
             "champion_pct": 0,
-            "lens_a": 2,
-            "lens_b": 2,
+            "lens_a": 0,
+            "lens_b": 0,
             "lens_c": 0,
             "lens_d": 2
           },
           "unique_share": {
             "champion_pct": 1.0,
-            "lens_a": 0.8571,
-            "lens_b": 0.8571,
+            "lens_a": 1.0,
+            "lens_b": 1.0,
             "lens_c": 1.0,
             "lens_d": 0.8571
           },
-          "consensus2": 1,
-          "pareto": 5,
+          "consensus2": 2,
+          "pareto": 6,
           "peer_sensitivity_ge_25": 4
         }
       ]
@@ -435,151 +435,151 @@
     "structural_history": {
       "basis": "exact_formal_snapshot_census_no_inference",
       "performance_claim": false,
-      "days": 9,
+      "days": 13,
       "first_date": "2026-10-12",
-      "latest_date": "2026-10-22",
+      "latest_date": "2026-10-30",
       "pairwise_rank_correlation_equal_group_weight": {
         "lens_a__lens_b": {
-          "days": 9,
-          "latest": 0.1444,
-          "median": 0.1319,
-          "min": -0.0371,
-          "max": 0.1995
+          "days": 13,
+          "latest": 0.254,
+          "median": 0.1438,
+          "min": -0.0585,
+          "max": 0.254
         },
         "lens_a__lens_c": {
-          "days": 9,
-          "latest": 0.4227,
+          "days": 13,
+          "latest": 0.1681,
           "median": 0.2996,
           "min": 0.1446,
           "max": 0.4227
         },
         "lens_a__lens_d": {
-          "days": 9,
-          "latest": 0.1521,
+          "days": 13,
+          "latest": 0.139,
           "median": 0.1521,
           "min": 0.0365,
-          "max": 0.2446
+          "max": 0.2768
         },
         "lens_b__lens_c": {
-          "days": 9,
-          "latest": 0.3412,
-          "median": 0.4062,
-          "min": 0.3095,
+          "days": 13,
+          "latest": 0.2722,
+          "median": 0.3412,
+          "min": 0.2722,
           "max": 0.519
         },
         "lens_b__lens_d": {
-          "days": 9,
-          "latest": -0.0986,
-          "median": -0.0917,
+          "days": 13,
+          "latest": 0.0621,
+          "median": -0.0815,
           "min": -0.1772,
-          "max": -0.0245
+          "max": 0.0621
         },
         "lens_c__lens_d": {
-          "days": 9,
-          "latest": -0.0996,
-          "median": -0.0638,
-          "min": -0.0996,
+          "days": 13,
+          "latest": -0.0849,
+          "median": -0.0712,
+          "min": -0.106,
           "max": 0.0161
         }
       },
       "pairwise_top20_jaccard": {
         "lens_a__lens_b": {
-          "days": 9,
-          "latest": 0.1042,
-          "median": 0.1304,
-          "min": 0.0755,
-          "max": 0.1915
+          "days": 13,
+          "latest": 0.2553,
+          "median": 0.1458,
+          "min": 0.0727,
+          "max": 0.2553
         },
         "lens_a__lens_c": {
-          "days": 9,
-          "latest": 0.25,
-          "median": 0.25,
+          "days": 13,
+          "latest": 0.16,
+          "median": 0.2444,
           "min": 0.1489,
           "max": 0.4
         },
         "lens_a__lens_d": {
-          "days": 9,
-          "latest": 0.2,
-          "median": 0.2,
+          "days": 13,
+          "latest": 0.1875,
+          "median": 0.2174,
           "min": 0.1739,
-          "max": 0.25
+          "max": 0.2727
         },
         "lens_b__lens_c": {
-          "days": 9,
-          "latest": 0.1739,
+          "days": 13,
+          "latest": 0.2955,
           "median": 0.2444,
           "min": 0.1739,
           "max": 0.3947
         },
         "lens_b__lens_d": {
-          "days": 9,
-          "latest": 0.1277,
+          "days": 13,
+          "latest": 0.1429,
           "median": 0.125,
-          "min": 0.08,
+          "min": 0.0784,
           "max": 0.1778
         },
         "lens_c__lens_d": {
-          "days": 9,
-          "latest": 0.0577,
-          "median": 0.1429,
+          "days": 13,
+          "latest": 0.0784,
+          "median": 0.1667,
           "min": 0.0577,
           "max": 0.1915
         }
       },
       "unique_top20_count": {
         "lens_a": {
-          "days": 9,
-          "latest": 7,
-          "median": 9,
+          "days": 13,
+          "latest": 8,
+          "median": 8,
           "min": 7,
           "max": 13
         },
         "lens_b": {
-          "days": 9,
-          "latest": 12,
-          "median": 11,
-          "min": 8,
-          "max": 14
+          "days": 13,
+          "latest": 6,
+          "median": 12,
+          "min": 6,
+          "max": 16
         },
         "lens_c": {
-          "days": 9,
-          "latest": 10,
-          "median": 6,
+          "days": 13,
+          "latest": 9,
+          "median": 8,
           "min": 5,
           "max": 10
         },
         "lens_d": {
-          "days": 9,
-          "latest": 13,
+          "days": 13,
+          "latest": 12,
           "median": 12,
-          "min": 11,
+          "min": 10,
           "max": 15
         }
       },
       "adjacent_snapshot_top20_retention": {
         "lens_a": {
-          "days": 8,
-          "latest": 0.5,
-          "median": 0.5064,
+          "days": 12,
+          "latest": 0.4872,
+          "median": 0.5,
           "min": 0.381,
-          "max": 0.5714
+          "max": 0.6286
         },
         "lens_b": {
-          "days": 8,
-          "latest": 0.5143,
-          "median": 0.5508,
-          "min": 0.4857,
+          "days": 12,
+          "latest": 0.475,
+          "median": 0.5429,
+          "min": 0.475,
           "max": 0.6562
         },
         "lens_c": {
-          "days": 8,
-          "latest": 0.4865,
+          "days": 12,
+          "latest": 0.6,
           "median": 0.6,
           "min": 0.4865,
-          "max": 0.75
+          "max": 0.7742
         },
         "lens_d": {
-          "days": 8,
+          "days": 12,
           "latest": 1.0,
           "median": 1.0,
           "min": 0.6176,
@@ -588,37 +588,37 @@
       },
       "tie_rate": {
         "lens_a": {
-          "days": 9,
-          "latest": 0.1157,
-          "median": 0.1818,
+          "days": 13,
+          "latest": 0.1653,
+          "median": 0.1653,
           "min": 0.0992,
           "max": 0.25
         },
         "lens_b": {
-          "days": 9,
-          "latest": 0.1901,
+          "days": 13,
+          "latest": 0.1488,
           "median": 0.2167,
-          "min": 0.15,
+          "min": 0.1488,
           "max": 0.3167
         },
         "lens_c": {
-          "days": 9,
-          "latest": 0.1405,
-          "median": 0.0917,
+          "days": 13,
+          "latest": 0.0744,
+          "median": 0.0992,
           "min": 0.0667,
-          "max": 0.1405
+          "max": 0.1488
         },
         "lens_d": {
-          "days": 9,
+          "days": 13,
           "latest": 0.124,
-          "median": 0.15,
+          "median": 0.124,
           "min": 0.124,
           "max": 0.15
         }
       },
       "pareto_rate": {
-        "days": 9,
-        "latest": 0.5124,
+        "days": 13,
+        "latest": 0.5207,
         "median": 0.5041,
         "min": 0.4463,
         "max": 0.525
@@ -628,29 +628,29 @@
   "structural_reviews": [
     {
       "formal_days": 10,
-      "remaining": 1
+      "remaining": 0
     },
     {
       "formal_days": 20,
-      "remaining": 11
+      "remaining": 7
     },
     {
       "formal_days": 40,
-      "remaining": 31
+      "remaining": 27
     }
   ],
   "outcome_reviews": [
     {
       "paired_mature_days": 100,
-      "remaining_at_least": 100
+      "remaining_at_least": 97
     },
     {
       "paired_mature_days": 200,
-      "remaining_at_least": 200
+      "remaining_at_least": 197
     },
     {
       "paired_mature_days": 300,
-      "remaining_at_least": 300
+      "remaining_at_least": 297
     }
   ],
   "limitations": [
