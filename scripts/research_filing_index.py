@@ -17,6 +17,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from html.parser import HTMLParser
@@ -32,6 +33,10 @@ FILENAME_RE = re.compile(r"^\d{6}_\d+_[A-Z0-9]+\.pdf$", re.IGNORECASE)
 
 class FilingIndexError(ValueError):
     """Raised when input or the official index response violates the contract."""
+
+
+class FilingIndexRateLimitError(FilingIndexError):
+    """An explicit limit response; callers must stop the current request batch."""
 
 
 class _TableParser(HTMLParser):
@@ -95,6 +100,10 @@ def parse_stock_ids(value: str, universe: dict[str, str]) -> list[str]:
 def parse_filing_index_html(
     html: str, *, stock_id: str, year: int, season: int,
 ) -> list[dict[str, object]]:
+    # MOPS can return HTTP 200 with a limit notice instead of an index.  Keep
+    # this distinct from both an empty index and an unrecognized response.
+    if any(marker in html for marker in ("查詢過量", "查詢過於頻繁", "查詢太頻繁")):
+        raise FilingIndexRateLimitError(f"{stock_id} MOPS 查詢過量，停止本批取件")
     parser = _TableParser()
     parser.feed(html)
     if "查無所需資料" in html:
@@ -155,9 +164,16 @@ def fetch_index(stock_id: str, year: int, season: int, timeout: float) -> tuple[
             "Accept": "text/html,application/xhtml+xml",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        payload = response.read()
-        charset = response.headers.get_content_charset() or "big5"
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            payload = response.read()
+            charset = response.headers.get_content_charset() or "big5"
+    except urllib.error.HTTPError as exc:
+        if exc.code == 429:
+            raise FilingIndexRateLimitError(
+                f"{stock_id} MOPS HTTP 429，停止本批取件"
+            ) from exc
+        raise
     try:
         return url, payload.decode(charset)
     except (LookupError, UnicodeDecodeError) as exc:
@@ -169,13 +185,35 @@ def build_report(
     checked_at: dt.date, timeout: float, delay_ms: int,
 ) -> dict[str, object]:
     results = []
+    rate_limited: list[str] = []
+    not_attempted: list[str] = []
     for offset, stock_id in enumerate(stock_ids):
         if offset and delay_ms:
             time.sleep(delay_ms / 1000)
-        index_url, html = fetch_index(stock_id, year, season, timeout)
-        filings = parse_filing_index_html(
-            html, stock_id=stock_id, year=year, season=season,
-        )
+        index_url = build_index_url(stock_id, year, season)
+        try:
+            index_url, html = fetch_index(stock_id, year, season, timeout)
+            filings = parse_filing_index_html(
+                html, stock_id=stock_id, year=year, season=season,
+            )
+        except FilingIndexRateLimitError as exc:
+            rate_limited.append(stock_id)
+            results.append({
+                "stockId": stock_id, "name": universe[stock_id],
+                "indexUrl": index_url, "status": "rate_limited",
+                "found": None, "hasChineseConsolidatedReport": None,
+                "filings": [], "error": str(exc),
+            })
+            not_attempted = stock_ids[offset + 1:]
+            for pending_id in not_attempted:
+                results.append({
+                    "stockId": pending_id, "name": universe[pending_id],
+                    "indexUrl": build_index_url(pending_id, year, season),
+                    "status": "not_attempted", "found": None,
+                    "hasChineseConsolidatedReport": None, "filings": [],
+                    "reason": f"stopped_after_rate_limit:{stock_id}",
+                })
+            break
         chinese_report = next(
             (item for item in filings if str(item["filename"]).upper().endswith("_AI1.PDF")),
             None,
@@ -188,9 +226,9 @@ def build_report(
             "hasChineseConsolidatedReport": chinese_report is not None,
             "filings": filings,
         })
-    found = [item["stockId"] for item in results if item["found"]]
-    missing = [item["stockId"] for item in results if not item["found"]]
-    return {
+    found = [item["stockId"] for item in results if item["found"] is True]
+    missing = [item["stockId"] for item in results if item["found"] is False]
+    report = {
         "schemaVersion": 1,
         "checkedAt": checked_at.isoformat(),
         "yearRoc": year,
@@ -208,6 +246,17 @@ def build_report(
         "missingStockIds": missing,
         "results": results,
     }
+    # Preserve the successful schema-1 payload.  Only incomplete reports add
+    # explicit attempt state; unknown/blocked targets never inflate missing.
+    if rate_limited:
+        report.update({
+            "complete": False,
+            "stoppedReason": "rate_limited",
+            "attempted": len(stock_ids) - len(not_attempted),
+            "rateLimitedStockIds": rate_limited,
+            "notAttemptedStockIds": not_attempted,
+        })
+    return report
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -261,6 +310,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"output: {os.path.relpath(output_path, ROOT)}")
     else:
         print(json.dumps(report, ensure_ascii=True, indent=2))
+    if not report.get("complete", True):
+        print("research filing index partial: rate limited; remaining targets not attempted", file=sys.stderr)
+        return 2
     return 0
 
 

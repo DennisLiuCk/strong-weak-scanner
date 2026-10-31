@@ -350,3 +350,67 @@ next_check: 2026-10-31
 trigger: 新附件拆分付款與履約進度，或提供同一客戶專案的交付、收入及投運配對
 invalidation: 取消或合約修改改變已記錄的履約安排；沒有逐案資料時維持客戶歸因未證實
 -->
+
+## 10月31日回查：收款增加，仍要分開看履約
+
+**先收到錢，不等於設備已經交完。** GE Vernova 第三季季報新增合約負債與遞延收入的期末數字，並另列前三季從年初合約負債認列的收入。這是付款與履約的公司級新證據，不是同一資料中心專案已投運的證明。[S6/C8]
+
+**存量與流量，不能直接相加。** 9 月底仍待履約的合約負債及遞延收入是期末存量；前三季已從年初負債轉成的收入是九個月流量。負債增加還包含 Prolec GE 收購併表因素，不能全部當成燃氣設備預約帶來的現金。[S6/C8]
+
+- **遞延收入**：先記錄、之後依條件轉為收入的金額；此處依公司季報與合約負債合列。
+- **收購併表**：收購後把被收購公司的相關資產、負債及營運納入合併報表，數字增加不一定全來自原有業務。
+- **想一想**：如果合約負債上升，哪些證據才能區分新收款、尚未交貨和收購加入的餘額？若現金流很強，能否直接推論設備已完成驗收？
+
+下一步是追同一口徑的負債變動、收入認列與收購影響，再找具名客戶的交付及投運配對。這次只接納付款／履約旁支，未刷新原主命題的證據日期，也沒有新增台灣公司的訂單或收入關係。
+
+<!-- research_source
+source_id: S6
+role: company_filing
+source_kind: document
+publisher: GE Vernova
+title: Form 10-Q for the quarterly period ended September 30 2026
+published_at: 2026-10-28
+captured_at: 2026-10-31
+accepted_at: 2026-10-31
+status: active
+url: https://www.gevernova.com/sites/default/files/gev_webcast_10q_10282026.pdf
+locator: PDF／印刷頁14–15 Note 9的合約負債與遞延收入、從年初負債認列收入及設備／服務RPO；頁11 Note 2的百萬美元及四捨五入說明
+limitation: 合併公司及Power／Electrification／Wind分部口徑；負債增量含Prolec GE併表，不能全歸因燃氣預約或資料中心；未提供具名專案交付、投運或台股訂單證據
+independence_group: gevernova
+-->
+
+<!-- research_claim
+claim_id: C8
+label: verified
+status: active
+claim: GE Vernova截至2026/9/30的合約負債與遞延收入合計45,747百萬美元，2025年底為25,950百萬美元；前三季增加19,797百萬美元主要因新收款超過收入認列及Prolec GE併表，前三季從年初合約負債認列收入10,688百萬美元
+supporting_source_ids: S6
+contrary_source_ids:
+as_of: 2026-10-28
+basis: Note 9頁14–15；45,747減25,950等於19,797，總額含流動及非流動；10,688是由年初負債認列的收入，不是本季全部收款或交付量
+boundary: 單公司合併口徑、九個月而非Q3單季；增量含收購因素，不把45,747全稱燃氣SRA、不將現金等同履約，也不把10,688與新增負債相加；N=1公司披露值，非抽樣估計，SE/t不適用
+verification_needed:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T3
+status: active
+claim_ids: C5,C7,C8
+metric: 同口徑合約負債、由年初負債認列的收入、收購影響與具名專案履約配對
+source_ids: S6
+watch_source_ids: S5
+frequency: quarterly
+frequency_detail: 官方事件頁排定2027/1/27 07:30 EST第四季結果，台灣同日20:30後取件；1/28為補查工作日
+next_check: 2027-01-28
+trigger: 下一季附件分開期末存量、期間收入認列及併表因素，或公開同一客戶的預付、交付、收入與投運節點
+invalidation: 合約取消、重大修改或分類變更使本次口徑無法銜接；缺乏逐案資料時仍不得推定資料中心已投運
+-->
+
+<!-- transition
+date: 2026-10-31
+from: triaged
+to: triaged
+reason: reconcile_q3_contract_liability_stock_and_nine_month_revenue_recognition_without_project_attribution
+evidence: sources:S6
+-->

@@ -816,6 +816,10 @@ evidence: sources:S18,S19
 
 ### 名詞小字典
 
+- **PSU（電源供應器）**：把輸入電源轉換成設備所需電力；額定功率不是實際出貨數量。
+- **ASIC（特定用途晶片）**：針對指定任務設計的晶片；配套電源不能直接當成所有AI平台共用產品。
+- **Prototype（原型）**：供測試、整合或評估的產品階段；出貨展望不等於已交付、客戶驗收或量產。
+
 - **RFI（Request for Information，資料要求）**：電網營運方要求申請者補交資料的程序；個案有自己的截止日，收到或回覆 RFI 都不等於獲准通電。
 - **800VDC**：以約 800 伏特直流電在資料中心傳送電力，目的是降低超高功率機櫃的電流、線材與轉換損耗。
 - **Power rack**：集中把資料中心電力轉換、分配給多個運算機櫃的電源系統，不等於伺服器本身。
@@ -1161,7 +1165,7 @@ transformer、switchgear、relay、generator 與 campus control 排除在 BESS q
 - [ERCOT：Data Centers Interim Charge](https://www.ercot.com/files/docs/2026/08/19/ERCOTPanel1DataCenters.pdf)（2026-08-19；PDF pp.2–3 的 Batch Study／LCP 與約 205GW preliminary Large Load eligibility）。
 - [ERCOT Large Load Integration 持續更新入口](https://www.ercot.com/services/rq/large-load-integration)（2026-08-23 捕捉，只供後續重查 classification、LCP、QSA、energization 與 meter 證據）。
 
-NVIDIA 列名 Delta、LITEON 只證實生態系參與。對 2301 而言，800V 仍停在公司預定的驗證節點；
+NVIDIA 列名 Delta、LITEON 只證實生態系參與。對 2301 而言，10/30 新稿把 800VDC 原型出貨列入第四季展望，但未補齊客戶驗收與量產財務；
 對 2308 而言，證據已由展示增加到 MOU planned deployment，但仍沒有完成部署與財務分母；
 對 8255 而言，本輪來源仍未點名。NVIDIA 的效率、減銅、維護與 TCO 數字屬架構模型／目標，
 並非第三方場站實績。OCP、UL 與 BESS 文件也各有不同邊界，不能多數決成「已驗收」；OCP 的
@@ -1286,4 +1290,153 @@ from: triaged
 to: triaged
 reason: add_ercot_batch_zero_rfi_case_specific_deadlines_without_claiming_energization
 evidence: sources:S21
+-->
+
+## 10月31日新手更新：同一份財報，也要分產品與時間
+
+**一份好財報，不代表每項新產品都已量產。** [光寶10/30官方稿](https://www.liteon.com/en/news/press-center/content/quarterly-third-eps-2026)
+在第四季展望中，把部分電源產品列為量產驅動，800VDC電源機櫃則列為本季開始原型出貨。
+這證實公司公布了這項展望，不是證實第四季計畫已完成；也不能把其他產品的量產狀態搬到800VDC。
+
+原型（prototype）是供測試、整合或評估的產品階段，不等於客戶驗收。量產（volume production）
+是進入重複製造的階段，實際交付數量仍要另查。PSU是電源供應器；BBU是電池備援單元；
+ASIC是針對指定任務設計的晶片。不同產品即使都服務AI，仍須各自核對型號與階段。
+
+| 原稿範圍 | 期間與口徑 | 能回答什麼／不能回答什麼 |
+|---|---|---|
+| 800VDC Power Rack | Q4展望：原型出貨 | 有具體產品時程；不是已完成客戶驗收、量產數量或收入 |
+| 8.5kW ASIC PSU、BBU、VR 110kW、Helios 42吋Power Shelves | Q4展望：量產驅動 | 是其他具名產品的展望；功率規格與尺寸不是出貨數量 |
+| cloud computing-related收入 | 2026前三季年增80% | 公司自述的大分類成長；不是單季或800VDC收入 |
+| Cloud & IoT事業收入／AI-related收入 | 前者Q3年增近60%；後者今年占總收入逾30% | 期間、分類與分母不同，不互相代算，也不代表800VDC毛利 |
+
+以上數字均為同一家公司自述，成長率以去年同期為基準；不是跨公司可比表或抽樣估計。
+**推論：**讀季報先固定「產品、期間、階段、財務分母」四欄，才能判斷新架構是否真的形成業績。
+**待驗證：**同一800VDC型號的原型交付、買方驗證、量產數量，以及可分辨的收入與毛利。
+
+想一想：如果公司AI收入增加，但800VDC仍列在原型出貨展望，哪份文件才足以把兩者連起來？
+若下季只有展場規格升級，能否當作客戶驗收？先追具名產品交付與驗證紀錄，再追同品同季財務；
+11/10是研究補查日，不是公司承諾的驗收期限。這項更新不延長原七關主命題的證據日期。
+
+<!-- research_source
+source_id: S22
+role: company_release
+source_kind: document
+publisher: LITEON
+title: LITEON 2026 Q3 results and Q4 outlook
+published_at: 2026-10-30
+captured_at: 2026-10-31
+accepted_at: 2026-10-31
+status: active
+url: https://www.liteon.com/en/news/press-center/content/quarterly-third-eps-2026
+locator: 首段前三季分類、AI Infrastructure Demand段、Outlook for Q4條列1–2與OCP展示段
+limitation: 公司新聞稿與管理層展望；Q4量產與原型交付不是整季完成量。Cloud computing-related、Cloud & IoT及AI-related不可互換；未揭800VDC具名客戶驗收、量產數量、收入或毛利分母
+independence_group: liteon
+-->
+
+<!-- research_source
+source_id: S23
+role: company_release
+source_kind: living_index
+publisher: LITEON
+title: LITEON financial press center
+published_at:
+captured_at: 2026-10-31
+accepted_at: 2026-10-31
+status: active
+url: https://www.liteon.com/en/news/press-center/index/0/financial
+locator: Financial列表2026/10/30 Q3結果、未來月營收與季報入口
+limitation: 索引只定位文件與日期，不代替原文、客戶證據或財務歸因；與S22同一來源群
+independence_group: liteon
+-->
+
+<!-- research_claim
+claim_id: C26
+label: verified
+status: active
+claim: 光寶10/30官方稿在2026Q4展望中，分列8.5kW ASIC電源供應器、BBU、下一代VR 110kW方案與Helios用42吋Power Shelves的量產驅動，以及800VDC Power Rack本季開始原型出貨的規劃
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-10-30
+basis: S22 Outlook for Q4條列1–2；verified指公司如此公布而非展望已實現
+boundary: 不證明800VDC量產或第四季全部計畫已完成，亦沒有同品客戶驗收、數量、收入或毛利；110kW為規格、42吋為尺寸，不是出貨數量
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: 光寶官方稿分別報告2026前三季cloud computing-related收入年增80%、第三季Cloud & IoT事業收入年增近60%，並表示今年AI-related收入占總收入逾30%
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-10-30
+basis: S22前三季重點、Q3結果段及總經理引述分別定位期間與分類
+boundary: 公司自述分類，前三季與單季不可並排排名；三個分類不是同義集合，AI占比不能轉成800VDC收入占比，也不能推出單品毛利
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: inference
+status: active
+claim: 讀取供應商季報應以同一產品、同一期間、同一商業階段及同一財務分母建立四欄對照，避免把廣義收入成長轉成新架構產品已量產
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-10-31
+basis: S22同稿存在Q3結果、前三季分類及Q4不同產品階段，據此整理研究方法，不是公司自訂標準
+boundary: 四欄是研究查核框架，不是供應商認證、客戶採用、收入歸因、股票排序或投資建議
+verification_needed: 後續同品同期間客戶資格、實際量產與收入／毛利共同鍵
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C29
+label: unverified
+status: active
+claim: 光寶800VDC Power Rack是否完成具名客戶驗證並形成可分辨的量產出貨、收入與毛利
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-10-31
+basis: 新稿只支持原型出貨展望，尚不足閉合原T2四欄條件
+boundary: 未公開不等於未發生；不以展示、其他產品量產、Cloud & IoT成長或AI占比代填
+verification_needed: 公司與客戶雙向核對同型號／版本、驗證完成日、量產交付量及收入和毛利口徑
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T5
+status: active
+claim_ids: C26,C28,C29
+metric: 光寶800VDC Power Rack由Q4原型出貨展望到實際原型交付、客戶驗證與量產的具名進度
+source_ids: S22
+watch_source_ids: S23,S6
+frequency: monthly
+frequency_detail: 月營收或產品公告先核交付階段，Q4結束後再核整季完成；11月工作日不是公司承諾期限
+next_check: 2026-11-10
+trigger: 公司與買方文件對到同一型號、原型交付與驗證結果，並把量產展望與已完成量分開
+invalidation: 公司撤回或延後原型／驗證計畫，或文件顯示產品、電壓與期間與原主張不同
+-->
+
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C27,C28,C29
+metric: 光寶800VDC單品收入／毛利是否可由Q3及後續廣義分類中拆出
+source_ids: S22
+watch_source_ids: S23,S6
+frequency: quarterly
+frequency_detail: 下一季結果原件待公司排程；2027/02/05為研究補查日而非已確認法說日
+next_check: 2027-02-05
+trigger: 公司公開同品同季交付、收入及毛利分母，並與三種廣義分類對照
+invalidation: 定義更改無法銜接，或後續明示800VDC未形成收入；只有公司大類成長仍未命中
+-->
+
+<!-- transition
+date: 2026-10-31
+from: triaged
+to: triaged
+reason: distinguish_liteon_q4_prototype_outlook_from_other_product_volume_drivers_and_revenue_categories
+evidence: sources:S22
 -->

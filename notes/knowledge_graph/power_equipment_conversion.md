@@ -79,18 +79,18 @@ view: industry
 from_id: product:gas-power-equipment
 to_id: metric:equipment-prepayments-and-obligations
 relation: measured_by
-claim_refs: MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C3,MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C5
+claim_refs: MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C3,MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C5,MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C8
 note_refs:
 evidence_state: inference
 commercial_stage: planned
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-09-10
-review_due: 2026-10-31
+as_of: 2026-10-28
+review_due: 2027-01-28
 status: active
-boundary: 現金與履約分時的判讀框架；美元剩餘履約義務含設備服務，不能換算為燃氣設備GW或把全部現金流歸於預約。
-next_trigger: 新季度合約負債、付款節奏及設備服務履約說明。
+boundary: 現金與履約分時的判讀框架；新季合約負債是合併口徑且增量含Prolec GE收購，不是全部燃氣SRA預收；期末存量不等九個月收入流量，亦不能換算設備GW或推具名電廠投運。
+next_trigger: 同口徑負債、認列收入與收購影響調節，再追同一客戶交付及投運配對。
 -->
 
 <!-- knowledge_edge

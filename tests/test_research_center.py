@@ -5793,7 +5793,7 @@ process.stdout.write(JSON.stringify(results));
             "## 10 月更新：規格換版和產品出貨分開看",
             "Meta於2026-10-12自述Tahan正在出貨",
             "不能當成客戶交付完成",
-            "不能據此改寫測試要求", "把 ESUN 資料平面放在未來世代",
+            "不能由舊測試補齊新版資格", "把 ESUN 資料平面放在未來世代",
         ):
             self.assertIn(ledger_contract, topic)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
@@ -7307,7 +7307,17 @@ process.stdout.write(JSON.stringify(results));
             ("impact", 3), ("monitoring_item", 4),
             ("transition", 9),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in {"research_source", "research_claim", "monitoring_item", "transition"}:
+                self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        # Keep all historical IDs exactly once while permitting new evidence.
+        for field, prefix, historical_count in (
+            ("source_id", "S", 21), ("claim_id", "C", 25), ("monitor_id", "T", 4),
+        ):
+            ids = re.findall(rf"^{field}: ({prefix}\d+)$", topic, re.MULTILINE)
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{n}" for n in range(1, historical_count + 1)} <= set(ids))
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"
@@ -7340,7 +7350,9 @@ process.stdout.write(JSON.stringify(results));
             / "800vdc_execution_readiness.md"
         ).read_text(encoding="utf-8")
         self.assertIn("label: 800VDC 七關執行準備度", graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 22)
+        self.assertGreaterEqual(graph.count("<!-- knowledge_edge"), 22)
+        edge_ids = re.findall(r"^edge_id: (KG-8ER-\w+)$", graph, re.MULTILINE)
+        self.assertEqual(len(edge_ids), len(set(edge_ids)))
         for edge_target in (
             "from_id: company:2308",
             "from_id: organization:open-compute-project",

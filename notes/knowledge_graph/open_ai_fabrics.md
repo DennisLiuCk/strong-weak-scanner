@@ -100,18 +100,18 @@ view: industry
 from_id: concept:open-ai-fabrics
 to_id: standard:uec
 relation: includes
-claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C2,MI-2026-08-02-OPEN-AI-FABRICS#C24
+claim_refs: MI-2026-08-02-OPEN-AI-FABRICS#C2,MI-2026-08-02-OPEN-AI-FABRICS#C27,MI-2026-08-02-OPEN-AI-FABRICS#C28
 note_refs:
 evidence_state: verified
 commercial_stage: concept
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-10-19
-review_due: 2026-10-21
+as_of: 2026-10-31
+review_due: 2026-11-07
 status: active
-boundary: 10/19官方歷史索引將1.1列為現行、發布日10/12，1.0.3為歷史版本；本輪未核1.1全文，發布不證明舊測試床適用、新版條文或具名產品合規、互通與部署。
-next_trigger: 取得1.1固定全文及差異，再追新版compliance、互通矩陣與具名產品結果；兩關不得互代。
+boundary: 10/31取得完整1.1檔與兩頁差異說明，只核封面與差異分類，非764頁逐條審查；Unified Local必要要求、規範性修正與選填新增功能分開，不證明舊測試床適用或產品合規、互通及部署。
+next_trigger: 固定具名產品功能組合，逐條對上1.1要求、適用工具及原始結果；文件取得與產品驗收不得互代。
 -->
 
 <!-- knowledge_edge

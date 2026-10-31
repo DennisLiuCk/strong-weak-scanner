@@ -453,3 +453,23 @@ status: active
 boundary: ERCOT逐案核驗開始與補件責任不是同案最終納入 容量配額 QSA 通電許可 電表 800V採用或供應商財務；10個工作日從每案RFI發出時計 可申請延長不是自動加5日。
 next_trigger: 同案公開RFI發出日 完整回覆與核验結果 再接後續分類配額通電與電表 不能只憑行政進展更新舊部署邊。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-8ER-I20
+view: industry
+from_id: concept:800vdc-execution-readiness
+to_id: process:product-period-stage-financial-boundary
+relation: measured_by
+claim_refs: MI-2026-08-01-800VDC-EXECUTION-READINESS#C28
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-31
+review_due: 2026-11-10
+status: active
+boundary: 研究方法拆開公司同稿不同產品與期間，不證明800VDC量產、客戶驗收、收入或毛利，也不升級公司曝險。
+next_trigger: 同型號同期間公開原型、客戶驗證、量產交付與財務分母，分別接納各層證據。
+-->

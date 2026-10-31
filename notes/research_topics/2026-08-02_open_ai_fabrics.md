@@ -959,7 +959,10 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 - **Avg／Min／Max／p99**：Avg 是平均，Min／Max 是指定 rank 或 iteration 集合的最低／最高值，p99 是約 99% 觀測不超過的尾端門檻；必須連同事件數與集合定義閱讀。
 - **JSON**：以固定鍵值結構保存文字、數字與陣列的可機器讀取格式；輸出原始 JSON 有助重算，但不保證量測方法或資料本身正確。
 - **UALink（加速器互連）**：主要服務機架內多顆加速器的開放互連規格路徑。
-- **UEC（超乙太網路聯盟）**：主要改善人工智慧與高效能運算跨機架乙太網路的規格生態系。
+- **UEC（超乙太網路聯盟）**：改善人工智慧與高效能運算乙太網路的規格生態系；1.1 另加入面向機架內擴充的 Unified Local 功能組合。[S29]
+- **Profile（功能組合）**：依使用情境，把一套規格中的必做、條件式與選配功能組合起來；比較產品時，除了版本還要對齊這一欄。
+- **Unified Local**：UEC 1.1 為機架內擴充加入的功能組合，有自己的必要要求；不是所有舊版產品自動取得的新資格。[S29]
+- **向後相容**：新版保留與舊版協同工作的設計；這和已實作新版新增功能、已完成新版測試是不同問題。
 - **ESUN（機架內乙太網路交換）**：OCP 開放規格，處理機架內網路交換、封包格式、無損傳輸與可靠性。
 - **Tahan**：Meta 為 MTIA 300 加速器設計的乙太網路交換器；它正在出貨的說法，和後續設計預計採用 ESUN 是兩件事。[S26]
 - **SUE-T（機架內乙太傳輸）**：偏向定義加速器端點、記憶體使用方式與傳輸；它與 ESUN 分工。
@@ -995,7 +998,7 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 - 再把 UALink、ESUN、SUE-T 與 UEC 放回正確網路工作，分別追實體／連結、端點／傳輸、交換／壅塞、軟體／管理與驗收層。
 - 互通報告要列出廠商組合、產品版本、測試拓撲、正常與故障測項、軟體版本、通過條件與重現方法。
 - 最後依序追樣品、出貨、客戶驗收、正式開放、實際部署與利用率；任何一步都不能跳過。
-- UEC 先核對 1.1 的完整版本差異與適用測試；Tahan 則另追具名配置與出貨範圍，客戶交付完成及後續 ESUN 設計要再找自己的驗收報告。[S25][S26]
+- UEC 1.1 完整文件與發行差異已取得，下一步依產品選用的功能組合逐條對照適用測試；Tahan 則另追具名配置與出貨範圍，客戶交付完成及後續 ESUN 設計要再找自己的驗收報告。[S28][S29][S26]
 
 ### 想一想
 
@@ -1003,12 +1006,18 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 - 同一類網路技術能服務不同工作時，研究者要如何分開延遲、資料、權限、路由與故障要求？
 - 如果同一台設備同時服務幾張網，如何避免把同一份連接數、出貨或收入計算兩次？
 - 一則公告同時說「目前正在出貨」和「未來將採用新規格」，哪個產品、哪個版本才是這兩句各自的主詞？
+- 新規格說向後相容，舊產品能繼續連線，為什麼仍要問它是否實作了新功能、通過哪一版測試？
 
 ## 10 月更新：規格換版和產品出貨分開看
 
-**證實：UEC 的發布索引已列出 1.1。** 官方版本歷史把 2026 年 10 月 12 日列為發布日；
-本文先前的 1.0.3 是當時記錄，不再代表現行版本。本輪未取得可核對的 1.1 全文，
-不能據此改寫測試要求，更不能宣稱產品已通過新版。[S25]
+**證實：UEC 1.1 已由索引前進到完整文件取得。** 官方版本歷史與文件封面均列 2026 年
+10 月 12 日；10 月 19 日只完成索引核對，10 月 31 日已取回完整版本，並逐頁核對兩頁
+發行說明。這是補足文件取得分支，不是 10 月 31 日又發布一次規格，也不是已逐條審完全文。[S25][S28][S29]
+
+**新手重點：向後相容和新增功能合格是兩件事。** 發行說明把差異分成新增功能、規範性修正、
+澄清與編輯調整，另指出 Unified Local 功能組合有必要要求。[S29] 可以把它想成考試換版：
+舊知識仍能使用，不代表新科目已經考過。判讀產品時要先問「它選哪個功能組合」，再核對
+新要求與已填測試清單；只有規格封面和發行說明，還不能回答產品是否通過。
 
 **證實的是 Meta 正在出貨的自述，不是客戶交付完成或 ESUN 驗收。** Meta 10 月 12 日說 Tahan 正在出貨，
 對象是 MTIA 300，採用 Tomahawk 5 與既有 RoCE 傳輸；同文另把下一代設計稱為預覽，
@@ -1179,7 +1188,7 @@ per-iteration p99／max、raw JSON 與 correctness 設定，讓第 3、4、8、9
 
 | 本文六類角色 | 它交付什麼 | 本輪具名例子 | 已證實到哪裡 | 不能外推 |
 |---|---|---|---|---|
-| 1. 規格與開放工作組 | 定義端點、傳輸、交換、測試與版本要求 | UALink Consortium、Ultra Ethernet Consortium、Open Compute Project | UALink 2.0、UEC 1.0.3 與 ESUN 1.0 是已查文件；UEC 索引現列 1.1，全文差異待核 [S25] | 參與組織或規格發布不等於產品已符合規格與互通 |
+| 1. 規格與開放工作組 | 定義端點、傳輸、交換、測試與版本要求 | UALink Consortium、Ultra Ethernet Consortium、Open Compute Project | UALink 2.0、UEC 1.0.3 與 ESUN 1.0 是既有已查文件；UEC 1.1 原件與發行說明已取得，逐條合規對照待核 [S28][S29] | 參與組織或規格發布不等於產品已符合規格與互通 |
 | 2. 加速器、端點與晶片智財 | 實作記憶體、傳輸、實體層與控制功能 | AMD Helios 端點路徑、Broadcom SUE 架構、Marvell custom UALink 方案 | 公開產品與架構說明證明開發路徑存在 | 公司自述可互通不等於第三方跨廠測試、客戶採用或收入 |
 | 3. 交換器專用晶片與平台 | 實作封包轉送、緩衝、壅塞與網路管理 | Arista 7060XE7 以及 Broadcom 對機架內乙太網路的架構說明 | 7060XE7 被定位為同時服務機架內外的具名平台 | 產品用途不等於已對應 ESUN／SUE-T、已出貨或已部署 |
 | 4. 機架與系統整合 | 把運算、機架內外網路、軟體、電源與散熱整合成可驗收系統 | AMD Helios 參考設計 | 公開架構同時列出 UALink／UALoE 機架內與 UEC-ready 跨機架路徑 | 參考設計不等於整機廠已量產、客戶已驗收或所有組件已互通 |
@@ -1193,7 +1202,7 @@ per-iteration p99／max、raw JSON 與 correctness 設定，讓第 3、4、8、9
 
 | 本文六關 | 這一關要證明 | 本輪可確認到哪裡 | 下一份證據 | 不能外推 |
 |---|---|---|---|---|
-| 1. 共同規則可查核 | 規格版本、功能、角色、錯誤行為與測試入口有公開文件 | 已查 UALink 2.0、UEC 1.0.3、ESUN 1.0；UEC 1.1 已列發布，不能由舊版補齊新版內容 [S25] | UEC 1.1 全文與測試版本對照、SUE-T 正式規格及各路徑互通方法 | 規格或工具發布不等於實體晶片存在或產品已通過測試 |
+| 1. 共同規則可查核 | 規格版本、功能、角色、錯誤行為與測試入口有公開文件 | 已查 UALink 2.0、UEC 1.0.3、ESUN 1.0；UEC 1.1 完整文件及發行差異已取得，不能由舊測試補齊新版資格 [S28][S29] | UEC 1.1 逐條要求與測試版本對照、SUE-T 正式規格及各路徑互通方法 | 規格或工具發布不等於實體晶片存在或產品已通過測試 |
 | 2. 路徑各位置有具名實物 | 至少能指出端點、連接傳輸、交換器與所需軟體的產品、版本和功能 | Helios、Marvell UALink 方案與 Arista 7060XE7 證明多個位置有具名開發路徑 | 對應同一規格版本的端點、交換器、韌體、驅動與測試配置 | 不同新聞中有多個產品，不等於它們已在同一路徑上工作 |
 | 3. 單件產品符合指定規格 | 每件產品依共同方法通過實體層、協定、功能、計時與錯誤測項 | UEC 已有自我聲明、測試床與 checklist 工具；本輪仍未找到具名產品已填清單或通過報告 | 產品名、版本、已填清單、測試器、測項、通過條件與可查核結果 | 工具存在或一件產品合格不等於它能和其他廠商產品工作 |
 | 4. 不同廠商完成交叉互通 | 至少兩家獨立端點與交換實作，在共同版本與軟體下交叉測試正常與異常情境 | UEC 測試床文件明示 interoperation 不在範圍；其他現有文件也沒有可核對交叉矩陣 | 參與廠商、組合矩陣、版本、拓撲、測項、錯誤注入、軟體與重現方法 | 單廠端到端展示、會員名單、自我聲明或產品互連宣稱不等於通過 |
@@ -1279,6 +1288,7 @@ evidence_boundary: 更高頻寬的工程需求不自動對應任一 PCB／CCL �
 
 ## 下一個可證明／否定的節點
 
+- UEC 1.1 依具名產品的功能組合，將發行說明中的新增要求與修正逐條接到測試版本和結果；完整原件取得不再當成缺件，合規對照仍待完成。[S28][S29]
 - UEC 公開第一批具名產品的已填自我聲明／測試結果，並與 patent declaration 分開；UALink、ESUN／SUE-T 也各自公布可核對的 compliance program。
 - UALink／ESUN／SUE-T／UEC 公布 plugfest 與可重現的 multi-vendor interoperability 組合矩陣，而不是只提供 checklist。
 - 具名人工智慧叢集公開六張網的實體／邏輯映射、是否匯聚、冗餘、BOM、軟體版本、故障與長時間系統驗收。
@@ -1436,4 +1446,92 @@ frequency_detail: 分別追當期Tahan與後續ESUN產品，不以preview、規�
 next_check: 2026-10-23
 trigger: 同一具名產品公開版本化BOM、實作規格、跨廠測試與驗收範圍；財務升級另須供應商同產品出貨及期間分母
 invalidation: Meta更正出貨說法、取消後續設計或資格失敗時，依該產品下修，不以另一世代進度抵銷
+-->
+
+<!-- transition
+date: 2026-10-31
+from: triaged
+to: triaged
+reason: fulfilled_uec_1_1_document_acquisition_branch_with_release_note_locators_compliance_crosswalk_pending_no_main_clock_refresh
+evidence: sources:S28,S29
+-->
+
+<!-- research_source
+source_id: S28
+role: standard
+source_kind: document
+publisher: Ultra Ethernet Consortium
+title: Ultra Ethernet Specification v1.1
+published_at: 2026-10-12
+captured_at: 2026-10-31
+accepted_at: 2026-10-31
+status: active
+url: https://ultraethernet.org/wp-content/uploads/sites/20/2026/10/UE-Specification-1.1.pdf
+locator: 完整PDF取回17613842 bytes、764頁；封面PDF第1頁版本v1.1與日期October 12 2026；SHA256 4c8436ec7daa627ad6cce0680bea66cfac496dfe4e217631064e68acafe04531
+limitation: 本輪只接受完整檔案取得與封面版次日期，未逐條審完764頁、未重算新版與既有測試工具對照；來源取得不等於具名產品符合規格、跨廠互通或部署；與S25同一消息鏈
+independence_group: ultra-ethernet-consortium
+-->
+
+<!-- research_source
+source_id: S29
+role: standard
+source_kind: document
+publisher: Ultra Ethernet Consortium
+title: Ultra Ethernet Specification v1.1 Release Notes
+published_at: 2026-10-12
+captured_at: 2026-10-31
+accepted_at: 2026-10-31
+status: active
+url: https://ultraethernet.org/wp-content/uploads/sites/20/2026/10/20261026-3711-UE-Specification-1.1-release-notes.pdf
+locator: PDF兩頁完整視讀；p1 Version／Release Date／Previous Version及Summary of Changes章節定位，p2 Impact Statement；頁內Release Date為10/12/2026，檔名20261026不替代發布日；SHA256 eb86fda279a835204f0fd18ba94d4538cbccf1ba9c71192d0f522ef8225267cb
+limitation: 官方發行差異摘要，不替代完整條文逐條審查、產品功能宣告或測試結果；向後相容敘述不證明所有舊工具已覆蓋新版；與S28及S25同一消息鏈
+independence_group: ultra-ethernet-consortium
+-->
+
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: 2026-10-31已取得UEC 1.1完整PDF，封面標示版本v1.1與2026-10-12；這補足10/19只有發布索引的文件取得範圍
+supporting_source_ids: S28
+contrary_source_ids:
+as_of: 2026-10-31
+basis: 完整下載檔案固定SHA並以PDF解析器核對764頁，視讀第1頁版本與日期；保留S25原取得限制，不回改舊記錄
+boundary: 只證實原件取得與封面資訊，不代表逐條全文審閱或產品合規；不是新發布事件、錯誤更正或新增獨立消息鏈；C18主命題時鐘不變
+verification_needed: 依具名產品功能組合逐條對照1.1要求與適用測試版本及原始結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C28
+label: verified
+status: active
+claim: UEC 1.1發行說明以1.0.3為前版並逐節列出差異，區分新增功能、修正、澄清及編輯變更；Impact Statement另列Unified Local功能組合的必要要求及符合規格實作必須納入的規範性修正
+supporting_source_ids: S29
+contrary_source_ids:
+as_of: 2026-10-12
+basis: p1 Summary of Changes提供各類差異的章節定位，p2區分optional enhancements、Unified Local mandatory requirements與normative corrections；不是將全體差異一律稱為編輯更動
+boundary: 只接受官方差異分類，未完成各條文與舊工具的合規對照；不得以backward compatibility推成舊產品已實作新功能或通過新版測試，也不構成公司訂單與營收證據
+verification_needed: 具名產品的版本及功能組合、要求對照表、已填測試清單和可重現原始結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T8
+status: active
+claim_ids: C27,C28
+metric: UEC 1.1具名產品功能組合的逐條要求、合規測試版本與實測結果對照
+source_ids: S28,S29
+watch_source_ids: S7,S18
+frequency: weekly
+frequency_detail: 完整規格與差異摘要已取得，下一步依功能組合核對必要要求、規範性修正和適用測項；不把同一文件取得重算為第二份獨立支持
+next_check: 2026-11-07
+trigger: 官方提供1.1功能組合對應的測試矩陣，且具名產品版本可接到要求、測項、通過條件與原始結果
+invalidation: 官方修正或撤回差異條目、舊工具未覆蓋新要求，或具名產品缺少必要功能時，依受影響版本縮窄合規判斷，不以向後相容或檔案取得補證
 -->

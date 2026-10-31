@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 """MOPS direct filing-index parser and input contract."""
 import sys
+import datetime as dt
+import json
+import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -53,6 +58,71 @@ class ResearchFilingIndexTest(unittest.TestCase):
                 "<html><title>maintenance</title></html>",
                 stock_id="6488", year=115, season=2,
             )
+
+    def test_rate_limit_notice_has_typed_error_before_no_data(self):
+        for notice in ("查詢過量，請稍後再查詢!", "查詢過於頻繁", "查詢太頻繁"):
+            with self.subTest(notice=notice):
+                with self.assertRaises(filing_index.FilingIndexRateLimitError):
+                    filing_index.parse_filing_index_html(
+                        f"<td>{notice}</td><!-- 查無所需資料 -->",
+                        stock_id="6488", year=115, season=3,
+                    )
+
+    def test_http_429_is_typed_limit_not_missing(self):
+        error = urllib.error.HTTPError("https://doc.twse.com.tw/", 429, "Too Many Requests", {}, None)
+        with patch.object(filing_index.urllib.request, "urlopen", side_effect=error):
+            with self.assertRaises(filing_index.FilingIndexRateLimitError):
+                filing_index.fetch_index("6488", 115, 3, 1)
+
+    def test_batch_stops_at_limit_and_preserves_unattempted_targets(self):
+        universe = {"8261": "富鼎", "6488": "環球晶", "3289": "宜特"}
+        responses = [("first", SAMPLE_HTML), ("limited", "<td>查詢過量，請稍後再查詢!</td>")]
+        with patch.object(filing_index, "fetch_index", side_effect=responses) as fetch:
+            report = filing_index.build_report(
+                stock_ids=list(universe), universe=universe, year=115, season=2,
+                checked_at=dt.date(2026, 10, 31), timeout=1, delay_ms=0,
+            )
+        self.assertEqual(fetch.call_count, 2)
+        self.assertEqual(report["requested"], 3)
+        self.assertEqual(report["attempted"], 2)
+        self.assertFalse(report["complete"])
+        self.assertEqual(report["foundStockIds"], ["8261"])
+        self.assertEqual(report["missingStockIds"], [])
+        self.assertEqual(report["rateLimitedStockIds"], ["6488"])
+        self.assertEqual(report["notAttemptedStockIds"], ["3289"])
+        self.assertEqual(report["results"][1]["status"], "rate_limited")
+        self.assertEqual(report["results"][2]["status"], "not_attempted")
+        self.assertIsNone(report["results"][1]["found"])
+        self.assertIsNone(report["results"][2]["found"])
+
+    def test_successful_report_keeps_existing_schema(self):
+        with patch.object(filing_index, "fetch_index", return_value=("url", "查無所需資料")):
+            report = filing_index.build_report(
+                stock_ids=["6488"], universe={"6488": "環球晶"}, year=115, season=3,
+                checked_at=dt.date(2026, 10, 31), timeout=1, delay_ms=0,
+            )
+        self.assertEqual(report["schemaVersion"], 1)
+        self.assertEqual(report["missingStockIds"], ["6488"])
+        self.assertNotIn("complete", report)
+        self.assertNotIn("status", report["results"][0])
+
+    def test_cli_writes_partial_receipt_and_exits_nonzero(self):
+        universe = {"6488": "環球晶", "3289": "宜特"}
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "partial.json"
+            with patch.object(filing_index, "load_universe", return_value=universe), patch.object(
+                filing_index, "fetch_index",
+                side_effect=filing_index.FilingIndexRateLimitError("6488 MOPS 查詢過量"),
+            ) as fetch:
+                code = filing_index.main([
+                    "--stock-ids", "6488,3289", "--year", "115", "--season", "3",
+                    "--checked-at", "2026-10-31", "--delay-ms", "0", "--output", str(output),
+                ])
+            report = json.loads(output.read_text(encoding="utf-8"))
+        self.assertEqual(code, 2)
+        self.assertEqual(fetch.call_count, 1)
+        self.assertEqual(report["missing"], 0)
+        self.assertEqual(report["notAttemptedStockIds"], ["3289"])
 
     def test_parser_rejects_unparseable_size_in_a_filing_row(self):
         broken = SAMPLE_HTML.replace("1,410,794", "unknown", 1)
