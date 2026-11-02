@@ -754,9 +754,13 @@ evidence: sources:S15,S17
 
 ## 新手先讀：這篇在講什麼
 
+**11 月複核的新證據：** Meta 公開的 OCP 簡報開始給出 CPO 可靠度評估的埠數、運作時數、溫度與事件定義。這讓問題從「能不能換雷射」前進到「在什麼條件下出了什麼事」；但不同批次的環境與製造條件不同，仍不能排出全市場可靠度名次。[S21][S22][C26][C27]
+
 **10 月的新案例：** 緯穎、Ayar Labs 與 GUC 的展會公告已把共同封裝光引擎、外部雷射與系統整合接到同一個具名展示；這比只有架構圖更具體，但尚不足以回答訊號處理模式、客戶資格與收入。[S19][C25]
 
 ### 名詞小字典
+
+- **FRO／FR4**：FRO 是原簡報的完整重定時光學比較組；FR4 在這裡只保留原件的光學組態標記，不拿它推定 PCB 板材或整機可靠度。[S22]
 
 - **TeraPHY／SuperNova**：這次合作展示中 Ayar 的光引擎與外部光源名稱；名稱可以鎖定零組件角色，不能代替客戶資格、測試結果或出貨數量。[S19]
 
@@ -1189,6 +1193,39 @@ raw log、比較組分母、field mix 或全部故障。若埠時數高度共享
 不報一般 sampling SE／t，也不建立 CPO／pluggable performance comparison。65% 只保留原稿
 headline，不納入比較帳本，因型號、功耗邊界、樣本與重複試驗缺失。
 
+## 新資料有了分母：Meta 的可靠度評估，能證明到哪裡？
+
+**證實的是一份有範圍的業者評估，不是全市場排名。** Meta 於 10/26 官方文章公開的
+OCP 簡報，列出 51.2T CPO 與使用可插拔光學的 Minipack3 比較組；下表是簡報原列值，
+不是本文另算的統計估計。[S21][S22，PDF p.3][C26]
+
+| 評估組別 | 光學操作溫度 | 400G 埠數 | 400G device-hours | 期間與可比性 |
+|---|---|---:|---:|---|
+| FRO：完整重定時可插拔，2×400G FR4 | 40°C | 1,792 | 8 百萬 | 測試日曆起訖未列；不能把埠數當獨立樣本數 |
+| CPO Phase 1：128×400G FR4 | 40°C | 8,960 | 50 百萬 | 高溫實驗室組；同溫度不代表已控制版本、負載與其他差異 |
+| CPO Phase 2：128×400G FR4 | 15–35°C | 38,400 | 175 百萬 | 更新製造條件；不能和前兩組直接解讀成架構因果差異 |
+
+**新手讀法：** device-hours 是累計設備暴露時數，不是單一設備的實際壽命，
+也不是同樣多個互相獨立的試驗。簡報另用 **system-hours（整機時數）**，兩種分母不能交換。
+**UCW** 是錯誤更正後仍無法修復的碼字；這份評估以單一 UCW 作為鏈路中斷判準，
+不是舊新聞稿的 link-flap 判準。[S22，PDF第3、5–6頁]
+
+**推論的邊界：** Phase 2 的「沒有不可維修故障」不等於沒有中斷或不用維修；
+簡報仍列 ELS 模組與光纖／連接器事件。即使只看同一期，保留全部中斷與排除雷射驅動
+SMT 元件故障也是不同問題，不能挑排除後的口徑替整機可靠度背書。原件沒有逐事件帳、
+各埠觀察／退出時點、共用光源與整機的相依群組，也沒有這些比較的信賴區間；本文不另造
+SE、顯著性或改善倍率，不把零觀測寫成真實故障率為零。[S22，PDF pp.4–6][C27]
+
+**待驗證：** 51.2T 的測試不能直接接到簡報的未來 102.4T CPO／NPO 產品、緯穎展示、
+NVIDIA 型號或台灣供應商收入。Meta 自己也強調可靠度取決於實作與供應商，並要求更多
+跨供應商資料。T5 的「可靠度有分母」子條件有了新材料，但同一測試產品的完整三軸、
+型號／版本仍缺，整個 AND 觸發條件尚未達成。[S22，PDF pp.7–8、15]
+
+**接下來追什麼？** 新 T7 追同一評估的型號／韌體、時間窗、完整事件與共同故障群組，
+再看修正前後是否用相同口徑。閱讀時問自己：如果排除最主要的故障原因，回答的還是
+「整機會不會中斷」嗎？如果新版同時降溫又改製造流程，能把改善全部歸功於 CPO 嗎？
+這才是這份新資料對產品採用與維修成本判斷的價值，而非替任一家股票保證受惠。
+
 ## 再用五把尺比較三種光引擎位置
 
 | 本文五把尺 | 前面板可插拔 | 板上／NPO | CPO | 共同要量的結果 |
@@ -1479,4 +1516,102 @@ frequency: weekly
 next_check: 2026-10-23
 trigger: 同一展示後續公開固定系統與元件版本、訊號處理模式、測試條件及原始錯誤／可靠度結果，或客戶對應配置的資格與交付；收入另需同期具名財務橋接
 invalidation: 合作方撤回整合、客戶資格失敗或公開測試否定原配置可運作；別的型號、只改宣傳文案或未見新資訊都不代替原測試對象
+-->
+
+<!-- research_source
+source_id: S21
+role: company_release
+source_kind: document
+publisher: Meta Engineering
+title: Meta Networking at the 2026 OCP Global Summit
+published_at: 2026-10-26
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://engineering.fb.com/2026/10/26/open-source/ocp-summit-2026-meta-networking-talks/
+locator: Switch Platforms, Optics, and Interconnect 中 Integrated Optics at Scale 的官方簡報連結；提供 S22 的公開發布鏈
+limitation: 官方彙整文章只負責定位同一 Meta 簡報；不作第二份獨立可靠度驗證，10/26 也不是試驗起訖日期
+independence_group: broadcom-meta-cpo
+-->
+
+<!-- research_source
+source_id: S22
+role: other_primary
+source_kind: document
+publisher: Meta
+title: Integrated Optics at Scale - From 51.2T Validation to Future 102.4T Product
+published_at: 2026-10-26
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://drive.google.com/file/d/15XRDwq-46b3G2xgUpiWXODVdfo6dKCEW/view
+locator: PDF file pp.3–6 的組別／溫度／埠數／device-hours、失效構成、UCW 與 RAS 結果；pp.7–8 的未來產品與實作限定，p.15 的跨供應商資料缺件；日期採 S21 官方公開連結日而非試驗日期；原檔 SHA-256 641d4003a60741e1b4318cb9857f254d6b58c10951e220af8a1f15e945b0822f，引用頁及相鄰 pp.2–9、14–16 已渲染核對
+limitation: 單一營運商的特定評估；日曆起訖、完整型號／版本、逐事件／退出時點與獨立群組未公開，Phase 2 同時改溫度與製造條件；不重算因果倍率、獨立樣本數、信賴區間或跨產品優劣。102.4T 是下一產品目標，不能把51.2T結果搬過去；與S21同鏈，與舊ECOC來源的試驗重疊程度未明
+independence_group: broadcom-meta-cpo
+-->
+
+<!-- research_claim
+claim_id: C26
+label: verified
+status: active
+claim: Meta OCP 2026 簡報對51.2T CPO評估與Minipack3可插拔比較組列出400G埠數、device-hours、溫度與UCW中斷定義，並把全部中斷、排除ELS SMT故障及不可維修中斷分開報告
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-10-26
+basis: PDF第3–6頁逐頁核對表頭、組別與分母；只接受作者已公開的評估設計與觀測口徑，不把原稿的優越性措辭視為本文獨立統計結論
+boundary: 日曆起訖、型號／韌體、原始事件與獨立群組未列，Phase 2環境及製造條件不同；不等於64/102.4T產品、全市場CPO、其他供應商、無中斷更換或台股收入；不刷新C9主命題時鐘
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C27
+label: inference
+status: active
+claim: 新公開的Meta可靠度分母足以把追蹤問題縮到同一配置的失效與維修，但不能由不同溫度和製造批次推得CPO相對可插拔的純架構因果優勢，也不能以零不可維修故障替代零中斷
+supporting_source_ids: S22,S13
+contrary_source_ids:
+as_of: 2026-10-26
+basis: S22第3–6頁的組別條件與事件口徑不同，第8及15頁明示實作／供應商限定；S13的方法條件未由逐事件資料驗證，因此不外造SE、改善倍率或信賴區間
+boundary: 這是可比性與外推限制，不是否定作者觀測，也不把新簡報當成舊ECOC cohort的獨立重複試驗；不證明任何股票受惠
+verification_needed: 同版本完整三軸、測試日曆起訖、逐埠時長／退出、共同故障群組與事件帳；若要跨組比較須明示匹配環境與方法
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C26,C27
+metric: Meta 51.2T CPO評估的配置、時間窗、事件分類、維修與有效獨立暴露，以及102.4T另案的資格結果
+source_ids: S21,S22,S13
+watch_source_ids: S23
+frequency: monthly
+frequency_detail: 每月追同評估原始附錄／後續技術文件；新版本、勘誤或實際產品結果出現即提前，11/30為研究檢視日而非宣稱公司承諾發布日
+next_check: 2026-11-30
+trigger: 同一51.2T評估公開可核對型號／韌體、三軸、日曆時間窗、逐事件及暴露／退出／共同故障群組，使全部中斷與可維修性可依相同條件重算；102.4T或另一供應商須另立cohort，不與舊案合併
+invalidation: 作者勘誤撤回原觀測、原始事件不支持已列分母／分類，或對照調整後不再支持原比較；發現共享失效或事件刪除時下修可泛化與可比性，不以另一產品成功抵銷
+-->
+
+<!-- research_source
+source_id: S23
+role: company_release
+source_kind: living_index
+publisher: Meta Engineering
+title: Data Infrastructure articles
+published_at:
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://engineering.fb.com/category/data-infrastructure/
+locator: 11/02實讀分類入口與10/26 OCP networking文章，用於定位後續同評估技術附件、勘誤或新產品結果
+limitation: 活頁索引只作發現來源，不證明評估已更新或試驗獨立；不可因重新打開索引刷新C26或C9時鐘
+independence_group: broadcom-meta-cpo
+-->
+
+<!-- transition
+date: 2026-11-02
+from: triaged
+to: triaged
+reason: added_operator_cpo_reliability_denominators_with_cohort_and_event_boundaries_without_claiming_full_T5_trigger_or_refreshing_thesis_clock
+evidence: sources:S21,S22
 -->

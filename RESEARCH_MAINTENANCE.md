@@ -314,6 +314,9 @@ GitHub 的 `research-watch.yml` 會在台灣每週一 09:00，以及 `fetch-fina
 - **可證偽性**：待驗證 claim 是否寫下一份證據，monitor 是否有 living watch source。
 - **新鮮度**：逾期 topic／edge／monitor 數，不以「已重新看過」消除 stale。
 - **修正學習**：到期 monitor 是否留下 review event，反方證據是否真的觸發新 claim 或修正。
+- **回查與證據進度分開**：檢查 `reviewProgress` 的最後結果及連續待驗回查日，回到具名
+  review notes 核對缺件原因和下一原件；不得將「已回查」或下一工作日尚未到期解讀為
+  「主命題完成驗證」。未查、取件不足與結果尚未成熟須在月報分開說明，不自動關閉或延期。
 - **掃描覆蓋問責**：scan log 是否納入方法指紋、是否存在 full scan、partial 與最新全域
   cadence 是否如實顯示；partial 不得冒充全市場覆蓋。歷史 scan row 是不可變事件，未建立
   scope lineage 前不把舊期限永久累加為逾期，也不宣稱個別 scope 已由後續掃描關閉。

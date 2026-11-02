@@ -148,7 +148,7 @@ class ResearchCycleOctober17Test(unittest.TestCase):
         topics = []
         for path in (HELIOS, CPO, COOLING):
             meta = records(path, "research_topic")[0]
-            transitions = records(path, "transition")
+            transitions = [r for r in records(path, "transition") if r["date"] <= "2026-10-17"]
             current = [r for r in transitions if r["date"] == "2026-10-17"]
             self.assertEqual(len(current), 1)
             self.assertTrue(current[0]["evidence"].startswith("sources:"))

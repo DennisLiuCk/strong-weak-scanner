@@ -345,17 +345,17 @@ view: industry
 from_id: concept:cpo-networking
 to_id: process:cpo-reliability-exposure-passport
 relation: measured_by
-claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C11,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C13
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C11,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C13,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C26,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C27
 note_refs:
 evidence_state: inference
 commercial_stage: validation
 materiality: unknown
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-14
-review_due: 2026-08-26
+as_of: 2026-10-26
+review_due: 2026-11-30
 status: active
-boundary: Broadcom／Meta 公布 100 萬 400G-equivalent port-device-hours 與零 link flap，但沒有埠數、各埠時長、共享群組、完整事件、raw log 或比較組；護照是研究中心查核框架，不是兩家公司共同標準。
+boundary: 舊ECOC觀測保留；10/26 Meta OCP簡報另提供51.2T的比較組、埠數、device-hours、溫度及UCW事件定義，但與舊試驗重疊未明、缺逐事件及獨立群組。零不可維修故障不是零中斷；Phase 2同改溫度及製造條件，不推出純架構因果優勢，102.4T未來產品不得沿用本cohort。主命題與其他線不續期。
 next_trigger: 同一產品版本公開受測單元、暴露／設限、環境工作量、完整 failure taxonomy、共同故障、事件日誌及同條件 comparison cohort。
 -->
 

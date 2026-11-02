@@ -400,16 +400,16 @@ view: industry
 from_id: concept:section301-taiwan-exposure
 to_id: process:ofac-alert-authorization-boundary
 relation: requires
-claim_refs: MI-2026-07-23-US-SECTION301-TAIWAN#C15,MI-2026-07-23-US-SECTION301-TAIWAN#C16,MI-2026-07-23-US-SECTION301-TAIWAN#C17
+claim_refs: MI-2026-07-23-US-SECTION301-TAIWAN#C15,MI-2026-07-23-US-SECTION301-TAIWAN#C16,MI-2026-07-23-US-SECTION301-TAIWAN#C17,MI-2026-07-23-US-SECTION301-TAIWAN#C18,MI-2026-07-23-US-SECTION301-TAIWAN#C19,MI-2026-07-23-US-SECTION301-TAIWAN#C20,MI-2026-07-23-US-SECTION301-TAIWAN#C21
 note_refs:
 evidence_state: inference
 commercial_stage: validation
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-09-09
-review_due: 2026-09-18
+as_of: 2026-10-26
+review_due: 2026-11-16
 status: active
-boundary: 新FAQ補足通用查核分工 不是關稅變更 公司命中或許可判定 申請編號不等於已批准 公開查無個別授權不能證明不存在；多份OFAC來源仍為同一消息鏈。
-next_trigger: 主管機關後續指引或同一產品與交易的身分 授權條件 期限和責任人底稿可回查 原七關與公司曝險時鐘不由此邊刷新。
+boundary: FAQ現版補足通用分工，未作舊新版逐句法律對照；詢問非付款指示、拒絕非封鎖、申報非授權，不是關稅變更或公司命中及損失判定。多份OFAC來源仍為同一消息鏈，不升公司曝險。
+next_trigger: 主管機關後續指引或同一交易的指示、處理、申報與授權原件可核對；原七關與公司財務主命題時鐘不由此旁支刷新。
 -->

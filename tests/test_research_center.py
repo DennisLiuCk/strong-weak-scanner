@@ -7998,13 +7998,18 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 18),
-            ("research_claim", 17), ("metric_comparison", 0),
-            ("impact", 4), ("monitoring_item", 5),
+            ("research_topic", 1), ("metric_comparison", 0), ("impact", 4),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        # Preserve every historical ID exactly once, while allowing audited additions.
+        for field, prefix, historical_count in (
+            ("source_id", "S", 18), ("claim_id", "C", 17), ("monitor_id", "T", 5),
+        ):
+            ids = re.findall(rf"(?m)^{field}: ({prefix}\d+)$", topic)
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, historical_count + 1)}.issubset(ids))
         glossary = topic[topic.index("### 名詞小字典"):topic.index("### 三句話抓重點")]
-        self.assertEqual(
+        self.assertGreaterEqual(
             sum(line.startswith("- **") for line in glossary.splitlines()),
             29,
         )

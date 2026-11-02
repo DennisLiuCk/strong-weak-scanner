@@ -20,17 +20,17 @@ view: company
 from_id: company:advantest
 to_id: concept:inference-compute-test-demand
 relation: cites_demand
-claim_refs: MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C1
+claim_refs: MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C1,MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C24,MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C25,MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM#C27
 note_refs:
 evidence_state: verified
 commercial_stage: planned
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-01
-review_due: 2026-10-30
+as_of: 2026-11-02
+review_due: 2027-02-01
 status: active
-boundary: Advantest 的 CY2026 tester TAM 與驅動因素是設備商市場預估 不是已實現市場收入 分架構貢獻 台灣公司訂單或獲利。
+boundary: 10/28公司維持七月CY2026 tester TAM區間，並非再次上修；SoC年產能超過5000台不是實際出貨或驗收。市場預估、公司銷售、年產能與客戶驗收四種分母分開；一月展望是預告，不是CY2027已實現成長，亦非台廠訂單或獲利。主命題C6不續期。
 next_trigger: Advantest 更新同口徑 TAM 並把變動橋接到具名產品數量 插入點 時間 站數 利用率 增量設備與出貨。
 -->
 

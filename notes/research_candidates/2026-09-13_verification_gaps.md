@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-11-02
+next_review: 2026-11-05
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -60,7 +60,7 @@ why_now: 到期HBF追蹤初查找到9/9研究者HBFSim v1；模擬與校準的�
 knowledge_gain: 把研究者方法、模型擬合、可重現運行與真實晶片分層；10/8已核v3、v0.1.1與固定proof及reference原始紀錄，仍缺相同共同鍵的fast原始run，舊倍率與秒數未對齊，沒有重跑或外部驗證，不採效能點估計。
 first_rejection: 若未取得原始run或作者勘誤便無法對齊秒數與倍率，或只有擬合點沒有外部驗證，就不發布效能點估計或HBF硬體受惠結論。
 next_evidence: 先核對版本化PDF與作者原始run及勘誤，再分開NVMe校準與HBF模型參數，要求未參與擬合的驗證工作負載和實體裝置邊界。
-next_check: 2026-11-02
+next_check: 2026-11-09
 route: watch_only
 article_topic_id:
 graph_id:
@@ -85,7 +85,7 @@ why_now: Samsung Electro-Mechanics9/10展稿新增玻璃核心與導孔加工展
 knowledge_gain: 只有新客戶或製造共同鍵才會超越既有玻璃角色地圖；公司展稿與材料供應商用途說明不是互相替客戶資格背書。
 first_rejection: 若仍只有展品或單站加工能力，未有同一封裝產品的客戶資格及量產结果，就不另立文章或將carrier出貨算成glass-core採用。
 next_evidence: 取得同一glass-core封裝產品與版本的客戶資格及製造結果，逐項分開carrier與interposer角色，核對連續批次良率及量產時間而非展會日期。
-next_check: 2026-11-02
+next_check: 2026-11-09
 route: watch_only
 article_topic_id:
 graph_id:
@@ -325,3 +325,24 @@ UEC另完成1.1原件及差異說明取得，GE Vernova補新季付款／履約�
 本輪公告只覆蓋10/30，不能宣稱完整10/28–31窗口。新增3338貸與公告元／仟元衝突待更正，
 3231租賃是替換既有物件，不重加成擴產；2059母子注資、債券面額上限及工程預算也分開。
 附件索引與限流另列實際狀態，沒有把取得失敗改寫成查無文件或把索引成功改成PDF已驗證。
+
+## 11月2日月度回查：取得文件與完成驗證分開
+
+三題原順位、知識價值、第一拒絕與升格條件維持，沒有為湊篇數另建文章。
+SSCB尚未到11/5原工作日，本輪電源旁支的規格索引也沒有同型號故障測試與買方驗收，不延後原日期。
+
+HBFSim已讀[版本列表](https://github.com/SlugLab/HBFSim/releases)、[v0.1.2](https://github.com/SlugLab/HBFSim/releases/tag/v0.1.2)
+及[固定commit重建說明](https://raw.githubusercontent.com/SlugLab/HBFSim/ed6f5559673767bd620eb8174fdf61bdc7aa3639/reproduction/olmoe-full147-v0.1.2/REBUILD.md)。
+作者仍將全新GPU重建／跨機重現列為未驗證，完整原始運行附件未公開；CPU檢查不代替GPU行為、
+實體HBF或未參與擬合資料的校準。本輪未實跑，也未重讀完整v3 PDF，不報效能倍率。
+11/9追完整原始紀錄、乾淨環境重建及實體校準，維持順位2／watch。
+
+玻璃核心實讀[SKC新聞室10/28 Q3段](https://www.skc.kr/m/eng/Conmmunication/newsroom/system.do?menuCd=006001)：
+embedding可靠度及必要良率工作，與non-embedding的客戶概念驗證討論分開。
+仍缺同一路徑客戶資格完成及量產／良率／商業交付結果，不把集團半導體材料獲利分給Absolics。
+11/9追同產品客戶原件，維持順位3／watch；進行中不等於失敗。
+
+本輪可發布增量放回既有文章：Advantest新季市場區間維持而非上修、CPO可靠度事件與分母、
+OFAC付款處理狀態，並更正國巨兩取得管道不等兩條獨立經濟證據。Microsoft現金／租賃橋仍未閉合，
+不發布跨公司排名。AMD官方預定美國11/3盤後發表Q3，台灣11/4先看實際附件，
+不把Oracle文中MI355X的GA文字搬給Helios。研究排序是查證工作的先後，不是投資建議。

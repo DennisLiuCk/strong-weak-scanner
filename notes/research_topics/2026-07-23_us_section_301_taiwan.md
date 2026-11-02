@@ -106,6 +106,9 @@ evidence: sources:S5,S12,S13
 - **合格評定（conformity assessment）**：證明產品、流程或系統符合指定要求的活動，可包含供應商聲明、抽樣、測試、檢查、認證與認可。
 - **第一方／第二方／第三方評定**：分別由供應商、買方／使用者或獨立機構執行的合格評定；「有測試」不必然等於已有獨立第三方證書或客戶簽收。
 - **FAQ（常見問題）**：主管機關用問答澄清制度邊界的官方頁面；能支持頁面明載的通用解釋，不會自動替個案完成法律判定。
+- **Blocking（封鎖）**：依適用制裁規則限制財產的轉移或處分，不是把付款退回去，也不等於沒收。
+- **Rejecting（拒絕）**：在交易被禁止但沒有須封鎖權益的情境，不往收款方處理；不能和封鎖當成同一種資金結果。
+- **ORS**：OFAC Reporting System，制裁處理的申報系統；提交報告不等於取得交易許可。
 
 ### 三句話抓重點
 
@@ -124,12 +127,14 @@ PCB、電源、散熱或被動元件混為一談。
 - 追 USTR／Federal Register 是否修改 Annex、豁免、在途規則或生效條件。
 - 追公司一手文件或可追溯報關資料是否揭露實際 HTS、原產地、美國直出占比與 Incoterms。
 - 優先核對裸 PCB、電源、散熱與被動元件，不用產品俗稱猜測報關分類。
+- 遇到付款受阻的消息，先找同一交易的付款指示、處理結果及適用規則，再判斷是詢問、拒絕還是封鎖；申報回執不替代交易授權。
 
 ### 想一想
 
 - 同一台伺服器裡的整機、零件與材料，為什麼可能適用不同關稅結果？
 - 即使某項產品未豁免，新增稅負一定由台灣供應商吸收嗎？
 - 缺少公司報關 code 時，直接用美國營收占比估毛利衝擊會漏掉哪些變數？
+- 客戶只問能否付款，和銀行已收到付款指示，為什麼不能都算成一筆被拒交易？
 
 ## 為何值得進佇列
 
@@ -1020,4 +1025,176 @@ from: triaged
 to: triaged
 reason: add_ofac_screening_authorization_boundaries_and_repair_monitor_source_routing_without_thesis_clock_refresh
 evidence: sources:S14,S15,S16,S17,S18
+-->
+
+## 11 月補充：付款卡住，要先問是哪一種狀態
+
+**官方指引更新，不等於每家公司遇到新的禁令。** OFAC 在 10 月 26 日宣布更新封鎖、
+拒絕與申報相關 FAQ。本輪核對的是更新後內容，沒有舊版逐句差異包，因此不把每個規定
+都叫作「10 月新設義務」，也不把它當成 Section 301 關稅公式改變。[S19]
+
+**封鎖與拒絕對資金的處理不同。** FAQ 36 區分被禁止、卻沒有須封鎖權益的交易，與
+具有須封鎖權益的情境；前者不能繼續往收款人處理。FAQ 32 則說明封鎖資金的保管與
+可追查紀錄。研究者不能把銀行拒絕一筆交易寫成資產已被封鎖，更不能由此直接估計
+台灣公司的呆帳或營收損失。[S20,S21]
+
+**先問是否已有付款指示。** FAQ 53 以銀行情境區分一般詢問與實際付款指示。只是詢問
+能否匯款、並被告知不允許，不等於已發生一筆要申報的拒絕交易。反過來，已收到指示的
+處理義務仍須按適用規則及權益判斷，不能靠一句「客戶沒有在名單上」直接放行。[S23]
+
+| 本文三種訊息 | 研究時先找什麼 | 不能直接推成什麼 |
+|---|---|---|
+| 客戶詢問能否付款 | 是一般問題，還是已提交具體付款指示 | 已被拒交易、已封鎖金額 |
+| 一筆交易被拒絕 | 適用禁止、是否有須封鎖權益、銀行實際處理紀錄 | 同金額資產被封鎖、客戶永久不可交易 |
+| 財產被封鎖 | 受管財產與權益、責任主體、日期及適用授權 | 已沒收、已認列公司損失或取得解封許可 |
+
+FAQ 49 明載封鎖與拒絕的報告須經 ORS，在處理日起十個工作日內提交，並附支持文件。
+這是該指引的通用要求，不是本研究替特定銀行或台灣公司判定期限。報告可留下查核線索，
+卻不是准許交易的執照；公司財務仍要接上同一交易、金額、會計處理與可回收性。[S22]
+
+讀完可問自己：手上的文件證明了「發生什麼動作」，還是只證明「問過一個問題」？下一次
+遇到停款新聞，先固定交易與責任人，再查適用方案與原件；不要把付款流程、關稅成本與
+技術驗收合成一個「合規失敗」。本節是研究查核方法，不提供個案法律結論。[C21]
+
+<!-- research_source
+source_id: S19
+role: regulator_or_policy
+publisher: OFAC
+title: 10月26日更新封鎖拒絕與申報常見問題公告
+published_at: 2026-10-26
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://ofac.treasury.gov/recent-actions/20261026
+locator: 公告日期及列出更新FAQ10、32至36、41、42、49、50、53的正文
+limitation: 公告證明指引修訂，不證明每一現行條款皆為新設義務；未作全部FAQ舊新版逐句法律對照
+independence_group: ofac-sanctions
+-->
+<!-- research_source
+source_id: S20
+role: regulator_or_policy
+publisher: OFAC
+title: FAQ32 封鎖資金的保管與可回查紀錄 10月26日版
+published_at: 2026-10-26
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://ofac.treasury.gov/faqs/32
+locator: Date Updated October26 2026；segregated interest-bearing account、OFAC-authorized debits及clear audit trail段
+limitation: 原始日期2002-09-10與本版更新日分開；金融機構通用情境，不判定台灣公司財產已封鎖或已損失
+independence_group: ofac-sanctions
+-->
+<!-- research_source
+source_id: S21
+role: regulator_or_policy
+publisher: OFAC
+title: FAQ36 拒絕與封鎖的區別 10月26日版
+published_at: 2026-10-26
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://ofac.treasury.gov/faqs/36
+locator: 第一段prohibited但no blockable interest、reject and return及不得forward，後接具名方案例子
+limitation: 原始日期2020-08-11；須依實際方案與授權判讀，不把FAQ例子套用任何台股供應鏈公司
+independence_group: ofac-sanctions
+-->
+<!-- research_source
+source_id: S22
+role: regulator_or_policy
+publisher: OFAC
+title: FAQ49 封鎖與拒絕的申報 10月26日版
+published_at: 2026-10-26
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://ofac.treasury.gov/faqs/49
+locator: ORS、date of action起10 business days、supporting documentation及501.603與501.604各自引用
+limitation: 原始日期2017-07-28；不是具名個案期限裁定，申報不是授權；未以本輪捕捉日當法規生效日
+independence_group: ofac-sanctions
+-->
+<!-- research_source
+source_id: S23
+role: regulator_or_policy
+publisher: OFAC
+title: FAQ53 詢問與付款指示 10月26日版
+published_at: 2026-10-26
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://ofac.treasury.gov/faqs/53
+locator: payment instructions對照simply asks a question及末段nothing to reject
+limitation: 原始日期2015-01-15；銀行例子不是任何特定企業已提交或被拒付款的證據
+independence_group: ofac-sanctions
+-->
+
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: OFAC10月26日更新FAQ32與36，現版分開被禁止但無須封鎖權益的拒絕交易，以及須封鎖資金的保管和紀錄；拒絕不是封鎖的同義詞
+supporting_source_ids: S19,S20,S21
+contrary_source_ids:
+as_of: 2026-10-26
+basis: 公告列出本次更新項目，FAQ36第一段與FAQ32保管段直接支持此制度區別
+boundary: 未對照舊版，不能說區別是本次才創設；不判定任何公司交易結果或損失，不改關稅主命題
+verification_needed:
+resolution:
+-->
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: OFAC現版FAQ53區分一般詢問與付款指示；銀行僅回答匯款詢問而沒有可拒絕的交易時，不需因此提交拒絕交易報告
+supporting_source_ids: S23
+contrary_source_ids:
+as_of: 2026-10-26
+basis: FAQ53的銀行情境及末段nothing to reject直接支持，保留前提而不推成所有接觸皆免申報
+boundary: 不表示已收到付款指示可不處理，也不是產品放行、BIS許可或公司財務結果
+verification_needed:
+resolution:
+-->
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: OFAC現版FAQ49要求封鎖財產與拒絕交易的報告於處理日起十個工作日內透過ORS提交，並附支持文件
+supporting_source_ids: S22
+contrary_source_ids:
+as_of: 2026-10-26
+basis: FAQ49第一段及分別指向501.603與501.604的段落
+boundary: 這是官方通用指引的措辭，不是本研究替個案認定義務起算或法律適用；報告不等於授權
+verification_needed:
+resolution:
+-->
+<!-- research_claim
+claim_id: C21
+label: inference
+status: active
+claim: 研究付款受阻時應先固定同一交易的指示、處理狀態、適用方案和責任人，再查申報與授權；詢問數、拒絕金額與封鎖財產不能互作分母或直接推估供應商損失
+supporting_source_ids: S20,S21,S22,S23,S15
+contrary_source_ids:
+as_of: 2026-10-26
+basis: 各FAQ對應不同事件與文件，S15又把實際授權分開，因此流程紀錄不能互相代換為法律或財務結果
+boundary: 研究取證順序而非法律處理建議；缺同一交易的金額、會計及可回收性時不估台股營收毛利影響
+verification_needed: 同一交易原始指示與銀行處理、適用授權、公司財務歸因及負責人確認
+resolution:
+-->
+<!-- monitoring_item
+monitor_id: T6
+status: active
+claim_ids: C18,C19,C20,C21
+metric: OFAC指引版本與同一付款事件的詢問指示處理申報授權分層
+source_ids: S19,S20,S21,S22,S23
+watch_source_ids: S17
+frequency: monthly
+next_check: 2026-12-02
+trigger: 後續正式指引修改上述事件或申報邊界，或公開同一事件原件可核對詢問付款處理與授權的不同狀態
+invalidation: 新規則或原件顯示本文把詢問與實際指示、拒絕與封鎖、申報與授權混為一談
+-->
+<!-- transition
+date: 2026-11-02
+from: triaged
+to: triaged
+reason: add_updated_ofac_payment_state_and_reporting_boundaries_without_tariff_thesis_clock_refresh
+evidence: sources:S19,S20,S21,S22,S23
 -->

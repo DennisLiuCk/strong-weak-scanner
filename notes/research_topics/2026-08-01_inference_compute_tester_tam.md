@@ -128,16 +128,18 @@ evidence: sources:S8,S10,S19,S20,S21
 - **退貨分析（RMA）**：產品在客戶或現場失效後，沿序號、批次與既有測試結果回查、重現並分析根因的流程；單一退貨不等於全體失效率。
 - **已知良品晶粒（known-good die）**：在投入昂貴多晶粒封裝前，已按約定範圍完成篩選的晶粒；「已知良品」仍受測試覆蓋和條件限制。
 - **年化營收規模**：把目前一季或當下速度換算成一年的概略規模，不等於已完成的全年會計收入。
+- **年化生產能力**：按目前工廠與供應鏈配置換算的一年可製造量；它不是當季實際出貨、客戶已驗收台數或全年訂單。
 - **營收時鐘**：同一波測試需求在服務商、介面商與設備商分別跨過可計費機時、產品交付、設備驗收等事件後，才可能進入收入；三者不是同一個時間點。
 - **Trainium**：Amazon（AWS）自行設計的 AI 晶片系列。它是雲端業者自研晶片的代表之一，與外購 GPU 是不同採購路徑。
 - **Maia**：Microsoft 自行設計的 AI 加速晶片系列，角色與 Trainium 類似。
 - **DRAM**：主流的動態隨機存取記憶體。本文提到它，是因為記憶體測試需求也構成測試機市場的一部分，與推論晶片需求要分開看。
 - **CY2026（2026 曆年）**：從 2026 年 1 月到 12 月；它與公司的財政年度可能不同，本文用它表示 Advantest 市場預估涵蓋的時間。
+- **CY2027（2027 曆年）**：從 2027 年 1 月到 12 月；預計於 2027 年一月提出的當年度市場預測，不能與 CY2026 的實績或未完成預估混用。
 - **SoC（系統單晶片）**：把處理器、控制器與其他功能整合在同一顆晶片；本文的 SoC tester 市場不只包含 AI 加速器。
 
 ### 三句話抓重點
 
-- Advantest 上修 2026 年 tester TAM，並把推論 ASIC、CPU 與 DRAM 的產量及複雜度列為原因之一。
+- Advantest 在七月上修 2026 年 tester TAM；10/28 新展望維持同一區間，並非再次上修。市場金額、設備商收入與實際出貨台數要分開讀。
 - 多晶粒產品與更長測項可能增加測試內容，但多站並行、既有設備升級與程式／載板重用也可能減少新增測試單元；兩邊必須放在同一張表。
 - 三份台灣公司正式資料顯示，同一測試鏈會開出測試服務、介面產品與設備三種不同發票；它們仍沒有證明具名 AI 專案的新增訂單與獲利。
 
@@ -154,7 +156,7 @@ evidence: sources:S8,S10,S19,S20,S21
 
 ### 接下來怎麼追
 
-- 下一次 Advantest 展望先追 2026 年市場區間是否維持，再找同產品的顆數、測試插入點、時間、站數、利用率、既有設備餘裕與新增測試單元。
+- Advantest 預計在 2027 年一月第三季說明會提出 CY2027 量化展望；先核對市場年度與預估版本，再找同產品的顆數、測試插入點、時間、站數、利用率、既有設備餘裕與新增測試單元。一月目前是公司給的月份，不是已確定的日期。
 - 追 Amazon Trainium 與 Microsoft Maia 的實際部署，但不把平台部署直接換算成測試設備採購。
 - 追台灣公司法說與財報是否同時揭露具名專案、介面、量產、稼動率、平均售價、收入及毛利，而不是只談產業市場規模。
 
@@ -163,6 +165,13 @@ evidence: sources:S8,S10,S19,S20,S21
 - 如果每顆晶片測試時間變長，但一套系統可同時測更多顆，新增測試單元一定增加嗎？
 - 已知良品晶粒可以降低昂貴封裝後才報廢的風險，但它一定代表測試設備商收入等比例增加嗎？
 - Advantest 的全球市場估計要經過哪八個分母，才能合理連到某一家台灣供應商的獲利？
+- 若設備商提高自己的銷售預估，卻維持整體市場區間，這可能是市占、出貨時點或配置改變，還是整個市場擴大？各需要什麼證據？
+
+### 分母練習：不要把四張不同的表接成一張
+
+讀設備業新聞時，先在數字旁寫下「誰、哪一年、什麼單位、實績還是預估」。全球市場以美元計，設備商營收受自己的市占、售價與會計期間影響；工廠年產能以台／年計，客戶採購則要有訂單、交付與驗收紀錄。即使四者都成長，也不能直接互除得到單價或台灣供應商份額。
+
+例如「年產能已超過 5,000 台」回答的是設備商供給能力，不是「今年已售出超過 5,000 台」。再問一句：**有沒有同產品、同期間的實際出貨和驗收，能把能力變成收入？** 這才是下一份文件應補上的橋。
 
 ## 主張與證據帳本
 
@@ -693,6 +702,22 @@ verification_needed:
 resolution:
 -->
 
+## 十一月回查：市場區間沒再上修，產能也不是出貨
+
+**證實的是公司最新預估，不是市場已實現。** Advantest 10/28 簡報維持七月的 CY2026 tester 市場區間：SoC 為 105–115 億美元、memory 為 25–30 億美元，合計 130–145 億美元；公司目前判讀 SoC 較靠近區間上緣、memory 約在中點。這是對同一曆年預測位置的更新，不是把區間再次向上調整。公司自己的 FY2026 銷售展望上調，與全球 CY2026 市場區間維持，並不矛盾；財政年度、公司份額與整體市場不是同一分母。[S30：PDF 第 9 頁／投影片 12](https://www.advantest.com/document/en/investors/ir-library/result/JE_BIZ_261028_note.pdf)、[S31：Q&A 第 1 頁 Q4](https://www.advantest.com/document/en/investors/ir-library/result/JE_BIZ_261028_QA.pdf)
+
+| 10/28 披露 | 期間、單位與定義 | 不能拿來替代什麼 |
+|---|---|---|
+| SoC 105–115 億、memory 25–30 億；總計 130–145 億美元 | CY2026 全年全球 tester 市場估計；10/28 版本維持七月區間 | 單一設備商收入、實際台數或台灣公司訂單 |
+| SoC tester 年產能已超過 5,000 台 | 公司當時工廠與供應鏈的年化製造能力，不是 CY2026 已完成產量 | 當季出貨、裝機、客戶驗收或新增訂單 |
+| 希望提前達到年產能 10,000 台 | 公司擴產計畫；Q&A 未給新的確定完成日期 | 已建成產能或已鎖定需求 |
+
+**推論：供需兩側要分開追。** 公司可以靠擴產與交期改善承接更多需求，也可能受到記憶體成本上升影響；Q&A 將下半年 DRAM 成本與產品配置、授權及儀器定價放在一起討論，尚不能判定成本必然全部轉嫁。先確認供給能力，再核對實際出貨、配置、售價與毛利，才知道擴產是否轉成可持續成果。[S30：PDF 第 10 頁／投影片 13](https://www.advantest.com/document/en/investors/ir-library/result/JE_BIZ_261028_note.pdf)、[S31：第 1–2 頁 Q5、Q7](https://www.advantest.com/document/en/investors/ir-library/result/JE_BIZ_261028_QA.pdf)
+
+**待驗證：同產品測試工作量到新增設備的橋仍未補齊。** 本輪沒有拿到顆數、測項、測時、並行站數、利用率、既有合格餘裕與增購／驗收完整對照，也沒有台灣公司的對向專案財務。Q&A 的貿易統計問題來自分析師；公司明示那些不是其發布的數據，不能把問題本身當成公司確認的出貨證據。CY2027 量化展望預計於一月第三季說明會再提供，未來還要追預估修訂與實際交付，而非只看擴產目標。[S31：第 1 頁 Q1、第 2 頁 Q10](https://www.advantest.com/document/en/investors/ir-library/result/JE_BIZ_261028_QA.pdf)
+
+本次只新增 C24–C27 旁支：T3 的「新展望」條件有新文件可裁決，沒有因此證成其另一條「同產品完整橋接」條件；C6 主命題、原複核日與可信度時鐘維持不變。研究追蹤優先序不是投資建議。
+
 ## 十月更新：測試變難，也可能把設備用得更有效率
 
 **本輪新增的是產品能力與效率路徑，還不是台廠訂單。** Teradyne 九月至十月的公告，同時把高功率、記憶體介面和可靠度測試放進新產品，也說明如何延用設備或整合測試工作。這使多空雙方必須使用同一把尺：先量同產品的工作量，再扣掉效率與重用能吸收的部分，最後才查服務商增加多少可計費產能。以下產品能力皆為供應商自述，沒有買方同案驗收或量產分母；C6 主命題與原到期警示維持不變。（C17–C23）
@@ -708,7 +733,7 @@ resolution:
 
 **看空小作文：新增工作不必全部變成新增設備。** C17、C18 的效率、相容與整合路徑，給「測得更多卻不同比例添購」一個可查的機制；工程效率與量產吞吐也必須分開。這仍不是需求萎縮證據，更不能認定某家台廠客戶流失。最脆弱處：若客戶新增的測試內容與量產數量超過所有效率改善，而且合格閒置產能不足，多方的增量需求仍可能成立。（C20–C22）
 
-**勝負手是同產品的前後對照。** 下一輪先取具名產品的流程、測試秒數、站數、可用時數、既有餘裕及實際驗收，再對服務收入、折舊和成本。資本預算、設備下單、到廠驗收與可計費產能分開記錄；總營收不能替未公開的客戶與專案作證。Advantest 官方日曆目前安排 10/28 公布 FY2026 第二季，研究工作排在 10/29 回查；這是未來事件，不是已讀的新季報。（C22、C23；T6）
+**勝負手是同產品的前後對照。** 下一輪先取具名產品的流程、測試秒數、站數、可用時數、既有餘裕及實際驗收，再對服務收入、折舊和成本。資本預算、設備下單、到廠驗收與可計費產能分開記錄；總營收不能替未公開的客戶與專案作證。10/8 回查時，Advantest 官方日曆安排 10/28 公布 FY2026 第二季，研究工作排在 10/29；這保留當時對未來事件的紀錄，實際新附件的判讀見上方十一月更新。（C22、C23；T6）
 
 ## 先把 tester TAM 拆成八個分母
 
@@ -1659,4 +1684,108 @@ from: triaged
 to: triaged
 reason: append_vendor_platform_and_efficiency_paths_without_taiwan_attribution_or_thesis_clock_refresh
 evidence: sources:S24,S25,S26,S27,S28,S29
+-->
+
+<!-- research_source
+source_id: S30
+role: company_release
+source_kind: document
+publisher: Advantest
+title: FY2026 Q2 Business Briefing with notes
+published_at: 2026-10-28
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://www.advantest.com/document/en/investors/ir-library/result/JE_BIZ_261028_note.pdf
+locator: PDF第9–10頁／內嵌投影片12–13的CY2026 tester market及SoC生產能力；SHA256 0e10dd5aecc4e2158d9f9c11aafa8a3774e5006c2cc978882a19bc65bb982f5d
+limitation: 發行人的市場估計與年化製造能力，不是全球實績或實際出貨；與S1/S31同一Advantest來源群，不是獨立驗證，也不提供台灣公司專案歸因
+-->
+
+<!-- research_source
+source_id: S31
+role: company_release
+source_kind: document
+publisher: Advantest
+title: Consolidated Financial Results for the Six Months Ended September 30 2026 Q&A Summary
+published_at: 2026-10-28
+captured_at: 2026-11-02
+accepted_at: 2026-11-02
+status: active
+url: https://www.advantest.com/document/en/investors/ir-library/result/JE_BIZ_261028_QA.pdf
+locator: PDF第1頁Q1/Q4/Q5及第2頁Q7/Q10；SHA256 a5c01c2b62fc9055b1fc82c8f2f338c1551ec0599dda12093ec0918b57ce77f5
+limitation: 公司整理的Q&A摘要，不是逐字稿；分析師提問不當成公司確認的事實，計畫與預估不當成實績；與S30同源
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: Advantest在10/28維持七月CY2026全球tester市場區間，SoC為10.5–11.5、memory為2.5–3.0、合計13.0–14.5十億美元，並表示SoC預期靠近上緣而memory約在中點
+supporting_source_ids: S30,S31
+contrary_source_ids:
+as_of: 2026-11-02
+basis: S30 PDF9／slide12列出區間及位置判讀；S31 Q4明示市場預測自七月未變，不能寫成十月再次上修
+boundary: 證實最新公司預估的內容，不認證市場實績；CY2026市場與Advantest FY2026自身銷售不同，不外推台廠訂單；不改C6主命題時鐘
+verification_needed: 同口徑市場實績與後續預測修訂，及同產品數量、測試工作量和新增設備橋接
+-->
+
+<!-- research_claim
+claim_id: C25
+label: verified
+status: active
+claim: Advantest在10/28表示SoC tester年化生產能力已超過5000台，並計畫較原排程提前達到10000台年產能
+supporting_source_ids: S30,S31
+contrary_source_ids:
+as_of: 2026-11-02
+basis: S30 PDF10／slide13區分已達年產能與下一階段目標；S31 Q7說明原目標為FY2028年底、目前預期提前但未給新確定日期
+boundary: 年產能不是當期實際產量、出貨、已驗收台數或訂單；不把內部討論中的更高產能當成已核定投資，也不推算台灣供應鏈營收
+verification_needed: 同產品、同期間的實際出貨及驗收、供應約束、可用產能與投資落地
+-->
+
+<!-- research_claim
+claim_id: C26
+label: inference
+status: active
+claim: 全球tester市場金額、設備商會計收入、年化產能與客戶實際驗收是四種不同分母，不能因市場預估維持而否定公司成長，也不能由擴產或貿易統計直接推算出貨與台廠受惠
+supporting_source_ids: S30,S31
+contrary_source_ids:
+as_of: 2026-11-02
+basis: S31 Q4同時描述公司銷售預估提高與市場區間維持；Q5提出DRAM成本及配置定價抵銷的前瞻判斷；Q10對分析師提出的貿易數據不予評論，未作公司出貨確認
+boundary: 這是比較口徑與驗證流程的推論，不裁定市占、定價或成本轉嫁的因果；缺同案測試工作量、產能缺口、客戶驗收與台廠財務共同鍵，C6及C22維持原判斷
+verification_needed: 同年度市場、同季公司出貨與收入，以及同客戶設備驗收和成本資料逐層對帳
+-->
+
+<!-- research_claim
+claim_id: C27
+label: verified
+status: active
+claim: Advantest在10/28的Q&A表示預計於2027年一月第三季說明會提出CY2027量化市場展望
+supporting_source_ids: S31
+contrary_source_ids:
+as_of: 2026-11-02
+basis: S31 PDF第1頁Q1給出一月第三季業務說明會的預告，未給精確日期
+boundary: 排程及預計披露內容不是CY2027市場已成長，也不表示公司已公布日期或實際訂單
+verification_needed: 實際第三季說明會附件、預測年度、區間及方法版本
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C24,C25,C26,C27
+metric: CY2027量化市場展望、CY2026估計修訂及年產能到實際交付的同口徑橋接
+source_ids: S30,S31
+watch_source_ids: S27
+frequency: event_driven
+frequency_detail: 公司預告2027年一月第三季說明會提出量化市場展望；2027-02-01是月份窗口後的工作回查日，不是公司確認的發布日期；若提前公布修訂、交付或擴產落地即提前查核
+next_check: 2027-02-01
+trigger: 實際新附件給出CY2027量化市場範圍或修訂CY2026估計，或同產品揭露年產能、實際出貨和客戶驗收的可比橋接；台廠映射另需雙向產品財務證據
+invalidation: 市場區間下修、擴產明確延後或取消、供給能力無法轉為交付或驗收；成本上升未能被定價和配置吸收時，縮窄獲利推論而不由產能直接外推
+-->
+
+<!-- transition
+date: 2026-11-02
+from: triaged
+to: triaged
+reason: append_october_tam_outlook_and_capacity_denominator_without_thesis_clock_or_taiwan_attribution_upgrade
+evidence: sources:S30,S31
 -->

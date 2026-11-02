@@ -279,6 +279,51 @@ def effective_monitor_schedule(
     return schedule
 
 
+def monitor_review_progress(topics: list[dict], reviews: list[dict], as_of: dt.date) -> dict:
+    """Census of latest work outcomes, never a thesis verdict or evidence-clock update.
+
+    Ledger order is authoritative within a day. Count distinct check dates in a
+    trailing not-yet-testable run so duplicate same-day events cannot inflate it.
+    No threshold labels a monitor failed, and future evidence is never read.
+    """
+    grouped: dict[tuple[str, str], list[dict]] = {}
+    for row in reviews:
+        if row.get("checked_at", "") <= as_of.isoformat():
+            grouped.setdefault((row["topic_id"], row["monitor_id"]), []).append(row)
+    counts = Counter()
+    pending = []
+    for topic in topics:
+        if topic.get("status") in {"dismissed", "resolved"}:
+            continue
+        for monitor in topic.get("monitoring", []):
+            if monitor.get("status") != "active":
+                continue
+            pair = (topic["topic_id"], monitor["monitor_id"])
+            history = grouped.get(pair, [])
+            latest = history[-1] if history else None
+            counts[latest["result"] if latest else "never_reviewed"] += 1
+            if not latest or latest["result"] != "not_yet_testable":
+                continue
+            trailing = []
+            for row in reversed(history):
+                if row["result"] != "not_yet_testable":
+                    break
+                trailing.append(row)
+            dates = {row["checked_at"] for row in trailing}
+            pending.append({
+                "topicId": pair[0], "monitorId": pair[1],
+                "consecutiveCheckDates": len(dates),
+                "firstCheckedAt": min(dates), "lastCheckedAt": latest["checked_at"],
+                "lastReviewId": latest["review_id"],
+            })
+    pending.sort(key=lambda row: (-row["consecutiveCheckDates"], row["firstCheckedAt"], row["topicId"], row["monitorId"]))
+    return {
+        "latestOutcomeCounts": {key: counts[key] for key in ["never_reviewed", *sorted(REVIEW_RESULTS)]},
+        "notYetTestableRuns": pending,
+        "boundary": "只盤點active monitor最後工作結果及連續待驗的不同回查日；不解析notes猜測缺件原因，不代表主命題真假、取件失敗率或研究成效，不更改期限或證據時鐘。",
+    }
+
+
 def compute_method_audit(
     topics: list[dict], graph: dict, radar: dict, reviews: list[dict], scan: dict,
     as_of: dt.date,
@@ -526,6 +571,7 @@ def compute_method_audit(
             "thesesWithTwoIndependentGroups": thesis_cross_checked,
             "activeTheses": len(active_topics),
             "thesesNeedingSecondIndependentGroup": theses_needing_second_group,
+            "boundary": "群組數依既有 independence_group／網域計算，只是結構檢查；交易所轉載公司申報、多網站鏡像或同公司引述可能仍同源。人工原始產生者審查與例外見同期方法回顧，不等於全庫已有兩份獨立經濟驗證。",
         },
         "monitors": {
             "active": len(active_monitors),
@@ -534,6 +580,7 @@ def compute_method_audit(
             "overdue": len(overdue_monitors),
             "reviewedMature": mature_review_events,
         },
+        "reviewProgress": monitor_review_progress(topics, reviews, as_of),
         "freshness": {
             "staleTopics": stale_topics,
             "staleEdges": stale_edges,
@@ -607,10 +654,10 @@ def compute_method_audit(
                 "boundary": "通過只代表財務口徑與歸因狀態可稽核；bounded_proxy 與 not_disclosed 不得被解讀成題材收入，direct 也不等於投資報酬或因果效果。",
             },
             {
-                "id": "cross_check_depth", "label": "獨立交叉驗證",
+                "id": "cross_check_depth", "label": "來源群組結構",
                 "status": "pass" if cross_check_ok else "attention",
-                "observed": f"{thesis_cross_checked}/{len(active_topics)} 個主命題有至少兩條獨立來源鏈；缺口 {','.join(theses_needing_second_group) or '無'}",
-                "boundary": "兩條獨立消息鏈只能降低單一來源偏誤，不代表主張一定為真。",
+                "observed": f"{thesis_cross_checked}/{len(active_topics)} 個主命題登錄至少兩個來源群組；機器分組缺口 {','.join(theses_needing_second_group) or '無'}",
+                "boundary": "通過只代表既有群組／網域鍵不同，不代表原始產生者獨立；公司申報的交易所轉載、鏡像及共同公告仍可能同源，人工例外見同期方法回顧。",
             },
             {
                 "id": "falsifiability", "label": "可證偽性",
@@ -652,7 +699,7 @@ def compute_method_audit(
             "選題前凍結與升格結果分開保存；至少累積多輪到期結果前，不計算選題命中率。",
             "升格候選數是研究流程產出，不是研究正確率。",
             "退役雷達仍納入 selection fingerprint；cutover 前 3 次未留 early trigger 的重選被保留揭露，不回溯改寫。",
-            "獨立來源鏈覆蓋是交叉檢查深度，不是多數決或真實性分數。",
+            "來源群組覆蓋是結構盤點，不等於原始產生者已逐一確認獨立，也不是多數決或真實性分數。",
             "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
             "no_new_evidence 是一次有紀錄的檢查，不得刷新 claim 的證據時鐘。",
             "Partial scan 不等於全 universe 或全市場覆蓋；研究漏網風險必須持續顯示。",

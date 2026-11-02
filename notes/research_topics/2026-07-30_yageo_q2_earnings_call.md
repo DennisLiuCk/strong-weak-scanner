@@ -21,7 +21,7 @@ evidence_role: candidate_source
 route: formal_note_candidate
 thesis_claim_id: C5
 base_confidence: medium
-confidence_basis: Q2 營收可由國巨簡報與 TWSE 個股報告兩條獨立官方鏈交叉重算，正式核閱季報也已補上 H1 現金流與 IFRS 資產負債；毛利、AI 組合、價格歸因與管理現金定義仍主要來自公司簡報，focused pack 獨立簽核、價格範圍、交期與稼動率仍待補
+confidence_basis: Q2 營收可由國巨簡報與 TWSE 轉載的公司月營收交叉重算，但兩個取得管道仍依賴同一公司申報，不是兩條獨立經濟驗證；正式核閱季報補上 H1 現金流與 IFRS 資產負債，不代替產品財務歸因；focused pack 獨立簽核、價格範圍、交期與稼動率仍待補
 cross_company_numbers: false
 schema_migrated_at: 2026-08-02
 -->
@@ -349,6 +349,19 @@ evidence pack、不同 reviewer 離線複核、管理現金調節與下一季重
 8 月 15 日或 8 月 31 日才處理。8 月 14 日正式季報上傳後，現金流與資產負債的第一輪研究核對
 也已完成；正式公司筆記仍要走 frozen evidence pack 與不同 reviewer 簽核，不能把研究中心文章
 直接當成 independently verified 筆記。
+
+## 11月2日來源邊界勘誤：兩個入口，不一定是兩個證人
+
+原本信心說明與圖譜把公司簡報和交易所個股報告稱為「兩條獨立官方鏈」，語意過強。
+S2與S4確實提供不同表格與期間，可以重新加總、檢查季度營收是否對得上；但交易所刊登的
+月營收仍來自公司申報，不能視為客戶或第三方重新驗證交易。重算的方法可以獨立，原始
+經濟資訊的產生者卻未必獨立。這次只修正來源判讀，不撤銷已重算的公司營收，也不更新
+舊C5、來源捕捉日、主命題時鐘或商業曝險。
+
+舊來源block及群組名稱留作歷史，不暗改成當時已正確分組。方法快照的群組數目前仍是
+結構檢查，不能當作全庫完成來源原始產生者審查；本例是明確的人工例外。
+讀者可問：**如果公司原始申報有錯，另一個網站是否也會跟著錯？** 若會，應先找具不同
+責任與資訊取得方式的原件，而不是多開幾個轉載入口。
 
 ## 來源與證據邊界
 
@@ -736,3 +749,11 @@ invalidation: 後續文件顯示自由現金流分類改變、營業現金轉負
   若沒有一手揭露，保留為未驗證，不把簡報用語擴寫成 MLCC 全面漲價。
 - 更新 2327 多空小作文的量化背景與 Q2 證據；正式筆記完成獨立 reviewer 簽核後，再決定
   `H1`、`H2` 的生命週期是否轉移。
+
+<!-- transition
+date: 2026-11-02
+from: triaged
+to: triaged
+reason: corrected_acquisition_channel_vs_economic_source_independence_without_rewriting_historical_source_groups_or_evidence_clock
+evidence: sources:S2,S4
+-->
