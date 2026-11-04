@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: us-advanced-packaging-regionalization
 root_node_id: concept:us-advanced-packaging-regionalization
 label: 美國先進封裝區域化九關橋接
-summary: 9月Phase2擴建只更新campus計畫與建設時鐘；CHIPS撥款 客戶預付款 工具 資格 量產利用 損平 滿載 財務及台美替代仍分關驗證，保留project phase facility版本與reference plane。
+summary: Q3申報分開Arizona累計成本、CHIPS尚未收款與韓國另案補助；成本不是現金實付，兩地資金不能互抵。工具、資格、量產利用、損平與台美替代仍逐關驗證。
 article_ids: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION
 status: active
 -->
@@ -100,18 +100,18 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: stage:milestone-disbursement
 relation: passes_through
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C5
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C20,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C21
 note_refs:
 evidence_state: verified
 commercial_stage: planned
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-15
+as_of: 2026-11-04
+review_due: 2026-11-30
 status: active
-boundary: 已驗證的是 construction technology production commercial 四類里程碑撥付機制，不是任何一類已完成 請領 核准或收到現金。
-next_trigger: NIST 或 Amkor 公布各里程碑日期 達成條件 核准額與 cash receipt。
+boundary: 10/27季度申報明示CHIPS直接補助最高4.07億美元但尚未收款；不是award取消或違約。韓國FDI已收150億韓元屬另一協議且列受限制現金與負債，不是Arizona撥款、里程碑全達或公司利潤。
+next_trigger: NIST或Amkor公布Arizona同案里程碑、核准及實收；韓國條件與限制解除另列，不跨國家或計畫抵銷。
 -->
 
 <!-- knowledge_edge

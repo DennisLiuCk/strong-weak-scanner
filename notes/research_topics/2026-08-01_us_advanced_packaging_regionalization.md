@@ -90,6 +90,13 @@ to: triaged
 reason: phase2_scope_and_construction_clock_updated_without_production_or_financial_upgrade
 evidence: sources:S13
 -->
+<!-- transition
+date: 2026-11-04
+from: triaged
+to: triaged
+reason: q3_arizona_costs_and_us_korea_grant_status_separated_without_thesis_clock_upgrade
+evidence: sources:S15
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -109,6 +116,9 @@ evidence: sources:S13
 - **FC BGA（覆晶球柵陣列封裝）**：以 flip-chip 方式把晶片連到球柵陣列基板的封裝家族；本文只把它當日月光公告的製程方向，不當成實際產出。
 - **WUS**：日月光高雄先進 AI 封裝 hub 公告中的合作公司；共同建設公告沒有提供可歸因到任一方的產能、收入或毛利分拆。
 - **資本支出（CapEx）**：公司為廠房、設備與其他長期資產投入的支出；全公司年度指引不等於單一 Arizona 專案預算。
+- **已發生成本／資本化利息**：前者是會計上累積歸入工程的成本，未必等於同期付出的現金；後者是符合條件而納入資產成本的借款利息，不是另一筆可再相加的工程款。
+- **受限制現金**：有用途或其他限制的現金；收到政府款項不代表已履行所有條件，也不代表可自由分配的利潤。
+- **FDI（外國直接投資）／Liquidity（流動性）**：前者是韓國現金支持協議所屬投資類型，後者是季報討論現金與資金來源的章節；兩者不是同一補助計畫名稱。
 - **名目產能／利用率**：名目產能是設計可處理的上限，利用率是實際使用比例；兩者還要再乘上良率，才接近可交付合格產出。
 - **損平（break-even）**：某個專案或設施的收入剛好覆蓋公司所採用的成本口徑；若未說明期間、成本與 phase，就不能把它當成自由現金流轉正或投資已回收。
 - **滿載（full utilization）**：設施在公司定義下接近充分使用的規劃狀態；它不是建築完工、產能上線、一次工程批次或損平的同義詞。
@@ -123,9 +133,9 @@ evidence: sources:S13
 
 - Amkor 與 NVIDIA 公布約 15 億美元多年期先進封裝與開發協議，Amkor 並預計 2027 年收到約 15 億美元客戶預付款。
 - Amkor 2026 年 9 月 8 日把 Arizona 兩期園區計畫投資改列約 120 億美元，Phase 2 預計 2027 年底開工、2029 年底完工；這是計畫版本，不是已花出去的錢，更不是收入或實際產出。
-- NIST 的 CHIPS award-project 與 Amkor 5 月的 Phase 1 損平／滿載目標各有自己的範圍；新公告未把後者重發給 Phase 2。日月光高雄也有建設計畫，但兩地資格、合格產出、獲利及台灣轉單仍未閉合。
+- 10/27 Q3 申報把 Arizona 已發生成本、尚未收到的美國 CHIPS 款及另案已收到的韓國補助分開；這讓資金狀態更清楚，仍沒有證實兩地資格、合格產出、獲利及台灣轉單。[S15](https://www.sec.gov/Archives/edgar/data/1047127/000104712726000052/amkr-20260930.htm)
 
-### 本輪新增：120 億美元與 9.3 萬平方公尺，分別在回答什麼？
+### 計畫規模與現金進度分別在回答什麼
 
 120 億美元是**整個兩期園區的計畫投資**；約 9.3 萬平方公尺是新公告的規劃無塵室空間，
 不是每月晶圓數、合格封裝顆數或服務收入。就像擴大廚房，先增加的是空間與預算，還需要
@@ -136,6 +146,11 @@ evidence: sources:S13
 被交付」，而不是把更大的預算直接當成更高獲利。若空間增加但良率、利用率或客戶放行
 沒有跟上，這筆投資能否形成回報？這才是下一個需要證據的問題。
 
+Q3 申報新增了一個容易理解的區分：工程可以已經發生成本，而政府補助還沒入帳；
+同一家公司在韓國收到補助，也不能拿來填美國專案的收款欄。就像同時裝修兩間店，
+必須知道哪間店、什麼款、何時收到，以及還有哪些限制，才能判斷資金是否真正到位。
+下一步要追的是 Arizona 自身的撥款和付款調節，不是用全球現金餘額代替。
+
 ### 為什麼重要
 
 市場容易把大額協議當成已認列收入，把最高補助額當成已收現金，把十年框架當成十年保底量，或把產能上線、損平與滿載壓成同一天，再把美國新增直接翻譯成台灣被取代。這篇把政府獎勵、里程碑撥付、客戶預付款、公司資本投入、建設、資格驗證、量產利用與財務歸因拆成九關，並用台美同欄位比較，讓讀者能判斷區域化究竟走到哪裡。
@@ -145,12 +160,15 @@ evidence: sources:S13
 - 追 2027 年預付款是否如期收到，以及在資產負債表、資本支出與後續收入認列中的處理方式。
 - 每次更新都用 `agreement／cash receipt／credit support／balance sheet／capacity spending／performance` 六欄護照，不把金額相近的項目互相抵銷。
 - 追 CHIPS 資金實際撥付與對應里程碑，不把最高 4.07 億美元核定額視為已收款。
+- 以 Q3 申報的 Arizona 成本與 CHIPS 尚未收款狀態作基線，追後續具名實付與補助入帳；韓國補助另記，不互相抵銷。
 - 追 Arizona 各期設施的建築完工、工具進場、製程資格、客戶產品認證、合格產出、良率與利用率，並固定每個數字所屬的 project／phase／facility 版本。
 - 追 Phase 1 是否實現 5/21 公布的損平與滿載目標；另追 Phase 2 的 9/8 建設時程及是否有新的財務目標。新稿沒有重發 Phase 1 財務目標，也沒說 Phase 2 已納入，不能代填。
 - 追日月光與台灣設備、材料公司是否揭露具名產品、區域訂單、稼動率與毛利，而不是只談政策方向。
 
 ### 想一想
 
+- 工程成本已入帳但補助還沒收到，是否就能斷言公司缺現金？還需要哪些付款條件與融資資料？
+- 韓國案收到補助，為什麼不能證明 Arizona 的 CHIPS 里程碑已通過？
 - 客戶先付 15 億美元，為什麼不能立刻把同額金額當成 Amkor 的服務收入與獲利？
 - 14.652 億美元採購義務和另一份約 15 億美元預付款協議只差 3,480 萬美元，為什麼仍不能當成同一專案的自動資金調節表？
 - NIST 頁面的 17 億美元預期資本支出、舊版 70 億與新版 120 億美元園區計畫，為什麼不能相加？
@@ -372,6 +390,22 @@ status: active
 url: https://ir.amkor.com/press-releases
 locator: Date/Title列表；本輪可定位9/8 Phase2公告及較早季報、合作、活動附件；從S13頁Press Releases連結解析所得
 limitation: 只作未來附件查找路由，不支持公司事實或刷新主命題clock；news-releases舊路由本輪404，不把索引空白當無新消息，進入附件後須另建document source
+-->
+
+<!-- research_source
+source_id: S15
+role: company_filing
+source_kind: document
+publisher: Amkor Technology
+independence_group: amkor.com
+title: Form 10-Q for the quarter ended September 30 2026
+published_at: 2026-10-27
+captured_at: 2026-11-04
+accepted_at: 2026-11-04
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1047127/000104712726000052/amkr-20260930.htm
+locator: SEC accession 0001047127-26-000052；Note 1印刷pp.9–10韓國FDI現金補助、Note 9 p.17 Arizona costs incurred、MD&A Liquidity p.30 CHIPS no funds received to date。原HTML SHA256 6082cfdf426fcbf76beea01188e5b68f086b2b9b71923bba0a3189f1ebd14258；本輪只核所引段落，不宣稱全文差異稽核
+limitation: 公司自行申報的未經查核季度財報；建設累計成本不是現金實付，沒有Phase1／2拆分；CHIPS未收到款不等核定取消或違約，韓國補助不是Arizona資金。未證實工具進場、客戶資格、量產利用率、損平或台灣訂單移轉；同Amkor消息鏈不新增獨立客戶驗證
 -->
 
 <!-- research_claim
@@ -669,6 +703,57 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: Amkor Q3 10-Q申報截至2026-09-30，Arizona Facility累計已發生成本為5.533億美元，其中包含850萬美元資本化利息
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-11-04
+basis: S15 Note9印刷p.17直接列costs incurred US$553.3 million及including capitalized interest US$8.5 million；均為截至9/30累計值，非單季支出
+boundary: costs incurred不是同額現金已付，利息已包含在總額內不得再加；未分Phase1／2，不將該成本除以120億美元計畫預算宣稱工程完成率，也不代表工具、客戶資格或可歸因收入
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: Amkor 2026-10-27提交的Q3 10-Q在Liquidity段仍列Arizona CHIPS最高4.07億美元直接補助，並明示截至該申報尚未收到這筆資金
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-11-04
+basis: S15 MD&A Liquidity印刷p.30在2024年12月Direct Funding Agreement段直接寫no funds have been received to date，並保留未來數年的construction及production milestones要求
+boundary: no funds received限定該CHIPS直接補助，不表示所有政府資金、稅額抵減或客戶預付款皆為零；也不等補助取消、公司違約或無法建廠，未據此估算資金缺口或融資風險
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: Amkor Q3 10-Q申報韓國子公司於2026年7月簽訂FDI現金支持協議，潛在補助最高1,500億韓元（公司約計1.1億美元），截至9月30日已收到150億韓元（約1,100萬美元），列為受限制現金及其他非流動負債
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-11-04
+basis: S15 Note1 Grant Accounting印刷pp.9–10列KRW150 billion potential／KRW15 billion received及公司美元約數，並說明investment、employment與performance條件及會計位置
+boundary: 這是韓國FDI協議，不是Arizona CHIPS補助；美元值沿用公司約數而非本輪換匯，收到款不等全部條件完成、收入或可自由分配現金。不同地點、幣別、計畫及時點不與C19工程成本相減，也不將此款歸因給具名客戶訂單
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 美國先進封裝區域化不再只有政策口號：Amkor 與 NVIDIA 7 月 23 日公布約 15 億美元多年期
@@ -685,7 +770,7 @@ resolution:
 | 關卡 | 要回答的問題 | 本篇目前的證據 | 尚缺的完成證據 |
 |---|---|---|---|
 | 1. 政策獎勵與專案範圍 | 哪個 project／phase／facility 可獲多少支持？ | CHIPS final award 與現行專案頁列最高 4.07 億美元直接補助 | 可追溯的專案版本、契約範圍與後續修訂 |
-| 2. 里程碑撥付 | 補助是核定、可請領，還是已收到？ | NIST 明示依建設、技術、生產與商業里程碑分段撥付 | 各期已達里程碑、請領、核准與現金收到額 |
+| 2. 里程碑撥付 | 補助是核定、可請領，還是已收到？ | NIST列里程碑；10/27 Q3申報明示CHIPS款尚未收到（C20） | 各期已達里程碑、請領、核准與後續現金收到額 |
 | 3. 專案資本結構 | 政府、客戶與公司各自提供哪一筆錢？ | 有 CHIPS 上限、約 15 億美元客戶預付款預期與公司級 CapEx 指引 | 同一專案的政府補助、預付款、自有資金、債務與稅務抵減調節表 |
 | 4. 土地與建築完成 | 哪一期、哪一棟、何時可交付工具安裝？ | 舊版第一座設施預計2027年中完成；9/8新增Phase2預計2027年底開工、2029年底完工 | 各期工程完工、驗收、供電／水／無塵室 ready 與實際日期 |
 | 5. 工具進場與製程 enablement | 設備是否安裝、連線並能跑指定封裝流程？ | 尚無同一 facility 的完整公開證據 | 具名工具、move-in、hook-up、工程批次與製程整合結果 |
@@ -696,6 +781,22 @@ resolution:
 
 這九關不是預測分數，而是證據路由。CHIPS 文件把第 1、2 關變得更具體，Amkor 文件支援
 第 3、4 關的規劃；第 5 至第 9 關仍不能用協議金額或預期產出代填。
+
+## Q3 新進度 要把工程成本和兩地補助分開
+
+**證實的是申報內容，不是所有建廠關卡完成。** 10/27提交的Q3季報提供以下三個不同口徑：
+
+| 項目 | 時點與金額 | 可以回答什麼 | 不能替代什麼 |
+|---|---|---|---|
+| Arizona建設已發生成本 | 截至9/30累計5.533億美元，已含850萬美元資本化利息 | 工程成本累計入帳值（C19） | 現金實付、Phase分拆或工程完成率 |
+| 美國CHIPS直接補助 | 10/27申報仍說最高4.07億美元但尚未收款 | 核定上限與實收不是一件事（C20） | 補助取消、違約或資金缺口判定 |
+| 韓國FDI補助 | 截至9/30已收到150億韓元，約1,100萬美元 | 另一協議的受限制收款及負債（C21） | Arizona撥款、收入或不附條件資金 |
+
+來源為[Amkor Q3 10-Q](https://www.sec.gov/Archives/edgar/data/1047127/000104712726000052/amkr-20260930.htm)的Note1、Note9及Liquidity。金額是公司申報的會計／收款數字，不是抽樣統計；本文沒有估計標準誤或達成機率。韓國美元約數沿用原文，沒有用今日匯率改算。
+
+**推論：** 建設投入與資金入帳會有不同時鐘，不能靠兩個相近金額自動連成資金調節表。
+**待驗證：** Arizona各期實際付款、補助里程碑、工具進場、產品放行、穩定產出與現金回收。
+本次只補財務／撥款狀態分支，保留C18主命題的10/4證據時鐘；不宣稱美國新增已造成台灣轉單。
 
 ## 四種錢不能放進同一個加總
 
@@ -921,6 +1022,7 @@ Phase 2 尚未納入，時程由客戶承諾驅動。Phase 1 在 full-scale 欄�
 - [Amkor 2026 Investor Day 簡報（SEC Exhibit 99.1）](https://www.sec.gov/Archives/edgar/data/1047127/000104712726000036/ex-991amkorinvestorprese.htm)（2026-05-21；Phase 1／2、損平與滿載為公司前瞻目標）。
 - [日月光—WUS 高雄先進 AI 封裝 hub 公告](https://ase.aseglobal.com/press-room/ase-and-wus-announce-strategic-expansion/)（2026-05-08；建設與製程規劃，不是已量產實績）。
 - [Amkor Phase 2 與120億美元新版園區計畫](https://ir.amkor.com/news-releases/news-release-details/amkor-technology-announces-phase-2-arizona-advanced-packaging)（2026-09-08；計畫、空間與建設時程，不是實際產出或財務目標更新）。
+- [Amkor Q3 Form 10-Q](https://www.sec.gov/Archives/edgar/data/1047127/000104712726000052/amkr-20260930.htm)（2026-10-27；截至9/30建設成本與韓國補助、申報時CHIPS尚未收款，三種口徑分開）。
 
 Amkor 10-Q 把客戶預付款放在 contract liabilities／standby letters of credit 的脈絡；收到
 現金與認列封裝服務收入並非同一件事。公司同時警告，新產能的時程、成本、規格與效益都
@@ -1106,6 +1208,20 @@ frequency_detail: 以 MOPS 公司 filing／法說為台灣端 living index，只
 next_check: 2026-11-14
 trigger: Amkor、客戶或台灣公司首次揭露同一產品的 qualification、區域訂單、合格產出、利用率、毛利或現金，足以跨公司核對替代或互補
 invalidation: 框架未轉成量產服務，台灣產能與毛利維持強勁而無轉單證據，或兩地只提供建設／一般 AI 敘事，零和與互補均維持未證
+-->
+
+<!-- monitoring_item
+monitor_id: T9
+status: active
+claim_ids: C19,C20,C21
+metric: Arizona已發生成本與現金實付、CHIPS實收，以及韓國FDI受限制現金的各案調節
+source_ids: S15
+watch_source_ids: S8,S14
+frequency: monthly
+frequency_detail: 每月查NIST專案頁與Amkor實際申報／公告，按國家、協議、期別與會計欄位分開；新季度附件公布時提前
+next_check: 2026-11-30
+trigger: 正式文件提供Arizona成本至付款調節、CHIPS實際撥款，或韓國補助後續收款、限制解除與條件履行資料
+invalidation: 公司更正累計工程成本或收款／會計分類，補助條件變更、回收或實際付款不能依同案同期間核對
 -->
 
 ## 下一個可證明／否定的節點

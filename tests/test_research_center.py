@@ -8956,11 +8956,20 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 14),
-            ("research_claim", 18), ("metric_comparison", 0),
-            ("impact", 3), ("monitoring_item", 8),
+            ("research_topic", 1), ("metric_comparison", 0), ("impact", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        # New filings may append evidence; the historical contract must survive
+        # with unique IDs rather than freezing the article's lifetime total.
+        for block, field, prefix, historical_count in (
+            ("research_source", "source_id", "S", 14),
+            ("research_claim", "claim_id", "C", 18),
+            ("monitoring_item", "monitor_id", "T", 8),
+        ):
+            ids = re.findall(r"^" + field + r": (" + prefix + r"\d+)$", topic, re.M)
+            self.assertEqual(len(ids), topic.count(f"<!-- {block}"))
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, historical_count + 1)} <= set(ids))
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"

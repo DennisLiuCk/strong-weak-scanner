@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
 label: AMD Helios 部署階梯
-summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD 10/12 自述四家初始系統已運行，仍與獨立驗收、雲端正式開放及台灣供應商財務分開。
+summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD Q3自述五家在首批系統執行工作負載，10-Q明示不出售完整機櫃；仍與客戶驗收、正式開放及台廠財務分開。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
@@ -720,18 +720,18 @@ view: industry
 from_id: product:amd-helios
 to_id: stage:oem-systemization
 relation: passes_through
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C10,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C11
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C32
 note_refs:
-evidence_state: inference
+evidence_state: verified
 commercial_stage: integration
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-19
+as_of: 2026-11-04
+review_due: 2026-11-11
 status: active
-boundary: AMD 說藍圖供 OEM／ODM 打造品牌系統，支持把 systemization 當成必要交接；目前仍沒有完整公開的具名型號、BOM 與版本清單。
-next_trigger: OEM／ODM 正式產品頁與 datasheet 公開品牌型號、BOM 邊界、韌體、軟體、冷卻與製造狀態。
+boundary: 10-Q證實的是角色分工：AMD開發授權架構並供部分產品，不製造或出售完整Helios機櫃，客戶及製造夥伴另向第三方採購部分元件；不等於AMD完全不供網路元件、不代表已發生短缺延誤，也不證明任一品牌整櫃已驗收或台廠已認列收入。
+next_trigger: 同一品牌型號與版本的OEM／ODM配置、第三方元件責任、交付及客戶驗收原件；不能用部門總收入替產品分子。
 -->
 
 <!-- knowledge_edge
@@ -872,4 +872,24 @@ review_due: 2026-10-23
 status: active
 boundary: AMD 單方公告稱 Oracle 初始 Helios 系統已安裝並運行；缺 Oracle 自有場站、品牌配置及驗收，不代表 GA、部署容量、排他採用或收入。
 next_trigger: Oracle 自有文件給出同一系統配置、場站、日期、驗收與服務開放狀態。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-HEL-C16
+view: company
+from_id: company:anthropic
+to_id: product:amd-helios
+relation: tests
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C31
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-11-04
+review_due: 2026-11-11
+status: active
+boundary: AMD 11/3單方稱Anthropic在首批Helios執行模型與工作負載；沒有客戶自有品牌配置、場站、日期或驗收分母，不是首個GW開始部署、最高2GW已上線或產品收入。原計畫線另存且期限未刷新。
+next_trigger: Anthropic或具名整機廠對上同配置場站及交付驗收；容量與財務另查同期間原件。
 -->

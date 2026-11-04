@@ -104,9 +104,19 @@ reason: added_issuer_reported_initial_helios_operation_and_wiwynn_demo_without_r
 evidence: sources:S26,S27
 -->
 
+<!-- transition
+date: 2026-11-04
+from: triaged
+to: triaged
+reason: added_q3_workload_statement_and_filed_helios_responsibility_boundary_without_refreshing_thesis_clock
+evidence: sources:S28,S29
+-->
+
 ## 新手先讀：這篇在講什麼
 
-**10 月的新進度：** AMD 已表示四家客戶有初始 Helios 系統安裝並運行；這比「預計上線」多了一步，但仍是供應商自述，不是四份獨立客戶驗收，也不等於雲端客戶現在就能購買使用。[S26][C29]
+**11 月的新進度：** AMD 11/3 財報稿稱 Anthropic、Meta、Microsoft、OpenAI 與 OCI 正在首批 Helios 上跑模型與工作負載；相較 10/12 初始系統名單，新列了 Anthropic。這仍是同一供應商的陳述，不是五份獨立客戶驗收，也不等於雲端客戶已能購買服務。[S26][S28][C31]
+
+11/4 季報另界定 AMD 供應部分產品、但不出售完整 Helios 機櫃；整櫃交付與產品收入仍須分開追。[S29][C32]
 
 ### 名詞小字典
 
@@ -180,6 +190,7 @@ evidence: sources:S26,S27
 - **可辨識收入**：公司財報或說明能把收入與具名產品、客戶或業務分部合理連結，而不是只看產業總需求。
 - **日月光／矽品／力成（ASE／SPIL／PTI）**：三家台灣封裝測試業者的中英文名稱；被 AMD 文件列為合作角色，仍不等於已有 Helios 訂單或財務貢獻。
 - **現金流足跡**：訂單與收入最後是否轉成現金，並能在存貨、應收帳款或營業現金流看到合理變化。
+- **Data Center（資料中心）分部**：AMD 按業務管理的財務分類，合計多類資料中心產品；不是單一 Helios 機櫃或 MI450 的產品帳。
 
 ### 三句話抓重點
 
@@ -378,6 +389,31 @@ Redfish 把軟硬體盤點與更新服務、遙測服務做成不同的機器可
 **推論：** 「能在客戶端運行」回答是否開始實作；「完成驗收」回答固定版本是否符合約定；「正式可用」回答外部使用者是否能買到服務。三題需要不同的證據。**待驗證：** 同一品牌型號與場站的客戶確認、測試結果、部署分母，以及台灣供應商同期間的出貨和財務。
 
 新手接下來可以問：四家公司被點名，為何仍只有一條 AMD 消息鏈？如果只有一小批試用機，和雲端產品正式開放差在哪裡？下一份文件能否對上相同配置、客戶與日期，而不只再列一次合作名單？新 T14 追這條橋接；主命題 C11 的原到期日不因新聞發布而延後。
+
+## 11 月新手補充 誰在跑工作 誰在賣整櫃
+
+**證實的是 AMD 的新說法，不是每家客戶都完成驗收。** AMD 11/3 財報稿把 Anthropic
+加入首批 Helios 已跑模型與工作負載的具名名單；其餘為 Meta、Microsoft、OpenAI 與 OCI。
+相較 10 月的四家初始系統，這是新的公開描述，但仍沒有各家品牌型號、配置版本、場站與
+驗收分母。[S28][C31]
+
+11/4 的季度申報進一步說清責任：AMD 開發並授權 Helios 設計、供應部分產品，卻不製造或
+出售完整機櫃；其他元件由客戶及製造夥伴向第三方採購。供貨問題是文件列出的可能風險，
+不是已發生延誤的公告。[S29][C32]
+
+| 讀到的詞 | 白話意思 | 還不能代替什麼 |
+|---|---|---|
+| running workloads | 有系統正在執行工作 | 固定配置已驗收，或外部客戶已可購買的 GA 服務 |
+| design and license | 提供設計並授權別人實作 | AMD 自己出售每一套完整機櫃 |
+| Data Center 分部收入 | 多類資料中心產品合計 | MI450、Helios 或某家台灣供應商的專屬收入 |
+
+例如截至 2026/9/26 的三個月，AMD Data Center 分部淨收入為 **8,546 百萬美元**；這個
+口徑含多類產品，不是 Helios 的財務分子。[S29][C33] **推論：** 把平台進度接回供應商時，
+應先對上同一配置與交付，再找同期間收入，而不是直接分配分部總額。
+
+想一想：如果 AMD 已賣出元件，但整機廠還沒完成客戶驗收，哪兩家公司的認列時點可能
+不同？下一份文件應找誰？目前繼續等待具名系統的客戶確認與供應商財務，不據此提高
+主命題可信度或作投資判斷；新增追蹤 T15 專看 Anthropic 的同配置橋接。
 
 ## 主張與證據帳本
 
@@ -1323,6 +1359,89 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_source
+source_id: S28
+role: company_release
+source_kind: document
+publisher: AMD
+title: AMD Reports Third Quarter 2026 Financial Results — Form 8-K Exhibit 99.1
+published_at: 2026-11-03
+captured_at: 2026-11-04
+accepted_at: 2026-11-04
+status: active
+url: https://ir.amd.com/financial-information/sec-filings/content/0000002488-26-000188/q32026991.htm
+locator: Recent Highlights 首項，Anthropic、Meta、Microsoft、OpenAI、OCI 正在首批 Helios 跑 models and workloads 段
+limitation: 同一 AMD 發行人陳述，不是五份客戶驗收；未列各家品牌 SKU、配置版本、場站、運行日、部署容量或 GA；Recent Highlights 的公告日不可倒填成每家系統的季度末運行日
+independence_group: amd
+-->
+
+<!-- research_source
+source_id: S29
+role: company_filing
+source_kind: document
+publisher: AMD
+title: AMD Form 10-Q for the quarter ended September 26 2026
+published_at: 2026-11-04
+captured_at: 2026-11-04
+accepted_at: 2026-11-04
+status: active
+url: https://ir.amd.com/financial-information/sec-filings/content/0000002488-26-000191/amd-20260926.htm
+locator: HTML Note 4 Segment Reporting 印刷頁 11–12 的產品範圍與 three months ended September 26 2026 表；Risk Factors 印刷頁 40 以 The increased frequency of product transitions 開頭的 Helios 段
+limitation: 未經審計期中申報；分部不是產品分拆，沒有 MI450／Helios 專屬收入；風險段說明角色與可能風險，不證明任何具名客戶已延誤或台灣供應商已取得訂單；與 AMD 新聞稿同一來源群
+independence_group: amd
+-->
+
+<!-- research_claim
+claim_id: C31
+label: verified
+status: active
+claim: AMD 2026-11-03 財報稿稱 Anthropic、Meta、Microsoft、OpenAI 與 OCI 正在首批 Helios 機櫃執行模型及工作負載；相較 S26 的四家名單，本次新列 Anthropic
+supporting_source_ids: S26,S28
+contrary_source_ids:
+as_of: 2026-11-03
+basis: 逐名對照 10/12 公告與 11/3 Recent Highlights；兩份皆由 AMD 發行，新增的是具名陳述，不把名稱數當獨立驗收樣本
+boundary: 不證明 Anthropic 原首個 GW 已部署，不知道各家品牌配置、場站、實際日期與規模；不能判為五家全數驗收完成、GA 或台灣供應商出貨，亦不以公告日期替代事件發生日
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C32
+label: verified
+status: active
+claim: AMD 2026-11-04 季度申報明示其開發並授權 Helios 設計、供應部分產品但不製造或出售完整 Helios 機櫃；客戶及製造夥伴另向第三方取得部分網路、記憶體、電源、冷卻與機構等元件
+supporting_source_ids: S29
+contrary_source_ids:
+as_of: 2026-11-04
+basis: Risk Factors 的 Helios 段直接界定 AMD 與客戶／製造夥伴的角色，並說明第三方元件供應問題可能影響製造、交付與部署
+boundary: 風險揭露不是已發生短缺或延誤的判定；不提供逐家台廠、訂單、資格、收入歸屬或個別合約責任，也不代表 AMD 不供應任何網路產品
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C33
+label: verified
+status: active
+claim: AMD 季報揭露截至 2026-09-26 三個月 Data Center 分部淨收入為 8546 百萬美元，分部含 AI 加速器、伺服器 CPU 及其他資料中心產品，並非 Helios 專屬收入
+supporting_source_ids: S29
+contrary_source_ids:
+as_of: 2026-11-04
+basis: Note 4 定義分部產品範圍；同表區分 three months 與 nine months，採前者 Data Center net revenue 8546，單位 In millions 美元
+boundary: 單一發行人單季申報量不是統計抽樣，SE／t 不適用；不把整個分部、毛利、現金流或其他公司數字按比例分配到 MI450、Helios 或台灣供應商，也不作跨公司排名
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 再把各組公開節點放回自己的時間線
 
 原始文件與 10 月更新中的動詞、時程與容量數字，分別來自平台方及不同客戶。正確讀法不是
@@ -1356,6 +1475,8 @@ resolution:
 
 ## 來源與證據邊界
 
+- [AMD 11/3 財報稿](https://ir.amd.com/financial-information/sec-filings/content/0000002488-26-000188/q32026991.htm)（S28；具名工作負載陳述，不是客戶驗收）。
+- [AMD 11/4 季度申報](https://ir.amd.com/financial-information/sec-filings/content/0000002488-26-000191/amd-20260926.htm)（S29；整櫃責任、分部範圍與可能風險分開判讀）。
 - [AMD：OCP 2026 演講摘要](https://newsroom.amd.com/news/ocp-2026-amd-ceo-lisa-su-keynote-takeaways/)（S26；四家初始系統運行是 AMD 自述，不是四份客戶驗收）。
 - [緯穎：OCP 2026 平台與整合展示](https://www.wiwynn.com/news/wiwynn-showcases-next-gen-ai-platforms-thermal-engineering-and-optical-interconnect-technologies-at-2026-ocp-global-summit)（S27；Helios 與另一平台的試產段落分開）。
 - [Microsoft：Azure 與 AMD 基礎設施擴展](https://blogs.microsoft.com/blog/2026/07/20/microsoft-expands-azure-ai-and-hpc-infrastructure-with-amd/)（S1）。
@@ -1630,6 +1751,23 @@ invalidation: AMD 或被列名客戶更正初始系統未運行、取消或撤�
 -->
 
 ## 下一個可證明／否定的節點
+
+<!-- monitoring_item
+monitor_id: T15
+status: active
+claim_ids: C31,C32,C33
+metric: Anthropic 首批 Helios 工作負載陳述能否接上同一品牌配置、場站、交付驗收與產品財務範圍
+source_ids: S28,S29
+watch_source_ids: S6,S11,S12
+frequency: weekly
+next_check: 2026-11-11
+trigger: Anthropic 或具名整機廠公開品牌型號、配置版本、場站及已發生交付／驗收範圍，且明示與 AMD 所述首批 Helios 為同一對象；財務判讀另須同期間可定位的產品收入
+invalidation: AMD 或 Anthropic 更正未執行所述工作負載、撤回具名配置或取消計畫；只有未公開細節不視為反證，其他平台或其他客戶不能替代
+-->
+
+11/4 新增的季度文件只補首批工作負載陳述、整櫃責任與分部口徑，沒有把原部署門檻判為
+完成。T15 在 11/11 按週頻回查 Anthropic 的同配置證據；原 T5–T14 的有效工作日仍由
+回查帳本接續。主命題 C11、原始到期日與可信度時鐘均不變。
 
 10/17 本輪回查後，新增 T14 的下一節點是 2026-10-23：客戶或整機廠能否把初始運行
 對到同一品牌配置、場站及驗收範圍？原有 T5–T13 的有效工作日須讀 append-only
