@@ -5,7 +5,7 @@ schema_version: 1
 graph_id: custom-hbm-scope-ladder
 root_node_id: concept:custom-hbm-commercialization
 label: Custom HBM 客製範圍與商用階梯
-summary: 顯示 Samsung SK hynix 與 Micron 各自揭露的客製入口、工作搬移效能分母及 sample qualification production 門檻；不能用來比較領先 市占或台灣公司收入。
+summary: 顯示 Samsung SK hynix 與 Micron 各自揭露的客製入口、NVIDIA 控制器與 PHY 架構、工作搬移效能分母及 sample qualification production 門檻；不能用來比較領先 市占或台灣公司收入。
 article_ids: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER
 status: active
 -->
@@ -336,7 +336,7 @@ view: industry
 from_id: concept:custom-hbm-commercialization
 to_id: concept:custom-hbm-base-die-contract
 relation: includes
-claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C3,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C4,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C8,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C9,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C10
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C3,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C4,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C8,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C9,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C10,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C18
 note_refs:
 evidence_state: verified
 commercial_stage: capability
@@ -346,7 +346,7 @@ exclusivity_scope:
 as_of: 2026-08-12
 review_due: 2026-09-15
 status: active
-boundary: 多份供應商文件直接把 controller additional logic IP 與製程路徑放進 base die 設計，但沒有共同 die identity PPA 熱 sign-off 客戶 qualification 或量產分母。
+boundary: 多份供應商文件列出 base die 設計；另補 NVIDIA 8/26 原文的 NVHBM 控制器移入堆疊與客製 PHY。只增加技術範圍，不把跨公司不同設計拼成同一產品；沒有共同 die identity PPA 熱 sign-off 客戶 qualification 或量產分母，原期限不延後。
 next_trigger: 同一產品公開 base-die function IP ownership foundry node tape-out PPA thermal 與 customer qualification。
 -->
 

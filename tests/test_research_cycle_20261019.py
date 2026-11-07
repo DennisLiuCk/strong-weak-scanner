@@ -68,7 +68,8 @@ class ResearchCycleOctober19Test(unittest.TestCase):
             meta = records(path, "research_topic")[0]
             self.assertEqual(tuple(meta[k] for k in
                                    ("thesis_claim_id", "last_reviewed_at", "review_due")), clock)
-            transitions = records(path, "transition")
+            # This is a 10/19 fixture; later revisions must not move its recency anchor.
+            transitions = [t for t in records(path, "transition") if t["date"] <= "2026-10-19"]
             self.assertTrue(any(t["date"] == "2026-10-19" and
                                 t["evidence"].startswith("sources:") for t in transitions))
             topic = {"topic_id": meta["topic_id"], "title": meta["topic_id"],
@@ -78,6 +79,7 @@ class ResearchCycleOctober19Test(unittest.TestCase):
         recent = bd.build_recent_articles("2026-10-19", {}, {}, topics=topics)
         self.assertEqual({r["researchId"] for r in recent["items"]},
                          {"topic-" + t["topic_id"] for t in topics})
+        self.assertEqual({r["date"] for r in recent["items"]}, {"2026-10-19"})
 
     def test_scan_records_missing_dates_not_zero_market_events(self):
         with (ROOT / "notes/research_topics/scan_log.csv").open(encoding="utf-8", newline="") as stream:

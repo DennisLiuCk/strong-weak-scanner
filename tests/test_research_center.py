@@ -3960,7 +3960,14 @@ process.stdout.write(JSON.stringify(results));
             ("research_claim", 17), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 4),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in {"research_source", "research_claim"}:
+                # Preserve the original teaching contract without banning new evidence.
+                key, prefix = ("source_id", "S") if block == "research_source" else ("claim_id", "C")
+                ids = re.findall(rf"<!-- {block}\s+{key}: ([A-Z]+\d+)\s", topic)
+                self.assertEqual(len(ids), len(set(ids)))
+                self.assertTrue({f"{prefix}{i}" for i in range(1, expected + 1)} <= set(ids))
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
@@ -5425,7 +5432,7 @@ process.stdout.write(JSON.stringify(results));
             "### 為什麼重要", 1
         )[0]
         reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先用五個位置看", 1
+            "\n## ", 1  # Only the reflection section, not later evidence updates.
         )[0]
         for jargon in (
             "Spectrum-X", "Photonics", "Spectrum-6", "Ara", "SPIL",

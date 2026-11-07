@@ -280,6 +280,22 @@ limitation: 公司法說只支持具名開發合作；未給實體樣品、客�
 independence_group: micron
 -->
 
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA NVLink Fusion Brings NVHBM to Next-Generation AI Infrastructure
+published_at: 2026-08-26
+captured_at: 2026-11-07
+accepted_at: 2026-11-07
+status: active
+url: https://developer.nvidia.com/blog/nvidia-nvlink-fusion-brings-nvhbm-to-next-generation-ai-infrastructure/
+locator: More package area, more flexibility 段落的 memory controller 與 custom PHY；只核對正文架構描述，不採頁首 AI-generated summary 或效能倍率
+limitation: NVIDIA 自述架構，不是實體樣品交付、具名客戶測試版本／qualification、量產或財務。8/26 舊文於 11/7 新取得，非 11/7 新事件；HTML SHA256 7c93cc33f0e24efafb55ddc6b3aac4115bb37e61dc0c66cd06f15e1443c7a746
+independence_group: nvidia
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -569,6 +585,23 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C18
+label: verified
+status: active
+claim: NVIDIA 的 NVHBM 架構說明把記憶體控制器移入三維 HBM 堆疊，並採用客製實體介面 PHY
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2026-08-26
+basis: S16 正文 More package area, more flexibility 明列 controller 位置與 custom PHY；證實的是 NVIDIA 公開的設計描述
+boundary: 不把架構或供應商 validation 敘述當具名客戶 qualification，不承接未揭露的產品版本、量產或財務。面積、頻寬與耗電的分母不同，本文不採用倍率或合成端到端效能；不推定台灣供應商角色。舊文補入不刷新主命題 C5 的證據時鐘
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -669,7 +702,26 @@ reason: named_nv_hbm_development_branch_without_sample_qualification_financial_o
 evidence: sources:S15
 -->
 
+<!-- transition
+date: 2026-11-07
+from: triaged
+to: triaged
+reason: added_nvidia_controller_phy_architecture_from_august_document_without_sample_qualification_or_thesis_clock_upgrade
+evidence: sources:S16
+-->
+
 ## 新手先讀：這篇在講什麼
+
+### 11 月 7 日補充：客製也可能改變控制器的位置
+
+這次補入 NVIDIA 8 月 26 日的架構原文，不是 11 月的新產品發布。它描述把記憶體
+控制器移入 HBM 堆疊，並搭配客製 PHY。[S16][C18] 控制器像安排資料進出的交通管理員，
+PHY 則是實際傳送訊號的電路；兩者位置與介面改變，需要重新核對設計及驗證責任。
+
+**證實**的是公司公開的設計描述；**推論**是後續追蹤要從「有沒有合作」深入到
+「控制器與介面由誰負責、是哪個版本」；**待驗證**仍是同一產品的樣品接收方、測試條件
+及客戶資格結果。想一想：把功能搬了位置，為什麼還不能直接說整台系統更快？
+下一份有用的證據應把架構、產品版本與客戶實測接起來，而不只是再報一個效能倍率。
 
 ### 10 月 4 日更新：名字出現了，但交貨證明還沒出現
 
@@ -685,7 +737,7 @@ evidence: sources:S15
 
 ### 名詞小字典
 
-- **NVHBM**：美光本次法說對與 NVIDIA 合作之客製 HBM4E 的稱呼；名稱不是交付或驗收證明。
+- **NVHBM**：美光與 NVIDIA 文件所述的客製記憶體路徑；NVIDIA 另公開控制器與 PHY 的架構描述，名稱與設計仍不是交付或驗收證明。
 - **NVLink Fusion**：美光文件列為 NVHBM 未來用途的平台名稱；本文不藉此推定已採用或實際配置。
 
 - **高頻寬記憶體（HBM）**：把多層動態隨機存取記憶體垂直堆疊，放在運算晶片附近，用較寬的連接介面搬動大量資料。
@@ -921,6 +973,7 @@ SK 海力士、Intel 與 LBNL 是公司產品敘事與兩條通用效能方法�
 - [SK hynix GTC 2026 review](https://news.skhynix.com/gtc-2026-review/)（Stream DQ 與 base die）。
 - [Micron FY2025 Q4 slides](https://investors.micron.com/static-files/5fb98d73-2134-4446-8d1b-0f90285f6c02)（p.13，標準／客製 base logic die 與管理層毛利預期）。
 - [Micron FY2026 Q4 prepared remarks](https://s25.q4cdn.com/621799436/files/doc_financials/2026/q4/Q4-FY26-Prepared-Remarks.pdf)（9 月 30 日 p.4；NVHBM 具名開發合作，非樣品、資格或量產簽核）。
+- [NVIDIA NVHBM 技術說明](https://developer.nvidia.com/blog/nvidia-nvlink-fusion-brings-nvhbm-to-next-generation-ai-infrastructure/)（8 月 26 日原文、11 月 7 日補入；只採控制器位置與 PHY 描述，不採效能倍率）。
 - [Samsung HBM4E sample shipment](https://news.samsung.com/global/samsung-electronics-begins-shipment-of-industry-first-hbm4e-samples)（標準 HBM4E 樣品與 custom 時鐘的分界）。
 - [Samsung Memory Labs](https://semiconductor.samsung.com/about-us/locations/us-rnd-labs/memory-labs/)（I/O architecture／IP、firmware、base die、customer engagement 與 workload／software 分工）。
 - [Samsung Foundry HPC／AI application service](https://semiconductor.samsung.com/foundry/application-specific-service/hpc-ai/)（die-to-die interface、base-die controller 與 additional logic 的供應商架構邊界）。

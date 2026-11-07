@@ -14,7 +14,7 @@ schema_version: 1
 graph_id: cpo-networking
 root_node_id: concept:cpo-networking
 label: AI 光學三軸組態與產品證據
-summary: 拆開光引擎、訊號處理與雷射三軸，以及鏈路兩端和埠數分母；新增緯穎／Ayar／GUC 具名系統展示，但仍缺完整訊號模式、客戶資格與財務橋接。
+summary: 拆開光引擎、訊號處理與雷射三軸，以及鏈路兩端和埠數分母；日月光新增第四季CPO量產自述，緯穎仍為具名系統展示，均不能跳過產品驗收與實際財務橋接。
 article_ids: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
 status: active
 -->
@@ -94,9 +94,29 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-06-01
 review_due: 2026-10-31
-status: active
+status: retired
 boundary: NVIDIA 直接列名 SPIL 的 CPO chip-level packaging、assembly、testing 角色；沒有日月光公司級出貨量、收入、毛利或供應份額。
-next_trigger: 日月光投控正式文件揭露 Spectrum-X／CPO 客戶、量產、產能利用與財務貢獻。
+next_trigger: 11/7取得公司自述第四季CPO量產，由KG-CPO-C05接續；原平台列名事實未被推翻，保留此歷史線。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CPO-C05
+view: company
+from_id: company:3711
+to_id: concept:cpo-networking
+relation: produces
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C28
+note_refs:
+evidence_state: verified
+commercial_stage: production
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-29
+review_due: 2027-01-29
+status: active
+boundary: 只確認日月光10/29法說自述第四季CPO量產；不是客戶獨立驗收，不知道具名產品、客戶、數量、實際收入或毛利，不能將集團說法全部歸給SPIL、某NVIDIA型號或NPO，也不建立重大財務受惠與獨占。
+next_trigger: T8接續季度法說及申報，核同一產品期間的交付、驗收與實際財務；展望或一般集團毛利不能替代。
 -->
 
 <!-- knowledge_edge

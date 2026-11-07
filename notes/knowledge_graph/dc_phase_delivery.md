@@ -8,7 +8,7 @@ schema_version: 1
 graph_id: dc-phase-delivery
 root_node_id: concept:dc-phase-delivery
 label: 資料中心分期交付
-summary: Beacon Point兩期租約對應不同融資與交付進度；公司循環額度、實際動用與各期專案資金分開，不把全數簽租或母公司融資寫成已交付算力。
+summary: Beacon Point第三季披露一期基礎與管線施工、二期土木設計，交付仍為未來目標；二期融資仍在推進，不把母公司額度或全數簽租寫成已交付算力。
 article_ids: MI-2026-09-10-DC-PHASE-DELIVERY
 status: active
 -->
@@ -19,17 +19,17 @@ view: company
 from_id: company:hut8
 to_id: concept:dc-phase-delivery
 relation: plans_deployment
-claim_refs: MI-2026-09-10-DC-PHASE-DELIVERY#C2,MI-2026-09-10-DC-PHASE-DELIVERY#C4
+claim_refs: MI-2026-09-10-DC-PHASE-DELIVERY#C2,MI-2026-09-10-DC-PHASE-DELIVERY#C11
 note_refs:
 evidence_state: verified
 commercial_stage: planned
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-09-10
-review_due: 2026-10-10
+as_of: 2026-11-04
+review_due: 2026-12-07
 status: active
-boundary: 只證實Hut 8公布兩期租約與交付目標；未證實如期上線、起租或台灣公司訂單。
+boundary: 只證實公司公布兩期租約、Q3工程階段及交付目標；planned保留，未證實客戶驗收、如期上線、起租或台灣公司訂單。
 next_trigger: 官方文件披露各期實際交付與驗收，或調整原時程。
 -->
 
@@ -99,16 +99,16 @@ view: industry
 from_id: concept:dc-phase-delivery
 to_id: stage:dc-phase-financing
 relation: passes_through
-claim_refs: MI-2026-09-10-DC-PHASE-DELIVERY#C9
+claim_refs: MI-2026-09-10-DC-PHASE-DELIVERY#C9,MI-2026-09-10-DC-PHASE-DELIVERY#C12
 note_refs:
 evidence_state: inference
 commercial_stage: planned
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-10-10
-review_due: 2026-11-05
+as_of: 2026-11-04
+review_due: 2026-12-07
 status: active
-boundary: 接續I01的查證框架：母公司revolver、實際動用與第二期專案資金不同；新額度不證明第二期融資或交付完成，未新增公司受惠線。
-next_trigger: 11/4預告Q3結果後核對第二期具名資金與交付，或提前出現同一期別公告；未取得仍保持待證。
+boundary: 接續I01的查證框架：Q3季報仍稱二期融資在推進；母公司revolver、實際動用與該期資金分開，沒有交付或台廠受惠歸因。
+next_trigger: 第二期具名融資完成、資金用途及條件，或同一期別工程與交付更新。
 -->

@@ -56,8 +56,8 @@ evidence: sources:S1,S2,S3,S4,S5,S6
 
 ### 三句話抓重點
 
-- Hut 8在7月為Beacon Point簽下第二期租約，但8月季報仍把第二期融資列為正在推進的工作。
-- 第一期的初次通電與資料廳交付也排在不同季度，供應鏈要按期別及工作內容追蹤設備需求。
+- Hut 8在11/4第三季披露仍在推進Beacon Point第二期融資；全數簽租沒有替融資完成打勾。[S11/C12]
+- 新工程說明把第一期基礎及地下管線施工、第二期土木設計分開；資料廳交付目標仍是2027Q3與2028Q2，不是已交付。[S10/C11]
 - 目前可研究的是合約如何走向實際交付；台灣供應商的訂單、驗收與收款仍需另外核對。
 
 ### 為什麼重要
@@ -69,7 +69,7 @@ evidence: sources:S1,S2,S3,S4,S5,S6
 
 ### 接下來怎麼追
 
-- 10/10已回查公司公告及9/28的8-K；新母公司額度不是第二期專案融資證明。公司預告11/4公布Q3，11/5再核結果；若之前有具名工程公告則提前。
+- 11/7已核對Q3工程與融資披露；11/10依另一追蹤項查起租、驗收及現金流條款，12/7再按月追第二期具名融資與工程更新；新公告出現則提前。
 - 按公司最新文件分別追蹤初次通電、第一期資料廳與第二期資料廳；取得租金起算及交付條款後再往現金流延伸。
 
 ### 想一想
@@ -116,6 +116,18 @@ J.P. Morgan在8月10日的公開文章把專案融資與供電限制放在一起
 
 ## 有哪些證據支持繼續追蹤
 
+### 11/7更新：兩期正在做不同的工作
+
+Hut 8的[11/4財報稿數位基礎設施段](https://www.sec.gov/Archives/edgar/data/1964789/000110465926122347/tm2628741d1_ex99-1.htm)
+新增季度工程描述：Beacon Point的變電站開始施工，第一期進行基礎及地下管線工作，第二期進行土木設計；兩期初次資料廳交付目標仍為2027Q3及2028Q2。[S10/C11]
+
+**土木設計**是把場地、道路、排水與相關工程安排形成可施工設計的階段，不等於資料廳驗收。
+因此，比起把「施工中」當成同一成熟度，下一步應追每一期的具體工作。
+[同期10-Q的Liquidity and Capital Resources](https://www.sec.gov/Archives/edgar/data/1964789/000119312526446146/hut-20260930.htm)
+仍說正在為第二期開發與施工尋求融資。[S11/C12]
+這是有進度、仍有條件的狀態；讀者可以問：下一份文件證明的是設計、施工、通電，還是客戶接收？
+本文沒有電網或客戶的獨立驗收，也沒有新增台廠營收歸因。
+
 ### 10/10補充：母公司多了額度，不能替第二期打勾
 
 [9/28公告](https://www.hut8.com/news-insights/press-releases/hut-8-expands-corporate-liquidity-with-usd1-07-billion-senior-secured-revolving-credit-facility)
@@ -160,8 +172,8 @@ Hut 8於9/24簽訂四年期、10.70億美元的母公司有擔保循環額度；
 台灣公司的證據，因此文章保留族群觀察，沒有填入個股受惠名單。若之後公司公布具名
 產品或客戶，應先對上期別，再接出貨與財務資料。
 
-10/10在上述已讀公告與8-K範圍內，沒有取得第二期融資完成或新交付時點的證明；未全面查核
-電網、地方建照與承包商，不能宣稱第二期至今必然未融資。下一次仍先問：第二期是否取得確定融資？兩期交付目標有無調整？已採購設備
+11/7取得的Q3工程說明補上階段差異，季報仍列第二期融資為正在推進；這個判讀只適用文件所述時點，未全面查核
+電網、地方建照與承包商。下一次仍先問：第二期是否取得確定融資？兩期交付目標有無調整？已採購設備
 是否開始到貨、通電或驗收？若融資與交付條件已有實質進展，研究重心應隨之移動；若
 日期延後或新增成本，則追延後的原因與責任。重複公告園區總規模，本身不增加交付證據。
 
@@ -435,6 +447,68 @@ from: triaged
 to: triaged
 reason: separated_parent_revolver_drawn_cash_and_phase_financing_without_thesis_clock_refresh
 evidence: sources:S7,S8,S9
+-->
+
+<!-- research_source
+source_id: S10
+role: company_release
+source_kind: document
+publisher: Hut 8
+title: Hut 8 Reports Third Quarter 2026 Results
+published_at: 2026-11-04
+captured_at: 2026-11-07
+accepted_at: 2026-11-07
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1964789/000110465926122347/tm2628741d1_ex99-1.htm
+locator: SEC 8-K Exhibit 99.1；Digital Infrastructure的Beacon Point施工及交付目標段；本輪HTML SHA256 fa9e63788f0670e4efd082f790004ad0e8b596892cd1ad00c88639de96a26274
+limitation: 公司自述工程進度及未來交付目標，非電網或客戶獨立驗收；SEC刊載不增加獨立來源群組
+independence_group: hut8-beacon-point
+-->
+<!-- research_source
+source_id: S11
+role: company_filing
+source_kind: document
+publisher: Hut 8
+title: Form 10-Q for the quarter ended September 30 2026
+published_at: 2026-11-04
+captured_at: 2026-11-07
+accepted_at: 2026-11-07
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1964789/000119312526446146/hut-20260930.htm
+locator: 印刷頁69 Liquidity and Capital Resources的Beacon Point Notes及Phase 2段；本輪HTML SHA256 0a2488b84d802c7e2fc1470f285da27a294a7672d332cc1076479c1a42f06163
+limitation: 只接受指定融資段落的公司披露；未完成全部合約條款法律審查，不將期後未知事件寫成沒有發生
+independence_group: hut8-beacon-point
+-->
+<!-- research_claim
+claim_id: C11
+label: verified
+status: active
+claim: Hut 8於11/4披露Beacon Point園區變電站開始施工、第一期進行基礎與地下管線工作、第二期進行土木設計；初次資料廳交付目標仍分別為2027Q3及2028Q2
+supporting_source_ids: S10
+contrary_source_ids:
+as_of: 2026-11-04
+basis: 財報稿數位基礎設施季度工程段，分開園區變電站、第一期及第二期，不將River Bend進度套到Beacon Point
+boundary: 證實的是公司披露，不是客戶驗收、完成交付或如期保證；未延伸8月初次通電目標為11月再次確認，未增加供應商收入線
+verification_needed:
+-->
+<!-- research_claim
+claim_id: C12
+label: verified
+status: active
+claim: 11/4第三季10-Q仍將Beacon Point第二期開發與施工融資描述為正在尋求，沒有把母公司循環額度列為該期融資完成
+supporting_source_ids: S11
+contrary_source_ids:
+as_of: 2026-11-04
+basis: Liquidity and Capital Resources p69的actively pursuing financing限定第二期；保留公司文件時點
+boundary: 這是當期申報狀態而非11/7所有場外事件調查；第一期專案債及母公司額度不代填第二期資金，不判定信用或投資報酬
+verification_needed:
+-->
+<!-- transition
+date: 2026-11-07
+from: triaged
+to: triaged
+reason: append_q3_phase_specific_construction_and_financing_status_without_thesis_clock_refresh
+evidence: sources:S10,S11
 -->
 
 ## 來源與證據邊界

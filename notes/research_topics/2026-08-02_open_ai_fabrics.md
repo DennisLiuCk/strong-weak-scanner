@@ -926,6 +926,10 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 - **資料平面**：真正搬運工作資料的部分；它回答資料怎麼走，不負責決定所有設定與政策。
 - **控制平面**：計算路徑、下達設定、協調設備狀態與故障處置的部分；控制正確不等於資料搬運已通過壓力測試。
 - **自我聲明（self-attestation）**：供應商依共同清單自行申報產品實作狀態；它需要可核對附件，也不同於第三方認證或跨廠互通。
+- **檢查表（checklist）**：列出要核對哪些要求；空白清單不是已填入產品與測試結果的成績單。
+- **修訂紀錄（revision history）**：說明文件各次改版內容；不能直接代替每個測項引用的規格版本。
+- **封包傳遞子層（PDS）**：處理封包如何送達、排序及重試的一層傳輸責任。
+- **封包裁切（trimming）**：壅塞時移除封包部分內容，保留協助接收端識別與處理的資訊。
 - **系統壓力與規模測試**：在高負載、擴大節點數、長時間運轉與故障注入下檢查整套系統，而不只測單一連線。
 - **生命週期自動化**：把設備上線、設定、更新、監控、故障替換與退役變成可重複流程，並追蹤設定是否悄悄偏離。
 - **OPG-M**：OCP 針對多顆加速器開放運算櫃提出的參考架構名稱；本文只把它當成一套可核對設計，不當成所有叢集標準答案。
@@ -1026,6 +1030,30 @@ invalidation: 實際部署廣泛把平面匯聚、採不同責任邊界或參考
 **推論：每個版本要有自己的證據。** 正在出貨的 Tahan 不能替未來 ESUN 設計取得資格，
 規格升版也不能替廠商補上互通結果。接下來分開追版本差異、具名配置的測試、出貨範圍與客戶驗收，
 再看台灣公司是否有同產品的出貨與財務資料；目前仍不能畫成營收受惠線。[S25][S26]
+
+## 11 月補充：檢查表的版本與產品通過分開看
+
+**證實：官方合規入口已有新的傳輸檢查表。** 11 月 7 日取回的工作簿，
+PDS Checklist 與 Trimming Checklist 的測項列包含規格版本、章節及頁碼。
+PDS 是封包傳遞子層，負責資料如何送達；Trimming 是壅塞時裁去封包內容、
+保留必要資訊的機制。這些欄位讓「要查哪條要求」更具體，仍不是產品成績。[S30]
+
+**新手重點：先認三種版本，再問誰考過。** 可以把它想成考試大綱、試卷和成績單。
+
+| 本次附件中的版本 | 它管理什麼 | 不能拿來代替什麼 |
+|---|---|---|
+| 檢查表修訂 1.0 | 這份表本身的改版 | 通訊規格版號 |
+| schema_version 1.0.1 | 表格資料格式 | 產品韌體或晶片版本 |
+| 測項欄位 UE Spec Version 1.1 | 個別要求引用的規格 | 已完成測試及通過結果 |
+
+同一檔案的 Revision History 最後一列仍寫更新至 UEC 1.0，與測項欄位的 1.1 不一致。
+因此目前能確認的是「欄位寫了什麼」，不能宣告整份表已完整覆蓋 1.1。
+TR Profile 還把部分項目列為選填，意思是宣稱支援時仍需測試，不是可以一概略過。[S30]
+
+**推論與待驗證：** 下一步先對齊官方修訂說明及逐條引用，再找同一產品版本、功能組合、
+測試條件與原始結果。原本的合規追蹤仍待驗證，不因拿到空白清單就升級。[S29][S30]
+閱讀下一則互通新聞時可問：它公布的是要求清單，還是填有產品身分及結果的成績單？
+若廠商只展示其中一項功能，足以代表整個規格通過嗎？
 
 ## 先把一座人工智慧叢集拆成六張網
 
@@ -1534,4 +1562,62 @@ frequency_detail: 完整規格與差異摘要已取得，下一步依功能組�
 next_check: 2026-11-07
 trigger: 官方提供1.1功能組合對應的測試矩陣，且具名產品版本可接到要求、測項、通過條件與原始結果
 invalidation: 官方修正或撤回差異條目、舊工具未覆蓋新要求，或具名產品缺少必要功能時，依受影響版本縮窄合規判斷，不以向後相容或檔案取得補證
+-->
+
+<!-- transition
+date: 2026-11-07
+from: triaged
+to: triaged
+reason: added_transport_checklist_version_scope_and_internal_revision_conflict_without_product_pass_or_main_clock_refresh
+evidence: sources:S30
+-->
+
+<!-- research_source
+source_id: S30
+role: standard
+source_kind: living_index
+publisher: Ultra Ethernet Consortium
+title: UEC Compliance及其連結的Transport PDS and Trimming Matrix and Checklist v1.0
+published_at:
+captured_at: 2026-11-07
+accepted_at: 2026-11-07
+status: active
+url: https://ultraethernet.org/compliance/
+locator: 11/7入口連結https://ultraethernet.org/wp-content/uploads/sites/20/2026/11/UEC-Transport-Matrix-and-Checklist_v1.0.xlsx；31825 bytes，SHA256 17993f235ddb62fe5106efb03a6774168ab55e7ca2c146a957b95f0a27f4b2b4；TR Profile A1:K22、PDS Checklist D1:H4、Trimming Checklist D1:H4、Revision History A1:D14及schema_version A1:B2
+limitation: 本筆是動態入口及當次附件的觀測，沒有可核實的公開發布日，不以URL月份或內部編輯日代替；只核所列儲存格及檔案完整性，未逐條驗證全部規範對照；Revision History D14提UEC 1.0而兩張Checklist E2:E4列1.1，保留衝突；沒有具名產品結果，與S18及S28/S29同一UEC消息鏈
+independence_group: ultra-ethernet-consortium
+-->
+
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: 11/7官方合規入口連結的Transport檢查表將表格修訂1.0、資料格式1.0.1與測項引用規格1.1分開；Revision History最後一列卻仍寫UEC 1.0，版本文字有待官方釐清
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-11-07
+basis: 固定同份xlsx雜湊，核對Revision History D1及A14:D14、schema_version A2、PDS及Trimming Checklist E1:E4；只接受儲存格內容，不自行裁決版本衝突
+boundary: 不是11/7發布新規格、逐條全文驗證、UEC 1.1完整覆蓋或產品合規；工作簿沒有在上述欄位提供具名產品通過結果；C18主證據時計不變
+verification_needed: 官方修訂釐清與具名產品逐條測試對照
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: inference
+status: active
+claim: 有可定位要求的檢查表會改善驗證路徑，但必須先釐清版本，再接上具名產品功能組合、測試版本及原始結果，不能把清單存在當作合規完成
+supporting_source_ids: S29,S30
+contrary_source_ids:
+as_of: 2026-11-07
+basis: S29有版本差異，S30有規格引用欄及內部衝突；TR Profile H21說明選填功能一旦宣稱支援仍須測試，測項清單與執行結果是不同證據
+boundary: 只提出驗證順序，不判產品不合格、效能優劣、跨廠互通、客戶驗收或台廠收入；T8的AND條件不變
+verification_needed: 官方版本更正或說明，以及同一具名產品的功能宣告、已填測試表與原始結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
 -->

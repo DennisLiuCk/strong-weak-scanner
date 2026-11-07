@@ -8,7 +8,7 @@ schema_version: 1
 graph_id: power-equipment-conversion
 root_node_id: product:gas-power-equipment
 label: 燃氣設備預約與交付
-summary: 預約與訂單分列後，再看管線施工準備、預付款義務及現場投運；公司季度出貨提供案例，後續計畫仍待驗證。
+summary: Q3新增預約、既有預約轉單與出貨分列，季末存量可算術銜接；出貨不代替當季產出，融資未見拖延不代替管線、工程總包或現場投運驗收。
 article_ids: MI-2026-09-10-POWER-EQUIPMENT-CONVERSION
 status: active
 -->
@@ -19,17 +19,17 @@ view: company
 from_id: company:ge-vernova
 to_id: product:gas-power-equipment
 relation: produces
-claim_refs: MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C2
+claim_refs: MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C2,MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C9
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-22
-review_due: 2026-10-31
+as_of: 2026-10-28
+review_due: 2027-01-28
 status: active
-boundary: 只證實GE Vernova披露2026Q2燃氣設備出貨；全球合計未辨認資料中心客戶或台灣供應商。
+boundary: 只證實GE Vernova披露2026Q3全球燃氣設備出貨5 GW；不是同季工廠產出或現場驗收，未辨認資料中心客戶或台灣供應商收入。
 next_trigger: 下一季度同口徑出貨與具名客戶文件。
 -->
 
@@ -39,17 +39,17 @@ view: industry
 from_id: product:gas-power-equipment
 to_id: metric:gas-backlog-and-reservations
 relation: measured_by
-claim_refs: MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C1,MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C2
+claim_refs: MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C1,MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C2,MI-2026-09-10-POWER-EQUIPMENT-CONVERSION#C9
 note_refs:
 evidence_state: inference
 commercial_stage: planned
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-09-10
-review_due: 2026-10-31
+as_of: 2026-10-28
+review_due: 2027-01-28
 status: active
-boundary: 以公司分列欄位形成追蹤框架，含預約合計不能視為全部正式訂單，未計算產業轉換率。
+boundary: Q3欄位可作約數算術銜接，轉單是既有承諾內部移動；含預約合計不是全部正式訂單，未計產業轉換率、投運率或台廠營收。
 next_trigger: 同定義的新增預約、既有預約轉單、出貨及季末存量。
 -->
 

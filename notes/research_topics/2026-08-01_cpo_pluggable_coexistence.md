@@ -754,6 +754,8 @@ evidence: sources:S15,S17
 
 ## 新手先讀：這篇在講什麼
 
+**11/7 取得的公司端進度：** 日月光投控在 10/29 法說中表示 CPO 已於第四季開始量產。這比被平台列名更進一步，但仍是管理層對生產階段的自述，不是客戶驗收、已認列收入或毛利證明。接下來要把量產日期、實際交付與財報接在一起。[S24][C28][C29]
+
 **11 月複核的新證據：** Meta 公開的 OCP 簡報開始給出 CPO 可靠度評估的埠數、運作時數、溫度與事件定義。這讓問題從「能不能換雷射」前進到「在什麼條件下出了什麼事」；但不同批次的環境與製造條件不同，仍不能排出全市場可靠度名次。[S21][S22][C26][C27]
 
 **10 月的新案例：** 緯穎、Ayar Labs 與 GUC 的展會公告已把共同封裝光引擎、外部雷射與系統整合接到同一個具名展示；這比只有架構圖更具體，但尚不足以回答訊號處理模式、客戶資格與收入。[S19][C25]
@@ -842,12 +844,13 @@ evidence: sources:S15,S17
 - **部署分母**：判斷需求規模的共同基準，例如交換器數、連接埠數、光連線數與兩種形式的使用比例。
 - **雙向核對**：平台端與供應商端文件能對上同一產品、角色、期間與量產狀態。
 - **財務足跡**：能在出貨、收入、毛利或現金流中辨識的結果；生態系列名與技術合作還不算。
+- **管理層展望**：公司對未來收入或進度的預期，不是已發生的財報結果；「開始量產」與「下一年可賺多少」要分開核對。
 
 ### 三句話抓重點
 
 - 資料先以電訊號進入交換晶片，再轉成光訊號送往下一台設備；先問光引擎放前面板、板上／NPO，還是和晶片共同封裝。
 - 再分開問電介面是重定時、傳送端重定時或線性，以及雷射整合在光引擎內還是放在外部；三個答案可以重新組合，不能濃縮成「CPO 對可插拔」。
-- 最後才追同一具名產品的互通、link budget、現場更換、可靠度、部署埠數與財務分母；標準存在或產品進入生產，都不能替後面幾關背書。
+- 最後才追同一具名產品的互通、link budget、現場更換、可靠度、部署埠數與財務分母；日月光已有第四季量產自述，客戶驗收與實際收入仍是另外兩關。[S24][C28][C29]
 
 ### 為什麼重要
 
@@ -873,7 +876,7 @@ evidence: sources:S15,S17
 - 再追同一組態的 link budget、跨供應商互通、故障率、現場更換時間、交換器數與連接埠數，並由平台端和供應商端對上同一版本、期間、驗收與出貨。
 - 看到「可在上電時更換」時，再追哪個模組被抽換、多少鏈路受影響、流量如何切換、誰能操作、用了哪些工具、花多久，以及換後 BER／FEC／link-flap 是否重新通過。
 - 看到「零 flap」時，先追埠數、每埠時長、交換器／光源共享結構、失效分類、事件日誌、設限與比較組，再決定能否套可靠度模型。
-- 最後追日月光投控是否拆出矽品相關產能、收入、毛利與現金流；其他台灣公司沒有具名文件前，維持研究候選。
+- 日月光量產自述之後，追公司是否拆出同一產品與期間的交付、收入、毛利與現金流；不把未具名的集團 CPO 說法全部歸給矽品或某一平台。T2 保留原條件及季度節奏，公司法說若先補件即提前核對；其他台灣公司沒有具名文件前，維持研究候選。[S24][C28][C29]
 
 ### 想一想
 
@@ -882,6 +885,16 @@ evidence: sources:S15,S17
 - 兩個產品都叫 CPO，但一個完整重定時、另一個走線性介面，它們的功耗與訊號驗收責任能直接比較嗎？
 - IA 已經發布，但廠商沒有公開同一應用的 link budget、互通矩陣與現場結果時，技術信心應該升到哪一層就停？
 - 100 萬 port-device-hours 沒有 link flap，為什麼仍不能寫成「失效率為零」或「MTBF 無限大」？
+
+## 日月光已談量產 下一步要核對實際交付與財務
+
+**證實的是管理層自述：** 10/29 法說逐字稿第 23 頁，日月光投控財務長表示 CPO 已在第四季開始量產，並預期延續至 2027 年。這使公司端證據由平台列名，前進到公司自己描述生產階段；原 T2 的「量產、客戶或收入」是擇一條件，因此量產分支已有新支持。[S24][C28]
+
+**推論仍要收斂：** 同份逐字稿第 19–21 頁不評論特定產品、客戶，也沒有拆出測試與基板相關服務各占多少收入。故不能把集團 CPO 量產直接綁到某個 NVIDIA 型號、全部歸給矽品，或從其他業務毛利率推算 CPO 獲利。[S24][C29] 公司對下一年收入的談話仍屬展望，本文不把它當成已認列數字，也不據此計算市場占有率或財務重要性。
+
+**待驗證的共同問題：** 同一產品何時交付、由誰驗收，哪個期間開始認列收入，以及收入增加後的毛利、折舊與現金流如何？新手可把它想成「工廠開始做貨」和「貨已交給客戶並收到相應收益」兩張不同收據。若後續公司撤回量產說法或客戶延後驗收，就要縮窄生產進度；若量產延續卻沒有可辨識財務，經濟受惠仍待證明。T2 的量產分支已獲支持，後續以季度法說及申報追新增內容，不把同一說法重算支持；2027/1/29 是研究檢視日，不是公司已承諾的發布日。[C28][C29]
+
+這次沒有刷新三軸主命題 C9 的舊證據日，也沒有替 NPO 量產背書：同份逐字稿對 NPO 的承接表述仍以出現實際需求為條件。想一想：為什麼管理層說「開始量產」值得調整圖譜，卻仍不足以把一家公司排成最受惠股票？[S24]
 
 ## 一個新案例把光引擎和外部雷射接進系統
 
@@ -1297,7 +1310,8 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 ## 這篇對公司判斷的用處與界線
 
 日月光投控是目前可追的台灣公司入口，因為 NVIDIA 直接列名旗下 SPIL 負責 CPO 晶片級封裝、
-組裝與測試；這能確認角色，卻沒有回答產品出貨量、產能利用、收入占比、毛利與資本回報。
+組裝與測試；公司 10/29 法說進一步自述第四季已開始 CPO 量產，卻沒有回答具名產品出貨量、
+產能利用、實際收入占比、毛利與資本回報，也不能把集團說法全部指定給 SPIL。[S24][C28][C29]
 頎邦與訊芯等既有研究候選沒有被本輪平台或可插拔文件列名，仍要依自己的正式文件補齊客戶、
 料號、驗收與財務證據。
 
@@ -1307,6 +1321,7 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 
 ## 來源與證據邊界
 
+- [日月光投控 2026 第三季法說逐字稿](https://media-aseholdco.todayir.com/20261102120005848469499_en.pdf)（S24；10/29 會議，第 19–21、23–24 頁；公司自述量產與未拆出的客戶／服務範圍，非獨立驗收）。
 - [緯穎、Ayar Labs 與 GUC：光學運算系統現場展示](https://www.wiwynn.com/news/wiwynn-ayar-labs-and-guc-advance-co-packaged-optics-with-live-demonstration-of-integrated-optical-compute-system-at-ocp-global-summit-2026)（S19；10/13 同一條合作公告鏈，非獨立驗收）。
 
 ### 新手查核：同一篇公告，不能共用一個「量產」主詞
@@ -1344,7 +1359,8 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 讓 port 與 module 分母不同。Broadcom／Meta 另新增一筆客戶高溫實驗室的
 累計 100 萬 port-device-hours／零 link-flap 觀測，但正確統計解讀仍需模型與底層分母。ITU 方法
 再確認 link budget 必須同時保存最小／最大发射、最小／最大 attenuation、sensitivity／overload、
-path penalty 與 BER，而不是用雷射輸出或架構標籤代替端到端驗收。
+path penalty 與 BER，而不是用雷射輸出或架構標籤代替端到端驗收。公司端則新增日月光投控
+10/29 法說的第四季 CPO 量產自述，限於這個階段，不代替具名交付與財務。[S24][C28]
 
 **還不知道：** 具名產品完整三軸組態、NPO／ELS 實際部署、應用 link budget、跨廠互通、
 共同 reference points／power quantity／inclusion map／兩端 margin、field replacement 與完整長期
@@ -1368,8 +1384,8 @@ direction: mixed
 hypothesis_refs:
 note_action: review_due
 action_due: 2026-08-26
-rationale: SPIL 被 NVIDIA 直接列為 CPO 封裝組裝測試夥伴；新 OIF 三軸框架要求再固定具名產品組態、互通與部署，並由日月光投控正式文件裁決量產收入與獲利。
-evidence_boundary: OIF framework／IA、平台 production 與生態系列名都不等於 3711 已有可量化新增訂單；不建立收入、市占或毛利事實，6147與6451僅保留在正文的既有 H# 複核清單。
+rationale: SPIL 被 NVIDIA 直接列為 CPO 封裝組裝測試夥伴；日月光10/29法說自述第四季已開始CPO量產，T2續追具名產品、交付、實際收入與獲利。
+evidence_boundary: 公司集團量產自述不等於同一NVIDIA型號、全部歸於SPIL、客戶獨立驗收或已知實際財務；不建立收入、市占或毛利事實，6147與6451僅保留在正文的既有 H# 複核清單。
 -->
 
 對 `serverodm` 僅新增具名系統整合的追蹤入口：緯穎參與聯合展示，沒有由展會角色推成
@@ -1393,7 +1409,7 @@ evidence_boundary: 一條聯合消息鏈只支持具名整合角色，不是獨�
 - **互通層**：3.2T CPO module、ELSFP 與應用 link budget 是否由多家產品在同一版本與條件下，以共同 reference points、mean／OMA／OSNR 定義、Tx／Rx limits、逐段 attenuation、path penalty、inclusion map、兩端 margin 與 raw BER 完成互通、故障注入、field replacement 與長期可靠度。
 - **可靠度層**：Meta ECOC 2025 完整論文或資料附錄能否補上 100 萬 port-device-hours 的埠數、各埠時長、共同故障群組、版本、所有事件與比較組；只有零 link-flap headline 不能估 field lifetime。
 - **平台層**：首批雲端採用者是否公布各三軸組態的交換器數、部署位置、可靠度、修復時間或節能實際值；若只停在 IA、展示或少量部署，量產解讀不升級。
-- **公司層**：3711 是否拆出光電共同封裝的收入／毛利；6147、6451 是否由送樣或小量生產轉為正式量產收入。沒有公司文件，就不把平台證據寫進正式筆記事實。
+- **公司層**：3711 已自述第四季 CPO 量產，下一步看同一產品的交付與實際收入／毛利；6147、6451 是否由送樣或小量生產轉為正式量產收入。平台證據和日月光說法不替其他公司補證，正式筆記仍須各自的 evidence pack 複核。[S24][C28][C29]
 - **經濟層**：新增封裝與測試內容量是否高於所需資本支出、良率爬坡與維修成本；若收入增加但毛利、現金流未改善，受惠只停在營收表面。
 
 <!-- research_source
@@ -1614,4 +1630,72 @@ from: triaged
 to: triaged
 reason: added_operator_cpo_reliability_denominators_with_cohort_and_event_boundaries_without_claiming_full_T5_trigger_or_refreshing_thesis_clock
 evidence: sources:S21,S22
+-->
+
+<!-- research_source
+source_id: S24
+role: management_commentary
+source_kind: document
+publisher: ASE Technology Holding
+title: Third Quarter 2026 Earnings Conference Transcript
+published_at: 2026-10-29
+captured_at: 2026-11-07
+accepted_at: 2026-11-07
+status: active
+url: https://media-aseholdco.todayir.com/20261102120005848469499_en.pdf
+locator: 27頁逐字稿，p1會議日10/29；pp19–21不評論具名客戶／產品及CPO測試與基板收入拆分，pp23–24 CFO第四季已開始量產及NPO有需求才承接；引用頁及相鄰頁已渲染核對；SHA256 6b56569d35fa65ca43eda40a1e6f9346fe32d3a5a5041aa2aaaf81c913d1610b；11/7由官方事件頁id22006的Transcript連結取得，檔名11/2不冒充已驗證首次公開日
+limitation: 單一公司管理層自述，不是客戶驗收或獨立工廠稽核；沒有具名產品、客戶、出貨量與實際收入／毛利拆分，不能將集團CPO全部歸於SPIL或某一平台；未使用幣別須另確認的口頭收入展望作量化財務，也不以NPO條件句證明量產
+independence_group: ase-technology-holding
+-->
+
+<!-- research_source
+source_id: S25
+role: company_release
+source_kind: living_index
+publisher: ASE Technology Holding
+title: ASE Investor Relations Events
+published_at:
+captured_at: 2026-11-07
+accepted_at: 2026-11-07
+status: active
+url: https://ir.aseglobal.com/html/ir_events.php
+locator: 2026Q3 Earnings Conference列與event id22006附件；後續季度法說、逐字稿及簡報入口
+limitation: 索引只定位文件；不能代替附件或公司產品驗收，不因重開網頁刷新證據日
+independence_group: ase-technology-holding
+-->
+
+<!-- research_claim
+claim_id: C28
+label: verified
+status: active
+claim: 日月光投控在2026-10-29法說自述CPO已於2026年第四季開始量產，並預期延續到2027年
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-10-29
+basis: 逐字稿p23 CFO回答開始量產的時點，封面鎖定2026年第三季法說；已發生的公司自述與2027年前瞻部分分開
+boundary: verified只確認官方說法，不是客戶驗收、具名產品出貨或實際財務；不自動指向NVIDIA某型號、SPIL全部收入、NPO量產或獨占性；不刷新C9主命題時鐘
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C29
+label: inference
+status: active
+claim: 日月光量產自述足以提升公司參與成熟度，但尚不足以把集團CPO對回具名產品或計算已實現財務貢獻
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-10-29
+basis: pp19–21未拆產品、客戶及測試／基板服務收入，p23對下一年仍使用展望語氣；生產、驗收與認列是不同條件
+boundary: 這是披露範圍的推論，不是否定量產、推斷沒有訂單或營收；未計算CPO收入占比、毛利、估值或投資受惠順位
+verification_needed: 同一產品／客戶與期間的出貨、驗收及實際收入毛利，再核對服務與子公司歸屬
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-07
+from: triaged
+to: triaged
+reason: added_ase_management_reported_cpo_production_and_official_watch_source_without_financial_attribution_or_thesis_clock_refresh
+evidence: sources:S24,S25
 -->

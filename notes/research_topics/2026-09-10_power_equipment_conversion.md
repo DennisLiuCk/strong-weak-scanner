@@ -56,9 +56,9 @@ evidence: sources:S1,S2,S3,S4
 
 ### 三句話抓重點
 
-- GE Vernova 在 2026 年第二季將 10 GW 既有燃氣設備預約轉成訂單，同季出貨 3 GW，需求已出現可追查的履約進度。
+- GE Vernova 第三季將13 GW既有燃氣設備預約轉成訂單，出貨5 GW；季末正式訂單與預約仍須分列。[S7/C9]
 - 公司說明，轉單要有包含管線與工程總包的明確時程；供電設備的研究因此要一起看工廠與施工現場。
-- 下一關是公司預期第三季提高季度產出能否兌現，並逐步補齊設備出貨、收入認列與客戶投運的對應。
+- 第三季出貨不直接等於第三季生產量；還要補上產出、客戶施工與投運的對應，不能只因同為5 GW就宣稱原產出計畫已驗收。[S4,S7/C6,C9]
 
 ### 為什麼重要
 
@@ -66,7 +66,7 @@ evidence: sources:S1,S2,S3,S4
 
 ### 接下來怎麼追
 
-- 公司 IR 目前列出 10 月 28 日第三季法說；本篇安排 10 月 31 日人工回查，核對季度產出與預約轉單進度。
+- 11/7已核第三季財報稿及逐字稿指定段落。下一輪按季度在2027/1/28核對第四季結果；此前若有具名管線或工程總包文件，提前補查原T1缺件。
 - 留意管線、工程總包及現場投運的說明，再把設備與服務收入分開看。
 
 ### 想一想
@@ -75,6 +75,20 @@ evidence: sources:S1,S2,S3,S4
 - 如果積壓訂單下降，同時出貨加快，這代表需求變弱，還是履約加速？
 
 ## 兩個等待中的存量，三種當季進度
+
+### 第三季更新：分開看帳面轉移與真正出貨
+
+[10/28財報稿第1頁](https://www.gevernova.com/sites/default/files/gev_webcast_pressrelease_10282026.pdf)
+列出新簽8 GW預約、3 GW訂單，另有13 GW既有預約轉單及5 GW出貨；季末正式訂單64 GW、預約58 GW。[S7/C9]
+
+可以用兩條簡單的帳面調節來讀：正式訂單為53＋3＋13－5＝64，預約為63＋8－13＝58，單位均為GW。
+**轉單**只是把已存在的承諾從一個欄位移到另一個欄位，不應再算成新增需求。公司數字為約數，這組相等不證明逐案取消與調整都不存在，也不提供轉換率。
+
+**待驗證的部分仍有兩個。** 前季計畫談的是「產出」，新稿列的是「出貨」，兩者未必來自同季製造；
+新[逐字稿第19頁](https://www.gevernova.com/sites/default/files/gev_webcast_transcript_10282026.pdf)說未見客戶融資問題拖慢轉單，也不是逐案管線及工程總包已準備好的驗收表。[S8/C10]
+想一想：若出貨增加來自前季庫存，能否證明本季工廠產能提升？若預約下降但訂單增加，是否一定是需求轉弱？
+
+### 第二季基線
 
 以下公司進度以 7 月 22 日披露為準；本次 9 月 10 日核對確認的是原文件內容，後續進展留待新一季資料驗證。
 
@@ -108,13 +122,13 @@ GE Vernova 管理層在[法說問答第 14 頁](https://www.gevernova.com/sites/
 
 這也提供反向判讀的空間：某季積壓訂單下降，若同時有交付加快，可能反映執行進度；現金流較弱，若主要來自付款節奏改變，也需要與需求轉弱分開研究。要做出這些判斷，應回到當季新增訂單、交付與營運資金說明，而不是只看一個存量或現金流標題。
 
-## 下一關在第三季，設備出貨之後還有現場
+## 設備出貨之後還有現場
 
 [7 月法說第 10 頁](https://www.gevernova.com/sites/default/files/gev_webcast_transcript_07222026.pdf)中，管理層預期從第三季開始，把季度產出由約 3 GW 提高到 5 GW，並明說這對應年化 20 GW。這是一項尚待季度結果驗證的產能計畫。對讀者而言，較有用的問題是新增能力是否真的反映到第三、四季產出，以及管線與施工準備能否繼續推動預約轉單。
 
 工廠交付之後，還有客戶現場。管理層在[法說第 15–16 頁](https://www.gevernova.com/sites/default/files/gev_webcast_transcript_07222026.pdf)舉例說明，航改型渦輪可以先提供過渡供電，大型機組的現場投運則需要更長時間。設備交期因而只是供電時程的一部分：要追資料中心何時可以使用電力，還得接上安裝、測試及正式運轉。這也解釋了為何同一波設備需求，會在不同年份形成交付與運轉成果。
 
-帶回機櫃電源與伺服器組裝研究，最有用的是把客戶的「場址可用電日期」列入交付訪談，再追設備進場與上線安排。本篇目前提供的是全球燃氣設備商的進度框架；哪一批轉單實際連到特定資料中心，以及其收入和投運時間，仍需要逐案文件補齊。10 月回查會先看公司已公開的同口徑欄位，再決定是否擴大研究。
+帶回機櫃電源與伺服器組裝研究，最有用的是把客戶的「場址可用電日期」列入交付訪談，再追設備進場與上線安排。本篇目前提供的是全球燃氣設備商的進度框架；哪一批轉單實際連到特定資料中心，以及其收入和投運時間，仍需要逐案文件補齊。11/7已補上Q3公司欄位，但尚未把工廠產出、客戶施工與投運接成同一條履約鏈。
 
 ## 主張與證據帳本
 
@@ -413,4 +427,66 @@ from: triaged
 to: triaged
 reason: reconcile_q3_contract_liability_stock_and_nine_month_revenue_recognition_without_project_attribution
 evidence: sources:S6
+-->
+
+<!-- research_source
+source_id: S7
+role: company_release
+source_kind: document
+publisher: GE Vernova
+title: GE Vernova reports strong third quarter 2026 financial performance raises 2026 guidance and increases share repurchase authorization
+published_at: 2026-10-28
+captured_at: 2026-11-07
+accepted_at: 2026-11-07
+status: active
+url: https://www.gevernova.com/sites/default/files/gev_webcast_pressrelease_10282026.pdf
+locator: PDF／印刷第1頁Power段及截至9/30季度標題；引用頁與相鄰第2頁已渲染核對；原檔SHA256 c3ae377a39aaa3bceb6a8b9e7d69522c6130ec8251e8d71ed3f18a8febadc4b5
+limitation: 全球Gas Power設備約數，出貨不等同當季生產；缺逐案轉單／出貨配對，不是台灣供應商營收證據
+independence_group: gevernova
+-->
+<!-- research_source
+source_id: S8
+role: management_commentary
+source_kind: document
+publisher: GE Vernova
+title: 3Q 2026 GE Vernova Earnings Conference Call and Acquisition of Trench Group
+published_at: 2026-10-28
+captured_at: 2026-11-07
+accepted_at: 2026-11-07
+status: active
+url: https://www.gevernova.com/sites/default/files/gev_webcast_transcript_10282026.pdf
+locator: PDF／印刷頁8的5 GW出貨及頁19的融資拖延問答；引用頁與前後頁已渲染；原檔SHA256 41be3842a87f9f1b87746f39e6fe4fb12f5b09d74aff5f4045a872a14db54daa
+limitation: 本輪只接納具名段落的管理層陳述，與財報稿同源；不替客戶逐案管線、工程總包或實際投運補證
+independence_group: gevernova
+-->
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: GE Vernova 2026Q3新簽8 GW燃氣設備預約及3 GW訂單，13 GW既有預約轉單、5 GW出貨；9/30正式訂單64 GW及預約58 GW，合計122 GW
+supporting_source_ids: S7,S8
+contrary_source_ids:
+as_of: 2026-10-28
+basis: 財報稿第1頁欄位及逐字稿頁8；53+3+13-5=64，63+8-13=58，64+58=122；表列值與獨立算術路徑一致
+boundary: 單公司Q3流量與9/30存量分列、GW約數；N=1披露非抽樣估計，標準誤與t統計不適用；轉單不是新增需求，不計轉換率，出貨不是當季產出或現場投運
+verification_needed:
+-->
+<!-- research_claim
+claim_id: C10
+label: verified
+status: active
+claim: GE Vernova管理層在10/28法說回答尚未看到客戶融資問題造成取消預約或轉單放緩，並稱取得設備的付款條件未變
+supporting_source_ids: S8
+contrary_source_ids:
+as_of: 2026-10-28
+basis: 頁19 David Arcaro問答，限定公司管理層當日觀察
+boundary: 不是獨立客戶信用審查，亦未提供同一專案的管線、工程總包、產出與投運共同鍵；不把未報融資拖延寫成所有施工條件已完成
+verification_needed:
+-->
+<!-- transition
+date: 2026-11-07
+from: triaged
+to: triaged
+reason: append_q3_reservation_order_shipment_rollforward_keep_output_and_site_readiness_unresolved
+evidence: sources:S7,S8
 -->
