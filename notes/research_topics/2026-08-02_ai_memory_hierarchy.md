@@ -1432,6 +1432,72 @@ reason: separated_reported_shipments_forecasts_capacity_lta_and_hbf_roadmap_with
 evidence: sources:S30
 -->
 
+<!-- research_source
+source_id: S32
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: Five Ways NVIDIA Co-Design Maximizes the Value of Every Byte in the AI Factory
+published_at: 2026-11-05
+captured_at: 2026-11-09
+accepted_at: 2026-11-09
+status: active
+url: https://developer.nvidia.com/blog/five-ways-nvidia-co-design-maximizes-the-value-of-every-byte-in-the-ai-factory/
+locator: 正文第3節KVCR、Guard及separate validation tests段，與第4、5節架構邊界交讀；不採頁首AI摘要。原HTML 321714 bytes，SHA256 b06c350031811382db4da95223ba6667f5505d50cc1f4ac789544e1cc1f25a71
+limitation: 同一NVIDIA公司來源鏈；只確認功能描述與條件，不採效能倍率，未取得固定release、原始故障紀錄或客戶驗收。各測試不是同一受測系統，不構成CMX部署或台廠財務證據
+independence_group: nvidia
+-->
+
+<!-- research_claim
+claim_id: C43
+label: verified
+status: active
+claim: NVIDIA描述KVCR追蹤配置層的快取並使用NIXL搬運，推論引擎仍管GPU記憶體與本機host卸載；Guard保留已提交的host快取跨引擎故障，前提是host及guard服務仍可用
+supporting_source_ids: S32
+contrary_source_ids:
+as_of: 2026-11-05
+basis: 正文第3節直接列出責任與存活條件
+boundary: 公司功能說明，不是本輪實測；不延伸為主機斷電、guard故障或所有未提交資料都可復原
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C44
+label: inference
+status: active
+claim: 同文H100儲存測試、Guard功能與Rubin／CMX架構應分開驗證，不能拼成同一套已完成客戶驗收的系統
+supporting_source_ids: S32
+contrary_source_ids:
+as_of: 2026-11-05
+basis: 第3節將VAST與WEKA結果明列為分開的驗證測試，後續段落另談Vera與CMX
+boundary: 受測範圍的研究推論；未重算或轉載效能點估計，不代表上述產品無效，也不構成C8主命題的新驗證
+verification_needed: 同一客戶、固定軟硬體版本、資料路徑與故障條件的原始結果及驗收
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T12
+status: active
+claim_ids: C43,C44
+metric: KVCR與Guard的固定版本、已提交資料範圍及引擎／guard／host三類故障的快取復原與服務結果
+source_ids: S32
+watch_source_ids: S32,S5
+frequency: event_driven
+frequency_detail: 11/23為兩週工作回查日而非公司承諾；正式release、勘誤或具名故障測試先出則提前核對
+next_check: 2026-11-23
+trigger: 具名operator提供固定版本及資料共同鍵，且分開引擎、guard、host故障，公開已提交與未提交資料的讀回驗證、重算量、TTFT/ITL/goodput/errors及復原成本
+invalidation: 官方修訂存活前提、責任邊界，或同條件故障測試出現遺失／錯讀／服務退步時縮窄對應主張；網址失效或未公開測試不當作功能取消
+-->
+
+<!-- transition
+date: 2026-11-09
+from: triaged
+to: triaged
+reason: bounded_kvcr_guard_failure_scope_and_separate_test_systems_without_thesis_clock_refresh
+evidence: sources:S32
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -1464,6 +1530,7 @@ evidence: sources:S30
 - **中央處理器記憶體模組（SOCAMM）**：以低功耗 DRAM 做成的可維護模組，放在 CPU 系統記憶體一側，重點偏向容量、功耗與機架密度。
 - **第二代 SOCAMM（SOCAMM2）**：一個包含不同容量型號的產品家族。Micron 明列 192GB 已量產，較早的 256GB 公告則只到客戶送樣；家族名稱本身不能替每個容量決定成熟度。
 - **鍵值快取（KV cache）**：模型推論時保存先前文字片段的中間結果，避免每一步都重新計算全部上下文。
+- **KVCR／Guard**：前者是快取追蹤與搬運元件，後者保護指定故障下的快取；都是軟體名稱，不是新一代記憶體晶片。
 - **上下文視窗（context window）**：這一次模型呼叫可以直接看見的 token 範圍；把內容放進視窗不代表它會跨 session 永久保存。
 - **Agent 持久／共享狀態（persistent／shared agent state）**：把進度、決策、工具結果或交接產物留在檔案、資料庫或物件中，讓下一次 invocation、下一個 session 或另一個 agent 能接續；它不是 KV cache 的同義詞。
 - **冪等與去重（idempotency／deduplication）**：同一工作被重試或重複看見時，避免產生兩份互相衝突的結果；資料已可見不代表系統自動只處理一次。
@@ -1537,6 +1604,7 @@ evidence: sources:S30
 
 ### 想一想
 
+- 引擎重啟後能取回快取，是否代表整台主機斷電也能？你還會要求哪種故障與讀回測試？
 - 如果把一份可以重新建立的暫存資料移到較遠的位置，省下的會是近端空間、設備成本，還是運算等待時間？需要哪些不同數據驗證？
 - 如果中央處理器旁的系統記憶體出貨成長，圖形運算晶片旁的高速記憶體也同步成長，這代表互相替代，還是平台把資料分配到不同位置？
 
@@ -1883,6 +1951,23 @@ reference architecture，不是 production workload 隨機樣本；具名客戶�
 若拿不出同一產品與期間的證據，就先停在原來那一格。T10追出貨與展望，T11追長約拆分；
 新增教材不解除既有分層主命題的過期狀態。
 
+## 快取能跨引擎故障，不等於能跨主機斷電
+
+**證實：**NVIDIA 11/5文件描述KVCR的搬運分工，以及Guard在主機與服務仍存活時保留已提交快取的能力。[C43]
+**推論：**不能把這個條件縮成「永不丟資料」，也不能把文中不同H100測試套到Rubin／CMX。[C44]
+**待驗證：**固定版本、資料共同鍵與原始故障紀錄；T12追這一窄問題，不替原T3／T5／T7的完整部署條件過關。
+
+可以用一個假想櫃檯理解：櫃員暫時離席，留在櫃檯上的已收件資料可能仍在；但整個櫃檯毀損，
+是另一種事件。這只是辨認故障邊界的比喻，不是實驗結果。「誰故障、誰還活著、哪份資料已完成交接」
+三個問題，缺一個就可能高估保障範圍。
+
+下一份測試應先固定軟硬體版本及基準，再分別中斷引擎、守護服務與主機，核對重啟後讀回的是不是
+同一份已提交內容。還要保留未完成寫入、錯誤、逾時及需要重算的請求，不能只挑成功讀回的案例。
+即使正確讀回，也要同看使用者等待、復原成本與故障後容量；「資料仍在」與「服務沒有退步」不是同一句話。
+
+這項教材的重要性在於讓可靠度主張可被反駁，不是預測新增記憶體需求。本輪沒有執行故障注入、
+沒有獨立客戶驗收，也沒有可報的實測樣本或SE／t；主命題C8的證據日期、過期狀態及公司線不變。
+
 ## 在研究中心裡接著怎麼學
 
 - 先讀本篇建立「資料層 × 資料處理 × 連接 × 搬運 × 決策」框架。
@@ -1942,6 +2027,7 @@ S22 的頁面日期早於 C8 所依據的 2026-08-12 五角色資料路徑證據
 
 ## 來源與證據邊界
 
+- [NVIDIA記憶體共同設計與KVCR／Guard](https://developer.nvidia.com/blog/five-ways-nvidia-co-design-maximizes-the-value-of-every-byte-in-the-ai-factory/)（S32；11/5正文功能與故障前提，H100個別測試不移植為Rubin／CMX結果）。
 - [NVIDIA Vera Rubin architecture](https://developer.nvidia.com/blog/inside-the-nvidia-rubin-platform-six-new-chips-one-ai-supercomputer/)（HBM、SOCAMM 與 CXL 版本）。
 - [NVIDIA CMX context memory](https://developer.nvidia.com/blog/introducing-nvidia-bluefield-4-powered-inference-context-memory-storage-platform-for-the-next-frontier-of-ai/)（G1–G4／G3.5 分層）。
 - [Micron 256GB SOCAMM2](https://investors.micron.com/news-releases/news-release-details/meiguangtuichuquanqiushoukuangaorongliang256gb-lpdram)（customer sampling 與內部測試邊界）。

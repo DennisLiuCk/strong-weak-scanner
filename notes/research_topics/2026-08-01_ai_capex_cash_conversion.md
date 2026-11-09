@@ -1280,6 +1280,244 @@ S&P 也關注債務、租賃、合資及殘值保證。對 ODM、PCB、電源與
 | 承諾與履行 | 債務、未起租租約與保證的到期、觸發及實付；同一義務不要重複加總 |
 | 變現與歸因 | 相同期間的收入與回收；台廠的具名產品、出貨、毛利及收款證據 |
 
+<!-- research_source
+source_id: S25
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: Microsoft FY2027 Q1 earnings release
+published_at: 2026-10-28
+captured_at: 2026-11-09
+accepted_at: 2026-11-09
+status: active
+url: https://www.microsoft.com/en-us/investor/earnings/fy-2027-q1/press-release-webcast
+locator: Cash Flows Statements，三個月截至2026/9/30，單位百萬美元；營業現金58000與設備購置39367
+limitation: 公司總額不是AI設備批次回收，也沒有台灣供應商對應
+independence_group: microsoft
+-->
+
+<!-- research_source
+source_id: S26
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: Microsoft FY2027 Q1 earnings call
+published_at: 2026-10-28
+captured_at: 2026-11-09
+accepted_at: 2026-11-09
+status: active
+url: https://www.microsoft.com/en-us/investor/events/fy-2027/earnings-fy-2027-q1
+locator: Amy Hood prepared remarks的CapEx45.2、finance leases7.4、cash PP&E39.4、FCF18.6；皆十億美元
+limitation: 管理層約數與10-Q租賃欄位未提供完整調節，不能擅自相加或指定差額成因；全年正FCF仍是展望
+independence_group: microsoft
+-->
+
+<!-- research_source
+source_id: S27
+role: company_filing
+source_kind: document
+publisher: Microsoft
+title: Microsoft FY2027 Q1 Form 10-Q
+published_at: 2026-10-28
+captured_at: 2026-11-09
+accepted_at: 2026-11-09
+status: active
+url: https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm
+locator: Note12 pp21–22，三個月截至9/30：finance ROU obtained5192、finance lease financing cash1000，單位百萬美元；期末not-yet-commenced leases364.6十億美元
+limitation: 取得使用權資產與法說finance leases非已證明同定義；未起租是期末額外租賃，不是當季現金付款；未取得完整headline橋接
+independence_group: microsoft
+-->
+
+<!-- research_source
+source_id: S28
+role: company_release
+source_kind: document
+publisher: Meta Platforms
+title: Meta third-quarter 2026 results
+published_at: 2026-10-21
+captured_at: 2026-11-09
+accepted_at: 2026-11-09
+status: active
+url: https://investor.atmeta.com/investor-news/press-release-details/2026/Meta-Reports-Third-Quarter-2026-Results/default.aspx
+locator: Reconciliation of GAAP to Non-GAAP Results的三個月截至9/30：32786-33942-964=-2120，單位百萬美元
+limitation: 公司公式扣融資租賃本金，不能當作其他公司同定義或AI專屬現金流
+independence_group: meta
+-->
+
+<!-- research_source
+source_id: S29
+role: company_release
+source_kind: document
+publisher: Amazon
+title: Amazon third-quarter 2026 results
+published_at: 2026-10-29
+captured_at: 2026-11-09
+accepted_at: 2026-11-09
+status: active
+url: https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Third-Quarter-Results/default.aspx
+locator: Consolidated Statements of Cash Flows，三個月截至9/30的2026欄：OCF42422、PP&E purchases77259、sales/incentives1381，單位百萬美元
+limitation: 本文由單季表重算，不使用新聞標題TTM負42.4十億美元作單季；公司公式不另扣融資租賃本金，不能評比AI投資報酬
+independence_group: amazon
+-->
+
+<!-- research_claim
+claim_id: C32
+label: verified
+status: active
+claim: 截至2026/9/30同一季度，Microsoft營業現金58000減設備購置39367為18633；Meta32786減33942及租賃本金964為負2120；Amazon42422減77259加出售及獎勵金1381為負33456，均百萬美元
+supporting_source_ids: S25,S28,S29
+contrary_source_ids:
+as_of: 2026-10-29
+basis: 三份公司原表逐欄核對2026單季列，以整數及Decimal兩路重算；Microsoft結果對法說18.6十億美元約數，Amazon值為本研究衍生單季數
+boundary: 這是三個不同公司公式的確定性重算，不是可直接排名的AI ROI；N為3家公司文件而非獨立統計樣本，SE不適用
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C33
+label: inference
+status: active
+claim: 三家公司新季資料已能對齊2026年7至9月，但租賃本金與出售及獎勵金的扣除公式仍不同，尚不能直接排名現金回收效率
+supporting_source_ids: S25,S28,S29
+contrary_source_ids:
+as_of: 2026-10-29
+basis: 同期間排除了TTM混季問題，但Microsoft的OCF減cash PP&E、Meta另扣本金、Amazon加回出售及獎勵金仍非相同定義
+boundary: 期間正規化不等同會計分類正規化，也不證實任何台灣供應商收入
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C34
+label: verified
+status: active
+claim: Microsoft同季法說列CapEx45.2、finance leases7.4及cash PP&E39.4十億美元；10-Q另列finance ROU取得5.192及融資租賃本金現金1.000十億美元，期末未起租額外租賃364.6十億美元
+supporting_source_ids: S26,S27
+contrary_source_ids:
+as_of: 2026-10-28
+basis: 逐字保留法說與Note12各欄定義及單位，不以同名租賃字串認定口徑相同
+boundary: 各數字可定位不等於已可相加；7.4與5.192差異及headline調節未取得，不擅稱錯誤或重編；未起租非已付款
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C35
+label: unverified
+status: active
+claim: Microsoft法說資本支出、租賃數字與當期10-Q租賃資產及付款之間尚待可重算的逐項橋接
+supporting_source_ids: S26,S27
+contrary_source_ids:
+as_of: 2026-10-28
+basis: 法說39.4+7.4為46.8而非45.2；此算術只揭示不能直接相加，不決定各項定義或差額成因
+boundary: 不得用本研究自行補一個調整項，也不把公司全文沒有披露當成已做完的窮盡證明
+verification_needed: 同一版本逐項調節與分類定義
+resolution:
+-->
+
+<!-- metric_comparison
+comparison_id: M4
+observation_id: M4-O1
+claim_id: C33
+entity: Microsoft
+metric: company-specific quarterly free cash flow
+reported_value: 18633
+period_start: 2026-07-01
+period_end: 2026-09-30
+period_basis: calendar-aligned quarter
+unit: USD million
+definition_key: q3_2026_company_fcf_1
+definition: 營業現金流減cash PP&E；不另扣融資租賃本金
+evidence_ids: S25
+comparability: not_comparable
+comparability_reason: 同季仍有租賃本金與出售及獎勵金公式差異；無同批AI資產回收分母
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M4
+observation_id: M4-O2
+claim_id: C33
+entity: Meta Platforms
+metric: company-specific quarterly free cash flow
+reported_value: -2120
+period_start: 2026-07-01
+period_end: 2026-09-30
+period_basis: calendar-aligned quarter
+unit: USD million
+definition_key: q3_2026_company_fcf_2
+definition: 營業現金流減cash PP&E及融資租賃本金
+evidence_ids: S28
+comparability: not_comparable
+comparability_reason: 同季仍有租賃本金與出售及獎勵金公式差異；無同批AI資產回收分母
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- metric_comparison
+comparison_id: M4
+observation_id: M4-O3
+claim_id: C33
+entity: Amazon
+metric: company-specific quarterly free cash flow
+reported_value: -33456
+period_start: 2026-07-01
+period_end: 2026-09-30
+period_basis: calendar-aligned quarter
+unit: USD million
+definition_key: q3_2026_company_fcf_3
+definition: 單季營業現金流減PP&E購置加出售及獎勵金；非TTM
+evidence_ids: S29
+comparability: not_comparable
+comparability_reason: 同季仍有租賃本金與出售及獎勵金公式差異；無同批AI資產回收分母
+normalization_method:
+normalized_value:
+normalized_unit:
+-->
+
+<!-- transition
+date: 2026-11-09
+from: triaged
+to: triaged
+reason: aligned_new_quarter_cash_formulas_and_preserved_unreconciled_lease_fields_without_thesis_clock_refresh
+evidence: sources:S25,S26,S27,S28,S29
+-->
+
+## 11 月 9 日回查：同一季也不代表同一種自由現金流
+
+**先把期間對齊，再看公式。** 本輪取得三家公司截至 2026 年 9 月底的季度資料。
+Microsoft 是會計年度 2027 第一季，Meta 與 Amazon 是曆年第三季，三者都涵蓋 7–9 月。
+下面不拿 Amazon 新聞標題的過去十二個月數字混入單季，也不據此評比 AI 投資報酬。[S25–S29]
+跨公司可比性帳本 M4 逐項保存同季期間、單位與不同公式。
+
+| 公司與單季範圍 | 營業現金流（百萬美元） | 設備現金購置與其他調節（百萬美元） | 依各自公式的結果（百萬美元） |
+| --- | ---: | --- | ---: |
+| Microsoft，2026/7–9 | 58,000 | 減設備購置 39,367 | 18,633 |
+| Meta，2026/7–9 | 32,786 | 減設備購置 33,942，再減融資租賃本金 964 | −2,120 |
+| Amazon，2026/7–9 | 42,422 | 減設備購置 77,259，加出售與獎勵金 1,381 | −33,456 |
+
+**日期相同，扣除項目仍不同。** Microsoft 的上述差額能對上法說約 186 億美元，Meta 能
+對上公司已列的自由現金流；Amazon 這一格是用單季表重算，不是新聞標題的十二個月值。
+這是三家公司報表內的確定性算術，並非抽樣估計，沒有可合理填入的標準誤。
+若要比較，還須逐一統一租賃本金、出售與獎勵金等分類；目前判定仍為不可直接排名。
+
+**同一公司的兩份官方文件，也可能尚未接成一張表。** Microsoft 法說報資本支出
+452 億美元、融資租賃 74 億美元、設備現金 394 億美元；不能把後兩項相加硬湊前者。
+其季報租賃附註另列換取融資租賃義務的使用權資產 51.92 億美元、租賃本金現金
+10 億美元，以及尚未起租的額外租賃 3,646 億美元。這些各自描述不同事件；公開材料尚未
+在本輪核對範圍內提供把法說租賃數字與附註完整對上的逐項調節。[S25–S27]
+
+先記住：存量承諾、取得資產與當季付款不是同一筆錢。這張表只把季度和公司公式攤開。
+它不能證明同一批 AI 設備的回收速度，更不能把雲端公司的支出配給某一家台灣供應商。
+
+接下來先追 Microsoft 同期資本支出與租賃調節，另查 Meta、Amazon 當季新增租賃及本金的
+完整橋接。思考題：如果只把某公司公式多扣的一項加回，排名會變；這是在改變營運結果，
+還是在改變尺？本輪只接納新季財務旁支，不把原主命題的到期日往後移。
+
 ## 三家公司要先按各自口徑讀
 
 單位為十億美元；微軟與 Meta 是截至 2026-06-30 的**單季**，Amazon 的 OCF／淨 PP&E／FCF 是截至同日的**過去十二個月（TTM）**。這張表刻意不做橫向排名。CapEx／PP&E、OCF、公司自訂 FCF 分別對應比較帳本 `M1`、`M2`、`M3`。
@@ -1650,6 +1888,13 @@ Microsoft 的 684 RPO 與 Amazon 的 496 AWS 未來服務承諾也不是本期�
 另外兩家公司在 2025 年對伺服器／網路設備做了方向相反的耐用年限調整。Meta 把多數此類資產延長至 5.5 年，並揭露當年折舊少 29.2 億美元、淨利多 25.9 億美元；Amazon 則因 AI／ML 技術迭代加快，把部分設備由 6 年縮到 5 年，揭露 2025 年折舊多 14 億美元、淨利少 10 億美元，主要影響 AWS。微軟調的是資料中心與辦公**建物**，Meta／Amazon 調的是多數或部分**伺服器與網路設備**，資產範圍不同；不能據此把任一家公司貼成「較保守」或直接比較 AI ROI。
 
 ## 來源與證據邊界
+
+11/9 補件來源：Microsoft [新季財務表](https://www.microsoft.com/en-us/investor/earnings/fy-2027-q1/press-release-webcast)、
+[法說](https://www.microsoft.com/en-us/investor/events/fy-2027/earnings-fy-2027-q1)與
+[10-Q 租賃附註](https://www.sec.gov/Archives/edgar/data/789019/000119312526436133/msft-20260930.htm)，
+Meta [第三季財報稿](https://investor.atmeta.com/investor-news/press-release-details/2026/Meta-Reports-Third-Quarter-2026-Results/default.aspx)，
+Amazon [第三季財報稿](https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Third-Quarter-Results/default.aspx)。
+公司申報與同公司的法說不是兩條獨立經濟來源；上述只是文件與算術查核，不是正式筆記的獨立簽核。
 
 - [Microsoft FY2026 Q4 earnings call，2026-07-29](https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q4)
 - [Meta 2026 Q2 results，2026-07-29](https://investor.atmeta.com/investor-news/press-release-details/2026/Meta-Reports-Second-Quarter-2026-Results/default.aspx)

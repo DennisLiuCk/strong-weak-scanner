@@ -9,6 +9,9 @@
 10/8 依 FCSA 1.1.0 RC0 增加受限啟動與維修權限交接兩條產業關係，只表示候選規格
 描述的設計條件；原 Alpha 關係保留其版本與到期狀態，不升格公司曝險或財務材料性。
 
+11/9 已取得 FCSA 1.1.0 正式版，另加版本與安全角色分工的產業關係；舊版關係保留歷史，
+新線仍只到架構能力，不代表非 Arm 實作、共同測試或財務受惠。
+
 <!-- knowledge_graph_meta
 schema_version: 1
 graph_id: chiplet-design-handoff-contracts
@@ -77,6 +80,26 @@ review_due: 2026-08-24
 status: active
 boundary: FCSA 1.0.0 定義 system topology chiplet type interface requirement 與 compliance level；不背書 CDXML 3DK tool import 或製造資格。
 next_trigger: 非 Arm 實作公開固定 FCSA version level test suite 與可重現通過結果。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-CDH-I20
+view: industry
+from_id: concept:chiplet-design-handoff
+to_id: standard:fcsa
+relation: includes
+claim_refs: MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C29,MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS#C30
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: unknown
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-11-09
+review_due: 2026-11-23
+status: active
+boundary: 正式FCSA 1.1.0只支持指定頁的版次與安全角色分工 不代表共同測試 非Arm產品 客戶資格 量產或財務；舊版不新增獨立來源鏈。
+next_trigger: 非Arm具名產品固定FCSA版本並公開本地證據 額外安全服務 系統決策的責任映射與可重現測試。
 -->
 
 <!-- knowledge_edge

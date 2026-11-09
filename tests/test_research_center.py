@@ -6273,12 +6273,20 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("transition", 7),
-            ("research_source", 18), ("research_claim", 28),
-            ("metric_comparison", 0), ("impact", 3),
-            ("monitoring_item", 5),
+            ("research_topic", 1), ("metric_comparison", 0), ("impact", 3),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        self.assertGreaterEqual(topic.count("<!-- transition"), 7)
+        # Preserve historical evidence exactly once without freezing future additions.
+        for block, field, prefix, historical_count in (
+            ("research_source", "source_id", "S", 18),
+            ("research_claim", "claim_id", "C", 28),
+            ("monitoring_item", "monitor_id", "T", 5),
+        ):
+            ids = re.findall(r"^" + field + r": (" + prefix + r"\d+)$", topic, re.M)
+            self.assertEqual(len(ids), topic.count(f"<!-- {block}"))
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, historical_count + 1)} <= set(ids))
 
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
@@ -6332,7 +6340,10 @@ process.stdout.write(JSON.stringify(results));
             "to_id: process:chiplet-rma-authority-boundary",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 20)
+        edge_ids = re.findall(r"^edge_id: (KG-CDH-[CI]\d+)$", graph, re.M)
+        self.assertEqual(len(edge_ids), graph.count("<!-- knowledge_edge"))
+        self.assertEqual(len(edge_ids), len(set(edge_ids)))
+        self.assertTrue({"KG-CDH-C01", *[f"KG-CDH-I{i:02d}" for i in range(1, 20)]} <= set(edge_ids))
 
         scans = (
             ROOT / "notes" / "research_topics" / "scan_log.csv"
@@ -8479,11 +8490,15 @@ process.stdout.write(JSON.stringify(results));
             ("research_claim", 27), ("metric_comparison", 9),
             ("impact", 4), ("monitoring_item", 5), ("transition", 11),
         ):
-            if block in {"research_source", "research_claim", "monitoring_item", "transition"}:
+            if block in {"research_source", "research_claim", "metric_comparison", "monitoring_item", "transition"}:
                 # Keep historical evidence while allowing later append-only research.
                 self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
             else:
                 self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        observation_ids = re.findall(r"^observation_id: (M\d+-O\d+)$", topic, re.M)
+        self.assertEqual(len(observation_ids), topic.count("<!-- metric_comparison"))
+        self.assertEqual(len(observation_ids), len(set(observation_ids)))
+        self.assertTrue({f"M{m}-O{o}" for m in range(1, 4) for o in range(1, 4)} <= set(observation_ids))
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"
@@ -9520,11 +9535,18 @@ process.stdout.write(JSON.stringify(results));
         ):
             self.assertIn(contract, topic)
         for block, expected in (
-            ("research_topic", 1), ("research_source", 5),
-            ("research_claim", 13), ("metric_comparison", 0),
+            ("research_topic", 1), ("metric_comparison", 0),
             ("impact", 1), ("monitoring_item", 6),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for block, field, prefix, historical_count in (
+            ("research_source", "source_id", "S", 5),
+            ("research_claim", "claim_id", "C", 13),
+        ):
+            ids = re.findall(r"^" + field + r": (" + prefix + r"\d+)$", topic, re.M)
+            self.assertEqual(len(ids), topic.count(f"<!-- {block}"))
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, historical_count + 1)} <= set(ids))
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"

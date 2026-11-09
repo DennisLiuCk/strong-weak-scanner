@@ -74,6 +74,13 @@ to: triaged
 reason: added_rc0_restricted_bootstrap_and_rma_boundaries_and_repaired_fcsa_watch_route_without_thesis_clock_refresh
 evidence: sources:S17,S18
 -->
+<!-- transition
+date: 2026-11-09
+from: triaged
+to: triaged
+reason: added_fcsa_110_release_and_security_role_boundary_preserving_rc0_history_and_original_and_monitors_without_thesis_clock_refresh
+evidence: sources:S19
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -124,7 +131,8 @@ evidence: sources:S17,S18
 - **DankaChiplet**：Thrace 的 3D-IC 架構工具；本篇只引用其 CDXML 產品自述，不把它當成跨工具測試。
 - **Python**：本輪用來執行唯讀解析檢查的程式語言；版本與套件已記在稽核方法，方便重現結果。
 - **Alpha／Beta／Release**：規格成熟度階段；Alpha 可含明確規則，也可以公開發行，但仍在早期審閱，不能等同正式穩定的合規基線。
-- **候選版（RC）**：準備定稿但仍待審閱的版本；本文取得的是 FCSA 1.1.0 RC0，不能省略後綴當成已定稿的 1.1.0。
+- **候選版（RC）**：準備定稿但仍待審閱的版本；本文保留 10/8 取得的 FCSA 1.1.0 RC0，再另列 11/9 取得的正式版，不能省略後綴把兩份文件混為一份。
+- **次要晶粒信任根（Secondary Chiplet RoT）**：非主要晶粒可選的額外安全服務角色；它可協助本地安全工作，但不代替系統信任根決定整套安全平台是否成立。
 - **受限啟動**：系統先留在政策允許的有限功能狀態，等必要的安全評估成功後，才建立完整信任域。
 - **維修退回（RMA）**：把產品退回診斷或處理；開放除錯前，仍須處理上一位使用者的資料、憑證與權限。
 - **信任根（Root of Trust，RoT）**：負責保護身分、量測或安全決策的最小可信基礎；不是一句「有安全功能」的行銷名稱。
@@ -154,7 +162,7 @@ evidence: sources:S17,S18
 ### 三句話抓重點
 
 - 小晶片能用共同介面傳資料，只證明連線契約的一部分；系統角色、設計資料與合規流程仍要另外交接。
-- FCSA 1.0 已有正式架構與分級，1.1 則進入候選版；規格、安全程序、設計資料與客戶驗收仍是不同關卡。
+- FCSA 1.1 已取得正式版，但規格定稿、安全程序、設計資料與客戶驗收仍是不同關卡。
 - 所以目前可建立責任與驗證階梯，不能直接推成跨廠隨插即用、封測訂單、設備需求或任何台灣公司的收入。
 
 ### 為什麼重要
@@ -171,6 +179,7 @@ evidence: sources:S17,S18
 ### 接下來怎麼追
 
 - 先追 FCSA 新版本、實作清單與公開測試套件，確認符合性等級是否有獨立產品通過。
+- 已有正式版後，核對誰提供晶粒證據、誰提供額外安全服務、誰作系統放行決策；還要把這些責任對到同一產品的實測。
 - 對照候選版的受限啟動與維修退回條件，找同一產品的失敗測試、隔離紀錄及重新授權結果，不能只看正常開機成功。
 - 再追 CDXML／3DK 是否發布固定版本、完整範例與可執行 validator，四份 XSD 都要能解析與編譯。
 - 接著找兩套獨立 EDA 工具匯入同一資料包，核對單位、版本、錯誤位置與通過結果是否一致。
@@ -182,6 +191,7 @@ evidence: sources:S17,S18
 - 同一份檔案能在一套工具開啟，另一套工具卻讀不到，問題在格式、版本、資料或工具哪一層？
 - 聯盟成員很多，卻沒有共同測試輸入與通過紀錄時，能用成員數判斷商業成熟度嗎？
 - 如果外部驗證服務尚未就緒，或產品正交給維修人員，之前的安全通過結果還能授權哪些動作？
+- 規格定稿與產品通過之間，還缺哪份可以重做的測試紀錄？
 
 ## 主張與證據帳本
 
@@ -832,6 +842,63 @@ rate。本輪是 `N=2` 份官方紀錄、`N=2` 條發布消息鏈，兩份都涉
 產品 qualification、production 與財務共同觀測均為 `N=0`。這些是文件紀錄而非抽樣估計，
 因此 sampling SE／t 不適用。
 
+## 正式版已到，下一關是誰真的照它做
+
+**這次跨過的是文件關卡。** 11/9 取得的 FCSA 1.1.0 正式文件，其版本表記錄發布日為
+10/9。它不再帶 RC0 後綴；但「規格定稿」仍不是「產品通過」。（C29）
+
+**三種角色不能混成一張通行證。** 正式版安全章把晶粒內的最小證據根、可選的額外安全服務，
+以及系統級的組合判定分開。次要晶粒可以協助處理本地安全工作，卻不負責決定整套安全平台成立。
+這讓買方知道要向誰要證據、向誰追問放行責任，而不是只數產品有幾個安全功能。（C30）
+
+**下一份要找的是同產品測試。** 下表只把版本與角色分工轉成查核順序，不表示實作已通過。
+想像兩家供應商各交出晶粒，買方仍須固定晶粒清單、韌體版本與測試條件，再核對本地證據如何
+進入同一次系統判定；只展示各自開機，不能替代組合後的測試。
+
+| 本輪看到的進展 | 對讀者的意義 | 下一關仍要什麼 |
+|---|---|---|
+| 正式 1.1.0 文件 | 不再把目前最新取得版本寫成 RC0 | 指定產品引用的版本與測試套件 |
+| 三種安全角色分工 | 分清提供證據、額外服務與系統放行 | 同一產品的責任映射與可重現結果 |
+| 舊 RC0 與 Alpha 紀錄保留 | 能回看每次研究實際讀過哪一版 | 不把版本累積當成多個獨立實作 |
+
+本輪只核對一份規格的指定頁，不宣稱完成 RC0 到正式版的全篇差異審查，也不宣稱上述角色首次
+出現於正式版。它與舊版同屬 OCP 規格消息鏈。原 T1、T5 還要求非 Arm 具名實作、共同測試與
+跨廠資格；文件定稿沒有讓這些條件自動成立。主命題 C7、可信度與證據時鐘均維持原值。
+
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: 2026-11-09 取得的 FCSA 固定文件封面為 1.1.0，版本表列 2026-10-09 Release of 1.1.0，已不是 1.1.0 RC0 候選文件
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-11-09
+basis: PDF 封面 p.1 與版本表 p.7 逐項核對版號、後綴與發布日；回查日不冒充發布日
+boundary: 只證實正式文件存在，不證明共同測試套件、非 Arm 實作、客戶資格、量產或財務；C26 保留為當時取得 RC0 的歷史事實，不構成反證或錯誤更正
+verification_needed: 同一具名產品的固定規格、測試套件、輸入與可重現通過結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: FCSA 1.1.0 安全章區分提供晶粒本地證據的 CRoT-A、非主要晶粒可選的 Secondary Chiplet RoT 額外安全服務，以及 System RoT 的系統組合決策；Secondary Chiplet RoT 不負責系統身分、系統證明或建立 Security Platform 的決定
+supporting_source_ids: S19
+contrary_source_ids:
+as_of: 2026-11-09
+basis: PDF p.166（印刷152）§9.1.4.2–9.1.4.4 的角色與不負責事項，引用頁及相鄰頁保留供複核
+boundary: 抽象架構分工，不是具名晶粒的安全資格或現場測試；未完成全版差異，不宣稱正式版首次新增此角色，不把安全章全部文字當成規範性 Rule
+verification_needed: 同一產品固定版本的角色映射、證據輸入、系統決策與失敗處置測試
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 候選版要追兩個失敗場景
 
 **先辨認版本，再談通過。** 10/8 取得的固定文件是 FCSA 1.1.0 RC0，版本表日期為
@@ -1436,6 +1503,22 @@ status: active
 url: https://www.opencompute.org/projects/server/open-chiplet-economy/foundation-chiplet-system-architecture/
 locator: 10/8搜尋服務可讀的官方頁索引仍列1.1.0 RC0為For review、發布欄9/14；原wiki與index.php入口均轉向Server總頁，新的具名工作流URL已定位
 limitation: 本輪新頁直接讀取失敗且HTTP為403，版本表僅見搜尋索引，不聲稱完整即時頁已核驗；用作下輪取件入口，文件內容以S17固定PDF為準，頁面會變動且不證明產品合格
+-->
+
+<!-- research_source
+source_id: S19
+role: standard
+source_kind: document
+publisher: Open Compute Project Foundation / Arm Ltd. / Secure-IC
+independence_group: ocp-fcsa-standard
+title: Foundation Chiplet System Architecture 1.1.0
+published_at: 2026-10-09
+captured_at: 2026-11-09
+accepted_at: 2026-11-09
+status: active
+url: https://www.opencompute.org/wp-content/uploads/2026/10/FCSA-1.1.0.pdf
+locator: 固定 PDF 共204頁；封面p.1、版本表p.7（09 Oct 26／1.1.0／Release）、p.166（印刷152）§9.1.4.2–9.1.4.4；SHA-256 789feb5ecb1b4c23e2128b8fa48a2f7009abee586bbc418302d97a4337869846；下載HTTP 200並渲染引用頁及相鄰頁，版本表與角色頁目視核對
+limitation: 只核指定頁的正式版與角色分工，不是全篇RC0差異審查、獨立實作、共同測試套件、客戶資格或財務結果；與舊版同屬ocp-fcsa-standard消息鏈；不刷新主命題C7時鐘
 -->
 
 ## 族群影響

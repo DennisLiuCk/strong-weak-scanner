@@ -170,7 +170,7 @@ exclusivity: unknown
 exclusivity_scope:
 as_of: 2026-08-12
 review_due: 2026-08-31
-status: active
+status: retired
 boundary: KV cache 是 CMX／STX 與 KVBM 所服務的資料類型，NVIDIA 並描述 placement、recall、pre-staging、reuse、offload 與 onboard；功能與機制指標不證明特定儲存產品的淨效益或客戶採用。
 next_trigger: 實際工作負載公開 KV cache placement、recall／pre-staging、冷熱命中、搬移／重算成本、request-level SLO 與 GPU idle time。
 -->
@@ -613,4 +613,24 @@ review_due: 2026-11-25
 status: active
 boundary: 出貨、預期、總產能LTA與HBF路線圖分帳是研究方法，不是客戶驗收、產品收入、台灣公司曝險或獨佔性證明；不能刷新其他產品線。
 next_trigger: 同產品、期間、容量單位、合約條款、客戶交付與認列資料可對帳，或公司修正既有說法。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-MEM-I27
+view: industry
+from_id: concept:ai-memory-hierarchy
+to_id: concept:kv-cache
+relation: routes_to
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C43
+note_refs:
+evidence_state: verified
+commercial_stage: capability
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-11-05
+review_due: 2026-11-23
+status: active
+boundary: 本線只投影KVCR的快取角色與Guard條件：已提交host快取跨引擎故障，仍要求host和guard存活。替代I04作較窄功能投影，不刷新CMX部署、公司線或主命題；不同H100測試不能拼成Rubin驗收。
+next_trigger: 同一版本與資料共同鍵，分別注入引擎、guard及host故障並核對正確讀回、重算、request SLO與復原成本；官方修訂條件亦重查。
 -->

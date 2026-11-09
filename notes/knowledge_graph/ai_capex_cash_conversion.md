@@ -23,17 +23,17 @@ view: company
 from_id: company:microsoft
 to_id: concept:ai-capex-cash-conversion
 relation: reports_financials
-claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C1
+claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C32,MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C34
 note_refs:
 evidence_state: verified
 commercial_stage: financial
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-29
-review_due: 2026-08-15
+as_of: 2026-10-29
+review_due: 2026-11-13
 status: active
-boundary: Microsoft 公司級 headline CapEx cash paid for PP&E OCF 與 FCF 可按其公式回溯；這不是可與 Meta Amazon 直接排名的 AI ROI，也沒有台灣供應商分子。
+boundary: 11/9補入截至9/30單季現金流與租賃各欄；OCF減cash PP&E可重算，法說45.2／7.4／39.4十億美元仍未與10-Q租賃欄位完整調節。不能直接相加或排名AI ROI，也無台灣供應商分子；新季公司線不刷新原主命題時計。
 next_trigger: Microsoft 提供同期間資產類別 租賃現金 上線容量 使用收入與供應商財務的完整橋接。
 -->
 
@@ -43,17 +43,17 @@ view: company
 from_id: company:meta
 to_id: concept:ai-capex-cash-conversion
 relation: reports_financials
-claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C1
+claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C32
 note_refs:
 evidence_state: verified
 commercial_stage: financial
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-29
-review_due: 2026-08-15
+as_of: 2026-10-29
+review_due: 2026-11-13
 status: active
-boundary: Meta 公司級 cash PP&E finance-lease principal OCF 與自訂 FCF 可按其公式回溯；沒有 AI 資產批次 利用率或台灣供應商財務分子。
+boundary: 11/9補入2026Q3公司公式32786-33942-964=-2120百萬美元；另扣融資租賃本金，不能和其他公式直接排名。沒有AI資產批次、利用率或台灣供應商分子；新季公司線不刷新原主命題時計。
 next_trigger: Meta 提供同期間資產類別 租賃增加 上線容量 使用收入與供應商財務的完整橋接。
 -->
 
@@ -63,17 +63,17 @@ view: company
 from_id: company:amazon
 to_id: concept:ai-capex-cash-conversion
 relation: reports_financials
-claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C1
+claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C32
 note_refs:
 evidence_state: verified
 commercial_stage: financial
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-30
-review_due: 2026-08-15
+as_of: 2026-10-29
+review_due: 2026-11-13
 status: active
-boundary: Amazon TTM OCF PP&E purchases incentives 與自訂 FCF 可按其公式回溯；TTM 不能和兩家單季直接排名，也沒有台灣供應商財務分子。
+boundary: 11/9由2026Q3單季表重算42422-77259+1381=-33456百萬美元，未使用新聞標題TTM；期間已對齊但出售與獎勵金及租賃公式仍不同。沒有AI批次或台灣供應商分子；新季公司線不刷新原主命題時計。
 next_trigger: Amazon 提供可對齊的單季資產類別 租賃 上線容量 使用收入與供應商財務橋接。
 -->
 

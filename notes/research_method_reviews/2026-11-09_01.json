@@ -1,0 +1,1308 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-11-09",
+  "methodologyVersion": "1.6",
+  "registryFingerprint": "4457d0ea1d1487f964d181a4c08cfc11a9634b26c8843764eb290f47032954c7",
+  "scope": {
+    "topics": 42,
+    "activeTopics": 42,
+    "radarCandidates": 3,
+    "promotedCandidates": 0,
+    "expandedCandidates": 0,
+    "radarCycles": 11,
+    "radarHistoryCandidates": 55,
+    "graphs": 40,
+    "financialAssessments": 6,
+    "scanEvents": 193
+  },
+  "selection": {
+    "cycleId": "RS-2026-09-13-01",
+    "candidates": 3,
+    "frozenBeforeResearch": 3,
+    "advanceDecisions": 0,
+    "promotedAfterResearch": 0,
+    "expandedAfterResearch": 0,
+    "rejectedAfterResearch": 0,
+    "cycles": 11,
+    "accountableCycles": 11,
+    "historicalCandidates": 55,
+    "earlyReselections": 4,
+    "requiredEarlyReselections": 1,
+    "documentedEarlyTriggers": 1,
+    "grandfatheredEarlyReselections": 3,
+    "accountable": true,
+    "boundary": "歷史雷達退役後仍逐輪核對凍結值；未到期重選自 2026-08-07 起必須留下新來源 early trigger。這只能證明選擇可稽核，升格不是選題正確率或投資命中率。"
+  },
+  "claims": {
+    "active": 960,
+    "verified": 629,
+    "inference": 234,
+    "unverified": 97,
+    "withBoundary": 960,
+    "unverifiedWithNextEvidence": 97,
+    "comparisonObservations": 51
+  },
+  "sources": {
+    "active": 834,
+    "withLocatorAndLimitation": 834,
+    "thesesWithTwoIndependentGroups": 42,
+    "activeTheses": 42,
+    "thesesNeedingSecondIndependentGroup": [],
+    "boundary": "群組數依既有 independence_group／網域計算，只是結構檢查；交易所轉載公司申報、多網站鏡像或同公司引述可能仍同源。人工原始產生者審查與例外見同期方法回顧，不等於全庫已有兩份獨立經濟驗證。"
+  },
+  "monitors": {
+    "active": 178,
+    "withLivingWatchSource": 178,
+    "dueOrOverdue": 0,
+    "overdue": 0,
+    "reviewedMature": 1046
+  },
+  "reviewProgress": {
+    "latestOutcomeCounts": {
+      "never_reviewed": 17,
+      "new_contrary": 0,
+      "new_support": 8,
+      "no_new_evidence": 14,
+      "not_yet_testable": 139
+    },
+    "notYetTestableRuns": [
+      {
+        "topicId": "MI-2026-07-29-PRIORITY-Q2-DISCLOSURES",
+        "monitorId": "T11",
+        "consecutiveCheckDates": 13,
+        "firstCheckedAt": "2026-08-29",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-COMPANY-013"
+      },
+      {
+        "topicId": "MI-2026-07-23-US-SECTION301-TAIWAN",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 12,
+        "firstCheckedAt": "2026-08-31",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-ROOT-001"
+      },
+      {
+        "topicId": "MI-2026-07-31-MISSED-PRIORITY-Q2",
+        "monitorId": "T8",
+        "consecutiveCheckDates": 12,
+        "firstCheckedAt": "2026-08-31",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-COMPANY-001"
+      },
+      {
+        "topicId": "MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 12,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-009"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY",
+        "monitorId": "T10",
+        "consecutiveCheckDates": 11,
+        "firstCheckedAt": "2026-08-28",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-COMPANY-023"
+      },
+      {
+        "topicId": "MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 11,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-030"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 10,
+        "firstCheckedAt": "2026-09-07",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-AMD-003"
+      },
+      {
+        "topicId": "MI-2026-08-01-800VDC-EXECUTION-READINESS",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 10,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-005"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T12",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-08-31",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-AMD-008"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-08-31",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-AMD-002"
+      },
+      {
+        "topicId": "MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MAIN-001"
+      },
+      {
+        "topicId": "MI-2026-08-02-OPEN-AI-FABRICS",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-040"
+      },
+      {
+        "topicId": "MI-2026-08-01-800VDC-EXECUTION-READINESS",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-006"
+      },
+      {
+        "topicId": "MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-007"
+      },
+      {
+        "topicId": "MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-047"
+      },
+      {
+        "topicId": "MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-MAIN-001"
+      },
+      {
+        "topicId": "MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-COMPANY-015"
+      },
+      {
+        "topicId": "MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-092"
+      },
+      {
+        "topicId": "MI-2026-08-07-AI-RACK-ACTION-CONTRACT",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 9,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-017"
+      },
+      {
+        "topicId": "MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-09-09",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-INTERCONNECT-028"
+      },
+      {
+        "topicId": "MI-2026-08-03-PCIE6-COMPLIANCE-LADDER",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-TECH-POLICY-026"
+      },
+      {
+        "topicId": "MI-2026-08-12-224G-PCB-QUALIFICATION-CHAIN",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-COMPANY-024"
+      },
+      {
+        "topicId": "MI-2026-08-12-SIC-AI-POWER-QUALIFICATION",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-POWER-048"
+      },
+      {
+        "topicId": "MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-09-24",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MEMORY-003"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-MEMORY-HIERARCHY",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-024"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-MEMORY-HIERARCHY",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-026"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-MEMORY-HIERARCHY",
+        "monitorId": "T8",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MEMORY-001"
+      },
+      {
+        "topicId": "MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-093"
+      },
+      {
+        "topicId": "MI-2026-08-02-OPEN-AI-FABRICS",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-AMD-011"
+      },
+      {
+        "topicId": "MI-2026-08-03-800VDC-PROTECTION-LAYERS",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-POWER-042"
+      },
+      {
+        "topicId": "MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-109"
+      },
+      {
+        "topicId": "MI-2026-08-07-AI-RACK-ACTION-CONTRACT",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-POWER-046"
+      },
+      {
+        "topicId": "MI-2026-08-07-AI-RACK-ACTION-CONTRACT",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-POWER-047"
+      },
+      {
+        "topicId": "MI-2026-08-09-AI-STORAGE-DATA-PLANE",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 8,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-033"
+      },
+      {
+        "topicId": "MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-COMPANY-022"
+      },
+      {
+        "topicId": "MI-2026-08-12-SIC-AI-POWER-QUALIFICATION",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-054"
+      },
+      {
+        "topicId": "MI-2026-08-12-SIC-AI-POWER-QUALIFICATION",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-POWER-049"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-MEMORY-HIERARCHY",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-025"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-MEMORY-HIERARCHY",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-014"
+      },
+      {
+        "topicId": "MI-2026-08-02-OPEN-AI-FABRICS",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-039"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-POWER-044"
+      },
+      {
+        "topicId": "MI-2026-08-09-AI-RACK-EMC-CERTIFICATION",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-052"
+      },
+      {
+        "topicId": "MI-2026-08-09-AI-RACK-EMC-CERTIFICATION",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-020"
+      },
+      {
+        "topicId": "MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-051"
+      },
+      {
+        "topicId": "MI-2026-09-10-GALLIUM-PERMIT-DELIVERY",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 7,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-TECH-POLICY-031"
+      },
+      {
+        "topicId": "MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-087"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T10",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-AMD-007"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T11",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-028"
+      },
+      {
+        "topicId": "MI-2026-08-03-PCIE6-COMPLIANCE-LADDER",
+        "monitorId": "T8",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-TECH-POLICY-027"
+      },
+      {
+        "topicId": "MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-031"
+      },
+      {
+        "topicId": "MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-004"
+      },
+      {
+        "topicId": "MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-INTERCONNECT-027"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-MEMORY-HIERARCHY",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-027"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-ROOT-010"
+      },
+      {
+        "topicId": "MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-043"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-CAPACITOR-ROLE-MAP",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-011"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY",
+        "monitorId": "T9",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-ROOT-014"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T8",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MAIN-003"
+      },
+      {
+        "topicId": "MI-2026-08-02-BACKSIDE-POWER-DELIVERY",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-019"
+      },
+      {
+        "topicId": "MI-2026-08-03-800VDC-PROTECTION-LAYERS",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-048"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-014"
+      },
+      {
+        "topicId": "MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-051"
+      },
+      {
+        "topicId": "MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-111"
+      },
+      {
+        "topicId": "MI-2026-08-07-AI-RACK-ACTION-CONTRACT",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-ROOT-016"
+      },
+      {
+        "topicId": "MI-2026-08-09-AI-RACK-EMC-CERTIFICATION",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-053"
+      },
+      {
+        "topicId": "MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-TECH-POLICY-029"
+      },
+      {
+        "topicId": "MI-2026-08-01-AI-CAPEX-CASH-CONVERSION",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-12",
+        "lastCheckedAt": "2026-10-28",
+        "lastReviewId": "MR-2026-10-28-COMPUTE-005"
+      },
+      {
+        "topicId": "MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-021"
+      },
+      {
+        "topicId": "MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-19",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-022"
+      },
+      {
+        "topicId": "MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 6,
+        "firstCheckedAt": "2026-10-19",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MEMORY-002"
+      },
+      {
+        "topicId": "MI-2026-08-02-BACKSIDE-POWER-DELIVERY",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-INTERCONNECT-062"
+      },
+      {
+        "topicId": "MI-2026-08-12-SIC-AI-POWER-QUALIFICATION",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-09-18",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-119"
+      },
+      {
+        "topicId": "MI-2026-08-02-BACKSIDE-POWER-DELIVERY",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-016"
+      },
+      {
+        "topicId": "MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-112"
+      },
+      {
+        "topicId": "MI-2026-08-03-LIQUID-COOLING-LOOP-BOUNDARIES",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-113"
+      },
+      {
+        "topicId": "MI-2026-08-09-AI-STORAGE-DATA-PLANE",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-034"
+      },
+      {
+        "topicId": "MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-049"
+      },
+      {
+        "topicId": "MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-COMPUTE-056"
+      },
+      {
+        "topicId": "MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-044"
+      },
+      {
+        "topicId": "MI-2026-08-03-800VDC-PROTECTION-LAYERS",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-047"
+      },
+      {
+        "topicId": "MI-2026-08-03-800VDC-PROTECTION-LAYERS",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-POWER-043"
+      },
+      {
+        "topicId": "MI-2026-08-03-800VDC-PROTECTION-LAYERS",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-010"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-CAPACITOR-ROLE-MAP",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-049"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-CAPACITOR-ROLE-MAP",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-012"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-CAPACITOR-ROLE-MAP",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-013"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-050"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-015"
+      },
+      {
+        "topicId": "MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-052"
+      },
+      {
+        "topicId": "MI-2026-08-03-PCIE6-COMPLIANCE-LADDER",
+        "monitorId": "T9",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-12",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-046"
+      },
+      {
+        "topicId": "MI-2026-07-31-MISSED-PRIORITY-Q2",
+        "monitorId": "T12",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-COMPANY-019"
+      },
+      {
+        "topicId": "MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-037"
+      },
+      {
+        "topicId": "MI-2026-08-08-AI-RACK-TRUST-ROOT",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-019"
+      },
+      {
+        "topicId": "MI-2026-08-12-SEMICONDUCTOR-PFAS-EXPOSURE",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-TECH-POLICY-030"
+      },
+      {
+        "topicId": "MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 5,
+        "firstCheckedAt": "2026-10-19",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MEMORY-004"
+      },
+      {
+        "topicId": "MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MEMORY-005"
+      },
+      {
+        "topicId": "MI-2026-08-03-PCIE6-COMPLIANCE-LADDER",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-09-24",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-045"
+      },
+      {
+        "topicId": "MI-2026-08-02-HYBRID-BONDING-READINESS",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-INTERCONNECT-067"
+      },
+      {
+        "topicId": "MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-10",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-042"
+      },
+      {
+        "topicId": "MI-2026-08-02-HBF-COMMERCIALIZATION-LADDER",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-029"
+      },
+      {
+        "topicId": "MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-038"
+      },
+      {
+        "topicId": "MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-INTERCONNECT-034"
+      },
+      {
+        "topicId": "MI-2026-08-12-AI-HARDWARE-SDC-LIFECYCLE",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-17",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-048"
+      },
+      {
+        "topicId": "MI-2026-08-12-CHIPLET-DESIGN-HANDOFF-CONTRACTS",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-21",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-050"
+      },
+      {
+        "topicId": "MI-2026-08-02-OPEN-AI-FABRICS",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-24",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-041"
+      },
+      {
+        "topicId": "MI-2026-08-03-AI-POWER-BUFFERING-HIERARCHY",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 4,
+        "firstCheckedAt": "2026-10-24",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-016"
+      },
+      {
+        "topicId": "MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-09-13",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-INTERCONNECT-044"
+      },
+      {
+        "topicId": "MI-2026-08-01-AI-CAPEX-CASH-CONVERSION",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-28",
+        "lastReviewId": "MR-2026-10-28-COMPUTE-004"
+      },
+      {
+        "topicId": "MI-2026-08-02-BACKSIDE-POWER-DELIVERY",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-017"
+      },
+      {
+        "topicId": "MI-2026-08-02-BACKSIDE-POWER-DELIVERY",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-018"
+      },
+      {
+        "topicId": "MI-2026-08-02-HYBRID-BONDING-READINESS",
+        "monitorId": "T4",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MEMORY-006"
+      },
+      {
+        "topicId": "MI-2026-08-01-INFERENCE-COMPUTE-TESTER-TAM",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-08",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-009"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T14",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-24",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-AMD-010"
+      },
+      {
+        "topicId": "MI-2026-08-02-800V-POWER-SEMICONDUCTOR-PARTITION",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-26",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-POWER-008"
+      },
+      {
+        "topicId": "MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-MAIN-002"
+      },
+      {
+        "topicId": "MI-2026-08-01-AI-CAPEX-CASH-CONVERSION",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-MAIN-004"
+      },
+      {
+        "topicId": "MI-2026-08-01-AI-CAPEX-CASH-CONVERSION",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 3,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-MAIN-003"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-ROOT-012"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY",
+        "monitorId": "T8",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-ROOT-013"
+      },
+      {
+        "topicId": "MI-2026-08-02-HIGH-NA-EUV-INSERTION-LADDER",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-04",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-023"
+      },
+      {
+        "topicId": "MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER",
+        "monitorId": "T10",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-09",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-POWER-041"
+      },
+      {
+        "topicId": "MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-24",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-094"
+      },
+      {
+        "topicId": "MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER",
+        "monitorId": "T9",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-24",
+        "lastCheckedAt": "2026-10-26",
+        "lastReviewId": "MR-2026-10-26-POWER-COOLING-089"
+      },
+      {
+        "topicId": "MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-26",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-023"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-MEMORY-HIERARCHY",
+        "monitorId": "T9",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-28",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-015"
+      },
+      {
+        "topicId": "MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-28",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-ROOT-011"
+      },
+      {
+        "topicId": "MI-2026-08-01-AI-CAPEX-CASH-CONVERSION",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-COMPANY-020"
+      },
+      {
+        "topicId": "MI-2026-08-01-SPHBM4-ORGANIC-SUBSTRATE",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-11-02",
+        "lastReviewId": "MR-2026-11-02-COMPUTE-010"
+      },
+      {
+        "topicId": "MI-2026-09-10-POWER-EQUIPMENT-CONVERSION",
+        "monitorId": "T1",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-POWER-002"
+      },
+      {
+        "topicId": "MI-2026-08-02-GLASS-SUBSTRATE-COMMERCIALIZATION",
+        "monitorId": "T3",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-11-02",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-036"
+      },
+      {
+        "topicId": "MI-2026-08-09-AI-STORAGE-DATA-PLANE",
+        "monitorId": "T5",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-11-02",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-COMPUTE-032"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T7",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-11-04",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MAIN-002"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T9",
+        "consecutiveCheckDates": 2,
+        "firstCheckedAt": "2026-11-04",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MAIN-004"
+      },
+      {
+        "topicId": "MI-2026-08-01-800VDC-EXECUTION-READINESS",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 1,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-POWER-045"
+      },
+      {
+        "topicId": "MI-2026-08-02-HYBRID-BONDING-READINESS",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 1,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-INTERCONNECT-040"
+      },
+      {
+        "topicId": "MI-2026-08-02-PANEL-LEVEL-PACKAGING-READINESS",
+        "monitorId": "T2",
+        "consecutiveCheckDates": 1,
+        "firstCheckedAt": "2026-10-31",
+        "lastCheckedAt": "2026-10-31",
+        "lastReviewId": "MR-2026-10-31-INTERCONNECT-043"
+      },
+      {
+        "topicId": "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER",
+        "monitorId": "T13",
+        "consecutiveCheckDates": 1,
+        "firstCheckedAt": "2026-11-04",
+        "lastCheckedAt": "2026-11-04",
+        "lastReviewId": "MR-2026-11-04-AMD-009"
+      },
+      {
+        "topicId": "MI-2026-08-02-OPEN-AI-FABRICS",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 1,
+        "firstCheckedAt": "2026-11-07",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MAIN-005"
+      },
+      {
+        "topicId": "MI-2026-08-02-OPEN-AI-FABRICS",
+        "monitorId": "T8",
+        "consecutiveCheckDates": 1,
+        "firstCheckedAt": "2026-11-07",
+        "lastCheckedAt": "2026-11-07",
+        "lastReviewId": "MR-2026-11-07-MAIN-006"
+      },
+      {
+        "topicId": "MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE",
+        "monitorId": "T6",
+        "consecutiveCheckDates": 1,
+        "firstCheckedAt": "2026-11-09",
+        "lastCheckedAt": "2026-11-09",
+        "lastReviewId": "MR-2026-11-09-PACKAGING-035"
+      }
+    ],
+    "boundary": "只盤點active monitor最後工作結果及連續待驗的不同回查日；不解析notes猜測缺件原因，不代表主命題真假、取件失敗率或研究成效，不更改期限或證據時鐘。"
+  },
+  "freshness": {
+    "staleTopics": 42,
+    "staleEdges": 857
+  },
+  "scans": {
+    "events": 193,
+    "full": 2,
+    "partial": 191,
+    "overdue": 0,
+    "latestAt": "2026-11-09",
+    "latestId": "scan-2026-11-09-quarterly-comparatives-and-version-scope",
+    "latestScope": "partial"
+  },
+  "corrections": {
+    "supersededOrRefutedClaims": 41,
+    "monitorReviewEvents": 1169,
+    "resultCounts": {
+      "new_contrary": 4,
+      "new_support": 107,
+      "no_new_evidence": 186,
+      "not_yet_testable": 872
+    }
+  },
+  "calibration": {
+    "evidenceBearingOutcomes": 111,
+    "minimumOutcomesForDescriptiveBreakdown": 3,
+    "descriptiveBreakdownReady": true,
+    "outcomeCounts": {
+      "new_support": 107,
+      "new_contrary": 4
+    },
+    "boundary": "只列到期 monitor 找到的新支持／反方證據筆數，不計算支持率。new_support 表示找到支持該 monitor 檢查方向的新證據，不等於主命題正確、投資命中、報酬或因果效果。"
+  },
+  "graphs": {
+    "activeEdges": 899,
+    "traceableEdges": 899,
+    "verified": 459,
+    "inference": 299,
+    "unverified": 141,
+    "financialMateriality": 1,
+    "financialAssessments": 6,
+    "financialContractComplete": 6,
+    "directFinancialAttribution": 1,
+    "boundedFinancialProxies": 3,
+    "financialDenominatorsNotDisclosed": 2
+  },
+  "gates": [
+    {
+      "id": "selection_accountability",
+      "label": "選題前承諾",
+      "status": "pass",
+      "observed": "11/11 輪 schema 2 雷達保留凍結值；本輪 3/3 個候選有研究前凍結；0 個 advance 中 0 個完成升格、0 個擴充既有研究、0 個研究後拒絕；cutover 後 early trigger 1/1，另揭露 3 次舊制未留 trigger",
+      "boundary": "通過只代表歷史初始排名、第一拒絕、下一份證據與未到期重選理由可回查；不能由單輪升格數或 early trigger 判定研究正確。"
+    },
+    {
+      "id": "traceability",
+      "label": "可追溯性",
+      "status": "pass",
+      "observed": "899/899 條圖譜線可回查；960/960 個 active claim 有邊界",
+      "boundary": "通過代表引用完整，不代表主張一定為真。"
+    },
+    {
+      "id": "financial_materiality_contract",
+      "label": "財務材料性 v2",
+      "status": "pass",
+      "observed": "6/6 筆 assessment 有完整分子、分母、期間、來源與邊界；direct 1、bounded_proxy 3、not_disclosed 2",
+      "boundary": "通過只代表財務口徑與歸因狀態可稽核；bounded_proxy 與 not_disclosed 不得被解讀成題材收入，direct 也不等於投資報酬或因果效果。"
+    },
+    {
+      "id": "cross_check_depth",
+      "label": "來源群組結構",
+      "status": "pass",
+      "observed": "42/42 個主命題登錄至少兩個來源群組；機器分組缺口 無",
+      "boundary": "通過只代表既有群組／網域鍵不同，不代表原始產生者獨立；公司申報的交易所轉載、鏡像及共同公告仍可能同源，人工例外見同期方法回顧。"
+    },
+    {
+      "id": "falsifiability",
+      "label": "可證偽性",
+      "status": "pass",
+      "observed": "178/178 個 monitor 有 living watch source；97/97 個待驗證 claim 寫明下一份證據",
+      "boundary": "Monitor 完整不等於結果已成熟。"
+    },
+    {
+      "id": "freshness",
+      "label": "新鮮度",
+      "status": "attention",
+      "observed": "42 篇 topic、857 條 edge 過期；0 個 monitor 逾期",
+      "boundary": "過期會降可信度，但不自動判定主張錯誤。"
+    },
+    {
+      "id": "correction_learning",
+      "label": "修正學習",
+      "status": "pass",
+      "observed": "目前沒有待回顧 monitor；仍 active 的 monitor 過往已完成 1046 次到期回查；回顧帳本累積 1169 筆（含已退役 monitor）；累積 41 個已修正 claim",
+      "boundary": "沒有新證據必須留下 no_new_evidence，而不能刷新 evidence clock。"
+    },
+    {
+      "id": "scan_accountability",
+      "label": "掃描覆蓋問責",
+      "status": "pass",
+      "observed": "193 次掃描：2 次 full、191 次 partial；最新 cadence 逾期 0 次；最新 scan-2026-11-09-quarterly-comparatives-and-version-scope",
+      "boundary": "Partial 只證明指定來源與題材已查過，不能證明全市場沒有其他重要主題；逾期只檢查最新全域 cadence，尚未量化每個歷史 scope 是否被後續掃描覆蓋；通過也不代表每則公告都被正確解讀。"
+    },
+    {
+      "id": "calibration",
+      "label": "校準可用性",
+      "status": "pass",
+      "observed": "111 個具新證據的到期結果：new_support 107、new_contrary 4；最低分類揭露門檻 3",
+      "boundary": "即使達門檻也只報結果分類與 N，不計支持率；review outcome 尚未編碼主命題真假或投資結果。"
+    }
+  ],
+  "caveats": [
+    "選題前凍結與升格結果分開保存；至少累積多輪到期結果前，不計算選題命中率。",
+    "升格候選數是研究流程產出，不是研究正確率。",
+    "退役雷達仍納入 selection fingerprint；cutover 前 3 次未留 early trigger 的重選被保留揭露，不回溯改寫。",
+    "來源群組覆蓋是結構盤點，不等於原始產生者已逐一確認獨立，也不是多數決或真實性分數。",
+    "尚未到期或 not_yet_testable 的 monitor 不能算支持或反對。",
+    "no_new_evidence 是一次有紀錄的檢查，不得刷新 claim 的證據時鐘。",
+    "Partial scan 不等於全 universe 或全市場覆蓋；研究漏網風險必須持續顯示。",
+    "Scan overdue 目前只量最新全域 cadence；尚無 scope lineage 前，不把歷史期限累加成永久逾期。",
+    "Monitor outcome 只描述新證據方向；在 outcome schema 能分辨主命題效應前，不計算 support rate。",
+    "財務材料性 v2 的 company_total 只是分母錨點；bounded_proxy 與 not_disclosed 都不能升級成題材財務貢獻。"
+  ],
+  "snapshotId": "RMA-2026-11-09-01"
+}

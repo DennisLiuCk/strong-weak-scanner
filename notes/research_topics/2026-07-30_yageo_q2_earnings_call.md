@@ -739,6 +739,88 @@ trigger: 公司正式揭露管理現金與 IFRS 現金的逐項調節，或下�
 invalidation: 後續文件顯示自由現金流分類改變、營業現金轉負或融資持續增加且無資產取得／收購／到期結構可調節；只見同名摘要數字不算完成
 -->
 
+<!-- research_source
+source_id: S6
+role: company_release
+source_kind: document
+publisher: YAGEO Group
+title: YAGEO 2026Q3 Earnings Conference Presentation Chinese
+published_at: 2026-10-29
+captured_at: 2026-11-09
+accepted_at: 2026-11-09
+status: active
+url: https://yageogroup.com/content/Resource%20Library/Financial/YAGEO%203Q26_Earnings%20Conference%20Presentation_CH.pdf
+locator: PDF pp4、6、8、13及相鄰頁；p8圖表FCF9236與5783、p13九月底125047及六月底200718，均百萬新台幣
+limitation: 簡報不是完整季報；未揭產品價格/產能/毛利調節與管理現金定義；新舊簡報六月底現金比較欄不同尚未解釋，不能代稱重編或錯誤
+independence_group: yageo
+-->
+
+<!-- research_claim
+claim_id: C14
+label: verified
+status: active
+claim: 國巨第三季簡報列營收49532百萬新台幣、毛利率41.0%、AI終端占總營收19.8%與鉭質電容銷售季增10.0%
+supporting_source_ids: S6
+contrary_source_ids:
+as_of: 2026-10-29
+basis: p4與p6核對各自公司總額、毛利、應用占比與產品成長分母
+boundary: 不是同一產品級分子，也沒有完整價格/產能/毛利貢獻調節
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: 國巨第三季簡報圖表列當季自由現金流9236、第二季5783，資產負債摘要列九月底現金125047與六月底比較數200718，單位百萬新台幣
+supporting_source_ids: S6
+contrary_source_ids:
+as_of: 2026-10-29
+basis: 目視p8圖表與p13表格，分開期間流量與期末存量
+boundary: 沒有完整現金流量表，不能自行歸因變動或認定與IFRS現金定義一致
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: unverified
+status: active
+claim: 新舊國巨簡報的2026年六月底管理摘要現金相差640百萬新台幣，原因與管理現金對IFRS的逐項調節仍待正式說明
+supporting_source_ids: S2,S6
+contrary_source_ids:
+as_of: 2026-10-29
+basis: 舊S2值200078、新S6比較欄200718；相減640，保留兩個文件版本
+boundary: 差額不等實際現金增加；未指定為重編/誤植/收購，不覆寫舊claim與snapshot
+verification_needed: 完整季報、比較欄變動原因與管理現金調節
+resolution:
+-->
+
+## 11 月 9 日回查：新一季改善，仍要保留舊版本的分母
+
+**先讀本季已公布的結果。** 10 月 29 日第三季簡報列營收 495.32 億元、毛利率 41.0%，
+AI 終端占總營收 19.8%；鉭質電容銷售季增 10.0%。這分別是公司總額、公司毛利、應用占比
+與產品成長，不能把它們相加成同一筆受惠。公司仍把價格調整與 AI 產品組合列為毛利改善
+因素，但沒有足以拆出各因素貢獻的價格、產能與毛利調節表。[S6]
+
+**自由現金流改善，不等於季末現金增加。** 簡報第 8 頁圖表列第三季自由現金流
+92.36 億元，第二季 57.83 億元；第 13 頁卻列第三季管理摘要現金 1,250.47 億元，
+比較欄六月底為 2,007.18 億元。期間流量與期末存量不同，差額不能自行歸因為收購、還款
+或營運變差。這輪 MOPS 第三季查詢未找到匹配附件，因此還沒有正式季報的完整調節。[S6]
+
+**比較欄有差異，就把差異留下。** 舊第二季簡報的六月底摘要現金是 2,000.78 億元；
+新第三季簡報的同日期比較欄是 2,007.18 億元，相差 6.40 億元。本輪未取得原因說明，
+不能默默覆寫舊數，也不能自行稱為會計重編、誤植或新增現金。第 8 頁的負債比圖亦由
+第二季約 22% 升到第三季約 24%，不能把「較去年第四季高點改善」讀成每季都下降。
+
+接下來取得新季完整現金流及附註，分開核對管理現金定義、比較欄差異與融資變化，再判定
+是否能延續上半年公式。想一想：如果前一期數字在新簡報變了，你會先重算成長率，還是
+先問為什麼分母變了？本輪沒有把原第二季主命題或正式筆記重新簽核。
+
+來源：[國巨第三季官方簡報](https://yageogroup.com/content/Resource%20Library/Financial/YAGEO%203Q26_Earnings%20Conference%20Presentation_CH.pdf)，
+引用第 4、6、8、13 頁並核對相鄰頁；第 8 頁數字來自實際圖表，不只依賴文字抽取。
+
 ## 下一個可證明／否定的節點
 
 - 把已取得的 2026Q2 核閱財務報告建立 frozen evidence pack，交由不同 reviewer 離線重算
@@ -756,4 +838,12 @@ from: triaged
 to: triaged
 reason: corrected_acquisition_channel_vs_economic_source_independence_without_rewriting_historical_source_groups_or_evidence_clock
 evidence: sources:S2,S4
+-->
+
+<!-- transition
+date: 2026-11-09
+from: triaged
+to: triaged
+reason: added_q3_reported_results_and_unresolved_comparative_cash_difference_without_overwriting_q2_or_refreshing_thesis_clock
+evidence: sources:S2,S6
 -->

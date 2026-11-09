@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-11-09
+next_review: 2026-11-11
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -60,7 +60,7 @@ why_now: 到期HBF追蹤初查找到9/9研究者HBFSim v1；模擬與校準的�
 knowledge_gain: 把研究者方法、模型擬合、可重現運行與真實晶片分層；10/8已核v3、v0.1.1與固定proof及reference原始紀錄，仍缺相同共同鍵的fast原始run，舊倍率與秒數未對齊，沒有重跑或外部驗證，不採效能點估計。
 first_rejection: 若未取得原始run或作者勘誤便無法對齊秒數與倍率，或只有擬合點沒有外部驗證，就不發布效能點估計或HBF硬體受惠結論。
 next_evidence: 先核對版本化PDF與作者原始run及勘誤，再分開NVMe校準與HBF模型參數，要求未參與擬合的驗證工作負載和實體裝置邊界。
-next_check: 2026-11-09
+next_check: 2026-11-23
 route: watch_only
 article_topic_id:
 graph_id:
@@ -85,7 +85,7 @@ why_now: Samsung Electro-Mechanics9/10展稿新增玻璃核心與導孔加工展
 knowledge_gain: 只有新客戶或製造共同鍵才會超越既有玻璃角色地圖；公司展稿與材料供應商用途說明不是互相替客戶資格背書。
 first_rejection: 若仍只有展品或單站加工能力，未有同一封裝產品的客戶資格及量產结果，就不另立文章或將carrier出貨算成glass-core採用。
 next_evidence: 取得同一glass-core封裝產品與版本的客戶資格及製造結果，逐項分開carrier與interposer角色，核對連續批次良率及量產時間而非展會日期。
-next_check: 2026-11-09
+next_check: 2026-11-16
 route: watch_only
 article_topic_id:
 graph_id:
@@ -388,3 +388,31 @@ Corning用途／製程入口，Intel原文仍受限；沒有取得同一客戶�
 
 公告旁支留下8155保證及Q2附註更正的11/9補件工作；工程合約、預算變更、集團內資金回流、
 額定增資與實付分開，母子公司同案公告不重算。公告及附件索引覆蓋仍partial，詳見本輪方法回顧。
+
+## 11月9日 HBFSim原件回查：能下載不代表可獨立重現
+
+本輪實讀[版本列表](https://github.com/SlugLab/HBFSim/releases)，最新仍列v0.1.2，並核對
+[固定commit的重建說明](https://raw.githubusercontent.com/SlugLab/HBFSim/ed6f5559673767bd620eb8174fdf61bdc7aa3639/reproduction/olmoe-full147-v0.1.2/REBUILD.md)
+與[同commit版本說明](https://raw.githubusercontent.com/SlugLab/HBFSim/ed6f5559673767bd620eb8174fdf61bdc7aa3639/docs/releases/v0.1.2.md)。
+作者仍把乾淨環境完整GPU重建及跨機GPU效能重現列為未驗證；大型原始紀錄等未作公開附件。
+CPU檢查、部分重新連結與兩次不同嘗試，都不能代替同條件重複GPU測試、實體HBF校準或外部保留樣本。
+
+本輪未執行重建、未重新閱讀完整論文，亦未取得完整可配對原始紀錄，因此不報倍率或支持率。
+兩份原件SHA256分別為552c998cb059d8ea30f293b68c99f69a55b6da1cf0ea753ed3a518fbc37629eb及
+32bf62edddf6744e5b7e236386961ad3bc976dd2714f4bc4573e07b9a002b9b3；只證明本輪核對的固定文件，
+不宣稱所有分支或歷史都未變。順位2、知識價值、watch與原升格／拒絕條件維持；11/23為兩週工作回查，
+不是作者發布承諾，若先有完整原始紀錄、勘誤或外部驗證則提前處理。
+
+## 11月9日 玻璃與新季文件的邊界
+
+玻璃核心回查[SKC新聞室](https://www.skc.kr/m/eng/Conmmunication/newsroom/system.do?menuCd=006001)、
+[三星電機展稿](https://samsungsem.com/global/newsroom/news/view.do?id=10522)與
+[Corning用途頁](https://www.corning.com/worldwide/en/products/advanced-optics/product-materials/semiconductor-laser-optic-components/semiconductor-glass-wafers.html)。
+SKC 10/28仍把可靠度、良率及客戶概念驗證列為後續工作，展示與材料能力沒有補上同一產品的
+客戶放行及連續批次結果；Corning直接取件受限，經官方頁搜尋服務可讀的用途描述不當完整
+即時清單。維持順位3／watch，11/16再追具名客戶與製造共同鍵。SSCB未到期，保留11/21。
+
+本輪不新增重複文章，將可回查增量放回四篇既有研究：新季現金公式、國巨新舊比較欄差異、
+快取故障條件及晶粒架構正式版。所有原主命題時鐘不動；文件取得與新功能不等商業驗收。
+博智補更正公告與實際下載附註未同步，另在方法回顧明列待取得的替換原件，不拿原版「無」
+否定已公布的保證資訊。11/11總檢查先處理ERCOT/CDU取件與當日到期項，不為湊篇數升格。

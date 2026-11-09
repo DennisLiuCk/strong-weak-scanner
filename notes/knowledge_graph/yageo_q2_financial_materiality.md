@@ -129,17 +129,17 @@ view: industry
 from_id: concept:yageo-q2-financial-materiality
 to_id: process:ifrs-management-cash-reconciliation-passport
 relation: includes
-claim_refs: MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL#C13
+claim_refs: MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL#C13,MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL#C15,MI-2026-07-30-YAGEO-Q2-EARNINGS-CALL#C16
 note_refs:
-evidence_state: inference
+evidence_state: unverified
 commercial_stage: financial
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-14
-review_due: 2026-08-21
+as_of: 2026-10-29
+review_due: 2026-11-13
 status: active
-boundary: 正式季報 IFRS 現金與簡報同名管理摘要相差 525.82515 億元；即使加兩類流動金融資產仍差 6.39783 億元，接近不得冒充公司逐項公式或第三方驗證。
+boundary: 原管理現金與IFRS調節仍未完成；11/9另發現新舊簡報的六月底比較欄相差640百萬新台幣，原因未明。保留兩版，不自行判為重編、誤植或實際現金增加；第三季FCF圖表不等完整季報，新季差異線不刷新原主命題時計。
 next_trigger: 公司提供同一報導日的科目納入 排除 抵減 分類與受限現金逐項調節，且後續季度能以相同公式重算。
 -->
 
