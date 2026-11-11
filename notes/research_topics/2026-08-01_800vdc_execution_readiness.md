@@ -863,7 +863,7 @@ evidence: sources:S18,S19
 ### 三句話抓重點
 
 - NVIDIA 仍把 800VDC full-scale production 放在 2027；OCP 則把設施轉換拆成三階段，說明「支援 800V」不是一個單點開關。
-- 2026 的證據已從展場往前走到標準工作、子系統資格框架與台達／X LABS 的規劃部署 MOU，但各來源停在不同關卡，不能合成「已全面商用」。
+- 2026 的標準、子系統資格與部署規劃各停在不同關卡；ERCOT 11/5 仍在核驗補件，部分專案連冷卻配置都尚未定案，不能合成「已全面商用」。
 - 真正需要等待的是同一場站的介面、冗餘、安全、commissioning、客戶驗收與 production volume，再由供應商文件對上收入與毛利。
 
 ### 為什麼重要
@@ -874,6 +874,7 @@ evidence: sources:S18,S19
 
 - 追 OCP 是否把白皮書推進成固定版本的 voltage band、interoperability、redundancy、protection 與 commissioning 契約。
 - 追同一大型負載專案是否從 request／preliminary eligibility 前進到 LCP／allocation、QSA、approval to energize 與 actual meter，而不是只加總 queue headline。
+- ERCOT 以 12/10 為核驗及社區影響報告的目標節點，研究排在台灣 12/11 補查；先分清正式結果、仍待補件與未定案欄位，再找具名專案共同鍵。
 - 追具名場站是否把 installed／critical／actual load 與年度 PUE 分成四本帳，公開 single-line、失效假設、同步功率序列與 meter boundary。
 - 追平台或客戶是否公布同一場站的子系統資格、現場驗收、部署容量、故障／維修結果與正式量產日期。
 - 追台達電的 MOU 是否轉為實際部署與出貨，並追光寶科是否揭露 800V 驗證結果；兩家公司都要再對上收入與毛利分母。
@@ -884,6 +885,7 @@ evidence: sources:S18,S19
 - 為什麼 205GW 的 preliminary eligible Large Load 不能直接除以單櫃 MW，換算成 GPU、機櫃或供應商營收？
 - 若 50V 過渡產品持續成長，但互通標準或地方 commissioning 延後，供應商短期收入與長期技術方向可能如何分化？
 - MOU 從「規劃 100MW」走到「已交付 100MW」，中間至少還缺哪些可核對文件？
+- 問卷的 N/A 是不適用、還沒決定，還是在等第三方？如果原因不同，能否一律當成沒有需求？
 
 ## 先用七關看懂：800VDC 何時才算真的走到量產
 
@@ -988,6 +990,28 @@ Large Load，且 eligible、included、allocated、authorized 與 metered 各是
 收件日，還是核驗結果日？先取得同案 RFI 發出日與結果，再接前述分類、配額、QSA、
 通電許可和電表。這份新公告沒有提供具名專案已通電或已採用 800V 的證據；C13 與舊圖譜
 的到期狀態不因此延後。
+
+### 11/5 補件更新：空白答案不只有一種意思
+
+**證實：核驗前進到第二輪，但不是個案已通過。** ERCOT 11/5 的
+[核驗更新](https://www.ercot.com/files/docs/2026/11/05/ERCOT-Verification-RFI-Update.pdf)
+第 2 頁說明正在核對第一輪資料並發出針對性的追加問題，第二輪回覆期限為 5 個工作日；
+希望在 11 月完成核驗，以便 12/10 提交報告。這不是把 9 月第一輪的 10 日規則改成 5 日，
+也不是所有案件從公告日同時起算。[S24；C30]
+
+**證實：N/A 不一定是「不適用」。** 同日的
+[社區影響初步摘要](https://www.ercot.com/files/docs/2026/11/05/Community-Impact-RFI-PUC-Update.pdf)
+第 4–6 頁區分：設計不適用、專案還沒走到決策階段、決策取決於尚未選定或簽約的第三方，
+以及其他原因；其中也指出多個專案尚未決定最終冷卻配置。文件明示仍屬初步結果，
+分析未完成，最終報告目標也是 12/10。[S25；C31]
+
+**推論：讀缺值要先問原因，再判斷能否估需求。** 「尚未決定」不是零需求，卻也不能填入
+某家冷卻或電源廠的訂單。想一想：一座申請中的資料中心尚未選定設備，什麼新文件才能把
+架構需求連到具名型號？先等設計、供應商與驗收資料對得上，不用問卷空白替公司畫受惠線。
+
+**待驗證：同一專案後續結果。** 台灣 12/11 是下一個報告補查日，不是通電承諾日。
+兩份簡報都未讓本輪取得可串接的具名專案分類、配額、QSA、通電核准或電表新欄位；
+T4 的原條件、C13 主命題與舊部署線的證據期限維持不變。
 
 ### QSA 是必要條件，不是通電許可
 
@@ -1439,4 +1463,102 @@ from: triaged
 to: triaged
 reason: distinguish_liteon_q4_prototype_outlook_from_other_product_volume_drivers_and_revenue_categories
 evidence: sources:S22
+-->
+
+<!-- research_source
+source_id: S24
+role: regulator_or_policy
+source_kind: document
+publisher: ERCOT
+title: Batch Zero Eligibility Verification Process Update
+published_at: 2026-11-05
+captured_at: 2026-11-11
+accepted_at: 2026-11-11
+status: active
+url: https://www.ercot.com/files/docs/2026/11/05/ERCOT-Verification-RFI-Update.pdf
+locator: 2頁PDF第2頁，第一輪覆核、針對性第二輪RFI、5 Business Day deadline、11月完成核驗與12月10日報告段；由官方Presentations索引定位
+limitation: 本機取原PDF為403，網頁讀取工具可讀2頁文字但未取得原件SHA或可目視截圖；只採程序敘述，不採人數或比例圖表。第二輪期限不覆寫9月首次RFI規則，也不是具名專案核驗結果或通電證據
+independence_group: ercot
+-->
+
+<!-- research_source
+source_id: S25
+role: regulator_or_policy
+source_kind: document
+publisher: ERCOT
+title: Data Center State and Community Impact RFI Preliminary Summary
+published_at: 2026-11-05
+captured_at: 2026-11-11
+accepted_at: 2026-11-11
+status: active
+url: https://www.ercot.com/files/docs/2026/11/05/Community-Impact-RFI-PUC-Update.pdf
+locator: 9頁PDF第2頁Executive Summary的初步結果與12月10日目標；第4頁Key insights的冷卻配置未定案；第5–6頁Full N/A answer text的原因定義
+limitation: 本機取原PDF為403，網頁讀取工具可讀指定頁文字但未取得原件SHA或可目視截圖；不採統計圖表數字、比例、GW或跨頁分母。問卷初步彙整不是個案核驗通過、最終冷卻設計、設備訂單或台股財務
+independence_group: ercot
+-->
+
+<!-- research_source
+source_id: S26
+role: regulator_or_policy
+source_kind: living_index
+publisher: ERCOT
+title: Presentations
+published_at:
+captured_at: 2026-11-11
+accepted_at: 2026-11-11
+status: active
+url: https://www.ercot.com/news/presentations
+locator: 2026-11-05 PUCT Open Meeting的Batch Zero核驗與Community Impact RFI兩份公開簡報入口
+limitation: 動態索引只定位日期與原件，不證明程序完成、個案核准或供應商受惠；與S24及S25同一來源群
+independence_group: ercot
+-->
+
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: ERCOT在11月5日說明正核對第一輪核驗資料並發出針對性第二輪RFI，第二輪回覆期限為5個工作日，目標在11月完成核驗以於12月10日提交報告
+supporting_source_ids: S24
+contrary_source_ids:
+as_of: 2026-11-05
+basis: S24第2頁的程序、合理補件機會、第二輪期限及報告安排；verified指當日公布內容，不是目標已完成
+boundary: 不把第二輪5日覆寫第一輪10日，也不以11月5日當全部個案收件日；未取得具名專案最終納入、年度MW、QSA、通電核准、電表或800V供應商財務
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C31
+label: verified
+status: active
+claim: ERCOT同日社區影響初步摘要把N/A區分為設計不適用、尚未走到決策階段、依賴尚未選定或簽約的第三方及其他原因，並說明多個專案的最終冷卻配置尚未決定；最終報告目標為12月10日
+supporting_source_ids: S25
+contrary_source_ids:
+as_of: 2026-11-05
+basis: S25第2頁目標與初步標記、第4頁冷卻敘述、第5–6頁逐字定義；只採明確文字，不重建圖表分母或統計數字
+boundary: 問卷缺值原因不是零需求、取消、具名採購或供應商資格的證明；此社區影響RFI與Batch Zero核驗是不同問題，不能互相代替通過結果
+verification_needed:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C30,C31
+metric: ERCOT第二輪核驗與社區影響初步摘要是否轉為正式報告或修訂程序，並保留兩種RFI的範圍與缺值原因
+source_ids: S24,S25
+watch_source_ids: S26,S20
+frequency: event_driven
+frequency_detail: 官方目標美國12月10日，台灣12月11日補查；若提前公布正式結果或修改期限與適用範圍則立即回查
+next_check: 2026-12-11
+trigger: 正式核驗或社區影響報告公布，或官方明確修訂第二輪RFI期限、適用範圍或未定案欄位定義；逐份對照版本，不將行政結果代作T4同案通電欄位
+invalidation: 官方更改核驗程序、適用範圍、報告日期或N/A定義時縮窄C30或C31；若仍缺具名專案共同鍵，T4與800V商業實現保持待驗
+-->
+
+<!-- transition
+date: 2026-11-11
+from: triaged
+to: triaged
+reason: distinguish_second_round_ercot_rfi_and_unresolved_cooling_configuration_from_named_project_realization
+evidence: sources:S24,S25
 -->

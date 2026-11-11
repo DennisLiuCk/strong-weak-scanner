@@ -6461,7 +6461,16 @@ process.stdout.write(JSON.stringify(results));
             ("research_claim", 44), ("metric_comparison", 5),
             ("impact", 4), ("monitoring_item", 10),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in ("research_source", "research_claim"):
+                self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
+        for key, prefix, historical_count in (("source_id", "S", 37), ("claim_id", "C", 44)):
+            block_type = "research_source" if key == "source_id" else "research_claim"
+            blocks = re.findall(rf"<!-- {block_type}\s+(.*?)-->", topic, re.S)
+            ids = [re.search(rf"^{key}: ([^\n]+)$", block, re.M).group(1) for block in blocks]
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, historical_count + 1)} <= set(ids))
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"

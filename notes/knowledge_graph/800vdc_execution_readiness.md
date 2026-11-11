@@ -473,3 +473,23 @@ status: active
 boundary: 研究方法拆開公司同稿不同產品與期間，不證明800VDC量產、客戶驗收、收入或毛利，也不升級公司曝險。
 next_trigger: 同型號同期間公開原型、客戶驗證、量產交付與財務分母，分別接納各層證據。
 -->
+
+<!-- knowledge_edge
+edge_id: KG-8ER-I21
+view: industry
+from_id: concept:800vdc-execution-readiness
+to_id: process:ercot-case-rfi-verification
+relation: passes_through
+claim_refs: MI-2026-08-01-800VDC-EXECUTION-READINESS#C30
+note_refs:
+evidence_state: verified
+commercial_stage: validation
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-11-05
+review_due: 2026-12-11
+status: active
+boundary: 第二輪RFI五工作日是核驗程序進展，不等於同案最終納入、容量配額、QSA、通電、800V採用或供應商財務，也不覆寫首輪期限或刷新舊部署邊。
+next_trigger: 12月10日目標核驗報告或正式程序修訂後，核對個案共同鍵與通過結果；台灣12月11日補查不是場站通電承諾。
+-->

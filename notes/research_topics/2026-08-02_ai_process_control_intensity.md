@@ -131,6 +131,14 @@ reason: added_internal_orders_rpo_contract_balance_and_revenue_clock_boundary_wi
 evidence: sources:S35,S36,S37
 -->
 
+<!-- transition
+date: 2026-11-11
+from: triaged
+to: triaged
+reason: added_onto_q3_named_tool_record_and_kla_calendar_year_forecast_without_refreshing_thesis_clock
+evidence: sources:S38,S39
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
@@ -221,7 +229,7 @@ evidence: sources:S35,S36,S37
 
 - 五家設備商的一手文件，分別說明需求方向、缺陷為何更昂貴、設備走到客戶驗證／未來交付的哪一步，以及不同寬度的訂單與收入訊號。
 - 真正要查的是：每一代產品的 control plan 是否改變抽樣覆蓋、靈敏度、偽警報、週期時間與圍堵動作，而不只是設備名稱變多。
-- Camtek 已提供較接近題材分子—公司分母的近似收入組合，但期間未標明；Applied FY26Q3 又證明 AP 與 PDC 兩個廣義集合各自成長仍解不出交集；弘塑、均華與萬潤的廣義設備收入、產品清單與研發計畫也不能替代具名製程控制分子。
+- 最新旁支是 Onto 將一個較寬類別的季度新高連到具名工具，以及 KLA 提供全年先進封裝製程控制收入預測；前者沒拆金額、後者尚非全年實績，仍不能排出題材收入強弱或推成台灣供應鏈受惠。
 
 ### 為什麼重要
 
@@ -798,6 +806,33 @@ technical sign-off、收入認列、actual／order／forecast 標籤、題材分
 Decimal 與獨立 awk 兩路重算一致；這些是指定揭露值的確定性算術，沒有 sampling SE／t，且
 繼承來源「約 15 億、約 12 億、約 77%」的捨入與前瞻不確定性。本輪仍沒有 AP-specific PDC
 actual revenue、order intake、工具數或客戶單位產能分母，故不改 C22 主命題與信心時鐘。
+
+## 11 月更新：新高有產品名字，預測仍不是實績
+
+**證實的是公司各自說了什麼。** Onto 在 11 月 9 日發布的 2026Q3 結果中，將
+Advanced Packaging and Specialty Devices 的季度收入新高，主要歸因於 Dragonfly G5
+與 Firefly 檢查系統；期間截至 2026 年 9 月 30 日，但公告未拆出該類別或兩項工具的
+金額。這比只有「市場很熱」多了可追的產品名字，仍不能把整個類別當成 HBM 收入。
+[S38](https://investors.ontoinnovation.com/news/news-details/2026/Onto-Innovation-Reports-2026-Third-Quarter-Results/default.aspx)
+
+KLA 在 10 月 28 日的 FY27Q1 股東信中，表示曆年 2026 的先進封裝製程控制**系統收入**
+預測仍可望達約 **11 億美元**、較曆年 2025 成長逾 **70%**。這是公司對全年、指定產品
+集合的預測，不是截至 9 月底季度已認列的先進封裝收入；也沒有拆成 HBM、單一機種或
+台灣供應商訂單。[S39，PDF 第 2 頁／印刷第 1 頁](https://d1io3yog0oux5.cloudfront.net/_50d63f16d5350a23b8ec3131256a9548/klatencor/db/1117/10679/letter_to_shareholders/KLA_Earnings_Shareholder_Letter_-_Q1_FY27.pdf)
+
+**推論與閱讀方法：先標狀態，再看數字。** 已實現收入（actual）是在指定期間認列的
+結果；創新高（record）只描述與自身過去相比的位置；預測（forecast）則仍包含尚未
+完成的期間。這兩份文件是不同診斷量，判定為 **not_comparable**：Onto 的較寬季度
+類別沒有金額，KLA 是全年指定類別預測，不能相除、排名，也不能合成「兩家公司已證實
+題材營收規模」。本節沒有新增跨公司數值比較或成長貢獻計算。（C45–C47）
+
+**待驗證的是錢如何對上產品與客戶。** 下一步看 Onto 能否公開同季類別／產品金額、
+客戶部署範圍；看 KLA 能否在全年結束後以相同定義交代實績，再接回公司分母。
+另一條公司鏈的新季度結果，必須也提供同口徑題材分子才算有效補件。
+T2、T6、T9 的既有完整觸發條件與主命題證據時鐘不變。
+
+給新手的問題：如果只有「新高」與一個全年預測，哪一個數字已經發生？哪個集合包含
+非 HBM 業務？需要補哪一欄，才有資格比較兩家公司？
 
 ## 台灣映射的三個同名陷阱：先進封裝、設備與製程控制不是同一個分子
 
@@ -1429,6 +1464,38 @@ url: https://investors.appliedmaterials.com/events/event-details/q3-2026-applied
 locator: 2026-08-15 Supporting Materials；列 Q326 News Release 與 Q326 Non-GAAP Reconciliation，尚未列 Earnings Call Published Script
 limitation: 這是會持續更新的公司事件頁與指定日期的負面查核，不是法說逐字稿；後續新增附件會改變頁面，當時尚未列出 script 也不能用來推論管理層沒有更細部產品或訂單資訊
 independence_group: applied-materials
+-->
+
+<!-- research_source
+source_id: S38
+role: company_release
+source_kind: document
+publisher: Onto Innovation
+title: Onto Innovation Reports 2026 Third Quarter Results
+published_at: 2026-11-09
+captured_at: 2026-11-11
+accepted_at: 2026-11-11
+status: active
+url: https://investors.ontoinnovation.com/news/news-details/2026/Onto-Innovation-Reports-2026-Third-Quarter-Results/default.aspx
+locator: Third Quarter Business and Financial Highlights 第三項；Operating Results 的 three months ended September 30, 2026；本輪 HTML SHA-256 2465efea77681a709a5ea67795c5d37cbcd6a6d28d3bb6432e2d1b4b2f011e28
+limitation: 發行人將較寬 Advanced Packaging and Specialty Devices 季度新高歸因於 Dragonfly G5 與 Firefly，沒有類別或產品金額、HBM 專屬收入、客戶部署／驗收分母或良率結果；公司總收入與 backlog 不能替代題材分子
+independence_group: onto-innovation
+-->
+
+<!-- research_source
+source_id: S39
+role: management_commentary
+source_kind: document
+publisher: KLA Corporation
+title: Letter to Shareholders Q1 Fiscal 2027
+published_at: 2026-10-28
+captured_at: 2026-11-11
+accepted_at: 2026-11-11
+status: active
+url: https://d1io3yog0oux5.cloudfront.net/_50d63f16d5350a23b8ec3131256a9548/klatencor/db/1117/10679/letter_to_shareholders/KLA_Earnings_Shareholder_Letter_-_Q1_FY27.pdf
+locator: PDF 第 2 頁／印刷第 1 頁 CEO Update 的 Advanced Packaging 段；封面為 quarter ended September 30, 2026 reported October 28, 2026；僅渲染引用頁及相鄰頁；PDF SHA-256 3cca4d056c477a4c06587ed80e047e2b3bcb903af48934165a54d00061eae683
+limitation: 約 11 億美元與逾 70% 是 CY2026 advanced-packaging process-control systems revenue 的全年預測，不是 FY27Q1 該類別實績，也不提供 FY26Q4 工具量／ASP／市占／組合／服務 growth bridge、HBM 專屬金額或台灣公司訂單；公司市場成長倍數說法未作獨立驗證
+independence_group: kla
 -->
 
 <!-- research_claim
@@ -2173,6 +2240,57 @@ as_of: 2026-08-15
 basis: S36 官方 EDGAR Latest Filings 與 S37 官方 Q3 event Supporting Materials 在同一查核日逐項核對
 boundary: 這是兩個會更新入口在指定時間的可重現負面查核，不是永久缺件證明；後續頁面可能新增 Q3 10-Q 或 published script，且未公開不能推論公司內部沒有 AP-specific PDC 訂單、工具或收入資料
 verification_needed: 2026-08-21 重新查核 S36／S37，附件出現時另建 document source 並逐項核對 actual、order、forecast 與同期間分母
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C45
+label: verified
+status: active
+claim: Onto 在 2026-11-09 發布的截至 2026-09-30 第三季結果中表示 Advanced Packaging and Specialty Devices 收入創季度新高，主要由 Dragonfly G5 與 Firefly inspection systems 帶動，但未拆出類別或產品金額
+supporting_source_ids: S38
+contrary_source_ids:
+as_of: 2026-11-09
+basis: S38 第三項 Business and Financial Highlights 直接列兩項具名工具；Operating Results 固定季度截止日，公告沒有該類別／產品收入表
+boundary: 證實公司陳述而非獨立驗證營收歸因；較寬類別包含 specialty devices，不等於 HBM 專屬收入、跨客戶高量產結果、工具台數或台灣公司受惠
+verification_needed: 同季類別與具名產品 actual revenue 及公司分母，另補客戶部署範圍與製造成效
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C46
+label: verified
+status: active
+claim: KLA 2026-10-28 FY27Q1 股東信表示 CY2026 先進封裝製程控制系統收入仍可望達約 11 億美元、較 CY2025 成長逾 70%，這是全年預測而非截至 2026-09-30 季度的該類別實績
+supporting_source_ids: S39
+contrary_source_ids:
+as_of: 2026-10-28
+basis: S39 PDF 第 2 頁／印刷第 1 頁的 calendar 2026 與 remains on track to hit 字樣明定期間和預測狀態；原文美元 billion 按十億換成億，1.1 billion 等於 11 億美元
+boundary: 單一發行人前瞻陳述，不是實現機率、全產業成長或客戶支出觀測；約數與成長下限不能反推精確基期，全年預測也不能除以單季公司收入
+verification_needed: CY2026 結束後的同定義實績及公司分母，再分解產品、工具量、客戶與成長來源
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C47
+label: inference
+status: active
+claim: Onto 的較寬季度類別 record 與 KLA 的全年指定類別 forecast 是 not_comparable 的不同診斷量，尚不能共同命中同期間題材 actual revenue／order intake 與公司分母的門檻
+supporting_source_ids: S38,S39
+contrary_source_ids:
+as_of: 2026-11-11
+basis: C45 缺類別／產品金額而 C46 屬全年預測；期間、產品集合與會計狀態均不相同，故不做比值或排名，也不把兩條公司消息鏈視為兩筆已實現題材收入
+boundary: 僅是這兩份文件的可比性判讀，不否定既有採用或商業進展，不證明成長不存在，也不刷新 C22、T2／T6／T9 或原主命題證據時鐘
+verification_needed: 依 T9 取得兩條獨立公司鏈同期間具名產品／類別實績或訂單及公司分母，或依客戶路徑公開單位產能支出與工具／控制步驟
 correction_kind:
 corrects_claim_id:
 corrected_by_claim_id:

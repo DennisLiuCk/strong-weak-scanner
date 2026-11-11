@@ -199,18 +199,18 @@ view: company
 from_id: company:onto-innovation
 to_id: concept:hbm
 relation: reports_financials
-claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C8
+claim_refs: MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C3,MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C45,MI-2026-08-02-AI-PROCESS-CONTROL-INTENSITY#C47
 note_refs:
-evidence_state: verified
+evidence_state: inference
 commercial_stage: financial
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-06
-review_due: 2026-11-05
+as_of: 2026-11-11
+review_due: 2026-11-18
 status: active
-boundary: Onto 只表示較寬的 Specialty Devices and Advanced Packaging 收入創季度新高，支撐含 2.5D logic、HBM 與 silicon photonics；沒有類別金額、題材占比、產品分子或客戶名稱，因此不能改寫成 Dragonfly／HBM 專屬收入。
-next_trigger: 公司以同期間公司分母拆出 HBM／2.5D 或具名 process-control 工具收入、工具數、客戶廣度與重複採購。
+boundary: Onto Q3 將較寬 Advanced Packaging and Specialty Devices 季度新高連到 Dragonfly G5 與 Firefly，但無類別或產品金額；本圖僅以既有 HBM 檢查能力作相鄰閱讀路由，並非 HBM 專屬收入、兩家公司同口徑強度比較或客戶量產成效。
+next_trigger: 公司以同期間公司分母拆出 HBM／2.5D 或具名 process-control 工具收入，並補客戶部署與驗收範圍；既有主命題與其他舊線的到期時計不變。
 -->
 
 <!-- knowledge_edge
