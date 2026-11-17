@@ -637,6 +637,99 @@ evidence: sources:S1,S12,S13
 - 最高速度只有共同規則與送廠設計，較低速度已有實體互通時，研究者應如何避免把兩筆證據拼成同一項成果？
 - 如果封裝裡所有小晶片都由同一家公司設計，即使使用開放介面，能否證明不同公司產品可以互換？
 
+## UCIe 4.0 把連線規則擴展到系統管理
+
+**證實：規格新增，不等於產品已通過。** Consortium 在 2026 年 11 月 12 日發布
+UCIe 4.0。公告把封裝內 SoC 與記憶體邏輯晶片之間的 UCIe.mem 連線、可信狀態回報、
+管理通道完整性保護與重設管理放進共同規則。（C15）
+[S14，PDF 第 1–2 頁](https://www.uciexpress.org/_files/ugd/0c1418_970201e6ba294a0fa690ae864082fc46.pdf)
+
+**給新手的理解方式：能傳資料，和能共同運作，是兩件事。** 記憶體連線要處理資料交換；
+管理通道要傳遞控制資訊；可信狀態回報則協助系統判斷晶片回報的狀態是否可信。新版規格
+讓研究問題從「線接通了嗎」進一步變成「不同晶片的狀態與重設如何配合」。這是我們對
+公告用途的歸納，不是完整規範條文的逐項合規裁決。（C16）
+
+**待驗證：同一組實體產品能否做到。** 新規格不能替原本的 64G 跨廠實測補考，也不能
+證明台灣公司的量產或收入。接下來要找具名兩端晶片、使用版本、封裝、測項與通過／失敗
+結果，再看客戶是否接受。若公告或正式勘誤縮窄功能範圍，就按新文件修正規格層主張；
+若只看到會員支持聲明，產品成熟度維持原判定。（T4；原 T1 不結案）
+
+讀新聞時可問自己：廠商公布的是規則、實作還是測試結果？「支持新版」究竟測過哪個
+功能？即使介面通過，誰提供客戶整合驗收與可辨識收入？這三問能避免把版本號升級當成
+整條供應鏈同時受惠。
+
+<!-- research_source
+source_id: S14
+role: standard
+source_kind: document
+publisher: UCIe Consortium
+title: UCIe Consortium Advances from Chiplet Connectivity to System-Level Integration with UCIe 4.0 Specification
+published_at: 2026-11-12
+captured_at: 2026-11-17
+accepted_at: 2026-11-17
+status: active
+url: https://www.uciexpress.org/_files/ugd/0c1418_970201e6ba294a0fa690ae864082fc46.pdf
+locator: PDF 第1頁日期與發布段、第2頁 Standardizing Memory and Increasing System Efficiency 及 Advancing System-Level Security and Manageability；引用頁及相鄰第1–3頁已渲染核對；原件SHA256 f07d39232b3e37e5f73cd3fc4fe392b71789890e36cd85856c1058cb12afd6ba
+limitation: 正式新聞公告，不是完整規格或產品測試報告；不採公告效能上限作實測，不支持兩廠64G互通、客戶驗收、台灣公司收入或安全認證；與既有Consortium來源同鏈
+independence_group: ucie-consortium
+-->
+
+<!-- research_claim
+claim_id: C15
+label: verified
+status: active
+claim: UCIe Consortium於2026年11月12日發布4.0規格，公告新增UCIe.mem封裝內記憶體連線、可信晶片狀態回報、管理通道完整性保護及重設管理
+supporting_source_ids: S14
+contrary_source_ids:
+as_of: 2026-11-17
+basis: 原件第1頁確認日期與發布，第2頁列記憶體連線及系統管理安全功能；只接納公告所述規格範圍
+boundary: 規格功能不是具名silicon測試、客戶整合驗收或財務結果；未將公告中的效能改善百分比當產品量測
+verification_needed: 完整版本條文及勘誤、具名實作與固定測試包絡，並保留未通過項目
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C16
+label: inference
+status: active
+claim: UCIe 4.0的新規格範圍應另追管理與記憶體整合證據，不能用版本升級替既有64G跨廠實體互通及客戶產品條件結案
+supporting_source_ids: S2,S14
+contrary_source_ids:
+as_of: 2026-11-17
+basis: S14是規格公告；S2則是不同速度與受測物件的具名展示，兩者沒有共同產品鍵可直接拼接
+boundary: 這是證據判讀原則，不是否認產品可能已存在；不改C9主命題與原證據期限
+verification_needed: 同一版本與受測組合的介面、管理、記憶體、重設及客戶整合測試結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T4
+status: active
+claim_ids: C15,C16
+metric: UCIe 4.0的正式版本勘誤及具名記憶體與管理功能實作邊界
+source_ids: S14
+watch_source_ids: S5
+frequency: weekly
+frequency_detail: 每週核對Consortium正式原件；SC26結束後先查是否有具名實作附件，不把展覽排程當成果
+next_check: 2026-11-24
+trigger: 官方勘誤改變公告功能範圍，或具名實作公開同版本兩端晶片、封裝、記憶體與管理測試條件及pass／fail結果
+invalidation: 正式文件撤回或縮窄功能，或實作結果顯示公告範圍不能在指定組合成立；會員支持、模擬與新規格版本本身不替代實測
+-->
+
+<!-- transition
+date: 2026-11-17
+from: triaged
+to: triaged
+reason: accepted_ucie4_standard_scope_without_promoting_silicon_or_customer_maturity
+evidence: sources:S14
+-->
+
 ## 先用五個位置看小晶片如何在同一封裝裡接力
 
 | 本文五個位置 | 它做什麼 | 代表元件或工作 | 下一個要驗收 | 不能直接推成 |

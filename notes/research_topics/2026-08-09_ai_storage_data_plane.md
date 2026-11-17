@@ -120,6 +120,36 @@ locator: How does NVIDIA KvikIO leverage GDS?；Tutorial system；第4節 Determ
 limitation: NVIDIA 官方教學的成功讀取流程與限定 H100／本機 NVMe／ext4 環境，圖省略錯誤與不支援情境；不是第三方 production benchmark、Rubin／CMX／STX 驗收或台灣供應商財務證據。本輪未執行教材或變更任何安全設定。
 -->
 
+<!-- research_source
+source_id: S27
+role: company_release
+source_kind: document
+publisher: Phison Electronics
+independence_group: phison-issuer
+title: Phison 3Q26 Earnings Call
+published_at: 2026-11-06
+captured_at: 2026-11-17
+accepted_at: 2026-11-17
+status: active
+url: https://www.phison.com/wp-content/uploads/2026/11/3Q26_Phison-Earnings-Call_EN_Official_uploaded-version.pdf
+locator: 實體第5頁3Q26 Revenue Contribution圖表及所含分類；原件1605977 bytes，SHA256 d6f058edd542172ed413205ca2909f01c63eb239305a8c93c0486dc71bdb8daf；引用頁及前後各一頁已渲染，直接核對第5頁
+limitation: 單一公司法說的廣義應用分類，圖表57%而左側摘要寫57%+；沒有Pascari、具名operator或三條I/O契約收入與毛利拆分，不能以圓整比例反推精確產品金額
+-->
+
+<!-- research_claim
+claim_id: C32
+label: verified
+status: active
+claim: 群聯2026年第三季法說第5頁圖表把AI Ecosystem Module列為該季營收57%，所含分類仍涵蓋企業級SSD、aiDAPTIV、AI PC、AI網通、AI伺服器及Boot Drive，而不是本文三條I/O契約的收入
+supporting_source_ids: S27
+contrary_source_ids:
+as_of: 2026-11-06
+basis: 直接讀取原PDF並目視核對第5頁圖表；採圖表57%而不將摘要57%+改成更精確數字，保留C27對第二季38%的歷史紀錄
+boundary: N=1公司文件的季度揭露而非抽樣估計，SE/t不適用；不能當Pascari、純企業級SSD、具名買方訂單或三條資料路徑的可辨識損益；不刷新C5或待驗C7時鐘
+verification_needed:
+resolution:
+-->
+
 <!-- research_claim
 claim_id: C29
 label: verified
@@ -193,10 +223,19 @@ reason: separated_api_success_data_path_visibility_and_end_to_end_outcome
 evidence: sources:S26
 -->
 
+<!-- transition
+date: 2026-11-17
+from: triaged
+to: triaged
+reason: updated_phison_q3_broad_application_mix_without_operator_attribution_or_thesis_clock_refresh
+evidence: sources:S27
+-->
+
 ## 新手先讀：這篇在講什麼
 
 ### 名詞小字典
 
+- **Pascari**：群聯的企業級SSD產品品牌；不是廣義AI Ecosystem應用分類的同義詞。
 - **KvikIO**：供應用程式讀檔的軟體介面，會決定是否呼叫下一層cuFile。
 - **cuFile**：可使用GDS的讀寫介面，呼叫成功仍可能走相容路徑。
 - **POSIX相容路徑**：本文指經CPU暫存的讀取方式；KvikIO及cuFile各有自己的路徑。
@@ -1121,13 +1160,23 @@ end markets 的長約存量，不能把它指定給 AI SSD、8299 群聯或任�
 群聯是目前可以查核的公司入口，原因是既有公司筆記已確認它具有控制器、韌體、企業級 SSD
 與儲存系統能力；這只說明「可能負責哪些元件」，還沒有回答產品是否出現在本文三種工作中。
 
-目前缺少的是買方與供應商雙向證據：平台端沒有公布群聯具名產品與客戶認證，群聯公布的 38%
+目前缺少的是買方與供應商雙向證據：平台端沒有公布群聯具名產品與客戶認證，群聯最新第三季圖表的 57% [S27][C32]
 又同時包含企業 SSD、個人電腦、網路、伺服器與其他產品，無法拆出餵資料、保存進度或搬模型
 各自的收入。伺服器組裝廠也只保留「可能整合儲存節點」的研究入口，不能從一般整機能力推成
 已取得部署或訂單。
 
 因此個股研究的下一步不是估算受惠比例，而是依六關找出具名料號、客戶認證、正式部署分母、
 出貨與財務貢獻。在這些資料出現前，本文不支持個股排序、營收預測或投資動作。
+
+### 11/17回查：比例更新了，但「裡面有什麼」更重要
+
+**已證實**：11/6第三季法說圖表把AI Ecosystem Module列為該季營收57%；這是一個混合多種終端的
+大分類，並不是Pascari或企業級SSD專屬收入。[S27][C32] **推論**：研究時應先拆分類，再問成長來自哪種工作；
+**待驗證**：同一料號在哪個客戶完成認證、部署多少，以及收入與毛利如何對上。原第二季38%的歷史紀錄保留。
+
+新手可把「應用分類」想成混合購物籃：籃子變大，不代表每一項商品都增加。下次看法說，先問：
+分類定義是否相同？有沒有單獨的企業級SSD或Pascari分母？能接到餵資料、保存進度、搬模型其中一條嗎？
+T2與T4繼續追客戶與財務共同鍵；本次更新公司分類值，不提高主命題可信度。
 
 ### 8/28回查：產品更具體，買方與收入仍未接上
 
@@ -1626,7 +1675,7 @@ invalidation: 新規格或 production evidence 顯示四帳／十二欄遺漏會
 
 - 不能把 Meta、AWS 與 NVIDIA 三家的文件拼成同一套正式運作架構；本篇只把三種工作分開比較。
 - 不能把資料容量、峰值速度或模型大小直接換算成 SSD 顆數；快取、預先讀取與附近節點互傳都會減少重複讀取。
-- 不能把群聯廣義 AI 產品組合的 38% 當成企業級 SSD、AI 伺服器或本文三種工作的收入；這個比例混合多種產品與終端。
+- 不能把群聯最新第三季廣義 AI 產品組合圖表的 57% 當成企業級 SSD、AI 伺服器或本文三種工作的收入；這個比例混合多種產品與終端。[S27][C32]
 - 不能由群聯具備控制器、韌體與企業 SSD 能力，推導它已進入 Meta、AWS 或 NVIDIA 的具名設計、訂單、份額或毛利。
 - 不能把伺服器組裝廠的一般整合能力當成 AI 儲存路徑已通過客戶認證；仍需要同一平台的物料清單、服務目標、驗收、部署與出貨文件。
 - 不能把 I/O 模擬跑完、暫存完成或上傳完成改寫成 checkpoint 已跨故障範圍耐久保存、正確回載並改善 Runtime Goodput；六層完成階梯要逐層留證據。

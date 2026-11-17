@@ -19,17 +19,17 @@ view: company
 from_id: company:axt
 to_id: product:gaas-substrate
 relation: produces
-claim_refs: MI-2026-09-10-GALLIUM-PERMIT-DELIVERY#C2
+claim_refs: MI-2026-09-10-GALLIUM-PERMIT-DELIVERY#C2,MI-2026-09-10-GALLIUM-PERMIT-DELIVERY#C9
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-13
-review_due: 2026-10-01
+as_of: 2026-11-12
+review_due: 2026-12-17
 status: active
-boundary: 公司申報自身生產砷化鎵基板，並不證明所有出口目的地可交貨或資料中心收入占比。
+boundary: Q3公司收入解釋提及砷化鎵與新增許可，但沒有產品乘目的地金額；不代表對美放行、資料中心占比或台廠受惠，材料性仍為具名產品。
 next_trigger: 新申報分列同產品的許可及實際交付。
 -->
 

@@ -5,6 +5,7 @@
 NAND 寫入與額定壽命四本帳，最後再把容量出貨、每單位營收、長約、RPO 與已認列財務拆成
 五本商業帳。公司線只表示已核驗的儲存能力或財務揭露
 或平台路徑；沒有買方客戶認證、部署分母與財務資料前，不把相鄰能力畫成訂單。
+2026-11-17補讀群聯第三季廣義AI分類（本文C32）只更新讀者邊界；公司能力線的證據日期與成熟度不變。
 
 <!-- knowledge_graph_meta
 schema_version: 1
@@ -32,7 +33,7 @@ exclusivity_scope:
 as_of: 2026-07-16
 review_due: 2026-08-28
 status: active
-boundary: 群聯文件只證實 NAND 控制器 韌體 企業級 SSD 與廣義 AI Ecosystem 產品能力；沒有把具名產品接到資料集 checkpoint 或模型分發的客戶資格 部署 訂單 收入或毛利。
+boundary: 群聯文件只證實 NAND 控制器 韌體 企業級 SSD 與廣義 AI Ecosystem 產品能力；廣義AI分類不能當企業SSD或三條路徑收入；沒有把具名產品接到資料集 checkpoint 或模型分發的客戶資格 部署 訂單 收入或毛利。
 next_trigger: 平台與群聯雙向揭露具名產品 路徑角色 qualification production 數量及財務分母。
 -->
 

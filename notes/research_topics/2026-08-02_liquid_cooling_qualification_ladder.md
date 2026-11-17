@@ -114,6 +114,8 @@ evidence: sources:S21
 
 ### 名詞小字典
 
+- **FAQ（常見問答）**：公司整理給投資人的問題與回答。本文引用光寶指定季度的回答，不把網站其他季度內容混在一起。
+
 - **Pecos**：美國德州的一個場址；本文指Microsoft公布的資料中心建設計畫，不能與其其他德州園區的營運成績混用。
 - **Hyderabad／India South Central**：Microsoft 新印度雲端區域所在城市與區域名稱；啟用公告和分階段開放的服務要分開讀，亦不能把它的冷卻說法套到 Pecos。
 - **機械冷卻**：用機械設備移走熱量的方式。公告使用這個詞，不代表已披露完整水路、設備型號或供應商。
@@ -2620,4 +2622,142 @@ from: triaged
 to: triaged
 reason: added_pg_guideline_scope_and_material_traceability_without_thesis_clock_refresh
 evidence: sources:S36
+-->
+
+<!-- research_source
+source_id: S37
+role: management_commentary
+source_kind: document
+publisher: Delta Electronics
+independence_group: delta-electronics
+title: Delta Electronics 3Q26 Earnings Conference — company English transcript
+published_at: 2026-10-29
+captured_at: 2026-11-17
+accepted_at: 2026-11-17
+status: active
+url: https://filecenter.deltaww.com/IR/download/calendar/3Q26_Transcript.pdf
+locator: PDF p1會議日期及翻譯免責、p7 Q11 CFO回答；官方法說索引列10/29。原件SHA256 ddbb3089a881b711fdf7879d577a8c5a2b577731fde606373a5a0be316172d5e；p7及相鄰p6、p8已渲染核對
+limitation: 公司整理的英文稿只供參考、中文原音優先；只接納公司自身液冷揭露，不採稿內對其他公司的轉述。金額與占比皆約數，未提供產品分項核閱附註、客戶、數量或毛利；同Delta消息鏈不是新增獨立交叉驗證
+-->
+
+<!-- research_source
+source_id: S38
+role: management_commentary
+source_kind: living_index
+publisher: LITEON Technology
+independence_group: liteon-technology
+title: Earnings Conference — 2026 3Q Investor FAQ
+published_at:
+captured_at: 2026-11-17
+accepted_at: 2026-11-17
+status: active
+url: https://www.liteon.com/en/download/investor-conference
+locator: 2026 3Q下Investor FAQ之What is the current progress of the liquid cooling business；原始HTML SHA256 6fa834d7392d34ad18ea36acd21c00c24144836b4011000cabc4c1ca520a94e4。固定引用本輪保存的FAQ段落，非全頁其他季度或最新側欄
+limitation: 活頁沒有該FAQ獨立發布日，2026Q3是回答期間而非取件日；公司自述出貨，不提供具名客戶、型號ID、台數、收入、毛利或買方驗收。不是NVIDIA Marketplace列項，也不把官方網站所附第三方LSEG逐字稿算第二條獨立來源
+-->
+
+<!-- research_claim
+claim_id: C46
+label: verified
+status: active
+claim: 台達2026Q3公司英文法說稿載明CFO表示，2026年第三季液冷收入約新台幣250億元、約占同期總營收13%；全年占比相近仍是管理層預期
+supporting_source_ids: S37
+contrary_source_ids:
+as_of: 2026-11-17
+basis: S37 p7 Q11的CFO回答將3Q26約NT$25bn、around13%與full-year expected分開
+boundary: verified只證實公司對2026-07-01至09-30液冷產品族的近似揭露，不是具名CDU財報附註；NT$25bn換成250億元只做單位換算，不由約13%反推精確收入。不拆給L2A、L2L或任何平台型號；單一發行人揭露不是推論樣本，無sampling SE或t
+verification_needed: 同期產品分項、定義與可重算金額；若要歸因具名CDU，另需客戶驗收、數量與產品損益
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C47
+label: verified
+status: active
+claim: 光寶2026Q3官方Investor FAQ表示120kW CDU於第三季開始出貨，第四季預期放量；220kW CDU當時仍在設計階段
+supporting_source_ids: S38
+contrary_source_ids:
+as_of: 2026-11-17
+basis: S38的2026 3Q液冷問題將began shipments、expected to ramp up與under design分開
+boundary: 120kW與220kW是公司產品描述而非本輪實測容量，沒有相同流體、ATD或測試包；不得與Marketplace的380kW LC-LL-WCDU-6011(S)合併。出貨陳述未列客戶、台數、認列金額、毛利或收現；不把Q4預期或220kW設計當成已完成
+verification_needed: 公司與客戶以同一型號及版本連接出貨、驗收、數量和期間損益；下一次回查Q4放量是否實現
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C48
+label: inference
+status: active
+claim: 台達液冷產品族收入與光寶CDU出貨各自補上一個商業節點，但兩者不能用來排列CDU公司優劣，也尚未把平台列名接到同款設備的客戶驗收及財務貢獻
+supporting_source_ids: S37,S38,S22
+contrary_source_ids:
+as_of: 2026-11-17
+basis: S37是公司產品族的季度收入與占比；S38是產品描述加出貨階段；S22是較早的平台型號欄位，三者沒有共同產品ID與測試條件
+boundary: 這是研究端的不可比性判斷，不表示出貨沒有收入，也不否定公司可能掌握內部明細；不以缺乏公開分解認定零受惠
+verification_needed: 固定同一產品ID、版本、客戶、期間、數量、認列與毛利，再分別評估材料性；不得用總營收代填
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 11 月 17 日更新 液冷收入與產品出貨各前進到哪裡
+
+台達已提供新的**產品族收入**：公司第三季法說稿載明，2026年7至9月液冷收入約新台幣
+250億元、約占同季總營收13%；全年占比相近仍是預期。[C46] 光寶官方FAQ則表示，
+120kW CDU已在第三季開始出貨，第四季預期放量；220kW CDU仍在設計。[C47]
+
+新手可以把「產品族」想成店裡的一整類商品，把「型號」想成其中一件商品的編號。
+台達回答的是整類賣了多少，光寶回答的是某類設備開始交貨。這比展示或合作意向更具體，
+但還不能把台達的收入分給某一台CDU，也不能把光寶120kW產品當成平台清單上另一個型號。
+收入占比、額定容量與交貨階段不是同一把尺，不能據此替兩家公司排名。[C48]
+
+接著可以問三個問題：**交貨的是哪個型號？客戶是否驗收？同一季究竟認列多少收入及毛利？**
+第一個問題避免串錯產品，第二個分清交貨與通過驗收，第三個才讓商業重要性可重算。
+追蹤台達下一季的產品分項與光寶Q4出貨更新；若只重述產品族或展望，具名CDU的財務橋接
+仍屬待驗證。原T8及主命題時鐘不因這兩項局部進展延長。
+
+來源：[S37 台達2026Q3公司法說稿](https://filecenter.deltaww.com/IR/download/calendar/3Q26_Transcript.pdf)、
+[S38 光寶2026Q3官方FAQ](https://www.liteon.com/en/download/investor-conference)。
+
+<!-- monitoring_item
+monitor_id: T11
+status: active
+claim_ids: C46,C48
+metric: 台達液冷產品族季度實際收入、占比及定義是否延續或修正，與具名CDU分解分開
+source_ids: S37
+watch_source_ids: S5
+frequency: quarterly
+frequency_detail: 下一季公司法說或正式更正時回查；2027-02-17為研究端檢查日，非公司公布承諾
+next_check: 2027-02-17
+trigger: 公司下一季或更正文件提供液冷產品族實際金額、同期分母與定義，或正式拆開L2A／L2L／CDU及產品毛利
+invalidation: 公司修正3Q26金額或範圍、重分類導致前後不可比時追加更正；全年仍只有預期時不得當實績，產品族收入不得分給單一型號
+-->
+
+<!-- monitoring_item
+monitor_id: T12
+status: active
+claim_ids: C47,C48
+metric: 光寶120kW CDU的Q4放量預期與220kW設計階段是否由同款產品的實際交付資料接續
+source_ids: S38
+watch_source_ids: S38
+frequency: quarterly
+frequency_detail: 下一季法說與產品公告後複核；具名客戶驗收或正式更正時提前
+next_check: 2027-02-17
+trigger: 同一型號與版本揭露Q4實際出貨、客戶驗收、數量及認列，或220kW產品正式進入下一階段
+invalidation: 公司撤回出貨陳述、延後產品或Q4放量未實現時按對應產品下修；不能用其他容量或DCX產品的進展代填
+-->
+
+<!-- transition
+date: 2026-11-17
+from: triaged
+to: triaged
+reason: added_quarterly_liquid_cooling_family_revenue_and_cdu_shipment_statement_without_named_model_financial_bridge
+evidence: sources:S37,S38
 -->

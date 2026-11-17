@@ -10,7 +10,7 @@ schema_version: 1
 graph_id: ucie-interoperability
 root_node_id: concept:ucie-interoperability
 label: UCIe 小晶片互通與量產階梯
-summary: 以證據物件、測試包絡與供應商獨立性三軸，對齊 16G 跨廠展示、32G 實體晶片與 64G 各家送廠，再以連線效能護照分開 GT/s、方向、raw、payload、錯誤恢復、服務與客戶量產。
+summary: 以證據物件、測試包絡與供應商獨立性三軸，對齊 16G 跨廠展示、32G 實體晶片與 64G 各家送廠；UCIe 4.0另留在規格層，不替代實體互通、客戶產品或收入。
 article_ids: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER
 status: active
 -->
@@ -373,4 +373,24 @@ review_due: 2026-08-17
 status: active
 boundary: x16@64 GT/s＝128 GB/s／direction、兩向加總 256 GB/s 是 N=1 假想配置的條件式 raw 算術，沒有 device、run、sampling SE／t；未扣 protocol／flit／CRC／replay／idle，也不是 payload、服務效能或 interoperability result。
 next_trigger: 具名 64G link 同時公開 raw reference plane、單向／雙向 traffic、protocol／flit、payload counters、error／replay／retrain、duration、latency／energy 與 application result。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-UCI-I15
+view: industry
+from_id: concept:ucie-interoperability
+to_id: standard:ucie4
+relation: includes
+claim_refs: MI-2026-08-02-UCIE-INTEROPERABILITY-LADDER#C15
+note_refs:
+evidence_state: verified
+commercial_stage: concept
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-11-17
+review_due: 2026-11-24
+status: active
+boundary: 4.0公告新增記憶體連線與系統管理安全範圍，只是規格層；不證明實體64G跨廠互通、客戶產品、安全認證或收入，不延長其他既有連線的證據期限。
+next_trigger: 正式勘誤或同版本具名兩端晶片、封裝及記憶體與管理功能測試結果。
 -->

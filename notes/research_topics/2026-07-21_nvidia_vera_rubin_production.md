@@ -114,6 +114,21 @@ evidence: sources:S27
 
 ## 新手先讀：這篇在講什麼
 
+### 11 月 17 日更新：跑分的「可取得」，和你的「買得到」怎麼對上？
+
+**已證實的是公司揭露**：CoreWeave於11/16稱其Rubin測試參加MLPerf Training v6.1的Closed／Available
+類別，使用客戶訓練也使用的正式叢集；NVIDIA同日正文稱系統已透過多家雲端夥伴一般供應。[S28][S29][C29][C31]
+
+這使供應語言較9月底的有限度開放前進，但未逐一交代哪個營運商、地區、可下單SKU與交付日期。
+
+**Available**是跑分提交的可取得類別，不是每個地區即刻有貨的保證；**rerun**是用更新軟體重跑。
+NVIDIA把這些重跑明標為未經MLCommons核驗，不能混入正式提交的同一欄來比較。[C30]
+本文不轉載效能倍率，因尚未離線重算原始執行、重複樣本與誤差；「公司報告結果」也不等於本文獨立驗證效能。
+
+**推論**：商業可取得與效能可比較是兩道問題。**待驗證**：你能在哪裡取得同版本產品、客戶實際驗收多少、
+以及哪家台灣公司認列收入。接著先問：結果是正式提交還是重跑？軟體版本是否相同？可租用產品頁與
+具名客戶部署能否對上？T3追供應階段，T4追台廠財務；主命題C11的時鐘不因這條新分支刷新。
+
 ### 10 月 21 日補課：工廠先測好，現場還要驗什麼？
 
 NVIDIA 的 **DSX POD** 是把 AI 基礎設施預先裝進貨櫃的參考設計。其公開說明把驗證拆成
@@ -146,6 +161,11 @@ CoreWeave 9 月 30 日公告，Cognition 已在 Vera Rubin NVL72 上執行正式
 供應商交貨、客戶驗收及財務認列對上？本文只推進具名工作旁支，不刷新主命題 C11 的時鐘。
 
 ### 名詞小字典
+
+- **MLPerf Training v6.1**：由MLCommons組織維護的訓練效能測試第6.1輪，量測達到指定品質所需時間；本文沒有獨立重算結果。
+- **MLCommons**：維護上述測試規則與提交流程的組織；廠商派生倍率或自行重跑不一定經其核驗。
+- **Closed／Available**：前者限制提交使用指定模型以利比較，後者是公司所稱可購買或租用硬體的提交類別，不等於逐地區庫存保證。
+- **Rerun（重跑）**：原提交後使用更新軟體重做測試；必須另看版本與是否經正式核驗。
 
 - **DSX／DSX POD**：NVIDIA 的 AI 基礎設施設計框架，以及其中把系統預先整合進貨櫃的參考設計；設計方案不是具名場站的實際驗收結果。
 
@@ -1335,6 +1355,88 @@ as_of: 2026-10-21
 basis: 由原文出貨前記錄configuration與test status、運抵重做指定檢查及場站連接後commissioning的先後關係推導
 boundary: 研究使用的核對方法，不宣稱取得客戶實際紀錄或統一合格標準；不能把工廠測試日期當收入認列日期
 verification_needed: 同名設備批次、組態與版本、工廠及現場測試、運輸變更、失敗處置及客戶簽收
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-17
+from: triaged
+to: triaged
+reason: added_training_availability_disclosures_and_unverified_rerun_boundary_without_thesis_clock_or_supplier_financial_upgrade
+evidence: sources:S28,S29
+-->
+
+<!-- research_source
+source_id: S28
+role: company_release
+source_kind: document
+publisher: CoreWeave
+independence_group: coreweave
+title: CoreWeave Becomes First Cloud Provider to Deliver Multi-Rack NVIDIA Vera Rubin Results in MLPerf Training v6.1
+published_at: 2026-11-16
+captured_at: 2026-11-17
+accepted_at: 2026-11-17
+status: active
+url: https://wf.coreweave.com/news/coreweave-becomes-first-cloud-provider-to-deliver-multi-rack-nvidia-vera-rubin-results-in-mlperf-r-training-v6-1
+locator: 開頭Closed division Available category、陳述same production clusters及頁尾註1；原網頁315477 bytes，SHA256 ce3610b8f5e6d33b88f28fb38b55b4de02dcbe98de4f3b4ca37ae05a84107b09
+limitation: 營運商自行公告；尚未取得MLCommons原始提交完整資料或獨立重跑；派生speedups註1明載not verified by MLCommons；不能當所有地區GA、客戶驗收或台廠財務
+-->
+
+<!-- research_source
+source_id: S29
+role: other_primary
+source_kind: document
+publisher: NVIDIA
+independence_group: nvidia-platform
+title: NVIDIA Vera Rubin NVL72 Achieves up to 2x Blackwell Ultra Performance in MLPerf Training v6.1
+published_at: 2026-11-16
+captured_at: 2026-11-17
+accepted_at: 2026-11-17
+status: active
+url: https://developer.nvidia.com/blog/nvidia-vera-rubin-nvl72-achieves-up-to-2x-blackwell-ultra-performance-in-mlperf-training-v6-1/
+locator: 正文Continuous software optimization、Tables2–3未核驗重跑註解，以及An ecosystem that shipped on day one的generally available段；非AI-generated summary。原網頁298788 bytes，SHA256 b7c8b87d69fddb64d0f524c6f6bf0ea4e835afaac4f156752aac8cfba317d9df
+limitation: 平台商技術公告與供應陳述；沒有逐個具名營運商地區及可下單SKU，重跑未經MLCommons審查；不以標題效能倍率作本文驗證結論
+-->
+
+<!-- research_claim
+claim_id: C29
+label: verified
+status: active
+claim: CoreWeave於11月16日表示Rubin NVL72參加MLPerf Training v6.1 Closed的Available類別，並稱測試使用其客戶訓練也使用的正式叢集
+supporting_source_ids: S28
+contrary_source_ids:
+as_of: 2026-11-16
+basis: 核對公司公告正文的提交類別與環境陳述，不將公告本身稱作本文獨立核驗的測試結果
+boundary: N=1公司消息鏈，SE/t不適用；不採未重算倍率，不證明所有地區即時可租用、具名客戶驗收、正式運行分母或台灣ODM財務
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: NVIDIA的Training v6.1文章將使用較新軟體版本的重跑與正式MLCommons提交分欄，並明示重跑未經MLCommons審查
+supporting_source_ids: S29
+contrary_source_ids:
+as_of: 2026-11-16
+basis: 直接核對Continuous software optimization段及Tables2–3腳註；該腳註還警告量測方法或工作負載實作可能不符合正式規格
+boundary: 只驗證來源對結果類別的區隔；未重跑、未檢查原始資料或估計不確定度，不得把新版本重跑混成正式比賽結果或實際部署效益
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C31
+label: verified
+status: active
+claim: NVIDIA於11月16日技術文章正文表示系統已透過多家雲端基礎設施夥伴一般供應，較本文此前保存的CoreWeave有限度開放說法多出一條平台商供應階段陳述
+supporting_source_ids: S29
+contrary_source_ids:
+as_of: 2026-11-16
+basis: An ecosystem that shipped on day one正文直接使用generally available across various cloud infrastructure partners；只核對平台商陳述，不替個別營運商背書
+boundary: 不是對每家夥伴與地區的交叉驗證；未公布完整可下單SKU、交期、客戶驗收或台廠財務共同鍵。保留C26的9月歷史範圍，不覆寫其時點，也不刷新C11
+verification_needed:
 resolution:
 -->
 

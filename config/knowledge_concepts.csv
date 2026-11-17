@@ -612,3 +612,4 @@ process:hv-ibc-operating-point-contract,process,高壓IBC工作條件契約,HV I
 process:gds-path-observation-contract,process,GDS資料路徑觀測,GDS path observation|KvikIO|cuFile|nvfs|POSIX,concept:ai-storage-data-plane,分開API成功 實際選路 計數器可見範圍與端到端結果 不由部分操作計數推全應用效益或公司收入
 process:memory-commercial-evidence-ledgers,process,記憶體商用證據分帳,Memory shipment forecast LTA roadmap,concept:ai-memory-hierarchy,分開當季出貨 下一季展望 未來產能長約及中長期產品計畫 不由總產能比例推特定產品收入
 process:product-period-stage-financial-boundary,process,產品期間階段與財務四欄核對,Product period stage financial boundary,concept:800vdc-execution-readiness,同一公司不同產品的原型與量產展望分開 保留期間與收入分類 不以廣義AI收入替單品收入或毛利
+standard:ucie4,standard,第四代通用小晶片互連（UCIe 4.0）,Universal Chiplet Interconnect Express 4.0,process:advanced-packaging,將封裝內記憶體連線與管理安全要求納入的第四代開放介面規格 不代表產品驗收

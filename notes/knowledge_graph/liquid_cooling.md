@@ -244,17 +244,17 @@ view: company
 from_id: company:2308
 to_id: concept:liquid-cooling
 relation: reports_financials
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C20
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C20,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C46
 note_refs:
 evidence_state: verified
 commercial_stage: financial
 materiality: financial
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-30
-review_due: 2026-11-14
+as_of: 2026-11-17
+review_due: 2027-02-17
 status: active
-boundary: 台達管理層表示 aggregate liquid-cooling products 約占 2025 年合併營收 10%；這是公司產品族的近似歷史占比，不是經查核財報產品附註，也沒有拆成 L2A、L2L、RDF106CDT5192、客戶、數量或產品毛利。2026 年超過 12% 仍是預期，不列為實績。
+boundary: 台達管理層披露2025全年液冷產品族約10%；2026Q3公司稿另披露同季液冷約250億元、約13%。不同期間不可當同季成長率；均未拆成L2A、L2L、具名CDU、客戶、數量或產品毛利。全年相近占比仍為預期；不刷新Marketplace型號或原主命題時鐘。
 next_trigger: 台達以同期間合併分母揭露液冷實際金額與口徑，並把產品族拆成 L2A／L2L／CDU、具名型號、客戶驗收、數量與產品毛利。
 -->
 
@@ -284,6 +284,54 @@ metric_definition: 台達管理層對 2025 年 aggregate liquid-cooling products
 denominator_definition: 同一管理層回答中的公司合併營收占比基準，以 100 個百分點表示；來源未提供底層合併金額與產品收入金額。
 boundary: direct 只表示產品族分子可直接歸因到液冷主題；數字是管理層近似說法、不是經查核產品附註，也不能分配給 L2A、L2L、CDU 或 RDF106CDT5192。2026 年超過 12% 是預期，不納入本筆歷史 assessment；單一發行人揭露沒有 sampling SE／t。
 next_trigger: 公司以正式期間數字重述 2025／2026 液冷產品收入與分母，並拆出 L2A／L2L／CDU、具名型號、客戶、數量與產品毛利。
+-->
+
+<!-- financial_materiality
+contract_version: 2
+assessment_id: FM-LC-2308-03
+edge_id: KG-LC-C08
+financial_scope: product
+metric: aggregate_liquid_cooling_revenue_share
+value_kind: reported
+reported_value: 13
+unit: percentage_points
+period_start: 2026-07-01
+period_end: 2026-09-30
+period_basis: quarter
+denominator_metric: consolidated_revenue_share
+denominator_value: 100
+denominator_unit: percentage_points
+share_percent: 13
+attribution_status: direct
+source_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#S37
+calculation:
+as_of: 2026-11-17
+review_due: 2027-02-17
+status: active
+metric_definition: 台達CFO在3Q26公司法說稿披露同季liquid cooling約占總營收13%；按近似原始占比保存，不把約NT$25bn反推成精確值。
+denominator_definition: 2026年第三季同期總營收占比基準100個百分點；與2025全年10%保存為不同觀察，不計算跨期間成長率。
+boundary: direct只及液冷產品族，非經核閱的型號收入或毛利；沒有L2A／L2L／CDU分解。管理層約數未附四捨五入規則；單一發行人揭露不是抽樣估計，無sampling SE或t；全年相近占比仍是預期。
+next_trigger: 下一季或更正文件提供同口徑實際分子分母與產品分解；若範圍改變，另列不可比性與修正。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-LC-C11
+view: company
+from_id: company:2301
+to_id: concept:liquid-cooling
+relation: produces
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C47
+note_refs:
+evidence_state: verified
+commercial_stage: shipment
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-11-17
+review_due: 2027-02-17
+status: active
+boundary: 光寶官方FAQ表示120kW CDU於2026Q3開始出貨；沒有型號ID、客戶、台數、產品收入或毛利。不可合併為Marketplace的380kW LC-LL-WCDU-6011(S)，Q4放量與220kW產品進度仍需另驗；出貨不等客戶已驗收。
+next_trigger: 同一120kW產品ID與版本的Q4實際出貨、具名客戶驗收、數量與期間財務；220kW設計不得代填。
 -->
 
 <!-- knowledge_edge

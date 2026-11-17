@@ -288,7 +288,7 @@ resolution:
 
 ## 來源與證據邊界
 
-本篇採三份固定日期文件與一個重查入口。[AXT 官方申報索引](https://investors.axt.com/Investors/financials/sec-filings/default.aspx)當日可開啟，但文字提取沒有動態申報列。季報期末與提交日分開記錄，全文採用的公司狀態最晚截至 8 月 13 日，並不冒充 9 月 10 日即時出貨調查。
+9月10日初稿採三份固定日期文件與一個重查入口。[AXT 官方申報索引](https://investors.axt.com/Investors/financials/sec-filings/default.aspx)當時可開啟，但文字提取沒有動態申報列。初稿公司狀態最晚截至8月13日，不冒充9月10日即時出貨調查。11月17日更新另採S5：期末9月30日的Q3、11月12日申報；期末、提交與本輪查核日期分開，不回寫舊紀錄。
 
 機構框架與公司披露是兩條消息鏈；公司季報與新聞稿同屬 AXT。尚缺客戶端收貨、分產品待交訂單，以及任何台灣公司的收入對照，故不新增正式個股結論。
 
@@ -336,3 +336,63 @@ invalidation: 只有磷化銦或總收入改善時，仍不能確認鎵需求；
 ## 下一個可證明／否定的節點
 
 先看公司能否把新增許可與同產品交付接起來。沒有新文件時，保留本次判斷日期與證據限制，不用舊的需求展望替供應風險補上實績。
+
+## 11月17日更新：新增許可開始連到收入說明，但不是每種產品都一樣
+
+[AXT 11月12日提交的第三季季報](https://www.sec.gov/Archives/edgar/data/1051627/000143774926036542/axti20261101_10q.htm)第44–45頁，把基板收入成長同時連到磷化銦、砷化鎵需求與新增出口批准；歐洲收入成長也提到這兩種基板的新增批准。相反地，台灣與日本收入下降的解釋，包含磷化銦出口限制與砷化鎵需求降低。這比只看到總營收創高更有用：同一家公司，不同產品、目的地可能朝不同方向走。
+
+**證實**只到「公司本期有上述收入解釋」，不是各因素貢獻已獨立量出。第35–36頁仍說對美砷化鎵許可尚未獲批，磷化銦仍有待許可訂單；不能把歐洲改善寫成對美全面放行。**推論**是產品、目的地與期間應一起查；**待驗證**仍是各產品在各目的地的數量、收入、許可與實際交付配對。財報把各基板收入合在一類，地區收入也混合產品，兩張表不能直接交叉相乘得到「歐洲砷化鎵收入」。
+
+新手可以把它想成一家店同時賣兩種商品：總營業額變好，不代表每種商品在每個分店都賣得更好。下一次要追的是同產品、同目的地的交付資料，而不是再找一則總營收標題。若批准增加後交付仍卡住，就要檢查製造或客戶因素。外國公司案例仍不證明任何台灣供應商受惠。
+
+<!-- research_source
+source_id: S5
+role: company_filing
+source_kind: document
+publisher: AXT / SEC
+title: AXT 2026Q3 Form 10-Q filed November 12
+published_at: 2026-11-12
+captured_at: 2026-11-17
+accepted_at: 2026-11-17
+status: active
+url: https://www.sec.gov/Archives/edgar/data/1051627/000143774926036542/axti20261101_10q.htm
+locator: SEC submissions確認11/12提交；HTML印刷頁35–36許可、44–45產品與地區收入解釋，季度截至9/30
+limitation: 公司自述收入歸因，不是獨立因果估計；沒有產品乘目的地矩陣。本輪SEC直接下載403、閱讀服務正文可讀，沒有原申報HTML離線SHA，不宣稱完整離線原件核驗。
+independence_group: axt
+-->
+
+<!-- research_claim
+claim_id: C9
+label: verified
+status: active
+claim: AXT第三季申報把基板及歐洲收入成長連到磷化銦與砷化鎵需求及新增出口批准，台灣與日本則提及磷化銦出口限制及砷化鎵需求降低
+supporting_source_ids: S5
+contrary_source_ids:
+as_of: 2026-11-12
+basis: S5印刷pp44–45的Revenue與Revenue by Geographic Region解釋；只確認公司做出分產品方向與地區歸因
+boundary: 沒有各基板的收入金額、數量、個別批准與交付共同鍵；不外推對美放行或台股營收受惠
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C10
+label: inference
+status: active
+claim: 基板類別合計與地區收入合計不能交叉拼成各產品各目的地收入，新增許可的質化說明也不能分離各因素的貢獻
+supporting_source_ids: S2,S5
+contrary_source_ids:
+as_of: 2026-11-17
+basis: S5 pp44–45按產品大類與地區分表揭露，無共同的產品乘地區數字；pp35–36仍有對美許可與待批准訂單限制
+boundary: 這是披露口徑限制，不代表沒有交付、許可無效或各地區表現相同
+verification_needed: 公司提供同產品、目的地、期間、批准與交付的配對資料
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-17
+from: triaged
+to: triaged
+reason: added_q3_product_and_destination_revenue_explanations_without_inventing_cross_tab_attribution_or_refreshing_thesis_clock
+evidence: sources:S5
+-->

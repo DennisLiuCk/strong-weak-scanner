@@ -112,12 +112,15 @@ class ResearchMethodAuditTest(unittest.TestCase):
         )
         self.assertNotIn("supportRate", self.current["calibration"])
         self.assertNotIn("score", self.current)
-        self.assertEqual(self.current["scope"]["financialAssessments"], 6)
-        self.assertEqual(self.current["graphs"]["financialAssessments"], 6)
-        self.assertEqual(self.current["graphs"]["financialContractComplete"], 6)
-        self.assertEqual(self.current["graphs"]["directFinancialAttribution"], 1)
-        self.assertEqual(self.current["graphs"]["boundedFinancialProxies"], 3)
-        self.assertEqual(self.current["graphs"]["financialDenominatorsNotDisclosed"], 2)
+        assessments = [item for graph in self.graph["graphs"] for item in graph["financialAssessments"]]
+        self.assertEqual(self.current["scope"]["financialAssessments"], len(assessments))
+        self.assertEqual(self.current["graphs"]["financialAssessments"], len(assessments))
+        self.assertEqual(self.current["graphs"]["financialContractComplete"], len(assessments))
+        for key, status in (("directFinancialAttribution", "direct"),
+                            ("boundedFinancialProxies", "bounded_proxy"),
+                            ("financialDenominatorsNotDisclosed", "not_disclosed")):
+            self.assertEqual(self.current["graphs"][key],
+                             sum(item["attributionStatus"] == status for item in assessments))
         selection = self.current["selection"]
         self.assertEqual(selection["cycleId"], self.radar["selectionCycleId"])
         self.assertEqual(selection["candidates"], len(self.radar["candidates"]))

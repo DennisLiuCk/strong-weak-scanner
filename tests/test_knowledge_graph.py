@@ -123,7 +123,7 @@ class KnowledgeGraphTest(unittest.TestCase):
             {item["id"] for item in assessments},
             {
                 "FM-YQ2-2327-01", "FM-LC-3017-01", "FM-LC-2308-01",
-                "FM-LC-2308-02", "FM-LC-2301-01", "FM-ITD-6223-01",
+                "FM-LC-2308-02", "FM-LC-2308-03", "FM-LC-2301-01", "FM-ITD-6223-01",
             },
         )
         self.assertEqual(
@@ -146,7 +146,10 @@ class KnowledgeGraphTest(unittest.TestCase):
                             for item in proxies))
         self.assertTrue(all(item["sharePercent"] for item in proxies))
         direct = [item for item in assessments if item["attributionStatus"] == "direct"]
-        self.assertEqual([item["id"] for item in direct], ["FM-LC-2308-02"])
+        self.assertEqual([item["id"] for item in direct], ["FM-LC-2308-02", "FM-LC-2308-03"])
+        self.assertEqual([(item["periodStart"], item["periodEnd"]) for item in direct],
+                         [("2025-01-01", "2025-12-31"), ("2026-07-01", "2026-09-30")])
+        self.assertEqual([str(item["sharePercent"]) for item in direct], ["10", "13"])
         financial_edges = [
             edge for graph in self.payload["graphs"] for edge in graph["edges"]
             if edge["materiality"] == "financial"

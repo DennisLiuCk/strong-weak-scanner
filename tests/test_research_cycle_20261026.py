@@ -58,7 +58,8 @@ class ResearchCycleOctober26Test(unittest.TestCase):
         self.assertEqual(keyed(TOPIC, 'research_claim', 'claim_id')['C5']['as_of'], '2026-08-09')
         transitions = records(TOPIC, 'transition')
         self.assertTrue(any(t['date'] == '2026-10-26' and t['evidence'] == 'sources:S26' for t in transitions))
-        topic = dict(topic_id=meta['topic_id'], title=meta['topic_id'], relpath=TOPIC, meta=meta, transitions=transitions)
+        historical = [t for t in transitions if t['date'] <= '2026-10-26']
+        topic = dict(topic_id=meta['topic_id'], title=meta['topic_id'], relpath=TOPIC, meta=meta, transitions=historical)
         recent = bd.build_recent_articles('2026-10-26', {}, {}, topics=[topic])
         self.assertEqual(recent['items'][0]['researchId'], 'topic-'+meta['topic_id'])
         self.assertEqual(recent['items'][0]['date'], '2026-10-26')

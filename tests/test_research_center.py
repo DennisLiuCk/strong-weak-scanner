@@ -6126,9 +6126,8 @@ process.stdout.write(JSON.stringify(results));
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0]
-        reflection = topic.split("### 想一想", 1)[1].split(
-            "## 先用五個位置看", 1
-        )[0]
+        # Stop at the next heading; later appended sections are not reflection text.
+        reflection = re.split(r"\n##? ", topic.split("### 想一想", 1)[1], maxsplit=1)[0]
         for jargon in (
             "UCIe", "GT/s", "chiplet", "die-to-die", "controller",
             "PHY", "lane", "sideband", "manageability", "protocol",
@@ -6143,7 +6142,15 @@ process.stdout.write(JSON.stringify(results));
             ("research_claim", 14), ("metric_comparison", 0),
             ("impact", 3), ("monitoring_item", 3),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in {"research_source", "research_claim", "monitoring_item"}:
+                self.assertGreaterEqual(topic.count(f"<!-- {block}"), expected)
+                field, prefix = {"research_source": ("source_id", "S"), "research_claim": ("claim_id", "C"), "monitoring_item": ("monitor_id", "T")}[block]
+                blocks = re.findall(r"<!-- " + block + r"\s*\n(.*?)-->", topic, re.S)
+                ids = [re.search(r"^" + field + r":\s*(\S+)", value, re.M).group(1) for value in blocks]
+                self.assertEqual(len(ids), len(set(ids)))
+                self.assertTrue({f"{prefix}{i}" for i in range(1, expected + 1)}.issubset(ids))
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
         guide = (ROOT / "config" / "research_topic_guide.csv").read_text(
             encoding="utf-8"
         )
@@ -6182,7 +6189,11 @@ process.stdout.write(JSON.stringify(results));
             "edge_id: KG-UCI-I14", "to_id: metric:ucie-transfer-raw-payload-direction-contract",
         ):
             self.assertIn(graph_contract, graph)
-        self.assertEqual(graph.count("<!-- knowledge_edge"), 18)
+        edge_ids = re.findall(r"^edge_id: (.+)$", graph, re.M)
+        self.assertGreaterEqual(len(edge_ids), 18)
+        self.assertEqual(len(edge_ids), len(set(edge_ids)))
+        self.assertTrue({f"KG-UCI-C{i:02}" for i in range(1, 5)}.issubset(edge_ids))
+        self.assertTrue({f"KG-UCI-I{i:02}" for i in range(1, 15)}.issubset(edge_ids))
 
     def test_design_test_quality_station_one_separates_chiplet_handoff_contracts_and_conformance_gates(self):
         topic = (

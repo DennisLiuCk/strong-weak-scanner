@@ -4,6 +4,7 @@
 再把平台生產、系統就緒、工廠生產、整櫃驗證、站點驗收、工作負載與財務歸因逐關分開。
 圖中的族群線是下一份證據的搜尋入口；除具名系統廠角色外，不代表台灣供應商已取得訂單或獲利。
 DSX POD 的工廠／運輸／現場交接另以方法線呈現，不提高原部署與公司財務線的成熟度。
+11月16日的跑分類別與平台商一般供應陳述增列於公司線邊界，不能替代逐地區SKU、客戶驗收與財務共同鍵。
 
 <!-- knowledge_edge
 edge_id: KG-VRD-I21
@@ -41,17 +42,17 @@ view: company
 from_id: company:nvidia
 to_id: product:nvidia-vera-rubin-nvl72
 relation: owns_platform
-claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C1,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C12,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C21
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C1,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C12,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C21,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C31
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-31
-review_due: 2026-09-07
+as_of: 2026-11-17
+review_due: 2026-11-24
 status: active
-boundary: NVIDIA 的 full production 8月production shipments與廣義PO類別只證明平台商自身階段；沒有出貨物件 數量 具名ODM acceptance或台灣供應商財務共同鍵。
+boundary: NVIDIA的full production 8月production shipments與廣義PO類別及11月16日多家雲端夥伴一般供應陳述只證明平台商披露階段；後者未逐一列營運商地區與SKU；沒有出貨物件 數量 具名ODM acceptance或台灣供應商財務共同鍵。
 next_trigger: NVIDIA與具名客戶公布有版本的 configuration matrix shipment object與quantity ODM factory 客戶站點驗收及可對時部署量。
 -->
 
@@ -61,17 +62,17 @@ view: company
 from_id: company:coreweave
 to_id: product:nvidia-vera-rubin-nvl72
 relation: owns_platform
-claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C26
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C26,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C29
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-09-30
-review_due: 2026-10-18
+as_of: 2026-11-17
+review_due: 2026-11-24
 status: active
-boundary: CoreWeave 具名 Cognition production workloads 但限 limited availability；單一公司消息鏈 無精確站點 機架數 版本 驗收分母 或台灣供應商收入，不能當全面 GA。
+boundary: 9月底CoreWeave具名Cognition production workloads限limited availability；11月新增Training v6.1 Available類別與正式叢集測試的公司陳述，未獨立重算結果。無逐地區SKU 客戶驗收分母 或台灣供應商收入，不能由跑分類別當全面GA。
 next_trigger: 同一具名客戶與產品補固定組態 站點 機架數 持續運行與驗收分母；財務映射另需雙向公司證據。
 -->
 
