@@ -1188,6 +1188,8 @@ evidence: sources:S1,S23,S24
 
 ### 名詞小字典
 
+- **SHA（檔案雜湊指紋）**：以固定演算法為檔案內容產生識別值，讓兩位讀者確認使用相同原件；指紋相同不代表公司說法已獲第三方證實。
+- **RFS（ready-for-service，可提供服務狀態）**：本案逐棟場所達到合約約定可提供服務的節點，不等同未來預期日或整座園區已上線。
 - **FOCF（自由營運現金流）**：S&P本次展望使用的現金流指標；本輪公開稿沒有逐家公司調節表，不能直接等同公司自訂FCF。
 - **SpaceX**：S&P本次研究列入的第六家公司；本篇保留原名單，不以常見的五大雲端名單替代。
 - **MD&A（管理階層討論與分析）**：申報文件中由管理層解釋營運、財務與風險的章節，仍應與報表附註及契約條文對照。
@@ -1486,6 +1488,118 @@ to: triaged
 reason: aligned_new_quarter_cash_formulas_and_preserved_unreconciled_lease_fields_without_thesis_clock_refresh
 evidence: sources:S25,S26,S27,S28,S29
 -->
+
+<!-- research_source
+source_id: S30
+role: company_filing
+source_kind: document
+publisher: NVIDIA
+title: NVIDIA 2026-11-17 Form 8-K 與 FY2027 Q3 CFO commentary
+published_at: 2026-11-17
+captured_at: 2026-11-18
+accepted_at: 2026-11-18
+status: active
+url: https://d18rn0p25nwr6d.cloudfront.net/CIK-0001045810/46a9c98c-87ae-40f5-acac-7d9264b18eb4.pdf
+locator: PDF第2頁Item2.02及附件分類；第19頁未來承諾表；第20頁額外承諾與Guarantees，表格截至2026-10-25、單位十億美元
+limitation: 公司IR提供的32頁8-K附件，furnished而非Section18意義下filed；不是10-Q或經查核報表。另一讀者離線重算同包SHA與指定頁，仍只算NVIDIA一條經濟來源，不是逐租約或供應商驗收。
+independence_group: nvidia
+-->
+
+<!-- research_claim
+claim_id: C36
+label: verified
+status: active
+claim: NVIDIA截至2026-10-25未來承諾表列供應及產能390、雲端服務28、尚未起租資料中心租約74、股權投資20、資本支出6，合計518十億美元；另表有附條件neocloud承諾32十億美元
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-11-17
+basis: PDF第19至20頁，六段財年期間從FY2027剩餘期間到FY2032以後；逐列及逐欄確定性重算皆吻合。另一讀者核對同包SHA及指定頁；不是新獨立發行人樣本
+boundary: 多年未來承諾不是本季已付現CapEx；32另表有融資、部署運轉與NVIDIA接受條件；不得合併成無條件支出、客戶收入或台灣供應商訂單
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C37
+label: verified
+status: active
+claim: NVIDIA 11/17說明稱截至該次揭露尚未支付保證相關款項；10/25三類最高毛額曝險為3.5、105.0及9.5，合計118十億美元，其中PORTS-Pike相關105已包含於總額，首期仍預期FY2029且逐棟完成可服務後才生效
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-11-17
+basis: PDF第20頁Guarantees正文及表格；3.5+105.0+9.5=118.0，明示未付款的時間文字保留為11/17揭露時點，不偷換表格基準日
+boundary: 公司自述未付款不是銀行獨立確認、已觸發付款、OpenAI已補償或未來損失為零；FY2029是財年預期不是已RFS，118是三類最高毛額而非PORTS單案105或預期損失
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C38
+label: inference
+status: active
+claim: 518未來承諾、32附條件額外承諾與118最高保證毛額屬不同表格與條件，不能相加當當期現金支出，也不能把已包含的105再次加進118
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-11-17
+basis: 分開發行人、10/25表格基準日、未來財年、單位、條件及最高毛額；當期雲端28加未起租74為102，不能把上一季同兩類合計74當成同一欄的前期數
+boundary: 算術和分類查核不估計違約概率或AI回報率；不建立供應商收入歸因，也不刷新原C2主命題時鐘
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C39
+label: unverified
+status: active
+claim: NVIDIA新季承諾到履約、現金支付、逐租約回收及台灣供應商收入的同案橋接仍待文件驗證
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-11-17
+basis: 本輪只接受第19至20頁的公司表格與狀態；缺少同一租約和資產批次的完整事件、付款及供應商共同鍵
+boundary: 不能由未來容量或採購承諾反推本期供應商營收；不是宣稱全市場沒有資料
+verification_needed: 後續10-Q與同案合約條件、驗收、實付、回收及供應商財務調節
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T7
+status: active
+claim_ids: C36,C37,C38,C39
+metric: NVIDIA新季10-Q與8-K附表的承諾口徑、財年期間及附條件履約調節
+source_ids: S30
+watch_source_ids: S17
+frequency: weekly
+frequency_detail: 11/25工作回查；新10-Q或具名修訂先出即提前，工作日不是公司發布承諾
+next_check: 2026-11-25
+trigger: 正式新文件逐項對回10/25承諾及保證分類，或提供同案已履約、付款與供應商財務的共同鍵
+invalidation: 新文件重編金額、範圍、條件或財年分類使原表調節不再適用；保留修正前資料並另增更正
+-->
+
+<!-- transition
+date: 2026-11-18
+from: triaged
+to: triaged
+reason: nvidia_commitment_and_guarantee_tables_scoped_update_without_thesis_refresh
+evidence: sources:S30
+-->
+
+## 11 月 18 日新手補充：承諾、保證、付款是三種不同的錢
+
+**先問這筆錢是哪一種，不要先把大數字加起來。** NVIDIA的[11/17官方8-K附件，第19至20頁](https://d18rn0p25nwr6d.cloudfront.net/CIK-0001045810/46a9c98c-87ae-40f5-acac-7d9264b18eb4.pdf)把未來承諾、額外附條件承諾與保證分表。前兩者是未來可能履約的安排；保證則是在約定條件下替另一方承擔責任。它們都不是「今天已經付了多少現金」。
+
+| 截至2026/10/25，單位十億美元 | 公司披露與可重算內容 | 不能換成什麼 |
+| --- | --- | --- |
+| 未來承諾518 | 供應／產能390＋雲端服務28＋未起租租約74＋股權投資20＋資本支出6；期間從FY2027剩餘期間至FY2032以後 | 不能全部叫本季CapEx，也不是台灣供應商收入 |
+| 另表額外承諾32 | 取決於合作雲端業者融資、設施部署運轉及NVIDIA接受等條件 | 不能當成已無條件付款或已驗收 |
+| 最高保證毛額118 | 土地／電力／建物3.5＋SB Energy信用支持105＋電力／系統9.5 | 不是預期損失；105已在118裡，不能再加一次 |
+
+**有證實的只是表格、條件及公司所述狀態。** 公司在11/17說明稱保證相關款項迄今尚未支付。PORTS-Pike仍要逐棟完成並可服務才生效，首期是FY2029的預期；這不是已經完工、付款或取得OpenAI補償。財年也不能直接改寫成曆年。這份附件屬提交供參考的公司披露，不是本輪尚未取得的新10-Q或經查核報表。[S30；C36–C37]
+
+**推論時先防止兩種重複計算。** 當期雲端28＋未起租租約74＝102；文件所述上一季兩類合計74，碰巧等於當期其中一類74，但定義不同。另把518、32及118相加，得不到當期支出或損失。這裡是單一發行人表格的確定性算術，沒有抽樣誤差或統計支持率，也不能由相鄰供應鏈推台廠受惠。[C38]
+
+**待驗的仍是同一案子從承諾到交付、付款與收入的橋。** 11/25回查後續10-Q及修訂；若先出具名文件則提前。原PORTS-Pike T5要求的逐租約條件或實際事件未被這次「尚未付款」代替，原主命題到期警示保留。新T7只追這批新表格與條件，不把舊問題改成已解。[C39]
+
+想一想：看到「1,180億美元保證」時，還需要哪些條件才能估計實際損失？若下季數字變小，可能是履約付款、租約移轉、條件取消或範圍變更，哪份調節表能分清楚？如果供應商營收同時增加，要怎樣找到同一產品與期間的雙向證據？
 
 ## 11 月 9 日回查：同一季也不代表同一種自由現金流
 

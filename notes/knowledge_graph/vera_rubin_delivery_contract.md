@@ -5,6 +5,8 @@
 圖中的族群線是下一份證據的搜尋入口；除具名系統廠角色外，不代表台灣供應商已取得訂單或獲利。
 DSX POD 的工廠／運輸／現場交接另以方法線呈現，不提高原部署與公司財務線的成熟度。
 11月16日的跑分類別與平台商一般供應陳述增列於公司線邊界，不能替代逐地區SKU、客戶驗收與財務共同鍵。
+11月18日補入Oracle 10/27 NVL72 GA、Google 11/6 A5X GA與現行機型預留程序；取得日不是GA事件日，
+具名產品仍不代表各區域即時有貨。Oracle的NVL8與多GW擴張維持計畫，不借用NVL72成熟度。
 
 <!-- knowledge_edge
 edge_id: KG-VRD-I21
@@ -82,18 +84,38 @@ view: company
 from_id: company:google
 to_id: product:nvidia-vera-rubin-nvl72
 relation: integrates
-claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C7
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C7,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C33,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C34
 note_refs:
 evidence_state: verified
 commercial_stage: deployment
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-22
-review_due: 2026-08-15
+as_of: 2026-11-18
+review_due: 2026-11-24
 status: active
-boundary: Google CEO remarks 只證明 Google Cloud 的 offer 語言，沒有 SKU 地區 preview或GA 容量 利用率 工作負載或系統供應商。
-next_trigger: Google Cloud 發布可取得的 Vera Rubin SKU 區域 配額 上線日期與 workload 邊界。
+boundary: Google頁首明示11/6 A5X GA；11/18產品頁列a5x-highgpu-4g-metal與聯繫業務預留容量程序。兩頁同Google消息鏈，未驗證實際可下單區域 帳戶配額 交付 客戶驗收 利用率或台廠財務，不能解讀為全球即刻有貨。
+next_trigger: Google Cloud以同機型與區域提供帳戶配額 可交付日期 實際工作負載及驗收分母；型號可指定不等於容量已取得。
+-->
+
+<!-- knowledge_edge
+edge_id: KG-VRD-C08
+view: company
+from_id: company:oracle
+to_id: product:nvidia-vera-rubin-nvl72
+relation: integrates
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C32
+note_refs:
+evidence_state: verified
+commercial_stage: deployment
+materiality: named_product
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-10-27
+review_due: 2026-11-24
+status: active
+boundary: Oracle與NVIDIA的10/27聯合公告稱NVL72在OCI一般供應，11/18才納入本圖；同文NVL8推出及多GW擴張仍是計畫，沒有逐區域SKU 配額 交付數 客戶驗收或台灣供應商財務，聯合公告轉載不算獨立驗收。
+next_trigger: OCI以同一NVL72產品補具名區域 配額 可交付日期 實際客戶與驗收分母；另追NVL8及擴張的各自里程碑，不共用GA動詞。
 -->
 
 <!-- knowledge_edge
@@ -282,18 +304,18 @@ view: industry
 from_id: product:nvidia-vera-rubin-nvl72
 to_id: stage:vera-rubin-cloud-workload
 relation: reaches_stage
-claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C7,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C11
+claim_refs: MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C7,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C11,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C33,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C34,MI-2026-07-21-NVIDIA-VERA-RUBIN-RAMP#C35
 note_refs:
 evidence_state: inference
 commercial_stage: deployment
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-08-15
+as_of: 2026-11-18
+review_due: 2026-11-24
 status: active
-boundary: Google 的 offer 語言接近服務端但沒有 SKU 地區 GA 容量 利用率 SLO 或持續 workload，不能直接寫成全面可用。
-next_trigger: 雲端商公布具名 SKU 區域 可取得日期 配額 工作負載與服務結果。
+boundary: Google已公布A5X GA日期及機型預留方式，研究方法因此前進到逐區域可取得性；沒有帳戶訂購結果 配額 交付 利用率 SLO或持續工作負載分母，GA不能代替站點驗收與財務歸因，C11時鐘不變。
+next_trigger: 雲端商用同機型與區域公開可取得日期 配額 交付 實際工作負載及服務結果，再另核客戶驗收與供應商財務。
 -->
 
 <!-- knowledge_edge

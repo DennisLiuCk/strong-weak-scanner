@@ -114,6 +114,24 @@ evidence: sources:S27
 
 ## 新手先讀：這篇在講什麼
 
+### 11 月 18 日更新：GA 有了日期與產品代碼，仍要問「在哪裡、如何取得」
+
+沿著 NVIDIA 11/17 財報的雲端連結回查，本輪補入的是較早發布、此前未入帳的營運商證據，
+不是把所有服務的開放日期改成今天。Oracle 10/27 公告稱 Vera Rubin NVL72 已一般供應；
+Google 頁面顯示 10/22 發布的文章則在頁首另標明 11/6 A5X 已一般供應。[S30][S31][C32][C33]
+
+**已證實**：Google 現行文件列出 `a5x-highgpu-4g-metal` 裸機型號，並要求聯繫業務團隊預留容量、
+取得建立服務的指引。[S32][C34] **GA（一般供應）**是營運商宣告的供應階段；**SKU／機型代碼**
+是可以明確指定的產品；**預留容量**則是取得該產品的程序。三者各回答一件事，GA 不等於任意地區即時有貨。
+
+**推論**：現在可以從「有沒有開放」往下查「這個型號在哪個地區、何時能交付」。**待驗證**：
+本輪沒有實際帳戶配額、訂購結果、區域交付承諾、客戶驗收分母或台灣供應商財務。Oracle 同文的
+HGX Rubin NVL8 與多 GW 擴張仍是計畫，不能套用 NVL72 已 GA 的動詞。[C32][C35]
+
+下次追蹤先問：公告是哪一天、實際開放又是哪一天？能指定哪個型號與地區？預留成功後是否已有
+交付、客戶使用與驗收紀錄？Google 的文章與產品文件同屬 Google 消息鏈，Oracle 與 NVIDIA
+轉載同一聯合公告也只算一條；它們不是三次獨立驗收。T3 提前補查這條供應旁支，C11 原時鐘不變。
+
 ### 11 月 17 日更新：跑分的「可取得」，和你的「買得到」怎麼對上？
 
 **已證實的是公司揭露**：CoreWeave於11/16稱其Rubin測試參加MLPerf Training v6.1的Closed／Available
@@ -162,6 +180,10 @@ CoreWeave 9 月 30 日公告，Cognition 已在 Vera Rubin NVL72 上執行正式
 
 ### 名詞小字典
 
+- **A5X／a5x-highgpu-4g-metal**：前者是 Google Cloud 採用 Vera Rubin 的裸機系列，後者是官方文件列出的確切機型代碼；裸機是直接提供實體主機資源，這個代碼不是整座機房或已交付機架數。[S32]
+- **SKU（產品代碼）**：用來指定要取得哪個產品或配置；本文把雲端機型代碼當作可追查的產品鍵，不能由代碼存在推成各區域都有可用量。
+- **HGX Rubin NVL8**：另一種 Rubin 系統配置，Oracle 公告描述為八顆 GPU 的 x86 伺服器；HGX 是該類伺服器平台名稱，NVL8 不同於 NVL72，公告當時仍是計畫推出。[S30]
+- **OCI**：Oracle Cloud Infrastructure，Oracle 的雲端基礎設施服務；其產品公告與 NVIDIA 轉載同一聯合稿，不是兩次獨立客戶驗收。
 - **MLPerf Training v6.1**：由MLCommons組織維護的訓練效能測試第6.1輪，量測達到指定品質所需時間；本文沒有獨立重算結果。
 - **MLCommons**：維護上述測試規則與提交流程的組織；廠商派生倍率或自行重跑不一定經其核驗。
 - **Closed／Available**：前者限制提交使用指定模型以利比較，後者是公司所稱可購買或租用硬體的提交類別，不等於逐地區庫存保證。
@@ -213,7 +235,7 @@ CoreWeave 9 月 30 日公告，Cognition 已在 Vera Rubin NVL72 上執行正式
 ### 三句話抓重點
 
 - Vera Rubin 的公開證據已橫跨平台量產、系統型錄、未來工廠、整櫃驗證與雲端供應語言，不能再只用「路線圖／已量產」二分法。
-- 每份文件只跨過七關中的一部分：Noetra 的規劃容量、CoreWeave 的單一工作負載 benchmark、Google 的 offer、緯創的未來生產與台灣系統廠型錄都不是同一張證書。
+- 每份文件只跨過七關中的一部分：Noetra 的規劃容量、CoreWeave 的單一工作負載 benchmark、Google／Oracle 的具名 GA、緯創的未來生產與台灣系統廠型錄都不是同一張證書；Google 的預留容量程序也不等於每個地區即時可租。
 - 8 月 26 日新增的 NVIDIA 財報與法說已把平台時鐘推進到 full production、production shipments 與採購單；但仍沒有一手資料用同一產品鍵把台灣公司 Rubin 的完工、出貨、到貨、驗收、可用、計費、收入與收款完整接起來。
 
 ### 為什麼重要
@@ -258,12 +280,12 @@ gigascale AI factories。這是供應鏈時程的重要變化，值得檢查現�
 | 3. 工廠實際生產 | 哪一座工廠現在正做哪個世代？ | 緯創稱 Texas D1 現在生產 GB300，Rubin 將接續 | Rubin 已在該廠量產或已形成收入 |
 | 4. 整櫃 bring-up／驗證 | 把整個機架帶起後，系統級路徑能否運作？ | CoreWeave 稱完成 NVL72 整櫃 bring-up 與 system-level validation | 測試母體、長時間負載、客戶驗收與廣泛複製 |
 | 5. 站點啟用／客戶驗收 | 機架到特定機房後，電力、冷卻、網路與軟體是否完成交接？ | 公開來源尚未提供台灣系統廠可核對的 acceptance 節點 | 誰簽收、何時可計費、多少機架通過 |
-| 6. 雲端可用／工作負載運行 | 客戶能否取得服務，且真實工作負載是否持續運作？ | Google 稱 Cloud 提供 Vera Rubin；NVIDIA 列名多個運行站點 | SKU、區域、GA 條款、容量、利用率及 workload SLO |
+| 6. 雲端可用／工作負載運行 | 客戶能否取得服務，且真實工作負載是否持續運作？ | Oracle 10/27 NVL72 GA；Google 11/6 A5X GA 與具名機型、需聯繫業務預留容量；CoreWeave 具名工作負載 | 實際可取得區域、帳戶配額、交付時間、驗收分母、利用率及 workload SLO |
 | 7. 供應商財務歸因 | 哪家公司因哪些數量與單價留下收入、毛利及現金流？ | 尚無可重算的台灣公司 Rubin 橋接 | 個股受惠幅度、份額、獲利與現金回收 |
 
-這張表不是要求所有公司使用相同術語，而是把研究的「停止線」畫清楚。例如，Google 的
-`offer` 比單純列名更接近服務端，但若沒有產品代碼、地區、容量與取得方式，就不能自行寫成
-全球全面 GA；緯創說「soon」也只能放在未來生產關，不得改寫成當期 Rubin 產量。
+這張表不是要求所有公司使用相同術語，而是把研究的「停止線」畫清楚。例如，Google 已有
+GA 日期、產品代碼與預留容量方式，但仍不能自行補成全球任意地區即刻有貨；緯創說「soon」
+也只能放在未來生產關，不得改寫成當期 Rubin 產量。
 
 ### 8 月 26 日新增證據：出貨時鐘前進，台灣公司財務時鐘沒有跟著跳
 
@@ -1437,6 +1459,118 @@ as_of: 2026-11-16
 basis: An ecosystem that shipped on day one正文直接使用generally available across various cloud infrastructure partners；只核對平台商陳述，不替個別營運商背書
 boundary: 不是對每家夥伴與地區的交叉驗證；未公布完整可下單SKU、交期、客戶驗收或台廠財務共同鍵。保留C26的9月歷史範圍，不覆寫其時點，也不刷新C11
 verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-18
+from: triaged
+to: triaged
+reason: backfilled_named_operator_ga_dates_and_a5x_reservation_conditions_without_thesis_clock_or_supplier_financial_upgrade
+evidence: sources:S30,S31,S32
+-->
+
+<!-- research_source
+source_id: S30
+role: company_release
+source_kind: document
+publisher: Oracle and NVIDIA
+independence_group: oracle-nvidia-joint
+title: NVIDIA and Oracle Expand NVIDIA Vera Rubin to Multi-Gigawatt Scale and Bring NVIDIA Vera CPU to Oracle Cloud Infrastructure
+published_at: 2026-10-27
+captured_at: 2026-11-18
+accepted_at: 2026-11-18
+status: active
+url: https://www.oracle.com/news/announcement/ai-world-nvidia-and-oracle-expand-nvidia-vera-rubin-to-multi-gigawatt-scale-2026-10-27/
+locator: 10/27日期、副標與開頭NVL72 now generally available、下文HGX Rubin NVL8 plans to introduce及multi-gigawatt plans to expand；原網頁57731 bytes，SHA256 4d98c3b48247d36ba926940e713c3445c4d4d86355315b821f55f1da73f20764
+limitation: 同一Oracle與NVIDIA聯合公告，轉載不構成獨立驗收；本次只採產品階段，沒有逐區域可下單SKU、配額、實際交付或台廠財務；NVL8及擴張計畫不可套用NVL72的GA動詞
+-->
+
+<!-- research_source
+source_id: S31
+role: company_release
+source_kind: document
+publisher: Google Cloud
+independence_group: google
+title: Google Cloud and NVIDIA expand co-engineering collaboration to scale infrastructure for the agentic era
+published_at: 2026-10-22
+captured_at: 2026-11-18
+accepted_at: 2026-11-18
+status: active
+url: https://cloud.google.com/blog/topics/ai-infrastructure/google-cloud-infrastructure-at-nvidia-gtc-berlin-2026
+locator: 可見頁首October 22 2026、另列November 6 2026更新A5X Instances are now generally available、正文A5X based on Vera Rubin NVL72；原網頁255460 bytes，SHA256 3c0691b691c7a684c3d92028736925dc43aa49a51b459c1c17433170837c7ba1
+limitation: 發布日採可見10/22；原HTML的JSON-LD datePublished為10/21而published_time為2026-10-22T02:30:03+0800，保留差異不以無時區日期自行換算；GA事件11/6與取得11/18分列。正文舊coming next month是原稿語境，不當新延期；同Google文件消息鏈，不提供逐地區配額、交付或客戶驗收
+-->
+
+<!-- research_source
+source_id: S32
+role: other_primary
+source_kind: living_index
+publisher: Google Cloud
+independence_group: google
+title: GPUs on Compute Engine — A5X machine series
+published_at:
+captured_at: 2026-11-18
+accepted_at: 2026-11-18
+status: active
+url: https://docs.cloud.google.com/compute/docs/gpus/
+locator: 只採A5X machine series段、Note中的contact your account team to reserve capacity、a5x-highgpu-4g-metal列及based on NVL72說明；原網頁438773 bytes，SHA256 4b36435f0ac591997317a1955f07dfaa6bc7fdd51ace7c32711ea8a31935b4c0
+limitation: 可變產品文件只代表本輪取得狀態，不倒填首次機型上線日；沒有執行帳戶訂購、驗證區域可用量或客戶驗收；與S31同消息鏈，單一機型不等於整櫃交付數
+-->
+
+<!-- research_claim
+claim_id: C32
+label: verified
+status: active
+claim: Oracle與NVIDIA於10月27日聯合公告稱Vera Rubin NVL72已在OCI一般供應，同文HGX Rubin NVL8推出與多GW擴張仍以計畫描述
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-10-27
+basis: 分別核對副標與正文產品名稱和成熟度動詞；11/18沿NVIDIA財報連結回查，將較早公告補入而不改為本日開放
+boundary: 一條聯合公告只證明公司披露的產品階段，不能推為多GW已建成、NVL8已GA、逐地區即時可取得、客戶驗收或台灣ODM收入
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C33
+label: verified
+status: active
+claim: Google Cloud可見發布日為10月22日的文章於頁首另標明11月6日A5X Instances已一般供應，正文將A5X連到Vera Rubin NVL72
+supporting_source_ids: S31
+contrary_source_ids:
+as_of: 2026-11-06
+basis: 直接核對可見頁首10/22發布與11/6更新及正文產品對應；metadata日期差異見S31，不取代11/6GA事件，也不把取得日11/18當事件日
+boundary: 證明營運商具名GA公告而非實際訂購成功；不證明所有區域有配額、容量已滿載、客戶驗收或任何台灣公司已認列收入
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C34
+label: verified
+status: active
+claim: 本輪取得的Google A5X文件列出a5x-highgpu-4g-metal裸機型號，並要求聯繫業務團隊預留容量與取得建立instances和clusters的指引
+supporting_source_ids: S32
+contrary_source_ids:
+as_of: 2026-11-18
+basis: 直接核對A5X machine series產品表與Note的取得程序，沒有執行下單或把公開文件視為帳戶可用量
+boundary: 型號與預留方式已具名，但不提供本文已驗證的可下單地區、帳戶配額、交付時間、機架數或驗收分母；本輪capture不是首次SKU上線日期
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C35
+label: inference
+status: active
+claim: 具名GA日期、可指定機型與容量預留程序是不同欄位，補齊前兩者後仍須以同一營運商和地區的配額與交付紀錄判斷實際可取得性
+supporting_source_ids: S30,S31,S32
+contrary_source_ids:
+as_of: 2026-11-18
+basis: Oracle對NVL72與NVL8使用不同階段動詞；Google分別公開GA日期及機型取得程序，不能由任一欄自動補出地區與庫存
+boundary: 是研究交接方法，不聲稱已取得客戶實際訂單、全區域服務或驗收；Google兩頁及Oracle聯合轉載均須按消息鏈去重，不刷新主命題C11
+verification_needed: 同一營運商、機型、地區、帳戶配額、可交付日期、實際工作負載與客戶驗收紀錄，財務另需供應商雙向共同鍵
 resolution:
 -->
 

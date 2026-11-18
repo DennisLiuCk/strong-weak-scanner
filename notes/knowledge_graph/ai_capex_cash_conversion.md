@@ -83,18 +83,18 @@ view: company
 from_id: company:nvidia
 to_id: concept:ai-capex-cash-conversion
 relation: reports_financials
-claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C16,MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C17
+claim_refs: MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C36,MI-2026-08-01-AI-CAPEX-CASH-CONVERSION#C37
 note_refs:
 evidence_state: verified
 commercial_stage: financial
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-17
-review_due: 2026-08-27
+as_of: 2026-11-17
+review_due: 2026-12-01
 status: active
-boundary: NVIDIA 8-K 只證明 PORTS-Pike 初始保證的附條件累計上限與違約後回收／補差額摘要；它不是當期 CapEx、已支付 1,050 億美元、預期損失或台灣供應商財務。
-next_trigger: NVIDIA 在 10-Q 提交完整 Agreements form，或正式揭露逐租約起租 ready-for-service Trigger Event 回收 實際付款與 OpenAI 補償。
+boundary: 11/17附件只證明10/25未來承諾518、另表附條件32及最高保證毛額118十億美元各有不同範圍；105已含於118，且公司稱迄今未付款。不是當期CapEx、已觸發、預期損失或台灣供應商財務；原主命題時計不動。
+next_trigger: 新10-Q對回同期間分類條件，或逐租約起租 ready-for-service Trigger Event 回收 實際付款與 OpenAI 補償。
 -->
 
 <!-- knowledge_edge

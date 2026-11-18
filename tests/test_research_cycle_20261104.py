@@ -1,5 +1,6 @@
 """November 4: narrow new evidence does not upgrade deployment or funding scope."""
 import copy
+import re
 import unittest
 
 from test_research_cycle_20261012 import ROOT, bd, records
@@ -162,7 +163,16 @@ class ResearchCycleNovember4Test(unittest.TestCase):
         reports = load_reports(notes=load_notes())
         for path, earliest in ((HELIOS, "2026-11-06"), (AMKOR, "2026-11-14")):
             with self.subTest(path=path):
-                topic = analyse_topic(str(ROOT / path), (ROOT / path).read_text(encoding="utf8"),
+                # Freeze dated registry blocks at the fixture's own date. Later
+                # append-only evidence is valid today, not future evidence on 11/4.
+                text = (ROOT / path).read_text(encoding="utf8")
+                def at_fixture_date(match):
+                    dates = re.findall(r"^(?:date|as_of|captured_at|accepted_at): (\d{4}-\d{2}-\d{2})$",
+                                       match.group(0), re.M)
+                    return "" if any(day > AS_OF for day in dates) else match.group(0)
+                text = re.sub(r"<!--\s*(?:transition|research_source|research_claim)\b.*?-->",
+                              at_fixture_date, text, flags=re.S)
+                topic = analyse_topic(str(ROOT / path), text,
                                       reports=reports, as_of=AS_OF)
                 self.assertFalse(topic["quality_invalid"], topic["quality_errors"])
                 before = copy.deepcopy(topic)

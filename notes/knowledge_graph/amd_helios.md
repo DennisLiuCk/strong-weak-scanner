@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
 label: AMD Helios 部署階梯
-summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD Q3自述五家在首批系統執行工作負載，10-Q明示不出售完整機櫃；仍與客戶驗收、正式開放及台廠財務分開。
+summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD自述首批工作負載，Microsoft新增工程程序但未提供同配置驗收結果；正式開放、區域與台廠財務仍分開。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
@@ -40,17 +40,17 @@ view: company
 from_id: company:microsoft
 to_id: product:amd-helios
 relation: tests
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C7,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C7,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C34,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C35
 note_refs:
 evidence_state: verified
 commercial_stage: validation
 materiality: named_product
 exclusivity: multi_source
 exclusivity_scope: Azure AI 基礎設施同時使用外部方案與 purpose-built silicon，不是 Helios 排他採用。
-as_of: 2026-10-12
-review_due: 2026-10-23
+as_of: 2026-11-17
+review_due: 2026-11-20
 status: active
-boundary: AMD 10/12 稱 Microsoft 初始 Helios 系統已安裝並運行且驗證進行中；這是供應商自述，不是 Microsoft 獨立驗收，沒有 Azure GA、區域、利用率、容量或收入分母。
+boundary: AMD初始運行自述與Microsoft工程程序分開；後者仍未公開同配置場站結果，活動文的MI300X GA與HDv2 preview不屬MI455X，不能升為Helios已開放或台廠收入。
 next_trigger: Microsoft 公開同一品牌配置、場站及驗收，並另列 Azure 產品開放狀態與區域。
 -->
 
@@ -760,17 +760,17 @@ view: industry
 from_id: product:amd-helios
 to_id: capability:rack-configuration-baseline
 relation: requires
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C21
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C21,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C34
 note_refs:
 evidence_state: inference
 commercial_stage: qualification
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-12
-review_due: 2026-09-12
+as_of: 2026-11-13
+review_due: 2026-11-20
 status: active
-boundary: 多子系統整櫃要讓測試結果對回硬體、軟體、網路、場站與測試版本；這是由通用機櫃方法推得的必要證據，不是 Helios 已公開配置身分證或已通過資格。
+boundary: Microsoft已描述Helios版本化基準方法，支持追索同配置結果的必要性；本線仍是研究推論，不是已取得具名場站配置包或通過資格。
 next_trigger: 具名 Helios 品牌系統公開 factory inventory、BOM／SBOM、設定、場站輸入、測試條件、簽核與交接的同版紀錄。
 -->
 

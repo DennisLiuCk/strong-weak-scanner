@@ -112,7 +112,17 @@ reason: added_q3_workload_statement_and_filed_helios_responsibility_boundary_wit
 evidence: sources:S28,S29
 -->
 
+<!-- transition
+date: 2026-11-18
+from: triaged
+to: triaged
+reason: added_microsoft_cluster_engineering_and_versioned_availability_boundary_without_refreshing_thesis_clock
+evidence: sources:S30,S31
+-->
+
 ## 新手先讀：這篇在講什麼
+
+**11/18 補充：流程公開，不等於結果公開。** Microsoft 新文說明 Helios 的配置基準、整群測試與修復後重驗；這能幫助我們知道該問什麼，但還不是具名場站的驗收報告或雲端可用區域。[S30][C34]
 
 **11 月的新進度：** AMD 11/3 財報稿稱 Anthropic、Meta、Microsoft、OpenAI 與 OCI 正在首批 Helios 上跑模型與工作負載；相較 10/12 初始系統名單，新列了 Anthropic。這仍是同一供應商的陳述，不是五份獨立客戶驗收，也不等於雲端客戶已能購買服務。[S26][S28][C31]
 
@@ -123,6 +133,7 @@ evidence: sources:S28,S29
 - **EPYC／Pensando**：AMD 的伺服器處理器與網路產品家族名稱；出現在 Helios 組成表可協助分工，不能只靠家族名判定固定料號、版本或整櫃資格。[S27]
 - **MI355X／MI400／MI450**：本文出現的 AMD Instinct 產品型號或系列名稱；先辨識是哪一代、哪一個具名系統，再讀出貨及上線進度，不能只因品牌相同就共用驗收結果。[S12][S25]
 - **機架級系統（Rack-scale）**：把運算晶片、網路、電力、散熱與軟體整合成一整櫃交付；它比單顆晶片更接近可用設備，但不代表客戶已正式上線。
+- **燒機（Burn-in）**：讓整套設備持續承受工作負載，找出短時間開機不容易出現的故障；方法已寫清楚，不等於某批設備已通過。[S30]
 - **參考設計（Reference design）**：平台方公開的整體藍圖與共同介面，讓製造夥伴能做自己的品牌系統；藍圖本身不一定是平台方直接出售的成品。
 - **品牌系統**：整機廠依參考設計選定零件、韌體與製造版本後，以自己的產品名稱交付；它仍要另做資格驗證與客戶驗收。
 - **開放式寬機架（Open Rack Wide／ORW）**：為高密度人工智慧設備設計的雙寬機架標準，提供較高功率、液冷、較寬托盤與共同機械介面。
@@ -414,6 +425,14 @@ Redfish 把軟硬體盤點與更新服務、遙測服務做成不同的機器可
 想一想：如果 AMD 已賣出元件，但整機廠還沒完成客戶驗收，哪兩家公司的認列時點可能
 不同？下一份文件應找誰？目前繼續等待具名系統的客戶確認與供應商財務，不據此提高
 主命題可信度或作投資判斷；新增追蹤 T15 專看 Anthropic 的同配置橋接。
+
+## 微軟如何把機櫃測成可用服務
+
+**配置要能重現，修復後也要再測。** Microsoft 11/13 的工程說明要求固定軟硬體基準，讓相連機櫃在負載下共同驗證；修好的節點先隔離重驗，再回到備援池。這解釋了為何「開機成功」還不是交付終點。[S30][C34]
+
+**不同產品的開放狀態不能借用。** 11/17 更新的活動文分開寫 HDv2 測試開放、MI300X 正式供應與 MI455X 尚待推出；不能把前兩者的進度貼到 Helios。[S31][C35]
+
+想一想：若只有測試方法、沒有同配置的日期、場站與通過結果，你能確認的是工程責任，還是客戶已可使用？接下來追同一產品的結果與區域，不從流程描述推估台灣供應商收入。
 
 ## 主張與證據帳本
 
@@ -1435,6 +1454,72 @@ contrary_source_ids:
 as_of: 2026-11-04
 basis: Note 4 定義分部產品範圍；同表區分 three months 與 nine months，採前者 Data Center net revenue 8546，單位 In millions 美元
 boundary: 單一發行人單季申報量不是統計抽樣，SE／t 不適用；不把整個分部、毛利、現金流或其他公司數字按比例分配到 MI450、Helios 或台灣供應商，也不作跨公司排名
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_source
+source_id: S30
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: From Silicon to Service Bringing AMD Helios to Azure version 1.0
+published_at: 2026-11-13
+captured_at: 2026-11-18
+accepted_at: 2026-11-18
+status: active
+url: https://techcommunity.microsoft.com/blog/AzureHighPerformanceComputingBlog/from-silicon-to-service-bringing-amd-helios%E2%84%A2-to-azure/4573029
+locator: Datacenter requirements、Establish a repeatable software foundation、Burn-In及Exercise recovery段；頁尾Updated Nov 13 2026及Version 1.0；原HTML 557324 bytes，SHA256 2b80d9ed56b51c12362444092b4722cb64a5c2c2984a219408db94572179d8e2
+limitation: Microsoft自述工程方法，不是同一初始Helios配置的具名場站結果、產品GA或區域清單；流程段的production語態不提供完成日期與驗收分母；未採用規格數字或效能推算
+independence_group: microsoft
+-->
+
+<!-- research_source
+source_id: S31
+role: company_release
+source_kind: document
+publisher: Microsoft
+title: Visit Azure and AMD at Microsoft Ignite and SC26 version 2.0
+published_at: 2026-11-17
+captured_at: 2026-11-18
+accepted_at: 2026-11-18
+status: active
+url: https://techcommunity.microsoft.com/blog/azureinfrastructureblog/visit-azure-and-amd-at-microsoft-ignite-and-sc26/4570345
+locator: 首段及HDv2、MI300X、MI455X各節；首發Nov 12 2026，頁尾更新Nov 17 2026、Version 2.0，本筆日期指已讀修訂版；HTML 529776 bytes，SHA256 6faf3153829e5d9006dd1e3e60b913bd8d3e7f2f4d3648090a69933979ec43fe
+limitation: 僅接受三產品的明示狀態區分，不由其他產品的preview或GA推得ND MI455X v7開放；未取得Azure Updates完整動態資料集，不宣稱已完整排除其他新公告；與S30同一Microsoft來源群
+independence_group: microsoft
+-->
+
+<!-- research_claim
+claim_id: C34
+label: verified
+status: active
+claim: Microsoft 的 Helios 工程文描述版本化基準、連接機櫃共同負載測試及修復節點重驗後回備援池的程序
+supporting_source_ids: S30
+contrary_source_ids:
+as_of: 2026-11-13
+basis: 逐節核對配置、燒機與維修程序；直接確認官方描述的責任範圍
+boundary: 方法不是具名場站已通過的結果；沒有型號版本與實際驗收共同鍵，不裁決T14完成，不推GA、可用區域或台廠財務
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C35
+label: verified
+status: active
+claim: Microsoft 11/17修訂活動文把HDv2的preview、MI300X的GA與MI455X的coming狀態分開
+supporting_source_ids: S31
+contrary_source_ids:
+as_of: 2026-11-17
+basis: 核對首段與三個產品專節；版本2.0的更新日不同於11/12首發日
+boundary: 只確認這份修訂文的產品狀態，不是全站公告普查；尚不足T6的ND MI455X v7開放且區域分支，也不是官方取消或延後的證據
 verification_needed:
 correction_kind:
 corrects_claim_id:
