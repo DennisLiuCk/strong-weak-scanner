@@ -1066,7 +1066,7 @@ function rvExplain(row,focus){
 function rvDetailCard(R,row,focus,onFocus){
   if(!row)return h('article',{class:'card rv-detail-card'},h('p',{class:'note',text:'這個族群目前沒有可顯示的成分股。'}));
   const explanation=rvExplain(row,focus),periods=row.d_periods||{};
-  const observation={champion_pct:'現行 7 因子、3 日平滑',lens_a:'5／20／60 交易日',lens_b:'20 日抗跌、槓桿與量價過熱',lens_c:'當日法人；TDCC 僅週頻旁證',lens_d:(periods.month||'月營收待補')+'／'+(periods.quarter||'季財報待補')}[focus];
+  const observation={champion_pct:'現行 7 因子、3 日平滑',lens_a:'5／20／60 交易日',lens_b:'20 日抗跌、槓桿與量價過熱',lens_c:'20 日外資持股變化與逆勢買賣、5 日投信淨買賣、融資',lens_d:(periods.month||'月營收待補')+'／'+(periods.quarter||'季財報待補')}[focus];
   const cadence={champion_pct:'每日收盤後',lens_a:'每日收盤後',lens_b:'每日收盤後',lens_c:'每日收盤後；旁證每週',lens_d:'月／季資料 first-seen 後'}[focus];
   const scores=h('div',{class:'rv-score-grid','aria-label':'五個視角的族群內相對位置'});
   RV_KEYS.forEach(key=>{const m=RV_META[key];scores.appendChild(h('button',{type:'button',class:'rv-score-card','aria-pressed':key===focus?'true':'false','aria-label':'改以 '+m.title+' 排序',style:`--rv-tone:${m.tone}`,onclick:()=>onFocus(key)},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:m.icon}),h('span',{text:m.scoreLabel}),h('b',{text:rvPct(row[key])})));});

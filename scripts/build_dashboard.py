@@ -4550,7 +4550,7 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     }
 
 
-def main():
+def main(research_as_of=None):
     # 唯讀開啟(鐵律:唯讀一律走 db_ro)。這支只從 db 讀、寫的是 index.html 與
     # archive/,不曾寫 db;bare sqlite3.connect 會在路徑打錯時無聲建一個空 db,
     # 然後產出一份「0 檔」的頁面覆蓋掉正常的那份。
@@ -4740,7 +4740,7 @@ def main():
     # 最近研究文章使用各層既有 parser 的可稽核 meta；不讀 git/檔案 mtime。
     # anchor 取市場資料日與文章日期較晚者，避免市場資料尚未換日時漏掉今天剛更新的文章。
     # 研究 freshness 跟日曆日走，不跟最後交易日走；否則週末與休市日會延後降級。
-    research_as_of = research_today()
+    research_as_of = research_as_of or research_today()
     research_topics = load_research_topics(
         TOPICS_DIR, reports=hypotheses_map, as_of=research_as_of)
     research_reviews = load_monitor_reviews(
