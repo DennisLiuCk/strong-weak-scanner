@@ -1,5 +1,9 @@
 """rank_change:選週規則、首次正式發布、三日窗口與名次拆解(小型 SQLite fixture)。"""
+import contextlib
 import datetime as dt
+import hashlib
+import io
+import json
 import os
 import sqlite3
 import sys
@@ -41,7 +45,8 @@ class Fixture:
         con.executescript("""
             CREATE TABLE market(date TEXT PRIMARY KEY, taiex REAL);
             CREATE TABLE oos_snapshot_runs(snapshot_id TEXT PRIMARY KEY, data_date TEXT, captured_at TEXT,
-                source TEXT, is_official INTEGER, quality_json TEXT, stock_count INTEGER, group_count INTEGER);
+                source TEXT, is_official INTEGER, quality_json TEXT, stock_count INTEGER, group_count INTEGER,
+                universe_hash TEXT);
             CREATE TABLE oos_signal_snapshots(snapshot_id TEXT, date TEXT, stock_id TEXT, grp TEXT,
                 composite REAL, composite_s REAL, tier TEXT, s_price INT, s_resil INT, s_vol INT,
                 s_foreign INT, s_trust INT, s_dip INT, s_margin INT);""")
@@ -49,13 +54,13 @@ class Fixture:
         con.commit()
         con.close()
 
-    def run(self, sid, day, rows, captured=None, official=1, stock_count=None):
+    def run(self, sid, day, rows, captured=None, official=1, stock_count=None, universe="u1", spec="s1"):
         """rows: {stock_id: (grp, composite, composite_s)};預設擷取時間=當日台北 23:52。"""
         captured = captured or f"{day}T15:52:00+00:00"
         con = sqlite3.connect(self.path)
-        con.execute("INSERT INTO oos_snapshot_runs VALUES(?,?,?,?,?,?,?,1)",
-                    (sid, day, captured, "github-actions", official, "{}",
-                     len(rows) if stock_count is None else stock_count))
+        con.execute("INSERT INTO oos_snapshot_runs VALUES(?,?,?,?,?,?,?,1,?)",
+                    (sid, day, captured, "github-actions", official, json.dumps({"score_spec_sha": spec}),
+                     len(rows) if stock_count is None else stock_count, universe))
         con.executemany("INSERT INTO oos_signal_snapshots VALUES(?,?,?,?,?,?,'潛在/中性',0,0,0,0,0,0,0)",
                         [(sid, day, s, g, c, cs) for s, (g, c, cs) in rows.items()])
         con.commit()
@@ -117,6 +122,35 @@ class WeekSelection(unittest.TestCase):
             rc.select_weeks(con, at("2026-11-21T10:00"))
         self.assertEqual(self.dates(con, at("2026-11-20T22:00"))[0], ["2026-11-06", "2026-11-13"])
 
+    def test_replay_ignores_market_dates_after_as_of(self):
+        # 10/23 週五休市;10/26、10/27 之後才出現。10/24 重播時不能用未來交易日確認休市。
+        market = weekdays("2026-10-05", "2026-10-30", skip={"2026-10-09", "2026-10-23", "2026-10-26"})
+        _, con = self.make(market)
+        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-10-23.*無法確認是休市還是資料缺漏"):
+            rc.select_weeks(con, at("2026-10-24T10:00"))
+        self.assertEqual(self.dates(con, at("2026-10-23T20:00"))[0], ["2026-10-08", "2026-10-16"])
+        got, notes = self.dates(con, at("2026-10-28T10:00"))
+        self.assertEqual(got, ["2026-10-16", "2026-10-22"])
+        self.assertTrue(any("其後有交易日 2026-10-27" in n for n in notes))
+
+    def test_same_day_market_row_needs_snapshot_or_provenance_before_as_of(self):
+        fx, con = self.make(weekdays("2026-11-02", "2026-11-12"))
+        con.close()
+        raw = sqlite3.connect(fx.path)
+        raw.execute("INSERT INTO market VALUES('2026-11-16',1)")
+        raw.execute("CREATE TABLE market_provenance(date TEXT PRIMARY KEY, checked_at TEXT)")
+        raw.execute("INSERT INTO market_provenance VALUES('2026-11-16','2026-11-16 10:05:00')")  # 台北 18:05
+        raw.commit()
+        raw.close()
+        con = fx.con()
+        self.addCleanup(con.close)
+        self.assertNotIn("2026-11-16", rc.trading_calendar(con, at("2026-11-16T17:00"), {}))
+        self.assertIn("2026-11-16", rc.trading_calendar(con, at("2026-11-16T18:10"), {}))
+        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-11-13.*無法確認"):
+            rc.select_weeks(con, at("2026-11-16T17:00"))
+        got, notes = self.dates(con, at("2026-11-16T18:10"))
+        self.assertEqual(got, ["2026-11-06", "2026-11-12"])
+
     def test_first_official_run_wins_and_late_or_unofficial_runs_ignored(self):
         fx = Fixture(weekdays("2026-11-02", "2026-11-20"))
         self.addCleanup(fx.close)
@@ -170,7 +204,31 @@ class SmoothingWindow(unittest.TestCase):
         self.assertEqual(len({s["date"] for s in win}), 3)
         ex = rc.explain(snap({"T": 0.0}), snap({"T": 2.0}), "T")
         out = rc.render(ex, "A", "B", None, [win, win])
-        self.assertIn("2026-11-17 +3.00, 2026-11-19 +2.00, 2026-11-20 +1.00 → 3 個不同交易日平均 +2.00", out)
+        self.assertIn("2026-11-17 +3.00, 2026-11-19 +2.00, 2026-11-20 +1.00 → 3 個不同交易日平均 +2.00"
+                      "(與快照 composite_s +2.00 一致,建置指紋相同)", out)
+
+    def test_universe_rebuild_is_labelled_as_prior_published_observations(self):
+        fx = self.fx
+        fx.run("d18", "2026-11-18", {"T": ("g", 3.0, 3.0)}, universe="u98")
+        fx.run("d19", "2026-11-19", {"T": ("g", 2.0, 2.5)}, universe="u98")
+        fx.run("d20", "2026-11-20", {"T": ("g", 1.0, 4.0)}, universe="u121")
+        win = self.window()
+        out = rc.render(rc.explain(snap({"T": 0.0}), snap({"T": 4.0}), "T"), "A", "B", None, [win, win])
+        self.assertIn("先前發布觀測值", out)
+        self.assertIn("universe 與端點不同(2026-11-18, 2026-11-19)", out)
+        self.assertIn("平均不等於快照 composite_s", out)
+        self.assertIn("原始平滑輸入無法以快照驗證", out)
+        self.assertNotIn("個不同交易日平均", out)
+
+    def test_score_spec_change_alone_blocks_verification(self):
+        fx = self.fx
+        fx.run("d18", "2026-11-18", {"T": ("g", 3.0, 3.0)}, spec="old")
+        fx.run("d19", "2026-11-19", {"T": ("g", 2.0, 2.5)})
+        fx.run("d20", "2026-11-20", {"T": ("g", 1.0, 2.0)})
+        out = rc.render(rc.explain(snap({"T": 0.0}), snap({"T": 2.0}), "T"), "A", "B", None,
+                        [self.window(), self.window()])
+        self.assertIn("評分規格 與端點不同(2026-11-18)", out)
+        self.assertNotIn("平均不等於", out)
 
     def test_trading_day_without_snapshot_is_reported_as_gap(self):
         self.fx.run("d18", "2026-11-18", {"T": ("g", 3.0, 3.0)})
@@ -252,6 +310,22 @@ class Cli(unittest.TestCase):
         self.assertIn("Q3b SELECT", text)
         with self.assertRaises(sqlite3.OperationalError):
             rc.main(["--db", fx.path, "--run-sql", "DELETE FROM market"])
+
+    def test_output_refuses_input_database_and_creates_parent_dir(self):
+        fx = Fixture(weekdays("2026-11-09", "2026-11-20"))
+        self.addCleanup(fx.close)
+        fx.fill(weekdays("2026-11-09", "2026-11-20"))
+        digest = hashlib.sha256(Path(fx.path).read_bytes()).hexdigest()
+        link = os.path.join(fx.tmp.name, "alias.db")
+        os.link(fx.path, link)
+        rel = os.path.relpath(fx.path)
+        for target in (fx.path, rel, link, fx.path + "-wal"):
+            with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
+                rc.main(["--db", fx.path, "--as-of", "2026-11-21T10:00:00+08:00", "--output", target])
+        self.assertEqual(hashlib.sha256(Path(fx.path).read_bytes()).hexdigest(), digest)
+        out = os.path.join(fx.tmp.name, "new", "dir", "r.txt")
+        self.assertEqual(rc.main(["--db", fx.path, "--as-of", "2026-11-21T10:00:00+08:00", "--output", out]), 0)
+        self.assertTrue(Path(out).read_bytes().decode("utf-8").startswith("as-of"))
 
     def test_selection_error_exits_2(self):
         fx = Fixture(weekdays("2026-11-09", "2026-11-20"))

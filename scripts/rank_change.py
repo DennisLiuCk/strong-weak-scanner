@@ -12,6 +12,9 @@
   * 週五不在 market、且 market 之後已有交易日 → 確認休市,改用該週前一個交易日。
   * 週五不在 market、之後也沒有交易日 → 期限前視為未完成;期限後無法區分休市或
     抓取失敗 → 明示錯誤(repo 沒有獨立的交易所休市日曆)。
+  * 交易日曆取 as-of 當下可見者(point-in-time):早於 as-of 台北日期的 market 日期;
+    as-of 當日的日期須有已發布的首次正式快照,或 market_provenance.checked_at ≤ as-of。
+    重播歷史 as-of 時,之後才出現的交易日不得用來確認休市。
   * 同日多份正式快照沿用 evidence_status.first_official_runs(首次正式發布);
     首次快照為空或不完整時明示錯誤,不以後來修正版取代。
 
@@ -24,6 +27,7 @@
 """
 import argparse
 import datetime as dt
+import json
 import os
 import sys
 
@@ -74,8 +78,24 @@ def published_first_runs(con, as_of):
             if _aware(r["captured_at"]) <= as_of}
 
 
-def trading_calendar(con):
-    return [r[0] for r in con.execute("SELECT date FROM market ORDER BY date")]
+def _utc(text):
+    moment = dt.datetime.fromisoformat(text.replace(" ", "T"))
+    return moment if moment.tzinfo else moment.replace(tzinfo=dt.timezone.utc)
+
+
+def trading_calendar(con, as_of=None, firsts=None):
+    """market 交易日;給 as_of 時只回傳 as-of 當下已可見的日期(見模組說明)。"""
+    dates = [r[0] for r in con.execute("SELECT date FROM market ORDER BY date")]
+    if as_of is None:
+        return dates
+    today = str(_aware(as_of).astimezone(TAIPEI_TZ).date())
+    checked = {}
+    if con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='market_provenance'").fetchone():
+        checked = {d: c for d, c in con.execute(
+            "SELECT date, checked_at FROM market_provenance WHERE date=?", (today,))}
+    seen_today = today in (firsts or {}) or (today in checked and checked[today]
+                                             and _utc(checked[today]) <= as_of)
+    return [d for d in dates if d < today or (d == today and seen_today)]
 
 
 def require_complete(con, run):
@@ -97,7 +117,8 @@ def week_end(con, monday, as_of, cal, firsts):
         later = [d for d in cal if d > friday]
         if not later:
             if as_of < publish_deadline(friday):
-                return {"status": "pending", "note": f"週五 {friday} 尚未進交易日曆且未到發布期限"}
+                return {"status": "pending",
+                        "note": f"週五 {friday} 交易日曆與正式快照尚未發布(期限 {publish_deadline(friday).isoformat()})"}
             raise SelectionError(
                 f"週五 {friday} 已過發布期限 {publish_deadline(friday).isoformat()},但 market 沒有該日"
                 f"也沒有之後的交易日;無法確認是休市還是資料缺漏")
@@ -117,8 +138,8 @@ def week_end(con, monday, as_of, cal, firsts):
 
 def select_weeks(con, as_of, n=2, max_weeks=60):
     as_of = _aware(as_of)
-    cal = trading_calendar(con)
     firsts = published_first_runs(con, as_of)
+    cal = trading_calendar(con, as_of, firsts)
     monday = as_of.astimezone(TAIPEI_TZ).date()
     monday -= dt.timedelta(days=monday.weekday())
     picked, notes = [], []
@@ -138,9 +159,18 @@ def select_weeks(con, as_of, n=2, max_weeks=60):
     raise SelectionError(f"找不到 {n} 個已完成交易週")
 
 
+def run_build(run):
+    """平滑可比性用的建置指紋:universe 與評分規格;舊快照缺欄位時為 None。"""
+    keys = run.keys()
+    quality = json.loads(run["quality_json"] or "{}") if "quality_json" in keys else {}
+    return {"universe_hash": run["universe_hash"] if "universe_hash" in keys else None,
+            "score_spec_sha": quality.get("score_spec_sha")}
+
+
 def smoothing_window(con, firsts, cal, stock, day, n=SMOOTH_N):
     """composite_s 的平滑窗口:該股最近 n 個「不同」交易日的首次正式快照 composite。
-    該股不在某日快照(例:官方零交易不評分)時不佔窗口;交易日缺正式快照則記為缺口。"""
+    該股不在某日快照(例:官方零交易不評分)時不佔窗口;交易日缺正式快照則記為缺口。
+    每格附 build 指紋;各快照凍結的是自己那次建置的 composite,不同建置不可混算。"""
     slots = []
     for d in reversed([x for x in cal if x <= day]):
         if len(slots) == n:
@@ -153,7 +183,7 @@ def smoothing_window(con, firsts, cal, stock, day, n=SMOOTH_N):
                           "WHERE snapshot_id=? AND stock_id=?", (run["snapshot_id"], stock)).fetchone()
         if row is None:
             continue
-        slots.append({"date": d, "snapshot_id": run["snapshot_id"],
+        slots.append({"date": d, "snapshot_id": run["snapshot_id"], "build": run_build(run),
                       "composite": row["composite"], "composite_s": row["composite_s"]})
     if len({s["date"] for s in slots}) != len(slots):
         raise AssertionError("平滑窗口出現重複交易日")
@@ -254,6 +284,22 @@ def _reason_counts(rows, key):
     return f"快照無此股 {c['absent']}、轉族群 {c['moved']}、composite_s 缺值 {c['null']}"
 
 
+def window_mismatch(win, mean):
+    """窗口不能當作端點 composite_s 平滑輸入的原因;空串列=可驗證。"""
+    why = []
+    end = win[0].get("build") or {}
+    for key, label in (("universe_hash", "universe"), ("score_spec_sha", "評分規格")):
+        vals = [(s.get("build") or {}).get(key) for s in win]
+        if None in vals:
+            why.append(f"部分快照缺 {label} 指紋")
+        elif any(v != end.get(key) for v in vals):
+            diff = [s["date"] for s, v in zip(win, vals) if v != end.get(key)]
+            why.append(f"{label} 與端點不同({', '.join(sorted(diff))})")
+    if win[0]["composite_s"] is None or abs(mean - win[0]["composite_s"]) >= 0.006:
+        why.append("平均不等於快照 composite_s")
+    return why
+
+
 def render(ex, dA, dB, cite=None, window=None):
     cite = cite or {}
     c = lambda k: f" [{cite[k]}]" if k in cite else ""
@@ -302,9 +348,13 @@ def render(ex, dA, dB, cite=None, window=None):
             L.append(f"    {d} 窗口{c('win' + tag)}: {parts} → 不完整,無法以快照驗算")
             continue
         mean = round(sum(s["composite"] for s in win) / len(win), 2)
-        ok = abs(mean - win[0]["composite_s"]) < 0.006
+        why = window_mismatch(win, mean)
+        if why:
+            L.append(f"    {d} 先前發布觀測值{c('win' + tag)}: {parts}(平均 {mean:+.2f},快照 composite_s "
+                     f"{win[0]['composite_s']:+.2f})→ {';'.join(why)};原始平滑輸入無法以快照驗證")
+            continue
         L.append(f"    {d} 窗口{c('win' + tag)}: {parts} → {len(win)} 個不同交易日平均 {mean:+.2f}"
-                 f"(快照 composite_s {win[0]['composite_s']:+.2f}{'' if ok else ',不一致!'})")
+                 f"(與快照 composite_s {win[0]['composite_s']:+.2f} 一致,建置指紋相同)")
     return "\n".join(L)
 
 
@@ -315,8 +365,8 @@ def _load(con, sid):
 
 def build_report(con, as_of, dates=None, stock=None):
     as_of = _aware(as_of)
-    cal = trading_calendar(con)
     firsts = published_first_runs(con, as_of)
+    cal = trading_calendar(con, as_of, firsts)
     out = [f"as-of {as_of.astimezone(TAIPEI_TZ).isoformat()}(台北)"]
     if dates:
         runs = []
@@ -362,6 +412,15 @@ def build_report(con, as_of, dates=None, stock=None):
     return "\n".join(out)
 
 
+def _same_file(out, db):
+    for target in (db, db + "-wal", db + "-shm", db + "-journal"):
+        if os.path.realpath(out) == os.path.realpath(target):
+            return True
+        if os.path.exists(out) and os.path.exists(target) and os.path.samefile(out, target):
+            return True
+    return False
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("dates", nargs="*", help="兩個資料日;省略則依選週規則自動選")
@@ -373,6 +432,8 @@ def main(argv=None):
     a = ap.parse_args(argv)
     if a.dates and len(a.dates) != 2:
         ap.error("請給兩個日期")
+    if a.output and _same_file(a.output, a.db):
+        ap.error(f"--output 指向輸入資料庫 {a.db}(或其 -wal/-shm/-journal);拒絕覆寫")
     con = db_ro.connect(a.db)
     try:
         if a.run_sql:
@@ -386,6 +447,7 @@ def main(argv=None):
     finally:
         con.close()
     if a.output:
+        os.makedirs(os.path.dirname(os.path.abspath(a.output)), exist_ok=True)
         with open(a.output, "wb") as fh:
             fh.write((text + "\n").encode("utf-8"))
     else:
