@@ -56,7 +56,7 @@ view: company
 from_id: company:micron
 to_id: concept:custom-hbm-commercialization
 relation: develops_ip
-claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C4,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C17
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C4,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C17,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C19
 note_refs:
 evidence_state: verified
 commercial_stage: planned
@@ -66,7 +66,7 @@ exclusivity_scope:
 as_of: 2026-09-30
 review_due: 2026-10-18
 status: active
-boundary: Micron 新增具名 NVIDIA NVHBM 開發合作；未來採用不是已交貨。舊 base-die 選項與 TSMC 分工不自動套到新專案；樣品 資格 量產 客製毛利與獨家仍未證。
+boundary: Micron 具名 NVHBM 開發合作仍非已交貨；10/21簡報的 custom base-die 與 vHBM 路線分類不替同一 NVHBM 補上樣品、測試版本與資格。舊製程分工不套入新專案，不推量產、財務或獨家；保留原邊期限。
 next_trigger: Micron 公布具名客戶 qualification 量產與可核對的 NRE 售價 良率或毛利。
 -->
 

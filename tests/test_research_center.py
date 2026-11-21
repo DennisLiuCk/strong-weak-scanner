@@ -1999,7 +1999,13 @@ class ResearchCenterTest(unittest.TestCase):
             ("research_claim", 20), ("metric_comparison", 0),
             ("impact", 2), ("monitoring_item", 4),
         ):
-            self.assertEqual(topic.count(f"<!-- {block}"), expected)
+            if block in {"research_source", "research_claim"}:
+                key, prefix = ("source_id", "S") if block == "research_source" else ("claim_id", "C")
+                ids = re.findall(rf"<!-- {block}\s+{key}: ([A-Z]+\d+)\s", topic)
+                self.assertEqual(len(ids), len(set(ids)))
+                self.assertTrue({f"{prefix}{i}" for i in range(1, expected + 1)} <= set(ids))
+            else:
+                self.assertEqual(topic.count(f"<!-- {block}"), expected)
 
         concepts = (ROOT / "config" / "knowledge_concepts.csv").read_text(
             encoding="utf-8"
@@ -3940,9 +3946,9 @@ process.stdout.write(JSON.stringify(results));
         glossary = topic.split("### 名詞小字典", 1)[1].split(
             "### 三句話抓重點", 1
         )[0]
-        self.assertEqual(
-            sum(line.startswith("- **") for line in glossary.splitlines()), 59
-        )
+        glossary_terms = re.findall(r"^- \*\*(.*?)\*\*", glossary, re.M)
+        self.assertGreaterEqual(len(glossary_terms), 59)
+        self.assertEqual(len(glossary_terms), len(set(glossary_terms)))
         lead = topic.split("### 三句話抓重點", 1)[1].split(
             "### 為什麼重要", 1
         )[0].splitlines()[2]

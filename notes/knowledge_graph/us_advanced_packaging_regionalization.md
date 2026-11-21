@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: us-advanced-packaging-regionalization
 root_node_id: concept:us-advanced-packaging-regionalization
 label: 美國先進封裝區域化九關橋接
-summary: Q3申報分開Arizona累計成本、CHIPS尚未收款與韓國另案補助；成本不是現金實付，兩地資金不能互抵。工具、資格、量產利用、損平與台美替代仍逐關驗證。
+summary: Q3申報分開工程成本與兩地補助；11月另核買方及供應商的美韓台合作範圍。Amkor多年協議包含關係與實收仍待調節，不把不同產線、地區或承諾金額合成收入或轉單。
 article_ids: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION
 status: active
 -->
@@ -40,18 +40,18 @@ view: company
 from_id: company:nvidia
 to_id: concept:us-advanced-packaging-regionalization
 relation: planned_customer
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C1
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C1,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C22
 note_refs:
 evidence_state: verified
 commercial_stage: planned
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-01
-review_due: 2026-08-15
+as_of: 2026-11-21
+review_due: 2026-11-30
 status: active
-boundary: 約 15 億美元多年期協議與 2027 年客戶預付款預期不等於已付款 已履約 保底量 客戶產品資格或 Amkor 已認列收入。
-next_trigger: NVIDIA 與 Amkor 對上同一產品 facility qualification release 預付款收取與服務收入期間。
+boundary: 10月Amkor稱美韓協議合計30億美元，11月買方稱7月和10月合計近30億且含預付款；沒有精確總額調節、實收或收入。7月金額不能再加到已含該案的總額，Q2未具名客戶亦不自動配對；同案雙方不是獨立驗收。
+next_trigger: NVIDIA與Amkor以同協議、產品及廠區釐清總額包含關係、資金分類、預付款實收、抵扣／退還、驗收與收入認列。
 -->
 
 <!-- knowledge_edge
@@ -120,18 +120,18 @@ view: industry
 from_id: concept:us-advanced-packaging-regionalization
 to_id: stage:regional-project-capital-stack
 relation: passes_through
-claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C18,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C17
+claim_refs: MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C18,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C17,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C22,MI-2026-08-01-US-ADVANCED-PACKAGING-REGIONALIZATION#C25
 note_refs:
 evidence_state: inference
 commercial_stage: financial
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-10-04
-review_due: 2026-10-31
+as_of: 2026-11-21
+review_due: 2026-11-30
 status: active
-boundary: 9/8新版120億美元為两期campus計畫，不是已支出；與補助上限 客戶預付款 公司級年度CapEx分屬不同payer recipient period scope與會計欄位，不能加總。新scope不補齊資金實收或財務轉換。
-next_trigger: Amkor 發布同一 project phase period 的 grant prepayment own funds debt tax credit CapEx 與 contract-liability reconciliation。
+boundary: 120億美元是兩期campus計畫；客戶美韓多年協議、政府補助、公司CapEx各有不同付款方、範圍與時點。合作金額與工程成本不等實收或已付，台美並列計畫不證明訂單互補或替代；沒有財務歸因內圈。
+next_trigger: Amkor按同契約、project、phase及期間公開總額包含關係、grant、prepayment、own funds、debt、CapEx及contract liability調節，另核同產品區域配置。
 -->
 
 <!-- knowledge_edge

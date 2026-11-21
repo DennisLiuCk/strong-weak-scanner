@@ -97,6 +97,13 @@ to: triaged
 reason: q3_arizona_costs_and_us_korea_grant_status_separated_without_thesis_clock_upgrade
 evidence: sources:S15
 -->
+<!-- transition
+date: 2026-11-21
+from: triaged
+to: triaged
+reason: supplier_counterparty_releases_separate_regional_capacity_commitments_from_receipts_and_revenue_without_thesis_clock_refresh
+evidence: sources:S16,S17,S18,S19
+-->
 
 ## 新手先讀：這篇在講什麼
 
@@ -128,10 +135,13 @@ evidence: sources:S15
 - **Phase1／Phase2（第一期／第二期）**：同一園區分期建設的範圍；各期有自己的預算、建築、客戶資格與財務目標，不能自動共用一個日期或毛利率。
 - **Campus（園區）／cleanroom（無塵室）**：前者是整體廠區範圍，後者是控制潔淨度的生產空間；平方公尺描述面積，不描述已交付的合格產品數。
 - **OSAT（委外封裝與測試廠）**：替晶片公司承接封裝與測試的專業廠商。Amkor 與台灣的日月光投控都屬這一類，但美國擴產不自動等於台灣訂單流失。
+- **ABF 載板**：使用薄膜絕緣材料製作細密線路的封裝基板，承接晶片與外部電路的連接；它不等於整套封裝服務。
+- **CPO（共同封裝光學）**：把光學連接元件與運算或交換晶片靠近整合的方式；光引擎產線與一般先進封裝擴產必須分開辨認。
+- **Youth 廠區**：景碩與 NVIDIA 原稿具名的桃園製造廠區；該廠的專用載板產能不等於景碩全公司產能。
 
 ### 三句話抓重點
 
-- Amkor 與 NVIDIA 公布約 15 億美元多年期先進封裝與開發協議，Amkor 並預計 2027 年收到約 15 億美元客戶預付款。
+- Amkor 7月與 NVIDIA 的約15億美元協議，與10月新增韓國安排分屬不同公告版本；10/21公司稱兩地協議合計30億美元，仍不是已收款或收入。Q2季報另預期2027年收到一名未具名客戶的預付款，不把兩者自動配對。[S1][S2][S17]
 - Amkor 2026 年 9 月 8 日把 Arizona 兩期園區計畫投資改列約 120 億美元，Phase 2 預計 2027 年底開工、2029 年底完工；這是計畫版本，不是已花出去的錢，更不是收入或實際產出。
 - 10/27 Q3 申報把 Arizona 已發生成本、尚未收到的美國 CHIPS 款及另案已收到的韓國補助分開；這讓資金狀態更清楚，仍沒有證實兩地資格、合格產出、獲利及台灣轉單。[S15](https://www.sec.gov/Archives/edgar/data/1047127/000104712726000052/amkr-20260930.htm)
 
@@ -151,6 +161,8 @@ Q3 申報新增了一個容易理解的區分：工程可以已經發生成本�
 必須知道哪間店、什麼款、何時收到，以及還有哪些限制，才能判斷資金是否真正到位。
 下一步要追的是 Arizona 自身的撥款和付款調節，不是用全球現金餘額代替。
 
+11月雙方公告讓「誰與誰合作、在哪裡擴產」更清楚。就像連鎖店同時替幾間工廠預留生產能力，簽約、匯款、驗收與賣出商品仍是四件事；台灣與美國都列入計畫，也不能直接判定彼此搶走訂單。[S16][S18][S19]
+
 ### 為什麼重要
 
 市場容易把大額協議當成已認列收入，把最高補助額當成已收現金，把十年框架當成十年保底量，或把產能上線、損平與滿載壓成同一天，再把美國新增直接翻譯成台灣被取代。這篇把政府獎勵、里程碑撥付、客戶預付款、公司資本投入、建設、資格驗證、量產利用與財務歸因拆成九關，並用台美同欄位比較，讓讀者能判斷區域化究竟走到哪裡。
@@ -164,10 +176,12 @@ Q3 申報新增了一個容易理解的區分：工程可以已經發生成本�
 - 追 Arizona 各期設施的建築完工、工具進場、製程資格、客戶產品認證、合格產出、良率與利用率，並固定每個數字所屬的 project／phase／facility 版本。
 - 追 Phase 1 是否實現 5/21 公布的損平與滿載目標；另追 Phase 2 的 9/8 建設時程及是否有新的財務目標。新稿沒有重發 Phase 1 財務目標，也沒說 Phase 2 已納入，不能代填。
 - 追日月光與台灣設備、材料公司是否揭露具名產品、區域訂單、稼動率與毛利，而不是只談政策方向。
+- 對照 Amkor 7月、10月與 NVIDIA 11月原稿，先核總額包含哪些協議，再找付款及抵服務費條件；矽品先進封裝與景碩載板另按產品追，不拿同一客戶名字串成同一筆收入。
 
 ### 想一想
 
 - 工程成本已入帳但補助還沒收到，是否就能斷言公司缺現金？還需要哪些付款條件與融資資料？
+- 同一客戶在美國、韓國及台灣都宣布擴產，哪一份資料才能分辨是增加總需求、備援，還是訂單移轉？
 - 韓國案收到補助，為什麼不能證明 Arizona 的 CHIPS 里程碑已通過？
 - 客戶先付 15 億美元，為什麼不能立刻把同額金額當成 Amkor 的服務收入與獲利？
 - 14.652 億美元採購義務和另一份約 15 億美元預付款協議只差 3,480 萬美元，為什麼仍不能當成同一專案的自動資金調節表？
@@ -406,6 +420,70 @@ status: active
 url: https://www.sec.gov/Archives/edgar/data/1047127/000104712726000052/amkr-20260930.htm
 locator: SEC accession 0001047127-26-000052；Note 1印刷pp.9–10韓國FDI現金補助、Note 9 p.17 Arizona costs incurred、MD&A Liquidity p.30 CHIPS no funds received to date。原HTML SHA256 6082cfdf426fcbf76beea01188e5b68f086b2b9b71923bba0a3189f1ebd14258；本輪只核所引段落，不宣稱全文差異稽核
 limitation: 公司自行申報的未經查核季度財報；建設累計成本不是現金實付，沒有Phase1／2拆分；CHIPS未收到款不等核定取消或違約，韓國補助不是Arizona資金。未證實工具進場、客戶資格、量產利用率、損平或台灣訂單移轉；同Amkor消息鏈不新增獨立客戶驗證
+-->
+
+<!-- research_source
+source_id: S16
+role: company_release
+source_kind: document
+publisher: NVIDIA
+independence_group: nvidia-supply-capacity-agreements-2026
+title: NVIDIA Expands Commitments With Supply Chain Partners to Support AI Infrastructure Buildout
+published_at: 2026-11-17
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://nvidianews.nvidia.com/news/nvidia-expands-commitments-with-supply-chain-partners-to-support-ai-infrastructure-buildout
+locator: Increasing Substrate Capacity及Scaling Advanced Packaging Through Multiyear Agreements兩節；Amkor的July／October協議、SPIL的台灣整合封裝與Kinsus Youth專供範圍
+limitation: 買方合作公告，描述計畫與協議，不是已付款或已驗收明細；與S17至S19同一合作安排交叉引用，保守列同一消息群，不計獨立部署或財務樣本。原HTML已保存SHA256 3bc57bbfd596b511163e7d7a160feb0933facfcaf4d703b4eefd1324db94eb65
+-->
+
+<!-- research_source
+source_id: S17
+role: company_release
+source_kind: document
+publisher: Amkor Technology
+independence_group: nvidia-supply-capacity-agreements-2026
+title: Amkor Technology and NVIDIA Advance Strategic Partnership for AI Infrastructure
+published_at: 2026-10-21
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://ir.amkor.com/news-releases/news-release-details/amkor-technology-and-nvidia-advance-strategic-partnership-ai
+locator: 副標New $1.3 billion agreement與首兩段South Korea、Arizona and South Korea total $3 billion、prepayments；末段前瞻風險
+limitation: 閱讀服務取得官方HTML正文，本地直取403，未封存原HTML；文字可定位但非完整離線證據包。公司總額與S16 nearly約數並列，不自補精度、收款或7月加10月的差額調節；兩方引述同一安排，不當第二筆獨立驗收
+-->
+
+<!-- research_source
+source_id: S18
+role: company_release
+source_kind: document
+publisher: Siliconware Precision Industries
+independence_group: nvidia-supply-capacity-agreements-2026
+title: SPIL and NVIDIA Announce Multi-Year Expansion to Triple Advanced Packaging Capacity
+published_at: 2026-11-18
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://www.spilglobal.com/NewsDetail/63c1aba5d14bac8c
+locator: TAIPEI日期、首段及A Strategic Play段的Taiwan、bumping／assembly／testing、設施升級與自動化；文末連回S16
+limitation: 本輪只接納同案台灣封裝範圍及計畫階段，不採產能倍率作跨公司比較；沒有實收、合格產出或毛利調節。原HTML已保存SHA256 31f66eb2781942c24deadf8afc93005bb2597bd0f34ae57aa140139d82ed8b2b；未讀下載PDF，不冒稱同包全文驗收
+-->
+
+<!-- research_source
+source_id: S19
+role: company_release
+source_kind: document
+publisher: Kinsus Interconnect Technology
+independence_group: nvidia-supply-capacity-agreements-2026
+title: Kinsus Announces more than US$1 Billion Investment From NVIDIA to Expand Advanced Substrate Capacity for AI
+published_at: 2026-11-18
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://www.kinsus.com.tw/en/news/newsroom/detail/news_category1/news_20261118
+locator: Corporate News日期及首段Youth manufacturing campus、advanced packaging substrates；文末連回NVIDIA原稿
+limitation: 閱讀服務可讀官方正文，本地直取401；非原HTML離線包。只用具名廠區／載板角色，不使用標題投資額作跨公司數字比較，也不由investment一詞判定股權投資、預付款已收或收入。與S16同案公告，不是獨立量產驗收
 -->
 
 <!-- research_claim
@@ -754,6 +832,91 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C22
+label: verified
+status: active
+claim: Amkor 10/21公告韓國新增13億美元安排及Arizona與韓國多年協議總計30億美元；NVIDIA 11/17將7月和10月協議合稱近30億美元並說明含預付款，用以支援Amkor兩地先進封裝擴產
+supporting_source_ids: S1,S2,S16,S17
+contrary_source_ids:
+as_of: 2026-11-21
+basis: S17副標及首兩段明列USD billion 1.3／3；S16先進封裝節明列July and October、nearly $3 billion及include prepayments；是同一Amkor協議組合的不同日期敘述，不是兩家公司財務規模比較
+boundary: 公告合計不是當期已付／已收或服務收入；7月約15億與10月13億的公告值算術和約28億，不是公司30億的精確合約調節，公開稿未列總額精度與其餘組成，也未逐案對應Q2未具名客戶收款預期；不把10月總額再加到7月金額
+verification_needed: Amkor正式申報的同協議明細、總額精度及包含關係，實際預付款收取、抵服務費或退還條件與收入認列
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: SPIL 11/18自有公告確認與NVIDIA的台灣先進封裝擴產安排，列出凸塊、組裝、測試、設施升級及自動化；NVIDIA 11/17也把此案與Amkor美韓擴產分列
+supporting_source_ids: S16,S18
+contrary_source_ids:
+as_of: 2026-11-21
+basis: S18首段及A Strategic Play逐項描述台灣計畫範圍；S16先進封裝節分開兩個合作對象，並另列更早的光引擎擴產，不能互換產品分母
+boundary: 證實雙方公開的具名計畫，不是已驗收產能、現金實收、日月光收入或台美訂單移轉；本案先進封裝不能當成10月光引擎案，也不能與沒有客戶共同鍵的廠務工程公告拼接為履約
+verification_needed: 同一契約、產品、廠區、日期的工具進場、客戶資格、合格產出、收款及財務歸因
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: 景碩11/18自有公告把NVIDIA合作連到桃園Youth廠區的先進封裝載板擴充；NVIDIA原稿限定為該廠區供NVIDIA使用的ABF載板產能，而非景碩全公司或封測服務產能
+supporting_source_ids: S16,S19
+contrary_source_ids:
+as_of: 2026-11-21
+basis: S19首段明列Youth campus及advanced packaging substrates；S16 Increasing Substrate Capacity明列ABF package substrate capacity dedicated to NVIDIA及Taoyuan地點
+boundary: 同案角色核對不是已收到款、股權投資或收入分類；不採倍率或投資額排名，不連到SPHBM4、Helios或未具名台灣材料／設備商，也不推論擴產已投產
+verification_needed: 完整契約的資金類型、實付與收款條件、同產品產能驗收及收入共同鍵
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C25
+label: inference
+status: active
+claim: 同一買方同時公布美國、韓國與台灣的不同製程擴產安排，研究上應先按契約、產品與廠區拆分，再檢查訂單是否移轉；只用美國新增推台灣流失，現有資料不足
+supporting_source_ids: S16,S17,S18,S19
+contrary_source_ids:
+as_of: 2026-11-21
+basis: C22至C24核對到不同地區與製程的安排，但沒有同產品同期間的區域訂單或利用率調節；並列計畫不能決定替代或互補
+boundary: 不宣稱總需求已增加、各區已互補或供應商必受惠；多家公司公告可能共用同一交易敘事，不能以篇數計獨立支持
+verification_needed: 同一客戶產品的跨區資格、訂單配置、合格產出、利用率及服務毛利
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C26
+label: unverified
+status: active
+claim: 目前仍不能把這批多年期合作承諾逐案橋接成供應商已收預付款、已驗收產能或已認列收入
+supporting_source_ids: S16,S17,S18,S19
+contrary_source_ids:
+as_of: 2026-11-21
+basis: 本輪閱讀範圍是四份官方合作原稿，不是完整契約、付款收據或逐案財報調節；其餘財務期末總額也不能代填本案
+boundary: 缺乏本輪可驗證的共同鍵，不代表款項未發生或未來一定不能履約；同網站取件失敗與閱讀服務成功各自保留，不宣稱已取得全部原件
+verification_needed: 每案契約主體、產品／廠區、日期、資金分類、實收、抵扣或退還、交付與收入的可回查調節
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 為何值得進佇列
 
 美國先進封裝區域化不再只有政策口號：Amkor 與 NVIDIA 7 月 23 日公布約 15 億美元多年期
@@ -797,6 +960,18 @@ resolution:
 **推論：** 建設投入與資金入帳會有不同時鐘，不能靠兩個相近金額自動連成資金調節表。
 **待驗證：** Arizona各期實際付款、補助里程碑、工具進場、產品放行、穩定產出與現金回收。
 本次只補財務／撥款狀態分支，保留C18主命題的10/4證據時鐘；不宣稱美國新增已造成台灣轉單。
+
+## 同一買方的跨區擴產 要先對契約再看現金
+
+**兩方都具名，先證明合作範圍。** NVIDIA 11/17原稿與供應商自己的公告可以互相核對角色：Amkor是美國及韓國先進封裝，矽品是台灣先進封裝，景碩是桃園Youth廠區的載板。它們不是同一個產品分母，不能用金額或擴產倍率排名。[S16][S17][S18][S19]
+
+**Amkor總額要保留版本。** 10/21公司公告韓國新增13億美元，並稱美韓多年協議合計30億美元；11/17買方稱7月與10月協議「近30億美元」、其中包括預付款。7月約15億加10月13億的公告約數合計約28億，不能自行猜測其餘組成或把約數補成精確調節。更不能再把7月數字加到已含7月的總額上。[C22]
+
+**同一篇公告裡，也有不同的產線。** 矽品此次稿件涉及凸塊、組裝、測試與廠務升級，不是把10月光引擎案換個標題；景碩稿件的investment用語，也沒有自行說明股權、預付款或服務收入如何入帳。正文只接受具名角色，不把英文「投資」直接譯成某一會計科目。[C23][C24]
+
+**接下來找同案的交接單。** 先核契約總額與包含關係，再逐案對實付／實收、可退還或抵服務費條件、客戶驗收及收入。若美國與亞洲都擴產，仍要有同產品訂單和利用率才能判斷替代或互補；宣布擴產不能預先回答這個問題。[C25][C26]
+
+這次接受的是四份合作公告的有界核對；同案雙方引述保守歸同一消息群，不是四次獨立驗收。Amkor及景碩正文經閱讀服務可讀，但本地取件分別403及401；不將節錄冒稱原件離線證據包。主命題C18與其10/4時鐘維持不變。
 
 ## 四種錢不能放進同一個加總
 
@@ -1222,6 +1397,20 @@ frequency_detail: 每月查NIST專案頁與Amkor實際申報／公告，按國�
 next_check: 2026-11-30
 trigger: 正式文件提供Arizona成本至付款調節、CHIPS實際撥款，或韓國補助後續收款、限制解除與條件履行資料
 invalidation: 公司更正累計工程成本或收款／會計分類，補助條件變更、回收或實際付款不能依同案同期間核對
+-->
+
+<!-- monitoring_item
+monitor_id: T10
+status: active
+claim_ids: C22,C25,C26
+metric: Amkor與NVIDIA美韓協議總額、包含關係及承諾到收款履約調節
+source_ids: S1,S2,S16,S17
+watch_source_ids: S14
+frequency: monthly
+frequency_detail: 11/30先查Amkor後續申報及具名合作原件；若提前公布同案總額調節、收款或條件則立即重審，不以活動或重述舊稿代替
+next_check: 2026-11-30
+trigger: Amkor正式文件釐清7月與10月協議總額及包含關係，或揭露同協議實收、抵服務費／退還條件、產品驗收與收入認列調節
+invalidation: 協議範圍、總額、地區、付款或履約條件遭更正、取消或延期，或新資料顯示既有總額被重複計入
 -->
 
 ## 下一個可證明／否定的節點
