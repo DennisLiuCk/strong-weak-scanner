@@ -122,7 +122,7 @@ def week_end(con, monday, as_of, cal, firsts, mcal):
     days = [str(monday + dt.timedelta(days=i)) for i in range(5)]
     closed, last = [], None
     for d in reversed(days):
-        st = mcal.status(d)
+        st = mcal.status(d, as_of)
         if st["state"] == "unknown":
             if as_of < publish_deadline(d):
                 return {"status": "pending", "note": f"{d} 尚未到發布期限,且{st['reason']}"}
@@ -137,7 +137,7 @@ def week_end(con, monday, as_of, cal, firsts, mcal):
     if last is None:
         return {"status": "closed_week", "note": f"{monday} 當週整週休市:{'、'.join(reversed(closed))}"}
     note = (f"{'、'.join(reversed(closed))},改用該週最後交易日 {last}" if closed else None)
-    basis = mcal.status(last)
+    basis = mcal.status(last, as_of)
     run = firsts.get(last)
     if run is None:
         if as_of < publish_deadline(last):

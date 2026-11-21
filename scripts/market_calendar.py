@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""market_calendar.py — 台股交易日曆(TWSE 開休市表 + TWSE/TPEx 實際成交日核對)。
+"""market_calendar.py — 台股交易日曆(TWSE 開休市表 + 臨時休市公告 + TWSE/TPEx 實際成交日)。
 
 rank_change 自動選週用它區分「週五休市」與「週五資料漏抓」;只讀 config/market_calendar.json,
-不連網。日期狀態:
-  * closed:週末、開休市表列為無交易,或已核對月份中 TWSE 與 TPEx 都沒有該日成交。
-  * trading:已核對月份中 TWSE 與 TPEx 都有該日成交(realized),
-    或尚未核對、但開休市表涵蓋該年且未列為休市(scheduled;臨時休市要 --refresh 才知道)。
-  * unknown:開休市表與成交核對都沒涵蓋 → 無法確認,呼叫端必須明示。
+不連網。status(day, as_of) 依序判定(給 as_of 時只用當時已知的資訊):
+  * closed/weekend:週六、日。
+  * trading/realized:as-of 前已取得(fetched_at)的 TWSE 與 TPEx 月成交資料都列有該日。
+  * closed/announced:臨時休市公告(closures,announced_at ≤ as-of)。
+  * closed/scheduled:TWSE 年度開休市表列為無交易。
+  * closed/realized:兩所已取得的成交資料都略過該日、且其後已有共同成交日(該日落在
+    已發布區間中間)。只到前一日的成交資料不能證明該日休市——只代表兩所列出相同日期。
+  * trading/scheduled:開休市表涵蓋該年、未列休市、也沒有公告(尚未以實際成交核對)。
+  * unknown:以上都沒涵蓋 → 無法確認,呼叫端必須明示。
+年度開休市表沒有可比較的發布時間,視為該年開始前已公告;臨時休市一律要有 announced_at。
 
 用法(repo 根目錄):
   python scripts/market_calendar.py --check 2026-10-23            # 離線讀 config,列出狀態與來源
@@ -41,44 +46,71 @@ def _roc(text):
     return str(dt.date(y + 1911, m, d))
 
 
+def _when(text):
+    t = dt.datetime.fromisoformat(text)
+    if t.tzinfo is None:
+        raise CalendarError(f"時間必須帶時區:{text}")
+    return t
+
+
 class MarketCalendar:
     def __init__(self, data):
         self.data = data
-        self.closures = {}
+        self.scheduled = {}
         for year, entry in data.get("announced", {}).items():
             for c in entry["closed"]:
-                self.closures[c["date"]] = (f"{c['name']}(TWSE {year} 開休市表)", entry["source"])
+                self.scheduled[c["date"]] = (f"{c['name']}(TWSE {year} 開休市表)", entry["source"])
+        self.closures = {}
         for c in data.get("closures", []):
-            self.closures[c["date"]] = (c["reason"], c["source"])
-        self.realized = {m: (e["covered_through"], set(e["trading_days"]), e)
-                         for m, e in data.get("realized", {}).items()}
+            if not c.get("announced_at"):
+                raise CalendarError(f"臨時休市 {c['date']} 缺 announced_at,無法做 as-of 判斷")
+            self.closures[c["date"]] = (_when(c["announced_at"]), c["reason"], c["source"])
+        default = data.get("fetched_at")
+        self.realized = []
+        for month, e in sorted(data.get("realized", {}).items()):
+            fetched = e.get("fetched_at") or default
+            if not fetched:
+                raise CalendarError(f"成交核對 {month} 缺 fetched_at,無法做 as-of 判斷")
+            self.realized.append((month, _when(fetched), set(e["trading_days"]), e["sources"]))
 
-    def coverage(self):
-        months = sorted(self.realized)
-        thru = self.realized[months[-1]][0] if months else None
-        return (f"成交核對 {months[0]}~{thru}" if months else "無成交核對") + \
+    def coverage(self, as_of=None):
+        seen = [r for r in self.realized if as_of is None or r[1] <= as_of]
+        days = sorted(set().union(*(r[2] for r in seen))) if seen else []
+        return (f"成交核對至 {days[-1]}" if days else "無成交核對") + \
             f";開休市表 {','.join(sorted(self.data.get('announced', {}))) or '無'}"
 
-    def status(self, day):
-        """{'state': trading|closed|unknown, 'basis': realized|scheduled|weekend|None, 'reason', 'source'}"""
+    def status(self, day, as_of=None):
+        """{'state': trading|closed|unknown, 'basis': realized|announced|scheduled|weekend|None,
+        'reason', 'source'};as_of(帶時區)只看當時已公告/已取得的資料。"""
         d = dt.date.fromisoformat(day)
         if d.weekday() >= 5:
             return {"state": "closed", "basis": "weekend", "reason": "週末", "source": None}
-        real = self.realized.get(day[:7])
-        if real and day <= real[0]:
-            if day in real[1]:
+        seen = [r for r in self.realized if as_of is None or r[1] <= as_of]
+        for month, _, days, sources in seen:
+            if day in days:
                 return {"state": "trading", "basis": "realized", "reason": "TWSE、TPEx 當日皆有成交",
-                        "source": real[2]["sources"]}
-            reason, source = self.closures.get(day, ("TWSE、TPEx 當月成交資料皆無此日", real[2]["sources"]))
-            return {"state": "closed", "basis": "realized", "reason": reason, "source": source}
-        if day in self.closures:
-            reason, source = self.closures[day]
+                        "source": sources}
+        c = self.closures.get(day)
+        if c and (as_of is None or c[0] <= as_of):
+            return {"state": "closed", "basis": "announced",
+                    "reason": f"{c[1]};公告 {c[0].isoformat()}", "source": c[2]}
+        if day in self.scheduled:
+            reason, source = self.scheduled[day]
             return {"state": "closed", "basis": "scheduled", "reason": reason, "source": source}
+        own = [r for r in seen if r[0] == day[:7]]
+        later = sorted(x for r in seen for x in r[2] if x > day)
+        if own and later:
+            return {"state": "closed", "basis": "realized",
+                    "reason": f"TWSE、TPEx 成交資料都略過此日(其後 {later[0]} 已有成交),無休市公告",
+                    "source": own[0][3]}
         if day[:4] in self.data.get("announced", {}):
-            return {"state": "trading", "basis": "scheduled",
-                    "reason": "開休市表未列休市(尚未以實際成交核對)",
+            note = "開休市表未列休市、無臨時休市公告(尚未以實際成交核對)"
+            if own:
+                note += f";兩所已取得的成交資料只到 {max(x for r in seen for x in r[2])},不能證明此日休市"
+            return {"state": "trading", "basis": "scheduled", "reason": note,
                     "source": self.data["announced"][day[:4]]["source"]}
-        return {"state": "unknown", "basis": None, "reason": f"交易日曆未涵蓋({self.coverage()})", "source": None}
+        return {"state": "unknown", "basis": None,
+                "reason": f"交易日曆未涵蓋({self.coverage(as_of)})", "source": None}
 
 
 def load(path=CALENDAR):
@@ -127,6 +159,7 @@ def _months(first, last):
 
 
 def refresh(path=CALENDAR, now=None):
+    """重抓官方資料並改寫 config;每月記錄實際取得時間(fetched_at),臨時休市 closures 原樣保留。"""
     now = now or dt.datetime.now(TAIPEI_TZ)
     old = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
     today = now.date()
@@ -144,10 +177,8 @@ def refresh(path=CALENDAR, now=None):
         if twse != tpex:
             raise CalendarError(f"{y}-{m:02d} TWSE 與 TPEx 成交日不一致:只在 TWSE {sorted(set(twse) - set(tpex))}、"
                                 f"只在 TPEx {sorted(set(tpex) - set(twse))}")
-        end = (dt.date(y + (m == 12), m % 12 + 1, 1) - dt.timedelta(days=1))
-        thru = min(end, today - dt.timedelta(days=1))
-        realized[f"{y}-{m:02d}"] = {"covered_through": str(thru), "trading_days": [d for d in twse if d <= str(thru)],
-                                    "sources": sources}
+        realized[f"{y}-{m:02d}"] = {"fetched_at": now.isoformat(timespec="seconds"),
+                                    "trading_days": [d for d in twse if d < str(today)], "sources": sources}
     data = {"schema": 1, "fetched_at": now.isoformat(timespec="seconds"),
             "note": "TWSE 開休市表 + TWSE FMTQIK/TPEx tradingIndex 實際成交日;由 market_calendar.py --refresh 產生",
             "announced": announced, "closures": old.get("closures", []), "realized": realized}
@@ -181,6 +212,7 @@ def main(argv=None):
     ap.add_argument("--check", nargs="+", metavar="日期")
     ap.add_argument("--verify-online", metavar="日期")
     ap.add_argument("--refresh", action="store_true")
+    ap.add_argument("--as-of", help="帶時區 ISO 時間;--check 只用當時已公告/已取得的資料")
     ap.add_argument("--path", default=CALENDAR)
     a = ap.parse_args(argv)
     out = []
@@ -191,8 +223,11 @@ def main(argv=None):
         out.append(verify_online(a.verify_online))
     if a.check:
         cal = load(a.path)
+        as_of = _when(a.as_of) if a.as_of else None
+        if as_of:
+            out.append(f"as-of {as_of.isoformat()}")
         for day in a.check:
-            st = cal.status(day)
+            st = cal.status(day, as_of)
             out.append(f"{day} {st['state']}({st['basis']}):{st['reason']}")
             src = st["source"]
             for s in (src if isinstance(src, list) else [src] if src else []):

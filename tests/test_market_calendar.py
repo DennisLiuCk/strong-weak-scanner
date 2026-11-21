@@ -8,9 +8,10 @@ import market_calendar as mc  # noqa: E402
 DATA = {
     "announced": {"2026": {"title": "115 年市場開休市日期", "source": "schedule-url",
                            "closed": [{"date": "2026-12-25", "name": "行憲紀念日"}]}},
-    "closures": [{"date": "2026-10-23", "reason": "臨時休市公告", "source": "news-url"}],
-    "realized": {"2026-10": {"covered_through": "2026-10-31", "sources": ["twse", "tpex"],
-                             "trading_days": ["2026-10-22", "2026-10-27"]}},
+    "closures": [{"date": "2026-10-23", "reason": "臨時休市公告", "source": "news-url",
+                  "announced_at": "2026-10-22T20:10:00+08:00"}],
+    "realized": {"2026-10": {"fetched_at": "2026-11-01T10:00:00+08:00", "sources": ["twse", "tpex"],
+                             "trading_days": ["2026-10-21", "2026-10-22", "2026-10-27"]}},
 }
 
 
@@ -25,14 +26,31 @@ class Status(unittest.TestCase):
     def test_states(self):
         self.assertEqual(self.state("2026-10-22"), ("trading", "realized"))
         self.assertEqual(self.state("2026-10-24"), ("closed", "weekend"))
-        self.assertEqual(self.state("2026-10-26"), ("closed", "realized"))      # 已核對月份無成交
+        self.assertEqual(self.state("2026-10-26"), ("closed", "realized"))      # 落在兩所成交日中間
+        self.assertEqual(self.state("2026-10-28"), ("trading", "scheduled"))    # 成交資料只到 10/27
         self.assertEqual(self.state("2026-12-25"), ("closed", "scheduled"))
         self.assertEqual(self.state("2026-12-28"), ("trading", "scheduled"))
         self.assertEqual(self.state("2027-01-04")[0], "unknown")
 
     def test_announced_closure_reason_and_source_win(self):
         st = self.cal.status("2026-10-23")
-        self.assertEqual((st["state"], st["reason"], st["source"]), ("closed", "臨時休市公告", "news-url"))
+        self.assertEqual((st["state"], st["basis"], st["source"]), ("closed", "announced", "news-url"))
+        self.assertIn("公告 2026-10-22T20:10:00+08:00", st["reason"])
+
+    def test_as_of_hides_later_announcements_and_fetches(self):
+        tpe = mc.TAIPEI_TZ
+        before = mc.dt.datetime(2026, 10, 22, 20, 9, tzinfo=tpe)
+        after = mc.dt.datetime(2026, 10, 22, 20, 11, tzinfo=tpe)
+        self.assertEqual(self.cal.status("2026-10-23", before)["basis"], "scheduled")
+        self.assertEqual(self.cal.status("2026-10-23", before)["state"], "trading")
+        self.assertEqual(self.cal.status("2026-10-23", after)["state"], "closed")
+        self.assertEqual(self.cal.status("2026-10-22", before)["basis"], "scheduled")   # 11/01 才取得成交資料
+        self.assertEqual(self.cal.status("2026-10-26", after)["state"], "trading")      # 成交缺口當時不可見
+
+    def test_closure_without_announcement_time_is_rejected(self):
+        bad = dict(DATA, closures=[{"date": "2026-10-23", "reason": "x", "source": "y"}])
+        with self.assertRaisesRegex(mc.CalendarError, "缺 announced_at"):
+            mc.MarketCalendar(bad)
 
     def test_repo_calendar_has_official_1023_closure(self):
         st = mc.load().status("2026-10-23")
