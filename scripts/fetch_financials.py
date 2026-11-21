@@ -431,7 +431,10 @@ def main():
                 if filled:
                     print("官方補入：" + ",".join(filled))
             except Exception as exc:
-                con.commit()
+                if isinstance(exc, OfficialMonthRevenueError):
+                    con.commit()
+                else:
+                    con.rollback()
                 remaining = missing_month_revenue(
                     con, ids, target.year, target.month)
                 print(

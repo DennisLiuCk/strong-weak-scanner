@@ -80,6 +80,42 @@ class OfficialMonthRevenueTest(unittest.TestCase):
                     "SELECT stock_id,revenue FROM month_revenue").fetchall(),
                     [("2330", 123_000)])
 
+    def test_strict_cli_rolls_back_unexpected_upsert_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "financials.db")
+            original_missing = ff.missing_month_revenue
+
+            def fill(con, ids, year, month):
+                ff.up_month_revenue(con, [{
+                    "date": "2026-07-01", "stock_id": "2330", "revenue": 123_000,
+                    "revenue_year": 2026, "revenue_month": 6,
+                }])
+                raise ValueError("unexpected upsert failure")
+
+            def missing(con, ids, year, month):
+                result = original_missing(con, ids, year, month)
+                self.assertEqual(result, ["2330"])
+                self.assertFalse(con.in_transaction)
+                return result
+
+            stderr = io.StringIO()
+            with patch.object(sys, "argv", ["fetch_financials.py", "--db", db,
+                    "--end", "2026-07-17", "--stocks", "2330",
+                    "--official-month-revenue-only", "--require-latest-month-complete"]), \
+                    patch.object(ff, "fill_official_month_revenue", side_effect=fill), \
+                    patch.object(ff, "missing_month_revenue", side_effect=missing) as coverage, \
+                    patch.object(sys, "stderr", stderr):
+                with self.assertRaises(SystemExit) as caught:
+                    ff.main()
+            coverage.assert_called_once()
+            self.assertEqual(caught.exception.code, 1)
+            self.assertIn("WARN 官方月營收補援失敗：ValueError: unexpected upsert failure",
+                          stderr.getvalue())
+            with sqlite3.connect(db) as con:
+                for table in ("month_revenue", "fundamental_availability",
+                              "fundamental_revisions"):
+                    self.assertEqual(con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0], 0)
+
     def test_fallback_saves_twse_rows_when_tpex_fails(self):
         con = sqlite3.connect(":memory:")
         self.addCleanup(con.close)
