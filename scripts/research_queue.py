@@ -2529,6 +2529,7 @@ def render_lint(topics, scan):
 
 
 def _validate_output(output, db_path):
+    db_path = os.path.abspath(db_path)
     if output and (
         os.path.realpath(output) == os.path.realpath(db_path)
         or (os.path.exists(output) and os.path.exists(db_path)

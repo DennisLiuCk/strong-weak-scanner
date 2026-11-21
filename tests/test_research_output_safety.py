@@ -69,3 +69,42 @@ class OutputSafetyTest(unittest.TestCase):
                 self.assertEqual((code, stderr), (0, ''))
                 self.assertIn('"as_of"', stdout)
                 self.assertEqual(db.read_bytes(), b'sentinel')
+
+    def test_symlink_parent_dotdot_matches_database_opened_by_db_ro(self):
+        for module in (rq, rw):
+            for alias in ('actual', 'hardlink', 'distinct'):
+                with self.subTest(module=module.__name__, alias=alias), \
+                        tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    work = root / 'work'
+                    run = root / 'snapshots' / 'run'
+                    work.mkdir()
+                    run.mkdir(parents=True)
+                    (work / 'link').symlink_to(run, target_is_directory=True)
+                    actual = work / 'input.db'
+                    distinct = run.parent / 'input.db'
+                    for path, marker in ((actual, 'actual'), (distinct, 'distinct')):
+                        with sqlite3.connect(path) as conn:
+                            conn.execute('CREATE TABLE sentinel (value TEXT)')
+                            conn.execute('INSERT INTO sentinel VALUES (?)', (marker,))
+                    db = work / 'link' / '..' / 'input.db'
+                    with rq.db_ro.connect(db) as conn:
+                        self.assertEqual(conn.execute('SELECT value FROM sentinel').fetchone()[0],
+                                         'actual')
+                    before = actual.read_bytes()
+                    output = actual
+                    if alias == 'hardlink':
+                        output = work / 'alias.db'
+                        os.link(actual, output)
+                    elif alias == 'distinct':
+                        output = db
+                    code, stdout, stderr = self.run_cli(module, db, output)
+                    if alias == 'distinct':
+                        self.assertEqual((code, stderr), (0, ''))
+                        self.assertIn('"as_of"', distinct.read_text())
+                    else:
+                        self.assertNotEqual(code, 0)
+                        self.assertIn('--output', stderr)
+                        self.assertIn('--db', stderr)
+                        self.assertEqual(stdout, '')
+                    self.assertEqual(actual.read_bytes(), before)
