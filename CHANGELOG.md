@@ -1,6 +1,6 @@
 # Changelog
 
-## 修正持股篩選的資料庫路徑錯誤
+## 修正 Universe 體檢（screen.py）打錯 --db 路徑時建立空資料庫
 
 - `scripts/screen.py` 以唯讀模式開啟資料庫；`--db` 路徑不存在時提示錯誤並結束，不再建立空檔。
 
