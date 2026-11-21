@@ -16,7 +16,7 @@ class DailyBriefTest(unittest.TestCase):
     def render_brief(self, current):
         with tempfile.TemporaryDirectory() as tmp:
             db = Path(tmp) / "brief.db"
-            with sqlite3.connect(db) as con:
+            with contextlib.closing(sqlite3.connect(db)) as con:
                 con.executescript("""
                     CREATE TABLE universe(stock_id TEXT, name TEXT, grp TEXT);
                     INSERT INTO universe VALUES ('3529', '力旺', '矽智財'),
@@ -38,6 +38,7 @@ class DailyBriefTest(unittest.TestCase):
                 if current is not None:
                     con.execute("INSERT INTO daily_scores VALUES (?, ?, ?, ?, ?, ?)",
                                 ('2026-01-02', '3529', *current, 0))
+                con.commit()
             out = io.StringIO()
             with patch.object(daily_brief, 'DB', str(db)), \
                     patch.object(daily_brief.tstatus, 'verified_exclusions', return_value=[]), \
