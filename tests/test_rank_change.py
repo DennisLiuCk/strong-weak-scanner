@@ -107,7 +107,7 @@ def calendar(start, end, closed=None, announced=(), closures=None, fetched_at=EA
             e["trading_days"].append(str(d))
         d += dt.timedelta(days=1)
     return rc.market_calendar.MarketCalendar({
-        "realized": realized,
+        "realized": {m: [e] for m, e in realized.items()},
         "announced": {y: {"source": "fixture-schedule", "closed": [{"date": k, "name": v} for k, v in closed.items()
                                                                   if k[:4] == y]} for y in announced},
         "closures": [{"date": k, "reason": r, "announced_at": t, "source": "fixture-news"}
@@ -209,7 +209,7 @@ class WeekSelection(unittest.TestCase):
         cal = calendar("2026-10-01", "2026-10-31", {"2026-10-09": "國慶補假"},
                        closures={"2026-10-23": ("臨時休市公告", "2026-10-22T20:10:00+08:00")},
                        fetched_at="2026-11-01T10:00:00+08:00")
-        cal.data["realized"]["2026-10"]["trading_days"].remove("2026-10-23")
+        cal.data["realized"]["2026-10"][0]["trading_days"].remove("2026-10-23")
         cal = rc.market_calendar.MarketCalendar(cal.data)
         fx, con = self.make([], [])
         con.close()
@@ -231,25 +231,35 @@ class WeekSelection(unittest.TestCase):
         self.assertEqual(notes_after, ["2026-10-23 休市(臨時休市公告;公告 2026-10-22T20:10:00+08:00),"
                                        "改用該週最後交易日 2026-10-22"])
 
-    def test_saturday_refresh_through_thursday_does_not_confirm_friday_closed(self):
+    def refresh(self, path, now, nov_days):
+        """走 market_calendar.refresh(),官方 API 以固定資料取代。"""
         mc = rc.market_calendar
-        thu = weekdays("2026-11-02", "2026-11-19")
-        months = lambda y, m: (thu, thu, [{"url": "fixture", "sha256": "x"}]) if (y, m) == (2026, 11) else ([], [], [])
+
+        def months(y, m):
+            return (nov_days, nov_days, [{"url": "fixture", "sha256": "x"}]) if (y, m) == (2026, 11) else ([], [], [])
 
         def holidays(y):
             if y != 2026:
                 raise mc.CalendarError("未公告")
             return {"title": "115 年市場開休市日期", "source": "fixture-schedule", "sha256": "x", "closed": []}
-        tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(tmp.cleanup)
-        path = os.path.join(tmp.name, "cal.json")
         old = (mc.fetch_month, mc.fetch_holidays)
         mc.fetch_month, mc.fetch_holidays = months, holidays
         try:
-            mc.refresh(path, now=at("2026-11-21T10:00"))
+            mc.refresh(path, now=at(now))
         finally:
             mc.fetch_month, mc.fetch_holidays = old
-        cal = mc.load(path)
+        return mc.load(path)
+
+    def outcome(self, con, as_of, cal):
+        try:
+            return self.dates(con, at(as_of), cal)
+        except rc.SelectionError as exc:
+            return f"SelectionError: {exc}"
+
+    def test_saturday_refresh_through_thursday_does_not_confirm_friday_closed(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        cal = self.refresh(os.path.join(tmp.name, "cal.json"), "2026-11-21T10:00", weekdays("2026-11-02", "2026-11-19"))
         st = cal.status("2026-11-20", at("2026-11-21T10:05"))
         self.assertEqual((st["state"], st["basis"]), ("trading", "scheduled"))
         self.assertIn("兩所已取得的成交資料只到 2026-11-19,不能證明此日休市", st["reason"])
@@ -259,6 +269,32 @@ class WeekSelection(unittest.TestCase):
             rc.select_weeks(con, at("2026-11-21T10:05"), mcal=cal)
         _, con = self.make(weekdays("2026-11-02", "2026-11-20"))
         self.assertEqual(self.dates(con, at("2026-11-21T10:05"), cal), (["2026-11-13", "2026-11-20"], []))
+
+    def test_repeated_refresh_keeps_point_in_time_replays_stable(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        path = os.path.join(tmp.name, "cal.json")
+        thu, fri = weekdays("2026-11-02", "2026-11-19"), weekdays("2026-11-02", "2026-11-20")
+        _, missing = self.make(thu)          # 週五 market 與快照都缺
+        _, late = self.make(fri, thu)        # 週五 market 有、快照缺
+        replay = lambda cal: [self.outcome(c, a, cal) for c in (missing, late)
+                              for a in ("2026-11-21T10:05", "2026-11-22T10:05")]
+        first = replay(self.refresh(path, "2026-11-21T10:00", thu))
+        # 第二次抓到相同資料:不另存版本,保留最早取得時間,所有重播不變
+        cal = self.refresh(path, "2026-11-21T12:00", thu)
+        self.assertEqual([r[0].isoformat() for r in cal.realized["2026-11"]], ["2026-11-21T10:00:00+08:00"])
+        self.assertEqual(replay(cal), first)
+        # 第三次多了 11/20:追加新版本;舊時間點仍只看到到 11/19 的版本
+        cal = self.refresh(path, "2026-11-23T10:00", fri)
+        self.assertEqual([sorted(r[1])[-1] for r in cal.realized["2026-11"]], ["2026-11-19", "2026-11-20"])
+        self.assertEqual(cal.status("2026-11-20", at("2026-11-21T10:05"))["basis"], "scheduled")
+        self.assertEqual(cal.status("2026-11-20", at("2026-11-23T10:05"))["basis"], "realized")
+        self.assertEqual(replay(cal), first)
+        # 新版本取得後的時間點才看到 11/20 已實際成交
+        self.assertIn("交易日曆判定該日開市(TWSE、TPEx 當日皆有成交)", self.outcome(missing, "2026-11-23T10:05", cal))
+        self.assertIn("缺 2026-11-20 的正式快照", first[0])
+        self.assertIn("market 也沒有該日,疑似資料漏抓", first[0])
+        self.assertIn("market 有該日資料", first[2])
 
     def test_1023_closure_from_repo_calendar_selects_thursday(self):
         # config/market_calendar.json:10/23 TWSE 臨時休市、10/26 開休市表假日;離線讀取,不連網。

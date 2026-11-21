@@ -10,8 +10,8 @@ DATA = {
                            "closed": [{"date": "2026-12-25", "name": "行憲紀念日"}]}},
     "closures": [{"date": "2026-10-23", "reason": "臨時休市公告", "source": "news-url",
                   "announced_at": "2026-10-22T20:10:00+08:00"}],
-    "realized": {"2026-10": {"fetched_at": "2026-11-01T10:00:00+08:00", "sources": ["twse", "tpex"],
-                             "trading_days": ["2026-10-21", "2026-10-22", "2026-10-27"]}},
+    "realized": {"2026-10": [{"fetched_at": "2026-11-01T10:00:00+08:00", "sources": ["twse", "tpex"],
+                              "trading_days": ["2026-10-21", "2026-10-22", "2026-10-27"]}]},
 }
 
 
@@ -46,6 +46,36 @@ class Status(unittest.TestCase):
         self.assertEqual(self.cal.status("2026-10-23", after)["state"], "closed")
         self.assertEqual(self.cal.status("2026-10-22", before)["basis"], "scheduled")   # 11/01 才取得成交資料
         self.assertEqual(self.cal.status("2026-10-26", after)["state"], "trading")      # 成交缺口當時不可見
+
+    def test_gap_needs_visible_common_trading_days_on_both_sides(self):
+        nov = {"2026-11": [{"fetched_at": "2026-12-01T10:00:00+08:00", "sources": ["s"],
+                            "trading_days": ["2026-11-03", "2026-11-04"]}]}
+        only_after = mc.MarketCalendar(dict(DATA, realized=nov, closures=[]))
+        st = only_after.status("2026-11-02")
+        self.assertEqual((st["state"], st["basis"]), ("trading", "scheduled"))
+        self.assertIn("只在此日之後(最早 2026-11-03),不能推定休市", st["reason"])
+        no_schedule = mc.MarketCalendar(dict(DATA, realized=nov, closures=[], announced={}))
+        self.assertEqual(no_schedule.status("2026-11-02")["state"], "unknown")
+        # 10 月資料讓 11/02 前面也有共同成交日 → 夾在中間才推定休市
+        both = mc.MarketCalendar(dict(DATA, realized={**DATA["realized"], **nov}, closures=[]))
+        self.assertEqual(self.state_of(both, "2026-11-02"), ("closed", "realized"))
+
+    def test_empty_month_list_does_not_imply_closures(self):
+        realized = {**DATA["realized"],
+                    "2026-11": [{"fetched_at": "2026-12-01T10:00:00+08:00", "sources": ["s"], "trading_days": []}],
+                    "2026-12": [{"fetched_at": "2026-12-02T10:00:00+08:00", "sources": ["s"],
+                                 "trading_days": ["2026-12-01"]}]}
+        cal = mc.MarketCalendar(dict(DATA, realized=realized))
+        st = cal.status("2026-11-13")
+        self.assertEqual((st["state"], st["basis"]), ("trading", "scheduled"))
+        self.assertIn("該月可見的成交清單是空的,不能推定休市", st["reason"])
+        self.assertEqual(mc.MarketCalendar(dict(DATA, realized=realized, announced={})).status("2026-11-13")["state"],
+                         "unknown")
+
+    @staticmethod
+    def state_of(cal, day):
+        st = cal.status(day)
+        return st["state"], st["basis"]
 
     def test_closure_without_announcement_time_is_rejected(self):
         bad = dict(DATA, closures=[{"date": "2026-10-23", "reason": "x", "source": "y"}])
