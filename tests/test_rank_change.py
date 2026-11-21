@@ -73,6 +73,20 @@ class Fixture:
     def con(self):
         return db_ro.connect(self.path)
 
+    def no_trade(self, day, stock):
+        """官方零成交:price 列 OHLC 空白且量/額/筆數 0,trading_status 標 no_trade。"""
+        con = sqlite3.connect(self.path)
+        con.executescript("""
+            CREATE TABLE IF NOT EXISTS price(date TEXT, stock_id TEXT, open REAL, high REAL, low REAL,
+                close REAL, volume INT, amount INT, trades INT);
+            CREATE TABLE IF NOT EXISTS trading_status(date TEXT, stock_id TEXT, status TEXT, source TEXT,
+                reason TEXT);""")
+        con.execute("INSERT INTO price VALUES(?,?,NULL,NULL,NULL,NULL,0,0,0)", (day, stock))
+        con.execute("INSERT INTO trading_status VALUES(?,?,?,?,?)",
+                    (day, stock, rc.trading_status.NO_TRADE, rc.trading_status.OFFICIAL_PRICE_SOURCE, "fixture"))
+        con.commit()
+        con.close()
+
     def close(self):
         self.tmp.cleanup()
 
@@ -110,28 +124,31 @@ class WeekSelection(unittest.TestCase):
         with self.assertRaises(rc.SelectionError):
             rc.build_report(con, at("2026-11-21T10:00"))
 
-    def test_confirmed_friday_holiday_uses_previous_trading_day(self):
-        _, con = self.make(weekdays("2026-11-02", "2026-11-20", skip={"2026-11-13"}))
-        got, notes = self.dates(con, at("2026-11-21T10:00"))
-        self.assertEqual(got, ["2026-11-12", "2026-11-20"])
-        self.assertTrue(any("週五 2026-11-13 休市" in n and "2026-11-12" in n for n in notes))
+    def test_friday_fetch_failure_then_monday_recovery_is_not_called_a_holiday(self):
+        # 週五 11/13 抓取失敗、週一 11/16 恢復:market 同樣是「週五沒資料、週一有資料」。
+        _, con = self.make(weekdays("2026-11-02", "2026-11-16", skip={"2026-11-13"}))
+        for as_of in ("2026-11-16T23:55", "2026-11-17T10:00"):
+            with self.assertRaisesRegex(rc.SelectionError, "週五 2026-11-13.*其後有交易日 2026-11-16.*"
+                                        "無法確認是休市還是抓取失敗,不退回該週前一交易日"):
+                rc.select_weeks(con, at(as_of))
+            with self.assertRaises(rc.SelectionError):
+                rc.build_report(con, at(as_of))
 
     def test_unconfirmed_friday_absence_is_explicit_after_deadline(self):
         _, con = self.make(weekdays("2026-11-02", "2026-11-19"))
-        with self.assertRaisesRegex(rc.SelectionError, "無法確認是休市還是資料缺漏"):
+        with self.assertRaisesRegex(rc.SelectionError, "無法確認是休市還是抓取失敗"):
             rc.select_weeks(con, at("2026-11-21T10:00"))
         self.assertEqual(self.dates(con, at("2026-11-20T22:00"))[0], ["2026-11-06", "2026-11-13"])
 
     def test_replay_ignores_market_dates_after_as_of(self):
-        # 10/23 週五休市;10/26、10/27 之後才出現。10/24 重播時不能用未來交易日確認休市。
-        market = weekdays("2026-10-05", "2026-10-30", skip={"2026-10-09", "2026-10-23", "2026-10-26"})
+        # 10/23 週五不在 market;10/26、10/27 之後才出現。10/24 重播時看不到未來交易日。
+        market = weekdays("2026-10-05", "2026-10-30", skip={"2026-10-23", "2026-10-26"})
         _, con = self.make(market)
-        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-10-23.*無法確認是休市還是資料缺漏"):
+        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-10-23.*也沒有之後的交易日"):
             rc.select_weeks(con, at("2026-10-24T10:00"))
-        self.assertEqual(self.dates(con, at("2026-10-23T20:00"))[0], ["2026-10-08", "2026-10-16"])
-        got, notes = self.dates(con, at("2026-10-28T10:00"))
-        self.assertEqual(got, ["2026-10-16", "2026-10-22"])
-        self.assertTrue(any("其後有交易日 2026-10-27" in n for n in notes))
+        self.assertEqual(self.dates(con, at("2026-10-23T20:00"))[0], ["2026-10-09", "2026-10-16"])
+        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-10-23.*其後有交易日 2026-10-27"):
+            rc.select_weeks(con, at("2026-10-28T10:00"))
 
     def test_same_day_market_row_needs_snapshot_or_provenance_before_as_of(self):
         fx, con = self.make(weekdays("2026-11-02", "2026-11-12"))
@@ -146,10 +163,10 @@ class WeekSelection(unittest.TestCase):
         self.addCleanup(con.close)
         self.assertNotIn("2026-11-16", rc.trading_calendar(con, at("2026-11-16T17:00"), {}))
         self.assertIn("2026-11-16", rc.trading_calendar(con, at("2026-11-16T18:10"), {}))
-        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-11-13.*無法確認"):
+        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-11-13.*也沒有之後的交易日"):
             rc.select_weeks(con, at("2026-11-16T17:00"))
-        got, notes = self.dates(con, at("2026-11-16T18:10"))
-        self.assertEqual(got, ["2026-11-06", "2026-11-12"])
+        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-11-13.*其後有交易日 2026-11-16"):
+            rc.select_weeks(con, at("2026-11-16T18:10"))
 
     def test_first_official_run_wins_and_late_or_unofficial_runs_ignored(self):
         fx = Fixture(weekdays("2026-11-02", "2026-11-20"))
@@ -194,18 +211,37 @@ class SmoothingWindow(unittest.TestCase):
         fx = self.fx
         fx.run("d16", "2026-11-16", {"T": ("g", 4.0, 4.0)})
         fx.run("d17", "2026-11-17", {"T": ("g", 3.0, 3.5)})
-        fx.run("d18", "2026-11-18", {"Q": ("g", 0.0, 0.0)})          # T 零交易:不評分、不佔窗口
+        fx.run("d18", "2026-11-18", {"Q": ("g", 0.0, 0.0)})          # T 已確認零成交:不評分、不佔窗口
+        fx.no_trade("2026-11-18", "T")
         fx.run("d19a", "2026-11-19", {"T": ("g", 2.0, 3.0)}, "2026-11-19T15:52:00+00:00")
         fx.run("d19b", "2026-11-19", {"T": ("g", 9.0, 9.0)}, "2026-11-19T16:30:00+00:00")
         fx.run("d20", "2026-11-20", {"T": ("g", 1.0, 2.0)})
         win = self.window()
-        self.assertEqual([s["date"] for s in win], ["2026-11-20", "2026-11-19", "2026-11-17"])
-        self.assertEqual([s["snapshot_id"] for s in win], ["d20", "d19a", "d17"])
-        self.assertEqual(len({s["date"] for s in win}), 3)
+        used = [s for s in win if s["status"] == "ok"]
+        self.assertEqual([s["date"] for s in used], ["2026-11-20", "2026-11-19", "2026-11-17"])
+        self.assertEqual([s["snapshot_id"] for s in used], ["d20", "d19a", "d17"])
+        self.assertEqual(len({s["date"] for s in used}), 3)
         ex = rc.explain(snap({"T": 0.0}), snap({"T": 2.0}), "T")
         out = rc.render(ex, "A", "B", None, [win, win])
-        self.assertIn("2026-11-17 +3.00, 2026-11-19 +2.00, 2026-11-20 +1.00 → 3 個不同交易日平均 +2.00"
-                      "(與快照 composite_s +2.00 一致,建置指紋相同)", out)
+        self.assertIn("2026-11-17 +3.00, 2026-11-18 已確認零成交/停牌(不佔窗口), 2026-11-19 +2.00, "
+                      "2026-11-20 +1.00 → 3 個不同交易日平均 +2.00(與快照 composite_s +2.00 一致,建置指紋相同)", out)
+
+    def test_unexplained_missing_row_marks_window_incomplete_even_if_average_matches(self):
+        # 11/18 有正式快照但缺 T 列,且無零成交/停牌證據。11/17 與 11/19、11/20 同分,
+        # 若誤把 11/17 補進窗口,平均剛好等於快照 composite_s;仍不得標成已驗證。
+        fx = self.fx
+        fx.run("d17", "2026-11-17", {"T": ("g", 2.0, 2.0)})
+        fx.run("d18", "2026-11-18", {"Q": ("g", 0.0, 0.0)})
+        fx.run("d19", "2026-11-19", {"T": ("g", 2.0, 2.0)})
+        fx.run("d20", "2026-11-20", {"T": ("g", 2.0, 2.0)})
+        win = self.window()
+        self.assertEqual([(s["date"], s["status"]) for s in win],
+                         [("2026-11-20", "ok"), ("2026-11-19", "ok"), ("2026-11-18", "missing_row")])
+        out = rc.render(rc.explain(snap({"T": 0.0}), snap({"T": 2.0}), "T"), "A", "B", None, [win, win])
+        self.assertIn("2026-11-18 快照缺該股列(原因不明), 2026-11-19 +2.00, 2026-11-20 +2.00 → 不完整", out)
+        self.assertNotIn("2026-11-17", out)
+        self.assertNotIn("一致", out)
+        self.assertNotIn("個不同交易日平均", out)
 
     def test_universe_rebuild_is_labelled_as_prior_published_observations(self):
         fx = self.fx

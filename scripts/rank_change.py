@@ -9,12 +9,14 @@
   * 週五在 market 中 → 週五是交易日;首次正式快照在 as-of 前已擷取就採用本週。
     尚未到發布期限(資料日次日台北 09:00,同 snapshot_signals.publication_timing)
     視為本週未完成,改用前兩週;已過期限仍無快照 → 明示錯誤,不默默退回。
-  * 週五不在 market、且 market 之後已有交易日 → 確認休市,改用該週前一個交易日。
-  * 週五不在 market、之後也沒有交易日 → 期限前視為未完成;期限後無法區分休市或
-    抓取失敗 → 明示錯誤(repo 沒有獨立的交易所休市日曆)。
+  * 週五不在 market → 期限前視為未完成;期限後明示「無法確認是休市還是抓取失敗」。
+    repo 沒有獨立的交易所休市依據;「週五缺、週一有」也可能是週五抓取失敗、週一恢復,
+    因此不以之後出現的交易日推定休市,也不退回該週前一交易日。
   * 交易日曆取 as-of 當下可見者(point-in-time):早於 as-of 台北日期的 market 日期;
     as-of 當日的日期須有已發布的首次正式快照,或 market_provenance.checked_at ≤ as-of。
-    重播歷史 as-of 時,之後才出現的交易日不得用來確認休市。
+    重播歷史 as-of 時,之後才出現的交易日不會被看見。
+  * 平滑窗口:交易日有正式快照但缺該股列時,只有 trading_status/suspension_evidence
+    可嚴格驗證的零成交/停牌才略過;原因不明的缺列標為窗口不完整。
   * 同日多份正式快照沿用 evidence_status.first_official_runs(首次正式發布);
     首次快照為空或不完整時明示錯誤,不以後來修正版取代。
 
@@ -34,6 +36,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import db_ro
 import evidence_status
+import trading_status
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "data", "findmind.db")
@@ -107,25 +110,21 @@ def require_complete(con, run):
 
 
 def week_end(con, monday, as_of, cal, firsts):
-    """回傳 {'status': complete|pending|closed_week, 'date', 'run', 'note'};應有卻缺則 raise。"""
+    """回傳 {'status': complete|pending, 'date', 'run', 'note'};應有卻缺或無法確認則 raise。"""
     sunday, friday = monday + dt.timedelta(days=6), str(monday + dt.timedelta(days=4))
     days = [d for d in cal if str(monday) <= d <= str(sunday)]
     note = None
-    if friday in days:
-        last = max(days)
-    else:
+    if friday not in days:
+        if as_of < publish_deadline(friday):
+            return {"status": "pending",
+                    "note": f"週五 {friday} 交易日曆與正式快照尚未發布(期限 {publish_deadline(friday).isoformat()})"}
         later = [d for d in cal if d > friday]
-        if not later:
-            if as_of < publish_deadline(friday):
-                return {"status": "pending",
-                        "note": f"週五 {friday} 交易日曆與正式快照尚未發布(期限 {publish_deadline(friday).isoformat()})"}
-            raise SelectionError(
-                f"週五 {friday} 已過發布期限 {publish_deadline(friday).isoformat()},但 market 沒有該日"
-                f"也沒有之後的交易日;無法確認是休市還是資料缺漏")
-        if not days:
-            return {"status": "closed_week", "note": f"{monday} 當週無交易日"}
-        last = max(days)
-        note = f"週五 {friday} 休市(market 無該日,其後有交易日 {later[0]}),改用該週前一交易日 {last}"
+        seen = f"market 其後有交易日 {later[0]},但這不能區分休市與週五抓取失敗後恢復" if later \
+            else "market 也沒有之後的交易日"
+        raise SelectionError(
+            f"週五 {friday} 已過發布期限 {publish_deadline(friday).isoformat()},但 market 沒有該日;"
+            f"{seen}。repo 沒有獨立的休市依據,無法確認是休市還是抓取失敗,不退回該週前一交易日")
+    last = max(days)
     run = firsts.get(last)
     if run is None:
         if as_of < publish_deadline(last):
@@ -169,22 +168,30 @@ def run_build(run):
 
 def smoothing_window(con, firsts, cal, stock, day, n=SMOOTH_N):
     """composite_s 的平滑窗口:該股最近 n 個「不同」交易日的首次正式快照 composite。
-    該股不在某日快照(例:官方零交易不評分)時不佔窗口;交易日缺正式快照則記為缺口。
+    每格 status:ok;no_trade(可嚴格驗證的零成交/停牌,不評分、不佔窗口);
+    no_snapshot(交易日缺正式快照)與 missing_row(快照缺該股列且原因不明)→ 窗口不完整。
     每格附 build 指紋;各快照凍結的是自己那次建置的 composite,不同建置不可混算。"""
-    slots = []
+    slots, used = [], 0
     for d in reversed([x for x in cal if x <= day]):
-        if len(slots) == n:
+        if used == n:
             break
         run = firsts.get(d)
+        slot = {"date": d, "snapshot_id": run["snapshot_id"] if run else None,
+                "composite": None, "composite_s": None}
         if run is None:
-            slots.append({"date": d, "snapshot_id": None, "composite": None, "composite_s": None})
-            continue
-        row = con.execute("SELECT composite, composite_s FROM oos_signal_snapshots "
-                          "WHERE snapshot_id=? AND stock_id=?", (run["snapshot_id"], stock)).fetchone()
-        if row is None:
-            continue
-        slots.append({"date": d, "snapshot_id": run["snapshot_id"], "build": run_build(run),
-                      "composite": row["composite"], "composite_s": row["composite_s"]})
+            slot["status"] = "no_snapshot"
+        else:
+            row = con.execute("SELECT composite, composite_s FROM oos_signal_snapshots "
+                              "WHERE snapshot_id=? AND stock_id=?", (run["snapshot_id"], stock)).fetchone()
+            if row is not None:
+                slot.update(status="ok", build=run_build(run),
+                            composite=row["composite"], composite_s=row["composite_s"])
+            elif stock in trading_status.verified_exclusion_ids(con, d, [stock]):
+                slot["status"] = "no_trade"
+            else:
+                slot["status"] = "missing_row"
+        slots.append(slot)
+        used += slot["status"] != "no_trade"
     if len({s["date"] for s in slots}) != len(slots):
         raise AssertionError("平滑窗口出現重複交易日")
     return slots
@@ -284,6 +291,10 @@ def _reason_counts(rows, key):
     return f"快照無此股 {c['absent']}、轉族群 {c['moved']}、composite_s 缺值 {c['null']}"
 
 
+SLOT_LABEL = {"no_snapshot": "缺正式快照", "missing_row": "快照缺該股列(原因不明)",
+              "no_trade": "已確認零成交/停牌(不佔窗口)"}
+
+
 def window_mismatch(win, mean):
     """窗口不能當作端點 composite_s 平滑輸入的原因;空串列=可驗證。"""
     why = []
@@ -340,11 +351,11 @@ def render(ex, dA, dB, cite=None, window=None):
             L.append(f"    元素加總 {tot:+.2f}(與當日分數變動{'一致' if abs(tot - d1) < 0.005 else '不一致!'})")
     L.append(f"(2) 三日平滑排名分數 composite_s:{ex['csA']:+.2f} → {ex['csB']:+.2f},"
              f"變動 {round(ex['csB'] - ex['csA'], 2):+.2f}{c('rows')}  ← 名次只依這個分數")
-    for tag, d, win in zip("AB", (dA, dB), window or ()):
-        gaps = [s["date"] for s in win if s["snapshot_id"] is None]
-        parts = ", ".join(f"{s['date']} " + ("缺正式快照" if s["snapshot_id"] is None else f"{s['composite']:+.2f}")
-                          for s in reversed(win))
-        if gaps or not win:
+    for tag, d, all_slots in zip("AB", (dA, dB), window or ()):
+        win = [s for s in all_slots if s["status"] == "ok"]
+        parts = ", ".join(f"{s['date']} " + (f"{s['composite']:+.2f}" if s["status"] == "ok" else SLOT_LABEL[s["status"]])
+                          for s in reversed(all_slots))
+        if len(win) != len([s for s in all_slots if s["status"] != "no_trade"]) or not win:
             L.append(f"    {d} 窗口{c('win' + tag)}: {parts} → 不完整,無法以快照驗算")
             continue
         mean = round(sum(s["composite"] for s in win) / len(win), 2)
