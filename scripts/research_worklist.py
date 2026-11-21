@@ -85,6 +85,7 @@ def main():
     parser.add_argument("--output")
     args = parser.parse_args()
     try:
+        rq._validate_output(args.output, args.db)
         as_of = dt.date.fromisoformat(args.as_of) if args.as_of else rq.taipei_today()
         snapshot = rq.build_attention(as_of, db_path=args.db)
         worklist = build_worklist(snapshot, args.limit, load_topic_schedule(as_of))
