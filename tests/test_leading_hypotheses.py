@@ -161,6 +161,17 @@ review_due: 2026-08-31
         self.assertEqual(lh.due_hypotheses(reports, "2026-08-31")[0][1:3],
                          ("1234", "H1"))
 
+    def test_report_rejects_noncanonical_review_dates(self):
+        for review_due in ("20260831", "2026-W36-1"):
+            with self.subTest(review_due=review_due):
+                text = report_text().replace("2026-08-31", review_due)
+                info = lh.analyse_report("1234_測試.md", text, notes=self.notes,
+                                         today="2026-07-12")
+                self.assertTrue(info["quality_invalid"], info["quality_errors"])
+                self.assertIn("H1 review_due 必須是 YYYY-MM-DD 或 none", info["quality_errors"])
+                self.assertIn("H1 open transition review_due 必須是 YYYY-MM-DD",
+                              info["quality_errors"])
+
     def test_due_queue_reconstructs_history_after_terminal_transition(self):
         reports = {"1234": {"hypotheses": [{
             "id": "H1", "title": "歷史期限", "meta": {"lifecycle": "confirmed"},
