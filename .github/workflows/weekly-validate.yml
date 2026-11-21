@@ -37,9 +37,12 @@ jobs:
         run: python scripts/validation_progress.py
 
       - name: 更新短週期實驗比較與固定檢視
+        id: experiment_lab
+        continue-on-error: true
         run: python scripts/experiment_lab.py
 
       - name: 獨立核對短週期實驗數值
+        if: steps.experiment_lab.outcome == 'success'
         run: python scripts/audit_experiment_lab.py
 
       - name: 同步首頁的證據狀態與最新週報連結
@@ -51,10 +54,20 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/ index.html research.html
+          if [ "${{ steps.experiment_lab.outcome }}" = "success" ]; then
+            git add reports/ index.html research.html
+          else
+            git add reports/validate_*.md reports/validation_progress.json index.html research.html
+          fi
           if git diff --staged --quiet; then
             echo "無新報告,略過 commit"
           else
             git commit -m "報告：週度驗證 $(date -u +%Y-%m-%d) [skip ci]"
             git push
           fi
+
+      - name: 實驗失敗標紅
+        if: steps.experiment_lab.outcome == 'failure'
+        run: |
+          echo "::error::實驗室更新失敗；正式週報已完成發布流程，請檢查實驗凍結檢視。"
+          exit 1

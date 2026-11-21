@@ -236,6 +236,26 @@ class ExperimentLabTests(unittest.TestCase):
         con.execute.return_value=rows
         self.assertEqual(lab.evidence_status.first_official_runs(con,eligible_only=True),{})
 
+    def test_freeze_reviews_drift_writes_no_new_files(self):
+        cal = list(range(30))
+        candidate = {"daily": {"delta_ic": {i: .03 for i in range(20)}},
+                     "cells": {i: {"g": {"delta_ic": .03}} for i in range(20)}}
+        report = {"protocol": "fixture", "fingerprint": {"spec": "v1"}, "config": self.cfg,
+                  "forward_looks": {"MOM20": lab.fixed_looks(candidate, cal, self.cfg)},
+                  "snapshot_receipts": {},
+                  "datasets": {"forward": {"horizons": {"3": {"MOM20": candidate}}}}}
+        with tempfile.TemporaryDirectory() as folder:
+            lab.freeze_reviews(folder, report, cal)
+            reviews = Path(folder) / 'fixture'
+            (reviews / 'MOM20-005.json').unlink()
+            drifted = reviews / 'MOM20-010.json'
+            drifted.write_bytes(b'{}\n')
+            before = {p.name: p.read_bytes() for p in reviews.iterdir()}
+            with self.assertRaisesRegex(ValueError, 'drift'):
+                lab.freeze_reviews(folder, report, cal)
+            self.assertEqual({p.name: p.read_bytes() for p in reviews.iterdir()}, before)
+            self.assertEqual(drifted.read_bytes(), b'{}\n')
+
     def test_freeze_reviews_rejects_tampering_and_disappearing_look(self):
         cal=list(range(30))
         candidate={"daily":{"delta_ic":{i:.03 for i in range(20)}},
