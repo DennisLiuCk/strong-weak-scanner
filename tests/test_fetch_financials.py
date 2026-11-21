@@ -4,7 +4,9 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +24,87 @@ class _Response(io.BytesIO):
 
 
 class OfficialMonthRevenueTest(unittest.TestCase):
+    def test_market_failures_are_isolated_and_identified(self):
+        for failed_url, market in ((ff.TWSE_MONTH_REVENUE_URL, "TWSE"),
+                                   (ff.TPEX_MONTH_REVENUE_URL, "TPEx")):
+            for payload in (b"not json", json.dumps([
+                    {"公司代號": "2330"}]).encode()):
+                with self.subTest(market=market, payload=payload):
+                    calls = []
+
+                    def opener(request, timeout):
+                        calls.append(request.full_url)
+                        if request.full_url == failed_url:
+                            return _Response(payload)
+                        return _Response(json.dumps([{
+                            "資料年月": "11506", "公司代號": "2330",
+                            "營業收入-當月營收": "123",
+                        }]).encode())
+
+                    if payload == b"not json":
+                        with self.assertRaises(ff.OfficialMonthRevenueError) as caught:
+                            ff.official_month_revenue_rows(["2330"], 2026, 6, opener)
+                        self.assertEqual(set(caught.exception.failures), {market})
+                        self.assertEqual(caught.exception.rows["2330"]["revenue"], 123_000)
+                    else:
+                        rows = ff.official_month_revenue_rows(["2330"], 2026, 6, opener)
+                        self.assertEqual(rows["2330"]["revenue"], 123_000)
+                    self.assertEqual(len(calls), 2)
+
+    def test_strict_cli_commits_partial_rows_before_reporting_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "financials.db")
+            failure = ff.OfficialMonthRevenueError({"2330": {
+                "date": "2026-07-01", "stock_id": "2330", "revenue": 123_000,
+                "revenue_year": 2026, "revenue_month": 6,
+            }}, {"TPEx": urllib.error.URLError("unavailable")})
+
+            def fill(con, ids, year, month):
+                def fetcher(*args):
+                    raise failure
+                return original_fill(con, ids, year, month, fetcher=fetcher)
+
+            original_fill = ff.fill_official_month_revenue
+            stderr = io.StringIO()
+            with patch.object(sys, "argv", ["fetch_financials.py", "--db", db,
+                    "--end", "2026-07-17", "--stocks", "2330",
+                    "--official-month-revenue-only", "--require-latest-month-complete"]), \
+                    patch.object(ff, "fill_official_month_revenue", side_effect=fill), \
+                    patch.object(sys, "stderr", stderr):
+                with self.assertRaises(SystemExit) as caught:
+                    ff.main()
+            self.assertEqual(caught.exception.code, 1)
+            self.assertIn("TPEx: URLError", stderr.getvalue())
+            with sqlite3.connect(db) as con:
+                self.assertEqual(con.execute(
+                    "SELECT stock_id,revenue FROM month_revenue").fetchall(),
+                    [("2330", 123_000)])
+
+    def test_fallback_saves_twse_rows_when_tpex_fails(self):
+        con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
+        ff.ensure_schema(con)
+
+        def opener(request, timeout):
+            if request.full_url == ff.TPEX_MONTH_REVENUE_URL:
+                raise urllib.error.URLError("TPEx unavailable")
+            return _Response(json.dumps([{
+                "資料年月": "11506", "公司代號": "2330",
+                "營業收入-當月營收": "123,456",
+            }]).encode())
+
+        def fetcher(stock_ids, year, month):
+            return ff.official_month_revenue_rows(stock_ids, year, month, opener=opener)
+
+        with self.assertRaisesRegex(Exception, "TPEx unavailable"):
+            ff.fill_official_month_revenue(con, ["2330", "3680"], 2026, 6,
+                                          fetcher=fetcher)
+        self.assertEqual(con.execute(
+            "SELECT stock_id,revenue FROM month_revenue").fetchall(),
+            [("2330", 123_456_000)])
+        self.assertEqual(ff.missing_month_revenue(con, ["2330", "3680"], 2026, 6),
+                         ["3680"])
+
     def test_official_rows_filter_period_convert_roc_and_thousand_dollars(self):
         listed = [{
             "資料年月": "11506",

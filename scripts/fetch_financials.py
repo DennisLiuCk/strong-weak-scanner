@@ -253,30 +253,48 @@ def _integer(value):
     return int(float(raw))
 
 
+class OfficialMonthRevenueError(RuntimeError):
+    def __init__(self, rows, failures):
+        self.rows = rows
+        self.failures = failures
+        super().__init__("; ".join(
+            f"{market}: {type(exc).__name__}: {exc}"
+            for market, exc in failures.items()))
+
+
 def official_month_revenue_rows(stock_ids, year, month, opener=urllib.request.urlopen):
     """從 TWSE/TPEx 當期 OpenAPI 取得月營收；官方單位千元，DB 單位元。"""
     wanted = set(stock_ids)
     roc_period = f"{year - 1911:03d}{month:02d}"
     rows = {}
-    for url in (TWSE_MONTH_REVENUE_URL, TPEX_MONTH_REVENUE_URL):
-        req = urllib.request.Request(
-            url, headers={"User-Agent": "strong-weak-scanner/financial-coverage"})
-        with opener(req, timeout=30) as response:
-            payload = json.loads(response.read().decode("utf-8-sig"))
-        for item in payload:
-            sid = str(item.get("公司代號") or "").strip()
-            if sid not in wanted or str(item.get("資料年月") or "").strip() != roc_period:
-                continue
-            revenue_thousand = _integer(item.get("營業收入-當月營收"))
-            if revenue_thousand is None:
-                continue
-            rows[sid] = {
-                "date": _month_storage_date(year, month),
-                "stock_id": sid,
-                "revenue": revenue_thousand * 1000,
-                "revenue_month": month,
-                "revenue_year": year,
-            }
+    failures = {}
+    for market, url in (("TWSE", TWSE_MONTH_REVENUE_URL), ("TPEx", TPEX_MONTH_REVENUE_URL)):
+        market_rows = {}
+        try:
+            req = urllib.request.Request(
+                url, headers={"User-Agent": "strong-weak-scanner/financial-coverage"})
+            with opener(req, timeout=30) as response:
+                payload = json.loads(response.read().decode("utf-8-sig"))
+            for item in payload:
+                sid = str(item.get("公司代號") or "").strip()
+                if sid not in wanted or str(item.get("資料年月") or "").strip() != roc_period:
+                    continue
+                revenue_thousand = _integer(item.get("營業收入-當月營收"))
+                if revenue_thousand is None:
+                    continue
+                market_rows[sid] = {
+                    "date": _month_storage_date(year, month),
+                    "stock_id": sid,
+                    "revenue": revenue_thousand * 1000,
+                    "revenue_month": month,
+                    "revenue_year": year,
+                }
+        except Exception as exc:
+            failures[market] = exc
+        else:
+            rows.update(market_rows)
+    if failures:
+        raise OfficialMonthRevenueError(rows, failures)
     return rows
 
 
@@ -301,10 +319,17 @@ def fill_official_month_revenue(con, stock_ids, year, month,
     before = missing_month_revenue(con, stock_ids, year, month)
     if not before:
         return before, [], []
-    official = fetcher(before, year, month)
+    failure = None
+    try:
+        official = fetcher(before, year, month)
+    except OfficialMonthRevenueError as exc:
+        official = exc.rows
+        failure = exc
     rows = [official[sid] for sid in before if sid in official]
     if rows:
         up_month_revenue(con, rows, source="TWSE_TPEx_official_openapi")
+    if failure is not None:
+        raise failure
     after = missing_month_revenue(con, stock_ids, year, month)
     return before, [row["stock_id"] for row in rows], after
 
@@ -406,6 +431,7 @@ def main():
                 if filled:
                     print("官方補入：" + ",".join(filled))
             except Exception as exc:
+                con.commit()
                 remaining = missing_month_revenue(
                     con, ids, target.year, target.month)
                 print(
