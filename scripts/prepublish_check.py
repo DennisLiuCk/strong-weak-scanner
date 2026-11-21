@@ -41,6 +41,12 @@ def protected_hashes():
 def verify_build(folder):
     """以 archive 副本重建；不修改首頁、研究頁或正式歷史快照。"""
     import build_dashboard as dashboard
+    try:
+        page = (ROOT / "research.html").read_text(encoding="utf-8")
+        payload, _ = json.JSONDecoder().raw_decode(page.split("const LIB=", 1)[1])
+        research_as_of = dt.date.fromisoformat(payload["asOf"])
+    except (IndexError, KeyError, TypeError, ValueError) as exc:
+        raise ValueError("research.html 缺少有效的研究 asOf 日期") from exc
     folder.mkdir()
     shutil.copytree(ROOT / "archive", folder / "archive")
     saved = {key: getattr(dashboard, key) for key in ("OUT", "RESEARCH_OUT", "ARCHIVE")}
@@ -51,7 +57,7 @@ def verify_build(folder):
         dashboard.ARCHIVE = str(folder / "archive")
         with (folder / "build.log").open("w", encoding="utf-8", newline="\n") as log:
             with contextlib.redirect_stdout(log):
-                dashboard.main()
+                dashboard.main(research_as_of=research_as_of)
     finally:
         for key, value in saved.items():
             setattr(dashboard, key, value)
