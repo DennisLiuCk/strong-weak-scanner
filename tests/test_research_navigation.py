@@ -11,6 +11,48 @@ NODE = shutil.which('node')
 
 @unittest.skipUnless(NODE, 'node 不在 PATH')
 class ResearchNavigationTest(unittest.TestCase):
+    def test_catalog_reuses_rows_and_refreshes_selection(self):
+        source = (ROOT / 'scripts/research_template.html').read_text(encoding='utf-8')
+        item = source.split('function resultItem(article)', 1)[1].split('function showEntryGuide', 1)[0]
+        result = self.run_helper('selectResultItem', 'function resultItem(article)' + item + """
+const resultItems=new WeakMap(),state={selected:'a'};
+let clicks=0;
+function selectArticle(id){clicks++;}
+function readerLeadParts(article,lead){return {text:lead}}
+function catalogLearningLead(article){return article.preview}
+function catalogReaderQuestion(){return 'question'}
+function fmtDate(date){return date}
+function h(tag,attrs,...children){return {attrs,children,
+  classList:{toggle(name,on){this.selected=on}},
+  setAttribute(key,value){this.attrs[key]=value},
+  removeAttribute(key){delete this.attrs[key]},
+  addEventListener(event,callback){this.click=callback}}}
+const a={id:'a',title:'A',preview:'',date:'2026-01-01'},b={id:'b',title:'B'};
+const first=resultItem(a);state.selected='b';const second=resultItem(a);
+const removed=!('aria-current' in second.attrs);
+resultItem(b);state.selected='a';const third=resultItem(a);third.click();
+console.log(JSON.stringify({same:first===second&&second===third,removed,
+  current:third.attrs['aria-current'],clicks,preview:first.children[1].attrs.text}));
+""")
+        self.assertEqual(result, {'same': True, 'removed': True, 'current': 'true',
+                                  'clicks': 1, 'preview': 'question'})
+
+    def test_catalog_only_moves_changed_children(self):
+        result = self.run_helper('updateCatalogChildren', """
+let moves=0;
+const root={children:[],get firstChild(){return this.children[0]||null},
+  insertBefore(child,next){moves++;const old=this.children.indexOf(child);if(old>=0)this.children.splice(old,1);
+    const index=next?this.children.indexOf(next):this.children.length;this.children.splice(index,0,child)}};
+function node(id){return {id,remove(){root.children.splice(root.children.indexOf(this),1)},
+  get nextSibling(){return root.children[root.children.indexOf(this)+1]||null}}}
+const a=node('a'),b=node('b'),c=node('c');root.children=[a,b,c];
+updateCatalogChildren(root,[a,c]);const unchanged=moves===0;
+updateCatalogChildren(root,[c,a,b]);const order=root.children.map(x=>x.id);
+updateCatalogChildren(root,[]);
+console.log(JSON.stringify({unchanged,order,empty:root.children.length===0}));
+""")
+        self.assertEqual(result, {'unchanged': True, 'order': ['c', 'a', 'b'], 'empty': True})
+
     def run_helper(self, name, script):
         source = (ROOT / 'scripts/research_template.html').read_text(encoding='utf-8')
         start = source.index('function ' + name + '(')
