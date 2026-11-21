@@ -1198,6 +1198,16 @@ class FetchWindowTest(unittest.TestCase):
         self.assert_cli_error("--start 2025-10-17 早於 2026-03-02",
                               "--days", "400")
 
+    def test_implicit_start_before_history_floor_is_allowed_with_separate_db(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "history.db")
+            with self.assertRaises(self.StopBeforeFetch):
+                self.run_cli("--db", db, "--days", "400")
+            self.connect.assert_called_once_with(db)
+        self.token.assert_called_once_with()
+        self.assertEqual(self.fetch_raw.call_args.args[3:5], ("2025-10-17", "2026-11-21"))
+        self.assertTrue(self.fetch_raw.call_args.kwargs["final_pass"])
+
     def test_invalid_dates_are_rejected(self):
         for option in ("--start", "--end"):
             with self.subTest(option=option):
