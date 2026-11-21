@@ -1,12 +1,14 @@
-"""screen.py CLI 契約:查用法不得產生報告。
+"""screen.py CLI 契約:查用法不得產生報告,錯誤路徑不得建立資料庫。
 
 原本 screen.py 沒有 argparse,任何參數都被默默忽略——下 `--help` 會跑完整篩選並寫出
 一份看起來正式的 `reports/screen_<今日>.md`,容易被誤讀成真的做過季度 universe 治理。
-本測試只走 argparse 提早退出的路徑,不觸發 §B 候選體檢,零 FinMind API call。
+本測試不觸發 §B 候選體檢,零 FinMind API call。
 """
 import datetime
+import os
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -16,7 +18,8 @@ SCREEN = ROOT / "scripts" / "screen.py"
 
 def run(*args):
     return subprocess.run([sys.executable, str(SCREEN), *args],
-                          cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+                          cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+                          env={**os.environ, "PYTHONIOENCODING": "utf-8"})
 
 
 class ScreenCliTest(unittest.TestCase):
@@ -39,6 +42,16 @@ class ScreenCliTest(unittest.TestCase):
         if not existed:
             self.assertFalse(self._report_path().exists(),
                              "參數錯誤時不得產生報告")
+
+    def test_missing_db_errors_without_creating_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            db = Path(directory) / "missing.db"
+            r = run("--no-candidates", "--dry-run", "--db", str(db))
+            self.assertFalse(db.exists(), "不存在的資料庫不得被建立")
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("資料庫不存在", r.stderr)
+            self.assertIn(str(db), r.stderr)
+            self.assertEqual(len(r.stderr.splitlines()), 1, r.stderr)
 
 
 if __name__ == "__main__":
