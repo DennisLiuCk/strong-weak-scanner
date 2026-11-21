@@ -21,12 +21,12 @@ class WeeklyLabWorkflowTest(unittest.TestCase):
         self.assertLess(dashboard_at, commit_at)
         self.assertLess(commit_at, gate_at)
         commit = workflow[commit_at:gate_at]
-        self.assertIn('if [ "${{ steps.experiment_lab.outcome }}" = "success" ] && [ "${{ steps.audit_experiment_lab.outcome }}" = "success" ]; then', commit)
-        success, failure = commit.split('else', 1)
-        failure = failure.split('fi', 1)[0]
-        self.assertIn('git add reports/ index.html research.html', success)
-        self.assertIn('git add reports/validate_*.md reports/validation_progress.json index.html research.html', failure)
-        self.assertNotIn('experiment', failure)
+        stage_at = commit.index('git add reports/ index.html research.html')
+        failure_at = commit.index('if [ "${{ steps.experiment_lab.outcome }}" != "success" ] || [ "${{ steps.audit_experiment_lab.outcome }}" != "success" ]; then')
+        self.assertLess(stage_at, failure_at)
+        failure = commit[failure_at:].split('fi', 1)[0]
+        self.assertIn('git reset -q -- reports/experiment_lab.json reports/experiment_lab.html reports/experiment_reviews/ reports/experiment_lab_acceptance.json', failure)
+        self.assertIn('git push', commit)
         gate = workflow[gate_at:]
         self.assertIn("if: steps.experiment_lab.outcome == 'failure' || steps.audit_experiment_lab.outcome == 'failure'", gate)
         self.assertIn('::error::experiment_lab 更新失敗', gate)

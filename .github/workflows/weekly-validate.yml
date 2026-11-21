@@ -56,10 +56,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ "${{ steps.experiment_lab.outcome }}" = "success" ] && [ "${{ steps.audit_experiment_lab.outcome }}" = "success" ]; then
-            git add reports/ index.html research.html
-          else
-            git add reports/validate_*.md reports/validation_progress.json index.html research.html
+          git add reports/ index.html research.html
+          if [ "${{ steps.experiment_lab.outcome }}" != "success" ] || [ "${{ steps.audit_experiment_lab.outcome }}" != "success" ]; then
+            git reset -q -- reports/experiment_lab.json reports/experiment_lab.html reports/experiment_reviews/ reports/experiment_lab_acceptance.json
           fi
           if git diff --staged --quiet; then
             echo "無新報告,略過 commit"
