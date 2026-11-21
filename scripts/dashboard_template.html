@@ -386,6 +386,19 @@ svg{display:block;overflow:visible}
 .grow{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:center}
 .tband{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:center}
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 28px}
+.rkc{margin-top:18px;background:var(--inset);border:1px solid var(--line2);border-radius:14px;padding:16px 18px}
+.rkc-sum{margin:8px 0 0;padding:0;list-style:none;font-size:13.5px;line-height:1.7;color:var(--ink2)}
+.rkc-sum li+li{margin-top:2px}
+.rkc details{margin-top:12px;border-top:1px solid var(--line2);padding-top:6px}
+.rkc details>summary{cursor:pointer;display:flex;align-items:center;min-height:44px;font-size:12.5px;font-weight:800;color:var(--teal)}
+.rkc-detail p{margin:8px 0 0;font-size:13px;line-height:1.7;color:var(--ink2)}
+.rkc h4{margin:14px 0 6px;font-size:13px;font-weight:850;color:var(--ink)}
+.rkc-row{display:grid;grid-template-columns:minmax(110px,1fr) minmax(150px,1.2fr) minmax(170px,1.1fr) minmax(170px,1.1fr);gap:8px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line2);font-size:12px;color:var(--ink2)}
+.rkc-row.head{font-size:var(--fs-11);color:var(--muted);font-weight:700}
+.rkc-row.rkc-el{grid-template-columns:minmax(110px,1fr) minmax(150px,1.2fr) minmax(170px,2.2fr)}
+.rkc-kv{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--ink2)}
+.rkc-win{margin-top:6px;padding:9px 11px;border-radius:10px;background:var(--card);border:1px solid var(--line2);font-size:12px;line-height:1.6;color:var(--ink2)}
+@media (max-width:720px){.rkc{padding:14px 13px}.rkc-row{grid-template-columns:1fr 1fr}.rkc-row,.rkc-row.rkc-el{grid-template-columns:1fr 1fr;gap:4px 10px}.rkc-row.head{display:none}.rkc-row>:first-child{grid-column:1/-1;font-weight:700;color:var(--ink)}.rkc-row.rkc-peer{grid-template-columns:1fr;gap:2px}}
 .dgrid{display:grid;grid-template-columns:1.5fr 1fr;gap:30px;margin-top:28px;align-items:start}
 .stepgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
 .hscroll{overflow-x:auto}
@@ -596,7 +609,7 @@ svg{display:block;overflow:visible}
 const DATA=__DATA_JSON__, GROUPS=__GROUPS_JSON__, TIERS=__TIERS_JSON__, TIER_FLOW=__TIER_FLOW_JSON__,
       OVERVIEW=__OVERVIEW_JSON__, GRP=__GRPMETA_JSON__, WEIGHTS=__WEIGHTS_JSON__, THRESH=__THRESH_JSON__,
       STRATEGY=__STRATEGY_JSON__, RANKV=__RANKING_VIEWS_JSON__, DIVERGE=__DIVERGE_JSON__, LENS=__LENS_JSON__,
-      RECENT=__RECENT_ARTICLES_JSON__, MKT=__MKT_TIP_JSON__,
+      RECENT=__RECENT_ARTICLES_JSON__, MKT=__MKT_TIP_JSON__, RANKCHG=__RANK_CHANGE_JSON__,
       DATE_ISO="__DATE_ISO__", DATE_STR="__DATE__";
 const RESEARCH_BASE=location.pathname.includes('/archive/')?'../research.html':'research.html';
 const ARCHIVE_DATES=__DATES_JSON__;
@@ -1853,6 +1866,44 @@ function cellDetail(cell, ci){
   box.appendChild(chips);
   return box;
 }
+/* ---------- 本週排名變化:rank_change.py 同一套計算;第一層摘要,明細收在 details ---------- */
+function rankChangeSection(d){
+  if(!RANKCHG)return null;
+  const head=h('h3',{style:'margin:0;font-size:14px;font-weight:850',text:'本週排名變化'});
+  const sub=t=>h('p',{style:'margin:4px 0 0;font-size:var(--fs-11);line-height:1.55;color:var(--muted)',text:t});
+  if(RANKCHG.error)return h('section',{class:'rkc'},head,sub('無法選出比較週：'+RANKCHG.error));
+  const x=(RANKCHG.stocks||{})[d.id];
+  if(!x||!x.available)return h('section',{class:'rkc'},head,sub(x?('這檔兩週名次不可比：'+x.reason):'兩期正式快照都沒有這檔股票。'));
+  const A=RANKCHG.dateA,B=RANKCHG.dateB,f2=v=>v==null?'—':(v>=0?'+':'')+Number(v).toFixed(2);
+  const rk=(pos,cs,why)=>pos==null?'未列入（'+(why||'—')+'）':pos+' · '+f2(cs);
+  const peers=h('div',{},h('div',{class:'rkc-row head'},h('span',{text:'同業'}),h('span',{text:'與它的相對位置'}),h('span',{text:A+' 名次 · 排名分數'}),h('span',{text:B+' 名次 · 排名分數'})),
+    ...x.peers.map(p=>h('div',{class:'rkc-row rkc-peer'},h('span',{text:(p.nm||'')+' '+p.id}),
+      h('span',{text:p.label+(p.side?'（一直在它'+p.side+(p.side==='同分'?'':'面')+'）':'')}),
+      h('span',{class:'mono',text:A.slice(5)+' '+rk(p.posA,p.csA,p.whyA)}),h('span',{class:'mono',text:B.slice(5)+' '+rk(p.posB,p.csB,p.whyB)}))));
+  const line=(label,v)=>h('div',{class:'rkc-kv'},h('b',{text:label+'：'}),h('span',{class:'mono',text:v}));
+  const dl=x.daily, daily=h('div',{},h('h4',{text:'當日綜合分數變動（composite，因子分解；不直接決定名次）'}),
+    dl?h('div',{},line('上週 → 本週（差額）',dl.line),
+      ...(dl.elements||[]).filter(e=>e.sA!==e.sB).map(e=>h('div',{class:'rkc-row rkc-el'},
+        h('span',{text:e.label+' ×'+e.weight}),h('span',{class:'mono',text:'元素分 '+(e.sA>0?'+':'')+e.sA+' → '+(e.sB>0?'+':'')+e.sB}),h('span',{class:'mono',text:'貢獻 '+f2(e.contrib)}))),
+      dl.sum!=null&&h('p',{class:'note',style:'margin:6px 0 0',text:'元素貢獻加總 '+f2(dl.sum)+(Math.abs(dl.sum-dl.delta)<0.005?'，與當日分數變動一致。':'，與當日分數變動不一致，需查核。')+'未列出的元素兩週相同。'}))
+      :h('p',{class:'note',text:'快照缺當日分數，無法分解。'}));
+  const sm=x.smooth, smooth=h('div',{},h('h4',{text:'三日平滑分數變動（composite_s；名次只依這個分數）'}),
+    line('上週 → 本週（差額）',sm.line),
+    ...sm.windows.map((w,i)=>h('div',{class:'rkc-win'},h('b',{text:[A,B][i]+' 窗口：'}),
+      w.slots.map(s=>s.date.slice(5)+' '+(s.status==='ok'?f2(s.composite):s.label)).join('、'),
+      h('div',{style:`color:${w.state==='verified'?'var(--teal)':'var(--amber)'}`,text:(w.mean!=null?'平均 '+f2(w.mean)+'；':'')+w.label+(w.why&&w.why.length?'（'+w.why.join('；')+'）':'')}))));
+  const meta=h('div',{},h('h4',{text:'日期與正式快照'}),
+    h('div',{class:'rkc-kv mono'},h('span',{text:'上週 '+A+' · '+RANKCHG.snapshotA}),h('span',{text:'本週 '+B+' · '+RANKCHG.snapshotB})),
+    ...(RANKCHG.notes||[]).map(n=>h('p',{class:'note',style:'margin:4px 0 0',text:n})),
+    h('p',{class:'note',style:'margin:6px 0 0;line-height:1.6',text:'各日只取首次正式發布的快照。名次＝族群內依 composite_s 由高到低排序，同分取平均序位。重跑：'+RANKCHG.rerun.replace('<股票代號>',d.id)}));
+  return h('section',{class:'rkc','aria-label':'本週排名變化'},
+    h('div',{style:'display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap'},head,
+      h('span',{class:'chip',style:`color:${x.move>0?'var(--strong)':x.move<0?'var(--weak)':'var(--ink2)'};background:var(--card)`,
+        text:x.posA+' → '+x.posB})),
+    h('ul',{class:'rkc-sum'},...x.summary.map(t=>h('li',{text:t}))),
+    h('details',{},h('summary',{text:'看明細：同業名次、兩週分數與日期'}),
+      h('div',{class:'rkc-detail'},...(x.rankDetail||[]).map(t=>h('p',{text:t}))),peers,daily,smooth,meta));
+}
 function buildDetail(){
   if(!D.detail)return null;
   const d=D.detail,ts=tierStyle(d.tier_confirmed||d.tier),cs=d.cells.map(c=>c[0]);
@@ -1915,7 +1966,7 @@ function buildDetail(){
         h('div',{style:'font-size:13.5px;color:var(--muted);margin-top:5px',text:d.biz})),
       h('div',{style:'text-align:right;flex:0 0 auto'},h('div',{class:'mono',style:`font-size:38px;font-weight:600;color:${compCol};line-height:1`,text:(d.comp>=0?'+':'')+d.comp.toFixed(1)}),
         h('div',{style:'font-size:var(--fs-11);color:var(--muted);margin-top:3px',text:'族群內綜合分（±'+COMP_MAX.toFixed(1)+'）'}))),
-    riskW,multi,
+    riskW,multi,rankChangeSection(d),
     d.note&&h('div',{style:'margin-top:20px;background:var(--tealbg);border-left:4px solid var(--teal);border-radius:12px;padding:15px 18px'},
       h('div',{style:'font-size:var(--fs-11);font-weight:800;color:var(--teal);letter-spacing:.05em;margin-bottom:5px',text:'一句話結論 · 研究筆記（'+d.note.label+'）'}),
       h('p',{style:'margin:0;font-size:14.5px;line-height:1.7;color:var(--ink2)',text:d.note.summary})),
