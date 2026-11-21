@@ -332,6 +332,57 @@ class TiesWithIntegerMidrank(unittest.TestCase):
         self.assertIn("同分狀態改變 2 檔", out)
 
 
+class DashboardPayload(unittest.TestCase):
+    """儀表板「本週排名變化」:與 CLI 同一套 explain/smoothing_window,另產第一層摘要。"""
+
+    def setUp(self):
+        fx = Fixture(weekdays("2026-11-09", "2026-11-20"))
+        self.addCleanup(fx.close)
+        week1 = {"L": ("g", 5.0, 5.0), "T": ("g", 3.0, 3.0), "X": ("g", 2.0, 2.0), "Y": ("g", 0.0, 0.0)}
+        week2 = {"X": ("g", 4.0, 4.0), "T": ("g", 1.0, 1.0), "Y": ("g", 1.0, 1.0)}
+        fx.fill(weekdays("2026-11-09", "2026-11-13"), week1)
+        fx.fill(weekdays("2026-11-16", "2026-11-20"), week2)
+        self.con = fx.con()
+        self.addCleanup(self.con.close)
+        self.p = rc.dashboard_payload(self.con, at("2026-11-21T10:00"), ["2026-11-13", "2026-11-20"],
+                                      {"X": "超車股", "Y": "同分股", "L": "離開股"}, {"g": "測試"})
+
+    def test_target_summary_counts_overtake_tie_and_membership(self):
+        x = self.p["stocks"]["T"]
+        self.assertEqual((self.p["dateA"], self.p["dateB"]), ("2026-11-13", "2026-11-20"))
+        self.assertEqual((self.p["snapshotA"], self.p["snapshotB"]), ("r-2026-11-13", "r-2026-11-20"))
+        self.assertEqual((x["rankA"], x["nA"], x["rankB"], x["nB"], x["tieB"]), (2, 4, 2.5, 3, 1))
+        self.assertEqual(x["summary"], [
+            "上週(2026-11-13)在測試族群 4 檔中排第 2 名,本週(2026-11-20)在 3 檔中排第 2.5 名(與 1 檔同分),下降 0.5 席。",
+            "有 1 檔同業從後面超車(超車股),它沒有超越原本在前面的同業。",
+            "同分狀態改變 1 檔(同分股),名次退後 0.5 席;1 檔未列入本週族群排名、0 檔本週新列入,名次前進 1 席。"])
+        cats = {p["id"]: (p["cat"], p["rankA"], p["rankB"], p["csA"], p["csB"], p["whyB"]) for p in x["peers"]}
+        self.assertEqual(cats, {"X": ("overtook_target", 3, 1, 2.0, 4.0, None),
+                                "Y": ("tie_change", 4, 2.5, 0.0, 1.0, None),
+                                "L": ("left", 1, None, 5.0, None, "快照無此股")})
+
+    def test_daily_composite_and_smoothed_composite_s_are_separate(self):
+        x = self.p["stocks"]["T"]
+        self.assertEqual((x["daily"]["compA"], x["daily"]["compB"], x["daily"]["delta"]), (3.0, 1.0, -2.0))
+        self.assertEqual((x["smooth"]["csA"], x["smooth"]["csB"], x["smooth"]["delta"]), (3.0, 1.0, -2.0))
+        w = x["smooth"]["windows"]
+        self.assertEqual([s["date"] for s in w[1]["slots"]], ["2026-11-18", "2026-11-19", "2026-11-20"])
+        self.assertEqual([v["state"] for v in w], ["verified", "verified"])
+        json.dumps(self.p, ensure_ascii=False, allow_nan=False)
+
+    def test_other_stocks_get_their_own_payload_or_explicit_unavailable_state(self):
+        self.assertEqual(sorted(self.p["stocks"]), ["L", "T", "X", "Y"])
+        x = self.p["stocks"]["X"]
+        self.assertEqual((x["rankA"], x["rankB"]), (3, 1))
+        self.assertIn("它超越了 1 檔原本在前面的同業(T)", x["summary"][1])
+        self.assertFalse(self.p["stocks"]["L"]["available"])
+        self.assertIn("L", self.p["stocks"]["L"]["reason"])
+
+    def test_unpublished_date_is_selection_error(self):
+        with self.assertRaises(rc.SelectionError):
+            rc.dashboard_payload(self.con, at("2026-11-21T10:00"), ["2026-11-13", "2026-11-23"])
+
+
 class Cli(unittest.TestCase):
     def test_report_file_and_run_sql_are_read_only(self):
         fx = Fixture(weekdays("2026-11-09", "2026-11-20"))

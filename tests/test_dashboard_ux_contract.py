@@ -90,7 +90,7 @@ class DashboardUxContractTest(unittest.TestCase):
                  "__WEIGHTS_JSON__", "__THRESH_JSON__",
                  "__STRATEGY_JSON__", "__DIVERGE_JSON__",
                  "__MKT_TIP_JSON__", "__DATE_ISO__", "__DATE__", "__PAGE_TITLE__", "__H1__",
-                 "__SCOPE__")
+                 "__SCOPE__", "__RANK_CHANGE_JSON__")
         for ph in pairs:
             self.assertIn(ph, self.template)
             self.assertIn(f'"{ph}"', self.builder)
@@ -318,6 +318,27 @@ class DashboardUxContractTest(unittest.TestCase):
             self.assertIn(marker, self.builder)
 
     # ---------- 行動版與觸控 ----------
+
+    def test_stock_detail_has_weekly_rank_change_with_summary_then_details(self):
+        fn = self.template[self.template.index("function rankChangeSection(d)"):
+                           self.template.index("function buildDetail()")]
+        detail = self.template[self.template.index("function buildDetail()"):]
+        self.assertIn("rankChangeSection(d)", detail[:detail.index("d.note&&")])
+        self.assertIn("(RANKCHG.stocks||{})[d.id]", fn)          # 依目前股票取資料,不綁定單一代號
+        self.assertNotIn("3443", fn)
+        self.assertIn("'本週排名變化'", fn)
+        self.assertIn("h('ul',{class:'rkc-sum'},...x.summary", fn)
+        # 同業名稱、兩週分數與日期只在 details 內
+        self.assertIn("h('details',{},h('summary',{text:'看明細：同業名次、兩週分數與日期'}),peers,daily,smooth,meta)", fn)
+        self.assertIn("① 當日分數 composite", fn)
+        self.assertIn("② 三日平滑排名分數 composite_s（名次只依這個分數）", fn)
+        self.assertIn("if(!RANKCHG)return null", fn)
+        self.assertIn("RANKCHG.error", fn)
+        self.assertIn("x.available", fn)
+        self.assertIn(".rkc details>summary{cursor:pointer;display:flex;align-items:center;min-height:44px", self.template)
+        self.assertIn(".rkc-row.rkc-peer{grid-template-columns:1fr", self.template)
+        self.assertIn("rank_change.dashboard_payload(", self.builder)
+        self.assertIn('"--rank-change"', self.builder)
 
     def test_mobile_layout_collapses_grids_and_meets_touch_targets(self):
         for marker in ("@media (max-width:720px)", "min-height:44px",
