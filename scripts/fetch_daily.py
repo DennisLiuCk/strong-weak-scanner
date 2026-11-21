@@ -2014,7 +2014,7 @@ def build_metrics(con):
             trust5 = round(t5 / 1000)                             # 張
             trust5_pct = (t5 / shares * 100) if shares else None  # 佔股本 %
             foreign5 = round(sum(fnet[max(0, k-4):k+1]) / 1000)   # 張
-            mutil = (mb * 1000 / shares * 100) if (mb and shares) else None
+            mutil = (mb * 1000 / shares * 100) if (mb is not None and shares) else None
             mchg5 = (mb / mbal[k-5] - 1) if (mb is not None and k >= 5 and mbal[k-5]) else None
             mchg10 = (mb / mbal[k-10] - 1) if (mb is not None and k >= 10 and mbal[k-10]) else None
             mchg20 = (mb / mbal[k-20] - 1) if (mb is not None and k >= 20 and mbal[k-20]) else None
