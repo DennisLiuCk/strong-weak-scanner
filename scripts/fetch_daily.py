@@ -2124,7 +2124,7 @@ def build_group_market(con):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--start", help="YYYY-MM-DD;省略則抓最近 --days 天")
+    ap.add_argument("--start", help="YYYY-MM-DD;省略則從 --end 往前推 --days 天")
     ap.add_argument("--end", help="YYYY-MM-DD;預設今天")
     ap.add_argument("--days", type=int, default=15)
     ap.add_argument("--sleep", type=float, default=0.25, help="每次 API 間隔秒數(避免限流)")
@@ -2152,13 +2152,35 @@ def main():
         ap.error("--backfill-expanded-fields 必須明確指定 --start，避免意外回打過大範圍")
     if args.backfill_expanded_fields and args.final_pass:
         ap.error("--backfill-expanded-fields 不可與 --final-pass 同時使用")
+
+    def parse_date(option, value):
+        if value is None:
+            return None
+        try:
+            return date.fromisoformat(value)
+        except ValueError:
+            ap.error(f"{option} 不是有效日期:{value!r}，請使用 YYYY-MM-DD")
+
+    start_date = parse_date("--start", args.start)
+    end_date = parse_date("--end", args.end)
+    if not args.metrics_only:
+        current_taipei = taipei_now()
+        end_date = end_date or current_taipei.date()
+        if start_date is None:
+            try:
+                start_date = end_date - timedelta(days=args.days)
+            except OverflowError:
+                ap.error(f"--days {args.days} 超出可用日期範圍")
+        if start_date > end_date:
+            ap.error(f"--start {start_date} 晚於 --end {end_date}")
+
     # 正式 db 只放 2026-03-02(策略起算日)之後的資料。要往前延伸必須改用 --db,
     # 否則會把回補歷史混進正在累積證據的正式庫。
     # normcase:Windows 檔名不分大小寫,單純比 abspath 時 --db data/FINDMIND.DB 會繞過護欄
     same_db = (os.path.normcase(os.path.abspath(args.db))
                == os.path.normcase(os.path.abspath(DB)))
-    if args.start and args.start < HISTORY_FLOOR and same_db:
-        ap.error(f"--start {args.start} 早於 {HISTORY_FLOOR}(正式 db 的起算日)。"
+    if same_db and start_date is not None and start_date < date.fromisoformat(HISTORY_FLOOR):
+        ap.error(f"--start {start_date} 早於 {HISTORY_FLOOR}(正式 db 的起算日)。"
                  f"歷史延伸請加 --db 指向另一個檔案,例如 --db data/history.db")
 
     if args.metrics_only:
@@ -2178,10 +2200,8 @@ def main():
               f"{obs['group_rows']} group rows")
         return
 
-    current_taipei = taipei_now()
-    today_taipei = current_taipei.date()
-    end = args.end or today_taipei.isoformat()
-    start = args.start or (today_taipei - timedelta(days=args.days)).isoformat()
+    start = start_date.isoformat()
+    end = end_date.isoformat()
     if args.final_pass and not final_pass_ready(end, current_taipei):
         sys.exit(
             f"拒絕過早 final-pass:{end} 當日終版門檻為台北 "
