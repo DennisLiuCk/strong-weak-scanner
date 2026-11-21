@@ -159,7 +159,12 @@ CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMA
 CREATE TABLE IF NOT EXISTS fetch_log(ts TEXT, start TEXT, "end" TEXT, rows INTEGER);
 CREATE TABLE IF NOT EXISTS fetch_coverage(dataset TEXT, data_id TEXT, covered_through TEXT,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(dataset,data_id));
+CREATE TABLE IF NOT EXISTS derived_rebuild_state(
+  id INTEGER PRIMARY KEY CHECK(id=1), level INTEGER NOT NULL);
 """
+
+REBUILD_OBSERVATION = 1
+REBUILD_ALL = 2
 
 # SQLite 的 CREATE TABLE IF NOT EXISTS 不會替既有表補欄；欄位順序刻意沿用「舊欄在前、
 # 新欄附加在後」，讓 repo 內既有 data/findmind.db 可原地升級且不需整表搬移。
@@ -211,9 +216,18 @@ RAW_AUDIT_COLUMNS = {
 }
 
 
+def _mark_derived_pending(con, level=REBUILD_ALL):
+    con.execute(
+        """INSERT INTO derived_rebuild_state VALUES(1,?)
+           ON CONFLICT(id) DO UPDATE SET level=excluded.level
+           WHERE derived_rebuild_state.level < excluded.level""", (level,))
+
+
 def ensure_schema(con):
     """建立新資料庫或就地升級舊 DB；可重複執行。"""
     con.executescript(SCHEMA)
+    # 舊庫無法靠日期判斷是否已有同日修正未重算；第一次升級保守重建。
+    con.execute("INSERT OR IGNORE INTO derived_rebuild_state VALUES(1,?)", (REBUILD_ALL,))
     for table, columns in RAW_COLUMN_MIGRATIONS.items():
         existing = {row[1] for row in con.execute(f"PRAGMA table_info({table})")}
         for name, sql_type in columns:
@@ -235,7 +249,7 @@ def ensure_schema(con):
              ON mi.date=m.date AND mi.market='TWSE' AND mi.index_key=?""",
         (MARKET_CROSSCHECK_TOLERANCE, MARKET_SOURCE_TWSE,
          MARKET_SOURCE_LEGACY, TWSE_TOTAL_RETURN_KEY))
-    con.execute(
+    updated = con.execute(
         """UPDATE market
            SET taiex=(SELECT p.official_taiex FROM market_provenance p
                       WHERE p.date=market.date)
@@ -245,6 +259,8 @@ def ensure_schema(con):
                AND p.official_taiex IS NOT NULL
                AND market.taiex!=p.official_taiex)""",
         (MARKET_SOURCE_TWSE,))
+    if updated.rowcount:
+        _mark_derived_pending(con)
     con.commit()
 
 _TOKENS = []   # get_tokens() 快取
@@ -912,6 +928,8 @@ def up_price(con, data):
     rows = [(d["date"], d["stock_id"], d.get("open"), d.get("max"), d.get("min"),
              d.get("close"), d.get("Trading_Volume"), d.get("Trading_money"),
              d.get("Trading_turnover")) for d in data]
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO price
            (date,stock_id,open,high,low,close,volume,amount,trades)
@@ -979,6 +997,8 @@ def up_inst(con, data):
             value["ds_buy"], value["ds_sell"], value["ds_net"],
             value["dh_buy"], value["dh_sell"], value["dh_net"],
         ))
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO inst
            (date,stock_id,foreign_net,trust_net,dealer_net,foreign_buy,foreign_sell,
@@ -996,6 +1016,8 @@ def up_margin(con, data):
              d.get("ShortSaleLimit"), d.get("MarginShortOffset"),
              d.get("MarginPurchasePreviousDayBalance"),
              d.get("ShortSalePreviousDayBalance")) for d in data]
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO margin
            (date,stock_id,margin_bal,short_bal,margin_buy,margin_sell,margin_cash_repay,
@@ -1010,6 +1032,8 @@ def up_holding(con, data):
              d.get("ForeignInvestmentAvailableShares"),
              d.get("ForeignInvestmentAvailableRatio"),
              d.get("ForeignInvestmentLimitRatio")) for d in data]
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO holding
            (date,stock_id,foreign_pct,shares_issued,foreign_shares,foreign_available_shares,
@@ -1023,6 +1047,8 @@ def up_sbl(con, data):
              d.get("SBLShortSalesCurrentDaySell"), d.get("SBLShortSalesCurrentDayReturn"),
              d.get("SBLShortSalesCurrentDayAdjustment"),
              d.get("SBLShortSalesNextDayLimit")) for d in data]
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO sbl
            (date,stock_id,sbl_bal,sbl_prev_bal,sbl_sell,sbl_return,sbl_adjustment,sbl_next_limit)
@@ -1033,6 +1059,8 @@ def up_sbl(con, data):
 def up_market_index(con, data):
     rows = [(d["date"], d["market"], d["index_key"], d["index_name"],
              d["index_type"], d.get("close")) for d in data]
+    if rows:
+        _mark_derived_pending(con, REBUILD_OBSERVATION)
     con.executemany(
         """INSERT OR REPLACE INTO market_index
            (date,market,index_key,index_name,index_type,close) VALUES(?,?,?,?,?,?)""", rows)
@@ -1510,6 +1538,7 @@ def fetch_dividends(con, ids, token, start, end, sleep, force=False):
         rows = [(d["date"], d["stock_id"], d.get("before_price"), d.get("reference_price"))
                 for d in data if d.get("before_price") and d.get("reference_price")]
         if rows:
+            _mark_derived_pending(con)
             con.executemany("INSERT OR REPLACE INTO dividend_result VALUES(?,?,?,?)", rows)
             n += len(rows)
         if ok:
@@ -1532,6 +1561,7 @@ def fetch_splits(con, ids, token, start, end, sleep, force=False):
     rows = [(d["date"], d["stock_id"], d.get("before_price"), d.get("after_price"))
             for d in data if d.get("stock_id") in keep and d.get("before_price") and d.get("after_price")]
     if rows:
+        _mark_derived_pending(con)
         con.executemany("INSERT OR REPLACE INTO split_event VALUES(?,?,?,?)", rows)
     if ok:
         _coverage_set(con, "TaiwanStockSplitPrice", "*", end)
@@ -1659,6 +1689,7 @@ def fetch_index(con, token, start, end, sleep, expected_dates=None, force=False,
         for day, _canonical, source, official_value, finmind_value, diff in planned
         if provenance_changed(day, source, official_value, finmind_value, diff)]
     if market_rows:
+        _mark_derived_pending(con)
         con.executemany(
             "INSERT OR REPLACE INTO market(date,taiex) VALUES(?,?)", market_rows)
     if provenance_rows:
@@ -1727,8 +1758,8 @@ def fetch_ref_series(con, token, start, end, sleep, expected_dates=None, force=F
 
 # 處置/注意股票(觀察層、不計分):交易所對異常價量的官方認證,五元素分數看不到這塊
 # ——2026-07-07 驗證發現「真強」評級個股同時被列注意股票(90日漲幅163%)的實例。
-# TWSE(上市)+TPEx(上櫃)各自的處置/注意端點,免token,合計涵蓋全市場;當天名單
-# 即代表當下正被列管,不必自行判斷起訖。任一端點失敗印警告後跳過,不擋主管線。
+# TWSE(上市)+TPEx(上櫃)各自的處置/注意端點,免token,合計涵蓋全市場。
+# 端點無日期參數：歷史補跑只採用能確認適用目標日的列，不用當期名單覆蓋歷史。
 TWSE_PUNISH_URL = "https://openapi.twse.com.tw/v1/announcement/punish"
 TWSE_NOTICE_URL = "https://openapi.twse.com.tw/v1/announcement/notice"
 TPEX_DISPOSAL_URL = "https://www.tpex.org.tw/openapi/v1/tpex_disposal_information"
@@ -1737,58 +1768,88 @@ TPEX_WARNING_URL = "https://www.tpex.org.tw/openapi/v1/tpex_trading_warning_info
 def _get_json(url):
     return _request_json(url)
 
+
+def _risk_disposal_period(period):
+    # TWSE: 115/11/23～115/11/27；TPEx: 1151123~1151127。
+    if not isinstance(period, str):
+        raise ValueError(f"處置期間不是文字:{period}")
+    start, end = period.replace("/", "").replace("～", "~").split("~")
+    start, end = _roc_ymd_to_iso(start), _roc_ymd_to_iso(end)
+    if end < start:
+        raise ValueError(f"處置期間起訖顛倒:{period}")
+    return start, end
+
+
 def fetch_risk_flags(con, target_date):
-    """抓當天 TWSE/TPEx 處置+注意名單,篩出 universe 內的檔位存進 risk_flags(整表重建,
-    冪等)。同一檔同一天可能有多筆理由(TPEx 注意常見),合併成一筆用「;」串接。"""
+    """回傳 (寫入筆數, 是否完整)。只有台北當天且四端點都有效時才替換當日旗標。"""
+    today = taipei_now().date().isoformat()
+    if target_date > today:
+        return 0, False
+    complete = target_date == today
     uni = {r[0] for r in con.execute("SELECT stock_id FROM universe")}
-    picked = {}   # (stock_id, kind) -> {"reasons": [...], "period": str|None}
-    successful_sources = 0
+    sources = (
+        ("TWSE", "處置", TWSE_PUNISH_URL, "Code", "ReasonsOfDisposition"),
+        ("TWSE", "注意", TWSE_NOTICE_URL, "Code", "TradingInfoForAttention"),
+        ("TPEx", "處置", TPEX_DISPOSAL_URL, "SecuritiesCompanyCode", "DispositionReasons"),
+        ("TPEx", "注意", TPEX_WARNING_URL, "SecuritiesCompanyCode", "TradingInformation"),
+    )
+    picked = {}
+    for market, kind, url, code_key, reason_key in sources:
+        try:
+            payload = _get_json(url)
+            if not isinstance(payload, list):
+                raise ValueError("回應不是陣列")
+        except Exception as e:
+            complete = False
+            print(f"  ! {market} {kind}股票抓取失敗:{e}", file=sys.stderr)
+            continue
+        for index, r in enumerate(payload, 1):
+            try:
+                sid, raw_date = r[code_key], r["Date"]
+                if sid == raw_date == "":  # 無公告時可能回傳單筆空白列
+                    continue
+                if not isinstance(sid, str) or not sid.strip():
+                    raise ValueError("公告缺少證券代號")
+                announced = _roc_ymd_to_iso(raw_date)
+                period = None
+                if kind == "注意":
+                    if announced != target_date:  # 即使不在 universe，仍代表端點回覆了其他日期
+                        complete = False
+                        continue
+                elif announced > target_date:
+                    complete = False
+                    continue
+                elif sid in uni:
+                    period = r["DispositionPeriod"]
+                    start, end = _risk_disposal_period(period)
+                    if not start <= target_date <= end:
+                        continue
+                if sid not in uni:
+                    continue
+                reason = r.get(reason_key)
+                if reason is not None and not isinstance(reason, str):
+                    raise ValueError("公告理由不是文字")
+            except (KeyError, TypeError, ValueError) as e:
+                complete = False
+                print(f"  ! {market} {kind}股票第 {index} 列格式異常，略過:{e}", file=sys.stderr)
+                continue
+            reasons, _ = picked.setdefault((sid, kind), ({}, period))
+            if reason:
+                reasons[reason] = None  # 同檔多則理由去重並保留順序
 
-    def add(sid, kind, reason, period=None):
-        if sid not in uni:
-            return
-        e = picked.setdefault((sid, kind), {"reasons": [], "period": period})
-        if reason and reason not in e["reasons"]:
-            e["reasons"].append(reason)
-        if period and not e["period"]:
-            e["period"] = period
-
-    try:
-        for r in _get_json(TWSE_PUNISH_URL):
-            add(r.get("Code"), "處置", r.get("ReasonsOfDisposition"), r.get("DispositionPeriod"))
-        successful_sources += 1
-    except Exception as e:
-        print(f"  ! TWSE 處置股票抓取失敗:{e}", file=sys.stderr)
-    try:
-        for r in _get_json(TWSE_NOTICE_URL):
-            if r.get("Code"):   # 當天無注意股票時回傳單筆全空值 placeholder row
-                add(r["Code"], "注意", r.get("TradingInfoForAttention"))
-        successful_sources += 1
-    except Exception as e:
-        print(f"  ! TWSE 注意股票抓取失敗:{e}", file=sys.stderr)
-    try:
-        for r in _get_json(TPEX_DISPOSAL_URL):
-            add(r.get("SecuritiesCompanyCode"), "處置", r.get("DispositionReasons"), r.get("DispositionPeriod"))
-        successful_sources += 1
-    except Exception as e:
-        print(f"  ! TPEx 處置股票抓取失敗:{e}", file=sys.stderr)
-    try:
-        for r in _get_json(TPEX_WARNING_URL):
-            if r.get("SecuritiesCompanyCode"):
-                add(r["SecuritiesCompanyCode"], "注意", r.get("TradingInformation"))
-        successful_sources += 1
-    except Exception as e:
-        print(f"  ! TPEx 注意股票抓取失敗:{e}", file=sys.stderr)
-
-    con.execute("DELETE FROM risk_flags WHERE date=?", (target_date,))
-    rows = [(target_date, sid, kind, "；".join(e["reasons"]), e["period"])
-            for (sid, kind), e in picked.items()]
-    if rows:
-        con.executemany("INSERT OR REPLACE INTO risk_flags VALUES(?,?,?,?,?)", rows)
+    # 歷史名單可能缺已結束的處置，空白回應也無法證明歷史當日無公告。
+    complete = complete and target_date == taipei_now().date().isoformat()
+    if complete:
+        con.execute("DELETE FROM risk_flags WHERE date=?", (target_date,))
+    else:
+        print(f"  ! 處置/注意股票 {target_date} 名單不完整，僅補缺、不標記完整", file=sys.stderr)
+    rows = [(target_date, sid, kind, "；".join(reasons), period)
+            for (sid, kind), (reasons, period) in picked.items()]
+    inserted = con.executemany("INSERT OR IGNORE INTO risk_flags VALUES(?,?,?,?,?)", rows).rowcount
     con.commit()
-    if rows:
-        print(f"  處置/注意股票(觀察層):{len(picked)} 檔次,{','.join(sorted({s for s, _ in picked}))}")
-    return len(rows), successful_sources == 4
+    if inserted:
+        print(f"  處置/注意股票(觀察層):寫入 {inserted} 筆")
+    return inserted, complete
 
 def build_price_adj(con):
     """由 price × 事件係數重算還原價(倒推法:事件日「之前」的價 × 係數連乘,最新區段==原始價)。
@@ -2122,6 +2183,21 @@ def build_group_market(con):
     con.executemany("INSERT OR REPLACE INTO group_metrics VALUES(?,?,?,?,?,?,?,?,?)", out)
     con.commit()
 
+def rebuild_derived(con, level):
+    _mark_derived_pending(con, level)
+    con.commit()
+    if level == REBUILD_ALL:
+        build_price_adj(con)
+        build_metrics(con)
+    obs = build_observation_metrics(
+        con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
+    if level == REBUILD_ALL:
+        build_group_market(con)
+    con.execute("UPDATE derived_rebuild_state SET level=0 WHERE id=1 AND level<=?", (level,))
+    con.commit()
+    return obs
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", help="YYYY-MM-DD;省略則從 --end 往前推 --days 天")
@@ -2189,11 +2265,7 @@ def main():
         load_universe(con)
         con.commit()
         print("只重算 price_adj + daily_metrics + 觀察指標 + 族群/大盤層(不抓取)…")
-        build_price_adj(con)
-        build_metrics(con)
-        obs = build_observation_metrics(
-            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
-        build_group_market(con)
+        obs = rebuild_derived(con, REBUILD_ALL)
         n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
         con.close()
         print(f"完成 — daily_metrics {n} rows;觀察層 {obs['stock_rows']} stock rows / "
@@ -2301,17 +2373,13 @@ def main():
         "SELECT MAX(date) FROM observation_metrics").fetchone()[0] if con.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='observation_metrics'").fetchone() else None
     price_last = con.execute("SELECT MAX(date) FROM price").fetchone()[0]
-    if data_changed or metric_last != price_last:
-        build_price_adj(con)
+    pending = con.execute("SELECT level FROM derived_rebuild_state WHERE id=1").fetchone()[0]
+    if pending == REBUILD_ALL or data_changed or metric_last != price_last:
         print("重算 daily_metrics + 觀察指標 + 族群/大盤層 …")
-        build_metrics(con)
-        build_observation_metrics(
-            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
-        build_group_market(con)
-    elif market_index_rows or observation_last != price_last:
+        rebuild_derived(con, REBUILD_ALL)
+    elif pending == REBUILD_OBSERVATION or market_index_rows or observation_last != price_last:
         print("官方指數／觀察層有更新，重算 observation_metrics …")
-        build_observation_metrics(
-            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
+        rebuild_derived(con, REBUILD_OBSERVATION)
     else:
         print("原始/事件資料無變更且 metrics/observation 已同步,略過衍生表重建")
     n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]

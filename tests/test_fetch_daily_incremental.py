@@ -4,7 +4,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import closing, redirect_stderr, redirect_stdout
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError
@@ -971,6 +971,87 @@ class IncrementalFetchTest(unittest.TestCase):
         self.assertEqual(repeat["requests"], 0)
         self.assertEqual(calls, [])
 
+    def test_resumed_final_pass_rebuilds_same_date_correction_without_new_rows(self):
+        day = "2026-07-09"
+        indexes = [
+            {"date": day, "market": market, "index_key": key, "index_name": key,
+             "index_type": "total_return", "close": 100}
+            for market, key in [("TWSE", fd.TWSE_TOTAL_RETURN_KEY),
+                                ("TPEx", fd.TPEX_TOTAL_RETURN_KEY)]
+        ]
+        fd.up_market_index(self.con, indexes)
+        self.con.execute("INSERT INTO market VALUES(?,100)", (day,))
+        self.con.commit()
+
+        def read_checkpoint(db):
+            with closing(sqlite3.connect(db)) as con:
+                return tuple(con.execute(
+                    f"SELECT MAX(date), MAX(CASE WHEN date=? AND stock_id='2330' "
+                    f"THEN close END) FROM {table}", (day,)).fetchone()
+                    for table in ("price", "price_adj", "daily_metrics"))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "resumed-final-pass.db")
+            con = sqlite3.connect(db)
+            self.con.backup(con)
+            con.close()
+            argv = ["fetch_daily.py", "--final-pass", "--start", day, "--end", day,
+                    "--sleep", "0", "--db", db]
+            stdout = io.StringIO()
+            with mock.patch.object(sys, "argv", argv + ["--force"]), \
+                    mock.patch.object(sys, "stdout", stdout), \
+                    mock.patch.object(fd, "taipei_now", return_value=datetime(
+                        2026, 7, 9, 23, 47, tzinfo=fd.TAIPEI_TZ)), \
+                    mock.patch.object(fd, "load_universe", return_value=self.ids), \
+                    mock.patch.object(fd, "get_token", return_value="token"), \
+                    mock.patch.object(fd, "fetch_exchange_price_source", self.expanded_price_fetch), \
+                    mock.patch.object(fd, "fetch_exchange_raw_source", self.fake_fetch), \
+                    mock.patch.object(fd, "fetch_tpex_market_indices", return_value=indexes[1:]), \
+                    mock.patch.object(fd, "api_get", return_value=([], True)), \
+                    mock.patch.object(fd, "fetch_ref_series", side_effect=[
+                        RuntimeError("interrupted after raw checkpoint"), (0, 0)]), \
+                    mock.patch.object(fd, "fetch_risk_flags", return_value=(0, True)):
+                with mock.patch.object(sys, "argv", ["fetch_daily.py", "--metrics-only", "--db", db]):
+                    fd.main()
+                with self.assertRaisesRegex(RuntimeError, "interrupted after raw checkpoint"):
+                    fd.main()
+                self.assertEqual(read_checkpoint(db), ((day, 3), (day, 2), (day, 2)))
+                self.calls.clear()
+                self.price_calls.clear()
+                stdout.truncate(0)
+                stdout.seek(0)
+                with mock.patch.object(sys, "argv", argv):
+                    fd.main()
+                self.assertEqual(self.calls, [])
+                self.assertEqual(self.price_calls, [])
+                self.assertIn("官方批次 0 次", stdout.getvalue())
+                self.assertIn("原始 0 rows 落地", stdout.getvalue())
+                self.assertEqual(read_checkpoint(db), ((day, 3), (day, 3), (day, 3)))
+
+    def test_observation_rebuild_preserves_concurrent_full_rebuild_marker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "concurrent-rebuild.db"
+            with closing(sqlite3.connect(db)) as rebuild, closing(sqlite3.connect(db)) as writer:
+                fd.ensure_schema(rebuild)
+                fd.rebuild_derived(rebuild, fd.REBUILD_ALL)
+                observation_builder = fd.build_observation_metrics
+
+                def build_then_write(*args):
+                    result = observation_builder(*args)
+                    self.assertEqual(writer.execute(
+                        "SELECT level FROM derived_rebuild_state WHERE id=1").fetchone()[0],
+                        fd.REBUILD_OBSERVATION)
+                    fd.up_price(writer, [{"date": "2026-07-09", "stock_id": "2330", "close": 3}])
+                    writer.commit()
+                    return result
+
+                with mock.patch.object(fd, "build_observation_metrics", side_effect=build_then_write):
+                    fd.rebuild_derived(rebuild, fd.REBUILD_OBSERVATION)
+
+                self.assertEqual(writer.execute(
+                    "SELECT level FROM derived_rebuild_state WHERE id=1").fetchone()[0],
+                    fd.REBUILD_ALL)
+
     def test_filtered_or_empty_final_pass_does_not_complete_universe(self):
         dataset = "TaiwanStockShareholding"
         for ids, filtered in ((self.ids, True), ([], False)):
@@ -1131,6 +1212,136 @@ class IncrementalFetchTest(unittest.TestCase):
                     observer.close()
             finally:
                 con.close()
+
+
+class RiskFlagFetchTest(unittest.TestCase):
+    day = "2026-11-19"
+
+    def setUp(self):
+        self.con = sqlite3.connect(":memory:")
+        self.addCleanup(self.con.close)
+        self.con.executescript(fd.SCHEMA)
+        self.con.executemany("INSERT INTO universe VALUES(?, '', '', '')",
+                             [(sid,) for sid in ("3131", "3491", "3532", "6510")])
+        self.con.execute("INSERT INTO risk_flags VALUES(?, '6510', '注意', '當日公告', NULL)",
+                         (self.day,))
+
+    def fetch(self, payloads, today="2026-11-21"):
+        def get_json(url):
+            payload = payloads.get(url, [])
+            if isinstance(payload, OSError):
+                raise payload
+            return payload
+
+        now = datetime.fromisoformat(today).replace(tzinfo=fd.TAIPEI_TZ)
+        with mock.patch.object(fd, "taipei_now", return_value=now), \
+                mock.patch.object(fd, "_get_json", side_effect=get_json):
+            return fd.fetch_risk_flags(self.con, self.day)
+
+    def flags(self):
+        return self.con.execute(
+            "SELECT stock_id, kind, reason, period FROM risk_flags WHERE date=? ORDER BY stock_id",
+            (self.day,)).fetchall()
+
+    def test_preserves_historical_rows_when_announcement_feeds_are_newer(self):
+        original = self.flags()
+        result = self.fetch({
+            fd.TWSE_NOTICE_URL: [{"Code": "", "Date": ""}],
+            fd.TPEX_WARNING_URL: [{"SecuritiesCompanyCode": "3131", "Date": "1151120",
+                                   "TradingInformation": "較新公告"}],
+            fd.TWSE_PUNISH_URL: [{"Code": "3532", "Date": "1151120",
+                                  "DispositionPeriod": "115/11/23～115/11/27"}],
+        })
+
+        self.assertEqual((result, self.flags()), ((0, False), original))
+
+    def test_historical_replay_keeps_existing_rows_and_adds_active_disposals(self):
+        original = self.flags()
+        self.assertEqual(self.fetch({
+            fd.TWSE_PUNISH_URL: [
+                {"Code": "3532", "Date": "1151115", "DispositionPeriod": "115/11/16～115/11/19"},
+                {"Code": "3131", "Date": "1151120", "DispositionPeriod": "115/11/19～115/11/23"},
+                {"Code": "6510", "Date": "1151114", "DispositionPeriod": "115/11/16～115/11/18"},
+            ],
+            fd.TPEX_DISPOSAL_URL: [
+                {"SecuritiesCompanyCode": "3491", "Date": "1151118", "DispositionPeriod": "1151119~1151127"},
+            ],
+            fd.TWSE_NOTICE_URL: [
+                {"Code": "6510", "Date": "1151119", "TradingInfoForAttention": "不覆寫既有紀錄"},
+            ],
+        }), (2, False))
+        self.assertEqual(self.flags(), [
+            ("3491", "處置", "", "1151119~1151127"),
+            ("3532", "處置", "", "115/11/16～115/11/19"),
+            *original,
+        ])
+
+    def test_current_day_replaces_flags_after_all_sources_are_verified(self):
+        self.assertEqual(self.fetch({
+            fd.TWSE_NOTICE_URL: [{"Code": "", "Date": ""}],
+            fd.TPEX_WARNING_URL: [
+                {"SecuritiesCompanyCode": "3131", "Date": "1151119", "TradingInformation": reason}
+                for reason in ("第一款", "第六款", "第一款")
+            ],
+            fd.TWSE_PUNISH_URL: [
+                {"Code": "3532", "Date": "1151118", "DispositionPeriod": "115/11/19～115/11/25"},
+            ],
+        }, today=self.day), (2, True))
+        self.assertEqual(self.flags(), [
+            ("3131", "注意", "第一款；第六款", None), ("3532", "處置", "", "115/11/19～115/11/25"),
+        ])
+
+    def test_partial_today_does_not_delete_existing_flags(self):
+        original = self.flags()
+        for unavailable in [
+            OSError("offline"),
+            {},
+            [{"Code": "3532", "Date": "1151117", "DispositionPeriod": "115/11/20～115/11/18"}],
+        ]:
+            with self.subTest(unavailable=unavailable):
+                self.assertEqual(self.fetch({fd.TWSE_PUNISH_URL: unavailable}, today=self.day),
+                                 (0, False))
+                self.assertEqual(self.flags(), original)
+
+    def test_stale_current_day_notice_outside_universe_cannot_verify_coverage(self):
+        original = self.flags()
+        self.assertEqual(self.fetch({
+            fd.TPEX_WARNING_URL: [{"SecuritiesCompanyCode": "0000", "Date": "1151118"}],
+        }, today=self.day), (0, False))
+        self.assertEqual(self.flags(), original)
+
+    def test_malformed_row_does_not_discard_valid_rows_from_same_source(self):
+        original = self.flags()
+        period = "115/11/19～115/11/25"
+        self.assertEqual(self.fetch({
+            fd.TWSE_PUNISH_URL: [
+                {"Code": "3532", "Date": "1151118", "DispositionPeriod": period},
+                {"Code": "3491", "Date": "1151118", "DispositionPeriod": "格式異常"},
+                {"Code": "3131", "Date": "1151118", "DispositionPeriod": period},
+            ],
+        }, today=self.day), (2, False))
+        self.assertEqual(self.flags(), [
+            ("3131", "處置", "", period),
+            ("3532", "處置", "", period),
+            *original,
+        ])
+
+    def test_empty_feeds_can_clear_flags_today_but_not_on_other_days(self):
+        original = self.flags()
+        for other_day in ("2026-11-18", "2026-11-20"):
+            with self.subTest(today=other_day):
+                self.assertEqual((self.fetch({}, today=other_day), self.flags()),
+                                 ((0, False), original))
+        self.assertEqual((self.fetch({}, today=self.day), self.flags()), ((0, True), []))
+
+    def test_empty_feeds_do_not_verify_coverage_if_fetch_crosses_midnight(self):
+        original = self.flags()
+        before = datetime(2026, 11, 19, 23, 59, tzinfo=fd.TAIPEI_TZ)
+        after = datetime(2026, 11, 20, 0, 0, tzinfo=fd.TAIPEI_TZ)
+        with mock.patch.object(fd, "taipei_now", side_effect=[before, after]), \
+                mock.patch.object(fd, "_get_json", return_value=[]):
+            self.assertEqual(fd.fetch_risk_flags(self.con, self.day), (0, False))
+        self.assertEqual(self.flags(), original)
 
 
 class WorkflowCheckpointTest(unittest.TestCase):
