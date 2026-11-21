@@ -3,6 +3,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -136,6 +137,19 @@ class SnapshotSignalsTest(unittest.TestCase):
         self.assertFalse(ss.publication_timing(self.date, "2026-07-11T09:00:00+08:00")["oos_eligible"])
         with self.assertRaisesRegex(ValueError, "時區"):
             ss.publication_timing(self.date, "2026-07-11T09:00:00")
+
+    def test_captured_at_is_normalized_to_utc_before_point_in_time_checks(self):
+        # fundamental_availability.first_seen_at 是 UTC 文字；as_of 須同格式才能以文字比時刻。
+        with mock.patch.object(ss.rv, "build_from_db", wraps=ss.rv.build_from_db) as build:
+            self.capture("taipei", "2026-07-10T21:30:00+08:00")
+        self.assertEqual(build.call_args.kwargs["as_of"], "2026-07-10T13:30:00+00:00")
+        row = self.con.execute(
+            "SELECT captured_at FROM oos_snapshot_runs WHERE snapshot_id='taipei'").fetchone()
+        self.assertEqual(row["captured_at"], "2026-07-10T13:30:00+00:00")
+
+    def test_captured_at_without_timezone_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "時區"):
+            self.capture("naive", "2026-07-10T21:30:00")
 
     def test_append_only_runs_keep_original_and_revision(self):
         sid, date_, created = self.capture("run-1", "2026-07-10T14:00:00+00:00")
