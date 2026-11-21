@@ -391,6 +391,7 @@ svg{display:block;overflow:visible}
 .rkc-sum li+li{margin-top:2px}
 .rkc details{margin-top:12px;border-top:1px solid var(--line2);padding-top:6px}
 .rkc details>summary{cursor:pointer;display:flex;align-items:center;min-height:44px;font-size:12.5px;font-weight:800;color:var(--teal)}
+.rkc-detail p{margin:8px 0 0;font-size:13px;line-height:1.7;color:var(--ink2)}
 .rkc h4{margin:14px 0 6px;font-size:13px;font-weight:850;color:var(--ink)}
 .rkc-row{display:grid;grid-template-columns:minmax(110px,1fr) minmax(150px,1.2fr) minmax(170px,1.1fr) minmax(170px,1.1fr);gap:8px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line2);font-size:12px;color:var(--ink2)}
 .rkc-row.head{font-size:var(--fs-11);color:var(--muted);font-weight:700}
@@ -1874,19 +1875,20 @@ function rankChangeSection(d){
   const x=(RANKCHG.stocks||{})[d.id];
   if(!x||!x.available)return h('section',{class:'rkc'},head,sub(x?('這檔兩週名次不可比：'+x.reason):'兩期正式快照都沒有這檔股票。'));
   const A=RANKCHG.dateA,B=RANKCHG.dateB,f2=v=>v==null?'—':(v>=0?'+':'')+Number(v).toFixed(2);
-  const rk=(r,cs,why)=>r==null?'未列入（'+(why||'—')+'）':'第 '+r+' 名 · '+f2(cs);
+  const rk=(pos,cs,why)=>pos==null?'未列入（'+(why||'—')+'）':pos+' · '+f2(cs);
   const peers=h('div',{},h('div',{class:'rkc-row head'},h('span',{text:'同業'}),h('span',{text:'與它的相對位置'}),h('span',{text:A+' 名次 · 排名分數'}),h('span',{text:B+' 名次 · 排名分數'})),
     ...x.peers.map(p=>h('div',{class:'rkc-row rkc-peer'},h('span',{text:(p.nm||'')+' '+p.id}),
       h('span',{text:p.label+(p.side?'（一直在它'+p.side+(p.side==='同分'?'':'面')+'）':'')}),
-      h('span',{class:'mono',text:A.slice(5)+' '+rk(p.rankA,p.csA,p.whyA)}),h('span',{class:'mono',text:B.slice(5)+' '+rk(p.rankB,p.csB,p.whyB)}))));
-  const dl=x.daily, daily=h('div',{},h('h4',{text:'① 當日分數 composite · 因子分解（不直接決定名次）'}),
-    dl?h('div',{},h('div',{class:'rkc-kv mono'},h('span',{text:A+' '+f2(dl.compA)}),h('span',{text:B+' '+f2(dl.compB)}),h('b',{text:'變動 '+f2(dl.delta)})),
+      h('span',{class:'mono',text:A.slice(5)+' '+rk(p.posA,p.csA,p.whyA)}),h('span',{class:'mono',text:B.slice(5)+' '+rk(p.posB,p.csB,p.whyB)}))));
+  const line=(label,v)=>h('div',{class:'rkc-kv'},h('b',{text:label+'：'}),h('span',{class:'mono',text:v}));
+  const dl=x.daily, daily=h('div',{},h('h4',{text:'當日綜合分數變動（composite，因子分解；不直接決定名次）'}),
+    dl?h('div',{},line('上週 → 本週（差額）',dl.line),
       ...(dl.elements||[]).filter(e=>e.sA!==e.sB).map(e=>h('div',{class:'rkc-row rkc-el'},
         h('span',{text:e.label+' ×'+e.weight}),h('span',{class:'mono',text:'元素分 '+(e.sA>0?'+':'')+e.sA+' → '+(e.sB>0?'+':'')+e.sB}),h('span',{class:'mono',text:'貢獻 '+f2(e.contrib)}))),
       dl.sum!=null&&h('p',{class:'note',style:'margin:6px 0 0',text:'元素貢獻加總 '+f2(dl.sum)+(Math.abs(dl.sum-dl.delta)<0.005?'，與當日分數變動一致。':'，與當日分數變動不一致，需查核。')+'未列出的元素兩週相同。'}))
       :h('p',{class:'note',text:'快照缺當日分數，無法分解。'}));
-  const sm=x.smooth, smooth=h('div',{},h('h4',{text:'② 三日平滑排名分數 composite_s（名次只依這個分數）'}),
-    h('div',{class:'rkc-kv mono'},h('span',{text:A+' '+f2(sm.csA)}),h('span',{text:B+' '+f2(sm.csB)}),h('b',{text:'變動 '+f2(sm.delta)})),
+  const sm=x.smooth, smooth=h('div',{},h('h4',{text:'三日平滑分數變動（composite_s；名次只依這個分數）'}),
+    line('上週 → 本週（差額）',sm.line),
     ...sm.windows.map((w,i)=>h('div',{class:'rkc-win'},h('b',{text:[A,B][i]+' 窗口：'}),
       w.slots.map(s=>s.date.slice(5)+' '+(s.status==='ok'?f2(s.composite):s.label)).join('、'),
       h('div',{style:`color:${w.state==='verified'?'var(--teal)':'var(--amber)'}`,text:(w.mean!=null?'平均 '+f2(w.mean)+'；':'')+w.label+(w.why&&w.why.length?'（'+w.why.join('；')+'）':'')}))));
@@ -1897,9 +1899,10 @@ function rankChangeSection(d){
   return h('section',{class:'rkc','aria-label':'本週排名變化'},
     h('div',{style:'display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap'},head,
       h('span',{class:'chip',style:`color:${x.move>0?'var(--strong)':x.move<0?'var(--weak)':'var(--ink2)'};background:var(--card)`,
-        text:x.rankA+'/'+x.nA+' → '+x.rankB+'/'+x.nB})),
+        text:x.posA+' → '+x.posB})),
     h('ul',{class:'rkc-sum'},...x.summary.map(t=>h('li',{text:t}))),
-    h('details',{},h('summary',{text:'看明細：同業名次、兩週分數與日期'}),peers,daily,smooth,meta));
+    h('details',{},h('summary',{text:'看明細：同業名次、兩週分數與日期'}),
+      h('div',{class:'rkc-detail'},...(x.rankDetail||[]).map(t=>h('p',{text:t}))),peers,daily,smooth,meta));
 }
 function buildDetail(){
   if(!D.detail)return null;

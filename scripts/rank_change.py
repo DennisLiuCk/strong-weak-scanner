@@ -450,33 +450,96 @@ def _names_text(ids, names, limit=3):
     return shown + (f" 等 {len(ids)} 檔" if len(ids) > limit else "")
 
 
-def stock_summary(ex, dA, dB, names=None, group_names=None):
-    """第一層白話摘要(兩三句):名次、超車/被超越、同分與成員變動對名次的影響。"""
+CN_NUM = dict(zip(range(2, 11), "兩三四五六七八九十"))
+MINUS = "\u2212"
+
+
+def first_position(rank, ties):
+    """同分組占的第一個名次(midrank = 第一個名次 + 同分檔數/2)。"""
+    return int(round(rank - ties / 2))
+
+
+def pos_text(rank, ties):
+    return None if rank is None else f"{'並列' if ties else ''}第 {first_position(rank, ties)}"
+
+
+def signed(x):
+    return f"{x:+.2f}".replace("-", MINUS)
+
+
+def change_line(a, b):
+    """上週值 → 本週值（差額），例 +6.10 → −3.10（−9.20）。"""
+    return f"{signed(a)} → {signed(b)}（{signed(round(b - a, 2))}）"
+
+
+def _nm(names, s):
+    return names.get(s, s) or s
+
+
+def _sp(text):
+    """拉丁字尾(如 -KY)接中文時補半形空白。"""
+    return text + " " if text and text[-1].isascii() else text
+
+
+def group_members(rows, grp):
+    return {s for s, r in rows.items() if r.get("grp") == grp}
+
+
+def stock_texts(ex, A, B, stock, names=None, group_names=None):
+    """(第一層摘要, 明細名次說明);名次一律以 explain() 的平均序位與同分數換算。"""
     names, group_names = names or {}, group_names or {}
     K, byp = ex["cats"], {r["stock"]: r for r in ex["peers"]}
-    move = ex["rankA"] - ex["rankB"]
-    verb = f"上升 {move:g} 席" if move > 0 else f"下降 {-move:g} 席" if move < 0 else "名次不變"
-    tie = lambda t: f"(與 {t} 檔同分)" if t else ""
-    g = group_names.get(ex["grp"], ex["grp"])
-    s1 = (f"上週({dA})在{g}族群 {ex['nA']} 檔中排第 {ex['rankA']:g} 名{tie(ex['tieA'])},"
-          f"本週({dB})在 {ex['nB']} 檔中排第 {ex['rankB']:g} 名{tie(ex['tieB'])},{verb}。")
-    by_rank = lambda ids: sorted(ids, key=lambda p: (byp[p]["rankB"] is None, byp[p]["rankB"] or 0, p))
-    up, down = by_rank(K["overtook_target"]), by_rank(K["overtaken_by_target"])
-    if up or down:
-        s2 = ((f"有 {len(up)} 檔同業從後面超車({_names_text(up, names)})" if up else "沒有同業從後面超車")
-              + (f",它超越了 {len(down)} 檔原本在前面的同業({_names_text(down, names)})。" if down
-                 else ",它沒有超越原本在前面的同業。"))
+    g, nm = group_names.get(ex["grp"], ex["grp"]), _nm(names, stock)
+    fA, fB = first_position(ex["rankA"], ex["tieA"]), first_position(ex["rankB"], ex["tieB"])
+    tied = lambda v: [p for p, r in sorted(byp.items(), key=lambda kv: kv[0]) if r[v] == 0.5]
+    with_ = lambda ids: "和" + _sp("、".join(_nm(names, p) for p in ids))
+    pa = f"{with_(tied('vA'))}並列第 {fA}" if ex["tieA"] else f"排第 {fA}"
+    up, down = len(K["overtaken_by_target"]), len(K["overtook_target"])
+    passing = ("超過 {u} 檔同業、也被 {d} 檔同業超過" if up and down else
+               "被 {d} 檔同業超過" if down else "超過 {u} 檔同業" if up else "").format(u=up, d=down)
+    if ex["tieB"]:
+        pb = f"{with_(tied('vB'))}並列第 {fB}"
     else:
-        s2 = "沒有同業和它互換前後位置。"
-    tie_eff = sum(byp[p]["vB"] - byp[p]["vA"] for p in K["tie_change"])
-    mem = K["left"] + K["joined"]
-    mem_eff = sum(-byp[p]["vA"] for p in K["left"]) + sum(byp[p]["vB"] for p in K["joined"])
-    eff = lambda x: f"名次退後 {x:g} 席" if x > 0 else f"名次前進 {-x:g} 席" if x < 0 else "名次沒有因此改變"
-    t3 = (f"同分狀態改變 {len(K['tie_change'])} 檔({_names_text(K['tie_change'], names)}),{eff(tie_eff)}"
-          if K["tie_change"] else "同分沒有影響名次")
-    m3 = (f"{len(K['left'])} 檔未列入本週族群排名、{len(K['joined'])} 檔本週新列入,{eff(mem_eff)}"
-          if mem else "族群成員沒有增減")
-    return [s1, s2, f"{t3};{m3}。"]
+        pb = (f"升到第 {fB}" if fB < fA else f"掉到第 {fB}" if fB > fA else f"仍排第 {fB}")
+    s1 = f"{_sp(nm)}上週在{g}族群{pa}，本週" + (f"{passing}，{pb}。" if passing else f"{pb}。")
+    mA, mB = group_members(A, ex["grp"]), group_members(B, ex["grp"])
+    left, joined = sorted(mA - mB), sorted(mB - mA)
+    if mA == mB and ex["nA"] == ex["nB"] == len(mA):
+        s2 = f"兩週都是同樣的 {len(mA)} 檔股票。"
+    elif mA == mB:
+        s2 = f"兩週族群名單相同，但有股票缺排名分數：上週排名 {ex['nA']} 檔、本週 {ex['nB']} 檔。"
+    else:
+        s2 = (f"族群成員有變動：上週 {ex['nA']} 檔、本週 {ex['nB']} 檔參與排名"
+              + (f"，{_sp(_names_text(left, names))}本週不在族群" if left else "")
+              + (f"，{_sp(_names_text(joined, names))}本週新加入" if joined else "") + "。")
+
+    def tie_sentence(rank, ties, prefix=""):
+        f = first_position(rank, ties)
+        seats = "、".join(str(f + i) for i in range(ties + 1))
+        return f"{prefix}{CN_NUM.get(ties + 1, ties + 1)}檔同分，占第 {seats} 席，平均名次為 {rank:g}"
+    move = ex["rankA"] - ex["rankB"]
+    mv = (f"比上週前進 {move:g} 席" if move > 0 else f"比上週退後 {-move:g} 席" if move < 0
+          else "與上週相同")
+    detail = []
+    if ex["tieA"]:
+        detail.append(tie_sentence(ex["rankA"], ex["tieA"], "上週") + "。")
+    detail.append((tie_sentence(ex["rankB"], ex["tieB"], "本週" if ex["tieA"] else "") if ex["tieB"]
+                   else f"本週沒有同分，名次為第 {fB}") + f"，{mv}。")
+    eff = lambda x: f"退後 {x:g} 席" if x > 0 else f"前進 {-x:g} 席" if x < 0 else "名次不受影響"
+    parts = []
+    if down:
+        parts.append(f"被 {down} 檔超過（{eff(down)}）")
+    if up:
+        parts.append(f"超過 {up} 檔（{eff(-up)}）")
+    if K["tie_change"]:
+        parts.append(f"同分狀態改變 {len(K['tie_change'])} 檔"
+                     f"（{_names_text(K['tie_change'], names)}，"
+                     f"{eff(sum(byp[p]['vB'] - byp[p]['vA'] for p in K['tie_change']))}）")
+    if K["left"] or K["joined"]:
+        parts.append(f"成員增減 {len(K['left']) + len(K['joined'])} 檔（"
+                     f"{eff(sum(-byp[p]['vA'] for p in K['left']) + sum(byp[p]['vB'] for p in K['joined']))}）")
+    detail.append("名次拆解：" + ("；".join(parts) if parts else "沒有同業和它交換位置、同分或增減") + "。")
+    return [s1, s2], detail
 
 
 def _window_view(all_slots):
@@ -496,9 +559,15 @@ def stock_payload(con, firsts, cal, A, B, stock, dA, dB, names=None, group_names
         ex = explain(A, B, stock)
     except ValueError as exc:
         return {"available": False, "reason": str(exc)}
+    g = ex["grp"]
+    rgA = rank_group({s: r for s, r in A.items() if r.get("grp") == g})
+    rgB = rank_group({s: r for s, r in B.items() if r.get("grp") == g})
+    summary, rank_detail = stock_texts(ex, A, B, stock, names, group_names)
     peers = [{"id": r["stock"], "nm": names.get(r["stock"], ""), "cat": r["cat"], "label": PEER_LABEL[r["cat"]],
               "side": None if r["vA"] is None or r["vA"] != r["vB"] else {1.0: "前", 0.5: "同分", 0.0: "後"}[r["vA"]],
               "rankA": r["rankA"], "rankB": r["rankB"], "csA": _r(r["csA"]), "csB": _r(r["csB"]),
+              "posA": pos_text(*rgA[r["stock"]][::2]) if r["stock"] in rgA else None,
+              "posB": pos_text(*rgB[r["stock"]][::2]) if r["stock"] in rgB else None,
               "whyA": r["whyA"][1] if r["whyA"] else None, "whyB": r["whyB"][1] if r["whyB"] else None}
              for r in ex["peers"]]
     order = list(PEER_LABEL)
@@ -509,14 +578,17 @@ def stock_payload(con, firsts, cal, A, B, stock, dA, dB, names=None, group_names
         els = [{"k": e, "label": EL_NAME[e], "sA": a, "sB": b, "weight": WEIGHTS[e], "contrib": w}
                for e, a, b, w in (ex["elements"] or [])]
         daily = {"compA": _r(ex["compA"]), "compB": _r(ex["compB"]), "delta": round(ex["compB"] - ex["compA"], 2),
+                 "line": change_line(ex["compA"], ex["compB"]),
                  "elements": els, "sum": round(sum(e["contrib"] for e in els), 2) if els else None}
     windows = [_window_view(smoothing_window(con, firsts, cal, stock, d)) for d in (dA, dB)]
     return {"available": True, "grp": ex["grp"], "rankA": ex["rankA"], "rankB": ex["rankB"],
             "nA": ex["nA"], "nB": ex["nB"], "tieA": ex["tieA"], "tieB": ex["tieB"],
             "move": ex["rankA"] - ex["rankB"],
+            "posA": pos_text(ex["rankA"], ex["tieA"]), "posB": pos_text(ex["rankB"], ex["tieB"]),
             "counts": {k: len(v) for k, v in ex["cats"].items()},
-            "summary": stock_summary(ex, dA, dB, names, group_names), "peers": peers, "daily": daily,
+            "summary": summary, "rankDetail": rank_detail, "peers": peers, "daily": daily,
             "smooth": {"csA": _r(ex["csA"]), "csB": _r(ex["csB"]), "delta": round(ex["csB"] - ex["csA"], 2),
+                       "line": change_line(ex["csA"], ex["csB"]),
                        "windows": windows}}
 
 

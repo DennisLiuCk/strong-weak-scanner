@@ -352,10 +352,15 @@ class DashboardPayload(unittest.TestCase):
         self.assertEqual((self.p["dateA"], self.p["dateB"]), ("2026-11-13", "2026-11-20"))
         self.assertEqual((self.p["snapshotA"], self.p["snapshotB"]), ("r-2026-11-13", "r-2026-11-20"))
         self.assertEqual((x["rankA"], x["nA"], x["rankB"], x["nB"], x["tieB"]), (2, 4, 2.5, 3, 1))
+        self.assertEqual((x["posA"], x["posB"]), ("第 2", "並列第 2"))
         self.assertEqual(x["summary"], [
-            "上週(2026-11-13)在測試族群 4 檔中排第 2 名,本週(2026-11-20)在 3 檔中排第 2.5 名(與 1 檔同分),下降 0.5 席。",
-            "有 1 檔同業從後面超車(超車股),它沒有超越原本在前面的同業。",
-            "同分狀態改變 1 檔(同分股),名次退後 0.5 席;1 檔未列入本週族群排名、0 檔本週新列入,名次前進 1 席。"])
+            "T 上週在測試族群排第 2，本週被 1 檔同業超過，和同分股並列第 2。",
+            "族群成員有變動：上週 4 檔、本週 3 檔參與排名，離開股本週不在族群。"])
+        self.assertEqual(x["rankDetail"], [
+            "兩檔同分，占第 2、3 席，平均名次為 2.5，比上週退後 0.5 席。",
+            "名次拆解：被 1 檔超過（退後 1 席）；同分狀態改變 1 檔（同分股，退後 0.5 席）；"
+            "成員增減 1 檔（前進 1 席）。"])
+        self.assertEqual({p["id"]: p["posB"] for p in x["peers"]}, {"X": "第 1", "Y": "並列第 2", "L": None})
         cats = {p["id"]: (p["cat"], p["rankA"], p["rankB"], p["csA"], p["csB"], p["whyB"]) for p in x["peers"]}
         self.assertEqual(cats, {"X": ("overtook_target", 3, 1, 2.0, 4.0, None),
                                 "Y": ("tie_change", 4, 2.5, 0.0, 1.0, None),
@@ -364,6 +369,8 @@ class DashboardPayload(unittest.TestCase):
     def test_daily_composite_and_smoothed_composite_s_are_separate(self):
         x = self.p["stocks"]["T"]
         self.assertEqual((x["daily"]["compA"], x["daily"]["compB"], x["daily"]["delta"]), (3.0, 1.0, -2.0))
+        self.assertEqual(x["daily"]["line"], "+3.00 → +1.00（−2.00）")
+        self.assertEqual(x["smooth"]["line"], "+3.00 → +1.00（−2.00）")
         self.assertEqual((x["smooth"]["csA"], x["smooth"]["csB"], x["smooth"]["delta"]), (3.0, 1.0, -2.0))
         w = x["smooth"]["windows"]
         self.assertEqual([s["date"] for s in w[1]["slots"]], ["2026-11-18", "2026-11-19", "2026-11-20"])
@@ -374,13 +381,47 @@ class DashboardPayload(unittest.TestCase):
         self.assertEqual(sorted(self.p["stocks"]), ["L", "T", "X", "Y"])
         x = self.p["stocks"]["X"]
         self.assertEqual((x["rankA"], x["rankB"]), (3, 1))
-        self.assertIn("它超越了 1 檔原本在前面的同業(T)", x["summary"][1])
+        self.assertEqual(x["summary"][0], "超車股上週在測試族群排第 3，本週超過 1 檔同業，升到第 1。")
         self.assertFalse(self.p["stocks"]["L"]["available"])
         self.assertIn("L", self.p["stocks"]["L"]["reason"])
 
     def test_unpublished_date_is_selection_error(self):
         with self.assertRaises(rc.SelectionError):
             rc.dashboard_payload(self.con, at("2026-11-21T10:00"), ["2026-11-13", "2026-11-23"])
+
+
+class DashboardTexts(unittest.TestCase):
+    """第一層摘要用同分組第一個名次;明細才寫占哪幾席與平均名次。"""
+
+    def texts(self, A, B, stock="T", names=None):
+        return rc.stock_texts(rc.explain(A, B, stock), A, B, stock, names, {"g": "矽智財"})
+
+    def test_three_way_tie_shows_first_seat_and_average_rank(self):
+        A = snap({"a": 9.0, "b": 8.0, "c": 7.0, "d": 6.0, "T": 5.0, "U": 4.0, "V": 1.0})
+        B = snap({"a": 9.0, "b": 8.0, "c": 7.0, "d": 6.0, "T": 3.0, "U": 3.0, "V": 3.0})
+        summary, detail = self.texts(A, B, names={"T": "目標", "U": "甲", "V": "乙"})
+        self.assertEqual(rc.rank_group(B)["T"], (6.0, 7, 2))
+        self.assertEqual(summary, ["目標上週在矽智財族群排第 5，本週和甲、乙並列第 5。", "兩週都是同樣的 7 檔股票。"])
+        self.assertEqual(detail[0], "三檔同分，占第 5、6、7 席，平均名次為 6，比上週退後 1 席。")
+        self.assertIn("同分狀態改變 2 檔", detail[1])
+
+    def test_same_count_but_different_members_is_not_called_same(self):
+        A = snap({"a": 9.0, "T": 5.0, "b": 1.0})
+        B = snap({"a": 9.0, "T": 5.0, "c": 1.0})
+        summary, _ = self.texts(A, B)
+        self.assertNotIn("同樣的", summary[1])
+        self.assertEqual(summary[1], "族群成員有變動：上週 3 檔、本週 3 檔參與排名，b 本週不在族群，c 本週新加入。")
+        self.assertEqual(summary[0], "T 上週在矽智財族群排第 2，本週仍排第 2。")
+
+    def test_same_members_with_missing_score_is_not_called_same(self):
+        A = snap({"a": 9.0, "T": 5.0, "b": 1.0})
+        B = snap({"a": 9.0, "T": 5.0, "b": None})
+        summary, _ = self.texts(A, B)
+        self.assertNotIn("同樣的", summary[1])
+
+    def test_change_line_uses_true_minus_and_rounded_delta(self):
+        self.assertEqual(rc.change_line(6.1, -3.1), "+6.10 → −3.10（−9.20）")
+        self.assertEqual(rc.change_line(6.4333, -0.9667), "+6.43 → −0.97（−7.40）")
 
 
 class Cli(unittest.TestCase):
