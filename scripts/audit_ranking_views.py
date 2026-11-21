@@ -296,6 +296,7 @@ def formal_progress(con, spec_sha, *, fwd=10):
     have_views = _table_exists(con, "oos_ranking_view_snapshots")
     specs_seen = set()
     current_dates = []
+    latest_complete_spec_date = None
     historical_other_spec_days = 0
     pre_effective_current_spec_days = 0
     invalid_runs = []
@@ -324,13 +325,15 @@ def formal_progress(con, spec_sha, *, fwd=10):
                 and not json_error
                 and len(payloads) == len(rows)
             )
-            if structurally_complete and specs == {spec_sha} and run["data_date"] < rv.EFFECTIVE_FROM:
-                pre_effective_current_spec_days += 1
-            elif structurally_complete and specs == {spec_sha}:
-                current_dates.append(run["data_date"])
-                parsed_rows += len(payloads)
-                latest_snapshot_health = analyze_rows(payloads)
-                current_payloads_by_date[run["data_date"]] = payloads
+            if structurally_complete and specs == {spec_sha}:
+                latest_complete_spec_date = run["data_date"]
+                if run["data_date"] < rv.EFFECTIVE_FROM:
+                    pre_effective_current_spec_days += 1
+                else:
+                    current_dates.append(run["data_date"])
+                    parsed_rows += len(payloads)
+                    latest_snapshot_health = analyze_rows(payloads)
+                    current_payloads_by_date[run["data_date"]] = payloads
             elif structurally_complete:
                 historical_other_spec_days += 1
             elif rows:
@@ -376,6 +379,7 @@ def formal_progress(con, spec_sha, *, fwd=10):
         "late_publication_days": len(set(current_dates) - eligible_dates),
         "current_spec_first_date": current_dates[0] if current_dates else None,
         "current_spec_latest_date": current_dates[-1] if current_dates else None,
+        "latest_complete_spec_date": latest_complete_spec_date,
         "mature_10d_days": len(mature_dates),
         "effective_independent_obs_approx": round(eff_obs, 2),
         "phase": phase,
@@ -417,10 +421,11 @@ def build_audit(con, *, date=None, fwd=10, require_current_snapshot=False):
         hard_errors.append("query_only_not_enforced")
 
     progress = formal_progress(con, rv.SPEC_SHA, fwd=fwd)
-    if require_current_snapshot and progress["current_spec_latest_date"] != date:
+    latest_complete = progress["latest_complete_spec_date"]
+    if require_current_snapshot and latest_complete != date:
         hard_errors.append(
             "current_formal_snapshot_missing:"
-            f"data_date={date},latest={progress['current_spec_latest_date']}"
+            f"data_date={date},latest={latest_complete}"
         )
     if progress["invalid_runs"]:
         hard_errors.append("invalid_or_mixed_spec_snapshot")

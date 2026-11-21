@@ -204,7 +204,7 @@ class FormalProgressTest(unittest.TestCase):
         self.assertEqual(result["structural_history"]["days"], 3)
         self.assertEqual(result["late_publication_days"], 0)
 
-    def test_pending_new_version_never_weakens_daily_snapshot_gate(self):
+    def add_current_census(self):
         self.con.executescript("""
             CREATE TABLE daily_scores(date,stock_id);
             CREATE TABLE daily_metrics(date,stock_id);
@@ -213,6 +213,9 @@ class FormalProgressTest(unittest.TestCase):
             INSERT INTO daily_metrics VALUES('2026-10-08','A'),('2026-10-08','B');
             INSERT INTO universe VALUES('A'),('B');
         """)
+
+    def test_pending_new_version_never_weakens_daily_snapshot_gate(self):
+        self.add_current_census()
         self.add_run("old", "2026-10-08", "2026-10-08T16:00:00Z", "old-spec")
         self.con.execute("PRAGMA query_only=1")
         payload = {"rows": [view_row("A", "g", 0), view_row("B", "g", 100)]}
@@ -223,6 +226,20 @@ class FormalProgressTest(unittest.TestCase):
         self.assertEqual(pending["hard_errors"], [])
         self.assertEqual(strict["status"], "fail")
         self.assertTrue(any("current_formal_snapshot_missing" in error for error in strict["hard_errors"]))
+
+    def test_first_publication_of_pre_effective_day_passes_without_counting_as_oos(self):
+        self.add_current_census()
+        self.add_run("recovery", "2026-10-08", "2026-10-09T16:00:00Z", rv.SPEC_SHA)
+        self.con.execute("PRAGMA query_only=1")
+        payload = {"rows": [view_row("A", "g", 0), view_row("B", "g", 100)]}
+        with mock.patch.object(rv, "build_from_db", return_value=payload):
+            result = audit.build_audit(self.con, require_current_snapshot=True)
+        self.assertEqual(result["hard_errors"], [])
+        self.assertEqual(result["status"], "pending")
+        progress = result["formal_progress"]
+        self.assertEqual(progress["pre_effective_current_spec_days"], 1)
+        self.assertEqual(progress["current_spec_days"], 0)
+        self.assertEqual(progress["current_spec_oos_days"], 0)
 
 
 class OutputContractTest(unittest.TestCase):
