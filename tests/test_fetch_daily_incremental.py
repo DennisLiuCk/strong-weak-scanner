@@ -636,6 +636,8 @@ class IncrementalFetchTest(unittest.TestCase):
         self.con = sqlite3.connect(":memory:")
         self.con.executescript(fd.SCHEMA)
         self.ids = ["2330", "2454"]
+        self.con.executemany("INSERT INTO universe(stock_id) VALUES(?)",
+                             [(sid,) for sid in self.ids])
         for day in ("2026-07-08", "2026-07-09"):
             for sid in self.ids:
                 self.con.execute(
@@ -919,6 +921,23 @@ class IncrementalFetchTest(unittest.TestCase):
             ("TaiwanStockShareholding", "TPEx", "2026-07-09", {"2454"}),
         ])
 
+    def test_subset_final_pass_does_not_complete_universe(self):
+        dataset = "TaiwanStockShareholding"
+        fd.fetch_missing_raw(
+            self.con, self.ids[:1], [dataset], "2026-07-09", "2026-07-09",
+            None, sleep=0, fetcher=self.fake_fetch, final_pass=True)
+        self.assertEqual(len(self.calls), 2)
+        self.assertIsNone(fd._coverage_get(self.con, "exchange_final", dataset))
+
+        self.calls.clear()
+        stats = fd.fetch_missing_raw(
+            self.con, self.ids, [dataset], "2026-07-09", "2026-07-09",
+            None, sleep=0, fetcher=self.fake_fetch, final_pass=True)
+        self.assertEqual(stats["requests"], 2)
+        self.assertEqual([call[3] for call in self.calls], [set(self.ids)] * 2)
+        self.assertEqual(fd._coverage_get(self.con, "exchange_final", dataset),
+                         "2026-07-09")
+
     def test_final_pass_refreshes_latest_holding_once(self):
         calls = []
 
@@ -950,6 +969,24 @@ class IncrementalFetchTest(unittest.TestCase):
             fetcher=final_holding, final_pass=True)
         self.assertEqual(repeat["requests"], 0)
         self.assertEqual(calls, [])
+
+    def test_filtered_or_empty_final_pass_does_not_complete_universe(self):
+        dataset = "TaiwanStockShareholding"
+        for ids, filtered in ((self.ids, True), ([], False)):
+            with self.subTest(ids=ids, filtered=filtered):
+                fd.fetch_missing_raw(
+                    self.con, ids, [dataset], "2026-07-09", "2026-07-09", None,
+                    sleep=0, fetcher=self.fake_fetch, final_pass=True, filtered=filtered)
+                self.assertIsNone(fd._coverage_get(self.con, "exchange_final", dataset))
+
+    def test_failed_final_pass_does_not_complete_universe(self):
+        dataset = "TaiwanStockShareholding"
+        with self.assertRaises(fd.ExchangeRawFetchError):
+            fd.fetch_missing_raw(
+                self.con, self.ids, [dataset], "2026-07-09", "2026-07-09", None,
+                sleep=0, fetcher=mock.Mock(side_effect=RuntimeError("offline")),
+                final_pass=True)
+        self.assertIsNone(fd._coverage_get(self.con, "exchange_final", dataset))
 
     def test_incomplete_price_batch_checkpoints_and_stops_before_other_raw_tables(self):
         def incomplete_price(source, day, wanted_ids):

@@ -1323,12 +1323,13 @@ def fetch_exchange_raw_dataset(con, ids, dataset, dates, overwrite_dates=None, f
 
 def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
                       force=False, fetcher=None, price_fetcher=None, final_pass=False,
-                      backfill_expanded_fields=False, suspension_resolver=None):
+                      backfill_expanded_fields=False, suspension_resolver=None,
+                      filtered=False):
     """五張原始表皆走交易所按日批次，只補 SQLite 尚缺的 dataset×日期。
 
     交易日以 price∪market 為準。未知尾端逐日用 TWSE+TPEx 批次探測；找到新交易日後，
     其餘四張表才各以 TWSE+TPEx 全市場報表補齊。`final_pass` 會把最新 holding 重新抓取
-    一次，避免 18:00 初版阻止 22:00 最終版覆寫；完成日另記 coverage，重跑保持冪等。
+    一次，避免 18:00 初版阻止 22:00 最終版覆寫；僅未篩選的完整 universe 記最終 coverage。
     `backfill_expanded_fields` 只掃既有交易日，把 RAW_COLUMN_MIGRATIONS 中任一 NULL 視為
     缺口；每個來源完成即 commit，同一命令中斷後可只續補剩餘股票／日期。
     """
@@ -1425,7 +1426,8 @@ def fetch_missing_raw(con, ids, ds_list, start, end, token, sleep=0.25,
 
     # 延至所有指定原始表都成功後才標示 holding 最終版；若後續 margin/sbl 失敗，
     # 23:47 終版重跑仍會再次刷新 holding，不會讓早場版本被誤認為完成。
-    if final_holding_day:
+    universe_ids = {row[0] for row in con.execute("SELECT stock_id FROM universe")}
+    if final_holding_day and not filtered and universe_ids and set(ids) == universe_ids:
         _coverage_set(con, "exchange_final", "TaiwanStockShareholding", final_holding_day)
         con.commit()
 
@@ -2211,6 +2213,7 @@ def main():
     stats = fetch_missing_raw(
         con, ids, ds_list, start, end, token, args.sleep, force=args.force,
         final_pass=args.final_pass,
+        filtered=bool(args.stocks),
         backfill_expanded_fields=args.backfill_expanded_fields,
         suspension_resolver=suspension_events.resolve_missing_prices)
     total = stats["rows"]
