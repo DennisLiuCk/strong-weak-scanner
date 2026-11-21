@@ -78,6 +78,21 @@ class DashboardJsBehaviourTest(unittest.TestCase):
         ])
         self.assertEqual(got, ['archive/2026-09-08.html', '2026-09-08.html', None])
 
+    def test_archive_nav_dates_merge_manifest_with_embedded_fallback(self):
+        pre = extract('archiveSnapshotHref') + extract('archiveNavDates') + """
+const embedded=['2026-11-18','2026-11-19'];
+const page='/strong-weak-scanner/archive/2026-11-19.html';
+"""
+        got = self.run_js(pre, [
+            ('僅內嵌清單', "archiveNavDates(embedded,page)"),
+            ('manifest 補上較新日期', "archiveNavDates(embedded.concat(['2026-11-18','2026-11-19','2026-11-20']),page)"),
+            ('manifest 缺漏不刪內嵌日期', "archiveNavDates(embedded.concat(['2026-11-20']),page)"),
+            ('過濾非法項目', "archiveNavDates(embedded.concat(['../index','2026-11-20']),page)"),
+        ])
+        self.assertEqual(got[0], ['2026-11-19', '2026-11-18'])
+        for merged in got[1:]:
+            self.assertEqual(merged, ['2026-11-20', '2026-11-19', '2026-11-18'])
+
     def test_stock_search_groups_preserve_scope_rank_and_suspended_order(self):
         pre = extract('stockSearchGroups') + """
 const groups=[{g:'memory'},{g:'ip'}];

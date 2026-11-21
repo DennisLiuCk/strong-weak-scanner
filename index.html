@@ -1990,16 +1990,27 @@ function archiveSnapshotHref(date,pathname){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return null;
   return (pathname.includes('/archive/')?'':'archive/')+date+'.html';
 }
+function archiveNavDates(dates,pathname){
+  return [...new Set(dates)].filter(date=>archiveSnapshotHref(date,pathname)).sort().reverse();
+}
 function buildArchiveNavigation(){
-  const dates=[...new Set(ARCHIVE_DATES)].filter(date=>archiveSnapshotHref(date,location.pathname)).sort().reverse();
+  const dates=archiveNavDates(ARCHIVE_DATES,location.pathname);
   const box=h('div',{class:'archive-picker'},h('label',{for:'archive-date',text:'歷史快照日期'}));
   if(!dates.length){box.appendChild(h('span',{class:'note',text:'尚無可用快照'}));return box;}
   const select=h('select',{id:'archive-date',class:'sortbtn'});
-  dates.forEach(date=>select.appendChild(h('option',{value:date,text:date})));
-  if(dates.includes(DATE_ISO))select.value=DATE_ISO;
   const link=h('a',{target:'_blank',rel:'noopener noreferrer',text:'開啟當日快照 ↗'});
   const update=()=>{link.href=archiveSnapshotHref(select.value,location.pathname);link.setAttribute('aria-label','開啟 '+select.value+' 歷史快照（另開分頁）');};
-  select.addEventListener('change',update);update();
+  const fill=list=>{const keep=select.value||DATE_ISO;
+    select.replaceChildren(...list.map(date=>h('option',{value:date,text:date})));
+    if(list.includes(keep))select.value=keep;
+    update();};
+  select.addEventListener('change',update);fill(dates);
+  // 內嵌清單在 build 當下凍結；上線後再讀 manifest 補上之後發布的快照
+  if(location.protocol!=='file:'){
+    const manifest=(location.pathname.includes('/archive/')?'':'archive/')+'manifest.json';
+    fetch(manifest,{cache:'no-cache'}).then(r=>r.ok?r.json():null)
+      .then(list=>{if(Array.isArray(list))fill(archiveNavDates(dates.concat(list),location.pathname));}).catch(()=>{});
+  }
   box.append(select,link,h('span',{class:'note',text:'另開分頁；保留當日首次發布的原始畫面。'}));
   if(location.pathname.includes('/archive/'))box.appendChild(h('a',{href:'../index.html',text:'返回最新掃描'}));
   return box;
