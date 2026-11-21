@@ -535,9 +535,17 @@ def stock_texts(ex, A, B, stock, names=None, group_names=None):
         parts.append(f"同分狀態改變 {len(K['tie_change'])} 檔"
                      f"（{_names_text(K['tie_change'], names)}，"
                      f"{eff(sum(byp[p]['vB'] - byp[p]['vA'] for p in K['tie_change']))}）")
-    if K["left"] or K["joined"]:
-        parts.append(f"成員增減 {len(K['left']) + len(K['joined'])} 檔（"
-                     f"{eff(sum(-byp[p]['vA'] for p in K['left']) + sum(byp[p]['vB'] for p in K['joined']))}）")
+    still_tied = [p for p in K["unchanged"] if byp[p]["vA"] == 0.5]
+    if still_tied:
+        parts.append(f"和{_sp(_names_text(still_tied, names))}兩週都同分，同分狀態沒變（名次不受影響）")
+    for ids, side, text in (
+            ([p for p in K["left"] if byp[p]["whyB"][0] == "null"], "vA", "缺分數，未列入排名"),
+            ([p for p in K["left"] if byp[p]["whyB"][0] != "null"], "vA", "本週不在族群"),
+            ([p for p in K["joined"] if byp[p]["whyA"][0] == "null"], "vB", "上週缺分數，本週列入排名"),
+            ([p for p in K["joined"] if byp[p]["whyA"][0] != "null"], "vB", "本週新加入族群")):
+        if ids:
+            sign = -1 if side == "vA" else 1
+            parts.append(f"{_sp(_names_text(ids, names))}{text}（{eff(sign * sum(byp[p][side] for p in ids))}）")
     detail.append("名次拆解：" + ("；".join(parts) if parts else "沒有同業和它交換位置、同分或增減") + "。")
     return [s1, s2], detail
 
@@ -563,7 +571,15 @@ def stock_payload(con, firsts, cal, A, B, stock, dA, dB, names=None, group_names
     rgA = rank_group({s: r for s, r in A.items() if r.get("grp") == g})
     rgB = rank_group({s: r for s, r in B.items() if r.get("grp") == g})
     summary, rank_detail = stock_texts(ex, A, B, stock, names, group_names)
-    peers = [{"id": r["stock"], "nm": names.get(r["stock"], ""), "cat": r["cat"], "label": PEER_LABEL[r["cat"]],
+    def peer_label(r):
+        if r["cat"] == "left" and r["whyB"][0] == "null":
+            return "缺分數，未列入排名"
+        if r["cat"] == "joined" and r["whyA"][0] == "null":
+            return "上週缺分數，本週列入排名"
+        if r["cat"] == "unchanged" and r["vA"] == 0.5:
+            return "同分狀態沒變"
+        return PEER_LABEL[r["cat"]]
+    peers = [{"id": r["stock"], "nm": names.get(r["stock"], ""), "cat": r["cat"], "label": peer_label(r),
               "side": None if r["vA"] is None or r["vA"] != r["vB"] else {1.0: "前", 0.5: "同分", 0.0: "後"}[r["vA"]],
               "rankA": r["rankA"], "rankB": r["rankB"], "csA": _r(r["csA"]), "csB": _r(r["csB"]),
               "posA": pos_text(*rgA[r["stock"]][::2]) if r["stock"] in rgA else None,

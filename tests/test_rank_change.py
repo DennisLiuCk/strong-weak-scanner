@@ -359,7 +359,7 @@ class DashboardPayload(unittest.TestCase):
         self.assertEqual(x["rankDetail"], [
             "兩檔同分，占第 2、3 席，平均名次為 2.5，比上週退後 0.5 席。",
             "名次拆解：被 1 檔超過（退後 1 席）；同分狀態改變 1 檔（同分股，退後 0.5 席）；"
-            "成員增減 1 檔（前進 1 席）。"])
+            "離開股本週不在族群（前進 1 席）。"])
         self.assertEqual({p["id"]: p["posB"] for p in x["peers"]}, {"X": "第 1", "Y": "並列第 2", "L": None})
         cats = {p["id"]: (p["cat"], p["rankA"], p["rankB"], p["csA"], p["csB"], p["whyB"]) for p in x["peers"]}
         self.assertEqual(cats, {"X": ("overtook_target", 3, 1, 2.0, 4.0, None),
@@ -415,9 +415,30 @@ class DashboardTexts(unittest.TestCase):
 
     def test_same_members_with_missing_score_is_not_called_same(self):
         A = snap({"a": 9.0, "T": 5.0, "b": 1.0})
-        B = snap({"a": 9.0, "T": 5.0, "b": None})
-        summary, _ = self.texts(A, B)
-        self.assertNotIn("同樣的", summary[1])
+        B = snap({"a": None, "T": 5.0, "b": 1.0})
+        summary, detail = self.texts(A, B, names={"a": "缺分股"})
+        self.assertEqual(summary, ["T 上週在矽智財族群排第 2，本週升到第 1。",
+                                   "兩週族群名單相同，但有股票缺排名分數：上週排名 3 檔、本週 2 檔。"])
+        self.assertEqual(detail, ["本週沒有同分，名次為第 1，比上週前進 1 席。",
+                                  "名次拆解：缺分股缺分數，未列入排名（前進 1 席）。"])
+
+    def test_missing_score_vs_left_group_and_rejoined_are_worded_apart(self):
+        A = snap({"a": 9.0, "c": 8.0, "T": 5.0, "d": None})
+        B = snap({"a": None, "T": 5.0, "d": 7.0})
+        B["c"] = {"grp": "other", "composite_s": 8.0}
+        _, detail = self.texts(A, B, names={"a": "甲", "c": "乙", "d": "丙"})
+        self.assertEqual(detail, ["本週沒有同分，名次為第 2，比上週前進 1 席。",
+                                  "名次拆解：甲缺分數，未列入排名（前進 1 席）；乙本週不在族群（前進 1 席）；"
+                                  "丙上週缺分數，本週列入排名（退後 1 席）。"])
+
+    def test_persistent_tie_says_tie_unchanged(self):
+        A = snap({"a": 9.0, "T": 5.0, "U": 5.0, "b": 1.0})
+        B = snap({"a": 9.0, "T": 5.0, "U": 5.0, "b": 8.0})
+        summary, detail = self.texts(A, B, names={"T": "目標", "U": "甲", "b": "乙"})
+        self.assertEqual(summary[0], "目標上週在矽智財族群和甲並列第 2，本週被 1 檔同業超過，和甲並列第 3。")
+        self.assertEqual(detail, ["上週兩檔同分，占第 2、3 席，平均名次為 2.5。",
+                                  "本週兩檔同分，占第 3、4 席，平均名次為 3.5，比上週退後 1 席。",
+                                  "名次拆解：被 1 檔超過（退後 1 席）；和甲兩週都同分，同分狀態沒變（名次不受影響）。"])
 
     def test_change_line_uses_true_minus_and_rounded_delta(self):
         self.assertEqual(rc.change_line(6.1, -3.1), "+6.10 → −3.10（−9.20）")
