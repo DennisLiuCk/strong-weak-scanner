@@ -82,6 +82,13 @@ def verdict_new(cap, liq, days):
 
 def verdict_member(cap, liq):
     """現有成員:遲滯剔除線 + 流動性。"""
+    missing = []
+    if cap is None:
+        missing.append("缺市值資料")
+    if liq is None:
+        missing.append("缺20日中位成交值資料")
+    if missing:
+        return "⚪ 資料不足", missing
     if cap is not None and cap < CAP_OUT:
         return "🔻 建議剔除", [f"市值 {cap/1e8:,.0f} 億 < 剔除線 {CAP_OUT/1e8:.0f} 億"]
     fails = []
@@ -133,8 +140,10 @@ def main():
         vd, why = verdict_member(cap, liq)
         if vd != "✅ 續留":
             actions.append(f"{vd} {sid} {r['name']}:{';'.join(why)}")
-        L.append(f"| {sid} | {r['name']} | {r['grp']} | {cap/1e8:,.0f} | "
-                 f"{liq/1e6:,.0f}M | {vd}{('(' + ';'.join(why) + ')') if why else ''} |")
+        cap_text = f"{cap/1e8:,.0f}" if cap is not None else "—"
+        liq_text = f"{liq/1e6:,.0f}M" if liq is not None else "—"
+        L.append(f"| {sid} | {r['name']} | {r['grp']} | {cap_text} | "
+                 f"{liq_text} | {vd}{('(' + ';'.join(why) + ')') if why else ''} |")
 
     # ── A2. 業務歸屬關鍵字複檢(R1,零 API)──
     L.append("")
