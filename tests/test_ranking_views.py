@@ -436,7 +436,8 @@ class DashboardContractTest(unittest.TestCase):
                 'summary["eff_obs"] < 10',
                 "多重比較校準及 tier／成本驗證前不得採用",
                 "shadow_resil05",
-                'row["spec_sha"] == rv.SPEC_SHA'):
+                "ranking_cutoff = max(IS_CUTOFF, rv.EFFECTIVE_FROM)",
+                'row["spec_sha"] == rv.SPEC_SHA and d > ranking_cutoff'):
             self.assertIn(fragment, source)
 
 

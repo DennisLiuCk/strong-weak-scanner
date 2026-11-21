@@ -179,16 +179,17 @@ def main():
     # daily_scores restated history 回填。舊快照沒有此表是預期狀態。
     ranking_snapshots = defaultdict(dict)
     ranking_specs = set()
+    ranking_cutoff = max(IS_CUTOFF, rv.EFFECTIVE_FROM)
     try:
         for d, run_id in snap_runs.items():
-            if d not in snap_dates or d <= IS_CUTOFF:
+            if d not in snap_dates:
                 continue
             for row in con.execute(
                     "SELECT * FROM oos_ranking_view_snapshots WHERE snapshot_id=?", (run_id,)):
                 ranking_specs.add(row["spec_sha"])
                 # 規格改版後不可把舊定義與新定義接成同一條績效序列。歷史 spec 只用來
                 # 標示 drift；評估一律只吃目前 evaluator 的精確 spec_sha。
-                if row["spec_sha"] == rv.SPEC_SHA:
+                if row["spec_sha"] == rv.SPEC_SHA and d > ranking_cutoff:
                     ranking_snapshots[d][row["stock_id"]] = row
     except sqlite3.OperationalError:
         ranking_snapshots = defaultdict(dict)
