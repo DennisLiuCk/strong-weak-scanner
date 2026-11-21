@@ -45,7 +45,7 @@ class OutputSafetyTest(unittest.TestCase):
                 with self.subTest(module=module.__name__, alias=alias), \
                         tempfile.TemporaryDirectory() as directory:
                     db = Path(directory) / 'input.db'
-                    with sqlite3.connect(db) as conn:
+                    with contextlib.closing(sqlite3.connect(db)) as conn, conn:
                         conn.execute('CREATE TABLE sentinel (value TEXT)')
                     before = db.read_bytes()
                     output = db
@@ -92,11 +92,11 @@ class OutputSafetyTest(unittest.TestCase):
                     actual = work / 'input.db'
                     distinct = run.parent / 'input.db'
                     for path, marker in ((actual, 'actual'), (distinct, 'distinct')):
-                        with sqlite3.connect(path) as conn:
+                        with contextlib.closing(sqlite3.connect(path)) as conn, conn:
                             conn.execute('CREATE TABLE sentinel (value TEXT)')
                             conn.execute('INSERT INTO sentinel VALUES (?)', (marker,))
                     db = work / 'link' / '..' / 'input.db'
-                    with rq.db_ro.connect(db) as conn:
+                    with contextlib.closing(rq.db_ro.connect(db)) as conn:
                         self.assertEqual(conn.execute('SELECT value FROM sentinel').fetchone()[0],
                                          'actual')
                     before = actual.read_bytes()
