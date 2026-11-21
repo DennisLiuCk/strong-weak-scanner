@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
 label: AMD Helios 部署階梯
-summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD自述首批工作負載，Microsoft新增工程程序但未提供同配置驗收結果；正式開放、區域與台廠財務仍分開。
+summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD自述首批工作負載，Microsoft提供工程程序，Dell具名整合責任；產品出貨、同配置驗收與台廠財務仍分開。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
@@ -720,18 +720,18 @@ view: industry
 from_id: product:amd-helios
 to_id: stage:oem-systemization
 relation: passes_through
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C32
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C32,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C36,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C37
 note_refs:
 evidence_state: verified
 commercial_stage: integration
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-11-04
-review_due: 2026-11-11
+as_of: 2026-11-16
+review_due: 2026-11-28
 status: active
-boundary: 10-Q證實的是角色分工：AMD開發授權架構並供部分產品，不製造或出售完整Helios機櫃，客戶及製造夥伴另向第三方採購部分元件；不等於AMD完全不供網路元件、不代表已發生短缺延誤，也不證明任一品牌整櫃已驗收或台廠已認列收入。
-next_trigger: 同一品牌型號與版本的OEM／ODM配置、第三方元件責任、交付及客戶驗收原件；不能用部門總收入替產品分子。
+boundary: AMD不出售完整機櫃；Dell新文具名品牌方案與網路儲存、部署維護責任，Supermicro另文的H15已出貨不能移植到Helios。只更新品牌整合這一層，不代表同配置交付驗收、官方延期或台廠收入。
+next_trigger: 同一品牌型號與版本的OEM／ODM配置、交付及客戶驗收原件；分開產品動詞，不能用其他平台出貨或部門總收入補產品分子。
 -->
 
 <!-- knowledge_edge

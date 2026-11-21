@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-11-20
+next_review: 2026-11-23
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -35,7 +35,7 @@ why_now: 到期追蹤初查發現Infineon9/9與SolarEdge合作把SSCB故障隔�
 knowledge_gain: 區分電力轉換、故障隔離與末端降壓，建立可重用的保護責任及測試邊界；合作稿與引述公司同一消息鏈，不計為兩份獨立驗收。
 first_rejection: 若仍只有合作稿或微秒級設計目標而沒有具名型號與可回查測試，就不另寫重複文章或新增公司受惠線。
 next_evidence: 取得同一SSCB型號與版本的電壓故障包絡及選擇性保護實測，核對客戶驗收與可比器件或替代拓撲；之後才追部署分母和收入。
-next_check: 2026-11-21
+next_check: 2026-12-05
 route: watch_only
 article_topic_id:
 graph_id:
@@ -452,3 +452,11 @@ SPHBM4 T2已以實際11/18日期追加有界檢查：Faraday、創意、南電�
 三候選維持原順位及watch，SSCB 11/21、HBFSim 11/23、玻璃11/24。新增待選線索為[NVIDIA 11/17供應鏈承諾公告](https://nvidianews.nvidia.com/news/nvidia-expands-commitments-with-supply-chain-partners-to-support-ai-infrastructure-buildout)：專用產能、預付款及未來產出有台股查證價值，但本輪只作來源掃描，不給新分數或搶先升格。11/20先凍結是否另立「承諾到供應商現金」候選、列第一拒絕，再追同案供應商文件。矽品先進封裝擴產不等既有CPO光引擎容量，景碩ABF也不能冒充SPHBM4或Helios專屬鍵。
 
 公告僅覆蓋11/17、13列6公司；6213更正、5234媒體澄清、3711設備與工程等說明已讀，附件未全驗收。公司端舊Q2完整簽核仍待做，6271取件恢復不當今日新申報；CDU平台及KLA舊季附件缺口如實保留。11/20先補Helios會後同產品文件與公告缺日，其他weekly項11/25重試；工作日期不是發行人承諾。
+
+## 11月21日 故障保護仍缺同產品測試
+
+SSCB維持順位1及watch。[SolarEdge平台頁](https://www.solaredge.com/us/data-centers)的公開內容仍把完整規格、保護圖列為保密協議下提供；本輪閱讀服務可讀，本地直取403，兩種取得結果分開。[白皮書入口](https://marketing.solaredge.com/800-vdc-protection-and-grounding-white-paper)只有摘要，未取得本體，也不申請或繞過限制。
+
+[11/4財報稿](https://investors.solaredge.com/news-releases/news-release-details/solaredge-announces-third-quarter-2026-financial-results)說的是SST展示與潛在客戶興趣；[10/13展稿](https://investors.solaredge.com/news-releases/news-release-details/solaredge-showcases-mvac-800-vdc-ai-factory-power-technology)仍分開轉換級帶載與整條供電路徑驗證。[OCP配電入口](https://www.opencompute.org/community/power-distribution)可定位規格與工作組，並非同型號故障測試及客戶驗收。未取得原凍結門檻的完整證據，不新增文章、產品合格或財務受惠線。按既有兩週節奏12/5重查公開測試附件；若先有具名測試，提前處理。
+
+HBFSim 11/23、玻璃11/24尚未到期，本輪未重新裁決。三題原順位、知識價值與第一拒絕保留，總檢查日11/23只是工作安排。上輪的供應承諾線索已於11/21另行事前凍結為定向研究，不重排這三題；結果另存同日候選紀錄。

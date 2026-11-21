@@ -3,8 +3,9 @@
 本圖把「規格定義了什麼」與「誰能替採購方查證」分開，再把 Evidence、新鮮度、參考值、
 Verifier policy、Attestation Result、依賴方決策與可信復原接成可查核責任鏈。Caliptra、SPDM 與
 SPDM Authorization 各自是已發布規格，OCP S.A.F.E. 是稽核制度；它們都不代表任何具體裝置
-已通過驗證，也不建立台灣公司的供貨或受惠線。company:5274 的線只表示產品頁具名列出該功能，
-不含出貨與財務。
+已通過驗證，也不建立台灣公司的供貨或受惠線。company:5274 的線仍停在功能層；11月簡報補上
+管理分工與整合配置，兩家 OEM 原頁也已具名列出 AST2700；但產品配置與第三季寬分類收入表
+都不能替代出貨、資格、安全驗收與財務。新增旁支不延展原邊期限。
 
 <!-- knowledge_graph_meta
 schema_version: 1
@@ -22,7 +23,7 @@ view: company
 from_id: company:5274
 to_id: concept:ai-rack-trust-root
 relation: uses_standard
-claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C5
+claim_refs: MI-2026-08-08-AI-RACK-TRUST-ROOT#C5,MI-2026-08-08-AI-RACK-TRUST-ROOT#C21,MI-2026-08-08-AI-RACK-TRUST-ROOT#C22,MI-2026-08-08-AI-RACK-TRUST-ROOT#C23,MI-2026-08-08-AI-RACK-TRUST-ROOT#C24
 note_refs:
 evidence_state: verified
 commercial_stage: capability
@@ -32,7 +33,7 @@ exclusivity_scope:
 as_of: 2026-08-08
 review_due: 2026-11-14
 status: active
-boundary: 信驊產品頁具名列出 AST2700 採用 Caliptra SiRoT；不證明出貨量、客戶認證階段、稽核結果、收入或毛利，也不支持份額與競爭優勢推論。
+boundary: AST2700 產品頁列出 Caliptra SiRoT；11月簡報補工程分工，Supermicro H15SPHM 與 GIGABYTE R265-DG3-AS1 已列名配置，但不證明整櫃安全、資格或出貨；第三季收入不能當 AST2700 分拆。本信任功能邊維持 capability 與原期限，不否認 OEM 設計採用。
 next_trigger: 季報、法說或重大訊息首次分開揭露 AST2700 出貨、客戶認證階段與可辨識收入或毛利。
 -->
 

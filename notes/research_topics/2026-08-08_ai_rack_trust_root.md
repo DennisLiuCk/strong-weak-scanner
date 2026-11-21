@@ -74,8 +74,23 @@ to: triaged
 reason: identified_existing_bmc_safe_report_and_current_solid_reporting_requirement_without_thesis_or_clock_refresh
 evidence: sources:S13,S14
 -->
+<!-- transition
+date: 2026-11-21
+from: triaged
+to: triaged
+reason: added_management_architecture_and_named_oem_configuration_without_security_financial_or_thesis_clock_upgrade
+evidence: sources:S15,S16,S17,S18
+-->
 
 ## 新手先讀：這篇在講什麼
+
+### 11 月 21 日補充：管理分工變清楚，不等於安全或營收已驗收
+
+信驊 11 月簡報把管理工作分成機櫃、伺服器、節點／模組三層；新增的 AST1840 整合選項仍保留 AST2700 作為伺服器管理晶片。[S15][C21][C22] 可以把它想成「總管理室、樓層管理員、房間控制器」分工更清楚了，但組織圖不等於每道門禁都已測試，更不等於客戶已買單。
+
+本輪也找到客戶端具名配置：Supermicro 的 H15SPHM 主機板與 GIGABYTE 的 R265-DG3-AS1 伺服器，官方規格都列出 AST2700。[S17][S18][C24] 這命中原監測條件中「或客戶端具名採用文件」的分支，不能再寫成只有信驊自己宣稱產品功能。
+
+但配置列名不等於已交付多少台、整櫃安全已驗收或相關收入已實現。第三季財報的收入分類仍比 AST2700 單一產品寬；下一步要把配置連到同版測試、實際出貨與可辨識財務，不能拿公司或類別收入替代。[S16][C23] 本輪不刷新完整信任鏈主題的可信度，也不把局部支持當成全部條件成立。
 
 ### 名詞小字典
 
@@ -105,6 +120,10 @@ evidence: sources:S13,S14
 - **Security Review Provider**：OCP 核可、可依 S.A.F.E. 制度執行第三方安全稽核的機構；列入名單不等於它已檢查本文提到的產品。
 - **Redfish**：DMTF 制定的設備管理介面，讓管理系統以共同格式讀取狀態或下指令；展示支援不等於已完成客戶部署。
 - **BMC**：伺服器裡獨立於主系統的管理晶片。主機關機或當掉時它仍可監控與下指令，所以它自己的身分與程式版本特別重要。
+- **RMC／SMC**：本輪信驊架構圖中，RMC 負責機櫃層協調，SMC 把控制延伸到節點或模組；它們與伺服器層的 BMC 是分工，不是安全稽核等級。[S15]
+- **eFPGA／AST1840**：eFPGA 是整合進晶片、可重新設定邏輯功能的電路；AST1840 是信驊簡報中的 SMC 加 eFPGA 整合選項，圖上仍搭配 AST2700 BMC，不能讀成取代 BMC 或已量產。[S15]
+- **OEM／DC-SCM**：OEM 指把零件整合成自家產品的設備商；DC-SCM 是把伺服器管理與安全功能放到模組上的形式。本輪 OEM 產品頁具名列出 AST2700 配置，只能確認選用關係，不能替終端場域出具安全驗收。[S17][S18]
+- **H15SPHM／R265-DG3-AS1**：分別是 Supermicro 主機板與 GIGABYTE 伺服器的產品型號；記下型號是為了下次對準同一配置追蹤，不是效能或安全等級。[S17][S18]
 - **AST2700**：信驊（5274）的第八代 BMC 晶片；產品頁載明內建 Caliptra 相關功能，但沒有提供出貨、客戶驗證或財務貢獻。
 - **SiRoT**：信驊產品頁對晶片內安全信任根的稱呼；列出這項功能只證明產品規格宣稱，不等於已完成第三方查證。
 - **SoC（系統單晶片）**：把運算、控制、記憶體介面等功能整合在同一顆晶片上的設計；Caliptra 規格描述的是其中一小塊安全功能。
@@ -154,7 +173,7 @@ evidence: sources:S13,S14
 - 先看零件互驗的共同測試指引（DSP-IS0023）是否由草稿轉成正式版本，以及授權白皮書是否如期發布；這會直接改變「規格比查證制度成熟」的判斷。
 - 接著核對已找到的 BMC 稽核長報告、被測韌體版本及缺口處置，再找完整機櫃的驗收鏈；另追蹤自 2026 年 10 月 1 日起，S.A.F.E. 長報告必須列出 S.O.L.I.D. 要求缺口的實際落地情況。[S13][S14]
 - 若平台開始談遠端證明，要求它同時公開證據涵蓋範圍、新鮮度、參考值版本、驗證政策、結果效期、授權後果與失敗復原，不接受只有一張「簽章成功」截圖。
-- 最後看 5274 信驊是否首次在季報、法說或重大訊息中，揭露 AST2700 的客戶驗證階段、量產出貨與可辨識收入或毛利。
+- 客戶端具名配置已有 Supermicro 與 GIGABYTE 原頁；下一步追同型號的測試版本、出貨／部署，再看信驊是否分開揭露 AST2700 收入或毛利。11 月架構圖與第三季寬分類收入表不能替代後兩層。[S15][S16][S17][S18]
 
 ### 想一想
 
@@ -162,6 +181,7 @@ evidence: sources:S13,S14
 - 同一份量測若昨天通過、今天才被重播，驗證者如何知道設備中間已經更新或被改動？
 - 一份第三方報告要寫到哪些被測功能與版本，才足以讓買方少做一次重複測試，而不只是讓賣方多一個標章？
 - 共同測試指引停在草稿，可能代表制度尚未成熟，也可能已有其他驗收方式；還要找什麼證據才能分辨？
+- 管理晶片從兩顆整合成一顆，改變的是零件配置、驗證責任，還是已實現收入？哪一份客戶文件才能把三者分開？
 
 ## 主張與證據帳本
 
@@ -507,6 +527,74 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C21
+label: verified
+status: active
+claim: 信驊 2026 年 11 月投資人簡報把管理架構分成 RMC 機櫃層協調、BMC 伺服器管理中心，以及 SMC 向節點或模組延伸控制三種角色
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-11-21
+basis: S15 PDF p.22 Hierarchical Management Architecture 明列三種管理層級及其功能；證實公司公開的工程架構描述
+boundary: 管理責任分層不是裝置身分、版本、授權或失敗復原已通過整櫃驗收；本份簡報的架構圖不提供客戶採用、出貨與財務分母，不改 C7 主命題與 T3 原觸發條件；另見 C24 的客戶端配置證據
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C22
+label: verified
+status: active
+claim: 信驊 2026 年 11 月簡報的 AST1840 整合圖，以 SMC 加 eFPGA 取代圖中 AST1700 I/O Expander 與外接 FPGA 的組合，而前端仍保留 AST2700 BMC
+supporting_source_ids: S15
+contrary_source_ids:
+as_of: 2026-11-21
+basis: S15 PDF p.26 左右架構圖均由 AST2700 BMC 連出，右圖改為 AST1840 SMC 與 eFPGA 整合選項；只比較圖內配置，不採未核效能或成本數字
+boundary: 示意圖不是 AST1840 已出貨、AST2700 已取得客戶資格、取代 BMC、安全稽核或財務貢獻證據；不能由元件整合推定供應商份額、售價與利潤
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C23
+label: verified
+status: active
+claim: 信驊 2026 年第三季合併財報附註二十四，p.28 按銷貨與其他收入列示第三季及前三季收入，p.29 的前三季收入細分則按多媒體晶片、電腦週邊晶片與其他分類，這兩張表沒有獨立 AST2700 產品列
+supporting_source_ids: S16
+contrary_source_ids:
+as_of: 2026-11-21
+basis: S16 PDF p.28–29 逐一核對表頭期間與分類名稱；p.29 是 2026 年 1 月 1 日至 9 月 30 日累計，不當成第三季單季
+boundary: 限於所引兩張收入表的揭露粒度，不宣稱公司全部文件皆無產品資訊；寬分類不能替代 AST2700 收入或毛利，未提供 T3 所需同產品出貨與資格證據，也不證明產品沒有收入
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C24
+label: verified
+status: active
+claim: 2026-11-21 讀取的 Supermicro H15SPHM 官方主機板頁在 Key Features 與 I/O 規格具名列出 AST2700 via DC-SCM；GIGABYTE R265-DG3-AS1 官方伺服器頁的 System Management 與 Video 規格亦具名列出 AST2700
+supporting_source_ids: S17,S18
+contrary_source_ids:
+as_of: 2026-11-21
+basis: 兩家 OEM 各自產品頁直接連結型號與 AST2700 配置，支持 T3 原 OR 條件中的客戶端具名採用文件分支；並非由信驊架構圖或供應鏈鄰接推導
+boundary: 只證實官網列名配置，不知道首次採用日、實體交付量、同版資格報告、整櫃授權安全或信驊產品財務；兩家設計列名不是市場滲透率樣本，不推 C10 已驗證或刷新 C7 主命題證據時鐘
+verification_needed: 同一 OEM 型號與 BMC 韌體版本的安全測試、採購或交付文件，以及 AST2700 可辨識收入或毛利
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 10 月 8 日複核：BMC 已有具名稽核，仍要對準版本與範圍
 
 這次新增的是一份先前未納入本文的舊報告。OCP 官方儲存庫中的 AMI MegaRAC Community
@@ -679,7 +767,7 @@ state、replay cache 與驗證服務本身增加延遲、狀態與故障面，�
 | 3. 有沒有買方採用？ | 具名客戶、驗證階段、量產配置或部署文件 | 停在產品能力，不寫成訂單或市占 |
 | 4. 有沒有財務足跡？ | 出貨量、可辨識收入、毛利或可重建的財務分母 | 停在技術查核入口，不做個股貢獻判斷 |
 
-目前唯一直接對應的 5274 信驊，能引用的只有 AST2700 產品頁所列功能；沒有第三方查證結果、客戶驗證階段、量產出貨與拆分收入或毛利。這四問也能套用到其他宣稱提供 AI 機櫃安全功能的公司，不限於信驊。
+目前直接對應的 5274 信驊，除產品頁外，本輪新增管理架構、第三季收入分類及兩家 OEM 的 AST2700 具名配置。[S15][S16][S17][S18] 第三問已有產品列名這一層證據，但沒有因此補齊同版資格、第三方安全查證、量產出貨與拆分收入或毛利。這四問也能套用到其他宣稱提供 AI 機櫃安全功能的公司。
 
 ## 來源
 
@@ -902,6 +990,70 @@ locator: 固定commit ce04fca4d27510024366eca5951d3462d60280de 的Review Scope�
 limitation: 現行制度文件的固定版本capture，未取得單一發布日；2026-10-01是文內要求生效日而非本輪證實的發布日。文件要求不證明特定報告已符合、產品已通過或缺口已修補；與S13共用OCP SAFE發布鏈，不能計成兩個獨立產品安全樣本
 -->
 
+<!-- research_source
+source_id: S15
+role: company_release
+source_kind: document
+publisher: ASPEED Technology
+independence_group: aspeed-technology
+title: ASPEED Technology Investor Conference — November 2026
+published_at: 2026-11-01
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://www.aspeedtech.com/file/calendar/1794758400000_InvestorConferenceBrief_en.pdf
+locator: 34 頁 PDF 的 p.22 Hierarchical Management Architecture 與 p.26 AST1840 Integrating SMC and eFPGA，引用頁及前後頁已渲染核圖；SHA-256 6aaf1be1ff190d2f43d9333d82c5982b4fdb32ce1bbc18920445cbf4bc9b83e2。由官網 investor_calendar 的公開 GET /app/1/calendars?page=1&limit=999&sort=-start 中 2026-11-16 台灣場次 brief 路徑取得
+limitation: 封面僅標 November 2026，published_at 以月首正規化，並非證實 11/1 發布；活動日期 11/16、calendar 建立時間 11/13 與 PDF Last-Modified 11/13 是不同欄位，均不當成精確首次公開日。只採管理分工與圖內配置，不採產品績效、出貨、客戶驗收或財務；11/18 場次附件本輪逾時，未視為同版或已讀。與 S16 同屬信驊來源鏈
+-->
+
+<!-- research_source
+source_id: S16
+role: other_primary
+source_kind: document
+publisher: 信驊科技股份有限公司
+independence_group: aspeed-technology
+title: 信驊科技及子公司民國 115 及 114 年第 3 季合併財務報告暨會計師核閱報告
+published_at: 2026-11-11
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=5274&filename=202603_5274_AI1.pdf
+locator: MOPS 官方索引 202603_5274_AI1.pdf，登載上傳 115/11/11 16:50:18；49 頁 PDF 的 p.28–29 附註二十四客戶合約收入，已核表頭、分類與 p.28–30 渲染頁；SHA-256 74c0b165bc48cb173e2f57b339bacb926d54eedb37b5f31b6493bccb55fc2312
+limitation: 交易所保存的公司申報文件與公司簡報不是獨立驗證鏈；本輪只做 AST2700 收入揭露粒度的有界複核，不是全財報或 focused 筆記重新簽核。p.29 為前三季累計，不能替代第三季單季，更不能將公司、銷貨或晶片類別收入全歸 AST2700；表內無產品列不等於產品無收入
+-->
+
+<!-- research_source
+source_id: S17
+role: other_primary
+source_kind: living_index
+publisher: Supermicro
+independence_group: supermicro
+title: H15SPHM motherboard — named AST2700 configuration
+published_at:
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://www.supermicro.com/en/products/motherboard/h15sphm
+locator: 官方產品正文 H15SPHM、Key Features 第5項，以及 Input/Output 的 LAN 與 Video 具名 AST2700 via DC-SCM；2026-11-21以網頁讀取工具取得完整產品正文並複核定位，非搜尋摘要
+limitation: 動態產品頁未標確切發布日；本機直接HTTP取件403，未取得可離線重算的HTML檔案SHA，不偽稱原始封包封存。只支持該型號列名配置，不證明首次採用、已出貨數量、資格測試、整櫃安全、收入或毛利；與信驊及GIGABYTE不同發布鏈
+-->
+
+<!-- research_source
+source_id: S18
+role: other_primary
+source_kind: living_index
+publisher: GIGABYTE
+independence_group: gigabyte
+title: R265-DG3-AS1 Rack Server — named AST2700 configuration
+published_at:
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://www.gigabyte.com/Enterprise/Rack-Server/R265-DG3-AS1
+locator: 官方 R265-DG3-AS1 頁的 System Management 與 Specifications/Video 直接指名 ASPEED AST2700，Part Numbers 列 DC-SCM 模組；2026-11-21以網頁讀取工具實讀產品正文與規格，不採搜尋摘要
+limitation: 動態產品頁未標發布日，且頁尾保留修改規格權利；本機HTTP取件403，未保存原始HTML或宣稱檔案SHA。只支持具名配置，不採效能宣稱，不能把官網列名當客戶場域驗收、量產交付量或信驊可辨識財務；與S17是不同OEM來源但非獨立安全測試
+-->
+
 ## 族群影響
 
 <!-- impact
@@ -912,7 +1064,7 @@ hypothesis_refs:
 note_action: watch
 action_due: 2026-11-14
 rationale: 5274 是 universe 中唯一在產品頁直接對應本信任鏈的個股，AST2700 明示採用 Caliptra SiRoT，因此是此議題的第一查核位置
-evidence_boundary: 只有產品頁規格與第三方韌體商整合公告，沒有出貨量、客戶認證階段、稽核結果或財務分拆；不建立受惠推論或排行
+evidence_boundary: 兩家OEM已具名列出AST2700配置，但不是整櫃安全驗收或量產交付；第三季收入表仍無獨立AST2700列，不把設計採用推成財務受惠或排行
 -->
 
 <!-- impact

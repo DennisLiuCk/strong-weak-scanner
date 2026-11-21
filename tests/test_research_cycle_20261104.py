@@ -114,9 +114,12 @@ class ResearchCycleNovember4Test(unittest.TestCase):
         self.assertEqual((current["relation"], current["commercial_stage"]), ("tests", "validation"))
         self.assertEqual((current["materiality"], current["exclusivity"]), ("named_product", "unknown"))
         role = edges["KG-HEL-I22"]
-        self.assertTrue(role["claim_refs"].endswith("#C32"))
+        self.assertEqual(role["claim_refs"].split(",").count(
+            "MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C32"), 1)
         self.assertEqual(role["commercial_stage"], "integration")
-        self.assertIn("不代表已發生短缺延誤", role["boundary"])
+        self.assertIn("不代表", role["boundary"])
+        self.assertTrue(any(term in role["boundary"] for term in
+                            ("已發生短缺延誤", "官方延期")))
         original = edges["KG-HEL-C05"]
         self.assertEqual((original["commercial_stage"], original["as_of"], original["review_due"]),
                          ("planned", "2026-07-21", "2026-08-09"))
@@ -166,12 +169,33 @@ class ResearchCycleNovember4Test(unittest.TestCase):
                 # Freeze dated registry blocks at the fixture's own date. Later
                 # append-only evidence is valid today, not future evidence on 11/4.
                 text = (ROOT / path).read_text(encoding="utf8")
+                excluded_urls = set()
                 def at_fixture_date(match):
                     dates = re.findall(r"^(?:date|as_of|captured_at|accepted_at): (\d{4}-\d{2}-\d{2})$",
                                        match.group(0), re.M)
-                    return "" if any(day > AS_OF for day in dates) else match.group(0)
+                    if any(day > AS_OF for day in dates):
+                        excluded_urls.update(re.findall(r"^url: (\S+)$", match.group(0), re.M))
+                        return ""
+                    return match.group(0)
                 text = re.sub(r"<!--\s*(?:transition|research_source|research_claim)\b.*?-->",
                               at_fixture_date, text, flags=re.S)
+                source_ids = set(re.findall(r"^source_id: (\w+)$", text, re.M))
+                claim_ids = set(re.findall(r"^claim_id: (\w+)$", text, re.M))
+                def monitor_at_fixture_date(match):
+                    fields = dict(re.findall(r"^(\w+): *(.*)$", match.group(0), re.M))
+                    # New monitors citing evidence not yet admitted do not belong
+                    # in this historical schedule fixture. Original monitors stay.
+                    for field, allowed in (("source_ids", source_ids),
+                                           ("watch_source_ids", source_ids),
+                                           ("claim_ids", claim_ids)):
+                        refs = {value.strip() for value in fields.get(field, "").split(",") if value.strip()}
+                        if not refs <= allowed:
+                            return ""
+                    return match.group(0)
+                text = re.sub(r"<!--\s*monitoring_item\b.*?-->",
+                              monitor_at_fixture_date, text, flags=re.S)
+                for url in excluded_urls:
+                    text = re.sub(r"\[([^\]]+)\]\(" + re.escape(url) + r"\)", r"\1", text)
                 topic = analyse_topic(str(ROOT / path), text,
                                       reports=reports, as_of=AS_OF)
                 self.assertFalse(topic["quality_invalid"], topic["quality_errors"])

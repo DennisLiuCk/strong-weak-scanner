@@ -296,6 +296,22 @@ limitation: NVIDIA 自述架構，不是實體樣品交付、具名客戶測試�
 independence_group: nvidia
 -->
 
+<!-- research_source
+source_id: S17
+role: company_release
+source_kind: document
+publisher: Micron
+title: Technology and products leadership for the AI era — October 21 2026
+published_at: 2026-10-21
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://s25.q4cdn.com/621799436/files/doc_downloads/2026/10/MU-TP-Webinar.pdf
+locator: 33頁 PDF 的 p.20 standard/custom/vertical HBM 配置與 p.22 圖例、時程註腳；已渲染 p.19–23 核圖。官方 Technology-and-product-webinar 事件頁直接連結；SHA256 00808627216e27375a163a3beff5393aea826c3722004a1a6948e88c07180f94
+limitation: 10/21舊簡報於11/21新納入，不是11/21新發布；p.22明示效能位置為示意、日期為目標量產且可變動。一般客製HBM與vHBM路線圖不是同一NVHBM產品的實體樣品接收方、測試版本與客戶資格，不採效能倍率、時程保證或台灣供應鏈受惠；與S15同屬Micron來源鏈
+independence_group: micron
+-->
+
 <!-- research_claim
 claim_id: C1
 label: verified
@@ -602,6 +618,23 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_claim
+claim_id: C19
+label: verified
+status: active
+claim: Micron 10/21 技術簡報把 Custom HBM 的底部邏輯客製與 vHBM 的記憶體堆在運算晶片上分開表示；產品路線圖標示 HBM4E 起有客製選項，並將日期限定為可變動的目標量產時程
+supporting_source_ids: S17
+contrary_source_ids:
+as_of: 2026-11-21
+basis: S17 p.20 配置示意與 p.22 圖例及底部註腳直接支持上述分類與時程性質
+boundary: 不把 vHBM 縮寫當成 NVHBM 專案別名，不把一般 HBM4E 樣品或架構路線圖接成同一 NVHBM 實體交付與 qualification；不採效能倍率、供應商排名或財務推估，C5 主命題證據時鐘與 T4 的 AND 條件保留
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 <!-- monitoring_item
 monitor_id: T1
 status: active
@@ -709,8 +742,21 @@ to: triaged
 reason: added_nvidia_controller_phy_architecture_from_august_document_without_sample_qualification_or_thesis_clock_upgrade
 evidence: sources:S16
 -->
+<!-- transition
+date: 2026-11-21
+from: triaged
+to: triaged
+reason: distinguished_custom_base_die_and_vertical_hbm_roadmap_without_nvhbm_qualification_or_thesis_clock_upgrade
+evidence: sources:S17
+-->
 
 ## 新手先讀：這篇在講什麼
+
+### 11 月 21 日補充：相似縮寫，不一定是同一顆產品
+
+美光 10 月簡報分開畫出「修改底部邏輯」的 Custom HBM 與「把記憶體堆到運算晶片上」的 vHBM。[S17][C19] 前者像改裝地基裡的設備，後者連樓層配置都不同；不能只因都有 HBM 就串成同一份交貨履歷，也不能把 vHBM 當成 NVHBM 的別名。
+
+**證實**的是這份分類與路線圖；**待驗證**的仍是同一 NVHBM 產品的客製欄位、樣品接收方、測試版本與客戶資格。圖上的目標量產年份不是驗收結果。本輪只補分類，不刷新主命題與商業成熟度。讀下一份新聞時，先問：「這是同一產品的新證據，還是另一條路線的新名稱？」
 
 ### 11 月 7 日補充：客製也可能改變控制器的位置
 
@@ -738,6 +784,7 @@ PHY 則是實際傳送訊號的電路；兩者位置與介面改變，需要重�
 ### 名詞小字典
 
 - **NVHBM**：美光與 NVIDIA 文件所述的客製記憶體路徑；NVIDIA 另公開控制器與 PHY 的架構描述，名稱與設計仍不是交付或驗收證明。
+- **vHBM（vertical HBM）**：美光簡報描述的垂直堆疊方向；小寫 v 指垂直，不是 NVHBM 的產品身分證。[S17]
 - **NVLink Fusion**：美光文件列為 NVHBM 未來用途的平台名稱；本文不藉此推定已採用或實際配置。
 
 - **高頻寬記憶體（HBM）**：把多層動態隨機存取記憶體垂直堆疊，放在運算晶片附近，用較寬的連接介面搬動大量資料。
@@ -974,6 +1021,7 @@ SK 海力士、Intel 與 LBNL 是公司產品敘事與兩條通用效能方法�
 - [Micron FY2025 Q4 slides](https://investors.micron.com/static-files/5fb98d73-2134-4446-8d1b-0f90285f6c02)（p.13，標準／客製 base logic die 與管理層毛利預期）。
 - [Micron FY2026 Q4 prepared remarks](https://s25.q4cdn.com/621799436/files/doc_financials/2026/q4/Q4-FY26-Prepared-Remarks.pdf)（9 月 30 日 p.4；NVHBM 具名開發合作，非樣品、資格或量產簽核）。
 - [NVIDIA NVHBM 技術說明](https://developer.nvidia.com/blog/nvidia-nvlink-fusion-brings-nvhbm-to-next-generation-ai-infrastructure/)（8 月 26 日原文、11 月 7 日補入；只採控制器位置與 PHY 描述，不採效能倍率）。
+- [Micron 10/21 技術簡報](https://s25.q4cdn.com/621799436/files/doc_downloads/2026/10/MU-TP-Webinar.pdf)（p.20／22；區分底部邏輯客製與垂直堆疊，路線圖不等於 NVHBM 客戶資格）。
 - [Samsung HBM4E sample shipment](https://news.samsung.com/global/samsung-electronics-begins-shipment-of-industry-first-hbm4e-samples)（標準 HBM4E 樣品與 custom 時鐘的分界）。
 - [Samsung Memory Labs](https://semiconductor.samsung.com/about-us/locations/us-rnd-labs/memory-labs/)（I/O architecture／IP、firmware、base die、customer engagement 與 workload／software 分工）。
 - [Samsung Foundry HPC／AI application service](https://semiconductor.samsung.com/foundry/application-specific-service/hpc-ai/)（die-to-die interface、base-die controller 與 additional logic 的供應商架構邊界）。

@@ -120,7 +120,17 @@ reason: added_microsoft_cluster_engineering_and_versioned_availability_boundary_
 evidence: sources:S30,S31
 -->
 
+<!-- transition
+date: 2026-11-21
+from: triaged
+to: triaged
+reason: added_named_dell_integration_and_product_scoped_shipping_language_without_refreshing_thesis_clock
+evidence: sources:S32,S33
+-->
+
 ## 新手先讀：這篇在講什麼
+
+**11/21 補充：品牌方案已具名，交付結果仍要另外查。** Dell 已公開自家 Helios 方案與部署維護分工；Supermicro 同篇的「已出貨」則指新一代處理器伺服器，不能直接移到 Helios。讀新聞先把動詞對回產品，再問客戶何時收到。[S32][S33][C36][C37]
 
 **11/18 補充：流程公開，不等於結果公開。** Microsoft 新文說明 Helios 的配置基準、整群測試與修復後重驗；這能幫助我們知道該問什麼，但還不是具名場站的驗收報告或雲端可用區域。[S30][C34]
 
@@ -130,6 +140,8 @@ evidence: sources:S30,S31
 
 ### 名詞小字典
 
+- **Dell PowerRack**：Dell 文中承擔網路與儲存的機架方案名稱；品牌名稱本身不是 Helios 客戶驗收結果。[S32]
+- **Helion**：Supermicro 同篇公告中的另一個機架平台，偏重處理器運算及部署彈性；名稱只差一個字母，也不能與 Helios 共用出貨判定。[S33]
 - **EPYC／Pensando**：AMD 的伺服器處理器與網路產品家族名稱；出現在 Helios 組成表可協助分工，不能只靠家族名判定固定料號、版本或整櫃資格。[S27]
 - **MI355X／MI400／MI450**：本文出現的 AMD Instinct 產品型號或系列名稱；先辨識是哪一代、哪一個具名系統，再讀出貨及上線進度，不能只因品牌相同就共用驗收結果。[S12][S25]
 - **機架級系統（Rack-scale）**：把運算晶片、網路、電力、散熱與軟體整合成一整櫃交付；它比單顆晶片更接近可用設備，但不代表客戶已正式上線。
@@ -318,7 +330,7 @@ Python `Decimal` 與 `awk` 兩條獨立路徑均重算為 46.091255 kN 與 25.49
 | 本文五種交付物 | 誰要交付 | 必須固定什麼 | 本輪證據 | 不能直接推成 |
 | --- | --- | --- | --- | --- |
 | 1. 開放標準與參考設計 | 標準組織與平台設計方 | 機架介面、元件角色、網路、電力、液冷與軟體藍圖 | OCP 已列 ORW 規格；AMD 把 Helios 定義為 ORW 參考設計 [S12][S14] | 市場上已有可採購的單一 AMD 成品 |
-| 2. 整機廠品牌系統 | OEM／ODM 與供應鏈 | 品牌型號、BOM、板卡、托盤、韌體、冷卻與製造版本 | AMD 稱藍圖正與夥伴分享，品牌配置與完整 BOM 未公開 [S12] | 所有夥伴使用同一配置、已量產或已有訂單 |
+| 2. 整機廠品牌系統 | OEM／ODM 與供應鏈 | 品牌型號、BOM、板卡、托盤、韌體、冷卻與製造版本 | Dell 11/16 已具名 Helios 品牌方案與整合責任；仍未在該文交付完整 BOM、版本及客戶驗收資料 [S32] | 所有夥伴使用同一配置、已量產或已有訂單 |
 | 3. 整櫃資格與驗收資料包 | 整機廠、平台方與客戶工程團隊 | 八條責任線的測試條件、版本、結果、變更與回退 | 目前沒有捕捉到一套具名品牌系統的完整公開資料包 | 單一托盤、網路、電力或液冷測試能替整櫃背書 |
 | 4. 出貨與現場接收 | 製造商、物流、資料中心與客戶 | 序號、數量、日期、場址、安裝、機房介面與接收結果 | AMD 10/12 稱交付與部署進行中，並稱四家初始系統已安裝運行；未列固定品牌配置、數量或客戶接收文件 [S26] | 供應商進度自述等於每家客戶獨立驗收 |
 | 5. 生產機群與財務 | 客戶營運、平台與供應商財務團隊 | 上線規模、工作負載、可用率、重複出貨、收入、毛利與現金流 | 初始運行與驗證進度已有 AMD 自述；規模、利用率及台灣公司財務仍未證 [S26] | 合作名單、容量上限或單次上線等於持續獲利 |
@@ -433,6 +445,14 @@ Redfish 把軟硬體盤點與更新服務、遙測服務做成不同的機器可
 **不同產品的開放狀態不能借用。** 11/17 更新的活動文分開寫 HDv2 測試開放、MI300X 正式供應與 MI455X 尚待推出；不能把前兩者的進度貼到 Helios。[S31][C35]
 
 想一想：若只有測試方法、沒有同配置的日期、場站與通過結果，你能確認的是工程責任，還是客戶已可使用？接下來追同一產品的結果與區域，不從流程描述推估台灣供應商收入。
+
+## 品牌整合與已出貨要對回同一產品
+
+**品牌方案讓責任更具體。** Dell 11/16 公開自家 Helios 機架方案，搭配 PowerRack 負責網路與儲存，並由 Dell 提供部署及後續維護服務。這讓我們能追問「整體整合由誰負責」，但該文沒有具名客戶的交付日期、場站或驗收結果。[S32][C36]
+
+**標題的動詞不能套用全篇產品。** Supermicro 11/11 公告的已出貨對象是 H15 伺服器組合；Helios 與另一個 Helion 平台在後文另述為合作推向市場。這份文件不能單獨證明 Helios 已出貨，也不是 Helios 沒有出貨的反證。[S33][C37]
+
+把這兩份文件放回六個關卡，新增的是品牌與整合責任的線索。客戶交付仍須對上同一產品、配置、日期與範圍；台廠收入則再多一層公司財務證據。想一想：如果同一篇公告同時談三種產品，哪些字能決定「已出貨」到底修飾誰？下一步先找具名系統的交付原件，不用另一產品的進度補答案。
 
 ## 主張與證據帳本
 
@@ -1527,6 +1547,72 @@ corrected_by_claim_id:
 resolution:
 -->
 
+<!-- research_source
+source_id: S32
+role: company_release
+source_kind: document
+publisher: Dell Technologies
+title: Dell與AMD的SC26品牌方案及整合服務公告
+published_at: 2026-11-16
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://www.dell.com/en-us/blog/dell-technologies-and-amd-offer-more-ways-to-deploy-ai-from-first-node-to-full-rack/
+locator: 署名Varun Chhabra及November 16日期；Frontier performance章的Helios方案、PowerRack及部署維護服務段；原HTML 590257 bytes，SHA256 d3bd768cd8e238d979649c17eedd90e79eab05defa2d4960466e4168084a0043
+limitation: 官方行銷公告支持具名方案與服務責任，不提供客戶交付日期、場站驗收或完整BOM版本；validated用語不是公開測試報告；未採效能數字，不移植前段其他伺服器配置或財務結論
+independence_group: dell
+-->
+
+<!-- research_source
+source_id: S33
+role: company_release
+source_kind: document
+publisher: Super Micro Computer
+title: Supermicro 11月11日H15出貨與Helios平台分段公告
+published_at: 2026-11-11
+captured_at: 2026-11-21
+accepted_at: 2026-11-21
+status: active
+url: https://ir.supermicro.com/news/news-details/2026/Supermicro-Now-Shipping-Next-Generation-Servers-Powered-by-6th-Gen-AMD-EPYC-9006-Series-CPUs-for-Cloud-HPC-and-Agentic-AI-Workloads/default.aspx
+locator: 開頭H15已出貨段、產品組合段及Next-generation rack-scale data center solutions章；原HTML 75922 bytes，SHA256 74aff33d2cbd9864fc67e5c41628e04753c049ec6b5d905b91c55c015bab0b88
+limitation: 已出貨動詞有H15產品範圍，Helios與Helion另述合作推向市場；未據此判定Helios實際未出貨或延期，亦未採效能、客戶數與財務推算；轉載同稿不增加獨立來源群
+independence_group: supermicro
+-->
+
+<!-- research_claim
+claim_id: C36
+label: verified
+status: active
+claim: Dell 11/16公開自家Helios機架方案，搭配PowerRack的網路與儲存，並由Dell提供端到端部署及生命週期服務
+supporting_source_ids: S32
+contrary_source_ids:
+as_of: 2026-11-16
+basis: 直接核對Helios專節的具名方案、網路儲存及服務分工，與同文其他CPU伺服器及MI350P方案分開
+boundary: 品牌方案和服務責任不等已交付、具名場站驗收或台廠財務；官方validated字樣不是公開的同配置測試結果，T6與T14完整條件仍未閉合
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C37
+label: verified
+status: active
+claim: Supermicro 11/11公告將已出貨陳述限定於H15伺服器組合，另段描述與AMD合作把Helios及Helion機架方案推向市場
+supporting_source_ids: S33
+contrary_source_ids:
+as_of: 2026-11-11
+basis: 逐段對照已出貨句的H15主詞與後段Helios／Helion描述，不以同文共現轉移產品階段
+boundary: 只確認本文件的陳述範圍，不證明Helios未出貨、取消或延後；不能把H15出貨當T6品牌Helios交付，也不替代T14同配置場站結果
+verification_needed:
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
 ## 再把各組公開節點放回自己的時間線
 
 原始文件與 10 月更新中的動詞、時程與容量數字，分別來自平台方及不同客戶。正確讀法不是
@@ -1560,6 +1646,8 @@ resolution:
 
 ## 來源與證據邊界
 
+- [Dell 的 SC26 品牌整合公告](https://www.dell.com/en-us/blog/dell-technologies-and-amd-offer-more-ways-to-deploy-ai-from-first-node-to-full-rack/)（S32；具名方案及服務分工，不是客戶交付報告）。
+- [Supermicro 的 H15 出貨公告](https://ir.supermicro.com/news/news-details/2026/Supermicro-Now-Shipping-Next-Generation-Servers-Powered-by-6th-Gen-AMD-EPYC-9006-Series-CPUs-for-Cloud-HPC-and-Agentic-AI-Workloads/default.aspx)（S33；H15 與後段 Helios／Helion 的動詞分開）。
 - [AMD 11/3 財報稿](https://ir.amd.com/financial-information/sec-filings/content/0000002488-26-000188/q32026991.htm)（S28；具名工作負載陳述，不是客戶驗收）。
 - [AMD 11/4 季度申報](https://ir.amd.com/financial-information/sec-filings/content/0000002488-26-000191/amd-20260926.htm)（S29；整櫃責任、分部範圍與可能風險分開判讀）。
 - [AMD：OCP 2026 演講摘要](https://newsroom.amd.com/news/ocp-2026-amd-ceo-lisa-su-keynote-takeaways/)（S26；四家初始系統運行是 AMD 自述，不是四份客戶驗收）。

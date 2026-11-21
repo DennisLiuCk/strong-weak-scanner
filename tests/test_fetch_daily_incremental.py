@@ -36,7 +36,9 @@ class TokenPoolTest(unittest.TestCase):
             "FINMIND_TOKEN2": "\ufefftoken-2",
             "FINMIND_TOKEN3": "token-1",
         }
-        with mock.patch.dict(os.environ, env, clear=True):
+        # Replace the Python mapping, not the native process environment. On
+        # Windows, clearing/restoring an empty value can delete it for Git children.
+        with mock.patch.object(fd.os, "environ", env):
             self.assertEqual(fd.get_tokens(), ["token-1", "token-2"])
 
     def test_402_rotation_reaches_third_token(self):
@@ -53,7 +55,7 @@ class TokenPoolTest(unittest.TestCase):
             "FINMIND_TOKEN2": "token-2",
             "FINMIND_TOKEN3": "token-3",
         }
-        with mock.patch.dict(os.environ, env, clear=True), \
+        with mock.patch.object(fd.os, "environ", env), \
                 mock.patch("fetch_daily.urllib.request.urlopen", side_effect=fake_urlopen):
             data = fd.api_get("dataset", "2330", "2026-07-17", "2026-07-17", "unused")
             again = fd.api_get("dataset", "2330", "2026-07-17", "2026-07-17", "unused")
@@ -76,7 +78,7 @@ class TokenPoolTest(unittest.TestCase):
             "FINMIND_TOKEN2": "token-2",
             "FINMIND_TOKEN3": "token-3",
         }
-        with mock.patch.dict(os.environ, env, clear=True), \
+        with mock.patch.object(fd.os, "environ", env), \
                 mock.patch("fetch_daily.urllib.request.urlopen", side_effect=always_402):
             with self.assertRaises(fd.TokenPoolExhausted):
                 fd.api_get("dataset", "2330", "2026-07-17", "2026-07-17", "unused")

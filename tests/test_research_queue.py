@@ -2416,8 +2416,13 @@ class ReadabilityGateTest(unittest.TestCase):
             "reason: expanded_attestation_evidence_policy_decision_and_recovery_contract",
             text,
         )
-        self.assertEqual(text.count("<!-- research_claim\n"), 20)
-        self.assertEqual(text.count("<!-- research_source\n"), 14)
+        for block, key, prefix, old_count in (
+            ("research_claim", "claim_id", "C", 20),
+            ("research_source", "source_id", "S", 14),
+        ):
+            ids = re.findall(rf"<!-- {block}\s+{key}: ([A-Z]+\d+)\s", text)
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertTrue({f"{prefix}{i}" for i in range(1, old_count + 1)} <= set(ids))
         self.assertEqual(text.count("<!-- monitoring_item\n"), 4)
 
     def test_future_beginner_guide_rejects_internal_maintenance_vocabulary(self):
