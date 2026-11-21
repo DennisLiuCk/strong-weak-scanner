@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import snapshot_signals as ss
+import fetch_financials as ff
 import score
 from test_suspension_events import add_evidence
 
@@ -299,6 +300,27 @@ class SnapshotSignalsTest(unittest.TestCase):
             captured_at="2026-07-10T14:00:00+00:00", source="github-actions", publish=True)
         self.assertEqual((sid2, created2), ("local-1", False))
         self.assertEqual(self.con.execute("SELECT COUNT(*) FROM oos_snapshot_runs").fetchone()[0], 1)
+
+    def test_first_local_publication_migrates_legacy_fundamentals_before_capture(self):
+        self.con.executescript(ff.SCHEMA)
+        for sid in ("1001", "1002"):
+            for year in (2025, 2026):
+                for month in (4, 5, 6):
+                    self.con.execute("INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+                                     (f"{year}-{month:02d}-01", sid, 100, month, year))
+                for item, value in (("Revenue", 100), ("OperatingIncome", 20)):
+                    self.con.execute("INSERT INTO financials VALUES(?,?,?,?,?)",
+                                     (f"{year}-03-31", sid, item, value, item))
+        clock = mock.Mock(side_effect=["2026-07-10T13:29:59+00:00",
+                                       "2026-07-10T13:30:00+00:00"])
+        with mock.patch.object(ss, "_utc_now", clock), mock.patch.object(ff, "utc_now", clock):
+            sid, _, created = ss.capture_snapshot(
+                self.con, root=str(self.root), snapshot_id="legacy", source="local", publish=True)
+        self.assertTrue(created)
+        quality = self.con.execute(
+            "SELECT quality_json FROM oos_snapshot_runs WHERE snapshot_id=?", (sid,),
+        ).fetchone()[0]
+        self.assertEqual(json.loads(quality)["ranking_lens_d"], 2)
 
     def test_local_preview_is_not_official(self):
         sid, _, created = ss.capture_snapshot(
