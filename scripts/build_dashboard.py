@@ -6,6 +6,7 @@ build_dashboard.py — 從 SQLite(daily_scores + daily_metrics)自動重生儀�
 並把同一份頁面凍結成 archive/<資料日>.html(as-seen 歷史快照,供日期選單回看)。
 零第三方依賴。用法:  python scripts/build_dashboard.py
 """
+import argparse
 import csv
 import datetime as dt
 import json, os, re, sqlite3, statistics, sys
@@ -4550,7 +4551,10 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     }
 
 
-def main(research_as_of=None):
+def main(research_as_of=None, output_dir=None):
+    out = os.path.join(output_dir, "index.html") if output_dir is not None else OUT
+    research_out = os.path.join(output_dir, "research.html") if output_dir is not None else RESEARCH_OUT
+    archive = os.path.join(output_dir, "archive") if output_dir is not None else ARCHIVE
     # 唯讀開啟(鐵律:唯讀一律走 db_ro)。這支只從 db 讀、寫的是 index.html 與
     # archive/,不曾寫 db;bare sqlite3.connect 會在路徑打錯時無聲建一個空 db,
     # 然後產出一份「0 檔」的頁面覆蓋掉正常的那份。
@@ -5202,8 +5206,8 @@ def main(research_as_of=None):
     html = html.replace("__DATE_ISO__", last)
     html = html.replace("__DATE__", date_str)
     # 快照日期清單(含本次):注入頁內當 fallback,另寫 manifest 供已凍結的舊頁抓最新清單
-    os.makedirs(ARCHIVE, exist_ok=True)
-    dates = sorted({f[:10] for f in os.listdir(ARCHIVE)
+    os.makedirs(archive, exist_ok=True)
+    dates = sorted({f[:10] for f in os.listdir(archive)
                     if re.fullmatch(r"\d{4}-\d{2}-\d{2}\.html", f)} | {last})
     html = html.replace("__DATES_JSON__", json.dumps(dates))
     research_html = open(RESEARCH_TEMPLATE, encoding="utf-8").read()
@@ -5212,14 +5216,14 @@ def main(research_as_of=None):
     )
     research_html = research_html.replace("__DATE_ISO__", last)
     research_html = research_html.replace("__DATE__", date_str)
-    open(OUT, "w", encoding="utf-8").write(html)
-    open(RESEARCH_OUT, "w", encoding="utf-8").write(research_html)
-    archive_path = os.path.join(ARCHIVE, f"{last}.html")
+    open(out, "w", encoding="utf-8").write(html)
+    open(research_out, "w", encoding="utf-8").write(research_html)
+    archive_path = os.path.join(archive, f"{last}.html")
     archive_created = not os.path.exists(archive_path)
     if archive_created:
         open(archive_path, "w", encoding="utf-8").write(html)
-    open(os.path.join(ARCHIVE, "manifest.json"), "w", encoding="utf-8").write(json.dumps(dates))
-    print(f"已重生 {OUT}、{RESEARCH_OUT} — 資料日 {date_str},{len(data)} 檔,"
+    open(os.path.join(archive, "manifest.json"), "w", encoding="utf-8").write(json.dumps(dates))
+    print(f"已重生 {out}、{research_out} — 資料日 {date_str},{len(data)} 檔,"
           f"研究 {research_library['total']} 篇,{len(tiers)} 個 tier;"
           f"{'建立' if archive_created else '保留既有'}快照 archive/{last}.html,"
           f"manifest 共 {len(dates)} 日")
@@ -5234,4 +5238,7 @@ def main(research_as_of=None):
 
 
 if __name__ == "__main__":
-    main()
+    ap = argparse.ArgumentParser(description="從 SQLite 重生儀表板與歷史快照")
+    ap.add_argument("--output-dir", help="頁面與 archive 的輸出目錄（預設為 repo 根目錄）")
+    args = ap.parse_args()
+    main(output_dir=args.output_dir)
