@@ -159,7 +159,12 @@ CREATE TABLE IF NOT EXISTS price_adj(date TEXT, stock_id TEXT, close REAL, PRIMA
 CREATE TABLE IF NOT EXISTS fetch_log(ts TEXT, start TEXT, "end" TEXT, rows INTEGER);
 CREATE TABLE IF NOT EXISTS fetch_coverage(dataset TEXT, data_id TEXT, covered_through TEXT,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(dataset,data_id));
+CREATE TABLE IF NOT EXISTS derived_rebuild_state(
+  id INTEGER PRIMARY KEY CHECK(id=1), level INTEGER NOT NULL);
 """
+
+REBUILD_OBSERVATION = 1
+REBUILD_ALL = 2
 
 # SQLite 的 CREATE TABLE IF NOT EXISTS 不會替既有表補欄；欄位順序刻意沿用「舊欄在前、
 # 新欄附加在後」，讓 repo 內既有 data/findmind.db 可原地升級且不需整表搬移。
@@ -211,9 +216,18 @@ RAW_AUDIT_COLUMNS = {
 }
 
 
+def _mark_derived_pending(con, level=REBUILD_ALL):
+    con.execute(
+        """INSERT INTO derived_rebuild_state VALUES(1,?)
+           ON CONFLICT(id) DO UPDATE SET level=excluded.level
+           WHERE derived_rebuild_state.level < excluded.level""", (level,))
+
+
 def ensure_schema(con):
     """建立新資料庫或就地升級舊 DB；可重複執行。"""
     con.executescript(SCHEMA)
+    # 舊庫無法靠日期判斷是否已有同日修正未重算；第一次升級保守重建。
+    con.execute("INSERT OR IGNORE INTO derived_rebuild_state VALUES(1,?)", (REBUILD_ALL,))
     for table, columns in RAW_COLUMN_MIGRATIONS.items():
         existing = {row[1] for row in con.execute(f"PRAGMA table_info({table})")}
         for name, sql_type in columns:
@@ -235,7 +249,7 @@ def ensure_schema(con):
              ON mi.date=m.date AND mi.market='TWSE' AND mi.index_key=?""",
         (MARKET_CROSSCHECK_TOLERANCE, MARKET_SOURCE_TWSE,
          MARKET_SOURCE_LEGACY, TWSE_TOTAL_RETURN_KEY))
-    con.execute(
+    updated = con.execute(
         """UPDATE market
            SET taiex=(SELECT p.official_taiex FROM market_provenance p
                       WHERE p.date=market.date)
@@ -245,6 +259,8 @@ def ensure_schema(con):
                AND p.official_taiex IS NOT NULL
                AND market.taiex!=p.official_taiex)""",
         (MARKET_SOURCE_TWSE,))
+    if updated.rowcount:
+        _mark_derived_pending(con)
     con.commit()
 
 _TOKENS = []   # get_tokens() 快取
@@ -912,6 +928,8 @@ def up_price(con, data):
     rows = [(d["date"], d["stock_id"], d.get("open"), d.get("max"), d.get("min"),
              d.get("close"), d.get("Trading_Volume"), d.get("Trading_money"),
              d.get("Trading_turnover")) for d in data]
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO price
            (date,stock_id,open,high,low,close,volume,amount,trades)
@@ -979,6 +997,8 @@ def up_inst(con, data):
             value["ds_buy"], value["ds_sell"], value["ds_net"],
             value["dh_buy"], value["dh_sell"], value["dh_net"],
         ))
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO inst
            (date,stock_id,foreign_net,trust_net,dealer_net,foreign_buy,foreign_sell,
@@ -996,6 +1016,8 @@ def up_margin(con, data):
              d.get("ShortSaleLimit"), d.get("MarginShortOffset"),
              d.get("MarginPurchasePreviousDayBalance"),
              d.get("ShortSalePreviousDayBalance")) for d in data]
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO margin
            (date,stock_id,margin_bal,short_bal,margin_buy,margin_sell,margin_cash_repay,
@@ -1010,6 +1032,8 @@ def up_holding(con, data):
              d.get("ForeignInvestmentAvailableShares"),
              d.get("ForeignInvestmentAvailableRatio"),
              d.get("ForeignInvestmentLimitRatio")) for d in data]
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO holding
            (date,stock_id,foreign_pct,shares_issued,foreign_shares,foreign_available_shares,
@@ -1023,6 +1047,8 @@ def up_sbl(con, data):
              d.get("SBLShortSalesCurrentDaySell"), d.get("SBLShortSalesCurrentDayReturn"),
              d.get("SBLShortSalesCurrentDayAdjustment"),
              d.get("SBLShortSalesNextDayLimit")) for d in data]
+    if rows:
+        _mark_derived_pending(con)
     con.executemany(
         """INSERT OR REPLACE INTO sbl
            (date,stock_id,sbl_bal,sbl_prev_bal,sbl_sell,sbl_return,sbl_adjustment,sbl_next_limit)
@@ -1033,6 +1059,8 @@ def up_sbl(con, data):
 def up_market_index(con, data):
     rows = [(d["date"], d["market"], d["index_key"], d["index_name"],
              d["index_type"], d.get("close")) for d in data]
+    if rows:
+        _mark_derived_pending(con, REBUILD_OBSERVATION)
     con.executemany(
         """INSERT OR REPLACE INTO market_index
            (date,market,index_key,index_name,index_type,close) VALUES(?,?,?,?,?,?)""", rows)
@@ -1510,6 +1538,7 @@ def fetch_dividends(con, ids, token, start, end, sleep, force=False):
         rows = [(d["date"], d["stock_id"], d.get("before_price"), d.get("reference_price"))
                 for d in data if d.get("before_price") and d.get("reference_price")]
         if rows:
+            _mark_derived_pending(con)
             con.executemany("INSERT OR REPLACE INTO dividend_result VALUES(?,?,?,?)", rows)
             n += len(rows)
         if ok:
@@ -1532,6 +1561,7 @@ def fetch_splits(con, ids, token, start, end, sleep, force=False):
     rows = [(d["date"], d["stock_id"], d.get("before_price"), d.get("after_price"))
             for d in data if d.get("stock_id") in keep and d.get("before_price") and d.get("after_price")]
     if rows:
+        _mark_derived_pending(con)
         con.executemany("INSERT OR REPLACE INTO split_event VALUES(?,?,?,?)", rows)
     if ok:
         _coverage_set(con, "TaiwanStockSplitPrice", "*", end)
@@ -1659,6 +1689,7 @@ def fetch_index(con, token, start, end, sleep, expected_dates=None, force=False,
         for day, _canonical, source, official_value, finmind_value, diff in planned
         if provenance_changed(day, source, official_value, finmind_value, diff)]
     if market_rows:
+        _mark_derived_pending(con)
         con.executemany(
             "INSERT OR REPLACE INTO market(date,taiex) VALUES(?,?)", market_rows)
     if provenance_rows:
@@ -2152,6 +2183,21 @@ def build_group_market(con):
     con.executemany("INSERT OR REPLACE INTO group_metrics VALUES(?,?,?,?,?,?,?,?,?)", out)
     con.commit()
 
+def rebuild_derived(con, level):
+    _mark_derived_pending(con, level)
+    con.commit()
+    if level == REBUILD_ALL:
+        build_price_adj(con)
+        build_metrics(con)
+    obs = build_observation_metrics(
+        con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
+    if level == REBUILD_ALL:
+        build_group_market(con)
+    con.execute("UPDATE derived_rebuild_state SET level=0 WHERE id=1 AND level<=?", (level,))
+    con.commit()
+    return obs
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", help="YYYY-MM-DD;省略則從 --end 往前推 --days 天")
@@ -2219,11 +2265,7 @@ def main():
         load_universe(con)
         con.commit()
         print("只重算 price_adj + daily_metrics + 觀察指標 + 族群/大盤層(不抓取)…")
-        build_price_adj(con)
-        build_metrics(con)
-        obs = build_observation_metrics(
-            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
-        build_group_market(con)
+        obs = rebuild_derived(con, REBUILD_ALL)
         n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]
         con.close()
         print(f"完成 — daily_metrics {n} rows;觀察層 {obs['stock_rows']} stock rows / "
@@ -2331,17 +2373,13 @@ def main():
         "SELECT MAX(date) FROM observation_metrics").fetchone()[0] if con.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='observation_metrics'").fetchone() else None
     price_last = con.execute("SELECT MAX(date) FROM price").fetchone()[0]
-    if data_changed or metric_last != price_last:
-        build_price_adj(con)
+    pending = con.execute("SELECT level FROM derived_rebuild_state WHERE id=1").fetchone()[0]
+    if pending == REBUILD_ALL or data_changed or metric_last != price_last:
         print("重算 daily_metrics + 觀察指標 + 族群/大盤層 …")
-        build_metrics(con)
-        build_observation_metrics(
-            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
-        build_group_market(con)
-    elif market_index_rows or observation_last != price_last:
+        rebuild_derived(con, REBUILD_ALL)
+    elif pending == REBUILD_OBSERVATION or market_index_rows or observation_last != price_last:
         print("官方指數／觀察層有更新，重算 observation_metrics …")
-        build_observation_metrics(
-            con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
+        rebuild_derived(con, REBUILD_OBSERVATION)
     else:
         print("原始/事件資料無變更且 metrics/observation 已同步,略過衍生表重建")
     n = con.execute("SELECT COUNT(*) FROM daily_metrics").fetchone()[0]

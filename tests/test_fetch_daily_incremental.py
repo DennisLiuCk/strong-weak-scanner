@@ -4,7 +4,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import closing, redirect_stderr, redirect_stdout
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError
@@ -970,6 +970,87 @@ class IncrementalFetchTest(unittest.TestCase):
             fetcher=final_holding, final_pass=True)
         self.assertEqual(repeat["requests"], 0)
         self.assertEqual(calls, [])
+
+    def test_resumed_final_pass_rebuilds_same_date_correction_without_new_rows(self):
+        day = "2026-07-09"
+        indexes = [
+            {"date": day, "market": market, "index_key": key, "index_name": key,
+             "index_type": "total_return", "close": 100}
+            for market, key in [("TWSE", fd.TWSE_TOTAL_RETURN_KEY),
+                                ("TPEx", fd.TPEX_TOTAL_RETURN_KEY)]
+        ]
+        fd.up_market_index(self.con, indexes)
+        self.con.execute("INSERT INTO market VALUES(?,100)", (day,))
+        self.con.commit()
+
+        def read_checkpoint(db):
+            with closing(sqlite3.connect(db)) as con:
+                return tuple(con.execute(
+                    f"SELECT MAX(date), MAX(CASE WHEN date=? AND stock_id='2330' "
+                    f"THEN close END) FROM {table}", (day,)).fetchone()
+                    for table in ("price", "price_adj", "daily_metrics"))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "resumed-final-pass.db")
+            con = sqlite3.connect(db)
+            self.con.backup(con)
+            con.close()
+            argv = ["fetch_daily.py", "--final-pass", "--start", day, "--end", day,
+                    "--sleep", "0", "--db", db]
+            stdout = io.StringIO()
+            with mock.patch.object(sys, "argv", argv + ["--force"]), \
+                    mock.patch.object(sys, "stdout", stdout), \
+                    mock.patch.object(fd, "taipei_now", return_value=datetime(
+                        2026, 7, 9, 23, 47, tzinfo=fd.TAIPEI_TZ)), \
+                    mock.patch.object(fd, "load_universe", return_value=self.ids), \
+                    mock.patch.object(fd, "get_token", return_value="token"), \
+                    mock.patch.object(fd, "fetch_exchange_price_source", self.expanded_price_fetch), \
+                    mock.patch.object(fd, "fetch_exchange_raw_source", self.fake_fetch), \
+                    mock.patch.object(fd, "fetch_tpex_market_indices", return_value=indexes[1:]), \
+                    mock.patch.object(fd, "api_get", return_value=([], True)), \
+                    mock.patch.object(fd, "fetch_ref_series", side_effect=[
+                        RuntimeError("interrupted after raw checkpoint"), (0, 0)]), \
+                    mock.patch.object(fd, "fetch_risk_flags", return_value=(0, True)):
+                with mock.patch.object(sys, "argv", ["fetch_daily.py", "--metrics-only", "--db", db]):
+                    fd.main()
+                with self.assertRaisesRegex(RuntimeError, "interrupted after raw checkpoint"):
+                    fd.main()
+                self.assertEqual(read_checkpoint(db), ((day, 3), (day, 2), (day, 2)))
+                self.calls.clear()
+                self.price_calls.clear()
+                stdout.truncate(0)
+                stdout.seek(0)
+                with mock.patch.object(sys, "argv", argv):
+                    fd.main()
+                self.assertEqual(self.calls, [])
+                self.assertEqual(self.price_calls, [])
+                self.assertIn("官方批次 0 次", stdout.getvalue())
+                self.assertIn("原始 0 rows 落地", stdout.getvalue())
+                self.assertEqual(read_checkpoint(db), ((day, 3), (day, 3), (day, 3)))
+
+    def test_observation_rebuild_preserves_concurrent_full_rebuild_marker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "concurrent-rebuild.db"
+            with closing(sqlite3.connect(db)) as rebuild, closing(sqlite3.connect(db)) as writer:
+                fd.ensure_schema(rebuild)
+                fd.rebuild_derived(rebuild, fd.REBUILD_ALL)
+                observation_builder = fd.build_observation_metrics
+
+                def build_then_write(*args):
+                    result = observation_builder(*args)
+                    self.assertEqual(writer.execute(
+                        "SELECT level FROM derived_rebuild_state WHERE id=1").fetchone()[0],
+                        fd.REBUILD_OBSERVATION)
+                    fd.up_price(writer, [{"date": "2026-07-09", "stock_id": "2330", "close": 3}])
+                    writer.commit()
+                    return result
+
+                with mock.patch.object(fd, "build_observation_metrics", side_effect=build_then_write):
+                    fd.rebuild_derived(rebuild, fd.REBUILD_OBSERVATION)
+
+                self.assertEqual(writer.execute(
+                    "SELECT level FROM derived_rebuild_state WHERE id=1").fetchone()[0],
+                    fd.REBUILD_ALL)
 
     def test_filtered_or_empty_final_pass_does_not_complete_universe(self):
         dataset = "TaiwanStockShareholding"
