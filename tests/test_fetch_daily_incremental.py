@@ -1229,6 +1229,22 @@ class RiskFlagFetchTest(unittest.TestCase):
         }, today=self.day), (0, False))
         self.assertEqual(self.flags(), original)
 
+    def test_malformed_row_does_not_discard_valid_rows_from_same_source(self):
+        original = self.flags()
+        period = "115/11/19～115/11/25"
+        self.assertEqual(self.fetch({
+            fd.TWSE_PUNISH_URL: [
+                {"Code": "3532", "Date": "1151118", "DispositionPeriod": period},
+                {"Code": "3491", "Date": "1151118", "DispositionPeriod": "格式異常"},
+                {"Code": "3131", "Date": "1151118", "DispositionPeriod": period},
+            ],
+        }, today=self.day), (2, False))
+        self.assertEqual(self.flags(), [
+            ("3131", "處置", "", period),
+            ("3532", "處置", "", period),
+            *original,
+        ])
+
     def test_empty_feeds_can_clear_flags_today_but_not_on_other_days(self):
         original = self.flags()
         for other_day in ("2026-11-18", "2026-11-20"):

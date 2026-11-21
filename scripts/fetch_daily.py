@@ -1764,12 +1764,16 @@ def fetch_risk_flags(con, target_date):
     )
     picked = {}
     for market, kind, url, code_key, reason_key in sources:
-        matched = []
         try:
             payload = _get_json(url)
             if not isinstance(payload, list):
                 raise ValueError("回應不是陣列")
-            for r in payload:
+        except Exception as e:
+            complete = False
+            print(f"  ! {market} {kind}股票抓取失敗:{e}", file=sys.stderr)
+            continue
+        for index, r in enumerate(payload, 1):
+            try:
                 sid, raw_date = r[code_key], r["Date"]
                 if sid == raw_date == "":  # 無公告時可能回傳單筆空白列
                     continue
@@ -1789,16 +1793,15 @@ def fetch_risk_flags(con, target_date):
                     start, end = _risk_disposal_period(period)
                     if not start <= target_date <= end:
                         continue
-                if sid in uni:
-                    reason = r.get(reason_key) or ""
-                    if not isinstance(reason, str):
-                        raise ValueError("公告理由不是文字")
-                    matched.append((sid, reason, period))
-        except Exception as e:
-            complete = False
-            print(f"  ! {market} {kind}股票抓取失敗:{e}", file=sys.stderr)
-            continue
-        for sid, reason, period in matched:
+                if sid not in uni:
+                    continue
+                reason = r.get(reason_key)
+                if reason is not None and not isinstance(reason, str):
+                    raise ValueError("公告理由不是文字")
+            except (KeyError, TypeError, ValueError) as e:
+                complete = False
+                print(f"  ! {market} {kind}股票第 {index} 列格式異常，略過:{e}", file=sys.stderr)
+                continue
             reasons, _ = picked.setdefault((sid, kind), ({}, period))
             if reason:
                 reasons[reason] = None  # 同檔多則理由去重並保留順序
