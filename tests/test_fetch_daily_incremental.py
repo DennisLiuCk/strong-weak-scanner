@@ -1007,6 +1007,23 @@ class IncrementalFetchTest(unittest.TestCase):
         self.assertAlmostEqual(resumed, 0.10)
         con.close()
 
+    def test_metrics_use_adjusted_close_across_ex_dividend_day(self):
+        con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
+        con.executescript(fd.SCHEMA)
+        con.execute("INSERT INTO universe VALUES('2454','測試','g','biz')")
+        con.executemany(
+            "INSERT INTO price(date,stock_id,close,volume) VALUES(?,?,?,?)",
+            (("2026-07-08", "2454", 100.0, 1000), ("2026-07-09", "2454", 95.0, 1000)))
+        con.execute("INSERT INTO dividend_result VALUES('2026-07-09','2454',100.0,95.0)")
+        fd.build_price_adj(con)
+        fd.build_metrics(con)
+
+        ret1 = con.execute(
+            "SELECT ret1 FROM daily_metrics WHERE date='2026-07-09' AND stock_id='2454'"
+        ).fetchone()[0]
+        self.assertAlmostEqual(ret1, 0.0, places=6)
+
     def test_zero_margin_balance_is_ranked_in_lens_b(self):
         con = sqlite3.connect(":memory:")
         self.addCleanup(con.close)
