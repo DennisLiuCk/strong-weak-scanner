@@ -89,12 +89,12 @@ def verdict_member(cap, liq):
         missing.append("缺20日中位成交值資料")
     if missing:
         return "⚪ 資料不足", missing
-    if cap is not None and cap < CAP_OUT:
+    if cap < CAP_OUT:
         return "🔻 建議剔除", [f"市值 {cap/1e8:,.0f} 億 < 剔除線 {CAP_OUT/1e8:.0f} 億"]
     fails = []
-    if cap is not None and cap < CAP_IN:
+    if cap < CAP_IN:
         fails.append(f"市值 {cap/1e8:,.0f} 億(緩衝帶 {CAP_OUT/1e8:.0f}~{CAP_IN/1e8:.0f} 億)")
-    if liq is not None and liq < LIQ_MIN:
+    if liq < LIQ_MIN:
         fails.append(f"20日中位成交值 {liq/1e6:,.0f}M 偏低")
     return ("👀 緩衝觀察" if fails else "✅ 續留"), fails
 
