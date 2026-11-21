@@ -4,6 +4,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError
@@ -1313,6 +1314,72 @@ class WorkflowCheckpointTest(unittest.TestCase):
         quality = (workflows / "qualitative-quality.yml").read_text(encoding="utf-8")
         self.assertIn("uses: actions/checkout@v6", quality)
         self.assertIn("uses: actions/setup-python@v6", quality)
+
+
+class FetchWindowTest(unittest.TestCase):
+    class StopBeforeFetch(Exception):
+        pass
+
+    def setUp(self):
+        now = datetime(2026, 11, 21, 23, 50, tzinfo=fd.TAIPEI_TZ)
+        self.enterContext(mock.patch.object(fd, "taipei_now", return_value=now))
+        self.token = self.enterContext(mock.patch.object(fd, "get_token"))
+        self.connect = self.enterContext(mock.patch.object(fd.sqlite3, "connect"))
+        self.enterContext(mock.patch.object(fd, "ensure_schema"))
+        self.enterContext(mock.patch.object(fd, "load_universe", return_value=[]))
+        self.enterContext(mock.patch.object(fd, "initialize_fetch_coverage"))
+        self.fetch_raw = self.enterContext(mock.patch.object(
+            fd, "fetch_missing_raw", side_effect=self.StopBeforeFetch))
+        self.stderr = self.enterContext(redirect_stderr(io.StringIO()))
+        self.enterContext(redirect_stdout(io.StringIO()))
+
+    def run_cli(self, *args):
+        argv = ["fetch_daily.py", "--final-pass", *args]
+        with mock.patch.object(sys, "argv", argv):
+            fd.main()
+
+    def assert_cli_error(self, message, *args):
+        self.stderr.seek(0)
+        self.stderr.truncate()
+        with self.assertRaises(SystemExit) as raised:
+            self.run_cli(*args)
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn(message, self.stderr.getvalue())
+        self.token.assert_not_called()
+        self.connect.assert_not_called()
+
+    def test_end_only_recovery_anchors_default_start_to_end(self):
+        with self.assertRaises(self.StopBeforeFetch):
+            self.run_cli("--end", "2026-10-07")
+        self.assertEqual(self.fetch_raw.call_args.args[3:5], ("2026-09-22", "2026-10-07"))
+
+    def test_cli_dates_are_normalized_before_dispatch(self):
+        with self.assertRaises(self.StopBeforeFetch):
+            self.run_cli("--start", "20261007", "--end", "2026-10-07")
+        self.assertEqual(self.fetch_raw.call_args.args[3:5], ("2026-10-07", "2026-10-07"))
+
+    def test_reversed_window_is_rejected(self):
+        self.assert_cli_error("--start 2026-10-08 晚於 --end 2026-10-07",
+                              "--start", "2026-10-08", "--end", "2026-10-07")
+
+    def test_implicit_start_before_production_history_floor_is_rejected(self):
+        self.assert_cli_error("--start 2025-10-17 早於 2026-03-02",
+                              "--days", "400")
+
+    def test_implicit_start_before_history_floor_is_allowed_with_separate_db(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "history.db")
+            with self.assertRaises(self.StopBeforeFetch):
+                self.run_cli("--db", db, "--days", "400")
+            self.connect.assert_called_once_with(db)
+        self.token.assert_called_once_with()
+        self.assertEqual(self.fetch_raw.call_args.args[3:5], ("2025-10-17", "2026-11-21"))
+        self.assertTrue(self.fetch_raw.call_args.kwargs["final_pass"])
+
+    def test_invalid_dates_are_rejected(self):
+        for option in ("--start", "--end"):
+            with self.subTest(option=option):
+                self.assert_cli_error(f"{option} 不是有效日期", option, "2026-02-30")
 
 
 class FinalPassReadinessTest(unittest.TestCase):
