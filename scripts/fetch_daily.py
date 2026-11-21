@@ -81,6 +81,7 @@ GRP_MIN_N      = 6       # 族群聚合最少有效檔數(避免 1 檔代表全�
 GS_OFF_HIGH    = -0.05   # 族群狀態:「價未回高」門檻(中位距60日高)
 GS_BREADTH_LOW = 0.4     # 族群狀態:「佈局廣度低」門檻
 TDCC_LAG_DAYS  = 3       # 資料層假設:TDCC 週快照(週五結算、週六公布)自次週一生效(T−3 日曆日)
+TDCC_FULL_LEVELS = frozenset(range(1, 18))
 MARKET_CROSSCHECK_TOLERANCE = 1e-6
 MARKET_SOURCE_TWSE = "TWSE_MI_INDEX"
 MARKET_SOURCE_FINMIND = "FinMind_fallback"
@@ -1978,21 +1979,25 @@ def build_metrics(con):
         acc = {}
         for d, sid, lv, people, pct in con.execute(
                 "SELECT date, stock_id, level, people, pct FROM tdcc_holding ORDER BY date"):
-            w = acc.setdefault(sid, {}).setdefault(d, [0.0, 0.0, None, set(), True])
-            w[3].add(lv)
+            w = acc.setdefault(sid, {}).setdefault(d, {
+                "big400": 0.0, "big1000": 0.0, "people": None,
+                "levels": set(), "valid_pct": True})
+            w["levels"].add(lv)
             if 12 <= lv <= 15:
                 if pct is None:
-                    w[4] = False
-                w[0] += pct or 0.0
+                    w["valid_pct"] = False
+                w["big400"] += pct or 0.0
             if lv == 15:
-                w[1] = pct or 0.0
+                w["big1000"] = pct or 0.0
             if lv == 17:
-                w[2] = people   # 合計列人數=總股東數(含差異調整,誤差可忽略)
+                w["people"] = people   # 合計列人數=總股東數(含差異調整,誤差可忽略)
         for sid, byd in acc.items():
-            tdcc[sid] = sorted(
-                (d, v[0] if v[3] == set(range(1, 18)) and v[4] else None,
-                 v[1] if v[3] == set(range(1, 18)) and v[4] else None, v[2])
-                for d, v in byd.items())
+            snaps = []
+            for d, w in byd.items():
+                complete = w["levels"] == TDCC_FULL_LEVELS and w["valid_pct"]
+                snaps.append((d, w["big400"] if complete else None,
+                              w["big1000"] if complete else None, w["people"]))
+            tdcc[sid] = sorted(snaps)
     # ── 第一趟:每檔基礎序列 ──
     S = {}
     for sid, grp in con.execute("SELECT stock_id, grp FROM universe").fetchall():
