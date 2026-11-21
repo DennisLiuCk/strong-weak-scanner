@@ -62,6 +62,37 @@ console.log(JSON.stringify({unchanged,order,empty:root.children.length===0}));
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)
 
+    def test_graph_labels_fit_measured_width_and_preserve_code_points(self):
+        result = self.run_helper('fitGraphLabel', """
+function shortGraphLabel(value,max=18){const chars=Array.from(String(value||''));return chars.length>max?chars.slice(0,max-1).join('')+'…':chars.join('')}
+function fit(label,width,measure=true){const el={textContent:'',style:{}};if(measure!==null)el.getComputedTextLength=()=>measure?Array.from(el.textContent).length*parseFloat(el.style.fontSize):0;const shortened=fitGraphLabel(el,label,width,{size:16,minSize:13,max:4});return [el.textContent,el.style.fontSize,shortened]}
+console.log(JSON.stringify([fit('AB',40),fit('ABC',40),fit('A😀BCDE',40),fit('',40),fit('A😀BCD',40,false),fit('A😀BCD',40,null)]))
+""")
+        self.assertEqual(result, [
+            ['AB', '16px', False], ['ABC', '13px', False],
+            ['A😀…', '13px', True], ['', '16px', False],
+            ['A😀B…', '16px', True], ['A😀B…', '16px', True],
+        ])
+
+    def test_root_labels_wrap_before_truncating_with_deterministic_fallback(self):
+        result = self.run_helper('fitGraphRootLabel', """
+function svgEl(tag,attrs){return {tag,attrs}}
+function fit(label,width,mode='measured'){const el={textContent:'',style:{},children:[],appendChild(child){this.children.push(child)}};if(mode!=='missing')el.getComputedTextLength=()=>mode==='zero'?0:Array.from(el.textContent).length*parseFloat(el.style.fontSize);const sub={setAttribute(key,value){this[key]=value}};const shortened=fitGraphRootLabel(el,label,width,sub);return {lines:el.children.map(child=>child.attrs.text),ys:el.children.map(child=>child.attrs.y),size:el.style.fontSize,subY:sub.y,shortened}}
+console.log(JSON.stringify([fit('AB',100),fit('ABC DEF',60),fit('AB中文',30),fit('甲乙丙丁',30),fit('A😀BCDEFGHIJK',30),fit('',60),fit('ABC DEF',60,'zero'),fit('ABC DEF',60,'missing'),fit('ABCDEFGH',60)]))
+""")
+        self.assertEqual(result[0], dict(lines=['AB'], ys=[-3], size='15px', subY=17, shortened=False))
+        for index, lines in [(1, ['ABC', 'DEF']), (2, ['AB', '中文']), (3, ['甲乙', '丙丁'])]:
+            self.assertEqual(result[index], dict(lines=lines, ys=[-12, 6], size='15px', subY=24, shortened=False))
+        self.assertEqual(result[4]['lines'], ['A…', 'F…'])
+        self.assertTrue(result[4]['shortened'])
+        self.assertEqual(result[4]['size'], '14px')
+        self.assertEqual(result[5]['lines'], [''])
+        self.assertFalse(result[5]['shortened'])
+        self.assertEqual(result[6], result[1])
+        self.assertEqual(result[7], result[1])
+        self.assertFalse(result[8]['shortened'])
+        self.assertEqual(result[8]['lines'], ['ABCD', 'EFGH'])
+
     def test_company_heading_identifies_the_document_without_repeating_the_mission(self):
         result = self.run_helper('articleReaderHeading', """
 function h(tag,attrs,...children){return {tag,attrs,children}}
