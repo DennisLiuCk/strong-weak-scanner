@@ -1,3 +1,5 @@
+import contextlib
+import io
 import sqlite3
 import sys
 import unittest
@@ -236,6 +238,25 @@ class DashboardExplainabilityPayloadTest(unittest.TestCase):
     def test_overview_placeholder_is_injected(self):
         source = (ROOT / "scripts" / "build_dashboard.py").read_text(encoding="utf-8")
         self.assertIn('html.replace("__OVERVIEW_JSON__"', source)
+
+
+class RankChangePreviewPayload(unittest.TestCase):
+    def test_default_pipeline_does_not_build_rank_change(self):
+        self.assertIsNone(bd.build_rank_change(None, None, {}, {}))
+
+    def test_selection_error_becomes_visible_error_payload(self):
+        con = sqlite3.connect(":memory:")
+        con.row_factory = sqlite3.Row
+        con.executescript("""
+            CREATE TABLE market(date TEXT PRIMARY KEY, taiex REAL);
+            CREATE TABLE oos_snapshot_runs(snapshot_id TEXT, data_date TEXT, captured_at TEXT, source TEXT,
+                is_official INTEGER, quality_json TEXT, stock_count INTEGER, group_count INTEGER,
+                universe_hash TEXT);""")
+        as_of = bd.dt.datetime(2026, 11, 21, 10, tzinfo=bd.rank_change.TAIPEI_TZ)
+        with contextlib.redirect_stdout(io.StringIO()) as log:
+            out = bd.build_rank_change(con, ("2026-11-13", "2026-11-20"), {}, {}, as_of=as_of)
+        self.assertIn("本週排名變化", log.getvalue())
+        self.assertIn("2026-11-13", out["error"])
 
 
 if __name__ == "__main__":
