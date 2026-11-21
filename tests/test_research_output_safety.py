@@ -14,6 +14,14 @@ import research_worklist as rw
 
 
 class OutputSafetyTest(unittest.TestCase):
+    def symlink(self, alias, target, target_is_directory=False):
+        try:
+            alias.symlink_to(target, target_is_directory=target_is_directory)
+        except OSError as exc:
+            if os.name == 'nt' and getattr(exc, 'winerror', None) == 1314:
+                self.skipTest('Windows account lacks symlink privilege; exercised on Linux CI')
+            raise
+
     def run_cli(self, module, db, output):
         snapshot = {'items': [], 'as_of': '2026-11-21',
                     'topic_errors': [], 'scan': {'errors': []}}
@@ -46,7 +54,7 @@ class OutputSafetyTest(unittest.TestCase):
                     elif alias in ('symlink', 'hardlink'):
                         output = db.with_name('alias.db')
                         if alias == 'symlink':
-                            output.symlink_to(db)
+                            self.symlink(output, db)
                         else:
                             os.link(db, output)
                     code, stdout, stderr = self.run_cli(module, db, output)
@@ -80,7 +88,7 @@ class OutputSafetyTest(unittest.TestCase):
                     run = root / 'snapshots' / 'run'
                     work.mkdir()
                     run.mkdir(parents=True)
-                    (work / 'link').symlink_to(run, target_is_directory=True)
+                    self.symlink(work / 'link', run, target_is_directory=True)
                     actual = work / 'input.db'
                     distinct = run.parent / 'input.db'
                     for path, marker in ((actual, 'actual'), (distinct, 'distinct')):
