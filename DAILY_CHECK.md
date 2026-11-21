@@ -74,7 +74,8 @@
 `no_trade`、移除 universe 或補零放行。一般臨時停牌未納入此自動減資契約。
 
 補過去交易日使用 `python scripts/run_daily.py --end YYYY-MM-DD`，避免意外抓到今日尚未
-終版的資料。管線先稽核原始五表，再評分與快照；發布後執行
+終版的資料。省略 `--start` 時，若從 `--end` 往前推 `--days` 早於 2026-03-02，正式 db 會拒絕；請指定不早於該日的 `--start` 或縮短 `--days`。
+管線先稽核原始五表，再評分與快照；發布後執行
 `python scripts/operational_health.py --check-pages`，核對部署 SHA。新快照如晚於資料日
 次日台北 09:00，會保留真實時間並明示延遲補發布，不進 OOS 成效樣本；既有 archive／OOS
 不改寫。此門檻對假日採保守處理。
