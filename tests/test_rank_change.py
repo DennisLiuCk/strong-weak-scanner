@@ -91,7 +91,26 @@ class Fixture:
         self.tmp.cleanup()
 
 
+def calendar(start, end, closed=None, announced=(), closures=None):
+    """固定交易日曆:start~end 逐月已核對成交日(扣掉 closed);announced=只有開休市表的年份。"""
+    closed = closed or {}
+    realized, d, last = {}, dt.date.fromisoformat(start), dt.date.fromisoformat(end)
+    while d <= last:
+        m = str(d)[:7]
+        e = realized.setdefault(m, {"covered_through": str(d), "trading_days": [], "sources": ["fixture"]})
+        e["covered_through"] = str(d)
+        if d.weekday() < 5 and str(d) not in closed:
+            e["trading_days"].append(str(d))
+        d += dt.timedelta(days=1)
+    return rc.market_calendar.MarketCalendar({
+        "realized": realized,
+        "announced": {y: {"source": "fixture-schedule", "closed": []} for y in announced},
+        "closures": [{"date": k, "reason": v, "source": "fixture"} for k, v in {**closed, **(closures or {})}.items()]})
+
+
 class WeekSelection(unittest.TestCase):
+    NOV = calendar("2026-11-01", "2026-11-30")
+
     def make(self, market, snapshots=None):
         fx = Fixture(market)
         self.addCleanup(fx.close)
@@ -100,8 +119,8 @@ class WeekSelection(unittest.TestCase):
         self.addCleanup(con.close)
         return fx, con
 
-    def dates(self, con, as_of):
-        picked, notes = rc.select_weeks(con, as_of)
+    def dates(self, con, as_of, mcal=NOV):
+        picked, notes = rc.select_weeks(con, as_of, mcal=mcal)
         return [w["date"] for w in picked], notes
 
     def test_friday_published_uses_this_week(self):
@@ -115,40 +134,80 @@ class WeekSelection(unittest.TestCase):
         self.assertEqual(got, ["2026-11-06", "2026-11-13"])
         self.assertIn("尚未發布", notes[0])
 
-    def test_friday_trading_but_snapshot_missing_after_deadline_is_explicit(self):
-        market = weekdays("2026-11-02", "2026-11-20")
-        _, con = self.make(market, [d for d in market if d != "2026-11-20"])
-        with self.assertRaisesRegex(rc.SelectionError, "2026-11-20 是交易日.*沒有正式快照"):
-            rc.select_weeks(con, at("2026-11-21T10:00"))
-        # 不得默默退回週四
-        with self.assertRaises(rc.SelectionError):
-            rc.build_report(con, at("2026-11-21T10:00"))
+    def test_friday_holiday_uses_weeks_actual_last_trading_day(self):
+        cal = calendar("2026-11-01", "2026-11-30", {"2026-11-13": "測試休市"})
+        _, con = self.make(weekdays("2026-11-02", "2026-11-20", skip={"2026-11-13"}))
+        got, notes = self.dates(con, at("2026-11-21T10:00"), cal)
+        self.assertEqual(got, ["2026-11-12", "2026-11-20"])
+        self.assertEqual(notes, ["2026-11-13 休市(測試休市),改用該週最後交易日 2026-11-12"])
 
-    def test_friday_fetch_failure_then_monday_recovery_is_not_called_a_holiday(self):
-        # 週五 11/13 抓取失敗、週一 11/16 恢復:market 同樣是「週五沒資料、週一有資料」。
+    def test_friday_and_thursday_holiday_walks_back_to_wednesday(self):
+        cal = calendar("2026-11-01", "2026-11-30", {"2026-11-12": "甲", "2026-11-13": "乙"})
+        _, con = self.make(weekdays("2026-11-02", "2026-11-20", skip={"2026-11-12", "2026-11-13"}))
+        got, notes = self.dates(con, at("2026-11-21T10:00"), cal)
+        self.assertEqual(got, ["2026-11-11", "2026-11-20"])
+        self.assertIn("2026-11-12 休市(甲)、2026-11-13 休市(乙),改用該週最後交易日 2026-11-11", notes[0])
+
+    def test_friday_fetch_failure_reports_missing_day(self):
+        # 日曆判定 11/13 開市;market 與正式快照都沒有該日(週一恢復)→ 不是休市,是缺漏。
         _, con = self.make(weekdays("2026-11-02", "2026-11-16", skip={"2026-11-13"}))
         for as_of in ("2026-11-16T23:55", "2026-11-17T10:00"):
-            with self.assertRaisesRegex(rc.SelectionError, "週五 2026-11-13.*其後有交易日 2026-11-16.*"
-                                        "無法確認是休市還是抓取失敗,不退回該週前一交易日"):
-                rc.select_weeks(con, at(as_of))
+            with self.assertRaisesRegex(rc.SelectionError, r"缺 2026-11-13 的正式快照:交易日曆判定該日開市"
+                                        r".*market 也沒有該日,疑似資料漏抓。不退回該週前一交易日"):
+                rc.select_weeks(con, at(as_of), mcal=self.NOV)
             with self.assertRaises(rc.SelectionError):
-                rc.build_report(con, at(as_of))
+                rc.build_report(con, at(as_of), mcal=self.NOV)
 
-    def test_unconfirmed_friday_absence_is_explicit_after_deadline(self):
+    def test_market_present_but_snapshot_missing_is_reported(self):
+        market = weekdays("2026-11-02", "2026-11-20")
+        _, con = self.make(market, [d for d in market if d != "2026-11-20"])
+        with self.assertRaisesRegex(rc.SelectionError, "缺 2026-11-20 的正式快照.*market 有該日資料"):
+            rc.select_weeks(con, at("2026-11-21T10:00"), mcal=self.NOV)
+
+    def test_scheduled_only_day_is_trading_but_says_not_yet_verified(self):
+        cal = calendar("2026-11-01", "2026-11-12", announced=("2026",))
         _, con = self.make(weekdays("2026-11-02", "2026-11-19"))
-        with self.assertRaisesRegex(rc.SelectionError, "無法確認是休市還是抓取失敗"):
-            rc.select_weeks(con, at("2026-11-21T10:00"))
-        self.assertEqual(self.dates(con, at("2026-11-20T22:00"))[0], ["2026-11-06", "2026-11-13"])
+        with self.assertRaisesRegex(rc.SelectionError, "缺 2026-11-20.*開休市表未列休市\\(尚未以實際成交核對\\)"):
+            rc.select_weeks(con, at("2026-11-21T10:00"), mcal=cal)
 
-    def test_replay_ignores_market_dates_after_as_of(self):
-        # 10/23 週五不在 market;10/26、10/27 之後才出現。10/24 重播時看不到未來交易日。
-        market = weekdays("2026-10-05", "2026-10-30", skip={"2026-10-23", "2026-10-26"})
+    def test_day_outside_calendar_is_unconfirmed(self):
+        cal = calendar("2026-11-01", "2026-11-13")
+        _, con = self.make(weekdays("2026-11-02", "2026-11-20"))
+        with self.assertRaisesRegex(rc.SelectionError, "2026-11-20 不在交易日曆涵蓋範圍,無法確認是否開市"
+                                    ".*market_calendar.py --refresh"):
+            rc.select_weeks(con, at("2026-11-21T10:00"), mcal=cal)
+        # 期限前:本週視為未完成,前兩週仍在涵蓋範圍內
+        got, notes = self.dates(con, at("2026-11-20T20:00"), cal)
+        self.assertEqual(got, ["2026-11-06", "2026-11-13"])
+        self.assertIn("2026-11-20 尚未到發布期限,且交易日曆未涵蓋", notes[0])
+
+    def test_whole_week_closed_is_skipped_and_noted(self):
+        holidays = {d: "春節" for d in weekdays("2026-11-09", "2026-11-13")}
+        cal = calendar("2026-11-01", "2026-11-30", holidays)
+        _, con = self.make(weekdays("2026-11-02", "2026-11-20", skip=set(holidays)))
+        got, notes = self.dates(con, at("2026-11-21T10:00"), cal)
+        self.assertEqual(got, ["2026-11-06", "2026-11-20"])
+        self.assertEqual(notes, ["略過 2026-11-09 當週:2026-11-09 當週整週休市:" +
+                                 "、".join(f"{d} 休市(春節)" for d in sorted(holidays))])
+
+    def test_calendar_closed_but_data_present_is_contradiction(self):
+        cal = calendar("2026-11-01", "2026-11-30", {"2026-11-20": "測試休市"})
+        _, con = self.make(weekdays("2026-11-02", "2026-11-20"))
+        with self.assertRaisesRegex(rc.SelectionError, "交易日曆判定 2026-11-20 休市.*日曆與資料矛盾"):
+            rc.select_weeks(con, at("2026-11-21T10:00"), mcal=cal)
+
+    def test_1023_closure_from_repo_calendar_selects_thursday(self):
+        # config/market_calendar.json:10/23 TWSE 臨時休市、10/26 開休市表假日;離線讀取,不連網。
+        real = rc.market_calendar.load()
+        st = real.status("2026-10-23")
+        self.assertEqual((st["state"], st["basis"]), ("closed", "realized"))
+        self.assertIn("115年10月23日休市一天", st["reason"])
+        market = weekdays("2026-10-05", "2026-10-30", skip={"2026-10-09", "2026-10-23", "2026-10-26"})
         _, con = self.make(market)
-        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-10-23.*也沒有之後的交易日"):
-            rc.select_weeks(con, at("2026-10-24T10:00"))
-        self.assertEqual(self.dates(con, at("2026-10-23T20:00"))[0], ["2026-10-09", "2026-10-16"])
-        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-10-23.*其後有交易日 2026-10-27"):
-            rc.select_weeks(con, at("2026-10-28T10:00"))
+        got, notes = self.dates(con, at("2026-10-24T10:00"), real)
+        self.assertEqual(got, ["2026-10-16", "2026-10-22"])
+        self.assertIn("改用該週最後交易日 2026-10-22", notes[0])
+        self.assertEqual(self.dates(con, at("2026-10-31T10:00"), real)[0], ["2026-10-22", "2026-10-30"])
 
     def test_same_day_market_row_needs_snapshot_or_provenance_before_as_of(self):
         fx, con = self.make(weekdays("2026-11-02", "2026-11-12"))
@@ -163,10 +222,6 @@ class WeekSelection(unittest.TestCase):
         self.addCleanup(con.close)
         self.assertNotIn("2026-11-16", rc.trading_calendar(con, at("2026-11-16T17:00"), {}))
         self.assertIn("2026-11-16", rc.trading_calendar(con, at("2026-11-16T18:10"), {}))
-        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-11-13.*也沒有之後的交易日"):
-            rc.select_weeks(con, at("2026-11-16T17:00"))
-        with self.assertRaisesRegex(rc.SelectionError, "週五 2026-11-13.*其後有交易日 2026-11-16"):
-            rc.select_weeks(con, at("2026-11-16T18:10"))
 
     def test_first_official_run_wins_and_late_or_unofficial_runs_ignored(self):
         fx = Fixture(weekdays("2026-11-02", "2026-11-20"))
@@ -177,10 +232,10 @@ class WeekSelection(unittest.TestCase):
         fx.run("revision", "2026-11-20", {"T": ("g", 7, 7.0), "Q": ("g", 0, 0.0)}, "2026-11-20T16:30:00+00:00")
         con = fx.con()
         self.addCleanup(con.close)
-        picked, _ = rc.select_weeks(con, at("2026-11-21T10:00"))
+        picked, _ = rc.select_weeks(con, at("2026-11-21T10:00"), mcal=self.NOV)
         self.assertEqual(picked[1]["run"]["snapshot_id"], "first")
         # as-of 早於首次擷取 → 本週視為尚未發布
-        picked, notes = rc.select_weeks(con, at("2026-11-20T23:00"))
+        picked, notes = rc.select_weeks(con, at("2026-11-20T23:00"), mcal=self.NOV)
         self.assertEqual(picked[1]["date"], "2026-11-13")
         self.assertIn("尚未發布", notes[0])
 
@@ -193,7 +248,7 @@ class WeekSelection(unittest.TestCase):
         con = fx.con()
         self.addCleanup(con.close)
         with self.assertRaisesRegex(rc.SelectionError, "empty.*0/2.*不以後來修正版取代"):
-            rc.select_weeks(con, at("2026-11-21T10:00"))
+            rc.select_weeks(con, at("2026-11-21T10:00"), mcal=self.NOV)
 
 
 class SmoothingWindow(unittest.TestCase):
