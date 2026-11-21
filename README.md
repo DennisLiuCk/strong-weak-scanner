@@ -305,6 +305,9 @@ python -m unittest discover -s tests
 
 `run_daily.py` 可安全重跑，只補缺口；上游未齊時會拒絕正式發布。它不會替你 review、commit
 或 push。
+加 `--preview` 只建立非正式快照（不進 OOS canonical），頁面寫入已忽略的
+`tmp/preview/index.html` 與 `tmp/preview/research.html`；預覽 archive 亦隔離在該目錄，
+不改寫根目錄頁面或正式 `archive/`。完成時會印出本機預覽路徑。
 補過去資料日請明確指定 `--end YYYY-MM-DD`；本地與 Actions 在評分前都先執行五表稽核。
 正式快照保留實際 `captured_at`；新快照若晚於資料日次日台北 09:00 的保守期限，標為
 `late_recovery`／`oos_eligible=false`，可發布完整資料，但不計入週報及首頁的 OOS 成效樣本。

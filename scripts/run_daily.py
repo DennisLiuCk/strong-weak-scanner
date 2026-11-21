@@ -34,7 +34,7 @@ def main():
     ap.add_argument("--force", action="store_true", help="強制重抓指定範圍")
     ap.add_argument("--skip-tdcc", action="store_true", help="略過 TDCC 週快照")
     ap.add_argument("--preview", action="store_true",
-                    help="只建立非正式預覽快照；不進 OOS canonical")
+                    help="只建立非正式預覽快照；不進 OOS canonical，頁面寫入 tmp/preview/")
     args = ap.parse_args()
 
     if not args.skip_tdcc:
@@ -61,7 +61,12 @@ def main():
     if not args.preview:
         audit_args.append("--require-current-snapshot")
     run("audit_ranking_views.py", *audit_args)
-    run("build_dashboard.py")
+    if args.preview:
+        preview_dir = os.path.join(ROOT, "tmp", "preview")
+        run("build_dashboard.py", "--output-dir", preview_dir)
+        print(f"\n預覽頁面：{os.path.join(preview_dir, 'index.html')}", flush=True)
+    else:
+        run("build_dashboard.py")
     print("\n本地 daily pipeline 完成；尚未 git commit/push。", flush=True)
 
 
