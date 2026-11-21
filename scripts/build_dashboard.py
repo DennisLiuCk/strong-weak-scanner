@@ -32,6 +32,7 @@ import signal_structure as sig   # 策略狀態卡的結構指標(與每日簡�
 import ranking_views as rv       # A/B/C/D 多視角排名；觀察層＋append-only challenger
 import hypotheses as hyp         # 兩視角分歧的籌碼定義 = H1 檢定的同一個定義
 import evidence_status
+import rank_change
 # 個股質化筆記的時效與查核品質——單一事實來源在 qual_notes.py
 from qual_notes import (_extract_sections, load_notes, note_status, note_review_status,
                         load_events, EVENT_KPI_KEYS,
@@ -4551,7 +4552,21 @@ def build_group_maturity(notes, topics, stock_meta, group_names, knowledge_graph
     }
 
 
-def main(research_as_of=None, output_dir=None):
+def build_rank_change(con, spec, names, group_names, as_of=None):
+    """「本週排名變化」預覽 payload;spec=None 時不產生(每日管線預設不啟用)。
+    spec="auto" 依 rank_change 選週規則,或給 (上週日期, 本週日期)。"""
+    if spec is None:
+        return None
+    as_of = as_of or dt.datetime.now(rank_change.TAIPEI_TZ)
+    try:
+        return rank_change.dashboard_payload(con, as_of, None if spec == "auto" else list(spec),
+                                             names, group_names)
+    except rank_change.SelectionError as exc:
+        print(f"⚠ 本週排名變化:{exc}")
+        return {"error": str(exc)}
+
+
+def main(research_as_of=None, output_dir=None, rank_change_spec=None):
     out = os.path.join(output_dir, "index.html") if output_dir is not None else OUT
     research_out = os.path.join(output_dir, "research.html") if output_dir is not None else RESEARCH_OUT
     archive = os.path.join(output_dir, "archive") if output_dir is not None else ARCHIVE
@@ -4732,6 +4747,9 @@ def main(research_as_of=None, output_dir=None):
     diverge = build_divergence(con, last, _names(con), GROUP_NM)
     lenses = build_lenses(con, last, _names(con), GROUP_NM)
     ranking_views = build_ranking_views(con, last, _names(con), GROUP_NM)
+    with open(GROUPS_CONFIG, encoding="utf-8") as f:
+        group_names = {r["group"]: r["name"] for r in csv.DictReader(f)}
+    rank_chg = build_rank_change(con, rank_change_spec, _names(con), group_names)
     ranking_by_stock = {
         row["stock_id"]: row for row in (ranking_views or {}).get("rows", [])
     }
@@ -5201,6 +5219,7 @@ def main(research_as_of=None, output_dir=None):
         scope += " · 延遲補發布（不計入 OOS）"
     html = html.replace("__SCOPE__", scope)
     html = html.replace("__MKT_TIP_JSON__", json.dumps(mtip, ensure_ascii=False))
+    html = html.replace("__RANK_CHANGE_JSON__", json.dumps(rank_chg, ensure_ascii=False))
     html = html.replace("__GROUP_HOW_JSON__", json.dumps({"how": GROUP_HOW, "src": GROUP_SRC},
                                                          ensure_ascii=False))
     html = html.replace("__DATE_ISO__", last)
@@ -5240,5 +5259,13 @@ def main(research_as_of=None, output_dir=None):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="從 SQLite 重生儀表板與歷史快照")
     ap.add_argument("--output-dir", help="頁面與 archive 的輸出目錄（預設為 repo 根目錄）")
+    ap.add_argument("--rank-change", metavar="上週,本週|auto",
+                    help="預覽個股詳情的「本週排名變化」:給兩個正式快照日期(例 2026-11-13,2026-11-20)"
+                         "或 auto 依 rank_change 選週規則;預設不產生")
     args = ap.parse_args()
-    main(output_dir=args.output_dir)
+    spec = args.rank_change
+    if spec and spec != "auto":
+        spec = tuple(x.strip() for x in spec.split(","))
+        if len(spec) != 2:
+            ap.error("--rank-change 需要兩個日期,以逗號分隔")
+    main(output_dir=args.output_dir, rank_change_spec=spec)

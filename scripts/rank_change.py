@@ -311,6 +311,16 @@ def window_mismatch(win, mean):
     return why
 
 
+def window_check(all_slots):
+    """(verified|prior_observation|incomplete, 平均, 原因);缺快照或原因不明缺列即不完整。"""
+    win = [s for s in all_slots if s["status"] == "ok"]
+    if not win or len(win) != len([s for s in all_slots if s["status"] != "no_trade"]):
+        return "incomplete", None, []
+    mean = round(sum(s["composite"] for s in win) / len(win), 2)
+    why = window_mismatch(win, mean)
+    return ("prior_observation" if why else "verified"), mean, why
+
+
 def render(ex, dA, dB, cite=None, window=None):
     cite = cite or {}
     c = lambda k: f" [{cite[k]}]" if k in cite else ""
@@ -352,14 +362,13 @@ def render(ex, dA, dB, cite=None, window=None):
     L.append(f"(2) 三日平滑排名分數 composite_s:{ex['csA']:+.2f} → {ex['csB']:+.2f},"
              f"變動 {round(ex['csB'] - ex['csA'], 2):+.2f}{c('rows')}  ← 名次只依這個分數")
     for tag, d, all_slots in zip("AB", (dA, dB), window or ()):
-        win = [s for s in all_slots if s["status"] == "ok"]
         parts = ", ".join(f"{s['date']} " + (f"{s['composite']:+.2f}" if s["status"] == "ok" else SLOT_LABEL[s["status"]])
                           for s in reversed(all_slots))
-        if len(win) != len([s for s in all_slots if s["status"] != "no_trade"]) or not win:
+        state, mean, why = window_check(all_slots)
+        win = [s for s in all_slots if s["status"] == "ok"]
+        if state == "incomplete":
             L.append(f"    {d} 窗口{c('win' + tag)}: {parts} → 不完整,無法以快照驗算")
             continue
-        mean = round(sum(s["composite"] for s in win) / len(win), 2)
-        why = window_mismatch(win, mean)
         if why:
             L.append(f"    {d} 先前發布觀測值{c('win' + tag)}: {parts}(平均 {mean:+.2f},快照 composite_s "
                      f"{win[0]['composite_s']:+.2f})→ {';'.join(why)};原始平滑輸入無法以快照驗證")
@@ -421,6 +430,208 @@ def build_report(con, as_of, dates=None, stock=None):
     out.append("\n可重跑查詢(python scripts/rank_change.py --run-sql \"<SQL>\";Q1 第一列=首次正式發布):")
     out += [f"  {k} {sql}" for k, sql in queries]
     return "\n".join(out)
+
+
+# ── 儀表板 payload ────────────────────────────────────────────────
+PEER_LABEL = {"overtook_target": "超車(原在後→現在前)", "overtaken_by_target": "被它超越(原在前→現在後)",
+              "tie_change": "同分狀態改變", "unchanged": "相對位置不變", "left": "未列入本週族群排名",
+              "joined": "本週新列入族群排名", "unranked_both": "兩週皆未列入族群排名"}
+WINDOW_LABEL = {"verified": "已驗算:三日平均等於快照 composite_s,建置指紋相同",
+                "prior_observation": "先前發布觀測值:原始平滑輸入無法以快照驗證",
+                "incomplete": "窗口不完整:無法以快照驗算"}
+
+
+def _r(x, nd=4):
+    return None if x is None else round(x, nd)
+
+
+def _names_text(ids, names, limit=3):
+    shown = "、".join(names.get(p, p) for p in ids[:limit])
+    return shown + (f" 等 {len(ids)} 檔" if len(ids) > limit else "")
+
+
+CN_NUM = dict(zip(range(2, 11), "兩三四五六七八九十"))
+MINUS = "\u2212"
+
+
+def first_position(rank, ties):
+    """同分組占的第一個名次(midrank = 第一個名次 + 同分檔數/2)。"""
+    return int(round(rank - ties / 2))
+
+
+def pos_text(rank, ties):
+    return None if rank is None else f"{'並列' if ties else ''}第 {first_position(rank, ties)}"
+
+
+def signed(x):
+    return f"{x:+.2f}".replace("-", MINUS)
+
+
+def change_line(a, b):
+    """上週值 → 本週值（差額），例 +6.10 → −3.10（−9.20）。"""
+    return f"{signed(a)} → {signed(b)}（{signed(round(b - a, 2))}）"
+
+
+def _nm(names, s):
+    return names.get(s, s) or s
+
+
+def _sp(text):
+    """拉丁字尾(如 -KY)接中文時補半形空白。"""
+    return text + " " if text and text[-1].isascii() else text
+
+
+def group_members(rows, grp):
+    return {s for s, r in rows.items() if r.get("grp") == grp}
+
+
+def stock_texts(ex, A, B, stock, names=None, group_names=None):
+    """(第一層摘要, 明細名次說明);名次一律以 explain() 的平均序位與同分數換算。"""
+    names, group_names = names or {}, group_names or {}
+    K, byp = ex["cats"], {r["stock"]: r for r in ex["peers"]}
+    g, nm = group_names.get(ex["grp"], ex["grp"]), _nm(names, stock)
+    fA, fB = first_position(ex["rankA"], ex["tieA"]), first_position(ex["rankB"], ex["tieB"])
+    tied = lambda v: [p for p, r in sorted(byp.items(), key=lambda kv: kv[0]) if r[v] == 0.5]
+    with_ = lambda ids: "和" + _sp("、".join(_nm(names, p) for p in ids))
+    pa = f"{with_(tied('vA'))}並列第 {fA}" if ex["tieA"] else f"排第 {fA}"
+    up, down = len(K["overtaken_by_target"]), len(K["overtook_target"])
+    passing = ("超過 {u} 檔同業、也被 {d} 檔同業超過" if up and down else
+               "被 {d} 檔同業超過" if down else "超過 {u} 檔同業" if up else "").format(u=up, d=down)
+    if ex["tieB"]:
+        pb = f"{with_(tied('vB'))}並列第 {fB}"
+    else:
+        pb = (f"升到第 {fB}" if fB < fA else f"掉到第 {fB}" if fB > fA else f"仍排第 {fB}")
+    s1 = f"{_sp(nm)}上週在{g}族群{pa}，本週" + (f"{passing}，{pb}。" if passing else f"{pb}。")
+    mA, mB = group_members(A, ex["grp"]), group_members(B, ex["grp"])
+    left, joined = sorted(mA - mB), sorted(mB - mA)
+    if mA == mB and ex["nA"] == ex["nB"] == len(mA):
+        s2 = f"兩週都是同樣的 {len(mA)} 檔股票。"
+    elif mA == mB:
+        s2 = f"兩週族群名單相同，但有股票缺排名分數：上週排名 {ex['nA']} 檔、本週 {ex['nB']} 檔。"
+    else:
+        s2 = (f"族群成員有變動：上週 {ex['nA']} 檔、本週 {ex['nB']} 檔參與排名"
+              + (f"，{_sp(_names_text(left, names))}本週不在族群" if left else "")
+              + (f"，{_sp(_names_text(joined, names))}本週新加入" if joined else "") + "。")
+
+    def tie_sentence(rank, ties, prefix=""):
+        f = first_position(rank, ties)
+        seats = "、".join(str(f + i) for i in range(ties + 1))
+        return f"{prefix}{CN_NUM.get(ties + 1, ties + 1)}檔同分，占第 {seats} 席，平均名次為 {rank:g}"
+    move = ex["rankA"] - ex["rankB"]
+    mv = (f"比上週前進 {move:g} 席" if move > 0 else f"比上週退後 {-move:g} 席" if move < 0
+          else "與上週相同")
+    detail = []
+    if ex["tieA"]:
+        detail.append(tie_sentence(ex["rankA"], ex["tieA"], "上週") + "。")
+    detail.append((tie_sentence(ex["rankB"], ex["tieB"], "本週" if ex["tieA"] else "") if ex["tieB"]
+                   else f"本週沒有同分，名次為第 {fB}") + f"，{mv}。")
+    eff = lambda x: f"退後 {x:g} 席" if x > 0 else f"前進 {-x:g} 席" if x < 0 else "名次不受影響"
+    parts = []
+    if down:
+        parts.append(f"被 {down} 檔超過（{eff(down)}）")
+    if up:
+        parts.append(f"超過 {up} 檔（{eff(-up)}）")
+    if K["tie_change"]:
+        parts.append(f"同分狀態改變 {len(K['tie_change'])} 檔"
+                     f"（{_names_text(K['tie_change'], names)}，"
+                     f"{eff(sum(byp[p]['vB'] - byp[p]['vA'] for p in K['tie_change']))}）")
+    still_tied = [p for p in K["unchanged"] if byp[p]["vA"] == 0.5]
+    if still_tied:
+        parts.append(f"和{_sp(_names_text(still_tied, names))}兩週都同分，同分狀態沒變（名次不受影響）")
+    for ids, side, text in (
+            ([p for p in K["left"] if byp[p]["whyB"][0] == "null"], "vA", "缺分數，未列入排名"),
+            ([p for p in K["left"] if byp[p]["whyB"][0] != "null"], "vA", "本週不在族群"),
+            ([p for p in K["joined"] if byp[p]["whyA"][0] == "null"], "vB", "上週缺分數，本週列入排名"),
+            ([p for p in K["joined"] if byp[p]["whyA"][0] != "null"], "vB", "本週新加入族群")):
+        if ids:
+            sign = -1 if side == "vA" else 1
+            parts.append(f"{_sp(_names_text(ids, names))}{text}（{eff(sign * sum(byp[p][side] for p in ids))}）")
+    detail.append("名次拆解：" + ("；".join(parts) if parts else "沒有同業和它交換位置、同分或增減") + "。")
+    return [s1, s2], detail
+
+
+def _window_view(all_slots):
+    state, mean, why = window_check(all_slots)
+    end = next((s for s in all_slots if s["status"] == "ok"), None)
+    return {"state": state, "label": WINDOW_LABEL[state], "mean": mean, "why": why,
+            "snapshotCs": _r(end["composite_s"]) if end and end["date"] == all_slots[0]["date"] else None,
+            "slots": [{"date": s["date"], "status": s["status"], "snapshot": s["snapshot_id"],
+                       "composite": _r(s["composite"]),
+                       "label": None if s["status"] == "ok" else SLOT_LABEL[s["status"]]}
+                      for s in reversed(all_slots)]}
+
+
+def stock_payload(con, firsts, cal, A, B, stock, dA, dB, names=None, group_names=None):
+    names = names or {}
+    try:
+        ex = explain(A, B, stock)
+    except ValueError as exc:
+        return {"available": False, "reason": str(exc)}
+    g = ex["grp"]
+    rgA = rank_group({s: r for s, r in A.items() if r.get("grp") == g})
+    rgB = rank_group({s: r for s, r in B.items() if r.get("grp") == g})
+    summary, rank_detail = stock_texts(ex, A, B, stock, names, group_names)
+    def peer_label(r):
+        if r["cat"] == "left" and r["whyB"][0] == "null":
+            return "缺分數，未列入排名"
+        if r["cat"] == "joined" and r["whyA"][0] == "null":
+            return "上週缺分數，本週列入排名"
+        if r["cat"] == "unchanged" and r["vA"] == 0.5:
+            return "同分狀態沒變"
+        return PEER_LABEL[r["cat"]]
+    peers = [{"id": r["stock"], "nm": names.get(r["stock"], ""), "cat": r["cat"], "label": peer_label(r),
+              "side": None if r["vA"] is None or r["vA"] != r["vB"] else {1.0: "前", 0.5: "同分", 0.0: "後"}[r["vA"]],
+              "rankA": r["rankA"], "rankB": r["rankB"], "csA": _r(r["csA"]), "csB": _r(r["csB"]),
+              "posA": pos_text(*rgA[r["stock"]][::2]) if r["stock"] in rgA else None,
+              "posB": pos_text(*rgB[r["stock"]][::2]) if r["stock"] in rgB else None,
+              "whyA": r["whyA"][1] if r["whyA"] else None, "whyB": r["whyB"][1] if r["whyB"] else None}
+             for r in ex["peers"]]
+    order = list(PEER_LABEL)
+    peers.sort(key=lambda p: (order.index(p["cat"]), p["rankB"] if p["rankB"] is not None else 99, p["id"]))
+    daily = None
+    if ex["compA"] is not None and ex["compB"] is not None:
+        from score import WEIGHTS
+        els = [{"k": e, "label": EL_NAME[e], "sA": a, "sB": b, "weight": WEIGHTS[e], "contrib": w}
+               for e, a, b, w in (ex["elements"] or [])]
+        daily = {"compA": _r(ex["compA"]), "compB": _r(ex["compB"]), "delta": round(ex["compB"] - ex["compA"], 2),
+                 "line": change_line(ex["compA"], ex["compB"]),
+                 "elements": els, "sum": round(sum(e["contrib"] for e in els), 2) if els else None}
+    windows = [_window_view(smoothing_window(con, firsts, cal, stock, d)) for d in (dA, dB)]
+    return {"available": True, "grp": ex["grp"], "rankA": ex["rankA"], "rankB": ex["rankB"],
+            "nA": ex["nA"], "nB": ex["nB"], "tieA": ex["tieA"], "tieB": ex["tieB"],
+            "move": ex["rankA"] - ex["rankB"],
+            "posA": pos_text(ex["rankA"], ex["tieA"]), "posB": pos_text(ex["rankB"], ex["tieB"]),
+            "counts": {k: len(v) for k, v in ex["cats"].items()},
+            "summary": summary, "rankDetail": rank_detail, "peers": peers, "daily": daily,
+            "smooth": {"csA": _r(ex["csA"]), "csB": _r(ex["csB"]), "delta": round(ex["csB"] - ex["csA"], 2),
+                       "line": change_line(ex["csA"], ex["csB"]),
+                       "windows": windows}}
+
+
+def dashboard_payload(con, as_of, dates=None, names=None, group_names=None):
+    """儀表板「本週排名變化」:與 build_report 同一套選週、首次正式快照與名次拆解。"""
+    as_of = _aware(as_of)
+    firsts = published_first_runs(con, as_of)
+    cal = trading_calendar(con, as_of, firsts)
+    if dates:
+        runs = []
+        for d in dates:
+            if d not in firsts:
+                raise SelectionError(f"{d} 在 as-of 前沒有首次正式快照")
+            require_complete(con, firsts[d])
+            runs.append(firsts[d])
+        notes = []
+    else:
+        picked, notes = select_weeks(con, as_of)
+        runs = [w["run"] for w in picked]
+    (dA, rA), (dB, rB) = [(r["data_date"], r) for r in runs]
+    A, B = _load(con, rA["snapshot_id"]), _load(con, rB["snapshot_id"])
+    return {"asOf": as_of.astimezone(TAIPEI_TZ).isoformat(timespec="minutes"), "dateA": dA, "dateB": dB,
+            "snapshotA": rA["snapshot_id"], "snapshotB": rB["snapshot_id"],
+            "capturedA": rA["captured_at"], "capturedB": rB["captured_at"], "notes": notes,
+            "rerun": f"python scripts/rank_change.py {dA} {dB} --stock <股票代號>",
+            "stocks": {s: stock_payload(con, firsts, cal, A, B, s, dA, dB, names, group_names)
+                       for s in sorted(set(A) | set(B))}}
 
 
 def _same_file(out, db):

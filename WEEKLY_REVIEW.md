@@ -19,6 +19,8 @@
 
 1. `git pull`;確認 `daily-fetch` 與 `weekly-validate` 兩個 Actions 最近一次都是綠的。
    紅的先修管線(看 stderr 警告:TAIEX 抓空、price_adj 缺列、無事件跳空),當週不做策略判斷。
+   若只有「實驗失敗標紅」步驟失敗（experiment_lab / audit_experiment_lab），正式週報仍已發布，
+   策略檢視照常進行；實驗室問題另依 [EXPERIMENT_LAB.md](EXPERIMENT_LAB.md) 處理。
 2. 執行 `python scripts/audit_ranking_views.py --compact --require-current-snapshot`。
    `hard_errors` 非空先修正式快照／spec／漏列，當週不判斷多視角；tie、Pareto、peer
    sensitivity warning 只進結構追蹤，不因單週跨線調 evaluator。

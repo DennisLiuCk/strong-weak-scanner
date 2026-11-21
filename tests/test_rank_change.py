@@ -332,6 +332,119 @@ class TiesWithIntegerMidrank(unittest.TestCase):
         self.assertIn("同分狀態改變 2 檔", out)
 
 
+class DashboardPayload(unittest.TestCase):
+    """儀表板「本週排名變化」:與 CLI 同一套 explain/smoothing_window,另產第一層摘要。"""
+
+    def setUp(self):
+        fx = Fixture(weekdays("2026-11-09", "2026-11-20"))
+        self.addCleanup(fx.close)
+        week1 = {"L": ("g", 5.0, 5.0), "T": ("g", 3.0, 3.0), "X": ("g", 2.0, 2.0), "Y": ("g", 0.0, 0.0)}
+        week2 = {"X": ("g", 4.0, 4.0), "T": ("g", 1.0, 1.0), "Y": ("g", 1.0, 1.0)}
+        fx.fill(weekdays("2026-11-09", "2026-11-13"), week1)
+        fx.fill(weekdays("2026-11-16", "2026-11-20"), week2)
+        self.con = fx.con()
+        self.addCleanup(self.con.close)
+        self.p = rc.dashboard_payload(self.con, at("2026-11-21T10:00"), ["2026-11-13", "2026-11-20"],
+                                      {"X": "超車股", "Y": "同分股", "L": "離開股"}, {"g": "測試"})
+
+    def test_target_summary_counts_overtake_tie_and_membership(self):
+        x = self.p["stocks"]["T"]
+        self.assertEqual((self.p["dateA"], self.p["dateB"]), ("2026-11-13", "2026-11-20"))
+        self.assertEqual((self.p["snapshotA"], self.p["snapshotB"]), ("r-2026-11-13", "r-2026-11-20"))
+        self.assertEqual((x["rankA"], x["nA"], x["rankB"], x["nB"], x["tieB"]), (2, 4, 2.5, 3, 1))
+        self.assertEqual((x["posA"], x["posB"]), ("第 2", "並列第 2"))
+        self.assertEqual(x["summary"], [
+            "T 上週在測試族群排第 2，本週被 1 檔同業超過，和同分股並列第 2。",
+            "族群成員有變動：上週 4 檔、本週 3 檔參與排名，離開股本週不在族群。"])
+        self.assertEqual(x["rankDetail"], [
+            "兩檔同分，占第 2、3 席，平均名次為 2.5，比上週退後 0.5 席。",
+            "名次拆解：被 1 檔超過（退後 1 席）；同分狀態改變 1 檔（同分股，退後 0.5 席）；"
+            "離開股本週不在族群（前進 1 席）。"])
+        self.assertEqual({p["id"]: p["posB"] for p in x["peers"]}, {"X": "第 1", "Y": "並列第 2", "L": None})
+        cats = {p["id"]: (p["cat"], p["rankA"], p["rankB"], p["csA"], p["csB"], p["whyB"]) for p in x["peers"]}
+        self.assertEqual(cats, {"X": ("overtook_target", 3, 1, 2.0, 4.0, None),
+                                "Y": ("tie_change", 4, 2.5, 0.0, 1.0, None),
+                                "L": ("left", 1, None, 5.0, None, "快照無此股")})
+
+    def test_daily_composite_and_smoothed_composite_s_are_separate(self):
+        x = self.p["stocks"]["T"]
+        self.assertEqual((x["daily"]["compA"], x["daily"]["compB"], x["daily"]["delta"]), (3.0, 1.0, -2.0))
+        self.assertEqual(x["daily"]["line"], "+3.00 → +1.00（−2.00）")
+        self.assertEqual(x["smooth"]["line"], "+3.00 → +1.00（−2.00）")
+        self.assertEqual((x["smooth"]["csA"], x["smooth"]["csB"], x["smooth"]["delta"]), (3.0, 1.0, -2.0))
+        w = x["smooth"]["windows"]
+        self.assertEqual([s["date"] for s in w[1]["slots"]], ["2026-11-18", "2026-11-19", "2026-11-20"])
+        self.assertEqual([v["state"] for v in w], ["verified", "verified"])
+        json.dumps(self.p, ensure_ascii=False, allow_nan=False)
+
+    def test_other_stocks_get_their_own_payload_or_explicit_unavailable_state(self):
+        self.assertEqual(sorted(self.p["stocks"]), ["L", "T", "X", "Y"])
+        x = self.p["stocks"]["X"]
+        self.assertEqual((x["rankA"], x["rankB"]), (3, 1))
+        self.assertEqual(x["summary"][0], "超車股上週在測試族群排第 3，本週超過 1 檔同業，升到第 1。")
+        self.assertFalse(self.p["stocks"]["L"]["available"])
+        self.assertIn("L", self.p["stocks"]["L"]["reason"])
+
+    def test_unpublished_date_is_selection_error(self):
+        with self.assertRaises(rc.SelectionError):
+            rc.dashboard_payload(self.con, at("2026-11-21T10:00"), ["2026-11-13", "2026-11-23"])
+
+
+class DashboardTexts(unittest.TestCase):
+    """第一層摘要用同分組第一個名次;明細才寫占哪幾席與平均名次。"""
+
+    def texts(self, A, B, stock="T", names=None):
+        return rc.stock_texts(rc.explain(A, B, stock), A, B, stock, names, {"g": "矽智財"})
+
+    def test_three_way_tie_shows_first_seat_and_average_rank(self):
+        A = snap({"a": 9.0, "b": 8.0, "c": 7.0, "d": 6.0, "T": 5.0, "U": 4.0, "V": 1.0})
+        B = snap({"a": 9.0, "b": 8.0, "c": 7.0, "d": 6.0, "T": 3.0, "U": 3.0, "V": 3.0})
+        summary, detail = self.texts(A, B, names={"T": "目標", "U": "甲", "V": "乙"})
+        self.assertEqual(rc.rank_group(B)["T"], (6.0, 7, 2))
+        self.assertEqual(summary, ["目標上週在矽智財族群排第 5，本週和甲、乙並列第 5。", "兩週都是同樣的 7 檔股票。"])
+        self.assertEqual(detail[0], "三檔同分，占第 5、6、7 席，平均名次為 6，比上週退後 1 席。")
+        self.assertIn("同分狀態改變 2 檔", detail[1])
+
+    def test_same_count_but_different_members_is_not_called_same(self):
+        A = snap({"a": 9.0, "T": 5.0, "b": 1.0})
+        B = snap({"a": 9.0, "T": 5.0, "c": 1.0})
+        summary, _ = self.texts(A, B)
+        self.assertNotIn("同樣的", summary[1])
+        self.assertEqual(summary[1], "族群成員有變動：上週 3 檔、本週 3 檔參與排名，b 本週不在族群，c 本週新加入。")
+        self.assertEqual(summary[0], "T 上週在矽智財族群排第 2，本週仍排第 2。")
+
+    def test_same_members_with_missing_score_is_not_called_same(self):
+        A = snap({"a": 9.0, "T": 5.0, "b": 1.0})
+        B = snap({"a": None, "T": 5.0, "b": 1.0})
+        summary, detail = self.texts(A, B, names={"a": "缺分股"})
+        self.assertEqual(summary, ["T 上週在矽智財族群排第 2，本週升到第 1。",
+                                   "兩週族群名單相同，但有股票缺排名分數：上週排名 3 檔、本週 2 檔。"])
+        self.assertEqual(detail, ["本週沒有同分，名次為第 1，比上週前進 1 席。",
+                                  "名次拆解：缺分股缺分數，未列入排名（前進 1 席）。"])
+
+    def test_missing_score_vs_left_group_and_rejoined_are_worded_apart(self):
+        A = snap({"a": 9.0, "c": 8.0, "T": 5.0, "d": None})
+        B = snap({"a": None, "T": 5.0, "d": 7.0})
+        B["c"] = {"grp": "other", "composite_s": 8.0}
+        _, detail = self.texts(A, B, names={"a": "甲", "c": "乙", "d": "丙"})
+        self.assertEqual(detail, ["本週沒有同分，名次為第 2，比上週前進 1 席。",
+                                  "名次拆解：甲缺分數，未列入排名（前進 1 席）；乙本週不在族群（前進 1 席）；"
+                                  "丙上週缺分數，本週列入排名（退後 1 席）。"])
+
+    def test_persistent_tie_says_tie_unchanged(self):
+        A = snap({"a": 9.0, "T": 5.0, "U": 5.0, "b": 1.0})
+        B = snap({"a": 9.0, "T": 5.0, "U": 5.0, "b": 8.0})
+        summary, detail = self.texts(A, B, names={"T": "目標", "U": "甲", "b": "乙"})
+        self.assertEqual(summary[0], "目標上週在矽智財族群和甲並列第 2，本週被 1 檔同業超過，和甲並列第 3。")
+        self.assertEqual(detail, ["上週兩檔同分，占第 2、3 席，平均名次為 2.5。",
+                                  "本週兩檔同分，占第 3、4 席，平均名次為 3.5，比上週退後 1 席。",
+                                  "名次拆解：被 1 檔超過（退後 1 席）；和甲兩週都同分，同分狀態沒變（名次不受影響）。"])
+
+    def test_change_line_uses_true_minus_and_rounded_delta(self):
+        self.assertEqual(rc.change_line(6.1, -3.1), "+6.10 → −3.10（−9.20）")
+        self.assertEqual(rc.change_line(6.4333, -0.9667), "+6.43 → −0.97（−7.40）")
+
+
 class Cli(unittest.TestCase):
     def test_report_file_and_run_sql_are_read_only(self):
         fx = Fixture(weekdays("2026-11-09", "2026-11-20"))
