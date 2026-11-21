@@ -13,20 +13,21 @@ class GraphKeyboardFocusTest(unittest.TestCase):
     def test_keyboard_activation_preserves_node_and_edge_focus(self):
         source = (ROOT / 'scripts/research_template.html').read_text(encoding='utf-8')
         functions = []
-        for name in ('selectGraphEdge', 'selectGraphNode', 'graphKeyboard', 'renderGraphSvg'):
+        for name in ('fitGraphLabel', 'fitGraphRootLabel', 'selectGraphEdge', 'selectGraphNode', 'graphKeyboard', 'renderGraphSvg'):
             start = source.index('function ' + name + '(')
             functions.append(source[start:source.index('\nfunction ', start + 10)])
         script = r"""
 const assert=require('node:assert/strict');
 const body={};
 const document={activeElement:body,getElementById:()=>root};
-function svgEl(tag,attrs){return {tag,attrs,children:[],isConnected:false,handlers:{},
+function svgEl(tag,attrs){return {tag,attrs,children:[],style:{},textContent:attrs.text||'',isConnected:false,handlers:{},
  append(...items){items.forEach(item=>this.appendChild(item))},
  appendChild(item){this.children.push(item);item.isConnected=this.isConnected},
  addEventListener(type,handler){this.handlers[type]=handler},
  getAttribute(name){return this.attrs[name]??null},
+ setAttribute(name,value){this.attrs[name]=value},
  contains(el){return this===el||this.children.some(child=>child.contains(el))},
- querySelectorAll(){return this.children.filter(child=>child.attrs['data-graph-control'])},
+ querySelectorAll(selector){return this.children.filter(child=>selector==='text'?child.tag==='text':child.attrs['data-graph-control'])},
  focus(){document.activeElement=this},
  replaceChildren(){this.children.forEach(child=>{child.isConnected=false});this.children=[];document.activeElement=body}
 }}

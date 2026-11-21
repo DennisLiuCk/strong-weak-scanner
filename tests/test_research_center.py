@@ -2437,7 +2437,7 @@ class ResearchCenterTest(unittest.TestCase):
         template = (SCRIPTS / "research_template.html").read_text(encoding="utf-8")
         card = template.split("function resultItem(article)", 1)[1].split("function showEntryGuide(", 1)[0]
         for contract in ("text:article.typeLabel", "text:article.status", "datetime:article.date",
-                         "'aria-current':selected?'true':null", "class:'result-preview'"):
+                         "selectResultItem(button,article)", "class:'result-preview'"):
             self.assertIn(contract, card, contract)
         self.assertNotIn("catalogEvidencePosition(", card)
         self.assertNotIn("article.status=", template)
