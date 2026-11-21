@@ -55,13 +55,13 @@ class OfficialMonthRevenueTest(unittest.TestCase):
 
     def test_fallback_only_inserts_missing_rows(self):
         con = sqlite3.connect(":memory:")
-        con.executescript(ff.SCHEMA)
+        ff.ensure_schema(con)
         con.execute(
-            "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+            "INSERT INTO month_revenue(date,stock_id,revenue,revenue_month,revenue_year) VALUES(?,?,?,?,?)",
             ("2026-07-01", "3016", 111, 6, 2026),
         )
         con.execute(
-            "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+            "INSERT INTO month_revenue(date,stock_id,revenue,revenue_month,revenue_year) VALUES(?,?,?,?,?)",
             ("2026-07-01", "3680", None, 6, 2026),
         )
 
@@ -101,31 +101,59 @@ class OfficialMonthRevenueTest(unittest.TestCase):
             "SELECT first_seen_at,source FROM fundamental_availability"
         ).fetchone()
         self.assertEqual(row, ("2026-08-13T01:00:00+00:00", "FinMind"))
+        self.assertEqual(con.execute("SELECT COUNT(*) FROM fundamental_revisions").fetchone()[0], 0)
+        self.assertEqual(con.execute("SELECT revenue,observed_at FROM month_revenue").fetchone(),
+                         (100, "2026-08-13T01:00:00+00:00"))
         con.close()
+
+    def test_all_eav_datasets_keep_distinct_items_and_reversions(self):
+        con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
+        ff.ensure_schema(con)
+        first = "2026-08-13T01:00:00+00:00"
+        second = "2026-08-14T01:00:00+00:00"
+        for dataset in ff.UPSERT.keys() - {"TaiwanStockMonthRevenue"}:
+            upsert = ff.UPSERT[dataset]
+            item = {"date": "2026-06-30", "stock_id": "3016", "type": "X", "value": 10}
+            upsert(con, [item, dict(item, type="Y")], first_seen_at=first)
+            upsert(con, [dict(item, value=20)], first_seen_at=second)
+            upsert(con, [item], first_seen_at=second)
+            upsert(con, [item], first_seen_at=second)
+            self.assertEqual(con.execute(
+                """SELECT item_type,value,observed_at FROM fundamental_revisions
+                   WHERE dataset=? ORDER BY id""", (dataset,),
+            ).fetchall(), [("X", 10, first), ("X", 20, second)])
+            self.assertEqual(con.execute(
+                f"SELECT type,value,observed_at FROM {ff.DATASET_TABLES[dataset]} ORDER BY type"
+            ).fetchall(), [("X", 10, second), ("Y", 10, first)])
 
     def test_upsert_and_availability_ledger_share_the_callers_transaction(self):
         con = sqlite3.connect(":memory:")
         ff.ensure_schema(con)
-        con.commit()
-        con.execute(
-            "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
-            ("2026-07-01", "OLD", 1, 6, 2026),
-        )
-        ff.up_month_revenue(con, [{
+        data = {
             "date": "2026-08-01", "stock_id": "3016", "revenue": 100,
             "revenue_month": 7, "revenue_year": 2026,
-        }], first_seen_at="2026-08-13T01:00:00+00:00")
-        con.rollback()
-        self.assertEqual(con.execute("SELECT COUNT(*) FROM month_revenue").fetchone()[0], 0)
+        }
+        ff.up_month_revenue(con, [data], first_seen_at="2026-08-13T01:00:00+00:00")
+        con.commit()
+        ff.up_month_revenue(con, [dict(data, revenue=200), dict(data, stock_id="NEW")],
+                            first_seen_at="2026-08-14T01:00:00+00:00")
         self.assertEqual(con.execute(
-            "SELECT COUNT(*) FROM fundamental_availability").fetchone()[0], 0)
+            "SELECT value FROM fundamental_revisions").fetchall(), [(100,)])
+        con.rollback()
+        self.assertEqual(con.execute("SELECT stock_id,revenue FROM month_revenue").fetchall(),
+                         [("3016", 100)])
+        self.assertEqual(con.execute(
+            "SELECT stock_id FROM fundamental_availability").fetchall(), [("3016",)])
+        self.assertEqual(con.execute(
+            "SELECT COUNT(*) FROM fundamental_revisions").fetchone()[0], 0)
         con.close()
 
     def test_existing_history_is_only_available_from_migration_time(self):
         con = sqlite3.connect(":memory:")
         ff.ensure_schema(con)
         con.execute(
-            "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
+            "INSERT INTO month_revenue(date,stock_id,revenue,revenue_month,revenue_year) VALUES(?,?,?,?,?)",
             ("2026-08-01", "3016", 100, 7, 2026),
         )
         inserted = ff.initialize_existing_availability(
@@ -142,7 +170,7 @@ class OfficialMonthRevenueTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "financials.db"
             con = sqlite3.connect(path)
-            ff.ensure_schema(con)
+            con.executescript(ff.SCHEMA)
             con.execute(
                 "INSERT INTO month_revenue VALUES(?,?,?,?,?)",
                 ("2026-08-01", "3016", 100, 7, 2026),
@@ -161,6 +189,10 @@ class OfficialMonthRevenueTest(unittest.TestCase):
                 (1, 100))
             self.assertEqual(con.execute(
                 "SELECT first_seen_at FROM fundamental_availability"
+            ).fetchone()[0], "2026-08-13T01:00:00+00:00")
+            self.assertEqual(con.execute("SELECT COUNT(*) FROM fundamental_revisions").fetchone()[0], 0)
+            self.assertEqual(con.execute(
+                "SELECT observed_at FROM fundamental_revision_baseline"
             ).fetchone()[0], "2026-08-13T01:00:00+00:00")
             con.close()
 

@@ -22,7 +22,7 @@ PRIMARY KEY(date, stock_id, type)。
   python scripts/fetch_financials.py --datasets TaiwanStockMonthRevenue
   python scripts/fetch_financials.py --stocks 6525,8131 --start 2023-01-01
   python scripts/fetch_financials.py --official-month-revenue-only --stocks 3016,3680
-  python scripts/fetch_financials.py --initialize-availability-only
+  python scripts/fetch_financials.py --initialize-availability-only [--db PATH]
 """
 import argparse, csv, datetime as dt, json, os, sqlite3, sys, time
 import urllib.request
@@ -41,6 +41,12 @@ DB = os.path.join(ROOT, "data", "findmind.db")
 UNIVERSE = os.path.join(ROOT, "config", "universe.csv")
 TWSE_MONTH_REVENUE_URL = "https://openapi.twse.com.tw/v1/opendata/t187ap05_L"
 TPEX_MONTH_REVENUE_URL = "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap05_O"
+DATASET_TABLES = {
+    "TaiwanStockMonthRevenue": "month_revenue",
+    "TaiwanStockFinancialStatements": "financials",
+    "TaiwanStockBalanceSheet": "balance_sheet",
+    "TaiwanStockCashFlowsStatement": "cash_flow",
+}
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS month_revenue(date TEXT, stock_id TEXT, revenue INTEGER,
@@ -59,6 +65,20 @@ CREATE TABLE IF NOT EXISTS fundamental_availability(
   first_seen_at TEXT NOT NULL,
   source TEXT NOT NULL,
   PRIMARY KEY(dataset, data_date, stock_id));
+"""
+
+REVISION_SCHEMA = """
+CREATE TABLE fundamental_revisions(
+  id INTEGER PRIMARY KEY,
+  dataset TEXT NOT NULL,
+  data_date TEXT NOT NULL,
+  stock_id TEXT NOT NULL,
+  item_type TEXT NOT NULL,
+  observed_at TEXT NOT NULL,
+  value,
+  revenue_month INTEGER,
+  revenue_year INTEGER,
+  origin_name TEXT)
 """
 
 
@@ -90,14 +110,8 @@ def record_availability(con, dataset, data, *, first_seen_at=None, source=None,
 def initialize_existing_availability(con, *, first_seen_at=None):
     """將既有 restated rows 只宣告為「從 migration 當下起已知」，不回填歷史發布日。"""
     first_seen_at = first_seen_at or utc_now()
-    mapping = {
-        "TaiwanStockMonthRevenue": "month_revenue",
-        "TaiwanStockFinancialStatements": "financials",
-        "TaiwanStockBalanceSheet": "balance_sheet",
-        "TaiwanStockCashFlowsStatement": "cash_flow",
-    }
     inserted = 0
-    for dataset, table in mapping.items():
+    for dataset, table in DATASET_TABLES.items():
         before = con.total_changes
         con.execute(
             f"""INSERT OR IGNORE INTO fundamental_availability(
@@ -110,56 +124,103 @@ def initialize_existing_availability(con, *, first_seen_at=None):
     return inserted
 
 
+def _key_and_value_columns(table):
+    if table == "month_revenue":
+        return ("date", "stock_id"), ("revenue", "revenue_month", "revenue_year")
+    return ("date", "stock_id", "type"), ("value", "origin_name")
+
+
+def _initialize_revisions(con, observed_at):
+    if con.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='fundamental_revisions'"
+    ).fetchone():
+        return
+    con.execute(REVISION_SCHEMA)
+    con.execute("""CREATE INDEX fundamental_revision_lookup ON fundamental_revisions(
+        dataset,data_date,stock_id,item_type,observed_at DESC,id DESC)""")
+    con.execute("""CREATE TABLE fundamental_revision_baseline(
+        id INTEGER PRIMARY KEY CHECK(id=1), observed_at TEXT NOT NULL)""")
+    # 舊列可能已被重編。NULL 代表遷移時取得的版本，不用舊的期間 first-seen 回填。
+    con.execute("INSERT INTO fundamental_revision_baseline VALUES(1,?)", (observed_at,))
+    for dataset, table in DATASET_TABLES.items():
+        con.execute(f"ALTER TABLE {table} ADD COLUMN observed_at TEXT")
+        _, values = _key_and_value_columns(table)
+        old = ",".join(f"OLD.{col}" for col in values)
+        new = ",".join(f"NEW.{col}" for col in values)
+        payload = ("'',OLD.revenue,OLD.revenue_month,OLD.revenue_year,NULL"
+                   if table == "month_revenue" else "OLD.type,OLD.value,NULL,NULL,OLD.origin_name")
+        con.execute(
+            f"""CREATE TRIGGER archive_{table}_revision BEFORE UPDATE OF {','.join(values)}
+                ON {table} WHEN ({old}) IS NOT ({new})
+                BEGIN
+                    INSERT INTO fundamental_revisions(
+                        dataset,data_date,stock_id,observed_at,item_type,
+                        value,revenue_month,revenue_year,origin_name)
+                    SELECT '{dataset}',OLD.date,OLD.stock_id,
+                           COALESCE(OLD.observed_at,observed_at),{payload}
+                    FROM fundamental_revision_baseline WHERE id=1;
+                END""",
+        )
+
+
 def ensure_schema(con, *, initialize_existing=False, first_seen_at=None):
-    """建立財務 schema；只有正式抓取入口才初始化既有 rows 的 first-seen ledger。"""
+    """建立財務 schema 並原子保留既有資料作為修訂帳本的起點。"""
     con.executescript(SCHEMA)
-    if initialize_existing:
-        return initialize_existing_availability(con, first_seen_at=first_seen_at)
+    con.execute("BEGIN IMMEDIATE")
+    with con:
+        observed_at = first_seen_at or utc_now()
+        _initialize_revisions(con, observed_at)
+        if initialize_existing:
+            return initialize_existing_availability(con, first_seen_at=observed_at)
     return 0
 
 
 def initialize_availability_ledger(db=DB, *, first_seen_at=None):
-    """離線建立 first-seen 帳本；不抓網路、不更動既有財報列。"""
+    """離線建立 first-seen 與修訂帳本；不抓網路、不更動既有財報列。"""
     os.makedirs(os.path.dirname(os.path.abspath(db)), exist_ok=True)
     con = sqlite3.connect(db)
     try:
-        initialized = ensure_schema(
-            con, initialize_existing=True, first_seen_at=first_seen_at)
-        con.commit()
-        return initialized
+        return ensure_schema(con, initialize_existing=True, first_seen_at=first_seen_at)
     finally:
         con.close()
+
+
+def _upsert(con, dataset, data, rows, *, first_seen_at, source):
+    table = DATASET_TABLES[dataset]
+    observed_at = first_seen_at or utc_now()
+    keys, values = _key_and_value_columns(table)
+    updates = ",".join(f"{col}=excluded.{col}" for col in (*values, "observed_at"))
+    current = ",".join(f"{table}.{col}" for col in values)
+    incoming = ",".join(f"excluded.{col}" for col in values)
+    con.executemany(
+        f"""INSERT INTO {table}({','.join((*keys, *values, 'observed_at'))}) VALUES(?,?,?,?,?,?)
+            ON CONFLICT({','.join(keys)}) DO UPDATE SET {updates}
+            WHERE ({current}) IS NOT ({incoming})""",
+        ((*row, observed_at) for row in rows),
+    )
+    record_availability(con, dataset, data, first_seen_at=observed_at, source=source)
+    return len(rows)
 
 
 def up_month_revenue(con, data, *, first_seen_at=None, source="FinMind"):
     rows = [(d["date"], d["stock_id"], d.get("revenue"), d.get("revenue_month"),
              d.get("revenue_year")) for d in data]
-    con.executemany("INSERT OR REPLACE INTO month_revenue VALUES(?,?,?,?,?)", rows)
-    record_availability(
-        con, "TaiwanStockMonthRevenue", data,
-        first_seen_at=first_seen_at, source=source)
-    return len(rows)
+    return _upsert(con, "TaiwanStockMonthRevenue", data, rows,
+                   first_seen_at=first_seen_at, source=source)
 
 
-def _up_eav(table, dataset):
+def _up_eav(dataset):
     def _up(con, data, *, first_seen_at=None, source="FinMind"):
         rows = [(d["date"], d["stock_id"], d["type"], d.get("value"), d.get("origin_name"))
                 for d in data]
-        con.executemany(f"INSERT OR REPLACE INTO {table} VALUES(?,?,?,?,?)", rows)
-        record_availability(
-            con, dataset, data, first_seen_at=first_seen_at, source=source)
-        return len(rows)
+        return _upsert(con, dataset, data, rows, first_seen_at=first_seen_at, source=source)
     return _up
 
 
 UPSERT = {
     "TaiwanStockMonthRevenue": up_month_revenue,
-    "TaiwanStockFinancialStatements": _up_eav(
-        "financials", "TaiwanStockFinancialStatements"),
-    "TaiwanStockBalanceSheet": _up_eav(
-        "balance_sheet", "TaiwanStockBalanceSheet"),
-    "TaiwanStockCashFlowsStatement": _up_eav(
-        "cash_flow", "TaiwanStockCashFlowsStatement"),
+    **{dataset: _up_eav(dataset) for dataset, table in DATASET_TABLES.items()
+       if table != "month_revenue"},
 }
 
 
@@ -250,6 +311,7 @@ def fill_official_month_revenue(con, stock_ids, year, month,
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--db", default=DB)
     ap.add_argument("--start", help="YYYY-MM-DD;省略則抓近 1095 天(約 3 年,涵蓋 12 季)")
     ap.add_argument("--end", help="YYYY-MM-DD;預設今天")
     ap.add_argument("--datasets", help="逗號分隔,只抓指定 dataset")
@@ -266,7 +328,7 @@ def main():
         help="最新應公布月份仍有缺口時 exit 1（建議用於每月 17 日重試）")
     ap.add_argument(
         "--initialize-availability-only", action="store_true",
-        help="只建立 point-in-time ledger 並把既有列標成此刻才首次可知；不連網")
+        help="離線建立 first-seen 與財報修訂帳本；舊值從修訂帳本建立起可查")
     args = ap.parse_args()
 
     if args.initialize_availability_only:
@@ -278,10 +340,8 @@ def main():
         )
         if conflicting:
             sys.exit("--initialize-availability-only 不可與抓取／補援參數併用")
-        initialized = initialize_availability_ledger(DB)
-        print(
-            f"point-in-time ledger 初始化 {initialized} 組既有期間；"
-            "未抓網路，舊資料僅自本次 first-seen 起可用")
+        initialized = initialize_availability_ledger(args.db)
+        print(f"財報修訂帳本就緒；新增 {initialized} 組既有期間 first-seen 記錄（未連網）")
         return
 
     end = args.end or date.today().isoformat()
@@ -305,11 +365,10 @@ def main():
         ids = [s for s in ids if s in want]
 
     token = None if args.official_month_revenue_only else get_token()
-    os.makedirs(os.path.dirname(DB), exist_ok=True)
-    con = sqlite3.connect(DB)
+    os.makedirs(os.path.dirname(os.path.abspath(args.db)), exist_ok=True)
+    con = sqlite3.connect(args.db)
     initialized = ensure_schema(con, initialize_existing=True)
     if initialized:
-        con.commit()
         print(f"point-in-time ledger 初始化 {initialized} 組既有期間；僅自本次 first-seen 起可用")
     print(f"抓取財報 {start} .. {end} · {len(ids)} 檔 · {len(ds_list)} datasets")
     total = 0
@@ -355,7 +414,7 @@ def main():
                 if args.require_latest_month_complete:
                     con.close()
                     sys.exit(1)
-    print(f"完成 — 共 {total} rows 落地 {DB}")
+    print(f"完成 — 共 {total} rows 落地 {args.db}")
     con.close()
     if args.require_latest_month_complete and remaining:
         print("ERROR 最新月營收仍缺：" + ",".join(remaining), file=sys.stderr)

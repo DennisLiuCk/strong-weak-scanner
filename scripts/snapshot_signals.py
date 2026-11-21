@@ -21,6 +21,7 @@ import uuid
 
 import trading_status as tstatus
 import fetch_daily as fd
+import fetch_financials as ff
 import ranking_views as rv
 import score
 
@@ -243,6 +244,7 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
     """凍結最新資料日並回傳 snapshot_id；相同 snapshot_id 重跑為冪等。"""
     con.row_factory = sqlite3.Row
     ensure_schema(con)
+    ff.ensure_schema(con, initialize_existing=True)
     captured_at = _utc_isoformat(captured_at) if captured_at else _utc_now()
     snapshot_id = snapshot_id or _default_snapshot_id(captured_at)
     source = source or ("github-actions" if os.environ.get("GITHUB_ACTIONS") == "true" else "local")
