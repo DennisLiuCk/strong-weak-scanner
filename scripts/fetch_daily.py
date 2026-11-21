@@ -1727,8 +1727,8 @@ def fetch_ref_series(con, token, start, end, sleep, expected_dates=None, force=F
 
 # 處置/注意股票(觀察層、不計分):交易所對異常價量的官方認證,五元素分數看不到這塊
 # ——2026-07-07 驗證發現「真強」評級個股同時被列注意股票(90日漲幅163%)的實例。
-# TWSE(上市)+TPEx(上櫃)各自的處置/注意端點,免token,合計涵蓋全市場;當天名單
-# 即代表當下正被列管,不必自行判斷起訖。任一端點失敗印警告後跳過,不擋主管線。
+# TWSE(上市)+TPEx(上櫃)各自的處置/注意端點,免token,合計涵蓋全市場。
+# 端點無日期參數：歷史補跑只採用能確認適用目標日的列，不用當期名單覆蓋歷史。
 TWSE_PUNISH_URL = "https://openapi.twse.com.tw/v1/announcement/punish"
 TWSE_NOTICE_URL = "https://openapi.twse.com.tw/v1/announcement/notice"
 TPEX_DISPOSAL_URL = "https://www.tpex.org.tw/openapi/v1/tpex_disposal_information"
@@ -1737,58 +1737,88 @@ TPEX_WARNING_URL = "https://www.tpex.org.tw/openapi/v1/tpex_trading_warning_info
 def _get_json(url):
     return _request_json(url)
 
+
+def _risk_disposal_period(period):
+    # TWSE: 115/11/23～115/11/27；TPEx: 1151123~1151127。
+    if not isinstance(period, str):
+        raise ValueError(f"處置期間不是文字:{period}")
+    start, end = period.replace("/", "").replace("～", "~").split("~")
+    start, end = _roc_ymd_to_iso(start), _roc_ymd_to_iso(end)
+    if end < start:
+        raise ValueError(f"處置期間起訖顛倒:{period}")
+    return start, end
+
+
 def fetch_risk_flags(con, target_date):
-    """抓當天 TWSE/TPEx 處置+注意名單,篩出 universe 內的檔位存進 risk_flags(整表重建,
-    冪等)。同一檔同一天可能有多筆理由(TPEx 注意常見),合併成一筆用「;」串接。"""
+    """回傳 (寫入筆數, 是否完整)。只有台北當天且四端點都有效時才替換當日旗標。"""
+    today = taipei_now().date().isoformat()
+    if target_date > today:
+        return 0, False
+    complete = target_date == today
     uni = {r[0] for r in con.execute("SELECT stock_id FROM universe")}
-    picked = {}   # (stock_id, kind) -> {"reasons": [...], "period": str|None}
-    successful_sources = 0
+    sources = (
+        ("TWSE", "處置", TWSE_PUNISH_URL, "Code", "ReasonsOfDisposition"),
+        ("TWSE", "注意", TWSE_NOTICE_URL, "Code", "TradingInfoForAttention"),
+        ("TPEx", "處置", TPEX_DISPOSAL_URL, "SecuritiesCompanyCode", "DispositionReasons"),
+        ("TPEx", "注意", TPEX_WARNING_URL, "SecuritiesCompanyCode", "TradingInformation"),
+    )
+    picked = {}
+    for market, kind, url, code_key, reason_key in sources:
+        try:
+            payload = _get_json(url)
+            if not isinstance(payload, list):
+                raise ValueError("回應不是陣列")
+        except Exception as e:
+            complete = False
+            print(f"  ! {market} {kind}股票抓取失敗:{e}", file=sys.stderr)
+            continue
+        for index, r in enumerate(payload, 1):
+            try:
+                sid, raw_date = r[code_key], r["Date"]
+                if sid == raw_date == "":  # 無公告時可能回傳單筆空白列
+                    continue
+                if not isinstance(sid, str) or not sid.strip():
+                    raise ValueError("公告缺少證券代號")
+                announced = _roc_ymd_to_iso(raw_date)
+                period = None
+                if kind == "注意":
+                    if announced != target_date:  # 即使不在 universe，仍代表端點回覆了其他日期
+                        complete = False
+                        continue
+                elif announced > target_date:
+                    complete = False
+                    continue
+                elif sid in uni:
+                    period = r["DispositionPeriod"]
+                    start, end = _risk_disposal_period(period)
+                    if not start <= target_date <= end:
+                        continue
+                if sid not in uni:
+                    continue
+                reason = r.get(reason_key)
+                if reason is not None and not isinstance(reason, str):
+                    raise ValueError("公告理由不是文字")
+            except (KeyError, TypeError, ValueError) as e:
+                complete = False
+                print(f"  ! {market} {kind}股票第 {index} 列格式異常，略過:{e}", file=sys.stderr)
+                continue
+            reasons, _ = picked.setdefault((sid, kind), ({}, period))
+            if reason:
+                reasons[reason] = None  # 同檔多則理由去重並保留順序
 
-    def add(sid, kind, reason, period=None):
-        if sid not in uni:
-            return
-        e = picked.setdefault((sid, kind), {"reasons": [], "period": period})
-        if reason and reason not in e["reasons"]:
-            e["reasons"].append(reason)
-        if period and not e["period"]:
-            e["period"] = period
-
-    try:
-        for r in _get_json(TWSE_PUNISH_URL):
-            add(r.get("Code"), "處置", r.get("ReasonsOfDisposition"), r.get("DispositionPeriod"))
-        successful_sources += 1
-    except Exception as e:
-        print(f"  ! TWSE 處置股票抓取失敗:{e}", file=sys.stderr)
-    try:
-        for r in _get_json(TWSE_NOTICE_URL):
-            if r.get("Code"):   # 當天無注意股票時回傳單筆全空值 placeholder row
-                add(r["Code"], "注意", r.get("TradingInfoForAttention"))
-        successful_sources += 1
-    except Exception as e:
-        print(f"  ! TWSE 注意股票抓取失敗:{e}", file=sys.stderr)
-    try:
-        for r in _get_json(TPEX_DISPOSAL_URL):
-            add(r.get("SecuritiesCompanyCode"), "處置", r.get("DispositionReasons"), r.get("DispositionPeriod"))
-        successful_sources += 1
-    except Exception as e:
-        print(f"  ! TPEx 處置股票抓取失敗:{e}", file=sys.stderr)
-    try:
-        for r in _get_json(TPEX_WARNING_URL):
-            if r.get("SecuritiesCompanyCode"):
-                add(r["SecuritiesCompanyCode"], "注意", r.get("TradingInformation"))
-        successful_sources += 1
-    except Exception as e:
-        print(f"  ! TPEx 注意股票抓取失敗:{e}", file=sys.stderr)
-
-    con.execute("DELETE FROM risk_flags WHERE date=?", (target_date,))
-    rows = [(target_date, sid, kind, "；".join(e["reasons"]), e["period"])
-            for (sid, kind), e in picked.items()]
-    if rows:
-        con.executemany("INSERT OR REPLACE INTO risk_flags VALUES(?,?,?,?,?)", rows)
+    # 歷史名單可能缺已結束的處置，空白回應也無法證明歷史當日無公告。
+    complete = complete and target_date == taipei_now().date().isoformat()
+    if complete:
+        con.execute("DELETE FROM risk_flags WHERE date=?", (target_date,))
+    else:
+        print(f"  ! 處置/注意股票 {target_date} 名單不完整，僅補缺、不標記完整", file=sys.stderr)
+    rows = [(target_date, sid, kind, "；".join(reasons), period)
+            for (sid, kind), (reasons, period) in picked.items()]
+    inserted = con.executemany("INSERT OR IGNORE INTO risk_flags VALUES(?,?,?,?,?)", rows).rowcount
     con.commit()
-    if rows:
-        print(f"  處置/注意股票(觀察層):{len(picked)} 檔次,{','.join(sorted({s for s, _ in picked}))}")
-    return len(rows), successful_sources == 4
+    if inserted:
+        print(f"  處置/注意股票(觀察層):寫入 {inserted} 筆")
+    return inserted, complete
 
 def build_price_adj(con):
     """由 price × 事件係數重算還原價(倒推法:事件日「之前」的價 × 係數連乘,最新區段==原始價)。
