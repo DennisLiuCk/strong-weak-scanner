@@ -103,6 +103,7 @@ class CurrentCensusTest(unittest.TestCase):
 
 class FormalProgressTest(unittest.TestCase):
     def setUp(self):
+        self.enterContext(mock.patch.object(rv, "EFFECTIVE_FROM", "2026-10-09"))
         self.con = sqlite3.connect(":memory:")
         self.con.row_factory = sqlite3.Row
         self.con.executescript("""

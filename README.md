@@ -73,9 +73,11 @@ tier前2／倒2的同分邊界也採平均名次，同分者一同納入或排�
 | C 籌碼支持 | 誰的法人相對位置靠前？ | 外資、投信、修正日買賣、融資；TDCC/借券只作未驗證旁證 | 每日／週 |
 | D 基本面改善 | 截至當時已知資料，誰的成長與營運品質靠前？ | 3 月營收年增與加速度、營益率與年變化 | 月／季 |
 
-D 視角只讀 `fundamental_availability.first_seen_at` 已證明當時可見的資料。既有歷史資料在
-ledger 建立前不回填過去排名；2026-08-13 migration 時的既有資料只從該時點起視為已知，
-後續抓取同樣保留第一次看到的時間。這個保守下界避免用財報期間日冒充發布日造成 look-ahead。
+D 視角的歷史查詢按欄位選取截至查詢時點已觀測到的最新版本，而不是用目前值回填過去。
+財報抓取保留每個被取代的版本；相同內容重抓不改觀測時間。遷移前已覆寫的版本不能由目前
+資料庫還原，因此既有值只從修訂帳本初始化時起可供歷史查詢。即時排名仍使用目前值。
+每日終版和財報抓取會自動初始化；可用
+`python scripts/fetch_financials.py --initialize-availability-only --db <DB副本>` 離線初始化舊庫。
 
 D 的月、季比較期間分別採「正式 universe 當期原始值 100% 到齊」的最新共同月份／季度，
 參考股票不參與選期；季度須同時有營收與營業利益。少數早報者只更新新期間覆蓋提示，
@@ -162,7 +164,7 @@ peer sensitivity、component 與 append-only spec 進度；正式 final pipeline
 
 | 層 | 主要內容 | 更新語意 |
 |---|---|---|
-| 原始層 | `price`、`inst`、`margin`、`holding`、`sbl`、`risk_flags`、`market`、`market_provenance`、`market_index`、`tdcc_holding`、財報、`fundamental_availability` 與 `ref_*` | 依主鍵冪等補缺；財報 first-seen 不覆寫；大盤 canonical 保留逐日來源與雙邊原值 |
+| 原始層 | `price`、`inst`、`margin`、`holding`、`sbl`、`risk_flags`、`market`、`market_provenance`、`market_index`、`tdcc_holding`、財報、`fundamental_availability`、`fundamental_revisions` 與 `ref_*` | 依主鍵冪等補缺；財報保留被取代的版本及觀測時間；大盤 canonical 保留逐日來源與雙邊原值 |
 | 衍生層 | `price_adj`、`daily_metrics`、`observation_metrics`、`daily_scores`、`chip_health`、`group_metrics`、`market_daily` | 依目前規則全量重建，屬 restated history |
 | OOS as-seen 層 | `oos_snapshot_runs`、`oos_signal_snapshots`、`oos_group_snapshots`、`oos_market_snapshots`、`oos_ranking_view_snapshots` | append-only，不覆寫舊發布；多視角另存 spec hash |
 | 發布層 | `index.html`、`research.html`、`archive/<資料日>.html`、`reports/` | 首頁與研究中心可重建；同日 archive 首次建立後不覆寫 |

@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
+import fetch_financials as ff
 import ranking_views as rv
 import score
 
@@ -162,6 +163,8 @@ class RankingMathTest(unittest.TestCase):
 
 
 class FundamentalPointInTimeTest(unittest.TestCase):
+    BASELINE = "2026-08-13T01:00:00+00:00"
+
     def setUp(self):
         self.con = sqlite3.connect(":memory:")
         self.con.row_factory = sqlite3.Row
@@ -198,12 +201,24 @@ class FundamentalPointInTimeTest(unittest.TestCase):
         self.con.close()
 
     def test_as_of_before_first_seen_has_no_fundamental_rank(self):
+        ff.ensure_schema(self.con, first_seen_at=self.BASELINE)
         values, meta = rv.load_fundamental_inputs(
             self.con, as_of="2026-08-12T23:59:59+00:00")
         self.assertEqual(values, {})
         self.assertFalse(meta["available"])
 
+    def test_legacy_values_are_not_backdated_to_old_period_availability(self):
+        as_of = "2026-08-14T00:00:00+00:00"
+        self.assertEqual(rv.load_fundamental_inputs(self.con, as_of=as_of)[0], {})
+        ff.ensure_schema(self.con, first_seen_at=as_of)
+        self.assertEqual(rv.load_fundamental_inputs(self.con, as_of=self.BASELINE)[0], {})
+        self.assertEqual(rv.load_fundamental_inputs(self.con, as_of=as_of)[0]["A"]["first_seen_at"],
+                         as_of)
+        self.assertEqual(rv.load_fundamental_inputs(self.con)[0]["A"]["first_seen_at"],
+                         self.BASELINE)
+
     def test_as_of_after_first_seen_computes_growth_and_margin(self):
+        ff.ensure_schema(self.con, first_seen_at=self.BASELINE)
         values, meta = rv.load_fundamental_inputs(
             self.con, as_of="2026-08-13T01:00:00+00:00")
         self.assertTrue(meta["available"])
@@ -212,14 +227,49 @@ class FundamentalPointInTimeTest(unittest.TestCase):
         self.assertAlmostEqual(values["A"]["operating_margin_yoy_delta"], 0.05)
         self.assertIsNotNone(values["A"]["revenue_3m_yoy"])
 
+    def test_as_of_excludes_later_month_and_quarter_restatements(self):
+        ff.ensure_schema(self.con, first_seen_at=self.BASELINE)
+        before = "2026-08-14T00:00:00+00:00"
+        restated = "2026-08-15T00:00:00+00:00"
+        expected, _ = rv.load_fundamental_inputs(self.con, as_of=before)
+        self.assertAlmostEqual(expected["A"]["operating_margin"], 0.15)
+        ff.up_month_revenue(self.con, [{
+            "date": "2026-08-01", "stock_id": "A", "revenue": 227,
+            "revenue_month": 7, "revenue_year": 2026,
+        }], first_seen_at=restated)
+        ff.UPSERT["TaiwanStockFinancialStatements"](self.con, [{
+            "date": "2026-03-31", "stock_id": "A", "type": "OperatingIncome", "value": 30,
+        }], first_seen_at=restated)
+
+        historical, _ = rv.load_fundamental_inputs(self.con, as_of=before)
+        current, _ = rv.load_fundamental_inputs(self.con, as_of=restated)
+        live, _ = rv.load_fundamental_inputs(self.con)
+        self.assertEqual(historical, expected)
+        self.assertAlmostEqual(current["A"]["operating_margin"], 0.25)
+        self.assertAlmostEqual(current["A"]["revenue_3m_yoy"], 478 / 318 - 1)
+        self.assertEqual(current["A"]["first_seen_at"], restated)
+        for field in ("operating_margin", "revenue_3m_yoy"):
+            self.assertEqual(current["A"][field], live["A"][field])
+
+    def test_null_revision_does_not_resurrect_superseded_operating_income(self):
+        ff.ensure_schema(self.con, first_seen_at=self.BASELINE)
+        restated = "2026-08-15T00:00:00+00:00"
+        ff.UPSERT["TaiwanStockFinancialStatements"](self.con, [{
+            "date": "2026-03-31", "stock_id": "A", "type": "OperatingIncome", "value": None,
+        }], first_seen_at=restated)
+        _, meta = rv.load_fundamental_inputs(self.con, as_of=restated)
+        self.assertEqual(meta["quarter_period"], "2025-03-31")
+        self.assertEqual(meta["latest_quarter_missing"], ["A"])
+
     def add_month(self, sid, year, month, seen="2026-09-04T12:00:00+00:00"):
         storage = f"{year + (month == 12)}-{month % 12 + 1:02d}-01"
-        self.con.execute("INSERT INTO month_revenue VALUES(?,?,?,?,?)",
-                         (storage, sid, 150, month, year))
-        self.con.execute("INSERT INTO fundamental_availability VALUES(?,?,?,?,?,?)",
-                         ("TaiwanStockMonthRevenue", storage, sid, None, seen, "test"))
+        ff.up_month_revenue(self.con, [{
+            "date": storage, "stock_id": sid, "revenue": 150,
+            "revenue_month": month, "revenue_year": year,
+        }], first_seen_at=seen, source="test")
 
     def test_early_reporter_does_not_move_common_month_and_rest_comparison(self):
+        ff.ensure_schema(self.con, first_seen_at=self.BASELINE)
         before, _ = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
         self.add_month("A", 2026, 8)
         after, meta = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
@@ -231,6 +281,7 @@ class FundamentalPointInTimeTest(unittest.TestCase):
         self.assertEqual(meta["period_status"], "pending_new_period")
 
     def test_common_month_moves_only_after_both_reports_are_known(self):
+        ff.ensure_schema(self.con, first_seen_at=self.BASELINE)
         self.add_month("A", 2026, 8)
         self.add_month("B", 2026, 8, seen="2026-09-05T12:00:00+00:00")
         _, before = rv.load_fundamental_inputs(
@@ -242,6 +293,7 @@ class FundamentalPointInTimeTest(unittest.TestCase):
         self.assertEqual(after["period_status"], "complete")
 
     def test_reference_company_cannot_choose_period_or_block_universe(self):
+        ff.ensure_schema(self.con, first_seen_at=self.BASELINE)
         before, _ = rv.load_fundamental_inputs(self.con, stock_ids=["A", "B"])
         self.add_month("REF", 2027, 1)
         after, meta = rv.load_fundamental_inputs(self.con, stock_ids=["B", "A"])

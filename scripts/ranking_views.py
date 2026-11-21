@@ -35,9 +35,10 @@ from score import VOL_OVERHEAT, VOLR_OVERHEAT, WEIGHTS
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROLES_CONFIG = os.path.join(ROOT, "config", "ranking_roles.csv")
 SCHEMA_VERSION = 3
-REGISTERED_AT = "2026-10-09T00:00:00+08:00"
-EFFECTIVE_FROM = "2026-10-09"
-CHALLENGER_REGISTERED_AT = REGISTERED_AT
+REGISTERED_AT = "2026-11-21T00:00:00+08:00"
+EFFECTIVE_FROM = "2026-11-21"
+CHALLENGER_REGISTERED_AT = "2026-10-09T00:00:00+08:00"
+CHALLENGER_EFFECTIVE_FROM = "2026-10-09"
 PREVIOUS_SPECS = ({
     "spec_sha": "b9076628ddb7c9ddd76c5d4934a5f6c3d8e8bbb75c56d1b3bce9c60f8e23bd4e",
     "schema_version": 2,
@@ -45,7 +46,13 @@ PREVIOUS_SPECS = ({
     "challenger_original_registered_at": "2026-08-13T00:00:00+08:00",
     "score_version": score.SCORE_PREVIOUS_VERSION,
     "status": "retained as historical evidence; never pooled with the current spec",
-},)
+}, {
+    "spec_sha": "78c66c2e85caf7021ab49d75261ddda808f3d33c49adbe87a146289d78181217",
+    "schema_version": 3,
+    "registered_at": CHALLENGER_REGISTERED_AT,
+    "score_version": score.SCORE_VERSION,
+    "status": "retained as historical evidence; never pooled with the current spec",
+})
 MIN_ROLE_N = 4
 TOP_PCT = 80.0
 RISK_FLAG_CAP = 10.0
@@ -56,7 +63,7 @@ CHALLENGERS = {
         "purpose": "測試量能只保留為過熱 gate，是否降低無效自由度",
         "weights": {**WEIGHTS, "vol": 0.0},
         "registered_at": CHALLENGER_REGISTERED_AT,
-        "oos_start": EFFECTIVE_FROM,
+        "oos_start": CHALLENGER_EFFECTIVE_FROM,
         "original_registered_at": "2026-08-13T00:00:00+08:00",
     },
     "price_1_0": {
@@ -64,7 +71,7 @@ CHALLENGERS = {
         "purpose": "測試價格權重 1.4→1.0，其他條件不變",
         "weights": {**WEIGHTS, "price": 1.0},
         "registered_at": CHALLENGER_REGISTERED_AT,
-        "oos_start": EFFECTIVE_FROM,
+        "oos_start": CHALLENGER_EFFECTIVE_FROM,
         "original_registered_at": "2026-08-13T00:00:00+08:00",
     },
     "resil_0_5": {
@@ -72,7 +79,7 @@ CHALLENGERS = {
         "purpose": "前瞻檢驗抗跌權重 1.0→0.5；僅影子排名，不改正式 tier",
         "weights": {**WEIGHTS, "resil": 0.5},
         "registered_at": CHALLENGER_REGISTERED_AT,
-        "oos_start": EFFECTIVE_FROM,
+        "oos_start": CHALLENGER_EFFECTIVE_FROM,
     },
 }
 CHALLENGER_FIELDS = {
@@ -122,7 +129,7 @@ RANKING_CONTRACT = {
             "components": ["3m revenue yoy", "3m revenue yoy acceleration",
                            "operating margin", "operating margin yoy delta"],
             "minimum": "growth and operating margin present; at least 3/4 components",
-            "point_in_time": "fundamental_availability.first_seen_at <= as_of",
+            "point_in_time": "latest observed revision per item with observed_at <= as_of",
             "comparison_period": "latest common month and quarter across current universe",
             "period_coverage": "100% have non-null revenue; quarter also requires operating income",
             "early_reporters": "disclose newer partial periods; do not move the comparison cohort",
@@ -344,36 +351,74 @@ def _common_period(period_members, stock_ids):
     return selected, latest, len(present), sorted(required - present)
 
 
-def load_fundamental_inputs(con, *, as_of=None, stock_ids=None):
-    """只讀 first-seen ledger 已證明當時可見的基本面資料。
-
-    既有歷史資料在 baseline 前不會被冒充為過去已知；初始化只證明「從 baseline 起已知」。
-    """
-    meta = {"available": False, "as_of": as_of, "month_period": None,
-            "quarter_period": None, "reason": "availability ledger missing"}
-    have = con.execute(
-        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='fundamental_availability'"
-    ).fetchone()
-    if not have:
-        return {}, meta
-    predicate = " AND a.first_seen_at<=?" if as_of else ""
-    args = (as_of,) if as_of else ()
+def _current_fundamental_rows(con):
     revenue_rows = list(con.execute(
         """SELECT m.stock_id,m.revenue_year,m.revenue_month,m.revenue,a.first_seen_at
            FROM month_revenue m JOIN fundamental_availability a
              ON a.dataset='TaiwanStockMonthRevenue' AND a.data_date=m.date
             AND a.stock_id=m.stock_id
-           WHERE m.revenue IS NOT NULL""" + predicate,
-        args,
+           WHERE m.revenue IS NOT NULL""",
     ))
     financial_rows = list(con.execute(
         """SELECT f.stock_id,f.date,f.type,f.value,a.first_seen_at
            FROM financials f JOIN fundamental_availability a
              ON a.dataset='TaiwanStockFinancialStatements' AND a.data_date=f.date
             AND a.stock_id=f.stock_id
-           WHERE f.type IN ('Revenue','OperatingIncome') AND f.value IS NOT NULL""" + predicate,
-        args,
+           WHERE f.type IN ('Revenue','OperatingIncome') AND f.value IS NOT NULL""",
     ))
+    return revenue_rows, financial_rows
+
+
+def _fundamental_rows_as_of(con, as_of):
+    revenue_rows, financial_rows = [], []
+    for row in con.execute(
+        """WITH known AS (
+             SELECT 'TaiwanStockMonthRevenue' AS dataset,m.date,m.stock_id,'' AS type,
+                    m.revenue AS value,m.revenue_year,m.revenue_month,
+                    COALESCE(m.observed_at,b.observed_at) AS observed_at,NULL AS archived_id
+             FROM month_revenue m CROSS JOIN fundamental_revision_baseline b
+             UNION ALL
+             SELECT 'TaiwanStockFinancialStatements',f.date,f.stock_id,f.type,
+                    f.value,NULL,NULL,COALESCE(f.observed_at,b.observed_at),NULL
+             FROM financials f CROSS JOIN fundamental_revision_baseline b
+             WHERE f.type IN ('Revenue','OperatingIncome')
+             UNION ALL
+             SELECT dataset,data_date,stock_id,item_type,value,
+                    revenue_year,revenue_month,observed_at,id
+             FROM fundamental_revisions
+             WHERE dataset='TaiwanStockMonthRevenue' OR (
+                dataset='TaiwanStockFinancialStatements' AND item_type IN ('Revenue','OperatingIncome'))
+           ), visible AS (
+             SELECT *,observed_at AS first_seen_at,value AS revenue,
+                    ROW_NUMBER() OVER (
+                      PARTITION BY dataset,date,stock_id,type
+                      ORDER BY observed_at DESC,archived_id IS NULL DESC,archived_id DESC
+                    ) AS revision_rank
+             FROM known WHERE observed_at<=?
+           )
+           SELECT * FROM visible WHERE revision_rank=1 AND value IS NOT NULL""", (as_of,),
+    ):
+        if row["dataset"] == "TaiwanStockMonthRevenue":
+            revenue_rows.append(row)
+        else:
+            financial_rows.append(row)
+    return revenue_rows, financial_rows
+
+
+def load_fundamental_inputs(con, *, as_of=None, stock_ids=None):
+    """歷史查詢只讀當時已知的修訂；即時查詢維持目前值與期間 first-seen。"""
+    meta = {"available": False, "as_of": as_of, "month_period": None,
+            "quarter_period": None}
+    ledger = "fundamental_revisions" if as_of is not None else "fundamental_availability"
+    have = con.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (ledger,),
+    ).fetchone()
+    if not have:
+        meta["reason"] = ("revision ledger missing" if as_of is not None else
+                          "availability ledger missing")
+        return {}, meta
+    revenue_rows, financial_rows = (_fundamental_rows_as_of(con, as_of) if as_of is not None
+                                    else _current_fundamental_rows(con))
     if not revenue_rows or not financial_rows:
         meta["reason"] = "point-in-time rows not yet available"
         return {}, meta
@@ -394,8 +439,10 @@ def load_fundamental_inputs(con, *, as_of=None, stock_ids=None):
     financials = defaultdict(dict)
     quarter_seen = {}
     for row in financial_rows:
-        financials[(row["stock_id"], row["date"])][row["type"]] = row["value"]
-        quarter_seen[(row["stock_id"], row["date"])] = row["first_seen_at"]
+        key = (row["stock_id"], row["date"])
+        financials[key][row["type"]] = row["value"]
+        seen_at = row["first_seen_at"]
+        quarter_seen[key] = max(quarter_seen.get(key, seen_at), seen_at)
 
     quarter_members = defaultdict(set)
     for (stock_id, period), values in financials.items():
