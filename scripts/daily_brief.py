@@ -101,7 +101,9 @@ def main():
             print(f"   {s} {uni[s][0]:<5} ◇{cp[s]}{mark}")
         for s in pp:
             if s not in cp:
-                if "蓄勢" in cur[s]["tier"]:
+                if s not in cur:
+                    why = "最新日缺評分"
+                elif "蓄勢" in cur[s]["tier"]:
                     why = "升蓄勢!"
                 elif "蓄勢" in cur[s]["tier_raw"]:
                     why = "升蓄勢待確認(明日同向即轉層)"
