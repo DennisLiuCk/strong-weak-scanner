@@ -1028,6 +1028,30 @@ class IncrementalFetchTest(unittest.TestCase):
                 self.assertIn("原始 0 rows 落地", stdout.getvalue())
                 self.assertEqual(read_checkpoint(db), ((day, 3), (day, 3), (day, 3)))
 
+    def test_observation_rebuild_preserves_concurrent_full_rebuild_marker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "concurrent-rebuild.db"
+            with closing(sqlite3.connect(db)) as rebuild, closing(sqlite3.connect(db)) as writer:
+                fd.ensure_schema(rebuild)
+                fd.rebuild_derived(rebuild, fd.REBUILD_ALL)
+                observation_builder = fd.build_observation_metrics
+
+                def build_then_write(*args):
+                    result = observation_builder(*args)
+                    self.assertEqual(writer.execute(
+                        "SELECT level FROM derived_rebuild_state WHERE id=1").fetchone()[0],
+                        fd.REBUILD_OBSERVATION)
+                    fd.up_price(writer, [{"date": "2026-07-09", "stock_id": "2330", "close": 3}])
+                    writer.commit()
+                    return result
+
+                with mock.patch.object(fd, "build_observation_metrics", side_effect=build_then_write):
+                    fd.rebuild_derived(rebuild, fd.REBUILD_OBSERVATION)
+
+                self.assertEqual(writer.execute(
+                    "SELECT level FROM derived_rebuild_state WHERE id=1").fetchone()[0],
+                    fd.REBUILD_ALL)
+
     def test_filtered_or_empty_final_pass_does_not_complete_universe(self):
         dataset = "TaiwanStockShareholding"
         for ids, filtered in ((self.ids, True), ([], False)):

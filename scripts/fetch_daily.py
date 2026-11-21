@@ -2163,7 +2163,7 @@ def rebuild_derived(con, level):
         con, TWSE_TOTAL_RETURN_KEY, TPEX_TOTAL_RETURN_KEY, GRP_MIN_N)
     if level == REBUILD_ALL:
         build_group_market(con)
-    con.execute("UPDATE derived_rebuild_state SET level=0 WHERE id=1")
+    con.execute("UPDATE derived_rebuild_state SET level=0 WHERE id=1 AND level<=?", (level,))
     con.commit()
     return obs
 
