@@ -20,6 +20,18 @@ class ResearchNavigationTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)
 
+    def test_graph_labels_fit_measured_width_and_preserve_code_points(self):
+        result = self.run_helper('fitGraphLabel', """
+function shortGraphLabel(value,max=18){const chars=Array.from(String(value||''));return chars.length>max?chars.slice(0,max-1).join('')+'…':chars.join('')}
+function fit(label,width,measure=true){const el={textContent:'',style:{}};if(measure!==null)el.getComputedTextLength=()=>measure?Array.from(el.textContent).length*parseFloat(el.style.fontSize):0;const shortened=fitGraphLabel(el,label,width,{size:16,minSize:13,max:4});return [el.textContent,el.style.fontSize,shortened]}
+console.log(JSON.stringify([fit('AB',40),fit('ABC',40),fit('A😀BCDE',40),fit('',40),fit('A😀BCD',40,false),fit('A😀BCD',40,null)]))
+""")
+        self.assertEqual(result, [
+            ['AB', '16px', False], ['ABC', '13px', False],
+            ['A😀…', '13px', True], ['', '16px', False],
+            ['A😀B…', '16px', True], ['A😀B…', '16px', True],
+        ])
+
     def test_company_heading_identifies_the_document_without_repeating_the_mission(self):
         result = self.run_helper('articleReaderHeading', """
 function h(tag,attrs,...children){return {tag,attrs,children}}
