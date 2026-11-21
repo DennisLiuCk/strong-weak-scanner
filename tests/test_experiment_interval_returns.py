@@ -107,6 +107,11 @@ class IntervalReturnsTest(unittest.TestCase):
     def test_v2_archive_and_original_reviews_match_manifest(self):
         folder = lab.ROOT / 'reports/experiment_rounds/fast-lab-v2-20261009'
         manifest = json.loads((folder / 'manifest.json').read_text(encoding='utf-8'))
+        report = json.loads((folder / 'experiment_lab.json').read_text(encoding='utf-8'))
+        acceptance = json.loads((folder / 'experiment_lab_acceptance.json').read_text(encoding='utf-8'))
+        self.assertEqual(manifest['db_sha256'], report['db_sha256'])
+        self.assertEqual(manifest['db_sha256'], acceptance['db_sha256'])
+        self.assertEqual(acceptance['report_sha256'], hashlib.sha256((folder / 'experiment_lab.json').read_bytes()).hexdigest())
         for name, receipt in manifest['files'].items():
             self.assertEqual(hashlib.sha256((folder / name).read_bytes()).hexdigest(), receipt['sha256'], name)
             if name.startswith('experiment_reviews/'):
