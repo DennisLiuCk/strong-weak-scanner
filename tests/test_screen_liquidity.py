@@ -50,6 +50,18 @@ class ScreenLiquidityTest(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn(f"| 0001 | Member | test | 50 | {expected}", result.stdout)
 
+    def test_member_report_uses_previous_close_on_latest_no_trade_day(self):
+        with tempfile.TemporaryDirectory() as directory:
+            db = Path(directory) / "screen.db"
+            self.make_db(db, [100000000] * 9 + [0] * 11)
+            with closing(sqlite3.connect(db)) as con, con:
+                con.execute("UPDATE price SET close=NULL WHERE date='2026-01-20'")
+            result = run("--db", str(db), "--no-candidates", "--dry-run")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("| 0001 | Member | test | 50 | 0M | 👀 緩衝觀察", result.stdout)
+            self.assertNotIn("✅ 續留", result.stdout)
+            self.assertNotIn("資料不足", result.stdout)
+
     def test_candidate_report_counts_zero_amount_days_even_without_close(self):
         for low_amount, expected in ((0, "0M | ❌ 不納入"),
                                      (None, "100M | ✅ 建議納入")):

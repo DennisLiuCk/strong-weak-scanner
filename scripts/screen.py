@@ -134,7 +134,8 @@ def main():
                             ORDER BY date DESC LIMIT 20""", (sid,)).fetchall()
         sh = con.execute("""SELECT shares_issued FROM holding WHERE stock_id=? AND shares_issued
                             IS NOT NULL ORDER BY date DESC LIMIT 1""", (sid,)).fetchone()
-        cap = px[0]["close"] * sh[0] if (px and sh and px[0]["close"]) else None
+        close = next((p["close"] for p in px if p["close"] is not None), None)
+        cap = close * sh[0] if (close is not None and sh) else None
         amts = [p["amount"] for p in px if p["amount"] is not None]
         liq = statistics.median(amts) if amts else None
         vd, why = verdict_member(cap, liq)
