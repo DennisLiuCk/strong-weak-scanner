@@ -13,18 +13,24 @@ class WeeklyLabWorkflowTest(unittest.TestCase):
         lab = workflow[lab_at:audit_at]
         self.assertIn('id: experiment_lab', lab)
         self.assertIn('continue-on-error: true', lab)
-        self.assertIn("if: steps.experiment_lab.outcome == 'success'", workflow[audit_at:dashboard_at])
+        audit = workflow[audit_at:dashboard_at]
+        self.assertIn("if: steps.experiment_lab.outcome == 'success'", audit)
+        self.assertIn('id: audit_experiment_lab', audit)
+        self.assertIn('continue-on-error: true', audit)
         gate_at = workflow.index('- name: 實驗失敗標紅')
         self.assertLess(dashboard_at, commit_at)
         self.assertLess(commit_at, gate_at)
         commit = workflow[commit_at:gate_at]
-        self.assertIn("if [ \"${{ steps.experiment_lab.outcome }}\" = \"success\" ]; then", commit)
+        self.assertIn('if [ "${{ steps.experiment_lab.outcome }}" = "success" ] && [ "${{ steps.audit_experiment_lab.outcome }}" = "success" ]; then', commit)
         success, failure = commit.split('else', 1)
         failure = failure.split('fi', 1)[0]
         self.assertIn('git add reports/ index.html research.html', success)
         self.assertIn('git add reports/validate_*.md reports/validation_progress.json index.html research.html', failure)
         self.assertNotIn('experiment', failure)
         gate = workflow[gate_at:]
-        self.assertIn("if: steps.experiment_lab.outcome == 'failure'", gate)
-        self.assertIn('::error::', gate)
+        self.assertIn("if: steps.experiment_lab.outcome == 'failure' || steps.audit_experiment_lab.outcome == 'failure'", gate)
+        self.assertIn('::error::experiment_lab 更新失敗', gate)
+        self.assertIn('::error::audit_experiment_lab 核對失敗', gate)
+        self.assertIn('[ "${{ steps.experiment_lab.outcome }}" = "failure" ]', gate)
+        self.assertIn('[ "${{ steps.audit_experiment_lab.outcome }}" = "failure" ]', gate)
         self.assertIn('exit 1', gate)

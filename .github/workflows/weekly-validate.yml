@@ -42,6 +42,8 @@ jobs:
         run: python scripts/experiment_lab.py
 
       - name: 獨立核對短週期實驗數值
+        id: audit_experiment_lab
+        continue-on-error: true
         if: steps.experiment_lab.outcome == 'success'
         run: python scripts/audit_experiment_lab.py
 
@@ -54,7 +56,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ "${{ steps.experiment_lab.outcome }}" = "success" ]; then
+          if [ "${{ steps.experiment_lab.outcome }}" = "success" ] && [ "${{ steps.audit_experiment_lab.outcome }}" = "success" ]; then
             git add reports/ index.html research.html
           else
             git add reports/validate_*.md reports/validation_progress.json index.html research.html
@@ -67,7 +69,12 @@ jobs:
           fi
 
       - name: 實驗失敗標紅
-        if: steps.experiment_lab.outcome == 'failure'
+        if: steps.experiment_lab.outcome == 'failure' || steps.audit_experiment_lab.outcome == 'failure'
         run: |
-          echo "::error::實驗室更新失敗；正式週報已完成發布流程，請檢查實驗凍結檢視。"
+          if [ "${{ steps.experiment_lab.outcome }}" = "failure" ]; then
+            echo "::error::experiment_lab 更新失敗；正式週報已完成發布流程，請檢查實驗凍結檢視。"
+          fi
+          if [ "${{ steps.audit_experiment_lab.outcome }}" = "failure" ]; then
+            echo "::error::audit_experiment_lab 核對失敗；正式週報已完成發布流程，實驗輸出未發布。"
+          fi
           exit 1

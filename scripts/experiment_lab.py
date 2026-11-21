@@ -533,7 +533,6 @@ def freeze_reviews(path, report, calendar):
     """First-N forward inputs/outcomes are immutable; changed history hard-fails."""
     folder = Path(path) / report["protocol"]
     active = set()
-    pending = []
     for candidate, looks in report["forward_looks"].items():
         if candidate == report['config'].get('comparison_reference', 'BASE'):
             continue
@@ -555,13 +554,11 @@ def freeze_reviews(path, report, calendar):
                 if json.loads(file.read_text(encoding="utf-8")) != json.loads(canonical(payload)):
                     raise ValueError(f"fixed lab review drift: {file.name}; do not overwrite")
             else:
-                pending.append((file, canonical(payload)))
+                folder.mkdir(parents=True, exist_ok=True)
+                with file.open("xb") as stream:
+                    stream.write(canonical(payload))
     if folder.exists() and {p.name for p in folder.glob("*.json")} - active:
         raise ValueError("previously mature lab review disappeared")
-    for file, payload in pending:
-        folder.mkdir(parents=True, exist_ok=True)
-        with file.open("xb") as stream:
-            stream.write(payload)
 
 
 def forward_dates(runs, cfg):
