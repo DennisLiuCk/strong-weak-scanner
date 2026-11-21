@@ -2528,6 +2528,15 @@ def render_lint(topics, scan):
     return "\n".join(lines) + "\n", error_count
 
 
+def _validate_output(output, db_path):
+    if output and (
+        os.path.realpath(output) == os.path.realpath(db_path)
+        or (os.path.exists(output) and os.path.exists(db_path)
+            and os.path.samefile(output, db_path))
+    ):
+        raise ValueError('--output must not refer to the input --db file')
+
+
 def _write_output(text, output):
     if output:
         parent = os.path.dirname(os.path.abspath(output))
@@ -2554,6 +2563,11 @@ def main(argv=None):
     parser.add_argument(
         "--baseline-ref", help="--lint 時比較 Git 前版，防止舊 source/claim/monitor 被重寫")
     args = parser.parse_args(argv)
+
+    try:
+        _validate_output(args.output, args.db)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     try:
         as_of = dt.date.fromisoformat(args.as_of) if args.as_of else taipei_today()
