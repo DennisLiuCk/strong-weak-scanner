@@ -55,4 +55,10 @@ Windows整套測試另重現`missing config value GIT_CONFIG_VALUE_0`：token測
 
 接續main `5a87c1c496c0d5ef275e815cc444a4fd55f3ebc9`新合入的7組修正；保留其日期驗證、UTC正規化、零融資餘額、缺資料處理、字型、C視角說明及重建日期固定。使用合併保留39d7d3b先凍結選題的原提交，沒有改寫遠端歷史。CHANGELOG雙方新增段落均保留，測試檔改動自動合併後逐項核對；首頁與研究頁再由最新模板重建。
 
+整合後首次完整測試另發現main新加入的screen缺資料測試，在Windows清理臨時SQLite時仍占用檔案。原`with sqlite3.connect(...)`只管理交易、不關閉連線；補`contextlib.closing`後先關閉該測試用連線，不改正式screen判定，也不放寬缺資料斷言。這是跨平台測試資源釋放問題，與研究及正式資料庫無關。
+
 整合前基準29af3dc：Windows11 10.0.26200／python.org Python3.12.10，預設編碼（PYTHONUTF8未設、utf8_mode=0）及UTF-8（PYTHONUTF8=1、utf8_mode=1）各1002項，1001通過、1略過；六項lint、append-only及隔離build均通過。收據分別為`tmp/prepublish/20261121-default-3/verification.json`與`tmp/prepublish/20261121-utf8-1/verification.json`。這是研究分支的整合前結果，不替代接續main後的最終驗證。
+
+**整合後最終驗證**：以上述Windows11／Python3.12.10對main基準5a87c1c，預設與UTF-8各1011項完整測試，1010通過、1略過；六項lint、歷史append-only與隔離重建均通過，正式DB及archive未變。收據為`tmp/prepublish/20261121-final-default-2/verification.json`及`tmp/prepublish/20261121-final-utf8-1/verification.json`。新版模板的兩頁與本輪四篇內容一致，`tmp/payload_20261121_final.json`再次對新main核318個保護檔及42篇主時計。
+
+推送後另核tests、qualitative-quality及Pages均成功且head SHA一致，再核latest build、部署SHA，以及公開index.html／research.html位元組與提交相同；發布收據為`tmp/publication_20261121.json`，只有該收據成功才對外回報發布完成。原工作分支及兩個未追蹤項目保持原狀，未使用force push。

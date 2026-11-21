@@ -1,4 +1,5 @@
 """現有成員缺資料時不得續留或中斷報告。"""
+from contextlib import closing
 import sqlite3
 import sys
 import tempfile
@@ -33,7 +34,9 @@ class ScreenMissingDataTest(unittest.TestCase):
     def test_report_handles_missing_price_and_holding_rows(self):
         with tempfile.TemporaryDirectory() as directory:
             db = Path(directory) / "screen.db"
-            with sqlite3.connect(db) as con:
+            # SQLite's transaction context does not close the connection; close
+            # this temporary fixture before Windows attempts to remove its file.
+            with closing(sqlite3.connect(db)) as con, con:
                 con.executescript("""
                     CREATE TABLE groups (grp TEXT, ord INTEGER);
                     CREATE TABLE universe (stock_id TEXT, name TEXT, grp TEXT, biz TEXT);
