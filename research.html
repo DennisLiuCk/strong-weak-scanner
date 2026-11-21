@@ -1054,21 +1054,43 @@ function catalogComparableText(value){return String(value||'').replace(/\[S\d+\]
 function catalogTechnicalTitle(article,lead){const title=String(article.title||'').trim();if(article.type!=='formal_note')return title;const titleKey=catalogComparableText(title),leadKey=catalogComparableText(lead);if(titleKey&&leadKey&&(titleKey.includes(leadKey)||leadKey.includes(titleKey)))return'';return formalReaderDisplayText(article,title)}
 function catalogEvidencePosition(article){const guide=(article.sections||[]).map(section=>section.readerEvidenceGuide).find(Boolean),confidence=liveConfidence(article),parts=[String(article.status||'').trim()].filter(Boolean);if(guide?.claimLabel)parts.push('主張「'+guide.claimLabel+'」');if(confidence)parts.push(confidenceText(confidence));if(guide&&Number.isInteger(guide.sourceCount))parts.push(guide.sourceCount+' 份有效來源');return parts.join(' · ')}
 function catalogLearningPreview(article,readerQuestion){const rawLead=catalogLearningLead(article),lead=readerLeadParts(article,rawLead),preview=h('div',{class:'result-learning-preview'+(lead.text?' has-lead':''),'data-catalog-learning-id':article.id});preview.appendChild(h('div',{class:'result-learning-line','data-catalog-learning':'question'},h('span',{class:'result-learning-label',text:'讀完能回答'}),h('h3',{class:'result-reader-question','data-reader-question-type':article.type,'data-reader-question-id':article.id,text:readerQuestion})));if(lead.text){const copy=h('div',{class:'result-learning-copy'},h('p',{class:'result-learning-lead',text:lead.text}));if(lead.sourceRefs.length)copy.appendChild(h('small',{class:'result-learning-source',text:'原文來源標記：'+lead.sourceRefs.join('、')+'；文章內可逐句核對'}));preview.appendChild(h('div',{class:'result-learning-line','data-catalog-learning':'lead'},h('span',{class:'result-learning-label',text:catalogLearningLabel(article)}),copy))}return preview}
+const resultItems=new WeakMap();
+function selectResultItem(button,article){
+  const selected=article.id===state.selected;
+  button.classList.toggle('selected',selected);
+  if(selected)button.setAttribute('aria-current','true');else button.removeAttribute('aria-current');
+  return button;
+}
 function resultItem(article){
-  const selected=article.id===state.selected,lead=readerLeadParts(article,catalogLearningLead(article));
-  const button=h('button',{class:'result'+(selected?' selected':''),type:'button','aria-current':selected?'true':null,'data-testid':'article-'+article.id},
+  const cached=resultItems.get(article);
+  if(cached)return selectResultItem(cached,article);
+  const lead=readerLeadParts(article,catalogLearningLead(article));
+  const button=h('button',{class:'result',type:'button','data-testid':'article-'+article.id},
     h('h3',{text:article.readerTitle||article.title}),
     h('p',{class:'result-preview',text:lead.text||catalogReaderQuestion(article)||article.subject}),
     h('div',{class:'result-meta'},h('span',{text:article.typeLabel}),h('span',{class:'status '+article.statusTone,text:article.status}),h('time',{datetime:article.date,text:fmtDate(article.date)})));
-  button.addEventListener('click',()=>selectArticle(article.id));return button;
+  button.addEventListener('click',()=>selectArticle(article.id));resultItems.set(article,button);
+  return selectResultItem(button,article);
 }
 function showEntryGuide(){return state.surface==='library'&&!document.body.classList.contains('article-open')&&!state.search&&state.type==='all'&&!state.groups.size&&state.statuses.size===3&&state.date==='all'&&state.sort==='latest'}
 function resetEntryScroll(){requestAnimationFrame(()=>{window.scrollTo({top:0,left:0,behavior:'instant'});document.querySelector('.catalog')?.scrollTo({top:0,left:0,behavior:'instant'})})}
 function openEntrySurface(surface){if(surface==='maturity')state.maturityEntry='routes';if(surface==='graph')state.graphOrigin=null;selectSurface(surface);resetEntryScroll();const heading=surface==='maturity'?document.getElementById('maturityIntroTitle'):surface==='graph'?document.getElementById('graphTitle'):null;requestAnimationFrame(()=>requestAnimationFrame(()=>heading?.focus({preventScroll:true})))}
 function openEntryTopics(){state.type='topic';state.selected=null;renderTypeTabs();renderAll();resetEntryScroll()}
 function renderEntryGuideRoutes(){const root=document.getElementById('entryGuideRoutes');if(!root)return;root.replaceChildren();(MATURITY.learningRoutes||[]).forEach(route=>{const firstLabel=route.firstGraphLabel||'第一站',button=h('button',{class:'entry-guide-route',type:'button','data-testid':'entry-route-'+route.id,'aria-label':'開始 '+route.label+' 學習路線：'+route.question+'；第一站：'+firstLabel},h('span',{class:'entry-guide-route-meta',text:route.label+' · '+(route.stationCount||0)+' 站'}),h('strong',{text:route.question||'這條路線先回答什麼系統問題？'}),h('small',{text:'從「'+firstLabel+'」開始'}));if(route.firstArticleId&&byId.has(route.firstArticleId))button.addEventListener('click',()=>openMaturityRouteArticle(route,route.firstArticleId));else button.disabled=true;root.appendChild(h('div',{role:'listitem'},button))})}
-function renderCatalog(rows){const root=document.getElementById('results');root.replaceChildren();document.getElementById('entryGuide').hidden=!showEntryGuide();const selectedGroups=(LIB.groups||[]).filter(group=>state.groups.has(group.id)),groupScope=selectedGroups.length===1?selectedGroups[0].label:selectedGroups.length>1?'已選 '+selectedGroups.length+' 個族群':'';document.getElementById('resultTotal').textContent=(groupScope?groupScope+' · ':'')+'顯示 '+rows.length+'／'+LIB.total+' 篇';document.getElementById('catalogTitle').textContent=groupScope?groupScope+' · 全部文章':'研究文章';const confidenceDate=confidenceAsOf();document.getElementById('catalogHint').textContent=state.search?'符合搜尋':'研究更新 '+fmtDate(LIB.anchor)+(confidenceDate&&confidenceDate!==LIB.anchor?' · 可信度判定 '+fmtDate(confidenceDate):'');const detached=document.body.classList.contains('article-open')&&state.selected&&byId.has(state.selected)&&!rows.some(article=>article.id===state.selected);if(detached)root.appendChild(h('div',{class:'catalog-reader-detached',role:'status'},h('strong',{text:'目前閱讀不在左側結果'}),h('span',{text:'這篇由延伸學習開啟；原搜尋與篩選仍保留。'})));
-  if(!rows.length){root.appendChild(h('div',{class:'empty'},h('b',{text:'找不到符合條件的研究'}),'試著清除部分篩選或改用較短的關鍵字。'));return}rows.forEach(article=>root.appendChild(resultItem(article)))}
+function updateCatalogChildren(root,children){
+  const keep=new Set(children);
+  [...root.children].forEach(child=>{if(!keep.has(child))child.remove()});
+  let next=root.firstChild;
+  children.forEach(child=>{
+    if(child===next)next=next.nextSibling;
+    else root.insertBefore(child,next);
+  });
+}
+function renderCatalog(rows){const root=document.getElementById('results'),children=[];document.getElementById('entryGuide').hidden=!showEntryGuide();const selectedGroups=(LIB.groups||[]).filter(group=>state.groups.has(group.id)),groupScope=selectedGroups.length===1?selectedGroups[0].label:selectedGroups.length>1?'已選 '+selectedGroups.length+' 個族群':'';document.getElementById('resultTotal').textContent=(groupScope?groupScope+' · ':'')+'顯示 '+rows.length+'／'+LIB.total+' 篇';document.getElementById('catalogTitle').textContent=groupScope?groupScope+' · 全部文章':'研究文章';const confidenceDate=confidenceAsOf();document.getElementById('catalogHint').textContent=state.search?'符合搜尋':'研究更新 '+fmtDate(LIB.anchor)+(confidenceDate&&confidenceDate!==LIB.anchor?' · 可信度判定 '+fmtDate(confidenceDate):'');const detached=document.body.classList.contains('article-open')&&state.selected&&byId.has(state.selected)&&!rows.some(article=>article.id===state.selected);if(detached)children.push(h('div',{class:'catalog-reader-detached',role:'status'},h('strong',{text:'目前閱讀不在左側結果'}),h('span',{text:'這篇由延伸學習開啟；原搜尋與篩選仍保留。'})));
+  if(!rows.length)children.push(h('div',{class:'empty'},h('b',{text:'找不到符合條件的研究'}),'試著清除部分篩選或改用較短的關鍵字。'));
+  else rows.forEach(article=>children.push(resultItem(article)));
+  updateCatalogChildren(root,children);
+}
 
 const READER_HAN_RE=/[\u3400-\u9fff]/,READER_LATIN_RE=/[A-Za-z]/,READER_DIGIT_RE=/[0-9]/,READER_CJK_AFTER_RE=/[，。；：！？、]/,READER_CJK_BEFORE_RE=/[，。；：！？、）》」】]/,READER_CJK_OPEN_RE=/[（《「【]/;
 /* Markdown 換行在 payload 中會成為空白；顯示層只清除可確定的中文斷行空白，並把含漢字
