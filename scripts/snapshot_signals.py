@@ -148,6 +148,14 @@ def _utc_now():
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
+def _utc_isoformat(value):
+    """正規化成 ledger 的 UTC 文字；first_seen_at／captured_at 以 SQL 文字比較，混用時區會錯序。"""
+    moment = dt.datetime.fromisoformat(value)
+    if moment.tzinfo is None:
+        raise ValueError(f"captured_at 必須有時區：{value}")
+    return moment.astimezone(dt.timezone.utc).isoformat()
+
+
 def publication_timing(data_date, captured_at):
     """保守以資料日次日台北 09:00 為事前訊號期限；不猜測交易所休市日。"""
     captured = dt.datetime.fromisoformat(captured_at)
@@ -235,7 +243,7 @@ def capture_snapshot(con, *, root=ROOT, snapshot_id=None, captured_at=None,
     """凍結最新資料日並回傳 snapshot_id；相同 snapshot_id 重跑為冪等。"""
     con.row_factory = sqlite3.Row
     ensure_schema(con)
-    captured_at = captured_at or _utc_now()
+    captured_at = _utc_isoformat(captured_at) if captured_at else _utc_now()
     snapshot_id = snapshot_id or _default_snapshot_id(captured_at)
     source = source or ("github-actions" if os.environ.get("GITHUB_ACTIONS") == "true" else "local")
     is_official = int(source == "github-actions" if publish is None else publish)
@@ -502,7 +510,7 @@ def main():
     ap = argparse.ArgumentParser(description="凍結最新資料日的 append-only OOS as-seen 訊號")
     ap.add_argument("--db", default=DB)
     ap.add_argument("--snapshot-id", help="測試/重跑用；正式 Actions 自動採 run id")
-    ap.add_argument("--captured-at", help="ISO-8601 UTC；省略用目前時間")
+    ap.add_argument("--captured-at", help="帶時區 ISO-8601，存成 UTC；省略用目前時間")
     ap.add_argument("--source", choices=("github-actions", "local", "manual"),
                     help="只記錄觸發來源；省略則由環境自動判定")
     ap.add_argument("--publish", action="store_true", default=None,

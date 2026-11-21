@@ -111,8 +111,7 @@ def _csv_values(value):
 
 def _valid_date(value):
     try:
-        dt.date.fromisoformat(value)
-        return True
+        return dt.date.fromisoformat(value).isoformat() == value
     except (TypeError, ValueError):
         return False
 

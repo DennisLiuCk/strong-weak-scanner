@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import fetch_daily as fd
+import ranking_views as rv
 
 
 class TokenPoolTest(unittest.TestCase):
@@ -1007,6 +1008,36 @@ class IncrementalFetchTest(unittest.TestCase):
         ).fetchone()[0]
         self.assertAlmostEqual(resumed, 0.10)
         con.close()
+
+    def test_zero_margin_balance_is_ranked_in_lens_b(self):
+        con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
+        con.row_factory = sqlite3.Row
+        con.executescript(fd.SCHEMA)
+        days = ("2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09")
+        for sid, balance, shares in (
+                ("A", 0, 1_000_000), ("B", 10, 1_000_000),
+                ("C", None, 1_000_000), ("D", 0, 0)):
+            con.execute("INSERT INTO universe VALUES(?,?,'g','biz')", (sid, sid))
+            con.executemany("INSERT INTO price(date,stock_id,close,volume) VALUES(?,?,?,?)",
+                            ((day, sid, 100 - i, 1000) for i, day in enumerate(days)))
+            con.execute("INSERT INTO holding(date,stock_id,shares_issued) VALUES(?,?,?)",
+                        (days[0], sid, shares))
+            if balance is not None:
+                con.execute("INSERT INTO margin(date,stock_id,margin_bal) VALUES(?,?,?)",
+                            (days[-1], sid, balance))
+
+        fd.build_metrics(con)
+        rows = con.execute("SELECT * FROM daily_metrics WHERE date=?", (days[-1],)).fetchall()
+        views = {row["stock_id"]: row for row in rv.compute_group_views(rows)}
+        actual = {row["stock_id"]: (row["margin_util_pct"], views[row["stock_id"]]["lens_b"])
+                  for row in rows}
+        self.assertEqual(actual, {
+            "A": (0.0, 100.0),
+            "B": (1.0, 0.0),
+            "C": (None, None),
+            "D": (None, None),
+        })
 
     def test_wilder_rsi_handles_trending_and_flat_prices(self):
         rising = fd._wilder_rsi(list(range(1, 17)), 14)
