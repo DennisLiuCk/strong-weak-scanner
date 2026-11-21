@@ -300,6 +300,8 @@ class ExperimentLabTests(unittest.TestCase):
                 writer.executemany('INSERT INTO market VALUES (?)',[(d,) for d in days])
                 writer.execute('CREATE TABLE price(date TEXT,stock_id TEXT,open REAL,close REAL)')
                 writer.execute('CREATE TABLE price_adj(date TEXT,stock_id TEXT,close REAL)')
+                writer.execute('CREATE TABLE dividend_result(date TEXT,stock_id TEXT,before_price REAL,reference_price REAL)')
+                writer.execute('CREATE TABLE split_event(date TEXT,stock_id TEXT,before_price REAL,after_price REAL)')
                 for i,d in enumerate(days):
                     for s in range(9):
                         value=100+s*i*.1+math.sin(i+s)

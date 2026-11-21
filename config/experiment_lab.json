@@ -1,8 +1,8 @@
 {
-  "protocol": "fast-lab-v2-20261009",
-  "registered_at": "2026-10-09T04:07:13+08:00",
+  "protocol": "fast-lab-v3-20261122",
+  "registered_at": "2026-11-22T05:04:20+08:00",
   "purpose": "experimental learning only; no real trading",
-  "previous_round": "fast-lab-v1-20261009",
+  "previous_round": "fast-lab-v2-20261009",
   "comparison_reference": "REV1",
   "selection_candidates": [
     "REV1",
