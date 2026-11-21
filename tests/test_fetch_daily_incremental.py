@@ -1132,6 +1132,120 @@ class IncrementalFetchTest(unittest.TestCase):
                 con.close()
 
 
+class RiskFlagFetchTest(unittest.TestCase):
+    day = "2026-11-19"
+
+    def setUp(self):
+        self.con = sqlite3.connect(":memory:")
+        self.addCleanup(self.con.close)
+        self.con.executescript(fd.SCHEMA)
+        self.con.executemany("INSERT INTO universe VALUES(?, '', '', '')",
+                             [(sid,) for sid in ("3131", "3491", "3532", "6510")])
+        self.con.execute("INSERT INTO risk_flags VALUES(?, '6510', '注意', '當日公告', NULL)",
+                         (self.day,))
+
+    def fetch(self, payloads, today="2026-11-21"):
+        def get_json(url):
+            payload = payloads.get(url, [])
+            if isinstance(payload, OSError):
+                raise payload
+            return payload
+
+        now = datetime.fromisoformat(today).replace(tzinfo=fd.TAIPEI_TZ)
+        with mock.patch.object(fd, "taipei_now", return_value=now), \
+                mock.patch.object(fd, "_get_json", side_effect=get_json):
+            return fd.fetch_risk_flags(self.con, self.day)
+
+    def flags(self):
+        return self.con.execute(
+            "SELECT stock_id, kind, reason, period FROM risk_flags WHERE date=? ORDER BY stock_id",
+            (self.day,)).fetchall()
+
+    def test_preserves_historical_rows_when_announcement_feeds_are_newer(self):
+        original = self.flags()
+        result = self.fetch({
+            fd.TWSE_NOTICE_URL: [{"Code": "", "Date": ""}],
+            fd.TPEX_WARNING_URL: [{"SecuritiesCompanyCode": "3131", "Date": "1151120",
+                                   "TradingInformation": "較新公告"}],
+            fd.TWSE_PUNISH_URL: [{"Code": "3532", "Date": "1151120",
+                                  "DispositionPeriod": "115/11/23～115/11/27"}],
+        })
+
+        self.assertEqual((result, self.flags()), ((0, False), original))
+
+    def test_historical_replay_keeps_existing_rows_and_adds_active_disposals(self):
+        original = self.flags()
+        self.assertEqual(self.fetch({
+            fd.TWSE_PUNISH_URL: [
+                {"Code": "3532", "Date": "1151115", "DispositionPeriod": "115/11/16～115/11/19"},
+                {"Code": "3131", "Date": "1151120", "DispositionPeriod": "115/11/19～115/11/23"},
+                {"Code": "6510", "Date": "1151114", "DispositionPeriod": "115/11/16～115/11/18"},
+            ],
+            fd.TPEX_DISPOSAL_URL: [
+                {"SecuritiesCompanyCode": "3491", "Date": "1151118", "DispositionPeriod": "1151119~1151127"},
+            ],
+            fd.TWSE_NOTICE_URL: [
+                {"Code": "6510", "Date": "1151119", "TradingInfoForAttention": "不覆寫既有紀錄"},
+            ],
+        }), (2, False))
+        self.assertEqual(self.flags(), [
+            ("3491", "處置", "", "1151119~1151127"),
+            ("3532", "處置", "", "115/11/16～115/11/19"),
+            *original,
+        ])
+
+    def test_current_day_replaces_flags_after_all_sources_are_verified(self):
+        self.assertEqual(self.fetch({
+            fd.TWSE_NOTICE_URL: [{"Code": "", "Date": ""}],
+            fd.TPEX_WARNING_URL: [
+                {"SecuritiesCompanyCode": "3131", "Date": "1151119", "TradingInformation": reason}
+                for reason in ("第一款", "第六款", "第一款")
+            ],
+            fd.TWSE_PUNISH_URL: [
+                {"Code": "3532", "Date": "1151118", "DispositionPeriod": "115/11/19～115/11/25"},
+            ],
+        }, today=self.day), (2, True))
+        self.assertEqual(self.flags(), [
+            ("3131", "注意", "第一款；第六款", None), ("3532", "處置", "", "115/11/19～115/11/25"),
+        ])
+
+    def test_partial_today_does_not_delete_existing_flags(self):
+        original = self.flags()
+        for unavailable in [
+            OSError("offline"),
+            {},
+            [{"Code": "3532", "Date": "1151117", "DispositionPeriod": "115/11/20～115/11/18"}],
+        ]:
+            with self.subTest(unavailable=unavailable):
+                self.assertEqual(self.fetch({fd.TWSE_PUNISH_URL: unavailable}, today=self.day),
+                                 (0, False))
+                self.assertEqual(self.flags(), original)
+
+    def test_stale_current_day_notice_outside_universe_cannot_verify_coverage(self):
+        original = self.flags()
+        self.assertEqual(self.fetch({
+            fd.TPEX_WARNING_URL: [{"SecuritiesCompanyCode": "0000", "Date": "1151118"}],
+        }, today=self.day), (0, False))
+        self.assertEqual(self.flags(), original)
+
+    def test_empty_feeds_can_clear_flags_today_but_not_on_other_days(self):
+        original = self.flags()
+        for other_day in ("2026-11-18", "2026-11-20"):
+            with self.subTest(today=other_day):
+                self.assertEqual((self.fetch({}, today=other_day), self.flags()),
+                                 ((0, False), original))
+        self.assertEqual((self.fetch({}, today=self.day), self.flags()), ((0, True), []))
+
+    def test_empty_feeds_do_not_verify_coverage_if_fetch_crosses_midnight(self):
+        original = self.flags()
+        before = datetime(2026, 11, 19, 23, 59, tzinfo=fd.TAIPEI_TZ)
+        after = datetime(2026, 11, 20, 0, 0, tzinfo=fd.TAIPEI_TZ)
+        with mock.patch.object(fd, "taipei_now", side_effect=[before, after]), \
+                mock.patch.object(fd, "_get_json", return_value=[]):
+            self.assertEqual(fd.fetch_risk_flags(self.con, self.day), (0, False))
+        self.assertEqual(self.flags(), original)
+
+
 class WorkflowCheckpointTest(unittest.TestCase):
     def test_failed_fetch_checkpoints_data_before_blocking_publish(self):
         workflow = (ROOT / ".github" / "workflows" / "daily-fetch.yml").read_text(
