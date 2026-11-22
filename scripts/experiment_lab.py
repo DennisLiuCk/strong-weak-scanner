@@ -150,12 +150,27 @@ def load_inputs(con, as_of=None):
             continue
         frozen.extend(items)
         runs[day] = dict(run)
-    opening = {}
-    for r in con.execute("""SELECT p.date,p.stock_id,p.open,p.close,a.close AS adjusted
-                FROM price p JOIN price_adj a USING(date,stock_id) WHERE p.date<=?""", (cutoff,)):
-        if all(finite(r[k]) and r[k] > 0 for k in ("open", "close", "adjusted")):
-            opening[r["date"], r["stock_id"]] = r["open"] * r["adjusted"] / r["close"]
-    return calendar, rows, frozen, runs, rejected, opening
+    opening = {(r["date"], r["stock_id"]): r["open"]
+               for r in con.execute("SELECT date,stock_id,open FROM price WHERE date<=?", (cutoff,))
+               if finite(r["open"]) and r["open"] > 0}
+    events = defaultdict(list)
+    for table, after, lower, upper in (("dividend_result", "reference_price", 0, 1.02),
+                                       ("split_event", "after_price", .05, 20)):
+        for r in con.execute(f"SELECT date,stock_id,before_price,{after} AS after_price FROM {table} WHERE date<=?", (cutoff,)):
+            before, after_price = r["before_price"], r["after_price"]
+            factor = after_price / before if before and after_price else None
+            if finite(factor) and (0 < factor <= upper if lower == 0 else lower <= factor <= upper):
+                events[r["stock_id"]].append((r["date"], table, factor))
+    events = {sid: sorted(values) for sid, values in events.items()}
+    return calendar, rows, frozen, runs, rejected, opening, events
+
+
+def interval_return(opening, events, entry, exit_day, stock):
+    a, b = opening.get((entry, stock)), opening.get((exit_day, stock))
+    if not (finite(a) and finite(b) and a > 0 and b > 0):
+        return None
+    factor = math.prod(f for day, _, f in events.get(stock, ()) if entry < day <= exit_day)
+    return b / a / factor - 1
 
 
 def build_signals(rows, cfg, calendar=None):
@@ -286,7 +301,7 @@ def structural_report(signals, calendar, cfg, allowed):
                        'daily':dict(metrics), 'cells':dict(cells[candidate])} for candidate,metrics in series.items()}
 
 
-def evaluate(signals, calendar, opening, cfg, horizon, eligible_days=None, structure=None):
+def evaluate(signals, calendar, opening, cfg, horizon, eligible_days=None, structure=None, events=None):
     allowed = set(signals if eligible_days is None else eligible_days)
     position = {d: i for i, d in enumerate(calendar)}
     ids = [s["id"] for s in cfg["strategies"]]
@@ -307,9 +322,9 @@ def evaluate(signals, calendar, opening, cfg, horizon, eligible_days=None, struc
                 reason = "small_group"
             rr = {}
             for stock in stocks:
-                a, b = opening.get((entry, stock)), opening.get((exit_day, stock))
-                if finite(a) and finite(b) and a > 0 and b > 0:
-                    rr[stock] = b / a - 1
+                value = interval_return(opening, events or {}, entry, exit_day, stock)
+                if finite(value):
+                    rr[stock] = value
             if len(rr) != len(stocks):
                 reason = "missing_entry_or_exit_entire_group_excluded"
             for candidate in ids:
@@ -452,7 +467,7 @@ def walk_forward(results, calendar, cfg):
             "label": "歷史選擇流程重播；策略設計已看過歷史，非真正未見 OOS"}
 
 
-def negative_controls(signals, calendar, opening, cfg, allowed):
+def negative_controls(signals, calendar, opening, cfg, allowed, events=None):
     """Fixed per-group ticker permutations across time, diagnostic, not p-values."""
     members = defaultdict(set)
     for day in signals.values():
@@ -477,7 +492,7 @@ def negative_controls(signals, calendar, opening, cfg, allowed):
                     continue
                 fake.setdefault(day, {})[grp] = {s: {reference: row[reference],
                     "SHUFFLE": stocks[mapping[grp][s]][reference]} for s, row in stocks.items()}
-        result = evaluate(fake, calendar, opening, small_cfg, cfg["primary_horizon"], allowed)["SHUFFLE"]
+        result = evaluate(fake, calendar, opening, small_cfg, cfg["primary_horizon"], allowed, events=events)["SHUFFLE"]
         output.append({"seed": seed, "ic": result["summary"].get("ic"),
                        "coverage": result["coverage"]})
     return {"kind": "固定族群內 ticker 置換；保留分數時間路徑，非交換性保證或多重檢定 p 值",
@@ -575,7 +590,7 @@ def forward_dates(runs, cfg):
 
 
 def analyze(con, cfg, fingerprint, as_of=None):
-    calendar, rows, frozen, runs, rejected, opening = load_inputs(con, as_of)
+    calendar, rows, frozen, runs, rejected, opening, events = load_inputs(con, as_of)
     restated, restated_excluded = build_signals(rows, cfg, calendar)
     observed, observed_excluded = build_signals(frozen, cfg, calendar)
     forward = forward_dates(runs, cfg)
@@ -589,7 +604,7 @@ def analyze(con, cfg, fingerprint, as_of=None):
         structure = structural_report(signals, calendar, cfg, allowed)
         datasets[name] = {"label": DATASET_LABELS[name], "eligible_signal_dates": sorted(allowed),
             "structure": structure,
-            "horizons": {str(h): evaluate(signals, calendar, opening, cfg, h, allowed, structure) for h in cfg["horizons"]}}
+            "horizons": {str(h): evaluate(signals, calendar, opening, cfg, h, allowed, structure, events) for h in cfg["horizons"]}}
     primary = str(cfg["primary_horizon"])
     report = {"protocol": cfg["protocol"], "as_of": calendar[-1] if calendar else None,
               "config": cfg, "fingerprint": fingerprint, "calendar": calendar,
@@ -598,7 +613,7 @@ def analyze(con, cfg, fingerprint, as_of=None):
               "frozen": observed_excluded, "first_official": rejected},
               "walk_forward": walk_forward(datasets["replay"]["horizons"][primary], calendar, cfg),
               "iteration_decision": iteration_decision(datasets, cfg, calendar),
-              "negative_controls": negative_controls(restated, calendar, opening, cfg, set(replay_days)),
+              "negative_controls": negative_controls(restated, calendar, opening, cfg, set(replay_days), events),
               "forward_looks": {c: fixed_looks(r, calendar, cfg) for c, r in datasets["forward"]["horizons"][primary].items()
                                 if c in cfg.get('selection_candidates', [s['id'] for s in cfg['strategies']])},
               "snapshot_receipts": {d: {"snapshot_id": r["snapshot_id"], "captured_at": r["captured_at"],

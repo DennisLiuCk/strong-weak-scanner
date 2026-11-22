@@ -1,5 +1,10 @@
 # Changelog
 
+## 第三輪實驗：持有區間事件報酬 — 2026-11-22
+
+- 將實驗重播／前瞻報酬改為原始開盤價比除以持有區間內除權息／分割係數，不再經過四位小數還原價；獨立核對另從原始表計算。修正第二輪固定檢視被後續除息與捨入改寫的問題，不更動訊號、正式策略或名單穩定度。
+- 封存第二輪 config、registry、報告、檢視副本與原始碼 SHA；原 v2 帳本及 v1 封存不變。v3 沿用七個版本與探索門檻，以真實登錄時間重啟前瞻，不把修正後重播當成新 OOS 或策略效力證據。
+
 ## rank_change 自動選週改用官方交易日曆 — 2026-11-22
 
 - 新增 `scripts/market_calendar.py` 與 `config/market_calendar.json`：TWSE 年度開休市表、TWSE FMTQIK／TPEx tradingIndex 逐月成交日（兩邊必須一致）與人工核對的臨時休市公告；`rank_change` 只離線讀檔，`--refresh`／`--verify-online` 才連網。
