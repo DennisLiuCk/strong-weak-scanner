@@ -28,6 +28,7 @@ except Exception:
     pass
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import db_ro
 from fetch_daily import api_get, get_token   # 重用抓取層(retry/限流退避一致)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -111,8 +112,10 @@ def main():
     args = ap.parse_args()
 
     today = datetime.date.today().isoformat()
-    con = sqlite3.connect(args.db)
-    con.row_factory = sqlite3.Row
+    try:
+        con = db_ro.connect(args.db)
+    except sqlite3.OperationalError as exc:
+        sys.exit(f"screen.py: {exc}")
     L, w = [], None
     L.append(f"# Universe 體檢與候選提名 · {today}")
     L.append("")
