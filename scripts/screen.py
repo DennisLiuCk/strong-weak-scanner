@@ -134,8 +134,9 @@ def main():
                             ORDER BY date DESC LIMIT 20""", (sid,)).fetchall()
         sh = con.execute("""SELECT shares_issued FROM holding WHERE stock_id=? AND shares_issued
                             IS NOT NULL ORDER BY date DESC LIMIT 1""", (sid,)).fetchone()
-        cap = px[0]["close"] * sh[0] if (px and sh and px[0]["close"]) else None
-        amts = [p["amount"] for p in px if p["amount"]]
+        close = next((p["close"] for p in px if p["close"] is not None), None)
+        cap = close * sh[0] if (close is not None and sh) else None
+        amts = [p["amount"] for p in px if p["amount"] is not None]
         liq = statistics.median(amts) if amts else None
         vd, why = verdict_member(cap, liq)
         if vd != "✅ 續留":
@@ -194,7 +195,7 @@ def main():
                        if d.get("NumberOfSharesIssued")), None)
         closes = [d for d in px if d.get("close")]
         cap = closes[-1]["close"] * shares if (closes and shares) else None
-        amts = [d.get("Trading_money") for d in closes[-20:] if d.get("Trading_money")]
+        amts = [d.get("Trading_money") for d in px[-20:] if d.get("Trading_money") is not None]
         liq = statistics.median(amts) if amts else None
         vd, why = verdict_new(cap, liq, len(closes))
         nm = meta.get("stock_name", c.get("note", ""))
