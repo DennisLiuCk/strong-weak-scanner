@@ -45,10 +45,21 @@ def quadratic_se(series, horizon, calendar):
 def audit(con, report):
     cfg = report["config"]
     reference = cfg.get('comparison_reference', 'BASE')
-    calendar, rows, frozen, _, _, _ = lab.load_inputs(con, report['as_of'])
-    prices = {(r[0],r[1]):r[2] for r in con.execute("""SELECT p.date,p.stock_id,p.open*a.close/p.close
-        FROM price p JOIN price_adj a USING(date,stock_id)
-        WHERE p.open>0 AND p.close>0 AND a.close>0 AND p.date<=?""", (report['as_of'],))}
+    calendar, rows, frozen, _, _, _, _ = lab.load_inputs(con, report['as_of'])
+    prices = {(r[0],r[1]):r[2] for r in con.execute(
+        "SELECT date,stock_id,open FROM price WHERE open>0 AND date<=?", (report['as_of'],))
+        if math.isfinite(r[2])}
+    events = defaultdict(list)
+    for day, stock, before, after, kind in con.execute("""SELECT date,stock_id,before_price,reference_price,0
+        FROM dividend_result WHERE date<=? UNION ALL
+        SELECT date,stock_id,before_price,after_price,1 FROM split_event WHERE date<=?
+        ORDER BY 1,5,2""", (report['as_of'], report['as_of'])):
+        if not before or not after:
+            continue
+        factor = after / before
+        valid = 0 < factor <= 1.02 if kind == 0 else .05 <= factor <= 20
+        if math.isfinite(factor) and valid:
+            events[stock].append((day, factor))
     sources = {"replay": lab.build_signals(rows,cfg,calendar)[0],
                "frozen_replay": lab.build_signals(frozen,cfg,calendar)[0]}
     sources["forward"] = sources["frozen_replay"]
@@ -158,7 +169,13 @@ def audit(con, report):
                     entry,exit_day=calendar[index+1],calendar[index+1+horizon]
                     if any((entry,s) not in prices or (exit_day,s) not in prices for s in names):
                         continue
-                    future=[prices[exit_day,s]/prices[entry,s]-1 for s in names]
+                    future=[]
+                    for s in names:
+                        factor = 1.0
+                        for ex_date, adjustment in events[s]:
+                            if entry < ex_date <= exit_day:
+                                factor *= adjustment
+                        future.append(prices[exit_day,s]/prices[entry,s]/factor-1)
                     base=[stocks[s][reference] for s in names]
                     base_ic=rho(base,future)
                     for candidate in candidates:
