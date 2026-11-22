@@ -1,5 +1,8 @@
+import datetime as dt
+import json
 import os
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
@@ -87,6 +90,46 @@ class Status(unittest.TestCase):
         self.assertEqual(st["state"], "closed")
         self.assertIn("115年10月23日休市一天", st["reason"])
         self.assertIn("twse.com.tw", st["source"])
+
+
+class Refresh(unittest.TestCase):
+    def run_refresh(self, path, now, holidays):
+        def months(y, m):
+            days = ["2026-11-19", "2026-11-23"] if (y, m) == (2026, 11) else []
+            return days, days, [{"url": "fixture", "sha256": "x"}]
+        old = (mc.fetch_month, mc.fetch_holidays)
+        mc.fetch_month, mc.fetch_holidays = months, holidays
+        try:
+            mc.refresh(path, now=dt.datetime.fromisoformat(now))
+        finally:
+            mc.fetch_month, mc.fetch_holidays = old
+        return mc.load(path)
+
+    def test_failed_holiday_fetch_keeps_stored_year_table(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        path = os.path.join(tmp.name, "cal.json")
+        table = {"title": "115 年市場開休市日期", "source": "schedule-url", "sha256": "x",
+                 "closed": [{"date": "2026-11-20", "name": "測試休市"}]}
+
+        def ok(y):
+            if y != 2026:
+                raise mc.CalendarError("未公告")
+            return table
+
+        def broken(y):
+            raise mc.CalendarError(f"holidaySchedule {y} stat=error")
+
+        self.run_refresh(path, "2026-11-24T10:00:00+08:00", ok)
+        cal = self.run_refresh(path, "2027-01-05T10:00:00+08:00", broken)   # 年度表 API 回錯,月資料成功
+        with open(path, encoding="utf-8") as fh:
+            stored = json.load(fh)
+        self.assertEqual(stored["announced"]["2026"], table)
+        self.assertEqual(stored["fetched_at"], "2027-01-05T10:00:00+08:00")
+        st = cal.status("2026-11-20")
+        self.assertEqual((st["state"], st["basis"]), ("closed", "scheduled"))
+        self.assertIn("測試休市", st["reason"])
+        self.assertEqual(cal.status("2027-01-06")["state"], "unknown")       # 沒存過的年份不憑空補
 
 
 if __name__ == "__main__":

@@ -177,7 +177,8 @@ def _months(first, last):
 
 
 def refresh(path=CALENDAR, now=None):
-    """重抓官方資料並改寫 config;每月成交資料變動時追加新版本(fetched_at),舊版本與 closures 原樣保留。"""
+    """重抓官方資料並改寫 config;每月成交資料變動時追加新版本(fetched_at),舊版本與 closures 原樣保留;
+    年度開休市表抓取失敗時保留先前存過的該年表。"""
     now = now or dt.datetime.now(TAIPEI_TZ)
     old = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
     today = now.date()
@@ -186,6 +187,8 @@ def refresh(path=CALENDAR, now=None):
         try:
             h = fetch_holidays(y)
         except CalendarError:
+            if str(y) in old.get("announced", {}):          # API 暫時回錯:沿用先前存過的年度表
+                announced[str(y)] = old["announced"][str(y)]
             continue
         if h["closed"] or y <= today.year:
             announced[str(y)] = h
