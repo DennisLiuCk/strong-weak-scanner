@@ -389,6 +389,10 @@ svg{display:block;overflow:visible}
 .rkc{margin-top:18px;background:var(--inset);border:1px solid var(--line2);border-radius:14px;padding:16px 18px}
 .rkc-sum{margin:8px 0 0;padding:0;list-style:none;font-size:13.5px;line-height:1.7;color:var(--ink2)}
 .rkc-sum li+li{margin-top:2px}
+.rkc-scores{margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:8px}
+.rkc-score{min-width:0;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:var(--card)}
+.rkc-score h4{margin:0 0 4px}
+.rkc-score .mono{font-size:13px;font-weight:750;color:var(--ink)}
 .rkc details{margin-top:12px;border-top:1px solid var(--line2);padding-top:6px}
 .rkc details>summary{cursor:pointer;display:flex;align-items:center;min-height:44px;font-size:12.5px;font-weight:800;color:var(--teal)}
 .rkc-detail p{margin:8px 0 0;font-size:13px;line-height:1.7;color:var(--ink2)}
@@ -1892,6 +1896,11 @@ function rankChangeSection(d){
     ...sm.windows.map((w,i)=>h('div',{class:'rkc-win'},h('b',{text:[A,B][i]+' 窗口：'}),
       w.slots.map(s=>s.date.slice(5)+' '+(s.status==='ok'?f2(s.composite):s.label)).join('、'),
       h('div',{style:`color:${w.state==='verified'?'var(--teal)':'var(--amber)'}`,text:(w.mean!=null?'平均 '+f2(w.mean)+'；':'')+w.label+(w.why&&w.why.length?'（'+w.why.join('；')+'）':'')}))));
+  const scores=h('div',{class:'rkc-scores'},
+    h('div',{class:'rkc-score'},h('h4',{text:'排名依據｜三日平滑分數'}),
+      h('div',{class:'mono',text:sm.line}),sub('族群內依此分數排序；同分可並列。')),
+    h('div',{class:'rkc-score'},h('h4',{text:'因子拆解｜當日綜合分數'}),
+      h('div',{class:'mono',text:dl?dl.line:'快照缺當日分數，無法分解。'}),sub('單日變化，不直接決定名次。')));
   const meta=h('div',{},h('h4',{text:'日期與正式快照'}),
     h('div',{class:'rkc-kv mono'},h('span',{text:'上週 '+A+' · '+RANKCHG.snapshotA}),h('span',{text:'本週 '+B+' · '+RANKCHG.snapshotB})),
     ...(RANKCHG.notes||[]).map(n=>h('p',{class:'note',style:'margin:4px 0 0',text:n})),
@@ -1901,8 +1910,9 @@ function rankChangeSection(d){
       h('span',{class:'chip',style:`color:${x.move>0?'var(--strong)':x.move<0?'var(--weak)':'var(--ink2)'};background:var(--card)`,
         text:x.posA+' → '+x.posB})),
     h('ul',{class:'rkc-sum'},...x.summary.map(t=>h('li',{text:t}))),
+    sub('兩週分數：'+A+' → '+B+'（括號為分數差額，不是名次變動）'),scores,
     h('details',{},h('summary',{text:'看明細：同業名次、兩週分數與日期'}),
-      h('div',{class:'rkc-detail'},...(x.rankDetail||[]).map(t=>h('p',{text:t}))),peers,daily,smooth,meta));
+      h('div',{class:'rkc-detail'},...(x.rankDetail||[]).map(t=>h('p',{text:t}))),peers,smooth,daily,meta));
 }
 function buildDetail(){
   if(!D.detail)return null;

@@ -328,9 +328,13 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertNotIn("3443", fn)
         self.assertIn("'本週排名變化'", fn)
         self.assertIn("h('ul',{class:'rkc-sum'},...x.summary", fn)
-        # 同業名稱、兩週分數與日期只在 details 內
+        # 排名依據與當日分數在收合摘要可比較；明細保留同業、窗口與因子分解。
+        self.assertLess(fn.index("'),scores,"), fn.index("h('details'"))
+        self.assertIn("text:'排名依據｜三日平滑分數'", fn)
+        self.assertIn("text:'因子拆解｜當日綜合分數'", fn)
+        self.assertIn("括號為分數差額，不是名次變動", fn)
         self.assertIn("h('details',{},h('summary',{text:'看明細：同業名次、兩週分數與日期'}),", fn)
-        self.assertIn("...(x.rankDetail||[]).map(t=>h('p',{text:t}))),peers,daily,smooth,meta)", fn)
+        self.assertIn("...(x.rankDetail||[]).map(t=>h('p',{text:t}))),peers,smooth,daily,meta)", fn)
         self.assertIn("'當日綜合分數變動（composite", fn)
         self.assertIn("'三日平滑分數變動（composite_s；名次只依這個分數）'", fn)
         self.assertIn("line('上週 → 本週（差額）',dl.line)", fn)
