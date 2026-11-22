@@ -5,14 +5,16 @@
 比較最近兩個已完成交易週「最後交易日」的首次正式快照,說明某檔股票在族群內
 升名或掉名的原因。名次 = 族群內 composite_s 由高到低的平均序位(同 score.average_ranks)。
 
-選週規則(台北時間 + market 交易日曆):
-  * 週五在 market 中 → 週五是交易日;首次正式快照在 as-of 前已擷取就採用本週。
-    尚未到發布期限(資料日次日台北 09:00,同 snapshot_signals.publication_timing)
-    視為本週未完成,改用前兩週;已過期限仍無快照 → 明示錯誤,不默默退回。
-  * 週五不在 market → 期限前視為未完成;期限後明示「無法確認是休市還是抓取失敗」。
-    repo 沒有獨立的交易所休市依據;「週五缺、週一有」也可能是週五抓取失敗、週一恢復,
-    因此不以之後出現的交易日推定休市,也不退回該週前一交易日。
-  * 交易日曆取 as-of 當下可見者(point-in-time):早於 as-of 台北日期的 market 日期;
+選週規則(台北時間 + config/market_calendar.json 交易日曆,見 market_calendar.py):
+  * 先依日曆從週五往前找該週最後一個交易日;週五休市就用該週實際的最後交易日並註明原因。
+    整週休市 → 略過該週並註明,不算一個已完成交易週。
+  * 該日首次正式快照在 as-of 前已擷取就採用;尚未到發布期限(資料日次日台北 09:00,
+    同 snapshot_signals.publication_timing)視為本週未完成,改用前兩週。
+  * 日曆判定應開市、已過期限卻沒有正式快照 → 明示缺哪一天(並註明 market 是否也缺,
+    即疑似資料漏抓),不默默退回該週前一交易日。
+  * 日曆沒涵蓋的日期 → 明示無法確認是否開市;不以 market 之後出現的交易日推定休市。
+  * 日曆判定休市卻有 market 列或正式快照 → 日曆與資料矛盾,明示錯誤。
+  * 平滑窗口的交易日曆取 as-of 當下可見的 market 日期(point-in-time):早於 as-of 台北日期的 market 日期;
     as-of 當日的日期須有已發布的首次正式快照,或 market_provenance.checked_at ≤ as-of。
     重播歷史 as-of 時,之後才出現的交易日不會被看見。
   * 平滑窗口:交易日有正式快照但缺該股列時,只有 trading_status/suspension_evidence
@@ -36,6 +38,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import db_ro
 import evidence_status
+import market_calendar
 import trading_status
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -109,34 +112,46 @@ def require_complete(con, run):
                              f"{run['stock_count']} 列;不以後來修正版取代")
 
 
-def week_end(con, monday, as_of, cal, firsts):
-    """回傳 {'status': complete|pending, 'date', 'run', 'note'};應有卻缺或無法確認則 raise。"""
-    sunday, friday = monday + dt.timedelta(days=6), str(monday + dt.timedelta(days=4))
-    days = [d for d in cal if str(monday) <= d <= str(sunday)]
-    note = None
-    if friday not in days:
-        if as_of < publish_deadline(friday):
-            return {"status": "pending",
-                    "note": f"週五 {friday} 交易日曆與正式快照尚未發布(期限 {publish_deadline(friday).isoformat()})"}
-        later = [d for d in cal if d > friday]
-        seen = f"market 其後有交易日 {later[0]},但這不能區分休市與週五抓取失敗後恢復" if later \
-            else "market 也沒有之後的交易日"
-        raise SelectionError(
-            f"週五 {friday} 已過發布期限 {publish_deadline(friday).isoformat()},但 market 沒有該日;"
-            f"{seen}。repo 沒有獨立的休市依據,無法確認是休市還是抓取失敗,不退回該週前一交易日")
-    last = max(days)
+def _closed_text(day, st):
+    return f"{day} 休市({st['reason']})"
+
+
+def week_end(con, monday, as_of, cal, firsts, mcal):
+    """回傳 {'status': complete|pending|closed_week, 'date', 'run', 'note'};應有卻缺或無法確認則 raise。
+    cal=as-of 可見的 market 日期;mcal=market_calendar.MarketCalendar。"""
+    days = [str(monday + dt.timedelta(days=i)) for i in range(5)]
+    closed, last = [], None
+    for d in reversed(days):
+        st = mcal.status(d, as_of)
+        if st["state"] == "unknown":
+            if as_of < publish_deadline(d):
+                return {"status": "pending", "note": f"{d} 尚未到發布期限,且{st['reason']}"}
+            raise SelectionError(f"{d} 不在交易日曆涵蓋範圍,無法確認是否開市({st['reason']});"
+                                 f"請執行 python scripts/market_calendar.py --refresh,不退回該週前一交易日")
+        if st["state"] == "trading":
+            last = d
+            break
+        if d in cal or d in firsts:
+            raise SelectionError(f"交易日曆判定 {_closed_text(d, st)},但 market 或正式快照有該日;日曆與資料矛盾")
+        closed.append(_closed_text(d, st))
+    if last is None:
+        return {"status": "closed_week", "note": f"{monday} 當週整週休市:{'、'.join(reversed(closed))}"}
+    note = (f"{'、'.join(reversed(closed))},改用該週最後交易日 {last}" if closed else None)
+    basis = mcal.status(last, as_of)
     run = firsts.get(last)
     if run is None:
         if as_of < publish_deadline(last):
             return {"status": "pending", "note": f"{last} 正式快照尚未發布(期限 {publish_deadline(last).isoformat()})"}
-        raise SelectionError(f"{last} 是交易日且已過發布期限 {publish_deadline(last).isoformat()},"
-                             f"但沒有正式快照")
+        gap = "market 也沒有該日,疑似資料漏抓" if last not in cal else "market 有該日資料"
+        raise SelectionError(f"缺 {last} 的正式快照:交易日曆判定該日開市({basis['reason']}),"
+                             f"已過發布期限 {publish_deadline(last).isoformat()};{gap}。不退回該週前一交易日")
     require_complete(con, run)
     return {"status": "complete", "date": last, "run": run, "note": note}
 
 
-def select_weeks(con, as_of, n=2, max_weeks=60):
+def select_weeks(con, as_of, n=2, max_weeks=60, mcal=None):
     as_of = _aware(as_of)
+    mcal = mcal or market_calendar.load()
     firsts = published_first_runs(con, as_of)
     cal = trading_calendar(con, as_of, firsts)
     monday = as_of.astimezone(TAIPEI_TZ).date()
@@ -145,7 +160,7 @@ def select_weeks(con, as_of, n=2, max_weeks=60):
     for _ in range(max_weeks):
         if not cal or str(monday + dt.timedelta(days=6)) < cal[0]:
             break
-        w = week_end(con, monday, as_of, cal, firsts)
+        w = week_end(con, monday, as_of, cal, firsts, mcal)
         if w["status"] == "complete":
             picked.append(w)
             if w["note"]:
@@ -383,7 +398,7 @@ def _load(con, sid):
     return {r["stock_id"]: dict(r) for r in con.execute(Q_ROWS.format(sid=sid))}
 
 
-def build_report(con, as_of, dates=None, stock=None):
+def build_report(con, as_of, dates=None, stock=None, mcal=None):
     as_of = _aware(as_of)
     firsts = published_first_runs(con, as_of)
     cal = trading_calendar(con, as_of, firsts)
@@ -397,7 +412,7 @@ def build_report(con, as_of, dates=None, stock=None):
             runs.append(firsts[d])
         notes = []
     else:
-        picked, notes = select_weeks(con, as_of)
+        picked, notes = select_weeks(con, as_of, mcal=mcal)
         runs = [w["run"] for w in picked]
     (dA, rA), (dB, rB) = [(r["data_date"], r) for r in runs]
     for tag, r in (("A", rA), ("B", rB)):
@@ -608,7 +623,7 @@ def stock_payload(con, firsts, cal, A, B, stock, dA, dB, names=None, group_names
                        "windows": windows}}
 
 
-def dashboard_payload(con, as_of, dates=None, names=None, group_names=None):
+def dashboard_payload(con, as_of, dates=None, names=None, group_names=None, mcal=None):
     """儀表板「本週排名變化」:與 build_report 同一套選週、首次正式快照與名次拆解。"""
     as_of = _aware(as_of)
     firsts = published_first_runs(con, as_of)
@@ -622,7 +637,7 @@ def dashboard_payload(con, as_of, dates=None, names=None, group_names=None):
             runs.append(firsts[d])
         notes = []
     else:
-        picked, notes = select_weeks(con, as_of)
+        picked, notes = select_weeks(con, as_of, mcal=mcal)
         runs = [w["run"] for w in picked]
     (dA, rA), (dB, rB) = [(r["data_date"], r) for r in runs]
     A, B = _load(con, rA["snapshot_id"]), _load(con, rB["snapshot_id"])
