@@ -128,7 +128,61 @@ reason: added_named_dell_integration_and_product_scoped_shipping_language_withou
 evidence: sources:S32,S33
 -->
 
+<!-- research_source
+source_id: S34
+role: company_release
+source_kind: document
+publisher: AMD and Arista
+title: Powering Next-Gen AI Clusters High-Performance Networking with AMD and Arista version1.0
+published_at: 2026-11-10
+captured_at: 2026-11-23
+accepted_at: 2026-11-23
+status: active
+url: https://docs.amd.com/api/khub/documents/5svVJKgHvyQcE2iFkT0AfA/content
+locator: PDF第8–9頁，已渲染7–9頁；3841612 bytes SHA256 41add38599d95b8cf131624a9d2885232ee9dc0641a31ce1fd7d8301e7c2b02e；官方文件頁https://docs.amd.com/v/u/en-US/Powering_Next-Gen_AI_Clusters_High-Performance_Networking_with_AMD_and_Arista_WP-73780 列Release_Date2026-11-10與Version1.0
+limitation: PDF僅標November2026，日期取自官方metadata；標題WP-73780與metadata Document_ID WP37380差異照錄。第8頁的production說法與既有客戶試機說法缺共同配置及資訊截點，不直接推成全球未部署或反證；同協作文件保守歸AMD消息鏈
+independence_group: amd
+-->
+
+<!-- research_claim
+claim_id: C38
+label: verified
+status: active
+claim: AMD與Arista的11月白皮書在Helios網路章描述AMD實驗室bring-up與測試，第8頁稱尚未production deployment，第9頁仍以將驗證描述網路配置工作
+supporting_source_ids: S34
+contrary_source_ids:
+as_of: 2026-11-10
+basis: 核對第8頁首段與第9頁Figure12後段，將文件自述階段與實際驗收分開
+boundary: 只確認文件說法；與AMD先前客戶運行公告尚缺同客戶、配置及資料截點，不裁決其原因，不refute既有issuer claim，也不證明T11完整條件已成
+verification_needed:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T16
+status: active
+claim_ids: C38
+metric: AMD與Arista白皮書的資料截點、網路配置及正式客戶部署狀態是否可與AMD客戶運行說法對接
+source_ids: S34,S28
+watch_source_ids: S6,S12
+frequency: event_driven
+frequency_detail: 11/30是新辨識文件差異後的一週補件日，非公司承諾；正式釐清或新版先出即查
+next_check: 2026-11-30
+trigger: 官方釐清兩份說法的資訊截點、客戶及配置差異，或新版白皮書與同品牌系統驗收資料提供可對接結果
+invalidation: 官方更正已運行說法、撤回測試結果或明確相同配置仍未通過時，按受影響主張追加修正；缺公開資料不自行判反證
+-->
+
+<!-- transition
+date: 2026-11-23
+from: triaged
+to: triaged
+reason: retained_amd_arista_lab_validation_scope_and_unresolved_production_wording_without_refuting_customer_workload_claims_or_refreshing_thesis_clock
+evidence: sources:S34
+-->
+
 ## 新手先讀：這篇在講什麼
+
+**11/23 補充：同品牌的不同網路配置，進度不能互借。** AMD 與 Arista 的新白皮書仍在談實驗室網路驗證，與既有 AMD 客戶試機敘述必須並列核對。尚不清楚兩份文件的配置與資訊截點是否一致，不能直接說出貨公告被推翻，也不能把其他配置的進度移過來。[S34][C38]
 
 **11/21 補充：品牌方案已具名，交付結果仍要另外查。** Dell 已公開自家 Helios 方案與部署維護分工；Supermicro 同篇的「已出貨」則指新一代處理器伺服器，不能直接移到 Helios。讀新聞先把動詞對回產品，再問客戶何時收到。[S32][S33][C36][C37]
 
@@ -1645,6 +1699,14 @@ resolution:
   足跡，就應維持公司映射為待驗證，不能用平台進度替代公司證據。
 
 ## 來源與證據邊界
+
+### 同品牌不同文件的進度差異
+
+**先問它測的是哪套網路。** AMD 文件頁標示 11/10 發布的 AMD／Arista 白皮書，第 8–9 頁寫 Helios 網路仍在 AMD 實驗室測試，並使用尚未投入正式運作與後續將驗證的語氣。[S34][C38] 這是新找到的舊文件，不是 11/23 新發生的部署變化。
+
+**目前不能把差異硬解釋掉。** 既有 AMD 財報的具名客戶運行說法仍保留。[S28] 白皮書未提供足以與它對接的資料截點、同一客戶及配置識別；可能涉及範圍或編輯時差，但原因仍待驗證。T16 追正式釐清或改版，T11 仍追同品牌配置與變更後重驗結果。
+
+- [AMD／Arista 網路白皮書](https://docs.amd.com/api/khub/documents/5svVJKgHvyQcE2iFkT0AfA/content)（S34；第 8–9 頁，網路實驗室階段與未解範圍差異）。
 
 - [Dell 的 SC26 品牌整合公告](https://www.dell.com/en-us/blog/dell-technologies-and-amd-offer-more-ways-to-deploy-ai-from-first-node-to-full-rack/)（S32；具名方案及服務分工，不是客戶交付報告）。
 - [Supermicro 的 H15 出貨公告](https://ir.supermicro.com/news/news-details/2026/Supermicro-Now-Shipping-Next-Generation-Servers-Powered-by-6th-Gen-AMD-EPYC-9006-Series-CPUs-for-Cloud-HPC-and-Agentic-AI-Workloads/default.aspx)（S33；H15 與後段 Helios／Helion 的動詞分開）。

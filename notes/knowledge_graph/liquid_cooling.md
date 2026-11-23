@@ -184,18 +184,18 @@ view: company
 from_id: company:daikin
 to_id: concept:liquid-cooling
 relation: integrates
-claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C3,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C4
+claim_refs: MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C3,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C4,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C49,MI-2026-08-02-LIQUID-COOLING-QUALIFICATION-LADDER#C50
 note_refs:
 evidence_state: verified
 commercial_stage: integration
 materiality: adjacent
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-07-06
-review_due: 2026-08-09
+as_of: 2026-11-23
+review_due: 2027-02-23
 status: active
-boundary: MOU portfolio 與 PoC 時鐘不等於產品完成、客戶採購、節電效果或收入。
-next_trigger: PoC 公布可重算的節電、成本、可靠度結果或正式商用部署。
+boundary: MOU、PoC與D60-W參考藍圖都不是整套交付；D60-W的CDU及乾式冷卻器仍在開發，2027H2可供應是目標。60MW為參考IT負載，不是單台CDU容量、現場節能或公司收入。
+next_trigger: D60-W具名產品正式可供應、交付與雙迴路場址驗收；原NTT DATA PoC結果另依T3回查，不由藍圖代填。
 -->
 
 <!-- knowledge_edge

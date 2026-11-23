@@ -36,7 +36,7 @@ view: company
 from_id: company:sk-hynix
 to_id: concept:custom-hbm-commercialization
 relation: has_capability
-claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C3
+claim_refs: MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C3,MI-2026-08-03-CUSTOM-HBM-SCOPE-LADDER#C20
 note_refs:
 evidence_state: verified
 commercial_stage: capability
@@ -46,7 +46,7 @@ exclusivity_scope:
 as_of: 2026-03-27
 review_due: 2026-09-15
 status: active
-boundary: GTC 展示支持 Stream DQ 位於 base die 與 preprocessing 搬移；不證明客戶資格 量產或跨廠效能領先。
+boundary: GTC的Stream DQ與11/20 SC26的Custom HBM Array模型分別支持公司展示的客製方向，不認作同版產品；Array效能是預期，鄰接CXL驗證不移植為客戶資格、量產或領先。保留原邊期限。
 next_trigger: 具名客戶與 SK hynix 公布可重現 workload qualification 及量產結果。
 -->
 

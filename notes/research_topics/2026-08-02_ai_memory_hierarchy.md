@@ -1498,10 +1498,99 @@ reason: bounded_kvcr_guard_failure_scope_and_separate_test_systems_without_thesi
 evidence: sources:S32
 -->
 
+<!-- research_source
+source_id: S33
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: Dynamo v1.6.0 release notes
+published_at: 2026-10-22
+captured_at: 2026-11-23
+accepted_at: 2026-11-23
+status: active
+url: https://docs.nvidia.com/dynamo/v1.6.0/reference/releases/v1-6-0
+locator: 頁首GA Oct22及Kubernetes Deployment的KVCR Resiliency Deployment Example；固定v1.6.0本文，不用latest導覽代換版本；HTML SHA256 22e4632179bbe8fd838de920d8bde6f183a177b36d11666393c966fc4d7218ef
+limitation: 發布紀錄只支持範例存在，不是本輪執行、客戶故障驗收或持久資料保證；相鄰Dynamo Sidecar experimental節不直接當作memory-service sidecar的成熟度標籤
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S34
+role: other_primary
+source_kind: document
+publisher: NVIDIA Dynamo maintainers
+title: KVCR Resiliency Deployment Example PR14695
+published_at: 2026-09-17
+captured_at: 2026-11-23
+accepted_at: 2026-11-23
+status: active
+url: https://github.com/ai-dynamo/dynamo/pull/14695
+locator: Sep17 merged標記、作者Overview與Details末段；不採CodeRabbit自動摘要的live-cluster testing說法
+limitation: 由v1.6.0原發布紀錄連入；作者描述與測試設計不是本輪實測，靜態測試明確不宣稱RDMA或自動resiliency proof；與S33同一軟體來源鏈
+independence_group: nvidia
+-->
+
+<!-- research_source
+source_id: S35
+role: competitor_primary
+source_kind: document
+publisher: SK hynix
+title: Building the Future AI Ecosystem Around Memory at Supercomputing 2026
+published_at: 2026-11-20
+captured_at: 2026-11-23
+accepted_at: 2026-11-23
+status: active
+url: https://news.skhynix.com/en/sc26-ai-hpc-exhibition/
+locator: MARS三個demo及KV Cache Offloading over CXL正文段落；不採AI Summary；HTML SHA256 cde2bbafd6ba5eaeea8035934bf543adb8baebb724182abd61f1639846bcb035
+limitation: 公司展場回顧及與SK Telecom驗證自述；不是具名正式客戶的原始資料、CXL4.0互通清單、三層任務對帳或台廠財務證據
+independence_group: sk-hynix
+-->
+
+<!-- research_claim
+claim_id: C45
+label: verified
+status: active
+claim: Dynamo v1.6.0收錄雙節點KVCR復原部署範例，原始作者明示memory-service保留Guard跨引擎重啟，但跨主機RDMA仍需部署時驗證，靜態測試不宣稱實際傳輸或自動復原證明
+supporting_source_ids: S33,S34
+contrary_source_ids:
+as_of: 2026-10-22
+basis: 固定release連回原PR作者Overview與Details，分開範例、靜態檢查與執行期結果
+boundary: 補足可定位版本與測試入口，不是具名operator的故障紀錄；不擴張S32的host與guard存活前提，也不刷新C8主命題時計
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C46
+label: verified
+status: active
+claim: SK hynix的SC26回顧分列共享KV快取、運算型記憶體池及CPU token共享展示，另自述與SK Telecom完成CXL卸載的真實LLM環境驗證
+supporting_source_ids: S35
+contrary_source_ids:
+as_of: 2026-11-20
+basis: 正文三個MARS demo與獨立CXL卸載段逐項對讀，未把不同展示合成一個production測試
+boundary: 只證實公司如此描述；沒有同一任務的三層生命期、衝突、SLO、復原、成本與BOM，不命中T7完整條件，也不證明CXL4.0互通
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-23
+from: triaged
+to: triaged
+reason: separated_versioned_kvcr_example_static_checks_and_cxl_demos_from_operator_validation_without_thesis_clock_refresh
+evidence: sources:S33,S34,S35
+-->
+
 ## 新手先讀：這篇在講什麼
+
+**11/23 補充：有恢復教學，不等於已通過故障考試。** Dynamo 已有固定版本的 KVCR 復原範例，但作者明說靜態測試不能代替跨主機傳輸與實際復原驗證。SK hynix 的新展場回顧則把共享快取、共享 token 與 CXL 卸載分開；展示仍不能替同一正式工作補上成本與故障結果。[C45][C46]
 
 ### 名詞小字典
 
+- **RDMA（遠端直接記憶體存取）**：設備直接讀寫另一端記憶體的資料路徑；設定完成不等資料已正確傳輸或故障後可恢復。
+- **SC26（2026超級運算大會）**：本文展示資料的活動背景；展會日期不是產品交付日。
+- **v1.6.0（Dynamo版本號）**：本文固定引用的軟體發布版本，不代表其他版本或現場已部署的版本。
 - **HBF（高頻寬快閃記憶體）**：以快閃記憶體為基礎的高頻寬方向，與HBM不是同一產品；計畫不等樣品或量產。
 - **LTA（長期供應協議）**：約定較長期間供應的合約；要另外核產品、數量、定價及取消條件，不能直接當已認列收入。
 - **HBM3E**：HBM的一個產品世代；與HBM4比較時仍需固定期間、出貨與收入口徑。
@@ -1953,6 +2042,10 @@ reference architecture，不是 production workload 隨機樣本；具名客戶�
 
 ## 快取能跨引擎故障，不等於能跨主機斷電
 
+**版本已能定位，測試結果仍需另找。** Dynamo v1.6.0 的發布紀錄收錄雙節點 KVCR 復原範例；其原始開發說明把部署設定、人工恢復步驟與真正的跨主機 RDMA 驗證分開。RDMA 是設備直接存取另一端記憶體的資料路徑；設定檔通過檢查，不能證明資料真的循這條路徑正確回來。[S33][S34][C45]
+
+讀者可以接著問：引擎重啟時守護服務是否真的存活？同一份資料能否正確讀回？主機或守護服務也故障時會怎樣？原 T12 仍要求這些實際結果與服務成本，不因補到範例就改判完成。
+
 **證實：**NVIDIA 11/5文件描述KVCR的搬運分工，以及Guard在主機與服務仍存活時保留已提交快取的能力。[C43]
 **推論：**不能把這個條件縮成「永不丟資料」，也不能把文中不同H100測試套到Rubin／CMX。[C44]
 **待驗證：**固定版本、資料共同鍵與原始故障紀錄；T12追這一窄問題，不替原T3／T5／T7的完整部署條件過關。
@@ -2026,6 +2119,14 @@ S22 的頁面日期早於 C8 所依據的 2026-08-12 五角色資料路徑證據
 | 記憶體擴充連接（CXL 4.0） | 公開規格已發布 | 公開標準 | Vera Rubin 是否採用 4.0、互通裝置與量產收入 |
 
 ## 來源與證據邊界
+
+### 共享了哪一份資料，也要分開問
+
+SK hynix 11/20 的 SC26 回顧分列機櫃共享 KV 快取、運算型記憶體池及 CPU token 共享展示，另稱與 SK Telecom 做過 CXL 卸載的真實 LLM 環境驗證。[S35][C46] **證實的是公司展示與自述的範圍，不是三者已在同一客戶工作閉合。** 下一步仍要同一任務的資料生命期、衝突與重複工作、復原、成本及設備清單；原 T7 不以展場名稱替代這張對帳表。
+
+- [Dynamo v1.6.0 固定版本發布紀錄](https://docs.nvidia.com/dynamo/v1.6.0/reference/releases/v1-6-0)（S33；KVCR 復原範例）。
+- [KVCR 範例原始開發說明](https://github.com/ai-dynamo/dynamo/pull/14695)（S34；作者區分靜態檢查與執行期驗證）。
+- [SK hynix SC26 回顧](https://news.skhynix.com/en/sc26-ai-hpc-exhibition/)（S35；展示與公司驗證敘述，不移植為 CXL 4.0 互通或正式工作三帳）。
 
 - [NVIDIA記憶體共同設計與KVCR／Guard](https://developer.nvidia.com/blog/five-ways-nvidia-co-design-maximizes-the-value-of-every-byte-in-the-ai-factory/)（S32；11/5正文功能與故障前提，H100個別測試不移植為Rubin／CMX結果）。
 - [NVIDIA Vera Rubin architecture](https://developer.nvidia.com/blog/inside-the-nvidia-rubin-platform-six-new-chips-one-ai-supercomputer/)（HBM、SOCAMM 與 CXL 版本）。

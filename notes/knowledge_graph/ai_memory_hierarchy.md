@@ -621,7 +621,7 @@ view: industry
 from_id: concept:ai-memory-hierarchy
 to_id: concept:kv-cache
 relation: routes_to
-claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C43
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C43,MI-2026-08-02-AI-MEMORY-HIERARCHY#C45
 note_refs:
 evidence_state: verified
 commercial_stage: capability
@@ -631,6 +631,6 @@ exclusivity_scope:
 as_of: 2026-11-05
 review_due: 2026-11-23
 status: active
-boundary: 本線只投影KVCR的快取角色與Guard條件：已提交host快取跨引擎故障，仍要求host和guard存活。替代I04作較窄功能投影，不刷新CMX部署、公司線或主命題；不同H100測試不能拼成Rubin驗收。
+boundary: 本線只投影KVCR的快取角色與Guard條件：已提交host快取跨引擎故障，仍要求host和guard存活。v1.6.0範例與靜態檢查不等RDMA及故障實測；替代I04作較窄功能投影，不刷新原邊期限、CMX部署、公司線或主命題；不同H100測試不能拼成Rubin驗收。
 next_trigger: 同一版本與資料共同鍵，分別注入引擎、guard及host故障並核對正確讀回、重算、request SLO與復原成本；官方修訂條件亦重查。
 -->

@@ -4,7 +4,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
-from contextlib import closing, redirect_stderr, redirect_stdout
+from contextlib import ExitStack, closing, redirect_stderr, redirect_stdout
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError
@@ -998,7 +998,13 @@ class IncrementalFetchTest(unittest.TestCase):
             argv = ["fetch_daily.py", "--final-pass", "--start", day, "--end", day,
                     "--sleep", "0", "--db", db]
             stdout = io.StringIO()
-            with mock.patch.object(sys, "argv", argv + ["--force"]), \
+            connect = sqlite3.connect
+            # CLI interruption is simulated in-process; release handles retained
+            # by the mocked exception before TemporaryDirectory removes the DB.
+            with ExitStack() as connections, \
+                    mock.patch.object(fd.sqlite3, "connect", side_effect=lambda *a, **kw:
+                        connections.enter_context(closing(connect(*a, **kw)))), \
+                    mock.patch.object(sys, "argv", argv + ["--force"]), \
                     mock.patch.object(sys, "stdout", stdout), \
                     mock.patch.object(fd, "taipei_now", return_value=datetime(
                         2026, 7, 9, 23, 47, tzinfo=fd.TAIPEI_TZ)), \

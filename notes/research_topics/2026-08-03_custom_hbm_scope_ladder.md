@@ -750,7 +750,51 @@ reason: distinguished_custom_base_die_and_vertical_hbm_roadmap_without_nvhbm_qua
 evidence: sources:S17
 -->
 
+<!-- research_source
+source_id: S18
+role: competitor_primary
+source_kind: document
+publisher: SK hynix
+title: Building the Future AI Ecosystem Around Memory at Supercomputing 2026
+published_at: 2026-11-20
+captured_at: 2026-11-23
+accepted_at: 2026-11-23
+status: active
+url: https://news.skhynix.com/en/sc26-ai-hpc-exhibition/
+locator: Custom HBM Array照片下兩段，概念影片、product model、brochure與is expected；HTML SHA256 cde2bbafd6ba5eaeea8035934bf543adb8baebb724182abd61f1639846bcb035
+limitation: 公司展場敘述；鄰接CXL卸載與SK Telecom驗證不是Custom HBM Array的資格結果；與本篇既有SK來源及記憶體分層篇同稿屬同鏈
+independence_group: sk-hynix
+-->
+
+<!-- research_claim
+claim_id: C20
+label: verified
+status: active
+claim: SK hynix在SC26回顧中描述Custom HBM Array的概念影片、產品模型與手冊，連接多個具運算功能的cHBM單元，並把反應速度及能源效率改善寫為預期
+supporting_source_ids: S18
+contrary_source_ids:
+as_of: 2026-11-20
+basis: 核對Array專屬段落主詞與動詞，與CXL卸載驗證段分開
+boundary: 不是實體樣品交付、具名客戶qualification、量產、財務或跨廠領先；不把Array與早期Stream DQ視為同一版本，不刷新C5時計
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-23
+from: triaged
+to: triaged
+reason: separated_sc26_custom_hbm_array_model_and_expectations_from_adjacent_cxl_validation_without_thesis_clock_refresh
+evidence: sources:S18
+-->
+
 ## 新手先讀：這篇在講什麼
+
+### 11 月 23 日補充：產品模型不是送到客戶手上的樣品
+
+SK hynix 的 SC26 回顧把 Custom HBM Array 寫成概念影片、產品模型與說明手冊，效能與節能仍用預期語氣。[S18][C20] **Array 是把多個具運算功能的客製記憶體單元相連，不是「這些單元都已通過客戶測試」的意思。** 同篇 CXL 卸載的驗證敘述屬於另一個展示，不能借給這個 Array。
+
+接下來問：拿到的是模型還是可測試的實體晶片？哪個客戶、哪個版本、什麼工作負載通過了哪些條件？原 T3 要求同產品的交接與量產證據，仍未因展場進度過關。
 
 ### 11 月 21 日補充：相似縮寫，不一定是同一顆產品
 
@@ -783,6 +827,8 @@ PHY 則是實際傳送訊號的電路；兩者位置與介面改變，需要重�
 
 ### 名詞小字典
 
+- **Array（陣列）**：本文指將多個具運算功能的客製HBM單元相連的架構；名稱本身不表示已交付實體樣品或完成資格。
+- **SC26（2026超級運算大會）**：本篇產品模型展示的活動背景，不是量產或客戶驗收日期。
 - **NVHBM**：美光與 NVIDIA 文件所述的客製記憶體路徑；NVIDIA 另公開控制器與 PHY 的架構描述，名稱與設計仍不是交付或驗收證明。
 - **vHBM（vertical HBM）**：美光簡報描述的垂直堆疊方向；小寫 v 指垂直，不是 NVHBM 的產品身分證。[S17]
 - **NVLink Fusion**：美光文件列為 NVHBM 未來用途的平台名稱；本文不藉此推定已採用或實際配置。
@@ -1014,6 +1060,8 @@ SK 海力士、Intel 與 LBNL 是公司產品敘事與兩條通用效能方法�
 主命題的樣品、qualification 或量產證據時鐘。
 
 ## 來源與證據邊界
+
+- [SK hynix SC26 展場回顧](https://news.skhynix.com/en/sc26-ai-hpc-exhibition/)（S18；Custom HBM Array 模型與預期，不借用鄰接 CXL 展示的驗證）。
 
 - [Samsung HBM4／Custom HBM roadmap](https://news.samsung.com/global/samsung-ships-industry-first-commercial-hbm4-with-ultimate-performance-for-ai-computing)（2027 樣品時程）。
 - [Samsung 韓文官方定義](https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-%EC%84%B8%EA%B3%84-%EC%B5%9C%EC%B4%88-%EC%97%85%EA%B3%84-%EC%B5%9C%EA%B3%A0-%EC%84%B1%EB%8A%A5%EC%9D%98-hbm4-%EC%96%91%EC%82%B0-%EC%B6%9C%ED%95%98)（客製欄位）。

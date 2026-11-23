@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 import urllib.error
+from contextlib import closing
 from pathlib import Path
 from unittest.mock import patch
 
@@ -75,7 +76,7 @@ class OfficialMonthRevenueTest(unittest.TestCase):
                     ff.main()
             self.assertEqual(caught.exception.code, 1)
             self.assertIn("TPEx: URLError", stderr.getvalue())
-            with sqlite3.connect(db) as con:
+            with closing(sqlite3.connect(db)) as con:
                 self.assertEqual(con.execute(
                     "SELECT stock_id,revenue FROM month_revenue").fetchall(),
                     [("2330", 123_000)])
@@ -111,7 +112,7 @@ class OfficialMonthRevenueTest(unittest.TestCase):
             self.assertEqual(caught.exception.code, 1)
             self.assertIn("WARN 官方月營收補援失敗：ValueError: unexpected upsert failure",
                           stderr.getvalue())
-            with sqlite3.connect(db) as con:
+            with closing(sqlite3.connect(db)) as con:
                 for table in ("month_revenue", "fundamental_availability",
                               "fundamental_revisions"):
                     self.assertEqual(con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0], 0)

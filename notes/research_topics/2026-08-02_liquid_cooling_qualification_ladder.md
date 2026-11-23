@@ -114,6 +114,8 @@ evidence: sources:S21
 
 ### 名詞小字典
 
+- **D60-W／參考架構**：Daikin Applied 提供的整套冷卻設計藍圖，幫工程團隊安排設備與控制如何相接；公布藍圖不表示圖中設備已全部上市或場址已驗收。
+- **RCU（Rack Containment Unit，機櫃圍護冷卻單元）**：本文 D60-W 中收集機櫃剩餘空氣熱量的設備，接到專用低溫迴路；不等於服務液冷 CDU 的高溫迴路。
 - **FAQ（常見問答）**：公司整理給投資人的問題與回答。本文引用光寶指定季度的回答，不把網站其他季度內容混在一起。
 
 - **Pecos**：美國德州的一個場址；本文指Microsoft公布的資料中心建設計畫，不能與其其他德州園區的營運成績混用。
@@ -217,6 +219,7 @@ evidence: sources:S21
 - 查 3017、2308、2301 的重大訊息、法說與季報；對台達先追「液冷產品族」如何拆成 L2A／L2L 與具名 CDU，等公司把型號連到客戶驗收、量產數量、實際收入及毛利，才把證據推進到產品層。
 - 對光寶／DCX 先追交易是否完成交割，再追雙方是否公布共同型號、具名場域驗收、出貨量與同期間財務分子；「持股 25%」不能替代這四個節點。
 - 追蹤 Daikin／NTT DATA 的概念驗證是否在 2027 年 3 月前公布可重算的節電、成本或自動化結果，以及 Daikin 對 2027 財政年度的商用目標是否維持。
+- 另追 Daikin Applied D60-W 的 CDU 與乾式冷卻器：2027 年下半年可供應只是目標，先等具名型號上市與同架構場址驗收；不要把它當成 NTT DATA 的 PoC 成果。
 
 ### 想一想
 
@@ -224,6 +227,7 @@ evidence: sources:S21
 - 客戶選擇冷卻設備時，除了容量，是否還會同時檢查流量、壓差、故障備援、材料相容性、維修網路與整套控制整合？
 - 如果後續收入來自冰水主機、冷板或控制軟體，而不是冷卻液分配單元，研究中心應如何重新判斷價值落在哪一層？
 - 如果一筆策略投資最後完成，但始終沒有共同型號、具名客戶驗收或產品財務分子，應把它留在「能力整合」還是升到「商業落地」？為什麼？
+- 一張整套冷卻藍圖已公布，但其中兩種設備仍在開發，能說整套已交付嗎？高、低溫兩條迴路又各要驗哪一種負載？
 
 ## 主張與證據帳本
 
@@ -2760,4 +2764,93 @@ from: triaged
 to: triaged
 reason: added_quarterly_liquid_cooling_family_revenue_and_cdu_shipment_statement_without_named_model_financial_bridge
 evidence: sources:S37,S38
+-->
+
+<!-- research_source
+source_id: S39
+role: company_release
+source_kind: document
+publisher: Daikin Industries / Daikin Applied
+independence_group: daikin
+title: Daikin Applied Introduces 60 MW AI Factory Cooling Reference Architecture
+published_at: 2026-11-11
+captured_at: 2026-11-23
+accepted_at: 2026-11-23
+status: active
+url: https://www.daikin.com/press/2026/20261111
+locator: 開頭D60-W與two temperature loops段；Air and liquid cooling working as one system at the rack；Getting from design to capacity faster末段。Global頁日期11/11，內文Minneapolis新聞稿日期11/10，兩者分開。原始HTML SHA256 7c1b4cc1a73efaf435b52b57024773b2f6a18cdf338f7bbf25f0bef7bbc68948
+limitation: 公司參考設計與上市目標，不是具名場址運轉或測試結果；本輪只接納新聞稿明示內容，未把連結中的完整設計包當成已驗證。Daikin集團同一發布鏈，不增加獨立來源數；不屬NTT DATA PoC結果，亦未指認台灣CDU供應商或財務分子
+-->
+
+<!-- research_claim
+claim_id: C49
+label: verified
+status: active
+claim: Daikin Applied公布D60-W參考架構，設計對象為60MW IT負載；高溫液體迴路服務CDU，另一條專用低溫迴路服務機櫃空氣冷卻RCU，屬從機櫃到環境排熱的系統藍圖
+supporting_source_ids: S39
+contrary_source_ids:
+as_of: 2026-11-23
+basis: S39開頭明示reference architecture、60MW IT load及two temperature loops，RCU段說明剩餘空氣熱量走低溫迴路
+boundary: 60MW是同一參考設計的IT負載，不是單台CDU容量、實際投入運轉容量或採購量；高低溫是相對迴路角色，本主張不自行補出溫度值、現場效率或跨廠容量比較
+verification_needed: 同架構具名場址、設備型號、兩迴路工作點與驗收結果
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C50
+label: verified
+status: active
+claim: Daikin Applied在同一D60-W公告明示其CDU與資料中心乾式冷卻器仍在開發，目標為2027年下半年可供應
+supporting_source_ids: S39
+contrary_source_ids:
+as_of: 2026-11-23
+basis: S39的Getting from design to capacity faster末段直接使用currently under development與availability targeted for the second half of 2027
+boundary: verified只證實公司發布此開發狀態與未來目標，不等於已上市、出貨、驗收或認列收入；不延伸到同稿其他設備的可供應狀態，也不將2027H2曆年目標與NTT DATA的FY2027商用目標合併
+verification_needed: 同一產品的正式可供應、交付及驗收文件，或公司對時程的正式修正
+correction_kind:
+corrects_claim_id:
+corrected_by_claim_id:
+resolution:
+-->
+
+## 11 月 23 日更新 整套設計公布不代表所有設備已交付
+
+**兩條水路先按工作分開，不只看總容量。** Daikin Applied 的 D60-W 是以60MW IT負載為
+對象的參考藍圖。高溫迴路服務CDU，低溫迴路服務RCU，後者收走機櫃剩餘的空氣熱量。
+新手可以先把它想成兩組不同工作需求的水路；不能因同在一張圖上，就把設備容量與
+現場工作點混為一談。[C49]
+
+**藍圖裡仍有尚未上市的設備。** 同稿明示Daikin Applied的CDU及資料中心乾式冷卻器還在
+開發，目標是2027年下半年可供應。這不是客戶已收到貨的日期，也不是NTT DATA那項
+概念驗證已成功。下一步要查同款產品何時正式可供應，再查哪個場址採用與完成驗收。[C50]
+
+讀完可以問：哪一份文件證明的是設計，哪一份證明產品已交付？若只有整體架構新聞，
+能否把它分配成某家台灣供應商的訂單？本次只補上設計角色與開發時程，原T3的PoC結果、
+C21主命題及其證據時鐘都不變。
+
+來源：[S39 大金D60-W官方公告](https://www.daikin.com/press/2026/20261111)。
+
+<!-- monitoring_item
+monitor_id: T13
+status: active
+claim_ids: C49,C50
+metric: D60-W指定CDU及資料中心乾式冷卻器的可供應狀態、同架構場址與雙迴路驗收
+source_ids: S39
+watch_source_ids: S7
+frequency: quarterly
+frequency_detail: 下一季度檢查正式產品與專案公告；2027-02-23為研究端工作日，早於公司2027H2目標，具名產品發布或時程修正時提前
+next_check: 2027-02-23
+trigger: Daikin公布同一D60-W產品正式可供應、具名交付或場址雙迴路驗收，或正式更新原2027H2目標
+invalidation: 公司撤回或延後原目標，或具名驗收顯示雙迴路設計須實質調整時追加修正；沒有新公告不等於產品失敗，其他設備出貨不得代填此CDU與乾式冷卻器
+-->
+
+<!-- transition
+date: 2026-11-23
+from: triaged
+to: triaged
+reason: added_d60w_reference_architecture_and_development_target_without_poc_or_thesis_clock_refresh
+evidence: sources:S39
 -->

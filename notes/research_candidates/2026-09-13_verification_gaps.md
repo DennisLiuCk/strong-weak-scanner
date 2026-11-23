@@ -11,7 +11,7 @@
 schema_version: 2
 radar_id: RADAR-2026-09-13-01
 as_of: 2026-09-13
-next_review: 2026-11-23
+next_review: 2026-11-24
 status: active
 method: 到期monitor的一手來源初查產生三個未完成問題，先凍結再安排後續深研。SSCB按具名測試可證偽性及電源角色居前，HBFSim按方法增量次之但不採待核倍率，玻璃核心因多為既有框架重述而等待客戶結果；全部watch，不用來源篇數或公司logo當独立證據。
 selection_cycle_id: RS-2026-09-13-01
@@ -60,7 +60,7 @@ why_now: 到期HBF追蹤初查找到9/9研究者HBFSim v1；模擬與校準的�
 knowledge_gain: 把研究者方法、模型擬合、可重現運行與真實晶片分層；10/8已核v3、v0.1.1與固定proof及reference原始紀錄，仍缺相同共同鍵的fast原始run，舊倍率與秒數未對齊，沒有重跑或外部驗證，不採效能點估計。
 first_rejection: 若未取得原始run或作者勘誤便無法對齊秒數與倍率，或只有擬合點沒有外部驗證，就不發布效能點估計或HBF硬體受惠結論。
 next_evidence: 先核對版本化PDF與作者原始run及勘誤，再分開NVMe校準與HBF模型參數，要求未參與擬合的驗證工作負載和實體裝置邊界。
-next_check: 2026-11-23
+next_check: 2026-12-07
 route: watch_only
 article_topic_id:
 graph_id:
@@ -460,3 +460,11 @@ SSCB維持順位1及watch。[SolarEdge平台頁](https://www.solaredge.com/us/da
 [11/4財報稿](https://investors.solaredge.com/news-releases/news-release-details/solaredge-announces-third-quarter-2026-financial-results)說的是SST展示與潛在客戶興趣；[10/13展稿](https://investors.solaredge.com/news-releases/news-release-details/solaredge-showcases-mvac-800-vdc-ai-factory-power-technology)仍分開轉換級帶載與整條供電路徑驗證。[OCP配電入口](https://www.opencompute.org/community/power-distribution)可定位規格與工作組，並非同型號故障測試及客戶驗收。未取得原凍結門檻的完整證據，不新增文章、產品合格或財務受惠線。按既有兩週節奏12/5重查公開測試附件；若先有具名測試，提前處理。
 
 HBFSim 11/23、玻璃11/24尚未到期，本輪未重新裁決。三題原順位、知識價值與第一拒絕保留，總檢查日11/23只是工作安排。上輪的供應承諾線索已於11/21另行事前凍結為定向研究，不重排這三題；結果另存同日候選紀錄。
+
+## 11月23日 模擬研究仍缺完整外部重現
+
+HBFSim 維持順位2與watch。[發布列表](https://github.com/SlugLab/HBFSim/releases)仍以v0.1.2為最新版本；公開main最新提交是10/23的`696cc8418e2d2375cdfd249ca5833dfd97e1e0f2`。本輪重新取得並閱讀固定版本的[重建說明](https://raw.githubusercontent.com/SlugLab/HBFSim/ed6f5559673767bd620eb8174fdf61bdc7aa3639/reproduction/olmoe-full147-v0.1.2/REBUILD.md)及[版本說明](https://raw.githubusercontent.com/SlugLab/HBFSim/ed6f5559673767bd620eb8174fdf61bdc7aa3639/docs/releases/v0.1.2.md)，兩份原件雜湊與11/9相同。作者仍把完整乾淨環境GPU重建與跨機重現列為未驗證；兩次不同嘗試各一筆觀察，也不是同條件重複實驗。大型原始紀錄未公開，CPU發布檢查不能填補這個缺口。
+
+因此不發布效能倍率、不把模擬轉成實體HBF採用或台股受惠線。下一份有價值的證據仍是可配對的完整運行紀錄、作者勘誤與未參與擬合的外部驗證，按兩週工作節奏12/7重查；具名新材料先出現就提前。這不是作者發布承諾。本輪沒有執行第三方程式或重跑模型。
+
+SSCB與玻璃本輪未到期，不重新裁決，分別保留12/5與11/24。三題的凍結順位、知識價值、選題理由與第一拒絕不變；雷達11/24總檢查只承接玻璃到期工作，不表示所有候選已取得新證據。

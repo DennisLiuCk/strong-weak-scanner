@@ -760,7 +760,7 @@ view: industry
 from_id: product:amd-helios
 to_id: capability:rack-configuration-baseline
 relation: requires
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C21,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C34
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C21,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C34,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C38
 note_refs:
 evidence_state: inference
 commercial_stage: qualification
@@ -770,7 +770,7 @@ exclusivity_scope:
 as_of: 2026-11-13
 review_due: 2026-11-20
 status: active
-boundary: Microsoft已描述Helios版本化基準方法，支持追索同配置結果的必要性；本線仍是研究推論，不是已取得具名場站配置包或通過資格。
+boundary: Microsoft已描述Helios版本化基準方法；AMD／Arista白皮書另談實驗室網路驗證，其與客戶運行說法缺共同配置及截點。本線仍是研究推論，不是已取得具名場站配置包、通過資格或出貨遭反證，保留原邊期限。
 next_trigger: 具名 Helios 品牌系統公開 factory inventory、BOM／SBOM、設定、場站輸入、測試條件、簽核與交接的同版紀錄。
 -->
 

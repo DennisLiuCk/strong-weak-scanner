@@ -1,0 +1,3 @@
+# Signed experiment receipts must retain the exact LF bytes recorded in manifests.
+reports/experiment_reviews/** text eol=lf
+reports/experiment_rounds/** text eol=lf
