@@ -369,6 +369,12 @@ class DashboardUxContractTest(unittest.TestCase):
                        ".srow{grid-template-columns:1fr", ".shead{display:none}",
                        ".bhead{display:none}", ".hscroll{overflow-x:auto}"):
             self.assertIn(marker, self.template)
+        # 族群排行榜在手機藏起欄位表頭後,每個數值仍要自帶維度標籤(與熱圖 cell label 同一模式)。
+        for marker in (".board-metric-label{display:none}",
+                       ".board-metric-label{display:block",
+                       "metricCell(mom,fmtPct(mom,1),pctCol(mom),md,25,'動能 vs 全體')",
+                       "dd,3,'修正日外資'"):
+            self.assertIn(marker, self.template)
         # 桌機鎖寬已移除,窄視口不得水平溢位
         self.assertNotIn("min-width:1180px", self.template)
 

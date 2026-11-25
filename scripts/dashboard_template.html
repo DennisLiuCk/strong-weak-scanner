@@ -400,6 +400,7 @@ svg{display:block;overflow:visible}
 .stock-position-label{display:none}
 .board-row{display:grid;grid-template-columns:30px minmax(120px,1fr) 150px 150px;gap:14px;align-items:center}
 .bhead{align-items:end}
+.board-metric-label{display:none}
 .grow{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:center}
 .tband{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:center}
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 28px}
@@ -489,6 +490,7 @@ svg{display:block;overflow:visible}
   .board-row{grid-template-columns:24px 1fr;gap:8px 12px}
   .board-row>*:nth-child(3),.board-row>*:nth-child(4){grid-column:2/-1}
   .bhead{display:none}
+  .board-metric-label{display:block;font-size:var(--fs-105);font-weight:700;color:var(--ink2);margin-bottom:2px}
   /* 四象限 SVG 是固定 viewBox 0 0 470 380 的 width:100%：375px 手機上會被縮到
      scale 0.64，font-size:9 的座標標籤實際只有 5.8px。改成在卡片內橫向捲動、
      維持 1:1 呈現(與熱圖 .hscroll 同一套處理)，字級才等於作者指定的值 */
@@ -1462,8 +1464,8 @@ function buildGroup(){
         h('div',{style:'display:flex;align-items:center;gap:7px;flex-wrap:wrap'},h('b',{style:'font-size:15.5px;font-weight:700',text:grp(g.g).short}),
           h('span',{class:'chip',style:`color:${st.col};background:${st.bg}`,text:g.state})),
         h('div',{style:'font-size:var(--fs-11);color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap',text:grp(g.g).tag||''})),
-      h('div',{},metricCell(mom,fmtPct(mom,1),pctCol(mom),md,25),absLine(g.abs20)),
-      metricCell(dip,(dip>=0?'淨買 ':'淨賣 ')+Math.abs(dip).toFixed(2)+'%',dip>=0?'var(--strong)':'var(--weak)',dd,3)));
+      h('div',{},metricCell(mom,fmtPct(mom,1),pctCol(mom),md,25,'動能 vs 全體'),absLine(g.abs20)),
+      metricCell(dip,(dip>=0?'淨買 ':'淨賣 ')+Math.abs(dip).toFixed(2)+'%',dip>=0?'var(--strong)':'var(--weak)',dd,3,'修正日外資')));
   });
 
   const boardPanel=h('div',{id:'grp-panel-board',class:'group-panel',role:'tabpanel','aria-labelledby':'grp-tab-board'},
@@ -1528,7 +1530,8 @@ function absLine(a){ if(!a) return null;
     h('span',{class:'mono',style:`color:${pctCol(a.med)};font-weight:700`,text:fmtPct(a.med,1)}),
     h('span',{text:` · ${a.pos}/${a.n} 檔漲`})); }
 
-function metricCell(v,valTxt,col,d,max){ return h('div',{},
+function metricCell(v,valTxt,col,d,max,label){ return h('div',{},
+  label?h('div',{class:'board-metric-label',text:label}):null,
   h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:6px'},
     h('span',{class:'mono',style:`font-size:13px;font-weight:600;color:${col}`,text:valTxt}),
     h('span',{style:`font-size:var(--fs-10);font-weight:700;color:${d.c}`,text:d.t})),
