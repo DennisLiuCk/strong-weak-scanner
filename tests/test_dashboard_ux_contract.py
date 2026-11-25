@@ -376,8 +376,16 @@ class DashboardUxContractTest(unittest.TestCase):
                        "metricCell(mom,fmtPct(mom,1),pctCol(mom),md,25,'動能 vs 全體')",
                        "dd,3,'修正日外資'"):
             self.assertIn(marker, self.template)
-        # 桌機鎖寬已移除,窄視口不得水平溢位
+        # 桌機鎖寬已移除,窄視口不得水平溢位；詳情抽屜在窄屏也要把寬度留給圖表，
+        # 不可讓 sheet/card/chart 三層寬鬆 padding 把 SVG 壓到 200px 左右。
         self.assertNotIn("min-width:1180px", self.template)
+        for marker in (".stock-detail-card{padding:30px 32px}",
+                       ".history-chart-card{padding:20px 22px}",
+                       "#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}",
+                       ".stock-detail-card{padding:20px 16px}",
+                       ".history-chart-card{padding:16px 12px}",
+                       ".chart-canvas{padding:10px 6px 4px}"):
+            self.assertIn(marker, self.template)
 
     # ---------- 抽屜:focus 管理 ----------
 
