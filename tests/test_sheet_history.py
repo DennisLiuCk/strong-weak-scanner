@@ -26,13 +26,13 @@ const sheetwrap=element();sheetwrap.classList={open:false,contains(){return this
 const closer=element('BUTTON');
 const sheetEl=element();sheetEl.querySelector=()=>closer;
 const document={activeElement:opener,body:{style:{overflow:'auto'},children:[header,main,script,sheetwrap]}};
-const location={assign(href){navigated.push(href)}};let navigated=[];
+const location={assign(href){navigated.push(href);scrollY=9000}};let navigated=[];
 const window={requestAnimationFrame(fn){frames.push(fn)},setTimeout(fn){timers.push(fn)},addEventListener(type,fn){listeners[type]=fn}};
 // A fragment entry already exists: opening/closing the sheet must not consume it.
 const entries=[{state:null,url:'/'},{state:{existing:'keep'},url:'/#tier'}];let index=1;
 const history={get state(){return entries[index].state},
  pushState(state,title,url){assert.equal(url,undefined);entries.splice(index+1);entries.push({state,url:entries[index].url});index++},
- back(){pending.push(()=>{if(index>0){index--;listeners.popstate({state:this.state});document.activeElement=document.body}})},
+ back(){pending.push(()=>{if(index>0){index--;listeners.popstate({state:this.state});document.activeElement=document.body;scrollY=700}})},
  forward(){pending.push(()=>{if(index<entries.length-1){index++;listeners.popstate({state:this.state})}})}};
 function flush(){while(pending.length)pending.shift()();while(timers.length)timers.shift()();while(frames.length)frames.shift()()}
 let currentView='';
@@ -67,6 +67,7 @@ history.forward();flush();assert.equal(currentView,'group-return');assert.equal(
 let prevented=false;const guide={currentTarget:{tagName:'A',href:'http://localhost/#flow-guide'},preventDefault(){prevented=true}};
 closeSheet(guide);assert.equal(prevented,true);assert.deepEqual(navigated,[]);flush();
 assert.equal(index,1);assert.deepEqual(navigated,['http://localhost/#flow-guide']);assert.equal(sheetwrap.classList.open,false);
+assert.equal(scrollY,9000,'guide scroll must happen after native history scroll restoration');
 // A disconnected opener and a late animation callback must not steal focus.
 document.activeElement=opener;opener.isConnected=false;render('stock-rapid');
 const focusBeforeClose=focusCalls.length;closeSheet();flush();

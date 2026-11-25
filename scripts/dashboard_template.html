@@ -1607,18 +1607,27 @@ function hideSheet(){ if(!sheetwrap.classList.contains('on'))return;sheetwrap.cl
   },0);
   lastSheetFocus=null;sheetHistoryId=null; }
 function closeSheet(event){
-  if(!sheetwrap.classList.contains('on')||sheetHistoryClosing)return;
+  if(!sheetwrap.classList.contains('on'))return;
   // 指南連結先退掉面板這筆歷史，再前往錨點，避免 Back 遇到空白面板歷史。
   if(event?.currentTarget?.tagName==='A'){event.preventDefault();sheetLinkAfterClose=event.currentTarget.href;}
+  if(sheetHistoryClosing)return;
   if(history.state?.scannerSheet===sheetHistoryId){sheetHistoryClosing=true;history.back();}
-  else {hideSheet();if(sheetLinkAfterClose){const href=sheetLinkAfterClose;sheetLinkAfterClose=null;location.assign(href);}}
+  else {hideSheet();followSheetLink();}
+}
+function followSheetLink(){
+  if(!sheetLinkAfterClose)return;
+  const href=sheetLinkAfterClose,version=sheetFocusVersion,url=location.href;sheetLinkAfterClose=null;
+  // 與焦點相同，錨點捲動必須晚於瀏覽器這次 traversal 的 scroll 還原。
+  window.setTimeout(()=>{
+    if(version===sheetFocusVersion&&!sheetwrap.classList.contains('on')&&location.href===url)location.assign(href);
+  },0);
 }
 function handleSheetHistory(event){
   sheetHistoryClosing=false;
   const id=event.state?.scannerSheet,restore=sheetHistoryViews.get(id);
   if(restore){sheetHistoryId=id;restoringSheetHistory=true;try{restore();}finally{restoringSheetHistory=false;}}
   else hideSheet();
-  if(sheetLinkAfterClose){const href=sheetLinkAfterClose;sheetLinkAfterClose=null;location.assign(href);}
+  followSheetLink();
 }
 window.addEventListener('popstate',handleSheetHistory);
 function openStockDetail(id,groupContext=null,chartContext=null,opener=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
