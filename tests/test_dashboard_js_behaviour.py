@@ -70,6 +70,77 @@ class DashboardJsBehaviourTest(unittest.TestCase):
 
     # ---------- fmtPct:唯一的百分比格式化入口 ----------
 
+    def test_price_chart_keeps_tapped_date_and_supports_keyboard_without_losing_hover(self):
+        # 跑完整 priceChart 與事件處理器；SVG 重繪後容器事件仍須有效。
+        dom = r"""
+class Element {
+  constructor(tag) { this.tag=tag; this.nodeType=1; this.attrs={}; this.style={}; this.children=[]; this.events={}; }
+  setAttribute(k,v) { this.attrs[k]=v; }
+  set textContent(v) { this.children=[]; this.text=String(v); }
+  get textContent() { return (this.text||'')+this.children.map(c=>c.textContent).join(''); }
+  appendChild(c) { this.children.push(c); return c; }
+  append(...cs) { cs.forEach(c=>this.appendChild(c)); }
+  replaceChildren(...cs) { this.text=''; this.children=cs.filter(Boolean); }
+  addEventListener(k,f) { (this.events[k]??=[]).push(f); }
+  fire(k,e={}) { (this.events[k]||[]).forEach(f=>f(e)); }
+  find(f) { if(f(this))return this; for(const c of this.children){const x=c.find?.(f);if(x)return x;} }
+  querySelector(tag) { return this.find(e=>e.tag===tag); }
+  getBoundingClientRect() { return {left:0,width:680}; }
+}
+const document={createElement:t=>new Element(t),createElementNS:(_,t)=>new Element(t),
+  createTextNode:t=>({nodeType:3,textContent:String(t)})};
+const NS='http://www.w3.org/2000/svg';
+"""
+        setup = r"""
+const n=65, vals=Array.from({length:n},(_,i)=>100+i);
+const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
+  rsi:vals.map(()=>0),vol:vals.map(()=>0),foreign:vals.map(()=>0),trust:vals.map(()=>null)});
+const box=()=>host.find(e=>e.attrs.role==='group');
+const output=()=>host.find(e=>e.attrs.role==='status');
+const state=()=>({hidden:output().hidden,text:output().textContent});
+const fire=(type,e)=>{box().fire(type,e);return state();};
+const key=k=>{let prevented=false;box().fire('keydown',{key:k,preventDefault(){prevented=true;}});return {...state(),prevented};};
+const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
+"""
+        pre = dom + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + setup
+        got = self.run_js(pre, [
+            ('初始未選日期', 'state()'),
+            ('桌機 hover', "fire('pointermove',{pointerType:'mouse',clientX:8})"),
+            ('桌機離開清除預覽', "fire('pointerleave',{pointerType:'mouse'})"),
+            ('手指拖曳不攔截捲動也不選日期', "fire('pointermove',{pointerType:'touch',clientX:8})"),
+            ('點按保留首日', "fire('click',{clientX:8})"),
+            ('手指離開仍保留', "fire('pointerleave',{pointerType:'touch'})"),
+            ('桌機移入可暫看別日', "fire('pointermove',{pointerType:'mouse',clientX:628})"),
+            ('移出恢復點選日期', "fire('pointerleave',{pointerType:'mouse'})"),
+            ('鍵盤下一交易日', "key('ArrowRight')"),
+            ('鍵盤到最早', "key('Home')"),
+            ('不越過最早', "key('ArrowLeft')"),
+            ('鍵盤到最新', "key('End')"),
+            ('不越過最新', "key('ArrowRight')"),
+            ('其他按鍵不攔截', "key('Tab')"),
+            ('換區間清除舊日期', "(button('20 日').fire('click'),state())"),
+            ('換區間後首日正確', "key('Home')"),
+            ('指標切換保留日期與零值', "(host.find(e=>e.tag==='button'&&e.textContent.includes('外資')).fire('click'),state())"),
+        ])
+        for i in (0, 2, 3, 14):
+            self.assertTrue(got[i]['hidden'])
+            self.assertEqual(got[i]['text'], '')
+        for i in (1, 4, 5, 7, 9, 10):
+            self.assertFalse(got[i]['hidden'])
+            self.assertIn('日期day5', got[i]['text'])
+            self.assertIn('現價105.00', got[i]['text'])
+            self.assertIn('RSI0.0', got[i]['text'])
+        self.assertIn('日期day6', got[8]['text'])
+        for i in (6, 11, 12, 13):
+            self.assertIn('日期day64', got[i]['text'])
+        for i in (8, 9, 10, 11, 12, 15):
+            self.assertTrue(got[i]['prevented'])
+        self.assertFalse(got[13]['prevented'])
+        for i in (15, 16):
+            self.assertIn('日期day45', got[i]['text'])
+        self.assertIn('外資+0', got[16]['text'])
+        self.assertNotIn('投信', got[16]['text'])
+
     def test_archive_links_resolve_from_live_and_historical_pages(self):
         got = self.run_js(extract('archiveSnapshotHref'), [
             ('首頁', "archiveSnapshotHref('2026-09-08','/strong-weak-scanner/index.html')"),
