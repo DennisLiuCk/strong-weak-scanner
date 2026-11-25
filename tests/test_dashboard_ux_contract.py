@@ -362,7 +362,7 @@ class DashboardUxContractTest(unittest.TestCase):
     def test_sheet_manages_focus_and_escape(self):
         for marker in ("lastSheetFocus=document.activeElement",
                        "if(c) c.focus()",
-                       "lastSheetFocus.focus()",
+                       "lastSheetFocus.focus({preventScroll:true})",
                        "if(e.key==='Escape'){e.preventDefault();closeSheet();return;}",
                        "sheetEl.querySelectorAll('a[href],button:not([disabled])",
                        "item.el.inert=true",

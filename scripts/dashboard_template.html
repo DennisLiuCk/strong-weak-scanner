@@ -1580,23 +1580,43 @@ function openSheet(s){
     h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'五面向明細'}),list,
     h('div',{style:'margin-top:14px'},chipRow(stockChips(s)))];
   if(s.note&&s.note[1])body.push(h('p',{style:'margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line2);font-size:12.5px;color:var(--ink2);line-height:1.65',text:s.note[1]}));
-  sheetEl.replaceChildren(...body); showSheet();
+  sheetEl.replaceChildren(...body); showSheet(()=>openSheet(s));
 }
 let lastSheetFocus=null;
 let sheetInerted=[],sheetBodyOverflow='';
-function showSheet(){ const wasOpen=sheetwrap.classList.contains('on');
+// 一次開啟面板只佔一筆同網址歷史；換檔／返回族群不堆疊，Forward 可重開最後一檔。
+const sheetHistoryViews=new Map(),sheetHistorySession=Date.now()+'-'+Math.random();
+let sheetHistoryIndex=0,sheetHistoryId=null,restoringSheetHistory=false,sheetHistoryClosing=false,sheetLinkAfterClose=null;
+function showSheet(restore){ const wasOpen=sheetwrap.classList.contains('on');
   if(!wasOpen){lastSheetFocus=document.activeElement;sheetBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
     sheetInerted=[...document.body.children].filter(el=>el!==sheetwrap&&el.tagName!=='SCRIPT').map(el=>({el,aria:el.getAttribute('aria-hidden')}));
-    sheetInerted.forEach(item=>{item.el.inert=true;item.el.setAttribute('aria-hidden','true');});}
+    sheetInerted.forEach(item=>{item.el.inert=true;item.el.setAttribute('aria-hidden','true');});
+    if(!restoringSheetHistory){sheetHistoryId=sheetHistorySession+'-'+(++sheetHistoryIndex);history.pushState({...history.state,scannerSheet:sheetHistoryId},'');}}
+  sheetHistoryViews.set(sheetHistoryId,restore);
   sheetwrap.classList.add('on');sheetwrap.setAttribute('aria-hidden','false');
   sheetEl.setAttribute('aria-labelledby','sheet-title');
   sheetEl.scrollTop=0;
   const c=sheetEl.querySelector('.sheetclose'); if(c) c.focus();
-  window.requestAnimationFrame(function(){ const c2=sheetEl.querySelector('.sheetclose'); if(c2&&document.activeElement!==c2) c2.focus(); }); }
-function closeSheet(){ if(!sheetwrap.classList.contains('on'))return;sheetwrap.classList.remove('on');sheetwrap.setAttribute('aria-hidden','true');document.body.style.overflow=sheetBodyOverflow;
+  window.requestAnimationFrame(function(){ const c2=sheetEl.querySelector('.sheetclose'); if(sheetwrap.classList.contains('on')&&c2&&document.activeElement!==c2) c2.focus(); }); }
+function hideSheet(){ if(!sheetwrap.classList.contains('on'))return;sheetwrap.classList.remove('on');sheetwrap.setAttribute('aria-hidden','true');document.body.style.overflow=sheetBodyOverflow;
   sheetInerted.forEach(item=>{item.el.inert=false;if(item.aria==null)item.el.removeAttribute('aria-hidden');else item.el.setAttribute('aria-hidden',item.aria);});sheetInerted=[];
-  if(lastSheetFocus&&lastSheetFocus.focus) lastSheetFocus.focus();
-  lastSheetFocus=null; }
+  if(lastSheetFocus&&lastSheetFocus.isConnected&&lastSheetFocus.focus) lastSheetFocus.focus({preventScroll:true});
+  lastSheetFocus=null;sheetHistoryId=null; }
+function closeSheet(event){
+  if(!sheetwrap.classList.contains('on')||sheetHistoryClosing)return;
+  // 指南連結先退掉面板這筆歷史，再前往錨點，避免 Back 遇到空白面板歷史。
+  if(event?.currentTarget?.tagName==='A'){event.preventDefault();sheetLinkAfterClose=event.currentTarget.href;}
+  if(history.state?.scannerSheet===sheetHistoryId){sheetHistoryClosing=true;history.back();}
+  else {hideSheet();if(sheetLinkAfterClose){const href=sheetLinkAfterClose;sheetLinkAfterClose=null;location.assign(href);}}
+}
+function handleSheetHistory(event){
+  sheetHistoryClosing=false;
+  const id=event.state?.scannerSheet,restore=sheetHistoryViews.get(id);
+  if(restore){sheetHistoryId=id;restoringSheetHistory=true;try{restore();}finally{restoringSheetHistory=false;}}
+  else hideSheet();
+  if(sheetLinkAfterClose){const href=sheetLinkAfterClose;sheetLinkAfterClose=null;location.assign(href);}
+}
+window.addEventListener('popstate',handleSheetHistory);
 function openStockDetail(id,groupContext=null,chartContext=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
   // 同族群、依綜合分排序的前後檔
   const sibs=(D.stocks||[]).filter(x=>x.g===s.g).sort((a,b)=>b.comp-a.comp);
@@ -1631,7 +1651,7 @@ function openStockDetail(id,groupContext=null,chartContext=null){ const s=D.byId
       onclick:()=>goToHeading(hd), text:label}));
     jumpSelect.appendChild(h('option',{value:String(index),text:label}));});
   jumpSelect.addEventListener('change',()=>{if(jumpSelect.value==='')return;goToHeading(headings[Number(jumpSelect.value)]);jumpSelect.value='';});
-  showSheet();
+  showSheet(()=>openStockDetail(id,groupContext,chartContext));
   // 明確的同日比較才跳回圖表；原本頂端的上一檔／下一檔仍從明細頂端開始。
   if(chartContext){const heading=card.querySelector('[data-history-chart] h3');if(heading)window.requestAnimationFrame(()=>goToHeading(heading,true));}
 }
@@ -1665,7 +1685,7 @@ function openGroupSheet(g){
     h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'族群五項指標'}),statList];
   const gfs=flowSection(g.flow);
   if(gfs)body.push(h('div',{style:'margin-top:10px;border-top:1px solid var(--line)'},gfs));
-  sheetEl.replaceChildren(...body); showSheet();
+  sheetEl.replaceChildren(...body); showSheet(()=>openGroupSheet(g));
 }
 
 // 分層 pill 用：5 個元素分 → 極簡色條（紅＝相對強、綠＝相對弱，高度／濃度＝強度）
