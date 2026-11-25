@@ -381,6 +381,8 @@ svg{display:block;overflow:visible}
    剛好漏掉這一段)。桌機滿版時 1fr 吸收剩餘空間，各軌解析結果與改版前相同 */
 .srow{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,340px) minmax(0,240px);gap:22px;align-items:center}
 .shead{align-items:end}
+.stock-position{text-align:center;font-size:16px;font-weight:600;color:var(--ink2)}
+.stock-position-label{display:none}
 .board-row{display:grid;grid-template-columns:30px minmax(120px,1fr) 150px 150px;gap:14px;align-items:center}
 .bhead{align-items:end}
 .grow{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:center}
@@ -465,7 +467,8 @@ svg{display:block;overflow:visible}
   .tband{grid-template-columns:1fr;gap:10px}
   .grow{grid-template-columns:1fr;gap:6px}
   .srow{grid-template-columns:1fr;gap:10px}
-  .srow>*:nth-child(1){display:none}
+  .stock-position{font-size:12px;text-align:left}
+  .stock-position-label{display:inline;font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;font-weight:500}
   .srow>*:nth-child(4){grid-column:auto}
   .shead{display:none}
   .board-row{grid-template-columns:24px 1fr;gap:8px 12px}
@@ -1468,7 +1471,10 @@ function buildStocks1c(){
   function row(s,rank){ const ts=tierStyle(s.tier),compCol=s.comp>=0?'var(--strong)':'var(--weak)';
     return h('div',{class:'clickrow srow',role:'button',tabindex:'0',style:'padding:16px 6px;border-top:1px solid var(--line2)',
       onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}}},
-      h('div',{class:'mono',style:'text-align:center;font-size:16px;font-weight:600;color:var(--ink2)',text:rank==null?'—':rank}),
+      h('div',{class:'mono stock-position',
+        title:'族群內目前排序位置，依所選維度與方向排列，非並列名次'},
+        h('span',{class:'stock-position-label',text:rank==null?'暫停／未交易 · 不列排序 ':'族群內排序位置 '}),
+        h('span',{text:rank==null?'—':rank})),
       h('div',{style:'min-width:0'},
         h('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap'},h('b',{style:'font-size:16px;font-weight:800',text:s.nm}),
           h('span',{class:'mono',style:'font-size:var(--fs-115);color:var(--muted)',text:s.id}),h('span',{class:'chip',style:`color:${ts.col};background:${ts.bg}`,text:s.tierLabel})),
@@ -1515,7 +1521,7 @@ function buildStocks1c(){
   const toolbar=h('div',{class:'toolbar'},gsel,dimSel,search,sortBtn,count);
   return [h('p',{class:'kicker',text:'個股層'}),h('h2',{class:'sec',text:'族群內個股比較 · 同一族群誰強誰弱'}),
     h('p',{class:'lead',html:'選定族群後依<b style="color:var(--ink)">族群內綜合分</b>排序，可搜尋／切換排序；暫停／未交易股票置底且不列名次，數值是標示日期的前次訊號。<b style="color:var(--ink)">點任一列</b>看該檔完整研究與近期數據。注意：五面向是族群內相對排名——相對分靠前不保證原始值為正，▲ 也不代表原始值為正或股價會漲；本頁不宣稱法人一定買進或賣出，請以明細內原始數字為準。'}),
-    toolbar,h('p',{id:'stock-search-help',class:'lead',style:'font-size:12px;margin:0 0 12px',text:'搜尋依族群選單範圍；不知道所屬族群時可選「全部族群」。各族群分開排序，搜尋保留原排序位置。'}),cont];
+    toolbar,h('p',{id:'stock-search-help',class:'lead',style:'font-size:12px;margin:0 0 12px',text:'搜尋依族群選單範圍；不知道所屬族群時可選「全部族群」。各族群分開排序，位置依目前維度與方向排列，非並列名次；搜尋保留原排序位置。'}),cont];
 }
 function sheetHeader(title){
   return h('header',{class:'sheetheader'},h('h2',{id:'sheet-title',class:'sheettitle',text:title}),
