@@ -17,7 +17,7 @@ class SheetHistoryTest(unittest.TestCase):
                            source.index("function openStockDetail(")]
         harness = r"""
 const assert=require('node:assert/strict');
-let scrollY=700,focusCalls=[],frames=[],timers=[],listeners={},pending=[];
+let scrollX=0,scrollY=700,focusCalls=[],frames=[],timers=[],listeners={},pending=[];
 function element(tag='DIV',attrs={}){return {tagName:tag,style:{},attrs,inert:false,isConnected:true,
  getAttribute(k){return this.attrs[k]??null},setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]},
  focus(options){focusCalls.push({el:this,options});document.activeElement=this;if(!options?.preventScroll)scrollY+=88;}}}
@@ -27,12 +27,12 @@ const closer=element('BUTTON');
 const sheetEl=element();sheetEl.querySelector=()=>closer;
 const document={activeElement:opener,body:{style:{overflow:'auto'},children:[header,main,script,sheetwrap]}};
 const location={assign(href){navigated.push(href);scrollY=9000}};let navigated=[];
-const window={requestAnimationFrame(fn){frames.push(fn)},setTimeout(fn){timers.push(fn)},addEventListener(type,fn){listeners[type]=fn}};
+const window={get scrollX(){return scrollX},get scrollY(){return scrollY},scrollTo(options){scrollX=options.left;scrollY=options.top},requestAnimationFrame(fn){frames.push(fn)},setTimeout(fn){timers.push(fn)},addEventListener(type,fn){listeners[type]=fn}};
 // A fragment entry already exists: opening/closing the sheet must not consume it.
 const entries=[{state:null,url:'/'},{state:{existing:'keep'},url:'/#tier'}];let index=1;
 const history={get state(){return entries[index].state},
  pushState(state,title,url){assert.equal(url,undefined);entries.splice(index+1);entries.push({state,url:entries[index].url});index++},
- back(){pending.push(()=>{if(index>0){index--;listeners.popstate({state:this.state});document.activeElement=document.body;scrollY=700}})},
+ back(){pending.push(()=>{if(index>0){index--;listeners.popstate({state:this.state});document.activeElement=document.body;scrollX=0;scrollY=700}})},
  forward(){pending.push(()=>{if(index<entries.length-1){index++;listeners.popstate({state:this.state})}})}};
 function flush(){while(pending.length)pending.shift()();while(timers.length)timers.shift()();while(frames.length)frames.shift()()}
 let currentView='';
@@ -59,6 +59,15 @@ assert.equal(index,1);assert.equal(sheetwrap.classList.open,false);assert.equal(
 // Touch activation of a custom role=button may leave BODY active: use currentTarget.
 document.activeElement=document.body;render('stock-touch',opener);flush();scrollY=700;closeSheet();flush();
 assert.equal(document.activeElement,opener);assert.equal(scrollY,700);assert.equal(index,1);
+// Scrolling within #tier before opening must not snap back to the anchor on close.
+for(const close of [()=>history.back(),()=>closeSheet()]){
+  scrollX=24;scrollY=940;render('stock-scrolled',opener);flush();
+  render('stock-scrolled-peer');flush(); // Peer switches must retain the original page position.
+  close();flush();
+  assert.equal(scrollX,24);assert.equal(scrollY,940);assert.equal(document.activeElement,opener);
+  assert.equal(index,1);assert.equal(sheetwrap.classList.open,false);
+}
+scrollX=0;scrollY=700;
 // A nested group -> stock -> group transition also takes only one entry.
 render('group');render('stock-in-group');render('group-return');flush();scrollY=700;
 assert.equal(entries.length,3);closeSheet();flush();assert.equal(index,1);
