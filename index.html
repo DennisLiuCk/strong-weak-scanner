@@ -945,7 +945,7 @@ function quadEl(G){ const W=470,H=380,m={l:52,r:22,t:26,b:44},xs=[],ys=[];
     dot.appendChild(sv('title',{},document.createTextNode(grp(g.g).nm+'｜動能 '+(g.axis.price*100).toFixed(1)+'%（5日前 '+_p5+'）｜修正日外資 '+g.axis.dip.toFixed(2)+'（5日前 '+_d5+'）')));
     const t=sv('text',{x:cx+9,y:cyy+4,'font-size':11,'font-weight':800,fill:'var(--ink)','paint-order':'stroke',stroke:'var(--card)','stroke-width':3,'stroke-linejoin':'round'});t.textContent=grp(g.g).short;t.style.cursor='pointer';
     const gEl=sv('g',{}); [trail,end,hit,dot,t].forEach(x=>gEl.appendChild(x)); gEl.style.cursor='pointer'; gEl.style.transition='opacity .15s ease';
-    gEl.addEventListener('click',()=>openGroupSheet(g));
+    gEl.addEventListener('click',event=>openGroupSheet(g,event.currentTarget));
     gEl.addEventListener('mouseenter',()=>GHL.enter(g.g)); gEl.addEventListener('mouseleave',()=>GHL.leave(g.g));
     GHL.add(g.g,()=>setFocus(g.g),()=>setFocus(null));
     layer.push({g:g.g,gEl,trail,end,dot,t}); k.push(gEl);});
@@ -983,7 +983,7 @@ function buildOverview(){
   const pulse=h('div',{class:'pulse-list'});
   leaders.forEach((g,i)=>{const mom=g.axis.price*100,st=stateStyle(g.state);
     pulse.appendChild(h('div',{class:'clickrow pulse-row',role:'button',tabindex:'0',
-      onclick:()=>openGroupSheet(g),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}},
+      onclick:event=>openGroupSheet(g,event.currentTarget),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}},
       title:'點開 '+grp(g.g).nm+' 族群明細'},
       h('span',{class:'mono pulse-rank',text:String(i+1).padStart(2,'0')}),
       h('div',{class:'pulse-name'},h('b',{text:grp(g.g).short}),
@@ -1072,7 +1072,7 @@ function buildDiverge(){
     if(!list.length){ box.appendChild(h('p',{style:'margin:0;font-size:13px;color:var(--muted)',
       text:`今日沒有落差達 ${D2.threshold} 個百分位點的個股。`})); return box; }
     const tb=h('div',{style:'display:grid;gap:7px'});
-    list.forEach(x=>tb.appendChild(h('div',{class:'clickrow',role:'button',tabindex:'0','aria-label':'查看 '+x.nm+' '+x.id+' 的完整個股明細',onclick:()=>openStockDetail(x.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(x.id);}},style:'display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 10px;align-items:baseline;font-size:13px;min-height:44px;padding:6px 0'},
+    list.forEach(x=>tb.appendChild(h('div',{class:'clickrow',role:'button',tabindex:'0','aria-label':'查看 '+x.nm+' '+x.id+' 的完整個股明細',onclick:event=>openStockDetail(x.id,null,null,event.currentTarget),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(x.id);}},style:'display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 10px;align-items:baseline;font-size:13px;min-height:44px;padding:6px 0'},
       h('div',{}, h('b',{text:x.nm}), h('span',{class:'mono',style:'margin-left:6px;font-size:var(--fs-115);color:var(--muted)',text:x.id}),
         h('span',{style:'margin-left:8px;font-size:var(--fs-115);color:var(--muted)',text:x.g})),
       h('div',{class:'mono',style:'font-size:12px;color:var(--ink2);white-space:nowrap'},
@@ -1167,7 +1167,7 @@ function rvDetailCard(R,row,focus,onFocus){
   if(row.risk_flagged)diagnostics.push('本日有交易所風險旗標；B 視角依既定契約套用上限。');
   const diagnosticList=h('ul',{});diagnostics.forEach(text=>diagnosticList.appendChild(h('li',{text})));
   return h('article',{class:'card rv-detail-card',style:`--rv-tone:${RV_META[focus].tone}`},
-    h('div',{class:'rv-detail-head'},h('div',{class:'rv-detail-title'},h('b',{text:row.nm}),h('span',{class:'mono',text:row.id})),h('button',{type:'button',class:'rv-detail-action','aria-label':'查看完整個股',onclick:()=>openStockDetail(row.id)},h('span',{text:'查看完整個股'}),h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:'arrow_forward'}))),
+    h('div',{class:'rv-detail-head'},h('div',{class:'rv-detail-title'},h('b',{text:row.nm}),h('span',{class:'mono',text:row.id})),h('button',{type:'button',class:'rv-detail-action','aria-label':'查看完整個股',onclick:event=>openStockDetail(row.id,null,null,event.currentTarget)},h('span',{text:'查看完整個股'}),h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:'arrow_forward'}))),
     h('p',{class:'rv-detail-eyebrow',text:'五個視角在本族群的相對位置（百分位）'}),scores,
     h('div',{class:'rv-explanation'},h('h3',{text:explanation.title}),h('p',{text:explanation.text})),
     h('div',{class:'rv-meta-grid'},
@@ -1276,7 +1276,7 @@ function buildLenses(){
       const r=x.r20, rc=r==null?'var(--muted)':(r>0?'var(--strong)':(r<0?'var(--weak)':'var(--muted)'));
       listBox.appendChild(h('div',{class:'card clickrow',role:'button',tabindex:'0',
         style:'padding:13px 15px;cursor:pointer',
-        onclick:()=>openStockDetail(x.id),
+        onclick:event=>openStockDetail(x.id,null,null,event.currentTarget),
         onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(x.id);}}},
         h('div',{style:'display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-bottom:2px'},
           h('b',{style:'font-size:14px',text:x.nm}),
@@ -1353,7 +1353,7 @@ function buildGroup(){
   const heatGrid=h('div',{class:'heatgrid'});
   heatGrid.appendChild(h('div',{class:'heat-head name',text:'族群'}));
   metrics.forEach(m=>heatGrid.appendChild(h('div',{class:'heat-head',html:m.label+'<br><span style="font-weight:500;opacity:.8">'+m.hint+'</span>'})));
-  heatSorted.forEach(g=>{ const row=h('div',{class:'clickrow heatrow',role:'button',tabindex:'0',onclick:()=>openGroupSheet(g),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}}});
+  heatSorted.forEach(g=>{ const row=h('div',{class:'clickrow heatrow',role:'button',tabindex:'0',onclick:event=>openGroupSheet(g,event.currentTarget),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}}});
     row.addEventListener('mouseenter',()=>GHL.enter(g.g)); row.addEventListener('mouseleave',()=>GHL.leave(g.g));
     GHL.add(g.g, ()=>{row.style.background='var(--inset)';row.style.borderRadius='8px';}, ()=>{row.style.background='';row.style.borderRadius='';});
     row.appendChild(h('div',{class:'heat-rowname',text:grp(g.g).short}));
@@ -1373,7 +1373,7 @@ function buildGroup(){
     h('div',{style:'font-size:var(--fs-105);color:var(--muted);font-weight:700',text:'修正日外資'})));
   [...G].sort((a,b)=>b.axis.price-a.axis.price).forEach((g,i)=>{ const st=stateStyle(g.state),mom=g.axis.price*100,dip=g.axis.dip;
     const md=deltaTxt(g.stats[2]&&g.stats[2][3]),dd=deltaTxt(g.stats[0]&&g.stats[0][3]);
-    board.appendChild(h('div',{class:'clickrow board-row',role:'button',tabindex:'0',onmouseenter:()=>GHL.enter(g.g),onmouseleave:()=>GHL.leave(g.g),onclick:()=>openGroupSheet(g),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}},style:'padding:13px 4px;border-top:1px solid var(--line2)'},
+    board.appendChild(h('div',{class:'clickrow board-row',role:'button',tabindex:'0',onmouseenter:()=>GHL.enter(g.g),onmouseleave:()=>GHL.leave(g.g),onclick:event=>openGroupSheet(g,event.currentTarget),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openGroupSheet(g);}},style:'padding:13px 4px;border-top:1px solid var(--line2)'},
       h('div',{class:'mono',style:'font-size:15px;font-weight:600;color:var(--muted);text-align:center',text:i+1}),
       h('div',{style:'min-width:0'},
         h('div',{style:'display:flex;align-items:center;gap:7px;flex-wrap:wrap'},h('b',{style:'font-size:15.5px;font-weight:700',text:grp(g.g).short}),
@@ -1500,7 +1500,7 @@ function buildStocks1c(){
   const count=h('span',{class:'mcount',role:'status','aria-live':'polite'});
   function row(s,rank){ const ts=tierStyle(s.tier),compCol=s.comp>=0?'var(--strong)':'var(--weak)';
     return h('div',{class:'clickrow srow',role:'button',tabindex:'0',style:'padding:16px 6px;border-top:1px solid var(--line2)',
-      onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}}},
+      onclick:event=>openStockDetail(s.id,null,null,event.currentTarget),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}}},
       h('div',{class:'mono stock-position',
         title:'族群內目前排序位置，依所選維度與方向排列，非並列名次'},
         h('span',{class:'stock-position-label',text:rank==null?'暫停／未交易 · 不列排序 ':'族群內排序位置 '}),
@@ -1580,24 +1580,44 @@ function openSheet(s){
     h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'五面向明細'}),list,
     h('div',{style:'margin-top:14px'},chipRow(stockChips(s)))];
   if(s.note&&s.note[1])body.push(h('p',{style:'margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line2);font-size:12.5px;color:var(--ink2);line-height:1.65',text:s.note[1]}));
-  sheetEl.replaceChildren(...body); showSheet();
+  sheetEl.replaceChildren(...body); showSheet(()=>openSheet(s));
 }
 let lastSheetFocus=null;
 let sheetInerted=[],sheetBodyOverflow='';
-function showSheet(){ const wasOpen=sheetwrap.classList.contains('on');
-  if(!wasOpen){lastSheetFocus=document.activeElement;sheetBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+// 一次開啟面板只佔一筆同網址歷史；換檔／返回族群不堆疊，Forward 可重開最後一檔。
+const sheetHistoryViews=new Map(),sheetHistorySession=Date.now()+'-'+Math.random();
+let sheetHistoryIndex=0,sheetHistoryId=null,restoringSheetHistory=false,sheetHistoryClosing=false,sheetLinkAfterClose=null;
+function showSheet(restore,opener=null){ const wasOpen=sheetwrap.classList.contains('on');
+  if(!wasOpen){lastSheetFocus=opener||document.activeElement;sheetBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
     sheetInerted=[...document.body.children].filter(el=>el!==sheetwrap&&el.tagName!=='SCRIPT').map(el=>({el,aria:el.getAttribute('aria-hidden')}));
-    sheetInerted.forEach(item=>{item.el.inert=true;item.el.setAttribute('aria-hidden','true');});}
+    sheetInerted.forEach(item=>{item.el.inert=true;item.el.setAttribute('aria-hidden','true');});
+    if(!restoringSheetHistory){sheetHistoryId=sheetHistorySession+'-'+(++sheetHistoryIndex);history.pushState({...history.state,scannerSheet:sheetHistoryId},'');}}
+  sheetHistoryViews.set(sheetHistoryId,restore);
   sheetwrap.classList.add('on');sheetwrap.setAttribute('aria-hidden','false');
   sheetEl.setAttribute('aria-labelledby','sheet-title');
   sheetEl.scrollTop=0;
   const c=sheetEl.querySelector('.sheetclose'); if(c) c.focus();
-  window.requestAnimationFrame(function(){ const c2=sheetEl.querySelector('.sheetclose'); if(c2&&document.activeElement!==c2) c2.focus(); }); }
-function closeSheet(){ if(!sheetwrap.classList.contains('on'))return;sheetwrap.classList.remove('on');sheetwrap.setAttribute('aria-hidden','true');document.body.style.overflow=sheetBodyOverflow;
+  window.requestAnimationFrame(function(){ const c2=sheetEl.querySelector('.sheetclose'); if(sheetwrap.classList.contains('on')&&c2&&document.activeElement!==c2) c2.focus(); }); }
+function hideSheet(){ if(!sheetwrap.classList.contains('on'))return;sheetwrap.classList.remove('on');sheetwrap.setAttribute('aria-hidden','true');document.body.style.overflow=sheetBodyOverflow;
   sheetInerted.forEach(item=>{item.el.inert=false;if(item.aria==null)item.el.removeAttribute('aria-hidden');else item.el.setAttribute('aria-hidden',item.aria);});sheetInerted=[];
-  if(lastSheetFocus&&lastSheetFocus.focus) lastSheetFocus.focus();
-  lastSheetFocus=null; }
-function openStockDetail(id,groupContext=null,chartContext=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
+  if(lastSheetFocus&&lastSheetFocus.isConnected&&lastSheetFocus.focus) lastSheetFocus.focus({preventScroll:true});
+  lastSheetFocus=null;sheetHistoryId=null; }
+function closeSheet(event){
+  if(!sheetwrap.classList.contains('on')||sheetHistoryClosing)return;
+  // 指南連結先退掉面板這筆歷史，再前往錨點，避免 Back 遇到空白面板歷史。
+  if(event?.currentTarget?.tagName==='A'){event.preventDefault();sheetLinkAfterClose=event.currentTarget.href;}
+  if(history.state?.scannerSheet===sheetHistoryId){sheetHistoryClosing=true;history.back();}
+  else {hideSheet();if(sheetLinkAfterClose){const href=sheetLinkAfterClose;sheetLinkAfterClose=null;location.assign(href);}}
+}
+function handleSheetHistory(event){
+  sheetHistoryClosing=false;
+  const id=event.state?.scannerSheet,restore=sheetHistoryViews.get(id);
+  if(restore){sheetHistoryId=id;restoringSheetHistory=true;try{restore();}finally{restoringSheetHistory=false;}}
+  else hideSheet();
+  if(sheetLinkAfterClose){const href=sheetLinkAfterClose;sheetLinkAfterClose=null;location.assign(href);}
+}
+window.addEventListener('popstate',handleSheetHistory);
+function openStockDetail(id,groupContext=null,chartContext=null,opener=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
   // 同族群、依綜合分排序的前後檔
   const sibs=(D.stocks||[]).filter(x=>x.g===s.g).sort((a,b)=>b.comp-a.comp);
   const idx=sibs.findIndex(x=>x.id===s.id);
@@ -1631,11 +1651,11 @@ function openStockDetail(id,groupContext=null,chartContext=null){ const s=D.byId
       onclick:()=>goToHeading(hd), text:label}));
     jumpSelect.appendChild(h('option',{value:String(index),text:label}));});
   jumpSelect.addEventListener('change',()=>{if(jumpSelect.value==='')return;goToHeading(headings[Number(jumpSelect.value)]);jumpSelect.value='';});
-  showSheet();
+  showSheet(()=>openStockDetail(id,groupContext,chartContext,opener),opener);
   // 明確的同日比較才跳回圖表；原本頂端的上一檔／下一檔仍從明細頂端開始。
   if(chartContext){const heading=card.querySelector('[data-history-chart] h3');if(heading)window.requestAnimationFrame(()=>goToHeading(heading,true));}
 }
-function openGroupSheet(g){
+function openGroupSheet(g,opener=null){
   const st=stateStyle(g.state),statList=h('div',{});
   const members=stockSearchGroups(D.stocks,D.groups,g.g,'','comp',true)[0];
   const memberLinks=h('section',{'aria-label':grp(g.g).nm+'成分股',style:'margin:16px 0'},
@@ -1665,7 +1685,7 @@ function openGroupSheet(g){
     h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'族群五項指標'}),statList];
   const gfs=flowSection(g.flow);
   if(gfs)body.push(h('div',{style:'margin-top:10px;border-top:1px solid var(--line)'},gfs));
-  sheetEl.replaceChildren(...body); showSheet();
+  sheetEl.replaceChildren(...body); showSheet(()=>openGroupSheet(g,opener),opener);
 }
 
 // 分層 pill 用：5 個元素分 → 極簡色條（紅＝相對強、綠＝相對弱，高度／濃度＝強度）
@@ -1700,7 +1720,7 @@ function buildTier(){
     return h('span',{class:'clickrow',role:'button',tabindex:'0',
       title:s.trading?`當日不參與排名；畫面訊號截至 ${s.trading.signalDate}`:(r==null?'':`20 日絕對報酬 ${fmtPct(r,1)}`
         +(mismatch?'(族群內相對靠前,但絕對報酬為負)':'')),
-      onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
+      onclick:event=>openStockDetail(s.id,null,null,event.currentTarget),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
       style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid '
         +(mismatch?'var(--weak)':'var(--line2)')+';border-radius:100px;padding:4px 11px;cursor:pointer'},
       h('b',{style:'font-weight:700',text:s.nm}),h('span',{class:'mono',style:'font-size:var(--fs-10);color:var(--muted)',text:grp(s.g).short}),
@@ -1729,7 +1749,7 @@ function buildTier(){
     const sorted=changed.slice().sort((a,b)=>b.lastChange-a.lastChange),show=curG?sorted:sorted.slice(0,15);
     fg.replaceChildren(...show.map(s=>{const from=s.states[0],to=s.states[s.states.length-1],up=tierRank(to)>tierRank(from);
       return h('div',{class:'clickrow',role:'button',tabindex:'0',
-        onclick:()=>openStockDetail(s.id),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
+        onclick:event=>openStockDetail(s.id,null,null,event.currentTarget),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
         style:'display:grid;grid-template-columns:1fr 104px 74px;gap:10px;align-items:center;padding:9px 2px;border-top:1px solid var(--line2)'},
         h('div',{style:'min-width:0'},h('b',{style:'font-size:13.5px;font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap',text:s.nm}),
           h('span',{class:'mono',style:'font-size:var(--fs-10);color:var(--muted)',text:s.id+' · '+grp(s.g).short})),

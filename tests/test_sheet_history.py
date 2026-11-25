@@ -36,7 +36,7 @@ const history={get state(){return entries[index].state},
  forward(){pending.push(()=>{if(index<entries.length-1){index++;listeners.popstate({state:this.state})}})}};
 function flush(){while(pending.length)pending.shift()();while(frames.length)frames.shift()()}
 let currentView='';
-function render(view){currentView=view;showSheet(()=>render(view))}
+function render(view,trigger=null){currentView=view;showSheet(()=>render(view,trigger),trigger)}
 """
         cases = r"""
 assert.equal(typeof listeners.popstate,'function');
@@ -56,6 +56,9 @@ assert.equal(currentView,'stock-peer');assert.equal(sheetwrap.classList.open,tru
 // Rapid Escape/close/backdrop requests must enqueue only one traversal.
 closeSheet();closeSheet();assert.equal(pending.length,1);flush();
 assert.equal(index,1);assert.equal(sheetwrap.classList.open,false);assert.equal(scrollY,700);
+// Touch activation of a custom role=button may leave BODY active: use currentTarget.
+document.activeElement=document.body;render('stock-touch',opener);flush();scrollY=700;closeSheet();flush();
+assert.equal(document.activeElement,opener);assert.equal(scrollY,700);assert.equal(index,1);
 // A nested group -> stock -> group transition also takes only one entry.
 render('group');render('stock-in-group');render('group-return');flush();scrollY=700;
 assert.equal(entries.length,3);closeSheet();flush();assert.equal(index,1);

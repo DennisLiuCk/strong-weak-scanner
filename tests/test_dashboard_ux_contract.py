@@ -360,7 +360,7 @@ class DashboardUxContractTest(unittest.TestCase):
     # ---------- 抽屜:focus 管理 ----------
 
     def test_sheet_manages_focus_and_escape(self):
-        for marker in ("lastSheetFocus=document.activeElement",
+        for marker in ("lastSheetFocus=opener||document.activeElement",
                        "if(c) c.focus()",
                        "lastSheetFocus.focus({preventScroll:true})",
                        "if(e.key==='Escape'){e.preventDefault();closeSheet();return;}",
