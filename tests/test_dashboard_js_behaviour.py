@@ -70,6 +70,28 @@ class DashboardJsBehaviourTest(unittest.TestCase):
 
     # ---------- fmtPct:唯一的百分比格式化入口 ----------
 
+    def test_stock_lookup_matches_exact_id_before_loose_matches(self):
+        pre = extract("stockLookupMatches") + r"""
+const stocks=[
+  {id:'2000',nm:'創意電子'},
+  {id:'3443',nm:'創意'},
+  {id:'3000',nm:'測試3443'},
+  {id:'3661',nm:'世芯-KY'},
+];
+"""
+        got = self.run_js(pre, [
+            ('空白不搜尋', "stockLookupMatches(stocks,'  ').length"),
+            ('完整股號唯一且第一', "stockLookupMatches(stocks,'3443').map(x=>x.id)"),
+            ('名稱含股號可找到', "stockLookupMatches(stocks,'測試3443').map(x=>x.id)"),
+            ('名稱關鍵字可找到', "stockLookupMatches(stocks,'世芯').map(x=>x.id)"),
+        ])
+        self.assertEqual(got[0], 0)
+        self.assertEqual(got[1][0], '3443')
+        self.assertIn('3000', got[1])
+        self.assertEqual(got[2], ['3000'])
+        self.assertEqual(got[3], ['3661'])
+
+
     def chart_dom(self):
         return r"""
 class Element {

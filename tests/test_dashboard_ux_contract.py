@@ -272,6 +272,21 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("${D.allStocks.length}", self.template)
         self.assertNotIn("把全 121 檔", self.template)
 
+    # ---------- 首屏直接查個股 ----------
+
+    def test_first_screen_has_direct_stock_lookup(self):
+        for marker in ("function buildHeroLookup()", "function stockLookupMatches(",
+                       "role:'combobox'", "'aria-autocomplete':'list'",
+                       "role:'listbox'", "hero-stock-lookup", "快速查個股"):
+            self.assertIn(marker, self.template)
+        self.assertIn("stockLookupMatches(D.allStocks,q)", self.template)
+        self.assertIn("placeholder:'輸入股號或名稱，例如 3443'", self.template)
+        self.assertIn("openStockDetail(stock.id,null,null,input)", self.template)
+        overview = self.template[self.template.index("function buildOverview()"):
+                                 self.template.index("function buildStrategyStatus()")]
+        self.assertIn("buildHeroLookup()", overview)
+        self.assertLess(overview.index("buildHeroLookup()"), overview.index("class:'command-foot'"))
+
     # ---------- 個股層:族群選單 + 搜尋排序 + 點列開詳情 ----------
 
     def test_stock_list_has_group_selector_search_sort_and_detail_click(self):
