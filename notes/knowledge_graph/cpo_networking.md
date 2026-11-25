@@ -14,7 +14,7 @@ schema_version: 1
 graph_id: cpo-networking
 root_node_id: concept:cpo-networking
 label: AI 光學三軸組態與產品證據
-summary: 拆開光引擎、訊號處理與雷射三軸，以及鏈路兩端和埠數分母；日月光新增第四季CPO量產自述，緯穎仍為具名系統展示，均不能跳過產品驗收與實際財務橋接。
+summary: 拆開光引擎、訊號處理與雷射三軸；Lambda新增Quebec部署自述，但GPU規模不能換算OSFP或收入。Q3450新版手冊標籤前進而佈線分母仍矛盾；日月光量產與緯穎展示也各自保留邊界。
 article_ids: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
 status: active
 -->
@@ -65,18 +65,18 @@ view: company
 from_id: company:nvidia
 to_id: concept:cpo-networking
 relation: owns_platform
-claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C24
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C24,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C30
 note_refs:
 evidence_state: verified
 commercial_stage: production
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-05-31
-review_due: 2026-08-26
+as_of: 2026-11-16
+review_due: 2026-12-02
 status: active
-boundary: NVIDIA 將 Spectrum-X Ethernet Photonics 定義為進入生產；未揭露 CPO 交換器數、埠數、收入、客戶驗收或全網路占比。
-next_trigger: NVIDIA 或首批採用者披露 production shipment、部署交換器數、埠數與實際可靠度／功耗結果。
+boundary: Spectrum-X生產說法與Lambda Quebec的NVIDIA Photonics部署分開；後者為客戶自述同事件鏈，沒有完整SKU／韌體與switch／link census，不把GPU數或未附原始事件的可靠度宣稱換成模組減量、台股收入或獨占性。
+next_trigger: 同一Quebec部署的固定配置、逐鏈路端點／料號、installed／active／spare分母與可靠度事件／暴露；收入另需同期間財務。
 -->
 
 <!-- knowledge_edge
@@ -445,18 +445,18 @@ view: industry
 from_id: concept:cpo-networking
 to_id: concept:optical-link-endpoint-pairing
 relation: includes
-claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C16,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C17
+claim_refs: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C16,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C17,MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE#C31
 note_refs:
 evidence_state: verified
 commercial_stage: capability
 materiality: named_product
 exclusivity: unknown
 exclusivity_scope:
-as_of: 2026-08-23
-review_due: 2026-09-30
+as_of: 2026-11-24
+review_due: 2026-12-02
 status: active
-boundary: NVIDIA Q3450 正式手冊直接列出 CPO↔CPO、CPO↔pluggable switch 與 CPO↔pluggable compute 的支援拓撲；同一手冊對 72／144 MPO connectors 尚有衝突，兩個數都不得做 module 算術，且不證明三種配對的客戶 deployed mix、模組數、出貨或財務。
-next_trigger: NVIDIA 先在同一 revision 裁決 72／144 MPO 與一對一／一對二 port mapping；客戶或平台再公開逐鏈路 endpoint-pair BOM、part number、ports per module 與 installed／active／spare census。
+boundary: Q3450三種支援端點拓撲仍不是部署配比；1.6佈線段寫144 MPO且每接頭兩個ports，卻同時寫總144 ports及72nd接頭，不能宣稱分母已裁決，也不能計算模組或收入。
+next_trigger: NVIDIA在同一revision給出無矛盾connector／port mapping，客戶再公開逐鏈路BOM與installed／active／spare census；不借用GPU數補分母。
 -->
 
 <!-- knowledge_edge
@@ -495,6 +495,6 @@ exclusivity_scope:
 as_of: 2026-08-24
 review_due: 2026-09-30
 status: active
-boundary: 研究中心八欄護照依單一 NVIDIA 手冊消息鏈整理；Q3450 文件只證實目前標為 Prototype 的指定型號具有 18×8 ELS 配置、模組級服務、檢查清潔工具、powered-on 與 30 分鐘條件，不證明 hitless、實際受影響 links、MTTR、備品可得性、換後 BER／FEC／flap、客戶部署或財務。
+boundary: 研究中心八欄護照依單一NVIDIA手冊鏈整理；Prototype是8/23歷史讀值而非現況（新版見C31）。原程序的18×8 ELS、模組級服務、清潔工具、powered-on及30分鐘條件，不證明hitless、受影響links、MTTR、備品、換後BER／FEC／flap或財務。
 next_trigger: 具名客戶以同一系統與程序版本公布 emitter／module 故障、受影響 links、流量切換、授權人員、備品工具、逐階段時間戳、清潔結果、換後錯誤與重複 RMA，並與 SLA 及成本對帳。
 -->

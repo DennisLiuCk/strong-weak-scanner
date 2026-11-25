@@ -1,5 +1,9 @@
 # 資料先是電、再變成光：別只問 CPO 或可插拔，要拆光引擎、訊號處理與雷射位置
 
+> 2026-11-25 新證據：Lambda 已自行公告具名 CPO 機群部署；NVIDIA 1.6 手冊的
+> Q3450-LD 生命週期欄也已不同於本文 8 月截圖。文末「部署不等於需求分母」保留這兩項
+> 進展及仍未解決的佈線矛盾；不以新案例刷新全市場共存主命題的證據日期。
+
 <!-- research_topic
 topic_id: MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE
 schema_version: 3
@@ -20,7 +24,7 @@ evidence_role: candidate_source
 route: market_issue_watch
 thesis_claim_id: C9
 base_confidence: medium
-confidence_basis: OIF 正式文件把光引擎位置、訊號處理方式與雷射位置拆成可組合的設計選擇，NVIDIA 與 Marvell 又證實 CPO 與可插拔產品路徑同時存在；但 NPO／外部雷射的具名部署、多供應商互通、現場可靠度、產品配比與財務分母仍未公開
+confidence_basis: OIF把光引擎、訊號處理及雷射位置拆成設計選擇，NVIDIA與Marvell提供共存路徑；Lambda另有具名外部光源CPO部署自述，但不足以證明全部三軸組合、NPO採用、多供應商互通或全市場產品配比與財務，C9主命題時鐘維持不變
 cross_company_numbers: false
 schema_migrated_at: 2026-08-02
 -->
@@ -783,7 +787,10 @@ evidence: sources:S15,S17
 - **維持上電／維持服務**：維持上電只代表設備不必整機斷電；維持服務還要證明受影響鏈路、流量與工作負載沒有中斷或已成功切換。
 - **Gbps**：每秒十億位元；`4×200 Gbps＝800 Gbps` 是指定光學 lanes 的名目合計，不等於扣除協定與錯誤更正後的有效資料量。
 - **RMA／MTTR／SLA**：RMA 是故障品退回維修或更換流程，MTTR 是從故障到恢復的平均修復時間，SLA 是服務承諾；30 分鐘模組缺席上限不能替代這三本帳。
-- **Ordering Information／Lifecycle Phase／Prototype／ES**：Ordering Information 是官方訂購資訊，Lifecycle Phase 是產品生命週期標籤；Prototype 表示目前仍在原型階段，ES 只保留為該列的料號描述標記，文件未在此頁展開全名，兩者都不能由維修手冊存在推成大量部署。
+- **Ordering Information／Lifecycle Phase／Prototype／ES**：Ordering Information 是官方訂購資訊，Lifecycle Phase 是產品生命週期標籤；Prototype是8/23擷取的原型階段歷史標籤，不能讀成現況。ES只保留為該列料號描述，文件未在此頁展開全名，兩者都不能由維修手冊存在推成大量部署。
+- **Quebec**：加拿大魁北克；此處是客戶指定園區，不代表全部機群。
+- **SKU**：用來辨識具體產品配置的料號；平台名稱不能取代它。
+- **P-Rel**：新版手冊的生命週期欄位原字串；來源未展開縮寫，因此只照錄，不自行等同驗收。
 - **Installation**：把新模組清潔、檢查並裝回指定位置的安裝步驟；完成 installation 仍要另外確認鏈路、錯誤與工作負載恢復。
 - **前面板**：交換器機箱面向維修人員、安裝光模組與光纖接頭的位置。
 - **連接埠**：交換器對外收送一條連線的介面；產品開始生產不等於已知部署了多少個連接埠。
@@ -1037,8 +1044,8 @@ ELS 模組。[S15]
 | 7. 事件時間軸 | 告警、隔離、抽出、裝回、重訓練、恢復與 RMA 時間 | 30 分鐘上限等於 MTTR 或 SLA |
 | 8. 換後服務結果 | link、traffic、BER／FEC、flap、溫度、重複故障與客戶簽收 | 模組裝回等於長期可靠度與部署成功 |
 
-還要把「有完整維修手冊」和「已大量部署」分開。截至本輪擷取，NVIDIA 同一手冊的 Ordering
-Information 仍把 Q3450-LD 料號標成 `ES`、Lifecycle Phase 列為 `Prototype`。[S15] 這不否定
+還要把「有完整維修手冊」和「已大量部署」分開。2026-08-23擷取時，NVIDIA 同一手冊的 Ordering
+Information 把 Q3450-LD 料號標成 `ES`、Lifecycle Phase 列為 `Prototype`。[S15] 新版標籤已變，見C31；舊讀值不否定
 工程樣品、私有試點或日後轉階段，也不能拿來推翻不同具名產品的 production 敘述；它只提醒
 讀者：服務程序能證明平台已設計維修路徑，不能自行補成 installed base、現場維修實績或收入。
 
@@ -1052,7 +1059,7 @@ Information 仍把 Q3450-LD 料號標成 `ES`、Lifecycle Phase 列為 `Prototyp
   可能高於單看「可上電更換」的想像。
 
 兩邊共同需要具名客戶的事件分母、受影響 links、流量切換、備品可得性、逐階段時間戳、清潔
-次數、換後錯誤與重複故障；不能用程序頁取代 field outcome。本輪是 N=1 個目前標為 Prototype
+次數、換後錯誤與重複故障；不能用程序頁取代 field outcome。8/23擷取是 N=1 個當時標為 Prototype
 的 Q3450 產品配置、
 N=1 份 NVIDIA 官方手冊消息鏈，不是客戶或維修事件樣本；18×8＝144 是指定配置的完整列舉，
 不是抽樣估計，因此沒有 sampling SE／t。實際維修事件、MTTR、受影響 link-hours、客戶部署與
@@ -1303,7 +1310,7 @@ socketed NPO 的價值分配仍可能不同，更不能把平台生產直接改�
 | 6. 供應商出貨、份額與價格可辨識 | 具名供應商有出貨量、單價、份額、產能利用與重複訂單 | 現有來源沒有 SPIL 或 Lumentum 的產品分母 | 公司與客戶文件對上同期間組態與量產出貨 | 平台產品生產不能直接換算供應商營收 |
 | 7. 收入、毛利與現金流留下來 | 新增製造內容能接回公司收入、成本、毛利與現金流 | 日月光尚未拆出 Spectrum-X／CPO 的財務貢獻 | 具名產品收入、成本、毛利、資本支出與收款 | 營收成長不等於扣除良率、設備與維修成本後仍受惠 |
 
-本輪框架與 IA 能到第一、二關，兩條具名產品路徑各自走到第三關；SPIL 與 Lumentum 最多提供
+8月框架與 IA 能到第一、二關，兩條具名產品路徑各自走到第三關；當時SPIL 與 Lumentum 最多提供
 第四關的角色線索，尚未通過第五到第七關。七關是證據排序，不是技術排名、供應商名單、營收
 預測或投資建議。
 
@@ -1698,4 +1705,154 @@ from: triaged
 to: triaged
 reason: added_ase_management_reported_cpo_production_and_official_watch_source_without_financial_attribution_or_thesis_clock_refresh
 evidence: sources:S24,S25
+-->
+
+## 2026-11-25：部署不等於需求分母
+
+新手可以把證據分成三層：**有客戶在用、設備怎麼接、供應商賺了多少**。第一層前進，
+後兩層不會自動成立。**retimer** 是重新整理高速電訊號的元件；原稿說不需要它，
+不能自行改成已通過某一版 linear／LPO 標準。
+
+**證實的是公告內容（C30）**：Lambda 11/16 表示已在 Quebec 園區以 NVIDIA Photonics
+CPO 連接超過一萬顆 Blackwell Ultra GPU。這使本文不再只能指向供應商型錄或展會展示。
+但 GPU 是運算規模，不是交換器、鏈路或可插拔模組的數量。[S26]
+
+**另一項證實（C31）**：11/24 更新的 NVIDIA 1.6 手冊把 Q3450-LD 列為 `P-Rel`，
+所以 C23 的 `Prototype` 只能作為 8/23 歷史紀錄。`P-Rel` 的縮寫不在該表解釋，
+本研究不擅自翻成客戶驗收。新版佈線頁卻同時寫「144 MPO、每接頭兩個 ports、合計
+144 ports」，並沿用第 72 接頭的標示；這仍不是可供重算的無矛盾 BOM。[S28–S30]
+
+**推論／待驗證**：具名部署把問題推進到「哪些鏈路、多少模組、什麼期間」；不能由
+機群 GPU 數換算遠端 OSFP，也不能拿平台部署補上緯穎另一套展示的測試（T6）。
+思考三題：是否公布逐鏈路兩端與料號？可靠度比較有事件數和暴露時數嗎？出貨與收入是否
+能對到同一客戶、產品及期間？這三題仍分別由 T4、T8 及台灣公司財務查核追蹤。
+
+<!-- research_source
+source_id: S26
+role: company_release
+source_kind: document
+publisher: Lambda
+title: Lambda announces the world's first large-scale CPO deployment of NVIDIA Photonics switches
+published_at: 2026-11-16
+captured_at: 2026-11-25
+accepted_at: 2026-11-25
+status: active
+url: https://lambda.com/blog/worlds-first-large-scale-deployment-of-nvidia-photonics-switches-with-cpo
+locator: 日期、Quebec deployment 開頭及配置段；原始 HTML SHA256 ca5536fbd3fe21ca66b0204ee8d98877cd46e786180cc0dd18678e5d44186afe
+limitation: 客戶自述且與NVIDIA同一事件鏈；沒有完整SKU／韌體、switch／port census、逐事件與暴露時間、客戶BOM或供應商財務；不引用未附原始樣本的改善倍率作獨立統計結果
+independence_group: nvidia-lambda-cpo-deployment
+-->
+
+<!-- research_source
+source_id: S27
+role: company_release
+source_kind: document
+publisher: NVIDIA
+title: Lambda Boosts AI Factory Resiliency and Efficiency With NVIDIA Photonics
+published_at: 2026-11-16
+captured_at: 2026-11-25
+accepted_at: 2026-11-25
+status: active
+url: https://blogs.nvidia.com/blog/lambda-photonics/
+locator: deployment opening及Cooler Optics, Replaceable Light Sources段；原始 HTML SHA256 3da8b9eb5327936a87e874f1a1c625fda784de76c5c1387aaeade306566cc6c0
+limitation: 與Lambda同一部署消息鏈，不算第二個獨立客戶／試驗；供應商的比較與可靠度宣稱沒有可重算原始事件和獨立分母，不能外推全市場或台股獲利
+independence_group: nvidia-lambda-cpo-deployment
+-->
+
+<!-- research_source
+source_id: S28
+role: other_primary
+source_kind: document
+publisher: NVIDIA
+title: Q3xxx XDR InfiniBand Switch Systems User Manual 1.6 — Ordering Information
+published_at: 2026-11-24
+captured_at: 2026-11-25
+accepted_at: 2026-11-25
+status: active
+url: https://networking-docs.nvidia.com/xdrswitcheshw/1.6
+locator: Ordering Information的Q3450-LD列及頁尾更新日；HTML SHA256 2d92cfbfd536987e3c5a4af5ab93bb3c5204bfc8c39cba4501f05c44352c6813
+limitation: 固定1.6路徑仍可能修改，故保留原件SHA；Lifecycle Phase寫P-Rel但未解釋縮寫，description仍有ES；不是出貨、客戶驗收或Lambda平台SKU對帳
+independence_group: nvidia-cpo-platform
+-->
+
+<!-- research_source
+source_id: S29
+role: other_primary
+source_kind: document
+publisher: NVIDIA
+title: Q3xxx XDR InfiniBand Switch Systems User Manual 1.6 — Cable Installation
+published_at: 2026-11-24
+captured_at: 2026-11-25
+accepted_at: 2026-11-25
+status: active
+url: https://networking-docs.nvidia.com/xdrswitcheshw/1.6/cable-installation
+locator: Splitting Options中Q3450段與Q3450 Co-Packaged Optics Topology表；HTML SHA256 11df74473c75e36d967ac4419ced6cf8b75dfcdd3520262a72075b78bf85fadb
+limitation: 同段connector數、每connector port數、總port數與72nd標示仍互不相容；不能任選一個作BOM、installed／active／spare或模組需求算術
+independence_group: nvidia-cpo-platform
+-->
+
+<!-- research_source
+source_id: S30
+role: other_primary
+source_kind: document
+publisher: NVIDIA
+title: Q3xxx XDR InfiniBand Switch Systems User Manual 1.6 — Document Revision History
+published_at: 2026-11-24
+captured_at: 2026-11-25
+accepted_at: 2026-11-25
+status: active
+url: https://networking-docs.nvidia.com/xdrswitcheshw/1.6/document-revision-history
+locator: November 2026 revision1.6新增Q3300-LD及頁尾更新日；HTML SHA256 8c76fdb7d2196ca85627d1ac80898c07d0f2219b83dee14966875dd8c6e0ffbb
+limitation: 版本史只列新增型號，沒有宣告已裁決Q3450全部欄位衝突；不是客戶部署時間或產品驗收紀錄
+independence_group: nvidia-cpo-platform
+-->
+
+<!-- research_claim
+claim_id: C30
+label: verified
+status: active
+claim: Lambda在2026-11-16自述Quebec園區的NVIDIA Photonics CPO已連接超過一萬顆Blackwell Ultra GPU，每台交換器為144個800Gb/s ports及18個可移除外部光源，光引擎在switch ASIC旁且不需retimer
+supporting_source_ids: S26,S27
+contrary_source_ids:
+as_of: 2026-11-16
+basis: 客戶原稿列出地點、平台、機群規模及三軸配置；供應商同日原稿交叉定位同一部署，不把同鏈兩稿算獨立重複試驗
+boundary: 只確認具名客戶公告；GPU數不是switch或link分母，配置未明列完整SKU／韌體或標準profile，未驗證benchmark因果倍率／SE，也不證明OSFP減量與台股財務；不刷新C9
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C31
+label: verified
+status: active
+claim: NVIDIA於2026-11-24更新的1.6手冊將Q3450-LD的Lifecycle Phase列為P-Rel，但佈線頁仍存在connector與port對應的內部衝突；C23的Prototype保留為8/23歷史讀值
+supporting_source_ids: S28,S29,S30
+contrary_source_ids:
+as_of: 2026-11-24
+basis: Ordering Information與Splitting Options逐欄對照，revision history固定1.6；新版同列144 MPO、每接頭兩個ports、總144 ports及72nd接頭，不能同時作一個一致分母
+boundary: 不將P-Rel自行展開為量產或驗收，不改寫C23歷史讀值，也不以新版首頁數字抹除佈線矛盾；單一手冊鏈、未形成客戶BOM與財務證據
+verification_needed:
+resolution:
+-->
+
+<!-- monitoring_item
+monitor_id: T8
+status: active
+claim_ids: C30,C31,C19
+metric: Lambda同一Quebec部署的固定配置、逐鏈路分母、可靠度原始事件與供應商財務
+source_ids: S26,S27,S28,S29,S30
+watch_source_ids: S16,S15
+frequency: weekly
+frequency_detail: 每週回查Lambda原公告及NVIDIA手冊是否新增同部署附件或勘誤；新客戶或新型號另立cohort，不與Quebec合併
+next_check: 2026-12-02
+trigger: 同一Quebec部署公開固定SKU／韌體、endpoint-pair與installed／active／spare分母，或提供可重算的時間窗、事件、暴露／退出及比較條件；營收另需同期間具名交易與認列
+invalidation: 客戶撤回部署或修正平台／規模，原始事件否定原比較，或手冊勘誤縮窄可用配置時分項修正；沒有新附件不等於部署失敗
+-->
+
+<!-- transition
+date: 2026-11-25
+from: triaged
+to: triaged
+reason: added_customer_reported_cpo_deployment_and_revision_specific_manual_delta_while_retaining_bom_conflict_and_thesis_clock
+evidence: sources:S26,S27,S28,S29,S30
 -->

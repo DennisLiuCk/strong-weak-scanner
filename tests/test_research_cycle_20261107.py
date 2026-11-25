@@ -78,7 +78,15 @@ class ResearchCycleNovember7Test(unittest.TestCase):
     def test_cpo_keeps_original_monitor_and_unknown_financial_materiality(self):
         path = 'notes/research_topics/2026-08-01_cpo_pluggable_coexistence.md'
         monitors = keyed(path, 'monitoring_item', 'monitor_id')
-        self.assertNotIn('T8', monitors)
+        # November 7 did not add a successor to T2. A later, separately sourced
+        # Lambda deployment may have T8, but must not replace ASE's old trigger.
+        with (ROOT / 'notes/research_method_reviews/monitor_reviews.csv').open(encoding='utf8', newline='') as handle:
+            cpo_reviews = [r for r in csv.DictReader(handle)
+                           if r['topic_id'] == 'MI-2026-08-01-CPO-PLUGGABLE-COEXISTENCE'
+                           and r['checked_at'] <= AS_OF]
+        self.assertNotIn('T8', {r['monitor_id'] for r in cpo_reviews})
+        self.assertEqual(monitors['T8']['claim_ids'], 'C30,C31,C19')
+        self.assertIn('同一Quebec部署', monitors['T8']['trigger'])
         self.assertEqual(monitors['T2']['status'], 'active')
         self.assertIn('量產、客戶或收入', monitors['T2']['trigger'])
         edge = keyed('notes/knowledge_graph/cpo_networking.md', 'knowledge_edge', 'edge_id')['KG-CPO-C05']

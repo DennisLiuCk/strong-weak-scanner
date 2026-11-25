@@ -1582,12 +1582,70 @@ reason: separated_versioned_kvcr_example_static_checks_and_cxl_demos_from_operat
 evidence: sources:S33,S34,S35
 -->
 
+<!-- research_source
+source_id: S36
+role: company_release
+source_kind: document
+publisher: HP Inc.
+title: HP Inc. Reports Fiscal 2026 Full Year and Fourth Quarter Results
+published_at: 2026-11-24
+captured_at: 2026-11-25
+accepted_at: 2026-11-25
+status: active
+url: https://www.hp.com/us-en/newsroom/press-releases/2026/hp-inc-reports-fiscal-2026-full-year-and-fourth-quarter-results.html
+locator: Fiscal 2026 fourth quarter segment results與CEO成本說明、Stock-Based Compensation Expense Change；原HTML 284797 bytes，SHA256 c8369ab9db51492567151fc166bb12564f15d0c1012c79ca362d234858213e5b
+limitation: 公司業績新聞稿，不是審計結論；Personal Systems不是伺服器或HBM市場。未分拆記憶體採購價、同款售價與成本對利潤的因果貢獻；FY27 non-GAAP另有口徑改動
+independence_group: hp-inc
+-->
+
+<!-- research_claim
+claim_id: C47
+label: verified
+status: active
+claim: HP FY26第四季Personal Systems美元營收年增14%、總台數年減29%、部門營業利益率3.0%；公司同時描述記憶體與儲存成本壓力，並宣布FY27起non-GAAP排除股票薪酬
+supporting_source_ids: S36
+contrary_source_ids:
+as_of: 2026-11-24
+basis: 只逐欄核對同一公司同一財季的營收、台數及部門利益率，另保留下一年度調整口徑；公司全體實績而非抽樣估計，SE與t不適用
+boundary: 不是記憶體成本的單一因果估計；不由營收除台數計算同款漲幅，也不把PC結果推成HBM需求或台廠獲利。原T8採購／定價共同鍵仍不足，C8主命題時計不動
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C48
+label: inference
+status: active
+claim: 買方營收增加不能代替實物需求增加；研究記憶體成本傳導時須把台數、產品組合、同款價格與利潤拆帳，跨年度還要固定會計調整口徑
+supporting_source_ids: S36
+contrary_source_ids:
+as_of: 2026-11-24
+basis: HP同季營收與台數方向分歧，且下一年度non-GAAP定義改動，構成比較方法的具體案例
+boundary: 這是研究比較規則，不推定HP的因果分解，也不比較HP與記憶體供應商的利潤率或作投資推薦
+verification_needed: 同產品與期間的採購、售價、數量、產品組合與可比利潤橋接
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-25
+from: triaged
+to: triaged
+reason: separated_hp_buyer_revenue_units_margin_and_accounting_basis_without_thesis_clock_refresh
+evidence: sources:S36
+-->
+
 ## 新手先讀：這篇在講什麼
+
+**11/25 補充：賣得更貴或組合改變，不等於賣得更多。** HP 個人運算事業在FY26第四季呈現營收增加、台數減少，部門營業利益率為3.0%。這提醒我們把收入、數量與利潤分開；它沒有證明差異全由記憶體漲價造成，也不能換成HBM或台廠訂單。[C47][C48]
+
+**non-GAAP**是公司調整部分費用後的績效口徑。HP宣布下一年度排除股票薪酬，因此比較未來利潤時要先對齊定義。接著問：同款產品真的漲價，還是高價款占比變多？成本提高由誰承擔？T8繼續追同產品的採購、定價與利潤橋接；取得這些之前，原因仍待驗證。
 
 **11/23 補充：有恢復教學，不等於已通過故障考試。** Dynamo 已有固定版本的 KVCR 復原範例，但作者明說靜態測試不能代替跨主機傳輸與實際復原驗證。SK hynix 的新展場回顧則把共享快取、共享 token 與 CXL 卸載分開；展示仍不能替同一正式工作補上成本與故障結果。[C45][C46]
 
 ### 名詞小字典
 
+- **FY26／FY27（2026／2027會計年度）**：依HP自己的年度結算期間，不直接等於曆年；本文第四季指HP的FY26第四季。
+- **non-GAAP（非一般公認會計原則調整績效）**：公司排除部分項目後呈現的數字，須另讀調整表與前後年度定義，不可直接與未調整數字相比。
 - **RDMA（遠端直接記憶體存取）**：設備直接讀寫另一端記憶體的資料路徑；設定完成不等資料已正確傳輸或故障後可恢復。
 - **SC26（2026超級運算大會）**：本文展示資料的活動背景；展會日期不是產品交付日。
 - **v1.6.0（Dynamo版本號）**：本文固定引用的軟體發布版本，不代表其他版本或現場已部署的版本。

@@ -16,6 +16,26 @@ status: active
 -->
 
 <!-- knowledge_edge
+edge_id: KG-MEM-I28
+view: industry
+from_id: concept:ai-memory-hierarchy
+to_id: process:memory-commercial-evidence-ledgers
+relation: requires
+claim_refs: MI-2026-08-02-AI-MEMORY-HIERARCHY#C48
+note_refs:
+evidence_state: inference
+commercial_stage: concept
+materiality: adjacent
+exclusivity: unknown
+exclusivity_scope:
+as_of: 2026-11-24
+review_due: 2026-12-25
+status: active
+boundary: HP買方案例只說明營收、台數、組合與調整利潤須分帳；不證明記憶體價格因果、HBM需求、供應商財務或台灣公司受惠，不刷新既有邊期限。
+next_trigger: 取得同產品期間的採購、售價、台數、組合與可比利潤橋接，或HP修正數值及調整口徑；依T8月頻回查。
+-->
+
+<!-- knowledge_edge
 edge_id: KG-MEM-C01
 view: company
 from_id: company:nvidia

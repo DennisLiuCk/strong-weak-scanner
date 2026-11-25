@@ -31,9 +31,19 @@ class SeptemberResearchCycleTest(unittest.TestCase):
         for field in ("metric", "trigger", "invalidation", "next_check", "frequency"):
             self.assertEqual(monitors["T5"][field], monitors["T3"][field])
         graph = (ROOT / "notes/knowledge_graph/cpo_networking.md").read_text(encoding="utf8")
-        corrected = [e for e in records(graph, "knowledge_edge") if e["claim_refs"].endswith("#C24")]
-        self.assertEqual(len(corrected), 4)
+        corrected = [e for e in records(graph, "knowledge_edge")
+                     if any(ref.endswith("#C24") for ref in e["claim_refs"].split(","))]
+        self.assertEqual({e["edge_id"] for e in corrected},
+                         {"KG-CPO-C01", "KG-CPO-I01", "KG-CPO-I02", "KG-CPO-I04"})
         for edge in corrected:
+            if edge["edge_id"] == "KG-CPO-C01":
+                # A later named deployment has its own source date; the three
+                # C24-only edges must not inherit that unrelated fresh clock.
+                self.assertIn("#C30", edge["claim_refs"])
+                self.assertEqual(edge["as_of"], claims["C30"]["as_of"])
+                self.assertEqual(edge["review_due"], monitors["T8"]["next_check"])
+                self.assertIn("不把GPU數", edge["boundary"])
+                continue
             self.assertEqual(edge["as_of"], "2026-05-31")
             self.assertEqual(edge["review_due"], "2026-08-26")
 
