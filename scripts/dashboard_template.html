@@ -727,7 +727,7 @@ function priceChart(chart, tech){
   const on=k=>st.ind[k] && has(k);
 
   const host=h('div',{class:'card',style:'padding:20px 22px'});
-  let chartBox=h('div',{}), readout=h('div',{});
+  let chartBox=h('div',{}), readout=h('div',{}), tap=null, touchUntil=0;
 
   function buildSvg(){
     const R=st.range, s=a=>(a||[]).slice(-R);
@@ -826,10 +826,27 @@ function priceChart(chart, tech){
       style:'display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;line-height:1.7;margin-bottom:10px;color:var(--ink2)'});
     chartBox=h('div',{tabindex:'0',role:'group','aria-label':'歷史股價圖表；左右方向鍵切換交易日，Home 最早，End 最新',
       style:'background:var(--inset);border:1px solid var(--line2);border-radius:12px;padding:14px 12px 6px'});
-    // 事件綁在不會被重繪替換的容器；觸控只用 click，不攔截垂直捲動。
-    chartBox.addEventListener('pointermove',ev=>{if(ev.pointerType!=='mouse')return;const i=pointIndex(ev);if(i!==st.hover){st.hover=i;drawSvg();}});
+    // 只接受沒有滑動的按下／放開；捲動取消後的相容滑鼠事件不可另選日期。
+    // 事件綁在穩定容器，不攔截 touchmove／preventDefault，保留原生垂直捲動。
+    const touchGuard=ev=>{if(ev.pointerType!=='mouse')touchUntil=Date.now()+800;};
+    chartBox.addEventListener('pointerdown',ev=>{
+      touchGuard(ev);
+      tap=ev.isPrimary&&ev.button===0?{id:ev.pointerId,x:ev.clientX,y:ev.clientY}:null;
+      if(ev.pointerType!=='mouse'&&st.hover!=null){st.hover=null;drawSvg();}
+    });
+    chartBox.addEventListener('pointermove',ev=>{
+      touchGuard(ev);
+      if(tap&&tap.id===ev.pointerId&&Math.hypot(ev.clientX-tap.x,ev.clientY-tap.y)>8)tap=null;
+      if(ev.pointerType!=='mouse'||Date.now()<touchUntil||ev.sourceCapabilities?.firesTouchEvents)return;
+      const i=pointIndex(ev);if(i!==st.hover){st.hover=i;drawSvg();}
+    });
+    chartBox.addEventListener('pointerup',ev=>{
+      touchGuard(ev);
+      if(tap&&tap.id===ev.pointerId&&Math.hypot(ev.clientX-tap.x,ev.clientY-tap.y)<=8)selectPoint(pointIndex(ev));
+      tap=null;
+    });
+    chartBox.addEventListener('pointercancel',ev=>{touchGuard(ev);tap=null;});
     chartBox.addEventListener('pointerleave',ev=>{if(ev.pointerType==='mouse'&&st.hover!=null){st.hover=null;drawSvg();}});
-    chartBox.addEventListener('click',ev=>selectPoint(pointIndex(ev)));
     chartBox.addEventListener('keydown',ev=>{
       const n=Math.min(st.range,maxN), i=st.selected==null?n-1:st.selected;
       const next={ArrowLeft:Math.max(0,i-1),ArrowRight:Math.min(n-1,i+1),Home:0,End:n-1};

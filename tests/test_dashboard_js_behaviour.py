@@ -90,6 +90,7 @@ class Element {
 const document={createElement:t=>new Element(t),createElementNS:(_,t)=>new Element(t),
   createTextNode:t=>({nodeType:3,textContent:String(t)})};
 const NS='http://www.w3.org/2000/svg';
+let now=1000;const Date={now:()=>now};
 """
         setup = r"""
 const n=65, vals=Array.from({length:n},(_,i)=>100+i);
@@ -99,6 +100,8 @@ const box=()=>host.find(e=>e.attrs.role==='group');
 const output=()=>host.find(e=>e.attrs.role==='status');
 const state=()=>({hidden:output().hidden,text:output().textContent});
 const fire=(type,e)=>{box().fire(type,e);return state();};
+const tap=x=>{const e={pointerType:'touch',pointerId:1,isPrimary:true,button:0,clientX:x,clientY:100};
+  box().fire('pointerdown',e);box().fire('pointerup',e);return state();};
 const key=k=>{let prevented=false;box().fire('keydown',{key:k,preventDefault(){prevented=true;}});return {...state(),prevented};};
 const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
 """
@@ -108,9 +111,9 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
             ('桌機 hover', "fire('pointermove',{pointerType:'mouse',clientX:8})"),
             ('桌機離開清除預覽', "fire('pointerleave',{pointerType:'mouse'})"),
             ('手指拖曳不攔截捲動也不選日期', "fire('pointermove',{pointerType:'touch',clientX:8})"),
-            ('點按保留首日', "fire('click',{clientX:8})"),
+            ('點按保留首日', 'tap(8)'),
             ('手指離開仍保留', "fire('pointerleave',{pointerType:'touch'})"),
-            ('桌機移入可暫看別日', "fire('pointermove',{pointerType:'mouse',clientX:628})"),
+            ('桌機移入可暫看別日', "(now+=801,fire('pointermove',{pointerType:'mouse',clientX:628}))"),
             ('移出恢復點選日期', "fire('pointerleave',{pointerType:'mouse'})"),
             ('鍵盤下一交易日', "key('ArrowRight')"),
             ('鍵盤到最早', "key('Home')"),
@@ -121,6 +124,9 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
             ('換區間清除舊日期', "(button('20 日').fire('click'),state())"),
             ('換區間後首日正確', "key('Home')"),
             ('指標切換保留日期與零值', "(host.find(e=>e.tag==='button'&&e.textContent.includes('外資')).fire('click'),state())"),
+            ('滑動取消後相容 click 不可選日期', "(()=>{const e={pointerType:'touch',pointerId:1,isPrimary:true,button:0,clientX:8,clientY:100};box().fire('pointerdown',e);box().fire('pointermove',{...e,clientY:75});box().fire('pointercancel',e);box().fire('pointerup',e);return fire('click',{clientX:628});})()"),
+            ('滑動後的相容 mousemove 不可蓋掉讀數', "fire('pointermove',{pointerType:'mouse',clientX:628})"),
+            ('超出點按距離不可選日期，即使沒有 cancel', "(()=>{const e={pointerType:'touch',pointerId:1,isPrimary:true,button:0,clientX:628,clientY:100};box().fire('pointerdown',e);return fire('pointerup',{...e,clientY:125});})()"),
         ])
         for i in (0, 2, 3, 14):
             self.assertTrue(got[i]['hidden'])
@@ -136,7 +142,7 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
         for i in (8, 9, 10, 11, 12, 15):
             self.assertTrue(got[i]['prevented'])
         self.assertFalse(got[13]['prevented'])
-        for i in (15, 16):
+        for i in (15, 16, 17, 18, 19):
             self.assertIn('日期day45', got[i]['text'])
         self.assertIn('外資+0', got[16]['text'])
         self.assertNotIn('投信', got[16]['text'])
