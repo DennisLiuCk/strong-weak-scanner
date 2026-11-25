@@ -371,7 +371,8 @@ class DashboardUxContractTest(unittest.TestCase):
             self.assertIn(marker, self.template)
         # 族群排行榜在手機藏起欄位表頭後,每個數值仍要自帶維度標籤(與熱圖 cell label 同一模式)。
         for marker in (".board-metric-label{display:none}",
-                       ".board-metric-label{display:block",
+                       ".board-metric-label{display:inline",
+                       ".board-metric-label{flex-basis:100%}",
                        "metricCell(mom,fmtPct(mom,1),pctCol(mom),md,25,'動能 vs 全體')",
                        "dd,3,'修正日外資'"):
             self.assertIn(marker, self.template)

@@ -490,7 +490,8 @@ svg{display:block;overflow:visible}
   .board-row{grid-template-columns:24px 1fr;gap:8px 12px}
   .board-row>*:nth-child(3),.board-row>*:nth-child(4){grid-column:2/-1}
   .bhead{display:none}
-  .board-metric-label{display:block;font-size:var(--fs-105);font-weight:700;color:var(--ink2);margin-bottom:2px}
+  .board-metric-label{display:inline;font-size:var(--fs-105);font-weight:700;color:var(--ink2)}
+  .board-metric-value{margin-right:auto}
   /* 四象限 SVG 是固定 viewBox 0 0 470 380 的 width:100%：375px 手機上會被縮到
      scale 0.64，font-size:9 的座標標籤實際只有 5.8px。改成在卡片內橫向捲動、
      維持 1:1 呈現(與熱圖 .hscroll 同一套處理)，字級才等於作者指定的值 */
@@ -534,6 +535,7 @@ svg{display:block;overflow:visible}
   html{scroll-padding-top:180px}
   .strip{flex-wrap:wrap}
   .tile{flex:1 1 28%}
+  .board-metric-label{flex-basis:100%}
 }
 </style>
 </head>
@@ -1531,9 +1533,9 @@ function absLine(a){ if(!a) return null;
     h('span',{text:` · ${a.pos}/${a.n} 檔漲`})); }
 
 function metricCell(v,valTxt,col,d,max,label){ return h('div',{},
-  label?h('div',{class:'board-metric-label',text:label}):null,
-  h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:6px'},
-    h('span',{class:'mono',style:`font-size:13px;font-weight:600;color:${col}`,text:valTxt}),
+  h('div',{style:'display:flex;justify-content:space-between;align-items:baseline;gap:6px;flex-wrap:wrap'},
+    label?h('span',{class:'board-metric-label',text:label}):null,
+    h('span',{class:'mono board-metric-value',style:`font-size:13px;font-weight:600;color:${col}`,text:valTxt}),
     h('span',{style:`font-size:var(--fs-10);font-weight:700;color:${d.c}`,text:d.t})),
   h('div',{style:'margin-top:3px'},diverg(v,max,150,12))); }
 
