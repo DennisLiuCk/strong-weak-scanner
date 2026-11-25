@@ -127,6 +127,8 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
             ('滑動取消後相容 click 不可選日期', "(()=>{const e={pointerType:'touch',pointerId:1,isPrimary:true,button:0,clientX:8,clientY:100};box().fire('pointerdown',e);box().fire('pointermove',{...e,clientY:75});box().fire('pointercancel',e);box().fire('pointerup',e);return fire('click',{clientX:628});})()"),
             ('滑動後的相容 mousemove 不可蓋掉讀數', "fire('pointermove',{pointerType:'mouse',clientX:628})"),
             ('超出點按距離不可選日期，即使沒有 cancel', "(()=>{const e={pointerType:'touch',pointerId:1,isPrimary:true,button:0,clientX:628,clientY:100};box().fire('pointerdown',e);return fire('pointerup',{...e,clientY:125});})()"),
+            ('滑鼠直接拖出容器再回原點放開不可釘選', "(()=>{key('End');now+=801;const e={pointerType:'mouse',pointerId:2,isPrimary:true,button:0,clientX:8,clientY:100};box().fire('pointerdown',e);box().fire('pointerleave',e);box().fire('pointermove',e);box().fire('pointerup',e);return fire('pointerleave',e);})()"),
+            ('取消拖曳後仍可正常點選另一日期', "(()=>{const e={pointerType:'mouse',pointerId:2,isPrimary:true,button:0,clientX:8,clientY:100};box().fire('pointerdown',e);box().fire('pointerup',e);return fire('pointerleave',e);})()"),
         ])
         for i in (0, 2, 3, 14):
             self.assertTrue(got[i]['hidden'])
@@ -146,6 +148,8 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
             self.assertIn('日期day45', got[i]['text'])
         self.assertIn('外資+0', got[16]['text'])
         self.assertNotIn('投信', got[16]['text'])
+        self.assertIn('日期day64', got[20]['text'])
+        self.assertIn('日期day45', got[21]['text'])
 
     def test_archive_links_resolve_from_live_and_historical_pages(self):
         got = self.run_js(extract('archiveSnapshotHref'), [
