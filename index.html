@@ -1583,12 +1583,12 @@ function openSheet(s){
   sheetEl.replaceChildren(...body); showSheet(()=>openSheet(s));
 }
 let lastSheetFocus=null;
-let sheetInerted=[],sheetBodyOverflow='';
+let sheetInerted=[],sheetBodyOverflow='',sheetFocusVersion=0;
 // 一次開啟面板只佔一筆同網址歷史；換檔／返回族群不堆疊，Forward 可重開最後一檔。
 const sheetHistoryViews=new Map(),sheetHistorySession=Date.now()+'-'+Math.random();
 let sheetHistoryIndex=0,sheetHistoryId=null,restoringSheetHistory=false,sheetHistoryClosing=false,sheetLinkAfterClose=null;
 function showSheet(restore,opener=null){ const wasOpen=sheetwrap.classList.contains('on');
-  if(!wasOpen){lastSheetFocus=opener||document.activeElement;sheetBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+  if(!wasOpen){sheetFocusVersion++;lastSheetFocus=opener||document.activeElement;sheetBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
     sheetInerted=[...document.body.children].filter(el=>el!==sheetwrap&&el.tagName!=='SCRIPT').map(el=>({el,aria:el.getAttribute('aria-hidden')}));
     sheetInerted.forEach(item=>{item.el.inert=true;item.el.setAttribute('aria-hidden','true');});
     if(!restoringSheetHistory){sheetHistoryId=sheetHistorySession+'-'+(++sheetHistoryIndex);history.pushState({...history.state,scannerSheet:sheetHistoryId},'');}}
@@ -1600,7 +1600,11 @@ function showSheet(restore,opener=null){ const wasOpen=sheetwrap.classList.conta
   window.requestAnimationFrame(function(){ const c2=sheetEl.querySelector('.sheetclose'); if(sheetwrap.classList.contains('on')&&c2&&document.activeElement!==c2) c2.focus(); }); }
 function hideSheet(){ if(!sheetwrap.classList.contains('on'))return;sheetwrap.classList.remove('on');sheetwrap.setAttribute('aria-hidden','true');document.body.style.overflow=sheetBodyOverflow;
   sheetInerted.forEach(item=>{item.el.inert=false;if(item.aria==null)item.el.removeAttribute('aria-hidden');else item.el.setAttribute('aria-hidden',item.aria);});sheetInerted=[];
-  if(lastSheetFocus&&lastSheetFocus.isConnected&&lastSheetFocus.focus) lastSheetFocus.focus({preventScroll:true});
+  // popstate 後瀏覽器還會還原 persisted focus；等這次 traversal 完成再回原列。
+  const opener=lastSheetFocus,version=sheetFocusVersion,url=location.href;
+  if(!sheetLinkAfterClose)window.setTimeout(()=>{
+    if(version===sheetFocusVersion&&!sheetwrap.classList.contains('on')&&location.href===url&&opener?.isConnected&&opener.focus)opener.focus({preventScroll:true});
+  },0);
   lastSheetFocus=null;sheetHistoryId=null; }
 function closeSheet(event){
   if(!sheetwrap.classList.contains('on')||sheetHistoryClosing)return;

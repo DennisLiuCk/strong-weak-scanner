@@ -17,7 +17,7 @@ class SheetHistoryTest(unittest.TestCase):
                            source.index("function openStockDetail(")]
         harness = r"""
 const assert=require('node:assert/strict');
-let scrollY=700,focusCalls=[],frames=[],listeners={},pending=[];
+let scrollY=700,focusCalls=[],frames=[],timers=[],listeners={},pending=[];
 function element(tag='DIV',attrs={}){return {tagName:tag,style:{},attrs,inert:false,isConnected:true,
  getAttribute(k){return this.attrs[k]??null},setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]},
  focus(options){focusCalls.push({el:this,options});document.activeElement=this;if(!options?.preventScroll)scrollY+=88;}}}
@@ -27,14 +27,14 @@ const closer=element('BUTTON');
 const sheetEl=element();sheetEl.querySelector=()=>closer;
 const document={activeElement:opener,body:{style:{overflow:'auto'},children:[header,main,script,sheetwrap]}};
 const location={assign(href){navigated.push(href)}};let navigated=[];
-const window={requestAnimationFrame(fn){frames.push(fn)},addEventListener(type,fn){listeners[type]=fn}};
+const window={requestAnimationFrame(fn){frames.push(fn)},setTimeout(fn){timers.push(fn)},addEventListener(type,fn){listeners[type]=fn}};
 // A fragment entry already exists: opening/closing the sheet must not consume it.
 const entries=[{state:null,url:'/'},{state:{existing:'keep'},url:'/#tier'}];let index=1;
 const history={get state(){return entries[index].state},
  pushState(state,title,url){assert.equal(url,undefined);entries.splice(index+1);entries.push({state,url:entries[index].url});index++},
- back(){pending.push(()=>{if(index>0){index--;listeners.popstate({state:this.state})}})},
+ back(){pending.push(()=>{if(index>0){index--;listeners.popstate({state:this.state});document.activeElement=document.body}})},
  forward(){pending.push(()=>{if(index<entries.length-1){index++;listeners.popstate({state:this.state})}})}};
-function flush(){while(pending.length)pending.shift()();while(frames.length)frames.shift()()}
+function flush(){while(pending.length)pending.shift()();while(timers.length)timers.shift()();while(frames.length)frames.shift()()}
 let currentView='';
 function render(view,trigger=null){currentView=view;showSheet(()=>render(view,trigger),trigger)}
 """
@@ -71,6 +71,11 @@ assert.equal(index,1);assert.deepEqual(navigated,['http://localhost/#flow-guide'
 document.activeElement=opener;opener.isConnected=false;render('stock-rapid');
 const focusBeforeClose=focusCalls.length;closeSheet();flush();
 assert.equal(focusCalls.length,focusBeforeClose);assert.equal(sheetwrap.classList.open,false);opener.isConnected=true;
+// A deferred close must not focus the old row after a different sheet has opened.
+document.activeElement=opener;render('stock-old');flush();closeSheet();pending.shift()();
+const newOpener=element('BUTTON');render('stock-new',newOpener);flush();
+assert.equal(document.activeElement,closer);assert.equal(sheetwrap.classList.open,true);
+closeSheet();flush();assert.equal(document.activeElement,newOpener);
 // Foreign or stale history states are not treated as our sheet.
 listeners.popstate({state:{scannerSheet:'old-document'}});assert.equal(sheetwrap.classList.open,false);
 // A real next Back still leaves the list; the list entry was not overwritten.
