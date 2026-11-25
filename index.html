@@ -73,6 +73,7 @@ h2.sec{margin:0 0 6px;font-size:28px;font-weight:800;letter-spacing:.3px}
 .stock-detail-card{padding:30px 32px}
 .history-chart-card{padding:20px 22px}
 .chart-meta{display:flex;flex-wrap:wrap;gap:2px 12px;margin:-2px 0 8px;font-size:11.5px;line-height:1.5;color:var(--ink2)}
+.chart-meta[hidden]{display:none}
 .chart-canvas{background:var(--inset);border:1px solid var(--line2);border-radius:12px;padding:14px 12px 6px}
 .opthd{display:flex;align-items:center;gap:10px;margin-bottom:13px}
 .opthd b{font-size:16px} .opthd span{font-size:12.5px;color:var(--muted)}
@@ -763,7 +764,7 @@ function priceChart(chart, tech, comparison=null){
   const compactMode=()=>typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(max-width: 680px)').matches;
   const chartPads=()=>compactMode()?{l:4,r:10}:{l:8,r:52};
   const host=h('div',{class:'card history-chart-card','data-history-chart':''});
-  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[];
+  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],renderedCompact=null;
 
   function buildSvg(){
     const R=st.range, s=a=>(a||[]).slice(-R);
@@ -778,8 +779,10 @@ function priceChart(chart, tech, comparison=null){
     if(on('trust'))panels.push({k:'trust',h:compact?70:54});
     const GAP=compact?18:16; let yo=0; panels.forEach(p=>{p.top=yo; yo+=p.h+GAP;}); const axisH=compact?4:18, H=yo-GAP+axisH;
     if(chartMeta){
+      chartMeta.hidden=!compact;
       const valid=px.filter(v=>v!=null),lo=valid.length?Math.min(...valid):null,hi=valid.length?Math.max(...valid):null;
-      chartMeta.replaceChildren(
+      chartMeta.replaceChildren();
+      if(compact)chartMeta.replaceChildren(
         h('span',{text:N+' 日 · '+(dates[0]||'—')+' → '+(dates[N-1]||'—')}),
         h('span',{text:valid.length?'現價低 '+lo.toFixed(1)+' · 高 '+hi.toFixed(1):'現價範圍 —'}));
     }
@@ -838,7 +841,7 @@ function priceChart(chart, tech, comparison=null){
     }
     return svg(W,H,K,'height:auto');
   }
-  function drawSvg(){ chartBox.replaceChildren(buildSvg()); }
+  function drawSvg(){ renderedCompact=compactMode(); chartBox.replaceChildren(buildSvg()); }
   function pointIndex(ev){
     const r=chartBox.querySelector('svg').getBoundingClientRect(),pads=chartPads();
     const xx=(ev.clientX-r.left)/r.width*680, n=Math.min(st.range,maxN);
@@ -886,7 +889,7 @@ function priceChart(chart, tech, comparison=null){
       compareNav=h('nav',{class:'chart-compare','aria-label':'圖表同日比較',style:'border-top:1px solid var(--line2);padding-top:10px;margin-bottom:12px'},
         h('b',{style:'font-size:12px',text:'同族群 · 同日比較｜'+comparison.name}),compareStatus,pair);
     }
-    chartMeta=compactMode()?h('div',{class:'chart-meta','aria-label':'圖表日期與價格範圍'}):null;
+    chartMeta=h('div',{class:'chart-meta','aria-label':'圖表日期與價格範圍'});
     readout=h('div',{role:'status','aria-live':'polite','aria-atomic':'true',
       style:'display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;line-height:1.7;margin-bottom:10px;color:var(--ink2)'});
     chartBox=h('div',{class:'chart-canvas',tabindex:'0',role:'group','aria-label':'歷史股價圖表；左右方向鍵切換交易日，Home 最早，End 最新'});
@@ -916,6 +919,13 @@ function priceChart(chart, tech, comparison=null){
       const next={ArrowLeft:Math.max(0,i-1),ArrowRight:Math.min(n-1,i+1),Home:0,End:n-1};
       if(Object.prototype.hasOwnProperty.call(next,ev.key)){ev.preventDefault();selectPoint(next[ev.key]);}
     });
+    if(typeof window!=='undefined'&&window.addEventListener){
+      if(!window.__scannerChartResizeBound){
+        window.addEventListener('resize',()=>{const redraw=window.__scannerChartResize;if(redraw)redraw();});
+        window.__scannerChartResizeBound=true;
+      }
+      window.__scannerChartResize=()=>{if(compactMode()!==renderedCompact)drawSvg();};
+    }
     const foot=h('p',{style:'margin:10px 0 0;font-size:var(--fs-11);color:var(--muted);line-height:1.6',
       text:'現價／MA5／MA20／MA60 共用價格軸；RSI14、成交量、外資、投信各自成副圖、對齊同一時間軸。滑鼠移入可預覽；點按圖表可保留日期與讀數，切換區間後清除。鍵盤聚焦圖表後，用左右鍵切換交易日，Home／End 跳到最早／最新。'});
     host.replaceChildren(...[top, cP, cS, chartMeta, chartBox, readout, compareNav, foot].filter(Boolean));

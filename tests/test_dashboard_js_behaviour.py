@@ -218,7 +218,7 @@ const key=(host,k)=>box(host).fire('keydown',{key:k,preventDefault(){}});
 
     def test_compact_mobile_chart_moves_scaled_labels_into_html(self):
         """窄幅圖不再把 680px SVG 縮到一半還硬塞小字:座標與提示只留 HTML。"""
-        pre = self.chart_dom() + "let narrow=true;const window={matchMedia:q=>({matches:narrow})};\n" + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
+        pre = self.chart_dom() + "let narrow=true;const listeners={};const window={matchMedia:q=>({matches:narrow}),addEventListener:(type,fn)=>{(listeners[type]=listeners[type]||[]).push(fn)}};\n" + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
 const n=65, vals=Array.from({length:n},(_,i)=>100+i);
 const chart={px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
   rsi:vals.map(()=>0),vol:vals.map(()=>0),foreign:vals.map(()=>0),trust:vals.map(()=>null)};
@@ -230,14 +230,18 @@ const meta=host=>host.find(e=>e.className==='chart-meta');
 """
         got = self.run_js(pre, [
             ('手機 SVG 無被縮小文字', "(()=>{const svg=firstSvg(mobile);return {noText:!svg.find(e=>e.tag==='text'),meta:meta(mobile)?.textContent||'',viewBox:svg.attrs.viewBox};})()"),
-            ('桌機保留 SVG 座標文字且無手機 meta', "(()=>{const svg=firstSvg(desktop);return {hasText:!!svg.find(e=>e.tag==='text'),hasMeta:!!meta(desktop),viewBox:svg.attrs.viewBox};})()"),
+            ('桌機保留 SVG 座標文字且手機 meta 隱藏', "(()=>{const svg=firstSvg(desktop);return {hasText:!!svg.find(e=>e.tag==='text'),metaHidden:meta(desktop)?.hidden,viewBox:svg.attrs.viewBox};})()"),
+            ('桌機開啟後 resize 到手機可補上 meta', "(()=>{narrow=true;(listeners.resize||[]).forEach(fn=>fn());const svg=firstSvg(desktop);return {noText:!svg.find(e=>e.tag==='text'),meta:meta(desktop)?.textContent||'',metaHidden:meta(desktop)?.hidden};})()"),
         ])
         self.assertTrue(got[0]['noText'])
         self.assertIn('60 日 · day5 → day64', got[0]['meta'])
         self.assertIn('現價低 105.0 · 高 164.0', got[0]['meta'])
         self.assertTrue(got[0]['viewBox'].startswith('0 0 680 '))
         self.assertTrue(got[1]['hasText'])
-        self.assertFalse(got[1]['hasMeta'])
+        self.assertTrue(got[1]['metaHidden'])
+        self.assertTrue(got[2]['noText'])
+        self.assertIn('60 日 · day5 → day64', got[2]['meta'])
+        self.assertFalse(got[2]['metaHidden'])
 
     def test_archive_links_resolve_from_live_and_historical_pages(self):
         got = self.run_js(extract('archiveSnapshotHref'), [
