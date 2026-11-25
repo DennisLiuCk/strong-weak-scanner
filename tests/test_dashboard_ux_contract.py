@@ -292,7 +292,7 @@ class DashboardUxContractTest(unittest.TestCase):
     # ---------- 個股詳情:七因子 + null 防護 ----------
 
     def test_stock_detail_has_seven_factor_profile_with_null_guards(self):
-        for marker in ("function buildDetail()", "七因子拆解", "diverg(f.score,2",
+        for marker in ("function buildDetail(", "七因子拆解", "diverg(f.score,2",
                        "(d.tech||{}).chart", "d.note&&h(",
                        "if(d.note)card.appendChild(researchEntry(d));"):
             self.assertIn(marker, self.template)
@@ -321,8 +321,8 @@ class DashboardUxContractTest(unittest.TestCase):
 
     def test_stock_detail_has_weekly_rank_change_with_summary_then_details(self):
         fn = self.template[self.template.index("function rankChangeSection(d)"):
-                           self.template.index("function buildDetail()")]
-        detail = self.template[self.template.index("function buildDetail()"):]
+                           self.template.index("function buildDetail(")]
+        detail = self.template[self.template.index("function buildDetail("):]
         self.assertIn("rankChangeSection(d)", detail[:detail.index("d.note&&")])
         self.assertIn("(RANKCHG.stocks||{})[d.id]", fn)          # 依目前股票取資料,不綁定單一代號
         self.assertNotIn("3443", fn)

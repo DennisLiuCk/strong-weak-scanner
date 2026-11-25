@@ -190,6 +190,7 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 svg{display:block;overflow:visible}
 .togglebtn{display:inline-flex;align-items:center;gap:7px;cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink2);border-radius:100px;padding:7px 14px;font:inherit;font-size:12.5px}
 .togglebtn:hover{color:var(--ink);border-color:var(--muted)}
+.chart-compare .togglebtn:disabled{opacity:.45;cursor:default;border-color:var(--line);color:var(--ink2)}
 .togglebtn.themebtn{width:44px;height:44px;padding:0;justify-content:center;font-size:0}
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}
 .msearch{font:inherit;font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:100px;padding:8px 15px;min-width:220px;outline:none}
@@ -700,7 +701,7 @@ function lineChart(series,w=520,ht=150){ const P=8,Pb=16; let all=[]; series.for
     k.push(sv('path',{d,fill:'none',stroke:s.color,'stroke-width':s.width||2,'stroke-dasharray':s.dash||'none','stroke-linecap':'round','stroke-linejoin':'round'}));});
   const m0=series[0]; k.push(sv('circle',{cx:X(n-1),cy:Y(m0.v[n-1]),r:3.2,fill:m0.color,stroke:'var(--card)','stroke-width':1.5}));
   return svg(w,ht,k,'height:auto'); }
-function priceChart(chart, tech){
+function priceChart(chart, tech, comparison=null){
   if(!chart || !chart.px || chart.px.length < 2) return null;
   tech = tech || {};
   const MAP={price:'px', ma5:'ma5', ma20:'ma', ma60:'ma60', rsi:'rsi', vol:'vol', foreign:'foreign', trust:'trust'};
@@ -721,6 +722,14 @@ function priceChart(chart, tech){
   const st={ range: Math.min(60, maxN),
              ind:{price:1,ma5:1,ma20:1,ma60:1,rsi:1,vol:1,foreign:0,trust:0},
              hover:null, selected:null };
+  const context=comparison&&comparison.context;
+  let requestedDate=context&&context.date;
+  if(context){
+    if(Number.isInteger(context.range)&&context.range>0)st.range=Math.min(context.range,maxN);
+    Object.keys(st.ind).forEach(k=>{if(context.ind&&typeof context.ind[k]==='boolean')st.ind[k]=context.ind[k]?1:0;});
+    const i=(chart.dates||[]).slice(-st.range).indexOf(requestedDate);
+    if(i>=0)st.selected=i; // 僅對齊相同日期，缺資料時不可偷偷改選鄰日。
+  }
 
   const _fv=n=>{ if(n==null)return '—'; const a=Math.abs(n); return a>=1e8?(n/1e8).toFixed(2)+'億':a>=1e4?(n/1e4).toFixed(1)+'萬':String(Math.round(n)); };
   const _fs=n=> n==null?'—':(n>=0?'+':'')+Math.round(n).toLocaleString('en-US');
@@ -729,8 +738,8 @@ function priceChart(chart, tech){
   const txt=(x,y,s,size,fill,anchor,mono,weight)=>{ const e=sv('text',{x,y,'font-size':size,fill,'text-anchor':anchor||'start'}); if(mono)e.setAttribute('font-family',"'IBM Plex Mono','Noto Sans TC',monospace"); if(weight)e.setAttribute('font-weight',weight); e.textContent=s==null?'':s; return e; };
   const on=k=>st.ind[k] && has(k);
 
-  const host=h('div',{class:'card',style:'padding:20px 22px'});
-  let chartBox=h('div',{}), readout=h('div',{}), tap=null, touchUntil=0;
+  const host=h('div',{class:'card','data-history-chart':'',style:'padding:20px 22px'});
+  let chartBox=h('div',{}), readout=h('div',{}), tap=null, touchUntil=0, compareStatus=null, compareButtons=[];
 
   function buildSvg(){
     const R=st.range, s=a=>(a||[]).slice(-R);
@@ -774,6 +783,10 @@ function priceChart(chart, tech){
     // x 軸日期
     const nt=Math.min(6,N); for(let t=0;t<nt;t++){ const i=Math.round(t/(nt-1||1)*(N-1)); K.push(txt(X(i), H-4, dates[i]||'', 9, 'var(--muted)', t===0?'start':t===nt-1?'end':'middle', true)); }
     // 十字游標 + 讀數框
+    const selectedDate=st.selected==null?null:dates[st.selected];
+    if(compareStatus)compareStatus.textContent=selectedDate?'已選 '+selectedDate+'；比較時保留區間與指標。':requestedDate?
+      '本檔無 '+requestedDate+' 的可用圖表日期；未改選其他日期，請另選日期。':'先點按圖表保留日期，再比較同族群個股。';
+    compareButtons.forEach(({button,peer})=>{button.disabled=!selectedDate||!peer||!peer.available;});
     const active=st.hover==null?st.selected:st.hover;
     const hv=(active!=null&&active>=0&&active<N)?active:null;
     readout.hidden=hv==null;
@@ -800,7 +813,7 @@ function priceChart(chart, tech){
     const xx=(ev.clientX-r.left)/r.width*680, n=Math.min(st.range,maxN);
     return Math.max(0,Math.min(n-1,Math.round((xx-8)/(680-8-52)*(n-1))));
   }
-  function selectPoint(i){st.selected=i;st.hover=null;drawSvg();}
+  function selectPoint(i){st.selected=i;st.hover=null;requestedDate=null;drawSvg();}
 
   function chip(x){ const onx=!!st.ind[x.k], lv=lastNN(arrOf(x.k));
     const val = x.k==='vol'?_fv(lv.v) : (x.k==='foreign'||x.k==='trust')?_fs(lv.v) : (lv.v==null?'—':lv.v.toFixed(x.k==='rsi'?1:2));
@@ -814,7 +827,7 @@ function priceChart(chart, tech){
   function full(){
     const techCol=tech.cls==='up'?'var(--strong)':tech.cls==='down'?'var(--weak)':'var(--muted)';
     const rangeSeg=h('div',{style:'display:inline-flex;gap:3px;padding:3px;background:var(--inset);border-radius:10px'},
-      ...RANGES.map(rg=>h('button',{onclick:()=>{st.range=rg[1];st.hover=null;st.selected=null;full();},
+      ...RANGES.map(rg=>h('button',{onclick:()=>{st.range=rg[1];st.hover=null;st.selected=null;requestedDate=null;full();},
         style:'font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;color:'+(st.range===rg[1]?'var(--card)':'var(--ink2)')+';background:'+(st.range===rg[1]?'var(--ink)':'transparent')}, rg[0])));
     const top=h('div',{style:'display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px'},
       h('div',{},
@@ -825,6 +838,23 @@ function priceChart(chart, tech){
     const subChips=IND.filter(x=>x.g==='s'&&has(x.k)).map(chip);
     const cS=subChips.length?h('div',{style:'display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px'},
       h('span',{style:'font-size:var(--fs-11);color:var(--muted);align-self:center;margin-right:2px',text:'副圖：'}, ), ...subChips):null;
+    let compareNav=null;
+    compareButtons=[];
+    if(comparison){
+      compareStatus=h('p',{'aria-live':'polite',style:'font-size:12px;color:var(--ink2);margin:5px 0 8px'});
+      const pair=h('div',{style:'display:flex;flex-wrap:wrap;gap:8px'});
+      comparison.peers.forEach((peer,i)=>{
+        const label=(i===0?'‹ 同日看':'同日看')+(peer?' '+peer.name+' '+peer.id:'（無'+(i===0?'上一檔':'下一檔')+'）')+(peer&&!peer.available?'（無歷史圖表）':'')+(i===1?' ›':'');
+        const button=h('button',{class:'togglebtn',type:'button',style:'min-height:44px',text:label,onclick:()=>{
+          const date=(chart.dates||[]).slice(-st.range)[st.selected];
+          if(st.selected==null||!date||!peer||!peer.available)return;
+          comparison.navigate(peer.id,{date,range:st.range,ind:Object.fromEntries(Object.entries(st.ind).map(([k,v])=>[k,!!v]))});
+        }});
+        compareButtons.push({button,peer});pair.appendChild(button);
+      });
+      compareNav=h('nav',{class:'chart-compare','aria-label':'圖表同日比較',style:'border-top:1px solid var(--line2);padding-top:10px;margin-bottom:12px'},
+        h('b',{style:'font-size:12px',text:'同族群 · 同日比較｜'+comparison.name}),compareStatus,pair);
+    }
     readout=h('div',{role:'status','aria-live':'polite','aria-atomic':'true',
       style:'display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;line-height:1.7;margin-bottom:10px;color:var(--ink2)'});
     chartBox=h('div',{tabindex:'0',role:'group','aria-label':'歷史股價圖表；左右方向鍵切換交易日，Home 最早，End 最新',
@@ -857,7 +887,7 @@ function priceChart(chart, tech){
     });
     const foot=h('p',{style:'margin:10px 0 0;font-size:var(--fs-11);color:var(--muted);line-height:1.6',
       text:'現價／MA5／MA20／MA60 共用價格軸；RSI14、成交量、外資、投信各自成副圖、對齊同一時間軸。滑鼠移入可預覽；點按圖表可保留日期與讀數，切換區間後清除。鍵盤聚焦圖表後，用左右鍵切換交易日，Home／End 跳到最早／最新。'});
-    host.replaceChildren(top, cP, cS, chartBox, readout, foot);
+    host.replaceChildren(top, cP, cS, chartBox, readout, compareNav, foot);
     drawSvg();
   }
   full();
@@ -1567,13 +1597,15 @@ function closeSheet(){ if(!sheetwrap.classList.contains('on'))return;sheetwrap.c
   sheetInerted.forEach(item=>{item.el.inert=false;if(item.aria==null)item.el.removeAttribute('aria-hidden');else item.el.setAttribute('aria-hidden',item.aria);});sheetInerted=[];
   if(lastSheetFocus&&lastSheetFocus.focus) lastSheetFocus.focus();
   lastSheetFocus=null; }
-function openStockDetail(id,groupContext=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
-  const card=buildDetail(); if(!card)return;
-  card.style.marginTop='12px';
+function openStockDetail(id,groupContext=null,chartContext=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
   // 同族群、依綜合分排序的前後檔
   const sibs=(D.stocks||[]).filter(x=>x.g===s.g).sort((a,b)=>b.comp-a.comp);
   const idx=sibs.findIndex(x=>x.id===s.id);
   const prev=idx>0?sibs[idx-1]:null, next=(idx>=0&&idx<sibs.length-1)?sibs[idx+1]:null;
+  const card=buildDetail({name:s.nm+' '+s.id,context:chartContext,
+    peers:[prev,next].map(peer=>peer?{id:peer.id,name:peer.nm,available:(D.byId[peer.id]?.tech?.chart?.px?.length||0)>=2}:null),
+    navigate:(peerId,context)=>openStockDetail(peerId,groupContext,context)}); if(!card)return;
+  card.style.marginTop='12px';
   const navBtn=(o,label)=>h('button',{class:'togglebtn',type:'button',disabled:o?null:true,
     onclick:o?()=>openStockDetail(o.id,groupContext):null, text:label+(o?' '+o.nm:'')});
   const jump=h('nav',{class:'sheetjumps','aria-label':'個股明細段落'});
@@ -1586,11 +1618,11 @@ function openStockDetail(id,groupContext=null){ const s=D.byId&&D.byId[id]; if(!
   sheetEl.replaceChildren(sheetHeader(s.nm+' '+s.id+' · 個股明細'),nav,jump,mobileJump,card);
   // 跳段：依 card 內的 h3 標題自動生成（在 #sheet 內捲動，不動全頁）
   const headings=[...card.querySelectorAll('h3')];
-  const goToHeading=hd=>{
+  const goToHeading=(hd,instant=false)=>{
     const headerHeight=sheetEl.querySelector('.sheetheader').getBoundingClientRect().height;
     const top=hd.getBoundingClientRect().top-sheetEl.getBoundingClientRect().top+sheetEl.scrollTop-headerHeight-8;
     hd.tabIndex=-1;hd.focus({preventScroll:true});
-    sheetEl.scrollTo({top,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+    sheetEl.scrollTo({top,behavior:instant||matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
   };
   headings.forEach((hd,index)=>{
     const label=(hd.textContent||'').replace(/ · .*/,'').trim();
@@ -1599,7 +1631,10 @@ function openStockDetail(id,groupContext=null){ const s=D.byId&&D.byId[id]; if(!
       onclick:()=>goToHeading(hd), text:label}));
     jumpSelect.appendChild(h('option',{value:String(index),text:label}));});
   jumpSelect.addEventListener('change',()=>{if(jumpSelect.value==='')return;goToHeading(headings[Number(jumpSelect.value)]);jumpSelect.value='';});
-  showSheet(); }
+  showSheet();
+  // 明確的同日比較才跳回圖表；原本頂端的上一檔／下一檔仍從明細頂端開始。
+  if(chartContext){const heading=card.querySelector('[data-history-chart] h3');if(heading)window.requestAnimationFrame(()=>goToHeading(heading,true));}
+}
 function openGroupSheet(g){
   const st=stateStyle(g.state),statList=h('div',{});
   const members=stockSearchGroups(D.stocks,D.groups,g.g,'','comp',true)[0];
@@ -1959,7 +1994,7 @@ function rankChangeSection(d){
     h('details',{},h('summary',{text:'看明細：同業名次、兩週分數與日期'}),
       h('div',{class:'rkc-detail'},...(x.rankDetail||[]).map(t=>h('p',{text:t}))),peers,smooth,daily,meta));
 }
-function buildDetail(){
+function buildDetail(chartComparison=null){
   if(!D.detail)return null;
   const d=D.detail,ts=tierStyle(d.tier_confirmed||d.tier),cs=d.cells.map(c=>c[0]);
   const fac=h('div',{});
@@ -1978,7 +2013,7 @@ function buildDetail(){
     fac.appendChild(panel);
     if(i===0)flip();   // 預設展開第一列（①相對強弱），讓使用者看見可展開的形態
   });
-  const t=(d.tech||{}).chart, price=t?priceChart(t, d.tech):null;
+  const t=(d.tech||{}).chart, price=t?priceChart(t, d.tech, chartComparison):null;
   const frows=(d.fund&&d.fund.rows)||[],yoy=(frows.find(r=>/年增/.test(r[0]))||[])[1],latest=(frows.find(r=>/最新月營收/.test(r[0]))||[])[1];
   const yoyCol=!yoy?'var(--muted)':(String(yoy).trim().startsWith('-')?'var(--weak)':'var(--strong)');
   const chipList=h('div',{});

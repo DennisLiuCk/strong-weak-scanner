@@ -70,9 +70,8 @@ class DashboardJsBehaviourTest(unittest.TestCase):
 
     # ---------- fmtPct:唯一的百分比格式化入口 ----------
 
-    def test_price_chart_keeps_tapped_date_and_supports_keyboard_without_losing_hover(self):
-        # 跑完整 priceChart 與事件處理器；SVG 重繪後容器事件仍須有效。
-        dom = r"""
+    def chart_dom(self):
+        return r"""
 class Element {
   constructor(tag) { this.tag=tag; this.nodeType=1; this.attrs={}; this.style={}; this.children=[]; this.events={}; }
   setAttribute(k,v) { this.attrs[k]=v; }
@@ -92,6 +91,10 @@ const document={createElement:t=>new Element(t),createElementNS:(_,t)=>new Eleme
 const NS='http://www.w3.org/2000/svg';
 let now=1000;const Date={now:()=>now};
 """
+
+    def test_price_chart_keeps_tapped_date_and_supports_keyboard_without_losing_hover(self):
+        # 跑完整 priceChart 與事件處理器；SVG 重繪後容器事件仍須有效。
+        dom = self.chart_dom()
         setup = r"""
 const n=65, vals=Array.from({length:n},(_,i)=>100+i);
 const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
@@ -150,6 +153,46 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
         self.assertNotIn('投信', got[16]['text'])
         self.assertIn('日期day64', got[20]['text'])
         self.assertIn('日期day45', got[21]['text'])
+
+    def test_chart_peer_comparison_uses_pinned_date_not_hover_and_aligns_exact_dates(self):
+        pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
+const vals=Array.from({length:65},(_,i)=>100+i);
+const chart={px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,foreign:vals};
+let target, context;
+const comparison={name:'甲 1111',peers:[null,{id:'2222',name:'乙',available:true}],
+  navigate:(id,state)=>{target=id;context=state;}};
+const host=priceChart(chart,{},comparison);
+const find=(host,tag,text)=>host.find(e=>e.tag===tag&&e.textContent.includes(text));
+const next=host=>find(host,'button','同日看 乙');
+const output=host=>host.find(e=>e.attrs.role==='status');
+const box=host=>host.find(e=>e.attrs.role==='group');
+const key=(host,k)=>box(host).fire('keydown',{key:k,preventDefault(){}});
+"""
+        got = self.run_js(pre, [
+            ('未選日期不可比較', '[next(host).disabled,find(host,"button","無上一檔").disabled]'),
+            ('hover 不啟用同日比較', "(box(host).fire('pointermove',{pointerType:'mouse',clientX:628}),next(host).disabled)"),
+            ('釘選、改指標、再 hover 其他日', "(key(host,'Home'),find(host,'button','外資').fire('click'),box(host).fire('pointermove',{pointerType:'mouse',clientX:628}),next(host).fire('click'),{target,context})"),
+            ('下一檔中間少一天仍按日期對齊', "(()=>{const keep=a=>a.filter((_,i)=>i!==20);const c={...chart,px:keep(vals),dates:keep(chart.dates),ma5:keep(vals),foreign:keep(vals)};const peer=priceChart(c,{}, {...comparison,context});return output(peer).textContent;})()"),
+            ('缺該日不能偷換到鄰日', "(()=>{const c={...chart,dates:chart.dates.map(d=>d==='day5'?'other':d)};const peer=priceChart(c,{}, {...comparison,context});return {hidden:output(peer).hidden,disabled:next(peer).disabled,text:peer.textContent};})()"),
+            ('缺日後可另選日期並比較', "(()=>{const peer=priceChart(chart,{}, {...comparison,context:{...context,date:'missing'}});key(peer,'End');next(peer).fire('click');return context.date;})()"),
+            ('換區間仍清除日期', "(find(host,'button','20 日').fire('click'),{hidden:output(host).hidden,disabled:next(host).disabled})"),
+            ('無歷史圖表的同業不能比較', "(()=>{const peer=priceChart(chart,{}, {...comparison,context,peers:[null,{id:'2222',name:'乙',available:false}]});return next(peer).disabled;})()"),
+        ])
+        self.assertEqual(got[0], [True, True])
+        self.assertTrue(got[1])
+        self.assertEqual(got[2]['target'], '2222')
+        self.assertEqual(got[2]['context']['date'], 'day5')
+        self.assertEqual(got[2]['context']['range'], 60)
+        self.assertTrue(got[2]['context']['ind']['foreign'])
+        self.assertIn('日期day5', got[3])
+        self.assertIn('現價105.00', got[3])
+        self.assertIn('外資+105', got[3])
+        self.assertTrue(got[4]['hidden'])
+        self.assertTrue(got[4]['disabled'])
+        self.assertIn('無 day5', got[4]['text'])
+        self.assertEqual(got[5], 'day64')
+        self.assertEqual(got[6], {'hidden': True, 'disabled': True})
+        self.assertTrue(got[7])
 
     def test_archive_links_resolve_from_live_and_historical_pages(self):
         got = self.run_js(extract('archiveSnapshotHref'), [
