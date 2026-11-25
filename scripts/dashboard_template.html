@@ -803,7 +803,7 @@ function priceChart(chart, tech){
     const val = x.k==='vol'?_fv(lv.v) : (x.k==='foreign'||x.k==='trust')?_fs(lv.v) : (lv.v==null?'—':lv.v.toFixed(x.k==='rsi'?1:2));
     return h('button',{onclick:()=>{st.ind[x.k]=onx?0:1; full();},
       style:'display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:6px 11px;border-radius:9px;cursor:pointer;border:1px solid '+(onx?x.c:'var(--line)')+';background:'+(onx?'var(--card)':'transparent')+';color:'+(onx?'var(--ink)':'var(--muted)')+';opacity:'+(onx?1:0.72)},
-      h('span',{style:'width:14px;height:14px;border-radius:4px;border:1.5px solid '+x.c+';background:'+(onx?x.c:'transparent')+';color:#fff;font-size:var(--fs-10);line-height:12px;text-align:center;font-weight:800'}, onx?'✓':''),
+      h('span',{style:'width:14px;height:14px;border-radius:4px;border:1.5px solid '+x.c+';background:'+(onx?x.c:'transparent')+';color:var(--card);font-size:var(--fs-10);line-height:12px;text-align:center;font-weight:800'}, onx?'✓':''),
       h('span',{style:'width:11px;height:3px;border-radius:2px;background:'+x.c}),
       x.l,
       h('span',{class:'mono',style:'font-size:var(--fs-105);color:var(--muted)'}, val)); }
@@ -812,7 +812,7 @@ function priceChart(chart, tech){
     const techCol=tech.cls==='up'?'var(--strong)':tech.cls==='down'?'var(--weak)':'var(--muted)';
     const rangeSeg=h('div',{style:'display:inline-flex;gap:3px;padding:3px;background:var(--inset);border-radius:10px'},
       ...RANGES.map(rg=>h('button',{onclick:()=>{st.range=rg[1];st.hover=null;st.selected=null;full();},
-        style:'font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;color:'+(st.range===rg[1]?'#fff':'var(--ink2)')+';background:'+(st.range===rg[1]?'var(--ink)':'transparent')}, rg[0])));
+        style:'font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;color:'+(st.range===rg[1]?'var(--card)':'var(--ink2)')+';background:'+(st.range===rg[1]?'var(--ink)':'transparent')}, rg[0])));
     const top=h('div',{style:'display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px'},
       h('div',{},
         h('h3',{class:'sub3',style:'margin:0',text:'股價與均線 · 多指標疊圖'}),
