@@ -256,6 +256,12 @@ class DashboardUxContractTest(unittest.TestCase):
                        'html.replace("__TIER_FLOW_JSON__"'):
             self.assertIn(marker, self.builder)
         self.assertIn("LIMIT 5", self.builder)
+        # 族群明細先回答「為什麼領先／有人接」：五項指標在成分股導覽之前；
+        # 手機首屏不能被一整組成分股按鈕占滿。成分股仍保留在同一面板下方。
+        group_sheet = self.template[self.template.index("function openGroupSheet"):
+                                    self.template.index("// 分層 pill 用")]
+        self.assertIn("text:'族群五項指標'}),statList,memberLinks];", group_sheet)
+        self.assertNotIn("text:g.note}),memberLinks", group_sheet)
 
     def test_tier_bands_and_five_day_flow(self):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",
