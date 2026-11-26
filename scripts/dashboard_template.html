@@ -369,10 +369,16 @@ svg{display:block;overflow:visible}
   .rv-detail-card{padding:17px 15px}
   .rv-detail-head{align-items:flex-start}
   .rv-detail-title b{font-size:22px}
-  .rv-detail-action{padding:7px 11px}
+  .rv-detail-action{min-width:44px;min-height:44px;padding:7px 11px}
   .rv-detail-action span:not(.material-symbols-rounded){display:none}
-  .rv-score-grid{grid-template-columns:repeat(5,86px);overflow-x:auto}
-  .rv-score-card{min-height:94px}
+  .rv-group-select{min-height:44px}
+  .rv-score-grid{grid-template-columns:repeat(6,minmax(0,1fr));overflow:hidden}
+  .rv-score-card{grid-column:span 2;min-height:82px}
+  .rv-score-card:nth-child(3){border-right:0}
+  .rv-score-card:nth-child(n+4){border-top:1px solid var(--line)}
+  .rv-score-card:nth-child(4){grid-column:2/span 2}
+  .rv-score-card:nth-child(5){grid-column:4/span 2}
+  .rv-score-card span:not(.material-symbols-rounded){white-space:normal;line-height:1.25}
   .rv-meta-grid{grid-template-columns:1fr}
   .rv-meta-item{padding:9px 0;border-right:0;border-bottom:1px solid var(--line)}
   .rv-meta-item:last-child{border-bottom:0}
@@ -1269,7 +1275,7 @@ function rvDetailCard(R,row,focus,onFocus){
   const observation={champion_pct:'現行 7 因子、3 日平滑',lens_a:'5／20／60 交易日',lens_b:'20 日抗跌、槓桿與量價過熱',lens_c:'20 日外資持股變化與逆勢買賣、5 日投信淨買賣、融資',lens_d:(periods.month||'月營收待補')+'／'+(periods.quarter||'季財報待補')}[focus];
   const cadence={champion_pct:'每日收盤後',lens_a:'每日收盤後',lens_b:'每日收盤後',lens_c:'每日收盤後；旁證每週',lens_d:'月／季資料 first-seen 後'}[focus];
   const scores=h('div',{class:'rv-score-grid','aria-label':'五個視角的族群內相對位置'});
-  RV_KEYS.forEach(key=>{const m=RV_META[key];scores.appendChild(h('button',{type:'button',class:'rv-score-card','aria-pressed':key===focus?'true':'false','aria-label':'改以 '+m.title+' 排序',style:`--rv-tone:${m.tone}`,onclick:()=>onFocus(key)},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:m.icon}),h('span',{text:m.scoreLabel}),h('b',{text:rvPct(row[key])})));});
+  RV_KEYS.forEach(key=>{const m=RV_META[key];scores.appendChild(h('button',{type:'button',class:'rv-score-card','data-rv-lens':key,'aria-pressed':key===focus?'true':'false','aria-label':'改以 '+m.title+' 排序',style:`--rv-tone:${m.tone}`,onclick:event=>onFocus(key,event.currentTarget)},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:m.icon}),h('span',{text:m.scoreLabel}),h('b',{text:rvPct(row[key])})));});
   const sensitivity=rvSensitivity(row.peer_sensitivity),diagnostics=[];
   diagnostics.push('移除單一同族群成分股後，跨五分位區間的情境比例為 '+(row.peer_sensitivity==null?'尚無估計':row.peer_sensitivity.toFixed(0)+'%')+'；這是結構敏感度，不是時間穩定度。');
   diagnostics.push(row.champion_tie_n>1?'正式綜合有 '+row.champion_tie_n+' 檔同分，這些股票共享名次。':'正式綜合目前沒有同分共享名次。');
@@ -1305,7 +1311,8 @@ function buildRankingViews(){
   const listCard=h('div',{class:'card rv-list-card','aria-label':'族群內多視角排序'},tableHead,tableBody,listFoot),detailHost=h('div',{});
   const workspace=h('div',{id:'rv-workspace',class:'rv-workspace',role:'tabpanel',tabindex:'0'},listCard,detailHost);
   function rowsForGroup(){return R.rows.filter(x=>x.g===groupKey).sort((a,b)=>(b[focus]??-1)-(a[focus]??-1)||a.id.localeCompare(b.id));}
-  function setFocus(key){if(!RV_META[key]||key===focus)return;focus=key;rvRemember('rankingLens',key);render(false);}
+  function setFocus(key,source){if(!RV_META[key]||key===focus)return;focus=key;rvRemember('rankingLens',key);render(false);
+    if(source&&source.classList.contains('rv-score-card')){const replacement=detailHost.querySelector('[data-rv-lens="'+key+'"]');if(replacement)replacement.focus({preventScroll:true});}}
   function selectRow(id,restoreFocus){selectedId=id;render(restoreFocus);}
   function render(restoreRowFocus){
     const rows=rowsForGroup();if(!rows.some(x=>x.id===selectedId))selectedId=rows[0]&&rows[0].id;
