@@ -279,6 +279,10 @@ class DashboardUxContractTest(unittest.TestCase):
                        'html.replace("__TIER_FLOW_JSON__"'):
             self.assertIn(marker, self.builder)
         self.assertIn("LIMIT 5", self.builder)
+        # 桌機排行榜往下掃後段族群時，兩個百分比欄仍要看得見欄名；
+        # 721–900px 的站台導覽較高，sticky 上限要跟著避開，≤720px 仍用列內標籤。
+        self.assertIn(".bhead{align-items:end;position:sticky;top:89px;z-index:3;background:var(--card)}", self.template)
+        self.assertIn("@media (max-width:900px) and (min-width:721px){.bhead{top:125px}}", self.template)
         # 族群明細先回答「為什麼領先／有人接」：五項指標在 DOM 上仍在成分股導覽之前；
         # 手機直式堆疊，桌機寬面板並排使用原本空著的橫向空間。
         group_sheet = self.template[self.template.index("function openGroupSheet"):

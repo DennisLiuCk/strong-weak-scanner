@@ -473,7 +473,10 @@ svg{display:block;overflow:visible}
 .stock-position{text-align:center;font-size:16px;font-weight:600;color:var(--ink2)}
 .stock-position-label{display:none}
 .board-row{display:grid;grid-template-columns:30px minmax(120px,1fr) 150px 150px;gap:14px;align-items:center}
-.bhead{align-items:end}
+/* 桌機排行榜有 11 列；往下掃後段族群時兩個百分比欄都不能失去欄名。
+   手機原本就隱藏表頭、改在每列內嵌維度標籤，所以這裡只影響寬版。 */
+.bhead{align-items:end;position:sticky;top:89px;z-index:3;background:var(--card)}
+@media (max-width:900px) and (min-width:721px){.bhead{top:125px}}
 .board-metric-label{display:none}
 .grow{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:center}
 .tband{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:center}
