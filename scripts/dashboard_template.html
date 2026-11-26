@@ -165,6 +165,24 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .pulse-rank{font-size:var(--fs-105);color:var(--muted)}
 .pulse-name{min-width:0;font-size:12.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pulse-value{font-size:var(--fs-115);font-weight:700}
+.rank-movers{margin-top:14px;padding-top:13px;border-top:1px solid var(--line2)}
+.rank-movers-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
+.rank-movers-head b{font-size:13px}
+.rank-movers-head span{font-size:var(--fs-105);color:var(--muted);white-space:nowrap}
+.rank-movers-list{display:grid;gap:7px}
+.rank-mover{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;min-height:52px;padding:8px 10px;border:1px solid var(--line2);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.rank-mover:hover{background:var(--inset)}
+.rank-mover:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+.rank-mover-stock{display:flex;align-items:baseline;gap:5px;min-width:0;font-size:12px;color:var(--muted)}
+.rank-mover-stock b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--ink)}
+.rank-mover-stock .mono{font-size:var(--fs-10)}
+.rank-mover-stock span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-mover-pos{display:flex;align-items:baseline;gap:4px;white-space:nowrap;font-size:var(--fs-105);font-weight:800}
+.rank-mover-pos .mono{font-size:12px}
+.rank-mover-dir{font-size:var(--fs-10);font-weight:700;color:var(--muted)}
+.rank-mover.is-up .rank-mover-pos{color:var(--strong)}
+.rank-mover.is-down .rank-mover-pos{color:var(--weak)}
+.rank-mover.is-up .rank-mover-dir,.rank-mover.is-down .rank-mover-dir{color:var(--ink2)}
 .shortlist-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 19px;color:var(--ink);background:var(--tealbg);border-color:var(--teal)}
 .shortlist-cta-mobile{display:none}
 .shortlist-cta:hover{color:var(--ink);text-decoration:none;transform:translateY(-1px)}
@@ -1131,6 +1149,31 @@ function buildHeroLookup(){
     h('label',{class:'lookup-label',for:inputId,text:'快速查個股'}),
     h('div',{class:'lookup-box'},input,results),hint);
 }
+function rankPosShort(pos){
+  return String(pos||'—').replace(/^並列第\s*/,'並列').replace(/^第\s*/,'');
+}
+function buildRankChangeMovers(){
+  if(!RANKCHG||RANKCHG.error||!RANKCHG.stocks)return null;
+  const movers=Object.entries(RANKCHG.stocks)
+    .filter(([id,x])=>x&&x.available&&x.move&&D.byId[id])
+    .sort((a,b)=>Math.abs(b[1].move)-Math.abs(a[1].move)||a[0].localeCompare(b[0]))
+    .slice(0,3);
+  if(!movers.length)return null;
+  const list=h('div',{class:'rank-movers-list'});
+  movers.forEach(([id,x])=>{
+    const stock=D.byId[id],up=x.move>0;
+    const pos=rankPosShort(x.posA)+' → '+rankPosShort(x.posB),direction=up?'上升':'下滑';
+    list.appendChild(h('button',{type:'button',class:'rank-mover '+(up?'is-up':'is-down'),
+      title:'查看 '+stock.nm+' 本週排名變化原因',
+      'aria-label':'查看 '+stock.nm+' '+stock.id+' 本週排名變化：'+x.posA+'到'+x.posB,
+      onclick:event=>openStockDetail(id,null,null,event.currentTarget)},
+      h('span',{class:'rank-mover-stock'},h('b',{text:stock.nm}),h('span',{class:'mono',text:stock.id}),h('span',{text:grp(stock.g).short})),
+      h('span',{class:'rank-mover-pos'},h('span',{'aria-hidden':'true',text:up?'▲':'▼'}),h('span',{class:'mono',text:pos}),h('span',{class:'rank-mover-dir',text:direction}))));
+  });
+  return h('div',{class:'rank-movers','aria-label':'本週排名變化個股入口'},
+    h('div',{class:'rank-movers-head'},h('b',{text:'本週排名變化'}),h('span',{text:RANKCHG.dateA.slice(5).replace('-','/')+' → '+RANKCHG.dateB.slice(5).replace('-','/')})),list,
+    h('p',{class:'note',style:'margin:7px 0 0',text:'依族群內名次變化取前 3；點個股看排名依據與因子拆解。'}));
+}
 function buildOverview(){
   const o=D.overview,bt={}; D.allStocks.forEach(s=>bt[s.tier]=(bt[s.tier]||0)+1);
   const strong=bt['真強']||0,accum=bt['蓄勢·外資佈局']||0,weak=(bt['真弱']||0)+(bt['真弱·陷阱']||0);
@@ -1177,7 +1220,8 @@ function buildOverview(){
   const side=h('aside',{class:'command-side','aria-label':'今日快速入口'},
     h('div',{class:'card pulse-card'},
       h('div',{class:'pulse-head'},h('b',{text:'動能領先族群'}),h('a',{href:'#grp',text:'看完整比較 →'})),pulse,
-      h('p',{class:'note',style:'margin:11px 0 0',text:'依「動能 vs 全體」排序；點族群看明細。'})),
+      h('p',{class:'note',style:'margin:11px 0 0',text:'依「動能 vs 全體」排序；點族群看明細。'}),
+      buildRankChangeMovers()),
     h('a',{class:'card shortlist-cta',href:'#tier-primary-list'},
       h('div',{},h('b',{text:'今日強弱個股名單'}),h('span',{text:'先看已確認分層，再展開完整八層'})),
       h('span',{'aria-hidden':'true',text:'›'})));

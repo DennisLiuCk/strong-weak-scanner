@@ -421,6 +421,21 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("rank_change.dashboard_payload(", self.builder)
         self.assertIn('"--rank-change"', self.builder)
 
+    def test_overview_rank_movers_link_directly_to_weekly_rank_change(self):
+        fn = self.template[self.template.index("function buildRankChangeMovers()"):
+                           self.template.index("function buildOverview()")]
+        overview = self.template[self.template.index("function buildOverview()"):
+                                 self.template.index("function buildStrategyStatus()")]
+        # 本週排名資料只在預覽 payload 存在；正式無資料時不得出現空入口。
+        self.assertIn("if(!RANKCHG||RANKCHG.error||!RANKCHG.stocks)return null", fn)
+        self.assertIn(".slice(0,3)", fn)
+        self.assertIn("onclick:event=>openStockDetail(id,null,null,event.currentTarget)", fn)
+        self.assertIn("type:'button'", fn)
+        self.assertIn("aria-label", fn)
+        self.assertIn("direction=up?'上升':'下滑'", fn)
+        self.assertIn("text:'依族群內名次變化取前 3；點個股看排名依據與因子拆解。'", fn)
+        self.assertIn("buildRankChangeMovers())", overview)
+
     def test_mobile_layout_collapses_grids_and_meets_touch_targets(self):
         for marker in ("@media (max-width:720px)", "min-height:44px",
                        ".srow{grid-template-columns:1fr", ".shead{display:none}",
