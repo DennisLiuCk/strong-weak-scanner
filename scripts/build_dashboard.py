@@ -4947,7 +4947,7 @@ def main(research_as_of=None, output_dir=None, rank_change_spec=None):
              {"meter": [round(bt, 3), 1, 0.5]} if bt is not None else None],
         ]}
         if n:
-            gobj["dur"] = f"第 {n} 個交易日(自 {since})"
+            gobj["dur"] = f"已持續 {n} 個交易日(自 {since})"
         if g in chip_by_grp:
             gobj["chip"] = chip_by_grp[g]
         if g in group_observation_map:
