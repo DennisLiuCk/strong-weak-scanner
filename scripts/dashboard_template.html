@@ -1145,7 +1145,7 @@ function buildOverview(){
     h('span',{html:`<b class="mono cweak">${weak}</b>弱勢`}));
   const marketSource=MKT?h('p',{class:'note market-source-note'},
     h('b',{text:`大盤 ${MKT.scLabel}：`}),h('span',{text:MKT.src})):null;
-  const mobileShortlist=h('a',{class:'card shortlist-cta shortlist-cta-mobile',href:'#tier'},
+  const mobileShortlist=h('a',{class:'card shortlist-cta shortlist-cta-mobile',href:'#tier-primary-list'},
     h('div',{},h('b',{text:'看今日強弱個股名單'}),h('span',{text:`${strong} 強勢 · ${accum} 蓄勢 · ${weak} 弱勢`})),
     h('span',{'aria-hidden':'true',text:'›'}));
   const hero=h('article',{class:'card command-hero'},
@@ -1177,7 +1177,7 @@ function buildOverview(){
     h('div',{class:'card pulse-card'},
       h('div',{class:'pulse-head'},h('b',{text:'動能領先族群'}),h('a',{href:'#grp',text:'看完整比較 →'})),pulse,
       h('p',{class:'note',style:'margin:11px 0 0',text:'依「動能 vs 全體」排序；點族群看明細。'})),
-    h('a',{class:'card shortlist-cta',href:'#tier'},
+    h('a',{class:'card shortlist-cta',href:'#tier-primary-list'},
       h('div',{},h('b',{text:'今日強弱個股名單'}),h('span',{text:'先看已確認分層，再展開完整八層'})),
       h('span',{'aria-hidden':'true',text:'›'})));
   return [h('div',{class:'command-grid'},hero,side)];
@@ -1998,10 +1998,10 @@ function buildTier(){
     ['相對蓄勢','籌碼靠前、價格位置仍待確認','var(--teal)',D.allStocks.filter(s=>!s.trading&&s.tier==='蓄勢·外資佈局')],
     ['相對弱勢','價格與綜合分在族群後段','var(--weak)',D.allStocks.filter(s=>!s.trading&&(s.tier==='真弱'||s.tier==='真弱·陷阱'))]
   ];
-  snapshotDefs.forEach(([title,desc,col,mem])=>{mem.sort((a,b)=>b.comp-a.comp);const list=h('div',{class:'tier-snapshot-list'});
+  snapshotDefs.forEach(([title,desc,col,mem],idx)=>{mem.sort((a,b)=>b.comp-a.comp);const list=h('div',{class:'tier-snapshot-list'});
     mem.slice(0,6).forEach(s=>list.appendChild(stockPill(s)));
     if(!mem.length)list.appendChild(h('span',{class:'note',text:'目前無成員'}));
-    snapshot.appendChild(h('div',{class:'card tier-snapshot-card',style:`border-left-color:${col}`},
+    snapshot.appendChild(h('div',{class:'card tier-snapshot-card',id:idx===0?'tier-primary-list':null,style:`border-left-color:${col}`},
       h('div',{class:'tier-snapshot-head'},h('b',{style:`color:${col}`,text:title}),h('span',{class:'mono',style:`color:${col}`,text:mem.length})),
       h('p',{class:'note',style:'margin:-7px 0 11px',text:desc}),list,
       mem.length>6?h('div',{class:'tier-snapshot-more',text:'另 '+(mem.length-6)+' 檔，展開完整分層查看'}):null));});
@@ -2445,6 +2445,10 @@ document.getElementById('diverge').append(...buildDiverge());
 document.getElementById('lens').append(...buildLenses());
 document.getElementById('stocks').append(...buildStocks1c());
 document.getElementById('trust').append(buildStrategyStatus());
+// 主要名單卡片由 JS 生成；直接開 #tier-primary-list 時，瀏覽器在 script 執行前找不到錨點。
+if(location.hash==='#tier-primary-list'){
+  requestAnimationFrame(()=>document.getElementById('tier-primary-list')?.scrollIntoView());
+}
 </script>
 </body>
 </html>
