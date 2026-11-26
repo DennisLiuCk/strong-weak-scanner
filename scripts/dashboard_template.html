@@ -1875,24 +1875,28 @@ function handleSheetHistory(event){
   followSheetLink();
 }
 window.addEventListener('popstate',handleSheetHistory);
-function openStockDetail(id,groupContext=null,chartContext=null,opener=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
+function openStockDetail(id,groupContext=null,chartContext=null,opener=null,groupReturn=null){ const s=D.byId&&D.byId[id]; if(!s)return; D.detail=s;
+  if(groupContext){
+    if(!groupReturn)groupReturn={scrollTop:sheetEl.scrollTop,stockId:id};
+    groupReturn.stockId=id;
+  }
   // 同族群、依綜合分排序的前後檔
   const sibs=(D.stocks||[]).filter(x=>x.g===s.g).sort((a,b)=>b.comp-a.comp);
   const idx=sibs.findIndex(x=>x.id===s.id);
   const prev=idx>0?sibs[idx-1]:null, next=(idx>=0&&idx<sibs.length-1)?sibs[idx+1]:null;
   const card=buildDetail({name:s.nm+' '+s.id,context:chartContext,
     peers:[prev,next].map(peer=>peer?{id:peer.id,name:peer.nm,available:(D.byId[peer.id]?.tech?.chart?.px?.length||0)>=2}:null),
-    navigate:(peerId,context)=>openStockDetail(peerId,groupContext,context)}); if(!card)return;
+    navigate:(peerId,context)=>openStockDetail(peerId,groupContext,context,null,groupReturn)}); if(!card)return;
   card.style.marginTop='12px';
   const navBtn=(o,label)=>h('button',{class:'togglebtn',type:'button',disabled:o?null:true,
-    onclick:o?()=>openStockDetail(o.id,groupContext):null, text:label+(o?' '+o.nm:'')});
+    onclick:o?()=>openStockDetail(o.id,groupContext,null,null,groupReturn):null, text:label+(o?' '+o.nm:'')});
   const jump=h('nav',{class:'sheetjumps','aria-label':'個股明細段落'});
   const jumpSelect=h('select',{class:'sortbtn','aria-label':'跳到個股明細段落'},h('option',{value:'',text:'選擇段落…'}));
   const mobileJump=h('label',{class:'sheetjump-select'},'跳到',jumpSelect);
   const nav=h('nav',{class:'stocknav','aria-label':'同族群個股導覽'},
     h('span',{class:'mono stocknav-status',text:(idx+1)+' / '+sibs.length+' · '+grp(s.g).nm}),
     h('div',{class:'stocknav-pair'},navBtn(prev,'‹ 上一檔'),navBtn(next,'下一檔 ›')));
-  if(groupContext)nav.prepend(h('button',{class:'togglebtn',type:'button',text:'返回'+grp(groupContext.g).nm+'族群',onclick:()=>openGroupSheet(groupContext)}));
+  if(groupContext)nav.prepend(h('button',{class:'togglebtn',type:'button',text:'返回'+grp(groupContext.g).nm+'族群',onclick:()=>openGroupSheet(groupContext,null,groupReturn)}));
   sheetEl.replaceChildren(sheetHeader(s.nm+' '+s.id+' · 個股明細'),nav,jump,mobileJump,card);
   // 跳段：依 card 內的 h3 標題自動生成（在 #sheet 內捲動，不動全頁）
   const headings=[...card.querySelectorAll('h3')];
@@ -1909,11 +1913,11 @@ function openStockDetail(id,groupContext=null,chartContext=null,opener=null){ co
       onclick:()=>goToHeading(hd), text:label}));
     jumpSelect.appendChild(h('option',{value:String(index),text:label}));});
   jumpSelect.addEventListener('change',()=>{if(jumpSelect.value==='')return;goToHeading(headings[Number(jumpSelect.value)]);jumpSelect.value='';});
-  showSheet(()=>openStockDetail(id,groupContext,chartContext,opener),opener);
+  showSheet(()=>openStockDetail(id,groupContext,chartContext,opener,groupReturn),opener);
   // 明確的同日比較才跳回圖表；原本頂端的上一檔／下一檔仍從明細頂端開始。
   if(chartContext){const heading=card.querySelector('[data-history-chart] h3');if(heading)window.requestAnimationFrame(()=>goToHeading(heading,true));}
 }
-function openGroupSheet(g,opener=null){
+function openGroupSheet(g,opener=null,restore=null){
   const st=stateStyle(g.state),statList=h('div',{});
   const members=stockSearchGroups(D.stocks,D.groups,g.g,'','comp',true)[0];
   const memberLinks=h('section',{'aria-label':grp(g.g).nm+'成分股',style:'margin:16px 0'},
@@ -1923,7 +1927,7 @@ function openGroupSheet(g,opener=null){
   if(members)members.rows.forEach(({stock:s,rank})=>{
     const compTxt=(s.comp>=0?'+':'')+s.comp.toFixed(1),r20Txt=fmtPct(s.r20,1),rankTxt=rank==null?'—':'#'+rank;
     const summary=rankTxt+' '+s.nm+' '+s.id+'，族群內綜合分 '+compTxt+'，20日絕對報酬 '+r20Txt+(s.trading?'，暫停／未交易':'');
-    memberList.appendChild(h('button',{class:'togglebtn group-member-btn',type:'button',title:summary,'aria-label':summary+'；查看明細',onclick:()=>openStockDetail(s.id,g)},
+    memberList.appendChild(h('button',{class:'togglebtn group-member-btn',type:'button','data-stock-id':s.id,title:summary,'aria-label':summary+'；查看明細',onclick:()=>openStockDetail(s.id,g)},
       h('span',{class:'group-member-main'},
         h('span',{class:'group-member-rank mono',text:rankTxt}),
         h('b',{class:'group-member-name',text:s.nm}),
@@ -1955,7 +1959,22 @@ function openGroupSheet(g,opener=null){
     h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'族群五項指標'}),statList,memberLinks];
   const gfs=flowSection(g.flow);
   if(gfs)body.push(h('div',{style:'margin-top:10px;border-top:1px solid var(--line)'},gfs));
-  sheetEl.replaceChildren(...body); showSheet(()=>openGroupSheet(g,opener),opener);
+  sheetEl.replaceChildren(...body); showSheet(()=>openGroupSheet(g,opener,restore),opener);
+  if(restore){
+    const targetTop=Math.max(0,restore.scrollTop||0),stockId=restore.stockId;
+    window.requestAnimationFrame(()=>{
+      if(!sheetwrap.classList.contains('on'))return;
+      sheetEl.scrollTop=targetTop;
+      const target=stockId?sheetEl.querySelector('.group-member-btn[data-stock-id="'+stockId+'"]'):null;
+      if(target){
+        const sheetBox=sheetEl.getBoundingClientRect(),targetBox=target.getBoundingClientRect(),header=sheetEl.querySelector('.sheetheader');
+        const visibleTop=sheetBox.top+(header?header.getBoundingClientRect().height:0)+8,visibleBottom=sheetBox.bottom-8;
+        if(targetBox.top<visibleTop)sheetEl.scrollTop=Math.max(0,sheetEl.scrollTop-(visibleTop-targetBox.top));
+        else if(targetBox.bottom>visibleBottom)sheetEl.scrollTop+=targetBox.bottom-visibleBottom;
+        target.focus({preventScroll:true});
+      }
+    });
+  }
 }
 
 // 分層 pill 用：5 個元素分 → 極簡色條（紅＝相對強、綠＝相對弱，高度／濃度＝強度）
