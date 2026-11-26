@@ -191,6 +191,8 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
         got = self.run_js(pre, [
             ('最新日期排在最前', "select().children.slice(0,4).map(x=>x.textContent)"),
             ('直接選日期', "choose('day10')"),
+            ('選單關閉造成的原位 hover 不蓋掉讀數', "(box().fire('pointermove',{pointerType:'mouse',clientX:628}),{text:output().textContent,value:select().value})"),
+            ('短暫抑制後仍保留 hover 預覽', "(now+=501,box().fire('pointermove',{pointerType:'mouse',clientX:628}),{text:output().textContent,value:select().value})"),
             ('鍵盤移動同步選單', "key('ArrowRight')"),
             ('切換指標保留日期', "(button('外資').fire('click'),{text:output().textContent,value:select().value})"),
             ('切換區間清除日期並縮短清單', "(button('20 日').fire('click'),{hidden:output().hidden,value:select().value||'',count:select().children.length,first:select().children[1].textContent,last:select().children.at(-1).textContent})"),
@@ -198,11 +200,15 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
         self.assertEqual(got[0], ['選擇交易日…', 'day64', 'day63', 'day62'])
         self.assertIn('日期day10', got[1]['text'])
         self.assertEqual(got[1]['value'], 'day10')
-        self.assertIn('日期day11', got[2]['text'])
-        self.assertEqual(got[2]['value'], 'day11')
-        self.assertIn('日期day11', got[3]['text'])
-        self.assertEqual(got[3]['value'], 'day11')
-        self.assertEqual(got[4], {
+        self.assertIn('日期day10', got[2]['text'])
+        self.assertEqual(got[2]['value'], 'day10')
+        self.assertIn('日期day64', got[3]['text'])
+        self.assertEqual(got[3]['value'], 'day10')
+        self.assertIn('日期day11', got[4]['text'])
+        self.assertEqual(got[4]['value'], 'day11')
+        self.assertIn('日期day11', got[5]['text'])
+        self.assertEqual(got[5]['value'], 'day11')
+        self.assertEqual(got[6], {
             'hidden': True, 'value': '', 'count': 21,
             'first': 'day64', 'last': 'day45'})
 

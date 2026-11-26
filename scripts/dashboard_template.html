@@ -784,7 +784,7 @@ function priceChart(chart, tech, comparison=null){
   const compactMode=()=>typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(max-width: 680px)').matches;
   const chartPads=()=>compactMode()?{l:4,r:10}:{l:8,r:52};
   const host=h('div',{class:'card history-chart-card','data-history-chart':''});
-  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],renderedCompact=null,dateSelect=null;
+  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],renderedCompact=null,dateSelect=null,suppressHoverUntil=0;
 
   function buildSvg(){
     const R=st.range, s=a=>(a||[]).slice(-R);
@@ -896,6 +896,8 @@ function priceChart(chart, tech, comparison=null){
       h('span',{style:'font-size:var(--fs-11);color:var(--muted);align-self:center;margin-right:2px',text:'副圖：'}, ), ...subChips):null;
     const visibleDates=(chart.dates||[]).slice(-st.range);
     dateSelect=h('select',{class:'sortbtn','aria-label':'直接選擇圖表日期',onchange:e=>{
+      // 原生選單關閉時游標常已停在圖表上；補發的第一次 mousemove 不是使用者要預覽別日。
+      suppressHoverUntil=Date.now()+500;
       if(!e.target.value){st.selected=null;st.hover=null;requestedDate=null;drawSvg();return;}
       const i=visibleDates.indexOf(e.target.value);
       if(i>=0)selectPoint(i);
@@ -936,7 +938,7 @@ function priceChart(chart, tech, comparison=null){
     chartBox.addEventListener('pointermove',ev=>{
       touchGuard(ev);
       if(tap&&tap.id===ev.pointerId&&Math.hypot(ev.clientX-tap.x,ev.clientY-tap.y)>8)tap=null;
-      if(ev.pointerType!=='mouse'||Date.now()<touchUntil||ev.sourceCapabilities?.firesTouchEvents)return;
+      if(ev.pointerType!=='mouse'||Date.now()<touchUntil||Date.now()<suppressHoverUntil||ev.sourceCapabilities?.firesTouchEvents)return;
       const i=pointIndex(ev);if(i!==st.hover){st.hover=i;drawSvg();}
     });
     chartBox.addEventListener('pointerup',ev=>{
