@@ -2313,7 +2313,7 @@ function buildDetail(chartComparison=null){
         h('div',{style:'font-size:13.5px;color:var(--muted);margin-top:5px',text:d.biz})),
       h('div',{style:'text-align:right;flex:0 0 auto'},h('div',{class:'mono',style:`font-size:38px;font-weight:600;color:${compCol};line-height:1`,text:(d.comp>=0?'+':'')+d.comp.toFixed(1)}),
         h('div',{style:'font-size:var(--fs-11);color:var(--muted);margin-top:3px',text:'族群內綜合分（±'+COMP_MAX.toFixed(1)+'）'}))),
-    riskW,multi,rankChangeSection(d),
+    riskW,rankChangeSection(d),multi,
     d.note&&h('div',{style:'margin-top:20px;background:var(--tealbg);border-left:4px solid var(--teal);border-radius:12px;padding:15px 18px'},
       h('div',{style:'font-size:var(--fs-11);font-weight:800;color:var(--teal);letter-spacing:.05em;margin-bottom:5px',text:'一句話結論 · 研究筆記（'+d.note.label+'）'}),
       h('p',{style:'margin:0;font-size:14.5px;line-height:1.7;color:var(--ink2)',text:d.note.summary})),
