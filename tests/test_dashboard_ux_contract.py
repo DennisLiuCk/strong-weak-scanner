@@ -306,8 +306,12 @@ class DashboardUxContractTest(unittest.TestCase):
                        "openGroupSheet(groupContext,null,groupReturn)",
                        "openStockDetail(o.id,groupContext,null,null,groupReturn)",
                        "'data-stock-id':s.id", "sheetEl.scrollTop=targetTop",
-                       "target.focus({preventScroll:true})"):
+                       "target.classList.add('focus-return')",
+                       "target.focus({preventScroll:true,focusVisible:true})"):
             self.assertIn(marker, stock_sheet)
+        # 滑鼠走完整個比較循環時，瀏覽器不把程式還原焦點當 :focus-visible；
+        # 返回位置仍要有明確焦點框，否則使用者看不出剛才比較的是哪一檔。
+        self.assertIn(".group-member-btn.focus-return{outline:2px solid var(--strong)", self.template)
 
     def test_tier_bands_and_five_day_flow(self):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",

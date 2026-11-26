@@ -233,8 +233,10 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 svg{display:block;overflow:visible}
 .togglebtn{display:inline-flex;align-items:center;gap:7px;cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink2);border-radius:100px;padding:7px 14px;font:inherit;font-size:12.5px}
 .togglebtn:hover{color:var(--ink);border-color:var(--muted)}
+.togglebtn:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
 .group-member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(136px,100%),1fr));gap:8px}
 .group-member-btn{align-items:flex-start;flex-direction:column;gap:2px;min-width:0;border-radius:12px;padding:7px 10px;text-align:left}
+.group-member-btn.focus-return{outline:2px solid var(--strong);outline-offset:2px}
 .group-member-main{display:flex;align-items:baseline;gap:5px;min-width:0;color:var(--ink);line-height:1.25}
 .group-member-rank{flex:0 0 auto;font-size:var(--fs-10);font-weight:700;color:var(--muted)}
 .group-member-name{min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1975,7 +1977,9 @@ function openGroupSheet(g,opener=null,restore=null){
         const visibleTop=sheetBox.top+(header?header.getBoundingClientRect().height:0)+8,visibleBottom=sheetBox.bottom-8;
         if(targetBox.top<visibleTop)sheetEl.scrollTop=Math.max(0,sheetEl.scrollTop-(visibleTop-targetBox.top));
         else if(targetBox.bottom>visibleBottom)sheetEl.scrollTop+=targetBox.bottom-visibleBottom;
-        target.focus({preventScroll:true});
+        target.classList.add('focus-return');
+        target.addEventListener('blur',()=>target.classList.remove('focus-return'),{once:true});
+        target.focus({preventScroll:true,focusVisible:true});
       }
     });
   }
