@@ -259,6 +259,7 @@ svg{display:block;overflow:visible}
 .sheetjump-select{display:none}
 @media(max-width:680px){.sheetjumps{display:none}.sheetjump-select{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--muted)}.sheetjump-select select{flex:1;min-width:0;min-height:44px}}
 @media(max-width:680px){#sheetwrap{align-items:flex-end}#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}#sheetwrap.on #sheet{transform:translateY(0)}.sheetheader{top:-18px;margin:-18px -12px 14px;padding:10px 12px}.stock-detail-card{padding:20px 16px}.history-chart-card{padding:16px 12px}.chart-date-picker{align-items:flex-start;flex-direction:column;gap:5px}.chart-date-picker select{width:100%}.chart-canvas{padding:10px 6px 4px}.chart-range-btn,.chart-chip-btn{min-height:44px}}
+@media(max-width:380px){.sheetheader{padding-top:6px;padding-bottom:6px;margin-bottom:8px}.stocknav{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center}.stocknav>button{grid-column:1/-1}.stocknav-status{flex:none;font-size:10px;white-space:nowrap}.stocknav-pair{display:contents}.stocknav-pair .togglebtn{width:100%;min-height:44px;padding:4px 5px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sheetjump-select{margin-top:8px}.stock-detail-card{padding-top:14px}.stock-detail-head{gap:8px!important}.stock-detail-id b{font-size:24px!important}.stock-detail-id .mono{font-size:13px!important}.stock-detail-id .chip{font-size:11px!important}.stock-detail-score .mono{font-size:30px!important}.stock-detail-score>div:last-child{font-size:10.5px!important}.rkc{margin-top:12px;padding:12px 11px}}
 /* ---------- 多視角探索：方案 3，單一族群主從式比較 ---------- */
 #perspectives{width:min(1400px,calc(100vw - 80px));max-width:none;margin-left:50%;padding:7px 11px 0 0;transform:translateX(-50%)}
 #perspectives>.kicker{margin-bottom:16px}
@@ -2306,12 +2307,12 @@ function buildDetail(chartComparison=null){
       '移除單一 peer 後跨五分位情境 '+(d.views.peer_sensitivity==null?'尚無':d.views.peer_sensitivity.toFixed(0)+'%')+
       (d.views.top_boundary_tied?'；正式前二邊界有 tie，名次需保守解讀。':'。')}));
   const card=h('div',{class:'card stock-detail-card'},
-    h('div',{style:'display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap'},
-      h('div',{style:'min-width:0'},h('div',{style:'display:flex;align-items:baseline;gap:10px;flex-wrap:wrap'},
+    h('div',{class:'stock-detail-head',style:'display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap'},
+      h('div',{class:'stock-detail-id',style:'min-width:0'},h('div',{style:'display:flex;align-items:baseline;gap:10px;flex-wrap:wrap'},
         h('b',{style:'font-size:28px;font-weight:900;letter-spacing:.5px',text:d.nm}),h('span',{class:'mono',style:'font-size:15px;color:var(--muted)',text:d.id}),
         h('span',{class:'chip',style:`color:${ts.col};background:${ts.bg}`,text:(d.tier_label||d.tierLabel)})),
         h('div',{style:'font-size:13.5px;color:var(--muted);margin-top:5px',text:d.biz})),
-      h('div',{style:'text-align:right;flex:0 0 auto'},h('div',{class:'mono',style:`font-size:38px;font-weight:600;color:${compCol};line-height:1`,text:(d.comp>=0?'+':'')+d.comp.toFixed(1)}),
+      h('div',{class:'stock-detail-score',style:'text-align:right;flex:0 0 auto'},h('div',{class:'mono',style:`font-size:38px;font-weight:600;color:${compCol};line-height:1`,text:(d.comp>=0?'+':'')+d.comp.toFixed(1)}),
         h('div',{style:'font-size:var(--fs-11);color:var(--muted);margin-top:3px',text:'族群內綜合分（±'+COMP_MAX.toFixed(1)+'）'}))),
     riskW,rankChangeSection(d),multi,
     d.note&&h('div',{style:'margin-top:20px;background:var(--tealbg);border-left:4px solid var(--teal);border-radius:12px;padding:15px 18px'},
