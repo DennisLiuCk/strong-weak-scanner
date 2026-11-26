@@ -391,13 +391,22 @@ class DashboardUxContractTest(unittest.TestCase):
                        "metricCell(mom,fmtPct(mom,1),pctCol(mom),md,25,'動能 vs 全體')",
                        "dd,3,'修正日外資'"):
             self.assertIn(marker, self.template)
-        # 多視角詳情標示五個位置，手機不得把第五個藏進橫向捲軸；兩列排列仍維持原五張卡與文字標籤。
-        for marker in (".rv-score-grid{grid-template-columns:repeat(6,minmax(0,1fr));overflow:hidden}",
+        # 多視角主分頁與詳情都標示五個位置，手機不得把任何一個藏進橫向捲軸；兩列排列仍維持原文字標籤。
+        for marker in (".rv-lens-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));overflow:hidden}",
+                       ".rv-lens-tab:nth-child(4){grid-column:2/span 2}",
+                       ".rv-lens-tab:nth-child(5){grid-column:4/span 2}",
+                       ".rv-score-grid{grid-template-columns:repeat(6,minmax(0,1fr));overflow:hidden}",
                        ".rv-score-card:nth-child(4){grid-column:2/span 2}",
                        ".rv-score-card:nth-child(5){grid-column:4/span 2}",
                        ".rv-score-card span:not(.material-symbols-rounded){white-space:normal;line-height:1.25}",
                        ".rv-detail-action{min-width:44px;min-height:44px",
                        ".rv-group-select{min-height:44px}"):
+            self.assertIn(marker, self.template)
+        for marker in ("const moveTabFocus=(key,event)=>",
+                       "ArrowLeft:-1,ArrowUp:-1,ArrowRight:1,ArrowDown:1",
+                       "else if(event.key==='Home')nextIndex=0",
+                       "else if(event.key==='End')nextIndex=RV_KEYS.length-1",
+                       "onkeydown:event=>moveTabFocus(key,event)"):
             self.assertIn(marker, self.template)
         self.assertNotIn(".rv-score-grid{grid-template-columns:repeat(5,86px);overflow-x:auto}", self.template)
         # 桌機鎖寬已移除,窄視口不得水平溢位；詳情抽屜在窄屏也要把寬度留給圖表，
