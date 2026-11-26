@@ -257,7 +257,7 @@ svg{display:block;overflow:visible}
 .sheetjumps{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
 .sheetjump-select{display:none}
 @media(max-width:680px){.sheetjumps{display:none}.sheetjump-select{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--muted)}.sheetjump-select select{flex:1;min-width:0;min-height:44px}}
-@media(max-width:680px){#sheetwrap{align-items:flex-end}#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}#sheetwrap.on #sheet{transform:translateY(0)}.sheetheader{top:-18px;margin:-18px -12px 14px;padding:10px 12px}.stock-detail-card{padding:20px 16px}.history-chart-card{padding:16px 12px}.chart-date-picker{align-items:flex-start;flex-direction:column;gap:5px}.chart-date-picker select{width:100%}.chart-canvas{padding:10px 6px 4px}}
+@media(max-width:680px){#sheetwrap{align-items:flex-end}#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}#sheetwrap.on #sheet{transform:translateY(0)}.sheetheader{top:-18px;margin:-18px -12px 14px;padding:10px 12px}.stock-detail-card{padding:20px 16px}.history-chart-card{padding:16px 12px}.chart-date-picker{align-items:flex-start;flex-direction:column;gap:5px}.chart-date-picker select{width:100%}.chart-canvas{padding:10px 6px 4px}.chart-range-btn,.chart-chip-btn{min-height:44px}}
 /* ---------- 多視角探索：方案 3，單一族群主從式比較 ---------- */
 #perspectives{width:min(1400px,calc(100vw - 80px));max-width:none;margin-left:50%;padding:7px 11px 0 0;transform:translateX(-50%)}
 #perspectives>.kicker{margin-bottom:16px}
@@ -894,7 +894,7 @@ function priceChart(chart, tech, comparison=null){
 
   function chip(x){ const onx=!!st.ind[x.k], lv=lastNN(arrOf(x.k));
     const val = x.k==='vol'?_fv(lv.v) : (x.k==='foreign'||x.k==='trust')?_fs(lv.v) : (lv.v==null?'—':lv.v.toFixed(x.k==='rsi'?1:2));
-    return h('button',{onclick:()=>{st.ind[x.k]=onx?0:1; full();},
+    return h('button',{class:'chart-chip-btn',onclick:()=>{st.ind[x.k]=onx?0:1; full();},
       style:'display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:6px 11px;border-radius:9px;cursor:pointer;border:1px solid '+(onx?x.c:'var(--line)')+';background:'+(onx?'var(--card)':'transparent')+';color:'+(onx?'var(--ink)':'var(--muted)')+';opacity:'+(onx?1:0.72)},
       h('span',{style:'width:14px;height:14px;border-radius:4px;border:1.5px solid '+x.c+';background:'+(onx?x.c:'transparent')+';color:var(--card);font-size:var(--fs-10);line-height:12px;text-align:center;font-weight:800'}, onx?'✓':''),
       h('span',{style:'width:11px;height:3px;border-radius:2px;background:'+x.c}),
@@ -904,7 +904,7 @@ function priceChart(chart, tech, comparison=null){
   function full(){
     const techCol=tech.cls==='up'?'var(--strong)':tech.cls==='down'?'var(--weak)':'var(--muted)';
     const rangeSeg=h('div',{style:'display:inline-flex;gap:3px;padding:3px;background:var(--inset);border-radius:10px'},
-      ...RANGES.map(rg=>h('button',{onclick:()=>{st.range=rg[1];st.hover=null;st.selected=null;requestedDate=null;full();},
+      ...RANGES.map(rg=>h('button',{class:'chart-range-btn',onclick:()=>{st.range=rg[1];st.hover=null;st.selected=null;requestedDate=null;full();},
         style:'font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;color:'+(st.range===rg[1]?'var(--card)':'var(--ink2)')+';background:'+(st.range===rg[1]?'var(--ink)':'transparent')}, rg[0])));
     const top=h('div',{style:'display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px'},
       h('div',{},
