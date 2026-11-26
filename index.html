@@ -1914,9 +1914,11 @@ function openStockDetail(id,groupContext=null,chartContext=null,opener=null,grou
     h('div',{class:'stocknav-pair'},navBtn(prev,'‹ 上一檔'),navBtn(next,'下一檔 ›')));
   if(groupContext)nav.prepend(h('button',{class:'togglebtn',type:'button',text:'返回'+grp(groupContext.g).nm+'族群',onclick:()=>openGroupSheet(groupContext,null,groupReturn)}));
   sheetEl.replaceChildren(sheetHeader(s.nm+' '+s.id+' · 個股明細'),nav,jump,mobileJump,card);
-  // 跳段：依 card 內的 h3 標題自動生成（在 #sheet 內捲動，不動全頁）
-  const headings=[...card.querySelectorAll('h3')];
+  // 跳段：依 card 內的 h3 標題自動生成（在 #sheet 內捲動，不動全頁）。
+  // 圖表控制列會重 render 圖卡；段落與目前位置都要即時查 live DOM，不能沿用舊 h3。
   const headingLabel=hd=>(hd.textContent||'').replace(/ · .*/,'').trim();
+  const liveHeadings=()=>[...card.querySelectorAll('h3')];
+  const findHeading=label=>liveHeadings().find(hd=>headingLabel(hd)===label);
   const desktopNav=()=>typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(min-width: 681px)').matches;
   const headingOffset=()=>{
     const headerHeight=sheetEl.querySelector('.sheetheader').getBoundingClientRect().height;
@@ -1931,17 +1933,17 @@ function openStockDetail(id,groupContext=null,chartContext=null,opener=null,grou
   currentSectionLabel=()=>{
     const probe=sheetEl.getBoundingClientRect().top+headingOffset()+24;
     let label=null;
-    headings.slice().sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top)
+    liveHeadings().sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top)
       .forEach(hd=>{if(hd.getBoundingClientRect().top<=probe)label=headingLabel(hd);});
     return label;
   };
-  headings.forEach((hd,index)=>{
+  liveHeadings().forEach(hd=>{
     const label=headingLabel(hd);
     if(!label)return;
     jump.appendChild(h('button',{class:'togglebtn',style:'padding:5px 11px;font-size:12px',
-      onclick:()=>goToHeading(hd), text:label}));
-    jumpSelect.appendChild(h('option',{value:String(index),text:label}));});
-  jumpSelect.addEventListener('change',()=>{if(jumpSelect.value==='')return;goToHeading(headings[Number(jumpSelect.value)]);jumpSelect.value='';});
+      onclick:()=>{const target=findHeading(label);if(target)goToHeading(target);}, text:label}));
+    jumpSelect.appendChild(h('option',{value:label,text:label}));});
+  jumpSelect.addEventListener('change',()=>{if(jumpSelect.value==='')return;const target=findHeading(jumpSelect.value);if(target)goToHeading(target);jumpSelect.value='';});
   showSheet(()=>openStockDetail(id,groupContext,chartContext,opener,groupReturn,sectionKey),opener);
   // 明確的同日比較在手機直接落到圖表本身；若只對齊段落標題，控制列會把圖表與比較按鈕擠出首屏。
   // 桌機首屏本來就放得下控制列、圖表與比較鈕，仍維持落在段落標題；原本頂端的上一檔／下一檔從明細頂端開始。
@@ -1949,7 +1951,7 @@ function openStockDetail(id,groupContext=null,chartContext=null,opener=null,grou
     const target=(narrow?card.querySelector('[data-history-chart] .chart-canvas'):null)||card.querySelector('[data-history-chart] h3');
     if(target)window.requestAnimationFrame(()=>goToHeading(target,true));}
   else if(sectionKey){
-    const target=headings.find(hd=>headingLabel(hd)===sectionKey);
+    const target=findHeading(sectionKey);
     if(target)window.requestAnimationFrame(()=>goToHeading(target,true));
   }
 }

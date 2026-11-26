@@ -532,14 +532,17 @@ class DashboardUxContractTest(unittest.TestCase):
     def test_desktop_stocknav_stays_available_and_preserves_section(self):
         # 桌機連看同族群個股時，上一檔／下一檔不能在捲入圖表後消失；
         # 從某個段落換檔也應落在同一個段落，否則仍無法真正比較。
+        # 圖表控制項會重 render 圖卡，段落位置必須查 live DOM，否則回頂端仍會誤判成圖表段落。
         for marker in ("@media(min-width:681px)",
                        ".stocknav{position:sticky;top:43px;z-index:4;flex-wrap:nowrap;margin:0 -26px;padding:7px 26px 9px;background:var(--card);border-bottom:1px solid var(--line2)}",
                        ".stocknav-status{flex:0 0 auto;white-space:nowrap}",
                        ".stocknav-pair{flex:1 1 auto;width:auto}",
                        "function openStockDetail(id,groupContext=null,chartContext=null,opener=null,groupReturn=null,sectionKey=null)",
+                       "const liveHeadings=()=>[...card.querySelectorAll('h3')]",
                        "currentSectionLabel=()=>",
                        "openStockDetail(o.id,groupContext,null,null,groupReturn,currentSectionLabel())",
-                       "else if(sectionKey)"):
+                       "else if(sectionKey)",
+                       "const target=findHeading(sectionKey)"):
             self.assertIn(marker, self.template)
 
     # ---------- 抽屜:focus 管理 ----------
