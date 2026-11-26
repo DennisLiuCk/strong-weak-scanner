@@ -874,7 +874,7 @@ function priceChart(chart, tech, comparison=null){
     // 十字游標 + 讀數框
     const selectedDate=st.selected==null?null:dates[st.selected];
     if(compareStatus)compareStatus.textContent=selectedDate?'已選 '+selectedDate+'；比較時保留區間與指標。':requestedDate?
-      '本檔無 '+requestedDate+' 的可用圖表日期；未改選其他日期，請另選日期。':'先點按圖表保留日期，再比較同族群個股。';
+      '本檔無 '+requestedDate+' 的可用圖表日期；未改選其他日期，請另選日期。':'先用「跳到日期」或點按圖表保留日期，再比較同族群個股。';
     compareButtons.forEach(({button,peer})=>{button.disabled=!selectedDate||!peer||!peer.available;});
     const active=st.hover==null?st.selected:st.hover;
     const hv=(active!=null&&active>=0&&active<N)?active:null;
@@ -997,7 +997,7 @@ function priceChart(chart, tech, comparison=null){
     }
     const foot=h('p',{style:'margin:10px 0 0;font-size:var(--fs-11);color:var(--muted);line-height:1.6',
       text:'現價／MA5／MA20／MA60 共用價格軸；RSI14、成交量、外資、投信各自成副圖、對齊同一時間軸。可直接選日期，或點按圖表保留日期與讀數；切換區間後清除。鍵盤聚焦圖表後，用左右鍵切換交易日，Home／End 跳到最早／最新。'});
-    host.replaceChildren(...[top, cP, cS, datePicker, chartMeta, chartBox, readout, compareNav, foot].filter(Boolean));
+    host.replaceChildren(...[top, datePicker, cP, cS, chartMeta, chartBox, readout, compareNav, foot].filter(Boolean));
     drawSvg();
   }
   full();
