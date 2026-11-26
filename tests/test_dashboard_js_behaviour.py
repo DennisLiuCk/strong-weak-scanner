@@ -176,6 +176,36 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent===text);
         self.assertIn('日期day64', got[20]['text'])
         self.assertIn('日期day45', got[21]['text'])
 
+    def test_chart_date_select_pins_exact_date_and_survives_indicator_toggle(self):
+        pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
+const vals=Array.from({length:65},(_,i)=>100+i);
+const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
+  rsi:vals.map(()=>0),vol:vals.map(()=>0),foreign:vals.map(()=>0),trust:vals.map(()=>null)},{});
+const output=()=>host.find(e=>e.attrs.role==='status');
+const box=()=>host.find(e=>e.attrs.role==='group');
+const select=()=>host.find(e=>e.className==='chart-date-picker').find(e=>e.tag==='select');
+const choose=d=>{select().value=d;select().fire('change',{target:select()});return {text:output().textContent,value:select().value};};
+const key=k=>{box().fire('keydown',{key:k,preventDefault(){}});return {text:output().textContent,value:select().value};};
+const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
+"""
+        got = self.run_js(pre, [
+            ('最新日期排在最前', "select().children.slice(0,4).map(x=>x.textContent)"),
+            ('直接選日期', "choose('day10')"),
+            ('鍵盤移動同步選單', "key('ArrowRight')"),
+            ('切換指標保留日期', "(button('外資').fire('click'),{text:output().textContent,value:select().value})"),
+            ('切換區間清除日期並縮短清單', "(button('20 日').fire('click'),{hidden:output().hidden,value:select().value||'',count:select().children.length,first:select().children[1].textContent,last:select().children.at(-1).textContent})"),
+        ])
+        self.assertEqual(got[0], ['選擇交易日…', 'day64', 'day63', 'day62'])
+        self.assertIn('日期day10', got[1]['text'])
+        self.assertEqual(got[1]['value'], 'day10')
+        self.assertIn('日期day11', got[2]['text'])
+        self.assertEqual(got[2]['value'], 'day11')
+        self.assertIn('日期day11', got[3]['text'])
+        self.assertEqual(got[3]['value'], 'day11')
+        self.assertEqual(got[4], {
+            'hidden': True, 'value': '', 'count': 21,
+            'first': 'day64', 'last': 'day45'})
+
     def test_chart_peer_comparison_uses_pinned_date_not_hover_and_aligns_exact_dates(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
 const vals=Array.from({length:65},(_,i)=>100+i);

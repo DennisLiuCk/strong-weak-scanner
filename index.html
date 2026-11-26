@@ -74,6 +74,8 @@ h2.sec{margin:0 0 6px;font-size:28px;font-weight:800;letter-spacing:.3px}
 .history-chart-card{padding:20px 22px}
 .chart-meta{display:flex;flex-wrap:wrap;gap:2px 12px;margin:-2px 0 8px;font-size:11.5px;line-height:1.5;color:var(--ink2)}
 .chart-meta[hidden]{display:none}
+.chart-date-picker{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:12px;font-weight:800;color:var(--muted)}
+.chart-date-picker select{min-width:154px;border-radius:10px;text-align:left}
 .chart-canvas{background:var(--inset);border:1px solid var(--line2);border-radius:12px;padding:14px 12px 6px}
 .opthd{display:flex;align-items:center;gap:10px;margin-bottom:13px}
 .opthd b{font-size:16px} .opthd span{font-size:12.5px;color:var(--muted)}
@@ -243,7 +245,7 @@ svg{display:block;overflow:visible}
 .sheetjumps{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
 .sheetjump-select{display:none}
 @media(max-width:680px){.sheetjumps{display:none}.sheetjump-select{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--muted)}.sheetjump-select select{flex:1;min-width:0;min-height:44px}}
-@media(max-width:680px){#sheetwrap{align-items:flex-end}#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}#sheetwrap.on #sheet{transform:translateY(0)}.sheetheader{top:-18px;margin:-18px -12px 14px;padding:10px 12px}.stock-detail-card{padding:20px 16px}.history-chart-card{padding:16px 12px}.chart-canvas{padding:10px 6px 4px}}
+@media(max-width:680px){#sheetwrap{align-items:flex-end}#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}#sheetwrap.on #sheet{transform:translateY(0)}.sheetheader{top:-18px;margin:-18px -12px 14px;padding:10px 12px}.stock-detail-card{padding:20px 16px}.history-chart-card{padding:16px 12px}.chart-date-picker{align-items:flex-start;flex-direction:column;gap:5px}.chart-date-picker select{width:100%}.chart-canvas{padding:10px 6px 4px}}
 /* ---------- 多視角探索：方案 3，單一族群主從式比較 ---------- */
 #perspectives{width:min(1400px,calc(100vw - 80px));max-width:none;margin-left:50%;padding:7px 11px 0 0;transform:translateX(-50%)}
 #perspectives>.kicker{margin-bottom:16px}
@@ -782,7 +784,7 @@ function priceChart(chart, tech, comparison=null){
   const compactMode=()=>typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(max-width: 680px)').matches;
   const chartPads=()=>compactMode()?{l:4,r:10}:{l:8,r:52};
   const host=h('div',{class:'card history-chart-card','data-history-chart':''});
-  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],renderedCompact=null;
+  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],renderedCompact=null,dateSelect=null;
 
   function buildSvg(){
     const R=st.range, s=a=>(a||[]).slice(-R);
@@ -865,7 +867,9 @@ function priceChart(chart, tech, comparison=null){
     const xx=(ev.clientX-r.left)/r.width*680, n=Math.min(st.range,maxN);
     return Math.max(0,Math.min(n-1,Math.round((xx-pads.l)/(680-pads.l-pads.r)*(n-1))));
   }
-  function selectPoint(i){st.selected=i;st.hover=null;requestedDate=null;drawSvg();}
+  function selectPoint(i){st.selected=i;st.hover=null;requestedDate=null;
+    if(dateSelect)dateSelect.value=(chart.dates||[]).slice(-st.range)[i]||'';
+    drawSvg();}
 
   function chip(x){ const onx=!!st.ind[x.k], lv=lastNN(arrOf(x.k));
     const val = x.k==='vol'?_fv(lv.v) : (x.k==='foreign'||x.k==='trust')?_fs(lv.v) : (lv.v==null?'—':lv.v.toFixed(x.k==='rsi'?1:2));
@@ -890,6 +894,16 @@ function priceChart(chart, tech, comparison=null){
     const subChips=IND.filter(x=>x.g==='s'&&has(x.k)).map(chip);
     const cS=subChips.length?h('div',{style:'display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px'},
       h('span',{style:'font-size:var(--fs-11);color:var(--muted);align-self:center;margin-right:2px',text:'副圖：'}, ), ...subChips):null;
+    const visibleDates=(chart.dates||[]).slice(-st.range);
+    dateSelect=h('select',{class:'sortbtn','aria-label':'直接選擇圖表日期',onchange:e=>{
+      if(!e.target.value){st.selected=null;st.hover=null;requestedDate=null;drawSvg();return;}
+      const i=visibleDates.indexOf(e.target.value);
+      if(i>=0)selectPoint(i);
+    }},h('option',{value:'',text:'選擇交易日…'}),
+      ...[...visibleDates].reverse().map(date=>h('option',{value:date,text:date})));
+    const pinnedDate=st.selected==null?null:visibleDates[st.selected];
+    dateSelect.value=pinnedDate||'';
+    const datePicker=h('label',{class:'chart-date-picker'},h('span',{text:'跳到日期'}),dateSelect);
     let compareNav=null;
     compareButtons=[];
     if(comparison){
@@ -945,8 +959,8 @@ function priceChart(chart, tech, comparison=null){
       window.__scannerChartResize=()=>{if(compactMode()!==renderedCompact)drawSvg();};
     }
     const foot=h('p',{style:'margin:10px 0 0;font-size:var(--fs-11);color:var(--muted);line-height:1.6',
-      text:'現價／MA5／MA20／MA60 共用價格軸；RSI14、成交量、外資、投信各自成副圖、對齊同一時間軸。滑鼠移入可預覽；點按圖表可保留日期與讀數，切換區間後清除。鍵盤聚焦圖表後，用左右鍵切換交易日，Home／End 跳到最早／最新。'});
-    host.replaceChildren(...[top, cP, cS, chartMeta, chartBox, readout, compareNav, foot].filter(Boolean));
+      text:'現價／MA5／MA20／MA60 共用價格軸；RSI14、成交量、外資、投信各自成副圖、對齊同一時間軸。可直接選日期，或點按圖表保留日期與讀數；切換區間後清除。鍵盤聚焦圖表後，用左右鍵切換交易日，Home／End 跳到最早／最新。'});
+    host.replaceChildren(...[top, cP, cS, datePicker, chartMeta, chartBox, readout, compareNav, foot].filter(Boolean));
     drawSvg();
   }
   full();
