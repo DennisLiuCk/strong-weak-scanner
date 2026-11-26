@@ -176,6 +176,7 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .tier-snapshot-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
 .tier-snapshot-head b{font-size:15px}.tier-snapshot-head span{font-size:14px;font-weight:700}
 .tier-snapshot-list{display:flex;flex-wrap:wrap;gap:7px}
+.tier-snapshot-legend{grid-column:1/-1;margin:0 2px -5px;font-size:var(--fs-11);color:var(--ink2);line-height:1.5}
 .tier-snapshot-more{margin-top:10px;font-size:var(--fs-105);color:var(--muted)}
 .tier-full{margin-top:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
 .tier-full>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;font-size:12.5px;font-weight:800;color:var(--ink2)}
@@ -1841,6 +1842,10 @@ function buildTier(){
      擴到三個上層 tier(真強/蓄勢·外資佈局/強但過熱)是 23 檔裡 15 檔為負,最深 −38.2%。
      只顯示綜合分會讓人把「相對強」讀成「在漲」,故每一列並列 20 日絕對報酬;
      相對靠前的層若絕對為負,額外標記。 */
+  function tierPillMetric(label,value,col,size,weight){
+    return h('span',{style:'display:inline-grid;grid-template-rows:auto auto;gap:0;line-height:1.12;text-align:left'},
+      h('span',{style:'font-size:var(--fs-9);font-weight:700;color:var(--ink2);line-height:1.05',text:label}),
+      h('span',{class:'mono',style:`font-size:${size};font-weight:${weight};color:${col};line-height:1.15`,text:value})); }
   function stockPill(s){ const cc=s.comp>=0?'var(--strong)':'var(--weak)';
     const r=s.r20, rc=pctCol(r);
     const mismatch=r!=null&&r<0&&UPPER_TIERS[s.tier];
@@ -1848,14 +1853,13 @@ function buildTier(){
       title:s.trading?`當日不參與排名；畫面訊號截至 ${s.trading.signalDate}`:(r==null?'':`20 日絕對報酬 ${fmtPct(r,1)}`
         +(mismatch?'(族群內相對靠前,但絕對報酬為負)':'')),
       onclick:event=>openStockDetail(s.id,null,null,event.currentTarget),onkeydown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStockDetail(s.id);}},
-      style:'display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid '
+      style:'display:inline-flex;align-items:center;gap:6px;font-size:12.5px;background:var(--inset);border:1px solid '
         +(mismatch?'var(--weak)':'var(--line2)')+';border-radius:100px;padding:4px 11px;cursor:pointer'},
       h('b',{style:'font-weight:700',text:s.nm}),h('span',{class:'mono',style:'font-size:var(--fs-10);color:var(--muted)',text:grp(s.g).short}),
       s.cs&&s.cs.length?microStrip(s.cs):null,
-      h('span',{class:'mono',style:`font-size:var(--fs-11);font-weight:600;color:${cc}`,text:(s.comp>=0?'+':'')+s.comp.toFixed(1)}),
+      tierPillMetric('綜合',(s.comp>=0?'+':'')+s.comp.toFixed(1),cc,'var(--fs-11)',600),
       s.trading?h('span',{style:'font-size:var(--fs-10);color:var(--amber);font-weight:800',text:'截至 '+s.trading.signalDate.slice(5)}):null,
-      r==null?null:h('span',{class:'mono',style:`font-size:var(--fs-105);color:${rc};opacity:.9`,
-        text:fmtPct(r)}),
+      r==null?null:tierPillMetric('20日',fmtPct(r),rc,'var(--fs-105)',500),
       mismatch?h('span',{style:'font-size:var(--fs-10);color:var(--weak);font-weight:800',text:'↓'}):null); }
   const bands=h('div',{style:'display:flex;flex-direction:column;gap:11px'});
   function renderBands(){ bands.replaceChildren(...order.map(([k,t,d])=>{
@@ -1890,6 +1894,8 @@ function buildTier(){
   gsel.appendChild(h('option',{value:'',text:'全部族群'}));
   D.groups.forEach(g=>gsel.appendChild(h('option',{value:g.g,text:grp(g.g).nm})));
   const snapshot=h('div',{class:'tier-snapshot'});
+  snapshot.appendChild(h('div',{class:'tier-snapshot-legend',
+    text:'每列：五面向骨架｜綜合分｜20日絕對報酬；↓＝相對靠前但 20 日仍跌'}));
   const snapshotDefs=[
     ['相對強勢','價格與籌碼多在族群前段','var(--strong)',D.allStocks.filter(s=>!s.trading&&s.tier==='真強')],
     ['相對蓄勢','籌碼靠前、價格位置仍待確認','var(--teal)',D.allStocks.filter(s=>!s.trading&&s.tier==='蓄勢·外資佈局')],

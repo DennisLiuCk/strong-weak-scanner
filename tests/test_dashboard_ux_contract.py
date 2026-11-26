@@ -264,6 +264,10 @@ class DashboardUxContractTest(unittest.TestCase):
         for marker in ("class:'tier-snapshot'", "相對強勢", "相對蓄勢", "相對弱勢",
                        "class:'tier-full'", "完整八層、族群篩選與近 5 日變層軌跡"):
             self.assertIn(marker, self.template)
+        # 主要分層 pill 直接標出兩個數值的口徑，避免把綜合分與 20 日絕對報酬混在一起
+        for marker in ("function tierPillMetric", "tierPillMetric('綜合'", "tierPillMetric('20日'",
+                       "tier-snapshot-legend", "五面向骨架｜綜合分｜20日絕對報酬"):
+            self.assertIn(marker, self.template)
         # 分層區可依族群篩選(選定=全列)、全部模式「＋N 檔」可展開、chip/變層列點開明細
         for marker in ("'aria-label':'分層篩選族群'", "檔 展開",
                        "onclick:()=>{expanded[k]=true;renderBands();}"):
