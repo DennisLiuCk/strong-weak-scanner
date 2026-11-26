@@ -1026,11 +1026,15 @@ function priceChart(chart, tech, comparison=null){
         window.addEventListener('resize',()=>{const redraw=window.__scannerChartResize;if(redraw)redraw();});
         window.__scannerChartResizeBound=true;
       }
-      window.__scannerChartResize=()=>{if(compactMode()!==renderedCompact)drawSvg();};
+      window.__scannerChartResize=()=>{if(compactMode()!==renderedCompact){drawSvg();placeChildren();}};
     }
     const foot=h('p',{style:'margin:10px 0 0;font-size:var(--fs-11);color:var(--muted);line-height:1.6',
       text:'現價／MA5／MA20／MA60 共用價格軸；RSI14、成交量、外資、投信各自成副圖、對齊同一時間軸。可直接選日期，或點按圖表保留日期與讀數；切換區間後清除。鍵盤聚焦圖表後，用左右鍵切換交易日，Home／End 跳到最早／最新。'});
     host.replaceChildren(...[top, datePicker, cP, cS, chartMeta, chartBox, readout, compareNav, foot].filter(Boolean));
+    const placeChildren=()=>{
+      host.insertBefore(readout, compactMode()?cP:(compareNav||foot));
+    };
+    placeChildren();
     drawSvg();
   }
   full();
