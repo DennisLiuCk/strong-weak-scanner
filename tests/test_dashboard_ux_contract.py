@@ -445,6 +445,10 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("direction=up?'上升':'下滑'", fn)
         self.assertIn("text:'依族群內名次變化取前 3；點個股看排名依據與因子拆解。'", fn)
         self.assertIn("buildRankChangeMovers())", overview)
+        # ≤360px 單行寬度不足時，股票資訊與名次變化分成兩行；
+        # 不得讓長族群名把股名截到只剩一個字。
+        self.assertIn(".rank-mover{grid-template-columns:1fr;gap:2px;align-items:start}", self.template)
+        self.assertIn(".rank-mover-pos{justify-self:end}", self.template)
 
     def test_mobile_layout_collapses_grids_and_meets_touch_targets(self):
         for marker in ("@media (max-width:720px)", "min-height:44px",

@@ -613,6 +613,10 @@ svg{display:block;overflow:visible}
   .group-member-btn{padding-left:8px;padding-right:8px}
   .group-member-metrics{gap:6px}
   .group-member-metric{gap:2px}
+  /* 320px 的排名變化入口單行只剩約 112px 給股票資訊，長族群名會把股名壓到一個字。
+     窄幅改為股票資訊、名次變化各一行，保留完整股名／代碼／族群與名次。 */
+  .rank-mover{grid-template-columns:1fr;gap:2px;align-items:start}
+  .rank-mover-pos{justify-self:end}
 }
 </style>
 </head>
