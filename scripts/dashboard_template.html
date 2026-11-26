@@ -1888,7 +1888,7 @@ function openGroupSheet(g,opener=null){
     h('div',{style:'font-size:12px;color:var(--muted);margin-bottom:10px',text:grp(g.g).tag||''}),
     h('p',{style:'margin:0 0 12px;font-size:13.5px;color:var(--ink2);line-height:1.6',text:g.note}),
     h('div',{style:'display:flex;gap:16px;flex-wrap:wrap;font-size:var(--fs-115);color:var(--muted);font-weight:600;background:var(--inset);border-radius:10px;padding:10px 14px'},
-      h('span',{text:g.dur}),h('span',{style:'color:var(--teal)',text:'籌碼健 '+g.chip.health}),h('span',{text:'中性 '+g.chip.neutral}),h('span',{style:'color:var(--amber)',text:'待觀察 '+g.chip.warn})),
+      h('span',{text:'目前狀態'+g.dur}),h('span',{style:'color:var(--teal)',text:'籌碼健康 '+g.chip.health+' 檔'}),h('span',{text:'中性 '+g.chip.neutral+' 檔'}),h('span',{style:'color:var(--amber)',text:'待觀察 '+g.chip.warn+' 檔'})),
     h('div',{style:'margin:14px 0 2px'},h('div',{style:'font-size:var(--fs-11);color:var(--muted);margin-bottom:4px',text:'20日動能 vs 全體 · 近 30 個交易日（高＝跑贏）'}),spark(g.trend.rel,300,42,'var(--ink)',0)),
     h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'族群五項指標'}),statList,memberLinks];
   const gfs=flowSection(g.flow);
