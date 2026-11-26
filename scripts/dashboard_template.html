@@ -448,6 +448,7 @@ svg{display:block;overflow:visible}
 .rkc-score{min-width:0;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:var(--card)}
 .rkc-score h4{margin:0 0 4px}
 .rkc-score .mono{font-size:13px;font-weight:750;color:var(--ink)}
+.rkc-drivers{margin-top:8px}
 .rkc details{margin-top:12px;border-top:1px solid var(--line2);padding-top:6px}
 .rkc details>summary{cursor:pointer;display:flex;align-items:center;min-height:44px;font-size:12.5px;font-weight:800;color:var(--teal)}
 .rkc-detail p{margin:8px 0 0;font-size:13px;line-height:1.7;color:var(--ink2)}
@@ -2214,6 +2215,13 @@ function rankChangeSection(d){
       h('div',{class:'mono',text:sm.line}),sub('族群內依此分數排序；同分可並列。')),
     h('div',{class:'rkc-score'},h('h4',{text:'因子拆解｜當日綜合分數'}),
       h('div',{class:'mono',text:dl?dl.line:'快照缺當日分數，無法分解。'}),sub('單日變化，不直接決定名次。')));
+  const driverItems=(dl?(dl.elements||[]):[]).filter(e=>Math.abs(e.contrib||0)>=0.005&&(!dl.delta||Math.sign(e.contrib)===Math.sign(dl.delta)))
+    .sort((a,b)=>Math.abs(b.contrib)-Math.abs(a.contrib)).slice(0,2);
+  const driverLabel=dl&&dl.delta<0?'當日分數主要拖累':dl&&dl.delta>0?'當日分數主要推升':'當日分數主要變化';
+  const fmtContrib=v=>(v>=0?'+':'−')+Math.abs(Number(v)).toFixed(2);
+  const drivers=driverItems.length?h('div',{class:'rkc-score rkc-drivers'},h('h4',{text:driverLabel}),
+    h('div',{class:'mono',text:driverItems.map(e=>e.label+' '+fmtContrib(e.contrib)).join(' · ')}),
+    sub('依元素貢獻最多取前兩項；這是當日 composite 拆解，不直接決定名次。')):null;
   const meta=h('div',{},h('h4',{text:'日期與正式快照'}),
     h('div',{class:'rkc-kv mono'},h('span',{text:'上週 '+A+' · '+RANKCHG.snapshotA}),h('span',{text:'本週 '+B+' · '+RANKCHG.snapshotB})),
     ...(RANKCHG.notes||[]).map(n=>h('p',{class:'note',style:'margin:4px 0 0',text:n})),
@@ -2223,7 +2231,7 @@ function rankChangeSection(d){
       h('span',{class:'chip',style:`color:${x.move>0?'var(--strong)':x.move<0?'var(--weak)':'var(--ink2)'};background:var(--card)`,
         text:x.posA+' → '+x.posB})),
     h('ul',{class:'rkc-sum'},...x.summary.map(t=>h('li',{text:t}))),
-    sub('兩週分數：'+A+' → '+B+'（括號為分數差額，不是名次變動）'),scores,
+    sub('兩週分數：'+A+' → '+B+'（括號為分數差額，不是名次變動）'),scores,drivers,
     h('details',{},h('summary',{text:'看明細：同業名次、兩週分數與日期'}),
       h('div',{class:'rkc-detail'},...(x.rankDetail||[]).map(t=>h('p',{text:t}))),peers,smooth,daily,meta));
 }
