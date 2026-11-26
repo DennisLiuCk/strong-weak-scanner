@@ -216,7 +216,7 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
             'hidden': True, 'value': '', 'count': 21,
             'first': 'day64', 'last': 'day45'})
 
-    def test_chart_readout_moves_before_controls_only_on_compact(self):
+    def test_chart_readout_follows_selection_source_on_compact(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
 let compact=true;
 const window={matchMedia:()=>({matches:compact}),addEventListener(){}};
@@ -228,18 +228,28 @@ const order=()=>{const kids=host.children;
     readout:kids.findIndex(e=>e.attrs.role==='status'),
     chip:kids.findIndex(e=>e.find?.(x=>x.tag==='button'&&x.textContent.includes('現價'))),
     canvas:kids.findIndex(e=>e.attrs.role==='group')};};
+const select=()=>host.find(e=>e.className==='chart-date-picker').find(e=>e.tag==='select');
+const choose=d=>{select().value=d;select().fire('change',{target:select()});return order();};
+const key=k=>{host.find(e=>e.attrs.role==='group').fire('keydown',{key:k,preventDefault(){}});return order();};
+const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
 """
         got = self.run_js(pre, [
-            ('手機讀數在指標開關與圖表前', 'order()'),
-            ('桌機讀數留在圖表後', '(compact=false,window.__scannerChartResize(),order())'),
-            ('跨回手機讀數回到指標開關前', '(compact=true,window.__scannerChartResize(),order())'),
+            ('未選日期時維持圖表後', 'order()'),
+            ('手機跳到日期讀數在控制項前', "choose('day10')"),
+            ('切換指標後仍保留選單來源位置', "(button('外資').fire('click'),order())"),
+            ('鍵盤從圖表選日期讀數回圖表後', "key('ArrowRight')"),
+            ('再用跳到日期讀數回控制項前', "choose('day11')"),
+            ('桌機即使從選單選也留在圖表後', '(compact=false,window.__scannerChartResize(),order())'),
+            ('跨回手機仍記得選單來源位置', '(compact=true,window.__scannerChartResize(),order())'),
         ])
-        self.assertLess(got[0]['date'], got[0]['readout'])
-        self.assertLess(got[0]['readout'], got[0]['chip'])
-        self.assertLess(got[0]['chip'], got[0]['canvas'])
-        self.assertLess(got[1]['chip'], got[1]['canvas'])
-        self.assertLess(got[1]['canvas'], got[1]['readout'])
-        self.assertEqual(got[2], got[0])
+        self.assertLess(got[0]['canvas'], got[0]['readout'])
+        for i in (1, 2, 4, 6):
+            self.assertLess(got[i]['date'], got[i]['readout'])
+            self.assertLess(got[i]['readout'], got[i]['chip'])
+            self.assertLess(got[i]['chip'], got[i]['canvas'])
+        for i in (3, 5):
+            self.assertLess(got[i]['chip'], got[i]['canvas'])
+            self.assertLess(got[i]['canvas'], got[i]['readout'])
 
     def test_chart_peer_comparison_uses_pinned_date_not_hover_and_aligns_exact_dates(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
