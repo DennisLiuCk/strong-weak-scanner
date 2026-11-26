@@ -351,9 +351,15 @@ svg{display:block;overflow:visible}
   .rv-context-item:nth-child(2){border-right:0}
   .rv-context-item:nth-child(3){border-top:1px solid var(--line);border-right:1px solid var(--line)}
   .rv-context-note{grid-column:1/-1;min-height:0;border-top:1px solid var(--line);border-right:0}
-  .rv-lens-tabs{display:flex;overflow-x:auto;scroll-snap-type:x proximity}
-  .rv-lens-tab{flex:0 0 166px;min-height:68px;padding:10px 14px;scroll-snap-align:start}
-  .rv-lens-tab .material-symbols-rounded{font-size:23px}
+  .rv-lens-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));overflow:hidden}
+  .rv-lens-tab{grid-column:span 2;min-height:86px;padding:8px 4px;grid-template-columns:1fr;justify-items:center;align-content:center;gap:3px;text-align:center}
+  .rv-lens-tab:nth-child(3){border-right:0}
+  .rv-lens-tab:nth-child(n+4){border-top:1px solid var(--line)}
+  .rv-lens-tab:nth-child(4){grid-column:2/span 2}
+  .rv-lens-tab:nth-child(5){grid-column:4/span 2}
+  .rv-lens-tab .material-symbols-rounded{font-size:20px}
+  .rv-lens-tab b{font-size:12.5px;line-height:1.25}
+  .rv-lens-tab small{margin-top:1px;font-size:10px;line-height:1.25}
   .rv-workspace{gap:12px}
   .rv-list-card,.rv-detail-card{border-radius:14px}
   .rv-table-head{display:none}
@@ -1306,7 +1312,18 @@ function buildRankingViews(){
     h('div',{class:'rv-context-item'},h('span',{class:'rv-context-label',text:'資料日期'}),dateValue),
     h('div',{class:'rv-context-item rv-context-note'},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:'info'}),h('span',{text:'以下數值均為族群內相對名次，非機率、預測或投資建議。'})));
   const tabs=h('div',{class:'rv-lens-tabs',role:'tablist','aria-label':'選擇排名視角'}),tabButtons=new Map();
-  RV_KEYS.forEach(key=>{const m=RV_META[key],button=h('button',{id:'rv-tab-'+key,type:'button',class:'rv-lens-tab',role:'tab','aria-controls':'rv-workspace',style:`--rv-tone:${m.tone}`,onclick:()=>setFocus(key)},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:m.icon}),h('span',{},h('b',{text:m.title}),h('small',{text:m.sub})));tabButtons.set(key,button);tabs.appendChild(button);});
+  const moveTabFocus=(key,event)=>{
+    const step={ArrowLeft:-1,ArrowUp:-1,ArrowRight:1,ArrowDown:1}[event.key];
+    let nextIndex=null;
+    if(step)nextIndex=(RV_KEYS.indexOf(key)+step+RV_KEYS.length)%RV_KEYS.length;
+    else if(event.key==='Home')nextIndex=0;
+    else if(event.key==='End')nextIndex=RV_KEYS.length-1;
+    else return;
+    event.preventDefault();
+    const next=RV_KEYS[nextIndex];setFocus(next);
+    const target=tabButtons.get(next);if(target)target.focus();
+  };
+  RV_KEYS.forEach(key=>{const m=RV_META[key],button=h('button',{id:'rv-tab-'+key,type:'button',class:'rv-lens-tab',role:'tab','aria-controls':'rv-workspace',style:`--rv-tone:${m.tone}`,onclick:()=>setFocus(key),onkeydown:event=>moveTabFocus(key,event)},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:m.icon}),h('span',{},h('b',{text:m.title}),h('small',{text:m.sub})));tabButtons.set(key,button);tabs.appendChild(button);});
   const tableHead=h('div',{class:'rv-table-head',role:'row'}),tableBody=h('div',{class:'rv-table-body'}),listFoot=h('p',{class:'rv-list-foot'});
   const listCard=h('div',{class:'card rv-list-card','aria-label':'族群內多視角排序'},tableHead,tableBody,listFoot),detailHost=h('div',{});
   const workspace=h('div',{id:'rv-workspace',class:'rv-workspace',role:'tabpanel',tabindex:'0'},listCard,detailHost);
