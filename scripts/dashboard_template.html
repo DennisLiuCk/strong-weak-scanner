@@ -77,6 +77,7 @@ h2.sec{margin:0 0 6px;font-size:28px;font-weight:800;letter-spacing:.3px}
 .chart-date-picker{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:12px;font-weight:800;color:var(--muted)}
 .chart-date-picker select{min-width:154px;border-radius:10px;text-align:left}
 .chart-canvas{background:var(--inset);border:1px solid var(--line2);border-radius:12px;padding:14px 12px 6px}
+.chart-canvas:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
 .opthd{display:flex;align-items:center;gap:10px;margin-bottom:13px}
 .opthd b{font-size:16px} .opthd span{font-size:12.5px;color:var(--muted)}
 .chip{font-size:var(--fs-11);font-weight:700;border-radius:100px;padding:2px 9px;white-space:nowrap}
@@ -1008,6 +1009,7 @@ function priceChart(chart, tech, comparison=null){
     chartBox.addEventListener('pointercancel',ev=>{touchGuard(ev);tap=null;});
     chartBox.addEventListener('pointerleave',ev=>{tap=null;if(ev.pointerType==='mouse'&&st.hover!=null){st.hover=null;drawSvg();}});
     chartBox.addEventListener('keydown',ev=>{
+      if(ev.altKey||ev.ctrlKey||ev.metaKey)return;
       const n=Math.min(st.range,maxN), i=st.selected==null?n-1:st.selected;
       const next={ArrowLeft:Math.max(0,i-1),ArrowRight:Math.min(n-1,i+1),Home:0,End:n-1};
       if(Object.prototype.hasOwnProperty.call(next,ev.key)){ev.preventDefault();selectPoint(next[ev.key]);}
@@ -1909,7 +1911,8 @@ function openStockDetail(id,groupContext=null,chartContext=null,opener=null,grou
   const goToHeading=(hd,instant=false)=>{
     const headerHeight=sheetEl.querySelector('.sheetheader').getBoundingClientRect().height;
     const top=hd.getBoundingClientRect().top-sheetEl.getBoundingClientRect().top+sheetEl.scrollTop-headerHeight-8;
-    hd.tabIndex=-1;hd.focus({preventScroll:true});
+    if(!hd.hasAttribute('tabindex'))hd.tabIndex=-1;
+    hd.focus({preventScroll:true});
     sheetEl.scrollTo({top,behavior:instant||matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
   };
   headings.forEach((hd,index)=>{
@@ -1920,8 +1923,11 @@ function openStockDetail(id,groupContext=null,chartContext=null,opener=null,grou
     jumpSelect.appendChild(h('option',{value:String(index),text:label}));});
   jumpSelect.addEventListener('change',()=>{if(jumpSelect.value==='')return;goToHeading(headings[Number(jumpSelect.value)]);jumpSelect.value='';});
   showSheet(()=>openStockDetail(id,groupContext,chartContext,opener,groupReturn),opener);
-  // 明確的同日比較才跳回圖表；原本頂端的上一檔／下一檔仍從明細頂端開始。
-  if(chartContext){const heading=card.querySelector('[data-history-chart] h3');if(heading)window.requestAnimationFrame(()=>goToHeading(heading,true));}
+  // 明確的同日比較在手機直接落到圖表本身；若只對齊段落標題，控制列會把圖表與比較按鈕擠出首屏。
+  // 桌機首屏本來就放得下控制列、圖表與比較鈕，仍維持落在段落標題；原本頂端的上一檔／下一檔從明細頂端開始。
+  if(chartContext){const narrow=typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(max-width: 680px)').matches;
+    const target=(narrow?card.querySelector('[data-history-chart] .chart-canvas'):null)||card.querySelector('[data-history-chart] h3');
+    if(target)window.requestAnimationFrame(()=>goToHeading(target,true));}
 }
 function openGroupSheet(g,opener=null,restore=null){
   const st=stateStyle(g.state),statList=h('div',{});
