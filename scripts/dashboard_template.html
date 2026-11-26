@@ -166,6 +166,7 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .pulse-name{min-width:0;font-size:12.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pulse-value{font-size:var(--fs-115);font-weight:700}
 .shortlist-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 19px;color:var(--ink);background:var(--tealbg);border-color:var(--teal)}
+.shortlist-cta-mobile{display:none}
 .shortlist-cta:hover{color:var(--ink);text-decoration:none;transform:translateY(-1px)}
 .shortlist-cta b{display:block;font-size:14px}.shortlist-cta span{display:block;margin-top:2px;font-size:var(--fs-11);color:var(--ink2)}
 .shortlist-cta>span:last-child{font-size:18px;color:var(--teal)}
@@ -485,6 +486,8 @@ svg{display:block;overflow:visible}
      落在 720~900 這段的多半仍是手邊的手機，物理字級跟直向一樣小 */
   :root{--fs-8:10.5px;--fs-9:11px;--fs-95:11px;--fs-10:11.5px;--fs-105:12px;--fs-11:12px;--fs-115:12.5px}
   .command-grid{grid-template-columns:1fr}.command-hero{min-height:0}
+  .shortlist-cta-mobile{display:flex;margin-top:12px}
+  .command-side>.shortlist-cta{display:none}
   .tier-snapshot{grid-template-columns:1fr}.research-grid{grid-template-columns:1fr}
   .srow{grid-template-columns:34px minmax(150px,1fr) minmax(200px,1fr)}.srow>*:nth-child(4){grid-column:2/-1}
 }
@@ -1133,6 +1136,9 @@ function buildOverview(){
     h('span',{html:`<b class="mono cweak">${weak}</b>弱勢`}));
   const marketSource=MKT?h('p',{class:'note market-source-note'},
     h('b',{text:`大盤 ${MKT.scLabel}：`}),h('span',{text:MKT.src})):null;
+  const mobileShortlist=h('a',{class:'card shortlist-cta shortlist-cta-mobile',href:'#tier'},
+    h('div',{},h('b',{text:'看今日強弱個股名單'}),h('span',{text:`${strong} 強勢 · ${accum} 蓄勢 · ${weak} 弱勢`})),
+    h('span',{'aria-hidden':'true',text:'›'}));
   const hero=h('article',{class:'card command-hero'},
     h('div',{},
       h('p',{class:'kicker',style:'color:var(--teal);margin-bottom:9px',text:'今日掃描焦點 · '+D.date}),
@@ -1140,6 +1146,7 @@ function buildOverview(){
       h('p',{class:'command-summary',text:o.summary}),
       buildHeroLookup(),
       buildArchiveNavigation(),
+      mobileShortlist,
       signals,
       h('p',{class:'note',style:'margin:13px 0 0;line-height:1.55',text:o.note}),
       marketSource),

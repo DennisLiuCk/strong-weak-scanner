@@ -52,7 +52,7 @@ class DashboardUxContractTest(unittest.TestCase):
         # 指定日期快照是首頁可見任務，不再只藏在 utility menu 底部。
         self.assertIn('href="#date-snapshots"', self.template)
         self.assertIn("id:'date-snapshots'", self.template)
-        self.assertIn('buildArchiveNavigation(),\n      signals,', self.template)
+        self.assertIn('buildArchiveNavigation(),\n      mobileShortlist,\n      signals,', self.template)
         self.assertNotIn("document.querySelector('.quicknav').appendChild(buildArchiveNavigation())", self.template)
         self.assertNotIn('href="#tsmc"', self.template)
         self.assertNotIn('<section id="tsmc"', self.template)
@@ -86,6 +86,19 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("class:'command-grid'", self.template)
         self.assertIn("text:'進入族群比較 ↓'", self.template)
         self.assertIn("text:'今日強弱個股名單'", self.template)
+
+    def test_single_column_overview_keeps_stock_shortlist_visible(self):
+        """手機單欄時，個股名單入口要在首屏主要任務旁，而不是排在動能族群卡之後。"""
+        overview = self.template[self.template.index("function buildOverview()"):
+                                 self.template.index("function buildStrategyStatus()")]
+        self.assertIn("const mobileShortlist=", overview)
+        self.assertIn("class:'card shortlist-cta shortlist-cta-mobile'", overview)
+        self.assertLess(overview.index("buildArchiveNavigation()"), overview.index("mobileShortlist,\n      signals"))
+        self.assertIn("text:'看今日強弱個股名單'", overview)
+        self.assertIn("${strong} 強勢 · ${accum} 蓄勢 · ${weak} 弱勢", overview)
+        self.assertIn(".shortlist-cta-mobile{display:none}", self.template)
+        self.assertIn(".shortlist-cta-mobile{display:flex", self.template)
+        self.assertIn(".command-side>.shortlist-cta{display:none}", self.template)
 
     # ---------- 資料契約:placeholder 注入與 adapter ----------
 
