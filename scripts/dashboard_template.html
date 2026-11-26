@@ -288,7 +288,9 @@ svg{display:block;overflow:visible}
 .rv-column-label{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .rv-column-label small{display:block;margin-top:2px;font-size:9px;font-weight:600;color:var(--muted)}
 .rv-mobile-metric-label{display:none;font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;font-size:var(--fs-105);font-weight:800}
-.rv-sensitivity{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:3px 8px;border-radius:100px;font-size:var(--fs-105);font-weight:800;white-space:nowrap;color:var(--muted);background:var(--inset)}
+.rv-sensitivity{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:28px;padding:3px 8px;border-radius:100px;font-size:var(--fs-105);font-weight:800;white-space:nowrap;color:var(--muted);background:var(--inset)}
+.rv-sensitivity-label{display:none;font-weight:700}
+.rv-table-note{margin:0;padding:11px 17px;border-bottom:1px solid var(--line);font-size:var(--fs-105);line-height:1.6;color:var(--muted)}
 .rv-sensitivity.medium{color:var(--amber);background:var(--amberbg)}
 .rv-sensitivity.high{color:var(--trap);background:var(--strongbg)}
 .rv-list-foot{display:flex;align-items:flex-start;min-height:88px;margin:0;padding:14px 17px;border-top:1px solid var(--line);font-size:var(--fs-105);line-height:1.65;color:var(--muted)}
@@ -371,6 +373,8 @@ svg{display:block;overflow:visible}
   .rv-metric-cell.is-focus{display:flex;grid-column:3;grid-row:1;min-height:44px}
   .rv-mobile-metric-label{display:block}
   .rv-sensitivity{grid-column:2/-1;grid-row:2;justify-self:start}
+  .rv-sensitivity-label{display:inline}
+  .rv-table-note{padding:10px 13px}
   .rv-list-foot{padding:12px 13px}
   .rv-detail-card{padding:17px 15px}
   .rv-detail-head{align-items:flex-start}
@@ -1283,7 +1287,7 @@ function rvDetailCard(R,row,focus,onFocus){
   const scores=h('div',{class:'rv-score-grid','aria-label':'五個視角的族群內相對位置'});
   RV_KEYS.forEach(key=>{const m=RV_META[key];scores.appendChild(h('button',{type:'button',class:'rv-score-card','data-rv-lens':key,'aria-pressed':key===focus?'true':'false','aria-label':'改以 '+m.title+' 排序',style:`--rv-tone:${m.tone}`,onclick:event=>onFocus(key,event.currentTarget)},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:m.icon}),h('span',{text:m.scoreLabel}),h('b',{text:rvPct(row[key])})));});
   const sensitivity=rvSensitivity(row.peer_sensitivity),diagnostics=[];
-  diagnostics.push('移除單一同族群成分股後，跨五分位區間的情境比例為 '+(row.peer_sensitivity==null?'尚無估計':row.peer_sensitivity.toFixed(0)+'%')+'；這是結構敏感度，不是時間穩定度。');
+  diagnostics.push('移除單一同族群成分股後，排名所屬五分位組別改變的情境比例為 '+(row.peer_sensitivity==null?'尚無估計':row.peer_sensitivity.toFixed(0)+'%')+'；這是結構敏感度，不是時間穩定度。');
   diagnostics.push(row.champion_tie_n>1?'正式綜合有 '+row.champion_tie_n+' 檔同分，這些股票共享名次。':'正式綜合目前沒有同分共享名次。');
   diagnostics.push('A–D 進入前 20% 的視角數為 '+row.consensus_count+'；'+(row.pareto===true?'位於 '+row.pareto_dimensions+' 維 Pareto 前緣。':'未位於目前完整維度的 Pareto 前緣。'));
   if(row.role_label)diagnostics.push('角色同儕：'+row.role_label+(row.role_pct==null?'；同角色 '+row.role_n+' 檔，樣本不足 4 檔時不硬排。':'，正式綜合在角色內為 '+rvPct(row.role_pct)+' 百分位。'));
@@ -1325,7 +1329,8 @@ function buildRankingViews(){
   };
   RV_KEYS.forEach(key=>{const m=RV_META[key],button=h('button',{id:'rv-tab-'+key,type:'button',class:'rv-lens-tab',role:'tab','aria-controls':'rv-workspace',style:`--rv-tone:${m.tone}`,onclick:()=>setFocus(key),onkeydown:event=>moveTabFocus(key,event)},h('span',{class:'material-symbols-rounded','aria-hidden':'true',text:m.icon}),h('span',{},h('b',{text:m.title}),h('small',{text:m.sub})));tabButtons.set(key,button);tabs.appendChild(button);});
   const tableHead=h('div',{class:'rv-table-head',role:'row'}),tableBody=h('div',{class:'rv-table-body'}),listFoot=h('p',{class:'rv-list-foot'});
-  const listCard=h('div',{class:'card rv-list-card','aria-label':'族群內多視角排序'},tableHead,tableBody,listFoot),detailHost=h('div',{});
+  const listNote=h('p',{class:'rv-table-note',text:'百分位越高代表在本族群中相對靠前；「同儕敏感」是移除單一同族群成分股後，排名所屬五分位組別改變的情境比例。'});
+  const listCard=h('div',{class:'card rv-list-card','aria-label':'族群內多視角排序'},listNote,tableHead,tableBody,listFoot),detailHost=h('div',{});
   const workspace=h('div',{id:'rv-workspace',class:'rv-workspace',role:'tabpanel',tabindex:'0'},listCard,detailHost);
   function rowsForGroup(){return R.rows.filter(x=>x.g===groupKey).sort((a,b)=>(b[focus]??-1)-(a[focus]??-1)||a.id.localeCompare(b.id));}
   function setFocus(key,source){if(!RV_META[key]||key===focus)return;focus=key;rvRemember('rankingLens',key);render(false);
@@ -1344,8 +1349,8 @@ function buildRankingViews(){
     tableBody.textContent='';
     rows.forEach((row,index)=>{const sensitivity=rvSensitivity(row.peer_sensitivity),button=h('button',{type:'button',class:'rv-table-row','data-rv-stock':row.id,'aria-current':row.id===selectedId?'true':'false','aria-label':'選擇 '+row.nm+'，'+RV_META[focus].title+' '+rvPct(row[focus])+' 百分位',style:`grid-template-columns:${grid};--rv-tone:${RV_META[focus].tone}`,onclick:()=>selectRow(row.id,true),onkeydown:event=>{if(event.key!=='ArrowDown'&&event.key!=='ArrowUp')return;event.preventDefault();const next=Math.max(0,Math.min(rows.length-1,index+(event.key==='ArrowDown'?1:-1)));selectRow(rows[next].id,true);}},h('span',{class:'rv-rank',text:ranks.get(row.id)}),h('span',{class:'rv-stock'},h('b',{text:row.nm}),h('span',{text:row.id})));
       keys.forEach(key=>button.appendChild(h('span',{class:'rv-metric-cell'+(key===focus?' is-focus':''),style:`--rv-tone:${RV_META[key].tone}`,title:RV_META[key].title+'：'+RV_META[key].question},h('span',{class:'rv-mobile-metric-label',text:RV_META[key].short}),h('span',{text:rvPct(row[key])}))));
-      button.appendChild(h('span',{class:'rv-sensitivity '+sensitivity.cls,text:sensitivity.label}));tableBody.appendChild(button);});
-    listFoot.textContent='百分位越高代表在本族群中相對靠前；同分以「=」共享名次。顯示 '+rows.length+' 檔，依 '+RV_META[focus].title+' 排序。';
+      button.appendChild(h('span',{class:'rv-sensitivity '+sensitivity.cls,title:'移除單一同族群成分股後，排名所屬五分位組別改變的情境比例'},h('span',{class:'rv-sensitivity-label',text:'同儕敏感'}),h('span',{text:sensitivity.label})));tableBody.appendChild(button);});
+    listFoot.textContent='顯示 '+rows.length+' 檔，依 '+RV_META[focus].title+' 排序；同分以「=」共享名次。';
     detailHost.replaceChildren(rvDetailCard(R,selected,focus,setFocus));
     if(restoreRowFocus){const target=tableBody.querySelector('[data-rv-stock="'+selectedId+'"]');if(target)target.focus();}
   }

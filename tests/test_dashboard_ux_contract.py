@@ -408,6 +408,15 @@ class DashboardUxContractTest(unittest.TestCase):
                        "else if(event.key==='End')nextIndex=RV_KEYS.length-1",
                        "onkeydown:event=>moveTabFocus(key,event)"):
             self.assertIn(marker, self.template)
+        # 手機列表沒有欄位表頭；百分位方向與同儕敏感口徑要在進入列前可讀，row 內也要保留維度標籤。
+        for marker in ("class:'rv-table-note'",
+                       "百分位越高代表在本族群中相對靠前",
+                       "「同儕敏感」是移除單一同族群成分股後",
+                       ".rv-sensitivity-label{display:none",
+                       ".rv-sensitivity-label{display:inline}",
+                       "class:'rv-sensitivity-label',text:'同儕敏感'",
+                       "title:'移除單一同族群成分股後，排名所屬五分位組別改變的情境比例'"):
+            self.assertIn(marker, self.template)
         self.assertNotIn(".rv-score-grid{grid-template-columns:repeat(5,86px);overflow-x:auto}", self.template)
         # 桌機鎖寬已移除,窄視口不得水平溢位；詳情抽屜在窄屏也要把寬度留給圖表，
         # 不可讓 sheet/card/chart 三層寬鬆 padding 把 SVG 壓到 200px 左右。
