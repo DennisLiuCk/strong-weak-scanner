@@ -176,7 +176,7 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .tier-snapshot-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
 .tier-snapshot-head b{font-size:15px}.tier-snapshot-head span{font-size:14px;font-weight:700}
 .tier-snapshot-list{display:flex;flex-wrap:wrap;gap:7px}
-.tier-snapshot-legend{grid-column:1/-1;margin:0 2px -5px;font-size:var(--fs-11);color:var(--muted);line-height:1.5}
+.tier-snapshot-legend{grid-column:1/-1;margin:0 2px -5px;font-size:var(--fs-11);color:var(--ink2);line-height:1.5}
 .tier-snapshot-more{margin-top:10px;font-size:var(--fs-105);color:var(--muted)}
 .tier-full{margin-top:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
 .tier-full>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;font-size:12.5px;font-weight:800;color:var(--ink2)}
@@ -1844,7 +1844,7 @@ function buildTier(){
      相對靠前的層若絕對為負,額外標記。 */
   function tierPillMetric(label,value,col,size,weight){
     return h('span',{style:'display:inline-grid;grid-template-rows:auto auto;gap:0;line-height:1.12;text-align:left'},
-      h('span',{style:'font-size:var(--fs-9);font-weight:700;color:var(--muted);line-height:1.05',text:label}),
+      h('span',{style:'font-size:var(--fs-9);font-weight:700;color:var(--ink2);line-height:1.05',text:label}),
       h('span',{class:'mono',style:`font-size:${size};font-weight:${weight};color:${col};line-height:1.15`,text:value})); }
   function stockPill(s){ const cc=s.comp>=0?'var(--strong)':'var(--weak)';
     const r=s.r20, rc=pctCol(r);
