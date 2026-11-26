@@ -318,6 +318,8 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("[data-history-chart] .chart-canvas", stock_sheet)
         self.assertIn("if(!hd.hasAttribute('tabindex'))hd.tabIndex=-1", stock_sheet)
         self.assertIn(".chart-canvas:focus-visible{outline:2px solid var(--strong)", self.template)
+        # Alt+方向鍵等瀏覽器捷徑不能被圖表換日期攔下；否則自動聚焦後 Alt+← 無法返回。
+        self.assertIn("if(ev.altKey||ev.ctrlKey||ev.metaKey)return", self.template)
 
     def test_tier_bands_and_five_day_flow(self):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",

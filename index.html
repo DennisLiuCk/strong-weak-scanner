@@ -1009,6 +1009,7 @@ function priceChart(chart, tech, comparison=null){
     chartBox.addEventListener('pointercancel',ev=>{touchGuard(ev);tap=null;});
     chartBox.addEventListener('pointerleave',ev=>{tap=null;if(ev.pointerType==='mouse'&&st.hover!=null){st.hover=null;drawSvg();}});
     chartBox.addEventListener('keydown',ev=>{
+      if(ev.altKey||ev.ctrlKey||ev.metaKey)return;
       const n=Math.min(st.range,maxN), i=st.selected==null?n-1:st.selected;
       const next={ArrowLeft:Math.max(0,i-1),ArrowRight:Math.min(n-1,i+1),Home:0,End:n-1};
       if(Object.prototype.hasOwnProperty.call(next,ev.key)){ev.preventDefault();selectPoint(next[ev.key]);}
