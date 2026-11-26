@@ -390,6 +390,8 @@ class DashboardUxContractTest(unittest.TestCase):
                            self.template.index("function buildDetail(")]
         detail = self.template[self.template.index("function buildDetail("):]
         self.assertIn("rankChangeSection(d)", detail[:detail.index("d.note&&")])
+        # 排名為什麼改變是個股詳情的主要任務；次級的多視角百分位不得把它壓到第一屏外。
+        self.assertIn("riskW,rankChangeSection(d),multi,", detail)
         self.assertIn("(RANKCHG.stocks||{})[d.id]", fn)          # 依目前股票取資料,不綁定單一代號
         self.assertNotIn("3443", fn)
         self.assertIn("'本週排名變化'", fn)
