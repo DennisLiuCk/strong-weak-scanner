@@ -444,8 +444,12 @@ class DashboardUxContractTest(unittest.TestCase):
                        "#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}",
                        ".stock-detail-card{padding:20px 16px}",
                        ".history-chart-card{padding:16px 12px}",
-                       ".chart-canvas{padding:10px 6px 4px}"):
+                       ".chart-canvas{padding:10px 6px 4px}",
+                       ".chart-range-btn,.chart-chip-btn{min-height:44px}"):
             self.assertIn(marker, self.template)
+        # 圖表日期可點選後，區間與指標仍是行動版必要控制；不得留在 26–32px 的桌機滑鼠尺寸。
+        self.assertIn("class:'chart-range-btn'", self.template)
+        self.assertIn("class:'chart-chip-btn'", self.template)
 
     # ---------- 抽屜:focus 管理 ----------
 
