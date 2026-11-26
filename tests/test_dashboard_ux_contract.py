@@ -95,6 +95,8 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("class:'card shortlist-cta shortlist-cta-mobile'", overview)
         self.assertLess(overview.index("mobileShortlist,"), overview.index("buildArchiveNavigation()"))
         self.assertIn("text:'看今日強弱個股名單'", overview)
+        self.assertIn("href:'#tier-primary-list'", overview)
+        self.assertIn("if(location.hash==='#tier-primary-list')", self.template)
         self.assertIn("${strong} 強勢 · ${accum} 蓄勢 · ${weak} 弱勢", overview)
         self.assertIn(".shortlist-cta-mobile{display:none}", self.template)
         self.assertIn(".shortlist-cta-mobile{display:flex", self.template)
@@ -301,7 +303,7 @@ class DashboardUxContractTest(unittest.TestCase):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",
                        "D.tierFlow", "蓄勢候補", "不是買賣指示"):
             self.assertIn(marker, self.template)
-        for marker in ("class:'tier-snapshot'", "相對強勢", "相對蓄勢", "相對弱勢",
+        for marker in ("class:'tier-snapshot'", "id:idx===0?'tier-primary-list':null", "相對強勢", "相對蓄勢", "相對弱勢",
                        "class:'tier-full'", "完整八層、族群篩選與近 5 日變層軌跡"):
             self.assertIn(marker, self.template)
         # 主要分層 pill 直接標出兩個數值的口徑，避免把綜合分與 20 日絕對報酬混在一起
