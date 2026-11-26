@@ -298,6 +298,16 @@ class DashboardUxContractTest(unittest.TestCase):
                        "text:'綜合'", "text:'20日'", "fmtPct(s.r20,1)",
                        "按鈕列出排序、綜合分與20日絕對報酬"):
             self.assertIn(marker, group_sheet)
+        # 從成分股進個股再返回族群時，要回到原本成分股列表位置；
+        # 否則手機每比較一檔就要重新捲近千像素，無法連續看下一檔。
+        stock_sheet = self.template[self.template.index("function openStockDetail"):
+                                    self.template.index("// 分層 pill 用")]
+        for marker in ("groupReturn={scrollTop:sheetEl.scrollTop,stockId:id}",
+                       "openGroupSheet(groupContext,null,groupReturn)",
+                       "openStockDetail(o.id,groupContext,null,null,groupReturn)",
+                       "'data-stock-id':s.id", "sheetEl.scrollTop=targetTop",
+                       "target.focus({preventScroll:true})"):
+            self.assertIn(marker, stock_sheet)
 
     def test_tier_bands_and_five_day_flow(self):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",
