@@ -576,6 +576,11 @@ svg{display:block;overflow:visible}
   .strip{flex-wrap:wrap}
   .tile{flex:1 1 28%}
   .board-metric-label{flex-basis:100%}
+  /* 320px 兩欄成分股卡每格約 144px；維持 10px 左右內距會讓
+     「綜合 +5.7｜20日 −23.0%」貼到框線。窄幅只壓縮間距，不縮小字級。 */
+  .group-member-btn{padding-left:8px;padding-right:8px}
+  .group-member-metrics{gap:6px}
+  .group-member-metric{gap:2px}
 }
 </style>
 </head>
