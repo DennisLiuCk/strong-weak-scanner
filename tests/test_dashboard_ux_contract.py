@@ -474,8 +474,10 @@ class DashboardUxContractTest(unittest.TestCase):
         # 320×568 小螢幕的詳情抽屜先保留 44px 觸控高度，但把導覽與標題區垂直空間壓縮；
         # 否則「本週排名變化」只剩一條細縫，使用者看不到第一句名次改變原因。
         for marker in ("@media(max-width:380px)",
+                       "#sheet{max-height:94vh}",
                        ".stocknav{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr)",
                        ".stocknav-pair .togglebtn{width:100%;min-height:44px",
+                       "white-space:normal;overflow-wrap:anywhere;justify-content:center;text-align:center",
                        ".stock-detail-head{gap:8px!important}",
                        ".stock-detail-score .mono{font-size:30px!important}",
                        ".rkc{margin-top:12px;padding:12px 11px}",
