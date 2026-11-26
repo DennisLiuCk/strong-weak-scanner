@@ -471,6 +471,19 @@ class DashboardUxContractTest(unittest.TestCase):
                        ".chart-canvas{padding:10px 6px 4px}",
                        ".chart-range-btn,.chart-chip-btn{min-height:44px}"):
             self.assertIn(marker, self.template)
+        # 320×568 小螢幕的詳情抽屜先保留 44px 觸控高度，但把導覽與標題區垂直空間壓縮；
+        # 否則「本週排名變化」只剩一條細縫，使用者看不到第一句名次改變原因。
+        for marker in ("@media(max-width:380px)",
+                       "#sheet{max-height:94vh}",
+                       ".stocknav{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr)",
+                       ".stocknav-pair .togglebtn{width:100%;min-height:44px",
+                       "white-space:normal;overflow-wrap:anywhere;justify-content:center;text-align:center",
+                       ".stock-detail-head{gap:8px!important}",
+                       ".stock-detail-score .mono{font-size:30px!important}",
+                       ".rkc{margin-top:12px;padding:12px 11px}",
+                       "class:'stock-detail-head'",
+                       "class:'stock-detail-score'"):
+            self.assertIn(marker, self.template)
         # 圖表日期可點選後，區間與指標仍是行動版必要控制；不得留在 26–32px 的桌機滑鼠尺寸。
         self.assertIn("class:'chart-range-btn'", self.template)
         self.assertIn("class:'chart-chip-btn'", self.template)
