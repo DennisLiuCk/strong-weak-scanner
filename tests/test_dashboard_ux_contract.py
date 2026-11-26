@@ -52,7 +52,7 @@ class DashboardUxContractTest(unittest.TestCase):
         # 指定日期快照是首頁可見任務，不再只藏在 utility menu 底部。
         self.assertIn('href="#date-snapshots"', self.template)
         self.assertIn("id:'date-snapshots'", self.template)
-        self.assertIn('buildArchiveNavigation(),\n      mobileShortlist,\n      signals,', self.template)
+        self.assertIn('mobileShortlist,\n      buildArchiveNavigation(),\n      signals,', self.template)
         self.assertNotIn("document.querySelector('.quicknav').appendChild(buildArchiveNavigation())", self.template)
         self.assertNotIn('href="#tsmc"', self.template)
         self.assertNotIn('<section id="tsmc"', self.template)
@@ -93,12 +93,15 @@ class DashboardUxContractTest(unittest.TestCase):
                                  self.template.index("function buildStrategyStatus()")]
         self.assertIn("const mobileShortlist=", overview)
         self.assertIn("class:'card shortlist-cta shortlist-cta-mobile'", overview)
-        self.assertLess(overview.index("buildArchiveNavigation()"), overview.index("mobileShortlist,\n      signals"))
+        self.assertLess(overview.index("mobileShortlist,"), overview.index("buildArchiveNavigation()"))
         self.assertIn("text:'看今日強弱個股名單'", overview)
         self.assertIn("${strong} 強勢 · ${accum} 蓄勢 · ${weak} 弱勢", overview)
         self.assertIn(".shortlist-cta-mobile{display:none}", self.template)
         self.assertIn(".shortlist-cta-mobile{display:flex", self.template)
         self.assertIn(".command-side>.shortlist-cta{display:none}", self.template)
+        self.assertIn("@media (max-width:720px) and (max-height:640px)", self.template)
+        self.assertIn(".command-headline{font-size:24px;line-height:1.18}", self.template)
+        self.assertIn(".lookup{margin-top:12px}", self.template)
 
     # ---------- 資料契約:placeholder 注入與 adapter ----------
 

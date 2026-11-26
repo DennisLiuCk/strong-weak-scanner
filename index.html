@@ -572,6 +572,15 @@ svg{display:block;overflow:visible}
   .recent-actions{align-items:stretch}
   .recent-actions .togglebtn{width:100%;justify-content:center}
 }
+/* 低矮手機視窗(例如 320×568)保留全部文字，只壓縮首屏垂直間距；
+   個股名單入口才能在快速查個股後進入第一視窗。 */
+@media (max-width:720px) and (max-height:640px){
+  .wrap{padding-top:12px}
+  .command-hero{padding-top:18px}
+  .command-headline{font-size:24px;line-height:1.18}
+  .command-summary{margin-top:8px;line-height:1.55}
+  .lookup{margin-top:12px}
+}
 /* ≤360px(iPhone SE 一代／Fold 封面屏)：五元素一列 5 格時每格只剩 42px，
    「投信 -1,807張」這類四位數張數放不下。改成 3+2 換行，不動 375px 以上的一列 5 格 */
 @media (max-width:360px){
@@ -1072,7 +1081,7 @@ function stockLookupMatches(stocks,query){
 function buildHeroLookup(){
   const inputId='hero-stock-lookup',resultsId='hero-stock-results',hintId='hero-stock-hint';
   const results=h('div',{class:'lookup-results',id:resultsId,role:'listbox','aria-label':'個股搜尋結果'});
-  const hint=h('p',{class:'lookup-hint',id:hintId,role:'status','aria-live':'polite',text:'輸入後會列出符合個股；Enter 開啟第一個結果。'});
+  const hint=h('p',{class:'lookup-hint',id:hintId,role:'status','aria-live':'polite',text:'輸入後列出符合個股；Enter 開第一筆。'});
   let matches=[],active=-1,skipFocusRender=false;
   const input=h('input',{class:'msearch lookup-input',id:inputId,type:'search',role:'combobox',
     'aria-label':'快速查個股','aria-autocomplete':'list','aria-expanded':'false','aria-controls':resultsId,'aria-describedby':hintId,
@@ -1092,7 +1101,7 @@ function buildHeroLookup(){
     const q=input.value.trim();
     const all=stockLookupMatches(D.allStocks,q);
     matches=all.slice(0,6);
-    if(!q){results.replaceChildren();hint.textContent='輸入後會列出符合個股；Enter 開啟第一個結果。';close();return;}
+    if(!q){results.replaceChildren();hint.textContent='輸入後列出符合個股；Enter 開第一筆。';close();return;}
     if(!matches.length){results.replaceChildren();hint.textContent='找不到符合「'+q+'」的個股。';close();return;}
     active=-1;input.removeAttribute('aria-activedescendant');
     results.replaceChildren(...matches.map((stock,index)=>h('button',{type:'button',class:'lookup-option',role:'option',
@@ -1145,8 +1154,8 @@ function buildOverview(){
       h('h1',{class:'command-headline',text:o.headline}),
       h('p',{class:'command-summary',text:o.summary}),
       buildHeroLookup(),
-      buildArchiveNavigation(),
       mobileShortlist,
+      buildArchiveNavigation(),
       signals,
       h('p',{class:'note',style:'margin:13px 0 0;line-height:1.55',text:o.note}),
       marketSource),
