@@ -851,7 +851,7 @@ function priceChart(chart, tech, comparison=null){
   const compactMode=()=>typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(max-width: 680px)').matches;
   const chartPads=()=>compactMode()?{l:4,r:10}:{l:8,r:52};
   const host=h('div',{class:'card history-chart-card','data-history-chart':''});
-  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],renderedCompact=null,dateSelect=null,suppressHoverUntil=0;
+  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],renderedCompact=null,dateSelect=null,suppressHoverUntil=0,readoutBeforeControls=false,placeReadout=()=>{};
 
   function buildSvg(){
     const R=st.range, s=a=>(a||[]).slice(-R);
@@ -934,9 +934,9 @@ function priceChart(chart, tech, comparison=null){
     const xx=(ev.clientX-r.left)/r.width*680, n=Math.min(st.range,maxN);
     return Math.max(0,Math.min(n-1,Math.round((xx-pads.l)/(680-pads.l-pads.r)*(n-1))));
   }
-  function selectPoint(i){st.selected=i;st.hover=null;requestedDate=null;
+  function selectPoint(i,fromPicker=false){st.selected=i;st.hover=null;requestedDate=null;readoutBeforeControls=!!fromPicker;
     if(dateSelect)dateSelect.value=(chart.dates||[]).slice(-st.range)[i]||'';
-    drawSvg();}
+    drawSvg();placeReadout();}
 
   function chip(x){ const onx=!!st.ind[x.k], lv=lastNN(arrOf(x.k));
     const val = x.k==='vol'?_fv(lv.v) : (x.k==='foreign'||x.k==='trust')?_fs(lv.v) : (lv.v==null?'—':lv.v.toFixed(x.k==='rsi'?1:2));
@@ -967,7 +967,7 @@ function priceChart(chart, tech, comparison=null){
       suppressHoverUntil=Date.now()+500;
       if(!e.target.value){st.selected=null;st.hover=null;requestedDate=null;drawSvg();return;}
       const i=visibleDates.indexOf(e.target.value);
-      if(i>=0)selectPoint(i);
+      if(i>=0)selectPoint(i,true);
     }},h('option',{value:'',text:'選擇交易日…'}),
       ...[...visibleDates].reverse().map(date=>h('option',{value:date,text:date})));
     const pinnedDate=st.selected==null?null:visibleDates[st.selected];
@@ -1026,11 +1026,16 @@ function priceChart(chart, tech, comparison=null){
         window.addEventListener('resize',()=>{const redraw=window.__scannerChartResize;if(redraw)redraw();});
         window.__scannerChartResizeBound=true;
       }
-      window.__scannerChartResize=()=>{if(compactMode()!==renderedCompact)drawSvg();};
+      window.__scannerChartResize=()=>{if(compactMode()!==renderedCompact){drawSvg();placeChildren();}};
     }
     const foot=h('p',{style:'margin:10px 0 0;font-size:var(--fs-11);color:var(--muted);line-height:1.6',
       text:'現價／MA5／MA20／MA60 共用價格軸；RSI14、成交量、外資、投信各自成副圖、對齊同一時間軸。可直接選日期，或點按圖表保留日期與讀數；切換區間後清除。鍵盤聚焦圖表後，用左右鍵切換交易日，Home／End 跳到最早／最新。'});
     host.replaceChildren(...[top, datePicker, cP, cS, chartMeta, chartBox, readout, compareNav, foot].filter(Boolean));
+    const placeChildren=()=>{
+      host.insertBefore(readout, compactMode()&&readoutBeforeControls?cP:(compareNav||foot));
+    };
+    placeReadout=placeChildren;
+    placeChildren();
     drawSvg();
   }
   full();

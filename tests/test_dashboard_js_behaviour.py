@@ -102,6 +102,7 @@ class Element {
   appendChild(c) { this.children.push(c); return c; }
   append(...cs) { cs.forEach(c=>this.appendChild(c)); }
   replaceChildren(...cs) { this.text=''; this.children=cs.filter(Boolean); }
+  insertBefore(c,ref) { this.children=this.children.filter(x=>x!==c); const i=this.children.indexOf(ref); if(i<0)this.children.push(c); else this.children.splice(i,0,c); return c; }
   addEventListener(k,f) { (this.events[k]??=[]).push(f); }
   fire(k,e={}) { (this.events[k]||[]).forEach(f=>f(e)); }
   find(f) { if(f(this))return this; for(const c of this.children){const x=c.find?.(f);if(x)return x;} }
@@ -214,6 +215,41 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
         self.assertEqual(got[7], {
             'hidden': True, 'value': '', 'count': 21,
             'first': 'day64', 'last': 'day45'})
+
+    def test_chart_readout_follows_selection_source_on_compact(self):
+        pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
+let compact=true;
+const window={matchMedia:()=>({matches:compact}),addEventListener(){}};
+const vals=Array.from({length:65},(_,i)=>100+i);
+const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
+  rsi:vals.map(()=>0),vol:vals.map(()=>0),foreign:vals.map(()=>0),trust:vals.map(()=>null)},{});
+const order=()=>{const kids=host.children;
+  return {date:kids.findIndex(e=>e.className==='chart-date-picker'),
+    readout:kids.findIndex(e=>e.attrs.role==='status'),
+    chip:kids.findIndex(e=>e.find?.(x=>x.tag==='button'&&x.textContent.includes('現價'))),
+    canvas:kids.findIndex(e=>e.attrs.role==='group')};};
+const select=()=>host.find(e=>e.className==='chart-date-picker').find(e=>e.tag==='select');
+const choose=d=>{select().value=d;select().fire('change',{target:select()});return order();};
+const key=k=>{host.find(e=>e.attrs.role==='group').fire('keydown',{key:k,preventDefault(){}});return order();};
+const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
+"""
+        got = self.run_js(pre, [
+            ('未選日期時維持圖表後', 'order()'),
+            ('手機跳到日期讀數在控制項前', "choose('day10')"),
+            ('切換指標後仍保留選單來源位置', "(button('外資').fire('click'),order())"),
+            ('鍵盤從圖表選日期讀數回圖表後', "key('ArrowRight')"),
+            ('再用跳到日期讀數回控制項前', "choose('day11')"),
+            ('桌機即使從選單選也留在圖表後', '(compact=false,window.__scannerChartResize(),order())'),
+            ('跨回手機仍記得選單來源位置', '(compact=true,window.__scannerChartResize(),order())'),
+        ])
+        self.assertLess(got[0]['canvas'], got[0]['readout'])
+        for i in (1, 2, 4, 6):
+            self.assertLess(got[i]['date'], got[i]['readout'])
+            self.assertLess(got[i]['readout'], got[i]['chip'])
+            self.assertLess(got[i]['chip'], got[i]['canvas'])
+        for i in (3, 5):
+            self.assertLess(got[i]['chip'], got[i]['canvas'])
+            self.assertLess(got[i]['canvas'], got[i]['readout'])
 
     def test_chart_peer_comparison_uses_pinned_date_not_hover_and_aligns_exact_dates(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
