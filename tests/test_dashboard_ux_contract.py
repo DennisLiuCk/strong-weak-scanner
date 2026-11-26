@@ -49,6 +49,11 @@ class DashboardUxContractTest(unittest.TestCase):
         for anchor in ("ov", "grp", "diverge", "tier", "stocks", "flow-guide"):
             self.assertIn(f'href="#{anchor}"', self.template)
             self.assertIn(f'<section id="{anchor}"', self.template)
+        # 指定日期快照是首頁可見任務，不再只藏在 utility menu 底部。
+        self.assertIn('href="#date-snapshots"', self.template)
+        self.assertIn("id:'date-snapshots'", self.template)
+        self.assertIn('buildArchiveNavigation(),\n      signals,', self.template)
+        self.assertNotIn("document.querySelector('.quicknav').appendChild(buildArchiveNavigation())", self.template)
         self.assertNotIn('href="#tsmc"', self.template)
         self.assertNotIn('<section id="tsmc"', self.template)
         # 個股詳情只由點列開抽屜,不再有底部常駐展示區(設計稿 demo 殘留,已移除)
