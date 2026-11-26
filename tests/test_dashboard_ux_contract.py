@@ -279,12 +279,17 @@ class DashboardUxContractTest(unittest.TestCase):
                        'html.replace("__TIER_FLOW_JSON__"'):
             self.assertIn(marker, self.builder)
         self.assertIn("LIMIT 5", self.builder)
-        # 族群明細先回答「為什麼領先／有人接」：五項指標在成分股導覽之前；
-        # 手機首屏不能被一整組成分股按鈕占滿。成分股仍保留在同一面板下方。
+        # 族群明細先回答「為什麼領先／有人接」：五項指標在 DOM 上仍在成分股導覽之前；
+        # 手機直式堆疊，桌機寬面板並排使用原本空著的橫向空間。
         group_sheet = self.template[self.template.index("function openGroupSheet"):
                                     self.template.index("// 分層 pill 用")]
-        self.assertIn("text:'族群五項指標'}),statList,memberLinks];", group_sheet)
+        for marker in ("class:'group-detail-columns'", "class:'group-stats-panel'",
+                       "text:'族群五項指標'}),statList),", "memberLinks)];"):
+            self.assertIn(marker, group_sheet)
+        self.assertLess(group_sheet.index("class:'group-stats-panel'"), group_sheet.index("memberLinks)];"))
         self.assertNotIn("text:g.note}),memberLinks", group_sheet)
+        self.assertIn("@media(min-width:880px)", self.template)
+        self.assertIn(".group-detail-columns .group-member-panel{margin-top:0}", self.template)
         # 狀態摘要不能把「持續時間」與三類成分股籌碼狀態縮成無單位數字；
         # 手機沒有 hover，必須直接看出幾檔個股屬於各狀態。
         self.assertIn("text:'目前狀態'+g.dur", group_sheet)

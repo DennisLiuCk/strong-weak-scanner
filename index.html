@@ -235,7 +235,14 @@ svg{display:block;overflow:visible}
 .togglebtn{display:inline-flex;align-items:center;gap:7px;cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink2);border-radius:100px;padding:7px 14px;font:inherit;font-size:12.5px}
 .togglebtn:hover{color:var(--ink);border-color:var(--muted)}
 .togglebtn:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+.group-member-panel{margin:16px 0;min-width:0}
+.group-stats-panel{min-width:0}
 .group-member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(136px,100%),1fr));gap:8px}
+@media(min-width:880px){
+  .group-detail-columns{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:18px;align-items:start}
+  .group-detail-columns .group-member-panel{margin-top:0}
+  .group-detail-columns .group-stats-panel>h3{margin-top:0}
+}
 .group-member-btn{align-items:flex-start;flex-direction:column;gap:2px;min-width:0;border-radius:12px;padding:7px 10px;text-align:left}
 .group-member-btn.focus-return{outline:2px solid var(--strong);outline-offset:2px}
 .group-member-main{display:flex;align-items:baseline;gap:5px;min-width:0;color:var(--ink);line-height:1.25}
@@ -1963,7 +1970,7 @@ function openStockDetail(id,groupContext=null,chartContext=null,opener=null,grou
 function openGroupSheet(g,opener=null,restore=null){
   const st=stateStyle(g.state),statList=h('div',{});
   const members=stockSearchGroups(D.stocks,D.groups,g.g,'','comp',true)[0];
-  const memberLinks=h('section',{'aria-label':grp(g.g).nm+'成分股',style:'margin:16px 0'},
+  const memberLinks=h('section',{class:'group-member-panel','aria-label':grp(g.g).nm+'成分股'},
     h('h3',{class:'sub3',text:'成分股 · '+(members?members.total:0)+' 檔'}),
     h('p',{class:'note',text:'依族群內綜合分排序；按鈕列出排序、綜合分與20日絕對報酬。點個股看明細，可返回本族群。'}));
   const memberList=h('div',{class:'group-member-grid'});
@@ -1999,7 +2006,10 @@ function openGroupSheet(g,opener=null,restore=null){
     h('div',{style:'display:flex;gap:16px;flex-wrap:wrap;font-size:var(--fs-115);color:var(--muted);font-weight:600;background:var(--inset);border-radius:10px;padding:10px 14px'},
       h('span',{text:'目前狀態'+g.dur}),h('span',{style:'color:var(--teal)',text:'籌碼健康 '+g.chip.health+' 檔'}),h('span',{text:'中性 '+g.chip.neutral+' 檔'}),h('span',{style:'color:var(--amber)',text:'待觀察 '+g.chip.warn+' 檔'})),
     h('div',{style:'margin:14px 0 2px'},h('div',{style:'font-size:var(--fs-11);color:var(--muted);margin-bottom:4px',text:'20日動能 vs 全體 · 近 30 個交易日（高＝跑贏）'}),spark(g.trend.rel,300,42,'var(--ink)',0)),
-    h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'族群五項指標'}),statList,memberLinks];
+    h('div',{class:'group-detail-columns'},
+      h('section',{class:'group-stats-panel','aria-label':grp(g.g).nm+'族群五項指標'},
+        h('h3',{style:'margin:16px 0 0;font-size:13px;font-weight:800',text:'族群五項指標'}),statList),
+      memberLinks)];
   const gfs=flowSection(g.flow);
   if(gfs)body.push(h('div',{style:'margin-top:10px;border-top:1px solid var(--line)'},gfs));
   sheetEl.replaceChildren(...body); showSheet(()=>openGroupSheet(g,opener,restore),opener);
