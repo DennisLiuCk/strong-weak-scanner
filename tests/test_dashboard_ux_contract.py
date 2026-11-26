@@ -267,6 +267,12 @@ class DashboardUxContractTest(unittest.TestCase):
                                     self.template.index("// 分層 pill 用")]
         self.assertIn("text:'族群五項指標'}),statList,memberLinks];", group_sheet)
         self.assertNotIn("text:g.note}),memberLinks", group_sheet)
+        # 成分股導覽不能只列名字：使用者在族群明細內就要能分辨誰值得先看，
+        # 且相對綜合分必須與 20 日絕對報酬並列，避免把相對強誤讀成絕對上漲。
+        for marker in ("class:'group-member-grid'", "group-member-btn", "group-member-rank",
+                       "text:'綜合'", "text:'20日'", "fmtPct(s.r20,1)",
+                       "按鈕列出排序、綜合分與20日絕對報酬"):
+            self.assertIn(marker, group_sheet)
 
     def test_tier_bands_and_five_day_flow(self):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",
