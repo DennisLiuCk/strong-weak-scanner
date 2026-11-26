@@ -312,6 +312,12 @@ class DashboardUxContractTest(unittest.TestCase):
         # 滑鼠走完整個比較循環時，瀏覽器不把程式還原焦點當 :focus-visible；
         # 返回位置仍要有明確焦點框，否則使用者看不出剛才比較的是哪一檔。
         self.assertIn(".group-member-btn.focus-return{outline:2px solid var(--strong)", self.template)
+        # 手機同日比較的目的地是本檔圖表，不是段落標題；否則控制列會把圖表、讀數
+        # 與下一個比較按鈕一起擠出首屏。圖表本身原本就可聚焦，不得被跳轉改成 -1。
+        self.assertIn("window.matchMedia('(max-width: 680px)')", stock_sheet)
+        self.assertIn("[data-history-chart] .chart-canvas", stock_sheet)
+        self.assertIn("if(!hd.hasAttribute('tabindex'))hd.tabIndex=-1", stock_sheet)
+        self.assertIn(".chart-canvas:focus-visible{outline:2px solid var(--strong)", self.template)
 
     def test_tier_bands_and_five_day_flow(self):
         for marker in ("function buildTier()", "flowSpark", "近 5 日變層軌跡",
