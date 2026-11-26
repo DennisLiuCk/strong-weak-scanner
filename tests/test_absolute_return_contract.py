@@ -93,7 +93,7 @@ class AbsoluteReturnContractTest(unittest.TestCase):
         """小數位、U+2212 負號、−0 中性這三件事的**行為**由
         test_dashboard_js_behaviour 用 node 實際跑過;這裡只釘「沒有人繞過它」——
         行內各寫各的正是三個格式 bug 的來源。"""
-        for spot in ("text:fmtPct(r)",                       # 分層帶個股列
+        for spot in ("tierPillMetric('20日',fmtPct(r)",      # 分層帶個股列
                      "text:fmtPct(a.med,1)",                 # 族群排行榜絕對列
                      "text:fmtPct(s.r20,1)",                 # 族群內個股表格列
                      "text:'20日 '+fmtPct(r)"):              # 時間尺度卡
