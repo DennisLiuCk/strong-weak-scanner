@@ -111,10 +111,12 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .quicknav a{display:flex;align-items:center;min-height:38px;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;color:var(--ink2)}
 .quicknav a:hover{color:var(--ink);background:var(--inset);text-decoration:none}
 .quicknav .menu-scope{padding:8px 10px 3px;border-top:1px solid var(--line2);font-size:var(--fs-10);color:var(--muted);line-height:1.5}
-.archive-picker{grid-column:1/-1;display:grid;gap:6px;padding:10px;border-top:1px solid var(--line2)}
-.archive-picker label{font-size:12px;font-weight:700;color:var(--ink2)}
-.archive-picker select{width:100%;min-width:0;min-height:44px}
-.archive-picker a{justify-content:center;border:1px solid var(--line);min-height:44px}
+.archive-picker{display:grid;grid-template-columns:auto minmax(140px,1fr) auto;gap:6px 9px;align-items:center;margin-top:12px;padding:10px 12px;border:1px solid var(--line2);border-radius:12px;background:var(--inset)}
+.archive-picker label{font-size:var(--fs-105);font-weight:800;color:var(--muted);letter-spacing:.03em}
+.archive-picker select{width:100%;min-width:0;min-height:38px;border-radius:10px;text-align:left}
+.archive-picker a{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:100px;min-height:38px;padding:7px 13px;background:var(--card);font-size:12px;font-weight:800;white-space:nowrap}
+.archive-picker .note{grid-column:1/-1;margin:0;font-size:var(--fs-105);line-height:1.45}
+.archive-picker .archive-back{grid-column:1/-1;justify-content:flex-start;border:0;padding-left:0}
 .themebtn{width:44px;height:44px;padding:0;justify-content:center;font-size:0;background:transparent;border-color:rgba(255,255,255,.18);color:#f7f5ef}
 .themebtn::before{content:'◐';font-size:16px}
 #ov{margin-top:0}
@@ -489,6 +491,9 @@ svg{display:block;overflow:visible}
   .utility-menu>summary::after{display:none}
   .quicknav{position:fixed;top:62px;right:14px;left:14px;width:auto;grid-template-columns:1fr 1fr}
   .quicknav .menu-scope{grid-column:1/-1}
+  .archive-picker{grid-template-columns:minmax(0,1fr) auto;align-items:end}
+  .archive-picker label{grid-column:1/-1}
+  .archive-picker select,.archive-picker a{min-height:44px}
 }
 @media (max-width:720px){
   h1{font-size:30px} h2.sec{font-size:22px}
@@ -584,6 +589,7 @@ svg{display:block;overflow:visible}
         <summary>快速前往</summary>
         <nav class="quicknav" aria-label="快速導覽">
           <a href="#ov">今日掃描焦點</a>
+          <a href="#date-snapshots">指定日期快照</a>
           <a href="#grp">族群比較</a>
           <a href="#tier">個股分層</a>
           <a href="research.html" data-research-link>研究中心</a>
@@ -1117,6 +1123,7 @@ function buildOverview(){
       h('h1',{class:'command-headline',text:o.headline}),
       h('p',{class:'command-summary',text:o.summary}),
       buildHeroLookup(),
+      buildArchiveNavigation(),
       signals,
       h('p',{class:'note',style:'margin:13px 0 0;line-height:1.55',text:o.note}),
       marketSource),
@@ -2335,10 +2342,10 @@ function archiveNavDates(dates,pathname){
 }
 function buildArchiveNavigation(){
   const dates=archiveNavDates(ARCHIVE_DATES,location.pathname);
-  const box=h('div',{class:'archive-picker'},h('label',{for:'archive-date',text:'歷史快照日期'}));
+  const box=h('div',{class:'archive-picker',id:'date-snapshots'},h('label',{for:'archive-date',text:'指定日期快照'}));
   if(!dates.length){box.appendChild(h('span',{class:'note',text:'尚無可用快照'}));return box;}
   const select=h('select',{id:'archive-date',class:'sortbtn'});
-  const link=h('a',{target:'_blank',rel:'noopener noreferrer',text:'開啟當日快照 ↗'});
+  const link=h('a',{target:'_blank',rel:'noopener noreferrer',text:'開啟快照 ↗'});
   const update=()=>{link.href=archiveSnapshotHref(select.value,location.pathname);link.setAttribute('aria-label','開啟 '+select.value+' 歷史快照（另開分頁）');};
   const fill=list=>{const keep=select.value||DATE_ISO;
     select.replaceChildren(...list.map(date=>h('option',{value:date,text:date})));
@@ -2351,11 +2358,10 @@ function buildArchiveNavigation(){
     fetch(manifest,{cache:'no-cache'}).then(r=>r.ok?r.json():null)
       .then(list=>{if(Array.isArray(list))fill(archiveNavDates(dates.concat(list),location.pathname));}).catch(()=>{});
   }
-  box.append(select,link,h('span',{class:'note',text:'另開分頁；保留當日首次發布的原始畫面。'}));
-  if(location.pathname.includes('/archive/'))box.appendChild(h('a',{href:'../index.html',text:'返回最新掃描'}));
+  box.append(select,link,h('span',{class:'note',text:'另開分頁；保留當日首次發布的原始掃描畫面。'}));
+  if(location.pathname.includes('/archive/'))box.appendChild(h('a',{class:'archive-back',href:'../index.html',text:'返回最新掃描'}));
   return box;
 }
-document.querySelector('.quicknav').appendChild(buildArchiveNavigation());
 const _html=document.documentElement;
 { const saved=rvStored('dashTheme'); if(saved==='light'||saved==='dark')_html.dataset.theme=saved; }
 document.querySelectorAll('.quicknav a').forEach(link=>link.addEventListener('click',()=>{const menu=link.closest('.utility-menu');if(menu)menu.open=false;}));
