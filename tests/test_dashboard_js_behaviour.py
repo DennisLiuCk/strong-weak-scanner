@@ -220,11 +220,14 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
     def test_chart_legend_values_follow_the_active_chart_date(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
 const vals=Array.from({length:65},(_,i)=>100+i);
-const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
+const ma60=vals.slice();ma60[10]=null;
+const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60,
   rsi:vals.map(()=>0),vol:vals.map(()=>0),foreign:vals.map(()=>0),trust:vals.map(()=>null)},{});
-const priceChip=()=>host.find(e=>e.tag==='button'&&e.className==='chart-chip-btn'&&e.textContent.includes('現價'));
+const chipByLabel=label=>host.find(e=>e.tag==='button'&&e.className==='chart-chip-btn'&&e.textContent.includes(label));
+const priceChip=()=>chipByLabel('現價');
 const rangeButton=()=>host.find(e=>e.tag==='button'&&e.className==='chart-range-btn');
 const state=()=>({chipText:priceChip().textContent,
+  ma60ChipText:chipByLabel('MA60').textContent,
   chipFont:priceChip().style.cssText.includes('font-family:inherit'),
   rangeFont:rangeButton().style.cssText.includes('font-family:inherit')});
 const output=()=>host.find(e=>e.attrs.role==='status');
@@ -240,8 +243,12 @@ const choose=d=>{select().value=d;select().fire('change',{target:select()});retu
         self.assertTrue(got[0]['rangeFont'])
         self.assertIn('110.00', got[1]['chip']['chipText'])
         self.assertNotIn('164.00', got[1]['chip']['chipText'])
+        self.assertIn('MA60—', got[1]['chip']['ma60ChipText'])
+        self.assertNotIn('MA60 164.00', got[1]['chip']['ma60ChipText'])
+        self.assertNotIn('MA60 110.00', got[1]['chip']['ma60ChipText'])
         self.assertIn('日期day10', got[1]['readout'])
         self.assertIn('現價110.00', got[1]['readout'])
+        self.assertNotIn('MA60', got[1]['readout'])
 
     def test_chart_indicator_chip_exposes_pressed_state_and_restores_focus(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""

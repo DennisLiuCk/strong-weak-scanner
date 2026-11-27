@@ -950,7 +950,7 @@ function priceChart(chart, tech, comparison=null){
     const active=st.hover==null?st.selected:st.hover;
     const hv=(active!=null&&active>=0&&active<N)?active:null;
     const series={price:px,ma5,ma20,ma60,rsi,vol,foreign:fore,trust:tr};
-    chipValueEls.forEach(item=>{ const arr=series[item.key]||[], value=hv!=null&&arr[hv]!=null?arr[hv]:lastNN(arr).v;
+    chipValueEls.forEach(item=>{ const arr=series[item.key]||[], value=hv!=null?arr[hv]:lastNN(arr).v;
       item.el.textContent=chipText(item.key,value); });
     readout.hidden=hv==null;
     readout.style.display=hv==null?'none':'flex';
