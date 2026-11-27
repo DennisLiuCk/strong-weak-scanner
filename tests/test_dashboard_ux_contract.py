@@ -482,7 +482,7 @@ class DashboardUxContractTest(unittest.TestCase):
         # 本週排名資料只在預覽 payload 存在；正式無資料時不得出現空入口。
         self.assertIn("if(!RANKCHG||RANKCHG.error||!RANKCHG.stocks)return null", fn)
         self.assertIn(".slice(0,3)", fn)
-        self.assertIn("onclick:event=>openStockDetail(id,null,null,event.currentTarget)", fn)
+        self.assertIn("onclick:event=>openStockDetail(id,null,null,event.currentTarget,null,'本週排名變化')", fn)
         self.assertIn("type:'button'", fn)
         self.assertIn("aria-label", fn)
         self.assertIn("direction=up?'上升':'下滑'", fn)
