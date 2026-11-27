@@ -202,6 +202,8 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .tier-snapshot-list{display:flex;flex-wrap:wrap;gap:7px}
 .tier-snapshot-legend{grid-column:1/-1;margin:0 2px -5px;font-size:var(--fs-11);color:var(--ink2);line-height:1.5}
 .tier-snapshot-more{margin-top:10px;font-size:var(--fs-105);color:var(--muted)}
+.tier-snapshot-actions{display:grid;gap:2px;justify-items:start;margin-top:10px}
+.tier-snapshot-actions .tier-snapshot-more{margin-top:0}
 button.tier-snapshot-more{display:inline-flex;align-items:center;min-height:44px;padding:4px 0;border:0;background:transparent;color:var(--teal);font:inherit;font-size:var(--fs-105);font-weight:800;text-align:left;cursor:pointer}
 button.tier-snapshot-more:hover{text-decoration:underline}
 button.tier-snapshot-more:focus-visible{outline:2px solid var(--strong);outline-offset:2px;border-radius:4px}
@@ -2123,6 +2125,7 @@ function buildTier(){
     curG='';gsel.value='';
     (tierKeys||[]).forEach(k=>{expanded[k]=true;});
     renderBands();
+    renderFlow();
     const target=bands.querySelector('[data-tier-band="'+bandIndex+'"]');
     if(!target)return;
     const headerH=document.querySelector('.sitebar')?.getBoundingClientRect().height||0;
@@ -2133,18 +2136,24 @@ function buildTier(){
   const snapshotDefs=[
     ['相對強勢','價格與籌碼多在族群前段','var(--strong)',D.allStocks.filter(s=>!s.trading&&s.tier==='真強'),0,['真強']],
     ['相對蓄勢','籌碼靠前、價格位置仍待確認','var(--teal)',D.allStocks.filter(s=>!s.trading&&s.tier==='蓄勢·外資佈局'),1,['蓄勢·外資佈局']],
-    ['相對弱勢','價格與綜合分在族群後段','var(--weak)',D.allStocks.filter(s=>!s.trading&&(s.tier==='真弱'||s.tier==='真弱·陷阱')),5,['真弱','真弱·陷阱']]
+    ['相對弱勢','價格與綜合分在族群後段；槓桿風險另列','var(--weak)',D.allStocks.filter(s=>!s.trading&&s.tier==='真弱'),5,['真弱'],D.allStocks.filter(s=>!s.trading&&s.tier==='真弱·陷阱')]
   ];
-  snapshotDefs.forEach(([title,desc,col,mem,bandIndex,tierKeys],idx)=>{mem.sort((a,b)=>b.comp-a.comp);const list=h('div',{class:'tier-snapshot-list'});
+  snapshotDefs.forEach(([title,desc,col,mem,bandIndex,tierKeys,riskMem],idx)=>{mem.sort((a,b)=>b.comp-a.comp);const list=h('div',{class:'tier-snapshot-list'});
     mem.slice(0,6).forEach(s=>list.appendChild(stockPill(s)));
     if(!mem.length)list.appendChild(h('span',{class:'note',text:'目前無成員'}));
+    const actions=[];
+    if(mem.length>6)actions.push(h('button',{type:'button',class:'tier-snapshot-more tier-snapshot-expand',
+      'aria-label':'展開完整分層，查看'+title+'其餘 '+(mem.length-6)+' 檔',
+      onclick:()=>openTierBand(bandIndex,tierKeys),
+      text:'另 '+(mem.length-6)+' 檔，展開完整分層查看'}));
+    if(riskMem&&riskMem.length)actions.push(h('button',{type:'button',class:'tier-snapshot-more tier-snapshot-risk',
+      'aria-label':'展開完整分層，查看相對弱勢·槓桿風險 '+riskMem.length+' 檔',
+      onclick:()=>openTierBand(6,['真弱·陷阱']),
+      text:'槓桿風險另列 '+riskMem.length+' 檔，直接查看'}));
     snapshot.appendChild(h('div',{class:'card tier-snapshot-card',id:idx===0?'tier-primary-list':null,style:`border-left-color:${col}`},
       h('div',{class:'tier-snapshot-head'},h('b',{style:`color:${col}`,text:title}),h('span',{class:'mono',style:`color:${col}`,text:mem.length})),
       h('p',{class:'note',style:'margin:-7px 0 11px',text:desc}),list,
-      mem.length>6?h('button',{type:'button',class:'tier-snapshot-more tier-snapshot-expand',
-        'aria-label':'展開完整分層，查看'+title+'其餘 '+(mem.length-6)+' 檔',
-        onclick:()=>openTierBand(bandIndex,tierKeys),
-        text:'另 '+(mem.length-6)+' 檔，展開完整分層查看'}):null));});
+      actions.length?h('div',{class:'tier-snapshot-actions'},...actions):null));});
   const caveat=absCaveat();
   const fullBody=h('div',{class:'tier-full-body'},
     caveat?h('p',{style:'margin:0 0 14px;font-size:12px;color:var(--ink2);line-height:1.65',html:caveat}):null,
