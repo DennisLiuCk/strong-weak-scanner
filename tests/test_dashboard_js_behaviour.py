@@ -97,6 +97,7 @@ const stocks=[
 class Element {
   constructor(tag) { this.tag=tag; this.nodeType=1; this.attrs={}; this.style={}; this.children=[]; this.events={}; }
   setAttribute(k,v) { this.attrs[k]=v; }
+  focus() { document.activeElement=this; }
   set textContent(v) { this.children=[]; this.text=String(v); }
   get textContent() { return (this.text||'')+this.children.map(c=>c.textContent).join(''); }
   appendChild(c) { this.children.push(c); return c; }
@@ -215,6 +216,35 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
         self.assertEqual(got[7], {
             'hidden': True, 'value': '', 'count': 21,
             'first': 'day64', 'last': 'day45'})
+
+    def test_chart_indicator_chip_exposes_pressed_state_and_restores_focus(self):
+        pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
+const vals=Array.from({length:65},(_,i)=>100+i);
+const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
+  rsi:vals.map(()=>0),vol:vals.map(()=>0),foreign:vals.map(()=>0),trust:vals.map(()=>0)},{});
+const collect=(root,out=[])=>{if(root.tag==='button'&&root.className==='chart-chip-btn')out.push(root);
+  (root.children||[]).forEach(c=>c&&c.nodeType===1&&collect(c,out));return out;};
+const chips=()=>collect(host);
+const clickFocused=i=>{const old=chips()[i];old.focus();old.fire('click');
+  const replacement=chips()[i];return {focused:document.activeElement===replacement,
+    key:replacement.__chartChipKey,aria:replacement.attrs['aria-pressed'],text:replacement.textContent,
+    allAria:chips().map(x=>x.attrs['aria-pressed'])};};
+"""
+        got = self.run_js(pre, [
+            ('八個開關都有 pressed 狀態', "chips().map(x=>({key:x.__chartChipKey,aria:x.attrs['aria-pressed']}))"),
+            ('關掉現價後焦點留在替換開關', 'clickFocused(0)'),
+            ('開啟外資後狀態與焦點同步', 'clickFocused(6)'),
+        ])
+        self.assertEqual(len(got[0]), 8)
+        self.assertTrue(all(x['aria'] in ('true', 'false') for x in got[0]))
+        self.assertEqual(got[1]['focused'], True)
+        self.assertEqual(got[1]['key'], 'price')
+        self.assertEqual(got[1]['aria'], 'false')
+        self.assertNotIn('✓', got[1]['text'])
+        self.assertEqual(got[2]['focused'], True)
+        self.assertEqual(got[2]['key'], 'foreign')
+        self.assertEqual(got[2]['aria'], 'true')
+        self.assertIn('✓', got[2]['text'])
 
     def test_chart_readout_follows_selection_source_on_compact(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
