@@ -217,6 +217,32 @@ const button=text=>host.find(e=>e.tag==='button'&&e.textContent.includes(text));
             'hidden': True, 'value': '', 'count': 21,
             'first': 'day64', 'last': 'day45'})
 
+    def test_chart_legend_values_follow_the_active_chart_date(self):
+        pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
+const vals=Array.from({length:65},(_,i)=>100+i);
+const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
+  rsi:vals.map(()=>0),vol:vals.map(()=>0),foreign:vals.map(()=>0),trust:vals.map(()=>null)},{});
+const priceChip=()=>host.find(e=>e.tag==='button'&&e.className==='chart-chip-btn'&&e.textContent.includes('現價'));
+const rangeButton=()=>host.find(e=>e.tag==='button'&&e.className==='chart-range-btn');
+const state=()=>({chipText:priceChip().textContent,
+  chipFont:priceChip().style.cssText.includes('font-family:inherit'),
+  rangeFont:rangeButton().style.cssText.includes('font-family:inherit')});
+const output=()=>host.find(e=>e.attrs.role==='status');
+const select=()=>host.find(e=>e.className==='chart-date-picker').find(e=>e.tag==='select');
+const choose=d=>{select().value=d;select().fire('change',{target:select()});return {chip:state(),readout:output().textContent};};
+"""
+        got = self.run_js(pre, [
+            ('未選日期時圖例停留在最新值', 'state()'),
+            ('釘選舊日期後圖例同步到同一日期', "choose('day10')"),
+        ])
+        self.assertIn('164.00', got[0]['chipText'])
+        self.assertTrue(got[0]['chipFont'])
+        self.assertTrue(got[0]['rangeFont'])
+        self.assertIn('110.00', got[1]['chip']['chipText'])
+        self.assertNotIn('164.00', got[1]['chip']['chipText'])
+        self.assertIn('日期day10', got[1]['readout'])
+        self.assertIn('現價110.00', got[1]['readout'])
+
     def test_chart_indicator_chip_exposes_pressed_state_and_restores_focus(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
 const vals=Array.from({length:65},(_,i)=>100+i);
