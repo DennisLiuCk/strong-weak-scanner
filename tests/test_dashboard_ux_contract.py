@@ -537,16 +537,16 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertNotIn("min-width:1180px", self.template)
         for marker in (".stock-detail-card{padding:30px 32px}",
                        ".history-chart-card{padding:20px 22px}",
-                       "#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}",
+                       "#sheet{width:100%;height:auto;max-height:94vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}",
                        ".stock-detail-card{padding:20px 16px}",
                        ".history-chart-card{padding:16px 12px}",
                        ".chart-canvas{padding:10px 6px 4px}",
                        ".chart-range-btn,.chart-chip-btn{min-height:44px}"):
             self.assertIn(marker, self.template)
-        # 320×568 小螢幕的詳情抽屜先保留 44px 觸控高度，但把導覽與標題區垂直空間壓縮；
+        # 行動版詳情抽屜是 aria-modal；上方留白實際上不可互動。94vh 只保留一條
+        # 可點擊關閉的 backdrop，把主要內容空間還給明細。320×568 再額外壓縮導覽與標題區，
         # 否則「本週排名變化」只剩一條細縫，使用者看不到第一句名次改變原因。
         for marker in ("@media(max-width:380px)",
-                       "#sheet{max-height:94vh}",
                        ".stocknav{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr)",
                        ".stocknav-pair .togglebtn{width:100%;min-height:44px",
                        "white-space:normal;overflow-wrap:anywhere;justify-content:center;text-align:center",
