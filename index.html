@@ -79,7 +79,7 @@ h2.sec{margin:0 0 6px;font-size:28px;font-weight:800;letter-spacing:.3px}
 .chart-date-picker select{min-width:154px;border-radius:10px;text-align:left}
 .chart-canvas{background:var(--inset);border:1px solid var(--line2);border-radius:12px;padding:14px 12px 6px}
 .chart-canvas:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
-.chart-chip-btn:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+.chart-chip-btn:focus-visible,.chart-range-btn:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
 .opthd{display:flex;align-items:center;gap:10px;margin-bottom:13px}
 .opthd b{font-size:16px} .opthd span{font-size:12.5px;color:var(--muted)}
 .chip{font-size:var(--fs-11);font-weight:700;border-radius:100px;padding:2px 9px;white-space:nowrap}
@@ -974,11 +974,16 @@ function priceChart(chart, tech, comparison=null){
     button.__chartChipKey=x.k;
     return button; }
 
-  function full(focusChip=null){
+  function full(focusChip=null,focusRange=null){
     const techCol=tech.cls==='up'?'var(--strong)':tech.cls==='down'?'var(--weak)':'var(--muted)';
-    const rangeSeg=h('div',{style:'display:inline-flex;gap:3px;padding:3px;background:var(--inset);border-radius:10px'},
-      ...RANGES.map(rg=>h('button',{class:'chart-range-btn',onclick:()=>{st.range=rg[1];st.hover=null;st.selected=null;requestedDate=null;full();},
-        style:'font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;color:'+(st.range===rg[1]?'var(--card)':'var(--ink2)')+';background:'+(st.range===rg[1]?'var(--ink)':'transparent')}, rg[0])));
+    const rangeButtons=RANGES.map(rg=>{
+      const button=h('button',{class:'chart-range-btn',type:'button','aria-pressed':st.range===rg[1]?'true':'false',
+        onclick:()=>{st.range=rg[1];st.hover=null;st.selected=null;requestedDate=null;full(null,rg[1]);},
+        style:'font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;color:'+(st.range===rg[1]?'var(--card)':'var(--ink2)')+';background:'+(st.range===rg[1]?'var(--ink)':'transparent')}, rg[0]);
+      button.__chartRange=rg[1];
+      return button;
+    });
+    const rangeSeg=h('div',{style:'display:inline-flex;gap:3px;padding:3px;background:var(--inset);border-radius:10px'},...rangeButtons);
     const top=h('div',{style:'display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px'},
       h('div',{},
         h('h3',{class:'sub3',style:'margin:0',text:'股價與均線 · 多指標疊圖'}),
@@ -987,6 +992,7 @@ function priceChart(chart, tech, comparison=null){
     const priceChips=IND.filter(x=>x.g==='p'&&has(x.k)).map(chip);
     const subChips=IND.filter(x=>x.g==='s'&&has(x.k)).map(chip);
     const focusTarget=focusChip==null?null:priceChips.concat(subChips).find(button=>button.__chartChipKey===focusChip);
+    const focusRangeTarget=focusRange==null?null:rangeButtons.find(button=>button.__chartRange===focusRange);
     const cP=h('div',{style:'display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px'}, ...priceChips);
     const cS=subChips.length?h('div',{style:'display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px'},
       h('span',{class:'chart-subchips-label',style:'font-size:var(--fs-11);color:var(--muted);align-self:center;margin-right:2px',text:'副圖：'}, ), ...subChips):null;
@@ -1066,7 +1072,8 @@ function priceChart(chart, tech, comparison=null){
     placeReadout=placeChildren;
     placeChildren();
     drawSvg();
-    if(focusTarget)focusTarget.focus({preventScroll:true});
+    const focusReplacement=focusTarget||focusRangeTarget;
+    if(focusReplacement)focusReplacement.focus({preventScroll:true});
   }
   full();
   return host;

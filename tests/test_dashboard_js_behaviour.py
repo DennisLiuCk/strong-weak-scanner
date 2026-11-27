@@ -246,6 +246,37 @@ const clickFocused=i=>{const old=chips()[i];old.focus();old.fire('click');
         self.assertEqual(got[2]['aria'], 'true')
         self.assertIn('✓', got[2]['text'])
 
+    def test_chart_range_buttons_expose_pressed_state_and_restore_focus(self):
+        pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
+const vals=Array.from({length:120},(_,i)=>100+i);
+const host=priceChart({px:vals,dates:vals.map((_,i)=>'day'+i),ma5:vals,ma:vals,ma60:vals,
+  rsi:vals.map(()=>0),vol:vals.map(()=>0),foreign:vals.map(()=>0),trust:vals.map(()=>0)},{});
+const collect=(root,out=[])=>{if(root.tag==='button'&&root.className==='chart-range-btn')out.push(root);
+  (root.children||[]).forEach(c=>c&&c.nodeType===1&&collect(c,out));return out;};
+const ranges=()=>collect(host);
+const clickFocused=i=>{const old=ranges()[i];old.focus();old.fire('click');
+  const replacement=ranges()[i];return {focused:document.activeElement===replacement,
+    key:replacement.__chartRange,type:replacement.attrs.type,aria:replacement.attrs['aria-pressed'],
+    allAria:ranges().map(x=>x.attrs['aria-pressed'])};};
+"""
+        got = self.run_js(pre, [
+            ('三個區間按鈕都有 type 與 pressed 狀態', "ranges().map(x=>({key:x.__chartRange,type:x.attrs.type,aria:x.attrs['aria-pressed']}))"),
+            ('切到 20 日後焦點留在替換按鈕', 'clickFocused(0)'),
+            ('再切到 120 日狀態與焦點同步', 'clickFocused(2)'),
+        ])
+        self.assertEqual(got[0], [
+            {'key': 20, 'type': 'button', 'aria': 'false'},
+            {'key': 60, 'type': 'button', 'aria': 'true'},
+            {'key': 120, 'type': 'button', 'aria': 'false'}])
+        self.assertEqual(got[1]['focused'], True)
+        self.assertEqual(got[1]['key'], 20)
+        self.assertEqual(got[1]['aria'], 'true')
+        self.assertEqual(got[1]['allAria'], ['true', 'false', 'false'])
+        self.assertEqual(got[2]['focused'], True)
+        self.assertEqual(got[2]['key'], 120)
+        self.assertEqual(got[2]['aria'], 'true')
+        self.assertEqual(got[2]['allAria'], ['false', 'false', 'true'])
+
     def test_chart_readout_follows_selection_source_on_compact(self):
         pre = self.chart_dom() + '\n'.join(extract(f) for f in ('h', 'sv', 'svg', 'priceChart')) + r"""
 let compact=true;
