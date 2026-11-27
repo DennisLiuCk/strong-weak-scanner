@@ -299,6 +299,14 @@ svg{display:block;overflow:visible}
 .sheetjump-select{display:none}
 @media(max-width:680px){.sheetjumps{display:none}.sheetjump-select{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--muted)}.sheetjump-select select{flex:1;min-width:0;min-height:44px}}
 @media(max-width:680px){#sheetwrap{align-items:flex-end}#sheet{width:100%;height:auto;max-height:86vh;border-left:none;border-radius:18px 18px 0 0;transform:translateY(100%);padding:18px 12px 32px}#sheetwrap.on #sheet{transform:translateY(0)}.sheetheader{top:-18px;margin:-18px -12px 14px;padding:10px 12px}.stock-detail-card{padding:20px 16px}.history-chart-card{padding:16px 12px}.chart-date-picker{align-items:flex-start;flex-direction:column;gap:5px}.chart-date-picker select{width:100%}.chart-canvas{padding:10px 6px 4px}.chart-range-btn,.chart-chip-btn{min-height:44px}}
+@media(max-width:680px){
+  .chart-chip-btn{display:inline-grid!important;grid-template-columns:auto auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:5px!important;row-gap:0;width:calc(50% - 4px);box-sizing:border-box;padding:4px 8px!important;align-items:center;align-content:center}
+  .chart-chip-check{grid-row:1/3}
+  .chart-chip-line{grid-row:1/3}
+  .chart-chip-label{grid-column:3;min-width:0;font-size:var(--fs-105);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chart-chip-value{grid-column:3;min-width:0;font-size:var(--fs-10)!important;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chart-subchips-label{flex:0 0 100%}
+}
 @media(max-width:380px){#sheet{max-height:94vh}.sheetheader{padding-top:6px;padding-bottom:6px;margin-bottom:8px}.stocknav{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center}.stocknav>button{grid-column:1/-1}.stocknav-status{flex:none;font-size:10px;white-space:nowrap}.stocknav-pair{display:contents}.stocknav-pair .togglebtn{width:100%;min-height:44px;padding:4px 5px;font-size:11px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;justify-content:center;text-align:center}.sheetjump-select{margin-top:8px}.stock-detail-card{padding-top:14px}.stock-detail-head{gap:8px!important}.stock-detail-id b{font-size:24px!important}.stock-detail-id .mono{font-size:13px!important}.stock-detail-id .chip{font-size:11px!important}.stock-detail-score .mono{font-size:30px!important}.stock-detail-score>div:last-child{font-size:10.5px!important}.rkc{margin-top:12px;padding:12px 11px}}
 /* ---------- 多視角探索：方案 3，單一族群主從式比較 ---------- */
 #perspectives{width:min(1400px,calc(100vw - 80px));max-width:none;margin-left:50%;padding:7px 11px 0 0;transform:translateX(-50%)}
@@ -957,10 +965,10 @@ function priceChart(chart, tech, comparison=null){
     const val = x.k==='vol'?_fv(lv.v) : (x.k==='foreign'||x.k==='trust')?_fs(lv.v) : (lv.v==null?'—':lv.v.toFixed(x.k==='rsi'?1:2));
     return h('button',{class:'chart-chip-btn',onclick:()=>{st.ind[x.k]=onx?0:1; full();},
       style:'display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:6px 11px;border-radius:9px;cursor:pointer;border:1px solid '+(onx?x.c:'var(--line)')+';background:'+(onx?'var(--card)':'transparent')+';color:'+(onx?'var(--ink)':'var(--muted)')+';opacity:'+(onx?1:0.72)},
-      h('span',{style:'width:14px;height:14px;border-radius:4px;border:1.5px solid '+x.c+';background:'+(onx?x.c:'transparent')+';color:var(--card);font-size:var(--fs-10);line-height:12px;text-align:center;font-weight:800'}, onx?'✓':''),
-      h('span',{style:'width:11px;height:3px;border-radius:2px;background:'+x.c}),
-      x.l,
-      h('span',{class:'mono',style:'font-size:var(--fs-105);color:var(--muted)'}, val)); }
+      h('span',{class:'chart-chip-check',style:'width:14px;height:14px;border-radius:4px;border:1.5px solid '+x.c+';background:'+(onx?x.c:'transparent')+';color:var(--card);font-size:var(--fs-10);line-height:12px;text-align:center;font-weight:800'}, onx?'✓':''),
+      h('span',{class:'chart-chip-line',style:'width:11px;height:3px;border-radius:2px;background:'+x.c}),
+      h('span',{class:'chart-chip-label'},x.l),
+      h('span',{class:'mono chart-chip-value',style:'font-size:var(--fs-105);color:var(--muted)'}, val)); }
 
   function full(){
     const techCol=tech.cls==='up'?'var(--strong)':tech.cls==='down'?'var(--weak)':'var(--muted)';
@@ -975,7 +983,7 @@ function priceChart(chart, tech, comparison=null){
     const cP=h('div',{style:'display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px'}, ...IND.filter(x=>x.g==='p'&&has(x.k)).map(chip));
     const subChips=IND.filter(x=>x.g==='s'&&has(x.k)).map(chip);
     const cS=subChips.length?h('div',{style:'display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px'},
-      h('span',{style:'font-size:var(--fs-11);color:var(--muted);align-self:center;margin-right:2px',text:'副圖：'}, ), ...subChips):null;
+      h('span',{class:'chart-subchips-label',style:'font-size:var(--fs-11);color:var(--muted);align-self:center;margin-right:2px',text:'副圖：'}, ), ...subChips):null;
     const visibleDates=(chart.dates||[]).slice(-st.range);
     dateSelect=h('select',{class:'sortbtn','aria-label':'直接選擇圖表日期',onchange:e=>{
       // 原生選單關閉時游標常已停在圖表上；補發的第一次 mousemove 不是使用者要預覽別日。
