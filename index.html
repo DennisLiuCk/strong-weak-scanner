@@ -169,6 +169,17 @@ h3.sub3{margin:0 0 4px;font-size:15px;font-weight:800}
 .pulse-name{min-width:0;font-size:12.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pulse-value{font-size:var(--fs-115);font-weight:700}
 .rank-movers{margin-top:14px;padding-top:13px;border-top:1px solid var(--line2)}
+.rank-movers-hero{display:none}
+.rank-movers-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 8px;align-items:center;min-height:44px;padding:6px 0;list-style:none;cursor:pointer}
+.rank-movers-summary::-webkit-details-marker{display:none}
+.rank-movers-summary:focus-visible{outline:2px solid var(--strong);outline-offset:2px;border-radius:8px}
+.rank-movers-summary-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0}
+.rank-movers-summary-title b{font-size:13px}
+.rank-movers-summary-title span{font-size:var(--fs-105);color:var(--muted);white-space:nowrap}
+.rank-movers-summary-stock{grid-column:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-105);color:var(--ink2)}
+.rank-movers-summary-caret{display:inline-block;grid-column:2;grid-row:1/span 2;color:var(--teal);font-weight:800;transition:transform .16s ease}
+.rank-movers-hero[open] .rank-movers-summary-caret{transform:rotate(90deg)}
+.rank-movers-hero[open] .rank-movers-summary{margin-bottom:7px;border-bottom:1px solid var(--line2)}
 .rank-movers-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
 .rank-movers-head b{font-size:13px}
 .rank-movers-head span{font-size:var(--fs-105);color:var(--muted);white-space:nowrap}
@@ -541,6 +552,8 @@ svg{display:block;overflow:visible}
   :root{--fs-8:10.5px;--fs-9:11px;--fs-95:11px;--fs-10:11.5px;--fs-105:12px;--fs-11:12px;--fs-115:12.5px}
   .command-grid{grid-template-columns:1fr}.command-hero{min-height:0}
   .shortlist-cta-mobile{display:flex;margin-top:12px}
+  .rank-movers-hero{display:block}
+  .rank-movers-side{display:none}
   .command-side>.shortlist-cta{display:none}
   .tier-snapshot{grid-template-columns:1fr}.research-grid{grid-template-columns:1fr}
   .srow{grid-template-columns:34px minmax(150px,1fr) minmax(200px,1fr)}.srow>*:nth-child(4){grid-column:2/-1}
@@ -1209,7 +1222,7 @@ function buildHeroLookup(){
 function rankPosShort(pos){
   return String(pos||'—').replace(/^並列第\s*/,'並列').replace(/^第\s*/,'');
 }
-function buildRankChangeMovers(){
+function buildRankChangeMovers(extraClass,collapsible){
   if(!RANKCHG||RANKCHG.error||!RANKCHG.stocks)return null;
   const movers=Object.entries(RANKCHG.stocks)
     .filter(([id,x])=>x&&x.available&&x.move&&D.byId[id])
@@ -1227,9 +1240,19 @@ function buildRankChangeMovers(){
       h('span',{class:'rank-mover-stock'},h('b',{text:stock.nm}),h('span',{class:'mono',text:stock.id}),h('span',{text:grp(stock.g).short})),
       h('span',{class:'rank-mover-pos'},h('span',{'aria-hidden':'true',text:up?'▲':'▼'}),h('span',{class:'mono',text:pos}),h('span',{class:'rank-mover-dir',text:direction}))));
   });
-  return h('div',{class:'rank-movers','aria-label':'本週排名變化個股入口'},
-    h('div',{class:'rank-movers-head'},h('b',{text:'本週排名變化'}),h('span',{text:RANKCHG.dateA.slice(5).replace('-','/')+' → '+RANKCHG.dateB.slice(5).replace('-','/')})),list,
-    h('p',{class:'note',style:'margin:7px 0 0',text:'依族群內名次變化取前 3；點個股看排名依據與因子拆解。'}));
+  const dates=RANKCHG.dateA.slice(5).replace('-','/')+' → '+RANKCHG.dateB.slice(5).replace('-','/');
+  const note=h('p',{class:'note',style:'margin:7px 0 0',text:'依族群內名次變化取前 3；點個股看排名依據與因子拆解。'});
+  if(collapsible){
+    const [firstId,firstX]=movers[0],firstStock=D.byId[firstId];
+    const firstPos=rankPosShort(firstX.posA)+' → '+rankPosShort(firstX.posB);
+    return h('details',{class:'rank-movers '+extraClass},
+      h('summary',{class:'rank-movers-summary'},
+        h('span',{class:'rank-movers-summary-title'},h('b',{text:'本週排名變化'}),h('span',{text:dates})),
+        h('span',{class:'rank-movers-summary-stock',text:firstStock.nm+' '+firstPos+' 等 '+movers.length+' 檔'}),
+        h('span',{class:'rank-movers-summary-caret','aria-hidden':'true',text:'▸'})),list,note);
+  }
+  return h('div',{class:'rank-movers '+extraClass,'aria-label':'本週排名變化個股入口'},
+    h('div',{class:'rank-movers-head'},h('b',{text:'本週排名變化'}),h('span',{text:dates})),list,note);
 }
 function buildOverview(){
   const o=D.overview,bt={}; D.allStocks.forEach(s=>bt[s.tier]=(bt[s.tier]||0)+1);
@@ -1256,6 +1279,7 @@ function buildOverview(){
       h('p',{class:'command-summary',text:o.summary}),
       buildHeroLookup(),
       mobileShortlist,
+      buildRankChangeMovers('rank-movers-hero',true),
       buildArchiveNavigation(),
       signals,
       h('p',{class:'note',style:'margin:13px 0 0;line-height:1.55',text:o.note}),
@@ -1278,7 +1302,7 @@ function buildOverview(){
     h('div',{class:'card pulse-card'},
       h('div',{class:'pulse-head'},h('b',{text:'動能領先族群'}),h('a',{href:'#grp',text:'看完整比較 →'})),pulse,
       h('p',{class:'note',style:'margin:11px 0 0',text:'依「動能 vs 全體」排序；點族群看明細。'}),
-      buildRankChangeMovers()),
+      buildRankChangeMovers('rank-movers-side')),
     h('a',{class:'card shortlist-cta',href:'#tier-intro'},
       h('div',{},h('b',{text:'今日強弱個股名單'}),h('span',{text:'先看已確認分層，再展開完整八層'})),
       h('span',{'aria-hidden':'true',text:'›'})));
