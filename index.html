@@ -66,6 +66,7 @@ h1{margin:0 0 14px;font-size:40px;line-height:1.15;font-weight:900;letter-spacin
 .kicker{margin:0 0 6px;font-size:12px;font-weight:800;letter-spacing:.16em;color:var(--muted)}
 h2.sec{margin:0 0 6px;font-size:28px;font-weight:800;letter-spacing:.3px}
 .lead{margin:0 0 24px;max-width:70ch;font-size:15px;color:var(--ink2)}
+#tier-intro{scroll-margin-top:20px}
 .sub{margin:0;max-width:70ch;font-size:16px;color:var(--ink2)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
   box-shadow:0 1px 2px rgba(26,23,18,.04),0 14px 30px rgba(26,23,18,.05)}
@@ -1271,7 +1272,7 @@ function buildOverview(){
       h('div',{class:'pulse-head'},h('b',{text:'動能領先族群'}),h('a',{href:'#grp',text:'看完整比較 →'})),pulse,
       h('p',{class:'note',style:'margin:11px 0 0',text:'依「動能 vs 全體」排序；點族群看明細。'}),
       buildRankChangeMovers()),
-    h('a',{class:'card shortlist-cta',href:'#tier-primary-list'},
+    h('a',{class:'card shortlist-cta',href:'#tier-intro'},
       h('div',{},h('b',{text:'今日強弱個股名單'}),h('span',{text:'先看已確認分層，再展開完整八層'})),
       h('span',{'aria-hidden':'true',text:'›'})));
   return [h('div',{class:'command-grid'},hero,side)];
@@ -2179,7 +2180,7 @@ function buildTier(){
   const full=h('details',{class:'tier-full'},
     h('summary',{text:'完整八層、族群篩選與近 5 日變層軌跡'}),fullBody);
   return [h('p',{class:'kicker',text:'個股層'}),h('h2',{class:'sec',text:'今日確認名單 · 先看主要強弱層'}),
-    h('p',{class:'lead',html:`完整追蹤 ${D.allStocks.length} 檔；這裡先呈現相對強勢、蓄勢與弱勢三個主要名單。分層名稱描述族群內相對位置，<b style="color:var(--ink)">不是買賣指示</b>；點任一檔可看完整明細。`
+    h('p',{class:'lead',id:'tier-intro',html:`完整追蹤 ${D.allStocks.length} 檔；這裡先呈現相對強勢、蓄勢與弱勢三個主要名單。分層名稱描述族群內相對位置，<b style="color:var(--ink)">不是買賣指示</b>；點任一檔可看完整明細。`
       +(STRATEGY&&STRATEGY.dwell!=null?`各層停留天數不長（相對強勢中位 <b style="color:var(--ink)">${STRATEGY.dwell.toFixed(0)} 個交易日</b>），名單本身會頻繁變動；穩定度與證據狀態見頁尾<a href="#strategy-status" style="color:var(--teal);font-weight:700">策略狀態</a>。`:'')}),
     snapshot,full];
 }
@@ -2608,9 +2609,12 @@ document.getElementById('diverge').append(...buildDiverge());
 document.getElementById('lens').append(...buildLenses());
 document.getElementById('stocks').append(...buildStocks1c());
 document.getElementById('trust').append(buildStrategyStatus());
-// 主要名單卡片由 JS 生成；直接開 #tier-primary-list 時，瀏覽器在 script 執行前找不到錨點。
+// 名單導覽目標由 JS 生成；直接開這些錨點時，瀏覽器在 script 執行前找不到元素。
 if(location.hash==='#tier-primary-list'){
   requestAnimationFrame(()=>document.getElementById('tier-primary-list')?.scrollIntoView());
+}
+if(location.hash==='#tier-intro'){
+  requestAnimationFrame(()=>document.getElementById('tier-intro')?.scrollIntoView());
 }
 </script>
 </body>

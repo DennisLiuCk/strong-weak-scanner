@@ -86,6 +86,11 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("class:'command-grid'", self.template)
         self.assertIn("text:'進入族群比較 ↓'", self.template)
         self.assertIn("text:'今日強弱個股名單'", self.template)
+        # 桌機首屏空間足夠，入口先落到分段標題與說明；手機仍直達第一張名單卡。
+        self.assertIn("class:'card shortlist-cta',href:'#tier-intro'", self.template)
+        self.assertIn("class:'lead',id:'tier-intro'", self.template)
+        self.assertIn("#tier-intro{scroll-margin-top:20px}", self.template)
+        self.assertIn("if(location.hash==='#tier-intro')", self.template)
 
     def test_single_column_overview_keeps_stock_shortlist_visible(self):
         """手機單欄時，個股名單入口要在首屏主要任務旁，而不是排在動能族群卡之後。"""
@@ -95,7 +100,7 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("class:'card shortlist-cta shortlist-cta-mobile'", overview)
         self.assertLess(overview.index("mobileShortlist,"), overview.index("buildArchiveNavigation()"))
         self.assertIn("text:'看今日強弱個股名單'", overview)
-        self.assertIn("href:'#tier-primary-list'", overview)
+        self.assertIn("class:'card shortlist-cta shortlist-cta-mobile',href:'#tier-primary-list'", overview)
         self.assertIn("if(location.hash==='#tier-primary-list')", self.template)
         self.assertIn("${strong} 強勢 · ${accum} 蓄勢 · ${weak} 弱勢", overview)
         self.assertIn(".shortlist-cta-mobile{display:none}", self.template)
