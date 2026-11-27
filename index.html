@@ -882,6 +882,7 @@ function priceChart(chart, tech, comparison=null){
   const _fv=n=>{ if(n==null)return '—'; const a=Math.abs(n); return a>=1e8?(n/1e8).toFixed(2)+'億':a>=1e4?(n/1e4).toFixed(1)+'萬':String(Math.round(n)); };
   const _fs=n=> n==null?'—':(n>=0?'+':'')+Math.round(n).toLocaleString('en-US');
   const lastNN=a=>{ for(let i=(a||[]).length-1;i>=0;i--) if(a[i]!=null)return {i,v:a[i]}; return {i:-1,v:null}; };
+  const chipText=(k,v)=>v==null?'—':k==='vol'?_fv(v):(k==='foreign'||k==='trust')?_fs(v):v.toFixed(k==='rsi'?1:2);
   const pathD=(arr,X,Y)=>{ let d='',pen=false; (arr||[]).forEach((v,i)=>{ if(v==null){pen=false;return;} d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)+' '; pen=true; }); return d.trim(); };
   const txt=(x,y,s,size,fill,anchor,mono,weight)=>{ const e=sv('text',{x,y,'font-size':size,fill,'text-anchor':anchor||'start'}); if(mono)e.setAttribute('font-family',"'IBM Plex Mono','Noto Sans TC',monospace"); if(weight)e.setAttribute('font-weight',weight); e.textContent=s==null?'':s; return e; };
   const on=k=>st.ind[k] && has(k);
@@ -889,7 +890,7 @@ function priceChart(chart, tech, comparison=null){
   const compactMode=()=>typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(max-width: 680px)').matches;
   const chartPads=()=>compactMode()?{l:4,r:10}:{l:8,r:52};
   const host=h('div',{class:'card history-chart-card','data-history-chart':''});
-  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],renderedCompact=null,dateSelect=null,suppressHoverUntil=0,readoutBeforeControls=false,placeReadout=()=>{};
+  let chartBox=h('div',{}), readout=h('div',{}), chartMeta=null, tap=null, touchUntil=0, compareStatus=null, compareButtons=[],chipValueEls=[],renderedCompact=null,dateSelect=null,suppressHoverUntil=0,readoutBeforeControls=false,placeReadout=()=>{};
 
   function buildSvg(){
     const R=st.range, s=a=>(a||[]).slice(-R);
@@ -948,6 +949,9 @@ function priceChart(chart, tech, comparison=null){
     compareButtons.forEach(({button,peer})=>{button.disabled=!selectedDate||!peer||!peer.available;});
     const active=st.hover==null?st.selected:st.hover;
     const hv=(active!=null&&active>=0&&active<N)?active:null;
+    const series={price:px,ma5,ma20,ma60,rsi,vol,foreign:fore,trust:tr};
+    chipValueEls.forEach(item=>{ const arr=series[item.key]||[], value=hv!=null?arr[hv]:lastNN(arr).v;
+      item.el.textContent=chipText(item.key,value); });
     readout.hidden=hv==null;
     readout.style.display=hv==null?'none':'flex';
     readout.replaceChildren();
@@ -976,14 +980,15 @@ function priceChart(chart, tech, comparison=null){
     if(dateSelect)dateSelect.value=(chart.dates||[]).slice(-st.range)[i]||'';
     drawSvg();placeReadout();}
 
-  function chip(x){ const onx=!!st.ind[x.k], lv=lastNN(arrOf(x.k));
-    const val = x.k==='vol'?_fv(lv.v) : (x.k==='foreign'||x.k==='trust')?_fs(lv.v) : (lv.v==null?'—':lv.v.toFixed(x.k==='rsi'?1:2));
+  function chip(x){ const onx=!!st.ind[x.k];
+    const valueEl=h('span',{class:'mono chart-chip-value',style:'font-size:var(--fs-105);color:var(--muted)'}, '—');
+    chipValueEls.push({key:x.k,el:valueEl});
     const button=h('button',{class:'chart-chip-btn',type:'button','aria-pressed':onx?'true':'false',onclick:()=>{st.ind[x.k]=onx?0:1; full(x.k);},
-      style:'display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:6px 11px;border-radius:9px;cursor:pointer;border:1px solid '+(onx?x.c:'var(--line)')+';background:'+(onx?'var(--card)':'transparent')+';color:'+(onx?'var(--ink)':'var(--muted)')+';opacity:'+(onx?1:0.72)},
+      style:'display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:12px;font-weight:700;padding:6px 11px;border-radius:9px;cursor:pointer;border:1px solid '+(onx?x.c:'var(--line)')+';background:'+(onx?'var(--card)':'transparent')+';color:'+(onx?'var(--ink)':'var(--muted)')+';opacity:'+(onx?1:0.72)},
       h('span',{class:'chart-chip-check',style:'width:14px;height:14px;border-radius:4px;border:1.5px solid '+x.c+';background:'+(onx?x.c:'transparent')+';color:var(--card);font-size:var(--fs-10);line-height:12px;text-align:center;font-weight:800'}, onx?'✓':''),
       h('span',{class:'chart-chip-line',style:'width:11px;height:3px;border-radius:2px;background:'+x.c}),
       h('span',{class:'chart-chip-label'},x.l),
-      h('span',{class:'mono chart-chip-value',style:'font-size:var(--fs-105);color:var(--muted)'}, val));
+      valueEl);
     button.__chartChipKey=x.k;
     return button; }
 
@@ -992,7 +997,7 @@ function priceChart(chart, tech, comparison=null){
     const rangeButtons=RANGES.map(rg=>{
       const button=h('button',{class:'chart-range-btn',type:'button','aria-pressed':st.range===rg[1]?'true':'false',
         onclick:()=>{st.range=rg[1];st.hover=null;st.selected=null;requestedDate=null;full(null,rg[1]);},
-        style:'font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;color:'+(st.range===rg[1]?'var(--card)':'var(--ink2)')+';background:'+(st.range===rg[1]?'var(--ink)':'transparent')}, rg[0]);
+        style:'font-family:inherit;font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;color:'+(st.range===rg[1]?'var(--card)':'var(--ink2)')+';background:'+(st.range===rg[1]?'var(--ink)':'transparent')}, rg[0]);
       button.__chartRange=rg[1];
       return button;
     });
@@ -1002,6 +1007,7 @@ function priceChart(chart, tech, comparison=null){
         h('h3',{class:'sub3',style:'margin:0',text:'股價與均線 · 多指標疊圖'}),
         tech.label?h('span',{style:'font-size:12px;font-weight:700;color:'+techCol,text:tech.label}):null),
       rangeSeg);
+    chipValueEls=[];
     const priceChips=IND.filter(x=>x.g==='p'&&has(x.k)).map(chip);
     const subChips=IND.filter(x=>x.g==='s'&&has(x.k)).map(chip);
     const focusTarget=focusChip==null?null:priceChips.concat(subChips).find(button=>button.__chartChipKey===focusChip);
