@@ -89,7 +89,7 @@ class DashboardUxContractTest(unittest.TestCase):
         # 桌機首屏空間足夠，入口先落到分段標題與說明；手機仍直達第一張名單卡。
         self.assertIn("class:'card shortlist-cta',href:'#tier-intro'", self.template)
         self.assertIn("class:'lead',id:'tier-intro'", self.template)
-        self.assertIn("#tier-intro{scroll-margin-top:20px}", self.template)
+        self.assertIn("#tier-intro{scroll-margin-top:36px}", self.template)
         self.assertIn("if(location.hash==='#tier-intro')", self.template)
 
     def test_single_column_overview_keeps_stock_shortlist_visible(self):
