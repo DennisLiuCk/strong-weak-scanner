@@ -345,6 +345,15 @@ class DashboardUxContractTest(unittest.TestCase):
         for marker in ("'aria-label':'分層篩選族群'", "檔 展開",
                        "onclick:()=>{expanded[k]=true;renderBands();}"):
             self.assertIn(marker, self.template)
+        # 主要名單的「另 N 檔」不能只是說明文字：手機上完整分層 summary 在三張卡之後，
+        # 使用者需要原地一個可鍵盤操作入口，直接展開並落到對應分層。
+        for marker in ("function openTierBand(bandIndex,tierKeys)", "'data-tier-band':bandIndex",
+                       "class:'tier-snapshot-more tier-snapshot-expand'",
+                       "onclick:()=>openTierBand(bandIndex,tierKeys)", "full.open=true",
+                       "renderBands();", "curG='';gsel.value='';", "['真弱','真弱·陷阱']",
+                       "target.focus({preventScroll:true})",
+                       "button.tier-snapshot-more:focus-visible"):
+            self.assertIn(marker, self.template)
         # 檔數不得寫死——用 D.allStocks.length 動態帶入
         self.assertIn("${D.allStocks.length}", self.template)
         self.assertNotIn("把全 121 檔", self.template)
