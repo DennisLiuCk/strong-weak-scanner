@@ -1262,7 +1262,7 @@ function buildRankChangeMovers(extraClass,collapsible){
     list.appendChild(h('button',{type:'button',class:'rank-mover '+(up?'is-up':'is-down'),
       title:'查看 '+stock.nm+' 本週排名變化原因',
       'aria-label':'查看 '+stock.nm+' '+stock.id+' 本週排名變化：'+x.posA+'到'+x.posB,
-      onclick:event=>openStockDetail(id,null,null,event.currentTarget)},
+      onclick:event=>openStockDetail(id,null,null,event.currentTarget,null,'本週排名變化')},
       h('span',{class:'rank-mover-stock'},h('b',{text:stock.nm}),h('span',{class:'mono',text:stock.id}),h('span',{text:grp(stock.g).short})),
       h('span',{class:'rank-mover-pos'},h('span',{'aria-hidden':'true',text:up?'▲':'▼'}),h('span',{class:'mono',text:pos}),h('span',{class:'rank-mover-dir',text:direction}))));
   });
