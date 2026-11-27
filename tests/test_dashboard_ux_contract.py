@@ -552,6 +552,19 @@ class DashboardUxContractTest(unittest.TestCase):
         # 圖表日期可點選後，區間與指標仍是行動版必要控制；不得留在 26–32px 的桌機滑鼠尺寸。
         self.assertIn("class:'chart-range-btn'", self.template)
         self.assertIn("class:'chart-chip-btn'", self.template)
+        # 手機詳情圖卡的指標開關若維持單欄，會把圖表整個擠出 bottom sheet；
+        # 兩欄 compact grid 保留標籤與最新數值，副圖標籤也不佔掉第一個按鈕的位置。
+        for marker in (".chart-chip-btn{display:inline-grid!important",
+                       "width:calc(50% - 4px)",
+                       ".chart-chip-check{grid-row:1/3}",
+                       ".chart-chip-label{grid-column:3",
+                       ".chart-chip-value{grid-column:3",
+                       ".chart-subchips-label{flex:0 0 100%}",
+                       "class:'chart-chip-check'",
+                       "class:'chart-chip-label'",
+                       "class:'mono chart-chip-value'",
+                       "class:'chart-subchips-label'"):
+            self.assertIn(marker, self.template)
 
     def test_desktop_stocknav_stays_available_and_preserves_section(self):
         # 桌機連看同族群個股時，上一檔／下一檔不能在捲入圖表後消失；
@@ -594,7 +607,7 @@ class DashboardUxContractTest(unittest.TestCase):
         # 圖例帶文字標籤與數值,不只靠顏色(1f 起圖例=priceChart 的指標 chip:
         # 色塊+文字標籤+最新值,勾選狀態另以 ✓ 雙編碼)
         # 字級走 --fs-* token(手機斷點統一抬高下限),這裡釘的是「有數值文字」而非某個 px
-        self.assertIn("h('span',{class:'mono',style:'font-size:var(--fs-105);color:var(--muted)'}, val)",
+        self.assertIn("h('span',{class:'mono chart-chip-value',style:'font-size:var(--fs-105);color:var(--muted)'}, val)",
                       self.template)
         self.assertIn("onx?'✓':''", self.template)
 
