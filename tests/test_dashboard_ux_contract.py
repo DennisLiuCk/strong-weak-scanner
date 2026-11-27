@@ -52,7 +52,7 @@ class DashboardUxContractTest(unittest.TestCase):
         # 指定日期快照是首頁可見任務，不再只藏在 utility menu 底部。
         self.assertIn('href="#date-snapshots"', self.template)
         self.assertIn("id:'date-snapshots'", self.template)
-        self.assertIn('mobileShortlist,\n      buildArchiveNavigation(),\n      signals,', self.template)
+        self.assertIn('mobileShortlist,\n      buildRankChangeMovers(\'rank-movers-hero\',true),\n      buildArchiveNavigation(),\n      signals,', self.template)
         self.assertNotIn("document.querySelector('.quicknav').appendChild(buildArchiveNavigation())", self.template)
         self.assertNotIn('href="#tsmc"', self.template)
         self.assertNotIn('<section id="tsmc"', self.template)
@@ -475,7 +475,7 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn('"--rank-change"', self.builder)
 
     def test_overview_rank_movers_link_directly_to_weekly_rank_change(self):
-        fn = self.template[self.template.index("function buildRankChangeMovers()"):
+        fn = self.template[self.template.index("function buildRankChangeMovers(extraClass,collapsible)"):
                            self.template.index("function buildOverview()")]
         overview = self.template[self.template.index("function buildOverview()"):
                                  self.template.index("function buildStrategyStatus()")]
@@ -487,7 +487,14 @@ class DashboardUxContractTest(unittest.TestCase):
         self.assertIn("aria-label", fn)
         self.assertIn("direction=up?'上升':'下滑'", fn)
         self.assertIn("text:'依族群內名次變化取前 3；點個股看排名依據與因子拆解。'", fn)
-        self.assertIn("buildRankChangeMovers())", overview)
+        self.assertIn("buildRankChangeMovers('rank-movers-hero',true)", overview)
+        self.assertIn("buildRankChangeMovers('rank-movers-side')", overview)
+        # 手機首屏先放收合摘要（不干擾指定日期快照位置），桌機保留側欄完整前三名單。
+        self.assertIn("h('details',{class:'rank-movers '+extraClass}", fn)
+        self.assertIn("firstStock.nm+' '+firstPos+' 等 '+movers.length+' 檔'", fn)
+        self.assertIn(".rank-movers-hero{display:none}", self.template)
+        self.assertIn(".rank-movers-hero{display:block}", self.template)
+        self.assertIn(".rank-movers-side{display:none}", self.template)
         # ≤360px 單行寬度不足時，股票資訊與名次變化分成兩行；
         # 不得讓長族群名把股名截到只剩一個字。
         self.assertIn(".rank-mover{grid-template-columns:1fr;gap:2px;align-items:start}", self.template)
