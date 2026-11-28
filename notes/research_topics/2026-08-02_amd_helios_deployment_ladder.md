@@ -180,7 +180,47 @@ reason: retained_amd_arista_lab_validation_scope_and_unresolved_production_wordi
 evidence: sources:S34
 -->
 
+<!-- research_source
+source_id: S35
+role: company_release
+source_kind: document
+publisher: AMD
+title: Microsoft Running Workload Validation with AMD Helios Rackscale Solution
+published_at: 2026-11-23
+captured_at: 2026-11-28
+accepted_at: 2026-11-28
+status: active
+url: https://newsroom.amd.com/news/microsoft-running-workload-validation-amd-helios-rackscale-solution/
+locator: Published日期、圖片說明及正文首兩段；原始HTML 95543 bytes SHA256 995057caa7abe84a7175646fa4f0f8595af22df1f90a412a3fc2a339ddef0016
+limitation: AMD發布且轉述Microsoft，不是Microsoft另行發布的驗收報告；只有秋季收貨與未具名研究實驗室，缺品牌型號、版本化配置、明確收貨日期與驗收範圍，規模部署仍是計畫
+independence_group: amd
+-->
+
+<!-- research_claim
+claim_id: C39
+label: verified
+status: active
+claim: AMD 11/23稿稱Microsoft在秋季收到首台Helios，於研究實驗室進行初期工作負載驗證
+supporting_source_ids: S35
+contrary_source_ids:
+as_of: 2026-11-23
+basis: 正文首段將收貨及初期工作負載明確置於validation testing；後段規模部署使用plans與expected
+boundary: 只確認AMD說法，不計為獨立客戶驗收；收貨不等於驗收完成，亦未滿足T14同品牌配置、場站、日期及驗收範圍的共同條件，不證明Azure正式開放或台廠收入
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-28
+from: triaged
+to: triaged
+reason: added_amd_reported_microsoft_lab_receipt_and_early_validation_without_customer_acceptance_or_thesis_clock_refresh
+evidence: sources:S35
+-->
+
 ## 新手先讀：這篇在講什麼
+
+**11/28 補充：收貨不是驗收，試跑不是正式服務。** AMD 新稿把 Microsoft 的進度寫到秋季收貨及研究實驗室初期驗證；仍缺同一品牌配置、具名場站與驗收結果。這是有用的新細節，但不是另一份客戶獨立確認，也不能把緯穎接成供貨商。[S35][C39]
 
 **11/23 補充：同品牌的不同網路配置，進度不能互借。** AMD 與 Arista 的新白皮書仍在談實驗室網路驗證，與既有 AMD 客戶試機敘述必須並列核對。尚不清楚兩份文件的配置與資訊截點是否一致，不能直接說出貨公告被推翻，也不能把其他配置的進度移過來。[S34][C38]
 
@@ -217,6 +257,7 @@ evidence: sources:S34
 - **可維修性與生命週期控制（Serviceability／lifecycle control）**：設備能否快速定位故障、抽換模組、更新版本、復原並持續管理整個機群的能力。
 - **開始生產（Production）**：製造端已進入生產階段；這比只有設計圖更前進，但不等於產品已送到客戶手上。
 - **實際出貨（Shipment）**：產品真正離開供應端並交付客戶；預告未來會出貨，不等於已發生出貨。
+- **收貨（Accepting delivery）**：設備已被接收；這個用語本身沒有保證客戶完成全部測試或簽署驗收，不能把「收到」翻成「驗收通過」。[S35]
 - **客戶測試與驗證（Validation）**：客戶仍在確認系統能否穩定執行自己的工作；開始測試不等於已通過、採購或部署。
 - **正式上線（Online）**：系統已接通並投入運行；本文來源中的預計上線，不等於截至資料日已上線，也不自動代表已對外商用或已有收入。
 - **部署（Deployment）**：把設備放進實際環境、接好並開始使用的過程；可以是一小批，也可以是後續擴張，必須看日期、範圍與容量。
@@ -292,6 +333,7 @@ evidence: sources:S34
 
 ### 想一想
 
+- 設備已送到實驗室，還缺哪些資料，才能說客戶已驗收、雲端服務已開放？
 - 如果工廠已能生產，但客戶仍在測試，哪一個部署關卡尚未完成？
 - 如果平台方只提供藍圖，誰要把零件做成可出貨的品牌系統，並對整櫃結果負責？
 - 如果一份文件只證明托盤能裝進共同介面，為什麼還不能說整櫃一定承得住、搬得動或進得了機房？
@@ -1675,7 +1717,7 @@ resolution:
 | 各自的時間線 | 已公開到哪一步 | 時間或上限 | 下一個可驗收節點 | 不能混成 |
 | --- | --- | --- | --- | --- |
 | 1. AMD 整體平台 | AMD 10/12 稱交付、部署與工作負載驗證進行中，並列四家初始系統已運行；平台仍屬夥伴品牌系統化路徑 [S12][S26] | 未提供每家場站日期、完整配置及部署容量 | 具名品牌型號、完整配置、整櫃資格、客戶接收與部署容量 | AMD 已出售單一 Helios 成品、所有客戶都已部署或台灣公司已有分配 |
-| 2. Microsoft／Azure | AMD 10/12 稱初始 Helios 系統已安裝並運行 [S26] | 沒有個別場站日期或規模 | 客戶確認、Azure 規格、正式推出與可用區域 | 雲端規格已可使用、已有利用率或收入 |
+| 2. Microsoft／Azure | AMD 11/23 稱秋季已收貨並在研究實驗室執行初期驗證 [S35] | 沒有具名場站、確切收貨日或配置版本 | 客戶獨立確認、同配置驗收、Azure 正式推出與可用區域 | 收貨等於驗收、雲端規格已可使用或已有收入 |
 | 3. OpenAI | AMD 10/12 稱初始 Helios 系統已安裝並運行 [S26] | 原第四季計畫已有供應商進度自述 | 客戶確認、固定配置、個別日期與部署分母 | 已獨立驗收、規模部署或已對外商用 |
 | 4. Meta | AMD 10/12 稱初始 Helios 系統已運行，工作負載驗證仍在進行 [S26] | 沒有公開驗證完成日期 | 品牌配置、客戶確認與驗證結果 | 已通過全部驗證或已有採購量 |
 | 5. Anthropic | 公布未來合作上限與首批部署規劃 [S3] | 最高 2 GW；首個 GW 預計 2027 上半年開始 | 首批實際部署日期、容量與後續擴張 | 2 GW 已全部啟用或 AMD 已認列收入 |

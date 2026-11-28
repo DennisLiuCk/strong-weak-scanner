@@ -9565,12 +9565,13 @@ process.stdout.write(JSON.stringify(results));
             self.assertIn(contract, topic)
         for block, expected in (
             ("research_topic", 1), ("metric_comparison", 0),
-            ("impact", 1), ("monitoring_item", 6),
+            ("impact", 1),
         ):
             self.assertEqual(topic.count(f"<!-- {block}"), expected)
         for block, field, prefix, historical_count in (
             ("research_source", "source_id", "S", 5),
             ("research_claim", "claim_id", "C", 13),
+            ("monitoring_item", "monitor_id", "T", 6),
         ):
             ids = re.findall(r"^" + field + r": (" + prefix + r"\d+)$", topic, re.M)
             self.assertEqual(len(ids), topic.count(f"<!-- {block}"))

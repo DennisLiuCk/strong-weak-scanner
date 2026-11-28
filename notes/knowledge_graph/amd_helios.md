@@ -9,7 +9,7 @@ schema_version: 1
 graph_id: amd-helios
 root_node_id: product:amd-helios
 label: AMD Helios 部署階梯
-summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD自述首批工作負載，Microsoft提供工程程序，Dell具名整合責任；產品出貨、同配置驗收與台廠財務仍分開。
+summary: 以參考設計、品牌系統與配置共同鍵追 Helios；AMD新述Microsoft研究實驗室收貨及初期驗證，Microsoft提供工程程序，Dell具名整合責任；收貨、同配置驗收與台廠財務仍分開。
 article_ids: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER
 status: active
 -->
@@ -40,17 +40,17 @@ view: company
 from_id: company:microsoft
 to_id: product:amd-helios
 relation: tests
-claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C7,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C34,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C35
+claim_refs: MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C7,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C29,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C34,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C35,MI-2026-08-02-AMD-HELIOS-DEPLOYMENT-LADDER#C39
 note_refs:
 evidence_state: verified
 commercial_stage: validation
 materiality: named_product
 exclusivity: multi_source
 exclusivity_scope: Azure AI 基礎設施同時使用外部方案與 purpose-built silicon，不是 Helios 排他採用。
-as_of: 2026-11-17
-review_due: 2026-11-20
+as_of: 2026-11-23
+review_due: 2026-12-05
 status: active
-boundary: AMD初始運行自述與Microsoft工程程序分開；後者仍未公開同配置場站結果，活動文的MI300X GA與HDv2 preview不屬MI455X，不能升為Helios已開放或台廠收入。
+boundary: AMD新述研究實驗室秋季收貨與初期驗證，仍不是Microsoft獨立驗收；缺同品牌配置、具名場站及測試範圍。Microsoft活動文的MI300X GA與HDv2 preview不屬MI455X；不升為Helios正式服務或台廠收入。
 next_trigger: Microsoft 公開同一品牌配置、場站及驗收，並另列 Azure 產品開放狀態與區域。
 -->
 

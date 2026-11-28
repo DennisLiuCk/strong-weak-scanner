@@ -235,6 +235,9 @@ evidence: sources:S27
 
 ### 名詞小字典
 
+- **X3**：群聯在 SC26 介紹的下一代企業級 SSD 控制器名稱；型號公告不等於買方驗收。
+- **PCIe Gen6**：第六代 PCI Express 傳輸介面；介面能力不能代替整個工作流程的測試結果。
+- **pSLC／QLC**：本文 SC26 設計中的兩種快閃儲存層；公司以 pSLC 承擔高耐久快取、QLC 提供較大容量，仍需核對實際配置與工作量。
 - **Pascari**：群聯的企業級SSD產品品牌；不是廣義AI Ecosystem應用分類的同義詞。
 - **KvikIO**：供應用程式讀檔的軟體介面，會決定是否呼叫下一層cuFile。
 - **cuFile**：可使用GDS的讀寫介面，呼叫成功仍可能走相容路徑。
@@ -377,6 +380,74 @@ cuFile 的 nvfs／posix 計數是操作數，不是資料量占比；KvikIO 自�
 未重跑實驗。作者配置是H100、CUDA 13.3、cuFile 1.18、本機NVMe／ext4及PIX拓撲，
 並列IOMMU／ACS關閉；這是受測前提，不是要求讀者關閉隔離功能。T5追同版本原始結果，
 不是由教材證明CMX／STX或任何客戶已驗收。原主命題C5與到期降級維持不變。
+
+## 11/28 新手補充：搬得更快、搬得更少與分配快取，是三個不同問題
+
+**證實的是公告，不是效果。** 群聯 11/17 的 SC26 原稿同時介紹 PCIe Gen6 X3 控制器、computational storage（運算式儲存：把部分資料處理移到 SSD 內），以及 mixed-media storage（混合媒體儲存：在同一控制器下結合 pSLC 快取與 QLC 容量）。原稿另提醒，多項產品或功能仍在開發、上市時間可能變動；不能把展會介紹一概讀成已交付。[S28；C33]
+
+可以把它們想成三種倉庫改善方式：加寬出貨通道、先在倉庫篩掉不需要運送的貨，以及重新分配快取區與大倉庫。**推論上的重點**是：三者應回答不同問題，不能只用同一個峰值速度排名。[C34]
+
+| 改善方向 | 下一份證據應回答什麼？ | 仍不能直接推出什麼？ |
+|---|---|---|
+| 搬得更快：提高傳輸能力 | 固定工作量後，端到端等待、吞吐與功耗是否改善？ | 控制器規格更快，所以整個 AI 工作就更快 |
+| 搬得更少：在 SSD 內先處理 | 輸出結果是否等價？實際搬動的 bytes、處理時間與能耗各改變多少？ | 少搬資料就必然省時，或峰值倍數可套用所有工作 |
+| 分配快取：pSLC 與 QLC 共存 | 快取容量、熱資料比例、寫入放大及故障後重建條件是什麼？ | 同一顆裝置能兼顧快取與容量，所以耐久或可用性已通過驗收 |
+
+**待驗證**的仍是具名買方、產品版本、同一工作量、認證與部署量，以及對應收入或毛利。T2 與 T4 原有的共同條件不變；本文不採公告中的效能倍數或故障案例作為實測結果，也不增加群聯的財務曝險評級。[C7；C34]
+
+讀完可問自己：若新設計讓同一工作少搬很多資料，所需 SSD 數量一定增加嗎？如果瓶頸仍在網路或軟體，換更快控制器能解決多少？接下來應找的是同一次測試的工作量、正確性與原始計數，以及買方驗收文件，而不只是下一張產品規格表。
+
+<!-- research_source
+source_id: S28
+role: company_release
+source_kind: document
+publisher: Phison Electronics
+independence_group: phison-issuer
+title: SC26: Phison Unveils Three Next-Generation Storage Innovations for the New Compute Era
+published_at: 2026-11-17
+captured_at: 2026-11-28
+accepted_at: 2026-11-28
+status: active
+url: https://www.phison.com/sc26-phison-unveils-three-next-generation-storage-innovations-for-the-new-compute-era/
+locator: 官方原站文字擷取之日期、PCIe Gen6、Computational Storage、Mixed-Media Storage 三節及開發中聲明（網頁讀取工具行87–124）；保存擷取文字 SHA256 ff66752151a928233c59768e654cee05692bfba7a710f8e0ff9848d36798a068，此雜湊僅辨識工具文字快照，不是原HTML；直接下載回HTTP403
+limitation: 單一供應商產品公告；多項產品或功能仍開發中。沒有完整可重算的同工作量對照、具名買方驗收、部署分母或產品損益；不採其倍數及示例作為獨立實測，不與同公司法說當成獨立來源群組
+-->
+
+<!-- research_claim
+claim_id: C33
+label: verified
+status: active
+claim: 群聯2026年11月17日SC26官方稿介紹PCIe Gen6 X3控制器、將資料處理移到SSD內的computational storage，以及同一控制器結合pSLC快取和QLC容量的mixed-media storage；原稿同時提醒多項產品或功能仍開發中且上市時間可能改變
+supporting_source_ids: S28
+contrary_source_ids:
+as_of: 2026-11-17
+basis: 逐段讀取原站三個技術小節與開發中聲明；只核實公司宣布的設計方向與文件限制，不把宣傳數字當成效果量
+boundary: 發表架構不等於完成量產交付、買方驗收或可辨識財務貢獻；單一供應商說法不提供獨立驗證，也不推論所有功能都未完成
+verification_needed:
+resolution:
+-->
+
+<!-- research_claim
+claim_id: C34
+label: inference
+status: active
+claim: 評估X3、computational storage與mixed-media storage時，應分開核對傳輸端到端結果、等價輸出下的搬運資料量，以及快取配置與耐久重建條件，不能用單一峰值吞吐或公告倍數替代三種工作契約
+supporting_source_ids: S28,S14,S20,S21,S22,S23
+contrary_source_ids:
+as_of: 2026-11-28
+basis: 依S28三種不同架構目標，接回既有C15效能護照及C18至C22應用主機NAND寫入與耐久帳；新增研究比較問題，不宣稱已執行產品測試
+boundary: 研究中心比較框架而非產業標準、買方qualification或採購預測；T2與T4原AND條件不改，C5及C7證據時鐘與群聯公司線日期及材料性不刷新
+verification_needed:
+resolution:
+-->
+
+<!-- transition
+date: 2026-11-28
+from: triaged
+to: triaged
+reason: separated_sc26_transfer_compute_and_cache_design_questions_without_thesis_or_company_exposure_upgrade
+evidence: sources:S28
+-->
 
 ## 主張與證據帳本
 
